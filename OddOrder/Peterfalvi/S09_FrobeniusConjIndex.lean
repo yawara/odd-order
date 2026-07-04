@@ -293,6 +293,46 @@ theorem hypothesis78_nu_zeta_sub_conj_support [Fintype G] [Invertible (Nat.card 
       (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj).toDadeIsometryData.isDadeMap
   exact hg (hdade.map_eq_zero_of_not_mem_dadeSupport _ g hgnot)
 
+open OddOrder.Peterfalvi.S09.Cert in
+/-- **The `(7.8)` coherent source set equals the Sibley family `S`.**  Both `sourceSet =
+{ζ_i | i ≠ ind1H} = {Ind θ_i | θ_i ≠ 1_K}` and `S = {Ind θ | θ ≠ 1_K}` coincide: `⊆` since
+`θ_i ≠ 1_K` for `i ≠ ind1H`; `⊇` since every `Ind θ` is `Ind θ_j` (`cover`) with `j ≠ ind1H`
+(else `Ind θ = Ind 1_K`, contra `induce_ne_trivialChar_induce`).
+Lets `F.coherence` (an `IsCoherent` over `S`) be transported to the `sourceSet` the (7.9) machinery
+expects. -/
+theorem hypothesis78_sourceSet_eq [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (i : Fin k) (hodd : Odd (Nat.card G))
+    [Fintype ↥(F.L i)] [Invertible (Nat.card ↥(F.L i) : ℂ)]
+    [Invertible (Nat.card ↥((F.H i).subgroupOf (F.L i)) : ℂ)]
+    [((F.H i).subgroupOf (F.L i)).Normal]
+    (hnilp : Group.IsNilpotent ↥((F.H i).subgroupOf (F.L i)))
+    (C : Subgroup ↥(F.L i))
+    (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C) :
+    (F.hypothesis78 i hodd hnilp C hFrob).sourceSet
+      = (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).S := by
+  classical
+  have hθ_ne : ∀ j, j ≠ (F.sibleyPlacedFamily i hodd hnilp C hFrob).ind1H →
+      (F.sibleyPlacedFamily i hodd hnilp C hFrob).θ j ≠ trivialIrreducibleCharacter _ := by
+    intro j hj h
+    refine hj ((F.sibleyPlacedFamily i hodd hnilp C hFrob).inj ?_)
+    simp only [h, (F.sibleyPlacedFamily i hodd hnilp C hFrob).triv]
+  ext φ
+  constructor
+  · rintro ⟨idx, hidx, rfl⟩
+    rw [congrFun (F.hypothesis78_hyp76_zeta_eq i hodd hnilp C hFrob) idx]
+    exact ⟨(F.sibleyPlacedFamily i hodd hnilp C hFrob).θ idx, hθ_ne idx hidx, rfl⟩
+  · rintro ⟨θ', hθ'_ne, rfl⟩
+    obtain ⟨j, hj⟩ := (F.sibleyPlacedFamily i hodd hnilp C hFrob).cover θ'
+    have hj' : ClassFunction.induce ((F.H i).subgroupOf (F.L i))
+        ((F.sibleyPlacedFamily i hodd hnilp C hFrob).θ j : ClassFunction _ ℂ)
+      = ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ' : ClassFunction _ ℂ) := hj
+    refine ⟨j, ?_, ?_⟩
+    · intro hjind
+      apply induce_ne_trivialChar_induce ((F.H i).subgroupOf (F.L i)) θ' hθ'_ne
+      rw [← hj', show j = (F.sibleyPlacedFamily i hodd hnilp C hFrob).ind1H from hjind,
+        (F.sibleyPlacedFamily i hodd hnilp C hFrob).triv]
+    · rw [congrFun (F.hypothesis78_hyp76_zeta_eq i hodd hnilp C hFrob) j]; exact hj'
+
 end FrobeniusFamily
 
 end OddOrder.Peterfalvi.S09
