@@ -3748,6 +3748,30 @@ theorem Hypothesis.exists_coherentImage_SHC [Finite G] {M : Subgroup G}
   · -- cardinality: injective on `s`
     exact Finset.card_image_of_injOn hinjOn
 
+open scoped Classical FiniteInduce in
+/-- **`S(HC) = S₁` is orthonormal** (Peterfalvi (11.8), the `S₁` side of the (11.8.6) union).
+Every member of `S(HC)` is an irreducible character of `M` (`SHCSet` filters `inducedFamily` by
+`IsIrreducibleCharacter`), so `⟨φ, ψ⟩ = [φ = ψ]` by `irr_cf_inner`.  This is the orthonormal-`X`
+input the (6.8.1) union glue `exists_integralCharacterMap_glue_of_orthonormal` takes for `S₁` in the
+(11.8.6) τ₂ union (`coherent_Sset_of_column_identities`). -/
+theorem Hypothesis.SHCSet_orthonormal [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    {φ ψ : ClassFunction ↥M ℂ} (hφ : φ ∈ hyp.SHCSet) (hψ : ψ ∈ hyp.SHCSet) :
+    ClassFunction.inner φ ψ = if φ = ψ then (1 : ℂ) else 0 :=
+  irr_cf_inner (mem_irreducibleCharacters.mpr hφ.2.1) (mem_irreducibleCharacters.mpr hψ.2.1)
+
+open scoped FiniteInduce in
+/-- **`S(HC) ⊥ (S − S(HC))`** (the source-orthogonality `hsrc_ortho` input for the (11.8.6) union):
+`S(HC)` and `S₂ = S(C) − S(HC)` are disjoint subsets of `S = inducedFamily M`, so a member of each
+is a distinct pair of `inducedFamily` characters, orthogonal by `inducedFamily_pairwiseOrthogonal`.
+This is the set-level `X ⊥ Y` the (6.8.1) union glue `exists_integralCharacterMap_glue_of_orthonormal`
+takes (with `X = S(HC)`, `Y = S₂`). -/
+theorem Hypothesis.SHCSet_inner_diff_eq_zero [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    {x y : ClassFunction ↥M ℂ} (hx : x ∈ hyp.SHCSet) (hy : y ∈ hyp.Sset \ hyp.SHCSet) :
+    ClassFunction.inner x y = 0 := by
+  haveI := hyp.finiteG
+  have hne : x ≠ y := fun h => hy.2 (h ▸ hx)
+  exact inducedFamily_pairwiseOrthogonal hx.1 hy.1 hne
+
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.1), `δ = 1`** (§9 count, named obligation).  The (10.3) column sign `δ`
 equals `1`.  `(U/C) ⋊ W₁` is a Frobenius group with abelian kernel `U/C`, so `u = |U/C| ≡ 1 (mod q)`;
