@@ -68,6 +68,13 @@ noncomputable scoped instance natCardInvC [Finite G] (H : Subgroup G) :
     Invertible (Nat.card H : ℂ) :=
   invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
 
+noncomputable scoped instance ambientFintype [Finite G] : Fintype G :=
+  Fintype.ofFinite _
+
+noncomputable scoped instance ambientNatCardInvC [Finite G] :
+    Invertible (Nat.card G : ℂ) :=
+  invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+
 end FiniteInduce
 
 /-! ## (13.1): the `S,T` hypothesis -/
@@ -202,6 +209,30 @@ structure Hypothesis where
   `Sdata.W2 = K*` (`typePData_of_kappaHall_hallComplement_W2`); discharges `card_P_eq` and hence
   `basic_structure_gated.P_order` (issue 3001/4014). -/
   Sdata_W2_eq : Sdata.W2 = W2
+  /- ### Grid property fields (issue 3002)
+
+  The (3.2)/(3.3)/(3.4) character-theoretic content of the Dade grid carriers `tau3`/`omega`,
+  which the §15 norm cascade ((13.5)–(13.10)) consumes.  All are supplied at construction from
+  the honest spine grid (`Section16CharacterData.omegaS`/`tau3W` in `FeitThompson.lean`):
+  ω-orthonormality via `S05.TICyclicHypothesis.omega_inner`, the τ₃ facts via the (3.2)
+  σ-isometry package (`S05.TICyclicHypothesis.sigmaIntegral_*`). -/
+  /-- **Peterfalvi (3.2), isometry part**: `τ₃` preserves the class-function inner product. -/
+  tau3_isometry : OddOrder.Peterfalvi.S07.IsIntegralIsometry tau3
+  /-- **Peterfalvi (3.2)**: `τ₃` sends the trivial character to the trivial character. -/
+  tau3_trivial : tau3 (trivialClassFunction ↥W) = trivialClassFunction G
+  /-- **Peterfalvi (3.2.c)**: on the regular set `W ∖ (W₁ ∪ W₂)` the map `τ₃` is the
+  identity: `(α^{τ₃})(w) = α(w)` for regular `w`. -/
+  tau3_apply_of_regular : ∀ (α : ClassFunction ↥W ℂ) (w : G) (hwW : w ∈ W),
+    w ∉ (W1 : Set G) ∪ (W2 : Set G) → tau3 α w = α ⟨w, hwW⟩
+  /-- **Peterfalvi (3.2)**: `τ₃` sends virtual characters to virtual characters. -/
+  tau3_mem_ZIrr : ∀ z ∈ ZIrr ↥W, tau3 z ∈ ZIrr G
+  /-- **Peterfalvi (3.3)/(3.4)**: the `ω`-grid is orthonormal. -/
+  omega_orthonormal : ∀ (i k : Fin q) (j l : Fin p),
+    ClassFunction.inner (omega i j) (omega k l) = if i = k ∧ j = l then 1 else 0
+  /-- The `ω_{ij}` are linear characters: `ω_{ij}(1) = 1`. -/
+  omega_apply_one : ∀ (i : Fin q) (j : Fin p), omega i j 1 = 1
+  /-- Each `ω_{ij}` is a virtual character (in fact an irreducible character of `W`). -/
+  omega_mem_ZIrr : ∀ (i : Fin q) (j : Fin p), omega i j ∈ ZIrr ↥W
 
 namespace Hypothesis
 
@@ -1265,6 +1296,91 @@ theorem global_character_bound [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd 
     ∃ data : NormCascadeData hyp, data.global_cover ∧ data.global_norm_lower := by
   sorry
 
+/-! ### The (13.10) atoms
+
+The (13.6)–(13.9) estimates are stated for shared rational atoms: `slam`/`seta` are the `G₀`
+squared-norm sums of `λ^{τ₁}`/`η₁₀` (rational by the Galois integrality
+`OddOrder.Algebra.exists_nat_sum_normSq_of_mem_ZIrr_of_cyclicClosed`), and `g0`/`HS` are counting
+ratios.  Materializing them as definitions lets the four estimates be stated (and attacked) as
+independent producers while `analyticInequalityEstimates` assembles them `sorry`-free. -/
+
+/-- The generic set `G₀` of (13.9) as a `Finset`. -/
+noncomputable def Hypothesis.G0Finset [Finite G] (hyp : Hypothesis (G := G)) : Finset G :=
+  (Set.toFinite hyp.G0).toFinset
+
+open scoped Classical in
+/-- **The squared-norm sum `Σ_{x∈A}‖χ(x)‖²` as a rational number** — defined as the natural
+number it equals when the Galois-integrality applies (`χ ∈ ℤ[Irr]`, `A` cyclic-closed:
+`exists_nat_sum_normSq_of_mem_ZIrr_of_cyclicClosed`), and junk `0` otherwise.  The (13.10) atoms
+`slam`/`seta` are `normSqSumQ G₀ χ / |G|`. -/
+noncomputable def normSqSumQ {H : Type*} [Group H] (A : Finset H) (χ : ClassFunction H ℂ) : ℚ :=
+  if h : ∃ n : ℕ, (n : ℝ) = ∑ x ∈ A, ‖χ x‖ ^ 2 then ((Classical.choose h : ℕ) : ℚ) else 0
+
+/-- The defining property of `normSqSumQ` on its good domain. -/
+theorem normSqSumQ_spec {H : Type*} [Group H] {A : Finset H} {χ : ClassFunction H ℂ}
+    (h : ∃ n : ℕ, (n : ℝ) = ∑ x ∈ A, ‖χ x‖ ^ 2) :
+    ((normSqSumQ A χ : ℚ) : ℝ) = ∑ x ∈ A, ‖χ x‖ ^ 2 := by
+  rw [normSqSumQ, dif_pos h]
+  exact_mod_cast Classical.choose_spec h
+
+/-- The distinguished `η₁₀ = τ₃(ω₁₀)` of the (13.7)/(13.9) estimates. -/
+noncomputable def Hypothesis.eta10 (hyp : Hypothesis (G := G)) : ClassFunction G ℂ :=
+  hyp.eta ⟨1, hyp.q_prime.one_lt⟩ ⟨0, hyp.p_prime.pos⟩
+
+/-! ### The four (13.6)–(13.9) estimate producers
+
+Each is a *faithful* statement of one textbook estimate in terms of the shared atoms; together
+they assemble into `analyticInequalityEstimates` `sorry`-free.  Remaining gates, per producer:
+
+* `analyticEstimate_lambda` (13.6): the (13.3) character `λ` (the `chars` fields are bare —
+  `character_degree_analysis` is the upstream `sorry`) + the (13.5) ρ-machinery
+  (`H_sharp_hypothesis76`, proven) + the `u`-bound `2u ≤ |P|−1` (issue 9000);
+* `analyticEstimate_eta` (13.7)+(13.8): the T-side (13.5) machinery + the carried grid
+  properties (`tau3_isometry`/`omega_orthonormal`, issue 3002 — now threaded);
+* `analyticCounting_disjointCover` (13.9.a): pure group-theoretic counting of the disjoint
+  cover `G = {1} ⊔ G₀ ⊔ (H#)^G ⊔ (Q#)^G` (TI-sets with normalizers `S`/`T`) + the (13.4)
+  counting values;
+* `analyticEstimate_galois` (13.9.b): the per-cyclic-class Galois bound
+  (`sum_normSq_ge_ncard_of_isCharacter_of_cyclicClosed`) + the (13.9) nonvanishing dichotomy
+  (`λ^{τ₁}`, `η₁₀` do not vanish simultaneously on `G₀`). -/
+
+/-- **Peterfalvi (13.6) + Parseval, atom form**: `1 ≥ 1/|G| + slam + 1 − uq/(cp^q)`. -/
+theorem analyticEstimate_lambda [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (chars : CharacterDegreeData hyp) :
+    (1 : ℚ) ≥ 1 / (Nat.card G : ℚ)
+        + normSqSumQ hyp.G0Finset (chars.tau1S chars.lambda) / (Nat.card G : ℚ) + 1
+        - (hyp.u : ℚ) * (hyp.q : ℚ) / ((hyp.c : ℚ) * (hyp.p : ℚ) ^ hyp.q) := by
+  sorry
+
+/-- **Peterfalvi (13.7)+(13.8) for `T` (`D = 1`), atom form**:
+`1 ≥ 1/|G| + seta + HS + TT` with `TT` the (13.4) counting value. -/
+theorem analyticEstimate_eta [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    (1 : ℚ) ≥ 1 / (Nat.card G : ℚ)
+        + normSqSumQ hyp.G0Finset hyp.eta10 / (Nat.card G : ℚ)
+        + ((Nat.card hyp.H - 1 : ℕ) : ℚ) / (Nat.card hyp.S : ℚ)
+        + (1 / (hyp.p : ℚ) - 1 / ((hyp.p : ℚ) * ((hyp.q : ℚ) - 1))
+          + 1 / ((hyp.p : ℚ) * ((hyp.q : ℚ) - 1) * (hyp.q : ℚ) ^ hyp.p)) := by
+  sorry
+
+/-- **Peterfalvi (13.9.a), atom form**: the disjoint-cover counting
+`1 = 1/|G| + |G₀|/|G| + |H#|/|S| + |Q#|/|T|` with `|Q#|/|T|` collapsed to its (13.4) value
+`(q−1)/(pq^p)`. -/
+theorem analyticCounting_disjointCover [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    (1 : ℚ) = 1 / (Nat.card G : ℚ) + (hyp.G0Finset.card : ℚ) / (Nat.card G : ℚ)
+        + ((Nat.card hyp.H - 1 : ℕ) : ℚ) / (Nat.card hyp.S : ℚ)
+        + ((hyp.q : ℚ) - 1) / ((hyp.p : ℚ) * (hyp.q : ℚ) ^ hyp.p) := by
+  sorry
+
+/-- **Peterfalvi (13.9.b), atom form**: `|G₀|/|G| ≤ slam + seta`. -/
+theorem analyticEstimate_galois [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (chars : CharacterDegreeData hyp) :
+    (hyp.G0Finset.card : ℚ) / (Nat.card G : ℚ)
+      ≤ normSqSumQ hyp.G0Finset (chars.tau1S chars.lambda) / (Nat.card G : ℚ)
+        + normSqSumQ hyp.G0Finset hyp.eta10 / (Nat.card G : ℚ) := by
+  sorry
+
 /-- **Faithful (13.6)–(13.9) norm-estimate inputs to Peterfalvi (13.10)**.
 
 The four estimates are the genuine character-theoretic / counting outputs of the norm cascade,
@@ -1279,11 +1395,9 @@ stated for the real atoms `slam = (1/|G|)·Σ_{G₀}‖λ^{τ₁}‖²`, `seta =
 * `h139b` — **(13.9.b)**: the Galois-integrality bound `|G₀|/|G| ≤ slam + seta`
   (`sum_ge_card_of_one_le_prod`).
 
-The character-theoretic content of `h1`/`h2`/`h139b` bottoms out at the grid `τ`-isometry /
-`ω`-orthonormality (the bare `omega`/`tau3` fields, **issue 3002**) and the (13.2.c) `u`-bound
-`2u ≤ |P| − 1` (**issue 9000**); it is isolated here as the single faithful producer that the
-(13.10) analytic inequality consumes.  The pure arithmetic that turns the four estimates into the
-`u/c` bound is the `sorry`-free `analytic_inequality_arith`. -/
+Assembled `sorry`-free from the four named producers above (which carry the residual gates —
+see their header).  The pure arithmetic that turns the four estimates into the `u/c` bound is
+the `sorry`-free `analytic_inequality_arith`. -/
 theorem analyticInequalityEstimates [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     ∃ slam seta g0 HS : ℚ,
@@ -1295,7 +1409,15 @@ theorem analyticInequalityEstimates [Finite G] (_hG : OddOrder.BG.IsMinimalSimpl
         (1 : ℚ) = 1 / (Nat.card G : ℚ) + g0 + HS
           + ((hyp.q : ℚ) - 1) / ((hyp.p : ℚ) * (hyp.q : ℚ) ^ hyp.p) ∧
         g0 ≤ slam + seta := by
-  sorry
+  obtain ⟨chars, -, -, -⟩ := character_degree_analysis _hG hyp
+  exact ⟨normSqSumQ hyp.G0Finset (chars.tau1S chars.lambda) / (Nat.card G : ℚ),
+    normSqSumQ hyp.G0Finset hyp.eta10 / (Nat.card G : ℚ),
+    (hyp.G0Finset.card : ℚ) / (Nat.card G : ℚ),
+    ((Nat.card hyp.H - 1 : ℕ) : ℚ) / (Nat.card hyp.S : ℚ),
+    analyticEstimate_lambda _hG hyp chars,
+    analyticEstimate_eta _hG hyp,
+    analyticCounting_disjointCover _hG hyp,
+    analyticEstimate_galois _hG hyp chars⟩
 
 /-- **AM–GM via `log`** (analytic core of [Is] Lemma 3.14): for positive reals whose product is
 `≥ 1`, the sum is at least the count.  This powers Peterfalvi (13.9.b): for a cyclic-equivalence

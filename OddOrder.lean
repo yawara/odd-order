@@ -58,6 +58,7 @@ import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
 import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Inertia
 import OddOrder.GroupTheory.RepresentationTheory.InertiaAbelianQuotient
+import OddOrder.GroupTheory.RepresentationTheory.InducedDegreeSum
 import OddOrder.GroupTheory.RepresentationTheory.InducedInvariantConstituent
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
@@ -88,6 +89,7 @@ import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 import OddOrder.GroupTheory.SCN
 import OddOrder.GroupTheory.SemiDihedral
 import OddOrder.GroupTheory.TISubset
+import OddOrder.GroupTheory.TISubsetCounting
 import OddOrder.GroupTheory.ZGroup
 import OddOrder.Mathlib.SchurZassenhausConj
 import OddOrder.Mathlib.SemidirectProduct

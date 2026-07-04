@@ -136,6 +136,15 @@
 > upstream cite に差し替える編集は逸脱としない (条件: signature 不変 + sorry/axiom regression なし
 > + self-flag)。**statement 改変は依然 out-of-scope** (要 hub flag)。実例 = commit 94a34018 の
 > S10 de-gate (B4 full-Theorem-B → `typeP_hall_small_subgroup_cyclic_tau2`)。
+> **carve-out (3002 供給編集権, ユーザー裁定 2026-07-05 — 監視 tick で明文化)**: 2026-07-05 hub 裁定
+> (9009 選択肢 2 = b への `FeitThompson.lean` `Section16Inputs`/constructor block 一時編集権) を
+> **「issue 3002 供給 chain に必要な lane-a 所有ファイルへの additive helper 追加」まで拡張**する。
+> 実例 = b の `S05_TICyclic.lean` `omega_inner` (+11、既存 proven `omega_inner_self`/`omega_inner_ne`
+> の Kronecker 形合成、`omegaS_inner` 供給用、issue 3002 で self-flag 済) — 本 tick でユーザー受理。
+> 条件: (i) 純 additive (既存宣言の statement/proof 改変は従来どおり逸脱)、(ii) proven (sorry 追加なし)、
+> (iii) 用途が 3002/9009 供給 chain、(iv) issue/notes で self-flag。**3002 供給完了で失効**
+> (以後の b の S05 等 lane-a ファイル編集は通常どおり逸脱)。
+
 1. 各レーンの未マージ確認: `git log --oneline main..<branch>`。
    **全レーン 0 なら「変化なし」1行報告で即終了**（build を走らせない）。
 1.5. **レーン範囲逸脱チェック（ユーザー方針 2026-06-22, 永続）**: 未マージがあるレーンについて、
@@ -287,6 +296,19 @@
 
 ## 現状メモ
 
+- **2026-07-05 — 監視再開 (ユーザー指示「各レーンを監視します」) + tick 合流 a/b/c 全レーン + b S05 裁定 (供給編集権明文化)**:
+  cron 死亡確認 (CronList 空) → 初回 tick で a=2 / b=3 / c=1 commits を合流。**a** = Pf 11.8.1
+  `charParam_d_modEq_one` 実証明 (d≡1 mod q 閉、S12_Section9Counts 新 leaf 分離、sorry 115→114)。
+  **c** = shared 9010 `InducedDegreeSum` (sorry-free、claim 携行; root closure 外 → 手順 3b で
+  OddOrder.lean に import 追記)。**b** = 3002 grid threading 両半分 (7 property fields 供給込み
+  sorry ゼロ、2026-07-05 裁定選択肢 2 の実施) + (13.10) atom 4 producer 分解 (sorry 114→117、
+  +4 は全て新 decl scaffold で ALLOW)。**b の S05_TICyclic `omega_inner` (+11) を step 1.5 逸脱として
+  保留 → ユーザー裁定 = 受理 + 3002 供給編集権として明文化** (上記 carve-out ブロック参照、3002 供給
+  完了で失効)。処理順は a→c 先行合流 → b 裁定後合流 (2026-07-04 夜 tick と同型)。検証: full build
+  green 3918/3919/3919 jobs (174.5s / 5.5s 増分 / 289.8s)、AxiomsCheck OK、新 axiom なし。push は
+  a+c 分で**前セッション滞留 21 commits も解消** (`50315e70..1a99f4f4`)、b+docs 分は本 commit 後。
+  ⚠ 教訓: tick 処理中に b の tip が 2→3 commits に進行 (lane セッション稼働中) — merge 直前の range
+  再確認 (2026-07-04 教訓) が実際に効いた。
 - **2026-07-04 (朝) — tick: b の S12→S10 relocation を STOP→ユーザー裁定受理 + 大 drift 検出 (cron 4db07909 再作成)**:
   b が lane-a authored の `typePData_V_ti`(Pf 4.6.b)/`typePData_typePV_not_mem_derived`(Pf 10.5) を
   **S12_Core(lane a)→S10 へ upstream relocation** (b の type-P Dade engine `typePA0_isConj` が cite 用、
