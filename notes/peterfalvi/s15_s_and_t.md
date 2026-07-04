@@ -10,6 +10,21 @@
 
 ## ✅ LIVE STATUS (2026-07-05 後半, lane **b** — (13.10) 4 producer 全 discharge、residual = 教科書番号 5 本)
 
+### cont.³ (07-05 loop it.14-19): λ-package 実 assembly + 直交性 real 化、gate-map 確定
+
+- **`exists_caseB_data_lambda` 実 assembly** (`0dc592c0`): atom 3 本 (exists_lambda_index /
+  lambda_alphaFun_inner_zero / exists_lambda_alphaFun_one_qb) — proven の H_sharp_point_formula
+  が c̄/‖ζ‖² = 1 で collapse。
+- **orbit 直交性 + inner-zero 実証明** (`1c756d7a`/`f9a97bdf`): lambda_alphaFun_inner_zero は
+  **S-level shortcut** (λ は K 外で消える → filter-和を全和に延長 → distinct-fibre induced 直交
+  `inner_induce_eq_zero_of_not_conj`) で K-side 迂回して完全 real。restrict-分解抽出 2 本も追加。
+- **確定 gate-map (両 package 残 4 atom)**: `exists_lambda_index` ((13.3): λ = ζ_{i₁}、c=1、
+  middle 直交 — S-coherence) / `eta10_cCoeff_orthogonal` ((13.3.c)+(5.3.b): η ⊥ S^{τ₁}) /
+  **(1.10)-合同 2 本 → issue 2033** (ω の W₁×W₂ 因子分解 field 未 threading が真の gate;
+  α(1) = η₁₀(x) on W₂# までは real 到達可能)。
+- **次の ungated 実仕事**: T-side (13.8) package 用の ρ-machinery mirror
+  (Q_sharp_isTISubset proven → Q_sharp_dadeHypothesis → hypothesis76 mirror)。
+
 ### cont.² (07-05 loop it.5-13): (13.5) 整数性 unit 完遂 — (13.7) package 実 assembly、残 grid-atom 2 本
 
 H-side 整数性 unit を完遂 (`d24c7b9c`〜`d1be0c6e`、全て実証明):
