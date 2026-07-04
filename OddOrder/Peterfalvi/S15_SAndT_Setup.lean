@@ -2584,7 +2584,14 @@ Assembly target (WIP): the concrete correction `α = H_sharp_alphaFun` with the 
 (`sum_filter_erase_one_normSq_eq`), the (13.5.c) inflation (`H_sharp_alphaFun_inflation`),
 `α(1) ≠ 0` (`eta10_alphaCF_one_ne_zero`) forcing `n ≥ 1`, and `H` abelian
 (`H_mulCommutative` + `apply_one_eq_one_of_isMulCommutative`) forcing `d² = 1` at `n = 1`.
-The remaining glue is `Fintype`/`Decidable` instance canonicalization across the sum shapes. -/
+The remaining glue is `Fintype`/`Decidable` instance canonicalization across the sum shapes —
+**decided route (07-05 loop it.12)**: parameterize `sum_filter_erase_one_normSq_eq`,
+`sum_apply_erase_one_filter_subgroupOf`, and `H_sharp_alphaFun_inflation` over an explicit
+`F : Finset ↥S` with a membership characterization `hF : ∀ x, x ∈ F ↔ (↑x ∈ K ∧ x ≠ 1)`
+(instance-free interfaces; each proof converts `F` to its local spelling by `Finset.ext hF`
+within its own single elaboration context), then instantiate all three with one assembly-side
+`F`.  Direct `rw`-joins across the lemmas' baked spellings fail on invisible
+`Fintype`/`DecidablePred` instance differences even under shared `open scoped` context. -/
 theorem exists_caseB_data_eta10 [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     ∃ (α : G → ℂ) (d n s : ℕ),
