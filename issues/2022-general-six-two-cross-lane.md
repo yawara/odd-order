@@ -341,3 +341,12 @@ coherent_S_of_coherent_SH0C。(11.6) 消費側の再点検 or (5.7) 配線が次
   次: S08_Theorem62_63_Standalone の `six_three_of_six_two_oracle` を
   (L,K,M,H,H₁) = (M,M',⊥,HC,H₀C)-trace で実体化 (hbound=(9.6)+(11.1), h56=dichotomy)。
   commit ca5f866b。
+
+## 2026-07-05 lane-a (loop 23-25): **(11.3) 閉了** — S13_MaximalIII_IV bare sorry 0
+
+- 6.3-route 完成: card_H0C/H0C_relIndex_HC/p_q_distinct_odd_primes/HC_isNilpotent
+  → six_three_of_six_two_oracle 実体化 (h56 = exists_source_of_coherence_dichotomy)。
+- §11 チェーン (11.3)/(11.4)/(11.5)/(11.6)/(5.7)-instance 全て S13 層実証明。
+  残 upstream named: sixTwoDecompositionData (μ-column) / no_typeV_maximal (10.10) /
+  S12 producer 層。S13 内残 = (11.7) H₀=1 (symplectic) + (11.8) 系。
+- commits 53e4e59f / f91534f3 / (this)。
