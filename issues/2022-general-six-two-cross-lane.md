@@ -188,3 +188,25 @@ axiom-clean, commits 51d1d54f / 10a7e8f4 / 32c7ece4 / 82d570f3):
 
 作業順 (上流優先): 2 の irreducible-member 分枝 → 3 routine pins → 1 anchor → 2 の μ-column
 (最深, S12 grid 併用) → 4 pin + (11.3)/(11.4) 閉じ。
+
+## 2026-07-05 lane-a (loop 2): hdatum の irr-irr 対角を一般 discharge — 残 = μ-column pair のみ
+
+commit 54bf51db (S08_SixTwoGeneral 追記, sorry-free):
+`inducedKernelFamily_memberDatum_of_irreducible` (member D + coupling) /
+`inducedKernelFamily_breakDa_of_irreducible` (break Da, tau1=τ 定義的) /
+`inducedKernelFamily_memberDatum_orthogonal_breakDa_of_irr_irr` (両者の直交性 = hdatum ∃D 節
+の irr×irr 完全 discharge) + `exists_anchor_of_linear_of_inertia_eq` (hanchor ← inertia 条件)
++ `inducedKernelFamily_nonempty_of_commutator_ne_top` (hSBne)。
+
+**S13 の hdatum 残 obligation (更新)**:
+- break = μ-column の Da (ψaux = a·χ₁): grid 供給 (caseB の columnDecompositionTau 相当を
+  §11 grid で)。
+- member = μ-column の D (ψ=0, tau1 = hS₁coh.extension): **(5.8)-型 uniqueness が本丸**
+  (任意 coherent extension で μⱼ ↦ ±Σωᵢₖ 形; S12 grid + (11.8.6) 論法)。
+- 直交性 (irr×col, col×irr, col×col): grid の R(μ) family と Dade R(χ) family の
+  imageSet-level 直交。
+- 注: helpers は imageFamily を**等式で expose** (subtype 第2成分) — S13 は rewrite で
+  接続する (obtain 分解で fvar 化させると whnf 爆発、直接 projection + .2.1/.2.2 を使う)。
+
+hanchor の §11 discharge 素材: W₁ の M'/A' linear char への作用が非自明
+(inertia θ = M' なる linear θ) — (8.4.d) W₁ fixed-point-free on (HC)/M'' 系から。
