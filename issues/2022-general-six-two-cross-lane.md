@@ -317,3 +317,10 @@ coherent_S_of_coherent_SH0C。(11.6) 消費側の再点検 or (5.7) 配線が次
   (9.3) 転写 → O_{q'} ≤ C_H(U) → R=O_{p'}(H) 定義 → M'' ≤ O_p⁅R,R⁆ ⊔ U' →
   R perfect → R=⊥ → IsPGroup p H。commits ef7d40d5/e3d4707b/8e302745/(this)。
 - core_structure 残 = H₀ = H' conjunct のみ (BG 1.6(d) + (11.5))。
+
+## 2026-07-05 lane-a (loop 20): **(11.6) 完全閉了** — core_structure sorry-free
+
+- H₀ = H' 閉: K₁=⁅H,M'⁆ bound + trap + H̄ 上 BG 1.6(d)
+  (fixedPoints ⊓ actionCommutator = ⊥)。4 clause 全実証明。
+- 次 (文書順): (11.7) H_elementaryAbelian (|H|=p^q, H₀=1)。
+  quotient_order |H| = p^q·|H₀| + (11.6) H₀=H' + p-群機構が材料。
