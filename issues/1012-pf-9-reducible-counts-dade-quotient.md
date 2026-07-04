@@ -2087,3 +2087,24 @@ signature 正なら sorried-cite で wiring、genuine local 論証が要るな�
   `theoremA_maximal_structure` cite を sorry-free な `typeP_auxiliary_structure`
   (`S15_MF.lean:1706`) に差替** — BG sorried 依存を 1 本削減できる (swap 後、
   `theoremA_maximal_structure` は唯一の cross-lane caller を失い dead で削除可)。
+
+## 2026-07-04 update (lane-a) — mkSection11CharacterData BREAKTHROUGH connects degree side
+
+**新 infra (S12, committed)**: `Hypothesis.mkSection11CharacterData` — S12.Hypothesis + data + chief →
+`Section11CharacterData`。char families derived、genuine field = u=|Ū| (rfl pinned)、
+tau/H0CprimeSupport/quotientSemidirectFrobenius は degree-irrelevant (placeholder、count/degree で不使用;
+(9.11) coherence だけが使う)。⟹ **§9 degree/count 機構が S12.Hypothesis 上で reachable**。
+`forall_sOf_H0Cprime_degree_qu_caseB` (committed) が `clifford_dichotomy` + `caseB_degree_qu` compose を validate。
+
+**⟹ (9.9.a) degree qu は Hypothesis 上で得られる**。残 count crux は本 issue の B2 assembly:
+- **次手 = induceHU injectivity-on-reducibles** (上記 cont.¹⁷ の crux): 「reducible-inducing χ̄ は W̄₁-stable
+  ⟹ induceHU InjOn reducible subset」。§6/Clifford stability + Pf (9.5)/(9.9) orbit 構造。B1
+  (`chiefFactorQuotientHypothesis`) + B2 commute (`induce_compHom_subgroupMap_mk'`) は landed ゆえ、
+  この injectivity + bijection assembly が |S(HC)|=n (card_SHCSet_filter_eq_charParam_n) への残路。
+- **δ=1 側 (charParam_d_modEq_one)**: d=|Ū| (μ_j degree qu / w1 = u、上記 correspondence) + |Ū|≡1 mod q
+  (Frobenius quotient `IsFrobeniusAction.quotient`; action-instance を internal letI で setup 要、
+  card_kernel_modEq_one 流)。charParam_delta_eq_one arithmetic は proven。
+
+**capstone (11.8) 全体**: exists_zeta_residual_not_orthogonal は sorry-free wired、残 = charParam_d_modEq_one
++ card_SHCSet_filter_eq_charParam_n (両 = 本 issue の correspondence/injectivity) + coherent_Sset_of_column_identities
+(τ₂ union、別 gate: S₂ coherence 9.11 = coherent_H0C_commutator on genuine chars)。
