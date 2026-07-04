@@ -1229,3 +1229,57 @@ of_zeta_irreducible_of_isCoherent_parity` (S09_Nonex:4094, 他 input 全済) →
 の Bsum_le field** (5 field bundle: i/hmin/B/B_avoids_min/Bsum_le/base_estimate; S09_Nonex:5560) → hdata →
 `card_G0_lower_bound` (6561 の sorry)。定量 assembly (min-index 選択 + 𝓑-set + base_estimate via (7.5))
 は別 strand で残る。
+
+---
+
+## cont.⁴⁶ — generic delta_isReal DONE (commit); hbeta_conj_sub 完全 mapped (全 bridge 所在確認)
+
+**commit (delta_isReal)**: generic `Hypothesis78.delta_isReal` (S09_FrobeniusConjIndex, sorry-free)。
+`hbeta_conj_sub : β̄−β = νζ−νζ̄` と `hnu_conj : (νζ)‾=ν(ζ̄)` から純代数で `Δ=β−1_G+νζ` real:
+`Δ̄−Δ = (β̄−β)+((νζ)‾−νζ) = (νζ−νζ̄)+(νζ̄−νζ) = 0` (conj_add/conj_sub + abel、1_G real は drop)。
+delta-reality の代数核を wrapper-plumbing から分離。2 input は Frobenius caller 供給。
+
+**残 = Frobenius `hbeta_conj_sub` (`β̄−β = νζ_dist − νζ_dist.conj`) — 全 bridge 所在確認済、~80 行 multi-defeq**:
+route (additivity 要ゆえ dadeIntegralCharacterMap LinearMap 経由):
+- `beta = dadeIntegralCharacterMap hyp dade (ζ_ind−ζ_dist)` — bridge:
+  `sibleyToHypothesis71.τ = (fullDadeIsometryData hconj).toDadeIsometryData.toDadeMap`
+  `= hyp.dadeMap` (**`Hypothesis.dadeIsometryData_toDadeMap` S04:4124** + toDadeIsometryData defeq S04:4317)
+  `= dadeIntegralCharacterMap hyp dade ·` (**`dadeIntegralCharacterMap_apply_of_support`** S07)
+- `beta.conj = dadeIntegralCharacterMap hyp dade (ζ_ind−ζ̄)` — **`dadeIntegralCharacterMap_mapRingEquiv_comm`**
+  (S07_CoherenceGalois:51) at conjAe + ζ_ind real (`induce_apply_one_star` / Ind 1_H real) + bridge
+  `X.conj = mapRingEquiv conjAe X`
+- `β̄−β = dadeIntegralCharacterMap hyp dade ((ζ_ind−ζ̄)−(ζ_ind−ζ_dist)) = ·(ζ_dist−ζ̄)` — **`LinearMap.map_sub`**
+- `·(ζ_dist−ζ̄) = νζ_dist − νζ_dist.conj` — **`coherence_hagree_dadeMap`** (ζi=ζ_dist, ζ0=ζ̄, di=1 ∵ 等次数;
+  ζ_dist,ζ̄∈S ✓ ∵ `exists_conjIndex_hypothesis78`+`S_closedUnderConjugate`) + `hypothesis78_nu_eq` +
+  support `hypothesis78_zeta_sub_conj_support` (S09_FrobeniusConjIndex:224)
+注意: ζ_ind∉S ゆえ agreement を ζ_ind に直接使えない → additivity で ζ_dist−ζ̄ (両∈S) に畳む route が必須。
+
+**その後**: hbeta_conj_sub + hnu_conj ((B) via nu_eq) → delta_isReal (両 family) + delta_orth_one →
+`cfdot_real_vchar_even` → hdelta_even → (7.9) conclusion → hgood → CharacterEstimateData.Bsum_le →
+hdata → card_G0_lower_bound。定量 assembly (min-index/𝓑-set/base_estimate via (7.5)) は別 strand。
+
+---
+
+## cont.⁴⁷ — delta-reality COMPLETE (Frobenius Δ real, sorry-free) ✅
+
+**delta-reality sub-project 完了** (cont.⁴⁴ で「deep blocker」と flag した strand が全て解けた)。全 sorry-free commit:
+1. (A) `dadeMap_conj` — Dade map が共役と可換 (S09_FrobeniusConjIndex)
+2. (B) `coherence_extension_conj` — coherent extension が共役と可換 (`extension_mapRingEquiv_comm` at conjAe)
+3. generic `Hypothesis78.delta_isReal` — `hnu_conj`+`hbeta_conj_sub` から純代数で Δ real
+4. `hypothesis78_beta_conj_sub` — `β̄−β = νζ−νζ̄` (dadeIntegralCharacterMap LinearMap 経由の
+   additivity-fold + mapRingEquiv_comm + coherence_hagree_dadeMap di=1; wrapper 全 defeq 確認)
+5. `hypothesis78_delta_isReal` — Frobenius Δ real (3+4 を wire; (B) を nu_eq で hnu_conj に橋渡し)
+
+**残 = hdelta_even assembly + 定量 CharacterEstimateData** (deep math でなく assembly):
+`hdelta_even : ∃z, ⟨δ₁,δ₂⟩=z ∧ Even z` (H79 level) の全 input 所在確認済:
+- δ real: `hypothesis78_delta_isReal` ✅ (本 milestone)
+- δ ∈ ZIrr: `delta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent` (S09_Nonex:2175;
+  input = hcoh `hypothesis78_isCoherent_sourceSet` / hnu `hypothesis78_nu_eq` / hindZ `induce_mem_ZIrr` /
+  hzeta_irr `hypothesis78_zeta_irreducible`)
+- ⟨δ,1⟩=0: `delta_orth_one` (S09_Nonex:2822; input = hBD `hypothesis78_betaDecomp`)
+- parity: `cfdot_real_vchar_even hodd δ₁Z δ₁R δ₂Z δ₂R` (a=b=⟨δ,1⟩=0 ⟹ Even m)
+
+**次 iteration**: Frobenius Hypothesis79 を 2 family (F.hypothesis78 i,j) から組む → 上記で hdelta_even →
+(7.9) `conclusion_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent_parity` (S09_Nonex:4094、hzeta_cross =
+`hypothesis79_zetaImage_cross_eq_zero` 済) → hgood → CharacterEstimateData (5-field bundle) → hdata →
+card_G0_lower_bound。定量側 (min-index/𝓑-set/base_estimate via (7.5)) は別 strand で残る。
