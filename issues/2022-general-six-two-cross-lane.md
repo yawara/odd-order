@@ -332,3 +332,12 @@ coherent_S_of_coherent_SH0C。(11.6) 消費側の再点検 or (5.7) 配線が次
 - 残 sharp sorry: `charValue_one_eq_one_of_commutator_le_ker` (G' ⊆ ker → 次数 1、
   汎用) — 次 iteration。その先: (11.3) coherent_S_of_coherent_SH0C (6.3-route) /
   (11.7) H₀=1 (symplectic) / sixTwoDecompositionData。commit e07728c0。
+
+## 2026-07-05 lane-a (loop 22): charValue_one… 閉 — S13_MaximalIII_IV 残 sorry は (11.3) のみ
+
+- G' ⊆ ker → 次数 1 は既存 `apply_one_eq_one_of_subset_characterKernel_of_
+  isMulCommutative_quotient` (InflationCharacter) で 4 行。(5.7) 配線 sorry-free。
+- S13_MaximalIII_IV の実 sorry = `coherent_S_of_coherent_SH0C` ((11.3), 6.3-route) 1 点。
+  次: S08_Theorem62_63_Standalone の `six_three_of_six_two_oracle` を
+  (L,K,M,H,H₁) = (M,M',⊥,HC,H₀C)-trace で実体化 (hbound=(9.6)+(11.1), h56=dichotomy)。
+  commit ca5f866b。
