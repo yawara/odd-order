@@ -295,6 +295,50 @@ theorem coprime_card_kernel_complement [Finite G] (h : IsFrobeniusGroup G N A) :
   simpa only [Fintype.card_eq_nat_card] using
     IsFrobeniusAction.coprime_card (A := A) (N := N) h.toFrobeniusAction
 
+/-- **Frobenius-group image congruence.** In a finite Frobenius group `G = N ⋊ A`, for *any*
+homomorphism `φ : G →* X`, the image `φ(N)` of the kernel satisfies `|φ(N)| ≡ 1 (mod |A|)`.
+
+By Noether's first isomorphism theorem `φ(N) ≅ N / ker(φ|_N)`, and the Frobenius conjugation action
+of `A` on `N` (`toFrobeniusAction`) descends — since `ker(φ|_N)` is `A`-invariant (`φ` is a
+homomorphism on all of `G`, so it intertwines the conjugation) — to a Frobenius action of `A` on the
+quotient `N / ker(φ|_N)` (Isaacs Cor 6.2, `IsFrobeniusAction.quotient`).  Isaacs Lemma 6.1
+(`IsFrobeniusAction.card_modEq_one`) then gives `|N / ker(φ|_N)| ≡ 1 (mod |A|)`.
+
+This is the mechanism behind Peterfalvi's `|Ū| ≡ 1 (mod q)` for the chief-factor image
+`Ū = U/C_U(H̄)` in (11.8.1): take `φ` the `U W₁`-action on `H̄`, `N = U`, `A = W₁`, so that
+`φ(U) = Ū` and `|A| = q`. -/
+theorem card_range_comp_subtype_modEq_one [Finite G] (h : IsFrobeniusGroup G N A)
+    {X : Type*} [Group X] (φ : G →* X) :
+    Nat.card ↥((φ.comp N.subtype).range) ≡ 1 [MOD Nat.card A] := by
+  classical
+  letI : N.Normal := h.isNormal
+  letI : MulDistribMulAction A N :=
+    MulDistribMulAction.compHom N ((MulAut.conjNormal (H := N)).comp A.subtype)
+  have hFA : IsFrobeniusAction A N := h.toFrobeniusAction
+  set ψ : N →* X := φ.comp N.subtype with hψ
+  set K : Subgroup N := ψ.ker with hK
+  haveI : K.Normal := by rw [hK]; infer_instance
+  -- `K = ker(φ|_N)` is `A`-invariant: for `a ∈ A`, `m ∈ K`, the conjugate `a • m` has
+  -- `φ(a·m·a⁻¹) = φ(a)·φ(m)·φ(a)⁻¹ = φ(a)·1·φ(a)⁻¹ = 1`, using `φ` a homomorphism on all of `G`.
+  have hinv : ∀ a : A, ∀ m ∈ K, a • m ∈ K := by
+    intro a m hm
+    rw [hK, MonoidHom.mem_ker] at hm ⊢
+    have hcoe : ((a • m : N) : G) = (a : G) * (m : G) * (a : G)⁻¹ := rfl
+    have hψa : ψ (a • m) = φ ((a : G) * (m : G) * (a : G)⁻¹) := by
+      rw [hψ]; exact congrArg φ hcoe
+    have hφm : φ (m : G) = 1 := by rw [hψ] at hm; exact hm
+    rw [hψa, map_mul, map_mul, map_inv, hφm, mul_one, mul_inv_cancel]
+  -- descend the Frobenius conjugation action to `N ⧸ K`
+  letI : MulDistribMulAction A (N ⧸ K) :=
+    IsFrobeniusAction.invariantQuotientMulDistribMulAction K hinv
+  have hFAQ : IsFrobeniusAction A (N ⧸ K) := hFA.quotient K hinv
+  haveI : Fintype A := Fintype.ofFinite A
+  haveI : Fintype (N ⧸ K) := Fintype.ofFinite _
+  have hcong : Nat.card (N ⧸ K) ≡ 1 [MOD Nat.card A] := by
+    simpa only [Fintype.card_eq_nat_card] using IsFrobeniusAction.card_modEq_one hFAQ
+  -- `N ⧸ K ≅ range ψ` (Noether I), so `|range ψ| = |N ⧸ K| ≡ 1 (mod |A|)`
+  rwa [Nat.card_congr (QuotientGroup.quotientKerEquivRange ψ).toEquiv] at hcong
+
 /-- **Isaacs Thm 6.4 (3) ⇒ (1)** (constructor). If `C_G(a) ⊆ A` for every nontrivial `a ∈ A`,
 then the conjugation action of `A` on `N` is Frobenius. -/
 theorem of_centralizer_complement_le
