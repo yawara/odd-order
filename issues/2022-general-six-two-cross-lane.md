@@ -115,3 +115,38 @@ contrapositive, general 既存) の orthonormality/support/generation 仮説を�
 constituent (= §10-12 muGrid/columnSum) で discharge すること。**lane-h §6/§8 スコープ外、lane-b/c 領域。**
 
 本 issue は open 維持 (`h56` landing で close)。lane-h の producer 側は完了。
+
+## 2026-07-05 lane-a — h56 は lane-a frontier に編入 (両 (11.8) 残 gate の共通上流)
+
+**Ownership 更新**: 2026-07-04/05 再々編で §9-13 char 核 + S08 非-coherence-glob (`S08_Theorem62_63_Standalone`
+含む) = **lane a**。ヘッダの「現 owner = lane b (07-02)」は stale。h56 の実体 (§10-12 muGrid/columnSum
+構造) も a 所有。⟹ **h56 = lane-a の次 frontier** (charParam_d_modEq_one 完了後の上流優先)。
+
+**なぜ今 h56 か**: (11.8) の残 2 gates の共通上流。
+- gate 2 `card_SHCSet_filter_eq_charParam_n` ((11.8.1) n-count) は (11.6) C=U' (U/C abelian order u) を
+  経由 ⟸ (11.5) M''=HC ⟸ (11.4)+(11.3) ⟸ **h56** (S13 の該当 4 定理は全 sorry、
+  `six_three_of_six_two_oracle`/`six_two_general` cite + h56 供給 + S13.SOf pin で閉じる)。
+- gate 3 `coherent_Sset_of_column_identities` ((11.8.6) τ₂) の S₂-coherence ((11.7)) も (11.5) 構造 +
+  (9.11) を要する。
+- Coq 対応: (11.3)=FTtype34_noncoherence / (11.4)=bounded_proper_coherent / (11.5)=FTtype34_der2 /
+  (11.6)=FTtype34_facts (PFsection11.v:205-350)。**(11.3) は (9.11) 不要** (bounded_seqIndD_coherence
+  (6.3) + (10.8) proven のみ) — S13 docstring の「(11.7) 経由」読みは Coq route でバイパス可。
+
+**Coq model (h56 の中身)**: PFsection6 `coherent_seqIndD_bound` (6.2) は break-member を直接見つけるの
+でなく **`extend_coherent` (5.4) induction**: S(A)-coherent から S(B) の pair {ψ,ψ*} を 1 つずつ吸収、
+全部吸収できれば S(B) coherent (unless 枝)、失敗点 ψ で extend_coherent の norm-sum bound 反転が
+`|K:A|−1 ≤ 2|L:C|√|C:D|` を与える (`sum_seqIndD_square` + `irr1_bound_quo`)。
+⟹ Lean h56 = `coherentDegreeSumBound_of_not_coherent` ((5.6) contrapositive, CorePart1:2451,
+general 済) の**仮説 discharge for solvable-K induced family**: orthonormality/support/generation を
+可約 member (= μ-column sums) 込みで。2026-07-05 の `muGrid_column_sum_mem_sOf_H0_and_reducible`
+(S12_Section9Counts) で「可約 member = column sums、source = chiRestrict、pairwise distinct」の
+enumeration が整った — これが (5.2.d) R(χ)-構造 discharge の素材。
+
+**次 iteration 手順 (lane a)**:
+1. `coherentDegreeSumBound_of_not_coherent` (CorePart1:2451) の正確な仮説リストを読み、
+   solvable-K family での discharge 計画を立てる (Coq PFsection5 (5.6) 証明と併読)。
+2. h56 を `S08_Theorem62_63_Standalone` (a 所有) に landing → `six_three_of_six_two_oracle` 完全 discharge。
+3. S13 side: SOf free field を induced-family filter に pin (enrich) → (11.3)/(11.4) を producer cite で
+   閉じ、(11.5)/(11.6) を assembly。
+4. gate 2 n-count: (11.6) U/C abelian order u + M/HC Frobenius (`frobMtilde` 相当は
+   `typeP_uW1_frobenius` 系) + Ind-linear irreducibility で S1 count = (u−1)/q = n。
