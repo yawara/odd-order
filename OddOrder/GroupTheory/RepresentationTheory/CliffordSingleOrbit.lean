@@ -226,6 +226,57 @@ theorem exists_induce_inner_ne_zero [Finite G] [Fintype G] [Invertible (Nat.card
   obtain ⟨ρ, hρ⟩ := IrreducibleCharacter.exists_liesOver (H := H) φ
   exact ⟨ρ, (IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H φ ρ).mpr hρ⟩
 
+open scoped Classical in
+/-- **Partition of `Irr G` into `Ind_H^G` blocks.**  For `H ⊴ G`, the irreducible characters of `G`
+partition into the constituent-sets of the induced characters `Ind_H^G λ` (`λ ∈ Irr H`): every
+`φ ∈ Irr G` lies in exactly one block.  Blocks are indexed by their own `Finset` (conjugate `λ` give
+the *same* block), via `cap φ := {θ | ⟨Ind_H λ(φ), θ⟩ ≠ 0}` where `λ(φ)` is a chosen constituent of
+`Res_H φ` (`exists_liesOver`).  `PairwiseDisjoint` from `exists_conj_of_common_induce_constituent`
+(a shared constituent forces `λ`-conjugacy) + conjugation-closure of `Res_H φ` constituents
+(`liesOver_conjBy_iff`); cover from `φ ∈ cap φ`.  The `trivIset`/`cover` packaging for the Peterfalvi
+(12.5) `DpsiH` Fourier regrouping (`Finset.sum_biUnion`). -/
+theorem exists_induce_constituent_partition [Finite G]
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {H : Subgroup G} [hH : H.Normal] [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
+    [Fintype (IrreducibleCharacter G)] :
+    ∃ parts : Finset (Finset (IrreducibleCharacter G)),
+      (Finset.univ : Finset (IrreducibleCharacter G)) = parts.biUnion id ∧
+      (↑parts : Set (Finset (IrreducibleCharacter G))).PairwiseDisjoint id := by
+  classical
+  let lam : IrreducibleCharacter G → IrreducibleCharacter ↥H :=
+    fun φ => (IrreducibleCharacter.exists_liesOver (H := H) φ).choose
+  have hlam : ∀ φ, IrreducibleCharacter.LiesOver H φ (lam φ) :=
+    fun φ => (IrreducibleCharacter.exists_liesOver (H := H) φ).choose_spec
+  let cap : IrreducibleCharacter G → Finset (IrreducibleCharacter G) :=
+    fun φ => Finset.univ.filter (fun θ =>
+      ClassFunction.inner (ClassFunction.induce H (lam φ : ClassFunction ↥H ℂ))
+        (θ : ClassFunction G ℂ) ≠ 0)
+  have hmem_cap : ∀ φ θ : IrreducibleCharacter G, θ ∈ cap φ ↔
+      IrreducibleCharacter.LiesOver H θ (lam φ) := by
+    intro φ θ
+    show θ ∈ Finset.univ.filter _ ↔ _
+    rw [Finset.mem_filter]
+    simp only [Finset.mem_univ, true_and]
+    exact IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H θ (lam φ)
+  have hself : ∀ φ : IrreducibleCharacter G, φ ∈ cap φ := fun φ => (hmem_cap φ φ).mpr (hlam φ)
+  refine ⟨Finset.univ.image cap, ?_, ?_⟩
+  · ext φ
+    simp only [Finset.mem_univ, true_iff, Finset.mem_biUnion, id_eq]
+    exact ⟨cap φ, Finset.mem_image_of_mem cap (Finset.mem_univ φ), hself φ⟩
+  · intro B hB B' hB' hBB'
+    rw [Finset.mem_coe, Finset.mem_image] at hB hB'
+    obtain ⟨φ, -, rfl⟩ := hB
+    obtain ⟨φ', -, rfl⟩ := hB'
+    simp only [Function.onFun, id_eq]
+    rw [Finset.disjoint_left]
+    intro θ hθ hθ'
+    apply hBB'
+    obtain ⟨g, hg⟩ := exists_conj_of_common_induce_constituent
+      ((IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H θ (lam φ)).mpr ((hmem_cap φ θ).mp hθ))
+      ((IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H θ (lam φ')).mpr ((hmem_cap φ' θ).mp hθ'))
+    ext θ''
+    rw [hmem_cap, hmem_cap, ← hg, IrreducibleCharacter.liesOver_conjBy_iff]
+
 /-- **Clifford's theorem for an invariant constituent** ([Isaacs] Thm 6.5, invariant case).  For a
 normal `H ⊴ G` and `χ ∈ Irr G` lying over `θ ∈ Irr H` with `θ` **`G`-invariant** (`θ^g = θ` for all
 `g`), the restriction is a single multiple of `θ`: `Res^G_H χ = e · θ` with `e = ⟨Res χ, θ⟩`.
