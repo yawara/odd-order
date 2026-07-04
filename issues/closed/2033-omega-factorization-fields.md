@@ -33,8 +33,11 @@ Hypothesis に無い** (現 fields: omega_orthonormal / omega_apply_one / omega_
       `int_dvd_of_one_sub_primRoot_dvd` (共に CyclotomicCharacterCongruence、完備)。
       新 helper `mul_notMem_W1_union_W2` + `eta10_apply_sub_one_integral` (η₁₀(y)≡1)。
       W2_le_P + pgroup_le_of_normal_coprime_index を Setup に relocate。
-- [ ] (λ-side) `exists_lambda_alphaFun_one_qb` — λ^{τ₁}(y)−λ(y) の合同 (Pf (13.6) 本文の
-      λ-congruence を要精読; λ = Ind_{PC}(linear) の W₂#-値 + α(1)∈ℤ 経路)
+- [x] (λ-side, 07-05 it.30-31, commits bd1f44aa/4d076d23) `exists_lambda_alphaFun_one_qb`
+      実 assembly + `lambda_apply_mul_eq_zero` (位数論法) + `lambda_alphaFun_one_int`
+      (α(1)∈ℤ, inertia 恒等式 — 完全実証明) + `H_sharp_cCoeff_int` 一般化。
+      残 gate は (13.3)-cluster 3 本 (exists_lambda_index / lambda_tau1_norm_one /
+      lambda_tau1_apply_mul_eq_zero) に縮約 — 2033 スコープ外、issue close。
 
 ## 調査ログ (07-05 loop it.27)
 
