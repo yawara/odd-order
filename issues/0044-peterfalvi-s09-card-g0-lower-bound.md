@@ -1029,3 +1029,25 @@ sourceSet=S / coherence transport → **Frobenius hzeta_cross**。
 - → hgood (chiRhoNormSq_ge_ratio_of_inner_beta_ne_zero) → 𝓑-set → min-index/hG0sum →
   characterEstimateData_of_family71_reduced_estimates_of_signed_irreducible → card_G0_lower_bound
   (endpoint sorry @S09_NonexistenceCertain:6552)。
+
+## 2026-07-04 cont.³⁸ — 次フェーズ: (7.10) CharacterEstimateData assembly のスコープ
+
+hzeta_cross 完成 (cont.³⁷) で **深部 §1 frontier は完結**。残る endpoint sorry
+(@S09_NonexistenceCertain:6552, `hdata : F.CharacterEstimateData`) は (7.10) 定量 assembly:
+
+- **BetaDecomp (hBD)**: `betaDecompOfDade` (S09_CertDischarge:2216) が
+  `(hypothesis78OfDade ARGS).BetaDecomp` を供給。ARGS = θ/ν/hagree/hnu_isometry/hzeta0nu/hζ0norm/a/ha
+  (hypothesis78 内部と同じ) → **sibleyPlacedFamily で re-thread** (hzeta_cross と同種の opacity plumbing;
+  hzeta0nu は本 session 前半で完成済 @S09_FrobeniusEstimate、a は exists_betaDecomp_a、hagree は
+  coherence_hagree_dadeMap、hnu_isometry は coherence_extension_inner_eq_on_family)。
+- **(7.9) conclusion (Frobenius)**: `conclusion_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent_parity`
+  に hcoh/hnu (済) + hindZ (zeta ind1H = Ind 1_K ∈ ZIrr、character) + hzeta_irr (済
+  hypothesis78_zeta_irreducible) + hBD + **hzeta_cross (済 hypothesis79_zetaImage_cross_eq_zero)** +
+  hdelta_even (parity primitive cfdot_real_vchar_even + delta_orth_one @2822 → ⟨δ_i,δ_j⟩ even) 供給
+  → H79.conclusion (⟨β_i,ζ_j^ν⟩≠0 ∨ ⟨β_j,ζ_i^ν⟩≠0)。
+- **hgood**: `chiRhoNormSq_ge_ratio_of_inner_beta_ne_zero` (S09_FrobeniusEstimate:124) に (7.9)
+  conclusion の非零を供給 → good-index norm bound。**hi** = exists_chiRhoNormSq_ge (S09_FrobeniusEstimate:488、済)。
+- **CharacterEstimateData**: hi/hgood/hBsum/hG0sum/min-index を束ねる (F.CharacterEstimateData 構造;
+  lowerBoundTerm_of_characterEstimateData で card_G0_lower_bound へ)。𝓑-set の min-index 選択が残の主眼。
+
+次 iteration: BetaDecomp re-thread (betaDecompOfDade を F.hypothesis78 に適用) から着手。
