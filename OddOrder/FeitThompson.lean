@@ -176,6 +176,24 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
   S_U_commutative : IsMulCommutative ↥U
   /-- **W₂-reconciliation**: intrinsic `Sdata.W2 = C_{S'}(W₁#)` equals abstract `W₂` (= `K*`). -/
   Sdata_W2_eq : Sdata.W2 = W2
+  /- Grid property fields (issue 3002): the (3.2)/(3.3)/(3.4) character-theoretic content of
+  `tau3`/`omega`, threaded from `Section16CharacterData` into `S15.Hypothesis`. -/
+  /-- **Peterfalvi (3.2), isometry part**: `τ₃` preserves the class-function inner product. -/
+  tau3_isometry : OddOrder.Peterfalvi.S07.IsIntegralIsometry tau3
+  /-- **Peterfalvi (3.2)**: `τ₃` sends the trivial character to the trivial character. -/
+  tau3_trivial : tau3 (trivialClassFunction ↥W) = trivialClassFunction G
+  /-- **Peterfalvi (3.2.c)**: on the regular set `W ∖ (W₁ ∪ W₂)` the map `τ₃` is the identity. -/
+  tau3_apply_of_regular : ∀ (α : ClassFunction ↥W ℂ) (w : G) (hwW : w ∈ W),
+    w ∉ (W1 : Set G) ∪ (W2 : Set G) → tau3 α w = α ⟨w, hwW⟩
+  /-- **Peterfalvi (3.2)**: `τ₃` sends virtual characters to virtual characters. -/
+  tau3_mem_ZIrr : ∀ z ∈ ZIrr ↥W, tau3 z ∈ ZIrr G
+  /-- **Peterfalvi (3.3)/(3.4)**: the `ω`-grid is orthonormal. -/
+  omega_orthonormal : ∀ (i k : Fin q) (j l : Fin p),
+    ClassFunction.inner (omega i j) (omega k l) = if i = k ∧ j = l then 1 else 0
+  /-- The `ω_{ij}` are linear characters: `ω_{ij}(1) = 1`. -/
+  omega_apply_one : ∀ (i : Fin q) (j : Fin p), omega i j 1 = 1
+  /-- Each `ω_{ij}` is a virtual character (in fact an irreducible character of `W`). -/
+  omega_mem_ZIrr : ∀ (i : Fin q) (j : Fin p), omega i j ∈ ZIrr ↥W
 
 /-! ### Partition of `Section16Inputs` into three independent producer obligations
 
@@ -321,6 +339,24 @@ structure Section16CharacterData {G : Type*} [Group G] [Finite G]
             ((le_of_eq tp.W_eq_inter).trans inf_le_right)).toMonoidHom
           (omega i j - omega i ⟨0, tp.p_prime.pos⟩))
       = (deltaPrime i : ℂ) • (nu i j - nu i ⟨0, tp.p_prime.pos⟩)
+  /- Grid property fields (issue 3002): the (3.2)/(3.3)/(3.4) character-theoretic content of
+  `tau3`/`omega`, supplied by the producer from `tau3W_isometry` etc. and `omegaS_inner` etc. -/
+  /-- **Peterfalvi (3.2), isometry part**: `τ₃` preserves the class-function inner product. -/
+  tau3_isometry : OddOrder.Peterfalvi.S07.IsIntegralIsometry tau3
+  /-- **Peterfalvi (3.2)**: `τ₃` sends the trivial character to the trivial character. -/
+  tau3_trivial : tau3 (trivialClassFunction ↥tp.W) = trivialClassFunction G
+  /-- **Peterfalvi (3.2.c)**: on the regular set `W ∖ (W₁ ∪ W₂)` the map `τ₃` is the identity. -/
+  tau3_apply_of_regular : ∀ (α : ClassFunction ↥tp.W ℂ) (w : G) (hwW : w ∈ tp.W),
+    w ∉ (tp.W1 : Set G) ∪ (tp.W2 : Set G) → tau3 α w = α ⟨w, hwW⟩
+  /-- **Peterfalvi (3.2)**: `τ₃` sends virtual characters to virtual characters. -/
+  tau3_mem_ZIrr : ∀ z ∈ ZIrr ↥tp.W, tau3 z ∈ ZIrr G
+  /-- **Peterfalvi (3.3)/(3.4)**: the `ω`-grid is orthonormal. -/
+  omega_orthonormal : ∀ (i k : Fin tp.q) (j l : Fin tp.p),
+    ClassFunction.inner (omega i j) (omega k l) = if i = k ∧ j = l then 1 else 0
+  /-- The `ω_{ij}` are linear characters: `ω_{ij}(1) = 1`. -/
+  omega_apply_one : ∀ (i : Fin tp.q) (j : Fin tp.p), omega i j 1 = 1
+  /-- Each `ω_{ij}` is a virtual character (in fact an irreducible character of `W`). -/
+  omega_mem_ZIrr : ∀ (i : Fin tp.q) (j : Fin tp.p), omega i j ∈ ZIrr ↥tp.W
 
 /-- **Canonical type-`P` maximal pair data** (issue 7005): for a minimal simple group of odd order,
 there is a type-`P` dual pair `S, T` together with the full κ-Hall witness data of BG Theorem 14.7
@@ -1654,67 +1690,149 @@ formal one): `η := τ₃ ∘ ω` is consumed downstream as a real virtual chara
 fact is read off the proven `BG §14 typeP_duality` (Theorem 14.7), and the Dade isometry from the
 general §4 producer `S04.Hypothesis.fullDadeIsometryData` (all local `H(a) = ⊥`, so `HConjInvariant` is
 automatic).  Named `tau3W` to avoid the `Section16CharacterData.tau3` field projection. -/
-noncomputable def tau3W : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥tp.W G := by
-  classical
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Invertible (Nat.card G : ℂ) :=
-    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  -- The `Ẑ = zTilde` TI-set fact for the canonical pair (BG Theorem 14.7).
-  have hZti : OddOrder.GroupTheory.IsTISubset (BG.Ch4.S14.zTilde mp.K mp.Kstar) (mp.K ⊔ mp.Kstar) := by
-    obtain ⟨Mst, hMstP⟩ :=
-      (BG.Ch4.S14.typeP_duality hG mp.S_maximal mp.S_typeP mp.K_le_S mp.K_hall mp.Kstar_eq).2.2.exists
-    exact hMstP.2.2.2.2.2.1
-  -- The G-internal TI-cyclic Hypothesis (3.1) for `W = tp.W`, support `V = W \ (W₁ ∪ W₂)`.
-  let tiW : OddOrder.Peterfalvi.S05.TICyclicHypothesis G :=
-    { W := tp.W
-      W1 := tp.W1
-      W2 := tp.W2
-      W1_le_W := by rw [tp.W_eq_join]; exact le_sup_left
-      W2_le_W := by rw [tp.W_eq_join]; exact le_sup_right
-      W1_nontrivial := by
-        rw [tp.W1_eq_K hG]
-        exact fun h => BG.Ch4.S14.card_kappaHall_ne_one mp.S_typeP mp.K_le_S mp.K_hall
-          (Subgroup.card_eq_one.mpr h)
-      W2_nontrivial := by
-        rw [tp.W2_eq_Kstar hG]
-        exact fun h => BG.Ch4.S14.card_kappaHall_ne_one mp.T_typeP mp.Kstar_le_T mp.Kstar_hall
-          (Subgroup.card_eq_one.mpr h)
-      W_sup := tp.W_eq_join.symm
-      W_disjoint := disjoint_iff.mpr tp.W1_inf_W2_eq_bot
-      W_card_coprime := by
-        rw [← tp.q_eq_card_W1, ← tp.p_eq_card_W2]
-        exact (Nat.coprime_primes tp.q_prime tp.p_prime).mpr (ne_of_lt tp.q_lt_p)
-      W_card_odd := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card tp.W)
-      W_cyclic := tp.W_cyclic
-      V := (tp.W : Set G) \ ((tp.W1 : Set G) ∪ (tp.W2 : Set G))
-      V_subset_sharp := by
-        rintro x hx
-        rw [Set.mem_diff] at hx
-        obtain ⟨_, hxni⟩ := hx
-        simp only [Set.mem_union, SetLike.mem_coe, not_or] at hxni
-        change x ∈ Set.univ \ ({1} : Set G)
-        refine ⟨Set.mem_univ x, ?_⟩
-        simp only [Set.mem_singleton_iff]
-        exact fun h => hxni.1 (h ▸ one_mem tp.W1)
-      V_subset_W := Set.diff_subset
-      W_normalizes_V := by
-        intro w v hv
-        have hvW : v ∈ tp.W := hv.1
-        haveI := tp.W_cyclic
-        letI : CommGroup ↥tp.W := IsCyclic.commGroup
-        have hcg : (w : G) * v = v * (w : G) := by
-          have h := mul_comm w (⟨v, hvW⟩ : ↥tp.W)
-          have := congrArg (Subgroup.subtype tp.W) h
-          simpa using this
-        have heq : (w : G) * v * (w : G)⁻¹ = v := by rw [hcg]; group
-        rw [heq]; exact hv
-      V_ti := by
-        rw [tp.W_eq_kappa_join hG, tp.W1_eq_K hG, tp.W2_eq_Kstar hG]
-        exact hZti }
-  exact tiW.sigmaIntegral rfl
-    (OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication.mk
-      (tiW.toDadeHypothesis.fullDadeIsometryData
-        (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl))))
+
+/-- The **G-internal TI-cyclic structure (3.1)** on `W = S ∩ T = mp.K ⊔ mp.Kstar`, supported on
+the regular set `Ẑ = W ∖ (W₁ ∪ W₂)` (`= S14.zTilde mp.K mp.Kstar`); the TI-set fact is the proven
+BG §14 `typeP_duality` (Theorem 14.7).  Extracted from `tau3W`'s local `let` as a top-level
+definition so the (3.2) σ-isometry property package (`tau3W_isometry` etc., the issue-3002 grid
+property supply) can be read off the `S05` lemmas. -/
+noncomputable def tiCyclicW : OddOrder.Peterfalvi.S05.TICyclicHypothesis G :=
+  { W := tp.W
+    W1 := tp.W1
+    W2 := tp.W2
+    W1_le_W := by rw [tp.W_eq_join]; exact le_sup_left
+    W2_le_W := by rw [tp.W_eq_join]; exact le_sup_right
+    W1_nontrivial := by
+      rw [tp.W1_eq_K hG]
+      exact fun h => BG.Ch4.S14.card_kappaHall_ne_one mp.S_typeP mp.K_le_S mp.K_hall
+        (Subgroup.card_eq_one.mpr h)
+    W2_nontrivial := by
+      rw [tp.W2_eq_Kstar hG]
+      exact fun h => BG.Ch4.S14.card_kappaHall_ne_one mp.T_typeP mp.Kstar_le_T mp.Kstar_hall
+        (Subgroup.card_eq_one.mpr h)
+    W_sup := tp.W_eq_join.symm
+    W_disjoint := disjoint_iff.mpr tp.W1_inf_W2_eq_bot
+    W_card_coprime := by
+      rw [← tp.q_eq_card_W1, ← tp.p_eq_card_W2]
+      exact (Nat.coprime_primes tp.q_prime tp.p_prime).mpr (ne_of_lt tp.q_lt_p)
+    W_card_odd := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card tp.W)
+    W_cyclic := tp.W_cyclic
+    V := (tp.W : Set G) \ ((tp.W1 : Set G) ∪ (tp.W2 : Set G))
+    V_subset_sharp := by
+      rintro x hx
+      rw [Set.mem_diff] at hx
+      obtain ⟨_, hxni⟩ := hx
+      simp only [Set.mem_union, SetLike.mem_coe, not_or] at hxni
+      change x ∈ Set.univ \ ({1} : Set G)
+      refine ⟨Set.mem_univ x, ?_⟩
+      simp only [Set.mem_singleton_iff]
+      exact fun h => hxni.1 (h ▸ one_mem tp.W1)
+    V_subset_W := Set.diff_subset
+    W_normalizes_V := by
+      intro w v hv
+      have hvW : v ∈ tp.W := hv.1
+      haveI := tp.W_cyclic
+      letI : CommGroup ↥tp.W := IsCyclic.commGroup
+      have hcg : (w : G) * v = v * (w : G) := by
+        have h := mul_comm w (⟨v, hvW⟩ : ↥tp.W)
+        have := congrArg (Subgroup.subtype tp.W) h
+        simpa using this
+      have heq : (w : G) * v * (w : G)⁻¹ = v := by rw [hcg]; group
+      rw [heq]; exact hv
+    V_ti := by
+      -- The `Ẑ = zTilde` TI-set fact for the canonical pair (BG Theorem 14.7).
+      have hZti : OddOrder.GroupTheory.IsTISubset (BG.Ch4.S14.zTilde mp.K mp.Kstar)
+          (mp.K ⊔ mp.Kstar) := by
+        obtain ⟨Mst, hMstP⟩ :=
+          (BG.Ch4.S14.typeP_duality hG mp.S_maximal mp.S_typeP mp.K_le_S mp.K_hall
+            mp.Kstar_eq).2.2.exists
+        exact hMstP.2.2.2.2.2.1
+      rw [tp.W_eq_kappa_join hG, tp.W1_eq_K hG, tp.W2_eq_Kstar hG]
+      exact hZti }
+
+/-- The full §4 Dade application for `tiCyclicW` (all local subgroups `H(a) = ⊥`, so
+`HConjInvariant` is automatic). -/
+noncomputable def tiCyclicWDadeApp :
+    OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication (G := G)
+      (tiCyclicW hG mp tp) :=
+  OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication.mk
+    ((tiCyclicW hG mp tp).toDadeHypothesis.fullDadeIsometryData
+      (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl)))
+
+/-- **The (3.2) Dade σ-integral on `W = tp.W`** (see the section header above): the σ-isometry of
+`tiCyclicW`, re-viewed as an integral character map. -/
+noncomputable def tau3W : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥tp.W G :=
+  (tiCyclicW hG mp tp).sigmaIntegral rfl (tiCyclicWDadeApp hG mp tp)
+
+/-! #### The (3.2) property package of `tau3W` (issue-3002 grid property supply)
+
+Read off the `S05` σ-isometry lemmas through the extracted `tiCyclicW`/`tiCyclicWDadeApp`;
+these discharge the `tau3_*` fields of `Section16CharacterData` (and hence of
+`Section16Inputs` / `S15.Hypothesis`). -/
+
+/-- **Peterfalvi (3.2), isometry part**: `tau3W` preserves the class-function inner product. -/
+theorem tau3W_isometry :
+    OddOrder.Peterfalvi.S07.IsIntegralIsometry (tau3W hG mp tp) :=
+  (tiCyclicW hG mp tp).sigmaIntegral_isIntegralIsometry rfl (tiCyclicWDadeApp hG mp tp)
+
+/-- **Peterfalvi (3.2)**: `tau3W` sends the trivial character to the trivial character. -/
+theorem tau3W_trivial :
+    tau3W hG mp tp (trivialClassFunction ↥tp.W) = trivialClassFunction G :=
+  (tiCyclicW hG mp tp).sigmaIntegral_trivial rfl (tiCyclicWDadeApp hG mp tp)
+
+/-- **Peterfalvi (3.2)**: `tau3W` sends virtual characters to virtual characters. -/
+theorem tau3W_mem_ZIrr {z : ClassFunction ↥tp.W ℂ} (hz : z ∈ ZIrr ↥tp.W) :
+    tau3W hG mp tp z ∈ ZIrr G :=
+  (tiCyclicW hG mp tp).sigmaIntegral_mem_ZIrr rfl (tiCyclicWDadeApp hG mp tp) hz
+
+/-- **Peterfalvi (3.2.c)**: on the regular set `W ∖ (W₁ ∪ W₂)` the map `tau3W` is the
+identity. -/
+theorem tau3W_apply_of_regular (α : ClassFunction ↥tp.W ℂ) (w : G) (hwW : w ∈ tp.W)
+    (hnot : w ∉ (tp.W1 : Set G) ∪ (tp.W2 : Set G)) :
+    tau3W hG mp tp α w = α ⟨w, hwW⟩ :=
+  (tiCyclicW hG mp tp).sigmaIntegral_apply_of_mem_V rfl (tiCyclicWDadeApp hG mp tp) α
+    (show w ∈ (tiCyclicW hG mp tp).V from ⟨hwW, hnot⟩)
+
+/-! #### The (3.3)/(3.4) property package of `omegaS` (issue-3002 grid property supply)
+
+The `omegaS` are distinct irreducible linear characters of `↥tp.W` — the `certainTypeS`
+`chiColumn`s (S05 `omega ∘ omegaProdChar`, orthonormal by `omega_inner` and the injectivity of
+the enumerations) transported along the group isomorphism `gridEquivE` (which preserves the
+inner product, `ClassFunction.inner_compHom_mulEquiv`). -/
+
+/-- **Peterfalvi (3.3)/(3.4)**: the S-side `ω`-grid is orthonormal. -/
+theorem omegaS_inner (i k : Fin tp.q) (j l : Fin tp.p) :
+    ClassFunction.inner (omegaS hG mp tp i j) (omegaS hG mp tp k l)
+      = if i = k ∧ j = l then 1 else 0 := by
+  rw [omegaS, omegaS, ClassFunction.inner_compHom_mulEquiv (gridEquivE hG mp tp)]
+  simp only [Peterfalvi.S06.Hypothesis.chiColumn]
+  rw [(mp.certainTypeS hG).sdiffTICyclicHypothesis.omega_inner]
+  by_cases h : i = k ∧ j = l
+  · obtain ⟨rfl, rfl⟩ := h
+    rw [if_pos rfl, if_pos ⟨rfl, rfl⟩]
+  · have hne : (mp.certainTypeS hG).sdiffTICyclicHypothesis.omegaProdChar
+        ((mp.certainTypeS hG).w1CharEquiv (eqQ hG mp tp i)) (chi2enum hG mp tp j)
+        ≠ (mp.certainTypeS hG).sdiffTICyclicHypothesis.omegaProdChar
+          ((mp.certainTypeS hG).w1CharEquiv (eqQ hG mp tp k)) (chi2enum hG mp tp l) := by
+      intro hc
+      obtain ⟨h1, h2⟩ := (mp.certainTypeS hG).sdiffTICyclicHypothesis.omegaProdChar_inj hc
+      exact h ⟨(eqQ hG mp tp).injective ((mp.certainTypeS hG).w1CharEquiv_injective h1),
+        (chi2enum hG mp tp).injective h2⟩
+    rw [if_neg hne, if_neg h]
+
+/-- The `omegaS` are linear characters: `ω_{ij}(1) = 1`. -/
+theorem omegaS_apply_one (i : Fin tp.q) (j : Fin tp.p) :
+    omegaS hG mp tp i j 1 = 1 := by
+  rw [omegaS, ClassFunction.compHom_apply, map_one]
+  exact (mp.certainTypeS hG).chiColumn_apply_one _ _
+
+/-- Each `omegaS i j` is a virtual character of `↥tp.W` (the pullback along `gridEquivE` of an
+irreducible character). -/
+theorem omegaS_mem_ZIrr (i : Fin tp.q) (j : Fin tp.p) :
+    omegaS hG mp tp i j ∈ ZIrr ↥tp.W := by
+  rw [omegaS]
+  exact ClassFunction.compHom_mem_ZIrr _
+    ((mp.certainTypeS hG).chiColumn (chi2enum hG mp tp j) (eqQ hG mp tp i)).mem_ZIrr
 
 end Section16CharacterData
 
@@ -1769,7 +1887,15 @@ noncomputable def section16CharacterData_of_isMinimalSimpleOdd {G : Type*} [Grou
       deltaPrime := Section16CharacterData.deltaPrimeT hG mp tp
       tau3 := Section16CharacterData.tau3W hG mp tp
       mu_definition := Section16CharacterData.muS_definition hG mp tp
-      nu_definition := Section16CharacterData.nuT_definition hG mp tp }
+      nu_definition := Section16CharacterData.nuT_definition hG mp tp
+      tau3_isometry := Section16CharacterData.tau3W_isometry hG mp tp
+      tau3_trivial := Section16CharacterData.tau3W_trivial hG mp tp
+      tau3_apply_of_regular := fun α w hwW hnot =>
+        Section16CharacterData.tau3W_apply_of_regular hG mp tp α w hwW hnot
+      tau3_mem_ZIrr := fun _ hz => Section16CharacterData.tau3W_mem_ZIrr hG mp tp hz
+      omega_orthonormal := Section16CharacterData.omegaS_inner hG mp tp
+      omega_apply_one := Section16CharacterData.omegaS_apply_one hG mp tp
+      omega_mem_ZIrr := Section16CharacterData.omegaS_mem_ZIrr hG mp tp }
 
 /-- **Assembly of `Section16Inputs` from the three lane producers** (`sorry`-free).
 Each field of `Section16Inputs` is sourced from exactly one of `mp` / `tp` / `cd`;
@@ -1837,7 +1963,14 @@ noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [F
     Sdata_U_eq := tp.Sdata_U_eq
     Sdata_W1_eq := tp.Sdata_W1_eq
     S_U_commutative := tp.S_U_commutative
-    Sdata_W2_eq := tp.Sdata_W2_eq }
+    Sdata_W2_eq := tp.Sdata_W2_eq
+    tau3_isometry := cd.tau3_isometry
+    tau3_trivial := cd.tau3_trivial
+    tau3_apply_of_regular := cd.tau3_apply_of_regular
+    tau3_mem_ZIrr := cd.tau3_mem_ZIrr
+    omega_orthonormal := cd.omega_orthonormal
+    omega_apply_one := cd.omega_apply_one
+    omega_mem_ZIrr := cd.omega_mem_ZIrr }
 
 /-- **Assembly of the Section 16 configuration from named inputs** (`sorry`-free).
 
@@ -1937,7 +2070,14 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       Sdata_U_eq := inp.Sdata_U_eq
       Sdata_W1_eq := inp.Sdata_W1_eq
       S_U_commutative := inp.S_U_commutative
-      Sdata_W2_eq := inp.Sdata_W2_eq }
+      Sdata_W2_eq := inp.Sdata_W2_eq
+      tau3_isometry := inp.tau3_isometry
+      tau3_trivial := inp.tau3_trivial
+      tau3_apply_of_regular := inp.tau3_apply_of_regular
+      tau3_mem_ZIrr := inp.tau3_mem_ZIrr
+      omega_orthonormal := inp.omega_orthonormal
+      omega_apply_one := inp.omega_apply_one
+      omega_mem_ZIrr := inp.omega_mem_ZIrr }
   q_lt_p := inp.q_lt_p
 
 /-- **The one remaining upstream obligation.** From a minimal simple group of odd

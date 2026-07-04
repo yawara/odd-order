@@ -745,6 +745,17 @@ theorem omega_inner_ne (hyp : TICyclicHypothesis G) [Fintype hyp.W]
       (hyp.omega χ' : ClassFunction hyp.W ℂ) = 0 := by
   rw [irreducibleCharacter_inner, if_neg (fun hc => h (hyp.omega_injective hc))]
 
+open scoped Classical in
+/-- The `ω`-family orthonormality in Kronecker form: `⟨ω(χ), ω(χ')⟩ = δ_{χχ'}`
+(`omega_inner_self` + `omega_inner_ne` combined; the shape the §13 grid fields carry). -/
+theorem omega_inner (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] (χ χ' : hyp.W →* ℂˣ) :
+    ClassFunction.inner (hyp.omega χ : ClassFunction hyp.W ℂ)
+      (hyp.omega χ' : ClassFunction hyp.W ℂ) = if χ = χ' then 1 else 0 := by
+  split_ifs with h
+  · subst h; exact hyp.omega_inner_self χ
+  · exact hyp.omega_inner_ne h
+
 /- 3.4 (cont.): the character-group separation behind `⟨α_{kl}, ω_{ij}⟩ = δ` -/
 
 /-- `wFst` restricted to `W₁` is the identity (the `W₁`-component of a `W₁`-element is itself). -/

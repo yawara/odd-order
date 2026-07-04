@@ -68,6 +68,13 @@ noncomputable scoped instance natCardInvC [Finite G] (H : Subgroup G) :
     Invertible (Nat.card H : ℂ) :=
   invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
 
+noncomputable scoped instance ambientFintype [Finite G] : Fintype G :=
+  Fintype.ofFinite _
+
+noncomputable scoped instance ambientNatCardInvC [Finite G] :
+    Invertible (Nat.card G : ℂ) :=
+  invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+
 end FiniteInduce
 
 /-! ## (13.1): the `S,T` hypothesis -/
@@ -202,6 +209,30 @@ structure Hypothesis where
   `Sdata.W2 = K*` (`typePData_of_kappaHall_hallComplement_W2`); discharges `card_P_eq` and hence
   `basic_structure_gated.P_order` (issue 3001/4014). -/
   Sdata_W2_eq : Sdata.W2 = W2
+  /- ### Grid property fields (issue 3002)
+
+  The (3.2)/(3.3)/(3.4) character-theoretic content of the Dade grid carriers `tau3`/`omega`,
+  which the §15 norm cascade ((13.5)–(13.10)) consumes.  All are supplied at construction from
+  the honest spine grid (`Section16CharacterData.omegaS`/`tau3W` in `FeitThompson.lean`):
+  ω-orthonormality via `S05.TICyclicHypothesis.omega_inner`, the τ₃ facts via the (3.2)
+  σ-isometry package (`S05.TICyclicHypothesis.sigmaIntegral_*`). -/
+  /-- **Peterfalvi (3.2), isometry part**: `τ₃` preserves the class-function inner product. -/
+  tau3_isometry : OddOrder.Peterfalvi.S07.IsIntegralIsometry tau3
+  /-- **Peterfalvi (3.2)**: `τ₃` sends the trivial character to the trivial character. -/
+  tau3_trivial : tau3 (trivialClassFunction ↥W) = trivialClassFunction G
+  /-- **Peterfalvi (3.2.c)**: on the regular set `W ∖ (W₁ ∪ W₂)` the map `τ₃` is the
+  identity: `(α^{τ₃})(w) = α(w)` for regular `w`. -/
+  tau3_apply_of_regular : ∀ (α : ClassFunction ↥W ℂ) (w : G) (hwW : w ∈ W),
+    w ∉ (W1 : Set G) ∪ (W2 : Set G) → tau3 α w = α ⟨w, hwW⟩
+  /-- **Peterfalvi (3.2)**: `τ₃` sends virtual characters to virtual characters. -/
+  tau3_mem_ZIrr : ∀ z ∈ ZIrr ↥W, tau3 z ∈ ZIrr G
+  /-- **Peterfalvi (3.3)/(3.4)**: the `ω`-grid is orthonormal. -/
+  omega_orthonormal : ∀ (i k : Fin q) (j l : Fin p),
+    ClassFunction.inner (omega i j) (omega k l) = if i = k ∧ j = l then 1 else 0
+  /-- The `ω_{ij}` are linear characters: `ω_{ij}(1) = 1`. -/
+  omega_apply_one : ∀ (i : Fin q) (j : Fin p), omega i j 1 = 1
+  /-- Each `ω_{ij}` is a virtual character (in fact an irreducible character of `W`). -/
+  omega_mem_ZIrr : ∀ (i : Fin q) (j : Fin p), omega i j ∈ ZIrr ↥W
 
 namespace Hypothesis
 
