@@ -1,9 +1,15 @@
 ---
-id: 9010
+id: 9011
 slug: ti-conjugate-counting
 title: "TI-subset conjugate counting: |A^G| = [G:L]·|A| + class-invariant sum transport (shared GroupTheory infra)"
 created: 2026-07-05
 ---
+
+> **hub renumber (2026-07-05 監視 tick)**: 本 issue は lane b が 9010 で採番したが、同番号は
+> lane c の `9010-frobenius-induced-degree-sum.md` が先に main 合流済み (SEQUENCE.9000 の並行
+> 消費レース)。hub が **9011 に renumber** し SEQUENCE.9000 を 9011 に更新。lane b は次回
+> `git merge main` でリネームを取り込むこと (b 側 worktree の 9010-ti ファイルは main の
+> rename に置換される; 衝突したら 9011 側を正とする)。
 
 # TI-subset conjugate counting: |A^G| = [G:L]·|A| + class-invariant sum transport (shared GroupTheory infra)
 

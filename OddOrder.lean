@@ -58,6 +58,7 @@ import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
 import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Inertia
 import OddOrder.GroupTheory.RepresentationTheory.InertiaAbelianQuotient
+import OddOrder.GroupTheory.RepresentationTheory.InducedDegreeSum
 import OddOrder.GroupTheory.RepresentationTheory.InducedInvariantConstituent
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
@@ -88,6 +89,7 @@ import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 import OddOrder.GroupTheory.SCN
 import OddOrder.GroupTheory.SemiDihedral
 import OddOrder.GroupTheory.TISubset
+import OddOrder.GroupTheory.TISubsetCounting
 import OddOrder.GroupTheory.ZGroup
 import OddOrder.Mathlib.SchurZassenhausConj
 import OddOrder.Mathlib.SemidirectProduct
@@ -211,6 +213,7 @@ import OddOrder.Peterfalvi.S08_PGroupReduction
 import OddOrder.Peterfalvi.S08_Theorem63
 import OddOrder.Peterfalvi.S08_Theorem65c2
 import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
+import OddOrder.Peterfalvi.S08_SixTwoGeneral
 import OddOrder.Peterfalvi.S08_RetargetReducible
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.Peterfalvi.S09_CertificateDischarge
@@ -232,6 +235,7 @@ import OddOrder.Peterfalvi.S13_MaximalIII_IV
 import OddOrder.Peterfalvi.S14_MaximalI
 import OddOrder.Peterfalvi.S15_SAndT
 import OddOrder.Peterfalvi.S16_NonExistenceG
+import OddOrder.Peterfalvi.S16_PairingCoherence
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppB_PuigB3B4

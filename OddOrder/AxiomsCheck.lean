@@ -110,6 +110,7 @@ import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
 import OddOrder.Peterfalvi.S07_CoherenceGalois
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
 import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
+import OddOrder.Peterfalvi.S08_SixTwoGeneral
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.FeitThompson
@@ -2287,6 +2288,36 @@ set_option linter.style.longLine false in
 -- `six_three_descent ∘ six_three_index_bound_general ∘ six_two_general`, leaving the (5.6) break-member
 -- oracle `h56` (the §10–§12 muGrid bound) as the only character-theoretic hypothesis.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_three_of_six_two_oracle
+-- General-kernel (6.1) family `S(X) = {Ind_K^L θ | θ ∈ Irr K, θ ≠ 1, X ⊆ Ker θ}` (the issue-2022
+-- `h56` producer layer, Coq `seqIndD K L K X`): the antitone/finite/conjugation-closed suite, the
+-- degree-`|L:K|` anchor member (Coq `exists_linInd`), and the (6.2) B2 degree-square identity
+-- `∑_{χ∈S(X)} χ(1)²/‖χ‖² = |L:K|·(|K:X|−1)` in real form (general-kernel form of
+-- `sum_re_div_normSq_SsubFiltration_eq`; members may be reducible μ-columns).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.inducedKernelFamily_closedUnderConjugate
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.exists_inducedKernelFamily_member_degree_index
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.sum_re_div_normSq_inducedKernelFamily_eq
+-- Break pair for *incomparable* filtrations (Peterfalvi (6.2) assumes no `S(A) ⊆ S(B)`; §11's
+-- (11.4) instantiates `(A,B) = (H₁, H₀C)` with neither containing the other): the absorption chain
+-- runs over `Sa ∪ Sb`, and a fully-absorbed chain would make `Sb` coherent by restriction
+-- (`IsCoherent.subset` + the nonzero supported witness), so a break pair `ψ ∈ Sb` exists.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_coherentBreakPair_union
+-- General-kernel family structure + the h56 producer chain (issue 2022): pairwise orthogonality /
+-- real positive norms / real-freeness (odd order) of the possibly-reducible family; K^#-supported
+-- scaled and conjugate member differences; the norm-weighted (5.6) member-family bound at a break
+-- (`coherentDegreeSqNormBound_of_not_coherentW_k` fed from the family layer, with the (5.2.d)
+-- decomposition data `Da`/`datum` as the sole grid-backed inputs); the (6.2) S(A')-sum comparison
+-- (B2); and the producer `exists_source_index_le_two_psi_of_break` — from `S(A')` coherent,
+-- `S(B)` not, an anchor, and the decomposition data, a source `θ ∈ Irr K` trivial on `B` with
+-- `|K:A'| − 1 ≤ 2·(Ind_K^L θ)(1)` — exactly the `h56` oracle of `six_three_of_six_two_oracle`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.inducedKernelFamily_scaledDiff_support
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.inducedKernelFamily_breakChar_fields
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.inducedKernelFamily_degreeSqNormReBound_of_break_k
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.inducedKernelFamily_SA_sum_le_two_psi_k
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_source_index_le_two_psi_of_break
 -- (6.5) chief-factor core + (6.5)(b) reduction: a Frobenius-acted abelian section obeying the (6.3)
 -- index bound `≤ 4|R|²+1` is a `p`-group (chief-factor argument via the `p`-primary component,
 -- `card_modEq_one` + `six_five_chief_factor_contradiction`); combined with the nilpotent

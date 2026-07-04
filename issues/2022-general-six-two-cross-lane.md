@@ -115,3 +115,76 @@ contrapositive, general 既存) の orthonormality/support/generation 仮説を�
 constituent (= §10-12 muGrid/columnSum) で discharge すること。**lane-h §6/§8 スコープ外、lane-b/c 領域。**
 
 本 issue は open 維持 (`h56` landing で close)。lane-h の producer 側は完了。
+
+## 2026-07-05 lane-a — h56 は lane-a frontier に編入 (両 (11.8) 残 gate の共通上流)
+
+**Ownership 更新**: 2026-07-04/05 再々編で §9-13 char 核 + S08 非-coherence-glob (`S08_Theorem62_63_Standalone`
+含む) = **lane a**。ヘッダの「現 owner = lane b (07-02)」は stale。h56 の実体 (§10-12 muGrid/columnSum
+構造) も a 所有。⟹ **h56 = lane-a の次 frontier** (charParam_d_modEq_one 完了後の上流優先)。
+
+**なぜ今 h56 か**: (11.8) の残 2 gates の共通上流。
+- gate 2 `card_SHCSet_filter_eq_charParam_n` ((11.8.1) n-count) は (11.6) C=U' (U/C abelian order u) を
+  経由 ⟸ (11.5) M''=HC ⟸ (11.4)+(11.3) ⟸ **h56** (S13 の該当 4 定理は全 sorry、
+  `six_three_of_six_two_oracle`/`six_two_general` cite + h56 供給 + S13.SOf pin で閉じる)。
+- gate 3 `coherent_Sset_of_column_identities` ((11.8.6) τ₂) の S₂-coherence ((11.7)) も (11.5) 構造 +
+  (9.11) を要する。
+- Coq 対応: (11.3)=FTtype34_noncoherence / (11.4)=bounded_proper_coherent / (11.5)=FTtype34_der2 /
+  (11.6)=FTtype34_facts (PFsection11.v:205-350)。**(11.3) は (9.11) 不要** (bounded_seqIndD_coherence
+  (6.3) + (10.8) proven のみ) — S13 docstring の「(11.7) 経由」読みは Coq route でバイパス可。
+
+**Coq model (h56 の中身)**: PFsection6 `coherent_seqIndD_bound` (6.2) は break-member を直接見つけるの
+でなく **`extend_coherent` (5.4) induction**: S(A)-coherent から S(B) の pair {ψ,ψ*} を 1 つずつ吸収、
+全部吸収できれば S(B) coherent (unless 枝)、失敗点 ψ で extend_coherent の norm-sum bound 反転が
+`|K:A|−1 ≤ 2|L:C|√|C:D|` を与える (`sum_seqIndD_square` + `irr1_bound_quo`)。
+⟹ Lean h56 = `coherentDegreeSumBound_of_not_coherent` ((5.6) contrapositive, CorePart1:2451,
+general 済) の**仮説 discharge for solvable-K induced family**: orthonormality/support/generation を
+可約 member (= μ-column sums) 込みで。2026-07-05 の `muGrid_column_sum_mem_sOf_H0_and_reducible`
+(S12_Section9Counts) で「可約 member = column sums、source = chiRestrict、pairwise distinct」の
+enumeration が整った — これが (5.2.d) R(χ)-構造 discharge の素材。
+
+**次 iteration 手順 (lane a)**:
+1. `coherentDegreeSumBound_of_not_coherent` (CorePart1:2451) の正確な仮説リストを読み、
+   solvable-K family での discharge 計画を立てる (Coq PFsection5 (5.6) 証明と併読)。
+2. h56 を `S08_Theorem62_63_Standalone` (a 所有) に landing → `six_three_of_six_two_oracle` 完全 discharge。
+3. S13 side: SOf free field を induced-family filter に pin (enrich) → (11.3)/(11.4) を producer cite で
+   閉じ、(11.5)/(11.6) を assembly。
+4. gate 2 n-count: (11.6) U/C abelian order u + M/HC Frobenius (`frobMtilde` 相当は
+   `typeP_uW1_frobenius` 系) + Ind-linear irreducibility で S1 count = (u−1)/q = n。
+
+## 2026-07-05 lane-a: h56 producer 完成 — `exists_source_index_le_two_psi_of_break` (S08_SixTwoGeneral)
+
+**abstract 層は閉じた。** 新 leaf `OddOrder/Peterfalvi/S08_SixTwoGeneral.lean` (全実証明 sorry-free +
+axiom-clean, commits 51d1d54f / 10a7e8f4 / 32c7ece4 / 82d570f3):
+
+- `inducedKernelFamily K X` = S(X) (Coq seqIndD): mem/antitone/finite/conj-closed/anchor +
+  **直交性・実正 norm・real-freeness (奇数位数)** — 可約 μ-column member 込みで全部実証明。
+- `exists_coherentBreakPair_union`: **A'/B 包含なし** の first-obstruction ((11.4) の
+  (H₁,H₀C) 対応; chain を Sa ∪ Sb 上で走らせ IsCoherent.subset で落とす)。
+- P1 `inducedKernelFamily_degreeSqNormReBound_of_break_k`: weighted engine
+  (`coherentDegreeSqNormBound_of_not_coherentW_k`, 既存・完成済だった) への plumbing 全 discharge
+  (Gram / deg 比 / K^#-support / ZIrr integrality / 生成 2 条)。
+- P2 `inducedKernelFamily_SA_sum_le_two_psi_k`: + B2 → |L:K|(|K:A'|−1) ≤ 2ψ(1)χ₁(1)。
+- **P3 `exists_source_index_le_two_psi_of_break` = h56 producer**: 結論が
+  `six_three_of_six_two_oracle`/`six_two_general` の h56 oracle と一致
+  (∃θ ∈ Irr K trivial-on-B, |K:A'|−1 ≤ 2(Ind θ)(1).re)。
+
+**残 = S13 instantiation のみ (次 frontier)**。P3 の §11-side hypotheses:
+1. **hanchor**: irreducible degree-|L:K| member of S(A') — W₁ が K/A' の linear char に非自明に
+   作用する事実 (K=M', L=M, |L:K|=q)。Frobenius W₁-action (8.4.d 系) から。
+2. **hdatum**: break Da + per-member R(χ)-分解 (coherent extension と両立、Da family と直交)。
+   - irreducible member: `memberExtensionDecomposition` (CorePart1) の適用で一般 discharge
+     可能な見込み (per-member 事実は family 層で証明済) — まずここから。
+   - **μ-column member: 本丸。** hS₁coh.extension(μⱼ) の multiplicity-free 性 = (11.8.6)/(5.8) 型
+     uniqueness。S12 muGrid (`muGrid_column_sum_mem_sOf_H0_and_reducible` ほか) +
+     grid 直交性が素材。任意の coherent extension に対する statement が要る点に注意
+     (hdatum は witness ∀-quantified)。
+3. routine: hKsupp (K^# ⊆ Dade support set — §9/§10 の A(M) 定義確認), h1A, hSBne
+   (= B ⊊ K solvable の linear char, `exists_inducedKernelFamily_member_degree_index` 流用),
+   hodd (M ≤ G 奇数)。
+4. S13 の SOf free field を `inducedKernelFamily (M'.subgroupOf M)`-形に pin
+   (§9 の sOf は「H ⊄ ker」filter 付き = S − S(H); §11 の S は full family — S(H) 部分の
+   合流に注意, (11.2) remark)。τ free field = dadeIntegralCharacterMap の形に pin
+   (S12 側の (9.5)/(10.x) Dade hypothesis instance を確認)。
+
+作業順 (上流優先): 2 の irreducible-member 分枝 → 3 routine pins → 1 anchor → 2 の μ-column
+(最深, S12 grid 併用) → 4 pin + (11.3)/(11.4) 閉じ。
