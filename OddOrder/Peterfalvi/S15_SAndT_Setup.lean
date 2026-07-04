@@ -2394,16 +2394,72 @@ theorem Hypothesis.two_mul_u_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
 
 open scoped Classical in
 open scoped FiniteInduce in
+/-- **Peterfalvi (13.3)/(13.5), the distinguished index of `λ`** — the (13.10) supposition
+localized to the (7.6) family: `λ` (irreducible, induced from a linear character of `H` with
+`P` off its kernel) *is* a member `ζ_{i₁}` of the induced family, with distinguished (7.7.a)
+coefficient `c_{i₁} = a = 1` and all other `P`-non-kernel coefficients vanishing (the (13.5)
+hypothesis for `χ = λ^{τ₁}`, `a = 1` — from `S`-coherence).  Faithful producer; gated on the
+(13.3) analysis pinning `chars.lambda`/`chars.tau1S` to the family and the coherence
+orthogonality. -/
+theorem exists_lambda_index [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (chars : CharacterDegreeData hyp)
+    (_hlam : chars.lambda_induced_from_PC_linear) :
+    ∃ i₁ : Fin ((H_sharp_hypothesis76 hG hyp).n + 1), 0 < i₁ ∧
+      ¬ ((hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel ((H_sharp_hypothesis76 hG hyp).zeta i₁)) ∧
+      (H_sharp_hypothesis76 hG hyp).zeta i₁ = chars.lambda ∧
+      (H_sharp_hypothesis76 hG hyp).cCoeff (chars.tau1S chars.lambda) i₁ = 1 ∧
+      (∀ i : Fin ((H_sharp_hypothesis76 hG hyp).n + 1), 0 < i → i ≠ i₁ →
+        ¬ ((hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel ((H_sharp_hypothesis76 hG hyp).zeta i)) →
+        (H_sharp_hypothesis76 hG hyp).cCoeff (chars.tau1S chars.lambda) i = 0) := by
+  sorry
+
+open scoped Classical in
+open scoped FiniteInduce in
+/-- **`⟨Res_H λ, α⟩ = 0`** — the (13.5.a) `P`-kernel orthogonality for the `λ`-package: `λ`'s
+`H`-restriction is the orbit character of the `P`-non-kernel `θ_{i₁}`, while `α` is supported
+on `P`-kernel orbit characters; distinct orbits are orthogonal.  Real-provable from the orbit
+machinery (distinct induced ⟹ disjoint orbits ⟹ orthogonal restrictions); kept as a named
+producer pending the orbit-orthogonality lemma. -/
+theorem lambda_alphaFun_inner_zero [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (chars : CharacterDegreeData hyp)
+    (_hlam : chars.lambda_induced_from_PC_linear) :
+    (∑ x ∈ Finset.univ.filter (· ∈ hyp.H.subgroupOf hyp.S),
+      chars.lambda x * (starRingEnd ℂ)
+        (H_sharp_alphaFun hG hyp (chars.tau1S chars.lambda) x)) = 0 := by
+  sorry
+
+open scoped Classical in
+open scoped FiniteInduce in
+/-- **`α(1) ≡ 0 (mod q)` for the `λ`-package** (Peterfalvi (13.6) proof, the (1.10) congruence):
+`λ(x) ≡ λ^{τ₁}(x) ≡ 0 (mod 1−ε)` on `W₂^#`, so `α(1) = α(x) = λ^{τ₁}(x) − λ(x) ≡ 0 (mod q)`.
+Faithful producer; gated on the (1.10)/(3.2) grid congruences. -/
+theorem exists_lambda_alphaFun_one_qb [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (chars : CharacterDegreeData hyp)
+    (_hlam : chars.lambda_induced_from_PC_linear) :
+    ∃ b : ℤ, H_sharp_alphaFun hG hyp (chars.tau1S chars.lambda) 1
+      = (hyp.q : ℂ) * (b : ℂ) := by
+  sorry
+
+open scoped Classical in
+open scoped FiniteInduce in
 /-- **Peterfalvi (13.5.a)+(13.5.c) for `ζ₁ = λ`, `χ = λ^{τ₁}`, `a = 1`** — the correction datum
-`α` of the (13.5) TI-subset calculation: `λ` vanishes off `H` (induced from `H ⊴ S`),
-`(Res_H λ, α) = 0` (the `P`-kernel orthogonality), the point formula `λ^{τ₁} = λ + α` on `H^#`
-((7.7.a) `chiRho_explicit_formula` on the proven `H_sharp_hypothesis76`, plus the (13.2.e)
-`τ`-agreement), `α(1) = qb` (the (1.10) congruence), and the inflation bound
-`(|P|−1)·α(1)² ≤ ∑_{H^#}|α|²` ((13.5.c), `P ≤ ker` of every component of `α`).  Faithful
-producer of the (13.5)-for-`λ` package; gated on the (13.3)/(13.2.e) analysis. -/
+of the (13.6) estimate.
+
+**Real assembly** from the distinguished-index atom (`exists_lambda_index`): with
+`ζ_{i₁} = λ`, `c_{i₁} = 1`, and `‖ζ_{i₁}‖² = ⟨λ,λ⟩ = 1` (`lambda_tau1_norm_one`), the proven
+point formula `H_sharp_point_formula` collapses to `λ^{τ₁} = λ + α` on `H^#` with
+`α = H_sharp_alphaFun` the `P`-kernel tail; `λ` vanishes off `H` (`zeta_eq_zero_of_not_mem_H`);
+the inner-product and congruence facts are the named producers
+(`lambda_alphaFun_inner_zero` / `exists_lambda_alphaFun_one_qb`); the (13.5.c) inflation is
+`H_sharp_alphaFun_inflation`. -/
 theorem exists_caseB_data_lambda [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {hyp : Hypothesis (G := G)} (chars : CharacterDegreeData hyp)
-    (_hlam : chars.lambda_induced_from_PC_linear) :
+    (hlam : chars.lambda_induced_from_PC_linear) :
     ∃ (α : ↥hyp.S → ℂ) (b : ℤ),
       (∀ x : ↥hyp.S, x ∉ hyp.H.subgroupOf hyp.S → chars.lambda x = 0) ∧
       (∑ x ∈ Finset.univ.filter (· ∈ hyp.H.subgroupOf hyp.S),
@@ -2413,7 +2469,45 @@ theorem exists_caseB_data_lambda [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOd
       α 1 = (hyp.q : ℂ) * (b : ℂ) ∧
       ((hyp.p ^ hyp.q - 1 : ℕ) : ℝ) * ((hyp.q : ℝ) * (b : ℝ)) ^ 2
         ≤ ∑ x ∈ (Finset.univ.filter (· ∈ hyp.H.subgroupOf hyp.S)).erase 1, ‖α x‖ ^ 2 := by
-  sorry
+  haveI : Fintype G := Fintype.ofFinite G
+  haveI : Invertible (Nat.card G : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  obtain ⟨i₁, hi₁pos, hi₁ker, hi₁eq, hi₁c, hmiddle⟩ := exists_lambda_index _hG chars hlam
+  obtain ⟨-, -, hinnerLam⟩ := lambda_tau1_norm_one _hG chars hlam
+  obtain ⟨b, hb⟩ := exists_lambda_alphaFun_one_qb _hG chars hlam
+  refine ⟨H_sharp_alphaFun _hG hyp (chars.tau1S chars.lambda), b, ?_, ?_, ?_, hb, ?_⟩
+  · -- `λ = ζ_{i₁}` vanishes off `H`.
+    intro x hx
+    rw [← hi₁eq]
+    exact (H_sharp_hypothesis76 _hG hyp).zeta_eq_zero_of_not_mem_H i₁ x
+      (fun hmem => hx (Subgroup.mem_subgroupOf.mpr hmem))
+  · exact lambda_alphaFun_inner_zero _hG chars hlam
+  · -- The point formula collapses: `c̄_{i₁}/‖ζ_{i₁}‖² = 1` and `ζ_{i₁} = λ`.
+    intro x hx
+    obtain ⟨hx1, hxmem⟩ := Finset.mem_erase.mp hx
+    have hxH : (↑x : G) ∈ hyp.H :=
+      Subgroup.mem_subgroupOf.mp (Finset.mem_filter.mp hxmem).2
+    have hxsharp : (↑x : G) ∈ OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G) := by
+      refine OddOrder.Peterfalvi.S04.mem_sharp.mpr ⟨hxH, ?_⟩
+      intro h1
+      exact hx1 (Subtype.ext h1)
+    have hpt := H_sharp_point_formula _hG hyp (chars.tau1S chars.lambda) i₁ hi₁pos hi₁ker
+      hmiddle x hxsharp
+    rw [hpt, hi₁c]
+    have hnorm1 : (H_sharp_hypothesis76 _hG hyp).zetaNormSq i₁ = 1 := by
+      rw [OddOrder.Peterfalvi.S09.Hypothesis76.zetaNormSq, hi₁eq]
+      exact hinnerLam
+    rw [hnorm1, hi₁eq, star_one, div_one, one_mul]
+    rfl
+  · -- (13.5.c): the inflation bound for the concrete tail, with `α(1) = qb`.
+    have hinfl := H_sharp_alphaFun_inflation _hG hyp (chars.tau1S chars.lambda)
+    rw [hb] at hinfl
+    have hval : ‖(hyp.q : ℂ) * (b : ℂ)‖ ^ 2 = ((hyp.q : ℝ) * (b : ℝ)) ^ 2 := by
+      rw [norm_mul, mul_pow, Complex.norm_natCast, Complex.norm_intCast, sq_abs]
+      push_cast
+      ring
+    rw [hval] at hinfl
+    exact hinfl
 
 open scoped Classical in
 open scoped FiniteInduce in
