@@ -1394,6 +1394,103 @@ theorem H_sharp_alphaFun_inflation [Fintype G] [Invertible (Nat.card G : ℂ)]
         norm_num
     _ ≤ (∑ x : ↥hyp.S, ‖α x‖ ^ 2) - ‖α 1‖ ^ 2 := hcore
 
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce Classical in
+/-- **The (13.5.a) correction as a class function on `↥S`**: `H_sharp_alphaFun` is the
+underlying function of the `ℂ`-combination `∑_{i≥1, P⊆ker ζ_i} (c̄_i/‖ζ_i‖²) • ζ_i`. -/
+noncomputable def H_sharp_alphaCF [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (χ : ClassFunction G ℂ) : ClassFunction ↥hyp.S ℂ :=
+  ∑ i ∈ (Finset.Ioi (0 : Fin ((H_sharp_hypothesis76 hG hyp).n + 1))).filter
+        (fun i => (hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel ((H_sharp_hypothesis76 hG hyp).zeta i)),
+      (star ((H_sharp_hypothesis76 hG hyp).cCoeff χ i) /
+        (H_sharp_hypothesis76 hG hyp).zetaNormSq i) • (H_sharp_hypothesis76 hG hyp).zeta i
+
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce Classical in
+@[simp] theorem H_sharp_alphaCF_apply [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (χ : ClassFunction G ℂ) (a : ↥hyp.S) :
+    H_sharp_alphaCF hG hyp χ a = H_sharp_alphaFun hG hyp χ a := by
+  rw [H_sharp_alphaCF, H_sharp_alphaFun,
+    OddOrder.RepresentationTheory.ClassFunction.finset_sum_apply]
+  exact Finset.sum_congr rfl (fun i _ => by rw [ClassFunction.smul_apply])
+
+/-- `H = PC` is normal in `S` (it is the Fitting subgroup, `H_eq_fittingInG`) — as an
+instance on the `subgroupOf` form, so that `conjBy`/`inertia` statements over `↥S` elaborate. -/
+instance H_sharp_subgroupOf_normal (hyp : Hypothesis (G := G)) :
+    (hyp.H.subgroupOf hyp.S).Normal := by
+  rw [hyp.H_eq_fittingInG]
+  exact OddOrder.BG.Ch2.S08.fittingInG_subgroupOf_normal hyp.S
+
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce Classical in
+/-- **`(1/‖ζ_i‖²)·Res_H ζ_i` is a virtual character of `H`** — the "`Res ζ_i/‖ζ_i‖²` is a
+character" step of Peterfalvi (13.5.a).  `ζ_i = Ind_K^S θ_i` (`zeta_induced`), so by the Mackey
+orbit form (`card_smul_restrict_induce_eq_inertia_smul_orbitSum`) and the inertia norm
+(`card_mul_inner_self_induce_eq_card_inertia`), `Res_K ζ_i = ‖ζ_i‖² · (sum of the distinct
+conjugates of θ_i)` — an ℕ-combination of irreducibles (`orbitSum_mem_ZIrr`). -/
+theorem H_sharp_inv_normSq_restrict_zeta_mem_ZIrr [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (i : Fin ((H_sharp_hypothesis76 hG hyp).n + 1)) :
+    ((H_sharp_hypothesis76 hG hyp).zetaNormSq i)⁻¹ •
+        ClassFunction.restrict ((H_sharp_hypothesis76 hG hyp).H.subgroupOf hyp.S)
+          ((H_sharp_hypothesis76 hG hyp).zeta i)
+      ∈ ZIrr ↥((H_sharp_hypothesis76 hG hyp).H.subgroupOf hyp.S) := by
+  classical
+  set K : Subgroup ↥hyp.S := (H_sharp_hypothesis76 hG hyp).H.subgroupOf hyp.S with hKdef
+  haveI hKnorm : K.Normal := H_sharp_subgroupOf_normal hyp
+  obtain ⟨θ₀, hθ₀⟩ := (H_sharp_hypothesis76 hG hyp).zeta_induced i
+  -- Re-type across the definitional equality `(H_sharp_hypothesis76 hG hyp).H = hyp.H`, and
+  -- bridge the canonical `Fintype`/`Invertible` instances (both subsingleton classes).
+  have hθ : (H_sharp_hypothesis76 hG hyp).zeta i
+      = ClassFunction.induce K (θ₀ : ClassFunction ↥K ℂ) := by
+    rw [hθ₀]
+  -- The Mackey orbit form, divided by `|K|`.
+  have hK0 : (Nat.card ↥K : ℂ) ≠ 0 := by exact_mod_cast Nat.card_pos.ne'
+  have horbit := OddOrder.RepresentationTheory.card_smul_restrict_induce_eq_inertia_smul_orbitSum
+    (G := ↥hyp.S) (H := K) (k := ℂ) (θ₀ : ClassFunction ↥K ℂ)
+  have hinertia := OddOrder.RepresentationTheory.card_mul_inner_self_induce_eq_card_inertia
+    (G := ↥hyp.S) (H := K) θ₀
+  -- `‖ζ_i‖² ≠ 0` (it is `|I|/|K|` with `|I| ≥ 1`).
+  have hnormval : (Nat.card ↥K : ℂ) * (H_sharp_hypothesis76 hG hyp).zetaNormSq i
+      = (Nat.card ↥(ClassFunction.inertia (G := ↥hyp.S)
+          (θ₀ : ClassFunction ↥K ℂ)) : ℂ) := by
+    rw [OddOrder.Peterfalvi.S09.Hypothesis76.zetaNormSq, hθ]
+    exact hinertia
+  have hI0 : (Nat.card ↥(ClassFunction.inertia (G := ↥hyp.S)
+      (θ₀ : ClassFunction ↥K ℂ)) : ℂ) ≠ 0 := by
+    exact_mod_cast Nat.card_pos.ne'
+  have hnorm0 : (H_sharp_hypothesis76 hG hyp).zetaNormSq i ≠ 0 := by
+    intro h0
+    rw [h0, mul_zero] at hnormval
+    exact hI0 hnormval.symm
+  -- `Res ζ_i = ‖ζ_i‖² • orbitSum θ₀`, hence `(1/‖ζ_i‖²)·Res ζ_i` is the orbit sum.
+  have hIKnorm : ((Nat.card ↥K : ℂ))⁻¹ * (Nat.card ↥(ClassFunction.inertia (G := ↥hyp.S)
+      (θ₀ : ClassFunction ↥K ℂ)) : ℂ) = (H_sharp_hypothesis76 hG hyp).zetaNormSq i := by
+    rw [← hnormval]
+    field_simp
+  have hres : ClassFunction.restrict K ((H_sharp_hypothesis76 hG hyp).zeta i)
+      = (H_sharp_hypothesis76 hG hyp).zetaNormSq i •
+          ∑ ψ ∈ Finset.univ.image (fun x : ↥hyp.S =>
+            ClassFunction.conjBy x⁻¹ (θ₀ : ClassFunction ↥K ℂ)), ψ := by
+    have h1 : (Nat.card ↥K : ℂ) • ClassFunction.restrict K
+        ((H_sharp_hypothesis76 hG hyp).zeta i)
+        = ((Nat.card ↥(ClassFunction.inertia (G := ↥hyp.S)
+            (θ₀ : ClassFunction ↥K ℂ)) : ℕ) : ℂ) • ∑ ψ ∈ Finset.univ.image
+              (fun x : ↥hyp.S => ClassFunction.conjBy x⁻¹ (θ₀ : ClassFunction ↥K ℂ)), ψ := by
+      rw [← Nat.cast_smul_eq_nsmul (R := ℂ)] at horbit
+      rw [hθ]
+      exact horbit
+    have h2 := congrArg (fun φ => ((Nat.card ↥K : ℂ))⁻¹ • φ) h1
+    simp only [smul_smul, inv_mul_cancel₀ hK0, one_smul] at h2
+    rw [h2, hIKnorm]
+  have hmain : ((H_sharp_hypothesis76 hG hyp).zetaNormSq i)⁻¹ •
+      ClassFunction.restrict K ((H_sharp_hypothesis76 hG hyp).zeta i)
+      = ∑ ψ ∈ Finset.univ.image (fun x : ↥hyp.S =>
+          ClassFunction.conjBy x⁻¹ (θ₀ : ClassFunction ↥K ℂ)), ψ := by
+    rw [hres, smul_smul, inv_mul_cancel₀ hnorm0, one_smul]
+  rw [hmain]
+  exact OddOrder.RepresentationTheory.orbitSum_mem_ZIrr (G := ↥hyp.S) θ₀
+
 /-- **Peterfalvi (13.5)**: the TI-subset calculation on `H = P C` gives a
 pointwise formula and two norm estimates. -/
 theorem tiSubset_character_orthogonality [Finite G]
