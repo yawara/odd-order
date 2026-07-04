@@ -2302,6 +2302,22 @@ set_option linter.style.longLine false in
 -- runs over `Sa ∪ Sb`, and a fully-absorbed chain would make `Sb` coherent by restriction
 -- (`IsCoherent.subset` + the nonzero supported witness), so a break pair `ψ ∈ Sb` exists.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_coherentBreakPair_union
+-- General-kernel family structure + the h56 producer chain (issue 2022): pairwise orthogonality /
+-- real positive norms / real-freeness (odd order) of the possibly-reducible family; K^#-supported
+-- scaled and conjugate member differences; the norm-weighted (5.6) member-family bound at a break
+-- (`coherentDegreeSqNormBound_of_not_coherentW_k` fed from the family layer, with the (5.2.d)
+-- decomposition data `Da`/`datum` as the sole grid-backed inputs); the (6.2) S(A')-sum comparison
+-- (B2); and the producer `exists_source_index_le_two_psi_of_break` — from `S(A')` coherent,
+-- `S(B)` not, an anchor, and the decomposition data, a source `θ ∈ Irr K` trivial on `B` with
+-- `|K:A'| − 1 ≤ 2·(Ind_K^L θ)(1)` — exactly the `h56` oracle of `six_three_of_six_two_oracle`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.inducedKernelFamily_scaledDiff_support
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.inducedKernelFamily_breakChar_fields
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.inducedKernelFamily_degreeSqNormReBound_of_break_k
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.inducedKernelFamily_SA_sum_le_two_psi_k
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_source_index_le_two_psi_of_break
 -- (6.5) chief-factor core + (6.5)(b) reduction: a Frobenius-acted abelian section obeying the (6.3)
 -- index bound `≤ 4|R|²+1` is a `p`-group (chief-factor argument via the `p`-primary component,
 -- `card_modEq_one` + `six_five_chief_factor_contradiction`); combined with the nilpotent

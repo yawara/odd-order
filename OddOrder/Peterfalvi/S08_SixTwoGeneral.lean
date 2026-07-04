@@ -5,6 +5,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import OddOrder.GroupTheory.RepresentationTheory.CliffordDecomposition
 import OddOrder.Peterfalvi.S08_CoherenceCorePart1
 import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
+import OddOrder.Peterfalvi.S08_CaseBEnumeration
 
 /-!
 # Peterfalvi (6.2), general kernel: the induced family `S(X)`
@@ -441,6 +442,250 @@ theorem sum_re_div_normSq_inducedKernelFamily_eq (X : Subgroup ↥L) [X.Normal] 
 
 end DegreeSum
 
+/-! ### The norm-weighted member-family bound at a break (general kernel) -/
+
+section MemberFamilyBound
+
+variable [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
+
+open scoped Classical in
+/-- **The general-kernel norm-weighted member-family degree-square bound** (the `h56` plumbing:
+general analogue of `sMember_degreeSqNormReBound_of_not_coherent_columnBreak`).
+
+For a coherent finite `S₁` inside the general induced family `S = S(⊥)`, an anchor
+`χ₁ ∈ S₁` (irreducible, degree `|L:K|`), and a possibly-**reducible** break `ψ ∈ S(B)` (with
+degree ratio `a`, decomposition `Da`, and per-member (5.2.d) decompositions `datum` — the
+grid-supplied data of issue 2022) whose conjugate pair cannot be coherently adjoined, the
+enumerated norm-weighted degree-square sum obeys the (5.6) bound
+`∑ⱼ (χⱼ(1))²/‖χⱼ‖² ≤ 2·ψ(1)·χ₁(1)` (real parts).
+
+Everything except `Da`/`datum` is discharged from the family-structure layer: enumeration
+(`exists_finEnum_general`), Gram matrix (`inducedKernelFamily_pairwise_orthogonal` +
+`inducedKernelFamily_inner_self_real_pos`), degree ratios (`inducedKernelFamily_degree_ratio`),
+supports (`inducedKernelFamily_scaledDiff_support`), integrality
+(`dadeIntegralCharacterMap_mem_ZIrr_of_supported`), generation (the S07 anchor-generation pair),
+and the break fields (`inducedKernelFamily_breakChar_fields`). -/
+theorem inducedKernelFamily_degreeSqNormReBound_of_break_k
+    {A : Set G}
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hodd : Odd (Nat.card ↥L))
+    {K : Subgroup ↥L} [K.Normal] [Invertible (Nat.card ↥K : ℂ)]
+    (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 →
+      x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (h1A : (1 : ↥L) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ inducedKernelFamily K ⊥)
+    (hS₁fin : S₁.Finite)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      S₁ (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁S₁ : χ₁ ∈ S₁) (hχ₁irr : IsIrreducibleCharacter χ₁)
+    (hχ₁deg : χ₁ 1 = (K.index : ℂ))
+    {B : Subgroup ↥L} {ψ : ClassFunction ↥L ℂ} (hψB : ψ ∈ inducedKernelFamily K B)
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
+    {a : ℕ} (hψdeg : ψ 1 = (a : ℂ) * χ₁ 1)
+    (Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      ψ (a • χ₁))
+    (hDatau1 : Da.tau1 = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
+      (hyp.fullDadeIsometryData hconj))
+    (datum : ∀ χ ∈ S₁,
+      { D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
+          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
+            (hyp.fullDadeIsometryData hconj)) χ 0 //
+        D.imageFamily.Orthogonal Da.imageFamily ∧
+        D.tau1 χ = hS₁coh.extension χ })
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (S₁ ∪ {ψ, ψ.conj})
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A L))) :
+    ∃ (k : ℕ) (χmem : Fin k → ClassFunction ↥L ℂ) (mc : Fin k → ℝ),
+      Function.Injective χmem ∧
+      Set.range χmem = S₁ ∧
+      (∀ j, 0 < mc j) ∧
+      (∀ j, ClassFunction.inner (χmem j) (χmem j) = ((mc j : ℝ) : ℂ)) ∧
+      ∑ j : Fin k, ((χmem j 1).re) ^ 2 / mc j ≤ 2 * (ψ 1).re * (χ₁ 1).re := by
+  classical
+  -- (1) enumeration of `S₁` and its membership in the full family
+  obtain ⟨k, χmem, hinj, hrange⟩ := exists_finEnum_general hS₁fin
+  have hmemS1set : ∀ j, χmem j ∈ S₁ := fun j => hrange ▸ Set.mem_range_self j
+  have hmemfam : ∀ j, χmem j ∈ inducedKernelFamily K ⊥ := fun j => hS₁sub (hmemS1set j)
+  -- (2) norms `mc` and the weighted Gram matrix
+  set mc : Fin k → ℝ := fun j => (ClassFunction.inner (χmem j) (χmem j)).re with hmc
+  have hmcpos : ∀ j, 0 < mc j := fun j =>
+    (inducedKernelFamily_inner_self_real_pos (hmemfam j)).2
+  have hmcnorm : ∀ j, ClassFunction.inner (χmem j) (χmem j) = ((mc j : ℝ) : ℂ) := fun j =>
+    (inducedKernelFamily_inner_self_real_pos (hmemfam j)).1
+  have hmemortho : ∀ i j, ClassFunction.inner (χmem i) (χmem j)
+      = @ite ℂ (i = j) (Classical.propDecidable (i = j)) ((mc i : ℝ) : ℂ) 0 := by
+    intro i j
+    by_cases hij : i = j
+    · subst hij; rw [if_pos rfl]; exact hmcnorm i
+    · rw [if_neg hij]
+      exact inducedKernelFamily_pairwise_orthogonal (hmemfam i) (hmemfam j)
+        (fun h => hij (hinj h))
+  -- (3) the anchor's index `i₁` in the enumeration (and eliminate `χ₁` in its favour)
+  have hχ₁mem : χ₁ ∈ Set.range χmem := hrange ▸ hχ₁S₁
+  obtain ⟨i₁, hi₁eq⟩ := hχ₁mem
+  subst hi₁eq
+  -- (4) degree ratios `deg` against the index anchor
+  choose deg hdegpos hdegeq using fun j => inducedKernelFamily_degree_ratio (hmemfam j)
+  have hKidx_ne : (K.index : ℂ) ≠ 0 := by
+    rw [Nat.cast_ne_zero, Subgroup.index_eq_card]
+    exact Nat.card_pos.ne'
+  have hdeg_anchor : ∀ j, χmem j 1 = (deg j : ℂ) * χmem i₁ 1 := fun j => by
+    rw [hdegeq j, hχ₁deg]
+  have ha1 : deg i₁ = 1 := by
+    have h : (deg i₁ : ℂ) * (K.index : ℂ) = 1 * (K.index : ℂ) := by
+      rw [one_mul, ← hdegeq i₁, hχ₁deg]
+    have h1 := mul_right_cancel₀ hKidx_ne h
+    exact_mod_cast h1
+  have hanchorNorm : mc i₁ = 1 := by
+    have hval : ClassFunction.inner (χmem i₁) (χmem i₁) = 1 := by
+      have h := irreducibleCharacter_inner_eq_ite
+        (⟨χmem i₁, hχ₁irr⟩ : IrreducibleCharacter ↥L) ⟨χmem i₁, hχ₁irr⟩
+      rwa [if_pos rfl] at h
+    simp only [hmc, hval, Complex.one_re]
+  -- (5) break-character fields
+  obtain ⟨hreal, hψψne, hψbψbne, hψbψ, hψψb, hdiffsuppψ, hψ_S1, hψbar_S1⟩ :=
+    inducedKernelFamily_breakChar_fields hodd hKsupp hS₁sub hψB hψnotS1 hψcnotS1
+  -- (6) support conditions for the scaled differences
+  have hmemdegdiffsupp : ∀ (i : Fin k), i ∈ (Finset.univ : Finset (Fin k)) →
+      ((χmem i - deg i • χmem i₁).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup A L) := by
+    intro i _
+    exact inducedKernelFamily_scaledDiff_support hKsupp (hmemfam i) (hmemfam i₁)
+      (d := deg i) (hdeg_anchor i)
+  have hdiffasuppψ : (ψ - a • χmem i₁).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L :=
+    inducedKernelFamily_scaledDiff_support hKsupp hψB (hmemfam i₁) (d := a) hψdeg
+  -- (7) Dade-image integrality of the break difference
+  have htau1ψ : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
+      (hyp.fullDadeIsometryData hconj) (ψ - a • χmem i₁) ∈ ZIrr G := by
+    refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj
+      hdiffasuppψ ?_
+    exact Submodule.sub_mem _ (inducedKernelFamily_mem_ZIrr hψB)
+      (nsmul_mem (inducedKernelFamily_mem_ZIrr (hmemfam i₁)) a)
+  -- (8) generation: anchor generation of `ℤ[S₁]` and the adjoined-pair supported span
+  have hcover : ∀ x ∈ S₁, ∃ j, j ∈ (Finset.univ : Finset (Fin k)) ∧ χmem j = x := by
+    intro x hx
+    rw [← hrange] at hx
+    obtain ⟨j, hj⟩ := hx
+    exact ⟨j, Finset.mem_univ j, hj⟩
+  have hSgen := OddOrder.Peterfalvi.S07.span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs
+    (s := (Finset.univ : Finset (Fin k))) (χmem := χmem) (deg := deg) (i₁ := i₁)
+    hcover (Finset.mem_univ i₁) (fun j _ => hmemS1set j) hmemdegdiffsupp
+  have hψ1cast : ψ 1 = ((a * K.index : ℕ) : ℂ) := by
+    rw [hψdeg, hχ₁deg]; push_cast; ring
+  have hbar1 : ψ.conj 1 = ψ 1 := by
+    rw [ClassFunction.conj_apply, hψ1cast]
+    exact star_natCast _
+  have hχ₁ne : χmem i₁ 1 ≠ 0 := by
+    rw [hχ₁deg]; exact hKidx_ne
+  have hgen := OddOrder.Peterfalvi.S07.zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration
+    (χ := ψ) (chibar := ψ.conj) (chi1 := χmem i₁) (a := a)
+    hSgen hψdeg hbar1 hχ₁ne h1A
+  -- (9) feed the norm-weighted reducible-break engine
+  have hbound := coherentDegreeSqNormBound_of_not_coherentW_k hyp hconj hS₁coh
+    ψ hdiffsuppψ hψψne hψbψbne hψψb hψbψ hψ_S1 hψbar_S1
+    (Finset.univ : Finset (Fin k)) χmem deg i₁ (Finset.mem_univ i₁)
+    hmemdegdiffsupp (fun j _ => hmemS1set j) mc (fun j _ => hmcpos j)
+    (fun i _ j _ => hmemortho i j) hanchorNorm
+    (fun χ hχ => (datum (χmem χ) (hmemS1set χ)).1)
+    Da hDatau1
+    (fun i _ => (datum (χmem i) (hmemS1set i)).2.1)
+    (fun i _ => (datum (χmem i) (hmemS1set i)).2.2)
+    hdiffasuppψ htau1ψ ha1 hSgen hgen hnc
+  -- (10) convert the ratio bound to the real degree-square form
+  refine ⟨k, χmem, mc, hinj, hrange, hmcpos, hmcnorm, ?_⟩
+  have hdegre : ∀ j, (χmem j 1).re = (deg j : ℝ) * (χmem i₁ 1).re := by
+    intro j
+    rw [hdeg_anchor j, Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
+    ring
+  have hψre : (ψ 1).re = (a : ℝ) * (χmem i₁ 1).re := by
+    rw [hψdeg, Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
+    ring
+  calc ∑ j : Fin k, ((χmem j 1).re) ^ 2 / mc j
+      = ∑ j : Fin k, ((deg j : ℝ) * (χmem i₁ 1).re) ^ 2 / mc j := by
+        refine Finset.sum_congr rfl (fun j _ => ?_); rw [hdegre j]
+    _ = (χmem i₁ 1).re ^ 2 * ∑ j : Fin k, (deg j : ℝ) ^ 2 / mc j := by
+        rw [Finset.mul_sum]; refine Finset.sum_congr rfl (fun j _ => ?_); ring
+    _ ≤ (χmem i₁ 1).re ^ 2 * (2 * (a : ℝ)) := mul_le_mul_of_nonneg_left hbound (sq_nonneg _)
+    _ = 2 * ((a : ℝ) * (χmem i₁ 1).re) * (χmem i₁ 1).re := by ring
+    _ = 2 * (ψ 1).re * (χmem i₁ 1).re := by rw [hψre]
+
+/-- **The (6.2) `S(A)`-sum bound at a break, general kernel** — the norm-weighted (5.6) family
+bound compared against the `S(A)` degree-square identity (B2).
+
+If additionally the coherent `S₁` contains the whole filtration layer `S(A')`, the enumerated
+family bound of `inducedKernelFamily_degreeSqNormReBound_of_break_k` dominates the `S(A')`-sum,
+giving `|L:K|·(|K:A'| − 1) ≤ 2·ψ(1)·χ₁(1)` (general-kernel form of
+`sSubFiltration_sum_le_two_psi_caseB`/`_columnBreak`). -/
+theorem inducedKernelFamily_SA_sum_le_two_psi_k
+    {A : Set G}
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hodd : Odd (Nat.card ↥L))
+    {K : Subgroup ↥L} [K.Normal] [Invertible (Nat.card ↥K : ℂ)]
+    (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 →
+      x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (h1A : (1 : ↥L) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ inducedKernelFamily K ⊥)
+    (hS₁fin : S₁.Finite)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      S₁ (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
+    {A' : Subgroup ↥L} [A'.Normal] (hSAsub : inducedKernelFamily K A' ⊆ S₁)
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁S₁ : χ₁ ∈ S₁) (hχ₁irr : IsIrreducibleCharacter χ₁)
+    (hχ₁deg : χ₁ 1 = (K.index : ℂ))
+    {B : Subgroup ↥L} {ψ : ClassFunction ↥L ℂ} (hψB : ψ ∈ inducedKernelFamily K B)
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
+    {a : ℕ} (hψdeg : ψ 1 = (a : ℂ) * χ₁ 1)
+    (Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      ψ (a • χ₁))
+    (hDatau1 : Da.tau1 = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
+      (hyp.fullDadeIsometryData hconj))
+    (datum : ∀ χ ∈ S₁,
+      { D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
+          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
+            (hyp.fullDadeIsometryData hconj)) χ 0 //
+        D.imageFamily.Orthogonal Da.imageFamily ∧
+        D.tau1 χ = hS₁coh.extension χ })
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (S₁ ∪ {ψ, ψ.conj})
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A L))) :
+    (K.index : ℝ) * ((Nat.card (↥K ⧸ A'.subgroupOf K) : ℝ) - 1)
+      ≤ 2 * (ψ 1).re * (χ₁ 1).re := by
+  classical
+  obtain ⟨k, χmem, mc, hinj, hrange, hmcpos, hmcnorm, hfambound⟩ :=
+    inducedKernelFamily_degreeSqNormReBound_of_break_k hyp hconj hodd hKsupp h1A hS₁sub hS₁fin
+      hS₁coh hχ₁S₁ hχ₁irr hχ₁deg hψB hψnotS1 hψcnotS1 hψdeg Da hDatau1 datum hnc
+  have hSAsum := sum_re_div_normSq_inducedKernelFamily_eq (K := K) (X := A')
+  set SAfilt := (Finset.univ.filter (fun θ : IrreducibleCharacter ↥K =>
+          (↑(A'.subgroupOf K) : Set ↥K) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+              (θ : ClassFunction ↥K ℂ) ∧
+            θ ≠ trivialIrreducibleCharacter ↥K)).image
+          (fun θ => ClassFunction.induce K θ.toClassFunction) with hSAdef
+  have hsub : SAfilt ⊆ (Set.range χmem).toFinset := by
+    intro χ hχ
+    rw [Set.mem_toFinset, hrange]
+    rw [hSAdef] at hχ
+    obtain ⟨θ, hθ, rfl⟩ := Finset.mem_image.mp hχ
+    obtain ⟨-, hker, hne⟩ := Finset.mem_filter.mp hθ
+    exact hSAsub ⟨θ, hne, hker, rfl⟩
+  rw [← hSAsum]
+  calc ∑ χ ∈ SAfilt, ((χ 1).re) ^ 2 / (ClassFunction.inner χ χ).re
+      ≤ ∑ χ ∈ (Set.range χmem).toFinset, ((χ 1).re) ^ 2 / (ClassFunction.inner χ χ).re :=
+        Finset.sum_le_sum_of_subset_of_nonneg hsub
+          (fun χ _ _ => div_nonneg (sq_nonneg _) (inner_self_re_nonneg χ))
+    _ = ∑ j : Fin k, ((χmem j 1).re) ^ 2 / (ClassFunction.inner (χmem j) (χmem j)).re :=
+        sum_toFinset_range_eq hinj (fun χ => ((χ 1).re) ^ 2 / (ClassFunction.inner χ χ).re)
+    _ = ∑ j : Fin k, ((χmem j 1).re) ^ 2 / mc j := by
+        refine Finset.sum_congr rfl (fun j _ => ?_); rw [hmcnorm j, Complex.ofReal_re]
+    _ ≤ 2 * (ψ 1).re * (χ₁ 1).re := hfambound
+
+end MemberFamilyBound
+
 /-! ### The break pair for incomparable filtrations -/
 
 /-- **First obstruction to coherence, union form** — the (6.2) break pair for **incomparable**
@@ -496,5 +741,146 @@ theorem exists_coherentBreakPair_union
     · exact absurd (hSaS₁ hψa) hψnotS₁
     · exact hψb
   exact ⟨S₁, ψ, hS₁conj, hSaS₁, hS₁un, hψSb, hψnotS₁, hψcnotS₁, hS₁coh, hbreak⟩
+
+/-! ### The h56 producer: the (6.2) break index bound for a general solvable kernel -/
+
+section H56Producer
+
+variable [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
+
+open scoped Classical in
+/-- **The (6.2) index bound `|K:A'| − 1 ≤ 2ψ(1)` at a break member — the `h56` producer**
+(issue 2022; Coq `coherent_seqIndD_bound`, contrapositive route).
+
+Given the general induced families `S(A')` (coherent) and `S(B)` (not coherent) over a kernel
+`K ≤ L` — **no inclusion between `A'` and `B` is assumed** (Peterfalvi (11.4) needs
+`(A', B) = (H₁, H₀C)` incomparable) — together with
+
+* an **anchor**: an irreducible `χ₁ ∈ S(A')` of the minimal degree `|L:K|` (in the Sibley case
+  supplied by the Frobenius action; for §11 by the `W₁`-action on the linear characters of
+  `K/A'`), and
+* the **(5.2.d) decomposition data** `hdatum` for any intermediate coherent set and break pair —
+  the genuinely grid-backed obligation (§10–§12 muGrid/columnSum, issue 2022): the break's
+  decomposition `Da` over the Dade map and, per member `χ` of the coherent set, an
+  `R(χ)`-decomposition compatible with the coherent extension and orthogonal to `Da`'s family,
+
+the first-obstruction chain (`exists_coherentBreakPair_union`) produces a break `ψ ∈ S(B)`
+with `|K:A'| − 1 ≤ 2·ψ(1)`; unpacking `ψ = Ind_K^L θ` gives exactly the `h56` oracle of
+`six_three_of_six_two_oracle`/`six_two_general` (`S08_Theorem62_63_Standalone`): a source
+`θ ∈ Irr K` trivial on `B` whose induced degree bounds the index.  Everything outside `hdatum`
+and the anchor is discharged by the general family layer of this file. -/
+theorem exists_source_index_le_two_psi_of_break
+    {A : Set G}
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hodd : Odd (Nat.card ↥L))
+    {K : Subgroup ↥L} [K.Normal] [Invertible (Nat.card ↥K : ℂ)]
+    (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 →
+      x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (h1A : (1 : ↥L) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    {A' B : Subgroup ↥L} [A'.Normal]
+    (hanchor : ∃ χ₁ ∈ inducedKernelFamily K A',
+      IsIrreducibleCharacter χ₁ ∧ χ₁ 1 = (K.index : ℂ))
+    (hSBne : (inducedKernelFamily K B).Nonempty)
+    (hdatum : ∀ (S₁ : Set (ClassFunction ↥L ℂ)),
+      OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁ →
+      S₁ ⊆ inducedKernelFamily K A' ∪ inducedKernelFamily K B →
+      ∀ (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+        S₁ (OddOrder.Peterfalvi.S04.supportInSubgroup A L)),
+      ∀ (ψ : ClassFunction ↥L ℂ), ψ ∈ inducedKernelFamily K B → ψ ∉ S₁ → ψ.conj ∉ S₁ →
+      ∀ (χ₁ : ClassFunction ↥L ℂ), χ₁ ∈ S₁ →
+      ∀ (a : ℕ), ψ 1 = (a : ℂ) * χ₁ 1 →
+      ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+        (S₁ ∪ {ψ, ψ.conj}) (OddOrder.Peterfalvi.S04.supportInSubgroup A L)) →
+      ∃ Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
+          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
+            (hyp.fullDadeIsometryData hconj)) ψ (a • χ₁),
+        Da.tau1 = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
+          (hyp.fullDadeIsometryData hconj) ∧
+        ∀ χ ∈ S₁, ∃ D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
+            (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
+              (hyp.fullDadeIsometryData hconj)) χ 0,
+          D.imageFamily.Orthogonal Da.imageFamily ∧
+          D.tau1 χ = hS₁coh.extension χ)
+    (hAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (inducedKernelFamily K A') (OddOrder.Peterfalvi.S04.supportInSubgroup A L)))
+    (hBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (inducedKernelFamily K B) (OddOrder.Peterfalvi.S04.supportInSubgroup A L))) :
+    ∃ θ : IrreducibleCharacter ↥K,
+      (↑(B.subgroupOf K) : Set ↥K) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+          (θ : ClassFunction ↥K ℂ) ∧
+      (Nat.card (↥K ⧸ A'.subgroupOf K) : ℝ) - 1 ≤
+        2 * (ClassFunction.induce K (θ : ClassFunction ↥K ℂ) 1).re := by
+  classical
+  obtain ⟨χ₁, hχ₁A', hχ₁irr, hχ₁deg⟩ := hanchor
+  -- the nonzero supported witness for `ℤ[S(B)]`: a conjugate difference of any member.
+  obtain ⟨φ₀, hφ₀⟩ := hSBne
+  have hne : ∃ φ : ClassFunction ↥L ℂ,
+      φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (inducedKernelFamily K B)
+        (OddOrder.Peterfalvi.S04.supportInSubgroup A L) ∧ φ ≠ 0 := by
+    refine ⟨φ₀.conj - φ₀, ?_, ?_⟩
+    · refine OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mpr ⟨?_, ?_⟩
+      · exact Submodule.sub_mem _
+          (Submodule.subset_span (inducedKernelFamily_closedUnderConjugate B hφ₀))
+          (Submodule.subset_span hφ₀)
+      · exact inducedKernelFamily_conjDiff_support hKsupp hφ₀
+    · intro h
+      exact inducedKernelFamily_hasNoRealCharacters hodd B hφ₀
+        (sub_eq_zero.mp h)
+  -- the first-obstruction break pair over `S(A') ∪ S(B)`.
+  obtain ⟨S₁, ψ, hS₁conj, hSaS₁, hS₁un, hψB, hψnotS₁, hψcnotS₁, hS₁coh, hbreak⟩ :=
+    exists_coherentBreakPair_union
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (inducedKernelFamily_finite A') (inducedKernelFamily_finite B)
+      (inducedKernelFamily_closedUnderConjugate A')
+      (inducedKernelFamily_closedUnderConjugate B)
+      (inducedKernelFamily_hasNoRealCharacters hodd A')
+      (inducedKernelFamily_hasNoRealCharacters hodd B)
+      hne hAcoh hBncoh
+  -- fixed coherence witness for `S₁` (the datum couples to its extension).
+  obtain ⟨hcoh⟩ := hS₁coh
+  -- `S₁` sits inside the full family and is finite.
+  have hS₁bot : S₁ ⊆ inducedKernelFamily K ⊥ := fun χ hχ => by
+    rcases hS₁un hχ with h | h
+    · exact inducedKernelFamily_subset_bot A' h
+    · exact inducedKernelFamily_subset_bot B h
+  have hS₁fin : S₁.Finite :=
+    ((inducedKernelFamily_finite (K := K) A').union (inducedKernelFamily_finite B)).subset hS₁un
+  -- the break's degree ratio against the anchor.
+  obtain ⟨a, hapos, haeq⟩ := inducedKernelFamily_degree_ratio (inducedKernelFamily_subset_bot B hψB)
+  have hψdeg : ψ 1 = (a : ℂ) * χ₁ 1 := by rw [haeq, hχ₁deg]
+  -- the grid-backed decomposition data at this break.
+  obtain ⟨Da, hDatau1, hdat⟩ := hdatum S₁ hS₁conj hS₁un hcoh ψ hψB hψnotS₁ hψcnotS₁
+    χ₁ (hSaS₁ hχ₁A') a hψdeg hbreak
+  -- the (6.2) `S(A')`-sum bound at the break.
+  have hbound := inducedKernelFamily_SA_sum_le_two_psi_k hyp hconj hodd hKsupp h1A
+    hS₁bot hS₁fin hcoh hSaS₁ (hSaS₁ hχ₁A') hχ₁irr hχ₁deg hψB hψnotS₁ hψcnotS₁ hψdeg
+    Da hDatau1
+    (fun χ hχ => ⟨(hdat χ hχ).choose, (hdat χ hχ).choose_spec⟩)
+    hbreak
+  -- divide by the positive anchor degree `χ₁(1) = |L:K|`.
+  have hKidx_pos : (0 : ℝ) < (K.index : ℝ) := by
+    rw [Subgroup.index_eq_card]
+    exact_mod_cast Nat.card_pos
+  have hχ₁re : (χ₁ 1).re = (K.index : ℝ) := by
+    rw [hχ₁deg, Complex.natCast_re]
+  rw [hχ₁re] at hbound
+  have hdiv : (Nat.card (↥K ⧸ A'.subgroupOf K) : ℝ) - 1 ≤ 2 * (ψ 1).re := by
+    have h2 : (K.index : ℝ) * ((Nat.card (↥K ⧸ A'.subgroupOf K) : ℝ) - 1)
+        ≤ (K.index : ℝ) * (2 * (ψ 1).re) := by
+      calc (K.index : ℝ) * ((Nat.card (↥K ⧸ A'.subgroupOf K) : ℝ) - 1)
+          ≤ 2 * (ψ 1).re * (K.index : ℝ) := hbound
+        _ = (K.index : ℝ) * (2 * (ψ 1).re) := by ring
+    exact le_of_mul_le_mul_left h2 hKidx_pos
+  -- unpack the break's source `θ` (trivial on `B`).
+  obtain ⟨θ, -, hθker, hψeq⟩ := hψB
+  refine ⟨θ, hθker, ?_⟩
+  rw [← hψeq]
+  exact hdiv
+
+end H56Producer
 
 end OddOrder.Peterfalvi.S08
