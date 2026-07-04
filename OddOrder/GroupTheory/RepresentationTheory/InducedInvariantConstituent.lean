@@ -439,4 +439,58 @@ theorem induce_inertia_constituents_apply_one_eq
   rw [induce_inertia_constituent_apply_one_eq hNT hab θ hinertia ψ hover φ₁ hφ₁,
     induce_inertia_constituent_apply_one_eq hNT hab θ hinertia ψ hover φ₂ hφ₂]
 
+open scoped commutatorElement in
+/-- **Equal degree of the constituents of `Ind_{[HH,HH]}^{HH} ρ`** (Peterfalvi (1.7.b) specialised to
+the derived subgroup — the exact `H' = [H,H]` case (12.5) needs, self-contained).  For a finite `HH`
+and `ρ ∈ Irr [HH,HH]`, any two constituents `θ₁, θ₂` of `Ind_{[HH,HH]}^{HH} ρ` have equal degree.
+Since `HH/[HH,HH]` is abelian, every inertia quotient `I(ρ)/[HH,HH]` is abelian, so
+`induce_inertia_constituents_apply_one_eq` applies with `N = [HH,HH]`, `T = I(ρ)`, `hab` from
+`⁅x,y⁆ ∈ ⁅⊤,⊤⁆`, and a Clifford correspondent `ψ` from `exists_liesOver_of_subgroup`. -/
+theorem commutator_induce_constituents_apply_one_eq {HH : Type*} [Group HH] [Finite HH]
+    [Fintype HH] [Invertible (Nat.card HH : ℂ)]
+    [Fintype ↥(commutator HH)] [Invertible (Nat.card ↥(commutator HH) : ℂ)]
+    (ρ : IrreducibleCharacter ↥(commutator HH))
+    (θ₁ θ₂ : IrreducibleCharacter HH)
+    (h₁ : IrreducibleCharacter.LiesOver (commutator HH) θ₁ ρ)
+    (h₂ : IrreducibleCharacter.LiesOver (commutator HH) θ₂ ρ) :
+    (θ₁ : ClassFunction HH ℂ) 1 = (θ₂ : ClassFunction HH ℂ) 1 := by
+  classical
+  have hNT : commutator HH ≤ ClassFunction.inertia (ρ : ClassFunction ↥(commutator HH) ℂ) :=
+    ClassFunction.subgroup_le_inertia _
+  haveI : Fintype ↥(ClassFunction.inertia (ρ : ClassFunction ↥(commutator HH) ℂ)) :=
+    Fintype.ofFinite _
+  haveI : Fintype ↥((commutator HH).subgroupOf
+      (ClassFunction.inertia (ρ : ClassFunction ↥(commutator HH) ℂ))) := Fintype.ofFinite _
+  haveI : Invertible
+      (Nat.card ↥(ClassFunction.inertia (ρ : ClassFunction ↥(commutator HH) ℂ)) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : Invertible (Nat.card ↥((commutator HH).subgroupOf
+      (ClassFunction.inertia (ρ : ClassFunction ↥(commutator HH) ℂ))) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : Fintype (IrreducibleCharacter ↥((commutator HH).subgroupOf
+      (ClassFunction.inertia (ρ : ClassFunction ↥(commutator HH) ℂ)))) := Fintype.ofFinite _
+  haveI : Fintype ((↥(ClassFunction.inertia (ρ : ClassFunction ↥(commutator HH) ℂ)) ⧸
+      (commutator HH).subgroupOf
+        (ClassFunction.inertia (ρ : ClassFunction ↥(commutator HH) ℂ))) →* ℂˣ) :=
+    Fintype.ofFinite _
+  haveI : ((commutator HH).subgroupOf
+      (ClassFunction.inertia (ρ : ClassFunction ↥(commutator HH) ℂ))).Normal :=
+    ClassFunction.subgroupOf_inertia_normal _
+  have hab : ∀ x y : ↥(ClassFunction.inertia (ρ : ClassFunction ↥(commutator HH) ℂ)),
+      ⁅x, y⁆ ∈ (commutator HH).subgroupOf
+        (ClassFunction.inertia (ρ : ClassFunction ↥(commutator HH) ℂ)) := by
+    intro x y
+    rw [Subgroup.mem_subgroupOf]
+    exact Subgroup.commutator_mem_commutator (Subgroup.mem_top _) (Subgroup.mem_top _)
+  obtain ⟨ψ, hψ⟩ := exists_liesOver_of_subgroup
+    (⟨ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hNT).toMonoidHom
+        (ρ : ClassFunction ↥(commutator HH) ℂ),
+      IsIrreducibleCharacter.compHom_of_surjective
+        (Subgroup.subgroupOfEquivOfLe hNT).surjective ρ.isIrreducible⟩ :
+      IrreducibleCharacter ↥((commutator HH).subgroupOf
+        (ClassFunction.inertia (ρ : ClassFunction ↥(commutator HH) ℂ))))
+  exact induce_inertia_constituents_apply_one_eq hNT hab ρ rfl ψ hψ θ₁ θ₂
+    ((IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver (commutator HH) θ₁ ρ).mpr h₁)
+    ((IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver (commutator HH) θ₂ ρ).mpr h₂)
+
 end OddOrder.RepresentationTheory
