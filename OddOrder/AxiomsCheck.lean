@@ -110,6 +110,7 @@ import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
 import OddOrder.Peterfalvi.S07_CoherenceGalois
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
 import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
+import OddOrder.Peterfalvi.S08_SixTwoGeneral
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.FeitThompson
@@ -2287,6 +2288,20 @@ set_option linter.style.longLine false in
 -- `six_three_descent ∘ six_three_index_bound_general ∘ six_two_general`, leaving the (5.6) break-member
 -- oracle `h56` (the §10–§12 muGrid bound) as the only character-theoretic hypothesis.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_three_of_six_two_oracle
+-- General-kernel (6.1) family `S(X) = {Ind_K^L θ | θ ∈ Irr K, θ ≠ 1, X ⊆ Ker θ}` (the issue-2022
+-- `h56` producer layer, Coq `seqIndD K L K X`): the antitone/finite/conjugation-closed suite, the
+-- degree-`|L:K|` anchor member (Coq `exists_linInd`), and the (6.2) B2 degree-square identity
+-- `∑_{χ∈S(X)} χ(1)²/‖χ‖² = |L:K|·(|K:X|−1)` in real form (general-kernel form of
+-- `sum_re_div_normSq_SsubFiltration_eq`; members may be reducible μ-columns).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.inducedKernelFamily_closedUnderConjugate
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.exists_inducedKernelFamily_member_degree_index
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.sum_re_div_normSq_inducedKernelFamily_eq
+-- Break pair for *incomparable* filtrations (Peterfalvi (6.2) assumes no `S(A) ⊆ S(B)`; §11's
+-- (11.4) instantiates `(A,B) = (H₁, H₀C)` with neither containing the other): the absorption chain
+-- runs over `Sa ∪ Sb`, and a fully-absorbed chain would make `Sb` coherent by restriction
+-- (`IsCoherent.subset` + the nonzero supported witness), so a break pair `ψ ∈ Sb` exists.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_coherentBreakPair_union
 -- (6.5) chief-factor core + (6.5)(b) reduction: a Frobenius-acted abelian section obeying the (6.3)
 -- index bound `≤ 4|R|²+1` is a `p`-group (chief-factor argument via the `p`-primary component,
 -- `card_modEq_one` + `six_five_chief_factor_contradiction`); combined with the nilpotent
@@ -6628,6 +6643,22 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- `S04.Hypothesis.fullDadeIsometryData` (`HConjInvariant` automatic since all `H(a) = ⊥`).  The
 -- genuine (not formal) `τ₃` so that `η = τ₃ ∘ ω` is a real virtual character downstream.  Axiom-clean.
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.tau3W
+
+-- **cd grid property package (issue 3002)** — the (3.2)/(3.3)/(3.4) character-theoretic content of
+-- `tau3W`/`omegaS`, read off the `S05` σ-isometry lemmas (`sigmaIntegral_*`) through the extracted
+-- `tiCyclicW`/`tiCyclicWDadeApp` and the `S05` ω-orthonormality (`omega_inner`) transported along
+-- `gridEquivE` (`ClassFunction.inner_compHom_mulEquiv`).  These discharge the grid property fields
+-- threaded onto `Section16CharacterData` / `Section16Inputs` / `S15.Hypothesis`, which the §15 norm
+-- cascade ((13.5)–(13.10)) consumes.  Axiom-clean.
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.tiCyclicW
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.tiCyclicWDadeApp
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.tau3W_isometry
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.tau3W_trivial
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.tau3W_mem_ZIrr
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.tau3W_apply_of_regular
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaS_inner
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaS_apply_one
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaS_mem_ZIrr
 
 -- **cd producer (POLE-1 `charData`)** — `section16CharacterData_of_isMinimalSimpleOdd` packs the
 -- proven grid building blocks (`omegaS`/`muS`/`nuT`/`deltaS`/`deltaPrimeT`/`tau3W` with the

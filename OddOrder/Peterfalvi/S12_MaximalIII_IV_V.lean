@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core
+import OddOrder.Peterfalvi.S12_Section9Counts
 
 /-!
 # Peterfalvi Section 12: Maximal Subgroups of Types III, IV, and V
@@ -3800,152 +3800,6 @@ theorem Hypothesis.span_inner_SHCSet_diff_eq_zero [Finite G] {M : Subgroup G} (h
   | smul a x _ ih =>
       rw [← Int.cast_smul_eq_zsmul ℂ a x, ClassFunction.inner_smul_left, ih, mul_zero]
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
-/-- **Construct the §9 `Section11CharacterData` from the §10 `Hypothesis`** (the key unblocker for
-the (11.8.1) §9 counts).  Given the §9 setup `data` (`toTypesIIIIIIVSetup`) and a chief factor
-`chief` (`exists_chiefFactorData`), the §9 character datum's *character* fields are all derived from
-`data`/`chief` (the families `𝒳 = xiSet`, `𝒮 = Ind_{HU}^M 𝒳`, `𝒮(Y)`); the only genuine fields are
-`u = |Ū|` (pinned to the `U`-action image on the chief factor, `rfl`) and the degree-irrelevant
-`tau`/`H0CprimeSupport`/`quotientSemidirectFrobenius` (used only by the (9.11) coherence, not by the
-degree fact `caseB_degree_qu`).  So the §9 *degree* analysis — `clifford_dichotomy` (9.7) and the
-`μ_j(1) = qu` of (9.8)/(9.9) — becomes available on the §10 `Hypothesis`.  (`tau := hyp.tau` records
-the genuine Dade map for the coherence use; the support/`Prop` are placeholders for the count use.) -/
-noncomputable def Hypothesis.mkSection11CharacterData [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
-    (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup M)
-    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData data) :
-    OddOrder.Peterfalvi.S11.Section11CharacterData data chief where
-  u := Nat.card ↥(((quotientMulAutHom (N := chief.N) chief.N_aInvariant).comp
-      (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype).range)
-  u_eq_card_quotient := rfl
-  H0CprimeSupport := ∅
-  tau := hyp.tau
-  quotientSemidirectFrobenius := True
-
-open OddOrder.Peterfalvi.S11 in
-/-- **§9 degree `qu` on the §10 `Hypothesis`, case (b) branch** (validating `mkSection11CharacterData`
-end-to-end).  Via the constructed `Section11CharacterData`, the (9.7) Clifford dichotomy
-(`clifford_dichotomy`, proven) splits into case (a)/(b); in case (b), `caseB_degree_qu` gives that
-every member of the §9 family `𝒮(H₀C')` has degree `q·u = q·|Ū|`.  This is the §9 half of the
-(11.8.1) degree `d = |Ū|` (the μ-grid column `μ_j = ∑_i μ_{ij}` has degree `qu`, so `μ_{ij}(1) = u`);
-combined with the μ-grid ↔ §9-family correspondence (`huSub = M'`, `chars.S ⊆ inducedFamily`) it
-gives `d = |Ū|`.  The case (a) branch (reducible-induction degree, `caseA_reducible_*`) is the
-remaining case. -/
-theorem Hypothesis.forall_sOf_H0Cprime_degree_qu_caseB [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
-    (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data)
-    (caseB : CliffordCaseBData (hyp.mkSection11CharacterData data chief)) :
-    ∀ φ ∈ (hyp.mkSection11CharacterData data chief).SOf
-        (chief.H0 ⊔ (hyp.mkSection11CharacterData data chief).Cprime),
-      φ 1 = ((data.q * (hyp.mkSection11CharacterData data chief).u : ℕ) : ℂ) :=
-  caseB_degree_qu hG (hyp.mkSection11CharacterData data chief) caseB
-
-/-- **Bridge to the §9 (repo S11) character analysis.**  A §10 type-III/IV `Hypothesis` yields the
-§9 `TypesIIIIIIVSetup` on the same `M`, sharing the type-`P` structure `(H, U, W₁, W₂)`.  This is the
-`Hypothesis` → `Section11CharacterData` bridge the (11.8.1) §9 counts need: with it,
-`exists_chiefFactorData` produces the chief factor `H̄ = H/H₀`, and the §9 results (`caseB_degree_qu`
-for `μ_j(1) = qu`, `coherent_H0C_commutator` for the (9.11) `S(H₀C')` coherence) apply to the §10
-character parameters.  `type_alt` restricts to III/IV (type V is eliminated separately by
-`no_typeV_maximal`); the `nontrivial` core (`U ≠ ⊥`, `|W₁|` prime, the `M_F`-TI condition) is the §8
-structural input, threaded as `hnt`. -/
-def Hypothesis.toTypesIIIIIIVSetup [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
-    (htype : IsTypeIII M ∨ IsTypeIV M) (hnt : TypePNontrivialCore M hyp.typeP) :
-    OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup M where
-  maximal := hyp.maximal
-  typeP := hyp.typeP
-  nontrivial := hnt
-  type_alt := htype.elim (fun h => Or.inr (Or.inl h)) (fun h => Or.inr (Or.inr h))
-
-/-- **Peterfalvi (11.8.1), the Frobenius congruence `|U| ≡ 1 (mod q)`.**  The type-`P` group
-`U ⋊ W₁` is a Frobenius group with kernel `U` (`typeP_uW1_frobenius`, `U ≠ ⊥` from the type-`P`
-`U_nontrivial`), so by Isaacs Lemma 6.1 (`card_kernel_modEq_one`) `|U| ≡ 1 (mod |W₁| = q)`.  This is
-the group-theoretic half of (11.8.1)'s `δ = 1`: with the (9.8)/(9.9) degree `d = μ_{ij}(1) = |Ū|`
-and the `U/C_U(H̄)`-quotient of this congruence `|Ū| ≡ 1 (mod q)`, the index relation `n·q = d − δ`
-(`δ = ±1`) forces `d ≡ 1 (mod q)`, i.e. `δ = 1`. -/
-theorem Hypothesis.card_U_modEq_one [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
-    (hU : hyp.typeP.U ≠ ⊥) :
-    Nat.card ↥hyp.typeP.U ≡ 1 [MOD hyp.w1] := by
-  have h := (OddOrder.Peterfalvi.S11.typeP_uW1_frobenius hyp.typeP hU).card_kernel_modEq_one
-  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_left).toEquiv,
-    Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv] at h
-  exact h
-
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
-/-- **Peterfalvi (11.8.1), the chief-factor image congruence `|Ū| ≡ 1 (mod q)`.**  The genuine `u`
-field of the constructed §9 character datum, `u = |Ū| = |U/C_U(H̄)|` (the image of `U` in
-`Aut(H̄)`, `mkSection11CharacterData.u`), satisfies `|Ū| ≡ 1 (mod w₁ = q)`.
-
-This is the `U/C_U(H̄)`-quotient of the Frobenius congruence `|U| ≡ 1 (mod q)` (`card_U_modEq_one`):
-`W₁` acts fixed-point-freely on `U` (`typeP_uW1_frobenius`) and this descends to the chief-factor
-image `Ū` — a homomorphic image of `U` under the `U W₁`-equivariant action map `quotientMulAutHom` —
-by the general Frobenius-group image congruence
-`IsFrobeniusGroup.card_range_comp_subtype_modEq_one` (Isaacs Cor 6.2 + Lemma 6.1).  Together with the
-μ-grid degree `d = |Ū|` (from `caseB_degree_qu`, the μ-grid ↔ §9-family correspondence) this is the
-§9 half of `charParam_d_modEq_one`. -/
-theorem Hypothesis.mkSection11CharacterData_u_modEq_one [Finite G] {M : Subgroup G}
-    (hyp : Hypothesis M) (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup M)
-    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData data) (hU : data.typeP.U ≠ ⊥) :
-    (hyp.mkSection11CharacterData data chief).u ≡ 1 [MOD Nat.card ↥data.typeP.W1] := by
-  have hgen := (OddOrder.Peterfalvi.S11.typeP_uW1_frobenius data.typeP hU).card_range_comp_subtype_modEq_one
-    (quotientMulAutHom (N := chief.N) chief.N_aInvariant)
-  rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv] at hgen
-
-/-- **Peterfalvi (11.8.1), the residue `d ≡ 1 (mod q)`** (§9 count, named obligation).  The common
-degree `d = μ_{ij}(1)` of the (10.3) grid is `≡ 1 (mod w₁ = q)`.  By (9.8)/(9.9) `d = |Ū|` — the
-`caseB_degree_qu` degree `μ_j(1) = qu` divided by the `w₁` equal rows `μ_j = ∑_i μ_{ij}` — and
-`|Ū| ≡ 1 (mod q)` is the `U/C_U(H̄)`-quotient of the Frobenius congruence `|U| ≡ 1 (mod q)`
-(`card_U_modEq_one`), `W₁` acting fixed-point-freely on `Ū` by coprimality.  §9-gated: needs the
-`Section11CharacterData` construction (`toTypesIIIIIIVSetup` + `exists_chiefFactorData`) to apply
-`caseB_degree_qu`, the μ-grid ↔ §9-family correspondence (`huSub = M'`), and the coprime quotient of
-`card_U_modEq_one`. -/
-theorem Hypothesis.charParam_d_modEq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hyp : Hypothesis M) (params : CharacterParameters hyp) :
-    params.d ≡ 1 [MOD hyp.w1] := by
-  sorry
-
-/-- **Peterfalvi (11.8.1), `δ = 1`**.  The (10.3) column sign `δ ∈ {±1}` equals `1`.  From the index
-relation `n·w₁ = d − δ` (`n_formula`), `w₁ ∣ d − δ`; from the (11.8.1) residue `d ≡ 1 (mod w₁)`
-(`charParam_d_modEq_one`), `w₁ ∣ 1 − d`; adding, `w₁ ∣ 1 − δ`.  With `δ = −1` this forces `w₁ ∣ 2`,
-impossible for the odd `w₁ = |W₁| ≥ 3`.  Hence `δ = 1`.  (This is the pure arithmetic of (11.8.1);
-the §9/Frobenius content is isolated in `charParam_d_modEq_one`.) -/
-theorem Hypothesis.charParam_delta_eq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hyp : Hypothesis M) (params : CharacterParameters hyp)
-    (hδpm : params.delta = 1 ∨ params.delta = -1) : params.delta = 1 := by
-  have hw1odd : Odd hyp.w1 := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card hyp.W1)
-  have hw1gt : 1 < hyp.w1 := (Subgroup.one_lt_card_iff_ne_bot _).mpr hyp.typeP.W1_nontrivial
-  have hw1 : 3 ≤ hyp.w1 := by obtain ⟨k, hk⟩ := hw1odd; omega
-  have hddelta : (hyp.w1 : ℤ) ∣ (params.d : ℤ) - params.delta :=
-    ⟨params.n, by rw [mul_comm]; exact params.n_formula.symm⟩
-  have hd1 : (hyp.w1 : ℤ) ∣ (1 : ℤ) - (params.d : ℤ) :=
-    Nat.modEq_iff_dvd.mp (hyp.charParam_d_modEq_one hG params)
-  have hkey : (hyp.w1 : ℤ) ∣ (1 : ℤ) - params.delta := by
-    have hcomb : (1 : ℤ) - params.delta = ((params.d : ℤ) - params.delta) + (1 - (params.d : ℤ)) := by
-      ring
-    rw [hcomb]; exact dvd_add hddelta hd1
-  rcases hδpm with h1 | hm1
-  · exact h1
-  · exfalso
-    rw [hm1] at hkey
-    have h2 : (hyp.w1 : ℤ) ∣ 2 := by simpa using hkey
-    have hle := Int.le_of_dvd (by norm_num) h2
-    have hw1Z : (3 : ℤ) ≤ (hyp.w1 : ℤ) := by exact_mod_cast hw1
-    omega
-
-open scoped Classical FiniteInduce in
-/-- **Peterfalvi (11.8.1), `|S(HC)| = n`** (§9 count, named obligation).  The number of degree-`w₁`
-irreducible members of `S = inducedFamily M` equals `n = (d − δ)/w₁ = (d − 1)/w₁`.  `S(HC) = S₁`
-consists of the `(u − 1)/q` degree-`q = w₁` irreducible constituents of the constant-degree Frobenius
-family `(U/C) ⋊ W₁`, so `|S(HC)| = (u − 1)/q = (d − 1)/w₁ = n` by (11.8.1).  This is the cardinality
-matching the isometric coherent image (`exists_coherentImage_SHC`, `|R| = |S(HC)|`) to `n` — the sole
-remaining §9-gated input of the `R`-data.  §9-gated: needs the Frobenius constituent count and
-`caseB_degree_qu`. -/
-theorem Hypothesis.card_SHCSet_filter_eq_charParam_n [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
-    (params : CharacterParameters hyp) :
-    (Finset.univ.filter (fun χ : IrreducibleCharacter ↥M =>
-      (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
-        ((χ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (hyp.w1 : ℂ))).card = params.n := by
-  sorry
-
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.6), the τ₂ union-coherence** (the deep capstone step, named obligation).
 From the column identities `(μ_j − dζ)^τ = ∑_i ω_{ij}^σ − dζ^{τ₁}` (`0 < j`, all rows; `τ₁ = coh`),
@@ -3985,7 +3839,8 @@ index, `|K*| = w₂` from `card_Msigma_inf_centralizer_eq_card_W2`) are proven, 
 closes `card_kappaHall_lt_of_isTypeIIIorIV` (the unique bare `feitThompson` sorry).  See
 `notes/peterfalvi/s13_11_8_orthogonality.md` for the full formalization plan. -/
 theorem exists_zeta_residual_not_orthogonal [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M) :
     ∃ ζ : ClassFunction ↥M ℂ, ζ ∈ inducedFamily M ∧ IsIrreducibleCharacter ζ ∧
       ζ 1 = (hyp.w1 : ℂ) ∧
       ¬ ∀ (i : Fin hyp.w1) (j : Fin hyp.w2),
@@ -4003,13 +3858,14 @@ theorem exists_zeta_residual_not_orthogonal [Finite G]
   -- the whole family `S = S(HC) ∪ (S(C)−S(HC))`, contradicting (10.8) `S_not_coherent`.
   intro h_orth
   -- (11.8.1) `δ = 1` (§9 count).
-  have hδ1 : params.delta = 1 := hyp.charParam_delta_eq_one hG params hδpm
+  have hδ1 : params.delta = 1 := hyp.charParam_delta_eq_one hG htype params hmu hδpm
   -- (11.8.4) the coherent extension `ν` and the `h114` value, from the orthogonality assumption.
   obtain ⟨ν, hνconj, h114⟩ :=
     hyp.exists_coherent_extension_h114_of_orthogonal hG hG.odd hzS params.zeta_irreducible hz1 h_orth
   -- (11.8.1)/(5.7) the orthonormal coherent image `R`; its cardinality `|R| = n` is the §9 count.
   obtain ⟨R, hZ, hRorth, hRmem, hRrev, hRcard⟩ := hyp.exists_coherentImage_SHC ν
-  have hRn : R.card = params.n := hRcard.trans (hyp.card_SHCSet_filter_eq_charParam_n hG params)
+  have hRn : R.card = params.n :=
+    hRcard.trans (hyp.card_SHCSet_filter_eq_charParam_n hG htype params hmu)
   -- degree relations at `δ = 1`.
   have hnf : (params.n : ℤ) * (hyp.w1 : ℤ) = (params.d : ℤ) - 1 := by rw [← hδ1]; exact params.n_formula
   have hd : (params.d : ℂ) = (hyp.w1 : ℂ) * (params.n : ℂ) + 1 := by
@@ -4038,9 +3894,10 @@ open scoped FiniteInduce in
 (`q > p`).  Combines the genuine (11.8) (`exists_zeta_residual_not_orthogonal`) with the
 coherence-free `w₂ < w₁` reduction (`w2_lt_w1_of_residual_not_orthogonal`). -/
 theorem w2_lt_w1_of_hypothesis [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M) :
     hyp.w2 < hyp.w1 := by
-  obtain ⟨ζ, hζS, hζirr, hζ1, h118⟩ := exists_zeta_residual_not_orthogonal hG hyp
+  obtain ⟨ζ, hζS, hζirr, hζ1, h118⟩ := exists_zeta_residual_not_orthogonal hG hyp htype
   exact w2_lt_w1_of_residual_not_orthogonal hG hyp hζS hζirr hζ1 h118
 
 /-- **Peterfalvi (10.10.1)--(10.10.4)**: if Hypothesis (10.1) holds with `M`

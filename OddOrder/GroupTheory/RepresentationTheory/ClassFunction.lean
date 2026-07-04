@@ -313,6 +313,29 @@ def inner [Invertible (Nat.card G : k)] (φ ψ : ClassFunction G k) : k :=
     (Nat.card G : k) * inner φ ψ = innerSum φ ψ := by
   rw [inner, ← mul_assoc, mul_invOf_self, one_mul]
 
+/-- The unscaled inner sum is invariant under pullback along a group **isomorphism**:
+reindexing the sum over `H` by `e : H ≃* G` recovers the sum over `G`. -/
+theorem innerSum_compHom_mulEquiv {H : Type*} [Group H] [Fintype H] (e : H ≃* G)
+    (φ ψ : ClassFunction G k) :
+    innerSum (compHom e.toMonoidHom φ) (compHom e.toMonoidHom ψ) = innerSum φ ψ := by
+  simpa [innerSum] using e.toEquiv.sum_comp (fun g => φ g * star (ψ g))
+
+/-- The normalized inner product is invariant under pullback along a group isomorphism
+(`|H| = |G|`, so the normalizations agree). -/
+theorem inner_compHom_mulEquiv {H : Type*} [Group H] [Fintype H] (e : H ≃* G)
+    [Invertible (Nat.card H : k)] [Invertible (Nat.card G : k)]
+    (φ ψ : ClassFunction G k) :
+    inner (compHom e.toMonoidHom φ) (compHom e.toMonoidHom ψ) = inner φ ψ := by
+  have hcard : ((Nat.card H : ℕ) : k) = ((Nat.card G : ℕ) : k) := by
+    rw [Nat.card_congr e.toEquiv]
+  have h := innerSum_compHom_mulEquiv e φ ψ
+  calc inner (compHom e.toMonoidHom φ) (compHom e.toMonoidHom ψ)
+      = ⅟(Nat.card H : k) * innerSum φ ψ := by rw [inner, h]
+    _ = ⅟(Nat.card H : k) * ((Nat.card H : k) * inner φ ψ) := by
+        rw [← card_mul_inner, ← hcard]
+    _ = inner φ ψ := by rw [← mul_assoc, invOf_mul_self, one_mul]
+
+
 /-- If two class functions have disjoint supports, their unscaled inner sum vanishes:
 every summand `φ g * star (ψ g)` is zero because `g` lies outside at least one support. -/
 theorem innerSum_eq_zero_of_disjoint_support {φ ψ : ClassFunction G k}

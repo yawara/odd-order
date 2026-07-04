@@ -142,3 +142,30 @@ norm-cascade が cross-lane threading 待ちの間、solo build-green な keysto
 **threading 両半分とも lane b が実施** (S15.Hypothesis fields = 自所有 + `FeitThompson.lean`
 `Section16Inputs`/constructor = 一時編集権、9009 裁定更新参照)。a は S12 (11.8) 3 named gates に専念。
 正本 = `ft_lane_reallocation_2026_06_28.md`「3 レーン役割更新 (2026-07-05)」。
+
+## ✅ 2026-07-05 (lane b): threading 両半分 LANDED (commit 3dc9306e)
+
+hub 裁定 (9009 選択肢 2) どおり b が両半分を実施、full build 3917 green + AxiomsCheck green:
+- **7 property fields** を `S15.Hypothesis` / `Section16Inputs` / `Section16CharacterData` に追加:
+  `tau3_isometry` / `tau3_trivial` / `tau3_apply_of_regular` ((3.2.c) regular-set identity) /
+  `tau3_mem_ZIrr` / `omega_orthonormal` / `omega_apply_one` / `omega_mem_ZIrr`。
+- **供給は全 chain (cd producer → inputs assembly → constructor base) で sorry ゼロ**:
+  tau3W を tiCyclicW/tiCyclicWDadeApp に抽出refactor → S05 σ-isometry package を直読み。
+  omegaS_inner = S05 `omega_inner` (新設) + `ClassFunction.inner_compHom_mulEquiv` (新設 shared
+  infra) + enumeration injectivity。`sectionSixteenHypothesis_of_inputs` の sorryAx-不許可
+  assert が供給込み green = **「a が同時に supply しないと build-red」の障害は解消済**。
+- 旧 signature 案の `eta_orthonormal`/`eta_intCast_on_G0`/`eta_conj_neg` は **hyp field にせず
+  導出定理へ変更** (η = τ₃∘ω ゆえ tau3_isometry + omega_orthonormal から S15 内で導出可;
+  primitive を carry する方が supply が機械的)。
+- **残 (consumer-side, lane b)**: cascade wrapper wiring — (13.5) machinery + hyp の carried
+  properties から `analyticInequalityEstimates` (S15_SAndT_Setup:1298) の 4 estimates を実証明。
+  hu (2u≤|P|-1) は issue 9000 producer を sorried-cite。
+
+## 🧾 ユーザー裁定 (2026-07-05 監視 tick): S05 `omega_inner` 受理 + 供給編集権明文化
+
+b の供給 chain の一部 `S05_TICyclic.lean` `omega_inner` (+11、lane a 所有ファイルへの追加、
+self-flag 済) を step 1.5 逸脱として保留 → **ユーザー裁定 = 受理 + 明文化**: 3002 供給 chain に
+必要な lane-a 所有ファイルへの **additive helper 追加** (純 additive・proven・self-flag 必須) を
+b の一時編集権に含める。**3002 供給完了で失効**。正本 = `notes/meta/merge_monitor.md` の
+carve-out (3002 供給編集権) ブロック。threading 両半分 (3dc9306e) + (13.10) atom 分解 (a39ca309)
+は 2026-07-05 監視 tick で main 合流済 (merge 88a3bdd1)。

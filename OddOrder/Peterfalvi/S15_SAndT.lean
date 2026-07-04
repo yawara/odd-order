@@ -1257,83 +1257,8 @@ theorem coprime_card_V_card_Q_of_disjoint [Finite G]
   rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQ_le).toEquiv, hidx] at hcop_idx
   exact hcop_idx.symm
 
-/-- **T-side type-`P` structure reconciled to the abstract `V`/`W₂`** (the honest replacement for the
-withdrawn `Tdata` spine carrier; HUB tick² 2026-06-30).  `T` is type non-I (`T_nonI`), hence type-`P`,
-and the §16-chosen complement `V` (κ-Hall-invariant) / cyclic factor `W₂` form a type-`P`
-decomposition of `T`: there is a `TypePData T` with `.U = V`, `.W1 = W₂`, and `.W2 = W₁` (the dual
-cyclic factor `C_{T'}(W₂#)` of `T`'s type-`P` structure is exactly the shared `W₁`).
-
-This is the genuine §13 reconciliation — **TRUE**, and the right §13-level statement: it asserts only
-the *general* type-`P` structure of `T` (available from `T_nonI` at §13), reconciled to the abstract
-`V`/`W₂`.  (The sharper `IsTypeP2 T` is *equivalent* to the (14.9) conclusion `IsTypeII T` by the BG
-type dictionary `proposition_type_classification` — `IsTypeII M ↔ IsTypeP2 M` — but is not needed for
-the reconciliation itself, so this stays a clean §13 obligation.)  It lives **off the FT spine**: the
-`V`-side helpers cite this obligation, keeping `section16TypePStructure_of_isMinimalSimpleOdd`
-sorry-free.  Gated on §13; declared sorried. -/
-theorem reconciled_typePData_T [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
-    ∃ data : TypePData hyp.T, data.U = hyp.V ∧ data.W1 = hyp.W2 ∧ data.W2 = hyp.W1 := by
-  -- `W₂, W₁ ≤ W` from the (13.1) join `W = W₁ ⊔ W₂`, and `W ≤ T` from `W = S ⊓ T`.
-  have hW2W : hyp.W2 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_right
-  have hW1W : hyp.W1 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_left
-  have hWT : hyp.W ≤ hyp.T := by rw [hyp.W_eq_inter]; exact inf_le_right
-  haveI hWcyc : IsCyclic ↥hyp.W := hyp.W_cyclic
-  -- Cyclic factors: a subgroup of the cyclic `W` is cyclic (transport along `subgroupOfEquivOfLe`).
-  have hW2cyc : IsCyclic ↥hyp.W2 :=
-    isCyclic_of_surjective _ (Subgroup.subgroupOfEquivOfLe hW2W).surjective
-  have hW1cyc : IsCyclic ↥hyp.W1 :=
-    isCyclic_of_surjective _ (Subgroup.subgroupOfEquivOfLe hW1W).surjective
-  refine ⟨{
-    H := hyp.Q
-    U := hyp.V
-    W1 := hyp.W2
-    W2 := hyp.W1
-    W := hyp.W
-    H_eq := hyp.Q_eq_TF
-    H_le := by rw [hyp.T_deriv_eq_QV]; exact le_sup_left
-    U_le := by rw [hyp.T_deriv_eq_QV]; exact le_sup_right
-    W1_le := hW2W.trans hWT
-    -- The following are the genuine §13/§14 type-`P` structure of `T` (the `T`-side analogue of what
-    -- `Section16TypePStructure` establishes for `S` when it builds `Sdata`).  No `T`-side carrier
-    -- exists by design (`FeitThompson:276`), so these stay gated on the §13/§14 σ-structure theory.
-    W2_le := sorry
-    W_eq := by rw [hyp.W_eq_join, sup_comm]
-    W_cyclic := hyp.W_cyclic
-    W1_nontrivial := by
-      intro h; have hp := hyp.p_prime.one_lt
-      rw [hyp.p_eq_card_W2, h, Subgroup.card_bot] at hp; exact absurd hp (by norm_num)
-    W2_nontrivial := by
-      intro h; have hq := hyp.q_prime.one_lt
-      rw [hyp.q_eq_card_W1, h, Subgroup.card_bot] at hq; exact absurd hq (by norm_num)
-    W1_cyclic := hW2cyc
-    W2_cyclic := hW1cyc
-    M_complement := sorry
-    W1_normalizes_U := hyp.W2_normalizes_V
-    U_nilpotent := sorry
-    derived_complement := sorry
-    H_noncyclic := by
-      -- `H := Q = maxNilpotentNormalHall T` is the *intrinsic* Fitting Hall (choice-independent),
-      -- so `¬ IsCyclic ↥Q` is read off any type-`P` datum on `T`.  The §13-level producer
-      -- `typePData_of_isTypeNonI T_nonI` supplies one (no `T_typeII`/(14.9) needed, keeping this a
-      -- clean §13 obligation): its `H_noncyclic` is `¬ IsCyclic` of the same subgroup `Q`.
-      obtain ⟨tpd0⟩ := OddOrder.GroupTheory.typePData_of_isTypeNonI hyp.T_nonI
-      have hHeq : tpd0.H = hyp.Q := by rw [tpd0.H_eq, hyp.Q_eq_TF]
-      exact hHeq ▸ tpd0.H_noncyclic
-    secondDerived_le_fitting := sorry
-    fitting_eq := sorry
-    centralizer_W1 := sorry
-    normalizer_V := by
-      -- The `W`-exceptional-set normalizer `N_G(X) = W` is symmetric in `W₁`/`W₂`, so it is read off
-      -- the S-side carrier `Sdata.normalizer_V` (same fact as `base_W_normalizer_V`, inlined since S15
-      -- is upstream of S16).  The exceptional set `W − (W₂ ∪ W₁) = W − (W₁ ∪ W₂)` is `union_comm`.
-      have hWeq : hyp.Sdata.W = hyp.W := by
-        rw [hyp.Sdata.W_eq, hyp.Sdata_W1_eq, hyp.Sdata_W2_eq]; exact hyp.W_eq_join.symm
-      intro X hX hXsub
-      rw [← hWeq]
-      refine hyp.Sdata.normalizer_V X hX ?_
-      rw [hWeq, hyp.Sdata_W1_eq, hyp.Sdata_W2_eq, Set.union_comm]
-      exact hXsub
-  }, rfl, rfl, rfl⟩
+/- `reconciled_typePData_T` (T-side type-`P` reconciliation) relocated to
+`S15_SAndT_Setup` for the (13.9)/(13.10) counting layer (same namespace; citations unchanged). -/
 
 /-- `Q ⊓ V = ⊥` from a reconciled `TypePData T` (`tpd.U = V`): `V` complements `Q = T_F` in
 `M' = [T,T]`.  Used by the V-side helpers in place of the withdrawn `Tdata` carrier. -/

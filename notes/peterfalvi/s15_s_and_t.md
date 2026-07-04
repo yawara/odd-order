@@ -1050,3 +1050,20 @@ s15_s_and_t/
 terminal 1298 → c_eq_one assembly (hu = 9000 producer を sorried-cite 可)。S15 閉塞後の継続 frontier =
 **Wave 2: S10 §8 facts (carve-out 0096) → S14 witness 3 本** (all-type-I branch は honest FT の必要部品)。
 正本 = `ft_lane_reallocation_2026_06_28.md`「3 レーン役割更新 (2026-07-05)」節。
+
+---
+
+## ✅ LIVE STATUS (2026-07-05b, lane b — issue 3002 threading 両半分 LANDED)
+
+hub 裁定 (9009 選択肢 2) の実施完了 (commit 3dc9306e, full 3917 green + AxiomsCheck green):
+- `S15.Hypothesis`/`Section16Inputs`/`Section16CharacterData` に **7 grid property fields**
+  (tau3_isometry/trivial/apply_of_regular/mem_ZIrr + omega_orthonormal/apply_one/mem_ZIrr) を
+  追加し、**供給 chain 全段 sorry ゼロ** (tau3W→tiCyclicW 抽出 refactor + S05 σ-package 直読み;
+  omegaS_inner = S05 omega_inner + inner_compHom_mulEquiv + enum injectivity)。
+- **frontier 変化**: §15 cascade は「hyp が性質を carry しない」uniform gate が解消。次 =
+  **consumer-side wiring** — (13.5) machinery (`H_sharp_hypothesis76`/`H_sharp_point_formula`,
+  S15 内 proven) + hyp の carried properties から terminal `analyticInequalityEstimates`
+  (S15_SAndT_Setup:1298) の 4 estimates ((13.6)/(13.7)+(13.8)/(13.9.a)/(13.9.b)) を実証明。
+  依存: (13.3)/(13.4) `character_degree_analysis` (λ 存在+counting) の現状確認から。
+  hu (2u≤|P|-1, 13.2.c) = issue 9000 producer を sorried-cite 可。
+- 9009 は close (routing 完了)。3002 は wiring 完了まで open。

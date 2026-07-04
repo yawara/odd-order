@@ -102,3 +102,11 @@ build-error** → build-RED。⟹ b が field を足すには a が**同時に**
 **b に `FeitThompson.lean` の `Section16Inputs`/constructor block への一時編集権を承認** (選択肢 2、
 先例 `S_U_commutative`/`Sdata_W2_eq` 方式)。additive な field 追加に限定し、conflict は hub が merge で調整。
 b の実施順: S15.Hypothesis grid fields (自所有) → FeitThompson 供給 → engine wiring → terminal 1298。
+
+## ✅ CLOSE (2026-07-05, lane b): threading 実施完了 (commit 3dc9306e)
+
+2026-07-05 hub 裁定 (選択肢 2 = b が両半分) どおり b が実施完了: S15.Hypothesis /
+Section16Inputs / Section16CharacterData に 7 property fields + 全供給 proven (sorry ゼロ、
+AxiomsCheck green)。本 issue は routing 用ゆえ close (残る consumer-side wiring は issue 3002
+の 2026-07-05 節で追跡)。⚠ 07-04 の b 訂正「sorried-default 機構は不成立」は、b が供給まで
+一括実施したことで無関係化 (assert は供給込みで green)。
