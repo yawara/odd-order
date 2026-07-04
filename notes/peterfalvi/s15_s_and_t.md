@@ -8,6 +8,38 @@
 
 ---
 
+## ✅ LIVE STATUS (2026-07-04, lane **b** 再開 — 07-04 reallocation で S15 が c→b 移管後の初手)
+
+**b が S15_SAndT_Setup + S15_SAndT を所有** (07-04 3 レーン再々編、focus = ON-PATH (13.9)-(13.19)
+parity/構造/norm)。再開時に `git merge main` (HEAD..main=1→0)、frontier 全数をコード検証。
+
+### ✅ landed: (13.10) `analytic_inequality` de-opacify (commit `f17fdbcd`)
+実 conclusion `u/c > m·p^(q-1)/q` を **bare sorry → 実定理** に。sorry-free 算術核
+`analytic_inequality_arith` に、4 estimates を carry する faithful producer
+`analyticInequalityEstimates` ((13.6)-(13.9)) を供給して discharge。full build 3916 green。
+sorry は producer に isolate (net ±0) だが (13.10) 出力が real theorem 化 (下流 c_eq_one/numeric が cite 可)。
+
+### frontier 精査結論 — b の §15 は「一律 gated」でない (要ニュアンス、過去の pessimism 訂正)
+コード検証で各 sorry の gate を確定 (「上流待ち」の誤ラベルでなく実 gate):
+- **(13.10) 出力**: ✅ de-opacify 済。完全 discharge には η-estimates + λ-estimates + u-bound が要る (下記)。
+- **η-side norm estimates (13.7)/(13.8)** = **UNGATED 深 b-work**: `hyp` は `W`/`W_cyclic`/`W1`/`W2` を carry
+  → **honest W-grid を hyp.W から新規構成** (`S05.TICyclicHypothesis` 構築 → ω 直交性 → S07 τ-isometry →
+  η'=τ₃(ω)) すれば field-threading (issue 3002) 不要で η-estimates を実証明可能。⚠ 要 Dade-support `V⊆W`
+  (TI・W-normalized) の構成 = 多段 (multi-session)。**= reallocation が意図した「b の §12 Dade+char 強み」の本体**。
+- **λ-side (13.6) `caseB_lambda_norm_bound` 入力**: S-coherence (13.5.a point formula) 経由。⚠ 07-02 hub 裁定
+  「(13.5)-(13.9) の **S-side τ₁ 形は W-side restate or retire を判定してから着手**」の対象 = 要 design 判断。
+- **u-bound (13.2.c) `2u≤|P|-1`**: issue 9000 (typeP_Galois、hub/a dedup 中 = 着手不可)。
+- **(13.19) parity `caseC2_eta0j_odd` → S16 W-side terminal**: statement が `hyp.eta` を直接参照 (S16 consume)
+  → honest W-grid の fresh η' に swap 不可 = **issue 3002 (grid field-threading, a の FeitThompson) 必須**。
+- **grid 直交性/isometry を hyp.omega/tau3 に carry** = issue 3002 (cross-lane, a threading)。honest W-grid
+  route は (13.10) η-estimate には不要だが、hyp.eta-参照する S16 parity には issue 3002 が要る。
+
+**次 session の高 value 候補** (upstream-first): (A) honest W-grid 構成 (ungated 深 b-work、η-estimates 実証明、
+issue 3002 迂回) ← reallocation 本命。(B) issue 3002 a-side threading 調整 (hyp.eta-参照 parity/S16 terminal 用)。
+(C) (13.5)-(13.9) S-side τ₁ 形の W-side restate/retire 判定 (07-02 hub 裁定)。**(A) を正面から engage 推奨**。
+
+---
+
 ## ✅✅ MILESTONE (2026-07-01, lane c): (13.16) W₂-side が **gate ゼロで完全 proven**
 
 **(13.16) W₂-confinement 全体が sorry-free** (S15 sorry 12→10、full build 3890 green, AxiomsCheck OK):
