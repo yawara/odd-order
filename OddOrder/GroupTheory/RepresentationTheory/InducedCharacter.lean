@@ -300,6 +300,28 @@ theorem induce_apply_one (H : Subgroup G) [Invertible (Nat.card H : k)]
   push_cast
   rw [mul_comm (H.index : k) _, ← mul_assoc, ← mul_assoc, invOf_mul_self, one_mul]
 
+/-- **Induced class function vanishes outside a normal subgroup.**  For `H ⊴ G` and any
+`θ : ClassFunction ↥H k`, the induced `Ind_H^G θ` vanishes off `H`: `Ind_H^G θ (g) = 0` for
+`g ∉ H`.  Every induction term `induceTerm H θ x g` vanishes because `x⁻¹ g x ∈ H ⟺ g ∈ H`
+(normality: `x H x⁻¹ = H`), so no conjugate of a `g ∉ H` lands in `H`.
+
+This is the support statement behind Peterfalvi (12.5): the off-kernel part of `Res_H ψ`, a
+combination of characters induced from `H' ⊴ H`, vanishes on `H − H'`. -/
+theorem induce_apply_eq_zero_of_not_mem_normal (H : Subgroup G) [Invertible (Nat.card H : k)]
+    [hH : H.Normal] (θ : ClassFunction ↥H k) {g : G} (hg : g ∉ H) :
+    induce H θ g = 0 := by
+  rw [induce_apply]
+  have hz : ∑ x : G, induceTerm H θ x g = 0 := by
+    apply Finset.sum_eq_zero
+    intro x _
+    apply induceTerm_of_not_mem
+    intro hmem
+    apply hg
+    have h2 : x * (x⁻¹ * g * x) * x⁻¹ ∈ H := hH.conj_mem _ hmem x
+    have h3 : x * (x⁻¹ * g * x) * x⁻¹ = g := by group
+    rwa [h3] at h2
+  rw [hz, mul_zero]
+
 @[simp] theorem card_smul_induce (H : Subgroup G) [Invertible (Nat.card H : k)]
     (θ : ClassFunction ↥H k) :
     (Nat.card H : k) • induce H θ = induceSum H θ := by

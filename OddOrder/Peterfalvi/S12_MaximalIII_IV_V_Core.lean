@@ -558,13 +558,18 @@ theorem exists_hypothesis_of_typeIIIorIVorV [Finite G]
     (hType : IsTypeIII M ∨ IsTypeIV M ∨ IsTypeV M) :
     Nonempty (Hypothesis M) := by
   obtain ⟨data⟩ := typePData_of_isTypeNonI (Or.inr hType)
-  obtain ⟨ptype, hptype⟩ : ∃ ptype : PeterfalviType, HasPeterfalviType ptype M := by
+  -- Types III/IV/V are `P₁` (classification): III/IV via `(III∨IV) ↔ (P₁ ∧ M_F≠M_σ)`, V via
+  -- `V ↔ (P₁ ∧ M_F=M_σ)`.  This routes the `A_0(M)` datum through the *`sorry`-free* type-`P₁`
+  -- construction `dadeSupportHypothesisData_typePA0_of_isTypeP1` (not the general
+  -- `dadeSupportHypotheses_typeP`, whose type-`P₂` branches are still `sorry`).
+  have hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M := by
+    have hcls := OddOrder.BG.Ch4.S16.proposition_type_classification hG hM
     rcases hType with h | h | h
-    · exact ⟨.III, h⟩
-    · exact ⟨.IV, h⟩
-    · exact ⟨.V, h⟩
+    · exact (hcls.2.2.1.mp (Or.inl h)).1
+    · exact (hcls.2.2.1.mp (Or.inr h)).1
+    · exact (hcls.2.2.2.1.mp h).1
   obtain ⟨dadeData⟩ :=
-    (OddOrder.Peterfalvi.S10.dadeSupportHypotheses_typeP hG hM data hptype).1
+    OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_typePA0_of_isTypeP1 hG hM data hP1
   -- (8.14)/(8.15): the kernel conjugation invariance is carried by the faithful datum.
   refine ⟨?_⟩
   exact
@@ -740,151 +745,6 @@ theorem typePData_typePV_ncard [Finite G] {M : Subgroup G} (data : TypePData M) 
     Nat.add_le_mul hw1ge hw2ge
   omega
 
-/-- An element of the exceptional set `V = W − (W₁ ∪ W₂)` of a type-`P` maximal subgroup lies
-outside the derived subgroup `M' = [M,M]`.
-
-Decompose `v ∈ W = W₁ ⊔ W₂` (cyclic, hence abelian) as `v = x·y` with `x ∈ W₁`, `y ∈ W₂`
-(`Subgroup.mem_sup`).  Now `W₂ ≤ M'` (`W₂ ≤ H ⊓ M'' ≤ H ≤ M'`); if `v ∈ M'` then
-`x = v·y⁻¹ ∈ M'`, so `x ∈ W₁ ⊓ M' = ⊥` (`M_complement` disjointness), i.e. `x = 1` and
-`v = y ∈ W₂`, contradicting `v ∉ W₂`.
-
-This is the structural fact behind `ζ` (induced from the normal `M'`) vanishing on `V`, used in the
-Dade-image half of (10.5). -/
-theorem typePData_typePV_not_mem_derived {M : Subgroup G} (data : TypePData M)
-    {v : G} (hv : v ∈ typePV M data) : v ∉ derivedInG M := by
-  simp only [typePV, Set.mem_diff, Set.mem_union, SetLike.mem_coe, not_or] at hv
-  obtain ⟨hvW, _hvnW1, hvnW2⟩ := hv
-  intro hvM'
-  haveI hcyc : IsCyclic ↥data.W := data.W_cyclic
-  letI : CommGroup ↥data.W := hcyc.commGroup
-  have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
-  have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
-  -- Decompose `v` in the abelian `↥W` along `W₁ ⊔ W₂ = ⊤`.
-  have hsup : data.W1.subgroupOf data.W ⊔ data.W2.subgroupOf data.W = ⊤ := by
-    rw [← Subgroup.subgroupOf_sup hW1le hW2le, ← data.W_eq, Subgroup.subgroupOf_self]
-  have hvmem : (⟨v, hvW⟩ : ↥data.W) ∈
-      data.W1.subgroupOf data.W ⊔ data.W2.subgroupOf data.W := by
-    rw [hsup]; exact Subgroup.mem_top _
-  rw [Subgroup.mem_sup] at hvmem
-  obtain ⟨a, ha, b, hb, hab⟩ := hvmem
-  have haW1 : ((a : ↥data.W) : G) ∈ data.W1 := Subgroup.mem_subgroupOf.mp ha
-  have hbW2 : ((b : ↥data.W) : G) ∈ data.W2 := Subgroup.mem_subgroupOf.mp hb
-  have habG : ((a : ↥data.W) : G) * ((b : ↥data.W) : G) = v := by
-    have := congrArg (Subtype.val) hab
-    simpa using this
-  -- `W₂ ≤ M'`, so `b ∈ M'`; with `v ∈ M'` this forces `a = v·b⁻¹ ∈ M'`.
-  have hW2D : data.W2 ≤ derivedInG M := data.W2_le.trans (inf_le_left.trans data.H_le)
-  have haM' : ((a : ↥data.W) : G) ∈ derivedInG M := by
-    have heq : ((a : ↥data.W) : G) = v * ((b : ↥data.W) : G)⁻¹ := by rw [← habG]; group
-    rw [heq]; exact mul_mem hvM' (inv_mem (hW2D hbW2))
-  -- `a ∈ W₁ ⊓ M' = ⊥` (the `M_complement` disjointness), hence `a = 1`.
-  have haM : ((a : ↥data.W) : G) ∈ M := data.W1_le haW1
-  have hdisj := data.M_complement.disjoint
-  rw [Subgroup.disjoint_def] at hdisj
-  have hm1 : (⟨(a : ↥data.W), haM⟩ : ↥M) ∈ (derivedInG M).subgroupOf M :=
-    Subgroup.mem_subgroupOf.mpr haM'
-  have hm2 : (⟨(a : ↥data.W), haM⟩ : ↥M) ∈ data.W1.subgroupOf M :=
-    Subgroup.mem_subgroupOf.mpr haW1
-  have ha1 : ((a : ↥data.W) : G) = 1 := Subtype.ext_iff.mp (hdisj hm1 hm2)
-  -- Then `v = b ∈ W₂`, contradicting `v ∉ W₂`.
-  exact hvnW2 (by rw [← habG, ha1, one_mul]; exact hbW2)
-
-/-- **Peterfalvi (4.6.b) / (4.3.a), ambient version** (issue 1005): for a type-`P` maximal
-subgroup, the exceptional set `V = W − (W₁ ∪ W₂)` is a TI-subset of `G` with normalizer-bound `W`.
-
-Given `g` conjugating some `a ∈ V` into `V`, the singleton normalizer fact `N_G({a}) = W`
-(`TypePData.normalizer_V`) forces `g` to normalize `W` — both `h ∈ W` and `g h g⁻¹ ∈ W` reduce to
-`h a h⁻¹ = a`.  Since `W = W₁ × W₂` is cyclic with coprime factors, `W₁` and `W₂` are the *unique*
-subgroups of their orders (`cyclic_subgroup_eq_of_card_eq`), hence characteristic, so `g` also
-normalizes `W₁` and `W₂` and therefore `V`; finally `N_G(V) = W` (`normalizer_V` with `X = V`,
-nonempty by `typePData_typePV_nonempty`) gives `g ∈ W`.
-
-This discharges the last field of `typePData_toTICyclicHypothesis`, making the §10 → §5 ω-grid
-bridge unconditional (closes issue 1005).  It also corrects the earlier diagnosis that
-`normalizer_V` is strictly weaker than the TI property: that is true *without* cyclicity, but the
-cyclic factor structure recovers the ambient TI. -/
-theorem typePData_V_ti [Finite G] {M : Subgroup G} (data : TypePData M) :
-    IsTISubset (typePV M data) data.W := by
-  classical
-  haveI : IsCyclic ↥data.W := data.W_cyclic
-  have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
-  have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
-  -- Singleton normalizer = pointwise stabilizer.
-  have mem_norm_sing : ∀ c z : G,
-      z ∈ Subgroup.normalizer ({c} : Set G) ↔ z * c * z⁻¹ = c := by
-    intro c z
-    rw [Subgroup.mem_set_normalizer_iff]
-    constructor
-    · intro hz
-      have := (hz c).mp rfl
-      simpa using this
-    · intro hz h
-      simp only [Set.mem_singleton_iff]
-      constructor
-      · rintro rfl; exact hz
-      · intro hh
-        have hcc : z * h * z⁻¹ = z * c * z⁻¹ := by rw [hh, hz]
-        exact mul_left_cancel (mul_right_cancel hcc)
-  intro g hg
-  obtain ⟨a, haV, hbV⟩ := hg
-  have hNa : Subgroup.normalizer ({a} : Set G) = data.W :=
-    data.normalizer_V {a} (Set.singleton_nonempty a) (Set.singleton_subset_iff.mpr haV)
-  have hNb : Subgroup.normalizer ({g * a * g⁻¹} : Set G) = data.W :=
-    data.normalizer_V {g * a * g⁻¹} (Set.singleton_nonempty _) (Set.singleton_subset_iff.mpr hbV)
-  -- `g` normalizes `W` as a set: both sides reduce to `h * a * h⁻¹ = a`.
-  have hgW : ∀ h, h ∈ data.W ↔ g * h * g⁻¹ ∈ data.W := by
-    intro h
-    have e1 : (h ∈ data.W) ↔ h * a * h⁻¹ = a := by rw [← hNa, mem_norm_sing]
-    have e2 : (g * h * g⁻¹ ∈ data.W) ↔ h * a * h⁻¹ = a := by
-      rw [← hNb, mem_norm_sing]
-      have hexp : g * h * g⁻¹ * (g * a * g⁻¹) * (g * h * g⁻¹)⁻¹ = g * (h * a * h⁻¹) * g⁻¹ := by
-        group
-      rw [hexp]
-      constructor
-      · intro hh; exact mul_left_cancel (mul_right_cancel hh)
-      · intro hh; rw [hh]
-    rw [e1, e2]
-  -- Any subgroup `A ≤ W` is `g`-stable (cyclic uniqueness ⇒ `A` characteristic in `W`).
-  have hstab : ∀ (A : Subgroup G), A ≤ data.W → ∀ x : G, g * x * g⁻¹ ∈ A ↔ x ∈ A := by
-    intro A hAW
-    have hmap_le : A.map (MulAut.conj g).toMonoidHom ≤ data.W := by
-      rintro y hy
-      rw [Subgroup.mem_map] at hy
-      obtain ⟨z, hzA, rfl⟩ := hy
-      simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
-      exact (hgW z).mp (hAW hzA)
-    have hcard : Nat.card ↥(A.map (MulAut.conj g).toMonoidHom) = Nat.card ↥A :=
-      (Nat.card_congr (Subgroup.equivMapOfInjective A (MulAut.conj g).toMonoidHom
-        (MulAut.conj g).injective).toEquiv).symm
-    have hsubeq : (A.map (MulAut.conj g).toMonoidHom).subgroupOf data.W
-        = A.subgroupOf data.W := by
-      apply OddOrder.BG.Ch3.S10.cyclic_subgroup_eq_of_card_eq (C := ↥data.W)
-      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hmap_le).toEquiv,
-        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAW).toEquiv, hcard]
-    have hmapeq : A.map (MulAut.conj g).toMonoidHom = A := by
-      rw [← Subgroup.map_subgroupOf_eq_of_le hmap_le, hsubeq,
-        Subgroup.map_subgroupOf_eq_of_le hAW]
-    intro x
-    constructor
-    · intro hx
-      have hmem : g * x * g⁻¹ ∈ A.map (MulAut.conj g).toMonoidHom := by rw [hmapeq]; exact hx
-      rw [Subgroup.mem_map] at hmem
-      obtain ⟨z, hzA, hz⟩ := hmem
-      simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply] at hz
-      have hzx : z = x := mul_left_cancel (mul_right_cancel hz)
-      rwa [hzx] at hzA
-    · intro hx
-      have hmem : (MulAut.conj g).toMonoidHom x ∈ A.map (MulAut.conj g).toMonoidHom :=
-        Subgroup.mem_map_of_mem _ hx
-      rw [hmapeq] at hmem
-      simpa only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply] using hmem
-  -- `g` normalizes `V`, so `g ∈ N_G(V) = W`.
-  rw [← data.normalizer_V (typePV M data) ⟨a, haV⟩ Set.Subset.rfl,
-    Subgroup.mem_set_normalizer_iff]
-  intro h
-  simp only [typePV, Set.mem_diff, Set.mem_union, SetLike.mem_coe]
-  rw [hgW h, hstab data.W1 hW1le h, hstab data.W2 hW2le h]
-
 /-- For a type-`P` maximal subgroup, every `l ∈ W` stabilises the exceptional set `V` under
 conjugation: `l ∈ N_G(V) = W` (`TypePData.normalizer_V` with `X = V`), so `(MulAut.conj l) • V = V`.
 This is the `W`-stability input to the `|V^G|` TI-orbit count `ncard_conjClassSet_of_isTISubset`. -/
@@ -913,7 +773,7 @@ theorem typePData_conjClassSet_typePV_ncard [Finite G] {M : Subgroup G} (data : 
     (conjClassSet (typePV M data)).ncard
       = (Nat.card ↥data.W1 * Nat.card ↥data.W2 - Nat.card ↥data.W1 - Nat.card ↥data.W2 + 1)
         * data.W.index := by
-  rw [OddOrder.BG.Ch4.S14.ncard_conjClassSet_of_isTISubset (typePData_V_ti data)
+  rw [OddOrder.BG.Ch4.S14.ncard_conjClassSet_of_isTISubset (OddOrder.Peterfalvi.S10.typePData_V_ti data)
     (typePData_W_normalizes_typePV data), typePData_typePV_ncard]
 
 /-- `W₂ ≤ M` for type-`P` data (`W₂ ≤ H ⊓ M'' ≤ M' ≤ M`). -/
@@ -1009,7 +869,7 @@ noncomputable def typePData_toTICyclicHypothesis [Finite G] {M : Subgroup G}
       S06.commute_of_mem_of_isCyclic data.W_cyclic w.2 hv.1
     have h3 : (w : G) * v * (w : G)⁻¹ = v := by rw [hcomm.eq, mul_inv_cancel_right]
     rw [h3]; exact hv
-  V_ti := typePData_V_ti data
+  V_ti := OddOrder.Peterfalvi.S10.typePData_V_ti data
 
 /-! ## §10 → §6 (4.2)+Dade bridge (μ-grid unlock)
 
@@ -3701,7 +3561,7 @@ theorem Hypothesis.tau_muGridAlpha_apply_eq_on_typePV [Finite G]
     haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
     have hnotmem : (⟨v, hvM⟩ : ↥M) ∉ (derivedInG M).subgroupOf M := by
       rw [Subgroup.mem_subgroupOf]
-      exact typePData_typePV_not_mem_derived hyp.typeP hv
+      exact OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived hyp.typeP hv
     rw [hζeq]
     exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hnotmem
   -- Evaluate `α ⟨v⟩` via the reconciliation (`μ = δ_j·ω^σ`), `δ_0 = 1`, and `ζ(v) = 0`.
@@ -4768,7 +4628,7 @@ theorem Hypothesis.tau_zeta_sub_conj_vanishes_on_typePV [Finite G]
   haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
   have hnotmem : (⟨v, hvM⟩ : ↥M) ∉ (derivedInG M).subgroupOf M := by
     rw [Subgroup.mem_subgroupOf]
-    exact typePData_typePV_not_mem_derived hyp.typeP hv
+    exact OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived hyp.typeP hv
   have hζv : ζ ⟨v, hvM⟩ = 0 := by
     rw [hζeq]; exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hnotmem
   rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hζv, star_zero, sub_zero]
@@ -5251,7 +5111,7 @@ theorem Hypothesis.muColumn_tau1_vanishes_on_typePV [Finite G] {M : Subgroup G}
     haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
     have hnotmem : (⟨v, hvM⟩ : ↥M) ∉ (derivedInG M).subgroupOf M := by
       rw [Subgroup.mem_subgroupOf]
-      exact typePData_typePV_not_mem_derived hyp.typeP hv
+      exact OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived hyp.typeP hv
     have hμv : (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k) ⟨v, hvM⟩ = 0 :=
       hyp.muGrid_column_sum_vanishes_off_derived hG hodd k hnotmem
     have hζv : ζ ⟨v, hvM⟩ = 0 := by

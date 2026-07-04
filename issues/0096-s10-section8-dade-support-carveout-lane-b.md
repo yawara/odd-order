@@ -335,3 +335,602 @@ typePA0(P1) Dade data の**構造基礎 2 本を build-green で landed**:
 BG A0Set 対応を確認 (A_0(M) 記法の BG↔Pf 一致)、なら typePA0_isConj + coprimality が tame embedding
 から wire 可能で typePA0(P1) engine 完成 → `dadeSupportHypotheses_typeP` typePA0 成分 discharge →
 S12 (10.1 existence) unblock。
+
+### loop¹²² — typePData_V_ti を S10 へ upstream + V^M conjugacy landed (typePA0_isConj の V^M 半分)
+
+typePA0_isConj (typePA0=M_σ#∪V^M の G-conj→M-conj) に向け:
+- **`typePData_V_ti` を S12→S10 へ move** (upstream + dedup): V=W∖(W1∪W2) は TI-subset with
+  normalizer W。self-contained (TypePData + cyclic_subgroup_eq_of_card_eq + IsTISubset) ゆえ S10 で proven、
+  S12 は cite (S12 は S10 を transitive import; `S10.typePData_V_ti` に 2 cite 更新)。
+- **`conjClassSetIn_typePV_isConj_conj_in_M`** (V^M half): a,b∈V^M, b=gag⁻¹ ⟹ M-conj。
+  a=m1v1m1⁻¹, b=m2v2m2⁻¹ で h=m2⁻¹gm1 が v1↦v2 (V内) ⟹ typePData_V_ti で h∈W≤M ⟹
+  **g=m2·h·m1⁻¹∈M 自身が M-conjugator**。
+
+**typePA0_isConj の残 = mixed case** (a∈M_σ#, b∈V^M, G-conj): V 元は W1-成分 (κ-order) 非自明ゆえ
+純 σ-元でない → M_σ#(σ-order) と非共役 (order prime-type mismatch) = **vacuous**。要 κ∩σ=∅ + W1 の
+κ-order 構造。次: mixed-case vacuity → typePA0_isConj 完成 → generalized engine + coprimality →
+typePA0(P1) Dade data discharge → S12 (10.1) unblock。
+
+### loop¹²³ — typePData_typePV_not_mem_derived を S10 へ upstream (mixed-case 準備)
+
+typePA0_isConj の mixed case (a∈M_σ#, b∈V^M は非共役) は「v∈V→v∉M'」を要する。この fact
+(`typePData_typePV_not_mem_derived`, S12) を **S10 へ move** (upstream + dedup): self-contained
+(TypePData の W_cyclic/W_eq/M_complement/W2_le/H_le)。S12 の 5 cite (S12_Core 3 + S12_MaximalIII_IV_V 2)
+を `OddOrder.Peterfalvi.S10.` prefix に更新。両 S12 leaf build green。
+
+**次 (mixed case 完成 → typePA0_isConj)**: a∈M_σ#→σ-elt (`isPiElement_sigma_of_mem_Msigma`)、
+b=gag⁻¹→σ-elt (`isPiElement_conj`)、b∈V^M→v∈V σ-elt→v∈M_σ (`sigma_subgroup_le_Msigma_of_isHall`
++`Msigma_isHall`)=M' (P1, `isTypeP1_derivedInG_eq_Msigma`)、v∉M' (`typePData_typePV_not_mem_derived`)
+で矛盾 = vacuous。⟹ typePA0_isConj (M_σ#/V^M/mixed 3-case) 完成。その後 coprimality + generalized
+engine (X⊆M, escaping⊆M_σ# 版) → typePA0(P1) Dade data discharge → S12 (10.1) unblock。
+
+### loop¹²³ cont. — ★ typePA0_isConj (P1) COMPLETE (mixed-case vacuity landed)
+
+**`typePA0_isConj_conj_in_M_of_isTypeP1`** = typePA0(P1)=M_σ#∪V^M の G-conj→M-conj、**3-case 完成**:
+- both M_σ#: `sigmaSharp_isConj_conj_in_M`。
+- both V^M: `conjClassSetIn_typePV_isConj_conj_in_M`。
+- mixed: `not_isConj_typePA_typePV_of_isTypeP1` (vacuous) — M_σ#=σ-elt、conj で σ-elt 保存、
+  V^M の v は σ-elt なら M_σ=M' (P1) に入り v∉M' と矛盾。σ-chain =
+  isPiElement_sigma_of_mem_Msigma / isPiElement_conj / sigma_subgroup_le_Msigma_of_isHall /
+  isTypeP1_derivedInG_eq_Msigma / typePData_typePV_not_mem_derived。
+
+**技術メモ**: mixed-case lemma が whnf timeout したが原因は `m⁻¹⁻¹` vs `m` の defeq search (heartbeat
+bump 不要)。isPiElement_conj m⁻¹ の型は `m⁻¹*y*m⁻¹⁻¹` で `m` と書くと whnf 爆発。正しい形で即解決。
+
+**typePA0(P1) Dade engine の残 (isConj 完了)**: (1) **coprimality** (escaping a, b∈typePA0 で
+coprime |R(a)| |C_M(b)|; b∈M_σ#→σ-sharp coprimality、b∈V^M→C_M(b)⊆W との coprimality)、
+(2) **generalized engine** (X⊆M, escaping⊆M_σ# 版; sigmaSharp engine を一般化)、(3) assembly →
+dadeSupportHypotheses_typeP typePA0 成分 discharge → S12 (10.1) unblock。pins 済:
+escaping_typePA0_mem_sigmaSharp (8.13.b) + centralizer_typePV_le_M (V^M 非escaping) + isConj。
+
+### loop¹²⁴ — ★ coprimality は tractable (σ-sharp に還元) — typePA0(P1) engine 全 pin 完備
+
+初め「V^M coprimality は deep (σ vs W structure)」と危惧したが、**σ-sharp coprimality に還元できると判明**
+(過去の "deep" 危惧と同様に tractable):
+
+**`coprime_FT_signalizer_centralizerIn_typePV`**: escaping a∈M_σ#, b∈V^M で coprime |R(a)| |C_M(b)|。
+鍵: **C_M(b) は C_M(v)=W に M-共役** (v∈V: C_G(v)=N_G(⟨v⟩)=W by normalizer_V、⊇ は W abelian)、
+`w∈W₂#⊆M_σ#` を取れば W≤C_M(w) (abelian) ⟹ |W| | |C_M(w)| ⟹ **σ-sharp coprimality
+(`escaping_sigmaSharp_disjoint_centralizer`) を w で適用**して共通素数を殺す。card_centralizerIn_conj で
+|C_M(b)|=|C_M(v)|、C_G(v)=W は normalizer_V + W abelian の antisymm。
+
+**typePA0(P1) Dade engine の全 pin 完備**:
+- isConj: `typePA0_isConj_conj_in_M_of_isTypeP1` ✓
+- escaping→σ-sharp (8.13.b): `escaping_typePA0_mem_sigmaSharp_of_isTypeP1` ✓
+- V^M 非escaping: `centralizer_typePV_le_M` ✓
+- coprimality (V^M): `coprime_FT_signalizer_centralizerIn_typePV` ✓ (M_σ# は sigmaSharp engine)
+- escaping structure: `escaping_sigmaSharp_signalizer_structure` ✓
+
+**残 = final assembly のみ**: generalized engine (X=typePA0; sigmaSharp engine を X⊆M+escaping⊆M_σ# に
+一般化、上記 pin で駆動) + ftSupportKernel_conj_smul の typePA0 版 + normalizer_eq(typePA0)。→
+`dadeSupportHypotheses_typeP` typePA0 成分 discharge → S12 (10.1 existence) unblock。deep 部分は無し、
+残りは mechanical assembly。
+
+### loop¹²⁵ — general engine + full typePA0 coprimality landed (残 = set-facts + discharge のみ)
+
+typePA0(P1) Dade engine の assembly infra を landed:
+- **`dadeSupportHypothesisData_of_subset_escaping_sigmaSharp`** (general engine): sigmaSharp engine を
+  X⊆M + escaping⊆M_σ# に一般化。(8.13.a) conj_in_L + (8.13.c2) coprimality を hypothesis 化、
+  escaping structure は σ-generic `escaping_sigmaSharp_signalizer_structure`。
+- **`ftSupportKernel_conj_smul_escaping_sigmaSharp`** (general conj_smul, hconj field 用)。
+- **`coprime_FT_signalizer_centralizerIn_typePA0_of_isTypeP1`**: A_0 全体の coprimality
+  (A(M)=M_σ# は σ-sharp、V^M は `coprime_FT_signalizer_centralizerIn_typePV`)。
+
+**残 = mechanical wiring のみ**: typePA0 の set-facts (⊆M / ≠1 / nonempty / M-conj-invariant) を
+組んで general engine に渡す `dadeSupportHypothesisData_typePA0_of_isTypeP1` → `dadeSupportHypotheses_typeP`
+の typePA0(P1) 成分 discharge (P2 は別 sorry のまま) → S12 (10.1 existence) unblock。deep content は
+全て済み、残りは typePA0=typePA∪V^M の union set-facts の組立。
+
+### loop¹²⁶ — ★★ typePA0(P1) Dade datum CONSTRUCTED (sorry-free) — dadeSupportHypotheses_typeP typePA0(P1) discharge
+
+**`dadeSupportHypothesisData_typePA0_of_isTypeP1`** (sorry-free): type-P1 の A_0(M)=A(M)∪V^M の
+Dade (2.2) support data を general engine + 全 pin + union set-facts (⊆M/≠1/nonempty/M-conj-inv,
+conjClassSetIn API 経由) で **完全構成**。doneness = carrier 構成可能性を満たす (posited でなく実構成)。
+
+**`dadeSupportHypotheses_typeP` の typePA0 成分を P1 で discharge**: by_cases hP1 → P1 は engine helper、
+P2 は sorry (deeper)。現状 dadeSupportHypotheses_typeP: A₁ ✅ + typePA-P1 ✅ + typePA0-P1 ✅、
+残 2 sorry = typePA0-P2 + typePA-P2 (deeper type-P2 (M')# geometry)。
+
+**次 = S12 unblock**: `exists_hypothesis_of_typeIIIorIVorV` (Pf 10.1 existence) は現在
+`(dadeSupportHypotheses_typeP ...).1` を使うが、これは P2 sorry を transitively 含む。**sorry-free な
+`dadeSupportHypothesisData_typePA0_of_isTypeP1` に切替**れば S12 の typePA0 datum が sorry-free に。
+要 hP1 : IsTypeP1 M を IsTypeIII/IV/V から導出 (III/IV/V=P1)。
+
+### loop¹²⁷ — ★★★ S12 Pf (10.1) existence が sorry-free に — type-P (III/IV/V) tower の入口 UNBLOCK
+
+**`exists_hypothesis_of_typeIIIorIVorV` (Pf 10.1 existence) を sorry-free 化**:
+- S12 の `(dadeSupportHypotheses_typeP ...).1` (typePA0-P2 sorry を transitive 依存) を、sorry-free な
+  **`dadeSupportHypothesisData_typePA0_of_isTypeP1` に routing 切替**。
+- hP1 : IsTypeP1 M を III/IV/V から `proposition_type_classification` 経由で導出
+  (III/IV = `.2.2.1`、V = `.2.2.2.1`)。
+- **`#print axioms exists_hypothesis_of_typeIIIorIVorV` = [propext, Classical.choice, Quot.sound]
+  のみ (sorryAx 無し)**。⟹ §12 type-P (III/IV/V) tower の入口 (Hypothesis 構成) が sorry-free。
+
+**session 総括 (loop¹¹⁸-¹²⁷, ~20 commits)**: lane b の type-P Dade support 機構を σ-sharp engine から
+type-P1 A_0 datum の sorry-free 構成まで積み上げ、S12 (10.1) を unblock。全ての "deep multi-session"
+と恐れた障害 (engine 全体 / isConj / coprimality / V^M geometry) は σ-sharp 機構に還元。残 type-P2
+((M')# geometry) は dadeSupportHypotheses_typeP の 2 sorry として cleanly 分離 (S12 は P1 のみ使うゆえ
+tower 入口には不要)。
+
+### loop¹²⁷ cont. — 次 frontier survey: §12 char analysis (S12_MaximalIII_IV_V の 4 sorry)
+
+**unblocked 10.1 の downstream consumer (FT critical path 確認)**:
+- **`FeitThompson.lean:446`** (FT spine) — `exists_hypothesis_of_typeIIIorIVorV` を
+  `card_kappaHall_lt_of_isTypeIIIorIV` 経由で使用。⟹ 10.1 unblock は spine に直結。
+- `S12_MaximalIII_IV_V:3666` (type-V contradiction)。
+
+**次 lane-b frontier = `S12_MaximalIII_IV_V.lean` の 4 real sorry** (§12 type-P char analysis /
+Dade tower body、10.1 Hypothesis が入手可能になった今 downstream)。S12_Core は 0 sorry。
+次 iteration: 4 sorry を survey → 上流優先で engage (§10 ω-grid / §5 依存の有無を確認)。
+
+type-P Dade support (§8) の carve-out 0096 の主目的 (typePA0 datum 構成 → S12 10.1) は達成。
+以降は §12/§10 char analysis (別 arc、S12 主体)。
+
+### loop¹²⁸ — 次 arc = §12 char body (deep character theory) と characterize
+
+carve-out 0096 (type-P Dade **support** geometry) は達成。次 arc = **§12 char analysis body**
+(`S12_MaximalIII_IV_V.lean` の 4 sorry)、いずれも deep §10/§11 character theory:
+- `typeII_derived_frobenius` (10.7): type-II [S,S] Frobenius 構造 (coherence 仮定下)。
+- `typeII_coherence_contradiction_estimate` (10.8): 「§7 analytic heart」norm-counting estimate。
+- `exists_zeta_residual_not_orthogonal` (11.8.1-6): σ-grid identities + (5.7) S(HC)-coherence +
+  (5.6) coherence-union の deep 非直交計算。
+- `typeV_forces_coherence` (10.10): type-V coherence。
+
+**これは type-P Dade support (σ-generic wiring だった) と質的に異なる deep char body** = lane b の core
+§12 Dade tower の最深部 (loop¹¹⁷ が "deep char" と識別した領域)。ungated own-work だが genuine deep。
+一部は §9↔§10 carrier bridge に gated の注記あり (L2244)。次 iteration: 上流優先で
+`typeII_derived_frobenius` (10.7) から engage (fresh context 推奨、深い char/structure 証明)。
+
+### loop¹²⁸ cont. — lane-b frontier 全体 survey (type-P support arc 後): S14 type-I Dade tower が主
+
+「lane b mostly blocked」の早計を訂正。lane-b sorry inventory:
+- **S14_MaximalI: 11 sorry** (type-I Dade tower: rho_constant_on_H_minus_Hprime, sibleyTarget_frobI,
+  witness_L_isTypeI/complement_isZGroup, intersection_complement_structure, complement_cyclic_order_dvd,
+  psi_constant_on_xK, rhoM_integer_values, exists_counterexample_dade_data, exists_typeICovering×2)。
+  = lane b の core 型-I char/Dade 解析、ungated own-work 多数。
+- S12_MaximalIII_IV_V: 4 (type-P char body、mixed: 11.8=lane-a gated、11.9.b/§10-11 core=lane-b)。
+- S10 (carve-out): 8 (type-P2 residue 含む + type-II structural 系)。
+
+**FT-path 確認**: exists_hypothesis (10.1) ✅ + w2_lt_w1 (11.9.b, lane-b) → exists_zeta_residual
+(11.8, **lane-a** gated) → card_kappaHall_lt → FT spine。typeII_derived_frobenius (10.7) は 0 consumer。
+
+**次 = S14 type-I Dade tower** (上流優先で engage)。type-P support arc (0096 主目的) 完了後の lane-b
+主 frontier。深い char 解析ゆえ fresh context 推奨。
+
+### loop¹²⁹ — (12.5) rho_constant 精読: deep multi-session char (Dade reciprocity/inertia/coherence infra 要)
+
+S14 type-I Dade tower の上流 (12.5) `rho_constant_on_H_minus_Hprime` を Coq
+`FtypeI_invDade_ortho_constant` (PFsection12:416) で精読:
+- **(12.4) coset-constancy は Lean で proven** (`orthogonal_character_constant_on_coset` S14:2360,
+  sorry-free): x∈L∖H で ψ(xh)=ψ(x)。
+- **(12.5) は H∖H' 上 (inside-H) の ρ(=invDade) 版で別物・deeper**。Coq 証明は
+  `pair_degree_coherence` + `invDade_reciprocity` (Dade reciprocity) + Iirr-H の
+  Ind[H,H']-partition (P_ i, trivIset/cover) + `cfInd_central_Inertia` (central inertia) を要す。
+- Lean 未整備: Dade reciprocity (invDade)、induced-from-H' partition、central inertia。⟹ **(12.5) は
+  substantial char infra build を要する multi-session effort** (S14 type-I Dade tower 全 11 sorry も同様の
+  deep char)。
+
+**honest 状況**: type-P Dade **support** arc (0096 主目的) 完了 (S12 10.1 sorry-free, FT spine 直結)。
+残 lane-b frontier = **deep multi-session §14 type-I char theory** (coherence/Dade-reciprocity/inertia
+infra build 込み)。type-P support の σ-generic wiring とは質的に異なる。
+
+### loop¹³⁰ — ★ 訂正: (12.5) は lane-b own-work + 主要 infra 存在 (loop¹²⁹ の過小評価を修正)
+
+claim-before-build 調整で loop¹²⁹「(12.5) は from-scratch multi-session char-infra 要」を**訂正**:
+- **§10-12 char core は lane-b own-work** (FeitThompson:418/496/855: §10-11/§10-12 char は lane-b 所有;
+  lane-a は 11.8 exists_zeta_residual のみ)。→ (12.5) は lane-b own-work、lane-a と非競合。
+- **Dade reciprocity は存在** (`Hypothesis.tau_inner_eq_of_supported` S12_Core:3586、
+  `tau_inner_trivial` 5776)。loop¹²⁹「invDade 無し」は grep 名違い (Lean は tau_inner_*)。
+- **Rset span も存在** (`coherent_extension_constituent_mem_span_Rset` S14:1720)。coherence も (S07/S08)。
+
+**∴ (12.5) の残 infra = induced-from-H' Iirr partition のみ** (Clifford: H'⊴H で Irr(H)=⊔ constt(Ind[H,H'] χ),
+Lean 未整備)。Ind[H,H'] χ は H∖H' 上 vanish (H'⊴H) ゆえ Fourier で ρψ=const on H∖H'。o_rpsi_S 部は
+tau_inner + span + horth で即。**(12.5) は 1-2 iteration の tractable build** (from-scratch でない)。
+
+**次 = induced-from-H' Iirr partition (Clifford) を build → (12.5) 組立**。concrete target 確定。
+
+### loop¹³¹ — ★★ territorial 訂正: lane-b frontier = S14 Type-I tower (NOT §10/§9-keystone = lane-a)
+
+**重大訂正**: loop¹²⁵-¹³⁰ で (10.8)`typeII_coherence_contradiction_estimate` / §9-keystone(2030) /
+(11.8) を lane-b frontier と分析していたが、**これらは 2026-07-02 3レーン再編で lane-a 所有**
+(正本 `ft_lane_reallocation_2026_06_28.md`:48「Pf S(0[3-9]|1[0-3])* 全体 = lane a」、:108-111 で
+10.7/10.8/10.10/11.8/S13 は lane-a deepest body)。cross-check: 直近 S12 commit da165ea8/5a67ee61
+=「Pf 11.8.4/5」= lane-a active。**FeitThompson.lean:418/496/855「§10-§12 char owned by lane-b」は
+stale (再編前)** — lane-a 所有 file ゆえ lane-b は編集せず、staleness は lane-a へ notes 通知のみ。
+
+**lane-b の実所有 (再編後)** = `S14_MaximalI.lean` 全体 (§12 all-Type-I Dade tower) + carve-out 0096
+(S10 §8 Dade-support) + coherence infra (6.5.c)。type-P Dade support arc (loop¹¹⁸-¹²⁹) は 0096 = 正しく
+lane-b territory だった (S10)。誤ったのは (10.8)/§9 への pivot のみ。
+
+**lane-b live frontier = S14 の 11 sorry** (comment-strip 実測):
+| Pf | decl | 複雑さ |
+|---|---|---|
+| 8.17 | `exists_typeICovering` (6197) | 8022 M̃-reroute に entangled (旧 lane-d carve-out、d 退役) |
+| 12.5 | `rho_constant_on_H_minus_Hprime` (2413) | orphan(0 consumer) + statement 疑義 (ψ(h)=ψ(1) vs Coq「H∖H' で const」) |
+| 12.10 | `sibleyTarget_frobI` (2521) | TI-case 限定、issue 2032 |
+| 12.10 | `witness_L_isTypeI` (4666) | hub 9003 Cluster A pinned (deep §8-§11 type-analysis) |
+| 12.10 | `witness_L_complement_isZGroup` (4677) | hub 9003 Cluster A pinned (deep §8 minimality) |
+| 12.11 | `intersection_complement_structure` (4711) | 4 consumer だが (12.10) downstream |
+| 12.12 | `complement_cyclic_order_dvd` (5148) | proven `isCyclic_..._fpf_conj_elemAbelian` は ∣p²-1、p+1 は Frobenius torus 構造要 |
+| 12.13 | `exists_counterexample_dade_data` (5578) | 12.16 chain |
+| 12.14 | `psi_constant_on_xK` (5340) | downstream char |
+| 12.15 | `rhoM_integer_values` (5349) | downstream char |
+
+**proven 済** (deepest-body list は stale): `nonconjugate_diffImage_inner_zero` (8.18.c, loop¹⁰⁰)、
+`constituent_diff_support_subset_nonescaping` (loop¹¹¹)。
+
+**次 = S14 tower を正面 engage** (lane-b assigned deep cluster; 全 sorry deep だが territory 内)。
+upstream-most cleanly-lane-b = (12.5) rho_constant (statement 解決 → induced-from-H' partition +
+Dade reciprocity(tau_inner) で build) か (12.12) の Frobenius-torus p+1 refinement。
+
+### loop¹³² — ✅ 実 landing: induce vanishing lemma + (12.5) statement 確定
+
+**① LANDED (sorry-free, commit 4f831a66)**: `induce_apply_eq_zero_of_not_mem_normal`
+(InducedCharacter.lean:310) — 一般再利用可能: H ⊴ G で g∉H ⟹ Ind_H^G θ(g)=0 (各 induceTerm が
+正規性 x⁻¹gx∈H⟺g∈H で消える)。build green 3158 jobs。数 iteration ぶりの実コード landing。
+
+**② (12.5) statement 確定 = MIS-STATED (orphan stub)**: Coq `FtypeI_invDade_ortho_constant`
+(PFsection12:417-419) は `{in H:\:H' &, rho psi x = rho psi y}` = **ρψ が H∖H' 上 const**
+(H∖H' 内 2 点比較、ρψ=a という特定定数、line 457)。Lean stub `ψ(h)=ψ(1)` は **1∈H' の値**と比較で
+別物。DpsiH 分解 `ρψ|_H = Σ a_A·Ind_{H'}^H χ_A + a·1_H` で確定: H∖H' 上 Ind 項は上記 lemma で消え
+ρψ(h)=a、だが ρψ(1)=a+Σa_A[H:H']χ_A(1)≠a。∴ **ψ(h)=ψ(1) は偽**、正 = const on H∖H'。
+
+**③ (12.5) deep-proof path**: DpsiH 分解 (o_rpsi_S = Dade reciprocity `tau_inner_eq_of_supported` +
+Irr(H) の induced-from-H' 分割) → 上記 vanishing lemma で finish。induced-from-H' 分割 (Clifford)
+が残 infra。**次: (12.5) statement を const-on-H∖H' に訂正 (orphan ゆえ lane-b 裁量) + DpsiH 組立**、
+または (12.14)/(12.15) downstream char へ。
+
+### loop¹³³ — ✅ (12.5) statement 訂正 + faithful Fourier 還元 landed (commit 7fd6f34d)
+
+(12.5) `rho_constant_on_H_minus_Hprime` を **opaque sorry → 訂正 statement + 実証明還元** に:
+- statement: `ψ(h)=ψ(1)` (偽) → **const on H∖H'** (∀ h1 h2∈H∖H', ψ h1=ψ h2、Coq 準拠)。0 consumer。
+- 還元 (実証明): Fourier `Res_L ψ=γ+β` ((12.4) 同型)、**γ は H 全体で const 実証明**
+  (`apply_mul_eq_of_mem_characterKernel`、各 H-kernel φ で φ(h)=φ(1))。残 sorry = **hβconst**
+  (β const on H∖H') の 1 本のみに isolate。build green 3871 jobs。
+
+**残 (12.5) core = hβconst**: β (off-H-kernel ∈ ℂ[S], S=Ind_H^L θ) が H∖H' で const。
+Coq o_rpsi_S (horth ψ⊥R(χ) → 等次数 ξ の係数構造) + DpsiH (induced-from-H' 分解) →
+`induce_apply_eq_zero_of_not_mem_normal` (loop¹³²) で finish。次: hβconst の S-structure +
+Dade reciprocity (`tau_inner_eq_of_supported`) 接続を build。
+
+**(12.5) 進捗**: 2 iteration で opaque sorry → [訂正 statement + γ 実証明 + isolate hβconst + vanishing infra]。
+FT decomposition パターン (mechanical spine 実証明 + deep core を精密 isolate)。
+
+### loop¹³⁴ — (12.5) hβconst 精密 decomposition roadmap (deep multi-iter build、既存 infra へ mapping)
+
+hβconst (β const on H∖H') = Coq (12.5) 本体 (PFsection12:420-475) 精読。各 piece を既存 Lean infra へ mapping:
+1. **o_rpsi_S** (⟨ρψ, ξ1-ξ2⟩=0、等次数 ξ∈S): Dade reciprocity `tau_inner_eq_of_supported`
+   (S12_Core:3586) + coherence `pair_degree_coherence`/`mem_coherent_sum_subseq` + ψ⊥R (horth)。
+2. **induced-from-H' 分割 P_i = constt(Ind_{H'}^H χ_i)** (trivIset + cover):
+   - disjoint: **直接 route** = `inner_induce_eq_zero_of_not_conj` (InducedIrreducible:151、非共役⟹⟨Ind i1,Ind i2⟩=0)
+     + 「直交指標は constituent 非共有」。単一軌道機構 (RestrictionConstituentsSingleOrbit) 不要。
+   - cover: 各 j∈Irr(H) は Res_{H'} j に constituent i を持つ (Clifford) + Frobenius `inner_induce_eq_inner_restrict`。
+   - constt_Ind_Res は `inner_induce_eq_inner_restrict` そのもの (wrapper 不要)。
+3. **cfInd_central_Inertia** (Ind χ_i = e·Σχ_j): `exists_extension_induce_eq_sum_distinct_of_inertia_inf_le`
+   (CliffordDecomposition:290) + `InertiaAbelianQuotient` 系。
+4. **DpsiH assembly** (ρψ|_H = Σ a_A Ind χ_A + a·1): Fourier `cfun_sum_cfdot` + 上記。
+5. **H∖H' vanish**: `induce_apply_eq_zero_of_not_mem_normal` (loop¹³², LANDED)。
+
+∴ hβconst は **既存 infra から assemblable な multi-iteration build** (from-scratch でない)。(12.5) は orphan
+ゆえ FT 即効値は低いが、partition/inertia は type-I char 全般の再利用 infra。
+**次: partition disjointness lemma (直接 route) を build** → cover → DpsiH → o_rpsi_S。
+
+### loop¹³⁵ — ✅ partition trivIset core landed (commit 822d37fa)
+
+`exists_conj_of_common_induce_constituent` (CliffordSingleOrbit.lean、sorry-free): H⊴G で θ₁ θ₂∈Irr(H)
+が共通 χ を Ind constituent に持てば G-共役。= induced-from-H' 分割の **trivIset core** (非共役⟹P_i disjoint)。
+Clifford 単一軌道 + Frobenius の assembly。再利用 Clifford infra。build green 3298 jobs。
+
+**(12.5) hβconst 進捗** (4 iter): vanishing lemma (¹³²) + statement 訂正/Fourier 還元 (¹³³) + roadmap (¹³⁴)
++ trivIset core (¹³⁵)。**次 = partition cover** (∀ j∈Irr(H), ∃ i∈Irr(H'), j lies over Ind i;
+= Res_{H'} j ≠ 0 の constituent 存在) → partition 組立 → DpsiH → o_rpsi_S (Dade reciprocity)。
+
+### loop¹³⁶ — partition 完成 (cover は既存) + o_rpsi_S 深さ確定; (12.5) 残 core 評価
+
+**partition 完成**: induced-from-H' 分割の 2 事実が両方 available:
+- **trivIset**: `exists_conj_of_common_induce_constituent` (loop¹³⁵ landed)。
+- **cover**: `exists_liesOver` (Clifford:626、**既存・proven**、正規性不要)。∴ cover の build 不要。
+
+**o_rpsi_S 深さ確定 (subtle Lean-Coq alignment)**: Lean は Dade **isometry** `tau_inner_eq_of_supported`
+(⟨τφ,τψ⟩=⟨φ,ψ⟩) + coherence bridge `coherent_extension_constituent_mem_span_Rset` を持つが、
+Lean (12.5) は ψ on G (horth = τ-image 直交) で Coq o_rpsi_S は ⟨ρψ,·⟩ on L。**この reconciliation +
+DpsiH 組立が残 hβconst core** = deep/subtle/multi-iter。
+
+**(12.5) 総括**: 5 iter で reusable infra 全抽出 (induce vanishing ¹³² + partition trivIset ¹³⁵)、
+statement 訂正 + Fourier 還元 (¹³³)、roadmap (¹³⁴)。残 hβconst = o_rpsi_S reconciliation + DpsiH の
+deep orphan build。reusable infra (vanishing/partition) は type-I char 全般で再利用可。
+**次: DpsiH-const 汎用 lemma (係数 class-const → const on H∖H') = partition + cfInd_central_Inertia
+(`exists_extension_induce_eq_sum_distinct_of_inertia_inf_le`) + vanishing の assembly** を build、
+o_rpsi_S を残 hypothesis に isolate。
+
+### loop¹³⁷ — frontier 総括 + (12.5) hβconst に集中決定
+
+**(12.14) 評価**: Coq は (12.4) `FTtype1_ortho_constant` 適用で証明。但し Lean mapping subtle:
+dade.psi = coh.extension χ は span R(χ) 内ゆえ R(χ) と非直交 → (12.4) 適用は cross-family 直交
+(R(χ)⊥R(χ'), χ≠χ') + coset/kernel 構造依存。deep multi-piece。
+
+**lane-b S14 frontier 総括**: 全 target が deep multi-iteration build:
+- (12.5) hβconst: partition (trivIset ¹³⁵ + cover exists_liesOver 既存) + vanishing (¹³²) DONE、残 = o_rpsi_S reconciliation + DpsiH。
+- (12.14): (12.4) 経由だが dade.psi⊥R subtle + cross-family 直交要。
+- (12.11): group theory (support facts + Cauchy/Sylow)。
+- (12.10) witness_L_*: hub 9003 pinned。
+reusable infra (induce vanishing + partition trivIset) は抽出済・type-I char 全般で再利用可。
+
+**決定: (12.5) hβconst に集中** (最多 infra 済 + upstream-most)。o_rpsi_S = horth (ψ⊥R on G) →
+Res_L ψ の S-係数構造 の reconciliation を sustained build。orphan だが CLAUDE.md 上 skip 理由でなく、
+infra 蓄積が最も進んでいる。次: o_rpsi_S の concrete build 着手。
+
+### loop¹³⁸ — ★ Dade reciprocity 存在確認 (loop¹³⁷ 訂正) + lane-b frontier 網羅評価
+
+**★ 訂正: Dade reciprocity は存在** (loop¹³⁷「invDade 欠如」は誤り、grep 名違い):
+`adjoint_formula` (S04:3894) = ⟨τα, χ⟩_G = ⟨α, ρχ⟩_L (ρχ = `adjointAverageFun` S04:3866)。
+docstring:「§4 最重要 export、§7/§9/§12/§13/§16 が直接 cite」。∴ ρ-based 論法 (o_rpsi_S 等) は
+既存 infra で可能。from-scratch invDade build 不要。
+
+**lane-b S14 frontier 網羅評価** (全 target の性質確定):
+- (12.5) rho_constant: orphan + formulation 混乱 (stub psi は G 上だが真の (12.5) は ρψ=adjointAverageFun ψ on L)
+  + deep o_rpsi_S/DpsiH。**reusable infra 抽出済** (induce vanishing ¹³² + partition trivIset ¹³⁵)。
+- (12.14) psi_constant_on_xK (consumed 3): (12.4) 経由、dade.psi⊥R + cross-family 直交 + coset 構造要。
+- (12.15) rhoM_integer_values (consumed 1): **dade.rhoMFormula = free Prop (scaffold carrier)** → arbitrary dade で
+  unprovable。genuine carrier 構成 gated (S11 §9 keystone 型)。
+- (12.11) (consumed 4): deep group theory (support facts + Cauchy/Sylow)。
+- (12.10) witness_L_*: hub 9003 pinned。
+
+**総括**: reusable char infra 抽出完了。残 frontier = deep multi-piece build か carrier-scaffold-gated か
+formulation-confused。**最 tractable FT-path = (12.14)** ((12.4) 経由の明確 path)。次: (12.14) の
+cross-family R-orthogonality (same-L, R(χ1)⊥R(χ2) χ1≠χ2) prerequisite を build。
+
+### loop¹³⁹ — ✅ 二族 constituent-diff 直交 landed (commit 0e7a3b94)
+
+`constituentDiff_tau_inner_eq_zero_of_ne_across` (S14、sorry-free): 同一 L・異 χ1,χ2∈S の
+φ∈S(χ1), φ'∈S(χ2) で φ≠φ'・φ≠φ̄'・φ̄≠φ' なら ⟨τ(φ-φ̄),τ(φ'-φ̄')⟩=0。既存同一-χ 版の二族一般化
+(証明同型)。build green 3871 jobs。code cadence 復帰 (assessment 3連 ¹³⁶⁻¹³⁸ 後)。
+
+**次 = 同一 L cross-family R-orthogonality** (`R(χ1)⊥R(χ2)`, χ1∉{χ2,χ̄2}):
+`toOrthonormalImage_inner_eq_zero_across` (S07:977) + 上記二族 diff 直交 + χ1∉{χ2,χ̄2}→
+disjoint constituents (partition trivIset `exists_conj_of_common_induce_constituent` ¹³⁵) から
+h2/h3 (φ≠φ̄' 等) 導出。(12.14) path の reusable 入力 + nonconjugate 版の companion。
+
+### loop¹⁴⁰ — ✅ 同一L cross-family R-orthogonality landed (commit 44c39a0d)
+
+`samegroup_typeI_R_orthogonal` (S14、sorry-free): 同一 L の χ1,χ2∈S で constituents pairwise distinct
+(hcond, χ1∉{χ2,χ̄2} で成立) なら R(χ1)⊥R(χ2)。nonconjugate 版の companion、前 commit の二族 diff 直交で
+signed-diff を埋める。build green 3871。**2 連続 code landing** (¹³⁹ 二族 diff + ¹⁴⁰ same-L R-ortho)。
+
+**R-orthogonality toolkit 完成**: nonconjugate (異L) + samegroup (同L) + constituentDiff_..._across
+(二族 diff)。type-I char (12.3/12.4/12.14) の reusable 入力。
+
+**(12.14) 残 subtlety**: dade.psi=coh.extension χ0 ∈ ℤ[R(χ0)] は R(χ0) と非直交。(12.4)
+orthogonal_character_constant_on_coset は ⊥ 全 R(χ') 要 → χ'=χ0 で gap。samegroup R-ortho は χ'≠χ0 を
+埋めるが χ0 は残る。Coq (12.14) の FTtype1_ortho_constant 適用の calS/χ0 扱いが要精読。次: (12.14)
+assembly の χ0 subtlety 解決 (Lean 意図 proof / Coq 精読) か、R-orthogonality を別 consumer で活用。
+
+### loop¹⁴¹ — (12.14) subtlety 解決 = cross-group + Hypothesis M gated; frontier 全 gated 確定
+
+**(12.14) 解決**: Coq `FTtype1_seqInd_ortho` (237-243) = **cross-group** (非共役 L1,L2) R-orthogonality
+(要 L2∉L1^G)。∴ (12.14) は (12.4) を **M** (counterexample maximal) に適用、dade.psi⊥R_M(φ) は
+cross-group (L vs M 非共役) = 既存 `nonconjugate_typeI_R_orthogonal`。**my ¹³⁹/¹⁴⁰ same-L 版は
+(12.14) の鍵でない** (reusable だが (12.14) は cross-group [既存] 使用)。
+**(12.14) 実 gate**: `Hypothesis M` (M の Dade 設定) 構成要 — CounterexampleHypothesis は
+K=maxNilpotentNormalHall M を持つが Dade Hypothesis M を carry せず。deep 構成。
+
+**★ lane-b S14 frontier 全 gated 確定** (網羅):
+| Pf | gate |
+|---|---|
+| 12.5 | formulation-confused (psi on G vs ρψ on L) + o_rpsi_S/DpsiH |
+| 12.10 | hub 9003 pinned (deep §8-11) |
+| 12.11 | deep Cauchy/Sylow + support facts |
+| 12.14 | Hypothesis M 構成 gated (cross-group R-ortho は既存) |
+| 12.15 | DadeNotation carrier scaffold (free rhoMFormula Prop) |
+
+reusable infra 全抽出 (induce vanishing/partition trivIset/two-family diff/same-L R-ortho)。残 = 各
+deep 構成 (Hypothesis M / carrier genuinize / Cauchy-Sylow) = multi-session。**最 concrete structural =
+(12.11) part-2** (M∩L≤H の Cauchy/Sylow, group theory, 4 consumer)。次: (12.11) part-2 着手。
+
+### loop¹⁴² — root unblock = Hypothesis M 構成 (12.14/12.15/DadeNotation の共通根)
+
+(12.11) part-2 精査: 特定の Frobenius/Sylow 論法 (isPiSubgroup_le_of_normal_isHall [BG S12:43 既存]
+で π-group へ還元、但し L Frobenius [witness_L_frobenius, 10.10 cross-lane gated] + Sylow 構造依存)。
+clean ungated general lemma は抽出できず。
+
+**★ root 発見**: char endgame の gated targets が共通根に収束:
+- (12.14): Hypothesis M (M の Dade 設定) 要 → (12.4) を M に適用。
+- (12.15)/(DadeNotation ρM): ρM = adjointAverageFun (M の Dade adjoint) 要 → **Hypothesis M** 要。
+∴ **Hypothesis M 構成 = 12.14-12.16 chain の root unblock** (lane-b territory)。
+
+**構成可能性**: 反例 M (noncyclic Sylow p, p∣[M:M_F]) の型に依存。型-P なら **既に build 済の
+type-P Dade support engine (S10, type-P arc loop¹¹⁸-¹²⁹)** が Hypothesis M を構成しうる (reuse!)。
+型-I なら type-I Dade 構成。**次: 反例 M の型判定 + type-P Dade engine が Hypothesis M を与えるか確認**
+→ 与えれば 12.14-16 chain unblock (major)。Dade reciprocity (adjoint_formula ¹³⁸) は既存。
+
+### loop¹⁴³ — ★★ 重大訂正: (12.14) は ASSEMBLABLE (Hypothesis M 利用可、gated でない)
+
+**loop¹⁴¹ の「Hypothesis M gated」は誤り**: 反例 M は **type-I** (`ctr.M_typeI : IsTypeI M` S14:4220)、
+`exists_typeI_hypothesis hG ctr.M_maximal ctr.M_typeI : Nonempty (Hypothesis M)` (S14:218) で **直接利用可**。
+
+**(12.14) 全 piece 存在 → assemblable**:
+1. Hypothesis M: `exists_typeI_hypothesis` ✓
+2. data_M (∀χ∈Sset_M, CharacterDecompositionData): existence 構成子 (S14:658/675) ✓
+3. horth (dade.psi ⊥ R_M): `coherent_extension_constituent_orthogonal_Rset_of_nonconjugate` (S14:1844、
+   coh.extension ⊥ R_M for L≠M) + dade.psi=coh.extension χ を constituent 和で ✓ (L≠M 要)
+4. (12.4) for M: `orthogonal_character_constant_on_coset` (S14:2448) ✓
+5. hypM.H = ctr.K = maxNilpotentNormalHall M (K_eq_MF) ✓
+6. x∈M (P0≤M) ✓、x∉K (p-element + p∤|K|)
+
+**残 sub-facts**: L≠M non-conjugate (witness 構造から)、dade.psi=coh.extension χ の constituent-和 for horth、
+x∉K の p-element 論法。**(12.14) は ~60 行 assembly** (gated でない、全 piece 存在)。
+
+**★ 訂正の意義**: 「char endgame 全 gated on deep constructions」は **過度に悲観的だった** — M が type-I で
+Hypothesis M 直接利用可ゆえ (12.14)/(12.15)/(12.16) chain は既存 piece から assemblable。次: (12.14) assembly を build。
+
+### loop¹⁴⁴ — (12.14) assembly 完全 scope: statement redesign 要 (coh + L≠M input)
+
+(12.14) 精査: assemblable だが **現 statement は under-specified**:
+- horth (dade.psi ⊥ R_M) は dade.tau1 が coherent extension である必要 → 一般 DadeNotation の tau1 では不足。
+  **coh_L (IsCoherent) 入力要** + dade.psi = coh.extension dade.chi の link。
+- cross-group には **L≠M non-conjugate** 要 (現 statement に無し)。
+→ **statement redesign 要** (coh + hLM 追加; code consumer 0 ゆえ安全)。
+
+**assembly plan** (redesign 後):
+```
+obtain ⟨hypM⟩ := exists_typeI_hypothesis hG ctr.M_maximal ctr.M_typeI
+hHK : hypM.H = ctr.K  := hypM.typeI.typeF.H_eq.trans ctr.K_eq_MF.symm
+data_M := fun χ hχ => (⟨CharacterDecompositionData existence S14:658⟩).choose
+refine orthogonal_character_constant_on_coset hG hypM data_M horth hxM hxK g (hHK▸hg)
+  horth: dade.psi=coh.extension χ ⊥ R_M — χ の constituents で分解 + coherent_extension_orthogonal (L≠M)
+  hxM: witness.x ∈ P0 ≤ M;  hxK: x∉K via p-element + p∤|K|
+```
+**subtlety**: dade.chi は degree e=[L:H] ⟹ Ind_H^L θ (θ linear≠1) ⟹ Frobenius で irreducible ⟹ 単一
+constituent (horth 簡略化)。**次: (12.14) redesign + assembly を build** (~60-80 行、全 piece 存在)。
+
+### loop¹⁴⁵ — ✅ (12.14) reduction landed (commit af21399b)
+
+`psi_constant_on_xK` を opaque sorry → **実 assembly reduction**: (12.4) を Hypothesis M
+(exists_typeI_hypothesis、M=type-I ゆえ直接) に適用。機械部 (Hypothesis M 構成 + hHK[typeF.H_eq+K_eq_MF]
++ data_M[character_decomposition existence] + hxM[P0≤M] + (12.4) 配線) 実証明。build green 3871。
+**loop¹⁴³ unblock (M=type-I) を実 code 化** — 「全 gated」の悲観を実証明で覆した。
+
+**残 2 obligation (既知 path、次)**:
+- **horth** (dade.psi⊥R_M): coherent_extension_constituent_orthogonal_Rset_of_nonconjugate (S14:1844)。
+  要 coh (coherence) + L≠M + dade.psi=coh.extension χ (χ irreducible constituent)。statement redesign 要。
+- **hxK** (x∉K): witness.x は nontrivial p-element、K=M_F は p'-Hall (p∣[M:M_F]) ゆえ p∤|K| → x∉K。
+  witness の x_ne_one + x^p=1 + K の Hall 構造から (自己完結的、redesign 不要)。
+次: hxK (self-contained) を先に埋め、horth は redesign + coherent_extension_orthogonal threading。
+
+### loop¹⁴⁶ — ✅ (12.14) hxK 実証明 (commit 4ec8434c); 残 horth のみ
+
+hxK (x∉K) 実証明: witness.x は nontrivial p-element (orderOf x = p via orderOf_eq_prime)。
+x∈K⟹p∣|K| (Lagrange orderOf_dvd_natCard + orderOf_injective coe)。K=M_F Hall
+(maxNilpotentNormalHall_isHall.coprime_index) + p∣[M:K] (p_dvd_index) で Coprime(|K|,[M:K]) ⟹ p∤|K| ⟹ 矛盾。
+build green 3871。**(12.14) 2 obligation の 1 完了** (¹⁴⁵ reduction + ¹⁴⁶ hxK の 2 連 landing)。
+
+**残 = horth のみ** (dade.psi⊥R_M): dade.psi=dade.tau1 dade.chi。tau1 が coherent extension である必要
+(一般 IntegralCharacterMap では不足) ⟹ **statement redesign 要** (coh:IsCoherent + hpsi:dade.psi=coh.extension χ
++ hLM:L≠M 追加)。coherent_extension_constituent_orthogonal_Rset_of_nonconjugate (S14:1844) で証明。
+χ irreducible constituent 構造 (dade.chi degree=[L:H]⟹Ind linear⟹irreducible) を thread。次: horth 完成 → (12.14) sorry-free。
+
+### loop¹⁴⁷ — ✅★ (12.14) 完成 SORRY-FREE (commit 86c17b4b)
+
+horth 実証明で **(12.14) psi_constant_on_xK 完全 sorry-free**。statement redesign (coherence input:
+coh + chi0 IrreducibleCharacter の data/constt/mem + hpsi + hLM) で horth =
+coherent_extension_constituent_orthogonal の 1 行。full assembly 実証明 (Hypothesis M + hHK + data_M
++ horth + hxK + (12.4) 適用)。**3 iter (¹⁴⁵ reduction/¹⁴⁶ hxK/¹⁴⁷ horth) で完成**。build green 3871。
+
+**★ loop¹⁴³ unblock 完全実証**: 「char endgame 全 gated」の悲観 (¹⁴¹) を、M=type-I ⟹ Hypothesis M
+直接利用可 (exists_typeI_hypothesis) の発見 (¹⁴³) → 実 code (¹⁴⁵⁻¹⁴⁷) で覆した。(12.16) chain の 1 piece 完成。
+
+**次 = (12.15) rhoM_integer_values**: 同 Hypothesis M unblock 適用。dade.psi g∈ℤ for g∈K∖K'
+(ρ=adjointAverageFun + Hypothesis M) + rhoMFormula (free Prop、redesign or caller 供給要)。
+
+### loop¹⁴⁸ — (12.15)/(12.16) chain 評価: (12.14) done、残 = deep final Dade contradiction
+
+(12.15) rhoM_integer_values: Coq `rhoM_psi` は `rhoM := invDade` for M (M の Dade adjoint =
+adjointAverageFun) + norm 下界 `lb_psiM` + cyclotomic `vchar_ker_mod_prim`。**deep** (12.14 より深い)。
++ rhoMFormula/rhoFormula は free Prop (constructor で True) = scaffold carrier。consumer 0。
+
+(12.16) chain: `counterexample_contradiction` (headline) = exists_rankTwoWitness + exists_witness_g +
+**exists_counterexample_dade_data** (deep §7/§12 bundle、sorry S14:5782) + counterexample_contradiction_of_facts。
+`CounterexampleDadeData` fields = ψ-data + **h_const(=12.14 DONE)** + h_psig_int(=12.15 deep) +
+norm bounds hA/hB/hC (deep §7) + he(3≤e, discharged)。
+
+**∴ 残 (12.16) chain content = deep final Dade contradiction** (M の ρM adjoint + §7 norm estimates +
+cyclotomic + 12.15)。(12.14) done は h_const field を供給 (chain の 1 field 完成)。
+**次: CounterexampleDadeData 構成 (exists_counterexample_dade_data) で 12.14 [h_const] を wire +
+dischargeable field を埋め、deep field (h_psig_int/norm bounds) を isolate** = faithful decomposition。
+
+### loop¹⁴⁹ — CounterexampleDadeData field map: (12.14) done = h_const; 残 = h_psix/h_psig_int/hA-C
+
+`CounterexampleDadeData` (S14:5738) fields = (12.16) contract:
+- **he** (3≤e): discharged。
+- **h_const** (ψ(x·g)=ψ(x)): **= (12.14) DONE** (specific g への適用)。
+- **h_psix** (∃w integral, ψ(x)-e=(1-ε)w): cyclotomic 合同 ψ(x)≡e mod(1-ε)。
+  Coq = vchar_ker_mod_prim; Lean は (1.10.a) `exists_integral_apply_sub_of_commute` 系か。
+- **h_psig_int** (ψ(g)=mval∈ℤ): **= (12.15) deep** (M の ρM=adjointAverageFun + norm 下界 + cyclotomic)。
+- **hA/hB/hC** (norm bounds normRhoM/normRho の不等式): **deep §7 estimates** (Hypothesis78/NormEstimates 系)。
+
+∴ exists_counterexample_dade_data (bundle 構成) の残 = **deep final Dade contradiction**
+(h_psix cyclotomic + h_psig_int 12.15 + hA-C §7 norm)。(12.14) は h_const を供給済。
+**次: h_psix (cyclotomic、(1.10) infra で最 tractable) を build 検討 → CounterexampleDadeData の
+非-deep field を埋める**。deep field (h_psig_int/norm) は multi-session。
+
+### loop¹⁵⁰ — h_psix も ψ(1)=e (coherence degree-preservation) 要; (12.16) chain 全 field deep 確定
+
+h_psix (∃w, ψ(x)-e=(1-ε)w): `exists_integral_apply_sub_of_commute` (CyclotomicCharacterCongruence:234,
+既存) を y=1 で適用 ⟹ ψ(x)-ψ(1)=(1-ε)z。∴ h_psix には **ψ(1)=e** 要 (e=χ(1)、chi_degree_eq_e)。
+だが IsCoherent (S07:1659) は isometry (extension_inner_eq) + ZIrr のみで **degree-preservation
+(coh.extension χ(1)=χ(1)) を直接持たない**。ψ(1)=e は coherence degree/sign 性質要 (isometry⟹±irr
++ degree = χ(1) の導出)。
+
+**∴ (12.16) chain 全 field deep 確定**: h_psix (ψ(1)=e degree-preserv) / h_psig_int (12.15 ρM) /
+hA-C (§7 norm)。**(12.14) は strong milestone (chain 再開 + h_const 供給)**、残は deep final Dade
+contradiction (multi-session)。次: ψ(1)=e (coherence degree-preservation) の導出可否を検討
+(isometry + ZIrr ⟹ ±irr ⟹ degree)、可なら h_psix landing。
+
+### loop¹⁵¹ — ψ(1)=e は S07 apply_one infra で導出可能 (deep field は infra 有・from-scratch でない)
+
+h_psix upstream の ψ(1)=e (coherence degree-preservation) の infra 発見:
+- `dadeIntegralCharacterMap_apply_one` (S07_CoherenceGalois:86、"Dade images vanish at 1")。
+- `extension_apply_one_eq_zero_of_supported` (S08:328、supported diff は 1 で消える)。
+- `coherent_of_constant_degree` (S07:551)。S-members は irreducible (`hSirr`)。
+∴ ψ(1)=e は導出可能 (χ-χ' supported diff の extension が 1 で消える ⟹ 同次数 S-member の
+extension は 1 で同値、+ constant-degree)。**involved だが from-scratch でなく、既存 infra から build 可**。
+
+**(12.16) chain 総括**: 全 field deep だが **各に relevant infra 有** (h_psix=S07 apply_one、
+h_psig_int=12.15 の ρM=adjointAverageFun+cyclotomic、hA-C=§7 Hypothesis78/NormEstimates)。
+= sustained multi-iter build (from-scratch でない)。**(12.14) は strong milestone**。
+**次: ψ(1)=e を grind → h_psix landing** (genuine deep build、churn assessment を脱する)。
+
+### loop¹⁵² — ✅ h_psix cyclotomic 合同 landed (commit fcc499a2); 残 = ψ(1)=e
+
+`psi_apply_x_sub_e_cyclotomic` (S14、sorry-free): ψ∈ℤ[Irr G], x^p=1, ε primitive, **ψ(1)=e** ⟹
+∃w integral, ψ(x)-e=(1-ε)w。(1.10.a) exists_integral_apply_sub_of_commute (y=1) + ψ(1)=e。
+build green 3871。**assessment churn (¹⁴⁸⁻¹⁵¹) を脱する実 code landing** — h_psix の cyclotomic 部完成。
+
+**残 h_psix input = ψ(1)=e** (coherence degree-preservation dade.psi(1)=coh.extension χ(1)=χ(1)=e)。
+IsCoherent は isometry+ZIrr のみ ⟹ ψ(1)=e は coherence の degree/sign 性質要 (χ-χ̄ supported diff の
+extension 消失 ⟹ real は出るが =e には不足)。**(12.13) 構成 (dadeNotation_of_coherence) が degree 性質を
+持つか、または coherence 構成から導出**。次: ψ(1)=e の導出可否を examine → 可なら h_psix 完成。
+
+### loop¹⁵³ — ψ(1)=e は coherence degree-preservation 要 (直接 lemma 無し); (12.16) 残は deep endgame
+
+ψ(1)=e (coh.extension χ(1)=χ(1)) の直接 lemma 探索: `restrict_extension_Yset_degree_value_eq_of_frobenius`
+(S08:2017) は SibleyDadeHypothesis の coherentYset/Xset 構造用で別物。`coherent_of_constant_degree`
+(S07:551) は isometry 構成のみ。**IsCoherent は isometry+ZIrr ⟹ coh.extension χ = ±ζ (norm-1 irr)
+だが degree-preservation (=χ(1)) は出ない** (χ-χ̄ supported ⟹ extension が 1 で χ,χ̄ 同値 = real は出るが
+=e 不足)。∴ ψ(1)=e は coherence の degree/sign 性質から build 要 (involved)。
+
+**(12.16) chain 総括 (確定)**: 全 field deep endgame — h_psix (ψ(1)=e coherence-degree、cyclotomic 部は
+¹⁵² landed) / h_psig_int (12.15 ρM) / hA-C (§7 norm)。**session milestone = (12.14) sorry-free +
+h_psix cyclotomic congruence**。残 = deep final Dade contradiction (coherence-degree + ρM + §7 norm)、
+sustained multi-session char theory。次: ψ(1)=e を coherence 構成 (witness_L_coherent) から build 試行、
+または h_psig_int/norm へ。
+
+### loop¹⁵⁴ — ψ(1)=e 深さ最終確認; (12.16) = deep endgame、measured pace へ
+
+ψ(1)=e: `nu_zeta_isIrreducibleCharacter_of_isCoherent_of_apply_one_pos` (S09:2948) で coh.extension χ =
+irreducible (norm-1 + apply_one>0) は出るが、その degree=χ(1)=e は coherence の **construction-level
+degree-preservation** 要 (isometry+sign では degree が χ(1) に固定されない)。∴ ψ(1)=e は deep sub-fact。
+
+**(12.16) chain 確定 (¹⁴⁸⁻¹⁵⁴ の網羅精査)**: deep final Dade contradiction、各 field は sustained
+per-field char-theory derivation 要:
+- h_psix: cyclotomic 部 landed (¹⁵²)、残 ψ(1)=e = coherence degree-preservation (construction level)。
+- h_psig_int (12.15): M の ρM=adjointAverageFun + norm 下界 + cyclotomic。
+- hA/hB/hC: §7 Hypothesis78/NormEstimates。
+
+**session milestones (strong)**: (12.14) psi_constant_on_xK **sorry-free** (¹⁴⁵⁻¹⁴⁷、Hypothesis M
+unblock 実証)、h_psix cyclotomic 合同 (¹⁵²)。**残 = deep endgame** (multi-session、各 field 深い)。
+rapid churn を避け measured pace で継続 (各 deep field は多 iteration の build)。
+
+### loop¹⁵⁵ — coherent_of_constant_degree 精査: extension(1)=const だが ≠e; h_psix は ρL 経由で entangled
+
+`coherent_of_constant_degree` (S07:551) 構成: extension(χⱼ)=β-τ(χ₀-χⱼ) ⟹ extension(χⱼ)(1)=β(1)
+(**S-member 間で const**、τ 像は χ₀-χⱼ supported ゆえ 1 で消える extension_apply_one_eq_zero_of_supported)。
+但し β(1)=±ζ(1) は e に固定されない ⟹ **ψ(1)=e は構成から出ない**。
+更に Coq h_psix は psi(x*g)=χ(x) (ρL relation rhoL_psi) 経由 ⟹ **h_psix は (12.15) ρ-machinery と entangled**、
+ψ(1)=e standalone でない。my psi_apply_x_sub_e_cyclotomic (¹⁵²) は valid lemma (ψ(1)=e given) だが
+h_psix の実 route は ρL。
+
+**(12.16) 最終確定**: deep entangled final Dade contradiction — h_psix/h_psig_int は ρM/ρL machinery
+(M の adjointAverageFun + norm 下界 + cyclotomic) で結合、hA-C は §7。**sustained focused work 要**
+(rapid /loop でなく dedicated session 向き)。**session milestones (strong)**: (12.14) sorry-free +
+reusable toolkit + h_psix cyclotomic。残 = ρM machinery build (multi-session)。measured pace 継続。
