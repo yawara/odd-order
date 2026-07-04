@@ -512,3 +512,23 @@ coeff (X ∈ ℤ[R]) / Y ⊥ R。
   何で host-τ を hyp.tau に接続していたかを alpha_tau_image 内部で確認)。
 - その後: 列和へ Finset.sum (既存 columnSum_diff の骨格流用) →
   columnImageFamily の coh-free 版 → ofProjection → named 2 点閉。
+
+### 追記 8 (loop 33): 橋は不要 — tau_muGridAlpha_eq の証明形を ζ-free で mirror する
+
+- `tau_muGridAlpha_eq` (S12_Core:4789) の証明は §6-host 橋を使わず
+  **hyp.tau-level で (4.8)-型論法を再演**している:
+  ‖X‖²=2 + X ∈ ℤIrr + V-vanish + σ-係数 grid (3.7)/(3.8) trichotomy
+  (部品: muGridAlpha_tau_X_inner / exists_alignedOmegaSigmaGrid_chiFam_family /
+  typePData_toTICyclicHypothesis / canonicalFullDadeApp / tau1_zeta_vanishes…)。
+  coh は −n·ζ^{τ₁} 項の処理にだけ入る。
+- **確定レシピ**: `tau_muGrid_row_diff_cohFree (i) (hj0) (hk0) (hjk) :
+  hyp.tau (μ_ij − μ_ik) = δ • (ω^σ_ij − ω^σ_ik)` を同じ骨格で ζ-free に書く:
+  * 支持: α_ij − α_ik = μ_ij − μ_ik (alpha_def; ζ 消滅) → alpha_support 差
+  * ‖μ_ij − μ_ik‖² = 2: grid 成分は既約・相異 (muGrid 直交補題群) →
+    Dade 等長で τ-像も norm 2、ℤIrr ✓
+  * V-vanish: (4.8) step (4) 型 — ω^σ 側は certainTypeOmegaSigma_apply_of_mem_V
+    の aligned-版 (exists_alignedOmegaSigmaGrid_chiFam_family + chiFam-V-値)
+  * trichotomy 部は tau_muGridAlpha_eq の該当ブロックをそのまま流用
+    (ζ-項が無い分単純化)
+- そこから列和 (Finset.sum) → coh-free columnImageFamily → ofProjection →
+  named 2 点。全行程が既存部品の組替えで閉じる見込み。
