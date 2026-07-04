@@ -1283,3 +1283,19 @@ hdata → card_G0_lower_bound。定量 assembly (min-index/𝓑-set/base_estimat
 (7.9) `conclusion_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent_parity` (S09_Nonex:4094、hzeta_cross =
 `hypothesis79_zetaImage_cross_eq_zero` 済) → hgood → CharacterEstimateData (5-field bundle) → hdata →
 card_G0_lower_bound。定量側 (min-index/𝓑-set/base_estimate via (7.5)) は別 strand で残る。
+
+---
+
+## cont.⁴⁸ — ⚠ card_G0 (7.10) は 2026-07-04 再々編で OFF-PATH 判定 / pivot-pending
+
+**2026-07-04 3 レーン再々編** (`ft_lane_reallocation_2026_06_28.md` 末尾 + merge_monitor) の audit
+(2 Explore + spine 検証) が確定: **feitThompson の唯一の bare sorry = `S12.exists_zeta_residual_not_
+orthogonal` (Pf 11.8)** (S12_MaximalIII_IV_V.lean:3633)。feitThompson は §12→§16 route で最終矛盾に到達。
+**card_G0 (7.10) は off-path**: consumer は S09 assembly 内のみ、feitThompson spine 上に無い。
+
+**本 issue (card_G0 delta-reality) は完遂寸前だが off-path**: delta-reality は全 sorry-free 完了
+(cont.⁴⁷)。残 = hdelta_even + CharacterEstimateData assembly (全 input 所在済) のみ。**ただし現 spine
+の前進には寄与しない**ため、A-レーン on-path 焦点は **S12 (11.8)** に pivot 推奨 (ユーザー確認 2026-07-04:
+「いったん区切り」)。**次 session は loop 再開前にこの判定を確認**し、S12 (11.8) か card_G0 完遂かを選ぶ。
+delta-reality 成果 (dadeMap_conj/coherence_extension_conj/delta_isReal/hbeta_conj_sub/
+hypothesis78_delta_isReal) は genuine・保存済で再利用可。
