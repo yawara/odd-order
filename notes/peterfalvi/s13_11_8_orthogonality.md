@@ -1280,3 +1280,29 @@ green + AxiomsCheck OK, S12 sorry 4 不変)。
 **次 frontier 候補** (上流優先+文書順): endpoint の (11.8.6) assembly は §14-gated ゆえ、lane-a の on-spine
 ungated 上流は §9 count carrier (`card_G0_lower_bound` 7.10 = issue 0044、on-path 確定) か §10-13 structural。
 (11.8) machinery 側は interface 完成につき、これ以上の ungated 前進は endpoint assembly (gated) 待ち。
+
+---
+
+## 2026-07-04 assessment (lane a pivot to on-path (11.8)) — foundations verified, entry point
+
+**pivot 経緯**: 2026-07-04 再々編で lane a on-path = **S12 (11.8) `exists_zeta_residual_not_orthogonal`**
+(= feitThompson の唯一 bare sorry) と確定 (card_G0 (7.10) は off-path)。本ノートの計画に沿って着手。
+
+**doneness 検証済 (honest to build)**:
+- S12 `Hypothesis` の carrier は**構成済 (opaque でない)**: `typeP : TypePData` / `dadeData :
+  S10.DadeSupportHypothesisData` / `muGrid`・`alignedOmegaSigmaGrid` は `noncomputable def`
+  (S12_Core:1236/1293)。⟹ (11.8) を積むのは scaffold でなく genuine。
+- **τ₁ 基盤**: `CoherentHypothesis hyp params` (S12_Core:2810、field = `IsCoherent hyp.tau hyp.Sset
+  hyp.A0`) が `.tau1` を持つ。ただし**これは full-S 係数の extension** (⟨hcoh⟩ で S_not_coherent が
+  背理法で使う)。**(11.8) が要るのは S₁=S(HC) の定数次数 q 係数の τ₁** = (5.7)
+  `S07.coherent_of_constant_degree` を **S(HC) 部分族**に適用したもの (無条件、full-S coherence を
+  仮定しない別物)。⟹ **entry point = S(HC) を inducedFamily M の定数次数 q 部分族として材料化 →
+  (5.7) で τ₁**。
+- landed: (10.9) `inner_tau_muColumnZero_sub_zeta_alignedOmegaSigma_of_w1_lt_w2` (S12:827) +
+  `residual_alignedOmegaSigma_inner_eq_zero_of_w1_lt_w2` (S12:967); (11.3) `S13.S_H0C_not_coherent`;
+  ‖α^τ‖²=2+n² `muGridAlpha_tau_inner_self`; §9 は S11 に def_Itheta/caseA_character_counts 系あり。
+
+**次 iteration の第一手 (上流優先)**: **S(HC) 部分族の材料化 + (5.7) τ₁ 構成** (11.8 全 step の土台)。
+その後 attack order = (11.8.4 landed 10.9)→(11.8.2 CS 不等式)→(11.8.3 β real)→(11.8.5 a=0)→
+(11.8.6 (9.11)+(11.3) 矛盾)。§9 (9.8/9.9/9.11) gate は S11 (a 所有) で並行に埋める。
+これは deep multi-session effort。scaffold/仮説 hoist はしない (carrier 構成可能性で doneness 判定)。
