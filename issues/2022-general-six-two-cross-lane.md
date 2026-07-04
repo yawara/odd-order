@@ -227,3 +227,11 @@ pin はこの実体で行う)。
 1. S12.Hypothesis 上の fully-pinned producer wrapper (機械的、instance 束ね)。
 2. anchor: inertia θ = M' なる linear θ (trivial on A') — W₁ 作用非固定。
 3. hdatum の μ-column pairs (break-Da / member-D / 直交性) — S12 grid + (5.8) 型 uniqueness。
+
+## 2026-07-05 lane-a (loop 4): anchor 前提 2 点 landing (27b065b8)
+
+`isTypeIIIorIV` (type V 排除 = (10.10) sorried-cite; AxiomsCheck 登録は (10.10) closure 後) +
+`coprime_card_W1_derived` ((|W₁|,|M'|)=1 完全実証明: H 側 typeP_coprime_H_uW1 + U 側 Frobenius)。
+inertia 核の設計 fix: **w = k·w₁ᵃ 分解で primality 不要** (内部自己同型は abelianization 上自明)。
+実装部品: coprime_fixedPoints_quotient_of_coprime_normal (3.28) / map_mul_of_apply_one_eq_one /
+centralizer_W1 + W2_le (→ secondDerived ⊆ commutator 翻訳) / subgroup_le_inertia / M_complement 分解。
