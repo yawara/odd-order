@@ -1080,3 +1080,28 @@ block A (= constt Ind_N λ, N:=H'.subgroupOf H) 内: ⟨f,θ⟩ は θ≠1_H で
   Ind_N λ = e∑θ (Fourier + brick A の all-mults-equal) + `induce_apply_eq_zero_of_not_mem_normal` (Ind vanish off N)。1_H 項は (θ(h1)−θ(h2))=0 で処理。
 - **D. assemble + restate**: `sum_inner_irreducibleCharacter_smul` Fourier-difference + B の biUnion regroup + C。
   `rho_constant_on_H_minus_Hprime` を ρψ 文へ restate、θ-coeff = `chiRhoCF_restrict_inner_eq_of_equal_degree` (S14:1995)、block equal-degree = `induce_inertia_constituent_apply_one_eq` (H'/H instantiation、H/H' abelian ⟹ inertia quotient abelian)。
+
+### loop¹⁷⁹⁻¹⁸² — (12.5) DpsiH: generic 機構 **全完成** (core + partition + 等次数) — 残 = S14 wiring のみ
+
+**この iteration で (12.5) の generic/reusable 機構を全て完成 (3 commit、全 green)**:
+1. **partition 強化** `exists_induce_constituent_partition` に block characterization
+   (`∀ A ∈ parts, ∃ ρ, ∀θ, θ∈A ↔ LiesOver H θ ρ`) 追加。
+2. **DpsiH core** `constant_off_normal_of_inner_block_const` (InducedInvariantConstituent, ~114 行, 一発 green):
+   H ⊴ G, g ∈ CF(G) が hcoeff(block 内 ⟨g,θ⟩ 一致, θ≠1)+hmult(⟨Ind ρ,θ⟩ 一致) ⟹ g は H 外で定数。
+   Fourier + partition regroup (sum_biUnion) + block ごと e·(sum)=c·(Ind ρ x−Ind ρ y)=0。
+3. **等次数系** `induce_inertia_constituents_apply_one_eq`: Ind_N^L θ の 2 constituent は等次数
+   (`induce_inertia_constituent_apply_one_eq` を同一 ψ で 2 回 → 両者 [L:T]·ψ(1))。
+
+**残 = Brick D (S14 wiring のみ)** `rho_constant_on_H_minus_Hprime` を core に帰着:
+- **restate**: 結論を `(chiRhoCF psi)⟨h1⟩ = (chiRhoCF psi)⟨h2⟩` (ρψ, 現 plain-psi は誤・consumer 無)。
+- **core 適用**: 環境 G_core := ↥((hyp.H).subgroupOf L)、g := restrict(H.subgroupOf L)(chiRhoCF psi)、
+  H_core := G_core の commutator (= H'=derivedInG H に対応、`Hprime = derivedInG hyp.H` 確認済 ⟹ G_core/H_core abelian)。
+- **hab 一様**: G_core/commutator abelian ⟹ ∀ x y ∈ G_core, ⁅x,y⁆∈commutator ⟹ 各 inertia T_ρ で hab 成立。
+- **hcoeff**: θ₁,θ₂ ≠triv, LiesOver ρ → (i) 等次数 = `induce_inertia_constituents_apply_one_eq`
+  (per-ρ: N=H_core, T=inertia(ρ), ψ_ρ=constituent over compHom ρ〈存在補題要〉, hinertia=定義) →
+  (ii) θᵢ≠triv ⟹ Ind_{H.subgroupOf L}θᵢ ∈ Sset (`Sset = {Ind θ : θ≠triv}` 確認済) →
+  (iii) `chiRhoCF_restrict_inner_eq_of_equal_degree` (S14:1995) で ⟨θ₁,Res(ρψ)⟩=⟨θ₂,Res(ρψ)⟩。
+- **hmult**: 同 (i) 等次数 → `inner_induce_constituent_eq_of_apply_one_eq` (Brick A)。
+- **翻訳**: g(x)=(chiRhoCF psi)(x:L) via restrict_apply; x∉H_core ⟺ h∉Hprime (subgroupOf iso)。
+- **要確認/新設**: (a) ψ_ρ 存在補題 (Irr(inertia ρ) で compHom ρ の上); (b) x∉commutator(G_core) ⟺ 像∉derivedInG H;
+  (c) inertia T_ρ の Fintype/Invertible/Normal instance plumbing。

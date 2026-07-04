@@ -226,6 +226,32 @@ theorem exists_induce_inner_ne_zero [Finite G] [Fintype G] [Invertible (Nat.card
   obtain ⟨ρ, hρ⟩ := IrreducibleCharacter.exists_liesOver (H := H) φ
   exact ⟨ρ, (IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H φ ρ).mpr hρ⟩
 
+/-- **Dual of `exists_liesOver`**: every irreducible `σ` of a subgroup `H ≤ G` lies *under* some
+irreducible `ψ` of `G` (`σ` is a constituent of `Res_H ψ`, i.e. `⟨Ind_H σ, ψ⟩ ≠ 0`).  The induced
+character `Ind_H^G σ` has positive degree `[G:H]·σ(1)`, hence is nonzero, hence — by completeness
+(`classFunction_eq_zero_of_orthogonal`) — not orthogonal to every irreducible of `G`.  This supplies
+the Clifford correspondent `ψ` over `θ'` in the Peterfalvi (1.7.b)/(12.5) inertia setup. -/
+theorem exists_liesOver_of_subgroup [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {H : Subgroup G} [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
+    (σ : IrreducibleCharacter ↥H) :
+    ∃ ψ : IrreducibleCharacter G, IrreducibleCharacter.LiesOver H ψ σ := by
+  classical
+  have hne : ClassFunction.induce H (σ : ClassFunction ↥H ℂ) ≠ 0 := by
+    intro hzero
+    have h1 : ClassFunction.induce H (σ : ClassFunction ↥H ℂ) 1 = 0 := by rw [hzero]; rfl
+    rw [ClassFunction.induce_apply_one] at h1
+    obtain ⟨d, hd, hdeq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast σ
+    rw [hdeq] at h1
+    have hidx : (H.index : ℂ) ≠ 0 := by exact_mod_cast Subgroup.index_ne_zero_of_finite
+    exact mul_ne_zero hidx (by exact_mod_cast hd.ne') h1
+  by_contra hcon
+  push_neg at hcon
+  apply hne
+  apply classFunction_eq_zero_of_orthogonal
+  intro ψ
+  by_contra hz
+  exact hcon ψ ((IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H ψ σ).mp hz)
+
 open scoped Classical in
 /-- **Partition of `Irr G` into `Ind_H^G` blocks.**  For `H ⊴ G`, the irreducible characters of `G`
 partition into the constituent-sets of the induced characters `Ind_H^G λ` (`λ ∈ Irr H`): every
