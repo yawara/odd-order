@@ -1944,6 +1944,46 @@ theorem Sset_diff_support_subset_ambientA {L : Subgroup G} (hyp : Hypothesis L)
   exact (OddOrder.Peterfalvi.S09.Cert.mem_supportInSubgroup_sharp_subgroupOf_iff
     hyp.typeI.typeF.H hAH x).mpr ⟨Subgroup.mem_subgroupOf.mpr hnot.1, hnot.2⟩
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.5), the `o_rpsi_S` coefficient equality** (Frobenius witness case): the
+`ρ`-image `χ^ρ = toHypothesis71.chiRhoCF ψ` has the *same* coefficient on two equal-degree members
+`χ₁, χ₂ ∈ S`: `⟨χ₁, ρψ⟩ = ⟨χ₂, ρψ⟩`, provided the coherent Dade images `coh.extension χᵢ` are
+orthogonal to `ψ`.
+
+The Coq `o_rpsi_S` step, assembled from the now-complete bridge chain: the difference `χ₁ − χ₂` is
+supported in `A(L)` (`Sset_diff_support_subset_ambientA`), so the Dade reciprocity `chiRho_adjoint`
+gives `⟨χ₁ − χ₂, ρψ⟩ = ⟨H71.τ (χ₁−χ₂), ψ⟩`; the τ-bridging `toHypothesis71_tau_apply` and coherence
+`extends_on_supported` rewrite `H71.τ (χ₁−χ₂) = hyp.tau (χ₁−χ₂) = coh.extension (χ₁−χ₂) =
+coh.extension χ₁ − coh.extension χ₂`; the orthogonality hypotheses close it to `0`.  The
+orthogonalities come from `inner_psi_coherent_extension_eq_zero` (`ψ ⊥ R(χ)`); combined with
+Frobenius (`⟨Res_H ρψ, θ⟩ = ⟨ρψ, Ind_H^L θ⟩`) this is the degree-determined coefficient of the
+(12.5) `DpsiH` decomposition. -/
+theorem chiRhoCF_inner_eq_of_equal_degree {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+    {χ₁ χ₂ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Sset) (hχ₂ : χ₂ ∈ hyp.Sset)
+    (hdeg : χ₁ (1 : ↥L) = χ₂ (1 : ↥L))
+    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1}) {ψ : ClassFunction G ℂ}
+    (horth1 : ClassFunction.inner ψ (coh.extension χ₁) = 0)
+    (horth2 : ClassFunction.inner ψ (coh.extension χ₂) = 0) :
+    ClassFunction.inner χ₁ (hyp.toHypothesis71.chiRhoCF ψ)
+      = ClassFunction.inner χ₂ (hyp.toHypothesis71.chiRhoCF ψ) := by
+  haveI := hyp.finiteG
+  have hsupp := Sset_diff_support_subset_ambientA hyp hχ₁ hχ₂ hdeg hAH
+  set α : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ (typeIA L hyp.typeI) L :=
+    ⟨χ₁ - χ₂, (ClassFunction.mem_supportedSubmodule).mpr hsupp⟩ with hα
+  have hmemspan : (χ₁ - χ₂) ∈ OddOrder.Peterfalvi.S07.zSupportedSpan hyp.Sset hyp.A :=
+    ⟨sub_mem (Submodule.subset_span hχ₁) (Submodule.subset_span hχ₂), hsupp⟩
+  have hkey : ClassFunction.inner (χ₁ - χ₂) (hyp.toHypothesis71.chiRhoCF ψ) = 0 := by
+    have hrec := hyp.toHypothesis71.chiRho_adjoint α ψ
+    have hαcoe : (α : ClassFunction ↥L ℂ) = χ₁ - χ₂ := rfl
+    rw [hαcoe] at hrec
+    rw [← hrec, hyp.toHypothesis71_tau_apply α, hαcoe,
+      ← coh.extends_on_supported (χ₁ - χ₂) hmemspan, map_sub, ClassFunction.inner_sub_left,
+      inner_conj_symm ψ (coh.extension χ₁),
+      inner_conj_symm ψ (coh.extension χ₂), horth1, horth2, star_zero, sub_zero]
+  rw [ClassFunction.inner_sub_left] at hkey
+  exact sub_eq_zero.mp hkey
+
 open scoped Classical in
 /-- **General TI-induction self-value** (Isaacs 7.x / Peterfalvi (3.2.c) value half), generalized
 from `TICyclicHypothesis.induce_apply_eq_self_of_mem_V` to an arbitrary TI subset.  For a TI subset
