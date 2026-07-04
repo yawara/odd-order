@@ -2175,14 +2175,86 @@ theorem eta10_sharp_norm_lower [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd 
     hH1 (fun x hx => hχ x hx) hs hP2 hn hParseval (by simpa using hInflation) habelian
   exact h
 
+/-- **`2v ≤ |Q| − 1`** — the `T`-side mirror of `two_mul_u_le`: from the (13.4) value
+`v = (q^p − 1)/(q − 1)` and `q ≥ 3`, so `v ≤ (q^p−1)/2`. -/
+theorem Hypothesis.two_mul_v_le (hyp : Hypothesis (G := G))
+    (hv : hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1)) :
+    2 * hyp.v ≤ hyp.q ^ hyp.p - 1 := by
+  have hq3 := hyp.three_le_q
+  have h1 : (hyp.q ^ hyp.p - 1) / (hyp.q - 1) ≤ (hyp.q ^ hyp.p - 1) / 2 :=
+    Nat.div_le_div_left (by omega) (by omega)
+  have h2 : (hyp.q ^ hyp.p - 1) / 2 * 2 ≤ hyp.q ^ hyp.p - 1 := Nat.div_mul_le_self _ _
+  omega
+
+open scoped Classical in
+open scoped FiniteInduce in
+/-- **Peterfalvi (13.5) for the `T`-side, `χ = η₁₀`, `ζ = (1/p)·μ'_j`, `a = δ`** — the
+correction datum of the (13.8)-for-`T` estimate.  By the `T`-side (13.3.c) there are `j` and
+`δ = ±1` with `μ'_j{}^{τ₂} = δ·Σᵢ η'`, and the (13.5.a) point formula on `Q^# ⊂ T` reads
+`η₁₀ = (δ/p)·μ'_j + α` (the induced `μ'_j` has `‖μ'_j‖² = p`, degree `pv`); with the
+*normalized* `ζ := (1/p)·μ'_j` the coefficient is `δ = ±1` and
+
+  `∑_T ‖ζ‖² − ‖ζ(1)‖² = (1/p²)(|T|·p − (pv)²) = |T'| − v²`,
+
+the (13.8) first term.  `α(1) = α1 ∈ ℤ`, the cross term is `Re(ζ(1)·conj α(1)) = v·α1`, and the
+(13.5.c) inflation bound holds with `|Q| = q^p`.  Faithful producer of the `T`-side (13.5)
+package; gated on the `T`-side (13.3)/Dade machinery. -/
+theorem exists_caseB_data_eta10_T [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {hyp : Hypothesis (G := G)} (chars : CharacterDegreeData hyp)
+    (_hlam : chars.lambda_induced_from_PC_linear) :
+    ∃ (ζ α : ↥hyp.T → ℂ) (α1 δ : ℤ),
+      (∀ x : ↥hyp.T, x ∉ hyp.Q.subgroupOf hyp.T → ζ x = 0) ∧
+      (∑ x ∈ Finset.univ.filter (· ∈ hyp.Q.subgroupOf hyp.T),
+        ζ x * (starRingEnd ℂ) (α x)) = 0 ∧
+      (∀ x ∈ (Finset.univ.filter (· ∈ hyp.Q.subgroupOf hyp.T)).erase 1,
+        hyp.eta10 ↑x = (δ : ℂ) * ζ x + α x) ∧
+      ((∑ x : ↥hyp.T, ‖ζ x‖ ^ 2) - ‖ζ 1‖ ^ 2
+        = (Nat.card ↥(derivedInG hyp.T) : ℝ) - (hyp.v : ℝ) ^ 2) ∧
+      ((ζ 1 * (starRingEnd ℂ) (α 1)).re = (hyp.v : ℝ) * (α1 : ℝ)) ∧
+      δ ^ 2 = 1 ∧
+      ((hyp.q ^ hyp.p - 1 : ℕ) : ℝ) * ((α1 : ℤ) : ℝ) ^ 2
+        ≤ ∑ x ∈ (Finset.univ.filter (· ∈ hyp.Q.subgroupOf hyp.T)).erase 1, ‖α x‖ ^ 2 := by
+  sorry
+
+open scoped Classical in
+open scoped FiniteInduce in
 /-- **Peterfalvi (13.8) applied to `T`**: `∑_{x∈Q^#}|η₁₀(x)|² ≥ |T'| − v²`, as a sum over the
-ambient sharp `Q^# ⊂ G`.  Faithful producer; the engine is `caseB_eta01_norm_bound` on the
-`T`-side (13.5) machinery (the `K^# = Q^#` Dade datum, `D = 1`). -/
+ambient sharp `Q^# ⊂ G`.
+
+**Real assembly** through the (13.8) engine `caseB_eta01_norm_bound` (inside `↥T`, with
+`Q.subgroupOf T`): the character-theoretic inputs are the `T`-side (13.5) package
+(`exists_caseB_data_eta10_T`, normalized `ζ` with first term `|T'| − v²`), and the `v`-bound
+`2v ≤ |Q| − 1 = q^p − 1` (`two_mul_v_le`, real from the (13.4) value); the engine output
+transports to the ambient sharp by `sum_apply_erase_one_filter_subgroupOf`. -/
 theorem eta10_Qsharp_norm_lower [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     (Nat.card ↥(derivedInG hyp.T) : ℝ) - (hyp.v : ℝ) ^ 2
       ≤ ∑ x ∈ (Set.toFinite (sharpSubgroup hyp.Q)).toFinset, ‖hyp.eta10 x‖ ^ 2 := by
-  sorry
+  classical
+  obtain ⟨chars, -, -, -⟩ := character_degree_analysis _hG hyp
+  have hlam := chars.lambda_induced_from_PC_linear_holds
+  obtain ⟨-, hv, -⟩ := lambda_forces_T_caseB _hG chars hlam
+  obtain ⟨ζ, α, α1, δ, hvanish, hinner, hχ, hfirstTerm, hcross, hδ, hinfl⟩ :=
+    exists_caseB_data_eta10_T _hG chars hlam
+  have hQT : hyp.Q ≤ hyp.T := by
+    rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.T
+  have hu := hyp.two_mul_v_le hv
+  -- The engine (bridging the `Classical` decidability instances baked into its statement).
+  have hengine : (Nat.card ↥(derivedInG hyp.T) : ℝ) - (hyp.v : ℝ) ^ 2
+      ≤ ∑ x ∈ (Finset.univ.filter (· ∈ hyp.Q.subgroupOf hyp.T)).erase 1,
+          ‖hyp.eta10 ↑x‖ ^ 2 := by
+    have h := caseB_eta01_norm_bound (S := ↥hyp.T) (hyp.Q.subgroupOf hyp.T)
+      ζ α (fun x => hyp.eta10 ↑x)
+      (Pm1 := hyp.q ^ hyp.p - 1) (u := hyp.v)
+      (firstTerm := (Nat.card ↥(derivedInG hyp.T) : ℝ) - (hyp.v : ℝ) ^ 2)
+      (α1 := α1) (δ := δ)
+      hvanish (by convert hinner using 2 <;> congr!)
+      (fun x hx => hχ x (by convert hx using 2 <;> congr!))
+      hfirstTerm hcross hδ
+      (by convert hinfl using 2 <;> congr!) hu
+    convert h using 2 <;> congr!
+  rwa [sum_apply_erase_one_filter_subgroupOf hQT
+    (fun y => ‖hyp.eta10 y‖ ^ 2)] at hengine
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (13.6) + Parseval, atom form**: `1 ≥ 1/|G| + slam + 1 − uq/(cp^q)`.
