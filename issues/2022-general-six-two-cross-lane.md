@@ -296,3 +296,9 @@ coherent_S_of_coherent_SH0C ((11.3) = 6.3-route、producer 部品は全て揃済
 C_lt_U (U_noncentral_on_quotient 経由; MulAut-coe は defeq-change で) +
 q_dvd_secondDerived_relIndex_HC_sub_one (W1_dvd_index_of_fixedPoints_le 再利用)。
 残 = 純算術 glue (tower + (11.4)@M'' + 奇偶) → HC_le_secondDerived 閉了へ。
+
+## 2026-07-05 lane-a (loop 14): **(11.5) 閉了** — M'' = HC 完成
+
+HC_le_secondDerived 実証明 (relIndex=1 化 + (11.4)@M'' + tower + FPF-dvd + 奇偶)。
+secondDerived_eq_HC 自動完成。残 named: sixTwoDecompositionData / secondDerived_coherent /
+coherent_S_of_coherent_SH0C。(11.6) 消費側の再点検 or (5.7) 配線が次。
