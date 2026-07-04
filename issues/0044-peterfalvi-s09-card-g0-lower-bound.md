@@ -814,3 +814,46 @@ bridge の仮説 (b=ζ̄₁^ν, d=ζ̄₂^ν の hbZ/hbn/hab/hab_supp) を F.hyp
 - その後: (7.9) conclusion 適用 (hcoh/hnu/hindZ/hzeta_irr/hBD/hdelta_even も要) → 𝓑-set →
   min-index/hG0sum → characterEstimateData → card_G0_lower_bound (endpoint sorry
   @S09_NonexistenceCertain:6552)。
+
+## 2026-07-04 cont.³⁰ (Frobenius discharge scoping — construction-ready) — 全 API 確認済
+
+深部 scoping 完了。opaque `let pf` (hypothesis78 内) が唯一の真の障害と特定。最クリーン分解:
+**中間 bridge `zetaImage_cross_eq_zero_of_conjIndex`** で refactor を「共役 index の供給」だけに隔離。
+
+### 次 iteration = 純構築 (再調査不要、全 API 下記で確認済)
+
+**Unit B1 (S09_FrobeniusCrossOrtho.lean 追記)**: `Hypothesis79.zetaImage_cross_eq_zero_of_conjIndex`
+共役 **index** j₁,j₂ を仮説に取り、nu_isometry で orthonormality を導出して既存 bridge
+`zetaImage_cross_eq_zero_of_conjugate_images` に流す。仮説:
+- coherence: `(hcoh₁ : IsCoherent τ₁ H79.first.sourceSet A'₁) (hnu₁ : H79.first.nu = hcoh₁.extension)` ×2
+- `(hz₁irr : IsIrreducibleCharacter (H79.first.hyp76.zeta H79.first.zetaDistinct))` ×2
+- 共役 index: `(j₁ : Fin (H79.first.hyp76.n+1)) (hj₁ne_ind : j₁ ≠ H79.first.ind1H)`
+  `(hj₁ne_dist : j₁ ≠ H79.first.zetaDistinct)`
+  `(hj₁ : H79.first.hyp76.zeta j₁ = (H79.first.hyp76.zeta H79.first.zetaDistinct).conj)` ×2
+- Dade agreement 差 support (Hyp78 は agreement を carry せぬため仮説): `(hab_supp : (H79.firstZetaImage
+  - H79.first.nu (H79.first.hyp76.zeta j₁)).support ⊆ H79.first.hyp76.hyp71.hyp.dadeSupport)` ×2
+- 導出: b := H79.first.nu (zeta j₁); `haZ/hcZ` = `nu_zetaDistinct_mem_ZIrr_of_isCoherent`;
+  `hbZ/hdZ` = `nu_zeta_mem_ZIrr_of_isCoherent hcoh₁ hnu₁ hj₁ne_ind`;
+  `han` = nu_isometry zetaDistinct zetaDistinct + `hz₁irr.inner_self_eq_one`;
+  `hbn` = nu_isometry j₁ j₁ + (zeta j₁ = ζ.conj, `(hz₁irr.conj).inner_self_eq_one` 経由、conj norm=1);
+  `hab` = nu_isometry zetaDistinct j₁ = ⟨ζ, ζ.conj⟩ = 0 (distinct irr; ζ irr + ζ.conj irr + ζ≠ζ.conj
+  ← hj₁ne_dist+injectivity or bundle IrreducibleCharacter で `irreducibleCharacter_inner`)。
+  → `exact H79.zetaImage_cross_eq_zero_of_conjugate_images haZ hbZ hcZ hdZ han hbn hcn hdn hab hcd
+  hab_supp hcd_supp`。
+
+**Unit B2 (Frobenius refactor, S09_FrobeniusHypothesis78.lean)**: opaque 解消。
+- `let pf := placedInducedFamily ...` と `choose χ ...` を **named def** に抽出
+  (`F.sibleyDistinguishedChar i`, `F.sibleyPlacedFamily i`)、`hypothesis78` を書き換え (green 維持)。
+- projection: `(F.hypothesis78 i ...).hyp76.zeta = fun j => induce K ((F.sibleyPlacedFamily i).θ j)`
+  (hypothesis78OfDade→hypothesis76OfFamily の `zeta := ζ` は `set`、rfl 見込み; 要 build 確認)。
+- 共役 index: `conj_induce` ((induce K θ).conj = induce K θ.conj) + `pf.cover` +
+  `pf.inj` で j₁ を構成 (∃j', zeta j' = ζ.conj; j'≠ind1H ← ζ.conj≠triv, j'≠0=zetaDistinct ← ζ≠ζ.conj
+  ← `not_isReal_of_ne_trivial_of_odd_card'`、L odd ← `Subgroup.card_subgroup_dvd_card`+`Odd.of_dvd`)。
+- hab_supp: `coherence_hagree_dadeMap` で ν(ζ)−ν(ζ.conj)=τ(ζ−ζ.conj)、`map_eq_zero_of_not_mem_dadeSupport`
+  で support ⊆ dadeSupport。
+
+**確認済 API**: nu_zeta_mem_ZIrr_of_isCoherent (S09_Nonexistence:2120), IsIrreducibleCharacter.
+inner_self_eq_one (CharacterProduct:195), IsIrreducibleCharacter.conj (BrauerPerm:136),
+not_isReal_of_ne_trivial_of_odd_card' (BrauerPerm:233), conj_induce (CliffordDecomp:363),
+coherence_hagree_dadeMap (S09_CertDischarge:2559), zeta_mem_sourceSet (1580), one_notMem_dadeSupport
+(S04:397), Subgroup.card_subgroup_dvd_card, hypothesis78OfDade zetaDistinct:=0 (S09_CertDischarge:1641)。
