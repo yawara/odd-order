@@ -2,6 +2,7 @@
 Copyright (c) 2026 The Odd Order Project. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import OddOrder.GroupTheory.RepresentationTheory.CliffordDecomposition
 import OddOrder.Peterfalvi.S08_CoherenceCorePart1
 import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
 
@@ -150,6 +151,80 @@ theorem exists_inducedKernelFamily_member_degree_index {X : Subgroup ↥L}
     by rw [ClassFunction.induce_apply_one, hθdeg, mul_one]⟩
 
 end InducedKernelFamily
+
+/-! ### Family structure: orthogonality, norms, real-freeness -/
+
+section FamilyStructure
+
+variable [Invertible (Nat.card ↥L : ℂ)]
+variable {K : Subgroup ↥L} [K.Normal] [Invertible (Nat.card ↥K : ℂ)]
+
+/-- **Distinct members of `S(X)` are orthogonal** (members from distinct source orbits;
+`induce_eq_induce_iff_conj` + `inner_induce_eq_zero_of_not_conj`).  No irreducibility of the
+members: this is the pairwise orthogonality of the possibly-reducible general family. -/
+theorem inducedKernelFamily_pairwise_orthogonal {X Y : Subgroup ↥L}
+    {φ φ' : ClassFunction ↥L ℂ}
+    (hφ : φ ∈ inducedKernelFamily K X) (hφ' : φ' ∈ inducedKernelFamily K Y)
+    (hne : φ ≠ φ') :
+    ClassFunction.inner φ φ' = 0 := by
+  obtain ⟨θ, -, -, rfl⟩ := hφ
+  obtain ⟨θ', -, -, rfl⟩ := hφ'
+  haveI : Fintype ↥K := Fintype.ofFinite _
+  refine inner_induce_eq_zero_of_not_conj θ θ' (fun g hg => hne ?_)
+  exact (induce_eq_induce_iff_conj θ θ').mpr ⟨g, hg⟩
+
+/-- **Members of `S(X)` have real, positive squared norm** — `⟨φ, φ⟩ = ‖φ‖²·1` with
+`0 < ‖φ‖².re` (`|K| · ⟨Ind θ, Ind θ⟩ = |I_L(θ)| > 0`,
+`card_mul_inner_self_induce_eq_card_inertia`). -/
+theorem inducedKernelFamily_inner_self_real_pos {X : Subgroup ↥L}
+    {φ : ClassFunction ↥L ℂ} (hφ : φ ∈ inducedKernelFamily K X) :
+    ClassFunction.inner φ φ = ((ClassFunction.inner φ φ).re : ℂ) ∧
+      0 < (ClassFunction.inner φ φ).re := by
+  obtain ⟨θ, -, -, rfl⟩ := hφ
+  haveI : Fintype ↥K := Fintype.ofFinite _
+  constructor
+  · rw [inner_self_eq_realCast (ClassFunction.induce K (θ : ClassFunction ↥K ℂ)),
+      Complex.ofReal_re]
+  · have hcard := card_mul_inner_self_induce_eq_card_inertia (G := ↥L) (H := K) (θ := θ)
+    set φ := ClassFunction.induce K (θ : ClassFunction ↥K ℂ)
+    -- take real parts: `|K| · ⟨φ,φ⟩.re = |I_L(θ)|`
+    have hre : (Nat.card ↥K : ℝ) * (ClassFunction.inner φ φ).re
+        = (Nat.card ↥(ClassFunction.inertia (θ : ClassFunction ↥K ℂ)) : ℝ) := by
+      have := congrArg Complex.re hcard
+      simpa [Complex.mul_re] using this
+    have hKpos : (0 : ℝ) < (Nat.card ↥K : ℝ) := by exact_mod_cast Nat.card_pos
+    have hIpos : (0 : ℝ)
+        < (Nat.card ↥(ClassFunction.inertia (θ : ClassFunction ↥K ℂ)) : ℝ) := by
+      exact_mod_cast Nat.card_pos
+    nlinarith [hre]
+
+/-- **`S(X)` has no real members** for `L` of odd order (Peterfalvi (1.1) extended to the
+possibly-reducible family): `Ind_K^L θ` real would force `θ̄ = θ^g` for some `g ∈ L`
+(`induce_conj` + `induce_eq_induce_iff_conj`), impossible in odd order
+(`conjBy_ne_conj_of_odd` — `θ = θ^{g²}` and `⟨g⟩ = ⟨g²⟩` give `θ̄ = θ`, but a nontrivial
+irreducible of an odd-order group is non-real). -/
+theorem inducedKernelFamily_hasNoRealCharacters (hodd : Odd (Nat.card ↥L)) (X : Subgroup ↥L) :
+    OddOrder.Peterfalvi.S03.HasNoRealCharacters (inducedKernelFamily K X) := by
+  rintro φ ⟨θ, hθne, -, rfl⟩ hreal
+  haveI : Fintype ↥K := Fintype.ofFinite _
+  -- realness transfers to the sources: `Ind θ = (Ind θ)̄ = Ind θ̄`.
+  let θc : IrreducibleCharacter ↥K := ⟨(θ : ClassFunction ↥K ℂ).conj, θ.isIrreducible.conj⟩
+  have hind : ClassFunction.induce K (θ : ClassFunction ↥K ℂ)
+      = ClassFunction.induce K (θc : ClassFunction ↥K ℂ) := by
+    have h1 : (ClassFunction.induce K (θ : ClassFunction ↥K ℂ)).conj
+        = ClassFunction.induce K (θ : ClassFunction ↥K ℂ) := hreal
+    calc ClassFunction.induce K (θ : ClassFunction ↥K ℂ)
+        = (ClassFunction.induce K (θ : ClassFunction ↥K ℂ)).conj := h1.symm
+      _ = ClassFunction.induce K (θc : ClassFunction ↥K ℂ) :=
+          ClassFunction.induce_conj K (θ : ClassFunction ↥K ℂ)
+  obtain ⟨g, hg⟩ := (induce_eq_induce_iff_conj θ θc).mp hind
+  have hθneCF : (θ : ClassFunction ↥K ℂ) ≠ trivialClassFunction ↥K :=
+    fun h => hθne (Subtype.ext h)
+  refine conjBy_ne_conj_of_odd hodd θ.isIrreducible hθneCF g ?_
+  have := congrArg (fun η : IrreducibleCharacter ↥K => (η : ClassFunction ↥K ℂ)) hg
+  simpa [IrreducibleCharacter.coe_conjBy, θc] using this
+
+end FamilyStructure
 
 /-! ### The (6.2) B2 degree-square identity over `S(X)`, real form -/
 
