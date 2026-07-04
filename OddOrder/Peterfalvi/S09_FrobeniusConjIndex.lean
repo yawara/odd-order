@@ -24,6 +24,28 @@ namespace OddOrder.Peterfalvi.S09
 
 open OddOrder.RepresentationTheory
 
+/-- **The Dade map commutes with complex conjugation** (coq `Dade_conjC`).  Directly from the
+`IsDadeMap` defining equations: on `dadeSupport` (`g ~ a·h`) both sides equal `star (α a)`
+(`map_eq_of_isConj_hCoset` + `conj_apply`), and off `dadeSupport` both vanish
+(`map_eq_zero_of_not_mem_dadeSupport`).  A step toward the `delta`-reality needed for
+`hdelta_even`. -/
+theorem dadeMap_conj {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    {hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L}
+    {τ : OddOrder.Peterfalvi.S04.DadeMap (G := G) ℂ A L}
+    (hτ : OddOrder.Peterfalvi.S04.IsDadeMap hyp τ)
+    (α : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ A L)
+    (hconjmem : (α : ClassFunction ↥L ℂ).conj ∈
+      ClassFunction.supportedSubmodule (OddOrder.Peterfalvi.S04.supportInSubgroup A L)) :
+    τ ⟨(α : ClassFunction ↥L ℂ).conj, hconjmem⟩ = (τ α).conj := by
+  ext g
+  by_cases hg : g ∈ hyp.dadeSupport
+  · obtain ⟨a, h, hh, hcj⟩ := hyp.mem_dadeSupport_iff.mp hg
+    rw [ClassFunction.conj_apply (τ α) g, hτ.map_eq_of_isConj_hCoset _ g a h hh hcj,
+      hτ.map_eq_of_isConj_hCoset α g a h hh hcj]
+    exact ClassFunction.conj_apply _ _
+  · rw [hτ.map_eq_zero_of_not_mem_dadeSupport _ g hg, ClassFunction.conj_apply,
+      hτ.map_eq_zero_of_not_mem_dadeSupport α g hg, star_zero]
+
 namespace FrobeniusFamily
 
 variable {G : Type*} [Group G] {k : ℕ}
