@@ -40,6 +40,20 @@ tractable solo = faithful-producer de-opacify (grid obligation を isolate、con
 sorried producer で全 wrapper を engine から実証明 → grid property を単一 producer に集約 (a の threading と pair)。
 **最高 leverage = issue 3002 の a-side threading** (b cascade 全体 unblock)。詳細 = issue 3002 の 07-04 b 訂正節。
 
+### ⚠⚠ 2026-07-04 loop 続報 — b は §12 (S14) + §15 (S15) 両クラスタとも a の §8-§13 に comprehensive gated
+loop で b の全所有ファイルを精査した結論 (「exhausted と即断」でなく code+issue 検証):
+- **S14_MaximalI (= Pf §12) に実 sorry 9 本** (reallocation の「S14 finished」は不正確)。だが **全て gated**
+  (issue 9003 が map 済): **Cluster A** (12.10 `witness_L_isTypeI`/`_complement_isZGroup` → 12.11/12.12) は
+  §8-§11 型解析 ((8.16)/(8.6.a)/(9.7.b)/(10.10)/(11.9.c)/(11.6)) を要すが**これらは未形式化** (S10/S11 に grep
+  不在) ゆえ cite 不能 = 真の gate。**Cluster B** (8.18.c `nonconjugate_diffImage_inner_zero` → 12.3 → 12.16
+  `exists_counterexample_dade_data`) は `S10.support_mutual_exclusion` (a 領域、sorried) gated。
+- **∴ b の on-path 2 クラスタ (§12 S14 + §15 S15) は共に a の §8-§13 (型解析 + §10 support + grid) に gated**。
+  b の ungated solo work は完了: (12.6) coherence tower DONE (9003) / (13.9.b) core (`sum_normSq_ge_ncard...`,
+  commit 9c9b6ad4) / (13.10) 出力 de-opacify (f17fdbcd)。
+- **これは 07-04 reallocation の想定 (b が §15 で solo 前進) に反する検証結果** = 大規模 cross-lane scope の
+  strategic 判断が要る (b を a の §8-§13 応援に再配置 / b に grid-threading 承認 / a の §8-§13 進捗待ち)。
+  gate は hub 化済 (9003 §12 + 9009 grid)。
+
 ---
 
 ## ✅✅ MILESTONE (2026-07-01, lane c): (13.16) W₂-side が **gate ゼロで完全 proven**
