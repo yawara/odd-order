@@ -99,3 +99,24 @@ Option B landing + build green（S10 の P2 sorry 2 本消滅、typePA docstring
   `S10_MinimalSimpleStructure.lean:2466`（dadeSupportHypotheses_typeP）
 - 関連: 9003（type-P2 の従来 gate map）, [[ft-settled-findings]]（type-II support の over-claim 系列:
   typeII_A_sets_TI / typeI_or_typeII_centralizer_unique / 15.7(c)）
+
+## ✅ HUB 裁定 (2026-07-04, cron tick): 確認事項 1 = Option B で確定 (Option A 不要)
+
+hub 検証で b の「S-side type-II Dade は off-path/vestigial」を確定:
+- `S15_SAndT_Setup:408` (2026-07-02 hub ruling): S-side maximal-coherent Dade route (tauS/Sset/A0S) は
+  **off the FT path**、carrier は tauS=0 placeholder を供給、spine は消費しない。§13/§16 矛盾は W-side grid
+  `eta = τ₃∘ω` 経由。
+- `FeitThompson:1739`: vestigial fields (Sset/Tset/A0S/A0T/tauS/tauT) は honest placeholder (∅/0)、
+  FT critical path 非消費。
+- `dadeSupportHypotheses_typeP` の live consumer = `S12_MaximalIII_IV_V_Core` (type III/IV/V = P1) のみ。P2 consumer 0。
+
+⟹ **正しい A(S) を必要とする on-path consumer は存在せず、将来も (S-side vestigial 設計が standing) 生じない
+→ Option A (typePA 定義訂正) は不要。Option B (IsTypeP1 narrow, 実施済 `cefdfc3b`) で確定・close 可**。
+将来 S-side を honest 化 (W-side restate でなく) する設計変更が起きた場合のみ Option A を再検討 (その時は
+本 issue を re-open)。→ **本 issue は Option B landing + build green で解決済 (sorry 118→115 の一部)**。
+
+## 📋 確認事項 2 (lane-b frontier 再配分) は 9003 で継続
+
+lane-b の char/support frontier は本 OCR 訂正で type-P2 phantom が解消し**確定的に枯渇**。残 on-path =
+§8 III/IV (BG§14-15 gate) / (7.9)(11.8) (lane a gate) / §12 endgame (Cluster A gated + DadeNotation
+de-scaffold 設計判断)。次配分は 9003 の frontier map + hub/ユーザー裁定で継続。
