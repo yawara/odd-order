@@ -226,6 +226,140 @@ theorem inducedKernelFamily_hasNoRealCharacters (hodd : Odd (Nat.card ↥L)) (X 
 
 end FamilyStructure
 
+/-! ### Support and lattice membership of family differences -/
+
+section SupportLemmas
+
+variable {K : Subgroup ↥L} [K.Normal] [Invertible (Nat.card ↥K : ℂ)]
+
+omit [K.Normal] in
+/-- Every `S(X)`-member is a virtual character of `L` (`Ind_K^L θ ∈ ℤ[Irr L]`). -/
+theorem inducedKernelFamily_mem_ZIrr [Invertible (Nat.card ↥L : ℂ)] {X : Subgroup ↥L}
+    {φ : ClassFunction ↥L ℂ} (hφ : φ ∈ inducedKernelFamily K X) :
+    φ ∈ ZIrr ↥L := by
+  obtain ⟨θ, -, -, rfl⟩ := hφ
+  haveI : Fintype ↥K := Fintype.ofFinite _
+  exact ClassFunction.induce_mem_ZIrr K θ.mem_ZIrr
+
+/-- **Scaled member differences are `K^#`-supported.**  For members `φ, φ' ∈ S(X)`/`S(Y)` with
+matching degrees `φ(1) = d·φ'(1)`, the difference `φ − d·φ'` vanishes off `K` (induced characters
+of the normal `K` vanish there, `induce_apply_eq_zero_of_not_mem_normal`) and at `1` (degree
+match), so its support lies in any set containing `K ∖ {1}`.  This discharges the (5.6) engine's
+support conditions (`hmemdegdiffsupp`/`hdiffasuppχ`) once the §11 consumer knows
+`K^# ⊆ A₀` for its Dade support set `A₀`. -/
+theorem inducedKernelFamily_scaledDiff_support {A0 : Set ↥L}
+    (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A0)
+    {X Y : Subgroup ↥L} {φ φ' : ClassFunction ↥L ℂ}
+    (hφ : φ ∈ inducedKernelFamily K X) (hφ' : φ' ∈ inducedKernelFamily K Y)
+    {d : ℕ} (hdeg : φ 1 = (d : ℂ) * φ' 1) :
+    (φ - d • φ').support ⊆ A0 := by
+  obtain ⟨θ, -, -, rfl⟩ := hφ
+  obtain ⟨θ', -, -, rfl⟩ := hφ'
+  intro x hx
+  rw [ClassFunction.mem_support] at hx
+  have hnsmul : ∀ (ψ : ClassFunction ↥L ℂ) (y : ↥L), (d • ψ) y = (d : ℂ) * ψ y := by
+    intro ψ y
+    rw [← Nat.cast_smul_eq_nsmul ℂ d ψ, ClassFunction.smul_apply]
+  have hval : ∀ y : ↥L,
+      (ClassFunction.induce K (θ : ClassFunction ↥K ℂ)
+        - d • ClassFunction.induce K (θ' : ClassFunction ↥K ℂ)) y
+      = ClassFunction.induce K (θ : ClassFunction ↥K ℂ) y
+        - (d : ℂ) * ClassFunction.induce K (θ' : ClassFunction ↥K ℂ) y := by
+    intro y
+    rw [ClassFunction.sub_apply, hnsmul]
+  refine hKsupp x ?_ ?_
+  · -- off `K` both induced characters vanish
+    by_contra hxK
+    refine hx ?_
+    rw [hval, ClassFunction.induce_apply_eq_zero_of_not_mem_normal K _ hxK,
+      ClassFunction.induce_apply_eq_zero_of_not_mem_normal K _ hxK, mul_zero, sub_zero]
+  · -- at `1` the degrees cancel
+    intro hx1
+    refine hx ?_
+    rw [hx1, hval, hdeg, sub_self]
+
+/-- **Conjugate member differences are `K^#`-supported**: `(φ̄ − φ).support ⊆ A₀` for a member
+`φ ∈ S(X)` (the (5.6) engine's `hdiffsuppχ`/`hmemdiffsupp`).  Special case of the scaled
+difference at `d = 1`: `φ̄` is again a member (`inducedKernelFamily_closedUnderConjugate`) of the
+same (real, integral) degree `φ̄(1) = star φ(1) = φ(1)`. -/
+theorem inducedKernelFamily_conjDiff_support {A0 : Set ↥L}
+    (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A0)
+    {X : Subgroup ↥L} {φ : ClassFunction ↥L ℂ} (hφ : φ ∈ inducedKernelFamily K X) :
+    (φ.conj - φ).support ⊆ A0 := by
+  have hφc := inducedKernelFamily_closedUnderConjugate X hφ
+  have hdeg : φ.conj 1 = ((1 : ℕ) : ℂ) * φ 1 := by
+    obtain ⟨θ, -, -, rfl⟩ := hφ
+    obtain ⟨d, -, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+    rw [Nat.cast_one, one_mul, ClassFunction.conj_apply, ClassFunction.induce_apply_one, hd]
+    rw [show ((K.index : ℂ) * (d : ℂ)) = ((K.index * d : ℕ) : ℂ) by push_cast; ring]
+    exact star_natCast _
+  have h := inducedKernelFamily_scaledDiff_support hKsupp hφc hφ (d := 1) hdeg
+  simpa using h
+
+end SupportLemmas
+
+/-! ### Break-character fields and member degree ratios -/
+
+section BreakFields
+
+variable [Invertible (Nat.card ↥L : ℂ)]
+variable {K : Subgroup ↥L} [K.Normal] [Invertible (Nat.card ↥K : ℂ)]
+
+omit [Invertible (Nat.card ↥L : ℂ)] [K.Normal] in
+/-- **Member degree ratio against the index anchor.**  Every `S(X)`-member has degree an
+integral multiple of `|L:K|`: `φ(1) = d · (K.index : ℂ)` with `d = θ(1) ∈ ℕ` positive.  This is
+the divisibility `|L:K| ∣ ψ(1)` of the (6.2) proof (Coq: `dvdC_mulr`/`Cnat_irr1`), producing the
+(5.6) engine's `deg` ratios once the anchor `χ₁(1) = |L:K|` is fixed. -/
+theorem inducedKernelFamily_degree_ratio {X : Subgroup ↥L}
+    {φ : ClassFunction ↥L ℂ} (hφ : φ ∈ inducedKernelFamily K X) :
+    ∃ d : ℕ, 0 < d ∧ φ 1 = (d : ℂ) * (K.index : ℂ) := by
+  obtain ⟨θ, -, -, rfl⟩ := hφ
+  obtain ⟨d, hdpos, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+  exact ⟨d, hdpos, by rw [ClassFunction.induce_apply_one, hd]; ring⟩
+
+/-- **The general break-character fields** — the break-side inputs of the norm-weighted (5.6)
+engine, packaged for a break `ψ ∈ S(B)` whose conjugate pair avoids `S₁ ⊆ S = S(⊥)`.
+
+General-family analogue of `caseB_breakChar_fields`/`caseB_breakChar_fields_columnBreak`
+(`S08_CaseBEnumeration`): non-reality (odd order), nonzero self-norms (norm positivity), vanishing
+cross-norms and orthogonality to `S₁` (distinct family members are orthogonal), and the
+`A₀`-supported conjugate difference. -/
+theorem inducedKernelFamily_breakChar_fields
+    (hodd : Odd (Nat.card ↥L)) {A0 : Set ↥L}
+    (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A0)
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ inducedKernelFamily K ⊥)
+    {B : Subgroup ↥L} {ψ : ClassFunction ↥L ℂ} (hψB : ψ ∈ inducedKernelFamily K B)
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁) :
+    ¬ ClassFunction.IsReal ψ ∧
+      ClassFunction.inner ψ ψ ≠ 0 ∧ ClassFunction.inner ψ.conj ψ.conj ≠ 0 ∧
+      ClassFunction.inner ψ.conj ψ = 0 ∧ ClassFunction.inner ψ ψ.conj = 0 ∧
+      ((ψ.conj - ψ).support ⊆ A0) ∧
+      (∀ χ ∈ S₁, ClassFunction.inner ψ χ = 0) ∧
+      (∀ χ ∈ S₁, ClassFunction.inner ψ.conj χ = 0) := by
+  have hψc := inducedKernelFamily_closedUnderConjugate B hψB
+  have hreal : ¬ ClassFunction.IsReal ψ := inducedKernelFamily_hasNoRealCharacters hodd B hψB
+  have hψconj_ne : ψ.conj ≠ ψ := fun h => hreal h
+  have hnormψ := inducedKernelFamily_inner_self_real_pos hψB
+  have hnormψc := inducedKernelFamily_inner_self_real_pos hψc
+  refine ⟨hreal, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  · rw [hnormψ.1]
+    exact_mod_cast hnormψ.2.ne'
+  · rw [hnormψc.1]
+    exact_mod_cast hnormψc.2.ne'
+  · exact inducedKernelFamily_pairwise_orthogonal hψc hψB hψconj_ne
+  · exact inducedKernelFamily_pairwise_orthogonal hψB hψc (fun h => hψconj_ne h.symm)
+  · exact inducedKernelFamily_conjDiff_support hKsupp hψB
+  · intro χ hχ
+    exact inducedKernelFamily_pairwise_orthogonal
+      (inducedKernelFamily_subset_bot B hψB) (hS₁sub hχ)
+      (fun h => hψnotS1 (h ▸ hχ))
+  · intro χ hχ
+    exact inducedKernelFamily_pairwise_orthogonal
+      (inducedKernelFamily_subset_bot B hψc) (hS₁sub hχ)
+      (fun h => hψcnotS1 (h ▸ hχ))
+
+end BreakFields
+
 /-! ### The (6.2) B2 degree-square identity over `S(X)`, real form -/
 
 section DegreeSum
