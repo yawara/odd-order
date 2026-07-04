@@ -478,6 +478,77 @@ theorem HC_central_condition [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
   intro r
   exact hyp.HC_quotient_H0C_comm r q
 
+/-- **`|HC| = |H|·|C|`**: `H` and `C` are complementary inside `HC` (`H` normal there,
+`H ⊓ C ≤ H ⊓ U = ⊥`). -/
+theorem card_HC [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
+    Nat.card ↥hyp.HC = Nat.card ↥hyp.base.typeP.H * Nat.card ↥hyp.C := by
+  have hHle : hyp.base.typeP.H ≤ hyp.HC := le_sup_left
+  have hCle : hyp.C ≤ hyp.HC := le_sup_right
+  have hHCleM : hyp.HC ≤ M := hyp.HC_le_derived.trans (Subgroup.map_subtype_le _)
+  haveI hHn : (hyp.base.typeP.H.subgroupOf hyp.HC).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hHle).mpr
+      (hHCleM.trans hyp.H_normalized_by_M)
+  have hdisj : Disjoint (hyp.base.typeP.H.subgroupOf hyp.HC) (hyp.C.subgroupOf hyp.HC) := by
+    rw [disjoint_iff]
+    have hsplit : hyp.base.typeP.H.subgroupOf hyp.HC ⊓ hyp.C.subgroupOf hyp.HC
+        = (hyp.base.typeP.H ⊓ hyp.C).subgroupOf hyp.HC :=
+      (Subgroup.comap_inf _ _ _).symm
+    have hbot : hyp.base.typeP.H ⊓ hyp.C = ⊥ := by
+      rw [eq_bot_iff, ← hyp.H_inf_U_eq_bot]
+      exact inf_le_inf_left _ hyp.C_le_U
+    rw [hsplit, hbot, Subgroup.bot_subgroupOf]
+  have hsup : (hyp.base.typeP.H.subgroupOf hyp.HC) ⊔ (hyp.C.subgroupOf hyp.HC) = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hHle hCle]
+    exact Subgroup.subgroupOf_self _
+  have hcomp : Subgroup.IsComplement' (hyp.base.typeP.H.subgroupOf hyp.HC)
+      (hyp.C.subgroupOf hyp.HC) := by
+    refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ hdisj ?_
+    rw [← Subgroup.normal_mul, hsup, Subgroup.coe_top]
+  have hmul := hcomp.card_mul
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHle).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hCle).toEquiv] at hmul
+  exact hmul.symm
+
+/-- **`|M' : HC| = |U : C|`** (cancel the common factor `|H|`). -/
+theorem HC_relIndex_derived [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.HC.relIndex (derivedInG M) = hyp.C.relIndex hyp.U := by
+  -- `relIndex · card = card` on both sides
+  have h1 : Nat.card ↥hyp.HC * hyp.HC.relIndex (derivedInG M)
+      = Nat.card ↥(derivedInG M) := by
+    have := Subgroup.card_mul_index (hyp.HC.subgroupOf (derivedInG M))
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.HC_le_derived).toEquiv] at this
+  have hCleU' : hyp.C ≤ hyp.U := hyp.C_le_U
+  have h2 : Nat.card ↥hyp.C * hyp.C.relIndex hyp.U = Nat.card ↥hyp.U := by
+    have := Subgroup.card_mul_index (hyp.C.subgroupOf hyp.U)
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hCleU').toEquiv] at this
+  have hM' : Nat.card ↥(derivedInG M)
+      = Nat.card ↥hyp.base.typeP.H * Nat.card ↥hyp.base.typeP.U := by
+    have hmul := hyp.base.typeP.derived_complement.card_mul
+    rw [← hmul,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.base.typeP.H_le).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.base.typeP.U_le).toEquiv]
+  -- combine: `(|H||C|)·rel_HC = |H||U| = (|H||C|)·rel_CU`, cancel the positive `|H||C|`
+  have hkey : (Nat.card ↥hyp.base.typeP.H * Nat.card ↥hyp.C) * hyp.HC.relIndex (derivedInG M)
+      = (Nat.card ↥hyp.base.typeP.H * Nat.card ↥hyp.C) * hyp.C.relIndex hyp.U := by
+    rw [← hyp.card_HC, h1, hM', hyp.card_HC, mul_assoc, h2]
+    rfl
+  have hpos : 0 < Nat.card ↥hyp.base.typeP.H * Nat.card ↥hyp.C :=
+    Nat.mul_pos Nat.card_pos Nat.card_pos
+  exact Nat.eq_of_mul_eq_mul_left hpos hkey
+
+/-- **`|M : HC| = q · |U : C|`** (the (11.4) index: `|M:HC| = |M:M'|·|M':HC|`). -/
+theorem HC_trace_index [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
+    (hyp.HC.subgroupOf M).index = hyp.base.w1 * hyp.C.relIndex hyp.U := by
+  have htower : hyp.HC.relIndex (derivedInG M) * (derivedInG M).relIndex M
+      = hyp.HC.relIndex M :=
+    Subgroup.relIndex_mul_relIndex hyp.HC (derivedInG M) M hyp.HC_le_derived
+      (Subgroup.map_subtype_le _)
+  have hq : (derivedInG M).relIndex M = hyp.base.w1 := by
+    have := hyp.base.typeP.card_W1_eq_derived_index
+    exact this.symm
+  change hyp.HC.relIndex M = hyp.base.w1 * hyp.C.relIndex hyp.U
+  rw [← htower, hyp.HC_relIndex_derived, hq, Nat.mul_comm]
+
 end Hypothesis
 
 /-! ## (11.3)--(11.5): commutator-chain consequences -/
@@ -518,15 +589,85 @@ theorem S_H0C_not_coherent [Finite G] [Fintype G]
 /-- **Peterfalvi (11.4)**: if `S(H_1)` is coherent for a normal subgroup `H_1 < M'`,
 then `|M'/H_1| - 1 ≤ 2 q |U/C|` (the quotient bound from Theorem (6.2)), stated here in
 the subtraction-free form `|M' : H_1| ≤ 2 q |U : C| + 1`. -/
-theorem coherent_quotient_bound [Finite G] [Fintype G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M H1 : Subgroup G} [Fintype ↥M]
-    [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
+theorem coherent_quotient_bound [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M H1 : Subgroup G}
     (hyp : Hypothesis M) (hH1_norm : M ≤ Subgroup.normalizer (H1 : Set G))
     (hH1_lt : H1 < derivedInG M)
     (hcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       hyp.base.tau (hyp.SOf H1) hyp.base.A0)) :
     H1.relIndex (derivedInG M) ≤ 2 * hyp.q * hyp.C.relIndex hyp.U + 1 := by
-  sorry
+  classical
+  -- normality instances for the section subgroups and their traces
+  haveI hA'n : ((H1.subgroupOf M)).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer
+      (hH1_lt.le.trans (Subgroup.map_subtype_le _))).mpr hH1_norm
+  haveI hBn : ((hyp.H0C.subgroupOf M)).Normal := hyp.H0C_subgroupOf_normal
+  haveI : ((H1.subgroupOf M).subgroupOf ((derivedInG M).subgroupOf M)).Normal :=
+    hA'n.subgroupOf _
+  haveI : ((hyp.H0C.subgroupOf M).subgroupOf ((derivedInG M).subgroupOf M)).Normal :=
+    hBn.subgroupOf _
+  haveI : ((hyp.H0C.subgroupOf M).subgroupOf (hyp.HC.subgroupOf M)).Normal :=
+    hBn.subgroupOf _
+  -- coherence dichotomy at the pinned family (`SOf_eq`; `tau`/`A0` are definitional)
+  have hAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.base.dadeData.dade
+        (hyp.base.dadeData.dade.fullDadeIsometryData hyp.base.hconj))
+      (OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M)
+        (H1.subgroupOf M)) hyp.base.A0) := by
+    have h := hcoh
+    rw [hyp.SOf_eq] at h
+    exact h
+  have hBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.base.dadeData.dade
+        (hyp.base.dadeData.dade.fullDadeIsometryData hyp.base.hconj))
+      (OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M)
+        (hyp.H0C.subgroupOf M)) hyp.base.A0) := by
+    have h := S_H0C_not_coherent _hG hyp
+    rw [hyp.SOf_eq] at h
+    exact h
+  -- the (6.2) bound at `(C, D) = (HC, HC)`-traces
+  have hbound := hyp.base.six_two_dichotomy_bound _hG
+    (A' := H1.subgroupOf M) (B := hyp.H0C.subgroupOf M)
+    (C := hyp.HC.subgroupOf M) (D := hyp.HC.subgroupOf M)
+    (Hypothesis.trace_ne_top_of_lt_derived hH1_lt) hyp.H0C_trace_ne_top
+    (Subgroup.subgroupOf_mono M
+      (sup_le (hyp.H0_lt_H.le.trans le_sup_left) le_sup_right))
+    (Subgroup.subgroupOf_mono M hyp.HC_le_derived)
+    hyp.HC_central_condition hAcoh hBncoh
+  -- the square-root factor is `√1 = 1`
+  have hsq : Nat.card (↥(hyp.HC.subgroupOf M) ⧸
+      (hyp.HC.subgroupOf M).subgroupOf (hyp.HC.subgroupOf M)) = 1 := by
+    rw [Subgroup.subgroupOf_self]
+    haveI : Subsingleton (↥(hyp.HC.subgroupOf M) ⧸ (⊤ : Subgroup ↥(hyp.HC.subgroupOf M))) :=
+      QuotientGroup.subsingleton_quotient_top
+    exact Nat.card_unique
+  rw [hsq] at hbound
+  simp only [Nat.cast_one, Real.sqrt_one, mul_one] at hbound
+  -- the left side is the relative index `|M' : H₁|`
+  have hL : Nat.card (↥((derivedInG M).subgroupOf M) ⧸
+      (H1.subgroupOf M).subgroupOf ((derivedInG M).subgroupOf M))
+      = H1.relIndex (derivedInG M) := by
+    have h1 : Nat.card (↥((derivedInG M).subgroupOf M) ⧸
+        (H1.subgroupOf M).subgroupOf ((derivedInG M).subgroupOf M))
+        = (H1.subgroupOf M).relIndex ((derivedInG M).subgroupOf M) := rfl
+    rw [h1]
+    exact Subgroup.relIndex_subgroupOf (show derivedInG M ≤ M from Subgroup.map_subtype_le _)
+  rw [hL] at hbound
+  -- the index factor is `q·|U:C|`
+  have hidx : ((hyp.HC.subgroupOf M).index : ℝ)
+      = (hyp.base.w1 * hyp.C.relIndex hyp.U : ℕ) := by
+    rw [hyp.HC_trace_index]
+  rw [hidx] at hbound
+  -- conclude over `ℕ`
+  have hfinal : (H1.relIndex (derivedInG M) : ℝ)
+      ≤ 2 * (hyp.base.w1 * hyp.C.relIndex hyp.U : ℕ) + 1 := by linarith
+  have : H1.relIndex (derivedInG M) ≤ 2 * (hyp.base.w1 * hyp.C.relIndex hyp.U) + 1 := by
+    exact_mod_cast hfinal
+  calc H1.relIndex (derivedInG M) ≤ 2 * (hyp.base.w1 * hyp.C.relIndex hyp.U) + 1 := this
+    _ = 2 * hyp.q * hyp.C.relIndex hyp.U + 1 := by
+        change 2 * (hyp.base.w1 * hyp.C.relIndex hyp.U) + 1
+          = 2 * hyp.base.w1 * hyp.C.relIndex hyp.U + 1
+        ring
 
 /-- **Peterfalvi (11.5), reverse inclusion `HC ⊆ M''`** (named obligation): the coherence content
 of (11.5).  Since `M'/M''` is abelian, `S(M'')` is coherent by (5.7); the quotient bound (11.4)
