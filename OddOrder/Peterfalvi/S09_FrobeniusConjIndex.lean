@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import OddOrder.Peterfalvi.S09_FrobeniusCrossOrtho
+import OddOrder.Peterfalvi.S09_FrobeniusEstimate
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
 import OddOrder.GroupTheory.RepresentationTheory.CliffordDecomposition
 
@@ -22,6 +23,28 @@ contradicting `ind1H ≠ 0` via `inj`).
 namespace OddOrder.Peterfalvi.S09
 
 open OddOrder.RepresentationTheory
+
+/-- **The Dade map commutes with complex conjugation** (coq `Dade_conjC`).  Directly from the
+`IsDadeMap` defining equations: on `dadeSupport` (`g ~ a·h`) both sides equal `star (α a)`
+(`map_eq_of_isConj_hCoset` + `conj_apply`), and off `dadeSupport` both vanish
+(`map_eq_zero_of_not_mem_dadeSupport`).  A step toward the `delta`-reality needed for
+`hdelta_even`. -/
+theorem dadeMap_conj {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    {hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L}
+    {τ : OddOrder.Peterfalvi.S04.DadeMap (G := G) ℂ A L}
+    (hτ : OddOrder.Peterfalvi.S04.IsDadeMap hyp τ)
+    (α : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ A L)
+    (hconjmem : (α : ClassFunction ↥L ℂ).conj ∈
+      ClassFunction.supportedSubmodule (OddOrder.Peterfalvi.S04.supportInSubgroup A L)) :
+    τ ⟨(α : ClassFunction ↥L ℂ).conj, hconjmem⟩ = (τ α).conj := by
+  ext g
+  by_cases hg : g ∈ hyp.dadeSupport
+  · obtain ⟨a, h, hh, hcj⟩ := hyp.mem_dadeSupport_iff.mp hg
+    rw [ClassFunction.conj_apply (τ α) g, hτ.map_eq_of_isConj_hCoset _ g a h hh hcj,
+      hτ.map_eq_of_isConj_hCoset α g a h hh hcj]
+    exact ClassFunction.conj_apply _ _
+  · rw [hτ.map_eq_zero_of_not_mem_dadeSupport _ g hg, ClassFunction.conj_apply,
+      hτ.map_eq_zero_of_not_mem_dadeSupport α g hg, star_zero]
 
 namespace FrobeniusFamily
 
@@ -402,6 +425,132 @@ theorem hypothesis79_zetaImage_cross_eq_zero [Fintype G] [Invertible (Nat.card G
     hj₂ne_ind hj₂ (F.hypothesis78_zeta_ne_conj j hodd hnilp_j C_j hFrob_j)
     (F.hypothesis78_nu_zeta_sub_conj_support i hodd hnilp_i C_i hFrob_i hj₁ne_ind hj₁)
     (F.hypothesis78_nu_zeta_sub_conj_support j hodd hnilp_j C_j hFrob_j hj₂ne_ind hj₂)
+
+open OddOrder.Peterfalvi.S09.Cert in
+/-- **The (7.8.a) `BetaDecomp` for the `i`-th Frobenius member.**  Built via the abstract
+`betaDecompOfFacts`, discharging its facts from the induced family `ζ_j = Ind_K θ_j`
+(`hypothesis78_hyp76_zeta_eq` projection): orthogonality (`induce_family_orthogonal_of_injective`),
+norms (`induce_norm_ne_zero`), degree reality (`induce_apply_one_star`), the Dade agreement
+(`coherence_hagree_dadeMap`), `⟨ζ_0^ν, 1_G⟩ = 0` (`F.hzeta0nu`), `⟨ζ_i, 1_L⟩ = 0` for `i ≠ ind1H`
+(`inner_induce_constOne_eq_zero`), and `⟨β, 1_G⟩ = 1`.  The `hBD` input of the (7.9) conclusion. -/
+noncomputable def hypothesis78_betaDecomp [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (i : Fin k) (hodd : Odd (Nat.card G))
+    [Fintype ↥(F.L i)] [Invertible (Nat.card ↥(F.L i) : ℂ)]
+    [Invertible (Nat.card ↥((F.H i).subgroupOf (F.L i)) : ℂ)]
+    [((F.H i).subgroupOf (F.L i)).Normal]
+    (hnilp : Group.IsNilpotent ↥((F.H i).subgroupOf (F.L i)))
+    (C : Subgroup ↥(F.L i))
+    (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C) :
+    (F.hypothesis78 i hodd hnilp C hFrob).BetaDecomp := by
+  classical
+  set pf := F.sibleyPlacedFamily i hodd hnilp C hFrob with hpf
+  -- Family projection `ζ_a = Ind_K θ_a`, and `θ_j ≠ 1_K` for `j ≠ ind1H`.
+  have hzeta : ∀ a, (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta a
+      = ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (pf.θ a : ClassFunction _ ℂ) :=
+    fun a => congrFun (F.hypothesis78_hyp76_zeta_eq i hodd hnilp C hFrob) a
+  have hθ_ne : ∀ j, j ≠ pf.ind1H →
+      pf.θ j ≠ trivialIrreducibleCharacter _ := by
+    intro j hj h
+    refine hj (pf.inj ?_)
+    simp only [h, pf.triv]
+  -- `hz0`, `hζ0norm`, `hindZ`, and `a`/`ha`.
+  have hz0 : (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta 0 (1 : ↥(F.L i)) ≠ 0 := by
+    rw [hzeta 0]; exact induce_apply_one_ne_zero ((F.H i).subgroupOf (F.L i)) (pf.θ 0)
+  have hζ0norm : ClassFunction.inner
+      ((F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta 0)
+      ((F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta 0) = 1 := by
+    have := (F.hypothesis78_zeta_irreducible i hodd hnilp C hFrob)
+    rw [show (F.hypothesis78 i hodd hnilp C hFrob).zetaDistinct = 0 from rfl] at this
+    exact IsIrreducibleCharacter.inner_self_eq_one this
+  have hindZ : (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta
+        (F.hypothesis78 i hodd hnilp C hFrob).ind1H
+      - (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta
+        (F.hypothesis78 i hodd hnilp C hFrob).zetaDistinct ∈ ZIrr ↥(F.L i) := by
+    rw [hzeta, hzeta]
+    exact Submodule.sub_mem _
+      (ClassFunction.induce_mem_ZIrr _ (pf.θ _).property.mem_ZIrr)
+      (ClassFunction.induce_mem_ZIrr _ (pf.θ _).property.mem_ZIrr)
+  have hζ0nuZ : (F.hypothesis78 i hodd hnilp C hFrob).nu
+      ((F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta
+        (F.hypothesis78 i hodd hnilp C hFrob).zetaDistinct) ∈ ZIrr G :=
+    (F.hypothesis78 i hodd hnilp C hFrob).nu_zetaDistinct_mem_ZIrr_of_isCoherent
+      (F.hypothesis78_isCoherent_sourceSet i hodd hnilp C hFrob)
+      (F.hypothesis78_nu_eq i hodd hnilp C hFrob)
+  refine betaDecompOfFacts (F.hypothesis78 i hodd hnilp C hFrob) rfl ?_ ?_ hz0 ?_ ?_ ?_ ?_ ?_
+    hζ0norm
+    (Classical.choose (exists_betaDecomp_a (F.hypothesis78 i hodd hnilp C hFrob) hindZ hζ0nuZ))
+    (Classical.choose_spec (exists_betaDecomp_a (F.hypothesis78 i hodd hnilp C hFrob) hindZ hζ0nuZ))
+  · -- horth: distinct induced irreducibles are orthogonal.
+    intro a b hab
+    rw [hzeta a, hzeta b]
+    exact induce_family_orthogonal_of_injective ((F.H i).subgroupOf (F.L i)) pf.θ
+      pf.inj a b hab
+  · -- hN
+    intro j; rw [hzeta j]
+    exact induce_norm_ne_zero ((F.H i).subgroupOf (F.L i)) (pf.θ j)
+  · -- hP_real
+    intro j; rw [hzeta j]
+    exact induce_apply_one_star ((F.H i).subgroupOf (F.L i)) (pf.θ j)
+  · -- hagree: coherence extension agrees with τ on the equal-degree difference.
+    intro j hj0 hjind
+    have hSj : (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta j
+        ∈ (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).S :=
+      ⟨pf.θ j, hθ_ne j hjind, hzeta j⟩
+    have hS0 : (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta 0
+        ∈ (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).S :=
+      ⟨pf.θ 0,
+        hθ_ne 0 (Ne.symm pf.ind1H_ne_zero), hzeta 0⟩
+    obtain ⟨deg_j, -, hdegj⟩ :=
+      irreducibleCharacter_apply_one_eq_pos_natCast (pf.θ j)
+    obtain ⟨deg_0, hdeg0_pos, hdeg0⟩ :=
+      irreducibleCharacter_apply_one_eq_pos_natCast (pf.θ
+        (0 : Fin ((F.hypothesis78 i hodd hnilp C hFrob).hyp76.n + 1)))
+    have hdeg0_ne : (deg_0 : ℂ) ≠ 0 := by exact_mod_cast hdeg0_pos.ne'
+    have hidxC : (((F.H i).subgroupOf (F.L i)).index : ℂ) ≠ 0 := by
+      exact_mod_cast Subgroup.index_ne_zero_of_finite
+    have hzj1 : (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta j (1 : ↥(F.L i))
+        = (((F.H i).subgroupOf (F.L i)).index : ℂ) * (deg_j : ℂ) := by
+      rw [hzeta j, ClassFunction.induce_apply_one, hdegj]
+    have hz01 : (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta 0 (1 : ↥(F.L i))
+        = (((F.H i).subgroupOf (F.L i)).index : ℂ) * (deg_0 : ℂ) := by
+      rw [hzeta 0, ClassFunction.induce_apply_one, hdeg0]
+    have hd : (F.hypothesis78 i hodd hnilp C hFrob).hyp76.d j = (deg_j : ℂ) / (deg_0 : ℂ) := by
+      have h1 := (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta_one_eq_d_mul j
+      rw [hzj1, hz01] at h1
+      rw [eq_div_iff hdeg0_ne]
+      apply mul_left_cancel₀ hidxC
+      linear_combination -h1
+    have hres := coherence_hagree_dadeMap
+      (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade
+      (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj
+      (F.coherence i hodd hnilp C hFrob) hSj hS0 (m0 := deg_0) (mi := deg_j) hdeg0_ne hd
+      ((F.hypothesis78 i hodd hnilp C hFrob).hyp76.psi_support j)
+    rw [F.hypothesis78_nu_eq i hodd hnilp C hFrob]
+    exact hres
+  · -- hzeta0nu
+    rw [F.hypothesis78_nu_eq i hodd hnilp C hFrob, hzeta 0]
+    exact F.hzeta0nu i hodd hnilp C hFrob (pf.θ 0)
+      (hθ_ne 0 (Ne.symm pf.ind1H_ne_zero))
+  · -- hzeta_orth_one
+    intro j hj; rw [hzeta j]
+    exact inner_induce_constOne_eq_zero ((F.H i).subgroupOf (F.L i)) (pf.θ j)
+      (hθ_ne j hj)
+  · -- hβ1
+    have hz_ind : (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta
+          (F.hypothesis78 i hodd hnilp C hFrob).ind1H
+        = ClassFunction.induce ((F.H i).subgroupOf (F.L i))
+          (trivialIrreducibleCharacter ↥((F.H i).subgroupOf (F.L i)) : ClassFunction _ ℂ) := by
+      rw [hzeta, show (F.hypothesis78 i hodd hnilp C hFrob).ind1H
+          = pf.ind1H from rfl,
+        pf.triv]
+    have hz_zd : (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta
+          (F.hypothesis78 i hodd hnilp C hFrob).zetaDistinct
+        = ClassFunction.induce ((F.H i).subgroupOf (F.L i))
+          (pf.θ 0 : ClassFunction _ ℂ) := hzeta _
+    rw [(F.hypothesis78 i hodd hnilp C hFrob).beta_def, inner_tau_supported_constOne,
+      ClassFunction.inner_sub_left, hz_ind, hz_zd, inner_induce_trivialChar_constOne_eq_one,
+      inner_induce_constOne_eq_zero ((F.H i).subgroupOf (F.L i)) (pf.θ 0)
+        (hθ_ne 0 (Ne.symm pf.ind1H_ne_zero)), sub_zero]
 
 end FrobeniusFamily
 
