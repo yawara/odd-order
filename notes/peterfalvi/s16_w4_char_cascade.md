@@ -1468,6 +1468,19 @@ norm cascade 全体 unblock)、または (b) issue 9000 typeP_Galois の hub ded
 Lane B §13)・4343 (caseB_contradiction_data, η-grid)・**4526 (orthogonality_switch_pairing_bounds,
 NEW, §7/§8 = 7.8.b norm=lane-a + 8.17.c disjoint support)**・4946 (exists_MHypothesis betaGrid/normSq/signs)。
 残 W-side assembly は全て proven; leaves は b (§13 char/S15 grid) / a (§7 norm 7.8.b) / 9000 (Galois) gated。
-c-solo の arithmetic/assembly は (14.14) で出し尽くした — 次は §7 dichotomy を §9 coherence machinery
-(`chiRhoNormSq_ge_ratio_of_inner_beta_ne_zero` S09:124) から build する deep char body (multi-iteration,
-7.8.b=lane-a と overlap) か、b/a の grid/norm threading 合流待ち。
+
+**2 本目 landing (commit `f56039d7`)**: `main_size_bounds_structural` (14.11.1) の opaque `k>2pv` bare
+sorry を精密 structural obligation + proven arithmetic に isolate:
+- `two_mul_add_one_le_of_modEq_one_odd` (sorry-free): `x≡1 mod p` (p odd) + Odd x + x≠1 → x≥2p+1
+  (Pf が省略する fpf 合同+oddness step の整数形)。
+- `k>2pv` を `hstruct : ∃x, k=v·x ∧ x≡1 [MOD p] ∧ x≠1` ((13.17) 分解 + W₂ fpf + K≠V = §13/§15 供給)
+  から導出 (k=|K| odd ⟹ x odd ⟹ x≥2p+1 ⟹ k=vx>2pv)。
+
+**c-solo W-side arithmetic は完全に出し尽くした (2 本 = 全て)**。残 9 leaves の gate を精査確定:
+`orthogonality_switch_pairing_bounds` (dichotomy) の全部品が a/b 領域と判明 — (7.9) pairing dichotomy
+theorem は **repo に不在** (§7 coherence = **b 所有** S07_Coherence*)、(7.8.b) β-norm bound = **a 所有**、
+(8.17.c) disjoint support = **b の §8**。∴ re-re-org「c は a の §7 / b の S15 を cite」通り faithful cited
+obligation が正しい (c が build = a/b の §7/§8 侵食)。同様に eta_generic_data/betaGrid/signs = issue 3002
+(b が S15.Hypothesis grid field 追加 + a が FeitThompson threading)、U/V cyclic・Q elemAb・T_typeII = b §13、
+v-value = 9000 Galois。**c の §16 W-side assembly は完了; 前進には b (§13/§8/S15 grid) / a (§7 norm/threading)
+/ 9000 の上流供給が先決** (待ちでなく、cited obligation は既に精密に pin 済 = signature-contract 成立)。
