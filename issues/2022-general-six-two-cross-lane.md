@@ -449,3 +449,18 @@ coeff (X ∈ ℤ[R]) / Y ⊥ R。
   の subfamily-coherence 経由。Coq PFsection11 の cohS1-消費部
   (FTtype345_noncoherent 系) の該当行間を精読すること。
 - いずれにせよ irr×irr-放電済み skeleton は不変; named 2 点の中身のみの問題。
+
+### 追記 4 (loop 30): coh-依存の実質判定 — (10.2) 経由で本質的、ただし一般化の形が見えた
+
+- 依存鎖: tau_muGrid_columnSum_diff → tau_muGrid_column_diff →
+  `alpha_tau_image` (S12_Core:4856)。後者の結論自体が
+  τ(α_ij) = δ(ω_ij^σ − ω_i0^σ) − n·**coh.tau1 ζ** ((10.2)) — τ₁ = ℤ[S]-extension
+  で ζ・μ を通す導出。列差 (α_ij − α_ik) で ζ^{τ₁}-項は相殺 (だから
+  columnSum_diff の式は ζ-free)。
+- 一般化方針: alpha_tau_image を「S-full coherence」でなく
+  「{関連 μ_ij 行, ζ} ⊇ を含む部分族 S' の coherence」でパラメタ化した
+  coh'-版に切り出せるかが鍵。ただし sixTwoDecompositionData の S₁ は
+  chain-任意で μ-成分を含む保証なし → **Peterfalvi (11.8) が可約 member を
+  どう chain に通すかの行間** = Coq PFsection11 の該当部
+  (cohS1 消費、redPmu/FTtype345 系, L216 以降) の精読が次セッション第一手。
+- 現状整理: named 2 点の充足は「(10.2)-式の S₁-文脈版」一点に集約された。
