@@ -8,6 +8,34 @@
 
 ---
 
+## ✅ LIVE STATUS (2026-07-05 loop it.27-31, lane **b**): issue 2033 完遂 — ω (3.3) 意味論貫通 + (1.10)-合同層 real 化
+
+- **2033 threading (it.27-28, commit 9c79ee63)**: `TICyclicHypothesis.omega` は hom-パラメータ化済 →
+  field は 5 本 (omega_mul / col-0 W₂-自明 / row-0 W₁-自明 / W₁ q-乗根 / W₂ p-乗根)。spine supply 5 本
+  実証明 (`omegaS_mul` 等 — S06 chiColumn の hom-性 + `chi2enum_zero`/`w1CharEquiv_zero`/
+  `pow_card_eq_one'`) + Section16Inputs/CharacterData/S15.Hypothesis 3 構造貫通。
+- **(13.7) atom real 化 (it.29, commit 688e9c93)**: `eta10_alphaCF_one_ne_zero` 実証明 — helper
+  `mul_notMem_W1_union_W2` + `eta10_apply_sub_one_integral` (η₁₀(y) ≡ 1 mod 1−ε: (1.10.a) =
+  `exists_integral_apply_sub_of_commute`、τ₃-regular + 2033 fields で ω₁₀(xy) = ω₁₀(x) = ε^k)。
+  α(1)=0 なら (1.10.b) `int_dvd_of_one_sub_primRoot_dvd` で q∣1 矛盾。残 gate =
+  `eta10_cCoeff_orthogonal` のみ。`W2_le_P`+`pgroup_le_of_normal_coprime_index` を Setup に relocate。
+- **(13.6) atom real 化 (it.30, commit bd1f44aa)**: `exists_lambda_alphaFun_one_qb` 実 assembly —
+  `lambda_apply_mul_eq_zero` 実証明 (q ∣ ord(xy) vs q ∤ |H|)、point formula (c₁=1, ‖ζ₁‖²=1) で
+  α(x) = λ^{τ₁}(x) − λ(x)、(1.10.a) G-level + ↥S-level 二本 (λ ∈ ZIrr ↥S は `zeta_induced` から実導出)。
+  新 sorried sub-atom `lambda_tau1_apply_mul_eq_zero` ((3.2.d)/(5.3.b)/(5.5) gate)。
+- **α(1) ∈ ℤ real 化 (it.31, commit 4d076d23)**: `lambda_alphaFun_one_int` 完全実証明 —
+  `H_sharp_cCoeff_int` 一般化 (eta10 版は 1 行 cite に refactor) + inertia 恒等式
+  (`card_mul_inner_self_induce_eq_card_inertia`: |K|·‖ζ‖² = |I| → ζᵢ(1)/‖ζᵢ‖² = [S:Iᵢ]) +
+  `(Int.castRingHom ℂ).range` の `Subring.sum_mem` (filter を restate しない = instance-trap 回避)。
+  **技術ノート: FiniteInduce scoped Invertible と手動 invertibleOfNonzero の二重供給は induce の
+  instance 不一致を起こす — scoped に任せる (haveI しない)**。
+- **現況**: (13.5)–(13.10) norm cascade の (1.10)-合同層は全 real。残 sorried atom =
+  (13.3)-cluster (`character_degree_analysis` / `exists_lambda_index` / `lambda_tau1_norm_one` /
+  `lambda_tau1_apply_mul_eq_zero` / `eta10_cCoeff_orthogonal`) + T-side (Q-abelian gated) +
+  `G0_nonvanishing_dichotomy` + `lambda_forces_T_caseB` + `reconciled_typePData_T`。
+  次 frontier = (13.3)-cluster 設計精読 (tau1S の W-side routing は s16_w4_char_cascade.md
+  2026-07-02 hub section が正本)。
+
 ## ✅ LIVE STATUS (2026-07-05 後半, lane **b** — (13.10) 4 producer 全 discharge、residual = 教科書番号 5 本)
 
 ### cont.⁴ (07-05 loop it.20-25): (13.5)-package 3 本全 real 化 — cascade 構造完成
