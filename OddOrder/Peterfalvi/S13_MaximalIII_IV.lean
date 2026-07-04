@@ -826,7 +826,110 @@ via (11.3)/(11.4) — so it is left as a clean named subgroup-inclusion obligati
 theorem HC_le_secondDerived [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) :
     hyp.HC ≤ secondDerivedInAmbient M := by
-  sorry
+  classical
+  rw [← Subgroup.relIndex_eq_one]
+  -- `HC < M'` (else `U ≤ HC` forces `U ≤ C`, contradicting `C ⊊ U`)
+  have hHCltM' : hyp.HC < derivedInG M := by
+    refine lt_of_le_of_ne hyp.HC_le_derived ?_
+    intro hEq
+    refine (hyp.C_lt_U).not_ge ?_
+    intro u hu
+    have huHC : u ∈ hyp.HC := by rw [hEq]; exact hyp.base.typeP.U_le hu
+    -- decompose `u = h·c` along the normal `H`-factor inside `↥M`
+    have hHle : hyp.base.typeP.H ≤ M := hyp.base.typeP.H_le.trans (Subgroup.map_subtype_le _)
+    have hCle : hyp.C ≤ M := (hyp.C_le_U.trans hyp.base.typeP.U_le).trans
+      (Subgroup.map_subtype_le _)
+    haveI hHn : ((hyp.base.typeP.H).subgroupOf M).Normal :=
+      (Subgroup.normal_subgroupOf_iff_le_normalizer hHle).mpr hyp.H_normalized_by_M
+    have huM : u ∈ M := (hyp.HC_le_derived.trans (Subgroup.map_subtype_le _)) huHC
+    have hmem : (⟨u, huM⟩ : ↥M) ∈
+        (hyp.base.typeP.H).subgroupOf M ⊔ hyp.C.subgroupOf M := by
+      rw [← Subgroup.subgroupOf_sup hHle hCle]
+      exact Subgroup.mem_subgroupOf.mpr huHC
+    rw [← SetLike.mem_coe, Subgroup.normal_mul, Set.mem_mul] at hmem
+    obtain ⟨a, ha, b, hb, hab⟩ := hmem
+    have haH : ((a : ↥M) : G) ∈ hyp.base.typeP.H := Subgroup.mem_subgroupOf.mp ha
+    have hbC : ((b : ↥M) : G) ∈ hyp.C := Subgroup.mem_subgroupOf.mp hb
+    -- `a = u·b⁻¹ ∈ H ∩ U = ⊥`, so `u = b ∈ C`
+    have haU : ((a : ↥M) : G) ∈ hyp.base.typeP.U := by
+      have haeq : (a : ↥M) = ⟨u, huM⟩ * (b : ↥M)⁻¹ := by rw [← hab]; group
+      have hcoe : ((a : ↥M) : G) = u * ((b : ↥M) : G)⁻¹ := by rw [haeq]; rfl
+      rw [hcoe]
+      exact Subgroup.mul_mem _ hu (Subgroup.inv_mem _ (hyp.C_le_U hbC))
+    have ha1 : ((a : ↥M) : G) = 1 := by
+      have := hyp.H_inf_U_eq_bot.le ⟨haH, haU⟩
+      rwa [Subgroup.mem_bot] at this
+    have hueq : u = ((b : ↥M) : G) := by
+      have h1 : (⟨u, huM⟩ : ↥M) = a * b := hab.symm
+      have h2 : u = ((a * b : ↥M) : G) := congrArg Subtype.val h1
+      rw [h2]
+      change ((a : ↥M) : G) * ((b : ↥M) : G) = ((b : ↥M) : G)
+      rw [ha1, one_mul]
+    rw [hueq]
+    exact hbC
+  -- `(11.4)` at `H₁ := M''` with `(5.7)`
+  have hM''lt : secondDerivedInAmbient M < derivedInG M :=
+    lt_of_le_of_lt hyp.secondDerived_le_HC hHCltM'
+  have h114 := coherent_quotient_bound _hG hyp le_normalizer_secondDerived hM''lt
+    (hyp.secondDerived_coherent _hG)
+  -- tower `|M':M''| = X·|U:C|`
+  set X := (secondDerivedInAmbient M).relIndex hyp.HC with hX
+  set v := hyp.C.relIndex hyp.U with hv
+  have htower : (secondDerivedInAmbient M).relIndex (derivedInG M) = X * v := by
+    rw [hX, hv, ← hyp.HC_relIndex_derived]
+    exact (Subgroup.relIndex_mul_relIndex (secondDerivedInAmbient M) hyp.HC (derivedInG M)
+      hyp.secondDerived_le_HC hyp.HC_le_derived).symm
+  rw [htower] at h114
+  -- `v ≥ 2` from `C ⊊ U`
+  have hvpos : v ≠ 0 := by
+    intro h0
+    have h2 : Nat.card ↥hyp.C * v = Nat.card ↥hyp.U := by
+      have := Subgroup.card_mul_index (hyp.C.subgroupOf hyp.U)
+      rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+        (show hyp.C ≤ hyp.U from hyp.C_le_U)).toEquiv] at this
+    rw [h0, Nat.mul_zero] at h2
+    exact (Nat.card_pos (α := ↥hyp.U)).ne' h2.symm
+  have hvne1 : v ≠ 1 := by
+    intro h1
+    rw [hv, Subgroup.relIndex_eq_one] at h1
+    exact hyp.C_lt_U.not_ge h1
+  have hv2 : 2 ≤ v := by omega
+  -- `X ≤ 2q`
+  have hX2q : X ≤ 2 * hyp.q := by
+    by_contra hgt
+    push Not at hgt
+    have hge : 2 * hyp.q + 1 ≤ X := hgt
+    have h1 : (2 * hyp.q + 1) * v ≤ X * v := Nat.mul_le_mul_right v hge
+    have h2 : 2 * hyp.q * v + v ≤ 2 * hyp.q * v + 1 := by
+      calc 2 * hyp.q * v + v = (2 * hyp.q + 1) * v := by ring
+        _ ≤ X * v := h1
+        _ ≤ 2 * hyp.q * v + 1 := h114
+    omega
+  -- `q ∣ X − 1`, `X` and `q` odd ⟹ `X = 1`
+  have hdvd : hyp.q ∣ X - 1 := hyp.q_dvd_secondDerived_relIndex_HC_sub_one _hG
+  have hXodd : Odd X := by
+    refine _hG.odd.of_dvd_nat ?_
+    calc X ∣ Nat.card ↥hyp.HC := Subgroup.relIndex_dvd_card _ _
+      _ ∣ Nat.card G := Subgroup.card_subgroup_dvd_card hyp.HC
+  have hqodd : Odd hyp.q := by
+    refine _hG.odd.of_dvd_nat ?_
+    calc hyp.q = Nat.card ↥hyp.base.typeP.W1 := rfl
+      _ ∣ Nat.card G := Subgroup.card_subgroup_dvd_card hyp.base.typeP.W1
+  have hqpos : 0 < hyp.q := hqodd.pos
+  obtain ⟨k, hk⟩ := hdvd
+  have hXpos : 0 < X := hXodd.pos
+  rw [Nat.odd_iff] at hXodd hqodd
+  rcases Nat.lt_or_ge k 2 with hk2 | hk2
+  · interval_cases k
+    · omega
+    · rw [Nat.mul_one] at hk
+      omega
+  · exfalso
+    have h3 : hyp.q * 2 ≤ hyp.q * k := Nat.mul_le_mul_left hyp.q hk2
+    have h4 : 2 * hyp.q ≤ X - 1 := by
+      rw [hk]
+      omega
+    omega
 
 /-- **Peterfalvi (11.5)**: the second derived subgroup is `H C`, i.e. `M'' = HC`.
 
