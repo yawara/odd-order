@@ -761,3 +761,22 @@ hzeta_cross、(2) real-vchar parity → hdelta_even、(3) BetaDecomp 構成 (bet
 **進捗総括 (cont.¹⁶–²⁶)**: (7.8) 層完全 + hi + hgood core + (7.9) two-family datum は landed・merged。
 残は Peterfalvi の genuine 難所 (§1 (4.1)/parity primitives) — easy wiring は概ね尽き、深部 formalization
 フェーズへ移行。
+
+## 2026-07-04 cont.²⁸ (集中掘り, ユーザー "一気に掘る" 指示) — ★ parity primitive cfdot_real_vchar_even 完成
+
+**Landed** (S09_ParityPrimitive.lean、190行、sorry-free、commit ebee613b): (7.9) の深部 §1 primitive
+`cfdot_real_vchar_even` (real vchar φ,ψ over odd G で ⟨φ,ψ⟩ ≡ ⟨φ,1⟩⟨ψ,1⟩ mod 2) を完全形式化。
+構成: inner_conj_right → inner_conjPerm_eq_of_real → sum_conjPerm_invariant_sub_trivial_even
+(ZMod2 + Finset.sum_involution) → cross-Parseval → cfdot_real_vchar_even。**hdelta_even の producer 完成**。
+
+**cross-ortho primitive の数学解明 (次の §1 piece、着手準備完了)**:
+coq `orthonormal_vchar_diff_ortho` = 「orthonormal ±irr pair {a,b},{c,d} が **同次数** (a(1)=b(1),
+c(1)=d(1); coq `Dade1`: Dade image 差は 1 で消える) かつ差直交 ⟨a-b,c-d⟩=0 ⟹ ⟨a,c⟩=0」。
+**同次数条件が必須** (無いと μ=ν,μ'=ν',符号相殺の反例あり; 同次数で ε=ε'・μ(1)=μ'(1) が pin され反例消滅)。
+証明 = exists_zsmul_irreducibleCharacter (a=εμ 等) + 4-char ±irr case analysis (既存
+`inner_constOne_eq_zero_of_orthonormal_pair` @S09_CertDischarge:2606 と同パターン、~80-100行)。
+μ=ν 仮定 → hdiff 展開 (εδ[μ=ν]-εδ'[μ=ν']-ε'δ[μ'=ν]+ε'δ'[μ'=ν']=0) + 両次数条件 → δ=δ' かつ δ=-δ' 矛盾。
+
+**残 (7.10 endpoint)**: cross-ortho primitive → hzeta_cross (Frobenius: a=ν_iζ_i, b=ν_iζ̄_i,
+差=τ_i(ζ_i-ζ̄_i) Dade image, disjoint support で ⟨a-b,c-d⟩=0) → (7.9) conclusion 適用 (hcoh/hnu/hindZ/
+hzeta_irr/hBD も要) → 𝓑-set → min-index/hG0sum → characterEstimateData → card_G0_lower_bound。
