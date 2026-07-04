@@ -532,3 +532,22 @@ coeff (X ∈ ℤ[R]) / Y ⊥ R。
     (ζ-項が無い分単純化)
 - そこから列和 (Finset.sum) → coh-free columnImageFamily → ofProjection →
   named 2 点。全行程が既存部品の組替えで閉じる見込み。
+
+### 追記 9 (loop 34): 実装直前 — 全部品 coh-free 確認済み、組み立てレシピ最終形
+
+`tau_muGrid_row_diff_cohFree` の材料 (全て存在・coh-free):
+- V-値 leg: `tau_muGridAlpha_apply_eq_on_typePV` (S12_Core:~4600 手前, coh 無し!) —
+  行差では leg_j − leg_k で ζ^τ₁-値も相殺 → hψV。
+- norm-2: muGrid_inner_self / muGrid_inner_cross_column (2095/2125) →
+  ⟨μdiff, μdiff⟩ = 2 → Dade 等長 (supported: params.alpha_support の差 +
+  alpha_def で μ_ij − μ_ik = α_ij − α_ik) → ⟨X,X⟩ = 2。
+- ZIrr: dadeIntegralCharacterMap_mem_ZIrr_of_supported (S07)。
+- engine: `eq_smul_chiFam_diff_of_vanishOnV` (S05_SigmaTrichotomy:153) via
+  tic := typePData_toTICyclicHypothesis + app := canonicalFullDadeApp +
+  P := exists_alignedOmegaSigmaGrid_chiFam_family (行 i 固定; P j ≠ P k)。
+- 署名案: (hG) (hyp) (hodd) (params) (hmu : params.mu = muGrid)
+  (hδpm) (hδj) (i) (hj0 hk0 hjk) : hyp.tau (μ_ij − μ_ik)
+  = (params.delta:ℂ) • (ω^σ_ij − ω^σ_ik)。
+- 完了後: Finset.sum で列和 → columnImageFamily の coh-free 版
+  (image_eq を新恒等式+exists_conj_column で) → named 2 点 =
+  ofProjection + hS₁coh.extension (member-D) / muGridAlpha_inner 系 (直交)。
