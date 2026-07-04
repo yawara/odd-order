@@ -5022,15 +5022,92 @@ theorem exists_rankTwoWitness [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
            CKx_not_le_Kprime := hCKx, normalizer_closure_x_le_M := hNx,
            centralizer_x_not_le_L := hCx }⟩
 
-/-- **Peterfalvi (12.10) obligation A**: the (12.9) witness `L` is of Type I.  (12.10) rules out
-type `P`: Type II via (8.16) (`C_G(y) ⊆ L` for `y ∈ A(L)`, contradicting (12.9)); Type III via
-Theorem (10.10) + (11.9.c) + (11.6) `C_U(H)=1` + (9.7.b) `U` cyclic, whence `P₀ ⊂ H` and (8.6.a)
-`C_G(y) ⊆ L` for `y ∈ H^#`, again contradicting (12.9).  Deep §8–§11 type-analysis; pinned
-(hub 9003 Cluster A). -/
+/-- **Peterfalvi (8.16) centralizer-containment, Type II** (pinned sorried §8–§11 obligation,
+hub 9003 Cluster A): for a maximal subgroup `L` of Type II, `C_G(y) ⊆ L` for every nonidentity
+`y ∈ L_s = A_1(L)` (`L_s = L_F` for Type II).
+
+This is the "By (8.16), `C_G(y) ⊆ L` for all `y ∈ A(L)`" step of (12.10).  Peterfalvi (8.16) states
+that `A_0(L)`, `A(L)`, `A_1(L)` are TI-subsets of `G` with normalizer `L`
+(`S12.typeII_A_sets_normalizer` / `typeII_A_sets_TI`, both sorried), and `A_1(L) = L_s^#`
+(`sharpSubgroup (mainSubgroup L .II)`).  For `y ∈ A_1(L)`, `C_G(y) ≤ N_G(A_1(L)) = L` because `y`'s
+centralizer normalizes the TI-set through `y`.  Stated at the §8–§11 boundary (the honest
+containment consumed by the witness argument) pending relocation of the genuine (8.16)/(2.3)
+tame-embedding facts upstream of §14.  **Genuinely still-missing** as a *usable* containment: the
+repo carries only the (overstated, sorried) `typeII_A_sets_normalizer`; no direct
+`C_G(y) ⊆ L` for `y ∈ L_s^#` exists. -/
+theorem typeII_centralizer_le_of_mem_mainSubgroup [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} (hL : L ∈ maximalSubgroups G)
+    (hII : IsTypeII L) {y : G} (hy : y ∈ mainSubgroup L PeterfalviType.II) (hy1 : y ≠ 1) :
+    Subgroup.centralizer ({y} : Set G) ≤ L := by
+  sorry
+
+/-- **Peterfalvi (10.10)+(11.9.c)+(11.6)+(9.7.b)+(8.6.a), Type III/IV route** (pinned sorried
+§8–§11 obligation, hub 9003 Cluster A): for a maximal subgroup `L` of Type III or IV and a
+noncyclic `p`-group `P₀ ⊆ L_s`, one has `P₀ ⊆ L_F` and `C_G(y) ⊆ L` for every nonidentity
+`y ∈ P₀` (so `y ∈ L_F^#`).
+
+This is the second paragraph of (12.10): by Theorem (10.10) (`S12.no_typeV_maximal`, available —
+excludes Type V) and (11.9.c) (`S13.final_typeIII_conclusions`, sorried) `L` is Type III with case
+(b) of (9.7); by (11.6) (`S11.typeII_centralizer_U_eq_bot`-analogue, `C_U(H)=1`) and (9.7.b) the
+complement `U` of `H = L_F` in `[L,L]` is cyclic, so the noncyclic `P₀` lands in `H`; by (8.6.a)
+`C_G(y) ⊆ L` for all `y ∈ H^#`.  Stated at the §8–§11 boundary pending relocation of the genuine
+Type III/IV structural facts (9.7.b, 11.6, 8.6.a) upstream of §14.  **Genuinely still-missing** as
+a usable containment: `S13.final_typeIII_conclusions` and the (8.6.a) `L_F^#`-TI covering are
+sorried, and no assembled `P₀ ⊆ L_F ⟹ C_G(y) ⊆ L` exists in the repo. -/
+theorem typeIIIorIV_centralizer_le_of_mem_noncyclic_mainSubgroup [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L P0 : Subgroup G} (hL : L ∈ maximalSubgroups G)
+    (hIIIIV : IsTypeIII L ∨ IsTypeIV L) (hP0nc : ¬ IsCyclic ↥P0)
+    {Lt : PeterfalviType} (hLhasType : HasPeterfalviType Lt L)
+    (hP0 : P0 ≤ mainSubgroup L Lt) {y : G} (hy : y ∈ P0) (hy1 : y ≠ 1) :
+    Subgroup.centralizer ({y} : Set G) ≤ L := by
+  sorry
+
+/-- **Peterfalvi (12.10) obligation A**: the (12.9) witness `L` is of Type I.
+
+(12.10) rules out every non-Type-I possibility, each forcing `C_G(x) ⊆ L` and so contradicting the
+(12.9) escape condition `data.centralizer_x_not_le_L` (`¬ C_G(x) ≤ L`).  The witness `x` lies in
+`P₀^# ⊆ (L_s)^#` (`data.x_mem_P0`, `data.P0_le_Ls`, `data.x_ne_one`), and `P₀` is noncyclic
+(`ctr.P0_noncyclic`).
+
+* **Type V** is excluded outright by Theorem (10.10) (`S12.no_typeV_maximal`).
+* **Type II**: (8.16) gives `C_G(x) ⊆ L` for `x ∈ (L_s)^# = A_1(L)`
+  (`typeII_centralizer_le_of_mem_mainSubgroup`), contradiction.
+* **Types III/IV**: via (10.10)+(11.9.c)+(11.6)+(9.7.b), `P₀ ⊆ L_F`, and (8.6.a) gives
+  `C_G(x) ⊆ L` for `x ∈ L_F^#` (`typeIIIorIV_centralizer_le_of_mem_noncyclic_mainSubgroup`),
+  contradiction.
+
+The two §8–§11 centralizer-containment facts are pinned sorried above (genuinely missing as usable
+containments — the upstream (8.16)/(8.6.a)/(11.9.c) results are themselves sorried or overstated);
+the case analysis, the Type-V exclusion (cited, real), and the contradiction assembly here are
+honest. -/
 theorem witness_L_isTypeI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
     IsTypeI data.L := by
-  sorry
+  -- `x ∈ (L_s)^#`: nonidentity element of `mainSubgroup L L_type`.
+  have hx_mem : data.x ∈ mainSubgroup data.L data.L_type := data.P0_le_Ls data.x_mem_P0
+  -- The escape condition to be contradicted in every non-Type-I case.
+  have hEsc : ¬ (Subgroup.centralizer ({data.x} : Set G) ≤ data.L) := data.centralizer_x_not_le_L
+  -- Case-split on the Peterfalvi type of `L` (carried by `data.L_hasType`).
+  have hLt := data.L_hasType
+  cases hLtype : data.L_type with
+  | I =>
+    -- `HasPeterfalviType .I L` is definitionally `IsTypeI L`.
+    rw [hLtype] at hLt; exact hLt
+  | II =>
+    rw [hLtype] at hLt hx_mem
+    exact absurd (typeII_centralizer_le_of_mem_mainSubgroup hG data.L_maximal hLt hx_mem
+      data.x_ne_one) hEsc
+  | III =>
+    rw [hLtype] at hLt
+    exact absurd (typeIIIorIV_centralizer_le_of_mem_noncyclic_mainSubgroup hG data.L_maximal
+      (Or.inl hLt) ctr.P0_noncyclic data.L_hasType data.P0_le_Ls data.x_mem_P0 data.x_ne_one) hEsc
+  | IV =>
+    rw [hLtype] at hLt
+    exact absurd (typeIIIorIV_centralizer_le_of_mem_noncyclic_mainSubgroup hG data.L_maximal
+      (Or.inr hLt) ctr.P0_noncyclic data.L_hasType data.P0_le_Ls data.x_mem_P0 data.x_ne_one) hEsc
+  | V =>
+    rw [hLtype] at hLt
+    exact absurd ⟨data.L, data.L_maximal, hLt⟩ (OddOrder.Peterfalvi.S12.no_typeV_maximal hG)
 
 /-- **Peterfalvi (12.10) obligation B**: the type-I witness `L`'s complement `U` is a Z-group.  A
 prime `q ∣ |L/H|` has `q < p`: in case (8.3.c) `q ∣ p−1`; in case (8.3.b) a Sylow `p`-subgroup of `H`
