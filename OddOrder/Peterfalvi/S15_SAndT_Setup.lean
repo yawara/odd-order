@@ -1262,6 +1262,138 @@ theorem H_sharp_point_formula [Fintype G] [Invertible (Nat.card G : ℂ)]
     rw [Finset.mem_filter]; exact fun h => hi1_ker h.2
   rw [hmid0, add_zero, Finset.filter_erase, Finset.erase_eq_self.mpr hi1notin]
 
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce Classical in
+/-- **Peterfalvi (13.5.a), point formula for `a = 0`**: if *every* `P`-non-kernel coefficient of
+`χ` vanishes (the (13.5) hypothesis with `a = 0`, as for `χ = η₁₀` which is orthogonal to all of
+`S^{τ₁}`), then on `H^#` the character `χ` *is* its `P`-kernel tail.  The `i₁`-free variant of
+`H_sharp_point_formula`. -/
+theorem H_sharp_point_formula_kernel_only [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) (χ : ClassFunction G ℂ)
+    (hall : ∀ i : Fin ((H_sharp_hypothesis76 hG hyp).n + 1), 0 < i →
+      ¬ ((hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel ((H_sharp_hypothesis76 hG hyp).zeta i)) →
+      (H_sharp_hypothesis76 hG hyp).cCoeff χ i = 0)
+    (a : hyp.S) (ha : (a : G) ∈ OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G)) :
+    χ (a : G) =
+      ∑ i ∈ (Finset.Ioi (0 : Fin ((H_sharp_hypothesis76 hG hyp).n + 1))).filter
+            (fun i => (hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
+              OddOrder.Peterfalvi.S03.characterKernel ((H_sharp_hypothesis76 hG hyp).zeta i)),
+          (star ((H_sharp_hypothesis76 hG hyp).cCoeff χ i) /
+            (H_sharp_hypothesis76 hG hyp).zetaNormSq i) * (H_sharp_hypothesis76 hG hyp).zeta i a := by
+  classical
+  rw [H_sharp_chiRho_eq_explicit hG hyp χ a ha,
+    ← Finset.sum_filter_add_sum_filter_not (Finset.Ioi 0)
+      (fun i => (hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel ((H_sharp_hypothesis76 hG hyp).zeta i))]
+  have hmid0 : ∑ i ∈ (Finset.Ioi (0 : Fin ((H_sharp_hypothesis76 hG hyp).n + 1))).filter (fun i =>
+      ¬ ((hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel ((H_sharp_hypothesis76 hG hyp).zeta i))),
+      (star ((H_sharp_hypothesis76 hG hyp).cCoeff χ i) /
+        (H_sharp_hypothesis76 hG hyp).zetaNormSq i) * (H_sharp_hypothesis76 hG hyp).zeta i a = 0 := by
+    refine Finset.sum_eq_zero (fun i hi => ?_)
+    simp only [Finset.mem_filter] at hi
+    rw [hall i (Finset.mem_Ioi.mp hi.1) hi.2, star_zero, zero_div, zero_mul]
+  rw [hmid0, add_zero]
+
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce Classical in
+/-- **The (13.5.a) correction term `α`** for a test character `χ`: the `P`-kernel tail
+`α = ∑_{i≥1, P⊆ker ζ_i} (c̄_i/‖ζ_i‖²)·ζ_i` of the (7.7.a) decomposition, as a function on `↥S`.
+By `H_sharp_point_formula` (resp. the `a = 0` variant), `χ = (distinguished term) + α` (resp.
+`χ = α`) on `H^#`; it is constant on `P` (`H_sharp_alphaFun_const_on_P`) and vanishes off `H`
+(`H_sharp_alphaFun_eq_zero_of_not_mem`), which drive the (13.5.c) inflation bound. -/
+noncomputable def H_sharp_alphaFun [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (χ : ClassFunction G ℂ) : ↥hyp.S → ℂ :=
+  fun a =>
+    ∑ i ∈ (Finset.Ioi (0 : Fin ((H_sharp_hypothesis76 hG hyp).n + 1))).filter
+          (fun i => (hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
+            OddOrder.Peterfalvi.S03.characterKernel ((H_sharp_hypothesis76 hG hyp).zeta i)),
+        (star ((H_sharp_hypothesis76 hG hyp).cCoeff χ i) /
+          (H_sharp_hypothesis76 hG hyp).zetaNormSq i) * (H_sharp_hypothesis76 hG hyp).zeta i a
+
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
+/-- The (13.5.a) correction `α` is **constant on `P`** — each `ζ_i` in the tail has `P` in its
+kernel (`ζ_i(x) = ζ_i(1)` for `x ∈ P`), so the tail is `P`-constant.  The kernel input to
+(13.5.c). -/
+theorem H_sharp_alphaFun_const_on_P [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (χ : ClassFunction G ℂ) :
+    ∀ x ∈ hyp.P.subgroupOf hyp.S, H_sharp_alphaFun hG hyp χ x = H_sharp_alphaFun hG hyp χ 1 := by
+  classical
+  intro x hx
+  refine Finset.sum_congr rfl (fun i hi => ?_)
+  have hker := (Finset.mem_filter.mp hi).2
+  have hx1 : (H_sharp_hypothesis76 hG hyp).zeta i x
+      = (H_sharp_hypothesis76 hG hyp).zeta i 1 := hker hx
+  rw [hx1]
+
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
+/-- The (13.5.a) correction `α` **vanishes off `H`** — each induced `ζ_i` does
+(`zeta_eq_zero_of_not_mem_H`). -/
+theorem H_sharp_alphaFun_eq_zero_of_not_mem [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (χ : ClassFunction G ℂ) :
+    ∀ x : ↥hyp.S, x ∉ hyp.H.subgroupOf hyp.S → H_sharp_alphaFun hG hyp χ x = 0 := by
+  classical
+  intro x hx
+  refine Finset.sum_eq_zero (fun i hi => ?_)
+  have h0 : (H_sharp_hypothesis76 hG hyp).zeta i x = 0 := by
+    refine (H_sharp_hypothesis76 hG hyp).zeta_eq_zero_of_not_mem_H i x ?_
+    intro hmem
+    exact hx (Subgroup.mem_subgroupOf.mpr (by
+      rwa [show (H_sharp_hypothesis76 hG hyp).H = hyp.H from rfl] at hmem))
+  rw [h0, mul_zero]
+
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce Classical in
+/-- **Peterfalvi (13.5.c) for the concrete correction `α`**: the inflation bound
+`(|P|−1)·‖α(1)‖² ≤ ∑_{x∈H^#}‖α(x)‖²` — `α` is `P`-constant (`H_sharp_alphaFun_const_on_P`), so
+the `P^#`-part of the sharp sum already contributes `(|P|−1)·‖α(1)‖²` (`|P| = p^q` by
+`card_P_eq`), and `α` vanishes off `H` so the ambient `↥S`-sum *is* the `H`-filtered sum. -/
+theorem H_sharp_alphaFun_inflation [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (χ : ClassFunction G ℂ) :
+    ((hyp.p ^ hyp.q - 1 : ℕ) : ℝ) * ‖H_sharp_alphaFun hG hyp χ 1‖ ^ 2
+      ≤ ∑ x ∈ (Finset.univ.filter (· ∈ hyp.H.subgroupOf hyp.S)).erase 1,
+          ‖H_sharp_alphaFun hG hyp χ x‖ ^ 2 := by
+  classical
+  set α := H_sharp_alphaFun hG hyp χ with hαdef
+  -- The core bound over all of `↥S`.
+  have hcore := sum_normSq_erase_one_ge_of_const_on_subgroup (hyp.P.subgroupOf hyp.S) α
+    (H_sharp_alphaFun_const_on_P hG hyp χ)
+  -- `|P.subgroupOf S| = |P| = p^q`.
+  have hPS : hyp.P ≤ hyp.S := by
+    rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
+  have hcard : Nat.card ↥(hyp.P.subgroupOf hyp.S) = hyp.p ^ hyp.q := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPS).toEquiv]
+    exact hyp.card_P_eq hG hyp.Sdata_W2_eq
+  -- The ambient sum equals the `H`-filtered sum (`α` vanishes off `H`).
+  have hsupp : ∑ x : ↥hyp.S, ‖α x‖ ^ 2
+      = ∑ x ∈ Finset.univ.filter (· ∈ hyp.H.subgroupOf hyp.S), ‖α x‖ ^ 2 := by
+    rw [← Finset.sum_filter_add_sum_filter_not Finset.univ (· ∈ hyp.H.subgroupOf hyp.S)]
+    have h0 : ∑ x ∈ Finset.univ.filter (fun x => ¬ x ∈ hyp.H.subgroupOf hyp.S), ‖α x‖ ^ 2
+        = 0 := by
+      refine Finset.sum_eq_zero (fun x hx => ?_)
+      rw [hαdef, H_sharp_alphaFun_eq_zero_of_not_mem hG hyp χ x (Finset.mem_filter.mp hx).2]
+      simp
+    rw [h0, add_zero]
+  -- The sharp sum is the filtered sum minus the identity term.
+  have h1mem : (1 : ↥hyp.S) ∈ Finset.univ.filter (· ∈ hyp.H.subgroupOf hyp.S) :=
+    Finset.mem_filter.mpr ⟨Finset.mem_univ _, (hyp.H.subgroupOf hyp.S).one_mem⟩
+  have hsharp : ∑ x ∈ (Finset.univ.filter (· ∈ hyp.H.subgroupOf hyp.S)).erase 1, ‖α x‖ ^ 2
+      = (∑ x ∈ Finset.univ.filter (· ∈ hyp.H.subgroupOf hyp.S), ‖α x‖ ^ 2) - ‖α 1‖ ^ 2 := by
+    rw [← Finset.add_sum_erase _ _ h1mem]
+    ring
+  rw [hsharp, ← hsupp]
+  calc ((hyp.p ^ hyp.q - 1 : ℕ) : ℝ) * ‖α 1‖ ^ 2
+      = ((Nat.card ↥(hyp.P.subgroupOf hyp.S) : ℝ) - 1) * ‖α 1‖ ^ 2 := by
+        rw [hcard]
+        congr 1
+        have h1 : (1 : ℕ) ≤ hyp.p ^ hyp.q :=
+          Nat.one_le_pow _ _ (by have := hyp.three_le_p; omega)
+        rw [Nat.cast_sub h1]
+        norm_num
+    _ ≤ (∑ x : ↥hyp.S, ‖α x‖ ^ 2) - ‖α 1‖ ^ 2 := hcore
+
 /-- **Peterfalvi (13.5)**: the TI-subset calculation on `H = P C` gives a
 pointwise formula and two norm estimates. -/
 theorem tiSubset_character_orthogonality [Finite G]
