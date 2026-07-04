@@ -111,6 +111,7 @@ import OddOrder.Peterfalvi.S07_CoherenceGalois
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
 import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
 import OddOrder.Peterfalvi.S08_SixTwoGeneral
+import OddOrder.Peterfalvi.S13_SixTwoBridge
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.FeitThompson
@@ -2334,6 +2335,13 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_anchor_of_linear_of_inertia_eq
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.inducedKernelFamily_nonempty_of_commutator_ne_top
+-- §11 routine pins for the h56 producer (S13_SixTwoBridge): Peterfalvi's type-P support is
+-- exactly `A(M) = (M')^#` (typePA_eq_sharpSubgroup_derivedInG), so `(M')^# ⊆ A₀(M)` (hKsupp);
+-- `1 ∉ A₀(M)` (h1A, S04.ne_one); `|M|` odd in the minimal-simple-odd ambient (hodd); and the
+-- pinned §10 family `S12.inducedFamily` IS the general kernel-filter family at `X = ⊥`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.mderivSharp_subset_A0
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.one_notMem_A0
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.inducedFamily_eq_inducedKernelFamily_bot
 -- (6.5) chief-factor core + (6.5)(b) reduction: a Frobenius-acted abelian section obeying the (6.3)
 -- index bound `≤ 4|R|²+1` is a `p`-group (chief-factor argument via the `p`-primary component,
 -- `card_modEq_one` + `six_five_chief_factor_contradiction`); combined with the nilpotent
