@@ -2318,6 +2318,22 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S08.inducedKernelFamily_degreeSqNormReBound_of_break_k
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.inducedKernelFamily_SA_sum_le_two_psi_k
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_source_index_le_two_psi_of_break
+-- h56 hdatum discharge helpers: the per-member (5.2.d) datum for an *irreducible* member
+-- (`memberExtensionDecomposition` with the coherent extension, coupling definitional), the break
+-- decomposition `Da` for an *irreducible* break (`decompositionDaFromDadeOfDiff`, `tau1 = τ`
+-- definitional), both exposing their `R(·)` image families as equations; their composition
+-- discharges the full `hdatum` clause on the irreducible–irreducible diagonal
+-- (`dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal` + family orthogonality), leaving only
+-- pairs involving a reducible μ-column to the §11 grid (issue 2022).  Plus the anchor from a
+-- non-invariant linear source ([Is] 6.34) and the `S(X)`-nonemptiness pin.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.inducedKernelFamily_memberDatum_of_irreducible
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.inducedKernelFamily_breakDa_of_irreducible
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.inducedKernelFamily_memberDatum_orthogonal_breakDa_of_irr_irr
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_anchor_of_linear_of_inertia_eq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.inducedKernelFamily_nonempty_of_commutator_ne_top
 -- (6.5) chief-factor core + (6.5)(b) reduction: a Frobenius-acted abelian section obeying the (6.3)
 -- index bound `≤ 4|R|²+1` is a `p`-group (chief-factor argument via the `p`-primary component,
 -- `card_modEq_one` + `six_five_chief_factor_contradiction`); combined with the nilpotent
