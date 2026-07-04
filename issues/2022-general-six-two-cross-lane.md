@@ -464,3 +464,21 @@ coeff (X ∈ ℤ[R]) / Y ⊥ R。
   どう chain に通すかの行間** = Coq PFsection11 の該当部
   (cohS1 消費、redPmu/FTtype345 系, L216 以降) の精読が次セッション第一手。
 - 現状整理: named 2 点の充足は「(10.2)-式の S₁-文脈版」一点に集約された。
+
+### 追記 5 (loop 31): ★Coq 精読の結論 — 正しい設計 = FTtypeP_subcoherent 移植
+
+- Coq `subcoherent S tau R` (PFsection5:486) = **coherence-free** の (5.2)-carrier:
+  全 member ξ ∈ S (可約含む!) に R ξ ⊆ ℤ[irr G] orthonormal +
+  **τ(ξ − ξ̄) = Σ_{α∈R ξ} α** + cross-直交 (e)。
+- 供給元 = `FTtypeP_subcoherent` (PFsection9:1506 域, cyclicTI-σ 経由) —
+  **coherence 不要**。部分族へは `subset_subcoherent` で制限
+  (PFsection11: scohS1/scohS2/scohM'' 全部これ)。
+- repo 検証: `alignedOmegaSigmaGrid` (S12_Core:1293) は §6 host
+  (toCertainTypeHypothesis = cyclicTI) 由来で **coherence-free** ✓。
+  coh-依存は alpha_tau_image ((10.2)-式) の導出経路だけ。
+- **次セッションの方針**: FTtypeP_subcoherent-analog を repo に建てる:
+  τ(μ_j − μ̄_j) = δ(Σω_j^σ − Σω_j'^σ) を **coh-free** で直接証明
+  (列差は A0-supported (同次数) → Dade-supported-計算 + cyclicTI-σ 同定;
+  PFsection9 の FTtypeP_subcoherent 証明の該当部を行間ソースに)。
+  それで columnImageFamily の coh-free 版が立ち、named 2 点は
+  ofProjection-plumbing に落ちる。alpha_tau_image 経由は捨てる。
