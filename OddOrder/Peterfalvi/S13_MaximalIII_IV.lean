@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.Peterfalvi.S08_SixTwoGeneral
 import OddOrder.Peterfalvi.S12_MaximalIII_IV_V
 import OddOrder.GroupTheory.ElementaryAbelian
 
@@ -31,6 +32,7 @@ open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory
 open OddOrder.Isaacs
 open scoped Pointwise
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce
 
 variable {G : Type*} [Group G]
 
@@ -102,6 +104,7 @@ theorem prime_pow_gt_four_mul_sq_add_one {p q : ℕ}
 in `Formula` are the named algebraic or character-theoretic calculations proved
 throughout §13. -/
 structure Hypothesis (M : Subgroup G) where
+  [finiteG : Finite G]
   base : OddOrder.Peterfalvi.S12.Hypothesis M
   params : OddOrder.Peterfalvi.S12.CharacterParameters base
   type_alt : IsTypeIII M ∨ IsTypeIV M
@@ -123,6 +126,13 @@ structure Hypothesis (M : Subgroup G) where
   Uprime : Subgroup G
   Uprime_eq : Uprime = derivedInG base.typeP.U
   SOf : Subgroup G → Set (ClassFunction ↥M ℂ)
+  /-- **(11.2) family pin**: `S(X)` is the source-kernel filtration of the §10 induced family
+  (Coq `seqIndD M' M M' X`) — the general kernel-filter family of `S08_SixTwoGeneral`, through
+  which the whole general-(6.2) layer (orthogonality/norms/real-freeness/B2/h56 producer,
+  issue 2022) applies to `S(X)`.  At `X = ⊥` this is `base.Sset`
+  (`S12.inducedFamily_eq_inducedKernelFamily_bot`). -/
+  SOf_eq : ∀ X : Subgroup G, SOf X = OddOrder.Peterfalvi.S08.inducedKernelFamily
+    ((derivedInG M).subgroupOf M) (X.subgroupOf M)
   notOrthogonalFormula : ClassFunction ↥M ℂ → Prop
   finalOrthogonalityFormula : ClassFunction ↥M ℂ → Prop
   caseB_of_97 : Prop

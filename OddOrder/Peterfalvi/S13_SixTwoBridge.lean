@@ -357,6 +357,30 @@ theorem exists_anchor [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : 
   exact OddOrder.Peterfalvi.S08.exists_anchor_of_linear_of_inertia_eq θ hθne hθker hθdeg
     (hyp.inertia_eq_derived_of_linear hG hθne hθdeg)
 
+/-- **Solvable-quotient commutator pin**: for a proper trace `X ⊓ M' ≠ M'`, the quotient
+`M'/(X ⊓ M')` is a nontrivial solvable group, so its commutator subgroup is proper.  This is the
+hypothesis feeding both the anchor (`exists_anchor`) and the `S(X)`-nonemptiness
+(`inducedKernelFamily_nonempty_of_commutator_ne_top`); `M` is solvable as a proper subgroup of
+the minimal counterexample (`solvable_of_lt_top`). -/
+theorem commutator_quotient_ne_top [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {X : Subgroup ↥M} [(X.subgroupOf ((derivedInG M).subgroupOf M)).Normal]
+    (hXne : X.subgroupOf ((derivedInG M).subgroupOf M) ≠ ⊤) :
+    commutator (↥((derivedInG M).subgroupOf M)
+      ⧸ X.subgroupOf ((derivedInG M).subgroupOf M)) ≠ ⊤ := by
+  haveI : IsSolvable ↥M := hG.solvable_of_lt_top M (lt_top_iff_ne_top.mpr hyp.maximal.1)
+  haveI : IsSolvable ↥((derivedInG M).subgroupOf M) := inferInstance
+  haveI : IsSolvable (↥((derivedInG M).subgroupOf M)
+      ⧸ X.subgroupOf ((derivedInG M).subgroupOf M)) := inferInstance
+  haveI : Nontrivial (↥((derivedInG M).subgroupOf M)
+      ⧸ X.subgroupOf ((derivedInG M).subgroupOf M)) := by
+    obtain ⟨y, hy⟩ : ∃ y, y ∉ X.subgroupOf ((derivedInG M).subgroupOf M) := by
+      by_contra hall
+      push Not at hall
+      exact hXne ((Subgroup.eq_top_iff' _).mpr hall)
+    exact ⟨QuotientGroup.mk y, 1, fun h => hy ((QuotientGroup.eq_one_iff y).mp h)⟩
+  exact (IsSolvable.commutator_lt_top_of_nontrivial _).ne
+
 end Hypothesis
 
 /-- **The §10 family `S` is the general kernel-filter family at `X = ⊥`**: the `⊥`-kernel
@@ -458,6 +482,68 @@ theorem exists_source_index_le_two_psi
   exact OddOrder.Peterfalvi.S08.exists_source_index_le_two_psi_of_break
     hyp.dadeData.dade hyp.hconj (hyp.card_odd_of_isMinimalSimpleOdd hG)
     hyp.mderivSharp_subset_A0 hyp.one_notMem_A0 hanchor hSBne hdatum hAcoh hBncoh
+
+/-- **The h56 producer with anchor and nonemptiness auto-discharged**: only the coherence
+dichotomy and the grid-backed (5.2.d) decomposition data (`hdatum`) remain.  The anchor comes
+from `exists_anchor` (Peterfalvi (8.4.d)) and `S(B)`-nonemptiness from the solvable-quotient
+linear character, both via `commutator_quotient_ne_top` at the proper traces `A', B ⊊ M'`. -/
+theorem exists_source_index_le_two_psi_of_ne_top
+    [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {A' B : Subgroup ↥M} [A'.Normal]
+    [(A'.subgroupOf ((derivedInG M).subgroupOf M)).Normal]
+    [(B.subgroupOf ((derivedInG M).subgroupOf M)).Normal]
+    (hA'ne : A'.subgroupOf ((derivedInG M).subgroupOf M) ≠ ⊤)
+    (hBne : B.subgroupOf ((derivedInG M).subgroupOf M) ≠ ⊤)
+    (hdatum : ∀ (S₁ : Set (ClassFunction ↥M ℂ)),
+      OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁ →
+      S₁ ⊆ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) A' ∪
+        S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B →
+      ∀ (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+        S₁ hyp.A0),
+      ∀ (ψ : ClassFunction ↥M ℂ),
+        ψ ∈ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B →
+        ψ ∉ S₁ → ψ.conj ∉ S₁ →
+      ∀ (χ₁ : ClassFunction ↥M ℂ), χ₁ ∈ S₁ →
+      ∀ (a : ℕ), ψ 1 = (a : ℂ) * χ₁ 1 →
+      ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+        (S₁ ∪ {ψ, ψ.conj}) hyp.A0) →
+      ∃ Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
+          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+            (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) ψ (a • χ₁),
+        Da.tau1 = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) ∧
+        ∀ χ ∈ S₁, ∃ D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
+            (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+              (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) χ 0,
+          D.imageFamily.Orthogonal Da.imageFamily ∧
+          D.tau1 χ = hS₁coh.extension χ)
+    (hAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+      (S08.inducedKernelFamily ((derivedInG M).subgroupOf M) A') hyp.A0))
+    (hBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+      (S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B) hyp.A0)) :
+    ∃ θ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M),
+      (↑(B.subgroupOf ((derivedInG M).subgroupOf M)) :
+          Set ↥((derivedInG M).subgroupOf M)) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel
+          (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) ∧
+      (Nat.card (↥((derivedInG M).subgroupOf M) ⧸
+          A'.subgroupOf ((derivedInG M).subgroupOf M)) : ℝ) - 1 ≤
+        2 * (ClassFunction.induce ((derivedInG M).subgroupOf M)
+          (θ : ClassFunction
+            ↥((derivedInG M).subgroupOf M) ℂ) 1).re := by
+  haveI := hyp.finiteG
+  refine hyp.exists_source_index_le_two_psi hG
+    (hyp.exists_anchor hG (hyp.commutator_quotient_ne_top hG hA'ne)) ?_ hdatum hAcoh hBncoh
+  exact OddOrder.Peterfalvi.S08.inducedKernelFamily_nonempty_of_commutator_ne_top
+    (hyp.commutator_quotient_ne_top hG hBne)
 
 end Hypothesis
 
