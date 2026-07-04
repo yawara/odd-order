@@ -8,10 +8,10 @@ created: 2026-06-29
 # §15/§16 cascade wrappers need Hypothesis grid τ-isometry/orthogonality fields (toolkit ready)
 
 **Lane:** c (γ §15/§16 POLE-2) raising; fix = **cross-lane**。
-🧾 fix-owner 更新 (2026-07-02 hub, 3 レーン再編 — 正本 `notes/meta/ft_lane_reallocation_2026_06_28.md`):
-**S15 grid 性質 fields (`S15.Hypothesis` 変更) = lane c** / **FeitThompson.lean threading
-(constructor 供給) = lane a** / **grid producers (§5 grid / cd 系) = lane b**。旧「lanes B grids /
-D carrier」表記は stale (lane D 退役)。
+🧾 fix-owner **更新 (2026-07-04 hub, 3 レーン再々編 — 正本 `notes/meta/ft_lane_reallocation_2026_06_28.md` + issue 9009 裁定)**:
+**S15 grid 性質 fields (`S15.Hypothesis`/`S15_SAndT_Setup` 変更) = lane b** (S15 は 2026-07-04 に c→b 移管) /
+**FeitThompson.lean threading (`Section16Inputs`/constructor 供給) = lane a**。各自の自所有ファイル内 additive ゆえ
+carve-out 不要 (9009 裁定)。旧 fix-owner 表 (2026-07-02: S15.Hypothesis=c / grid producers=b) は S15 移管で stale。
 検証 (2026-07-02): `tau3_isometry` / `omega_orthonormal` / `eta_orthogonality` / `mu_degree` は
 `OddOrder/**.lean` に **0 hits** — field 追加は未実施で本 issue は live。
 
