@@ -302,3 +302,11 @@ q_dvd_secondDerived_relIndex_HC_sub_one (W1_dvd_index_of_fixedPoints_le 再利�
 HC_le_secondDerived 実証明 (relIndex=1 化 + (11.4)@M'' + tower + FPF-dvd + 奇偶)。
 secondDerived_eq_HC 自動完成。残 named: sixTwoDecompositionData / secondDerived_coherent /
 coherent_S_of_coherent_SH0C。(11.6) 消費側の再点検 or (5.7) 配線が次。
+
+## 2026-07-05 lane-a (loop 15): (11.6) C = U' 閉了
+
+- `exists_mul_of_mem_sup_of_normalized` (sup 分解 helper 公開化) +
+  `secondDerived_le_H_sup_derivedU` (M'' ≤ H ⊔ U'; mk' mod-H 計算) +
+  `C_eq_derivedU` (C ≤ HC = M'' ≤ H⊔U', H⊓U=⊥ で H-部分消去)。
+- `core_structure` (11.6) 残 = conjunct 1 (H は p-群; (9.3) U centralizes O_{p'}(H) 要)
+  + conjunct 3 (H₀ = H'; BG 1.6(d) 要)。commit 426b995c。
