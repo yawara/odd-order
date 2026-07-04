@@ -2461,11 +2461,26 @@ theorem dadeSupportHypothesisData_typePA0_of_isTypeP1 [Fintype G] [Finite G]
       · exact Or.inl (typePA_conj_mem M data hm hpa)
       · exact Or.inr ((mem_conjClassSetIn_conj_iff hm x).mpr hva)
 
-/-- **Peterfalvi (8.15)** for type `P`: the Dade (2.2) support hypotheses hold
-for `A_0(M)`, `A(M)`, and `A_1(M)`, with `L=M` and `H(a)=R(a)`. -/
+/-- **Peterfalvi (8.15)** for type `P₁` (BG types III/IV/V): the Dade (2.2) support hypotheses hold
+for `A_0(M)`, `A(M)`, and `A_1(M)`, with `L=M` and `H(a)=R(a)`.
+
+**Restricted to `P₁`** (issue 9008).  Peterfalvi (8.10) defines the type-`P` support as
+`A(M) = ⋃_{x∈M_s^#} C_{M'}(x)^#` indexed over the **core** `M_s^# = M_σ^#`.  For `P₁` (`M_σ = M'`)
+this equals `(M')^#`, which is exactly `typePA` (`typePA_eq_sigmaSharp_of_isTypeP1`).  For `P₂`
+(type II, `M_σ = M_F ⊊ M'`) the correct `A(M)` is *strictly smaller* than `(M')^#`: it excludes the
+Frobenius-complement points `U^#` (which have `C_{M_σ} = 1`).  Since `typePA` models the full `(M')^#`
+(the `.mmd` extraction of (8.10) dropped the `M_s → M` subscript — see 9008), the `P₂` Dade support
+over `typePA` is **false-as-stated**: those `U^#` points can escape `M` yet are not `σ`-sharp,
+violating (8.13.b).  It also has **no on-path consumer** — the sole intended consumer
+(`S12.Hypothesis.dadeData`) is `IsTypeIII ∨ IsTypeIV ∨ IsTypeV = P₁`, and type-II Dade support flows
+through `Section16CharacterData.A0S` (an abstract `Set ↥S`, off-path/vestigial), not `typePA0`.  The
+"deep `P₂` geometry" chased by earlier loops was that OCR error; the `hP1` hypothesis is the honest
+scope.  (If a type-II consumer ever needs the *correct* `A(S)`, redefine `typePA` to index over
+`M_σ^#`; the `P₂` escape then reduces to the type-I `ASet` bridge — see 9008 Option A.) -/
 theorem dadeSupportHypotheses_typeP [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (data : TypePData M)
+    (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M)
     {tau : PeterfalviType} (hType : HasPeterfalviType tau M) :
     Nonempty (DadeSupportHypothesisData M (typePA0 M data)) ∧
       Nonempty (DadeSupportHypothesisData M (typePA M data)) ∧
@@ -2488,20 +2503,13 @@ theorem dadeSupportHypotheses_typeP [Fintype G] [Finite G]
       have h3 : m⁻¹ * (m * x * m⁻¹) * m⁻¹⁻¹ = x := by group
       rwa [h3] at h2
   refine ⟨?_, ?_, hA1⟩
-  · -- `A_0(M) = A(M) ∪ V^M`.  For `P₁`, the σ-decomposition engine assembles the full datum
-    -- (`dadeSupportHypothesisData_typePA0_of_isTypeP1`); for `P₂` the exceptional `V^M` needs the
-    -- deeper type-`P₂` support geometry.
-    by_cases hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M
-    · exact dadeSupportHypothesisData_typePA0_of_isTypeP1 hG hM data hP1
-    · sorry
-  · -- `A(M) = (M')^#`.  For `P₁`, `A(M) = M_σ^# = A_1(M)` (`typePA_eq_sigmaSharp_of_isTypeP1`
-    -- + `A1_eq_sigmaSharp`), so the `A_1` datum transports directly.  For `P₂` (`M_σ ⊊ M'`),
-    -- escaping points reduce to `A_1` by the type-`P` (8.13.b) `escaping_typePA_mem_A1` — deeper.
-    by_cases hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M
-    · rw [typePA_eq_sigmaSharp_of_isTypeP1 hG hM data hP1,
-        ← OddOrder.BG.Ch4.S16.A1_eq_sigmaSharp hG hM hType]
-      exact hA1
-    · sorry
+  · -- `A_0(M) = A(M) ∪ V^M`, type-`P₁`: the σ-decomposition engine assembles the full datum.
+    exact dadeSupportHypothesisData_typePA0_of_isTypeP1 hG hM data hP1
+  · -- `A(M) = (M')^# = M_σ^# = A_1(M)` for `P₁` (`typePA_eq_sigmaSharp_of_isTypeP1` +
+    -- `A1_eq_sigmaSharp`), so the `A_1` datum transports directly.
+    rw [typePA_eq_sigmaSharp_of_isTypeP1 hG hM data hP1,
+      ← OddOrder.BG.Ch4.S16.A1_eq_sigmaSharp hG hM hType]
+    exact hA1
 
 /-! ### (8.17.c) bridge: the faithful thickened `A₁`-support is the BG `M̃`-cover
 
