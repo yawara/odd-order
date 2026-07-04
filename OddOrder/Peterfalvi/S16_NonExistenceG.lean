@@ -7,6 +7,7 @@ import OddOrder.BG.AppC_NormSet
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
 import OddOrder.Peterfalvi.S15_SAndT
 import OddOrder.Peterfalvi.S16_NonExistenceGCore
+import OddOrder.Peterfalvi.S16_PairingBessel
 
 /-!
 # Peterfalvi Section 16: Non-existence of G — tail (14.3)--(14.16)
@@ -4779,8 +4780,73 @@ theorem orthogonality_switch_pairing_bounds [Finite G]
     (((nc.h - 1 : ℕ) : ℚ) / (hyp.base.p * hyp.base.q : ℚ) ≤
         ((hyp.base.p * hyp.base.q - 1 : ℕ) : ℚ)) ∨
       (((hyp.base.v - 1 : ℕ) : ℚ) / ((hyp.base.p * hyp.base.q : ℕ) : ℚ) ≤
-        ((hyp.base.p * hyp.base.q - 1 : ℕ) : ℚ)) :=
-  sorry
+        ((hyp.base.p * hyp.base.q - 1 : ℕ) : ℚ)) := by
+  classical
+  -- The two (14.14) coherence bundles, for `L ⊇ N_G(U)` and `M ⊇ N_G(V)`.
+  obtain ⟨dataL⟩ := TypeICoherent78Data.nonempty _hG nc.Ldata.L_maximal nc.Ldata.isTypeI
+  obtain ⟨dataM⟩ := TypeICoherent78Data.nonempty _hG nc.Mdata.M_maximal
+    ⟨nc.Mdata.typeIHyp.typeI⟩
+  have hbounds := pairing_bounds_of_nonconjugate dataL dataM _hG nc.Ldata.L_maximal
+    nc.Mdata.M_maximal nc.not_conj
+  -- `L`-side sizes: `|H| = h` and `[L : H] = p q`.
+  have hcardL : Nat.card ↥dataL.kernelIn = nc.h := by
+    have h1 : Nat.card ↥dataL.kernelIn = Nat.card ↥dataL.kernel :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe dataL.kernel_le).toEquiv
+    have h2 : dataL.kernel = nc.Ldata.H := by
+      rw [show dataL.kernel = maxNilpotentNormalHall nc.Ldata.L from
+          dataL.typeIHyp.typeI.typeF.H_eq, ← nc.Ldata.H_eq_LF]
+    rw [h1, h2, nc.h_eq_card_H]
+  have hidxL : (dataL.kernelIn).index = hyp.base.p * hyp.base.q := by
+    have h := OddOrder.Peterfalvi.S15.typeIFrobenius_kernel_index_eq_complement
+      nc.Ldata.typeI_data.frobenius
+    have h2 : dataL.kernelIn
+        = (maxNilpotentNormalHall nc.Ldata.L).subgroupOf nc.Ldata.L := by
+      rw [show dataL.kernelIn = (dataL.typeIHyp.typeI.typeF.H).subgroupOf nc.Ldata.L
+          from rfl, dataL.typeIHyp.typeI.typeF.H_eq]
+    rw [h2, ← nc.Ldata.typeI_data_L_eq]
+    exact h.trans nc.Ldata.typeI_complement_card_eq_pq
+  -- `M`-side sizes: `|K| = v` ((14.11) `K = V`, `|V| = v·d`, `d = 1`) and `[M : K] = p q`.
+  obtain ⟨hKV, hepq⟩ := K_eq_V_index_pq _hG hyp nc.Ldata nc.Mdata
+  have hkerM : dataM.kernel = nc.Mdata.K := by
+    rw [show dataM.kernel = maxNilpotentNormalHall nc.Mdata.M from
+        dataM.typeIHyp.typeI.typeF.H_eq, ← nc.Mdata.K_eq_MF]
+  have hd1 : hyp.base.d = 1 := by
+    have hTII : IsTypeII hyp.base.T := T_typeII _hG hyp
+    have hDbot : hyp.base.D = ⊥ := by
+      rw [hyp.base.D_eq]
+      exact OddOrder.Peterfalvi.S15.V_inf_centralizer_Q_eq_bot _hG hyp.base hTII
+    rw [hyp.base.d_eq_card_D, hDbot, Subgroup.card_bot]
+  have hcardM : Nat.card ↥dataM.kernelIn = hyp.base.v := by
+    have h1 : Nat.card ↥dataM.kernelIn = Nat.card ↥dataM.kernel :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe dataM.kernel_le).toEquiv
+    rw [h1, hkerM, hKV, hyp.base.card_V_eq_vd, hd1, mul_one]
+  have hidxM : (dataM.kernelIn).index = hyp.base.p * hyp.base.q := by
+    have h1 : dataM.kernelIn = nc.Mdata.K.subgroupOf nc.Mdata.M := by
+      rw [show dataM.kernelIn = (dataM.kernel).subgroupOf nc.Mdata.M from rfl, hkerM]
+    rw [h1, ← nc.Mdata.e_eq_index]
+    exact hepq
+  rw [dataL.complementIndex_eq _hG, dataM.complementIndex_eq _hG, hcardL, hcardM,
+    hidxL, hidxM] at hbounds
+  -- Convert the `ℚ`-subtractions to the `ℕ`-subtraction casts of the statement.
+  have hpq1 : 1 ≤ hyp.base.p * hyp.base.q :=
+    Nat.one_le_iff_ne_zero.mpr
+      (Nat.mul_ne_zero hyp.base.p_prime.pos.ne' hyp.base.q_prime.pos.ne')
+  have hv1 : 1 ≤ hyp.base.v := by
+    have hVpos : 0 < Nat.card ↥hyp.base.V := Nat.card_pos
+    rw [hyp.base.card_V_eq_vd, hd1, mul_one] at hVpos
+    exact hVpos
+  have hh1 : 1 ≤ nc.h := (nc.h_odd _hG).pos
+  rcases hbounds with hMK | hLH
+  · -- `(v − 1)/pq ≤ pq − 1`.
+    right
+    rw [Nat.cast_sub hv1, Nat.cast_sub hpq1]
+    push_cast at hMK ⊢
+    convert hMK using 2
+  · -- `(h − 1)/pq ≤ pq − 1`.
+    left
+    rw [Nat.cast_sub hh1, Nat.cast_sub hpq1]
+    push_cast at hLH ⊢
+    convert hLH using 2
 
 /-- **Peterfalvi (14.14)**: either the case-(a) bound `(h − 1)/pq ≤ pq − 1` holds (the
 `β_M`--`φ` pairing is nonzero), or the case-(b) exceptional primes `q = 3`, `p = 5` hold (the

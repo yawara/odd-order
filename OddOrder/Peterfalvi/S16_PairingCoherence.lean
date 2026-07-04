@@ -874,6 +874,40 @@ theorem nu_zeta_inner_nu_conj_eq_zero (hodd : Odd (Nat.card G))
     (⟨_, hirr_i⟩ : IrreducibleCharacter ↥L) ⟨_, hirr_i'⟩
   rwa [if_neg (fun heq => hne (congrArg Subtype.val heq))] at h
 
+/-- **Existence of the bundle for any type-I maximal subgroup** (Peterfalvi (12.1) +
+(12.6) + (12.7)): the Dade setup from `exists_typeI_hypothesis`, the Frobenius witness
+from the headline (12.7) `typeI_frobenius`, the coherence from
+`frobenius_typeI_coherent`, and the placed family from
+`exists_witness_placed_family`. -/
+theorem nonempty (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G}
+    (hLmax : L ∈ maximalSubgroups G) (hLtypeI : IsTypeI L) :
+    Nonempty (TypeICoherent78Data L) := by
+  classical
+  obtain ⟨typeIHyp⟩ := OddOrder.Peterfalvi.S14.exists_typeI_hypothesis hG hLmax hLtypeI
+  obtain ⟨fdata, -⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius hG hLmax hLtypeI
+  -- Transport the Frobenius witness to `typeIHyp`'s kernel (both are `L_F`).
+  have hHeq : fdata.typeI.typeF.H = typeIHyp.typeI.typeF.H := by
+    rw [fdata.typeI.typeF.H_eq, typeIHyp.typeI.typeF.H_eq]
+  have hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L
+      ((typeIHyp.typeI.typeF.H).subgroupOf L) fdata.complement := by
+    rw [← hHeq]; exact fdata.frobenius
+  obtain ⟨coh⟩ := OddOrder.Peterfalvi.S14.frobenius_typeI_coherent hG typeIHyp
+    ⟨fdata.complement, hFrob⟩
+  obtain ⟨n, θ, ind1H, hind1H, hdeg0, htriv, hinj, hcover⟩ :=
+    OddOrder.Peterfalvi.S14.exists_witness_placed_family typeIHyp
+  exact ⟨{ typeIHyp := typeIHyp
+           C := fdata.complement
+           hFrob := hFrob
+           coh := coh
+           n := n
+           θ := θ
+           ind1H := ind1H
+           ind1H_ne_zero := hind1H
+           deg0 := hdeg0
+           triv := htriv
+           inj := hinj
+           cover := hcover }⟩
+
 end TypeICoherent78Data
 
 section Pairing
