@@ -214,4 +214,31 @@ theorem induce_eq_sum_mul_linearClassFunction [Finite K] [Fintype K]
   have hfinal := eq_sum_of_inner_eq_one_of_inner_self_eq_card h1 hnorm
   rw [hfinal, hS, Finset.sum_image fun β₁ _ β₂ _ h => hΦinj h]
 
+open scoped commutatorElement in
+/-- **Induced trivial character of a normal subgroup with abelian quotient = sum of the quotient's
+linear characters** (the regular character of `K/H`, inflated).  For `H ⊴ K` finite with `K/H`
+abelian, `Ind_H^K 1_H = ∑_{β ∈ Hom(K/H, ℂˣ)} Inf(β)`.
+
+The `θ = 1_H` case of `induce_eq_sum_mul_linearClassFunction` (coprimality `gcd([K:H], 1) = 1` is
+vacuous, extension `1_K`), followed by `1_K · Inf(β) = Inf(β)`.  This is the `Ind_H^T 1_H` factor of
+the projection-formula (`induce_restrict_mul`) route to the **general** Peterfalvi (1.7.b) — the
+equal-degree induced-constituent decomposition for an abelian inertia quotient, no coprimality. -/
+theorem induce_trivial_eq_sum_linearClassFunction [Finite K] [Fintype K]
+    [Invertible (Nat.card K : ℂ)] [Invertible (Nat.card ↥H : ℂ)]
+    [Fintype ((K ⧸ H) →* ℂˣ)] (hab : ∀ x y : K, ⁅x, y⁆ ∈ H) :
+    ClassFunction.induce H (trivialClassFunction ↥H)
+      = ∑ β : (K ⧸ H) →* ℂˣ, linearClassFunction (β.comp (QuotientGroup.mk' H)) := by
+  have hinv : ∀ y : K,
+      ClassFunction.conjBy y (trivialClassFunction ↥H) = trivialClassFunction ↥H := by
+    intro y; ext h; simp [ClassFunction.conjBy_apply, trivialClassFunction_apply]
+  have hres : ClassFunction.restrict H (trivialClassFunction K) = trivialClassFunction ↥H := by
+    ext h; simp [ClassFunction.restrict_apply, trivialClassFunction_apply]
+  have hgal := induce_eq_sum_mul_linearClassFunction (K := K) (H := H)
+    trivialClassFunction_isIrreducible hinv hab trivialClassFunction_isIrreducible hres
+    (d := 1) (by rw [trivialClassFunction_apply]; norm_num) (Nat.coprime_one_right _)
+  rw [hgal]
+  refine Finset.sum_congr rfl fun β _ => ?_
+  ext y
+  rw [ClassFunction.mul_apply, trivialClassFunction_apply, one_mul]
+
 end OddOrder.RepresentationTheory
