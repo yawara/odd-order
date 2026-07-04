@@ -264,3 +264,8 @@ datum の μ-column 本体。
 C_normalized_by_M field (S11 cSub = C_U(H̄) ≠ (11.2) C = C_U(H) の確認込み) + H₀C/HC 正規性
 一式 + **H_not_le_H0C** (normal_mul 分解)。残: trace-ne-⊤ 2 行 + hcentral (H'≤H₀ route) +
 index 算術 + (11.4) glue → その後 μ-column datum。
+
+## 2026-07-05 lane-a (loop 9): (11.4) 前提完了 — ⁅HC,HC⁆ ⊆ H₀C
+
+H0C_trace_ne_top / commutator_mem_H0 (elementary abelian 経由) / commutator_HC_mem_H0C
+(H·C 分解 + Commute swap)。残 (11.4): hcentral wrapper + H₁-trace-ne-⊤ + index 算術 + glue。
