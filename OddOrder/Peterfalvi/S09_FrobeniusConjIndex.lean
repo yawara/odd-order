@@ -361,6 +361,48 @@ noncomputable def hypothesis78_isCoherent_sourceSet [Fintype G] [Invertible (Nat
       extension_mem_ZIrr := fun φ hφ =>
         (F.coherence i hodd hnilp C hFrob).extension_mem_ZIrr φ (hS ▸ hφ) }
 
+/-- **The Frobenius-family `hzeta_cross`** (Peterfalvi (7.9), coq `disjoint_coherent_ortho`).  For
+two distinct Frobenius members `i ≠ j`, the two distinguished coherent images are orthogonal:
+`⟨ζ_i^{ν_i}, ζ_j^{ν_j}⟩ = 0`.  Assembles `zetaImage_cross_eq_zero_of_conjIndex` from all the
+Frobenius-level inputs: the coherence over `sourceSet` (`hypothesis78_isCoherent_sourceSet`) with
+`ν = coherence.extension` (`hypothesis78_nu_eq`), irreducibility (`hypothesis78_zeta_irreducible`),
+the conjugate index (`exists_conjIndex_hypothesis78`), non-realness
+(`hypothesis78_zeta_ne_conj`), and the Dade-agreement support
+(`hypothesis78_nu_zeta_sub_conj_support`).  The `hzeta_cross` hypothesis of the (7.9)
+`conclusion` producers, en route to `card_G0_lower_bound` (7.10). -/
+theorem hypothesis79_zetaImage_cross_eq_zero [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (i j : Fin k) (hij : i ≠ j) (hodd : Odd (Nat.card G))
+    [Fintype ↥(F.L i)] [Invertible (Nat.card ↥(F.L i) : ℂ)]
+    [Invertible (Nat.card ↥((F.H i).subgroupOf (F.L i)) : ℂ)]
+    [((F.H i).subgroupOf (F.L i)).Normal]
+    (hnilp_i : Group.IsNilpotent ↥((F.H i).subgroupOf (F.L i)))
+    (C_i : Subgroup ↥(F.L i))
+    (hFrob_i : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C_i)
+    [Fintype ↥(F.L j)] [Invertible (Nat.card ↥(F.L j) : ℂ)]
+    [Invertible (Nat.card ↥((F.H j).subgroupOf (F.L j)) : ℂ)]
+    [((F.H j).subgroupOf (F.L j)).Normal]
+    (hnilp_j : Group.IsNilpotent ↥((F.H j).subgroupOf (F.L j)))
+    (C_j : Subgroup ↥(F.L j))
+    (hFrob_j : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(F.L j) ((F.H j).subgroupOf (F.L j)) C_j) :
+    ClassFunction.inner
+        (F.hypothesis79 i j hij hodd hnilp_i C_i hFrob_i hnilp_j C_j hFrob_j).firstZetaImage
+        (F.hypothesis79 i j hij hodd hnilp_i C_i hFrob_i hnilp_j C_j hFrob_j).secondZetaImage
+      = 0 := by
+  obtain ⟨j₁, hj₁ne_ind, hj₁⟩ := F.exists_conjIndex_hypothesis78 i hodd hnilp_i C_i hFrob_i
+  obtain ⟨j₂, hj₂ne_ind, hj₂⟩ := F.exists_conjIndex_hypothesis78 j hodd hnilp_j C_j hFrob_j
+  exact (F.hypothesis79 i j hij hodd hnilp_i C_i hFrob_i hnilp_j C_j
+      hFrob_j).zetaImage_cross_eq_zero_of_conjIndex
+    (F.hypothesis78_isCoherent_sourceSet i hodd hnilp_i C_i hFrob_i)
+    (F.hypothesis78_nu_eq i hodd hnilp_i C_i hFrob_i)
+    (F.hypothesis78_isCoherent_sourceSet j hodd hnilp_j C_j hFrob_j)
+    (F.hypothesis78_nu_eq j hodd hnilp_j C_j hFrob_j)
+    (F.hypothesis78_zeta_irreducible i hodd hnilp_i C_i hFrob_i)
+    (F.hypothesis78_zeta_irreducible j hodd hnilp_j C_j hFrob_j)
+    hj₁ne_ind hj₁ (F.hypothesis78_zeta_ne_conj i hodd hnilp_i C_i hFrob_i)
+    hj₂ne_ind hj₂ (F.hypothesis78_zeta_ne_conj j hodd hnilp_j C_j hFrob_j)
+    (F.hypothesis78_nu_zeta_sub_conj_support i hodd hnilp_i C_i hFrob_i hj₁ne_ind hj₁)
+    (F.hypothesis78_nu_zeta_sub_conj_support j hodd hnilp_j C_j hFrob_j hj₂ne_ind hj₂)
+
 end FrobeniusFamily
 
 end OddOrder.Peterfalvi.S09
