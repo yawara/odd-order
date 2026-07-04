@@ -124,12 +124,15 @@ norm-cascade が cross-lane threading 待ちの間、solo build-green な keysto
 
 07-04 reallocation で S15_SAndT_Setup + S15_SAndT が c→b。b が frontier 全数をコード検証:
 - **(13.10) `analytic_inequality` 出力を de-opacify 済** (commit `f17fdbcd`): 実 `u/c` bound が real theorem 化。
-- **重要: honest W-grid route が issue 3002 を PART 迂回可能**: `hyp` は `W`/`W_cyclic`/`W1`/`W2` を carry ゆえ、
-  **`S05.TICyclicHypothesis` を hyp.W から新規構成** → ω 直交性 (S05) + τ-isometry (S07=b infra) → η'=τ₃(ω') で
-  **η-side norm estimates (13.7/13.8) を field-threading 無しで実証明可能** (fresh grid、hyp.omega/tau3 非依存)。
-  ⟹ 本 issue の grid field-threading が**必須なのは hyp.eta を statement で直接参照する箇所のみ**:
-  `TypeIOrthogonalityData.caseC2_eta0j_odd` (13.19 parity、S16 が consume する W-side terminal) など。
-  norm cascade の (13.10) 出力路は honest W-grid で迂回可。
-- **⟹ a-side threading (本 issue) の残 necessity = hyp.eta 参照の (13.19) parity / S16 terminal 系**に絞られた。
-  (13.7/13.8) 系は b が honest W-grid で ungated に進められる (multi-session、Dade-support V⊆W 構成が要)。
-- 詳細 = `notes/peterfalvi/s15_s_and_t.md` の 2026-07-04 lane b LIVE STATUS。
+- **⚠ 訂正 (同 07-04 loop): 「honest W-grid で迂回可能」は誤り**。**spine (`FeitThompson.lean:1319` `omegaS`) が
+  既に honest grid を `mp.certainTypeS.sdiffTICyclicHypothesis` から構成済**。だが `S15.Hypothesis` は grid を
+  bare field で持ち **mp/certainType/TICyclicHypothesis への structural link を carry しない** (field 精査済)。
+  ⟹ b が fresh grid を組んでも **hyp.omega と同定不能**、cascade は hyp の λ/(13.5) machinery に tie ゆえ
+  fresh grid では (13.10)-about-hyp 不可。**∴ η-side 含め §15 cascade 全体が本 issue に uniformly gated**。
+- **✅ a-side threading は機械的** (grid は spine に proven 済、新規構成不要): S15.Hypothesis + Section16Inputs に
+  下記 property field を足し、`sectionSixteenHypothesis_of_inputs` で **`omegaS` の直交性 (`S05_TICyclic.lean:733/740`)
+  + `tau3W` isometry (S07 `extension_inner_eq`)** から supply。field 形 = 各 `caseB_*_norm_bound` engine 仮説
+  (`hvanish`/`hinner`/`hχ`点公式/`hParseval`/`hs`整数性/`hInflation` + ω-orthonormal/τ-isometry)。
+- **b-side (build-green solo)**: `GridProperties (hyp)` carrier + sorried producer で cascade wrapper を engine から
+  実証明 (wiring は a threading 後も再利用、producer sorry のみ hyp 新 field で discharge)。a threading と pair。
+- 詳細 = `notes/peterfalvi/s15_s_and_t.md` の 2026-07-04 lane b LIVE STATUS (訂正済)。

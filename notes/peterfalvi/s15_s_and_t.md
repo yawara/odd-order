@@ -22,21 +22,23 @@ sorry は producer に isolate (net ±0) だが (13.10) 出力が real theorem �
 ### frontier 精査結論 — b の §15 は「一律 gated」でない (要ニュアンス、過去の pessimism 訂正)
 コード検証で各 sorry の gate を確定 (「上流待ち」の誤ラベルでなく実 gate):
 - **(13.10) 出力**: ✅ de-opacify 済。完全 discharge には η-estimates + λ-estimates + u-bound が要る (下記)。
-- **η-side norm estimates (13.7)/(13.8)** = **UNGATED 深 b-work**: `hyp` は `W`/`W_cyclic`/`W1`/`W2` を carry
-  → **honest W-grid を hyp.W から新規構成** (`S05.TICyclicHypothesis` 構築 → ω 直交性 → S07 τ-isometry →
-  η'=τ₃(ω)) すれば field-threading (issue 3002) 不要で η-estimates を実証明可能。⚠ 要 Dade-support `V⊆W`
-  (TI・W-normalized) の構成 = 多段 (multi-session)。**= reallocation が意図した「b の §12 Dade+char 強み」の本体**。
-- **λ-side (13.6) `caseB_lambda_norm_bound` 入力**: S-coherence (13.5.a point formula) 経由。⚠ 07-02 hub 裁定
-  「(13.5)-(13.9) の **S-side τ₁ 形は W-side restate or retire を判定してから着手**」の対象 = 要 design 判断。
-- **u-bound (13.2.c) `2u≤|P|-1`**: issue 9000 (typeP_Galois、hub/a dedup 中 = 着手不可)。
-- **(13.19) parity `caseC2_eta0j_odd` → S16 W-side terminal**: statement が `hyp.eta` を直接参照 (S16 consume)
-  → honest W-grid の fresh η' に swap 不可 = **issue 3002 (grid field-threading, a の FeitThompson) 必須**。
-- **grid 直交性/isometry を hyp.omega/tau3 に carry** = issue 3002 (cross-lane, a threading)。honest W-grid
-  route は (13.10) η-estimate には不要だが、hyp.eta-参照する S16 parity には issue 3002 が要る。
+- **⚠⚠ 訂正 (同 07-04 loop、初回 claim は誤り)**: 「η-side は hyp.W から honest W-grid 新規構成で ungated」は
+  **誤り**。理由: **spine (`FeitThompson.lean:1319` `omegaS`) が既に honest grid を `mp.certainTypeS.sdiffTICyclicHypothesis`
+  (`S05.TICyclicHypothesis`) から構成済**。だが `S15.Hypothesis` は grid を **bare field** で持ち、`mp`/certainType/
+  TICyclicHypothesis への **structural link を一切 carry しない** (field 精査: omega/eta/tau3/mu/nu/delta は
+  bare、関係 field は `eta_eq_tau_omega`/`mu_definition`/`nu_definition` のみ = 直交性/isometry 無し)。
+  ⟹ b が **fresh grid を組んでも hyp.omega と同定不能** (link 無し) → cascade は hyp の λ (CharacterDegreeData)・
+  (13.5) machinery に tie されるので fresh grid では (13.10)-about-hyp を証明できない。**∴ η-side も含め §15 cascade
+  全体が issue 3002 (grid property を hyp に threading、a の FeitThompson) に uniformly gated**。
+- **honest grid は spine に既存**: `omegaS` orthonormal は S05:733/740、τ isometry は S07。issue 3002 の a-side
+  threading = 「omegaS の直交性 + tau3W isometry を S15.Hypothesis/Section16Inputs の新 field に供給」= 機械的
+  (grid は既に proven、新規構成不要)。
+- **u-bound (13.2.c) `2u≤|P|-1`**: issue 9000 (typeP_Galois、hub/a dedup 中)。
 
-**次 session の高 value 候補** (upstream-first): (A) honest W-grid 構成 (ungated 深 b-work、η-estimates 実証明、
-issue 3002 迂回) ← reallocation 本命。(B) issue 3002 a-side threading 調整 (hyp.eta-参照 parity/S16 terminal 用)。
-(C) (13.5)-(13.9) S-side τ₁ 形の W-side restate/retire 判定 (07-02 hub 裁定)。**(A) を正面から engage 推奨**。
+**⟹ b の §15 cascade に solo build-green な深 math は無い** (uniformly gated on issue 3002 [a] + 9000 [hub/a])。
+tractable solo = faithful-producer de-opacify (grid obligation を isolate、consumer-side): `GridProperties` carrier +
+sorried producer で全 wrapper を engine から実証明 → grid property を単一 producer に集約 (a の threading と pair)。
+**最高 leverage = issue 3002 の a-side threading** (b cascade 全体 unblock)。詳細 = issue 3002 の 07-04 b 訂正節。
 
 ---
 
