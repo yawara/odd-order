@@ -322,6 +322,40 @@ theorem induce_apply_eq_zero_of_not_mem_normal (H : Subgroup G) [Invertible (Nat
     rwa [h3] at h2
   rw [hz, mul_zero]
 
+/-- **Sums of characters induced from a normal subgroup vanish off it.**  For `H ⊴ G`, any
+`k`-linear combination `∑ i ∈ s, a i • Ind_H^G (θ i)` of induced class functions vanishes at
+every `g ∉ H`.  Termwise consequence of `induce_apply_eq_zero_of_not_mem_normal`.
+
+This is Peterfalvi/Coq (12.5) step 6 (`cfun_onP (cfInd_normal)`) and the analogous step of
+(12.15): `Res_H(ψ^ρ) = ∑_λ a_λ · Ind_{H'}^H λ + a · 1_H` is constant on `H − H'` because every
+induced-from-`H' ⊴ H` summand vanishes there, leaving the constant `a`. -/
+theorem sum_smul_induce_apply_eq_zero_of_not_mem_normal {ι : Type*} (H : Subgroup G)
+    [Invertible (Nat.card H : k)] [H.Normal] (s : Finset ι) (a : ι → k)
+    (θ : ι → ClassFunction ↥H k) {g : G} (hg : g ∉ H) :
+    (∑ i ∈ s, a i • induce H (θ i)) g = 0 := by
+  classical
+  induction s using Finset.induction with
+  | empty => simp
+  | insert i s hi ih =>
+      rw [Finset.sum_insert hi, add_apply, smul_apply,
+        induce_apply_eq_zero_of_not_mem_normal H (θ i) hg, mul_zero, zero_add, ih]
+
+/-- **An "induced-from-normal + constant" class function is constant off the normal subgroup.**
+If `ψ = (∑ i ∈ s, a i • Ind_H^G (θ i)) + c` pointwise, with `H ⊴ G`, then `ψ x = ψ y` for all
+`x, y ∉ H`: every induced summand vanishes off `H`
+(`sum_smul_induce_apply_eq_zero_of_not_mem_normal`), leaving the common constant `c`.
+
+This is the final "constant on `H − H'`" step shared by Peterfalvi (12.5) (`Res_H(ψ^ρ) =
+∑_λ a_λ Ind_{H'}^H λ + a·1_H`) and (12.15) (the analogous `ρ_M`-image decomposition on `K − K'`);
+establishing the decomposition itself is the Clifford-theoretic content upstream of this reduction. -/
+theorem apply_eq_of_eq_sum_smul_induce_add_const {ι : Type*} (H : Subgroup G)
+    [Invertible (Nat.card H : k)] [H.Normal] (ψ : ClassFunction G k) (s : Finset ι)
+    (a : ι → k) (θ : ι → ClassFunction ↥H k) (c : k)
+    (hψ : ∀ g : G, ψ g = (∑ i ∈ s, a i • induce H (θ i)) g + c) {x y : G}
+    (hx : x ∉ H) (hy : y ∉ H) : ψ x = ψ y := by
+  rw [hψ x, hψ y, sum_smul_induce_apply_eq_zero_of_not_mem_normal H s a θ hx,
+    sum_smul_induce_apply_eq_zero_of_not_mem_normal H s a θ hy]
+
 @[simp] theorem card_smul_induce (H : Subgroup G) [Invertible (Nat.card H : k)]
     (θ : ClassFunction ↥H k) :
     (Nat.card H : k) • induce H θ = induceSum H θ := by
