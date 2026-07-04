@@ -1503,3 +1503,42 @@ v-value = 9000 Galois。**c の §16 W-side assembly は完了; 前進には b (
 特に dichotomy `orthogonality_switch_pairing_bounds` の (7.8.b) β-norm 部が §7/§9 producer で build 可能か
 (normSq と同じ発見の可能性)。残 η-grid (betaGrid/signs/eta_generic_data/caseB_contradiction_data) は honest
 η-grid carrier (issue 3002) 要で真 gated、U/V cyclic/T_typeII は b §13、v-value は 9000。
+
+### cont.⁵⁴ (2026-07-05 lane c 再開): 🎯 orthogonality_switch_pairing_bounds (14.14) 実証明化 — dichotomy+Bessel 全結線
+
+**前セッション末 (同日)**: (14.14) 部品調査で Bessel 側の欠落部品 = 誘導族次数平方和を特定、
+shared leaf `InducedDegreeSum.lean` (9010, `card_index_mul_sum_induced_family_degree_sq`
+e·Σθᵢ(1)²=|H|−1, Mackey fiber 経由) を landing (`d6328cfe`)。
+
+**本セッション**: cont.⁵³ の教訓 (「gated」は producer 検証まで信じない) を (14.14) 全部品に適用
+→ **全て repo に proven で存在**と判明し、S16:4776 の bare sorry を 4 commit で完全実証明化:
+
+1. **`339e1f52` S16_PairingCoherence.lean (新 leaf, c 所有)**: `TypeICoherent78Data` bundle
+   (S14.Hypothesis + Frobenius + coherence + placed family) → `h78 = hypothesis78OfDade` を
+   任意 type-I maximal に def 化 (exists_M_hypothesis78 の一般化)。(7.9) 入力の非-family 化
+   (S09_FrobeniusConjIndex のコピー適応): conjIndex/非実性/Δ-reality/BetaDecomp
+   (betaDecompOfDade 直結)。`hypothesis79OfNonconjugate`: **(8.17.c) は S10
+   `ftThickenedSupport_A1_disjoint_of_nonconjugate` に proven 済**
+   (cont.⁵² の「b 領域 gated」は phantom) — `dadeSupport_eq_ftThickenedSupport` +
+   `typeIA_eq_A1` (sharp Fitting kernel) bridge で直結。`pairing_dichotomy` =
+   (7.9) 結論 (parity 経由、cfdot_real_vchar_even)。
+2. **`d5e13a98` family-wide cross-ortho**: 一般 index conjIndex 機構 → `pair_cross_orthogonal`
+   (全 (i,j) で ⟨φᵢ^ν, χⱼ^ν⟩=0) = 教科書 p.90「(4.1) より ℒ^τ₁ ⊥ ℳ^τ₁」の実体。
+3. **`a6c06957` S16_PairingBessel.lean (新 leaf)**: (7.8.b) full `NormEstimates`
+   (‖Γ‖²≤e−1 込み) を bundle に実証明 (zetaNuRhoNormSq_eq_normQuad = GeOfDade の eq 版 11-fact)。
+   β/Γ の family 比例係数 (disjoint support + cross-ortho) → 単枝 Bessel
+   `(h_L−1)/e_L ≤ e_M−1` (sum_rat_weights_le_of_orthogonal_integer_decomposition (7.10 機構) +
+   **InducedDegreeSum 9010 cite**) → `pairing_bounds_of_nonconjugate` (dichotomy 両枝)。
+4. **`60b9b6b6` S16 instantiation**: `TypeICoherent78Data.nonempty` ((12.7) typeI_frobenius 経由、
+   MHypothesis 拡張**不要**) + L/M size 結線 (|H|=h, |K|=v via (14.11) K_eq_V_index_pq +
+   d=1, index=pq 両側) + cast 変換で sorry 置換。
+
+**S16 実 sorry 7→6**。(14.14)→(14.15)/(14.16) の W-side cascade は arithmetic 込みで端まで実証明。
+残 6 は全て既知 gate: 80 (T_typeII, b §13) / 175 (v-value, 9000) / 2599+4604+5415 (η-grid, 3002) /
+5347 (k>2pv assembly, 9000)。full build 3923 green (26s)、AxiomsCheck OK。
+
+**dedup flag (hub 宛)**: 9010 の `card_index_mul_sum_induced_family_degree_sq` は
+`S09_CertificateDischarge.family_degree_sum` (Σζᵢ(1)²/‖ζᵢ‖² = e(h−1), norm-divided 一般形) と
+数学的に重複気味 (Frobenius 下で相互導出可; 9010 claim 時の grep は名前不一致でヒットせず)。
+両形とも現に使われている (family_degree_sum → normEstimates 系 / 9010 → Bessel の Σdᵢ² 直接形) ので
+即統合は不急; (7.10) card_G0 (issue 0044) 着手時にどちらへ寄せるか判断。
