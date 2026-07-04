@@ -402,15 +402,17 @@ theorem isSimpleModule_of_abelian_faithful_card {q : ℕ} (hq : q.Prime) (hqodd 
     exact not_dvd_factorial_pred hq hqdvdD
   exact hnotdvd hrN
 
-/-- **Peterfalvi (14.2)(a), abstract form.**  A faithful action of a cyclic group `C` of order
-`(p^q-1)/(p-1)` on an `F_p`-module `M` of order `p^q` (`q` prime) realizes `M` as the Galois
-field `GF(p^q)` with `C` embedded in the multiplicative group `GF(p^q)ˣ`: there is an additive
+omit [IsCyclic C] in
+/-- **Peterfalvi (14.2)(a), abstract form.**  A faithful action of an abelian group `C` of order
+`(p^q-1)/(p-1)` on an `F_p`-module `M` of order `p^q` (`q` an *odd* prime) realizes `M` as the
+Galois field `GF(p^q)` with `C` embedded in the multiplicative group `GF(p^q)ˣ`: there is an additive
 isomorphism `e : M ≃+ GF(p^q)` and an injective `μ : C →* GF(p^q)ˣ` with `e (c • x) = μ c · e x`.
 
 This is the field-isomorphism that the Section 16 finite-field model (`FieldNormalizerData`)
-requires: combine `isSimpleModule_of_isCyclic_faithful_card` (irreducibility), the Singer engine,
+requires: combine `isSimpleModule_of_abelian_faithful_card` (irreducibility), the Singer engine,
 and `nonempty_ringEquiv_galoisField` (uniqueness of finite fields). -/
-theorem exists_galoisField_repr {q : ℕ} (hq : q.Prime) [NeZero (Nat.card C : ZMod p)]
+theorem exists_galoisField_repr {q : ℕ} (hq : q.Prime) (hqodd : Odd q)
+    [NeZero (Nat.card C : ZMod p)]
     (hcardM : Nat.card M = p ^ q) (hcardC : Nat.card C = (p ^ q - 1) / (p - 1))
     (hfaith : ∀ c : C, (∀ x : M, MonoidAlgebra.of (ZMod p) C c • x = x) → c = 1) :
     ∃ (e : M ≃+ GaloisField p q) (μ : C →* (GaloisField p q)ˣ),
@@ -420,7 +422,7 @@ theorem exists_galoisField_repr {q : ℕ} (hq : q.Prime) [NeZero (Nat.card C : Z
   classical
   haveI : Fintype M := Fintype.ofFinite _
   haveI hsimp : IsSimpleModule (MonoidAlgebra (ZMod p) C) M :=
-    isSimpleModule_of_isCyclic_faithful_card hq hcardM hcardC hfaith
+    isSimpleModule_of_abelian_faithful_card hq hqodd hcardM hcardC hfaith
   obtain ⟨data⟩ := nonempty_singerFieldData (p := p) (C := C) (M := M)
   obtain ⟨φ⟩ := data.nonempty_ringEquiv_galoisField hq.pos.ne'
     (by rw [← Nat.card_eq_fintype_card, hcardM])

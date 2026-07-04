@@ -776,7 +776,7 @@ theorem exists_pu_field_repr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   obtain ⟨e0, μ, hμinj, hcompat0⟩ :=
     OddOrder.RepresentationTheory.exists_galoisField_repr
       (C := ↥hyp.base.U) (M := Additive ↥hyp.base.P)
-      hyp.base.q_prime hcardM hu_full hfaith
+      hyp.base.q_prime hyp.base.q_odd hcardM hu_full hfaith
   refine ⟨e0, μ, hμinj, ?_⟩
   intro v x
   rw [← hcompat0 v (Additive.ofMul x), hof_smul v (Additive.ofMul x)]
