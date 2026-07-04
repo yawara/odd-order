@@ -657,3 +657,33 @@ geometry を正面 build する** (heartbeat 待機でなく、深いゲート�
 - 完成で type-P engine P2 → `dadeSupportHypotheses_typeP` 全 field discharge → §12 Dade tower endgame へ。
 - **(12.15) DadeNotation de-scaffold は今回は保留** (type-P engine P2 を優先; 必要になれば別途裁定)。
 - b は着手前に本裁定 + loop¹⁰⁷ de-risked plan + loop¹⁰⁹ reconciliation を再読。
+
+**⚠ 下記 loop¹⁹³ で refine**: BG §14 σ-theory foundation は issue 9000 で **別レーンが claim 済・能動 build 中**
+と b が判明 → b は σ-theory foundation を**重複 build しない** (claim-before-build)。本裁定の「BG§14-15 type-P2
+geometry を build」は、**b 所有部分 = type-P2 の CLOSE (`escaping_typePA_mem_A1` + S10 engine mirror、b の
+carve-out)** に読み替え、σ-foundation が merge-main で揃い次第 engage する (それまで heartbeat)。σ-foundation
+自体は 9000 claim レーンが build。⟹ hub は BG §14 の σ-theory build が停滞していないか (9000 レーンの生存) を注視。
+
+## loop¹⁹³ (2026-07-04, heartbeat) — type-P2 obstruction を精密特定: typePA の K-part は BG A0Set escape lemma 範囲外
+
+heartbeat 起動、main に他レーン進捗無し (gate 未解除)。type-P2 の deep 度を精密検証:
+- **BG escape lemma `mem_sigmaSharp_of_mem_aSet_of_escape` (S16) は type-general** (K=kappa-Hall 引数)、
+  escaping 点 (of ASet or A0Set) → M_σ#。→ 機構は存在。
+- **しかし `A0Set M K = hatMsigma M \ conjClassSet(sharpSubgroup K)` は K-part を除外**。
+  一方 **`typePA = (M')# = sharpSubgroup(derivedInG M)` は K-part を含む** (K ⊆ M')。
+  ⟹ typePA の K-元 (kappa#) は A0Set にも ASet にも入らず、escape lemma の射程外。
+- **∴ type-P2 typePA case は BG §14-15 type-P2 の新 K-structure geometry (V^M / kappa-action /
+  K# の signalizer) を要する** — type-I の clean mirror では**閉じない** (loop¹⁰⁹ の
+  「別物」を set-level で確定: (M')# の K-part が A0Set 除外部)。
+
+**結論 (loop¹⁰⁹ を精密化)**: type-P2 は BG §14-15「III/IV gate」領域の新 geometry を要し、lane-b 単独
+build 圏外 (BG Ch4 cluster 領域、claim-before-build/coordination 要)。→ heartbeat 継続、BG§14-15 進捗 /
+ユーザー方向指示待ち。lane-b の char/support tractable 作業は (12.5) 完済で確定的に枯渇。
+
+**⟳ type-P2 gate は LIVE (別レーンが BG §14 σ-theory を能動 build 中)**: `git log -- BG/Ch4/S14/S15` に
+非常に最近の `feat(BG §14)` 群 (`mem_U_sup_Msigma_iff_isPiElement_kappa_compl` /
+`mem_Msigma_iff_isPiElement_sigma` / `index_U_sup_Msigma_primeFactors_subset_kappa` / Cor 14.10
+σ-length ≤ 2 / fix-W type-P Ẑ ...) = type-P2 K-part geometry の前提。issue 9000
+(sigma-theory-typep-galois-foundation) で claim 済。→ **type-P2 は idle-gate でなく別レーン能動作業に
+gated**。claim-before-build ゆえ lane-b は BG §14 を重複 build しない。heartbeat が正: merge-main で
+BG §14 進捗を拾い、σ-foundation 揃い次第 type-P2 close (escaping_typePA_mem_A1 + engine mirror) を engage。
