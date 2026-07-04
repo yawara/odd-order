@@ -718,6 +718,50 @@ theorem coherence_extension_conj [Fintype G] [Invertible (Nat.card G : ℂ)]
       (F.coherence i hodd hnilp C hFrob).extension_mem_ZIrr ψ (Submodule.subset_span hψ))
     hχS h2
 
+/-- **The residual `Δ = β − 1_G + νζ` is real** (Frobenius; Peterfalvi (7.9)).  The generic
+`delta_isReal` fed the two Frobenius inputs: `hnu_conj = (νζ)‾ = ν(ζ̄)` (= (B)
+`coherence_extension_conj` at the distinguished `ζ ∈ S`, via `hypothesis78_nu_eq`) and
+`hbeta_conj_sub = β̄ − β = νζ − νζ̄` (`hypothesis78_beta_conj_sub`).  Feeds
+`cfdot_real_vchar_even` for the (7.9) `hdelta_even`. -/
+theorem hypothesis78_delta_isReal [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (i : Fin k) (hodd : Odd (Nat.card G))
+    [Fintype ↥(F.L i)] [Invertible (Nat.card ↥(F.L i) : ℂ)]
+    [Invertible (Nat.card ↥((F.H i).subgroupOf (F.L i)) : ℂ)]
+    [((F.H i).subgroupOf (F.L i)).Normal]
+    (hnilp : Group.IsNilpotent ↥((F.H i).subgroupOf (F.L i)))
+    (C : Subgroup ↥(F.L i))
+    (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C) :
+    ClassFunction.IsReal (F.hypothesis78 i hodd hnilp C hFrob).delta := by
+  classical
+  set pf := F.sibleyPlacedFamily i hodd hnilp C hFrob with hpf
+  obtain ⟨j₁, hj₁ne, hj₁⟩ := F.exists_conjIndex_hypothesis78 i hodd hnilp C hFrob
+  have hθ_ne : ∀ j, j ≠ pf.ind1H → pf.θ j ≠ trivialIrreducibleCharacter _ := fun j hj h =>
+    hj (pf.inj (by simp only [h, pf.triv]))
+  have hzeta : ∀ j, (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta j
+      = ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (pf.θ j : ClassFunction _ ℂ) :=
+    fun j => congrFun (F.hypothesis78_hyp76_zeta_eq i hodd hnilp C hFrob) j
+  have hzd_mem : (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta
+        (F.hypothesis78 i hodd hnilp C hFrob).zetaDistinct ∈
+        (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).S := by
+    rw [show (F.hypothesis78 i hodd hnilp C hFrob).zetaDistinct = 0 from rfl, hzeta 0]
+    exact ⟨pf.θ 0, hθ_ne 0 (Ne.symm pf.ind1H_ne_zero), rfl⟩
+  have hj₁_mem : (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta j₁ ∈
+      (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).S := by
+    rw [hzeta j₁]; exact ⟨pf.θ j₁, hθ_ne j₁ hj₁ne, rfl⟩
+  have h2 : ∃ ψ ∈ (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).S,
+      ψ ≠ (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta
+        (F.hypothesis78 i hodd hnilp C hFrob).zetaDistinct :=
+    ⟨_, hj₁_mem, by rw [hj₁]; exact (F.hypothesis78_zeta_ne_conj i hodd hnilp C hFrob).symm⟩
+  have hnu_conj : ((F.hypothesis78 i hodd hnilp C hFrob).nu
+        ((F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta
+          (F.hypothesis78 i hodd hnilp C hFrob).zetaDistinct)).conj
+      = (F.hypothesis78 i hodd hnilp C hFrob).nu
+        ((F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta
+          (F.hypothesis78 i hodd hnilp C hFrob).zetaDistinct).conj := by
+    rw [F.hypothesis78_nu_eq i hodd hnilp C hFrob]
+    exact F.coherence_extension_conj i hodd hnilp C hFrob hzd_mem h2
+  exact delta_isReal (F.hypothesis78 i hodd hnilp C hFrob) hnu_conj
+    (F.hypothesis78_beta_conj_sub i hodd hnilp C hFrob)
 end FrobeniusFamily
 
 end OddOrder.Peterfalvi.S09
