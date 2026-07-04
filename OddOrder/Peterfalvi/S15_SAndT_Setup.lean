@@ -1996,9 +1996,160 @@ theorem normSqSumQ_spec {H : Type*} [Group H] {A : Finset H} {χ : ClassFunction
   rw [normSqSumQ, dif_pos h]
   exact_mod_cast Classical.choose_spec h
 
+/-- **A `p`-subgroup lies in a normal subgroup of coprime-to-`p` index.**  If `W ≤ S`,
+`P.subgroupOf S ⊴ S`, `[S : P]` is coprime to `|P|`, and `p ∣ |P|`, then every element of `W` of
+order dividing `p` lies in `P`: its image in `S/P` has order dividing both `p` and `[S : P]`, hence
+`1`.  Generic group theory (used to place the prime-order factors `W₁`, `W₂` inside the Fitting
+kernels `Q`, `P`). -/
+theorem pgroup_le_of_normal_coprime_index [Finite G]
+    {S P W : Subgroup G} {p : ℕ} (hp : p.Prime)
+    (hWS : W ≤ S) (hPnorm : (P.subgroupOf S).Normal)
+    (hcop : Nat.Coprime (Nat.card ↥P) (P.subgroupOf S).index)
+    (hpP : p ∣ Nat.card ↥P) (hWp : ∀ w ∈ W, orderOf w ∣ p) : W ≤ P := by
+  haveI := hPnorm
+  have hp_not_index : ¬ p ∣ (P.subgroupOf S).index := by
+    intro hdvd
+    have : p ∣ 1 := hcop ▸ Nat.dvd_gcd hpP hdvd
+    exact Nat.Prime.not_dvd_one hp this
+  have hcop2 : Nat.Coprime p (P.subgroupOf S).index :=
+    (hp.coprime_iff_not_dvd).mpr hp_not_index
+  intro w hw
+  have hwS : w ∈ S := hWS hw
+  have horder : orderOf w ∣ p := hWp w hw
+  have hmk : QuotientGroup.mk' (P.subgroupOf S) ⟨w, hwS⟩ = 1 := by
+    rw [← orderOf_eq_one_iff]
+    have hd1 : orderOf (QuotientGroup.mk' (P.subgroupOf S) ⟨w, hwS⟩) ∣ p := by
+      refine (orderOf_map_dvd _ _).trans ?_
+      rw [show orderOf (⟨w, hwS⟩ : ↥S) = orderOf w from
+        (orderOf_injective S.subtype Subtype.coe_injective ⟨w, hwS⟩).symm]
+      exact horder
+    have hd2 : orderOf (QuotientGroup.mk' (P.subgroupOf S) ⟨w, hwS⟩) ∣
+        (P.subgroupOf S).index := orderOf_dvd_natCard _
+    exact Nat.dvd_one.mp (hcop2 ▸ Nat.dvd_gcd hd1 hd2)
+  have hmem : (⟨w, hwS⟩ : ↥S) ∈ P.subgroupOf S := by
+    rw [← QuotientGroup.eq_one_iff, ← QuotientGroup.mk'_apply]
+    exact hmk
+  rwa [Subgroup.mem_subgroupOf] at hmem
+
+/-- **Peterfalvi (13.2.b)/(14.2.a): `W₂ ≤ P`.**  `W₂` is a `p`-group (`|W₂| = p`) inside `S`
+(`W₂ ≤ W = S ⊓ T ≤ S`), while `P = S_F` is the normal Hall `p`-subgroup of `S` of order `p^q`
+(`basic_structure`); hence `W₂ ≤ P` — the `F_p ⊆ F` identification of (14.2.a). -/
+theorem W2_le_P [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) : hyp.W2 ≤ hyp.P := by
+  obtain ⟨_, _, _, hP_card, _, _⟩ := basic_structure _hG hyp
+  have hP_le_S : hyp.P ≤ hyp.S := by
+    rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
+  refine pgroup_le_of_normal_coprime_index (S := hyp.S) hyp.p_prime ?_ ?_ ?_ ?_ ?_
+  · have h1 : hyp.W2 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_right
+    have h2 : hyp.W ≤ hyp.S := by rw [hyp.W_eq_inter]; exact inf_le_left
+    exact h1.trans h2
+  · rw [hyp.P_eq_SF]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal hyp.S
+  · have hHall := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall hyp.S
+    rw [← hyp.P_eq_SF] at hHall
+    have hcard_eq : Nat.card ↥(hyp.P.subgroupOf hyp.S) = Nat.card ↥hyp.P :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hP_le_S).toEquiv
+    exact hcard_eq ▸ Ch03.IsHallSubgroup.coprime_index hHall
+  · rw [hP_card]; exact dvd_pow_self hyp.p hyp.q_prime.pos.ne'
+  · intro w hw
+    have heq : orderOf (⟨w, hw⟩ : ↥hyp.W2) = orderOf w :=
+      (orderOf_injective hyp.W2.subtype Subtype.coe_injective ⟨w, hw⟩).symm
+    have h1 : orderOf (⟨w, hw⟩ : ↥hyp.W2) ∣ Nat.card ↥hyp.W2 := orderOf_dvd_natCard _
+    rw [heq, ← hyp.p_eq_card_W2] at h1
+    exact h1
+
 /-- The distinguished `η₁₀ = τ₃(ω₁₀)` of the (13.7)/(13.9) estimates. -/
 noncomputable def Hypothesis.eta10 (hyp : Hypothesis (G := G)) : ClassFunction G ℂ :=
   hyp.eta ⟨1, hyp.q_prime.one_lt⟩ ⟨0, hyp.p_prime.pos⟩
+
+open scoped FiniteInduce in
+/-- **`η₁₀` is a virtual character of `G`** — real content of the 3002-threaded grid:
+`η₁₀ = τ₃(ω₁₀)` (`eta_eq_tau_omega`), `ω₁₀ ∈ ZIrr W` (`omega_mem_ZIrr`), and `τ₃` preserves
+virtual characters (`tau3_mem_ZIrr`). -/
+theorem Hypothesis.eta10_mem_ZIrr [Finite G] (hyp : Hypothesis (G := G)) :
+    hyp.eta10 ∈ ZIrr G := by
+  rw [Hypothesis.eta10, hyp.eta_eq_tau_omega]
+  exact hyp.tau3_mem_ZIrr _ (hyp.omega_mem_ZIrr _ _)
+
+/-- **Regularity of mixed products**: for `x ∈ W₁ ∖ {1}` and `y ∈ W₂ ∖ {1}` the product `x·y`
+avoids `W₁ ∪ W₂` — otherwise one factor would lie in `W₁ ⊓ W₂ = ⊥`.  The membership feed of
+`tau3_apply_of_regular` in the (1.10) congruence computations. -/
+theorem Hypothesis.mul_notMem_W1_union_W2 (hyp : Hypothesis (G := G))
+    {x y : G} (hx : x ∈ hyp.W1) (hy : y ∈ hyp.W2) (hx1 : x ≠ 1) (hy1 : y ≠ 1) :
+    x * y ∉ (hyp.W1 : Set G) ∪ (hyp.W2 : Set G) := by
+  rintro (hmem | hmem)
+  · have hyW1 : y ∈ hyp.W1 := by
+      have h := mul_mem (inv_mem hx) hmem
+      rwa [inv_mul_cancel_left] at h
+    have hbot : y ∈ hyp.W1 ⊓ hyp.W2 := ⟨hyW1, hy⟩
+    rw [hyp.W1_inf_W2_eq_bot, Subgroup.mem_bot] at hbot
+    exact hy1 hbot
+  · have hxW2 : x ∈ hyp.W2 := by
+      have h := mul_mem hmem (inv_mem hy)
+      rwa [mul_inv_cancel_right] at h
+    have hbot : x ∈ hyp.W1 ⊓ hyp.W2 := ⟨hx, hxW2⟩
+    rw [hyp.W1_inf_W2_eq_bot, Subgroup.mem_bot] at hbot
+    exact hx1 hbot
+
+/-- **Peterfalvi (13.7), the (1.10) congruence for `η₁₀`**: for `y ∈ W₂^#`,
+`η₁₀(y) ≡ 1 (mod (1 − ε))` in the algebraic integers, `ε` a primitive `q`-th root of unity.
+
+Route: pick `x ∈ W₁^#`; `x` commutes with `y`, `x^q = 1`, and `η₁₀ ∈ ℤ[Irr G]`, so the
+(1.10.a) congruence (`exists_integral_apply_sub_of_commute`) gives `η₁₀(xy) ≡ η₁₀(y)`.  The
+product `xy` is `τ₃`-regular (`mul_notMem_W1_union_W2`), so `η₁₀(xy) = ω₁₀(xy)` ((3.2.c));
+the (3.3) grid semantics factorize `ω₁₀(xy) = ω₁₀(x)·ω₁₀(y) = ω₁₀(x)` (issue 2033:
+`omega_mul`, `omega_col_zero_apply_of_mem_W2`), a `q`-th root of unity
+(`omega_pow_q_of_mem_W1`), which is `≡ 1 (mod (1 − ε))` by the geometric-sum identity. -/
+theorem Hypothesis.eta10_apply_sub_one_integral [Finite G] (hyp : Hypothesis (G := G))
+    {ε : ℂ} (hε : IsPrimitiveRoot ε hyp.q) {y : G} (hyW2 : y ∈ hyp.W2) (hy1 : y ≠ 1) :
+    ∃ z : ℂ, IsIntegral ℤ z ∧ hyp.eta10 y - 1 = (1 - ε) * z := by
+  have hW1W : hyp.W1 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_left
+  have hW2W : hyp.W2 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_right
+  -- pick `x ∈ W₁^#`
+  obtain ⟨x, hxW1, hx1⟩ : ∃ x : G, x ∈ hyp.W1 ∧ x ≠ 1 := by
+    haveI : Nontrivial ↥hyp.W1 := Finite.one_lt_card_iff_nontrivial.mp
+      (by rw [← hyp.q_eq_card_W1]; exact hyp.q_prime.one_lt)
+    obtain ⟨x', hx'⟩ := exists_ne (1 : ↥hyp.W1)
+    exact ⟨x', x'.2, fun h => hx' (Subtype.ext h)⟩
+  -- `x^q = 1`
+  have hxq : x ^ hyp.q = 1 := by
+    have h1 : (⟨x, hxW1⟩ : ↥hyp.W1) ^ hyp.q = 1 := by
+      rw [hyp.q_eq_card_W1]; exact pow_card_eq_one'
+    have h2 := congrArg Subtype.val h1
+    rwa [SubmonoidClass.coe_pow, OneMemClass.coe_one] at h2
+  -- (1.10.a): `η₁₀(xy) − η₁₀(y) = (1 − ε)·z₁`
+  obtain ⟨z₁, hz₁int, hz₁⟩ :=
+    OddOrder.RepresentationTheory.exists_integral_apply_sub_of_commute hyp.q_prime.pos hε
+      hyp.eta10_mem_ZIrr hxq (hyp.W1_commutes_W2 x hxW1 y hyW2)
+  -- `τ₃`-regular value: `η₁₀(xy) = ω₁₀(xy)`
+  have hxyW : x * y ∈ hyp.W := mul_mem (hW1W hxW1) (hW2W hyW2)
+  have hreg : hyp.eta10 (x * y)
+      = hyp.omega ⟨1, hyp.q_prime.one_lt⟩ ⟨0, hyp.p_prime.pos⟩ ⟨x * y, hxyW⟩ := by
+    rw [Hypothesis.eta10, hyp.eta_eq_tau_omega]
+    exact hyp.tau3_apply_of_regular _ _ hxyW (hyp.mul_notMem_W1_union_W2 hxW1 hyW2 hx1 hy1)
+  -- factorize: `ω₁₀(xy) = ω₁₀(x)·ω₁₀(y) = ω₁₀(x)` (issue-2033 grid semantics)
+  have hfact : hyp.omega ⟨1, hyp.q_prime.one_lt⟩ ⟨0, hyp.p_prime.pos⟩ ⟨x * y, hxyW⟩
+      = hyp.omega ⟨1, hyp.q_prime.one_lt⟩ ⟨0, hyp.p_prime.pos⟩ ⟨x, hW1W hxW1⟩ := by
+    have hmul : (⟨x * y, hxyW⟩ : ↥hyp.W) = ⟨x, hW1W hxW1⟩ * ⟨y, hW2W hyW2⟩ := rfl
+    rw [hmul, hyp.omega_mul,
+      hyp.omega_col_zero_apply_of_mem_W2 _ ⟨y, hW2W hyW2⟩ hyW2, mul_one]
+  -- `ω₁₀(x)` is a `q`-th root of unity: `= ε^k`
+  have hpow : hyp.omega ⟨1, hyp.q_prime.one_lt⟩ ⟨0, hyp.p_prime.pos⟩ ⟨x, hW1W hxW1⟩ ^ hyp.q
+      = 1 := hyp.omega_pow_q_of_mem_W1 _ _ ⟨x, hW1W hxW1⟩ hxW1
+  haveI : NeZero hyp.q := ⟨hyp.q_prime.pos.ne'⟩
+  obtain ⟨k, -, hk⟩ := hε.eq_pow_of_pow_eq_one hpow
+  -- `ε^k − 1 = (1 − ε)·z₂` with `z₂` integral (geometric sum)
+  have hε_mem : ε ∈ integralClosure ℤ ℂ := hε.isIntegral hyp.q_prime.pos
+  have hz₂int : IsIntegral ℤ (-(∑ i ∈ Finset.range k, ε ^ i)) :=
+    (Subalgebra.sum_mem _ (fun i _ => Subalgebra.pow_mem _ hε_mem i) :
+      IsIntegral ℤ (∑ i ∈ Finset.range k, ε ^ i)).neg
+  have hz₂ : ε ^ k - 1 = (1 - ε) * (-(∑ i ∈ Finset.range k, ε ^ i)) := by
+    rw [← geom_sum_mul ε k]; ring
+  -- combine: `η₁₀(y) − 1 = (η₁₀(xy) − (1−ε)z₁) − 1 = (ε^k − 1) − (1−ε)z₁`
+  refine ⟨-(∑ i ∈ Finset.range k, ε ^ i) - z₁, hz₂int.sub hz₁int, ?_⟩
+  have hyval : hyp.eta10 y = hyp.eta10 (x * y) - (1 - ε) * z₁ := by linear_combination -hz₁
+  rw [hyval, hreg, hfact, ← hk]
+  linear_combination hz₂
 
 /-! ### The (13.9)/(13.10) counting layer
 
@@ -2716,14 +2867,8 @@ theorem Hypothesis.caseB_vd_facts (hyp : Hypothesis (G := G))
     omega
   exact ⟨hd1, hv2, by rw [hd1, mul_one]; omega⟩
 
-open scoped FiniteInduce in
-/-- **`η₁₀` is a virtual character of `G`** — real content of the 3002-threaded grid:
-`η₁₀ = τ₃(ω₁₀)` (`eta_eq_tau_omega`), `ω₁₀ ∈ ZIrr W` (`omega_mem_ZIrr`), and `τ₃` preserves
-virtual characters (`tau3_mem_ZIrr`). -/
-theorem Hypothesis.eta10_mem_ZIrr [Finite G] (hyp : Hypothesis (G := G)) :
-    hyp.eta10 ∈ ZIrr G := by
-  rw [Hypothesis.eta10, hyp.eta_eq_tau_omega]
-  exact hyp.tau3_mem_ZIrr _ (hyp.omega_mem_ZIrr _ _)
+/- `Hypothesis.eta10_mem_ZIrr` moved up next to the `eta10` definition (issue 2033:
+the (1.10) congruence helper cites it). -/
 
 open scoped FiniteInduce in
 /-- **`‖η₁₀‖² = 1`** — real content of the 3002-threaded grid: `τ₃` is an isometry
@@ -3166,7 +3311,45 @@ on the (1.10)/(3.2.c) grid congruences. -/
 theorem eta10_alphaCF_one_ne_zero [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     H_sharp_alphaCF hG hyp hyp.eta10 1 ≠ 0 := by
-  sorry
+  classical
+  intro hzero
+  -- pick `y ∈ W₂^#`
+  obtain ⟨y', hy'⟩ : ∃ y' : ↥hyp.W2, y' ≠ 1 := by
+    haveI : Nontrivial ↥hyp.W2 := Finite.one_lt_card_iff_nontrivial.mp
+      (by rw [← hyp.p_eq_card_W2]; exact hyp.p_prime.one_lt)
+    exact exists_ne 1
+  have hyW2 : (y' : G) ∈ hyp.W2 := y'.2
+  have hy1 : (y' : G) ≠ 1 := fun h => hy' (Subtype.ext h)
+  -- `y ∈ P ≤ H`, `y ∈ S`
+  have hyP : (y' : G) ∈ hyp.P := W2_le_P hG hyp hyW2
+  have hPS : hyp.P ≤ hyp.S := by
+    rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
+  have hyS : (y' : G) ∈ hyp.S := hPS hyP
+  have hyH : (y' : G) ∈ hyp.H := (le_sup_left : hyp.P ≤ hyp.H) hyP
+  -- kernel-only point formula (`eta10_cCoeff_orthogonal`): `η₁₀(y) = α(y)`
+  have hval : hyp.eta10 ((⟨(y' : G), hyS⟩ : ↥hyp.S) : G)
+      = H_sharp_alphaFun hG hyp hyp.eta10 ⟨(y' : G), hyS⟩ :=
+    H_sharp_point_formula_kernel_only hG hyp hyp.eta10
+      (eta10_cCoeff_orthogonal hG hyp) ⟨(y' : G), hyS⟩
+      (by rw [OddOrder.Peterfalvi.S04.mem_sharp]; exact ⟨hyH, hy1⟩)
+  -- `α(y) = α(1) = 0` (`P`-constancy + the assumption)
+  have hconst := H_sharp_alphaFun_const_on_P hG hyp hyp.eta10 ⟨(y' : G), hyS⟩
+    (Subgroup.mem_subgroupOf.mpr hyP)
+  have halpha0 : H_sharp_alphaFun hG hyp hyp.eta10 1 = 0 := by
+    rw [← H_sharp_alphaCF_apply hG hyp hyp.eta10 1]; exact hzero
+  have heta0 : hyp.eta10 (y' : G) = 0 := by
+    have := hval.trans (hconst.trans halpha0)
+    exact this
+  -- the (1.10) congruence: `η₁₀(y) ≡ 1 (mod (1 − ε))`, so `η₁₀(y) = 0` forces `q ∣ 1`
+  obtain ⟨z, hzint, hz⟩ := hyp.eta10_apply_sub_one_integral
+    (Complex.isPrimitiveRoot_exp hyp.q hyp.q_prime.pos.ne') hyW2 hy1
+  rw [heta0, zero_sub] at hz
+  have hdvd : (hyp.q : ℤ) ∣ (-1 : ℤ) :=
+    OddOrder.RepresentationTheory.int_dvd_of_one_sub_primRoot_dvd hyp.q_prime
+      (Complex.isPrimitiveRoot_exp hyp.q hyp.q_prime.pos.ne') hzint (by exact_mod_cast hz)
+  have hle : (hyp.q : ℤ) ≤ 1 := Int.le_of_dvd one_pos (dvd_neg.mp hdvd)
+  have := hyp.q_prime.one_lt
+  omega
 
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce Classical in
 /-- **Peterfalvi (13.5) for `χ = η₁₀`, `a = 0`** — the correction datum of the (13.7) estimate.
