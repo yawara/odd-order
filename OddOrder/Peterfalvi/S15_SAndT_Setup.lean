@@ -1681,6 +1681,14 @@ theorem disjoint_conjClassSet_sharp_H_Q [Finite G] (hG : OddOrder.BG.IsMinimalSi
     rwa [Subgroup.orderOf_mk a (SetLike.mem_coe.mp haH)] at h1
   exact hyp.q_not_dvd_card_H hG (hqdvd_a.trans hadvd)
 
+/-- Membership in the generic set `G₀`, unfolded: nonidentity and in neither saturation. -/
+theorem Hypothesis.mem_G0_iff (hyp : Hypothesis (G := G)) (x : G) :
+    x ∈ hyp.G0 ↔ x ≠ 1 ∧ x ∉ conjClassSet (sharpSubgroup hyp.H)
+      ∧ x ∉ conjClassSet (sharpSubgroup hyp.Q) := by
+  show x ∈ sharpSubgroup (⊤ : Subgroup G) \ _ ↔ _
+  simp only [sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe,
+    Subgroup.mem_top, true_and, Set.mem_union, not_or]
+
 open scoped Classical in
 /-- **The four-piece split of a conjugation-invariant sum** (the (13.10) counting skeleton):
 for a conjugation-invariant `f`,
@@ -1731,12 +1739,7 @@ theorem Hypothesis.sum_univ_split [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleO
   have hne1H : ∀ x ∈ CH, x ≠ 1 := fun x hx => hne1 hyp.H x ((hmemCH x).mp hx)
   have hne1Q : ∀ x ∈ CQ, x ≠ 1 := fun x hx => hne1 hyp.Q x ((hmemCQ x).mp hx)
   -- `G₀` misses `1` and both saturations (definitional).
-  have hG0iff : ∀ x : G, x ∈ hyp.G0 ↔
-      x ≠ 1 ∧ x ∉ conjClassSet (sharpSubgroup hyp.H) ∧ x ∉ conjClassSet (sharpSubgroup hyp.Q) := by
-    intro x
-    show x ∈ sharpSubgroup (⊤ : Subgroup G) \ _ ↔ _
-    simp only [sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe,
-      Subgroup.mem_top, true_and, Set.mem_union, not_or]
+  have hG0iff := hyp.mem_G0_iff
   -- The partition: `univ = {1} ∪ G₀ ∪ CH ∪ CQ`, pairwise disjoint.
   have hcover : (Finset.univ : Finset G) = insert 1 (hyp.G0Finset ∪ CH ∪ CQ) := by
     ext x
@@ -1853,6 +1856,83 @@ theorem Hypothesis.card_univ_split [Fintype G] (hG : OddOrder.BG.IsMinimalSimple
   rw [Nat.card_eq_fintype_card]
   exact h
 
+/-- **`G₀` is cyclic-closed**: closed under `x ↦ x^k` for `k` coprime to `|G|` — the hypothesis
+shape of the Galois integrality `exists_nat_sum_normSq_of_mem_ZIrr_of_cyclicClosed` (and of
+[Is] Lemma 3.14) that makes the (13.10) atoms `slam`/`seta` rational.  The coprime power is
+undone by a further coprime power (Euler), so `x^k = 1` forces `x = 1`, and a conjugate of
+`H^#`/`Q^#` hitting `x^k` pulls back to one hitting `x` (subgroups are power-closed). -/
+theorem Hypothesis.G0Finset_cyclicClosed [Finite G] (hyp : Hypothesis (G := G)) :
+    ∀ x ∈ hyp.G0Finset, ∀ k : ℕ, k.Coprime (Nat.card G) → x ^ k ∈ hyp.G0Finset := by
+  intro x hx k hk
+  rw [Hypothesis.G0Finset, Set.Finite.mem_toFinset] at hx ⊢
+  obtain ⟨hx1, hxH, hxQ⟩ := (hyp.mem_G0_iff x).mp hx
+  -- Euler round-trip: `(x^k)^(k^(φ(|G|)−1)) = x`.
+  have hN0 : Nat.card G ≠ 0 := Nat.card_pos.ne'
+  set t := (Nat.card G).totient with htdef
+  have ht1 : 1 ≤ t := Nat.totient_pos.mpr (Nat.pos_of_ne_zero hN0)
+  set m : ℕ := k ^ (t - 1) with hmdef
+  have hround : (x ^ k) ^ m = x := by
+    rw [hmdef, ← pow_mul]
+    have hkt : k * k ^ (t - 1) = k ^ t := by rw [← pow_succ']; congr 1; omega
+    rw [hkt]
+    have hord : orderOf x ∣ Nat.card G := orderOf_dvd_natCard x
+    have hmod : k ^ t ≡ 1 [MOD orderOf x] := (Nat.ModEq.pow_totient hk).of_dvd hord
+    rw [pow_eq_pow_iff_modEq.mpr hmod, pow_one]
+  -- Conjugates of `K^#` hitting `x^k` pull back to `x`.
+  have hpull : ∀ K : Subgroup G, x ^ k ∈ conjClassSet (sharpSubgroup K) →
+      x ∈ conjClassSet (sharpSubgroup K) := by
+    intro K hmem
+    obtain ⟨a, ⟨haK, ha1⟩, g, hg⟩ := mem_conjClassSet.mp hmem
+    refine mem_conjClassSet.mpr ⟨a ^ m, ⟨?_, ?_⟩, g, ?_⟩
+    · exact SetLike.mem_coe.mpr (pow_mem (SetLike.mem_coe.mp haK) m)
+    · intro h1
+      rw [Set.mem_singleton_iff] at h1
+      refine hx1 ?_
+      rw [← hround, ← hg, conj_pow, h1, mul_one, mul_inv_cancel]
+    · rw [← conj_pow, hg, hround]
+  refine (hyp.mem_G0_iff _).mpr ⟨?_, fun h => hxH (hpull _ h), fun h => hxQ (hpull _ h)⟩
+  intro h1
+  refine hx1 ?_
+  rw [← hround, h1, one_pow]
+
+/-- `|T'| = |Q|·(vd)` — the `T`-side derived-subgroup order decomposition
+(`derived_complement` of the reconciled type-`P` datum). -/
+theorem Hypothesis.card_deriv_T_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    Nat.card ↥(derivedInG hyp.T) = Nat.card ↥hyp.Q * (hyp.v * hyp.d) := by
+  obtain ⟨tpd, hU, -, -⟩ := reconciled_typePData_T hG hyp
+  have h2 := tpd.derived_complement.card_mul
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe tpd.H_le).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe tpd.U_le).toEquiv, tpd.H_eq, ← hyp.Q_eq_TF,
+    hU, hyp.card_V_eq_vd] at h2
+  exact h2.symm
+
+open scoped FiniteInduce in
+/-- **Global Parseval four-piece split** for a norm-`1` class function (the shared spine of the
+Peterfalvi (13.10.1)/(13.10.2) estimates):
+
+  `|G| = ‖φ(1)‖² + ∑_{G₀}‖φ‖² + [G:S]·∑_{H^#}‖φ‖² + [G:T]·∑_{Q^#}‖φ‖²`.
+
+The total `∑_G ‖φ‖² = |G|·⟨φ,φ⟩ = |G|` (Parseval, `sum_normSq_eq_card_mul_inner`), split by the
+four-piece decomposition `sum_univ_split` (the summand `‖φ(·)‖²` is conjugation-invariant since
+`φ` is a class function). -/
+theorem Hypothesis.global_normSq_split [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (φ : ClassFunction G ℂ)
+    (hn : ClassFunction.inner φ φ = 1)
+    (hcardQ : Nat.card ↥hyp.Q = hyp.q ^ hyp.p) (hvd : hyp.v * hyp.d ≠ 1) :
+    (Nat.card G : ℝ)
+      = ‖φ 1‖ ^ 2 + (∑ x ∈ hyp.G0Finset, ‖φ x‖ ^ 2)
+        + hyp.S.index • (∑ x ∈ (Set.toFinite (sharpSubgroup hyp.H)).toFinset, ‖φ x‖ ^ 2)
+        + hyp.T.index • (∑ x ∈ (Set.toFinite (sharpSubgroup hyp.Q)).toFinset, ‖φ x‖ ^ 2) := by
+  have hsplit := hyp.sum_univ_split hG (fun x => ‖φ x‖ ^ 2)
+    (fun g x => by
+      show ‖φ (g * x * g⁻¹)‖ ^ 2 = ‖φ x‖ ^ 2
+      rw [ClassFunction.conj_eq φ x g]) hcardQ hvd
+  have htotal : ((∑ x : G, ‖φ x‖ ^ 2 : ℝ) : ℂ) = (Nat.card G : ℂ) := by
+    rw [sum_normSq_eq_card_mul_inner, hn, mul_one]
+  have htotalR : ∑ x : G, ‖φ x‖ ^ 2 = (Nat.card G : ℝ) := by exact_mod_cast htotal
+  rw [← htotalR, hsplit]
+
 end CountingLayer
 
 /-! ### The four (13.6)–(13.9) estimate producers
@@ -1872,16 +1952,169 @@ they assemble into `analyticInequalityEstimates` `sorry`-free.  Remaining gates,
   (`sum_normSq_ge_ncard_of_isCharacter_of_cyclicClosed`) + the (13.9) nonvanishing dichotomy
   (`λ^{τ₁}`, `η₁₀` do not vanish simultaneously on `G₀`). -/
 
-/-- **Peterfalvi (13.6) + Parseval, atom form**: `1 ≥ 1/|G| + slam + 1 − uq/(cp^q)`. -/
+/-- The (13.4) case-(b) parameters, unpacked: `d = 1`, `v ≥ 2`, and (for the type-V exclusion
+of the counting layer) `vd ≠ 1`. -/
+theorem Hypothesis.caseB_vd_facts (hyp : Hypothesis (G := G))
+    (hD : hyp.D = ⊥) (hv : hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1)) :
+    hyp.d = 1 ∧ 2 ≤ hyp.v ∧ hyp.v * hyp.d ≠ 1 := by
+  have hd1 : hyp.d = 1 := by rw [hyp.d_eq_card_D, hD, Subgroup.card_bot]
+  have hq3 : 3 ≤ hyp.q := hyp.three_le_q
+  have hqp_ge : hyp.q * hyp.q ≤ hyp.q ^ hyp.p := by
+    calc hyp.q * hyp.q = hyp.q ^ 2 := (sq hyp.q).symm
+      _ ≤ hyp.q ^ hyp.p := Nat.pow_le_pow_right (by omega)
+        (by have := hyp.three_le_p; omega)
+  have hv2 : 2 ≤ hyp.v := by
+    rw [hv, Nat.le_div_iff_mul_le (by omega : 0 < hyp.q - 1)]
+    have h3q : 3 * hyp.q ≤ hyp.q * hyp.q := Nat.mul_le_mul_right _ hq3
+    omega
+  exact ⟨hd1, hv2, by rw [hd1, mul_one]; omega⟩
+
+open scoped FiniteInduce in
+/-- **`η₁₀` is a virtual character of `G`** — real content of the 3002-threaded grid:
+`η₁₀ = τ₃(ω₁₀)` (`eta_eq_tau_omega`), `ω₁₀ ∈ ZIrr W` (`omega_mem_ZIrr`), and `τ₃` preserves
+virtual characters (`tau3_mem_ZIrr`). -/
+theorem Hypothesis.eta10_mem_ZIrr [Finite G] (hyp : Hypothesis (G := G)) :
+    hyp.eta10 ∈ ZIrr G := by
+  rw [Hypothesis.eta10, hyp.eta_eq_tau_omega]
+  exact hyp.tau3_mem_ZIrr _ (hyp.omega_mem_ZIrr _ _)
+
+open scoped FiniteInduce in
+/-- **`‖η₁₀‖² = 1`** — real content of the 3002-threaded grid: `τ₃` is an isometry
+(`tau3_isometry`) and the `ω`-grid is orthonormal (`omega_orthonormal`). -/
+theorem Hypothesis.eta10_inner_self_one [Finite G] (hyp : Hypothesis (G := G)) :
+    ClassFunction.inner hyp.eta10 hyp.eta10 = 1 := by
+  rw [Hypothesis.eta10, hyp.eta_eq_tau_omega, hyp.tau3_isometry.inner_eq,
+    hyp.omega_orthonormal]
+  simp
+
+open scoped FiniteInduce in
+/-- **`λ^{τ₁}` is a norm-one virtual character** — the (13.2.d)/(13.3) coherence-isometry facts
+for the distinguished `λ`: `τ₁` extends the Dade isometry isometrically on `ℤ[S] ∋ λ`, and `λ`
+is irreducible.  Faithful producer; gated on the (13.3) analysis (`character_degree_analysis`)
+pinning `tau1S` to the coherence extension of (13.2.d). -/
+theorem lambda_tau1_norm_one [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {hyp : Hypothesis (G := G)} (chars : CharacterDegreeData hyp)
+    (_hlam : chars.lambda_induced_from_PC_linear) :
+    chars.tau1S chars.lambda ∈ ZIrr G ∧
+      ClassFunction.inner (chars.tau1S chars.lambda) (chars.tau1S chars.lambda) = 1 := by
+  sorry
+
+/-- **Peterfalvi (13.6), textbook form**: `∑_{x∈H^#}|λ^{τ₁}(x)|² ≥ |S| − λ(1)²` (`λ(1) = uq`),
+as a sum over the ambient sharp `H^# ⊂ G`.  Faithful producer; the (13.5) ρ-machinery
+(`caseB_lambda_norm_bound` + `H_sharp_hypothesis76`) discharges it once the (13.5.a) point
+formula is pinned to `λ^{τ₁}` — the residual is the (13.2.e) `τ`-agreement and the `u`-bound
+`2u ≤ |P|−1` (issue 9000). -/
+theorem lambda_tau1_sharp_norm_lower [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {hyp : Hypothesis (G := G)} (chars : CharacterDegreeData hyp)
+    (_hlam : chars.lambda_induced_from_PC_linear) :
+    (Nat.card ↥hyp.S : ℝ) - ((hyp.u * hyp.q : ℕ) : ℝ) ^ 2
+      ≤ ∑ x ∈ (Set.toFinite (sharpSubgroup hyp.H)).toFinset,
+          ‖chars.tau1S chars.lambda x‖ ^ 2 := by
+  sorry
+
+/-- **Peterfalvi (13.7), textbook form**: `∑_{x∈H^#}|η₁₀(x)|² ≥ |H^#|`, as a sum over the
+ambient sharp `H^# ⊂ G`.  Faithful producer; the engine is `caseB_eta_norm_bound` — the
+residual is the (13.5.a) `a = 0` point formula for `η₁₀` on `H^#`. -/
+theorem eta10_sharp_norm_lower [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    (Nat.card ↥hyp.H : ℝ) - 1
+      ≤ ∑ x ∈ (Set.toFinite (sharpSubgroup hyp.H)).toFinset, ‖hyp.eta10 x‖ ^ 2 := by
+  sorry
+
+/-- **Peterfalvi (13.8) applied to `T`**: `∑_{x∈Q^#}|η₁₀(x)|² ≥ |T'| − v²`, as a sum over the
+ambient sharp `Q^# ⊂ G`.  Faithful producer; the engine is `caseB_eta01_norm_bound` on the
+`T`-side (13.5) machinery (the `K^# = Q^#` Dade datum, `D = 1`). -/
+theorem eta10_Qsharp_norm_lower [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    (Nat.card ↥(derivedInG hyp.T) : ℝ) - (hyp.v : ℝ) ^ 2
+      ≤ ∑ x ∈ (Set.toFinite (sharpSubgroup hyp.Q)).toFinset, ‖hyp.eta10 x‖ ^ 2 := by
+  sorry
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (13.6) + Parseval, atom form**: `1 ≥ 1/|G| + slam + 1 − uq/(cp^q)`.
+
+The (13.10.1) estimate: global Parseval for `λ^{τ₁}` (`global_normSq_split`, real), the
+`‖λ^{τ₁}(1)‖² ≥ 1` term (`one_le_normSq_apply_one_of_mem_ZIrr_of_inner_self_one`, real from
+`lambda_tau1_norm_one`), the `G₀`-sum read as the rational atom (`normSqSumQ_spec` +
+`G0Finset_cyclicClosed` + Galois integrality, real), the `H^#`-sum bounded by (13.6)
+(`lambda_tau1_sharp_norm_lower`), the `Q^#`-sum dropped, and `|S| = p^q(uc)q` (`card_S_val`). -/
 theorem analyticEstimate_lambda [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (chars : CharacterDegreeData hyp) :
     (1 : ℚ) ≥ 1 / (Nat.card G : ℚ)
         + normSqSumQ hyp.G0Finset (chars.tau1S chars.lambda) / (Nat.card G : ℚ) + 1
         - (hyp.u : ℚ) * (hyp.q : ℚ) / ((hyp.c : ℚ) * (hyp.p : ℚ) ^ hyp.q) := by
-  sorry
+  classical
+  have hlam := chars.lambda_induced_from_PC_linear_holds
+  obtain ⟨hZ, hn⟩ := lambda_tau1_norm_one _hG chars hlam
+  obtain ⟨hD, hv, hQ⟩ := lambda_forces_T_caseB _hG chars hlam
+  obtain ⟨hd1, hv2, hvd⟩ := hyp.caseB_vd_facts hD hv
+  set φ : ClassFunction G ℂ := chars.tau1S chars.lambda with hφdef
+  -- Global Parseval split and the term bounds.
+  have hsplit := hyp.global_normSq_split _hG φ hn hQ hvd
+  have hone : (1 : ℝ) ≤ ‖φ 1‖ ^ 2 :=
+    OddOrder.RepresentationTheory.one_le_normSq_apply_one_of_mem_ZIrr_of_inner_self_one hZ hn
+  have hsharp := lambda_tau1_sharp_norm_lower _hG chars hlam
+  rw [← hφdef] at hsharp
+  have hQnonneg : (0 : ℝ) ≤ (hyp.T.index : ℝ)
+      * ∑ x ∈ (Set.toFinite (sharpSubgroup hyp.Q)).toFinset, ‖φ x‖ ^ 2 := by
+    have h1 : (0 : ℝ) ≤ ∑ x ∈ (Set.toFinite (sharpSubgroup hyp.Q)).toFinset, ‖φ x‖ ^ 2 :=
+      Finset.sum_nonneg fun x _ => by positivity
+    positivity
+  -- The rational atom is the `G₀`-sum.
+  have hGal := OddOrder.Algebra.exists_nat_sum_normSq_of_mem_ZIrr_of_cyclicClosed hZ
+    hyp.G0Finset_cyclicClosed
+  have hspec := normSqSumQ_spec hGal
+  -- Cardinalities.
+  have hg0 : (0 : ℝ) < (Nat.card G : ℝ) := by exact_mod_cast Nat.card_pos (α := G)
+  have hGeq : (Nat.card G : ℝ)
+      = (hyp.p : ℝ) ^ hyp.q * ((hyp.u : ℝ) * (hyp.c : ℝ)) * (hyp.q : ℝ)
+        * (hyp.S.index : ℝ) := by
+    have h := hyp.S.card_mul_index
+    rw [hyp.card_S_val _hG] at h
+    exact_mod_cast h.symm
+  have hc0 : (0 : ℝ) < (hyp.c : ℝ) := by
+    have : 0 < hyp.c := by rw [hyp.c_eq_card_C]; exact Nat.card_pos
+    exact_mod_cast this
+  have hp0 : (0 : ℝ) < (hyp.p : ℝ) := by
+    have := hyp.three_le_p; exact_mod_cast (by omega : 0 < hyp.p)
+  -- Assemble in ℝ, then cast.
+  rw [ge_iff_le, ← Rat.cast_le (K := ℝ)]
+  push_cast
+  rw [hspec]
+  set s : ℝ := ∑ x ∈ hyp.G0Finset, ‖φ x‖ ^ 2 with hsdef
+  set w : ℝ := (hyp.u : ℝ) * (hyp.q : ℝ) / ((hyp.c : ℝ) * (hyp.p : ℝ) ^ hyp.q) with hwdef
+  -- `w·|G| = [G:S]·(uq)²`.
+  have hwg : w * (Nat.card G : ℝ) = (hyp.S.index : ℝ) * ((hyp.u : ℝ) * (hyp.q : ℝ)) ^ 2 := by
+    rw [hwdef, hGeq]
+    field_simp
+  -- `1 + s ≤ w·|G|` from the split.
+  have hSidx0 : (0 : ℝ) ≤ (hyp.S.index : ℝ) := by positivity
+  have hkey : 1 + s ≤ w * (Nat.card G : ℝ) := by
+    rw [hwg]
+    have hSGeq : (hyp.S.index : ℝ) * (Nat.card ↥hyp.S : ℝ) = (Nat.card G : ℝ) := by
+      exact_mod_cast mul_comm (Nat.card ↥hyp.S) hyp.S.index ▸ hyp.S.card_mul_index
+    have huq : ((hyp.u * hyp.q : ℕ) : ℝ) = (hyp.u : ℝ) * (hyp.q : ℝ) := by push_cast; ring
+    rw [huq] at hsharp
+    have hHbound := mul_le_mul_of_nonneg_left hsharp hSidx0
+    rw [nsmul_eq_mul, nsmul_eq_mul] at hsplit
+    linarith [hsplit, hone, hHbound, hQnonneg, hSGeq]
+  -- Final division.
+  have hdiv : (1 + s) / (Nat.card G : ℝ) ≤ w :=
+    (div_le_iff₀ hg0).mpr (by linarith [hkey])
+  calc 1 / (Nat.card G : ℝ) + s / (Nat.card G : ℝ) + 1 - w
+      = (1 + s) / (Nat.card G : ℝ) + 1 - w := by rw [add_div]
+    _ ≤ w + 1 - w := by linarith [hdiv]
+    _ = 1 := by ring
 
+open scoped FiniteInduce in
 /-- **Peterfalvi (13.7)+(13.8) for `T` (`D = 1`), atom form**:
-`1 ≥ 1/|G| + seta + HS + TT` with `TT` the (13.4) counting value. -/
+`1 ≥ 1/|G| + seta + HS + TT` with `TT` the (13.4) counting value.
+
+The (13.10.2) estimate: global Parseval for `η₁₀` (`global_normSq_split`; the norm-one facts
+are *real*, from the 3002-threaded grid: `eta10_mem_ZIrr`/`eta10_inner_self_one`), the
+`G₀`-sum read as the rational atom, the `H^#`-sum bounded by (13.7) (`eta10_sharp_norm_lower`),
+the `Q^#`-sum bounded by (13.8)-for-`T` (`eta10_Qsharp_norm_lower`), and the (13.4) values
+collapsing `(|T'|−v²)/|T|` to the stated `TT`. -/
 theorem analyticEstimate_eta [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     (1 : ℚ) ≥ 1 / (Nat.card G : ℚ)
@@ -1889,7 +2122,126 @@ theorem analyticEstimate_eta [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
         + ((Nat.card hyp.H - 1 : ℕ) : ℚ) / (Nat.card hyp.S : ℚ)
         + (1 / (hyp.p : ℚ) - 1 / ((hyp.p : ℚ) * ((hyp.q : ℚ) - 1))
           + 1 / ((hyp.p : ℚ) * ((hyp.q : ℚ) - 1) * (hyp.q : ℚ) ^ hyp.p)) := by
-  sorry
+  classical
+  obtain ⟨chars, -, -, -⟩ := character_degree_analysis _hG hyp
+  have hlam := chars.lambda_induced_from_PC_linear_holds
+  obtain ⟨hD, hv, hQ⟩ := lambda_forces_T_caseB _hG chars hlam
+  obtain ⟨hd1, hv2, hvd⟩ := hyp.caseB_vd_facts hD hv
+  have hZ := hyp.eta10_mem_ZIrr
+  have hn := hyp.eta10_inner_self_one
+  -- Global Parseval split and the term bounds.
+  have hsplit := hyp.global_normSq_split _hG hyp.eta10 hn hQ hvd
+  have hone : (1 : ℝ) ≤ ‖hyp.eta10 1‖ ^ 2 :=
+    OddOrder.RepresentationTheory.one_le_normSq_apply_one_of_mem_ZIrr_of_inner_self_one hZ hn
+  have hsharpH := eta10_sharp_norm_lower _hG hyp
+  have hsharpQ := eta10_Qsharp_norm_lower _hG hyp
+  -- The rational atom is the `G₀`-sum.
+  have hGal := OddOrder.Algebra.exists_nat_sum_normSq_of_mem_ZIrr_of_cyclicClosed hZ
+    hyp.G0Finset_cyclicClosed
+  have hspec := normSqSumQ_spec hGal
+  -- Cardinalities and casts.
+  have hg0 : (0 : ℝ) < (Nat.card G : ℝ) := by exact_mod_cast Nat.card_pos (α := G)
+  have hq3 : 3 ≤ hyp.q := hyp.three_le_q
+  have hp3 : 3 ≤ hyp.p := hyp.three_le_p
+  have hqp1 : (1 : ℕ) ≤ hyp.q ^ hyp.p := Nat.one_le_pow _ _ (by omega)
+  have hdvd : (hyp.q - 1) ∣ (hyp.q ^ hyp.p - 1) := by
+    simpa only [one_pow] using Nat.sub_dvd_pow_sub_pow hyp.q 1 hyp.p
+  have hvq : (hyp.v : ℝ) * ((hyp.q : ℝ) - 1) = (hyp.q : ℝ) ^ hyp.p - 1 := by
+    have h := Nat.div_mul_cancel hdvd
+    rw [← hv] at h
+    have := congrArg (Nat.cast (R := ℝ)) h
+    push_cast [Nat.cast_sub (by omega : (1:ℕ) ≤ hyp.q), Nat.cast_sub hqp1] at this
+    convert this using 2 <;> push_cast <;> ring
+  have hderivT : (Nat.card ↥(derivedInG hyp.T) : ℝ) = (hyp.q : ℝ) ^ hyp.p * (hyp.v : ℝ) := by
+    have h := hyp.card_deriv_T_eq _hG
+    rw [hQ, hd1, mul_one] at h
+    exact_mod_cast h
+  have hTval : (Nat.card ↥hyp.T : ℝ) = (hyp.q : ℝ) ^ hyp.p * (hyp.v : ℝ) * (hyp.p : ℝ) := by
+    have h := hyp.card_T_eq _hG
+    rw [hQ, hd1, mul_one] at h
+    exact_mod_cast h
+  have hSGeq : (hyp.S.index : ℝ) * (Nat.card ↥hyp.S : ℝ) = (Nat.card G : ℝ) := by
+    exact_mod_cast mul_comm (Nat.card ↥hyp.S) hyp.S.index ▸ hyp.S.card_mul_index
+  have hTGeq : (hyp.T.index : ℝ) * (Nat.card ↥hyp.T : ℝ) = (Nat.card G : ℝ) := by
+    exact_mod_cast mul_comm (Nat.card ↥hyp.T) hyp.T.index ▸ hyp.T.card_mul_index
+  have hS0 : (0 : ℝ) < (Nat.card ↥hyp.S : ℝ) := by
+    exact_mod_cast Nat.card_pos (α := ↥hyp.S)
+  have hT0 : (0 : ℝ) < (Nat.card ↥hyp.T : ℝ) := by
+    exact_mod_cast Nat.card_pos (α := ↥hyp.T)
+  have hSidx0 : (0 : ℝ) < (hyp.S.index : ℝ) := by
+    rcases (Nat.cast_pos (α := ℝ)).mpr (Nat.pos_of_ne_zero
+      (Subgroup.index_ne_zero_of_finite (H := hyp.S))) with h
+    exact h
+  have hTidx0 : (0 : ℝ) < (hyp.T.index : ℝ) := by
+    rcases (Nat.cast_pos (α := ℝ)).mpr (Nat.pos_of_ne_zero
+      (Subgroup.index_ne_zero_of_finite (H := hyp.T))) with h
+    exact h
+  have hp0 : (0 : ℝ) < (hyp.p : ℝ) := by exact_mod_cast (by omega : 0 < hyp.p)
+  have hq10 : (0 : ℝ) < (hyp.q : ℝ) - 1 := by
+    have : (3 : ℝ) ≤ (hyp.q : ℝ) := by exact_mod_cast hq3
+    linarith
+  have hqp0 : (0 : ℝ) < (hyp.q : ℝ) ^ hyp.p := by
+    have : (0 : ℝ) < (hyp.q : ℝ) := by exact_mod_cast (by omega : 0 < hyp.q)
+    positivity
+  have hv0 : (0 : ℝ) < (hyp.v : ℝ) := by exact_mod_cast (by omega : 0 < hyp.v)
+  -- Cast the goal to ℝ.
+  rw [ge_iff_le, ← Rat.cast_le (K := ℝ)]
+  push_cast
+  rw [hspec]
+  set s : ℝ := ∑ x ∈ hyp.G0Finset, ‖hyp.eta10 x‖ ^ 2 with hsdef
+  set sH : ℝ := ∑ x ∈ (Set.toFinite (sharpSubgroup hyp.H)).toFinset, ‖hyp.eta10 x‖ ^ 2
+    with hsHdef
+  set sQ : ℝ := ∑ x ∈ (Set.toFinite (sharpSubgroup hyp.Q)).toFinset, ‖hyp.eta10 x‖ ^ 2
+    with hsQdef
+  rw [nsmul_eq_mul, nsmul_eq_mul] at hsplit
+  -- The `TT` value equals `(|T'| − v²)/|T|`.
+  set TT : ℝ := 1 / (hyp.p : ℝ) - 1 / ((hyp.p : ℝ) * ((hyp.q : ℝ) - 1))
+      + 1 / ((hyp.p : ℝ) * ((hyp.q : ℝ) - 1) * (hyp.q : ℝ) ^ hyp.p) with hTTdef
+  have hveq : (hyp.v : ℝ) = ((hyp.q : ℝ) ^ hyp.p - 1) / ((hyp.q : ℝ) - 1) := by
+    rw [eq_div_iff hq10.ne']
+    exact hvq
+  have hTT : TT = ((Nat.card ↥(derivedInG hyp.T) : ℝ) - (hyp.v : ℝ) ^ 2)
+      / (Nat.card ↥hyp.T : ℝ) := by
+    rw [hTTdef, hderivT, hTval, hveq]
+    have hqp1' : (1 : ℝ) < (hyp.q : ℝ) ^ hyp.p := by
+      have h1 : (1:ℕ) < hyp.q ^ hyp.p := by
+        calc 1 < hyp.q := by omega
+          _ ≤ hyp.q ^ hyp.p := Nat.le_self_pow (by omega) _
+      exact_mod_cast h1
+    have hnum0 : (hyp.q : ℝ) ^ hyp.p - 1 ≠ 0 := by linarith
+    field_simp
+    ring
+  -- The `HS` term transported to `/|G|`.
+  have hH1 : (1 : ℕ) ≤ Nat.card ↥hyp.H := Nat.one_le_iff_ne_zero.mpr Nat.card_pos.ne'
+  have hterm3 : ((Nat.card ↥hyp.H - 1 : ℕ) : ℝ) / (Nat.card ↥hyp.S : ℝ)
+      = (hyp.S.index : ℝ) * ((Nat.card ↥hyp.H : ℝ) - 1) / (Nat.card G : ℝ) := by
+    rw [← hSGeq, Nat.cast_sub hH1, Nat.cast_one,
+      mul_div_mul_left _ _ hSidx0.ne']
+  have hterm4 : TT = (hyp.T.index : ℝ)
+      * ((Nat.card ↥(derivedInG hyp.T) : ℝ) - (hyp.v : ℝ) ^ 2) / (Nat.card G : ℝ) := by
+    rw [hTT, ← hTGeq, mul_div_mul_left _ _ hTidx0.ne']
+  -- Assemble.
+  have hbound : 1 + s + (hyp.S.index : ℝ) * ((Nat.card ↥hyp.H : ℝ) - 1)
+      + (hyp.T.index : ℝ) * ((Nat.card ↥(derivedInG hyp.T) : ℝ) - (hyp.v : ℝ) ^ 2)
+      ≤ (Nat.card G : ℝ) := by
+    have hHb := mul_le_mul_of_nonneg_left hsharpH hSidx0.le
+    have hQb := mul_le_mul_of_nonneg_left hsharpQ hTidx0.le
+    nlinarith [hsplit, hone, hHb, hQb]
+  rw [hterm3, hterm4]
+  have hfinal : (1 + s + (hyp.S.index : ℝ) * ((Nat.card ↥hyp.H : ℝ) - 1)
+      + (hyp.T.index : ℝ) * ((Nat.card ↥(derivedInG hyp.T) : ℝ) - (hyp.v : ℝ) ^ 2))
+      / (Nat.card G : ℝ) ≤ 1 := by
+    rw [div_le_one hg0]
+    exact hbound
+  calc 1 / (Nat.card G : ℝ) + s / (Nat.card G : ℝ)
+        + (hyp.S.index : ℝ) * ((Nat.card ↥hyp.H : ℝ) - 1) / (Nat.card G : ℝ)
+        + (hyp.T.index : ℝ) * ((Nat.card ↥(derivedInG hyp.T) : ℝ) - (hyp.v : ℝ) ^ 2)
+          / (Nat.card G : ℝ)
+      = (1 + s + (hyp.S.index : ℝ) * ((Nat.card ↥hyp.H : ℝ) - 1)
+          + (hyp.T.index : ℝ) * ((Nat.card ↥(derivedInG hyp.T) : ℝ) - (hyp.v : ℝ) ^ 2))
+          / (Nat.card G : ℝ) := by
+        rw [add_div, add_div, add_div]
+    _ ≤ 1 := hfinal
 
 /-- **Peterfalvi (13.9.a), atom form**: the disjoint-cover counting
 `1 = 1/|G| + |G₀|/|G| + |H#|/|S| + |Q#|/|T|` with `|Q#|/|T|` collapsed to its (13.4) value
@@ -1985,13 +2337,134 @@ theorem analyticCounting_disjointCover [Finite G] (_hG : OddOrder.BG.IsMinimalSi
   -- Assemble.
   rw [hterm3, hterm4, ← add_div, ← add_div, ← add_div, ← key, div_self hG0.ne']
 
-/-- **Peterfalvi (13.9.b), atom form**: `|G₀|/|G| ≤ slam + seta`. -/
+/-- **Peterfalvi (13.9.a), nonvanishing dichotomy**: on the generic set `G₀`, the characters
+`λ^{τ₁}` and `η₁₀` do not vanish simultaneously.  Faithful producer of the textbook (13.9.a) —
+the character content bottoms out at the (13.3.c) `μ_j^{τ₁} = δ·Σηᵢ₁` formula, the (13.2.e)
+support fact for `(μ_j − λ)^τ`, the (3.2.c) regular-value formula, and the (3.9.b)/(3.4) grid
+relations forcing `q·η₁₁(x) + 1 = 0` (impossible for an algebraic integer) in the doubly-vanishing
+case. -/
+theorem G0_nonvanishing_dichotomy [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {hyp : Hypothesis (G := G)} (chars : CharacterDegreeData hyp)
+    (_hlam : chars.lambda_induced_from_PC_linear) :
+    ∀ x ∈ hyp.G0Finset, chars.tau1S chars.lambda x ≠ 0 ∨ hyp.eta10 x ≠ 0 := by
+  sorry
+
+/-- **AM–GM via `log`** (analytic core of [Is] Lemma 3.14): for positive reals whose product is
+`≥ 1`, the sum is at least the count.  This powers Peterfalvi (13.9.b): for a cyclic-equivalence
+class `[a] = {a^k : gcd(k, |⟨a⟩|) = 1}`, the values `χ(a^k)` are the Galois conjugates of `χ(a)`,
+so `∏_k |χ(a^k)|² = |N(χ(a))|² ≥ 1` whenever `χ(a) ≠ 0` (the field norm of a nonzero algebraic
+integer is a nonzero rational integer), whence `∑_k |χ(a^k)|² ≥ φ(|⟨a⟩|) = |[a]|`; summing over the
+cyclic classes gives `∑_{x∈A}|χ(x)|² ≥ |A|` for any cyclic-closed `A` with `χ ≠ 0` on `A`.
+Proof: `log x ≤ x − 1` summed gives `0 ≤ log (∏ f) ≤ ∑ (f − 1) = ∑ f − |s|`. -/
+theorem sum_ge_card_of_one_le_prod {ι : Type*} (s : Finset ι) (f : ι → ℝ)
+    (hpos : ∀ i ∈ s, 0 < f i) (hprod : 1 ≤ ∏ i ∈ s, f i) :
+    (s.card : ℝ) ≤ ∑ i ∈ s, f i := by
+  have hlog : ∑ i ∈ s, Real.log (f i) ≤ ∑ i ∈ s, (f i - 1) :=
+    Finset.sum_le_sum (fun i hi => Real.log_le_sub_one_of_pos (hpos i hi))
+  have hprodlog : (0 : ℝ) ≤ ∑ i ∈ s, Real.log (f i) := by
+    rw [← Real.log_prod (fun i hi => (hpos i hi).ne')]
+    exact Real.log_nonneg hprod
+  have hsum : (0 : ℝ) ≤ ∑ i ∈ s, (f i - 1) := le_trans hprodlog hlog
+  rw [Finset.sum_sub_distrib, Finset.sum_const, nsmul_eq_mul, mul_one] at hsum
+  linarith
+
+/-- **[Isaacs] Lemma 3.14 (sum form, virtual characters)**: a virtual character nowhere zero on
+a cyclic-closed `Finset A` has `∑_{x∈A}‖φ(x)‖² ≥ |A|` — the `ℤ[Irr]` extension of
+`sum_normSq_ge_ncard_of_isCharacter_of_cyclicClosed`, combining the Galois product bound
+`one_le_prod_normSq_of_mem_ZIrr_of_cyclicClosed` with the AM–GM `sum_ge_card_of_one_le_prod`
+(declared below; the two are independent). -/
+theorem sum_normSq_ge_card_of_mem_ZIrr_of_cyclicClosed {H : Type*} [Group H] [Finite H]
+    {φ : ClassFunction H ℂ} (hφ : φ ∈ ZIrr H) {A : Finset H}
+    (hclosed : ∀ x ∈ A, ∀ k : ℕ, k.Coprime (Nat.card H) → x ^ k ∈ A)
+    (hne : ∀ x ∈ A, φ x ≠ 0) :
+    (A.card : ℝ) ≤ ∑ x ∈ A, ‖φ x‖ ^ 2 :=
+  sum_ge_card_of_one_le_prod A (fun x => ‖φ x‖ ^ 2)
+    (fun x hx => pow_pos (norm_pos_iff.mpr (hne x hx)) 2)
+    (OddOrder.Algebra.one_le_prod_normSq_of_mem_ZIrr_of_cyclicClosed hφ hclosed hne)
+
+/-- **The nonvanishing locus of a virtual character inside a cyclic-closed set is cyclic-closed**
+(Peterfalvi (1.9.b)): for `k` coprime to `|G|` there is `σ : ℂ ≃+* ℂ` with `σ(φ(x)) = φ(x^k)`
+(`exists_complexRingEquiv_mapRingEquiv_eq_pow` with `a = |G|`, `b = 1`), and ring automorphisms
+preserve nonvanishing. -/
+theorem filter_ne_zero_cyclicClosed [Finite G] {φ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G)
+    {A : Finset G} (hclosed : ∀ x ∈ A, ∀ k : ℕ, k.Coprime (Nat.card G) → x ^ k ∈ A) :
+    ∀ x ∈ A.filter (fun y => φ y ≠ 0), ∀ k : ℕ, k.Coprime (Nat.card G) →
+      x ^ k ∈ A.filter (fun y => φ y ≠ 0) := by
+  classical
+  intro x hx k hk
+  obtain ⟨hxA, hxne⟩ := Finset.mem_filter.mp hx
+  refine Finset.mem_filter.mpr ⟨hclosed x hxA k hk, ?_⟩
+  obtain ⟨σ, hσ⟩ := OddOrder.RepresentationTheory.exists_complexRingEquiv_mapRingEquiv_eq_pow G
+    (a := Nat.card G) (b := 1) (mul_one _).symm (Nat.coprime_one_right _) hk
+  have hval : ClassFunction.mapRingEquiv σ φ x = φ (x ^ k) :=
+    (hσ hφ x).1 (orderOf_dvd_natCard x)
+  rw [ClassFunction.mapRingEquiv_apply] at hval
+  rw [← hval]
+  simpa using hxne
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (13.9.b), atom form**: `|G₀|/|G| ≤ slam + seta`.
+
+`G₀ = A ∪ B` with `A`/`B` the nonvanishing loci of `λ^{τ₁}`/`η₁₀`
+(`G0_nonvanishing_dichotomy` = (13.9.a)); each locus is cyclic-closed
+(`filter_ne_zero_cyclicClosed`, Pf (1.9.b)), so [Is] Lemma 3.14
+(`sum_normSq_ge_card_of_mem_ZIrr_of_cyclicClosed`) bounds its cardinality by the norm sum. -/
 theorem analyticEstimate_galois [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (chars : CharacterDegreeData hyp) :
     (hyp.G0Finset.card : ℚ) / (Nat.card G : ℚ)
       ≤ normSqSumQ hyp.G0Finset (chars.tau1S chars.lambda) / (Nat.card G : ℚ)
         + normSqSumQ hyp.G0Finset hyp.eta10 / (Nat.card G : ℚ) := by
-  sorry
+  classical
+  have hlam := chars.lambda_induced_from_PC_linear_holds
+  obtain ⟨hZlam, -⟩ := lambda_tau1_norm_one _hG chars hlam
+  have hZeta := hyp.eta10_mem_ZIrr
+  set φ : ClassFunction G ℂ := chars.tau1S chars.lambda with hφdef
+  set A : Finset G := hyp.G0Finset.filter (fun y => φ y ≠ 0) with hA
+  set B : Finset G := hyp.G0Finset.filter (fun y => hyp.eta10 y ≠ 0) with hB
+  -- The dichotomy: `G₀ ⊆ A ∪ B`.
+  have hdich := G0_nonvanishing_dichotomy _hG chars hlam
+  have hcover : hyp.G0Finset ⊆ A ∪ B := by
+    intro x hx
+    rcases hdich x hx with h | h
+    · exact Finset.mem_union_left _ (Finset.mem_filter.mpr ⟨hx, by rw [← hφdef] at h; exact h⟩)
+    · exact Finset.mem_union_right _ (Finset.mem_filter.mpr ⟨hx, h⟩)
+  have hcard : hyp.G0Finset.card ≤ A.card + B.card :=
+    le_trans (Finset.card_le_card hcover) (Finset.card_union_le _ _)
+  -- Per-locus Galois bounds.
+  have hgeA : (A.card : ℝ) ≤ ∑ x ∈ A, ‖φ x‖ ^ 2 :=
+    sum_normSq_ge_card_of_mem_ZIrr_of_cyclicClosed hZlam
+      (filter_ne_zero_cyclicClosed hZlam hyp.G0Finset_cyclicClosed)
+      (fun x hx => (Finset.mem_filter.mp hx).2)
+  have hgeB : (B.card : ℝ) ≤ ∑ x ∈ B, ‖hyp.eta10 x‖ ^ 2 :=
+    sum_normSq_ge_card_of_mem_ZIrr_of_cyclicClosed hZeta
+      (filter_ne_zero_cyclicClosed hZeta hyp.G0Finset_cyclicClosed)
+      (fun x hx => (Finset.mem_filter.mp hx).2)
+  -- Locus sums are bounded by the `G₀` sums.
+  have hsubA : ∑ x ∈ A, ‖φ x‖ ^ 2 ≤ ∑ x ∈ hyp.G0Finset, ‖φ x‖ ^ 2 :=
+    Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset _ _)
+      (fun x _ _ => by positivity)
+  have hsubB : ∑ x ∈ B, ‖hyp.eta10 x‖ ^ 2 ≤ ∑ x ∈ hyp.G0Finset, ‖hyp.eta10 x‖ ^ 2 :=
+    Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset _ _)
+      (fun x _ _ => by positivity)
+  -- The rational atoms.
+  have hspecLam := normSqSumQ_spec
+    (OddOrder.Algebra.exists_nat_sum_normSq_of_mem_ZIrr_of_cyclicClosed hZlam
+      hyp.G0Finset_cyclicClosed)
+  have hspecEta := normSqSumQ_spec
+    (OddOrder.Algebra.exists_nat_sum_normSq_of_mem_ZIrr_of_cyclicClosed hZeta
+      hyp.G0Finset_cyclicClosed)
+  -- Assemble over ℝ.
+  have hg0 : (0 : ℝ) < (Nat.card G : ℝ) := by exact_mod_cast Nat.card_pos (α := G)
+  rw [← Rat.cast_le (K := ℝ)]
+  push_cast
+  rw [hspecLam, hspecEta, ← add_div]
+  have hnum : (hyp.G0Finset.card : ℝ)
+      ≤ (∑ x ∈ hyp.G0Finset, ‖φ x‖ ^ 2) + ∑ x ∈ hyp.G0Finset, ‖hyp.eta10 x‖ ^ 2 := by
+    have hcard' : (hyp.G0Finset.card : ℝ) ≤ (A.card : ℝ) + (B.card : ℝ) := by
+      exact_mod_cast hcard
+    linarith [hgeA, hgeB, hsubA, hsubB]
+  gcongr
+
 
 /-- **Faithful (13.6)–(13.9) norm-estimate inputs to Peterfalvi (13.10)**.
 
@@ -2031,24 +2504,6 @@ theorem analyticInequalityEstimates [Finite G] (_hG : OddOrder.BG.IsMinimalSimpl
     analyticCounting_disjointCover _hG hyp,
     analyticEstimate_galois _hG hyp chars⟩
 
-/-- **AM–GM via `log`** (analytic core of [Is] Lemma 3.14): for positive reals whose product is
-`≥ 1`, the sum is at least the count.  This powers Peterfalvi (13.9.b): for a cyclic-equivalence
-class `[a] = {a^k : gcd(k, |⟨a⟩|) = 1}`, the values `χ(a^k)` are the Galois conjugates of `χ(a)`,
-so `∏_k |χ(a^k)|² = |N(χ(a))|² ≥ 1` whenever `χ(a) ≠ 0` (the field norm of a nonzero algebraic
-integer is a nonzero rational integer), whence `∑_k |χ(a^k)|² ≥ φ(|⟨a⟩|) = |[a]|`; summing over the
-cyclic classes gives `∑_{x∈A}|χ(x)|² ≥ |A|` for any cyclic-closed `A` with `χ ≠ 0` on `A`.
-Proof: `log x ≤ x − 1` summed gives `0 ≤ log (∏ f) ≤ ∑ (f − 1) = ∑ f − |s|`. -/
-theorem sum_ge_card_of_one_le_prod {ι : Type*} (s : Finset ι) (f : ι → ℝ)
-    (hpos : ∀ i ∈ s, 0 < f i) (hprod : 1 ≤ ∏ i ∈ s, f i) :
-    (s.card : ℝ) ≤ ∑ i ∈ s, f i := by
-  have hlog : ∑ i ∈ s, Real.log (f i) ≤ ∑ i ∈ s, (f i - 1) :=
-    Finset.sum_le_sum (fun i hi => Real.log_le_sub_one_of_pos (hpos i hi))
-  have hprodlog : (0 : ℝ) ≤ ∑ i ∈ s, Real.log (f i) := by
-    rw [← Real.log_prod (fun i hi => (hpos i hi).ne')]
-    exact Real.log_nonneg hprod
-  have hsum : (0 : ℝ) ≤ ∑ i ∈ s, (f i - 1) := le_trans hprodlog hlog
-  rw [Finset.sum_sub_distrib, Finset.sum_const, nsmul_eq_mul, mul_one] at hsum
-  linarith
 
 /-- **Peterfalvi (13.9.b) core** ([Is] Lemma 3.14, sum form): for a character `φ` that is nowhere
 zero on a cyclic-closed `Finset A` (closed under `x ↦ x ^ k`, `k` coprime `|G|`), the squared-norm

@@ -344,4 +344,62 @@ theorem one_le_prod_normSq_character_of_cyclicClosed {G : Type*} [Group G] [Fini
     exact_mod_cast Int.one_le_abs hz0
   nlinarith [hzabs, norm_nonneg ((z : ℂ))]
 
+open OddOrder.RepresentationTheory in
+/-- **Virtual-character product over a cyclic-closed set is a rational integer** — the `ℤ[Irr]`
+extension of `exists_int_prod_character_of_cyclicClosed`: `∏_{x∈A} φ(x)` is an algebraic integer
+(values are, `isIntegral_apply_of_mem_ZIrr`) fixed by every `σ : ℂ ≃+* ℂ` (`σ` acts as a coprime
+power `x ↦ x^k` permuting `A`), hence a rational integer. -/
+theorem exists_int_prod_of_mem_ZIrr_of_cyclicClosed {G : Type*} [Group G] [Finite G]
+    {φ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G) {A : Finset G}
+    (hclosed : ∀ x ∈ A, ∀ k : ℕ, k.Coprime (Nat.card G) → x ^ k ∈ A) :
+    ∃ z : ℤ, (z : ℂ) = ∏ x ∈ A, φ x := by
+  classical
+  have hint : IsIntegral ℤ (∏ x ∈ A, φ x) :=
+    IsIntegral.prod _ (fun x _ => isIntegral_apply_of_mem_ZIrr hφ x)
+  have hfix : ∀ σ : ℂ ≃+* ℂ, σ (∏ x ∈ A, φ x) = ∏ x ∈ A, φ x := by
+    intro σ
+    have hN0 : Nat.card G ≠ 0 := Nat.card_pos.ne'
+    obtain ⟨k, hkcop, hkσ⟩ := exists_pow_of_complexRingEquiv σ hN0
+    obtain ⟨hinj, himg⟩ := powClosed_image_pow_eq_of_cyclicClosed hclosed hkcop
+    have hpowN : ∀ w : G, w ^ Nat.card G = 1 := fun w => pow_card_eq_one'
+    have hσval : ∀ w : G, σ (φ w) = φ (w ^ k) := by
+      intro w
+      have hσw : ∀ ζ : ℂ, ζ ^ orderOf w = 1 → σ ζ = ζ ^ k := by
+        intro ζ hζ
+        refine hkσ ζ ?_
+        obtain ⟨c, hc⟩ := orderOf_dvd_of_pow_eq_one (hpowN w)
+        rw [hc, pow_mul, hζ, one_pow]
+      have h := mapRingEquiv_apply_eq_apply_pow_of_mem_ZIrr hφ σ (isOfFinOrder_of_finite w) hσw
+      rwa [ClassFunction.mapRingEquiv_apply] at h
+    calc σ (∏ x ∈ A, φ x)
+        = ∏ x ∈ A, φ (x ^ k) := by
+          rw [map_prod]; exact Finset.prod_congr rfl (fun x _ => hσval x)
+      _ = ∏ x ∈ A, φ x := by
+          conv_rhs => rw [← himg]
+          exact (Finset.prod_image (fun x hx y hy => hinj x hx y hy)).symm
+  exact exists_int_of_isIntegral_of_forall_complexRingEquiv_fixed hint hfix
+
+open OddOrder.RepresentationTheory in
+/-- **[Isaacs] Lemma 3.14 (product form, virtual characters)**: for `φ ∈ ℤ[Irr G]` nowhere zero
+on a cyclic-closed `Finset A`, `∏_{x∈A} ‖φ(x)‖² ≥ 1` — the product of the values is a *nonzero*
+rational integer (`exists_int_prod_of_mem_ZIrr_of_cyclicClosed`). -/
+theorem one_le_prod_normSq_of_mem_ZIrr_of_cyclicClosed {G : Type*} [Group G] [Finite G]
+    {φ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G) {A : Finset G}
+    (hclosed : ∀ x ∈ A, ∀ k : ℕ, k.Coprime (Nat.card G) → x ^ k ∈ A)
+    (hne : ∀ x ∈ A, φ x ≠ 0) :
+    1 ≤ ∏ x ∈ A, ‖φ x‖ ^ 2 := by
+  obtain ⟨z, hz⟩ := exists_int_prod_of_mem_ZIrr_of_cyclicClosed hφ hclosed
+  have hprodne : (∏ x ∈ A, φ x) ≠ 0 := Finset.prod_ne_zero_iff.mpr hne
+  have hz0 : z ≠ 0 := by
+    intro h
+    apply hprodne
+    rw [← hz, h, Int.cast_zero]
+  have hnorm : ∏ x ∈ A, ‖φ x‖ ^ 2 = ‖(z : ℂ)‖ ^ 2 := by
+    rw [Finset.prod_pow, ← norm_prod, ← hz]
+  rw [hnorm]
+  have hzabs : (1 : ℝ) ≤ ‖(z : ℂ)‖ := by
+    rw [Complex.norm_intCast]
+    exact_mod_cast Int.one_le_abs hz0
+  nlinarith [hzabs, norm_nonneg ((z : ℂ))]
+
 end OddOrder.Algebra
