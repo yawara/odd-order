@@ -1984,12 +1984,42 @@ theorem norm_cascade_contradiction_of_caseB_outputs_main_size_bounds
   exact norm_cascade_contradiction_of_caseB_data_main_size_bounds Tdata Sdata Mdata
     hsize hbound
 
+/-- If `x ≡ 1 (mod p)` with `p` odd and `≥ 2`, `x` odd and `x ≠ 1`, then `x ≥ 2p + 1`.  This is the
+elided "fixed-point-free congruence + oddness" step of Peterfalvi (14.11.1): `x ≡ 1 (mod p)` and
+`x ≠ 1` give `x = pm + 1` with `m ≥ 1`, and `x` odd with `p` odd forces `m` even, hence `m ≥ 2`. -/
+private theorem two_mul_add_one_le_of_modEq_one_odd {p x : ℕ} (hp : Odd p) (hp2 : 2 ≤ p)
+    (hmod : x ≡ 1 [MOD p]) (hodd : Odd x) (hne : x ≠ 1) : 2 * p + 1 ≤ x := by
+  have hxmod : x % p = 1 := by
+    have h := hmod
+    unfold Nat.ModEq at h
+    rwa [Nat.mod_eq_of_lt (by omega : 1 < p)] at h
+  have hdm := Nat.div_add_mod x p
+  set m := x / p with hm_def
+  rw [hxmod] at hdm
+  have hm1 : 1 ≤ m := by
+    rcases Nat.eq_zero_or_pos m with h0 | h1
+    · exfalso; rw [h0, Nat.mul_zero] at hdm; omega
+    · exact h1
+  have hpm_even : Even (p * m) := by
+    rcases hodd with ⟨t, ht⟩; exact ⟨t, by omega⟩
+  have hm_even : Even m := by
+    by_contra hodd_m
+    rw [Nat.not_even_iff_odd] at hodd_m
+    exact (Nat.not_odd_iff_even.mpr hpm_even) (Nat.odd_mul.mpr ⟨hp, hodd_m⟩)
+  have hm2 : 2 ≤ m := by rcases hm_even with ⟨r, hr⟩; omega
+  have hpm : 2 * p ≤ p * m := by
+    calc 2 * p = p * 2 := by ring
+      _ ≤ p * m := by gcongr
+  omega
+
 /-- **Peterfalvi (14.11.1)** structural half: under `K ≠ V`, the Fitting kernel `K = M_F` is large
 (`k > 2 p v`) and the Frobenius quotient `(k − 1) / e` dominates `(v − 1) / p`.  The **quotient
 bound is now a genuine consequence** of `k > 2 p v` (with `e = pq`, `q < p`): `q(v−1) ≤ qv ≤ 2pv ≤
-k−1`, so `(v−1)/p ≤ (k−1)/(pq)` (`div_le_div_iff₀` + `nlinarith`).  The single remaining obligation
-is the order bound `k > 2 p v` — the genuine §13/§14 character-theoretic residual of (14.11.1)
-(type-I order datum of `M`, gated on the cyclotomic `v`-value).  The third inequality of (14.11.1),
+k−1`, so `(v−1)/p ≤ (k−1)/(pq)` (`div_le_div_iff₀` + `nlinarith`).  The `k > 2 p v` bound is in turn
+the arithmetic consequence (`two_mul_add_one_le_of_modEq_one_odd`) of the §13/§15 structural datum
+`hstruct` of (14.11.1): by (13.17) the kernel order factors as `k = v·x` with `x` an integer, `x ≠ 1`
+(as `K ≠ V`), and `x ≡ 1 (mod p)` (since `W₂` acts fixed-point-freely on `K` and `V`); as `k = |K|`
+is odd, `x` is odd, so `x ≥ 2p+1` and `k = vx > 2pv`.  The third inequality of (14.11.1),
 `(v − 1) / p > (u − 1) / q`, is `key_ratio_inequality_of_caseB_data` (14.8), discharged in
 `main_size_bounds`. -/
 theorem main_size_bounds_structural [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -1999,9 +2029,23 @@ theorem main_size_bounds_structural [Finite G] (_hG : OddOrder.BG.IsMinimalSimpl
       (((Mdata.k - 1 : ℕ) : ℚ) / (Mdata.e : ℚ) ≥
         ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ)) := by
   have hqp : hyp.base.q < hyp.base.p := hyp.q_lt_p
-  -- The structural bound `k > 2 p v` is the genuine §13/§14 residual of (14.11.1) (the type-I
-  -- order datum of `M`; gated on the cyclotomic `v`-value and the Frobenius quotient).
-  have hk : Mdata.k > 2 * hyp.base.p * hyp.base.v := sorry
+  -- (14.11.1): `k = v·x`, `x ≡ 1 (mod p)` (`W₂` fixed-point-free on `K`, `V`), `x ≠ 1` (`K ≠ V`) —
+  -- the §13/§15 structural datum (13.17); `k > 2 p v` is then arithmetic (`x` odd, so `x ≥ 2p+1`).
+  have hstruct : ∃ x : ℕ, Mdata.k = hyp.base.v * x ∧ x ≡ 1 [MOD hyp.base.p] ∧ x ≠ 1 := sorry
+  have hk : Mdata.k > 2 * hyp.base.p * hyp.base.v := by
+    obtain ⟨x, hkx, hxmod, hxne⟩ := hstruct
+    have hk_odd : Odd Mdata.k := by
+      rw [Mdata.k_eq_card_K]
+      exact _hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card Mdata.K)
+    have hvx_odd : Odd (hyp.base.v * x) := hkx ▸ hk_odd
+    have hx_odd : Odd x := (Nat.odd_mul.mp hvx_odd).2
+    have hv_pos : 0 < hyp.base.v := by rcases (Nat.odd_mul.mp hvx_odd).1 with ⟨r, hr⟩; omega
+    have hx_ge : 2 * hyp.base.p + 1 ≤ x :=
+      two_mul_add_one_le_of_modEq_one_odd hyp.base.p_odd hyp.base.p_prime.two_le hxmod hx_odd hxne
+    have hle : hyp.base.v * (2 * hyp.base.p + 1) ≤ hyp.base.v * x := by gcongr
+    have hexpand : hyp.base.v * (2 * hyp.base.p + 1)
+        = 2 * hyp.base.p * hyp.base.v + hyp.base.v := by ring
+    rw [hkx]; omega
   refine ⟨hk, ?_⟩
   -- The quotient bound `(k−1)/e ≥ (v−1)/p` is pure arithmetic from `k > 2pv`, `q < p`, `e = pq`:
   -- `q(v−1) ≤ qv ≤ 2pv ≤ k−1`, so `(v−1)/p ≤ (k−1)/(pq)`.
