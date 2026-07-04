@@ -684,7 +684,7 @@ elementary-abelian `P` of order `p^q` makes `Additive ↥P ≅ 𝔽_{p^q}` with 
 (Singer mechanism, `exists_galoisField_repr`).  Cites the §13 producers `basic_structure`
 (`|P|=p^q`, `P` elementary abelian) and `c_eq_one` (`U` faithful on `P`). -/
 theorem exists_pu_field_repr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) [IsCyclic ↥hyp.base.U]
+    (hyp : Hypothesis (G := G))
     (hu_full : Nat.card ↥hyp.base.U =
       (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1)) :
     letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
@@ -959,7 +959,7 @@ isomorphism `e : Additive ↥P ≃+ 𝔽_{p^q}`, an injective character `μ : U 
 producers `basic_structure` (`|P| = p^q`) and `c_eq_one` (`U` faithful) through
 `exists_pu_field_repr`; its extra structural input is `W₂ ≤ P`. -/
 theorem exists_pu_field_repr_W2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) [IsCyclic ↥hyp.base.U]
+    (hyp : Hypothesis (G := G))
     (hu_full : Nat.card ↥hyp.base.U =
       (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1))
     (hW2_le_P : hyp.base.W2 ≤ hyp.base.P) :
@@ -993,7 +993,6 @@ through the §13 producers `basic_structure`/`c_eq_one` cited inside `exists_pu_
 and `P_inf_U_eq_bot` (Lane B), so it becomes unconditional exactly when those land. -/
 theorem field_normalizer_of_U_characteristic_of_inputs [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    [IsCyclic ↥hyp.base.U]
     (hu_full : Nat.card ↥hyp.base.U =
       (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1))
     (hW2_le_P : hyp.base.W2 ≤ hyp.base.P)
@@ -1280,7 +1279,7 @@ given the (14.7) fixed-point-free congruence `u ≡ 1 mod p` (the `W₂^y`-on-`U
 producers (`basic_structure`/`c_eq_one`, via the assembly) and `caseB_for_S` (Lane B). -/
 theorem field_normalizer_of_U_characteristic_of_fpf [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (Ldata : LHypothesis hyp) [IsCyclic ↥hyp.base.U]
+    (Ldata : LHypothesis hyp)
     (hu_mod_p : hyp.base.u ≡ 1 [MOD hyp.base.p])
     (hW2_le_P : hyp.base.W2 ≤ hyp.base.P)
     (hQ_elemAb : IsElementaryAbelian hyp.base.q ↥hyp.base.Q)
@@ -3555,32 +3554,28 @@ theorem W2_le_P [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) : hyp.base.W2 ≤ hyp.base.P :=
   OddOrder.Peterfalvi.S15.W2_le_P _hG hyp.base
 
-/-- **Peterfalvi (13.2.a)/(13.2.b dual) for the (14.7) field model**: `U` is cyclic (13.2.a `UW₁`
-Frobenius with abelian kernel `U`, `c = 1`) and `Q` is elementary abelian (13.2.b applied to the
-dual subgroup `T`).  These two facts bottom out on §9/§11 character theory; `W₂ ≤ P` is the third
-(14.2.a) structural input and is proved unconditionally by `W2_le_P`. -/
-theorem U_cyclic_and_Q_elemAbelian [Finite G]
+/-- **Peterfalvi (13.2.b) for `T`**: `Q` is elementary abelian (13.2.b applied to the dual subgroup
+`T`) — the canonical §15 obligation `Q_elementaryAbelian_T` (`T` type-II from `T_typeII` (14.9)). -/
+theorem Q_elemAbelian_S [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
-    IsCyclic ↥hyp.base.U ∧ IsElementaryAbelian hyp.base.q ↥hyp.base.Q := by
-  refine ⟨?_, ?_⟩
-  · -- **Peterfalvi (13.2.a)**: `U` cyclic (the `UW₁` Frobenius complement with abelian kernel `U`,
-    -- `c = 1`); §9/§11 character theory.
-    sorry
-  · -- **Peterfalvi (13.2.b) for `T`**: `Q` elementary abelian — the canonical §15 obligation
-    -- `Q_elementaryAbelian_T` (`T` type-II from `T_typeII` (14.9)).
-    exact OddOrder.Peterfalvi.S15.Q_elementaryAbelian_T _hG hyp.base (T_typeII _hG hyp)
+    IsElementaryAbelian hyp.base.q ↥hyp.base.Q :=
+  OddOrder.Peterfalvi.S15.Q_elementaryAbelian_T _hG hyp.base (T_typeII _hG hyp)
 
 /-- **Peterfalvi (13.2) `S`-side structural inputs for the (14.7) field model.**  The field-model
-construction (14.2.a) needs three §13 structural facts about the type-`P` subgroup `S`: `U` cyclic
-(13.2.a), `W₂ ≤ P` (the `F_p ⊆ F` identification), and `Q` elementary abelian (13.2.b for `T`).
-`W₂ ≤ P` is proved outright (`W2_le_P`); `U` cyclic and `Q` elementary abelian are the remaining
-§9/§11 obligation `U_cyclic_and_Q_elemAbelian`. -/
+construction (14.2.a) needs two §13 structural facts about the type-`P` subgroup `S`: `W₂ ≤ P`
+(the `F_p ⊆ F` identification) and `Q` elementary abelian (13.2.b for `T`).  `W₂ ≤ P` is proved
+outright (`W2_le_P`); `Q` elementary abelian is the §15 obligation `Q_elemAbelian_S`.
+
+The field model needs **no** cyclicity of `U`: the Singer representation `exists_pu_field_repr` is
+built from `U` **abelian** (Peterfalvi (13.2.a): `UW₁` is Frobenius with abelian kernel `U`; coq
+`PFsection14.v` `cUU : abelian U`) via the abelian Singer irreducibility
+`isSimpleModule_of_abelian_faithful_card`, and the injection `μ : U ↪ 𝔽_{p^q}^×` into the cyclic unit
+group is a *consequence* — never a hypothesis. -/
 theorem S_field_model_structural_inputs [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
-    IsCyclic ↥hyp.base.U ∧ hyp.base.W2 ≤ hyp.base.P ∧
+    hyp.base.W2 ≤ hyp.base.P ∧
       IsElementaryAbelian hyp.base.q ↥hyp.base.Q :=
-  ⟨(U_cyclic_and_Q_elemAbelian _hG hyp).1, W2_le_P _hG hyp,
-    (U_cyclic_and_Q_elemAbelian _hG hyp).2⟩
+  ⟨W2_le_P _hG hyp, Q_elemAbelian_S _hG hyp⟩
 
 /-- **Peterfalvi (14.7)**: if `U` is characteristic in `H`, then the field-normalizer
 configuration (14.2) holds.  The value argument is assembled entirely from the structural
@@ -3600,7 +3595,7 @@ theorem field_normalizer_of_U_characteristic [Finite G]
   have hmod := u_modEq_one_mod_p_of_LHypothesis hG Ldata hchar hW2y_compl
   have hW2_conj_y := W2conj_le_normalizer_U_of_LHypothesis Ldata hchar hW2y_compl
   -- §13 structural inputs (13.2.a/b, companion to `basic_structure`; Lane B / §13 group theory)
-  obtain ⟨hcyc_U, hW2_le_P, hQ_elemAb⟩ := S_field_model_structural_inputs hG hyp
+  obtain ⟨hW2_le_P, hQ_elemAb⟩ := S_field_model_structural_inputs hG hyp
   -- `W₂ ≤ N_G(Q)` is ungated: `W₂ ≤ W ≤ T` and `Q = T_F`
   have hW2_norm_Q : hyp.base.W2 ≤ Subgroup.normalizer (hyp.base.Q : Set G) := by
     have hW2_le_W : hyp.base.W2 ≤ hyp.base.W := by
@@ -3610,7 +3605,6 @@ theorem field_normalizer_of_U_characteristic [Finite G]
     rw [hyp.base.Q_eq_TF]
     exact (hW2_le_W.trans hW_le_T).trans
       (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.base.T)
-  haveI := hcyc_U
   exact field_normalizer_of_U_characteristic_of_fpf hG hyp Ldata hmod hW2_le_P
     hQ_elemAb hW2_norm_Q y hyQ hW2_conj_y
 
@@ -3643,10 +3637,12 @@ theorem characteristic_of_isCyclic {C : Type*} [Group C] [Finite C] [IsCyclic C]
   conv_rhs => rw [key K]
   rw [hcard_eq]
 
-/-- **Peterfalvi (13.2.a) for `T`**: the `T`-side cyclic complement `V` is cyclic — the dual of `U`
-cyclic (`U_cyclic_and_Q_elemAbelian`, 13.2.a for `S`).  `V` is the abelian Frobenius kernel of the
-type-I-over-`N_G(V)` configuration; cyclicity is the §9/§13 character-theoretic obligation (Lane B)
-for the `V`-side, used to transport `K = V` (14.11) to `K` cyclic in `MHypothesis_kernel_cyclic`. -/
+/-- **Peterfalvi (13.2.a) for `T`**: the `T`-side complement `V` is cyclic.  `V` is the abelian
+Frobenius kernel of the type-I-over-`N_G(V)` configuration.  This is the `T`/`V`-side dual of the
+`S`/`U`-side field-model cyclicity (`exists_pv_field_repr`, still to be built): once the dual Singer
+representation `μ : V ↪ 𝔽_{q^p}^×` is constructed from `V` abelian via
+`isSimpleModule_of_abelian_faithful_card`, `V` cyclic follows.  Used to transport `K = V` (14.11) to
+`K` cyclic in `MHypothesis_kernel_cyclic`. -/
 theorem V_cyclic [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) : IsCyclic ↥hyp.base.V := sorry
 
