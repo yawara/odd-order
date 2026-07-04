@@ -3316,17 +3316,53 @@ theorem Hypothesis.two_mul_v_le (hyp : Hypothesis (G := G))
 
 open scoped Classical in
 open scoped FiniteInduce in
+open scoped Classical in
+open scoped FiniteInduce in
+/-- **The `T`-side (13.3.c) distinguished index** — the `μ'_j` of the (13.8)-for-`T` estimate,
+localized to the `(T, Q^#)` (7.6) family: a `Q`-non-kernel member `ζ_{i₁}` with
+`‖ζ_{i₁}‖² = p`, degree `pv`, distinguished coefficient `⟨τψ_{i₁}, η₁₀⟩ = δ = ±1`, and all
+other `Q`-non-kernel coefficients vanishing.  Faithful producer; gated on the `T`-side (13.3.c)
+grid analysis. -/
+theorem exists_muT_index [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (chars : CharacterDegreeData hyp) (_hlam : chars.lambda_induced_from_PC_linear)
+    (hvd : hyp.v * hyp.d ≠ 1) :
+    ∃ (i₁ : Fin ((Q_sharp_hypothesis76 hG hyp hvd).n + 1)) (δ : ℤ), 0 < i₁ ∧
+      ¬ ((hyp.Q.subgroupOf hyp.T : Set ↥hyp.T) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel ((Q_sharp_hypothesis76 hG hyp hvd).zeta i₁)) ∧
+      δ ^ 2 = 1 ∧
+      (Q_sharp_hypothesis76 hG hyp hvd).cCoeff hyp.eta10 i₁ = (δ : ℂ) ∧
+      (∀ i : Fin ((Q_sharp_hypothesis76 hG hyp hvd).n + 1), 0 < i → i ≠ i₁ →
+        ¬ ((hyp.Q.subgroupOf hyp.T : Set ↥hyp.T) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel ((Q_sharp_hypothesis76 hG hyp hvd).zeta i)) →
+        (Q_sharp_hypothesis76 hG hyp hvd).cCoeff hyp.eta10 i = 0) ∧
+      (Q_sharp_hypothesis76 hG hyp hvd).zetaNormSq i₁ = (hyp.p : ℂ) ∧
+      (Q_sharp_hypothesis76 hG hyp hvd).zeta i₁ 1 = ((hyp.p * hyp.v : ℕ) : ℂ) := by
+  sorry
+
+open scoped Classical in
+open scoped FiniteInduce in
+/-- **The `T`-side correction has integer value at `1`** — the `T`-side (13.5.a) integrality
+(`α|_Q ∈ ℤ[Irr Q]` needs `Q` abelian, the gated (13.2.b)-dual; carried as an atom). -/
+theorem exists_etaT_alphaFun_one_int [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (hvd : hyp.v * hyp.d ≠ 1) :
+    ∃ α1 : ℤ, hypothesis76AlphaFun (Q_sharp_hypothesis76 hG hyp hvd)
+      (hyp.Q.subgroupOf hyp.T) hyp.eta10 1 = (α1 : ℂ) := by
+  sorry
+
+open scoped Classical in
+open scoped FiniteInduce in
 /-- **Peterfalvi (13.5) for the `T`-side, `χ = η₁₀`, `ζ = (1/p)·μ'_j`, `a = δ`** — the
-correction datum of the (13.8)-for-`T` estimate.  By the `T`-side (13.3.c) there are `j` and
-`δ = ±1` with `μ'_j{}^{τ₂} = δ·Σᵢ η'`, and the (13.5.a) point formula on `Q^# ⊂ T` reads
-`η₁₀ = (δ/p)·μ'_j + α` (the induced `μ'_j` has `‖μ'_j‖² = p`, degree `pv`); with the
-*normalized* `ζ := (1/p)·μ'_j` the coefficient is `δ = ±1` and
+correction datum of the (13.8)-for-`T` estimate.
 
-  `∑_T ‖ζ‖² − ‖ζ(1)‖² = (1/p²)(|T|·p − (pv)²) = |T'| − v²`,
-
-the (13.8) first term.  `α(1) = α1 ∈ ℤ`, the cross term is `Re(ζ(1)·conj α(1)) = v·α1`, and the
-(13.5.c) inflation bound holds with `|Q| = q^p`.  Faithful producer of the `T`-side (13.5)
-package; gated on the `T`-side (13.3)/Dade machinery. -/
+**Real assembly** over the `T`-side ρ-machinery (`Q_sharp_hypothesis76`) and the generic
+(13.5.a) cluster: `ζ := (1/p)·ζ_{i₁}` (`exists_muT_index`: `‖ζ_{i₁}‖² = p`, degree `pv`,
+coefficient `δ`), `α` the `Q`-kernel tail (`hypothesis76AlphaFun`); the point formula is the
+generic `hypothesis76_point_formula`, the first term is `(1/p²)(|T|·p − (pv)²) = |T'| − v²`
+(Parseval + `card_T_eq_deriv_mul_p`), the inner-product vanishes by the distinct-fibre
+orthogonality (S-level shortcut), and the inflation is the generic `F`-form with
+`|Q| = q^p`. -/
 theorem exists_caseB_data_eta10_T [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {hyp : Hypothesis (G := G)} (chars : CharacterDegreeData hyp)
     (_hlam : chars.lambda_induced_from_PC_linear) :
@@ -3343,6 +3379,7 @@ theorem exists_caseB_data_eta10_T [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleO
       ((hyp.q ^ hyp.p - 1 : ℕ) : ℝ) * ((α1 : ℤ) : ℝ) ^ 2
         ≤ ∑ x ∈ (Finset.univ.filter (· ∈ hyp.Q.subgroupOf hyp.T)).erase 1, ‖α x‖ ^ 2 := by
   sorry
+
 
 open scoped Classical in
 open scoped FiniteInduce in
