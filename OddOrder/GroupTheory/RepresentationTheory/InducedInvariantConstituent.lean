@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
+import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
 
 /-!
 # The general Peterfalvi (1.7.b): equal-degree induced constituents (abelian inertia quotient)
@@ -108,5 +109,74 @@ theorem induce_invariant_constituent_apply_one_eq [Finite K] [Fintype K] [Fintyp
       = (ψ : ClassFunction K ℂ) * linearClassFunction (β.comp (QuotientGroup.mk' H)) := by
     rw [← hΦβ]
   rw [hcoe, ClassFunction.mul_apply, linearClassFunction_apply, map_one, Units.val_one, mul_one]
+
+open scoped commutatorElement in
+/-- **Peterfalvi (1.7.b), lifted to the full group via the Clifford correspondence.**  For `N ⊴ L`
+with `θ ∈ Irr N`, inertia `T = I_L(θ)`, and `T/N` abelian, the induced character `Ind_N^L θ`
+decomposes (scaled by `e = ⟨Res_T ψ, θ'⟩` for a `T`-constituent `ψ`) as
+`e · Ind_N^L θ = ∑_β Ind_T^L(ψ·Inf(β))`, each summand irreducible of degree `[L:T]·ψ(1)`.
+
+Combines induction in stages (`induce_induce_subgroupOf`, `Ind_N^L θ = Ind_T^L(Ind_N^T θ')`) with the
+inertia-level general (1.7.b) decomposition `induce_smul_eq_mul_sum_of_invariant`
+(`e·Ind_N^T θ' = ψ·∑_β Inf(β)`, valid since `θ'` is `T`-invariant as `T = I_L(θ)` and `T/N` is
+abelian), pushing `Ind_T^L` through the scalar (`induce_smul`), the product-sum
+(`ClassFunction.mul_sum`), and the sum (`induce_sum`).  The general (no-coprimality) analog of
+`exists_extension_induce_eq_sum_induce_mul`, using a constituent `ψ` (with factor `e`) in place of an
+extension `χ`.  Feeds the `H'/H`-level equal-degree that Peterfalvi (12.5) needs. -/
+theorem induce_smul_eq_sum_induce_mul_of_invariant_inertia
+    {L : Type*} [Group L] [Finite L] [Fintype L] [Invertible (Nat.card L : ℂ)]
+    {N T : Subgroup L} [N.Normal] [(N.subgroupOf T).Normal] (hNT : N ≤ T)
+    [Fintype ↥N] [Fintype ↥T] [Fintype ↥(N.subgroupOf T)]
+    [Invertible (Nat.card ↥N : ℂ)] [Invertible (Nat.card ↥T : ℂ)]
+    [Invertible (Nat.card ↥(N.subgroupOf T) : ℂ)]
+    [Fintype (IrreducibleCharacter ↥(N.subgroupOf T))] [Fintype ((↥T ⧸ N.subgroupOf T) →* ℂˣ)]
+    (hab : ∀ x y : ↥T, ⁅x, y⁆ ∈ N.subgroupOf T)
+    (θ : IrreducibleCharacter ↥N)
+    (hinertia : ClassFunction.inertia (G := L) (θ : ClassFunction ↥N ℂ) = T)
+    (ψ : IrreducibleCharacter ↥T)
+    (hover : IrreducibleCharacter.LiesOver (N.subgroupOf T) ψ
+      (⟨ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hNT).toMonoidHom
+          (θ : ClassFunction ↥N ℂ),
+        IsIrreducibleCharacter.compHom_of_surjective
+          (Subgroup.subgroupOfEquivOfLe hNT).surjective θ.isIrreducible⟩ :
+        IrreducibleCharacter ↥(N.subgroupOf T))) :
+    ClassFunction.restrictionMultiplicity (N.subgroupOf T) (ψ : ClassFunction ↥T ℂ)
+        (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hNT).toMonoidHom
+          (θ : ClassFunction ↥N ℂ))
+      • ClassFunction.induce N (θ : ClassFunction ↥N ℂ)
+      = ∑ β : (↥T ⧸ N.subgroupOf T) →* ℂˣ,
+          ClassFunction.induce T ((ψ : ClassFunction ↥T ℂ) *
+            linearClassFunction (β.comp (QuotientGroup.mk' (N.subgroupOf T)))) := by
+  classical
+  set θ' : IrreducibleCharacter ↥(N.subgroupOf T) :=
+    ⟨ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hNT).toMonoidHom
+        (θ : ClassFunction ↥N ℂ),
+      IsIrreducibleCharacter.compHom_of_surjective
+        (Subgroup.subgroupOfEquivOfLe hNT).surjective θ.isIrreducible⟩ with hθ'
+  -- `θ` is `T`-invariant (as `T = I_L(θ)`), transported to `θ'` on `N.subgroupOf T`.
+  have hinvT : ∀ t : ↥T, ClassFunction.conjBy ((t : L)) (θ : ClassFunction ↥N ℂ)
+      = (θ : ClassFunction ↥N ℂ) := fun t => by
+    have hmem : (t : L) ∈ ClassFunction.inertia (G := L) (θ : ClassFunction ↥N ℂ) := by
+      rw [hinertia]; exact t.2
+    exact (ClassFunction.mem_inertia).mp hmem
+  have hinertia' : ClassFunction.inertia (G := ↥T)
+      (θ' : ClassFunction ↥(N.subgroupOf T) ℂ) = ⊤ :=
+    inertia_compHom_subgroupOfEquivOfLe_eq_top hNT hinvT
+  have hinv' : ∀ y : ↥T, IrreducibleCharacter.conjBy y θ' = θ' := fun y => by
+    apply IrreducibleCharacter.ext
+    rw [IrreducibleCharacter.coe_conjBy]
+    have hmem : y ∈ ClassFunction.inertia (G := ↥T)
+        (θ' : ClassFunction ↥(N.subgroupOf T) ℂ) := by
+      rw [hinertia']; exact Subgroup.mem_top y
+    exact (ClassFunction.mem_inertia).mp hmem
+  -- Inertia-level general (1.7.b): `e · Ind_N^T θ' = ψ · ∑_β Inf(β)`.
+  have h5a := induce_smul_eq_mul_sum_of_invariant (K := ↥T) (H := N.subgroupOf T) hab θ' ψ hover hinv'
+  -- Induction in stages: `Ind_T^L(Ind_N^T θ') = Ind_N^L θ`.
+  have hstages := induce_induce_subgroupOf (M := L) hNT (θ : ClassFunction ↥N ℂ)
+  have hcoe' : (θ' : ClassFunction ↥(N.subgroupOf T) ℂ)
+      = ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hNT).toMonoidHom
+          (θ : ClassFunction ↥N ℂ) := rfl
+  rw [← hstages, ← ClassFunction.induce_smul, ← hcoe', h5a, ClassFunction.mul_sum,
+    ClassFunction.induce_sum]
 
 end OddOrder.RepresentationTheory
