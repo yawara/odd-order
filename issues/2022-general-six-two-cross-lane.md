@@ -275,3 +275,10 @@ H0C_trace_ne_top / commutator_mem_H0 (elementary abelian 経由) / commutator_HC
 trace_ne_top_of_lt_derived / HC_quotient_H0C_comm / HC_central_condition (Normal は
 instance-arg)。(11.4) glue の全数学的前提が揃った — 残 = relIndex 変換 (relIndex_subgroupOf /
 relIndex_mul_relIndex / card_W1_eq_derived_index) + |HC| = |H||C| (disjoint sup card) + 適用。
+
+## 2026-07-05 lane-a (loop 11): **(11.4) 閉了** — coherent_quotient_bound 実証明
+
+bare sorry 撤去 (依存 = sixTwoDecompositionData のみ)。index 算術 (card_HC /
+HC_relIndex_derived / HC_trace_index) + glue。instance desync は legacy binder 削除で解決。
+次候補: (11.5) HC_le_secondDerived ((11.4) 消費、(5.7)+(11.1)/(9.6) 算術) or (11.3) 6.3-route
+or μ-column datum 本体。
