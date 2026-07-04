@@ -74,6 +74,21 @@ sorry-free に flip。b・a とも独立に build-green (sorried contract 経由
 **この裁定は user 相談不要と判断**: 再々編で確立した lane charter (S15=b, FeitThompson=a) の執行であり、
 spec 違反でも大規模 cross-lane scope 変更でもない。各自の所有ファイル内 additive threading。3002 解決で本 issue close。
 
+## ⚠ 2026-07-04 (lane b) 訂正: 「sorried default で b-solo build-green」機構は不成立
+HUB 裁定の分担 (b が S15.Hypothesis に field pin / a が supply) は正しいが、**「b が sorried-default field で
+independently build-green」は誤り**。理由: `sectionSixteenHypothesis_of_inputs` (a の constructor, FeitThompson)
+に **`#assert_only_allowed_axioms OddOrder.sectionSixteenHypothesis_of_inputs` (AxiomsCheck.lean:3221)** が在り、
+allowlist = 3 axiom (propext/Classical.choice/Quot.sound)、**sorryAx は不許可**。`S15.Hypothesis` に
+`field := sorry` default を足すと、a の constructor が (omit → default 使用で) sorryAx 依存になり **assertion が
+build-error** → build-RED。⟹ b が field を足すには a が**同時に**実値/sorried-supply + assertion 調整をせねばならず、
+**b-solo build-green 不可** (a coordination 必須)。
+- **b-solo で build-green に前進できるのは cite-sorried-**producer**経路**: 別 sorried producer (S15 内) を立て
+  wrapper を engine から実証明 (grid obligation を producer に isolate)。(13.10) `analyticInequalityEstimates`
+  が先例 (f17fdbcd)。**a threading 後は producer→hyp.field へ re-point** (engine wiring は再利用)。
+- **∴ sequencing 修正**: b は producer 経路で wrapper de-opacify を進める (build-green, solo)。field-threading
+  (hyp interface) は a の supply landing と**同時**に行う coordinated change (b field 追加 + a supply、単一 build-green
+  commit、hub 承認合流) — sorried-default による段階 landing は不可。
+
 ## 参照
 - issue 3002 (grid-property-carrier-enrichment) — a-side spec + b 訂正節 (2026-07-04) + fix-owner を 2026-07-04 再々編に更新
 - `notes/peterfalvi/s15_s_and_t.md` 2026-07-04 lane b LIVE STATUS
