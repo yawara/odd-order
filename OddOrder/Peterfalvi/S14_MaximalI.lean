@@ -5109,17 +5109,76 @@ theorem witness_L_isTypeI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [hLtype] at hLt
     exact absurd ⟨data.L, data.L_maximal, hLt⟩ (OddOrder.Peterfalvi.S12.no_typeV_maximal hG)
 
-/-- **Peterfalvi (12.10) obligation B**: the type-I witness `L`'s complement `U` is a Z-group.  A
-prime `q ∣ |L/H|` has `q < p`: in case (8.3.c) `q ∣ p−1`; in case (8.3.b) a Sylow `p`-subgroup of `H`
-has rank 2 and (8.1.c) gives an order-`q` element of `L` acting fixed-point-freely on `Ω₁(P)`, so
-`q ∣ p²−1`, hence `q ∣ p−1` or `q ∣ p+1`, so `q < p`.  By the minimality of `p` (12.8) a Sylow
-`q`-subgroup of `L` is cyclic; thus `U` is a Z-group.  Deep §8 minimality argument; pinned
-(hub 9003 Cluster A). -/
+/-- **Peterfalvi (12.10) obligation B, minimality core** (pinned sorried §8/(12.8) obligation, hub
+9003 Cluster A): for the type-I witness `L` of (12.9), every Sylow `q`-subgroup of `L` at a prime
+`q` dividing `|U|` (`U =` the complement of `H = L_F`) is **cyclic**.
+
+Peterfalvi's argument: a prime `q ∣ |L/H|` has `q < p` — in case (8.3.c) `q ∣ p−1`; in case
+(8.3.b) a Sylow `p`-subgroup `P` of `H` is of rank `2` and (8.1.c) yields an order-`q` element of
+`L` acting fixed-point-freely on `Ω₁(P)`, so `q ∣ p²−1`, hence `q ∣ p−1` or `q ∣ p+1`, giving
+`q < p`.  By the minimality of `p` in (12.8) (no type-I maximal has a noncyclic Sylow `q`-subgroup
+of its `M/M_F` for `q < p`), a Sylow `q`-subgroup of `L` is cyclic.
+
+**Genuinely still-missing**: the (8.3.b/c)/(8.1.c) fixed-point-free-order-`q` facts and the
+(12.8)-minimality transfer to `L`'s Sylow `q`-subgroups are not assembled in reach of S14.  The
+statement is **sound**: it is Peterfalvi's genuine minimality conclusion for the witness `L` (tied
+to `ctr` via `data`), true because every `q ∣ |U|` is `< p` and `p` is minimal.  Constrained to
+primes `q ∣ |U|` (for `q ∤ |U|` the claim is not needed and the witness complement is a `p'`-group,
+so the (8.3)/(12.8) route only speaks about such `q`). -/
+theorem witness_L_sylow_cyclic_of_dvd_complement [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
+    (typeI : TypeIData data.L) {q : ℕ} (hq : q.Prime)
+    (hqU : q ∣ Nat.card ↥typeI.typeF.U) (Q : Sylow q ↥data.L) :
+    IsCyclic ↥(Q : Subgroup ↥data.L) := by
+  sorry
+
+/-- **Peterfalvi (12.10) obligation B**: the type-I witness `L`'s complement `U` is a Z-group.
+
+**Assembly** (`sorry`-free modulo the (8.3)/(8.1.c)/(12.8) minimality core): to show every Sylow
+`q`-subgroup `P` of `U` is cyclic, distinguish `q ∣ |U|` from `q ∤ |U|`.  If `q ∤ |U|` then `P` is
+trivial (its order is a `q`-power dividing `|U|`, forcing order `1`), hence cyclic.  If `q ∣ |U|`,
+embed `U ↪ L` (via `U_le`): `P` becomes a `q`-subgroup of `L`, contained in a Sylow `q`-subgroup `Q`
+of `L`, which is cyclic by the minimality core `witness_L_sylow_cyclic_of_dvd_complement`; a subgroup
+of a cyclic group is cyclic, so `P` is cyclic. -/
 theorem witness_L_complement_isZGroup [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
     (typeI : TypeIData data.L) :
     _root_.IsZGroup ↥typeI.typeF.U := by
-  sorry
+  classical
+  rw [isZGroup_iff]
+  intro q hq P
+  haveI : Fact q.Prime := ⟨hq⟩
+  by_cases hqU : q ∣ Nat.card ↥typeI.typeF.U
+  · -- `q ∣ |U|`: embed `P` into `L`, contain it in a cyclic Sylow `q`-subgroup of `L`.
+    -- `P`, pushed along `U ↪ L`, is a `q`-subgroup of `L`.
+    have hincl : Function.Injective (Subgroup.inclusion typeI.typeF.U_le) :=
+      Subgroup.inclusion_injective _
+    set PL : Subgroup ↥data.L :=
+      (P : Subgroup ↥typeI.typeF.U).map (Subgroup.inclusion typeI.typeF.U_le) with hPL
+    have hPLpg : IsPGroup q ↥PL :=
+      (P.2.map (Subgroup.inclusion typeI.typeF.U_le))
+    obtain ⟨Q, hQle⟩ := hPLpg.exists_le_sylow
+    -- The containing Sylow `q`-subgroup of `L` is cyclic (minimality core).
+    haveI hQcyc : IsCyclic ↥(Q : Subgroup ↥data.L) :=
+      witness_L_sylow_cyclic_of_dvd_complement hG data typeI hq hqU Q
+    -- A subgroup of a cyclic group is cyclic; `PL ≤ Q ≅ P`.
+    haveI : IsCyclic ↥PL := Subgroup.isCyclic_of_le hQle
+    exact isCyclic_of_surjective _
+      (Subgroup.equivMapOfInjective (P : Subgroup ↥typeI.typeF.U)
+        (Subgroup.inclusion typeI.typeF.U_le) hincl).symm.surjective
+  · -- `q ∤ |U|`: the Sylow `q`-subgroup is trivial, hence cyclic.
+    have hcard : Nat.card ↥(P : Subgroup ↥typeI.typeF.U) ∣ Nat.card ↥typeI.typeF.U :=
+      (P : Subgroup ↥typeI.typeF.U).card_subgroup_dvd_card
+    obtain ⟨k, hk⟩ := P.2.exists_card_eq
+    have hqk : q ^ k ∣ Nat.card ↥typeI.typeF.U := hk ▸ hcard
+    have hk0 : k = 0 := by
+      by_contra hk0
+      exact hqU ((dvd_pow_self q hk0).trans hqk)
+    have hcard1 : Nat.card ↥(P : Subgroup ↥typeI.typeF.U) = 1 := by rw [hk, hk0, pow_zero]
+    haveI : Subsingleton ↥(P : Subgroup ↥typeI.typeF.U) :=
+      (Finite.card_le_one_iff_subsingleton).mp (by omega)
+    infer_instance
 
 /-- **Peterfalvi (12.10)**: the maximal subgroup `L` supplied by (12.9) is Frobenius with kernel
 `L_F`.  **Assembly** (`sorry`-free modulo the two (12.10) obligations): `L` is Type I
@@ -5147,14 +5206,53 @@ theorem mainSubgroup_le (M : Subgroup G) (tau : OddOrder.GroupTheory.PeterfalviT
       | exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le M
       | exact Subgroup.map_subtype_le _
 
-/-- **Peterfalvi (12.11)**: `M inter L` complements `K` in `M` and lies in the
-Fitting kernel `H` of the witness subgroup `L`. -/
+/-- **Peterfalvi (12.11), first assertion** (pinned sorried §8 obligation, hub 9003 Cluster A):
+`M ∩ L` complements `K = M_F` in `M`.  This is the "first assertion follows from (12.9) and
+(8.13.c1)" step: for the (12.9) witness with `x ∈ Ω₁(P₀)^#` escaping (`C_G(x) ⊄ L`,
+`N_G(⟨x⟩) ⊆ M`), (8.13.c1) (BG §16 Theorem II) gives `C_G(x) = R(x) ⋊ C_M(x)` and, transported to
+`M`, `M ∩ L` complements `M_F = K`.
+
+**Genuinely still-missing** as a usable complement: the (8.13.c1) signalizer-complement structure
+(`S10.escaping_typeIA_signalizer_structure`, itself pinned upstream through BG §16 Theorem II) is
+not assembled into the `M ∩ L`-complements-`K` conclusion anywhere in the repo.  The statement is
+**sound**: it is Peterfalvi's genuine (12.11) first assertion for the witness `L` of `ctr` (tied via
+`data`), true by (12.9)+(8.13.c1). -/
+theorem intersection_complements_K [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
+    Subgroup.IsComplement' (ctr.K.subgroupOf ctr.M) ((ctr.M ⊓ data.L).subgroupOf ctr.M) := by
+  sorry
+
+/-- **Peterfalvi (12.11), second assertion** (pinned sorried §8/§9 obligation, hub 9003 Cluster A):
+`M ∩ L ⊆ H = L_F`.  This is the second paragraph of (12.11): a subgroup `A ≤ M ∩ L` of order prime
+to `|H|` normalizes `P₀ = O_p(H) ∩ M` (nilpotency of `H`); by (8.1.c) `P₀` does not centralize `K`
+and, by (12.10) (`L` Frobenius, kernel `H`), `P₀A` is Frobenius with kernel `P₀` when `A ≠ 1`; by
+(9.1) (Wielandt) applied to `P₀A ↷ K`, `C_K(A) ≠ 1`, hence (via (12.9)) `C_K(x) ≠ 1`; by (8.1.b)
+`A` and `x` lie in an abelian subgroup of `M ∩ L`, so `A` centralizes `x`, forcing `A = 1`.  Thus
+`M ∩ L` has no nontrivial `p'`-part, i.e. `M ∩ L ⊆ O_p(H) ⊆ H`.
+
+**Genuinely still-missing** as a usable containment: this argument chains (8.1.b), (8.1.c), (9.1),
+(12.10); the §8 facts (8.1.b/c) are not assembled in reach of S14 and the (12.10) Frobenius input is
+itself pinned.  The statement is **sound**: it is Peterfalvi's (12.11) second assertion for the
+genuine witness `L` (tied to `ctr` via `data`). -/
+theorem intersection_le_kernel [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
+    ctr.M ⊓ data.L ≤ maxNilpotentNormalHall data.L := by
+  sorry
+
+/-- **Peterfalvi (12.11)**: `M ∩ L` complements `K` in `M` and lies in the Fitting kernel
+`H = L_F` of the witness subgroup `L`.
+
+**Assembly**: the two textbook assertions of (12.11) are `intersection_complements_K` (from (12.9)
+and (8.13.c1)) and `intersection_le_kernel` (the (8.1.b/c)+(9.1)+(12.10) `A = 1` argument),
+combined here. -/
 theorem intersection_complement_structure [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
     Subgroup.IsComplement' (ctr.K.subgroupOf ctr.M) ((ctr.M ⊓ data.L).subgroupOf ctr.M) ∧
-      ctr.M ⊓ data.L ≤ maxNilpotentNormalHall data.L := by
-  sorry
+      ctr.M ⊓ data.L ≤ maxNilpotentNormalHall data.L :=
+  ⟨intersection_complements_K hG data, intersection_le_kernel hG data⟩
 
 /-- **Peterfalvi (12.10), non-TI clause**: for the (12.9) witness `L`, its Frobenius kernel
 `H = L_F` has `H^#` **not** a TI-subset of `G`.  This is the "By (12.9), `H^#` is not a TI-subset"
@@ -5584,16 +5682,112 @@ theorem isCyclic_and_card_dvd_of_fpf_conj_elemAbelian
   · exact Or.inl (by rwa [h] at hdvd)
   · exact Or.inr (by rwa [h] at hdvd)
 
-/-- **Peterfalvi (12.12)**: the Frobenius complement in the witness subgroup is
-cyclic, with order dividing `p - 1` or `p + 1`. -/
+/-- **Peterfalvi (12.12), structural input from (12.9)/(12.10)/(12.11)** (pinned sorried §8/§9
+obligation, hub 9003 Cluster A).  For the (12.9) witness `L` (type-I Frobenius, kernel `H = L_F`),
+with `E := frob.complement.map L.subtype` the Frobenius complement realized in `G`, there is a
+subgroup `T ≤ G` — Peterfalvi's `T = Ω₁Z(O_p(H))` — that is
+* **elementary abelian** of order `p` or `p²` (`P₀` is abelian of rank `2` by (12.9), so `Ω₁Z(P)`
+  has order `p` or `p²`);
+* **normalized by `E`** (`E` normalizes `O_p(H)`, its center, and the `Ω₁`);
+* on which `E` acts **fixed-point-freely by conjugation** (Peterfalvi (12.10): as `L` is Frobenius
+  with kernel `H`, the complement `E` fixes no nonidentity element of `H`, a fortiori none of
+  `T ⊆ H`),
+
+and, encoding the `p+1` refinement of (12.12) (the (12.11) step `A ⊆ M ⟹ A = 1` for `A ≤ E` of
+order dividing `p-1`), if `|E|` divides `p² - 1` then in fact `|E|` divides `p - 1` or `p + 1`.  We
+also record `T ≤ H` (`Ω₁Z(O_p(H)) ⊆ H`), used to see `p ∣ |H|`.
+
+**Genuinely still-missing**: the `O_p(H)`/`Ω₁Z` structure theory of the nilpotent kernel `H`, the
+FPF-conjugation fact from the (still-pinned) Frobenius structure of `L` ((12.10)
+`witness_L_frobenius`), and the (12.11) `A = 1` refinement are none of them assembled in the repo as
+a usable package for the witness complement.  The statement is **sound**: it is exactly Peterfalvi's
+(12.12) intermediate data for the genuine witness `L` (tied to `ctr` via `data`), true because `L`
+is the Frobenius witness of (12.9)/(12.10) with `P₀ ⊆ H` of rank `2`. -/
+theorem exists_center_omega1_elemAbelian_fpf_of_witness [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
+    (frob : TypeIFrobeniusData data.L) :
+    ∃ T : Subgroup G, IsElementaryAbelian ctr.p ↥T ∧
+      (frob.complement.map data.L.subtype ≤ Subgroup.normalizer (T : Set G)) ∧
+      (Nat.card ↥T = ctr.p ∨ Nat.card ↥T = ctr.p ^ 2) ∧
+      T ≤ frob.typeI.typeF.H ∧
+      (∀ e : G, e ∈ frob.complement.map data.L.subtype → e ≠ 1 →
+        ∀ t : G, t ∈ T → e * t * e⁻¹ = t → t = 1) ∧
+      (Nat.card ↥frob.complement ∣ ctr.p ^ 2 - 1 →
+        Nat.card ↥frob.complement ∣ ctr.p - 1 ∨ Nat.card ↥frob.complement ∣ ctr.p + 1) := by
+  sorry
+
+/-- **Peterfalvi (12.12)**: the Frobenius complement `E` in the (12.9) witness subgroup `L` is
+cyclic, with order `e = |E|` dividing `p - 1` or `p + 1`.
+
+**Assembly** (`sorry`-free modulo the (12.9)/(12.10)/(12.11) structural package): from
+`exists_center_omega1_elemAbelian_fpf_of_witness` we obtain `T = Ω₁Z(O_p(H))` — elementary abelian
+of order `p` or `p²`, normalized by `E` (realized in `G` as `E' = frob.complement.map L.subtype`),
+with `E'` acting fixed-point-freely on `T` by conjugation.  The proven rep-theory core
+`isCyclic_and_card_dvd_of_fpf_conj_elemAbelian` then gives `IsCyclic E' ∧ (|E'| ∣ p-1 ∨ |E'| ∣ p²-1)`
+(the `§8`-free Singer/Case-A+B mechanism).  Transporting cyclicity back along `L.subtype` (`E ≅ E'`)
+and applying the packaged `p+1` refinement to the `p²-1` branch yields the (12.12) conclusion. -/
 theorem complement_cyclic_order_dvd [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {ctr : CounterexampleHypothesis (G := G)} {L : Subgroup G}
-    (frob : TypeIFrobeniusData L) :
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
+    (frob : TypeIFrobeniusData data.L) :
     IsCyclic ↥frob.complement ∧
       ((Nat.card ↥frob.complement ∣ ctr.p - 1) ∨
         (Nat.card ↥frob.complement ∣ ctr.p + 1)) := by
-  sorry
+  classical
+  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  -- The Frobenius complement, realized as a subgroup `E'` of the ambient `G`.
+  set E' : Subgroup G := frob.complement.map data.L.subtype with hE'
+  -- `E ≅ E'` (injective image), so cardinalities agree.
+  have hEcard : Nat.card ↥E' = Nat.card ↥frob.complement :=
+    Subgroup.card_map_of_injective (K := frob.complement) data.L.subtype_injective
+  -- The (12.9)/(12.10)/(12.11) structural package for the witness complement.
+  obtain ⟨T, hTelem, hEnorm, hTcard, hTleH, hfpf, hrefine⟩ :=
+    exists_center_omega1_elemAbelian_fpf_of_witness hG data frob
+  -- Odd order of `E'` (a subgroup of the odd-order `G`).
+  have hodd : Odd (Nat.card ↥E') :=
+    hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card E')
+  -- `p ∤ |E'|`: `E'` is a Frobenius complement, coprime to the kernel `H ⊇ T` which has order
+  -- divisible by `p` (`|T| = p` or `p²`).  Concretely `|T| ∣ |kernel|` and `p ∣ |T|`, while
+  -- `Coprime |kernel| |complement|`, so `p ∤ |E'|`.
+  have hp_ndvd : ¬ ctr.p ∣ Nat.card ↥E' := by
+    -- `p ∣ |T|` (order `p` or `p²`).
+    have hpT : ctr.p ∣ Nat.card ↥T := by
+      rcases hTcard with h | h
+      · rw [h]
+      · rw [h]; exact dvd_pow_self ctr.p (by norm_num)
+    -- `T ≤ H` (`T = Ω₁Z(O_p(H)) ⊆ H`); realize via the FPF hypothesis: `T`'s elements are moved by
+    -- every nontrivial element of `E'`, and `E'`, `H` are Frobenius-coprime.  We use the abstract
+    -- coprimality of the Frobenius pair on `↥L`.
+    have hcopLL : Nat.Coprime (Nat.card ↥(frob.typeI.typeF.H.subgroupOf data.L))
+        (Nat.card ↥frob.complement) := frob.frobenius.coprime_card_kernel_complement
+    -- It suffices that `p ∣ |H|` and `Coprime |H| |E'|` (via `|E'| = |E|`), then `p ∤ |E'|`.
+    -- `|H_L| = |H|` where `H_L = H.subgroupOf L`.
+    have hHcard : Nat.card ↥(frob.typeI.typeF.H.subgroupOf data.L)
+        = Nat.card ↥frob.typeI.typeF.H :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe frob.typeI.typeF.H_le).toEquiv
+    -- `p ∣ |H|`: `T ≤ H` (`hTleH`, from the package), and `p ∣ |T| ∣ |H|`.
+    have hpH : ctr.p ∣ Nat.card ↥frob.typeI.typeF.H :=
+      hpT.trans (Subgroup.card_dvd_of_le hTleH)
+    have hpHL : ctr.p ∣ Nat.card ↥(frob.typeI.typeF.H.subgroupOf data.L) := by
+      rw [hHcard]; exact hpH
+    rw [hEcard]
+    intro hpE
+    exact ctr.p_prime.not_dvd_one (hcopLL ▸ Nat.dvd_gcd hpHL hpE)
+  -- The proven rep-theory core: `E'` cyclic and `|E'| ∣ p-1 ∨ |E'| ∣ p²-1`.
+  obtain ⟨hcycE', hdvdE'⟩ :=
+    isCyclic_and_card_dvd_of_fpf_conj_elemAbelian hTelem hEnorm hodd (hEcard ▸ hp_ndvd) hTcard hfpf
+  -- Transport cyclicity `E' ≅ E` back to `E`.
+  have hcyc : IsCyclic ↥frob.complement :=
+    isCyclic_of_surjective _
+      (Subgroup.equivMapOfInjective frob.complement data.L.subtype
+        data.L.subtype_injective).symm.surjective
+  refine ⟨hcyc, ?_⟩
+  -- Rewrite `|E'| = |E|` in the divisibility and apply the `p+1` refinement.
+  rw [hEcard] at hdvdE'
+  rcases hdvdE' with h | h
+  · exact Or.inl h
+  · exact hrefine h
 
 /-! ## (12.13)--(12.16): Dade notation and contradiction -/
 

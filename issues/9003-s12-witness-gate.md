@@ -723,3 +723,18 @@ geometry は存在しなかった**ことが判明。原因は **Peterfalvi (8.1
 **この issue の Cluster A/B gate map は P1 側は解決、P2 側は phantom として棄却**。type-P2 の「BG§14-15 新
 geometry build」指示は不要（構築対象が偽だった）。→ **lane-b char/support frontier は確定的に枯渇**。次配分は
 9008「hub への確認事項」参照。
+
+## ✅ 2026-07-04 (lane b): Cluster A gate map が STALE と判明 → §12 (12.10)-(12.12) chain を実証明化
+本 issue の Cluster A「§8-§11 は grep 不在ゆえ (12.10) witness path は gated」は **07-02 時点で stale**。
+その後 §8-§11 の多くが形式化済 (`no_typeV_maximal` S12:3742・`typeI_or_typeII_centralizer_unique` S10:407・
+`typeII_centralizer_U_eq_bot` S11:530 等)。cite-and-proceed (available cite + 欠け分を sound sorried pin) で
+**§12 の (12.10)/(12.11)/(12.12)/(12.10.B) 全 4 obligation を body-sorry-free に実証明** (commits 3fe1980a
+`witness_L_isTypeI` / 0282f2cb 残 3)。
+- **isolate された §8-§11 pin (6 本、= 真の残 upstream obligation、Cluster A の実体)**:
+  `typeII_centralizer_le_of_mem_mainSubgroup` (8.16)・`typeIIIorIV_centralizer_le_of_mem_noncyclic_mainSubgroup`
+  (11.9.c+11.6+9.7.b+8.6.a)・`witness_L_sylow_cyclic_of_dvd_complement` (8.3/12.8 minimality)・
+  `intersection_complements_K` (12.11.1, 8.13.c1)・`intersection_le_kernel` (12.11.2, 8.1.b/c+9.1+12.10)・
+  `exists_center_omega1_elemAbelian_fpf_of_witness` (12.12 T-package + 12.11 refinement)。全 witness-tied で
+  sound-as-stated (§8-§11 が clean 形式化されたら discharge/relocate 可)。
+- ⟹ **Cluster A は「§12 witness path 全体 gated」でなく「6 個の precise §8-§11 pin に isolate 済」に更新**。
+  §12 の構造 logic は real。**教訓: gate map issue は日付を見て疑い、上流を今 grep + cite-sorried を適用**。
