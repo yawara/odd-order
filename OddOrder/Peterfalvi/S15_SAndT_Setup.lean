@@ -1544,7 +1544,7 @@ open scoped Classical in
 function `f` agreeing on `K` with a class function `ψ` of self inner product `n`, the
 squared-norm sum over the nonidentity `K`-members is `|K|·n − ‖f(1)‖²`. -/
 theorem sum_filter_erase_one_normSq_eq {L : Type*} [Group L] [Fintype L]
-    {K : Subgroup L} [Invertible (Nat.card ↥K : ℂ)]
+    {K : Subgroup L} [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)]
     (f : L → ℂ) (ψ : ClassFunction ↥K ℂ) (hagree : ∀ k : ↥K, f ↑k = ψ k)
     {n : ℕ} (hn : ClassFunction.inner ψ ψ = (n : ℂ)) :
     ∑ x ∈ (Finset.univ.filter (· ∈ K)).erase 1, ‖f x‖ ^ 2
@@ -2481,12 +2481,52 @@ theorem lambda_tau1_sharp_norm_lower [Finite G] (_hG : OddOrder.BG.IsMinimalSimp
   rwa [sum_apply_erase_one_filter_subgroupOf hHS
     (fun y => ‖chars.tau1S chars.lambda y‖ ^ 2)] at hengine
 
-/-- **Peterfalvi (13.5) for `χ = η₁₀`, `a = 0`** — the correction datum of the (13.7) estimate:
-`η₁₀` is orthogonal to `S^{τ₁}` ((5.3.b)+(5.5)+(13.3.c)), so the (13.5.a) point formula
-collapses to `η₁₀ = α` on `H^#`; the sharp sum of `‖α‖²` is the integer
-`s = |H|·‖α‖² − α(1)²` (`n = ‖α‖²`, Parseval), `α(1)² = d²` with `d ≡ 1 (mod q)` (so `α ≠ 0`,
-`n ≥ 1`), the (13.5.c) inflation bound holds with `|P| = p^q`, and — `H` being abelian
-(13.2.a,b) — `n = 1` forces `d² = 1`.  Faithful producer of the (13.5)-for-`η₁₀` package. -/
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce Classical in
+/-- **The (13.5) orthogonality hypothesis for `χ = η₁₀`** (Peterfalvi (13.7), first step):
+`η₁₀` is orthogonal to `S^{τ₁}` by (5.3.b)+(5.5)+(13.3.c), so *every* `P`-non-kernel (7.7.a)
+coefficient vanishes (`a = 0`).  Faithful producer; gated on the (13.3.c)/(5.3.b) grid
+orthogonality. -/
+theorem eta10_cCoeff_orthogonal [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    ∀ i : Fin ((H_sharp_hypothesis76 hG hyp).n + 1), 0 < i →
+      ¬ ((hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel ((H_sharp_hypothesis76 hG hyp).zeta i)) →
+      (H_sharp_hypothesis76 hG hyp).cCoeff hyp.eta10 i = 0 := by
+  sorry
+
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce Classical in
+/-- **The (7.7.a) coefficients of `η₁₀` are integers**: `c_i = ⟨τ(ψ_i), η₁₀⟩` with
+`η₁₀ ∈ ℤ[Irr G]` (real, `eta10_mem_ZIrr`) and `τ(ψ_i) ∈ ℤ[Irr G]` (the Dade image of the
+virtual character `ψ_i = ζ_i − d_i ζ_0`, Peterfalvi (2.10)).  Faithful producer; the residual
+is the `τ`-image virtuality (the (2.10) inclusion–exclusion is a `ℤ`-combination of
+`Ind_{M(B)} α_B ∈ ℤ[Irr G]`, `induce_alphaB_mem_ZIrr`). -/
+theorem eta10_cCoeff_int [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    ∀ i : Fin ((H_sharp_hypothesis76 hG hyp).n + 1),
+      ∃ z : ℤ, (H_sharp_hypothesis76 hG hyp).cCoeff hyp.eta10 i = (z : ℂ) := by
+  sorry
+
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce Classical in
+/-- **The (13.7) correction is nonzero at `1`**: `α(1) ≡ 1 (mod q)` by the (1.10) congruence
+(`η₁₀(x) ≡ ω₁₀(y) ≡ 1 (mod 1−ε)` on `W₂^#`-cosets), so `α(1) ≠ 0`.  Faithful producer; gated
+on the (1.10)/(3.2.c) grid congruences. -/
+theorem eta10_alphaCF_one_ne_zero [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    H_sharp_alphaCF hG hyp hyp.eta10 1 ≠ 0 := by
+  sorry
+
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce Classical in
+/-- **Peterfalvi (13.5) for `χ = η₁₀`, `a = 0`** — the correction datum of the (13.7) estimate.
+
+Assembly target (WIP): the concrete correction `α = H_sharp_alphaFun` with the point formula
+`η₁₀ = α` on `H^#` (`H_sharp_point_formula_kernel_only` + `eta10_cCoeff_orthogonal`),
+`α|_H ∈ ℤ[Irr H]` (`H_sharp_alphaCF_restrict_mem_ZIrr` + `eta10_cCoeff_int`) giving
+`n = ‖α‖² ∈ ℕ` (`exists_nat_inner_self_of_mem_ZIrr`) and `d = |α(1)|`
+(`exists_int_apply_one_of_mem_ZIrr`), the Parseval bookkeeping
+(`sum_filter_erase_one_normSq_eq`), the (13.5.c) inflation (`H_sharp_alphaFun_inflation`),
+`α(1) ≠ 0` (`eta10_alphaCF_one_ne_zero`) forcing `n ≥ 1`, and `H` abelian
+(`H_mulCommutative` + `apply_one_eq_one_of_isMulCommutative`) forcing `d² = 1` at `n = 1`.
+The remaining glue is `Fintype`/`Decidable` instance canonicalization across the sum shapes. -/
 theorem exists_caseB_data_eta10 [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     ∃ (α : G → ℂ) (d n s : ℕ),
