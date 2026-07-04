@@ -410,3 +410,27 @@ coeff (X ∈ ℤ[R]) / Y ⊥ R。
 - 残り本体: CharacterPsiDecomposition の tau1 (lattice-relative isometry) を
   列和 ψ に対して与える部分 = (5.2) 的 τ₁-構成。irr 版
   `decompositionDaFromDadeOfDiff` の内部を読み、列版に一般化するのが次の実作業。
+
+### 追記 2 (loop 28): columnImageFamily 既存 — 分岐は plumbing に帰着
+
+- `Hypothesis.columnImageFamily` (S12_Core:5301) — 列 μ_j の bundled
+  OrthonormalCharacterImageFamily (hyp.tau 版) が**完全既存**。
+  R(μ_j) = {δω_ij^σ} ∪ {−δω_ij'^σ}; image_eq = exists_conj_column +
+  tau_muGrid_columnSum_diff + columnRImage_sum。
+- `decompositionDaFromDadeOfDiff` の本体 = `CharacterPsiDecomposition.ofProjection`
+  (S07) は **generic** (imageFamily + lattice-isometry + agreement + ZIrr + 3 直交)。
+- **残 plumbing**:
+  (a) member-D (可約 χ, ψ-slot 0): ofProjection with columnImageFamily;
+      tau1 := hS₁coh.extension 系 (irr 版 memberDatum_of_irreducible の内部と同型;
+      extension_inner_eq で lattice-isometry)。
+  (b) break-Da (可約 ψ): ofProjection with columnImageFamily (ψ, a•χ₁);
+      直交 3 点は muGridAlpha_inner_* 系。
+  (c) columnImageFamily の引数 (params : CharacterParameters hyp /
+      coh : CoherentHypothesis hyp params / hmu / hos / hzS / hδ...) を
+      sixTwo*-named の文脈 (hS₁coh のみ) からどう供給するかが本丸:
+      (11.8)-consumer 側では mkSection11CharacterData / toCertainTypeHypothesis
+      経由で構築済みのはず → その組を bridge の Hypothesis (S12.Hypothesis) から
+      再構成する producer を先に確認 (grep CoherentHypothesis 構成子)。
+      注意: tau_muGrid_columnSum_diff が coh を要求 — S₁-coherence でなく
+      グローバル (10.2-10.5) パッケージ。sixTwoDecompositionData の呼び出し文脈
+      ((11.4)/(11.3) 消費時) にそれが立つかの検証が次の第一手。
