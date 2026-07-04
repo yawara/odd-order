@@ -324,3 +324,18 @@ N=p^{(q-1)!}−1 → g^N が M 全体を固定 → g^N=1 (faithful) → |C|∣N 
 |V|=(q^p−1)/(q-1), p odd prime) + isSimpleModule_of_abelian_faithful_card。ただし |V|=v-value は
 T_side_caseB_facts (127) の sorry (§13 Galois, 9000)。T-side は常に case-B ゆえ V cyclic は無条件真だが
 v-value 構築が先決。次 stage 候補。
+
+## 2026-07-05 (loop 継続) — ✅ V cyclic 実証明化完了 (T-side dual field model)
+
+V_cyclic (3646) を U cyclic と同 route で closure (S16 real sorry 8→7、full build 3917 green,
+AxiomsCheck OK)。commit ad7efe7f。dual helpers V_le_normalizer_Q/conj_mem_Q (dd320a73) の上に、
+exists_pu_field_repr の module 構成を U→V/P→Q/char p→q/exp q→p で mirror し
+exists_galoisField_repr[p:=q,q:=p] → μ:V↪(GF(q^p))ˣ 単射 → isCyclic_of_injective。
+faithful=D⊥ (proven)、V abelian=S15.isMulCommutative_V、|V|=v (card_V_eq_vd+d=1)、|Q|=q^p=card_Q_eq。
+落とし穴: `open scoped IsMulCommutative in` が Additive Q の AddCommGroup 供給に必須。
+
+**U/V cyclic + kernel-cyclic 連鎖の単一残 gate = v-value** (T_side_caseB_facts 174 の
+`v=(q^p-1)/(q-1)`, §13/9000 σ-theory)。S-side u-value (S15.caseB_order_u_data) も同 σ-theory gate。
+両者は type-P Galois/(9.7) dichotomy foundation (issue 9000, lane a/d 領域) — c 単独 build は不可。
+∴ V_cyclic closure で c の abelian-Singer machinery による S16 leaf 消化は一段落。残 S16 leaf
+(T_typeII/caseB_contradiction/dichotomy/betaGrid/eta_grid) は §3-13 char/grid で other-lane gated。
