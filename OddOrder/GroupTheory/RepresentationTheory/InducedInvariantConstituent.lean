@@ -179,4 +179,77 @@ theorem induce_smul_eq_sum_induce_mul_of_invariant_inertia
   rw [← hstages, ← ClassFunction.induce_smul, ← hcoe', h5a, ClassFunction.mul_sum,
     ClassFunction.induce_sum]
 
+open scoped commutatorElement in
+/-- **The general Peterfalvi (1.7.b): H-level equal degree** (the fact (12.5) consumes).  For `N ⊴ L`
+with inertia `T = I_L(θ)`, `T/N` abelian, and a `T`-constituent `ψ` over `θ'`, every irreducible
+constituent `φ` of `Ind_N^L θ` has degree `φ(1) = [L:T]·ψ(1)`.
+
+From `induce_smul_eq_sum_induce_mul_of_invariant_inertia`, `e·Ind_N^L θ = ∑_β Ind_T^L(ψ·Inf β)`,
+whose summands are irreducible (`isIrreducibleCharacter_induce_of_liesOver_of_inertia_eq`, since
+`Res(ψ·Inf β) = Res ψ` lies over `θ'`).  Pairing with `φ` and using orthonormality,
+`e·⟨Ind θ, φ⟩ = #{β : Ind_T(ψ·Inf β) = φ}`; `φ` a constituent and `e ≠ 0` force
+`φ = Ind_T(ψ·Inf β)`, of degree `[L:T]·(ψ·Inf β)(1) = [L:T]·ψ(1)` (`induce_apply_one`).  As two
+constituents share this common value, `Ind_N^L θ` has equal-degree constituents — with the
+abelian-quotient inertia, no coprimality — as Peterfalvi (12.5) needs at `H'/H`. -/
+theorem induce_inertia_constituent_apply_one_eq
+    {L : Type*} [Group L] [Finite L] [Fintype L] [Invertible (Nat.card L : ℂ)]
+    {N T : Subgroup L} [N.Normal] [(N.subgroupOf T).Normal] (hNT : N ≤ T)
+    [Fintype ↥N] [Fintype ↥T] [Fintype ↥(N.subgroupOf T)]
+    [Invertible (Nat.card ↥N : ℂ)] [Invertible (Nat.card ↥T : ℂ)]
+    [Invertible (Nat.card ↥(N.subgroupOf T) : ℂ)]
+    [Fintype (IrreducibleCharacter ↥(N.subgroupOf T))] [Fintype ((↥T ⧸ N.subgroupOf T) →* ℂˣ)]
+    (hab : ∀ x y : ↥T, ⁅x, y⁆ ∈ N.subgroupOf T)
+    (θ : IrreducibleCharacter ↥N)
+    (hinertia : ClassFunction.inertia (G := L) (θ : ClassFunction ↥N ℂ) = T)
+    (ψ : IrreducibleCharacter ↥T)
+    (hover : ClassFunction.restrictionMultiplicity (N.subgroupOf T) (ψ : ClassFunction ↥T ℂ)
+        (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hNT).toMonoidHom
+          (θ : ClassFunction ↥N ℂ)) ≠ 0)
+    (φ : IrreducibleCharacter L)
+    (hφ : ClassFunction.inner (ClassFunction.induce N (θ : ClassFunction ↥N ℂ))
+        (φ : ClassFunction L ℂ) ≠ 0) :
+    (φ : ClassFunction L ℂ) (1 : L) = (T.index : ℂ) * (ψ : ClassFunction ↥T ℂ) (1 : ↥T) := by
+  classical
+  set θ'cf : ClassFunction ↥(N.subgroupOf T) ℂ :=
+    ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hNT).toMonoidHom
+      (θ : ClassFunction ↥N ℂ) with hθ'cf
+  -- Each twist `ψ·Inf(β)` lies over `θ'` (its restriction to `N.subgroupOf T` is `Res ψ`).
+  have hoverβ : ∀ β : (↥T ⧸ N.subgroupOf T) →* ℂˣ,
+      ClassFunction.restrictionMultiplicity (N.subgroupOf T)
+        ((ψ : ClassFunction ↥T ℂ) * linearClassFunction (β.comp (QuotientGroup.mk' (N.subgroupOf T))))
+        θ'cf ≠ 0 := by
+    intro β
+    rw [ClassFunction.restrictionMultiplicity_def,
+      ClassFunction.restrict_mul_of_apply_eq_one (ψ : ClassFunction ↥T ℂ) _
+        (fun x => linearClassFunction_comp_mk'_apply_eq_one β x.2),
+      ← ClassFunction.restrictionMultiplicity_def]
+    exact hover
+  -- The irreducible constituents `Φ β = Ind_T^L(ψ·Inf β)`, bundled.
+  set Φ : ((↥T ⧸ N.subgroupOf T) →* ℂˣ) → IrreducibleCharacter L := fun β =>
+    ⟨ClassFunction.induce T ((ψ : ClassFunction ↥T ℂ) *
+        linearClassFunction (β.comp (QuotientGroup.mk' (N.subgroupOf T)))),
+      isIrreducibleCharacter_induce_of_liesOver_of_inertia_eq (G := L) hNT θ.isIrreducible
+        hinertia
+        (⟨(ψ : ClassFunction ↥T ℂ) *
+            linearClassFunction (β.comp (QuotientGroup.mk' (N.subgroupOf T))),
+          isIrreducibleCharacter_mul_linearClassFunction ψ.isIrreducible _⟩ :
+          IrreducibleCharacter ↥T)
+        (hoverβ β)⟩ with hΦ
+  have hlift := induce_smul_eq_sum_induce_mul_of_invariant_inertia hNT hab θ hinertia ψ hover
+  -- Pair with `φ`.
+  have hkey : ClassFunction.restrictionMultiplicity (N.subgroupOf T) (ψ : ClassFunction ↥T ℂ) θ'cf
+        * ClassFunction.inner (ClassFunction.induce N (θ : ClassFunction ↥N ℂ)) (φ : ClassFunction L ℂ)
+      = ∑ β : (↥T ⧸ N.subgroupOf T) →* ℂˣ, (if Φ β = φ then (1 : ℂ) else 0) := by
+    rw [← ClassFunction.inner_smul_left, hlift, inner_sum_left]
+    refine Finset.sum_congr rfl fun β _ => ?_
+    simpa using irreducibleCharacter_inner (Φ β) φ
+  have hsum_ne : (∑ β : (↥T ⧸ N.subgroupOf T) →* ℂˣ, (if Φ β = φ then (1 : ℂ) else 0)) ≠ 0 := by
+    rw [← hkey]; exact mul_ne_zero hover hφ
+  obtain ⟨β, _, hβ⟩ := Finset.exists_ne_zero_of_sum_ne_zero hsum_ne
+  have hΦβ : Φ β = φ := by by_contra h; rw [if_neg h] at hβ; exact hβ rfl
+  have hcoe : (φ : ClassFunction L ℂ) = ClassFunction.induce T ((ψ : ClassFunction ↥T ℂ) *
+      linearClassFunction (β.comp (QuotientGroup.mk' (N.subgroupOf T)))) := by rw [← hΦβ]
+  rw [hcoe, ClassFunction.induce_apply_one, ClassFunction.mul_apply, linearClassFunction_apply,
+    map_one, Units.val_one, mul_one]
+
 end OddOrder.RepresentationTheory
