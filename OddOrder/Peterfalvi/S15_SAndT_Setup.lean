@@ -1452,6 +1452,85 @@ instance H_sharp_subgroupOf_normal (hyp : Hypothesis (G := G)) :
   exact OddOrder.BG.Ch2.S08.fittingInG_subgroupOf_normal hyp.S
 
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce Classical in
+/-- **Restriction of a (7.6) family member is `‖ζ_j‖²` times its conjugate-orbit sum**
+(extraction of the Mackey computation shared by the ZIrr-membership and the (13.5.a)
+inner-product orthogonality): there is an inducing irreducible `θ` with
+`ζ_j = Ind_K^S θ` and `Res_K ζ_j = ‖ζ_j‖² • ∑_{ψ ∈ orbit(θ)} ψ`. -/
+theorem H_sharp_restrict_zeta_eq_orbitSum [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (j : Fin ((H_sharp_hypothesis76 hG hyp).n + 1)) :
+    ∃ θ : OddOrder.RepresentationTheory.IrreducibleCharacter
+        ↥((H_sharp_hypothesis76 hG hyp).H.subgroupOf hyp.S),
+      (H_sharp_hypothesis76 hG hyp).zeta j
+        = ClassFunction.induce ((H_sharp_hypothesis76 hG hyp).H.subgroupOf hyp.S)
+            (θ : ClassFunction ↥((H_sharp_hypothesis76 hG hyp).H.subgroupOf hyp.S) ℂ) ∧
+      (haveI : ((H_sharp_hypothesis76 hG hyp).H.subgroupOf hyp.S).Normal :=
+        H_sharp_subgroupOf_normal hyp
+      ClassFunction.restrict ((H_sharp_hypothesis76 hG hyp).H.subgroupOf hyp.S)
+          ((H_sharp_hypothesis76 hG hyp).zeta j)
+        = (H_sharp_hypothesis76 hG hyp).zetaNormSq j •
+            ∑ ψ ∈ Finset.univ.image (fun x : ↥hyp.S =>
+              ClassFunction.conjBy x⁻¹
+                (θ : ClassFunction ↥((H_sharp_hypothesis76 hG hyp).H.subgroupOf hyp.S) ℂ)), ψ) := by
+  classical
+  set K : Subgroup ↥hyp.S := (H_sharp_hypothesis76 hG hyp).H.subgroupOf hyp.S with hKdef
+  haveI hKnorm : K.Normal := H_sharp_subgroupOf_normal hyp
+  obtain ⟨θ₀, hθ₀⟩ := (H_sharp_hypothesis76 hG hyp).zeta_induced j
+  have hθ : (H_sharp_hypothesis76 hG hyp).zeta j
+      = ClassFunction.induce K (θ₀ : ClassFunction ↥K ℂ) := by
+    rw [hθ₀]
+  refine ⟨θ₀, hθ, ?_⟩
+  have hK0 : (Nat.card ↥K : ℂ) ≠ 0 := by exact_mod_cast Nat.card_pos.ne'
+  have horbit := OddOrder.RepresentationTheory.card_smul_restrict_induce_eq_inertia_smul_orbitSum
+    (G := ↥hyp.S) (H := K) (k := ℂ) (θ₀ : ClassFunction ↥K ℂ)
+  have hinertia := OddOrder.RepresentationTheory.card_mul_inner_self_induce_eq_card_inertia
+    (G := ↥hyp.S) (H := K) θ₀
+  have hnormval : (Nat.card ↥K : ℂ) * (H_sharp_hypothesis76 hG hyp).zetaNormSq j
+      = (Nat.card ↥(ClassFunction.inertia (G := ↥hyp.S)
+          (θ₀ : ClassFunction ↥K ℂ)) : ℂ) := by
+    rw [OddOrder.Peterfalvi.S09.Hypothesis76.zetaNormSq, hθ]
+    exact hinertia
+  have hIKnorm : ((Nat.card ↥K : ℂ))⁻¹ * (Nat.card ↥(ClassFunction.inertia (G := ↥hyp.S)
+      (θ₀ : ClassFunction ↥K ℂ)) : ℂ) = (H_sharp_hypothesis76 hG hyp).zetaNormSq j := by
+    rw [← hnormval]
+    field_simp
+  have h1 : (Nat.card ↥K : ℂ) • ClassFunction.restrict K
+      ((H_sharp_hypothesis76 hG hyp).zeta j)
+      = ((Nat.card ↥(ClassFunction.inertia (G := ↥hyp.S)
+          (θ₀ : ClassFunction ↥K ℂ)) : ℕ) : ℂ) • ∑ ψ ∈ Finset.univ.image
+            (fun x : ↥hyp.S => ClassFunction.conjBy x⁻¹ (θ₀ : ClassFunction ↥K ℂ)), ψ := by
+    rw [← Nat.cast_smul_eq_nsmul (R := ℂ)] at horbit
+    rw [hθ]
+    exact horbit
+  have h2 := congrArg (fun φ => ((Nat.card ↥K : ℂ))⁻¹ • φ) h1
+  simp only [smul_smul, inv_mul_cancel₀ hK0, one_smul] at h2
+  rw [h2, hIKnorm]
+
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce Classical in
+/-- **Restriction of the (13.5.a) correction as a combination of family restrictions**
+(pointwise linearity; extraction shared by the ZIrr-membership and the inner-product
+orthogonality). -/
+theorem H_sharp_restrict_alphaCF_decomp [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (χ : ClassFunction G ℂ) :
+    ClassFunction.restrict ((H_sharp_hypothesis76 hG hyp).H.subgroupOf hyp.S)
+        (H_sharp_alphaCF hG hyp χ)
+      = ∑ i ∈ (Finset.Ioi (0 : Fin ((H_sharp_hypothesis76 hG hyp).n + 1))).filter
+            (fun i => (hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
+              OddOrder.Peterfalvi.S03.characterKernel ((H_sharp_hypothesis76 hG hyp).zeta i)),
+          (star ((H_sharp_hypothesis76 hG hyp).cCoeff χ i) /
+            (H_sharp_hypothesis76 hG hyp).zetaNormSq i) •
+            ClassFunction.restrict ((H_sharp_hypothesis76 hG hyp).H.subgroupOf hyp.S)
+              ((H_sharp_hypothesis76 hG hyp).zeta i) := by
+  classical
+  ext x
+  rw [ClassFunction.restrict_apply, H_sharp_alphaCF,
+    OddOrder.RepresentationTheory.ClassFunction.finset_sum_apply,
+    OddOrder.RepresentationTheory.ClassFunction.finset_sum_apply]
+  exact Finset.sum_congr rfl (fun i _ => by
+    rw [ClassFunction.smul_apply, ClassFunction.smul_apply, ClassFunction.restrict_apply])
+
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce Classical in
 /-- **`(1/‖ζ_i‖²)·Res_H ζ_i` is a virtual character of `H`** — the "`Res ζ_i/‖ζ_i‖²` is a
 character" step of Peterfalvi (13.5.a).  `ζ_i = Ind_K^S θ_i` (`zeta_induced`), so by the Mackey
 orbit form (`card_smul_restrict_induce_eq_inertia_smul_orbitSum`) and the inertia norm
