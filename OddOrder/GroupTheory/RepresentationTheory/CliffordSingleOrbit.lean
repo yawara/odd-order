@@ -185,6 +185,44 @@ theorem exists_conj_of_common_induce_constituent
     ((IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H χ θ₁).mp h₁)
     ((IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H χ θ₂).mp h₂)
 
+/-- **Clifford's theorem for an invariant constituent** ([Isaacs] Thm 6.5, invariant case).  For a
+normal `H ⊴ G` and `χ ∈ Irr G` lying over `θ ∈ Irr H` with `θ` **`G`-invariant** (`θ^g = θ` for all
+`g`), the restriction is a single multiple of `θ`: `Res^G_H χ = e · θ` with `e = ⟨Res χ, θ⟩`.
+
+All constituents of `Res^G_H χ` form one `G`-orbit (`restrictionConstituentsSingleOrbit_of_isIrreducible`);
+`G`-invariance collapses that orbit to `{θ}`, so the Fourier expansion
+(`sum_inner_irreducibleCharacter_smul`) of `Res χ` over `Irr H` has only the `θ`-term.
+
+This is the `Res_H ψ = e·θ` input of the general Peterfalvi (1.7.b) — with the inertia-quotient
+decomposition `Ind_H^T(Res ψ) = ψ·∑_β Inf(β)` it gives `e·Ind_H^T θ = ψ·∑_β Inf(β)`, whose
+constituents `ψ·Inf(β)` all have the common degree `ψ(1) = e·θ(1)`. -/
+theorem restrict_eq_restrictionMultiplicity_smul_of_invariant
+    {H : Subgroup G} [hH : H.Normal] [Fintype G] [Fintype ↥H]
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥H : ℂ)]
+    [Fintype (IrreducibleCharacter ↥H)]
+    (χ : IrreducibleCharacter G) (θ : IrreducibleCharacter ↥H)
+    (hover : IrreducibleCharacter.LiesOver H χ θ)
+    (hinv : ∀ g : G, IrreducibleCharacter.conjBy g θ = θ) :
+    ClassFunction.restrict H (χ : ClassFunction G ℂ)
+      = ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ) (θ : ClassFunction ↥H ℂ)
+          • (θ : ClassFunction ↥H ℂ) := by
+  classical
+  have hsingle := restrictionConstituentsSingleOrbit_of_isIrreducible (H := H) χ
+  conv_lhs => rw [← sum_inner_irreducibleCharacter_smul
+    (ClassFunction.restrict H (χ : ClassFunction G ℂ))]
+  rw [Finset.sum_eq_single θ]
+  · rw [ClassFunction.restrictionMultiplicity_def]
+  · intro θ' _ hne
+    rw [smul_eq_zero]
+    left
+    by_contra hc
+    have hover' : IrreducibleCharacter.LiesOver H χ θ' := hc
+    obtain ⟨g, hg⟩ := hsingle θ θ' hover hover'
+    rw [hinv g] at hg
+    exact hne hg.symm
+  · intro h
+    exact absurd (Finset.mem_univ θ) h
+
 set_option backward.isDefEq.respectTransparency false in
 /-- **Clifford's theorem, degree formula** ([Isaacs] Thm 6.5).  For a `G`-irreducible character `χ`,
 a normal subgroup `H ⊴ G`, and a constituent `θ₀` of `Res^G_H χ`, the degree factors as
