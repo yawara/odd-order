@@ -128,6 +128,105 @@ theorem opCore_map_le_centralizer [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
   rw [hK, Subgroup.subgroupOf_map_subtype]
   exact inf_le_left.trans inf_le_right
 
+/-- The `p`-complement `O_{p\'}(H)` of the nilpotent `H` — the join of the `q\'`-cores over
+the primes `q\' ≠ p` of `|H|` — as a subgroup of `↥H`. -/
+noncomputable def pComplementCore [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
+    Subgroup ↥hyp.H :=
+  ⨆ (j : (Nat.card ↥hyp.H).primeFactors) (_ : (j : ℕ) ≠ hyp.p),
+    OddOrder.Isaacs.Ch01.opCore (j : ℕ) ↥hyp.H
+
+/-- The ambient `p`-complement `R = O_{p\'}(H) ≤ G`. -/
+noncomputable def pComplement [Finite G] {M : Subgroup G} (hyp : Hypothesis M) : Subgroup G :=
+  hyp.pComplementCore.map hyp.H.subtype
+
+theorem pComplement_le_H [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.pComplement ≤ hyp.H :=
+  Subgroup.map_subtype_le _
+
+/-- The `p`-complement is characteristic in `H` (join of the characteristic `q\'`-cores). -/
+theorem pComplementCore_characteristic [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.pComplementCore.Characteristic := by
+  rw [Subgroup.characteristic_iff_map_eq]
+  intro φ
+  rw [pComplementCore]
+  simp_rw [Subgroup.map_iSup]
+  exact iSup_congr fun j => iSup_congr fun _ =>
+    Subgroup.characteristic_iff_map_eq.mp
+      (OddOrder.Isaacs.Ch01.opCore.characteristic (j : ℕ) ↥hyp.H) φ
+
+/-- **`U` centralizes the `p`-complement** — each `q\'`-core lies in `C_G(U)`
+(`opCore_map_le_centralizer`), hence so does the join. -/
+theorem pComplement_le_centralizer [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.pComplement ≤ Subgroup.centralizer (hyp.U : Set G) := by
+  rw [pComplement, pComplementCore]
+  simp_rw [Subgroup.map_iSup]
+  refine iSup_le fun j => iSup_le fun hj => ?_
+  exact hyp.opCore_map_le_centralizer hG (Nat.prime_of_mem_primeFactors j.2) hj
+
+/-- The `p`-core and the `p`-complement intersect trivially (independence of the cores). -/
+theorem disjoint_opCore_pComplementCore [Finite G]
+    {M : Subgroup G} (hyp : Hypothesis M) (hp_prime : hyp.p.Prime)
+    (hp_mem : hyp.p ∈ (Nat.card ↥hyp.H).primeFactors) :
+    Disjoint (OddOrder.Isaacs.Ch01.opCore hyp.p ↥hyp.H) hyp.pComplementCore := by
+  classical
+  set O : (Nat.card ↥hyp.H).primeFactors → Subgroup ↥hyp.H :=
+    fun q => OddOrder.Isaacs.Ch01.opCore (q : ℕ) ↥hyp.H with hO
+  have hindep : iSupIndep O := by
+    apply OddOrder.Isaacs.Ch01.iSupIndep_of_coprime_card_of_normal O
+    intro i j hij
+    haveI : Fact (i : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors i.2⟩
+    haveI : Fact (j : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors j.2⟩
+    have hne : (i : ℕ) ≠ (j : ℕ) := fun h => hij (Subtype.ext h)
+    exact IsPGroup.coprime_card_of_ne (i : ℕ) (j : ℕ) hne _ _
+      (OddOrder.Isaacs.Ch01.opCore_isPGroup (i : ℕ) ↥hyp.H)
+      (OddOrder.Isaacs.Ch01.opCore_isPGroup (j : ℕ) ↥hyp.H)
+  set i₀ : (Nat.card ↥hyp.H).primeFactors := ⟨hyp.p, hp_mem⟩ with hi₀
+  have hdisj : Disjoint (O i₀) (⨆ (j) (_ : j ≠ i₀), O j) := (iSupIndep_def.mp hindep) i₀
+  have hjoin : hyp.pComplementCore = ⨆ (j) (_ : j ≠ i₀), O j := by
+    rw [pComplementCore]
+    exact iSup_congr fun j => iSup_congr_Prop
+      ⟨fun h heq => h (congrArg Subtype.val heq), fun h heq => h (Subtype.ext heq)⟩
+      (fun _ => rfl)
+  rw [hjoin]
+  exact hdisj
+
+/-- **(11.6) endgame form**: if the `p`-complement is trivial, `H` is a `p`-group. -/
+theorem isPGroup_of_pComplementCore_eq_bot [Finite G]
+    {M : Subgroup G} (hyp : Hypothesis M) (hbot : hyp.pComplementCore = ⊥) :
+    IsPGroup hyp.p ↥hyp.H := by
+  classical
+  haveI hHnil : Group.IsNilpotent ↥hyp.H := hyp.H_isNilpotent
+  -- every prime factor `q\' ≠ p` has trivial core, hence trivial Sylow — impossible
+  have hsub : (Nat.card ↥hyp.H).primeFactors ⊆ {hyp.p} := by
+    intro q' hq'
+    rw [Finset.mem_singleton]
+    by_contra hne
+    haveI : Fact q'.Prime := ⟨Nat.prime_of_mem_primeFactors hq'⟩
+    have hcore : OddOrder.Isaacs.Ch01.opCore q' ↥hyp.H = ⊥ := by
+      refine le_bot_iff.mp ?_
+      rw [← hbot, pComplementCore]
+      exact le_iSup₂ (f := fun (j : (Nat.card ↥hyp.H).primeFactors)
+        (_ : (j : ℕ) ≠ hyp.p) => OddOrder.Isaacs.Ch01.opCore (j : ℕ) ↥hyp.H) ⟨q', hq'⟩ hne
+    obtain ⟨T⟩ : Nonempty (Sylow q' ↥hyp.H) := inferInstance
+    have hTeq : (↑T : Subgroup ↥hyp.H) = OddOrder.Isaacs.Ch01.opCore q' ↥hyp.H :=
+      OddOrder.Isaacs.Ch01.Sylow.eq_opCore_of_normal T
+        (OddOrder.Isaacs.Ch01.Sylow.normal_of_isNilpotent T)
+    have hTbot : (↑T : Subgroup ↥hyp.H) = ⊥ := hTeq.trans hcore
+    have hcard := T.card_eq_multiplicity
+    rw [hTbot, Subgroup.card_bot] at hcard
+    have hpos : 0 < (Nat.card ↥hyp.H).factorization q' :=
+      Nat.Prime.factorization_pos_of_dvd (Nat.prime_of_mem_primeFactors hq')
+        Nat.card_pos.ne' (Nat.dvd_of_mem_primeFactors hq')
+    have : 2 ≤ q' ^ (Nat.card ↥hyp.H).factorization q' :=
+      le_trans (Nat.prime_of_mem_primeFactors hq').two_le
+        (Nat.le_self_pow hpos.ne' _)
+    omega
+  refine IsPGroup.of_card (n := (Nat.card ↥hyp.H).factorization hyp.p) ?_
+  conv_lhs => rw [← Nat.prod_factorization_pow_eq_self (Nat.card_pos (α := ↥hyp.H)).ne']
+  rw [Finsupp.prod_of_support_subset _ (Nat.support_factorization _ ▸ hsub) _
+    (fun i _ => pow_zero i), Finset.prod_singleton]
+
 end Hypothesis
 
 
