@@ -3821,6 +3821,24 @@ noncomputable def Hypothesis.mkSection11CharacterData [Finite G] {M : Subgroup G
   tau := hyp.tau
   quotientSemidirectFrobenius := True
 
+open OddOrder.Peterfalvi.S11 in
+/-- **§9 degree `qu` on the §10 `Hypothesis`, case (b) branch** (validating `mkSection11CharacterData`
+end-to-end).  Via the constructed `Section11CharacterData`, the (9.7) Clifford dichotomy
+(`clifford_dichotomy`, proven) splits into case (a)/(b); in case (b), `caseB_degree_qu` gives that
+every member of the §9 family `𝒮(H₀C')` has degree `q·u = q·|Ū|`.  This is the §9 half of the
+(11.8.1) degree `d = |Ū|` (the μ-grid column `μ_j = ∑_i μ_{ij}` has degree `qu`, so `μ_{ij}(1) = u`);
+combined with the μ-grid ↔ §9-family correspondence (`huSub = M'`, `chars.S ⊆ inducedFamily`) it
+gives `d = |Ū|`.  The case (a) branch (reducible-induction degree, `caseA_reducible_*`) is the
+remaining case. -/
+theorem Hypothesis.forall_sOf_H0Cprime_degree_qu_caseB [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data)
+    (caseB : CliffordCaseBData (hyp.mkSection11CharacterData data chief)) :
+    ∀ φ ∈ (hyp.mkSection11CharacterData data chief).SOf
+        (chief.H0 ⊔ (hyp.mkSection11CharacterData data chief).Cprime),
+      φ 1 = ((data.q * (hyp.mkSection11CharacterData data chief).u : ℕ) : ℂ) :=
+  caseB_degree_qu hG (hyp.mkSection11CharacterData data chief) caseB
+
 /-- **Bridge to the §9 (repo S11) character analysis.**  A §10 type-III/IV `Hypothesis` yields the
 §9 `TypesIIIIIIVSetup` on the same `M`, sharing the type-`P` structure `(H, U, W₁, W₂)`.  This is the
 `Hypothesis` → `Section11CharacterData` bridge the (11.8.1) §9 counts need: with it,
