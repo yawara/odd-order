@@ -2342,6 +2342,11 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.mderivSharp_subset_A0
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.one_notMem_A0
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.inducedFamily_eq_inducedKernelFamily_bot
+-- The h56 producer fully pinned to the §10/§11 context (S12.Hypothesis): genuine Dade data on
+-- A₀(M), kernel M', routine pins burned in; remaining hypotheses = anchor + S(B)-nonempty +
+-- the grid-backed (5.2.d) decomposition data.  Conclusion = the h56 oracle shape.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S12.Hypothesis.exists_source_index_le_two_psi
 -- (6.5) chief-factor core + (6.5)(b) reduction: a Frobenius-acted abelian section obeying the (6.3)
 -- index bound `≤ 4|R|²+1` is a `p`-group (chief-factor argument via the `p`-primary component,
 -- `card_modEq_one` + `six_five_chief_factor_contradiction`); combined with the nilpotent

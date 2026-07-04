@@ -93,4 +93,84 @@ theorem inducedFamily_eq_inducedKernelFamily_bot [Finite G] :
   · rintro ⟨θ, hθne, -, rfl⟩
     exact ⟨θ, hθne, rfl⟩
 
+namespace Hypothesis
+
+open scoped FiniteInduce in
+/-- **The h56 producer, fully pinned to the §10/§11 context** (`S12.Hypothesis M`): Peterfalvi's
+(6.2) break index bound `|M':A'| − 1 ≤ 2ψ(1)` over the genuine Dade data
+(`hyp.dadeData.dade` on `A₀(M)`, `hyp.hconj`), kernel `K = M' = (derivedInG M).subgroupOf M`,
+with the routine pins discharged (`mderivSharp_subset_A0`, `one_notMem_A0`,
+`card_odd_of_isMinimalSimpleOdd`).  The remaining hypotheses are exactly the issue-2022
+obligations: the **anchor** (an irreducible degree-`|M:M'|` member of `S(A')`, from the
+`W₁`-action), `S(B)`-nonemptiness, and the **(5.2.d) decomposition data** (grid-backed).
+
+The conclusion is the `h56` oracle shape of
+`six_three_of_six_two_oracle`/`six_two_general` (`S08_Theorem62_63_Standalone`) at
+`SOf X := inducedKernelFamily K X`, `τ := hyp.tau`, `A₀ := hyp.A0`. -/
+theorem exists_source_index_le_two_psi
+    [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {A' B : Subgroup ↥M} [A'.Normal]
+    (hanchor : ∃ χ₁ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) A',
+      IsIrreducibleCharacter χ₁ ∧ χ₁ 1 = (((derivedInG M).subgroupOf M).index : ℂ))
+    (hSBne : (OddOrder.Peterfalvi.S08.inducedKernelFamily
+      ((derivedInG M).subgroupOf M) B).Nonempty)
+    (hdatum : ∀ (S₁ : Set (ClassFunction ↥M ℂ)),
+      OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁ →
+      S₁ ⊆ OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) A' ∪
+        OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B →
+      ∀ (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+        S₁ hyp.A0),
+      ∀ (ψ : ClassFunction ↥M ℂ),
+        ψ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B →
+        ψ ∉ S₁ → ψ.conj ∉ S₁ →
+      ∀ (χ₁ : ClassFunction ↥M ℂ), χ₁ ∈ S₁ →
+      ∀ (a : ℕ), ψ 1 = (a : ℂ) * χ₁ 1 →
+      ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+        (S₁ ∪ {ψ, ψ.conj}) hyp.A0) →
+      ∃ Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
+          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+            (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) ψ (a • χ₁),
+        Da.tau1 = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) ∧
+        ∀ χ ∈ S₁, ∃ D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
+            (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+              (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) χ 0,
+          D.imageFamily.Orthogonal Da.imageFamily ∧
+          D.tau1 χ = hS₁coh.extension χ)
+    (hAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+      (OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) A')
+      hyp.A0))
+    (hBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+      (OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B)
+      hyp.A0)) :
+    ∃ θ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M),
+      (↑(B.subgroupOf ((derivedInG M).subgroupOf M)) :
+          Set ↥((derivedInG M).subgroupOf M)) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel
+          (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) ∧
+      (Nat.card (↥((derivedInG M).subgroupOf M) ⧸
+          A'.subgroupOf ((derivedInG M).subgroupOf M)) : ℝ) - 1 ≤
+        2 * (ClassFunction.induce ((derivedInG M).subgroupOf M)
+          (θ : ClassFunction
+            ↥((derivedInG M).subgroupOf M) ℂ) 1).re := by
+  haveI := hyp.finiteG
+  haveI : ((derivedInG M).subgroupOf M).Normal := by
+    rw [derivedInG, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+    infer_instance
+  exact OddOrder.Peterfalvi.S08.exists_source_index_le_two_psi_of_break
+    hyp.dadeData.dade hyp.hconj (hyp.card_odd_of_isMinimalSimpleOdd hG)
+    hyp.mderivSharp_subset_A0 hyp.one_notMem_A0 hanchor hSBne hdatum hAcoh hBncoh
+
+end Hypothesis
+
 end OddOrder.Peterfalvi.S12
