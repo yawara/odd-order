@@ -194,6 +194,21 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
   omega_apply_one : ∀ (i : Fin q) (j : Fin p), omega i j 1 = 1
   /-- Each `ω_{ij}` is a virtual character (in fact an irreducible character of `W`). -/
   omega_mem_ZIrr : ∀ (i : Fin q) (j : Fin p), omega i j ∈ ZIrr ↥W
+  /-- **Peterfalvi (3.3)** (issue 2033): each `ω_{ij}` is multiplicative — a linear character. -/
+  omega_mul : ∀ (i : Fin q) (j : Fin p) (w w' : ↥W),
+    omega i j (w * w') = omega i j w * omega i j w'
+  /-- **Peterfalvi (3.3)** (issue 2033): the column-`0` characters `ω_{i0}` are trivial on `W₂`. -/
+  omega_col_zero_apply_of_mem_W2 : ∀ (i : Fin q) (w : ↥W), (w : G) ∈ W2 →
+    omega i ⟨0, p_prime.pos⟩ w = 1
+  /-- **Peterfalvi (3.3)** (issue 2033): the row-`0` characters `ω_{0j}` are trivial on `W₁`. -/
+  omega_row_zero_apply_of_mem_W1 : ∀ (j : Fin p) (w : ↥W), (w : G) ∈ W1 →
+    omega ⟨0, q_prime.pos⟩ j w = 1
+  /-- **Peterfalvi (3.3)** (issue 2033): on `W₁` the grid values are `q`-th roots of unity. -/
+  omega_pow_q_of_mem_W1 : ∀ (i : Fin q) (j : Fin p) (w : ↥W), (w : G) ∈ W1 →
+    omega i j w ^ q = 1
+  /-- **Peterfalvi (3.3)** (issue 2033): on `W₂` the grid values are `p`-th roots of unity. -/
+  omega_pow_p_of_mem_W2 : ∀ (i : Fin q) (j : Fin p) (w : ↥W), (w : G) ∈ W2 →
+    omega i j w ^ p = 1
 
 /-! ### Partition of `Section16Inputs` into three independent producer obligations
 
@@ -357,6 +372,21 @@ structure Section16CharacterData {G : Type*} [Group G] [Finite G]
   omega_apply_one : ∀ (i : Fin tp.q) (j : Fin tp.p), omega i j 1 = 1
   /-- Each `ω_{ij}` is a virtual character (in fact an irreducible character of `W`). -/
   omega_mem_ZIrr : ∀ (i : Fin tp.q) (j : Fin tp.p), omega i j ∈ ZIrr ↥tp.W
+  /-- **Peterfalvi (3.3)** (issue 2033): each `ω_{ij}` is multiplicative — a linear character. -/
+  omega_mul : ∀ (i : Fin tp.q) (j : Fin tp.p) (w w' : ↥tp.W),
+    omega i j (w * w') = omega i j w * omega i j w'
+  /-- **Peterfalvi (3.3)** (issue 2033): the column-`0` characters `ω_{i0}` are trivial on `W₂`. -/
+  omega_col_zero_apply_of_mem_W2 : ∀ (i : Fin tp.q) (w : ↥tp.W), (w : G) ∈ tp.W2 →
+    omega i ⟨0, tp.p_prime.pos⟩ w = 1
+  /-- **Peterfalvi (3.3)** (issue 2033): the row-`0` characters `ω_{0j}` are trivial on `W₁`. -/
+  omega_row_zero_apply_of_mem_W1 : ∀ (j : Fin tp.p) (w : ↥tp.W), (w : G) ∈ tp.W1 →
+    omega ⟨0, tp.q_prime.pos⟩ j w = 1
+  /-- **Peterfalvi (3.3)** (issue 2033): on `W₁` the grid values are `q`-th roots of unity. -/
+  omega_pow_q_of_mem_W1 : ∀ (i : Fin tp.q) (j : Fin tp.p) (w : ↥tp.W), (w : G) ∈ tp.W1 →
+    omega i j w ^ tp.q = 1
+  /-- **Peterfalvi (3.3)** (issue 2033): on `W₂` the grid values are `p`-th roots of unity. -/
+  omega_pow_p_of_mem_W2 : ∀ (i : Fin tp.q) (j : Fin tp.p) (w : ↥tp.W), (w : G) ∈ tp.W2 →
+    omega i j w ^ tp.p = 1
 
 /-- **Canonical type-`P` maximal pair data** (issue 7005): for a minimal simple group of odd order,
 there is a type-`P` dual pair `S, T` together with the full κ-Hall witness data of BG Theorem 14.7
@@ -1834,6 +1864,97 @@ theorem omegaS_mem_ZIrr (i : Fin tp.q) (j : Fin tp.p) :
   exact ClassFunction.compHom_mem_ZIrr _
     ((mp.certainTypeS hG).chiColumn (chi2enum hG mp tp j) (eqQ hG mp tp i)).mem_ZIrr
 
+/-! #### The (3.3) value semantics of `omegaS` (issue-2033 factorization supply)
+
+Each `omegaS i j` is a *linear* character — its values are the monoid-hom values of
+`omegaProdChar (w1CharEquiv (eqQ i)) (chi2enum j)` transported along `gridEquivE` — the
+column-`0`/row-`0` normalizations are trivial on `W₂`/`W₁`, and the `W₁`- and `W₂`-values
+are `q`-th and `p`-th roots of unity.  These five facts are the Peterfalvi (3.3) grid semantics
+that the (1.10)-congruence atoms of the §13 norm cascade consume, threaded through the
+matching fields of `Peterfalvi.S15.Hypothesis` (issue 2033, the 3002-pattern successor). -/
+
+omit [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)] in
+/-- **Peterfalvi (3.3), linearity** (issue 2033): each `ω_{ij}` is multiplicative — a linear
+character of `W`.  Discharges the `omega_mul` field of `Peterfalvi.S15.Hypothesis`. -/
+theorem omegaS_mul (i : Fin tp.q) (j : Fin tp.p) (w w' : ↥tp.W) :
+    omegaS hG mp tp i j (w * w') = omegaS hG mp tp i j w * omegaS hG mp tp i j w' := by
+  simp only [omegaS, ClassFunction.compHom_apply, MulEquiv.coe_toMonoidHom,
+    Peterfalvi.S06.Hypothesis.chiColumn, Peterfalvi.S05.TICyclicHypothesis.omega_apply,
+    map_mul, Units.val_mul]
+
+omit [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)] in
+/-- **Peterfalvi (3.3), column-`0` normalization** (issue 2033): the column-`0` grid characters
+`ω_{i0}` are trivial on `W₂` (`chi2enum 0 = 1` is the trivial `W₂`-dual).  Discharges the
+`omega_col_zero_apply_of_mem_W2` field of `Peterfalvi.S15.Hypothesis`. -/
+theorem omegaS_col_zero_apply_of_mem_W2 (i : Fin tp.q) (w : ↥tp.W) (hw : (w : G) ∈ tp.W2) :
+    omegaS hG mp tp i ⟨0, tp.p_prime.pos⟩ w = 1 := by
+  have hwK : (w : G) ∈ mp.Kstar := tp.W2_eq_Kstar hG ▸ hw
+  rw [omegaS, ClassFunction.compHom_apply, MulEquiv.coe_toMonoidHom,
+    Peterfalvi.S06.Hypothesis.chiColumn, Peterfalvi.S05.TICyclicHypothesis.omega_apply,
+    omegaProdCharS_apply_mem_Kstar hG mp tp _ _ w hwK, chi2enum_zero]
+  exact Units.val_one
+
+omit [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)] in
+/-- **Peterfalvi (3.3), row-`0` normalization** (issue 2033): the row-`0` grid characters
+`ω_{0j}` are trivial on `W₁` (`w1CharEquiv 0 = 1` is the trivial `W₁`-dual).  Discharges the
+`omega_row_zero_apply_of_mem_W1` field of `Peterfalvi.S15.Hypothesis`. -/
+theorem omegaS_row_zero_apply_of_mem_W1 (j : Fin tp.p) (w : ↥tp.W) (hw : (w : G) ∈ tp.W1) :
+    omegaS hG mp tp ⟨0, tp.q_prime.pos⟩ j w = 1 := by
+  have hwK : (w : G) ∈ mp.K := tp.W1_eq_K hG ▸ hw
+  rw [omegaS, ClassFunction.compHom_apply, MulEquiv.coe_toMonoidHom,
+    Peterfalvi.S06.Hypothesis.chiColumn, Peterfalvi.S05.TICyclicHypothesis.omega_apply,
+    omegaProdCharS_apply_mem_K hG mp tp _ _ w hwK, eqQ_zero hG mp tp,
+    (mp.certainTypeS hG).w1CharEquiv_zero]
+  exact Units.val_one
+
+omit [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)] in
+/-- **Peterfalvi (3.3), `W₁`-value order** (issue 2033): on `W₁` the grid values are `q`-th
+roots of unity — the `W₂`-factor is trivial there and the `W₁`-factor character has order
+dividing `|W₁| = q`.  Discharges the `omega_pow_q_of_mem_W1` field of
+`Peterfalvi.S15.Hypothesis`. -/
+theorem omegaS_pow_q_of_mem_W1 (i : Fin tp.q) (j : Fin tp.p) (w : ↥tp.W)
+    (hw : (w : G) ∈ tp.W1) :
+    omegaS hG mp tp i j w ^ tp.q = 1 := by
+  have hwK : (w : G) ∈ mp.K := tp.W1_eq_K hG ▸ hw
+  have mem := gridEquivE_mem_W1 hG mp tp w hwK
+  have hcard : Nat.card ↥((mp.certainTypeS hG).sdiffTICyclicHypothesis.W1.subgroupOf
+      (mp.certainTypeS hG).sdiffTICyclicHypothesis.W) = tp.q := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+      (mp.certainTypeS hG).sdiffTICyclicHypothesis.W1_le_W).toEquiv]
+    exact cardCertainTypeS_W1 hG mp tp
+  have hx : (⟨gridEquivE hG mp tp w, mem⟩ :
+      ↥((mp.certainTypeS hG).sdiffTICyclicHypothesis.W1.subgroupOf
+        (mp.certainTypeS hG).sdiffTICyclicHypothesis.W)) ^ tp.q = 1 := by
+    rw [← hcard]; exact pow_card_eq_one'
+  rw [omegaS, ClassFunction.compHom_apply, MulEquiv.coe_toMonoidHom,
+    Peterfalvi.S06.Hypothesis.chiColumn, Peterfalvi.S05.TICyclicHypothesis.omega_apply,
+    omegaProdCharS_apply_mem_K hG mp tp _ _ w hwK, ← Units.val_pow_eq_pow_val, ← map_pow,
+    hx, map_one, Units.val_one]
+
+omit [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)] in
+/-- **Peterfalvi (3.3), `W₂`-value order** (issue 2033): on `W₂` the grid values are `p`-th
+roots of unity — the `W₁`-factor is trivial there and the `W₂`-factor character has order
+dividing `|W₂| = p`.  Discharges the `omega_pow_p_of_mem_W2` field of
+`Peterfalvi.S15.Hypothesis`. -/
+theorem omegaS_pow_p_of_mem_W2 (i : Fin tp.q) (j : Fin tp.p) (w : ↥tp.W)
+    (hw : (w : G) ∈ tp.W2) :
+    omegaS hG mp tp i j w ^ tp.p = 1 := by
+  have hwK : (w : G) ∈ mp.Kstar := tp.W2_eq_Kstar hG ▸ hw
+  have mem := gridEquivE_mem_W2 hG mp tp w hwK
+  have hcard : Nat.card ↥((mp.certainTypeS hG).sdiffTICyclicHypothesis.W2.subgroupOf
+      (mp.certainTypeS hG).sdiffTICyclicHypothesis.W) = tp.p := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+      (mp.certainTypeS hG).sdiffTICyclicHypothesis.W2_le_W).toEquiv]
+    exact cardCertainTypeS_W2 hG mp tp
+  have hx : (⟨gridEquivE hG mp tp w, mem⟩ :
+      ↥((mp.certainTypeS hG).sdiffTICyclicHypothesis.W2.subgroupOf
+        (mp.certainTypeS hG).sdiffTICyclicHypothesis.W)) ^ tp.p = 1 := by
+    rw [← hcard]; exact pow_card_eq_one'
+  rw [omegaS, ClassFunction.compHom_apply, MulEquiv.coe_toMonoidHom,
+    Peterfalvi.S06.Hypothesis.chiColumn, Peterfalvi.S05.TICyclicHypothesis.omega_apply,
+    omegaProdCharS_apply_mem_Kstar hG mp tp _ _ w hwK, ← Units.val_pow_eq_pow_val, ← map_pow,
+    hx, map_one, Units.val_one]
+
 end Section16CharacterData
 
 /-- **Peterfalvi §13 coherent Dade-grid producer** (`sorry`-free) — *lane-b*
@@ -1895,7 +2016,14 @@ noncomputable def section16CharacterData_of_isMinimalSimpleOdd {G : Type*} [Grou
       tau3_mem_ZIrr := fun _ hz => Section16CharacterData.tau3W_mem_ZIrr hG mp tp hz
       omega_orthonormal := Section16CharacterData.omegaS_inner hG mp tp
       omega_apply_one := Section16CharacterData.omegaS_apply_one hG mp tp
-      omega_mem_ZIrr := Section16CharacterData.omegaS_mem_ZIrr hG mp tp }
+      omega_mem_ZIrr := Section16CharacterData.omegaS_mem_ZIrr hG mp tp
+      omega_mul := Section16CharacterData.omegaS_mul hG mp tp
+      omega_col_zero_apply_of_mem_W2 :=
+        Section16CharacterData.omegaS_col_zero_apply_of_mem_W2 hG mp tp
+      omega_row_zero_apply_of_mem_W1 :=
+        Section16CharacterData.omegaS_row_zero_apply_of_mem_W1 hG mp tp
+      omega_pow_q_of_mem_W1 := Section16CharacterData.omegaS_pow_q_of_mem_W1 hG mp tp
+      omega_pow_p_of_mem_W2 := Section16CharacterData.omegaS_pow_p_of_mem_W2 hG mp tp }
 
 /-- **Assembly of `Section16Inputs` from the three lane producers** (`sorry`-free).
 Each field of `Section16Inputs` is sourced from exactly one of `mp` / `tp` / `cd`;
@@ -1970,7 +2098,12 @@ noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [F
     tau3_mem_ZIrr := cd.tau3_mem_ZIrr
     omega_orthonormal := cd.omega_orthonormal
     omega_apply_one := cd.omega_apply_one
-    omega_mem_ZIrr := cd.omega_mem_ZIrr }
+    omega_mem_ZIrr := cd.omega_mem_ZIrr
+    omega_mul := cd.omega_mul
+    omega_col_zero_apply_of_mem_W2 := cd.omega_col_zero_apply_of_mem_W2
+    omega_row_zero_apply_of_mem_W1 := cd.omega_row_zero_apply_of_mem_W1
+    omega_pow_q_of_mem_W1 := cd.omega_pow_q_of_mem_W1
+    omega_pow_p_of_mem_W2 := cd.omega_pow_p_of_mem_W2 }
 
 /-- **Assembly of the Section 16 configuration from named inputs** (`sorry`-free).
 
@@ -2077,7 +2210,12 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       tau3_mem_ZIrr := inp.tau3_mem_ZIrr
       omega_orthonormal := inp.omega_orthonormal
       omega_apply_one := inp.omega_apply_one
-      omega_mem_ZIrr := inp.omega_mem_ZIrr }
+      omega_mem_ZIrr := inp.omega_mem_ZIrr
+      omega_mul := inp.omega_mul
+      omega_col_zero_apply_of_mem_W2 := inp.omega_col_zero_apply_of_mem_W2
+      omega_row_zero_apply_of_mem_W1 := inp.omega_row_zero_apply_of_mem_W1
+      omega_pow_q_of_mem_W1 := inp.omega_pow_q_of_mem_W1
+      omega_pow_p_of_mem_W2 := inp.omega_pow_p_of_mem_W2 }
   q_lt_p := inp.q_lt_p
 
 /-- **The one remaining upstream obligation.** From a minimal simple group of odd

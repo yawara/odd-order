@@ -234,6 +234,21 @@ structure Hypothesis where
   omega_apply_one : ∀ (i : Fin q) (j : Fin p), omega i j 1 = 1
   /-- Each `ω_{ij}` is a virtual character (in fact an irreducible character of `W`). -/
   omega_mem_ZIrr : ∀ (i : Fin q) (j : Fin p), omega i j ∈ ZIrr ↥W
+  /-- **Peterfalvi (3.3)** (issue 2033): each `ω_{ij}` is multiplicative — a linear character. -/
+  omega_mul : ∀ (i : Fin q) (j : Fin p) (w w' : ↥W),
+    omega i j (w * w') = omega i j w * omega i j w'
+  /-- **Peterfalvi (3.3)** (issue 2033): the column-`0` characters `ω_{i0}` are trivial on `W₂`. -/
+  omega_col_zero_apply_of_mem_W2 : ∀ (i : Fin q) (w : ↥W), (w : G) ∈ W2 →
+    omega i ⟨0, p_prime.pos⟩ w = 1
+  /-- **Peterfalvi (3.3)** (issue 2033): the row-`0` characters `ω_{0j}` are trivial on `W₁`. -/
+  omega_row_zero_apply_of_mem_W1 : ∀ (j : Fin p) (w : ↥W), (w : G) ∈ W1 →
+    omega ⟨0, q_prime.pos⟩ j w = 1
+  /-- **Peterfalvi (3.3)** (issue 2033): on `W₁` the grid values are `q`-th roots of unity. -/
+  omega_pow_q_of_mem_W1 : ∀ (i : Fin q) (j : Fin p) (w : ↥W), (w : G) ∈ W1 →
+    omega i j w ^ q = 1
+  /-- **Peterfalvi (3.3)** (issue 2033): on `W₂` the grid values are `p`-th roots of unity. -/
+  omega_pow_p_of_mem_W2 : ∀ (i : Fin q) (j : Fin p) (w : ↥W), (w : G) ∈ W2 →
+    omega i j w ^ p = 1
 
 namespace Hypothesis
 
