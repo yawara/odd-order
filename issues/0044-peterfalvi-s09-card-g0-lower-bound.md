@@ -1171,3 +1171,21 @@ coherent-extension conj-compat)。深い sub-lemma:
 
 **本 session 実績 (深部完了)**: hzeta_cross 全 chain (深部 §1 frontier) + BetaDecomp (7.8.a)、
 ~22 sorry-free commits, full build green。残りは delta-reality (τ/ν conj-compat) + 定量 assembly。
+
+## 2026-07-04 cont.⁴⁴ — ★ (A) dadeMap_conj 完成、残 (B) ν-conj-compat が deep
+
+**Landed** (S09_FrobeniusConjIndex.lean, commit, sorry-free): `dadeMap_conj` — Dade map の複素共役両立
+`τ(φ.conj) = (τ φ).conj` (IsDadeMap の map_eq_of_isConj_hCoset + map_eq_zero から直接、reusable、
+coq `Dade_conjC`)。delta-reality reduction の **(A)** 完成。
+
+**残 = (B) ν-conj-compat** (`ν(ζ).conj = ν(ζ̄)`): agreement + dadeMap_conj からは **導けない** (検証済:
+両辺 anti-real だが等号は強制されない; τ(ζ−ζ̄) = ν(ζ)−ν(ζ).conj が (B) と同値で循環)。
+→ **retarget/coherent-extension の共役構造が必要** (coq `cfConjC_Dade_coherent`; S07_RetargetScaled の
+`conjImage = X − τ(χ−χ.conj)` が χ.conj の像だが `X̄ = X.conj` は retarget で明示されておらず、構築レベルで
+確立が必要)。deep sub-project (S07 extension 構築レベル)。
+
+**その後**: (A)+(B)+agreement → delta_isReal → cfdot_real_vchar_even (parity, 済) + delta_orth_one →
+hdelta_even → (7.9) conclusion (他全 input 済) → hgood → CharacterEstimateData → card_G0_lower_bound。
+
+**本 session 実績 (深部)**: hzeta_cross 全 chain + BetaDecomp (7.8.a) + dadeMap_conj (A)、
+~23 sorry-free commits, full build green。残 = (B) ν-conj-compat (retarget 共役) + 定量 assembly。
