@@ -545,6 +545,114 @@ theorem exists_source_index_le_two_psi_of_ne_top
   exact OddOrder.Peterfalvi.S08.inducedKernelFamily_nonempty_of_commutator_ne_top
     (hyp.commutator_quotient_ne_top hG hBne)
 
+/-- **The (5.2.d) decomposition data for the §11 family — the single remaining grid obligation
+of the h56 chain** (issue 2022).  For any intermediate coherent set `S₁` between the `S(A')` and
+`S(B)` layers and any break `ψ ∈ S(B)` with anchor ratio `a`, supplies the break decomposition
+`Da` over the Dade map and, per member `χ ∈ S₁`, an `R(χ)`-decomposition compatible with the
+coherent extension and orthogonal to `Da`'s family.
+
+*Content*: for irreducible `ψ` and irreducible members this is fully general
+(`inducedKernelFamily_breakDa_of_irreducible` /
+`inducedKernelFamily_memberDatum_orthogonal_breakDa_of_irr_irr`, `S08_SixTwoGeneral`); the
+genuinely open cases involve a reducible μ-column (as break or member): the column's
+decomposition is the §10–§12 `muGrid`/`columnSum` structure, and the coupling
+`D.tau1 χ = hS₁coh.extension χ` for a column member is the (11.8.6)/(5.8)-type
+extension-uniqueness.  See issue 2022. -/
+theorem sixTwoDecompositionData [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (A' B : Subgroup ↥M) :
+    ∀ (S₁ : Set (ClassFunction ↥M ℂ)),
+      OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁ →
+      S₁ ⊆ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) A' ∪
+        S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B →
+      ∀ (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+        S₁ hyp.A0),
+      ∀ (ψ : ClassFunction ↥M ℂ),
+        ψ ∈ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B →
+        ψ ∉ S₁ → ψ.conj ∉ S₁ →
+      ∀ (χ₁ : ClassFunction ↥M ℂ), χ₁ ∈ S₁ →
+      ∀ (a : ℕ), ψ 1 = (a : ℂ) * χ₁ 1 →
+      ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+        (S₁ ∪ {ψ, ψ.conj}) hyp.A0) →
+      ∃ Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
+          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+            (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) ψ (a • χ₁),
+        Da.tau1 = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) ∧
+        ∀ χ ∈ S₁, ∃ D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
+            (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+              (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) χ 0,
+          D.imageFamily.Orthogonal Da.imageFamily ∧
+          D.tau1 χ = hS₁coh.extension χ := by
+  sorry
+
+/-- **The h56 oracle for the §11 context, complete modulo the grid datum**: from the coherence
+dichotomy alone (proper traces `A', B ⊊ M'`), a source `θ ∈ Irr M'` trivial on `B` with
+`|M':A'| − 1 ≤ 2·(Ind_{M'}^M θ)(1)`.  Cites the named grid obligation
+`sixTwoDecompositionData`. -/
+theorem exists_source_of_coherence_dichotomy
+    [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {A' B : Subgroup ↥M} [A'.Normal]
+    [(A'.subgroupOf ((derivedInG M).subgroupOf M)).Normal]
+    [(B.subgroupOf ((derivedInG M).subgroupOf M)).Normal]
+    (hA'ne : A'.subgroupOf ((derivedInG M).subgroupOf M) ≠ ⊤)
+    (hBne : B.subgroupOf ((derivedInG M).subgroupOf M) ≠ ⊤)
+    (hAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+      (S08.inducedKernelFamily ((derivedInG M).subgroupOf M) A') hyp.A0))
+    (hBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+      (S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B) hyp.A0)) :
+    ∃ θ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M),
+      (↑(B.subgroupOf ((derivedInG M).subgroupOf M)) :
+          Set ↥((derivedInG M).subgroupOf M)) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel
+          (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) ∧
+      (Nat.card (↥((derivedInG M).subgroupOf M) ⧸
+          A'.subgroupOf ((derivedInG M).subgroupOf M)) : ℝ) - 1 ≤
+        2 * (ClassFunction.induce ((derivedInG M).subgroupOf M)
+          (θ : ClassFunction
+            ↥((derivedInG M).subgroupOf M) ℂ) 1).re :=
+  hyp.exists_source_index_le_two_psi_of_ne_top hG hA'ne hBne
+    (hyp.sixTwoDecompositionData hG A' B) hAcoh hBncoh
+
+/-- **Peterfalvi (6.2) for the §11 context, complete modulo the grid datum**: with a section
+`B ≤ D ≤ C ≤ M'` (inside `↥M`) whose quotient `D/B` is central in `C/B`, the coherence
+dichotomy yields `|M':A'| − 1 ≤ 2·|M:C|·√|C:D|`.  This is `six_two_general` fed by
+`exists_source_of_coherence_dichotomy`; the (11.4) instance takes `(C, D) = (HC, HC)`
+(`√1 = 1`) and the (11.3)/(6.3) route takes `(C, D) = (HC, A')` per section. -/
+theorem six_two_dichotomy_bound
+    [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {A' B C D : Subgroup ↥M} [A'.Normal] [B.Normal]
+    [(A'.subgroupOf ((derivedInG M).subgroupOf M)).Normal]
+    [(B.subgroupOf ((derivedInG M).subgroupOf M)).Normal]
+    (hA'ne : A'.subgroupOf ((derivedInG M).subgroupOf M) ≠ ⊤)
+    (hBne : B.subgroupOf ((derivedInG M).subgroupOf M) ≠ ⊤)
+    (hBD : B ≤ D) (hCK : C ≤ (derivedInG M).subgroupOf M)
+    (hcentral : (D.subgroupOf C).map (QuotientGroup.mk' (B.subgroupOf C)) ≤
+        Subgroup.center (↥C ⧸ B.subgroupOf C))
+    (hAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+      (S08.inducedKernelFamily ((derivedInG M).subgroupOf M) A') hyp.A0))
+    (hBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+      (S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B) hyp.A0)) :
+    (Nat.card (↥((derivedInG M).subgroupOf M) ⧸
+        A'.subgroupOf ((derivedInG M).subgroupOf M)) : ℝ) - 1 ≤
+      2 * (C.index : ℝ) * Real.sqrt (Nat.card (↥C ⧸ D.subgroupOf C) : ℝ) := by
+  haveI := hyp.finiteG
+  haveI : Fintype ↥C := Fintype.ofFinite _
+  exact OddOrder.Peterfalvi.S08.six_two_general hBD hCK hcentral
+    (hyp.exists_source_of_coherence_dichotomy hG hA'ne hBne hAcoh hBncoh)
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.S12
