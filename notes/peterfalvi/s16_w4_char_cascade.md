@@ -1413,3 +1413,34 @@ main 同期で入った lane a の shared infra (`inner_self_induce_eq_one_of_fr
 **この /loop セッション累計**: exists_MHypothesis の 1 monolithic sorry → 34 genuine field + 4 char obligation を
 isolate → うち 2 (psi_degree_eq_e / psi_tau1_norm_one) を genuine 化。commits `a1faa86d` `e96ade8b` `e8a59466`
 (+ docs)。full build 3910 green、AxiomsCheck OK。
+
+### cont.⁵¹ (2026-07-04 lane c=γ 再開): frontier 全数再検証 → norm-cascade engine 完備確認 + keystone `reconciled_typePData_T` 13/20
+
+**再開手順**: `git merge main` (117 behind→0)、所有 3 file の実 sorry 棚卸し (Setup 15 / S15 15 / S16 11 = 41)。
+
+**frontier 全数再検証の結論 (code-level、false な "gated" 主張でない)**: lane c の char frontier は
+検証済みで以下に収束:
+- **grid-carrier (issue 3002, cross-lane)**: norm cascade (13.6-13.10 consumer)・`c_eq_one` (13.12)・
+  `character_degree_analysis` (13.3)・`lambda_forces_T_caseB` (13.4)・`betaGrid` (exists_MHypothesis 残)・
+  `eta_generic_data`・`orthogonality_switch` (14.14 の `OrthogonalitySwitchData` = eta-grid 直交性) を一斉に gate。
+  **engine は完備**: 算術核 (`caseB_*_norm_core`/`analytic_inequality_arith`) + character-level engine
+  (`caseB_lambda_norm_bound`/`caseB_eta_norm_bound`、grid 性質を明示仮説に取る) が全 sorry-free。
+  ⟹ solo build-green work 枯渇、残は field threading (lane c 部 + **lane a の FeitThompson constructor
+  threading 承認要**、issue 3002 に詳細追記)。
+- **typeP_Galois (issue 9000, claimed shared-infra)**: `basic_structure_gated.u_bound` (9.7)・
+  `Q_elementaryAbelian_T` (11.7 dual)・`V_inf_centralizer_Q_eq_bot`/`c_eq_one` の Fcore_max 段・
+  `T_side_caseB_facts` の v=(q^p−1)/(q−1)。hub/lane-a が dedup 中 = 着手不可。
+- **reconciled-crux (import-gated)**: `reconciled_typePData_T` の complement 一致 (V = type-P U) は
+  `T_typeII` (14.9, S16:87 = §13 の import 下流) を要し §13 では使えず → 正しく sorried。
+- **lane-a §11 (11.7)**: `basic_structure_gated.P_elementaryAbelian`。
+
+これは reallocation note が予告した **POLE-2 coupled-pipeline stall** の実体 (上流 grid/σ が他所に集中、
+γ が下流で待つ構造)。過去セッション (cont.⁴⁴) も同検証 → solo work (exists_MHypothesis) を選び 3002 を coordination 記録。
+
+**solo build-green 進捗 (本セッション)**: keystone `reconciled_typePData_T` の `H_noncyclic` を実証明化
+(12/20→13/20)。`H=Q=maxNilpotentNormalHall T` intrinsic ゆえ `typePData_of_isTypeNonI T_nonI` から transport。
+build green (3875 jobs)。
+
+**次セッションへの handoff**: lane c の実質前進は (a) issue 3002 の **lane-a threading 合流** (最高 leverage、
+norm cascade 全体 unblock)、または (b) issue 9000 typeP_Galois の hub dedup 決着後の cite、待ち。
+それまでの solo は keystone 端の marginal 置換のみ (reconciled 残 7 は crux-gated)。
