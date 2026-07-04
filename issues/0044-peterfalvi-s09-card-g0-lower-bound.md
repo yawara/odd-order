@@ -887,3 +887,30 @@ top-level private lemma 抽出で 1.0s (maxHeartbeats 不要)。[[lean-local-hav
   dadeSupport` で support ⊆ dadeSupport。
 - (d) conjIndex bridge 適用で F レベル hzeta_cross → (7.9) conclusion → 𝓑-set → characterEstimateData
   → card_G0_lower_bound。
+
+## 2026-07-04 cont.³² — ★ hypothesis78 de-opaque 完了 (Unit B2 の linchpin)
+
+**Landed** (S09_FrobeniusHypothesis78.lean, commit 671c2995, full build green 3915 jobs):
+- `sibleyPlacedFamily i` : `hypothesis78` 内部の induced family を named def で露出 (χdist =
+  `Classical.choose (exists_sibley...)`、内部 `let pf` と proof-irrelevance で defeq)。
+- `hypothesis78` を `let pf := F.sibleyPlacedFamily i ...` 使用に refactor (behavior-preserving)
+  → `(F.hypothesis78 i).hyp76.n` が **syntactically** `(F.sibleyPlacedFamily i).n` に (dependent Fin
+  index の一致に必須)。
+- `hypothesis78_hyp76_zeta_eq : (F.hypothesis78 i).hyp76.zeta = fun j => induce K (pf.θ j)` **rfl で成立**。
+
+これで opaque 障害が消え、`sibleyPlacedFamily.cover/.inj` + `conj_induce` で共役 index が構成可能に。
+
+**残 = 共役 index 構成 + hab_supp (次 iteration、全 API 済)**:
+- **共役 index** `∃ j₁, zeta j₁ = (zeta 0).conj` (zetaDistinct=0): (zeta 0).conj = (induce K (θ 0)).conj
+  = induce K ((θ 0).conj) [`conj_induce`]、`pf.cover ((θ 0).conj)` で ∃ j₁, induce K (θ j₁) =
+  induce K ((θ 0).conj)。projection で zeta j₁ に translate。
+- **hj₁ne_ind** (j₁≠ind1H): zeta j₁ = (zeta 0).conj ≠ zeta ind1H = induce K triv ⟸ (θ 0).conj ≠ triv
+  ⟸ θ 0 ≠ triv (← `pf.inj` + ind1H≠0 + θ ind1H = triv)。
+- **hζ₁ne_conj** (zeta 0 ≠ (zeta 0).conj): zeta 0 = induce K (θ 0) は L の非自明既約 (degree [L:K]>1)、
+  L odd (`Subgroup.card_subgroup_dvd_card`+`Odd.of_dvd`) → `not_isReal_of_ne_trivial_of_odd_card'`
+  (bundle IrreducibleCharacter)。
+- **hab_supp**: `coherence_hagree_dadeMap` で ν(zeta 0)−ν(zeta j₁) = τ(zeta 0 − zeta j₁) (equal degree:
+  conj は degree 保存、supported ⟸ zeta 0 − zeta j₁ が A-supported)、`map_eq_zero_of_not_mem_dadeSupport`
+  で support ⊆ dadeSupport。
+- 適用: `zetaImage_cross_eq_zero_of_conjIndex` → F レベル hzeta_cross → (7.9) conclusion → ... →
+  card_G0_lower_bound。
