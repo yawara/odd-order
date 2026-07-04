@@ -914,3 +914,23 @@ top-level private lemma 抽出で 1.0s (maxHeartbeats 不要)。[[lean-local-hav
   で support ⊆ dadeSupport。
 - 適用: `zetaImage_cross_eq_zero_of_conjIndex` → F レベル hzeta_cross → (7.9) conclusion → ... →
   card_G0_lower_bound。
+
+## 2026-07-04 cont.³³ — ★ 共役 index 構成 完了 (exists_conjIndex_hypothesis78)
+
+**Landed** (S09_FrobeniusConjIndex.lean, commit, sorry-free 1.0s):
+`exists_conjIndex_hypothesis78` — `∃ j₁ ≠ ind1H, zeta j₁ = (zeta zetaDistinct).conj`。
+sibleyPlacedFamily.cover + conj_induce + conjPerm で j₁ 構成、j₁≠ind1H は zeta 単射
+(sibleyPlacedFamily.inj + projection) + ζ_ind1H=Ind 1_K が実 で。dependent Fin index は型 ascription
+で defeq 強制。**技法**: j₁≠ind1H は raw `pf.inj` でなく zeta 実値上の単射で (raw inj は非θ項で whnf loop)。
+
+**残 = Unit B2 最終ストレッチ (非実性 + hab_supp + assembly)**:
+1. **hz₁irr** (ζ=Ind K θ_lin 既約): `isIrreducibleCharacter_induce_of_frobeniusGroup`
+   (InducedIrreducible:459) を θ 0 に適用 (Frobenius kernel からの誘導は既約)。
+2. **hζ₁ne_conj** (ζ≠ζ.conj): hz₁irr + ζ≠triv(degree [L:K]>1) + L odd
+   (`Subgroup.card_subgroup_dvd_card`+Odd.of_dvd) → `not_isReal_of_ne_trivial_of_odd_card'` (bundle)。
+3. **hab_supp** ((ζ^ν−ζ̄^ν).support ⊆ dadeSupport): nu 線形 → nu(ζ−ζ̄); `coherence_hagree_dadeMap`
+   で = τ(ζ−ζ̄) (equal degree: conj は degree 保存 → ζ−ζ̄ が A-supported); `map_eq_zero_of_not_mem_
+   dadeSupport` で support ⊆ dadeSupport。※ hnu (nu=coh.extension) は hypothesis78_nu_eq。
+4. **assembly**: `F.hypothesis79 i j hij ...` に `zetaImage_cross_eq_zero_of_conjIndex` 適用
+   (両族 i,j の 1-3 を供給) → F レベル hzeta_cross → (7.9) conclusion producer → hgood → 𝓑-set →
+   characterEstimateData → card_G0_lower_bound (endpoint sorry @S09_NonexistenceCertain:6552)。
