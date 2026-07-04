@@ -218,6 +218,81 @@ theorem hypothesis78_zeta_sub_conj_support [Fintype G] [Invertible (Nat.card G :
     rw [OneMemClass.coe_eq_one.mp hx1, hdeg]
     simp
 
+open OddOrder.Peterfalvi.S09.Cert in
+/-- **`hab_supp`: `(ζ^ν − ζ̄^ν)` is supported in the Dade support.**  The coherent extension agrees
+with the Dade isometry on the equal-degree difference (`coherence_hagree_dadeMap`, `di = 1`), so
+`ν(ζ) − ν(ζ̄) = τ(ζ − ζ̄)` is a Dade image, which vanishes off `dadeSupport`
+(`map_eq_zero_of_not_mem_dadeSupport`).  The last input to
+`zetaImage_cross_eq_zero_of_conjIndex`. -/
+theorem hypothesis78_nu_zeta_sub_conj_support [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (i : Fin k) (hodd : Odd (Nat.card G))
+    [Fintype ↥(F.L i)] [Invertible (Nat.card ↥(F.L i) : ℂ)]
+    [Invertible (Nat.card ↥((F.H i).subgroupOf (F.L i)) : ℂ)]
+    [((F.H i).subgroupOf (F.L i)).Normal]
+    (hnilp : Group.IsNilpotent ↥((F.H i).subgroupOf (F.L i)))
+    (C : Subgroup ↥(F.L i))
+    (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C)
+    {j₁ : Fin ((F.hypothesis78 i hodd hnilp C hFrob).hyp76.n + 1)}
+    (hj₁ne_ind : j₁ ≠ (F.hypothesis78 i hodd hnilp C hFrob).ind1H)
+    (hj₁ : (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta j₁
+      = ((F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta
+          (F.hypothesis78 i hodd hnilp C hFrob).zetaDistinct).conj) :
+    ((F.hypothesis78 i hodd hnilp C hFrob).nu
+          ((F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta
+            (F.hypothesis78 i hodd hnilp C hFrob).zetaDistinct)
+        - (F.hypothesis78 i hodd hnilp C hFrob).nu
+            ((F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta j₁)).support
+      ⊆ (F.hypothesis78 i hodd hnilp C hFrob).hyp76.hyp71.hyp.dadeSupport := by
+  classical
+  -- `θ_j ≠ 1_K` for `j ≠ ind1H` (via `inj`), giving `S`-membership `ζ_j = Ind θ_j ∈ S`.
+  have hθ_ne : ∀ j, j ≠ (F.sibleyPlacedFamily i hodd hnilp C hFrob).ind1H →
+      (F.sibleyPlacedFamily i hodd hnilp C hFrob).θ j ≠ trivialIrreducibleCharacter _ := by
+    intro j hj h
+    refine hj ((F.sibleyPlacedFamily i hodd hnilp C hFrob).inj ?_)
+    simp only [h, (F.sibleyPlacedFamily i hodd hnilp C hFrob).triv]
+  have hzd_mem : (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta
+        (F.hypothesis78 i hodd hnilp C hFrob).zetaDistinct
+      ∈ (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).S := by
+    rw [show (F.hypothesis78 i hodd hnilp C hFrob).zetaDistinct = 0 from rfl,
+      congrFun (F.hypothesis78_hyp76_zeta_eq i hodd hnilp C hFrob) 0]
+    exact ⟨(F.sibleyPlacedFamily i hodd hnilp C hFrob).θ 0,
+      hθ_ne 0 (Ne.symm (F.sibleyPlacedFamily i hodd hnilp C hFrob).ind1H_ne_zero), rfl⟩
+  have hj₁_mem : (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta j₁
+      ∈ (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).S := by
+    rw [congrFun (F.hypothesis78_hyp76_zeta_eq i hodd hnilp C hFrob) j₁]
+    exact ⟨(F.sibleyPlacedFamily i hodd hnilp C hFrob).θ j₁, hθ_ne j₁ hj₁ne_ind, rfl⟩
+  have hsupp' : ((F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta
+        (F.hypothesis78 i hodd hnilp C hFrob).zetaDistinct
+        - (1 : ℂ) • (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta j₁).support
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+          (OddOrder.Peterfalvi.S08.sharpImage ((F.H i).subgroupOf (F.L i))) (F.L i) := by
+    rw [one_smul]; exact F.hypothesis78_zeta_sub_conj_support i hodd hnilp C hFrob hj₁
+  have hagree := coherence_hagree_dadeMap
+    (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade
+    (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj
+    (F.coherence i hodd hnilp C hFrob) hzd_mem hj₁_mem
+    (m0 := 1) (mi := 1) (by norm_num) (by norm_num) hsupp'
+  have heq : (F.hypothesis78 i hodd hnilp C hFrob).nu
+        ((F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta
+          (F.hypothesis78 i hodd hnilp C hFrob).zetaDistinct)
+      - (F.hypothesis78 i hodd hnilp C hFrob).nu
+          ((F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta j₁)
+      = ((F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade.fullDadeIsometryData
+          (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj).toDadeMap
+          ⟨_, (ClassFunction.mem_supportedSubmodule).mpr hsupp'⟩ := by
+    rw [F.hypothesis78_nu_eq i hodd hnilp C hFrob,
+      ← one_smul ℂ ((F.coherence i hodd hnilp C hFrob).extension
+        ((F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta j₁))]
+    exact hagree.symm
+  rw [heq]
+  intro g hg
+  rw [ClassFunction.mem_support] at hg
+  by_contra hgnot
+  have hdade :=
+    ((F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade.fullDadeIsometryData
+      (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj).toDadeIsometryData.isDadeMap
+  exact hg (hdade.map_eq_zero_of_not_mem_dadeSupport _ g hgnot)
+
 end FrobeniusFamily
 
 end OddOrder.Peterfalvi.S09
