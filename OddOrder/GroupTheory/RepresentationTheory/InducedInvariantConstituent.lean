@@ -180,6 +180,38 @@ theorem induce_smul_eq_sum_induce_mul_of_invariant_inertia
     ClassFunction.induce_sum]
 
 open scoped commutatorElement in
+/-- **The induced block sum vanishes off the normal subgroup** (Peterfalvi (12.5) `DpsiH`
+block-vanishing).  For `N ⊴ L`, inertia `T = I_L(θ)`, `T/N` abelian, the induced-block sum
+`∑_β Ind_T^L(ψ·Inf β)` (the `e`-scaled constituent sum of `Ind_N^L θ`) vanishes at every `g ∉ N`:
+it equals `e·Ind_N^L θ` (`induce_smul_eq_sum_induce_mul_of_invariant_inertia`), and `Ind_N^L θ`
+vanishes off the normal `N` (`induce_apply_eq_zero_of_not_mem_normal`).  Each `λ ≠ 1` block of the
+(12.5) `DpsiH` regrouping is a `c_λ`-multiple of such a sum, so vanishes on `H − H'`. -/
+theorem sum_induce_mul_apply_eq_zero_of_not_mem_normal
+    {L : Type*} [Group L] [Finite L] [Fintype L] [Invertible (Nat.card L : ℂ)]
+    {N T : Subgroup L} [N.Normal] [(N.subgroupOf T).Normal] (hNT : N ≤ T)
+    [Fintype ↥N] [Fintype ↥T] [Fintype ↥(N.subgroupOf T)]
+    [Invertible (Nat.card ↥N : ℂ)] [Invertible (Nat.card ↥T : ℂ)]
+    [Invertible (Nat.card ↥(N.subgroupOf T) : ℂ)]
+    [Fintype (IrreducibleCharacter ↥(N.subgroupOf T))] [Fintype ((↥T ⧸ N.subgroupOf T) →* ℂˣ)]
+    (hab : ∀ x y : ↥T, ⁅x, y⁆ ∈ N.subgroupOf T)
+    (θ : IrreducibleCharacter ↥N)
+    (hinertia : ClassFunction.inertia (G := L) (θ : ClassFunction ↥N ℂ) = T)
+    (ψ : IrreducibleCharacter ↥T)
+    (hover : IrreducibleCharacter.LiesOver (N.subgroupOf T) ψ
+      (⟨ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hNT).toMonoidHom
+          (θ : ClassFunction ↥N ℂ),
+        IsIrreducibleCharacter.compHom_of_surjective
+          (Subgroup.subgroupOfEquivOfLe hNT).surjective θ.isIrreducible⟩ :
+        IrreducibleCharacter ↥(N.subgroupOf T)))
+    {g : L} (hg : g ∉ N) :
+    (∑ β : (↥T ⧸ N.subgroupOf T) →* ℂˣ,
+        ClassFunction.induce T ((ψ : ClassFunction ↥T ℂ) *
+          linearClassFunction (β.comp (QuotientGroup.mk' (N.subgroupOf T))))) g = 0 := by
+  rw [← induce_smul_eq_sum_induce_mul_of_invariant_inertia hNT hab θ hinertia ψ hover,
+    ClassFunction.smul_apply,
+    ClassFunction.induce_apply_eq_zero_of_not_mem_normal N (θ : ClassFunction ↥N ℂ) hg, mul_zero]
+
+open scoped commutatorElement in
 /-- **The general Peterfalvi (1.7.b): H-level equal degree** (the fact (12.5) consumes).  For `N ⊴ L`
 with inertia `T = I_L(θ)`, `T/N` abelian, and a `T`-constituent `ψ` over `θ'`, every irreducible
 constituent `φ` of `Ind_N^L θ` has degree `φ(1) = [L:T]·ψ(1)`.
