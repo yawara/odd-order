@@ -1444,3 +1444,30 @@ build green (3875 jobs)。
 **次セッションへの handoff**: lane c の実質前進は (a) issue 3002 の **lane-a threading 合流** (最高 leverage、
 norm cascade 全体 unblock)、または (b) issue 9000 typeP_Galois の hub dedup 決着後の cite、待ち。
 それまでの solo は keystone 端の marginal 置換のみ (reconciled 残 7 は crux-gated)。
+
+### cont.⁵² (2026-07-04 lane c=γ 再開, re-re-org 後): 🎯 `orthogonality_switch` (14.14) PROVEN — caseB arithmetic 抽出 + faithful dichotomy に isolate
+
+**re-re-org (2026-07-04) 適用**: S15 が c→b に移管、c は **S16 W-side (14.14) cascade + parity contradiction**
+に集約 (off-path T-side carrier `reconciled_typePData_T` は退役)。cont.⁵¹ の「solo build-green work 枯渇」を
+**訂正** — (14.14) に genuine な solo arithmetic があった。
+
+**landing (commit `a67a4ef0`)**: `orthogonality_switch` (14.14, `H_eq_U`→(14.15)/(14.16) 矛盾 cascade を
+発火させる key sorry) の **bare sorry を実証明化**:
+- `Hypothesis.caseB_forces_q_three_and_p_five` (**sorry-free**, 14.14.b/14.15/14.8.a arithmetic core):
+  case-(b) bound `(v-1)/pq ≤ pq-1` + v=(q^p-1)/(q-1) (14.4) + `key_inequality` `q^(p+1)>p^(q+1)`
+  (14.8.a, 既 proven) → q=3∧p=5。経路 `q^(p-1)≤v-1<p²q²`→`q^(p-3)<p²`→(14.8.a+q<p)`p^(q-3)<q^(p-3)`→
+  `p^(q-3)<p²`→q=3、`3^(p-3)<p²` vs `p²≤3^(p-3)`(p≥7 induction) → p=5。
+- `orthogonality_switch` を faithful (7.9)+(8.17.c) dichotomy `orthogonality_switch_pairing_bounds`
+  (S16:4526 = §7/§8 char content を精密 isolate: disjoint Dade support + β_M/β_L pairing norm bound) +
+  上記 arithmetic で assemble。`OrthogonalitySwitchData` の抽象 caseA/caseB を bound/`(q,p)=(3,5)` 結論
+  そのものに取り、既 proven の (14.15)/(14.16) 23-method namespace が直読。
+- full build 3916 green、AxiomsCheck OK、新 axiom なし。
+
+**残 S16 sorry (9 decl)**: 73 (T_typeII_structural_inputs, Lane B §13)・163 (T_side_caseB_facts v-value,
+9000)・1995 (main_size_bounds k>2pv, 9000)・2389 (eta_generic_data, η-grid)・3429/3510 (U/V cyclic,
+Lane B §13)・4343 (caseB_contradiction_data, η-grid)・**4526 (orthogonality_switch_pairing_bounds,
+NEW, §7/§8 = 7.8.b norm=lane-a + 8.17.c disjoint support)**・4946 (exists_MHypothesis betaGrid/normSq/signs)。
+残 W-side assembly は全て proven; leaves は b (§13 char/S15 grid) / a (§7 norm 7.8.b) / 9000 (Galois) gated。
+c-solo の arithmetic/assembly は (14.14) で出し尽くした — 次は §7 dichotomy を §9 coherence machinery
+(`chiRhoNormSq_ge_ratio_of_inner_beta_ne_zero` S09:124) から build する deep char body (multi-iteration,
+7.8.b=lane-a と overlap) か、b/a の grid/norm threading 合流待ち。
