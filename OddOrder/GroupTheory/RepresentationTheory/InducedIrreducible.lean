@@ -105,6 +105,69 @@ theorem card_smul_restrict_induce (θ : ClassFunction ↥H k) :
   rw [induceTerm_of_mem_normal (le_refl H) θ h.property x, conjBy_apply]
   exact congrArg θ (Subtype.ext (by group))
 
+open scoped Classical in
+/-- **Mackey restriction as an orbit sum** (normal-subgroup case): grouping the Mackey sum
+`|H| • Res_H (Ind_H^G θ) = ∑_{x∈G} θ^{x⁻¹}` (`card_smul_restrict_induce`) by the value of the
+conjugate gives
+
+  `|H| • Res_H (Ind_H^G θ) = |I_G(θ)| • ∑_{ψ ∈ orbit(θ)} ψ`,
+
+where the orbit is the `Finset` image of `x ↦ θ^{x⁻¹}` over `G` and each fibre
+`{x | θ^{x⁻¹} = ψ}` is a right coset of the inertia group `I_G(θ)` (hence of constant size
+`|I_G(θ)|`).  Combined with `|H|·‖Ind θ‖² = |I_G(θ)|`
+(`card_mul_inner_self_induce_eq_card_inertia`) this is the classical
+`Res_H (Ind_H^G θ) = ‖Ind θ‖² · (sum of the distinct conjugates)` — the "`(1/‖ζ_i‖²)·Res ζ_i`
+is a character" step of Peterfalvi (13.5.a). -/
+theorem card_smul_restrict_induce_eq_inertia_smul_orbitSum (θ : ClassFunction ↥H k) :
+    (Nat.card H : k) • restrict H (induce H θ)
+      = (Nat.card ↥(ClassFunction.inertia (G := G) (H := H) θ)) •
+          ∑ ψ ∈ Finset.univ.image (fun x : G => ClassFunction.conjBy x⁻¹ θ), ψ := by
+  classical
+  rw [card_smul_restrict_induce, Finset.sum_comp (fun ψ : ClassFunction ↥H k => ψ)
+    (fun x : G => ClassFunction.conjBy x⁻¹ θ)]
+  -- Each fibre is a right coset of the inertia group.
+  have hfiber : ∀ ψ ∈ Finset.univ.image (fun x : G => ClassFunction.conjBy x⁻¹ θ),
+      (Finset.univ.filter (fun x : G => ClassFunction.conjBy x⁻¹ θ = ψ)).card
+        = Nat.card ↥(ClassFunction.inertia (G := G) (H := H) θ) := by
+    intro ψ hψ
+    obtain ⟨x₀, -, rfl⟩ := Finset.mem_image.mp hψ
+    haveI : Fintype ↥(ClassFunction.inertia (G := G) (H := H) θ) := Fintype.ofFinite _
+    rw [Nat.card_eq_fintype_card, ← Finset.card_univ]
+    -- Bijection `x ↦ x₀⁻¹·x` from the fibre (the left coset `x₀·I`) onto the inertia group.
+    refine (Finset.card_bij' (fun x hx => (⟨x₀⁻¹ * x, ?_⟩ : ↥(ClassFunction.inertia
+        (G := G) (H := H) θ))) (fun j _ => x₀ * (j : G)) ?_ ?_ ?_ ?_)
+    · -- the fibre condition puts `x₀⁻¹·x` in the inertia group (`conjBy` composes
+      -- contravariantly: `conjBy (a·b) = conjBy b ∘ conjBy a`)
+      have hfib : ClassFunction.conjBy x⁻¹ θ = ClassFunction.conjBy x₀⁻¹ θ :=
+        (Finset.mem_filter.mp hx).2
+      rw [ClassFunction.mem_inertia]
+      calc ClassFunction.conjBy (x₀⁻¹ * x) θ
+          = ClassFunction.conjBy x (ClassFunction.conjBy x₀⁻¹ θ) := by
+            rw [ClassFunction.conjBy_mul]
+        _ = ClassFunction.conjBy x (ClassFunction.conjBy x⁻¹ θ) := by rw [hfib]
+        _ = ClassFunction.conjBy (x⁻¹ * x) θ := by rw [ClassFunction.conjBy_mul]
+        _ = θ := by rw [inv_mul_cancel, ClassFunction.conjBy_one]
+    · -- membership of the image point (trivial: full finset)
+      intro x hx
+      exact Finset.mem_univ _
+    · -- the reverse map lands in the fibre
+      intro j _
+      refine Finset.mem_filter.mpr ⟨Finset.mem_univ _, ?_⟩
+      have hjinv : ClassFunction.conjBy ((j : G))⁻¹ θ = θ :=
+        ClassFunction.mem_inertia.mp (Subgroup.inv_mem _ j.2)
+      calc ClassFunction.conjBy (x₀ * (j : G))⁻¹ θ
+          = ClassFunction.conjBy ((j : G)⁻¹ * x₀⁻¹) θ := by rw [mul_inv_rev]
+        _ = ClassFunction.conjBy x₀⁻¹ (ClassFunction.conjBy ((j : G))⁻¹ θ) := by
+            rw [ClassFunction.conjBy_mul]
+        _ = ClassFunction.conjBy x₀⁻¹ θ := by rw [hjinv]
+    · -- left inverse
+      intro x hx
+      group
+    · -- right inverse
+      intro j _
+      exact Subtype.ext (by group)
+  rw [Finset.sum_congr rfl (fun ψ hψ => by rw [hfiber ψ hψ]), ← Finset.smul_sum]
+
 section Complex
 
 variable [Fintype H] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card H : ℂ)]
