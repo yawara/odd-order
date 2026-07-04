@@ -2505,11 +2505,65 @@ producer pending the orbit-orthogonality lemma. -/
 theorem lambda_alphaFun_inner_zero [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
     (chars : CharacterDegreeData hyp)
-    (_hlam : chars.lambda_induced_from_PC_linear) :
+    (hlam : chars.lambda_induced_from_PC_linear) :
     (∑ x ∈ Finset.univ.filter (· ∈ hyp.H.subgroupOf hyp.S),
       chars.lambda x * (starRingEnd ℂ)
         (H_sharp_alphaFun hG hyp (chars.tau1S chars.lambda) x)) = 0 := by
-  sorry
+  classical
+  obtain ⟨i₁, -, hi₁ker, hi₁eq, -, -⟩ := exists_lambda_index hG chars hlam
+  -- `λ = ζ_{i₁}` vanishes off `H`, so the filtered sum extends to the full `↥S`-sum.
+  have hvanish : ∀ x : ↥hyp.S, x ∉ hyp.H.subgroupOf hyp.S → chars.lambda x = 0 := by
+    intro x hx
+    rw [← hi₁eq]
+    exact (H_sharp_hypothesis76 hG hyp).zeta_eq_zero_of_not_mem_H i₁ x
+      (fun hmem => hx (Subgroup.mem_subgroupOf.mpr hmem))
+  have hext : (∑ x ∈ Finset.univ.filter (· ∈ hyp.H.subgroupOf hyp.S),
+      chars.lambda x * (starRingEnd ℂ)
+        (H_sharp_alphaFun hG hyp (chars.tau1S chars.lambda) x))
+      = ∑ x : ↥hyp.S, chars.lambda x * (starRingEnd ℂ)
+          (H_sharp_alphaFun hG hyp (chars.tau1S chars.lambda) x) := by
+    rw [← Finset.sum_filter_add_sum_filter_not Finset.univ (· ∈ hyp.H.subgroupOf hyp.S)
+      (fun x => chars.lambda x * (starRingEnd ℂ)
+        (H_sharp_alphaFun hG hyp (chars.tau1S chars.lambda) x))]
+    have h0 : ∑ x ∈ Finset.univ.filter (fun x => ¬ x ∈ hyp.H.subgroupOf hyp.S),
+        chars.lambda x * (starRingEnd ℂ)
+          (H_sharp_alphaFun hG hyp (chars.tau1S chars.lambda) x) = 0 := by
+      refine Finset.sum_eq_zero (fun x hx => ?_)
+      rw [hvanish x (Finset.mem_filter.mp hx).2, zero_mul]
+    rw [h0, add_zero]
+  rw [hext]
+  -- The full sum is `|S|·⟨λ, α⟩`, and `⟨λ, α⟩ = 0` term by term.
+  have hsum : ∑ x : ↥hyp.S, chars.lambda x * (starRingEnd ℂ)
+      (H_sharp_alphaFun hG hyp (chars.tau1S chars.lambda) x)
+      = ClassFunction.innerSum chars.lambda (H_sharp_alphaCF hG hyp (chars.tau1S chars.lambda)) := by
+    rw [ClassFunction.innerSum]
+    exact Finset.sum_congr rfl (fun x _ => by
+      rw [H_sharp_alphaCF_apply, starRingEnd_apply])
+  rw [hsum, ← ClassFunction.card_mul_inner]
+  -- `⟨λ, α⟩ = Σ_j coeff·⟨ζ_{i₁}, ζ_j⟩ = 0` (distinct-fibre induced are orthogonal).
+  have hinner0 : ClassFunction.inner chars.lambda
+      (H_sharp_alphaCF hG hyp (chars.tau1S chars.lambda)) = 0 := by
+    rw [H_sharp_alphaCF, inner_sum_right]
+    refine Finset.sum_eq_zero (fun j hj => ?_)
+    rw [OddOrder.RepresentationTheory.inner_smul_right]
+    have hjker := (Finset.mem_filter.mp hj).2
+    -- `ζ_{i₁} ≠ ζ_j` (`P`-kernel property differs), both induced ⟹ orthogonal.
+    have hzne : (H_sharp_hypothesis76 hG hyp).zeta i₁ ≠ (H_sharp_hypothesis76 hG hyp).zeta j :=
+      fun heq => hi₁ker (heq ▸ hjker)
+    obtain ⟨θ, hθ⟩ := (H_sharp_hypothesis76 hG hyp).zeta_induced i₁
+    obtain ⟨θ', hθ'⟩ := (H_sharp_hypothesis76 hG hyp).zeta_induced j
+    haveI : ((H_sharp_hypothesis76 hG hyp).H.subgroupOf hyp.S).Normal :=
+      H_sharp_subgroupOf_normal hyp
+    have hz0 : ClassFunction.inner ((H_sharp_hypothesis76 hG hyp).zeta i₁)
+        ((H_sharp_hypothesis76 hG hyp).zeta j) = 0 := by
+      rw [hθ, hθ']
+      refine OddOrder.RepresentationTheory.inner_induce_eq_zero_of_not_conj θ θ'
+        (fun g hconj => ?_)
+      refine hzne ?_
+      rw [hθ, hθ', ← hconj, OddOrder.RepresentationTheory.IrreducibleCharacter.coe_conjBy,
+        OddOrder.RepresentationTheory.ClassFunction.induce_conjBy_eq]
+    rw [← hi₁eq, hz0, mul_zero]
+  rw [hinner0, mul_zero]
 
 open scoped Classical in
 open scoped FiniteInduce in
