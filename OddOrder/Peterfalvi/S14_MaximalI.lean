@@ -169,6 +169,26 @@ noncomputable def toHypothesis71 {L : Subgroup G} [Finite G] (hyp : Hypothesis L
   isDadeMap := (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).toDadeIsometryData.isDadeMap
   hConjInvariant := hyp.hconj
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **τ-bridging**: the §9 `Hypothesis71` Dade map `toHypothesis71.τ` (a `DadeMap` on
+`SupportedClassFunctions`) agrees with the §7 integral character map `tau` on supported functions.
+Both unfold to the underlying §4 Dade map `dadeData.dade.dadeMap` — via
+`dadeIntegralCharacterMap_apply_of_support` and `dadeIsometryData_toDadeMap`.  Lets the
+`chiRho_adjoint` reciprocity (stated for `toHypothesis71.τ`) meet the coherence
+`extends_on_supported` (stated for `tau`) in the (12.5) `o_rpsi_S` Fact-A. -/
+theorem toHypothesis71_tau_apply {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    (α : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ (typeIA L hyp.typeI) L) :
+    hyp.toHypothesis71.τ α = hyp.tau (α : ClassFunction ↥L ℂ) := by
+  haveI := hyp.finiteG
+  have hsupp : (α : ClassFunction ↥L ℂ).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (typeIA L hyp.typeI) L :=
+    (ClassFunction.mem_supportedSubmodule).mp α.2
+  have hmap : hyp.toHypothesis71.τ = hyp.dadeData.dade.dadeMap (k := ℂ) :=
+    OddOrder.Peterfalvi.S04.IsDadeMap.unique hyp.toHypothesis71.isDadeMap
+      hyp.dadeData.dade.isDadeMap_dadeMap
+  rw [tau, OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support
+      hyp.dadeData.dade _ hsupp, hmap]
+
 end Hypothesis
 
 /-- Conjugation transports the centralizer of a singleton:
