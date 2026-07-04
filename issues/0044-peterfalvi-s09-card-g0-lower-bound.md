@@ -1189,3 +1189,43 @@ hdelta_even → (7.9) conclusion (他全 input 済) → hgood → CharacterEstim
 
 **本 session 実績 (深部)**: hzeta_cross 全 chain + BetaDecomp (7.8.a) + dadeMap_conj (A)、
 ~23 sorry-free commits, full build green。残 = (B) ν-conj-compat (retarget 共役) + 定量 assembly。
+
+---
+
+## cont.⁴⁵ — (B) ν-conj-compat DONE (cont.⁴⁴ の "deep sub-project" 判定は誤り) + delta-reality 完全特定
+
+**cont.⁴⁴ の (B) 評価を訂正**: 「(B) は retarget 共役構造を要する deep sub-project (S07 extension
+構築レベル)」は **誤り**。(B) は **`IsCoherent.extension_mapRingEquiv_comm` (Peterfalvi (5.9)(a)) を
+σ = complex conjugation で適用するだけ**の tractable な application だった。教訓: 「anti-real 両辺が
+等号強制されない」= 追加構造が要る、は正しいが、その構造は**既に `extension_mapRingEquiv_comm` として
+存在**していた (retarget を新規構築する必要は無い)。[[feedback-dont-mislabel-formalization-as-research]]。
+
+**commit `a f726ec93`**: `coherence_extension_conj` (S09_FrobeniusConjIndex, sorry-free, leaf-green):
+`(ν χ).conj = ν χ.conj` for χ ∈ Sibley S。証明 = `extension_mapRingEquiv_comm` at `Complex.conjAe`、
+`Hypothesis.SHC_extension_conj` (S12:1209) を template に。5 つの Sibley input は全て既存:
+- S ⊆ Irr L: `SibleyDadeHypothesis.isIrreducibleCharacter_of_mem_S_of_frobenius` (hyp.W1 = C rfl)
+- S conj-closed (hSu): `S_closedUnderConjugate` + bridge `X.conj = mapRingEquiv conjAe X`
+- vanish-at-1 support (hspan): `zSpan_S_support_subset_of_apply_one_eq_zero` (ちょうど A' を返す)
+- extension ∈ ZIrr (hlat): `IsCoherent.extension_mem_ZIrr`
+- |S| ≥ 2 (h2): caller 供給 (ζ̄ ∈ S, ≠ ζ)
+
+**delta-reality (`delta_isReal`) 完全特定** — 全 tool 所在確認済、betaDecomp に pattern 確立済:
+`delta = beta − constOne + nu(ζ)`, `beta = hyp76.hyp71.τ ⟨ζ_ind1H − ζ_dist⟩`。
+**重要**: `Hypothesis71.τ : S04.DadeMap` (S09_Nonex:115) ゆえ (A) `dadeMap_conj` が beta.conj に**直接**適用
+(IntegralCharacterMap 層を経由不要)。calc:
+- `delta.conj = beta.conj − constOne + (nu ζ).conj` (conj 加法的, constOne real)
+- `beta.conj = τ⟨(ζ_ind1H − ζ_dist).conj⟩ = τ⟨ζ_ind1H − ζ̄⟩` ← (A) dadeMap_conj + ζ_ind1H real (Ind 1_H)
+- `(nu ζ).conj = nu ζ̄` ← (B) coherence_extension_conj via `hypothesis78_nu_eq`
+- `τ⟨ζ_ind1H − ζ̄⟩ − τ⟨ζ_ind1H − ζ⟩ = τ⟨ζ − ζ̄⟩` ← DadeMap 線形性
+- `τ⟨ζ − ζ̄⟩ = nu ζ − nu ζ̄` ← agreement `coherence_hagree_dadeMap` (ζi=ζ, ζ0=ζ̄=conjIndex, di=1
+  ∵ 等次数) — betaDecomp:494-529 に pattern
+- ⟹ `delta.conj − delta = τ⟨ζ−ζ̄⟩ + (nu ζ̄ − nu ζ) = (nu ζ − nu ζ̄) + (nu ζ̄ − nu ζ) = 0` ∴ delta real
+残作業 = multi-wrapper 型 plumbing (DadeMap ↔ fullDadeIsometryData.toDadeMap defeq, conjIndex の
+ζ̄ = zeta(conjIndex) 同定) — deep math でなく betaDecomp と同種の配管。
+
+**その後**: delta_isReal (両 family) + delta_orth_one → `cfdot_real_vchar_even hodd hδZ hδR hδZ' hδR'`
+(S09_ParityPrimitive:144, a=b=⟨δ,1⟩=0 ゆえ Even m) → hdelta_even → (7.9) `conclusion_of_ind_mem_ZIrr_
+of_zeta_irreducible_of_isCoherent_parity` (S09_Nonex:4094, 他 input 全済) → hgood → **CharacterEstimateData
+の Bsum_le field** (5 field bundle: i/hmin/B/B_avoids_min/Bsum_le/base_estimate; S09_Nonex:5560) → hdata →
+`card_G0_lower_bound` (6561 の sorry)。定量 assembly (min-index 選択 + 𝓑-set + base_estimate via (7.5))
+は別 strand で残る。

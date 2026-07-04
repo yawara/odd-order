@@ -552,6 +552,43 @@ noncomputable def hypothesis78_betaDecomp [Fintype G] [Invertible (Nat.card G : 
       inner_induce_constOne_eq_zero ((F.H i).subgroupOf (F.L i)) (pf.θ 0)
         (hθ_ne 0 (Ne.symm pf.ind1H_ne_zero)), sub_zero]
 
+/-- **The Sibley coherent extension commutes with complex conjugation** (Peterfalvi (5.9)(a); input
+(B) of delta-reality).  `(ν χ).conj = ν χ.conj` for `χ` in the Sibley family `S`, by
+`IsCoherent.extension_mapRingEquiv_comm` at `σ = conjugation` — the Sibley `S` is closed under
+conjugation (`S_closedUnderConjugate`), consists of irreducibles
+(`isIrreducibleCharacter_of_mem_S_of_frobenius`), and has the vanishing-at-1 support property
+(`zSpan_S_support_subset_of_apply_one_eq_zero`). -/
+theorem coherence_extension_conj [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (i : Fin k) (hodd : Odd (Nat.card G))
+    [Fintype ↥(F.L i)] [Invertible (Nat.card ↥(F.L i) : ℂ)]
+    [Invertible (Nat.card ↥((F.H i).subgroupOf (F.L i)) : ℂ)]
+    [((F.H i).subgroupOf (F.L i)).Normal]
+    (hnilp : Group.IsNilpotent ↥((F.H i).subgroupOf (F.L i)))
+    (C : Subgroup ↥(F.L i))
+    (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C)
+    {χ : ClassFunction ↥(F.L i) ℂ}
+    (hχS : χ ∈ (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).S)
+    (h2 : ∃ ψ ∈ (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).S, ψ ≠ χ) :
+    ((F.coherence i hodd hnilp C hFrob).extension χ).conj
+      = (F.coherence i hodd hnilp C hFrob).extension χ.conj := by
+  have hbridge : ∀ X : ClassFunction ↥(F.L i) ℂ,
+      X.conj = ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv X := fun X => by
+    ext g; rw [ClassFunction.conj_apply, ClassFunction.mapRingEquiv_apply]; rfl
+  simp only [hbridge]
+  exact (F.coherence i hodd hnilp C hFrob).extension_mapRingEquiv_comm subset_rfl
+    (fun ψ hψ => mem_irreducibleCharacters.mpr
+      ((F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob)
+        |>.isIrreducibleCharacter_of_mem_S_of_frobenius hFrob hψ))
+    (fun ψ hψ hψ1 => (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob)
+      |>.zSpan_S_support_subset_of_apply_one_eq_zero hψ hψ1)
+    Complex.conjAe.toRingEquiv
+    (fun ψ hψ => by
+      rw [← hbridge]
+      exact (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).S_closedUnderConjugate hψ)
+    (fun ψ hψ =>
+      (F.coherence i hodd hnilp C hFrob).extension_mem_ZIrr ψ (Submodule.subset_span hψ))
+    hχS h2
+
 end FrobeniusFamily
 
 end OddOrder.Peterfalvi.S09
