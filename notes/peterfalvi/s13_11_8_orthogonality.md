@@ -1579,3 +1579,40 @@ caseB 要) + `reducible_mem_sOf_H0C` (S11:6215、reducible ∈ sOf(H₀) → ∈
 
 **評価**: correspondence の核 = **μ_k の source を §9 𝒳(H₀) に落とす bridge のみ** (残りは既存 cite)。deep だが
 「大 §9 formalization」でなく columnFamily source の kernel 解析 1 本。次 iteration = この bridge を正面から。
+
+## 2026-07-05 update¹³ (lane-a) — **(11.8.1) 完全 LANDED: `charParam_d_modEq_one` 実証明化 (d≡1 mod q 閉)**
+
+update¹² の bridge (μ_k source ↔ §9 𝒳(H₀)) を Coq `memSred` の **counting route** で正面から閉じ、
+**(11.8.1) の d≡1 (mod q) と δ=1 が sorry-free になった**。3 named gates の 1 本目が消滅。
+
+- **新 leaf `S12_Section9Counts.lean`** (S12_Core → 本 leaf → S12_MaximalIII_IV_V の中間層):
+  leaf 4137 行 → 3991 行 (1500 行規約対応で §9-counts クラスタを分離)。移動 5 宣言
+  (`mkSection11CharacterData`/`forall_sOf_H0Cprime_degree_qu_caseB`/`toTypesIIIIIIVSetup`/
+  `card_U_modEq_one`/`mkSection11CharacterData_u_modEq_one`) + 新規 4 宣言。
+- **`muGrid_column_sum_mem_sOf_H0_and_reducible`** (核心、Coq PFsection11 `memSred` 並行):
+  A := {φ∈𝒮(H₀) | reducible} は ncard = p−1 (`reducible_count_sOf_H0`、証明済を cite)。
+  B := {μ_k | k≠0} は §6 characterization (`induce_not_isIrreducible_iff` ⟺ chiRestrict column、
+  `chiRestrict_injective`+`induce_injective_on_reducible` で pairwise distinct) で ncard = w₂−1。
+  A ⊆ B (reducible 𝒮(H₀)-member を huSub=M' の `subgroupCongr` transport → §6 column と同定、
+  trivial column は 𝒳 の H⊄ker が排除) + p = w₂ (`chief.typeIII_IV_p_eq_W2`、field 既在) +
+  `Set.eq_of_subset_of_ncard_le` → **A = B** → 各 μ_k ∈ 𝒮(H₀) ∧ reducible。**kernel 解析は不要だった**
+  (update¹² の懸念「columnFamily source の kernel 解析 1 本」は counting が丸ごと吸収)。
+- **`reducible_mem_sOf_H0_apply_one_eq_qu`** (dichotomy 統一 degree): caseA =
+  `caseA_reducible_induceHU_apply_one_eq_qu` (S11 既存)、caseB = `reducible_mem_sOf_H0C` ∘
+  `forall_mem_sOf_H0C_apply_one_eq_qu`。⟹ caller は Clifford case 分岐不要。
+- **`charParam_d_modEq_one` 実証明**: μ₁ ∈ 𝒮(H₀) reducible → μ₁(1) = q·u (統一 degree) =
+  w₁·d (`degree_independent` via 新 hypothesis `hmu : params.mu = hyp.muGrid`) → d = u →
+  `mkSection11CharacterData_u_modEq_one` で d ≡ 1。`charParam_delta_eq_one` も htype/hmu thread で追従。
+- **htype threading**: `charParam_d_modEq_one`/`charParam_delta_eq_one`/
+  `card_SHCSet_filter_eq_charParam_n`/`exists_zeta_residual_not_orthogonal`/`w2_lt_w1_of_hypothesis`
+  に `(htype : IsTypeIII M ∨ IsTypeIV M)` を追加 (Coq notMtype5 相当; type V は 10.10 で別殺し)。
+  FT-spine consumer `card_kappaHall_lt_of_isTypeIIIorIV` (FeitThompson:458) は手持ちの `hIIIorIV` を
+  渡すだけ。hnt は新 shared lemma `typePNontrivialCore_of_isTypeIIIorIV` +
+  `TypePNontrivialCore.transfer` (MaximalSubgroupType.lean、witness 独立性 = card_U_eq_index/
+  card_W1_eq_derived_index) で hyp.typeP に転送 — V 除外の forward-ref 問題は explicit htype で回避。
+
+**残り 2 gates (次 iteration、文書順)**:
+1. **`card_SHCSet_filter_eq_charParam_n`** (S12_Section9Counts 末尾、(11.8.1) n-count):
+   |𝒮(HC) 内 degree-w₁ irr| = n = (d−1)/w₁。d=u は今回の機構で出る ⟹ 残 = S₁ ↔ Iirr(U/C)\{0}
+   対応 (Coq size_S1: HU/HC ≅ U/C quotient + abelian |Iirr| = |U/C| = u) + (u−1)/q count。
+2. **`coherent_Sset_of_column_identities`** ((11.8.6) τ₂=S₂ coherence、最深、leaf 3799)。

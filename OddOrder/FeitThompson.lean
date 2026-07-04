@@ -455,7 +455,7 @@ theorem card_kappaHall_lt_of_isTypeIIIorIV {G : Type*} [Group G] [Finite G]
     exact OddOrder.Peterfalvi.S10.card_Msigma_inf_centralizer_eq_card_W2 hG hS hSP hKS hK hyp.typeP
   -- `w₂ < w₁` (Peterfalvi (11.9.b), from the genuine (11.8)).
   rw [hKstarw2, hKw1]
-  exact OddOrder.Peterfalvi.S12.w2_lt_w1_of_hypothesis hG hyp
+  exact OddOrder.Peterfalvi.S12.w2_lt_w1_of_hypothesis hG hyp hIIIorIV
 
 /-- **Peterfalvi (13.2.a), character core** (mmd §13, `references/peterfalvi/04.15_*`).
 
