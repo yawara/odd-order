@@ -1438,3 +1438,30 @@ CliffordCaseBData の関係)、または τ₂ union の S07-instantiation を S
 1. δ=1 / |S(HC)|=n: **S12↔S11 Clifford bridge** (Section11CharacterData 構成 = §9 Clifford 解析) 要。
 2. τ₂ union: **S₂ coherence (9.11/11.7)** + **S₂ orthonormality の §10 解決** or 非 orthonormal union 機構。
 これらは fresh focused session での深い §9/§10/§11 形式化が適する (本 session は巨大 context)。
+
+## 2026-07-04 update⁷ (lane-a) — τ₂ union の完全 recipe 判明 (build 前の全設計確定)
+
+τ₂ union (`coherent_Sset_of_column_identities`) の**完全な建設 recipe を確定** (S07 machinery 精査):
+- **使う lemma**: `S07.coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal` (S07:4685) —
+  set-level 版 diagonal-aware union。plain `coherentUnion_of_glued` の hgen は (6.8.1) 状況で**偽**
+  (cross-diagonal μ_j−dζ が naive span 外) ゆえ diagonal 版必須。
+- **X=S(HC), Y=S₂=Sset\SHCSet, D={μ_j−dζ | j≠0}** (cross-diagonals, supported degree-0)。
+- **ν = `exists_integralCharacterMap_glue_of_orthonormal`** (X,Y orthonormal + X⊥Y、νX=coh.ext, νY=τ₂)。
+- 各 input:
+  - hagreeX/hagreeY: ν の set-level 一致 (glue spec)。 ✅ 自動。
+  - hsrc_ortho (span): X⊥Y (`SHCSet_inner_diff_eq_zero` set-level) を span に lift (bilinearity induction)。
+  - hmixed (set): inner(νx)(νy)=inner(coh.ext x)(τ₂ y)=**himg_ortho**=0=inner x y。← (5.3.b/5.5)。
+  - **hDτ: ν(μ_j−dζ)=τ(μ_j−dζ)**: ν(μ_j−dζ)=τ₂(μ_j)−d·coh.ext(ζ)、τ(μ_j−dζ)=∑ω−d·coh.ext(ζ)
+    [**column identity ✅ landed**] ⟹ 要 **τ₂(μ_j)=∑ω_{ij}** (= μ_j^{τ₂}=∑ω, (4.9)/(5.8))。
+  - hgen: zSupportedSpan(X∪Y) ⊆ span(zSupp X ∪ zSupp Y ∪ D) — lattice 生成 (D 込みで成立、(6.8.1) 型)。
+
+**deep sub-obligations (τ₂ union の実 math、全 §9/§10/§11)**:
+1. **S₂=Sset\SHCSet coherence** (τ₂) — (9.11)/(11.7)、最深。
+2. **μ_j^{τ₂}=∑ω_{ij}** — (4.9)/(5.8)、hDτ の核。
+3. **S₂ orthonormal** — §10 certain-type (inducedFamily uniform-irr 未解決)。
+4. **himg_ortho** S₁^{τ₁}⊥S₂^{τ₂} — (5.3.b)/(5.5)。
+5. **hgen** (D 込み lattice 生成)。
+
+**landed τ₂ inputs**: column identities (hDτ 半分)、`SHCSet_orthonormal` (X orthonormal)、
+`SHCSet_inner_diff_eq_zero` (X⊥Y)。**残 = 上記 1-5 の deep §9/§10/§11** + composition wiring。
+これらは fresh focused session での §9/§10/§11 形式化が適切 (本 session は超大 context、tractable work 尽く)。
