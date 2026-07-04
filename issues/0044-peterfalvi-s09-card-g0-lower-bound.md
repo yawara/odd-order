@@ -780,3 +780,37 @@ c(1)=d(1); coq `Dade1`: Dade image 差は 1 で消える) かつ差直交 ⟨a-b
 **残 (7.10 endpoint)**: cross-ortho primitive → hzeta_cross (Frobenius: a=ν_iζ_i, b=ν_iζ̄_i,
 差=τ_i(ζ_i-ζ̄_i) Dade image, disjoint support で ⟨a-b,c-d⟩=0) → (7.9) conclusion 適用 (hcoh/hnu/hindZ/
 hzeta_irr/hBD も要) → 𝓑-set → min-index/hG0sum → characterEstimateData → card_G0_lower_bound。
+
+## 2026-07-04 cont.²⁹ (集中掘り続行) — ★ 両 §1 primitive + hzeta_cross bridge 完成
+
+**Landed (3 commit, all sorry-free)**:
+1. `orthonormal_vchar_diff_ortho` (S09_CrossOrthogonality.lean, 120行, commit 5069691a) —
+   cross-ortho primitive。coq `orthonormal_vchar_diff_ortho` (PFsection4)。a=ε·μ 展開 +
+   同次数⟹同符号 (`sign_eq_of_mul_pos_cast` via `irreducibleCharacter_apply_one_eq_pos_natCast`) +
+   μ=ν 矛盾。**両次数条件必須** (符号相殺反例)。
+2. `zetaImage_cross_eq_zero_of_conjugate_images` (S09_FrobeniusCrossOrtho.lean, commit 8cb8ed2f) —
+   Hypothesis79-level bridge。coq `disjoint_coherent_ortho` (PFsection7)。共役像 b=ζ̄₁^ν, d=ζ̄₂^ν を
+   与え、差 ζ_i^ν−ζ̄_i^ν が disjoint dadeSupport に supported ⟹ ⟨a−b,c−d⟩=0
+   (`inner_eq_zero_of_disjoint_support`、beta_inner_beta_eq_zero と同型) + 1∉dadeSupport で vanish
+   (`one_notMem_dadeSupport`) ⟹ orthonormal_vchar_diff_ortho 適用。
+   (parity primitive `cfdot_real_vchar_even` は前 session commit ebee613b で完成済)。
+
+**残 = Frobenius 共役 discharge (次の大 sub-project、enabling lemma 全同定済)**:
+bridge の仮説 (b=ζ̄₁^ν, d=ζ̄₂^ν の hbZ/hbn/hab/hab_supp) を F.hypothesis78 から供給する。
+- **enabling lemmas (全存在確認済)**: `conj_induce` (CliffordDecomposition:363、(induce K θ).conj =
+  induce K θ.conj) → 誘導族の共役閉性; `IsIrreducibleCharacter.conj` (BrauerPermutation:136);
+  `not_isReal_of_ne_trivial_of_odd_card'` (BrauerPermutation:233、Pf 1.1 奇位数非実、ζ≠ζ̄ を保証);
+  `coherence_hagree_dadeMap` (S09_CertDischarge:2559、ν(ζ−dζ₀)=τ(ζ−dζ₀)); `nu_isometry` (H78 field);
+  placedInducedFamily の `cover`/`inj` (共役指標の族内 index を供給)。
+- **設計の急所**: `F.hypothesis78 i` は **opaque** (`choose`+`let pf := placedInducedFamily` で構成、
+  返り値 Hypothesis78 は不透明)。hyp76.zeta = `fun j => induce K (pf.θ j)` だが**外から露出していない**。
+  → discharge には (F.hypothesis78 i).hyp76 の族を placedInducedFamily に結びつける **projection 補題**
+  (`(F.hypothesis78 i ...).hyp76.zeta = fun j => induce K (θ j)` 等) が必要。hypothesis78 の
+  リファクタ (族を data で露出) or 等式補題群の追加。ここが次 session の主タスク。
+- **decomposition (次 session)**: (a) hypothesis78 の hyp76 族露出 (projection lemma or 構成 refactor);
+  (b) 共役 index 補題 `∃ j ≠ ind1H, zeta j = (zeta zetaDistinct).conj` (conj_induce+cover);
+  (c) ζ≠ζ̄ (not_isReal odd) → nu_isometry で hbn/hab; (d) hab_supp = coherence_hagree_dadeMap で
+  ν(ζ)−ν(ζ̄)=τ(ζ−ζ̄) supported; (e) bridge 適用で hzeta_cross。
+- その後: (7.9) conclusion 適用 (hcoh/hnu/hindZ/hzeta_irr/hBD/hdelta_even も要) → 𝓑-set →
+  min-index/hG0sum → characterEstimateData → card_G0_lower_bound (endpoint sorry
+  @S09_NonexistenceCertain:6552)。
