@@ -251,3 +251,10 @@ coherence dichotomy のみ) + S13.Hypothesis に **SOf_eq field 追加 = SOf pin
 inducedKernelFamily M' (X.subgroupOf M); constructor 未存在で既存破壊なし) + [finiteG] field。
 次: (11.4) wiring (named hdatum obligation `sixTwoDecompositionData` 起こし + (6.2) 算術) →
 その後 hdatum μ-column 本体 (S12 grid)。
+
+## 2026-07-05 lane-a (loop 7): (6.2)-§11 が単一 named obligation に集約
+
+`sixTwoDecompositionData` (named sorried — h56 チェーン唯一の sorry、μ-column datum) +
+`exists_source_of_coherence_dichotomy` + `six_two_dichotomy_bound` (任意 (C,D) section で
+(6.2) bound、consumer-ready)。次: (11.4) HC-instantiation + index 算術 / (11.3) 6.3-route /
+datum の μ-column 本体。
