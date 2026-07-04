@@ -10,6 +10,31 @@
 
 ## ✅ LIVE STATUS (2026-07-05 後半, lane **b** — (13.10) 4 producer 全 discharge、residual = 教科書番号 5 本)
 
+### cont.² (07-05 loop it.5-13): (13.5) 整数性 unit 完遂 — (13.7) package 実 assembly、残 grid-atom 2 本
+
+H-side 整数性 unit を完遂 (`d24c7b9c`〜`d1be0c6e`、全て実証明):
+- **Mackey orbit-sum** `card_smul_restrict_induce_eq_inertia_smul_orbitSum` (InducedIrreducible) +
+  `orbitSum_mem_ZIrr`
+- **`Hypothesis76.zeta_induced` field 追加** (S09、additive; 唯一の constructor OfFamily は
+  term-mode 化して充足)。canonical instance = FiniteInduce instance が同一項で bridge 不要
+- **(1/‖ζᵢ‖²)·Res ζᵢ ∈ ℤ[Irr K]** → **α|_K ∈ ℤ[Irr K]** (cᵢ ∈ ℤ 下) → ⟨φ,φ⟩ ∈ ℕ /
+  φ(1) ∈ ℤ 抽出補題
+- **`eta10_cCoeff_int` 実証明**: FullDadeIsometryData.preserves_virtualCharacters ((2.10)、
+  既存発見!) + dᵢ = 1 (K abelian → θ linear) 経由
+- **`H_mulCommutative`** (H = PC abelian、carrier 実導出) + Parseval bookkeeping
+- **`exists_caseB_data_eta10` 実 assembly 完成**: 単一 F : Finset ↥S 上で全 bookkeeping。
+  **教訓: 異なる補題の baked spelling への rw-join は不可視の Fintype/DecidablePred instance
+  差で失敗する** (classical タクティクの fvar-instance も割れ要因) → **F-引数化 wrapper**
+  (explicit Finset + mem-iff 特性、instance-free interface) が決定的解 —
+  `sum_finset_sharp_normSq_eq` / `sum_finset_sharp_transport` /
+  `H_sharp_alphaFun_inflation_finset`
+
+**(13.7) chain 現況**: analyticEstimate_eta ← eta10_sharp_norm_lower ← exists_caseB_data_eta10
+← **残 atom 2 本のみ**: `eta10_cCoeff_orthogonal` ((13.3.c)/(5.3.b) 直交性) /
+`eta10_alphaCF_one_ne_zero` ((1.10)/(3.2.c) 合同)。
+**次**: λ-side (13.6) package の同型 atomization (`exists_lambda_index` の設計 —
+「λ = ζ_{i₁} with cCoeff = 1」の (13.3)-gated 同定) と T-side (13.8) の横展開。
+
 ### cont. (07-05 loop it.2-4): sharp 3 本 engine wiring 完了 + (13.5.a/c) 具体化、次 = H-side 整数性
 
 - **(13.6)/(13.7)/(13.8-T) sharp 全て engine assembly 化** (`631c4538`/`d8ea58d0`): 残 =
