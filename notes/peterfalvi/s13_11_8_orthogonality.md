@@ -1398,3 +1398,43 @@ honest assembly + 3 named obligation に分解。capstone 本体は proven glue 
 **次の攻略順** (上流優先): (1)(2) §9 counts は `caseB_degree_qu` (S11:6060 proven) を Section11CharacterData
 ↔ Hypothesis bridge で cite (要 bridge 調査) → (3) τ₂ union は S₂ coherence が最深 (inducedFamily は induced
 = 一般に非既約ゆえ orthonormal 直用不可; Peterfalvi (11.7)/(6.6) coherence-union の構造理解が要る)。
+
+## 2026-07-04 update⁵ (lane-a) — frontier 精査: 3 obligations は全 §9/§11-bridge gated
+
+capstone-wiring 後の 3 obligation の tractability を精査。**全て §9/§11 の深部 gate**と判明:
+- **§9 counts (δ=1, |S(HC)|=n)**: `params.d` の**値**が要る (δ≡d mod w₁、|S(HC)|=(d−1)/w₁)。しかし
+  `muGrid_apply_one_eq` (S12) は degree **独立性のみ**で値を pin しない。値 (d=u, μ_j(1)=qu) は §9
+  `caseB_degree_qu` (S11:6060 proven) にあるが、**S12.Hypothesis ↔ S11 Section11CharacterData の bridge
+  が無い** (bridge は S13 level = `hyp.s11Setup`、S12 には無)。⟹ **S12↔S11 bridge = 鍵となる欠落 infra**。
+  Frobenius u≡1 mod q の材料 (`typeP_uW1_frobenius` S11:162、`dvd_card_sub_one_of_free_off_unique_fixed`)
+  は hyp.typeP で使えるが d=u が無いと δ=1 に繋がらない。
+- **τ₂ union (`coherent_Sset_of_column_identities`)**: `Sset = inducedFamily M` (Core:353)、`SHCSet ⊆ Sset`
+  ゆえ S=S₁∪(Sset\SHCSet) は clean。**S₁=SHCSet orthonormal は landed** (`SHCSet_orthonormal`, commit 直近)。
+  残: (i) S₂=Sset\SHCSet coherence (9.11/11.7、深部) + (ii) S₂ orthonormal (inducedFamily は induced=
+  一般非既約、要確認) + (iii) himg_ortho (5.3.b/5.5、column identity 由来) + (iv) S07 union instantiation
+  (`coherentUnion_of_glued` + `exists_integralCharacterMap_glue_of_orthonormal` S07:3229)。
+  **S08 の union lemma 群は case-B 専用** (`coherentXunionYset_centralCommutator_*`)、S12 は独自 instantiate 要。
+
+**評価**: (11.8) capstone は wired、残 = 3 obligation は**深部 §9/§11 multi-session** (S12↔S11 bridge 構築、
+または (11.7)/(9.11) S₂ coherence 形式化)。上流優先では bridge が 2 obligation を unblock ゆえ最優先候補。
+**次 iteration**: S12↔S11 bridge の構築可能性を精査 (TypePData/CharacterParameters ↔ Section11CharacterData/
+CliffordCaseBData の関係)、または τ₂ union の S07-instantiation を S₂ coherence 仮説で前倒し。
+
+## 2026-07-04 update⁶ (lane-a) — τ₂ union の S₂ orthonormality は deep §10 (未解決); tractable work 尽く
+
+τ₂ union の建設可能性を精査、**S₂ orthonormality が未解決の deep §10 crux**と確定:
+- S08 case-B union (`coherentXunionYset_centralCommutator_of_himg_ortho`) の pattern は
+  **X, Y 両方 irreducible** を要求 (orthonormal で `exists_integralCharacterMap_glue_of_orthonormal`)。
+- **`inducedFamily` は uniform irreducible でない**: 既約性は per-char で `induce_isIrreducible_of_forall_
+  chiRestrict_ne` (havoid: θ≠全 chiRestrict χ₂) 経由のみ。`inducedFamily_all_irreducible` lemma 無し、
+  type-P regular/free action lemma 無し。‖Ind θ‖²=|Stab_{M/M'}(θ)| ゆえ uniform-1 は M/M' が Irr(M')−1 に
+  free 作用する時のみ (要 §10 certain-type structure 検証)。⟹ **S₂ orthonormality は未解決**、
+  orthonormal-glue union が Peterfalvi の実機構か不明 (非 orthonormal なら別機構)。
+
+**landed union inputs** (S₂ orthonormal が成立する場合に有効): `SHCSet_orthonormal` (S₁ 側)、
+`SHCSet_inner_diff_eq_zero` (S₁⊥S₂, hsrc_ortho)。
+
+**tractable surrounding work は尽きた**。残 3 obligation は全 deep §9/§10/§11:
+1. δ=1 / |S(HC)|=n: **S12↔S11 Clifford bridge** (Section11CharacterData 構成 = §9 Clifford 解析) 要。
+2. τ₂ union: **S₂ coherence (9.11/11.7)** + **S₂ orthonormality の §10 解決** or 非 orthonormal union 機構。
+これらは fresh focused session での深い §9/§10/§11 形式化が適する (本 session は巨大 context)。
