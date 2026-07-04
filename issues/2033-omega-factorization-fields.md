@@ -28,7 +28,13 @@ Hypothesis に無い** (現 fields: omega_orthonormal / omega_apply_one / omega_
       — 正確な形は Pf (3.3)/(13.1) と spine 構成 (FeitThompson omegaS ← TICyclicHypothesis)
       が supply できる形で確定)
 - [x] FeitThompson.lean の構成箇所で supply — omegaS_mul 等 5 本実証明 + 両構造 + 3 wiring sites (07-05 it.28, commit 9c79ee63)
-- [ ] (1.10.a/b) 合同 (`CyclotomicCharacterCongruence` 在庫確認) と接続して両 atom を実証明
+- [x] (η-side, 07-05 it.29, commit 688e9c93) `eta10_alphaCF_one_ne_zero` 実証明 —
+      在庫確認結果: (1.10.a) = `exists_integral_apply_sub_of_commute`、(1.10.b) =
+      `int_dvd_of_one_sub_primRoot_dvd` (共に CyclotomicCharacterCongruence、完備)。
+      新 helper `mul_notMem_W1_union_W2` + `eta10_apply_sub_one_integral` (η₁₀(y)≡1)。
+      W2_le_P + pgroup_le_of_normal_coprime_index を Setup に relocate。
+- [ ] (λ-side) `exists_lambda_alphaFun_one_qb` — λ^{τ₁}(y)−λ(y) の合同 (Pf (13.6) 本文の
+      λ-congruence を要精読; λ = Ind_{PC}(linear) の W₂#-値 + α(1)∈ℤ 経路)
 
 ## 調査ログ (07-05 loop it.27)
 
