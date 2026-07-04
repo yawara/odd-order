@@ -541,6 +541,35 @@ theorem sum_normSq_eq_card_mul_inner {H : Type*} [Group H] [Fintype H]
     ((∑ g : H, ‖α g‖ ^ 2 : ℝ) : ℂ) = (Nat.card H : ℂ) * ClassFunction.inner α α := by
   rw [← innerSum_self_eq_sum_normSq, ClassFunction.card_mul_inner]
 
+/-- **The self inner product of a virtual character is a natural number**: `⟨φ,φ⟩ ∈ ℤ`
+(`inner_mem_ZIrr_int`) and `|H|·⟨φ,φ⟩ = ∑‖φ‖² ≥ 0` (`sum_normSq_eq_card_mul_inner`), so the
+integer is nonnegative.  The `n = ‖α‖²` of the (13.7) Parseval bookkeeping. -/
+theorem exists_nat_inner_self_of_mem_ZIrr {H : Type*} [Group H] [Fintype H]
+    [Invertible (Nat.card H : ℂ)] {φ : ClassFunction H ℂ}
+    (hφ : φ ∈ OddOrder.RepresentationTheory.ZIrr H) :
+    ∃ n : ℕ, ClassFunction.inner φ φ = (n : ℂ) := by
+  obtain ⟨z, hz⟩ := ClassFunction.inner_mem_ZIrr_int hφ hφ
+  have hsum := sum_normSq_eq_card_mul_inner φ
+  rw [hz] at hsum
+  have hcard : (0 : ℝ) < (Nat.card H : ℝ) := by exact_mod_cast Nat.card_pos
+  have hzr : ((Nat.card H : ℝ) * (z : ℝ) : ℂ) = ((∑ g : H, ‖φ g‖ ^ 2 : ℝ) : ℂ) := by
+    rw [hsum]
+    push_cast
+    ring
+  have hzreal : (Nat.card H : ℝ) * (z : ℝ) = ∑ g : H, ‖φ g‖ ^ 2 := by exact_mod_cast hzr
+  have hz0 : (0 : ℤ) ≤ z := by
+    by_contra hneg
+    push_neg at hneg
+    have h1 : (z : ℝ) < 0 := by exact_mod_cast hneg
+    have h2 : (Nat.card H : ℝ) * (z : ℝ) < 0 := mul_neg_of_pos_of_neg hcard h1
+    have h3 : (0 : ℝ) ≤ ∑ g : H, ‖φ g‖ ^ 2 :=
+      Finset.sum_nonneg (fun g _ => by positivity)
+    linarith [hzreal ▸ h2]
+  refine ⟨z.toNat, ?_⟩
+  rw [hz]
+  have := Int.toNat_of_nonneg hz0
+  exact_mod_cast congrArg (fun m : ℤ => (m : ℂ)) this.symm
+
 /-- **Parseval expansion of a real-scalar linear combination** (the algebraic core of Peterfalvi
 (13.5.b)).  For complex functions `f, g` on a finite index set and a real scalar `κ`,
 `∑‖κ·f + g‖² = κ²∑‖f‖² + 2κ·Re(∑ f·ḡ) + ∑‖g‖²`.  In (13.5.b) this is applied with `κ = a/‖ζ₁‖²`,
@@ -1490,6 +1519,42 @@ theorem H_sharp_inv_normSq_restrict_zeta_mem_ZIrr [Fintype G] [Invertible (Nat.c
     rw [hres, smul_smul, inv_mul_cancel₀ hnorm0, one_smul]
   rw [hmain]
   exact OddOrder.RepresentationTheory.orbitSum_mem_ZIrr (G := ↥hyp.S) θ₀
+
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce Classical in
+/-- **The (13.5.a) correction restricted to `H` is a virtual character of `H`**: with integer
+(7.7.a) coefficients `c_i ∈ ℤ` (the `χ ∈ ℤ[Irr G]` case), the `P`-kernel tail
+`α = ∑ (c̄_i/‖ζ_i‖²) • ζ_i` restricts to `∑ c_i • ((1/‖ζ_i‖²)·Res ζ_i) ∈ ℤ[Irr H]`
+(each normalized restriction is the conjugate-orbit character,
+`H_sharp_inv_normSq_restrict_zeta_mem_ZIrr`).  The integrality carrier of Peterfalvi (13.5):
+it makes `‖α‖²_H ∈ ℕ` and `α(1) ∈ ℤ` available to the (13.7)/(13.8) Parseval bookkeeping. -/
+theorem H_sharp_alphaCF_restrict_mem_ZIrr [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (χ : ClassFunction G ℂ)
+    (hc : ∀ i, ∃ z : ℤ, (H_sharp_hypothesis76 hG hyp).cCoeff χ i = (z : ℂ)) :
+    ClassFunction.restrict ((H_sharp_hypothesis76 hG hyp).H.subgroupOf hyp.S)
+        (H_sharp_alphaCF hG hyp χ)
+      ∈ ZIrr ↥((H_sharp_hypothesis76 hG hyp).H.subgroupOf hyp.S) := by
+  classical
+  set K : Subgroup ↥hyp.S := (H_sharp_hypothesis76 hG hyp).H.subgroupOf hyp.S with hKdef
+  -- Restriction is pointwise, so it commutes with the defining sum.
+  have hlin : ClassFunction.restrict K (H_sharp_alphaCF hG hyp χ)
+      = ∑ i ∈ (Finset.Ioi (0 : Fin ((H_sharp_hypothesis76 hG hyp).n + 1))).filter
+            (fun i => (hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
+              OddOrder.Peterfalvi.S03.characterKernel ((H_sharp_hypothesis76 hG hyp).zeta i)),
+          (star ((H_sharp_hypothesis76 hG hyp).cCoeff χ i) /
+            (H_sharp_hypothesis76 hG hyp).zetaNormSq i) •
+            ClassFunction.restrict K ((H_sharp_hypothesis76 hG hyp).zeta i) := by
+    ext x
+    rw [ClassFunction.restrict_apply, H_sharp_alphaCF,
+      OddOrder.RepresentationTheory.ClassFunction.finset_sum_apply,
+      OddOrder.RepresentationTheory.ClassFunction.finset_sum_apply]
+    exact Finset.sum_congr rfl (fun i _ => by
+      rw [ClassFunction.smul_apply, ClassFunction.smul_apply, ClassFunction.restrict_apply])
+  rw [hlin]
+  refine Submodule.sum_mem _ (fun i _ => ?_)
+  obtain ⟨z, hz⟩ := hc i
+  rw [hz, star_intCast, div_eq_mul_inv, mul_smul, Int.cast_smul_eq_zsmul]
+  exact Submodule.smul_mem _ z (H_sharp_inv_normSq_restrict_zeta_mem_ZIrr hG hyp i)
 
 /-- **Peterfalvi (13.5)**: the TI-subset calculation on `H = P C` gives a
 pointwise formula and two norm estimates. -/
