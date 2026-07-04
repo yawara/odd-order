@@ -969,3 +969,28 @@ reusable toolkit + h_psix cyclotomic。残 = ρM machinery build (multi-session)
 (IntegralCharacterMap) ↔ `coh.extension` via extends_on_supported、(c) **A-set 型** `chiRho_adjoint` の
 A:Set G (typeIA) vs `IsCoherent` の A:Set ↥L (supportInSubgroup) の橋渡し。
 Fact-A 後も **Clifford partition (step 5)** が残る = (12.5) は multi-iteration (材料は揃った)。
+
+### loop¹⁵⁸ — (12.5) 全 step を既存 tooling に mapping 完了 (de-risk) + escaping-support 判明
+
+**landed** (this iter): `Sset_diff_vanishes_off_H_sharp` (A1xi12 support: 等次数 S-member 差は H^# で消える)。
+
+**(12.5) full build mapping** (全 step → 既存 lemma、de-risked):
+- **step 3 (H-level Fact A)** `⟨ρψ, χ₁−χ₂⟩=0`: `chiRho_adjoint` 相互律 (S09_NonexistenceCertain:353)
+  + `inner_psi_coherent_extension_eq_zero` (my corollary) + `extends_on_supported`。ρψ=`hyp.toHypothesis71.chiRhoCF psi`。
+  ⚠ **escaping-support 注意**: Lean type-I Dade は nonescaping-supported constituent 差で動く
+  (`constituent_diff_tau_eq_induce`)。S-member 差 (Ind θ₁−Ind θ₂) は H^# support だが nonescaping
+  でない (Res_H(Ind θ) の escaping 消失を欠く — constituent と違い Res 一致しない)。
+  ∴ Frobenius witness case (escaping 空 ⟹ H^#=nonescaping) で S-member route 有効、
+  一般は constituent-level 経由要。
+- **step 4 (等次数 Ind_{H'}^H λ constituents)**: H'=[H,H] ゆえ **H/H' abelian 自動** ⟹ I_H(λ)/H' abelian
+  ⟹ λ extends (CyclicCharacterExtension) ⟹ Gallagher (GallagherDecomposition) ⟹ 全 constituent
+  degree=[H:I]·λ(1) 等しい。tooling: InertiaAbelianQuotient + CyclicCharacterExtension + Gallagher。
+  (L-level 版 = `typeI_induced_char_constituents`; H-level は abelian 自動で (8.2.c) 不要・より clean。)
+- **step 5 (partition + DpsiH assembly)**: `CliffordSingleOrbit`
+  (`restrictionConstituentsSingleOrbit_of_isIrreducible` + degree formula) + trivIset/cover。
+- **step 6 (vanishing→const)**: my bricks `sum_smul_induce_apply_eq_zero_of_not_mem_normal` +
+  `apply_eq_of_eq_sum_smul_induce_add_const`。**DONE**。
+
+**次 iteration = step 4 build** (generic 「等次数 constituents of Ind_N^H λ, H/N abelian」lemma、
+Gallagher+extension で組む — 独立 reusable Clifford 定理)。以降 step 3-full→step 5→assemble。
+`rho_constant_on_H_minus_Hprime` は ρψ に restate 要 (現 plain-ψ は誤 statement、consumer 無)。
