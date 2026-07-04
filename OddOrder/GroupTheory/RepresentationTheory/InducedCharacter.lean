@@ -375,6 +375,18 @@ theorem induce_smul (H : Subgroup G) [Invertible (Nat.card H : k)]
     induce H (c • θ) = c • induce H θ := by
   rw [induce, induce, induceSum_smul, smul_smul, smul_smul, mul_comm]
 
+/-- **Induction commutes with finite sums**: `Ind_H^G (∑ i ∈ s, F i) = ∑ i ∈ s, Ind_H^G (F i)`.
+Termwise from `induce_add` / `induce_zero`.  Used to push `Ind_I^H` through the inertia-level
+decomposition `∑_β ψ·Inf(β)` in the (1.7.a) Clifford-correspondence lift. -/
+theorem induce_sum {ι : Type*} (H : Subgroup G) [Invertible (Nat.card H : k)]
+    (s : Finset ι) (F : ι → ClassFunction ↥H k) :
+    induce H (∑ i ∈ s, F i) = ∑ i ∈ s, induce H (F i) := by
+  classical
+  induction s using Finset.induction with
+  | empty => simp
+  | insert a s ha ih =>
+      rw [Finset.sum_insert ha, Finset.sum_insert ha, induce_add, ih]
+
 theorem induce_eq_zero_of_not_conjugatesInto {H : Subgroup G}
     [Invertible (Nat.card H : k)] (θ : ClassFunction ↥H k) {g : G}
     (hg : g ∉ conjugatesInto H) :
