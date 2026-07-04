@@ -482,3 +482,18 @@ coeff (X ∈ ℤ[R]) / Y ⊥ R。
   PFsection9 の FTtypeP_subcoherent 証明の該当部を行間ソースに)。
   それで columnImageFamily の coh-free 版が立ち、named 2 点は
   ofProjection-plumbing に落ちる。alpha_tau_image 経由は捨てる。
+
+### 追記 6 (loop 32): coh-free 直接証明の部品所在 (§6 layer)
+
+- `S06_CertainTypeIsometry`: `certainTypeOmegaSigma` (σ-像 def, coh-free) +
+  `tau_toDadeMap_apply_of_mem` (:378) + `tau_toDadeMap_sum` (:767) +
+  `certainTypeOmegaSigma_inner` — §6 Dade-τ の supported-値計算 API 一式。
+- `S06_MuColumnBridge.induce_omegaColumnDiff_mu_diff` ((4.3.b)):
+  Ind_W^L(ω_ij − ω_0j) = δ_j(μ_ij − μ_0j) — 誘導側恒等式。
+- **次の第一手 (実作業)**: これらで
+  `tau_muGrid_row_diff_cohFree : hyp.tau (μ_ij − μ_ik) = δ·(ω_ij^σ − ω_ik^σ)`
+  (j,k ≠ 0, 同 i 行) を S12 側に直接証明する
+  (support = alpha_support の差 / τ-値 = tau_toDadeMap_apply_of_mem を
+  muGrid-def (toCertainTypeHypothesis 経由) に沿って評価)。
+  成功すれば columnSum_diff の coh-free 版 → columnImageFamily' → named 2 点。
+  PFsection9 FTtypeP_subcoherent の該当証明部を並走参照。
