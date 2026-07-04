@@ -1331,3 +1331,27 @@ ungated 上流は §9 count carrier (`card_G0_lower_bound` 7.10 = issue 0044、o
 (1) `coh := hyp.SHC_isCoherent hG`、(2) `_h_orth` → (11.8.4) form (landed (10.9)
 `residual_alignedOmegaSigma_inner_eq_zero_of_w1_lt_w2` 経由)、(3) charParam_a_eq_zero chain →
 μ_j^τ identity、(4) τ₂ capstone (§9 gate、必要なら sorried skeleton で前倒し) → S_not_coherent。
+
+## 2026-07-04 update² (lane-a) — column-identity assembly (step 3) PROVEN
+
+commit `7c865220`: 上記「次 iteration」の step (3) を **proven lemma に landing**。
+- **`Hypothesis.tau_muColumnSum_sub_dzeta_eq_of_residualData` (S12:3610, sorry-free)**: 各列 j≠0 で
+  `(μ_j − dζ)^τ = ∑_i ω_ij^σ − d•coh.ext ζ` を assemble。中身 = (11.8.5) a=0 → 各行 image:
+  - i≠0: `residualCoeff_eq_zero` (a=0) → `SHC_tau_muGridAlpha_eq` で α_ij^τ = ω_ij^σ−ω_i0^σ−nζ^{τ₁};
+  - i=0: 任意 i≠0 の image + four-corner (4.10) `tau_muGrid_fourCorner` (nζ が α_ij−α_0j で相殺);
+  - δ=1 (d=w₁n+1) で (11.8.6) opening `tau_muColumnSum_sub_zeta_eq_of_alphaImage` が線形 assemble。
+- **`tau_muColumnSum_sub_zeta_eq_of_alphaImage` を generic `coh` に一般化** (旧 `SHC_isCoherent` hardcode)。
+  h114 lemma `exists_coherent_extension_h114_of_orthogonal` が返す swap-branch ν を通すため。
+- **§9 counts は仮説のまま**: δ=1・n・R image data (`|S(HC)|=n`, orthonormal, `=coh.ext '' S(HC)`) は
+  hypothesis。これらは (11.8.1) = §9 (9.8)/(9.9) gate。
+
+**残 = 2 gate のみ** (どちらも本 lemma の下流 assembly):
+1. **§9-count threading** (capstone 用): `exists_charParameters_full` の params から δ=1・n・R materialization
+   を供給。R = `coh.extension '' SHCSet` の orthonormal Finset (isometry `extension_inner_eq` から
+   ungated、cardinality `|SHCSet|=n` のみ §9-gated)。
+2. **(11.8.6) τ₂ capstone**: 上記 column identity ∀j → **full S(C)=S₁∪S₂ coherence** →
+   `S12.S_not_coherent` (10.8) で False。`coherentUnion_of_glued` (S07:4511) instantiate:
+   hX=coh (S₁), hY=S₂ coherence (§9 (9.11)/(11.7) gate、未 build)、hsrc_ortho=distinct-irr ⊥ (ungated)、
+   himg_ortho=S₁^{τ₁}⊥S₂^{τ₂} (5.3.b/5.5)、hgen=S=S₁∪S₂ 分解 (§9)。**S₂ coherence が最深 gate**。
+
+**次**: R materialization (mostly ungated) → capstone wiring (§9 counts sorried-cite) → τ₂ union skeleton。
