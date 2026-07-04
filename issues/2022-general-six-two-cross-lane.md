@@ -243,3 +243,11 @@ hom 構造不要) + `exists_anchor` (S(A') の irreducible degree-|M:M'| anchor,
 proper-commutator quotient)。**h56 の残 = hdatum の μ-column pairs のみ** (次 frontier):
 break-Da (column) / member-D (column, (5.8) 型 extension-uniqueness) / 直交性 (col 絡み) —
 S12 muGrid 素材との接続。producer wrapper への anchor 配線 + (11.3)/(11.4) skeleton も可。
+
+## 2026-07-05 lane-a (loop 6): producer 精錬 + S13 SOf pin (c58f80c3)
+
+`exists_source_index_le_two_psi_of_ne_top` (anchor/hSBne 自動 discharge — 残 = hdatum +
+coherence dichotomy のみ) + S13.Hypothesis に **SOf_eq field 追加 = SOf pin 実現** (S(X) =
+inducedKernelFamily M' (X.subgroupOf M); constructor 未存在で既存破壊なし) + [finiteG] field。
+次: (11.4) wiring (named hdatum obligation `sixTwoDecompositionData` 起こし + (6.2) 算術) →
+その後 hdatum μ-column 本体 (S12 grid)。
