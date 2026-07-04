@@ -342,6 +342,110 @@ theorem hypothesis78_nu_zeta_sub_conj_support [Fintype G] [Invertible (Nat.card 
   exact hg (hdade.map_eq_zero_of_not_mem_dadeSupport _ g hgnot)
 
 open OddOrder.Peterfalvi.S09.Cert in
+/-- **`β̄ − β = νζ − νζ̄`** (Frobenius; the `hbeta_conj_sub` input to `delta_isReal`).  `β = τ⟨ζ_ind − ζ⟩`
+with `ζ_ind = Ind 1_K` real; conjugating (`dadeIntegralCharacterMap_mapRingEquiv_comm` at `conjAe`)
+gives `β̄ = τ⟨ζ_ind − ζ̄⟩`, so `β̄ − β = τ⟨ζ − ζ̄⟩` (`LinearMap.map_sub`).  The agreement
+(`coherence_hagree_dadeMap`, `di = 1` by equal degrees) rewrites that to `νζ − νζ̄`.  `ζ_ind ∉ S`, so
+folding to the `S`-pair `{ζ, ζ̄}` via additivity is essential (the agreement only sees `S`). -/
+theorem hypothesis78_beta_conj_sub [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (i : Fin k) (hodd : Odd (Nat.card G))
+    [Fintype ↥(F.L i)] [Invertible (Nat.card ↥(F.L i) : ℂ)]
+    [Invertible (Nat.card ↥((F.H i).subgroupOf (F.L i)) : ℂ)]
+    [((F.H i).subgroupOf (F.L i)).Normal]
+    (hnilp : Group.IsNilpotent ↥((F.H i).subgroupOf (F.L i)))
+    (C : Subgroup ↥(F.L i))
+    (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C) :
+    (F.hypothesis78 i hodd hnilp C hFrob).beta.conj
+        - (F.hypothesis78 i hodd hnilp C hFrob).beta
+      = (F.hypothesis78 i hodd hnilp C hFrob).nu
+          ((F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta
+            (F.hypothesis78 i hodd hnilp C hFrob).zetaDistinct)
+        - (F.hypothesis78 i hodd hnilp C hFrob).nu
+          ((F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta
+            (F.hypothesis78 i hodd hnilp C hFrob).zetaDistinct).conj := by
+  classical
+  set pf := F.sibleyPlacedFamily i hodd hnilp C hFrob with hpf
+  set hyp := (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade with hhyp
+  set hconj := (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj with hhconj
+  set dade := hyp.fullDadeIsometryData hconj with hdade
+  obtain ⟨j₁, hj₁ne, hj₁⟩ := F.exists_conjIndex_hypothesis78 i hodd hnilp C hFrob
+  have hzeta : ∀ j, (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta j
+      = ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (pf.θ j : ClassFunction _ ℂ) :=
+    fun j => congrFun (F.hypothesis78_hyp76_zeta_eq i hodd hnilp C hFrob) j
+  have hind : (F.hypothesis78 i hodd hnilp C hFrob).ind1H = pf.ind1H := rfl
+  -- `ζ_ind = Ind 1_K` is real.
+  have hind_real : ((F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta
+        (F.hypothesis78 i hodd hnilp C hFrob).ind1H).conj
+      = (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta
+        (F.hypothesis78 i hodd hnilp C hFrob).ind1H := by
+    rw [hzeta, hind, pf.triv, conj_induce]; exact congrArg _ trivialClassFunction_isReal
+  -- `S`-memberships of `ζ` and `ζ̄ = ζ_{j₁}`.
+  have hθ_ne : ∀ j, j ≠ pf.ind1H → pf.θ j ≠ trivialIrreducibleCharacter _ := fun j hj h =>
+    hj (pf.inj (by simp only [h, pf.triv]))
+  have hzd_mem : (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta
+        (F.hypothesis78 i hodd hnilp C hFrob).zetaDistinct ∈
+        (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).S := by
+    rw [show (F.hypothesis78 i hodd hnilp C hFrob).zetaDistinct = 0 from rfl, hzeta 0]
+    exact ⟨pf.θ 0, hθ_ne 0 (Ne.symm pf.ind1H_ne_zero), rfl⟩
+  have hj₁_mem : (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta j₁ ∈
+      (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).S := by
+    rw [hzeta j₁]; exact ⟨pf.θ j₁, hθ_ne j₁ hj₁ne, rfl⟩
+  have hsupp' : ((F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta
+        (F.hypothesis78 i hodd hnilp C hFrob).zetaDistinct
+        - (1 : ℂ) • (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta j₁).support
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+          (OddOrder.Peterfalvi.S08.sharpImage ((F.H i).subgroupOf (F.L i))) (F.L i) := by
+    rw [one_smul]; exact F.hypothesis78_zeta_sub_conj_support i hodd hnilp C hFrob hj₁
+  have hagree := coherence_hagree_dadeMap hyp hconj
+    (F.coherence i hodd hnilp C hFrob) hzd_mem hj₁_mem
+    (m0 := 1) (mi := 1) (by norm_num) (by norm_num) hsupp'
+  -- `dade.toDadeMap` on supported functions is `dadeIntegralCharacterMap hyp dade` (a `ℤ`-linear map).
+  have hbridge : ∀ (φ : ClassFunction ↥(F.L i) ℂ)
+      (hφ : φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+          (OddOrder.Peterfalvi.S08.sharpImage ((F.H i).subgroupOf (F.L i))) (F.L i)),
+      dade.toDadeMap ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφ⟩
+        = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp dade φ := by
+    intro φ hφ
+    rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support hyp dade hφ]
+    rfl
+  -- Support of `ζ_ind − ζ` (the `β`-argument) and its conjugate `ζ_ind − ζ̄`.
+  have hiz_supp : ((F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta
+        (F.hypothesis78 i hodd hnilp C hFrob).ind1H
+        - (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta
+          (F.hypothesis78 i hodd hnilp C hFrob).zetaDistinct).support
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+          (OddOrder.Peterfalvi.S08.sharpImage ((F.H i).subgroupOf (F.L i))) (F.L i) :=
+    (F.hypothesis78 i hodd hnilp C hFrob).diff_support
+  -- `β = τ_I (ζ_ind − ζ)`.
+  have hbeta_eq : (F.hypothesis78 i hodd hnilp C hFrob).beta
+      = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp dade
+          ((F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta
+            (F.hypothesis78 i hodd hnilp C hFrob).ind1H
+          - (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta
+            (F.hypothesis78 i hodd hnilp C hFrob).zetaDistinct) := by
+    rw [← hbridge _ hiz_supp]; rfl
+  -- `β̄ = τ_I (ζ_ind − ζ̄)`; combine via `map_sub` and the bridge back to `dade.toDadeMap`.
+  have hconjbridgeL : ∀ X : ClassFunction ↥(F.L i) ℂ,
+      X.conj = ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv X := fun X => by
+    ext g; rw [ClassFunction.conj_apply, ClassFunction.mapRingEquiv_apply]; rfl
+  have hconjbridgeG : ∀ X : ClassFunction G ℂ,
+      X.conj = ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv X := fun X => by
+    ext g; rw [ClassFunction.conj_apply, ClassFunction.mapRingEquiv_apply]; rfl
+  have hLHS : (F.hypothesis78 i hodd hnilp C hFrob).beta.conj
+        - (F.hypothesis78 i hodd hnilp C hFrob).beta
+      = dade.toDadeMap ⟨(F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta
+            (F.hypothesis78 i hodd hnilp C hFrob).zetaDistinct
+          - (1 : ℂ) • (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta j₁,
+          (ClassFunction.mem_supportedSubmodule).mpr hsupp'⟩ := by
+    rw [hbridge _ hsupp', hbeta_eq, hconjbridgeG (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+      hyp dade _), ← OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mapRingEquiv_comm hyp dade
+      Complex.conjAe.toRingEquiv hiz_supp, ← hconjbridgeL, ← map_sub]
+    congr 1
+    rw [one_smul, ClassFunction.conj_sub, hind_real, ← hj₁]
+    abel
+  rw [hLHS, hagree, ← hj₁, F.hypothesis78_nu_eq i hodd hnilp C hFrob, one_smul]
+
+open OddOrder.Peterfalvi.S09.Cert in
 /-- **The `(7.8)` coherent source set equals the Sibley family `S`.**  Both `sourceSet =
 {ζ_i | i ≠ ind1H} = {Ind θ_i | θ_i ≠ 1_K}` and `S = {Ind θ | θ ≠ 1_K}` coincide: `⊆` since
 `θ_i ≠ 1_K` for `i ≠ ind1H`; `⊇` since every `Ind θ` is `Ind θ_j` (`cover`) with `j ≠ ind1H`
