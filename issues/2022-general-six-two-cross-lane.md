@@ -356,3 +356,44 @@ coherent_S_of_coherent_SH0C。(11.6) 消費側の再点検 or (5.7) 配線が次
 - irr×irr は S08 helpers で全放電。残 = μ-column 2 named
   (sixTwoDecompositionData_of_reducible_break / sixTwoMemberDatum_of_reducible_member)。
   材料: S12 muGrid + muGrid_column_sum_mem_sOf_H0_and_reducible + (5.8)。
+
+## 2026-07-05 lane-a (loop 27): μ-column 分岐 attack plan (恒久 handoff)
+
+**残 2 named** (S13_SixTwoBridge):
+`sixTwoDecompositionData_of_reducible_break` / `sixTwoMemberDatum_of_reducible_member`。
+
+### 中身の設計 (調査済)
+
+対象 = `CharacterPsiDecomposition τ ψ (a•χ₁)` の構成 (S07_Coherence:1212):
+fields = imageFamily R(ψ) (orthonormal, (ψ−ψ̄)^τ = Σ) / tau1 / lattice-relative
+isometry (zSpan {χ−χ̄, χ−ψ}) / tau1_agrees / tau1_image ((χ−ψ)^τ₁ = X−Y) /
+coeff (X ∈ ℤ[R]) / Y ⊥ R。
+
+**可約 member/break φ の正体**: `muGrid_column_sum_mem_sOf_H0_and_reducible`
+(S12_Section9Counts:171) — φ = Σ_i muGrid i k (列和)、φ(1) = q·u
+(reducible_mem_sOf_H0_apply_one_eq_qu:143)。
+
+**鍵材料**:
+- `CharacterParameters.alpha i j = mu i j − δ•mu i 0 − n•zeta`
+  (S12_Core:2793) with `alpha_support ⊆ A0` (S12_Core:3491) —
+  これが列の (5.2.d) 差分データ = R(ψ)-像の素材。
+- irr 版の構成体 `decompositionDaFromDadeOfDiff` /
+  `dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal`
+  (S08_SixTwoGeneral) の列和版を作る:
+  (ψ − a•χ₁)^τ の R(χ₁)-係数分解を α-params の
+  τ-像直交性で。member-D の extension 一致は (5.8)
+  (extension uniqueness; hS₁coh.extension) — S07 の
+  `IsCoherent.extension` API と `tau1_agrees`-clause。
+- Coq 対応: PFsection11 の `redPmu`-まわり (cohS1 消費部)。
+
+### 手順案 (次セッション)
+1. S12_Core の CharacterParameters を bridge の Hypothesis から
+   取得する経路確認 (mkSection11CharacterData:55 →
+   toCertainTypeHypothesis 系; muGrid は hyp.muGrid hG hG.odd)。
+2. 列和 ψ の (ψ − ψ̄) を α-params 差で表す補題 (両列 k, w2−k?
+   ψ̄ = 列 −k ✓ conj-grid 対応 grep: muGrid_conj)。
+3. imageFamily: dadeOrthonormalCharacterImageFamilyOfDiff の
+   列和版 or 直接 OrthonormalCharacterImageFamily 構成。
+4. member-D (可約 χ): D.tau1 χ = extension χ は列和の
+   coherence-extension 値 = Σ extension(成分)-linearity。
+
