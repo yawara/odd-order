@@ -2,7 +2,7 @@
 Copyright (c) 2026 The Odd Order Project. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V
 import OddOrder.Peterfalvi.S08_SixTwoGeneral
 
 /-!
@@ -68,6 +68,56 @@ theorem one_notMem_A0 (hyp : Hypothesis M) : (1 : ↥M) ∉ hyp.A0 := by
 theorem card_odd_of_isMinimalSimpleOdd [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (_hyp : Hypothesis M) : Odd (Nat.card ↥M) :=
   hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+
+/-- Under `IsMinimalSimpleOdd`, the §11 hypothesis forces type III or IV: type V is eliminated
+by Peterfalvi (10.10) (`no_typeV_maximal`). -/
+theorem isTypeIIIorIV [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis M) : IsTypeIII M ∨ IsTypeIV M := by
+  haveI : Fintype G := Fintype.ofFinite _
+  rcases hyp.type_alt with h | h | h
+  · exact Or.inl h
+  · exact Or.inr h
+  · exact absurd ⟨M, hyp.maximal, h⟩ (no_typeV_maximal hG)
+
+/-- **`|W₁|` is coprime to `|M'|`** (types III/IV): `M' = H ⋊ U` with
+`(|H|, |U·W₁|) = 1` (Peterfalvi (8.4), `typeP_coprime_H_uW1`) killing the `H`-side, and
+`U ⋊ W₁` Frobenius (`typeP_uW1_frobenius`) killing the `U`-side
+(`coprime_card_kernel_complement`).  This is the coprimality input of the `W₁`-fixed-point
+lifting on `M'/M''` behind the h56 anchor (Peterfalvi (8.4.d)). -/
+theorem coprime_card_W1_derived [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) :
+    Nat.Coprime (Nat.card ↥hyp.W1) (Nat.card ↥(derivedInG M)) := by
+  haveI : Fintype G := Fintype.ofFinite _
+  have hnt : TypePNontrivialCore M hyp.typeP :=
+    typePNontrivialCore_of_isTypeIIIorIV (hyp.isTypeIIIorIV hG) hyp.typeP
+  have hU : hyp.typeP.U ≠ ⊥ := hnt.1
+  -- `q` is coprime to `|H|`: `(|H|, |U ⊔ W₁|) = 1` and `|W₁| ∣ |U ⊔ W₁|`.
+  have hcopH : Nat.Coprime (Nat.card ↥hyp.W1) (Nat.card ↥hyp.typeP.H) := by
+    refine Nat.Coprime.coprime_dvd_left ?_ (OddOrder.Peterfalvi.S11.typeP_coprime_H_uW1
+      hyp.typeP hU).symm
+    exact Subgroup.card_dvd_of_le le_sup_right
+  -- `q` is coprime to `|U|`: `U ⋊ W₁` is Frobenius with kernel `U`, complement `W₁`.
+  have hcopU : Nat.Coprime (Nat.card ↥hyp.W1) (Nat.card ↥hyp.typeP.U) := by
+    have hF := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius hyp.typeP hU
+    have hc := hF.coprime_card_kernel_complement
+    have h1 : Nat.card ↥(hyp.typeP.U.subgroupOf (hyp.typeP.U ⊔ hyp.typeP.W1))
+        = Nat.card ↥hyp.typeP.U :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_left).toEquiv
+    have h2 : Nat.card ↥(hyp.typeP.W1.subgroupOf (hyp.typeP.U ⊔ hyp.typeP.W1))
+        = Nat.card ↥hyp.typeP.W1 :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv
+    have : Nat.Coprime (Nat.card ↥hyp.typeP.U) (Nat.card ↥hyp.typeP.W1) := by
+      rw [← h1, ← h2]; exact hc
+    exact this.symm
+  -- combine over `|M'| = |H| · |U|` (`derived_complement`).
+  have hcard : Nat.card ↥(derivedInG M)
+      = Nat.card ↥hyp.typeP.H * Nat.card ↥hyp.typeP.U := by
+    have hmul := hyp.typeP.derived_complement.card_mul
+    rw [← hmul,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.typeP.H_le).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.typeP.U_le).toEquiv]
+  rw [hcard]
+  exact Nat.Coprime.mul_right hcopH hcopU
 
 end Hypothesis
 

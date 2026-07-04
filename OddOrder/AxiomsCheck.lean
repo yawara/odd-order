@@ -2347,6 +2347,9 @@ set_option linter.style.longLine false in
 -- the grid-backed (5.2.d) decomposition data.  Conclusion = the h56 oracle shape.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S12.Hypothesis.exists_source_index_le_two_psi
+-- NOTE: `S12.Hypothesis.isTypeIIIorIV` / `coprime_card_W1_derived` (anchor prerequisites,
+-- S13_SixTwoBridge) cite `no_typeV_maximal` ((10.10), currently sorried upstream) — honest
+-- sorried-cites, NOT registered here until the (10.10) chain is axiom-clean.
 -- (6.5) chief-factor core + (6.5)(b) reduction: a Frobenius-acted abelian section obeying the (6.3)
 -- index bound `≤ 4|R|²+1` is a `p`-group (chief-factor argument via the `p`-primary component,
 -- `card_modEq_one` + `six_five_chief_factor_contradiction`); combined with the nilpotent
