@@ -10,6 +10,7 @@ import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
 import OddOrder.GroupTheory.RepresentationTheory.CliffordDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
+import OddOrder.GroupTheory.RepresentationTheory.InducedInvariantConstituent
 import Mathlib.RepresentationTheory.Irreducible
 
 /-!
@@ -2665,72 +2666,6 @@ theorem mem_commutator_subgroupOf_iff {L H : Subgroup G} (hHL : H ≤ L)
     rw [← hcomm_H, Subgroup.mem_subgroupOf]
   rw [hstep1, hstep2, hcoe]
 
-open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (12.5)**: after the rho-reduction, a class function `ψ` orthogonal
-to every type-I family `R(χ)` is **constant on `H − H'`** (any two points of `H ∖ H'` take the
-same value — Coq `FtypeI_invDade_ortho_constant`, `{in H :\: H' &, ψ x = ψ y}`).  The orthogonality
-hypothesis is the genuine `⟨ψ, α⟩ = 0` for `α ∈ R(χ)`, no longer an opaque field.
-
-**Statement correction (loop¹³³)**: the former conclusion `ψ(h) = ψ(1)` was wrong — `1 ∈ H'`, and
-the DpsiH decomposition `ρψ|_H = Σ a_A · Ind_{H'}^H χ_A + a·1_H` gives `ψ = a` on `H ∖ H'`
-(`induce_apply_eq_zero_of_not_mem_normal`) but `ψ(1) = a + Σ a_A[H:H']χ_A(1) ≠ a`.
-
-**Faithful reduction (landed)**: by the Fourier split `Res_L ψ = γ + β` (as in (12.4)), the
-`H`-kernel part `γ` is constant on **all** of `H` (each `φ` with `H ⊆ ker φ` has `φ(h) = φ(1)`,
-`apply_mul_eq_of_mem_characterKernel`), so `ψ(h₁) = ψ(h₂)` reduces to the single genuine obligation
-`β(h₁) = β(h₂)` for `h₁, h₂ ∈ H ∖ H'` — the off-kernel part `β ∈ ℂ[S]` is constant on `H ∖ H'`
-(where the `o_rpsi_S` Dade-reciprocity / coherence input and the induced-from-`H'` structure live). -/
-theorem rho_constant_on_H_minus_Hprime {L : Subgroup G} [Finite G] [Fintype G]
-    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis L)
-    (data : ∀ χ ∈ hyp.Sset, CharacterDecompositionData hyp χ) {psi : ClassFunction G ℂ}
-    (horth : ∀ χ (hχ : χ ∈ hyp.Sset), ∀ α ∈ Rset (data χ hχ), ClassFunction.inner psi α = 0) :
-    ∀ h1 : G, h1 ∈ hyp.H → h1 ∉ hyp.Hprime → ∀ h2 : G, h2 ∈ hyp.H → h2 ∉ hyp.Hprime →
-      psi h1 = psi h2 := by
-  haveI := hyp.finiteG
-  classical
-  intro h1 hh1 hh1' h2 hh2 hh2'
-  have hh1L : h1 ∈ L := hyp.typeI.typeF.H_le hh1
-  have hh2L : h2 ∈ L := hyp.typeI.typeF.H_le hh2
-  set h1L : ↥L := ⟨h1, hh1L⟩ with hh1Ldef
-  set h2L : ↥L := ⟨h2, hh2L⟩ with hh2Ldef
-  set gf : ClassFunction ↥L ℂ := ClassFunction.restrict L psi with hgf
-  set γ : ClassFunction ↥L ℂ := ∑ φ ∈ Finset.univ.filter (fun φ => InHKernel hyp φ),
-    ClassFunction.inner gf (φ : ClassFunction ↥L ℂ) • (φ : ClassFunction ↥L ℂ) with hγ
-  set β : ClassFunction ↥L ℂ := ∑ φ ∈ Finset.univ.filter (fun φ => ¬ InHKernel hyp φ),
-    ClassFunction.inner gf (φ : ClassFunction ↥L ℂ) • (φ : ClassFunction ↥L ℂ) with hβ
-  have hsplit : gf = γ + β := by
-    rw [hγ, hβ, Finset.sum_filter_add_sum_filter_not]
-    exact (sum_inner_irreducibleCharacter_smul gf).symm
-  -- `γ` is constant on `H` (each `H`-kernel `φ` satisfies `φ(h₁) = φ(1) = φ(h₂)`).
-  have hγconst : γ h1L = γ h2L := by
-    rw [hγ, classFunction_sum_apply, classFunction_sum_apply]
-    refine Finset.sum_congr rfl fun φ hφ => ?_
-    rw [ClassFunction.smul_apply, ClassFunction.smul_apply]
-    have hInK := (Finset.mem_filter.mp hφ).2
-    have hm1 : (h1L : ↥L) ∈
-        OddOrder.Peterfalvi.S03.characterKernel (φ : ClassFunction ↥L ℂ) :=
-      hInK (Subgroup.mem_subgroupOf.mpr hh1)
-    have hm2 : (h2L : ↥L) ∈
-        OddOrder.Peterfalvi.S03.characterKernel (φ : ClassFunction ↥L ℂ) :=
-      hInK (Subgroup.mem_subgroupOf.mpr hh2)
-    have e1 := apply_mul_eq_of_mem_characterKernel φ.isIrreducible hm1 (1 : ↥L)
-    have e2 := apply_mul_eq_of_mem_characterKernel φ.isIrreducible hm2 (1 : ↥L)
-    rw [one_mul] at e1 e2
-    rw [e1, e2]
-  -- **The genuine remaining obligation** (Peterfalvi (12.5) proper): the off-kernel part `β ∈ ℂ[S]`
-  -- is constant on `H ∖ H'`.  This is where the `o_rpsi_S` Dade-reciprocity input
-  -- (`tau_inner_eq_of_supported`) and the induced-from-`H'` structure enter (via the DpsiH
-  -- decomposition + `induce_apply_eq_zero_of_not_mem_normal`).
-  have hβconst : β h1L = β h2L := by
-    sorry
-  have key : gf h1L = gf h2L := by
-    rw [hsplit]
-    simp only [ClassFunction.add_apply, hγconst, hβconst]
-  have hg1 : gf h1L = psi h1 := by rw [hgf, ClassFunction.restrict_apply]
-  have hg2 : gf h2L = psi h2 := by rw [hgf, ClassFunction.restrict_apply]
-  rw [← hg1, ← hg2]; exact key
-
 /-! ## (12.6)--(12.7): type-I Frobenius structure -/
 
 /-- Carrier for Peterfalvi (12.7): a type-I maximal subgroup is Frobenius with
@@ -2966,6 +2901,75 @@ theorem Sset_inner_coherent_extension_eq_zero {L : Subgroup G} [Finite G] (hyp :
   rw [← hφeq]
   exact inner_psi_coherent_extension_eq_zero hyp coh (data χ hχ) hφmem
     (by rw [hφeq]; exact hχ) (horth χ hχ)
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.5)** (Frobenius witness case): a class function `ψ` orthogonal to every type-I
+family `R(χ)` has `ρ`-image `ψ^ρ = chiRhoCF ψ` **constant on `H − H'`**.  Reduces to the generic
+`DpsiH` core `constant_off_normal_of_inner_block_const` at ambient `↥(H.subgroupOf L)` with
+`H_core = commutator`: `hcoeff` from the `θ`-coefficient equality
+`chiRhoCF_restrict_inner_eq_of_equal_degree` (with orthogonality from
+`Sset_inner_coherent_extension_eq_zero` and equal degree from
+`commutator_induce_constituents_apply_one_eq`), `hmult` from
+`inner_induce_constituent_eq_of_apply_one_eq`, and the `x ∉ commutator ↔ h ∉ H'` translation from
+`mem_commutator_subgroupOf_iff`. -/
+theorem rho_constant_on_H_minus_Hprime {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1}) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    (data : ∀ χ ∈ hyp.Sset, CharacterDecompositionData hyp χ) {psi : ClassFunction G ℂ}
+    (horth : ∀ χ (hχ : χ ∈ hyp.Sset), ∀ α ∈ Rset (data χ hχ), ClassFunction.inner psi α = 0) :
+    ∀ h1 : G, ∀ (hh1 : h1 ∈ hyp.H), h1 ∉ hyp.Hprime → ∀ h2 : G, ∀ (hh2 : h2 ∈ hyp.H),
+      h2 ∉ hyp.Hprime →
+      (hyp.toHypothesis71.chiRhoCF psi) ⟨h1, hyp.typeI.typeF.H_le hh1⟩
+        = (hyp.toHypothesis71.chiRhoCF psi) ⟨h2, hyp.typeI.typeF.H_le hh2⟩ := by
+  haveI := hyp.finiteG
+  classical
+  intro h1 hh1 hh1' h2 hh2 hh2'
+  have hHL : hyp.typeI.typeF.H ≤ L := hyp.typeI.typeF.H_le
+  haveI : Fintype (IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L)) := Fintype.ofFinite _
+  set g : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ :=
+    ClassFunction.restrict ((hyp.typeI.typeF.H).subgroupOf L) (hyp.toHypothesis71.chiRhoCF psi)
+    with hg
+  set x : ↥((hyp.typeI.typeF.H).subgroupOf L) :=
+    ⟨⟨h1, hHL hh1⟩, Subgroup.mem_subgroupOf.mpr hh1⟩ with hx_def
+  set y : ↥((hyp.typeI.typeF.H).subgroupOf L) :=
+    ⟨⟨h2, hHL hh2⟩, Subgroup.mem_subgroupOf.mpr hh2⟩ with hy_def
+  have hx : x ∉ commutator ↥((hyp.typeI.typeF.H).subgroupOf L) := fun hxc =>
+    hh1' ((mem_commutator_subgroupOf_iff hHL x).mp hxc)
+  have hy : y ∉ commutator ↥((hyp.typeI.typeF.H).subgroupOf L) := fun hyc =>
+    hh2' ((mem_commutator_subgroupOf_iff hHL y).mp hyc)
+  have hgx : g x = (hyp.toHypothesis71.chiRhoCF psi) ⟨h1, hHL hh1⟩ := by
+    rw [hg, ClassFunction.restrict_apply]
+  have hgy : g y = (hyp.toHypothesis71.chiRhoCF psi) ⟨h2, hHL hh2⟩ := by
+    rw [hg, ClassFunction.restrict_apply]
+  rw [← hgx, ← hgy]
+  refine constant_off_normal_of_inner_block_const g ?_ ?_ hx hy
+  · intro θ₁ θ₂ ρ hne1 hne2 hlo1 hlo2
+    have hdeg := commutator_induce_constituents_apply_one_eq ρ θ₁ θ₂ hlo1 hlo2
+    have hχ₁mem : ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+        (θ₁ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ) ∈ hyp.Sset := by
+      simp only [Hypothesis.Sset, Set.mem_setOf_eq]; exact ⟨θ₁, hne1, rfl⟩
+    have hχ₂mem : ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+        (θ₂ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ) ∈ hyp.Sset := by
+      simp only [Hypothesis.Sset, Set.mem_setOf_eq]; exact ⟨θ₂, hne2, rfl⟩
+    have hχ₁mem' := hχ₁mem
+    have hdegχ : (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+          (θ₁ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)) (1 : ↥L)
+        = (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+          (θ₂ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)) (1 : ↥L) := by
+      rw [ClassFunction.induce_apply_one, ClassFunction.induce_apply_one, hdeg]
+    have horth1 := Sset_inner_coherent_extension_eq_zero hyp coh hfrob data horth hχ₁mem
+    have horth2 := Sset_inner_coherent_extension_eq_zero hyp coh hfrob data horth hχ₂mem
+    have hθc := chiRhoCF_restrict_inner_eq_of_equal_degree hyp coh hχ₁mem hχ₂mem hdegχ hAH
+      horth1 horth2 rfl rfl
+    have hfin : ClassFunction.inner (θ₁ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ) g
+        = ClassFunction.inner (θ₂ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ) g := by
+      rw [hg]; exact hθc
+    rw [inner_conj_symm (θ₁ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ) g,
+      inner_conj_symm (θ₂ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ) g, hfin]
+  · intro θ₁ θ₂ ρ hlo1 hlo2
+    exact inner_induce_constituent_eq_of_apply_one_eq hlo1 hlo2
+      (commutator_induce_constituents_apply_one_eq ρ θ₁ θ₂ hlo1 hlo2)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Witness `S = {Ind_H^L θ}` has no real characters** ((5.2) input for case (b)/(12.6)).  Each

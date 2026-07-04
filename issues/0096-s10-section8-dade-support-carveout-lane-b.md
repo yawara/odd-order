@@ -1177,3 +1177,35 @@ S14: `mem_commutator_subgroupOf_iff` (bridge) / `Sset_self_mem_constituents` / `
 ```
 **要検証**: (a) x:↥HH の (x:↥L:G)=h1 coercion; (b) restrict_apply で g x=(chiRhoCF psi)(x:↥L);
 (c) inner 変換 conj (core=inner g θ vs θ-coeff=inner θ g); (d) instance 解決 (特に Fintype(Irr ↥HH))。
+
+### loop¹⁹⁰ — 🎉 **Peterfalvi (12.5) 完全証明・閉じた** (rho_constant_on_H_minus_Hprime)
+
+**(12.5) `rho_constant_on_H_minus_Hprime` を完全証明** — sorry-free、`#print axioms` =
+`[propext, Classical.choice, Quot.sound]` (標準3 axiom のみ、sorryAx 無・新 axiom 無)。
+full build green (3915 jobs)、AxiomsCheck OK。
+
+旧 plain-ψ 文 (hβconst sorry、consumer 無) を削除し、正しい **ψ^ρ = chiRhoCF psi の
+H−H' 定数性**を generic DpsiH core へ帰着。5 iteration (loop¹⁷⁶⁻¹⁹⁰) で全 ingredient を
+build して最終 assembly:
+
+**generic 機構 (RepTheory、再利用可)**:
+- `constant_off_normal_of_inner_block_const` — DpsiH core (Fourier + block regroup + 各 block 消去)
+- `exists_induce_constituent_partition` — Irr G の Ind_H^G block 分割 (block char 付)
+- `inner_induce_constituent_eq_of_apply_one_eq` — 等次数 ⟹ 等 multiplicity
+- `commutator_induce_constituents_apply_one_eq` — [HH,HH] block 全 constituent 等次数
+- `exists_liesOver_of_subgroup` — σ の上に ψ 存在 (Clifford correspondent)
+- `restrictionMultiplicity_eq_of_liesOver_of_apply_one_eq` — degree formula の等次数系
+
+**S14-specific**:
+- `mem_commutator_subgroupOf_iff` — commutator bridge (x∈commutator ↥(H.subgroupOf L) ↔ (x:G)∈derivedInG H)
+- `Sset_self_mem_constituents` — Frobenius χ∈S は自身の constituent
+- `Sset_inner_coherent_extension_eq_zero` — ψ⊥R(χ) ⟹ ⟨ψ,coh.extension χ⟩=0
+- `chiRhoCF_restrict_inner_eq_of_equal_degree` — θ-coefficient equality (既存)
+
+**key 教訓**: FiniteInduce scoped instance (finiteSubFintype/natCardInvC、任意 subgroup 汎用) が
+全 subgroupOf/commutator の Fintype/Invertible を供給。自前 haveI は instance diamond
+(induce の Invertible が競合 → rfl 失敗) を招くので削除する。Sset membership は
+`simp only [Hypothesis.Sset, Set.mem_setOf_eq]` で unfold。
+
+**次 frontier**: §12 の (12.6) coherence / (12.7) type-I Frobenius (Coq FT_Frobenius_coherence /
+FT_type1)、または §12 downstream の上流未証明項。次 iteration で scan。
