@@ -210,3 +210,20 @@ commit 54bf51db (S08_SixTwoGeneral 追記, sorry-free):
 
 hanchor の §11 discharge 素材: W₁ の M'/A' linear char への作用が非自明
 (inertia θ = M' なる linear θ) — (8.4.d) W₁ fixed-point-free on (HC)/M'' 系から。
+
+## 2026-07-05 lane-a (loop 3): routine pins 全 discharge — S13_SixTwoBridge (commit afed3a1f)
+
+新 leaf `S13_SixTwoBridge.lean` で h56 producer の routine pins を S12.Hypothesis で実証明:
+hKsupp = `mderivSharp_subset_A0` (**決め手: 既存 `typePA_eq_sharpSubgroup_derivedInG` で
+A(M) = (M')^# ちょうど** → A₀ ⊇ (M')^#) / h1A = `one_notMem_A0` / hodd =
+`card_odd_of_isMinimalSimpleOdd` / family 一致 = `inducedFamily_eq_inducedKernelFamily_bot`
+(§10 pin 済み S = inducedKernelFamily K ⊥、K = (derivedInG M).subgroupOf M)。
+
+S12 Dade context は完全 pin 済み確認: hyp.tau = dadeIntegralCharacterMap hyp.dadeData.dade
+(= S04.Hypothesis G (typePA0 M) M) + hyp.hconj — producer 要求と一致 (τ/A0 の S13 free field
+pin はこの実体で行う)。
+
+**h56 残 obligation (最終形)**:
+1. S12.Hypothesis 上の fully-pinned producer wrapper (機械的、instance 束ね)。
+2. anchor: inertia θ = M' なる linear θ (trivial on A') — W₁ 作用非固定。
+3. hdatum の μ-column pairs (break-Da / member-D / 直交性) — S12 grid + (5.8) 型 uniqueness。
