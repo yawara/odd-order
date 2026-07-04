@@ -119,3 +119,17 @@ norm-cascade が cross-lane threading 待ちの間、solo build-green な keysto
 不要 = clean §13)。残 7 axiom (`W2_le`/`M_complement`/`U_nilpotent`/`derived_complement`/`secondDerived_le_fitting`/
 `fitting_eq`/`centralizer_W1`) は complement 一致 (V=type-P U) の reconciliation crux に gated
 (§13 では `T_typeII` が import 下流 S16:87 ゆえ使えず、genuine に §13/§14 σ-structure 要 = 正しく sorried)。
+
+## ✅ 2026-07-04 (lane **b** 再開) — S15 が c→b 移管。b-side status + 迂回 route 発見
+
+07-04 reallocation で S15_SAndT_Setup + S15_SAndT が c→b。b が frontier 全数をコード検証:
+- **(13.10) `analytic_inequality` 出力を de-opacify 済** (commit `f17fdbcd`): 実 `u/c` bound が real theorem 化。
+- **重要: honest W-grid route が issue 3002 を PART 迂回可能**: `hyp` は `W`/`W_cyclic`/`W1`/`W2` を carry ゆえ、
+  **`S05.TICyclicHypothesis` を hyp.W から新規構成** → ω 直交性 (S05) + τ-isometry (S07=b infra) → η'=τ₃(ω') で
+  **η-side norm estimates (13.7/13.8) を field-threading 無しで実証明可能** (fresh grid、hyp.omega/tau3 非依存)。
+  ⟹ 本 issue の grid field-threading が**必須なのは hyp.eta を statement で直接参照する箇所のみ**:
+  `TypeIOrthogonalityData.caseC2_eta0j_odd` (13.19 parity、S16 が consume する W-side terminal) など。
+  norm cascade の (13.10) 出力路は honest W-grid で迂回可。
+- **⟹ a-side threading (本 issue) の残 necessity = hyp.eta 参照の (13.19) parity / S16 terminal 系**に絞られた。
+  (13.7/13.8) 系は b が honest W-grid で ungated に進められる (multi-session、Dade-support V⊆W 構成が要)。
+- 詳細 = `notes/peterfalvi/s15_s_and_t.md` の 2026-07-04 lane b LIVE STATUS。
