@@ -1886,6 +1886,23 @@ theorem inner_psi_coherent_extension_eq_zero {L : Subgroup G} [Finite G]
   OddOrder.Peterfalvi.S07.IntegralCharacterMap.inner_eq_zero_of_mem_zSpan horth
     (coherent_extension_constituent_mem_span_Rset hyp coh data hφ hφmem)
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.5) support input** (the `A1xi12` step of the Coq `o_rpsi_S` proof): the
+difference `χ₁ − χ₂` of two **equal-degree** members of `S` vanishes off `H^# = H ∖ {1}` — i.e. at
+every `x` with `(x : G) ∉ H` (both `Ind_H^L`-characters vanish off the normal `H = L_F`,
+`Sset_vanishes_off_H`) or `x = 1` (equal degree, so `(χ₁ − χ₂)(1) = 0`).  This is the
+`xi1 − xi2 ∈ CF(L, H^#)` support hypothesis under which the type-I Dade isometry `τ` acts on the
+difference (feeding `constituent_diff_tau_eq_induce` / the `chiRho_adjoint` reciprocity of the
+(12.5) Fact-A rebuild). -/
+theorem Sset_diff_vanishes_off_H_sharp {L : Subgroup G} (hyp : Hypothesis L)
+    {χ₁ χ₂ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Sset) (hχ₂ : χ₂ ∈ hyp.Sset)
+    (hdeg : χ₁ (1 : ↥L) = χ₂ (1 : ↥L)) {x : ↥L}
+    (hx : (x : G) ∉ hyp.H ∨ x = 1) : (χ₁ - χ₂) x = 0 := by
+  rw [ClassFunction.sub_apply]
+  rcases hx with hxH | hx1
+  · rw [Sset_vanishes_off_H hyp hχ₁ hxH, Sset_vanishes_off_H hyp hχ₂ hxH, sub_zero]
+  · subst hx1; rw [hdeg, sub_self]
+
 open scoped Classical in
 /-- **General TI-induction self-value** (Isaacs 7.x / Peterfalvi (3.2.c) value half), generalized
 from `TICyclicHypothesis.induce_apply_eq_self_of_mem_V` to an arbitrary TI subset.  For a TI subset
