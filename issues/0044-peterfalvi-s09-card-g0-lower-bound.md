@@ -1148,3 +1148,26 @@ card_G0_lower_bound (@6552)。
 
 **本 session 実績**: 深部 §1 frontier (hzeta_cross 全 chain) + (7.8.a) BetaDecomp 完成 (~22 sorry-free
 commits)。残りは delta-reality → hdelta_even → (7.9) conclusion → 定量 assembly。
+
+## 2026-07-04 cont.⁴³ — delta-reality の clean reduction (τ/ν conj-compat + agreement)
+
+**delta = β − 1_G + ν(ζ) の reality を clean に reduce**:
+`delta.conj − delta = (β.conj − β) + (ν(ζ).conj − ν(ζ))`。
+- **(A) τ-conj-compat** (τ(φ).conj = τ(φ.conj)) 前提で: β = τ(Ind1_K − ζ) → β.conj = τ(Ind1_K − ζ̄)
+  → β.conj − β = τ((Ind1_K−ζ̄)−(Ind1_K−ζ)) = τ(ζ − ζ̄)。
+- **(B) ν-conj-compat** (ν(φ).conj = ν(φ.conj)) 前提で: ν(ζ).conj = ν(ζ̄) →
+  ν(ζ).conj − ν(ζ) = ν(ζ̄ − ζ) = −ν(ζ − ζ̄)。
+- **(C) coherence agreement** (ν(ζ−ζ̄) = τ(ζ−ζ̄)、既有 coherence_hagree, ζ−ζ̄ は A-supported):
+  → delta.conj − delta = τ(ζ−ζ̄) − ν(ζ−ζ̄) = 0。**delta real**。
+
+**残 = (A) τ-conj-compat + (B) ν-conj-compat** (両方 未 in Lean; coq `Dade_conjC` +
+coherent-extension conj-compat)。深い sub-lemma:
+- (A) Dade map の複素共役両立: S04 dadeMap 定義 (mobius/α_B) レベル。`Hypothesis.dadeMap` の conj 挙動。
+- (B) coherent extension の共役両立: S07 hcoh.extension の conj。誘導族 conj-closed (sourceSet=S、
+  conj_induce) を利用できる可能性。
+
+これらが揃えば delta_isReal → cfdot_real_vchar_even (parity, 済) + delta_orth_one → hdelta_even →
+(7.9) conclusion (他 input 全済) → hgood → CharacterEstimateData → card_G0_lower_bound。
+
+**本 session 実績 (深部完了)**: hzeta_cross 全 chain (深部 §1 frontier) + BetaDecomp (7.8.a)、
+~22 sorry-free commits, full build green。残りは delta-reality (τ/ν conj-compat) + 定量 assembly。
