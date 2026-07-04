@@ -634,3 +634,19 @@ tractable 例外 DpsiH/(12.5) を完済済)**:
 残る全 pin は (a) deep BG§14-15 type-P2/III-IV geometry (other-cluster)、(b) §8-§11 type-analysis gated、
 (c) (7.9)/(11.8) char (lane a) gated、(d) DadeNotation de-scaffold 設計判断。
 → loop cadence を heartbeat (20min) に落とし、user 方向指示 / 他レーン (BG§14-15, 7.9/11.8) unblock を待つ。
+
+## loop¹⁹³ (2026-07-04, heartbeat) — type-P2 obstruction を精密特定: typePA の K-part は BG A0Set escape lemma 範囲外
+
+heartbeat 起動、main に他レーン進捗無し (gate 未解除)。type-P2 の deep 度を精密検証:
+- **BG escape lemma `mem_sigmaSharp_of_mem_aSet_of_escape` (S16) は type-general** (K=kappa-Hall 引数)、
+  escaping 点 (of ASet or A0Set) → M_σ#。→ 機構は存在。
+- **しかし `A0Set M K = hatMsigma M \ conjClassSet(sharpSubgroup K)` は K-part を除外**。
+  一方 **`typePA = (M')# = sharpSubgroup(derivedInG M)` は K-part を含む** (K ⊆ M')。
+  ⟹ typePA の K-元 (kappa#) は A0Set にも ASet にも入らず、escape lemma の射程外。
+- **∴ type-P2 typePA case は BG §14-15 type-P2 の新 K-structure geometry (V^M / kappa-action /
+  K# の signalizer) を要する** — type-I の clean mirror では**閉じない** (loop¹⁰⁹ の
+  「別物」を set-level で確定: (M')# の K-part が A0Set 除外部)。
+
+**結論 (loop¹⁰⁹ を精密化)**: type-P2 は BG §14-15「III/IV gate」領域の新 geometry を要し、lane-b 単独
+build 圏外 (BG Ch4 cluster 領域、claim-before-build/coordination 要)。→ heartbeat 継続、BG§14-15 進捗 /
+ユーザー方向指示待ち。lane-b の char/support tractable 作業は (12.5) 完済で確定的に枯渇。
