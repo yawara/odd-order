@@ -1227,6 +1227,130 @@ theorem chiRho_eq_self_of_H_eq_bot {G : Type*} [Group G] [Fintype G] {A : Set G}
   rw [show ((default : ↥(⊥ : Subgroup G)) : G) = 1 from
     Subgroup.mem_bot.mp (default : ↥(⊥ : Subgroup G)).2, mul_one]
 
+section GenericAlpha
+
+/-! ### The (13.5.a) machinery over an abstract (7.6) datum
+
+Generic forms of the point formula and the correction-term `α` cluster, over any
+`H76 : Hypothesis76 G A L` whose `ρ` is the identity on `A` (the TI case) and any
+"kernel" subgroup `P' ≤ L`.  Instantiated by the `S`-side (`H_sharp_*`, `P' = P.subgroupOf S`)
+and the `T`-side ((13.8): `Q_sharp_hypothesis76`, `P' = Q.subgroupOf T`). -/
+
+variable {A : Set G} {L : Subgroup G}
+
+open scoped Classical in
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
+/-- Generic (13.5.a) point formula, `a = 0` form: if every `P'`-non-kernel coefficient of `χ`
+vanishes, then on `A` the character `χ` is its `P'`-kernel tail. -/
+theorem hypothesis76_point_formula_kernel_only [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (H76 : OddOrder.Peterfalvi.S09.Hypothesis76 G A L)
+    (hHbot : ∀ a : {a : G // a ∈ A}, H76.hyp71.hyp.H a = ⊥)
+    (P' : Subgroup ↥L) (χ : ClassFunction G ℂ)
+    (hall : ∀ i : Fin (H76.n + 1), 0 < i →
+      ¬ ((P' : Set ↥L) ⊆ OddOrder.Peterfalvi.S03.characterKernel (H76.zeta i)) →
+      H76.cCoeff χ i = 0)
+    (a : ↥L) (ha : (a : G) ∈ A) :
+    χ (a : G) =
+      ∑ i ∈ (Finset.Ioi (0 : Fin (H76.n + 1))).filter
+            (fun i => (P' : Set ↥L) ⊆
+              OddOrder.Peterfalvi.S03.characterKernel (H76.zeta i)),
+          (star (H76.cCoeff χ i) / H76.zetaNormSq i) * H76.zeta i a := by
+  classical
+  have hbase : χ (a : G) = ∑ i ∈ Finset.Ioi (0 : Fin (H76.n + 1)),
+      (star (H76.cCoeff χ i) / H76.zetaNormSq i) * H76.zeta i a :=
+    (chiRho_eq_self_of_H_eq_bot H76.hyp71 hHbot χ a ha).symm.trans
+      (OddOrder.Peterfalvi.S09.Hypothesis76.chiRho_explicit_formula H76 χ ha)
+  rw [hbase, ← Finset.sum_filter_add_sum_filter_not (Finset.Ioi 0)
+    (fun i => (P' : Set ↥L) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (H76.zeta i))]
+  have hmid0 : ∑ i ∈ (Finset.Ioi (0 : Fin (H76.n + 1))).filter (fun i =>
+      ¬ ((P' : Set ↥L) ⊆ OddOrder.Peterfalvi.S03.characterKernel (H76.zeta i))),
+      (star (H76.cCoeff χ i) / H76.zetaNormSq i) * H76.zeta i a = 0 := by
+    refine Finset.sum_eq_zero (fun i hi => ?_)
+    simp only [Finset.mem_filter] at hi
+    rw [hall i (Finset.mem_Ioi.mp hi.1) hi.2, star_zero, zero_div, zero_mul]
+  rw [hmid0, add_zero]
+
+open scoped Classical in
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
+/-- Generic (13.5.a) correction term: the `P'`-kernel tail of the (7.7.a) decomposition. -/
+noncomputable def hypothesis76AlphaFun [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (H76 : OddOrder.Peterfalvi.S09.Hypothesis76 G A L) (P' : Subgroup ↥L)
+    (χ : ClassFunction G ℂ) : ↥L → ℂ :=
+  fun a =>
+    ∑ i ∈ (Finset.Ioi (0 : Fin (H76.n + 1))).filter
+          (fun i => (P' : Set ↥L) ⊆
+            OddOrder.Peterfalvi.S03.characterKernel (H76.zeta i)),
+        (star (H76.cCoeff χ i) / H76.zetaNormSq i) * H76.zeta i a
+
+open scoped Classical in
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
+/-- The generic correction is constant on `P'`. -/
+theorem hypothesis76AlphaFun_const [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (H76 : OddOrder.Peterfalvi.S09.Hypothesis76 G A L) (P' : Subgroup ↥L)
+    (χ : ClassFunction G ℂ) :
+    ∀ x ∈ P', hypothesis76AlphaFun H76 P' χ x = hypothesis76AlphaFun H76 P' χ 1 := by
+  classical
+  intro x hx
+  refine Finset.sum_congr rfl (fun i hi => ?_)
+  have hker := (Finset.mem_filter.mp hi).2
+  rw [show H76.zeta i x = H76.zeta i 1 from hker hx]
+
+open scoped Classical in
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
+/-- The generic correction vanishes off `H76.H`. -/
+theorem hypothesis76AlphaFun_eq_zero [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (H76 : OddOrder.Peterfalvi.S09.Hypothesis76 G A L) (P' : Subgroup ↥L)
+    (χ : ClassFunction G ℂ) :
+    ∀ x : ↥L, (x : G) ∉ H76.H → hypothesis76AlphaFun H76 P' χ x = 0 := by
+  classical
+  intro x hx
+  refine Finset.sum_eq_zero (fun i _ => ?_)
+  rw [H76.zeta_eq_zero_of_not_mem_H i x hx, mul_zero]
+
+open scoped Classical in
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
+/-- Generic (13.5.c): the inflation bound for the correction over any sharp `Finset` of the
+`H76.H`-members (instance-free `F`-interface). -/
+theorem hypothesis76AlphaFun_inflation [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (H76 : OddOrder.Peterfalvi.S09.Hypothesis76 G A L) (P' : Subgroup ↥L)
+    (χ : ClassFunction G ℂ)
+    (F : Finset ↥L) (hF : ∀ x : ↥L, x ∈ F ↔ ((x : G) ∈ H76.H ∧ x ≠ 1))
+    (hP'H : ∀ x : ↥L, x ∈ P' → (x : G) ∈ H76.H) :
+    ((Nat.card ↥P' : ℝ) - 1) * ‖hypothesis76AlphaFun H76 P' χ 1‖ ^ 2
+      ≤ ∑ x ∈ F, ‖hypothesis76AlphaFun H76 P' χ x‖ ^ 2 := by
+  classical
+  set α := hypothesis76AlphaFun H76 P' χ with hαdef
+  have hcore := sum_normSq_erase_one_ge_of_const_on_subgroup P' α
+    (hypothesis76AlphaFun_const H76 P' χ)
+  -- The ambient `↥L`-sum equals the `F`-sum plus the identity term (α vanishes off `H76.H`).
+  have hFeq : F = (Finset.univ.filter (fun x : ↥L => (x : G) ∈ H76.H)).erase 1 := by
+    ext x
+    rw [hF, Finset.mem_erase, Finset.mem_filter]
+    exact ⟨fun ⟨h1, h2⟩ => ⟨h2, Finset.mem_univ _, h1⟩, fun ⟨h2, _, h1⟩ => ⟨h1, h2⟩⟩
+  have hsupp : ∑ x : ↥L, ‖α x‖ ^ 2
+      = ∑ x ∈ Finset.univ.filter (fun x : ↥L => (x : G) ∈ H76.H), ‖α x‖ ^ 2 := by
+    rw [← Finset.sum_filter_add_sum_filter_not Finset.univ
+      (fun x : ↥L => (x : G) ∈ H76.H)]
+    have h0 : ∑ x ∈ Finset.univ.filter (fun x : ↥L => ¬ (x : G) ∈ H76.H), ‖α x‖ ^ 2 = 0 := by
+      refine Finset.sum_eq_zero (fun x hx => ?_)
+      rw [hαdef, hypothesis76AlphaFun_eq_zero H76 P' χ x (Finset.mem_filter.mp hx).2]
+      simp
+    rw [h0, add_zero]
+  have h1mem : (1 : ↥L) ∈ Finset.univ.filter (fun x : ↥L => (x : G) ∈ H76.H) := by
+    refine Finset.mem_filter.mpr ⟨Finset.mem_univ _, ?_⟩
+    rw [OneMemClass.coe_one]
+    exact H76.H.one_mem
+  have hsharp : ∑ x ∈ F, ‖α x‖ ^ 2
+      = (∑ x ∈ Finset.univ.filter (fun x : ↥L => (x : G) ∈ H76.H), ‖α x‖ ^ 2)
+        - ‖α 1‖ ^ 2 := by
+    rw [hFeq, ← Finset.add_sum_erase _ _ h1mem]
+    ring
+  rw [hsharp, ← hsupp]
+  exact hcore
+
+end GenericAlpha
+
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
 /-- **Peterfalvi (13.5.a), base decomposition**: on `H^#`, `χ` equals the (7.7.a) `ρ`-decomposition
 `∑_{i≥1} (c̄_i / ‖ζ_i‖²) ζ_i` of the coherent datum `H_sharp_hypothesis76`.  Combines the `χ = χ^ρ`
