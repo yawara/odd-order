@@ -473,6 +473,12 @@ structure CharacterDegreeData (hyp : Hypothesis (G := G)) where
   lambda_irreducible : Prop
   lambda_degree : lambda 1 = ((hyp.u * hyp.q : ℕ) : ℂ)
   lambda_induced_from_PC_linear : Prop
+  /-- **Peterfalvi (13.3.b) WLOG** (cf. the (13.12) proof: "By (13.3.b), we may assume that the
+  hypothesis of (13.10) holds"): the distinguished `λ` *is* induced from a linear character of
+  `PC` — the (13.3.b) case split is resolved into this branch, the other branch being handled by
+  the `S ↔ T` symmetry upstream.  Carried as a `_holds` field so the (13.4)-dependent counting
+  ((13.9.a), `|Q| = q^p`, the `|T|`-decomposition) can consume (13.4). -/
+  lambda_induced_from_PC_linear_holds : lambda_induced_from_PC_linear
   mu_j_linear_induced : Prop
   mu_j_linear_induced_holds : mu_j_linear_induced
   no_lambda_forces_caseB_S : Prop
@@ -494,11 +500,16 @@ theorem character_degree_analysis [Finite G]
 
 /-- **Peterfalvi (13.4)**: if `S` contains a degree-`u q` character induced
 from a linear character of `P C`, then case (9.7.b) holds for `T`, with
-`D = 1` and `v = (q^p - 1) / (q - 1)`. -/
+`D = 1` and `v = (q^p - 1) / (q - 1)`.
+
+The third conjunct `|Q| = q^p` is the kernel-order component of "case (9.7.b) holds for `T`"
+(the (9.7.b) field model identifies `Q̄` with a field of cardinality `q^p`); it is what the
+(13.10) counting reads off ((13.10.3) computes `|Q^#|/|T| = (q^p−1)/(pq^p v)`). -/
 theorem lambda_forces_T_caseB [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
     (chars : CharacterDegreeData hyp) (hlambda : chars.lambda_induced_from_PC_linear) :
-    hyp.D = ⊥ ∧ hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) := by
+    hyp.D = ⊥ ∧ hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) ∧
+      Nat.card ↥hyp.Q = hyp.q ^ hyp.p := by
   sorry
 
 /-! ## (13.5)--(13.10): norm estimates -/
@@ -1763,6 +1774,85 @@ theorem Hypothesis.sum_univ_split [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleO
     OddOrder.GroupTheory.IsTISubset.sum_conjClassSet f hTIQ hstabQ hf]
   abel
 
+/-- `|S'| = |P|·|U|` — the (13.1.b) `S' = P ⋊ U` order decomposition
+(`Sdata.derived_complement`). -/
+theorem Hypothesis.card_deriv_S_eq [Finite G] (hyp : Hypothesis (G := G)) :
+    Nat.card ↥(derivedInG hyp.S) = Nat.card ↥hyp.P * Nat.card ↥hyp.U := by
+  have h := hyp.Sdata.derived_complement.card_mul
+  have hPeq : hyp.Sdata.H = hyp.P := by rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Sdata.H_le).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Sdata.U_le).toEquiv, hPeq,
+    hyp.Sdata_U_eq] at h
+  exact h.symm
+
+/-- `|S| = |S'|·q` — the (13.1.b) `S = S' ⋊ W₁` order decomposition (`Sdata.M_complement`). -/
+theorem Hypothesis.card_S_eq_deriv_mul_q [Finite G] (hyp : Hypothesis (G := G)) :
+    Nat.card ↥hyp.S = Nat.card ↥(derivedInG hyp.S) * hyp.q := by
+  have hle : derivedInG hyp.S ≤ hyp.S := Subgroup.map_subtype_le _
+  have h := hyp.Sdata.M_complement.card_mul
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Sdata.W1_le).toEquiv,
+    hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1] at h
+  exact h.symm
+
+/-- **`|S| = p^q·(uc)·q`** — the (13.2)-level order value of `S`, assembling
+`card_S_eq_deriv_mul_q`, `card_deriv_S_eq`, `card_P_eq` (`|P| = p^q`), and `|U| = uc`. -/
+theorem Hypothesis.card_S_val [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    Nat.card ↥hyp.S = hyp.p ^ hyp.q * (hyp.u * hyp.c) * hyp.q := by
+  rw [hyp.card_S_eq_deriv_mul_q, hyp.card_deriv_S_eq, hyp.card_P_eq hG hyp.Sdata_W2_eq,
+    hyp.card_U_eq_uc]
+
+/-- `|T| = |Q|·(vd)·p` — the `T`-side order decomposition, read off the reconciled type-`P`
+datum (`M_complement`/`derived_complement` of `reconciled_typePData_T`) with `|V| = vd` and
+`|W₂| = p`. -/
+theorem Hypothesis.card_T_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    Nat.card ↥hyp.T = Nat.card ↥hyp.Q * (hyp.v * hyp.d) * hyp.p := by
+  obtain ⟨tpd, hU, hW1, -⟩ := reconciled_typePData_T hG hyp
+  -- `|T| = |T'|·p`.
+  have hle : derivedInG hyp.T ≤ hyp.T := Subgroup.map_subtype_le _
+  have h1 := tpd.M_complement.card_mul
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe tpd.W1_le).toEquiv,
+    hW1, ← hyp.p_eq_card_W2] at h1
+  -- `|T'| = |Q|·|V| = |Q|·(vd)`.
+  have h2 := tpd.derived_complement.card_mul
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe tpd.H_le).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe tpd.U_le).toEquiv, tpd.H_eq, ← hyp.Q_eq_TF,
+    hU, hyp.card_V_eq_vd] at h2
+  rw [← h1, ← h2]
+
+open scoped Classical in
+/-- `|K^#| = |K| − 1`, `Finset` form. -/
+theorem card_sharp_toFinset [Fintype G] (K : Subgroup G) :
+    (Set.toFinite (sharpSubgroup K)).toFinset.card = Nat.card ↥K - 1 := by
+  classical
+  have h : (Set.toFinite (sharpSubgroup K)).toFinset
+      = (Finset.univ.filter (· ∈ K)).erase 1 := by
+    ext x
+    rw [Set.Finite.mem_toFinset, Finset.mem_erase, Finset.mem_filter]
+    show x ∈ (K : Set G) \ {1} ↔ _
+    rw [Set.mem_diff, Set.mem_singleton_iff]
+    exact ⟨fun ⟨h1, h2⟩ => ⟨h2, Finset.mem_univ _, h1⟩, fun ⟨h2, _, h1⟩ => ⟨h1, h2⟩⟩
+  rw [h, Finset.card_erase_of_mem (Finset.mem_filter.mpr ⟨Finset.mem_univ _, K.one_mem⟩)]
+  congr 1
+  rw [Nat.card_eq_fintype_card]
+  simp [Fintype.card_subtype]
+
+/-- **Peterfalvi (13.10.3), ℕ form**: `|G| = 1 + |G₀| + [G:S]·|H^#| + [G:T]·|Q^#|` — the
+`f = 1` instance of the four-piece split. -/
+theorem Hypothesis.card_univ_split [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    (hcardQ : Nat.card ↥hyp.Q = hyp.q ^ hyp.p) (hvd : hyp.v * hyp.d ≠ 1) :
+    Nat.card G = 1 + hyp.G0Finset.card
+      + hyp.S.index * (Nat.card ↥hyp.H - 1) + hyp.T.index * (Nat.card ↥hyp.Q - 1) := by
+  have h := hyp.sum_univ_split hG (fun _ => (1 : ℕ)) (fun _ _ => rfl) hcardQ hvd
+  simp only [← Finset.card_eq_sum_ones, Finset.card_univ, smul_eq_mul,
+    card_sharp_toFinset] at h
+  rw [Nat.card_eq_fintype_card]
+  exact h
+
 end CountingLayer
 
 /-! ### The four (13.6)–(13.9) estimate producers
@@ -1803,13 +1893,97 @@ theorem analyticEstimate_eta [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 /-- **Peterfalvi (13.9.a), atom form**: the disjoint-cover counting
 `1 = 1/|G| + |G₀|/|G| + |H#|/|S| + |Q#|/|T|` with `|Q#|/|T|` collapsed to its (13.4) value
-`(q−1)/(pq^p)`. -/
+`(q−1)/(pq^p)`.
+
+Assembled from the ℕ-count `card_univ_split` (the `f = 1` four-piece split over the TI
+saturations), Lagrange (`card_mul_index` on `S` and `T`), the `|T|`-decomposition `card_T_eq`,
+and the (13.4) values (`lambda_forces_T_caseB`: `D = 1`, `v = (q^p−1)/(q−1)`, `|Q| = q^p`). -/
 theorem analyticCounting_disjointCover [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     (1 : ℚ) = 1 / (Nat.card G : ℚ) + (hyp.G0Finset.card : ℚ) / (Nat.card G : ℚ)
         + ((Nat.card hyp.H - 1 : ℕ) : ℚ) / (Nat.card hyp.S : ℚ)
         + ((hyp.q : ℚ) - 1) / ((hyp.p : ℚ) * (hyp.q : ℚ) ^ hyp.p) := by
-  sorry
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  -- (13.4) values.
+  obtain ⟨chars, -, -, -⟩ := character_degree_analysis _hG hyp
+  obtain ⟨hD, hv, hQ⟩ :=
+    lambda_forces_T_caseB _hG chars chars.lambda_induced_from_PC_linear_holds
+  have hd1 : hyp.d = 1 := by rw [hyp.d_eq_card_D, hD, Subgroup.card_bot]
+  have hq3 : 3 ≤ hyp.q := hyp.three_le_q
+  have hp3 : 3 ≤ hyp.p := hyp.three_le_p
+  -- `v ≥ 2` (so `vd ≠ 1`, excluding type V in the counting layer).
+  have hqp_ge : hyp.q * hyp.q ≤ hyp.q ^ hyp.p := by
+    calc hyp.q * hyp.q = hyp.q ^ 2 := (sq hyp.q).symm
+      _ ≤ hyp.q ^ hyp.p := Nat.pow_le_pow_right (by omega) (by omega)
+  have hv2 : 2 ≤ hyp.v := by
+    rw [hv, Nat.le_div_iff_mul_le (by omega : 0 < hyp.q - 1)]
+    have h3q : 3 * hyp.q ≤ hyp.q * hyp.q := Nat.mul_le_mul_right _ hq3
+    omega
+  have hvd : hyp.v * hyp.d ≠ 1 := by rw [hd1, mul_one]; omega
+  -- The ℕ-count, cast to ℚ.
+  have hsplit := hyp.card_univ_split _hG hQ hvd
+  have key : (Nat.card G : ℚ) = 1 + (hyp.G0Finset.card : ℚ)
+      + (hyp.S.index : ℚ) * ((Nat.card ↥hyp.H - 1 : ℕ) : ℚ)
+      + (hyp.T.index : ℚ) * ((Nat.card ↥hyp.Q - 1 : ℕ) : ℚ) := by
+    exact_mod_cast hsplit
+  -- Nonvanishing.
+  have hG0 : (0 : ℚ) < (Nat.card G : ℚ) := by exact_mod_cast Nat.card_pos (α := G)
+  have hS0 : (0 : ℚ) < (Nat.card ↥hyp.S : ℚ) := by exact_mod_cast Nat.card_pos (α := ↥hyp.S)
+  have hT0 : (0 : ℚ) < (Nat.card ↥hyp.T : ℚ) := by exact_mod_cast Nat.card_pos (α := ↥hyp.T)
+  have hSidx : (hyp.S.index : ℚ) * (Nat.card ↥hyp.S : ℚ) = (Nat.card G : ℚ) := by
+    exact_mod_cast mul_comm (Nat.card ↥hyp.S) hyp.S.index ▸ hyp.S.card_mul_index
+  have hTidx : (hyp.T.index : ℚ) * (Nat.card ↥hyp.T : ℚ) = (Nat.card G : ℚ) := by
+    exact_mod_cast mul_comm (Nat.card ↥hyp.T) hyp.T.index ▸ hyp.T.card_mul_index
+  have hSidx0 : (hyp.S.index : ℚ) ≠ 0 := by
+    intro h; rw [h, zero_mul] at hSidx; exact hG0.ne' hSidx.symm
+  have hTidx0 : (hyp.T.index : ℚ) ≠ 0 := by
+    intro h; rw [h, zero_mul] at hTidx; exact hG0.ne' hTidx.symm
+  -- `v(q−1) = q^p − 1` in ℚ (exact ℕ-division).
+  have hq1 : (1 : ℕ) ≤ hyp.q := by omega
+  have hqp1 : (1 : ℕ) ≤ hyp.q ^ hyp.p := Nat.one_le_pow _ _ (by omega)
+  have hdvd : (hyp.q - 1) ∣ (hyp.q ^ hyp.p - 1) := by
+    simpa only [one_pow] using Nat.sub_dvd_pow_sub_pow hyp.q 1 hyp.p
+  have hvq : (hyp.v : ℚ) * ((hyp.q : ℚ) - 1) = (hyp.q : ℚ) ^ hyp.p - 1 := by
+    have h := Nat.div_mul_cancel hdvd
+    rw [← hv] at h
+    have := congrArg (Nat.cast (R := ℚ)) h
+    push_cast [Nat.cast_sub hq1, Nat.cast_sub hqp1] at this
+    convert this using 2 <;> push_cast <;> ring
+  -- `|T| = q^p·v·p` in ℚ.
+  have hTval : (Nat.card ↥hyp.T : ℚ)
+      = (hyp.q : ℚ) ^ hyp.p * (hyp.v : ℚ) * (hyp.p : ℚ) := by
+    have h := hyp.card_T_eq _hG
+    rw [hQ, hd1, mul_one] at h
+    exact_mod_cast h
+  -- `|Q^#|` in ℚ.
+  have hQ1 : ((Nat.card ↥hyp.Q - 1 : ℕ) : ℚ) = (hyp.q : ℚ) ^ hyp.p - 1 := by
+    rw [hQ, Nat.cast_sub hqp1]
+    push_cast
+    ring
+  -- Term conversions: `S.index·(|H|−1)/|G| = (|H|−1)/|S|`, and the `Q`-term collapses to the
+  -- (13.4) value.
+  have hterm3 : ((Nat.card ↥hyp.H - 1 : ℕ) : ℚ) / (Nat.card ↥hyp.S : ℚ)
+      = (hyp.S.index : ℚ) * ((Nat.card ↥hyp.H - 1 : ℕ) : ℚ) / (Nat.card G : ℚ) := by
+    rw [← hSidx, mul_div_mul_left _ _ hSidx0]
+  have hv0 : (hyp.v : ℚ) ≠ 0 := by
+    have : (2 : ℚ) ≤ (hyp.v : ℚ) := by exact_mod_cast hv2
+    linarith
+  have hq10 : (hyp.q : ℚ) - 1 ≠ 0 := by
+    have : (3 : ℚ) ≤ (hyp.q : ℚ) := by exact_mod_cast hq3
+    linarith
+  have hp0 : (hyp.p : ℚ) ≠ 0 := by
+    have : (3 : ℚ) ≤ (hyp.p : ℚ) := by exact_mod_cast hp3
+    linarith
+  have hqp0 : (hyp.q : ℚ) ^ hyp.p ≠ 0 := by
+    have : (1 : ℚ) ≤ (hyp.q : ℚ) ^ hyp.p := by exact_mod_cast hqp1
+    linarith
+  have hterm4 : ((hyp.q : ℚ) - 1) / ((hyp.p : ℚ) * (hyp.q : ℚ) ^ hyp.p)
+      = (hyp.T.index : ℚ) * ((Nat.card ↥hyp.Q - 1 : ℕ) : ℚ) / (Nat.card G : ℚ) := by
+    rw [hQ1, ← hvq, ← hTidx, hTval]
+    field_simp
+  -- Assemble.
+  rw [hterm3, hterm4, ← add_div, ← add_div, ← add_div, ← key, div_self hG0.ne']
 
 /-- **Peterfalvi (13.9.b), atom form**: `|G₀|/|G| ≤ slam + seta`. -/
 theorem analyticEstimate_galois [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
