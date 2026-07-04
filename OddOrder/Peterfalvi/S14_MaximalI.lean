@@ -7124,6 +7124,61 @@ theorem maximalSubgroup_eq_normalizer_maxNilpotentNormalHall
       exact hco.1 (top_le_iff.mp hle)
   · exact heq.ge
 
+/-- **Peterfalvi (8.13.c1)+(2.3), all-type-I case** — the escaping-centralizer control that makes
+each type-I kernel's Fitting subgroup a `TI`-subgroup, supplying the `FittingIsTI` gate of the
+(12.17) `isTI` covering input.
+
+For a maximal subgroup `M` of a minimal simple group of odd order in which **every** maximal subgroup
+is of type I (`hall`), the Fitting subgroup `F(M)` is `TI` (`S15.FittingIsTI M`).  In the all-type-I
+configuration the (8.13.c1) escaping-centralizer control forces `R(x) = 1` on `M_σ#` (the (8.14)
+signalizer is trivial), so `M_σ = M_F = F(M)` is a genuine trivial-intersection subgroup.
+
+**Genuinely still-missing**: the (8.13.c1) escaping-centralizer control is `escapingCentralizers_control`
+(S10:526), itself an open BG §16 / (2.3) residual, and the passage from it to `FittingIsTI` is not
+assembled anywhere in reach of `S14`.  BG §16 exposes `FittingIsTI` only in the `M_F ≠ M_σ` /
+type-`P₂` directions (`fittingIsTI_of_isTypeP2`, `fitting_isTI_of_mf_ne_msigma`), never for the
+all-type-I `M_F = M_σ` case, which is exactly the escaping-centralizer content here.
+
+**Soundness**: the statement is TRUE and **not** a false general implication.  It is *not* claimed
+for an arbitrary type-I subgroup — the (12.10)/(12.16) Frobenius witness `L` is type-I-like yet
+has `H^# = (L_F)#` **not** `TI` in `G` (Pf (12.10), see `sibleyTarget_frobI`), so the conclusion
+genuinely requires the ambient all-type-I hypothesis `hall` (which excludes the counterexample
+configuration and puts us in the (8.17.a) type-I covering case where (8.13.c1) applies).  Tied to
+`hG`, `M` maximal, its type-I witness, and `hall`. -/
+private theorem allTypeI_fittingIsTI (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (_hI : IsTypeI M)
+    (_hall : ∀ N : Subgroup G, N ∈ maximalSubgroups G → IsTypeI N) :
+    OddOrder.BG.Ch4.S15.FittingIsTI M := by
+  sorry
+
+/-- **Peterfalvi (8.8.a) dichotomy, all-type-I case** — the case-(b) covering branch of BG Theorem
+E cannot occur when every maximal subgroup is of type I.
+
+If `data`'s cover admits a `BGTheoremENonTypeICovering` (the two-exceptional-subgroup case (8.8.b)
+of BG Theorem E) while every maximal subgroup is of type I (`hall`), a contradiction results.
+
+**Genuinely still-missing**: the `BGTheoremENonTypeICovering` carrier records only the exceptional
+`Ẑ`-set and its cover geometry — it does **not** expose the type-`P` maximal whose Theorem 14.7
+duality produced `Ẑ` (see `nonTypeICovering_of_isTypeP`, whose inputs `Mref, Kref, …` are consumed
+but not re-exported).  So no non-type-I maximal is directly extractable from `hNonTypeI` to
+contradict `hall`.  The (8.8) dichotomy's *exclusivity* — case (b) selected `iff` some maximal is
+non-type-I — is the BG §16 (8.8.a) residual (parallel to `theorem88_dichotomy`), not assembled in
+reach of `S14`.
+
+**Soundness**: the statement is TRUE — the (8.8.b) covering branch is produced (in
+`nonTypeICovering_of_isTypeP`) *only* from a type-`P` (= non-type-I, `isTypeNonI_of_isTypeP`)
+maximal, which `hall` forbids; so the two hypotheses are jointly contradictory.  It is **not** a
+false general implication: it does not claim `BGTheoremENonTypeICovering` is empty unconditionally
+(it is inhabited whenever a non-type-I maximal exists) — only its incompatibility with the
+all-type-I hypothesis `hall`.  Tied to `hG`, the specific `data`, its non-type-I covering, and
+`hall`. -/
+private theorem not_nonTypeICovering_of_all_typeI (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {data : OddOrder.Peterfalvi.S10.BGTheoremECoverData G}
+    (_hcov : OddOrder.Peterfalvi.S10.BGTheoremENonTypeICovering data)
+    (_hall : ∀ N : Subgroup G, N ∈ maximalSubgroups G → IsTypeI N) :
+    False := by
+  sorry
+
 /-- **§8/§10 covering inputs to Peterfalvi (12.17)** — the all-type-I case of Theorem (8.8).
 
 When every maximal subgroup of `G` is of type I, the §8 covering theory (BG Theorem E, (8.17), and
@@ -7268,9 +7323,30 @@ theorem exists_typeICovering (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           * (data.reps i₀).index with hP
         omega
     · -- `isTI`: each kernel sharp-set `((M_i)_F)#` is a TI-subset, by (8.13.c1)+(2.3).
-      -- Escaping-centralizer §8 residual.
+      -- Honest derivation: `FittingIsTI (M_j)` (the (8.13.c1) escaping-centralizer gate,
+      -- `allTypeI_fittingIsTI`) feeds `maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI`
+      -- (S16, `M_F# TI` with normalizer `N_G(M_F)`); and `N_G(M_F) = M_j` for the type-I maximal
+      -- (`maximalSubgroup_eq_normalizer_maxNilpotentNormalHall`, kernel `≠ ⊥`).
       intro j
-      sorry
+      set M := data.reps (e.symm j) with hMdef
+      have hMmax : M ∈ maximalSubgroups G := data.maximal (e.symm j)
+      have hMI : IsTypeI M := hall _ hMmax
+      -- `M_F ≠ ⊥` for the type-I maximal.
+      have hMFne : maxNilpotentNormalHall M ≠ ⊥ := by
+        obtain ⟨td⟩ := hMI
+        rw [← td.typeF.H_eq]
+        exact td.typeF.H_nontrivial
+      -- `N_G(M_F) = M`.
+      have hNorm : M = Subgroup.normalizer (maxNilpotentNormalHall M : Set G) :=
+        maximalSubgroup_eq_normalizer_maxNilpotentNormalHall hG hMmax hMFne
+      -- `M_F#` is TI with normalizer `N_G(M_F)`, from `FittingIsTI M`; rewrite `N_G(M_F) = M` in
+      -- the TI witness (not in the goal — that would fold `M` inside `maxNilpotentNormalHall M`).
+      have hTI :=
+        OddOrder.BG.Ch4.S16.maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI hG hMmax
+          (allTypeI_fittingIsTI hG hMmax hMI hall)
+      rw [← hNorm] at hTI
+      -- `sharpSubgroup (maxNilpotentNormalHall M)` unfolds to `(maxNilpotentNormalHall M) \ {1}`.
+      exact hTI
     · -- **`coprime`** (discharged): the kernels have pairwise-coprime order because the (8.17)
       -- partition makes their prime-factor sets disjoint.
       intro j j' hjj'
@@ -7303,9 +7379,10 @@ theorem exists_typeICovering (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     -- This is the all-type-I case of the (8.8) dichotomy (`theorem88_dichotomy`); under `hall`
     -- BG Theorem E returns the type-I cover, never the two-exceptional-subgroup case (the
     -- exceptional `W` of `hNonTypeI` is the normalizer of a non-type-I maximal).  Isolating that
-    -- is the BG §16 (8.8.a) residual.
+    -- is the BG §16 (8.8.a) residual (`not_nonTypeICovering_of_all_typeI`).
     exfalso
-    sorry
+    obtain ⟨hcov⟩ := hNonTypeI
+    exact not_nonTypeICovering_of_all_typeI hG hcov hall
 
 /-- **Peterfalvi (12.17), non-existence half**: in a minimal simple group of odd order, not every
 maximal subgroup is of type I.
