@@ -1984,6 +1984,34 @@ theorem chiRhoCF_inner_eq_of_equal_degree {L : Subgroup G} [Finite G] (hyp : Hyp
   rw [ClassFunction.inner_sub_left] at hkey
   exact sub_eq_zero.mp hkey
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.5), the θ-level coefficient equality** (Frobenius form of `o_rpsi_S`).  For
+`χᵢ = Ind_H^L θᵢ ∈ S` of equal degree, the `ρ`-image's `H`-restriction has equal coefficient on
+`θ₁, θ₂`: `⟨θ₁, Res_H ρψ⟩ = ⟨θ₂, Res_H ρψ⟩`.  Frobenius reciprocity
+(`inner_induce_eq_inner_restrict`, `⟨Ind_H^L θ, ρψ⟩ = ⟨θ, Res_H ρψ⟩`) applied to
+`chiRhoCF_inner_eq_of_equal_degree`.  Input to the (12.5) `DpsiH` decomposition: grouped by the
+induced-from-`H'` partition of `Irr H` (equal-degree blocks, general (1.7.b)), it forces
+`Res_H ρψ = ∑_λ a_λ Ind_{H'}^H λ + a·1_H`. -/
+theorem chiRhoCF_restrict_inner_eq_of_equal_degree {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+    {χ₁ χ₂ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Sset) (hχ₂ : χ₂ ∈ hyp.Sset)
+    (hdeg : χ₁ (1 : ↥L) = χ₂ (1 : ↥L))
+    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1}) {ψ : ClassFunction G ℂ}
+    (horth1 : ClassFunction.inner ψ (coh.extension χ₁) = 0)
+    (horth2 : ClassFunction.inner ψ (coh.extension χ₂) = 0)
+    {θ₁ θ₂ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ}
+    (hθ₁ : χ₁ = ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) θ₁)
+    (hθ₂ : χ₂ = ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) θ₂) :
+    ClassFunction.inner θ₁ (ClassFunction.restrict ((hyp.typeI.typeF.H).subgroupOf L)
+        (hyp.toHypothesis71.chiRhoCF ψ))
+      = ClassFunction.inner θ₂ (ClassFunction.restrict ((hyp.typeI.typeF.H).subgroupOf L)
+        (hyp.toHypothesis71.chiRhoCF ψ)) := by
+  haveI := hyp.finiteG
+  have hfact := chiRhoCF_inner_eq_of_equal_degree hyp coh hχ₁ hχ₂ hdeg hAH horth1 horth2
+  rw [hθ₁, hθ₂, ClassFunction.inner_induce_eq_inner_restrict,
+    ClassFunction.inner_induce_eq_inner_restrict] at hfact
+  exact hfact
+
 open scoped Classical in
 /-- **General TI-induction self-value** (Isaacs 7.x / Peterfalvi (3.2.c) value half), generalized
 from `TICyclicHypothesis.induce_apply_eq_self_of_mem_V` to an arbitrary TI subset.  For a TI subset
