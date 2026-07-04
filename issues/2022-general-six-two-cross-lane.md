@@ -290,3 +290,9 @@ le_normalizer_secondDerived (pointwise_smul 既存活用) + secondDerived_cohere
 再利用可、hfix = W2_le 直) + C<U (U_noncentral_on_quotient 経由) + tower + glue。
 open named sorries: sixTwoDecompositionData (μ-column) / secondDerived_coherent ((5.7) 配線) /
 coherent_S_of_coherent_SH0C ((11.3) = 6.3-route、producer 部品は全て揃済)。
+
+## 2026-07-05 lane-a (loop 13): (11.5) 部品完了 — C⊊U + FPF-dvd
+
+C_lt_U (U_noncentral_on_quotient 経由; MulAut-coe は defeq-change で) +
+q_dvd_secondDerived_relIndex_HC_sub_one (W1_dvd_index_of_fixedPoints_le 再利用)。
+残 = 純算術 glue (tower + (11.4)@M'' + 奇偶) → HC_le_secondDerived 閉了へ。
