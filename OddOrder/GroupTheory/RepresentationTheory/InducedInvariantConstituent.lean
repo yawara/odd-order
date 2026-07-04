@@ -305,4 +305,110 @@ theorem inner_induce_constituent_eq_of_apply_one_eq {H : Type*} [Group H]
   rw [inner_induce_coe_eq_restrictionMultiplicity, inner_induce_coe_eq_restrictionMultiplicity]
   exact restrictionMultiplicity_eq_of_liesOver_of_apply_one_eq h₁ h₂ hdeg
 
+open scoped Classical in
+/-- **Peterfalvi (12.5) core: block-constant coefficients ⟹ constant off `H`.**  For `H ⊴ G` and
+`g ∈ CF(G)`, suppose within each `Ind_H^G ρ`-block (`ρ ∈ Irr H`) the inner products `⟨g, θ⟩` agree
+across the *non-trivial* constituents (`hcoeff`), and the multiplicities `⟨Ind_H ρ, θ⟩` agree across
+*all* constituents (`hmult`, the common `e`).  Then `g` is constant off `H`: `g x = g y` for
+`x, y ∉ H`.
+
+Proof (the `DpsiH` decomposition of Peterfalvi (12.5)): Fourier `g = ∑_θ ⟨g,θ⟩·θ`, so
+`g x − g y = ∑_θ ⟨g,θ⟩(θ x − θ y)`; regroup over the `Ind_H^G` partition
+(`exists_induce_constituent_partition`, `Finset.sum_biUnion`).  Each block `A` over `ρ` satisfies
+`e·(block sum) = c·∑_{θ∈A}⟨Ind ρ,θ⟩(θ x − θ y) = c·(Ind ρ x − Ind ρ y) = 0` (with `c = ⟨g,θ₀⟩`,
+`e = ⟨Ind ρ,θ₀⟩ ≠ 0` for a non-trivial `θ₀ ∈ A`), since `Ind_H^G ρ` vanishes off `H`
+(`induce_apply_eq_zero_of_not_mem_normal`) and the trivial character drops (`θ x − θ y = 0`).
+Blocks with no non-trivial constituent contribute `0` termwise. -/
+theorem constant_off_normal_of_inner_block_const {G : Type*} [Group G] [Finite G]
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {H : Subgroup G} [hH : H.Normal] [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
+    [Fintype (IrreducibleCharacter G)]
+    (g : ClassFunction G ℂ)
+    (hcoeff : ∀ (θ₁ θ₂ : IrreducibleCharacter G) (ρ : IrreducibleCharacter ↥H),
+        θ₁ ≠ trivialIrreducibleCharacter G → θ₂ ≠ trivialIrreducibleCharacter G →
+        IrreducibleCharacter.LiesOver H θ₁ ρ → IrreducibleCharacter.LiesOver H θ₂ ρ →
+        ClassFunction.inner g (θ₁ : ClassFunction G ℂ)
+          = ClassFunction.inner g (θ₂ : ClassFunction G ℂ))
+    (hmult : ∀ (θ₁ θ₂ : IrreducibleCharacter G) (ρ : IrreducibleCharacter ↥H),
+        IrreducibleCharacter.LiesOver H θ₁ ρ → IrreducibleCharacter.LiesOver H θ₂ ρ →
+        ClassFunction.inner (ClassFunction.induce H (ρ : ClassFunction ↥H ℂ))
+              (θ₁ : ClassFunction G ℂ)
+          = ClassFunction.inner (ClassFunction.induce H (ρ : ClassFunction ↥H ℂ))
+              (θ₂ : ClassFunction G ℂ))
+    {x y : G} (hx : x ∉ H) (hy : y ∉ H) :
+    g x = g y := by
+  classical
+  obtain ⟨parts, hcover, hdisj, hchar⟩ := exists_induce_constituent_partition (G := G) (H := H)
+  have hg_eval : ∀ z : G, g z = ∑ θ : IrreducibleCharacter G,
+      ClassFunction.inner g (θ : ClassFunction G ℂ) * (θ : ClassFunction G ℂ) z := by
+    intro z
+    conv_lhs => rw [← sum_inner_irreducibleCharacter_smul g]
+    rw [ClassFunction.sum_apply]
+    refine Finset.sum_congr rfl fun θ _ => ?_
+    rw [ClassFunction.smul_apply]
+  rw [← sub_eq_zero, hg_eval x, hg_eval y, ← Finset.sum_sub_distrib]
+  simp_rw [← mul_sub]
+  rw [hcover, Finset.sum_biUnion hdisj]
+  refine Finset.sum_eq_zero fun A hA => ?_
+  simp only [id_eq]
+  obtain ⟨ρ, hρ⟩ := hchar A hA
+  have hIndeval : ∀ z : G, ∑ θ ∈ A,
+      ClassFunction.inner (ClassFunction.induce H (ρ : ClassFunction ↥H ℂ)) (θ : ClassFunction G ℂ)
+          * (θ : ClassFunction G ℂ) z
+        = ClassFunction.induce H (ρ : ClassFunction ↥H ℂ) z := by
+    intro z
+    have hf : ∀ θ ∈ (Finset.univ : Finset (IrreducibleCharacter G)), θ ∉ A →
+        ClassFunction.inner (ClassFunction.induce H (ρ : ClassFunction ↥H ℂ))
+            (θ : ClassFunction G ℂ) * (θ : ClassFunction G ℂ) z = 0 := by
+      intro θ _ hθA
+      have hz : ClassFunction.inner (ClassFunction.induce H (ρ : ClassFunction ↥H ℂ))
+          (θ : ClassFunction G ℂ) = 0 := by
+        by_contra hne
+        exact hθA ((hρ θ).mpr
+          ((IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H θ ρ).mp hne))
+      rw [hz, zero_mul]
+    rw [Finset.sum_subset (Finset.subset_univ A) hf]
+    conv_rhs => rw [← sum_inner_irreducibleCharacter_smul
+      (ClassFunction.induce H (ρ : ClassFunction ↥H ℂ))]
+    rw [ClassFunction.sum_apply]
+    refine Finset.sum_congr rfl fun θ _ => ?_
+    rw [ClassFunction.smul_apply]
+  by_cases hnt : ∃ θ₀ ∈ A, θ₀ ≠ trivialIrreducibleCharacter G
+  · obtain ⟨θ₀, hθ₀A, hθ₀nt⟩ := hnt
+    have hlo₀ : IrreducibleCharacter.LiesOver H θ₀ ρ := (hρ θ₀).mp hθ₀A
+    have he_ne : ClassFunction.inner (ClassFunction.induce H (ρ : ClassFunction ↥H ℂ))
+        (θ₀ : ClassFunction G ℂ) ≠ 0 :=
+      (IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H θ₀ ρ).mpr hlo₀
+    have hkey : ClassFunction.inner (ClassFunction.induce H (ρ : ClassFunction ↥H ℂ))
+          (θ₀ : ClassFunction G ℂ)
+        * (∑ θ ∈ A, ClassFunction.inner g (θ : ClassFunction G ℂ)
+            * ((θ : ClassFunction G ℂ) x - (θ : ClassFunction G ℂ) y)) = 0 := by
+      rw [Finset.mul_sum]
+      have hswap : (∑ θ ∈ A, ClassFunction.inner (ClassFunction.induce H (ρ : ClassFunction ↥H ℂ))
+              (θ₀ : ClassFunction G ℂ)
+            * (ClassFunction.inner g (θ : ClassFunction G ℂ)
+              * ((θ : ClassFunction G ℂ) x - (θ : ClassFunction G ℂ) y)))
+          = ClassFunction.inner g (θ₀ : ClassFunction G ℂ)
+            * ∑ θ ∈ A, ClassFunction.inner (ClassFunction.induce H (ρ : ClassFunction ↥H ℂ))
+                (θ : ClassFunction G ℂ)
+              * ((θ : ClassFunction G ℂ) x - (θ : ClassFunction G ℂ) y) := by
+        rw [Finset.mul_sum]
+        refine Finset.sum_congr rfl fun θ hθA => ?_
+        by_cases hθt : θ = trivialIrreducibleCharacter G
+        · subst hθt; simp
+        · have hlo : IrreducibleCharacter.LiesOver H θ ρ := (hρ θ).mp hθA
+          rw [hcoeff θ θ₀ ρ hθt hθ₀nt hlo hlo₀, hmult θ θ₀ ρ hlo hlo₀]; ring
+      rw [hswap]
+      have hI0 : ∑ θ ∈ A, ClassFunction.inner (ClassFunction.induce H (ρ : ClassFunction ↥H ℂ))
+            (θ : ClassFunction G ℂ) * ((θ : ClassFunction G ℂ) x - (θ : ClassFunction G ℂ) y) = 0 := by
+        simp_rw [mul_sub]
+        rw [Finset.sum_sub_distrib, hIndeval x, hIndeval y,
+          ClassFunction.induce_apply_eq_zero_of_not_mem_normal H _ hx,
+          ClassFunction.induce_apply_eq_zero_of_not_mem_normal H _ hy, sub_zero]
+      rw [hI0, mul_zero]
+    exact (mul_eq_zero.mp hkey).resolve_left he_ne
+  · push_neg at hnt
+    refine Finset.sum_eq_zero fun θ hθA => ?_
+    rw [hnt θ hθA]; simp
+
 end OddOrder.RepresentationTheory
