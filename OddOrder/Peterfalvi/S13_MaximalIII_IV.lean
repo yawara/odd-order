@@ -602,6 +602,112 @@ theorem H0C_relIndex_HC [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     Nat.mul_pos Nat.card_pos Nat.card_pos
   exact Nat.eq_of_mul_eq_mul_left hpos hkey
 
+/-- The (11.1) inputs: `p` and `q` are distinct odd primes.  `q = |W₁|` is prime (type-`P`
+core), `p = |W₂|` is the chief-factor prime; both are odd (dividing `|G|`); and `p ≠ q`
+since `p ∣ |H|` while `q ∣ |U ⊔ W₁|`, which are coprime. -/
+theorem p_q_distinct_odd_primes [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.p.Prime ∧ hyp.q.Prime ∧ Odd hyp.p ∧ Odd hyp.q ∧ hyp.p ≠ hyp.q := by
+  have hHH : hyp.s11Setup.typeP.H = hyp.base.typeP.H := by
+    rw [hyp.s11Setup.typeP.H_eq, hyp.base.typeP.H_eq]
+  -- `p` prime via the chief factor
+  have hp_eq : hyp.chief.p = hyp.p := by
+    have h2 := hyp.chief.typeIII_IV_p_eq_W2 (hyp.base.isTypeIIIorIV hG)
+    rw [hyp.s11Setup_card_W2_eq] at h2
+    exact h2.symm
+  have hp_prime : hyp.p.Prime := hp_eq ▸ hyp.chief.p_prime
+  -- `q` prime from the type-`P` core
+  have hq_prime : hyp.q.Prime := by
+    have h := hyp.s11Setup.nontrivial.2.1
+    rwa [show Nat.card ↥hyp.s11Setup.typeP.W1 = hyp.q from hyp.s11Setup_q_eq] at h
+  -- odd: both are cards of subgroups of the odd-order `G`
+  have hodd : Odd (Nat.card G) := hG.odd
+  have hp_odd : Odd hyp.p :=
+    hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card hyp.base.typeP.W2)
+  have hq_odd : Odd hyp.q :=
+    hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card hyp.base.typeP.W1)
+  -- `p ≠ q`: `p ∣ |H|`, `q ∣ |U ⊔ W₁|`, and those cards are coprime
+  refine ⟨hp_prime, hq_prime, hp_odd, hq_odd, ?_⟩
+  intro hpq
+  have hUne : hyp.base.typeP.U ≠ ⊥ := by
+    rw [← hyp.setup_typeP_eq]; exact hyp.s11Setup.nontrivial.1
+  have hcop := OddOrder.Peterfalvi.S11.typeP_coprime_H_uW1 hyp.base.typeP hUne
+  have hpH : hyp.p ∣ Nat.card ↥hyp.base.typeP.H := by
+    have horder : Nat.card ↥hyp.base.typeP.H = hyp.p ^ hyp.q * Nat.card ↥hyp.chief.H0 := by
+      have h := hyp.chief.quotient_order
+      have hcardHH : Nat.card ↥hyp.s11Setup.H = Nat.card ↥hyp.base.typeP.H :=
+        congrArg (fun (X : Subgroup G) => Nat.card ↥X) hHH
+      rw [hcardHH, hp_eq] at h
+      rw [h]
+      congr 1
+      rw [hyp.s11Setup_q_eq]
+    rw [horder]
+    exact Dvd.dvd.mul_right (dvd_pow_self _ hq_prime.pos.ne') _
+  have hqUW : hyp.q ∣ Nat.card ↥(hyp.base.typeP.U ⊔ hyp.base.typeP.W1) := by
+    have : hyp.base.typeP.W1 ≤ hyp.base.typeP.U ⊔ hyp.base.typeP.W1 := le_sup_right
+    exact Subgroup.card_dvd_of_le this
+  have h1 : hyp.p ∣ 1 := by
+    rw [← hcop]
+    exact Nat.dvd_gcd hpH (hpq ▸ hqUW)
+  exact hp_prime.one_lt.ne' (Nat.eq_one_of_dvd_one h1 ▸ rfl)
+
+/-- **`HC` is nilpotent** (Peterfalvi (6.3.a) for the §11 instance; Coq `PFsection11`
+`nilHC` via `F(M') = HC`).  `H` and `C` are normal in `HC`, both nilpotent (`H = M_F`;
+`C ≤ U` with `U` nilpotent), so `HC = H ⊔ C ≤ F(HC)` by Fitting's theorem. -/
+theorem HC_isNilpotent [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
+    Group.IsNilpotent ↥hyp.HC := by
+  classical
+  have hHle : hyp.base.typeP.H ≤ hyp.HC := le_sup_left
+  have hCle : hyp.C ≤ hyp.HC := le_sup_right
+  have hHCleM : hyp.HC ≤ M := hyp.HC_le_derived.trans (Subgroup.map_subtype_le _)
+  -- both traces are normal in `↥HC`
+  haveI hHn : (hyp.base.typeP.H.subgroupOf hyp.HC).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hHle).mpr
+      (hHCleM.trans hyp.H_normalized_by_M)
+  haveI hCn : (hyp.C.subgroupOf hyp.HC).Normal := by
+    refine (Subgroup.normal_subgroupOf_iff_le_normalizer hCle).mpr ?_
+    refine sup_le (le_trans ?_ (Subgroup.centralizer_le_normalizer (hyp.C : Set G)))
+      Subgroup.le_normalizer
+    intro h hh
+    rw [Subgroup.mem_centralizer_iff]
+    intro c hc
+    exact hyp.commute_of_mem_C_of_mem_H hc hh
+  -- both traces are nilpotent
+  haveI hHnil : Group.IsNilpotent ↥hyp.base.typeP.H := by
+    rw [hyp.base.typeP.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent M
+  haveI hUnil : Group.IsNilpotent ↥hyp.base.typeP.U := hyp.base.typeP.U_nilpotent
+  haveI hCnil : Group.IsNilpotent ↥hyp.C := by
+    haveI : Group.IsNilpotent ↥(hyp.C.subgroupOf hyp.base.typeP.U) := Subgroup.isNilpotent _
+    exact nilpotent_of_surjective
+      (Subgroup.subgroupOfEquivOfLe hyp.C_le_U).toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hyp.C_le_U).surjective
+  haveI hHtr : Group.IsNilpotent ↥(hyp.base.typeP.H.subgroupOf hyp.HC) :=
+    nilpotent_of_surjective
+      (Subgroup.subgroupOfEquivOfLe hHle).symm.toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hHle).symm.surjective
+  haveI hCtr : Group.IsNilpotent ↥(hyp.C.subgroupOf hyp.HC) :=
+    nilpotent_of_surjective
+      (Subgroup.subgroupOfEquivOfLe hCle).symm.toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hCle).symm.surjective
+  -- Fitting: both ≤ F(↥HC), and they join to ⊤
+  have hHfit : hyp.base.typeP.H.subgroupOf hyp.HC ≤ OddOrder.Isaacs.Ch01.fitting ↥hyp.HC :=
+    OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
+  have hCfit : hyp.C.subgroupOf hyp.HC ≤ OddOrder.Isaacs.Ch01.fitting ↥hyp.HC :=
+    OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
+  have hsup : (hyp.base.typeP.H.subgroupOf hyp.HC) ⊔ (hyp.C.subgroupOf hyp.HC) = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hHle hCle]
+    exact Subgroup.subgroupOf_self _
+  have hfit_top : OddOrder.Isaacs.Ch01.fitting ↥hyp.HC = ⊤ :=
+    le_antisymm le_top (hsup ▸ sup_le hHfit hCfit)
+  haveI := OddOrder.Isaacs.Ch01.fitting.isNilpotent (G := ↥hyp.HC)
+  have : Group.IsNilpotent ↥(⊤ : Subgroup ↥hyp.HC) := by
+    rw [← hfit_top]
+    infer_instance
+  exact nilpotent_of_surjective
+    (Subgroup.topEquiv (G := ↥hyp.HC)).toMonoidHom
+    (Subgroup.topEquiv (G := ↥hyp.HC)).surjective
+
 /-- **`|M' : HC| = |U : C|`** (cancel the common factor `|H|`). -/
 theorem HC_relIndex_derived [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
     hyp.HC.relIndex (derivedInG M) = hyp.C.relIndex hyp.U := by
