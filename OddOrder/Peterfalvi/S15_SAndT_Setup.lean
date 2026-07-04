@@ -1273,6 +1273,50 @@ theorem hypothesis76_point_formula_kernel_only [Fintype G] [Invertible (Nat.card
 
 open scoped Classical in
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
+/-- Generic (13.5.a) point formula with a distinguished index (`a ≠ 0` form): the `P'`-non-kernel
+middle coefficients vanish, leaving the `i₁`-term plus the `P'`-kernel tail. -/
+theorem hypothesis76_point_formula [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (H76 : OddOrder.Peterfalvi.S09.Hypothesis76 G A L)
+    (hHbot : ∀ a : {a : G // a ∈ A}, H76.hyp71.hyp.H a = ⊥)
+    (P' : Subgroup ↥L) (χ : ClassFunction G ℂ)
+    (i₁ : Fin (H76.n + 1)) (hi₁ : 0 < i₁)
+    (hi₁ker : ¬ ((P' : Set ↥L) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (H76.zeta i₁)))
+    (hmiddle : ∀ i : Fin (H76.n + 1), 0 < i → i ≠ i₁ →
+      ¬ ((P' : Set ↥L) ⊆ OddOrder.Peterfalvi.S03.characterKernel (H76.zeta i)) →
+      H76.cCoeff χ i = 0)
+    (a : ↥L) (ha : (a : G) ∈ A) :
+    χ (a : G) =
+      (star (H76.cCoeff χ i₁) / H76.zetaNormSq i₁) * H76.zeta i₁ a
+      + ∑ i ∈ (Finset.Ioi (0 : Fin (H76.n + 1))).filter
+            (fun i => (P' : Set ↥L) ⊆
+              OddOrder.Peterfalvi.S03.characterKernel (H76.zeta i)),
+          (star (H76.cCoeff χ i) / H76.zetaNormSq i) * H76.zeta i a := by
+  classical
+  have hbase : χ (a : G) = ∑ i ∈ Finset.Ioi (0 : Fin (H76.n + 1)),
+      (star (H76.cCoeff χ i) / H76.zetaNormSq i) * H76.zeta i a :=
+    (chiRho_eq_self_of_H_eq_bot H76.hyp71 hHbot χ a ha).symm.trans
+      (OddOrder.Peterfalvi.S09.Hypothesis76.chiRho_explicit_formula H76 χ ha)
+  rw [hbase, ← Finset.add_sum_erase _ _ (Finset.mem_Ioi.mpr hi₁)]
+  congr 1
+  rw [← Finset.sum_filter_add_sum_filter_not ((Finset.Ioi 0).erase i₁)
+      (fun i => (P' : Set ↥L) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel (H76.zeta i))]
+  have hmid0 : ∑ i ∈ ((Finset.Ioi 0).erase i₁).filter (fun i =>
+      ¬ ((P' : Set ↥L) ⊆ OddOrder.Peterfalvi.S03.characterKernel (H76.zeta i))),
+      (star (H76.cCoeff χ i) / H76.zetaNormSq i) * H76.zeta i a = 0 := by
+    refine Finset.sum_eq_zero (fun i hi => ?_)
+    simp only [Finset.mem_filter, Finset.mem_erase] at hi
+    rw [hmiddle i (Finset.mem_Ioi.mp hi.1.2) hi.1.1 hi.2, star_zero, zero_div, zero_mul]
+  have hi₁notin : i₁ ∉ (Finset.Ioi (0 : Fin (H76.n + 1))).filter
+      (fun i => (P' : Set ↥L) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel (H76.zeta i)) := by
+    rw [Finset.mem_filter]
+    exact fun h => hi₁ker h.2
+  rw [hmid0, add_zero, Finset.filter_erase, Finset.erase_eq_self.mpr hi₁notin]
+
+open scoped Classical in
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
 /-- Generic (13.5.a) correction term: the `P'`-kernel tail of the (7.7.a) decomposition. -/
 noncomputable def hypothesis76AlphaFun [Fintype G] [Invertible (Nat.card G : ℂ)]
     (H76 : OddOrder.Peterfalvi.S09.Hypothesis76 G A L) (P' : Subgroup ↥L)
@@ -2377,6 +2421,19 @@ theorem Hypothesis.card_T_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe tpd.U_le).toEquiv, tpd.H_eq, ← hyp.Q_eq_TF,
     hU, hyp.card_V_eq_vd] at h2
   rw [← h1, ← h2]
+
+/-- `|T| = |T'|·p` — the `T`-side mirror of `card_S_eq_deriv_mul_q`
+(`M_complement` of the reconciled type-`P` datum + `|W₂| = p`). -/
+theorem Hypothesis.card_T_eq_deriv_mul_p [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    Nat.card ↥hyp.T = Nat.card ↥(derivedInG hyp.T) * hyp.p := by
+  obtain ⟨tpd, -, hW1, -⟩ := reconciled_typePData_T hG hyp
+  have hle : derivedInG hyp.T ≤ hyp.T := Subgroup.map_subtype_le _
+  have h := tpd.M_complement.card_mul
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe tpd.W1_le).toEquiv,
+    hW1, ← hyp.p_eq_card_W2] at h
+  exact h.symm
 
 open scoped Classical in
 /-- `|K^#| = |K| − 1`, `Finset` form. -/
