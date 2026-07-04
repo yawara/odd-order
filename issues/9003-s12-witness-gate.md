@@ -687,3 +687,18 @@ build 圏外 (BG Ch4 cluster 領域、claim-before-build/coordination 要)。→
 (sigma-theory-typep-galois-foundation) で claim 済。→ **type-P2 は idle-gate でなく別レーン能動作業に
 gated**。claim-before-build ゆえ lane-b は BG §14 を重複 build しない。heartbeat が正: merge-main で
 BG §14 進捗を拾い、σ-foundation 揃い次第 type-P2 close (escaping_typePA_mem_A1 + engine mirror) を engage。
+
+## 🔎 HUB 明確化 (2026-07-04, loop¹⁹³ の待機前提を訂正): σ-foundation は in-main、b は今 engage せよ
+
+hub 検証: b の loop¹⁹³「別レーンが BG §14 σ-theory を能動 build 中ゆえ heartbeat 待機」の前提は**不正確**。
+- b が参照する σ-theory 補題 (`mem_U_sup_Msigma_iff_isPiElement_kappa_compl` / `mem_Msigma_iff_isPiElement_sigma` /
+  `index_U_sup_Msigma_primeFactors_subset_kappa` 等) は**既に main の `BG/Ch4_FamilyOfMaximal/S14_TypePCounting.lean`
+  に存在** (以前の σ-theory build で landing 済)。
+- **現在 BG §14 σ-theory を能動 build しているレーンは無い** (全レーン `main..lane`=0; issue 9000 は lane a 承継だが
+  a は §7 S09 に集中中)。⟹ b が「σ-foundation 揃うのを待つ」= 進行していない build を待つことになる。
+- ⟹ **ユーザー裁定どおり b は今 engage せよ** (heartbeat 待機でなく): 既存 σ-foundation を cite しつつ、type-P2 の
+  K-structure geometry (typePA K-part = A0Set 除外部の新 geometry: V^M / kappa-action / K# signalizer +
+  `escaping_typePA_mem_A1` (8.13.b) + engine mirror) を **shared BG-foundation / S10 carve-out で正面 build**。
+  追加で要る σ-lemma (Cor 14.10 σ-length≤2 等が未 landing なら) も同じく shared BG に additive build (Theorem B 前例)。
+- b の loop¹⁹³ 技術分析 (typePA K-part が escape lemma 射程外 = 新 geometry 要) は**正しい**; 訂正点は「別レーンが
+  それを build 中」の部分のみ (実際は誰も build しておらず b が担当)。
