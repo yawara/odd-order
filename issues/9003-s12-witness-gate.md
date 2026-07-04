@@ -634,3 +634,26 @@ tractable 例外 DpsiH/(12.5) を完済済)**:
 残る全 pin は (a) deep BG§14-15 type-P2/III-IV geometry (other-cluster)、(b) §8-§11 type-analysis gated、
 (c) (7.9)/(11.8) char (lane a) gated、(d) DadeNotation de-scaffold 設計判断。
 → loop cadence を heartbeat (20min) に落とし、user 方向指示 / 他レーン (BG§14-15, 7.9/11.8) unblock を待つ。
+
+## ✅ HUB/ユーザー裁定 (2026-07-04, loop¹⁹² frontier 枯渇への回答): b を BG§14-15 type-P2 geometry へ再配分
+
+lane b の loop¹⁹² 精査「(12.5) 完済で ungated tractable work 枯渇、残 type-P engine P2 は deep BG§14-15
+type-P2 geometry に gated」に対し、**ユーザー裁定 = b は自 engine P2 を gate している BG§14-15 type-P2
+geometry を正面 build する** (heartbeat 待機でなく、深いゲートを foundation 構築で開ける)。
+
+**具体 target** (b の loop¹⁹² 分析より):
+- **`escaping_typePA_mem_A1`** (type-P 8.13.b) — type-P escaping 元が A_1 に属する。
+- **`escaping_typePA_signalizer_structure`** (type-P σ-geometry) — type-P2 の signalizer 構造。
+- これらが `dadeSupportHypotheses_typeP` の **typePA P2** (S10:2509) / **typePA0 P2** (S10:2500, V^M
+  exceptional support) を un-gate する。
+
+**運用**:
+- BG§14-15 の type-P2 geometry lemma は **BG/** (shared foundation) に build 可** (Theorem B(4)(5) 完成の
+  前例と同型: b が BG を extend、ユーザー承認済)。**BG は "完了・共有凍結" だが type-P2 geometry は未形式化ゆえ
+  additive extension は許容** (既存 BG 宣言の statement 改変は要 flag)。原文は BG §14-15 + Gorenstein 行間
+  (coq/theories/BGsection14.v/15.v コメント併読)。
+- type-P2 の反例 (loop¹⁰⁹: M'∖M_σ の U-元は C_{M_σ}=1 で A_1 に落ちない) を踏まえ、type-I の clean analogue
+  でない deep geometry を honest に build (feedback-no-avoiding-hard-parts)。
+- 完成で type-P engine P2 → `dadeSupportHypotheses_typeP` 全 field discharge → §12 Dade tower endgame へ。
+- **(12.15) DadeNotation de-scaffold は今回は保留** (type-P engine P2 を優先; 必要になれば別途裁定)。
+- b は着手前に本裁定 + loop¹⁰⁷ de-risked plan + loop¹⁰⁹ reconciliation を再読。
