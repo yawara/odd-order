@@ -258,6 +258,35 @@ def IsTypeV (M : Subgroup G) : Prop :=
 def IsTypeNonI (M : Subgroup G) : Prop :=
   IsTypeII M ∨ IsTypeIII M ∨ IsTypeIV M ∨ IsTypeV M
 
+/-- **The (8.6) nontrivial core transfers between type-`P` witnesses**: `TypePNontrivialCore` for
+one `TypePData` on `M` gives it for any other.  Its three clauses are witness-independent: the TI
+condition mentions only `M_F = maxNilpotentNormalHall M`; `|W₁|` is the derived index
+(`card_W1_eq_derived_index`); and `|U|` is the index `[M' : M_F]` (`card_U_eq_index`), so `U ≠ ⊥`
+transfers through the cardinality. -/
+theorem TypePNontrivialCore.transfer [Finite G] {M : Subgroup G} {data : TypePData M}
+    (h : TypePNontrivialCore M data) (data' : TypePData M) :
+    TypePNontrivialCore M data' := by
+  obtain ⟨hU, hW1, hTI⟩ := h
+  refine ⟨?_, ?_, hTI⟩
+  · intro hbot
+    have hcard : Nat.card ↥data'.U = Nat.card ↥data.U := by
+      rw [data.card_U_eq_index, data'.card_U_eq_index]
+    rw [hbot, Subgroup.card_bot] at hcard
+    exact hU (Subgroup.card_eq_one.mp hcard.symm)
+  · rw [data'.card_W1_eq_derived_index, ← data.card_W1_eq_derived_index]
+    exact hW1
+
+/-- **Types III and IV carry the (8.6) nontrivial core for every type-`P` witness** (the `hnt`
+input of the §9 `TypesIIIIIIVSetup`): the bundled `TypeIIIData`/`TypeIVData` provides
+`TypePNontrivialCore` for *its own* `typeP`, and `TypePNontrivialCore.transfer` moves it to any
+given `TypePData` on the same `M`. -/
+theorem typePNontrivialCore_of_isTypeIIIorIV [Finite G] {M : Subgroup G}
+    (htype : IsTypeIII M ∨ IsTypeIV M) (data : TypePData M) :
+    TypePNontrivialCore M data := by
+  rcases htype with ⟨⟨d⟩⟩ | ⟨⟨d⟩⟩
+  · exact d.common.transfer data
+  · exact d.common.transfer data
+
 /-- Every non-Type-I maximal subgroup carries type-`P` data: all four of `TypeII`–`TypeV` bundle a
 `TypePData` (the type-`P` structure `M = M' ⋊ W₁`, `M' = M_F ⋊ U`, `W = W₁ × W₂`).  This is the
 entry point that lets the §16 producer extract the structure of `S` and `T` from
