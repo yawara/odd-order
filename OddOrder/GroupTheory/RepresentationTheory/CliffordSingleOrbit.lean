@@ -210,6 +210,22 @@ theorem induce_constituents_disjoint_of_not_conj [Fintype G] [Invertible (Nat.ca
   rw [Finset.mem_filter] at hχ1 hχ2
   exact hnc (exists_conj_of_common_induce_constituent hχ1.2 hχ2.2)
 
+/-- **Every irreducible is a constituent of some induced character** (the `cover` of the
+induced-from-`H'` partition).  For `H ⊴ G` and `φ ∈ Irr G`, there is `ρ ∈ Irr H` with `φ` a
+constituent of `Ind_H^G ρ` (`⟨Ind_H^G ρ, φ⟩ ≠ 0`).  From `exists_liesOver` (`Res_H φ` has a
+constituent `ρ`) and Frobenius (`inner_induce_ne_zero_iff_liesOver`).  With
+`induce_constituents_disjoint_of_not_conj` (`trivIset`), the constituent sets
+`{φ : ⟨Ind_H ρ, φ⟩ ≠ 0}` cover and pairwise-partition `Irr G` — the `trivIset`+`cover` of the
+Peterfalvi (12.5) `DpsiH` regrouping. -/
+theorem exists_induce_inner_ne_zero [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {H : Subgroup G} [hH : H.Normal] [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
+    (φ : IrreducibleCharacter G) :
+    ∃ ρ : IrreducibleCharacter ↥H,
+      ClassFunction.inner (ClassFunction.induce H (ρ : ClassFunction ↥H ℂ))
+        (φ : ClassFunction G ℂ) ≠ 0 := by
+  obtain ⟨ρ, hρ⟩ := IrreducibleCharacter.exists_liesOver (H := H) φ
+  exact ⟨ρ, (IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H φ ρ).mpr hρ⟩
+
 /-- **Clifford's theorem for an invariant constituent** ([Isaacs] Thm 6.5, invariant case).  For a
 normal `H ⊴ G` and `χ ∈ Irr G` lying over `θ ∈ Irr H` with `θ` **`G`-invariant** (`θ^g = θ` for all
 `g`), the restriction is a single multiple of `θ`: `Res^G_H χ = e · θ` with `e = ⟨Res χ, θ⟩`.
