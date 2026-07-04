@@ -920,3 +920,17 @@ per-field char-theory derivation 要:
 **session milestones (strong)**: (12.14) psi_constant_on_xK **sorry-free** (¹⁴⁵⁻¹⁴⁷、Hypothesis M
 unblock 実証)、h_psix cyclotomic 合同 (¹⁵²)。**残 = deep endgame** (multi-session、各 field 深い)。
 rapid churn を避け measured pace で継続 (各 deep field は多 iteration の build)。
+
+### loop¹⁵⁵ — coherent_of_constant_degree 精査: extension(1)=const だが ≠e; h_psix は ρL 経由で entangled
+
+`coherent_of_constant_degree` (S07:551) 構成: extension(χⱼ)=β-τ(χ₀-χⱼ) ⟹ extension(χⱼ)(1)=β(1)
+(**S-member 間で const**、τ 像は χ₀-χⱼ supported ゆえ 1 で消える extension_apply_one_eq_zero_of_supported)。
+但し β(1)=±ζ(1) は e に固定されない ⟹ **ψ(1)=e は構成から出ない**。
+更に Coq h_psix は psi(x*g)=χ(x) (ρL relation rhoL_psi) 経由 ⟹ **h_psix は (12.15) ρ-machinery と entangled**、
+ψ(1)=e standalone でない。my psi_apply_x_sub_e_cyclotomic (¹⁵²) は valid lemma (ψ(1)=e given) だが
+h_psix の実 route は ρL。
+
+**(12.16) 最終確定**: deep entangled final Dade contradiction — h_psix/h_psig_int は ρM/ρL machinery
+(M の adjointAverageFun + norm 下界 + cyclotomic) で結合、hA-C は §7。**sustained focused work 要**
+(rapid /loop でなく dedicated session 向き)。**session milestones (strong)**: (12.14) sorry-free +
+reusable toolkit + h_psix cyclotomic。残 = ρM machinery build (multi-session)。measured pace 継続。
