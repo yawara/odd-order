@@ -1484,3 +1484,22 @@ obligation が正しい (c が build = a/b の §7/§8 侵食)。同様に eta_g
 (b が S15.Hypothesis grid field 追加 + a が FeitThompson threading)、U/V cyclic・Q elemAb・T_typeII = b §13、
 v-value = 9000 Galois。**c の §16 W-side assembly は完了; 前進には b (§13/§8/S15 grid) / a (§7 norm/threading)
 / 9000 の上流供給が先決** (待ちでなく、cited obligation は既に精密に pin 済 = signature-contract 成立)。
+
+### cont.⁵³ (2026-07-04 lane c=γ /loop 継続): 🎯 normSq (7.8.b) を genuine discharge — 「all gated」結論を一部訂正
+
+**cont.⁵² の「残 leaves 全て cross-lane gated」は誤りを含んだ** (anti-stall で phantom gate を検証すべき教訓、
+[[verify-port-state-by-number-not-coq-name]] を両方向で)。`exists_MHypothesis` の `normSq` (7.8.b coherence-norm
+下界 `1−e/h ≤ ‖ζ_0^{νρ}‖²`) を **§7/§9 producer 経由で実証明化** (commit `ff84547b`、sorry 移動でない real close):
+- 鍵: §9 producer `S09.Cert.zetaNuRhoNormSqGeOfDade` は**既 proven**、`witness_L_zeta_bound` (S14, L-side
+  (12.16) witness) が 4 入力の供給パターンを示す。**c は M-side dual を §16 application として build** (shared
+  §9 producer を cite = territory 侵食でない)。
+- 4 入力全て M-side で利用可能: hzeta0nu=`S14.witness_L_hzeta0nu` (generic)、hζ0norm=Frobenius (既 witness)、
+  a/ha=`exists_betaDecomp_a`、hsmall=`frobenius_two_mul_card_complement_add_one_le_card_kernel` (M は
+  N_G(V) 上 type-I Frobenius, complement pq/kernel k)。`exists_M_hypothesis78` に witness 追加 → obtain
+  thread → normSq cite。`hnu_isometry`/`hagree` を top-level have に抽出 (construction と共有)。
+- S16 real sorry 11→10。full build 3916 green、AxiomsCheck OK、新 axiom なし。
+
+**教訓 + 次手**: 「gated」分類は producer が既 proven なら過度に保守的。次 iteration で残 leaves を同様精査 —
+特に dichotomy `orthogonality_switch_pairing_bounds` の (7.8.b) β-norm 部が §7/§9 producer で build 可能か
+(normSq と同じ発見の可能性)。残 η-grid (betaGrid/signs/eta_generic_data/caseB_contradiction_data) は honest
+η-grid carrier (issue 3002) 要で真 gated、U/V cyclic/T_typeII は b §13、v-value は 9000。

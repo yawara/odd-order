@@ -3563,17 +3563,18 @@ key step of (11.8.6): with `μ_j^{τ₂} = ∑_i ω_{ij}^σ` (via (4.9)/(5.8)) i
 coherent, contradicting (11.3). -/
 theorem Hypothesis.tau_muColumnSum_sub_zeta_eq_of_alphaImage [Finite G] {M : Subgroup G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
     (j : Fin hyp.w2) {ζ : ClassFunction ↥M ℂ} {d n : ℕ} (hd : (d : ℂ) = (hyp.w1 : ℂ) * (n : ℂ) + 1)
     (halpha : ∀ i : Fin hyp.w1,
       hyp.tau (hyp.muGrid hG hodd i j - hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
         = hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0
-          - (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ)
+          - (n : ℂ) • coh.extension ζ)
     (h114 : hyp.tau ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - ζ)
         = (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i 0)
-          - (hyp.SHC_isCoherent hG).extension ζ) :
+          - coh.extension ζ) :
     hyp.tau ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j) - (d : ℂ) • ζ)
       = (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i j)
-        - (d : ℂ) • (hyp.SHC_isCoherent hG).extension ζ := by
+        - (d : ℂ) • coh.extension ζ := by
   have hMlevel : ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j) - (d : ℂ) • ζ)
       = ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - ζ)
         + ∑ i : Fin hyp.w1, (hyp.muGrid hG hodd i j - hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ) := by
@@ -3586,13 +3587,91 @@ theorem Hypothesis.tau_muColumnSum_sub_zeta_eq_of_alphaImage [Finite G] {M : Sub
   rw [hMlevel, map_add, h114, map_sum, Finset.sum_congr rfl (fun i _ => halpha i)]
   have hsum : (∑ i : Fin hyp.w1, (hyp.alignedOmegaSigmaGrid hG hodd i j
         - hyp.alignedOmegaSigmaGrid hG hodd i 0
-        - (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ))
+        - (n : ℂ) • coh.extension ζ))
       = (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i j)
         - (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i 0)
-        - ((hyp.w1 : ℂ) * (n : ℂ)) • (hyp.SHC_isCoherent hG).extension ζ := by
+        - ((hyp.w1 : ℂ) * (n : ℂ)) • coh.extension ζ := by
     rw [Finset.sum_sub_distrib, Finset.sum_sub_distrib, ← Finset.smul_sum, Finset.sum_const,
       Finset.card_univ, Fintype.card_fin, ← Nat.cast_smul_eq_nsmul (R := ℂ), smul_smul, mul_comm]
   rw [hsum, hd]; module
+
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (11.8.5)+(11.8.6 opening), the assembled column identity**
+`(μ_j − dζ)^τ = ∑_i ω_{ij}^σ − dζ^{τ₁}` (`0 < j`, `δ = 1`).  Assembles the (11.8.5) `a = 0` residual
+coefficient into the full column Dade image: for every row `i ≠ 0`, `residualCoeff_eq_zero` gives
+`(α_{ij}^τ, ζ^{τ₁}) = −n`, whence `SHC_tau_muGridAlpha_eq` gives the image
+`α_{ij}^τ = ω_{ij}^σ − ω_{i0}^σ − nζ^{τ₁}`; the `i = 0` image follows from any `i ≠ 0` one via the
+four-corner (4.10) identity `tau_muGrid_fourCorner` (the `nζ` cancels in `α_{ij} − α_{0j}`, and
+`μ_{0j} − μ_{00} − nζ = (α_{ij}) − (μ_{ij} − μ_{0j} − μ_{i0} + μ_{00})`).  With `δ = 1`
+(`d = w₁·n + 1`) the (11.8.6) opening `tau_muColumnSum_sub_zeta_eq_of_alphaImage` then linearly
+assembles the column sum.  The `S(HC)`-coherent extension `coh` and its orthonormal image data `R`
+(`= coh.extension '' S(HC)`, `|R| = n`) are the (11.8.1)/(5.7) inputs; `h114` is the (11.8.4)
+normalization; `δ = 1`, `n`, and the `R` cardinality `|S(HC)| = n` are the §9 (11.8.1) counts. -/
+theorem Hypothesis.tau_muColumnSum_sub_dzeta_eq_of_residualData [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
+    (hconj : ∀ {χ : ClassFunction ↥M ℂ}, χ ∈ inducedFamily M → IsIrreducibleCharacter χ →
+      χ 1 = (hyp.w1 : ℂ) → (coh.extension χ).conj = coh.extension χ.conj)
+    (hodd : Odd (Nat.card G)) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) {d n : ℕ} (hw2 : (hyp.w2).Prime)
+    (hd : (d : ℂ) = (hyp.w1 : ℂ) * (n : ℂ) + 1)
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - 1)
+    (hdegall : ∀ i : Fin hyp.w1, hyp.muGrid hG hodd i j 1 = (d : ℂ))
+    (hμ0all : ∀ i : Fin hyp.w1, hyp.muGrid hG hodd i 0 1 = 1)
+    (hδj : hyp.muColumnSign hG hodd j = 1) (hn2 : 2 ≤ n)
+    {R : Finset (ClassFunction G ℂ)} (hRn : R.card = n) (hZ : ∀ β ∈ R, β ∈ ZIrr G)
+    (horth : ∀ α ∈ R, ∀ β ∈ R, ClassFunction.inner α β = if α = β then (1 : ℂ) else 0)
+    (hRmem : ∀ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M → IsIrreducibleCharacter φ →
+      φ 1 = (hyp.w1 : ℂ) → coh.extension φ ∈ R)
+    (hRrev : ∀ β ∈ R, ∃ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+      φ 1 = (hyp.w1 : ℂ) ∧ β = coh.extension φ)
+    (h114 : hyp.tau ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - ζ)
+        = (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0) - coh.extension ζ) :
+    hyp.tau ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j) - (d : ℂ) • ζ)
+      = (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i j)
+        - (d : ℂ) • coh.extension ζ := by
+  have hw1 : 1 < hyp.w1 := (Subgroup.one_lt_card_iff_ne_bot _).mpr hyp.typeP.W1_nontrivial
+  have hdℕ : d = hyp.w1 * n + 1 := by exact_mod_cast hd
+  have hw1le : hyp.w1 ≤ hyp.w1 * n := Nat.le_mul_of_pos_right _ (by omega)
+  have hdgt : hyp.w1 < d := by omega
+  have hζne : ζ.conj ≠ ζ := hyp.inducedFamily_degree_w1_conj_ne hG hζirr hζ1
+  have hdζall : ∀ i : Fin hyp.w1, hyp.muGrid hG hodd i j 1 ≠ ζ 1 := fun i => by
+    rw [hdegall i, hζ1]; exact_mod_cast (by omega : d ≠ hyp.w1)
+  have h0ζall : ∀ i : Fin hyp.w1, hyp.muGrid hG hodd i 0 1 ≠ ζ 1 := fun i => by
+    rw [hμ0all i, hζ1]; exact_mod_cast (by omega : (1 : ℕ) ≠ hyp.w1)
+  -- the row-`i` Dade image `α_{ij}^τ = ω_{ij}^σ − ω_{i0}^σ − nζ^{τ₁}` for `i ≠ 0`
+  have halpha_ne : ∀ i : Fin hyp.w1, i ≠ 0 →
+      hyp.tau (hyp.muGrid hG hodd i j - hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+        = hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0
+          - (n : ℂ) • coh.extension ζ := by
+    intro i hi0
+    have hα0 := hyp.residualCoeff_eq_zero hG coh hconj hodd i hj0 hi0 hζS hζirr hζ1 hw2
+      (hdegall i) (hμ0all i) hnf hδj (hdζall i) (h0ζall i) (Or.inl rfl) hn2 hRn hZ horth hRmem hRrev
+      h114
+    have himg := hyp.SHC_tau_muGridAlpha_eq hG coh hodd i hj0 hζS hζirr hζ1 hζne (hdegall i)
+      (hμ0all i) hnf hδj (hdζall i) (h0ζall i) (Or.inl rfl) hα0
+    simpa only [Int.cast_one, one_smul] using himg
+  -- the row-`0` image via the four-corner identity from row `i₁ = 1 ≠ 0`
+  have halpha : ∀ i : Fin hyp.w1,
+      hyp.tau (hyp.muGrid hG hodd i j - hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+        = hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0
+          - (n : ℂ) • coh.extension ζ := by
+    intro i
+    by_cases hi0 : i = 0
+    · subst hi0
+      set i₁ : Fin hyp.w1 := ⟨1, by omega⟩ with hi1def
+      have hi1 : i₁ ≠ 0 := by rw [hi1def]; simp [Fin.ext_iff]
+      have h410 := hyp.tau_muGrid_fourCorner hG hodd i₁ j
+      rw [hδj] at h410
+      simp only [Int.cast_one, one_smul] at h410
+      have key : hyp.muGrid hG hodd 0 j - hyp.muGrid hG hodd 0 0 - (n : ℂ) • ζ
+          = (hyp.muGrid hG hodd i₁ j - hyp.muGrid hG hodd i₁ 0 - (n : ℂ) • ζ)
+            - (hyp.muGrid hG hodd i₁ j - hyp.muGrid hG hodd 0 j - hyp.muGrid hG hodd i₁ 0
+                + hyp.muGrid hG hodd 0 0) := by module
+      rw [key, map_sub, halpha_ne i₁ hi1, h410]; module
+    · exact halpha_ne i hi0
+  exact hyp.tau_muColumnSum_sub_zeta_eq_of_alphaImage hG hodd coh j hd halpha h114
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8), the genuine non-orthogonality** (lane-b W3 obligation, issue 2020).

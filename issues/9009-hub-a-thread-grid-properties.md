@@ -44,7 +44,37 @@ b の §15 char cascade ((13.3)-(13.19): `character_degree_analysis`/`lambda_for
 `S15.Hypothesis` が grid 直交性/isometry を field で carry し、b の §15 norm cascade wrapper が engine から
 sorry-free に証明可能になる (issue 3002 の完了条件と同一)。本 issue は routing 用ゆえ 3002 解決で close。
 
+## 🧾 HUB 裁定 (2026-07-04, merge monitor)
+
+**判定: 選択肢 1 系 — ただし carve-out 不要。各レーンが自所有ファイルを additive に編集する split で解決。**
+
+3002 の carrier constructibility は GENUINE と確認済 (spine `Section16CharacterData.omegaS` ←
+honest `S05.TICyclicHypothesis`、性質は `S05_TICyclic.lean:733/740` ω-orthonormal + `S07` τ-isometry
+から導出可能 = hoist でない)。よって threading は「新規数学ゼロの mechanical additive」で確定。
+2026-07-04 再々編で **S15 は c→b 移管**ゆえ 3002 の旧 owner 表 (2026-07-02: S15.Hypothesis=c) は stale
+→ **S15.Hypothesis 側 = b (自所有 `S15_SAndT_Setup`)**、**FeitThompson threading = a (自所有)** に更新。
+この split では **どちらも自ファイルのみ編集 → carve-out (他レーン所有への一時編集権) は不要**。選択肢 2
+(b に FT 編集権) は採らない。
+
+**分担 (確定)**:
+- **b (自ファイル `S15_SAndT_Setup`、即着手可)**: (i) `S15.Hypothesis` に grid 性質 field を追加
+  (`eta_orthonormal`/`eta_intCast_on_G0`/`eta_conj_neg` — 3002 signature 案 + consumer parity/Parseval
+  engine の入力に整形)。(ii) norm-cascade wrapper を engine に wire。**supply が a 未着地の間は sorried
+  contract field で pin → build-green を維持** (先に signature を確定させて a に渡す)。(iii) 並行で
+  consumer-side `GridProperties` de-opacify (a threading 後も wiring 再利用)。
+- **a (自ファイル `FeitThompson.lean`)**: `Section16Inputs` に同 field 追加 + `sectionSixteenHypothesis_of_inputs`
+  / `section16Inputs_of_isMinimalSimpleOdd` で ω-orthonormality (`S05_TICyclic.lean:733/740`) + τ-isometry
+  (`S07`) から supply。**mechanical additive な短タスク**ゆえ 11.8 (unique bare feitThompson sorry) から
+  外れず slot-in (b が sorried supply で build-green ゆえ hard-block でない → 緊急転進は不要、近い iteration で
+  着手すればよい)。timing は a 裁量。
+
+**sequencing**: b が field signature を先に pin (sorried) → a が supply を threading → b が wrapper を
+sorry-free に flip。b・a とも独立に build-green (sorried contract 経由) ゆえ並行開始可。
+
+**この裁定は user 相談不要と判断**: 再々編で確立した lane charter (S15=b, FeitThompson=a) の執行であり、
+spec 違反でも大規模 cross-lane scope 変更でもない。各自の所有ファイル内 additive threading。3002 解決で本 issue close。
+
 ## 参照
-- issue 3002 (grid-property-carrier-enrichment) — a-side spec + b 訂正節 (2026-07-04)
+- issue 3002 (grid-property-carrier-enrichment) — a-side spec + b 訂正節 (2026-07-04) + fix-owner を 2026-07-04 再々編に更新
 - `notes/peterfalvi/s15_s_and_t.md` 2026-07-04 lane b LIVE STATUS
 - (13.10) `analytic_inequality` は b が de-opacify 済 (commit f17fdbcd) — 実 `u/c` bound は theorem 化
