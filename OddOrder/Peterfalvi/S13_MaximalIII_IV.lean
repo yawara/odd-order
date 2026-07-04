@@ -428,6 +428,56 @@ theorem commutator_HC_mem_H0C [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
       (Subgroup.inv_mem _ hc₁)) (Subgroup.inv_mem _ hc₂)
   exact Subgroup.mul_mem _ (Subgroup.mem_sup_left hHpart) (Subgroup.mem_sup_right hCpart)
 
+/-- A proper subgroup of `M'` has proper double trace — the `hA'ne` input at `A' = H₁`. -/
+theorem trace_ne_top_of_lt_derived {M : Subgroup G} {H1 : Subgroup G}
+    (h : H1 < derivedInG M) :
+    ((H1.subgroupOf M).subgroupOf ((derivedInG M).subgroupOf M)) ≠ ⊤ := by
+  intro htop
+  obtain ⟨x, hxM', hxH1⟩ := SetLike.exists_of_lt h
+  have hxM : x ∈ M := Subgroup.map_subtype_le _ hxM'
+  have hmem : (⟨⟨x, hxM⟩, Subgroup.mem_subgroupOf.mpr hxM'⟩ :
+      ↥((derivedInG M).subgroupOf M)) ∈
+      (H1.subgroupOf M).subgroupOf ((derivedInG M).subgroupOf M) := by
+    rw [htop]; trivial
+  exact hxH1 (Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp hmem))
+
+/-- **`HC/H₀C` is abelian**, in quotient form (`commutator_HC_mem_H0C` descended). -/
+theorem HC_quotient_H0C_comm [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    [((hyp.H0C.subgroupOf M).subgroupOf (hyp.HC.subgroupOf M)).Normal]
+    (a b : ↥(hyp.HC.subgroupOf M) ⧸
+      (hyp.H0C.subgroupOf M).subgroupOf (hyp.HC.subgroupOf M)) :
+    a * b = b * a := by
+  induction a using QuotientGroup.induction_on with | _ x => ?_
+  induction b using QuotientGroup.induction_on with | _ y => ?_
+  rw [← QuotientGroup.mk_mul, ← QuotientGroup.mk_mul, QuotientGroup.eq]
+  -- `(x·y)⁻¹·(y·x) = ⁅y⁻¹, x⁻¹⁆` lies in `H₀C` by the ambient commutator bound.
+  have hxHC : ((x : ↥M) : G) ∈ hyp.HC := Subgroup.mem_subgroupOf.mp x.2
+  have hyHC : ((y : ↥M) : G) ∈ hyp.HC := Subgroup.mem_subgroupOf.mp y.2
+  have hkey := hyp.commutator_HC_mem_H0C
+    (Subgroup.inv_mem _ hyHC) (Subgroup.inv_mem _ hxHC)
+  simp only [inv_inv] at hkey
+  refine Subgroup.mem_subgroupOf.mpr (Subgroup.mem_subgroupOf.mpr ?_)
+  have hcoe : ((((x * y)⁻¹ * (y * x) : ↥(hyp.HC.subgroupOf M)) : ↥M) : G)
+      = ((y : ↥M) : G)⁻¹ * ((x : ↥M) : G)⁻¹ * ((y : ↥M) : G) * ((x : ↥M) : G) := by
+    push_cast
+    group
+  rw [hcoe]
+  exact hkey
+
+/-- **(11.4)/(6.2) centrality input at `(C, D) = (HC, HC)`**: the trivial section
+`D/B = HC/H₀C` is central in `C/B = HC/H₀C` — i.e. the quotient is abelian
+(`HC_quotient_H0C_comm`). -/
+theorem HC_central_condition [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    [((hyp.H0C.subgroupOf M).subgroupOf (hyp.HC.subgroupOf M)).Normal] :
+    ((hyp.HC.subgroupOf M).subgroupOf (hyp.HC.subgroupOf M)).map
+      (QuotientGroup.mk' ((hyp.H0C.subgroupOf M).subgroupOf (hyp.HC.subgroupOf M))) ≤
+    Subgroup.center (↥(hyp.HC.subgroupOf M) ⧸
+      (hyp.H0C.subgroupOf M).subgroupOf (hyp.HC.subgroupOf M)) := by
+  intro q _
+  rw [Subgroup.mem_center_iff]
+  intro r
+  exact hyp.HC_quotient_H0C_comm r q
+
 end Hypothesis
 
 /-! ## (11.3)--(11.5): commutator-chain consequences -/
