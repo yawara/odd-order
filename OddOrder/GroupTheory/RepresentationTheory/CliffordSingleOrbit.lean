@@ -185,6 +185,31 @@ theorem exists_conj_of_common_induce_constituent
     ((IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H χ θ₁).mp h₁)
     ((IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H χ θ₂).mp h₂)
 
+open scoped Classical in
+/-- **Induced characters from non-conjugate constituents have disjoint constituent sets.**  For a
+normal `H ⊴ G` and non-`G`-conjugate `θ₁, θ₂ ∈ Irr H`, the sets of irreducible constituents of
+`Ind_H^G θ₁` and `Ind_H^G θ₂` are disjoint.  Contrapositive of
+`exists_conj_of_common_induce_constituent` (a common constituent forces conjugacy), packaged as a
+`Finset` disjointness — the `trivIset` core of the induced-from-`H'` partition of `Irr H` for the
+Peterfalvi (12.5) `DpsiH` regrouping (`Finset.sum_biUnion`). -/
+theorem induce_constituents_disjoint_of_not_conj [Fintype G] [Invertible (Nat.card G : ℂ)]
+    [Fintype (IrreducibleCharacter G)]
+    {H : Subgroup G} [hH : H.Normal] [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
+    {θ₁ θ₂ : IrreducibleCharacter ↥H}
+    (hnc : ¬ ∃ g : G, IrreducibleCharacter.conjBy g θ₁ = θ₂) :
+    Disjoint
+      (Finset.univ.filter fun χ : IrreducibleCharacter G =>
+        ClassFunction.inner (ClassFunction.induce H (θ₁ : ClassFunction ↥H ℂ))
+          (χ : ClassFunction G ℂ) ≠ 0)
+      (Finset.univ.filter fun χ : IrreducibleCharacter G =>
+        ClassFunction.inner (ClassFunction.induce H (θ₂ : ClassFunction ↥H ℂ))
+          (χ : ClassFunction G ℂ) ≠ 0) := by
+  classical
+  rw [Finset.disjoint_left]
+  intro χ hχ1 hχ2
+  rw [Finset.mem_filter] at hχ1 hχ2
+  exact hnc (exists_conj_of_common_induce_constituent hχ1.2 hχ2.2)
+
 /-- **Clifford's theorem for an invariant constituent** ([Isaacs] Thm 6.5, invariant case).  For a
 normal `H ⊴ G` and `χ ∈ Irr G` lying over `θ ∈ Irr H` with `θ` **`G`-invariant** (`θ^g = θ` for all
 `g`), the restriction is a single multiple of `θ`: `Res^G_H χ = e · θ` with `e = ⟨Res χ, θ⟩`.
