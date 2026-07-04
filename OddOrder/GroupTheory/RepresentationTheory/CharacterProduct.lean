@@ -55,6 +55,33 @@ degenerate case of the extension classification (`β = 1` forces `χ₂ = χ₁`
     restrict H (φ * ψ) = restrict H φ * restrict H ψ := by
   ext h; simp
 
+/-- **The projection (Frobenius–Nakayama) formula.**  For `H ≤ G`, a class function `φ` on `G` and
+a class function `χ` on `H`, `Ind_H^G (Res_H φ · χ) = φ · Ind_H^G χ`.  Each induction term
+`induceTerm H (Res_H φ · χ) x g` factors as `φ(g) · induceTerm H χ x g`: `φ` is constant on the
+conjugacy class of `g` (`conj_eq`), so `φ(x⁻¹gx) = φ(g)` pulls out of the sum.
+
+Key identity behind Peterfalvi (1.7.b): with `χ = Res_H ψ` (`ψ ∈ Irr T` over `θ`), `H ⊴ T`,
+`T/H` abelian, `Ind_H^T(Res_H ψ) = ψ · Ind_H^T 1_H = ∑_{λ ∈ Irr(T/H)} λψ` — the equal-degree
+induced-constituent decomposition for an abelian inertia quotient, needed at the `H'/H` level of
+Peterfalvi (12.5) where `T/H` abelian is automatic (`H' = [H,H]`). -/
+theorem induce_restrict_mul [Fintype G] {H : Subgroup G} [Invertible (Nat.card H : k)]
+    (φ : ClassFunction G k) (χ : ClassFunction ↥H k) :
+    induce H (restrict H φ * χ) = φ * induce H χ := by
+  classical
+  ext g
+  have hterm : ∀ x : G, induceTerm H (restrict H φ * χ) x g = φ g * induceTerm H χ x g := by
+    intro x
+    by_cases hx : x⁻¹ * g * x ∈ H
+    · rw [induceTerm_of_mem _ hx, induceTerm_of_mem _ hx, mul_apply, restrict_apply]
+      have h : φ ((⟨x⁻¹ * g * x, hx⟩ : ↥H) : G) = φ g := by
+        have h2 := φ.conj_eq g x⁻¹
+        rwa [inv_inv] at h2
+      rw [h]
+    · rw [induceTerm_of_not_mem _ hx, induceTerm_of_not_mem _ hx, mul_zero]
+  rw [mul_apply, induce_apply, induce_apply, Finset.sum_congr rfl (fun x _ => hterm x),
+    ← Finset.mul_sum]
+  ring
+
 /-- Pullback along a group homomorphism is multiplicative for the pointwise product. -/
 @[simp] theorem compHom_mul {K : Type*} [Group K] (f : K →* G) (φ ψ : ClassFunction G k) :
     compHom f (φ * ψ) = compHom f φ * compHom f ψ := by
