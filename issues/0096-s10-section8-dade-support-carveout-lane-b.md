@@ -1035,3 +1035,23 @@ InducedInvariantConstituent.lean:
   + `extends_on_supported` + `Sset_diff_vanishes_off_H_sharp` (全 landed、要 wiring)。
 - **statement 修正**: `rho_constant_on_H_minus_Hprime` を ρψ=`hyp.toHypothesis71.chiRhoCF psi` に restate
   (現 plain-ψ 誤、consumer 無)。
+
+### loop¹⁷¹⁻¹⁷⁵ — (12.5) o_rpsi_S Fact-A **完成** (残り = DpsiH assembly のみ)
+
+**milestone**: (12.5) の 2 大前提が完済:
+1. **一般 (1.7.b)** equal-degree (完全版、full-group lift) — 別 milestone。
+2. **o_rpsi_S Fact-A** `chiRhoCF_inner_eq_of_equal_degree` — ⟨χ₁, ρψ⟩=⟨χ₂, ρψ⟩ (等次数 S-member)。
+   bridge chain 全 landed:
+   - `Sset_diff_support_subset_ambientA` (χ₁−χ₂ ⊆ A(L)、SupportedClassFunctions 化)
+   - `chiRho_adjoint` 相互律 (⟨χ₁−χ₂, ρψ⟩ = ⟨H71.τ(χ₁−χ₂), ψ⟩)
+   - `toHypothesis71_tau_apply` (τ-bridging: H71.τ = hyp.tau on supported、via IsDadeMap.unique)
+   - `extends_on_supported` (hyp.tau = coh.extension) + `map_sub`
+   - orthogonality hyps (from `inner_psi_coherent_extension_eq_zero`, ψ⊥R(χ))
+
+**(12.5) 残り = DpsiH assembly のみ** (`rho_constant_on_H_minus_Hprime`):
+`Res_H(ρψ) = ∑_λ a_λ Ind_{H'}^H λ + a·1_H`、H−H' で定数。要:
+- partition P (Ind_{H'}^H λ constituents、CliffordSingleOrbit `exists_conj_of_common_induce_constituent` trivIset/cover)
+- degree-determined coefficient (Fact-A + Frobenius `⟨Res_H ρψ, θ⟩=⟨ρψ, Ind_H^L θ⟩`)
+- block 内 equal-degree (完成 1.7.b、H'/H instantiation)
+- step-6 bricks (`sum_smul_induce_apply_eq_zero_of_not_mem_normal`、Ind_{H'} vanish off H')
+- statement を ρψ=`toHypothesis71.chiRhoCF ψ` に restate (現 plain-ψ 誤、consumer 無)。
