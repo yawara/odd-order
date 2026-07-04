@@ -857,3 +857,11 @@ inner_self_eq_one (CharacterProduct:195), IsIrreducibleCharacter.conj (BrauerPer
 not_isReal_of_ne_trivial_of_odd_card' (BrauerPerm:233), conj_induce (CliffordDecomp:363),
 coherence_hagree_dadeMap (S09_CertDischarge:2559), zeta_mem_sourceSet (1580), one_notMem_dadeSupport
 (S04:397), Subgroup.card_subgroup_dvd_card, hypothesis78OfDade zetaDistinct:=0 (S09_CertDischarge:1641)。
+
+**cont.³⁰ 修正 (Unit B1 signature)**: `Hypothesis76` は zeta injectivity を carry せぬ →
+hab の ζ≠ζ.conj は `j₁≠zetaDistinct` から導けない。よって `hj₁ne_dist` を捨て、直接
+`(hζ₁neconj : H79.first.hyp76.zeta H79.first.zetaDistinct ≠ (H79.first.hyp76.zeta
+H79.first.zetaDistinct).conj)` を仮説化 (Frobenius 側 Unit B2 で not_isReal_of_ne_trivial_of_odd_card'
+により discharge)。⟨ζ,ζ.conj⟩=0 は ζ,ζ.conj を `IrreducibleCharacter` に bundle (⟨ζ,hz₁irr⟩) して
+`irreducibleCharacter_inner` (=if χ=ψ then 1 else 0) + hζ₁neconj (bundle 等号は ClassFunction 等号に
+帰着) で。次 turn 冒頭で IrreducibleCharacter の bundling/coe API を 1 回 grep してから純構築。
