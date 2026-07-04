@@ -198,3 +198,36 @@ FeitThompson.lean 実 sorry 0、唯一の bare spine sorry = Pf 11.8)
 - import closure = 285 module、on-path sorry = 92/115 (off-path appendix 23 は凍結)、honest 経路 = ~27 宣言。
 - **binding constraint = γ (POLE-2 §14–16 char cascade)**。次点 = α の bare spine sorry (11.8/11.9.b)。両者は §11 Dade-norm 依存を共有。
 - 詳細は評価 workflow 結果 (run `wf_388a95a3-568`) と `ft_frontier_remap_2026_06_25.md`。
+
+---
+
+## 3 レーン再々編 (2026-07-04, ユーザー委任「ちゃんと考えて決めて」) — on-path 集中 + off-path 退役
+
+**契機**: 9008 で type-P2 gate が phantom (mmd OCR) と判明し lane-b frontier が枯渇。ユーザーが 3 レーン
+役割のゼロベース再考を委任。2 並列 Explore 監査 + spine 検証で FT の真の構造が判明:
+
+**判明した FT 構造** (根拠 = FeitThompson.lean:3611 / AxiomsCheck.lean:6672 / 2 Explore 報告):
+1. **`feitThompson` の unique bare sorry = `S12.exists_zeta_residual_not_orthogonal` (Pf 11.8.1–11.8.6)**。
+   全 prereq (coherence (5.6)/(5.7)/(6.8), Wielandt (9.1)/(9.6), 構造 (11.6)/(11.7)) proven。lane-a 所有。
+   ただし section16 char grid は現状 scaffold (vestigial ∅ S/T-side) — 真の §16 非存在は下記 W-side cascade。
+2. **§15-16 の 31 sorry 中 ~19 が OFF-PATH vestigial**: S-side cascade (13.5–13.10, 9 本, 2026-07-02 hub
+   ruling で W-side `eta=τ₃∘ω` に routing) + T-side carrier `reconciled_typePData_T` (8 field, off-spine)。
+   **c はこの off-path T-side carrier を building していた (12/20→13/20) = 要修正**。
+3. **on-path endgame = §16 W-side cascade ~12-14 本**: (13.9)-(13.19) parity/構造 + (14.x) norm cascade。
+   最深 terminal = `eta_generic_data`(§3/§4 Dade)・`betaGrid`(13.1.d)・`h78_zetaNuRho`(7.8.b = a の §7 norm)。
+4. **a の 16 その他 sorry は off-path** (card_G0 (7.10) / §8 local / §13 downstream typeIII)。
+
+**再配分 (file 所有 + focus)**:
+
+| lane | focus (最高優先) | 所有 file 変更 | 退役 (触らない off-path) |
+|---|---|---|---|
+| **a** | **S12 `exists_zeta_residual_not_orthogonal` (11.8) = unique bare feitThompson sorry** + on-path §7 norm (7.8.b `h78_zetaNuRho` が §16 terminal に feed) | S03-S13 所有維持 (focus は S12 11.8) | card_G0 (7.10) / §8 local (S10) / §13 downstream typeIII / §12 type-specific |
+| **b** | **§16 endgame char cascade を担当: `S15_SAndT_Setup` + `S15_SAndT` の ON-PATH (13.9)-(13.19)** (parity/構造/norm、b の §12 Dade+char 強みが直結) | **S15_SAndT_Setup + S15_SAndT を c→b** (S14 は finished、cite-only 保持) | S-side cascade (13.5-13.10) / T-side carrier `reconciled_typePData_T` |
+| **c** | **`S16_NonExistenceG` の非存在: W-side (14.x) norm cascade + parity contradiction** (最終矛盾)、b の S15 + a の (11.8)/§7 を signature-contract で cite | S16_NonExistenceG に集約 (S15 は b へ移管、c は import cite) | T-side carrier building 停止 (off-path 確定) |
+
+**signature-contract pipeline** (依存方向確認済: S16 imports S15 imports S15_Setup):
+`a: S12 (11.8) + §7 norm` → `b: S15 char cascade (13.9-13.19)` → `c: S16 非存在 (14.x)`。各下流は上流 sorried
+signature を cite (待たない)。
+
+**原則 (不変)**: off-path/vestigial は**証明しない** (S-side cascade・T-side carrier・a の §10-13 local)。
+各レーンは on-path の最深 body を正面から (feedback-no-avoiding-hard-parts)。doneness は carrier 構成可能性で判定。

@@ -27,9 +27,9 @@
 
 | lane | branch | worktree | クラスタ | 主所有 .lean | issue base |
 |---|---|---|---|---|---|
-| **a** | `a` | `odd-order-a` | α Pf §10–13 中央指標核 (bare spine sorry 11.8) + σ-theory tail | `Peterfalvi/S(0[3-9]|1[0-3])*` + `FeitThompson.lean` (全体) | 1000 |
-| **b** | `b` | `odd-order-b` | β Pf §12 Dade tower (12.16) + coherence infra | `Peterfalvi/S14_MaximalI.lean` + coherence file 群 + carve-out 0090/0096 | 2000 |
-| **c** | `c` | `odd-order-c` | γ POLE-2 §15–16 chain 一本化 + 構成的 Clifford (issue 9002) | `Peterfalvi/{S15_SAndT_Setup, S15_SAndT, S16_NonExistenceG}.lean` | 3000 |
+| **a** | `a` | `odd-order-a` | α **S12 (11.8) unique feitThompson sorry** + §7 on-path norm (2026-07-04 再々編) | `Peterfalvi/S(0[3-9]|1[0-3])*` + `FeitThompson.lean` (全体) | 1000 |
+| **b** | `b` | `odd-order-b` | β **§16 endgame char cascade = S15 (13.9)-(13.19)** (2026-07-04 再々編; §12 Dade は完遂・cite-only) | `Peterfalvi/{S15_SAndT_Setup, S15_SAndT}.lean` (c→b, 2026-07-04) + `S14_MaximalI.lean` + coherence file 群 + carve-out 0090/0096 | 2000 |
+| **c** | `c` | `odd-order-c` | γ **S16 非存在 = W-side (14.x) norm cascade + parity 矛盾** (2026-07-04 再々編; off-path T-side carrier 退役) | `Peterfalvi/S16_NonExistenceG.lean` (S15 は b へ移管、c は import cite) + 構成的 Clifford (issue 9002) | 3000 |
 
 例外・共有・凍結の正確な判定は下の 🔒 所有マップが正。**lane d は 2026-07-02 退役** (branch `d` は
 温存・全 merge 済で `main..d` は常に 0; 旧 4 レーン表は git 履歴参照)。
@@ -72,7 +72,8 @@
 > |---|---|---|
 > | **a** | α Pf §10–13 中央指標核 + σ-theory tail | `OddOrder/Peterfalvi/S(0[3-9]|1[0-3])*` + `OddOrder/FeitThompson.lean`（`card_kappaHall_lt_of_isTypeIIIorIV` (行番号は drift するため decl 名で参照) + 旧 d carrier 宣言群 = 全体、d 退役で fold）+ **S10 bgTheoremE carrier**（旧 carve-out 0086 解消）+ σ-theory tail (S11 imprimitivity + dup retire は S11 内、GroupTheory/** 共有で cite) |
 > | **b** | β Pf §12 Dade tower + coherence infra | `OddOrder/Peterfalvi/S14_MaximalI.lean`（**全体**、旧 carve-out 0088 `exists_typeICovering` は b に解消）+ **coherence infra** = `S07_Coherence*`/`S08_PGroupReduction`（既存 coherence file、(5.7)/(6.5.c)/(6.8) case-B 系、hub authorized 2026-07-02）+ GroupTheory/** coherence leaf。⚠ これらは nominal に a の `S0[3-9]` regex に掛かるが **coherence infra ゆえ b 担当（逸脱でない）**、a の active territory は §9-13 char 核で S07/S08 coherence は非接触。**⚠ b の例外 glob は正確に `S07_Coherence*` + `S08_PGroupReduction` の 2 つのみ** (正本 ft_lane_reallocation §レーン表): `S08_CaseB*`/`S08_CoherenceTheorems` 等その他の S07/S08 file は **lane a 所有** — 2026-07-03 tick で a の `S08_CaseBCoherence2` 1 行追従を「b 所有では」と誤読しかけた (glob 照合で解消、逸脱でない) |
-> | **c** | γ POLE-2 §15–16 chain 一本化 | `OddOrder/Peterfalvi/{S15_SAndT_Setup, S15_SAndT, S16_NonExistenceG}.lean`（**S15_SAndT_Setup は 2026-07-02 に lane d→c、§15→16 全 chain を c が所有**）+ 構成的 Clifford (issue 9002、GroupTheory/** shared) |
+> | **c** | γ **S16 非存在 (W-side (14.x) cascade)** | `OddOrder/Peterfalvi/S16_NonExistenceG.lean`（**2026-07-04 再々編: S15_SAndT_Setup + S15_SAndT は c→b 移管**、c は S16 に集約し S15 を import cite; off-path T-side carrier `reconciled_typePData_T` は退役）+ 構成的 Clifford (issue 9002、GroupTheory/** shared) |
+> | **b 追加所有 (2026-07-04)** | β §16 char cascade | `OddOrder/Peterfalvi/{S15_SAndT_Setup, S15_SAndT}.lean`（c→b 移管、(13.9)-(13.19) on-path parity/構造/norm を b が担当; off-path S-side cascade 13.5-13.10 は退役）|
 > | **~~d~~ 退役** | — | **2026-07-02 退役**。σ-theory leaf (`GroupTheory/**`, sorry-free) は共有ゾーンに残置 (a が tail 完成)。BG/** は完了・共有凍結。FeitThompson carrier は a に fold。**branch `d` は git に温存 (作業は全 merge 済)、worktree セッションは停止**。 |
 > | **共有（全 lane 可）** | — | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / `OddOrder/Mathlib/**` / `OddOrder/Algebra/**` / **`OddOrder/Isaacs/**`**（全 lane 加算可）/ `OddOrder/BG/**`（完了・共有凍結）/ `notes/**` / `issues/**`。**⚠ Isaacs 追加 (2026-07-04 hub 裁定)**: `OddOrder/Isaacs/**` は基盤 finite-group-theory ライブラリで**どのレーンの active territory でもない**ゆえ shared foundation として扱う (consumer が proven 補題を additive に加算可、GroupTheory/Algebra 同格)。precedent = c の Isaacs 6.11 使用 / a の (7.8.b) 用 `IsFrobeniusGroup.two_mul_card_complement_add_one_le_card_kernel` 追加 (commit 9f41b6f7)。既存 Isaacs 宣言の statement 改変は要 hub flag (additive のみ非逸脱)。|
 > | **凍結 scaffold** | — | `OddOrder/Peterfalvi/Appendices/**`（off-path・consumer 0、2026-07-02 census 検証済: Huppert 1 / NearFields 2 / Suzuki 5 / Suzuki2Groups 4 / FeitSibley 3 sorry。**どのレーンも編集しない**。σ-theory near-field 等が App B/C を cite する必要が生じたら、その時点で hub が owner 割当 — 自然候補 = a の σ-theory tail 系）|
