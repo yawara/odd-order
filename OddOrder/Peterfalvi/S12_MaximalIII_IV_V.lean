@@ -3869,6 +3869,26 @@ theorem Hypothesis.card_U_modEq_one [Finite G] {M : Subgroup G} (hyp : Hypothesi
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv] at h
   exact h
 
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+/-- **Peterfalvi (11.8.1), the chief-factor image congruence `|Ū| ≡ 1 (mod q)`.**  The genuine `u`
+field of the constructed §9 character datum, `u = |Ū| = |U/C_U(H̄)|` (the image of `U` in
+`Aut(H̄)`, `mkSection11CharacterData.u`), satisfies `|Ū| ≡ 1 (mod w₁ = q)`.
+
+This is the `U/C_U(H̄)`-quotient of the Frobenius congruence `|U| ≡ 1 (mod q)` (`card_U_modEq_one`):
+`W₁` acts fixed-point-freely on `U` (`typeP_uW1_frobenius`) and this descends to the chief-factor
+image `Ū` — a homomorphic image of `U` under the `U W₁`-equivariant action map `quotientMulAutHom` —
+by the general Frobenius-group image congruence
+`IsFrobeniusGroup.card_range_comp_subtype_modEq_one` (Isaacs Cor 6.2 + Lemma 6.1).  Together with the
+μ-grid degree `d = |Ū|` (from `caseB_degree_qu`, the μ-grid ↔ §9-family correspondence) this is the
+§9 half of `charParam_d_modEq_one`. -/
+theorem Hypothesis.mkSection11CharacterData_u_modEq_one [Finite G] {M : Subgroup G}
+    (hyp : Hypothesis M) (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup M)
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData data) (hU : data.typeP.U ≠ ⊥) :
+    (hyp.mkSection11CharacterData data chief).u ≡ 1 [MOD Nat.card ↥data.typeP.W1] := by
+  have hgen := (OddOrder.Peterfalvi.S11.typeP_uW1_frobenius data.typeP hU).card_range_comp_subtype_modEq_one
+    (quotientMulAutHom (N := chief.N) chief.N_aInvariant)
+  rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv] at hgen
+
 /-- **Peterfalvi (11.8.1), the residue `d ≡ 1 (mod q)`** (§9 count, named obligation).  The common
 degree `d = μ_{ij}(1)` of the (10.3) grid is `≡ 1 (mod w₁ = q)`.  By (9.8)/(9.9) `d = |Ū|` — the
 `caseB_degree_qu` degree `μ_j(1) = qu` divided by the `w₁` equal rows `μ_j = ∑_i μ_{ij}` — and
