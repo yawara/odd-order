@@ -321,6 +321,34 @@ theorem apply_one_eq_restrictionMultiplicity_mul_index_inertia
   rw [hcard]
   ring
 
+/-- **Equal-degree constituents over the same character have equal restriction multiplicity.**  For
+`H ⊴ G` and `φ₁, φ₂ ∈ Irr G` both lying over `ρ ∈ Irr H` with `φ₁(1) = φ₂(1)`, the multiplicities
+`⟨Res_H φᵢ, ρ⟩` agree.  From the Clifford degree formula
+`apply_one_eq_restrictionMultiplicity_mul_index_inertia` (`φ(1) = ⟨Res φ, ρ⟩·[G:I(ρ)]·ρ(1)`) and the
+common nonzero factor `[G:I(ρ)]·ρ(1)`.  With the general (1.7.b) equal degree of the constituents of
+`Ind_H^G ρ`, this gives their **common multiplicity `e`** — the coefficient-matching `a_ρ = c_ρ/e`
+of the Peterfalvi (12.5) `DpsiH` decomposition. -/
+theorem restrictionMultiplicity_eq_of_liesOver_of_apply_one_eq
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {H : Subgroup G} [hH : H.Normal] [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
+    [Fintype (IrreducibleCharacter ↥H)]
+    {φ₁ φ₂ : IrreducibleCharacter G} {ρ : IrreducibleCharacter ↥H}
+    (h₁ : IrreducibleCharacter.LiesOver (G := G) (H := H) φ₁ ρ)
+    (h₂ : IrreducibleCharacter.LiesOver (G := G) (H := H) φ₂ ρ)
+    (hdeg : (φ₁ : ClassFunction G ℂ) 1 = (φ₂ : ClassFunction G ℂ) 1) :
+    ClassFunction.restrictionMultiplicity H (φ₁ : ClassFunction G ℂ) (ρ : ClassFunction ↥H ℂ)
+      = ClassFunction.restrictionMultiplicity H (φ₂ : ClassFunction G ℂ) (ρ : ClassFunction ↥H ℂ) := by
+  have e1 := apply_one_eq_restrictionMultiplicity_mul_index_inertia φ₁ ρ h₁
+  have e2 := apply_one_eq_restrictionMultiplicity_mul_index_inertia φ₂ ρ h₂
+  rw [hdeg] at e1
+  have hkey := e1.symm.trans e2
+  have hρ1 : (ρ : ClassFunction ↥H ℂ) 1 ≠ 0 := by
+    obtain ⟨d, hd, hdeq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast ρ
+    rw [hdeq]; exact_mod_cast hd.ne'
+  have hIdx : ((IrreducibleCharacter.inertia (G := G) (H := H) ρ).index : ℂ) ≠ 0 := by
+    exact_mod_cast Subgroup.index_ne_zero_of_finite
+  exact mul_right_cancel₀ hIdx (mul_right_cancel₀ hρ1 hkey)
+
 /-- **Clifford correspondence** ([Isaacs] Thm 6.11, degree form).  If `ψ ∈ Irr I` (for a subgroup
 `I ≤ G`) has an *irreducible* induction `Ind_I^G ψ`, and the irreducible `χ ∈ Irr G` lies over `ψ`
 (i.e. `ψ` is a constituent of `Res_I χ`), then `χ` **is** that induction: `χ = Ind_I^G ψ` as class
