@@ -218,3 +218,18 @@ tick² の指摘 (spine sorry regression + 型が逆 `IsTypeP2 T` + d-carrier �
 **spine 前進**: `field_normalizer_structure → exists_MHypothesis` の gate が assembly 完成で解消。
 exists_MHypothesis は 34 genuine field + 2 char obligation (psi_degree/psi_tau1_norm は discharge 済)。
 残 2 は Track A (issue 3002) と (7.8.b) lane a landing 待ち — この 2 が埋まれば §16 endgame は spine 直結。
+
+## 2026-07-04 lane-c (再開, re-re-org 後) — 🎯 orthogonality_switch (14.14) PROVEN
+
+re-re-org (S15→b、c は S16 W-side (14.14) cascade + parity contradiction 集約) 後の初 landing。
+cont.⁵¹ の「solo work 枯渇」を訂正し (14.14) の genuine arithmetic を landing (commit `a67a4ef0`):
+
+- **`orthogonality_switch` (14.14) の bare sorry を実証明化**。これは `H_eq_U` (14.16)→(14.15)/(14.16)
+  矛盾 cascade (23-method `OrthogonalitySwitchData` namespace、既 sorry-free) を発火させる key sorry。
+- **`Hypothesis.caseB_forces_q_three_and_p_five`** (sorry-free): case-(b) bound `(v-1)/pq≤pq-1` +
+  v-value (14.4) + `key_inequality` (14.8.a, 既 proven) から q=3∧p=5 を導出する数論核 (`q^(p-3)<p²`
+  → (14.8.a) → q=3、`3^(p-3)<p²` vs `p²≤3^(p-3)` p≥7 induction → p=5)。
+- 残 char 義務は opaque bare sorry から **faithful `orthogonality_switch_pairing_bounds`** (S16:4526,
+  §7/§8 = (7.9) pairing dichotomy + (8.17.c) disjoint Dade support + (7.8.b) norm bound = lane-a 領域)
+  に置換。doneness↑ (carrier 構成可能性で判定)。
+- full build 3916 green、AxiomsCheck OK、新 axiom なし。詳細 = `notes/peterfalvi/s16_w4_char_cascade.md` cont.⁵²。

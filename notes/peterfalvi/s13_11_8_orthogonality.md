@@ -1280,3 +1280,54 @@ green + AxiomsCheck OK, S12 sorry 4 不変)。
 **次 frontier 候補** (上流優先+文書順): endpoint の (11.8.6) assembly は §14-gated ゆえ、lane-a の on-spine
 ungated 上流は §9 count carrier (`card_G0_lower_bound` 7.10 = issue 0044、on-path 確定) か §10-13 structural。
 (11.8) machinery 側は interface 完成につき、これ以上の ungated 前進は endpoint assembly (gated) 待ち。
+
+---
+
+## 2026-07-04 assessment (lane a pivot to on-path (11.8)) — foundations verified, entry point
+
+**pivot 経緯**: 2026-07-04 再々編で lane a on-path = **S12 (11.8) `exists_zeta_residual_not_orthogonal`**
+(= feitThompson の唯一 bare sorry) と確定 (card_G0 (7.10) は off-path)。本ノートの計画に沿って着手。
+
+**doneness 検証済 (honest to build)**:
+- S12 `Hypothesis` の carrier は**構成済 (opaque でない)**: `typeP : TypePData` / `dadeData :
+  S10.DadeSupportHypothesisData` / `muGrid`・`alignedOmegaSigmaGrid` は `noncomputable def`
+  (S12_Core:1236/1293)。⟹ (11.8) を積むのは scaffold でなく genuine。
+- **τ₁ 基盤**: `CoherentHypothesis hyp params` (S12_Core:2810、field = `IsCoherent hyp.tau hyp.Sset
+  hyp.A0`) が `.tau1` を持つ。ただし**これは full-S 係数の extension** (⟨hcoh⟩ で S_not_coherent が
+  背理法で使う)。**(11.8) が要るのは S₁=S(HC) の定数次数 q 係数の τ₁** = (5.7)
+  `S07.coherent_of_constant_degree` を **S(HC) 部分族**に適用したもの (無条件、full-S coherence を
+  仮定しない別物)。⟹ **entry point = S(HC) を inducedFamily M の定数次数 q 部分族として材料化 →
+  (5.7) で τ₁**。
+- landed: (10.9) `inner_tau_muColumnZero_sub_zeta_alignedOmegaSigma_of_w1_lt_w2` (S12:827) +
+  `residual_alignedOmegaSigma_inner_eq_zero_of_w1_lt_w2` (S12:967); (11.3) `S13.S_H0C_not_coherent`;
+  ‖α^τ‖²=2+n² `muGridAlpha_tau_inner_self`; §9 は S11 に def_Itheta/caseA_character_counts 系あり。
+
+**次 iteration の第一手 (上流優先)**: **S(HC) 部分族の材料化 + (5.7) τ₁ 構成** (11.8 全 step の土台)。
+その後 attack order = (11.8.4 landed 10.9)→(11.8.2 CS 不等式)→(11.8.3 β real)→(11.8.5 a=0)→
+(11.8.6 (9.11)+(11.3) 矛盾)。§9 (9.8/9.9/9.11) gate は S11 (a 所有) で並行に埋める。
+これは deep multi-session effort。scaffold/仮説 hoist はしない (carrier 構成可能性で doneness 判定)。
+
+## 2026-07-04 frontier 精査 (重要更新) — infrastructure ~90% 済、gap = (11.8.6) capstone (τ₂)
+
+**判明**: (11.8) は「from-scratch deep」でなく **既に ~90% landed**。sorry は **final assembly**。
+- **τ₁ producer 済**: `Hypothesis.SHC_isCoherent hG : IsCoherent hyp.tau hyp.SHCSet hyp.A0`
+  (`noncomputable def` S12:1087、無条件構成)。`SHCSet` = `{φ∈S | irr, φ(1)=w₁}` (abbrev, concrete)。
+  extension conj-compat = `SHC_extension_conj` (S12:1213)。
+- **(11.8.2-11.8.5) lemma 群 landed** (S12): `muGridAlpha_tau_proj_a_mem` (a∈{0,1,2}) /
+  `beta_column_eq_zeroRow` (β indep) / `sum_alignedOmegaSigma_zeroColumn_isReal` (β real) /
+  `muGridAlpha_a_eq_inner_sumOmegaSigma_beta` (a=(∑ω,β)) / `charParam_a_eq_zero_of_residualEq`
+  (11.8.5 a=0) / `residualCoeff_eq_zero` (S12:3495) / `tau_muColumnSum_sub_zeta_eq_of_alphaImage`
+  (S12:3564、11.8.6 の μ_j^τ=∑ω−dζ^{τ₁} identity)。
+- **矛盾到達点の訂正**: (11.3) `S13.S_H0C_not_coherent` は **downstream (S13 imports S12)** ゆえ sorry
+  から cite 不可。実際は **upstream `S12.S_not_coherent` (10.8)** に full-S coherence を渡して False。
+  経路: μ_j^τ identity → S(H₀C) coherence → **`coherent_S_of_coherent_SH0C` (6.3、S13:206 で言及)** で
+  full S coherent → `S_not_coherent` → False。
+
+**残 gap = (11.8.6) capstone のみ**: μ_j^τ=∑ω identity (landed) から **τ₂ = S₂=S(C)−S(HC) coherence**
+を構成 (§9 (9.11)/(11.7) gate、S11 = a 所有) + S₁^{τ₁}⊥S₂^{τ₂} (5.3.b/5.5) で **S(C) coherent** →
+(6.3) lift → S_not_coherent。この τ₂ 構成 + union が唯一の deep 残部。
+
+**次 iteration = build 着手** (3 iter 精査終、以後 assembly): sorry 内で
+(1) `coh := hyp.SHC_isCoherent hG`、(2) `_h_orth` → (11.8.4) form (landed (10.9)
+`residual_alignedOmegaSigma_inner_eq_zero_of_w1_lt_w2` 経由)、(3) charParam_a_eq_zero chain →
+μ_j^τ identity、(4) τ₂ capstone (§9 gate、必要なら sorried skeleton で前倒し) → S_not_coherent。
