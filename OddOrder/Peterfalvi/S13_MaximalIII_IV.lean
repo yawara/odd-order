@@ -701,6 +701,122 @@ theorem q_dvd_secondDerived_relIndex_HC_sub_one [Finite G]
 
 end Hypothesis
 
+/-- Decomposition along an `M`-normalized factor: `x ∈ A ⊔ B` splits as `x = a·b`
+(`A` normalized by `M ⊇ A ⊔ B`; the sup is computed inside `↥M` where `A`-trace is normal). -/
+theorem exists_mul_of_mem_sup_of_normalized {M A B : Subgroup G}
+    (hAM : A ≤ M) (hBM : B ≤ M)
+    (hnorm : M ≤ Subgroup.normalizer (A : Set G)) {x : G} (hx : x ∈ A ⊔ B) :
+    ∃ a ∈ A, ∃ b ∈ B, x = a * b := by
+  haveI hAn : (A.subgroupOf M).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hAM).mpr hnorm
+  have hxM : x ∈ M := (sup_le hAM hBM) hx
+  have hmem : (⟨x, hxM⟩ : ↥M) ∈ A.subgroupOf M ⊔ B.subgroupOf M := by
+    rw [← Subgroup.subgroupOf_sup hAM hBM]
+    exact Subgroup.mem_subgroupOf.mpr hx
+  rw [← SetLike.mem_coe, Subgroup.normal_mul, Set.mem_mul] at hmem
+  obtain ⟨a, ha, b, hb, hab⟩ := hmem
+  refine ⟨((a : ↥M) : G), Subgroup.mem_subgroupOf.mp ha,
+    ((b : ↥M) : G), Subgroup.mem_subgroupOf.mp hb, ?_⟩
+  have := congrArg (fun m : ↥M => (m : G)) hab
+  simpa using this.symm
+
+namespace Hypothesis
+
+/-- **`M'' ≤ H ⊔ U'`** — the derived subgroup of `M' = H·U` collapses mod `H` to `U'`:
+commutator generators `⁅a, b⁆` of `M''` reduce, through `M'/H`-projection along the
+`H`-normal decomposition `a = h·u`, to `H`-multiples of `⁅u_a, u_b⁆ ∈ U'`. -/
+theorem secondDerived_le_H_sup_derivedU [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
+    secondDerivedInAmbient M ≤ hyp.base.typeP.H ⊔ derivedInG hyp.base.typeP.U := by
+  have hHle : hyp.base.typeP.H ≤ M := hyp.base.typeP.H_le.trans (Subgroup.map_subtype_le _)
+  have hUle : hyp.base.typeP.U ≤ M := hyp.base.typeP.U_le.trans (Subgroup.map_subtype_le _)
+  have hM'eq : derivedInG M = hyp.base.typeP.H ⊔ hyp.base.typeP.U := by
+    rw [hyp.base.typeP.derivedInG_eq_fitting_sup_U, hyp.base.typeP.H_eq]
+  haveI hHn : ((hyp.base.typeP.H).subgroupOf M).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hHle).mpr hyp.H_normalized_by_M
+  -- the quotient projection `↥M → ↥M / H`-trace kills the `H`-parts
+  set φ := QuotientGroup.mk' ((hyp.base.typeP.H).subgroupOf M) with hφ
+  rintro x hx
+  rw [secondDerivedInAmbient, derivedInG] at hx
+  obtain ⟨c, hc, rfl⟩ := hx
+  rw [commutator_eq_closure] at hc
+  induction hc using Subgroup.closure_induction with
+  | one =>
+      simpa using Subgroup.one_mem (hyp.base.typeP.H ⊔ derivedInG hyp.base.typeP.U)
+  | mul y z _ _ hy hz =>
+      rw [map_mul]
+      exact Subgroup.mul_mem _ hy hz
+  | inv y _ hy =>
+      rw [map_inv]
+      exact Subgroup.inv_mem _ hy
+  | mem cel hcel =>
+      obtain ⟨a, b, hab⟩ := hcel
+      have hcel_eq : cel = a * b * a⁻¹ * b⁻¹ := hab.symm
+      -- decompose both along the `H`-factor of `M' = H ⊔ U`
+      have haM' : ((a : ↥(derivedInG M)) : G) ∈ hyp.base.typeP.H ⊔ hyp.base.typeP.U := by
+        rw [← hM'eq]; exact a.2
+      have hbM' : ((b : ↥(derivedInG M)) : G) ∈ hyp.base.typeP.H ⊔ hyp.base.typeP.U := by
+        rw [← hM'eq]; exact b.2
+      obtain ⟨ha', hha', ua, hua, haeq⟩ :=
+        exists_mul_of_mem_sup_of_normalized hHle hUle hyp.H_normalized_by_M haM'
+      obtain ⟨hb', hhb', ub, hub, hbeq⟩ :=
+        exists_mul_of_mem_sup_of_normalized hHle hUle hyp.H_normalized_by_M hbM'
+      -- mod `H`: `⁅a,b⁆ ≡ ⁅u_a, u_b⁆`, so the ratio lies in `H`
+      have haMm : ((a : ↥(derivedInG M)) : G) ∈ M := (Subgroup.map_subtype_le _) a.2
+      have hbMm : ((b : ↥(derivedInG M)) : G) ∈ M := (Subgroup.map_subtype_le _) b.2
+      set A : ↥M := ⟨((a : ↥(derivedInG M)) : G), haMm⟩ with hA
+      set B : ↥M := ⟨((b : ↥(derivedInG M)) : G), hbMm⟩ with hB
+      set UA : ↥M := ⟨ua, hUle hua⟩ with hUA
+      set UB : ↥M := ⟨ub, hUle hub⟩ with hUB
+      have hφA : φ A = φ UA := by
+        have h1 : A = ⟨ha', hHle hha'⟩ * UA := by
+          ext; rw [haeq]; rfl
+        rw [h1, map_mul]
+        have h2 : φ ⟨ha', hHle hha'⟩ = 1 := by
+          rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+          exact Subgroup.mem_subgroupOf.mpr hha'
+        rw [h2, one_mul]
+      have hφB : φ B = φ UB := by
+        have h1 : B = ⟨hb', hHle hhb'⟩ * UB := by
+          ext; rw [hbeq]; rfl
+        rw [h1, map_mul]
+        have h2 : φ ⟨hb', hHle hhb'⟩ = 1 := by
+          rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+          exact Subgroup.mem_subgroupOf.mpr hhb'
+        rw [h2, one_mul]
+      have hratio : (A * B * A⁻¹ * B⁻¹) * (UA * UB * UA⁻¹ * UB⁻¹)⁻¹
+          ∈ (hyp.base.typeP.H).subgroupOf M := by
+        have hmapped : φ ((A * B * A⁻¹ * B⁻¹) * (UA * UB * UA⁻¹ * UB⁻¹)⁻¹)
+            = (φ A * φ B * (φ A)⁻¹ * (φ B)⁻¹) * (φ UA * φ UB * (φ UA)⁻¹ * (φ UB)⁻¹)⁻¹ := by
+          simp only [map_mul, map_inv]
+        have h1 : φ ((A * B * A⁻¹ * B⁻¹) * (UA * UB * UA⁻¹ * UB⁻¹)⁻¹) = 1 := by
+          rw [hmapped, hφA, hφB]; group
+        exact (QuotientGroup.eq_one_iff
+          (N := (hyp.base.typeP.H).subgroupOf M) _).mp h1
+      -- conclude: the commutator is an `H`-multiple of `⁅u_a, u_b⁆ ∈ U'`
+      have hcomm_coe : (((derivedInG M).subtype) cel : G)
+          = ((A * B * A⁻¹ * B⁻¹ : ↥M) : G) := by
+        rw [hcel_eq]; exact rfl
+      have hsplit : ((A * B * A⁻¹ * B⁻¹ : ↥M) : G)
+          = (((A * B * A⁻¹ * B⁻¹) * (UA * UB * UA⁻¹ * UB⁻¹)⁻¹ : ↥M) : G)
+            * ((UA * UB * UA⁻¹ * UB⁻¹ : ↥M) : G) := by
+        push_cast
+        group
+      rw [hcomm_coe, hsplit]
+      refine Subgroup.mul_mem _ (Subgroup.mem_sup_left ?_) (Subgroup.mem_sup_right ?_)
+      · exact Subgroup.mem_subgroupOf.mp hratio
+      · have hUcomm : ua * ub * ua⁻¹ * ub⁻¹ ∈ derivedInG hyp.base.typeP.U := by
+          rw [show derivedInG hyp.base.typeP.U
+              = ⁅hyp.base.typeP.U, hyp.base.typeP.U⁆
+            from Subgroup.map_subtype_commutator hyp.base.typeP.U]
+          exact Subgroup.commutator_mem_commutator hua hub
+        have hcoe : ((UA * UB * UA⁻¹ * UB⁻¹ : ↥M) : G) = ua * ub * ua⁻¹ * ub⁻¹ := by
+          push_cast
+          rfl
+        rw [hcoe]
+        exact hUcomm
+
+end Hypothesis
+
 /-! ## (11.3)--(11.5): commutator-chain consequences -/
 
 /-- **Peterfalvi (11.3), the Theorem (6.3) coherence-extension input** (§13 instance): if the
@@ -941,6 +1057,36 @@ theorem secondDerived_eq_HC [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     secondDerivedInAmbient M = hyp.HC :=
   le_antisymm hyp.secondDerived_le_HC (HC_le_secondDerived _hG hyp)
 
+/-- **Peterfalvi (11.6), `C = U'`**: `U' ≤ C` is (8.5.b) (`derivedU_le_C`); conversely
+`C ≤ HC = M'' ≤ H ⊔ U'` ((11.5) + `secondDerived_le_H_sup_derivedU`), and an
+`H ⊔ U'`-element of `U` splits as `h·u'` with `h ∈ H ⊓ U = ⊥`, so `C ≤ U'`. -/
+theorem C_eq_derivedU [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.C = derivedInG hyp.base.typeP.U := by
+  refine le_antisymm ?_ hyp.derivedU_le_C
+  intro c hc
+  have hcM'' : c ∈ secondDerivedInAmbient M := by
+    rw [secondDerived_eq_HC hG hyp]
+    exact Subgroup.mem_sup_right hc
+  have hcHU' : c ∈ hyp.base.typeP.H ⊔ derivedInG hyp.base.typeP.U :=
+    hyp.secondDerived_le_H_sup_derivedU hcM''
+  -- split `c = h·u'` and cancel the `H`-part inside `U`
+  have hHle : hyp.base.typeP.H ≤ M := hyp.base.typeP.H_le.trans (Subgroup.map_subtype_le _)
+  have hU'le : derivedInG hyp.base.typeP.U ≤ M :=
+    ((Subgroup.map_subtype_le _).trans hyp.base.typeP.U_le).trans (Subgroup.map_subtype_le _)
+  obtain ⟨h, hh, u', hu', hceq⟩ :=
+    exists_mul_of_mem_sup_of_normalized hHle hU'le hyp.H_normalized_by_M hcHU'
+  have hhU : h ∈ hyp.base.typeP.U := by
+    have h1 : h = c * u'⁻¹ := by rw [hceq]; group
+    rw [h1]
+    exact Subgroup.mul_mem _ (hyp.C_le_U hc)
+      (Subgroup.inv_mem _ ((Subgroup.map_subtype_le _) hu'))
+  have hh1 : h = 1 := by
+    have := hyp.H_inf_U_eq_bot.le ⟨hh, hhU⟩
+    rwa [Subgroup.mem_bot] at this
+  rw [hceq, hh1, one_mul]
+  exact hu'
+
 /-! ## (11.6)--(11.7): the core structure of `H` and `U` -/
 
 /-- **Peterfalvi (11.6), the `U`-centralizes-`H_0` clause via Wielandt (9.1)**: if the cyclic
@@ -1095,11 +1241,10 @@ theorem U_centralizes_H0 [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
 
 /-- **Peterfalvi (11.6)**: `H` is a `p`-group, `U` centralizes `H_0`, `H_0 = H'`, and `C = U'`.
 
-The second clause `U` centralizes `H_0` is now **unconditional** (`U_centralizes_H0`, via (9.6)/(9.1)),
-and the inclusion `U' ⊆ C` of the last clause is unconditional (`Hypothesis.derivedU_le_C`, from
-(8.5.b)).  The remaining three obligations are character-gated: `H` a `p`-group needs (9.3) [`U`
-centralizes `O_{p'}(H)`] + (11.5); `H_0 = H'` needs `[BG] 1.6(d)` + (11.5); and the reverse `C ⊆ U'`
-needs (11.5) `secondDerived_eq_HC` (itself coherence-gated). -/
+The second clause `U` centralizes `H_0` is **unconditional** (`U_centralizes_H0`, via (9.6)/(9.1)),
+and the last clause `C = U'` is discharged by `C_eq_derivedU` ((11.5) + `M'' ≤ H ⊔ U'`).  The
+remaining two obligations are: `H` a `p`-group needs (9.3) [`U` centralizes `O_{p'}(H)`] + (11.5);
+`H_0 = H'` needs `[BG] 1.6(d)` + (11.5). -/
 theorem core_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) :
     IsPGroup hyp.p ↥hyp.H ∧
@@ -1111,8 +1256,9 @@ theorem core_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     sorry
   · -- `H_0 = H'`: `[BG]` Proposition 1.6(d) + (11.5).
     sorry
-  · -- `C = U'`: `U' ⊆ C` is `derivedU_le_C`; reverse `C ⊆ U'` is (11.5)-gated.
-    sorry
+  · -- `C = U'`: `U' ⊆ C` is `derivedU_le_C`; the reverse is `C ≤ M'' ≤ H ⊔ U'` via (11.5).
+    rw [hyp.Uprime_eq]
+    exact C_eq_derivedU _hG hyp
 
 /-- **Peterfalvi (11.7)**: `H` is elementary abelian of order `p^q`, and
 `H_0 = 1`. -/
