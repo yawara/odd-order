@@ -1272,7 +1272,61 @@ the reconciliation itself, so this stays a clean §13 obligation.)  It lives **o
 sorry-free.  Gated on §13; declared sorried. -/
 theorem reconciled_typePData_T [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
-    ∃ data : TypePData hyp.T, data.U = hyp.V ∧ data.W1 = hyp.W2 ∧ data.W2 = hyp.W1 := sorry
+    ∃ data : TypePData hyp.T, data.U = hyp.V ∧ data.W1 = hyp.W2 ∧ data.W2 = hyp.W1 := by
+  -- `W₂, W₁ ≤ W` from the (13.1) join `W = W₁ ⊔ W₂`, and `W ≤ T` from `W = S ⊓ T`.
+  have hW2W : hyp.W2 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_right
+  have hW1W : hyp.W1 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_left
+  have hWT : hyp.W ≤ hyp.T := by rw [hyp.W_eq_inter]; exact inf_le_right
+  haveI hWcyc : IsCyclic ↥hyp.W := hyp.W_cyclic
+  -- Cyclic factors: a subgroup of the cyclic `W` is cyclic (transport along `subgroupOfEquivOfLe`).
+  have hW2cyc : IsCyclic ↥hyp.W2 :=
+    isCyclic_of_surjective _ (Subgroup.subgroupOfEquivOfLe hW2W).surjective
+  have hW1cyc : IsCyclic ↥hyp.W1 :=
+    isCyclic_of_surjective _ (Subgroup.subgroupOfEquivOfLe hW1W).surjective
+  refine ⟨{
+    H := hyp.Q
+    U := hyp.V
+    W1 := hyp.W2
+    W2 := hyp.W1
+    W := hyp.W
+    H_eq := hyp.Q_eq_TF
+    H_le := by rw [hyp.T_deriv_eq_QV]; exact le_sup_left
+    U_le := by rw [hyp.T_deriv_eq_QV]; exact le_sup_right
+    W1_le := hW2W.trans hWT
+    -- The following are the genuine §13/§14 type-`P` structure of `T` (the `T`-side analogue of what
+    -- `Section16TypePStructure` establishes for `S` when it builds `Sdata`).  No `T`-side carrier
+    -- exists by design (`FeitThompson:276`), so these stay gated on the §13/§14 σ-structure theory.
+    W2_le := sorry
+    W_eq := by rw [hyp.W_eq_join, sup_comm]
+    W_cyclic := hyp.W_cyclic
+    W1_nontrivial := by
+      intro h; have hp := hyp.p_prime.one_lt
+      rw [hyp.p_eq_card_W2, h, Subgroup.card_bot] at hp; exact absurd hp (by norm_num)
+    W2_nontrivial := by
+      intro h; have hq := hyp.q_prime.one_lt
+      rw [hyp.q_eq_card_W1, h, Subgroup.card_bot] at hq; exact absurd hq (by norm_num)
+    W1_cyclic := hW2cyc
+    W2_cyclic := hW1cyc
+    M_complement := sorry
+    W1_normalizes_U := hyp.W2_normalizes_V
+    U_nilpotent := sorry
+    derived_complement := sorry
+    H_noncyclic := sorry
+    secondDerived_le_fitting := sorry
+    fitting_eq := sorry
+    centralizer_W1 := sorry
+    normalizer_V := by
+      -- The `W`-exceptional-set normalizer `N_G(X) = W` is symmetric in `W₁`/`W₂`, so it is read off
+      -- the S-side carrier `Sdata.normalizer_V` (same fact as `base_W_normalizer_V`, inlined since S15
+      -- is upstream of S16).  The exceptional set `W − (W₂ ∪ W₁) = W − (W₁ ∪ W₂)` is `union_comm`.
+      have hWeq : hyp.Sdata.W = hyp.W := by
+        rw [hyp.Sdata.W_eq, hyp.Sdata_W1_eq, hyp.Sdata_W2_eq]; exact hyp.W_eq_join.symm
+      intro X hX hXsub
+      rw [← hWeq]
+      refine hyp.Sdata.normalizer_V X hX ?_
+      rw [hWeq, hyp.Sdata_W1_eq, hyp.Sdata_W2_eq, Set.union_comm]
+      exact hXsub
+  }, rfl, rfl, rfl⟩
 
 /-- `Q ⊓ V = ⊥` from a reconciled `TypePData T` (`tpd.U = V`): `V` complements `Q = T_F` in
 `M' = [T,T]`.  Used by the V-side helpers in place of the withdrawn `Tdata` carrier. -/
