@@ -702,3 +702,24 @@ hub 検証: b の loop¹⁹³「別レーンが BG §14 σ-theory を能動 buil
   追加で要る σ-lemma (Cor 14.10 σ-length≤2 等が未 landing なら) も同じく shared BG に additive build (Theorem B 前例)。
 - b の loop¹⁹³ 技術分析 (typePA K-part が escape lemma 射程外 = 新 geometry 要) は**正しい**; 訂正点は「別レーンが
   それを build 中」の部分のみ (実際は誰も build しておらず b が担当)。
+
+## ✅ lane b 解決 (2026-07-04, loop¹⁹⁴) — type-P2 は phantom だった: mmd OCR 誤りで typePA over-claim (→ issue 9008)
+
+hub 明確化「b は今 type-P2 K-geometry を engage せよ」に従い正面から engage した結果、**追うべき deep
+geometry は存在しなかった**ことが判明。原因は **Peterfalvi (8.10) の mmd 抽出 OCR 誤り**（詳細 = **issue 9008**）:
+
+- **PDF 確認**: 本文は `A(M) = ⋃_{x∈M_s#} C_{M'}(x)#`（core `M_s#=M_σ#` 上の union）。`.mmd:117` が
+  添字 `s` を落とし `⋃_{x∈M#}` に化け → Lean `typePA` が `(M')#` と定義されていた。
+- **P1 では一致** (`M_σ=M'`) だが **P2 (type II, `M_σ=M_F⊊M'`) で乖離**: 正しい A(M) は Frobenius 補元
+  `U#`（`C_{M_σ}=1`）を除外するが `(M')#` は含む。U# は escaping し得るゆえ `DadeSupportHypothesisData M
+  (typePA=(M')#)` は P2 で **false-as-stated**（loop¹⁹³ の「typePA K-part が escape lemma 射程外」は
+  「新 geometry 要」でなく「statement が偽」の徴候だった）。
+- **consumer 0**: `dadeSupportHypotheses_typeP` は live caller 無し、唯一の intent consumer
+  `S12.Hypothesis.dadeData` は III/IV/V=P1 限定、type-II Dade は `Section16CharacterData.A0S`（off-path
+  vestigial）。∴ P2 typePA0/typePA Dade を要する on-path consumer は無い。
+
+**landing (commit 本 tick)**: `dadeSupportHypotheses_typeP` に `hP1 : IsTypeP1 M` を追加し P2 sorry 2 本削除
+（Option B、S10 のみ・cross-lane 破壊なし・full build 3916 green）。typePA docstring に P1/P2 caveat 明記。
+**この issue の Cluster A/B gate map は P1 側は解決、P2 側は phantom として棄却**。type-P2 の「BG§14-15 新
+geometry build」指示は不要（構築対象が偽だった）。→ **lane-b char/support frontier は確定的に枯渇**。次配分は
+9008「hub への確認事項」参照。
