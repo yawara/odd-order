@@ -479,21 +479,26 @@ theorem S_coherent [Finite G] [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
 
 /-! ## (13.3)--(13.4): character degrees and the first case split -/
 
-/-- Character-degree and Dade-extension data from Peterfalvi (13.3). -/
+open scoped FiniteInduce in
+/-- Character-degree and Dade-extension data from Peterfalvi (13.3).
+
+W-side restate (issue 2034, hub 裁定 2026-07-02 §2): the former `lambda_mem : lambda ∈ hyp.Sset`
+field is dropped — the spine supplies the vestigial `Sset := ∅`, which made this structure
+uninhabited at the consuming instantiation (`character_degree_analysis` unprovable).  The
+formerly opaque `Prop` fields `lambda_irreducible`/`lambda_induced_from_PC_linear` are
+materialized as their honest statements (Pf (13.3.b): `λ` is an irreducible character of `S` of
+degree `uq` induced from a linear character of `H = PC`). -/
 structure CharacterDegreeData (hyp : Hypothesis (G := G)) where
   tau1S : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥hyp.S G
   tau1T : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥hyp.T G
   lambda : ClassFunction ↥hyp.S ℂ
-  lambda_mem : lambda ∈ hyp.Sset
-  lambda_irreducible : Prop
+  lambda_irreducible : OddOrder.RepresentationTheory.IsIrreducibleCharacter lambda
   lambda_degree : lambda 1 = ((hyp.u * hyp.q : ℕ) : ℂ)
-  lambda_induced_from_PC_linear : Prop
-  /-- **Peterfalvi (13.3.b) WLOG** (cf. the (13.12) proof: "By (13.3.b), we may assume that the
-  hypothesis of (13.10) holds"): the distinguished `λ` *is* induced from a linear character of
-  `PC` — the (13.3.b) case split is resolved into this branch, the other branch being handled by
-  the `S ↔ T` symmetry upstream.  Carried as a `_holds` field so the (13.4)-dependent counting
-  ((13.9.a), `|Q| = q^p`, the `|T|`-decomposition) can consume (13.4). -/
-  lambda_induced_from_PC_linear_holds : lambda_induced_from_PC_linear
+  lambda_induced_from_PC_linear :
+    haveI := hyp.finiteG
+    ∃ θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ,
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter θ ∧ θ 1 = 1 ∧
+        lambda = ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ
   mu_j_linear_induced : Prop
   mu_j_linear_induced_holds : mu_j_linear_induced
   no_lambda_forces_caseB_S : Prop
@@ -522,7 +527,7 @@ The third conjunct `|Q| = q^p` is the kernel-order component of "case (9.7.b) ho
 (13.10) counting reads off ((13.10.3) computes `|Q^#|/|T| = (q^p−1)/(pq^p v)`). -/
 theorem lambda_forces_T_caseB [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
-    (chars : CharacterDegreeData hyp) (hlambda : chars.lambda_induced_from_PC_linear) :
+    (chars : CharacterDegreeData hyp) :
     hyp.D = ⊥ ∧ hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) ∧
       Nat.card ↥hyp.Q = hyp.q ^ hyp.p := by
   sorry
@@ -2885,8 +2890,7 @@ for the distinguished `λ`: `τ₁` extends the Dade isometry isometrically on `
 is irreducible.  Faithful producer; gated on the (13.3) analysis (`character_degree_analysis`)
 pinning `tau1S` to the coherence extension of (13.2.d). -/
 theorem lambda_tau1_norm_one [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {hyp : Hypothesis (G := G)} (chars : CharacterDegreeData hyp)
-    (_hlam : chars.lambda_induced_from_PC_linear) :
+    {hyp : Hypothesis (G := G)} (chars : CharacterDegreeData hyp) :
     chars.tau1S chars.lambda ∈ ZIrr G ∧
       ClassFunction.inner (chars.tau1S chars.lambda) (chars.tau1S chars.lambda) = 1 ∧
       ClassFunction.inner chars.lambda chars.lambda = 1 := by
@@ -2946,8 +2950,7 @@ hypothesis for `χ = λ^{τ₁}`, `a = 1` — from `S`-coherence).  Faithful pro
 orthogonality. -/
 theorem exists_lambda_index [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
-    (chars : CharacterDegreeData hyp)
-    (_hlam : chars.lambda_induced_from_PC_linear) :
+    (chars : CharacterDegreeData hyp) :
     ∃ i₁ : Fin ((H_sharp_hypothesis76 hG hyp).n + 1), 0 < i₁ ∧
       ¬ ((hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
         OddOrder.Peterfalvi.S03.characterKernel ((H_sharp_hypothesis76 hG hyp).zeta i₁)) ∧
@@ -2968,13 +2971,12 @@ machinery (distinct induced ⟹ disjoint orbits ⟹ orthogonal restrictions); ke
 producer pending the orbit-orthogonality lemma. -/
 theorem lambda_alphaFun_inner_zero [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
-    (chars : CharacterDegreeData hyp)
-    (hlam : chars.lambda_induced_from_PC_linear) :
+    (chars : CharacterDegreeData hyp) :
     (∑ x ∈ Finset.univ.filter (· ∈ hyp.H.subgroupOf hyp.S),
       chars.lambda x * (starRingEnd ℂ)
         (H_sharp_alphaFun hG hyp (chars.tau1S chars.lambda) x)) = 0 := by
   classical
-  obtain ⟨i₁, -, hi₁ker, hi₁eq, -, -⟩ := exists_lambda_index hG chars hlam
+  obtain ⟨i₁, -, hi₁ker, hi₁eq, -, -⟩ := exists_lambda_index hG chars
   -- `λ = ζ_{i₁}` vanishes off `H`, so the filtered sum extends to the full `↥S`-sum.
   have hvanish : ∀ x : ↥hyp.S, x ∉ hyp.H.subgroupOf hyp.S → chars.lambda x = 0 := by
     intro x hx
@@ -3038,11 +3040,11 @@ family vanishes off `H` (`zeta_eq_zero_of_not_mem_H`), and `x·y ∉ H` — `q` 
 (`q_not_dvd_card_H`). -/
 theorem lambda_apply_mul_eq_zero [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
-    (chars : CharacterDegreeData hyp) (hlam : chars.lambda_induced_from_PC_linear)
+    (chars : CharacterDegreeData hyp)
     {x y : G} (hx : x ∈ hyp.W2) (hy : y ∈ hyp.W1) (hy1 : y ≠ 1)
     (hxyS : x * y ∈ hyp.S) :
     chars.lambda ⟨x * y, hxyS⟩ = 0 := by
-  obtain ⟨i₁, -, -, hi₁eq, -, -⟩ := exists_lambda_index hG chars hlam
+  obtain ⟨i₁, -, -, hi₁eq, -, -⟩ := exists_lambda_index hG chars
   rw [← hi₁eq]
   refine (H_sharp_hypothesis76 hG hyp).zeta_eq_zero_of_not_mem_H i₁ _ (fun hmem => ?_)
   have hmem' : x * y ∈ hyp.H := by
@@ -3089,7 +3091,7 @@ to class functions whose values on the regular section `xy ∈ Ŵ` are controlle
 `exists_lambda_index`). -/
 theorem lambda_tau1_apply_mul_eq_zero [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
-    (chars : CharacterDegreeData hyp) (_hlam : chars.lambda_induced_from_PC_linear)
+    (chars : CharacterDegreeData hyp)
     {x y : G} (hx : x ∈ hyp.W2) (hy : y ∈ hyp.W1) (hx1 : x ≠ 1) (hy1 : y ≠ 1) :
     chars.tau1S chars.lambda (x * y) = 0 := by
   sorry
@@ -3177,10 +3179,10 @@ via `preserves_virtualCharacters` as in `eta10_cCoeff_int`) and `ζᵢ(1)/‖ζ�
 the per-index inertia bookkeeping. -/
 theorem lambda_alphaFun_one_int [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
-    (chars : CharacterDegreeData hyp) (hlam : chars.lambda_induced_from_PC_linear) :
+    (chars : CharacterDegreeData hyp) :
     ∃ m : ℤ, H_sharp_alphaFun hG hyp (chars.tau1S chars.lambda) 1 = (m : ℂ) := by
   classical
-  obtain ⟨hZtau, -, -⟩ := lambda_tau1_norm_one hG chars hlam
+  obtain ⟨hZtau, -, -⟩ := lambda_tau1_norm_one hG chars
   have hcInt := H_sharp_cCoeff_int hG hyp hZtau
   -- `K = H.subgroupOf S` is abelian normal, so `ζ_j(1) = [S:K]` for every `j`
   set K : Subgroup ↥hyp.S := (H_sharp_hypothesis76 hG hyp).H.subgroupOf hyp.S with hKdef
@@ -3269,16 +3271,15 @@ open scoped FiniteInduce in
 Faithful producer; gated on the (1.10)/(3.2) grid congruences. -/
 theorem exists_lambda_alphaFun_one_qb [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
-    (chars : CharacterDegreeData hyp)
-    (hlam : chars.lambda_induced_from_PC_linear) :
+    (chars : CharacterDegreeData hyp) :
     ∃ b : ℤ, H_sharp_alphaFun hG hyp (chars.tau1S chars.lambda) 1
       = (hyp.q : ℂ) * (b : ℂ) := by
   classical
   -- `α(1) = m ∈ ℤ` (integrality producer)
-  obtain ⟨m, hm⟩ := lambda_alphaFun_one_int hG chars hlam
+  obtain ⟨m, hm⟩ := lambda_alphaFun_one_int hG chars
   -- the distinguished index and the norm normalizations
-  obtain ⟨i₁, hi₁pos, hi₁ker, hi₁eq, hi₁c, hmiddle⟩ := exists_lambda_index hG chars hlam
-  obtain ⟨hZtau, -, hnormLam⟩ := lambda_tau1_norm_one hG chars hlam
+  obtain ⟨i₁, hi₁pos, hi₁ker, hi₁eq, hi₁c, hmiddle⟩ := exists_lambda_index hG chars
+  obtain ⟨hZtau, -, hnormLam⟩ := lambda_tau1_norm_one hG chars
   -- pick `x ∈ W₂^#`, `y ∈ W₁^#`
   obtain ⟨x', hx'⟩ : ∃ x' : ↥hyp.W2, x' ≠ 1 := by
     haveI : Nontrivial ↥hyp.W2 := Finite.one_lt_card_iff_nontrivial.mp
@@ -3336,7 +3337,7 @@ theorem exists_lambda_alphaFun_one_qb [Fintype G] [Invertible (Nat.card G : ℂ)
       hZtau hyq hcommG
   have htau0 : chars.tau1S chars.lambda ((y' : G) * (x' : G)) = 0 := by
     rw [hcommG.eq]
-    exact lambda_tau1_apply_mul_eq_zero hG chars hlam hxW2 hyW1 hx1 hy1
+    exact lambda_tau1_apply_mul_eq_zero hG chars hxW2 hyW1 hx1 hy1
   -- λ-side (`↥S`-level): `λ(x) = λ(yx) − (1−ε)z₁ = −(1−ε)z₁`
   have hyqS : (⟨(y' : G), hyS⟩ : ↥hyp.S) ^ hyp.q = 1 := by
     apply Subtype.ext
@@ -3351,7 +3352,7 @@ theorem exists_lambda_alphaFun_one_qb [Fintype G] [Invertible (Nat.card G : ℂ)
     have hmulS : ((⟨(y' : G), hyS⟩ : ↥hyp.S) * ⟨(x' : G), hxS⟩ : ↥hyp.S)
         = ⟨(x' : G) * (y' : G), mul_mem hxS hyS⟩ := Subtype.ext hcommG.eq
     rw [hmulS]
-    exact lambda_apply_mul_eq_zero hG chars hlam hxW2 hyW1 hy1 _
+    exact lambda_apply_mul_eq_zero hG chars hxW2 hyW1 hy1 _
   -- combine: `α(1) = α(x) = λ^{τ₁}(x) − λ(x) = (1−ε)(z₁ − z₂)`
   have hconst := H_sharp_alphaFun_const_on_P hG hyp (chars.tau1S chars.lambda)
     ⟨(x' : G), hxS⟩ (Subgroup.mem_subgroupOf.mpr hxP)
@@ -3391,8 +3392,7 @@ the inner-product and congruence facts are the named producers
 (`lambda_alphaFun_inner_zero` / `exists_lambda_alphaFun_one_qb`); the (13.5.c) inflation is
 `H_sharp_alphaFun_inflation`. -/
 theorem exists_caseB_data_lambda [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {hyp : Hypothesis (G := G)} (chars : CharacterDegreeData hyp)
-    (hlam : chars.lambda_induced_from_PC_linear) :
+    {hyp : Hypothesis (G := G)} (chars : CharacterDegreeData hyp) :
     ∃ (α : ↥hyp.S → ℂ) (b : ℤ),
       (∀ x : ↥hyp.S, x ∉ hyp.H.subgroupOf hyp.S → chars.lambda x = 0) ∧
       (∑ x ∈ Finset.univ.filter (· ∈ hyp.H.subgroupOf hyp.S),
@@ -3405,16 +3405,16 @@ theorem exists_caseB_data_lambda [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOd
   haveI : Fintype G := Fintype.ofFinite G
   haveI : Invertible (Nat.card G : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  obtain ⟨i₁, hi₁pos, hi₁ker, hi₁eq, hi₁c, hmiddle⟩ := exists_lambda_index _hG chars hlam
-  obtain ⟨-, -, hinnerLam⟩ := lambda_tau1_norm_one _hG chars hlam
-  obtain ⟨b, hb⟩ := exists_lambda_alphaFun_one_qb _hG chars hlam
+  obtain ⟨i₁, hi₁pos, hi₁ker, hi₁eq, hi₁c, hmiddle⟩ := exists_lambda_index _hG chars
+  obtain ⟨-, -, hinnerLam⟩ := lambda_tau1_norm_one _hG chars
+  obtain ⟨b, hb⟩ := exists_lambda_alphaFun_one_qb _hG chars
   refine ⟨H_sharp_alphaFun _hG hyp (chars.tau1S chars.lambda), b, ?_, ?_, ?_, hb, ?_⟩
   · -- `λ = ζ_{i₁}` vanishes off `H`.
     intro x hx
     rw [← hi₁eq]
     exact (H_sharp_hypothesis76 _hG hyp).zeta_eq_zero_of_not_mem_H i₁ x
       (fun hmem => hx (Subgroup.mem_subgroupOf.mpr hmem))
-  · exact lambda_alphaFun_inner_zero _hG chars hlam
+  · exact lambda_alphaFun_inner_zero _hG chars
   · -- The point formula collapses: `c̄_{i₁}/‖ζ_{i₁}‖² = 1` and `ζ_{i₁} = λ`.
     intro x hx
     obtain ⟨hx1, hxmem⟩ := Finset.mem_erase.mp hx
@@ -3454,14 +3454,13 @@ as a sum over the ambient sharp `H^# ⊂ G`.
 `2u ≤ |P| − 1 = p^q − 1` (`two_mul_u_le`, real from (13.2.e)); the engine output transports to
 the ambient sharp by `sum_apply_erase_one_filter_subgroupOf`. -/
 theorem lambda_tau1_sharp_norm_lower [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {hyp : Hypothesis (G := G)} (chars : CharacterDegreeData hyp)
-    (hlam : chars.lambda_induced_from_PC_linear) :
+    {hyp : Hypothesis (G := G)} (chars : CharacterDegreeData hyp) :
     (Nat.card ↥hyp.S : ℝ) - ((hyp.u * hyp.q : ℕ) : ℝ) ^ 2
       ≤ ∑ x ∈ (Set.toFinite (sharpSubgroup hyp.H)).toFinset,
           ‖chars.tau1S chars.lambda x‖ ^ 2 := by
   classical
-  obtain ⟨α, b, hvanish, hinner, hχ, hα1, hinfl⟩ := exists_caseB_data_lambda _hG chars hlam
-  obtain ⟨-, -, hinnerLam⟩ := lambda_tau1_norm_one _hG chars hlam
+  obtain ⟨α, b, hvanish, hinner, hχ, hα1, hinfl⟩ := exists_caseB_data_lambda _hG chars
+  obtain ⟨-, -, hinnerLam⟩ := lambda_tau1_norm_one _hG chars
   -- `H ≤ S`.
   have hUS : hyp.U ≤ hyp.S := by
     have h1 : hyp.U ≤ derivedInG hyp.S := by rw [hyp.S_deriv_eq_PU]; exact le_sup_right
@@ -3851,7 +3850,7 @@ other `Q`-non-kernel coefficients vanishing.  Faithful producer; gated on the `T
 grid analysis. -/
 theorem exists_muT_index [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
-    (chars : CharacterDegreeData hyp) (_hlam : chars.lambda_induced_from_PC_linear)
+    (chars : CharacterDegreeData hyp)
     (hvd : hyp.v * hyp.d ≠ 1) :
     ∃ (i₁ : Fin ((Q_sharp_hypothesis76 hG hyp hvd).n + 1)) (δ : ℤ), 0 < i₁ ∧
       ¬ ((hyp.Q.subgroupOf hyp.T : Set ↥hyp.T) ⊆
@@ -3890,8 +3889,7 @@ generic `hypothesis76_point_formula`, the first term is `(1/p²)(|T|·p − (pv)
 orthogonality (S-level shortcut), and the inflation is the generic `F`-form with
 `|Q| = q^p`. -/
 theorem exists_caseB_data_eta10_T [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {hyp : Hypothesis (G := G)} (chars : CharacterDegreeData hyp)
-    (_hlam : chars.lambda_induced_from_PC_linear) :
+    {hyp : Hypothesis (G := G)} (chars : CharacterDegreeData hyp) :
     ∃ (ζ α : ↥hyp.T → ℂ) (α1 δ : ℤ),
       (∀ x : ↥hyp.T, x ∉ hyp.Q.subgroupOf hyp.T → ζ x = 0) ∧
       (∑ x ∈ Finset.univ.filter (· ∈ hyp.Q.subgroupOf hyp.T),
@@ -3907,10 +3905,10 @@ theorem exists_caseB_data_eta10_T [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleO
   haveI : Fintype G := Fintype.ofFinite G
   haveI : Invertible (Nat.card G : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  obtain ⟨hD, hv, hQcard⟩ := lambda_forces_T_caseB _hG chars _hlam
+  obtain ⟨hD, hv, hQcard⟩ := lambda_forces_T_caseB _hG chars
   obtain ⟨hd1, hv2, hvd⟩ := hyp.caseB_vd_facts hD hv
   obtain ⟨i₁, δ, hi₁pos, hi₁ker, hδ2, hi₁c, hmiddle, hnormP, hdeg⟩ :=
-    exists_muT_index _hG chars _hlam hvd
+    exists_muT_index _hG chars hvd
   obtain ⟨α1, hα1⟩ := exists_etaT_alphaFun_one_int _hG (hyp := hyp) hvd
   have hp3 := hyp.three_le_p
   have hpC : (hyp.p : ℂ) ≠ 0 := by exact_mod_cast (by omega : hyp.p ≠ 0)
@@ -4067,10 +4065,9 @@ theorem eta10_Qsharp_norm_lower [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd
       ≤ ∑ x ∈ (Set.toFinite (sharpSubgroup hyp.Q)).toFinset, ‖hyp.eta10 x‖ ^ 2 := by
   classical
   obtain ⟨chars, -, -, -⟩ := character_degree_analysis _hG hyp
-  have hlam := chars.lambda_induced_from_PC_linear_holds
-  obtain ⟨-, hv, -⟩ := lambda_forces_T_caseB _hG chars hlam
+  obtain ⟨-, hv, -⟩ := lambda_forces_T_caseB _hG chars
   obtain ⟨ζ, α, α1, δ, hvanish, hinner, hχ, hfirstTerm, hcross, hδ, hinfl⟩ :=
-    exists_caseB_data_eta10_T _hG chars hlam
+    exists_caseB_data_eta10_T _hG chars
   have hQT : hyp.Q ≤ hyp.T := by
     rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.T
   have hu := hyp.two_mul_v_le hv
@@ -4105,16 +4102,15 @@ theorem analyticEstimate_lambda [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd
         + normSqSumQ hyp.G0Finset (chars.tau1S chars.lambda) / (Nat.card G : ℚ) + 1
         - (hyp.u : ℚ) * (hyp.q : ℚ) / ((hyp.c : ℚ) * (hyp.p : ℚ) ^ hyp.q) := by
   classical
-  have hlam := chars.lambda_induced_from_PC_linear_holds
-  obtain ⟨hZ, hn, -⟩ := lambda_tau1_norm_one _hG chars hlam
-  obtain ⟨hD, hv, hQ⟩ := lambda_forces_T_caseB _hG chars hlam
+  obtain ⟨hZ, hn, -⟩ := lambda_tau1_norm_one _hG chars
+  obtain ⟨hD, hv, hQ⟩ := lambda_forces_T_caseB _hG chars
   obtain ⟨hd1, hv2, hvd⟩ := hyp.caseB_vd_facts hD hv
   set φ : ClassFunction G ℂ := chars.tau1S chars.lambda with hφdef
   -- Global Parseval split and the term bounds.
   have hsplit := hyp.global_normSq_split _hG φ hn hQ hvd
   have hone : (1 : ℝ) ≤ ‖φ 1‖ ^ 2 :=
     OddOrder.RepresentationTheory.one_le_normSq_apply_one_of_mem_ZIrr_of_inner_self_one hZ hn
-  have hsharp := lambda_tau1_sharp_norm_lower _hG chars hlam
+  have hsharp := lambda_tau1_sharp_norm_lower _hG chars
   rw [← hφdef] at hsharp
   have hQnonneg : (0 : ℝ) ≤ (hyp.T.index : ℝ)
       * ∑ x ∈ (Set.toFinite (sharpSubgroup hyp.Q)).toFinset, ‖φ x‖ ^ 2 := by
@@ -4185,8 +4181,7 @@ theorem analyticEstimate_eta [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
           + 1 / ((hyp.p : ℚ) * ((hyp.q : ℚ) - 1) * (hyp.q : ℚ) ^ hyp.p)) := by
   classical
   obtain ⟨chars, -, -, -⟩ := character_degree_analysis _hG hyp
-  have hlam := chars.lambda_induced_from_PC_linear_holds
-  obtain ⟨hD, hv, hQ⟩ := lambda_forces_T_caseB _hG chars hlam
+  obtain ⟨hD, hv, hQ⟩ := lambda_forces_T_caseB _hG chars
   obtain ⟨hd1, hv2, hvd⟩ := hyp.caseB_vd_facts hD hv
   have hZ := hyp.eta10_mem_ZIrr
   have hn := hyp.eta10_inner_self_one
@@ -4321,7 +4316,7 @@ theorem analyticCounting_disjointCover [Finite G] (_hG : OddOrder.BG.IsMinimalSi
   -- (13.4) values.
   obtain ⟨chars, -, -, -⟩ := character_degree_analysis _hG hyp
   obtain ⟨hD, hv, hQ⟩ :=
-    lambda_forces_T_caseB _hG chars chars.lambda_induced_from_PC_linear_holds
+    lambda_forces_T_caseB _hG chars
   have hd1 : hyp.d = 1 := by rw [hyp.d_eq_card_D, hD, Subgroup.card_bot]
   have hq3 : 3 ≤ hyp.q := hyp.three_le_q
   have hp3 : 3 ≤ hyp.p := hyp.three_le_p
@@ -4405,8 +4400,7 @@ support fact for `(μ_j − λ)^τ`, the (3.2.c) regular-value formula, and the 
 relations forcing `q·η₁₁(x) + 1 = 0` (impossible for an algebraic integer) in the doubly-vanishing
 case. -/
 theorem G0_nonvanishing_dichotomy [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {hyp : Hypothesis (G := G)} (chars : CharacterDegreeData hyp)
-    (_hlam : chars.lambda_induced_from_PC_linear) :
+    {hyp : Hypothesis (G := G)} (chars : CharacterDegreeData hyp) :
     ∀ x ∈ hyp.G0Finset, chars.tau1S chars.lambda x ≠ 0 ∨ hyp.eta10 x ≠ 0 := by
   sorry
 
@@ -4476,14 +4470,13 @@ theorem analyticEstimate_galois [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd
       ≤ normSqSumQ hyp.G0Finset (chars.tau1S chars.lambda) / (Nat.card G : ℚ)
         + normSqSumQ hyp.G0Finset hyp.eta10 / (Nat.card G : ℚ) := by
   classical
-  have hlam := chars.lambda_induced_from_PC_linear_holds
-  obtain ⟨hZlam, -, -⟩ := lambda_tau1_norm_one _hG chars hlam
+  obtain ⟨hZlam, -, -⟩ := lambda_tau1_norm_one _hG chars
   have hZeta := hyp.eta10_mem_ZIrr
   set φ : ClassFunction G ℂ := chars.tau1S chars.lambda with hφdef
   set A : Finset G := hyp.G0Finset.filter (fun y => φ y ≠ 0) with hA
   set B : Finset G := hyp.G0Finset.filter (fun y => hyp.eta10 y ≠ 0) with hB
   -- The dichotomy: `G₀ ⊆ A ∪ B`.
-  have hdich := G0_nonvanishing_dichotomy _hG chars hlam
+  have hdich := G0_nonvanishing_dichotomy _hG chars
   have hcover : hyp.G0Finset ⊆ A ∪ B := by
     intro x hx
     rcases hdich x hx with h | h
