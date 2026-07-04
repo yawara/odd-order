@@ -1520,6 +1520,61 @@ theorem H_sharp_inv_normSq_restrict_zeta_mem_ZIrr [Fintype G] [Invertible (Nat.c
   rw [hmain]
   exact OddOrder.RepresentationTheory.orbitSum_mem_ZIrr (G := ↥hyp.S) θ₀
 
+/-- **`H = PC` is abelian** (Peterfalvi (13.2.a,b)): `P` is (elementary) abelian
+(`basic_structure`), `C ≤ U` is abelian (`S_U_commutative`), and `C` centralizes `P`
+(`C = U ⊓ C_S(P)`), so the join is abelian (`isMulCommutative_sup_of_le_centralizer`).
+The `habelian` input of the (13.7) Parseval bookkeeping. -/
+theorem Hypothesis.H_mulCommutative [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) : IsMulCommutative ↥hyp.H := by
+  obtain ⟨-, -, hPel, -, -, -⟩ := basic_structure hG hyp
+  have hPab : IsMulCommutative ↥hyp.P := ⟨⟨hPel.1⟩⟩
+  have hCab : IsMulCommutative ↥hyp.C := by
+    have hCU : hyp.C ≤ hyp.U := hyp.C_eq ▸ inf_le_left
+    exact ⟨⟨fun a b => Subtype.ext (by
+      have h := hyp.S_U_commutative.is_comm.comm
+        (⟨(a : G), hCU a.2⟩ : ↥hyp.U) ⟨(b : G), hCU b.2⟩
+      simpa using congrArg Subtype.val h)⟩⟩
+  have hCP : hyp.C ≤ Subgroup.centralizer (hyp.P : Set G) := hyp.C_eq ▸ inf_le_right
+  show IsMulCommutative ↥(hyp.P ⊔ hyp.C)
+  rw [sup_comm]
+  exact OddOrder.BG.Ch4.S15.isMulCommutative_sup_of_le_centralizer hCab hPab hCP
+
+open scoped Classical in
+/-- **Sharp-set Parseval bookkeeping** (the `s + d² = |H|·n` shape of Peterfalvi (13.7)): for a
+function `f` agreeing on `K` with a class function `ψ` of self inner product `n`, the
+squared-norm sum over the nonidentity `K`-members is `|K|·n − ‖f(1)‖²`. -/
+theorem sum_filter_erase_one_normSq_eq {L : Type*} [Group L] [Fintype L]
+    {K : Subgroup L} [Invertible (Nat.card ↥K : ℂ)]
+    (f : L → ℂ) (ψ : ClassFunction ↥K ℂ) (hagree : ∀ k : ↥K, f ↑k = ψ k)
+    {n : ℕ} (hn : ClassFunction.inner ψ ψ = (n : ℂ)) :
+    ∑ x ∈ (Finset.univ.filter (· ∈ K)).erase 1, ‖f x‖ ^ 2
+      = (Nat.card ↥K : ℝ) * (n : ℝ) - ‖f 1‖ ^ 2 := by
+  classical
+  -- The full `K`-sum is `|K|·n` (Parseval on `↥K`).
+  have htotal : ∑ x ∈ Finset.univ.filter (· ∈ K), ‖f x‖ ^ 2
+      = (Nat.card ↥K : ℝ) * (n : ℝ) := by
+    have hbij : ∑ x ∈ Finset.univ.filter (· ∈ K), ‖f x‖ ^ 2 = ∑ k : ↥K, ‖ψ k‖ ^ 2 := by
+      refine Finset.sum_bij' (fun x hx => (⟨x, (Finset.mem_filter.mp hx).2⟩ : ↥K))
+        (fun k _ => (k : L)) ?_ ?_ ?_ ?_ ?_
+      · intro x hx; exact Finset.mem_univ _
+      · intro k _; exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, k.2⟩
+      · intro x hx; rfl
+      · intro k _; rfl
+      · intro x hx
+        rw [hagree ⟨x, (Finset.mem_filter.mp hx).2⟩]
+    have hpars : ((∑ k : ↥K, ‖ψ k‖ ^ 2 : ℝ) : ℂ) = (Nat.card ↥K : ℂ) * (n : ℂ) := by
+      rw [sum_normSq_eq_card_mul_inner, hn]
+    have hpars' : ∑ k : ↥K, ‖ψ k‖ ^ 2 = (Nat.card ↥K : ℝ) * (n : ℝ) := by
+      exact_mod_cast hpars
+    rw [hbij, hpars']
+  have h1mem : (1 : L) ∈ Finset.univ.filter (· ∈ K) :=
+    Finset.mem_filter.mpr ⟨Finset.mem_univ _, K.one_mem⟩
+  have hsplit : ∑ x ∈ (Finset.univ.filter (· ∈ K)).erase 1, ‖f x‖ ^ 2
+      = (∑ x ∈ Finset.univ.filter (· ∈ K), ‖f x‖ ^ 2) - ‖f 1‖ ^ 2 := by
+    rw [← Finset.add_sum_erase _ _ h1mem]
+    ring
+  rw [hsplit, htotal]
+
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce Classical in
 /-- **The (13.5.a) correction restricted to `H` is a virtual character of `H`**: with integer
 (7.7.a) coefficients `c_i ∈ ℤ` (the `χ ∈ ℤ[Irr G]` case), the `P`-kernel tail
