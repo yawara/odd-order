@@ -1465,3 +1465,37 @@ CliffordCaseBData の関係)、または τ₂ union の S07-instantiation を S
 **landed τ₂ inputs**: column identities (hDτ 半分)、`SHCSet_orthonormal` (X orthonormal)、
 `SHCSet_inner_diff_eq_zero` (X⊥Y)。**残 = 上記 1-5 の deep §9/§10/§11** + composition wiring。
 これらは fresh focused session での §9/§10/§11 形式化が適切 (本 session は超大 context、tractable work 尽く)。
+
+## 2026-07-04 update⁸ (lane-a) — §9 counts の blocker = posited Section11CharacterData の構成
+
+§9 counts (δ=1, |S(HC)|=n) の attack path を精査:
+- `caseB_degree_qu` (S11:6060) 等 §9 結果は**全て `Section11CharacterData` を hypothesis に取る** (posited)。
+  S11 に `exists_Section11CharacterData` producer は**無い** — §9 char-data は posited-not-constructed。
+- ⟹ §9 counts を S12.Hypothesis で使うには **posited Section11CharacterData を type-P から構成**する必要
+  (doneness 原則の「posited data を実際に構成」)。これは §9 Clifford char 解析の materialization = 大 sub-project。
+- bridge prefix は構成可能: `TypesIIIIIIVSetup` (要 typeP + nontrivial core + type_alt III/IV; S12.Hyp は
+  type_alt=III∨IV∨V ゆえ V で不整合 — 一般 hyp では type 分岐要)、`exists_chiefFactorData` (S11:1409, clean)。
+  だが `Section11CharacterData` の X/S/char-data 構成が deep §9 残部。
+
+**結論**: 残 3 obligation は全 deep §9/§10/§11 formalization (posited char-data 構成 + coherence 結果):
+- δ=1 / count: Section11CharacterData 構成 (§9 Clifford) → caseB_degree_qu で d=qu → Frobenius u≡1 で δ=1。
+- τ₂ union: S₂ coherence (9.11/11.7) + μ_j^{τ₂}=∑ω (4.9/5.8) + S₂ orthonormal (§10) + himg_ortho + hgen。
+これらを **loop 継続で iteration 跨ぎに engage** (deep でも止めない; CLAUDE.md 方針)。次 = 最上流の
+Section11CharacterData 構成 or S₂ coherence を正面から formalize。
+
+## 2026-07-04 update⁹ (lane-a) — §9-bridge 着工: toTypesIIIIIIVSetup landed; Section11CharacterData は小
+
+deep §9 work に正面着手 (loop 継続、止めない)。**S12 imports S11** 確認 (cycle 無) ⟹ bridge は S12 に置ける。
+**`toTypesIIIIIIVSetup` (S12, commit 直近, compiles)**: S12.Hypothesis (III/IV) + hnt → S11.TypesIIIIIIVSetup。
+§9 結果 (`caseB_degree_qu`, `coherent_H0C_commutator` (9.11)) を S12.Hypothesis に適用する橋の第一歩。
+**重要 de-risk: `Section11CharacterData` は小構造** (u=|Ū|, H0CprimeSupport, tau:IntegralCharacterMap,
+quotientSemidirectFrobenius:Prop; X/S/SOf は data/chief から derived — field でない)。⟹ type-P から構成は
+tractable (恐れていた大 §9 char 解析でない)。
+
+**§9-bridge chain (δ=1/count への道、次 iterations)**:
+1. `toTypesIIIIIIVSetup` (hnt 込み) ✅。 2. `S11.exists_chiefFactorData` → chief。
+3. **Section11CharacterData 構成**: u:=|Ū| (rfl), H0CprimeSupport:=?, **tau:=hyp.tau** (同 Dade map か要確認),
+   quotientSemidirectFrobenius:=? (Prop)。 4. caseA/caseB → `caseB_degree_qu` で φ(1)=qu (φ∈chars.SOf)。
+5. **chars.SOf(H₀⊔C') と S12 μ-grid の関係** (= chars.S が inducedFamily/μ-grid と一致するか、要 §9 study)。
+6. Frobenius u≡1 mod q (`typeP_uW1_frobenius` + `dvd_card_sub_one_of_free_off_unique_fixed`) → δ=1。
+残 deep = step 3 (support/tau/Prop) + step 5 (degree 対応)。hnt (TypePNontrivialCore) の導出も sub-task。

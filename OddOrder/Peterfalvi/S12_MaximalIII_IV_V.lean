@@ -3772,18 +3772,76 @@ theorem Hypothesis.SHCSet_inner_diff_eq_zero [Finite G] {M : Subgroup G} (hyp : 
   have hne : x ≠ y := fun h => hy.2 (h ▸ hx)
   exact inducedFamily_pairwiseOrthogonal hx.1 hy.1 hne
 
-open scoped FiniteInduce in
-/-- **Peterfalvi (11.8.1), `δ = 1`** (§9 count, named obligation).  The (10.3) column sign `δ`
-equals `1`.  `(U/C) ⋊ W₁` is a Frobenius group with abelian kernel `U/C`, so `u = |U/C| ≡ 1 (mod q)`;
-with the degree `d = μ_{ij}(1) = u` (`caseB_degree_qu`, `q·u` divided by the `q` from
-`induceHU_apply_one`), `w₁ = q`, and `n = (d − δ)/w₁ ∈ ℤ`, the residue `d ≡ 1 (mod w₁)` forces
-`δ = 1` (the alternative `δ = −1` needs `d ≡ −1`).  §9-gated: needs the `(9.8)/(9.9)` degree count and
-the Frobenius `u ≡ 1 (mod q)`; the S11 `caseB_degree_qu` (μ_j(1) = qu) is proven, modulo the
-`Section11CharacterData` ↔ `Hypothesis` bridge. -/
+/-- **Bridge to the §9 (repo S11) character analysis.**  A §10 type-III/IV `Hypothesis` yields the
+§9 `TypesIIIIIIVSetup` on the same `M`, sharing the type-`P` structure `(H, U, W₁, W₂)`.  This is the
+`Hypothesis` → `Section11CharacterData` bridge the (11.8.1) §9 counts need: with it,
+`exists_chiefFactorData` produces the chief factor `H̄ = H/H₀`, and the §9 results (`caseB_degree_qu`
+for `μ_j(1) = qu`, `coherent_H0C_commutator` for the (9.11) `S(H₀C')` coherence) apply to the §10
+character parameters.  `type_alt` restricts to III/IV (type V is eliminated separately by
+`no_typeV_maximal`); the `nontrivial` core (`U ≠ ⊥`, `|W₁|` prime, the `M_F`-TI condition) is the §8
+structural input, threaded as `hnt`. -/
+def Hypothesis.toTypesIIIIIIVSetup [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M) (hnt : TypePNontrivialCore M hyp.typeP) :
+    OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup M where
+  maximal := hyp.maximal
+  typeP := hyp.typeP
+  nontrivial := hnt
+  type_alt := htype.elim (fun h => Or.inr (Or.inl h)) (fun h => Or.inr (Or.inr h))
+
+/-- **Peterfalvi (11.8.1), the Frobenius congruence `|U| ≡ 1 (mod q)`.**  The type-`P` group
+`U ⋊ W₁` is a Frobenius group with kernel `U` (`typeP_uW1_frobenius`, `U ≠ ⊥` from the type-`P`
+`U_nontrivial`), so by Isaacs Lemma 6.1 (`card_kernel_modEq_one`) `|U| ≡ 1 (mod |W₁| = q)`.  This is
+the group-theoretic half of (11.8.1)'s `δ = 1`: with the (9.8)/(9.9) degree `d = μ_{ij}(1) = |Ū|`
+and the `U/C_U(H̄)`-quotient of this congruence `|Ū| ≡ 1 (mod q)`, the index relation `n·q = d − δ`
+(`δ = ±1`) forces `d ≡ 1 (mod q)`, i.e. `δ = 1`. -/
+theorem Hypothesis.card_U_modEq_one [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    (hU : hyp.typeP.U ≠ ⊥) :
+    Nat.card ↥hyp.typeP.U ≡ 1 [MOD hyp.w1] := by
+  have h := (OddOrder.Peterfalvi.S11.typeP_uW1_frobenius hyp.typeP hU).card_kernel_modEq_one
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_left).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv] at h
+  exact h
+
+/-- **Peterfalvi (11.8.1), the residue `d ≡ 1 (mod q)`** (§9 count, named obligation).  The common
+degree `d = μ_{ij}(1)` of the (10.3) grid is `≡ 1 (mod w₁ = q)`.  By (9.8)/(9.9) `d = |Ū|` — the
+`caseB_degree_qu` degree `μ_j(1) = qu` divided by the `w₁` equal rows `μ_j = ∑_i μ_{ij}` — and
+`|Ū| ≡ 1 (mod q)` is the `U/C_U(H̄)`-quotient of the Frobenius congruence `|U| ≡ 1 (mod q)`
+(`card_U_modEq_one`), `W₁` acting fixed-point-freely on `Ū` by coprimality.  §9-gated: needs the
+`Section11CharacterData` construction (`toTypesIIIIIIVSetup` + `exists_chiefFactorData`) to apply
+`caseB_degree_qu`, the μ-grid ↔ §9-family correspondence (`huSub = M'`), and the coprime quotient of
+`card_U_modEq_one`. -/
+theorem Hypothesis.charParam_d_modEq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) (params : CharacterParameters hyp) :
+    params.d ≡ 1 [MOD hyp.w1] := by
+  sorry
+
+/-- **Peterfalvi (11.8.1), `δ = 1`**.  The (10.3) column sign `δ ∈ {±1}` equals `1`.  From the index
+relation `n·w₁ = d − δ` (`n_formula`), `w₁ ∣ d − δ`; from the (11.8.1) residue `d ≡ 1 (mod w₁)`
+(`charParam_d_modEq_one`), `w₁ ∣ 1 − d`; adding, `w₁ ∣ 1 − δ`.  With `δ = −1` this forces `w₁ ∣ 2`,
+impossible for the odd `w₁ = |W₁| ≥ 3`.  Hence `δ = 1`.  (This is the pure arithmetic of (11.8.1);
+the §9/Frobenius content is isolated in `charParam_d_modEq_one`.) -/
 theorem Hypothesis.charParam_delta_eq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) (params : CharacterParameters hyp)
     (hδpm : params.delta = 1 ∨ params.delta = -1) : params.delta = 1 := by
-  sorry
+  have hw1odd : Odd hyp.w1 := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card hyp.W1)
+  have hw1gt : 1 < hyp.w1 := (Subgroup.one_lt_card_iff_ne_bot _).mpr hyp.typeP.W1_nontrivial
+  have hw1 : 3 ≤ hyp.w1 := by obtain ⟨k, hk⟩ := hw1odd; omega
+  have hddelta : (hyp.w1 : ℤ) ∣ (params.d : ℤ) - params.delta :=
+    ⟨params.n, by rw [mul_comm]; exact params.n_formula.symm⟩
+  have hd1 : (hyp.w1 : ℤ) ∣ (1 : ℤ) - (params.d : ℤ) :=
+    Nat.modEq_iff_dvd.mp (hyp.charParam_d_modEq_one hG params)
+  have hkey : (hyp.w1 : ℤ) ∣ (1 : ℤ) - params.delta := by
+    have hcomb : (1 : ℤ) - params.delta = ((params.d : ℤ) - params.delta) + (1 - (params.d : ℤ)) := by
+      ring
+    rw [hcomb]; exact dvd_add hddelta hd1
+  rcases hδpm with h1 | hm1
+  · exact h1
+  · exfalso
+    rw [hm1] at hkey
+    have h2 : (hyp.w1 : ℤ) ∣ 2 := by simpa using hkey
+    have hle := Int.le_of_dvd (by norm_num) h2
+    have hw1Z : (3 : ℤ) ≤ (hyp.w1 : ℤ) := by exact_mod_cast hw1
+    omega
 
 open scoped Classical FiniteInduce in
 /-- **Peterfalvi (11.8.1), `|S(HC)| = n`** (§9 count, named obligation).  The number of degree-`w₁`
