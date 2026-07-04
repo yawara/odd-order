@@ -286,6 +286,19 @@
 
 ## 現状メモ
 
+- **2026-07-04 (朝) — tick: b の S12→S10 relocation を STOP→ユーザー裁定受理 + 大 drift 検出 (cron 4db07909 再作成)**:
+  b が lane-a authored の `typePData_V_ti`(Pf 4.6.b)/`typePData_typePV_not_mem_derived`(Pf 10.5) を
+  **S12_Core(lane a)→S10 へ upstream relocation** (b の type-P Dade engine `typePA0_isConj` が cite 用、
+  S10<S12 の import 依存で必須) + a の S12 call site 2 箇所更新 → **S12_Core 編集 = 0096 protocol の都度裁定
+  逸脱** で STOP (cron 541028bc CronDelete)。**ユーザー裁定 = 受理 (build 検証後合流、standing でない)**。
+  ⚠ **大 drift 教訓**: AskUserQuestion 回答まで ~6h gap があり、その間 b が loop¹²⁰→¹⁵⁵ の ~38 commit
+  ((12.14) SORRY-FREE 完成・(12.16) cyclotomic 等の Dade tower endgame、全 S14=b 所有 + S10 carve-out +
+  GroupTheory 共有) を進行 → `git merge b` が range-check 済 2-commit tip でなく現 tip を取り込んだ。
+  **post-merge 監査で全 clean 確認**: S10 out-of-scope decl 非接触 / S12 変更は承認済 relocation の 2 decl のみ
+  (他 decl 削除なし) / 新 axiom なし / 全ファイル owned(S14)・shared(GroupTheory)・carve-out(S10)・承認済(S12)
+  ゾーン内 / **build green 3912 / AxiomsCheck OK / sorry 113→112 (−1, b の 12.14 系 discharge)**。push
+  `042c2d05..316d818e`。**⟹ cron prompt に「長 gap 後は merge 直前に range 再確認」を追加** (step 5)。
+  S12_Core 編集は今後も 0096 protocol で都度裁定 (受理は standing carve-out でない)。
 - **2026-07-04 (夜) — tick: a(RepTheory induce_inner_trivial)/b(Pf 8.12.b faithful) 合流 + b の S10 (8.12.b) landing を hub 裁定受理 (carve-out 0096 拡張 #2) + 9006 relocate 裁定**:
   a=`692a8ba4` (`induce_inner_trivial` = ⟨Ind_H^G θ,1_G⟩=⟨θ,1_H⟩、GroupTheory/InducedCharacter 共有、
   grandfather leaf、build green 3906) +`a04539e4`(docs) → 合流 `69f8858b`。**b** = `7f863d33`
