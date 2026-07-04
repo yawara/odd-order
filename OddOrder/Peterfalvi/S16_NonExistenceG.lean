@@ -3655,14 +3655,110 @@ theorem characteristic_of_isCyclic {C : Type*} [Group C] [Finite C] [IsCyclic C]
   conv_rhs => rw [key K]
   rw [hcard_eq]
 
+open scoped IsMulCommutative in
 /-- **Peterfalvi (13.2.a) for `T`**: the `T`-side complement `V` is cyclic.  `V` is the abelian
 Frobenius kernel of the type-I-over-`N_G(V)` configuration.  This is the `T`/`V`-side dual of the
 `S`/`U`-side field-model cyclicity (`exists_pv_field_repr`, still to be built): once the dual Singer
 representation `μ : V ↪ 𝔽_{q^p}^×` is constructed from `V` abelian via
 `isSimpleModule_of_abelian_faithful_card`, `V` cyclic follows.  Used to transport `K = V` (14.11) to
 `K` cyclic in `MHypothesis_kernel_cyclic`. -/
-theorem V_cyclic [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) : IsCyclic ↥hyp.base.V := sorry
+theorem V_cyclic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) : IsCyclic ↥hyp.base.V := by
+  letI : Fact hyp.base.q.Prime := ⟨hyp.base.q_prime⟩
+  haveI : NeZero hyp.base.q := ⟨hyp.base.q_prime.ne_zero⟩
+  haveI hTII : IsTypeII hyp.base.T := T_typeII hG hyp
+  have hQea : IsElementaryAbelian hyp.base.q ↥hyp.base.Q := Q_elemAbelian_S hG hyp
+  haveI hQcomm : IsMulCommutative ↥hyp.base.Q := IsMulCommutative.of_comm hQea.comm
+  letI hVcomm : CommGroup ↥hyp.base.V :=
+    { (inferInstance : Group ↥hyp.base.V) with
+      mul_comm := fun a b =>
+        (isMulCommutative_iff.mp
+          (OddOrder.Peterfalvi.S15.isMulCommutative_V hG hyp.base hTII)) a b }
+  -- `|V| = v = (q^p - 1)/(q - 1)`: `d = 1` from `D = V ⊓ C_G(Q) = ⊥` (13.12 dual), plus the
+  -- `v`-value (14.4) `T_side_caseB_facts`.
+  have hv_full : Nat.card ↥hyp.base.V =
+      (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1) := by
+    have hDbot : hyp.base.D = ⊥ := by
+      rw [hyp.base.D_eq]
+      exact OddOrder.Peterfalvi.S15.V_inf_centralizer_Q_eq_bot hG hyp.base hTII
+    have hd1 : hyp.base.d = 1 := by rw [hyp.base.d_eq_card_D, hDbot, Subgroup.card_bot]
+    rw [hyp.base.card_V_eq_vd, hd1, mul_one]
+    exact (T_side_caseB_facts hG hyp).2
+  have hqsmul : ∀ x : Additive ↥hyp.base.Q, (hyp.base.q : ℕ) • x = 0 := by
+    intro x
+    apply Additive.toMul.injective
+    rw [toMul_nsmul, toMul_zero]
+    exact hQea.pow_eq_one x.toMul
+  haveI hQmod : Module (ZMod hyp.base.q) (Additive ↥hyp.base.Q) :=
+    AddCommGroup.zmodModule hqsmul
+  -- the conjugation representation of `V` on `Additive ↥Q`
+  let conjHom : ↥hyp.base.V →* MulAut ↥hyp.base.Q :=
+    (Subgroup.normalizerMonoidHom (H := hyp.base.Q)).comp
+      (Subgroup.inclusion (V_le_normalizer_Q hyp))
+  let ρ : Representation (ZMod hyp.base.q) ↥hyp.base.V (Additive ↥hyp.base.Q) :=
+    (OddOrder.BG.Ch1_Preliminary.mulAutToEnd ↥hyp.base.Q hyp.base.q).comp conjHom
+  have hρ_apply : ∀ (c : ↥hyp.base.V) (a : Additive ↥hyp.base.Q),
+      ρ c a = Additive.ofMul ((conjHom c) (Additive.toMul a)) := fun _ _ => rfl
+  letI hQmodAlg :
+      Module (MonoidAlgebra (ZMod hyp.base.q) ↥hyp.base.V) (Additive ↥hyp.base.Q) :=
+    Module.compHom (Additive ↥hyp.base.Q) (ρ.asAlgebraHom).toRingHom
+  have hof_smul : ∀ (c : ↥hyp.base.V) (a : Additive ↥hyp.base.Q),
+      MonoidAlgebra.of (ZMod hyp.base.q) ↥hyp.base.V c • a =
+        Additive.ofMul ((conjHom c) (Additive.toMul a)) := by
+    intro c a
+    have h : MonoidAlgebra.of (ZMod hyp.base.q) ↥hyp.base.V c • a = ρ c a := by
+      show (ρ.asAlgebraHom (MonoidAlgebra.of (ZMod hyp.base.q) ↥hyp.base.V c)) a = ρ c a
+      rw [Representation.asAlgebraHom_of]
+    rw [h, hρ_apply]
+  haveI hNeZero : NeZero (Nat.card ↥hyp.base.V : ZMod hyp.base.q) := by
+    refine ⟨fun h => ?_⟩
+    rw [hv_full] at h
+    have hdvd : hyp.base.q ∣ (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1) :=
+      (ZMod.natCast_eq_zero_iff _ _).mp h
+    have hmod : (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1) ≡ 1 [MOD hyp.base.q] := by
+      have hsum_eq : ∑ k ∈ Finset.range hyp.base.p, hyp.base.q ^ k =
+          (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1) :=
+        Nat.geomSum_eq hyp.base.q_prime.two_le _
+      rw [← hsum_eq, show hyp.base.p = (hyp.base.p - 1) + 1 by
+          have := hyp.base.p_prime.pos; omega, Finset.sum_range_succ']
+      have hzero : (∑ k ∈ Finset.range (hyp.base.p - 1), hyp.base.q ^ (k + 1)) ≡ 0
+          [MOD hyp.base.q] := by
+        rw [Nat.modEq_zero_iff_dvd]
+        exact Finset.dvd_sum fun k _ => dvd_pow_self hyp.base.q (Nat.succ_ne_zero k)
+      simpa using hzero.add_right 1
+    have hdvd1 : hyp.base.q ∣ 1 := by
+      have h0 := (Nat.modEq_zero_iff_dvd).mpr hdvd
+      have h01 := h0.symm.trans hmod
+      rwa [Nat.modEq_iff_dvd', Nat.sub_zero] at h01
+      omega
+    exact absurd (Nat.le_of_dvd one_pos hdvd1) (by have := hyp.base.q_prime.two_le; omega)
+  have hcardM : Nat.card (Additive ↥hyp.base.Q) = hyp.base.q ^ hyp.base.p :=
+    OddOrder.Peterfalvi.S15.card_Q_eq hG hyp.base hTII
+  have hfaith : ∀ c : ↥hyp.base.V,
+      (∀ x : Additive ↥hyp.base.Q,
+          MonoidAlgebra.of (ZMod hyp.base.q) ↥hyp.base.V c • x = x) → c = 1 := by
+    intro c hc
+    have hcomm : ∀ y : ↥hyp.base.Q, (c : G) * (y : G) = (y : G) * (c : G) := by
+      intro y
+      have h1 := hc (Additive.ofMul y)
+      rw [hof_smul] at h1
+      have h2 : (conjHom c) y = y := Additive.ofMul.injective (by simpa using h1)
+      have h3 : (c : G) * (y : G) * (c : G)⁻¹ = (y : G) := congrArg Subtype.val h2
+      rwa [mul_inv_eq_iff_eq_mul] at h3
+    have hmem : (c : G) ∈ hyp.base.D := by
+      rw [hyp.base.D_eq]
+      exact ⟨c.2, Subgroup.mem_centralizer_iff.mpr (fun y hy => (hcomm ⟨y, hy⟩).symm)⟩
+    have hDbot : hyp.base.D = ⊥ := by
+      rw [hyp.base.D_eq]
+      exact OddOrder.Peterfalvi.S15.V_inf_centralizer_Q_eq_bot hG hyp.base hTII
+    rw [hDbot, Subgroup.mem_bot] at hmem
+    exact Subtype.ext hmem
+  obtain ⟨e0, μ, hμinj, _⟩ :=
+    OddOrder.RepresentationTheory.exists_galoisField_repr
+      (C := ↥hyp.base.V) (M := Additive ↥hyp.base.Q)
+      hyp.base.p_prime hyp.base.p_odd hcardM hv_full hfaith
+  -- `μ : V ↪ 𝔽_{q^p}ˣ` is injective and the finite-field unit group is cyclic, so `V` is cyclic.
+  exact isCyclic_of_injective μ hμinj
 
 /-- **Peterfalvi (14.11)/(14.4)/(13.12)**: the Fitting kernel `K = M_F` of the type-I maximal
 subgroup `M` over `N_G(V)` is cyclic.
