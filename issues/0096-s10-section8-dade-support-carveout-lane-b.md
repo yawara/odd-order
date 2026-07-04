@@ -1105,3 +1105,29 @@ block A (= constt Ind_N λ, N:=H'.subgroupOf H) 内: ⟨f,θ⟩ は θ≠1_H で
 - **翻訳**: g(x)=(chiRhoCF psi)(x:L) via restrict_apply; x∉H_core ⟺ h∉Hprime (subgroupOf iso)。
 - **要確認/新設**: (a) ψ_ρ 存在補題 (Irr(inertia ρ) で compHom ρ の上); (b) x∉commutator(G_core) ⟺ 像∉derivedInG H;
   (c) inertia T_ρ の Fintype/Invertible/Normal instance plumbing。
+
+### loop¹⁸³⁻¹⁸⁵ — (12.5) Brick D 材料 **全完成** — 残 = 純 S14 wiring + commutator bridge
+
+**この iteration (2 commit)**: Brick D の最後の難所 2 補題を landing (全 green)。
+- `exists_liesOver_of_subgroup` (CliffordSingleOrbit): exists_liesOver の双対 (σ∈Irr H の上に ψ∈Irr G 存在)。
+  Ind σ 正次数 ⟹ 非零 ⟹ completeness。inertia setup の Clifford correspondent ψ を供給。
+- `commutator_induce_constituents_apply_one_eq` (InducedInvariantConstituent): [HH,HH] block 等次数。
+  induce_inertia_constituents_apply_one_eq を N=[HH,HH]/T=I(ρ)/ψ=上記/hab=⁅⊤,⊤⁆ で適用、
+  inertia instance を Fintype.ofFinite/invertibleOfNonzero/subgroupOf_inertia_normal 供給。
+  **注**: LiesOver を signature で述べるため `[Fintype ↥(commutator HH)] [Invertible (card ↥(commutator HH):ℂ)]`
+  を signature instance に要 (body haveI 不可)。
+
+**(12.5) 材料 全完成リスト** (core+partition+等次数+等mult+θ-coeff+ψ存在):
+core `constant_off_normal_of_inner_block_const` / `exists_induce_constituent_partition` (block char 付) /
+`inner_induce_constituent_eq_of_apply_one_eq` (等mult) / `commutator_induce_constituents_apply_one_eq` (等次数) /
+`chiRhoCF_restrict_inner_eq_of_equal_degree` (S14 θ-coeff) / `exists_liesOver_of_subgroup`。
+
+**残 = 純 S14 wiring のみ** (`rho_constant_on_H_minus_Hprime` restate + core 帰着):
+- G_core := ↥((hyp.H).subgroupOf L)、H_core := commutator G_core、g := restrict((hyp.H).subgroupOf L)(chiRhoCF psi)。
+- **commutator bridge** (残る唯一の非自明 sub-task): `x ∈ commutator ↥(H.subgroupOf L) ↔ (x:G) ∈ derivedInG H`。
+  `subgroupOfEquivOfLe (H≤L) : ↥(H.subgroupOf L) ≃* ↥H` で commutator 転送
+  (`(derivedInG H).subgroupOf H = commutator ↥H` = FeitThompson:955) + coercion chain。
+- hcoeff: 等次数(helper) → θᵢ≠triv ⟹ Ind_{H.subgroupOf L}θᵢ∈Sset → θ-coeff (inner 引数順は conj で合わせる:
+  core は inner(g,θ)、θ-coeff は inner(θ,restrict); g=restrict ゆえ inner(g,θ)=conj inner(θ,g))。
+- hmult: 等次数(helper) → Brick A。
+- 翻訳: g(x)=(chiRhoCF psi)(x:L) via restrict_apply; x∉H_core ⟺ h∉Hprime (bridge)。
