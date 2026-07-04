@@ -1073,3 +1073,29 @@ hzeta_cross 完成 (cont.³⁷) で **深部 §1 frontier は完結**。残る e
 hgood + hBsum + hG0sum + 𝓑-set min-index) → card_G0_lower_bound。
 
 次 iteration: betaDecompOfFacts を F.hypothesis78 i に適用、11 facts を供給 (新規 4 facts を証明)。
+
+## 2026-07-04 cont.⁴⁰ — BetaDecomp construction-ready (全 abstract lemma 同定)
+
+`betaDecompOfDade` (S09_CertDischarge:2309-2315) が `betaDecompOfFacts H78 rfl <11 facts>` で構築する
+パターンを **F.hypothesis78 i に mirror** すれば良い。11 facts の abstract lemma (全確認済):
+- horth = `induce_family_orthogonal_of_injective K θ hinj` (S09_CertDischarge:403)
+- hN = `induce_norm_ne_zero K (θ j)` (:350)
+- hP_real = `induce_apply_one_star K (θ i)` (:376)
+- hzeta_orth_one = `inner_induce_constOne_eq_zero K (θ i) (θ_i≠triv)` (:930)
+- hβ1: `H78.beta_def` → `inner_tau_supported_constOne` (:974) → `inner_sub_left` →
+  `inner_induce_trivialChar_constOne_eq_one` (:944) + `inner_induce_constOne_eq_zero` (θ_0≠triv) → 1−0
+  (betaDecompOfDade:2305-2308 と同一)
+- hagree = `coherence_hagree_dadeMap` (FrobeniusEstimate:396 パターン; d-matching は betaDecompOfDade
+  hdeq:2274 と同型)
+- hzeta0nu = `F.hzeta0nu i ... (θ 0) hθ0_ne` (FrobeniusEstimate:446)
+- hζ0norm = `(hypothesis78_zeta_irreducible i ...).inner_self_eq_one`
+- a/ha = `exists_betaDecomp_a H78 hindZ hζ0nuZ` (hindZ = `induce_mem_ZIrr`, FrobeniusEstimate:418-422)
+- hzd = rfl, hz0 = `induce_apply_one_ne_zero`
+
+**要 projection bridge**: 各 fact は `(F.hypothesis78 i).hyp76.zeta a` を `hypothesis78_hyp76_zeta_eq`
+(congrFun) で `induce K (sibleyPlacedFamily.θ a)` に rw してから abstract lemma 適用。~70-80 行。
+
+**注**: betaDecompOfFacts は H78 引数を直接取る → F.hypothesis78 i をそのまま渡せ、OfDade defeq 不要。
+d-matching (H78.hyp76.d vs induced degree) だけ betaDecompOfDade hdeq パターンで橋渡し。
+
+次 iteration: この construction を書いて build。その後 (7.9) conclusion (hBD 完成で全 input 揃う)。
