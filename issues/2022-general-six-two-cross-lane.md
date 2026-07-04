@@ -397,3 +397,16 @@ coeff (X ∈ ℤ[R]) / Y ⊥ R。
 4. member-D (可約 χ): D.tau1 χ = extension χ は列和の
    coherence-extension 値 = Σ extension(成分)-linearity。
 
+
+### 追記 (loop 27 調査続き): 既存インフラは想定より進んでいる
+
+- `Hypothesis.exists_conj_column` (S12_Core:5148): (Σ_i μ_ij).conj = Σ_i μ_ij'
+  (j' ≠ 0, j) — ψ̄-列対応は既製。
+- docstring 言及: `tau_muGrid_columnSum_diff` (k = j') が列の
+  OrthonormalCharacterImageFamily の image_eq (τ(μ_j − μ̄_j) = Σ R(μ_j)) を供給
+  = imageFamily-core は組み立て可能。
+- muGridAlpha_inner_muColumn_(self_)sub_conj / …_tau_inner_… 系 (S12_Core:3722-4150)
+  が R(ψ)-直交性計算の大半をカバー。
+- 残り本体: CharacterPsiDecomposition の tau1 (lattice-relative isometry) を
+  列和 ψ に対して与える部分 = (5.2) 的 τ₁-構成。irr 版
+  `decompositionDaFromDadeOfDiff` の内部を読み、列版に一般化するのが次の実作業。
