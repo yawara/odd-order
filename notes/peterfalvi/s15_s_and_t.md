@@ -10,6 +10,25 @@
 
 ## ✅ LIVE STATUS (2026-07-05 後半, lane **b** — (13.10) 4 producer 全 discharge、residual = 教科書番号 5 本)
 
+### cont.⁴ (07-05 loop it.20-25): (13.5)-package 3 本全 real 化 — cascade 構造完成
+
+- **T-side ρ-machinery mirror** (`0c541512`): Q_sharp_dadeHypothesis → hconj → h71 → h76
+  (proven Q_sharp_isTISubset から、全て実証明)
+- **(13.5.a) machinery generic 化** (`3ba0347b` + 後続): 任意 H76 + P' 上の point formula
+  (kernel-only + distinguished-i₁)、alphaFun cluster、F-inflation、**generic P'-kernel 直交性**
+  (`hypothesis76_zeta_inner_alphaFun_eq_zero`) — S/T 両側の共通基盤
+- **`exists_caseB_data_eta10_T` 実 assembly** (`88fd43a0`): ζ = (1/p)μ′ 正規化、
+  firstTerm = (1/p²)(|T|p−(pv)²) = |T′|−v² (card_T_eq_deriv_mul_p)、全部品 1-line cite
+
+**cascade 最終構造**: analytic_inequality (13.10、実定理) ← 4 producer (全実 assembly) ←
+sharp 3 本 (全 engine assembly) ← (13.5)-package 3 本 (全実 assembly) ← **原子 6 fact**:
+`exists_lambda_index`/`lambda_tau1_norm_one` ((13.3)-同定)、`eta10_cCoeff_orthogonal`/
+`exists_muT_index` ((13.3.c)-直交)、`exists_lambda_alphaFun_one_qb`/
+`eta10_alphaCF_one_ne_zero` ((1.10)-合同 = **issue 2033**)、`exists_etaT_alphaFun_one_int`
+(Q-abelian gated) + (13.3)/(13.4)/dichotomy/reconciled。
+**b の次の ungated front = issue 2033 の supply 側** (ω-因子分解 field threading —
+3002 パターン、lane-a file への additive 編集権は 07-05 裁定済)。
+
 ### cont.³ (07-05 loop it.14-19): λ-package 実 assembly + 直交性 real 化、gate-map 確定
 
 - **`exists_caseB_data_lambda` 実 assembly** (`0dc592c0`): atom 3 本 (exists_lambda_index /
