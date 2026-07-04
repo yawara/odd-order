@@ -310,3 +310,10 @@ coherent_S_of_coherent_SH0C。(11.6) 消費側の再点検 or (5.7) 配線が次
   `C_eq_derivedU` (C ≤ HC = M'' ≤ H⊔U', H⊓U=⊥ で H-部分消去)。
 - `core_structure` (11.6) 残 = conjunct 1 (H は p-群; (9.3) U centralizes O_{p'}(H) 要)
   + conjunct 3 (H₀ = H'; BG 1.6(d) 要)。commit 426b995c。
+
+## 2026-07-05 lane-a (loop 16-19): **(11.6) H は p-群 閉了** + C=U' 済
+
+- loop 15: C = U' (M'' ≤ H⊔U' 経由)。loop 16-19: S13_CoreStructure leaf 新設、
+  (9.3) 転写 → O_{q'} ≤ C_H(U) → R=O_{p'}(H) 定義 → M'' ≤ O_p⁅R,R⁆ ⊔ U' →
+  R perfect → R=⊥ → IsPGroup p H。commits ef7d40d5/e3d4707b/8e302745/(this)。
+- core_structure 残 = H₀ = H' conjunct のみ (BG 1.6(d) + (11.5))。
