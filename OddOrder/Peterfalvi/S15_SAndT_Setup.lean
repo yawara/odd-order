@@ -1996,30 +1996,184 @@ theorem lambda_tau1_norm_one [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {hyp : Hypothesis (G := G)} (chars : CharacterDegreeData hyp)
     (_hlam : chars.lambda_induced_from_PC_linear) :
     chars.tau1S chars.lambda ∈ ZIrr G ∧
-      ClassFunction.inner (chars.tau1S chars.lambda) (chars.tau1S chars.lambda) = 1 := by
+      ClassFunction.inner (chars.tau1S chars.lambda) (chars.tau1S chars.lambda) = 1 ∧
+      ClassFunction.inner chars.lambda chars.lambda = 1 := by
   sorry
 
-/-- **Peterfalvi (13.6), textbook form**: `∑_{x∈H^#}|λ^{τ₁}(x)|² ≥ |S| − λ(1)²` (`λ(1) = uq`),
-as a sum over the ambient sharp `H^# ⊂ G`.  Faithful producer; the (13.5) ρ-machinery
-(`caseB_lambda_norm_bound` + `H_sharp_hypothesis76`) discharges it once the (13.5.a) point
-formula is pinned to `λ^{τ₁}` — the residual is the (13.2.e) `τ`-agreement and the `u`-bound
-`2u ≤ |P|−1` (issue 9000). -/
-theorem lambda_tau1_sharp_norm_lower [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+open scoped Classical in
+/-- **Sharp-set sum transport** (subgroup-of form ↔ ambient form): for `K ≤ L`, a sum over the
+nonidentity `K`-members *inside `↥L`* equals the sum over the ambient sharp `K^# ⊂ G`.  The
+bridge between the (13.5)/(13.6) engines (stated inside the abstract ambient `↥S` with
+`H.subgroupOf S`) and the (13.10) counting layer (stated over `sharpSubgroup K ⊂ G`). -/
+theorem sum_apply_erase_one_filter_subgroupOf [Finite G] {M : Type*} [AddCommMonoid M]
+    {K L : Subgroup G} [Fintype ↥L] (hKL : K ≤ L) (f : G → M) :
+    ∑ x ∈ (Finset.univ.filter (· ∈ K.subgroupOf L)).erase 1, f ↑x
+      = ∑ x ∈ (Set.toFinite (sharpSubgroup K)).toFinset, f x := by
+  classical
+  refine Finset.sum_bij' (fun x _ => (↑x : G))
+    (fun y hy => (⟨y, hKL ((Set.Finite.mem_toFinset _).mp hy).1⟩ : ↥L)) ?_ ?_ ?_ ?_ ?_
+  · intro x hx
+    obtain ⟨hx1, hxK⟩ := Finset.mem_erase.mp hx
+    rw [Set.Finite.mem_toFinset]
+    refine ⟨Subgroup.mem_subgroupOf.mp (Finset.mem_filter.mp hxK).2, ?_⟩
+    intro h1
+    rw [Set.mem_singleton_iff] at h1
+    exact hx1 (Subtype.ext h1)
+  · intro y hy
+    obtain ⟨hyK, hy1⟩ := (Set.Finite.mem_toFinset _).mp hy
+    refine Finset.mem_erase.mpr ⟨?_, Finset.mem_filter.mpr
+      ⟨Finset.mem_univ _, Subgroup.mem_subgroupOf.mpr hyK⟩⟩
+    intro h1
+    exact hy1 (by simpa using congrArg (Subtype.val) h1)
+  · intro x hx
+    rfl
+  · intro y hy
+    rfl
+  · intro x hx
+    rfl
+
+/-- **`2u ≤ |P| − 1`** (Peterfalvi (13.2.c) consequence): from the (13.2.e) bound
+`u ≤ (p^q − 1)/(p − 1)` (`basic_structure`) and `p ≥ 3`, so `u ≤ (p^q−1)/2`. -/
+theorem Hypothesis.two_mul_u_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) : 2 * hyp.u ≤ hyp.p ^ hyp.q - 1 := by
+  obtain ⟨-, -, -, -, hub, -⟩ := basic_structure hG hyp
+  have hp3 := hyp.three_le_p
+  have h1 : (hyp.p ^ hyp.q - 1) / (hyp.p - 1) ≤ (hyp.p ^ hyp.q - 1) / 2 :=
+    Nat.div_le_div_left (by omega) (by omega)
+  have h2 : (hyp.p ^ hyp.q - 1) / 2 * 2 ≤ hyp.p ^ hyp.q - 1 := Nat.div_mul_le_self _ _
+  omega
+
+open scoped Classical in
+open scoped FiniteInduce in
+/-- **Peterfalvi (13.5.a)+(13.5.c) for `ζ₁ = λ`, `χ = λ^{τ₁}`, `a = 1`** — the correction datum
+`α` of the (13.5) TI-subset calculation: `λ` vanishes off `H` (induced from `H ⊴ S`),
+`(Res_H λ, α) = 0` (the `P`-kernel orthogonality), the point formula `λ^{τ₁} = λ + α` on `H^#`
+((7.7.a) `chiRho_explicit_formula` on the proven `H_sharp_hypothesis76`, plus the (13.2.e)
+`τ`-agreement), `α(1) = qb` (the (1.10) congruence), and the inflation bound
+`(|P|−1)·α(1)² ≤ ∑_{H^#}|α|²` ((13.5.c), `P ≤ ker` of every component of `α`).  Faithful
+producer of the (13.5)-for-`λ` package; gated on the (13.3)/(13.2.e) analysis. -/
+theorem exists_caseB_data_lambda [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {hyp : Hypothesis (G := G)} (chars : CharacterDegreeData hyp)
     (_hlam : chars.lambda_induced_from_PC_linear) :
+    ∃ (α : ↥hyp.S → ℂ) (b : ℤ),
+      (∀ x : ↥hyp.S, x ∉ hyp.H.subgroupOf hyp.S → chars.lambda x = 0) ∧
+      (∑ x ∈ Finset.univ.filter (· ∈ hyp.H.subgroupOf hyp.S),
+        chars.lambda x * (starRingEnd ℂ) (α x)) = 0 ∧
+      (∀ x ∈ (Finset.univ.filter (· ∈ hyp.H.subgroupOf hyp.S)).erase 1,
+        chars.tau1S chars.lambda ↑x = chars.lambda x + α x) ∧
+      α 1 = (hyp.q : ℂ) * (b : ℂ) ∧
+      ((hyp.p ^ hyp.q - 1 : ℕ) : ℝ) * ((hyp.q : ℝ) * (b : ℝ)) ^ 2
+        ≤ ∑ x ∈ (Finset.univ.filter (· ∈ hyp.H.subgroupOf hyp.S)).erase 1, ‖α x‖ ^ 2 := by
+  sorry
+
+open scoped Classical in
+open scoped FiniteInduce in
+/-- **Peterfalvi (13.6), textbook form**: `∑_{x∈H^#}|λ^{τ₁}(x)|² ≥ |S| − λ(1)²` (`λ(1) = uq`),
+as a sum over the ambient sharp `H^# ⊂ G`.
+
+**Real assembly** through the (13.5) engine `caseB_lambda_norm_bound` (inside `↥S`, with
+`H.subgroupOf S`): the character-theoretic inputs are the (13.5)-for-`λ` package
+(`exists_caseB_data_lambda`), the norm facts (`lambda_tau1_norm_one`: `‖λ‖² = 1` gives the
+`S`-Parseval `∑_S|λ|² = |S|`), the degree `λ(1) = uq` (`lambda_degree`), and the `u`-bound
+`2u ≤ |P| − 1 = p^q − 1` (`two_mul_u_le`, real from (13.2.e)); the engine output transports to
+the ambient sharp by `sum_apply_erase_one_filter_subgroupOf`. -/
+theorem lambda_tau1_sharp_norm_lower [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {hyp : Hypothesis (G := G)} (chars : CharacterDegreeData hyp)
+    (hlam : chars.lambda_induced_from_PC_linear) :
     (Nat.card ↥hyp.S : ℝ) - ((hyp.u * hyp.q : ℕ) : ℝ) ^ 2
       ≤ ∑ x ∈ (Set.toFinite (sharpSubgroup hyp.H)).toFinset,
           ‖chars.tau1S chars.lambda x‖ ^ 2 := by
+  classical
+  obtain ⟨α, b, hvanish, hinner, hχ, hα1, hinfl⟩ := exists_caseB_data_lambda _hG chars hlam
+  obtain ⟨-, -, hinnerLam⟩ := lambda_tau1_norm_one _hG chars hlam
+  -- `H ≤ S`.
+  have hUS : hyp.U ≤ hyp.S := by
+    have h1 : hyp.U ≤ derivedInG hyp.S := by rw [hyp.S_deriv_eq_PU]; exact le_sup_right
+    exact le_trans h1 (Subgroup.map_subtype_le _)
+  have hHS : hyp.H ≤ hyp.S := by
+    show hyp.P ⊔ hyp.C ≤ hyp.S
+    refine sup_le ?_ ?_
+    · rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
+    · rw [hyp.C_eq]; exact le_trans inf_le_left hUS
+  -- The `S`-Parseval total: `∑_{x:S}‖λ(x)‖² = |S|`.
+  have hT : ∑ x : ↥hyp.S, ‖chars.lambda x‖ ^ 2 = ((Nat.card ↥hyp.S : ℕ) : ℝ) := by
+    have h := sum_normSq_eq_card_mul_inner (H := ↥hyp.S) chars.lambda
+    rw [hinnerLam, mul_one] at h
+    exact_mod_cast h
+  -- Degree facts.
+  have hlamOne : chars.lambda 1 = ((hyp.u * hyp.q : ℕ) : ℂ) := chars.lambda_degree
+  have hzetaOne : ‖chars.lambda 1‖ ^ 2 = (((hyp.u * hyp.q : ℕ) : ℝ)) ^ 2 := by
+    rw [hlamOne, Complex.norm_natCast]
+  have hcross : (chars.lambda 1 * (starRingEnd ℂ) (α 1)).re
+      = ((hyp.u * hyp.q : ℕ) : ℝ) * ((hyp.q : ℝ) * (b : ℝ)) := by
+    have hval : chars.lambda 1 * (starRingEnd ℂ) (α 1)
+        = ((((hyp.u * hyp.q : ℕ) : ℝ) * ((hyp.q : ℝ) * (b : ℝ)) : ℝ) : ℂ) := by
+      rw [hlamOne, hα1, map_mul]
+      push_cast [map_natCast, map_intCast]
+      ring
+    rw [hval, Complex.ofReal_re]
+  have hlam1 : ((hyp.u * hyp.q : ℕ) : ℝ) = (hyp.u : ℝ) * (hyp.q : ℝ) := by push_cast; ring
+  -- The engine.
+  have hu := hyp.two_mul_u_le _hG
+  -- The engine (bridging the `Classical` decidability instances baked into its statement).
+  have hengine : (Nat.card ↥hyp.S : ℝ) - ((hyp.u * hyp.q : ℕ) : ℝ) ^ 2
+      ≤ ∑ x ∈ (Finset.univ.filter (· ∈ hyp.H.subgroupOf hyp.S)).erase 1,
+          ‖chars.tau1S chars.lambda ↑x‖ ^ 2 := by
+    have h := caseB_lambda_norm_bound (S := ↥hyp.S) (hyp.H.subgroupOf hyp.S)
+      (fun x => chars.lambda x) α (fun x => chars.tau1S chars.lambda ↑x)
+      (Scard := Nat.card ↥hyp.S) (Pm1 := hyp.p ^ hyp.q - 1)
+      (u := hyp.u) (q := hyp.q) (lam1 := ((hyp.u * hyp.q : ℕ) : ℝ)) (b := b)
+      hvanish (by convert hinner using 2 <;> congr!)
+      (fun x hx => hχ x (by convert hx using 2 <;> congr!))
+      hT hzetaOne hcross hlam1
+      (by convert hinfl using 2 <;> congr!) hu
+    convert h using 2 <;> congr!
+  -- Transport to the ambient sharp set.
+  rwa [sum_apply_erase_one_filter_subgroupOf hHS
+    (fun y => ‖chars.tau1S chars.lambda y‖ ^ 2)] at hengine
+
+/-- **Peterfalvi (13.5) for `χ = η₁₀`, `a = 0`** — the correction datum of the (13.7) estimate:
+`η₁₀` is orthogonal to `S^{τ₁}` ((5.3.b)+(5.5)+(13.3.c)), so the (13.5.a) point formula
+collapses to `η₁₀ = α` on `H^#`; the sharp sum of `‖α‖²` is the integer
+`s = |H|·‖α‖² − α(1)²` (`n = ‖α‖²`, Parseval), `α(1)² = d²` with `d ≡ 1 (mod q)` (so `α ≠ 0`,
+`n ≥ 1`), the (13.5.c) inflation bound holds with `|P| = p^q`, and — `H` being abelian
+(13.2.a,b) — `n = 1` forces `d² = 1`.  Faithful producer of the (13.5)-for-`η₁₀` package. -/
+theorem exists_caseB_data_eta10 [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    ∃ (α : G → ℂ) (d n s : ℕ),
+      (∀ x ∈ (Set.toFinite (sharpSubgroup hyp.H)).toFinset, hyp.eta10 x = α x) ∧
+      (∑ x ∈ (Set.toFinite (sharpSubgroup hyp.H)).toFinset, ‖α x‖ ^ 2 = (s : ℝ)) ∧
+      1 ≤ n ∧ s + d ^ 2 = Nat.card ↥hyp.H * n ∧
+      (hyp.p ^ hyp.q - 1) * d ^ 2 ≤ s ∧ (n = 1 → d ^ 2 = 1) := by
   sorry
 
 /-- **Peterfalvi (13.7), textbook form**: `∑_{x∈H^#}|η₁₀(x)|² ≥ |H^#|`, as a sum over the
-ambient sharp `H^# ⊂ G`.  Faithful producer; the engine is `caseB_eta_norm_bound` — the
-residual is the (13.5.a) `a = 0` point formula for `η₁₀` on `H^#`. -/
+ambient sharp `H^# ⊂ G`.
+
+**Real assembly** through the (13.7) engine `caseB_eta_norm_bound` (stated over an abstract
+`Finset`, instantiated with `H^# ⊂ G` directly): the character-theoretic inputs are the
+(13.5)-for-`η₁₀` package (`exists_caseB_data_eta10`); `|H| ≥ 1` and `|P| = p^q ≥ 2` are
+counting facts. -/
 theorem eta10_sharp_norm_lower [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     (Nat.card ↥hyp.H : ℝ) - 1
       ≤ ∑ x ∈ (Set.toFinite (sharpSubgroup hyp.H)).toFinset, ‖hyp.eta10 x‖ ^ 2 := by
-  sorry
+  obtain ⟨α, d, n, s, hχ, hs, hn, hParseval, hInflation, habelian⟩ :=
+    exists_caseB_data_eta10 _hG hyp
+  have hH1 : 1 ≤ Nat.card ↥hyp.H := Nat.one_le_iff_ne_zero.mpr Nat.card_pos.ne'
+  have hP2 : 2 ≤ hyp.p ^ hyp.q - 1 + 1 := by
+    have hp3 := hyp.three_le_p
+    have hq3 := hyp.three_le_q
+    have h1 : 3 ≤ hyp.p ^ hyp.q := by
+      calc 3 ≤ hyp.p := hp3
+        _ ≤ hyp.p ^ hyp.q := Nat.le_self_pow (by omega) _
+    omega
+  haveI : Fintype G := Fintype.ofFinite G
+  have h := caseB_eta_norm_bound (S := G) α (fun x => hyp.eta10 x)
+    ((Set.toFinite (sharpSubgroup hyp.H)).toFinset)
+    (Hcard := Nat.card ↥hyp.H) (P := hyp.p ^ hyp.q - 1 + 1) (d := d) (n := n) (s := s)
+    hH1 (fun x hx => hχ x hx) hs hP2 hn hParseval (by simpa using hInflation) habelian
+  exact h
 
 /-- **Peterfalvi (13.8) applied to `T`**: `∑_{x∈Q^#}|η₁₀(x)|² ≥ |T'| − v²`, as a sum over the
 ambient sharp `Q^# ⊂ G`.  Faithful producer; the engine is `caseB_eta01_norm_bound` on the
@@ -2045,7 +2199,7 @@ theorem analyticEstimate_lambda [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd
         - (hyp.u : ℚ) * (hyp.q : ℚ) / ((hyp.c : ℚ) * (hyp.p : ℚ) ^ hyp.q) := by
   classical
   have hlam := chars.lambda_induced_from_PC_linear_holds
-  obtain ⟨hZ, hn⟩ := lambda_tau1_norm_one _hG chars hlam
+  obtain ⟨hZ, hn, -⟩ := lambda_tau1_norm_one _hG chars hlam
   obtain ⟨hD, hv, hQ⟩ := lambda_forces_T_caseB _hG chars hlam
   obtain ⟨hd1, hv2, hvd⟩ := hyp.caseB_vd_facts hD hv
   set φ : ClassFunction G ℂ := chars.tau1S chars.lambda with hφdef
@@ -2416,7 +2570,7 @@ theorem analyticEstimate_galois [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd
         + normSqSumQ hyp.G0Finset hyp.eta10 / (Nat.card G : ℚ) := by
   classical
   have hlam := chars.lambda_induced_from_PC_linear_holds
-  obtain ⟨hZlam, -⟩ := lambda_tau1_norm_one _hG chars hlam
+  obtain ⟨hZlam, -, -⟩ := lambda_tau1_norm_one _hG chars hlam
   have hZeta := hyp.eta10_mem_ZIrr
   set φ : ClassFunction G ℂ := chars.tau1S chars.lambda with hφdef
   set A : Finset G := hyp.G0Finset.filter (fun y => φ y ≠ 0) with hA
