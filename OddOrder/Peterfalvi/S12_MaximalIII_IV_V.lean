@@ -3788,6 +3788,20 @@ def Hypothesis.toTypesIIIIIIVSetup [Finite G] {M : Subgroup G} (hyp : Hypothesis
   nontrivial := hnt
   type_alt := htype.elim (fun h => Or.inr (Or.inl h)) (fun h => Or.inr (Or.inr h))
 
+/-- **Peterfalvi (11.8.1), the Frobenius congruence `|U| ≡ 1 (mod q)`.**  The type-`P` group
+`U ⋊ W₁` is a Frobenius group with kernel `U` (`typeP_uW1_frobenius`, `U ≠ ⊥` from the type-`P`
+`U_nontrivial`), so by Isaacs Lemma 6.1 (`card_kernel_modEq_one`) `|U| ≡ 1 (mod |W₁| = q)`.  This is
+the group-theoretic half of (11.8.1)'s `δ = 1`: with the (9.8)/(9.9) degree `d = μ_{ij}(1) = |Ū|`
+and the `U/C_U(H̄)`-quotient of this congruence `|Ū| ≡ 1 (mod q)`, the index relation `n·q = d − δ`
+(`δ = ±1`) forces `d ≡ 1 (mod q)`, i.e. `δ = 1`. -/
+theorem Hypothesis.card_U_modEq_one [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    (hU : hyp.typeP.U ≠ ⊥) :
+    Nat.card ↥hyp.typeP.U ≡ 1 [MOD hyp.w1] := by
+  have h := (OddOrder.Peterfalvi.S11.typeP_uW1_frobenius hyp.typeP hU).card_kernel_modEq_one
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_left).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv] at h
+  exact h
+
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.1), `δ = 1`** (§9 count, named obligation).  The (10.3) column sign `δ`
 equals `1`.  `(U/C) ⋊ W₁` is a Frobenius group with abelian kernel `U/C`, so `u = |U/C| ≡ 1 (mod q)`;
