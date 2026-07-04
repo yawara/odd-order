@@ -41,6 +41,25 @@ instance instMul : Mul (ClassFunction G k) where
 
 @[simp] theorem mul_apply (φ ψ : ClassFunction G k) (g : G) : (φ * ψ) g = φ g * ψ g := rfl
 
+/-- Evaluation commutes with finite sums of class functions: `(∑ i ∈ s, F i) g = ∑ i ∈ s, F i g`.
+(`ClassFunction` is an `AddCommGroup` with `rfl` `add_apply`/`zero_apply`, but is not a semiring, so
+this and `mul_sum` below are proved by hand.) -/
+theorem sum_apply {ι : Type*} (s : Finset ι) (F : ι → ClassFunction G k) (g : G) :
+    (∑ i ∈ s, F i) g = ∑ i ∈ s, F i g := by
+  classical
+  induction s using Finset.induction with
+  | empty => simp
+  | insert a s ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, add_apply, ih]
+
+/-- Pointwise multiplication distributes over finite sums of class functions:
+`φ · ∑ i ∈ s, F i = ∑ i ∈ s, φ · F i`.  (`ClassFunction` carries `Mul` but not a semiring, so
+`Finset.mul_sum` does not apply; proved pointwise, reducing to `Finset.mul_sum` in `k`.) -/
+theorem mul_sum {ι : Type*} (φ : ClassFunction G k) (s : Finset ι) (F : ι → ClassFunction G k) :
+    φ * ∑ i ∈ s, F i = ∑ i ∈ s, φ * F i := by
+  ext g
+  rw [mul_apply, sum_apply, sum_apply, Finset.mul_sum]
+  exact Finset.sum_congr rfl fun i _ => (mul_apply φ (F i) g).symm
+
 /-- **Twisting by the trivial linear character is the identity**: `χ · lcf(1) = χ`.  The
 degenerate case of the extension classification (`β = 1` forces `χ₂ = χ₁`, issue 9002
 (v-c4)). -/
