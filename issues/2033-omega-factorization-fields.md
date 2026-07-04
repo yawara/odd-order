@@ -23,12 +23,11 @@ Hypothesis に無い** (現 fields: omega_orthonormal / omega_apply_one / omega_
 
 ## やること (3002 と同じ enrichment パターン)
 
-- [ ] `S15.Hypothesis` に ω-因子分解 field を追加 (候補: `omega_mul_decomp :
+- [x] `S15.Hypothesis` に ω-因子分解 field を追加 (07-05 it.28: 5 fields — mul / col-0 W₂-自明 / row-0 W₁-自明 / W₁ q-乗根 / W₂ p-乗根) (候補: `omega_mul_decomp :
       ∀ i j (x ∈ W₁) (y ∈ W₂), omega i j ⟨x*y,…⟩ = omega i 0 ⟨x,…⟩-型 · omega 0 j`
       — 正確な形は Pf (3.3)/(13.1) と spine 構成 (FeitThompson omegaS ← TICyclicHypothesis)
       が supply できる形で確定)
-- [ ] FeitThompson.lean の構成箇所で supply (lane-a 所有 file への additive 編集 —
-      2026-07-05 ユーザー裁定の追加編集権に基づき self-flag で)
+- [x] FeitThompson.lean の構成箇所で supply — omegaS_mul 等 5 本実証明 + 両構造 + 3 wiring sites (07-05 it.28, commit 9c79ee63)
 - [ ] (1.10.a/b) 合同 (`CyclotomicCharacterCongruence` 在庫確認) と接続して両 atom を実証明
 
 ## 調査ログ (07-05 loop it.27)
