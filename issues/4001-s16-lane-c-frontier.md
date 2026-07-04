@@ -299,3 +299,43 @@ N=p^{(q-1)!}−1 → g^N が M 全体を固定 → g^N=1 (faithful) → |C|∣N 
    内で hu_full+U_commutative+faithful から `haveI : IsCyclic ↥U` を derive → `[IsCyclic ↥U]` binder 全除去。
    `U_cyclic_and_Q_elemAbelian` の U-cyclic sorry (3568) 消滅 (無条件版は case 9.7.a で偽ゆえ **使わず**
    full-value context で局所導出)。V cyclic (3651) は dual (|V|=(q^p−1)/(q−1)=v-value 174 landing 後)。
+
+## 2026-07-05 (loop 継続) — ✅ U cyclic 実証明化完了 (Zsygmondy-lite 5-stage chain)
+
+前 iter の「vestigial-binder は FALSE」negative を、**別 route (abelian Singer 既約性) で覆して U cyclic を
+実際に閉じた** (S16 real sorry 9→8、full build 3917 green、AxiomsCheck OK・新 axiom なし)。5 stage:
+
+1. `orderOf_eq_of_prime_dvd_geomSum` (PrimitivePrimeDivisor.lean, 6aaebe82): prime factor r≠q ⟹ orderOf(p:ZMod r)=q。
+2. `exists_prime_orderOf_eq` (同, 61cbad1f): **Zsygmondy n=q prime 特殊ケース** — q odd prime で ∑_{i<q}p^i に
+   primitive prime divisor 存在。not_sq_dvd (LTE `Nat.emultiplicity_pow_sub_pow`) + n>q + 場合分け。
+3. `isSimpleModule_of_abelian_faithful_card` (SingerField.lean, 3ada6138): Singer 既約性を **cyclic→abelian(任意)**
+   一般化。cyclic 版 body を任意元へ parametrize、generator の代わりに Cauchy 元 (primitive prime r)、
+   a^N=1 ⟹ r∣N=p^{(q-1)!}−1 ⟹ q∣(q-1)! を Wilson で矛盾。
+4. `exists_galoisField_repr` を abelian 版へ re-point (c8768402): `[IsCyclic C]` omit + `Odd q` thread。
+5. S16 の `[IsCyclic ↥U]` binder 4 本除去 + `U_cyclic_and_Q_elemAbelian` U-cyclic sorry 削除 (a3107ad3):
+   field model は U abelian (`basic_structure.U_commutative`, coq `cUU:abelian U` と一致) から構成、
+   μ:U↪𝔽_{p^q}^× 単射は consequence。**case 9.7.a で U rank-2 非 cyclic ゆえ無条件 U-cyclic は元々不健全**、
+   engine が abelian で足りるので false gate を除去。
+
+**教訓**: 「gated」評価は route を尽くしてから (user pushback 正当)。1 つの route (vestigial binder) が dead でも
+別 route (数論 infra 構築) が live。isSimpleModule_of_isCyclic_faithful_card は unused 化 (削除候補)。
+
+**V cyclic (3077, dual)**: 同 route で閉じられる — dual field model `exists_pv_field_repr` (V acts on Q,
+|V|=(q^p−1)/(q-1), p odd prime) + isSimpleModule_of_abelian_faithful_card。ただし |V|=v-value は
+T_side_caseB_facts (127) の sorry (§13 Galois, 9000)。T-side は常に case-B ゆえ V cyclic は無条件真だが
+v-value 構築が先決。次 stage 候補。
+
+## 2026-07-05 (loop 継続) — ✅ V cyclic 実証明化完了 (T-side dual field model)
+
+V_cyclic (3646) を U cyclic と同 route で closure (S16 real sorry 8→7、full build 3917 green,
+AxiomsCheck OK)。commit ad7efe7f。dual helpers V_le_normalizer_Q/conj_mem_Q (dd320a73) の上に、
+exists_pu_field_repr の module 構成を U→V/P→Q/char p→q/exp q→p で mirror し
+exists_galoisField_repr[p:=q,q:=p] → μ:V↪(GF(q^p))ˣ 単射 → isCyclic_of_injective。
+faithful=D⊥ (proven)、V abelian=S15.isMulCommutative_V、|V|=v (card_V_eq_vd+d=1)、|Q|=q^p=card_Q_eq。
+落とし穴: `open scoped IsMulCommutative in` が Additive Q の AddCommGroup 供給に必須。
+
+**U/V cyclic + kernel-cyclic 連鎖の単一残 gate = v-value** (T_side_caseB_facts 174 の
+`v=(q^p-1)/(q-1)`, §13/9000 σ-theory)。S-side u-value (S15.caseB_order_u_data) も同 σ-theory gate。
+両者は type-P Galois/(9.7) dichotomy foundation (issue 9000, lane a/d 領域) — c 単独 build は不可。
+∴ V_cyclic closure で c の abelian-Singer machinery による S16 leaf 消化は一段落。残 S16 leaf
+(T_typeII/caseB_contradiction/dichotomy/betaGrid/eta_grid) は §3-13 char/grid で other-lane gated。
