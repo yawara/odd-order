@@ -350,3 +350,9 @@ coherent_S_of_coherent_SH0C。(11.6) 消費側の再点検 or (5.7) 配線が次
   残 upstream named: sixTwoDecompositionData (μ-column) / no_typeV_maximal (10.10) /
   S12 producer 層。S13 内残 = (11.7) H₀=1 (symplectic) + (11.8) 系。
 - commits 53e4e59f / f91534f3 / (this)。
+
+## 2026-07-05 lane-a (loop 26): sixTwoDecompositionData 骨格化
+
+- irr×irr は S08 helpers で全放電。残 = μ-column 2 named
+  (sixTwoDecompositionData_of_reducible_break / sixTwoMemberDatum_of_reducible_member)。
+  材料: S12 muGrid + muGrid_column_sum_mem_sOf_H0_and_reducible + (5.8)。
