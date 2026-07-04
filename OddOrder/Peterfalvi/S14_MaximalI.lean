@@ -2950,6 +2950,24 @@ theorem Sset_self_mem_constituents [Finite G] {L : Subgroup G} [Fintype ↥L]
   exact one_ne_zero h0
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The (12.5) orthogonality provision** (Frobenius case): `ψ ⊥ R(χ)` for all `χ ∈ S` gives
+`⟨ψ, coh.extension χ⟩ = 0` for each `χ ∈ S`.  The `S`-member `χ` is its own constituent
+(`Sset_self_mem_constituents`), so `inner_psi_coherent_extension_eq_zero` applies directly.  This is
+the `horth1`/`horth2` input of the `θ`-coefficient equality
+`chiRhoCF_restrict_inner_eq_of_equal_degree` in the (12.5) `DpsiH` wiring. -/
+theorem Sset_inner_coherent_extension_eq_zero {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    (data : ∀ χ ∈ hyp.Sset, CharacterDecompositionData hyp χ) {psi : ClassFunction G ℂ}
+    (horth : ∀ χ (hχ : χ ∈ hyp.Sset), ∀ α ∈ Rset (data χ hχ), ClassFunction.inner psi α = 0)
+    {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Sset) :
+    ClassFunction.inner psi (coh.extension χ) = 0 := by
+  obtain ⟨φ, hφeq, hφmem⟩ := Sset_self_mem_constituents hyp hfrob hχ (data χ hχ)
+  rw [← hφeq]
+  exact inner_psi_coherent_extension_eq_zero hyp coh (data χ hχ) hφmem
+    (by rw [hφeq]; exact hχ) (horth χ hχ)
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Witness `S = {Ind_H^L θ}` has no real characters** ((5.2) input for case (b)/(12.6)).  Each
 member is a Frobenius-induced irreducible (`frobenius_induce_char_singleton`), non-real by the odd
 order of `L` (`not_isReal_of_ne_trivial_of_odd_card'`). -/
