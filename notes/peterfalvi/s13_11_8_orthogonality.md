@@ -1547,3 +1547,35 @@ update¹⁰ の残 4 点のうち **点 2 (|Ū|≡1 mod q) を完全実証明化
 transport、μ_j ∈ chars.SOf(H₀C') で q·d=q·u ⟹ d=u) + **caseA branch** + **type III/IV + TypePNontrivialCore
 threading** (hyp → data/chief 構成、V 除外、8.6.a core)。congruence 半分 (点 2) は済 ⟹ 残は「d を u に繋ぐ」+
 threading のみ。correspondence が最上流の次手 (`caseB_degree_qu` 出力 q·u と μ-grid column q·d の同定)。
+
+## 2026-07-05 update¹² (lane-a) — **Coq PFsection11 精読で (11.8.1) route 判明: correspondence は §9 citation、transport でない**
+
+update¹¹ 後、d=|Ū| correspondence を「深い §6↔§9 transport」と恐れたが、**Coq PFsection11.v:730-752 精読で
+route が判明 — 大部分は既存 §9 Lean 補題の citation**。⟹ 想定より tractable。
+
+**Coq の (11.8.1) = `[/\ d = u, delta = 1 & n = size S1]` (PFsection11.v:730)**:
+- **`d = u`** (743-745): `mu_1 j : mu_ j 1 = (q*u)` (677、`typeP_reducible_core_Ind` を `mu_ j ∈ Sred` に適用) +
+  `prTIred_1`/`mu2_1` で `mu_ j 1 = q*d` ⟹ q*d=q*u ⟹ d=u。**Sred = reducible core = μ-columns 自身**
+  (`Sred := filter [predC irr M] (seqIndD HU M H H0)`、membership は near-definitional `image_f`)。
+- **`u ≡ 1 mod q`** は Coq では **count 由来**: `size_S1 : size S1 * q = u - 1` (731-742、`S1 ↔ Iirr(HU/HC)\{0}`
+  bijection + `HU/HC ≅ U/C` (`quotient_sdprodr_isog`) + `|Iirr(U/C)| = |U/C| = u` (abelian))。
+- **`delta = 1`** (746-752): `mu2_1` (prTIirr1_mod で d ≡ delta mod q) + d=u + u-1 が q 倍 (size_S1) ⟹ delta ≡ 1
+  mod q、delta=±1 & q>2 ⟹ delta=1。
+
+**Lean 対応 (既存)**: `forall_mem_sOf_H0C_apply_one_eq_qu` (S11:6177、= typeP_reducible_core_Ind 相当、degree qu、
+caseB 要) + `reducible_mem_sOf_H0C` (S11:6215、reducible ∈ sOf(H₀) → ∈ sOf(H₀C)、**caseB 不要**、p-1 count 一致で)
++ `reducible_count_sOf_H0/H0C` (S11:5466/6194)。⟹ **d=u = μ_k ∈ sOf(H₀) ∧ reducible を示せば cite で出る**。
+
+**残 gap (次 iteration の正確な的)**:
+1. **`μ_k (=∑_i μ_{ik}, k≠0) ∈ sOf(data.H0)`**: 現在 `muGrid_column_sum_mem_inducedFamily` (S12_Core:2284) は
+   **inducedFamily 止まり**。sOf(H₀) には source θ ∈ xiOf(H₀) (θ が H=hInHu 上非自明 + H₀ ⊆ ker θ) が要る =
+   §6-columnFamily source ↔ §9-Clifford 𝒳 の identification (**唯一の genuine bridge、次の主眼**)。μ_k reducible
+   (θ が M-stable、q 個の extension に分解) も要 (q·d=q·θ(1) と grid で θ(1)=d)。
+2. **threading**: hyp+htype(III∨IV) → data/chief/caseB。hnt=TypePNontrivialCore は **TypeIIIData/IVData.common
+   から出る** (MaximalSubgroupType:209/218/225)。V 除外は no_typeV_maximal (S12:4064) が charParam_d_modEq_one
+   (3900) より **後方定義ゆえ forward-ref 不可** — htype を明示 hypothesis で通すか file 再序列化。
+3. **u≡1 は Lean では既済** (`mkSection11CharacterData_u_modEq_one`、Frobenius quotient route) ⟹ Coq の count route
+   は不要。d=u さえ出れば d≡1 は d=u + u≡1 で即出る (delta 経由の Coq route より短い)。
+
+**評価**: correspondence の核 = **μ_k の source を §9 𝒳(H₀) に落とす bridge のみ** (残りは既存 cite)。deep だが
+「大 §9 formalization」でなく columnFamily source の kernel 解析 1 本。次 iteration = この bridge を正面から。
