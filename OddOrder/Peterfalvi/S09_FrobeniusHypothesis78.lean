@@ -119,6 +119,32 @@ theorem exists_sibley_distinguished_char [Fintype G] [Invertible (Nat.card G : �
   rw [ClassFunction.induce_apply_one, hθ_deg, mul_one]
 
 open OddOrder.Peterfalvi.S09.Cert in
+/-- **The placed induced family used inside `hypothesis78`, exposed as data.**  Built with the same
+distinguished character `Classical.choose (exists_sibley_distinguished_char …)` as the internal
+`let pf` of `hypothesis78`; the range/nontriviality proof arguments of `placedInducedFamily` are
+irrelevant (`Prop`), so this is *definitionally equal* to that internal `pf`.  This exposes the
+family representatives `θ` and their `cover`/`inj` so the (7.9) conjugate index can be produced. -/
+noncomputable def sibleyPlacedFamily [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (i : Fin k) (hodd : Odd (Nat.card G))
+    [Fintype ↥(F.L i)] [Invertible (Nat.card ↥(F.L i) : ℂ)]
+    [Fintype ↥((F.H i).subgroupOf (F.L i))]
+    [Invertible (Nat.card ↥((F.H i).subgroupOf (F.L i)) : ℂ)]
+    [((F.H i).subgroupOf (F.L i)).Normal]
+    (hnilp : Group.IsNilpotent ↥((F.H i).subgroupOf (F.L i)))
+    (C : Subgroup ↥(F.L i))
+    (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C) :
+    PlacedInducedFamily ((F.H i).subgroupOf (F.L i))
+      (Classical.choose (F.exists_sibley_distinguished_char i hodd hnilp C hFrob)) := by
+  classical
+  refine placedInducedFamily ((F.H i).subgroupOf (F.L i)) _ ?_ ?_
+  · obtain ⟨θlin, _, hχ_eq⟩ :=
+      (Classical.choose_spec (F.exists_sibley_distinguished_char i hodd hnilp C hFrob)).1
+    exact ⟨θlin, hχ_eq.symm⟩
+  · obtain ⟨θlin, hθ_ne, hχ_eq⟩ :=
+      (Classical.choose_spec (F.exists_sibley_distinguished_char i hodd hnilp C hFrob)).1
+    exact hχ_eq ▸ induce_ne_trivialChar_induce ((F.H i).subgroupOf (F.L i)) θlin hθ_ne
+
+open OddOrder.Peterfalvi.S09.Cert in
 /-- **Peterfalvi (7.8) for the `i`-th Frobenius member**: `Hypothesis78 G (H_i^#) L_i`.  Assembles
 `hypothesis78OfDade` from the (6.8) coherence `F.coherence` (extension `ν`, `nu_isometry`, (7.8.a)
 agreement), the placed induced family (distinguished `Ind θ_lin` at `0`, trivial `1_{K_i}` at
@@ -146,16 +172,17 @@ noncomputable def hypothesis78 [Fintype G] [Invertible (Nat.card G : ℂ)]
   -- The type-I support `A(L_i) = H_i^#`.
   have hAH : OddOrder.Peterfalvi.S08.sharpImage ((F.H i).subgroupOf (F.L i))
       = (F.H i : Set G) \ {1} := F.sharpImage_subgroupOf_eq i
-  -- The placed induced family (as data): distinguished `Ind θ_lin` at `0`, trivial `1_{K}` at `ind1H`.
-  choose χ hχS hχdeg using F.exists_sibley_distinguished_char i hodd hnilp C hFrob
-  choose θlin hθ_ne hχ_eq using hχS
-  let pf := placedInducedFamily ((F.H i).subgroupOf (F.L i)) χ ⟨θlin, hχ_eq.symm⟩
-    (hχ_eq ▸ induce_ne_trivialChar_induce ((F.H i).subgroupOf (F.L i)) θlin hθ_ne)
+  -- The placed induced family (as data), exposed via `sibleyPlacedFamily` (defeq to the inline `pf`).
+  let pf := F.sibleyPlacedFamily i hodd hnilp C hFrob
+  have hχdeg : (Classical.choose (F.exists_sibley_distinguished_char i hodd hnilp C hFrob))
+      (1 : ↥(F.L i)) = (((F.H i).subgroupOf (F.L i)).index : ℂ) :=
+    (Classical.choose_spec (F.exists_sibley_distinguished_char i hodd hnilp C hFrob)).2
   let n := pf.n
   let θ := pf.θ
   let ind1H := pf.ind1H
   have hind1H : ind1H ≠ 0 := pf.ind1H_ne_zero
-  have h0 : ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ 0 : ClassFunction _ ℂ) = χ :=
+  have h0 : ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ 0 : ClassFunction _ ℂ)
+      = Classical.choose (F.exists_sibley_distinguished_char i hodd hnilp C hFrob) :=
     pf.induce_zero_eq
   have htriv : θ ind1H = trivialIrreducibleCharacter ↥((F.H i).subgroupOf (F.L i)) := pf.triv
   have hinj : Function.Injective
@@ -231,6 +258,20 @@ noncomputable def hypothesis78 [Fintype G] [Invertible (Nat.card G : ℂ)]
       (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj coh
       (hSmem a ha_ind) (hSmem 0 (Ne.symm hind1H)) (m0 := 1) (mi := deg_a) (by norm_num)
       (by rw [hd a, hdeg_a_eq, Nat.cast_one, div_one]) (psi_support a)
+
+/-- **Projection: the `hypothesis78` family is `Ind ∘ θ` of the exposed placed family** (defeq). -/
+theorem hypothesis78_hyp76_zeta_eq [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (i : Fin k) (hodd : Odd (Nat.card G))
+    [Fintype ↥(F.L i)] [Invertible (Nat.card ↥(F.L i) : ℂ)]
+    [Fintype ↥((F.H i).subgroupOf (F.L i))]
+    [Invertible (Nat.card ↥((F.H i).subgroupOf (F.L i)) : ℂ)]
+    [((F.H i).subgroupOf (F.L i)).Normal]
+    (hnilp : Group.IsNilpotent ↥((F.H i).subgroupOf (F.L i)))
+    (C : Subgroup ↥(F.L i))
+    (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C) :
+    (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta
+      = fun j => ClassFunction.induce ((F.H i).subgroupOf (F.L i))
+          ((F.sibleyPlacedFamily i hodd hnilp C hFrob).θ j : ClassFunction _ ℂ) := rfl
 
 end FrobeniusFamily
 
