@@ -233,3 +233,15 @@ cont.⁵¹ の「solo work 枯渇」を訂正し (14.14) の genuine arithmetic 
   §7/§8 = (7.9) pairing dichotomy + (8.17.c) disjoint Dade support + (7.8.b) norm bound = lane-a 領域)
   に置換。doneness↑ (carrier 構成可能性で判定)。
 - full build 3916 green、AxiomsCheck OK、新 axiom なし。詳細 = `notes/peterfalvi/s16_w4_char_cascade.md` cont.⁵²。
+
+### 併行 landing: main_size_bounds (14.11.1) k>2pv isolate (commit `f56039d7`)
+
+`main_size_bounds_structural` の opaque `k>2pv` bare sorry を、精密 §13/§15 structural obligation
+`hstruct : ∃x, k=v·x ∧ x≡1 [MOD p] ∧ x≠1` ((13.17) 分解 + W₂ fpf + K≠V) + proven arithmetic
+(`two_mul_add_one_le_of_modEq_one_odd`: x≡1 mod p ∧ odd x ∧ x≠1 → x≥2p+1; k=|K| odd ⟹ x odd ⟹ k=vx>2pv)
+に分解。
+
+**c-solo W-side arithmetic 完了 (2 本 = 全て出し尽くし)**: 残 9 leaves は全て cross-lane gated と精査確定
+— dichotomy `orthogonality_switch_pairing_bounds` の (7.9)=§7 coherence (b) / (7.8.b)=a / (8.17.c)=§8 (b)、
+η-grid=issue 3002 (b field+a threading)、U/V cyclic・T_typeII=b §13、v-value=9000。W-side assembly は
+全 proven、leaves は precise faithful obligation で pin 済 (signature-contract 成立)。前進は b/a/9000 上流供給が先決。

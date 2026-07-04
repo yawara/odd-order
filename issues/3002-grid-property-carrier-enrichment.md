@@ -8,10 +8,10 @@ created: 2026-06-29
 # §15/§16 cascade wrappers need Hypothesis grid τ-isometry/orthogonality fields (toolkit ready)
 
 **Lane:** c (γ §15/§16 POLE-2) raising; fix = **cross-lane**。
-🧾 fix-owner 更新 (2026-07-02 hub, 3 レーン再編 — 正本 `notes/meta/ft_lane_reallocation_2026_06_28.md`):
-**S15 grid 性質 fields (`S15.Hypothesis` 変更) = lane c** / **FeitThompson.lean threading
-(constructor 供給) = lane a** / **grid producers (§5 grid / cd 系) = lane b**。旧「lanes B grids /
-D carrier」表記は stale (lane D 退役)。
+🧾 fix-owner **更新 (2026-07-04 hub, 3 レーン再々編 — 正本 `notes/meta/ft_lane_reallocation_2026_06_28.md` + issue 9009 裁定)**:
+**S15 grid 性質 fields (`S15.Hypothesis`/`S15_SAndT_Setup` 変更) = lane b** (S15 は 2026-07-04 に c→b 移管) /
+**FeitThompson.lean threading (`Section16Inputs`/constructor 供給) = lane a**。各自の自所有ファイル内 additive ゆえ
+carve-out 不要 (9009 裁定)。旧 fix-owner 表 (2026-07-02: S15.Hypothesis=c / grid producers=b) は S15 移管で stale。
 検証 (2026-07-02): `tau3_isometry` / `omega_orthonormal` / `eta_orthogonality` / `mu_degree` は
 `OddOrder/**.lean` に **0 hits** — field 追加は未実施で本 issue は live。
 
@@ -119,3 +119,20 @@ norm-cascade が cross-lane threading 待ちの間、solo build-green な keysto
 不要 = clean §13)。残 7 axiom (`W2_le`/`M_complement`/`U_nilpotent`/`derived_complement`/`secondDerived_le_fitting`/
 `fitting_eq`/`centralizer_W1`) は complement 一致 (V=type-P U) の reconciliation crux に gated
 (§13 では `T_typeII` が import 下流 S16:87 ゆえ使えず、genuine に §13/§14 σ-structure 要 = 正しく sorried)。
+
+## ✅ 2026-07-04 (lane **b** 再開) — S15 が c→b 移管。b-side status + 迂回 route 発見
+
+07-04 reallocation で S15_SAndT_Setup + S15_SAndT が c→b。b が frontier 全数をコード検証:
+- **(13.10) `analytic_inequality` 出力を de-opacify 済** (commit `f17fdbcd`): 実 `u/c` bound が real theorem 化。
+- **⚠ 訂正 (同 07-04 loop): 「honest W-grid で迂回可能」は誤り**。**spine (`FeitThompson.lean:1319` `omegaS`) が
+  既に honest grid を `mp.certainTypeS.sdiffTICyclicHypothesis` から構成済**。だが `S15.Hypothesis` は grid を
+  bare field で持ち **mp/certainType/TICyclicHypothesis への structural link を carry しない** (field 精査済)。
+  ⟹ b が fresh grid を組んでも **hyp.omega と同定不能**、cascade は hyp の λ/(13.5) machinery に tie ゆえ
+  fresh grid では (13.10)-about-hyp 不可。**∴ η-side 含め §15 cascade 全体が本 issue に uniformly gated**。
+- **✅ a-side threading は機械的** (grid は spine に proven 済、新規構成不要): S15.Hypothesis + Section16Inputs に
+  下記 property field を足し、`sectionSixteenHypothesis_of_inputs` で **`omegaS` の直交性 (`S05_TICyclic.lean:733/740`)
+  + `tau3W` isometry (S07 `extension_inner_eq`)** から supply。field 形 = 各 `caseB_*_norm_bound` engine 仮説
+  (`hvanish`/`hinner`/`hχ`点公式/`hParseval`/`hs`整数性/`hInflation` + ω-orthonormal/τ-isometry)。
+- **b-side (build-green solo)**: `GridProperties (hyp)` carrier + sorried producer で cascade wrapper を engine から
+  実証明 (wiring は a threading 後も再利用、producer sorry のみ hyp 新 field で discharge)。a threading と pair。
+- 詳細 = `notes/peterfalvi/s15_s_and_t.md` の 2026-07-04 lane b LIVE STATUS (訂正済)。
