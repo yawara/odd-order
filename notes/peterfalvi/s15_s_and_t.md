@@ -8,6 +8,36 @@
 
 ---
 
+## ✅ LIVE STATUS (2026-07-05 後半, lane **b** — (13.10) 4 producer 全 discharge、residual = 教科書番号 5 本)
+
+3002 threading の consumer wiring を完遂。`analyticInequalityEstimates` (旧 terminal) は
+**4 atom producer から sorry-free assembly** になり、4 producer も全て実 assembly 化:
+
+- **(13.9.a) `analyticCounting_disjointCover` — 完全実証明** (sorry 0)。基盤を新設:
+  shared `IsTISubset.sum_conjClassSet` (issue **9011**、TI saturation の weighted 和 transport;
+  card 版 `S14.ncard_conjClassSet_of_isTISubset` は既存だった) + S15 counting layer
+  (`p_ne_q` / `Q_sharp_isTISubset` (T-side TI、type V は vd≠1 で排除) / `q_not_dvd_card_H` /
+  `disjoint_conjClassSet_sharp_H_Q` / 4-piece split `sum_univ_split` / cardinality 恒等式
+  `card_S_val`・`card_T_eq` 等 — 全部実証明)。
+- **(13.6) `analyticEstimate_lambda` — 実 assembly**: global Parseval (`global_normSq_split`) +
+  `G0Finset_cyclicClosed` + Galois 整数性 (normSqSumQ atom) + `card_S_val`。
+- **(13.7+8) `analyticEstimate_eta` — 実 assembly**: η₁₀ norm-one facts は **完全 real**
+  (`eta10_mem_ZIrr`/`eta10_inner_self_one` — 3002 grid fields の payoff)。
+- **(13.9.b) `analyticEstimate_galois` — 実 assembly**: [Is] 3.14 の ZIrr 版
+  (product/sum form、GaloisRationalInteger 拡張) + 非零 locus cyclic-closure (Pf (1.9.b)) 全 real。
+
+**残 sorry (S15 cascade 関連) = 教科書番号どおりの faithful producer 5 本 + 既存 3 本**:
+`lambda_tau1_norm_one` ((13.2.d)/(13.3) λτ₁ coherence facts) /
+`lambda_tau1_sharp_norm_lower` (**13.6 textbook** — (13.5) ρ-engine wiring + 9000 u-bound) /
+`eta10_sharp_norm_lower` (**13.7 textbook**) / `eta10_Qsharp_norm_lower` (**13.8-for-T**) /
+`G0_nonvanishing_dichotomy` (**13.9.a textbook** — (13.3.c)+grid gated) + 既存
+`character_degree_analysis` (13.3) / `lambda_forces_T_caseB` (13.4、|Q|=q^p conjunct を enrich) /
+`reconciled_typePData_T` (Setup へ relocation 済)。
+**次の frontier (文書順)**: (13.6) sharp = `caseB_lambda_norm_bound` engine への (13.5.a) point
+formula 供給 (H_sharp_hypothesis76 の chiRho_explicit_formula 適用 + (13.2.e) τ-agreement)、
+u-bound は 9000 sorried-cite。CharacterDegreeData に `lambda_induced_from_PC_linear_holds`
+((13.3.b) WLOG per (13.12) 証明) を追加済。
+
 ## ✅ LIVE STATUS (2026-07-05, lane **b** 再開 — frontier 全数の gate を ENGINE レベルで確定)
 
 再開時 `git merge main` (HEAD..main 6→0)。b 所有 territory の全 sorry を精査し、gate の所在を
