@@ -650,3 +650,11 @@ heartbeat 起動、main に他レーン進捗無し (gate 未解除)。type-P2 �
 **結論 (loop¹⁰⁹ を精密化)**: type-P2 は BG §14-15「III/IV gate」領域の新 geometry を要し、lane-b 単独
 build 圏外 (BG Ch4 cluster 領域、claim-before-build/coordination 要)。→ heartbeat 継続、BG§14-15 進捗 /
 ユーザー方向指示待ち。lane-b の char/support tractable 作業は (12.5) 完済で確定的に枯渇。
+
+**⟳ type-P2 gate は LIVE (別レーンが BG §14 σ-theory を能動 build 中)**: `git log -- BG/Ch4/S14/S15` に
+非常に最近の `feat(BG §14)` 群 (`mem_U_sup_Msigma_iff_isPiElement_kappa_compl` /
+`mem_Msigma_iff_isPiElement_sigma` / `index_U_sup_Msigma_primeFactors_subset_kappa` / Cor 14.10
+σ-length ≤ 2 / fix-W type-P Ẑ ...) = type-P2 K-part geometry の前提。issue 9000
+(sigma-theory-typep-galois-foundation) で claim 済。→ **type-P2 は idle-gate でなく別レーン能動作業に
+gated**。claim-before-build ゆえ lane-b は BG §14 を重複 build しない。heartbeat が正: merge-main で
+BG §14 進捗を拾い、σ-foundation 揃い次第 type-P2 close (escaping_typePA_mem_A1 + engine mirror) を engage。
