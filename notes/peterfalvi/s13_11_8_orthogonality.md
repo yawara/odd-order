@@ -1355,3 +1355,46 @@ commit `7c865220`: 上記「次 iteration」の step (3) を **proven lemma に 
    himg_ortho=S₁^{τ₁}⊥S₂^{τ₂} (5.3.b/5.5)、hgen=S=S₁∪S₂ 分解 (§9)。**S₂ coherence が最深 gate**。
 
 **次**: R materialization (mostly ungated) → capstone wiring (§9 counts sorried-cite) → τ₂ union skeleton。
+
+## 2026-07-04 update³ (lane-a) — R materialization landed; capstone wiring plan precise
+
+commit `04e7cbed`: **`exists_coherentImage_SHC` (S12:3685, sorry-free)** — the R data materialized.
+`R = coh.extension '' S(HC)` は orthonormal ⊂ ZIrr G (isometry `extension_inner_eq` + `irr_cf_inner`
++ `extension_mem_ZIrr`)、`|R| = |S(HC)-Finset|` (injective on s)。**hZ/horth/hRmem/hRrev 全 ungated 供給**。
+
+**capstone `exists_zeta_residual_not_orthogonal` wiring plan (次 iteration, 精査済)**:
+`CharacterParameters` (`exists_charParameters_full`) が d/δ(±1)/n/degree_independent (∀i,j≠0 μ_ij(1)=d)/
+n_formula (n·w1=d−δ)/two_le_n/w2_prime を **全供給**。ungated lemma: hμ0all=`muGrid_zero_column_apply_one`。
+∴ capstone の残 §9-gate は **2 つだけ**:
+- **δ=1** (11.8.1): params.delta=±1 → =1 (Frobenius (U/C)⋊W₁ で u≡1 mod q)。§9。
+- **|S(HC)-Finset|=n** (11.8.1): `caseB_degree_qu` (μ_j(1)=qu, S11:6060 proven、要 bridge) + Frobenius (u−1)/q。§9。
+wiring: obtain params → δ=1/count (§9 cite) → hd/hnf 導出 → `exists_coherent_extension_h114_of_orthogonal`
+(_h_orth → ν, h114) → `exists_coherentImage_SHC ν` (R data) → ∀j≠0 `tau_muColumnSum_sub_dzeta_eq_of_residualData`
+(column identity) → **(11.8.6) τ₂ union** → `S_not_coherent` (10.8) で False。
+
+**τ₂ union = 唯一の deep 残部** (headline gap): column identities ∀j → full `IsCoherent hyp.tau hyp.Sset hyp.A0`。
+`coherentUnion_of_glued` (S07:4511) instantiate: hX=coh (S₁=S(HC))、**hY=S₂=S(C)−S(HC) coherence (9.11/11.7、
+未 build = 最深 gate)**、ν=τ₃ glued map (要構成)、hsrc_ortho=distinct-irr ⊥ (ungated)、himg_ortho=S₁^{τ₁}⊥S₂^{τ₂}
+(5.3.b/5.5 + column identity)、hgen=S=S₁∪S₂ 分解 (§9)。**次の genuine math = τ₂ gluing (S₂ coherence 仮説で)
+or §9 (δ=1/count/S₂) 実証明**。wiring は skeleton-cite で前倒し可だが τ₂ union sorry は giant ゆえ実 math 優先。
+
+## 2026-07-04 update⁴ (lane-a) — capstone WIRED; bare sorry → 3 named gates (major milestone)
+
+commit `d3b72a5d`: **`exists_zeta_residual_not_orthogonal` は sorry-free**。旧 opaque bare sorry を
+honest assembly + 3 named obligation に分解。capstone 本体は proven glue のみ:
+- (11.8.4) `exists_coherent_extension_h114_of_orthogonal` (proven) → ν, h114;
+- (11.8.1)/(5.7) `exists_coherentImage_SHC` (proven) → R data、|R|=n via count obligation;
+- (11.8.2)-(11.8.6 opening) `tau_muColumnSum_sub_dzeta_eq_of_residualData` (proven) → column identities
+  (δ=1/n/degree は CharacterParameters + hμ0all=muGrid_zero_column_apply_one で thread);
+- (11.8.6) τ₂ union → `S_not_coherent` (10.8) で False。
+
+**残 = 3 named obligation のみ** (S12:3762/3778/3800、他 sorry は typeII 10.7/typeV 10.10 = 別ブランチ):
+1. **`charParam_delta_eq_one`** (11.8.1 δ=1): Frobenius (U/C)⋊W₁ で u≡1 mod q + `caseB_degree_qu`。§9。
+2. **`card_SHCSet_filter_eq_charParam_n`** (11.8.1 |S(HC)|=n): Frobenius (u−1)/q count。§9。
+3. **`coherent_Sset_of_column_identities`** (11.8.6 τ₂ union): column identities → full S coherence。
+   **深部 gate** = S₂=S(C)−S(HC) coherence (9.11/11.7) + `coherentUnion_of_glued` (glued map
+   `exists_integralCharacterMap_glue_of_orthonormal` S07:3229、S₁ orthonormal irr) + S₁^{τ₁}⊥S₂^{τ₂} (5.3.b/5.5)。
+
+**次の攻略順** (上流優先): (1)(2) §9 counts は `caseB_degree_qu` (S11:6060 proven) を Section11CharacterData
+↔ Hypothesis bridge で cite (要 bridge 調査) → (3) τ₂ union は S₂ coherence が最深 (inducedFamily は induced
+= 一般に非既約ゆえ orthonormal 直用不可; Peterfalvi (11.7)/(6.6) coherence-union の構造理解が要る)。

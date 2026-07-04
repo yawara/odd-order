@@ -2427,12 +2427,36 @@ structure EtaGenericData (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) w
     hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩ g = 1
   betaM_vanish : ∀ g ∈ Mdata.G0, Mdata.betaM g = 0
 
-/-- **Peterfalvi (3.9)/(14.10) generic-set producer.**  Faithful §3/§4 Dade obligation supplying the
-`η`-grid integrality/symmetry on `G₀` and the support vanishing of `β_M^τ` (`EtaGenericData`
-docstring). -/
+/-- **Peterfalvi (3.9.a/c) `η`-grid facts on `G₀`** — the genuine §3/§5 Dade obligation, gated on the
+`ω`-orthonormality / `τ₃`-isometry grid properties of the base `Hypothesis` (issue 3002/9009): on the
+generic set `G₀` (elements of order prime to `pq`), the `η`-grid takes integer values (3.9.c), pairs
+under the negation involution (3.9.a), and has principal entry `η₀₀ = 1`. -/
+theorem eta_grid_facts_on_G0 [Finite G] (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) :
+    (∀ g ∈ Mdata.G0, ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
+      ∃ m : ℤ, hyp.base.eta i j g = (m : ℂ)) ∧
+    (∀ g ∈ Mdata.G0, ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
+      hyp.base.eta (finNeg hyp.base.q_prime.pos i) (finNeg hyp.base.p_prime.pos j) g
+        = hyp.base.eta i j g) ∧
+    (∀ g ∈ Mdata.G0,
+      hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩ g = 1) := sorry
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (3.9)/(14.10) generic-set producer.**  The `η`-grid integrality/symmetry on `G₀`
+(`eta_grid_facts_on_G0`, the §3/§5 grid obligation) together with the **now-genuine** support
+vanishing `β_M^τ = 0` on `G₀`: `β_M = β` is a Dade image, so its support lies in `Ã(M)`
+(`beta_support_subset_dadeSupport`), while `G₀` avoids `Ã(M)` (`G0_off_dadeSupport`). -/
 theorem eta_generic_data [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) :
-    EtaGenericData hyp Mdata := sorry
+    EtaGenericData hyp Mdata := by
+  obtain ⟨hint, hpair, hprinc⟩ := eta_grid_facts_on_G0 hyp Mdata
+  refine { eta_int := hint, eta_pair := hpair, eta_principal := hprinc, betaM_vanish := ?_ }
+  -- **Peterfalvi (14.11.3)**: `β_M^τ` vanishes off its Dade support `Ã(M)`, and `G₀ ⊆ G ∖ Ã(M)`.
+  intro g hg
+  rw [Mdata.betaM_eq]
+  by_contra hne
+  have hmem := Mdata.h78.beta_support_subset_dadeSupport (Function.mem_support.mpr hne)
+  rw [Mdata.h78_hyp_eq] at hmem
+  exact Mdata.G0_off_dadeSupport g hg hmem
 
 /-- **Peterfalvi (14.11.3)**: on the generic set `G_0`, the extended character `ψ^{τ₁}` has
 absolute value at least one: `|ψ^{τ₁}(g)| ≥ 1` for `g ∈ G_0`.
