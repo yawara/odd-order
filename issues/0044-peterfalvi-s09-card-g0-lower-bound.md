@@ -1099,3 +1099,75 @@ hgood + hBsum + hG0sum + 𝓑-set min-index) → card_G0_lower_bound。
 d-matching (H78.hyp76.d vs induced degree) だけ betaDecompOfDade hdeq パターンで橋渡し。
 
 次 iteration: この construction を書いて build。その後 (7.9) conclusion (hBD 完成で全 input 揃う)。
+
+## 2026-07-04 cont.⁴¹ — ✅★ BetaDecomp (7.8.a) 完成 — (7.9) conclusion 全 input 揃う
+
+**Landed** (S09_FrobeniusConjIndex.lean, commit, full build green 3916 jobs):
+`hypothesis78_betaDecomp` — `(F.hypothesis78 i).BetaDecomp` を `betaDecompOfFacts` で構築、11 facts を
+誘導族 ζ_j=Ind_K θ_j (projection) から discharge。hagree d-matching (H78.hyp76.d j = deg_j/deg_0、
+zeta_one_eq_d_mul + induce_apply_one で index 相殺、linear_combination) が最難関だったが完了。
+※ **技法**: `0 : Fin (h78.n+1)` と `0 : Fin (pf.n+1)` の defeq-but-syntactic mismatch は index annotation
+で解決 ([[lean-instance-defeq-traps]] 系)。
+
+**(7.9) conclusion (Frobenius) の全 input が揃った**:
+- hcoh/hnu = hypothesis78_isCoherent_sourceSet + hypothesis78_nu_eq ✅
+- hindZ = ClassFunction.induce_mem_ZIrr ✅ (BetaDecomp で使用済)
+- hzeta_irr = hypothesis78_zeta_irreducible ✅
+- **hBD = hypothesis78_betaDecomp ✅ (今回)**
+- **hzeta_cross = hypothesis79_zetaImage_cross_eq_zero ✅ (cont.³⁷)**
+- 残 hdelta_even = ∃z, ⟨δ_i,δ_j⟩=z ∧ Even z: parity primitive cfdot_real_vchar_even + delta_orth_one
+  (@S09_NonexistenceCertain:2822, ⟨δ,1⟩=0) → ⟨δ_i,δ_j⟩ ≡ ⟨δ_i,1⟩⟨δ_j,1⟩ = 0 mod 2 → even。
+  ※ δ_i real vchar (要確認: delta ∈ ZIrr + cfReal)。
+
+次 iteration: hdelta_even 構築 → (7.9) conclusion producer 適用 (Frobenius H79) → hgood → 𝓑-set →
+CharacterEstimateData → card_G0_lower_bound。
+
+## 2026-07-04 cont.⁴² — 残 hdelta_even の要 = delta-reality (Dade-conj 両立)
+
+(7.9) conclusion producer `conclusion_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent_parity`
+(@S09_NonexistenceCertain:4094) の全 input 中、**hdelta_even のみ未** (他は済: hcoh/hnu/hindZ[induce_mem_ZIrr]/
+hzeta_irr/hBD/hzeta_cross)。
+
+**hdelta_even = ∃z, ⟨δ_i,δ_j⟩=z ∧ Even z**:
+- parity primitive `cfdot_real_vchar_even` (S09_ParityPrimitive) を δ_i,δ_j に適用 → m,a,b with
+  ⟨δ_i,δ_j⟩=m, ⟨δ_i,1⟩=a, ⟨δ_j,1⟩=b, Even(m−a·b)。`delta_orth_one` (@2822, ⟨δ,1⟩=0) で a=b=0 →
+  Even m。⟨m, hm, Even m⟩。
+- **要件**: δ_i,δ_j ∈ ZIrr (済 delta_mem_ZIrr) **+ δ real (cfReal/IsReal)** ← これが未証明の deep piece。
+- **delta-reality**: δ = β − 1_G + ν(ζ)。real ⟺ (β + ν(ζ)) real (1_G real)。coq `Dade_sub_lin_nonorthogonal`
+  の `cfReal D` 証明 (PFsection7:625-640) = `cfConjC_Dade_coherent` (Dade map が coherent set 上で共役両立)
+  + `conj_cfInd` (Ind が共役両立) + `Dade_conjC` + `nu_tau`。Lean 側の対応:
+  - Ind-conj: `conj_induce` (済、使用中)。
+  - τ-conj / Dade_conjC: S04 の dadeMap 共役両立 (要探索; S07_Coherence:1234 `tau1_agrees` 系や
+    S04 dadeMap 性質)。
+  - 共役拡張 ν(ζ).conj = ν(ζ̄): coherent extension の共役両立 (S07_Coherence:1137 `nu_eq_mu_conj` 系)。
+  → **delta_isReal を Frobenius level で構築** (hab_supp と同程度の深さの sub-lemma)。
+
+**その後**: hdelta_even → (7.9) conclusion → hgood (chiRhoNormSq_ge_ratio_of_inner_beta_ne_zero) →
+CharacterEstimateData (hi[exists_chiRhoNormSq_ge]/hgood/hBsum/hG0sum/𝓑-set min-index) →
+card_G0_lower_bound (@6552)。
+
+**本 session 実績**: 深部 §1 frontier (hzeta_cross 全 chain) + (7.8.a) BetaDecomp 完成 (~22 sorry-free
+commits)。残りは delta-reality → hdelta_even → (7.9) conclusion → 定量 assembly。
+
+## 2026-07-04 cont.⁴³ — delta-reality の clean reduction (τ/ν conj-compat + agreement)
+
+**delta = β − 1_G + ν(ζ) の reality を clean に reduce**:
+`delta.conj − delta = (β.conj − β) + (ν(ζ).conj − ν(ζ))`。
+- **(A) τ-conj-compat** (τ(φ).conj = τ(φ.conj)) 前提で: β = τ(Ind1_K − ζ) → β.conj = τ(Ind1_K − ζ̄)
+  → β.conj − β = τ((Ind1_K−ζ̄)−(Ind1_K−ζ)) = τ(ζ − ζ̄)。
+- **(B) ν-conj-compat** (ν(φ).conj = ν(φ.conj)) 前提で: ν(ζ).conj = ν(ζ̄) →
+  ν(ζ).conj − ν(ζ) = ν(ζ̄ − ζ) = −ν(ζ − ζ̄)。
+- **(C) coherence agreement** (ν(ζ−ζ̄) = τ(ζ−ζ̄)、既有 coherence_hagree, ζ−ζ̄ は A-supported):
+  → delta.conj − delta = τ(ζ−ζ̄) − ν(ζ−ζ̄) = 0。**delta real**。
+
+**残 = (A) τ-conj-compat + (B) ν-conj-compat** (両方 未 in Lean; coq `Dade_conjC` +
+coherent-extension conj-compat)。深い sub-lemma:
+- (A) Dade map の複素共役両立: S04 dadeMap 定義 (mobius/α_B) レベル。`Hypothesis.dadeMap` の conj 挙動。
+- (B) coherent extension の共役両立: S07 hcoh.extension の conj。誘導族 conj-closed (sourceSet=S、
+  conj_induce) を利用できる可能性。
+
+これらが揃えば delta_isReal → cfdot_real_vchar_even (parity, 済) + delta_orth_one → hdelta_even →
+(7.9) conclusion (他 input 全済) → hgood → CharacterEstimateData → card_G0_lower_bound。
+
+**本 session 実績 (深部完了)**: hzeta_cross 全 chain (深部 §1 frontier) + BetaDecomp (7.8.a)、
+~22 sorry-free commits, full build green。残りは delta-reality (τ/ν conj-compat) + 定量 assembly。
