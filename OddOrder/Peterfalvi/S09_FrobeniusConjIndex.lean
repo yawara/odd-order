@@ -46,6 +46,31 @@ theorem dadeMap_conj {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup
   · rw [hτ.map_eq_zero_of_not_mem_dadeSupport _ g hg, ClassFunction.conj_apply,
       hτ.map_eq_zero_of_not_mem_dadeSupport α g hg, star_zero]
 
+/-- **The residual `Δ = β − 1_G + νζ` is real** (Peterfalvi (7.9), delta-reality — pure algebra).
+Given `β̄ − β = νζ − νζ̄` (`hbeta_conj_sub`, itself (A) `dadeMap_conj` + agreement + Dade linearity)
+and `(νζ)‾ = ν(ζ̄)` (`hnu_conj`, (B) `coherence_extension_conj`), the two conjugate-difference terms
+cancel: `Δ̄ − Δ = (β̄−β) + ((νζ)‾−νζ) = (νζ−νζ̄) + (νζ̄−νζ) = 0`.  `1_G` is real, so it drops out.
+Feeds `cfdot_real_vchar_even` for the (7.9) `hdelta_even`. -/
+theorem delta_isReal {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : Hypothesis78 G A L)
+    (hnu_conj : (H78.nu (H78.hyp76.zeta H78.zetaDistinct)).conj
+        = H78.nu (H78.hyp76.zeta H78.zetaDistinct).conj)
+    (hbeta_conj_sub : H78.beta.conj - H78.beta
+        = H78.nu (H78.hyp76.zeta H78.zetaDistinct)
+          - H78.nu (H78.hyp76.zeta H78.zetaDistinct).conj) :
+    ClassFunction.IsReal H78.delta := by
+  have hd : H78.delta = H78.beta - Hypothesis71.constOne G
+      + H78.nu (H78.hyp76.zeta H78.zetaDistinct) := rfl
+  have hconstOne : (Hypothesis71.constOne G).conj = Hypothesis71.constOne G := by
+    ext g; simp [ClassFunction.conj_apply, Hypothesis71.constOne_apply]
+  have hbeta : H78.beta.conj = (H78.nu (H78.hyp76.zeta H78.zetaDistinct)
+      - H78.nu (H78.hyp76.zeta H78.zetaDistinct).conj) + H78.beta := by
+    rw [← hbeta_conj_sub]; abel
+  rw [ClassFunction.IsReal, hd, ClassFunction.conj_add, ClassFunction.conj_sub, hconstOne,
+    hnu_conj, hbeta]
+  abel
+
 namespace FrobeniusFamily
 
 variable {G : Type*} [Group G] {k : ℕ}
