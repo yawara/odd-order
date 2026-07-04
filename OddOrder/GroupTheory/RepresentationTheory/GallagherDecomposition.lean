@@ -242,6 +242,20 @@ theorem induce_trivial_eq_sum_linearClassFunction [Finite K] [Fintype K]
   rw [ClassFunction.mul_apply, trivialClassFunction_apply, one_mul]
 
 open scoped commutatorElement in
+/-- **The sum of a quotient's linear characters vanishes off the normal subgroup**
+(regular-character vanishing).  For `H ⊴ K` with `K/H` abelian, `∑_β Inf(β)` vanishes at every
+`g ∉ H`: it equals `Ind_H^K 1_H` (`induce_trivial_eq_sum_linearClassFunction`), which vanishes off
+`H` (`induce_apply_eq_zero_of_not_mem_normal`).  (The regular character of `K/H`, inflated, is
+`[K:H]` on `H` and `0` off `H`.)  Feeds the linear (`H'`-kernel) part of the Peterfalvi (12.5)
+`DpsiH` decomposition — the piece `∑_{θ ∈ Irr(H/H'), θ ≠ 1} θ` vanishing on `H − H'`. -/
+theorem sum_linearClassFunction_apply_eq_zero_of_not_mem_normal [Finite K] [Fintype K]
+    [Invertible (Nat.card K : ℂ)] [Invertible (Nat.card ↥H : ℂ)]
+    [Fintype ((K ⧸ H) →* ℂˣ)] (hab : ∀ x y : K, ⁅x, y⁆ ∈ H) {g : K} (hg : g ∉ H) :
+    (∑ β : (K ⧸ H) →* ℂˣ, linearClassFunction (β.comp (QuotientGroup.mk' H))) g = 0 := by
+  rw [← induce_trivial_eq_sum_linearClassFunction hab]
+  exact ClassFunction.induce_apply_eq_zero_of_not_mem_normal H (trivialClassFunction ↥H) hg
+
+open scoped commutatorElement in
 /-- **The abelian-quotient restriction–induction identity** `Ind_H^K(Res_H ψ) = ∑_β ψ·Inf(β)`.
 Combines the projection formula (`ClassFunction.induce_restrict_mul`, with `χ = 1_H`, using
 `Res_H ψ · 1_H = Res_H ψ`) and `induce_trivial_eq_sum_linearClassFunction`.
