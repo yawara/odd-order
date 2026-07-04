@@ -434,3 +434,18 @@ coeff (X ∈ ℤ[R]) / Y ⊥ R。
       注意: tau_muGrid_columnSum_diff が coh を要求 — S₁-coherence でなく
       グローバル (10.2-10.5) パッケージ。sixTwoDecompositionData の呼び出し文脈
       ((11.4)/(11.3) 消費時) にそれが立つかの検証が次の第一手。
+
+### 追記 3 (loop 29): ⚠ CoherentHypothesis = S 全体 coherence (10.4.b) — 供給不可の可能性
+
+- `CoherentHypothesis hyp params` の唯一 field = `IsCoherent hyp.tau hyp.Sset hyp.A0`
+  (S12_Core:2810) — **(10.8) S_not_coherent で否定される側の作業仮定**。
+  sixTwo* の文脈 (S₁-coherence のみ、S-full は偽) では直接供給できない。
+- 帰結: columnImageFamily / tau_muGrid_columnSum_diff の coh-依存が
+  (a) 本質 (alignedOmegaSigmaGrid の σ-整列が τ₁=coh.extension 依存定義) か
+  (b) 過剰要求 (Dade τ の supported-計算だけで済む) かの検証が次の第一手。
+  (b) なら coh-free 版 tau_muGrid_columnSum_diff' を切り出して
+  columnImageFamily を S₁-文脈に移植。(a) なら Peterfalvi (11.8) の
+  τ₂ (S(C)−S(HC)-extension) 相当で σ-整列を再定義する必要 — (9.11)/(11.8)
+  の subfamily-coherence 経由。Coq PFsection11 の cohS1-消費部
+  (FTtype345_noncoherent 系) の該当行間を精読すること。
+- いずれにせよ irr×irr-放電済み skeleton は不変; named 2 点の中身のみの問題。
