@@ -30,6 +30,39 @@ variable {G : Type*} [Group G]
 
 /-! ## (11.6)--(11.7): the core structure of `H` and `U` -/
 
+/-- **Commutator product decomposition under cross-commutation**: if `c₁, c₂` commute with
+`h₁, h₂` (four swaps), then `⁅h₁c₁, h₂c₂⁆ = ⁅h₁,h₂⁆ · ⁅c₁,c₂⁆` (explicit products; crib of the
+`commutator_HC_mem_H0C` computation). -/
+theorem commutator_mul_of_commute {Q : Type*} [Group Q] {h₁ c₁ h₂ c₂ : Q}
+    (hsw12 : Commute c₁ h₂) (hsw11 : Commute c₁ h₁) (hsw21 : Commute c₂ h₁)
+    (hsw22 : Commute c₂ h₂) :
+    h₁ * c₁ * (h₂ * c₂) * (h₁ * c₁)⁻¹ * (h₂ * c₂)⁻¹
+      = (h₁ * h₂ * h₁⁻¹ * h₂⁻¹) * (c₁ * c₂ * c₁⁻¹ * c₂⁻¹) := by
+  have e12 : c₁ * h₂ = h₂ * c₁ := hsw12
+  calc h₁ * c₁ * (h₂ * c₂) * (h₁ * c₁)⁻¹ * (h₂ * c₂)⁻¹
+      = h₁ * (c₁ * h₂) * c₂ * (c₁⁻¹ * h₁⁻¹) * (c₂⁻¹ * h₂⁻¹) := by group
+    _ = h₁ * (h₂ * c₁) * c₂ * (c₁⁻¹ * h₁⁻¹) * (c₂⁻¹ * h₂⁻¹) := by rw [e12]
+    _ = h₁ * h₂ * (c₁ * c₂ * c₁⁻¹) * h₁⁻¹ * (c₂⁻¹ * h₂⁻¹) := by group
+    _ = h₁ * h₂ * h₁⁻¹ * (c₁ * c₂ * c₁⁻¹) * (c₂⁻¹ * h₂⁻¹) := by
+        have hcomm3 : (c₁ * c₂ * c₁⁻¹) * h₁⁻¹ = h₁⁻¹ * (c₁ * c₂ * c₁⁻¹) := by
+          have a1 : Commute (c₁ * c₂ * c₁⁻¹) h₁⁻¹ :=
+            ((hsw11.mul_left hsw21).mul_left hsw11.inv_left).inv_right
+          exact a1
+        rw [show h₁ * h₂ * (c₁ * c₂ * c₁⁻¹) * h₁⁻¹ * (c₂⁻¹ * h₂⁻¹)
+            = h₁ * h₂ * ((c₁ * c₂ * c₁⁻¹) * h₁⁻¹) * (c₂⁻¹ * h₂⁻¹) from by group,
+          hcomm3]
+        group
+    _ = h₁ * h₂ * h₁⁻¹ * h₂⁻¹ * (c₁ * c₂ * c₁⁻¹ * c₂⁻¹) := by
+        have hcomm4 : (c₁ * c₂ * c₁⁻¹ * c₂⁻¹) * h₂⁻¹ = h₂⁻¹ * (c₁ * c₂ * c₁⁻¹ * c₂⁻¹) := by
+          have a1 : Commute (c₁ * c₂ * c₁⁻¹ * c₂⁻¹) h₂⁻¹ :=
+            (((hsw12.mul_left hsw22).mul_left hsw12.inv_left).mul_left
+              hsw22.inv_left).inv_right
+          exact a1
+        rw [show h₁ * h₂ * h₁⁻¹ * (c₁ * c₂ * c₁⁻¹) * (c₂⁻¹ * h₂⁻¹)
+            = h₁ * h₂ * h₁⁻¹ * ((c₁ * c₂ * c₁⁻¹ * c₂⁻¹) * h₂⁻¹) from by group,
+          hcomm4]
+        group
+
 namespace Hypothesis
 
 /-- Bridge: the §9 setup's `H` is the §13 `H` (via `setup_typeP_eq`). -/
@@ -226,6 +259,85 @@ theorem isPGroup_of_pComplementCore_eq_bot [Finite G]
   conv_lhs => rw [← Nat.prod_factorization_pow_eq_self (Nat.card_pos (α := ↥hyp.H)).ne']
   rw [Finsupp.prod_of_support_subset _ (Nat.support_factorization _ ▸ hsub) _
     (fun i _ => pow_zero i), Finset.prod_singleton]
+
+
+/-- `p ∈ primeFactors |H|`: `p` is prime and `p^q ∣ |H|` with `q = |W₁| ≥ 1` ((9.3)). -/
+theorem p_mem_primeFactors [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.p ∈ (Nat.card ↥hyp.H).primeFactors := by
+  obtain ⟨hp_prime, hcard⟩ := hyp.p_prime_and_card_H_eq hG
+  have hq : hyp.q ≠ 0 := by
+    show Nat.card ↥hyp.base.typeP.W1 ≠ 0
+    exact Nat.card_pos.ne'
+  refine Nat.mem_primeFactors.mpr ⟨hp_prime, ?_, Nat.card_pos.ne'⟩
+  rw [hcard]
+  exact dvd_mul_of_dvd_left (dvd_pow_self _ hq) _
+
+/-- The `p`-core and the `p`-complement jointly generate `H` (nilpotent: Sylows generate). -/
+theorem opCore_sup_pComplementCore_eq_top [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) :
+    OddOrder.Isaacs.Ch01.opCore hyp.p ↥hyp.H ⊔ hyp.pComplementCore = ⊤ := by
+  classical
+  haveI hHnil : Group.IsNilpotent ↥hyp.H := hyp.H_isNilpotent
+  have htop : (⨆ q : (Nat.card ↥hyp.H).primeFactors,
+      OddOrder.Isaacs.Ch01.opCore (q : ℕ) ↥hyp.H) = ⊤ := by
+    have hrw : (⨆ q : (Nat.card ↥hyp.H).primeFactors,
+        OddOrder.Isaacs.Ch01.opCore (q : ℕ) ↥hyp.H)
+        = ⨆ q : (Nat.card ↥hyp.H).primeFactors,
+            ((default : Sylow (q : ℕ) ↥hyp.H) : Subgroup ↥hyp.H) :=
+      iSup_congr fun q => by
+        haveI : Fact (q : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors q.2⟩
+        exact (OddOrder.Isaacs.Ch01.Sylow.eq_opCore_of_normal default
+          (OddOrder.Isaacs.Ch01.Sylow.normal_of_isNilpotent default)).symm
+    rw [hrw]
+    exact OddOrder.Isaacs.Ch01.iSup_default_sylow_eq_top_of_nilpotent ↥hyp.H
+  refine le_antisymm le_top ?_
+  rw [← htop]
+  refine iSup_le fun j => ?_
+  by_cases hj : (j : ℕ) = hyp.p
+  · refine le_sup_of_le_left ?_
+    rw [hj]
+  · refine le_sup_of_le_right ?_
+    rw [pComplementCore]
+    exact le_iSup₂ (f := fun (j : (Nat.card ↥hyp.H).primeFactors)
+      (_ : (j : ℕ) ≠ hyp.p) => OddOrder.Isaacs.Ch01.opCore (j : ℕ) ↥hyp.H) j hj
+
+/-- The (11.6) kernel `K₀ = O_p(H)·⁅R,R⁆` (ambient), with `R` the `p`-complement. -/
+noncomputable def pKernel [Finite G] {M : Subgroup G} (hyp : Hypothesis M) : Subgroup G :=
+  (OddOrder.Isaacs.Ch01.opCore hyp.p ↥hyp.H).map hyp.H.subtype
+    ⊔ ⁅hyp.pComplement, hyp.pComplement⁆
+
+theorem pKernel_le_H [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.pKernel ≤ hyp.H := by
+  refine sup_le (Subgroup.map_subtype_le _) ?_
+  rw [Subgroup.commutator_le]
+  intro g₁ hg₁ g₂ hg₂
+  exact Subgroup.mul_mem _ (Subgroup.mul_mem _ (Subgroup.mul_mem _
+      (hyp.pComplement_le_H hg₁) (hyp.pComplement_le_H hg₂))
+      (Subgroup.inv_mem _ (hyp.pComplement_le_H hg₁)))
+    (Subgroup.inv_mem _ (hyp.pComplement_le_H hg₂))
+
+/-- `M` normalizes the kernel `K₀` (it is the image of a characteristic subgroup of `H`). -/
+theorem pKernel_normalized_by_M [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
+    M ≤ Subgroup.normalizer (hyp.pKernel : Set G) := by
+  classical
+  set N₀ : Subgroup ↥hyp.H :=
+    OddOrder.Isaacs.Ch01.opCore hyp.p ↥hyp.H ⊔ ⁅hyp.pComplementCore, hyp.pComplementCore⁆
+    with hN₀
+  have hchar : N₀.Characteristic := by
+    rw [Subgroup.characteristic_iff_map_eq]
+    intro φ
+    rw [hN₀, Subgroup.map_sup, Subgroup.map_commutator,
+      Subgroup.characteristic_iff_map_eq.mp
+        (OddOrder.Isaacs.Ch01.opCore.characteristic hyp.p ↥hyp.H) φ,
+      Subgroup.characteristic_iff_map_eq.mp hyp.pComplementCore_characteristic φ]
+  have hnorm : N₀.Normal := @Subgroup.normal_of_characteristic _ _ N₀ hchar
+  have hmap : hyp.pKernel = N₀.map hyp.H.subtype := by
+    rw [hN₀, Subgroup.map_sup, Subgroup.map_commutator, pKernel, pComplement]
+  rw [hmap]
+  exact OddOrder.Peterfalvi.S11.typeP_aInvariantNormal_le_normalizer hyp.base.typeP
+    (hNn := hnorm)
+    (@OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic _ _ _ _ _ N₀ hchar)
 
 end Hypothesis
 
