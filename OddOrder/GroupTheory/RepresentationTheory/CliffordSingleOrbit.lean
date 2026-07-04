@@ -185,6 +185,130 @@ theorem exists_conj_of_common_induce_constituent
     ((IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H χ θ₁).mp h₁)
     ((IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H χ θ₂).mp h₂)
 
+open scoped Classical in
+/-- **Induced characters from non-conjugate constituents have disjoint constituent sets.**  For a
+normal `H ⊴ G` and non-`G`-conjugate `θ₁, θ₂ ∈ Irr H`, the sets of irreducible constituents of
+`Ind_H^G θ₁` and `Ind_H^G θ₂` are disjoint.  Contrapositive of
+`exists_conj_of_common_induce_constituent` (a common constituent forces conjugacy), packaged as a
+`Finset` disjointness — the `trivIset` core of the induced-from-`H'` partition of `Irr H` for the
+Peterfalvi (12.5) `DpsiH` regrouping (`Finset.sum_biUnion`). -/
+theorem induce_constituents_disjoint_of_not_conj [Fintype G] [Invertible (Nat.card G : ℂ)]
+    [Fintype (IrreducibleCharacter G)]
+    {H : Subgroup G} [hH : H.Normal] [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
+    {θ₁ θ₂ : IrreducibleCharacter ↥H}
+    (hnc : ¬ ∃ g : G, IrreducibleCharacter.conjBy g θ₁ = θ₂) :
+    Disjoint
+      (Finset.univ.filter fun χ : IrreducibleCharacter G =>
+        ClassFunction.inner (ClassFunction.induce H (θ₁ : ClassFunction ↥H ℂ))
+          (χ : ClassFunction G ℂ) ≠ 0)
+      (Finset.univ.filter fun χ : IrreducibleCharacter G =>
+        ClassFunction.inner (ClassFunction.induce H (θ₂ : ClassFunction ↥H ℂ))
+          (χ : ClassFunction G ℂ) ≠ 0) := by
+  classical
+  rw [Finset.disjoint_left]
+  intro χ hχ1 hχ2
+  rw [Finset.mem_filter] at hχ1 hχ2
+  exact hnc (exists_conj_of_common_induce_constituent hχ1.2 hχ2.2)
+
+/-- **Every irreducible is a constituent of some induced character** (the `cover` of the
+induced-from-`H'` partition).  For `H ⊴ G` and `φ ∈ Irr G`, there is `ρ ∈ Irr H` with `φ` a
+constituent of `Ind_H^G ρ` (`⟨Ind_H^G ρ, φ⟩ ≠ 0`).  From `exists_liesOver` (`Res_H φ` has a
+constituent `ρ`) and Frobenius (`inner_induce_ne_zero_iff_liesOver`).  With
+`induce_constituents_disjoint_of_not_conj` (`trivIset`), the constituent sets
+`{φ : ⟨Ind_H ρ, φ⟩ ≠ 0}` cover and pairwise-partition `Irr G` — the `trivIset`+`cover` of the
+Peterfalvi (12.5) `DpsiH` regrouping. -/
+theorem exists_induce_inner_ne_zero [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {H : Subgroup G} [hH : H.Normal] [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
+    (φ : IrreducibleCharacter G) :
+    ∃ ρ : IrreducibleCharacter ↥H,
+      ClassFunction.inner (ClassFunction.induce H (ρ : ClassFunction ↥H ℂ))
+        (φ : ClassFunction G ℂ) ≠ 0 := by
+  obtain ⟨ρ, hρ⟩ := IrreducibleCharacter.exists_liesOver (H := H) φ
+  exact ⟨ρ, (IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H φ ρ).mpr hρ⟩
+
+/-- **Dual of `exists_liesOver`**: every irreducible `σ` of a subgroup `H ≤ G` lies *under* some
+irreducible `ψ` of `G` (`σ` is a constituent of `Res_H ψ`, i.e. `⟨Ind_H σ, ψ⟩ ≠ 0`).  The induced
+character `Ind_H^G σ` has positive degree `[G:H]·σ(1)`, hence is nonzero, hence — by completeness
+(`classFunction_eq_zero_of_orthogonal`) — not orthogonal to every irreducible of `G`.  This supplies
+the Clifford correspondent `ψ` over `θ'` in the Peterfalvi (1.7.b)/(12.5) inertia setup. -/
+theorem exists_liesOver_of_subgroup [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {H : Subgroup G} [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
+    (σ : IrreducibleCharacter ↥H) :
+    ∃ ψ : IrreducibleCharacter G, IrreducibleCharacter.LiesOver H ψ σ := by
+  classical
+  have hne : ClassFunction.induce H (σ : ClassFunction ↥H ℂ) ≠ 0 := by
+    intro hzero
+    have h1 : ClassFunction.induce H (σ : ClassFunction ↥H ℂ) 1 = 0 := by rw [hzero]; rfl
+    rw [ClassFunction.induce_apply_one] at h1
+    obtain ⟨d, hd, hdeq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast σ
+    rw [hdeq] at h1
+    have hidx : (H.index : ℂ) ≠ 0 := by exact_mod_cast Subgroup.index_ne_zero_of_finite
+    exact mul_ne_zero hidx (by exact_mod_cast hd.ne') h1
+  by_contra hcon
+  push_neg at hcon
+  apply hne
+  apply classFunction_eq_zero_of_orthogonal
+  intro ψ
+  by_contra hz
+  exact hcon ψ ((IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H ψ σ).mp hz)
+
+open scoped Classical in
+/-- **Partition of `Irr G` into `Ind_H^G` blocks.**  For `H ⊴ G`, the irreducible characters of `G`
+partition into the constituent-sets of the induced characters `Ind_H^G λ` (`λ ∈ Irr H`): every
+`φ ∈ Irr G` lies in exactly one block.  Blocks are indexed by their own `Finset` (conjugate `λ` give
+the *same* block), via `cap φ := {θ | ⟨Ind_H λ(φ), θ⟩ ≠ 0}` where `λ(φ)` is a chosen constituent of
+`Res_H φ` (`exists_liesOver`).  `PairwiseDisjoint` from `exists_conj_of_common_induce_constituent`
+(a shared constituent forces `λ`-conjugacy) + conjugation-closure of `Res_H φ` constituents
+(`liesOver_conjBy_iff`); cover from `φ ∈ cap φ`.  The `trivIset`/`cover` packaging for the Peterfalvi
+(12.5) `DpsiH` Fourier regrouping (`Finset.sum_biUnion`). -/
+theorem exists_induce_constituent_partition [Finite G]
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {H : Subgroup G} [hH : H.Normal] [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
+    [Fintype (IrreducibleCharacter G)] :
+    ∃ parts : Finset (Finset (IrreducibleCharacter G)),
+      (Finset.univ : Finset (IrreducibleCharacter G)) = parts.biUnion id ∧
+      (↑parts : Set (Finset (IrreducibleCharacter G))).PairwiseDisjoint id ∧
+      ∀ A ∈ parts, ∃ ρ : IrreducibleCharacter ↥H, ∀ θ : IrreducibleCharacter G,
+        θ ∈ A ↔ IrreducibleCharacter.LiesOver H θ ρ := by
+  classical
+  let lam : IrreducibleCharacter G → IrreducibleCharacter ↥H :=
+    fun φ => (IrreducibleCharacter.exists_liesOver (H := H) φ).choose
+  have hlam : ∀ φ, IrreducibleCharacter.LiesOver H φ (lam φ) :=
+    fun φ => (IrreducibleCharacter.exists_liesOver (H := H) φ).choose_spec
+  let cap : IrreducibleCharacter G → Finset (IrreducibleCharacter G) :=
+    fun φ => Finset.univ.filter (fun θ =>
+      ClassFunction.inner (ClassFunction.induce H (lam φ : ClassFunction ↥H ℂ))
+        (θ : ClassFunction G ℂ) ≠ 0)
+  have hmem_cap : ∀ φ θ : IrreducibleCharacter G, θ ∈ cap φ ↔
+      IrreducibleCharacter.LiesOver H θ (lam φ) := by
+    intro φ θ
+    show θ ∈ Finset.univ.filter _ ↔ _
+    rw [Finset.mem_filter]
+    simp only [Finset.mem_univ, true_and]
+    exact IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H θ (lam φ)
+  have hself : ∀ φ : IrreducibleCharacter G, φ ∈ cap φ := fun φ => (hmem_cap φ φ).mpr (hlam φ)
+  refine ⟨Finset.univ.image cap, ?_, ?_, ?_⟩
+  · ext φ
+    simp only [Finset.mem_univ, true_iff, Finset.mem_biUnion, id_eq]
+    exact ⟨cap φ, Finset.mem_image_of_mem cap (Finset.mem_univ φ), hself φ⟩
+  · intro B hB B' hB' hBB'
+    rw [Finset.mem_coe, Finset.mem_image] at hB hB'
+    obtain ⟨φ, -, rfl⟩ := hB
+    obtain ⟨φ', -, rfl⟩ := hB'
+    simp only [Function.onFun, id_eq]
+    rw [Finset.disjoint_left]
+    intro θ hθ hθ'
+    apply hBB'
+    obtain ⟨g, hg⟩ := exists_conj_of_common_induce_constituent
+      ((IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H θ (lam φ)).mpr ((hmem_cap φ θ).mp hθ))
+      ((IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H θ (lam φ')).mpr ((hmem_cap φ' θ).mp hθ'))
+    ext θ''
+    rw [hmem_cap, hmem_cap, ← hg, IrreducibleCharacter.liesOver_conjBy_iff]
+  · intro A hA
+    rw [Finset.mem_image] at hA
+    obtain ⟨φ, -, rfl⟩ := hA
+    exact ⟨lam φ, hmem_cap φ⟩
+
 /-- **Clifford's theorem for an invariant constituent** ([Isaacs] Thm 6.5, invariant case).  For a
 normal `H ⊴ G` and `χ ∈ Irr G` lying over `θ ∈ Irr H` with `θ` **`G`-invariant** (`θ^g = θ` for all
 `g`), the restriction is a single multiple of `θ`: `Res^G_H χ = e · θ` with `e = ⟨Res χ, θ⟩`.
@@ -279,6 +403,34 @@ theorem apply_one_eq_restrictionMultiplicity_mul_index_inertia
     simp [Set.mem_toFinset]
   rw [hcard]
   ring
+
+/-- **Equal-degree constituents over the same character have equal restriction multiplicity.**  For
+`H ⊴ G` and `φ₁, φ₂ ∈ Irr G` both lying over `ρ ∈ Irr H` with `φ₁(1) = φ₂(1)`, the multiplicities
+`⟨Res_H φᵢ, ρ⟩` agree.  From the Clifford degree formula
+`apply_one_eq_restrictionMultiplicity_mul_index_inertia` (`φ(1) = ⟨Res φ, ρ⟩·[G:I(ρ)]·ρ(1)`) and the
+common nonzero factor `[G:I(ρ)]·ρ(1)`.  With the general (1.7.b) equal degree of the constituents of
+`Ind_H^G ρ`, this gives their **common multiplicity `e`** — the coefficient-matching `a_ρ = c_ρ/e`
+of the Peterfalvi (12.5) `DpsiH` decomposition. -/
+theorem restrictionMultiplicity_eq_of_liesOver_of_apply_one_eq
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {H : Subgroup G} [hH : H.Normal] [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
+    [Fintype (IrreducibleCharacter ↥H)]
+    {φ₁ φ₂ : IrreducibleCharacter G} {ρ : IrreducibleCharacter ↥H}
+    (h₁ : IrreducibleCharacter.LiesOver (G := G) (H := H) φ₁ ρ)
+    (h₂ : IrreducibleCharacter.LiesOver (G := G) (H := H) φ₂ ρ)
+    (hdeg : (φ₁ : ClassFunction G ℂ) 1 = (φ₂ : ClassFunction G ℂ) 1) :
+    ClassFunction.restrictionMultiplicity H (φ₁ : ClassFunction G ℂ) (ρ : ClassFunction ↥H ℂ)
+      = ClassFunction.restrictionMultiplicity H (φ₂ : ClassFunction G ℂ) (ρ : ClassFunction ↥H ℂ) := by
+  have e1 := apply_one_eq_restrictionMultiplicity_mul_index_inertia φ₁ ρ h₁
+  have e2 := apply_one_eq_restrictionMultiplicity_mul_index_inertia φ₂ ρ h₂
+  rw [hdeg] at e1
+  have hkey := e1.symm.trans e2
+  have hρ1 : (ρ : ClassFunction ↥H ℂ) 1 ≠ 0 := by
+    obtain ⟨d, hd, hdeq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast ρ
+    rw [hdeq]; exact_mod_cast hd.ne'
+  have hIdx : ((IrreducibleCharacter.inertia (G := G) (H := H) ρ).index : ℂ) ≠ 0 := by
+    exact_mod_cast Subgroup.index_ne_zero_of_finite
+  exact mul_right_cancel₀ hIdx (mul_right_cancel₀ hρ1 hkey)
 
 /-- **Clifford correspondence** ([Isaacs] Thm 6.11, degree form).  If `ψ ∈ Irr I` (for a subgroup
 `I ≤ G`) has an *irreducible* induction `Ind_I^G ψ`, and the irreducible `χ ∈ Irr G` lies over `ψ`

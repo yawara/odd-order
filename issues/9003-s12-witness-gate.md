@@ -582,3 +582,55 @@ A₁=H^# ((8.13.b) `escaping_typeIA_mem_A1`) で Res 一致し消える。(12.4)
 - **(12.10)/(12.11)/(12.12)** = Cluster A (§8-§11 type-analysis) gated (既記載)。
 - **(12.14)/(12.15)/(12.16)** = Dade 計算 + witness assembly (deep)。
 - **helper `restrict_eq_of_mem_constituents` は reusable** — 将来 (8.2.c) や他の Res-of-Ind に流用可。
+
+## loop¹⁹¹ (2026-07-04) — 🎉 (12.5) 完全証明で DpsiH クラスタ完済 → frontier = deep type-P engine / gated 群
+
+**(12.5) `rho_constant_on_H_minus_Hprime` 完全証明** (sorry-free、標準3 axiom、full build green 3915 jobs)。
+loop¹¹¹ が tractable と見出した (12.4)/(12.5) DpsiH クラスタは**完済**。generic 機構
+(DpsiH core / block partition / 等次数・等mult / ψ存在) + S14 wiring を landing。
+
+**frontier 再検証 (S10/S14/S09 横断)** — loop¹¹⁰ の「枯渇」判定は今度は正しい (tractable 例外 DpsiH を
+完済したため):
+- **S14**: (8.2.c) は既 proven。残 = `witness_L_isTypeI`/`witness_L_complement_isZGroup` (Cluster A、
+  deep §8-§11 type-analysis、gated) / **`rhoM_integer_values` (12.15) は opaque `rhoMFormula` Prop
+  free field ⟹ scaffold** (一般 dade で証明不能・honest でない、要 DadeNotation de-scaffold 設計判断) /
+  (12.14/16)+counterexample assembly (deep Dade)。
+- **S10**: `dadeSupportHypotheses_typeP` = **type-P Dade engine** (Pf (M')# vs BG ASet reconciliation、
+  loop¹⁰⁷ de-risked plan + loop¹⁰⁹ reconciliation 論点済) = 最深 lane-b-owned on-path pin。
+  他 (hall/centralizer_unique/escapingCentralizers/bgTheoremE_cover) は §8/§4 structure。
+- **S09**: `card_G0_lower_bound` は (7.9)/(11.8) char theory (lane a 系) に gated。
+
+**次 = type-P Dade engine `dadeSupportHypotheses_typeP` を正面 build** (feedback-no-avoiding-hard-parts:
+deep でも engage)。loop¹⁰⁷ de-risked plan に従う。**設計判断 flag**: (12.15) の DadeNotation opaque
+Prop (rhoFormula/rhoMFormula/e_eq_index) de-scaffold は §12 endgame の honest 化に要 — hub/ユーザー裁定歓迎
+(type-P engine を優先し、(12.15) は後回し)。
+
+## loop¹⁹² (2026-07-04) — type-P engine P1 完済確認 / P2 は deep BG§14-15 gated — 全 lane-b frontier 精査完了
+
+`dadeSupportHypotheses_typeP` (S10:2466) 精査: **P1 case は完済** (A(M)=M_σ#=A_1、
+`typePA_eq_sigmaSharp_of_isTypeP1` + `dadeSupportHypothesisData_typePA0_of_isTypeP1`)。
+**残 = type-P2 の 2 sorry**:
+- **typePA P2** (S10:2509): X=(M')# ⊋ M_σ# ゆえ `dadeSupportHypothesisData_of_subset_sigmaSharp`
+  (X⊆M_σ# 要求) は使えない。type-P escaping engine + **`escaping_typePA_mem_A1`** (type-P 8.13.b) +
+  **`escaping_typePA_signalizer_structure`** (type-P σ-geometry) が要る。loop¹⁰⁹ 反例 (M'∖M_σ の
+  U-元は C_{M_σ}=1 で A_1 に落ちない) ゆえ type-I の clean analogue でない = deep BG§14-15 type-P2 geometry。
+- **typePA0 P2** (S10:2500): V^M exceptional support geometry (type-P2)。
+
+**全 lane-b frontier 精査完了 (S07/S08/S09/S10/S14、engine signature まで確認、loop¹¹⁰ の推測的枯渇宣言と違い
+tractable 例外 DpsiH/(12.5) を完済済)**:
+| pin | 状態 |
+|---|---|
+| §7/§8 coherence (S07/S08 26 files) | ✅ done |
+| DpsiH/(12.4)/(12.5) (S14) | ✅ **done (今 session)** |
+| (8.2.c) typeI_induced_char_constituents | ✅ done |
+| type-P engine P1 | ✅ done |
+| type-P engine **P2** | ⛔ deep BG§14-15 type-P2 geometry |
+| (12.10) witness_L_isTypeI/isZGroup | ⛔ Cluster A §8-§11 type-analysis gated |
+| (12.15) rhoM_integer_values | ⚠ scaffold (DadeNotation opaque Prop、de-scaffold 設計判断) |
+| S09 card_G0 | ⛔ (7.9)/(11.8) char theory gated (lane a 系) |
+| §8 III/IV, bgTheoremE_cover | ⛔ BG §14-15 gated |
+
+**結論**: lane b の cleanly-tractable, ungated, honest な char/support work は (12.5) 完済で枯渇。
+残る全 pin は (a) deep BG§14-15 type-P2/III-IV geometry (other-cluster)、(b) §8-§11 type-analysis gated、
+(c) (7.9)/(11.8) char (lane a) gated、(d) DadeNotation de-scaffold 設計判断。
+→ loop cadence を heartbeat (20min) に落とし、user 方向指示 / 他レーン (BG§14-15, 7.9/11.8) unblock を待つ。

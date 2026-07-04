@@ -1035,3 +1035,195 @@ InducedInvariantConstituent.lean:
   + `extends_on_supported` + `Sset_diff_vanishes_off_H_sharp` (全 landed、要 wiring)。
 - **statement 修正**: `rho_constant_on_H_minus_Hprime` を ρψ=`hyp.toHypothesis71.chiRhoCF psi` に restate
   (現 plain-ψ 誤、consumer 無)。
+
+### loop¹⁷¹⁻¹⁷⁵ — (12.5) o_rpsi_S Fact-A **完成** (残り = DpsiH assembly のみ)
+
+**milestone**: (12.5) の 2 大前提が完済:
+1. **一般 (1.7.b)** equal-degree (完全版、full-group lift) — 別 milestone。
+2. **o_rpsi_S Fact-A** `chiRhoCF_inner_eq_of_equal_degree` — ⟨χ₁, ρψ⟩=⟨χ₂, ρψ⟩ (等次数 S-member)。
+   bridge chain 全 landed:
+   - `Sset_diff_support_subset_ambientA` (χ₁−χ₂ ⊆ A(L)、SupportedClassFunctions 化)
+   - `chiRho_adjoint` 相互律 (⟨χ₁−χ₂, ρψ⟩ = ⟨H71.τ(χ₁−χ₂), ψ⟩)
+   - `toHypothesis71_tau_apply` (τ-bridging: H71.τ = hyp.tau on supported、via IsDadeMap.unique)
+   - `extends_on_supported` (hyp.tau = coh.extension) + `map_sub`
+   - orthogonality hyps (from `inner_psi_coherent_extension_eq_zero`, ψ⊥R(χ))
+
+**(12.5) 残り = DpsiH assembly のみ** (`rho_constant_on_H_minus_Hprime`):
+`Res_H(ρψ) = ∑_λ a_λ Ind_{H'}^H λ + a·1_H`、H−H' で定数。要:
+- partition P (Ind_{H'}^H λ constituents、CliffordSingleOrbit `exists_conj_of_common_induce_constituent` trivIset/cover)
+- degree-determined coefficient (Fact-A + Frobenius `⟨Res_H ρψ, θ⟩=⟨ρψ, Ind_H^L θ⟩`)
+- block 内 equal-degree (完成 1.7.b、H'/H instantiation)
+- step-6 bricks (`sum_smul_induce_apply_eq_zero_of_not_mem_normal`、Ind_{H'} vanish off H')
+- statement を ρψ=`toHypothesis71.chiRhoCF ψ` に restate (現 plain-ψ 誤、consumer 無)。
+
+### loop¹⁷⁶⁻¹⁷⁸ — (12.5) DpsiH: multiplicity-e 2 brick 完成 + assembly 4-brick 計画確定
+
+**Peterfalvi (12.5) 原文 + Coq `FtypeI_invDade_ortho_constant` (PFsection12.v:417-484) 精読で証明構造を確定。**
+結論は **ψ^ρ (= `toHypothesis71.chiRhoCF ψ`) が H−H' で定数** (現 S14 の plain-`psi` 文は誤、consumer 無 → restate 安全)。
+現行 proof の InHKernel γ/β split (L-level、hβconst sorry @2701) は (12.4) 用の別物 → **H-level Ind_{H'} block 分解に置換**する。
+
+**証明 (Coq mirror)**: f := Res_H(ρψ)。h1,h2 ∈ H−H' に対し
+f(h1)−f(h2) = ∑_{θ∈Irr H} ⟨f,θ⟩(θ(h1)−θ(h2)) を **Ind_{H'} block P で regroup** → 各 block = 0。
+block A (= constt Ind_N λ, N:=H'.subgroupOf H) 内: ⟨f,θ⟩ は θ≠1_H で定数 c_A (θ-coeff)、1_H 項は θ(h1)−θ(h2)=0 で落ちる →
+= c_A ∑_{θ∈A}(θ(h1)−θ(h2)) = c_A/e·(Ind_N λ(h1)−Ind_N λ(h2)) = c_A/e·(0−0) = 0 (Ind_N λ は H−H' で消える、H'⊴H)。
+
+**brick A 完成 (この iteration、2 commit)**:
+- `restrictionMultiplicity_eq_of_liesOver_of_apply_one_eq` (CliffordSingleOrbit) — equal-degree ⟹ equal restriction mult (degree formula の共通因子 [G:I(ρ)]·ρ(1) を mul_right_cancel₀ 2 段)。
+- `inner_induce_constituent_eq_of_apply_one_eq` (InducedInvariantConstituent) — 上を `inner_induce_coe_eq_restrictionMultiplicity` で ⟨Ind_N λ,φ⟩ 形へ持ち上げ (= block の共通 mult e)。
+
+**残 assembly (次 iteration、brick B→C→D→restate、各 build-green commit)**:
+- **B. H-level block partition** (generic, RepTheory): `∃ parts : Finset (Finset (Irr H)), univ = parts.biUnion id ∧ PairwiseDisjoint`。
+  cap: φ ↦ constt(Ind_N λ(φ)) (λ(φ) = `exists_liesOver` で選ぶ Res_N φ の constituent)、partition = univ.image cap。
+  PairwiseDisjoint: 別 block が θ 共有 ⟹ `exists_conj_of_common_induce_constituent` (CliffordSingleOrbit:175) で λ conj ⟹ Ind_N λ = Ind_N λ' (induce-conj-invariance 要確認/新設) ⟹ block 一致。
+  cover: φ ∈ constt(Ind_N λ(φ)) ⟺ λ(φ) ∈ constt(Res_N φ) (Frobenius `inner_induce_ne_zero_iff_liesOver`)。L-level `exists_offKernel_constituent_partition` (S14:2508) を template に。
+- **C. block-sum-zero** (generic): block A + coeff-const(θ≠1) + equal-mult(brick A) ⟹ ∑_{θ∈A}⟨g,θ⟩(θ(h1)−θ(h2))=0。
+  Ind_N λ = e∑θ (Fourier + brick A の all-mults-equal) + `induce_apply_eq_zero_of_not_mem_normal` (Ind vanish off N)。1_H 項は (θ(h1)−θ(h2))=0 で処理。
+- **D. assemble + restate**: `sum_inner_irreducibleCharacter_smul` Fourier-difference + B の biUnion regroup + C。
+  `rho_constant_on_H_minus_Hprime` を ρψ 文へ restate、θ-coeff = `chiRhoCF_restrict_inner_eq_of_equal_degree` (S14:1995)、block equal-degree = `induce_inertia_constituent_apply_one_eq` (H'/H instantiation、H/H' abelian ⟹ inertia quotient abelian)。
+
+### loop¹⁷⁹⁻¹⁸² — (12.5) DpsiH: generic 機構 **全完成** (core + partition + 等次数) — 残 = S14 wiring のみ
+
+**この iteration で (12.5) の generic/reusable 機構を全て完成 (3 commit、全 green)**:
+1. **partition 強化** `exists_induce_constituent_partition` に block characterization
+   (`∀ A ∈ parts, ∃ ρ, ∀θ, θ∈A ↔ LiesOver H θ ρ`) 追加。
+2. **DpsiH core** `constant_off_normal_of_inner_block_const` (InducedInvariantConstituent, ~114 行, 一発 green):
+   H ⊴ G, g ∈ CF(G) が hcoeff(block 内 ⟨g,θ⟩ 一致, θ≠1)+hmult(⟨Ind ρ,θ⟩ 一致) ⟹ g は H 外で定数。
+   Fourier + partition regroup (sum_biUnion) + block ごと e·(sum)=c·(Ind ρ x−Ind ρ y)=0。
+3. **等次数系** `induce_inertia_constituents_apply_one_eq`: Ind_N^L θ の 2 constituent は等次数
+   (`induce_inertia_constituent_apply_one_eq` を同一 ψ で 2 回 → 両者 [L:T]·ψ(1))。
+
+**残 = Brick D (S14 wiring のみ)** `rho_constant_on_H_minus_Hprime` を core に帰着:
+- **restate**: 結論を `(chiRhoCF psi)⟨h1⟩ = (chiRhoCF psi)⟨h2⟩` (ρψ, 現 plain-psi は誤・consumer 無)。
+- **core 適用**: 環境 G_core := ↥((hyp.H).subgroupOf L)、g := restrict(H.subgroupOf L)(chiRhoCF psi)、
+  H_core := G_core の commutator (= H'=derivedInG H に対応、`Hprime = derivedInG hyp.H` 確認済 ⟹ G_core/H_core abelian)。
+- **hab 一様**: G_core/commutator abelian ⟹ ∀ x y ∈ G_core, ⁅x,y⁆∈commutator ⟹ 各 inertia T_ρ で hab 成立。
+- **hcoeff**: θ₁,θ₂ ≠triv, LiesOver ρ → (i) 等次数 = `induce_inertia_constituents_apply_one_eq`
+  (per-ρ: N=H_core, T=inertia(ρ), ψ_ρ=constituent over compHom ρ〈存在補題要〉, hinertia=定義) →
+  (ii) θᵢ≠triv ⟹ Ind_{H.subgroupOf L}θᵢ ∈ Sset (`Sset = {Ind θ : θ≠triv}` 確認済) →
+  (iii) `chiRhoCF_restrict_inner_eq_of_equal_degree` (S14:1995) で ⟨θ₁,Res(ρψ)⟩=⟨θ₂,Res(ρψ)⟩。
+- **hmult**: 同 (i) 等次数 → `inner_induce_constituent_eq_of_apply_one_eq` (Brick A)。
+- **翻訳**: g(x)=(chiRhoCF psi)(x:L) via restrict_apply; x∉H_core ⟺ h∉Hprime (subgroupOf iso)。
+- **要確認/新設**: (a) ψ_ρ 存在補題 (Irr(inertia ρ) で compHom ρ の上); (b) x∉commutator(G_core) ⟺ 像∉derivedInG H;
+  (c) inertia T_ρ の Fintype/Invertible/Normal instance plumbing。
+
+### loop¹⁸³⁻¹⁸⁵ — (12.5) Brick D 材料 **全完成** — 残 = 純 S14 wiring + commutator bridge
+
+**この iteration (2 commit)**: Brick D の最後の難所 2 補題を landing (全 green)。
+- `exists_liesOver_of_subgroup` (CliffordSingleOrbit): exists_liesOver の双対 (σ∈Irr H の上に ψ∈Irr G 存在)。
+  Ind σ 正次数 ⟹ 非零 ⟹ completeness。inertia setup の Clifford correspondent ψ を供給。
+- `commutator_induce_constituents_apply_one_eq` (InducedInvariantConstituent): [HH,HH] block 等次数。
+  induce_inertia_constituents_apply_one_eq を N=[HH,HH]/T=I(ρ)/ψ=上記/hab=⁅⊤,⊤⁆ で適用、
+  inertia instance を Fintype.ofFinite/invertibleOfNonzero/subgroupOf_inertia_normal 供給。
+  **注**: LiesOver を signature で述べるため `[Fintype ↥(commutator HH)] [Invertible (card ↥(commutator HH):ℂ)]`
+  を signature instance に要 (body haveI 不可)。
+
+**(12.5) 材料 全完成リスト** (core+partition+等次数+等mult+θ-coeff+ψ存在):
+core `constant_off_normal_of_inner_block_const` / `exists_induce_constituent_partition` (block char 付) /
+`inner_induce_constituent_eq_of_apply_one_eq` (等mult) / `commutator_induce_constituents_apply_one_eq` (等次数) /
+`chiRhoCF_restrict_inner_eq_of_equal_degree` (S14 θ-coeff) / `exists_liesOver_of_subgroup`。
+
+**残 = 純 S14 wiring のみ** (`rho_constant_on_H_minus_Hprime` restate + core 帰着):
+- G_core := ↥((hyp.H).subgroupOf L)、H_core := commutator G_core、g := restrict((hyp.H).subgroupOf L)(chiRhoCF psi)。
+- **commutator bridge** (残る唯一の非自明 sub-task): `x ∈ commutator ↥(H.subgroupOf L) ↔ (x:G) ∈ derivedInG H`。
+  `subgroupOfEquivOfLe (H≤L) : ↥(H.subgroupOf L) ≃* ↥H` で commutator 転送
+  (`(derivedInG H).subgroupOf H = commutator ↥H` = FeitThompson:955) + coercion chain。
+- hcoeff: 等次数(helper) → θᵢ≠triv ⟹ Ind_{H.subgroupOf L}θᵢ∈Sset → θ-coeff (inner 引数順は conj で合わせる:
+  core は inner(g,θ)、θ-coeff は inner(θ,restrict); g=restrict ゆえ inner(g,θ)=conj inner(θ,g))。
+- hmult: 等次数(helper) → Brick A。
+- 翻訳: g(x)=(chiRhoCF psi)(x:L) via restrict_apply; x∉H_core ⟺ h∉Hprime (bridge)。
+
+### loop¹⁸⁶⁻¹⁸⁹ — (12.5) 全 ingredient 完成 (bridge+self-constituent+orthogonality) — 残 = main restate のみ
+
+**この iteration (3 commit)**: (12.5) wiring の残り material を全 landing (全 green)。
+- `mem_commutator_subgroupOf_iff` (S14): x∈commutator ↥(H.subgroupOf L) ↔ (x:G)∈derivedInG H (bridge、一発 green)。
+- `Sset_self_mem_constituents` (S14): Frobenius χ∈S は自身の constituent (∃φ∈constituents, ↑φ=χ)。
+- `Sset_inner_coherent_extension_eq_zero` (S14): ψ⊥R(χ) ⟹ ⟨ψ,coh.extension χ⟩=0 (orthogonality 供給)。
+  **注**: FiniteInduce scoped instance で coh を inner_psi_... と一致させる (open scoped ... in は docstring 前)。
+
+**(12.5) ingredient 全リスト (全 committed・green)**:
+RepTheory: `constant_off_normal_of_inner_block_const` (core) / `exists_induce_constituent_partition` (block char付) /
+`inner_induce_constituent_eq_of_apply_one_eq` (等mult) / `commutator_induce_constituents_apply_one_eq` (等次数) /
+`exists_liesOver_of_subgroup` (ψ存在)。
+S14: `mem_commutator_subgroupOf_iff` (bridge) / `Sset_self_mem_constituents` / `Sset_inner_coherent_extension_eq_zero` /
+`chiRhoCF_restrict_inner_eq_of_equal_degree` (θ-coeff)。
+
+**残 = main restate のみ** (`rho_constant_on_H_minus_Hprime`、unconsumed 確認済 ⟹ 旧 2683 削除 + helper 群の後へ新設):
+```
+新 signature (open scoped FiniteInduce in、helper 群の後に配置):
+  (hyp) (coh : IsCoherent hyp.tau hyp.Sset hyp.A) (hAH : ambientA = (hyp.H:Set G)\{1})
+  {C} (hfrob : IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+  (data) {psi} (horth : ∀χ∈Sset,∀α∈Rset,inner psi α=0) :
+  ∀ h1∈H, h1∉Hprime, ∀ h2∈H, h2∉Hprime,
+    (chiRhoCF psi)⟨h1,H_le _⟩ = (chiRhoCF psi)⟨h2,H_le _⟩
+証明:
+  set HH := (hyp.H).subgroupOf L; G_c := ↥HH; H_c := commutator ↥HH; g := restrict HH (chiRhoCF psi)
+  haveI 群: Finite/Fintype ↥HH, Invertible(card ↥HH:ℂ), Fintype(Irr ↥HH),
+           Fintype/Invertible ↥(commutator ↥HH) (ofFinite/invertibleOfNonzero)
+  x := ⟨⟨h1,hh1L⟩, mem_subgroupOf.mpr hh1⟩ : ↥HH; 同 y
+  hx : x∉commutator via (mem_commutator_subgroupOf_iff H_le x).not ← h1∉Hprime ((x:↥L:G)=h1)
+  goal (chiRhoCF psi)⟨h1⟩=(chiRhoCF psi)⟨h2⟩ を restrict_apply で g x = g y へ
+  refine constant_off_normal_of_inner_block_const g ?hcoeff ?hmult hx hy
+  hcoeff θ₁ θ₂ ρ hne1 hne2 hlo1 hlo2:
+    hdeg := commutator_induce_constituents_apply_one_eq ρ θ₁ θ₂ hlo1 hlo2 (θ₁(1)=θ₂(1))
+    hχᵢmem := ⟨θᵢ, hneᵢ, rfl⟩ : induce HH θᵢ ∈ Sset
+    hdegχ: induce_apply_one → (induce HH θ₁)(1)=(induce HH θ₂)(1)
+    horthᵢ := Sset_inner_coherent_extension_eq_zero hyp coh hfrob data horth hχᵢmem
+    hθcoeff := chiRhoCF_restrict_inner_eq_of_equal_degree hyp coh hχ₁mem hχ₂mem hdegχ hAH horth1 horth2 rfl rfl
+      : inner θ₁ (restrict HH (chiRhoCF psi)) = inner θ₂ (...)  [= inner θᵢ g]
+    core は inner g θ ⟹ conj 変換: inner g θ = conj(inner θ g) (inner_conj_symm) 両辺
+  hmult θ₁ θ₂ ρ hlo1 hlo2:
+    hdeg := commutator_induce_constituents_apply_one_eq ρ θ₁ θ₂ hlo1 hlo2
+    inner_induce_constituent_eq_of_apply_one_eq hlo1 hlo2 hdeg  [N=commutator ↥HH, Brick A]
+```
+**要検証**: (a) x:↥HH の (x:↥L:G)=h1 coercion; (b) restrict_apply で g x=(chiRhoCF psi)(x:↥L);
+(c) inner 変換 conj (core=inner g θ vs θ-coeff=inner θ g); (d) instance 解決 (特に Fintype(Irr ↥HH))。
+
+### loop¹⁹⁰ — 🎉 **Peterfalvi (12.5) 完全証明・閉じた** (rho_constant_on_H_minus_Hprime)
+
+**(12.5) `rho_constant_on_H_minus_Hprime` を完全証明** — sorry-free、`#print axioms` =
+`[propext, Classical.choice, Quot.sound]` (標準3 axiom のみ、sorryAx 無・新 axiom 無)。
+full build green (3915 jobs)、AxiomsCheck OK。
+
+旧 plain-ψ 文 (hβconst sorry、consumer 無) を削除し、正しい **ψ^ρ = chiRhoCF psi の
+H−H' 定数性**を generic DpsiH core へ帰着。5 iteration (loop¹⁷⁶⁻¹⁹⁰) で全 ingredient を
+build して最終 assembly:
+
+**generic 機構 (RepTheory、再利用可)**:
+- `constant_off_normal_of_inner_block_const` — DpsiH core (Fourier + block regroup + 各 block 消去)
+- `exists_induce_constituent_partition` — Irr G の Ind_H^G block 分割 (block char 付)
+- `inner_induce_constituent_eq_of_apply_one_eq` — 等次数 ⟹ 等 multiplicity
+- `commutator_induce_constituents_apply_one_eq` — [HH,HH] block 全 constituent 等次数
+- `exists_liesOver_of_subgroup` — σ の上に ψ 存在 (Clifford correspondent)
+- `restrictionMultiplicity_eq_of_liesOver_of_apply_one_eq` — degree formula の等次数系
+
+**S14-specific**:
+- `mem_commutator_subgroupOf_iff` — commutator bridge (x∈commutator ↥(H.subgroupOf L) ↔ (x:G)∈derivedInG H)
+- `Sset_self_mem_constituents` — Frobenius χ∈S は自身の constituent
+- `Sset_inner_coherent_extension_eq_zero` — ψ⊥R(χ) ⟹ ⟨ψ,coh.extension χ⟩=0
+- `chiRhoCF_restrict_inner_eq_of_equal_degree` — θ-coefficient equality (既存)
+
+**key 教訓**: FiniteInduce scoped instance (finiteSubFintype/natCardInvC、任意 subgroup 汎用) が
+全 subgroupOf/commutator の Fintype/Invertible を供給。自前 haveI は instance diamond
+(induce の Invertible が競合 → rfl 失敗) を招くので削除する。Sset membership は
+`simp only [Hypothesis.Sset, Set.mem_setOf_eq]` で unfold。
+
+**次 frontier**: §12 の (12.6) coherence / (12.7) type-I Frobenius (Coq FT_Frobenius_coherence /
+FT_type1)、または §12 downstream の上流未証明項。次 iteration で scan。
+
+### loop¹⁹¹ — (12.5) 後の frontier 再scan: (8.2.c) は既済、次 = (12.15) rhoM_integer_values (12.5 consumer)
+
+(12.5) 完済後、S14 frontier を再scan:
+- **(8.2.c) `typeI_induced_char_constituents` は既に proven** (S14:441-559、sorry-free、
+  `exists_extension_induce_eq_sum_distinct_of_inertia_inf_le` 経由)。loop¹¹¹ note が「S14 最上流 sorry」と
+  記録していたが、その後 (別 loop/merge で) 閉じられていた。frontier 更新。
+- **残 S14 sorry (8 本)**: `sibleyTarget_frobI` (2776、(6.8) TI-case carrier、witness 非-TI ゆえ FT-excluded) /
+  `witness_L_isTypeI` (5030) + `witness_L_complement_isZGroup` (5041) ((12.10) Cluster A、deep §8-§11
+  type-analysis、gated) / `intersection_complement_structure` (5080) / `complement_cyclic_order_dvd` (5519) /
+  **`rhoM_integer_values` (5789、(12.15))** / `exists_counterexample_dade_data` (6023) /
+  `exists_typeICovering` (6738/6773)。
+
+**次 target = (12.15) `rhoM_integer_values` (S14:5789)** — **(12.5) の自然な consumer**:
+`dade.rhoMFormula ∧ (∀ g∈K, g∉K', ∃ z:ℤ, dade.psi g = z)`。K−K' 上定数性は今 proven の
+`rho_constant_on_H_minus_Hprime` (ρψ) で供給できるはず。整数値は rational + algebraic integer。
+lane b の §12 Dade tower 領域 (witness pins の §8-§11 type-analysis より lane-b-appropriate)。
+deep Dade assembly ((12.13)-(12.15)) だが (12.5) を活かす直系の続き。次 iteration で engage。
