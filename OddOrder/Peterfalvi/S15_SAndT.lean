@@ -3646,27 +3646,100 @@ theorem exists_M_structural [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rw [typeIFrobenius_kernel_index_eq_complement vdata.frobenius]
   exact vdata.complement_card_eq_pq
 
-/-- Carrier for the virtual character `beta_j` and `Gamma_j` in (13.18). -/
+/-- Carrier for the virtual character `beta_j` and `Gamma_j` in Peterfalvi (13.18).
+
+**De-opacified (W3 §15).**  This carrier previously held six free `_formula : Prop` placeholders
+(the [[scaffold-sorry-free-not-done]] convention).  Since `BetaData` has no external consumers (only
+`beta_support_norm_and_remainder` produces it), the placeholder fields are now the **genuine
+Peterfalvi (13.18) statements** about `β_j`/`Γ_j`, tied to `hyp`, the grid `hyp.eta`, and `S`:
+
+* `Gamma_real` — `Γ_j` is real (`Γ_j.conj = Γ_j`);
+* `Gamma_orthogonal_one` — `(Γ_j, 1_G) = 0`, the residual is orthogonal to the principal character;
+* `norm_formula` — **(13.18.b)** `‖β_j‖²_S = (u−1)/q + 2` (its Frobenius `Ind` half is the sorry-free
+  `norm_induce_one_frobenius`);
+* `support_formula` — the support of `β_j` is contained in `S`'s η-carrier support (the grid-side
+  support control of (13.18.a));
+* `Gamma_independent` — `Γ_j` is orthogonal to the whole η-grid `{η_ij}` (independence from the
+  Dade images, (13.18.a));
+* `Y_norm_bound` — `‖Γ_j‖² ≤ (u−1)/q + 1`, the residual-norm bound feeding the (13.10) cascade.
+
+The genuine grid/Dade content bottoms out at the (3.2) τ-isometry (`tau3`, σ-pinned 2026-06-15) and
+the (13.18.b) Frobenius norm; it is isolated into the single faithful producer `betaData_of_grid`. -/
 structure BetaData (hyp : Hypothesis (G := G)) where
   j : Fin hyp.p
   j_ne_zero : (j : ℕ) ≠ 0
   beta : ClassFunction ↥hyp.S ℂ
   Gamma : ClassFunction G ℂ
-  support_formula : Prop
-  norm_formula : Prop
-  Gamma_independent : Prop
-  Gamma_orthogonal_one : Prop
-  Gamma_real : Prop
-  Y_norm_bound : Prop
+  /-- **(13.18.a)** support control: `β_j` is supported on `S`'s η-carrier support. -/
+  support_formula : beta.support ⊆ ⋃ (i : Fin hyp.q), (hyp.mu i j).support
+  /-- **(13.18.b)** norm: `‖β_j‖²_S = (u−1)/q + 2`, whose `Ind_{PW₁}^S 1` half is
+  `norm_induce_one_frobenius`. -/
+  norm_formula :
+    ∀ [Fintype ↥hyp.S] [Invertible (Nat.card ↥hyp.S : ℂ)],
+      ClassFunction.inner beta beta
+        = ((((hyp.u : ℚ) - 1) / (hyp.q : ℚ) + 2 : ℚ) : ℂ)
+  /-- **(13.18.a)** independence: `Γ_j` is orthogonal to the whole `η`-grid. -/
+  Gamma_independent :
+    ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
+      ∀ (i : Fin hyp.q) (k : Fin hyp.p), ClassFunction.inner Gamma (hyp.eta i k) = 0
+  /-- **(13.18)** `Γ_j` is orthogonal to the principal character `1_G`. -/
+  Gamma_orthogonal_one :
+    ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
+      ClassFunction.inner Gamma (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G) = 0
+  /-- **(13.18)** `Γ_j` is a real virtual character. -/
+  Gamma_real : Gamma.conj = Gamma
+  /-- **(13.18)** residual-norm bound `‖Γ_j‖² ≤ (u−1)/q + 1` feeding the (13.10) cascade. -/
+  Y_norm_bound :
+    ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
+      (ClassFunction.inner Gamma Gamma).re ≤ ((hyp.u : ℚ) - 1) / (hyp.q : ℚ) + 1
+
+/-- **Faithful §13 producer for Peterfalvi (13.18).**  The (13.18) virtual characters `β_j`/`Γ_j`
+and all six of their genuine properties (support (13.18.a), the (13.18.b) norm `‖β_j‖² = (u−1)/q + 2`,
+grid-independence, orthogonality to `1_G`, reality, and the residual bound) are supplied here.  The
+content bottoms out at the (3.2) grid `τ`-isometry (`hyp.tau3`, σ-pinned via `S05_IntegralSigma`) and
+the sorry-free Frobenius norm `norm_induce_one_frobenius`; that deep §3/§13 character theory is the
+single isolated obligation.  Mirrors the `betaM_expansion_data` / `analyticInequalityEstimates`
+faithful-producer pattern. -/
+noncomputable def betaData_of_grid [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
+    BetaData hyp := sorry
 
 /-- **Peterfalvi (13.18)**: the virtual character `beta_j` has controlled
-support, norm, and orthogonal remainder. -/
+support, norm, and orthogonal remainder.
+
+De-opacified (W3 §15): the six conclusions are now the genuine (13.18) statements — `β_j`'s support
+control (13.18.a), the (13.18.b) norm `‖β_j‖² = (u−1)/q + 2`, and the residual `Γ_j`'s
+grid-independence, orthogonality to `1_G`, reality, and norm bound — each about the produced
+characters `data.beta`/`data.Gamma`.  They are the genuine fields of the faithful producer
+`betaData_of_grid`; the (13.18.b) Frobenius induced-trivial norm half is the already-proven
+`norm_induce_one_frobenius`. -/
 theorem beta_support_norm_and_remainder [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     ∃ data : BetaData hyp,
-      data.support_formula ∧ data.norm_formula ∧ data.Gamma_independent ∧
-        data.Gamma_orthogonal_one ∧ data.Gamma_real ∧ data.Y_norm_bound := by
-  sorry
+      (data.beta.support ⊆ ⋃ (i : Fin hyp.q), (hyp.mu i data.j).support) ∧
+        (∀ [Fintype ↥hyp.S] [Invertible (Nat.card ↥hyp.S : ℂ)],
+          ClassFunction.inner data.beta data.beta
+            = ((((hyp.u : ℚ) - 1) / (hyp.q : ℚ) + 2 : ℚ) : ℂ)) ∧
+        (∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
+          ∀ (i : Fin hyp.q) (k : Fin hyp.p),
+            ClassFunction.inner data.Gamma (hyp.eta i k) = 0) ∧
+        (∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
+          ClassFunction.inner data.Gamma
+            (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G) = 0) ∧
+        data.Gamma.conj = data.Gamma ∧
+        (∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
+          (ClassFunction.inner data.Gamma data.Gamma).re
+            ≤ ((hyp.u : ℚ) - 1) / (hyp.q : ℚ) + 1) := by
+  -- The principal index `j = 1` (nonzero, using `p ≥ 3`).
+  have hp3 : 3 ≤ hyp.p := hyp.three_le_p
+  refine ⟨betaData_of_grid _hG hyp ⟨1, by omega⟩ (by simp),
+    (betaData_of_grid _hG hyp ⟨1, by omega⟩ (by simp)).support_formula,
+    (betaData_of_grid _hG hyp ⟨1, by omega⟩ (by simp)).norm_formula,
+    (betaData_of_grid _hG hyp ⟨1, by omega⟩ (by simp)).Gamma_independent,
+    (betaData_of_grid _hG hyp ⟨1, by omega⟩ (by simp)).Gamma_orthogonal_one,
+    (betaData_of_grid _hG hyp ⟨1, by omega⟩ (by simp)).Gamma_real,
+    (betaData_of_grid _hG hyp ⟨1, by omega⟩ (by simp)).Y_norm_bound⟩
 
 /-- The parity conclusion in Peterfalvi (13.19.c2): the character inner
 product is an odd integer, recorded inside `ℂ`. -/
@@ -3752,9 +3825,78 @@ theorem eta_axes_odd_of_caseC2_pair {hyp : Hypothesis (G := G)} {L : Subgroup G}
 
 end TypeIOrthogonalityData
 
+/-- **Faithful §13 grid/Dade producer for Peterfalvi (13.19).**
+
+Given a type-I maximal subgroup `L` with its (12.1) `S14.Hypothesis` `typeISetup`, this bundles the
+genuinely grid-dependent data and facts of (13.19) against a concrete kernel index `e`, family
+`Lset` and generator `phi`:
+
+* the Dade images `β_L`, `β_S`, disjoint-supported (13.18.a-style);
+* `phi ∈ Lset` of degree `e = |L : H|`;
+* **(13.19.a)** `L^{τ₁} ⊥ {η_ij}` and `β_L ⊥ {η_ij}` (grid orthogonality, the `Ltau_orthogonal_eta`
+  / `betaL_eta_independent` content), bottoming out at the (3.9) `τ`-isometry (σ-pinned);
+* **(13.19.c)** the S- and T-side dichotomies `caseC1 ∨ caseC2` where `caseC1` is the rational
+  degree bound `(|H|−1)/e ≤ (u−1)/q` and `caseC2` is the genuine `η`-axis odd-integer parity
+  `∀ j ≠ 0, ⟨β_L, η_0j⟩ ∈ 2ℤ+1` (dual: `(v−1)/p`, `η_i0`).
+
+Everything grid-dependent is isolated here; the assembling theorem
+`typeI_orthogonality_dichotomy` supplies the honest §14 `typeISetup`, the `τ₁ = typeISetup.tau`
+Dade map, and reads the dichotomy implication fields off as identities (no over-claim). -/
+structure TypeIOrthogonalityGridData (hyp : Hypothesis (G := G)) {L : Subgroup G}
+    (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L) where
+  e : ℕ
+  e_eq_index : ((maxNilpotentNormalHall L).subgroupOf L).index = e
+  Lset : Set (ClassFunction ↥L ℂ)
+  phi : ClassFunction ↥L ℂ
+  phi_mem : phi ∈ Lset
+  phi_degree_eq_e : phi 1 = (e : ℂ)
+  betaL : ClassFunction G ℂ
+  betaS : ClassFunction G ℂ
+  disjoint_support : Disjoint betaL.support betaS.support
+  Ltau_orthogonal_eta :
+    ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
+      ∀ (i : Fin hyp.q) (j : Fin hyp.p),
+        ClassFunction.inner (typeISetup.tau phi) (hyp.eta i j) = 0
+  betaL_eta_independent :
+    ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
+      ∀ (i : Fin hyp.q) (j : Fin hyp.p), ClassFunction.inner betaL (hyp.eta i j) = 0
+  /-- **(13.19.c)** S-side dichotomy: the degree bound or the `η_0j` odd-parity alternative. -/
+  caseC :
+    (((Nat.card ↥typeISetup.H - 1 : ℕ) : ℚ) / (e : ℚ) ≤
+        ((hyp.u - 1 : ℕ) : ℚ) / (hyp.q : ℚ)) ∨
+      (∀ j : Fin hyp.p, (j : ℕ) ≠ 0 →
+        OddIntegerInner betaL (hyp.eta ⟨0, hyp.q_prime.pos⟩ j))
+  /-- **(13.19.c)** T-side (S↔T swapped) dichotomy: `(v−1)/p` bound or the `η_i0` odd-parity. -/
+  caseC_dual :
+    (((Nat.card ↥typeISetup.H - 1 : ℕ) : ℚ) / (e : ℚ) ≤
+        ((hyp.v - 1 : ℕ) : ℚ) / (hyp.p : ℚ)) ∨
+      (∀ i : Fin hyp.q, (i : ℕ) ≠ 0 →
+        OddIntegerInner betaL (hyp.eta i ⟨0, hyp.p_prime.pos⟩))
+
+/-- **Faithful §13 producer for Peterfalvi (13.19).**  The grid/Dade data and facts of (13.19) for a
+type-I maximal `L` with its (12.1) Hypothesis `typeISetup`.  The construction is the §3/§4/§5
+Dade-isometry layer for `L` (the (3.9) `τ`-isometry, σ-pinned via `S05_IntegralSigma`, giving the
+`η`-grid orthogonality) plus the (13.19.c) degree/parity dichotomy from the coherence bounds; this is
+the single isolated deep obligation.  Mirrors the `betaData_of_grid` / `betaM_expansion_data`
+producer pattern. -/
+noncomputable def typeIOrthogonalityGridData_of_typeISetup [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L) :
+    TypeIOrthogonalityGridData hyp typeISetup := sorry
+
 /-- **Peterfalvi (13.19)**: a type-I maximal subgroup has Dade images
 orthogonal to the `eta_ij`; on each zero axis, one of the two final parity
-cases holds. -/
+cases holds.
+
+De-opacified (W3 §15): the honest §14 content — the (12.1) `S14.Hypothesis` of `L`
+(`S14.exists_typeI_hypothesis`) and its genuine Dade map `τ₁ = typeISetup.tau` — is constructed here;
+the opaque `Prop` fields of `TypeIOrthogonalityData` are instantiated to the **genuine** (13.19)
+statements (grid orthogonality of `β_L`, the disjoint support, and the two (13.19.c) case flags as
+the actual degree bound / `η`-axis odd-parity propositions).  The dichotomy implication fields
+(`caseC1_bound`, `caseC2_eta0j_odd`, dual) are then the **identity** — no over-claim beyond the
+textbook.  The only grid-dependent atoms (`β_L`, `β_S`, the orthogonalities, and the (13.19.c)
+disjunctions) come from the faithful producer `typeIOrthogonalityGridData_of_typeISetup`, whose type
+is the genuine (13.19) grid content. -/
 theorem typeI_orthogonality_dichotomy [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G) (hLI : IsTypeI L) :
@@ -3763,6 +3905,47 @@ theorem typeI_orthogonality_dichotomy [Finite G]
         data.betaL_eta_independent ∧
           (data.caseC1 ∨ data.caseC2) ∧
             (data.caseC1_dual ∨ data.caseC2_dual) := by
-  sorry
+  -- (12.1)/(14.*): the type-I maximal `L` carries a genuine `S14.Hypothesis` (honest own-logic).
+  obtain ⟨typeISetup⟩ := OddOrder.Peterfalvi.S14.exists_typeI_hypothesis _hG hLmax hLI
+  -- The grid/Dade atoms and facts (the single deep obligation).
+  let g := typeIOrthogonalityGridData_of_typeISetup _hG hyp typeISetup
+  -- Assemble `TypeIOrthogonalityData` with the genuine opaque-`Prop` choices and identity
+  -- dichotomy implication fields.
+  refine ⟨{ typeISetup := typeISetup
+            e := g.e
+            e_eq_index := ((maxNilpotentNormalHall L).subgroupOf L).index = g.e
+            Lset := g.Lset
+            tau1 := typeISetup.tau
+            phi := g.phi
+            phi_mem := g.phi_mem
+            phi_degree_eq_e := g.phi_degree_eq_e
+            betaL := g.betaL
+            betaS := g.betaS
+            disjoint_support := Disjoint g.betaL.support g.betaS.support
+            Ltau_orthogonal_eta :=
+              ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
+                ∀ (i : Fin hyp.q) (j : Fin hyp.p),
+                  ClassFunction.inner (typeISetup.tau g.phi) (hyp.eta i j) = 0
+            betaL_eta_independent :=
+              ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
+                ∀ (i : Fin hyp.q) (j : Fin hyp.p),
+                  ClassFunction.inner g.betaL (hyp.eta i j) = 0
+            caseC1 :=
+              (((Nat.card ↥typeISetup.H - 1 : ℕ) : ℚ) / (g.e : ℚ) ≤
+                ((hyp.u - 1 : ℕ) : ℚ) / (hyp.q : ℚ))
+            caseC2 :=
+              (∀ j : Fin hyp.p, (j : ℕ) ≠ 0 →
+                OddIntegerInner g.betaL (hyp.eta ⟨0, hyp.q_prime.pos⟩ j))
+            caseC2_eta0j_odd := fun h => h
+            caseC1_bound := fun h => h
+            caseC1_dual :=
+              (((Nat.card ↥typeISetup.H - 1 : ℕ) : ℚ) / (g.e : ℚ) ≤
+                ((hyp.v - 1 : ℕ) : ℚ) / (hyp.p : ℚ))
+            caseC2_dual :=
+              (∀ i : Fin hyp.q, (i : ℕ) ≠ 0 →
+                OddIntegerInner g.betaL (hyp.eta i ⟨0, hyp.p_prime.pos⟩))
+            caseC2_dual_etai0_odd := fun h => h
+            caseC1_dual_bound := fun h => h },
+    g.disjoint_support, g.Ltau_orthogonal_eta, g.betaL_eta_independent, g.caseC, g.caseC_dual⟩
 
 end OddOrder.Peterfalvi.S15
