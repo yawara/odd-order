@@ -1006,3 +1006,26 @@ dadeSupport 外で消失 (fullDadeIsometryData.toDadeIsometryData.isDadeMap.map_
   → `⟨H79.firstZetaImage, H79.secondZetaImage⟩ = 0` = F レベル hzeta_cross。
 - → (7.9) conclusion producer (別途 hindZ/hzeta_irr/hBD 供給) → hgood → 𝓑-set →
   characterEstimateData → card_G0_lower_bound (endpoint sorry @S09_NonexistenceCertain:6552)。
+
+## 2026-07-04 cont.³⁷ — ✅★ Frobenius hzeta_cross 完成 (両 §1 primitive + cross-ortho 完結)
+
+**Landed** (commit 2b967fa6, full build green 3916 jobs AxiomsCheck OK):
+`hypothesis79_zetaImage_cross_eq_zero` — `⟨ζ_i^{ν_i}, ζ_j^{ν_j}⟩ = 0` (i≠j Frobenius member)。
+`zetaImage_cross_eq_zero_of_conjIndex` に本 session の全 Frobenius-level input を供給して組み上げ:
+hypothesis78_isCoherent_sourceSet + hypothesis78_nu_eq / hypothesis78_zeta_irreducible /
+exists_conjIndex_hypothesis78 / hypothesis78_zeta_ne_conj / hypothesis78_nu_zeta_sub_conj_support。
+
+**本 session で構築した hzeta_cross chain 全体** (全 sorry-free):
+parity primitive (cfdot_real_vchar_even) → cross-ortho primitive (orthonormal_vchar_diff_ortho) →
+hzeta_cross bridge (zetaImage_cross_eq_zero_of_conjugate_images) → conjIndex bridge
+(zetaImage_cross_eq_zero_of_conjIndex) → hypothesis78 de-opaque (sibleyPlacedFamily +
+hypothesis78_hyp76_zeta_eq refactor) → 共役 index / 既約性 / 非実性 / A-support / hab_supp →
+sourceSet=S / coherence transport → **Frobenius hzeta_cross**。
+
+**残 = (7.9) conclusion 適用 + (7.10) assembly (次フェーズ)**:
+- (7.9) `conclusion` producer に hzeta_cross + (hindZ/hzeta_irr/hBD/hdelta_even) を供給
+  → `⟨β_i, ζ_j^ν⟩≠0 ∨ ⟨β_j, ζ_i^ν⟩≠0`。hdelta_even は cfdot_real_vchar_even 経由 (parity primitive、
+  producer 済 @S09_NonexistenceCertain)。
+- → hgood (chiRhoNormSq_ge_ratio_of_inner_beta_ne_zero) → 𝓑-set → min-index/hG0sum →
+  characterEstimateData_of_family71_reduced_estimates_of_signed_irreducible → card_G0_lower_bound
+  (endpoint sorry @S09_NonexistenceCertain:6552)。
