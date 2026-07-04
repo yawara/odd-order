@@ -1121,3 +1121,30 @@ zeta_one_eq_d_mul + induce_apply_one で index 相殺、linear_combination) が�
 
 次 iteration: hdelta_even 構築 → (7.9) conclusion producer 適用 (Frobenius H79) → hgood → 𝓑-set →
 CharacterEstimateData → card_G0_lower_bound。
+
+## 2026-07-04 cont.⁴² — 残 hdelta_even の要 = delta-reality (Dade-conj 両立)
+
+(7.9) conclusion producer `conclusion_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent_parity`
+(@S09_NonexistenceCertain:4094) の全 input 中、**hdelta_even のみ未** (他は済: hcoh/hnu/hindZ[induce_mem_ZIrr]/
+hzeta_irr/hBD/hzeta_cross)。
+
+**hdelta_even = ∃z, ⟨δ_i,δ_j⟩=z ∧ Even z**:
+- parity primitive `cfdot_real_vchar_even` (S09_ParityPrimitive) を δ_i,δ_j に適用 → m,a,b with
+  ⟨δ_i,δ_j⟩=m, ⟨δ_i,1⟩=a, ⟨δ_j,1⟩=b, Even(m−a·b)。`delta_orth_one` (@2822, ⟨δ,1⟩=0) で a=b=0 →
+  Even m。⟨m, hm, Even m⟩。
+- **要件**: δ_i,δ_j ∈ ZIrr (済 delta_mem_ZIrr) **+ δ real (cfReal/IsReal)** ← これが未証明の deep piece。
+- **delta-reality**: δ = β − 1_G + ν(ζ)。real ⟺ (β + ν(ζ)) real (1_G real)。coq `Dade_sub_lin_nonorthogonal`
+  の `cfReal D` 証明 (PFsection7:625-640) = `cfConjC_Dade_coherent` (Dade map が coherent set 上で共役両立)
+  + `conj_cfInd` (Ind が共役両立) + `Dade_conjC` + `nu_tau`。Lean 側の対応:
+  - Ind-conj: `conj_induce` (済、使用中)。
+  - τ-conj / Dade_conjC: S04 の dadeMap 共役両立 (要探索; S07_Coherence:1234 `tau1_agrees` 系や
+    S04 dadeMap 性質)。
+  - 共役拡張 ν(ζ).conj = ν(ζ̄): coherent extension の共役両立 (S07_Coherence:1137 `nu_eq_mu_conj` 系)。
+  → **delta_isReal を Frobenius level で構築** (hab_supp と同程度の深さの sub-lemma)。
+
+**その後**: hdelta_even → (7.9) conclusion → hgood (chiRhoNormSq_ge_ratio_of_inner_beta_ne_zero) →
+CharacterEstimateData (hi[exists_chiRhoNormSq_ge]/hgood/hBsum/hG0sum/𝓑-set min-index) →
+card_G0_lower_bound (@6552)。
+
+**本 session 実績**: 深部 §1 frontier (hzeta_cross 全 chain) + (7.8.a) BetaDecomp 完成 (~22 sorry-free
+commits)。残りは delta-reality → hdelta_even → (7.9) conclusion → 定量 assembly。
