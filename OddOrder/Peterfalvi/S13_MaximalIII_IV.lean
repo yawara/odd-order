@@ -581,6 +581,124 @@ theorem secondDerived_coherent [Finite G]
       hyp.base.tau (hyp.SOf (secondDerivedInAmbient M)) hyp.base.A0) := by
   sorry
 
+/-- **`C ⊊ U`**: `U` does not centralize the chief factor `H̄` (`U_noncentral_on_quotient`),
+but `C = C_U(H)` acts trivially on it. -/
+theorem C_lt_U {M : Subgroup G} (hyp : Hypothesis M) : hyp.C < hyp.base.typeP.U := by
+  refine lt_of_le_of_ne hyp.C_le_U ?_
+  intro hCU
+  refine hyp.chief.U_noncentral_on_quotient ?_
+  rw [eq_top_iff]
+  rintro hbar -
+  rw [OddOrder.GroupTheory.mem_fixedSubgroup]
+  intro l hl
+  induction hbar using QuotientGroup.induction_on with | _ x => ?_
+  have hmk : (QuotientGroup.mk x : ↥hyp.s11Setup.H ⧸ hyp.chief.N)
+      = QuotientGroup.mk' hyp.chief.N x := rfl
+  rw [hmk]
+  refine congrArg (QuotientGroup.mk' hyp.chief.N) ?_
+  -- `l ∈ U = C` centralizes `H`, so the conjugation action fixes `x`
+  have hlU : (l : G) ∈ hyp.s11Setup.typeP.U := Subgroup.mem_subgroupOf.mp hl
+  have hlU' : (l : G) ∈ hyp.base.typeP.U := by rwa [← hyp.setup_typeP_eq]
+  have hlC : (l : G) ∈ hyp.C := by rw [hCU]; exact hlU'
+  have hlcen : (l : G) ∈ Subgroup.centralizer (hyp.base.typeP.H : Set G) :=
+    (hyp.C_eq_centralizer ▸ hlC).2
+  have hxH : ((x : ↥hyp.s11Setup.H) : G) ∈ hyp.base.typeP.H := by
+    have hx2 : ((x : ↥hyp.s11Setup.H) : G) ∈ hyp.s11Setup.typeP.H := x.2
+    rwa [hyp.setup_typeP_eq] at hx2
+  ext
+  change (l : G) * ((x : ↥hyp.s11Setup.H) : G) * (l : G)⁻¹ = ((x : ↥hyp.s11Setup.H) : G)
+  have hcomm := Subgroup.mem_centralizer_iff.mp hlcen _ hxH
+  rw [← hcomm]
+  group
+
+/-- **The FPF divisibility `q ∣ |HC : M''| − 1`** — Peterfalvi (8.4.d) on `(HC)/M''`: the
+`W₁`-conjugation on `HC` has its nonidentity fixed points inside `W₂ ≤ M''`
+(`centralizer_W1` + `W2_le`), so the induced action on `(HC)/M''` is fixed-point-free and
+Burnside gives the congruence (`W1_dvd_index_of_fixedPoints_le`). -/
+theorem q_dvd_secondDerived_relIndex_HC_sub_one [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.base.w1 ∣ (secondDerivedInAmbient M).relIndex hyp.HC - 1 := by
+  classical
+  haveI hHCn : ((hyp.HC.subgroupOf M)).Normal := hyp.HC_subgroupOf_normal
+  haveI hM''n : (((secondDerivedInAmbient M).subgroupOf M)).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer
+      ((hyp.secondDerived_le_HC.trans hyp.HC_le_derived).trans
+        (Subgroup.map_subtype_le _))).mpr le_normalizer_secondDerived
+  letI act : MulDistribMulAction ↥(hyp.base.typeP.W1.subgroupOf M) ↥(hyp.HC.subgroupOf M) :=
+    MulDistribMulAction.compHom _
+      ((MulAut.conjNormal (H := hyp.HC.subgroupOf M)).comp
+        (hyp.base.typeP.W1.subgroupOf M).subtype)
+  have hsmul : ∀ (a : ↥(hyp.base.typeP.W1.subgroupOf M)) (x : ↥(hyp.HC.subgroupOf M)),
+      ((a • x : ↥(hyp.HC.subgroupOf M)) : ↥M) = (a : ↥M) * (x : ↥M) * (a : ↥M)⁻¹ := by
+    intro a x
+    change ((MulAut.conjNormal (H := hyp.HC.subgroupOf M)
+      ((hyp.base.typeP.W1.subgroupOf M).subtype a)) x : ↥M) = _
+    rw [MulAut.conjNormal_apply]; rfl
+  set Msub : Subgroup ↥(hyp.HC.subgroupOf M) :=
+    ((secondDerivedInAmbient M).subgroupOf M).subgroupOf (hyp.HC.subgroupOf M) with hMsub
+  haveI : Msub.Normal := hM''n.subgroupOf _
+  have hCop : Nat.Coprime (Nat.card ↥(hyp.base.typeP.W1.subgroupOf M))
+      (Nat.card ↥(hyp.HC.subgroupOf M)) := by
+    have h1 : Nat.card ↥(hyp.base.typeP.W1.subgroupOf M) = Nat.card ↥hyp.base.typeP.W1 :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.base.typeP.W1_le).toEquiv
+    have h2 : Nat.card ↥(hyp.HC.subgroupOf M) = Nat.card ↥hyp.HC :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+        (hyp.HC_le_derived.trans (Subgroup.map_subtype_le _))).toEquiv
+    rw [h1, h2]
+    exact (hyp.base.coprime_card_W1_derived hG).coprime_dvd_right
+      (Subgroup.card_dvd_of_le hyp.HC_le_derived)
+  have hMinv : ∀ a : ↥(hyp.base.typeP.W1.subgroupOf M), ∀ m ∈ Msub, a • m ∈ Msub := by
+    intro a m hm
+    have hmG : ((m : ↥M) : G) ∈ secondDerivedInAmbient M :=
+      Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp hm)
+    have haM : ((a : ↥M) : G) ∈ M := (a : ↥M).2
+    have hconj : ((a : ↥M) : G) * ((m : ↥M) : G) * ((a : ↥M) : G)⁻¹
+        ∈ secondDerivedInAmbient M := by
+      have hnorm := le_normalizer_secondDerived (M := M) haM
+      rw [Subgroup.mem_normalizer_iff] at hnorm
+      exact (hnorm _).mp hmG
+    refine Subgroup.mem_subgroupOf.mpr (Subgroup.mem_subgroupOf.mpr ?_)
+    have hcoe : (((a • m : ↥(hyp.HC.subgroupOf M)) : ↥M) : G)
+        = ((a : ↥M) : G) * ((m : ↥M) : G) * ((a : ↥M) : G)⁻¹ := by
+      rw [hsmul]; rfl
+    rw [hcoe]
+    exact hconj
+  have hfix : ∀ a : ↥(hyp.base.typeP.W1.subgroupOf M), a ≠ 1 →
+      ∀ x : ↥(hyp.HC.subgroupOf M), a • x = x → x ∈ Msub := by
+    intro a ha x hax
+    have haG : ((a : ↥M) : G) ∈ hyp.base.typeP.W1 :=
+      Subgroup.mem_subgroupOf.mp a.2
+    have haGne : ((a : ↥M) : G) ≠ 1 := fun h1 => ha (Subtype.ext (Subtype.ext h1))
+    have hxHC : ((x : ↥M) : G) ∈ hyp.HC := Subgroup.mem_subgroupOf.mp x.2
+    have hxM' : ((x : ↥M) : G) ∈ derivedInG M := hyp.HC_le_derived hxHC
+    have hcommG : ((a : ↥M) : G) * ((x : ↥M) : G) = ((x : ↥M) : G) * ((a : ↥M) : G) := by
+      have h1 := hsmul a x
+      rw [hax] at h1
+      have h2 := congrArg (fun m : ↥M => (m : G)) h1
+      simp only at h2
+      have h3 : ((x : ↥M) : G) = ((a : ↥M) : G) * ((x : ↥M) : G) * ((a : ↥M) : G)⁻¹ := h2
+      calc ((a : ↥M) : G) * ((x : ↥M) : G)
+          = (((a : ↥M) : G) * ((x : ↥M) : G) * ((a : ↥M) : G)⁻¹) * ((a : ↥M) : G) := by group
+        _ = ((x : ↥M) : G) * ((a : ↥M) : G) := by rw [← h3]
+    have hxcen : ((x : ↥M) : G) ∈ Subgroup.centralizer ({((a : ↥M) : G)} : Set G) :=
+      Subgroup.mem_centralizer_singleton_iff.mpr hcommG.symm
+    have hxW2 : ((x : ↥M) : G) ∈ hyp.base.typeP.W2 := by
+      rw [← hyp.base.typeP.centralizer_W1 _ haG haGne]
+      exact ⟨hxM', hxcen⟩
+    have hxM'' : ((x : ↥M) : G) ∈ secondDerivedInAmbient M := (hyp.base.typeP.W2_le hxW2).2
+    exact Subgroup.mem_subgroupOf.mpr (Subgroup.mem_subgroupOf.mpr hxM'')
+  have hdvd := OddOrder.Peterfalvi.S08.W1_dvd_index_of_fixedPoints_le hCop Msub hMinv hfix
+  -- translate `Msub.index` to the ambient relative index
+  have hidx : Msub.index = (secondDerivedInAmbient M).relIndex hyp.HC := by
+    have h1 : Msub.index
+        = ((secondDerivedInAmbient M).subgroupOf M).relIndex (hyp.HC.subgroupOf M) := rfl
+    rw [h1, Subgroup.relIndex_subgroupOf
+      (show hyp.HC ≤ M from hyp.HC_le_derived.trans (Subgroup.map_subtype_le _))]
+  have hq : Nat.card ↥(hyp.base.typeP.W1.subgroupOf M) = hyp.base.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.base.typeP.W1_le).toEquiv
+  rw [← hq, ← hidx]
+  exact hdvd
+
 end Hypothesis
 
 /-! ## (11.3)--(11.5): commutator-chain consequences -/
