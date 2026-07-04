@@ -219,7 +219,7 @@ theorem H_normalized_by_M [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
   have h := (Subgroup.normal_subgroupOf_iff_le_normalizer
     (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le M)).mp
     (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal M)
-  show M ≤ Subgroup.normalizer ((hyp.base.typeP.H : Subgroup G) : Set G)
+  change M ≤ Subgroup.normalizer ((hyp.base.typeP.H : Subgroup G) : Set G)
   rw [hyp.base.typeP.H_eq]
   exact h
 
@@ -304,10 +304,129 @@ theorem H_not_le_H0C {M : Subgroup G} (hyp : Hypothesis M) :
     have h1 : (⟨h, hhM⟩ : ↥M) = a * b := hab.symm
     have h2 : h = ((a * b : ↥M) : G) := congrArg Subtype.val h1
     rw [h2]
-    show ((a : ↥M) : G) * ((b : ↥M) : G) = ((a : ↥M) : G)
+    change ((a : ↥M) : G) * ((b : ↥M) : G) = ((a : ↥M) : G)
     rw [hb1, mul_one]
   rw [hha]
   exact haH0
+
+/-- **`H₀C`-trace is proper in `M'`-trace** — the `hBne` input of the h56 producer at
+`B = H₀C`: a full trace would force `M' ≤ H₀C`, hence `H ≤ H₀C` (`H_not_le_H0C`). -/
+theorem H0C_trace_ne_top {M : Subgroup G} (hyp : Hypothesis M) :
+    (hyp.H0C.subgroupOf M).subgroupOf ((derivedInG M).subgroupOf M) ≠ ⊤ := by
+  intro htop
+  refine hyp.H_not_le_H0C ?_
+  intro x hx
+  have hxM' : x ∈ derivedInG M := hyp.base.typeP.H_le hx
+  have hxM : x ∈ M := Subgroup.map_subtype_le _ hxM'
+  have hmem : (⟨⟨x, hxM⟩, Subgroup.mem_subgroupOf.mpr hxM'⟩ :
+      ↥((derivedInG M).subgroupOf M)) ∈
+      (hyp.H0C.subgroupOf M).subgroupOf ((derivedInG M).subgroupOf M) := by
+    rw [htop]; trivial
+  exact Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp hmem)
+
+/-- **Ambient commutators of `H` lie in `H₀`** (`H/H₀` elementary abelian ⟹ abelian):
+`H' ≤ H₀`, elementwise. -/
+theorem commutator_mem_H0 {M : Subgroup G} (hyp : Hypothesis M)
+    {x y : G} (hx : x ∈ hyp.base.typeP.H) (hy : y ∈ hyp.base.typeP.H) :
+    x * y * x⁻¹ * y⁻¹ ∈ hyp.chief.H0 := by
+  have hx' : x ∈ hyp.s11Setup.H := by
+    change x ∈ hyp.s11Setup.typeP.H
+    rw [hyp.setup_typeP_eq]; exact hx
+  have hy' : y ∈ hyp.s11Setup.H := by
+    change y ∈ hyp.s11Setup.typeP.H
+    rw [hyp.setup_typeP_eq]; exact hy
+  set xh : ↥hyp.s11Setup.H := ⟨x, hx'⟩ with hxh
+  set yh : ↥hyp.s11Setup.H := ⟨y, hy'⟩ with hyh
+  have hmk : QuotientGroup.mk' hyp.chief.N (xh * yh * xh⁻¹ * yh⁻¹) = 1 := by
+    simp only [map_mul, map_inv]
+    have h := hyp.chief.quotient_elementaryAbelian.comm
+      (QuotientGroup.mk' hyp.chief.N xh) (QuotientGroup.mk' hyp.chief.N yh)
+    rw [h]; group
+  have hmem : xh * yh * xh⁻¹ * yh⁻¹ ∈ hyp.chief.N := by
+    have := hmk
+    rwa [← MonoidHom.mem_ker, QuotientGroup.ker_mk'] at this
+  have hmap : ((xh * yh * xh⁻¹ * yh⁻¹ : ↥hyp.s11Setup.H) : G) ∈ hyp.chief.H0 := by
+    rw [hyp.chief.H0_eq]
+    exact Subgroup.mem_map_of_mem _ hmem
+  simpa using hmap
+
+/-- Every element of `C` commutes with every element of `H` (`C = C_U(H)`). -/
+theorem commute_of_mem_C_of_mem_H {M : Subgroup G} (hyp : Hypothesis M)
+    {c h : G} (hc : c ∈ hyp.C) (hh : h ∈ hyp.base.typeP.H) : Commute c h := by
+  have hc' := hyp.C_eq_centralizer ▸ hc
+  exact (Subgroup.mem_centralizer_iff.mp hc'.2 h hh).symm
+
+/-- **Ambient commutators of `HC` lie in `H₀C`** — the (11.4) centrality core: writing
+`x = h₁c₁`, `y = h₂c₂` (`HC = H·C` along the normal factor `H`, with `C` centralizing `H`),
+the commutator splits as `⁅x,y⁆ = ⁅h₁,h₂⁆·⁅c₁,c₂⁆ ∈ H₀·C ⊆ H₀C`
+(`commutator_mem_H0` for the `H`-part). -/
+theorem commutator_HC_mem_H0C [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    {x y : G} (hx : x ∈ hyp.HC) (hy : y ∈ hyp.HC) :
+    x * y * x⁻¹ * y⁻¹ ∈ hyp.H0C := by
+  -- decompose along the normal factor `H.subgroupOf M` inside `↥M`
+  have hHle : hyp.base.typeP.H ≤ M := hyp.base.typeP.H_le.trans (Subgroup.map_subtype_le _)
+  have hCle : hyp.C ≤ M := (hyp.C_le_U.trans hyp.base.typeP.U_le).trans
+    (Subgroup.map_subtype_le _)
+  haveI hHn : ((hyp.base.typeP.H).subgroupOf M).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hHle).mpr hyp.H_normalized_by_M
+  have hdecomp : ∀ z : G, z ∈ hyp.HC → ∃ h ∈ hyp.base.typeP.H, ∃ c ∈ hyp.C, z = h * c := by
+    intro z hz
+    have hzM : z ∈ M := (hyp.HC_le_derived.trans (Subgroup.map_subtype_le _)) hz
+    have hmem : (⟨z, hzM⟩ : ↥M) ∈
+        (hyp.base.typeP.H).subgroupOf M ⊔ hyp.C.subgroupOf M := by
+      rw [← Subgroup.subgroupOf_sup hHle hCle]
+      exact Subgroup.mem_subgroupOf.mpr hz
+    rw [← SetLike.mem_coe, Subgroup.normal_mul, Set.mem_mul] at hmem
+    obtain ⟨a, ha, b, hb, hab⟩ := hmem
+    refine ⟨((a : ↥M) : G), Subgroup.mem_subgroupOf.mp ha,
+      ((b : ↥M) : G), Subgroup.mem_subgroupOf.mp hb, ?_⟩
+    have := congrArg (fun m : ↥M => (m : G)) hab
+    simpa using this.symm
+  obtain ⟨h₁, hh₁, c₁, hc₁, rfl⟩ := hdecomp x hx
+  obtain ⟨h₂, hh₂, c₂, hc₂, rfl⟩ := hdecomp y hy
+  -- the swap identity `⁅h₁c₁, h₂c₂⁆ = ⁅h₁,h₂⁆·⁅c₁,c₂⁆`
+  have hsw12 : Commute c₁ h₂ := hyp.commute_of_mem_C_of_mem_H hc₁ hh₂
+  have hsw11 : Commute c₁ h₁ := hyp.commute_of_mem_C_of_mem_H hc₁ hh₁
+  have hsw21 : Commute c₂ h₁ := hyp.commute_of_mem_C_of_mem_H hc₂ hh₁
+  have hsw22 : Commute c₂ h₂ := hyp.commute_of_mem_C_of_mem_H hc₂ hh₂
+  have hkey : h₁ * c₁ * (h₂ * c₂) * (h₁ * c₁)⁻¹ * (h₂ * c₂)⁻¹
+      = (h₁ * h₂ * h₁⁻¹ * h₂⁻¹) * (c₁ * c₂ * c₁⁻¹ * c₂⁻¹) := by
+    have e12 : c₁ * h₂ = h₂ * c₁ := hsw12
+    have e11 : c₁ * h₁⁻¹ = h₁⁻¹ * c₁ := hsw11.inv_right
+    have e21 : c₂ * h₁⁻¹ = h₁⁻¹ * c₂ := hsw21.inv_right
+    have e22 : c₂ * h₂⁻¹ = h₂⁻¹ * c₂ := hsw22.inv_right
+    have e12i : c₁⁻¹ * h₂⁻¹ = h₂⁻¹ * c₁⁻¹ := (hsw12.inv_inv)
+    have e22i : c₂ * h₂ = h₂ * c₂ := hsw22
+    -- normalize both sides via the four swaps
+    calc h₁ * c₁ * (h₂ * c₂) * (h₁ * c₁)⁻¹ * (h₂ * c₂)⁻¹
+        = h₁ * (c₁ * h₂) * c₂ * (c₁⁻¹ * h₁⁻¹) * (c₂⁻¹ * h₂⁻¹) := by group
+      _ = h₁ * (h₂ * c₁) * c₂ * (c₁⁻¹ * h₁⁻¹) * (c₂⁻¹ * h₂⁻¹) := by rw [e12]
+      _ = h₁ * h₂ * (c₁ * c₂ * c₁⁻¹) * h₁⁻¹ * (c₂⁻¹ * h₂⁻¹) := by group
+      _ = h₁ * h₂ * h₁⁻¹ * (c₁ * c₂ * c₁⁻¹) * (c₂⁻¹ * h₂⁻¹) := by
+          have hcomm3 : (c₁ * c₂ * c₁⁻¹) * h₁⁻¹ = h₁⁻¹ * (c₁ * c₂ * c₁⁻¹) := by
+            have a1 : Commute (c₁ * c₂ * c₁⁻¹) h₁⁻¹ :=
+              ((hsw11.mul_left hsw21).mul_left hsw11.inv_left).inv_right
+            exact a1
+          rw [show h₁ * h₂ * (c₁ * c₂ * c₁⁻¹) * h₁⁻¹ * (c₂⁻¹ * h₂⁻¹)
+              = h₁ * h₂ * ((c₁ * c₂ * c₁⁻¹) * h₁⁻¹) * (c₂⁻¹ * h₂⁻¹) from by group,
+            hcomm3]
+          group
+      _ = h₁ * h₂ * h₁⁻¹ * h₂⁻¹ * (c₁ * c₂ * c₁⁻¹ * c₂⁻¹) := by
+          have hcomm4 : (c₁ * c₂ * c₁⁻¹ * c₂⁻¹) * h₂⁻¹ = h₂⁻¹ * (c₁ * c₂ * c₁⁻¹ * c₂⁻¹) := by
+            have a1 : Commute (c₁ * c₂ * c₁⁻¹ * c₂⁻¹) h₂⁻¹ :=
+              (((hsw12.mul_left hsw22).mul_left hsw12.inv_left).mul_left
+                hsw22.inv_left).inv_right
+            exact a1
+          rw [show h₁ * h₂ * h₁⁻¹ * (c₁ * c₂ * c₁⁻¹) * (c₂⁻¹ * h₂⁻¹)
+              = h₁ * h₂ * h₁⁻¹ * ((c₁ * c₂ * c₁⁻¹ * c₂⁻¹) * h₂⁻¹) from by group,
+            hcomm4]
+          group
+  rw [hkey]
+  have hHpart : h₁ * h₂ * h₁⁻¹ * h₂⁻¹ ∈ hyp.chief.H0 := hyp.commutator_mem_H0 hh₁ hh₂
+  have hCpart : c₁ * c₂ * c₁⁻¹ * c₂⁻¹ ∈ hyp.C :=
+    Subgroup.mul_mem _ (Subgroup.mul_mem _ (Subgroup.mul_mem _ hc₁ hc₂)
+      (Subgroup.inv_mem _ hc₁)) (Subgroup.inv_mem _ hc₂)
+  exact Subgroup.mul_mem _ (Subgroup.mem_sup_left hHpart) (Subgroup.mem_sup_right hCpart)
 
 end Hypothesis
 
