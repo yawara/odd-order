@@ -510,6 +510,98 @@ theorem card_HC [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hCle).toEquiv] at hmul
   exact hmul.symm
 
+/-- Bridge: the §9 setup's `H` is the §13 `H` (via `setup_typeP_eq`). -/
+theorem s11Setup_H_eq {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.s11Setup.H = hyp.H := by
+  show hyp.s11Setup.typeP.H = hyp.base.typeP.H
+  rw [hyp.setup_typeP_eq]
+
+/-- Bridge: the §9 setup's `U` is the §13 `U`. -/
+theorem s11Setup_U_eq {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.s11Setup.U = hyp.U := by
+  show hyp.s11Setup.typeP.U = hyp.base.typeP.U
+  rw [hyp.setup_typeP_eq]
+
+/-- Bridge: the §9 setup's `q` is the §13 `q`. -/
+theorem s11Setup_q_eq {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.s11Setup.q = hyp.q := by
+  show Nat.card ↥hyp.s11Setup.typeP.W1 = Nat.card ↥hyp.base.typeP.W1
+  rw [hyp.setup_typeP_eq]
+
+/-- Bridge: the §9 setup's `W₂` is the §13 `W₂`-carrier of `p`. -/
+theorem s11Setup_card_W2_eq {M : Subgroup G} (hyp : Hypothesis M) :
+    Nat.card ↥hyp.s11Setup.W2 = hyp.p := by
+  show Nat.card ↥hyp.s11Setup.typeP.W2 = Nat.card ↥hyp.base.typeP.W2
+  rw [hyp.setup_typeP_eq]
+
+/-- `|H₀C| = |H₀| · |C|` (mirror of `card_HC`: `H₀ ⊓ C ≤ H ⊓ U = ⊥`). -/
+theorem card_H0C [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
+    Nat.card ↥hyp.H0C = Nat.card ↥hyp.chief.H0 * Nat.card ↥hyp.C := by
+  have hH0H : hyp.chief.H0 ≤ hyp.base.typeP.H := by
+    have hHH : hyp.s11Setup.typeP.H = hyp.base.typeP.H := by
+      rw [hyp.s11Setup.typeP.H_eq, hyp.base.typeP.H_eq]
+    exact hHH ▸ hyp.chief.H0_lt_H.le
+  have hHle : hyp.chief.H0 ≤ hyp.H0C := le_sup_left
+  have hCle : hyp.C ≤ hyp.H0C := le_sup_right
+  have hH0CleM : hyp.H0C ≤ M := hyp.H0C_le_derived.trans (Subgroup.map_subtype_le _)
+  haveI hHn : (hyp.chief.H0.subgroupOf hyp.H0C).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hHle).mpr
+      (hH0CleM.trans hyp.chief.H0_normalized_by_M)
+  have hdisj : Disjoint (hyp.chief.H0.subgroupOf hyp.H0C) (hyp.C.subgroupOf hyp.H0C) := by
+    rw [disjoint_iff]
+    have hsplit : hyp.chief.H0.subgroupOf hyp.H0C ⊓ hyp.C.subgroupOf hyp.H0C
+        = (hyp.chief.H0 ⊓ hyp.C).subgroupOf hyp.H0C :=
+      (Subgroup.comap_inf _ _ _).symm
+    have hbot : hyp.chief.H0 ⊓ hyp.C = ⊥ := by
+      rw [eq_bot_iff, ← hyp.H_inf_U_eq_bot]
+      exact inf_le_inf hH0H hyp.C_le_U
+    rw [hsplit, hbot, Subgroup.bot_subgroupOf]
+  have hsup : (hyp.chief.H0.subgroupOf hyp.H0C) ⊔ (hyp.C.subgroupOf hyp.H0C) = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hHle hCle]
+    exact Subgroup.subgroupOf_self _
+  have hcomp : Subgroup.IsComplement' (hyp.chief.H0.subgroupOf hyp.H0C)
+      (hyp.C.subgroupOf hyp.H0C) := by
+    refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ hdisj ?_
+    rw [← Subgroup.normal_mul, hsup, Subgroup.coe_top]
+  have hmul := hcomp.card_mul
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHle).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hCle).toEquiv] at hmul
+  exact hmul.symm
+
+/-- **`|HC : H₀C| = p^q`** — the `C`-factor cancels and `|H : H₀| = p^q` is the chief-factor
+order ((9.6), `quotient_order` + `typeIII_IV_p_eq_W2`). -/
+theorem H0C_relIndex_HC [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.H0C.relIndex hyp.HC = hyp.p ^ hyp.q := by
+  have hHH : hyp.s11Setup.typeP.H = hyp.base.typeP.H := by
+    rw [hyp.s11Setup.typeP.H_eq, hyp.base.typeP.H_eq]
+  have hH0H : hyp.chief.H0 ≤ hyp.base.typeP.H := hHH ▸ hyp.chief.H0_lt_H.le
+  have hle : hyp.H0C ≤ hyp.HC := sup_le (hH0H.trans le_sup_left) le_sup_right
+  have h1 : Nat.card ↥hyp.H0C * hyp.H0C.relIndex hyp.HC = Nat.card ↥hyp.HC := by
+    have := Subgroup.card_mul_index (hyp.H0C.subgroupOf hyp.HC)
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv] at this
+  -- `|H| = p^q · |H₀|` (chief factor)
+  have hp_eq : hyp.chief.p = hyp.p := by
+    have h2 := hyp.chief.typeIII_IV_p_eq_W2 (hyp.base.isTypeIIIorIV hG)
+    rw [hyp.s11Setup_card_W2_eq] at h2
+    exact h2.symm
+  have horder : Nat.card ↥hyp.base.typeP.H = hyp.p ^ hyp.q * Nat.card ↥hyp.chief.H0 := by
+    have h := hyp.chief.quotient_order
+    have hcardHH : Nat.card ↥hyp.s11Setup.H = Nat.card ↥hyp.base.typeP.H := by
+      exact congrArg (fun (X : Subgroup G) => Nat.card ↥X) hHH
+    rw [hcardHH, hp_eq] at h
+    rw [h]
+    congr 1
+    rw [hyp.s11Setup_q_eq]
+  -- combine through `card_HC` / `card_H0C`
+  have hkey : (Nat.card ↥hyp.chief.H0 * Nat.card ↥hyp.C) * hyp.H0C.relIndex hyp.HC
+      = (Nat.card ↥hyp.chief.H0 * Nat.card ↥hyp.C) * hyp.p ^ hyp.q := by
+    rw [← hyp.card_H0C, h1, hyp.card_HC, horder, hyp.card_H0C]
+    ring
+  have hpos : 0 < Nat.card ↥hyp.chief.H0 * Nat.card ↥hyp.C :=
+    Nat.mul_pos Nat.card_pos Nat.card_pos
+  exact Nat.eq_of_mul_eq_mul_left hpos hkey
+
 /-- **`|M' : HC| = |U : C|`** (cancel the common factor `|H|`). -/
 theorem HC_relIndex_derived [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
     hyp.HC.relIndex (derivedInG M) = hyp.C.relIndex hyp.U := by

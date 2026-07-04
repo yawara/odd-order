@@ -65,30 +65,6 @@ theorem commutator_mul_of_commute {Q : Type*} [Group Q] {h₁ c₁ h₂ c₂ : Q
 
 namespace Hypothesis
 
-/-- Bridge: the §9 setup's `H` is the §13 `H` (via `setup_typeP_eq`). -/
-theorem s11Setup_H_eq {M : Subgroup G} (hyp : Hypothesis M) :
-    hyp.s11Setup.H = hyp.H := by
-  show hyp.s11Setup.typeP.H = hyp.base.typeP.H
-  rw [hyp.setup_typeP_eq]
-
-/-- Bridge: the §9 setup's `U` is the §13 `U`. -/
-theorem s11Setup_U_eq {M : Subgroup G} (hyp : Hypothesis M) :
-    hyp.s11Setup.U = hyp.U := by
-  show hyp.s11Setup.typeP.U = hyp.base.typeP.U
-  rw [hyp.setup_typeP_eq]
-
-/-- Bridge: the §9 setup's `q` is the §13 `q`. -/
-theorem s11Setup_q_eq {M : Subgroup G} (hyp : Hypothesis M) :
-    hyp.s11Setup.q = hyp.q := by
-  show Nat.card ↥hyp.s11Setup.typeP.W1 = Nat.card ↥hyp.base.typeP.W1
-  rw [hyp.setup_typeP_eq]
-
-/-- Bridge: the §9 setup's `W₂` is the §13 `W₂`-carrier of `p`. -/
-theorem s11Setup_card_W2_eq {M : Subgroup G} (hyp : Hypothesis M) :
-    Nat.card ↥hyp.s11Setup.W2 = hyp.p := by
-  show Nat.card ↥hyp.s11Setup.typeP.W2 = Nat.card ↥hyp.base.typeP.W2
-  rw [hyp.setup_typeP_eq]
-
 /-- **Peterfalvi (9.3) at the §13 hypothesis**: `p = |W₂|` is prime and
 `|H| = p^q · |C_H(U)|` (types III/IV; type V is excluded by (10.10)). -/
 theorem p_prime_and_card_H_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
