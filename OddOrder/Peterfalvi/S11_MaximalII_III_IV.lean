@@ -5607,6 +5607,471 @@ theorem exists_source_char_inertia_eq_hcuInHu_caseA [Finite G] {M : Subgroup G}
   obtain ⟨θbar, hreg, htriv⟩ := exists_source_char_caseA caseA hinf hsup
   exact ⟨θbar, hreg, inertia_eq_hcuInHu caseA hWinv hsup hreg htriv⟩
 
+/-! ### Peterfalvi (9.8.d): the pair character `θ₁·λ` on `H·C_U(S₀)` and the degree-`qa` irreducible
+
+Unlike the (9.8.c)/(9.9.c) `θ`-factor, which is the *inflation* `θ ∘ hcHom` killing the **normal**
+`H₀C`, the (9.8.d) `θ`-factor is a genuine **extension** of the `C_U(S₀)`-invariant linear seed `θ₀`
+from `H` to `H·C_U(S₀) = H ⋊ C_U(S₀)` (`C_U(S₀)` is *not* normal — only `H` is).  We build the
+extension as a homomorphism `hcuThetaHom : H·C_U(S₀) →* ℂˣ` via `SemidirectProduct.lift`: on the
+normal factor `H` it is the seed hom `θ ∘ mk'(N) ∘ hInHuEquivH`, on the complement `C_U(S₀)` it is
+trivial (the `λ`-factor is added separately as `hcuLambdaHom`).  The `lift` compatibility
+`fn(c·h·c⁻¹) = fn(h)` is exactly the `C_U(S₀)`-invariance of `θ₀` (`cuInHu_le_inertia_of_complement_triv`),
+made available at hom level because the codomain `ℂˣ` is abelian.  The pair
+`θ₁·λ = hcuThetaHom · (hcuLambdaHom λ)` restricts to `θ₀` on `H` (the `λ`-factor dies there), so the
+inertia lift `inertia_eq_hcuInHu` transfers verbatim and `Ind_{H·C_U(S₀)}^{HU}(θ₁·λ)` is irreducible
+of degree `[HU : H·C_U(S₀)] = a` (`index_hcuInHu_eq_caseA_a`), whence `Ind_{HU}^M` has degree `qa`. -/
+
+/-- **`H` and `C_U(S₀)` are complementary inside `H·C_U(S₀)`** (`IsComplement'` of the two
+`subgroupOf`-realizations in the join): `H ⊓ C_U(S₀) = ⊥` (`hInHu_inf_cuInHu_eq_bot`) gives disjointness,
+`H ⊔ C_U(S₀)` is the whole ambient by construction.  This is the complement input to
+`SemidirectProduct.mulEquivSubgroup`, exhibiting `H·C_U(S₀) ≃* H ⋊[φ] C_U(S₀)`. -/
+theorem hInHu_isComplement'_cuInHu_in_hcuInHu [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) :
+    ((hInHu data).subgroupOf (hInHu data ⊔ cuInHu caseA)).IsComplement'
+      ((cuInHu caseA).subgroupOf (hInHu data ⊔ cuInHu caseA)) := by
+  haveI := hInHu_normal data
+  haveI : ((hInHu data).subgroupOf (hInHu data ⊔ cuInHu caseA)).Normal :=
+    (hInHu_normal data).subgroupOf _
+  refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
+  · rw [disjoint_iff]
+    show (hInHu data).comap _ ⊓ (cuInHu caseA).comap _ = ⊥
+    rw [← Subgroup.comap_inf (hInHu data) (cuInHu caseA)
+      (hInHu data ⊔ cuInHu caseA).subtype, hInHu_inf_cuInHu_eq_bot caseA]
+    simp
+  · rw [← Subgroup.normal_mul, ← Subgroup.subgroupOf_sup le_sup_left le_sup_right,
+      Subgroup.subgroupOf_self, Subgroup.coe_top]
+
+/-- The seed hom `θ₀ : H →* ℂˣ` in raw hom form: `θ ∘ mk'(N) ∘ hInHuEquivH`.  Its `linearClassFunction`
+is the seed `θ₀` used in the inertia lift `inertia_eq_hcuInHu` (via
+`ClassFunction.compHom_linearIrreducibleCharacter`). -/
+noncomputable def hcuSeedHom [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data} (θ : (↥data.H ⧸ chief.N) →* ℂˣ) :
+    ↥(hInHu data) →* ℂˣ :=
+  θ.comp ((QuotientGroup.mk' chief.N).comp (hInHuEquivH data).toMonoidHom)
+
+
+/-- **The `θ₀`-extension hom `hcuThetaHom : H·C_U(S₀) →* ℂˣ`** (Peterfalvi (9.8.d)).  The extension of
+the seed hom `θ ∘ mk'(N) ∘ hInHuEquivH` from the normal factor `H` to `H·C_U(S₀)`, trivial on the
+complement `C_U(S₀)`.  Built by `SemidirectProduct.lift` (through the complement iso
+`hInHu_isComplement'_cuInHu_in_hcuInHu`); the `lift` `φ`-compatibility `fn(φ(c) h) = fn(h)` is the
+`C_U(S₀)`-invariance of `θ₀` (`hinv`, supplied by `cuInHu_le_inertia_of_complement_triv`), using that
+the codomain `ℂˣ` is abelian (`MulAut.conj = 1`).  Restricts to `θ₀` on `H`
+(`hcuThetaHom_inclusion_hInHu`). -/
+noncomputable def hcuThetaHom [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    (hinv : ∀ c : ↥(cuInHu caseA), ∀ h : ↥(hInHu data),
+      hcuSeedHom (chief := chief) θ
+          ⟨(c : ↥(huSub data)) * (h : ↥(huSub data)) * (c : ↥(huSub data))⁻¹,
+            (hInHu_normal data).conj_mem _ h.2 (c : ↥(huSub data))⟩
+        = hcuSeedHom (chief := chief) θ h) :
+    ↥(hInHu data ⊔ cuInHu caseA) →* ℂˣ :=
+  haveI := hInHu_normal data
+  haveI : ((hInHu data).subgroupOf (hInHu data ⊔ cuInHu caseA)).Normal :=
+    (hInHu_normal data).subgroupOf _
+  (SemidirectProduct.lift
+      ((hcuSeedHom (chief := chief) θ).comp
+        (Subgroup.subgroupOfEquivOfLe
+          (le_sup_left : hInHu data ≤ hInHu data ⊔ cuInHu caseA)).toMonoidHom)
+      (1 : ↥((cuInHu caseA).subgroupOf (hInHu data ⊔ cuInHu caseA)) →* ℂˣ)
+      (by
+        intro c
+        ext h
+        -- RHS: `(1 : _→*ℂˣ) c = 1`, `MulAut.conj 1 = 1`; LHS: `φ(c) h = c·h·c⁻¹` in the subgroupOf.
+        simp only [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, MonoidHom.one_apply, map_one,
+          MulAut.one_apply]
+        -- transport `c`, `h` from the join-`subgroupOf`s to `↥(cuInHu)`, `↥(hInHu)`.
+        set c' := (Subgroup.subgroupOfEquivOfLe
+          (le_sup_right : cuInHu caseA ≤ hInHu data ⊔ cuInHu caseA)) c with hc'
+        set h' := (Subgroup.subgroupOfEquivOfLe
+          (le_sup_left : hInHu data ≤ hInHu data ⊔ cuInHu caseA)) h with hh'
+        -- the two `↥(hInHu data)` arguments agree, so `hcuSeedHom θ` agrees on them.
+        have harg : (Subgroup.subgroupOfEquivOfLe
+              (le_sup_left : hInHu data ≤ hInHu data ⊔ cuInHu caseA))
+            ((((hInHu data).subgroupOf (hInHu data ⊔ cuInHu caseA)).normalizerMonoidHom
+              ((Subgroup.inclusion (((hInHu data).subgroupOf
+                (hInHu data ⊔ cuInHu caseA)).normalizer_eq_top ▸ le_top)) c)) h)
+            = ⟨(c' : ↥(huSub data)) * (h' : ↥(huSub data)) * (c' : ↥(huSub data))⁻¹,
+                (hInHu_normal data).conj_mem _ h'.2 (c' : ↥(huSub data))⟩ := by
+          apply Subtype.ext
+          simp only [hc', hh', Subgroup.subgroupOfEquivOfLe_apply_coe,
+            Subgroup.normalizerMonoidHom_apply_apply_coe, Subgroup.coe_inclusion,
+            Subgroup.coe_mul, Subgroup.coe_inv]
+        rw [harg]
+        exact congrArg (Units.val) (hinv c' h'))).comp
+    (SemidirectProduct.mulEquivSubgroup
+      (hInHu_isComplement'_cuInHu_in_hcuInHu caseA)).symm.toMonoidHom
+
+/-- **`hcuThetaHom` restricts to `θ₀` on `H`**: on the inclusion of `h ∈ H` into `H·C_U(S₀)`, the
+extension returns the seed value `hcuSeedHom θ h`.  Via `SemidirectProduct.lift_inl` after
+`(mulEquivSubgroup).symm (inclusion h) = inl h` (the complement iso sends the normal factor to `inl`).
+This is the single-factor analog of `hcHom_inclusion`, feeding the restriction-inertia argument. -/
+theorem hcuThetaHom_inclusion_hInHu [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    (hinv : ∀ c : ↥(cuInHu caseA), ∀ h : ↥(hInHu data),
+      hcuSeedHom (chief := chief) θ
+          ⟨(c : ↥(huSub data)) * (h : ↥(huSub data)) * (c : ↥(huSub data))⁻¹,
+            (hInHu_normal data).conj_mem _ h.2 (c : ↥(huSub data))⟩
+        = hcuSeedHom (chief := chief) θ h)
+    (h : ↥(hInHu data)) :
+    hcuThetaHom caseA θ hinv (Subgroup.inclusion
+        (le_sup_left : hInHu data ≤ hInHu data ⊔ cuInHu caseA) h)
+      = hcuSeedHom (chief := chief) θ h := by
+  haveI := hInHu_normal data
+  haveI : ((hInHu data).subgroupOf (hInHu data ⊔ cuInHu caseA)).Normal :=
+    (hInHu_normal data).subgroupOf _
+  -- `(mulEquivSubgroup).symm (inclusion h) = inl ⟨incl h, h ∈ H⟩`.
+  have hsymm : (SemidirectProduct.mulEquivSubgroup
+      (hInHu_isComplement'_cuInHu_in_hcuInHu caseA)).symm
+      (Subgroup.inclusion (le_sup_left : hInHu data ≤ hInHu data ⊔ cuInHu caseA) h)
+      = SemidirectProduct.inl
+        (⟨Subgroup.inclusion (le_sup_left : hInHu data ≤ hInHu data ⊔ cuInHu caseA) h,
+          Subgroup.mem_subgroupOf.mpr h.2⟩ :
+          ↥((hInHu data).subgroupOf (hInHu data ⊔ cuInHu caseA))) := by
+    rw [MulEquiv.symm_apply_eq]
+    simp only [SemidirectProduct.mulEquivSubgroup, MulEquiv.ofBijective_apply,
+      SemidirectProduct.monoidHomSubgroup_apply, SemidirectProduct.left_inl,
+      SemidirectProduct.right_inl, OneMemClass.coe_one, mul_one]
+  simp only [hcuThetaHom, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, hsymm,
+    SemidirectProduct.lift_inl]
+  congr 1
+
+/-- **The (9.8.d) pair hom `θ₁·λ : H·C_U(S₀) →* ℂˣ`**: the product of the `θ₀`-extension `hcuThetaHom`
+(the single-factor analog of the `θ`-inflation, restricting to `θ₀` on `H`) and the `λ`-lift
+`hcuLambdaHom λ` (trivial on `H`).  On `H` it agrees with `hcuThetaHom` (= `θ₀`) alone; on `C_U(S₀)` it
+is `λ` (the extension is trivial there by construction).  Mirror of `hcPairHom`, single-factor. -/
+noncomputable def hcuPairHom [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    (hinv : ∀ c : ↥(cuInHu caseA), ∀ h : ↥(hInHu data),
+      hcuSeedHom (chief := chief) θ
+          ⟨(c : ↥(huSub data)) * (h : ↥(huSub data)) * (c : ↥(huSub data))⁻¹,
+            (hInHu_normal data).conj_mem _ h.2 (c : ↥(huSub data))⟩
+        = hcuSeedHom (chief := chief) θ h)
+    (lam : ↥(cuInHu caseA) →* ℂˣ) :
+    ↥(hInHu data ⊔ cuInHu caseA) →* ℂˣ :=
+  hcuThetaHom caseA θ hinv * hcuLambdaHom caseA lam
+
+/-- **The `H·C_U(S₀)`-linear pair character `ψ_{θ₁,λ}`** of the (9.8.d) construction: the linear
+(degree-one) irreducible character with hom `hcuPairHom`.  Mirror of `hcPsiPair`, single-factor. -/
+noncomputable def hcuPsiPair [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    (hinv : ∀ c : ↥(cuInHu caseA), ∀ h : ↥(hInHu data),
+      hcuSeedHom (chief := chief) θ
+          ⟨(c : ↥(huSub data)) * (h : ↥(huSub data)) * (c : ↥(huSub data))⁻¹,
+            (hInHu_normal data).conj_mem _ h.2 (c : ↥(huSub data))⟩
+        = hcuSeedHom (chief := chief) θ h)
+    (lam : ↥(cuInHu caseA) →* ℂˣ) :
+    IrreducibleCharacter ↥(hInHu data ⊔ cuInHu caseA) :=
+  linearIrreducibleCharacter (hcuPairHom caseA θ hinv lam)
+
+/-- **`ψ_{θ₁,λ}|_hInHu = θ₀`** (pointwise): on the inclusion of `h ∈ H` the pair character equals the
+seed's inflation `θ₀`.  The `λ`-factor dies (`hcuLambdaHom_eq_one_of_mem_hInHu`) and the `θ`-factor is
+the extension's restriction (`hcuThetaHom_inclusion_hInHu`), which by
+`compHom_linearIrreducibleCharacter` is exactly the ClassFunction seed `θ₀`.  Same right-hand side as
+the seed of `inertia_eq_hcuInHu`, so the restriction-inertia argument applies to the pair verbatim. -/
+theorem hcuPsiPair_apply_inclusion [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    (hinv : ∀ c : ↥(cuInHu caseA), ∀ h : ↥(hInHu data),
+      hcuSeedHom (chief := chief) θ
+          ⟨(c : ↥(huSub data)) * (h : ↥(huSub data)) * (c : ↥(huSub data))⁻¹,
+            (hInHu_normal data).conj_mem _ h.2 (c : ↥(huSub data))⟩
+        = hcuSeedHom (chief := chief) θ h)
+    (lam : ↥(cuInHu caseA) →* ℂˣ) (h : ↥(hInHu data)) :
+    (hcuPsiPair caseA θ hinv lam : ClassFunction ↥(hInHu data ⊔ cuInHu caseA) ℂ)
+        (Subgroup.inclusion (le_sup_left : hInHu data ≤ hInHu data ⊔ cuInHu caseA) h)
+      = (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+        h := by
+  have hlam1 : hcuLambdaHom caseA lam
+      (Subgroup.inclusion (le_sup_left : hInHu data ≤ hInHu data ⊔ cuInHu caseA) h) = 1 :=
+    hcuLambdaHom_eq_one_of_mem_hInHu caseA lam (Subgroup.mem_subgroupOf.mpr h.2)
+  simp only [hcuPsiPair, hcuPairHom, linearIrreducibleCharacter_apply, MonoidHom.mul_apply,
+    Units.val_mul, hcuThetaHom_inclusion_hInHu, hlam1, Units.val_one, mul_one, hcuSeedHom,
+    MonoidHom.comp_apply, ClassFunction.compHom_apply, MulEquiv.coe_toMonoidHom,
+    linearIrreducibleCharacter_apply]
+
+/-- **Restriction-inertia `inertia(ψ_{θ₁,λ}) ≤ inertia(θ₀)`** (Peterfalvi (9.8.d)): an element fixing
+the pair character also fixes its `H`-restriction `θ₀` (`hcuPsiPair_apply_inclusion`).  Single-factor
+mirror of `hcPsiPair_inertia_le` — the `λ`-factor is invisible on the restriction. -/
+theorem hcuPsiPair_inertia_le [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    (hinv : ∀ c : ↥(cuInHu caseA), ∀ h : ↥(hInHu data),
+      hcuSeedHom (chief := chief) θ
+          ⟨(c : ↥(huSub data)) * (h : ↥(huSub data)) * (c : ↥(huSub data))⁻¹,
+            (hInHu_normal data).conj_mem _ h.2 (c : ↥(huSub data))⟩
+        = hcuSeedHom (chief := chief) θ h)
+    (lam : ↥(cuInHu caseA) →* ℂˣ)
+    [(hInHu data ⊔ cuInHu caseA).Normal] :
+    ClassFunction.inertia (hcuPsiPair caseA θ hinv lam : ClassFunction
+        ↥(hInHu data ⊔ cuInHu caseA) ℂ)
+      ≤ ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ))) := by
+  haveI := hInHu_normal data
+  intro g hg
+  rw [ClassFunction.mem_inertia] at hg ⊢
+  ext h
+  have key : (ClassFunction.conjBy g (hcuPsiPair caseA θ hinv lam : ClassFunction
+        ↥(hInHu data ⊔ cuInHu caseA) ℂ))
+      (Subgroup.inclusion (le_sup_left : hInHu data ≤ hInHu data ⊔ cuInHu caseA) h)
+      = (hcuPsiPair caseA θ hinv lam : ClassFunction ↥(hInHu data ⊔ cuInHu caseA) ℂ)
+        (Subgroup.inclusion (le_sup_left : hInHu data ≤ hInHu data ⊔ cuInHu caseA) h) := by
+    rw [hg]
+  rw [ClassFunction.conjBy_apply] at key ⊢
+  rw [← hcuPsiPair_apply_inclusion caseA θ hinv lam,
+    ← hcuPsiPair_apply_inclusion caseA θ hinv lam, ← key]
+  congr 1
+
+/-- **`inertia(ψ_{θ₁,λ}) = H·C_U(S₀)`** (Peterfalvi (9.8.d)): with the seed inertia
+`inertia(θ₀) = H·C_U(S₀)` (`inertia_eq_hcuInHu` for `θ` nontrivial on `S₀`, trivial on the complement),
+the pair character's `HU`-inertia is exactly `H·C_U(S₀)`.  Single-factor mirror of
+`hcPsiPair_inertia_eq_hc`.  Feeds `isIrreducibleCharacter_induce_of_inertia_eq` for the degree-`a`
+irreducible. -/
+theorem hcuPsiPair_inertia_eq_hcu [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    (hinv : ∀ c : ↥(cuInHu caseA), ∀ h : ↥(hInHu data),
+      hcuSeedHom (chief := chief) θ
+          ⟨(c : ↥(huSub data)) * (h : ↥(huSub data)) * (c : ↥(huSub data))⁻¹,
+            (hInHu_normal data).conj_mem _ h.2 (c : ↥(huSub data))⟩
+        = hcuSeedHom (chief := chief) θ h)
+    (lam : ↥(cuInHu caseA) →* ℂˣ)
+    [(hInHu data ⊔ cuInHu caseA).Normal]
+    (hθ₀ : ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+        (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+          (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+        = hInHu data ⊔ cuInHu caseA) :
+    ClassFunction.inertia (hcuPsiPair caseA θ hinv lam : ClassFunction
+        ↥(hInHu data ⊔ cuInHu caseA) ℂ)
+      = hInHu data ⊔ cuInHu caseA := by
+  apply le_antisymm ?_ (ClassFunction.subgroup_le_inertia _)
+  refine le_trans (hcuPsiPair_inertia_le caseA θ hinv lam) ?_
+  rw [hθ₀]
+
+/-- **`ζ_{θ₁,λ} = Ind_{H·C_U(S₀)}^{HU}(ψ_{θ₁,λ})` is irreducible** (Peterfalvi (9.8.d), degree `a`):
+direct from `isIrreducibleCharacter_induce_of_inertia_eq` and `inertia(ψ_{θ₁,λ}) = H·C_U(S₀)`
+(`hcuPsiPair_inertia_eq_hcu`).  The (9.8.d) irreducible source character over the extension `θ₀`.  Its
+degree is `[HU : H·C_U(S₀)] · 1 = a` (`hcuZetaPair_apply_one`). -/
+theorem hcuZetaPair_irreducible [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    (hinv : ∀ c : ↥(cuInHu caseA), ∀ h : ↥(hInHu data),
+      hcuSeedHom (chief := chief) θ
+          ⟨(c : ↥(huSub data)) * (h : ↥(huSub data)) * (c : ↥(huSub data))⁻¹,
+            (hInHu_normal data).conj_mem _ h.2 (c : ↥(huSub data))⟩
+        = hcuSeedHom (chief := chief) θ h)
+    (lam : ↥(cuInHu caseA) →* ℂˣ)
+    [Fintype ↥(huSub data)]
+    [Fintype ↥(hInHu data ⊔ cuInHu caseA)]
+    [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    [Invertible (Nat.card ↥(hInHu data ⊔ cuInHu caseA) : ℂ)]
+    [(hInHu data ⊔ cuInHu caseA).Normal]
+    (hθ₀ : ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+        (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+          (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+        = hInHu data ⊔ cuInHu caseA) :
+    IsIrreducibleCharacter (ClassFunction.induce (hInHu data ⊔ cuInHu caseA)
+      (hcuPsiPair caseA θ hinv lam : ClassFunction ↥(hInHu data ⊔ cuInHu caseA) ℂ)) :=
+  OddOrder.RepresentationTheory.isIrreducibleCharacter_induce_of_inertia_eq
+    (hcuPsiPair caseA θ hinv lam)
+    (hcuPsiPair_inertia_eq_hcu caseA θ hinv lam hθ₀)
+
+/-- **`ζ_{θ₁,λ}(1) = a`** (Peterfalvi (9.8.d), source degree): the induced source character has degree
+`[HU : H·C_U(S₀)] · ψ(1) = a · 1 = a`, since `ψ_{θ₁,λ}` is linear (`ClassFunction.induce_apply_one` +
+`index_hcuInHu_eq_caseA_a`).  The `M`-induction then has degree `q·a` (`hcuZetaPair_induceHU_apply_one`). -/
+theorem hcuZetaPair_apply_one [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    (hinv : ∀ c : ↥(cuInHu caseA), ∀ h : ↥(hInHu data),
+      hcuSeedHom (chief := chief) θ
+          ⟨(c : ↥(huSub data)) * (h : ↥(huSub data)) * (c : ↥(huSub data))⁻¹,
+            (hInHu_normal data).conj_mem _ h.2 (c : ↥(huSub data))⟩
+        = hcuSeedHom (chief := chief) θ h)
+    (lam : ↥(cuInHu caseA) →* ℂˣ)
+    [Fintype ↥(huSub data)]
+    [Invertible (Nat.card ↥(hInHu data ⊔ cuInHu caseA) : ℂ)] :
+    ClassFunction.induce (hInHu data ⊔ cuInHu caseA)
+        (hcuPsiPair caseA θ hinv lam : ClassFunction ↥(hInHu data ⊔ cuInHu caseA) ℂ)
+        (1 : ↥(huSub data))
+      = (caseA.a : ℂ) := by
+  rw [ClassFunction.induce_apply_one, index_hcuInHu_eq_caseA_a,
+    show (hcuPsiPair caseA θ hinv lam : ClassFunction ↥(hInHu data ⊔ cuInHu caseA) ℂ)
+        (1 : ↥(hInHu data ⊔ cuInHu caseA)) = 1 from by
+      simp [hcuPsiPair, linearIrreducibleCharacter_apply_one], mul_one]
+
+/-- **`Ind_{HU}^M ζ_{θ₁,λ}(1) = q·a`** (Peterfalvi (9.8.d), full degree): `[M:HU]·ζ(1) = q·a`, from
+`induceHU_apply_one_eq_q_mul` and the source degree `a` (`hcuZetaPair_apply_one`).  This is the
+degree-`qa` claimed by (9.8.d) for the members of `𝒮(H₀U')`. -/
+theorem hcuZetaPair_induceHU_apply_one [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    (hinv : ∀ c : ↥(cuInHu caseA), ∀ h : ↥(hInHu data),
+      hcuSeedHom (chief := chief) θ
+          ⟨(c : ↥(huSub data)) * (h : ↥(huSub data)) * (c : ↥(huSub data))⁻¹,
+            (hInHu_normal data).conj_mem _ h.2 (c : ↥(huSub data))⟩
+        = hcuSeedHom (chief := chief) θ h)
+    (lam : ↥(cuInHu caseA) →* ℂˣ)
+    [Fintype ↥(huSub data)]
+    [Invertible (Nat.card ↥(hInHu data ⊔ cuInHu caseA) : ℂ)] :
+    induceHU data (ClassFunction.induce (hInHu data ⊔ cuInHu caseA)
+        (hcuPsiPair caseA θ hinv lam) : ClassFunction ↥(huSub data) ℂ) (1 : ↥M)
+      = ((data.q * caseA.a : ℕ) : ℂ) := by
+  rw [induceHU_apply_one_eq_q_mul, hcuZetaPair_apply_one, Nat.cast_mul]
+
+/-- **`hcuSeedHom`-invariance from the `C_U(S₀)`-inertia of `θ₀`** (Peterfalvi (9.8.d)): the
+`ClassFunction`-level invariance `conjBy c θ₀ = θ₀` (available as `cuInHu_le_inertia_of_complement_triv`)
+descends to the hom-level invariance `hinv` required by `hcuThetaHom`, because `θ₀` is the
+`linearClassFunction` of `hcuSeedHom θ` (via `compHom_linearIrreducibleCharacter`) and the coercion
+`ℂˣ → ℂ` is injective.  This bridges the substrate to the extension construction. -/
+theorem hcuSeedHom_invariance_of_cuInHu_le_inertia [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    (hle : cuInHu caseA ≤ ClassFunction.inertia (G := ↥(huSub data)) (H := hInHu data)
+        (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))) :
+    ∀ c : ↥(cuInHu caseA), ∀ h : ↥(hInHu data),
+      hcuSeedHom (chief := chief) θ
+          ⟨(c : ↥(huSub data)) * (h : ↥(huSub data)) * (c : ↥(huSub data))⁻¹,
+            (hInHu_normal data).conj_mem _ h.2 (c : ↥(huSub data))⟩
+        = hcuSeedHom (chief := chief) θ h := by
+  haveI := hInHu_normal data
+  intro c h
+  -- `θ₀ = linearClassFunction (hcuSeedHom θ)` and `conjBy (c:huSub) θ₀ = θ₀`.
+  have hconj : ClassFunction.conjBy (c : ↥(huSub data))
+      (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+        (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+          (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+      = ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+        (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+          (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)) :=
+    ClassFunction.mem_inertia.mp (hle c.2)
+  -- evaluate both sides at `h`; the seed-ClassFunction is `hcuSeedHom θ`.
+  have hval := congrFun (congrArg (fun f : ClassFunction ↥(hInHu data) ℂ => (f : ↥(hInHu data) → ℂ))
+    hconj) h
+  simp only [ClassFunction.conjBy_apply, ClassFunction.compHom_apply, MulEquiv.coe_toMonoidHom,
+    ClassFunction.compHom_linearIrreducibleCharacter, linearIrreducibleCharacter_apply] at hval
+  -- `hval : (θ (mk' N (hInHuEquivH ⟨c·h·c⁻¹⟩)) : ℂ) = (θ (mk' N (hInHuEquivH h)) : ℂ)`.
+  refine Units.val_injective ?_
+  simpa only [hcuSeedHom, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom] using hval
+
+/-- **Peterfalvi (9.8.d) source character in hom form**: the hom-level version of
+`exists_source_char_caseA`.  There is a homomorphism `θ : H̄ →* ℂˣ` and an `S₀`-summand complement `W`
+such that `linearIrreducibleCharacter θ` is nontrivial on `S₀`, trivial on `W`, and `W` is
+`U`-invariant with `S₀ ⊔ W = ⊤`.  Same construction as `exists_source_char_caseA` (nontrivial character
+of the order-`p` quotient `H̄/W` pulled back along `mk' W`), but returning the underlying hom so the
+extension `hcuThetaHom` and the `hcuSeedHom`-invariance can be built. -/
+theorem exists_source_char_hom_caseA [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) :
+    ∃ (θ : (↥data.H ⧸ chief.N) →* ℂˣ) (W : Subgroup (↥data.H ⧸ chief.N)),
+      OddOrder.Isaacs.Ch03.IsAInvariant (uActionHom data chief) W ∧
+      caseA.S0 ⊔ W = ⊤ ∧
+      (∃ x ∈ caseA.S0, (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+        ≠ (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1) ∧
+      (∀ w ∈ W, (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) w
+        = (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1) := by
+  obtain ⟨W, hWinv, hinf, hsup⟩ := chiefFactor_caseA_S0_complement caseA
+  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+    IsMulCommutative.of_comm chief.quotient_elementaryAbelian.comm
+  letI : CommGroup (↥data.H ⧸ chief.N) :=
+    { (inferInstance : Group (↥data.H ⧸ chief.N)) with
+      mul_comm := isMulCommutative_iff.mp inferInstance }
+  haveI := Fact.mk chief.p_prime
+  haveI : W.Normal := Subgroup.normal_of_comm W
+  letI : CommGroup ((↥data.H ⧸ chief.N) ⧸ W) := inferInstance
+  have hcompl : Subgroup.IsComplement' caseA.S0 W :=
+    Subgroup.isComplement'_of_disjoint_and_mul_eq_univ (disjoint_iff.mpr hinf)
+      (by rw [← Subgroup.mul_normal caseA.S0 W, hsup]; rfl)
+  have hS0card : Nat.card ↥caseA.S0 = chief.p := by
+    have h := caseA.Hpart_order ⟨0, data.nontrivial.2.1.pos⟩
+    rwa [caseA.Hpart_orbit ⟨0, data.nontrivial.2.1.pos⟩, card_pointwise_smul] at h
+  have hcard : Nat.card ((↥data.H ⧸ chief.N) ⧸ W) = chief.p := by
+    rw [← Subgroup.index_eq_card, hcompl.index_eq_card, hS0card]
+  obtain ⟨χbar, hχbar⟩ := exists_ne_one_hom_of_prime_card (K := (↥data.H ⧸ chief.N) ⧸ W)
+    (by rw [hcard]; exact chief.p_prime)
+  set θ : (↥data.H ⧸ chief.N) →* ℂˣ := χbar.comp (QuotientGroup.mk' W) with hθ
+  have hθW : ∀ w ∈ W, θ w = 1 := by
+    intro w hw
+    rw [hθ, MonoidHom.comp_apply, QuotientGroup.mk'_apply, (QuotientGroup.eq_one_iff _).mpr hw,
+      map_one]
+  refine ⟨θ, W, hWinv, hsup, ?_, ?_⟩
+  · by_contra hall
+    push_neg at hall
+    have hθS0 : ∀ s ∈ caseA.S0, θ s = 1 := by
+      intro s hs
+      have hθs := hall s hs
+      rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one,
+        Units.val_one] at hθs
+      exact Units.val_injective (by simpa using hθs)
+    have hθ1 : θ = 1 := by
+      refine MonoidHom.ext fun y => ?_
+      have hymem : y ∈ caseA.S0 ⊔ W := hsup ▸ Subgroup.mem_top y
+      rw [Subgroup.mem_sup] at hymem
+      obtain ⟨s, hs, w, hw, hsw⟩ := hymem
+      rw [← hsw, map_mul, hθS0 s hs, hθW w hw, mul_one, MonoidHom.one_apply]
+    exact hχbar ((MonoidHom.cancel_right (QuotientGroup.mk'_surjective W)).mp (hθ ▸ hθ1))
+  · intro w hw
+    rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one, Units.val_one,
+      hθW w hw, Units.val_one]
+
+/-- **Peterfalvi (9.8.d): the degree-`qa` irreducible character of `HU`/`M`.**  Fully assembling the
+(9.8.d) construction: there is a homomorphism `θ` (nontrivial on `S₀`), an `S₀`-summand complement
+`W`, and — for any `λ ∈ Irr(C_U(S₀))` — the pair character `θ₁·λ` on `H·C_U(S₀)` whose `HU`-induction
+`ζ_{θ₁,λ}` is **irreducible** of degree `[HU : H·C_U(S₀)] = a` (`hcuZetaPair_irreducible` +
+`hcuZetaPair_apply_one`), and whose `M`-induction `Ind_{HU}^M ζ_{θ₁,λ}` has degree `q·a = qa`
+(`hcuZetaPair_induceHU_apply_one`).  The inertia hypotheses are discharged from the substrate:
+`exists_source_char_hom_caseA` supplies `θ`/`W`, `inertia_eq_hcuInHu` gives
+`inertia(θ₀) = H·C_U(S₀)`, and `hcuSeedHom_invariance_of_cuInHu_le_inertia` (via
+`cuInHu_le_inertia_of_complement_triv`) gives the extension's compatibility `hinv`.  This packages the
+honest source-character content of (9.8.d); the `Ind_{HU}^M`-irreducibility (`W₁`-free-orbit
+propagation) and the `𝒮(H₀U')`-membership/count consume it. -/
+theorem caseA_exists_irreducible_source_degree_qa [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (lam : ↥(cuInHu caseA) →* ℂˣ)
+    [Fintype ↥(huSub data)]
+    [Fintype ↥(hInHu data ⊔ cuInHu caseA)]
+    [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    [Invertible (Nat.card ↥(hInHu data ⊔ cuInHu caseA) : ℂ)] :
+    ∃ ζ : ClassFunction ↥(huSub data) ℂ,
+      IsIrreducibleCharacter ζ ∧ ζ (1 : ↥(huSub data)) = (caseA.a : ℂ) ∧
+      induceHU data ζ (1 : ↥M) = ((data.q * caseA.a : ℕ) : ℂ) := by
+  haveI := hcuInHu_normal caseA
+  obtain ⟨θ, W, hWinv, hsup, hreg, htriv⟩ := exists_source_char_hom_caseA caseA
+  -- the seed inertia `inertia(θ₀) = H·C_U(S₀)` from the full inertia lift
+  have hθ₀ : ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+      (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+        (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+      = hInHu data ⊔ cuInHu caseA :=
+    inertia_eq_hcuInHu caseA hWinv hsup hreg htriv
+  -- the `hcuSeedHom`-invariance from the easy inertia direction
+  have hinv := hcuSeedHom_invariance_of_cuInHu_le_inertia caseA θ
+    (cuInHu_le_inertia_of_complement_triv caseA hWinv hsup htriv)
+  refine ⟨ClassFunction.induce (hInHu data ⊔ cuInHu caseA)
+      (hcuPsiPair caseA θ hinv lam), ?_, ?_, ?_⟩
+  · exact hcuZetaPair_irreducible caseA θ hinv lam hθ₀
+  · exact hcuZetaPair_apply_one caseA θ hinv lam
+  · exact hcuZetaPair_induceHU_apply_one caseA θ hinv lam
+
 /-- **Inertia lift `I_{HU}(θ₀) = HC`, parametrized over the hard direction** `I(θ₀) ⊓ U ≤ C`.  The
 case-agnostic assembly: `⊇` from `H ≤ I(θ₀)` (`subgroup_le_inertia`) and `cInHu_le_inertia` (both
 case-independent), `⊆` by the modular decomposition `g = h·u` (`H ⊔ U = ⊤`, `H ◁ HU`) with the
