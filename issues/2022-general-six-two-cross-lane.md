@@ -888,3 +888,11 @@ vs CharacterDifferenceImage.Orthogonal) の突合が実装時の最初の確認�
      m := orderOf... |L| 奇数冪); chain_exponent_eq_one → ē₀∘conjA ≡ 1 → ē₀ ≡ 1
      (conjA 全単射) → hfix (s^{e₀v} = s from ≡1 + order p) → caseA_fixed_contradiction。
   - f の乗法性: s₀ 生成元 + pow_eq_pow_iff_modEq + ZMod.natCast_eq (mod p 抽出)。
+
+
+## 2026-07-05 lane-a (loop 66): exponent bundle (exists_exponent_fun_of_card_prime)
+
+- (i) p∤e (ii) 冪表示 (iii) mod-p 乗法性 (iv) ≡1→固定 を 1 補題に束ねた (commit 参照)。
+- main 組立に必要な部品はこれで全て: frame (loop 61-62 流用) / S_gen closure (loop 65) /
+  exponent bundle (今回) / chain (loop 65) / endgame (loop 64) / 双線形 (loop 63)。
+- 次 iteration = chiefKernel_caseA_false 本体 (設計は loop 65 ログの 6 ステップ)。
