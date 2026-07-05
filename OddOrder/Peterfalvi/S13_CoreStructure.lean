@@ -1183,33 +1183,20 @@ theorem chief_H0_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [OddOrder.Peterfalvi.S11.typeP_conjAction_apply hyp.s11Setup.typeP ↑u n]
     have hcent := Subgroup.mem_centralizer_iff.mp (U_centralizes_H0 hyp huU) (n : G) hnH0
     rw [← hcent]; group
-  · -- **case (a)**: `U` fixes the order-`p` factor `S₀` pointwise, via the exponent chain
-    -- (`caseA_fixes_of_action_chain`) with `σ` the `W₁`-generator conjugation on the (normal)
-    -- `U`-subgroup.  The chain relation `hchain` — Peterfalvi's commutator-form antisymmetry —
-    -- is the sole remaining input; the exponent machinery/`caseA_fixed_contradiction` are proven.
-    haveI hUnorm : (hyp.s11Setup.typeP.U.subgroupOf
-        (hyp.s11Setup.typeP.U ⊔ hyp.s11Setup.typeP.W1)).Normal :=
-      (Subgroup.normal_subgroupOf_iff_le_normalizer le_sup_left).mpr
-        (sup_le Subgroup.le_normalizer hyp.s11Setup.typeP.W1_normalizes_U)
-    haveI := hyp.s11Setup.typeP.W1_cyclic
-    obtain ⟨w₀, -⟩ := IsCyclic.exists_generator (α := ↥hyp.s11Setup.typeP.W1)
-    set w : ↥(hyp.s11Setup.typeP.U ⊔ hyp.s11Setup.typeP.W1) :=
-      Subgroup.inclusion le_sup_right w₀ with hw
-    set σ : MulAut ↥(hyp.s11Setup.typeP.U.subgroupOf
-        (hyp.s11Setup.typeP.U ⊔ hyp.s11Setup.typeP.W1)) := MulAut.conjNormal w with hσ
-    have hσm : σ ^ orderOf w = 1 := by rw [hσ, ← map_pow, pow_orderOf_eq_one, map_one]
-    have hwodd : Odd (orderOf w) :=
-      hG.odd.of_dvd_nat ((orderOf_dvd_natCard w).trans (Subgroup.card_subgroup_dvd_card _))
+  · -- **case (a)**: `U` fixes the order-`p` factor `S₀` pointwise.  The commutator-form chain
+    -- (`caseA_commutator_chain`, Peterfalvi's non-Galois `D`-antisymmetry — the sole remaining
+    -- sorry) supplies the inverting automorphism `σ` (conjugation by the specific `W₁`-element
+    -- `w₁ w₂⁻¹`) with the chain relation; the exponent reduction (`caseA_fixes_of_action_chain`)
+    -- and `caseA_fixed_contradiction` are proven.
     have hAodd : Odd (Nat.card ↥(hyp.s11Setup.typeP.U.subgroupOf
         (hyp.s11Setup.typeP.U ⊔ hyp.s11Setup.typeP.W1))) :=
       hG.odd.of_dvd_nat ((Subgroup.card_subgroup_dvd_card _).trans
         (Subgroup.card_subgroup_dvd_card _))
-    refine caseA_fixed_contradiction hyp.chief hS₀ne
-      (caseA_fixes_of_action_chain hyp.chief hS₀card
-        (fun v s hs => hS₀inv.smul_mem v hs) hAodd σ hwodd hσm ?_)
-    -- **the commutator-form chain relation** (Peterfalvi (11.7), non-Galois case): the
-    -- `σ`-conjugate action inverts the `v`-action on `S₀` (`D`-antisymmetry).
-    sorry
+    obtain ⟨σ, m, hmodd, hσm, hchain⟩ :=
+      caseA_commutator_chain hyp.chief hS₀card (fun v s hs => hS₀inv.smul_mem v hs)
+    exact caseA_fixed_contradiction hyp.chief hS₀ne
+      (caseA_fixes_of_action_chain hyp.chief hS₀card (fun v s hs => hS₀inv.smul_mem v hs)
+        hAodd σ hmodd hσm hchain)
 
 /-- **Peterfalvi (11.7)**: `H` is elementary abelian of order `p^q`, and `H_0 = 1`.
 

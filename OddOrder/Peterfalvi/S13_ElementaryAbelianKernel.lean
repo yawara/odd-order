@@ -767,6 +767,32 @@ theorem caseA_fixes_of_action_chain [Finite G] {M : Subgroup G}
   have hf1 : f v = 1 := chain_exponent_eq_one f (fun u v => hemul u v) hne hAodd σ hmodd hσm hrel v
   rw [← hφv v]; exact hefix v hf1 s hs
 
+/-- **Case (a), the commutator-form chain relation** (Peterfalvi (11.7), non-Galois case) — the
+sole remaining `sorry` of the (11.7) kernel-triviality `chief_H0_eq_bot`.  For the order-`p`
+`U`-invariant `S₀ ≤ H̄` there is an automorphism `σ` of the acting `U`-group, of odd order, whose
+conjugate action inverts every `v`-action on `S₀` — the chain relation `(φ v) ∘ (φ (σ v)) = id`.
+Fed to `caseA_fixes_of_action_chain`, this forces `U` to fix `S₀` pointwise.
+
+The `σ` is conjugation by the *specific* `W₁`-element `w₁ w₂⁻¹` at which the commutator form
+`D(y,z) = ⁅ẑ, ŷ⁆` on `Ĥ = H/Q` (`Q` maximal in `H₀`) is nontrivial — **not** a generic generator,
+so it must be produced together with the chain relation (hence the existential).  Proof outline
+(Coq `FTtype34_Fcore_kernel_trivial`, `PFsection11.v`:365-540): `Ĥ = H/Q` is class-`2` with
+`Ĥ' = H₀/Q` of order `p` (`exists_normal_subgroup_index_prime`, `quotient_classTwo_structure`);
+`D` is antisymmetric (`⁅b,a⁆ = ⁅a,b⁆⁻¹`) and bilinear (central commutators, `commutatorElement_*`);
+it is nontrivial on the `W₁`-conjugation basis `x_w` of `H̄` (as `Ĥ' ≠ 1`), giving `w₁, w₂` with
+`#|D(x_{w₁}, x_{w₂})| = p`; the exponent relation and odd `#|W₁/H₀|` then give `phi = phi⁻¹`. -/
+theorem caseA_commutator_chain [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    {S₀ : Subgroup (↥data.H ⧸ chief.N)} (hcardS₀ : Nat.card ↥S₀ = chief.p)
+    (hmem : ∀ (v : ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))),
+      ∀ s ∈ S₀, quotientMulAutHom chief.N_aInvariant ↑v s ∈ S₀) :
+    ∃ (σ : MulAut ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))) (m : ℕ),
+      Odd m ∧ σ ^ m = 1 ∧
+      ∀ (v : ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))),
+        ∀ s ∈ S₀, quotientMulAutHom chief.N_aInvariant ↑v
+          (quotientMulAutHom chief.N_aInvariant ↑(σ v) s) = s := by
+  sorry
+
 end CaseA
 
 end OddOrder.Peterfalvi.S13
