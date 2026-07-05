@@ -896,3 +896,74 @@ vs CharacterDifferenceImage.Orthogonal) の突合が実装時の最初の確認�
 - main 組立に必要な部品はこれで全て: frame (loop 61-62 流用) / S_gen closure (loop 65) /
   exponent bundle (今回) / chain (loop 65) / endgame (loop 64) / 双線形 (loop 63)。
 - 次 iteration = chiefKernel_caseA_false 本体 (設計は loop 65 ログの 6 ステップ)。
+
+## 2026-07-05 lane-a (loop 67): full build 検証 + main 組立 handoff
+
+Full build 3928 jobs green (2m11s)。(11.7) の残作業 = 以下の 2 定理のみ:
+
+### A. chiefKernel_caseA_false (S13_ElementaryAbelianKernel.lean, CaseA section 内に追加)
+
+署名 = chiefKernel_caseB_false と同型だが hirr の代わりに
+(S₀ : Subgroup (↥data.H ⧸ chief.N)) (hS₀ne : S₀ ≠ ⊥)
+(hS₀inv : IsAInvariant ((typeP_quotientCoprimeAction …).φ.comp (…).U.subtype) S₀)
+(hS₀card : Nat.card ↥S₀ = chief.p) + (hGodd : Odd (Nat.card G)) を取る。False を結論。
+
+手順 (全部品はファイル内に既存):
+1. case-b と同じ frame を再構築: Q (exists_normal_subgroup_index_prime) →
+   quotient_classTwo_structure → π/hπmk/hπker → hQinv → σ := quotientMulAutHom hQinv →
+   hπσ (帰納+rfl)。σ は N̂ を pointwise 固定 (hUcent 降下; hπker 経由の要素計算)。
+2. e-bundle: exists_exponent_fun_of_card_prime chief.p_prime hS₀card
+   (φ := (typeP_quotientCoprimeAction …).φ.comp (…).U.subtype)
+   (hmem := fun v s hs => IsAInvariant.smul_mem hS₀inv v hs) → ⟨e, hep, he, hemul, hefix⟩。
+3. S_gen := (π : Ĥ →* H̄) ⁻¹' (⋃ a, ((quotientMulAutHom chief.N_aInvariant a) • S₀ : Set _));
+   1 ∈ ⋃ (a := 1 で S₀.one_mem; smul-membership は ⟨1, S₀.one_mem, map_one …⟩);
+   closure (⋃) = ⊤: iSup_smul_eq_top_of_irreducible + Subgroup.iSup_eq_closure
+   (name 要確認; ⨆ = closure (⋃ coe) の変換) → closure_preimage_eq_top_of_closure_eq_top
+   (π 全射 = QuotientGroup.map_surjective or mk-lift) → closure S_gen = ⊤。
+4. by_cases hDall : ∀ x ∈ S_gen, ∀ y ∈ S_gen, Commute x y
+   - true: commute_all_of_closure_eq_top → 可換 → commutator Ĥ = ⊥ (case-b の J=⊤ 分岐末尾と
+     同じ: eq_bot_iff + commutator_le + mem_center) ↯ hcommHat + hNhatCard (card p ≠ 1)。
+   - false: push_neg → ⟨x̂, hx, ŷ, hy, hnc⟩; hx : π x̂ ∈ ⋃ → ⟨a, hxa⟩; hy → ⟨b, hyb⟩。
+5. c := ⁅x̂,ŷ⁆: c ≠ 1 (commutatorElement_eq_one_iff_mul_comm + hnc); c ∈ N̂
+   (hcommHat ▸ commutator_mem: ⁅x̂,ŷ⁆ ∈ ⁅⊤,⊤⁆ = commutator = N̂); c 中心 (hNhatLe);
+   orderOf c = p (N̂ card p, c ≠ 1: orderOf ∣ p prime, ≠ 1 — subtype 経由 loop 66 と同型)。
+6. 各 u : ↥Usub で: σu x̂ = x̂ ^ e (conjA a u) * ẑ 形:
+   - conjA a u : ↥Usub := ⟨a⁻¹ * ↑u * a, by simpa using hUnorm.conj_mem ↑u u.2 a⁻¹⟩
+   - π (σu x̂) = φ'u (π x̂) (hπσ) = φ'(conj 分解): φ'u (φa s) 転送は endgame 補題内の計算と同じ
+     (map_mul + MulAut.mul_apply + he (conjA a u) s hs) → = (π x̂)^{e (conjA a u)}
+   - ẑ := (x̂ ^ e (conjA a u))⁻¹ * σu x̂ ∈ ker π = N̂ (map_mul/map_pow で計算) → 中心。
+   - σu c = ⁅σu x̂, σu ŷ⁆ (map_commutatorElement) = ⁅x̂^k * ẑ...⁆ — 表示を x̂^k * ẑ に直すには
+     σu x̂ = x̂^k * ẑ (mul_inv_cancel 変形)。中心 drop ×2 (commutatorElement_mul_center_left/right)
+     → ⁅x̂^k, ŷ^l⁆ → 冪双線形 ×2 → c^{k*l}。
+   - σu c = c (σ の N̂-pointwise 固定) → c = c^{kl} → orderOf c = p ∣ kl - 1 →
+     ZMod p: (e (conjA a u) : ZMod p) * (e (conjA b u)) = 1
+     (pow_eq_pow_iff_modEq at exponents 1 vs kl + ZMod.natCast_eq_natCast_iff; kl ≥ 1 注意 —
+     c^1 = c^{kl} 形で扱えば subtraction 不要)。
+7. chain: f : ↥Usub → ZMod p := fun v => e (conjA a v); σ_c := MulAut conj by (a⁻¹ * b) on ↥Usub
+   (MulAut.conjNormal?? — ↥Usub は abstract group なので MulAut.conj (c : ↥Usub)?? 注意:
+   conj は L-元 a⁻¹b による ↥Usub 上の自己同型 — L が Usub を正規化 → 構成は
+   (typeP 側) … 素直には: ↥Usub の元でなく L-元による conj なので MulEquiv を手書き:
+   σc : ↥Usub ≃* ↥Usub := ⟨fun v => ⟨(a⁻¹*b)⁻¹ * ↑v * (a⁻¹*b), …⟩, …⟩ か、
+   MulAut.conjNormal ((a⁻¹*b) : ↥L) (H := Usub) — conjNormal : L →* MulAut ↥Usub ✓ これで OK
+   (Usub.Normal instance = hUnorm)。向き (c⁻¹vc vs cvc⁻¹) は 6 の等式に合わせて調整。
+   - hrel: (†) を u := ⟨a v a⁻¹⟩ 代入 → f v * f (σc v) = 1 (loop 65 設計通り)。
+   - m := Nat.card ↥L (σc^m = 1: (conjNormal)^m = conjNormal (c^m) = conjNormal 1 = 1 via
+     pow_card_eq_one; hmodd : Odd (Nat.card ↥L) from hGodd.of_dvd_nat)。
+   - hAodd : Odd (Nat.card ↥Usub) 同様。
+   - hne : f v ≠ 0 (hep + ZMod.natCast_zmod_eq_zero_iff_dvd: (n : ZMod p) = 0 ↔ p ∣ n)。
+   - hmul : f (u*v) = f u * f v — 注意! f = e ∘ conjA a は e の乗法性 + conjA a が
+     群準同型 (conjA a (u*v) = conjA a u * conjA a v ✓ subtype ext で) から。
+   - chain_exponent_eq_one → f ≡ 1 → e (conjA a v) ≡ 1 ∀v → v' := conjA a v は v を走ると
+     全 ↥Usub を走る (conjA a 全単射: inverse = conjA a⁻¹) → e ≡ 1 on ↥Usub
+   - hefix → ∀ v s ∈ S₀, φ'v s = s → caseA_fixed_contradiction chief hS₀ne hfix。
+
+### B. master + S13 instantiation (次々 iteration)
+
+- chiefKernel_eq_bot: by_contra + chiefFactor_clifford_U_dichotomy chief → case b / case a。
+  q-odd は hGodd.of_dvd_nat (card_subgroup_dvd) で W₁ から。
+- S13_CoreStructure.H_elementaryAbelian: hpK = (hyp.H_isPGroup hG を chief.p に変換 —
+  hyp.p = base.w2 vs chief.p: chief.typeIII_IV_p_eq_W2 hyp.type_alt : Nat.card W₂ = chief.p と
+  hyp.p = Nat.card W₂ (w2 def) で一致); hNcomm from H0_eq_Hprime + H0_eq + map-injective;
+  hUcent from U_centralizes_H0 (G-level → action-level 変換; typeP_conjAction_apply で coe 計算);
+  setup_typeP_eq 転送に注意。結論 3 conjuncts: N = ⊥ → H ≅ H̄ (QuotientGroup.quotientBot 経由
+  or H0_eq + card) で elementary abelian + card p^q。
