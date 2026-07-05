@@ -54,3 +54,17 @@ counts 不使用 (4-elt uniform family T2 の `uniform_degree_coherence` で loc
   PFsection5.v (uniform_degree_coherence, subcoherent)
 - stale docstring 修正候補: S12_Core:2836 (`exists_typeII_maximal_with_w2_of_typeP` は proven,
   「sorry」記述 stale)。
+
+## 🧭 HUB 裁定 (2026-07-05, 帰属/着手 — POLE-2 coordination クラスタ、ユーザー「判断して」委任下)
+
+**判定: §5 coherence infra (uniform_degree_coherence + subcoherent/FTtypeP_subcoherent) の着手 = lane a**。
+理由: (1) a は gate-1 CLOSED 後 group-theory ungated frontier を完遂し**現在 free**、(2) a が subagent
+精査で本 prereq を診断・Coq PFsection5 mirror を把握済み、(3) §5 coherence は a 自身の char capstone
+(10.8 typeII estimate) の直接 unblock ゆえ consumer=a、(4) プロジェクト方針「deep なら正面から engage・
+アイドル禁止」。**境界**: a は **新規 §5 coherence leaf を新設**する (例 `Peterfalvi/S05_UniformDegreeCoherence.lean`
+or `GroupTheory/**` coherence leaf; 「未所有 leaf 新設は consumer が他レーンでも in-scope」)。**b の既存
+`S07_Coherence*` は編集しない** (coherence owner=b の awareness は本 issue で確保、既存 file への追加が
+必要なら hub flag)。b は §13 η-grid keystone (issue 3002) に集中継続、c は S16 consumer wiring 継続。
+⟹ 3 レーン全てが char endgame の別 keystone を並行 deep-engage (a=§5 coherence / b=§13 η-grid /
+c=S16 wiring)、lane 数 3 維持・アイドルなし。a は本 leaf 完成後 (10.7) typeII_derived_frobenius →
+(10.8) estimate を閉じ、a 自身の char capstone を landing する。

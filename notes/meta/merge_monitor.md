@@ -304,6 +304,21 @@
 
 ## 現状メモ
 
+- **2026-07-05 (3) — tick: b の §13 η-grid keystone Step-D fallback (spine axiom 表明無効化) を STOP→ユーザー受理 + issue 1017 (§5 coherence) hub 裁定**:
+  HUB 裁定 (POLE-2) どおり b が §13 η-grid keystone に着手 (issue 3002): Section16Inputs/CharacterData に
+  Pf (3.9) η-grid Dade fields を threading。**副作用で spine producer `section16CharacterData_of_isMinimalSimpleOdd`
+  が sorryAx transit → `#assert_only_allowed_axioms` を一時無効化** (3.9.a `eta_pair_of_coprime` =
+  finNeg 組合せ転置 ≠ rowInv 指標反転 の documented gate; 3.9.c/3.9 は sorry-free 供給)。[[scaffold-sorry-free-not-done]]
+  「従来 sorry-free spine への sorry 混入=HOLD」に該当し **b の合流を abort → ユーザー裁定 = 受理 (Step-D
+  fallback 承認、field land で c の EtaGenericData wiring 即 unblock を優先)**。**axiom 表明再有効化条件 =
+  b が (3.9.a) を honest close (rowInv/colInv restatement、one_le_norm_signed_paired_sum が support) した時点**
+  (issue 3002 で追跡)。⟹ 以後、spine の `#assert_only_allowed_axioms` 無効化は本 (3.9.a) gate 由来の 1 件のみ
+  許容 (他 spine 表明の無効化は依然 HOLD+flag)。a/c は本 tick clean 合流 (a=gate-1 threading docs+issue /
+  c=bessel field close −1)。**issue 1017 (§5 uniform_degree_coherence + subcoherence 欠落 = a の 10.8 char
+  capstone prereq) hub 裁定 = 着手 lane a** (free + 診断済 + consumer、新規 §5 leaf 新設、b の S07_Coherence*
+  非接触)。⟹ 3 レーンが char endgame の別 keystone を並行 deep-engage (a=§5 coherence / b=§13 η-grid /
+  c=S16 wiring)。full build green 3929 / sorry 101→101 (a −1 gate-1 系, c −1 bessel, b +1 3.9.a gate = 差引 −1
+  だが c 合流時 100 → b 合流時 101)。push 完了。
 - **2026-07-05 (2) — tick: b の Hypothesis76 zeta_induced (S09_NonexistenceCertain) STOP→ユーザー裁定受理 + 38-commit burst 合流**:
   b が a 所有 `S09_NonexistenceCertain` の `structure Hypothesis76` に field `zeta_induced` (Pf (7.6)
   忠実、(13.5.a) 整数性の供給) を追加 = 3002 供給編集権 (additive helper 限定) の外 → 手順どおり
