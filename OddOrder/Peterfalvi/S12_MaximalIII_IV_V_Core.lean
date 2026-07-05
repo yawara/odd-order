@@ -4633,6 +4633,73 @@ theorem Hypothesis.tau_zeta_sub_conj_vanishes_on_typePV [Finite G]
     rw [hζeq]; exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hnotmem
   rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hζv, star_zero, sub_zero]
 
+open scoped FiniteInduce in
+/-- **`(χ − χ̄)^τ` is orthogonal to every aligned `σ`-grid entry** (Peterfalvi (5.3.b),
+generalised from `ζ` to any irreducible member of `S`): the difference image vanishes on `V`
+(`tau_zeta_sub_conj_vanishes_on_typePV`), lies in `ℤ[Irr G]` with norm `2`, so by the
+`(3.7)/(3.8)` all-zero trichotomy (`sigmaCoeff_eq_zero_of_vanishOnV`) every `σ`-coefficient —
+in particular every `⟨·, ω_{ik}^σ⟩` — vanishes.  This is the (5.2.e) member-vs-column
+orthogonality core (issue 2022). -/
+theorem Hypothesis.tau_chidiff_inner_alignedOmega_eq_zero [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) {χ : ClassFunction ↥M ℂ}
+    (hχS : χ ∈ inducedFamily M) (hχirr : IsIrreducibleCharacter χ)
+    (i : Fin hyp.w1) (k : Fin hyp.w2) :
+    ClassFunction.inner (hyp.tau (χ - χ.conj))
+      (hyp.alignedOmegaSigmaGrid hG hodd i k) = 0 := by
+  haveI := hyp.finiteG
+  classical
+  let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
+  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  let app := hyp.canonicalFullDadeApp hG hodd
+  have hVeq : tic.V = tic.Vdiff := rfl
+  -- `T`-facts
+  have hχcS : χ.conj ∈ inducedFamily M := inducedFamily_closedUnderConjugate M hχS
+  have hχcirr : IsIrreducibleCharacter χ.conj := hχirr.conj
+  have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+  have hχne : χ.conj ≠ χ := inducedFamily_hasNoRealCharacters hModd hχS
+  have hvanish : ∀ w ∈ tic.V, hyp.tau (χ - χ.conj) w = 0 := fun w hw =>
+    hyp.tau_zeta_sub_conj_vanishes_on_typePV hG hodd hχS hχirr hw
+  have hsupp := hyp.zeta_sub_conj_support hG hodd hχS hχirr
+  have hTZ : hyp.tau (χ - χ.conj) ∈ ZIrr G := by
+    refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+      hyp.dadeData.dade hyp.hconj hsupp ?_
+    exact Submodule.sub_mem _ hχirr.mem_ZIrr hχcirr.mem_ZIrr
+  have hT2 : ClassFunction.inner (hyp.tau (χ - χ.conj)) (hyp.tau (χ - χ.conj)) = 2 := by
+    have hset : ∀ s ∈ ({χ - χ.conj} : Set (ClassFunction ↥M ℂ)), s.support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (typePA0 M hyp.typeP) M := by
+      rintro s rfl
+      exact hsupp
+    have hmem : χ - χ.conj ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M)
+        ({χ - χ.conj} : Set (ClassFunction ↥M ℂ)) := Submodule.subset_span rfl
+    have hpres := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
+      hyp.dadeData.dade hyp.hconj hset hmem hmem
+    rw [show hyp.tau = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) from rfl, hpres,
+      ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right]
+    have h11 : ClassFunction.inner χ χ = 1 := by
+      simpa using irreducibleCharacter_inner_eq_ite
+        (⟨χ, hχirr⟩ : IrreducibleCharacter ↥M) ⟨χ, hχirr⟩
+    have hcc : ClassFunction.inner χ.conj χ.conj = 1 := by
+      simpa using irreducibleCharacter_inner_eq_ite
+        (⟨χ.conj, hχcirr⟩ : IrreducibleCharacter ↥M) ⟨χ.conj, hχcirr⟩
+    have hcross : ClassFunction.inner χ χ.conj = 0 :=
+      inducedFamily_pairwiseOrthogonal hχS hχcS (Ne.symm hχne)
+    have hcross' : ClassFunction.inner χ.conj χ = 0 :=
+      inducedFamily_pairwiseOrthogonal hχcS hχS hχne
+    rw [h11, hcc, hcross, hcross']
+    ring
+  -- engine + `P`-enumeration
+  have hall := tic.sigmaCoeff_eq_zero_of_vanishOnV hVeq app hTZ hT2 hvanish
+  obtain ⟨P, hPinj, hP⟩ := hyp.exists_alignedOmegaSigmaGrid_chiFam_family hG hodd i
+  have hk := hall (P k)
+  rw [show tic.sigmaCoeff hVeq app (hyp.tau (χ - χ.conj)) (P k)
+      = ClassFunction.inner (hyp.tau (χ - χ.conj)) (tic.chiFam hVeq app (P k)) from rfl,
+    ← hP k] at hk
+  exact hk
+
 /-- **Norm-`1` projection orthogonality.**  If `a, s ∈ ℤ[Irr G]` with `‖a‖² = ‖b‖² = ‖s‖² = 1`,
 `a ⊥ b`, and the difference `a − b` is orthogonal to `s`, then `a ⊥ s`.
 
