@@ -323,3 +323,22 @@ genuine target = この quotient-Dade bridge の構築。
 - 原典: Pf §9 = `references/peterfalvi/04.11` + (9.7)-(9.11); (10.7) 証明 = `04.12` line 71。
 - 関連: issue 2020, `notes/peterfalvi/s13_11_8_orthogonality.md`,
   `notes/peterfalvi/s12_10_8_noncoherence.md`。
+
+## 2026-07-06 lane-a /loop — (10.8) scoping が本 keystone への収束を再確認 + frontier 明確化
+
+`/loop Aレーンを進めます` で (10.8) `typeII_coherence_contradiction_estimate` (S12:453) を subagent 精査 →
+**本 2030 keystone に bottom out することを再確認** (notes/s12_10_8_noncoherence.md, commit a3f5baa3):
+- (10.8) の `∃u≥7` goal は type-II partner の `|U|` を existential bundle → **(10.7) `typeII_derived_frobenius`
+  に gated**。(10.7) の Coq `Frob_der1_type2` は partner chief factor に (9.8.b)/(9.9.b)/(9.10) を cite
+  (= 本 issue の §9 counts) **加えて** prime-TI-reducible apparatus (`primeTIred`/`FTtypeP_subcoherent`/
+  `cyclicTIiso`, Coq §3/§4) を T2 4-member family coherence 用に要する (repo 不在)。
+- ∴ (10.7) は **本 issue の §9 counts (task B/C) + 別途 prime-TI foundation** の両方を要する。
+- **一方 (11.8) 側** (gate-2 `coherent_Sset_of_column_identities`) は (9.11) `sibleyTarget_H0C` (§14-gated)
+  + carrier bridge。§9 counts (B/C) は両 obligation の共通 prerequisite。
+- **stale 訂正**: issue 1017 の「§5 uniform_degree_coherence 不在」は誤り (= `coherent_of_constant_degree`
+  完遂済)。issue 1017 RE-DIAGNOSIS 節参照。
+
+**⟹ 現 ungated lane-a frontier = task B (case-(b) §9 count) の Clifford 次数 assembly** (本 issue 上記
+task B: χ∈Irr(HU) の Res_H → realized-inflation constituent θ + 誘導次数 χ(1)=u)。infra 全存在
+(`caseB_inertia_realized` ✓ / `isIrreducibleCharacter_induce_of_inertia_eq` / `card_filter_induce_eq_index_inertia`)、
+「新 math 0・intricate realization」。次 subagent (2026-07-06 lane-a) がこの Clifford 次数 brick を build 中。
