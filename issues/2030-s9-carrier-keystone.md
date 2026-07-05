@@ -381,3 +381,29 @@ caseA sorry 9820 より上流、build で確認):
 (case-(a) (9.8.d) degree-qa Dade count、新規 infra 構築) か task D ((9.11) §14 witness、gated)。(10.7)/(10.8)・
 (11.8) の §9 依存のうち **case-(b) 分 ((9.9)/(9.9.b)/(9.9.c)) は解消済**; 残依存は (9.8.b) [済] + (9.8.d) [task C] +
 (9.10) type-II Frobenius [H₀=1 gated] + prime-TI foundation (repo 不在)。
+
+## 2026-07-06 lane-a /loop — (9.8.d) case-(a) degree-qa count 大幅前進 (6 verified landings)
+
+`/loop Aレーンを進めます` 継続セッション。task C = (9.8.d) `caseA_character_counts` conjunct (d)
+(case-(a) degree-qa Dade count) を substrate から系統的に build。**6 commit landed (全 exit-0 green,
+no new sorry/axiom, AxiomsCheck OK)**:
+- `23424b59`: **de-hoist** `CliffordCaseAData.a` (free field → genuine cardinality) + degree-index
+  substrate (`cuSub`/`cuInHu`=C_U(S₀), `index_hcuInHu_eq_caseA_a`=[HU:H·C_U(S₀)]=a)。
+- `6c8734ef`: hard inertia direction `inertia_inf_uInHu_le_cuInHu`。
+- `62d1879e`: **full inertia** `inertia_eq_hcuInHu` (I_{HU}(θ₁₀)=H·C_U(S₀), S₀-summand decomp via
+  operator Maschke) + source char `exists_source_char_caseA`。
+- `ddfb4d0e`: λ-lift channel `hcuLambdaHom` + `hInHu_inf_cuInHu_eq_bot`。**構造訂正**: H·C_U(S₀)=
+  H⋊C_U(S₀) は**半直積** (C_U(S₀) 非正規)→θ₁ は extension (inflation でない)。
+- `3668e556`: **degree-qa irreducible char capstone** `caseA_exists_irreducible_source_degree_qa`
+  (∃ζ, irreducible ∧ ζ(1)=a ∧ Ind_{HU}^M ζ(1)=qa)、θ₀-extension via `SemidirectProduct.lift`。
+- `936771c0`: count 前提 `uprimeSub_le_cuSub` (U'≤C_U(S₀)) + `realizedH0supUprime_normal_huSub` (H₀U'◁M)。
+
+**残 (9.8.d) = count の hard research core** (subagent a80c2a1e が着手中):
+- (iii) membership ∈𝒮(H₀U'): **tractable** plumbing (前提 landed、mirror hcZetaPair_mem_xiSet)。
+- (iv) Ind_{HU}^M irreducibility: **hard-absent** = **single-summand** S₀-supported θ₁ の W₁-free-orbit
+  propagation (既存 clifford_caseA は full regular seed 用)。
+- (v) count bijection: **hard-absent** = U-orbit descent (`OrbitOnIrr.card_image_induce_eq_div` は
+  normality 要、C_U(S₀) 非正規ゆえ不適 → U-orbit (size a) conjugation-descent 補題 要)。
+
+⟹ (9.8.d) は source-char + degree 完成、残は **count の (iv)/(v) research infra** (single-summand
+orbit propagation + U-orbit count descent)。iii が landing すれば substrate は count 直前まで完備。

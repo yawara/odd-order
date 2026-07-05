@@ -1744,6 +1744,57 @@ theorem cSub_normalized_by_uW1 [Finite G] (data : TypesIIIIIIVSetup M)
     (data.typeP.U ⊔ data.typeP.W1).subtype
   rwa [Subgroup.normalizer_eq_top, ← MonoidHom.range_eq_map, Subgroup.range_subtype] at h1
 
+open scoped IsMulCommutative in
+/-- **`C_U(H) ≤ C = C_U(H̄)`** (`U ∩ centralizer H ≤ cSub`): a `U`-element centralizing `H` (in `G`)
+acts trivially on the chief factor quotient `H̄ = H/N`, hence lies in `ker(uActionHom)`, i.e. in
+`C = cSub`.  Centralizing `H` pointwise makes conjugation trivial on every coset `hN`, so the induced
+automorphism of `H̄` is the identity.  This is the containment `[U,U] ≤ C(H) ⟹ U' ≤ C` behind
+Peterfalvi (9.8.d)'s `U' ≤ C_U(S₀)` and the (9.9) `C' = [C,C]` normality inputs. -/
+theorem mem_cSub_of_mem_U_of_centralizes [Finite G] {M : Subgroup G}
+    (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data) {x : G}
+    (hxU : x ∈ data.typeP.U) (hxC : x ∈ Subgroup.centralizer (data.typeP.H : Set G)) :
+    x ∈ cSub data chief := by
+  haveI : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
+  have hxUW1 : x ∈ data.typeP.U ⊔ data.typeP.W1 := Subgroup.mem_sup_left hxU
+  -- the `U`-action element with `G`-coordinate `x`
+  set a : ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) :=
+    ⟨⟨x, hxUW1⟩, Subgroup.mem_subgroupOf.mpr hxU⟩ with ha_def
+  -- `a ∈ ker(uActionHom)`: conjugation by `x ∈ C(H)` is trivial on `H`, hence on `H̄`.
+  have hker : a ∈ (uActionHom data chief).ker := by
+    rw [MonoidHom.mem_ker]
+    ext q
+    induction q using QuotientGroup.induction_on with
+    | _ h =>
+      rw [uActionHom, MonoidHom.comp_apply,
+        OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply,
+        MulAut.one_apply]
+      -- conjugation by `x` fixes `h` since `x` centralizes `H`
+      have hfix : (typeP_conjAction data.typeP
+          ((data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype a) h) = h := by
+        apply Subtype.ext
+        rw [typeP_conjAction_apply]
+        have hcom : (h : G) * x = x * (h : G) :=
+          (Subgroup.mem_centralizer_iff.mp hxC) (h : G) h.2
+        show x * (h : G) * x⁻¹ = (h : G)
+        rw [← hcom, mul_assoc, mul_inv_cancel, mul_one]
+      rw [hfix]
+  simp only [cSub, Subgroup.mem_map]
+  exact ⟨_, ⟨a, hker, rfl⟩, rfl⟩
+
+/-- **`U' = [U,U] ≤ C = C_U(H̄)`** (`uprimeSub ≤ cSub`, Peterfalvi (9.5)/(8.5.b)): the derived
+subgroup of `U` centralizes `H` (`typeP_commutator_U_centralizes_H`) and lies in `U`
+(`uprimeSub_le_U`), so by `mem_cSub_of_mem_U_of_centralizes` it lies in `C`.  Peterfalvi cites this
+as "(8.5.b): `U'` centralizes `H`". -/
+theorem uprimeSub_le_cSub [Finite G] {M : Subgroup G}
+    (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data) :
+    uprimeSub data ≤ cSub data chief := by
+  intro x hx
+  refine mem_cSub_of_mem_U_of_centralizes data chief (uprimeSub_le_U data hx) ?_
+  have hxUU : x ∈ ⁅data.U, data.U⁆ := by
+    rw [uprimeSub, derivedInG, commutator_def, Subgroup.map_commutator] at hx
+    simpa only [← data.U.subtype.range_eq_map, Subgroup.range_subtype] using hx
+  exact typeP_commutator_U_centralizes_H data.typeP hxUU
+
 /-! ### (9.9.a) realization: `HC ◁ HU` (the inertia subgroup is normal)
 
 For the (9.9.a) Clifford degree `χ(1) = u` we induce from the inertia subgroup `HC` of a chief-factor
@@ -4180,6 +4231,21 @@ theorem cSub_le_cuSub (caseA : CliffordCaseAData chars) : cSub data chief ≤ cu
 
 theorem cInHu_le_cuInHu (caseA : CliffordCaseAData chars) : cInHu data chief ≤ cuInHu caseA :=
   Subgroup.subgroupOf_mono _ (Subgroup.subgroupOf_mono _ (cSub_le_cuSub caseA))
+
+/-- **`U' ≤ C_U(S₀)`** (`uprimeSub ≤ cuSub`, Peterfalvi (9.8.d)): the derived subgroup `U' = [U,U]`
+lies in the single-factor centralizer `C_U(S₀)`, via `U' ≤ C = C_U(H̄) ≤ C_U(S₀)`
+(`uprimeSub_le_cSub` then `cSub_le_cuSub`).  This is the containment behind the (9.8.d) parameter
+`λ ∈ Irr(C_U(S₀)/U')` and the `𝒮(H₀U')`-membership of the induced characters. -/
+theorem uprimeSub_le_cuSub [Finite G] (caseA : CliffordCaseAData chars) :
+    uprimeSub data ≤ cuSub caseA :=
+  (uprimeSub_le_cSub data chief).trans (cSub_le_cuSub caseA)
+
+/-- **`U' ≤ C_U(S₀)` realized inside `HU`** (`Uprime`/`uprimeSub` ⟶ `cuInHu`).  The `HU`-realized form
+of `uprimeSub_le_cuSub`: `(U'.subgroupOf M).subgroupOf HU ≤ cuInHu`.  Used to identify `λ` trivial on
+`U'` as a character of `C_U(S₀)/U'` in the (9.8.d) count. -/
+theorem uprimeSub_subgroupOf_le_cuInHu [Finite G] (caseA : CliffordCaseAData chars) :
+    ((uprimeSub data).subgroupOf M).subgroupOf (huSub data) ≤ cuInHu caseA :=
+  Subgroup.subgroupOf_mono _ (Subgroup.subgroupOf_mono _ (uprimeSub_le_cuSub caseA))
 
 /-- **`H ⊓ U ≤ C_U(S₀)`** realized (`hInHu ⊓ uInHu ≤ cuInHu`): an `H ⊓ U` element centralizes the
 chief factor `H̄` (`hInHu_inf_uInHu_le_cInHu`), hence `S₀ ≤ H̄` (`cInHu_le_cuInHu`). -/
@@ -7124,6 +7190,86 @@ theorem cprimeSub_normalized_by_uW1 [Finite G] {M : Subgroup G} (data : TypesIII
     show cprimeSub data chief = ⁅cSub data chief, cSub data chief⁆ from
       derivedInG_eq_commutator _,
     Subgroup.pointwise_smul_def, Subgroup.map_commutator, ← Subgroup.pointwise_smul_def, hgC]
+
+/-- **`U W₁ ≤ N_G(U')`** (the `U W₁`-half of `H₀U' ◁ M`, Peterfalvi (9.8.d)): `U W₁` normalizes
+`U' = [U,U]`.  `U ⊔ W₁ ≤ N(U)` (`U ≤ N(U)` and `W₁ ≤ N(U)` by `W1_normalizes_U`), and normalizing
+`U` normalizes its derived subgroup `[U,U]`.  Mirror of `cprimeSub_normalized_by_uW1`. -/
+theorem uprimeSub_normalized_by_uW1 [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M) :
+    data.typeP.U ⊔ data.typeP.W1
+      ≤ Subgroup.normalizer ((uprimeSub data : Subgroup G) : Set G) := by
+  intro g hg
+  have hgN : g ∈ Subgroup.normalizer (data.U : Set G) :=
+    (sup_le (Subgroup.le_normalizer (H := data.typeP.U)) data.typeP.W1_normalizes_U) hg
+  have hgU : ConjAct.toConjAct g • data.U = data.U :=
+    Subgroup.conjAct_pointwise_smul_eq_self hgN
+  rw [← Subgroup.conjAct_pointwise_smul_iff,
+    show uprimeSub data = ⁅data.U, data.U⁆ from derivedInG_eq_commutator _,
+    Subgroup.pointwise_smul_def, Subgroup.map_commutator, ← Subgroup.pointwise_smul_def, hgU]
+
+/-- **`H ≤ N_G(U')`** (the `H`-half of `H₀U' ◁ M`, Peterfalvi (9.8.d)): `H` normalizes `U' = [U,U]`
+because it *centralizes* it — `U' ≤ C_G(H)` (`typeP_commutator_U_centralizes_H`) means every `h ∈ H`
+commutes with every `x ∈ U'`, so `H ≤ C_G(U') ≤ N_G(U')`.  This is the analog of
+`HsupC_le_normalizer_K` for the `U'`-side (where `H` centralizes rather than merely normalizes). -/
+theorem typeP_H_le_normalizer_uprimeSub [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M) :
+    data.typeP.H ≤ Subgroup.normalizer ((uprimeSub data : Subgroup G) : Set G) := by
+  -- `U' ≤ C(H)`: every `x ∈ U'` commutes with every `h ∈ H`.
+  have hUprime_CH : uprimeSub data ≤ Subgroup.centralizer (data.typeP.H : Set G) := by
+    rw [show uprimeSub data = ⁅data.U, data.U⁆ from derivedInG_eq_commutator _]
+    exact typeP_commutator_U_centralizes_H data.typeP
+  -- symmetric form: `H ≤ C(U')`, then `C(U') ≤ N(U')`.
+  refine le_trans (fun h hh => ?_) (Subgroup.centralizer_le_normalizer (uprimeSub data : Set G))
+  rw [Subgroup.mem_centralizer_iff]
+  intro x hx
+  exact ((Subgroup.mem_centralizer_iff.mp
+    (hUprime_CH (SetLike.mem_coe.mp hx)) h hh)).symm
+
+/-- **`H₀U' ≤ M'`** (Peterfalvi (9.8.d)): the kernel subgroup `H₀ ⊔ U'` lies in the derived subgroup
+`M'`.  `H₀ ≤ H ≤ M'` and `U' = [U,U] ≤ U ≤ M'` (both `H` and `U` lie in `M' = F(M) ⋊ U`). -/
+theorem chiefFactor_H0supUprime_le_derived {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    chief.H0 ⊔ uprimeSub data ≤ derivedInG M :=
+  sup_le (chief.H0_lt_H.le.trans data.typeP.H_le)
+    ((uprimeSub_le_U data).trans data.typeP.U_le)
+
+/-- **`H₀U' ◁ M`** (Peterfalvi (9.8.d)): the (9.8.d) kernel subgroup `H₀ ⊔ U'` is normal in `M`.
+`M = H ⊔ (U ⊔ W₁)` generator-class by generator-class: `U W₁ ≤ N(H₀) ⊓ N(U')`
+(`H0_normalized_by_M`, `uprimeSub_normalized_by_uW1`), and `H ≤ N(H₀) ⊓ N(U')`
+(`H0_normalized_by_M`, `typeP_H_le_normalizer_uprimeSub`).  Mirror of
+`chiefFactor_H0supCprime_subgroupOf_normal` for the `U'`-side. -/
+theorem chiefFactor_H0supUprime_subgroupOf_normal [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    ((chief.H0 ⊔ uprimeSub data).subgroupOf M).Normal := by
+  have hKleM : chief.H0 ⊔ uprimeSub data ≤ M :=
+    (chiefFactor_H0supUprime_le_derived chief).trans (derivedInG_le_self M)
+  rw [Subgroup.normal_subgroupOf_iff_le_normalizer hKleM]
+  have hUW1 : data.typeP.U ⊔ data.typeP.W1
+      ≤ Subgroup.normalizer ((chief.H0 ⊔ uprimeSub data : Subgroup G) : Set G) :=
+    le_trans (le_inf (le_trans (sup_le (U_le_M data) data.typeP.W1_le)
+        chief.H0_normalized_by_M)
+      (uprimeSub_normalized_by_uW1 data))
+      (Subgroup.normalizer_inf_normalizer_le_normalizer_sup chief.H0 (uprimeSub data))
+  have hH : data.typeP.H
+      ≤ Subgroup.normalizer ((chief.H0 ⊔ uprimeSub data : Subgroup G) : Set G) :=
+    le_trans (le_inf ((data.typeP.H_le.trans (derivedInG_le_self M)).trans chief.H0_normalized_by_M)
+        (typeP_H_le_normalizer_uprimeSub data))
+      (Subgroup.normalizer_inf_normalizer_le_normalizer_sup chief.H0 (uprimeSub data))
+  have hM'eq : derivedInG M = data.typeP.H ⊔ data.typeP.U := by
+    rw [data.typeP.derivedInG_eq_fitting_sup_U, data.typeP.H_eq]
+  have hMW1 : derivedInG M ⊔ data.typeP.W1 = M := by
+    have hmap := congrArg (Subgroup.map M.subtype) data.typeP.M_complement.sup_eq_top
+    rwa [Subgroup.map_sup, Subgroup.subgroupOf_map_subtype, Subgroup.subgroupOf_map_subtype,
+      inf_of_le_left (derivedInG_le_self M), inf_of_le_left data.typeP.W1_le,
+      ← MonoidHom.range_eq_map, Subgroup.range_subtype] at hmap
+  have hMeq : M = data.typeP.H ⊔ (data.typeP.U ⊔ data.typeP.W1) := by
+    rw [← sup_assoc, ← hM'eq, hMW1]
+  exact hMeq.le.trans (sup_le hH hUW1)
+
+/-- **realized `H₀U' ◁ HU`**: restriction of `H₀U' ◁ M` along `huSub ≤ ↥M`.  The `[A.Normal]`
+input of the induce-kernel step for the (9.8.d) source character's `𝒮(H₀U')`-membership. -/
+theorem realizedH0supUprime_normal_huSub [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    (((chief.H0 ⊔ uprimeSub data).subgroupOf M).subgroupOf (huSub data)).Normal :=
+  (chiefFactor_H0supUprime_subgroupOf_normal chief).subgroupOf (huSub data)
 
 /-- **`H₀C' ◁ M`** (mirror of `chiefFactor_H0supC_subgroupOf_normal` for `C'`): the (9.9)
 exceptional-case kernel subgroup `H₀ ⊔ C'` is normal in `M`.  `M = H ⊔ (U ⊔ W₁)`
@@ -11085,22 +11231,35 @@ intersection `hInHu_inf_cuInHu_eq_bot` (`H ⊓ C_U(S₀) = ⊥`, from `H ⊓ U =
 analog of `hInHu_inf_cInHu_eq_bot`.  These directly mirror the (9.9.c) `hcLambdaHom` channel
 (rewired `cInHu → cuInHu`), and are honest reusable substrate for the pair hom.
 
-**Still open** (next session — the count pipeline): (ii) the `θ₁`-factor and the full `θ₁·λ` pair
-hom on `H·C_U(S₀)`.  Unlike (9.8.c), the seed inflation `θ₀` **cannot** be built by killing
-`C_U(S₀)`: `C_U(S₀)` is *not* normal in `H·C_U(S₀)` (only `H` is; `H·C_U(S₀) = H ⋊ C_U(S₀)` is a
-genuine semidirect product), so there is no `hcuHom` mirror of `hcHom`.  Instead the pair hom
-`θ₁·λ = (θ₀-extension)·(hcuLambdaHom λ)` needs an *extension* of the `C_U(S₀)`-invariant linear `θ₀`
-from `H` to `H·C_U(S₀)` — the invariance is `cuInHu_le_inertia_of_complement_triv`
-(`conjBy c θ₀ = θ₀`), and the extension is either (a) `SemidirectProduct.lift` after the internal
-`H·C_U(S₀) ≃* H ⋊[φ] C_U(S₀)` from the complement `hInHu_inf_cuInHu_eq_bot` + `sup = ⊤`, with the
-`C`-invariance discharging `lift`'s `fn (φ g n) = fn n` hypothesis; or (b) Isaacs 8.16
-(`CanonicalCharacterExtension`, abelian coprime quotient `(sup)/H ≅ C_U(S₀)`, `|H| ⟂ |U|`).
-Then `inertia_eq_hcuInHu` feeds the `hcZeta_irreducible`-analog (via
-`isIrreducibleCharacter_induce_of_inertia_eq`) for irreducibility of degree `a`; (iii) the membership
-`Ind_{HU}^M χ ∈ 𝒮(H₀U')` (θ₁ nontrivial on `S₀ = H₁`, trivial on `H₂…H_q`, `λ` trivial on `U'`
-⟹ `H₀U' ⊆ Ker`); (iv) the count bijection giving
-`((p-1)/a)·|C_U(S₀):U'| = ((p-1)/a)·(|U|/(a|U'|))` distinct members (mirror `oXtheta_count`; needs
-`U' ≤ C_U(S₀)`, extractable from the `hcentral_triv` step of `chiefFactor_caseB_image_cyclic`). -/
+**Source character + degree (fully landed).**  The pair hom `θ₁·λ` on `H·C_U(S₀)` is built: the
+`θ₀`-extension `hcuThetaHom` (via `SemidirectProduct.lift`, the internal
+`H·C_U(S₀) ≃* H ⋊ C_U(S₀)` from `hInHu_inf_cuInHu_eq_bot` + `sup = ⊤`, with the `C`-invariance
+`cuInHu_le_inertia_of_complement_triv` discharging `lift`'s compatibility) times `hcuLambdaHom λ`,
+packaged as `hcuPairHom`/`hcuPsiPair`.  Its `HU`-induction `ζ_{θ₁,λ}` is irreducible of degree `a`
+(`hcuZetaPair_irreducible` via `inertia_eq_hcuInHu` + `isIrreducibleCharacter_induce_of_inertia_eq`),
+and `Ind_{HU}^M ζ` has degree `qa` (`hcuZetaPair_induceHU_apply_one`); the one-shot existence is
+`caseA_exists_irreducible_source_degree_qa`.
+
+**Group-theoretic prerequisites (landed).**  `U' ≤ C_U(S₀)` — `uprimeSub_le_cuSub`
+(`U' = [U,U] ≤ C = C_U(H̄) ≤ C_U(S₀)`, via `uprimeSub_le_cSub` + `cSub_le_cuSub`), realized as
+`uprimeSub_subgroupOf_le_cuInHu`.  `H₀U' ◁ M` — `chiefFactor_H0supUprime_subgroupOf_normal`
+(`U W₁ ≤ N(H₀) ⊓ N(U')` and `H ≤ N(H₀) ⊓ N(U')`, the latter because `H` *centralizes* `U'`
+via `typeP_H_le_normalizer_uprimeSub`), realized as `realizedH0supUprime_normal_huSub`.
+
+**Still open** (next session — membership, irreducibility, count): (iii) the membership
+`Ind_{HU}^M ζ ∈ 𝒮(H₀U')` (θ₁ nontrivial on `S₀ = H₁`, trivial on `H₂…H_q`, `λ` trivial on `U'`
+⟹ `H₀U' ⊆ Ker`): mirror `hcZetaPair_H0supCprime_subset_ker`/`hcZetaPair_mem_xiSet` (now that
+`realizedH0supUprime_normal_huSub` supplies the `[A.Normal]` input; the kernel step is
+`subsetCharacterKernel_induce_of_subgroupOf` with `hcuPairHom` trivial on realized `H₀U'`, from
+`hcuSeedHom` killing `H₀` = `N.comap hInHuEquivH` and `hcuLambdaHom` restricting to `λ` trivial on
+`U'`); (iv) the `Ind_{HU}^M ζ`-irreducibility — the `W₁`-free-orbit propagation for the
+*single-factor* `S₀`-supported `θ₁` (`I_M(ζ)∩W₁ = 1`, whence `I_M(ζ)=HU` and `Ind` irreducible):
+the analog of `clifford_caseA_exists_char_inertia_hc_not_fixed` but for `θ₁` supported on `S₀`
+(genuinely-absent, since the existing lemma is for the *full* regular seed); (v) the count bijection
+`((p-1)/a)·|C_U(S₀):U'| = ((p-1)/a)·(|U|/(a|U'|))`: NOT a direct `card_image_induce_eq_div`
+(`OrbitOnIrr`) because `C_U(S₀)` is *not* normal in `HU`, so the source subgroup `H·C_U(S₀)` moves
+under `HU`-conjugation; needs the `U`-orbit (size `a`) count of Peterfalvi's paragraph, plus a
+`hcuPsiPair`-conjugation-descent lemma (also genuinely-absent). -/
 theorem caseA_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     (chars : Section11CharacterData data chief) (caseA : CliffordCaseAData chars) :
