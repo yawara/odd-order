@@ -1211,18 +1211,11 @@ theorem caseB_eta01_norm_bound {S : Type*} [Group S] [Fintype S]
     (by intro x hx; rw [hχ x hx]; push_cast; ring), hcross, hfirstTerm, hδR]
   push_cast; ring
 
-/-- Carrier for Peterfalvi (13.5), the TI-subset orthogonality calculation. -/
-structure TISubsetOrthogonalityData (hyp : Hypothesis (G := G)) where
-  S1 : Set (ClassFunction ↥hyp.S ℂ)
-  zeta0 : ClassFunction ↥hyp.S ℂ
-  zeta1 : ClassFunction ↥hyp.S ℂ
-  chi : ClassFunction G ℂ
-  alpha : ClassFunction ↥hyp.H ℂ
-  a : ℤ
-  alpha_kernel_contains_P : Prop
-  point_formula : Prop
-  norm_formula : Prop
-  alpha_norm_bound : Prop
+/- `TISubsetOrthogonalityData` + its five `∃`-True-Prop scaffold theorems
+(`tiSubset_character_orthogonality`, `lambda_norm_lower`, `eta10_norm_lower`,
+`eta01_norm_lower`, `global_character_bound`) were retired (issue 2034, 07-05): the real
+(13.5)–(13.9) content is the proven `H_sharp_*` machinery, `exists_caseB_data_*` packages and
+sharp bounds above/below; the scaffolds were uncited. -/
 
 /-- **Peterfalvi (8.5.a)**: `H = PC = F(S)`.  The type-`P` carrier `Sdata` records (8.5.a),
 `F(S) = M_F · C_U(M_F) = M_F ⊔ (U ⊓ C_S(M_F))`, as its `fitting_eq` field (`TypePData.fitting_eq`,
@@ -2141,14 +2134,6 @@ theorem H_sharp_alphaCF_restrict_mem_ZIrr [Fintype G] [Invertible (Nat.card G : 
   rw [hz, star_intCast, div_eq_mul_inv, mul_smul, Int.cast_smul_eq_zsmul]
   exact Submodule.smul_mem _ z (H_sharp_inv_normSq_restrict_zeta_mem_ZIrr hG hyp i)
 
-/-- **Peterfalvi (13.5)**: the TI-subset calculation on `H = P C` gives a
-pointwise formula and two norm estimates. -/
-theorem tiSubset_character_orthogonality [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
-    ∃ data : TISubsetOrthogonalityData hyp,
-      data.point_formula ∧ data.norm_formula ∧ data.alpha_norm_bound := by
-  sorry
-
 /-- Carrier for the norm cascade (13.6)--(13.10). -/
 structure NormCascadeData (hyp : Hypothesis (G := G)) where
   chars : CharacterDegreeData hyp
@@ -2158,34 +2143,6 @@ structure NormCascadeData (hyp : Hypothesis (G := G)) where
   global_cover : Prop
   global_norm_lower : Prop
   analytic_inequality : Prop
-
-/-- **Peterfalvi (13.6)**: the degree-`u q` character gives the first norm lower
-bound on `H#`. -/
-theorem lambda_norm_lower [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
-    ∃ data : NormCascadeData hyp, data.lambda_norm_lower := by
-  sorry
-
-/-- **Peterfalvi (13.7)**: the character `eta_10` has norm at least `|H#|` on
-`H#`. -/
-theorem eta10_norm_lower [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
-    ∃ data : NormCascadeData hyp, data.eta10_norm_lower := by
-  sorry
-
-/-- **Peterfalvi (13.8)**: the character `eta_01` has the corresponding lower
-bound on `H#`. -/
-theorem eta01_norm_lower [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
-    ∃ data : NormCascadeData hyp, data.eta01_norm_lower := by
-  sorry
-
-/-- **Peterfalvi (13.9)**: outside the conjugates of `H#` and `Q#`, the
-characters `lambda^tau1` and `eta_10` cover every element. -/
-theorem global_character_bound [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
-    ∃ data : NormCascadeData hyp, data.global_cover ∧ data.global_norm_lower := by
-  sorry
 
 /-! ### The (13.10) atoms
 
