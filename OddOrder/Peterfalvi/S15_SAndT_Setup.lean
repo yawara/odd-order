@@ -463,15 +463,15 @@ theorem Hypothesis.card_P_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rw [hyp.Sdata.H_eq, ← hyp.P_eq_SF, hW2card, hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1] at hord2
   exact hord2
 
-/-- **The `S`-instance chief kernel is trivial** ((13.2.b) consequence): `P = S_F` has order
-`p^q` (`card_P_eq`), and the chief factor `H̄ = P/H₀` already has order `(chief.p)^q`
-(`chiefFactor_quotient_card`), so `chief.p = p`, `|H₀| = 1` and `H₀ = ⊥` — `P` itself is the
-chief factor.  Collapses the §9 families of the `S`-instance (`𝒳(H₀) = 𝒳(⊥)`), making the
-(13.3.a) kernel condition `H₀ ⊆ Ker χ_j` automatic. -/
-theorem Hypothesis.toTypesIIIIIIVSetupS_chief_H0_eq_bot [Finite G]
+/-- **The `S`-instance chief kernel `N` is trivial**: `P = S_F` has order `p^q`
+(`card_P_eq`), and the chief factor `H̄ = P/H₀ ≅ ↥P ⧸ N` already has order `(chief.p)^q`
+(`chiefFactor_quotient_card`), so `chief.p = p` and `|N| = 1`, i.e. `N = ⊥`.  Thus `↥P ⧸ N ≅ ↥P`
+— `P` itself is the chief factor.  The source of both `H₀ = ⊥` (below) and `cSub = C_U(P) = C`
+(the `C_U(H̄) = C_U(P)` identification once `H̄ = P`). -/
+theorem Hypothesis.toTypesIIIIIIVSetupS_chief_N_eq_bot [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
-    chief.H0 = ⊥ := by
+    chief.N = ⊥ := by
   haveI := chief.N_normal
   have hHeq : (hyp.toTypesIIIIIIVSetupS hG).H = hyp.P := by
     show hyp.Sdata.H = hyp.P
@@ -497,9 +497,95 @@ theorem Hypothesis.toTypesIIIIIIVSetupS_chief_H0_eq_bot [Finite G]
   have hN1 : Nat.card ↥chief.N = 1 := by
     have := hsplit.symm
     nlinarith [Nat.card_pos (α := ↥chief.N), pow_pos hyp.p_prime.pos hyp.q]
-  have hNbot : chief.N = ⊥ := Subgroup.card_eq_one.mp hN1
-  rw [chief.H0_eq, hNbot]
+  exact Subgroup.card_eq_one.mp hN1
+
+/-- **The `S`-instance chief `H₀` is trivial** (`toTypesIIIIIIVSetupS_chief_N_eq_bot`, mapped):
+`H₀ = N.map subtype = ⊥`.  Collapses the §9 families of the `S`-instance (`𝒳(H₀) = 𝒳(⊥)`), making
+the (13.3.a) kernel condition `H₀ ⊆ Ker χ_j` automatic. -/
+theorem Hypothesis.toTypesIIIIIIVSetupS_chief_H0_eq_bot [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
+    chief.H0 = ⊥ := by
+  rw [chief.H0_eq, hyp.toTypesIIIIIIVSetupS_chief_N_eq_bot hG chief]
   exact Subgroup.map_bot _
+
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+/-- **`C_U(H̄) = C`** for the `S`-instance: the §9 kernel `cSub` (`= C_U(H̄)`) equals Peterfalvi's
+`C = C_U(P) = U ⊓ C_G(P)`.  The reverse `C ≤ cSub` is general (an element of `U` centralizing
+`H = P` acts trivially on any quotient of `H`, so lies in the action kernel); the forward
+`cSub ≤ C` uses `H₀ = ⊥` (`toTypesIIIIIIVSetupS_chief_H0_eq_bot`): with `H̄ = P/H₀ = P` the kernel
+`cSub` centralizes `H = P` (`⁅cSub, H⁆ ≤ H₀ = ⊥`, `commutator_cSub_H_le_H0`).  This is the
+last spelling piece of the (13.3.a) `μ_j = Ind_{PC}(linear)`: `HC = P·C = P·cSub`. -/
+theorem Hypothesis.toTypesIIIIIIVSetupS_cSub_eq_C [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
+    OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief = hyp.C := by
+  haveI := hyp.finiteG
+  haveI := chief.N_normal
+  have hUeq : (hyp.toTypesIIIIIIVSetupS hG).U = hyp.U := hyp.Sdata_U_eq
+  have hHeq : (hyp.toTypesIIIIIIVSetupS hG).H = hyp.P := by
+    show hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
+  apply le_antisymm
+  · -- forward: `cSub ≤ U ⊓ C_G(P)`
+    rw [hyp.C_eq]
+    intro g hg
+    refine Subgroup.mem_inf.mpr ⟨hUeq ▸ OddOrder.Peterfalvi.S11.cSub_le_U _ chief hg, ?_⟩
+    rw [Subgroup.mem_centralizer_iff]
+    intro p hp
+    -- `⁅cSub, H⁆ ≤ H₀ = ⊥`, so `g` centralizes `H = P`
+    have hcomm : ⁅OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief,
+        (hyp.toTypesIIIIIIVSetupS hG).H⁆ ≤ ⊥ := by
+      rw [← hyp.toTypesIIIIIIVSetupS_chief_H0_eq_bot hG chief]
+      exact OddOrder.Peterfalvi.S11.commutator_cSub_H_le_H0 _ chief
+    have hpH : p ∈ (hyp.toTypesIIIIIIVSetupS hG).H := hHeq ▸ hp
+    have hcm := hcomm (Subgroup.commutator_mem_commutator hg hpH)
+    rw [Subgroup.mem_bot, commutatorElement_def] at hcm
+    -- `g p g⁻¹ p⁻¹ = 1 ⟹ p g = g p`
+    have hpg : g * p * g⁻¹ = p := by
+      have h1 : g * p * g⁻¹ * p⁻¹ * p = p := by rw [hcm, one_mul]
+      rwa [inv_mul_cancel_right] at h1
+    have hgp : g * p = p * g := by
+      have h2 : g * p * g⁻¹ * g = p * g := by rw [hpg]
+      rwa [inv_mul_cancel_right] at h2
+    exact hgp.symm
+  · -- reverse: `U ⊓ C_G(P) ≤ cSub`
+    rw [hyp.C_eq]
+    intro g hg
+    obtain ⟨hgU, hgC⟩ := Subgroup.mem_inf.mp hg
+    have hgUdata : g ∈ (hyp.toTypesIIIIIIVSetupS hG).U := hUeq ▸ hgU
+    have hgUW1 : g ∈ (hyp.toTypesIIIIIIVSetupS hG).typeP.U ⊔
+        (hyp.toTypesIIIIIIVSetupS hG).typeP.W1 :=
+      (le_sup_left : (hyp.toTypesIIIIIIVSetupS hG).typeP.U ≤ _) hgUdata
+    set bUW1 : ↥((hyp.toTypesIIIIIIVSetupS hG).typeP.U ⊔
+        (hyp.toTypesIIIIIIVSetupS hG).typeP.W1) := ⟨g, hgUW1⟩ with hbUW1def
+    have hbUW1mem : bUW1 ∈ ((hyp.toTypesIIIIIIVSetupS hG).typeP.U).subgroupOf
+        ((hyp.toTypesIIIIIIVSetupS hG).typeP.U ⊔ (hyp.toTypesIIIIIIVSetupS hG).typeP.W1) :=
+      Subgroup.mem_subgroupOf.mpr hgUdata
+    -- `bUW1` acts trivially on `H̄`: `g` centralizes `H = P`
+    have haut : quotientMulAutHom chief.N_aInvariant bUW1 = 1 := by
+      ext q
+      refine QuotientGroup.induction_on q ?_
+      intro x
+      rw [OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply
+        chief.N_aInvariant bUW1 x, MulAut.one_apply]
+      congr 1
+      apply Subtype.ext
+      rw [OddOrder.Peterfalvi.S11.typeP_conjAction_apply]
+      have hxP : ((x : G)) ∈ hyp.P := hHeq ▸ x.2
+      have hcx : g * (x : G) = (x : G) * g :=
+        (Subgroup.mem_centralizer_iff.mp hgC (x : G) hxP).symm
+      show (bUW1 : G) * (x : G) * (bUW1 : G)⁻¹ = (x : G)
+      rw [hbUW1def]
+      show g * (x : G) * g⁻¹ = (x : G)
+      rw [hcx]; group
+    have hbker : (⟨bUW1, hbUW1mem⟩ : ↥(((hyp.toTypesIIIIIIVSetupS hG).typeP.U).subgroupOf
+        ((hyp.toTypesIIIIIIVSetupS hG).typeP.U ⊔ (hyp.toTypesIIIIIIVSetupS hG).typeP.W1)))
+        ∈ (OddOrder.Peterfalvi.S11.uActionHom (hyp.toTypesIIIIIIVSetupS hG) chief).ker := by
+      rw [MonoidHom.mem_ker, OddOrder.Peterfalvi.S11.uActionHom, MonoidHom.comp_apply]
+      exact haut
+    -- assemble `g ∈ cSub`
+    simp only [OddOrder.Peterfalvi.S11.cSub, Subgroup.mem_map]
+    exact ⟨bUW1, ⟨⟨bUW1, hbUW1mem⟩, hbker, rfl⟩, rfl⟩
 
 
 
