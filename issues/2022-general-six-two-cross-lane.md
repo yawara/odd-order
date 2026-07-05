@@ -673,3 +673,21 @@ vs CharacterDifferenceImage.Orthogonal) の突合が実装時の最初の確認�
 - 残 sorry = member-∀-clause (可約 break の Da に対する各 χ ∈ S₁ の D):
   irr-χ は memberDatum-machinery + R(χ)⊥R(列) (源 4-cross 直交 → signedDifference
   経由); 可約-χ は列-列。+ sixTwoMemberDatum_of_reducible_member (対 irr-break)。
+
+### 追記 14 (loop 47): ⚠ member-clause の無条件直交は過強 (要 statement 修正)
+
+- Coq (5.2.e): `orthogonal phi (xi::xi^*) -> orthogonal (R phi) (R xi)` —
+  **条件付き** (4-cross 直交が前提)。
+- 現 sixTwoDecompositionData の member-∀-clause は ∀χ∈S₁ 無条件で
+  D.imageFamily ⊥ Da.imageFamily を要求。だが χ = μ_i₀k (ψ-列の既約成分)
+  ∈ S₁ の場合 ⟨χ, ψ⟩ = 1 ≠ 0 で、R(χ) と R(列) は ω^σ_i₀k-成分を共有し
+  直交は**偽**になり得る → 現形の named-sorry は充足不能の疑い。
+- **次の第一手**: exists_source_index_le_two_psi (bridge の
+  fully-pinned producer) の証明内で hdatum の D-直交がどう消費されるか
+  精査 → (a) 条件付き (⟨χ,ψ⟩=0 ∧ ⟨χ,ψ̄⟩=0 前提) に obligation を
+  弱める statement 修正 (エンジン側が当該 χ にしか使わないはず;
+  S08 の重み付き (5.6) Gram-計算部を確認) or (b) エンジン再導出。
+  irr-irr 放電 (…orthogonal_breakDa_of_irr_irr) は無条件で通っていた —
+  そこでは ψ 既約で χ,ψ 相異なら family-pairwise が 4-cross を自動供給
+  していた (列 ψ では成分-重なりが破る)。修正は可約-break 分岐にのみ影響。
+- break-Da 構成 (loop 46) 自体は影響なし (Da-半分は健全)。
