@@ -629,3 +629,39 @@ coeff (X ∈ ℤ[R]) / Y ⊥ R。
   𝒳-条件・Brauer-FPF・sOf-transport 全て不要の最短路)。
 - 残 = named 2 点の ofProjection 最終組み立て (columnImageFamilyCohFree +
   hS₁coh.extension-τ₁ + muGridAlpha_inner_* 直交)。
+
+### 追記 13 (loop 44): break-Da の ofProjection invocation recipe (完全形)
+
+`sixTwoDecompositionData_of_reducible_break` の Da-半分 (実装可能形):
+
+1. `obtain ⟨k, hk0, rfl⟩ := hyp.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum
+   hG htype hnt chief hψB hψred` — ※ htype/hnt/chief を named-sorry 署名に追加要
+   (S13-消費側: hyp.type_alt-isTypeIIIorIV / typePNontrivialCore_of / hyp.chief +
+   setup_typeP_eq-transport — S13.Hypothesis の chief は s11Setup-上; bridge は
+   toTypesIIIIIIVSetup htype hnt-上 → ChiefFactorData の transport が一点残る。
+   代替: named-sorry に (chief : ChiefFactorData (toTypesIIIIIIVSetup htype hnt))
+   を引数追加し S13 側で構築供給)。
+2. ψ̄-列: `obtain ⟨k', hk'0, hk'k, hconj⟩ := hyp.exists_conj_column hG hG.odd hk0`。
+3. `Da := OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection
+   (hyp.columnImageFamilyCohFree hG hmu hzS hz1 hzconj?? — hzconj 引数残存注意
+   (cohFree 版に hzconj が残っているか確認; 残っていれば pin 追加 or 除去)
+   hδpm hδj hk0 hk'0 hk'k.symm?? (hjj' : j≠j') hconj)
+   hyp.tau (dade-preserve) rfl (ZIrr) ⟨3 inners⟩` — 各 obligation:
+   - htau1_inner_eq: S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
+     (set = {ψ−ψ̄, ψ−a•χ₁}; supports: 前者 = 列差 (classification 後は
+     inducedKernelFamily_conjDiff_support or α-support-差), 後者 =
+     S08.inducedKernelFamily_scaledDiff_support (hKsupp = mderivSharp_subset_A0))
+   - htau1_agrees: rfl (tau1 := hyp.tau)
+   - htau1_mem: dadeIntegralCharacterMap_mem_ZIrr_of_supported + (列和∈ZIrr:
+     sum of muGrid-irr; χ₁: S08.inducedKernelFamily_mem_ZIrr)
+   - 3 inners: S08.inducedKernelFamily_pairwise_orthogonal (ψ,χ₁ 相異: ψ∉S₁∋χ₁;
+     ψ,ψ̄ 相異: hasNoReal or 列≠) + smul-線形。
+   - τ-型合わせ: hyp.tau vs dadeIntegral-式 = def-rfl (have := rfl-conversion)。
+4. member-∀-clause: χ irr → 新 narrower named `sixTwoMemberDatum_vs_columnDa`
+   (D := memberDatum-machinery; Orthogonal via
+   orthogonal_of_signedDifference_inner_eq_zero (S07:674) — source-inner:
+   family-pairwise-orthogonal の 4-cross); χ reducible → χ も列 → 列-列直交
+   (columnRImage_inner の cross-列版 or muGridAlpha_inner_muColumn 系)。
+
+member-clause の Orthogonal-def 階層 (OrthonormalCharacterImageFamily.Orthogonal
+vs CharacterDifferenceImage.Orthogonal) の突合が実装時の最初の確認点。
