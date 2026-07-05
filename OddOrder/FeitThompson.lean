@@ -158,6 +158,9 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
             ((le_of_eq W_eq_inter).trans inf_le_left)).toMonoidHom
           (omega i j - omega ⟨0, q_prime.pos⟩ j))
       = (delta j : ℂ) • (mu i j - mu ⟨0, q_prime.pos⟩ j)
+  mu_irreducible : ∀ (i : Fin q) (j : Fin p),
+    OddOrder.RepresentationTheory.IsIrreducibleCharacter (mu i j)
+  mu_col_injective : ∀ j : Fin p, Function.Injective (fun i : Fin q => mu i j)
   nu_definition : ∀ (i : Fin q) (j : Fin p),
     ClassFunction.induce (W.subgroupOf T)
         (ClassFunction.compHom
@@ -367,6 +370,9 @@ structure Section16CharacterData {G : Type*} [Group G] [Finite G]
             ((le_of_eq tp.W_eq_inter).trans inf_le_left)).toMonoidHom
           (omega i j - omega ⟨0, tp.q_prime.pos⟩ j))
       = (delta j : ℂ) • (mu i j - mu ⟨0, tp.q_prime.pos⟩ j)
+  mu_irreducible : ∀ (i : Fin tp.q) (j : Fin tp.p),
+    OddOrder.RepresentationTheory.IsIrreducibleCharacter (mu i j)
+  mu_col_injective : ∀ j : Fin tp.p, Function.Injective (fun i : Fin tp.q => mu i j)
   nu_definition : ∀ (i : Fin tp.q) (j : Fin tp.p),
     ClassFunction.induce (tp.W.subgroupOf mp.T)
         (ClassFunction.compHom
@@ -2488,6 +2494,14 @@ noncomputable def section16CharacterData_of_isMinimalSimpleOdd {G : Type*} [Grou
       deltaPrime := Section16CharacterData.deltaPrimeT hG mp tp
       tau3 := Section16CharacterData.tau3W hG mp tp
       mu_definition := Section16CharacterData.muS_definition hG mp tp
+      mu_irreducible := fun i j =>
+        (((mp.certainTypeS hG).columnFamily (Section16CharacterData.chi2enum hG mp tp j)).mu
+          (Section16CharacterData.eqQ hG mp tp i)).isIrreducible
+      mu_col_injective := fun j i i' h =>
+        (Section16CharacterData.eqQ hG mp tp).injective
+          ((((mp.certainTypeS hG).columnFamily
+            (Section16CharacterData.chi2enum hG mp tp j)).injective)
+            (OddOrder.RepresentationTheory.IrreducibleCharacter.ext h))
       nu_definition := Section16CharacterData.nuT_definition hG mp tp
       tau3_isometry := Section16CharacterData.tau3W_isometry hG mp tp
       tau3_trivial := Section16CharacterData.tau3W_trivial hG mp tp
@@ -2575,6 +2589,8 @@ noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [F
     deltaPrime := cd.deltaPrime
     tau3 := cd.tau3
     mu_definition := cd.mu_definition
+    mu_irreducible := cd.mu_irreducible
+    mu_col_injective := cd.mu_col_injective
     nu_definition := cd.nu_definition
     q_lt_p := tp.q_lt_p
     Sdata := tp.Sdata
@@ -2688,6 +2704,8 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       tau3 := inp.tau3
       eta_eq_tau_omega := fun _ _ => rfl
       mu_definition := inp.mu_definition
+      mu_irreducible := inp.mu_irreducible
+      mu_col_injective := inp.mu_col_injective
       nu_definition := inp.nu_definition
       m := 1 - 1 / ((inp.q : ℚ) - 1) - ((inp.q : ℚ) - 1) / (inp.q : ℚ) ^ inp.p +
         1 / (((inp.q : ℚ) - 1) * (inp.q : ℚ) ^ inp.p)
