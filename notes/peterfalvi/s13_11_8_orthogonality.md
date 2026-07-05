@@ -1829,3 +1829,27 @@ signature に hG + htype(III/IV) 追加 (type II は C_H(U)=⊥ ゆえ out-of-sc
 **(10.8) S_not_coherent + (11.5) の char-gating + (11.8) endpoint 自身**。commutator form は
 その prerequisite の群論部品で、完遂済。次 frontier 候補: gate-1 [U:C]=u (H₀=⊥ を cite-sorried で
 先行)、または (11.8.6) coherent_Sset_of_column_identities (gate-2, 深 char)、(11.5) char-gating。
+
+## 2026-07-05 update²¹ (lane-a) — **gate-1 の全 math ピース完備 (u_eq_relIndex_C) + lane-a 群論ほぼ完遂の総括**
+
+`u_eq_relIndex_C` ([U:C]=u, sorry-free, commit fdc61f59, subagent+hub検証) 完成で
+**gate-1 `|M'ᵃᵇ|=d` の全 math ピースが sorry-free 完備**:
+- `|M'ᵃᵇ| = [U:C]` = `typePData_card_abelianization_derived_eq_relIndex_C` (given M''=HC)
+- `[U:C] = u` = `u_eq_relIndex_C` (given chief.N=⊥ = H₀=⊥)
+- `u = d` = `charParam_d_eq_u`
+
+**残 gate-1 = threading のみ** (新 math 無し): card_SHCSet_filter_eq_charParam_n (S12) の
+`|M'ᵃᵇ|=d` sorry を閉じるには M''=HC (secondDerived_eq_HC, S13) + H₀=⊥ (H_elementaryAbelian, S13)
+を **FeitThompson 層まで thread**。難所: (i) consumer exists_zeta_residual_not_orthogonal (S12) が
+params を内部構成、(ii) chief 非一意 (H_elementaryAbelian の H₀=⊥ を内部 chief に転送 = H irreducible
+ゆえ chief 一意、要 subtle 論)、(iii) spine (exists_zeta = bare FT sorry) の signature 変更。
+delicate ゆえ careful 実装 or 慎重な delegation。**注意: 閉じても gate-1 は 11.5/11.7 経由で lane-b
+char (typeII_coherence_contradiction_estimate) に gated、exists_zeta は gate-2 + (10.8) で sorried 継続**。
+
+**総括 (重要)**: **lane-a の群論/構造部分はほぼ完遂**:
+- 構造核 |M'ᵃᵇ|=[U:C] ✓ / commutator form caseA_commutator_chain ✓ (~490行) / [U:C]=u ✓ /
+  (11.7) chief_H0_eq_bot 群論 ✓ (bundle は char-gated)。
+- **残 lane-a = char のみ**: gate-2 `coherent_Sset_of_column_identities` (11.8.6 τ₂ coherence, 深char capstone)、
+  gate-1 threading (plumbing, char-gated), (11.5) char-gating (→lane-b typeII estimate)。
+- ⟹ lane-a frontier は群論 endgame から **char endgame** へ移行。深 char (gate-2, lane-b typeII) が
+  真の残 FT content。次: gate-1 threading (my pieces wire, concrete) or gate-2 (deep char, 要 grind/delegate)。
