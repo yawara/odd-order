@@ -1872,3 +1872,22 @@ frontier 再評価 (code-level 検証済):
 (delicate spine plumbing, char-gated result), (b) gate-2/9.11 (deep char, §14/lane-b gated)。
 真の残 FT content は **char endgame** (lane-b typeII estimate, §14 structure, gate-2 char cascade)。
 次: gate-1 threading を fresh budget で careful に (my pieces を load-bearing 化)、or hub 再配分検討。
+
+## 2026-07-05 update²³ (lane-a) — **★ gate-1 CLOSED: card_SHCSet |M'ᵃᵇ|=d sorry 除去 (net −1 sorry, spine verified)**
+
+gate-1 `card_SHCSet_filter_eq_charParam_n` の `|M'/M''|=d` sorry を **CLOSED** (subagent threading,
+hub 検証+統合, commit 38724f9e)。全 OddOrder bare sorry **net −1 (86→85)**、**#print axioms
+feitThompson 不変** (spine axiom set 同一・新 axiom 無し)、full build 3929 green, AxiomsCheck OK。
+
+組立補題を wire + hM2 (M''=HC) + hHcard (|H|=|W₂|^{|W₁|}) を FeitThompson 層へ thread
+(4 定理素通し + import S13 + producer 強化 + sorry-free bridge 2 本)。核心知見: **chief 既約性 ≠ N=⊥**
+(N=⊥ は深い chief_H0_eq_bot 内容) → `|H|=w₂^w₁` の card 数え上げで N=⊥ (chief 非一意も回避)。
+
+**⟹ gate-1 (11.8.1 count) 構造 math 完全 load-bearing 化 + CLOSED**。lane-a 群論 + gate-1 完遂。
+
+**残 lane-a frontier**: **gate-2 `coherent_Sset_of_column_identities` (11.8.6 τ₂ union-coherence)**
+のみ = deep char capstone。gluing infra (coherentUnion_of_glued, S07) 在るが (9.11)
+`sibleyTarget_H0C` (§14-gated + lane-b (6.8)) に gated。exists_zeta (bare FT sorry) は gate-2 +
+(10.8, lane-b typeII estimate) で継続 sorried。**lane-a 高価値 ungated 群論 frontier は完遂**、
+残は char endgame (gate-2 の gluing [deep char, 9.11 cite-sorried 可] + lane-b/§14 依存)。
+次: gate-2 を Coq PFsection11 で map → assess/delegate (unmapped deep char ゆえ blind delegate 回避)。
