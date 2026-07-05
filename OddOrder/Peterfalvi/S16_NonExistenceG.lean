@@ -5377,10 +5377,10 @@ Two obligations are discharged genuinely, via extra witnesses on `exists_M_hypot
   `inner_self_induce_eq_one_of_frobeniusGroup`), and `tau1 = ν` is a family isometry on it
   (`nu_isometry`).
 
-Two residual obligations remain isolated as the genuine deep §7/§13 character content
-(gated on the coherence-norm and η-grid theory, not on this assembly):
-* `betaGrid` — the (13.1.d) η-grid expansion of `1_G + Δ` (Track A, issue 3002);
-* `h78_zetaNuRho_normSq_ge` — the (7.8.b) coherence-norm lower bound. -/
+One residual obligation remains isolated as the genuine deep §13 character content (gated on
+the η-grid theory, not on this assembly): the joint existence of the `±1` signs with the
+(13.1.d) η-grid expansion of `1_G + Δ` (Track A, issue 3002), consumed by the
+`betaSigns`/`betaSigns_pm`/`betaGrid` fields — no specific sign choice is asserted. -/
 theorem exists_MHypothesis [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     Nonempty (MHypothesis hyp) := by
@@ -5421,9 +5421,9 @@ theorem exists_MHypothesis [Finite G]
     betaM_formula_holds := trivial
     betaM_eq := rfl
     psi_tau1_eq := rfl
-    betaSigns := fun _ _ => 1
-    betaSigns_pm := fun _ _ => Or.inl rfl
-    betaGrid := ?betaGrid
+    betaSigns := betaSignsData
+    betaSigns_pm := hbetaSigns_pm
+    betaGrid := hbetaGrid
     G0 := Set.univ \ (typeIHyp.dadeData.dade.dadeSupport ∪
       (conjClassSet ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G)))
         ∪ conjClassSet (sharpSubgroup hyp.base.P)
@@ -5463,8 +5463,6 @@ theorem exists_MHypothesis [Finite G]
     rw [h78.nu_isometry h78.zetaDistinct h78.zetaDistinct h78.zetaDistinct_ne_ind1H
       h78.zetaDistinct_ne_ind1H]
     exact hnorm1
-  -- The two residual deep §7/§13 character obligations (see the docstring).
-  case betaGrid => sorry
   -- **Peterfalvi (7.8.b)**: the coherence-norm lower bound, now genuinely discharged by the
   -- `exists_M_hypothesis78` witness (via the concrete §7 producer `zetaNuRhoNormSqGeOfDade`).
   case normSq => exact hnormSq
