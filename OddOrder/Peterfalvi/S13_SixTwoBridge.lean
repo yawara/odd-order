@@ -804,10 +804,11 @@ theorem sixTwoMemberDatum_of_reducible_member [Finite G]
     rw [h11, hcc, hcr, hcr']
     ring
   -- assemble `D` and its orthogonality to the break `Da`
+  set ext := hS₁coh.extension with hext
   refine ⟨OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection
     (hyp.columnImageFamilyCohFree hG hmu hzS hz1 hzconj hδpm hδj hkχ0 hkχ'0
       (Ne.symm hkχ'k) hχconj)
-    hS₁coh.extension
+    ext
     (fun φ ζ hφ hζ => hS₁coh.extension_inner_eq φ ζ
       (Submodule.span_le.mpr (fun φ' hφ' => h2span φ' hφ') hφ)
       (Submodule.span_le.mpr (fun φ' hφ' => h2span φ' hφ') hζ))
@@ -817,9 +818,37 @@ theorem sixTwoMemberDatum_of_reducible_member [Finite G]
     (by simp)
     (S08.inducedKernelFamily_pairwise_orthogonal hχbot hχconjbot (Ne.symm hχne)),
     ?_, ?_⟩
-  · -- Orthogonal to the irreducible break `Da`: per-pair via (A)+(B) (issue 2022, next)
-    sorry
-  · -- `D.tau1 χ = extension χ`: definitional, blocked on a puzzling fvar mismatch (next)
+  · -- Orthogonal to the irreducible break `Da`: per-pair via (A)+(B)
+    intro α hα β hβ
+    -- `α` is a signed σ-grid entry of the `χ`-column family
+    have hα' : α ∈ Finset.univ.image (hyp.columnRImage hG hG.odd params.delta kχ kχ') := hα
+    rw [Finset.mem_image] at hα'
+    obtain ⟨⟨b, i⟩, -, rfl⟩ := hα'
+    -- `⟨ω_pt, β⟩ = 0` via the (B) per-element lemma on the break family
+    have hωβ : ∀ (i' : Fin hyp.w1) (k' : Fin hyp.w2),
+        ClassFunction.inner (hyp.alignedOmegaSigmaGrid hG hG.odd i' k') β = 0 := by
+      intro i' k'
+      have hβ0 : ClassFunction.inner β (hyp.alignedOmegaSigmaGrid hG hG.odd i' k') = 0 := by
+        refine OddOrder.Peterfalvi.S12.OrthonormalCharacterImageFamily.elt_inner_eq_zero
+          (R := (S08.inducedKernelFamily_breakDa_of_irreducible hyp.dadeData.dade hyp.hconj
+            (card_odd_of_isMinimalSimpleOdd hG hyp) hyp.mderivSharp_subset_A0 hS₁sub hψB hψirr
+            hψnotS1 hψcnotS1 hχ₁S₁ hψdeg).1.imageFamily) hβ
+          (hyp.alignedOmegaSigmaGrid_mem_ZIrr hG hG.odd i' k') ?_ ?_ ?_
+        · have := hyp.alignedOmegaSigmaGrid_inner hG hG.odd i' i' k' k'
+          simpa using this
+        · exact hψT2
+        · exact hyp.tau_chidiff_inner_alignedOmega_eq_zero hG hG.odd hψind hψirr i' k'
+      rw [OddOrder.RepresentationTheory.inner_conj_symm, hβ0, star_zero]
+    -- unfold the two signed cases
+    rcases b with _ | _
+    · simp only [Hypothesis.columnRImage]
+      rw [ClassFunction.inner_smul_left, hωβ, mul_zero]
+    · simp only [Hypothesis.columnRImage]
+      rw [neg_smul, ClassFunction.inner_neg_left, ClassFunction.inner_smul_left, hωβ,
+        mul_zero, neg_zero]
+  · -- `D.tau1 χ = extension χ`: rfl-blocked by a duplicated `IsCoherent` fvar in the
+    -- goal (confirmed via `rename_i` probe; same type as `hS₁coh`).  Diagnose fresh
+    -- (issue 2022 追記 18); the construction itself is complete.
     sorry
 
 /-- **The (5.2.d) decomposition data for the §11 family — the single remaining grid obligation
