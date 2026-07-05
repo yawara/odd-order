@@ -1804,3 +1804,37 @@ Coq `FTtype2_support_coherence` (PFsection14:172) の構造を忠実分離:
 grid split (Coq `orthonormal_span`+`ub_e`)。(c) grid_mem `Y=0` = 残差 orthogonal projection。
 これらは M-side `betaGrid`/`betaSigns` の未供給分 (exists_MHypothesis 内) と同族の §14 char。
 [[feedback-no-avoiding-hard-parts]] [[feedback-cite-sorried-lemmas-if-signature-correct]]
+
+**hub 検証済 (2026-07-05、subagent 委譲 → 親検証)**: 上 cont.⁶⁴ は fresh-context subagent の成果
+(commit `94d80f2e`、229k tok/20min) を hub (親) が独立検証して承認。確認: (1) `#print axioms` の
+2 新定理 = [propext, sorryAx, Classical.choice, Quot.sound] のみ (sorryAx は `lSideGridCoeffData`
+経由のみ、**新 custom axiom 無**)。(2) carrier `LSideGridCoeffData` の 4 field は実 β_L について
+真・充足可 (vacuous hoist でない = carrier 構成可能性 OK)。(3) rigidity core
+`all_pm_one_and_card_of_odd_sq_sum_le` + 分解 `beta_eq_constOne_sub_zetaImage_add_delta` は共に
+sorry-free proven。(4) full build 3929 green、AxiomsCheck OK、sorry 7 不変。**教訓 (orchestration)**:
+深い well-defined piece の subagent 委譲は、親が faithfulness (carrier 構成可能性) + `#print axioms`
++ build を厳密検証すれば安全に throughput を出せる (粒度: 1 deep piece = 1 subagent、乱発しない
+[[feedback-reasonable-parallelism-granularity]])。
+
+### cont.⁶⁵ (2026-07-05 lane c /loop it.8) — 🛑 c の ungated frontier 枯渇 = POLE-2 coupled stall 到達 (hub 再評価要)
+
+it.8 で残 (14.11.2) carrier `lSideGridCoeffData` の構成可能性を精査 → **c 独立では discharge 不能
+(b の §13 grid = issue 3002 に gated)** と確定。根拠:
+- M-side `MHypothesis.betaGrid` field (S16:1678) は **明示的に issue 3002 (§13 η-grid carrier) に
+  gated** (S16:5696 `exists_MHypothesis` の betaGrid/betaM は「§13 η-grid carrier, issue 3002 待ち」)。
+  `lSideGridCoeffData` はその L-analog ⟹ 同じく issue 3002 gated。
+- carrier 4 field の内訳: `coeff` (整数性=trivial c) / `boundary` (Coq FTtypeI_bridge = S/T type-P
+  partner bridge、b の §13 char) / `bessel` (‖β_L‖²=e+1 = a の (7.8.b) norm) / `grid_mem`
+  (§13 grid projection = b issue 3002)。⟹ **a/b/c 横断で結合、c 単独で全 field 供給不能**。
+  §13 grid を c が作れば b の on-path work (issue 3002 threading) と衝突 → policy 上不可。
+
+**判定 (reallocation note の予告どおり)**: この session で c の **独立 ungated frontier は実質枯渇**:
+(13.19.a) 完全証明・(13.19.b) engine 消費・(13.19.c) lSide を precise carrier まで de-scaffold 完了。
+残 S16 sorry 7 は全て **b (§13 grid/3.9.c) / a (7.8.b norm/9.7.b carrier) / 9000 (Galois)** に gated
+(lSideGridCoeffData=b, betaGrid=b, T_typeII=b, eta_grid_galois=b, s_/t_frobenius_kernel=a carrier,
+v-value=9000)。**これは POLE-2 coupled-pipeline stall** (reallocation note が「下流 c が上流 b に gated」
+と予告した構造)。**protocol**: ungated frontier 枯渇 → spin/他レーン侵食でなく **hub に flag して再評価**
+(lane 数を ungated 供給に合わせる / c を b の §13 grid 供給後に再開 / c を別 on-spine 上流に再配分)。
+loop を停止して報告 ([[feedback-flag-poor-progress]] [[feedback-loop-short-wakeup]] option 2)。
+**unblock 条件**: b が issue 3002 (§13 η-grid を S15.Hypothesis grid field に threading) を landing
+すれば lSideGridCoeffData/betaGrid の grid_mem+boundary が供給され (14.11.2) carrier 群が閉じる。
