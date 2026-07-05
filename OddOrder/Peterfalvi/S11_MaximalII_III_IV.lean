@@ -7685,6 +7685,113 @@ theorem oXtheta_count [Finite G] {M : Subgroup G}
   rw [key, hTdef, Finset.image_image] at hTeq
   exact hTeq
 
+/-- **Nontriviality of a seed survives conjugation-descent**: for `θ ≠ 1` and `g ∈ HU`, the
+conjugated seed `θ ∘ A_g` is again nontrivial (`A_g` bijective,
+`hcConjDescend_bijective`), and `(hcPsi θ)^g = hcPsi (θ ∘ A_g)`.  The case-(b) `T`-invariance
+(regularity of the case-(a) `oXtheta` replaced by mere nontriviality). -/
+theorem hcPsi_ne_one_conjBy [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal]
+    {θ : (↥data.H ⧸ chief.N) →* ℂˣ} (hθ : θ ≠ 1) (g : ↥(huSub data)) :
+    ∃ θ' : (↥data.H ⧸ chief.N) →* ℂˣ, θ' ≠ 1 ∧
+      IrreducibleCharacter.conjBy g (hcPsi chief θ) = hcPsi chief θ' := by
+  refine ⟨θ.comp (hcConjDescend chief g), ?_, hcPsi_irreducibleConjBy_eq chief g θ⟩
+  intro h1
+  apply hθ
+  refine MonoidHom.ext fun z => ?_
+  obtain ⟨x, rfl⟩ := (hcConjDescend_bijective chief g).surjective z
+  simpa using DFunLike.congr_fun h1 x
+
+/-- **Case-(b) inertia index of `hcPsi θ` is `u`** (any nontrivial `θ`): with the case-(b)
+inertia lift `inertia_eq_hcInHu` (no regularity needed), `[HU : I(hcPsi θ)] = [HU:HC] = u`
+(`hc_index_eq_u`).  The uniform fibre size of the case-(b) `oXtheta` count. -/
+theorem hcPsi_inertia_index_eq_u_caseB [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseB : CliffordCaseBData chars)
+    {θ : (↥data.H ⧸ chief.N) →* ℂˣ} (hθ : θ ≠ 1)
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal] :
+    (IrreducibleCharacter.inertia (hcPsi chief θ)).index = chars.u := by
+  have hθbarnt : (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)
+      ≠ trivialClassFunction _ := by
+    intro h0
+    apply hθ
+    rw [← linearIrreducibleCharacter_eq_trivial_iff]
+    exact IrreducibleCharacter.ext
+      (h0.trans (IrreducibleCharacter.coe_trivialIrreducibleCharacter).symm)
+  have hθ₀ := inertia_eq_hcInHu data chief caseB.actsIrreducibly hθbarnt
+  change (ClassFunction.inertia (hcPsi chief θ : ClassFunction
+    ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ)).index
+      = chars.u
+  rw [hcPsi_inertia_eq_hc chief θ hθ₀, hc_index_eq_u chars]
+
+open scoped Classical in
+/-- **The count of nontrivial chief-factor characters**: `|{θ : H̄ →* ℂˣ | θ ≠ 1}| = p^q − 1`.
+Duality `|Hom(H̄, ℂˣ)| = |H̄| = p^q` (`card_monoidHom_of_hasEnoughRootsOfUnity`,
+`chiefFactor_quotient_card`) minus the trivial character.  The domain count of the case-(b)
+`oXtheta`. -/
+theorem card_ne_one_chiefFactorHom [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    [Fintype ((↥data.H ⧸ chief.N) →* ℂˣ)] :
+    (Finset.univ.filter fun θ : (↥data.H ⧸ chief.N) →* ℂˣ => θ ≠ 1).card
+      = chief.p ^ data.q - 1 := by
+  haveI := chief.N_normal
+  letI : CommGroup (↥data.H ⧸ chief.N) :=
+    { (inferInstance : Group (↥data.H ⧸ chief.N)) with
+      mul_comm := chief.quotient_elementaryAbelian.1 }
+  haveI : NeZero (Monoid.exponent (↥data.H ⧸ chief.N)) := ⟨Monoid.exponent_ne_zero_of_finite⟩
+  have hcard : Nat.card ((↥data.H ⧸ chief.N) →* ℂˣ) = Nat.card (↥data.H ⧸ chief.N) :=
+    CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity _ ℂ
+  rw [Finset.filter_ne', Finset.card_erase_of_mem (Finset.mem_univ _), Finset.card_univ,
+    ← Nat.card_eq_fintype_card, hcard, chiefFactor_quotient_card chief]
+
+open scoped Classical in
+/-- **The case-(b) `oXtheta` count**: `u · |Xζ| = p^q − 1`, where `Xζ` is the set of distinct
+`HU`-induced characters `Ind_{HC}^{HU}(hcPsi θ)` over *all* nontrivial seeds `θ : H̄ →* ℂˣ`.
+Mirror of the case-(a) `oXtheta_count` with regularity replaced by nontriviality: fibres of
+`θ ↦ Ind(hcPsi θ)` are `HU`-conjugation orbits (`card_filter_induce_eq_index_inertia`,
+`T`-invariance `hcPsi_ne_one_conjBy`) of size `u` (`hcPsi_inertia_index_eq_u_caseB`), and the
+domain has size `p^q − 1` (`card_ne_one_chiefFactorHom`, `hcPsi_injective`).  With `C = ⊥`
+(the (9.9.c) situation) `Xζ` exhausts `𝒳(H₀)`, giving `u·|𝒳(H₀)| = p^q − 1`. -/
+theorem caseB_oXtheta_count [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseB : CliffordCaseBData chars)
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal]
+    [Fintype ↥(huSub data)] [Fintype ((↥data.H ⧸ chief.N) →* ℂˣ)]
+    [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)) : ℂ)] :
+    chars.u * ((Finset.univ.filter fun θ : (↥data.H ⧸ chief.N) →* ℂˣ => θ ≠ 1).image fun θ =>
+        ClassFunction.induce (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+          (huSub data)) (hcPsi chief θ).toClassFunction).card
+      = chief.p ^ data.q - 1 := by
+  classical
+  letI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+    (huSub data)) := Fintype.ofFinite _
+  set NF := Finset.univ.filter fun θ : (↥data.H ⧸ chief.N) →* ℂˣ => θ ≠ 1 with hNF
+  set T := NF.image (hcPsi chief) with hTdef
+  have hTinv : ∀ χ ∈ T, ∀ g : ↥(huSub data), IrreducibleCharacter.conjBy g χ ∈ T := by
+    intro χ hχ g
+    obtain ⟨θ, hθ, rfl⟩ := Finset.mem_image.mp hχ
+    obtain ⟨θ', hθ', heq⟩ := hcPsi_ne_one_conjBy chief (Finset.mem_filter.mp hθ).2 g
+    exact heq ▸ Finset.mem_image.mpr ⟨θ', Finset.mem_filter.mpr ⟨Finset.mem_univ _, hθ'⟩, rfl⟩
+  have hfib : ∀ b ∈ T.image fun χ => ClassFunction.induce _ χ.toClassFunction,
+      (T.filter fun χ => ClassFunction.induce _ χ.toClassFunction = b).card = chars.u := by
+    intro b hb
+    obtain ⟨χ₀, hχ₀, rfl⟩ := Finset.mem_image.mp hb
+    rw [card_filter_induce_eq_index_inertia (G := ↥(huSub data)) T hTinv χ₀ hχ₀]
+    obtain ⟨θ₀, hθ₀, rfl⟩ := Finset.mem_image.mp hχ₀
+    exact hcPsi_inertia_index_eq_u_caseB caseB (Finset.mem_filter.mp hθ₀).2
+  have key : T.card
+      = chars.u * (T.image fun χ => ClassFunction.induce _ χ.toClassFunction).card := by
+    rw [Finset.card_eq_sum_card_fiberwise
+        (fun χ hχ => Finset.mem_image_of_mem (fun χ => ClassFunction.induce _ χ.toClassFunction) hχ),
+      Finset.sum_congr rfl hfib, Finset.sum_const, smul_eq_mul, mul_comm]
+  have hTeq : T.card = chief.p ^ data.q - 1 := by
+    rw [hTdef, Finset.card_image_of_injective _ (hcPsi_injective chief), hNF]
+    exact card_ne_one_chiefFactorHom chief
+  rw [key, hTdef, Finset.image_image] at hTeq
+  exact hTeq
+
 /-- **`ζ(1) = u`**: the degree of `ζ = Ind_{HC}^{HU}(ψ)` is `u`.  `induce_apply_one` gives
 `ζ(1) = [HU:HC]·ψ(1) = u·1` (`hc_index_eq_u`, and `ψ` linear so `ψ(1)=1`).  This is the degree-`u`
 of the (9.8.c) irreducible; `induceHU ζ` then has degree `q·u = qu`. -/
