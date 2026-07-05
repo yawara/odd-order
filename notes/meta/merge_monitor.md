@@ -144,6 +144,14 @@
 > 条件: (i) 純 additive (既存宣言の statement/proof 改変は従来どおり逸脱)、(ii) proven (sorry 追加なし)、
 > (iii) 用途が 3002/9009 供給 chain、(iv) issue/notes で self-flag。**3002 供給完了で失効**
 > (以後の b の S05 等 lane-a ファイル編集は通常どおり逸脱)。
+>
+> **⟹ 拡張 #2 (ユーザー裁定 2026-07-05 tick(3) — Hypothesis76 (7.6) 忠実化 field の包括許可)**:
+> 同型逸脱 3 連発 (issue 0091 Hypothesis78 / zeta_induced / zeta_injective、各回ユーザー受理) の
+> 反復解消として、**issue 2034/3002 の (13.5) 供給作業中に限り、b による `S09_NonexistenceCertain`
+> `structure Hypothesis76` への Pf (7.6) 忠実な field 追加を包括許可**する。条件: (i) field **追加**のみ
+> (既存 field の改変・削除は逸脱)、(ii) 教科書 (7.6) に忠実な内容、(iii) 供給 (構築子/consumer 更新)
+> 込みで build green、(iv) issue 2034/3002 で self-flag。**2034/3002 完了で失効**。Hypothesis76 以外の
+> S09_NonexistenceCertain 編集は従来どおり逸脱。
 
 1. 各レーンの未マージ確認: `git log --oneline main..<branch>`。
    **全レーン 0 なら「変化なし」1行報告で即終了**（build を走らせない）。
