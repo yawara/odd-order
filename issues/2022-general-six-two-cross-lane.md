@@ -562,3 +562,22 @@ coeff (X ∈ ℤ[R]) / Y ⊥ R。
 
 - tau_muGrid_columnSum_diff_cohFree + columnImageFamilyCohFree 閉。
   残 = named 2 点の ofProjection plumbing (追記 8-9 のレシピ後半)。
+
+### 追記 10 (loop 37): plumbing の threading 設計 (確定)
+
+- **S13.Hypothesis は `params : CharacterParameters base` field を既に持つ** (S13:111)。
+  ただし pin (params.mu = muGrid 等) が無い。muGrid は (hG hodd)-引数依存だが
+  IsMinimalSimpleOdd/Odd は Prop → proof-irrelevant → ∀-量化 field で pin 可能:
+  `params_mu_eq : ∀ hG hodd, params.mu = base.muGrid hG hodd` /
+  `params_delta_sign : ∀ hG hodd j ≠ 0, base.muColumnSign hG hodd j = params.delta` /
+  (hzS/hz1 は params.zeta_mem/zeta_degree 系 field が既にあるか確認)。
+  S13.Hypothesis は constructor 未作成 (要再確認: grep mk/toS13) なら field 追加安全。
+- **署名 threading**: sixTwoDecompositionData と exists_source_of_coherence_dichotomy
+  (S13_SixTwoBridge, S12-hyp-level) に (params) (pins...) 引数を追加 →
+  S13-消費点 (exists_source_index_le_two_psi_of_ne_top 経由 (11.4)/(11.3)) で
+  hyp.params + 新 pin-fields から供給。
+- その上で named 2 点の本体: ψ-可約 → ψ = Σ_i muGrid i k (要: 可約 member の
+  列同定 lemma — sOf-membership から k の存在; S12_Section9Counts 331/395/428 の
+  params-引数付き補題群が材料) → columnImageFamilyCohFree → ofProjection
+  (tau1 := hS₁coh.extension-系, lattice-isometry = extension_inner_eq) +
+  直交 3 点 (muGridAlpha_inner_muColumn_* 系)。
