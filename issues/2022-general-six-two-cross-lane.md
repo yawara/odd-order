@@ -795,3 +795,11 @@ vs CharacterDifferenceImage.Orthogonal) の突合が実装時の最初の確認�
   (ii) 回避: 証明冒頭で `obtain ⟨ne, ext, hie, hos, hmz⟩ := hS₁coh` と
   即分解し ext-fvar 単独で全構成 (IsCoherent を早期に開けば以後の
   依存が単純 fvar になり fold 齟齬が消えるはず) — 有望。
+
+## 2026-07-05 lane-a (loop 58): ★named 片方完全閉 — member_of_reducible_member sorry-free
+
+- tau1-rfl は hS₁coh 冒頭分解で解決 (Lean 教訓を commit message に記録)。
+- 残 = sixTwoDecompositionData_of_reducible_break 内の member-∀ 1 sorry:
+  irr-χ: memberDatum_of_irreducible + 直交-vs-列 ((A)-for-χ + (B)-on-D(χ)-family
+  で ⟨D-elt, ω⟩=0 → ±δ-smul); 可約-χ: 今回の構成の写し + 列-列直交
+  (kχ ≠ kψ from χ≠ψ; aligned-inner cross)。全部品 in-context。
