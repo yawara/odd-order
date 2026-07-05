@@ -379,3 +379,60 @@ Parseval)。∴ 新規に整数線形代数を組む必要は無く、これを 
      で `mu2Grid` を `Fin q → Fin p → Irr G` grid に読み替え。**~0.5 session**。
 3. ~~H-level `S1cases`/`sS1S`~~ **✅ session 3**。
 4. **`sS1S` wrapper → `induce_H_mem_zSpan_S` (S15:629) close** — session 3 の残 (a)(b)(c) glue のまま。
+
+## 🛑 進捗 (session 7, 2026-07-06, lane b) — STEP 2 は **既に S06 で ported 済** と判明 → 再構築中止 (outcome B)
+
+継続 outline #2 step 2 (residue `chi`/`chi_res`/`ind_chi`/`chi_zero`, key = `cfRes_prTIirr_eq0`) を
+着手する前に **claim-before-build スキャン** (CLAUDE.md「既存を再構築しない」/[[verify-port-state-by-number-not-coq-name]])
+を実施した結果、**§4 prime-TI residue theory (4.5.a + 4.5.b) は既に `OddOrder/Peterfalvi/S06_*` に
+完全 port 済・sorry-free** と確定。`lake build OddOrder.Peterfalvi.S06_CertainTypeClifford
+OddOrder.Peterfalvi.S06_CertainTypeSupport` GREEN (3460 jobs, style linter warn のみ; real sorry=0)。
+**本 session は Lean 無変更・net real sorry ±0** (S05 の凍結 sorry-free 状態不変、S15:629 の 1 sorry も不変)。
+
+**決定 (なぜ再構築しない)**: `PrimeTIResidueData` の 4 field が要求する residue 数学は、`S06.Hypothesis`
+(= Coq `primeTI_hypothesis` の repo 版; `K ⋊ W1 = L`・`K_normal`・`card_coprime`・`W2 ≤ K` を bundle)
+の上で **既に honest に証明されている**。`S = L`・`PU = K` として 1:1 対応 (grep+読解で全数確認):
+
+| `PrimeTIResidueData` field / Coq | S06 の proven 定理 (sorry-free) | file:line |
+|---|---|---|
+| `chi j` / `primeTIres` | `chiRestrict χ₂ : IrreducibleCharacter ↥K` | S06_CertainTypeClifford:772 |
+| **`chi_res` (i 独立) / `cfRes_prTIirr_eq0` (Coq:533)** | **`restrict_certainType_eq`** (`Res_K μ_ij = Res_K μ_0j`) + `certainTypeRestrict_isIrreducible` | :608 / :732 |
+| `ind_chi` / `cfInd_prTIres` | `induce_restrict_certainType_eq` (`Ind_K^L χ_j = ∑_i μ_ij`) | :743 |
+| `chi_zero` / `prTIres0` | `chiRestrict_one_eq_trivial` (`chiRestrict 1 = 1_K`) | S06_CertainTypeSupport:287 |
+| `cfker_prTIres` (Coq:801) | `not_subset_characterKernel_chiRestrict_of_ne_one` (`W₂ ⊄ ker χ_j`, j≠0) | S06_CertainTypeSupport:182 |
+| `prTIres_irr_cases` (Coq:620) | `exists_eq_certainType_or_induce` + `induce_isIrreducible_of_forall_chiRestrict_ne` (inertia `I_L(χ)=K` 実証済 via `inertia_eq_K_of_forall_chiRestrict_ne`) | :964 / :913 / :868 |
+| `mu2_orthonormal` / `cfdot_prTIirr` | `columnFamily` (`.mu i` = μ_ij) + `columnFamily_mu_ne`/cross-orth 群 | S06_CertainTypeCharacters:432+ |
+
+- **key の `cfRes_prTIirr_eq0` (i-independence) は proved**: `restrict_certainType_eq` が Coq 論法
+  (`Ind_W^L(ω_ij−ω_0j)` の support が `W−W₂` の conjugate に限られ `K` を外す ⟹ `μ_ij−μ_0j` は `K` 上 0)
+  を **`induce_chiColumnDiff_eq_zero_of_mem_K` (:560) + `mem_W2_of_mem_sup_of_mem_K` (`W⊓K=W₂`, :371)**
+  で忠実に実証。engine `cfInd_sub_prTIirr` (=`Ind(ω_ij−ω_0j)=δ_j•(μ_ij−μ_0j)`) は **`columnFamily_spec`**
+  として在る (S05 `mu2Grid` route には無い; 下記)。
+- **既に FT spine が consume**: `FeitThompson.lean:2726/2731`・`S08_CaseB*`・`S12`・`S15.mu_definition`
+  が上記 S06 定理群を直接 cite。§13/§15 は `mu_definition` (Coq shape `Ind(ω_ij−ω_0j)=δ_j•(μ_ij−μ_0j)`,
+  = `S06_MuColumnBridge.induce_chiColumn_diff_mu_diff`) 経由で residue を得ており、`PrimeTIResidueData`
+  は経由しない。
+
+**なぜ `mu2Grid` route (本 issue の leaf) では step 2 を green に組めないか (技術的核心)**:
+`PrimeTIResidueData`/`mu2Grid` は `TICyclicHypothesis G` レベルで、**`PU=K` を持たない** (構造に normal
+subgroup field が無い)。かつ `cfRes_prTIirr_eq0` の engine は **column-uniform sign `δ_j`** を要すが、
+session 6 の `mu2Grid` は per-`ω` sign (`mu2GridSign ω`) しか持たず **column-uniform 性は未証明**
+(= Coq `primeTIirr_spec`, 未 port)。S06 は sign uniformity を **別 route** = (1.4) `columnFamily` +
+degree-congruence (4.3.d) `certainType_sign_eq_of_degree_eq` で得ている。`mu2Grid ↔ columnFamily` の
+bridge は **repo に存在しない** (grep: `mu2Grid` は S05 + 本 leaf のみ) 上、両者は ambient group
+(`G` vs `L`)・V-set (`W−(W₁∪W₂)` vs `W−W₂`)・induction 方向が異なり、bridge 自体が大きな独立 port。
+∴ `mu2Grid` からの step 2 は「clean な近道が無い」でなく **正しい層でない** (S06 が正しい層)。
+
+**⟹ 結論・handoff**:
+1. **step 2 は再実装しない** (S06 に proven 済; 再構築は CLAUDE.md 違反の重複)。本 issue の `PrimeTIResidue.lean`
+   leaf (sessions 1-6) は S06 residue theory の **parallel re-derivation** で、`S1cases`/`induce_H_mem_zSpan_calS`
+   等の下流 skeleton は有用だが、`mu2`/`chi`/... の field-grounding は S06 定理で置換すべき。
+2. **真の残作業 = S15:629 `induce_H_mem_zSpan_S` の close** は、`PrimeTIResidueData` 構成 (from `mu2Grid`)
+   ではなく、**S06 の proven residue 定理 (上表) を S15 の type-P2 setup に instantiate** して行うのが
+   honest かつ非重複な path。session 3 の H-level lift (`induce_H_mem_zSpan_calS`) は
+   `PrimeTIResidueData` を hypothesis に取る engine ゆえ、その `D` を **S06 由来で構成** (or S06 定理で
+   直接 `zSpan` membership を組む) すればよい。次 session はこの「S06 residue → S15:629」glue に注力する。
+3. `PrimeTIResidueData` の constructor を作るなら **source は `mu2Grid` でなく `columnFamily`/`chiRestrict`**
+   (index は `Ŵ₂ × Fin |W₁|`; `Fin q × Fin p` への読み替えは `card_charGroup_W2` 等で bijection)。
+   ただし `PrimeTIResidueData` は external consumer 0 ゆえ、S15:629 を S06 定理で直接閉じるなら
+   `PrimeTIResidueData` 構成自体が不要になる可能性が高い (次 session が判断)。
