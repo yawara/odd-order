@@ -549,6 +549,60 @@ theorem S_coherent [Finite G] [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
 
 /-! ## (13.3)--(13.4): character degrees and the first case split -/
 
+open scoped Classical in
+/-- **The `μ`-column sums are reducible** ((13.3.a) entry condition): `μ_j = ∑_i μ_{ij}` is a
+sum of `q ≥ 2` *distinct* irreducible characters (`mu_irreducible`, `mu_col_injective`), so its
+norm is `q ≠ 1` — not an irreducible character.  This is the membership shape that puts `μ_j`
+among the `p − 1` reducible members of `𝒮(H₀)` in the §9 analysis (Pf (9.8.b)/(9.9.b)). -/
+theorem Hypothesis.mu_colSum_not_irreducible [Finite G] (hyp : Hypothesis (G := G))
+    (j : Fin hyp.p) :
+    ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter (∑ i : Fin hyp.q, hyp.mu i j) := by
+  classical
+  haveI := hyp.finiteG
+  letI : Fintype ↥hyp.S := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥hyp.S : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  intro hirr
+  set a : Fin hyp.q → OddOrder.RepresentationTheory.IrreducibleCharacter ↥hyp.S :=
+    fun i => ⟨hyp.mu i j, hyp.mu_irreducible i j⟩ with ha
+  have hcond : ∀ i i' : Fin hyp.q, a i = a i' ↔ i = i' := by
+    intro i i'
+    constructor
+    · intro h
+      exact hyp.mu_col_injective j (congrArg
+        (fun χ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥hyp.S =>
+          (χ : ClassFunction ↥hyp.S ℂ)) h)
+    · rintro rfl
+      rfl
+  have hinner : ClassFunction.inner (∑ i : Fin hyp.q, hyp.mu i j)
+      (∑ i : Fin hyp.q, hyp.mu i j) = (hyp.q : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_sum_left]
+    calc ∑ i : Fin hyp.q, ClassFunction.inner (hyp.mu i j) (∑ i' : Fin hyp.q, hyp.mu i' j)
+        = ∑ i : Fin hyp.q, ∑ i' : Fin hyp.q, ClassFunction.inner (hyp.mu i j) (hyp.mu i' j) := by
+          refine Finset.sum_congr rfl fun i _ => ?_
+          rw [OddOrder.RepresentationTheory.inner_sum_right]
+      _ = ∑ i : Fin hyp.q, ∑ i' : Fin hyp.q, if i = i' then (1 : ℂ) else 0 := by
+          refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun i' _ => ?_
+          have hite := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite
+            (a i) (a i')
+          rw [ha] at hite
+          exact hite.trans (if_congr (hcond i i') rfl rfl)
+      _ = ∑ _i : Fin hyp.q, (1 : ℂ) := by
+          refine Finset.sum_congr rfl fun i _ => ?_
+          simp
+      _ = (hyp.q : ℂ) := by simp
+  have h1 : ClassFunction.inner (∑ i : Fin hyp.q, hyp.mu i j)
+      (∑ i : Fin hyp.q, hyp.mu i j) = 1 := by
+    have hite := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite
+      (⟨∑ i : Fin hyp.q, hyp.mu i j, hirr⟩ :
+        OddOrder.RepresentationTheory.IrreducibleCharacter ↥hyp.S)
+      (⟨∑ i : Fin hyp.q, hyp.mu i j, hirr⟩ :
+        OddOrder.RepresentationTheory.IrreducibleCharacter ↥hyp.S)
+    simpa using hite
+  rw [hinner] at h1
+  have : hyp.q = 1 := by exact_mod_cast h1
+  exact hyp.q_prime.one_lt.ne' this
+
 open scoped FiniteInduce in
 /-- Character-degree and Dade-extension data from Peterfalvi (13.3).
 
