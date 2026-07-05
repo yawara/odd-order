@@ -311,3 +311,28 @@ Peterfalvi (3.9.a) の真の内容 = 「η_ij の複素共役 = **character-inve
 ```
 (S16 に一時 test 定理 `tmp_verify_cite_forms` を入れて全 4 field が typecheck することを実確認 → revert 済。
 `eta_principal` は既存 `eta_principal_apply_eq_one hyp.base g` でも同値。)
+
+## ⚠ (3.9.a) 未解決ハンドオフ (2026-07-05 lane b, keystone landing 直後) — **unsound carrier 注意**
+
+keystone (d7cb137a) は **(3.9.c) integrality + (3.9) principal を honest 供給**したが、
+**(3.9.a) pairing field `eta_pair_of_coprime` は `finNeg` 形で likely-FALSE** と判明 (単なる未証明でなく):
+- G0 上 η 値は実整数 (3.9.c) ゆえ真の pairing は **character 反転 `rowInv`/`colInv`** (S06
+  `chiColumn_conj`/`galoisMap_conj_omega`) の下で成立。`finNeg` (組合せ的 index 反転) ≠ 反転置換
+  (非構成 enum `Fintype.equivFinOfCardEq` では `w1CharEquiv(finNeg i)=(w1CharEquiv i)⁻¹` が偽)。
+- ⟹ `finNeg`-form field を sorried で carry するのは **FT-path producer 上の unsound carrier**
+  (sorry ゆえ false-proof 完成はしないが、honest close 不能な false statement)。
+- keystone commit d7cb137a では暫定 sorried + `section16CharacterData_of_isMinimalSimpleOdd` の
+  AxiomsCheck assert を disable (documented)。**この状態は次セッションで解消要**。
+
+**次セッションの fix (2 択、A 優先)**:
+- **A (honest close)**: field を honest 反転 involution 形 (perm/rowInv/colInv をデータとして carry
+  or S06 反転) に**書き換え**、S06 `chiColumn_conj` + G0-実整数性から sorry-free 証明。AxiomsCheck
+  assert 再有効化。c へ通知: `EtaGenericData.eta_pair` を同 involution で restate
+  (`one_le_norm_signed_paired_sum` は抽象 `Equiv.Perm` を既に取る = c-side restatement のみ)。
+- **B (fallback)**: (3.9.a) field を**完全撤去** (Hypothesis/Section16Inputs/Section16CharacterData/
+  両 constructor から un-thread)、honest (3.9.c)+principal のみ残す。assert 再有効化。
+  pairing は cross-lane design item として明示。
+
+(先行 subagent が A を着手し Section16Inputs 更新中で停止 → incomplete edit は破棄済、
+d7cb137a の documented-gate 状態から再開)。**c は integrality+principal の wiring は今すぐ可**
+(それらは honest)。pairing のみ上記 fix 待ち。
