@@ -636,6 +636,66 @@ theorem closure_preimage_eq_top_of_closure_eq_top {Γ Γ' : Type*} [Group Γ] [G
     have hmem := Subgroup.inv_mem _ (ih g'⁻¹ h2)
     simpa using hmem
 
+/-- **The exponent function of an action on an order-`p` subgroup**: for a family
+`φ : A →* MulAut Γ` of automorphisms each mapping `T` (of order `p`) into itself, there is
+`e : A → ℕ` with `φ v s = s^(e v)` on `T`, no value divisible by `p`, *multiplicative mod `p`*,
+and such that `e v ≡ 1` forces `φ v` to fix `T` pointwise. -/
+theorem exists_exponent_fun_of_card_prime {Γ A : Type*} [Group Γ] [Group A] {p : ℕ}
+    (hp : p.Prime) {T : Subgroup Γ} (hT : Nat.card ↥T = p)
+    (φ : A →* MulAut Γ) (hmem : ∀ (v : A), ∀ s ∈ T, φ v s ∈ T) :
+    ∃ e : A → ℕ,
+      (∀ v, ¬ p ∣ e v) ∧
+      (∀ v, ∀ s ∈ T, φ v s = s ^ e v) ∧
+      (∀ u v, ((e (u * v) : ZMod p)) = (e u : ZMod p) * (e v : ZMod p)) ∧
+      (∀ v, (e v : ZMod p) = 1 → ∀ s ∈ T, φ v s = s) := by
+  classical
+  choose e hep he using fun v : A =>
+    exists_pow_eq_of_mapsTo_of_card_prime hp hT (φ v) (hmem v)
+  haveI : Finite ↥T := Nat.finite_of_card_ne_zero (hT ▸ hp.pos.ne')
+  haveI : Fact p.Prime := ⟨hp⟩
+  haveI : IsCyclic ↥T := isCyclic_of_prime_card hT
+  obtain ⟨t, ht⟩ := IsCyclic.exists_generator (α := ↥T)
+  have htord : orderOf (↑t : Γ) = p := by
+    have h := orderOf_injective T.subtype T.subtype_injective t
+    rw [show T.subtype t = ↑t from rfl] at h
+    rw [h, orderOf_eq_card_of_forall_mem_zpowers ht, hT]
+  have htfin : IsOfFinOrder (↑t : Γ) := by
+    rw [← orderOf_pos_iff, htord]
+    exact hp.pos
+  have hcong : ∀ k l : ℕ, (↑t : Γ) ^ k = (↑t : Γ) ^ l → (k : ZMod p) = l := by
+    intro k l hkl
+    have hmod := htfin.pow_eq_pow_iff_modEq.mp hkl
+    rw [htord] at hmod
+    exact (ZMod.natCast_eq_natCast_iff _ _ _).mpr hmod
+  refine ⟨e, hep, he, ?_, ?_⟩
+  · -- multiplicativity mod `p`, extracted at the generator
+    intro u v
+    have h2 := he (u * v) ↑t t.2
+    rw [map_mul, MulAut.mul_apply, he v ↑t t.2, map_pow, he u ↑t t.2, ← pow_mul] at h2
+    have h3 := hcong _ _ h2
+    rw [Nat.cast_mul] at h3
+    exact h3.symm
+  · -- `e v ≡ 1` pointwise-fixes `T`
+    intro v hv1 s hs
+    rw [he v s hs]
+    have hordfin : 0 < orderOf (⟨s, hs⟩ : ↥T) := by
+      rw [orderOf_pos_iff]
+      exact isOfFinOrder_of_finite _
+    have hords : orderOf s = orderOf (⟨s, hs⟩ : ↥T) := by
+      have h := orderOf_injective T.subtype T.subtype_injective (⟨s, hs⟩ : ↥T)
+      rw [show T.subtype ⟨s, hs⟩ = s from rfl] at h
+      exact h
+    have horddvd : orderOf s ∣ p := by
+      rw [hords, ← hT]
+      exact orderOf_dvd_natCard _
+    have hfin : IsOfFinOrder s := by
+      rw [← orderOf_pos_iff, hords]
+      exact hordfin
+    have hmod : e v ≡ 1 [MOD p] := (ZMod.natCast_eq_natCast_iff _ _ _).mp (by simpa using hv1)
+    have hmods : e v ≡ 1 [MOD orderOf s] := Nat.ModEq.of_dvd horddvd hmod
+    calc s ^ e v = s ^ 1 := hfin.pow_eq_pow_iff_modEq.mpr hmods
+      _ = s := pow_one s
+
 end CaseA
 
 end OddOrder.Peterfalvi.S13
