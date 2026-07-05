@@ -9519,7 +9519,13 @@ subgroup is Frobenius with kernel `H`, and `u = (p^q-1)/(p-1)`.
 
 The trigger set is `𝒮(H₀C')` (`chief.H0 ⊔ chars.Cprime`) — the `H₀C'` join, not `C` alone
 (count-statement audit, issue 2030); the missing character is required *irreducible* of degree `qu`
-(matching the negation of the (9.8.c)/(9.9) existence). -/
+(matching the negation of the (9.8.c)/(9.9) existence).  The degree condition is redundant given
+case (b) — every `𝒮(H₀C')`-member has degree `qu` (`caseB_degree_qu`) — so the trigger reduces
+to the (9.9.c) one and the `u`-formula conjunct is `caseB_no_irreducible_u_formula`.  The two
+Frobenius conjuncts remain: `quotientSemidirectFrobenius` is an *opaque `Prop` field* (the S12
+count-bridge supplies `True`; its honest content `H̄ ⋊ Ū` Frobenius is carried by the real
+`chiefFactor_caseB_action_fpf` — de-opacification tracked in issues 1012/2035), and the type-II
+`HU`-Frobenius clause is the genuine character-theoretic Frobenius criterion (deep). -/
 theorem exceptional_case_frobenius_realization [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
@@ -9532,6 +9538,11 @@ theorem exceptional_case_frobenius_realization [Finite G]
         OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(data.H ⊔ data.U)
           (data.H.subgroupOf (data.H ⊔ data.U))
           (data.U.subgroupOf (data.H ⊔ data.U))) := by
-  sorry
+  have hno' : ¬ ∃ χ ∈ chars.SOf (chief.H0 ⊔ chars.Cprime), IsIrreducibleCharacter χ := by
+    rintro ⟨χ, hmem, hirr⟩
+    exact hno ⟨χ, hmem, hirr, caseB_degree_qu hG chars caseB χ hmem⟩
+  refine ⟨?_, caseB_no_irreducible_u_formula hG chars caseB hno', ?_⟩
+  · sorry
+  · sorry
 
 end OddOrder.Peterfalvi.S11
