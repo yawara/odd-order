@@ -56,3 +56,10 @@ residual) から cite 可能。将来の hub 整理候補: BG S14 の ncard 版 
 - `OddOrder/Peterfalvi/S15_SAndT_Setup.lean` `analyticCounting_disjointCover` ほか 4 producer
 - `OddOrder/GroupTheory/TISubset.lean:86-110` (予告 docstring)
 - Pf §13 (13.9)-(13.10) = `references/peterfalvi/04.15_pp_75_86_The_Subgroups_S_and_T.mmd`
+
+## 拡張 (07-05 loop it.38, lane b)
+
+同クラスタとして TI-induce 値公式 2 本を追加 (issue 2034 の (13.2.e) τ=Ind 接続用):
+- `IsTISubset.induce_apply_of_mem_conj`: A-supported α の Ind_L^G は飽和上で α(a)
+  (非零 summand = coset yL ちょうど、|L| 個 → 正規化で collapse)
+- `IsTISubset.induce_apply_of_not_mem_conjClassSet`: 飽和外で 0

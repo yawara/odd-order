@@ -252,6 +252,61 @@ theorem card_mul_inner_self_induce_eq_card_inertia (θ : IrreducibleCharacter H)
   rw [Finset.sum_congr rfl fun x _ => hterm x, Finset.sum_boole, ← Fintype.card_subtype,
     Nat.card_eq_fintype_card]
 
+open scoped Classical in
+/-- **The conjugate-orbit sum is a virtual character**: each summand of the orbit
+`{θ^{x⁻¹} : x ∈ G}` is (the coercion of) an irreducible character of `H`
+(`IrreducibleCharacter.conjBy`), so the sum lies in `ℤ[Irr H]`.  Together with
+`card_smul_restrict_induce_eq_inertia_smul_orbitSum` this makes
+`(1/‖Ind θ‖²)·Res_H(Ind θ)` a genuine (ℕ-combination) character — the integrality carrier of
+Peterfalvi (13.5.a). -/
+theorem orbitSum_mem_ZIrr [Finite H] (θ : IrreducibleCharacter H) :
+    (∑ ψ ∈ Finset.univ.image
+        (fun x : G => ClassFunction.conjBy x⁻¹ (θ : ClassFunction ↥H ℂ)), ψ) ∈ ZIrr ↥H := by
+  refine Submodule.sum_mem _ (fun ψ hψ => ?_)
+  obtain ⟨x, -, rfl⟩ := Finset.mem_image.mp hψ
+  rw [← IrreducibleCharacter.coe_conjBy]
+  exact (IrreducibleCharacter.conjBy x⁻¹ θ).2.mem_ZIrr
+
+open scoped Classical in
+/-- **Distinct-fibre orbit sums are orthogonal**: if `Ind_H^G θ ≠ Ind_H^G θ'`, the conjugate
+orbits of `θ` and `θ'` are disjoint sets of irreducibles (`induce_conjBy_eq` — a common
+conjugate would force equal inductions), so the orbit sums are orthogonal
+(`irreducibleCharacter_inner_eq_ite`).  The `⟨Res ζ_{i₁}, α⟩ = 0` input of the Peterfalvi
+(13.5.a) `P`-kernel orthogonality. -/
+theorem orbitSum_inner_orbitSum_eq_zero_of_induce_ne [Finite H]
+    (θ θ' : IrreducibleCharacter H)
+    (hne : ClassFunction.induce H (θ : ClassFunction ↥H ℂ)
+      ≠ ClassFunction.induce H (θ' : ClassFunction ↥H ℂ)) :
+    ClassFunction.inner
+      (∑ ψ ∈ Finset.univ.image
+        (fun x : G => ClassFunction.conjBy x⁻¹ (θ : ClassFunction ↥H ℂ)), ψ)
+      (∑ ψ ∈ Finset.univ.image
+        (fun x : G => ClassFunction.conjBy x⁻¹ (θ' : ClassFunction ↥H ℂ)), ψ) = 0 := by
+  rw [inner_sum_left]
+  refine Finset.sum_eq_zero (fun ψ hψ => ?_)
+  rw [inner_sum_right]
+  refine Finset.sum_eq_zero (fun ψ' hψ' => ?_)
+  obtain ⟨x, -, rfl⟩ := Finset.mem_image.mp hψ
+  obtain ⟨y, -, rfl⟩ := Finset.mem_image.mp hψ'
+  rw [← IrreducibleCharacter.coe_conjBy, ← IrreducibleCharacter.coe_conjBy,
+    irreducibleCharacter_inner_eq_ite, if_neg]
+  intro heq
+  refine hne ?_
+  -- equal conjugates force equal inductions (`induce_conjBy_eq`)
+  have h1 : ClassFunction.induce H
+      (ClassFunction.conjBy x⁻¹ (θ : ClassFunction ↥H ℂ))
+      = ClassFunction.induce H (θ : ClassFunction ↥H ℂ) :=
+    induce_conjBy_eq (G := G) (H := H) x⁻¹ _
+  have h2 : ClassFunction.induce H
+      (ClassFunction.conjBy y⁻¹ (θ' : ClassFunction ↥H ℂ))
+      = ClassFunction.induce H (θ' : ClassFunction ↥H ℂ) :=
+    induce_conjBy_eq (G := G) (H := H) y⁻¹ _
+  have h3 : (IrreducibleCharacter.conjBy x⁻¹ θ : ClassFunction ↥H ℂ)
+      = (IrreducibleCharacter.conjBy y⁻¹ θ' : ClassFunction ↥H ℂ) := by rw [heq]
+  rw [← h1, ← h2]
+  rw [IrreducibleCharacter.coe_conjBy, IrreducibleCharacter.coe_conjBy] at h3
+  rw [h3]
+
 /-- **Induced irreducibles coincide iff the sources are `G`-conjugate.**  For `θ, ψ ∈ Irr H`
 (`H ⊴ G`), `Ind_H^G θ = Ind_H^G ψ` exactly when some `G`-conjugate of `θ` equals `ψ`.
 

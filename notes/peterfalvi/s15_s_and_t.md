@@ -8,7 +8,94 @@
 
 ---
 
+## ✅ LIVE STATUS (2026-07-05 loop it.27-31, lane **b**): issue 2033 完遂 — ω (3.3) 意味論貫通 + (1.10)-合同層 real 化
+
+- **2033 threading (it.27-28, commit 9c79ee63)**: `TICyclicHypothesis.omega` は hom-パラメータ化済 →
+  field は 5 本 (omega_mul / col-0 W₂-自明 / row-0 W₁-自明 / W₁ q-乗根 / W₂ p-乗根)。spine supply 5 本
+  実証明 (`omegaS_mul` 等 — S06 chiColumn の hom-性 + `chi2enum_zero`/`w1CharEquiv_zero`/
+  `pow_card_eq_one'`) + Section16Inputs/CharacterData/S15.Hypothesis 3 構造貫通。
+- **(13.7) atom real 化 (it.29, commit 688e9c93)**: `eta10_alphaCF_one_ne_zero` 実証明 — helper
+  `mul_notMem_W1_union_W2` + `eta10_apply_sub_one_integral` (η₁₀(y) ≡ 1 mod 1−ε: (1.10.a) =
+  `exists_integral_apply_sub_of_commute`、τ₃-regular + 2033 fields で ω₁₀(xy) = ω₁₀(x) = ε^k)。
+  α(1)=0 なら (1.10.b) `int_dvd_of_one_sub_primRoot_dvd` で q∣1 矛盾。残 gate =
+  `eta10_cCoeff_orthogonal` のみ。`W2_le_P`+`pgroup_le_of_normal_coprime_index` を Setup に relocate。
+- **(13.6) atom real 化 (it.30, commit bd1f44aa)**: `exists_lambda_alphaFun_one_qb` 実 assembly —
+  `lambda_apply_mul_eq_zero` 実証明 (q ∣ ord(xy) vs q ∤ |H|)、point formula (c₁=1, ‖ζ₁‖²=1) で
+  α(x) = λ^{τ₁}(x) − λ(x)、(1.10.a) G-level + ↥S-level 二本 (λ ∈ ZIrr ↥S は `zeta_induced` から実導出)。
+  新 sorried sub-atom `lambda_tau1_apply_mul_eq_zero` ((3.2.d)/(5.3.b)/(5.5) gate)。
+- **α(1) ∈ ℤ real 化 (it.31, commit 4d076d23)**: `lambda_alphaFun_one_int` 完全実証明 —
+  `H_sharp_cCoeff_int` 一般化 (eta10 版は 1 行 cite に refactor) + inertia 恒等式
+  (`card_mul_inner_self_induce_eq_card_inertia`: |K|·‖ζ‖² = |I| → ζᵢ(1)/‖ζᵢ‖² = [S:Iᵢ]) +
+  `(Int.castRingHom ℂ).range` の `Subring.sum_mem` (filter を restate しない = instance-trap 回避)。
+  **技術ノート: FiniteInduce scoped Invertible と手動 invertibleOfNonzero の二重供給は induce の
+  instance 不一致を起こす — scoped に任せる (haveI しない)**。
+- **現況**: (13.5)–(13.10) norm cascade の (1.10)-合同層は全 real。残 sorried atom =
+  (13.3)-cluster (`character_degree_analysis` / `exists_lambda_index` / `lambda_tau1_norm_one` /
+  `lambda_tau1_apply_mul_eq_zero` / `eta10_cCoeff_orthogonal`) + T-side (Q-abelian gated) +
+  `G0_nonvanishing_dichotomy` + `lambda_forces_T_caseB` + `reconciled_typePData_T`。
+  次 frontier = (13.3)-cluster 設計精読 (tau1S の W-side routing は s16_w4_char_cascade.md
+  2026-07-02 hub section が正本)。
+
 ## ✅ LIVE STATUS (2026-07-05 後半, lane **b** — (13.10) 4 producer 全 discharge、residual = 教科書番号 5 本)
+
+### cont.⁴ (07-05 loop it.20-25): (13.5)-package 3 本全 real 化 — cascade 構造完成
+
+- **T-side ρ-machinery mirror** (`0c541512`): Q_sharp_dadeHypothesis → hconj → h71 → h76
+  (proven Q_sharp_isTISubset から、全て実証明)
+- **(13.5.a) machinery generic 化** (`3ba0347b` + 後続): 任意 H76 + P' 上の point formula
+  (kernel-only + distinguished-i₁)、alphaFun cluster、F-inflation、**generic P'-kernel 直交性**
+  (`hypothesis76_zeta_inner_alphaFun_eq_zero`) — S/T 両側の共通基盤
+- **`exists_caseB_data_eta10_T` 実 assembly** (`88fd43a0`): ζ = (1/p)μ′ 正規化、
+  firstTerm = (1/p²)(|T|p−(pv)²) = |T′|−v² (card_T_eq_deriv_mul_p)、全部品 1-line cite
+
+**cascade 最終構造**: analytic_inequality (13.10、実定理) ← 4 producer (全実 assembly) ←
+sharp 3 本 (全 engine assembly) ← (13.5)-package 3 本 (全実 assembly) ← **原子 6 fact**:
+`exists_lambda_index`/`lambda_tau1_norm_one` ((13.3)-同定)、`eta10_cCoeff_orthogonal`/
+`exists_muT_index` ((13.3.c)-直交)、`exists_lambda_alphaFun_one_qb`/
+`eta10_alphaCF_one_ne_zero` ((1.10)-合同 = **issue 2033**)、`exists_etaT_alphaFun_one_int`
+(Q-abelian gated) + (13.3)/(13.4)/dichotomy/reconciled。
+**b の次の ungated front = issue 2033 の supply 側** (ω-因子分解 field threading —
+3002 パターン、lane-a file への additive 編集権は 07-05 裁定済)。
+
+### cont.³ (07-05 loop it.14-19): λ-package 実 assembly + 直交性 real 化、gate-map 確定
+
+- **`exists_caseB_data_lambda` 実 assembly** (`0dc592c0`): atom 3 本 (exists_lambda_index /
+  lambda_alphaFun_inner_zero / exists_lambda_alphaFun_one_qb) — proven の H_sharp_point_formula
+  が c̄/‖ζ‖² = 1 で collapse。
+- **orbit 直交性 + inner-zero 実証明** (`1c756d7a`/`f9a97bdf`): lambda_alphaFun_inner_zero は
+  **S-level shortcut** (λ は K 外で消える → filter-和を全和に延長 → distinct-fibre induced 直交
+  `inner_induce_eq_zero_of_not_conj`) で K-side 迂回して完全 real。restrict-分解抽出 2 本も追加。
+- **確定 gate-map (両 package 残 4 atom)**: `exists_lambda_index` ((13.3): λ = ζ_{i₁}、c=1、
+  middle 直交 — S-coherence) / `eta10_cCoeff_orthogonal` ((13.3.c)+(5.3.b): η ⊥ S^{τ₁}) /
+  **(1.10)-合同 2 本 → issue 2033** (ω の W₁×W₂ 因子分解 field 未 threading が真の gate;
+  α(1) = η₁₀(x) on W₂# までは real 到達可能)。
+- **次の ungated 実仕事**: T-side (13.8) package 用の ρ-machinery mirror
+  (Q_sharp_isTISubset proven → Q_sharp_dadeHypothesis → hypothesis76 mirror)。
+
+### cont.² (07-05 loop it.5-13): (13.5) 整数性 unit 完遂 — (13.7) package 実 assembly、残 grid-atom 2 本
+
+H-side 整数性 unit を完遂 (`d24c7b9c`〜`d1be0c6e`、全て実証明):
+- **Mackey orbit-sum** `card_smul_restrict_induce_eq_inertia_smul_orbitSum` (InducedIrreducible) +
+  `orbitSum_mem_ZIrr`
+- **`Hypothesis76.zeta_induced` field 追加** (S09、additive; 唯一の constructor OfFamily は
+  term-mode 化して充足)。canonical instance = FiniteInduce instance が同一項で bridge 不要
+- **(1/‖ζᵢ‖²)·Res ζᵢ ∈ ℤ[Irr K]** → **α|_K ∈ ℤ[Irr K]** (cᵢ ∈ ℤ 下) → ⟨φ,φ⟩ ∈ ℕ /
+  φ(1) ∈ ℤ 抽出補題
+- **`eta10_cCoeff_int` 実証明**: FullDadeIsometryData.preserves_virtualCharacters ((2.10)、
+  既存発見!) + dᵢ = 1 (K abelian → θ linear) 経由
+- **`H_mulCommutative`** (H = PC abelian、carrier 実導出) + Parseval bookkeeping
+- **`exists_caseB_data_eta10` 実 assembly 完成**: 単一 F : Finset ↥S 上で全 bookkeeping。
+  **教訓: 異なる補題の baked spelling への rw-join は不可視の Fintype/DecidablePred instance
+  差で失敗する** (classical タクティクの fvar-instance も割れ要因) → **F-引数化 wrapper**
+  (explicit Finset + mem-iff 特性、instance-free interface) が決定的解 —
+  `sum_finset_sharp_normSq_eq` / `sum_finset_sharp_transport` /
+  `H_sharp_alphaFun_inflation_finset`
+
+**(13.7) chain 現況**: analyticEstimate_eta ← eta10_sharp_norm_lower ← exists_caseB_data_eta10
+← **残 atom 2 本のみ**: `eta10_cCoeff_orthogonal` ((13.3.c)/(5.3.b) 直交性) /
+`eta10_alphaCF_one_ne_zero` ((1.10)/(3.2.c) 合同)。
+**次**: λ-side (13.6) package の同型 atomization (`exists_lambda_index` の設計 —
+「λ = ζ_{i₁} with cCoeff = 1」の (13.3)-gated 同定) と T-side (13.8) の横展開。
 
 ### cont. (07-05 loop it.2-4): sharp 3 本 engine wiring 完了 + (13.5.a/c) 具体化、次 = H-side 整数性
 
