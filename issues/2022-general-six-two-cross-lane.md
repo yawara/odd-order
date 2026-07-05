@@ -605,3 +605,20 @@ coeff (X ∈ ℤ[R]) / Y ⊥ R。
 - reducible_mem_sOf_H0_eq_muGrid_columnSum 閉 (build green)。
   ψ-列同定の主部品完成。残 = family-bridge (inducedKernelFamily ↔ sOf) +
   ofProjection 組み立て。
+
+### 追記 12 (loop 42): ★家族整合の解析 — U-side 可約は Frobenius-FPF で不可能
+
+- 事実確認 (Coq): repo `inducedKernelFamily` = Coq `S_ X = seqIndD HU M HU X`
+  (noncontainment = θ≠1) ✓ 健全。textbook-𝒳 (H ⊄ ker) = Coq `calS`
+  (M`_\s-slot) は別物で、S_ ⊋ calS (H ⊆ ker θ の U-side member を含む)。
+- (9.8)-列分類は sOf (𝒳-form) 側で証明済 → bridge-family の可約 ψ に適用する
+  には「可約 → H ⊄ ker θ」が必要。
+- **鍵**: U-side (H ⊆ ker θ) の可約 = θ が M-invariant (inertia_eq_top_of_
+  induceHU_not_irreducible :5021) → θ̄ ∈ Irr(Ū) が W₁-固定・非自明。
+  だが U⋊W₁ は Frobenius (typeP_uW1_frobenius) → W₁ は U# に FPF →
+  Brauer permutation で Irr(U)∖{1} にも固定点なし → 矛盾。
+  ∴ **可約 member は自動的に H ⊄ ker** → sOf-transport → 列分類 OK。
+- 次の実装: `inducedKernelFamily_reducible_H_not_le_ker` (Brauer-FPF;
+  部品: BrauerPermutationUnconditional + typeP_uW1_frobenius +
+  inertia_eq_top…) → sOf-⊥-transport lemma → ψ-同定完成 →
+  ofProjection 組み立て (columnImageFamilyCohFree)。
