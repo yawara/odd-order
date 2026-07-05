@@ -208,4 +208,164 @@ theorem quotient_classTwo_structure [Finite K] {p : ℕ} (hp : p.Prime)
 
 end QuotientClassTwo
 
+/-! ## Case (b): `U` irreducible on `H̄` refuted by the square-index parity -/
+
+section CaseB
+
+variable {G : Type*} [Group G]
+
+open OddOrder.Isaacs.Ch03 (IsAInvariant)
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
+
+/-- **Peterfalvi (11.7), Galois case refuted**: if `H` is a `p`-group with `H₀ = N = H'` a
+*nontrivial* chief kernel, `U` centralizes `N`, and `U` acts irreducibly on `H̄ = H/H₀`
+(Clifford case (b) of (9.7)), then `q = |W₁|` odd is contradictory.
+
+With `Q ◁ H`, `[H, N] ≤ Q ≤ N`, `|N : Q| = p` (`exists_normal_subgroup_index_prime`), the
+quotient `Ĥ = H/Q` is class-`2` with `Ĥ' = N̂ ≤ Z(Ĥ)` of order `p`
+(`quotient_classTwo_structure`).  The image of `Z(Ĥ)` in `H̄` is `U`-invariant (the `U`-action
+descends past the `U`-pointwise-fixed `Q`, and centers are characteristic), so by irreducibility
+it is `⊥` — giving `Z(Ĥ) = N̂` of order `p` and the parity contradiction
+`even_of_card_eq_prime_pow_succ_of_class_two` (`|Ĥ| = p^(q+1)` forces `q` even) — or `⊤` —
+making `Ĥ` abelian, contradicting `|Ĥ'| = p`. -/
+theorem chiefKernel_caseB_false [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (hpK : IsPGroup chief.p ↥data.H)
+    (hNcomm : chief.N = commutator ↥data.H)
+    (hUcent : ∀ (u : ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
+      (n : ↥data.H), n ∈ chief.N → typeP_conjAction data.typeP ↑u n = n)
+    (hqodd : Odd data.q)
+    (hNne : chief.N ≠ ⊥)
+    (hirr : ∀ J : Subgroup (↥data.H ⧸ chief.N),
+      IsAInvariant ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+        chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+        chief.N_aInvariant).U.subtype) J → J = ⊥ ∨ J = ⊤) :
+    False := by
+  classical
+  haveI := Fact.mk chief.p_prime
+  -- the index-`p` normal subgroup `Q` and the class-`2` structure of `Ĥ = H/Q`
+  obtain ⟨Q, hQnorm, hQle, hRQ, hcard⟩ :=
+    exists_normal_subgroup_index_prime chief.p_prime hpK hNne
+  haveI := hQnorm
+  obtain ⟨hNhatCard, hcommHat, hNhatLe⟩ :=
+    quotient_classTwo_structure chief.p_prime hQnorm hQle hRQ hcard hNcomm
+  -- the projection `π : Ĥ → H̄`
+  set π : (↥data.H ⧸ Q) →* (↥data.H ⧸ chief.N) :=
+    QuotientGroup.map Q chief.N (MonoidHom.id ↥data.H) (by simpa using hQle) with hπdef
+  have hπmk : ∀ x : ↥data.H, π ((QuotientGroup.mk' Q) x) = (QuotientGroup.mk' chief.N) x :=
+    fun x => rfl
+  have hπker : π.ker = chief.N.map (QuotientGroup.mk' Q) := by
+    ext h
+    constructor
+    · intro hh
+      obtain ⟨x, rfl⟩ := QuotientGroup.mk'_surjective Q h
+      rw [MonoidHom.mem_ker, hπmk] at hh
+      exact ⟨x, (QuotientGroup.eq_one_iff _).mp hh, rfl⟩
+    · rintro ⟨n, hn, rfl⟩
+      rw [MonoidHom.mem_ker, hπmk]
+      exact (QuotientGroup.eq_one_iff _).mpr hn
+  -- the `U`-action descends to `Ĥ` (as `U` fixes `Q ≤ N` pointwise)
+  set φU : ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) →* MulAut ↥data.H :=
+    (typeP_conjAction data.typeP).comp
+      (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype with hφUdef
+  have hQinv : IsAInvariant φU Q := by
+    intro u
+    change Q.map (φU u).toMonoidHom = Q
+    apply le_antisymm
+    · rintro _ ⟨x, hx, rfl⟩
+      have hfix : (φU u) x = x := hUcent u x (hQle hx)
+      rw [show (φU u).toMonoidHom x = x from hfix]
+      exact hx
+    · intro x hx
+      exact ⟨x, hx, hUcent u x (hQle hx)⟩
+  -- the `π`-equivariance of the two descended `U`-actions
+  have hπσ : ∀ (u : ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
+      (h : ↥data.H ⧸ Q),
+      ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+        chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+        chief.N_aInvariant).U.subtype) u (π h) = π (quotientMulAutHom hQinv u h) := by
+    intro u h
+    refine QuotientGroup.induction_on h ?_
+    intro x
+    rfl
+  -- centers are preserved by every automorphism
+  have hZcen : ∀ (e : MulAut (↥data.H ⧸ Q)) (z : ↥data.H ⧸ Q),
+      z ∈ Subgroup.center (↥data.H ⧸ Q) → e z ∈ Subgroup.center (↥data.H ⧸ Q) := by
+    intro e z hz
+    rw [Subgroup.mem_center_iff] at hz ⊢
+    intro g
+    calc g * e z = e (e.symm g * z) := by rw [map_mul, e.apply_symm_apply]
+      _ = e (z * e.symm g) := by rw [hz (e.symm g)]
+      _ = e z * g := by rw [map_mul, e.apply_symm_apply]
+  -- the image of the center of `Ĥ` in `H̄` is `U`-invariant
+  set J : Subgroup (↥data.H ⧸ chief.N) := (Subgroup.center (↥data.H ⧸ Q)).map π with hJdef
+  have hJinv : IsAInvariant ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+      chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+      chief.N_aInvariant).U.subtype) J := by
+    intro u
+    change J.map _ = J
+    apply le_antisymm
+    · rintro _ ⟨j, hj, rfl⟩
+      rw [hJdef] at hj
+      obtain ⟨z, hz, rfl⟩ := hj
+      exact ⟨quotientMulAutHom hQinv u z, hZcen _ z hz, (hπσ u z).symm⟩
+    · rintro _ ⟨z, hz, rfl⟩
+      refine ⟨π ((quotientMulAutHom hQinv u).symm z),
+        ⟨(quotientMulAutHom hQinv u).symm z, hZcen _ z hz, rfl⟩, ?_⟩
+      exact (hπσ u _).trans (congrArg π ((quotientMulAutHom hQinv u).apply_symm_apply z))
+  -- `|Ĥ| = p^(q+1)`
+  have hHhatCard : Nat.card (↥data.H ⧸ Q) = chief.p ^ (data.q + 1) := by
+    have h1 := Subgroup.card_eq_card_quotient_mul_card_subgroup Q
+    have h2 : Nat.card ↥chief.H0 = Nat.card ↥chief.N := by
+      rw [chief.H0_eq]
+      exact (Nat.card_congr
+        (chief.N.equivMapOfInjective data.H.subtype data.H.subtype_injective).toEquiv).symm
+    have h3 := chief.quotient_order
+    rw [h1, h2, hcard] at h3
+    have hQpos : 0 < Nat.card ↥Q := Nat.card_pos
+    refine Nat.eq_of_mul_eq_mul_right hQpos ?_
+    rw [h3, pow_succ]
+    ring
+  -- the dichotomy
+  rcases hirr J hJinv with hJbot | hJtop
+  · -- `J = ⊥`: `Z(Ĥ) = N̂` of order `p`, and the square-index parity forces `q` even
+    have hZle : Subgroup.center (↥data.H ⧸ Q) ≤ chief.N.map (QuotientGroup.mk' Q) := by
+      rw [← hπker]
+      exact (Subgroup.map_eq_bot_iff _).mp hJbot
+    have hZeq : Subgroup.center (↥data.H ⧸ Q) = chief.N.map (QuotientGroup.mk' Q) :=
+      le_antisymm hZle hNhatLe
+    have heven : Even data.q := by
+      refine OddOrder.RepresentationTheory.even_of_card_eq_prime_pow_succ_of_class_two
+        chief.p_prime (hpK.to_quotient Q) ?_ ?_ hHhatCard
+      · rw [hZeq]
+        exact hNhatCard
+      · rw [hcommHat, ← hZeq]
+    exact (Nat.not_even_iff_odd.mpr hqodd) heven
+  · -- `J = ⊤`: `Ĥ` is abelian, contradicting `|Ĥ'| = p`
+    have hZtop : Subgroup.center (↥data.H ⧸ Q) = ⊤ := by
+      rw [eq_top_iff]
+      intro h _
+      have hmemJ : π h ∈ J := by
+        rw [hJtop]
+        exact Subgroup.mem_top _
+      obtain ⟨z, hz, hzeq⟩ := hmemJ
+      have hker : z⁻¹ * h ∈ π.ker := by
+        rw [MonoidHom.mem_ker, map_mul, map_inv, hzeq, inv_mul_cancel]
+      have hmem : z⁻¹ * h ∈ Subgroup.center (↥data.H ⧸ Q) :=
+        hNhatLe (hπker ▸ hker)
+      have hsplit : h = z * (z⁻¹ * h) := by group
+      rw [hsplit]
+      exact Subgroup.mul_mem _ hz hmem
+    have hcommbot : commutator (↥data.H ⧸ Q) = ⊥ := by
+      rw [commutator_def, eq_bot_iff, Subgroup.commutator_le]
+      intro g _ h _
+      rw [Subgroup.mem_bot, commutatorElement_eq_one_iff_mul_comm]
+      exact Subgroup.mem_center_iff.mp (hZtop ▸ Subgroup.mem_top h) g
+    rw [hcommbot] at hcommHat
+    have : Nat.card ↥(⊥ : Subgroup (↥data.H ⧸ Q)) = chief.p := hcommHat ▸ hNhatCard
+    rw [Subgroup.card_bot] at this
+    exact absurd this.symm chief.p_prime.one_lt.ne'
+
+end CaseB
+
 end OddOrder.Peterfalvi.S13
