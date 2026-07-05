@@ -65,6 +65,91 @@ theorem isTypeI {hyp : Hypothesis (G := G)} (Ldata : LHypothesis hyp) :
 
 end LHypothesis
 
+/-! ### (14.9) `calT1` structural foundation
+
+The Coq `FTtypeP_min_typeII` body (PFsection14.v:737--853) opens `calT1 = seqIndD QV T QV Q` with
+three purely group-theoretic facts about `QV = T' = derivedInG T` that are *independent* of the
+character/coherence/Γ-bridge machinery:
+
+* `QV ◁ T` with `[T : QV] = p` (Coq `index_sdprod defT`, `p = |W2|` via `W2_isComplement_T_deriv`) —
+  this is `calT1_1p`'s degree factor.
+* `Q ⋊ V = QV` (Coq `defQV`, from `T_deriv_eq_QV` + `Q_inf_V_eq_bot`), giving `QV/Q ≅ V` and hence
+  `|QV/Q| = |V|` (Coq `card_isog (sdprod_isog defQV)`) — the source of the abelian-quotient irr count.
+* `QV/Q` abelian (Coq `isog_abelian (sdprod_isog defQV)`, `V` abelian) — makes every `QV/Q`-irr
+  linear, so `calT1_1p`'s inflated sources have degree one and `Ind_{QV}^T` has degree `[T:QV] = p`.
+
+These are landed below as reusable named helpers (`T_derived_index_eq_p`,
+`T_Q_isComplement_V_derived`, `T_card_quot_Q_derived_eq_card_V`).  They feed a future `calT1` build
+but do **not** on their own close (14.9); see the blocker map on `T_typeIII_ratio_le`. -/
+
+/-- **The `T`-side derived complement `T = T' ⋊ W₂`, index `[T : T'] = p`** (Coq
+`index_sdprod defT`, `p = |W2|`).  From the base `W2_isComplement_T_deriv` (`T' ⋊ W₂ = T`, available
+ungated at the §16 construction) and `p = |W2|` (`p_eq_card_W2`).  The degree factor of Coq
+`calT1_1p` (`Ind_{QV}^T θ (1) = [T:QV]·θ(1) = p` for linear `θ`). -/
+theorem T_derived_index_eq_p (hyp : Hypothesis (G := G)) :
+    ((derivedInG hyp.base.T).subgroupOf hyp.base.T).index = hyp.base.p := by
+  have hW2_le_T : hyp.base.W2 ≤ hyp.base.T := by
+    have h1 : hyp.base.W2 ≤ hyp.base.W := by rw [hyp.base.W_eq_join]; exact le_sup_right
+    have h2 : hyp.base.W ≤ hyp.base.T := by rw [hyp.base.W_eq_inter]; exact inf_le_right
+    exact h1.trans h2
+  rw [hyp.base.W2_isComplement_T_deriv.symm.index_eq_card,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2_le_T).toEquiv, hyp.base.p_eq_card_W2]
+
+/-- **`Q.subgroupOf QV` is normal in `QV = T' = derivedInG T`** (`Q = T_F` normalized by `T ⊇ T'`).
+The normality feeding the `QV/Q` quotient (Coq `nsQQV`). -/
+theorem T_Q_subgroupOf_derived_normal (hyp : Hypothesis (G := G)) :
+    (hyp.base.Q.subgroupOf (derivedInG hyp.base.T)).Normal := by
+  have hQ_le : hyp.base.Q ≤ derivedInG hyp.base.T := by
+    rw [hyp.base.T_deriv_eq_QV]; exact le_sup_left
+  have hM'_le_T : derivedInG hyp.base.T ≤ hyp.base.T := Subgroup.map_subtype_le _
+  have hT_le_NQ : hyp.base.T ≤ Subgroup.normalizer (hyp.base.Q : Set G) := by
+    rw [hyp.base.Q_eq_TF]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.base.T
+  exact (Subgroup.normal_subgroupOf_iff_le_normalizer hQ_le).mpr (hM'_le_T.trans hT_le_NQ)
+
+/-- **The `T`-side complement `Q ⋊ V = QV = T'`** (Coq `defQV`): `Q` (normal in `T'`, being `T_F`
+restricted) and `V` complement inside `derivedInG T`, from `Q ⊔ V = T'` (`T_deriv_eq_QV`) and
+`Q ⊓ V = ⊥` (`Q_inf_V_eq_bot`).  The `sdprod` giving `QV/Q ≅ V`.  Mirrors the complement built inside
+`S15.coprime_card_V_card_Q_of_disjoint`. -/
+theorem T_Q_isComplement_V_derived [Finite G] (hyp : Hypothesis (G := G)) :
+    Subgroup.IsComplement' (hyp.base.Q.subgroupOf (derivedInG hyp.base.T))
+      (hyp.base.V.subgroupOf (derivedInG hyp.base.T)) := by
+  have hQ_le : hyp.base.Q ≤ derivedInG hyp.base.T := by
+    rw [hyp.base.T_deriv_eq_QV]; exact le_sup_left
+  have hV_le : hyp.base.V ≤ derivedInG hyp.base.T := by
+    rw [hyp.base.T_deriv_eq_QV]; exact le_sup_right
+  haveI := T_Q_subgroupOf_derived_normal hyp
+  have hQnVn_inf : (hyp.base.Q.subgroupOf (derivedInG hyp.base.T)) ⊓
+      (hyp.base.V.subgroupOf (derivedInG hyp.base.T)) = ⊥ := by
+    ext ⟨x, hx⟩
+    simp only [Subgroup.mem_inf, Subgroup.mem_subgroupOf, Subgroup.mem_bot, Subtype.ext_iff,
+      OneMemClass.coe_one]
+    refine ⟨fun ⟨hxQ, hxV⟩ => ?_, fun h => by simp [h]⟩
+    have hxQV : x ∈ (hyp.base.Q ⊓ hyp.base.V : Subgroup G) := ⟨hxQ, hxV⟩
+    rwa [hyp.base.Q_inf_V_eq_bot, Subgroup.mem_bot] at hxQV
+  have hQnVn_sup : (hyp.base.Q.subgroupOf (derivedInG hyp.base.T)) ⊔
+      (hyp.base.V.subgroupOf (derivedInG hyp.base.T)) = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hQ_le hV_le, hyp.base.T_deriv_eq_QV.symm,
+      Subgroup.subgroupOf_self]
+  apply Subgroup.isComplement'_of_disjoint_and_mul_eq_univ (disjoint_iff.mpr hQnVn_inf)
+  have hmul := Subgroup.normal_mul (hyp.base.Q.subgroupOf (derivedInG hyp.base.T))
+    (hyp.base.V.subgroupOf (derivedInG hyp.base.T))
+  rw [hQnVn_sup, Subgroup.coe_top] at hmul
+  exact hmul.symm
+
+/-- **`|QV/Q| = |V|`** (Coq `card_isog (sdprod_isog defQV)`): the quotient of `QV = T'` by `Q` has
+the order of the complement `V`.  The source of the abelian-quotient irreducible count `v − 1`
+(nonprincipal `QV/Q`-irreducibles) in Coq `size calT1 = (v.-1) %/ p`. -/
+theorem T_card_quot_Q_derived_eq_card_V [Finite G] (hyp : Hypothesis (G := G)) :
+    Nat.card (↥(derivedInG hyp.base.T) ⧸ (hyp.base.Q.subgroupOf (derivedInG hyp.base.T)))
+      = Nat.card ↥hyp.base.V := by
+  have hV_le : hyp.base.V ≤ derivedInG hyp.base.T := by
+    rw [hyp.base.T_deriv_eq_QV]; exact le_sup_right
+  haveI := T_Q_subgroupOf_derived_normal hyp
+  -- `QV/Q ≅ V.subgroupOf QV` via the complement (`Q` normal in the `K`-slot).
+  rw [Nat.card_congr (T_Q_isComplement_V_derived hyp).symm.QuotientMulEquiv.toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hV_le).toEquiv]
+
 /-- **Peterfalvi (14.9), the character body** — the structural `≤` half of the ratio comparison, the
 sole deep obligation of (14.9).  Coq `PFsection14` `FTtypeP_min_typeII`, lines 737--853: assuming `T`
 is type III, build `calT1 = seqIndD QV T QV Q` (the degree-`p` induced characters of `T`, from
@@ -77,7 +162,55 @@ gap `Γ`, `⟨Γ, τ₁ ζ⟩ ≡ 1 (mod 2)` for each `ζ ∈ calT1` (Coq `nzT1_
 The `|calT1| = (v − 1)/p` step is *structural* (Coq line 836--845: `size calT1 = (v.-1) %/ p` from
 `v = |V/Q|` and the degree-`p` induction), so this bound does **not** re-derive the exact `v`-value;
 it is exactly the type-III Γ-bridge estimate whose `>` counterpart (14.8) `key_inequality` then
-contradicts.  Kept as the single precisely-named character residual of (14.9). -/
+contradicts.  Kept as the single precisely-named character residual of (14.9).
+
+**Blocker map (why this stays sorried; lane-c 2026-07-06).**  The Coq spine needs four missing
+pieces, none supplied by the `S16_PairingBessel` M-side template (which inducts from the *full*
+`Irr(M')` via a Frobenius `(T, M', C)` and counts fibers with `card_index_mul_sum_induced_family_
+degree_sq` — *not* the quotient-restricted `Irr(QV/Q)` family with a `W₁`-orbit count):
+
+1. **`v = |V|`** (Peterfalvi (13.12), `d = 1`, i.e. `D = V ⊓ C_G(Q) = ⊥`).  Coq's `v := |V|` is
+   *definitional* (PFsection14.v:66/422) so its `(v−1)/p` bound is literally `(|V|−1)/p`; the Lean
+   `Hypothesis.v` is a **free** ℕ with only `card_V_eq_vd : |V| = v·d`, so `v = |V|` iff `d = 1`.
+   That is `S15.V_inf_centralizer_Q_eq_bot` — currently **sorried and gated on `IsTypeII T`**, hence
+   unavailable in this type-III branch.  Without it, the honest `|calT1| = (|V|−1)/p` cannot be
+   identified with the goal's `(v−1)/p`.  (`T_card_quot_Q_derived_eq_card_V` above supplies the
+   `|QV/Q| = |V|` half; the `|V| = v` half is the missing (13.12).)
+2. **The `calT1` family + its `|calT1| = (v−1)/p` count.**  Needs (a) inflation `Irr(QV/Q) ↪
+   {χ ∈ Irr QV | Q ⊆ ker}` (available: `RepresentationTheory.InflationCharacter`), (b)
+   `Ind_{QV}^T`-irreducibility for nonprincipal inflated sources via `I_T(θ) = QV` — **the sole
+   genuinely-missing piece** (see below), and (c) the `/p` **orbit count**, now landed as reusable
+   shared infra `RepresentationTheory.card_image_induce_eq_div` (`OrbitOnIrr.lean`):
+   `|T.image (Ind_H^G)| = |T| / [G:H]` for a conjugation-invariant `T ⊆ Irr H` with `I_G(θ) = H`
+   throughout — the cardinality analogue of the M-side degree-square `sum_div_normSq_induce_image_eq`,
+   built from `card_filter_induce_eq_index_inertia`.  With (a)+(c) in hand the count reduces to (b).
+
+   The residual (b) — `I_T(inflate θ) = QV` for nonprincipal `θ ∈ Irr(QV/Q)` (Coq
+   `irr_induced_Frobenius_ker` + `injm_Frobenius_ker` through the quotient, PFsection14.v:757--762) —
+   needs two foundational rep-theory bricks the repo lacks: **(b1)** the *quotient* Frobenius
+   structure `T/Q = (QV/Q) ⋊ (W₂Q/Q)` with kernel `QV/Q ≅ V` (only the *subgroup* Frobenius
+   `V ⋊ W₂ ≤ T` exists, as a local `have` in `S15.isMulCommutative_V`; quotienting a Frobenius group by
+   a normal subgroup of its kernel is not formalized), and **(b2)** an inertia/inflation-commutation
+   lemma `I_G(inflate_N χ̄) = comap (mk' N) (I_{G/N}(χ̄))` (no `inertia`-through-quotient lemma exists).
+   Given (b1)+(b2), `inertia_eq_of_frobeniusGroup` gives `I_{T/Q}(θ̄) = QV/Q`, pulling back to
+   `I_T(inflate θ) = QV`.  Additionally `V` abelian (Coq `cVV`, type-P) is currently only ungated on
+   `IsTypeII T` (`S15.isMulCommutative_V`), so it too must be re-derived on this type-III branch.
+3. **A full `S07.Hypothesis` (5.2) instance for `calT1`** (the (12.1) T-side Dade `tauT` +
+   `difference_image`/`no_real`/`pairwise_orthogonal`/`tau_isometry_diff`), to feed
+   `coherent_of_constant_degree`.  This is the T-side coherence package, itself separately gated.
+4. **The `S`-side βₛ bridge gap `Γ`** and `⟨Γ, τ₁ζ⟩ ≡ 1 (mod 2)` (Coq `nzT1_Ga`, via
+   `S09.cfdot_real_vchar_even`), then `orthogonal_split` + Bessel.  `Γ` needs the full S-side
+   (13.x)/(14.x) βₛ construction (cf. the `S16_NonExistenceG` βₛ-grid sorry at ~line 6377).
+
+Escape-hatch conclusion (updated 2026-07-06, lane-c): the `/p` **orbit count** (item 2c) is now
+landed as reusable shared infra (`RepresentationTheory.card_image_induce_eq_div` /
+`card_image_induce_mul_index_eq`, `OrbitOnIrr.lean`), joining the group-theoretic foundation
+(`T_derived_index_eq_p`, `T_Q_isComplement_V_derived`, `T_card_quot_Q_derived_eq_card_V`).  The
+`calT1` count `|calT1| = (|V|−1)/p` now reduces to exactly **item 2b** — the Frobenius-kernel inertia
+fact `I_T(inflate θ) = QV`, which requires the two missing rep-theory bricks (b1) the quotient
+Frobenius `T/Q = V̄ ⋊ W̄₂` and (b2) inertia/inflation commutation — plus re-deriving `V` abelian off
+the type-III branch.  Those, together with items 3--4 (T-side coherence package + S-side `Γ` bridge),
+remain the documented residual of the character body. -/
 theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T) :
     ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) ≤
