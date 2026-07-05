@@ -765,3 +765,10 @@ vs CharacterDifferenceImage.Orthogonal) の突合が実装時の最初の確認�
   OfDiff-R-elt ⊥ ω^σ → columnRImage-elt (±δ-smul) →
   (C) member-D (irr: memberDatum_of_irreducible + B;
   可約: 列-列 = alignedOmegaSigmaGrid_inner cross)。
+
+## 2026-07-05 lane-a (loop 55): (B) 閉 — R-element 単位の直交確立
+
+- elt_inner_eq_zero (β := T−α 補部構成 + 射影補題)。(A)+(B) で
+  ⟨D-R-elt, ω^σ⟩ = 0 完成。残 = (C): columnRImage-elt = ±δ•ω への
+  smul-変換 + Orthogonal-def 束ね + memberDatum_of_irreducible 接続 +
+  可約-χ 側 (列-列)。
