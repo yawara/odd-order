@@ -37,12 +37,27 @@ created: 2026-07-06
 
 ## やること (残り research core)
 
-- [ ] **(iv) `hIM` の discharge** = single-summand W₁-free-orbit propagation:
-  `θ₁` が `S₀ = H₁` supported (`H₂…H_q` trivial) なら `w ∈ W₁#` で support が別の Clifford 因子
-  `H_j` (j≠1) に移る (`{Hpart j}` の W₁-transitivity, `Hpart_orbit`/`orbitRep`)。よって `χ^w ≠ χ`,
-  `I(ζ)∩W₁ = 1`, `I(ζ) ≠ ⊤`。**full-regular の `clifford_caseA_exists_char_inertia_hc_not_fixed`
-  より clean** (全因子 nontrivial 不要) だが、single-summand の support を追跡する新補題が要る。
-  - 前提: `θ₁` を `Irr(H̄/(H₂…H_q))#` から作る新 constructor (support = S₀ を保証)。
+- [x] **(iv) `hIM` の discharge** = single-summand W₁-free-orbit propagation — **LANDED**
+  (2026-07-06, build-green, sorry/axiom 無)。実装は当初想定の「support tracking constructor + `w`-moves」
+  ではなく、**既存 `caseA_reducible_theta_regular` の contrapositive** に帰着する clean route:
+  - **support witness** `caseA_exists_index_S0_not_le_biSup_compl`: `∃ j₀, ¬ S₀ ≤ ⨆_{j≠j₀} Hpart j`
+    (`iSupIndep` + spanning ⟹ `noncommPiCoprod` bijective; nonzero `x∈S₀` は component 射影で
+    ある `j₀`-成分が非自明)。
+  - **summand-join complement** `caseA_exists_summand_join_complement_S0`: `S₀ ⊕ W = ⊤`,
+    `W = ⨆_{j≠j₀} Hpart j` (U-invariant) **かつ `Hpart j₁ ≤ W` (j₁≠j₀, q≥2)**。
+    (`W` は order-`p` の `Hpart j₀` を complement ⟹ `[H̄:W]=p`; `S₀⊓W ⊊ S₀` prime ⟹ `⊥`;
+    `IsComplement' S₀ W` ⟹ `sup=⊤`。)
+  - **non-regular source** `exists_source_char_hom_caseA_nonRegular`: `θ₁` を上記 `W` で作り
+    `θ₁.comp (Hpart j₁).subtype = 1` (= 非 regular) を返す。
+  - **lies-over descent** `hcuPsiPair_restrict_hInHu_subgroupOf` + `liesOver_of_liesOver_liesOver_subgroupOf`
+    (`exists_liesOver_intermediate` の逆向き汎用補題) ⟹ `hcuZetaPair_liesOver_hInHu`
+    (`ζ` が `hInHu` で `θ₀` の上に lies over)。
+  - **discharge** `hcuZetaPair_inertia_ne_top`: `I_M(ζ)=⊤` を仮定 → `caseA_reducible_theta_regular`
+    が `θ₁` regular を強制 → `Hpart j₁` で `θ₁` 非自明のはずが `hnonreg` と矛盾 ⟹ `I_M(ζ)≠⊤`。
+  - **unconditional** `hcuZetaPair_induceHU_irreducible_of_nonRegular` /
+    `caseA_exists_irreducible_source_degree_qa_induceHU_irreducible`: `hIM` を discharge した
+    `Ind_{HU}^M ζ` 既約 (無仮説)。これで (9.8.d) の (iv) member = 既約 ∧ deg `qa` ∧ `HU`-source 既約
+    が完成。
 - [ ] **(v) count** `((p-1)/a)·|C_U(S₀):U'| = ((p-1)/a)·(|U|/(a|U'|))`:
   - **重要**: `H·C_U(S₀) ◁ HU` (`hcuInHu_normal`) は成立 → U-orbit step は `OrbitOnIrr` の
     `card_image_induce_eq_div` を `H·C_U(S₀)` 上で適用でき `|image|/[HU:H·C_U(S₀)] = |image|/a`。
