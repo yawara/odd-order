@@ -772,3 +772,15 @@ vs CharacterDifferenceImage.Orthogonal) の突合が実装時の最初の確認�
   ⟨D-R-elt, ω^σ⟩ = 0 完成。残 = (C): columnRImage-elt = ±δ•ω への
   smul-変換 + Orthogonal-def 束ね + memberDatum_of_irreducible 接続 +
   可約-χ 側 (列-列)。
+
+## 2026-07-05 lane-a (loop 56): 可約 member-D 実構成 (2 micro-goal 残し)
+
+- ofProjection + extension-τ₁ 組み立て成功。park 2 点:
+  (1) Orthogonal: per-pair = columnRImage 分解 (Finset.mem_image, ±δ•ω 2-case)
+      → inner-smul → conj_symm → (B) elt_inner_eq_zero (R := breakDa.1.imageFamily,
+      hT2 = hψT2 (証明済 in-context!), hTs = (A) tau_chidiff_inner_alignedOmega
+      (hψind hψirr, 各 (i,kχ/kχ')), s-facts = alignedOmegaSigmaGrid_inner self +
+      mem_ZIrr)。
+  (2) tau1-rfl: `hS₁coh✝` 二重 fvar 現象 — rw-flow 後も残存。fresh 診断:
+      (a) 単独最小再現 (b) ofProjection_tau1 @[simp] 補題新設で rw-close 試行
+      (c) statement 側の hS₁coh-依存 ∃ を Da-引数化する再定式化。
