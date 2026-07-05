@@ -436,3 +436,47 @@ bridge は **repo に存在しない** (grep: `mu2Grid` は S05 + 本 leaf の�
    (index は `Ŵ₂ × Fin |W₁|`; `Fin q × Fin p` への読み替えは `card_charGroup_W2` 等で bijection)。
    ただし `PrimeTIResidueData` は external consumer 0 ゆえ、S15:629 を S06 定理で直接閉じるなら
    `PrimeTIResidueData` 構成自体が不要になる可能性が高い (次 session が判断)。
+
+## ✅ 進捗 (session 8, 2026-07-06, lane b) — S15:629 を **S06-grounded で sorry-free close** → leaf REDUNDANT 確定
+
+継続 outline #4 (`sS1S` wrapper → `induce_H_mem_zSpan_S`) を **honest かつ非重複に landing**。
+`lake build OddOrder` **GREEN (3932 jobs, 新 axiom なし)**、S15 real sorry **20→19 (net −1)**。
+`#print axioms Hypothesis.induce_H_mem_zSpan_S` = `[propext, Classical.choice, Quot.sound]` (**sorryAx 無**)。
+
+**核心的発見 (session 7 の悲観 + 本 issue 全体の前提を訂正)**: S15:629 の close に **prime-TI residue
+dichotomy (`S1cases`/`prTIres_irr_cases`) も `PrimeTIResidueData` も一切不要**。理由 = 目標族
+`𝒮 = sSet = {Ind_{S'}^S χ | χ ∈ Irr(S'), P ⊄ ker χ}` は「S' から誘導した P-nonlinear irreducible の
+induction 全体」で、**membership は witness で即座に成立**する (`mem_sSet`; induction の可約/既約や
+`μ_j`-type かは問われない)。∴ Coq `S1cases` の dichotomy は `seqIndD` の定義形状 (可約 or family-member)
+ゆえに必要だったが、repo の `sSet` は最初から「全 P-nonlinear induction」なので dichotomy 不要。leaf の
+`induce_mem_calS` (witness membership, sorry 無) が本質で、`S1cases`/`prTIres_irr_cases` 経路は
+**over-engineered だった**。
+
+**実際の証明 (S15_SAndT_Setup.lean:668 `Hypothesis.induce_H_mem_zSpan_S`, sorry-free)**:
+1. `Ind_{PC}^S θ = Ind_{S'}^S (Ind_{PC'}^{S'} θ')` — 二段誘導 `induce_induce_subgroupOf` (`PC ≤ S' = HU`,
+   `θ' = θ ∘ subgroupOfEquivOfLe`)。
+2. `Ind_{PC'}^{S'} θ' = ∑_{s∈Irr(S')} ⟨θ', Res s⟩ • s` — `induce_eq_sum_inner_restrict_smul`、
+   `Ind_{S'}^S` を sum/scalar に通す。
+3. 係数 `⟨θ', Res s⟩ = (k:ℕ)` (`exists_natCast_inner_irreducible` + `inner_conj_symm`)。
+4. `k≠0` の各 `s`: `P ⊄ ker s` (新 generic helper `constituent_P_not_subset_characterKernel` =
+   S08 kernel 3 補題の contrapositive、leaf `constituent_P_not_subset_ker` の generic 版)、ゆえ
+   `Ind_{S'}^S s ∈ sSet` (witness `s`) → `zSpan sSet`、`nsmul_mem` で ℕ 倍も残る。`k=0` は `0`。
+- 使用建材: **すべて既存 proven** — `InducedTransport` (`induce_induce_subgroupOf`,
+  `induce_eq_sum_inner_restrict_smul`)、S08 kernel 補題、S11 `sSet`/`huSub_eq_derivedInG_subgroupOf`/
+  `mem_sSet`、`typePData_toS06Hypothesis` (S12; type-P Hypothesis 供給は S' 族形状の grounding 用、ただし
+  本証明では `sSet` 定義が既に S' 族なので S06 dichotomy は呼ばず)。**`PrimeTIResidue.lean` を import せず**。
+- 下流 consumer (`tau1S_ofHonest_inner_induce`/`_induce_mem_ZIrr`) は本 theorem を cite; それらの残 sorryAx は
+  §14 `sibleyTarget_H0C` gate (別件、本 task scope 外) のみ。
+
+**⟹ LEAF-FATE 裁定: `OddOrder/GroupTheory/RepresentationTheory/PrimeTIResidue.lean` は REDUNDANT**:
+- **importer 0 / code consumer 0** (grep 確認; S05/S15 の `PrimeTIResidueData` 言及は全て docstring のみ)。
+- (b) S15:629 は本 leaf 無しで close 済 (上記)。
+- (a) lane a issue 1017 の (10.7) `typeII_derived_frobenius` は、issue 1017 本文の精密診断では
+  **§5 `uniform_degree_coherence`/`subcoherent` (Coq PFsection5) が blocker** で、**prime-TI residue の
+  dichotomy ではない** (issue 1017: 「(10.7) は §9 counts 不使用、`uniform_degree_coherence` で local
+  partner coherence」)。9014 hub 注記の「a も prime-TI に gated」は `uniform_prTIred_coherent` の名前を
+  §5 uniform-coherence と混同したもの。⟹ a も本 leaf を必要としない。
+- **推奨 = delete** (`PrimeTIResidue.lean` 全体 + `PrimeTIResidueData` structure)。sessions 1-6 の
+  `mu2Grid` extraction (S05_SigmaIsometry.lean 内、leaf 外) は S05 の `sigma` 上の再利用可能 lemma 群として
+  残せるが、これも現状 external consumer 0。**leaf 削除は本 task scope 外 (fate 決定は保留と明記されたため
+  削除せず report のみ)**。9014 は本 session で **実質完了** (S15:629 close 達成); leaf 削除を別 issue 化推奨。
