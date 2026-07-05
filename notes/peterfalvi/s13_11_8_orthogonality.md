@@ -1891,3 +1891,27 @@ feitThompson 不変** (spine axiom set 同一・新 axiom 無し)、full build 3
 (10.8, lane-b typeII estimate) で継続 sorried。**lane-a 高価値 ungated 群論 frontier は完遂**、
 残は char endgame (gate-2 の gluing [deep char, 9.11 cite-sorried 可] + lane-b/§14 依存)。
 次: gate-2 を Coq PFsection11 で map → assess/delegate (unmapped deep char ゆえ blind delegate 回避)。
+
+## 2026-07-05 update²⁴ (lane-a) — **(10.8) typeII estimate = BLOCKED on missing §5 coherence infra (subagent 精査, 誤診断訂正)**
+
+char endgame の最上流 (10.8) `typeII_coherence_contradiction_estimate` (S12_MaximalIII_IV_V:453) を
+subagent が精査 → **genuinely BLOCKED** (tree 無編集・green)。Coq = `FTtype345_noncoherence_main`
+(PFsection10.v:668-815)、2-sided pincer `1−1/w₁−1/|U| < w₁w₂/|M'|`:
+- **line-87 side (7.8.b)**: **assemblable** — `hypothesis78OfDade` (S09_CertificateDischarge:1637)
+  + `zetaNuRhoNormSqGeOfDade` (:2406) + `card_derived_ge` は proven。
+- **hB side (10.7)**: **BLOCKED**。`typeII_derived_frobenius` (S12:47) 自身 sorry、root cause は
+  **§5 の欠落**: **`uniform_degree_coherence`** (Pf 5.x: uniform-degree seqInd family は coherent) +
+  **`subcoherent`/`FTtypeP_subcoherent` R-datum** が **OddOrder/ 全体に不在** (docstring 言及のみ)。
+  Coq `Frob_der1_type2` (10.7) は §9 counts に触れず、4-elt uniform family T2 の
+  `uniform_degree_coherence` で local partner coherence を作る。
+
+**★ 誤診断訂正 (notes の従来主張)**: (10.7)/hB は「§9-blocked (Section11CharacterData 未構成)」ではない
+— (i) `mkSection11CharacterData` (S12_Section9Counts:57) で **構成済**、(ii) (10.7) は §9 counts 不使用。
+真の blocker は **§5 coherence** (uniform_degree_coherence + subcoherence)。
+stale docstring: `exists_typeII_maximal_with_w2_of_typeP` (S10:317) は **proven** (S12_Core:2836 の
+「sorry」記述は stale)。`exists_typeII_maximal_with_w2` は M↔S partner counts を捨てている。
+
+**⟹ char endgame の (10.8) path は §5 coherence infra (uniform_degree_coherence + subcoherence) に
+gated** = substantial 新 char-theory body (Pf §5 coherence 基盤、現状 Lean 対応物皆無)。honest unblock =
+§5 coherence 実装 → (10.7) → (10.8)。lane 帰属: coherence infra は lane-b carve-out (S07) だが本体不在。
+issue 化 (hub 調整)。lane-a group-theory 完遂・char endgame は §5/§14/lane-b の major prereq に gated。
