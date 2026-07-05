@@ -1748,3 +1748,31 @@ full build green 3929 jobs):
 (要調査、update¹⁶ の ⚠)。infra: `exists_exponent_fun_of_card_prime`/`chain_exponent_eq_one`
 (both proven, S13_ElementaryAbelianKernel)。これを埋めれば chief_H0_eq_bot sorry-free →
 (11.7) H_elementaryAbelian 完全 → gate-1 の [U:C]=u が unblock。
+
+## 2026-07-05 update¹⁸ (lane-a) — **case-A hfix = commutator-form argument (Coq 精読, multi-iteration frontier)**
+
+chief_H0_eq_bot の残 case-A hfix を精査。**action 照合は trivial** と判明 (楽観確定):
+`typeP_quotientCoprimeAction.φ := quotientMulAutHom hN` (S11:728) ゆえ dichotomy の Φ =
+`(quotientMulAutHom chief.N_aInvariant).comp U.subtype`、hfix の `quotientMulAutHom chief.N_aInvariant ↑v`
+と U-元上で**定義的一致** (変換 lemma 不要)。⟹ 残 = 純粋に「U-invariant order-p S₀ ⟹ U pointwise fix」。
+
+**Coq FTtype34_Fcore_kernel_trivial (PFsection11.v:365-460+) = Peterfalvi (11.7) の真の argument**:
+- 全体は背理法 (H₀≠1 → U centralizes H̄ → C_U(H̄)≠U (9.6) と矛盾)。
+- Q = H₀ の maximal 部分群 (H-normal)、Ĥ=H/Q は class-2、Ĥ'=H₀/Q order p central。
+- **非Galois (case 9.7a = 我々の case-A)**: W₁-conjugation basis `xbar_w = coset H0 (x_ w)` (w∈W₁) で
+  H̄ を張る。**commutator "linear form" `D(y,z) := [coset_Q y, coset_Q z]`** (H/Q 内、H₀ を kernel)。
+  D は **antisymmetric** (`D z y = (D y z)⁻¹`) + z について linear (group morphism)。
+  **phi : Ubar → ℤ/p** = ubar の H1 上作用が exponentiation by n の n。`phi_w u` = W₁ の Ubar への
+  inverse-conjugation 作用 QV と compose。D が nontrivial (∵ (H/Q)'=H₀/Q≠1) ⟹
+  **`(phi_w1 u)(phi_w2 u) = 1`** ⟹ `(phi u)⁻¹ = phi u` ⟹ phi²=1 + odd ⟹ **phi=1** (U centralizes W̄)。
+  (Galois=case 9.7b は extraspecial 化 → parity で q even 矛盾 = 我々の `chiefKernel_caseB_false` 済)。
+
+**Lean 対応 (残 formalization、multi-iteration)**: endgame (phi²=1+odd→phi=1) = `chain_exponent_eq_one`
+(proven)、exponent 化 = `exists_exponent_fun_of_card_prime` (proven)。**残 = 中核の commutator-form**:
+(a) `D(y,z)=⁅coset_Q y, coset_Q z⁆` の antisymmetry+bilinearity (helper `commutatorElement_*`
+S13_ElementaryAbelianKernel に部分既在); (b) W₁-basis xbar_w 構成 (`typeP_Galois_Pn` 相当); (c) σ =
+W₁-gen の U inverse-conj MulAut 構成 + `phi_w1·phi_w2=1` 導出。**= (11.7) 最深、~50-100 行の
+新群論**。次 iteration = この commutator-form を段階的に formalize (D antisymmetry から)。
+
+**note**: これは (11.7) の genuine 核。chief_H0_eq_bot は case-B 完全 + case-A を本 1-sorry
+(hfix) に縮約済ゆえ、hfix を埋めれば (11.7)→gate-1 [U:C]=u→FeitThompson threading が連鎖 unblock。
