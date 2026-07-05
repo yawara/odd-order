@@ -214,3 +214,32 @@ c-side spec 1 (eta_grid_facts_on_G0) の **G0 → order-prime 接続を新 leaf
 `FieldNormalizerData.derived_inf_centralizer_le_P` (proven) が (14.2.a) carrier
 着き次第放電。⟹ **b の (3.9.c) 供給は「(orderOf g).Coprime (p*q) → ∃ m : ℤ,
 eta i j g = m」形 (+ (3.9.a) conj-pair 版) がそのまま最短で刺さる**。
+
+## 🧭 HUB 裁定 (2026-07-05, POLE-2 coupled stall 再評価 — ユーザー「判断して」委任)
+
+**背景**: c が cont.⁶⁵ で「独立 ungated frontier 枯渇 = POLE-2 coupled stall」を hub にエスカレーション
+(S16 残 sorry 7 は全て b の §13 η-grid=本 issue / a の 7.8.b norm・9.7.b carrier / 9000 Galois に gated、
+c が §13 grid を作ると b の on-path work と territorial 衝突ゆえ独立前進不可)。b も it.93 で「ungated
+ceiling 到達」を宣言 (残は u_bound→9000 / V_inf_centralizer→c_eq_one deep chain / char_degree_analysis
+keystone に deep-gated)。⟹ **b・c 2 レーンが共通の深層 keystone (§13 char_degree_analysis / 本 issue
+η-grid threading + issue 9000 σ-theory) に収束**。a は ungated frontier 継続中。
+
+**裁定 (プロジェクト方針「deep なら deep のまま engage・アイドル禁止」準拠、選択肢 1)**:
+- **b = §13 char keystone を deep-engage (最優先)**: 本 issue 3002 の §13 η-grid を `S15.Hypothesis`
+  grid field に threading する作業を、多反復を厭わず正面から実証明で進める。これが b 自身の下流
+  (V_inf_centralizer→c_eq_one) と c の S16 carrier 群 (`lSideGridCoeffData`/`betaGrid`/`grid_mem`/
+  `boundary`) を同時に unblock する pipeline のボトルネック。b の自所有領域 (S15 + coherence + FeitThompson
+  3002 供給 zone) ゆえ territorial に自然。gated-endpoint body の de-gate も継続可 (u_bound は 9000 待ちで
+  sorried-cite)。
+- **c = S16 consumer wiring を先回り準備 (待たない・idle しない)**: 本 issue の「c-side consumer spec」
+  (2026-07-05 節) どおり、b 供給後に即結線できる形まで S16 の carrier consumer を de-scaffold + 正確な
+  cite statement を固定しておく。`lSideGridCoeffData` の 4 field (coeff/boundary/bessel/grid_mem) のうち
+  c 独立で閉じられる部分 (coeff=整数性 trivial 等) は先に discharge。b の grid landing で残 (grid_mem/
+  boundary) が供給され次第 (14.11.2) carrier 群を閉じる。
+- **a = 現状維持 (ungated frontier 継続)**: §11-13 (chief_H0_eq_bot / caseA_commutator_chain / 11.8
+  counts) を通常どおり進める。a の 7.8.b norm・9.7.b carrier が閉じれば c の s_/t_frobenius_kernel も
+  un-gate される (副次的 unblock)。
+
+**lane 数 = 3 維持** (idle・退役はしない)。次の実質前進の主経路 = **b の §13 η-grid threading**
+(本 issue 完了 = b/c 両方の coupled carrier 群を解く)。cron 監視は継続。この裁定は各レーンが
+`git merge main` で本 issue を取り込んだ時点で有効。
