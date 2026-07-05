@@ -147,6 +147,22 @@ conjunct-3 type-II HU-Frobenius = 指標論的 Frobenius 判定法 (Isaacs 7 章
 → campaign step 3 ((13.3.a) の S11 側) は本質完了。次 = step 1-2 (S15↔S11 bridge の
 honest Section11CharacterData 構成 + sibleyTarget_H0C) or step 4 (τ₁ 導出)。
 
+## ✅ (13.3.c) S-side ∀j δⱼ=1 完成 (it.87-88)
+
+- it.87: mu_degree_modEq_delta threading ((4.3.d) 合同) + delta_eq_one_of_ne_zero
+  (j≥1: μ₀ⱼ(1)=u + u≡1 mod q + δⱼ=±1 + q odd prime → δⱼ=1)
+- it.88: delta_zero_eq_one threading (δ₀=1 via (4.4) certainType_zero_column_anchor) +
+  delta_eq_one_S (∀j δⱼ=1 統合)。CharacterDegreeData.delta_eq_one の S-half 完全証明。
+
+**producer 残 gate (確定)**:
+- delta_eq_one T-side (∀i δ'ᵢ=1): reconciled_typePData_T (S15:2838, **7 sorries** T-carrier
+  σ-gated BG §14) 依存で gated。v≡1 mod p は u≡1 mod q と同 route だが T-Frobenius が
+  T-carrier 要 → gated。
+- τ₁ 4 fields + mu_tau1_formula: sibleyTarget_H0C (S11:6305, §14-gated coherence witness)
+- λ family: (13.3.b) 条件付き既約存在
+
+→ 次: T-carrier が Section16 Tdata analog から threading 可能か調査 (可能なら T-dual 全開)。
+
 ## ✅ u ≡ 1 mod q 完全証明 (it.86) — δ=1 の crux ungated 実証
 
 `Hypothesis.u_modEq_one` (S15): |Ū| ≡ 1 mod q を Singer field_model **不要**で証明。
