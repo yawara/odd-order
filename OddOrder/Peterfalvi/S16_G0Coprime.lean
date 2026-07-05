@@ -32,6 +32,7 @@ Coq correspondent: `PFsection14.coprime_typeP_Galois_core` (its proof is the sam
 namespace OddOrder.Peterfalvi.S16
 
 open OddOrder.GroupTheory
+open scoped Pointwise
 
 variable {G : Type*} [Group G]
 
@@ -213,16 +214,110 @@ theorem coprime_q_card_derivedS [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
         rw [← hq, ← h1, ← h2]; exact hc
       exact hcUW.symm
 
+/-- **`p` is coprime to `|U|`** ((8.4)-structure): `(|H|, |U ⊔ W₁|) = 1`
+(`S11.typeP_coprime_H_uW1`) with `p ∣ |H| = p^q` kills `|U|` (trivially if `U = ⊥`). -/
+theorem coprime_p_card_U [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+    Nat.Coprime hyp.p (Nat.card ↥hyp.Sdata.U) := by
+  by_cases hU : hyp.Sdata.U = ⊥
+  · rw [hU, Subgroup.card_bot]; exact Nat.coprime_one_right _
+  · have hcop := OddOrder.Peterfalvi.S11.typeP_coprime_H_uW1 hyp.Sdata hU
+    have hPcard : Nat.card ↥hyp.Sdata.H = hyp.p ^ hyp.q := by
+      rw [hyp.Sdata.H_eq, ← hyp.P_eq_SF]
+      exact hyp.card_P_eq hG hyp.Sdata_W2_eq
+    have hpH : hyp.p ∣ Nat.card ↥hyp.Sdata.H := by
+      rw [hPcard]; exact dvd_pow_self _ hyp.q_prime.pos.ne'
+    exact (Nat.Coprime.coprime_dvd_left hpH hcop).coprime_dvd_right
+      (Subgroup.card_dvd_of_le le_sup_left)
+
+/-- **The order factorization `|S| = p^q · (|U| · q)`** — `S = (P ⋊ U) ⋊ W₁` via the two
+complement splittings (`derived_complement`, `M_complement`), with `|P| = p^q` and `|W₁| = q`. -/
+theorem card_S_eq_pow_mul [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+    Nat.card ↥hyp.S = hyp.p ^ hyp.q * (Nat.card ↥hyp.Sdata.U * hyp.q) := by
+  have hS' : Nat.card ↥(derivedInG hyp.S)
+      = Nat.card ↥hyp.Sdata.H * Nat.card ↥hyp.Sdata.U := by
+    have hmul := hyp.Sdata.derived_complement.card_mul
+    rw [← hmul,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Sdata.H_le).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Sdata.U_le).toEquiv]
+  have hS : Nat.card ↥hyp.S = Nat.card ↥(derivedInG hyp.S) * hyp.q := by
+    have hDle : derivedInG hyp.S ≤ hyp.S := Subgroup.map_subtype_le _
+    have hmul := hyp.Sdata.M_complement.card_mul
+    have h1 : Nat.card ↥((derivedInG hyp.S).subgroupOf hyp.S)
+        = Nat.card ↥(derivedInG hyp.S) :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hDle).toEquiv
+    have h2 : Nat.card ↥(hyp.Sdata.W1.subgroupOf hyp.S) = hyp.q := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Sdata.W1_le).toEquiv,
+        hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1]
+    rw [← hmul, h1, h2]
+  have hPcard : Nat.card ↥hyp.Sdata.H = hyp.p ^ hyp.q := by
+    rw [hyp.Sdata.H_eq, ← hyp.P_eq_SF]
+    exact hyp.card_P_eq hG hyp.Sdata_W2_eq
+  rw [hS, hS', hPcard, mul_assoc]
+
+/-- **`P` is a full Sylow `p`-subgroup of `G`** (as a Sylow object with underlying subgroup
+`P`).  `P.subgroupOf S` is Sylow in `S` (`|S| = p^q·(|U|·q)` with `p ∤ |U|·q`), `p ∈ σ(S)`
+(`N_G(P) = S`), and the BG §10 σ-Sylow theory (`isSylow_sylowMap_of_mem_sigma`) promotes it
+to a Sylow of `G`. -/
+theorem exists_sylow_coe_eq_P [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+    haveI : Fact hyp.p.Prime := ⟨hyp.p_prime⟩
+    ∃ S₀ : Sylow hyp.p G, (S₀ : Subgroup G) = hyp.P := by
+  haveI : Fact hyp.p.Prime := ⟨hyp.p_prime⟩
+  have hPle : hyp.P ≤ hyp.S := by
+    rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le _
+  have hPcard : Nat.card ↥hyp.P = hyp.p ^ hyp.q := hyp.card_P_eq hG hyp.Sdata_W2_eq
+  have hPsub_card : Nat.card ↥(hyp.P.subgroupOf hyp.S) = hyp.p ^ hyp.q := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPle).toEquiv, hPcard]
+  -- `P.subgroupOf S` sits inside a Sylow `Q` of `↥S`; cardinalities force equality.
+  have hPsub_pg : IsPGroup hyp.p ↥(hyp.P.subgroupOf hyp.S) :=
+    IsPGroup.of_card hPsub_card
+  obtain ⟨Q, hQle⟩ := hPsub_pg.exists_le_sylow
+  have hcop : Nat.Coprime hyp.p (Nat.card ↥hyp.Sdata.U * hyp.q) :=
+    Nat.Coprime.mul_right (coprime_p_card_U hG hyp)
+      ((Nat.coprime_primes hyp.p_prime hyp.q_prime).mpr hyp.p_ne_q)
+  have hQeq : (Q : Subgroup ↥hyp.S) = hyp.P.subgroupOf hyp.S := by
+    obtain ⟨k, hk⟩ := Q.isPGroup'.exists_card_eq
+    have hdvd : hyp.p ^ k ∣ hyp.p ^ hyp.q * (Nat.card ↥hyp.Sdata.U * hyp.q) := by
+      rw [← hk, ← card_S_eq_pow_mul hG hyp]
+      exact Subgroup.card_subgroup_dvd_card _
+    have hkq : hyp.p ^ k ∣ hyp.p ^ hyp.q :=
+      (Nat.Coprime.dvd_of_dvd_mul_right (Nat.Coprime.pow_left _ hcop) hdvd)
+    refine (Subgroup.eq_of_le_of_card_ge hQle ?_).symm
+    rw [hPsub_card, hk]
+    exact Nat.le_of_dvd (pow_pos hyp.p_prime.pos _) hkq
+  -- `p ∈ σ(S)`: the Sylow `Q` maps to `P` with normalizer `S`.
+  have hmap : (Q : Subgroup ↥hyp.S).map hyp.S.subtype = hyp.P := by
+    rw [hQeq]
+    exact Subgroup.map_subgroupOf_eq_of_le hPle
+  have hpσ : hyp.p ∈ OddOrder.BG.Ch3.S10.sigma hyp.S := by
+    refine ⟨Nat.mem_primeFactors.mpr ⟨hyp.p_prime, ?_, Nat.card_pos.ne'⟩, Q, ?_⟩
+    · exact dvd_trans (dvd_pow_self _ hyp.q_prime.pos.ne')
+        (hPcard ▸ Subgroup.card_dvd_of_le hPle)
+    · rw [hmap]
+      exact (normalizer_P_eq_S hG hyp).le
+  obtain ⟨S₀, hS₀⟩ := OddOrder.BG.Ch3.S10.isSylow_sylowMap_of_mem_sigma hpσ Q
+  exact ⟨S₀, by rw [hS₀, hmap]⟩
+
 /-- **`P` absorbs the order-`p` elements of `G` up to conjugacy** — the element form of
-`P ∈ Syl_p(G)`.  `P = S_F` is a `p`-group of order `p^q` (`card_P_eq`) and a full Sylow
-`p`-subgroup of `G`: `p ∈ σ(S)`, and the BG §10 Sylow theory
-(`isSylow_sylowMap_of_mem_sigma`) promotes a Sylow of `S` to a Sylow of `G`; Sylow conjugacy
-then absorbs any order-`p` element.  Named §14 obligation (BG σ-Hall interface; next
-decomposition target of this file). -/
+`P ∈ Syl_p(G)` (`exists_sylow_coe_eq_P`): any order-`p` element generates a `p`-group, lies
+in some Sylow, and Sylow conjugacy moves that Sylow onto `P`. -/
 theorem exists_conj_mem_P_of_orderOf_eq_p [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) {a : G}
     (ha : orderOf a = hyp.p) : ∃ y : G, y * a * y⁻¹ ∈ hyp.P := by
-  sorry
+  haveI : Fact hyp.p.Prime := ⟨hyp.p_prime⟩
+  obtain ⟨S₀, hS₀⟩ := exists_sylow_coe_eq_P hG hyp
+  have hA : IsPGroup hyp.p ↥(Subgroup.zpowers a) :=
+    IsPGroup.of_card (by rw [Nat.card_zpowers, ha, pow_one])
+  obtain ⟨R, hR⟩ := hA.exists_le_sylow
+  obtain ⟨y, hy⟩ := MulAction.exists_smul_eq G R S₀
+  refine ⟨y, ?_⟩
+  have hcoe : MulAut.conj y • (R : Subgroup G) = hyp.P := by
+    have h := congrArg Sylow.toSubgroup hy
+    rwa [Sylow.coe_subgroup_smul, hS₀] at h
+  rw [← hcoe]
+  exact ⟨a, hR (Subgroup.mem_zpowers a), rfl⟩
 
 /-- **Peterfalvi (14.6)/(13.12): the `U`-part of `S'` has no fixed points on `P#`** —
 `C_{S'}(x) ≤ P` for `x ∈ P#`.  In case (9.7.b) (which (14.6) forces for `S`),
