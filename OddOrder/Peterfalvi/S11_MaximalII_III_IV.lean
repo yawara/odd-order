@@ -17,6 +17,7 @@ import OddOrder.GroupTheory.RepresentationTheory.SingerLineBound
 import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
 import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
 import OddOrder.Peterfalvi.S08_CoherenceCorePart1
+import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
 
 /-!
 # Peterfalvi Section 11: Maximal Subgroups of Types II, III, and IV
@@ -7926,6 +7927,129 @@ theorem caseB_xiOf_H0C_eq_induce_hcPsi [Finite G] {M : Subgroup G}
     exact OddOrder.RepresentationTheory.coe_eq_induce_of_liesOver_of_isIrreducibleCharacter_induce
       (G := ↥(huSub data)) χ (hcPsi chief θbar)
       (hcZeta_irreducible chief θbar hθ₀) (hψeq' ▸ hψover)
+
+set_option maxHeartbeats 1600000 in
+open scoped Classical in
+/-- **Peterfalvi (13.3.a) core (Coq `PFsection9.isIndHC`)**: in Clifford case (b), every
+*reducible* member of `𝒮(H₀)` is induced from a linear character of `HC` at the `M`-level.
+Chain: (9.9.b) membership (`reducible_mem_sOf_H0C`), the `hcPsi`-exhaustion of `𝒳(H₀C)`
+(`caseB_xiOf_H0C_eq_induce_hcPsi`), and induction in stages
+`Ind^M_{HU} ∘ Ind^{HU}_{HC} = Ind^M_{HC}` (`induce_induce_subgroupOf`, with the
+`subgroupCongr`-transport `induce_compHom_subgroupCongr` bridging the two spellings of the
+`M`-level `HC`).  In the §13 instantiation `HC = PC`, so this is exactly the (13.3.a)
+"`μ_j` is induced from a linear character of `PC`" shape. -/
+theorem caseB_reducible_sOf_H0_isIndHC [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief) (caseB : CliffordCaseBData chars)
+    [Fintype ↥M]
+    [Invertible (Nat.card ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+      M).subgroupOf (huSub data)).map (huSub data).subtype) : ℂ)]
+    {φ : ClassFunction ↥M ℂ}
+    (hφ : φ ∈ sOf data chief.H0) (hred : ¬ IsIrreducibleCharacter φ) :
+    ∃ ψ : ClassFunction
+        ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+          (huSub data)).map (huSub data).subtype) ℂ,
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ ∧
+      ψ 1 = 1 ∧
+      φ = ClassFunction.induce
+        ((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+          (huSub data)).map (huSub data).subtype) ψ := by
+  classical
+  letI : Fintype ↥(huSub data) := Fintype.ofFinite _
+  letI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+    (huSub data)) := Fintype.ofFinite _
+  letI : Fintype ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+    (huSub data)).map (huSub data).subtype) := Fintype.ofFinite _
+  letI : Fintype ↥(((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+    (huSub data)).map (huSub data).subtype).subgroupOf (huSub data)) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥M : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+    M).subgroupOf (huSub data)) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥(((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+    M).subgroupOf (huSub data)).map (huSub data).subtype).subgroupOf (huSub data)) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+    (huSub data)).Normal := hcInHu_realized_normal chief
+  -- (9.9.b) membership + exhaustion
+  have hφC := reducible_mem_sOf_H0C hG chars φ hφ hred
+  obtain ⟨ζ', hζ'xi, rfl⟩ := mem_sOf.mp hφC
+  obtain ⟨θbar, hθne, hζ'eq⟩ := caseB_xiOf_H0C_eq_induce_hcPsi caseB hζ'xi
+  -- the `M`-level `HC` and the value-preserving iso back to the realized `HC`
+  have hKle : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)).map (huSub data).subtype ≤ huSub data :=
+    Subgroup.map_subtype_le _
+  have hKeq : ((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)).map (huSub data).subtype).subgroupOf (huSub data)
+      = hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data) :=
+    Subgroup.comap_map_eq_self_of_injective (huSub data).subtype_injective _
+  set f : ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)).map (huSub data).subtype) ≃*
+      ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) :=
+    (Subgroup.subgroupOfEquivOfLe hKle).symm.trans (MulEquiv.subgroupCongr hKeq) with hf
+  refine ⟨ClassFunction.compHom f.toMonoidHom
+    (hcPsi chief θbar : ClassFunction
+      ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ),
+    ?_, ?_, ?_⟩
+  · exact OddOrder.RepresentationTheory.IsIrreducibleCharacter.compHom_of_surjective
+      f.surjective (hcPsi chief θbar).isIrreducible
+  · rw [ClassFunction.compHom_apply, map_one]
+    simp [hcPsi, linearIrreducibleCharacter_apply_one]
+  · -- `Ind_{HU}^M (Ind_{HC}^{HU} ψ₀) = Ind_K^M (ψ₀ ∘ f)` by stages + `subgroupCongr` transport
+    have hstages := OddOrder.RepresentationTheory.induce_induce_subgroupOf
+      (M := ↥M) (K := (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+        (huSub data)).map (huSub data).subtype) (H := huSub data) hKle
+      (ClassFunction.compHom f.toMonoidHom
+        (hcPsi chief θbar : ClassFunction
+          ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+            (huSub data)) ℂ))
+    -- identify the inner induction with `Ind_{HC}^{HU}(hcPsi θbar)`
+    have hfe : f.toMonoidHom.comp (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom
+        = (MulEquiv.subgroupCongr hKeq).toMonoidHom := by
+      refine MonoidHom.ext fun x => ?_
+      rw [hf]
+      simp only [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, MulEquiv.trans_apply,
+        MulEquiv.symm_apply_apply]
+    have hcomp : ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom
+        (ClassFunction.compHom f.toMonoidHom
+          (hcPsi chief θbar : ClassFunction
+            ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+              (huSub data)) ℂ))
+        = ClassFunction.compHom (MulEquiv.subgroupCongr hKeq).toMonoidHom
+          (hcPsi chief θbar : ClassFunction
+            ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+              (huSub data)) ℂ) := by
+      rw [OddOrder.RepresentationTheory.ClassFunction.compHom_comp, hfe]
+    have hinner : ClassFunction.induce (((hInHu data ⊔ ((chief.H0 ⊔ cSub data
+        chief).subgroupOf M).subgroupOf (huSub data)).map
+          (huSub data).subtype).subgroupOf (huSub data))
+        (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom
+          (ClassFunction.compHom f.toMonoidHom
+            (hcPsi chief θbar : ClassFunction
+              ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+                (huSub data)) ℂ)))
+        = ClassFunction.induce
+            (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+            (hcPsi chief θbar).toClassFunction := by
+      rw [hcomp]
+      exact OddOrder.RepresentationTheory.induce_compHom_subgroupCongr hKeq _
+    show induceHU data (ζ' : ClassFunction ↥(huSub data) ℂ) = _
+    calc induceHU data (ζ' : ClassFunction ↥(huSub data) ℂ)
+        = ClassFunction.induce (huSub data) (ζ' : ClassFunction ↥(huSub data) ℂ) := by
+          unfold induceHU
+          congr! <;> exact Subsingleton.elim _ _
+      _ = ClassFunction.induce (huSub data)
+            (ClassFunction.induce (((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+              M).subgroupOf (huSub data)).map (huSub data).subtype).subgroupOf (huSub data))
+              (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom
+                (ClassFunction.compHom f.toMonoidHom
+                  (hcPsi chief θbar : ClassFunction
+                    ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+                      (huSub data)) ℂ)))) := by rw [hinner, ← hζ'eq]
+      _ = _ := hstages
 
 /-- **`ζ(1) = u`**: the degree of `ζ = Ind_{HC}^{HU}(ψ)` is `u`.  `induce_apply_one` gives
 `ζ(1) = [HU:HC]·ψ(1) = u·1` (`hc_index_eq_u`, and `ψ` linear so `ψ(1)=1`).  This is the degree-`u`
