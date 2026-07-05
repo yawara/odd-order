@@ -174,25 +174,187 @@ theorem centralizer_le_T_of_mem_sharp_Q [Finite G] (hG : OddOrder.BG.IsMinimalSi
   have hle := OddOrder.GroupTheory.IsTISubset.centralizer_le hTI hx
   rwa [normalizer_Q_eq_T hG hyp] at hle
 
+/-- **`q` is coprime to `|S'|`** ((8.4)-structure): `S' = P ⋊ U` with `|P| = p^q`
+(`card_P_eq`, `p ≠ q`) killing the `P`-side, and `U ⋊ W₁` Frobenius
+(`S11.typeP_uW1_frobenius`) killing the `U`-side (trivial if `U = ⊥`).  The coprimality
+input for the (2.1) coset collapse in `orderOf_coprime_p_of_not_mem_conj`. -/
+theorem coprime_q_card_derivedS [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+    Nat.Coprime hyp.q (Nat.card ↥(derivedInG hyp.S)) := by
+  have hcard : Nat.card ↥(derivedInG hyp.S)
+      = Nat.card ↥hyp.Sdata.H * Nat.card ↥hyp.Sdata.U := by
+    have hmul := hyp.Sdata.derived_complement.card_mul
+    rw [← hmul,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Sdata.H_le).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Sdata.U_le).toEquiv]
+  rw [hcard]
+  refine Nat.Coprime.mul_right ?_ ?_
+  · -- `q` is coprime to `|P| = p^q`
+    have hPcard : Nat.card ↥hyp.Sdata.H = hyp.p ^ hyp.q := by
+      rw [hyp.Sdata.H_eq, ← hyp.P_eq_SF]
+      exact hyp.card_P_eq hG hyp.Sdata_W2_eq
+    rw [hPcard]
+    exact Nat.Coprime.pow_right _
+      ((Nat.coprime_primes hyp.q_prime hyp.p_prime).mpr (Ne.symm hyp.p_ne_q))
+  · -- `q` is coprime to `|U|` (`U ⋊ W₁` Frobenius; trivial for `U = ⊥`)
+    by_cases hU : hyp.Sdata.U = ⊥
+    · rw [hU, Subgroup.card_bot]; exact Nat.coprime_one_right _
+    · have hF := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius hyp.Sdata hU
+      have hc := hF.coprime_card_kernel_complement
+      have h1 : Nat.card ↥(hyp.Sdata.U.subgroupOf (hyp.Sdata.U ⊔ hyp.Sdata.W1))
+          = Nat.card ↥hyp.Sdata.U :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_left).toEquiv
+      have h2 : Nat.card ↥(hyp.Sdata.W1.subgroupOf (hyp.Sdata.U ⊔ hyp.Sdata.W1))
+          = Nat.card ↥hyp.Sdata.W1 :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv
+      have hq : Nat.card ↥hyp.Sdata.W1 = hyp.q := by
+        rw [hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1]
+      have hcUW : Nat.Coprime (Nat.card ↥hyp.Sdata.U) hyp.q := by
+        rw [← hq, ← h1, ← h2]; exact hc
+      exact hcUW.symm
+
+/-- **`P` absorbs the order-`p` elements of `G` up to conjugacy** — the element form of
+`P ∈ Syl_p(G)`.  `P = S_F` is a `p`-group of order `p^q` (`card_P_eq`) and a full Sylow
+`p`-subgroup of `G`: `p ∈ σ(S)`, and the BG §10 Sylow theory
+(`isSylow_sylowMap_of_mem_sigma`) promotes a Sylow of `S` to a Sylow of `G`; Sylow conjugacy
+then absorbs any order-`p` element.  Named §14 obligation (BG σ-Hall interface; next
+decomposition target of this file). -/
+theorem exists_conj_mem_P_of_orderOf_eq_p [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) {a : G}
+    (ha : orderOf a = hyp.p) : ∃ y : G, y * a * y⁻¹ ∈ hyp.P := by
+  sorry
+
+/-- **Peterfalvi (14.6)/(13.12): the `U`-part of `S'` has no fixed points on `P#`** —
+`C_{S'}(x) ≤ P` for `x ∈ P#`.  In case (9.7.b) (which (14.6) forces for `S`),
+`S' = PU ≅ F ⋊ U*` with `U*` acting by field multiplication (`FieldNormalizerData`), so an
+element of `S'` centralizing a nontrivial additive point lies in the additive kernel `P`.
+Named §14 obligation (case-(9.7.b) carrier interface, issue-9000 sphere; discharge =
+transport of the Frobenius kernel property through `FieldNormalizerData.sigma`). -/
+theorem derived_inf_centralizer_le_P [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) {x : G}
+    (hx : x ∈ sharpSubgroup hyp.P) :
+    derivedInG hyp.S ⊓ Subgroup.centralizer ({x} : Set G) ≤ hyp.P := by
+  sorry
+
 /-- **Peterfalvi (14.11.3), S-side core**: an element avoiding the conjugates of `W#` and of
 `P#` has order prime to `p`.
 
-Contrapositive of the textbook chain (p. 90): if `p ∣ |g|`, the `p`-part of `g` is conjugate
-into `P#` (`P ∈ Syl_p(G)`, BG σ-Hall), so wlog `g ∈ C_G(x) ≤ S` for some `x ∈ P#`
-(`centralizer_le_S_of_mem_sharp_P`).  If `g ∉ S'` the coprime-coset partition (2.1) and the
-regularity `S' ⊓ C_G(w) = W₂` (`w ∈ W₁#`, `TypePData.centralizer_W1`) conjugate `g` into
-`W₂w ⊆ W#`; if `g ∈ S'` the case-(9.7.b) field structure ((14.6)/(13.12): `S' = P ⋊ U` is
-Frobenius with kernel `P`) forces `g ∈ C_{S'}(x) ≤ P#`.  Either way `g` meets an excluded
-orbit.  Coq: `PFsection14.coprime_typeP_Galois_core`.
-
-Named §14 obligation: the `Syl_p` input and the Frobenius kernel step are the case-(9.7.b)
-structure of `S` (issue 9000 typeP-Galois foundation); the coset step is Pf (2.1). -/
+Contrapositive of the textbook chain (p. 90): if `p ∣ |g|`, the order-`p` power of `g` is
+conjugate into `P#` (`exists_conj_mem_P_of_orderOf_eq_p`), so — conjugating `g` — `g ∈ C_G(a)
+≤ S` for some `a ∈ P#` (`centralizer_le_S_of_mem_sharp_P`).  Decompose `g = d·w` along
+`S = S' ⋊ W₁` (`Sdata.M_complement`).  If `w = 1` then `g = d ∈ C_{S'}(a) ≤ P#`
+(`derived_inf_centralizer_le_P`, the case-(9.7.b) Frobenius kernel).  If `w ≠ 1` the coprime
+coset collapse (2.1) (`exists_mem_centralizer_conj`, with `(q, |S'|) = 1` =
+`coprime_q_card_derivedS`) conjugates `g` into `C_{S'}(w)·w = W₂·w ⊆ W#`
+(`Sdata.centralizer_W1`).  Either way `g` meets an excluded orbit.
+Coq: `PFsection14.coprime_typeP_Galois_core`. -/
 theorem orderOf_coprime_p_of_not_mem_conj [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) {g : G}
     (hW : g ∉ conjClassSet (sharpSubgroup hyp.W))
     (hP : g ∉ conjClassSet (sharpSubgroup hyp.P)) :
     Nat.Coprime (orderOf g) hyp.p := by
-  sorry
+  rw [Nat.coprime_comm, Nat.Prime.coprime_iff_not_dvd hyp.p_prime]
+  intro hdvd
+  -- `g ≠ 1` and the order-`p` power `a₀` of `g`
+  have hord_ne : orderOf g ≠ 0 := (orderOf_pos g).ne'
+  have hg1 : g ≠ 1 := by
+    rintro rfl
+    rw [orderOf_one, Nat.dvd_one] at hdvd
+    exact hyp.p_prime.one_lt.ne' hdvd
+  set a₀ : G := g ^ (orderOf g / hyp.p) with ha₀def
+  have ha₀ord : orderOf a₀ = hyp.p := by
+    rw [ha₀def, orderOf_pow, Nat.gcd_eq_right (Nat.div_dvd_of_dvd hdvd),
+      Nat.div_div_self hdvd hord_ne]
+  have ha₀ne : a₀ ≠ 1 := by
+    intro h
+    rw [h, orderOf_one] at ha₀ord
+    exact hyp.p_prime.one_lt.ne ha₀ord
+  have hcomm : Commute g a₀ := (Commute.refl g).pow_right _
+  -- conjugate the `p`-part into `P#`
+  obtain ⟨y, hyP⟩ := exists_conj_mem_P_of_orderOf_eq_p hG hyp ha₀ord
+  set a : G := y * a₀ * y⁻¹ with hadef
+  have haP : a ∈ sharpSubgroup hyp.P := by
+    refine ⟨hyP, ?_⟩
+    intro h1
+    refine ha₀ne ?_
+    have ha1 : a = 1 := h1
+    have : a₀ = y⁻¹ * a * y := by rw [hadef]; group
+    rw [this, ha1, mul_one, inv_mul_cancel]
+  -- the conjugate `g' = y g y⁻¹` centralizes `a`, hence lies in `S`
+  set g' : G := y * g * y⁻¹ with hg'def
+  have hg'ne : g' ≠ 1 := by
+    intro h
+    refine hg1 ?_
+    have : g = y⁻¹ * g' * y := by rw [hg'def]; group
+    rw [this, h, mul_one, inv_mul_cancel]
+  have hg'cent : g' ∈ Subgroup.centralizer ({a} : Set G) := by
+    rw [Subgroup.mem_centralizer_singleton_iff]
+    calc g' * a = y * (g * a₀) * y⁻¹ := by rw [hg'def, hadef]; group
+      _ = y * (a₀ * g) * y⁻¹ := by rw [hcomm.eq]
+      _ = a * g' := by rw [hg'def, hadef]; group
+  have hg'S : g' ∈ hyp.S := centralizer_le_S_of_mem_sharp_P hG hyp haP hg'cent
+  -- decompose `g' = d · w` along `S = S' ⋊ W₁`
+  obtain ⟨⟨d, w⟩, hdw⟩ :=
+    (Subgroup.IsComplement.existsUnique hyp.Sdata.M_complement
+      (⟨g', hg'S⟩ : ↥hyp.S)).exists
+  have hdmem : ((d : ↥hyp.S) : G) ∈ derivedInG hyp.S := Subgroup.mem_subgroupOf.mp d.2
+  have hg'eq : ((d : ↥hyp.S) : G) * ((w : ↥hyp.S) : G) = g' := by
+    have h := congrArg (fun x : ↥hyp.S => (x : G)) hdw
+    simpa using h
+  by_cases hw1 : (w : ↥hyp.S) = (1 : ↥hyp.S)
+  · -- `w = 1`: `g' ∈ C_{S'}(a) ≤ P`, contradicting `g ∉ (P#)^G`
+    have hg'derived : g' ∈ derivedInG hyp.S := by
+      rw [← hg'eq, hw1]
+      simpa using hdmem
+    have hg'P : g' ∈ hyp.P :=
+      derived_inf_centralizer_le_P hG hyp haP ⟨hg'derived, hg'cent⟩
+    refine hP ⟨g', ⟨hg'P, fun h => hg'ne h⟩, y⁻¹, ?_⟩
+    rw [hg'def]; group
+  · -- `w ≠ 1`: the (2.1) coset collapse conjugates `g` into `W₂ · w ⊆ W#`
+    set w₀ : G := ((w : ↥hyp.S) : G) with hw₀def
+    have hw₀W1 : w₀ ∈ hyp.W1 := by
+      rw [← hyp.Sdata_W1_eq]
+      exact Subgroup.mem_subgroupOf.mp w.2
+    have hw₀ne : w₀ ≠ 1 := by
+      intro h
+      exact hw1 (Subtype.ext (by simpa [hw₀def] using h))
+    have hw₀ord : orderOf w₀ = hyp.q := by
+      have hdvd' : orderOf w₀ ∣ hyp.q := by
+        rw [hyp.q_eq_card_W1]
+        exact Subgroup.orderOf_dvd_natCard _ hw₀W1
+      rcases (Nat.Prime.eq_one_or_self_of_dvd hyp.q_prime _ hdvd') with h1 | hq
+      · exact absurd (orderOf_eq_one_iff.mp h1) hw₀ne
+      · exact hq
+    have hnorm : ∀ x ∈ derivedInG hyp.S, w₀ * x * w₀⁻¹ ∈ derivedInG hyp.S := by
+      intro x hx
+      have hw₀norm : w₀ ∈ Subgroup.normalizer (derivedInG hyp.S) :=
+        OddOrder.BG.Ch3.S10.le_normalizer_derivedInG hyp.S (SetLike.coe_mem (w : ↥hyp.S))
+      exact (Subgroup.mem_normalizer_iff.mp hw₀norm x).mp hx
+    have hcop : Nat.Coprime (orderOf w₀) (Nat.card ↥(derivedInG hyp.S)) := by
+      rw [hw₀ord]; exact coprime_q_card_derivedS hG hyp
+    obtain ⟨c, hc, x, hx, hxeq⟩ :=
+      OddOrder.GroupTheory.exists_mem_centralizer_conj hcop hnorm hdmem
+    -- `C_{S'}(w₀) = W₂` ((8.4) regularity)
+    have hcW2 : c ∈ hyp.W2 := by
+      have hreg := hyp.Sdata.centralizer_W1 w₀ (hyp.Sdata_W1_eq ▸ hw₀W1) hw₀ne
+      rw [← hyp.Sdata_W2_eq, ← hreg]
+      exact hc
+    have hW1le : hyp.W1 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_left
+    have hW2le : hyp.W2 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_right
+    have hcwW : c * w₀ ∈ hyp.W := hyp.W.mul_mem (hW2le hcW2) (hW1le hw₀W1)
+    have hcwne : c * w₀ ≠ 1 := by
+      intro h
+      have hw₀W2 : w₀ ∈ hyp.W2 := by
+        have hinv : w₀ = c⁻¹ := eq_inv_of_mul_eq_one_right h
+        rw [hinv]
+        exact hyp.W2.inv_mem hcW2
+      have hbot : w₀ ∈ hyp.W1 ⊓ hyp.W2 := ⟨hw₀W1, hw₀W2⟩
+      rw [hyp.W1_inf_W2_eq_bot, Subgroup.mem_bot] at hbot
+      exact hw₀ne hbot
+    refine hW ⟨c * w₀, ⟨hcwW, fun h => hcwne h⟩, (x * y)⁻¹, ?_⟩
+    have h1 : c * w₀ = x * g' * x⁻¹ := by
+      rw [← hxeq, hg'eq]
+    rw [h1, hg'def]; group
 
 /-- **Peterfalvi (14.11.3), T-side core**: an element avoiding the conjugates of `W#` and of
 `Q#` has order prime to `q`.  Dual of `orderOf_coprime_p_of_not_mem_conj` (with
