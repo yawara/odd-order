@@ -1551,4 +1551,35 @@ theorem typePData_card_abelianization_derived_eq_relIndex_C [Finite G] {M : Subg
   rw [hiso, hab, hM2]
   exact Nat.eq_of_mul_eq_mul_left hpos hkey
 
+open OddOrder.Peterfalvi.S11 in
+/-- **Peterfalvi (11.8.1), the abelianization order `|M'{}^{ab}| = d`** — the assembled `|M'/M''| = d`
+input to the `|S(HC)| = n` count, given the two structural facts of (11.5)/(11.7): `M'' = HC`
+(`hM2`, i.e. `secondDerivedInAmbient M = H ⊔ C`) and `H₀ = 1` (`hN`, i.e. `chief.N = ⊥`).
+
+Chains the three sorry-free pieces: `|M'{}^{ab}| = |U : C|`
+(`typePData_card_abelianization_derived_eq_relIndex_C`, given `M'' = HC`), `|U : C| = u`
+(`u_eq_relIndex_C`, given `H₀ = 1`), and `u = d` (`charParam_d_eq_u`).  The two hypotheses are
+Peterfalvi (11.5) `secondDerived_eq_HC` and (11.7) `H_elementaryAbelian` — proven in `S13`
+(downstream of this file), so `card_SHCSet_filter_eq_charParam_n` (above) discharges its
+`|M'/M''| = d` obligation by threading them from the `FeitThompson` layer where `S13` is available. -/
+theorem Hypothesis.card_abelianization_derived_eq_charParam_d [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M)
+    (params : CharacterParameters hyp) (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hnt : OddOrder.GroupTheory.TypePNontrivialCore M hyp.typeP)
+    (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetup htype hnt))
+    (hM2 : secondDerivedInAmbient M
+      = hyp.typeP.H ⊔ (hyp.typeP.U ⊓ Subgroup.centralizer (hyp.typeP.H : Set G)))
+    (hN : chief.N = ⊥) :
+    Nat.card (Abelianization ↥((derivedInG M).subgroupOf M)) = params.d := by
+  have h1 : Nat.card (Abelianization ↥((derivedInG M).subgroupOf M))
+      = (hyp.typeP.U ⊓ Subgroup.centralizer (hyp.typeP.H : Set G)).relIndex hyp.typeP.U :=
+    typePData_card_abelianization_derived_eq_relIndex_C hyp.typeP hM2
+  have h2 : (hyp.mkSection11CharacterData (hyp.toTypesIIIIIIVSetup htype hnt) chief).u
+      = (hyp.typeP.U ⊓ Subgroup.centralizer (hyp.typeP.H : Set G)).relIndex hyp.typeP.U :=
+    hyp.u_eq_relIndex_C (hyp.toTypesIIIIIIVSetup htype hnt) chief hN
+  have h3 : params.d = (hyp.mkSection11CharacterData (hyp.toTypesIIIIIIVSetup htype hnt) chief).u :=
+    hyp.charParam_d_eq_u hG htype params hmu hnt chief
+  rw [h1, ← h2, h3]
+
 end OddOrder.Peterfalvi.S12
