@@ -551,6 +551,12 @@ full decomposition clause for a *reducible* break member `ψ` — a μ-grid colu
 `α`-parameters and the member `D`s from (5.8) extension-uniqueness. -/
 theorem sixTwoDecompositionData_of_reducible_break [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {params : CharacterParameters hyp}
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
+    (hzS : params.zeta ∈ inducedFamily M)
+    (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
     (A' B : Subgroup ↥M)
     (S₁ : Set (ClassFunction ↥M ℂ))
     (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
@@ -587,6 +593,12 @@ member clause for a *reducible* `χ ∈ S₁` (μ-grid column sum) against an ir
 `Da`. -/
 theorem sixTwoMemberDatum_of_reducible_member [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {params : CharacterParameters hyp}
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
+    (hzS : params.zeta ∈ inducedFamily M)
+    (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
     {A' B : Subgroup ↥M}
     {S₁ : Set (ClassFunction ↥M ℂ)}
     (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
@@ -628,6 +640,12 @@ decomposition is the §10–§12 `muGrid`/`columnSum` structure, and the couplin
 extension-uniqueness.  See issue 2022. -/
 theorem sixTwoDecompositionData [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {params : CharacterParameters hyp}
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
+    (hzS : params.zeta ∈ inducedFamily M)
+    (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
     (A' B : Subgroup ↥M) :
     ∀ (S₁ : Set (ClassFunction ↥M ℂ)),
       OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁ →
@@ -674,11 +692,11 @@ theorem sixTwoDecompositionData [Finite G]
     · exact S08.inducedKernelFamily_memberDatum_orthogonal_breakDa_of_irr_irr
         hyp.dadeData.dade hyp.hconj hodd hyp.mderivSharp_subset_A0 hS₁sub hS₁conj hS₁coh
         hψB hψirr hψnotS1 hψcnotS1 hχ₁S₁ hψdeg hχS₁ hχirr
-    · exact sixTwoMemberDatum_of_reducible_member (A' := A') hG hyp hS₁conj hS₁sub hS₁coh hψB hψirr
+    · exact sixTwoMemberDatum_of_reducible_member (A' := A') hG hyp hmu hδpm hδj hzS hz1 hS₁conj hS₁sub hS₁coh hψB hψirr
         hψnotS1 hψcnotS1 hχ₁S₁ hψdeg hχS₁ hχirr
   · -- reducible (μ-column) break: the named grid obligation
-    exact sixTwoDecompositionData_of_reducible_break hG hyp A' B S₁ hS₁conj hsub hS₁coh
-      ψ hψB hψnotS1 hψcnotS1 χ₁ hχ₁S₁ a hψdeg hbreak hψirr
+    exact sixTwoDecompositionData_of_reducible_break hG hyp hmu hδpm hδj hzS hz1 A' B S₁
+      hS₁conj hsub hS₁coh ψ hψB hψnotS1 hψcnotS1 χ₁ hχ₁S₁ a hψdeg hbreak hψirr
 
 /-- **The h56 oracle for the §11 context, complete modulo the grid datum**: from the coherence
 dichotomy alone (proper traces `A', B ⊊ M'`), a source `θ ∈ Irr M'` trivial on `B` with
@@ -686,6 +704,12 @@ dichotomy alone (proper traces `A', B ⊊ M'`), a source `θ ∈ Irr M'` trivial
 `sixTwoDecompositionData`. -/
 theorem exists_source_of_coherence_dichotomy
     [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {params : CharacterParameters hyp}
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
+    (hzS : params.zeta ∈ inducedFamily M)
+    (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
     {A' B : Subgroup ↥M} [A'.Normal]
     [(A'.subgroupOf ((derivedInG M).subgroupOf M)).Normal]
     [(B.subgroupOf ((derivedInG M).subgroupOf M)).Normal]
@@ -710,7 +734,7 @@ theorem exists_source_of_coherence_dichotomy
           (θ : ClassFunction
             ↥((derivedInG M).subgroupOf M) ℂ) 1).re :=
   hyp.exists_source_index_le_two_psi_of_ne_top hG hA'ne hBne
-    (hyp.sixTwoDecompositionData hG A' B) hAcoh hBncoh
+    (hyp.sixTwoDecompositionData hG hmu hδpm hδj hzS hz1 A' B) hAcoh hBncoh
 
 /-- **Peterfalvi (6.2) for the §11 context, complete modulo the grid datum**: with a section
 `B ≤ D ≤ C ≤ M'` (inside `↥M`) whose quotient `D/B` is central in `C/B`, the coherence
@@ -719,6 +743,12 @@ dichotomy yields `|M':A'| − 1 ≤ 2·|M:C|·√|C:D|`.  This is `six_two_gener
 (`√1 = 1`) and the (11.3)/(6.3) route takes `(C, D) = (HC, A')` per section. -/
 theorem six_two_dichotomy_bound
     [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {params : CharacterParameters hyp}
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
+    (hzS : params.zeta ∈ inducedFamily M)
+    (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
     {A' B C D : Subgroup ↥M} [A'.Normal] [B.Normal]
     [(A'.subgroupOf ((derivedInG M).subgroupOf M)).Normal]
     [(B.subgroupOf ((derivedInG M).subgroupOf M)).Normal]
@@ -741,7 +771,7 @@ theorem six_two_dichotomy_bound
   haveI := hyp.finiteG
   haveI : Fintype ↥C := Fintype.ofFinite _
   exact OddOrder.Peterfalvi.S08.six_two_general hBD hCK hcentral
-    (hyp.exists_source_of_coherence_dichotomy hG hA'ne hBne hAcoh hBncoh)
+    (hyp.exists_source_of_coherence_dichotomy hG hmu hδpm hδj hzS hz1 hA'ne hBne hAcoh hBncoh)
 
 end Hypothesis
 

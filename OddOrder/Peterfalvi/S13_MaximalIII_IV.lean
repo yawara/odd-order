@@ -1236,7 +1236,10 @@ theorem coherent_S_of_coherent_SH0C [Finite G]
           (hyp.base.dadeData.dade.fullDadeIsometryData hyp.base.hconj))
         (OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B)
         hyp.base.A0) := fun h => hBncoh h
-    exact hyp.base.exists_source_of_coherence_dichotomy _hG hAne hBne hAcoh' hBncoh'
+    exact hyp.base.exists_source_of_coherence_dichotomy _hG
+      (hyp.params_mu_eq _hG _hG.odd) hyp.params_delta_pm
+      (hyp.params_delta_sign _hG _hG.odd) hyp.params_zeta_mem hyp.params_zeta_degree
+      hAne hBne hAcoh' hBncoh'
 
 /-- **Peterfalvi (11.3)**: `S(H_0 C)` is not coherent.
 
@@ -1292,6 +1295,8 @@ theorem coherent_quotient_bound [Finite G]
     exact h
   -- the (6.2) bound at `(C, D) = (HC, HC)`-traces
   have hbound := hyp.base.six_two_dichotomy_bound _hG
+    (hyp.params_mu_eq _hG _hG.odd) hyp.params_delta_pm
+    (hyp.params_delta_sign _hG _hG.odd) hyp.params_zeta_mem hyp.params_zeta_degree
     (A' := H1.subgroupOf M) (B := hyp.H0C.subgroupOf M)
     (C := hyp.HC.subgroupOf M) (D := hyp.HC.subgroupOf M)
     (Hypothesis.trace_ne_top_of_lt_derived hH1_lt) hyp.H0C_trace_ne_top
