@@ -2518,8 +2518,10 @@ structure CliffordCaseBData {M : Subgroup G} {data : TypesIIIIIIVSetup M}
     {chief : ChiefFactorData data} (chars : Section11CharacterData data chief) where
   field_model : Prop
   field_model_holds : field_model
-  Ubar_cyclic : Prop
-  Ubar_cyclic_holds : Ubar_cyclic
+  /-- **`Ū` is cyclic** (Singer, non-opaque): the image of the `U`-action on the chief factor `H̄`
+  — Peterfalvi's `Ū = U/C_U(H̄)` — is cyclic, as `Ū` embeds in the multiplicative group of the
+  field `End_{𝔽ₚ[U]}(H̄)` on which it acts irreducibly (`chiefFactor_caseB_image_cyclic`). -/
+  Ubar_cyclic : IsCyclic ↥(uActionHom data chief).range
   u_coprime_p_sub_one : Nat.Coprime chars.u (chief.p - 1)
   u_dvd_norm_quotient : chars.u ∣ (chief.p ^ data.q - 1) / (chief.p - 1)
   /-- The defining property of case (b): `U` acts **irreducibly** on the chief factor `H̄ = H/H_0`,
@@ -4933,8 +4935,7 @@ noncomputable def clifford_caseB_data [Finite G] {M : Subgroup G}
     CliffordCaseBData chars where
   field_model := True
   field_model_holds := trivial
-  Ubar_cyclic := True
-  Ubar_cyclic_holds := trivial
+  Ubar_cyclic := (chiefFactor_caseB_image_cyclic chief hcaseB).1
   u_coprime_p_sub_one := by
     rw [chars.u_eq_card_quotient]; exact chiefFactor_caseB_image_coprime chief hcaseB
   u_dvd_norm_quotient := by
