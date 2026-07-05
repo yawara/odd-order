@@ -252,3 +252,27 @@ S13_SixTwoBridge で多用)。`Section11CharacterData.tau` は bare `IntegralCha
 → 新 honest 定理を建て **b の S15 のみ re-point** (c の file signature は触らない、territorial)。c にも adopt を後で flag。
 
 次 iteration: §9 Dade-datum 接続を正面 build (Galois branch を close 目標)。lane a (10.7) も同一 §9 coherence 依存。
+
+## 2026-07-06 更新 #8 (lane b) — ★★定義的 crux 確定: (13.3) coherence の底 = §9/S-instance Dade subcoherence (13.2.e Dade isometry 基盤)
+
+更新 #7 の「§9 family の Dade/subcoherent hypothesis を build → Galois branch close」を掘り下げ、
+crux を定義的に確定。verify-first で以下を確認:
+- **S-instance の τ は placeholder**: S15 `Hypothesis` (S15:98) は `tauS : IntegralCharacterMap` を
+  **bare で持ち** (`tauS_eq_induction : Prop` の placeholder のみ)、**Dade isometry でない**。`dadeData` field なし
+  (S12 `Hypothesis` は `dadeData.dade` を持つが S15 は持たない)。
+- **§9/S-instance Dade isometry (`FTtypeP_coh_base`/`FTtypeP_subcoherent` analogue) は grep 皆無** = 真に不在。
+- **per-step pair-chain data `sixTwoDecompositionData` (S13:814) は存在するが M-instance 用** (`hyp.dadeData.dade`、
+  type-P maximal M の Dade context)。S-instance には未接続。
+- sSet family 基本性質 (conj-closed/no-real/orthogonal) も named lemma 不在 (`sSet_subset_ZIrr` S11:1636 のみ);
+  ただし `induce_eq_induce_iff_conj` (distinct-orbit ⟹ distinct-induced) 機構は在る。
+
+**⟹ (13.3) `coherent_H0Cprime_S` の honest 再grounding の底 = (13.2.e) S-instance Dade isometry
+`τ = Ind_S^G is a Dade isometry` + それに載る §9 subcoherence**。これが唯一の foundational gate。
+その上は全 ready/landed: squeeze arithmetic (全 landed)・`clifford_dichotomy` (S11:6668)・Galois uniform
+degree `caseB_character_counts.1` (S11:11712)・`irrSubcoherent` (5.3.a assembler, landed)・
+`coherentPairChain` engine (S07:4907)・`coherent_subset_of_constant_degree` (landed)。
+
+**次 build = (13.2.e) S-instance Dade isometry (foundational、substantial、lane-b (13.x) territory)**。
+sSet conj-closure 等の Dade-independent 小片を先に建てても subcoherence は Dade isometry で gated ゆえ
+scaffold になる → 底の Dade isometry を正面 build する (難所回避しない、CLAUDE.md)。upstream = (13.2) の
+S/T Dade 構成。lane a (10.7) は M-instance 側で `sixTwoDecompositionData` を既に持つため S-instance とは別 path。
