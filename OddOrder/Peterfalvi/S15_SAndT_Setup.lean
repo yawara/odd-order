@@ -366,6 +366,52 @@ structure BasicStructureGated (hyp : Hypothesis (G := G)) where
   tauS_eq_induction : Prop
   tauS_eq_induction_holds : tauS_eq_induction
 
+/-- **The §9 type-II setup on `S`** (Peterfalvi (13.2.a) → (9.2)): the `TypesIIIIIIVSetup`
+carrier for `S`, from the κ-Hall type-P₂ witness.  `maximal`/`typeP` are the carried
+`S_maximal`/`Sdata`; the nontrivial core is witness-independent (`U ≠ ⊥` via the canonical index
+`[S' : S_F]`, `|W₁| = q` prime, and the `A₀`-TI clause depends only on `S`); `type_alt` is
+type II (`isTypeII_of_isTypeP2`).  Note the §9 machinery's `H` is `Sdata.H = S_F = P`, so the
+§9 inertia subgroup `HC` is `PC = hyp.H` — the (13.3.a) `Ind_{PC}(linear)` shape.  Opens the §9
+Clifford/degree machinery ((9.7)–(9.9), the `hcPsi`-induction analysis) on `S`. -/
+noncomputable def Hypothesis.toTypesIIIIIIVSetupS [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup hyp.S := by
+  have hSII : IsTypeII hyp.S :=
+    OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.S_maximal hyp.S_typeP2
+  have tdata : TypeIIData hyp.S := hSII.some
+  have hUne : hyp.Sdata.U ≠ ⊥ := by
+    intro hbot
+    have h1 : Nat.card ↥hyp.Sdata.U = Nat.card ↥tdata.typeP.U := by
+      rw [hyp.Sdata.card_U_eq_index, tdata.typeP.card_U_eq_index]
+    rw [hbot, Subgroup.card_bot] at h1
+    exact tdata.common.1 (Subgroup.card_eq_one.mp h1.symm)
+  have hW1prime : (Nat.card ↥hyp.Sdata.W1).Prime := by
+    rw [hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1]; exact hyp.q_prime
+  exact { maximal := hyp.S_maximal
+          typeP := hyp.Sdata
+          nontrivial := ⟨hUne, hW1prime, tdata.common.2.2⟩
+          type_alt := Or.inl hSII }
+
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+/-- **§9 character data on `S`** (S12-mk mirror; degree-only placeholders): `u = |Ū|` is
+rfl-pinned to the `U`-action image; `tau := hyp.tauS`, `H0CprimeSupport := ∅` and
+`quotientSemidirectFrobenius := True` are the documented count/degree-only placeholders (as in
+`S12.Hypothesis.mkSection11CharacterData` — NOT for (9.11)-coherence consumption; the honest
+support/tau construction is issue 2035 step 1b).  Opens `caseB_degree_qu`, the (9.9) counts and
+the (9.9.c) `hcPsi`-induction exhaustion on `S` for the (13.3) μ-column facts. -/
+noncomputable def Hypothesis.mkSection11CharacterDataS [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
+    OddOrder.Peterfalvi.S11.Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief where
+  u := Nat.card ↥(((quotientMulAutHom (N := chief.N) chief.N_aInvariant).comp
+      ((hyp.toTypesIIIIIIVSetupS hG).typeP.U.subgroupOf
+        ((hyp.toTypesIIIIIIVSetupS hG).typeP.U
+          ⊔ (hyp.toTypesIIIIIIVSetupS hG).typeP.W1)).subtype).range)
+  u_eq_card_quotient := rfl
+  H0CprimeSupport := ∅
+  tau := hyp.tauS
+  quotientSemidirectFrobenius := True
+
 /-- **Peterfalvi (13.2.b), order part**: the Fitting kernel `P = S_F` has order `p^q`.
 
 This is the order half of (13.2.b) ("`P` is elementary abelian of order `p^q`").  `S` is of Type II
@@ -385,25 +431,9 @@ theorem Hypothesis.card_P_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     Nat.card ↥hyp.P = hyp.p ^ hyp.q := by
   have hSII : IsTypeII hyp.S :=
     OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.S_maximal hyp.S_typeP2
-  have tdata : TypeIIData hyp.S := hSII.some
-  -- `Sdata.U ≠ ⊥`: its order is the witness-independent index `[S' : S_F]`, which is `≠ 1`
-  -- because the type-II witness has `U ≠ 1` at the same index.
-  have hUne : hyp.Sdata.U ≠ ⊥ := by
-    intro hbot
-    have h1 : Nat.card ↥hyp.Sdata.U = Nat.card ↥tdata.typeP.U := by
-      rw [hyp.Sdata.card_U_eq_index, tdata.typeP.card_U_eq_index]
-    rw [hbot, Subgroup.card_bot] at h1
-    exact tdata.common.1 (Subgroup.card_eq_one.mp h1.symm)
-  have hW1prime : (Nat.card ↥hyp.Sdata.W1).Prime := by
-    rw [hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1]; exact hyp.q_prime
-  -- the `A_0(S)` TI-subset clause of the nontrivial core depends only on `S` (witness-independent).
-  have hTI := tdata.common.2.2
-  -- (9.3) Wielandt order relation for the type-II setup on `S`.
+  -- (9.3) Wielandt order relation for the type-II setup on `S` (`toTypesIIIIIIVSetupS`).
   have hord := (OddOrder.Peterfalvi.S11.typeII_III_IV_order_relations hG
-    { maximal := hyp.S_maximal
-      typeP := hyp.Sdata
-      nontrivial := ⟨hUne, hW1prime, hTI⟩
-      type_alt := Or.inl hSII }).1 hSII
+    (hyp.toTypesIIIIIIVSetupS hG)).1 hSII
   have hord2 : Nat.card ↥hyp.Sdata.H
       = Nat.card ↥hyp.Sdata.W2 ^ Nat.card ↥hyp.Sdata.W1 := hord.2
   have hW2card : Nat.card ↥hyp.Sdata.W2 = hyp.p := by
