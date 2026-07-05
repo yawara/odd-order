@@ -524,15 +524,225 @@ theorem orderOf_coprime_p_of_not_mem_conj [Finite G] (hG : OddOrder.BG.IsMinimal
       rw [← hxeq, hg'eq]
     rw [h1, hg'def]; group
 
+/-- **`p` is coprime to `|T'|`** (T-side dual of `coprime_q_card_derivedS`): `T' = Q ⋊ V`
+with `|Q| = q^p` (`card_Q_eq`, `p ≠ q`) killing the `Q`-side, and `V ⋊ W₂` Frobenius
+(`S11.typeP_uW1_frobenius` on the reconciled T-data) killing the `V`-side. -/
+theorem coprime_p_card_derivedT [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) (hTII : IsTypeII hyp.T) :
+    Nat.Coprime hyp.p (Nat.card ↥(derivedInG hyp.T)) := by
+  obtain ⟨tpd, htpdV, htpdW1, htpdW2⟩ :=
+    OddOrder.Peterfalvi.S15.reconciled_typePData_T hG hyp
+  have hcard : Nat.card ↥(derivedInG hyp.T)
+      = Nat.card ↥tpd.H * Nat.card ↥tpd.U := by
+    have hmul := tpd.derived_complement.card_mul
+    rw [← hmul,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe tpd.H_le).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe tpd.U_le).toEquiv]
+  rw [hcard]
+  refine Nat.Coprime.mul_right ?_ ?_
+  · -- `p` is coprime to `|Q| = q^p`
+    have hQcard : Nat.card ↥tpd.H = hyp.q ^ hyp.p := by
+      rw [tpd.H_eq, ← hyp.Q_eq_TF]
+      exact OddOrder.Peterfalvi.S15.card_Q_eq hG hyp hTII
+    rw [hQcard]
+    exact Nat.Coprime.pow_right _
+      ((Nat.coprime_primes hyp.p_prime hyp.q_prime).mpr hyp.p_ne_q)
+  · -- `p` is coprime to `|V|` (`V ⋊ W₂` Frobenius; trivial for `V = ⊥`)
+    by_cases hV : tpd.U = ⊥
+    · rw [hV, Subgroup.card_bot]; exact Nat.coprime_one_right _
+    · have hF := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius tpd hV
+      have hc := hF.coprime_card_kernel_complement
+      have h1 : Nat.card ↥(tpd.U.subgroupOf (tpd.U ⊔ tpd.W1)) = Nat.card ↥tpd.U :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_left).toEquiv
+      have h2 : Nat.card ↥(tpd.W1.subgroupOf (tpd.U ⊔ tpd.W1)) = Nat.card ↥tpd.W1 :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv
+      have hp : Nat.card ↥tpd.W1 = hyp.p := by rw [htpdW1, ← hyp.p_eq_card_W2]
+      have hcUW : Nat.Coprime (Nat.card ↥tpd.U) hyp.p := by
+        rw [← hp, ← h1, ← h2]; exact hc
+      exact hcUW.symm
+
+/-- **`Q` is a full Sylow `q`-subgroup of `G`** (T-side dual of `exists_sylow_coe_eq_P`).
+`Q.subgroupOf T` is Sylow in `T` (`|Q| = q^p` with `q` coprime to `[T : Q]` — `Q = T_F` is a
+Hall subgroup of `T`), `q ∈ σ(T)` (`N_G(Q) = T`), and the BG §10 σ-Sylow theory promotes it
+to a Sylow of `G`. -/
+theorem exists_sylow_coe_eq_Q [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) (hTII : IsTypeII hyp.T) :
+    haveI : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
+    ∃ S₀ : Sylow hyp.q G, (S₀ : Subgroup G) = hyp.Q := by
+  haveI : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
+  have hQle : hyp.Q ≤ hyp.T := by
+    rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le _
+  have hQcard : Nat.card ↥hyp.Q = hyp.q ^ hyp.p :=
+    OddOrder.Peterfalvi.S15.card_Q_eq hG hyp hTII
+  have hQsub_card : Nat.card ↥(hyp.Q.subgroupOf hyp.T) = hyp.q ^ hyp.p := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQle).toEquiv, hQcard]
+  have hQsub_pg : IsPGroup hyp.q ↥(hyp.Q.subgroupOf hyp.T) :=
+    IsPGroup.of_card hQsub_card
+  obtain ⟨R, hRle⟩ := hQsub_pg.exists_le_sylow
+  -- `Q = T_F` is Hall in `T`, so `q` is coprime to the index `[T : Q]`
+  have hHall : Nat.Coprime (Nat.card ↥(hyp.Q.subgroupOf hyp.T))
+      ((hyp.Q.subgroupOf hyp.T).index) := by
+    have h := (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall hyp.T).coprime_index
+    rwa [← hyp.Q_eq_TF] at h
+  have hcopq : Nat.Coprime hyp.q ((hyp.Q.subgroupOf hyp.T).index) := by
+    refine Nat.Coprime.coprime_dvd_left ?_ hHall
+    rw [hQsub_card]
+    exact dvd_pow_self _ hyp.p_prime.pos.ne'
+  have hRQ : (R : Subgroup ↥hyp.T) = hyp.Q.subgroupOf hyp.T := by
+    obtain ⟨k, hk⟩ := R.isPGroup'.exists_card_eq
+    have hdvd : hyp.q ^ k ∣ hyp.q ^ hyp.p * ((hyp.Q.subgroupOf hyp.T).index) := by
+      rw [← hk, ← hQsub_card, Subgroup.card_mul_index]
+      exact Subgroup.card_subgroup_dvd_card _
+    have hkq : hyp.q ^ k ∣ hyp.q ^ hyp.p :=
+      Nat.Coprime.dvd_of_dvd_mul_right (Nat.Coprime.pow_left _ hcopq) hdvd
+    refine (Subgroup.eq_of_le_of_card_ge hRle ?_).symm
+    rw [hQsub_card, hk]
+    exact Nat.le_of_dvd (pow_pos hyp.q_prime.pos _) hkq
+  have hmap : (R : Subgroup ↥hyp.T).map hyp.T.subtype = hyp.Q := by
+    rw [hRQ]
+    exact Subgroup.map_subgroupOf_eq_of_le hQle
+  have hqσ : hyp.q ∈ OddOrder.BG.Ch3.S10.sigma hyp.T := by
+    refine ⟨Nat.mem_primeFactors.mpr ⟨hyp.q_prime, ?_, Nat.card_pos.ne'⟩, R, ?_⟩
+    · exact dvd_trans (dvd_pow_self _ hyp.p_prime.pos.ne')
+        (hQcard ▸ Subgroup.card_dvd_of_le hQle)
+    · rw [hmap]
+      exact (normalizer_Q_eq_T hG hyp).le
+  obtain ⟨S₀, hS₀⟩ := OddOrder.BG.Ch3.S10.isSylow_sylowMap_of_mem_sigma hqσ R
+  exact ⟨S₀, by rw [hS₀, hmap]⟩
+
+/-- **`Q` absorbs the order-`q` elements of `G` up to conjugacy** (T-side dual of
+`exists_conj_mem_P_of_orderOf_eq_p`). -/
+theorem exists_conj_mem_Q_of_orderOf_eq_q [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) (hTII : IsTypeII hyp.T) {a : G}
+    (ha : orderOf a = hyp.q) : ∃ y : G, y * a * y⁻¹ ∈ hyp.Q := by
+  haveI : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
+  obtain ⟨S₀, hS₀⟩ := exists_sylow_coe_eq_Q hG hyp hTII
+  have hA : IsPGroup hyp.q ↥(Subgroup.zpowers a) :=
+    IsPGroup.of_card (by rw [Nat.card_zpowers, ha, pow_one])
+  obtain ⟨R, hR⟩ := hA.exists_le_sylow
+  obtain ⟨y, hy⟩ := MulAction.exists_smul_eq G R S₀
+  refine ⟨y, ?_⟩
+  have hcoe : MulAut.conj y • (R : Subgroup G) = hyp.Q := by
+    have h := congrArg Sylow.toSubgroup hy
+    rwa [Sylow.coe_subgroup_smul, hS₀] at h
+  rw [← hcoe]
+  exact ⟨a, hR (Subgroup.mem_zpowers a), rfl⟩
+
 /-- **Peterfalvi (14.11.3), T-side core**: an element avoiding the conjugates of `W#` and of
-`Q#` has order prime to `q`.  Dual of `orderOf_coprime_p_of_not_mem_conj` (with
-(14.4)/(13.12) in place of (14.6)/(13.12) for the `T' = Q ⋊ V` Frobenius step). -/
+`Q#` has order prime to `q`.  Dual of `orderOf_coprime_p_of_not_mem_conj`, along
+`T = T' ⋊ W₂`, `T' = Q ⋊ V`, `C_{T'}(w) = W₁` (`w ∈ W₂#`), with (14.4)/(13.12) in place of
+(14.6)/(13.12) for the `hfrobT` Frobenius-kernel input. -/
 theorem orderOf_coprime_q_of_not_mem_conj [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) (hTII : IsTypeII hyp.T) {g : G}
+    (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) (hTII : IsTypeII hyp.T)
+    (hfrobT : ∀ x ∈ sharpSubgroup hyp.Q,
+      derivedInG hyp.T ⊓ Subgroup.centralizer ({x} : Set G) ≤ hyp.Q) {g : G}
     (hW : g ∉ conjClassSet (sharpSubgroup hyp.W))
     (hQ : g ∉ conjClassSet (sharpSubgroup hyp.Q)) :
     Nat.Coprime (orderOf g) hyp.q := by
-  sorry
+  obtain ⟨tpd, htpdV, htpdW1, htpdW2⟩ :=
+    OddOrder.Peterfalvi.S15.reconciled_typePData_T hG hyp
+  rw [Nat.coprime_comm, Nat.Prime.coprime_iff_not_dvd hyp.q_prime]
+  intro hdvd
+  -- `g ≠ 1` and the order-`q` power `a₀` of `g`
+  have hord_ne : orderOf g ≠ 0 := (orderOf_pos g).ne'
+  have hg1 : g ≠ 1 := by
+    rintro rfl
+    rw [orderOf_one, Nat.dvd_one] at hdvd
+    exact hyp.q_prime.one_lt.ne' hdvd
+  set a₀ : G := g ^ (orderOf g / hyp.q) with ha₀def
+  have ha₀ord : orderOf a₀ = hyp.q := by
+    rw [ha₀def, orderOf_pow, Nat.gcd_eq_right (Nat.div_dvd_of_dvd hdvd),
+      Nat.div_div_self hdvd hord_ne]
+  have ha₀ne : a₀ ≠ 1 := by
+    intro h
+    rw [h, orderOf_one] at ha₀ord
+    exact hyp.q_prime.one_lt.ne ha₀ord
+  have hcomm : Commute g a₀ := (Commute.refl g).pow_right _
+  -- conjugate the `q`-part into `Q#`
+  obtain ⟨y, hyQ⟩ := exists_conj_mem_Q_of_orderOf_eq_q hG hyp hTII ha₀ord
+  set a : G := y * a₀ * y⁻¹ with hadef
+  have haQ : a ∈ sharpSubgroup hyp.Q := by
+    refine ⟨hyQ, ?_⟩
+    intro h1
+    refine ha₀ne ?_
+    have ha1 : a = 1 := h1
+    have : a₀ = y⁻¹ * a * y := by rw [hadef]; group
+    rw [this, ha1, mul_one, inv_mul_cancel]
+  -- the conjugate `g' = y g y⁻¹` centralizes `a`, hence lies in `T`
+  set g' : G := y * g * y⁻¹ with hg'def
+  have hg'ne : g' ≠ 1 := by
+    intro h
+    refine hg1 ?_
+    have : g = y⁻¹ * g' * y := by rw [hg'def]; group
+    rw [this, h, mul_one, inv_mul_cancel]
+  have hg'cent : g' ∈ Subgroup.centralizer ({a} : Set G) := by
+    rw [Subgroup.mem_centralizer_singleton_iff]
+    calc g' * a = y * (g * a₀) * y⁻¹ := by rw [hg'def, hadef]; group
+      _ = y * (a₀ * g) * y⁻¹ := by rw [hcomm.eq]
+      _ = a * g' := by rw [hg'def, hadef]; group
+  have hg'T : g' ∈ hyp.T := centralizer_le_T_of_mem_sharp_Q hG hyp hTII haQ hg'cent
+  -- decompose `g' = d · w` along `T = T' ⋊ W₂`
+  obtain ⟨⟨d, w⟩, hdw⟩ :=
+    (Subgroup.IsComplement.existsUnique tpd.M_complement
+      (⟨g', hg'T⟩ : ↥hyp.T)).exists
+  have hdmem : ((d : ↥hyp.T) : G) ∈ derivedInG hyp.T := Subgroup.mem_subgroupOf.mp d.2
+  have hg'eq : ((d : ↥hyp.T) : G) * ((w : ↥hyp.T) : G) = g' := by
+    have h := congrArg (fun x : ↥hyp.T => (x : G)) hdw
+    simpa using h
+  by_cases hw1 : (w : ↥hyp.T) = (1 : ↥hyp.T)
+  · -- `w = 1`: `g' ∈ C_{T'}(a) ≤ Q`, contradicting `g ∉ (Q#)^G`
+    have hg'derived : g' ∈ derivedInG hyp.T := by
+      rw [← hg'eq, hw1]
+      simpa using hdmem
+    have hg'Q : g' ∈ hyp.Q := hfrobT a haQ ⟨hg'derived, hg'cent⟩
+    refine hQ ⟨g', ⟨hg'Q, fun h => hg'ne h⟩, y⁻¹, ?_⟩
+    rw [hg'def]; group
+  · -- `w ≠ 1`: the (2.1) coset collapse conjugates `g` into `W₁ · w ⊆ W#`
+    set w₀ : G := ((w : ↥hyp.T) : G) with hw₀def
+    have hw₀W2 : w₀ ∈ hyp.W2 := by
+      rw [← htpdW1]
+      exact Subgroup.mem_subgroupOf.mp w.2
+    have hw₀ne : w₀ ≠ 1 := by
+      intro h
+      exact hw1 (Subtype.ext (by simpa [hw₀def] using h))
+    have hw₀ord : orderOf w₀ = hyp.p := by
+      have hdvd' : orderOf w₀ ∣ hyp.p := by
+        rw [hyp.p_eq_card_W2]
+        exact Subgroup.orderOf_dvd_natCard _ hw₀W2
+      rcases (Nat.Prime.eq_one_or_self_of_dvd hyp.p_prime _ hdvd') with h1 | hp
+      · exact absurd (orderOf_eq_one_iff.mp h1) hw₀ne
+      · exact hp
+    have hnorm : ∀ x ∈ derivedInG hyp.T, w₀ * x * w₀⁻¹ ∈ derivedInG hyp.T := by
+      intro x hx
+      have hw₀norm : w₀ ∈ Subgroup.normalizer (derivedInG hyp.T) :=
+        OddOrder.BG.Ch3.S10.le_normalizer_derivedInG hyp.T (SetLike.coe_mem (w : ↥hyp.T))
+      exact (Subgroup.mem_normalizer_iff.mp hw₀norm x).mp hx
+    have hcop : Nat.Coprime (orderOf w₀) (Nat.card ↥(derivedInG hyp.T)) := by
+      rw [hw₀ord]; exact coprime_p_card_derivedT hG hyp hTII
+    obtain ⟨c, hc, x, hx, hxeq⟩ :=
+      OddOrder.GroupTheory.exists_mem_centralizer_conj hcop hnorm hdmem
+    -- `C_{T'}(w₀) = W₁` ((8.4) regularity, T-side)
+    have hcW1 : c ∈ hyp.W1 := by
+      have hw₀tpd : w₀ ∈ tpd.W1 := by rw [htpdW1]; exact hw₀W2
+      have hreg := tpd.centralizer_W1 w₀ hw₀tpd hw₀ne
+      rw [← htpdW2, ← hreg]
+      exact hc
+    have hW1le : hyp.W1 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_left
+    have hW2le : hyp.W2 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_right
+    have hcwW : c * w₀ ∈ hyp.W := hyp.W.mul_mem (hW1le hcW1) (hW2le hw₀W2)
+    have hcwne : c * w₀ ≠ 1 := by
+      intro h
+      have hw₀W1 : w₀ ∈ hyp.W1 := by
+        have hinv : w₀ = c⁻¹ := eq_inv_of_mul_eq_one_right h
+        rw [hinv]
+        exact hyp.W1.inv_mem hcW1
+      have hbot : w₀ ∈ hyp.W1 ⊓ hyp.W2 := ⟨hw₀W1, hw₀W2⟩
+      rw [hyp.W1_inf_W2_eq_bot, Subgroup.mem_bot] at hbot
+      exact hw₀ne hbot
+    refine hW ⟨c * w₀, ⟨hcwW, fun h => hcwne h⟩, (x * y)⁻¹, ?_⟩
+    have h1 : c * w₀ = x * g' * x⁻¹ := by
+      rw [← hxeq, hg'eq]
+    rw [h1, hg'def]; group
 
 /-- **Peterfalvi (14.11.3), support half**: an element avoiding the conjugates of the regular
 set `W − (W₁ ∪ W₂)`, of `P#`, and of `Q#` — i.e. any element of the generic set `G₀` off the
@@ -542,13 +752,15 @@ integrality/pairing on `G₀`) consumes it through `EtaGenericData`. -/
 theorem orderOf_coprime_pq_of_not_mem_conj [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) (hTII : IsTypeII hyp.T)
     (hfrob : ∀ x ∈ sharpSubgroup hyp.P,
-      derivedInG hyp.S ⊓ Subgroup.centralizer ({x} : Set G) ≤ hyp.P) {g : G}
+      derivedInG hyp.S ⊓ Subgroup.centralizer ({x} : Set G) ≤ hyp.P)
+    (hfrobT : ∀ x ∈ sharpSubgroup hyp.Q,
+      derivedInG hyp.T ⊓ Subgroup.centralizer ({x} : Set G) ≤ hyp.Q) {g : G}
     (hreg : g ∉ conjClassSet ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))))
     (hP : g ∉ conjClassSet (sharpSubgroup hyp.P))
     (hQ : g ∉ conjClassSet (sharpSubgroup hyp.Q)) :
     Nat.Coprime (orderOf g) (hyp.p * hyp.q) := by
   have hW := not_mem_conjClassSet_sharp_W hG hyp hreg hP hQ
   exact Nat.Coprime.mul_right (orderOf_coprime_p_of_not_mem_conj hG hyp hfrob hW hP)
-    (orderOf_coprime_q_of_not_mem_conj hG hyp hTII hW hQ)
+    (orderOf_coprime_q_of_not_mem_conj hG hyp hTII hfrobT hW hQ)
 
 end OddOrder.Peterfalvi.S16
