@@ -5272,7 +5272,17 @@ noncomputable def lSideGridCoeffData [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
   -- **Genuinely cross-lane-gated (Coq `FTtypeI_bridge_facts`, the S/T type-P partner bridge).**
   -- Off-principal parity `a i j ≡ 1 (mod 2)` needs the `cycTIiso_cfdot_exchange` reciprocity of the
   -- type-P `S`/`T` maximals (`hyp.base.S_typeP2`), which lives in lane b's §13/§15 layer.
+  -- **Genuinely cross-lane-gated (Coq `FTtypeI_bridge_facts`, PFsection13.v:1987; issue 3002).**
+  -- `m_0j = ⟨β_L, η_0j⟩ ≡ 1 (mod 2)` is the (c2) disjunct of `FTtypeI_bridge_facts` applied to the
+  -- **S-side type-P partner** `StypeP` (PFsection14.v:187, `case/betaL_P: StypeP => _ _ -> //`).
+  -- That bound is the type-P coherent pairing `⟨τ β_S, τ₁ φ⟩ ≡ 1 (mod 2)` on the S-side residual
+  -- `β_S`, which lives in lane b's `S15_SAndT.lean`; S16 only carries an opaque `caseB_formula`.
+  -- Verified c-unreachable: the only c-available parity primitive `cfdot_real_vchar_even` needs
+  -- `η_0j` real (no `eta_isReal` — `η` is a cyclic-TI image, complex) and would anyway give
+  -- `⟨β_L,1⟩·⟨η_0j,1⟩ = 1·0 = 0 (mod 2)` = EVEN, the *opposite* parity.
   m_row_odd := sorry
+  -- Dual of `m_row_odd`, from `FTtypeI_bridge_facts` on the **T-side type-P partner** `TtypeP`
+  -- (PFsection14.v:190) — same lane-b §13 gate (issue 3002).
   m_col_odd := sorry
   -- **The (13.19.c) Bessel bound `Σ m² ≤ p q`** (Coq `ub_e`), fully proven via
   -- `betaL_grid_coeff_bessel`: the (7.8.a) decomposition projects onto the `η`-grid as
@@ -5281,8 +5291,16 @@ noncomputable def lSideGridCoeffData [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
   bessel :=
     betaL_grid_coeff_bessel hG hLmax dataL hepq _
       (fun i j => Classical.choose_spec (betaL_grid_coeff_int hG dataL i j))
-  -- **The deep §13 gate (issue 3002, Coq `Y = 0`).** `1_G + Δ_L = Σ m_ij η_ij`: the coherence
-  -- residual equals its own orthogonal projection onto the `η`-grid.
+  -- **The deep §13 gate (issue 3002, Coq `Y = 0`, PFsection14.v:212-251).** `1_G + Δ_L = Σ m_ij η_ij`:
+  -- the coherence residual equals its own orthogonal projection onto the `η`-grid, i.e. the residual
+  -- `Y := (1_G + Γ_L) − Σ m_ij η_ij` is `0`.  This is the `orthogonal_split` + `leif`-equality step
+  -- forced by the tightness `e = p q` (`ub_e`) **together with** each `|m_ij|² ≥ 1` (from the parities
+  -- `m_row_odd`/`m_col_odd` above, `a_odd`), so `grid_mem` genuinely *depends on* the gated boundary
+  -- parity.  Verified c-unreachable: the proven `NC ≤ 2` engine
+  -- `grid_eq_zero_of_relation_of_card_le_two` (S16_GridExpansion) does not apply here (all `p q ≥ 15`
+  -- coefficients are `±1`, so `NC = p q ≫ 2`), and the `bessel` proof only yields `⟨Y,Y⟩ ≥ 0`, not the
+  -- tight `⟨Y,Y⟩ = 0`.  Mirror: the M-side `MHypothesis.betaGrid` (identical statement) is discharged
+  -- by an explicit `sorry` at `exists_MHypothesis` tagged "genuine Track A obligation (issue 3002)".
   grid_mem := sorry
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
