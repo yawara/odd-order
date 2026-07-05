@@ -8,6 +8,34 @@
 
 ---
 
+## ✅✅ LIVE STATUS (2026-07-05 loop it.46-55, lane **b**): (13.9.a) 完全実証明 + (13.3) campaign 設計
+
+- **it.46-48**: (13.3) producer campaign 設計 (issue 2035) — route A ((9.11) = repo
+  `coherent_H0C_commutator`、(6.8)-wired、真 gap = `sibleyTarget_H0C` [multi-session]) /
+  route B (Sibley 直接 (S,PC)) は (6.8.a)-split |S|=|PC|·u·q で死亡と判定。
+  **⚠ S12 `mkSection11CharacterData` は H0CprimeSupport := ∅ の count-専用 placeholder —
+  (9.11)-coherence に流用不可 (Sset:=∅ 型罠)**。
+- **it.49 (F1)**: `mu_col_tau1_eta_col_one` field ((13.1.e) μⱼ = Σᵢμᵢⱼ 列和が
+  (13.3.a) で Ind-PC-linear + (13.3.c) 列公式の bundle)。
+- **it.50-51 (F2)**: `omegaSChar` pair 分解 + 行/列整列 lemmas →
+  `tau3W_omegaS_fourcorner_vanish` ((3.4)/(3.5): regular 飽和外で
+  1 − η_{i0} − η_{0j} + η_{ij} = 0) → `eta_fourcorner_vanish` field threading。
+- **it.52-53 (F3)**: `tau3W_omegaS_row_vanish_of_one_zero` ((3.9.b): η₁₀(x)=0 →
+  η_{i0}(x)=0 [i≠0]; 生成元 hom-ext + 原始 q 乗根 + `exists_mapRingEquiv_sigma_omega_pow`
+  Galois twist; **i=0 は偽 (η₀₀=1) と発見し Pf 通り制限**) → field threading。
+- **it.54**: helper `lambda_tau1_apply_eq_of_not_mem_H_sat`
+  (λ^{τ₁}(x) = δΣᵢηᵢ₁(x) off (H^#)^G — (μⱼ−λ) の H^#-台 + TI-off-vanishing)。
+  **識別子内 λ は 3 度目の parse 破壊 (疑似 case-h まで誘発) — 徹底禁止**。
+- **it.55 (12a2e653)**: **`G0_nonvanishing_dichotomy` (13.9.a) 完全実証明** — regular 枝
+  (ω-値 ≠ 0) + 背理枝 (q·η₀₁(x) = q−1 → 整性 + int_dvd で q∣1 矛盾)。issue 2036 close。
+- **セッション累計 (it.27-55)**: sorried atom 実証明化 9 本 + (13.2.e)/(3.2.d)/(3.4)(3.5)/
+  (3.9.b) の定理化 + soundness 修正 2 件 (lambda_mem / ∅-placeholder caveat)。
+- **残 on-path sorry (Setup)**: `character_degree_analysis` (13.3 producer、campaign 2035 —
+  sibleyTarget 系が critical) / `lambda_forces_T_caseB` (13.4) / `reconciled_typePData_T`
+  (T-side 構造 build 進行中) / T-side atoms (Q-abelian gated) / 数値系
+  (numeric_bounds/c_eq_one/caseA/caseB_order_u) / carrier (basic_structure_gated) /
+  vestigial (sibleyTarget_S)。
+
 ## ✅✅ LIVE STATUS (2026-07-05 loop it.32-45, lane **b**): (13.3)-cluster 実証明化 campaign — (13.6)+(13.7) 全 atom real 化
 
 **成果 (それぞれ commit 済、全 green)**:

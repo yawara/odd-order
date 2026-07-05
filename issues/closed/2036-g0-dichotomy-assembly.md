@@ -50,13 +50,21 @@ created: 2026-07-05
 
 - [x] F1 field `mu_col_tau1_eta_col_one` を CharacterDegreeData に追加 (it.49、supply は
       sorried (13.3) producer 内 = 追加義務なし)
-- [ ] F2: hyp-level field `eta_fourcorner_vanish` + spine supply (chiFam_spec 経由、
+- [x] F2: hyp-level field `eta_fourcorner_vanish` + spine supply (chiFam_spec 経由、
       2033-パターン; tau3W(omegaS-combo) と chiFam の橋は it.42 の exhaustion 流用)
-- [ ] F3: hyp-level field (ωᵢ₀ = ω₁₀^i の row-power + Galois) or 直接
+- [x] F3: hyp-level field (ωᵢ₀ = ω₁₀^i の row-power + Galois) or 直接
       `eta_row_zero_of_eta10_zero` 形 — S05 :1837 + 位数条件の設計
-- [ ] assembly: `G0_nonvanishing_dichotomy` 本体 (G0Finset-membership → 飽和外の抽出、
+- [x] assembly: `G0_nonvanishing_dichotomy` 本体 (07-05 it.55 完了) (G0Finset-membership → 飽和外の抽出、
       `mem_G0_iff` ✓ 在庫)
 
 ## 参照
 
 Pf 04.15 p.79 (13.9)、04.5 (3.9.b)/(3.4)/(3.5)。issues/2035 (13.3-producer、F1 の供給元)。
+
+## 完了 (07-05 it.49-55)
+
+全 4 項目着地 — `G0_nonvanishing_dichotomy` は sorry なしの実証明
+(残仮定 = CharacterDegreeData fields、supply = sorried (13.3) producer)。
+regular 枝: ω-値 ≠ 0 (omega_mul + apply_one)。背理枝: helper (λ = δΣηᵢ₁) +
+F3 (Galois row-vanish) + F2 (four-corner) → q·η₀₁(x) = q−1 →
+isIntegral + int_dvd_of_intCast_eq_mul_isIntegral で q ∣ 1 矛盾。issue close。

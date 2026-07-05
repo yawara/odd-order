@@ -44,8 +44,10 @@ grep 検証: `chars.lambda_mem` の cite は **0** (S16_PairingCoherence の `ty
       (∃ linear θ : CF(H.subgroupOf S), degree-1 irreducible ∧ lambda = Ind θ) に materialize
       — consumers は `hlam` を opaque に持ち回るだけなので signature 影響ゼロ、
       construct するのは sorried `character_degree_analysis` のみ
-- [ ] 残 free Props (`mu_j_linear_induced` / `no_lambda_forces_caseB_S` / `mu_tau1_formula` /
-      `sign_flip_exception`) の honest 化 — (13.3.a/c/d) の τ₁↔η-grid formula 設計と一体
+- [x] (07-05 it.57) 残 free Props の honest 化 — mu_j_linear_induced ((13.3.a) 全列 ∃-形) +
+      mu_tau1_formula ((13.3.c) 全形 normal ∨ p=3-swap) を materialize、
+      no_lambda_forces_caseB_S + sign_flip_exception (未消費 WLOG-枝/例外 doc) を除去、
+      character_degree_analysis の結論を Nonempty に簡約 — (13.3.a/c/d) の τ₁↔η-grid formula 設計と一体
       (tau1S の W-side 意味論: μⱼ^{τ₁} = δ Σᵢ η_{i1} 型の formula field 群)。
       (13.3)-cluster atom 群 (exists_lambda_index / lambda_tau1_norm_one /
       lambda_tau1_apply_mul_eq_zero / eta10_cCoeff_orthogonal) の実証明もこの設計に乗る。
