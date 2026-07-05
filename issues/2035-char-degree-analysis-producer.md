@@ -147,6 +147,22 @@ conjunct-3 type-II HU-Frobenius = 指標論的 Frobenius 判定法 (Isaacs 7 章
 → campaign step 3 ((13.3.a) の S11 側) は本質完了。次 = step 1-2 (S15↔S11 bridge の
 honest Section11CharacterData 構成 + sibleyTarget_H0C) or step 4 (τ₁ 導出)。
 
+## ✅ u ≡ 1 mod q 完全証明 (it.86) — δ=1 の crux ungated 実証
+
+`Hypothesis.u_modEq_one` (S15): |Ū| ≡ 1 mod q を Singer field_model **不要**で証明。
+UW₁ Frobenius (typeP_uW1_frobenius) の共役 φ : Sdata.U⊔W₁ →* Aut(P)、
+kernel-image φ(U) = U/C_U(P) = Ū、`IsFrobeniusGroup.card_range_comp_subtype_modEq_one`
+(Isaacs 6.1, purpose-built) で |Ū| ≡ 1 mod |W₁|。|Ū|=u (ker ψ = C を
+equivMapOfInjective で同定)、|W₁|=q。→ it.84-85 の「ungated」評価が実証完了。
+
+**δ=1 残 assembly (次 iteration)**:
+- (4.3.d) 合同を Hypothesis field 化: `∃ a:ℤ, μᵢⱼ(1) = δⱼ + q·a`
+  (producer supply = certainType_degree_modEq on certainTypeS、6-site threading)
+- delta_eq_one (S-side j≥1): (u:ℂ)=δⱼ+q·a (field + mu_apply_one_eq_u) ∧ u=1+q·b (u_modEq_one)
+  → δⱼ=1+q(b-a) 整数 → δⱼ≡1 mod q ∧ δⱼ=±1 (delta_pm_one) ∧ q≥3 → δⱼ=1
+- j=0: δ₀=1 via (4.4) μ₀₀=1_L (要 threading or 別 route)
+- T-side δ'ᵢ=1: dual (v≡1 mod p、reconciled_typePData_T gated の可能性)
+
 ## 🔑 (13.3.c) δ=1 は ungated と判明 (it.84-85 訂正) + (13.3.a) degree 完成
 
 **(13.3.a) degree 完成 (it.84)**: `card_H_eq` (|H|=p^q·c、P⊓C=⊥ coprime + 複補)、
