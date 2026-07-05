@@ -1202,23 +1202,10 @@ theorem coprime_card_V_card_Q_of_disjoint [Finite G]
 /- `reconciled_typePData_T` (T-side type-`P` reconciliation) relocated to
 `S15_SAndT_Setup` for the (13.9)/(13.10) counting layer (same namespace; citations unchanged). -/
 
-/-- `Q ⊓ V = ⊥` from a reconciled `TypePData T` (`tpd.U = V`): `V` complements `Q = T_F` in
-`M' = [T,T]`.  Used by the V-side helpers in place of the withdrawn `Tdata` carrier. -/
-theorem Q_inf_V_eq_bot_of_reconciled [Finite G] (hyp : Hypothesis (G := G))
-    {tpd : TypePData hyp.T} (htpdV : tpd.U = hyp.V) : hyp.Q ⊓ hyp.V = ⊥ := by
-  have key : tpd.H ⊓ tpd.U = ⊥ := by
-    have hd := disjoint_iff.mp tpd.derived_complement.disjoint
-    rw [eq_bot_iff]
-    rintro x ⟨hxH, hxU⟩
-    have hxD : x ∈ derivedInG hyp.T := tpd.H_le hxH
-    have hmem : (⟨x, hxD⟩ : ↥(derivedInG hyp.T)) ∈
-        (tpd.H.subgroupOf (derivedInG hyp.T)) ⊓ (tpd.U.subgroupOf (derivedInG hyp.T)) :=
-      ⟨Subgroup.mem_subgroupOf.mpr hxH, Subgroup.mem_subgroupOf.mpr hxU⟩
-    rw [hd, Subgroup.mem_bot] at hmem
-    rw [Subgroup.mem_bot]
-    simpa using Subtype.ext_iff.mp hmem
-  rw [hyp.Q_eq_TF, ← tpd.H_eq, ← htpdV]
-  exact key
+/- `Q ⊓ V = ⊥` is now the honest `Hypothesis.Q_inf_V_eq_bot` field (threaded from the §16 constructor
+via `exists_kappaHall_invariant_complement_to_MF`, ungated by (14.9)); the former
+`Q_inf_V_eq_bot_of_reconciled` — which derived it circularly from the sorried `reconciled_typePData_T`
+— is retired.  V-side helpers use `hyp.Q_inf_V_eq_bot` directly. -/
 
 /-- **Peterfalvi (13.2.b)/(14.2.a), `T`-side dual of `W2_le_P`: `W₁ ≤ Q`.**  The cyclic factor `W₁`
 (of prime order `q`) lies in `Q = T_F`, the maximal nilpotent normal Hall subgroup of `T`.  Dual to
@@ -1401,8 +1388,10 @@ from the off-spine `reconciled_typePData_T` (not the withdrawn `Tdata` carrier).
 theorem isMulCommutative_V [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T) : IsMulCommutative ↥hyp.V := by
   obtain ⟨tdata⟩ := hTTypeII
-  obtain ⟨tpd, htpdV, _, _⟩ := reconciled_typePData_T _hG hyp
-  have hdisj : hyp.Q ⊓ hyp.V = ⊥ := Q_inf_V_eq_bot_of_reconciled hyp htpdV
+  -- `Q ⊓ V = ⊥` is now the honest `Hypothesis` field `Q_inf_V_eq_bot` (threaded from the §16
+  -- constructor's `exists_kappaHall_invariant_complement_to_MF`, ungated by (14.9)), replacing the
+  -- former circular route through the sorried `reconciled_typePData_T`.
+  have hdisj : hyp.Q ⊓ hyp.V = ⊥ := hyp.Q_inf_V_eq_bot
   have hQH : hyp.Q = tdata.typeP.H := by rw [hyp.Q_eq_TF, tdata.typeP.H_eq]
   have hQ_le : hyp.Q ≤ derivedInG hyp.T := by rw [hyp.T_deriv_eq_QV]; exact le_sup_left
   have hV_le : hyp.V ≤ derivedInG hyp.T := by rw [hyp.T_deriv_eq_QV]; exact le_sup_right
@@ -2776,7 +2765,7 @@ theorem exists_typeI_maximal_overNormalizer_V [Finite G]
       Subgroup.normalizer (hyp.V : Set G) ≤ L ∧ hyp.V ≤ maxNilpotentNormalHall L := by
   obtain ⟨tdata⟩ := hTTypeII
   obtain ⟨tpd, htpdV, htpdW2, _⟩ := reconciled_typePData_T _hG hyp
-  have hdisj : hyp.Q ⊓ hyp.V = ⊥ := Q_inf_V_eq_bot_of_reconciled hyp htpdV
+  have hdisj : hyp.Q ⊓ hyp.V = ⊥ := hyp.Q_inf_V_eq_bot
   have hcop : Nat.Coprime (Nat.card ↥hyp.V) (Nat.card ↥hyp.Q) :=
     coprime_card_V_card_Q_of_disjoint hyp tdata hdisj
   have hNVT : ¬ Subgroup.normalizer (hyp.V : Set G) ≤ hyp.T :=
