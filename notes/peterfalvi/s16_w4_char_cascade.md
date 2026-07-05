@@ -2101,3 +2101,25 @@ cont.⁷⁰ の「9000 = lane-d」は issue 9000 の旧 header (2026-07-01) を 
 consume が実例) + lanes-equivalent ゆえ char cascade に貢献可**。T-side (13.15) は C 自 file・T-side ゆえ lane-b S-side と
 非衝突だが、lane-b estimate の re-derive は重複。⟹ **issue 9013 で lane-b に §13 estimate の subgroup-generic 化を
 依頼** (案 A 推奨: 両側 cite で非重複)。裁定待ちの間 C は landing consumer。
+
+### cont.⁷² (2026-07-06 lane c /loop、hub 9013 裁定に基づき (14.9) char body 着手) — (14.9) skeleton landing: char body `T_typeIII_ratio_le` を isolate
+
+**hub 9013 裁定 = 「c は (14.9) type-III char exclusion を並行 engage」**に従い、subagent が (14.9) skeleton を landing
+(commit `1f5af9f4`, full build 3929 green, AxiomsCheck OK, 新 axiom 無, `T_typeII` signature 不変):
+
+- **`T_typeIII_ratio_le`** (:76, sorried) = **ungated char body** = Coq `FTtypeP_min_typeII` (PFsection14:737-853):
+  `IsTypeIII T → (v−1)/p ≤ (u−1)/q`。calT1=seqIndD QV T QV Q + uniform-degree coherence + Γ-bridge
+  `⟨Γ,τ₁ζ⟩≡1(mod2)` + orthogonal_split+Bessel。**`|calT1|=(v−1)/p` は structural (exact v 不要)** ゆえ ungated。
+- **`T_isTypeIII_of_isTypeP1`** (:99, sorried) = type determination = Coq `FTtype34_structure`
+  (`IsTypeP1 T → IsTypeIII T`、type IV/V 排除)。config (V abelian `isMulCommutative_V` + V≠⊥) から provable。
+- **`T_isTypeP2`** (:122) = **wiring 実証明** (κ=σ'→P1→III→ratio≤→absurd)。両 lemma を consume (orphan 無)。
+- **⚠ 既知 debt**: `T_isTypeP2` の `>` (= (14.8)) は forward-ref sorry (key_inequality:1660 が downstream +
+  caseB_for_T→T_typeII 経由の file-cycle ゆえ cite 不可)。**sound** (真命題)。Coq では (14.8) `>` は typeP から
+  導出 (T-typeII 非依存) ゆえ cycle は Lean caseB routing の artifact。将来 (14.8) ratio を upstream hoist で解消。
+- sorry 8→10 (char body + type det = genuine (14.9) 分解; `>` は (14.8) 再sorry の wart)。
+
+**次 (char body `T_typeIII_ratio_le` を埋める、subagent 推奨順)**:
+1. **`|calT1|=(v−1)/p`** (Coq 836-845) — V/Q cardinality のみ、coherence 不要ゆえ最初。
+2. calT1 (seqIndD QV T QV Q, degree p) 構成 + `coherent_of_constant_degree` (S07, PROVEN) で coherence。
+3. S-side Γ-bridge gap + `⟨Γ,τ₁ζ⟩≡1(mod2)` (`cfdot_real_vchar_even` S09:144, PROVEN)。
+4. orthogonal_split (未実装 primitive、要 build) + Bessel で ≤ 完成。
