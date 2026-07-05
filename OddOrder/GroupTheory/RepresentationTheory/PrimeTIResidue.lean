@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair
 import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
 import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 import OddOrder.Peterfalvi.S07_Coherence
+import OddOrder.Peterfalvi.S08_CoherenceCorePart1
 
 /-!
 # Prime-TI residue characters (Peterfalvi (4.5), Feit–Thompson (13.2–13.3))
@@ -384,6 +386,118 @@ theorem induce_mem_zSpan_calS (θ : IrreducibleCharacter ↥PU)
   rcases D.S1cases θ hθP with ⟨j, hj, heq⟩ | ⟨_, hmem⟩
   · rw [heq]; exact D.FTseqInd_TIred hj
   · exact hmem
+
+/-! ### The `H`-level lift `induce_H_mem_zSpan_calS`
+
+Coq's `S1cases` is stated for a *smaller* group `H ≤ PU` than the induction target `PU`: it
+classifies `Ind_H^S θ` (for irreducible `θ ∈ Irr(H)` with `P ⊄ ker θ`) into `zSpan (calS)`.  The
+`PU`-level engine `induce_mem_zSpan_calS` above is the case `H = PU`; the general `H ≤ PU` case is
+obtained by *induction in stages* and *constituent expansion* (Coq's `cfun_sum_constt` → `rpred_sum`
+flow):
+
+* `Ind_H^S θ = Ind_{PU}^S (Ind_H^{PU} θ)` — the two-stage induction (definitionally, via the
+  `↥PU`-ambient `ClassFunction.induce`);
+* `Ind_H^{PU} θ = ∑_{s ∈ Irr(PU)} ⟨θ, Res_H s⟩ • s` — the constituent (Fourier + Frobenius)
+  decomposition `induce_eq_sum_inner_restrict_smul`, with non-negative integer coefficients;
+* each constituent `s` with `⟨θ, Res_H s⟩ ≠ 0` has `P ⊄ ker s` (`constituent_P_not_subset_ker`,
+  the kernel step: `θ` is a constituent of `Res_H s`, so `P ⊆ ker s ⟹ P ⊆ ker θ`, contradiction),
+  hence `Ind_{PU}^S s ∈ zSpan (calS)` by the engine;
+* `zSpan (calS)` is `ℤ`-closed, so the coefficient-weighted sum lands in it.
+
+Here `H : Subgroup ↥PU` is an intermediate subgroup with `P ≤ H`, and `Ind_H^S θ` is written as the
+honest two-stage induction `Ind_{PU}^S (Ind_H^{PU} θ)`.  Bridging this to the single-stage
+`Ind_{(H.map PU.subtype)}^S` (as the S15 consumer `induce_H_mem_zSpan_S` phrases it) is
+`induce_induce_subgroupOf` (`InducedTransport.lean`), applied on the S15 side. -/
+
+/-- **Kernel step for the `H`-level lift** (Coq `S1cases` inner kernel argument).  Let `H ≤ PU`,
+`θ` an irreducible character of `H` with `P ⊄ ker θ`.  If `s ∈ Irr(PU)` has `θ` as an irreducible
+constituent of its restriction `Res_H s` — i.e. the Frobenius multiplicity `⟨θ, Res_H s⟩ ≠ 0`, which
+is exactly the condition for `s` to appear with nonzero coefficient in the constituent expansion of
+`Ind_H^{PU} θ` — then `P ⊄ ker s`.
+
+**Contrapositive.**  If `P ⊆ ker s`, then `Res_H s` is trivial on `P.subgroupOf H`
+(`characterKernel_restrict_subgroupOf`); and `θ`, being a constituent of the genuine character
+`Res_H s` (`isCharacter_restrict`), inherits that kernel containment
+(`characterKernel_subset_of_isCharacter_of_inner_ne_zero`, applied pointwise on `P.subgroupOf H`),
+so `P.subgroupOf H ⊆ ker θ` — contradicting `P ⊄ ker θ`.  (`⟨θ, Res_H s⟩ ≠ 0` gives
+`⟨Res_H s, θ⟩ ≠ 0` by conjugate symmetry.) -/
+theorem constituent_P_not_subset_ker
+    (H : Subgroup ↥PU) [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
+    (θ : ClassFunction ↥H ℂ) (hθirr : IsIrreducibleCharacter θ)
+    (hθP : ¬ ((D.P.subgroupOf H : Set ↥H) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel θ))
+    (s : IrreducibleCharacter ↥PU)
+    (hs : ClassFunction.inner θ
+        (ClassFunction.restrict H (s : ClassFunction ↥PU ℂ)) ≠ 0) :
+    ¬ ((D.P : Set ↥PU) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (s : ClassFunction ↥PU ℂ)) := by
+  haveI : Finite ↥PU := Finite.of_fintype _
+  intro hker
+  -- `Res_H s` is a genuine character, and `θ` is one of its constituents (`⟨Res_H s, θ⟩ ≠ 0`).
+  have hResChar : IsCharacter (ClassFunction.restrict H (s : ClassFunction ↥PU ℂ)) :=
+    OddOrder.Peterfalvi.S08.isCharacter_restrict s.isIrreducible.isCharacter H
+  have hinner' : ClassFunction.inner
+      (ClassFunction.restrict H (s : ClassFunction ↥PU ℂ)) θ ≠ 0 := by
+    rw [inner_conj_symm]
+    exact fun h => hs (by rw [← star_star (ClassFunction.inner _ _), h, star_zero])
+  -- `P ⊆ ker s` pushes to `P.subgroupOf H ⊆ ker (Res_H s)`.
+  have hResker : (D.P.subgroupOf H : Set ↥H) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel
+        (ClassFunction.restrict H (s : ClassFunction ↥PU ℂ)) :=
+    OddOrder.Peterfalvi.S08.characterKernel_restrict_subgroupOf H hker
+  -- Then `θ` (a constituent of `Res_H s`) also has `P.subgroupOf H` in its kernel — contradiction.
+  exact hθP fun x hx =>
+    OddOrder.Peterfalvi.S08.characterKernel_subset_of_isCharacter_of_inner_ne_zero
+      hResChar hθirr hinner' (hResker hx)
+
+set_option linter.unusedFintypeInType false in
+/-- **`induce_H_mem_zSpan_calS`** — the `H`-level `sS1S` lift (Coq `S1cases`, `PFsection13.v:401`).
+For an intermediate subgroup `H ≤ PU` with `P ≤ H` and an irreducible character `θ ∈ Irr(H)` whose
+kernel does not contain `P`, the induced character `Ind_H^S θ`, written as the two-stage induction
+`Ind_{PU}^S (Ind_H^{PU} θ)`, lies in `zSpan (calS D) = ℤ[calS]`.
+
+**Proof** (Coq's `cfun_sum_constt` → `rpred_sum`, made concrete):
+
+* the constituent decomposition `Ind_H^{PU} θ = ∑_{s ∈ Irr(PU)} ⟨θ, Res_H s⟩ • s`
+  (`induce_eq_sum_inner_restrict_smul`) with non-negative integer coefficients;
+* `Ind_{PU}^S` pushed through the sum and scalars (`induce_sum`, `induce_smul`);
+* each coefficient `⟨θ, Res_H s⟩ = (k : ℂ)` (`k : ℕ`) by conjugate symmetry
+  (`inner_conj_symm`) and `IsCharacter.exists_natCast_inner_irreducible` (`θ` irreducible,
+  `Res_H s` genuine); when `k ≠ 0` the constituent has `P ⊄ ker s`
+  (`constituent_P_not_subset_ker`), so `Ind_{PU}^S s ∈ zSpan (calS D)` by the `PU`-level engine
+  `induce_mem_zSpan_calS`, and the `ℕ`-multiple stays in the span (`nsmul_mem`); when `k = 0`
+  the summand is `0`.
+
+The single-stage form `Ind_{(H.map PU.subtype)}^S θ` used by the S15 consumer
+`induce_H_mem_zSpan_S` differs from this two-stage `Ind_{PU}^S (Ind_H^{PU} θ)` only by
+`induce_induce_subgroupOf` (applied S15-side). -/
+theorem induce_H_mem_zSpan_calS
+    (H : Subgroup ↥PU) [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
+    (θ : ClassFunction ↥H ℂ) (hθirr : IsIrreducibleCharacter θ)
+    (hθP : ¬ ((D.P.subgroupOf H : Set ↥H) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel θ)) :
+    ClassFunction.induce PU (ClassFunction.induce H θ) ∈ zSpan D.calS := by
+  classical
+  haveI : Finite ↥PU := Finite.of_fintype _
+  haveI : Fintype (IrreducibleCharacter ↥PU) := Fintype.ofFinite _
+  -- Constituent expansion `Ind_H^{PU} θ = ∑_s ⟨θ, Res_H s⟩ • s`, then push `Ind_{PU}^S` inside.
+  rw [induce_eq_sum_inner_restrict_smul θ, ClassFunction.induce_sum]
+  refine Submodule.sum_mem _ fun s _ => ?_
+  rw [ClassFunction.induce_smul]
+  -- The coefficient `⟨θ, Res_H s⟩` is a non-negative integer `(k : ℂ)`.
+  have hResChar : IsCharacter (ClassFunction.restrict H (s : ClassFunction ↥PU ℂ)) :=
+    OddOrder.Peterfalvi.S08.isCharacter_restrict s.isIrreducible.isCharacter H
+  obtain ⟨k, hk⟩ := hResChar.exists_natCast_inner_irreducible hθirr
+  have hc : ClassFunction.inner θ (ClassFunction.restrict H (s : ClassFunction ↥PU ℂ))
+      = (k : ℂ) := by
+    rw [inner_conj_symm, hk, Complex.star_def, Complex.conj_natCast]
+  rw [hc, Nat.cast_smul_eq_nsmul ℂ k (ClassFunction.induce PU (s : ClassFunction ↥PU ℂ))]
+  -- `k • Ind_{PU}^S s ∈ zSpan`: either `k = 0` (the term is `0`), or `P ⊄ ker s` and the engine fires.
+  rcases Nat.eq_zero_or_pos k with hk0 | hk0
+  · simp [hk0]
+  · refine nsmul_mem ?_ k
+    refine D.induce_mem_zSpan_calS s ?_
+    exact D.constituent_P_not_subset_ker H θ hθirr hθP s (by rw [hc]; exact_mod_cast hk0.ne')
 
 end PrimeTIResidueData
 
