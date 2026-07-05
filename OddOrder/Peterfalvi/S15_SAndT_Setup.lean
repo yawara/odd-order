@@ -509,88 +509,6 @@ theorem S_coherent [Finite G] [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
 
 /-! ## (13.3)--(13.4): character degrees and the first case split -/
 
-/-- **Kernel descent for induced characters** (Peterfalvi (13.5)/𝒮₁ bookkeeping): if `x ∈ H`
-lies in the kernel of `Ind_H^L θ` (θ irreducible), then `x` lies in the kernel of `θ` itself.
-Mackey (`card_smul_restrict_induce_eq_inertia_smul_orbitSum`) writes `|H|·(Ind θ)|_H` as
-`|I(θ)|·∑_{orbit} θ^g`; the kernel hypothesis equates the orbit sums at `x` and `1`, and the
-triangle-equality keystone (`irreducibleCharacter_mem_characterKernel_of_natSum_value_eq`)
-forces every orbit member — in particular `θ` — to have `x` in its kernel.  Contrapositive:
-`P ⊄ Ker θ ⟹ P ⊄ Ker (Ind θ)` (`exists_lambda_index`, conjunct 2). -/
-theorem mem_characterKernel_of_mem_characterKernel_induce
-    {L : Type*} [Group L] [Fintype L] {H : Subgroup L} [H.Normal]
-    [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
-    {θ : ClassFunction ↥H ℂ} (hθ : OddOrder.RepresentationTheory.IsIrreducibleCharacter θ)
-    {x : L} (hxH : x ∈ H)
-    (hker : x ∈ OddOrder.Peterfalvi.S03.characterKernel (ClassFunction.induce H θ)) :
-    (⟨x, hxH⟩ : ↥H) ∈ OddOrder.Peterfalvi.S03.characterKernel θ := by
-  classical
-  -- the Mackey orbit identity, applied at `⟨x,hxH⟩` and at `1`
-  have hid :=
-    OddOrder.RepresentationTheory.card_smul_restrict_induce_eq_inertia_smul_orbitSum
-      (G := L) (H := H) (k := ℂ) θ
-  rw [← Nat.cast_smul_eq_nsmul ℂ] at hid
-  have happ : ∀ a : ↥H,
-      (Nat.card ↥H : ℂ) * ClassFunction.induce H θ (a : L)
-        = (Nat.card ↥(ClassFunction.inertia (G := L) (H := H) θ) : ℂ)
-          * ∑ ψ ∈ Finset.univ.image (fun g : L => ClassFunction.conjBy g⁻¹ θ), ψ a := by
-    intro a
-    have h1 := congrArg (fun f : ClassFunction ↥H ℂ => f a) hid
-    simpa only [ClassFunction.smul_apply, ClassFunction.restrict_apply, smul_eq_mul,
-      OddOrder.RepresentationTheory.ClassFunction.finset_sum_apply] using h1
-  -- kernel hypothesis ⟹ the orbit sums at `x` and `1` agree
-  have hI0 : (Nat.card ↥(ClassFunction.inertia (G := L) (H := H) θ) : ℂ) ≠ 0 :=
-    Nat.cast_ne_zero.mpr Nat.card_pos.ne'
-  have hxval : ClassFunction.induce H θ x = ClassFunction.induce H θ (1 : L) := by
-    have := (OddOrder.Peterfalvi.S03.mem_characterKernel).mp hker
-    simpa [OddOrder.Peterfalvi.S03.characterDegree_def] using this
-  have hsum : ∑ ψ ∈ Finset.univ.image (fun g : L => ClassFunction.conjBy g⁻¹ θ),
-        ψ (⟨x, hxH⟩ : ↥H)
-      = ∑ ψ ∈ Finset.univ.image (fun g : L => ClassFunction.conjBy g⁻¹ θ), ψ 1 := by
-    have h1 := happ ⟨x, hxH⟩
-    have h2 := happ 1
-    rw [show ((⟨x, hxH⟩ : ↥H) : L) = x from rfl] at h1
-    rw [show ((1 : ↥H) : L) = 1 from rfl] at h2
-    rw [hxval] at h1
-    exact mul_left_cancel₀ hI0 (h1.symm.trans h2)
-  -- the orbit members are irreducible of the common degree `θ(1) = n`
-  obtain ⟨n, -, hn, -⟩ :=
-    OddOrder.Peterfalvi.S03.exists_natDegree_characterDegree_dvd_card (G := ↥H) ⟨θ, hθ⟩
-  have hdeg : θ 1 = (n : ℂ) := by
-    simpa [OddOrder.Peterfalvi.S03.characterDegree_def] using hn
-  set S : Finset (ClassFunction ↥H ℂ) :=
-    Finset.univ.image (fun g : L => ClassFunction.conjBy g⁻¹ θ) with hSdef
-  have hmemirr : ∀ ψ ∈ S, OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ := by
-    intro ψ hψ
-    obtain ⟨g, -, rfl⟩ := Finset.mem_image.mp hψ
-    exact OddOrder.RepresentationTheory.ClassFunction.IsIrreducibleCharacter.conjBy
-      (H := H) hθ g⁻¹
-  set fam : ClassFunction ↥H ℂ → OddOrder.RepresentationTheory.IrreducibleCharacter ↥H :=
-    fun ψ => if h : OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ
-      then ⟨ψ, h⟩ else ⟨θ, hθ⟩ with hfam
-  have hfamcoe : ∀ ψ ∈ S, (fam ψ : ClassFunction ↥H ℂ) = ψ := by
-    intro ψ hψ
-    simp only [hfam]
-    rw [dif_pos (hmemirr ψ hψ)]
-  have hfamdeg : ∀ ψ ∈ S, (fam ψ : ClassFunction ↥H ℂ) 1 = (n : ℂ) := by
-    intro ψ hψ
-    rw [hfamcoe ψ hψ]
-    obtain ⟨g, -, rfl⟩ := Finset.mem_image.mp hψ
-    simpa [ClassFunction.conjBy_apply] using hdeg
-  have hval : ∑ ψ ∈ S, ((1 : ℕ) : ℂ) * (fam ψ : ClassFunction ↥H ℂ) (⟨x, hxH⟩ : ↥H)
-      = ∑ ψ ∈ S, ((1 : ℕ) : ℂ) * (fam ψ : ClassFunction ↥H ℂ) 1 := by
-    have e1 : ∀ pt : ↥H, ∑ ψ ∈ S, ((1 : ℕ) : ℂ) * (fam ψ : ClassFunction ↥H ℂ) pt
-        = ∑ ψ ∈ S, ψ pt := fun pt =>
-      Finset.sum_congr rfl (fun ψ hψ => by rw [hfamcoe ψ hψ, Nat.cast_one, one_mul])
-    rw [e1, e1]
-    exact hsum
-  -- keystone: every orbit member has `x` in its kernel; take `ψ = θ` (the `g = 1` member)
-  have hθS : θ ∈ S := by
-    rw [hSdef]
-    exact Finset.mem_image.mpr ⟨1, Finset.mem_univ _, by simp⟩
-  have hkey := OddOrder.Peterfalvi.S03.irreducibleCharacter_mem_characterKernel_of_natSum_value_eq
-    (⟨x, hxH⟩ : ↥H) S (fun _ => 1) fam (fun _ => n) hfamdeg hval θ hθS one_ne_zero
-  rwa [hfamcoe θ hθS] at hkey
-
 open scoped FiniteInduce in
 /-- Character-degree and Dade-extension data from Peterfalvi (13.3).
 
@@ -3190,7 +3108,7 @@ theorem exists_lambda_family_index [Fintype G] [Invertible (Nat.card G : ℂ)]
       have h1 := hsub hx₀S
       rw [heq, hlamEq] at h1
       exact h1
-    have hbridge := mem_characterKernel_of_mem_characterKernel_induce
+    have hbridge := OddOrder.Peterfalvi.S03.mem_characterKernel_of_mem_characterKernel_induce
       (L := ↥hyp.S) (H := hyp.H.subgroupOf hyp.S) hθirr x₀.2 hmem
     rwa [show (⟨((x₀ : ↥hyp.S)), x₀.2⟩ : ↥(hyp.H.subgroupOf hyp.S)) = x₀ from rfl] at hbridge
   -- positivity: `ζ₀ = Ind 1_H` is `P`-kernel, so `i₁ ≠ 0`
