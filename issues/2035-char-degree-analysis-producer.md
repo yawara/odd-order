@@ -120,3 +120,25 @@ campaign は正しく mapped されたが critical path (sibleyTarget_H0C + S11 
 深い。上流優先の原則で、並行して **ungated な (13.9.a) `G0_nonvanishing_dichotomy`**
 (文書順は (13.3) より後だが gate なしの genuine math) を先に閉じにいく
 (Galois/cyclic-closure 論法 — GaloisRationalInteger 在庫と接続の見込み)。
+
+## (9.9.c) branch-1 build-spec (it.60 recon)
+
+Pf の C ≠ 1 否定枝の Lean 化に必要な新規構成:
+
+1. **λ の存在**: C ≠ ⊥ + C abelian (caseB: U abelian、C ≤ U) → ∃ λ : C-hom ≠ 1
+   (dual-card = |C| > 1、it.42 の `CommGroup.card_monoidHom` パターン)。
+2. **(θ,λ)-積指標**: 既存 `hcPsi` (θ-inflation、λ-slot なし = C 上自明) の一般化
+   `hcPsiPair (θ, λ)` — HC-join 上の線形指標 (H̄-inflation ⊗ C-lift;
+   omegaProdChar-パターン; H ∩ C の整合は H₀-商で処理)。
+3. **既約性**: `hcZeta_induceHU_irreducible` (inertia = HC、fpf) を hcPsiPair に適用
+   → χ := Ind_{HC}^{HU}(θλ) ∈ Irr(HU)。
+4. **membership**: H₀C′ ⊆ Ker(θλ) (λ は C′-trivial: C abelian → C′ = ⊥ ✓ 自明) →
+   Ind_{HU}^M χ ∈ SOf(H₀C′)。
+5. **Ind_{HU}^M χ 既約**: C ⊄ Ker χ (λ ≠ 1) + (9.9.b) の「reducible は全て
+   𝒮(H₀C) 側 = C ⊆ Ker-族」(`reducible_mem_sOf_H0C` proven) との
+   dichotomy → 既約 → `hno` と矛盾 → C = ⊥。
+6. **C = ⊥ counting** (第 2 conjunct): free-action orbit 数
+   (`card_conjByOrbit_eq_index_inertia`) + 6.34-既約性 (在庫) + (9.9.b) p−1 本の突合
+   → u = (p^q−1)/(p−1)。
+
+規模見積: 2 (積指標) が主 (~150 行)、3-5 は既存機械の適用 (~80 行)、6 は counting (~100 行)。
