@@ -147,6 +147,28 @@ conjunct-3 type-II HU-Frobenius = 指標論的 Frobenius 判定法 (Isaacs 7 章
 → campaign step 3 ((13.3.a) の S11 側) は本質完了。次 = step 1-2 (S15↔S11 bridge の
 honest Section11CharacterData 構成 + sibleyTarget_H0C) or step 4 (τ₁ 導出)。
 
+## ✅ (13.3.a) 完全証明 — mu_j_isIndPC (it.74-83, 2026-07-05)
+
+**Pf (13.3.a) の genuine math 完結**: `Hypothesis.mu_j_isIndPC` (S15) —
+∀ j ≠ 0, ∃ θ linear irr on hyp.H.subgroupOf S, μⱼ = Ind_{PC} θ。
+CharacterDegreeData の `mu_j_linear_induced` field の内容そのもの (構成可能性 honest 検証)。
+
+積み上げた実証明 (全 sorry-free):
+- S11: `caseB/caseA/reducible_sOf_H0_isIndHC` (case-agnostic isIndHC — reducible 𝒮(H₀)-member
+  = Ind_{HC}^M linear)、`isIndHC_of_source_eq_induce_hcPsi` (stages-flatten helper)、
+  `hcRealized_map_subtype_eq` (M-level HC = (H⊔C).subgroupOf M)、(9.9.c) 全証明機構
+- S15: `mu_colSum_not_irreducible` (μⱼ = q distinct irr の和 → reducible)、
+  `mu_colSum_mem_sOf_H0` (𝒮(H₀)-membership)、`toTypesIIIIIIVSetupS` bridge、
+  `toTypesIIIIIIVSetupS_chief_N_eq_bot`/`_H0_eq_bot`、`toTypesIIIIIIVSetupS_cSub_eq_C`
+  (C_U(H̄)=C_U(P)=U⊓C_G(P))、`mu_colSum_eq_induce`/`mu_irreducible`/`mu_col_injective` threading
+- FeitThompson: 上記 3 fields の 3 層 threading (additive、self-flag)
+
+**次の候補** (character_degree_analysis producer への残):
+- μⱼ(1) = uq degree corollary (isIndHC + [S:PC]=uq、quick)
+- (13.3.c) δ=1 + mu_tau1_formula: (4.3.d)/(4.4)/(5.8) 経由 (sibleyTarget 非 gated、別 sub-campaign)
+- τ₁ 4 fields: coherent_H0C_commutator の IsCoherent 経由 (sibleyTarget_H0C §14-gated)
+- assembly: 全 fields 揃い次第 character_degree_analysis 本体
+
 ## (13.3.a) μⱼ ∈ 𝒮(H₀) 同定チェーン (it.74 recon — 経路確定)
 
 **Coq 対応**: PFsection13 は `mu_ := primeTIred` + `FTseqInd_TIred : mu_ j ∈ calS`

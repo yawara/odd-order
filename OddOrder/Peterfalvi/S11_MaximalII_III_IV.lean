@@ -2755,6 +2755,27 @@ theorem hInHu_sup_realizedH0supC {M : Subgroup G}
   exact sup_eq_left.mpr
     (Subgroup.subgroupOf_mono _ (Subgroup.subgroupOf_mono _ chief.H0_lt_H.le))
 
+/-- **The `M`-level `HC` is `(H ⊔ C).subgroupOf M`**: the `huSub`-image of the realized inertia
+subgroup `HC = hInHu ⊔ realizedH0C` (used as the source subgroup of the (13.3.a) `isIndHC`
+witness) is `(data.H ⊔ cSub).subgroupOf M`.  Via `hInHu_sup_realizedH0supC` (`= hInHu ⊔ cInHu`),
+`Subgroup.map_sup`, and `subgroupOf_map_subtype` collapsing each `⊓ huSub` (both `H.subgroupOf M`
+and `cSub.subgroupOf M` lie below `huSub`).  In the §13 `S`-instantiation this is
+`(P ⊔ C).subgroupOf S = (PC).subgroupOf S`, the `Ind_{PC}` target of (13.3.a). -/
+theorem hcRealized_map_subtype_eq [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).map
+        (huSub data).subtype
+      = (data.H ⊔ cSub data chief).subgroupOf M := by
+  have hHsub : data.H.subgroupOf M ≤ huSub data := Subgroup.subgroupOf_mono M le_sup_left
+  have hCsub : (cSub data chief).subgroupOf M ≤ huSub data :=
+    Subgroup.subgroupOf_mono M ((cSub_le_U data chief).trans le_sup_right)
+  rw [hInHu_sup_realizedH0supC, Subgroup.map_sup]
+  show (hInHu data).map (huSub data).subtype ⊔ (cInHu data chief).map (huSub data).subtype
+      = (data.H ⊔ cSub data chief).subgroupOf M
+  rw [hInHu, cInHu, Subgroup.subgroupOf_map_subtype, Subgroup.subgroupOf_map_subtype,
+    inf_of_le_left hHsub, inf_of_le_left hCsub, ← Subgroup.subgroupOf_sup (H_le_M data)
+      ((cSub_le_U data chief).trans (U_le_M data))]
+
 /-- **`H₀C ≤ M' = HU`**: `H₀ ≤ H ≤ M'` (`typeP.H_le`) and `C ≤ U ≤ M'` (`typeP.U_le`).  The second
 input (`K ≤ HU`) of the generic reducible-count hypothesis (Coq `PFsection9` `nb_redM`) for the
 quotient `M/H₀C`; combined with `chiefFactor_H0supC_inf_H_eq_H0` and `H₀C ◁ M` it makes the §9↔§6
