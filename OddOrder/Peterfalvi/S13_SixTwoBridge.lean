@@ -671,9 +671,174 @@ theorem sixTwoDecompositionData_of_reducible_break [Finite G]
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
         hyp.dadeData.dade hyp.hconj hSdiff hφ hζ)
     rfl hmemZ hinner1 hinner2 hinner3, rfl, ?_⟩
-  -- member clause: per-`χ` decomposition against the column `Da` (issue 2022, remaining)
+  -- member clause: per-`χ` decomposition against the column `Da`
   intro χ hχS₁
-  sorry
+  have hS₁sub' : S₁ ⊆ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) ⊥ := by
+    intro x hx
+    rcases hsub hx with h | h
+    · exact S08.inducedKernelFamily_antitone bot_le h
+    · exact S08.inducedKernelFamily_antitone bot_le h
+  have hχbot : χ ∈ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) ⊥ := hS₁sub' hχS₁
+  have hχind : χ ∈ inducedFamily M := by
+    rw [inducedFamily_eq_inducedKernelFamily_bot]
+    exact hχbot
+  by_cases hχirr : IsIrreducibleCharacter χ
+  · -- irreducible member: the (5.8) member datum, orthogonal to the column via (A)+(B)
+    obtain ⟨D, hDfam, hDtau⟩ := S08.inducedKernelFamily_memberDatum_of_irreducible
+      hyp.dadeData.dade hyp.hconj hModd hyp.mderivSharp_subset_A0 hS₁sub' hS₁conj hS₁coh
+      hχS₁ hχirr
+    refine ⟨D, ?_, hDtau⟩
+    intro α hα β hβ
+    -- norm-`2` of `τ(χ − χ̄)`
+    have hχconjbot : χ.conj ∈ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) ⊥ :=
+      S08.inducedKernelFamily_closedUnderConjugate ⊥ hχbot
+    have hχnr : χ.conj ≠ χ :=
+      S08.inducedKernelFamily_hasNoRealCharacters hModd ⊥ hχbot
+    have hχsupp : (χ - χ.conj).support ⊆ hyp.A0 :=
+      hyp.zeta_sub_conj_support hG hG.odd hχind hχirr
+    have hχT2 : ClassFunction.inner (hyp.tau (χ - χ.conj)) (hyp.tau (χ - χ.conj)) = 2 := by
+      have hset : ∀ s ∈ ({χ - χ.conj} : Set (ClassFunction ↥M ℂ)), s.support ⊆
+          OddOrder.Peterfalvi.S04.supportInSubgroup (typePA0 M hyp.typeP) M := by
+        rintro s rfl
+        exact hχsupp
+      have hmem : χ - χ.conj ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M)
+          ({χ - χ.conj} : Set (ClassFunction ↥M ℂ)) := Submodule.subset_span rfl
+      have hpres := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
+        hyp.dadeData.dade hyp.hconj hset hmem hmem
+      rw [show hyp.tau = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) from rfl, hpres,
+        ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+        ClassFunction.inner_sub_right]
+      have h11 : ClassFunction.inner χ χ = 1 := by
+        simpa using irreducibleCharacter_inner_eq_ite
+          (⟨χ, hχirr⟩ : IrreducibleCharacter ↥M) ⟨χ, hχirr⟩
+      have hcc : ClassFunction.inner χ.conj χ.conj = 1 := by
+        simpa using irreducibleCharacter_inner_eq_ite
+          (⟨χ.conj, hχirr.conj⟩ : IrreducibleCharacter ↥M) ⟨χ.conj, hχirr.conj⟩
+      have hcr : ClassFunction.inner χ χ.conj = 0 :=
+        S08.inducedKernelFamily_pairwise_orthogonal hχbot hχconjbot (Ne.symm hχnr)
+      have hcr' : ClassFunction.inner χ.conj χ = 0 :=
+        S08.inducedKernelFamily_pairwise_orthogonal hχconjbot hχbot hχnr
+      rw [h11, hcc, hcr, hcr']
+      ring
+    -- `⟨α, ω⟩ = 0` for every σ-grid vector, via the (B) per-element lemma on `R(χ)`
+    have hαω : ∀ (i' : Fin hyp.w1) (κ : Fin hyp.w2),
+        ClassFunction.inner α (hyp.alignedOmegaSigmaGrid hG hG.odd i' κ) = 0 := by
+      intro i' κ
+      refine OddOrder.Peterfalvi.S12.OrthonormalCharacterImageFamily.elt_inner_eq_zero
+        (R := D.imageFamily) hα (hyp.alignedOmegaSigmaGrid_mem_ZIrr hG hG.odd i' κ) ?_ ?_ ?_
+      · have := hyp.alignedOmegaSigmaGrid_inner hG hG.odd i' i' κ κ
+        simpa using this
+      · exact hχT2
+      · exact hyp.tau_chidiff_inner_alignedOmega_eq_zero hG hG.odd hχind hχirr i' κ
+    -- unfold the signed column element `β`
+    have hβ' : β ∈ Finset.univ.image (hyp.columnRImage hG hG.odd params.delta k k') := hβ
+    rw [Finset.mem_image] at hβ'
+    obtain ⟨⟨b, i⟩, -, rfl⟩ := hβ'
+    rcases b with _ | _
+    · simp only [Hypothesis.columnRImage]
+      rw [OddOrder.RepresentationTheory.inner_smul_right, hαω, mul_zero]
+    · simp only [Hypothesis.columnRImage]
+      rw [OddOrder.RepresentationTheory.inner_smul_right, hαω, mul_zero]
+  · -- reducible member: μ-column sum, column–column orthogonality
+    obtain ⟨hSne, sExt, hSie, hSeos, hSmz⟩ := hS₁coh
+    obtain ⟨kχ, hkχ0, hχcol⟩ := hyp.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum
+      hG htype hnt chief hχbot hχirr
+    subst hχcol
+    obtain ⟨kχ', hkχ'0, hkχ'k, hχconj⟩ := hyp.exists_conj_column hG hG.odd hkχ0
+    -- the member's column pair `{kχ, kχ'}` avoids the break's `{k, k'}`
+    have hkχk : kχ ≠ k := by
+      intro he
+      apply hψnotS1
+      rw [hψdef, ← he]
+      exact hχS₁
+    have hkχkc : kχ ≠ k' := by
+      intro he
+      apply hψcnotS1
+      rw [hcolconj, ← he]
+      exact hχS₁
+    have hkχ'kb : kχ' ≠ k := by
+      intro he
+      apply hψnotS1
+      rw [hψdef, ← he, ← hχconj]
+      exact hS₁conj hχS₁
+    have hkχ'kc : kχ' ≠ k' := by
+      intro he
+      apply hψcnotS1
+      rw [hcolconj, ← he, ← hχconj]
+      exact hS₁conj hχS₁
+    set χc : ClassFunction ↥M ℂ := ∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i kχ with hχcdef
+    have hχconjS₁ : χc.conj ∈ S₁ := hS₁conj hχS₁
+    have hχne : χc.conj ≠ χc :=
+      S08.inducedKernelFamily_hasNoRealCharacters hModd ⊥ hχbot
+    obtain ⟨θχc, -, -, hχ1⟩ := S08.inducedKernelFamily_apply_one hχbot
+    obtain ⟨nθχc, -, hnθχc, -⟩ := θχc.isIrreducible.exists_natDegree_charValue_one_dvd_card
+    have hχ1nat : χc 1 = ((((derivedInG M).subgroupOf M).index * nθχc : ℕ) : ℂ) := by
+      rw [hχ1, hnθχc]
+      push_cast
+      ring
+    have hχconjbot : χc.conj ∈ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) ⊥ :=
+      S08.inducedKernelFamily_closedUnderConjugate ⊥ hχbot
+    have hχconj1 : χc.conj 1 = (1 : ℕ) • χc 1 := by
+      rw [ClassFunction.conj_apply, hχ1nat]
+      simp
+    have hsupp1χ : (χc - χc.conj).support ⊆ hyp.A0 := by
+      have h := S08.inducedKernelFamily_scaledDiff_support hyp.mderivSharp_subset_A0
+        hχbot hχconjbot (d := 1) (by rw [hχconj1]; push_cast; ring)
+      simpa using h
+    have hχspan : χc ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M) S₁ :=
+      Submodule.subset_span hχS₁
+    have hχcspan : χc.conj ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M) S₁ :=
+      Submodule.subset_span hχconjS₁
+    have hdiffspan : χc - χc.conj ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M) S₁ :=
+      Submodule.sub_mem _ hχspan hχcspan
+    have h2span : ∀ φ ∈ ({χc - χc.conj, χc - 0} : Set (ClassFunction ↥M ℂ)),
+        φ ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M) S₁ := by
+      rintro φ (rfl | rfl)
+      · exact hdiffspan
+      · rw [sub_zero]
+        exact hχspan
+    refine ⟨OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection
+      (hyp.columnImageFamilyCohFree hG hmu hzS hz1 hzconj hδpm hδj hkχ0 hkχ'0
+        (Ne.symm hkχ'k) hχconj)
+      sExt
+      (fun φ ζ hφ hζ => hSie φ ζ
+        (Submodule.span_le.mpr (fun φ' hφ' => h2span φ' hφ') hφ)
+        (Submodule.span_le.mpr (fun φ' hφ' => h2span φ' hφ') hζ))
+      (hSeos _ ⟨hdiffspan, hsupp1χ⟩)
+      (by rw [sub_zero]; exact hSmz χc hχspan)
+      (by simp)
+      (by simp)
+      (S08.inducedKernelFamily_pairwise_orthogonal hχbot hχconjbot (Ne.symm hχne)),
+      ?_, ?_⟩
+    · -- column–column orthogonality: all four column pairs are distinct
+      intro α hα β hβ
+      have hα' : α ∈ Finset.univ.image (hyp.columnRImage hG hG.odd params.delta kχ kχ') := hα
+      have hβ' : β ∈ Finset.univ.image (hyp.columnRImage hG hG.odd params.delta k k') := hβ
+      rw [Finset.mem_image] at hα' hβ'
+      obtain ⟨⟨bα, iα⟩, -, rfl⟩ := hα'
+      obtain ⟨⟨bβ, iβ⟩, -, rfl⟩ := hβ'
+      have hcross : ∀ (i i' : Fin hyp.w1) (κ κ' : Fin hyp.w2), κ ≠ κ' →
+          ClassFunction.inner (hyp.alignedOmegaSigmaGrid hG hG.odd i κ)
+            (hyp.alignedOmegaSigmaGrid hG hG.odd i' κ') = 0 := by
+        intro i i' κ κ' hne
+        rw [hyp.alignedOmegaSigmaGrid_inner hG hG.odd i i' κ κ',
+          if_neg (fun hh => hne hh.2)]
+      rcases bα with _ | _ <;> rcases bβ with _ | _
+      · simp only [Hypothesis.columnRImage]
+        rw [ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+          hcross _ _ _ _ hkχk, mul_zero, mul_zero]
+      · simp only [Hypothesis.columnRImage]
+        rw [ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+          hcross _ _ _ _ hkχkc, mul_zero, mul_zero]
+      · simp only [Hypothesis.columnRImage]
+        rw [ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+          hcross _ _ _ _ hkχ'kb, mul_zero, mul_zero]
+      · simp only [Hypothesis.columnRImage]
+        rw [ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+          hcross _ _ _ _ hkχ'kc, mul_zero, mul_zero]
+    · -- `D.tau1 χc = extension χc`: definitional after destructuring `hS₁coh`
+      rfl
 
 /-- **μ-column member decomposition** (named obligation, Peterfalvi (11.8.6)/(5.8)): the
 member clause for a *reducible* `χ ∈ S₁` (μ-grid column sum) against an irreducible break
@@ -714,6 +879,7 @@ theorem sixTwoMemberDatum_of_reducible_member [Finite G]
       D.tau1 χ = hS₁coh.extension χ := by
   haveI := hyp.finiteG
   classical
+  obtain ⟨hSne, sExt, hSie, hSeos, hSmz⟩ := hS₁coh
   -- `χ` is a nonzero μ-column sum; pick its conjugate column
   have hχbot : χ ∈ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) ⊥ := hS₁sub hχS₁
   obtain ⟨kχ, hkχ0, hχcol⟩ := hyp.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum
@@ -804,16 +970,15 @@ theorem sixTwoMemberDatum_of_reducible_member [Finite G]
     rw [h11, hcc, hcr, hcr']
     ring
   -- assemble `D` and its orthogonality to the break `Da`
-  set ext := hS₁coh.extension with hext
   refine ⟨OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection
     (hyp.columnImageFamilyCohFree hG hmu hzS hz1 hzconj hδpm hδj hkχ0 hkχ'0
       (Ne.symm hkχ'k) hχconj)
-    ext
-    (fun φ ζ hφ hζ => hS₁coh.extension_inner_eq φ ζ
+    sExt
+    (fun φ ζ hφ hζ => hSie φ ζ
       (Submodule.span_le.mpr (fun φ' hφ' => h2span φ' hφ') hφ)
       (Submodule.span_le.mpr (fun φ' hφ' => h2span φ' hφ') hζ))
-    (hS₁coh.extends_on_supported _ ⟨hdiffspan, hsupp1⟩)
-    (by rw [sub_zero]; exact hS₁coh.extension_mem_ZIrr χc hχspan)
+    (hSeos _ ⟨hdiffspan, hsupp1⟩)
+    (by rw [sub_zero]; exact hSmz χc hχspan)
     (by simp)
     (by simp)
     (S08.inducedKernelFamily_pairwise_orthogonal hχbot hχconjbot (Ne.symm hχne)),
@@ -846,10 +1011,8 @@ theorem sixTwoMemberDatum_of_reducible_member [Finite G]
     · simp only [Hypothesis.columnRImage]
       rw [neg_smul, ClassFunction.inner_neg_left, ClassFunction.inner_smul_left, hωβ,
         mul_zero, neg_zero]
-  · -- `D.tau1 χ = extension χ`: rfl-blocked by a duplicated `IsCoherent` fvar in the
-    -- goal (confirmed via `rename_i` probe; same type as `hS₁coh`).  Diagnose fresh
-    -- (issue 2022 追記 18); the construction itself is complete.
-    sorry
+  · -- `D.tau1 χ = extension χ`: definitional after destructuring `hS₁coh`
+    rfl
 
 /-- **The (5.2.d) decomposition data for the §11 family — the single remaining grid obligation
 of the h56 chain** (issue 2022).  For any intermediate coherent set `S₁` between the `S(A')` and
