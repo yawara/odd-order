@@ -1727,3 +1727,24 @@ quotientCoprimeAction 形 — S₀ の inv 仮説を hfix 用に変換 or 一致
 **評価**: 骨格 + case-B 4 hyps は純 execution (transport のみ、~100 行)。case-A hfix の chain
 関係のみ新規 (W₁ が U の H̄-作用 exponent を反転 = Frobenius 構造)。次 iteration = case-B 完全化 +
 hfix を sorried-isolate (chain を別 named lemma に) で `chief_H0_eq_bot` を「chain 1 本」に縮約。
+
+## 2026-07-05 update¹⁷ (lane-a) — **`chief_H0_eq_bot` assembly LANDED: dichotomy + case-B 完全証明、残 = case-A hfix 1 本**
+
+update¹⁶ recipe を execution。`chief_H0_eq_bot` を opaque sorry から構造化 (commit 65b9c746,
+full build green 3929 jobs):
+- **dichotomy + case-B [U 既約作用] 完全証明**: `chiefFactor_clifford_U_dichotomy` (S11) の left
+  branch が `chiefKernel_caseB_false` の hirr と字面一致 (recipe 通り、照合不要)。case-B 4 hyps
+  (hpK/hNcomm/hUcent/hqodd) 全 derive 済 (H_isPGroup / H0_eq_Hprime+map_injective /
+  U_centralizes_H0+typeP_conjAction_apply / p_q_distinct)。setup_typeP_eq transport は
+  s11Setup_U_eq/s11Setup_q_eq/hHH で処理。import S13_ElementaryAbelianKernel 追加 (no cycle)。
+- **残 = case-A `hfix` 1 本**: `∀ v, ∀ s∈S₀, quotientMulAutHom chief.N_aInvariant ↑v s = s`
+  (U が order-p S₀ を pointwise fix)。`caseA_fixed_contradiction` に refine で goal 化済。
+
+**case-A hfix (次 iteration の唯一 target = (11.7) 完了)**: S₀ = U-invariant order-p (dichotomy
+右branch)。U は S₀≅Z/p に scalar 作用 (hom U→(Z/p)^*)。**要 2 点**: (i) **chain 関係
+`e(v)·e(σv)=1`** (σ=W₁-gen の U-共役、Frobenius inversion — 唯一の新規数学) →
+`chain_exponent_eq_one` で e≡1 → pointwise fix; (ii) **action 照合**: dichotomy S₀ の inv 仮説は
+`quotientCoprimeAction.φ.comp` 形、hfix は `quotientMulAutHom` 形 — 一致 lemma or 変換要
+(要調査、update¹⁶ の ⚠)。infra: `exists_exponent_fun_of_card_prime`/`chain_exponent_eq_one`
+(both proven, S13_ElementaryAbelianKernel)。これを埋めれば chief_H0_eq_bot sorry-free →
+(11.7) H_elementaryAbelian 完全 → gate-1 の [U:C]=u が unblock。
