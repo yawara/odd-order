@@ -623,6 +623,16 @@ structure CharacterDegreeData (hyp : Hypothesis (G := G)) where
     ∀ θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ,
       OddOrder.RepresentationTheory.IsIrreducibleCharacter θ →
       tau1S (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ) ∈ ZIrr G
+  /-- **Peterfalvi (4.1)+(5.3.b): the `η`-grid is orthogonal to the τ₁-image of the induced
+  family** (issue 2034): the coherence extension lands in the orthogonal complement of the
+  `σ`-image grid.  With the (3.2.d) completeness (`vanish_of_inner_eta_eq_zero`) this forces
+  `λ^{τ₁}` to vanish on the regular set `Ŵ` (`lambda_tau1_apply_mul_eq_zero`). -/
+  tau1S_induce_inner_eta :
+    haveI := hyp.finiteG
+    ∀ (i : Fin hyp.q) (j : Fin hyp.p) (θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ),
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter θ →
+      ClassFunction.inner (hyp.eta i j)
+        (tau1S (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ)) = 0
   mu_j_linear_induced : Prop
   mu_j_linear_induced_holds : mu_j_linear_induced
   no_lambda_forces_caseB_S : Prop
@@ -3505,6 +3515,21 @@ theorem lambda_apply_mul_eq_zero [Fintype G] [Invertible (Nat.card G : ℂ)]
     rw [h2]; exact orderOf_dvd_natCard _
   exact hyp.q_not_dvd_card_H hG (hqdvd.trans hdvdH)
 
+open scoped FiniteInduce in
+/-- **Peterfalvi (3.2.d)** (hypothesis-level): a class function of `G` orthogonal to the whole
+`η`-grid vanishes on the regular set `Ŵ = W ∖ (W₁ ∪ W₂)` — every irreducible of `G` off the
+`σ`-image vanishes on `Ŵ`, and the `η_{ij} = ω_{ij}^{τ₃}` enumerate the image.  Faithful
+producer; the honest supply is `S05.eq_zero_of_mem_V_of_inner_chiFam_eq_zero` (proven) through
+the spine's `ω`-grid ↔ character-pair identification (`gridEquivE`/`omegaProdChar` — the
+issue-2033 threading pattern; the grid here is `Fin q × Fin p`-indexed while the S05 family is
+hom-pair-indexed, and the enumerations correspond along `w1CharEquiv`/`chi2enum`). -/
+theorem Hypothesis.vanish_of_inner_eta_eq_zero [Finite G] (hyp : Hypothesis (G := G))
+    (χ : ClassFunction G ℂ)
+    (_horth : ∀ (i : Fin hyp.q) (j : Fin hyp.p), ClassFunction.inner (hyp.eta i j) χ = 0)
+    {w : G} (_hwW : w ∈ hyp.W) (_hnot : w ∉ (hyp.W1 : Set G) ∪ (hyp.W2 : Set G)) :
+    χ w = 0 := by
+  sorry
+
 open scoped Classical in
 open scoped FiniteInduce in
 /-- **`λ^{τ₁}` vanishes on the mixed products `W₂^#·W₁^#`** (Peterfalvi (13.6) proof, "by
@@ -3518,7 +3543,17 @@ theorem lambda_tau1_apply_mul_eq_zero [Fintype G] [Invertible (Nat.card G : ℂ)
     (chars : CharacterDegreeData hyp)
     {x y : G} (hx : x ∈ hyp.W2) (hy : y ∈ hyp.W1) (hx1 : x ≠ 1) (hy1 : y ≠ 1) :
     chars.tau1S chars.lambda (x * y) = 0 := by
-  sorry
+  obtain ⟨θl, hθlirr, -, hlamEq, -⟩ := chars.lambda_induced_from_PC_linear
+  have hW1W : hyp.W1 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_left
+  have hW2W : hyp.W2 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_right
+  have hcomm : Commute y x := hyp.W1_commutes_W2 y hy x hx
+  have hnot : x * y ∉ (hyp.W1 : Set G) ∪ (hyp.W2 : Set G) := by
+    rw [show x * y = y * x from hcomm.eq.symm]
+    exact hyp.mul_notMem_W1_union_W2 hy hx hy1 hx1
+  refine hyp.vanish_of_inner_eta_eq_zero (chars.tau1S chars.lambda) (fun i j => ?_)
+    (mul_mem (hW2W hx) (hW1W hy)) hnot
+  rw [hlamEq]
+  exact chars.tau1S_induce_inner_eta i j θl hθlirr
 
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce Classical in
 /-- **The (7.7.a) coefficients of any virtual character are integers** (general form; cf.

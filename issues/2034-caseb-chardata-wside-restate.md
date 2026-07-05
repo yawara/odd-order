@@ -111,3 +111,24 @@ supply 設計は field 確定後に FeitThompson 側を精査。
 3. τ₁ fields 追加 (extends/isometry/ZIrr) → lambda_tau1_norm_one, exists_lambda_index 実証明
 4. (13.3.c)/(4.1)-直交 fields → eta10_cCoeff_orthogonal, lambda_tau1_apply_mul_eq_zero
 5. supply 側 ((4.9)/(5.8) 経由の honest τ₁ 構成) は別 issue に切る (深さ = §4/§5 coherence)
+
+## 進捗 (07-05 loop it.34-41)
+
+τ₁-cluster の実証明化が完了域に (commits 116d139d/f8ab92a9/6ededdef/3a541099/fe51f2be/af545610/6c7a0237/+):
+
+- [x] Hypothesis76: `zeta_family_cover` + `zeta_injective` fields + trivial-base 正規化
+      (`hypothesis76OfDadeTrivialBase`、ζ₀ = Ind 1 pin)
+- [x] kernel descent bridge + P-non-kernel conjunct
+- [x] τ₁ fields 4 本 (extends-Ind / isometry / ZIrr / ⊥η-grid) — supply は sorried (13.3)
+- [x] `H_sharp_tau_eq_induce` ((13.2.e) τ=Ind、TI-induce 値公式 2 本 [9011 拡張] と S04 値公式の貼合せ)
+- [x] `exists_lambda_index` 全 real (membership: cover+base+descent / coefficient:
+      `lambda_tau1_cCoeff` — (13.2.e)+線形分配+isometry+distinct-Ind 直交+単射性)
+- [x] `lambda_tau1_norm_one` 実証明 (fields から)
+- [x] `lambda_tau1_apply_mul_eq_zero` real assembly — field (4.1)/(5.3.b) ⊥η +
+      新 sorried `Hypothesis.vanish_of_inner_eta_eq_zero` ((3.2.d))
+- [ ] **残: `vanish_of_inner_eta_eq_zero` の supply** — S05
+      `eq_zero_of_mem_V_of_inner_chiFam_eq_zero` (proven!) を spine の
+      ω-grid ↔ hom-pair 対応 (gridEquivE/omegaProdChar/w1CharEquiv/chi2enum) で
+      S15 field 化 (2033-threading パターン; Fin q×Fin p ↔ hom-pair 全単射)
+- [ ] 残: `eta10_cCoeff_orthogonal` (同じ (4.1)/(5.3.b) 系 — field 化検討) /
+      μ-side Props の honest 化 / `character_degree_analysis` 本体 ((4.9)/(5.8))
