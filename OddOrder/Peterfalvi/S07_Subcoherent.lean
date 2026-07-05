@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S07_Coherence
+import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
 
 /-!
 # Peterfalvi §5 (5.3)(a): the subcoherent `R`-datum producer (`irr_subcoherent`)
@@ -47,10 +48,11 @@ derived from the difference-isometry.
 * Coq `subcoherent` (`PFsection5.v:486`)  ↦  `S07.Hypothesis` (already ported).
 * Coq `irr_subcoherent` (`PFsection5.v:636`)  ↦  `irr_subcoherent` (this file).
 * Coq `prDade_subcoherent` (`PFsection5.v:683`) / `FTtypeP_subcoherent`
-  (`PFsection8.v:819`)  ↦  **NOT here**: those instantiate the prime-Dade
-  hypothesis and depend on the §3/§4 prime-TI machinery (`primeTIred`,
-  `cyclicTIiso`) not yet in the repo.  See the module note at the end of this
-  file for the multi-session outline.
+  (`PFsection8.v:819`)  ↦  **NOT here, and not needed**: the prime-TI machinery
+  is already in the repo under `certainType`/`columnFamily` names (S06), and
+  `prDade`'s content is already assembled as `sixTwoDecompositionData` (S13).  A
+  `prDade`-shaped `S07.Hypothesis` is impossible anyway (variable-length `R`) and
+  has zero consumers.  See the corrected module note at the end of this file.
 
 Reference note: `notes/peterfalvi/s07_coherence.md`, issue `1017`.
 -/
@@ -166,6 +168,100 @@ noncomputable def irrSubcoherent (τ : IntegralCharacterMap L G) (A : Set L)
     rw [hiso hφ (hconj hφ) hχ (hconj hχ)]
     exact inner_conjugateDifference_eq_zero h1 h2
 
+/-! ### `subset_subcoherent`: restricting a subcoherent family (Coq `PFsection5.v:845`)
+
+Coq `PFsection5.v:845`:
+```
+Lemma subset_subcoherent S1 : cfConjC_subset S1 S -> subcoherent S1 tau R.
+```
+Given a subcoherent `subcoherent S tau R` and a `cfConjC_subset S1 S` (`S1 ⊆ S`, conjugate-closed),
+every field of `subcoherent` restricts: `sub_in1`/`sub_in2` restrict the per-member `R`-datum and the
+cross-orthogonality; `sub_iso_to`/`zchar_subset` restrict the isometry; the family predicates restrict
+along the inclusion.  This is the first glue step of the (9.11) `Ptype_core_coherence` derived-series
+induction (`PFsection9.v:1484`), where the full type-P subcoherent family is cut down to
+`S_ H0C'` (and again to the uniform-degree sub-family `S1`) before `uniform_degree_coherence` fires.
+
+The `S07.Hypothesis` transcription restricts identically: `tau` is unchanged, and each of the five
+data/orthogonality fields is precomposed with the inclusion `hsub : S' ⊆ S`.  The
+`conjugate_closed`ness of `S'` is *not* inherited automatically (a subset of a conjugate-closed set
+need not itself be conjugate-closed), so it is taken as a hypothesis `hconj'` — exactly Coq's
+`cfConjC_subset` carrying `ccS1`. -/
+
+/-- **Peterfalvi (5.3)(a) restriction (`subset_subcoherent`).**
+
+Restrict a subcoherent `S07.Hypothesis` on `S` to a subset `S' ⊆ S` that is itself conjugate-closed.
+All fields restrict directly along the inclusion `hsub`; the base map `τ`, the difference isometry,
+the no-real / pairwise-orthogonal predicates, the per-member `R`-datum, and the cross-orthogonality
+all hold a fortiori on the smaller family.  Conjugate-closedness of `S'` (`hconj'`) is supplied
+separately, matching Coq's `cfConjC_subset S' S` premise. -/
+noncomputable def Hypothesis.restrict (hyp : Hypothesis (L := L) (G := G) S A)
+    {S' : Set (ClassFunction L ℂ)} (hsub : S' ⊆ S)
+    (hconj' : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S') :
+    Hypothesis (L := L) (G := G) S' A where
+  tau := hyp.tau
+  tau_isometry_diff := fun {_a _b _c _d} ha hb hc hd =>
+    hyp.tau_isometry_diff (hsub ha) (hsub hb) (hsub hc) (hsub hd)
+  conjugate_closed := hconj'
+  no_real_characters := fun {_χ} hχ => hyp.no_real_characters (hsub hχ)
+  pairwise_orthogonal := fun {_χ _ψ} hχ hψ hne => hyp.pairwise_orthogonal (hsub hχ) (hsub hψ) hne
+  difference_image := fun {_χ} hχ => hyp.difference_image (hsub hχ)
+  difference_images_orthogonal := fun {_φ _χ} hφ hχ h1 h2 =>
+    hyp.difference_images_orthogonal (hsub hφ) (hsub hχ) h1 h2
+
+/-- Alias of `Hypothesis.restrict` following the Coq lemma name `subset_subcoherent`
+(`PFsection5.v:845`). -/
+noncomputable def subset_subcoherent (hyp : Hypothesis (L := L) (G := G) S A)
+    {S' : Set (ClassFunction L ℂ)} (hsub : S' ⊆ S)
+    (hconj' : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S') :
+    Hypothesis (L := L) (G := G) S' A :=
+  hyp.restrict hsub hconj'
+
+/-! ### `coherent_subset_of_constant_degree`: the (9.11) base-case / Galois glue
+
+This is the reusable composition that Coq's `Ptype_core_coherence` (`PFsection9.v:1484`) invokes
+twice:
+
+* the Galois case `apply: uniform_degree_coherence scohS0` (the whole family `S_ H0C'` is uniform,
+  degree `|M:HU|·u`), and
+* the non-Galois base case `apply: uniform_degree_coherence (subset_subcoherent scohS0 sS10)` (the
+  uniform sub-family `S1`, degree `q·a`, seeds the (9.11.1)-(9.11.8) pair-adjoining induction).
+
+Both are `coherent_of_constant_degree ∘ subset_subcoherent`: restrict the subcoherent family to a
+uniform-degree conjugate-closed subset, then fire the (5.7) equal-degree coherence producer.  Lane
+a's (10.7) `typeII_derived_frobenius` (Coq `Frob_der1_type2`) consumes the same base-case glue on
+the 4-element uniform T2 family. -/
+
+/-- **Peterfalvi (5.7)∘(5.3)(a): coherence of a uniform-degree conjugate-closed subfamily.**
+
+Given a subcoherent `S07.Hypothesis` on `S` and a *uniform-degree* conjugate-closed subset
+`S' ⊆ S` (finite, `≥ 2` members, all irreducible with equal, nonzero degree, whose member
+differences the base map `τ` sends into `ℤ[Irr G]` and which are `A`-supported), the subfamily
+`(S', A, τ)` is coherent.
+
+This factors the `uniform_degree_coherence (subset_subcoherent …)` idiom of the (9.11) proof: it
+`subset_subcoherent`-restricts to `S'`, then applies `coherent_of_constant_degree`.  It is the base
+case of the (9.11) derived-series induction and the whole Galois case; it is *not* the full (9.11)
+coherence for a mixed-degree family (which needs the (9.11.1)-(9.11.8) pair-adjoining induction on
+top of this base). -/
+theorem coherent_subset_of_constant_degree
+    (hyp : Hypothesis (L := L) (G := G) S A)
+    {S' : Set (ClassFunction L ℂ)} (hsub : S' ⊆ S)
+    (hconj' : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S')
+    (hSfin : S'.Finite) (hcard : 2 ≤ S'.ncard)
+    (hirr : ∀ ζ ∈ S', ClassFunction.inner ζ ζ = 1)
+    (hZIrr : ∀ a ∈ S', ∀ b ∈ S', hyp.tau (a - b) ∈ ZIrr G)
+    (hconst : ∀ a ∈ S', ∀ b ∈ S',
+      ((a : ClassFunction L ℂ) : L → ℂ) 1 = ((b : ClassFunction L ℂ) : L → ℂ) 1)
+    (hdeg0 : ∀ a ∈ S', ((a : ClassFunction L ℂ) : L → ℂ) 1 ≠ 0) (h1A : (1 : L) ∉ A)
+    (hsuppdiff : ∀ a ∈ S', ∀ b ∈ S', ((a - b : ClassFunction L ℂ)).support ⊆ A) :
+    Nonempty (IsCoherent hyp.tau S' A) := by
+  -- `(hyp.restrict hsub hconj').tau = hyp.tau` definitionally; rewrite `hZIrr` through it so the
+  -- `coherent_of_constant_degree` application's `tau`-typed argument aligns syntactically.
+  have htau : (hyp.restrict hsub hconj').tau = hyp.tau := rfl
+  refine coherent_of_constant_degree (hyp.restrict hsub hconj') hSfin hcard hirr ?_ hconst hdeg0
+    h1A hsuppdiff
+  rw [htau]; exact hZIrr
+
 /-! ### Multi-session build outline for `FTtypeP_subcoherent` and the (9.11) cascade
 
 `irrSubcoherent` above is the (5.3)(a) *abstract* producer.  The full
@@ -207,8 +303,39 @@ both wrong, a Coq-name-grep false-negative, disproven by verify-first):
    subcoherent supply.  Lane a's (10.7) `typeII_derived_frobenius` consumes the
    same (9.11) coherence.
 
-**Reachable now (next, no new prime-TI)**: `Hypothesis.restrict` /
-`subset_subcoherent` (small, ungated, on top of `irrSubcoherent`), then the (9.11)
-re-grounding of `coherent_H0Cprime_S`. Tracking = issue 1017. -/
+**LANDED 2026-07-06 (this file, sorry-free — `#print axioms` shows only
+`propext`/`Classical.choice`/`Quot.sound`)**:
+* `Hypothesis.restrict` / `subset_subcoherent` (Coq `PFsection5.v:845`): restrict a subcoherent
+  `S07.Hypothesis` to a `cfConjC_subset` (conjugate-closed subset).
+* `coherent_subset_of_constant_degree`: the `uniform_degree_coherence (subset_subcoherent …)`
+  idiom — restrict to a *uniform-degree* conjugate-closed subset, then fire
+  `coherent_of_constant_degree`.  This is the whole **Galois case** and the **base case `S1`** of
+  the (9.11) derived-series induction.
+
+**NOT re-grounded this session — genuine multi-step induction (honest verdict, verify-first
+2026-07-06)**: `coherent_H0Cprime_S` cannot yet drop `sibleyTarget_H0C`.  The honest `S`-instance
+family `chars.S = sSet` is **mixed-degree** (`(Ind_{HU}^M χ)(1) = q·χ(1)` for varying `χ(1)`;
+`S11.induceHU_apply_one_eq_q_mul`), so `coherent_of_constant_degree` alone does **not** apply — it
+is exactly Coq's **non-Galois case**, needing the (9.11.1)-(9.11.8) pair-adjoining induction on top
+of the uniform base.  Precise remaining steps to fully replace `sibleyTarget_H0C`:
+
+1. Assemble a subcoherent `S07.Hypothesis` for `sSet` on the honest Dade map `indS` (via
+   `irrSubcoherent`, feeding per-member `R`-data from the §9 induced-family Dade witnesses).
+2. `coherent_subset_of_constant_degree` on the uniform sub-family `S1 = {χ ∈ sSet | χ(1)=q·a}` —
+   this base case is now reachable from (1) + the landed glue (Coq `cohS1`).
+3. The **(9.11.1)-(9.11.8) induction proper** (Coq `PFsection9.v:1519-1660`): run
+   `coherentPairChain` (`S07_Coherence.lean:4907`) from the `S1` base, adjoining conjugate pairs
+   `{χ,χ̄}` up to `sSet` via `retarget_isCoherent_of_decompositions_and_memberFamily`
+   (`S07_Coherence.lean:4083`).  The engine and the per-step (5.6) adjoining are **present and
+   sorry-free**; the **missing analytic content** is each step's `hstep` data — the (5.6.2)
+   integer-forcing `hY : Da.Y = a•Da.tau1 χ₁`, discharged in (9.11) by the norm chain
+   `lb0 ≤ … ≤ sumnS S2 ≤ lb0` (Peterfalvi's `extend_coherent` + the `Snorm`/`sumnS` degree-sum
+   bounds).  This norm chain is **not yet in the repo** (the (6.6) chain uses the simpler
+   `two_mul_lt_sq_of_primePow_gap` gap, not the (9.11) `sumnS` arithmetic).
+
+This norm chain is the single genuine gap for both (13.3) [lane b] and (10.7)
+`typeII_derived_frobenius` [lane a], which consumes the same (9.11) coherence on its 4-element T2
+family.  **If that T2 family is uniform-degree, base case (2) may close (10.7) directly, without the
+full induction — worth checking lane-a-side.**  Tracking = issue 1017. -/
 
 end OddOrder.Peterfalvi.S07
