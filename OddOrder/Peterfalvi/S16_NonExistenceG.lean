@@ -4945,35 +4945,96 @@ theorem betaL_grid_relation [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   inner_eta_grid_relation hyp.base (betaL_vanishes_on_regular_W hG hLmax dataL) i j
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Faithful §14 Dade carrier for the L-side `η`-grid coefficients** (Peterfalvi (13.19.c),
-Coq `FTtype2_support_coherence` core).  Bundles the three genuinely-deep facts about the integer
-grid coefficients `m_ij = ⟨β_L, η_ij⟩` of the coherence residual `β_L = (dataL.h78 hG).beta`,
-from which `lSide_delta_grid_expansion` proves the `±1` rigidity and the grid identity:
+/-- **`β_L ∈ ℤ[Irr G]`**: the coherence residual `β_L = τ_L(Ind 1_H − ζ)` is a virtual character
+(`beta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible` on the bundle's `Ind 1_H`-virtuality and the
+distinguished `ζ`-irreducibility).  This is the integrality input for the L-side grid coefficients
+`m_ij = ⟨β_L, η_ij⟩`. -/
+theorem betaL_mem_ZIrr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {L : Subgroup G} (dataL : TypeICoherent78Data L) :
+    (dataL.h78 hG).beta ∈ ZIrr G :=
+  (dataL.h78 hG).beta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible
+    (dataL.h78_ind_mem_ZIrr hG) (dataL.h78_zeta_irreducible hG)
 
-* `coeff` — the coefficients are integers, `⟨β_L, η_ij⟩ = m_ij` (a bookkeeping repackaging of the
-  proven `inner_mem_ZIrr_int`, carried so the three deep facts speak about one named grid);
-* `boundary` — **Peterfalvi (13.19.c) boundary parity** (Coq `FTtypeI_bridge_facts`, the S/T-side
-  type-P bridge): `m_00 = 1`, and `m_0j`, `m_i0` are *odd* off the principal row/column;
-* `bessel` — **the (13.19.c) Bessel bound** (Coq `orthonormal_span` + `lb_b` + `ub_e`, from
-  `‖β_L‖² = e + 1 = p q + 1`): `Σ_{ij} m_ij² ≤ p q`;
-* `grid_mem` — **the grid membership** (Coq `Y = 0`): `1_G + Δ_L = Σ_{ij} m_ij η_ij`, i.e.
-  `β_L + ζ_0^ν` equals its own orthogonal projection onto the `η`-grid.
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (14.11.2)/(13.19.c), integrality of the L-side grid coefficients** (Coq
+`Cint_cfdot_vchar`): each `m_ij = ⟨β_L, η_ij⟩` is an integer, since both `β_L` (`betaL_mem_ZIrr`)
+and `η_ij` (`eta_mem_ZIrr`) are virtual characters (`inner_mem_ZIrr_int`).  This is the fully-proven
+`coeff` ingredient of the (14.11.2) grid-coefficient carrier `LSideGridCoeffData`, available to lane
+c independently of the deep §13 grid-membership content. -/
+theorem betaL_grid_coeff_int [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {hyp : Hypothesis (G := G)} {L : Subgroup G} (dataL : TypeICoherent78Data L)
+    (i : Fin hyp.base.q) (j : Fin hyp.base.p) :
+    ∃ m : ℤ, ClassFunction.inner (dataL.h78 hG).beta (hyp.base.eta i j) = (m : ℂ) :=
+  ClassFunction.inner_mem_ZIrr_int (betaL_mem_ZIrr hG dataL) (eta_mem_ZIrr hyp.base i j)
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (14.11.2)/(13.19.c), the principal grid coefficient** (Coq `a00 = 1`):
+`m_00 = ⟨β_L, η_00⟩ = 1`.  The principal grid member is the trivial character
+`η_00 = 1_G` (`eta_principal_eq_trivial`), and the (7.8.a) Dade decomposition
+`β_L = 1_G − ζ_0^ν + Δ_L` (`beta_eq_constOne_sub_zetaImage_add_delta`, PROVEN) pairs against it as
+`⟨1_G, 1_G⟩ − ⟨ζ_0^ν, 1_G⟩ + ⟨Δ_L, 1_G⟩ = 1 − 0 + 0`, using `‖1_G‖² = 1`
+(`constOne_inner_self_eq_one`), the (7.8.a) source orthogonality `ζ_0^ν ⊥ 1_G`
+(`BetaDecomp.orth_one` at the distinguished index) and the residual orthogonality `Δ_L ⊥ 1_G`
+(`delta_orth_one`).  This is the fully-proven principal-boundary ingredient of
+`LSideGridCoeffData`, available to lane c independently of the deep off-principal parity
+(Coq `FTtypeI_bridge_facts`). -/
+theorem betaL_grid_coeff_principal_eq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {hyp : Hypothesis (G := G)} {L : Subgroup G} (dataL : TypeICoherent78Data L) :
+    ClassFunction.inner (dataL.h78 hG).beta
+        (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩) = 1 := by
+  -- `η_00 = 1_G = constOne`
+  have heta : hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩
+      = OddOrder.Peterfalvi.S09.Hypothesis71.constOne G := by
+    rw [eta_principal_eq_trivial hyp.base]
+    exact ClassFunction.ext fun _ => rfl
+  rw [heta, (dataL.h78 hG).beta_eq_constOne_sub_zetaImage_add_delta,
+    ClassFunction.inner_add_left, ClassFunction.inner_sub_left,
+    OddOrder.Peterfalvi.S09.Hypothesis71.constOne_inner_self_eq_one,
+    (dataL.betaDecomp hG).orth_one (dataL.h78 hG).zetaDistinct
+      (dataL.h78 hG).zetaDistinct_ne_ind1H,
+    (dataL.h78 hG).delta_orth_one (dataL.betaDecomp hG)]
+  ring
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Faithful §14 Dade carrier for the L-side `η`-grid coefficients** (Peterfalvi (13.19.c),
+Coq `FTtype2_support_coherence` core).  Bundles the facts about the integer grid coefficients
+`m_ij = ⟨β_L, η_ij⟩` of the coherence residual `β_L = (dataL.h78 hG).beta`, from which
+`lSide_delta_grid_expansion` proves the `±1` rigidity and the grid identity.  The two lane-c
+available facts are proven in-place in the producer `lSideGridCoeffData`; only the S/T type-P
+bridge and §13 grid content remain as the isolated gate:
+
+* `coeff` — the coefficients are integers, `⟨β_L, η_ij⟩ = m_ij` (**PROVEN in-place**,
+  `betaL_grid_coeff_int` via `inner_mem_ZIrr_int`; the witness `m` is the integer value);
+* `m_principal` — the principal coefficient `m_00 = 1` (**PROVEN in-place**,
+  `betaL_grid_coeff_principal_eq_one`: `η_00 = 1_G` and `β_L = 1_G − ζ_0^ν + Δ_L` pair as
+  `1 − 0 + 0`);
+* `m_row_odd`/`m_col_odd` — **off-principal boundary parity** (Coq `FTtypeI_bridge_facts`, the
+  S/T-side type-P bridge `cycTIiso_cfdot_exchange`): `m_0j`, `m_i0` are *odd*; genuinely
+  cross-lane-gated to the type-P `S`/`T` maximals (lane b's §13/§15 layer);
+* `bessel` — **the (13.19.c) Bessel bound** (Coq `orthonormal_span` + `lb_b` + `ub_e`):
+  `Σ_{ij} m_ij² ≤ p q`; needs the coherent-image/grid orthogonality `ζ_i^ν ⊥ η`-grid (Coq
+  `o_tauLeta`) to match `β_L`'s grid projection with `(Γ_L + 1_G)`'s and apply `‖Γ_L‖² ≤ e − 1`,
+  the same §13 residual content as `grid_mem`;
+* `grid_mem` — **the grid membership** (Coq `Y = 0`, issue 3002): `1_G + Δ_L = Σ_{ij} m_ij η_ij`,
+  i.e. `β_L + ζ_0^ν` equals its own orthogonal projection onto the `η`-grid.
 
 These are genuine facts about the type-I maximal `L` (its Dade isometry, coherent extension, and
-the S/T-partner bridge); their concrete construction is the remaining §14 obligation, isolated
-here away from the pure `±1` combinatorics. -/
+the S/T-partner bridge); the concrete construction of the three off-principal/grid facts is the
+remaining §13/§14 obligation, isolated here away from the pure `±1` combinatorics. -/
 structure LSideGridCoeffData [Finite G] (hyp : Hypothesis (G := G))
     {L : Subgroup G} (dataL : TypeICoherent78Data L)
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) where
   /-- The integer grid coefficient `m_ij = ⟨β_L, η_ij⟩`. -/
   m : Fin hyp.base.q → Fin hyp.base.p → ℤ
-  /-- `⟨β_L, η_ij⟩ = m_ij` (integrality, `inner_mem_ZIrr_int`). -/
+  /-- `⟨β_L, η_ij⟩ = m_ij` (integrality, `inner_mem_ZIrr_int`).  **PROVEN in-place**. -/
   coeff : ∀ i j, ClassFunction.inner (dataL.h78 hG).beta (hyp.base.eta i j) = (m i j : ℂ)
-  /-- **Boundary parity** (Coq `FTtypeI_bridge_facts`): `m_00 = 1`, and `m_0j`, `m_i0` are odd. -/
+  /-- **Principal coefficient** `m_00 = 1` (Coq `a00 = 1`).  **PROVEN in-place**. -/
   m_principal : m ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩ = 1
+  /-- **Off-principal row parity** (Coq `FTtypeI_bridge_facts`, gated): `m_0j` odd. -/
   m_row_odd : ∀ j, j ≠ ⟨0, hyp.base.p_prime.pos⟩ → Odd (m ⟨0, hyp.base.q_prime.pos⟩ j)
+  /-- **Off-principal column parity** (Coq `FTtypeI_bridge_facts`, gated): `m_i0` odd. -/
   m_col_odd : ∀ i, i ≠ ⟨0, hyp.base.q_prime.pos⟩ → Odd (m i ⟨0, hyp.base.p_prime.pos⟩)
-  /-- **Bessel bound** (Coq `ub_e`): `Σ m_ij² ≤ p q`. -/
+  /-- **Bessel bound** (Coq `ub_e`, gated): `Σ m_ij² ≤ p q`. -/
   bessel : ∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (m i j) ^ 2
     ≤ (hyp.base.p * hyp.base.q : ℤ)
   /-- **Grid membership** (Coq `Y = 0`): `1_G + Δ_L = Σ m_ij η_ij`. -/
@@ -4981,16 +5042,46 @@ structure LSideGridCoeffData [Finite G] (hyp : Hypothesis (G := G))
     ∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (m i j : ℂ) • hyp.base.eta i j
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Faithful §14 producer of the L-side grid-coefficient data.**  The type-I maximal `L`
-carries the (13.19.c)/(7.8) grid-coefficient package `LSideGridCoeffData`; its concrete
-construction is the §14 Dade/coherence + S/T-partner-bridge layer (Coq `FTtype2_support_coherence`,
-`Dade_Ind1_sub_lin` + `FTtypeI_bridge_facts` + `orthonormal_span`), isolated as the single named
-obligation behind the L-side signed expansion. -/
+/-- **Faithful §14 producer of the L-side grid-coefficient data** (policy-A descent).  The type-I
+maximal `L` carries the (13.19.c)/(7.8) grid-coefficient package `LSideGridCoeffData`.  The two
+lane-c-available facts are **proven in-place** here — `coeff` (integrality, `betaL_grid_coeff_int`)
+and `m_principal` (`m_00 = 1`, `betaL_grid_coeff_principal_eq_one`) — with the integer witness `m`
+taken from the proven integrality.  Only the three off-principal/grid facts remain as the isolated
+gate: `m_row_odd`/`m_col_odd` (the S/T type-P partner bridge, Coq `FTtypeI_bridge_facts`) and
+`bessel`/`grid_mem` (the §13 coherent-residual grid projection, Coq `orthonormal_span` + `Y = 0`,
+issue 3002).  These are genuinely cross-lane-gated to lane b's §13/§15 type-P layer. -/
 noncomputable def lSideGridCoeffData [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
     (dataL : TypeICoherent78Data L) (hq3 : hyp.base.q = 3) (hp5 : hyp.base.p = 5) :
-    LSideGridCoeffData hyp dataL hG :=
-  sorry
+    LSideGridCoeffData hyp dataL hG where
+  -- The integer coefficient is the witness of the proven integrality `betaL_grid_coeff_int`.
+  m i j := Classical.choose (betaL_grid_coeff_int hG dataL i j)
+  -- `coeff` is fully proven (integrality, `inner_mem_ZIrr_int`).
+  coeff i j := Classical.choose_spec (betaL_grid_coeff_int hG dataL i j)
+  -- `m_00 = 1` is fully proven: the chosen integer at `(0,0)` casts to `⟨β_L, η_00⟩ = 1`.
+  m_principal := by
+    have hspec := Classical.choose_spec
+      (betaL_grid_coeff_int hG dataL
+        (hyp := hyp) ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩)
+    have h1 := betaL_grid_coeff_principal_eq_one (hyp := hyp) hG dataL
+    -- `(m_00 : ℂ) = ⟨β_L, η_00⟩ = 1`, hence `m_00 = 1` over `ℤ`.
+    have : ((Classical.choose (betaL_grid_coeff_int hG dataL
+        (hyp := hyp) ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩) : ℤ) : ℂ) = 1 :=
+      hspec.symm.trans h1
+    exact_mod_cast this
+  -- **Genuinely cross-lane-gated (Coq `FTtypeI_bridge_facts`, the S/T type-P partner bridge).**
+  -- Off-principal parity `a i j ≡ 1 (mod 2)` needs the `cycTIiso_cfdot_exchange` reciprocity of the
+  -- type-P `S`/`T` maximals (`hyp.base.S_typeP2`), which lives in lane b's §13/§15 layer.
+  m_row_odd := sorry
+  m_col_odd := sorry
+  -- **Genuinely cross-lane-gated.** The Bessel bound `Σ m² ≤ p q` (Coq `ub_e` with `‖Γ_L‖² ≤ e − 1`)
+  -- requires the coherent-image/grid orthogonality `ζ_i^ν ⊥ η_grid` (Coq `o_tauLeta`,
+  -- `FTtypeI_bridge_facts`) to identify `β_L`'s grid projection with `(Γ_L + 1_G)`'s; that residual
+  -- decomposition is the same §13 content as `grid_mem`.
+  bessel := sorry
+  -- **The deep §13 gate (issue 3002, Coq `Y = 0`).** `1_G + Δ_L = Σ m_ij η_ij`: the coherence
+  -- residual equals its own orthogonal projection onto the `η`-grid.
+  grid_mem := sorry
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (13.19.c)/(13.1.d), the L-side `η`-grid identity of the coherence residual.**
