@@ -253,6 +253,20 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
   eta_row_vanish_of_one_zero : ∀ x : G,
     tau3 (omega ⟨1, q_prime.one_lt⟩ ⟨0, p_prime.pos⟩) x = 0 →
     ∀ i : Fin q, i ≠ ⟨0, q_prime.pos⟩ → tau3 (omega i ⟨0, p_prime.pos⟩) x = 0
+  /-- **Peterfalvi (3.9.c)** (issue-3002 keystone): on elements of order prime to `pq`, the
+  `η`-grid values `(τ₃ω)_{ij}(g)` are rational integers. -/
+  eta_intCast_of_coprime : ∀ (g : G), Nat.Coprime (orderOf g) (p * q) →
+    ∀ (i : Fin q) (j : Fin p), ∃ m : ℤ, tau3 (omega i j) g = (m : ℂ)
+  /-- **Peterfalvi (3.9.a)** (issue-3002 keystone): on elements of order prime to `pq`, the
+  `η`-grid pairs under the index negation `(i,j) ↦ (−i,−j)` (`S15.finNeg`). -/
+  eta_pair_of_coprime : ∀ (g : G), Nat.Coprime (orderOf g) (p * q) →
+    ∀ (i : Fin q) (j : Fin p),
+      tau3 (omega (OddOrder.Peterfalvi.S15.finNeg q_prime.pos i)
+              (OddOrder.Peterfalvi.S15.finNeg p_prime.pos j)) g
+        = tau3 (omega i j) g
+  /-- **Peterfalvi (3.9)** (issue-3002 keystone): the principal grid value is `η₀₀(g) = 1`. -/
+  eta_principal_of_coprime : ∀ (g : G), Nat.Coprime (orderOf g) (p * q) →
+    tau3 (omega ⟨0, q_prime.pos⟩ ⟨0, p_prime.pos⟩) g = 1
 
 /-! ### Partition of `Section16Inputs` into three independent producer obligations
 
@@ -475,6 +489,21 @@ structure Section16CharacterData {G : Type*} [Group G] [Finite G]
   eta_row_vanish_of_one_zero : ∀ x : G,
     tau3 (omega ⟨1, tp.q_prime.one_lt⟩ ⟨0, tp.p_prime.pos⟩) x = 0 →
     ∀ i : Fin tp.q, i ≠ ⟨0, tp.q_prime.pos⟩ → tau3 (omega i ⟨0, tp.p_prime.pos⟩) x = 0
+  /-- **Peterfalvi (3.9.c)** (issue-3002 keystone): on elements of order prime to `pq`, the
+  `η`-grid values `(τ₃ω)_{ij}(g)` are rational integers.  Supplied from
+  `tau3W_omegaS_intCast_of_coprime` (S05 σ-Galois integrality). -/
+  eta_intCast_of_coprime : ∀ (g : G), Nat.Coprime (orderOf g) (tp.p * tp.q) →
+    ∀ (i : Fin tp.q) (j : Fin tp.p), ∃ m : ℤ, tau3 (omega i j) g = (m : ℂ)
+  /-- **Peterfalvi (3.9.a)** (issue-3002 keystone): on elements of order prime to `pq`, the
+  `η`-grid pairs under the index negation `(i,j) ↦ (−i,−j)` (`S15.finNeg`). -/
+  eta_pair_of_coprime : ∀ (g : G), Nat.Coprime (orderOf g) (tp.p * tp.q) →
+    ∀ (i : Fin tp.q) (j : Fin tp.p),
+      tau3 (omega (OddOrder.Peterfalvi.S15.finNeg tp.q_prime.pos i)
+              (OddOrder.Peterfalvi.S15.finNeg tp.p_prime.pos j)) g
+        = tau3 (omega i j) g
+  /-- **Peterfalvi (3.9)** (issue-3002 keystone): the principal grid value is `η₀₀(g) = 1`. -/
+  eta_principal_of_coprime : ∀ (g : G), Nat.Coprime (orderOf g) (tp.p * tp.q) →
+    tau3 (omega ⟨0, tp.q_prime.pos⟩ ⟨0, tp.p_prime.pos⟩) g = 1
 
 /-- **Canonical type-`P` maximal pair data** (issue 7005): for a minimal simple group of odd order,
 there is a type-`P` dual pair `S, T` together with the full κ-Hall witness data of BG Theorem 14.7
@@ -2075,6 +2104,27 @@ theorem omegaS_eq_omega_omegaSChar (i : Fin tp.q) (j : Fin tp.p) :
     omegaSChar, MonoidHom.comp_apply]
   rfl
 
+omit [NeZero (Nat.card ↥(mp.certainTypeS hG).W1)] [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)] in
+/-- The cyclic factor `W = W₁ ⊔ W₂` has order `|W| = q·p` (`W₁ ∩ W₂ = ⊥`, `W₁` normalizes `W₂`
+since they commute). -/
+theorem cardTPW : Nat.card ↥tp.W = tp.q * tp.p := by
+  have hconj : ∀ x ∈ tp.W1, ∀ a ∈ tp.W2, x * a * x⁻¹ ∈ tp.W2 := by
+    intro x hx a ha
+    have hc : Commute x a := tp.W1_commutes_W2 x hx a ha
+    have hxa : x * a * x⁻¹ = a := by rw [hc.eq]; group
+    rw [hxa]; exact ha
+  have hW1norm : tp.W1 ≤ Subgroup.normalizer (tp.W2 : Set G) := by
+    intro x hx
+    rw [Subgroup.mem_normalizer_iff]
+    intro a
+    refine ⟨fun ha => hconj x hx a ha, fun ha => ?_⟩
+    have hb := hconj x⁻¹ (tp.W1.inv_mem hx) (x * a * x⁻¹) ha
+    simpa [mul_assoc] using hb
+  rw [tp.W_eq_join,
+    OddOrder.BG.Ch3.S12.card_sup_eq_mul_of_le_normalizer_of_disjoint hW1norm
+      tp.W1_inf_W2_eq_bot,
+    ← tp.q_eq_card_W1, ← tp.p_eq_card_W2]
+
 /-- **Exhaustion by counting**: every linear character of `↥tp.W` underlies some `omegaS i j` —
 the `(i,j) ↦ omegaSChar i j` map is injective (the `omegaS` are orthonormal, hence distinct)
 between types of the same cardinality `pq`. -/
@@ -2099,23 +2149,7 @@ theorem exists_omegaS_eq_omega (ξ : ↥tp.W →* ℂˣ) :
     rw [if_neg hcond, if_pos (⟨rfl, rfl⟩ : k = k ∧ l = l)] at h2
     exact zero_ne_one h2
   -- cardinalities agree: `|Fin q × Fin p| = pq = |W| = |Ŵ|`
-  have hcardW : Nat.card ↥tp.W = tp.q * tp.p := by
-    have hconj : ∀ x ∈ tp.W1, ∀ a ∈ tp.W2, x * a * x⁻¹ ∈ tp.W2 := by
-      intro x hx a ha
-      have hc : Commute x a := tp.W1_commutes_W2 x hx a ha
-      have hxa : x * a * x⁻¹ = a := by rw [hc.eq]; group
-      rw [hxa]; exact ha
-    have hW1norm : tp.W1 ≤ Subgroup.normalizer (tp.W2 : Set G) := by
-      intro x hx
-      rw [Subgroup.mem_normalizer_iff]
-      intro a
-      refine ⟨fun ha => hconj x hx a ha, fun ha => ?_⟩
-      have hb := hconj x⁻¹ (tp.W1.inv_mem hx) (x * a * x⁻¹) ha
-      simpa [mul_assoc] using hb
-    rw [tp.W_eq_join,
-      OddOrder.BG.Ch3.S12.card_sup_eq_mul_of_le_normalizer_of_disjoint hW1norm
-        tp.W1_inf_W2_eq_bot,
-      ← tp.q_eq_card_W1, ← tp.p_eq_card_W2]
+  have hcardW : Nat.card ↥tp.W = tp.q * tp.p := cardTPW mp tp
   have hcardHom : Fintype.card (↥tp.W →* ℂˣ) = tp.q * tp.p := by
     haveI := tp.W_cyclic
     letI : CommGroup ↥tp.W := IsCyclic.commGroup
@@ -2133,6 +2167,99 @@ theorem exists_omegaS_eq_omega (ξ : ↥tp.W →* ℂˣ) :
   refine ⟨i, j, ?_⟩
   rw [omegaS_eq_omega_omegaSChar]
   exact congrArg _ (congrArg _ hij)
+
+omit [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)] in
+/-- **Peterfalvi (3.9.c) for the S-side `η`-grid** (issue-3002 supply): the grid value
+`η_{ij}(g) = (τ₃ω)_{ij}(g)` is a rational integer on elements `g` of order prime to `pq`.
+
+The value is `σ(ω(ξ_{ij}))(g)` for the underlying linear character `ξ_{ij} = omegaSChar i j`
+(`omegaS_eq_omega_omegaSChar` + `sigmaIntegral_apply`).  Since `ξ_{ij}` is a character of the
+cyclic `W` (`|W| = pq`, `cardTPW`), its order divides `pq`, so `Coprime(orderOf g, pq)` gives
+`Coprime(orderOf g, orderOf ξ_{ij})`, and the S05 (3.9.c) Galois-integrality
+`exists_intCast_sigma_omega_apply` applies. -/
+theorem tau3W_omegaS_intCast_of_coprime (i : Fin tp.q) (j : Fin tp.p) {g : G}
+    (hg : Nat.Coprime (orderOf g) (tp.p * tp.q)) :
+    ∃ n : ℤ, tau3W hG mp tp (omegaS hG mp tp i j) g = (n : ℂ) := by
+  classical
+  haveI : Fintype ↥tp.W := Fintype.ofFinite _
+  -- `orderOf (omegaSChar i j) ∣ pq`: the hom `ξ` satisfies `ξ ^ |W| = 1` and `|W| = pq`.
+  have hdvd : orderOf (omegaSChar hG mp tp i j) ∣ tp.p * tp.q := by
+    set ξ := omegaSChar hG mp tp i j with hξ
+    have hpow : ξ ^ Fintype.card ↥tp.W = 1 := by
+      ext w
+      rw [MonoidHom.pow_apply, MonoidHom.one_apply, ← map_pow, pow_card_eq_one, map_one]
+    have hcardW : Fintype.card ↥tp.W = tp.p * tp.q := by
+      rw [← Nat.card_eq_fintype_card, cardTPW mp tp, Nat.mul_comm]
+    rw [← hcardW]
+    exact orderOf_dvd_of_pow_eq_one hpow
+  have hcop : (orderOf g).Coprime (orderOf (omegaSChar hG mp tp i j)) :=
+    hg.coprime_dvd_right hdvd
+  obtain ⟨n, hn⟩ := (tiCyclicW hG mp tp).exists_intCast_sigma_omega_apply rfl
+    (tiCyclicWDadeApp hG mp tp) (omegaSChar hG mp tp i j) hcop
+  refine ⟨n, ?_⟩
+  rw [omegaS_eq_omega_omegaSChar]
+  show (tiCyclicW hG mp tp).sigmaIntegral rfl (tiCyclicWDadeApp hG mp tp) _ g = _
+  rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_apply]
+  exact hn
+
+/-- The principal grid character `omegaS ⟨0⟩ ⟨0⟩` is the trivial character of `↥tp.W`:
+its underlying hom is `omegaProdChar (w1CharEquiv 0) (chi2enum 0) = omegaProdChar 1 1 = 1`
+(`w1CharEquiv_zero`, `chi2enum_zero`), and `omega 1 = trivialClassFunction`. -/
+theorem omegaS_principal_eq_trivial :
+    omegaS hG mp tp ⟨0, tp.q_prime.pos⟩ ⟨0, tp.p_prime.pos⟩
+      = trivialClassFunction ↥tp.W := by
+  have hchar : omegaSChar hG mp tp ⟨0, tp.q_prime.pos⟩ ⟨0, tp.p_prime.pos⟩ = 1 := by
+    have h0 : eqQ hG mp tp ⟨0, tp.q_prime.pos⟩ = 0 := by
+      apply Fin.ext; simp [eqQ]
+    rw [omegaSChar, h0, (mp.certainTypeS hG).w1CharEquiv_zero, chi2enum_zero]
+    apply MonoidHom.ext
+    intro w
+    show ((mp.certainTypeS hG).sdiffTICyclicHypothesis.omegaProdChar 1 1
+      ((gridEquivE hG mp tp).toMonoidHom w) : ℂˣ) = 1
+    rw [(mp.certainTypeS hG).sdiffTICyclicHypothesis.omegaProdChar_one_one, MonoidHom.one_apply]
+  rw [omegaS_eq_omega_omegaSChar, hchar]
+  apply ClassFunction.ext
+  intro w
+  rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.omega_apply]
+  change ((1 : ↥tp.W →* ℂˣ) w : ℂ) = _
+  rw [MonoidHom.one_apply, Units.val_one, trivialClassFunction_apply]
+
+/-- **Peterfalvi (3.9) principal value on generic elements** (issue-3002 supply): the principal
+grid value `(τ₃ω)_{00}(g) = 1` for every `g` (the coprimality hypothesis is unused:
+`omegaS₀₀` is the trivial character and `τ₃(1_W) = 1_G`). -/
+theorem tau3W_omegaS_principal_of_coprime {g : G}
+    (_hg : Nat.Coprime (orderOf g) (tp.p * tp.q)) :
+    tau3W hG mp tp (omegaS hG mp tp ⟨0, tp.q_prime.pos⟩ ⟨0, tp.p_prime.pos⟩) g = 1 := by
+  rw [omegaS_principal_eq_trivial, tau3W_trivial, trivialClassFunction_apply]
+
+/-- **Peterfalvi (3.9.a) conjugate-pair symmetry on generic elements** (issue-3002 supply):
+for `g` of order prime to `pq`, the `η`-grid pairs under the index negation `(i,j) ↦ (−i,−j)`
+(`S15.finNeg`), `(τ₃ω)_{−i,−j}(g) = (τ₃ω)_{ij}(g)`.
+
+**REMAINING SUPPLY OBLIGATION (issue-3002 keystone, honest gate — see notes).**  Peterfalvi's
+(3.9.a) genuine content is that the *complex conjugate* of `η_{ij}` is the grid character at the
+**character-inverse** index `(rowInv i, colInv j)` (`S06.chiColumn_conj`, `galoisMap_conj_omega`);
+combined with (3.9.c) (the value at a `pq`-coprime `g` is a real integer, so equals its own
+conjugate) this gives `η_{rowInv i, colInv j}(g) = η_{ij}(g)`.  The pairing therefore holds under
+the **character-inversion** involution `rowInv`/`colInv`, whose unique fixed point is the principal
+index (`w1CharEquiv 0 = 1`, `chi2enum 0 = 1`, `1⁻¹ = 1`).  Matching it to the **combinatorial**
+index negation `S15.finNeg = ⟨(n−i) % n, _⟩` requires `omegaSChar (finNeg i)(finNeg j) =
+(omegaSChar i j)⁻¹`, i.e. `w1CharEquiv (finNeg i) = (w1CharEquiv i)⁻¹`
+(= `w1CharEquiv (rowInv i)`) and likewise for `chi2enum`.  This is **false** for the nonconstructive
+enumerations `w1BaseEquiv`/`chi2baseEnum` (`Fintype.equivFinOfCardEq`, carrying no group
+structure): `finNeg` and `rowInv` are generically distinct permutations.  Closing this field
+honestly requires either (a) rebuilding `w1CharEquiv`/`chi2enum` as **structure-preserving**
+enumerations for which `finNeg = rowInv` (a `ZMod`-style power-map enumeration of the cyclic
+character group), or (b) the c-side restating `EtaGenericData.eta_pair` /
+`one_le_norm_eta_grid_signed_sum` over the honest `rowInv`/`colInv` involution (which
+`one_le_norm_signed_paired_sum` already supports as an abstract `Equiv.Perm`).  The integrality
+(3.9.c) and principal (3.9) fields are supplied `sorry`-free above. -/
+theorem tau3W_omegaS_pair_of_coprime (i : Fin tp.q) (j : Fin tp.p) {g : G}
+    (_hg : Nat.Coprime (orderOf g) (tp.p * tp.q)) :
+    tau3W hG mp tp (omegaS hG mp tp (OddOrder.Peterfalvi.S15.finNeg tp.q_prime.pos i)
+        (OddOrder.Peterfalvi.S15.finNeg tp.p_prime.pos j)) g
+      = tau3W hG mp tp (omegaS hG mp tp i j) g := by
+  sorry
 
 /-- **Peterfalvi (3.2.d), `η`-grid form** (issue-2034 supply): a class function of `G`
 orthogonal to the whole grid `tau3W (omegaS i j)` vanishes on the regular set
@@ -2626,7 +2753,13 @@ noncomputable def section16CharacterData_of_isMinimalSimpleOdd {G : Type*} [Grou
           obtain ⟨c, hc⟩ := isConj_iff.mp hconj
           exact hx (OddOrder.GroupTheory.mem_conjClassSet.mpr ⟨a, ha, c, hc⟩))
       eta_row_vanish_of_one_zero := fun x h0 i hi =>
-        Section16CharacterData.tau3W_omegaS_row_vanish_of_one_zero hG mp tp h0 i hi }
+        Section16CharacterData.tau3W_omegaS_row_vanish_of_one_zero hG mp tp h0 i hi
+      eta_intCast_of_coprime := fun g hg i j =>
+        Section16CharacterData.tau3W_omegaS_intCast_of_coprime hG mp tp i j hg
+      eta_pair_of_coprime := fun g hg i j =>
+        Section16CharacterData.tau3W_omegaS_pair_of_coprime hG mp tp i j hg
+      eta_principal_of_coprime := fun g hg =>
+        Section16CharacterData.tau3W_omegaS_principal_of_coprime hG mp tp hg }
 
 /-- **Assembly of `Section16Inputs` from the three lane producers** (`sorry`-free).
 Each field of `Section16Inputs` is sourced from exactly one of `mp` / `tp` / `cd`;
@@ -2717,7 +2850,10 @@ noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [F
     omega_pow_p_of_mem_W2 := cd.omega_pow_p_of_mem_W2
     eta_complete_vanish := cd.eta_complete_vanish
     eta_fourcorner_vanish := cd.eta_fourcorner_vanish
-    eta_row_vanish_of_one_zero := cd.eta_row_vanish_of_one_zero }
+    eta_row_vanish_of_one_zero := cd.eta_row_vanish_of_one_zero
+    eta_intCast_of_coprime := cd.eta_intCast_of_coprime
+    eta_pair_of_coprime := cd.eta_pair_of_coprime
+    eta_principal_of_coprime := cd.eta_principal_of_coprime }
 
 /-- **Assembly of the Section 16 configuration from named inputs** (`sorry`-free).
 
@@ -2840,7 +2976,10 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       omega_pow_p_of_mem_W2 := inp.omega_pow_p_of_mem_W2
       eta_complete_vanish := inp.eta_complete_vanish
       eta_fourcorner_vanish := inp.eta_fourcorner_vanish
-      eta_row_vanish_of_one_zero := inp.eta_row_vanish_of_one_zero }
+      eta_row_vanish_of_one_zero := inp.eta_row_vanish_of_one_zero
+      eta_intCast_of_coprime := inp.eta_intCast_of_coprime
+      eta_pair_of_coprime := inp.eta_pair_of_coprime
+      eta_principal_of_coprime := inp.eta_principal_of_coprime }
   q_lt_p := inp.q_lt_p
 
 /-- **The one remaining upstream obligation.** From a minimal simple group of odd

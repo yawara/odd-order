@@ -254,3 +254,60 @@ gate-1 threading を fresh budget で careful に engage する (exists_zeta sig
 波及は all-or-nothing ゆえ慎重に)。3 レーンとも char keystone 収束が確定したが、各自の ungated 残
 (a=gate-1 threading / b=§13 η-grid keystone / c=S16 consumer wiring) を正面から進めれば lane 数 3 の
 まま pipeline を解ける。gate-1 threading が真に block されたら (spine 破壊が避けられない等) 再度 hub flag。
+
+## ✅ 2026-07-05 (lane b): η-grid Dade (3.9) fields LANDED on `S15.Hypothesis` (keystone threading)
+
+hub 裁定 (本 issue「b = §13 η-grid keystone deep-engage」) を実施。**Peterfalvi (3.9) の 3 field を
+`S15.Hypothesis` に threading 完了**、c-lane が `EtaGenericData` を即構成できる citeable form を供給。
+full build **3929 jobs green**、新 sorry は下記 (3.9.a) の documented fallback 1 個のみ。
+
+### 3 新 field on `S15.Hypothesis` (`S15_SAndT_Setup.lean`)
+- **`eta_intCast_of_coprime`** (Peterfalvi (3.9.c)): `∀ g, Coprime (orderOf g) (p*q) → ∀ i j,
+  ∃ m:ℤ, eta i j g = (m:ℂ)` — **供給 sorry-free**。
+- **`eta_pair_of_coprime`** (Peterfalvi (3.9.a)): `∀ g, Coprime … → ∀ i j,
+  eta (finNeg q.pos i) (finNeg p.pos j) g = eta i j g` — **供給に sorry 1 個** (下記 honest gate)。
+- **`eta_principal_of_coprime`** (Peterfalvi (3.9)): `∀ g, Coprime … → eta ⟨0⟩ ⟨0⟩ g = 1`
+  — **供給 sorry-free**。
+- `S15.finNeg` を追加 (S16.finNeg と**byte-identical = defeq**、c の fill が `EtaGenericData.eta_pair`
+  の `S16.finNeg` 形に defeq で通ることを実検証済)。
+
+### 供給 chain (`FeitThompson.lean`、issue-3002 一時編集 zone)
+`Section16CharacterData` 名前空間に 3 supply lemma + 全 threading (producer + 2 constructor):
+- **(3.9.c) `tau3W_omegaS_intCast_of_coprime`** (sorry-free): `η_ij(g)=tau3W(omegaS i j)(g)=σ(ω(ξ_ij))(g)`
+  (既存 `omegaS_eq_omega_omegaSChar`+`sigmaIntegral_apply`) → `orderOf ξ_ij ∣ pq` (新 lemma `cardTPW`:
+  `|W|=pq`) → S05 **`exists_intCast_sigma_omega_apply`** (3.9.c σ-Galois integrality)。本 keystone の deep part。
+- **(3.9) `tau3W_omegaS_principal_of_coprime`** (sorry-free): 新 lemma `omegaS_principal_eq_trivial`
+  (`omegaSChar 0 0 = 1` via `w1CharEquiv_zero`/`chi2enum_zero`/`omegaProdChar_one_one`) + `tau3W_trivial`。
+- **(3.9.a) `tau3W_omegaS_pair_of_coprime`** (**sorry 1 個 — documented honest gate**、下記)。
+
+### ⚠ (3.9.a) finNeg-symmetry の honest gate (残 sorry の正確な obligation)
+Peterfalvi (3.9.a) の真の内容 = 「η_ij の複素共役 = **character-inverse** index `(rowInv i, colInv j)`
+の grid 値」(`S06_CertainTypeConjugation.chiColumn_conj`/`galoisMap_conj_omega`、実装済) + (3.9.c) で値が
+実整数ゆえ自己共役 ⟹ `η_{rowInv i, colInv j}(g) = η_ij(g)`。pairing は **character 反転 `rowInv`/`colInv`**
+(唯一の不動点 = principal) で honest 成立。だが `EtaGenericData.eta_pair` /
+`one_le_norm_eta_grid_signed_sum` の **組合せ的 `finNeg = ⟨(n−i)%n,_⟩`** に一致させるには
+`omegaSChar (finNeg i)(finNeg j) = (omegaSChar i j)⁻¹`、すなわち `w1CharEquiv (finNeg i) =
+(w1CharEquiv i)⁻¹` が要る。これは **非構成的 enumeration `w1BaseEquiv`/`chi2baseEnum`
+(`Fintype.equivFinOfCardEq`、群構造非保持) では FALSE** (`finNeg`≠`rowInv`)。Explore agent 2 回で厳密確認。
+- **honest close の 2 択 (c-lane 判断領域)**:
+  (a) `w1CharEquiv`/`chi2enum` を **構造保存 enumeration** (`ZMod`-style power-map) に組替え → `finNeg=rowInv`。
+  (b) c が `EtaGenericData.eta_pair` / `one_le_norm_eta_grid_signed_sum` を honest な `rowInv`/`colInv`
+      involution 上に restate (`one_le_norm_signed_paired_sum` は既に abstract `Equiv.Perm` を取る)。
+- Step-D fallback (mission 明示 sanction): field を landing → c-lane wiring を即 unblock。
+
+### AxiomsCheck の影響 (spine への波及は最小)
+- **`sectionSixteenHypothesis_of_inputs` は axiom-clean のまま** (inp を abstract に取るため sorry 非伝播、
+  実測 OK)。spine assembly point は不汚染。
+- **`section16CharacterData_of_isMinimalSimpleOdd` (concrete cd producer) のみ** (3.9.a) sorry を transit
+  ⟹ axiom-clean assertion を disable (documented comment 付き、`AxiomsCheck.lean:6719 付近)。この producer は
+  元々 sorried FT-frontier (`section16Inputs_of_isMinimalSimpleOdd`) に feed される経路上。
+
+### c-lane cite form (検証済、`eta_grid_galois_facts_on_G0` の sorry を discharge)
+```
+{ eta_int       := fun g hg i j => hyp.base.eta_intCast_of_coprime g (Mdata.G0_orderOf_coprime hG hg) i j
+  eta_pair      := fun g hg i j => hyp.base.eta_pair_of_coprime g (Mdata.G0_orderOf_coprime hG hg) i j
+  eta_principal := fun g hg     => hyp.base.eta_principal_of_coprime g (Mdata.G0_orderOf_coprime hG hg)
+  betaM_vanish  := (eta_generic_data hG hyp Mdata).betaM_vanish }
+```
+(S16 に一時 test 定理 `tmp_verify_cite_forms` を入れて全 4 field が typecheck することを実確認 → revert 済。
+`eta_principal` は既存 `eta_principal_apply_eq_one hyp.base g` でも同値。)

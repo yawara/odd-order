@@ -55,6 +55,14 @@ open scoped Pointwise
 
 variable {G : Type*} [Group G]
 
+/-- Negation `i ↦ -i ≡ (n − i) (mod n)` on `Fin n`, for `0 < n`.  This is the index map
+realizing the conjugation pairing `(i,j) ↦ (−i,−j)` of the Dade `η`-grid in Peterfalvi
+(3.9.a)/(14.11.3).  Defined identically to the (downstream) `S16.finNeg`, so the two are
+definitionally equal — the `(3.9.a)` field `eta_pair_of_coprime` below (stated with this
+`finNeg`) is thus citeable to fill `S16.EtaGenericData.eta_pair` (stated with `S16.finNeg`). -/
+def finNeg {n : ℕ} (hn : 0 < n) (i : Fin n) : Fin n :=
+  ⟨(n - i.val) % n, Nat.mod_lt _ hn⟩
+
 /- Scoped instances that make canonical `ClassFunction.induce` usable inside the
 `(13.1)` hypothesis-structure field types (`Ind_W^S`, `Ind_W^T`).  Kept `scoped`
 so the `noncomputable` `Fintype`/`Invertible` data is contained: it is opened only
@@ -317,6 +325,32 @@ structure Hypothesis where
   eta_row_vanish_of_one_zero : ∀ x : G,
     tau3 (omega ⟨1, q_prime.one_lt⟩ ⟨0, p_prime.pos⟩) x = 0 →
     ∀ i : Fin q, i ≠ ⟨0, q_prime.pos⟩ → tau3 (omega i ⟨0, p_prime.pos⟩) x = 0
+  /-- **Peterfalvi (3.9.c), the `η`-grid integrality on generic elements** (issue-3002
+  keystone): for `g` of order prime to `pq`, each grid value `η_{ij}(g) = (τ₃ω)_{ij}(g)` is a
+  rational integer.  The genuine §3/§5 Dade-Galois fact (`σ` intertwines the cyclotomic Galois
+  action, so a value at `g` of order prime to the character order `|ξ_{ij}| ∣ pq` is fixed by
+  every ring automorphism of `ℂ`, hence rational; a rational algebraic integer is an integer).
+  Supplied from the honest spine grid (`Section16CharacterData.omegaS`/`tau3W`, whose value is
+  `σ(ω(ξ_{ij}))(g)`) through `S05.exists_intCast_sigma_omega_apply`.  The c-side (`S16`) cites
+  this after `MHypothesis.G0_orderOf_coprime` to fill `EtaGenericData.eta_int`. -/
+  eta_intCast_of_coprime : ∀ (g : G), Nat.Coprime (orderOf g) (p * q) →
+    ∀ (i : Fin q) (j : Fin p), ∃ m : ℤ, eta i j g = (m : ℂ)
+  /-- **Peterfalvi (3.9.a), the conjugate-pair symmetry of the `η`-grid on generic elements**
+  (issue-3002 keystone): for `g` of order prime to `pq`, the grid pairs under the index
+  negation `(i,j) ↦ (−i,−j)` (`finNeg`), `η_{−i,−j}(g) = η_{ij}(g)`.  Peterfalvi's (3.9.a):
+  the complex conjugate of `η_{ij}` is the grid character at the conjugate index, and the value at
+  `g` (a rational integer by (3.9.c), hence real) equals its conjugate.  Stated with
+  `S15.finNeg` (defeq to `S16.finNeg`) so the c-side (`S16`) cites it to fill
+  `EtaGenericData.eta_pair`. -/
+  eta_pair_of_coprime : ∀ (g : G), Nat.Coprime (orderOf g) (p * q) →
+    ∀ (i : Fin q) (j : Fin p),
+      eta (finNeg q_prime.pos i) (finNeg p_prime.pos j) g = eta i j g
+  /-- **Peterfalvi (3.9), the principal grid value on generic elements** (issue-3002 keystone):
+  for `g` of order prime to `pq` (in fact for every `g`), the principal entry is `η₀₀(g) = 1`.
+  Since `ω₀₀ = 1_W` is the trivial character and `τ₃(1_W) = 1_G` (`tau3_trivial`), the value
+  is `1`.  The c-side (`S16`) cites this to fill `EtaGenericData.eta_principal`. -/
+  eta_principal_of_coprime : ∀ (g : G), Nat.Coprime (orderOf g) (p * q) →
+    eta ⟨0, q_prime.pos⟩ ⟨0, p_prime.pos⟩ g = 1
 
 namespace Hypothesis
 

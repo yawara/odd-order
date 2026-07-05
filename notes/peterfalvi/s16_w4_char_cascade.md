@@ -1880,3 +1880,66 @@ cont.⁶⁵ の判定どおり **b の §13 η-grid (issue 3002)** + a の (7.8.
 無関係)。つまり `Dade_Ind1_sub_lin` を「b の S07 territory」と見た仮説は **誤り**で、これは既に閉じた
 S09 の話。b の実 unblock 貢献は S07 でなく **issue 3002 (§13 grid → S15.Hypothesis grid field
 threading)** の landing。— lane b
+
+### b progress (2026-07-05, lane b /loop): η-grid Dade (3.9) fields LANDED on S15.Hypothesis (issue 3002 keystone)
+
+hub 裁定 (issue 3002「b = §13 η-grid keystone deep-engage」) を実施。**Peterfalvi (3.9) の η-grid
+Dade integrality/symmetry/principal を `S15.Hypothesis` の 3 新 field として threading 完了**、
+c-lane が `EtaGenericData` を構成できる citeable form を供給:
+
+- **3 新 field on `S15.Hypothesis`** (`S15_SAndT_Setup.lean`):
+  - `eta_intCast_of_coprime : ∀ g, Coprime (orderOf g) (p*q) → ∀ i j, ∃ m:ℤ, eta i j g = (m:ℂ)`
+    — **Peterfalvi (3.9.c)**、**供給は完全 sorry-free**。
+  - `eta_pair_of_coprime : ∀ g, Coprime … → ∀ i j, eta (finNeg q.pos i)(finNeg p.pos j) g = eta i j g`
+    — **Peterfalvi (3.9.a)**、**供給に sorry 1 個**(下記 honest gate)。
+  - `eta_principal_of_coprime : ∀ g, Coprime … → eta ⟨0⟩ ⟨0⟩ g = 1` — **Peterfalvi (3.9)**、
+    **供給は完全 sorry-free**。
+  - `S15.finNeg` を新規追加 (S16.finNeg と同一定義 = defeq)。S16 の `EtaGenericData.eta_pair` /
+    `eta_grid_galois_facts_on_G0` が `S16.finNeg` を使うため、c-lane の fill は defeq で通る。
+
+- **供給 chain (FeitThompson.lean, issue-3002 一時編集 zone)**:
+  - **(3.9.c) `tau3W_omegaS_intCast_of_coprime`** (Section16CharacterData 名前空間、**sorry-free**):
+    `η_ij(g) = tau3W(omegaS i j)(g) = σ(ω(ξ_ij))(g)` (既存 `omegaS_eq_omega_omegaSChar` +
+    `sigmaIntegral_apply`) → `orderOf(ξ_ij) ∣ pq` (ξ は W の character、`|W|=pq`=新 lemma `cardTPW`) →
+    `Coprime(orderOf g, pq) → Coprime(orderOf g, orderOf ξ)` → **S05 `exists_intCast_sigma_omega_apply`
+    (3.9.c σ-Galois integrality)**。これが本 keystone の deep part で、完全実証明。
+  - **(3.9) principal `tau3W_omegaS_principal_of_coprime`** (**sorry-free**): `omegaS₀₀ = trivialClassFunction`
+    (新 lemma `omegaS_principal_eq_trivial`: `omegaSChar 0 0 = 1` via `w1CharEquiv_zero`/`chi2enum_zero`/
+    `omegaProdChar_one_one`, `omega 1 = trivial`) + `tau3W_trivial`。
+  - **(3.9.a) pair `tau3W_omegaS_pair_of_coprime`** (**sorry 1 個 — documented honest gate**):
+    下記。
+  - 全 3 field を `Section16CharacterData` / `Section16Inputs` に追加し、producer
+    `section16CharacterData_of_isMinimalSimpleOdd` + 両 constructor
+    (`section16Inputs_of_isMinimalSimpleOdd` / `sectionSixteenHypothesis_of_inputs`) で thread
+    (commit 3dc9306e の tau3_isometry/omega_orthonormal threading を template に)。
+
+- **⚠ (3.9.a) finNeg-symmetry の honest gate (残 sorry の正確な obligation)**:
+  Peterfalvi (3.9.a) の真の内容は「η_ij の複素共役 = **character-inverse** index `(rowInv i, colInv j)`
+  の grid 値」(`S06_CertainTypeConjugation.chiColumn_conj`/`galoisMap_conj_omega` で実装済) + (3.9.c) で
+  値が実整数 ⟹ `η_{rowInv i, colInv j}(g) = η_ij(g)`。つまり pairing は **character 反転 `rowInv`/`colInv`**
+  (唯一の不動点 = principal) の下で honest に成立する。だが `EtaGenericData.eta_pair` /
+  `one_le_norm_eta_grid_signed_sum` が使う **組合せ的 index 反転 `finNeg = ⟨(n−i)%n,_⟩`** に一致させるには
+  `omegaSChar (finNeg i)(finNeg j) = (omegaSChar i j)⁻¹`、すなわち `w1CharEquiv (finNeg i) =
+  (w1CharEquiv i)⁻¹ (= w1CharEquiv (rowInv i))` が要る。これは **非構成的 enumeration
+  `w1BaseEquiv`/`chi2baseEnum` (`Fintype.equivFinOfCardEq`、群構造を保持しない) では FALSE**
+  (`finNeg` と `rowInv` は一般に別の置換)。Explore agent 2 回で厳密確認。
+  - **honest close の 2 択** (c-lane 判断領域):
+    (a) `w1CharEquiv`/`chi2enum` を **構造保存 enumeration** (`ZMod`-style power-map で cyclic character
+        group を列挙) に組み替え → `finNeg = rowInv` に。または
+    (b) c-side が `EtaGenericData.eta_pair` / `one_le_norm_eta_grid_signed_sum` を honest な
+        `rowInv`/`colInv` involution 上に restate (`one_le_norm_signed_paired_sum` は既に abstract
+        `Equiv.Perm` を取るので下地は在る)。
+  - この sorry は**mission の明示 fallback** (「finNeg-form supply が真に intractable なら sorry で field を
+    landing → c-lane wiring を即 unblock」) に沿う。field 3 本が landing した以上、c-lane は
+    `EtaGenericData.{eta_int, eta_pair, eta_principal}` を即結線可能。
+
+- **c-lane cite form** (`S16_NonExistenceG.eta_grid_galois_facts_on_G0` の sorry を discharge する形):
+  - `eta_int`  := `fun g hg i j => hyp.base.eta_intCast_of_coprime g (Mdata.G0_orderOf_coprime hg) i j`
+  - `eta_pair` := `fun g hg i j => hyp.base.eta_pair_of_coprime g (Mdata.G0_orderOf_coprime hg) i j`
+    (`S15.finNeg = S16.finNeg` defeq ゆえ `EtaGenericData.eta_pair` の finNeg 形に `exact` で通る)
+  - `eta_principal` := 既存 `eta_principal_apply_eq_one hyp.base g` でも可 (my `eta_principal_of_coprime`
+    は coprimality 不要の同値)。
+  - `betaM_vanish` は c が既に実証明済 (`eta_generic_data`)。
+
+- **build**: `lake build OddOrder` green (full)、新 sorry は `tau3W_omegaS_pair_of_coprime` の 1 個のみ
+  (既存 sorry-free 宣言への sorry 混入なし)。`cardTPW` 抽出で `exists_omegaS_eq_omega` の inline 証明も簡約。
