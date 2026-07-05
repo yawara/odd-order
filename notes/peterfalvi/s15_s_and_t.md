@@ -8,6 +8,25 @@
 
 ---
 
+## ✅✅ LIVE STATUS (2026-07-06 loop, lane **b**): (13.12) `c_eq_one` 数値消去を実証明 — bare sorry → 構造残余のみ
+
+- **(13.12) `c_eq_one` (a1dc3748)**: §16 `S16_NonExistenceG` が多所 (198/696/794/1315) で consume する
+  on-path producer。**bare `sorry` を撤去し数値消去を実証明**。梃子 = **(13.10) `analytic_inequality`
+  が sorry-free assembly になった** (it.2-55 の payoff): `u/c > m·p^(q-1)/q`。これ + (13.2.c) Singer
+  u-bound (`basic_structure`, `u ≤ (p^q-1)/(p-1)`) + FPF `c ≥ 2q+1` + (13.11) m-bounds で
+  `p=5 ∧ q=3 ∧ c=7` に一意収束。
+- **新 `c_eq_one_forces_params` (sorry-free 自己完結 ℚ/ℕ 算術)**: 既存 `caseB_numeric_forces_q_three`
+  で q=3 → q=3 bound `m < 3(p³-1)/(c p²(p-1))` で c≥13 排除 (< 49/100) → c=7 → p≥11 排除 (< 399/847)
+  → p<11 → **p=7 は exact-m** (m=½−1/(2·3⁶)=½−1/1458 > bound 171/343) で排除 → p=5。
+  ※ p=7 は m>49/100 では落ちない (bound≈0.4985>0.49) ため exact-m 必須 (Pf は coprimality 使用、こちらは
+  exact-m で回避)。
+- **残る唯一の gap = `c_eq_one_final_case` (明示 sorried)**: `p=5∧q=3∧c=7 → False`。u∣31 (case 9.7.b、
+  p-1=4 に奇因子なし) → c=7 coprime u → PC normal nilpotent Hall ⊋ P=S_F 矛盾 (typeP_Galois 二分 +
+  Fitting-core maximality `Fcore_max`、Coq `FTtypeP_Ind_Fitting_reg_Fcore`)。**深い §13 σ 構造残余、
+  次に (13.12) を触るならここだけ**。full build 3929 green / AxiomsCheck OK / sorry 数不変 (bare→isolated 移動)。
+- **副産物メモ**: 同じ (13.10)+(13.2.c) 素材は (13.15) `caseB_order_u` (現 opaque-Prop sorried) や
+  (13.11) `numeric_bounds` q=3 branch (u/c > (p²-1)/6 部分) にも効く見込み。
+
 ## ✅✅ LIVE STATUS (2026-07-05 loop it.46-55, lane **b**): (13.9.a) 完全実証明 + (13.3) campaign 設計
 
 - **it.46-48**: (13.3) producer campaign 設計 (issue 2035) — route A ((9.11) = repo
