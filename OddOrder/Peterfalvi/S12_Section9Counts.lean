@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core
+import OddOrder.Peterfalvi.S08_SixTwoGeneral
 
 /-!
 # Peterfalvi (11.8.1): the §9 counts for the §10 grid
@@ -474,6 +475,76 @@ theorem reducible_mem_sOf_bot_mem_sOf_H0 [Finite G] (hG : OddOrder.BG.IsMinimalS
   have hmem : φ ∈ {ψ ∈ sOf data (⊥ : Subgroup G) | ¬ IsIrreducibleCharacter ψ} := ⟨hφ, hred⟩
   rw [← hAB] at hmem
   exact hmem.1
+
+open scoped FiniteInduce in
+open OddOrder.Peterfalvi.S11 in
+/-- **(9.8) classification at the bridge family**: a *reducible* member of the general
+kernel-filter family `inducedKernelFamily M'-trace B` (any `B`) is a nonzero μ-grid column sum.
+
+Unlike the `𝒮(H₀)`-route, the trivial column is excluded directly by the family's `θ ≠ 1`
+condition (`chiRestrict_one_eq_trivial`), so no `𝒳`-kernel condition is needed — this covers
+the h56 break members (issue 2022, the U-side case being impossible for *reducible* members
+precisely because the trivial column is the only `H`-trivial one among the `χ_j`). -/
+theorem Hypothesis.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M) (hnt : TypePNontrivialCore M hyp.typeP)
+    (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetup htype hnt))
+    {B : Subgroup ↥M} {ψ : ClassFunction ↥M ℂ}
+    (hψ : ψ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+      ((derivedInG M).subgroupOf M) B)
+    (hred : ¬ IsIrreducibleCharacter ψ) :
+    ∃ k : Fin hyp.w2, k ≠ 0 ∧ ψ = ∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i k := by
+  haveI := hyp.finiteG
+  classical
+  obtain ⟨θ, hθne, hθker, rfl⟩ := hψ
+  let h := (hyp.toCertainTypeHypothesis hG hG.odd).toHypothesis
+  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  letI : Fintype ↥M := Fintype.ofFinite _
+  letI : Fintype ↥h.K := Fintype.ofFinite _
+  letI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have hFk : ∀ j : Fin hyp.w2, (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j)
+      = ClassFunction.induce h.K
+          ((h.chiRestrict (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j)))
+            : ClassFunction ↥h.K ℂ) := by
+    intro j
+    rw [h.coe_chiRestrict, h.induce_restrict_certainType_eq,
+      ← Equiv.sum_comp (finCongr hcardW1.symm)
+      (fun i' => ((h.columnFamily
+        (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j))).mu i'
+          : ClassFunction ↥M ℂ))]
+    exact Finset.sum_congr rfl (fun i _ => by unfold Hypothesis.muGrid; rfl)
+  -- the reducible source is a §6 column
+  obtain ⟨χ₂', hχ₂'⟩ := (h.induce_not_isIrreducible_iff θ).mp hred
+  have hχ₂'ne : χ₂' ≠ 1 := by
+    rintro rfl
+    rw [h.chiRestrict_one_eq_trivial] at hχ₂'
+    exact hθne hχ₂'.symm
+  refine ⟨finCongr hcardW2sub ((finCardEquivCharacterGroup _).symm χ₂'), ?_, ?_⟩
+  · intro h0
+    apply hχ₂'ne
+    have hs0 : (finCardEquivCharacterGroup
+        ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))).symm χ₂' = 0 := by
+      have := congrArg (finCongr hcardW2sub.symm) h0
+      simpa using this
+    calc χ₂' = finCardEquivCharacterGroup _
+          ((finCardEquivCharacterGroup _).symm χ₂') := (Equiv.apply_symm_apply _ _).symm
+      _ = finCardEquivCharacterGroup _ 0 := by rw [hs0]
+      _ = 1 := finCardEquivCharacterGroup_zero _
+  · rw [hFk, show finCongr hcardW2sub.symm
+        (finCongr hcardW2sub ((finCardEquivCharacterGroup _).symm χ₂'))
+        = (finCardEquivCharacterGroup _).symm χ₂' from by simp,
+      Equiv.apply_symm_apply, hχ₂']
+    exact rfl
 
 /-! ## (11.8.1): `d ≡ 1 (mod q)` and `δ = 1` -/
 
