@@ -841,3 +841,12 @@ vs CharacterDifferenceImage.Orthogonal) の突合が実装時の最初の確認�
   φ.comp U.subtype 形; Q は U-pointwise-fixed ゆえ U-invariant) → parity kernel;
   case (a) = φ_w 鎖。両 case とも hUcent (U centralizes H₀, S13 側 U_centralizes_H0)
   を入力仮定に取る generic 形で書く。
+
+## 2026-07-05 lane-a (loop 62): (11.7) case (b) 完全閉鎖 — chiefKernel_caseB_false
+
+- U-既約分岐を generic (data, chief) level で sorry-free 化 (commit 参照)。
+- 技術メモ: IsAInvariant の • は change で map 化 (quotientMulAutHom の def と同型);
+  pointwise-smul の hom-algebra rw は toMonoidEnd 形に阻まれる → 要素ベース le_antisymm が正解。
+  π-同変性は QuotientGroup.induction_on + rfl (apply lemma が rfl なので)。
+- 残: case (a) φ_w-鎖 (CliffordCaseAData ではなく raw S₀ dichotomy 分岐から直接;
+  W₁-orbit 生成 + LineScalarCharacter 系で φ_w 構成) → master → S13 instantiation。
