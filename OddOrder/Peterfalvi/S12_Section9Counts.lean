@@ -314,6 +314,107 @@ theorem Hypothesis.muGrid_column_sum_mem_sOf_H0_and_reducible [Finite G]
   rw [← hAeqB] at hmemB
   exact ⟨hmemB.1, hmemB.2⟩
 
+open scoped FiniteInduce in
+open OddOrder.Peterfalvi.S11 in
+/-- **Peterfalvi (9.8.a-b), reducible-member classification**: every *reducible* member of
+`𝒮(H₀)` is a nonzero μ-grid column sum `μ_k = ∑_i μ_{ik}` (`k ≠ 0`).
+
+Public extraction of the `A ⊆ B` step inside `muGrid_column_sum_mem_sOf_H0_and_reducible`
+(the reducible transported source is a §6 column `χ_j` by (4.5.b) `induce_not_isIrreducible_iff`,
+the trivial column being excluded by the `𝒳`-kernel condition); shared preamble duplicated.
+This is the ψ-column identification the (5.2.d) reducible-break datum consumes (issue 2022). -/
+theorem Hypothesis.reducible_mem_sOf_H0_eq_muGrid_columnSum [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M) (hnt : TypePNontrivialCore M hyp.typeP)
+    (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetup htype hnt))
+    {φ : ClassFunction ↥M ℂ}
+    (hφS : φ ∈ sOf (hyp.toTypesIIIIIIVSetup htype hnt) chief.H0)
+    (hφred : ¬ IsIrreducibleCharacter φ) :
+    ∃ k : Fin hyp.w2, k ≠ 0 ∧ φ = ∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i k := by
+  haveI := hyp.finiteG
+  classical
+  let h := (hyp.toCertainTypeHypothesis hG hG.odd).toHypothesis
+  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  letI : Fintype ↥M := Fintype.ofFinite _
+  letI : Fintype ↥h.K := Fintype.ofFinite _
+  letI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have hFk : ∀ j : Fin hyp.w2, (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j)
+      = ClassFunction.induce h.K
+          ((h.chiRestrict (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j)))
+            : ClassFunction ↥h.K ℂ) := by
+    intro j
+    rw [h.coe_chiRestrict, h.induce_restrict_certainType_eq,
+      ← Equiv.sum_comp (finCongr hcardW1.symm)
+      (fun i' => ((h.columnFamily
+        (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j))).mu i'
+          : ClassFunction ↥M ℂ))]
+    exact Finset.sum_congr rfl (fun i _ => by unfold Hypothesis.muGrid; rfl)
+  obtain ⟨χ, hχxi, rfl⟩ := hφS
+  have hKeq : huSub (hyp.toTypesIIIIIIVSetup htype hnt) = (derivedInG M).subgroupOf M :=
+    huSub_eq_derivedInG_subgroupOf _
+  have hχKirr : IsIrreducibleCharacter
+      (ClassFunction.compHom (MulEquiv.subgroupCongr hKeq.symm).toMonoidHom
+        (χ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetup htype hnt)) ℂ)) :=
+    IsIrreducibleCharacter.compHom_of_surjective
+      (MulEquiv.surjective _) χ.isIrreducible
+  have hind : ClassFunction.induce ((derivedInG M).subgroupOf M)
+      (ClassFunction.compHom (MulEquiv.subgroupCongr hKeq.symm).toMonoidHom
+        (χ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetup htype hnt)) ℂ))
+      = induceHU (hyp.toTypesIIIIIIVSetup htype hnt)
+          (χ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetup htype hnt)) ℂ) :=
+    induce_compHom_subgroupCongr hKeq.symm _
+  obtain ⟨χ₂', hχ₂'⟩ := (h.induce_not_isIrreducible_iff ⟨_, hχKirr⟩).mp (by
+    show ¬ IsIrreducibleCharacter (ClassFunction.induce ((derivedInG M).subgroupOf M)
+      (ClassFunction.compHom (MulEquiv.subgroupCongr hKeq.symm).toMonoidHom
+        (χ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetup htype hnt)) ℂ)))
+    rw [hind]
+    exact hφred)
+  have hχ₂'ne : χ₂' ≠ 1 := by
+    rintro rfl
+    rw [h.chiRestrict_one_eq_trivial] at hχ₂'
+    refine hχxi.1 ?_
+    have hval : ∀ y : ↥((derivedInG M).subgroupOf M),
+        (χ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetup htype hnt)) ℂ)
+          ((MulEquiv.subgroupCongr hKeq.symm) y) = 1 := by
+      intro y
+      have hcoe := congrArg
+        (fun c : IrreducibleCharacter ↥h.K => (c : ClassFunction ↥h.K ℂ) y) hχ₂'
+      simpa [IrreducibleCharacter.coe_trivialIrreducibleCharacter,
+        ClassFunction.compHom_apply] using hcoe.symm
+    intro x _hx
+    rw [OddOrder.Peterfalvi.S03.mem_characterKernel,
+      OddOrder.Peterfalvi.S03.characterDegree_def]
+    have hx1 := hval ((MulEquiv.subgroupCongr hKeq.symm).symm x)
+    have hone := hval ((MulEquiv.subgroupCongr hKeq.symm).symm 1)
+    rw [MulEquiv.apply_symm_apply] at hx1 hone
+    rw [hx1, hone]
+  refine ⟨finCongr hcardW2sub ((finCardEquivCharacterGroup _).symm χ₂'), ?_, ?_⟩
+  · intro h0
+    apply hχ₂'ne
+    have hs0 : (finCardEquivCharacterGroup
+        ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))).symm χ₂' = 0 := by
+      have := congrArg (finCongr hcardW2sub.symm) h0
+      simpa using this
+    calc χ₂' = finCardEquivCharacterGroup _
+          ((finCardEquivCharacterGroup _).symm χ₂') := (Equiv.apply_symm_apply _ _).symm
+      _ = finCardEquivCharacterGroup _ 0 := by rw [hs0]
+      _ = 1 := finCardEquivCharacterGroup_zero _
+  · rw [hFk, show finCongr hcardW2sub.symm
+        (finCongr hcardW2sub ((finCardEquivCharacterGroup _).symm χ₂'))
+        = (finCardEquivCharacterGroup _).symm χ₂' from by simp,
+      Equiv.apply_symm_apply, hχ₂']
+    exact hind.symm
+
 /-! ## (11.8.1): `d ≡ 1 (mod q)` and `δ = 1` -/
 
 open OddOrder.Peterfalvi.S11 in
