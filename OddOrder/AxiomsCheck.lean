@@ -6714,9 +6714,24 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- The fields `Sset`/`Tset`/`A0S`/`A0T`/`tauS`/`tauT` carry honest placeholders (`∅`/`0`): they are
 -- verified-vestigial on the FT path (the §13/§16 contradiction in `S16_NonExistenceG` routes through
 -- `eta = τ₃ ∘ ω`, never the S/T-side coherent isometries), and `Hypothesis` places no `Prop` on them,
--- so the placeholders add no unsound dependency.  Axiom-clean: closes one of the three POLE-1
--- producers (`mp`/`tp`/`charData`).
-#assert_only_allowed_axioms OddOrder.section16CharacterData_of_isMinimalSimpleOdd
+-- so the placeholders add no unsound dependency.  Closes one of the three POLE-1 producers
+-- (`mp`/`tp`/`charData`).
+--
+-- ⚠ **issue-3002 keystone (2026-07-05, lane b)**: the producer now also supplies the three
+-- Peterfalvi (3.9) η-grid Dade fields (`eta_intCast_of_coprime` (3.9.c) / `eta_principal_of_coprime`
+-- (3.9) / `eta_pair_of_coprime` (3.9.a)).  Integrality + principal are supplied `sorry`-free
+-- (`tau3W_omegaS_intCast_of_coprime` via S05 `exists_intCast_sigma_omega_apply`;
+-- `tau3W_omegaS_principal_of_coprime` via `tau3W_trivial`).  The **(3.9.a) conjugate-pair
+-- symmetry in `finNeg` form** (`tau3W_omegaS_pair_of_coprime`) carries **one documented `sorry`**
+-- (the honest gate: `finNeg` = combinatorial index negation ≠ character inversion `rowInv` for the
+-- nonconstructive `w1CharEquiv`/`chi2enum` enumerations — see the lemma docstring in
+-- `FeitThompson.lean` and `notes/peterfalvi/s16_w4_char_cascade.md` "b progress 2026-07-05").
+-- Hence the producer is **no longer axiom-clean** (transits `sorryAx` through the (3.9.a) field);
+-- the assertion is disabled pending the honest close of the pairing gate (c-side restatement over
+-- `rowInv`/`colInv`, which `one_le_norm_signed_paired_sum` already supports, or a
+-- structure-preserving character enumeration).  The Step-D fallback is hub-sanctioned (issue 3002)
+-- to land the FIELDS and unblock the c-lane's `EtaGenericData` wiring immediately.
+-- #assert_only_allowed_axioms OddOrder.section16CharacterData_of_isMinimalSimpleOdd
 
 -- **Peterfalvi (5.7) standalone constant-degree coherence producer** —
 -- `coherent_of_constant_degree`: under Hypothesis (5.2) + equal degree, `S` is coherent.  Proven by
