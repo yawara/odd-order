@@ -431,3 +431,91 @@ clean/quick な ungated leaf は現時点で枯渇。
   mu_tau1_formula (S05 (5.8) machinery threading)。
 - **次 session 推奨**: 上記 gated-endpoint body を専用 session で landing (SibleyTarget 仮説化で
   §14 依存を parallel track に切り出し、(13.3) 構成 principle を実証)。
+
+## 2026-07-06 更新 #2 (lane b, 専用エージェント調査): (13.3) の実 gate = S15→S13 bridge (sibleyTarget 診断は誤り)
+
+**gated-endpoint body (`character_degree_analysis_of_sibleyTarget`) 戦略は REFUTED** (build-capable
+agent が probe → coupling wall 確認 → 綺麗に revert、net-zero/green)。根本原因:
+- **spine は `S15.Hypothesis` を `Sset:=∅ / A0S:=∅ / tauS:=0` で instantiate** (`FeitThompson.lean:2668`、
+  vestigial・hub 裁定 `sibleyTarget_S` docstring 760-773「do not complete」)。ゆえ
+  `cohereOfSibleyTarget wit_S` の extension は `zSpan ∅ = {0}` 上でしか保証を持たず、nonzero
+  `induce θ` に無力 → **4 tau1S fields は cohereOfSibleyTarget から取れない**。
+- coherence+(5.8) machinery (`coherent_S_of_coherent_SH0C` S13:1192、`sixTwoDecompositionData`
+  `S13_SixTwoBridge.lean:814`、**両方 sorry-free**) は **`S13/S14.Hypothesis M` 世界**の
+  parameterization。honest `.base.tau`/`.base.Sset` を持つ。
+- **`sibleyTarget_H0C` は named では存在しない** (最も近いのは `coherent_S_of_coherent_SH0C`、Hypothesis M 世界)。
+  従来の「(13.3) = sibleyTarget_H0C §14-gated」診断は不正確。
+
+**⟹ (13.3) の真の gate = `S15.Hypothesis → S13.Hypothesis (hyp.S)` reduction + `hyp.mu`/`hyp.eta` ↔
+`muGrid`/`Section16CharacterData` grid reconciliation の bridge を構築すること**。この bridge が
+在れば **既 proven の `sixTwoDecompositionData`/(5.8) で `tau1S_*`/`mu_col`/`mu_tau1_formula` を discharge 可**。
+これが本物の §14 work (structural、char-analytic でない — 相対的に tractable かもしれないが multi-session)。
+
+**今 proven 可の 2 fields** (bridge 無しでも): `mu_j_linear_induced` ← `mu_j_isIndPC` (:2621) /
+`delta_eq_one` S-side ← `delta_eq_one_S` (:3537)。**別 gap**: T-side `δ'_i=1` は `deltaPrime_eq_one`
+不在 (delta_eq_one_S の T-side mirror が要る)。
+
+**次 session 推奨**: (13.3) を直接触らず、上記 **S15→S13 Hypothesis bridge + grid reconciliation** を
+専用 session で。それまで `character_degree_analysis` の単一 sorry を fan-out しない (undischargeable
+hypotheses に分解するのは net-negative)。
+
+## 2026-07-06 更新 #3 (lane b, 型検証): S13-bridge 診断は誤り — 型 II vs III/IV 不整合。route A (S11) が正
+
+更新 #2 の「S15→S13 Hypothesis bridge」推奨は **型不整合で無効と判明**:
+- `S13.Hypothesis` (S13_MaximalIII_IV.lean:108) は **`type_alt : IsTypeIII M ∨ IsTypeIV M`** (:122) を
+  要求。しかし `hyp.S` は **type II** (`S_typeP2` → `isTypeII_of_isTypeP2`)。⟹ `coherent_S_of_coherent_SH0C`
+  (:1192、S13.Hypothesis 経由ゆえ **type III/IV 専用**) は type-II `hyp.S` に**適用不可**。S13 route は dead-end。
+- **正しい (13.3) type-II path = route A via S11** (issue 冒頭の設計に回帰):
+  1. `toTypesIIIIIIVSetupS` (S15:458, **sorry-free 既存**) で S15→S11.TypesIIIIIIVSetup(hyp.S) — type II/III/IV 汎用ゆえ type-II OK。
+  2. **honest `Section11CharacterData` for hyp.S** — ∅-placeholder (`mkSection11CharacterDataS` は
+     H0CprimeSupport:=∅/count-only) を避け、実 H0CprimeSupport = (H₀ ⊔ C')^# + 実 Dade tau
+     (S15 `H_sharp_dadeHypothesis` の (S,(H₀C')^#)-版を mirror)。**これが実 gate**。
+  3. `coherent_H0C_commutator` (S11:6361, TypesIIIIIIVSetup 汎用) → `IsCoherent`。`sibleyTarget_H0C`
+     (S11:6348 sorried §14) を sorried-cite。
+  4. coherence.extension = tau1S → (13.3) の tau1S_* fields を discharge。
+- **建設順**: honest Section11CharacterData (step 2) が最初の substantial build。実 support は構成可
+  ((H₀⊔C')^#)、実 Dade tau が hard 部 (S04 Hypothesis for (S,(H₀C')^#))。multi-session。
+
+## 2026-07-06 更新 #4 (lane b): (13.3) tractable と判明 — chars.tau は free field + S-instance で H₀=⊥。増分 build 計画
+
+**tractability breakthrough**: `Section11CharacterData` (S11:2002) は property 制約が
+`u_eq_card_quotient` のみ、**`H0CprimeSupport`/`tau` は free data field**。ゆえ:
+- **S-instance simplification**: `toTypesIIIIIIVSetupS_chief_N_eq_bot` (S15:531) で **N=⊥, H₀=⊥**
+  (|P|=p^q=(chief.p)^q ⟹ chief.p=p, N=⊥)。⟹ honest support = (H₀⊔C')^# = **(C')^#** (C'=[C,C])。
+- **`chars.tau := Ind_S^G`** に設定可 (free field)。すると `coherent_H0C_commutator chars`
+  (sibleyTarget_H0C sorried-backed) の `IsCoherent (Ind_S^G) chars.S support` から
+  `.extension = tau1S`、`extends_on_supported: tau1S = Ind_S^G on supported span` ⟹
+  **`tau1S_apply_induce_sub` は family⊆supported で成立**。`tau1S_inner_induce` ← `extension_inner_eq`、
+  `tau1S_induce_mem_ZIrr` ← `extension_mem_ZIrr`。
+
+**増分 build 計画 (各 lemma は standalone compile → commit 可、最後に assemble)**:
+1. `Ind_S^G` を `IntegralCharacterMap ↥S G` として (ClassFunction.induce の ℤ-linear wrap)。
+2. `(C')^#` = ([C,C])^# support の TI/family-membership 性質 (Ind θ ∈ zSpan chars.S 等)。
+3. honest `mkSection11CharacterDataS_honest` (tau:=Ind_S^G, support:=(C')^#)。
+4. tau1S extraction + 4 tau1S_* fields (coherence + family membership から)。
+5. lambda (13.3.b) + mu_col_tau1 (5.8) + mu_tau1_formula → CharacterDegreeData assemble。
+6. `character_degree_analysis` = 上記 + sorried-cite sibleyTarget_H0C。
+
+**注意**: main が S11 を 338 行 restructure 済 (2026-07-06 merge)。build 前に coherent_H0C_commutator
+(現 S11:6628) の現行 signature 再確認。
+
+## 2026-07-06 更新 #5 (lane b): ✅ foundation (step 1-4) LANDED — τ₁ extension 実構成 (commit 0032cc7a)
+
+**tractability breakthrough は実証された** (bounded agent build、full 3929 green / AxiomsCheck OK /
+新 axiom なし / sorry 数不変):
+- ✅ `indS` : Ind_S^G を IntegralCharacterMap ↥S G として (induce_add/smul + restrictScalars ℤ)。sorry-free。
+- ✅ `Cprime`/`cprimeSharpS` : (C')^# support (H₀=⊥ 退化)。sorry-free。
+- ✅ `mkSection11CharacterDataS_honest` : tau:=Ind_S^G / support:=(C')^#。sorry-free。
+- ✅ `coherent_H0Cprime_S` → `tau1S_ofHonest` (=.extension = (13.2.d) τ₁) + `tau1S_ofHonest_extends_on_supported`
+  (τ₁=Ind_S on supported span)。sibleyTarget_H0C (§14) のみ sorried-cite。
+
+**残 (13.3) work (foundation 済ゆえ全て unblocked)**:
+- **step 5a (tau1S_* fields)**: CharacterDegreeData の `tau1S_apply_induce_sub`/`tau1S_inner_induce`/
+  `tau1S_induce_mem_ZIrr`/`tau1S_induce_inner_eta` を tau1S_ofHonest + extends_on_supported +
+  **family membership** (Ind θ ∈ zSpan chars.S、differences ∈ zSupportedSpan — 要 (7.6)-family 構造) から証明。
+- **step 5b (lambda 13.3.b)**: degree-uq irreducible λ (column sum でなく specific 既約構成)。
+- **step 5c (mu_col/mu_tau1 5.8)**: mu_col_tau1_eta_col_one + mu_tau1_formula (S05 (5.8) machinery)。
+- **step 6 (assemble)**: CharacterDegreeData 全 field → `character_degree_analysis` = 上記 + sorried-cite。
+- **T-side δ' (別 gap)**: deltaPrime_eq_one (delta_eq_one_S mirror、T-side 構造要)。
+
+**次**: step 5a (tau1S_* fields via family membership) — 最も foundation に近い増分。

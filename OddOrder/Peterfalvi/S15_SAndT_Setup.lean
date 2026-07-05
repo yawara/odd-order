@@ -494,6 +494,119 @@ noncomputable def Hypothesis.mkSection11CharacterDataS [Finite G]
   tau := hyp.tauS
   quotientSemidirectFrobenius := True
 
+open scoped FiniteInduce in
+/-- **`Ind_S^G` as a `ℂ`-linear map** `CF(S) →ₗ[ℂ] CF(G)` (issue 2035 step 1).  The
+canonical class-function induction `ClassFunction.induce hyp.S`, bundled as a linear map;
+linearity is `ClassFunction.induce_add` / `ClassFunction.induce_smul`.  This is the concrete
+Peterfalvi (13.2.e)/(7.2) Dade isometry `τ = Ind_S^G` (the `(S, H^#)` isometry coincides with
+induction), used as the honest `tau` of the §9 character data on `S`. -/
+noncomputable def Hypothesis.indSLinearC [Finite G] (hyp : Hypothesis (G := G)) :
+    ClassFunction ↥hyp.S ℂ →ₗ[ℂ] ClassFunction G ℂ where
+  toFun := ClassFunction.induce hyp.S
+  map_add' := ClassFunction.induce_add hyp.S
+  map_smul' c θ := ClassFunction.induce_smul hyp.S c θ
+
+open scoped FiniteInduce in
+@[simp] theorem Hypothesis.indSLinearC_apply [Finite G] (hyp : Hypothesis (G := G))
+    (θ : ClassFunction ↥hyp.S ℂ) :
+    hyp.indSLinearC θ = ClassFunction.induce hyp.S θ := rfl
+
+open scoped FiniteInduce in
+/-- **`Ind_S^G` as an `IntegralCharacterMap ↥S G`** (issue 2035 step 1): the `ℤ`-linear
+`Ind_S^G`, obtained by restricting scalars of the `ℂ`-linear `indSLinearC`.  This is the honest
+`τ` value the §9 coherence (`coherent_H0C_commutator`) consumes for the (13.3) `S`-instance —
+Peterfalvi's `τ = Ind_S^G` (13.2.e). -/
+noncomputable def Hypothesis.indS [Finite G] (hyp : Hypothesis (G := G)) :
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥hyp.S G :=
+  (hyp.indSLinearC).restrictScalars ℤ
+
+open scoped FiniteInduce in
+@[simp] theorem Hypothesis.indS_apply [Finite G] (hyp : Hypothesis (G := G))
+    (θ : ClassFunction ↥hyp.S ℂ) :
+    hyp.indS θ = ClassFunction.induce hyp.S θ := rfl
+
+/-- **`C' = [C, C]` as a subgroup** (Peterfalvi (9.5), `S`-instance): the derived subgroup of
+`C = C_U(P)`.  Definitionally matches the §9 `cprimeSub` (`= derivedInG (cSub …)`) once the
+`S`-instance kernel `cSub = C` identification (`toTypesIIIIIIVSetupS_cSub_eq_C`) is applied. -/
+def Hypothesis.Cprime (hyp : Hypothesis (G := G)) : Subgroup G := derivedInG hyp.C
+
+/-- **The honest `(H₀ ⊔ C')^#`-support for the `S`-instance, `= (C')^#`** (issue 2035 step 2).
+For the `S`-instance the chief kernel is trivial (`toTypesIIIIIIVSetupS_chief_N_eq_bot`, giving
+`H₀ = ⊥`), so the §9 `H₀C'`-support degenerates to `(C')^#` — the non-identity elements of
+`C' = [C, C]`, viewed inside `↥S` via `C' ≤ C ≤ U ≤ S`.  This is the genuine `H0CprimeSupport`
+of the honest §9 character data on `S`, replacing the `∅`-placeholder of `mkSection11CharacterDataS`. -/
+def Hypothesis.cprimeSharpS (hyp : Hypothesis (G := G)) : Set ↥hyp.S :=
+  OddOrder.Peterfalvi.S04.sharp ((hyp.Cprime).subgroupOf hyp.S : Set ↥hyp.S)
+
+@[simp] theorem Hypothesis.mem_cprimeSharpS (hyp : Hypothesis (G := G)) {x : ↥hyp.S} :
+    x ∈ hyp.cprimeSharpS ↔ (x : G) ∈ hyp.Cprime ∧ x ≠ 1 := by
+  simp only [Hypothesis.cprimeSharpS, OddOrder.Peterfalvi.S04.mem_sharp, SetLike.mem_coe,
+    Subgroup.mem_subgroupOf]
+
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+/-- **Honest §9 character data on `S`** (issue 2035 step 3): the `mkSection11CharacterDataS`
+mirror with the *genuine* coherence inputs — `tau := Ind_S^G` (`indS`, Peterfalvi (13.2.e)) and
+`H0CprimeSupport := (C')^#` (`cprimeSharpS`, the `S`-instance degeneration of `(H₀ ⊔ C')^#` via
+`H₀ = ⊥`) — instead of the `∅`/`tauS` degree-only placeholders.  Fed to `coherent_H0C_commutator`
+to extract the coherent extension `τ₁` (the (13.2.d)⇐(9.11) route to the (13.3) `τ₁`-fields).  `u`
+and `u_eq_card_quotient` are unchanged (rfl-pinned to the `U`-action image, as in the placeholder). -/
+noncomputable def Hypothesis.mkSection11CharacterDataS_honest [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
+    OddOrder.Peterfalvi.S11.Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief where
+  u := Nat.card ↥(((quotientMulAutHom (N := chief.N) chief.N_aInvariant).comp
+      ((hyp.toTypesIIIIIIVSetupS hG).typeP.U.subgroupOf
+        ((hyp.toTypesIIIIIIVSetupS hG).typeP.U
+          ⊔ (hyp.toTypesIIIIIIVSetupS hG).typeP.W1)).subtype).range)
+  u_eq_card_quotient := rfl
+  H0CprimeSupport := hyp.cprimeSharpS
+  tau := hyp.indS
+  quotientSemidirectFrobenius := True
+
+open scoped FiniteInduce in
+/-- **(9.11)-coherence of the honest `S`-instance §9 data** (issue 2035 step 4).  Applies the
+(6.8)-wired `coherent_H0C_commutator` (via the §14-gated `sibleyTarget_H0C`) to the honest
+character data (`mkSection11CharacterDataS_honest`), yielding `IsCoherent Ind_S^G 𝒮 (C')^#` — the
+Peterfalvi (13.2.d)⇐(9.11) coherence for `S(H₀C')` with the genuine Dade map `τ = Ind_S^G` and
+support `(C')^#`.  The only gap is `sibleyTarget_H0C` (§14 structural witness, sorried-cite). -/
+noncomputable def Hypothesis.coherent_H0Cprime_S [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
+    OddOrder.Peterfalvi.S07.IsCoherent (hyp.mkSection11CharacterDataS_honest hG chief).tau
+      (hyp.mkSection11CharacterDataS_honest hG chief).S
+      (hyp.mkSection11CharacterDataS_honest hG chief).H0CprimeSupport :=
+  OddOrder.Peterfalvi.S11.coherent_H0C_commutator (hyp.mkSection11CharacterDataS_honest hG chief)
+
+open scoped FiniteInduce in
+/-- **The coherent extension `τ₁` for the honest `S`-instance** (issue 2035 step 4): the
+`.extension` of the (9.11)-coherence `coherent_H0Cprime_S`.  This is the (13.2.d) `τ₁ :
+IntegralCharacterMap ↥S G` that the (13.3) degree analysis threads (the `μ_j^{τ₁}` machinery).
+Sorried-cite via `sibleyTarget_H0C` (§14). -/
+noncomputable def Hypothesis.tau1S_ofHonest [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥hyp.S G :=
+  (hyp.coherent_H0Cprime_S hG chief).extension
+
+open scoped FiniteInduce in
+/-- **Type-alignment probe for the (13.3) `τ₁` route** (issue 2035 step 4 verification): confirms
+`coherent_H0Cprime_S` obtains and its `.extension` is definitionally `tau1S_ofHonest`, of the
+expected `IntegralCharacterMap ↥S G` type; and that `extends_on_supported` gives
+`τ₁ φ = Ind_S^G φ` on the supported span (`tau1S_apply_induce` on the family) — the input to the
+(13.3) `tau1S_apply_induce_sub` / `tau1S_inner_induce` / `tau1S_induce_mem_ZIrr` fields. -/
+theorem Hypothesis.tau1S_ofHonest_extends_on_supported [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))
+    (φ : ClassFunction ↥hyp.S ℂ)
+    (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan
+      (hyp.mkSection11CharacterDataS_honest hG chief).S
+      (hyp.mkSection11CharacterDataS_honest hG chief).H0CprimeSupport) :
+    hyp.tau1S_ofHonest hG chief φ = ClassFunction.induce hyp.S φ := by
+  have h := (hyp.coherent_H0Cprime_S hG chief).extends_on_supported φ hφ
+  -- `.extension φ = chars.tau φ = indS φ = Ind_S^G φ`
+  simpa [Hypothesis.tau1S_ofHonest, Hypothesis.mkSection11CharacterDataS_honest,
+    Hypothesis.indS_apply] using h
+
 /-- **Peterfalvi (13.2.b), order part**: the Fitting kernel `P = S_F` has order `p^q`.
 
 This is the order half of (13.2.b) ("`P` is elementary abelian of order `p^q`").  `S` is of Type II
