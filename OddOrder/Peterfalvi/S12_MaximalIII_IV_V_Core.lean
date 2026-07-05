@@ -4840,6 +4840,138 @@ theorem Hypothesis.tau_muGridAlpha_eq [Finite G] {M : Subgroup G}
   exact tic.eq_smul_chiFam_diff_of_vanishOnV hVeq app hXZ hXfacts.2 hPne hδpm hψV
 
 open scoped FiniteInduce in
+/-- **Peterfalvi (10.5), coherence-free row-difference form**: for nontrivial columns
+`j ≠ k` in the same row `i`, `(μ_{ij} − μ_{ik})^τ = δ·(ω_{ij}^σ − ω_{ik}^σ)`.
+
+Unlike `alpha_tau_image` this needs **no** `CoherentHypothesis`: the `n·ζ` legs of the two
+`α`'s cancel in the row difference (equal degrees, (10.3) `degree_independent`), so the
+`V`-vanishing legs (`tau_muGridAlpha_apply_eq_on_typePV`, coherence-free) subtract to give the
+`ψ`-vanishing, and the norm-2 trichotomy engine applies to `X = (μ_{ij} − μ_{ik})^τ` directly.
+This is the repo analogue of Coq's coherence-free `FTtypeP_subcoherent` `R`-datum for the
+μ-grid (issue 2022, the (5.2.d) reducible-column route). -/
+theorem Hypothesis.tau_muGrid_row_diff [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) {params : CharacterParameters hyp}
+    (hmu : params.mu = hyp.muGrid hG hodd)
+    (hzS : params.zeta ∈ inducedFamily M) (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hodd j = params.delta)
+    (i : Fin hyp.w1) {j k : Fin hyp.w2} (hj0 : j ≠ 0) (hk0 : k ≠ 0) (hjk : j ≠ k) :
+    hyp.tau (hyp.muGrid hG hodd i j - hyp.muGrid hG hodd i k)
+      = (params.delta : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j
+          - hyp.alignedOmegaSigmaGrid hG hodd i k) := by
+  haveI := hyp.finiteG
+  classical
+  -- degrees and the `α`-difference identity
+  have hdegj : hyp.muGrid hG hodd i j 1 = (params.d : ℂ) := by
+    rw [← hmu]; exact params.degree_independent i j hj0
+  have hdegk : hyp.muGrid hG hodd i k 1 = (params.d : ℂ) := by
+    rw [← hmu]; exact params.degree_independent i k hk0
+  have hμ0 : hyp.muGrid hG hodd i 0 1 = 1 := hyp.muGrid_zero_column_apply_one hG hodd i
+  have hα : hyp.muGrid hG hodd i j - hyp.muGrid hG hodd i k
+      = params.alpha i j - params.alpha i k := by
+    rw [params.alpha_def, params.alpha_def, hmu]
+    abel
+  -- `X ∈ ℤ[Irr G]`: the difference is `A₀`-supported and integral
+  have hsupp : (hyp.muGrid hG hodd i j - hyp.muGrid hG hodd i k).support ⊆ hyp.A0 := by
+    rw [hα]
+    intro x hx
+    rw [ClassFunction.mem_support, ClassFunction.sub_apply] at hx
+    by_cases h1 : params.alpha i j x = 0
+    · refine params.alpha_support i k hk0 ?_
+      rw [ClassFunction.mem_support]
+      intro h2
+      exact hx (by rw [h1, h2, sub_zero])
+    · exact params.alpha_support i j hj0 (ClassFunction.mem_support.mpr h1)
+  -- `X ∈ ℤ[Irr G]` via the two `α`-legs
+  have hXZ : hyp.tau (hyp.muGrid hG hodd i j - hyp.muGrid hG hodd i k) ∈ ZIrr G := by
+    rw [hα, params.alpha_def, params.alpha_def, hmu, map_sub]
+    exact Submodule.sub_mem _
+      (hyp.muGridAlpha_tau_mem_ZIrr hG hodd i hj0 hzS params.zeta_irreducible hdegj hμ0 hz1
+        params.n_formula (hδj j hj0))
+      (hyp.muGridAlpha_tau_mem_ZIrr hG hodd i hk0 hzS params.zeta_irreducible hdegk hμ0 hz1
+        params.n_formula (hδj k hk0))
+  -- `‖X‖² = 2`: Dade preserves the inner product on the supported difference
+  have hsrc : ClassFunction.inner
+      (hyp.muGrid hG hodd i j - hyp.muGrid hG hodd i k)
+      (hyp.muGrid hG hodd i j - hyp.muGrid hG hodd i k) = 2 := by
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right,
+      hyp.muGrid_inner_self hG hodd i j, hyp.muGrid_inner_self hG hodd i k,
+      hyp.muGrid_inner_cross_column hG hodd i i hjk,
+      hyp.muGrid_inner_cross_column hG hodd i i (Ne.symm hjk)]
+    ring
+  have hX2 : ClassFunction.inner
+      (hyp.tau (hyp.muGrid hG hodd i j - hyp.muGrid hG hodd i k))
+      (hyp.tau (hyp.muGrid hG hodd i j - hyp.muGrid hG hodd i k)) = 2 := by
+    have hset : ∀ s ∈ ({hyp.muGrid hG hodd i j - hyp.muGrid hG hodd i k} :
+        Set (ClassFunction ↥M ℂ)), s.support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (typePA0 M hyp.typeP) M := by
+      rintro s rfl
+      exact hsupp
+    have hmem : hyp.muGrid hG hodd i j - hyp.muGrid hG hodd i k ∈
+        OddOrder.Peterfalvi.S07.zSpan (L := ↥M)
+          ({hyp.muGrid hG hodd i j - hyp.muGrid hG hodd i k} :
+            Set (ClassFunction ↥M ℂ)) :=
+      Submodule.subset_span rfl
+    have hpres := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
+      hyp.dadeData.dade hyp.hconj hset hmem hmem
+    rw [show hyp.tau = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) from rfl]
+    rw [hpres]
+    exact hsrc
+  -- the σ-grid enumeration and the trichotomy engine
+  let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
+  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  let app := hyp.canonicalFullDadeApp hG hodd
+  have hVeq : tic.V = tic.Vdiff := rfl
+  obtain ⟨P, hPinj, hP⟩ := hyp.exists_alignedOmegaSigmaGrid_chiFam_family hG hodd i
+  have hPj' : tic.chiFam hVeq app (P j) = hyp.alignedOmegaSigmaGrid hG hodd i j := (hP j).symm
+  have hPk' : tic.chiFam hVeq app (P k) = hyp.alignedOmegaSigmaGrid hG hodd i k := (hP k).symm
+  have hPne : P j ≠ P k := fun h => hjk (hPinj h)
+  have hψV : ∀ v ∈ tic.V,
+      (hyp.tau (hyp.muGrid hG hodd i j - hyp.muGrid hG hodd i k)
+        - (params.delta : ℂ) • (tic.chiFam hVeq app (P j) - tic.chiFam hVeq app (P k))) v
+        = 0 := by
+    intro v hv
+    have hlegj := hyp.tau_muGridAlpha_apply_eq_on_typePV hG hodd hj0 hzS hdegj hμ0 hz1
+      params.n_formula (hδj j hj0) hv
+    have hlegk := hyp.tau_muGridAlpha_apply_eq_on_typePV hG hodd hk0 hzS hdegk hμ0 hz1
+      params.n_formula (hδj k hk0) hv
+    have hXv : hyp.tau (hyp.muGrid hG hodd i j - hyp.muGrid hG hodd i k) v
+        = ((params.delta : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j
+            - hyp.alignedOmegaSigmaGrid hG hodd i k)) v := by
+      rw [hα, params.alpha_def, params.alpha_def, hmu, map_sub, ClassFunction.sub_apply,
+        hlegj, hlegk]
+      simp only [ClassFunction.smul_apply, ClassFunction.sub_apply]
+      ring
+    rw [ClassFunction.sub_apply, hXv, hPj', hPk']
+    simp only [ClassFunction.smul_apply, ClassFunction.sub_apply]
+    ring
+  rw [← hPj', ← hPk']
+  exact tic.eq_smul_chiFam_diff_of_vanishOnV hVeq app hXZ hX2 hPne hδpm hψV
+
+open scoped FiniteInduce in
+/-- **Column-sum form of `tau_muGrid_row_diff`** (coherence-free (10.5) for columns):
+`(μ_j − μ_k)^τ = δ·(∑ω_{ij}^σ − ∑ω_{ik}^σ)` for nontrivial columns `j ≠ k`. -/
+theorem Hypothesis.tau_muGrid_columnSum_diff_cohFree [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) {params : CharacterParameters hyp}
+    (hmu : params.mu = hyp.muGrid hG hodd)
+    (hzS : params.zeta ∈ inducedFamily M) (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hodd j = params.delta)
+    {j k : Fin hyp.w2} (hj0 : j ≠ 0) (hk0 : k ≠ 0) (hjk : j ≠ k) :
+    hyp.tau (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j
+        - ∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k) =
+      (params.delta : ℂ) • (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i j
+        - ∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i k) := by
+  rw [← Finset.sum_sub_distrib, ← Finset.sum_sub_distrib, map_sum, Finset.smul_sum]
+  exact Finset.sum_congr rfl fun i _ =>
+    hyp.tau_muGrid_row_diff hG hodd hmu hzS hz1 hδpm hδj i hj0 hk0 hjk
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (10.5), Dade-image half** (`CharacterParameters` corollary).  For the (10.2)/(10.3)
 character data — the `μ`-grid (`hmu`), the aligned `σ`-grid (`hos`), the degree-`w₁` irreducible `ζ`
 of (10.2) (`hzS`/`hz1`) and the column sign `δ = ±1` (`hδpm`/`hδj`) — the Dade image of
@@ -5336,6 +5468,59 @@ noncomputable def Hypothesis.columnImageFamily [Finite G]
         if_neg (fun he => hpq (hyp.columnRImage_injective hG hG.odd hδpm hjj' he))]
   image_eq := by
     rw [hconj, tau_muGrid_columnSum_diff hG coh hmu hos hzS hz1 hzconj hδpm hδj hj0 hj'0,
+      Finset.sum_image (fun p _ q _ hpq => hyp.columnRImage_injective hG hG.odd hδpm hjj' hpq),
+      hyp.columnRImage_sum, Finset.sum_sub_distrib]
+
+
+open scoped Classical FiniteInduce in
+/-- **§10 column `OrthonormalCharacterImageFamily`, coherence-free** ((5.2.d) for the reducible column
+`μ_j`): the difference-image family `R(μ_j) = {δ·ω_{ij}^σ} ∪ {−δ·ω_{ij'}^σ}` of the column character
+`μ_j = ∑_i μ_{ij}` against the §10 Dade isometry `hyp.tau`.  This is the §10 analogue of the §6
+`certainTypeR`, built directly on `hyp.tau` (an `IntegralCharacterMap`) instead of the §6 Dade map.
+
+The `image_eq` field `hyp.tau(μ_j − μ̄_j) = ∑ R(μ_j)` combines the conjugate-column identity
+`μ̄_j = μ_{j'}` (`hconj`, from `exists_conj_column`), the (10.5) summed isometry
+`tau_muGrid_columnSum_diff` (`hyp.tau(μ_j − μ_{j'}) = δ(∑ω_{ij}^σ − ∑ω_{ij'}^σ)`), and
+`columnRImage_sum`; `orthonormal`/`mem_ZIrr` come from `columnRImage_inner`/`_injective` and
+`alignedOmegaSigmaGrid_mem_ZIrr`.  Feeding `ofProjection` (with `coh.tau1`, ψ = 0), the (5.5)
+`eq_sum_of_psi_eq_zero` then computes `μ_j^{τ₁} = ∑_{E ⊆ R(μ_j)} α`. -/
+noncomputable def Hypothesis.columnImageFamilyCohFree [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} {hyp : Hypothesis M}
+    {params : CharacterParameters hyp}
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hzS : params.zeta ∈ inducedFamily M) (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (hzconj : params.zeta.conj ≠ params.zeta)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
+    {j j' : Fin hyp.w2} (hj0 : j ≠ 0) (hj'0 : j' ≠ 0) (hjj' : j ≠ j')
+    (hconj : (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j).conj
+      = ∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j') :
+    OddOrder.Peterfalvi.S07.OrthonormalCharacterImageFamily hyp.tau
+      (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j) where
+  imageSet := Finset.univ.image (hyp.columnRImage hG hG.odd params.delta j j')
+  mem_ZIrr := by
+    intro α hα
+    rw [Finset.mem_image] at hα
+    obtain ⟨⟨b, i⟩, _, rfl⟩ := hα
+    cases b
+    · simp only [Hypothesis.columnRImage]
+      rw [Int.cast_smul_eq_zsmul]
+      exact (ZIrr G).smul_mem _ (hyp.alignedOmegaSigmaGrid_mem_ZIrr hG hG.odd i j)
+    · simp only [Hypothesis.columnRImage]
+      rw [neg_smul, Int.cast_smul_eq_zsmul]
+      exact neg_mem ((ZIrr G).smul_mem _ (hyp.alignedOmegaSigmaGrid_mem_ZIrr hG hG.odd i j'))
+  orthonormal := by
+    intro α hα β hβ
+    rw [Finset.mem_image] at hα hβ
+    obtain ⟨p, _, rfl⟩ := hα
+    obtain ⟨q, _, rfl⟩ := hβ
+    rw [hyp.columnRImage_inner hG hG.odd hδpm hjj']
+    by_cases hpq : p = q
+    · subst hpq; simp
+    · rw [if_neg hpq,
+        if_neg (fun he => hpq (hyp.columnRImage_injective hG hG.odd hδpm hjj' he))]
+  image_eq := by
+    rw [hconj, hyp.tau_muGrid_columnSum_diff_cohFree hG hG.odd hmu hzS hz1 hδpm hδj hj0 hj'0 hjj',
       Finset.sum_image (fun p _ q _ hpq => hyp.columnRImage_injective hG hG.odd hδpm hjj' hpq),
       hyp.columnRImage_sum, Finset.sum_sub_distrib]
 
