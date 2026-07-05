@@ -470,6 +470,33 @@ theorem lb0_le_lb1_of_degreeRatio_le {a c b η : ℝ} (ha : 0 ≤ a) (hη : 0 �
   have h2a : 0 ≤ 2 * a := by linarith
   nlinarith [mul_le_mul_of_nonneg_left hcb h2a, mul_nonneg h2a hη]
 
+/-- **`Snorm` of a norm-one class function is its squared real degree** (`⟨ψ,ψ⟩.re = 1 ⟹
+Snorm ψ = ψ(1).re²`).  For an irreducible character `ψ`, `IsIrreducibleCharacter.inner_self_eq_one`
+gives `⟨ψ,ψ⟩ = 1`, hence `⟨ψ,ψ⟩.re = 1`; this is the `Snorm ψ = ψ(1)²` specialization used on the
+uniform sub-family `S1'` of Peterfalvi (9.11), whose members are irreducible of degree `q·a`. -/
+theorem Snorm_of_inner_self_re_one {ψ : ClassFunction L ℂ}
+    (hψ : (ClassFunction.inner ψ ψ).re = 1) : Snorm (L := L) ψ = (ψ (1 : L)).re ^ 2 := by
+  rw [Snorm, hψ, div_one]
+
+/-- **`sumnS` of a family with constant `Snorm` weight** (`Snorm ψ = v` on `Si ⟹
+sumnS Si = |Si|·v`).  The `Finset.sum_const` specialization of `sumnS`. -/
+theorem sumnS_constant {Si : Finset (ClassFunction L ℂ)} {v : ℝ}
+    (h : ∀ ψ ∈ Si, Snorm ψ = v) : sumnS (L := L) Si = (Si.card : ℝ) * v := by
+  rw [sumnS, Finset.sum_congr rfl h, Finset.sum_const, nsmul_eq_mul]
+
+/-- **Peterfalvi (9.11): the uniform sub-family `sumnS` value (Coq `lb3S1'` left endpoint).**
+
+If every member of `Si` is norm-one (`⟨ψ,ψ⟩.re = 1`, e.g. irreducible) of common real degree `d`,
+then `sumnS Si = |Si|·d²`.  This is the value Coq computes for `sumnS S1'` (`PFsection9.v:1607`,
+`rewrite (eq_bigr (fun _ => ((q * a) ^ 2)%:R))`): on `S1'` every member is irreducible of degree
+`q·a`, so `Snorm ≡ (q·a)²` and `sumnS S1' = |S1'|·(q·a)²` — the left endpoint of the `lb3 ≤ sumnS S1'`
+squeeze step, combined with the `lb_Sqa` lower bound `|S1'| ≥ (p−1)·|U:U'| / a²`. -/
+theorem sumnS_of_norm_one_constant_degree {Si : Finset (ClassFunction L ℂ)} {d : ℝ}
+    (hnorm : ∀ ψ ∈ Si, (ClassFunction.inner ψ ψ).re = 1)
+    (hdeg : ∀ ψ ∈ Si, (ψ (1 : L)).re = d) :
+    sumnS (L := L) Si = (Si.card : ℝ) * d ^ 2 :=
+  sumnS_constant fun ψ hψ => by rw [Snorm_of_inner_self_re_one (hnorm ψ hψ), hdeg ψ hψ]
+
 /-! ### Remaining (9.11.1)-(9.11.8) induction steps (outline, honest verdict 2026-07-06)
 
 With the `Snorm`/`sumnS` quantity (above), the `extend_coherent` positive engine
@@ -502,8 +529,8 @@ arithmetic (medium, mechanical), and (9.11.1)/(9.11.7)/(9.11.8) are the `coheren
 against the honest §9 induced-family Dade witnesses (the per-step `Dmem`/`hmemOrtho`/`hgen` data, as
 in `S08_CaseBEnumeration.sMember_degreeSqNormBound_of_not_coherent`, but for the §9 `S_ H0C'` family
 rather than §8 case-B).  This is **one focused multi-step session** for lane b's (13.3)
-`coherent_H0Cprime_S` re-grounding (drop `sibleyTarget_H0C`) once the §9 induced-family witnesses are
-threaded, and the same (9.11) coherence closes lane a's (10.7) `typeII_derived_frobenius`.  Tracking
-= issue 1017. -/
+`coherent_H0Cprime_S` re-grounding (drop `sibleyTarget_H0C`) once the §9 induced-family witnesses
+are threaded, and the same (9.11) coherence closes lane a's (10.7) `typeII_derived_frobenius`.
+Tracking = issue 1017. -/
 
 end OddOrder.Peterfalvi.S07
