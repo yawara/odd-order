@@ -9480,6 +9480,57 @@ theorem caseA_reducible_source_eq_hcZeta [Finite G] {M : Subgroup G}
   refine ⟨θbar, caseA_reducible_theta_regular caseA θbar χ hlo hMfix hnt, ?_⟩
   exact congrArg (induceHU data) (caseA_reducible_eq_hcZeta caseA θbar χ hlo hMfix hnt hH0C)
 
+set_option maxHeartbeats 1600000 in
+open scoped Classical in
+/-- **Peterfalvi (13.3.a) core, case (a)** (the (9.8.b)-side `isIndHC`): in Clifford case (a),
+every *reducible* member of `𝒮(H₀)` is induced from a linear character of `HC` at the
+`M`-level.  `caseA_reducible_source_eq_hcZeta` identifies the source as
+`Ind_{HC}(hcPsi θbar)` (regular seed), and the stages-flattening
+(`isIndHC_of_source_eq_induce_hcPsi`) concludes. -/
+theorem caseA_reducible_sOf_H0_isIndHC [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    [Fintype ↥M] [Fintype ↥(huSub data)]
+    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+      M).subgroupOf (huSub data)) : ℂ)]
+    [Invertible (Nat.card ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+      M).subgroupOf (huSub data)).map (huSub data).subtype) : ℂ)]
+    {φ : ClassFunction ↥M ℂ}
+    (hφ : φ ∈ sOf data chief.H0) (hred : ¬ IsIrreducibleCharacter φ) :
+    ∃ ψ : ClassFunction
+        ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+          (huSub data)).map (huSub data).subtype) ℂ,
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ ∧
+      ψ 1 = 1 ∧
+      φ = ClassFunction.induce
+        ((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+          (huSub data)).map (huSub data).subtype) ψ := by
+  classical
+  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Fintype ↥(hInHu data) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+    (huSub data)).Normal := hcInHu_realized_normal chief
+  obtain ⟨θbar, hreg, hφeq⟩ := caseA_reducible_source_eq_hcZeta caseA hG φ hφ hred
+  have hreg' : ∀ i, ∃ x ∈ caseA.Hpart i,
+      (linearIrreducibleCharacter θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+        ≠ (linearIrreducibleCharacter θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1 := by
+    intro i
+    obtain ⟨x, hx, hne⟩ := (comp_subtype_ne_one_iff_exists caseA θbar i).mp (hreg i)
+    refine ⟨x, hx, ?_⟩
+    rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one,
+      Units.val_one]
+    simpa using hne
+  have hθ₀ := inertia_eq_hcInHu_caseA data chief caseA hreg'
+  obtain ⟨ψ, hψirr, hψone, hψeq⟩ := isIndHC_of_source_eq_induce_hcPsi
+    (ζ' := ⟨ClassFunction.induce
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+      (hcPsi chief θbar), hcZeta_irreducible chief θbar hθ₀⟩) (θbar := θbar) rfl
+  exact ⟨ψ, hψirr, hψone, hφeq.trans hψeq⟩
+
 /-- **step 5 consequence (9.8.b degree, caseA): a reducible `𝒮(H₀)`-member has degree `qu`.**  By
 `caseA_reducible_source_eq_hcZeta` the reducible `φ = Ind_{HU}^M(Ind_{HC}(hcPsi θbar))`, whose degree
 is `q·u` (`hcZeta_induceHU_apply_one`).  The degree half of `caseA_character_counts` conjunct (b). -/
