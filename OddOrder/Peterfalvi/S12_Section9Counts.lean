@@ -546,27 +546,24 @@ theorem Hypothesis.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum [Finite
       Equiv.apply_symm_apply, hχ₂']
     exact rfl
 
-/-! ## (11.8.1): `d ≡ 1 (mod q)` and `δ = 1` -/
+/-! ## (11.8.1): `d = u`, `d ≡ 1 (mod q)` and `δ = 1` -/
 
 open OddOrder.Peterfalvi.S11 in
-/-- **Peterfalvi (11.8.1), the residue `d ≡ 1 (mod q)`** (§9 count, named obligation).  The common
-degree `d = μ_{ij}(1)` of the (10.3) grid is `≡ 1 (mod w₁ = q)`.
-
-The column sum `μ_1 = ∑_i μ_{i1}` is a reducible member of the §9 family `𝒮(H₀)`
+/-- **Peterfalvi (11.8.1), the degree identification `d = u = |Ū|`** (Coq `Dd`).  The column sum
+`μ_1 = ∑_i μ_{i1}` is a reducible member of the §9 family `𝒮(H₀)`
 (`muGrid_column_sum_mem_sOf_H0_and_reducible`), so it has degree `q·u = q·|Ū|` by (9.8.b)/(9.9.b)
 (`reducible_mem_sOf_H0_apply_one_eq_qu`, both Clifford cases); its degree is also `w₁·d` by the
-(10.3) grid (`degree_independent`, via `hmu`).  Cancelling `q = w₁` gives `d = |Ū|`, and
-`|Ū| ≡ 1 (mod q)` is the chief-factor image of the Frobenius congruence
-(`mkSection11CharacterData_u_modEq_one`). -/
-theorem Hypothesis.charParam_d_modEq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+(10.3) grid (`degree_independent`, via `hmu`).  Cancelling `q = w₁` gives `d = |Ū|`.  This is
+the `d`-identification consumed by the residue `d ≡ 1 (mod q)` (`charParam_d_modEq_one`) and by
+the `|S(HC)| = n = (d−1)/q` count. -/
+theorem Hypothesis.charParam_d_eq_u [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) (htype : IsTypeIII M ∨ IsTypeIV M)
-    (params : CharacterParameters hyp) (hmu : params.mu = hyp.muGrid hG hG.odd) :
-    params.d ≡ 1 [MOD hyp.w1] := by
+    (params : CharacterParameters hyp) (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hnt : TypePNontrivialCore M hyp.typeP)
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetup htype hnt)) :
+    params.d = (hyp.mkSection11CharacterData (hyp.toTypesIIIIIIVSetup htype hnt) chief).u := by
   haveI := hyp.finiteG
   classical
-  have hnt : TypePNontrivialCore M hyp.typeP :=
-    typePNontrivialCore_of_isTypeIIIorIV htype hyp.typeP
-  obtain ⟨chief, -⟩ := exists_chiefFactorData hG (hyp.toTypesIIIIIIVSetup htype hnt)
   -- the nonzero column `k = 1` (`w₂ ≥ 3`: `w₂` is an odd prime)
   have hw2odd : Odd hyp.w2 := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card hyp.W2)
   have hw2_3 : 3 ≤ hyp.w2 := by
@@ -601,20 +598,31 @@ theorem Hypothesis.charParam_d_modEq_one [Finite G] (hG : OddOrder.BG.IsMinimalS
       _ = ∑ _i : Fin hyp.w1, (params.d : ℂ) := Finset.sum_congr rfl (fun i _ => hterm i)
       _ = (hyp.w1 : ℂ) * (params.d : ℂ) := by
           rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
-  -- cancel `q = w₁`: `d = |Ū|`
+  -- cancel `q = w₁`
   have hq : (hyp.toTypesIIIIIIVSetup htype hnt).q = hyp.w1 := rfl
-  have hdu : params.d
-      = (hyp.mkSection11CharacterData (hyp.toTypesIIIIIIVSetup htype hnt) chief).u := by
-    have hqu' : (hyp.w1 : ℂ) * (params.d : ℂ)
-        = (((hyp.toTypesIIIIIIVSetup htype hnt).q
-            * (hyp.mkSection11CharacterData (hyp.toTypesIIIIIIVSetup htype hnt) chief).u : ℕ) : ℂ) := by
-      rw [← hdeg]; exact hqu
-    rw [hq] at hqu'
-    push_cast at hqu'
-    have hw1ne : (hyp.w1 : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr (NeZero.ne _)
-    exact_mod_cast mul_left_cancel₀ hw1ne hqu'
-  -- `|Ū| ≡ 1 (mod w₁)` (Frobenius image congruence)
-  rw [hdu]
+  have hqu' : (hyp.w1 : ℂ) * (params.d : ℂ)
+      = (((hyp.toTypesIIIIIIVSetup htype hnt).q
+          * (hyp.mkSection11CharacterData (hyp.toTypesIIIIIIVSetup htype hnt) chief).u : ℕ) : ℂ) := by
+    rw [← hdeg]; exact hqu
+  rw [hq] at hqu'
+  push_cast at hqu'
+  have hw1ne : (hyp.w1 : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr (NeZero.ne _)
+  exact_mod_cast mul_left_cancel₀ hw1ne hqu'
+
+open OddOrder.Peterfalvi.S11 in
+/-- **Peterfalvi (11.8.1), the residue `d ≡ 1 (mod q)`** (§9 count, named obligation).  `d = |Ū|`
+(`charParam_d_eq_u`), and `|Ū| ≡ 1 (mod q)` is the chief-factor image of the Frobenius congruence
+(`mkSection11CharacterData_u_modEq_one`). -/
+theorem Hypothesis.charParam_d_modEq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) (htype : IsTypeIII M ∨ IsTypeIV M)
+    (params : CharacterParameters hyp) (hmu : params.mu = hyp.muGrid hG hG.odd) :
+    params.d ≡ 1 [MOD hyp.w1] := by
+  haveI := hyp.finiteG
+  classical
+  have hnt : TypePNontrivialCore M hyp.typeP :=
+    typePNontrivialCore_of_isTypeIIIorIV htype hyp.typeP
+  obtain ⟨chief, -⟩ := exists_chiefFactorData hG (hyp.toTypesIIIIIIVSetup htype hnt)
+  rw [hyp.charParam_d_eq_u hG htype params hmu hnt chief]
   exact hyp.mkSection11CharacterData_u_modEq_one (hyp.toTypesIIIIIIVSetup htype hnt) chief hnt.1
 
 open scoped Classical in
