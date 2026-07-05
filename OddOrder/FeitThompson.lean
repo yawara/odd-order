@@ -209,6 +209,12 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
   /-- **Peterfalvi (3.3)** (issue 2033): on `W₂` the grid values are `p`-th roots of unity. -/
   omega_pow_p_of_mem_W2 : ∀ (i : Fin q) (j : Fin p) (w : ↥W), (w : G) ∈ W2 →
     omega i j w ^ p = 1
+  /-- **Peterfalvi (3.2.d)** (issue 2034): a class function of `G` orthogonal to the whole
+  `τ₃ω`-grid vanishes on the regular set `Ŵ = W ∖ (W₁ ∪ W₂)` — the grid enumerates the
+  `σ`-image, and every irreducible off the image vanishes on `Ŵ`. -/
+  eta_complete_vanish : ∀ χ : ClassFunction G ℂ,
+    (∀ (i : Fin q) (j : Fin p), ClassFunction.inner (tau3 (omega i j)) χ = 0) →
+    ∀ w : G, w ∈ W → w ∉ (W1 : Set G) ∪ (W2 : Set G) → χ w = 0
 
 /-! ### Partition of `Section16Inputs` into three independent producer obligations
 
@@ -387,6 +393,12 @@ structure Section16CharacterData {G : Type*} [Group G] [Finite G]
   /-- **Peterfalvi (3.3)** (issue 2033): on `W₂` the grid values are `p`-th roots of unity. -/
   omega_pow_p_of_mem_W2 : ∀ (i : Fin tp.q) (j : Fin tp.p) (w : ↥tp.W), (w : G) ∈ tp.W2 →
     omega i j w ^ tp.p = 1
+  /-- **Peterfalvi (3.2.d)** (issue 2034): a class function of `G` orthogonal to the whole
+  `τ₃ω`-grid vanishes on the regular set `Ŵ = W ∖ (W₁ ∪ W₂)` — the grid enumerates the
+  `σ`-image, and every irreducible off the image vanishes on `Ŵ`. -/
+  eta_complete_vanish : ∀ χ : ClassFunction G ℂ,
+    (∀ (i : Fin tp.q) (j : Fin tp.p), ClassFunction.inner (tau3 (omega i j)) χ = 0) →
+    ∀ w : G, w ∈ tp.W → w ∉ (tp.W1 : Set G) ∪ (tp.W2 : Set G) → χ w = 0
 
 /-- **Canonical type-`P` maximal pair data** (issue 7005): for a minimal simple group of odd order,
 there is a type-`P` dual pair `S, T` together with the full κ-Hall witness data of BG Theorem 14.7
@@ -2133,7 +2145,9 @@ noncomputable def section16CharacterData_of_isMinimalSimpleOdd {G : Type*} [Grou
       omega_row_zero_apply_of_mem_W1 :=
         Section16CharacterData.omegaS_row_zero_apply_of_mem_W1 hG mp tp
       omega_pow_q_of_mem_W1 := Section16CharacterData.omegaS_pow_q_of_mem_W1 hG mp tp
-      omega_pow_p_of_mem_W2 := Section16CharacterData.omegaS_pow_p_of_mem_W2 hG mp tp }
+      omega_pow_p_of_mem_W2 := Section16CharacterData.omegaS_pow_p_of_mem_W2 hG mp tp
+      eta_complete_vanish := fun χ horth w hwW hnot =>
+        Section16CharacterData.tau3W_omegaS_complete_vanish hG mp tp χ horth hwW hnot }
 
 /-- **Assembly of `Section16Inputs` from the three lane producers** (`sorry`-free).
 Each field of `Section16Inputs` is sourced from exactly one of `mp` / `tp` / `cd`;
@@ -2213,7 +2227,8 @@ noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [F
     omega_col_zero_apply_of_mem_W2 := cd.omega_col_zero_apply_of_mem_W2
     omega_row_zero_apply_of_mem_W1 := cd.omega_row_zero_apply_of_mem_W1
     omega_pow_q_of_mem_W1 := cd.omega_pow_q_of_mem_W1
-    omega_pow_p_of_mem_W2 := cd.omega_pow_p_of_mem_W2 }
+    omega_pow_p_of_mem_W2 := cd.omega_pow_p_of_mem_W2
+    eta_complete_vanish := cd.eta_complete_vanish }
 
 /-- **Assembly of the Section 16 configuration from named inputs** (`sorry`-free).
 
@@ -2325,7 +2340,8 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       omega_col_zero_apply_of_mem_W2 := inp.omega_col_zero_apply_of_mem_W2
       omega_row_zero_apply_of_mem_W1 := inp.omega_row_zero_apply_of_mem_W1
       omega_pow_q_of_mem_W1 := inp.omega_pow_q_of_mem_W1
-      omega_pow_p_of_mem_W2 := inp.omega_pow_p_of_mem_W2 }
+      omega_pow_p_of_mem_W2 := inp.omega_pow_p_of_mem_W2
+      eta_complete_vanish := inp.eta_complete_vanish }
   q_lt_p := inp.q_lt_p
 
 /-- **The one remaining upstream obligation.** From a minimal simple group of odd

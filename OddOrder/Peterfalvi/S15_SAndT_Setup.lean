@@ -249,6 +249,12 @@ structure Hypothesis where
   /-- **Peterfalvi (3.3)** (issue 2033): on `W₂` the grid values are `p`-th roots of unity. -/
   omega_pow_p_of_mem_W2 : ∀ (i : Fin q) (j : Fin p) (w : ↥W), (w : G) ∈ W2 →
     omega i j w ^ p = 1
+  /-- **Peterfalvi (3.2.d)** (issue 2034): a class function of `G` orthogonal to the whole
+  `τ₃ω`-grid vanishes on the regular set `Ŵ = W ∖ (W₁ ∪ W₂)` — the grid enumerates the
+  `σ`-image, and every irreducible off the image vanishes on `Ŵ`. -/
+  eta_complete_vanish : ∀ χ : ClassFunction G ℂ,
+    (∀ (i : Fin q) (j : Fin p), ClassFunction.inner (tau3 (omega i j)) χ = 0) →
+    ∀ w : G, w ∈ W → w ∉ (W1 : Set G) ∪ (W2 : Set G) → χ w = 0
 
 namespace Hypothesis
 
@@ -3525,10 +3531,12 @@ issue-2033 threading pattern; the grid here is `Fin q × Fin p`-indexed while th
 hom-pair-indexed, and the enumerations correspond along `w1CharEquiv`/`chi2enum`). -/
 theorem Hypothesis.vanish_of_inner_eta_eq_zero [Finite G] (hyp : Hypothesis (G := G))
     (χ : ClassFunction G ℂ)
-    (_horth : ∀ (i : Fin hyp.q) (j : Fin hyp.p), ClassFunction.inner (hyp.eta i j) χ = 0)
-    {w : G} (_hwW : w ∈ hyp.W) (_hnot : w ∉ (hyp.W1 : Set G) ∪ (hyp.W2 : Set G)) :
+    (horth : ∀ (i : Fin hyp.q) (j : Fin hyp.p), ClassFunction.inner (hyp.eta i j) χ = 0)
+    {w : G} (hwW : w ∈ hyp.W) (hnot : w ∉ (hyp.W1 : Set G) ∪ (hyp.W2 : Set G)) :
     χ w = 0 := by
-  sorry
+  refine hyp.eta_complete_vanish χ (fun i j => ?_) w hwW hnot
+  rw [← hyp.eta_eq_tau_omega]
+  exact horth i j
 
 open scoped Classical in
 open scoped FiniteInduce in
