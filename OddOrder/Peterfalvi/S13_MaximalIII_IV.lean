@@ -154,6 +154,53 @@ structure Hypothesis (M : Subgroup G) where
   finalOrthogonalityFormula : ClassFunction ↥M ℂ → Prop
   caseB_of_97 : Prop
 
+/-- **The §13 hypothesis holds for a type-III/IV maximal subgroup** — the producer connecting the
+whole §13 (11.1)–(11.7) theory (and hence (11.5) `secondDerived_eq_HC`, (11.7) `core_structure`) to
+the FT spine.  Every field is derived from the §12 hypothesis `hyp`: the (10.2)–(10.3) character
+parameters (`exists_charParameters_full`; proof-irrelevance of the `Prop`s `IsMinimalSimpleOdd` and
+`Odd` discharges the `∀ hG hodd` fields), the §11 chief-factor setup
+(`toTypesIIIIIIVSetup`/`exists_chiefFactorData`), and `C = C_U(H) = U ⊓ C_G(H)` with its `M`-normality
+(`S12.typePData_C_normalized_by_M`) and centralizer form.  The formula `Prop`s are unconstrained
+placeholder fields. -/
+theorem exists_hypothesis_of_isTypeIIIorIV [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M) :
+    Nonempty (Hypothesis M) := by
+  haveI := hyp.finiteG
+  classical
+  have hnt : OddOrder.GroupTheory.TypePNontrivialCore M hyp.typeP :=
+    OddOrder.GroupTheory.typePNontrivialCore_of_isTypeIIIorIV htype hyp.typeP
+  obtain ⟨params, hmu, _homega, hzmem, hzdeg, _hzconj, hδpm, hδsign⟩ :=
+    hyp.exists_charParameters_full hG
+  exact ⟨{
+    base := hyp
+    params := params
+    params_mu_eq := fun _ _ => hmu
+    params_delta_sign := fun _ _ j hj => hδsign j hj
+    params_delta_pm := hδpm
+    params_zeta_mem := hzmem
+    params_zeta_degree := hzdeg
+    type_alt := htype
+    s11Setup := hyp.toTypesIIIIIIVSetup htype hnt
+    chief := (OddOrder.Peterfalvi.S11.exists_chiefFactorData hG
+      (hyp.toTypesIIIIIIVSetup htype hnt)).choose
+    setup_typeP_eq := rfl
+    C := hyp.typeP.U ⊓ Subgroup.centralizer (hyp.typeP.H : Set G)
+    C_le_U := inf_le_left
+    C_eq_centralizer := rfl
+    C_normalized_by_M := OddOrder.Peterfalvi.S12.typePData_C_normalized_by_M hyp.typeP hnt.1
+    Hprime := derivedInG hyp.typeP.H
+    Hprime_eq := rfl
+    Uprime := derivedInG hyp.typeP.U
+    Uprime_eq := rfl
+    SOf := fun X => OddOrder.Peterfalvi.S08.inducedKernelFamily
+      ((derivedInG M).subgroupOf M) (X.subgroupOf M)
+    SOf_eq := fun _ => rfl
+    notOrthogonalFormula := fun _ => True
+    finalOrthogonalityFormula := fun _ => True
+    caseB_of_97 := True }⟩
+
 namespace Hypothesis
 
 /-- Peterfalvi's `H`. -/
