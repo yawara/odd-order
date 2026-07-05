@@ -519,3 +519,35 @@ hypotheses に分解するのは net-negative)。
 - **T-side δ' (別 gap)**: deltaPrime_eq_one (delta_eq_one_S mirror、T-side 構造要)。
 
 **次**: step 5a (tau1S_* fields via family membership) — 最も foundation に近い増分。
+
+## 2026-07-06 更新 #6 (lane b, bounded agent): ✅ step 5a helper 2/3 landed + 2 つの genuine gap を isolation
+
+**τ₁ helper 2 本が sorry-free で landing** (full 3929 green / 新 axiom なし / signature 変更なし / net +76 行 additive):
+- ✅ `Hypothesis.tau1S_ofHonest_inner_induce` (S15:648) — `⟨τ₁(Ind_{PC}θ), τ₁(Ind_{PC}θ')⟩ = ⟨Ind θ, Ind θ'⟩`
+  (irr θ,θ' on H.subgroupOf S、**P⊄Ker θ,θ' 仮説付き**)。`coherent_H0Cprime_S.extension_inner_eq` + family membership。
+- ✅ `Hypothesis.tau1S_ofHonest_induce_mem_ZIrr` (S15:674) — `τ₁(Ind_{PC}θ) ∈ ZIrr G` (P⊄Ker θ 付き)。
+  `.extension_mem_ZIrr` + family membership。
+- 🔑 `Hypothesis.induce_H_mem_zSpan_S` (S15:629, **isolated sorry**) — `Ind_{PC}^S θ ∈ zSpan 𝒮` (P⊄Ker θ)。
+
+**GENUINE GAP #1 (family membership = Coq `sS1S`, (1.5.a))**: `Ind_{PC}^S θ ∈ ℤ[𝒮]` は本物の §9/§13 定理。
+Coq `PFsection13:428` `sS1S : {subset calS1 <= 'Z[calS]}` (calS1=seqIndD H S P 1, calS=seqIndD PU S P 1)。
+証明 `S1cases` = prime-TI Clifford dichotomy「Ind_{PC}θ = μ_j (∈𝒮 via FTseqInd_TIred) ∨ ∈ ℤ[𝒮∩Irr S]」。
+**既存 S11 stock からは this (source→family) 方向は不可** (在庫 isIndHC/reducible_sOf_H0_isIndHC は逆向き
+family→Ind_{PC}(linear))。**⚠ 訂正: field は ∀irr θ だが membership は `P⊄Ker θ` に本質的に制限が要る**
+(P⊆Ker θ なら Ind_{PC}θ は P∈kernel で 𝒮∌ — 𝒮=Ind_{HU}𝒳 の全 member は P⊄Ker)。field 側にも P⊄Ker 仮説の追加が必要。
+
+**GENUINE GAP #2 (foundation の support が (13.3) に対して小さすぎる — helper 3 blocked)**:
+`tau1S_ofHonest_apply_induce_sub` (差 `Ind θ - Ind θ'` 上で τ₁ = Ind_S) は **本 foundation では landing 不可**。
+理由: `coherent_H0Cprime_S` の `.extends_on_supported` は `A = (C')^# = H0CprimeSupport` (9.11 由来) 上のみ agreement。
+しかし差 `Ind_{PC}θ - Ind_{PC}θ'` は **H^#=(PC)^# 上に台** ((C')^# ⊊ H^# 厳密: C'≤U, P∩U=⊥ ゆえ P^#⊄(C')^#)。
+Pf の実論法 (mmd:68, (13.2.e)): `(ζ_i−ζ_0)^τ = Ind_S^G(ζ_i−ζ_0)` は Dade τ が **A₀(S) ⊇ H^#** 相対だから成立。
+**⟹ (13.3) の τ₁ は support `A₀(S)` (or 少なくとも `(S')^#`⊇H^#) の coherence を要する**。repo に裏付け:
+`S13_SixTwoBridge.mderivSharp_subset_A0` = `(M')^# ⊆ A₀(M)` (M=S で `(S')^#⊆A₀(S)`, H^#⊆(S')^# ゆえ H^#⊆A₀(S))。
+→ **foundation 修正**: `mkSection11CharacterDataS_honest` の `H0CprimeSupport := (C')^#` を
+`A₀(S)` (or `(S')^#`) に広げた coherence が要る (9.11 の (C')^#-coherence とは別 object)。
+これは next-session の foundation redesign work (helper 1/2 の tau1S_ofHonest/coherent_H0Cprime_S base は再利用可、
+support だけ差し替え)。**helper 3 は speculative sorry で前倒しせず、この support 診断を正本記録して停止** (fan-out 回避)。
+
+**step 5a route の判定**: helper 1/2 は family membership (gap#1) さえ閉じれば完成。helper 3 (=field
+`tau1S_apply_induce_sub`) は gap#1 に加え gap#2 (support redesign) が要る。**step 5a は未完** (2/3 landed、
+1/3 は foundation-support blocked)。tau1S_induce_inner_eta ((5.3.b) η-orthogonality) は別 harder field で今回対象外。
