@@ -551,3 +551,9 @@ coeff (X ∈ ℤ[R]) / Y ⊥ R。
 - 完了後: Finset.sum で列和 → columnImageFamily の coh-free 版
   (image_eq を新恒等式+exists_conj_column で) → named 2 点 =
   ofProjection + hS₁coh.extension (member-D) / muGridAlpha_inner 系 (直交)。
+
+## 2026-07-05 lane-a (loop 35): ★tau_muGrid_row_diff 実証明 — coh-free 要石完成
+
+- (μ_ij − μ_ik)^τ = δ(ω^σ_ij − ω^σ_ik) を CoherentHypothesis なしで閉了。
+  レシピ通り (追記 9)。次 = 列和版 (Finset.sum) → coh-free columnImageFamily
+  → sixTwoDecompositionData named 2 点の plumbing。
