@@ -3917,6 +3917,7 @@ theorem field_normalizer_of_L_conj_M [Finite G]
   exact field_normalizer_of_U_characteristic hG hyp Ldata
     (characteristic_of_isCyclic (hyp.base.U.subgroupOf Ldata.H))
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- The two alternatives of **Peterfalvi (14.14)**. -/
 structure OrthogonalitySwitchData {hyp : Hypothesis (G := G)}
     (nc : NonConjugateHypothesis hyp) where
@@ -3927,6 +3928,22 @@ structure OrthogonalitySwitchData {hyp : Hypothesis (G := G)}
         ((hyp.base.p * hyp.base.q - 1 : ℕ) : ℚ))
   caseB : Prop
   caseB_params : caseB → hyp.base.q = 3 ∧ hyp.base.p = 5
+  /-- **Peterfalvi (14.14.b), the case-(b) pairing**: in case (b) the L-side `β` pairs
+  nontrivially with the M-side coherent test image — the first branch of the (7.9)
+  dichotomy (`pairing_dichotomy`), packaged with its coherence bundles.  This carries
+  the "(β_L^τ, ψ^{τ₁}) ≠ 0" half of Pf's case-(b) *definition*, which the `(q,p) = (3,5)`
+  conclusion alone cannot recover; the (14.16) contradiction consumes it through
+  `caseB_contradiction_data`. -/
+  caseB_pairing :
+    caseB →
+      haveI := hyp.base.finiteG
+      ∀ (hG : OddOrder.BG.IsMinimalSimpleOdd G),
+      ∃ (dataL : TypeICoherent78Data nc.Ldata.L) (dataM : TypeICoherent78Data nc.Mdata.M),
+        ClassFunction.inner
+          ((hypothesis79OfNonconjugate dataL dataM hG nc.Ldata.L_maximal nc.Mdata.M_maximal
+              nc.not_conj).first.beta)
+          ((hypothesis79OfNonconjugate dataL dataM hG nc.Ldata.L_maximal nc.Mdata.M_maximal
+              nc.not_conj).secondZetaImage) ≠ 0
 
 namespace CaseBForSData
 
@@ -4672,6 +4689,11 @@ structure CaseBContradictionData {hyp : Hypothesis (G := G)}
   betaL : ClassFunction G ℂ
   /-- The removed unit-norm L-side character `χ_L` (`= φ^{τ₁}` or `−φ̄^{τ₁}`). -/
   chiL : ClassFunction G ℂ
+  /-- The M-side test character `ψ^{τ₁}` (the coherent `ν`-image of the distinguished
+  `ζ` — carried as a field so the whole datum is bundle-local; the (14.16) contradiction
+  is a pure inner-product computation in the four fields and never needs the anchor
+  `ψ^{τ₁} = nc.Mdata.tau1 nc.Mdata.psi` itself). -/
+  psiImg : ClassFunction G ℂ
   /-- The `±1` signs of the `η`-grid expansion. -/
   signs : Fin hyp.base.q → Fin hyp.base.p → ℤ
   signs_pm_one : ∀ i j, signs i j = 1 ∨ signs i j = -1
@@ -4681,21 +4703,53 @@ structure CaseBContradictionData {hyp : Hypothesis (G := G)}
       (∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (signs i j : ℂ) • hyp.base.eta i j) - chiL
   /-- **(14.11.2)**: `ψ^{τ₁}` is orthogonal to the `η`-grid. -/
   eta_orthogonal_psi : ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
-    ClassFunction.inner (hyp.base.eta i j) (nc.Mdata.tau1 nc.Mdata.psi) = 0
+    ClassFunction.inner (hyp.base.eta i j) psiImg = 0
   /-- **(4.1)**: `χ_L ∈ L^{τ₁}` is orthogonal to `ψ^{τ₁} ∈ M^{τ₁}`. -/
   chiL_orthogonal_psi :
-    ClassFunction.inner chiL (nc.Mdata.tau1 nc.Mdata.psi) = 0
+    ClassFunction.inner chiL psiImg = 0
   /-- **(14.14.b)**: the case-(b) nonzero pairing `(β_L^τ, ψ^{τ₁}) ≠ 0`. -/
   pairing_ne_zero :
-    ClassFunction.inner betaL (nc.Mdata.tau1 nc.Mdata.psi) ≠ 0
+    ClassFunction.inner betaL psiImg ≠ 0
 
-/-- **Faithful §16 producer for the (14.16) case-(b) contradiction inputs.**  Under case-(b) and the
-two gap inequalities, the (14.11.2)/(13.19.c) expansion of `β_L^τ`, the (4.1) orthogonality, and the
-(14.14.b) pairing assemble into `CaseBContradictionData`.  The expansion bottoms out in the §3/§4
-Dade-isometry layer (as for `betaM_expansion_data`); the axes-odd input is the already-honest
-`exists_typeI_eta_axes_odd_of_caseB_gap`. -/
-noncomputable def caseB_contradiction_data [Finite G] [Fintype G]
-    [Invertible (Nat.card G : ℂ)] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The (14.16) expansion input** — the remaining §13-gated character content of the case-(b)
+contradiction.  Under case-(b) (`(q,p) = (3,5)`) and the two gap inequalities, (13.19.c) applies
+on both sides and assembles the (14.11.2)-style signed `η`-grid expansion of the L-side
+`β_L^τ = Σ ±η_ij − (±ζ_i^ν)` — the removed unit-norm member is an `L`-family coherent image
+(index `i ≠ ind1H`; the `−ψ̄^{τ₁}` alternative is the conjugate family member, `conjIndex`) —
+and the M-side (14.11.2) norm count makes `ψ^{τ₁} = ζ_M^ν` orthogonal to the whole `η`-grid.
+Named §16 obligation (the (13.19)-type grid counting, issue 3002 sphere). -/
+theorem caseB_expansion_input [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
+    (dataL : TypeICoherent78Data nc.Ldata.L) (dataM : TypeICoherent78Data nc.Mdata.M)
+    (hq3 : hyp.base.q = 3) (hp5 : hyp.base.p = 5)
+    (hhv :
+      ((nc.h - 1 : ℕ) : ℚ) / ((hyp.base.p * hyp.base.q : ℕ) : ℚ) >
+        ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ))
+    (hvu :
+      ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
+        ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)) :
+    ∃ signs : Fin hyp.base.q → Fin hyp.base.p → ℤ,
+      (∀ i j, signs i j = 1 ∨ signs i j = -1) ∧
+      ∃ i : Fin (dataL.n + 1), i ≠ dataL.ind1H ∧
+      ∃ ε : ℤ, (ε = 1 ∨ ε = -1) ∧
+        (dataL.h78 _hG).beta
+          = (∑ i' : Fin hyp.base.q, ∑ j : Fin hyp.base.p,
+              (signs i' j : ℂ) • hyp.base.eta i' j)
+            - (ε : ℂ) • ((dataL.h78 _hG).nu ((dataL.h78 _hG).hyp76.zeta i)) ∧
+        ∀ (i' : Fin hyp.base.q) (j : Fin hyp.base.p),
+          ClassFunction.inner (hyp.base.eta i' j)
+            ((dataM.h78 _hG).nu
+              ((dataM.h78 _hG).hyp76.zeta (dataM.h78 _hG).zetaDistinct)) = 0 := by
+  sorry
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Faithful §16 producer for the (14.16) case-(b) contradiction inputs.**  The case-(b)
+pairing comes from the enriched `OrthogonalitySwitchData.caseB_pairing` ((7.9) dichotomy);
+the `χ_L ⊥ ψ^{τ₁}` orthogonality is the proven (4.1) cross-orthogonality
+`pair_cross_orthogonal`; the remaining (13.19.c)/(14.11.2) grid content is the named
+`caseB_expansion_input`. -/
+theorem caseB_contradiction_data [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
     (data : OrthogonalitySwitchData nc) (hcaseB : data.caseB)
     (hhv :
@@ -4704,8 +4758,29 @@ noncomputable def caseB_contradiction_data [Finite G] [Fintype G]
     (hvu :
       ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
         ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)) :
-    CaseBContradictionData nc := sorry
+    Nonempty (CaseBContradictionData nc) := by
+  obtain ⟨hq3, hp5⟩ := data.caseB_params hcaseB
+  obtain ⟨dataL, dataM, hpair⟩ := data.caseB_pairing hcaseB _hG
+  obtain ⟨signs, hsigns, i, hi, ε, hε, hexp, horth⟩ :=
+    caseB_expansion_input _hG dataL dataM hq3 hp5 hhv hvu
+  have hjne : (dataM.h78 _hG).zetaDistinct ≠ dataM.ind1H := by
+    have h := (dataM.h78 _hG).zetaDistinct_ne_ind1H
+    rwa [dataM.h78_ind1H_eq] at h
+  refine ⟨{
+    betaL := (dataL.h78 _hG).beta
+    chiL := (ε : ℂ) • ((dataL.h78 _hG).nu ((dataL.h78 _hG).hyp76.zeta i))
+    psiImg := (dataM.h78 _hG).nu ((dataM.h78 _hG).hyp76.zeta (dataM.h78 _hG).zetaDistinct)
+    signs := signs
+    signs_pm_one := hsigns
+    betaL_expansion := hexp
+    eta_orthogonal_psi := horth
+    chiL_orthogonal_psi := ?_
+    pairing_ne_zero := hpair }⟩
+  rw [ClassFunction.inner_smul_left,
+    pair_cross_orthogonal dataL dataM _hG nc.Ldata.L_maximal nc.Mdata.M_maximal
+      nc.not_conj hi hjne, mul_zero]
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (14.16)**: character-theoretic endpoint of the exceptional
 case.  The two strict gap inequalities let (13.19.c) be applied on both the
 S- and T-sides, giving the same signed `eta_ij` expansion as in (14.11.2) for
@@ -4726,11 +4801,8 @@ theorem caseB_character_contradiction_of_gap_inequalities
       ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
         ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)) :
     False := by
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Invertible (Nat.card G : ℂ) :=
-    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   -- The (14.11.2)-style signed `eta_ij` expansion of `beta_L^tau` and its orthogonalities.
-  obtain ⟨betaL, chiL, signs, _hsigns, hexp, heta_orth, hchiL_orth, hpair_ne⟩ :=
+  obtain ⟨⟨betaL, chiL, psiImg, signs, _hsigns, hexp, heta_orth, hchiL_orth, hpair_ne⟩⟩ :=
     caseB_contradiction_data _hG data hcaseB hhv hvu
   -- `(beta_L^tau, psi^tau_1) = 0` by linearity + orthogonality, contradicting case-(b).
   refine hpair_ne ?_
@@ -4869,6 +4941,7 @@ theorem caseB_forces_q_three_and_p_five (hyp : Hypothesis (G := G))
 
 end Hypothesis
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (14.14) character dichotomy** — the genuine §7/§8 content of the orthogonality
 switch.  By (8.17.c) the Dade supports `Ã₁(L)` and `Ã₁(M)` are disjoint, so by (7.9) either the
 `M`-side pairing `(β_M^τ, φ^τ₁) ≠ 0` or the `L`-side pairing `(β_L^τ, ψ^τ₁) ≠ 0`.  In the first
@@ -4882,15 +4955,23 @@ theorem orthogonality_switch_pairing_bounds [Finite G]
     (nc : NonConjugateHypothesis hyp) :
     (((nc.h - 1 : ℕ) : ℚ) / (hyp.base.p * hyp.base.q : ℚ) ≤
         ((hyp.base.p * hyp.base.q - 1 : ℕ) : ℚ)) ∨
-      (((hyp.base.v - 1 : ℕ) : ℚ) / ((hyp.base.p * hyp.base.q : ℕ) : ℚ) ≤
-        ((hyp.base.p * hyp.base.q - 1 : ℕ) : ℚ)) := by
+      ((∀ (hG : OddOrder.BG.IsMinimalSimpleOdd G),
+          ∃ (dataL : TypeICoherent78Data nc.Ldata.L)
+            (dataM : TypeICoherent78Data nc.Mdata.M),
+            ClassFunction.inner
+              ((hypothesis79OfNonconjugate dataL dataM hG nc.Ldata.L_maximal
+                  nc.Mdata.M_maximal nc.not_conj).first.beta)
+              ((hypothesis79OfNonconjugate dataL dataM hG nc.Ldata.L_maximal
+                  nc.Mdata.M_maximal nc.not_conj).secondZetaImage) ≠ 0) ∧
+        (((hyp.base.v - 1 : ℕ) : ℚ) / ((hyp.base.p * hyp.base.q : ℕ) : ℚ) ≤
+          ((hyp.base.p * hyp.base.q - 1 : ℕ) : ℚ))) := by
   classical
   -- The two (14.14) coherence bundles, for `L ⊇ N_G(U)` and `M ⊇ N_G(V)`.
   obtain ⟨dataL⟩ := TypeICoherent78Data.nonempty _hG nc.Ldata.L_maximal nc.Ldata.isTypeI
   obtain ⟨dataM⟩ := TypeICoherent78Data.nonempty _hG nc.Mdata.M_maximal
     ⟨nc.Mdata.typeIHyp.typeI⟩
-  have hbounds := pairing_bounds_of_nonconjugate dataL dataM _hG nc.Ldata.L_maximal
-    nc.Mdata.M_maximal nc.not_conj
+  have hnc' : ¬ OddOrder.BG.Ch4.S14.IsConjugateSubgroup nc.Mdata.M nc.Ldata.L :=
+    fun h => nc.not_conj h.symm
   -- `L`-side sizes: `|H| = h` and `[L : H] = p q`.
   have hcardL : Nat.card ↥dataL.kernelIn = nc.h := by
     have h1 : Nat.card ↥dataL.kernelIn = Nat.card ↥dataL.kernel :=
@@ -4928,8 +5009,6 @@ theorem orthogonality_switch_pairing_bounds [Finite G]
       rw [show dataM.kernelIn = (dataM.kernel).subgroupOf nc.Mdata.M from rfl, hkerM]
     rw [h1, ← nc.Mdata.e_eq_index]
     exact hepq
-  rw [dataL.complementIndex_eq _hG, dataM.complementIndex_eq _hG, hcardL, hcardM,
-    hidxL, hidxM] at hbounds
   -- Convert the `ℚ`-subtractions to the `ℕ`-subtraction casts of the statement.
   have hpq1 : 1 ≤ hyp.base.p * hyp.base.q :=
     Nat.one_le_iff_ne_zero.mpr
@@ -4939,18 +5018,28 @@ theorem orthogonality_switch_pairing_bounds [Finite G]
     rw [hyp.base.card_V_eq_vd, hd1, mul_one] at hVpos
     exact hVpos
   have hh1 : 1 ≤ nc.h := (nc.h_odd _hG).pos
-  rcases hbounds with hMK | hLH
-  · -- `(v − 1)/pq ≤ pq − 1`.
+  -- The (7.9) pairing dichotomy, with the pairing itself retained in the case-(b) branch.
+  rcases pairing_dichotomy dataL dataM _hG nc.Ldata.L_maximal nc.Mdata.M_maximal
+      nc.not_conj with hfirst | hsecond
+  · -- `⟨β_L, ζ_M^ν⟩ ≠ 0`: the `M`-kernel Bessel bound `(v − 1)/pq ≤ pq − 1` + the pairing.
     right
+    have hMK := bessel_bound_of_inner_beta_zeta_ne_zero dataM dataL _hG
+      nc.Mdata.M_maximal nc.Ldata.L_maximal hnc' hfirst
+    rw [dataL.complementIndex_eq _hG, hcardM, hidxM, hidxL] at hMK
+    refine ⟨fun hG' => ⟨dataL, dataM, hfirst⟩, ?_⟩
     rw [Nat.cast_sub hv1, Nat.cast_sub hpq1]
     push_cast at hMK ⊢
     convert hMK using 2
-  · -- `(h − 1)/pq ≤ pq − 1`.
+  · -- `⟨β_M, ζ_L^ν⟩ ≠ 0`: the `L`-kernel Bessel bound `(h − 1)/pq ≤ pq − 1`.
     left
+    have hLH := bessel_bound_of_inner_beta_zeta_ne_zero dataL dataM _hG
+      nc.Ldata.L_maximal nc.Mdata.M_maximal nc.not_conj hsecond
+    rw [dataM.complementIndex_eq _hG, hcardL, hidxL, hidxM] at hLH
     rw [Nat.cast_sub hh1, Nat.cast_sub hpq1]
     push_cast at hLH ⊢
     convert hLH using 2
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (14.14)**: either the case-(a) bound `(h − 1)/pq ≤ pq − 1` holds (the
 `β_M`--`φ` pairing is nonzero), or the case-(b) exceptional primes `q = 3`, `p = 5` hold (the
 `β_L`--`ψ` pairing is nonzero).
@@ -4970,11 +5059,20 @@ theorem orthogonality_switch [Finite G]
     caseA := ((nc.h - 1 : ℕ) : ℚ) / (hyp.base.p * hyp.base.q : ℚ) ≤
       ((hyp.base.p * hyp.base.q - 1 : ℕ) : ℚ)
     caseA_bound := fun h => h
-    caseB := hyp.base.q = 3 ∧ hyp.base.p = 5
-    caseB_params := fun h => h }, ?_⟩
-  rcases orthogonality_switch_pairing_bounds _hG hyp nc with hA | hB
+    caseB := (hyp.base.q = 3 ∧ hyp.base.p = 5) ∧
+      haveI := hyp.base.finiteG
+      ∀ (hG : OddOrder.BG.IsMinimalSimpleOdd G),
+        ∃ (dataL : TypeICoherent78Data nc.Ldata.L) (dataM : TypeICoherent78Data nc.Mdata.M),
+          ClassFunction.inner
+            ((hypothesis79OfNonconjugate dataL dataM hG nc.Ldata.L_maximal
+                nc.Mdata.M_maximal nc.not_conj).first.beta)
+            ((hypothesis79OfNonconjugate dataL dataM hG nc.Ldata.L_maximal
+                nc.Mdata.M_maximal nc.not_conj).secondZetaImage) ≠ 0
+    caseB_params := fun h => h.1
+    caseB_pairing := fun h => h.2 }, ?_⟩
+  rcases orthogonality_switch_pairing_bounds _hG hyp nc with hA | ⟨hpair, hB⟩
   · exact Or.inl hA
-  · exact Or.inr (hyp.caseB_forces_q_three_and_p_five hv hB)
+  · exact Or.inr ⟨hyp.caseB_forces_q_three_and_p_five hv hB, hpair⟩
 
 /-- **Peterfalvi (14.14)--(14.15)**: the full `u` value once the
 cardinality consequences of (14.5) have been materialized.  The case-(b)
