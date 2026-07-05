@@ -1776,3 +1776,37 @@ W₁-gen の U inverse-conj MulAut 構成 + `phi_w1·phi_w2=1` 導出。**= (11.
 
 **note**: これは (11.7) の genuine 核。chief_H0_eq_bot は case-B 完全 + case-A を本 1-sorry
 (hfix) に縮約済ゆえ、hfix を埋めれば (11.7)→gate-1 [U:C]=u→FeitThompson threading が連鎖 unblock。
+
+## 2026-07-05 update¹⁹ (lane-a) — **chief_H0_eq_bot sorry-free 化 (milestone) + caseA_commutator_chain formalization roadmap**
+
+**milestone**: soundness 修正 (commit 2cd8badb) で **chief_H0_eq_bot が sorry-free 化**。(11.7) の
+残 sorry は `caseA_commutator_chain` (S13_ElementaryAbelianKernel) **1 本のみ** = commutator form。
+既 landed の proven infra: `caseA_fixes_of_action_chain` (exponent reduction)、`caseA_fixed_contradiction`、
+`chain_exponent_eq_one`、`exists_exponent_fun_of_card_prime`、dichotomy、case-B 全体。
+
+**caseA_commutator_chain = Coq FTtype34_Fcore_kernel_trivial (PFsection11.v:412-540) の translation**
+(~80 dense 行、mostly top-to-bottom formalize、~200-400 Lean 行、multi-iteration)。Coq→Lean 対応:
+1. **setup** (caseB と共通、reuse): `exists_normal_subgroup_index_prime chief.p_prime hpK hNne` →
+   Q (maximal in H₀, H-normal); `quotient_classTwo_structure` → Ĥ=H/Q class-2, Ĥ'=H₀/Q order p;
+   π : ↥H⧸Q → ↥H⧸N。**caseB の 373-395 パターンをそのまま流用**。
+2. **memH0**: ⁅y,z⁆∈H₀ for y,z∈↥H = `Subgroup.commutator_mem_commutator` + hNcomm (chief.N=commutator ↥H)。
+3. **D form**: `D y z := ⁅hat z, hat y⁆` (hat=mk' Q, in Ĥ)。
+   - `D_H0_1`: z∈H₀ → D y z=1 (H₀/Q ⊆ Z(Ĥ) central, `commutatorElement` of central =1)。
+   - `Dsym`: (D y z)⁻¹ = D z y (`commutatorElement_inv`: ⁅b,a⁆⁻¹=⁅a,b⁆)。
+   - `Dmul`: D y bilinear in z (`commutatorElement_pow/mul_center_*` helpers, class-2 central commutators)。
+   - `H0_D`: D y z ∈ H₀/Q。
+4. **Dx** (D y=1 on W₁-basis {x_w} → D y=1 全体): H̄=⨆ W₁-conjugates of ⟨x⟩ (x=H1 生成元)、
+   `kerP`/closure induction。
+5. **ntrivD** (∃ w₁,w₂∈W₁, #|D(x_{w₁},x_{w₂})|=p): 背理法 (D_1 → Ĥ'=H₀/Q=1 矛盾、prime_abelem)。
+6. **phi** (Ubar→F_p^* exponent, u acts on xbar by ^n(phi u)): `IsCyclic` order-p の Aut = Zp_unitm;
+   実は **`exists_exponent_fun_of_card_prime` が既にこれを提供** (e:U→ℕ, action=^e)。⟹ phi 再構成不要、
+   caseA_fixes_of_action_chain の内部機構を活用。
+7. **phi_w12** (phi_{w₁}(u)·phi_{w₂}(u)=1): D(x_w, y)^{n} = D(x_w^u, y) (DXn, morphX+rcoset) +
+   Dsym + #|D(x_{w₁},x_{w₂})|=p ⟹ n_u(w₁)·n_u(w₂)≡1 mod p。**核心の antisymmetry**。
+8. **σ + chain**: σ = conjNormal(w₁w₂⁻¹)、phiJ (phi(u^wbar)=(phi u)⁻¹) = phi_w12 の帰結。
+   chain 関係 `(φ v)∘(φ(σ v))=id on S₀` = phiJ を quotientMulAutHom 言語に translate。
+
+**次 iteration**: step 1-3 (setup + D form + antisym) を caseA_commutator_chain 内に実装開始
+(caseB の setup パターン流用)。step 7 (phi_w12) が核心 antisymmetry、step 8 が σ 生成。
+grind は multi-iteration。**注意**: Coq は Ubar=U/H₀ で作業するが Lean の quotientMulAutHom は
+U-subgroup 直接 (H̄ 上作用が C_U(H̄) を factor) — action factoring の照合に注意。
