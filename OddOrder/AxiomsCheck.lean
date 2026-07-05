@@ -43,6 +43,7 @@ import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Isaacs.Ch05_Transfer.Main
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
@@ -370,6 +371,10 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
   OddOrder.Isaacs.Ch06.nontrivialActionFixedByClosure_invariant_of_commutative
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.quotient_isFrobeniusAction_of_fixedBy_le
+-- Group-level companion of the action-quotient above: a Frobenius *group* transports across an
+-- isomorphism (kernel/complement/normality/complement-relation/Frobenius-condition all carried).
+-- Used in Peterfalvi (14.9) to move `V ⋊ W₂` onto `T/Q` for the `calT1` inertia `I_T(inflate θ)=QV`.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch06.isFrobeniusGroup_map_equiv
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch06.normal_of_commutator_le
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch06.sylow_not_le_of_prime_dvd_index
 #assert_only_allowed_axioms
