@@ -869,3 +869,22 @@ vs CharacterDifferenceImage.Orthogonal) の突合が実装時の最初の確認�
 - 残り = chain 部: 非可換 pair (x̂,ŷ) ∈ S_gen² → c := ⁅x̂,ŷ⁆ ∈ N̂ order p →
   σu-固定 + 双線形性で ē₀(a⁻¹ua)·ē₀(b⁻¹ub) = 1 → c-conj 鎖 (奇数位数) → ē₀ ≡ 1 → hfix。
   + S_gen closure = ⊤ (π-lift 帰納) + hDall dichotomy + Ĥ frame 再利用の main 組立。
+
+## 2026-07-05 lane-a (loop 65): (11.7) chain 算術 + closure 引き戻し (commit 129e7536)
+
+- chain_exponent_eq_one (f∘σ 反転 → σ 奇数冪で f²≡1 → d 奇数で x = (x²)^k·x = 1) と
+  closure_preimage_eq_top_of_closure_eq_top を sorry-free 化。
+- main 組立の設計メモ (次 iteration):
+  1. Ĥ frame (case b と同じ Q/N̂/π/σ/hπσ) を再構築
+  2. S_gen := π ⁻¹' (⋃ a, ↑(φa • S₀)); 1 ∈ ⋃ (S₀ ∋ 1); closure = ⊤ (span → closure union =
+     iSup: Subgroup.iSup_eq_closure or closure_iUnion_coe + 引き戻し補題)
+  3. by_cases 全 pair Commute → commute_all → Ĥ 可換 ↯ |Ĥ'| = p
+  4. else: pair x̂ ŷ (π x̂ ∈ φa•S₀, π ŷ ∈ φb•S₀), c := ⁅x̂,ŷ⁆ ≠ 1 ∈ N̂ 中心, orderOf c = p
+  5. e₀ choice (exists_pow_eq_of_mapsTo_of_card_prime on S₀; hS₀inv smul_mem);
+     transfer: σu x̂ = x̂^{e₀(a⁻¹ua)}·ẑ (π-同変 + ker π = N̂ 中心) → 双線形で
+     c = c^{e₀(a⁻¹ua)·e₀(b⁻¹ub)} → ZMod p 等式 ē₀(a⁻¹ua)·ē₀(b⁻¹ub) = 1
+  6. f v := ē₀(⟨a⁻¹va⟩)?? — 実際は g := fun v : ↥Usub => ē₀(conjA v) で hrel:
+     v ↦ a v a⁻¹ 代入で f v · f (σ_c v) = 1 (σ_c = conj by c := a⁻¹b in MulAut ↥Usub;
+     m := orderOf... |L| 奇数冪); chain_exponent_eq_one → ē₀∘conjA ≡ 1 → ē₀ ≡ 1
+     (conjA 全単射) → hfix (s^{e₀v} = s from ≡1 + order p) → caseA_fixed_contradiction。
+  - f の乗法性: s₀ 生成元 + pow_eq_pow_iff_modEq + ZMod.natCast_eq (mod p 抽出)。
