@@ -784,3 +784,14 @@ vs CharacterDifferenceImage.Orthogonal) の突合が実装時の最初の確認�
   (2) tau1-rfl: `hS₁coh✝` 二重 fvar 現象 — rw-flow 後も残存。fresh 診断:
       (a) 単独最小再現 (b) ofProjection_tau1 @[simp] 補題新設で rw-close 試行
       (c) statement 側の hS₁coh-依存 ∃ を Da-引数化する再定式化。
+
+### 追記 18 (loop 57): member-D Orthogonal 閉 — 残 = tau1-rfl fvar 謎 1 点
+
+- Orthogonal per-pair 実証明完了 ((A)+(B) 通り)。
+- tau1-rfl: goal の hS₁coh✝ は rename_i で確認した同型 IsCoherent の別 fvar。
+  set-ext fold でも解消せず (goal 側 fvar が現 hS₁coh でない)。
+  fresh 診断案: (i) 各 tactic 直後に goal-fvar を probe して二重化点を特定
+  (rw-at-hyps の revert 連鎖 or set の abstraction が疑い);
+  (ii) 回避: 証明冒頭で `obtain ⟨ne, ext, hie, hos, hmz⟩ := hS₁coh` と
+  即分解し ext-fvar 単独で全構成 (IsCoherent を早期に開けば以後の
+  依存が単純 fvar になり fold 齟齬が消えるはず) — 有望。
