@@ -7094,6 +7094,123 @@ theorem hcZetaPair_mem_xiOf [Finite G] {M : Subgroup G}
   exact ⟨hcZetaPair_mem_xiSet chief θ hθnt lam hθ₀,
     hcZetaPair_H0supCprime_subset_ker chief θ lam hlam⟩
 
+/-- **A nontrivial linear character of the chief factor exists**: `H̄` is a nontrivial finite
+abelian group, so `|Hom(H̄, ℂˣ)| = |H̄| > 1` (`card_monoidHom_of_hasEnoughRootsOfUnity`).
+Supplies the `θ ≠ 1` seed of the (9.9.c) pair character in Clifford case (b) (where no regular
+character is needed — `inertia_eq_hcInHu` takes any nontrivial `θ`). -/
+theorem exists_chiefFactorHom_ne_one [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    ∃ θ : (↥data.H ⧸ chief.N) →* ℂˣ, θ ≠ 1 := by
+  haveI := chief.N_normal
+  letI : CommGroup (↥data.H ⧸ chief.N) :=
+    { (inferInstance : Group (↥data.H ⧸ chief.N)) with
+      mul_comm := chief.quotient_elementaryAbelian.1 }
+  haveI : Nontrivial (↥data.H ⧸ chief.N) := by
+    obtain ⟨x, hxH, hxnot⟩ := SetLike.exists_of_lt chief.H0_lt_H
+    refine ⟨⟨QuotientGroup.mk ⟨x, hxH⟩, 1, ?_⟩⟩
+    rw [ne_eq, QuotientGroup.eq_one_iff]
+    intro hmem
+    exact hxnot (chief.H0_eq ▸ Subgroup.mem_map.mpr ⟨_, hmem, rfl⟩)
+  haveI : NeZero (Monoid.exponent (↥data.H ⧸ chief.N)) := ⟨Monoid.exponent_ne_zero_of_finite⟩
+  have hcard : Nat.card ((↥data.H ⧸ chief.N) →* ℂˣ) = Nat.card (↥data.H ⧸ chief.N) :=
+    CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity _ ℂ
+  haveI : Nontrivial ((↥data.H ⧸ chief.N) →* ℂˣ) := by
+    rw [← Finite.one_lt_card_iff_nontrivial, hcard]
+    exact Finite.one_lt_card_iff_nontrivial.mpr ‹_›
+  obtain ⟨f, g, hfg⟩ := exists_pair_ne ((↥data.H ⧸ chief.N) →* ℂˣ)
+  rcases eq_or_ne f 1 with rfl | hf
+  · exact ⟨g, (Ne.symm hfg)⟩
+  · exact ⟨f, hf⟩
+
+/-- **The realization iso `cInHu ≃* C`** (`G`-value preserving): the doubly-realized
+`C = C_U(H̄)` inside `HU` is isomorphic to the `G`-level `cSub`. -/
+noncomputable def cInHuEquivC {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data) :
+    ↥(cInHu data chief) ≃* ↥(cSub data chief) :=
+  (Subgroup.subgroupOfEquivOfLe (Subgroup.subgroupOf_mono M
+      (le_trans (cSub_le_U data chief) le_sup_right))).trans
+    (Subgroup.subgroupOfEquivOfLe ((cSub_le_U data chief).trans (U_le_M data)))
+
+theorem cInHuEquivC_coe {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data) (c : ↥(cInHu data chief)) :
+    ((cInHuEquivC data chief c : ↥(cSub data chief)) : G)
+      = (((c : ↥(huSub data)) : ↥M) : G) := rfl
+
+/-- **A `C'`-trivial nontrivial linear character of `C` exists** (`C ≠ 1`): `C` is a nontrivial
+solvable group (subgroup of the solvable maximal `M`), so its abelianization is nontrivial
+(`IsSolvable.commutator_lt_top_of_nontrivial`) and carries `|C/C'| > 1` linear characters; any
+of them kills every element of the realized `C' = ⁅C,C⁆` (commutators die in an abelian
+target).  Supplies the `λ` of the (9.9.c) pair character together with its `hlam` kernel
+hypothesis. -/
+theorem exists_cInHuHom_ne_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (hC : cSub data chief ≠ ⊥) :
+    ∃ lam : ↥(cInHu data chief) →* ℂˣ, lam ≠ 1 ∧
+      ∀ c : ↥(cInHu data chief),
+        (c : ↥(huSub data)) ∈ ((cprimeSub data chief).subgroupOf M).subgroupOf (huSub data) →
+        lam c = 1 := by
+  classical
+  -- `cInHu` is a nontrivial finite solvable group.
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups data.maximal
+  haveI : IsSolvable ↥(cInHu data chief) :=
+    solvable_of_solvable_injective (f := (huSub data).subtype.comp
+      (cInHu data chief).subtype)
+      ((huSub data).subtype_injective.comp (cInHu data chief).subtype_injective)
+  haveI : Nontrivial ↥(cSub data chief) := (Subgroup.nontrivial_iff_ne_bot _).mpr hC
+  haveI : Nontrivial ↥(cInHu data chief) := (cInHuEquivC data chief).toEquiv.nontrivial
+  -- the abelianization is nontrivial, so it has more than one linear character.
+  have hlt : commutator ↥(cInHu data chief) < ⊤ :=
+    IsSolvable.commutator_lt_top_of_nontrivial ↥(cInHu data chief)
+  haveI : Nontrivial (Abelianization ↥(cInHu data chief)) := by
+    obtain ⟨x, -, hxnot⟩ := SetLike.exists_of_lt hlt
+    exact ⟨⟨Abelianization.of x, 1, fun h => hxnot ((QuotientGroup.eq_one_iff x).mp h)⟩⟩
+  haveI : NeZero (Monoid.exponent (Abelianization ↥(cInHu data chief))) :=
+    ⟨Monoid.exponent_ne_zero_of_finite⟩
+  have hcard : Nat.card (Abelianization ↥(cInHu data chief) →* ℂˣ)
+      = Nat.card (Abelianization ↥(cInHu data chief)) :=
+    CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity _ ℂ
+  haveI : Nontrivial (Abelianization ↥(cInHu data chief) →* ℂˣ) := by
+    rw [← Finite.one_lt_card_iff_nontrivial, hcard]
+    exact Finite.one_lt_card_iff_nontrivial.mpr ‹_›
+  have hf : ∃ f : Abelianization ↥(cInHu data chief) →* ℂˣ, f ≠ 1 := by
+    obtain ⟨f, g, hfg⟩ := exists_pair_ne (Abelianization ↥(cInHu data chief) →* ℂˣ)
+    rcases eq_or_ne f 1 with rfl | hf
+    · exact ⟨g, (Ne.symm hfg)⟩
+    · exact ⟨f, hf⟩
+  obtain ⟨f, hf⟩ := hf
+  refine ⟨f.comp Abelianization.of, ?_, ?_⟩
+  · intro h1
+    apply hf
+    have hsurj : Function.Surjective ((Abelianization.of :
+        ↥(cInHu data chief) →* Abelianization ↥(cInHu data chief))) := fun a =>
+      QuotientGroup.mk_surjective a
+    exact (MonoidHom.cancel_right hsurj).mp
+      (h1.trans (MonoidHom.one_comp Abelianization.of).symm)
+  · intro c hc
+    -- `c` corresponds under the realization iso to an element of `commutator ↥C`.
+    have hcG : (((c : ↥(huSub data)) : ↥M) : G) ∈ cprimeSub data chief :=
+      Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp hc)
+    obtain ⟨y, hy, hyval⟩ := Subgroup.mem_map.mp (by
+      rw [show cprimeSub data chief
+          = (commutator ↥(cSub data chief)).map (cSub data chief).subtype from rfl] at hcG
+      exact hcG)
+    have hceq : cInHuEquivC data chief c = y :=
+      Subtype.ext ((cInHuEquivC_coe data chief c).trans hyval.symm)
+    have hcsymm : c = (cInHuEquivC data chief).symm y := by
+      rw [← hceq, MulEquiv.symm_apply_apply]
+    have hccomm : c ∈ commutator ↥(cInHu data chief) := by
+      have hmapped : (commutator ↥(cSub data chief)).map
+          (cInHuEquivC data chief).symm.toMonoidHom = commutator ↥(cInHu data chief) := by
+        rw [commutator_def, commutator_def, Subgroup.map_commutator,
+          Subgroup.map_top_of_surjective _ (cInHuEquivC data chief).symm.surjective]
+      rw [hcsymm, ← hmapped]
+      exact Subgroup.mem_map.mpr ⟨y, hy, rfl⟩
+    rw [MonoidHom.comp_apply,
+      show (Abelianization.of c : Abelianization ↥(cInHu data chief))
+        = QuotientGroup.mk c from rfl,
+      (QuotientGroup.eq_one_iff c).mpr hccomm]
+    exact map_one f
+
 /-- **Inertia index of `hcPsi θ` is `u`** (regular `θ`): for a regular seed `θ` (nontrivial on each
 Clifford factor `Hpart i`), the `HU`-inertia of `ζ_θ = hcPsi θ` is `HC` (`hcPsi_inertia_eq_hc` with the
 `inertia_eq_hcInHu_caseA` seed), so `[HU : I_{HU}(hcPsi θ)] = [HU:HC] = u` (`hc_index_eq_u`).  This is
