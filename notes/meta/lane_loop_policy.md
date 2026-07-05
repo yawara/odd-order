@@ -3,6 +3,12 @@
 > ❄ **FROZEN 2026-06-18** (ユーザー裁定; LAUNCH.md の LOOP GATE 全削除済)。ENTER 条件 3 (sorried cite 禁止) と
 > STOP の gate/depletion 項は 2026-06-28 no-gates 方式 ([`ft_lane_reallocation_2026_06_28.md`](ft_lane_reallocation_2026_06_28.md) §0)
 > と矛盾 — 再開時は要改訂。(注記 2026-07-02)
+>
+> ✅ **例外 = 60s cadence 規約は凍結対象外・operative (ユーザー再確認 2026-07-06)**: 凍結されたのは
+> LOOP GATE の **VERDICT/gate 機構** (hub が LOOP/STOP を設定する仕組み) のみ。line 33 の
+> **「/loop で回すときは wakeup = 最小 60s (即再開、idle 待ち禁止)」規約は wakeup 間隔の話で verdict 機構と
+> 独立ゆえ operative なまま**。LOOP GATE ブロック削除 (2026-06-18) で参照点が消え operative リンクが切れて
+> いたので、**各 LAUNCH.md の「開発」節に 60s cadence を明記して復活** (2026-07-06)。[[feedback-loop-short-wakeup]]。
 
 > 横断運用ドキュメント。各 worktree の `LAUNCH.md`（git-excluded）冒頭にある
 > **「▶ LOOP GATE」ブロック**から参照される正本。**ハブは他セッションに loop を注入できない**
