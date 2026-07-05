@@ -119,3 +119,18 @@ lane b の (13.3) `character_degree_analysis` τ₁ coherence を verify-first �
 prerequisite。** これを実装すれば両方 un-gate。lane b の (13.3) tau1S engine (tau1S_ofHonest 系) は現在
 likely-unsound な sibleyTarget_H0C を cite しており、subcoherent 実装後に coherent_H0Cprime_S を §5 route へ
 再 grounding して健全化する必要がある。hub 裁定: subcoherent の owner/着手 (shared §5/§7 infra)。
+
+## 2026-07-06 更新 #2 (lane b) — prime-TI は S06 に存在 (certainType 名)、prDade は assemblable + irrSubcoherent landed
+
+subcoherence 精査で 2 点判明:
+- **subcoherent structure は既 port 済** (S07.Hypothesis)。欠けは assembler のみ → `irrSubcoherent`
+  (S07_Subcoherent.lean、Coq irr_subcoherent、sorry-free) を landed。**FTtypeP_subcoherent は PFsection8:819** (PFsection5 でなく)。
+- **⚠ prime-TI machinery は「absent (0 refs)」でない — S06 に certainType 名で存在** (Coq 名 grep の見落とし、
+  本セッション 2 度目)。`certainType_isCoherent` (S06_CertainTypeCoherence:505 = 型-P family の coherence!)、
+  `certainType_columnSum_conj`/`certainType_columnSign_eq`/`certainType_nonzero`/`columnFamily_mu_injective`/
+  `Hypothesis46` 等。⟹ **item 1 `prDade_subcoherent` は S06 certainType_isCoherent + irrSubcoherent から
+  assemble 可能 (large 新 prime-TI port 不要)**。
+
+**⟹ (13.3) coherence chain の tractability 上方修正**: S06 certainType_isCoherent → prDade_subcoherent
+(assemble) → FTtypeP_subcoherent (thin) → (9.11) Ptype_core_coherence (8-step、coherent_of_constant_degree
+既存) → (13.3) tau1S coherence (sibleyTarget_H0C を置換) + (10.7)[a]。次 = prDade を verify-first で assemble。
