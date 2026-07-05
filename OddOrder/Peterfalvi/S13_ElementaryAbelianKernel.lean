@@ -497,4 +497,51 @@ theorem chiefKernel_caseB_false [Finite G] {M : Subgroup G}
 
 end CaseB
 
+/-! ## Case (a): the fixed-point endgame -/
+
+section CaseA
+
+variable {G : Type*} [Group G]
+
+open OddOrder.Isaacs.Ch03 (IsAInvariant)
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
+open scoped Pointwise
+
+/-- **Case (a) endgame**: if `U` fixes the order-`p` factor `S₀ ≠ ⊥` pointwise, it fixes every
+`U W₁`-translate pointwise (conjugating the acting element back into the normal kernel `U`),
+hence all of `H̄ = ⨆ translates` — contradicting (9.4.b) (`U_noncentral_on_quotient`). -/
+theorem caseA_fixed_contradiction [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    {S₀ : Subgroup (↥data.H ⧸ chief.N)} (hS₀ne : S₀ ≠ ⊥)
+    (hfix : ∀ (v : ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))),
+      ∀ s ∈ S₀, quotientMulAutHom chief.N_aInvariant ↑v s = s) :
+    False := by
+  have hUnorm : (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer le_sup_left).mpr
+      (sup_le Subgroup.le_normalizer data.typeP.W1_normalizes_U)
+  have hspan := iSup_smul_eq_top_of_irreducible
+    (φ := quotientMulAutHom chief.N_aInvariant) chief.quotient_chiefFactor hS₀ne
+  -- every translate is fixed pointwise by the `U`-part
+  have hfixT : ∀ (a : ↥(data.typeP.U ⊔ data.typeP.W1)),
+      (quotientMulAutHom chief.N_aInvariant a) • S₀ ≤
+        OddOrder.GroupTheory.fixedSubgroup (quotientMulAutHom chief.N_aInvariant)
+          (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) := by
+    intro a h hh
+    rw [Subgroup.mem_smul_pointwise_iff_exists] at hh
+    obtain ⟨s, hs, rfl⟩ := hh
+    rw [OddOrder.GroupTheory.mem_fixedSubgroup]
+    intro l hl
+    have hc : a⁻¹ * l * a ∈ data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1) := by
+      simpa using hUnorm.conj_mem l hl a⁻¹
+    have hkey := hfix ⟨a⁻¹ * l * a, hc⟩ s hs
+    rw [MulAut.smul_def, ← MulAut.mul_apply, ← map_mul,
+      show l * a = a * (a⁻¹ * l * a) by group, map_mul, MulAut.mul_apply, hkey]
+  have htop : OddOrder.GroupTheory.fixedSubgroup (quotientMulAutHom chief.N_aInvariant)
+      (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) = ⊤ := by
+    rw [eq_top_iff, ← hspan]
+    exact iSup_le hfixT
+  exact chief.U_noncentral_on_quotient htop
+
+end CaseA
+
 end OddOrder.Peterfalvi.S13
