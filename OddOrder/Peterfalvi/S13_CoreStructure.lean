@@ -1193,7 +1193,7 @@ theorem chief_H0_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       hG.odd.of_dvd_nat ((Subgroup.card_subgroup_dvd_card _).trans
         (Subgroup.card_subgroup_dvd_card _))
     obtain ⟨σ, m, hmodd, hσm, hchain⟩ :=
-      caseA_commutator_chain hyp.chief hS₀card (fun v s hs => hS₀inv.smul_mem v hs)
+      caseA_commutator_chain hyp.chief hpK hNcomm hNne hS₀card (fun v s hs => hS₀inv.smul_mem v hs)
     exact caseA_fixed_contradiction hyp.chief hS₀ne
       (caseA_fixes_of_action_chain hyp.chief hS₀card (fun v s hs => hS₀inv.smul_mem v hs)
         hAodd σ hmodd hσm hchain)
