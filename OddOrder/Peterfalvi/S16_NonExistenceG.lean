@@ -2585,10 +2585,60 @@ structure EtaGenericData (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) w
     hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩ g = 1
   betaM_vanish : ∀ g ∈ Mdata.G0, Mdata.betaM g = 0
 
-/-- **Peterfalvi (3.9.a/c) `η`-grid facts on `G₀`** — the genuine §3/§5 Dade obligation, gated on the
-`ω`-orthonormality / `τ₃`-isometry grid properties of the base `Hypothesis` (issue 3002/9009): on the
-generic set `G₀` (elements of order prime to `pq`), the `η`-grid takes integer values (3.9.c), pairs
-under the negation involution (3.9.a), and has principal entry `η₀₀ = 1`. -/
+/-- **Peterfalvi (3.3), the trivial grid entry**: `ω₀₀ = 1_W`.  Every `w ∈ W = W₁ ⊔ W₂`
+splits as `w = x·y` with `x ∈ W₁`, `y ∈ W₂` (`W` cyclic hence abelian, so the join is the
+product), and the row-`0`/column-`0` trivialities (issue-2033 grid semantics) kill both
+factors. -/
+theorem omega_zero_zero_eq_trivial [Finite G] (hyp : Hypothesis (G := G)) :
+    hyp.base.omega ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩
+      = trivialClassFunction ↥hyp.base.W := by
+  letI := hyp.base.W_cyclic
+  letI : CommGroup ↥hyp.base.W := IsCyclic.commGroup
+  have hW1le : hyp.base.W1 ≤ hyp.base.W := by
+    rw [hyp.base.W_eq_join]; exact le_sup_left
+  have hW2le : hyp.base.W2 ≤ hyp.base.W := by
+    rw [hyp.base.W_eq_join]; exact le_sup_right
+  ext w
+  have hw : w ∈ (hyp.base.W1.subgroupOf hyp.base.W)
+      ⊔ (hyp.base.W2.subgroupOf hyp.base.W) := by
+    have h1 : (hyp.base.W1 ⊔ hyp.base.W2).subgroupOf hyp.base.W = ⊤ := by
+      rw [← hyp.base.W_eq_join, Subgroup.subgroupOf_self]
+    rw [← Subgroup.subgroupOf_sup hW1le hW2le, h1]
+    exact Subgroup.mem_top w
+  obtain ⟨x, hxmem, y, hymem, hxy⟩ := Subgroup.mem_sup.mp hw
+  have hval : hyp.base.omega ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩ w = 1 := by
+    rw [← hxy, hyp.base.omega_mul,
+      hyp.base.omega_row_zero_apply_of_mem_W1 _ x (Subgroup.mem_subgroupOf.mp hxmem),
+      hyp.base.omega_col_zero_apply_of_mem_W2 _ y (Subgroup.mem_subgroupOf.mp hymem),
+      one_mul]
+  rw [hval, trivialClassFunction_apply]
+
+/-- **Peterfalvi (3.3)/(13.1.d): the principal `η`-entry is the constant `1`** —
+`η₀₀ = τ₃(ω₀₀) = τ₃(1_W) = 1_G` (`omega_zero_zero_eq_trivial` + `tau3_trivial`), so
+`η₀₀(g) = 1` for **every** `g ∈ G` (no `G₀` restriction needed). -/
+theorem eta_zero_zero_apply_eq_one [Finite G] (hyp : Hypothesis (G := G)) (g : G) :
+    hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩ g = 1 := by
+  rw [hyp.base.eta_eq_tau_omega, omega_zero_zero_eq_trivial hyp, hyp.base.tau3_trivial,
+    trivialClassFunction_apply]
+
+/-- **Peterfalvi (3.9.a/c), the Galois half of the `η`-grid facts** — the genuine §3/§5
+obligation still gated on the `τ₃`-Galois-equivariance (issue 3002 follow-up; the carried
+grid primitives determine `η` on `W`-regular values but not its Galois behaviour off `W`):
+on the generic set `G₀`, the `η`-grid takes integer values (3.9.c) and pairs under the
+negation involution (3.9.a). -/
+theorem eta_grid_galois_facts_on_G0 [Finite G] (hyp : Hypothesis (G := G))
+    (Mdata : MHypothesis hyp) :
+    (∀ g ∈ Mdata.G0, ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
+      ∃ m : ℤ, hyp.base.eta i j g = (m : ℂ)) ∧
+    (∀ g ∈ Mdata.G0, ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
+      hyp.base.eta (finNeg hyp.base.q_prime.pos i) (finNeg hyp.base.p_prime.pos j) g
+        = hyp.base.eta i j g) := sorry
+
+/-- **Peterfalvi (3.9.a/c) `η`-grid facts on `G₀`**: on the generic set `G₀`, the `η`-grid
+takes integer values (3.9.c), pairs under the negation involution (3.9.a), and has principal
+entry `η₀₀ = 1`.  The principal entry is now genuine (`eta_zero_zero_apply_eq_one`, the
+issue-2033 grid-semantics payoff); the Galois half remains the named obligation
+`eta_grid_galois_facts_on_G0`. -/
 theorem eta_grid_facts_on_G0 [Finite G] (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) :
     (∀ g ∈ Mdata.G0, ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
       ∃ m : ℤ, hyp.base.eta i j g = (m : ℂ)) ∧
@@ -2596,7 +2646,9 @@ theorem eta_grid_facts_on_G0 [Finite G] (hyp : Hypothesis (G := G)) (Mdata : MHy
       hyp.base.eta (finNeg hyp.base.q_prime.pos i) (finNeg hyp.base.p_prime.pos j) g
         = hyp.base.eta i j g) ∧
     (∀ g ∈ Mdata.G0,
-      hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩ g = 1) := sorry
+      hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩ g = 1) := by
+  obtain ⟨hint, hpair⟩ := eta_grid_galois_facts_on_G0 hyp Mdata
+  exact ⟨hint, hpair, fun g _ => eta_zero_zero_apply_eq_one hyp g⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (3.9)/(14.10) generic-set producer.**  The `η`-grid integrality/symmetry on `G₀`
