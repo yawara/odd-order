@@ -134,6 +134,13 @@ structure Hypothesis where
   (`isMulCommutative_V`, `coprime_card_V_card_Q_of_disjoint`, …), previously routed circularly through
   the sorried `reconciled_typePData_T` (`Q_inf_V_eq_bot_of_reconciled`). -/
   Q_inf_V_eq_bot : Q ⊓ V = ⊥
+  /-- **Peterfalvi (13.1.b), T-side semidirect complement `T = T' ⋊ W₂`**: the cyclic factor `W₂`
+  complements the derived subgroup `T'` in `T`.  Available ungated at the §16 construction from
+  `typeP_derivedInG_isComplement_kappaHall` (BG 14.7(h), via `T`'s type-`P` structure `T_nonI`,
+  **not** (14.9)); the abstract Hypothesis otherwise omits it.  Discharges the `M_complement` field
+  of `reconciled_typePData_T` and lets the ungated `coprime_card_Q_card_VW2` build honestly. -/
+  W2_isComplement_T_deriv :
+    Subgroup.IsComplement' ((derivedInG T).subgroupOf T) (W2.subgroupOf T)
   C_eq : C = U ⊓ Subgroup.centralizer (P : Set G)
   D_eq : D = V ⊓ Subgroup.centralizer (Q : Set G)
   W1_normalizes_U : W1 ≤ Subgroup.normalizer (U : Set G)
@@ -2884,7 +2891,9 @@ theorem reconciled_typePData_T [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd 
       rw [hyp.q_eq_card_W1, h, Subgroup.card_bot] at hq; exact absurd hq (by norm_num)
     W1_cyclic := hW2cyc
     W2_cyclic := hW1cyc
-    M_complement := sorry
+    -- `T = T' ⋊ W₂`: the honest field `W2_isComplement_T_deriv` (ungated, threaded from the §16
+    -- `typeP_derivedInG_isComplement_kappaHall`).  No longer `sorry`.
+    M_complement := hyp.W2_isComplement_T_deriv
     W1_normalizes_U := hyp.W2_normalizes_V
     U_nilpotent := sorry
     -- `V` complements `Q = T_F` in `T'`: disjointness is the honest field `Q_inf_V_eq_bot`

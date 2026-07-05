@@ -1676,3 +1676,28 @@ cont.⁵⁸ で S16_GridExpansion に engine (`eta_orthogonal_of_norm_one_pair_v
 拡張)。着手経路 = Coq `FT_Dade_support_partition`/`coHr` 精読 → Ã(M)=dadeSupport の Fitting
 素集合 vs W^G⊆(S∪T)^G の disjointness を nc.not_conj から。次点 = (13.19.c) lSide grid
 counting (issue 3002 sphere、grid 係数 enumerate)。両 gate とも c 所有・ungated。
+
+### cont.⁶⁰ (2026-07-05 lane c /loop) — 🎯 (13.19.a) mSide 実証明化 (Coq tiA_PWG reduction) + 二 σ-gate 分離
+
+cont.⁵⁹ が予告した (13.19.a) を Coq `tiA_PWG` (PFsection13:2009-2030
+`'A~(L) :&: PWG = set0`) の証明構造どおり分解 (commit `280aecb6`):
+
+- **`mSide_dadeSupport_avoids_regular` (PROVEN)**: elementary reduction を実証明。
+  x ∈ Ŵ^G → w∈W の共役 → **orderOf x ∣ p·q** (|W₁|=q, |W₂|=p 素数 `q_eq_card_W1`/
+  `p_eq_card_W2` + W=W₁·W₂ 可換 `W1_commutes_W2` + `Commute.orderOf_mul_dvd_mul_orderOf`
+  + Lagrange) → |M_F| 互素 → π(M_F)-singular gate と矛盾。API: `SemiconjBy.orderOf_eq`
+  (共役 order 不変)、`Nat.Coprime.coprime_dvd_left`。
+- **`card_kernel_coprime_pq` (sorry, σ-decomposition)**: `Coprime |M_F| (p·q)` = Coq
+  coHp/coHq。`FT_Dade_support_partition` bottom-out (nc.not_conj 必須)。**深 gate 1**。
+- **`dadeSupport_not_coprime_card_kernel` (sorry, Dade signalizer)**: Ã(M) の元 y は
+  `¬Coprime(orderOf y, |M_F|)` (y~x·r, x∈M_F^#, 1<orderOf x ∣ orderOf y)。**深 gate 2**。
+
+S16 実 sorry 8→9 (opaque 1 → proven reduction + precise 2)。full build 3929 green (41s)。
+
+**⚠ 次 iteration の主眼 = gate を「割る」でなく「閉じる」(sorry 削減)**: 7→8→9 と de-scaffold で
+sorry が増えた (各 step は honest だが)。次は **`card_kernel_coprime_pq` (σ-gate) を既存 σ 機構で
+閉じる**を試みる — 候補: `OddOrder.BG.Ch4.S14.genuineSigmaDecomposition` /
+`conjClassSet_Mtilde_disjoint` / S16_G0Coprime の `coprime_p_card_U`/`coprime_q_card_derivedS`
+系。M_F の σ-primes vs {p,q}⊆σ(S)∪σ(T) の disjointness を、M≁S,T (nc) から σ-decomposition で。
+これが closable なら実 sorry 減。Dade gate 2 は §8 ftThickenedSupport 元構造 (x·R(x)) +
+signalizer coprime = より深い。
