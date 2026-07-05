@@ -2079,3 +2079,25 @@ cont.⁶⁸ 系の「b-consume 候補」ラベルは全般に誤りだった:
   / `not_isTypeII_of_isTypeIII_or_IV` (proven) が下地。
 - **注意**: 他 7 sorry は b (S15 (13.15)/grid/η-grid) か 9000 (field-model) 待ち。c-lane は cite-when-landed。
   「b-consume 候補」ラベルは循環/gate を個別確認せず貼らない ([[verify-port-state-by-number-not-coq-name]])。
+
+### cont.⁷¹ (2026-07-06 lane c /loop、ユーザー lane-d 指摘で訂正) — gate-map 訂正 (lane-d 退役) + C assembly 完了確認 + T-side (13.15) 調整 issue 9013
+
+**ユーザー指摘「lane-d 廃止」で cont.⁷⁰ gate-map を訂正**: lane-d は 2026-07-02 退役 (`ft_lane_reallocation` 3レーン再編)。
+cont.⁷⁰ の「9000 = lane-d」は issue 9000 の旧 header (2026-07-01) を stale-cite したもの。**訂正**: 9000 σ-theory
+(Singer/Galois divisibility+upper-bound) は完成・frozen shared infra、gate でない。**残 8 sorry は全て lane-b**
+(§16 char cascade = S15 (13.9)-(13.19))。
+
+**新発見 (精査)**:
+1. **C の assembly は top-level `nonexistence_of_G` まで完了** (残 sorry は leaf のみ)。
+2. **exact u-value は C 内で proven** = `u_final_value` (:5874)、**(14.15) fpf-congruence route** (`orthogonality_switch`
+   + `u_final_value_of_fpf_card_congruences`) — **(13.15) 非経由・ungated**。⟹ exact-value は原理的に C-buildable。
+3. **但し v-value (T-side) は (14.15) 相当 route 無し** — (14.4) case-(9.7.b) = (13.15)-dual 直行。`key_ratio_inequality`
+   は T-side に **lower bound** (v ≥ V_v) を要求 (v が不等式大側)、9000 の upper-bound では不足。⟹ (13.15)-dual gated。
+4. **lane-b は §13 char cascade を active building** (commit a1dc3748: (13.12) c_eq_one = (13.10)+(13.11) 組立)。
+   但し S-side hardcoded (`hyp.c`)。
+
+**訂正した doctrine 適用**: cont.⁷⁰ の「should C wait?」framing は `ft_lane_reallocation` の「ゲートは幻・待ち文化禁止」
+に反していた。正しくは: **C は自クラスタ assembly 完了 → lane-b landing を consume (issue 3002 η-grid の cont.⁶⁸
+consume が実例) + lanes-equivalent ゆえ char cascade に貢献可**。T-side (13.15) は C 自 file・T-side ゆえ lane-b S-side と
+非衝突だが、lane-b estimate の re-derive は重複。⟹ **issue 9013 で lane-b に §13 estimate の subgroup-generic 化を
+依頼** (案 A 推奨: 両側 cite で非重複)。裁定待ちの間 C は landing consumer。
