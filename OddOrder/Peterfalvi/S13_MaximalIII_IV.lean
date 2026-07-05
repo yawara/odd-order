@@ -1239,6 +1239,10 @@ theorem coherent_S_of_coherent_SH0C [Finite G]
     exact hyp.base.exists_source_of_coherence_dichotomy _hG
       (hyp.params_mu_eq _hG _hG.odd) hyp.params_delta_pm
       (hyp.params_delta_sign _hG _hG.odd) hyp.params_zeta_mem hyp.params_zeta_degree
+      (hyp.base.isTypeIIIorIV _hG)
+      (OddOrder.GroupTheory.typePNontrivialCore_of_isTypeIIIorIV
+        (hyp.base.isTypeIIIorIV _hG) hyp.base.typeP)
+      (OddOrder.Peterfalvi.S11.exists_chiefFactorData _hG _).choose
       hAne hBne hAcoh' hBncoh'
 
 /-- **Peterfalvi (11.3)**: `S(H_0 C)` is not coherent.
@@ -1297,6 +1301,10 @@ theorem coherent_quotient_bound [Finite G]
   have hbound := hyp.base.six_two_dichotomy_bound _hG
     (hyp.params_mu_eq _hG _hG.odd) hyp.params_delta_pm
     (hyp.params_delta_sign _hG _hG.odd) hyp.params_zeta_mem hyp.params_zeta_degree
+    (hyp.base.isTypeIIIorIV _hG)
+    (OddOrder.GroupTheory.typePNontrivialCore_of_isTypeIIIorIV
+      (hyp.base.isTypeIIIorIV _hG) hyp.base.typeP)
+    (OddOrder.Peterfalvi.S11.exists_chiefFactorData _hG _).choose
     (A' := H1.subgroupOf M) (B := hyp.H0C.subgroupOf M)
     (C := hyp.HC.subgroupOf M) (D := hyp.HC.subgroupOf M)
     (Hypothesis.trace_ne_top_of_lt_derived hH1_lt) hyp.H0C_trace_ne_top
