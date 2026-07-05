@@ -665,3 +665,11 @@ coeff (X ∈ ℤ[R]) / Y ⊥ R。
 
 member-clause の Orthogonal-def 階層 (OrthonormalCharacterImageFamily.Orthogonal
 vs CharacterDifferenceImage.Orthogonal) の突合が実装時の最初の確認点。
+
+## 2026-07-05 lane-a (loop 46): ★break-Da 実構成完了
+
+- ofProjection 組み立て成功 (全 obligation family-level 放電 — 追記 13 recipe 通り、
+  ただし支持は α-計算不要で scaledDiff_support に一本化できた)。
+- 残 sorry = member-∀-clause (可約 break の Da に対する各 χ ∈ S₁ の D):
+  irr-χ は memberDatum-machinery + R(χ)⊥R(列) (源 4-cross 直交 → signedDifference
+  経由); 可約-χ は列-列。+ sixTwoMemberDatum_of_reducible_member (対 irr-break)。
