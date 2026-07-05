@@ -1993,3 +1993,28 @@ cont.⁶⁵ の loop 停止は誤り。**再開後、carrier の残 field を in
 (a_0j/a_i0≡1 mod2) = Coq `FTtypeI_bridge_facts` (S-side type-P coherent pairing、(13.19.c) boundary だが S15
 coherence source)、grid_mem (Y=0) = §13 cyclic-TI residual 分解。bessel と違い b の S15 coherence 要の公算だが
 internal descent で確認する (bessel の教訓: 2 度 gated 誤判定した)。
+
+### cont.⁶⁸ (2026-07-05 lane c /loop) — ✅ eta_grid_galois_facts_on_G0 実証明: b の issue 3002 η-grid keystone を consume (sorry 9→8)
+
+**「gated on b → b landing 後に cite」pattern が実現** (loop 継続の正当性の実証)。b が `b26fbc0d`
+(issue 3002 keystone, ユーザー承認 Step-D) で S15.Hypothesis に (3.9.c)/(3.9.a) η-grid Dade fields
+(`eta_intCast_of_coprime` / `eta_pair_of_coprime`、sorry-free) を threading。c が即 consume:
+- `eta_grid_galois_facts_on_G0` を実証明 (commit `a3eca9c0`): G0 元は order coprime to pq
+  (`MHypothesis.G0_orderOf_coprime`) ゆえ両 field 適用可。`hG` を eta_grid_galois/eta_grid_facts に
+  threading (`eta_generic_data` の _hG から、external contract 不変)。finNeg は S15/S16 defeq。
+- ⟹ `eta_generic_data` (EtaGenericData) が s/t_frobenius_kernel modulo で genuine 化。sorry 9→8。
+full build 3929 green、AxiomsCheck OK、新 axiom 無。
+
+**残 S16 sorry 8 の次候補** (深さ順):
+- **`T_typeII_structural_inputs` (:82)** = 次の最有力 consume 対象: 5 piece (TypePNontrivialCore /
+  IsMulCommutative U / ¬N_G(U)≤T / IsTypeF(T') / maxNilpotentNormalHall(T')=H) は b の
+  `S15_SAndT.lean` に関連事実あり (:1150 IsMulCommutative, :1194 maxNilpotentNormalHall(T')=Q 等)。
+  generic `TypePData hyp.base.T` への matching wiring が要 (b の tdata-specific 事実を canonical data に)。
+- `s_/t_side_frobenius_kernel` (:2592/2605): FND carrier (`field_normalizer_of_U_characteristic_of_fpf`)
+  = 14.2.a inputs (hu_mod_p / conjugation facts) が §13/9000 gated。engine は proven。
+- `v-value` (:177): Singer cyclotomic v=(q^p−1)/(q−1) = 9000 Galois。
+- carrier 3 field (m_row/m_col/grid_mem): cont.⁶⁵-⁶⁷ で b §13 FTtypeI_bridge + Y=0 に gated 確認済。
+
+**教訓 (loop 継続 = 正しい)**: cont.⁶⁵ で「停止」したのは誤り。loop を回し続けたことで b の issue 3002
+landing を即 consume して sorry 減 (9→8)。「gated on b」は停止理由でなく、b の landing を待って cite する
+signal ([[feedback-cite-sorried-lemmas-if-signature-correct]] 「ゲートは幻」の実証)。
