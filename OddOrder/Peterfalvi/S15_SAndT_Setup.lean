@@ -3041,13 +3041,85 @@ theorem Hypothesis.two_mul_u_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
 
 open scoped Classical in
 open scoped FiniteInduce in
-/-- **Peterfalvi (13.3)/(13.5), the distinguished index of `λ`** — the (13.10) supposition
-localized to the (7.6) family: `λ` (irreducible, induced from a linear character of `H` with
-`P` off its kernel) *is* a member `ζ_{i₁}` of the induced family, with distinguished (7.7.a)
-coefficient `c_{i₁} = a = 1` and all other `P`-non-kernel coefficients vanishing (the (13.5)
-hypothesis for `χ = λ^{τ₁}`, `a = 1` — from `S`-coherence).  Faithful producer; gated on the
-(13.3) analysis pinning `chars.lambda`/`chars.tau1S` to the family and the coherence
-orthogonality. -/
+/-- **The distinguished `λ`-index in the (7.6) family, membership half** (real): `λ = Ind_H^S θ`
+(the materialized (13.3.b) field) appears at a family index (`zeta_family_cover`), at a
+*positive* one (the base is pinned to `ζ₀ = Ind 1_H`, `H_sharp_zeta_zero`, which is `P`-kernel
+while `λ` is not), and `P ⊄ Ker ζ_{i₁}` (kernel descent,
+`mem_characterKernel_of_mem_characterKernel_induce`). -/
+theorem exists_lambda_family_index [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (chars : CharacterDegreeData hyp) :
+    ∃ i₁ : Fin ((H_sharp_hypothesis76 hG hyp).n + 1), 0 < i₁ ∧
+      ¬ ((hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel ((H_sharp_hypothesis76 hG hyp).zeta i₁)) ∧
+      (H_sharp_hypothesis76 hG hyp).zeta i₁ = chars.lambda := by
+  classical
+  obtain ⟨θ, hθirr, hθ1, hlamEq, x₀, hx₀P, hx₀ker⟩ := chars.lambda_induced_from_PC_linear
+  obtain ⟨i₁, hi₁⟩ := (H_sharp_hypothesis76 hG hyp).zeta_family_cover ⟨θ, hθirr⟩
+  -- `ζ_{i₁} = Ind θ = λ` (instance bridge between the canonical and scoped `induce`s)
+  have heq : (H_sharp_hypothesis76 hG hyp).zeta i₁ = chars.lambda := by
+    rw [hi₁, hlamEq]
+    congr! <;> exact Subsingleton.elim _ _
+  -- `P ⊄ Ker ζ_{i₁}`: the witness `x₀ ∈ P ∖ Ker θ` survives kernel descent
+  have hker : ¬ ((hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel ((H_sharp_hypothesis76 hG hyp).zeta i₁)) := by
+    intro hsub
+    refine hx₀ker ?_
+    have hx₀S : ((x₀ : ↥hyp.S)) ∈ hyp.P.subgroupOf hyp.S :=
+      Subgroup.mem_subgroupOf.mpr hx₀P
+    have hmem : ((x₀ : ↥hyp.S)) ∈ OddOrder.Peterfalvi.S03.characterKernel
+        (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ) := by
+      have h1 := hsub hx₀S
+      rw [heq, hlamEq] at h1
+      exact h1
+    have hbridge := mem_characterKernel_of_mem_characterKernel_induce
+      (L := ↥hyp.S) (H := hyp.H.subgroupOf hyp.S) hθirr x₀.2 hmem
+    rwa [show (⟨((x₀ : ↥hyp.S)), x₀.2⟩ : ↥(hyp.H.subgroupOf hyp.S)) = x₀ from rfl] at hbridge
+  -- positivity: `ζ₀ = Ind 1_H` is `P`-kernel, so `i₁ ≠ 0`
+  refine ⟨i₁, ?_, hker, heq⟩
+  rw [Fin.pos_iff_ne_zero]
+  intro h0
+  refine hker ?_
+  rw [h0, H_sharp_zeta_zero hG hyp]
+  intro y hyP
+  have hyH : (y : ↥hyp.S) ∈ hyp.H.subgroupOf hyp.S := by
+    have hPH : hyp.P ≤ hyp.H := le_sup_left
+    exact Subgroup.mem_subgroupOf.mpr (hPH (Subgroup.mem_subgroupOf.mp hyP))
+  rw [OddOrder.Peterfalvi.S03.mem_characterKernel,
+    OddOrder.Peterfalvi.S03.characterDegree_def,
+    show ((OddOrder.RepresentationTheory.trivialIrreducibleCharacter
+        ↥(hyp.H.subgroupOf hyp.S)) : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ)
+      = trivialClassFunction ↥(hyp.H.subgroupOf hyp.S) from rfl]
+  rw [OddOrder.Peterfalvi.S09.Cert.induce_trivialChar_apply_eq_index _ hyH,
+    OddOrder.Peterfalvi.S09.Cert.induce_trivialChar_apply_eq_index _
+      (Subgroup.one_mem (hyp.H.subgroupOf hyp.S))]
+
+open scoped Classical in
+open scoped FiniteInduce in
+/-- **The (7.7.a) coefficients of `λ^{τ₁}` at the distinguished index** (Peterfalvi (13.5),
+"the hypothesis of (13.5) holds with `ζ₁ = λ`, `χ = λ^{τ₁}`, `a = 1` — since `𝒮` is coherent
+and `𝒮₁ ⊂ ℤ[𝒮]`"): `c_{i₁} = ⟨τψ_{i₁}, λ^{τ₁}⟩ = 1` and every other `P`-non-kernel
+coefficient vanishes.  The content is the τ₁-coherence semantics (τ₁ extends τ on family
+differences + τ₁-isometry + distinct-induced orthogonality); faithful producer, gated on the
+(13.3)/τ₁ fields (issue 2034 設計). -/
+theorem lambda_tau1_cCoeff [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (chars : CharacterDegreeData hyp)
+    (i₁ : Fin ((H_sharp_hypothesis76 hG hyp).n + 1)) (hi₁pos : 0 < i₁)
+    (hi₁eq : (H_sharp_hypothesis76 hG hyp).zeta i₁ = chars.lambda) :
+    (H_sharp_hypothesis76 hG hyp).cCoeff (chars.tau1S chars.lambda) i₁ = 1 ∧
+      (∀ i : Fin ((H_sharp_hypothesis76 hG hyp).n + 1), 0 < i → i ≠ i₁ →
+        ¬ ((hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel ((H_sharp_hypothesis76 hG hyp).zeta i)) →
+        (H_sharp_hypothesis76 hG hyp).cCoeff (chars.tau1S chars.lambda) i = 0) := by
+  sorry
+
+open scoped Classical in
+open scoped FiniteInduce in
+/-- **Peterfalvi (13.3)/(13.5), the distinguished index of `λ`** — real assembly: the
+membership half is `exists_lambda_family_index` (family cover + trivial base + kernel
+descent, all proven); the coefficient half is the τ₁-coherence producer
+`lambda_tau1_cCoeff`. -/
 theorem exists_lambda_index [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
     (chars : CharacterDegreeData hyp) :
@@ -3060,7 +3132,9 @@ theorem exists_lambda_index [Fintype G] [Invertible (Nat.card G : ℂ)]
         ¬ ((hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
           OddOrder.Peterfalvi.S03.characterKernel ((H_sharp_hypothesis76 hG hyp).zeta i)) →
         (H_sharp_hypothesis76 hG hyp).cCoeff (chars.tau1S chars.lambda) i = 0) := by
-  sorry
+  obtain ⟨i₁, hpos, hker, heq⟩ := exists_lambda_family_index hG chars
+  obtain ⟨hc1, hmid⟩ := lambda_tau1_cCoeff hG chars i₁ hpos heq
+  exact ⟨i₁, hpos, hker, heq, hc1, hmid⟩
 
 open scoped Classical in
 open scoped FiniteInduce in
