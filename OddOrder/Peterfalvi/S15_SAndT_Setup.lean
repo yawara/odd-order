@@ -6544,16 +6544,45 @@ theorem c_eq_one_forces_params {p q c : ℕ} {m : ℚ}
   · exact absurd hp (by norm_num)
   · exact absurd hp (by norm_num)
 
-/-- **Peterfalvi (13.12), structural residual**: the numerically-forced case `p = 5, q = 3, c = 7`
-is impossible.  Since `p − 1 = 4` has no odd divisor `≠ 1`, case (9.7.b) holds for `S`, so `u`
-divides `(p^q − 1)/(p − 1) = 31`; then `c = 7` is coprime to `u`, making `PC` a **normal nilpotent
-Hall subgroup** of `S` strictly containing `P = S_F` — contradicting `P = maxNilpotentNormalHall S`
-(Coq `FTtypeP_Ind_Fitting_reg_Fcore`: `typeP_Galois` dichotomy + Fitting-core maximality
-`Fcore_max`).  Deep §13 σ-structure residual — the only gap left in (13.12) after the elimination
-`c_eq_one_forces_params`. -/
-theorem c_eq_one_final_case [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (hp5 : hyp.p = 5) (hq3 : hyp.q = 3) (hc7 : hyp.c = 7) : False :=
+/-- **Peterfalvi (13.12), the isolated `PC`-Hall obligation**: for the numerically-forced
+`p = 5, q = 3, c = 7`, the subgroup `PC = P ⊔ C` is contained in `M_F = maxNilpotentNormalHall S`.
+
+Peterfalvi's argument: `PC` is **abelian** (hence nilpotent) — `P` is elementary abelian, `C ≤ U` is
+abelian, and `C` centralizes `P` (`C_eq`); it is **normal** in `S` (type-`P` `W₁`-structure); and it
+is a **Hall** subgroup once `gcd(c, u) = 1`, which holds because case (9.7.b) for `S` (as `p − 1 = 4`
+has no odd divisor `≠ 1`) forces `u ∣ (p^q − 1)/(p − 1) = 31` (Singer / `typeP_Galois`), coprime to
+`c = 7`.  By `le_maxNilpotentNormalHall` these three facts give `PC ≤ M_F`.  The `typeP_Galois`
+dichotomy and the `W₁`-normality are the genuinely deep §13 σ-structure content (Coq
+`FTtypeP_Ind_Fitting_reg_Fcore`: `typeP_Galois` + Fitting-core maximality `Fcore_max`), §14-gated /
+multi-session — the sole remaining gap of (13.12). -/
+theorem pc_le_maxNilpotentNormalHall [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hp5 : hyp.p = 5) (hq3 : hyp.q = 3) (hc7 : hyp.c = 7) :
+    hyp.P ⊔ hyp.C ≤ maxNilpotentNormalHall hyp.S :=
   sorry
+
+/-- **Peterfalvi (13.12), structural residual**: the numerically-forced case `p = 5, q = 3, c = 7`
+is impossible.  By `pc_le_maxNilpotentNormalHall`, `PC = P ⊔ C ≤ M_F = P` (`P_eq_SF`), so `C ≤ P`;
+but `|C| = c = 7` cannot divide `|P| = p^q = 125`.  The genuine gap is isolated in
+`pc_le_maxNilpotentNormalHall` (the `PC`-nilpotent-normal-Hall obligation, `typeP_Galois`-gated); the
+`C ≤ P ⟹ 7 ∣ 125` maximality contradiction is discharged here. -/
+theorem c_eq_one_final_case [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hp5 : hyp.p = 5) (hq3 : hyp.q = 3) (hc7 : hyp.c = 7) : False := by
+  -- `C ≤ P ⊔ C ≤ M_F = P`.
+  have hCleP : hyp.C ≤ hyp.P := by
+    have h := pc_le_maxNilpotentNormalHall hG hyp hp5 hq3 hc7
+    rw [← hyp.P_eq_SF] at h
+    exact le_trans le_sup_right h
+  -- `|C| = 7`, `|P| = p^q = 125`.
+  have hCcard : Nat.card ↥hyp.C = 7 := by rw [← hyp.c_eq_card_C, hc7]
+  have hPcard : Nat.card ↥hyp.P = 5 ^ 3 := by
+    obtain ⟨_, _, _, hcard, _, _⟩ := basic_structure hG hyp
+    rw [hcard, hp5, hq3]
+  -- `C ≤ P ⟹ |C| ∣ |P|`, i.e. `7 ∣ 125`, false.
+  have hdvd : Nat.card ↥hyp.C ∣ Nat.card ↥hyp.P := by
+    have hd := Subgroup.card_subgroup_dvd_card (hyp.C.subgroupOf hyp.P)
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hCleP).toEquiv] at hd
+  rw [hCcard, hPcard] at hdvd
+  norm_num at hdvd
 
 /-- **Peterfalvi (13.12)**: the centralizer parameter `c` is `1`.
 
