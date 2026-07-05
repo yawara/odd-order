@@ -258,3 +258,455 @@ inducedKernelFamily M' (X.subgroupOf M); constructor 未存在で既存破壊な
 `exists_source_of_coherence_dichotomy` + `six_two_dichotomy_bound` (任意 (C,D) section で
 (6.2) bound、consumer-ready)。次: (11.4) HC-instantiation + index 算術 / (11.3) 6.3-route /
 datum の μ-column 本体。
+
+## 2026-07-05 lane-a (loop 8): (11.4) 群論前提 landing
+
+C_normalized_by_M field (S11 cSub = C_U(H̄) ≠ (11.2) C = C_U(H) の確認込み) + H₀C/HC 正規性
+一式 + **H_not_le_H0C** (normal_mul 分解)。残: trace-ne-⊤ 2 行 + hcentral (H'≤H₀ route) +
+index 算術 + (11.4) glue → その後 μ-column datum。
+
+## 2026-07-05 lane-a (loop 9): (11.4) 前提完了 — ⁅HC,HC⁆ ⊆ H₀C
+
+H0C_trace_ne_top / commutator_mem_H0 (elementary abelian 経由) / commutator_HC_mem_H0C
+(H·C 分解 + Commute swap)。残 (11.4): hcentral wrapper + H₁-trace-ne-⊤ + index 算術 + glue。
+
+## 2026-07-05 lane-a (loop 10): hcentral 完了 — (11.4) 残は index 算術 + glue のみ
+
+trace_ne_top_of_lt_derived / HC_quotient_H0C_comm / HC_central_condition (Normal は
+instance-arg)。(11.4) glue の全数学的前提が揃った — 残 = relIndex 変換 (relIndex_subgroupOf /
+relIndex_mul_relIndex / card_W1_eq_derived_index) + |HC| = |H||C| (disjoint sup card) + 適用。
+
+## 2026-07-05 lane-a (loop 11): **(11.4) 閉了** — coherent_quotient_bound 実証明
+
+bare sorry 撤去 (依存 = sixTwoDecompositionData のみ)。index 算術 (card_HC /
+HC_relIndex_derived / HC_trace_index) + glue。instance desync は legacy binder 削除で解決。
+次候補: (11.5) HC_le_secondDerived ((11.4) 消費、(5.7)+(11.1)/(9.6) 算術) or (11.3) 6.3-route
+or μ-column datum 本体。
+
+## 2026-07-05 lane-a (loop 12): (11.5) 準備 — M''-正規性 + (5.7) named
+
+le_normalizer_secondDerived (pointwise_smul 既存活用) + secondDerived_coherent (named sorried;
+配線先 = coherentEqualDegree_fromDade)。(11.5) 残: FPF-dvd (W1_dvd_index_of_fixedPoints_le
+再利用可、hfix = W2_le 直) + C<U (U_noncentral_on_quotient 経由) + tower + glue。
+open named sorries: sixTwoDecompositionData (μ-column) / secondDerived_coherent ((5.7) 配線) /
+coherent_S_of_coherent_SH0C ((11.3) = 6.3-route、producer 部品は全て揃済)。
+
+## 2026-07-05 lane-a (loop 13): (11.5) 部品完了 — C⊊U + FPF-dvd
+
+C_lt_U (U_noncentral_on_quotient 経由; MulAut-coe は defeq-change で) +
+q_dvd_secondDerived_relIndex_HC_sub_one (W1_dvd_index_of_fixedPoints_le 再利用)。
+残 = 純算術 glue (tower + (11.4)@M'' + 奇偶) → HC_le_secondDerived 閉了へ。
+
+## 2026-07-05 lane-a (loop 14): **(11.5) 閉了** — M'' = HC 完成
+
+HC_le_secondDerived 実証明 (relIndex=1 化 + (11.4)@M'' + tower + FPF-dvd + 奇偶)。
+secondDerived_eq_HC 自動完成。残 named: sixTwoDecompositionData / secondDerived_coherent /
+coherent_S_of_coherent_SH0C。(11.6) 消費側の再点検 or (5.7) 配線が次。
+
+## 2026-07-05 lane-a (loop 15): (11.6) C = U' 閉了
+
+- `exists_mul_of_mem_sup_of_normalized` (sup 分解 helper 公開化) +
+  `secondDerived_le_H_sup_derivedU` (M'' ≤ H ⊔ U'; mk' mod-H 計算) +
+  `C_eq_derivedU` (C ≤ HC = M'' ≤ H⊔U', H⊓U=⊥ で H-部分消去)。
+- `core_structure` (11.6) 残 = conjunct 1 (H は p-群; (9.3) U centralizes O_{p'}(H) 要)
+  + conjunct 3 (H₀ = H'; BG 1.6(d) 要)。commit 426b995c。
+
+## 2026-07-05 lane-a (loop 16-19): **(11.6) H は p-群 閉了** + C=U' 済
+
+- loop 15: C = U' (M'' ≤ H⊔U' 経由)。loop 16-19: S13_CoreStructure leaf 新設、
+  (9.3) 転写 → O_{q'} ≤ C_H(U) → R=O_{p'}(H) 定義 → M'' ≤ O_p⁅R,R⁆ ⊔ U' →
+  R perfect → R=⊥ → IsPGroup p H。commits ef7d40d5/e3d4707b/8e302745/(this)。
+- core_structure 残 = H₀ = H' conjunct のみ (BG 1.6(d) + (11.5))。
+
+## 2026-07-05 lane-a (loop 20): **(11.6) 完全閉了** — core_structure sorry-free
+
+- H₀ = H' 閉: K₁=⁅H,M'⁆ bound + trap + H̄ 上 BG 1.6(d)
+  (fixedPoints ⊓ actionCommutator = ⊥)。4 clause 全実証明。
+- 次 (文書順): (11.7) H_elementaryAbelian (|H|=p^q, H₀=1)。
+  quotient_order |H| = p^q·|H₀| + (11.6) H₀=H' + p-群機構が材料。
+
+## 2026-07-05 lane-a (loop 21): (5.7) instance 配線完了
+
+- `secondDerived_coherent` 実証明: `SOf_secondDerived_eq` (S(M'') = 次数-w₁ 既約
+  部分族; (8.4.d) inertia + kernel⟺linear) → `SHC_isCoherent` transport。
+- 残 sharp sorry: `charValue_one_eq_one_of_commutator_le_ker` (G' ⊆ ker → 次数 1、
+  汎用) — 次 iteration。その先: (11.3) coherent_S_of_coherent_SH0C (6.3-route) /
+  (11.7) H₀=1 (symplectic) / sixTwoDecompositionData。commit e07728c0。
+
+## 2026-07-05 lane-a (loop 22): charValue_one… 閉 — S13_MaximalIII_IV 残 sorry は (11.3) のみ
+
+- G' ⊆ ker → 次数 1 は既存 `apply_one_eq_one_of_subset_characterKernel_of_
+  isMulCommutative_quotient` (InflationCharacter) で 4 行。(5.7) 配線 sorry-free。
+- S13_MaximalIII_IV の実 sorry = `coherent_S_of_coherent_SH0C` ((11.3), 6.3-route) 1 点。
+  次: S08_Theorem62_63_Standalone の `six_three_of_six_two_oracle` を
+  (L,K,M,H,H₁) = (M,M',⊥,HC,H₀C)-trace で実体化 (hbound=(9.6)+(11.1), h56=dichotomy)。
+  commit ca5f866b。
+
+## 2026-07-05 lane-a (loop 23-25): **(11.3) 閉了** — S13_MaximalIII_IV bare sorry 0
+
+- 6.3-route 完成: card_H0C/H0C_relIndex_HC/p_q_distinct_odd_primes/HC_isNilpotent
+  → six_three_of_six_two_oracle 実体化 (h56 = exists_source_of_coherence_dichotomy)。
+- §11 チェーン (11.3)/(11.4)/(11.5)/(11.6)/(5.7)-instance 全て S13 層実証明。
+  残 upstream named: sixTwoDecompositionData (μ-column) / no_typeV_maximal (10.10) /
+  S12 producer 層。S13 内残 = (11.7) H₀=1 (symplectic) + (11.8) 系。
+- commits 53e4e59f / f91534f3 / (this)。
+
+## 2026-07-05 lane-a (loop 26): sixTwoDecompositionData 骨格化
+
+- irr×irr は S08 helpers で全放電。残 = μ-column 2 named
+  (sixTwoDecompositionData_of_reducible_break / sixTwoMemberDatum_of_reducible_member)。
+  材料: S12 muGrid + muGrid_column_sum_mem_sOf_H0_and_reducible + (5.8)。
+
+## 2026-07-05 lane-a (loop 27): μ-column 分岐 attack plan (恒久 handoff)
+
+**残 2 named** (S13_SixTwoBridge):
+`sixTwoDecompositionData_of_reducible_break` / `sixTwoMemberDatum_of_reducible_member`。
+
+### 中身の設計 (調査済)
+
+対象 = `CharacterPsiDecomposition τ ψ (a•χ₁)` の構成 (S07_Coherence:1212):
+fields = imageFamily R(ψ) (orthonormal, (ψ−ψ̄)^τ = Σ) / tau1 / lattice-relative
+isometry (zSpan {χ−χ̄, χ−ψ}) / tau1_agrees / tau1_image ((χ−ψ)^τ₁ = X−Y) /
+coeff (X ∈ ℤ[R]) / Y ⊥ R。
+
+**可約 member/break φ の正体**: `muGrid_column_sum_mem_sOf_H0_and_reducible`
+(S12_Section9Counts:171) — φ = Σ_i muGrid i k (列和)、φ(1) = q·u
+(reducible_mem_sOf_H0_apply_one_eq_qu:143)。
+
+**鍵材料**:
+- `CharacterParameters.alpha i j = mu i j − δ•mu i 0 − n•zeta`
+  (S12_Core:2793) with `alpha_support ⊆ A0` (S12_Core:3491) —
+  これが列の (5.2.d) 差分データ = R(ψ)-像の素材。
+- irr 版の構成体 `decompositionDaFromDadeOfDiff` /
+  `dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal`
+  (S08_SixTwoGeneral) の列和版を作る:
+  (ψ − a•χ₁)^τ の R(χ₁)-係数分解を α-params の
+  τ-像直交性で。member-D の extension 一致は (5.8)
+  (extension uniqueness; hS₁coh.extension) — S07 の
+  `IsCoherent.extension` API と `tau1_agrees`-clause。
+- Coq 対応: PFsection11 の `redPmu`-まわり (cohS1 消費部)。
+
+### 手順案 (次セッション)
+1. S12_Core の CharacterParameters を bridge の Hypothesis から
+   取得する経路確認 (mkSection11CharacterData:55 →
+   toCertainTypeHypothesis 系; muGrid は hyp.muGrid hG hG.odd)。
+2. 列和 ψ の (ψ − ψ̄) を α-params 差で表す補題 (両列 k, w2−k?
+   ψ̄ = 列 −k ✓ conj-grid 対応 grep: muGrid_conj)。
+3. imageFamily: dadeOrthonormalCharacterImageFamilyOfDiff の
+   列和版 or 直接 OrthonormalCharacterImageFamily 構成。
+4. member-D (可約 χ): D.tau1 χ = extension χ は列和の
+   coherence-extension 値 = Σ extension(成分)-linearity。
+
+
+### 追記 (loop 27 調査続き): 既存インフラは想定より進んでいる
+
+- `Hypothesis.exists_conj_column` (S12_Core:5148): (Σ_i μ_ij).conj = Σ_i μ_ij'
+  (j' ≠ 0, j) — ψ̄-列対応は既製。
+- docstring 言及: `tau_muGrid_columnSum_diff` (k = j') が列の
+  OrthonormalCharacterImageFamily の image_eq (τ(μ_j − μ̄_j) = Σ R(μ_j)) を供給
+  = imageFamily-core は組み立て可能。
+- muGridAlpha_inner_muColumn_(self_)sub_conj / …_tau_inner_… 系 (S12_Core:3722-4150)
+  が R(ψ)-直交性計算の大半をカバー。
+- 残り本体: CharacterPsiDecomposition の tau1 (lattice-relative isometry) を
+  列和 ψ に対して与える部分 = (5.2) 的 τ₁-構成。irr 版
+  `decompositionDaFromDadeOfDiff` の内部を読み、列版に一般化するのが次の実作業。
+
+### 追記 2 (loop 28): columnImageFamily 既存 — 分岐は plumbing に帰着
+
+- `Hypothesis.columnImageFamily` (S12_Core:5301) — 列 μ_j の bundled
+  OrthonormalCharacterImageFamily (hyp.tau 版) が**完全既存**。
+  R(μ_j) = {δω_ij^σ} ∪ {−δω_ij'^σ}; image_eq = exists_conj_column +
+  tau_muGrid_columnSum_diff + columnRImage_sum。
+- `decompositionDaFromDadeOfDiff` の本体 = `CharacterPsiDecomposition.ofProjection`
+  (S07) は **generic** (imageFamily + lattice-isometry + agreement + ZIrr + 3 直交)。
+- **残 plumbing**:
+  (a) member-D (可約 χ, ψ-slot 0): ofProjection with columnImageFamily;
+      tau1 := hS₁coh.extension 系 (irr 版 memberDatum_of_irreducible の内部と同型;
+      extension_inner_eq で lattice-isometry)。
+  (b) break-Da (可約 ψ): ofProjection with columnImageFamily (ψ, a•χ₁);
+      直交 3 点は muGridAlpha_inner_* 系。
+  (c) columnImageFamily の引数 (params : CharacterParameters hyp /
+      coh : CoherentHypothesis hyp params / hmu / hos / hzS / hδ...) を
+      sixTwo*-named の文脈 (hS₁coh のみ) からどう供給するかが本丸:
+      (11.8)-consumer 側では mkSection11CharacterData / toCertainTypeHypothesis
+      経由で構築済みのはず → その組を bridge の Hypothesis (S12.Hypothesis) から
+      再構成する producer を先に確認 (grep CoherentHypothesis 構成子)。
+      注意: tau_muGrid_columnSum_diff が coh を要求 — S₁-coherence でなく
+      グローバル (10.2-10.5) パッケージ。sixTwoDecompositionData の呼び出し文脈
+      ((11.4)/(11.3) 消費時) にそれが立つかの検証が次の第一手。
+
+### 追記 3 (loop 29): ⚠ CoherentHypothesis = S 全体 coherence (10.4.b) — 供給不可の可能性
+
+- `CoherentHypothesis hyp params` の唯一 field = `IsCoherent hyp.tau hyp.Sset hyp.A0`
+  (S12_Core:2810) — **(10.8) S_not_coherent で否定される側の作業仮定**。
+  sixTwo* の文脈 (S₁-coherence のみ、S-full は偽) では直接供給できない。
+- 帰結: columnImageFamily / tau_muGrid_columnSum_diff の coh-依存が
+  (a) 本質 (alignedOmegaSigmaGrid の σ-整列が τ₁=coh.extension 依存定義) か
+  (b) 過剰要求 (Dade τ の supported-計算だけで済む) かの検証が次の第一手。
+  (b) なら coh-free 版 tau_muGrid_columnSum_diff' を切り出して
+  columnImageFamily を S₁-文脈に移植。(a) なら Peterfalvi (11.8) の
+  τ₂ (S(C)−S(HC)-extension) 相当で σ-整列を再定義する必要 — (9.11)/(11.8)
+  の subfamily-coherence 経由。Coq PFsection11 の cohS1-消費部
+  (FTtype345_noncoherent 系) の該当行間を精読すること。
+- いずれにせよ irr×irr-放電済み skeleton は不変; named 2 点の中身のみの問題。
+
+### 追記 4 (loop 30): coh-依存の実質判定 — (10.2) 経由で本質的、ただし一般化の形が見えた
+
+- 依存鎖: tau_muGrid_columnSum_diff → tau_muGrid_column_diff →
+  `alpha_tau_image` (S12_Core:4856)。後者の結論自体が
+  τ(α_ij) = δ(ω_ij^σ − ω_i0^σ) − n·**coh.tau1 ζ** ((10.2)) — τ₁ = ℤ[S]-extension
+  で ζ・μ を通す導出。列差 (α_ij − α_ik) で ζ^{τ₁}-項は相殺 (だから
+  columnSum_diff の式は ζ-free)。
+- 一般化方針: alpha_tau_image を「S-full coherence」でなく
+  「{関連 μ_ij 行, ζ} ⊇ を含む部分族 S' の coherence」でパラメタ化した
+  coh'-版に切り出せるかが鍵。ただし sixTwoDecompositionData の S₁ は
+  chain-任意で μ-成分を含む保証なし → **Peterfalvi (11.8) が可約 member を
+  どう chain に通すかの行間** = Coq PFsection11 の該当部
+  (cohS1 消費、redPmu/FTtype345 系, L216 以降) の精読が次セッション第一手。
+- 現状整理: named 2 点の充足は「(10.2)-式の S₁-文脈版」一点に集約された。
+
+### 追記 5 (loop 31): ★Coq 精読の結論 — 正しい設計 = FTtypeP_subcoherent 移植
+
+- Coq `subcoherent S tau R` (PFsection5:486) = **coherence-free** の (5.2)-carrier:
+  全 member ξ ∈ S (可約含む!) に R ξ ⊆ ℤ[irr G] orthonormal +
+  **τ(ξ − ξ̄) = Σ_{α∈R ξ} α** + cross-直交 (e)。
+- 供給元 = `FTtypeP_subcoherent` (PFsection9:1506 域, cyclicTI-σ 経由) —
+  **coherence 不要**。部分族へは `subset_subcoherent` で制限
+  (PFsection11: scohS1/scohS2/scohM'' 全部これ)。
+- repo 検証: `alignedOmegaSigmaGrid` (S12_Core:1293) は §6 host
+  (toCertainTypeHypothesis = cyclicTI) 由来で **coherence-free** ✓。
+  coh-依存は alpha_tau_image ((10.2)-式) の導出経路だけ。
+- **次セッションの方針**: FTtypeP_subcoherent-analog を repo に建てる:
+  τ(μ_j − μ̄_j) = δ(Σω_j^σ − Σω_j'^σ) を **coh-free** で直接証明
+  (列差は A0-supported (同次数) → Dade-supported-計算 + cyclicTI-σ 同定;
+  PFsection9 の FTtypeP_subcoherent 証明の該当部を行間ソースに)。
+  それで columnImageFamily の coh-free 版が立ち、named 2 点は
+  ofProjection-plumbing に落ちる。alpha_tau_image 経由は捨てる。
+
+### 追記 6 (loop 32): coh-free 直接証明の部品所在 (§6 layer)
+
+- `S06_CertainTypeIsometry`: `certainTypeOmegaSigma` (σ-像 def, coh-free) +
+  `tau_toDadeMap_apply_of_mem` (:378) + `tau_toDadeMap_sum` (:767) +
+  `certainTypeOmegaSigma_inner` — §6 Dade-τ の supported-値計算 API 一式。
+- `S06_MuColumnBridge.induce_omegaColumnDiff_mu_diff` ((4.3.b)):
+  Ind_W^L(ω_ij − ω_0j) = δ_j(μ_ij − μ_0j) — 誘導側恒等式。
+- **次の第一手 (実作業)**: これらで
+  `tau_muGrid_row_diff_cohFree : hyp.tau (μ_ij − μ_ik) = δ·(ω_ij^σ − ω_ik^σ)`
+  (j,k ≠ 0, 同 i 行) を S12 側に直接証明する
+  (support = alpha_support の差 / τ-値 = tau_toDadeMap_apply_of_mem を
+  muGrid-def (toCertainTypeHypothesis 経由) に沿って評価)。
+  成功すれば columnSum_diff の coh-free 版 → columnImageFamily' → named 2 点。
+  PFsection9 FTtypeP_subcoherent の該当証明部を並走参照。
+
+### 追記 7 (loop 32 続): ★★ (4.8)(3) は §6 で coh-free 完全証明済み
+
+- `certainType_diff_dade_eq` (S06_CertainTypeIsometry:643):
+  **(μ_ij − μ_ik)^τ = δ_j·(ω_ij^σ − ω_ik^σ) — 証明済・coherence 不要**
+  (σ-係数 grid の (3.7)/(3.8) trichotomy で ψ=0; host h.tau.toDadeMap 版)。
+- よって残 plumbing の核心 = **host τ ↔ hyp.tau の橋**:
+  hyp.muGrid/alignedOmegaSigmaGrid は toCertainTypeHypothesis-host で定義済 →
+  certainType_diff_dade_eq を hyp.tau 版
+  `tau_muGrid_row_diff_cohFree` に翻訳する agreement lemma
+  (h.tau.toDadeMap vs dadeIntegralCharacterMap hyp.dadeData — 既存の
+  agreement を grep: tau_muGrid_columnSum_diff の証明が結局
+  何で host-τ を hyp.tau に接続していたかを alpha_tau_image 内部で確認)。
+- その後: 列和へ Finset.sum (既存 columnSum_diff の骨格流用) →
+  columnImageFamily の coh-free 版 → ofProjection → named 2 点閉。
+
+### 追記 8 (loop 33): 橋は不要 — tau_muGridAlpha_eq の証明形を ζ-free で mirror する
+
+- `tau_muGridAlpha_eq` (S12_Core:4789) の証明は §6-host 橋を使わず
+  **hyp.tau-level で (4.8)-型論法を再演**している:
+  ‖X‖²=2 + X ∈ ℤIrr + V-vanish + σ-係数 grid (3.7)/(3.8) trichotomy
+  (部品: muGridAlpha_tau_X_inner / exists_alignedOmegaSigmaGrid_chiFam_family /
+  typePData_toTICyclicHypothesis / canonicalFullDadeApp / tau1_zeta_vanishes…)。
+  coh は −n·ζ^{τ₁} 項の処理にだけ入る。
+- **確定レシピ**: `tau_muGrid_row_diff_cohFree (i) (hj0) (hk0) (hjk) :
+  hyp.tau (μ_ij − μ_ik) = δ • (ω^σ_ij − ω^σ_ik)` を同じ骨格で ζ-free に書く:
+  * 支持: α_ij − α_ik = μ_ij − μ_ik (alpha_def; ζ 消滅) → alpha_support 差
+  * ‖μ_ij − μ_ik‖² = 2: grid 成分は既約・相異 (muGrid 直交補題群) →
+    Dade 等長で τ-像も norm 2、ℤIrr ✓
+  * V-vanish: (4.8) step (4) 型 — ω^σ 側は certainTypeOmegaSigma_apply_of_mem_V
+    の aligned-版 (exists_alignedOmegaSigmaGrid_chiFam_family + chiFam-V-値)
+  * trichotomy 部は tau_muGridAlpha_eq の該当ブロックをそのまま流用
+    (ζ-項が無い分単純化)
+- そこから列和 (Finset.sum) → coh-free columnImageFamily → ofProjection →
+  named 2 点。全行程が既存部品の組替えで閉じる見込み。
+
+### 追記 9 (loop 34): 実装直前 — 全部品 coh-free 確認済み、組み立てレシピ最終形
+
+`tau_muGrid_row_diff_cohFree` の材料 (全て存在・coh-free):
+- V-値 leg: `tau_muGridAlpha_apply_eq_on_typePV` (S12_Core:~4600 手前, coh 無し!) —
+  行差では leg_j − leg_k で ζ^τ₁-値も相殺 → hψV。
+- norm-2: muGrid_inner_self / muGrid_inner_cross_column (2095/2125) →
+  ⟨μdiff, μdiff⟩ = 2 → Dade 等長 (supported: params.alpha_support の差 +
+  alpha_def で μ_ij − μ_ik = α_ij − α_ik) → ⟨X,X⟩ = 2。
+- ZIrr: dadeIntegralCharacterMap_mem_ZIrr_of_supported (S07)。
+- engine: `eq_smul_chiFam_diff_of_vanishOnV` (S05_SigmaTrichotomy:153) via
+  tic := typePData_toTICyclicHypothesis + app := canonicalFullDadeApp +
+  P := exists_alignedOmegaSigmaGrid_chiFam_family (行 i 固定; P j ≠ P k)。
+- 署名案: (hG) (hyp) (hodd) (params) (hmu : params.mu = muGrid)
+  (hδpm) (hδj) (i) (hj0 hk0 hjk) : hyp.tau (μ_ij − μ_ik)
+  = (params.delta:ℂ) • (ω^σ_ij − ω^σ_ik)。
+- 完了後: Finset.sum で列和 → columnImageFamily の coh-free 版
+  (image_eq を新恒等式+exists_conj_column で) → named 2 点 =
+  ofProjection + hS₁coh.extension (member-D) / muGridAlpha_inner 系 (直交)。
+
+## 2026-07-05 lane-a (loop 35): ★tau_muGrid_row_diff 実証明 — coh-free 要石完成
+
+- (μ_ij − μ_ik)^τ = δ(ω^σ_ij − ω^σ_ik) を CoherentHypothesis なしで閉了。
+  レシピ通り (追記 9)。次 = 列和版 (Finset.sum) → coh-free columnImageFamily
+  → sixTwoDecompositionData named 2 点の plumbing。
+
+## 2026-07-05 lane-a (loop 36): coh-free 列インフラ完成
+
+- tau_muGrid_columnSum_diff_cohFree + columnImageFamilyCohFree 閉。
+  残 = named 2 点の ofProjection plumbing (追記 8-9 のレシピ後半)。
+
+### 追記 10 (loop 37): plumbing の threading 設計 (確定)
+
+- **S13.Hypothesis は `params : CharacterParameters base` field を既に持つ** (S13:111)。
+  ただし pin (params.mu = muGrid 等) が無い。muGrid は (hG hodd)-引数依存だが
+  IsMinimalSimpleOdd/Odd は Prop → proof-irrelevant → ∀-量化 field で pin 可能:
+  `params_mu_eq : ∀ hG hodd, params.mu = base.muGrid hG hodd` /
+  `params_delta_sign : ∀ hG hodd j ≠ 0, base.muColumnSign hG hodd j = params.delta` /
+  (hzS/hz1 は params.zeta_mem/zeta_degree 系 field が既にあるか確認)。
+  S13.Hypothesis は constructor 未作成 (要再確認: grep mk/toS13) なら field 追加安全。
+- **署名 threading**: sixTwoDecompositionData と exists_source_of_coherence_dichotomy
+  (S13_SixTwoBridge, S12-hyp-level) に (params) (pins...) 引数を追加 →
+  S13-消費点 (exists_source_index_le_two_psi_of_ne_top 経由 (11.4)/(11.3)) で
+  hyp.params + 新 pin-fields から供給。
+- その上で named 2 点の本体: ψ-可約 → ψ = Σ_i muGrid i k (要: 可約 member の
+  列同定 lemma — sOf-membership から k の存在; S12_Section9Counts 331/395/428 の
+  params-引数付き補題群が材料) → columnImageFamilyCohFree → ofProjection
+  (tau1 := hS₁coh.extension-系, lattice-isometry = extension_inner_eq) +
+  直交 3 点 (muGridAlpha_inner_muColumn_* 系)。
+
+## 2026-07-05 lane-a (loop 38): params threading 完了
+
+- bridge 5 署名 + S13 消費 2 点に params+pins 貫通 (build green)。
+- named 2 点の本体着手条件が整った: 分岐内で params/hmu/hδj/hδpm/hzS/hz1 が
+  手元にある。次 = ψ-可約の列同定 → columnImageFamilyCohFree → ofProjection。
+
+### 追記 11 (loop 39): (9.8) 分類の抽出目標を特定
+
+- `muGrid_column_sum_mem_sOf_H0_and_reducible` (S12_Section9Counts:171) の証明**内部**に
+  「{S(H₀) の可約 member} の ncard = w₂−1」+ 列和 w₂−1 本の単射性 + ⊆ が既在
+  (Set.eq_of_subset_of_ncard_le で集合相等)。
+- **次の実作業**: この内部ステップを public に抽出:
+  `theorem reducible_mem_sOf_H0_eq_muGrid_columnSum (hred : ¬IsIrr φ)
+   (hφ : φ ∈ sOf … H0) : ∃ k ≠ 0, φ = ∑ i, muGrid i k`。
+  さらに bridge-family 側 (inducedKernelFamily K B の可約 member) から
+  sOf-H₀-membership への還元 (可約 Ind θ は自動的に S(H₀)-member —
+  (9.8.a); 要確認/形式化) を挟んで named 2 点の ψ-列同定が完了する。
+
+## 2026-07-05 lane-a (loop 40): (9.8) 分類 public 抽出完了
+
+- reducible_mem_sOf_H0_eq_muGrid_columnSum 閉 (build green)。
+  ψ-列同定の主部品完成。残 = family-bridge (inducedKernelFamily ↔ sOf) +
+  ofProjection 組み立て。
+
+### 追記 12 (loop 42): ★家族整合の解析 — U-side 可約は Frobenius-FPF で不可能
+
+- 事実確認 (Coq): repo `inducedKernelFamily` = Coq `S_ X = seqIndD HU M HU X`
+  (noncontainment = θ≠1) ✓ 健全。textbook-𝒳 (H ⊄ ker) = Coq `calS`
+  (M`_\s-slot) は別物で、S_ ⊋ calS (H ⊆ ker θ の U-side member を含む)。
+- (9.8)-列分類は sOf (𝒳-form) 側で証明済 → bridge-family の可約 ψ に適用する
+  には「可約 → H ⊄ ker θ」が必要。
+- **鍵**: U-side (H ⊆ ker θ) の可約 = θ が M-invariant (inertia_eq_top_of_
+  induceHU_not_irreducible :5021) → θ̄ ∈ Irr(Ū) が W₁-固定・非自明。
+  だが U⋊W₁ は Frobenius (typeP_uW1_frobenius) → W₁ は U# に FPF →
+  Brauer permutation で Irr(U)∖{1} にも固定点なし → 矛盾。
+  ∴ **可約 member は自動的に H ⊄ ker** → sOf-transport → 列分類 OK。
+- 次の実装: `inducedKernelFamily_reducible_H_not_le_ker` (Brauer-FPF;
+  部品: BrauerPermutationUnconditional + typeP_uW1_frobenius +
+  inertia_eq_top…) → sOf-⊥-transport lemma → ψ-同定完成 →
+  ofProjection 組み立て (columnImageFamilyCohFree)。
+
+## 2026-07-05 lane-a (loop 43): bridge-family 直接分類 閉 — ψ-列同定完成
+
+- reducible_mem_inducedKernelFamily_eq_muGrid_columnSum (θ≠1 で trivial-列排除、
+  𝒳-条件・Brauer-FPF・sOf-transport 全て不要の最短路)。
+- 残 = named 2 点の ofProjection 最終組み立て (columnImageFamilyCohFree +
+  hS₁coh.extension-τ₁ + muGridAlpha_inner_* 直交)。
+
+### 追記 13 (loop 44): break-Da の ofProjection invocation recipe (完全形)
+
+`sixTwoDecompositionData_of_reducible_break` の Da-半分 (実装可能形):
+
+1. `obtain ⟨k, hk0, rfl⟩ := hyp.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum
+   hG htype hnt chief hψB hψred` — ※ htype/hnt/chief を named-sorry 署名に追加要
+   (S13-消費側: hyp.type_alt-isTypeIIIorIV / typePNontrivialCore_of / hyp.chief +
+   setup_typeP_eq-transport — S13.Hypothesis の chief は s11Setup-上; bridge は
+   toTypesIIIIIIVSetup htype hnt-上 → ChiefFactorData の transport が一点残る。
+   代替: named-sorry に (chief : ChiefFactorData (toTypesIIIIIIVSetup htype hnt))
+   を引数追加し S13 側で構築供給)。
+2. ψ̄-列: `obtain ⟨k', hk'0, hk'k, hconj⟩ := hyp.exists_conj_column hG hG.odd hk0`。
+3. `Da := OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection
+   (hyp.columnImageFamilyCohFree hG hmu hzS hz1 hzconj?? — hzconj 引数残存注意
+   (cohFree 版に hzconj が残っているか確認; 残っていれば pin 追加 or 除去)
+   hδpm hδj hk0 hk'0 hk'k.symm?? (hjj' : j≠j') hconj)
+   hyp.tau (dade-preserve) rfl (ZIrr) ⟨3 inners⟩` — 各 obligation:
+   - htau1_inner_eq: S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
+     (set = {ψ−ψ̄, ψ−a•χ₁}; supports: 前者 = 列差 (classification 後は
+     inducedKernelFamily_conjDiff_support or α-support-差), 後者 =
+     S08.inducedKernelFamily_scaledDiff_support (hKsupp = mderivSharp_subset_A0))
+   - htau1_agrees: rfl (tau1 := hyp.tau)
+   - htau1_mem: dadeIntegralCharacterMap_mem_ZIrr_of_supported + (列和∈ZIrr:
+     sum of muGrid-irr; χ₁: S08.inducedKernelFamily_mem_ZIrr)
+   - 3 inners: S08.inducedKernelFamily_pairwise_orthogonal (ψ,χ₁ 相異: ψ∉S₁∋χ₁;
+     ψ,ψ̄ 相異: hasNoReal or 列≠) + smul-線形。
+   - τ-型合わせ: hyp.tau vs dadeIntegral-式 = def-rfl (have := rfl-conversion)。
+4. member-∀-clause: χ irr → 新 narrower named `sixTwoMemberDatum_vs_columnDa`
+   (D := memberDatum-machinery; Orthogonal via
+   orthogonal_of_signedDifference_inner_eq_zero (S07:674) — source-inner:
+   family-pairwise-orthogonal の 4-cross); χ reducible → χ も列 → 列-列直交
+   (columnRImage_inner の cross-列版 or muGridAlpha_inner_muColumn 系)。
+
+member-clause の Orthogonal-def 階層 (OrthonormalCharacterImageFamily.Orthogonal
+vs CharacterDifferenceImage.Orthogonal) の突合が実装時の最初の確認点。
+
+## 2026-07-05 lane-a (loop 46): ★break-Da 実構成完了
+
+- ofProjection 組み立て成功 (全 obligation family-level 放電 — 追記 13 recipe 通り、
+  ただし支持は α-計算不要で scaledDiff_support に一本化できた)。
+- 残 sorry = member-∀-clause (可約 break の Da に対する各 χ ∈ S₁ の D):
+  irr-χ は memberDatum-machinery + R(χ)⊥R(列) (源 4-cross 直交 → signedDifference
+  経由); 可約-χ は列-列。+ sixTwoMemberDatum_of_reducible_member (対 irr-break)。
+
+### 追記 14 (loop 47): ⚠ member-clause の無条件直交は過強 (要 statement 修正)
+
+- Coq (5.2.e): `orthogonal phi (xi::xi^*) -> orthogonal (R phi) (R xi)` —
+  **条件付き** (4-cross 直交が前提)。
+- 現 sixTwoDecompositionData の member-∀-clause は ∀χ∈S₁ 無条件で
+  D.imageFamily ⊥ Da.imageFamily を要求。だが χ = μ_i₀k (ψ-列の既約成分)
+  ∈ S₁ の場合 ⟨χ, ψ⟩ = 1 ≠ 0 で、R(χ) と R(列) は ω^σ_i₀k-成分を共有し
+  直交は**偽**になり得る → 現形の named-sorry は充足不能の疑い。
+- **次の第一手**: exists_source_index_le_two_psi (bridge の
+  fully-pinned producer) の証明内で hdatum の D-直交がどう消費されるか
+  精査 → (a) 条件付き (⟨χ,ψ⟩=0 ∧ ⟨χ,ψ̄⟩=0 前提) に obligation を
+  弱める statement 修正 (エンジン側が当該 χ にしか使わないはず;
+  S08 の重み付き (5.6) Gram-計算部を確認) or (b) エンジン再導出。
+  irr-irr 放電 (…orthogonal_breakDa_of_irr_irr) は無条件で通っていた —
+  そこでは ψ 既約で χ,ψ 相異なら family-pairwise が 4-cross を自動供給
+  していた (列 ψ では成分-重なりが破る)。修正は可約-break 分岐にのみ影響。
+- break-Da 構成 (loop 46) 自体は影響なし (Da-半分は健全)。
+
+### 追記 15 (loop 48): ✓ 追記 14 の懸念は解消 — 無条件 obligation は健全、証明形確定
+
+- **反例は成立しない**: χ ∈ S₁ は族 member (Ind-form)。μ_ik-entry は可約 Ind の
+  既約成分であって族 member ではない。さらに次数で χ ≠ μ_ik が強制される:
+  irr-member 次数 = q·θ(1) ≡ 0 (mod q) vs d ≡ 1 (mod q)
+  (charParam_d_modEq_one) → 相異既約 → ⟨χ, μ_ik⟩ = 0 (全 i,k)。
+  よって (5.2.e)-前提 (4-cross) は文脈内で常に成立 → 無条件 member-clause 健全。
+- **per-pair R(χ)-elt ⊥ ω^σ_ik の証明形 (pigeonhole)**:
+  1. ⟨τ(χ−χ̄), τ(μ_ik − μ_ik')⟩ = ⟨χ−χ̄, μ_ik − μ_ik'⟩ = 0
+     (両 supported + dade-preserve; 源は上記 per-entry 直交)。
+  2. τ(rowdiff) = δ(ω_ik − ω_ik') (tau_muGrid_row_diff!)。
+  3. R(χ) の底既約は 2 個; ω_ik が共有されると仮定 → 各 k'≠k で
+     ⟨…⟩=0 から ω_ik' も共有 → w₂−1 ≥ 2 個の相異 ω を 2-成分が
+     カバー不能 (w₂ ≥ 3) → 矛盾 → 共有なし → ⟨α, ω^σ_ik⟩ = 0 ✓。
+- 実装順: (i) per-entry ⟨χ, μ_ik⟩ = 0 lemma (次数 mod q);
+  (ii) pigeonhole per-pair lemma; (iii) member-D 組み立て
+  (memberDatum_of_irreducible + Orthogonal-per-pair) — 可約-χ は
+  列-列 cross (muGrid_inner_cross_column 直接)。

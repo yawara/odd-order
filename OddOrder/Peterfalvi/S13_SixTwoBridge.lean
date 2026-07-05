@@ -545,6 +545,175 @@ theorem exists_source_index_le_two_psi_of_ne_top
   exact OddOrder.Peterfalvi.S08.inducedKernelFamily_nonempty_of_commutator_ne_top
     (hyp.commutator_quotient_ne_top hG hBne)
 
+/-- **μ-column break decomposition** (named obligation, Peterfalvi (5.2.d)/(11.8.6)): the
+full decomposition clause for a *reducible* break member `ψ` — a μ-grid column sum
+(`muGrid_column_sum_mem_sOf_H0_and_reducible`).  The `Da`-data comes from the grid
+`α`-parameters and the member `D`s from (5.8) extension-uniqueness. -/
+theorem sixTwoDecompositionData_of_reducible_break [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {params : CharacterParameters hyp}
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
+    (hzS : params.zeta ∈ inducedFamily M)
+    (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (htype : IsTypeIII M ∨ IsTypeIV M) (hnt : TypePNontrivialCore M hyp.typeP)
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetup htype hnt))
+    (A' B : Subgroup ↥M)
+    (S₁ : Set (ClassFunction ↥M ℂ))
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
+    (hsub : S₁ ⊆ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) A' ∪
+      S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+      S₁ hyp.A0)
+    (ψ : ClassFunction ↥M ℂ)
+    (hψB : ψ ∈ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B)
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
+    (χ₁ : ClassFunction ↥M ℂ) (hχ₁S₁ : χ₁ ∈ S₁)
+    (a : ℕ) (hψdeg : ψ 1 = (a : ℂ) * χ₁ 1)
+    (hbreak : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+      (S₁ ∪ {ψ, ψ.conj}) hyp.A0))
+    (hψred : ¬ IsIrreducibleCharacter ψ) :
+    ∃ Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) ψ (a • χ₁),
+      Da.tau1 = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) ∧
+      ∀ χ ∈ S₁, ∃ D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
+          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+            (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) χ 0,
+        D.imageFamily.Orthogonal Da.imageFamily ∧
+        D.tau1 χ = hS₁coh.extension χ := by
+  haveI := hyp.finiteG
+  classical
+  -- ψ is a nonzero μ-column sum; pick its conjugate column
+  obtain ⟨k, hk0, hψcol⟩ := hyp.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum
+    hG htype hnt chief hψB hψred
+  subst hψcol
+  obtain ⟨k', hk'0, hk'k, hcolconj⟩ := hyp.exists_conj_column hG hG.odd hk0
+  -- `ζ` is not real (the induced family has no real characters)
+  have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+  have hzbot : params.zeta ∈ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) ⊥ := by
+    rw [← inducedFamily_eq_inducedKernelFamily_bot]
+    exact hzS
+  have hzconj : params.zeta.conj ≠ params.zeta :=
+    S08.inducedKernelFamily_hasNoRealCharacters hModd ⊥ hzbot
+  -- family memberships and distinctness
+  set ψ : ClassFunction ↥M ℂ := ∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i k with hψdef
+  have hψbot : ψ ∈ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) ⊥ :=
+    S08.inducedKernelFamily_antitone bot_le hψB
+  have hχ₁bot : χ₁ ∈ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) ⊥ := by
+    rcases hsub hχ₁S₁ with h | h
+    · exact S08.inducedKernelFamily_antitone bot_le h
+    · exact S08.inducedKernelFamily_antitone bot_le h
+  have hψconjbot : ψ.conj ∈ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) ⊥ :=
+    S08.inducedKernelFamily_closedUnderConjugate ⊥ hψbot
+  have hψχ₁ne : ψ ≠ χ₁ := fun he => hψnotS1 (he ▸ hχ₁S₁)
+  have hψcχ₁ne : ψ.conj ≠ χ₁ := fun he => hψcnotS1 (he ▸ hχ₁S₁)
+  have hψnotreal : ψ.conj ≠ ψ :=
+    S08.inducedKernelFamily_hasNoRealCharacters hModd ⊥ hψbot
+  -- degrees: `ψ̄(1) = ψ(1)` (character degrees are natural)
+  obtain ⟨θψ, -, hψeq, hψ1⟩ := S08.inducedKernelFamily_apply_one hψbot
+  obtain ⟨nθ, -, hnθ, -⟩ := θψ.isIrreducible.exists_natDegree_charValue_one_dvd_card
+  have hψ1nat : ψ 1 = ((((derivedInG M).subgroupOf M).index * nθ : ℕ) : ℂ) := by
+    rw [hψ1, hnθ]
+    push_cast
+    ring
+  have hψconj1 : ψ.conj 1 = (1 : ℕ) • ψ 1 := by
+    rw [ClassFunction.conj_apply, hψ1nat]
+    simp
+  -- supports of the sponsoring differences
+  have hsupp1 : (ψ - (1 : ℕ) • ψ.conj).support ⊆ hyp.A0 :=
+    S08.inducedKernelFamily_scaledDiff_support hyp.mderivSharp_subset_A0 hψbot hψconjbot
+      (by rw [hψconj1]; simp)
+  have hsupp1' : (ψ - ψ.conj).support ⊆ hyp.A0 := by
+    simpa using hsupp1
+  have hsupp2 : (ψ - a • χ₁).support ⊆ hyp.A0 :=
+    S08.inducedKernelFamily_scaledDiff_support hyp.mderivSharp_subset_A0 hψbot hχ₁bot
+      (by simpa using hψdeg)
+  have hSdiff : ∀ s ∈ ({ψ - ψ.conj, ψ - a • χ₁} : Set (ClassFunction ↥M ℂ)),
+      s.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (typePA0 M hyp.typeP) M := by
+    intro s hs
+    rcases hs with rfl | rfl
+    · exact hsupp1'
+    · exact hsupp2
+  -- integrality of `τ(ψ − a·χ₁)`
+  have hmemZ : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) (ψ - a • χ₁) ∈ ZIrr G := by
+    refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+      hyp.dadeData.dade hyp.hconj hsupp2 ?_
+    refine Submodule.sub_mem _ (S08.inducedKernelFamily_mem_ZIrr hψbot) ?_
+    exact nsmul_mem (S08.inducedKernelFamily_mem_ZIrr hχ₁bot) a
+  -- the three inner-product vanishings
+  have hχ₁inner : ClassFunction.inner ψ χ₁ = 0 :=
+    S08.inducedKernelFamily_pairwise_orthogonal hψbot hχ₁bot hψχ₁ne
+  have hχ₁cinner : ClassFunction.inner ψ.conj χ₁ = 0 :=
+    S08.inducedKernelFamily_pairwise_orthogonal hψconjbot hχ₁bot hψcχ₁ne
+  have hsmulcast : (a • χ₁ : ClassFunction ↥M ℂ) = (a : ℂ) • χ₁ :=
+    (Nat.cast_smul_eq_nsmul ℂ a χ₁).symm
+  have hinner1 : ClassFunction.inner ψ (a • χ₁) = 0 := by
+    rw [hsmulcast, ClassFunction.inner_smul_right, hχ₁inner, mul_zero]
+  have hinner2 : ClassFunction.inner ψ.conj (a • χ₁) = 0 := by
+    rw [hsmulcast, ClassFunction.inner_smul_right, hχ₁cinner, mul_zero]
+  have hinner3 : ClassFunction.inner ψ ψ.conj = 0 :=
+    S08.inducedKernelFamily_pairwise_orthogonal hψbot hψconjbot (Ne.symm hψnotreal)
+  -- the break decomposition via the coherence-free column image family
+  refine ⟨OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection
+    (hyp.columnImageFamilyCohFree hG hmu hzS hz1 hzconj hδpm hδj hk0 hk'0
+      (Ne.symm hk'k) hcolconj)
+    (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+    (fun φ ζ hφ hζ =>
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
+        hyp.dadeData.dade hyp.hconj hSdiff hφ hζ)
+    rfl hmemZ hinner1 hinner2 hinner3, rfl, ?_⟩
+  -- member clause: per-`χ` decomposition against the column `Da` (issue 2022, remaining)
+  intro χ hχS₁
+  sorry
+
+/-- **μ-column member decomposition** (named obligation, Peterfalvi (11.8.6)/(5.8)): the
+member clause for a *reducible* `χ ∈ S₁` (μ-grid column sum) against an irreducible break
+`Da`. -/
+theorem sixTwoMemberDatum_of_reducible_member [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {params : CharacterParameters hyp}
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
+    (hzS : params.zeta ∈ inducedFamily M)
+    (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (htype : IsTypeIII M ∨ IsTypeIV M) (hnt : TypePNontrivialCore M hyp.typeP)
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetup htype hnt))
+    {A' B : Subgroup ↥M}
+    {S₁ : Set (ClassFunction ↥M ℂ)}
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
+    (hS₁sub : S₁ ⊆ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) ⊥)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+      S₁ hyp.A0)
+    {ψ : ClassFunction ↥M ℂ}
+    (hψB : ψ ∈ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B)
+    (hψirr : IsIrreducibleCharacter ψ)
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
+    {χ₁ : ClassFunction ↥M ℂ} (hχ₁S₁ : χ₁ ∈ S₁)
+    {a : ℕ} (hψdeg : ψ 1 = (a : ℂ) * χ₁ 1)
+    {χ : ClassFunction ↥M ℂ} (hχS₁ : χ ∈ S₁)
+    (hχred : ¬ IsIrreducibleCharacter χ) :
+    ∃ D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) χ 0,
+      D.imageFamily.Orthogonal
+        (S08.inducedKernelFamily_breakDa_of_irreducible hyp.dadeData.dade hyp.hconj
+          (card_odd_of_isMinimalSimpleOdd hG hyp) hyp.mderivSharp_subset_A0 hS₁sub hψB hψirr
+          hψnotS1 hψcnotS1 hχ₁S₁ hψdeg).1.imageFamily ∧
+      D.tau1 χ = hS₁coh.extension χ := by
+  sorry
+
 /-- **The (5.2.d) decomposition data for the §11 family — the single remaining grid obligation
 of the h56 chain** (issue 2022).  For any intermediate coherent set `S₁` between the `S(A')` and
 `S(B)` layers and any break `ψ ∈ S(B)` with anchor ratio `a`, supplies the break decomposition
@@ -560,6 +729,14 @@ decomposition is the §10–§12 `muGrid`/`columnSum` structure, and the couplin
 extension-uniqueness.  See issue 2022. -/
 theorem sixTwoDecompositionData [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {params : CharacterParameters hyp}
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
+    (hzS : params.zeta ∈ inducedFamily M)
+    (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (htype : IsTypeIII M ∨ IsTypeIV M) (hnt : TypePNontrivialCore M hyp.typeP)
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetup htype hnt))
     (A' B : Subgroup ↥M) :
     ∀ (S₁ : Set (ClassFunction ↥M ℂ)),
       OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁ →
@@ -588,7 +765,29 @@ theorem sixTwoDecompositionData [Finite G]
               (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) χ 0,
           D.imageFamily.Orthogonal Da.imageFamily ∧
           D.tau1 χ = hS₁coh.extension χ := by
-  sorry
+  intro S₁ hS₁conj hsub hS₁coh ψ hψB hψnotS1 hψcnotS1 χ₁ hχ₁S₁ a hψdeg hbreak
+  have hS₁sub : S₁ ⊆ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) ⊥ := by
+    intro φ hφ
+    rcases hsub hφ with h | h
+    · exact S08.inducedKernelFamily_antitone bot_le h
+    · exact S08.inducedKernelFamily_antitone bot_le h
+  have hodd := card_odd_of_isMinimalSimpleOdd hG hyp
+  by_cases hψirr : IsIrreducibleCharacter ψ
+  · -- irreducible break: the S08 general discharge
+    set bd := S08.inducedKernelFamily_breakDa_of_irreducible
+      hyp.dadeData.dade hyp.hconj hodd hyp.mderivSharp_subset_A0 hS₁sub hψB hψirr
+      hψnotS1 hψcnotS1 hχ₁S₁ hψdeg with hbd
+    refine ⟨bd.1, bd.2.1, ?_⟩
+    intro χ hχS₁
+    by_cases hχirr : IsIrreducibleCharacter χ
+    · exact S08.inducedKernelFamily_memberDatum_orthogonal_breakDa_of_irr_irr
+        hyp.dadeData.dade hyp.hconj hodd hyp.mderivSharp_subset_A0 hS₁sub hS₁conj hS₁coh
+        hψB hψirr hψnotS1 hψcnotS1 hχ₁S₁ hψdeg hχS₁ hχirr
+    · exact sixTwoMemberDatum_of_reducible_member (A' := A') hG hyp hmu hδpm hδj hzS hz1 htype hnt chief hS₁conj hS₁sub hS₁coh hψB hψirr
+        hψnotS1 hψcnotS1 hχ₁S₁ hψdeg hχS₁ hχirr
+  · -- reducible (μ-column) break: the named grid obligation
+    exact sixTwoDecompositionData_of_reducible_break hG hyp hmu hδpm hδj hzS hz1 htype hnt
+      chief A' B S₁ hS₁conj hsub hS₁coh ψ hψB hψnotS1 hψcnotS1 χ₁ hχ₁S₁ a hψdeg hbreak hψirr
 
 /-- **The h56 oracle for the §11 context, complete modulo the grid datum**: from the coherence
 dichotomy alone (proper traces `A', B ⊊ M'`), a source `θ ∈ Irr M'` trivial on `B` with
@@ -596,6 +795,14 @@ dichotomy alone (proper traces `A', B ⊊ M'`), a source `θ ∈ Irr M'` trivial
 `sixTwoDecompositionData`. -/
 theorem exists_source_of_coherence_dichotomy
     [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {params : CharacterParameters hyp}
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
+    (hzS : params.zeta ∈ inducedFamily M)
+    (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (htype : IsTypeIII M ∨ IsTypeIV M) (hnt : TypePNontrivialCore M hyp.typeP)
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetup htype hnt))
     {A' B : Subgroup ↥M} [A'.Normal]
     [(A'.subgroupOf ((derivedInG M).subgroupOf M)).Normal]
     [(B.subgroupOf ((derivedInG M).subgroupOf M)).Normal]
@@ -620,7 +827,7 @@ theorem exists_source_of_coherence_dichotomy
           (θ : ClassFunction
             ↥((derivedInG M).subgroupOf M) ℂ) 1).re :=
   hyp.exists_source_index_le_two_psi_of_ne_top hG hA'ne hBne
-    (hyp.sixTwoDecompositionData hG A' B) hAcoh hBncoh
+    (hyp.sixTwoDecompositionData hG hmu hδpm hδj hzS hz1 htype hnt chief A' B) hAcoh hBncoh
 
 /-- **Peterfalvi (6.2) for the §11 context, complete modulo the grid datum**: with a section
 `B ≤ D ≤ C ≤ M'` (inside `↥M`) whose quotient `D/B` is central in `C/B`, the coherence
@@ -629,6 +836,14 @@ dichotomy yields `|M':A'| − 1 ≤ 2·|M:C|·√|C:D|`.  This is `six_two_gener
 (`√1 = 1`) and the (11.3)/(6.3) route takes `(C, D) = (HC, A')` per section. -/
 theorem six_two_dichotomy_bound
     [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {params : CharacterParameters hyp}
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
+    (hzS : params.zeta ∈ inducedFamily M)
+    (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (htype : IsTypeIII M ∨ IsTypeIV M) (hnt : TypePNontrivialCore M hyp.typeP)
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetup htype hnt))
     {A' B C D : Subgroup ↥M} [A'.Normal] [B.Normal]
     [(A'.subgroupOf ((derivedInG M).subgroupOf M)).Normal]
     [(B.subgroupOf ((derivedInG M).subgroupOf M)).Normal]
@@ -651,7 +866,7 @@ theorem six_two_dichotomy_bound
   haveI := hyp.finiteG
   haveI : Fintype ↥C := Fintype.ofFinite _
   exact OddOrder.Peterfalvi.S08.six_two_general hBD hCK hcentral
-    (hyp.exists_source_of_coherence_dichotomy hG hA'ne hBne hAcoh hBncoh)
+    (hyp.exists_source_of_coherence_dichotomy hG hmu hδpm hδj hzS hz1 htype hnt chief hA'ne hBne hAcoh hBncoh)
 
 end Hypothesis
 
