@@ -2592,7 +2592,11 @@ theorem s_side_frobenius_kernel [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
 
 /-- **Peterfalvi (14.4)+(13.12), the T-side Frobenius kernel** — `C_{T'}(x) ≤ Q` for
 `x ∈ Q#` (dual of `s_side_frobenius_kernel`: (14.4) puts `T` in case (9.7.b), and the
-T-side field model has Frobenius kernel `Q`). -/
+T-side field model has Frobenius kernel `Q`).  Discharge path (engine proven,
+`S16_G0Coprime`): supply the minimal (14.4) carrier `TFieldModelData` (injective
+`σ : F_{q^p} ⋊ V* →* G` with kernel `Q`, complement `V` — the
+`T_side_caseB_facts`/issue-9000 sphere) and apply
+`TFieldModelData.derived_inf_centralizer_le_Q`. -/
 theorem t_side_frobenius_kernel [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     ∀ x ∈ sharpSubgroup hyp.base.Q,
