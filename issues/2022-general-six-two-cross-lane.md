@@ -831,3 +831,13 @@ vs CharacterDifferenceImage.Orthogonal) の突合が実装時の最初の確認�
   CliffordCaseAData (Hpart ⊕分解 + orbitRep + iSupIndep) が S11 に実在。
 - 残 = S13 側 frame: Q ◁ H (index p in H₀) 構成 → Khat = H/Q class-2 化 →
   case (b): Z(Khat) = H0hat (U-既約性) → kernel 適用; case (a): φ_w 指標の w-鎖論法。
+
+## 2026-07-05 lane-a (loop 61): (11.7) frame 3 補題 (S13_ElementaryAbelianKernel 新設)
+
+- [K,N] < N (nilpotent) / index-p normal Q ([BG] 1.22 相当) / K/Q class-2 構造
+  (N̂ 位数 p = Ĥ' ≤ Z(Ĥ)) を S11 generic level で sorry-free 化。
+- 発見: N̂ の中心性は [K,N] ≤ Q から直接出る (Coq の meet-center 論法・p-群性不要)。
+- 残: case (b) = Z(Ĥ) = N̂ の U-invariance 転送 (typeP_quotientCoprimeAction の
+  φ.comp U.subtype 形; Q は U-pointwise-fixed ゆえ U-invariant) → parity kernel;
+  case (a) = φ_w 鎖。両 case とも hUcent (U centralizes H₀, S13 側 U_centralizes_H0)
+  を入力仮定に取る generic 形で書く。
