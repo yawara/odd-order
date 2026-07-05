@@ -11675,6 +11675,67 @@ theorem caseA_exists_irreducible_source_degree_qa_induceHU_irreducible [Finite G
     hcuZetaPair_induceHU_apply_one caseA θ hinv lam⟩
   exact hcuZetaPair_induceHU_irreducible_of_nonRegular caseA θ hθnt hinv lam hnonreg hθ₀
 
+/-- **Conjugation-stable kernel-containment** (Peterfalvi (9.8.d) count substrate, intrinsic-family
+`T`-invariance primitive).  For a class function `χ` on a normal subgroup `K ⊴ G` and a subset
+`A ⊆ ↥K` that is *invariant* under conjugation-by-`g` (`conjByMulEquiv g` maps `A` into `A`), the
+kernel-containment `A ⊆ Ker χ` transfers to the conjugate `χ^g`: `A ⊆ Ker (conjBy g χ)`.
+
+Pointwise: `(conjBy g χ) y = χ (g·y·g⁻¹)` and `characterDegree (conjBy g χ) = characterDegree χ`
+(conjugation fixes the value at `1`), so for `y ∈ A` the conjugate `g·y·g⁻¹ ∈ A ⊆ Ker χ` gives
+`(conjBy g χ) y = χ (g·y·g⁻¹) = characterDegree χ = characterDegree (conjBy g χ)`, i.e.
+`y ∈ Ker (conjBy g χ)`.
+
+This is the linchpin of the *intrinsic* characterization of the (9.8.d) pair-family
+`T = {ψ_{θ₁,λ}}` as `{χ ∈ Irr(H·C_U(S₀)) | linear ∧ H₀-realized ⊆ Ker χ ∧ W-lifted ⊆ Ker χ ∧
+χ|_H ≠ 1 ∧ U'-realized ⊆ Ker χ}`: each realized kernel condition `N-realized ⊆ Ker χ` for an
+`HU`-normal `N` (H₀-realized, W-lifted, U'-realized — all `◁ HU`) is `HU`-conjugation-stable, because
+the ambient normality makes `N-realized ∩ (H·C_U(S₀))` a `conjByMulEquiv g`-invariant set for every
+`g ∈ HU`.  Hence `T` is conjugation-closed, the input `hT` of `card_image_induce_eq_div` for the
+`|image| = |T|/a` orbit step — without a `hcuPsiPair`-conjBy-descent lemma. -/
+theorem subsetCharacterKernel_conjBy_of_invariant {K : Subgroup G} [K.Normal]
+    (g : G) (χ : ClassFunction ↥K ℂ) (A : Set ↥K)
+    (hAinv : ∀ a ∈ A, ClassFunction.conjByMulEquiv g a ∈ A)
+    (hker : A ⊆ OddOrder.Peterfalvi.S03.characterKernel χ) :
+    A ⊆ OddOrder.Peterfalvi.S03.characterKernel (ClassFunction.conjBy g χ) := by
+  intro y hy
+  rw [OddOrder.Peterfalvi.S03.mem_characterKernel]
+  have hy' : ClassFunction.conjByMulEquiv g y ∈ A := hAinv y hy
+  have hdeg : OddOrder.Peterfalvi.S03.characterDegree (ClassFunction.conjBy g χ)
+      = OddOrder.Peterfalvi.S03.characterDegree χ := by
+    rw [OddOrder.Peterfalvi.S03.characterDegree_def, OddOrder.Peterfalvi.S03.characterDegree_def]
+    show (ClassFunction.conjBy g χ) 1 = χ 1
+    rw [ClassFunction.conjBy_apply]
+    refine congrArg χ (Subtype.ext ?_)
+    simp only [OneMemClass.coe_one, mul_one, mul_inv_cancel]
+  show (ClassFunction.conjBy g χ) y
+    = OddOrder.Peterfalvi.S03.characterDegree (ClassFunction.conjBy g χ)
+  rw [ClassFunction.conjBy_apply, hdeg]
+  have hmem := hker hy'
+  rw [OddOrder.Peterfalvi.S03.mem_characterKernel] at hmem
+  rw [← hmem]
+  congr 1
+
+/-- **`conjByMulEquiv`-invariance of a realized normal subgroup** (Peterfalvi (9.8.d) count
+substrate).  If `N ⊴ K` (`K ⊴ G`) then the underlying set of `N` — as a `Set ↥K` — is invariant
+under `conjByMulEquiv g` for *every* `g : G` (not merely `g ∈ K`): `conjByMulEquiv g a = g·a·g⁻¹`
+lands back in `N` by normality of `N` in the ambient (here `N` is a subgroup of `K` that is itself
+`G`-conjugation-stable via the realization `N ⊴ G`).  Instantiated at the (9.8.d) `HU`-normal
+realized subgroups (`H₀`-realized, `W`-lifted, `U'`-realized, all `◁ HU`, all `≤ H·C_U(S₀)`), this
+supplies the `hAinv` hypothesis of `subsetCharacterKernel_conjBy_of_invariant`, making each kernel
+condition `HU`-conjugation-stable. -/
+theorem conjByMulEquiv_invariant_of_normal {K : Subgroup G} [K.Normal]
+    {N : Subgroup ↥K} (hN : ∀ (g : G) (a : ↥K), a ∈ N →
+      (⟨g * (a : G) * g⁻¹, ‹K.Normal›.conj_mem (a : G) a.2 g⟩ : ↥K) ∈ N)
+    (g : G) :
+    ∀ a ∈ (N : Set ↥K), ClassFunction.conjByMulEquiv g a ∈ (N : Set ↥K) := by
+  intro a ha
+  rw [SetLike.mem_coe] at ha ⊢
+  have hval : ClassFunction.conjByMulEquiv g a
+      = (⟨g * (a : G) * g⁻¹, ‹K.Normal›.conj_mem (a : G) a.2 g⟩ : ↥K) :=
+    Subtype.ext (by rw [ClassFunction.conjByMulEquiv_apply])
+  rw [hval]
+  exact hN g a ha
+
 /-- **step 5 (g): a `hcHom`-kernel-trivial `HC`-character is `hcPsi θbar`** (Peterfalvi (9.8.c)).
 An irreducible `HC`-character `ψ` trivial on `Ker hcHom` (`= H₀C`) inflates from `H̄ = HC/H₀C`
 (`exists_compHom_eq_of_subset_characterKernel`, `hcHom` surjective); since `H̄` is abelian the
@@ -12307,12 +12368,37 @@ permutation.
 
 **Still open (v)**: the count `((p-1)/a)·|C_U(S₀):U'| = ((p-1)/a)·(|U|/(a|U'|))`.  Since `H·C_U(S₀) ◁ HU`
 (`hcuInHu_normal`), the `U`-orbit step *is* a `card_image_induce_eq_div` (`OrbitOnIrr`) over
-`H·C_U(S₀)` giving `|image|/[HU:H·C_U(S₀)] = |image|/a` — but it needs (α) an `HU`-conjugation-invariant
-pair-family `T = {ψ_{θ₁,λ}}` with each member's inertia `= H·C_U(S₀)` (a `hcuPsiPair`-conjBy-descent
-lemma, analog of `hcPsi_regular_conjBy`, mixing the `θ₁`- and `λ`-conjugation — genuinely absent), (β)
-the domain count `|{(θ₁,λ)}| = (p-1)·|C_U(S₀):U'|`, and (γ) injectivity of the *second* induction
-`ζ ↦ Ind_{HU}^M ζ` on this family (the `W₁`-distinctness of (iv), so distinct `ζ` give distinct
-`𝒮(H₀U')`-members).  These three are the honest remaining research core.  Skeleton left `sorry`. -/
+`H·C_U(S₀)` giving `|image| = |T|/[HU:H·C_U(S₀)] = |T|/a`.  Mirrors the Coq `typeP_nonGalois_characters`
+(9.8.d) proof (`PFsection9.v` L1112-1254: `Mtheta`/`Xtheta`/`injXtheta`).  Three pieces remain:
+
+*(α) conjBy-closed inertia-`=`-source family `T`.*  The `T`-invariance no longer needs a
+`hcuPsiPair`-conjBy-descent (mixing `θ₁`/`λ`): the two landed primitives
+`subsetCharacterKernel_conjBy_of_invariant` + `conjByMulEquiv_invariant_of_normal` make the
+*intrinsic* characterization `T = {χ ∈ Irr(H·C_U(S₀)) linear | H₀-realized ⊆ Ker χ ∧ W-lifted ⊆ Ker χ
+∧ χ|_H ≠ 1 ∧ U'-realized ⊆ Ker χ}` conjBy-closed (each realized kernel condition is `HU`-stable via
+the `HU`-normality of H₀-realized/W-lifted/U'-realized, all `≤ H·C_U(S₀)`).  What remains for (α): the
+surjectivity `T ⊆ image(pair-param)` — every characterized `χ` *is* a `ψ_{θ₁,λ}` (Coq `def_Itheta`
+route: `cfDprodl`/`cfSdprod` reconstruction of the `θ₁`- and `λ`-factors from the restrictions
+`χ|_H`, `χ|_{C_U(S₀)}`), and each member's inertia `= H·C_U(S₀)` (`hcuPsiPair_inertia_eq_hcu` given
+the seed `hθ₀ = inertia_eq_hcuInHu`).
+
+*(β) domain count `|T| = (p-1)·[C_U(S₀):U']`* — restriction bijection `T ≃ (Irr(H̄/W)\{1}) ×
+Irr(C_U(S₀)/U')`; `p-1` nontrivial homs of the order-`p` `H̄/W ≅ S₀` (mirror `card_ne_one_chiefFactorHom`
++ `exists_ne_one_hom_of_prime_card`), `[C_U(S₀):U']` homs of abelian `C_U(S₀)/U'`
+(`card_monoidHom_of_hasEnoughRootsOfUnity`, `card_U_div_a_mul_card_Uprime_eq_relIndex` bridges to the
+statement RHS).
+
+*(γ) `W₁`-injectivity of `ζ ↦ Ind_{HU}^M ζ`* — genuinely absent (Coq `injXtheta`, L1233-1253): for
+`w ∈ M`, `ζ₁ = ζ₂^w` (`ζ_i ∈ Xtheta`) forces `w ∈ HU` — decompose `w = y·w₁` (`y∈HU`, `w₁∈W₁`),
+`ζ₁ = ζ₂^{w₁}`; since `H₂…H_q = W ⊆ Ker ζ_i` (`kerH1c`) yet `H₁ = S₀ ⊆ Ker(ζ₂^{w₁})` for `w₁≠1`
+(via `cfker_conjg` moving `W` to a `W₁`-conjugate containing `S₀`, using the `H̄ = ⊕ S₀^{w}` Clifford
+permutation of (9.7)), the `H₀U'`-structure + Frobenius `Ū ⋊ W₁` force `w₁=1`.  Needs new
+`cfker`-conjugation infra (`Ind`-kernel of an irreducible ↔ source kernel under `W₁`-conjugation).
+
+Assembly once (α)(β)(γ) land: `card_image_induce_eq_div` ((α)+`hcuInHu_normal`) ⟹ `|𝒵| = |T|/a`;
+(γ) ⟹ `induceHU` injective on `𝒵` ⟹ `ncard{irr,qa,∈𝒮(H₀U')} ≥ |induceHU '' 𝒵| = |𝒵| = |T|/a`
+(`Set.ncard_image_of_injOn`, `Set.ncard_le_ncard`); (β)+bridge ⟹ `= ((p-1)/a)·[C_U(S₀):U']` = RHS.
+Skeleton left `sorry`. -/
 theorem caseA_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     (chars : Section11CharacterData data chief) (caseA : CliffordCaseAData chars) :

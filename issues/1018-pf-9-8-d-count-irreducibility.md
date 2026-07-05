@@ -121,3 +121,39 @@ created: 2026-07-06
   各 member は irreducible ∧ deg qa ∧ ∈𝒮(H₀U') (全て landed:
   `caseA_exists_irreducible_source_degree_qa_induceHU_irreducible` 系)。
   RHS 算術は今回 landed の恒等で bridge。`≤` の向きは `Nat.div` monotonicity に注意。
+
+## (v) count セッション 2 (2026-07-06 続き): conjBy-closure 基盤 landed + γ が真の blocker と確定
+
+`caseA_character_counts` conjunct (d) の `sorry` は **未 close** (S11 は依然 3 sorries: 8074/12432/12517 系)。
+Coq `typeP_nonGalois_characters` (9.8.d) 原証明 (`PFsection9.v` L844-1254) を精読し、count = 3 ピース
+((α) conjBy-closed inertia-=-source family, (β) domain count, (γ) W₁-injectivity) と確定。**(γ) は
+repo に完全欠落の hard infra** で、これが真の gating item。
+
+### このセッションで landed (build-green, sorry/axiom 無, full build 3932 jobs exit 0, AxiomsCheck OK)
+
+intrinsic-kernel route ((α) を `hcuPsiPair`-conjBy-descent 無しで閉じる) の linchpin 2 本を S11 に追加:
+
+- **`subsetCharacterKernel_conjBy_of_invariant`** (S11:11695): `A ⊆ ↥K` が `conjByMulEquiv g`-不変 かつ
+  `A ⊆ characterKernel χ` ⟹ `A ⊆ characterKernel (conjBy g χ)`。汎用 (K ◁ G 任意)。
+- **`conjByMulEquiv_invariant_of_normal`** (S11:11726): `N ◁ K` (実は G-conj-stable) ⟹ `(N:Set ↥K)` は
+  全 `g:G` で `conjByMulEquiv g`-不変。上の `hAinv` を供給。
+- これで T の intrinsic 特徴づけ `{χ ∈ Irr(H·C_U(S₀)) linear | H₀-realized ⊆ Ker ∧ W-lifted ⊆ Ker ∧
+  χ|_H ≠1 ∧ U'-realized ⊆ Ker}` の **conjBy-closure が機械化可能** (各 realized kernel 条件が HU-normal
+  ゆえ HU-conj-stable)。**`hcuConjDescend` の pair 版は不要**と再確認。
+
+### 残り (次セッションが直行すべき precise gap; 詳細は `caseA_character_counts` docstring "Still open (v)")
+
+- **(α)-surjectivity**: 上記 characterized χ が全て `ψ_{θ₁,λ}` である (Coq `def_Itheta` = `cfDprodl`/`cfSdprod`
+  で χ|_H, χ|_{C_U(S₀)} から θ₁/λ を復元)。各 member inertia = H·C_U(S₀) は `hcuPsiPair_inertia_eq_hcu` (既存)。
+- **(β) domain count `|T| = (p-1)·[C_U(S₀):U']`**: restriction bijection `T ≃ (Irr(H̄/W)\{1}) ×
+  Irr(C_U(S₀)/U')`。θ-count `p-1` は `card_ne_one_chiefFactorHom` の mirror (order-p `H̄/W≅S₀`;
+  本セッションで scratch 検証済 6 行, `card_monoidHom_of_hasEnoughRootsOfUnity` + `exists_ne_one_hom_of_prime_card`)。
+  λ-count `[C_U(S₀):U']` は abelian `C_U(S₀)/U'`。RHS 橋は既存 `card_U_div_a_mul_card_Uprime_eq_relIndex`。
+- **(γ) W₁-injectivity (真の hard blocker, 完全欠落)**: Coq `injXtheta` (L1233-1253) + `kerH1c` (L1226)。
+  `w∈M`, `ζ₁=ζ₂^w` (ζ_i∈Xtheta) ⟹ `w∈HU`: `w=y·w₁` 分解 → `ζ₁=ζ₂^{w₁}` → `W=H₂…H_q ⊆ Ker ζ_i` かつ
+  `S₀=H₁ ⊆ Ker(ζ₂^{w₁})` (w₁≠1; `cfker_conjg` が W を S₀ を含む W₁-conjugate へ動かす, (9.7) の
+  Clifford 置換 `H̄=⊕S₀^w` 利用) → `H₀U'` 構造 + Frobenius `Ū⋊W₁` が w₁=1 強制。**新 `cfker`-conjugation
+  infra 必須** (既存 `caseA_reducible_theta_regular` は別命題; `induce_injective_of_inertia_stable` は
+  M-invariant source 用で (9.8.d) の non-invariant source に不適用)。
+- **assembly**: `card_image_induce_eq_div` ((α)+`hcuInHu_normal`) ⟹ `|𝒵|=|T|/a`; (γ) ⟹ `induceHU` inj on 𝒵
+  ⟹ `ncard ≥ |𝒵| = |T|/a` (`Set.ncard_image_of_injOn`+`Set.ncard_le_ncard`); (β)+橋 ⟹ RHS。
