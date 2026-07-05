@@ -6417,7 +6417,180 @@ theorem numeric_bounds [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     -- still needs the analytic inequality (13.10).
     sorry
 
-/-- **Peterfalvi (13.12)**: the centralizer parameter `c` is `1`. -/
+/-- **Peterfalvi (13.12), numeric elimination** (04.15 p.85): the (13.10)+(13.2.c) upper bound
+`m < q(p^q − 1)/(c · p^(q−1) · (p − 1))`, together with the fixed-point-free lower bound `c ≥ 2q+1`
+(with `2q ∣ c − 1`) and the (13.11) lower bounds on `m`, forces `p = 5`, `q = 3`, `c = 7`.
+
+This is the `sorry`-free `ℕ/ℚ`-arithmetic heart of (13.12): `q = 3` via
+`caseB_numeric_forces_q_three`; the `q = 3` bound `m < 3(p³−1)/(c p²(p−1))` then eliminates `c ≥ 13`
+(`< 49/100`, against (13.11.c)) forcing `c = 7`, eliminates `p ≥ 11` (`< 399/847 < 49/100`) forcing
+`p < 11`, and eliminates `p = 7` (the exact value `m = ½ − 1/(2·3^{p−1}) = ½ − 1/1458` exceeds the
+bound `171/343`) forcing `p = 5`.  Only the final `p = 5, q = 3, c = 7` structural contradiction
+(`PC` normal nilpotent Hall ⊋ `P = S_F`) remains, isolated in `c_eq_one_final_case`. -/
+theorem c_eq_one_forces_params {p q c : ℕ} {m : ℚ}
+    (hp : p.Prime) (hq : q.Prime) (hp3 : 3 ≤ p) (hq2 : q ≠ 2) (hpq : p ≠ q)
+    (hc2q1 : 2 * q + 1 ≤ c) (h2q : 2 * q ∣ c - 1)
+    (hm5 : 5 ≤ q → (7 : ℚ) / 10 < m) (hm7 : 7 ≤ q → (8 : ℚ) / 10 < m)
+    (hm49 : q = 3 → 5 ≤ p → (49 : ℚ) / 100 < m)
+    (hmval : m = 1 - 1 / ((q : ℚ) - 1) - ((q : ℚ) - 1) / (q : ℚ) ^ p
+      + 1 / (((q : ℚ) - 1) * (q : ℚ) ^ p))
+    (hbound : m < (q : ℚ) * ((p : ℚ) ^ q - 1)
+      / ((c : ℚ) * (p : ℚ) ^ (q - 1) * ((p : ℚ) - 1))) :
+    p = 5 ∧ q = 3 ∧ c = 7 := by
+  -- Basic positivity.
+  have hpR : (3 : ℚ) ≤ (p : ℚ) := by exact_mod_cast hp3
+  have hp0 : (0 : ℚ) < (p : ℚ) := by linarith
+  have hp1 : (0 : ℚ) < (p : ℚ) - 1 := by linarith
+  have hq3le : 3 ≤ q := by
+    rcases hq.two_le.lt_or_eq with h | h
+    · omega
+    · exact absurd h.symm hq2
+  have hqR : (3 : ℚ) ≤ (q : ℚ) := by exact_mod_cast hq3le
+  have hqpos : (0 : ℚ) < (q : ℚ) := by linarith
+  have hcpos : 0 < c := by omega
+  have hcR : (0 : ℚ) < (c : ℚ) := by exact_mod_cast hcpos
+  have hc2q1R : (2 * (q : ℚ) + 1) ≤ (c : ℚ) := by
+    have : ((2 * q + 1 : ℕ) : ℚ) ≤ (c : ℚ) := by exact_mod_cast hc2q1
+    push_cast at this; linarith
+  -- Odd prime `≥ 3` is `3` or `≥ 5`.
+  have prime_split : ∀ n : ℕ, n.Prime → 3 ≤ n → n = 3 ∨ 5 ≤ n := by
+    intro n hn hn3
+    by_contra hcon
+    rw [not_or, not_le] at hcon
+    obtain ⟨hne, hlt⟩ := hcon
+    interval_cases n
+    · exact hne rfl
+    · exact (by norm_num : ¬ Nat.Prime 4) hn
+  have hp35 : p = 3 ∨ 5 ≤ p := prime_split p hp hp3
+  have hq35 : q = 3 ∨ 5 ≤ q := prime_split q hq hq3le
+  -- `p^q = p^(q-1) · p`.
+  have hpexp : (p : ℚ) ^ q = (p : ℚ) ^ (q - 1) * (p : ℚ) := by
+    rw [← pow_succ]; congr 1; omega
+  -- Step 1: derive `m < q p / ((2q+1)(p-1))`, hence `q = 3`.
+  have hbound2q1 : m < (q : ℚ) * (p : ℚ) / ((2 * (q : ℚ) + 1) * ((p : ℚ) - 1)) := by
+    have hden1 : (0 : ℚ) < (c : ℚ) * (p : ℚ) ^ (q - 1) * ((p : ℚ) - 1) := by positivity
+    have hden2 : (0 : ℚ) < (2 * (q : ℚ) + 1) * ((p : ℚ) - 1) := by positivity
+    have hstep : (q : ℚ) * ((p : ℚ) ^ q - 1) / ((c : ℚ) * (p : ℚ) ^ (q - 1) * ((p : ℚ) - 1))
+        < (q : ℚ) * (p : ℚ) / ((2 * (q : ℚ) + 1) * ((p : ℚ) - 1)) := by
+      rw [div_lt_div_iff₀ hden1 hden2, hpexp]
+      have hkey : (2 * (q : ℚ) + 1) * ((p : ℚ) ^ (q - 1) * (p : ℚ) - 1)
+          < (c : ℚ) * ((p : ℚ) ^ (q - 1) * (p : ℚ)) := by
+        have hpp : (0 : ℚ) < (p : ℚ) ^ (q - 1) * (p : ℚ) := by positivity
+        have e1 : (2 * (q : ℚ) + 1) * ((p : ℚ) ^ (q - 1) * (p : ℚ) - 1)
+            < (2 * (q : ℚ) + 1) * ((p : ℚ) ^ (q - 1) * (p : ℚ)) := by nlinarith [hqR, hpp]
+        have e2 : (2 * (q : ℚ) + 1) * ((p : ℚ) ^ (q - 1) * (p : ℚ))
+            ≤ (c : ℚ) * ((p : ℚ) ^ (q - 1) * (p : ℚ)) :=
+          mul_le_mul_of_nonneg_right hc2q1R (le_of_lt hpp)
+        linarith [e1, e2]
+      have hqp1 : (0 : ℚ) < (q : ℚ) * ((p : ℚ) - 1) := by positivity
+      nlinarith [mul_lt_mul_of_pos_left hkey hqp1]
+    linarith [hbound, hstep]
+  have hq3 : q = 3 := caseB_numeric_forces_q_three hp35 hq35 hm5 hm7 hbound2q1
+  -- With `q = 3`, `p ≥ 5`.
+  have hp5 : 5 ≤ p := by
+    rcases hp35 with h | h
+    · exact absurd (h.trans hq3.symm) hpq
+    · exact h
+  have hpR5 : (5 : ℚ) ≤ (p : ℚ) := by exact_mod_cast hp5
+  subst hq3
+  -- Specialize the bound to `q = 3`.
+  have hbound3 : m < (3 : ℚ) * ((p : ℚ) ^ 3 - 1) / ((c : ℚ) * (p : ℚ) ^ 2 * ((p : ℚ) - 1)) := by
+    have he : (p : ℚ) ^ (3 - 1) = (p : ℚ) ^ 2 := by norm_num
+    have hc3 : ((3 : ℕ) : ℚ) = (3 : ℚ) := by norm_num
+    rw [he, hc3] at hbound
+    exact hbound
+  have hm49p : (49 : ℚ) / 100 < m := hm49 rfl hp5
+  -- `c ≡ 1 mod 6`, `c ≥ 7`, so `c = 7 ∨ c ≥ 13`.
+  have h6 : 6 ∣ c - 1 := by simpa using h2q
+  have hc7or13 : c = 7 ∨ 13 ≤ c := by omega
+  -- Kill `c ≥ 13`.
+  have hc7 : c = 7 := by
+    rcases hc7or13 with h | h
+    · exact h
+    exfalso
+    have hcR13 : (13 : ℚ) ≤ (c : ℚ) := by exact_mod_cast h
+    have hden : (0 : ℚ) < (c : ℚ) * (p : ℚ) ^ 2 * ((p : ℚ) - 1) := by positivity
+    have hb13 : (3 : ℚ) * ((p : ℚ) ^ 3 - 1) / ((c : ℚ) * (p : ℚ) ^ 2 * ((p : ℚ) - 1))
+        < (49 : ℚ) / 100 := by
+      rw [div_lt_div_iff₀ hden (by norm_num)]
+      nlinarith [hcR13, hpR5, mul_pos hp0 hp1, mul_pos (mul_pos hp0 hp0) hp1, hp0, hp1,
+        sq_nonneg ((p : ℚ) - 5)]
+    linarith [hbound3, hb13, hm49p]
+  subst hc7
+  -- Kill `p ≥ 11`.
+  have hp_lt_11 : p < 11 := by
+    by_contra hcon
+    rw [not_lt] at hcon
+    have hpR11 : (11 : ℚ) ≤ (p : ℚ) := by exact_mod_cast hcon
+    have hden : (0 : ℚ) < (7 : ℚ) * (p : ℚ) ^ 2 * ((p : ℚ) - 1) := by positivity
+    have hb11 : (3 : ℚ) * ((p : ℚ) ^ 3 - 1) / ((7 : ℚ) * (p : ℚ) ^ 2 * ((p : ℚ) - 1))
+        < (49 : ℚ) / 100 := by
+      rw [div_lt_div_iff₀ hden (by norm_num)]
+      nlinarith [hpR11, mul_pos hp0 hp1, mul_pos (mul_pos hp0 hp0) hp1, hp0, hp1]
+    linarith [hbound3, hb11, hm49p]
+  -- Kill `p = 7` via the exact value of `m`.
+  have hp_ne_7 : p ≠ 7 := by
+    intro h7
+    subst h7
+    rw [hmval] at hbound3
+    norm_num at hbound3
+  -- `5 ≤ p < 11`, prime, `≠ 7` ⇒ `p = 5`.
+  refine ⟨?_, rfl, rfl⟩
+  interval_cases p
+  · rfl
+  · exact absurd hp (by norm_num)
+  · exact absurd rfl hp_ne_7
+  · exact absurd hp (by norm_num)
+  · exact absurd hp (by norm_num)
+  · exact absurd hp (by norm_num)
+
+/-- **Peterfalvi (13.12), the isolated `PC`-Hall obligation**: for the numerically-forced
+`p = 5, q = 3, c = 7`, the subgroup `PC = P ⊔ C` is contained in `M_F = maxNilpotentNormalHall S`.
+
+Peterfalvi's argument: `PC` is **abelian** (hence nilpotent) — `P` is elementary abelian, `C ≤ U` is
+abelian, and `C` centralizes `P` (`C_eq`); it is **normal** in `S` (type-`P` `W₁`-structure); and it
+is a **Hall** subgroup once `gcd(c, u) = 1`, which holds because case (9.7.b) for `S` (as `p − 1 = 4`
+has no odd divisor `≠ 1`) forces `u ∣ (p^q − 1)/(p − 1) = 31` (Singer / `typeP_Galois`), coprime to
+`c = 7`.  By `le_maxNilpotentNormalHall` these three facts give `PC ≤ M_F`.  The `typeP_Galois`
+dichotomy and the `W₁`-normality are the genuinely deep §13 σ-structure content (Coq
+`FTtypeP_Ind_Fitting_reg_Fcore`: `typeP_Galois` + Fitting-core maximality `Fcore_max`), §14-gated /
+multi-session — the sole remaining gap of (13.12). -/
+theorem pc_le_maxNilpotentNormalHall [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hp5 : hyp.p = 5) (hq3 : hyp.q = 3) (hc7 : hyp.c = 7) :
+    hyp.P ⊔ hyp.C ≤ maxNilpotentNormalHall hyp.S :=
+  sorry
+
+/-- **Peterfalvi (13.12), structural residual**: the numerically-forced case `p = 5, q = 3, c = 7`
+is impossible.  By `pc_le_maxNilpotentNormalHall`, `PC = P ⊔ C ≤ M_F = P` (`P_eq_SF`), so `C ≤ P`;
+but `|C| = c = 7` cannot divide `|P| = p^q = 125`.  The genuine gap is isolated in
+`pc_le_maxNilpotentNormalHall` (the `PC`-nilpotent-normal-Hall obligation, `typeP_Galois`-gated); the
+`C ≤ P ⟹ 7 ∣ 125` maximality contradiction is discharged here. -/
+theorem c_eq_one_final_case [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hp5 : hyp.p = 5) (hq3 : hyp.q = 3) (hc7 : hyp.c = 7) : False := by
+  -- `C ≤ P ⊔ C ≤ M_F = P`.
+  have hCleP : hyp.C ≤ hyp.P := by
+    have h := pc_le_maxNilpotentNormalHall hG hyp hp5 hq3 hc7
+    rw [← hyp.P_eq_SF] at h
+    exact le_trans le_sup_right h
+  -- `|C| = 7`, `|P| = p^q = 125`.
+  have hCcard : Nat.card ↥hyp.C = 7 := by rw [← hyp.c_eq_card_C, hc7]
+  have hPcard : Nat.card ↥hyp.P = 5 ^ 3 := by
+    obtain ⟨_, _, _, hcard, _, _⟩ := basic_structure hG hyp
+    rw [hcard, hp5, hq3]
+  -- `C ≤ P ⟹ |C| ∣ |P|`, i.e. `7 ∣ 125`, false.
+  have hdvd : Nat.card ↥hyp.C ∣ Nat.card ↥hyp.P := by
+    have hd := Subgroup.card_subgroup_dvd_card (hyp.C.subgroupOf hyp.P)
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hCleP).toEquiv] at hd
+  rw [hCcard, hPcard] at hdvd
+  norm_num at hdvd
+
+/-- **Peterfalvi (13.12)**: the centralizer parameter `c` is `1`.
+
+The numeric elimination `c_eq_one_forces_params` — fed the (13.10) analytic inequality
+(`analytic_inequality`, `u/c > m p^(q-1)/q`), the (13.2.c) Singer bound (`basic_structure`,
+`u ≤ (p^q-1)/(p-1)`), the fixed-point-free lower bound `c ≥ 2q+1` (`two_mul_q_dvd_c_pred`), and the
+(13.11) `m`-bounds — forces `p = 5, q = 3, c = 7`, ruled out by the isolated structural residual
+`c_eq_one_final_case`. -/
 theorem c_eq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     hyp.c = 1 := by
@@ -6428,14 +6601,47 @@ theorem c_eq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hc_ge : 2 * hyp.q + 1 ≤ hyp.c := by
     have h2q : 2 * hyp.q ≤ hyp.c - 1 := Nat.le_of_dvd (by omega) (hyp.two_mul_q_dvd_c_pred hG)
     omega
-  -- The `c ≥ 2q + 1` lower bound (structural, `dv_2q_c1`) contradicts Peterfalvi's numeric
-  -- elimination: the (13.10) analytic inequality bounds `m` above by `q·p^q/(c·p^(q−1)·(p−1))`, which
-  -- with the `m > 7/10` lower bounds (13.11) and `c ≥ 2q+1` forces `q = 3, p = 5, c = 7, u ∣ 31`;
-  -- then `PC` would be a normal nilpotent Hall subgroup of `S` strictly containing `P = S_F`,
-  -- contradicting `P = maxNilpotentNormalHall S` (Coq `FTtypeP_Ind_Fitting_reg_Fcore`: `typeP_Galois`
-  -- dichotomy + Fitting-core maximality `Fcore_max`).  Deep §13 char/σ residual.
-  clear hcgt hc1
-  sorry
+  -- (13.10) analytic inequality: `u/c > m · p^(q-1) / q`.
+  obtain ⟨_, _, h1310⟩ := analytic_inequality hG hyp
+  have hWcast : ((hyp.p ^ (hyp.q - 1) : ℕ) : ℚ) = (hyp.p : ℚ) ^ (hyp.q - 1) := by push_cast; ring
+  rw [hWcast] at h1310
+  -- (13.2.c) Singer bound: `u ≤ (p^q - 1)/(p - 1)`, hence `u · (p-1) ≤ p^q - 1`.
+  obtain ⟨_, _, _, _, hu_bound, _⟩ := basic_structure hG hyp
+  have hp1nat : 1 ≤ hyp.p := hyp.p_prime.one_le
+  have hp0nat : 0 < hyp.p - 1 := by have := hyp.three_le_p; omega
+  have hpq1 : 1 ≤ hyp.p ^ hyp.q := Nat.one_le_pow _ _ hyp.p_prime.pos
+  have huP : hyp.u * (hyp.p - 1) ≤ hyp.p ^ hyp.q - 1 :=
+    (Nat.le_div_iff_mul_le hp0nat).mp hu_bound
+  have huPR : (hyp.u : ℚ) * ((hyp.p : ℚ) - 1) ≤ (hyp.p : ℚ) ^ hyp.q - 1 := by
+    have h1 : ((hyp.u * (hyp.p - 1) : ℕ) : ℚ) ≤ ((hyp.p ^ hyp.q - 1 : ℕ) : ℚ) := by
+      exact_mod_cast huP
+    have e1 : ((hyp.u * (hyp.p - 1) : ℕ) : ℚ) = (hyp.u : ℚ) * ((hyp.p : ℚ) - 1) := by
+      push_cast [Nat.cast_sub hp1nat]; ring
+    have e2 : ((hyp.p ^ hyp.q - 1 : ℕ) : ℚ) = (hyp.p : ℚ) ^ hyp.q - 1 := by
+      push_cast [Nat.cast_sub hpq1]; ring
+    rw [e1, e2] at h1; exact h1
+  -- Positivity.
+  have hqR : (0 : ℚ) < (hyp.q : ℚ) := by exact_mod_cast hyp.q_prime.pos
+  have hcRpos : (0 : ℚ) < (hyp.c : ℚ) := by exact_mod_cast (show 0 < hyp.c by omega)
+  have hp1R : (0 : ℚ) < (hyp.p : ℚ) - 1 := by
+    have : (3 : ℚ) ≤ (hyp.p : ℚ) := by exact_mod_cast hyp.three_le_p
+    linarith
+  -- From (13.10): `m · p^(q-1) · c < u · q`.
+  rw [gt_iff_lt, div_lt_div_iff₀ hqR hcRpos] at h1310
+  -- Assemble the abstract bound `m < q(p^q-1)/(c p^(q-1)(p-1))`.
+  have hbound : hyp.m < (hyp.q : ℚ) * ((hyp.p : ℚ) ^ hyp.q - 1)
+      / ((hyp.c : ℚ) * (hyp.p : ℚ) ^ (hyp.q - 1) * ((hyp.p : ℚ) - 1)) := by
+    rw [lt_div_iff₀ (by positivity)]
+    nlinarith [mul_lt_mul_of_pos_right h1310 hp1R,
+      mul_le_mul_of_nonneg_left huPR (le_of_lt hqR)]
+  -- Numeric elimination forces `p = 5, q = 3, c = 7`.
+  obtain ⟨hp5, hq3, hc7⟩ := c_eq_one_forces_params hyp.p_prime hyp.q_prime hyp.three_le_p
+    hyp.q_ne_two hyp.p_ne_q hc_ge (hyp.two_mul_q_dvd_c_pred hG)
+    (fun h => hyp.m_gt_seven_tenths_of_five_le_q h)
+    (fun h => hyp.m_gt_four_fifths_of_seven_le_q h)
+    (fun hq hp => hyp.m_gt_49_hundredths_of_q_eq_three_of_five_le_p hq hp)
+    hyp.m_eq hbound
+  exact c_eq_one_final_case hG hyp hp5 hq3 hc7
 
 /-- **Peterfalvi (13.13)**: if case (9.7.a) holds for `S`, then
 `q = 3` and `u = (p - 1)^2 / 4`. -/

@@ -2050,3 +2050,54 @@ type III を排除)。**b-consume ではない。**
   の char 議論の組み上げが大 (multi-iteration)。
 - **教訓**: 「b-consume 候補」の frontier ラベルは循環チェック必須 ([[verify-port-state-by-number-not-coq-name]])。
   b が `IsTypeII T` を仮説に取る facts は (14.9) の consumer であって producer でない。
+
+### cont.⁷⁰ (2026-07-06 lane c /loop、cont.⁶⁹ 継続) — S16 8-sorry の正確な gate-map 確定 + (14.9) 唯一の ungated my-lane 経路 = type-III char exclusion
+
+**S16_NonExistenceG の残 8 sorry を個別 trace → 全て deep-my-lane-(14.9)-char か cross-lane-gated と確定**
+(他 S16 Peterfalvi files = Bessel/Coherence/GridExpansion/Core は **全 sorry-free**、char infra は proven)。
+cont.⁶⁸ 系の「b-consume 候補」ラベルは全般に誤りだった:
+
+| sorry (line) | 内容 | 真の gate | owner |
+|---|---|---|---|
+| :85 `T_isTypeP2` | `κ(T) ≠ σ'(T)` = (14.9) canonical | **type-III char exclusion** (Γ-bridge + (14.8)) | **my-lane, ungated** |
+| :179 v-value | `v=(q^p−1)/(q−1)` exact | (13.15) Galois 正確値。S-side `caseB_order_u` (S15:6609) が **sorry** (b file) | lane b (S15) |
+| :2594 s_side_frobenius_kernel | `C_{S'}(x)≤P` | field-model carrier (`exists_pu_field_repr` は `hu_full` 要 = 正確 u 値) | 9000/2035 sphere |
+| :2607 t_side_frobenius_kernel | `C_{T'}(x)≤Q` | 同 dual (`TFieldModelData` σ 構成、正確 v 値) | 9000 sphere |
+| :5294/:5297/:5315 carrier fields | m_row/m_col/grid_mem | b の S15 grid property fields (issue 3002) | lane b |
+| :6317 1_G+Δ η-grid 展開 | ±signs joint existence | η-grid Track A (issue 3002) | lane b |
+
+**⟹ 唯一の ungated my-lane 深掘り対象 = (14.9) residual `κ(T) ≠ σ'(T)` の type-III char exclusion**
+(Bessel/Coherence proven ゆえ assemble 可能性あり)。Coq `PFsection14.FTtypeP_min_typeII` の spine:
+1. `contraLR`: `¬(T type II)` 仮定 → `FTtype34_structure` で T type III (type IV 排除)。
+2. type-III の calT1 = `seqIndD QV T QV Q` を uniform-degree (`calT1_1p`: ζ(1)=p) で coherent 化。
+3. β_{T0}=ν_0−ζ の Γ-bridge 展開: `⟨Γ, τ1 ζ⟩ ≡ 1 (mod 2)` (real vchar even) → `|⟨Γ,τ1 ζ⟩|²≥1`。
+4. orthogonal_split + Bessel lower bound `lb_Ga` で `(v−1)/p = p·|calT1| ≤ ⟨Γ,Γ⟩ ≤ (u−1)/q`。
+5. (14.8) `key_ratio_inequality_of_caseB_data` (**proven** ✓) の `(v−1)/p > (u−1)/q` と矛盾。
+- Lean 対応: Γ = `S16_PairingBessel` `betaDecomp.Gamma` (proven)、coherence = `S16_PairingCoherence`
+  (proven)、(14.8) proven。**次 iteration = これら proven export を読み、type-III→numeric lemma を
+  named で組む** (multi-step だが ungated、真の char body)。type-III/IV split = `isTypeIII_or_IV_of_typePData`
+  / `not_isTypeII_of_isTypeIII_or_IV` (proven) が下地。
+- **注意**: 他 7 sorry は b (S15 (13.15)/grid/η-grid) か 9000 (field-model) 待ち。c-lane は cite-when-landed。
+  「b-consume 候補」ラベルは循環/gate を個別確認せず貼らない ([[verify-port-state-by-number-not-coq-name]])。
+
+### cont.⁷¹ (2026-07-06 lane c /loop、ユーザー lane-d 指摘で訂正) — gate-map 訂正 (lane-d 退役) + C assembly 完了確認 + T-side (13.15) 調整 issue 9013
+
+**ユーザー指摘「lane-d 廃止」で cont.⁷⁰ gate-map を訂正**: lane-d は 2026-07-02 退役 (`ft_lane_reallocation` 3レーン再編)。
+cont.⁷⁰ の「9000 = lane-d」は issue 9000 の旧 header (2026-07-01) を stale-cite したもの。**訂正**: 9000 σ-theory
+(Singer/Galois divisibility+upper-bound) は完成・frozen shared infra、gate でない。**残 8 sorry は全て lane-b**
+(§16 char cascade = S15 (13.9)-(13.19))。
+
+**新発見 (精査)**:
+1. **C の assembly は top-level `nonexistence_of_G` まで完了** (残 sorry は leaf のみ)。
+2. **exact u-value は C 内で proven** = `u_final_value` (:5874)、**(14.15) fpf-congruence route** (`orthogonality_switch`
+   + `u_final_value_of_fpf_card_congruences`) — **(13.15) 非経由・ungated**。⟹ exact-value は原理的に C-buildable。
+3. **但し v-value (T-side) は (14.15) 相当 route 無し** — (14.4) case-(9.7.b) = (13.15)-dual 直行。`key_ratio_inequality`
+   は T-side に **lower bound** (v ≥ V_v) を要求 (v が不等式大側)、9000 の upper-bound では不足。⟹ (13.15)-dual gated。
+4. **lane-b は §13 char cascade を active building** (commit a1dc3748: (13.12) c_eq_one = (13.10)+(13.11) 組立)。
+   但し S-side hardcoded (`hyp.c`)。
+
+**訂正した doctrine 適用**: cont.⁷⁰ の「should C wait?」framing は `ft_lane_reallocation` の「ゲートは幻・待ち文化禁止」
+に反していた。正しくは: **C は自クラスタ assembly 完了 → lane-b landing を consume (issue 3002 η-grid の cont.⁶⁸
+consume が実例) + lanes-equivalent ゆえ char cascade に貢献可**。T-side (13.15) は C 自 file・T-side ゆえ lane-b S-side と
+非衝突だが、lane-b estimate の re-derive は重複。⟹ **issue 9013 で lane-b に §13 estimate の subgroup-generic 化を
+依頼** (案 A 推奨: 両側 cite で非重複)。裁定待ちの間 C は landing consumer。

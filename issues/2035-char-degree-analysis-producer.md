@@ -405,3 +405,29 @@ issue 9000 σ = a·d / coherence·τ₁ keystone = char_degree_analysis 本体)�
 (a) 他レーンが gate を閉じるのを待って re-assess (un-gate 波及)、or (b) deep keystone
 (char_degree_analysis τ₁ construction or 13.4 orthogonality) を multi-session で正面 engage。
 clean/quick な ungated leaf は現時点で枯渇。
+
+## 2026-07-06 更新 (lane b loop): (13.12) 数値部は ungated だった + (13.3) tractability 精査
+
+**「ungated leaf 枯渇」の部分訂正 — (13.12) `c_eq_one` の数値消去は ungated で closed済**:
+上の結論は (13.10) `analytic_inequality` が sorry-free assembly になった payoff を見落としていた。
+- **`c_eq_one_forces_params` (新, sorry-free)**: (13.10)+(13.2.c Singer)+(13.11)+FPF `c≥2q+1` で
+  `p=5∧q=3∧c=7` に絞る純 ℚ/ℕ 算術 (commit a1dc3748)。`c_eq_one` の bare sorry 撤去。
+- **`c_eq_one_final_case` の maximality 矛盾も実証明** (commit b6ddff8e): `pc_le_maxNilpotentNormalHall`
+  (PC ≤ M_F) → C ≤ P → 7∤125。**(13.12) 残 gap = `pc_le_maxNilpotentNormalHall` のみ** (PC が
+  nilpotent[proven-able: PC abelian] normal[W₁-struct] Hall[gcd(c,u)=1 = case 9.7.b ⇒ u∣31 の
+  typeP_Galois]。issue 9000 σ-theory と同 gate)。
+
+**(13.3) `character_degree_analysis` tractability 精査 (Explore agent 系統調査)**:
+- **確定: production `character_degree_analysis` は `sibleyTarget_H0C` (S11:6348 sorried, §14-gated)
+  無しには閉じない。~3-5 session。** route B (Sibley 直 (S,PC)) は (6.8.a) split で死亡 (既知)。
+  route A = `coherent_H0C_commutator` (9.11) が sibleyTarget_H0C を要す ((6.8)-shape witness for
+  H₀C'、W₁-composite complement)。
+- **landable path = "gated-endpoint body"**: `character_degree_analysis_of_sibleyTarget`
+  (SibleyTarget を仮説パラメータ化、~400 行、sorry-free extraction)。τ₁ = `coh.extension`
+  (S07 `IsCoherent` 構造 :1659) から抽出: `extension_inner_eq` → `tau1S_inner_induce` /
+  `extends_on_supported` → `tau1S_apply_induce_sub` / `extension_mem_ZIrr` → `tau1S_induce_mem_ZIrr`。
+- **既 proven fields** (assembly で cite 可): `mu_j_linear_induced` (it.83) / `delta_eq_one` S-side
+  (it.87-88) / `mu_col_tau1_eta_col_one`。残 = 4 coherence-extraction fields + lambda(MEDIUM) +
+  mu_tau1_formula (S05 (5.8) machinery threading)。
+- **次 session 推奨**: 上記 gated-endpoint body を専用 session で landing (SibleyTarget 仮説化で
+  §14 依存を parallel track に切り出し、(13.3) 構成 principle を実証)。
