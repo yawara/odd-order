@@ -861,3 +861,11 @@ vs CharacterDifferenceImage.Orthogonal) の突合が実装時の最初の確認�
   e ≡ e∘conj → e² ≡ 1 → e ≡ 1 (odd) → U が全 translate を固定 → fixedSubgroup = ⊤ ↯
   U_noncentral_on_quotient。D 全消滅側は commute_all_of_closure_eq_top で Ĥ 可換 ↯ |Ĥ'| = p。
 - 次 iteration: この設計で chiefKernel_caseA_false を実装。
+
+## 2026-07-05 lane-a (loop 64): (11.7) case (a) endgame 補題 (caseA_fixed_contradiction)
+
+- 「U が S₀ pointwise 固定 → False」を実証明 (translate へは conj-返しで伝播、
+  span = ⊤、(9.4.b) と矛盾)。
+- 残り = chain 部: 非可換 pair (x̂,ŷ) ∈ S_gen² → c := ⁅x̂,ŷ⁆ ∈ N̂ order p →
+  σu-固定 + 双線形性で ē₀(a⁻¹ua)·ē₀(b⁻¹ub) = 1 → c-conj 鎖 (奇数位数) → ē₀ ≡ 1 → hfix。
+  + S_gen closure = ⊤ (π-lift 帰納) + hDall dichotomy + Ĥ frame 再利用の main 組立。
