@@ -70,7 +70,12 @@ Pf (13.3) proof の引用 ↔ repo 在庫:
    - **C = 1 枝**: Frobenius H̄⋊U の kernel-非自明既約 = (p^q−1)/u 本
      (Isaacs 6.34-count; S11 `card_pffun_on`/oXtheta 系) が全部 reducible 誘導なら
      (9.9.b) の p−1 本と一致 → u = (p^q−1)/(p−1)
-   次 iteration から C = 1 枝 (counting、自己完結度高) → C ≠ 1 枝の順で着手。
+   **順序訂正 (it.59)**: 結論の第 1 conjunct が C = ⊥ を主張するため、C ≠ 1 の
+   否定 (branch-1: θ≠1, λ≠1 の θλ-lift + `hcZeta_induceHU_irreducible` 系で
+   既約メンバー構成 → hno と矛盾) が第一義。その後 C = ⊥ の下で counting
+   (free-action orbit 数 = (p^q−1)/u: `card_conjByOrbit_eq_index_inertia` +
+   Frobenius-6.34 既約性 [在庫確認済 InducedIrreducible:544-590] + (9.9.b) の
+   p−1 本と突合)。
    `exceptional_case_frobenius_realization` (9.10) も同素材で続けて閉じる見込み。
 4. [ ] τ₁-fields 導出: `coherent_H0C_commutator` の IsCoherent (extension_agrees /
    inner_eq_on_supported) から 2034 の 4 fields (extends-Ind は τ=Ind (H_sharp_tau_eq_induce
