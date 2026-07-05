@@ -208,7 +208,136 @@ theorem quotient_classTwo_structure [Finite K] {p : ℕ} (hp : p.Prime)
 
 end QuotientClassTwo
 
-/-! ## Case (b): `U` irreducible on `H̄` refuted by the square-index parity -/
+/-! ## Class-`2` commutator calculus (for case (a)) -/
+
+section ClassTwoCalculus
+
+variable {Γ : Type*} [Group Γ]
+
+/-- Central factors drop out of commutators (left argument). -/
+theorem commutatorElement_mul_center_left {z : Γ} (hz : z ∈ Subgroup.center Γ) (a b : Γ) :
+    ⁅a * z, b⁆ = ⁅a, b⁆ := by
+  have hzb : z * b = b * z := (Subgroup.mem_center_iff.mp hz b).symm
+  rw [commutatorElement_def, commutatorElement_def]
+  rw [show a * z * b * (a * z)⁻¹ * b⁻¹ = a * (z * b) * z⁻¹ * a⁻¹ * b⁻¹ by group, hzb]
+  group
+
+/-- Central factors drop out of commutators (right argument). -/
+theorem commutatorElement_mul_center_right {z : Γ} (hz : z ∈ Subgroup.center Γ) (a b : Γ) :
+    ⁅a, b * z⁆ = ⁅a, b⁆ := by
+  rw [← commutatorElement_inv, commutatorElement_mul_center_left hz,
+    commutatorElement_inv]
+
+/-- The product expansion `⁅x·y, b⁆ = ⁅y, b⁆ · ⁅x, b⁆` when `⁅y, b⁆` is central
+(the class-`2` "linearity" seed). -/
+theorem commutatorElement_mul_left_of_center {y b : Γ}
+    (hc : ⁅y, b⁆ ∈ Subgroup.center Γ) (x : Γ) :
+    ⁅x * y, b⁆ = ⁅y, b⁆ * ⁅x, b⁆ := by
+  have hexp : ⁅x * y, b⁆ = x * ⁅y, b⁆ * (b * x⁻¹ * b⁻¹) := by
+    rw [commutatorElement_def, commutatorElement_def]
+    group
+  rw [hexp, show x * ⁅y, b⁆ * (b * x⁻¹ * b⁻¹) = x * (⁅y, b⁆ * (b * x⁻¹ * b⁻¹)) by group,
+    ← Subgroup.mem_center_iff.mp hc (b * x⁻¹ * b⁻¹),
+    show x * (b * x⁻¹ * b⁻¹ * ⁅y, b⁆) = (x * b * x⁻¹ * b⁻¹) * ⁅y, b⁆ by group,
+    ← commutatorElement_def]
+  exact Subgroup.mem_center_iff.mp hc ⁅x, b⁆
+
+/-- **Class-`2` power bilinearity (left)**: `⁅a^k, b⁆ = ⁅a, b⁆^k` when `⁅a, b⁆` is central. -/
+theorem commutatorElement_pow_left_of_center {a b : Γ}
+    (hc : ⁅a, b⁆ ∈ Subgroup.center Γ) (k : ℕ) :
+    ⁅a ^ k, b⁆ = ⁅a, b⁆ ^ k := by
+  induction k with
+  | zero => simp [commutatorElement_def]
+  | succ k ih =>
+      have hkc : ⁅a ^ k, b⁆ ∈ Subgroup.center Γ := by
+        rw [ih]
+        exact Subgroup.pow_mem _ hc k
+      rw [pow_succ, show a ^ k * a = a * a ^ k by exact (Commute.pow_self a k).eq,
+        commutatorElement_mul_left_of_center hkc a, ih, pow_succ]
+
+/-- **Class-`2` power bilinearity (right)**: `⁅a, b^k⁆ = ⁅a, b⁆^k` when `⁅a, b⁆` is central. -/
+theorem commutatorElement_pow_right_of_center {a b : Γ}
+    (hc : ⁅a, b⁆ ∈ Subgroup.center Γ) (k : ℕ) :
+    ⁅a, b ^ k⁆ = ⁅a, b⁆ ^ k := by
+  have hc' : ⁅b, a⁆ ∈ Subgroup.center Γ := by
+    have := Subgroup.inv_mem _ hc
+    rwa [commutatorElement_inv] at this
+  rw [← commutatorElement_inv, commutatorElement_pow_left_of_center hc', ← inv_pow,
+    commutatorElement_inv]
+
+end ClassTwoCalculus
+
+/-! ## The exponent of an automorphism on an order-`p` subgroup -/
+
+section PrimeExponent
+
+variable {Γ : Type*} [Group Γ]
+
+/-- **An automorphism preserving a subgroup of prime order acts by exponentiation**: if
+`|T| = p` and `e` maps `T` into itself, there is `k` (indivisible by `p`) with `e h = h^k` for
+all `h ∈ T`. -/
+theorem exists_pow_eq_of_mapsTo_of_card_prime {p : ℕ} (hp : p.Prime)
+    {T : Subgroup Γ} (hT : Nat.card ↥T = p) (e : MulAut Γ)
+    (hmem : ∀ h ∈ T, e h ∈ T) :
+    ∃ k : ℕ, ¬ p ∣ k ∧ ∀ h ∈ T, e h = h ^ k := by
+  classical
+  haveI : Finite ↥T := Nat.finite_of_card_ne_zero (hT ▸ hp.pos.ne')
+  haveI : Fact p.Prime := ⟨hp⟩
+  haveI : IsCyclic ↥T := isCyclic_of_prime_card hT
+  obtain ⟨t, ht⟩ := IsCyclic.exists_generator (α := ↥T)
+  have htord : orderOf t = p := by
+    rw [orderOf_eq_card_of_forall_mem_zpowers ht, hT]
+  have htfin : IsOfFinOrder t := isOfFinOrder_of_finite t
+  -- `e t = t^k` for a natural `k`
+  obtain ⟨k, hk⟩ := htfin.mem_powers_iff_mem_zpowers.mpr
+    (ht (⟨e ↑t, hmem ↑t t.2⟩ : ↥T))
+  have hek : e (↑t : Γ) = (↑t : Γ) ^ k := by
+    have := congrArg (Subtype.val : ↥T → Γ) hk
+    simpa using this.symm
+  refine ⟨k, ?_, ?_⟩
+  · -- `p ∤ k`: otherwise `e t = 1`, so `t = 1`, contradicting `|T| = p`
+    intro hdvd
+    have ht1 : t ^ k = 1 := orderOf_dvd_iff_pow_eq_one.mp (htord ▸ hdvd)
+    have hcoe1 : (↑t : Γ) ^ k = 1 := by
+      have := congrArg (Subtype.val : ↥T → Γ) ht1
+      simpa using this
+    have het1 : e (↑t : Γ) = 1 := by rw [hek, hcoe1]
+    have ht1' : (↑t : Γ) = 1 := by
+      have := congrArg e.symm het1
+      simpa using this
+    have : t = 1 := Subtype.ext (by simpa using ht1')
+    rw [this, orderOf_one] at htord
+    exact hp.one_lt.ne' htord.symm
+  · -- every `h ∈ T` is a power of `t`, and `e` commutes with powers
+    intro h hh
+    obtain ⟨m, hm⟩ := htfin.mem_powers_iff_mem_zpowers.mpr (ht (⟨h, hh⟩ : ↥T))
+    have hcoe : h = (↑t : Γ) ^ m := by
+      have := congrArg (Subtype.val : ↥T → Γ) hm
+      simpa using this.symm
+    rw [hcoe, map_pow, hek, ← pow_mul, ← pow_mul, Nat.mul_comm]
+
+end PrimeExponent
+
+/-! ## Abelian from a commuting generating set -/
+
+section ClosureCommute
+
+variable {Γ : Type*} [Group Γ]
+
+/-- A group generated by a pairwise-commuting set is abelian (elementwise form). -/
+theorem commute_all_of_closure_eq_top {S : Set Γ}
+    (hS : Subgroup.closure S = ⊤) (hcomm : ∀ x ∈ S, ∀ y ∈ S, Commute x y)
+    (a b : Γ) : Commute a b := by
+  have ha : a ∈ Subgroup.closure S := hS ▸ Subgroup.mem_top a
+  have hb : b ∈ Subgroup.closure S := hS ▸ Subgroup.mem_top b
+  refine Subgroup.closure_induction (p := fun x _ => Commute x b) ?_ (Commute.one_left b)
+    (fun x y _ _ hx hy => hx.mul_left hy) (fun x _ hx => hx.inv_left) ha
+  intro x hxS
+  refine Subgroup.closure_induction (p := fun y _ => Commute x y)
+    (fun y hyS => hcomm x hxS y hyS) (Commute.one_right x)
+    (fun y z _ _ h1 h2 => h1.mul_right h2) (fun y _ h1 => h1.inv_right) hb
+
+end ClosureCommute
 
 section CaseB
 
