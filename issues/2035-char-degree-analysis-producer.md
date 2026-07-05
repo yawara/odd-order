@@ -387,3 +387,21 @@ P_elementaryAbelian) は出し切り。以降は gated-endpoint body (IsTypeP2 T
 V_inf_centralizer_Q_eq_bot=13.12 d=1 T-side 等) or deep char (13.4 orthogonality) or
 σ-producer (u_bound=9000)。次候補 = V_inf_centralizer_Q_eq_bot (S-side U_inf_centralizer_P_eq_bot
 の dual、gated-endpoint body 見込み) — fresh context で mirror 調査推奨。
+
+## 🔎 frontier assessment: B-lane ungated ceiling 到達 (it.93, 2026-07-05)
+
+session it.89-92 で明確な ungated win (T-carrier complements ×2 + P_elementaryAbelian +
+Q_elementaryAbelian_T gated-body) を出し切り。it.93 で残候補を精査、いずれも clean でないと確定:
+
+- **u_bound** (2u≤|P|-1, 13.2.c): issue 9000 typeP_Galois σ-theory (lane a/d 進行中) gated。leaf
+  `TypePGaloisUBound` は module-level (sorry-free) だが hyp への dichotomy assembly が 9000 の残作業。
+- **V_inf_centralizer_Q_eq_bot** (13.12 d=1 T-side): S-side dual `U_inf_centralizer_P_eq_bot` =
+  `C_eq_bot` = **`c_eq_one` (sorried, deep 13.12 numeric → 13.10 → char_degree_analysis)**。deep-gated。
+- **reconciled_typePData_T refactor** (thread IsTypeII T): 17 call-site の signature 変更に対し
+  payoff は U_nilpotent 1 本のみ確実 (5→4)、consumers は残 sorry で gated のまま。**low-payoff、非推奨**。
+
+**結論**: B-lane の残 frontier は全て deep-gated on 他レーンの upstream ((14.9) IsTypeP2 T = c-lane /
+issue 9000 σ = a·d / coherence·τ₁ keystone = char_degree_analysis 本体)。次の実質前進は
+(a) 他レーンが gate を閉じるのを待って re-assess (un-gate 波及)、or (b) deep keystone
+(char_degree_analysis τ₁ construction or 13.4 orthogonality) を multi-session で正面 engage。
+clean/quick な ungated leaf は現時点で枯渇。
