@@ -4745,6 +4745,71 @@ theorem inner_left_eq_zero_of_inner_sub_eq_zero {G : Type*} [Group G] [Fintype G
   rw [hx, hx0, Int.cast_zero]
 
 open scoped FiniteInduce in
+/-- **Per-element orthogonality of a difference-image family** (Peterfalvi (5.5)-style upgrade):
+if `s` is a norm-`1` virtual character orthogonal to the *sum* `(χ−χ̄)^τ = ∑ R(χ)`, then `s` is
+orthogonal to each element of `R(χ)`.  With `β := T − α` (the complementary part), `α − (−β) = T`
+and the norm-`1` projection lemma applies. -/
+theorem OrthonormalCharacterImageFamily.elt_inner_eq_zero {M : Subgroup G} [Finite G]
+    [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥M : ℂ)]
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G} {χ : ClassFunction ↥M ℂ}
+    (R : OddOrder.Peterfalvi.S07.OrthonormalCharacterImageFamily τ χ)
+    {α : ClassFunction G ℂ} (hα : α ∈ R.imageSet)
+    {s : ClassFunction G ℂ} (hsZ : s ∈ ZIrr G)
+    (hs1 : ClassFunction.inner s s = 1)
+    (hT2 : ClassFunction.inner (τ (χ - χ.conj)) (τ (χ - χ.conj)) = 2)
+    (hTs : ClassFunction.inner (τ (χ - χ.conj)) s = 0) :
+    ClassFunction.inner α s = 0 := by
+  classical
+  set T := τ (χ - χ.conj) with hT
+  have hTsum : T = ∑ β ∈ R.imageSet, β := R.image_eq
+  have hαZ : α ∈ ZIrr G := R.mem_ZIrr α hα
+  have hα1 : ClassFunction.inner α α = 1 := by
+    have := R.orthonormal α hα α hα
+    rwa [if_pos rfl] at this
+  have hTZ : T ∈ ZIrr G := by
+    rw [hTsum]
+    exact Submodule.sum_mem _ fun β hβ => R.mem_ZIrr β hβ
+  have hαT : ClassFunction.inner α T = 1 := by
+    rw [hTsum, OddOrder.RepresentationTheory.inner_sum_right, Finset.sum_eq_single α]
+    · rw [hα1]
+    · intro β hβ hne
+      have := R.orthonormal α hα β hβ
+      rwa [if_neg (fun h => hne h.symm)] at this
+    · intro habs
+      exact absurd hα habs
+  -- `b := −(T − α)`; then `α − b = T`
+  set b : ClassFunction G ℂ := -(T - α) with hb
+  have hbZ : b ∈ ZIrr G := by
+    rw [hb]
+    exact Submodule.neg_mem _ (Submodule.sub_mem _ hTZ hαZ)
+  have hbb : ClassFunction.inner b b = 1 := by
+    have hexp : ClassFunction.inner (T - α) (T - α)
+        = ClassFunction.inner T T - ClassFunction.inner T α
+          - ClassFunction.inner α T + ClassFunction.inner α α := by
+      rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+        ClassFunction.inner_sub_right]
+      ring
+    have hTα : ClassFunction.inner T α = 1 := by
+      rw [OddOrder.RepresentationTheory.inner_conj_symm, hαT]
+      norm_num
+    rw [hb, ClassFunction.inner_neg_left, ClassFunction.inner_neg_right, neg_neg,
+      hexp, hT2, hTα, hαT, hα1]
+    ring
+  have hαb : ClassFunction.inner α b = 0 := by
+    have hTα : ClassFunction.inner α (T - α) = 0 := by
+      rw [ClassFunction.inner_sub_right, hαT, hα1]
+      ring
+    rw [hb, ClassFunction.inner_neg_right, hTα, neg_zero]
+  have hdiff : ClassFunction.inner (α - b) s = 0 := by
+    have : α - b = T := by
+      rw [hb]
+      abel
+    rw [this]
+    exact hTs
+  exact inner_left_eq_zero_of_inner_sub_eq_zero hαZ hsZ hα1 hbb hs1 hαb hdiff
+
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (10.5), `ζ^{τ₁}` vanishes on `V`** (the genuine §5/§7 input, the textbook's
 "By (5.3.b), (5.5) and (3.2.d), `ζ^{τ₁}` vanishes on `V`").
 
