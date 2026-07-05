@@ -1915,3 +1915,45 @@ stale docstring: `exists_typeII_maximal_with_w2_of_typeP` (S10:317) は **proven
 gated** = substantial 新 char-theory body (Pf §5 coherence 基盤、現状 Lean 対応物皆無)。honest unblock =
 §5 coherence 実装 → (10.7) → (10.8)。lane 帰属: coherence infra は lane-b carve-out (S07) だが本体不在。
 issue 化 (hub 調整)。lane-a group-theory 完遂・char endgame は §5/§14/lane-b の major prereq に gated。
+
+## 2026-07-06 update²⁵ (lane-a /loop) — ★ frontier 全数 code-level 再検証: gates 進捗確認 + issue 1017 誤診断訂正
+
+`/loop Aレーンを進めます` セッション。merge main (af0f4aa6) 後、lane-a frontier を sorry census +
+consumer grep で全数再検証。**memory [[ft-four-fronts-w1-w4]] の 07-05 状態は stale** と判明:
+
+**(1) F1 の 3 named gates のうち 2 本は既に CLOSED** (S12_Section9Counts.lean = **0 sorry**):
+`charParam_d_modEq_one` (d=u bridge) / `card_SHCSet_filter_eq_charParam_n` (§9 count) 完遂済。
+残 F1 = **gate-2 `coherent_Sset_of_column_identities` (11.8.6 τ₂, S12:3823)** のみ。
+
+**(2) `exists_zeta_residual_not_orthogonal` (11.8 bare spine sorry) は既に ASSEMBLED** (S12:3841-3893,
+full proof body)。gate-2 に還元される (line 3893 `coherent_Sset_of_column_identities` を cite)。
+∴ (11.8) は「bare sorry」でなく「gate-2 に還元済」。
+
+**(3) S13_CoreStructure.lean の (11.8) scaffolding は VESTIGIAL** (sorry 1302/1321/1333):
+`OrthogonalityData`/`orthogonality_setup`/`not_orthogonal_mu0_sub_zeta`/`orthogonality_coefficient_zero`
+は **consumer 0** (S15 の `TypeIOrthogonalityData` は別物; S14 の `final_typeIII_conclusions` 参照は
+**comment のみ**)。opaque-Prop-field 版の旧 (11.8) で、genuine な S12 版に superseded。**証明しない**
+(off-path vestigial)。→ hub: 削除候補だが lane-a 非作成ゆえ flag のみ (build 影響未確認)。
+
+**(4) gate-2 は §14-gated**: (9.11) `coherent_H0C_commutator` (S11:6361) は coherence を **`chars.tau`/
+`chars.S`/`chars.H0CprimeSupport` (Section11CharacterData 世界)** で出すが gate-2 は **`hyp.tau`/
+`hyp.Sset`/`hyp.SHCSet` (Hypothesis 世界)** を要す → **carrier bridge** 未実装。かつ (9.11) は
+`sibleyTarget_H0C` (S11:6353 sorry, §14/lane-b (6.8) gated)。∴ lane-a 単独では honest close 不可
+(sorried-cite skeleton のみ可、carrier bridge も要マップ)。gluing engine
+`coherentUnion_of_glued_withDiagonal` (S07:4628) は在る。
+
+**(5) ★ issue 1017 (§5 coherence infra) は誤診断** — 詳細は issue 1017 の RE-DIAGNOSIS 節:
+- **item 1 `uniform_degree_coherence` (5.7) は完遂済** = `coherent_of_constant_degree`
+  (`S07_CoherenceConstantDegree.lean:551`, sorry-free, S14 が consume)。前 subagent が Coq 名 grep で
+  見落とし。
+- 真の残 = **(10.7) `typeII_derived_frobenius` (S12:47/54)** で、Coq `Frob_der1_type2` は
+  **prime-TI-reducible coherence 機構 (`primeTIred`/`FTtypeP_coherent_TIred`/`cyclicTIiso`, Coq §3/§4)
+  に依存 → repo 不在 (grep 0 refs)**。∴ (10.7)/(10.8) は §3/§4 prime-TI 基盤に gated。
+- (10.8) line-87 side 材料は存在: `hypothesis78OfDade` (S09_CertDischarge:1637) /
+  `zetaNuRhoNormSqGeOfDade` (:2406) / `typeII_noncoherence_arithmetic` (S12:67 proven)。
+
+**⟹ lane-a 残 char frontier は全て deep** (gate-2 §14-gated + carrier bridge / (10.7)(10.8) §3/§4
+prime-TI 基盤不在 / gate-2 skeleton は carrier bridge 要マップ)。「quick entry」は無いが方針上それは停止理由でない。
+background subagent (agentId a8e14…) が (10.8) 最小 path を scope+build 中 (prime-TI 全機構回避可否を判定)。
+**次 iteration**: subagent 結果を検証 → clean build なら commit; 深基盤要なら §3/§4 prime-TI leaf を新設着手
+(ungated・未所有 leaf ゆえ in-scope) or hub と scope 再調整。

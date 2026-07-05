@@ -68,3 +68,32 @@ or `GroupTheory/**` coherence leaf; 「未所有 leaf 新設は consumer が他�
 ⟹ 3 レーン全てが char endgame の別 keystone を並行 deep-engage (a=§5 coherence / b=§13 η-grid /
 c=S16 wiring)、lane 数 3 維持・アイドルなし。a は本 leaf 完成後 (10.7) typeII_derived_frobenius →
 (10.8) estimate を閉じ、a 自身の char capstone を landing する。
+
+## ★★ RE-DIAGNOSIS (2026-07-06, lane-a /loop — 前診断の重大な訂正) ★★
+
+**本 issue の前提 (「§5 coherence infra 不在」) は部分的に誤り。code-level 検証で確定** ([[verify-port-state-by-number-not-coq-name]] の罠に前 subagent が嵌っていた — Coq 名 grep で descriptive-named repo 定理を見落とし):
+
+1. **item 1 `uniform_degree_coherence` (Pf 5.7) は既に完遂・sorry-free**:
+   repo 名 = **`coherent_of_constant_degree`** (`S07_CoherenceConstantDegree.lean:551`, file header
+   に "COMPLETE — sorry-free, lane-c relane #8 issue 4012" 明記)。**lane-b の S14 が現に consume**
+   (`S14_MaximalI.lean:4030, 4129`)。∴ item 1 は着手不要。前 subagent が Coq 名 `uniform_degree_coherence`
+   のみ grep して見落とした。
+2. **item 2 `subcoherent`/`FTtypeP_subcoherent` R-datum**: repo の subcoherent-analog =
+   `S07.Hypothesis (5.2)` 構造 (`S07_Coherence.lean:1767`)。**一般 producer は無く consumer が
+   family ごとに ad-hoc 構築** (S14:4030 = 7 fields を手で組む pattern)。∴ 「general R-datum producer を
+   作る」でなく「(10.7) の T2 uniform family に対する `Hypothesis (5.2)` を組む」が正しい scope。
+3. **真の (10.8) blocker = (10.7) `typeII_derived_frobenius` (S12:47/54)**。その Coq 証明
+   `Frob_der1_type2` (PFsection10.v:549-658) は **prime-TI-reducible coherence 機構**
+   (`primeTIred` / `FTtypeP_coherent_TIred` / `cyclicTIiso` / `uniform_prTIred_coherent`, Coq §3/§4)
+   に依存し、これは **repo に不在 (grep 0 refs)**。∴ (10.7) は本 issue が示すより深く blocked
+   (item 2 だけでなく §3/§4 prime-TI 基盤 全体が要る)。
+4. **(10.8) line-87 side (7.8.b) の材料は存在**: `hypothesis78OfDade` (`S09_CertificateDischarge:1637`),
+   `zetaNuRhoNormSqGeOfDade` (`:2406`), `typeII_noncoherence_arithmetic` (S12:67, proven)。
+
+**⟹ re-scope**: 本 issue の「§5 coherence infra を作る」task は **item 1 完了・item 2 は §3/§4 prime-TI
+基盤に gated**。次 subagent (2026-07-06 lane-a /loop, background agentId a8e14...) が
+**(10.8) estimate (S12:453) の最小 buildable path** を scope + build 中: prime-TI 全機構を作らずに
+既存 S09 infra + light `|U|≥7` で `∃u≥7, bound` を組めるか判定 → 組めれば build、不可なら最小 missing
+§3/§4 基盤を named-report。結果は git log / 本 issue の次追記 / notes s13_11_8 で確認。
+**hub へ**: 本 issue の当初 scope (「§5 coherence を新設」) は誤前提。真の残 = (i) §3/§4 prime-TI 基盤
+(大, ungated, 誰の所有でもない leaf — 新設可) or (ii) (10.8) の Lean-specific 軽量 path (subagent が判定中)。
