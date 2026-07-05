@@ -617,6 +617,90 @@ theorem Hypothesis.charParam_d_modEq_one [Finite G] (hG : OddOrder.BG.IsMinimalS
   rw [hdu]
   exact hyp.mkSection11CharacterData_u_modEq_one (hyp.toTypesIIIIIIVSetup htype hnt) chief hnt.1
 
+open scoped Classical in
+/-- **Integral Bessel bound over an orthonormal `ℤIrr` triple**: if `T ∈ ℤ[Irr G]` has
+`⟨T,T⟩ = 2` and `ω₁, ω₂, ω₃` are pairwise-orthogonal orthonormal `ℤIrr` elements with equal
+`T`-coefficients, that coefficient is `0` (`3c² ≤ 2` in `ℤ`). -/
+theorem inner_eq_zero_of_three_equal_coeff [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {T ω₁ ω₂ ω₃ : ClassFunction G ℂ} (hT : T ∈ ZIrr G) (hT2 : ClassFunction.inner T T = 2)
+    (hω : ∀ ω ∈ ({ω₁, ω₂, ω₃} : Finset (ClassFunction G ℂ)), ω ∈ ZIrr G)
+    (horth : ∀ α ∈ ({ω₁, ω₂, ω₃} : Finset (ClassFunction G ℂ)),
+      ∀ β ∈ ({ω₁, ω₂, ω₃} : Finset (ClassFunction G ℂ)),
+      ClassFunction.inner α β = if α = β then (1 : ℂ) else 0)
+    (h12 : ω₁ ≠ ω₂) (h13 : ω₁ ≠ ω₃) (h23 : ω₂ ≠ ω₃)
+    (hequal : ClassFunction.inner T ω₁ = ClassFunction.inner T ω₂ ∧
+      ClassFunction.inner T ω₂ = ClassFunction.inner T ω₃) :
+    ClassFunction.inner T ω₁ = 0 := by
+  classical
+  obtain ⟨c, Y, hc, hdecomp, hY⟩ :=
+    OddOrder.RepresentationTheory.ClassFunction.exists_intProjection_of_orthonormal_ZIrr hT hω horth
+  set R : Finset (ClassFunction G ℂ) := {ω₁, ω₂, ω₃} with hR
+  -- expand `⟨T,T⟩ = ∑ |c|² + ⟨Y,Y⟩`
+  have hYS : ClassFunction.inner Y (∑ α ∈ R, (c α : ℂ) • α) = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_sum_right]
+    refine Finset.sum_eq_zero fun α hα => ?_
+    rw [ClassFunction.inner_smul_right, hY α hα, mul_zero]
+  have hSY : ClassFunction.inner (∑ α ∈ R, (c α : ℂ) • α) Y = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hYS, star_zero]
+  have hSS : ClassFunction.inner (∑ α ∈ R, (c α : ℂ) • α) (∑ α ∈ R, (c α : ℂ) • α)
+      = ∑ α ∈ R, (c α : ℂ) * star (c α : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_sum_left]
+    refine Finset.sum_congr rfl fun α hα => ?_
+    rw [ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_sum_right,
+      Finset.sum_eq_single α]
+    · rw [ClassFunction.inner_smul_right, horth α hα α hα, if_pos rfl, mul_one]
+    · intro β hβ hne
+      rw [ClassFunction.inner_smul_right, horth α hα β hβ,
+        if_neg (fun h => hne h.symm)]
+      ring
+    · intro habs
+      exact absurd hα habs
+  have hexp : ClassFunction.inner T T
+      = (∑ α ∈ R, (c α : ℂ) * star (c α : ℂ)) + ClassFunction.inner Y Y := by
+    conv_lhs => rw [hdecomp]
+    rw [ClassFunction.inner_add_left, ClassFunction.inner_add_right,
+      ClassFunction.inner_add_right, hSS, hYS, hSY]
+    ring
+  have hmem1 : ω₁ ∈ R := by simp [hR]
+  have hmem2 : ω₂ ∈ R := by simp [hR]
+  have hmem3 : ω₃ ∈ R := by simp [hR]
+  have hc1 := hc ω₁ hmem1
+  have hc2 := hc ω₂ hmem2
+  have hc3 := hc ω₃ hmem3
+  have hceq12 : c ω₁ = c ω₂ := by
+    have h := hequal.1
+    rw [hc1, hc2] at h
+    exact_mod_cast h
+  have hceq23 : c ω₂ = c ω₃ := by
+    have h := hequal.2
+    rw [hc2, hc3] at h
+    exact_mod_cast h
+  have hterm : ∀ α, (c α : ℂ) * star (c α : ℂ) = ((c α ^ 2 : ℤ) : ℂ) := fun α => by
+    rw [star_intCast]
+    push_cast
+    ring
+  have hsum3 : (∑ α ∈ R, (c α : ℂ) * star (c α : ℂ))
+      = ((3 * (c ω₁) ^ 2 : ℤ) : ℂ) := by
+    rw [hR, Finset.sum_insert (by simp [h12, h13]),
+      Finset.sum_insert (by simp [h23]), Finset.sum_singleton,
+      hterm, hterm, hterm, ← hceq12, ← (hceq12.trans hceq23)]
+    push_cast
+    ring
+  have hYnn := OddOrder.RepresentationTheory.inner_self_re_nonneg Y
+  have h := congrArg Complex.re hexp
+  rw [hT2, hsum3, Complex.add_re, Complex.intCast_re] at h
+  have h2c : (2 : ℂ).re = 2 := by norm_num
+  rw [h2c] at h
+  have hineq : ((3 * (c ω₁) ^ 2 : ℤ) : ℝ) ≤ 2 := by linarith
+  have hc0 : c ω₁ = 0 := by
+    by_contra hne
+    have h1 : (1 : ℤ) ≤ (c ω₁) ^ 2 := by
+      rcases lt_or_gt_of_ne hne with h | h <;> nlinarith
+    have hint : (3 * (c ω₁) ^ 2 : ℤ) ≤ 2 := by exact_mod_cast hineq
+    nlinarith
+  rw [hc1, hc0]
+  norm_num
+
 open scoped FiniteInduce in
 open OddOrder.Peterfalvi.S11 in
 /-- **Irreducible family members are orthogonal to every μ-grid entry** (degree separation
