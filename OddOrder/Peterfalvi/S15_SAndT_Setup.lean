@@ -2506,6 +2506,71 @@ theorem Hypothesis.mu_colSum_mem_sOf_H0 [Finite G]
       exact (OddOrder.RepresentationTheory.induce_compHom_subgroupCongr hKeq ψ).symm
     exact h2
 
+set_option maxHeartbeats 1600000 in
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (13.3.a)**: each nonzero `μ`-column sum `μ_j = ∑_i μ_{ij}` is induced from a
+*linear* (degree-one) irreducible character of `H = PC`.
+
+This is the honest statement of the `CharacterDegreeData.mu_j_linear_induced` field
+(materializing (13.3.a) at the `S`-instance).  Assembly of the campaign pieces: `μ_j` lies in
+the §9 family `𝒮(H₀)` (`mu_colSum_mem_sOf_H0`) and is reducible (`mu_colSum_not_irreducible`, a
+sum of `q ≥ 2` distinct irreducibles), so the case-agnostic §9 `isIndHC`
+(`reducible_sOf_H0_isIndHC`) gives `μ_j = Ind_{HC}(ψ)` with `ψ` linear irreducible; the `M`-level
+`HC` is `(H ⊔ C).subgroupOf S = (PC).subgroupOf S` (`hcRealized_map_subtype_eq`,
+`toTypesIIIIIIVSetupS_cSub_eq_C`, `H = P ⊔ C`), through which `ψ` transports to the required `θ`
+on `hyp.H.subgroupOf hyp.S`. -/
+theorem Hypothesis.mu_j_isIndPC [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (j : Fin hyp.p) (hj : j ≠ ⟨0, hyp.p_prime.pos⟩) :
+    ∃ θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ,
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter θ ∧ θ 1 = 1 ∧
+        (∑ i : Fin hyp.q, hyp.mu i j)
+          = ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ := by
+  classical
+  haveI := hyp.finiteG
+  set data := hyp.toTypesIIIIIIVSetupS hG with hdata
+  obtain ⟨chief, -⟩ := OddOrder.Peterfalvi.S11.exists_chiefFactorData hG data
+  letI : Fintype ↥(OddOrder.Peterfalvi.S11.huSub data) := Fintype.ofFinite _
+  letI : Fintype ↥(OddOrder.Peterfalvi.S11.hInHu data ⊔
+      ((chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub data chief).subgroupOf hyp.S).subgroupOf
+        (OddOrder.Peterfalvi.S11.huSub data)) := Fintype.ofFinite _
+  letI : Fintype ↥((OddOrder.Peterfalvi.S11.hInHu data ⊔
+      ((chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub data chief).subgroupOf hyp.S).subgroupOf
+        (OddOrder.Peterfalvi.S11.huSub data)).map
+      (OddOrder.Peterfalvi.S11.huSub data).subtype) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥(OddOrder.Peterfalvi.S11.hInHu data ⊔
+      ((chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub data chief).subgroupOf hyp.S).subgroupOf
+        (OddOrder.Peterfalvi.S11.huSub data)) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥((OddOrder.Peterfalvi.S11.hInHu data ⊔
+      ((chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub data chief).subgroupOf hyp.S).subgroupOf
+        (OddOrder.Peterfalvi.S11.huSub data)).map
+      (OddOrder.Peterfalvi.S11.huSub data).subtype) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  -- `μ_j ∈ 𝒮(H₀)`, reducible → `isIndHC`
+  have hmem := hyp.mu_colSum_mem_sOf_H0 hG chief j hj
+  have hred := hyp.mu_colSum_not_irreducible j
+  obtain ⟨ψ, hψirr, hψone, hψeq⟩ :=
+    OddOrder.Peterfalvi.S11.reducible_sOf_H0_isIndHC hG (hyp.mkSection11CharacterDataS hG chief)
+      hmem hred
+  -- `HC.map subtype = (H ⊔ C).subgroupOf S = (PC).subgroupOf S = hyp.H.subgroupOf S`
+  have hHeq : data.H = hyp.P := by show hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
+  have hsupeq : data.H ⊔ OddOrder.Peterfalvi.S11.cSub data chief = hyp.H := by
+    rw [hHeq, hyp.toTypesIIIIIIVSetupS_cSub_eq_C hG chief]; rfl
+  have hHC : (OddOrder.Peterfalvi.S11.hInHu data ⊔
+      ((chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub data chief).subgroupOf hyp.S).subgroupOf
+        (OddOrder.Peterfalvi.S11.huSub data)).map (OddOrder.Peterfalvi.S11.huSub data).subtype
+      = hyp.H.subgroupOf hyp.S := by
+    rw [OddOrder.Peterfalvi.S11.hcRealized_map_subtype_eq chief, hsupeq]
+  -- transport `ψ` back to `hyp.H.subgroupOf S`
+  set θ := ClassFunction.compHom (MulEquiv.subgroupCongr hHC.symm).toMonoidHom ψ with hθdef
+  refine ⟨θ, ?_, ?_, ?_⟩
+  · exact OddOrder.RepresentationTheory.IsIrreducibleCharacter.compHom_of_surjective
+      (MulEquiv.subgroupCongr hHC.symm).surjective hψirr
+  · rw [hθdef, ClassFunction.compHom_apply, map_one, hψone]
+  · rw [hψeq, hθdef,
+      OddOrder.RepresentationTheory.induce_compHom_subgroupCongr hHC.symm ψ]
+
 /-- The distinguished `η₁₀ = τ₃(ω₁₀)` of the (13.7)/(13.9) estimates. -/
 noncomputable def Hypothesis.eta10 (hyp : Hypothesis (G := G)) : ClassFunction G ℂ :=
   hyp.eta ⟨1, hyp.q_prime.one_lt⟩ ⟨0, hyp.p_prime.pos⟩
