@@ -206,3 +206,58 @@ intrinsic-kernel route ((α) を `hcuPsiPair`-conjBy-descent 無しで閉じる)
   W-summand 版ではない)。今 build-green。
 - 「`cfker`-conjugation infra 必須」→ **本セッションで landed** (`mem_characterKernel_conjBy` /
   `subsetCharacterKernel_conjBy_iff`)。γ は now `hcrit` の 2 本 (W⊆Ker propagation + S₀ orbit) に絞り込み済。
+
+## (v) count セッション 4 (2026-07-06 続き): γ core (1) 完全 landed + hcrit assembly 完成 — 残る唯一の gap = (9.7.a) W₁-free-orbit
+
+`caseA_character_counts` conjunct (d) の `sorry` は **依然 open** (S11 comment-stripped sorry = 3;
+full build 3932 jobs exit 0)。本セッションで **γ の 2 core のうち core (1) を完全に discharge** し、
+**`hcrit` assembly を完成** (M=HU⋊W₁ 分解 + conjBy 還元 + cfker-conjg + core(1) を全て実証明)。
+残る唯一の gap は **core (2) = Peterfalvi (9.7.a) の W₁-free-orbit 構造** で、これは
+`CliffordCaseAData` の abstraction が deliberately elide している genuine prerequisite と**確定**。
+
+### landed (build-green, sorry/axiom 無, full build 3932 jobs exit 0)
+
+**γ core (1) — `W = H₂…H_q ⊆ Ker ζ` 完全実装** (前 note の想定通り `hcuZetaPair_H0supUprime_subset_ker`
+の mirror):
+- `caseA_realizedComplement` (def): chief-factor subgroup `W ⊆ H̄` を G に realize (`(W.comap (mk' N)).map H.subtype`)。
+- realized W の基本補題: `caseA_realizedComplement_le_H` / `H0_le_caseA_realizedComplement` /
+  `caseA_realizedComplement_subgroupOf_le_hInHu` / `caseA_realizedComplement_subgroupOf_hInHu_eq_comap`
+  (realized W in hInHu = `W.comap (mk'∘hInHuEquivH)`, `realizedH0_subgroupOf_hInHu_eq_comap` の一般版)。
+- seed/pair 上の消滅: `hcuSeedHom_eq_one_of_mem_realizedComplement` (θ|_W=1 ⟹ seed=1 on realized W),
+  `hcuPairHom_eq_one_of_mem_realizedComplement`, `hcuPsiPair_realizedComplement_subset_characterKernel`。
+- **HU-normality** `caseA_realizedComplement_uW_le_normalizer` (`H⊔U ≤ N(WG)`; H̄ abelian ⟹ WH ◁ H, U-inv ⟹ U 正規化) +
+  `caseA_realizedComplement_subgroupOf_huSub_normal` (`le_normalizer_comap` で huSub-realize)。W₁ は不要 (HU で十分)。
+- **capstone** `hcuZetaPair_summandComplement_subset_ker`: realized W ⊆ Ker ζ (`subsetCharacterKernel_induce_of_subgroupOf`)。
+  = Coq injXtheta の `H₂…H_q ⊆ Ker χ` (`kerH1c`)。
+- 補助 `caseA_hInHu_le_realizedS0_sup_realizedComplement`: `S₀⊔W=⊤` ⟹ `hInHu ≤ realizedS₀ ⊔ realizedW`
+  (`comap_sup_eq` surjective + preimage-of-⊤; H̄ abelian で mem_sup_of_normal)。
+
+**γ `hcrit` assembly — 完成 (core (2) = horbit を honest 仮説として集約)**:
+- `hcrit_of_summand_orbit`: 3 仮説 (`hS0notker`: realized S₀ ⊄ Ker ζ₁ [member は θ₁≠1 on S₀ ゆえ真];
+  `hkerW₂`: realized W ⊆ Ker ζ₂ [core (1) で discharge 可]; `horbit`: **w₁∈W₁# が realized S₀ を realized W へ動かす**)
+  ⟹ `hcrit`。証明は Coq injXtheta を逐語再現: w=a·w₁ (M=HU⋊W₁, `M_complement`) → conjBy a inner →
+  conjBy w₁ ζ₂ = ζ₁ → w₁≠1 なら realized S₀ ⊆ Ker ζ₁ (cfker-conjg `mem_characterKernel_conjBy` で
+  w₁·s·w₁⁻¹∈W⊆Ker ζ₂) が `hS0notker` と矛盾 → w₁=1 → w∈HU。**kernel-subgroup 不要な clean route**
+  (H̄⊆Ker でなく S₀⊄Ker で矛盾)。
+
+### 残る唯一の gap = core (2) `horbit` = Peterfalvi (9.7.a) W₁-free-orbit (`CliffordCaseAData` に欠落)
+
+**確定した構造 gap**: `CliffordCaseAData` は summands を `Hpart : Fin q → Subgroup H̄` +
+`orbitRep : Fin q → ↥(U⊔W₁)` (choice function 由来, `clifford_caseA_data` の
+`exists_supIndep_aInvariant_family_of_iSup`) で持つが、**Peterfalvi (9.7.a) の `{Hᵢ}={H₁^w|w∈W₁}`
+(= summands が S₀ の W₁-共役軌道、W₁ で自由に添字づけ) を持たない**。よって「w₁∈W₁# が S₀ を別の
+summand (⊆W) へ動かす」(`horbit`) は現構造から**導出不可**。導出には (9.7.a) の再構成が要る:
+W₁ が U-invariant summands を置換 (W₁ が U を正規化 ∵ Frobenius UW₁, U が各 summand を保存) →
+UW₁-irreducibility で transitive → |W₁|=q=#summands prime ゆえ free。これは数百行の独立 prerequisite。
+
+**次セッションの選択肢** (どちらも genuine): (A) `CliffordCaseAData` に W₁-orbit field を追加 +
+producer `clifford_caseA_data` で (9.7.a) 再構成を供給 (signature 変更; 全 S11/S12 consumer に影響)。
+(B) 既存 field + Frobenius UW₁ から `horbit` を派生する standalone 補題を建てる (prime-transitive⟹free)。
+どちらも `horbit` を埋めれば `hcrit_of_summand_orbit` で (γ) が unconditional になり、(α)(β) + assembly
+で (9.8.d) sorry が閉じる。
+
+### 訂正
+- mission note「core (2) は orbit API (`Hpart`/`orbitRep`/`S0`) で足りる」→ **誤り**。orbitRep は
+  W₁-valued/free でなく choice-derived U⊔W₁ 元。core (2) は (9.7.a) 構造 (現状欠落) を要する。
+- assembly は当初「H̄⊆Ker ζ₁ で xiSet と矛盾」想定 → **kernel-is-subgroup (|χ|≤χ(1) equality, repo 未整備)
+  を要するため回避**。代わりに「realized S₀ ⊄ Ker (member は θ₁≠1 on S₀)」で矛盾させ clean 化。
