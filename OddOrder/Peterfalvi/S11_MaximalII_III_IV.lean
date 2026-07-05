@@ -2442,6 +2442,30 @@ theorem exists_regular_char {Hbar : Type*} [CommGroup Hbar] [Finite Hbar]
   · exact Subgroup.injective_noncommPiCoprod_of_iSupIndep hindep
   · rw [← MonoidHom.range_eq_top, Subgroup.noncommPiCoprod_range]; exact hspan
 
+/-- **Restriction of a `φ`-invariant action to the invariant subgroup `S`.**  Each `φ a` maps `S`
+bijectively onto itself, hence restricts to an automorphism of `↥S`; this is functorial in `a`,
+giving a group homomorphism `A →* MulAut ↥S`.  (Used for (9.7) case (a): the `U`-action on an
+order-`p` Clifford factor `H₁ ≤ H̄`; its range order is the Clifford integer `a = |Ū₁|`, pinned in
+`CliffordCaseAData.a_eq_card_restrictAut_range`.) -/
+noncomputable def aInvariantRestrictAut {K A : Type*} [Group K] [Group A] {φ : A →* MulAut K}
+    {S : Subgroup K} (hS : IsAInvariant φ S) : A →* MulAut ↥S where
+  toFun a := (MulEquiv.subgroupMap (φ a) S).trans
+    (MulEquiv.subgroupCongr ((pointwise_mulAut_smul_eq_map (φ a) S).symm.trans (hS a)))
+  map_one' := by
+    ext x
+    simp only [MulEquiv.trans_apply, MulEquiv.subgroupCongr_apply, MulEquiv.coe_subgroupMap_apply,
+      map_one, MulAut.one_apply]
+  map_mul' a b := by
+    ext x
+    simp only [MulEquiv.trans_apply, MulEquiv.subgroupCongr_apply, MulEquiv.coe_subgroupMap_apply,
+      map_mul, MulAut.mul_apply]
+
+@[simp] theorem aInvariantRestrictAut_coe {K A : Type*} [Group K] [Group A] {φ : A →* MulAut K}
+    {S : Subgroup K} (hS : IsAInvariant φ S) (a : A) (x : ↥S) :
+    ((aInvariantRestrictAut hS a x : ↥S) : K) = φ a x := by
+  simp only [aInvariantRestrictAut, MonoidHom.coe_mk, OneHom.coe_mk, MulEquiv.trans_apply,
+    MulEquiv.subgroupCongr_apply, MulEquiv.coe_subgroupMap_apply]
+
 /-- Case (a) of Peterfalvi (9.7): `H/H_0` splits as a direct product of `q`
 order-`p` factors permuted by `W_1`.
 
@@ -2478,6 +2502,15 @@ structure CliffordCaseAData {M : Subgroup G} {data : TypesIIIIIIVSetup M}
   a : ℕ
   a_pos : 0 < a
   a_dvd_p_sub_one : a ∣ chief.p - 1
+  /-- **`a = |Ū₁| = |U : C_U(H₁)|`** (Peterfalvi (9.7.a)): the Clifford integer `a` is pinned to the
+  order of the image `Ū₁` of the `U`-action on the order-`p` factor `S₀` (`= H₁`).  This is *not*
+  opaque data — it is the genuine group-theoretic index `|U : C_U(S₀)|` (first isomorphism theorem,
+  `index_cuInHu_subgroupOf_uInHu_eq_a`), which the (9.8.d) degree analysis needs: the source
+  character `θ₁·λ` induced from `H·C_U(S₀)` has degree `[HU : H·C_U(S₀)] = |Ū₁| = a`
+  (`index_hcuInHu_eq_a`).  Without this pin, `a` would be an unconstrained free field disconnected
+  from the character degrees, and the degree-`qa` count (9.8.d) would not be honestly provable. -/
+  a_eq_card_restrictAut_range :
+    a = Nat.card ↥(aInvariantRestrictAut S0_aInvariant).range
   quotient_factors_cyclic_order_a : Prop
   quotient_factors_cyclic_order_a_holds : quotient_factors_cyclic_order_a
   Ubar_embeds_product : Prop
@@ -3916,35 +3949,268 @@ theorem card_range_dvd_card_sub_one_of_prime_card {A K : Type*} [Group A] [Group
     _ = Nat.totient (Nat.card K) := IsCyclic.card_mulAut K
     _ = Nat.card K - 1 := Nat.totient_prime hp
 
-/-- **Restriction of a `φ`-invariant action to the invariant subgroup `S`.**  Each `φ a` maps `S`
-bijectively onto itself, hence restricts to an automorphism of `↥S`; this is functorial in `a`,
-giving a group homomorphism `A →* MulAut ↥S`.  (Used for (9.7) case (a): the `U`-action on an
-order-`p` Clifford factor `H₁ ≤ H̄`.) -/
-noncomputable def aInvariantRestrictAut {K A : Type*} [Group K] [Group A] {φ : A →* MulAut K}
-    {S : Subgroup K} (hS : IsAInvariant φ S) : A →* MulAut ↥S where
-  toFun a := (MulEquiv.subgroupMap (φ a) S).trans
-    (MulEquiv.subgroupCongr ((pointwise_mulAut_smul_eq_map (φ a) S).symm.trans (hS a)))
-  map_one' := by
-    ext x
-    simp only [MulEquiv.trans_apply, MulEquiv.subgroupCongr_apply, MulEquiv.coe_subgroupMap_apply,
-      map_one, MulAut.one_apply]
-  map_mul' a b := by
-    ext x
-    simp only [MulEquiv.trans_apply, MulEquiv.subgroupCongr_apply, MulEquiv.coe_subgroupMap_apply,
-      map_mul, MulAut.mul_apply]
-
-@[simp] theorem aInvariantRestrictAut_coe {K A : Type*} [Group K] [Group A] {φ : A →* MulAut K}
-    {S : Subgroup K} (hS : IsAInvariant φ S) (a : A) (x : ↥S) :
-    ((aInvariantRestrictAut hS a x : ↥S) : K) = φ a x := by
-  simp only [aInvariantRestrictAut, MonoidHom.coe_mk, OneHom.coe_mk, MulEquiv.trans_apply,
-    MulEquiv.subgroupCongr_apply, MulEquiv.coe_subgroupMap_apply]
-
 /-- **(9.7) case (a) bound for a Clifford factor.**  The image of the restricted `A`-action on a
 `φ`-invariant subgroup `S` of prime order has order dividing `|S| - 1`. -/
 theorem aInvariantRestrictAut_range_card_dvd {K A : Type*} [Group K] [Group A] [Finite K]
     {φ : A →* MulAut K} {S : Subgroup K} (hS : IsAInvariant φ S) (hp : (Nat.card ↥S).Prime) :
     Nat.card ↥(aInvariantRestrictAut hS).range ∣ Nat.card ↥S - 1 :=
   card_range_dvd_card_sub_one_of_prime_card (aInvariantRestrictAut hS) hp
+
+/-! ### The single-factor centralizer `C_U(H₁)` and its index `a` (Peterfalvi (9.8.d))
+
+Peterfalvi (9.8.d) constructs degree-`qa` irreducible characters of `M` from a nontrivial character
+`θ₁` of a *single* order-`p` Clifford factor `H₁ = S₀` and a linear `λ ∈ Irr(C_U(H₁)/U')`.  The
+degree of the `HU`-induced source is `|U : C_U(H₁)| = a` (the inertia group of `θ₁·λ` in `HU` is
+`H·C_U(H₁)`), so the family of these characters is indexed against the single-factor centralizer
+`C_U(H₁) = C_U(S₀)` — distinct from the full `C = C_U(H̄) = ⋂ᵢ C_U(Hᵢ)` of (9.8.b,c) which has index
+`u`.  This block realizes `C_U(S₀)` inside `G`/`HU` and proves `[HU : H·C_U(S₀)] = a`, exactly
+mirroring the `cSub`/`cInHu`/`index_cInHu_subgroupOf_uInHu_eq_u` chain for `C`, with `a = |Ū₁|` the
+order of the `U`-action image on `S₀` (`aInvariantRestrictAut caseA.S0_aInvariant`, the quantity the
+`clifford_caseA_data` constructor assigns to `CliffordCaseAData.a`).
+
+Here `S₀ = caseA.S0` plays the role of `H₁`; the `U`-action on it is `uActionHom data chief` (the
+`Finite`-free chief-factor action restricted to `U`, definitionally `act.φ.comp act.U.subtype`), and
+its restriction to `S₀` is `aInvariantRestrictAut caseA.S0_aInvariant`. -/
+
+section CuS0
+variable {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+  {chars : Section11CharacterData data chief}
+
+/-- **The single-factor centralizer `C_U(S₀)`**, realized as a subgroup of `G` with `C_U(S₀) ≤ U`.
+The kernel of the restricted `U`-action `aInvariantRestrictAut caseA.S0_aInvariant` on the order-`p`
+factor `S₀`, pushed into `G` along `↥(U.subgroupOf (U ⊔ W₁)) ↪ ↥(U ⊔ W₁) ↪ G` (exactly as `cSub`
+pushes `(uActionHom).ker`).  By the first isomorphism theorem `|U : C_U(S₀)| = |Ū₁| = caseA.a`
+(`index_cuInHu_subgroupOf_uInHu_eq_a`). -/
+noncomputable def cuSub (caseA : CliffordCaseAData chars) : Subgroup G :=
+  ((aInvariantRestrictAut caseA.S0_aInvariant).ker.map
+      (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype).map
+    (data.typeP.U ⊔ data.typeP.W1).subtype
+
+theorem cuSub_le_U (caseA : CliffordCaseAData chars) : cuSub caseA ≤ data.U :=
+  (Subgroup.map_mono (Subgroup.map_subtype_le _)).trans <| by
+    rw [Subgroup.subgroupOf_map_subtype]; exact inf_le_left
+
+/-- `|C_U(S₀)| = |ker(aInvariantRestrictAut S₀)|`: the realization is the injective double-image of
+the kernel (mirrors `card_cSub_eq_card_ker`). -/
+theorem card_cuSub_eq_card_ker (caseA : CliffordCaseAData chars) :
+    Nat.card ↥(cuSub caseA) = Nat.card ↥(aInvariantRestrictAut caseA.S0_aInvariant).ker := by
+  show Nat.card ↥(((aInvariantRestrictAut caseA.S0_aInvariant).ker.map
+      (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype).map
+        (data.typeP.U ⊔ data.typeP.W1).subtype)
+      = Nat.card ↥(aInvariantRestrictAut caseA.S0_aInvariant).ker
+  rw [← Nat.card_congr (Subgroup.equivMapOfInjective _ _ (Subgroup.subtype_injective _)).toEquiv,
+    ← Nat.card_congr (Subgroup.equivMapOfInjective _ _ (Subgroup.subtype_injective _)).toEquiv]
+
+/-- `C_U(S₀)`, realized as a subgroup of `HU` inside `↥M` (mirrors `cInHu` for `C`). -/
+noncomputable def cuInHu (caseA : CliffordCaseAData chars) : Subgroup ↥(huSub data) :=
+  ((cuSub caseA).subgroupOf M).subgroupOf (huSub data)
+
+theorem cuInHu_le_uInHu (caseA : CliffordCaseAData chars) : cuInHu caseA ≤ uInHu data :=
+  Subgroup.subgroupOf_mono _ (Subgroup.subgroupOf_mono _ (cuSub_le_U caseA))
+
+/-- `|C_U(S₀)|` realized inside `HU` equals `|C_U(S₀)|` in `G` (mirrors `card_cInHu_eq`). -/
+theorem card_cuInHu_eq (caseA : CliffordCaseAData chars) :
+    Nat.card ↥(cuInHu caseA) = Nat.card ↥(cuSub caseA) := by
+  have hCsubM : (cuSub caseA).subgroupOf M ≤ huSub data :=
+    Subgroup.subgroupOf_mono M
+      ((cuSub_le_U caseA).trans (le_sup_right : data.U ≤ data.H ⊔ data.U))
+  have hCleM : cuSub caseA ≤ M := (cuSub_le_U caseA).trans (U_le_M data)
+  calc Nat.card ↥(cuInHu caseA)
+      = Nat.card ↥((cuSub caseA).subgroupOf M) :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hCsubM).toEquiv
+    _ = Nat.card ↥(cuSub caseA) :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hCleM).toEquiv
+
+open Subgroup in
+/-- **`C_U(S₀) ◁ U`** (mirrors `cSub_subgroupOf_U_normal`): the realization `cuSub` is the `G`-image
+of a kernel, so its `subgroupOf U` is normal (kernels are normal, transported by the realization iso
+`↥(U.subgroupOf (U ⊔ W₁)) ≃* ↥U`). -/
+theorem cuSub_subgroupOf_U_normal (caseA : CliffordCaseAData chars) :
+    ((cuSub caseA).subgroupOf data.U).Normal := by
+  set e := subgroupOfEquivOfLe (le_sup_left : data.typeP.U ≤ data.typeP.U ⊔ data.typeP.W1) with he
+  have heq : (cuSub caseA).subgroupOf data.U
+      = (aInvariantRestrictAut caseA.S0_aInvariant).ker.map e.toMonoidHom := by
+    ext x
+    simp only [Subgroup.mem_subgroupOf]
+    constructor
+    · intro hx
+      simp only [cuSub, Subgroup.mem_map] at hx
+      obtain ⟨z, ⟨y, hy, hyz⟩, hzx⟩ := hx
+      refine ⟨y, hy, ?_⟩
+      apply Subtype.ext
+      rw [MulEquiv.coe_toMonoidHom, he, subgroupOfEquivOfLe_apply_coe, ← hzx, ← hyz]
+      rfl
+    · rintro ⟨y, hy, rfl⟩
+      simp only [cuSub, Subgroup.mem_map]
+      refine ⟨_, ⟨y, hy, rfl⟩, ?_⟩
+      rw [MulEquiv.coe_toMonoidHom, he, subgroupOfEquivOfLe_apply_coe]
+      rfl
+  rw [heq]
+  exact (MonoidHom.normal_ker _).map e.toMonoidHom e.surjective
+
+open Subgroup in
+/-- **`C_U(S₀) ◁ U`** realized inside `HU` (mirrors `cInHu_normal`): `cuInHu ◁ uInHu`, transported
+from `cuSub ◁ U` along `↥uInHu ≃* ↥U`. -/
+theorem cuInHu_normal (caseA : CliffordCaseAData chars) :
+    ((cuInHu caseA).subgroupOf (uInHu data)).Normal := by
+  have hUsubM : data.U.subgroupOf M ≤ huSub data :=
+    Subgroup.subgroupOf_mono M (le_sup_right : data.U ≤ data.H ⊔ data.U)
+  set f : ↥(uInHu data) ≃* ↥data.U :=
+    (subgroupOfEquivOfLe hUsubM).trans (subgroupOfEquivOfLe (U_le_M data)) with hf
+  have hgval : ∀ x : ↥(uInHu data), ((f x : ↥data.U) : G) = (((x : ↥(huSub data)) : ↥M) : G) := by
+    intro x
+    have h1 : (f x : ↥data.U)
+        = subgroupOfEquivOfLe (U_le_M data) (subgroupOfEquivOfLe hUsubM x) := by rw [hf]; rfl
+    rw [h1, subgroupOfEquivOfLe_apply_coe, subgroupOfEquivOfLe_apply_coe]
+  have hcomap : (cuInHu caseA).subgroupOf (uInHu data)
+      = ((cuSub caseA).subgroupOf data.U).comap f.toMonoidHom := by
+    ext x
+    simp only [cuInHu, Subgroup.mem_subgroupOf]
+    rw [Subgroup.mem_comap, Subgroup.mem_subgroupOf, MulEquiv.coe_toMonoidHom, hgval x]
+  rw [hcomap]
+  exact (cuSub_subgroupOf_U_normal caseA).comap f.toMonoidHom
+
+/-- **`H·C_U(S₀) ◁ HU`** (mirrors `hcInHu_normal`): the inertia subgroup of the (9.8.d) source
+character is normal, so `Ind_{H·C_U(S₀)}^{HU}` produces an irreducible.  From `H ◁ HU`
+(`hInHu_normal`), `C_U(S₀) ◁ U` (`cuInHu_normal`), `H ⊔ U = ⊤` (`hInHu_sup_uInHu_eq_top`). -/
+theorem hcuInHu_normal (caseA : CliffordCaseAData chars) :
+    (hInHu data ⊔ cuInHu caseA).Normal :=
+  haveI := hInHu_normal data
+  haveI := cuInHu_normal caseA
+  sup_normal_of_normal_left_of_normal_subgroupOf (cuInHu_le_uInHu caseA)
+    (hInHu_sup_uInHu_eq_top data)
+
+/-- **`ker(uActionHom) ≤ ker(aInvariantRestrictAut S₀)`**: an element acting trivially on the *whole*
+chief factor `H̄` acts trivially on the summand `S₀ ≤ H̄`.  The subgroup inclusion behind
+`C = C_U(H̄) ≤ C_U(S₀)`. -/
+theorem ker_uActionHom_le_ker_aInvariantRestrictAut (caseA : CliffordCaseAData chars) :
+    (uActionHom data chief).ker ≤ (aInvariantRestrictAut caseA.S0_aInvariant).ker := by
+  intro x hx
+  rw [MonoidHom.mem_ker] at hx ⊢
+  ext s
+  rw [MulAut.one_apply, aInvariantRestrictAut_coe, hx, MulAut.one_apply]
+
+/-- **`C = C_U(H̄) ≤ C_U(S₀)`** (`cSub ≤ cuSub`): centralizing the whole chief factor implies
+centralizing the summand `S₀`.  Both are `G`-images of kernels under the same double-map, and
+`ker(uActionHom) ≤ ker(aInvariantRestrictAut S₀)`. -/
+theorem cSub_le_cuSub (caseA : CliffordCaseAData chars) : cSub data chief ≤ cuSub caseA :=
+  Subgroup.map_mono (Subgroup.map_mono (ker_uActionHom_le_ker_aInvariantRestrictAut caseA))
+
+theorem cInHu_le_cuInHu (caseA : CliffordCaseAData chars) : cInHu data chief ≤ cuInHu caseA :=
+  Subgroup.subgroupOf_mono _ (Subgroup.subgroupOf_mono _ (cSub_le_cuSub caseA))
+
+/-- **`H ⊓ U ≤ C_U(S₀)`** realized (`hInHu ⊓ uInHu ≤ cuInHu`): an `H ⊓ U` element centralizes the
+chief factor `H̄` (`hInHu_inf_uInHu_le_cInHu`), hence `S₀ ≤ H̄` (`cInHu_le_cuInHu`). -/
+theorem hInHu_inf_uInHu_le_cuInHu [Finite G] (caseA : CliffordCaseAData chars) :
+    hInHu data ⊓ uInHu data ≤ cuInHu caseA :=
+  (hInHu_inf_uInHu_le_cInHu data chief).trans (cInHu_le_cuInHu caseA)
+
+/-- **`U ⊓ H·C_U(S₀) = C_U(S₀)`** realized (`uInHu ⊓ (hInHu ⊔ cuInHu) = cuInHu`), the second-iso
+input for `[HU : H·C_U(S₀)] = [U : C_U(S₀)]`.  Mirrors `uInHu_inf_hcInHu_eq_cInHu`. -/
+theorem uInHu_inf_hcuInHu_eq_cuInHu [Finite G] (caseA : CliffordCaseAData chars) :
+    uInHu data ⊓ (hInHu data ⊔ cuInHu caseA) = cuInHu caseA := by
+  haveI := hInHu_normal data
+  apply le_antisymm
+  · rintro x ⟨hxU, hxHC⟩
+    obtain ⟨hh, hhmem, cc, ccmem, rfl⟩ := Subgroup.mem_sup_of_normal_left.mp hxHC
+    have hcc_u : cc ∈ uInHu data := cuInHu_le_uInHu caseA ccmem
+    have hh_u : hh ∈ uInHu data := by
+      have h1 : hh * cc * cc⁻¹ ∈ uInHu data :=
+        (uInHu data).mul_mem hxU ((uInHu data).inv_mem hcc_u)
+      rwa [mul_inv_cancel_right] at h1
+    have hh_c : hh ∈ cuInHu caseA :=
+      hInHu_inf_uInHu_le_cuInHu caseA (Subgroup.mem_inf.mpr ⟨hhmem, hh_u⟩)
+    exact (cuInHu caseA).mul_mem hh_c ccmem
+  · exact le_inf (cuInHu_le_uInHu caseA) le_sup_right
+
+/-- **Second-iso index step: `[HU : H·C_U(S₀)] = [U : C_U(S₀)]`** (realized
+`(hInHu ⊔ cuInHu).index = (cuInHu.subgroupOf uInHu).index`).  Mirrors
+`index_hcInHu_eq_relindex_cInHu`: the second isomorphism theorem for `H·C_U(S₀) ◁ HU` with
+`uInHu ⊔ H·C_U(S₀) = ⊤`, and `uInHu ⊓ H·C_U(S₀) = cuInHu`. -/
+theorem index_hcuInHu_eq_relindex_cuInHu [Finite G] (caseA : CliffordCaseAData chars) :
+    (hInHu data ⊔ cuInHu caseA).index
+      = ((cuInHu caseA).subgroupOf (uInHu data)).index := by
+  haveI : (hInHu data ⊔ cuInHu caseA).Normal := hcuInHu_normal caseA
+  have htop : uInHu data ⊔ (hInHu data ⊔ cuInHu caseA) = ⊤ := by
+    rw [← sup_assoc, sup_comm (uInHu data) (hInHu data), hInHu_sup_uInHu_eq_top, top_sup_eq]
+  have he := Nat.card_congr (QuotientGroup.quotientInfEquivProdNormalQuotient
+    (uInHu data) (hInHu data ⊔ cuInHu caseA)).toEquiv
+  have hsub : (hInHu data ⊔ cuInHu caseA).subgroupOf (uInHu data)
+      = (cuInHu caseA).subgroupOf (uInHu data) := by
+    ext x
+    simp only [Subgroup.mem_subgroupOf]
+    constructor
+    · intro hx
+      have hxin : (x : ↥(huSub data)) ∈ uInHu data ⊓ (hInHu data ⊔ cuInHu caseA) :=
+        Subgroup.mem_inf.mpr ⟨x.2, hx⟩
+      rw [uInHu_inf_hcuInHu_eq_cuInHu caseA] at hxin
+      exact hxin
+    · intro hx; exact Subgroup.mem_sup_right hx
+  rw [hsub] at he
+  have hsplit := Subgroup.card_eq_card_quotient_mul_card_subgroup
+    ((hInHu data ⊔ cuInHu caseA).subgroupOf (uInHu data ⊔ (hInHu data ⊔ cuInHu caseA)))
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right :
+        (hInHu data ⊔ cuInHu caseA) ≤ uInHu data ⊔ (hInHu data ⊔ cuInHu caseA))).toEquiv,
+    ← he, ← Subgroup.index_eq_card] at hsplit
+  have htopcard : Nat.card ↥(uInHu data ⊔ (hInHu data ⊔ cuInHu caseA))
+      = Nat.card ↥(huSub data) := by
+    rw [htop]; exact Nat.card_congr Subgroup.topEquiv.toEquiv
+  rw [htopcard] at hsplit
+  have hmul := Subgroup.card_mul_index (hInHu data ⊔ cuInHu caseA)
+  rw [hsplit, mul_comm (((cuInHu caseA).subgroupOf (uInHu data)).index)] at hmul
+  exact Nat.eq_of_mul_eq_mul_left Nat.card_pos hmul
+
+/-- **`[U : C_U(S₀)] = |Ū₁|`** (realized `(cuInHu.subgroupOf uInHu).index = |range(aInvariantRestrictAut S₀)|`).
+Mirrors `index_cInHu_subgroupOf_uInHu_eq_u`: the first isomorphism theorem for the restricted
+`U`-action `aInvariantRestrictAut caseA.S0_aInvariant` on `S₀`, whose image `Ū₁` has order the index
+`a` of `C_U(S₀)` in `U`.  This is the value `clifford_caseA_data` assigns to `CliffordCaseAData.a`. -/
+theorem index_cuInHu_subgroupOf_uInHu_eq_a [Finite G] (caseA : CliffordCaseAData chars) :
+    ((cuInHu caseA).subgroupOf (uInHu data)).index
+      = Nat.card ↥(aInvariantRestrictAut caseA.S0_aInvariant).range := by
+  -- (I): `|C_U(S₀)| · [U:C_U(S₀)] = |U|`.
+  have hI : Nat.card ↥(cuSub caseA) * ((cuInHu caseA).subgroupOf (uInHu data)).index
+      = Nat.card ↥data.U := by
+    have h := Subgroup.card_mul_index ((cuInHu caseA).subgroupOf (uInHu data))
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (cuInHu_le_uInHu caseA)).toEquiv,
+      card_cuInHu_eq caseA, card_uInHu_eq data] at h
+    exact h
+  -- (II): `|U| = |Ū₁| · |C_U(S₀)|` (first iso for the restricted action hom, domain `≃* ↥U`).
+  have hII : Nat.card ↥data.U
+      = Nat.card ↥(aInvariantRestrictAut caseA.S0_aInvariant).range * Nat.card ↥(cuSub caseA) := by
+    have h := Subgroup.card_eq_card_quotient_mul_card_subgroup
+      (aInvariantRestrictAut caseA.S0_aInvariant).ker
+    rw [Nat.card_congr (QuotientGroup.quotientKerEquivRange
+        (aInvariantRestrictAut caseA.S0_aInvariant)).toEquiv,
+      ← card_cuSub_eq_card_ker caseA,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+        (le_sup_left : data.typeP.U ≤ data.typeP.U ⊔ data.typeP.W1)).toEquiv] at h
+    exact h
+  have hcancel : Nat.card ↥(cuSub caseA)
+      * ((cuInHu caseA).subgroupOf (uInHu data)).index
+      = Nat.card ↥(cuSub caseA) * Nat.card ↥(aInvariantRestrictAut caseA.S0_aInvariant).range := by
+    rw [hI, hII, mul_comm]
+  exact Nat.eq_of_mul_eq_mul_left Nat.card_pos hcancel
+
+/-- **`[HU : H·C_U(S₀)] = |Ū₁| = a`** (Peterfalvi (9.8.d) degree index).  The inertia subgroup of the
+degree-`qa` source character `θ₁·λ` has index `a` in `HU`, giving the source degree `a` and (after
+`Ind_{HU}^M`) the character degree `qa`.  Combines the second-iso step `[HU:H·C_U(S₀)] = [U:C_U(S₀)]`
+(`index_hcuInHu_eq_relindex_cuInHu`) with the first-iso value `[U:C_U(S₀)] = |Ū₁|`
+(`index_cuInHu_subgroupOf_uInHu_eq_a`).  Here `|Ū₁| = Nat.card (aInvariantRestrictAut …).range` is the
+genuine geometric `a = |U:C_U(H₁)|`, the value `clifford_caseA_data` assigns to `caseA.a`. -/
+theorem index_hcuInHu_eq_a [Finite G] (caseA : CliffordCaseAData chars) :
+    (hInHu data ⊔ cuInHu caseA).index
+      = Nat.card ↥(aInvariantRestrictAut caseA.S0_aInvariant).range :=
+  (index_hcuInHu_eq_relindex_cuInHu caseA).trans (index_cuInHu_subgroupOf_uInHu_eq_a caseA)
+
+/-- **`[HU : H·C_U(S₀)] = a`** (Peterfalvi (9.8.d), with `a = CliffordCaseAData.a`).  The genuine
+geometric index `[HU : H·C_U(S₀)] = |Ū₁|` (`index_hcuInHu_eq_a`) equals the carrier's `a`, since `a`
+is pinned to `|Ū₁|` (`CliffordCaseAData.a_eq_card_restrictAut_range`).  This is the degree of the
+(9.8.d) source character `Ind_{H·C_U(S₀)}^{HU}(θ₁·λ)`, whence `Ind_{HU}^M` of it has degree `qa`. -/
+theorem index_hcuInHu_eq_caseA_a [Finite G] (caseA : CliffordCaseAData chars) :
+    (hInHu data ⊔ cuInHu caseA).index = caseA.a := by
+  rw [index_hcuInHu_eq_a caseA, caseA.a_eq_card_restrictAut_range]
+
+end CuS0
 
 /-- **(9.7) Clifford dimension dichotomy** (the arithmetic heart of (9.7)).  Restricting the
 `U W₁`-action on the chief factor `H̄ = H/H₀` to `U`, there is a minimal `U`-invariant `S₀ ≠ ⊥` of
@@ -5002,6 +5268,7 @@ noncomputable def clifford_caseA_data [Finite G] {M : Subgroup G}
       a := Nat.card ↥(aInvariantRestrictAut hS₀inv).range
       a_pos := Nat.card_pos
       a_dvd_p_sub_one := ?_
+      a_eq_card_restrictAut_range := rfl
       quotient_factors_cyclic_order_a := True
       quotient_factors_cyclic_order_a_holds := trivial
       Ubar_embeds_product := True
@@ -9787,7 +10054,22 @@ All `𝒮(H₀·)` sets carry the `H₀`-join (`chief.H0 ⊔ ·`): Peterfalvi's 
 
 Relocated after the (9.8.c) `H₀C` character machinery so the (b)/(c) conjuncts can cite it.  (b) =
 `reducible_count_sOf_H0` (count) + `caseA_reducible_induceHU_apply_one_eq_qu` (degree) +
-`reducible_mem_sOf_H0C` (membership).  (c)/(d) remain open. -/
+`reducible_mem_sOf_H0C` (membership).  (c) is `caseA_exists_irreducible_sOf_H0C`.
+
+**(d) status (degree substrate landed, count open).**  The (9.8.d) degree-`qa` construction is the
+single-factor mirror of the degree-`qu` (b)/(c) machinery: the source character `θ₁·λ` (`θ₁` a
+nontrivial character of the order-`p` factor `S₀ = H₁`, `λ ∈ Irr(C_U(S₀)/U')`) induces from the
+inertia subgroup `H·C_U(S₀)`, of index `[HU : H·C_U(S₀)] = a` in `HU` — established here by
+`index_hcuInHu_eq_caseA_a` (`= caseA.a`, via the second/first-isomorphism chain
+`index_hcuInHu_eq_relindex_cuInHu` + `index_cuInHu_subgroupOf_uInHu_eq_a`, using the `C_U(S₀)`
+realization `cuSub`/`cuInHu` and its normality `hcuInHu_normal`).  The carrier's `a` is now pinned to
+this genuine index `|Ū₁| = |U:C_U(S₀)|` (`CliffordCaseAData.a_eq_card_restrictAut_range`) — without
+that pin the degree-`qa` claim referenced a free field and was not honestly provable.  **Still open**
+(next session): the `θ₁·λ` source-character construction (mirror `hcPsi`), its inertia
+`I_{HU}(θ₁·λ) = H·C_U(S₀)` (mirror `inertia_eq_hcInHu_caseA`), the membership
+`Ind_{HU}^M χ ∈ 𝒮(H₀U')` (θ₁ nontrivial ⟹ `H₀U' ⊆ Ker`), and the count bijection giving
+`((p-1)/a)·|C_U(S₀):U'| = ((p-1)/a)·(|U|/(a|U'|))` distinct members (mirror `oXtheta_count`; needs
+`U' ≤ C_U(S₀)`, extractable from the `hcentral_triv` step of `chiefFactor_caseB_image_cyclic`). -/
 theorem caseA_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     (chars : Section11CharacterData data chief) (caseA : CliffordCaseAData chars) :
@@ -9812,8 +10094,9 @@ theorem caseA_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
       (huSub data)) := Fintype.ofFinite _
     letI : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
       invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-    letI : Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
-      (huSub data)) : ℂ) := invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+    letI : Invertible
+        (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+          (huSub data)) : ℂ) := invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
     haveI : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
       (huSub data)).Normal := hcInHu_realized_normal chief
     exact caseA_exists_irreducible_sOf_H0C caseA hG
@@ -9844,7 +10127,8 @@ theorem caseB_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
         φ 1 = ((data.q * chars.u : ℕ) : ℂ) ∧ φ ∈ chars.SOf (chief.H0 ⊔ chars.C)) ∧
       ((¬ ∃ χ ∈ chars.SOf (chief.H0 ⊔ chars.Cprime), IsIrreducibleCharacter χ) →
         chars.C = ⊥ ∧ chars.u = (chief.p ^ data.q - 1) / (chief.p - 1)) := by
-  -- (9.9.a) is the proven `caseB_degree_qu`; (9.9.b) is the §9↔§6 bijection `reducible_count_sOf_H0`;
+  -- (9.9.a) is the proven `caseB_degree_qu`; (9.9.b) is the §9↔§6 bijection
+  -- `reducible_count_sOf_H0`;
   -- (9.9.c): `C = ⊥` is the pair-character argument; the `u`-count remains.
   refine ⟨caseB_degree_qu hG chars caseB, ?_, ?_, ?_⟩
   · exact reducible_count_sOf_H0 hG chief
