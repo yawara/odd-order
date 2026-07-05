@@ -1170,7 +1170,7 @@ theorem chief_H0_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hqodd : Odd hyp.s11Setup.q := by
     rw [hyp.s11Setup_q_eq]; exact (hyp.p_q_distinct_odd_primes hG).2.2.2.1
   rcases OddOrder.Peterfalvi.S11.chiefFactor_clifford_U_dichotomy hyp.chief with
-    hirrB | ⟨S₀, hS₀ne, _hS₀inv, _hS₀card, _hS₀sub⟩
+    hirrB | ⟨S₀, hS₀ne, hS₀inv, hS₀card, _hS₀sub⟩
   · -- **case (b)**: `U` acts irreducibly on `H̄`; parity `|Ĥ| = p^{q+1}` (`q` odd) is impossible.
     -- `U` centralizes `chief.N` (via `U_centralizes_H0`: conjugation of `H₀`-elements is trivial).
     refine chiefKernel_caseB_false hyp.chief hpK hNcomm ?_ hqodd hNne hirrB
@@ -1183,10 +1183,32 @@ theorem chief_H0_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [OddOrder.Peterfalvi.S11.typeP_conjAction_apply hyp.s11Setup.typeP ↑u n]
     have hcent := Subgroup.mem_centralizer_iff.mp (U_centralizes_H0 hyp huU) (n : G) hnH0
     rw [← hcent]; group
-  · -- **case (a)**: `U` fixes the order-`p` factor `S₀` pointwise — the `W₁`-exponent-chain content
-    -- (`exists_exponent_fun_of_card_prime` + the Frobenius chain relation `e(v)·e(σv)=1` +
-    -- `chain_exponent_eq_one`), the sole genuine remaining input; then `caseA_fixed_contradiction`.
-    refine caseA_fixed_contradiction hyp.chief hS₀ne ?_
+  · -- **case (a)**: `U` fixes the order-`p` factor `S₀` pointwise, via the exponent chain
+    -- (`caseA_fixes_of_action_chain`) with `σ` the `W₁`-generator conjugation on the (normal)
+    -- `U`-subgroup.  The chain relation `hchain` — Peterfalvi's commutator-form antisymmetry —
+    -- is the sole remaining input; the exponent machinery/`caseA_fixed_contradiction` are proven.
+    haveI hUnorm : (hyp.s11Setup.typeP.U.subgroupOf
+        (hyp.s11Setup.typeP.U ⊔ hyp.s11Setup.typeP.W1)).Normal :=
+      (Subgroup.normal_subgroupOf_iff_le_normalizer le_sup_left).mpr
+        (sup_le Subgroup.le_normalizer hyp.s11Setup.typeP.W1_normalizes_U)
+    haveI := hyp.s11Setup.typeP.W1_cyclic
+    obtain ⟨w₀, -⟩ := IsCyclic.exists_generator (α := ↥hyp.s11Setup.typeP.W1)
+    set w : ↥(hyp.s11Setup.typeP.U ⊔ hyp.s11Setup.typeP.W1) :=
+      Subgroup.inclusion le_sup_right w₀ with hw
+    set σ : MulAut ↥(hyp.s11Setup.typeP.U.subgroupOf
+        (hyp.s11Setup.typeP.U ⊔ hyp.s11Setup.typeP.W1)) := MulAut.conjNormal w with hσ
+    have hσm : σ ^ orderOf w = 1 := by rw [hσ, ← map_pow, pow_orderOf_eq_one, map_one]
+    have hwodd : Odd (orderOf w) :=
+      hG.odd.of_dvd_nat ((orderOf_dvd_natCard w).trans (Subgroup.card_subgroup_dvd_card _))
+    have hAodd : Odd (Nat.card ↥(hyp.s11Setup.typeP.U.subgroupOf
+        (hyp.s11Setup.typeP.U ⊔ hyp.s11Setup.typeP.W1))) :=
+      hG.odd.of_dvd_nat ((Subgroup.card_subgroup_dvd_card _).trans
+        (Subgroup.card_subgroup_dvd_card _))
+    refine caseA_fixed_contradiction hyp.chief hS₀ne
+      (caseA_fixes_of_action_chain hyp.chief hS₀card
+        (fun v s hs => hS₀inv.smul_mem v hs) hAodd σ hwodd hσm ?_)
+    -- **the commutator-form chain relation** (Peterfalvi (11.7), non-Galois case): the
+    -- `σ`-conjugate action inverts the `v`-action on `S₀` (`D`-antisymmetry).
     sorry
 
 /-- **Peterfalvi (11.7)**: `H` is elementary abelian of order `p^q`, and `H_0 = 1`.
