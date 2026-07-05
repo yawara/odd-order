@@ -346,3 +346,17 @@ Pf の C ≠ 1 否定枝の Lean 化に必要な新規構成:
 **B-lane frontier 総括 (it.89 時点)**: S15 (§13) の ungated genuine math は essentially 完了
 (S-side 全 + T-side disjointness)。残りは一律 §14 gate (`IsTypeII T` = (14.9), c-lane)
 の gated-endpoint threading + deep §13 char (complement_inf_Q/P (13.17.c) 等)。
+
+## ✅ M_complement (T = T' ⋊ W₂) も un-gated (it.90, 2026-07-05, commit d63e7526)
+
+前 it.89 の「次候補」を実施。`W2_isComplement_T_deriv` field を 3 structure 経由で threading
+(`typeP_derivedInG_isComplement_kappaHall` = BG 14.7(h)、`T_nonI` から、(14.9) 不要)。
+- `reconciled_typePData_T.M_complement`: 6→5 sorry (field で実証明)
+- `coprime_card_Q_card_VW2`: **完全 honest 化** — 2 fields (Q_inf_V_eq_bot + W2_isComplement_T_deriv)
+  から直接組立、sorried reconciliation の obtain を除去。docstring の「ungated」が真に成立。
+
+**reconciled_typePData_T 残 5 sorry** (session 開始時 7): W2_le / U_nilpotent /
+secondDerived_le_fitting / fitting_eq / centralizer_W1 — いずれも §14 gated
+(`IsTypeP2 T` = (14.9)) の T 型-`P₂` σ-structure。ungated complement facts は出し切った。
+次: これら残 5 は (14.9) 必須ゆえ、B-lane の ungated genuine math は別 frontier へ
+(S-side (13.3.b) λ 存在 or deep §13 char の complement_inf_Q/P (13.17.c) 調査)。
