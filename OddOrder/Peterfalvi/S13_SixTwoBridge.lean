@@ -714,6 +714,7 @@ theorem sixTwoMemberDatum_of_reducible_member [Finite G]
       D.tau1 χ = hS₁coh.extension χ := by
   haveI := hyp.finiteG
   classical
+  obtain ⟨hSne, sExt, hSie, hSeos, hSmz⟩ := hS₁coh
   -- `χ` is a nonzero μ-column sum; pick its conjugate column
   have hχbot : χ ∈ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) ⊥ := hS₁sub hχS₁
   obtain ⟨kχ, hkχ0, hχcol⟩ := hyp.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum
@@ -804,16 +805,15 @@ theorem sixTwoMemberDatum_of_reducible_member [Finite G]
     rw [h11, hcc, hcr, hcr']
     ring
   -- assemble `D` and its orthogonality to the break `Da`
-  set ext := hS₁coh.extension with hext
   refine ⟨OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection
     (hyp.columnImageFamilyCohFree hG hmu hzS hz1 hzconj hδpm hδj hkχ0 hkχ'0
       (Ne.symm hkχ'k) hχconj)
-    ext
-    (fun φ ζ hφ hζ => hS₁coh.extension_inner_eq φ ζ
+    sExt
+    (fun φ ζ hφ hζ => hSie φ ζ
       (Submodule.span_le.mpr (fun φ' hφ' => h2span φ' hφ') hφ)
       (Submodule.span_le.mpr (fun φ' hφ' => h2span φ' hφ') hζ))
-    (hS₁coh.extends_on_supported _ ⟨hdiffspan, hsupp1⟩)
-    (by rw [sub_zero]; exact hS₁coh.extension_mem_ZIrr χc hχspan)
+    (hSeos _ ⟨hdiffspan, hsupp1⟩)
+    (by rw [sub_zero]; exact hSmz χc hχspan)
     (by simp)
     (by simp)
     (S08.inducedKernelFamily_pairwise_orthogonal hχbot hχconjbot (Ne.symm hχne)),
@@ -846,10 +846,8 @@ theorem sixTwoMemberDatum_of_reducible_member [Finite G]
     · simp only [Hypothesis.columnRImage]
       rw [neg_smul, ClassFunction.inner_neg_left, ClassFunction.inner_smul_left, hωβ,
         mul_zero, neg_zero]
-  · -- `D.tau1 χ = extension χ`: rfl-blocked by a duplicated `IsCoherent` fvar in the
-    -- goal (confirmed via `rename_i` probe; same type as `hS₁coh`).  Diagnose fresh
-    -- (issue 2022 追記 18); the construction itself is complete.
-    sorry
+  · -- `D.tau1 χ = extension χ`: definitional after destructuring `hS₁coh`
+    rfl
 
 /-- **The (5.2.d) decomposition data for the §11 family — the single remaining grid obligation
 of the h56 chain** (issue 2022).  For any intermediate coherent set `S₁` between the `S(A')` and
