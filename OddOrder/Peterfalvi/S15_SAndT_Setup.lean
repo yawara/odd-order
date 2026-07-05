@@ -666,23 +666,33 @@ structure CharacterDegreeData (hyp : Hypothesis (G := G)) where
       OddOrder.RepresentationTheory.IsIrreducibleCharacter θ →
       ClassFunction.inner (hyp.eta i j)
         (tau1S (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ)) = 0
-  mu_j_linear_induced : Prop
-  mu_j_linear_induced_holds : mu_j_linear_induced
-  no_lambda_forces_caseB_S : Prop
+  /-- **Peterfalvi (13.3.a)** (materialized, issue 2034): every nonzero column sum
+  `μ_j = ∑_i μ_{ij}` is induced from a linear character of `H = PC` (hence of degree
+  `uq = [S : H]`). -/
+  mu_j_linear_induced :
+    haveI := hyp.finiteG
+    ∀ j : Fin hyp.p, j ≠ ⟨0, hyp.p_prime.pos⟩ →
+      ∃ θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ,
+        OddOrder.RepresentationTheory.IsIrreducibleCharacter θ ∧ θ 1 = 1 ∧
+          (∑ i : Fin hyp.q, hyp.mu i j) = ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ
   /-- **Peterfalvi (13.3.c)**: the signs `δ_j`, `δ'_i` of (13.1.e) are all equal
   to `1` (materialized as a concrete statement about `delta`/`deltaPrime`). -/
   delta_eq_one : (∀ j : Fin hyp.p, hyp.delta j = 1) ∧ (∀ i : Fin hyp.q, hyp.deltaPrime i = 1)
-  mu_tau1_formula : Prop
-  mu_tau1_formula_holds : mu_tau1_formula
-  sign_flip_exception : Prop
+  /-- **Peterfalvi (13.3.c)** (materialized, issue 2034): the `τ₁`-images of the nonzero
+  column sums are the `η`-column sums — either uniformly (`δ = 1`), or (`p = 3` sign-flip
+  exception) with a negative sign and the columns `1, 2` swapped. -/
+  mu_tau1_formula :
+    (∀ j : Fin hyp.p, j ≠ ⟨0, hyp.p_prime.pos⟩ →
+      tau1S (∑ i : Fin hyp.q, hyp.mu i j) = ∑ i : Fin hyp.q, hyp.eta i j) ∨
+    (hyp.p = 3 ∧ ∀ j j' : Fin hyp.p, j ≠ ⟨0, hyp.p_prime.pos⟩ →
+      j' ≠ ⟨0, hyp.p_prime.pos⟩ → j ≠ j' →
+      tau1S (∑ i : Fin hyp.q, hyp.mu i j) = -∑ i : Fin hyp.q, hyp.eta i j')
 
 /-- **Peterfalvi (13.3)**: the `mu_j` have degree `u q`, the signs are `1`,
 and the `tau_1` images are controlled by the `eta_ij` grid. -/
 theorem character_degree_analysis [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
-    ∃ data : CharacterDegreeData hyp,
-      data.mu_j_linear_induced ∧ data.no_lambda_forces_caseB_S ∧
-        data.mu_tau1_formula := by
+    Nonempty (CharacterDegreeData hyp) := by
   sorry
 
 /-- **Peterfalvi (13.4)**: if `S` contains a degree-`u q` character induced
@@ -4593,7 +4603,7 @@ theorem eta10_Qsharp_norm_lower [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd
     (Nat.card ↥(derivedInG hyp.T) : ℝ) - (hyp.v : ℝ) ^ 2
       ≤ ∑ x ∈ (Set.toFinite (sharpSubgroup hyp.Q)).toFinset, ‖hyp.eta10 x‖ ^ 2 := by
   classical
-  obtain ⟨chars, -, -, -⟩ := character_degree_analysis _hG hyp
+  obtain ⟨chars⟩ := character_degree_analysis _hG hyp
   obtain ⟨-, hv, -⟩ := lambda_forces_T_caseB _hG chars
   obtain ⟨ζ, α, α1, δ, hvanish, hinner, hχ, hfirstTerm, hcross, hδ, hinfl⟩ :=
     exists_caseB_data_eta10_T _hG chars
@@ -4709,7 +4719,7 @@ theorem analyticEstimate_eta [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
         + (1 / (hyp.p : ℚ) - 1 / ((hyp.p : ℚ) * ((hyp.q : ℚ) - 1))
           + 1 / ((hyp.p : ℚ) * ((hyp.q : ℚ) - 1) * (hyp.q : ℚ) ^ hyp.p)) := by
   classical
-  obtain ⟨chars, -, -, -⟩ := character_degree_analysis _hG hyp
+  obtain ⟨chars⟩ := character_degree_analysis _hG hyp
   obtain ⟨hD, hv, hQ⟩ := lambda_forces_T_caseB _hG chars
   obtain ⟨hd1, hv2, hvd⟩ := hyp.caseB_vd_facts hD hv
   have hZ := hyp.eta10_mem_ZIrr
@@ -4843,7 +4853,7 @@ theorem analyticCounting_disjointCover [Finite G] (_hG : OddOrder.BG.IsMinimalSi
   classical
   haveI : Fintype G := Fintype.ofFinite G
   -- (13.4) values.
-  obtain ⟨chars, -, -, -⟩ := character_degree_analysis _hG hyp
+  obtain ⟨chars⟩ := character_degree_analysis _hG hyp
   obtain ⟨hD, hv, hQ⟩ :=
     lambda_forces_T_caseB _hG chars
   have hd1 : hyp.d = 1 := by rw [hyp.d_eq_card_D, hD, Subgroup.card_bot]
@@ -5232,7 +5242,7 @@ theorem analyticInequalityEstimates [Finite G] (_hG : OddOrder.BG.IsMinimalSimpl
         (1 : ℚ) = 1 / (Nat.card G : ℚ) + g0 + HS
           + ((hyp.q : ℚ) - 1) / ((hyp.p : ℚ) * (hyp.q : ℚ) ^ hyp.p) ∧
         g0 ≤ slam + seta := by
-  obtain ⟨chars, -, -, -⟩ := character_degree_analysis _hG hyp
+  obtain ⟨chars⟩ := character_degree_analysis _hG hyp
   exact ⟨normSqSumQ hyp.G0Finset (chars.tau1S chars.lambda) / (Nat.card G : ℚ),
     normSqSumQ hyp.G0Finset hyp.eta10 / (Nat.card G : ℚ),
     (hyp.G0Finset.card : ℚ) / (Nat.card G : ℚ),
@@ -5336,7 +5346,7 @@ theorem analytic_inequality [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
       data.analytic_inequality ∧
         (hyp.u : ℚ) / (hyp.c : ℚ) >
           hyp.m * ((hyp.p ^ (hyp.q - 1) : ℕ) : ℚ) / (hyp.q : ℚ) := by
-  obtain ⟨chars, _⟩ := character_degree_analysis _hG hyp
+  obtain ⟨chars⟩ := character_degree_analysis _hG hyp
   obtain ⟨slam, seta, g0, HS, h1, h2, h3, h139b⟩ := analyticInequalityEstimates _hG hyp
   have hc0 : 0 < hyp.c := by rw [hyp.c_eq_card_C]; exact Nat.card_pos
   have hgi : (0 : ℚ) < 1 / (Nat.card G : ℚ) := by
