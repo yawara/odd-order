@@ -150,6 +150,8 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
   nu : Fin q → Fin p → ClassFunction ↥T ℂ
   delta : Fin p → ℤ
   deltaPrime : Fin q → ℤ
+  delta_pm_one : (∀ j : Fin p, delta j = 1 ∨ delta j = -1) ∧
+    (∀ i : Fin q, deltaPrime i = 1 ∨ deltaPrime i = -1)
   tau3 : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥W G
   mu_definition : ∀ (i : Fin q) (j : Fin p),
     ClassFunction.induce (W.subgroupOf S)
@@ -370,6 +372,8 @@ structure Section16CharacterData {G : Type*} [Group G] [Finite G]
   nu : Fin tp.q → Fin tp.p → ClassFunction ↥mp.T ℂ
   delta : Fin tp.p → ℤ
   deltaPrime : Fin tp.q → ℤ
+  delta_pm_one : (∀ j : Fin tp.p, delta j = 1 ∨ delta j = -1) ∧
+    (∀ i : Fin tp.q, deltaPrime i = 1 ∨ deltaPrime i = -1)
   tau3 : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥tp.W G
   mu_definition : ∀ (i : Fin tp.q) (j : Fin tp.p),
     ClassFunction.induce (tp.W.subgroupOf mp.S)
@@ -2508,6 +2512,11 @@ noncomputable def section16CharacterData_of_isMinimalSimpleOdd {G : Type*} [Grou
       nu := Section16CharacterData.nuT hG mp tp
       delta := Section16CharacterData.deltaS hG mp tp
       deltaPrime := Section16CharacterData.deltaPrimeT hG mp tp
+      delta_pm_one :=
+        ⟨fun j => ((mp.certainTypeS hG).columnFamily
+            (Section16CharacterData.chi2enum hG mp tp j)).sign_eq,
+         fun i => ((mp.certainTypeT hG).columnFamily
+            (Section16CharacterData.colT hG mp tp i)).sign_eq⟩
       tau3 := Section16CharacterData.tau3W hG mp tp
       mu_definition := Section16CharacterData.muS_definition hG mp tp
       mu_irreducible := fun i j =>
@@ -2632,6 +2641,7 @@ noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [F
     nu := cd.nu
     delta := cd.delta
     deltaPrime := cd.deltaPrime
+    delta_pm_one := cd.delta_pm_one
     tau3 := cd.tau3
     mu_definition := cd.mu_definition
     mu_irreducible := cd.mu_irreducible
@@ -2747,6 +2757,7 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       nu := inp.nu
       delta := inp.delta
       deltaPrime := inp.deltaPrime
+      delta_pm_one := inp.delta_pm_one
       tau3 := inp.tau3
       eta_eq_tau_omega := fun _ _ => rfl
       mu_definition := inp.mu_definition

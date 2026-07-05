@@ -157,6 +157,9 @@ structure Hypothesis where
   nu : Fin q → Fin p → ClassFunction ↥T ℂ
   delta : Fin p → ℤ
   deltaPrime : Fin q → ℤ
+  /-- **Peterfalvi (13.1.e)**: the signs `δ_j`, `δ'_i` are `±1` (the (4.3.b) `sign_eq`). -/
+  delta_pm_one : (∀ j : Fin p, delta j = 1 ∨ delta j = -1) ∧
+    (∀ i : Fin q, deltaPrime i = 1 ∨ deltaPrime i = -1)
   /-- The Peterfalvi (3.2)/(3.3) transfer map `τ`, typed as an integral
   (virtual-character) map via the same `IntegralCharacterMap` convention as
   `tauS`/`tauT` — faithful to `τ` being defined on the `ℤ`-lattice of virtual
@@ -3229,6 +3232,60 @@ theorem Hypothesis.mu_j_degree [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   haveI := hyp.finiteG
   obtain ⟨θ, hθirr, hθ1, hθeq⟩ := hyp.mu_j_isIndPC hG j hj
   rw [hθeq, ClassFunction.induce_apply_one, hθ1, mul_one, hyp.H_index_eq_uq hG]
+
+open scoped FiniteInduce in
+/-- **Column-constant degree** (Peterfalvi (13.1.e)/(4.3.c)): within a column `j`, all
+`μ_{ij}(1)` are equal.  From `mu_definition` at `1`: the LHS `Ind_W^S(ω_{ij} − ω_{0j})(1)` is
+`[S:W]·(ω_{ij}(1) − ω_{0j}(1)) = 0` (`omega_apply_one`: `ω`-grid linear), so the RHS
+`δ_j·(μ_{ij}(1) − μ_{0j}(1)) = 0`, and `δ_j = ±1 ≠ 0` (`delta_pm_one`) gives the equality. -/
+theorem Hypothesis.mu_apply_one_column_const [Finite G] (hyp : Hypothesis (G := G))
+    (i : Fin hyp.q) (j : Fin hyp.p) :
+    hyp.mu i j (1 : ↥hyp.S) = hyp.mu ⟨0, hyp.q_prime.pos⟩ j (1 : ↥hyp.S) := by
+  haveI := hyp.finiteG
+  have hdef := hyp.mu_definition i j
+  have h1 := congrArg (fun f : ClassFunction ↥hyp.S ℂ => f (1 : ↥hyp.S)) hdef
+  simp only at h1
+  -- LHS(1) = 0
+  rw [ClassFunction.induce_apply_one] at h1
+  have homega0 : (ClassFunction.compHom
+      (Subgroup.subgroupOfEquivOfLe ((le_of_eq hyp.W_eq_inter).trans inf_le_left)).toMonoidHom
+        (hyp.omega i j - hyp.omega ⟨0, hyp.q_prime.pos⟩ j))
+      (1 : ↥(hyp.W.subgroupOf hyp.S)) = 0 := by
+    rw [ClassFunction.compHom_apply, map_one, ClassFunction.sub_apply,
+      hyp.omega_apply_one, hyp.omega_apply_one, sub_self]
+  rw [homega0, mul_zero] at h1
+  -- RHS(1) = δ_j·(μ_{ij}(1) − μ_{0j}(1)) = 0, with δ_j ≠ 0
+  have hδ : (hyp.delta j : ℂ) ≠ 0 := by
+    rcases (hyp.delta_pm_one.1 j) with h | h <;> rw [h] <;> norm_num
+  have hsub : hyp.mu i j (1 : ↥hyp.S) - hyp.mu ⟨0, hyp.q_prime.pos⟩ j (1 : ↥hyp.S) = 0 :=
+    (mul_eq_zero.mp h1.symm).resolve_left hδ
+  exact sub_eq_zero.mp hsub
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (13.3.a), per-entry degree**: `μ_{ij}(1) = u` for `j ≥ 1`.  The column is
+degree-constant (`mu_apply_one_column_const`), so the column sum `μ_j(1) = q·μ_{0j}(1)`; with
+`μ_j(1) = uq` (`mu_j_degree`) and `q ≠ 0`, `μ_{0j}(1) = u`.  The `μ_{ij}(1) = u` that Peterfalvi
+(13.3.c) feeds into the `(4.3.d)` congruence `u ≡ δ_j (mod q)` for `δ_j = 1`. -/
+theorem Hypothesis.mu_apply_one_eq_u [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (i : Fin hyp.q) (j : Fin hyp.p)
+    (hj : j ≠ ⟨0, hyp.p_prime.pos⟩) :
+    hyp.mu i j (1 : ↥hyp.S) = ((hyp.u : ℕ) : ℂ) := by
+  haveI := hyp.finiteG
+  -- `∑ᵢ μ_{ij}(1) = q·μ_{0j}(1)` and `= uq`
+  have hsum := hyp.mu_j_degree hG j hj
+  rw [ClassFunction.finset_sum_apply] at hsum
+  have hconst : ∑ k : Fin hyp.q, hyp.mu k j (1 : ↥hyp.S)
+      = (hyp.q : ℂ) * hyp.mu ⟨0, hyp.q_prime.pos⟩ j (1 : ↥hyp.S) := by
+    rw [Finset.sum_congr rfl (fun k _ => hyp.mu_apply_one_column_const k j),
+      Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+  rw [hconst] at hsum
+  have hq0 : (hyp.q : ℂ) ≠ 0 := by
+    rw [Nat.cast_ne_zero]; exact hyp.q_prime.pos.ne'
+  have h0j : hyp.mu ⟨0, hyp.q_prime.pos⟩ j (1 : ↥hyp.S) = ((hyp.u : ℕ) : ℂ) := by
+    have : (hyp.q : ℂ) * hyp.mu ⟨0, hyp.q_prime.pos⟩ j (1 : ↥hyp.S)
+        = (hyp.q : ℂ) * ((hyp.u : ℕ) : ℂ) := by rw [hsum]; push_cast; ring
+    exact mul_left_cancel₀ hq0 this
+  rw [hyp.mu_apply_one_column_const i j, h0j]
 
 /-- `|T| = |Q|·(vd)·p` — the `T`-side order decomposition, read off the reconciled type-`P`
 datum (`M_complement`/`derived_complement` of `reconciled_typePData_T`) with `|V| = vd` and
