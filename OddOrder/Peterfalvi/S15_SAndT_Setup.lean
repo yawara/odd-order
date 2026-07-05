@@ -178,6 +178,16 @@ structure Hypothesis where
             ((le_of_eq W_eq_inter).trans inf_le_left)).toMonoidHom
           (omega i j - omega ⟨0, q_prime.pos⟩ j))
       = (delta j : ℂ) • (mu i j - mu ⟨0, q_prime.pos⟩ j)
+  /-- **Peterfalvi (13.1.e), irreducibility**: each `μ_{ij}` is an irreducible character of `S`
+  (the (1.4)/(4.3.b) column families consist of irreducibles; threaded from the
+  `SignedIrreducibleDifferenceFamily` producer, issue 2035 μ-linkage). -/
+  mu_irreducible : ∀ (i : Fin q) (j : Fin p),
+    OddOrder.RepresentationTheory.IsIrreducibleCharacter (mu i j)
+  /-- **Peterfalvi (13.1.e), column distinctness**: within a column `j` the `μ_{ij}` are
+  pairwise distinct (the (1.4) family `injective` field).  Makes the column sums
+  `μ_j = ∑_i μ_{ij}` sums of `q ≥ 2` distinct irreducibles — hence reducible, the (13.3.a)
+  entry condition. -/
+  mu_col_injective : ∀ j : Fin p, Function.Injective (fun i : Fin q => mu i j)
   /-- **Peterfalvi (13.1.e)**: `Ind_W^T (ω_{ij} − ω_{i0}) = δ'_i (ν_{ij} − ν_{i0})`,
   with the canonical `Ind_W^T = ClassFunction.induce (W.subgroupOf T)` and
   `δ'_i = ±1` is `deltaPrime`. -/
