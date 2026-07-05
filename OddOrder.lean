@@ -237,6 +237,7 @@ import OddOrder.Peterfalvi.S13_MaximalIII_IV
 import OddOrder.Peterfalvi.S13_CoreStructure
 import OddOrder.Peterfalvi.S14_MaximalI
 import OddOrder.Peterfalvi.S15_SAndT
+import OddOrder.Peterfalvi.S16_G0Coprime
 import OddOrder.Peterfalvi.S16_NonExistenceG
 import OddOrder.Peterfalvi.S16_PairingCoherence
 import OddOrder.BG.AppA_PStability
