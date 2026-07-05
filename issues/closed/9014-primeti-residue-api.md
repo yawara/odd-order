@@ -480,3 +480,18 @@ induction 全体」で、**membership は witness で即座に成立**する (`m
   `mu2Grid` extraction (S05_SigmaIsometry.lean 内、leaf 外) は S05 の `sigma` 上の再利用可能 lemma 群として
   残せるが、これも現状 external consumer 0。**leaf 削除は本 task scope 外 (fate 決定は保留と明記されたため
   削除せず report のみ)**。9014 は本 session で **実質完了** (S15:629 close 達成); leaf 削除を別 issue 化推奨。
+
+## ✅ RESOLVED / claim 撤回 (2026-07-06, session 8) — leaf 削除、S15:629 は S06 から non-dup 実証明
+
+**結論**: prime-TI residue API leaf は**不要だった**。(1) §4 residue theory は S06 に既存 (session 7)、
+(2) さらに target `induce_H_mem_zSpan_S` (S15:629, sS1S) は **sSet の witness 論法**で閉じ、prime-TI
+dichotomy 自体が不要 (session 8、commit 51751aa3、sorry-free)。⟹ **`PrimeTIResidue.lean` (6-session leaf)
+を削除** (consumer 0、OddOrder.lean import 除去)。lane a (10.7) も §5 uniform_degree_coherence が gate
+であり prime-TI residue でない (issue 1017 診断) → a も本 leaf 不要。
+
+**残置**: S05 の `mu2Grid`/`exists_sign_smul_irr_of_sigma_omega` (σ→signed-irr dirr extraction、
+sorry-free) は standalone §4 building block として残す (docstring を leaf 非依存に reword、現 unconsumed)。
+
+**教訓** ([[verify-port-state-by-number-not-coq-name]] 強化済): multi-session の新 infra port 前に
+概念名 (Coq 名でなく) で S0x を exhaustive grep + 該当 § file 通読。1 scan ミスが 6 session を溶かした。
+claim 撤回、本 issue close。

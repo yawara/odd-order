@@ -666,7 +666,7 @@ coefficient has `P ⊄ ker s` (`constituent_P_not_subset_characterKernel`), so `
 lies in `sSet` by witness `s`; the coefficient-weighted `ℤ`-sum lands in `zSpan sSet`.  This
 grounds the family
 membership on the proven S06 setup (`typePData_toS06Hypothesis` for `S` supplies the certain-type
-Hypothesis, though only its `S'`-family shape is needed here), *not* on `PrimeTIResidueData`. -/
+Hypothesis, though only its `S'`-family shape is needed here); no prime-TI residue dichotomy is used. -/
 theorem Hypothesis.induce_H_mem_zSpan_S [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))

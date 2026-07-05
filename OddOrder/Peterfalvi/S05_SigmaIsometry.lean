@@ -2051,9 +2051,10 @@ This is exactly the norm-`1` classifier applied to `ω^σ`: `ω^σ ∈ ZIrr G` (
 grid `mu2Grid`/`mu2GridSign` packages the extracted `μ`/`δ`, and `mu2Grid_orthonormal`
 (= Coq `cfdot_prTIirr`) reads the orthonormality of the `μ` straight off the isometry.
 
-These are the building blocks of `PrimeTIResidueData.mu2`/`mu2_orthonormal`
-(`OddOrder.GroupTheory.RepresentationTheory.PrimeTIResidue`); see
-`issues/9014-primeti-residue-api.md`. -/
+These are reusable `σ`-side building blocks for the Peterfalvi §4 `dirr` extraction (the signed
+irreducibles `μ` of the prime-TI grid, read off the (3.2) isometry).  Standalone, `sorry`-free;
+currently unconsumed (the §4 prime-TI residue grid itself is carried by `S06`'s `certainType`/
+`columnFamily` machinery, so these are kept only as a self-contained `σ`→signed-irreducible API). -/
 
 /-- **Peterfalvi §4 `dirr` step** (existence form).  Each basis image `ω^σ` of the (3.2) isometry
 is a single signed irreducible: there are a sign `δ = ±1` and an irreducible `μ ∈ Irr(G)` with
