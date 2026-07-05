@@ -260,6 +260,16 @@ def H (hyp : Hypothesis (G := G)) : Subgroup G :=
 def K (hyp : Hypothesis (G := G)) : Subgroup G :=
   hyp.Q ⊔ hyp.D
 
+/-- `H = PC ≤ S`: `P = S_F ≤ S` and `C = U ∩ C_G(P) ≤ U ≤ S' ≤ S`. -/
+theorem H_le_S [Finite G] (hyp : Hypothesis (G := G)) : hyp.H ≤ hyp.S := by
+  have hUS : hyp.U ≤ hyp.S := by
+    have h1 : hyp.U ≤ derivedInG hyp.S := by rw [hyp.S_deriv_eq_PU]; exact le_sup_right
+    exact le_trans h1 (Subgroup.map_subtype_le _)
+  show hyp.P ⊔ hyp.C ≤ hyp.S
+  refine sup_le ?_ ?_
+  · rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
+  · rw [hyp.C_eq]; exact le_trans inf_le_left hUS
+
 /-- The generic set `G_0 = G# - ((H#)^G union (Q#)^G)` from (13.9). -/
 def G0 (hyp : Hypothesis (G := G)) : Set G :=
   sharpSubgroup (⊤ : Subgroup G) \
@@ -1359,6 +1369,63 @@ theorem H_sharp_zeta_zero [Fintype G] [Invertible (Nat.card G : ℂ)]
               ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ) := by
   unfold H_sharp_hypothesis76
   exact OddOrder.Peterfalvi.S09.Cert.hypothesis76OfDadeTrivialBase_zeta_zero _ _ _ _ _ _
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (13.2.e)/(7.2): the `(S, H^#)` Dade isometry is `Ind_S^G`.**  For the
+TI-subset construction (all local subgroups trivial) the Dade map and the induction agree
+pointwise: on the conjugacy saturation of `H^#` both take the base value `α(a)`
+(`map_eq_of_isConj_of_forall_H_eq_bot` vs `IsTISubset.induce_apply_of_mem_conj`), and both
+vanish off it.  This is the "`τ` coincides with `Ind_S^G`" clause of (13.2.e), the link
+between the (7.7.a) coefficients `c_i = ⟨τψ_i, χ⟩` and the τ₁-extension field
+`tau1S_apply_induce_sub` (issue 2034). -/
+theorem H_sharp_tau_eq_induce [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (α : OddOrder.Peterfalvi.S04.SupportedClassFunctions ℂ
+      (OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G)) hyp.S) :
+    (H_sharp_hypothesis71 hG hyp).τ α
+      = ClassFunction.induce hyp.S (α : ClassFunction ↥hyp.S ℂ) := by
+  classical
+  have hAL : OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G) ⊆ (hyp.S : Set G) := fun x hx =>
+    hyp.H_le_S (OddOrder.Peterfalvi.S04.mem_sharp.mp hx).1
+  have hsupp : ∀ w : ↥hyp.S, (w : G) ∉ OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G) →
+      (α : ClassFunction ↥hyp.S ℂ) w = 0 := by
+    intro w hw
+    by_contra hne
+    exact hw (OddOrder.Peterfalvi.S04.mem_supportInSubgroup.mp
+      (α.2 (ClassFunction.mem_support.mpr hne)))
+  have hstab : ∀ l ∈ hyp.S,
+      MulAut.conj l • (OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G))
+        = OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G) := by
+    intro l hl
+    ext x
+    constructor
+    · rintro ⟨a, ha, rfl⟩
+      simp only [MulAut.smul_def, MulAut.conj_apply]
+      exact S_normalizes_H_sharp hG hyp ⟨l, hl⟩ ha
+    · intro hx
+      refine ⟨l⁻¹ * x * l, ?_, ?_⟩
+      · have := S_normalizes_H_sharp hG hyp (⟨l, hl⟩ : ↥hyp.S)⁻¹ hx
+        simpa using this
+      · simp only [MulAut.smul_def, MulAut.conj_apply]
+        group
+  ext g
+  by_cases hg : g ∈ OddOrder.GroupTheory.conjClassSet
+      (OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G))
+  · obtain ⟨a, ha, y, hy⟩ := OddOrder.GroupTheory.mem_conjClassSet.mp hg
+    rw [OddOrder.Peterfalvi.S04.map_eq_of_isConj_of_forall_H_eq_bot
+        (H_sharp_hypothesis71 hG hyp).isDadeMap (fun _ => rfl) α ha
+        (isConj_iff.mpr ⟨y, hy⟩),
+      OddOrder.GroupTheory.IsTISubset.induce_apply_of_mem_conj (H_sharp_isTISubset hG hyp)
+        hAL hstab (α : ClassFunction ↥hyp.S ℂ) hsupp ha hy.symm]
+  · have hg' : g ∉ Group.conjugatesOfSet (OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G)) := by
+      intro hmem
+      obtain ⟨a, ha, hconj⟩ := Group.mem_conjugatesOfSet_iff.mp hmem
+      obtain ⟨c, hc⟩ := isConj_iff.mp hconj
+      exact hg (OddOrder.GroupTheory.mem_conjClassSet.mpr ⟨a, ha, c, hc⟩)
+    rw [OddOrder.Peterfalvi.S04.map_eq_zero_of_not_mem_conjugatesOfSet_of_forall_H_eq_bot
+        (H_sharp_hypothesis71 hG hyp).isDadeMap (fun _ => rfl) α hg',
+      OddOrder.GroupTheory.IsTISubset.induce_apply_of_not_mem_conjClassSet
+        (α : ClassFunction ↥hyp.S ℂ) hsupp hg]
 
 /-- **TI-subset `ρ`-map collapse** (the `χ = χ^ρ` bridge of Peterfalvi (13.5.a)): when the local
 subgroups of a (7.1) datum are trivial (`H(a) = ⊥`, as for the TI-subset Dade construction
