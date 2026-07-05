@@ -120,6 +120,18 @@ structure PrimeTIResidueData (S : Type*) [Group S] [Fintype S]
       = ∑ i : Fin q, (mu2 i j : ClassFunction S ℂ)
   /-- **(4.5.a)** The `0`-residue is the trivial character (Coq `prTIres0`). -/
   chi_zero : (chi 0 : ClassFunction ↥PU ℂ) = trivialClassFunction ↥PU
+  /-- The Sylow `p`-subgroup `P ≤ PU` (`= S_F` realised inside `PU`), carrying the kernel
+  condition of the `(P)`-nonlinear induced family `seqIndD PU S P 1`.  In the Feit–Thompson
+  application `P = S_F` is the Fitting subgroup of `S` (elementary abelian of order `p^q`),
+  and the residues `chi_ j` (`j ≠ 0`) are exactly the `Irr(PU)`-characters non-trivial on `P`. -/
+  P : Subgroup ↥PU
+  /-- **(4.5.b), kernel condition** (Coq `cfker_prTIres`, `PFsection4.v:801`): for `j ≠ 0` the
+  residue `chi_ j` does **not** have `P` in its kernel (it is `P`-nonlinear).  Equivalently
+  `P ⊄ ker (chi_ j)`, so `μ_j = Ind_{PU}^S (chi_ j) ∈ seqIndD PU S P 1`.  A genuine mathcomp
+  theorem (the `j = 0` residue is trivial with full kernel by `chi_zero`; every other residue
+  is a non-principal constituent of `Res_P (mu2 0 j)`, hence non-trivial on `P`). -/
+  cfker_prTIres : ∀ j : Fin p, j ≠ 0 →
+    ¬ ((P : Set ↥PU) ⊆ OddOrder.Peterfalvi.S03.characterKernel (chi j : ClassFunction ↥PU ℂ))
 
 namespace PrimeTIResidueData
 
@@ -278,6 +290,100 @@ The `μ_j` are genuine characters (`prTIred_char`), hence virtual characters. -/
 (`prTIred_char`), and every genuine character lies in `ZIrr`. -/
 theorem prTIred_mem_ZIrr (j : Fin p) : D.primeTIred j ∈ ZIrr S :=
   (D.prTIred_char j).mem_ZIrr
+
+/-! ### The `(P)`-nonlinear induced family `calS = seqIndD PU S P 1`
+
+`calS D := { Ind_{PU}^S ξ | ξ ∈ Irr(PU), P ⊄ ker ξ }` (Coq `seqIndD PU S P 1`, the reduced
+family Peterfalvi's §13 coherence runs on).  This is the `PU`-level analogue of the S11 §9
+family `sSet = Ind_{HU}^M 𝒳`; here the kernel condition is on the field `D.P ≤ PU`.  The
+`μ_j` (`j ≠ 0`) are members (`FTseqInd_TIred`); more generally every `P`-nonlinear induction
+`Ind_{PU}^S θ` lands in `calS D` and hence in `zSpan (calS D)` (`induce_mem_calS`,
+`induce_mem_zSpan_calS`). -/
+
+/-- **Peterfalvi §13 family `calS = seqIndD PU S P 1`** (Coq `PFsection13.v:157`): the set of
+characters `Ind_{PU}^S ξ` induced from an irreducible `ξ ∈ Irr(PU)` whose kernel does **not**
+contain `P` (the `(P)`-nonlinear residue family).  Mirrors the S11 `sSet` idiom. -/
+noncomputable def calS : Set (ClassFunction S ℂ) :=
+  { φ | ∃ ξ : IrreducibleCharacter ↥PU,
+      ¬ ((D.P : Set ↥PU) ⊆ OddOrder.Peterfalvi.S03.characterKernel (ξ : ClassFunction ↥PU ℂ))
+        ∧ φ = ClassFunction.induce PU (ξ : ClassFunction ↥PU ℂ) }
+
+theorem mem_calS {φ : ClassFunction S ℂ} :
+    φ ∈ D.calS ↔ ∃ ξ : IrreducibleCharacter ↥PU,
+      ¬ ((D.P : Set ↥PU) ⊆ OddOrder.Peterfalvi.S03.characterKernel (ξ : ClassFunction ↥PU ℂ))
+        ∧ φ = ClassFunction.induce PU (ξ : ClassFunction ↥PU ℂ) :=
+  Iff.rfl
+
+/-- **`induce_mem_calS`.** Any `P`-nonlinear induction is a family member: if `θ ∈ Irr(PU)` has
+`P ⊄ ker θ`, then `Ind_{PU}^S θ ∈ calS D` (witness `ξ = θ`). -/
+theorem induce_mem_calS (θ : IrreducibleCharacter ↥PU)
+    (hθ : ¬ ((D.P : Set ↥PU) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥PU ℂ))) :
+    ClassFunction.induce PU (θ : ClassFunction ↥PU ℂ) ∈ D.calS :=
+  ⟨θ, hθ, rfl⟩
+
+/-- **`FTseqInd_TIred`** (Coq `S1mu`, `PFsection13.v:391`): for `j ≠ 0`, the reducible residue
+character `μ_j = primeTIred D j` lies in the family `calS D`.
+
+`μ_j = Ind_{PU}^S (chi_ j)` (`cfInd_prTIres`) with the residue `chi_ j` `P`-nonlinear
+(`cfker_prTIres`, valid for `j ≠ 0`); so `μ_j ∈ seqIndD PU S P 1 = calS D`. -/
+theorem FTseqInd_TIred {j : Fin p} (hj : j ≠ 0) : D.primeTIred j ∈ D.calS := by
+  refine ⟨D.chi j, D.cfker_prTIres j hj, ?_⟩
+  exact (D.cfInd_prTIres j).symm
+
+/-! ### The dichotomy `S1cases` and the membership `Ind θ ∈ zSpan calS`
+
+`S1cases` (Coq `PFsection13.v:401-428`) classifies the induced character `Ind_{PU}^S θ` of an
+irreducible `θ ∈ Irr(PU)` with `P ⊄ ker θ`, via `prTIres_irr_cases`, into two mutually
+exclusive shapes — either `Ind θ = μ_j` for some `j ≠ 0`, or `Ind θ ∈ calS D ∩ Irr(S)` — both
+of which lie in `calS D`.  This is the `PU`-level residue dichotomy on which Coq's
+`sS1S : calS1 ⊆ ℤ[calS]` (and the S15 consumer `induce_H_mem_zSpan_S`) is built. -/
+
+/-- **`S1cases` dichotomy** (Coq `PFsection13.v:401-428`).  For irreducible `θ ∈ Irr(PU)` with
+`P ⊄ ker θ`, the induced character `Ind_{PU}^S θ` is classified as one of:
+
+* **(residue / reducible case)** `∃ j ≠ 0, Ind_{PU}^S θ = μ_j`  (`θ = chi_ j`); or
+* **(irreducible case)** `Ind_{PU}^S θ ∈ Irr(S)` **and** it is a family member `∈ calS D`
+  (hence `∈ calS D ∩ Irr(S)`).
+
+Uses `prTIres_irr_cases`: in the residue branch `θ = chi_ j`, and `j ≠ 0` follows since `θ`,
+having `P ⊄ ker`, cannot be `chi_ 0 = 1` (whose kernel is everything); in the induced-irreducible
+branch `Ind θ ∈ Irr(S)`, and membership in `calS D` is by `induce_mem_calS` (witness `θ`). -/
+theorem S1cases (θ : IrreducibleCharacter ↥PU)
+    (hθP : ¬ ((D.P : Set ↥PU) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥PU ℂ))) :
+    (∃ j : Fin p, j ≠ 0 ∧
+        ClassFunction.induce PU (θ : ClassFunction ↥PU ℂ) = D.primeTIred j)
+      ∨ (IsIrreducibleCharacter (ClassFunction.induce PU (θ : ClassFunction ↥PU ℂ))
+          ∧ ClassFunction.induce PU (θ : ClassFunction ↥PU ℂ) ∈ D.calS) := by
+  rcases D.prTIres_irr_cases θ with ⟨j, hj⟩ | ⟨hirr, _⟩
+  · -- residue case: `θ = chi_ j`; show `j ≠ 0` and `Ind θ = μ_j`
+    refine Or.inl ⟨j, ?_, ?_⟩
+    · -- `j ≠ 0`: otherwise `θ = chi_ 0 = 1`, whose kernel is all of `PU ⊇ P`, contradicting `hθP`
+      rintro rfl
+      exact hθP (by
+        rw [hj, D.chi_zero, OddOrder.Peterfalvi.S03.characterKernel_trivialClassFunction]
+        exact Set.subset_univ _)
+    · -- `Ind θ = Ind (chi_ j) = μ_j`
+      rw [hj]; exact D.cfInd_prTIres j
+  · -- induced-irreducible case: `Ind θ ∈ Irr(S)` and `Ind θ ∈ calS D` (witness `θ`)
+    exact Or.inr ⟨hirr, D.induce_mem_calS θ hθP⟩
+
+/-- **`induce_mem_zSpan_calS`** (the `PU`-level `sS1S` engine).  For irreducible `θ ∈ Irr(PU)`
+with `P ⊄ ker θ`, the induced character `Ind_{PU}^S θ` lies in `zSpan (calS D) = ℤ[calS]`.
+
+This is the honest core the S15 consumer `induce_H_mem_zSpan_S` needs.  Via the `S1cases`
+dichotomy both branches land in `calS D` itself (the residue `μ_j` is a member by
+`FTseqInd_TIred`; the induced-irreducible is a member by `induce_mem_calS`), so the induction
+is a single generator of the integral span. -/
+theorem induce_mem_zSpan_calS (θ : IrreducibleCharacter ↥PU)
+    (hθP : ¬ ((D.P : Set ↥PU) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥PU ℂ))) :
+    ClassFunction.induce PU (θ : ClassFunction ↥PU ℂ) ∈ zSpan D.calS := by
+  refine Submodule.subset_span ?_
+  rcases D.S1cases θ hθP with ⟨j, hj, heq⟩ | ⟨_, hmem⟩
+  · rw [heq]; exact D.FTseqInd_TIred hj
+  · exact hmem
 
 end PrimeTIResidueData
 
