@@ -377,3 +377,58 @@ against free fields).  Full build 3884 green; consumers (S12 `typeII_section11_c
 `sibleyTarget_H0C`) unaffected (signature-stable, no producer to break).  **Remaining §9** (issue 2030):
 genuinize carrier subgroups `C=C_U(H̄)`/`U'=[U,U]`/`C'=[C,C]` (fiddly prerequisite, doesn't unlock a
 proof; best bundled with the counts) + the deep Clifford/Dade proofs of (9.8)/(9.9)/(9.10).
+
+## 2026-07-06 — SCOPE re-audit of `typeII_coherence_contradiction_estimate` (S12:445, sorry :453): the estimate is blocked on the type-II PARTNER Frobenius structure (10.7), which genuinely needs the ABSENT prime-TI-reducible coherence apparatus. NOT built (no clean ungated path); minimal missing piece named below.
+
+Re-read the **full** Coq `FTtype345_noncoherence_main` (10.8, `coq/theories/PFsection10.v:670-791`) and
+`Frob_der1_type2` (10.7, `PFsection10.v:549-666`) and re-inventoried the repo.  Findings (corroborated
+two independent sub-agents + direct reads):
+
+**Which facts the (10.8) FINAL numeric inequality needs, and their repo status**
+(via the proven ℚ chain `typeII_coherence_estimate_chain` (S12:389), whose inputs are `hA`/`hB`/`hS`):
+- **`hA` (line 87)** `1 − |G₁|/|G| − 1/w₁ < w₁/|M'|` = line-83 **upper** bound (`chiRhoNormSq_zeta_le_line83`,
+  S12:329, **PROVEN**) + (7.8.b) **lower** bound `chiRhoNormSq ≥ 1 − w₁/|M'|` + `card_typePA_div_card_lt_inv_w1`
+  (S12:204, PROVEN).  ⟹ `hA` reduces to **(7.8.b) for `(M,M')`**.
+  - **KEY POSITIVE FINDING**: `inducedFamily M = S` (S12_Core:79) is **exactly** `{Ind_{M'}^M θ | θ∈Irr(M'), θ≠1}`
+    = the Coq `calS = seqIndD … M`, so the coherence datum `coh.coherent : IsCoherent hyp.tau hyp.Sset hyp.A0`
+    **IS** the `cohS` that the Coq (7.8.b) `Dade_Ind1_sub_lin` (`PFsection7.v:345`, part (b)) consumes.
+    That lemma is **GENERIC coherence-theory — NO prime-TI, NO Frobenius-on-`L` requirement** (only
+    `coherent_with calS L^# (Dade ddA) ν`, `1 < size calS`, `ζ∈irr∩calS`, `ζ(1)=e`, and the `e≤(h−1)/2`
+    guard = `smallIndex 2w₁+1 ≤ |M'|`, which `card_derived_ge` gives).  Lean engine EXISTS + PROVEN:
+    `zetaNuRhoNormSqGeOfDade` (`S09_CertificateDischarge.lean:2406`), and the **exact wiring template is
+    already realised for the §14 case** in S16: `MHypothesis.rhoNormSq_ge_lower` (`S16_NonExistenceG.lean:2851`)
+    with its posited `h78 : Hypothesis78` field (S16:1643) + `psi_tau1_eq` (S16:1672).  So a `Hypothesis78`-for-`M`
+    (`H=M'`, `ν=coh.tau1`) carrier + the `θ`-family/`hagree`/`hnu_isometry` certificates would give `hA` — a
+    **genuine, ungated, feasible** (if deep, multi-step) build.  **BUT `hA` alone does not close the estimate** (below).
+- **`hB` (lines 89-91)** `|G₁|/|G| ≤ (|S_F|−1)/|S| + (w₁w₂−w₁−w₂+1)/(w₁w₂)`:
+  - `V^G` numerator half **PROVEN** (`typePData_conjClassSet_typePV_ncard`, S12_Core:772).
+  - `(S_F#)^G` count + the inclusion `G₁ ⊆ (S_F#)^G ∪ V^G` **ABSENT**; both need the type-II **partner** `S`'s
+    Frobenius structure (Coq `Frob_der1_type2` at line 721 + Hall covering `sG1_HVG` 724-755).
+- **`hS`/`hu`** `|S| = |S_F|·|U|·w₂` and `|U| ≥ 2w₂+1 ≥ 7` **ABSENT**; from the partner `S = (S_F⋊U)⋊W₂`
+  decomposition + `Ptype_compl_Frobenius`+`ltn_odd_Frobenius_ker` (Coq lines 783-785).  The estimate's goal
+  `∃ u, 7 ≤ u ∧ …` **existentially bundles `u = |U|`**, so the `7 ≤ u` witness AND the `hB` term (via `cardS`)
+  are inseparable from the partner — a `hA`-only build **cannot** produce them.
+
+**The single choke point** = the type-II partner Frobenius structure, i.e. **(10.7) `typeII_derived_frobenius`
+(S12:47, bare `sorry`, 0 downstream consumers, `DerivedFrobeniusData` fully opaque)**.  Its faithful proof
+(the entire Coq `Frob_der1_type2`) drives a coherence contradiction on the 4-member reducible family
+`T2 = [λ; λ*; νr; (νr)*]` and essentially uses **`primeTIred pddS`** (Coq 576), **`FTtypeP_subcoherent`/
+`subcoherent`/`subset_subcoherent`** (603-616), **`uniform_degree_coherence`** (618), **`FTtypeP_coherent_TIred`**
+(629,656), **`cyclicTIiso`** (631) + `cfdot_cycTIiso`/`coherent_ortho_cycTIiso`.
+
+**Minimal missing foundation (named)**: the **prime-TI-reducible character apparatus** — `primeTIred`,
+`FTtypeP_subcoherent`, `FTtypeP_coherent_TIred`, `cyclicTIiso` (Coq PFsection3/4).  **VERIFIED ABSENT from
+the Lean repo** (grep over `OddOrder/**` = 0 real identifiers; the lone hit is a *comment* in
+`S06_CertainHypothesis46.lean:50` referencing Coq's unrelated `cyclicTIset`).  NB `uniform_degree_coherence`
+alone **IS** present (= `coherent_of_constant_degree`, `S07_CoherenceConstantDegree.lean:551`, sorry-free) — but
+(10.7) needs the *whole* subcoherent/`TIred`/`cyclicTIiso` chain to even set up the `T2` family it feeds to it.
+This apparatus is the same root that (11.8) / the §9 keystone (`S11.Section11CharacterData`, issue 2030) bottom
+out on — a multi-session foundation build, not a one-shot leaf.
+
+**Decision (this session)**: did **NOT** modify `typeII_coherence_contradiction_estimate` — building only the
+ungated `hA` half would leave the `∃ u` goal unclosable and would tempt a hoist-into-false-hypotheses
+non-proof (forbidden).  The honest next genuine step, if one wants forward motion on THIS estimate
+independently of (10.7), is the **(7.8.b)-for-`(M,M')` `Hypothesis78` instance** (the S16 `MHypothesis.h78`/
+`rhoNormSq_ge_lower` pattern ported to the type-`P` `M`, `H=M'`, `ν=coh.tau1`) — a real reusable §7 brick that
+proves `hA`'s lower-bound half — but it does not on its own discharge the estimate.  The estimate's closure is
+gated on (10.7) ⟹ the prime-TI-reducible apparatus (issue 2030 territory).
