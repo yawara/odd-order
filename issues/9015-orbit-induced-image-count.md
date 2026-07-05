@@ -1,5 +1,5 @@
 ---
-id: 9014
+id: 9015
 slug: orbit-induced-image-count
 title: "shared: induced-image cardinality (G/H-orbit count) for irreducibly-inducing families"
 created: 2026-07-06
@@ -19,7 +19,8 @@ L836–845, `size_irr_subseq_seqInd` / `card_imset_Ind_irr` 経由) は「共役
 (構造も full-`Irr(M')` fiber 前提で `calT1` の quotient-restricted 族と異なる)。既存の
 `InducedIrreducible.card_filter_induce_eq_index_inertia` (fiber = `[G:I_G(θ)]`) を土台に、濃度版を
 新規 shared leaf として landing した (claim-before-build の retro claim; 既存 open 9000 に重複なし
-— 9007=Frobenius 共役直交, 9011=TI 共役計数, 9002=Clifford, いずれも別物)。
+— 9007=Frobenius 共役直交, 9011=TI 共役計数, 9002=Clifford, 9014=prime-TI-reducible coherence,
+いずれも別物)。
 
 ## やること
 
