@@ -3900,14 +3900,64 @@ theorem w2_lt_w1_of_hypothesis [Finite G]
   obtain ⟨ζ, hζS, hζirr, hζ1, h118⟩ := exists_zeta_residual_not_orthogonal hG hyp htype
   exact w2_lt_w1_of_residual_not_orthogonal hG hyp hζS hζirr hζ1 h118
 
-/-- **Peterfalvi (10.10.1)--(10.10.4)**: if Hypothesis (10.1) holds with `M`
-of type V, then the Type V parameter calculation forces `S` to be coherent. -/
+/-- **Peterfalvi (10.10.1), pure arithmetic**: for the type-V case (c) parameters — `p = w₂` prime,
+`w₁ ∣ p+1` (both odd, `w₁ > 1`), and the Huppert bound `|H:H'| = p² ≤ 4w₁²+1` (6.5.a) — one has
+`p = 2w₁ − 1`, hence `w₁ < p = w₂`.
+
+Writing `p+1 = 2k·w₁` (`m := (p+1)/w₁` is even, since `p+1` is even and `w₁` odd), the bound gives
+`(2kw₁−1)² ≤ 4w₁²+1`, i.e. `w₁(k²−1) ≤ k`; with `w₁ ≥ 2`, `k ≥ 1` this forces `k = 1`.  Mirrors the
+`typeII_noncoherence_arithmetic` pattern (the analytic/structural inputs are isolated). -/
+theorem typeV_param_arithmetic {p w₁ : ℕ} (hpodd : Odd p) (hw1odd : Odd w₁) (hw1 : 1 < w₁)
+    (hdvd : w₁ ∣ p + 1) (hbound : p ^ 2 ≤ 4 * w₁ ^ 2 + 1) :
+    p = 2 * w₁ - 1 ∧ w₁ < p := by
+  obtain ⟨m, hm⟩ := hdvd
+  -- `m` is even: `p+1` is even (`p` odd) and `w₁` is odd.
+  have hm_even : Even m := by
+    have hp1even : Even (p + 1) := Odd.add_one hpodd
+    rw [hm] at hp1even
+    rcases Nat.even_mul.mp hp1even with h | h
+    · exact absurd h (Nat.not_even_iff_odd.mpr hw1odd)
+    · exact h
+  obtain ⟨k, hk⟩ := hm_even
+  have hpk : p + 1 = 2 * w₁ * k := by rw [hm, hk]; ring
+  have hkpos : 1 ≤ k := by
+    rcases Nat.eq_zero_or_pos k with h0 | h1
+    · rw [h0, Nat.mul_zero] at hpk; omega
+    · exact h1
+  -- `k = 1` from the bound (over `ℤ` to avoid `ℕ`-subtraction).
+  have hk1 : k = 1 := by
+    have hpZ : (p : ℤ) = 2 * w₁ * k - 1 := by
+      have : (p : ℤ) + 1 = 2 * (w₁ : ℤ) * k := by exact_mod_cast hpk
+      linarith
+    have hboundZ : (p : ℤ) ^ 2 ≤ 4 * (w₁ : ℤ) ^ 2 + 1 := by exact_mod_cast hbound
+    rw [hpZ] at hboundZ
+    have hw1Z : (2 : ℤ) ≤ w₁ := by exact_mod_cast hw1
+    have hkZ : (1 : ℤ) ≤ k := by exact_mod_cast hkpos
+    have hkle : (k : ℤ) ≤ 1 := by
+      nlinarith [hboundZ, hw1Z, hkZ, mul_nonneg (by linarith : (0:ℤ) ≤ (w₁:ℤ) - 2)
+        (by nlinarith : (0:ℤ) ≤ (k:ℤ)^2 - 1), sq_nonneg ((k:ℤ) - 1)]
+    omega
+  subst hk1
+  constructor
+  · omega
+  · omega
+
+/-- **Peterfalvi (10.10.1)--(10.10.4)**: if Hypothesis (10.1) holds with `M` of type V, then the
+type-V parameter calculation forces `S` to be coherent.
+
+De-scaffolded: the conclusion is now the *genuine* coherence `Nonempty (IsCoherent τ S A₀)` only,
+dropping the former opaque `typeV_parameter_formula`/`typeV_coherence_formula : Prop` conjuncts
+(unprovable for generic `params`; producers set them `True`).  The remaining `sorry` is the honest
+(10.10.1)–(10.10.4) coherence argument: case (a) of Def (8.7) gives coherence by (6.8); case (b) is
+excluded by (6.5.c); case (c) (`|H| = p³`, `w₁ ∣ p+1`) runs the parameter calculation
+(`typeV_param_arithmetic` gives `p = 2w₁−1`, then `d = p`, `δ = −1`, `n = 2`) and the σ-grid column
+identities (reusing the (11.8) `muGrid`/`alignedOmegaSigmaGrid`/coherent-extension machinery).
+Gated on the §6/§8 coherence inputs (6.5.a/6.8) and the type-V `|H| = p³` structure. -/
 theorem typeV_forces_coherence [Finite G] [Fintype G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Fintype ↥M]
     [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
     {hyp : Hypothesis M} (hV : IsTypeV M) (params : CharacterParameters hyp) :
-    params.typeV_parameter_formula ∧ params.typeV_coherence_formula ∧
-      Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A0) := by
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A0) := by
   sorry
 
 open scoped FiniteInduce in
@@ -3923,7 +3973,7 @@ theorem no_typeV_maximal [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
   rintro ⟨M, hMmax, hMV⟩
   obtain ⟨hyp⟩ := exists_hypothesis_of_typeIIIorIVorV hG hMmax (Or.inr (Or.inr hMV))
   obtain ⟨params, -⟩ := w2_prime_and_parameter_independence hG hyp
-  exact S_not_coherent hG hyp (typeV_forces_coherence hG hMV params).2.2
+  exact S_not_coherent hG hyp (typeV_forces_coherence hG hMV params)
 
 /-- The case-(b) data in Peterfalvi (8.8), used in the remark (10.11). -/
 structure Theorem88CaseBData (G : Type*) [Group G] where

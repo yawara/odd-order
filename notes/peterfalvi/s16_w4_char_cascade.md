@@ -1648,3 +1648,31 @@ ungated** と判明し、新 leaf `S16_GridExpansion.lean` に実証明化 (2 co
 
 **教訓**: 「ungated solo なし」評価は §単位で route を尽くしてから (難所回避せず §3 全体を
 精査したら丸ごと未形式化だった)。memory ft-four-fronts の c 節「残は上流供給待ちのみ」を訂正済。
+
+### cont.⁵⁹ (2026-07-05 lane c /loop) — 🎯 (13.19.b) engine を spine 消費 + caseB_expansion_input sorry-free 化 (2 gate 分離)
+
+cont.⁵⁸ で S16_GridExpansion に engine (`eta_orthogonal_of_norm_one_pair_vanish` = (13.19.b))
+を実証明したが **未消費** (grep で 0 consumer 確認)。本 iteration で spine
+(caseB_expansion_input :4709 の monolithic sorry) に初めて結線 (commit `24fa9a76`):
+
+- **`caseB_eta_orthogonal_psi` (PROVEN)**: M-side 直交 ⟨η_ij, ψ^{τ₁}=ζ_M^ν⟩=0。engine の
+  6 入力全て TypeICoherent78Data (S16_PairingCoherence) から供給 —
+  `nu_zeta_norm_one` (unit-norm) / `nu_zeta_inner_nu_conj_eq_zero` (共役直交) /
+  `coh.extension_mem_ZIrr`∘`zeta_mem_Sset` (ZIrr) / `nu_zeta_sub_conj_support_at`
+  (support ⊆ dadeSupport) + hDadeAvoid で Ŵ^G-vanishing。`exists_conjIndex_at` で ζ̄ 同定。
+  ⟹ cont.⁵⁸ が予告した「horth は engine に帰着」を Lean 実装完了。
+- **caseB_expansion_input → sorry-free** (signature 不変; 下流 caseB_contradiction_data /
+  caseB_character_contradiction / …/:5105 は無変更で受益)。monolithic 1 sorry を分解:
+  - `mSide_dadeSupport_avoids_regular` (sorry, **(13.19.a)**): Ã(M)∩Ŵ^G=∅。faithful
+    (`nc.not_conj` 必須 — M が S/T 共役なら偽)。**深い gate**: BG §10 σ-decomposition
+    (Coq `FT_Dade_support_partition` = 別極大の Fitting 素集合互いに素)。S16_G0Coprime の
+    P#/Q# coprimality と同族だが M-side は別極大ゆえ新規 (cont.⁵⁸ の gate 1)。
+  - `lSide_signed_eta_expansion` (sorry, **(13.19.c)**): β_L^τ=Σ±η_ij−εζ_i^ν の grid counting。
+- S16_NonExistenceG 実 sorry 7→8 (opaque 1 → precise 2; engine proven)。full build 3929
+  green (18.6s)、AxiomsCheck OK。
+
+**次 frontier (上流優先 = 深い方から)**: **(13.19.a) `mSide_dadeSupport_avoids_regular`**
+が最深の genuine ungated math (BG §10 σ-decomposition、S16_G0Coprime の技法を M-side 別極大に
+拡張)。着手経路 = Coq `FT_Dade_support_partition`/`coHr` 精読 → Ã(M)=dadeSupport の Fitting
+素集合 vs W^G⊆(S∪T)^G の disjointness を nc.not_conj から。次点 = (13.19.c) lSide grid
+counting (issue 3002 sphere、grid 係数 enumerate)。両 gate とも c 所有・ungated。
