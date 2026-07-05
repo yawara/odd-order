@@ -125,6 +125,22 @@ structure Hypothesis where
   Q_eq_TF : Q = maxNilpotentNormalHall T
   S_deriv_eq_PU : derivedInG S = P ⊔ U
   T_deriv_eq_QV : derivedInG T = Q ⊔ V
+  /-- **Peterfalvi (13.1.b)/(13.2), T-side complement disjointness**: `Q ⊓ V = ⊥`.  The κ-Hall
+  invariant complement `V` to `Q = T_F` in `T'` genuinely *complements* `Q` — a fact available
+  ungated at the §16 construction (`exists_kappaHall_invariant_complement_to_MF` returns
+  `M_F ⊓ U = ⊥` from `T`'s type-`P` structure, i.e. from `T_nonI`, **not** requiring (14.9)/`IsTypeP2 T`),
+  but dropped by the abstract `T_deriv_eq_QV` (`T' = Q ⊔ V`, which alone does not force disjointness).
+  Threading it exposes the T-side linchpin used by every V-side coprimality/complement argument
+  (`isMulCommutative_V`, `coprime_card_V_card_Q_of_disjoint`, …), previously routed circularly through
+  the sorried `reconciled_typePData_T` (`Q_inf_V_eq_bot_of_reconciled`). -/
+  Q_inf_V_eq_bot : Q ⊓ V = ⊥
+  /-- **Peterfalvi (13.1.b), T-side semidirect complement `T = T' ⋊ W₂`**: the cyclic factor `W₂`
+  complements the derived subgroup `T'` in `T`.  Available ungated at the §16 construction from
+  `typeP_derivedInG_isComplement_kappaHall` (BG 14.7(h), via `T`'s type-`P` structure `T_nonI`,
+  **not** (14.9)); the abstract Hypothesis otherwise omits it.  Discharges the `M_complement` field
+  of `reconciled_typePData_T` and lets the ungated `coprime_card_Q_card_VW2` build honestly. -/
+  W2_isComplement_T_deriv :
+    Subgroup.IsComplement' ((derivedInG T).subgroupOf T) (W2.subgroupOf T)
   C_eq : C = U ⊓ Subgroup.centralizer (P : Set G)
   D_eq : D = V ⊓ Subgroup.centralizer (Q : Set G)
   W1_normalizes_U : W1 ≤ Subgroup.normalizer (U : Set G)
@@ -2875,10 +2891,37 @@ theorem reconciled_typePData_T [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd 
       rw [hyp.q_eq_card_W1, h, Subgroup.card_bot] at hq; exact absurd hq (by norm_num)
     W1_cyclic := hW2cyc
     W2_cyclic := hW1cyc
-    M_complement := sorry
+    -- `T = T' ⋊ W₂`: the honest field `W2_isComplement_T_deriv` (ungated, threaded from the §16
+    -- `typeP_derivedInG_isComplement_kappaHall`).  No longer `sorry`.
+    M_complement := hyp.W2_isComplement_T_deriv
     W1_normalizes_U := hyp.W2_normalizes_V
     U_nilpotent := sorry
-    derived_complement := sorry
+    -- `V` complements `Q = T_F` in `T'`: disjointness is the honest field `Q_inf_V_eq_bot`
+    -- (ungated, threaded from the §16 `exists_kappaHall_invariant_complement_to_MF`); the join
+    -- `Q ⊔ V = T'` is `T_deriv_eq_QV`.  No longer `sorry`.
+    derived_complement := by
+      have hQ_le : hyp.Q ≤ derivedInG hyp.T := by rw [hyp.T_deriv_eq_QV]; exact le_sup_left
+      have hV_le : hyp.V ≤ derivedInG hyp.T := by rw [hyp.T_deriv_eq_QV]; exact le_sup_right
+      have hM'_le_T : derivedInG hyp.T ≤ hyp.T := Subgroup.map_subtype_le _
+      have hT_le_NQ : hyp.T ≤ Subgroup.normalizer (hyp.Q : Set G) := by
+        rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.T
+      haveI hQn_normal : (hyp.Q.subgroupOf (derivedInG hyp.T)).Normal :=
+        (Subgroup.normal_subgroupOf_iff_le_normalizer hQ_le).mpr (hM'_le_T.trans hT_le_NQ)
+      refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
+      · rw [disjoint_iff]
+        ext ⟨x, hx⟩
+        simp only [Subgroup.mem_inf, Subgroup.mem_subgroupOf, Subgroup.mem_bot, Subtype.ext_iff,
+          OneMemClass.coe_one]
+        refine ⟨fun ⟨hxQ, hxV⟩ => ?_, fun h => by simp [h]⟩
+        have hxQV : x ∈ (hyp.Q ⊓ hyp.V : Subgroup G) := ⟨hxQ, hxV⟩
+        rwa [hyp.Q_inf_V_eq_bot, Subgroup.mem_bot] at hxQV
+      · have hsup : (hyp.Q.subgroupOf (derivedInG hyp.T)) ⊔
+            (hyp.V.subgroupOf (derivedInG hyp.T)) = ⊤ := by
+          rw [← Subgroup.subgroupOf_sup hQ_le hV_le, hyp.T_deriv_eq_QV.symm, Subgroup.subgroupOf_self]
+        have hmul := Subgroup.normal_mul (hyp.Q.subgroupOf (derivedInG hyp.T))
+          (hyp.V.subgroupOf (derivedInG hyp.T))
+        rw [hsup, Subgroup.coe_top] at hmul
+        exact hmul.symm
     H_noncyclic := by
       -- `H := Q = maxNilpotentNormalHall T` is the *intrinsic* Fitting Hall (choice-independent),
       -- so `¬ IsCyclic ↥Q` is read off any type-`P` datum on `T`.  The §13-level producer
