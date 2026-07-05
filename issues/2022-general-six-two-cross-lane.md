@@ -599,3 +599,9 @@ coeff (X ∈ ℤ[R]) / Y ⊥ R。
   さらに bridge-family 側 (inducedKernelFamily K B の可約 member) から
   sOf-H₀-membership への還元 (可約 Ind θ は自動的に S(H₀)-member —
   (9.8.a); 要確認/形式化) を挟んで named 2 点の ψ-列同定が完了する。
+
+## 2026-07-05 lane-a (loop 40): (9.8) 分類 public 抽出完了
+
+- reducible_mem_sOf_H0_eq_muGrid_columnSum 閉 (build green)。
+  ψ-列同定の主部品完成。残 = family-bridge (inducedKernelFamily ↔ sOf) +
+  ofProjection 組み立て。
