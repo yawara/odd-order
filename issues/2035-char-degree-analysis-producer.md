@@ -360,3 +360,17 @@ secondDerived_le_fitting / fitting_eq / centralizer_W1 — いずれも §14 gat
 (`IsTypeP2 T` = (14.9)) の T 型-`P₂` σ-structure。ungated complement facts は出し切った。
 次: これら残 5 は (14.9) 必須ゆえ、B-lane の ungated genuine math は別 frontier へ
 (S-side (13.3.b) λ 存在 or deep §13 char の complement_inf_Q/P (13.17.c) 調査)。
+
+## ✅ P_elementaryAbelian (S-instance, 13.2.b/11.7) 実証明 (it.91, 2026-07-05, commit 65b840a9)
+
+T-carrier complements 出し切り後、別 ungated frontier: `basic_structure_gated.P_elementaryAbelian`
+(`P = S_F` elementary abelian exp p) を honest 化。§11 chief-factor data (S-instance) から組立:
+`exists_chiefFactorData (toTypesIIIIIIVSetupS)` → N=⊥ (`toTypesIIIIIIVSetupS_chief_N_eq_bot` 既証)
+→ P 自体が chief factor → `quotient_elementaryAbelian` (chief.p=p, |P|=p^q 強制) を
+↥H⧸⊥ ≃* ↥H で transport → H=P。**ungated** (S-instance H₀=⊥ は既証、a-lane generic
+`chief_H0_eq_bot` sorry と別)。新 `Hypothesis.P_elementaryAbelian` は sorry-free。
+`basic_structure_gated`: 2→1 sorry (残 `u_bound` = 2u≤|P|-1 = issue 9000 σ-producer)。
+
+**session 累計 (it.89-91, 4 commits)**: T-carrier 7→5 sorry (Q⊓V + T=T'⋊W₂) + isMulCommutative_V/
+coprime_card_Q_card_VW2 完全 honest + P_elementaryAbelian。次 ungated 候補 (fresh 調査要):
+u_bound (9000 σ 依存の可能性) or chief-factor パターンの他 S-instance facts への波及。

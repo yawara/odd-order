@@ -696,6 +696,77 @@ theorem exists_exponent_fun_of_card_prime {Γ A : Type*} [Group Γ] [Group A] {p
     calc s ^ e v = s ^ 1 := hfin.pow_eq_pow_iff_modEq.mpr hmods
       _ = s := pow_one s
 
+/-- **Case (a) exponent reduction** (Peterfalvi (11.7), the `phi = 1` step abstracted): if `U`
+acts on the order-`p` subgroup `S₀ ≤ H̄` (`hmem`), `|U|` is odd, and there is an odd-order
+automorphism `σ` of the acting `U`-group whose conjugate action *inverts* the `v`-action on `S₀`
+— the chain relation `(φ v) ∘ (φ (σ v)) = id` on `S₀` — then `U` fixes `S₀` pointwise.
+
+This wires the exponent morphism `e : U → ℤ/p` (`exists_exponent_fun_of_card_prime`) to
+`chain_exponent_eq_one`: the chain relation gives `e(v)·e(σ v) ≡ 1 (mod p)` (both actions are
+exponentiations, and `S₀` is cyclic of order `p`), so `e ≡ 1`, i.e. `φ v` fixes `S₀`.  The chain
+relation is Peterfalvi's `phi_{w_1}(u)·phi_{w_2}(u) = 1`, the antisymmetry of the commutator form
+`D`; supplying it (with `σ` the `W₁`-generator's inverse-conjugation action on `U`) discharges the
+`hfix` obligation of `caseA_fixed_contradiction`. -/
+theorem caseA_fixes_of_action_chain [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    {S₀ : Subgroup (↥data.H ⧸ chief.N)} (hcardS₀ : Nat.card ↥S₀ = chief.p)
+    (hmem : ∀ (v : ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))),
+      ∀ s ∈ S₀, quotientMulAutHom chief.N_aInvariant ↑v s ∈ S₀)
+    (hAodd : Odd (Nat.card ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))))
+    (σ : MulAut ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
+    {m : ℕ} (hmodd : Odd m) (hσm : σ ^ m = 1)
+    (hchain : ∀ (v : ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))),
+      ∀ s ∈ S₀, quotientMulAutHom chief.N_aInvariant ↑v
+        (quotientMulAutHom chief.N_aInvariant ↑(σ v) s) = s) :
+    ∀ (v : ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))),
+      ∀ s ∈ S₀, quotientMulAutHom chief.N_aInvariant ↑v s = s := by
+  classical
+  haveI := Fact.mk chief.p_prime
+  -- the `U`-action morphism `φ : A →* MulAut (H̄)`
+  set φ : ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) →*
+      MulAut (↥data.H ⧸ chief.N) :=
+    (quotientMulAutHom chief.N_aInvariant).comp
+      (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype with hφ
+  have hφv : ∀ v, φ v = quotientMulAutHom chief.N_aInvariant ↑v := fun _ => rfl
+  obtain ⟨e, hep, he, hemul, hefix⟩ :=
+    exists_exponent_fun_of_card_prime chief.p_prime hcardS₀ φ
+      (fun v s hs => by rw [hφv]; exact hmem v s hs)
+  set f : ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) → ZMod chief.p :=
+    fun v => (e v : ZMod chief.p) with hf
+  have hne : ∀ v, f v ≠ 0 := fun v h =>
+    hep v ((CharP.cast_eq_zero_iff (ZMod chief.p) chief.p (e v)).mp h)
+  -- `S₀` is cyclic of order `p`; fix a generator `g`
+  haveI hfin : Finite ↥S₀ := Nat.finite_of_card_ne_zero (hcardS₀ ▸ chief.p_prime.pos.ne')
+  haveI : IsCyclic ↥S₀ := isCyclic_of_prime_card hcardS₀
+  obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := ↥S₀)
+  have hgS : (g : ↥data.H ⧸ chief.N) ∈ S₀ := g.2
+  have hordg : orderOf (g : ↥data.H ⧸ chief.N) = chief.p := by
+    have h := orderOf_injective S₀.subtype S₀.subtype_injective g
+    rw [show S₀.subtype g = (g : ↥data.H ⧸ chief.N) from rfl] at h
+    rw [h, orderOf_eq_card_of_forall_mem_zpowers hg, hcardS₀]
+  have hgfin : IsOfFinOrder (g : ↥data.H ⧸ chief.N) := by
+    rw [← orderOf_pos_iff, hordg]; exact chief.p_prime.pos
+  -- the chain relation `f v · f (σ v) = 1`
+  have hrel : ∀ v, f v * f (σ v) = 1 := by
+    intro v
+    have hσvS := hmem (σ v) _ hgS
+    have e1 : quotientMulAutHom chief.N_aInvariant ↑(σ v) (g : ↥data.H ⧸ chief.N)
+        = (g : ↥data.H ⧸ chief.N) ^ e (σ v) := by rw [← hφv (σ v)]; exact he (σ v) _ hgS
+    have hstep := hchain v (g : ↥data.H ⧸ chief.N) hgS
+    rw [e1, ← hφv v, map_pow, he v _ hgS, ← pow_mul] at hstep
+    have hmodp : e v * e (σ v) ≡ 1 [MOD chief.p] := by
+      have hpow : (g : ↥data.H ⧸ chief.N) ^ (e v * e (σ v)) = (g : ↥data.H ⧸ chief.N) ^ 1 := by
+        rw [pow_one]; exact hstep
+      have h := hgfin.pow_eq_pow_iff_modEq.mp hpow
+      rwa [hordg] at h
+    have h1 : ((e v * e (σ v) : ℕ) : ZMod chief.p) = ((1 : ℕ) : ZMod chief.p) :=
+      (ZMod.natCast_eq_natCast_iff _ _ _).mpr hmodp
+    simpa [hf, Nat.cast_mul] using h1
+  -- conclude
+  intro v s hs
+  have hf1 : f v = 1 := chain_exponent_eq_one f (fun u v => hemul u v) hne hAodd σ hmodd hσm hrel v
+  rw [← hφv v]; exact hefix v hf1 s hs
+
 end CaseA
 
 end OddOrder.Peterfalvi.S13
