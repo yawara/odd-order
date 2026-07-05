@@ -1342,4 +1342,64 @@ theorem Hypothesis.card_SHCSet_filter_eq_charParam_n [Finite G]
   -- equality) closes this without new mathematics.  See `notes/peterfalvi/s13_11_8_orthogonality.md`.
   sorry
 
+/-- **Structural index identity for the (11.8.1) count**: `|M'|·|C| = |HC|·|U|`, where
+`C = U ⊓ C_G(H)` and `HC = H ⊔ C`.  Since `M' = H ⋊ U` (`derived_complement`; `H ⊴ M'`,
+`H ⊓ U = ⊥`) we have `|M'| = |H|·|U|`, and `HC = H ⋊ C` (`C ≤ U`, same disjointness) gives
+`|HC| = |H|·|C|`.  Rearranged this is `[M' : HC] = [U : C]` — the structural half of
+`|M'/M''| = |U/C|` (with (11.5) `M'' = HC`) feeding the count. -/
+theorem typePData_card_derived_mul_card_C_eq [Finite G] {M : Subgroup G} (data : TypePData M) :
+    Nat.card ↥(derivedInG M)
+      * Nat.card ↥(data.U ⊓ Subgroup.centralizer (data.H : Set G))
+      = Nat.card ↥(data.H ⊔ (data.U ⊓ Subgroup.centralizer (data.H : Set G)))
+        * Nat.card ↥data.U := by
+  classical
+  set C := data.U ⊓ Subgroup.centralizer (data.H : Set G) with hCdef
+  have hCleU : C ≤ data.U := inf_le_left
+  have hHleM' : data.H ≤ derivedInG M := data.H_le
+  have hCleM' : C ≤ derivedInG M := hCleU.trans data.U_le
+  have hM'leM : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  -- `H ⊓ U = ⊥` from the complement `M' = H ⋊ U`
+  have hHUbot : data.H ⊓ data.U = ⊥ := by
+    have hd : (data.H ⊓ data.U).subgroupOf (derivedInG M) = ⊥ := by
+      have h1 : (data.H ⊓ data.U).subgroupOf (derivedInG M)
+          = data.H.subgroupOf (derivedInG M) ⊓ data.U.subgroupOf (derivedInG M) :=
+        Subgroup.comap_inf _ _ _
+      rw [h1]; exact disjoint_iff.mp data.derived_complement.disjoint
+    have hle : data.H ⊓ data.U ≤ derivedInG M := inf_le_left.trans data.H_le
+    rw [Subgroup.subgroupOf_eq_bot, disjoint_iff, inf_of_le_left hle] at hd
+    exact hd
+  -- `C ⊓ H = ⊥`
+  have hCHbot : C ⊓ data.H = ⊥ := by
+    refine le_bot_iff.mp ?_
+    calc C ⊓ data.H ≤ data.U ⊓ data.H := inf_le_inf_right _ hCleU
+      _ = data.H ⊓ data.U := inf_comm _ _
+      _ = ⊥ := hHUbot
+  -- `|M'| = |H|·|U|`
+  have hHU : Nat.card ↥data.H * Nat.card ↥data.U = Nat.card ↥(derivedInG M) := by
+    have h := data.derived_complement.card_mul
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.H_le).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.U_le).toEquiv] at h
+  -- `H ⊴ M'`
+  haveI hHn : (data.H.subgroupOf (derivedInG M)).Normal := by
+    refine (Subgroup.normal_subgroupOf_iff_le_normalizer data.H_le).mpr ?_
+    have hnM : M ≤ Subgroup.normalizer (data.H : Set G) := by
+      rw [data.H_eq]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer M
+    exact hM'leM.trans hnM
+  -- `|HC| = |H|·|C|`, via disjoint-normal card in `↥M'`
+  have hHC : Nat.card ↥(data.H ⊔ C) = Nat.card ↥data.H * Nat.card ↥C := by
+    have hdisj : C.subgroupOf (derivedInG M) ⊓ data.H.subgroupOf (derivedInG M) = ⊥ := by
+      have h1 : (C ⊓ data.H).subgroupOf (derivedInG M)
+          = C.subgroupOf (derivedInG M) ⊓ data.H.subgroupOf (derivedInG M) :=
+        Subgroup.comap_inf _ _ _
+      rw [← h1, hCHbot, Subgroup.bot_subgroupOf]
+    have hcard := OddOrder.BG.Ch1.S01.card_sup_eq_card_mul_card_of_disjoint_normal
+      (T := C.subgroupOf (derivedInG M)) (M := data.H.subgroupOf (derivedInG M)) hdisj
+    rw [← Subgroup.subgroupOf_sup hCleM' hHleM',
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe (sup_le hCleM' hHleM')).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hCleM').toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHleM').toEquiv, sup_comm] at hcard
+    rw [hcard, Nat.mul_comm]
+  rw [← hHU, hHC]
+  ring
+
 end OddOrder.Peterfalvi.S12

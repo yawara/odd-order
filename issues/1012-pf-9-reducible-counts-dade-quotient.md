@@ -2108,3 +2108,45 @@ tau/H0CprimeSupport/quotientSemidirectFrobenius は degree-irrelevant (placehold
 **capstone (11.8) 全体**: exists_zeta_residual_not_orthogonal は sorry-free wired、残 = charParam_d_modEq_one
 + card_SHCSet_filter_eq_charParam_n (両 = 本 issue の correspondence/injectivity) + coherent_Sset_of_column_identities
 (τ₂ union、別 gate: S₂ coherence 9.11 = coherent_H0C_commutator on genuine chars)。
+
+## 2026-07-05 update¹⁴ (lane-a, opus) — (11.8.1) count 大幅前進 + S12→S13 producer linchpin landed
+
+**(11.8.1) `|S(HC)| = n` count を軌道数え上げで実質証明化** (全 sorry-free、7 commits):
+- **軌道数え上げ核** (`card_abelianization_derived_eq_w1_mul_card_SHCSet_add_one`, S12_Section9Counts):
+  `|M'^{ab}| = w₁·|S(HC)| + 1`。非自明 linear char θ of M' は induce 既約 (`inertia_eq_derived_of_linear`
+  を S13_SixTwoBridge→S12_Section9Counts へ上流移動 + [Is]6.34)、degree-w₁ 既約 member は全て linear source を
+  持ち、各 member は自由共役軌道 (size w₁=[M:M']) で hit される (`card_filter_induce_eq_index_inertia`)。
+  linear char 数 = `|M'^{ab}|` は Pontryagin (`card_filter_degree_one_eq_card_abelianization`)。
+- **算術リダクション** (`card_SHCSet_filter_eq_charParam_n_of_card_abelianization_eq`, sorry-free):
+  `|M'^{ab}| = d` ∧ δ=1 ⟹ `|S(HC)| = n` (軌道数 + n_formula `n·w₁=d−1` で w₁ 相殺)。
+- **`charParam_d_eq_u`** (d=u=|Ū|) を公開補題として抽出。`card_SHCSet_filter_eq_charParam_n` の残 sorry は
+  **単一の `|M'/M''| = params.d`** に精密化 (S12_Section9Counts、δ=±1 を hδpm で threading)。
+
+**根本発見 = (11.5)/(11.8) の repo 順序逆転**: 教科書では (11.5)`M''=HC` は (11.8) の上流だが、repo では
+`secondDerived_eq_HC` (11.5) が S13 (S12 の下流) にあり、(11.8) capstone `exists_zeta_residual_not_orthogonal`
+(S12) から cite 不可。さらに **S13.Hypothesis の producer が皆無** = §13 (11.1-11.7) 理論全体が spine 未接続だった。
+
+**✅ linchpin landed: `S13.exists_hypothesis_of_isTypeIIIorIV`** (S13_MaximalIII_IV、sorry-free、commit 58b3631f):
+S12.Hypothesis(type III/IV) → S13.Hypothesis。全フィールド構成 (params=exists_charParameters_full を
+proof-irrel で ∀hG hodd 化、chief=exists_chiefFactorData.choose、**C_normalized_by_M=`typePData_C_normalized_by_M`**
+= 本セッションで証明した最難フィールド、C=U⊓C_G(H) rfl、formula は placeholder)。⟹ §13 全体 (11.5/11.7 含む) が
+spine から reachable に。
+
+## 次手 (count gate 閉包の完全レシピ、producer 後の残り)
+
+**(11.8) capstone を S13 下流へ re-home して count を閉じる**:
+1. **新 leaf `S13_Orthogonality.lean`** (import S13_MaximalIII_IV): `exists_zeta_residual_not_orthogonal` +
+   `w2_lt_w1_of_hypothesis` を S12_MaximalIII_IV_V から移設 (S12 の補題は cite; τ₂ `coherent_Sset_of_column_identities`
+   は依然 sorry で別 gate)。FeitThompson は新 leaf を import。
+2. **供給補題 `|M'^{ab}| = params.d`** (S13_Orthogonality 内 or S13、producer 経由):
+   - `secondDerived_eq_HC` (11.5): M'' = HC = H ⊔ (U⊓C_G(H))。
+   - **構造 iso `|M'/HC| = |U/C|`** (S12 structural、要新規): M'=H⋊U (`derived_complement`)、H⊴M'、H⊓U=⊥、
+     C≤U ⟹ HC/H≅C ⟹ M'/HC ≅ U/C。
+   - **(11.7) H₀=1** (`core_structure`) で C_U(H̄)=C_U(H)=C ⟹ `|Ū| = |U/C|`、+ `charParam_d_eq_u` (d=u=|Ū|)
+     ⟹ `|M'^{ab}| = |M'/M''| = |M'/HC| = |U/C| = |Ū| = u = d`。
+   - `card_SHCSet_filter_eq_charParam_n_of_card_abelianization_eq` に流して count 閉包。
+3. これで **spine gate 2 本中 count が閉じる** (残 = τ₂ `coherent_Sset_of_column_identities` = (9.11)/(6.8) coherence)。
+
+**注意**: params は existential ゆえ S12版 params.d と producer版 s13.params.d の同一性は degree_independent+params_mu_eq
+で follow (両 = muGrid 列 degree)。供給補題は re-home 後の `exists_zeta_residual` 内 params に対して直接証明するのが
+安全 (params 選択の二重化を避ける)。
