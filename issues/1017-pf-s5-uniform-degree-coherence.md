@@ -151,3 +151,18 @@ Snorm/sumnS 次数和不等式) が **repo 未在**。これが (13.3) coherent_
 full induction 不要で `coherent_subset_of_constant_degree` (landed) から**直接**閉じる可能性。要 lane-a 確認
 (T2 degree-uniformity は lane-b から未検証)。**⟹ 次: (a) lane a が T2 uniform で (10.7) を直接 close 試行、
 (b) sumnS norm chain を実装 (full (9.11) 用、shared)。** hub 裁定: sumnS chain の owner。
+
+## 2026-07-06 更新 #4 (lane b, subagent) — sumnS/Snorm quantity + extend_coherent 整数強制 bridge landed (sorry-free)
+
+**verify-first で前提を 1 つ訂正**: 「sumnS norm chain は repo 未在」は**部分的に誤り**だった (本セッション 3 度目の Coq 名 grep 見落とし class)。
+- **Snorm/sumnS の名前** は確かに未在 → 本更新で導入。
+- **extend_coherent の正方向 engine は既存・sorry-free** = `xAdjoinStepW` (S08_CoherenceWeighted:287): `hDeg : 2·a < ∑ᵢ deg(i)²/mc(i)` から `coherent(S₁∪{χ,χ̄})` を産む = Peterfalvi (5.6) = Coq `extend_coherent_with`。その contrapositive = `coherentDegreeSqNormBound_of_not_coherentW` (:635)、raw-degree `sumnS` bound `∑ᵢ χᵢ(1).re²/‖χᵢ‖² ≤ 2·ψ(1).re·η(1).re` は §8 case-B family 用に `sMember_degreeSqNormReBound_of_not_coherent` (S08_CaseBEnumeration:1080) が既に組んでいる。
+
+**landed (S07_Subcoherent.lean、+164 行、sorry-free、`#print axioms`=標準3公理のみ、`lake build OddOrder` GREEN 3932 jobs)**:
+- `Snorm ψ := (ψ 1).re²/⟨ψ,ψ⟩.re` (Coq `Snorm`, PFsection9:1534) + `sumnS Si := ∑_{ψ∈Si} Snorm ψ` (Coq `sumnS`, :1535)。
+- `Snorm_nonneg`/`sumnS_nonneg`/`sumnS_empty`/`sumnS_le_of_subset` (= Coq `lbS1'2` の (9.11.6) `S1'⊆S2` 単調性)。
+- **`sumnS_image_eq_anchorSq_mul`** = raw↔normalized 橋 `sumnS = η²·∑(deg²/mc)` (§8 が inline 重複していた calc を factor out; これが raw `sumnS` squeeze を `xAdjoinStepW` の normalized `hDeg` に繋ぐ load-bearing piece)。
+- **`two_mul_lt_normalizedDegreeSq_of_lb0_lt_sumnS`** = extend_coherent 発火 precondition: `lb0=2·a·η² < sumnS` から `2·a < ∑(deg²/mc)` を導く (η²>0 で cancel)。
+- `lb0_le_lb1_of_degreeRatio_le` = (9.11) 底 squeeze step (Coq `lb01`) の純算術単調性。
+
+**残り (= assembly、analytic gap は解消)**: (9.11.2-9.11.5) 中間 squeeze `lb1≤lb2≤lb3≤sumnS S1'` (Coq `lb12`/`lb23`/`lb3S1'`) は ℕ-index 算術 (`two_mul_lt_sq_of_commonIndex_primePower_gap` S07:1986 + Nat index lemmas、中規模・機械的)。(9.11.1/7/8) は `coherentPairChain` を §9 induced-family Dade witnesses に対して fold (per-step `Dmem`/`hmemOrtho`/`hgen` を、§8 case-B の `sMember_degreeSqNormBound_of_not_coherent` と同型で、§9 `S_ H0C'` family 用に組む)。**⟹ (13.3) `coherent_H0Cprime_S` の sibleyTarget_H0C 置換 + (10.7) `typeII_derived_frobenius` は、§9 induced-family witnesses を thread する 1 focused multi-step session で到達圏内** (analytic content は landed、残るは family-specific 組み立て)。

@@ -330,12 +330,180 @@ of the uniform base.  Precise remaining steps to fully replace `sibleyTarget_H0C
    sorry-free**; the **missing analytic content** is each step's `hstep` data — the (5.6.2)
    integer-forcing `hY : Da.Y = a•Da.tau1 χ₁`, discharged in (9.11) by the norm chain
    `lb0 ≤ … ≤ sumnS S2 ≤ lb0` (Peterfalvi's `extend_coherent` + the `Snorm`/`sumnS` degree-sum
-   bounds).  This norm chain is **not yet in the repo** (the (6.6) chain uses the simpler
-   `two_mul_lt_sq_of_primePow_gap` gap, not the (9.11) `sumnS` arithmetic).
+   bounds).  **UPDATE 2026-07-06: this norm chain is now landed sorry-free in the `Snorm`/`sumnS`
+   section below** (`Snorm`/`sumnS`/`sumnS_image_eq_anchorSq_mul`/
+   `two_mul_lt_normalizedDegreeSq_of_lb0_lt_sumnS`/`lb0_le_lb1_of_degreeRatio_le`), with the
+   `extend_coherent` positive engine identified as the pre-existing sorry-free `xAdjoinStepW`
+   (`S08_CoherenceWeighted.lean:287`).  What remains is the (9.11.1)-(9.11.8) *assembly* — see the
+   section's closing outline.
 
-This norm chain is the single genuine gap for both (13.3) [lane b] and (10.7)
+This norm chain was the single genuine analytic gap for both (13.3) [lane b] and (10.7)
 `typeII_derived_frobenius` [lane a], which consumes the same (9.11) coherence on its 4-element T2
 family.  **If that T2 family is uniform-degree, base case (2) may close (10.7) directly, without the
 full induction — worth checking lane-a-side.**  Tracking = issue 1017. -/
+
+/-! ### The `Snorm`/`sumnS` degree-square-over-norm quantity and the (9.11) `extend_coherent` core
+
+**Peterfalvi (9.11) norm chain (Coq `Ptype_core_coherence`, `PFsection9.v:1484-1560`).**  The
+non-Galois case of (9.11) runs the pair-adjoining induction (`coherentPairChain`,
+`S07_Coherence.lean:4907`); each step's (5.6.2) integer-forcing `hY : Da.Y = a • Da.tau1 χ₁`
+(the hypothesis of `retarget_isCoherent_of_decompositions_and_memberFamily`, `S07_Coherence.lean:4083`)
+is discharged in Coq by the **squeeze**
+
+`lb0 ≤ lb1 ≤ lb2 ≤ lb3 ≤ sumnS S1' ≤ sumnS S2 ≤ lb0`  (Coq `lb01`/`lb12`/`lb23`/`lb3S1'`/`lbS1'2`),
+
+where `Snorm ψ = ψ(1)²/'[ψ]` and `sumnS Si = ∑_{ψ ∈ Si} Snorm ψ`, and the adjoining fires via
+`extend_coherent` (Coq `PFsection5.v:1124`) the moment `lb0 < sumnS S2`.
+
+**Verify-first (2026-07-06 lane-b):**
+* The **`Snorm`/`sumnS` name** is genuinely absent from the repo (grep of the Coq names returns
+  nothing); this section introduces it.
+* The underlying **quantity** `∑ᵢ ψᵢ(1).re²/'[ψᵢ].re` and the `extend_coherent` **positive engine**
+  are *not* absent.  The Peterfalvi (5.6) extension `extend_coherent`/`extend_coherent_with` is the
+  landed, sorry-free `xAdjoinStepW` (`S08_CoherenceWeighted.lean:287`): given the anchor-normalized
+  bound `hDeg : 2·a < ∑ᵢ deg(i)²/mc(i)` it produces coherence of `S₁ ∪ {χ, χ̄}`.  Its contrapositive
+  is `coherentDegreeSqNormBound_of_not_coherentW` (`:635`), and the raw-degree `sumnS` bound
+  `∑ᵢ χᵢ(1).re²/‖χᵢ‖² ≤ 2·ψ(1).re·η(1).re` is already assembled for the §8 case-B family as
+  `sMember_degreeSqNormReBound_of_not_coherent` (`S08_CaseBEnumeration.lean:1080`).
+
+So the (9.11) content still missing is **(i)** the named `Snorm`/`sumnS` quantity, **(ii)** the
+*raw↔normalized* rescaling bridge `sumnS = anchorDeg²·(∑ deg²/mc)` (the `calc` currently duplicated
+inline at `S08_CaseBEnumeration.lean:1118-1125`/`1170-1177`), and **(iii)** the (9.11) squeeze base
+step `lb0 ≤ lb1` and the `extend_coherent`-firing precondition `lb0 < sumnS ⟹ 2·a < ∑ deg²/mc`.
+This section lands (i)-(iii) sorry-free; the (9.11.2)-(9.11.8) family-specific squeeze steps
+(`lb12`/`lb23`/`lb3S1'`, which pin down `C = U'` and the exact `|S1|`) remain, and are outlined at
+the end of the section. -/
+
+/-- **Peterfalvi (9.11): the degree-square-over-norm weight `Snorm ψ = ψ(1)²/'[ψ]` (real form).**
+
+Coq `PFsection9.v:1534` `pose Snorm (psi : 'CF(M)) := psi 1%g ^+ 2 / '[psi]`.  The real-part form
+`(ψ 1).re² / (⟨ψ,ψ⟩).re` used throughout §8 (`S08_CaseBEnumeration.lean:829`,
+`S08_Theorem63.lean:46`): for an actual character `ψ`, `ψ(1)` is a real degree and `⟨ψ,ψ⟩` a positive
+real, so this real form agrees with the complex `ψ(1)²/⟨ψ,ψ⟩`. -/
+noncomputable def Snorm (ψ : ClassFunction L ℂ) : ℝ :=
+  (ψ (1 : L)).re ^ 2 / (ClassFunction.inner ψ ψ).re
+
+/-- **Peterfalvi (9.11): the summed degree-square-over-norm `sumnS Si = ∑_{ψ ∈ Si} Snorm ψ`.**
+
+Coq `PFsection9.v:1535` `pose sumnS Si := \sum_(psi <- Si) Snorm psi`.  Taken over a `Finset` of
+class functions (the finite subfamilies `S1'`, `S2` of the (9.11) induction). -/
+noncomputable def sumnS (Si : Finset (ClassFunction L ℂ)) : ℝ :=
+  ∑ ψ ∈ Si, Snorm ψ
+
+@[simp] theorem sumnS_empty : sumnS (L := L) (∅ : Finset (ClassFunction L ℂ)) = 0 := by
+  simp [sumnS]
+
+/-- Each `Snorm` weight is nonnegative (`ψ(1).re²` is a square, `⟨ψ,ψ⟩.re ≥ 0`). -/
+theorem Snorm_nonneg (ψ : ClassFunction L ℂ) : 0 ≤ Snorm (L := L) ψ :=
+  div_nonneg (sq_nonneg _) (inner_self_re_nonneg ψ)
+
+/-- `sumnS` of a finite family is nonnegative (sum of nonnegative `Snorm` weights). -/
+theorem sumnS_nonneg (Si : Finset (ClassFunction L ℂ)) : 0 ≤ sumnS (L := L) Si :=
+  Finset.sum_nonneg fun ψ _ => Snorm_nonneg ψ
+
+/-- `sumnS` is monotone under `⊆` (adding nonnegative-`Snorm` members can only increase it). -/
+theorem sumnS_le_of_subset {S₁ S₂ : Finset (ClassFunction L ℂ)} (h : S₁ ⊆ S₂) :
+    sumnS (L := L) S₁ ≤ sumnS (L := L) S₂ :=
+  Finset.sum_le_sum_of_subset_of_nonneg h fun ψ _ _ => Snorm_nonneg ψ
+
+open scoped Classical in
+/-- **Peterfalvi (9.11): the raw↔normalized rescaling bridge for `sumnS`.**
+
+If every member `χmem i` has real degree a natural multiple of a common anchor degree `η` —
+`χmem i (1) .re = deg(i)·η` (`hdeg`) — and squared norm `⟨χmem i, χmem i⟩.re = mc(i)` (`hmc`), then
+the raw `sumnS` factors through the anchor degree:
+
+`sumnS (image χmem s) = η² · ∑ᵢ deg(i)²/mc(i)`.
+
+This is the `calc` block that §8 duplicates inline (`S08_CaseBEnumeration.lean:1118-1125`); factoring
+it out is what lets the (9.11) squeeze `lb0 ≤ sumnS S2` (raw form) feed `xAdjoinStepW`'s
+`hDeg : 2·a < ∑ᵢ deg(i)²/mc(i)` (anchor-normalized form). `hinj` makes the sum over the image agree
+with the sum over the index set. -/
+theorem sumnS_image_eq_anchorSq_mul {ι : Type*} (s : Finset ι) (χmem : ι → ClassFunction L ℂ)
+    (deg : ι → ℕ) (mc : ι → ℝ) (η : ℝ) (hinj : Set.InjOn χmem s)
+    (hdeg : ∀ i ∈ s, (χmem i (1 : L)).re = (deg i : ℝ) * η)
+    (hmc : ∀ i ∈ s, (ClassFunction.inner (χmem i) (χmem i)).re = mc i) :
+    sumnS (L := L) (s.image χmem) = η ^ 2 * ∑ i ∈ s, (deg i : ℝ) ^ 2 / mc i := by
+  classical
+  rw [sumnS, Finset.sum_image (fun a ha b hb => hinj ha hb), Finset.mul_sum]
+  refine Finset.sum_congr rfl fun i hi => ?_
+  rw [Snorm, hdeg i hi, hmc i hi]
+  ring
+
+open scoped Classical in
+/-- **Peterfalvi (9.11): the `extend_coherent`-firing precondition (raw `sumnS` ⟹ normalized bound).**
+
+The bridge from the (9.11) squeeze `lb0 < sumnS S₁` (raw degree-sum form) to the anchor-normalized
+degree bound `2·a < ∑ᵢ deg(i)²/mc(i)` that `xAdjoinStepW`/`retarget_isCoherent_of_decompositions`
+consume (their `hDeg`/(5.6.2)-forcing input).  Here `lb0 = 2·a·η²` in the Coq chain
+(`lb0 = 2·q·a·χ(1)` after rescaling by the anchor `η = χ₁(1)`), and `sumnS` factors as `η²·∑` by
+`sumnS_image_eq_anchorSq_mul`; cancelling the positive `η² > 0` gives the normalized bound.
+
+This is the load-bearing step: once the family-specific (9.11.1)-(9.11.8) arithmetic establishes
+`lb0 < sumnS S₂` (Coq's `boolP (lb0 < sumnS S2)` branch, `PFsection9.v:1611`), *this* lemma converts
+it to the `hDeg` that fires the adjoining engine on the running family. -/
+theorem two_mul_lt_normalizedDegreeSq_of_lb0_lt_sumnS {ι : Type*} (s : Finset ι)
+    (χmem : ι → ClassFunction L ℂ) (deg : ι → ℕ) (mc : ι → ℝ) (η : ℝ) (a : ℝ)
+    (hηpos : 0 < η) (hinj : Set.InjOn χmem s)
+    (hdeg : ∀ i ∈ s, (χmem i (1 : L)).re = (deg i : ℝ) * η)
+    (hmc : ∀ i ∈ s, (ClassFunction.inner (χmem i) (χmem i)).re = mc i)
+    (hlb0 : 2 * a * η ^ 2 < sumnS (L := L) (s.image χmem)) :
+    2 * a < ∑ i ∈ s, (deg i : ℝ) ^ 2 / mc i := by
+  rw [sumnS_image_eq_anchorSq_mul s χmem deg mc η hinj hdeg hmc] at hlb0
+  -- `2·a·η² < η²·∑`; cancel `η² > 0`.
+  have hη2 : 0 < η ^ 2 := by positivity
+  have h : η ^ 2 * (2 * a) < η ^ 2 * ∑ i ∈ s, (deg i : ℝ) ^ 2 / mc i := by
+    rw [show η ^ 2 * (2 * a) = 2 * a * η ^ 2 by ring]; exact hlb0
+  exact lt_of_mul_lt_mul_left h (le_of_lt hη2)
+
+/-- **Peterfalvi (9.11): the base squeeze step `lb0 ≤ lb1` (Coq `lb01`).**
+
+Coq `PFsection9.v:1560` `have lb01: lb0 <= lb1 ?= iff (chi 1%g == (q * u)%:R)`, with
+`lb0 = 2·q·a·χ(1)` and `lb1 = 2·a·q²·u`.  In normalized form (dividing the Coq inequality by the
+anchor degree `η = χ₁(1)` and writing `χ(1) = c·η`, i.e. `c = q·χ(1)/η` the degree ratio): the map
+`c ↦ 2·a·c·η` is monotone in `c ≥ 0`, so the base bound `lb0` is at most `lb1 = 2·a·b·η` whenever the
+degree ratio `c ≤ b` (Coq's `chi 1%g ≤ q*u`, the ordering that (9.11.1) forces to equality).  We
+isolate the pure-arithmetic monotonicity (over `ℝ`, `η ≥ 0`, `a ≥ 0`); the identification of `c`, `b`
+with the group-theoretic `q·χ(1)`, `q²·u` is supplied by the family. -/
+theorem lb0_le_lb1_of_degreeRatio_le {a c b η : ℝ} (ha : 0 ≤ a) (hη : 0 ≤ η) (hcb : c ≤ b) :
+    2 * a * c * η ≤ 2 * a * b * η := by
+  have h2a : 0 ≤ 2 * a := by linarith
+  nlinarith [mul_le_mul_of_nonneg_left hcb h2a, mul_nonneg h2a hη]
+
+/-! ### Remaining (9.11.1)-(9.11.8) induction steps (outline, honest verdict 2026-07-06)
+
+With the `Snorm`/`sumnS` quantity (above), the `extend_coherent` positive engine
+(`xAdjoinStepW`, sorry-free), the raw↔normalized bridge (`sumnS_image_eq_anchorSq_mul`), the
+firing precondition (`two_mul_lt_normalizedDegreeSq_of_lb0_lt_sumnS`), and the base squeeze step
+(`lb0_le_lb1_of_degreeRatio_le`) landed, the residual for the full (9.11) non-Galois coherence is:
+
+* **(9.11.2)-(9.11.4)** — the *middle* squeeze steps `lb1 ≤ lb2 ≤ lb3` (Coq `lb12`/`lb23`,
+  `PFsection9.v:1571-1596`).  These are `ℕ`-index monotonicities forcing `a = (p−1)/2` and `C = U'`
+  (`lb12` uses `Gauss_dvd`/`dvdn_leq`; `lb23` uses `Lagrange`/`subset_leqif_cards`).  Each is a
+  self-contained arithmetic `leif` on group indices, composable from the existing `ℕ` gap leaves
+  (`two_mul_lt_sq_of_commonIndex_primePower_gap`, `S07_Coherence.lean:1986`) plus `Nat` index lemmas;
+  no new analytic content.
+* **(9.11.5)** — `lb3 ≤ sumnS S1'` (Coq `lb3S1'`, `PFsection9.v:1596`): the uniform sub-family `S1'`
+  has every member of degree `q·a`, so `Snorm ≡ (q·a)²` on it and `sumnS S1' = |S1'|·(q·a)²`; combine
+  with the base-case lower bound `|S1| ≥ (p−1)·u/a²` (Coq `lb_Sqa`, the type-P `lb_Sqa` datum).  The
+  uniform-`Snorm` computation is `sumnS_image_eq_anchorSq_mul` specialized to constant `deg`.
+* **(9.11.6)** — `sumnS S1' ≤ sumnS S2` (Coq `lbS1'2`, `PFsection9.v:1601`): `sumnS_le_of_subset`
+  above (`S1' ⊆ S2`, all `Snorm ≥ 0`).  **Landed** as a reusable lemma.
+* **(9.11.1)/(9.11.7)/(9.11.8)** — the `without loss` normalization + the maximality contradiction
+  (Coq `PFsection9.v:1519-1540`, `1640-1660`): the induction skeleton, driven by `coherentPairChain`
+  from the `S1` base (`coherent_subset_of_constant_degree`, landed) adjoining pairs to `S2` via
+  `retarget_isCoherent_of_decompositions_and_memberFamily`, whose `hY` per step is discharged by the
+  `lb0 < sumnS S2` branch (`extend_coherent`) using the firing precondition above.
+
+**Verdict + effort.**  The single *analytic* gap named in the issue — the `Snorm`/`sumnS` degree-sum
+quantity and the `extend_coherent` integer-forcing bridge — is now landed sorry-free.  What remains
+is the **assembly** of the (9.11) induction: the middle squeeze steps (9.11.2-9.11.5) are ℕ-index
+arithmetic (medium, mechanical), and (9.11.1)/(9.11.7)/(9.11.8) are the `coherentPairChain` fold
+against the honest §9 induced-family Dade witnesses (the per-step `Dmem`/`hmemOrtho`/`hgen` data, as
+in `S08_CaseBEnumeration.sMember_degreeSqNormBound_of_not_coherent`, but for the §9 `S_ H0C'` family
+rather than §8 case-B).  This is **one focused multi-step session** for lane b's (13.3)
+`coherent_H0Cprime_S` re-grounding (drop `sibleyTarget_H0C`) once the §9 induced-family witnesses are
+threaded, and the same (9.11) coherence closes lane a's (10.7) `typeII_derived_frobenius`.  Tracking
+= issue 1017. -/
 
 end OddOrder.Peterfalvi.S07
