@@ -367,4 +367,135 @@ theorem inner_eta_eq_zero_of_vanish_of_inner_self_eq_two [Finite G]
   intro i j
   rw [hm i j, hzero i j]
 
+/-! ## The `dirr` finish: from `Ψ ⊥ grid` to `ψ^{τ₁} ⊥ grid` -/
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **A norm-one virtual character is a signed irreducible.**  If `φ ∈ ℤ[Irr G]` has
+`⟨φ, φ⟩ = 1`, then `φ = ε • χ` for a single irreducible `χ` and a sign `ε = ±1`.  Its
+integer Fourier coefficients sum of squares equals `1`, so exactly one is nonzero and it
+is `±1`.  This is the `dirr` primitive used to turn the (3.8) rigidity output
+`⟨ψ^{τ₁} − ψ̄^{τ₁}, η_ij⟩ = 0` into the individual orthogonality `⟨η_ij, ψ^{τ₁}⟩ = 0`. -/
+theorem exists_sign_irr_of_inner_self_one [Finite G] {φ : ClassFunction G ℂ}
+    (hφ : φ ∈ ZIrr G) (hnorm : ClassFunction.inner φ φ = 1) :
+    ∃ (χ : IrreducibleCharacter G) (ε : ℤ), (ε = 1 ∨ ε = -1) ∧
+      φ = (ε : ℂ) • (χ : ClassFunction G ℂ) := by
+  classical
+  obtain ⟨c, hsupp, hrepr, hsq⟩ := mem_ZIrr_inner_self_eq_sum_sq hφ
+  have hsumC : ∑ a ∈ c.support, (c a : ℂ) ^ 2 = 1 := hsq.symm.trans hnorm
+  have hsumZ : ∑ a ∈ c.support, c a ^ 2 = 1 := by exact_mod_cast hsumC
+  have hne : ∀ a ∈ c.support, c a ≠ 0 := fun a ha => Finsupp.mem_support_iff.mp ha
+  have hge : ∀ a ∈ c.support, 1 ≤ c a ^ 2 := fun a ha => by
+    have h := Int.one_le_abs (hne a ha)
+    calc (1 : ℤ) = 1 ^ 2 := by ring
+      _ ≤ |c a| ^ 2 := by gcongr
+      _ = c a ^ 2 := sq_abs (c a)
+  have hcard1 : c.support.card = 1 := by
+    have hle : (c.support.card : ℤ) ≤ ∑ a ∈ c.support, c a ^ 2 :=
+      calc (c.support.card : ℤ) = ∑ _a ∈ c.support, (1 : ℤ) := by
+            rw [Finset.sum_const, nsmul_eq_mul, mul_one]
+        _ ≤ ∑ a ∈ c.support, c a ^ 2 := Finset.sum_le_sum hge
+    rw [hsumZ] at hle
+    have hpos : 0 < c.support.card := by
+      rw [Finset.card_pos]
+      by_contra hempty
+      rw [Finset.not_nonempty_iff_eq_empty] at hempty
+      rw [hempty, Finset.sum_empty] at hsumZ
+      exact absurd hsumZ (by norm_num)
+    omega
+  obtain ⟨α₀, hα0eq⟩ := Finset.card_eq_one.mp hcard1
+  have hα0mem : α₀ ∈ irreducibleCharacters G := hsupp (by rw [hα0eq]; simp)
+  rw [hα0eq, Finset.sum_singleton] at hrepr
+  rw [hα0eq, Finset.sum_singleton] at hsumZ
+  have hcα : c α₀ = 1 ∨ c α₀ = -1 := by
+    rw [pow_two] at hsumZ; exact mul_self_eq_one_iff.mp hsumZ
+  exact ⟨⟨α₀, hα0mem⟩, c α₀, hcα, by rw [hrepr]⟩
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (13.19.b), the cross-group grid orthogonality** (engine + `dirr` finish;
+the Dade support-vanishing is the one named §13/§14 hypothesis).
+
+Let `ψ^{τ₁}` (`psi`) and `ψ̄^{τ₁}` (`psiConj`) be two distinct norm-one virtual characters of
+`G` (the `τ₁`-images of an irreducible `ψ ∈ ℒ` of a type-`I` maximal subgroup and its complex
+conjugate; distinctness `⟨ψ^{τ₁}, ψ̄^{τ₁}⟩ = 0` reflects `ψ ≠ ψ̄`).  If the difference
+`ψ^{τ₁} − ψ̄^{τ₁}` vanishes on the conjugacy saturation of the regular set `Ŵ = W ∖ (W₁ ∪ W₂)`
+(Peterfalvi (13.19.a): `Ã(L)` avoids `P^G ∪ W^G`, so `(ψ − ψ̄)^τ` is supported off `Ŵ^G`),
+then `ψ^{τ₁}` is orthogonal to the whole `η`-grid.
+
+The difference has squared norm `2`, so the (3.8) rigidity engine gives
+`⟨ψ^{τ₁} − ψ̄^{τ₁}, η_ij⟩ = 0`; the `dirr` finish (each of `ψ^{τ₁}`, `ψ̄^{τ₁}`, `η_ij` is a
+signed irreducible, `exists_sign_irr_of_inner_self_one`) upgrades this to the individual
+orthogonality: a nonzero `⟨η_ij, ψ^{τ₁}⟩` would force `ψ^{τ₁}` and `ψ̄^{τ₁}` to share the
+constituent `χ_{η_ij}`, contradicting `ψ^{τ₁} ≠ ψ̄^{τ₁}`. -/
+theorem eta_orthogonal_of_norm_one_pair_vanish [Finite G]
+    (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    {psi psiConj : ClassFunction G ℂ}
+    (hpsiZ : psi ∈ ZIrr G) (hconjZ : psiConj ∈ ZIrr G)
+    (hpsi1 : ClassFunction.inner psi psi = 1)
+    (hconj1 : ClassFunction.inner psiConj psiConj = 1)
+    (hcross : ClassFunction.inner psi psiConj = 0)
+    (hvanish : ∀ x ∈ conjClassSet
+      ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))), (psi - psiConj) x = 0) :
+    ∀ (i : Fin hyp.q) (j : Fin hyp.p),
+      ClassFunction.inner (hyp.eta i j) psi = 0 := by
+  classical
+  -- the difference `Ψ = ψ^{τ₁} − ψ̄^{τ₁}` is a norm-2 virtual character
+  have hPsiZ : psi - psiConj ∈ ZIrr G := (ZIrr G).sub_mem hpsiZ hconjZ
+  have hcross' : ClassFunction.inner psiConj psi = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hcross, star_zero]
+  have hPsi2 : ClassFunction.inner (psi - psiConj) (psi - psiConj) = 2 := by
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right, hpsi1, hconj1, hcross, hcross']
+    ring
+  -- engine: `Ψ ⊥ η_ij` for all `i, j`
+  have hengine := inner_eta_eq_zero_of_vanish_of_inner_self_eq_two hyp hPsiZ hvanish hPsi2
+  -- signed-irreducible decompositions of `ψ^{τ₁}`, `ψ̄^{τ₁}`
+  obtain ⟨χp, εp, hεp, hpeq⟩ := exists_sign_irr_of_inner_self_one hpsiZ hpsi1
+  obtain ⟨χc, εc, hεc, hceq⟩ := exists_sign_irr_of_inner_self_one hconjZ hconj1
+  -- distinct constituents: `χp ≠ χc`
+  have hp0 : (εp : ℂ) ≠ 0 := by rcases hεp with h | h <;> rw [h] <;> norm_num
+  have hc0 : (εc : ℂ) ≠ 0 := by rcases hεc with h | h <;> rw [h] <;> norm_num
+  have hχne : χp ≠ χc := by
+    intro heq
+    have hval2 : ClassFunction.inner psi psiConj = (εp : ℂ) * (εc : ℂ) := by
+      rw [hpeq, hceq, ClassFunction.inner_smul_left,
+        OddOrder.RepresentationTheory.inner_smul_right,
+        OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite, if_pos heq,
+        star_intCast, mul_one]
+    rw [hval2] at hcross
+    exact (mul_ne_zero hp0 hc0) hcross
+  -- individual orthogonality
+  intro i j
+  -- `η_ij` is a signed irreducible
+  obtain ⟨χη, εη, hεη, hηeq⟩ := exists_sign_irr_of_inner_self_one (eta_mem_ZIrr hyp i j)
+    (by simpa using eta_orthonormal hyp i i j j)
+  -- `⟨η_ij, ψ^{τ₁}⟩ = ε_η ε_p · [χ_η = χ_p]`
+  have hval : ∀ (χ : IrreducibleCharacter G) (ε : ℤ),
+      ClassFunction.inner (hyp.eta i j) ((ε : ℂ) • (χ : ClassFunction G ℂ))
+        = (εη : ℂ) * (ε : ℂ) * (if χη = χ then (1 : ℂ) else 0) := by
+    intro χ ε
+    rw [hηeq, ClassFunction.inner_smul_left,
+      OddOrder.RepresentationTheory.inner_smul_right,
+      OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite]
+    rw [star_intCast]; ring
+  -- engine relation at `(i, j)`: `⟨η_ij, ψ^{τ₁}⟩ = ⟨η_ij, ψ̄^{τ₁}⟩`
+  have hrel : ClassFunction.inner (hyp.eta i j) psi
+      = ClassFunction.inner (hyp.eta i j) psiConj := by
+    have h0 : ClassFunction.inner (hyp.eta i j) (psi - psiConj) = 0 := by
+      rw [OddOrder.RepresentationTheory.inner_conj_symm, hengine i j, star_zero]
+    rwa [ClassFunction.inner_sub_right, sub_eq_zero] at h0
+  by_contra hnz
+  rw [hpeq] at hnz hrel
+  rw [hceq] at hrel
+  rw [hval χp εp] at hnz hrel
+  rw [hval χc εc] at hrel
+  -- nonzero forces `χη = χp`; the relation then forces `χη = χc`; contradiction
+  have hp_eq : χη = χp := by
+    by_contra hpne; rw [if_neg hpne, mul_zero] at hnz; exact hnz rfl
+  rw [if_pos hp_eq] at hnz hrel
+  have hc_eq : χη = χc := by
+    by_contra hcne
+    rw [if_neg hcne, mul_zero] at hrel
+    exact hnz hrel
+  exact hχne (hp_eq ▸ hc_eq)
+
 end OddOrder.Peterfalvi.S16
