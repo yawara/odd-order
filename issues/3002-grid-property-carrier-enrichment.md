@@ -254,3 +254,31 @@ gate-1 threading を fresh budget で careful に engage する (exists_zeta sig
 波及は all-or-nothing ゆえ慎重に)。3 レーンとも char keystone 収束が確定したが、各自の ungated 残
 (a=gate-1 threading / b=§13 η-grid keystone / c=S16 consumer wiring) を正面から進めれば lane 数 3 の
 まま pipeline を解ける。gate-1 threading が真に block されたら (spine 破壊が避けられない等) 再度 hub flag。
+
+### ✅ 2026-07-05 (lane c, bounded investigate-and-attempt) — `lSideGridCoeffData` 残 3 field の gate 確定 (Coq 行番号付き、c-unreachable 実証済)
+
+`lSideGridCoeffData` の残 3 sorried field (`m_row_odd`/`m_col_odd`/`grid_mem`) を bounded で精査し、
+**3 field とも本 issue (b の §13 η-grid = `FTtypeI_bridge_facts`) に genuinely gated** と確定
+(`bessel` が 2 度 gated 誤判定された前例に鑑み internal descent で検証 — 今回は誤判定でなく真に gated):
+
+- **`m_row_odd` / `m_col_odd`** (境界 parity `m_0j`/`m_i0` odd): source = **Coq `FTtypeI_bridge_facts`
+  (PFsection13.v:1987) の (c2) 選言** `⟨tauL betaL, eta01⟩ ≡ 1 (mod 2)`。row は **S-side type-P partner
+  `StypeP`** に適用 (PFsection14.v:187 `case/betaL_P: StypeP => _ _ -> //`)、col は **T-side `TtypeP`**
+  (PFsection14.v:190)。中身 = type-P coherent pairing `⟨τ β_S, τ₁ φ⟩ ≡ 1 (mod2)` on the S-side residual
+  `β_S` — これは lane b の `S15_SAndT.lean:3671/3764` に所在 (S16 は opaque `caseB_formula : Prop` のみ)。
+  **c-unreachable 実証**: c の唯一の parity primitive `cfdot_real_vchar_even` は (i) `η_0j` real を要求
+  (repo に `eta_isReal` 無 — η は cycTI 像で複素) かつ (ii) 適用しても `⟨β_L,1⟩·⟨η_0j,1⟩ = 1·0 = 0
+  (mod2)` = **EVEN** を返す (required ODD の逆)。⟹ 真の gate、hoist でない。
+- **`grid_mem`** (`1_G + Δ_L = Σ m_ij η_ij` = Coq `Y=0`, PFsection14.v:212-251): `orthogonal_split` +
+  `leif`-equality で、tightness `e = pq` (`ub_e`) **かつ** 各 `|m_ij|² ≥ 1` (= 上記 parity `a_odd`) から
+  強制。⟹ `grid_mem` は境界 parity に **依存**。**c-unreachable 実証**: 既存 proven `NC≤2` engine
+  `grid_eq_zero_of_relation_of_card_le_two` (S16_GridExpansion) は不適用 (係数 pq≥15 個が全 ±1 で NC=pq≫2)、
+  `bessel` proof は `⟨Y,Y⟩ ≥ 0` しか出さず tight `=0` を出さない。Mirror: M-side `MHypothesis.betaGrid`
+  (同一 statement) は `exists_MHypothesis` で explicit `sorry` (S16:6288, "genuine Track A obligation
+  (issue 3002)") ゆえ L-analog も同 gate。
+
+**c 側の状態**: `lSideGridCoeffData` の proven 3 field (coeff/m_principal/bessel) は landing 済 (cont.⁶⁴-⁶⁷)。
+残 3 field は本 issue の b 供給 (S15.Hypothesis grid field: `eta_orthonormal`/`eta_intCast_on_G0`/
+`eta_conj_neg` + type-P coherent pairing bound) が入り次第 c が wire する。**新 9000 issue は不要** (本 3002
+が既に `lSideGridCoeffData`/`grid_mem`/`boundary` を fix-owner=b で追跡済)。file 内 sorry comment を精密化
+(Coq 行番号 + c-unreachable 根拠) して landing。build green (3899 jobs)、新 axiom 無。
