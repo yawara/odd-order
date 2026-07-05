@@ -3131,6 +3131,105 @@ theorem Hypothesis.card_S_val [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rw [hyp.card_S_eq_deriv_mul_q, hyp.card_deriv_S_eq, hyp.card_P_eq hG hyp.Sdata_W2_eq,
     hyp.card_U_eq_uc]
 
+/-- **`|H| = p^q · c`** (Peterfalvi (13.2)): `H = PC` with `P = S_F` elementary abelian of order
+`p^q` and `C = C_U(P)` of order `c`, and `P ⊓ C = ⊥` (`P` a `p`-group, `C ≤ U` with `|U| = uc`
+coprime to `p` by the Hall property of `P` in `S`).  So `|PC| = |P|·|C| = p^q·c` (the complement
+`card_mul_card_of_complement_normal`, `P ◁ H`).  Feeds `[S:H] = uq` (`mu_j_isIndPC` degree) and the
+(13.5) counting value `|H^#|/|S| = uq/(cp^q)`. -/
+theorem Hypothesis.card_H_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    Nat.card ↥hyp.H = hyp.p ^ hyp.q * hyp.c := by
+  have hP_le_S : hyp.P ≤ hyp.S := by
+    rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
+  have hC_le_S : hyp.C ≤ hyp.S := by
+    have hUS : hyp.U ≤ hyp.S := by
+      have h1 : hyp.U ≤ derivedInG hyp.S := by rw [hyp.S_deriv_eq_PU]; exact le_sup_right
+      exact le_trans h1 (Subgroup.map_subtype_le _)
+    exact le_trans (hyp.C_eq ▸ inf_le_left) hUS
+  have hPH : hyp.P ≤ hyp.H := le_sup_left
+  have hCH : hyp.C ≤ hyp.H := le_sup_right
+  have hPcard : Nat.card ↥hyp.P = hyp.p ^ hyp.q := hyp.card_P_eq hG hyp.Sdata_W2_eq
+  -- `p ∤ c`: `P` Hall in `S`, `[S:P] = ucq`
+  have hPScard : Nat.card ↥(hyp.P.subgroupOf hyp.S) = Nat.card ↥hyp.P :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hP_le_S).toEquiv
+  have hcop : Nat.Coprime (hyp.p ^ hyp.q) ((hyp.P.subgroupOf hyp.S).index) := by
+    have hHall := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall hyp.S
+    rw [← hyp.P_eq_SF] at hHall
+    have h0 := Ch03.IsHallSubgroup.coprime_index hHall
+    rw [hPScard, hPcard] at h0
+    exact h0
+  have hSPidx : (hyp.P.subgroupOf hyp.S).index = hyp.u * hyp.c * hyp.q := by
+    have hm := Subgroup.card_mul_index (hyp.P.subgroupOf hyp.S)
+    rw [hPScard, hPcard, hyp.card_S_val hG] at hm
+    have hpq : (0 : ℕ) < hyp.p ^ hyp.q := pow_pos hyp.p_prime.pos hyp.q
+    have hmm : hyp.p ^ hyp.q * (hyp.P.subgroupOf hyp.S).index
+        = hyp.p ^ hyp.q * (hyp.u * hyp.c * hyp.q) := by rw [hm]; ring
+    exact Nat.eq_of_mul_eq_mul_left hpq hmm
+  have hpc : Nat.Coprime (hyp.p ^ hyp.q) hyp.c := by
+    have hcdvd : hyp.c ∣ (hyp.P.subgroupOf hyp.S).index := by
+      rw [hSPidx]; exact ⟨hyp.u * hyp.q, by ring⟩
+    exact Nat.Coprime.coprime_dvd_right hcdvd hcop
+  have hpc' : Nat.gcd (hyp.p ^ hyp.q) hyp.c = 1 := hpc
+  -- `P ⊓ C = ⊥` from coprime orders
+  have hdisj : hyp.P ⊓ hyp.C = ⊥ := by
+    rw [← Subgroup.card_eq_one]
+    have hd1 : Nat.card ↥(hyp.P ⊓ hyp.C) ∣ hyp.p ^ hyp.q :=
+      hPcard ▸ Subgroup.card_dvd_of_le inf_le_left
+    have hd2 : Nat.card ↥(hyp.P ⊓ hyp.C) ∣ hyp.c :=
+      hyp.c_eq_card_C ▸ Subgroup.card_dvd_of_le inf_le_right
+    exact Nat.dvd_one.mp (hpc' ▸ Nat.dvd_gcd hd1 hd2)
+  -- `|H| = |P|·|C|` (complement `P ◁ H`)
+  haveI hPnormalH : (hyp.P.subgroupOf hyp.H).Normal := by
+    refine (Subgroup.normal_subgroupOf_iff_le_normalizer hPH).mpr ?_
+    have hSnorm : hyp.S ≤ Subgroup.normalizer (hyp.P : Set G) := by
+      rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
+    exact le_trans (hyp.H_le_S) hSnorm
+  have hinf : hyp.P.subgroupOf hyp.H ⊓ hyp.C.subgroupOf hyp.H = ⊥ := by
+    rw [eq_bot_iff]
+    intro x hx
+    obtain ⟨hxP, hxC⟩ := Subgroup.mem_inf.mp hx
+    have hmem : ((x : ↥hyp.H) : G) ∈ hyp.P ⊓ hyp.C :=
+      ⟨Subgroup.mem_subgroupOf.mp hxP, Subgroup.mem_subgroupOf.mp hxC⟩
+    rw [hdisj, Subgroup.mem_bot] at hmem
+    rw [Subgroup.mem_bot]; exact Subtype.ext hmem
+  have hsup : hyp.P.subgroupOf hyp.H ⊔ hyp.C.subgroupOf hyp.H = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hPH hCH]
+    exact Subgroup.subgroupOf_self hyp.H
+  have hcompl : Subgroup.IsComplement' (hyp.P.subgroupOf hyp.H) (hyp.C.subgroupOf hyp.H) :=
+    Subgroup.isComplement'_of_disjoint_and_mul_eq_univ (disjoint_iff.mpr hinf)
+      (by rw [← Subgroup.normal_mul, hsup, Subgroup.coe_top])
+  have hmul := hcompl.card_mul
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPH).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hCH).toEquiv, hPcard,
+    ← hyp.c_eq_card_C] at hmul
+  exact hmul.symm
+
+/-- **`[S : H] = uq`** (Peterfalvi (13.2)): the index of `H = PC` in `S`.  From
+`|S| = p^q·(uc)·q` (`card_S_val`) and `|H| = p^q·c` (`card_H_eq`), `[S:H] = |S|/|H| = uq`.  The
+degree index of `mu_j_isIndPC` (`μ_j(1) = [S:H]·θ(1) = uq`). -/
+theorem Hypothesis.H_index_eq_uq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    (hyp.H.subgroupOf hyp.S).index = hyp.u * hyp.q := by
+  have hm := Subgroup.card_mul_index (hyp.H.subgroupOf hyp.S)
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (hyp.H_le_S)).toEquiv, hyp.card_H_eq hG,
+    hyp.card_S_val hG] at hm
+  have hpos : (0 : ℕ) < hyp.p ^ hyp.q * hyp.c :=
+    Nat.mul_pos (pow_pos hyp.p_prime.pos hyp.q) (hyp.c_eq_card_C ▸ Nat.card_pos)
+  have hmm : hyp.p ^ hyp.q * hyp.c * (hyp.H.subgroupOf hyp.S).index
+      = hyp.p ^ hyp.q * hyp.c * (hyp.u * hyp.q) := by rw [hm]; ring
+  exact Nat.eq_of_mul_eq_mul_left hpos hmm
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (13.3.a), degree**: each nonzero `μ`-column sum has degree `uq`.  Immediate from
+`mu_j_isIndPC` (`μ_j = Ind_{PC} θ`, `θ` linear) and `H_index_eq_uq` (`[S:H] = uq`):
+`μ_j(1) = [S:H]·θ(1) = uq·1 = uq`. -/
+theorem Hypothesis.mu_j_degree [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (hj : j ≠ ⟨0, hyp.p_prime.pos⟩) :
+    (∑ i : Fin hyp.q, hyp.mu i j) (1 : ↥hyp.S) = ((hyp.u * hyp.q : ℕ) : ℂ) := by
+  haveI := hyp.finiteG
+  obtain ⟨θ, hθirr, hθ1, hθeq⟩ := hyp.mu_j_isIndPC hG j hj
+  rw [hθeq, ClassFunction.induce_apply_one, hθ1, mul_one, hyp.H_index_eq_uq hG]
+
 /-- `|T| = |Q|·(vd)·p` — the `T`-side order decomposition, read off the reconciled type-`P`
 datum (`M_complement`/`derived_complement` of `reconciled_typePData_T`) with `|V| = vd` and
 `|W₂| = p`. -/
