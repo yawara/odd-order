@@ -147,6 +147,33 @@ conjunct-3 type-II HU-Frobenius = 指標論的 Frobenius 判定法 (Isaacs 7 章
 → campaign step 3 ((13.3.a) の S11 側) は本質完了。次 = step 1-2 (S15↔S11 bridge の
 honest Section11CharacterData 構成 + sibleyTarget_H0C) or step 4 (τ₁ 導出)。
 
+## 🔑 (13.3.c) δ=1 は ungated と判明 (it.84-85 訂正) + (13.3.a) degree 完成
+
+**(13.3.a) degree 完成 (it.84)**: `card_H_eq` (|H|=p^q·c、P⊓C=⊥ coprime + 複補)、
+`H_index_eq_uq` ([S:PC]=uq)、`mu_j_degree` (μⱼ(1)=uq)。(13.3.a) statement 両半分 sorry-free。
+
+**★重要な訂正 (it.85)**: δ=1 の crux `u ≡ 1 mod q` は Singer field_model **不要**、ungated:
+- W₁ (order q) が Ū = U/C に共役作用、FPF (C_Ū(w)=1 for w∈W₁^#):
+  - UW₁ Frobenius (typeP_uW1_frobenius, **proven**) → C_U(w)=1
+  - W₁ normalizes C = U⊓C_G(P) (W1_normalizes_U + P=S_F)
+  - coprime 作用 (gcd(q,|U|)=1) の fixed-quotient
+    (`map_fixedSubgroup_eq_fixedSubgroup_quotient`, CoprimeFixedPoints:61):
+    C_Ū(w) = image C_U(w) = image ⊥ = ⊥
+- 素位数群 ⟨w⟩ (q-group) 作用の fixed-point 合同
+  (`IsPGroup.card_modEq_card_fixedPoints`, mathlib PGroup:158):
+  |Ū| ≡ |C_Ū(w)| = 1 mod q → u ≡ 1 mod q ✓
+
+→ **δ=1 の残実装** (次 iteration): u≡1 mod q (上記、~多段だが ungated) +
+per-entry μᵢⱼ(1)=u (mu_j_degree + columnFamily 等次数 — ⚠ certainTypeS が
+Hypothesis で columnFamily_mu_apply_one_eq が Hypothesis46 の構造非互換、要 bridge) +
+(4.3.d) certainType_degree_modEq → δⱼ ≡ 1 mod q ∧ δⱼ=±1 ∧ q≥3 → δⱼ=1。
+
+**producer 残 gate 再整理**:
+- δ=1: **ungated** (上記 u≡1 mod q route)、多段実装
+- τ₁ 4 fields + mu_tau1_formula: coherence (sibleyTarget_H0C §14-gated)
+- λ family: (13.3.b) 条件付き既約存在 ((9.8.c)/(9.9) S-lift)
+- basic_structure_gated (P elem abelian / u_bound): BG §10/§14 σ-theory
+
 ## ✅ (13.3.a) 完全証明 — mu_j_isIndPC (it.74-83, 2026-07-05)
 
 **Pf (13.3.a) の genuine math 完結**: `Hypothesis.mu_j_isIndPC` (S15) —
