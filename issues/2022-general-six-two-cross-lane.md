@@ -587,3 +587,15 @@ coeff (X ∈ ℤ[R]) / Y ⊥ R。
 - bridge 5 署名 + S13 消費 2 点に params+pins 貫通 (build green)。
 - named 2 点の本体着手条件が整った: 分岐内で params/hmu/hδj/hδpm/hzS/hz1 が
   手元にある。次 = ψ-可約の列同定 → columnImageFamilyCohFree → ofProjection。
+
+### 追記 11 (loop 39): (9.8) 分類の抽出目標を特定
+
+- `muGrid_column_sum_mem_sOf_H0_and_reducible` (S12_Section9Counts:171) の証明**内部**に
+  「{S(H₀) の可約 member} の ncard = w₂−1」+ 列和 w₂−1 本の単射性 + ⊆ が既在
+  (Set.eq_of_subset_of_ncard_le で集合相等)。
+- **次の実作業**: この内部ステップを public に抽出:
+  `theorem reducible_mem_sOf_H0_eq_muGrid_columnSum (hred : ¬IsIrr φ)
+   (hφ : φ ∈ sOf … H0) : ∃ k ≠ 0, φ = ∑ i, muGrid i k`。
+  さらに bridge-family 側 (inducedKernelFamily K B の可約 member) から
+  sOf-H₀-membership への還元 (可約 Ind θ は自動的に S(H₀)-member —
+  (9.8.a); 要確認/形式化) を挟んで named 2 点の ψ-列同定が完了する。
