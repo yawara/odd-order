@@ -1810,3 +1810,46 @@ W₁-gen の U inverse-conj MulAut 構成 + `phi_w1·phi_w2=1` 導出。**= (11.
 (caseB の setup パターン流用)。step 7 (phi_w12) が核心 antisymmetry、step 8 が σ 生成。
 grind は multi-iteration。**注意**: Coq は Ubar=U/H₀ で作業するが Lean の quotientMulAutHom は
 U-subgroup 直接 (H̄ 上作用が C_U(H̄) を factor) — action factoring の照合に注意。
+
+## 2026-07-05 update²⁰ (lane-a) — **caseA_commutator_chain 完全証明 (sorry-free) — commutator form 完遂 [MAJOR]**
+
+(11.7) 非Galois の commutator form (Coq FTtype34_Fcore_kernel_trivial, PFsection11:365-540) を
+background subagent が top-to-bottom 形式化 (+~490 行)、hub が htype fix + 検証 + 統合 (commit 24fa6c3d)。
+**`caseA_commutator_chain` は sorry-free** (#print axioms = [propext, Classical.choice, Quot.sound]、
+**sorryAx 無し独立検証**、full build 3929 green)。STEP0-7 = U centralize N / class-2 Ĥ=H/Q /
+D-form antisym+bilinear / exponent e:U→ℤ/p / ntrivD / phi_w12 antisymmetry / σ=conjNormal(b₀⁻¹a₀)。
+signature に hG + htype(III/IV) 追加 (type II は C_H(U)=⊥ ゆえ out-of-scope、Peterfalvi Hyp 11.2)。
+
+**重要な依存構造の発見 (検証済)**: `chief_H0_eq_bot`/`H_elementaryAbelian` は依然 **sorryAx 依存**だが、
+それは commutator form でなく **pre-existing (11.5) `secondDerived_eq_HC` → (10.8) `S_not_coherent`**
+(char endgame の深い sorry) 経由。`U_centralizes_H0` は sorry-free。⟹ **(11.7) の群論部分は完遂**、
+(11.7) bundle 全体は (11.5)/(10.8) [char/coherence] に gated (既存・想定内、本 commit 由来でない)。
+
+**含意**: (11.7)→gate-1 [U:C]=u→(11.8) の path 上の真の深い残 sorry は commutator form でなく
+**(10.8) S_not_coherent + (11.5) の char-gating + (11.8) endpoint 自身**。commutator form は
+その prerequisite の群論部品で、完遂済。次 frontier 候補: gate-1 [U:C]=u (H₀=⊥ を cite-sorried で
+先行)、または (11.8.6) coherent_Sset_of_column_identities (gate-2, 深 char)、(11.5) char-gating。
+
+## 2026-07-05 update²¹ (lane-a) — **gate-1 の全 math ピース完備 (u_eq_relIndex_C) + lane-a 群論ほぼ完遂の総括**
+
+`u_eq_relIndex_C` ([U:C]=u, sorry-free, commit fdc61f59, subagent+hub検証) 完成で
+**gate-1 `|M'ᵃᵇ|=d` の全 math ピースが sorry-free 完備**:
+- `|M'ᵃᵇ| = [U:C]` = `typePData_card_abelianization_derived_eq_relIndex_C` (given M''=HC)
+- `[U:C] = u` = `u_eq_relIndex_C` (given chief.N=⊥ = H₀=⊥)
+- `u = d` = `charParam_d_eq_u`
+
+**残 gate-1 = threading のみ** (新 math 無し): card_SHCSet_filter_eq_charParam_n (S12) の
+`|M'ᵃᵇ|=d` sorry を閉じるには M''=HC (secondDerived_eq_HC, S13) + H₀=⊥ (H_elementaryAbelian, S13)
+を **FeitThompson 層まで thread**。難所: (i) consumer exists_zeta_residual_not_orthogonal (S12) が
+params を内部構成、(ii) chief 非一意 (H_elementaryAbelian の H₀=⊥ を内部 chief に転送 = H irreducible
+ゆえ chief 一意、要 subtle 論)、(iii) spine (exists_zeta = bare FT sorry) の signature 変更。
+delicate ゆえ careful 実装 or 慎重な delegation。**注意: 閉じても gate-1 は 11.5/11.7 経由で lane-b
+char (typeII_coherence_contradiction_estimate) に gated、exists_zeta は gate-2 + (10.8) で sorried 継続**。
+
+**総括 (重要)**: **lane-a の群論/構造部分はほぼ完遂**:
+- 構造核 |M'ᵃᵇ|=[U:C] ✓ / commutator form caseA_commutator_chain ✓ (~490行) / [U:C]=u ✓ /
+  (11.7) chief_H0_eq_bot 群論 ✓ (bundle は char-gated)。
+- **残 lane-a = char のみ**: gate-2 `coherent_Sset_of_column_identities` (11.8.6 τ₂ coherence, 深char capstone)、
+  gate-1 threading (plumbing, char-gated), (11.5) char-gating (→lane-b typeII estimate)。
+- ⟹ lane-a frontier は群論 endgame から **char endgame** へ移行。深 char (gate-2, lane-b typeII) が
+  真の残 FT content。次: gate-1 threading (my pieces wire, concrete) or gate-2 (deep char, 要 grind/delegate)。

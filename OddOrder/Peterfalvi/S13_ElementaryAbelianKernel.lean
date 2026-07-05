@@ -767,22 +767,37 @@ theorem caseA_fixes_of_action_chain [Finite G] {M : Subgroup G}
   have hf1 : f v = 1 := chain_exponent_eq_one f (fun u v => hemul u v) hne hAodd σ hmodd hσm hrel v
   rw [← hφv v]; exact hefix v hf1 s hs
 
-/-- **Case (a), the commutator-form chain relation** (Peterfalvi (11.7), non-Galois case) — the
-sole remaining `sorry` of the (11.7) kernel-triviality `chief_H0_eq_bot`.  For the order-`p`
-`U`-invariant `S₀ ≤ H̄` there is an automorphism `σ` of the acting `U`-group, of odd order, whose
-conjugate action inverts every `v`-action on `S₀` — the chain relation `(φ v) ∘ (φ (σ v)) = id`.
-Fed to `caseA_fixes_of_action_chain`, this forces `U` to fix `S₀` pointwise.
+/-- **Case (a), the commutator-form chain relation** (Peterfalvi (11.7), non-Galois case).  For the
+order-`p` `U`-invariant `S₀ ≤ H̄` there is an automorphism `σ` of the acting `U`-group, of odd order,
+whose conjugate action inverts every `v`-action on `S₀` — the chain relation `(φ v) ∘ (φ (σ v)) = id`.
+Fed to `caseA_fixes_of_action_chain`, this forces `U` to fix `S₀` pointwise (whence the (11.7)
+contradiction in `chief_H0_eq_bot`).
 
-The `σ` is conjugation by the *specific* `W₁`-element `w₁ w₂⁻¹` at which the commutator form
-`D(y,z) = ⁅ẑ, ŷ⁆` on `Ĥ = H/Q` (`Q` maximal in `H₀`) is nontrivial — **not** a generic generator,
-so it must be produced together with the chain relation (hence the existential).  Proof outline
-(Coq `FTtype34_Fcore_kernel_trivial`, `PFsection11.v`:365-540): `Ĥ = H/Q` is class-`2` with
-`Ĥ' = H₀/Q` of order `p` (`exists_normal_subgroup_index_prime`, `quotient_classTwo_structure`);
-`D` is antisymmetric (`⁅b,a⁆ = ⁅a,b⁆⁻¹`) and bilinear (central commutators, `commutatorElement_*`);
-it is nontrivial on the `W₁`-conjugation basis `x_w` of `H̄` (as `Ĥ' ≠ 1`), giving `w₁, w₂` with
-`#|D(x_{w₁}, x_{w₂})| = p`; the exponent relation and odd `#|W₁/H₀|` then give `phi = phi⁻¹`. -/
-theorem caseA_commutator_chain [Finite G] {M : Subgroup G}
+The `σ` is conjugation `MulAut.conjNormal w` by the *specific* element `w = b₀⁻¹ a₀ ∈ U W₁` at which
+the commutator form `D(y,z) = ⁅ẑ, ŷ⁆` on `Ĥ = H/Q` (`Q` maximal in `H₀`) is nontrivial — **not** a
+generic generator, so it is produced together with the chain relation (hence the existential).  Proof
+(Coq `FTtype34_Fcore_kernel_trivial`, `PFsection11.v`:365-540, translated top-to-bottom):
+* STEP 0 — `U` centralizes `N = H₀` (Wielandt (9.1) via `C_{H₀}(W₁) = 1`, Coq `FTtype34_facts.cH0U`);
+* STEP 1/2 — `Ĥ = H/Q` is class-`2` with `Ĥ' = H₀/Q = N̂` central of order `p`
+  (`exists_normal_subgroup_index_prime`, `quotient_classTwo_structure`); `D` is antisymmetric
+  (`⁅b,a⁆ = ⁅a,b⁆⁻¹`) and bilinear (`commutatorElement_*`, central commutators);
+* STEP 3/4 — the `U`-action on `S₀` is exponentiation by `e : U → ℤ/p`
+  (`exists_exponent_fun_of_card_prime`); the `L`-conjugates `Φ a • S₀` span `H̄`
+  (`iSup_smul_eq_top_of_irreducible`), so `D` is nontrivial for some `xC a₀, xC b₀`
+  (`hntrivD`, else `Ĥ' = 1`);
+* STEP 5/6 — the action of `v ∈ U` on the second `D`-slot is `^{e(a⁻¹ v a)}` (`hDXn`), and applying
+  it to both slots while `v` centralises the commutator `⁅xC b₀, xC a₀⁆ ∈ N` gives
+  `e(b₀⁻¹ v b₀)·e(a₀⁻¹ v a₀) ≡ 1 (mod p)` (`hcore`, Coq `phi_w12`);
+* STEP 7 — reparametrising yields `e(v)·e(w v w⁻¹) ≡ 1` for `w = b₀⁻¹ a₀`, whence
+  `chain_exponent_eq_one`-style inversion; `σ = conjNormal w`, `m = orderOf w` odd (`|G|` odd).
+
+The one remaining `sorry` excludes the type-II disjunct of the general `TypesIIIIIIVSetup` (needed
+only for `|W₂| = chief.p`); Peterfalvi (11.7) is a type III/IV statement and the caller supplies the
+restriction. -/
+theorem caseA_commutator_chain [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (htype : OddOrder.GroupTheory.IsTypeIII M ∨ OddOrder.GroupTheory.IsTypeIV M)
     (hpK : IsPGroup chief.p ↥data.H) (hNcomm : chief.N = commutator ↥data.H)
     (hNne : chief.N ≠ ⊥)
     {S₀ : Subgroup (↥data.H ⧸ chief.N)} (hcardS₀ : Nat.card ↥S₀ = chief.p)
@@ -793,7 +808,462 @@ theorem caseA_commutator_chain [Finite G] {M : Subgroup G}
       ∀ (v : ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))),
         ∀ s ∈ S₀, quotientMulAutHom chief.N_aInvariant ↑v
           (quotientMulAutHom chief.N_aInvariant ↑(σ v) s) = s := by
-  sorry
+  classical
+  haveI := Fact.mk chief.p_prime
+  set L := data.typeP.U ⊔ data.typeP.W1 with hLdef
+  set φ := OddOrder.Peterfalvi.S11.typeP_conjAction data.typeP with hφdef
+  -- `U ◁ L` (the Frobenius kernel), so conjugation `σ = conjNormal w` acts on `U.subgroupOf L`.
+  have hUnorm : (data.typeP.U.subgroupOf L).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer le_sup_left).mpr
+      (sup_le Subgroup.le_normalizer data.typeP.W1_normalizes_U)
+  -- ###########################################################################
+  -- STEP 0: `U` centralizes `N = H₀` (Peterfalvi (8.5.a) / (11.6), Wielandt (9.1)).
+  -- This is the `cH0U` of Coq `FTtype34_facts`; it needs `|W₂| = chief.p` (types III/IV).
+  -- ###########################################################################
+  -- `H₀ = N.map H.subtype ≠ ⊥`.
+  have hH0ne : chief.H0 ≠ ⊥ := by
+    rw [chief.H0_eq]
+    intro h
+    exact hNne (Subgroup.map_injective (data.H).subtype_injective (by rw [h, Subgroup.map_bot]))
+  have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
+  -- **`data` is of type III or IV** (`htype`, hypothesis).  Peterfalvi (11.7) (Hypothesis (11.2))
+  -- is stated only for types III/IV; the `|W₂| = chief.p` identity below (`chief.typeIII_IV_p_eq_W2`),
+  -- needed for the (9.6) fixed-point-free step `C_{H₀}(W₁) = 1` yielding `U ≤ C(H₀)` (Coq
+  -- `FTtype34_facts.cH0U`), requires it.  The commutator-form antisymmetry argument is type-agnostic.
+  -- `|W₂| = chief.p` (types III/IV).
+  have hW2p : Nat.card ↥data.typeP.W2 = chief.p := chief.typeIII_IV_p_eq_W2 htype
+  -- The `W₂ ⊓ H₀ = ⊥` core (Peterfalvi (9.6), `chief_W2_inf_H0_eq_bot` replicated at chief level):
+  -- `|C_{H̄}(W₁)| = p` (`coprimeFrobeniusChiefFactor_card`) shows `W̄₂ ≠ ⊥`, and `|W₂| = p` prime
+  -- rules out `W₂ ⊆ H₀`.
+  have hW2H0bot : data.typeP.W2 ⊓ chief.H0 = ⊥ := by
+    have hHH : data.typeP.H = data.typeP.H := rfl
+    have hH0le : chief.H0 ≤ data.typeP.H := chief.H0_lt_H.le
+    set F : Subgroup ↥data.typeP.H :=
+      OddOrder.GroupTheory.fixedSubgroup φ (data.typeP.W1.subgroupOf L) with hF
+    have hFW2 : F.map data.typeP.H.subtype = data.typeP.W2 := by
+      rw [hF, hφdef, OddOrder.Peterfalvi.S11.typeP_fixedSubgroup_map data.typeP le_sup_right,
+        OddOrder.Peterfalvi.S11.typeP_H_inf_centralizer_W1]
+    have hH0eq : chief.H0 = chief.N.map data.typeP.H.subtype := chief.H0_eq
+    set act := OddOrder.Peterfalvi.S11.typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant
+      with hact
+    have hcopHW1 : Nat.Coprime
+        (Nat.card ↥(data.typeP.W1.subgroupOf L)) (Nat.card ↥data.typeP.H) :=
+      (OddOrder.Peterfalvi.S11.typeP_coprime_H_uW1 data.typeP hU).symm.coprime_dvd_left
+        (Subgroup.card_subgroup_dvd_card _)
+    haveI : IsSolvable ↥data.typeP.H :=
+      (OddOrder.Peterfalvi.S11.typeP_coprimeAction data.typeP hU).H_solvable
+    have hmap : F.map (QuotientGroup.mk' chief.N) = act.fixedByE :=
+      OddOrder.GroupTheory.map_fixedSubgroup_eq_fixedSubgroup_quotient chief.N_aInvariant hcopHW1
+        (Or.inr inferInstance)
+    have hUnormE : act.U.Normal :=
+      (OddOrder.Peterfalvi.S11.typeP_uW1_frobenius data.typeP hU).isNormal
+    have hEcyc : IsCyclic ↥act.fixedByE :=
+      OddOrder.Peterfalvi.S11.typeP_quotient_fixedByE_cyclic data.typeP hU chief.N_aInvariant
+    have hK1 : Nat.card (↥data.typeP.H ⧸ chief.N) ≠ 1 := by
+      have hNtop : chief.N ≠ ⊤ := by
+        intro htop
+        have hH0H : chief.H0 = data.typeP.H := by
+          rw [hH0eq, htop, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+        exact absurd (hH0H ▸ chief.H0_lt_H) (lt_irrefl _)
+      exact fun h => hNtop (Subgroup.index_eq_one.mp h)
+    have hcardE : Nat.card ↥act.fixedByE = chief.p :=
+      (OddOrder.Peterfalvi.S11.coprimeFrobeniusChiefFactor_card act hUnormE chief.p_prime
+        chief.quotient_elementaryAbelian chief.quotient_chiefFactor
+        chief.U_noncentral_on_quotient hEcyc hK1).2
+    have hp := chief.p_prime
+    have hdvd : Nat.card ↥(data.typeP.W2 ⊓ chief.H0 : Subgroup G) ∣ chief.p := by
+      rw [← hW2p]; exact Subgroup.card_dvd_of_le inf_le_left
+    rcases hp.eq_one_or_self_of_dvd _ hdvd with h1 | hpp
+    · exact Subgroup.card_eq_one.mp h1
+    · exfalso
+      have hle : data.typeP.W2 ⊓ chief.H0 = data.typeP.W2 :=
+        Subgroup.eq_of_le_of_card_ge inf_le_left (le_of_eq (hW2p.trans hpp.symm))
+      have hW2H0 : data.typeP.W2 ≤ chief.H0 := hle ▸ inf_le_right
+      have hFN : F ≤ chief.N := by
+        have hmm : F.map data.typeP.H.subtype ≤ chief.N.map data.typeP.H.subtype := by
+          rw [hFW2, ← hH0eq]; exact hW2H0
+        exact (Subgroup.map_le_map_iff_of_injective data.typeP.H.subtype_injective).mp hmm
+      have hFbot : act.fixedByE = ⊥ := by
+        rw [← hmap]
+        rw [Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']
+        exact hFN
+      rw [hFbot, Subgroup.card_bot] at hcardE
+      exact chief.p_prime.one_lt.ne' hcardE.symm
+  -- `U` centralizes `H₀` (Wielandt (9.1) via the fpf condition `C_{H₀}(W₁) = 1`).
+  have hUcentH0 : data.typeP.U ≤ Subgroup.centralizer (chief.H0 : Set G) := by
+    have hH0le : chief.H0 ≤ data.typeP.H := chief.H0_lt_H.le
+    have hUM : data.typeP.U ≤ M := data.typeP.U_le.trans (Subgroup.map_subtype_le _)
+    have hUEnorm : data.typeP.U ⊔ data.typeP.W1 ≤ Subgroup.normalizer (chief.H0 : Set G) :=
+      sup_le (hUM.trans chief.H0_normalized_by_M)
+        (data.typeP.W1_le.trans chief.H0_normalized_by_M)
+    haveI : Group.IsNilpotent ↥data.typeP.H := by
+      rw [data.typeP.H_eq]
+      exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent M
+    haveI : IsSolvable ↥data.typeP.H := IsNilpotent.to_isSolvable
+    haveI hsolv : IsSolvable ↥chief.H0 :=
+      solvable_of_solvable_injective
+        (f := (Subgroup.subgroupOfEquivOfLe hH0le).symm.toMonoidHom)
+        (Subgroup.subgroupOfEquivOfLe hH0le).symm.injective
+    have hcop : Nat.Coprime (Nat.card ↥chief.H0)
+        (Nat.card ↥(data.typeP.U ⊔ data.typeP.W1)) :=
+      Nat.Coprime.coprime_dvd_left (Subgroup.card_dvd_of_le hH0le)
+        (OddOrder.Peterfalvi.S11.typeP_coprime_H_uW1 data.typeP hU)
+    -- fpf: any `H₀`-element centralized by `W₁` lies in `W₂ ⊓ H₀ = ⊥`.
+    have hfpf : ∀ n ∈ chief.H0, (∀ w ∈ data.typeP.W1, w * n * w⁻¹ = n) → n = 1 := by
+      intro n hn hcent
+      have hnW2 : n ∈ data.typeP.W2 := by
+        rw [← OddOrder.Peterfalvi.S11.typeP_H_inf_centralizer_W1 data.typeP]
+        refine Subgroup.mem_inf.mpr ⟨hH0le hn, ?_⟩
+        rw [Subgroup.mem_centralizer_iff]
+        exact fun w hw => mul_inv_eq_iff_eq_mul.mp (hcent w hw)
+      have hmem : n ∈ data.typeP.W2 ⊓ chief.H0 := ⟨hnW2, hn⟩
+      rw [hW2H0bot] at hmem
+      exact Subgroup.mem_bot.mp hmem
+    exact OddOrder.GroupTheory.frobenius_kernel_centralizes_of_complement_fpf hUEnorm
+      (OddOrder.Peterfalvi.S11.typeP_uW1_frobenius data.typeP hU) hsolv hcop hfpf
+  -- Translate to the `φ`-action form: `φ v` fixes every `N`-element pointwise, for `v ∈ U`.
+  have hUcentN : ∀ (v : ↥L), (v : G) ∈ data.typeP.U → ∀ n : ↥data.typeP.H, n ∈ chief.N →
+      φ v n = n := by
+    intro v hvU n hnN
+    have hnH0 : (n : G) ∈ chief.H0 := by rw [chief.H0_eq]; exact ⟨n, hnN, rfl⟩
+    refine Subtype.ext ?_
+    rw [hφdef, OddOrder.Peterfalvi.S11.typeP_conjAction_apply data.typeP v n]
+    have hcent := Subgroup.mem_centralizer_iff.mp (hUcentH0 hvU) (n : G) hnH0
+    rw [← hcent]; group
+  -- ###########################################################################
+  -- STEP 1: the class-`2` structure of `Ĥ = H/Q` (`Q` maximal in `H₀ = N`).
+  -- ###########################################################################
+  obtain ⟨Q, hQnorm, hQle, hRQ, hcardQ⟩ :=
+    exists_normal_subgroup_index_prime chief.p_prime hpK hNne
+  haveI := hQnorm
+  obtain ⟨hNhatCard, hcommHat, hNhatLe⟩ :=
+    quotient_classTwo_structure chief.p_prime hQnorm hQle hRQ hcardQ hNcomm
+  -- `mk'Q : H → H/Q` and `π : H/Q → H/N`.
+  set hat : ↥data.typeP.H →* (↥data.typeP.H ⧸ Q) := QuotientGroup.mk' Q with hhatdef
+  set π : (↥data.typeP.H ⧸ Q) →* (↥data.typeP.H ⧸ chief.N) :=
+    QuotientGroup.map Q chief.N (MonoidHom.id ↥data.typeP.H) (by simpa using hQle) with hπdef
+  have hπmk : ∀ x : ↥data.typeP.H, π (hat x) = (QuotientGroup.mk' chief.N) x := fun x => rfl
+  -- `N̂ = N.map hat` is central of order `p`, equal to `(H/Q)'`.
+  set Nhat : Subgroup (↥data.typeP.H ⧸ Q) := chief.N.map hat with hNhatdef
+  have hNhatCentral : Nhat ≤ Subgroup.center (↥data.typeP.H ⧸ Q) := hNhatLe
+  -- ###########################################################################
+  -- STEP 2: the commutator form `D y z = ⁅hat z, hat y⁆` on `Ĥ`.
+  -- ###########################################################################
+  -- Every commutator `⁅hat b, hat a⁆` lies in `N̂ = (H/Q)'`, hence is central.
+  have hDmem : ∀ y z : ↥data.typeP.H, ⁅hat z, hat y⁆ ∈ Nhat := by
+    intro y z
+    have : ⁅hat z, hat y⁆ ∈ commutator (↥data.typeP.H ⧸ Q) :=
+      Subgroup.commutator_mem_commutator (Subgroup.mem_top _) (Subgroup.mem_top _)
+    rwa [hcommHat] at this
+  have hDcentral : ∀ y z : ↥data.typeP.H, ⁅hat z, hat y⁆ ∈ Subgroup.center (↥data.typeP.H ⧸ Q) :=
+    fun y z => hNhatCentral (hDmem y z)
+  -- `D y z = 1` when `z ∈ N` (image `hat z ∈ N̂` is central).
+  have hD_N_1 : ∀ (y : ↥data.typeP.H) {z : ↥data.typeP.H}, z ∈ chief.N → ⁅hat z, hat y⁆ = 1 := by
+    intro y z hz
+    have hzc : hat z ∈ Subgroup.center (↥data.typeP.H ⧸ Q) :=
+      hNhatCentral (Subgroup.mem_map_of_mem _ hz)
+    exact commutatorElement_eq_one_iff_mul_comm.mpr (Subgroup.mem_center_iff.mp hzc (hat y)).symm
+  -- antisymmetry.
+  have hDsym : ∀ y z : ↥data.typeP.H, (⁅hat z, hat y⁆)⁻¹ = ⁅hat y, hat z⁆ :=
+    fun y z => commutatorElement_inv _ _
+  -- morphism in `z` (class-`2` linearity, values central).
+  have hDmul : ∀ (y z t : ↥data.typeP.H),
+      ⁅hat (z * t), hat y⁆ = ⁅hat z, hat y⁆ * ⁅hat t, hat y⁆ := by
+    intro y z t
+    have hcomm : Commute (⁅hat t, hat y⁆) (⁅hat z, hat y⁆) :=
+      (Subgroup.mem_center_iff.mp (hDcentral y z) _)
+    rw [map_mul, commutatorElement_mul_left_of_center (hDcentral y t) (hat z), hcomm.eq]
+  -- ###########################################################################
+  -- STEP 3: the exponent function `e` of the `U`-action on `S₀ ≤ H̄`.
+  -- ###########################################################################
+  set L' := data.typeP.U.subgroupOf L with hL'def
+  set Φ : ↥L' →* MulAut (↥data.typeP.H ⧸ chief.N) :=
+    (quotientMulAutHom chief.N_aInvariant).comp L'.subtype with hΦdef
+  have hΦv : ∀ v : ↥L', Φ v = quotientMulAutHom chief.N_aInvariant ↑v := fun _ => rfl
+  obtain ⟨e, hep, he, hemul, _hefix⟩ :=
+    exists_exponent_fun_of_card_prime chief.p_prime hcardS₀ Φ
+      (fun v s hs => by rw [hΦv]; exact hmem v s hs)
+  -- `S₀` is cyclic of order `p` with generator `g`.
+  haveI hfin : Finite ↥S₀ := Nat.finite_of_card_ne_zero (hcardS₀ ▸ chief.p_prime.pos.ne')
+  haveI : IsCyclic ↥S₀ := isCyclic_of_prime_card hcardS₀
+  obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := ↥S₀)
+  have hgS : (g : ↥data.typeP.H ⧸ chief.N) ∈ S₀ := g.2
+  have hordg : orderOf (g : ↥data.typeP.H ⧸ chief.N) = chief.p := by
+    have h := orderOf_injective S₀.subtype S₀.subtype_injective g
+    rw [show S₀.subtype g = (g : ↥data.typeP.H ⧸ chief.N) from rfl] at h
+    rw [h, orderOf_eq_card_of_forall_mem_zpowers hg, hcardS₀]
+  have hgfin : IsOfFinOrder (g : ↥data.typeP.H ⧸ chief.N) := by
+    rw [← orderOf_pos_iff, hordg]; exact chief.p_prime.pos
+  -- ###########################################################################
+  -- STEP 7 (assembly): given a `W₁`-element `w` realising the antisymmetry
+  -- `e(v)·e(w v w⁻¹) ≡ 1 (mod p)`, take `σ = conjNormal w` and `m = orderOf w`.
+  -- ###########################################################################
+  suffices hantisym : ∃ (w : ↥L),
+      ∀ v : ↥L', (e v : ZMod chief.p) * (e (MulAut.conjNormal w v) : ZMod chief.p) = 1 by
+    obtain ⟨w, hrel⟩ := hantisym
+    haveI := hUnorm
+    refine ⟨MulAut.conjNormal w, orderOf w, ?_, ?_, ?_⟩
+    · -- `orderOf w` is odd (divides `|G|`).
+      exact hG.odd.of_dvd_nat ((orderOf_dvd_natCard w).trans (Subgroup.card_subgroup_dvd_card L))
+    · -- `σ^m = conjNormal (w^m) = conjNormal 1 = 1`.
+      rw [← map_pow, pow_orderOf_eq_one, map_one]
+    · -- the chain relation on `S₀`, via the exponent identity `e(v)·e(σ v) ≡ 1`.
+      intro v s hs
+      rw [← hΦv v, ← hΦv (MulAut.conjNormal w v), he (MulAut.conjNormal w v) s hs,
+        map_pow, he v _ hs, ← pow_mul]
+      -- `s^{e(σv)·e(v)} = s` since `e(σv)·e(v) ≡ 1 (mod p)` and `s` has order dividing `p`.
+      have hords : orderOf s ∣ chief.p := by
+        have h := orderOf_injective S₀.subtype S₀.subtype_injective (⟨s, hs⟩ : ↥S₀)
+        rw [show S₀.subtype ⟨s, hs⟩ = s from rfl] at h
+        rw [h, ← hcardS₀]; exact orderOf_dvd_natCard _
+      have hfin' : IsOfFinOrder s := by
+        rw [← orderOf_pos_iff]
+        rcases (Nat.eq_zero_or_pos (orderOf s)) with h0 | hpos
+        · rw [h0] at hords
+          exact absurd (Nat.eq_zero_of_zero_dvd hords) chief.p_prime.pos.ne'
+        · exact hpos
+      have hmodp : e v * e (MulAut.conjNormal w v) ≡ 1 [MOD chief.p] := by
+        have h1 : ((e v * e (MulAut.conjNormal w v) : ℕ) : ZMod chief.p)
+            = ((1 : ℕ) : ZMod chief.p) := by push_cast; rw [hrel v]
+        exact (ZMod.natCast_eq_natCast_iff _ _ _).mp h1
+      have hmods : e v * e (MulAut.conjNormal w v) ≡ 1 [MOD orderOf s] :=
+        Nat.ModEq.of_dvd hords hmodp
+      calc s ^ (e v * e (MulAut.conjNormal w v))
+          = s ^ 1 := hfin'.pow_eq_pow_iff_modEq.mpr hmods
+        _ = s := pow_one s
+  -- ###########################################################################
+  -- STEP 4: the `W₁`-conjugation basis of `H̄` and the nontriviality of `D`.
+  -- ###########################################################################
+  -- Lift the generator `g` of `S₀` to `x ∈ H`.
+  obtain ⟨x, hx⟩ := QuotientGroup.mk'_surjective chief.N (g : ↥data.typeP.H ⧸ chief.N)
+  -- Conjugates `x_ a = φ a x ∈ H` (for `a ∈ L`); their images are the `Φ a`-translates of `g`.
+  set xC : ↥L → ↥data.typeP.H := fun a => φ a x with hxCdef
+  have hxCmk : ∀ a : ↥L, QuotientGroup.mk' chief.N (xC a) =
+      quotientMulAutHom chief.N_aInvariant a (g : ↥data.typeP.H ⧸ chief.N) := by
+    intro a
+    rw [hxCdef]
+    show QuotientGroup.mk' chief.N (φ a x) = _
+    rw [← hx]
+    rfl
+  have hS₀ne : S₀ ≠ ⊥ := by
+    intro h
+    rw [h, Subgroup.card_bot] at hcardS₀
+    exact chief.p_prime.one_lt.ne' hcardS₀.symm
+  -- `⨆_{ŵ ∈ W1} Φ ŵ • S₀ = ⊤`: the `W₁`-conjugates of `S₀` span `H̄` (non-Galois structure).  Every
+  -- `L`-conjugate `Φ a • S₀` reduces to a `W₁`-conjugate because `S₀` is `U`-invariant and
+  -- `L = U W₁` is a Frobenius product.
+  have hspanL : ⨆ (a : ↥L), quotientMulAutHom chief.N_aInvariant a • S₀ = ⊤ :=
+    OddOrder.Peterfalvi.S11.iSup_smul_eq_top_of_irreducible
+      (φ := quotientMulAutHom chief.N_aInvariant) chief.quotient_chiefFactor hS₀ne
+  -- The images `mk'N (xC a) = Φ a • g` generate `H̄` (each generates `Φ a • S₀`, and these span).
+  have hgenHbar : Subgroup.closure
+      (Set.range (fun a : ↥L => QuotientGroup.mk' chief.N (xC a))) = ⊤ := by
+    rw [eq_top_iff, ← hspanL]
+    refine iSup_le fun a => ?_
+    intro y hy
+    rw [Subgroup.mem_smul_pointwise_iff_exists] at hy
+    obtain ⟨s, hs, rfl⟩ := hy
+    -- `s ∈ S₀ = <g>`, so `s = g^k`, and `Φ a • s = (Φ a • g)^k ∈ closure`.
+    obtain ⟨k, hk⟩ := hg (⟨s, hs⟩ : ↥S₀)
+    have hks : (g : ↥data.typeP.H ⧸ chief.N) ^ k = s := by
+      have := congrArg (Subtype.val : ↥S₀ → _) hk
+      simpa using this
+    rw [MulAut.smul_def, ← hks, map_zpow, ← hxCmk a]
+    exact (Subgroup.closure _).zpow_mem (Subgroup.subset_closure (Set.mem_range_self a)) k
+  -- `Dx`: if `⁅hat (xC a), hat y⁆ = 1` for all `a`, then `⁅hat z, hat y⁆ = 1` for all `z`.
+  -- The map `z ↦ ⁅hat z, hat y⁆` is a morphism (class-`2` linearity) killing `N`, and the `mk'N (xC a)`
+  -- generate `H̄`, so it vanishes on all of `H`.
+  have hDx : ∀ (y : ↥data.typeP.H), (∀ a : ↥L, ⁅hat (xC a), hat y⁆ = 1) →
+      ∀ z : ↥data.typeP.H, ⁅hat z, hat y⁆ = 1 := by
+    intro y hya z
+    -- the morphism `ψ z = ⁅hat z, hat y⁆`.
+    set ψ : ↥data.typeP.H →* (↥data.typeP.H ⧸ Q) :=
+      MonoidHom.mk' (fun z => ⁅hat z, hat y⁆) (fun z t => hDmul y z t) with hψdef
+    -- `ψ` kills `N` and factors through `H̄`, so `mk'N a = mk'N b → ψ a = ψ b`.
+    have hψN : ∀ n : ↥data.typeP.H, n ∈ chief.N → ψ n = 1 := fun n hn => hD_N_1 y hn
+    have hψeq : ∀ a b : ↥data.typeP.H,
+        QuotientGroup.mk' chief.N a = QuotientGroup.mk' chief.N b → ψ a = ψ b := by
+      intro a b hab
+      have hmem : a * b⁻¹ ∈ chief.N := by
+        have := QuotientGroup.eq_iff_div_mem.mp hab
+        rwa [div_eq_mul_inv] at this
+      have := hψN _ hmem
+      rw [map_mul, map_inv, mul_inv_eq_one] at this
+      exact this
+    -- `ψ` vanishes on all of `H` since `mk'N (xC a)` generate `H̄` and `ψ (xC a) = 1`.
+    have hker : ψ.ker = ⊤ := by
+      rw [eq_top_iff]
+      have hclos : Subgroup.closure ((QuotientGroup.mk' chief.N) ⁻¹'
+          (insert 1 (Set.range (fun a : ↥L => QuotientGroup.mk' chief.N (xC a))))) = ⊤ :=
+        closure_preimage_eq_top_of_closure_eq_top (QuotientGroup.mk' chief.N)
+          (QuotientGroup.mk'_surjective _) (Set.mem_insert _ _)
+          (by rw [eq_top_iff, ← hgenHbar]; exact Subgroup.closure_mono (Set.subset_insert _ _))
+      rw [← hclos]
+      refine (Subgroup.closure_le _).mpr fun w hw => ?_
+      rw [Set.mem_preimage, Set.mem_insert_iff] at hw
+      rw [SetLike.mem_coe, MonoidHom.mem_ker]
+      rcases hw with h1 | ⟨a, ha⟩
+      · have : ψ w = ψ 1 := hψeq w 1 (by rw [h1, map_one])
+        rw [this, map_one]
+      · rw [hψeq w (xC a) ha.symm]
+        exact hya a
+    have : z ∈ ψ.ker := hker ▸ Subgroup.mem_top z
+    rwa [MonoidHom.mem_ker] at this
+  -- `ntrivD`: some `⁅hat (xC a₀), hat (xC b₀)⁆ ≠ 1` (else `(H/Q)' = ⊥`, contradicting `|N̂| = p`).
+  have hntrivD : ∃ a₀ b₀ : ↥L, ⁅hat (xC b₀), hat (xC a₀)⁆ ≠ 1 := by
+    by_contra hall
+    push_neg at hall
+    -- All `⁅hat (xC b), hat (xC a)⁆ = 1`, so `H/Q` is abelian.
+    have hcommbot : commutator (↥data.typeP.H ⧸ Q) = ⊥ := by
+      rw [commutator_eq_bot_iff_center_eq_top, eq_top_iff]
+      intro w _
+      -- `w = hat z` for some `z`; show `hat z` central.
+      obtain ⟨z, rfl⟩ := QuotientGroup.mk'_surjective Q w
+      rw [Subgroup.mem_center_iff]
+      intro w'
+      obtain ⟨y, rfl⟩ := QuotientGroup.mk'_surjective Q w'
+      -- `⁅hat y, hat z⁆ = 1`.
+      have hzy : ⁅hat y, hat z⁆ = 1 := by
+        refine hDx z (fun a => ?_) y
+        -- `⁅hat (xC a), hat z⁆ = 1` from `⁅hat w', hat (xC a)⁆ = 1 ∀ w'` (via `hDx (xC a)`).
+        have h1 : ∀ z' : ↥data.typeP.H, ⁅hat z', hat (xC a)⁆ = 1 :=
+          hDx (xC a) (fun b => hall a b)
+        rw [← hDsym (xC a) z]
+        exact inv_eq_one.mpr (h1 z)
+      exact commutatorElement_eq_one_iff_mul_comm.mp hzy
+    rw [hcommHat] at hcommbot
+    have hbot : Nat.card ↥(⊥ : Subgroup (↥data.typeP.H ⧸ Q)) = chief.p :=
+      hcommbot ▸ hNhatCard
+    rw [Subgroup.card_bot] at hbot
+    exact chief.p_prime.one_lt.ne' hbot.symm
+  -- ###########################################################################
+  -- STEP 5: the action of `v ∈ U` on `xC a` is exponentiation by `e(a⁻¹ v a)`.
+  -- ###########################################################################
+  -- `L'` is normal in `L`, so `a⁻¹ v a ∈ L'` for `v ∈ L'`, `a ∈ L`.
+  have hconjL' : ∀ (a : ↥L) (v : ↥L'), (a⁻¹ * (v : ↥L) * a) ∈ L' := by
+    intro a v
+    haveI := hUnorm
+    have := hUnorm.conj_mem (v : ↥L) v.2 a⁻¹
+    simpa [mul_assoc] using this
+  -- the action `φ (v:↥L) (xC a)` agrees, mod `N`, with `(xC a)^{e(a⁻¹ v a)}`.
+  have hactexp : ∀ (a : ↥L) (v : ↥L'),
+      QuotientGroup.mk' chief.N (φ (v : ↥L) (xC a))
+        = (QuotientGroup.mk' chief.N (xC a)) ^ e (MulAut.conjNormal (a⁻¹) v) := by
+    intro a v
+    -- `φ (v:↥L) (xC a) = φ ((v:↥L) * a) x = xC ((v:↥L) * a)`.
+    have hcomp : φ (v : ↥L) (xC a) = xC ((v : ↥L) * a) := by
+      show φ (v : ↥L) (φ a x) = φ ((v : ↥L) * a) x
+      rw [map_mul, MulAut.mul_apply]
+    rw [hcomp, hxCmk ((v : ↥L) * a)]
+    -- `Φ ((v:↥L)*a) g = Φ a (Φ (a⁻¹ (v:↥L) a) g) = Φ a (g ^ e va) = (Φ a g)^{e va}`.
+    set va : ↥L' := MulAut.conjNormal (a⁻¹) v with hva
+    have hvaL : (va : ↥L) = a⁻¹ * (v : ↥L) * a := by
+      rw [hva]
+      have := MulAut.conjNormal_apply (a⁻¹ : ↥L) v
+      rw [inv_inv] at this
+      exact this
+    have hsplit : (v : ↥L) * a = a * (va : ↥L) := by rw [hvaL]; group
+    rw [hsplit, map_mul, MulAut.mul_apply]
+    have hgexp : quotientMulAutHom chief.N_aInvariant (va : ↥L)
+        (g : ↥data.typeP.H ⧸ chief.N) = (g : ↥data.typeP.H ⧸ chief.N) ^ e va := by
+      have h := he va (g : ↥data.typeP.H ⧸ chief.N) hgS
+      rw [hΦv va] at h
+      exact h
+    rw [hgexp, map_pow, ← hxCmk a]
+  -- ###########################################################################
+  -- STEP 6: `DXn` (action of `v` on the second `D`-slot) and the antisymmetry `phi_w12`.
+  -- ###########################################################################
+  -- `DXn`: `⁅hat (φ_v (xC a)), hat y⁆ = ⁅hat (xC a), hat y⁆ ^ e(a⁻¹ v a)`.
+  have hDXn : ∀ (a : ↥L) (y : ↥data.typeP.H) (v : ↥L'),
+      ⁅hat (φ (v : ↥L) (xC a)), hat y⁆
+        = ⁅hat (xC a), hat y⁆ ^ e (MulAut.conjNormal (a⁻¹) v) := by
+    intro a y v
+    set k := e (MulAut.conjNormal (a⁻¹) v) with hk
+    -- `φ_v (xC a)` and `(xC a)^k` differ by `n ∈ N`.
+    have hNmem : φ (v : ↥L) (xC a) * ((xC a) ^ k)⁻¹ ∈ chief.N := by
+      have heq : QuotientGroup.mk' chief.N (φ (v : ↥L) (xC a))
+          = QuotientGroup.mk' chief.N ((xC a) ^ k) := by rw [map_pow]; exact hactexp a v
+      have := QuotientGroup.eq_iff_div_mem.mp heq
+      rwa [div_eq_mul_inv] at this
+    set n : ↥data.typeP.H := φ (v : ↥L) (xC a) * ((xC a) ^ k)⁻¹ with hn
+    have hsplit : φ (v : ↥L) (xC a) = n * (xC a) ^ k := by rw [hn]; group
+    -- `hat n ∈ N̂` is central.
+    have hnhat : hat n ∈ Subgroup.center (↥data.typeP.H ⧸ Q) :=
+      hNhatCentral (Subgroup.mem_map_of_mem _ hNmem)
+    have hcomm2 : hat n * hat ((xC a) ^ k) = hat ((xC a) ^ k) * hat n :=
+      (Subgroup.mem_center_iff.mp hnhat _).symm
+    rw [hsplit, map_mul, hcomm2, commutatorElement_mul_center_left hnhat, map_pow,
+      commutatorElement_pow_left_of_center (hDcentral y (xC a))]
+  -- Extract the nontrivial pair and the order-`p` commutator `D₀`.
+  obtain ⟨a₀, b₀, hD₀ne⟩ := hntrivD
+  set D₀ : ↥data.typeP.H ⧸ Q := ⁅hat (xC b₀), hat (xC a₀)⁆ with hD₀def
+  -- `D₀` has order `p` (nonidentity element of `N̂` of prime order `p`).
+  have hD₀ord : orderOf D₀ = chief.p := by
+    have hmemN : D₀ ∈ Nhat := hDmem (xC a₀) (xC b₀)
+    have hdvd : orderOf D₀ ∣ chief.p := by
+      have h := orderOf_injective Nhat.subtype Nhat.subtype_injective (⟨D₀, hmemN⟩ : ↥Nhat)
+      rw [show Nhat.subtype ⟨D₀, hmemN⟩ = D₀ from rfl] at h
+      rw [h, ← hNhatCard]; exact orderOf_dvd_natCard _
+    rcases (chief.p_prime.eq_one_or_self_of_dvd _ hdvd) with h1 | hp
+    · exact absurd (orderOf_eq_one_iff.mp h1) hD₀ne
+    · exact hp
+  -- `phi_w12` core: `e(b₀⁻¹ v b₀)·e(a₀⁻¹ v a₀) ≡ 1 (mod p)` for all `v ∈ U`.
+  have hcore : ∀ v : ↥L',
+      (e (MulAut.conjNormal (b₀⁻¹) v) : ZMod chief.p)
+        * (e (MulAut.conjNormal (a₀⁻¹) v) : ZMod chief.p) = 1 := by
+    intro v
+    -- `v` (as an element of `L`) lies in `U` and centralizes `N`.
+    have hvU : ((v : ↥L) : G) ∈ data.typeP.U := Subgroup.mem_subgroupOf.mp v.2
+    -- compute `E := ⁅hat (φ_v (xC b₀)), hat (φ_v (xC a₀))⁆` in two ways.
+    -- Way 2 (centralizer): `E = D₀`.
+    have hway2 : ⁅hat (φ (v : ↥L) (xC b₀)), hat (φ (v : ↥L) (xC a₀))⁆ = D₀ := by
+      -- `⁅mk'Q p, mk'Q q⁆ = mk'Q ⁅p, q⁆` and `φ_v` preserves commutators.
+      have hcomm_map : ⁅hat (φ (v : ↥L) (xC b₀)), hat (φ (v : ↥L) (xC a₀))⁆
+          = hat ⁅φ (v : ↥L) (xC b₀), φ (v : ↥L) (xC a₀)⁆ := (map_commutatorElement hat _ _).symm
+      have hphi_comm : ⁅φ (v : ↥L) (xC b₀), φ (v : ↥L) (xC a₀)⁆
+          = φ (v : ↥L) ⁅xC b₀, xC a₀⁆ := (map_commutatorElement (φ (v : ↥L)).toMonoidHom _ _).symm
+      have hcommN : ⁅xC b₀, xC a₀⁆ ∈ chief.N := by
+        rw [hNcomm]
+        exact Subgroup.commutator_mem_commutator (Subgroup.mem_top _) (Subgroup.mem_top _)
+      have hfix : φ (v : ↥L) ⁅xC b₀, xC a₀⁆ = ⁅xC b₀, xC a₀⁆ :=
+        hUcentN v hvU _ hcommN
+      rw [hcomm_map, hphi_comm, hfix, hD₀def, map_commutatorElement]
+    -- Way 1 (bilinearity via `hDXn`): `E = D₀ ^ (e(a₀⁻¹ v a₀) · e(b₀⁻¹ v b₀))`.
+    have hway1 : ⁅hat (φ (v : ↥L) (xC b₀)), hat (φ (v : ↥L) (xC a₀))⁆
+        = D₀ ^ (e (MulAut.conjNormal (a₀⁻¹) v) * e (MulAut.conjNormal (b₀⁻¹) v)) := by
+      -- second slot first (via antisymmetry + `hDXn`).
+      have hinner : ⁅hat (xC b₀), hat (φ (v : ↥L) (xC a₀))⁆
+          = D₀ ^ e (MulAut.conjNormal (a₀⁻¹) v) := by
+        rw [← hDsym (xC b₀) (φ (v : ↥L) (xC a₀)), hDXn a₀ (xC b₀) v, ← inv_pow]
+        congr 1
+        rw [hD₀def]; exact hDsym (xC b₀) (xC a₀)
+      rw [hDXn b₀ (φ (v : ↥L) (xC a₀)) v, hinner, ← pow_mul]
+    -- combine: `D₀ = D₀ ^ (…)`, so the exponent is `≡ 1 (mod p)`.
+    have hDeq : D₀ = D₀ ^ (e (MulAut.conjNormal (a₀⁻¹) v) * e (MulAut.conjNormal (b₀⁻¹) v)) := by
+      rw [← hway1, hway2]
+    have hmod : e (MulAut.conjNormal (a₀⁻¹) v) * e (MulAut.conjNormal (b₀⁻¹) v) ≡ 1 [MOD chief.p] := by
+      have hpoweq : D₀ ^ (e (MulAut.conjNormal (a₀⁻¹) v) * e (MulAut.conjNormal (b₀⁻¹) v))
+          = D₀ ^ 1 := by rw [pow_one]; exact hDeq.symm
+      have hfinD : IsOfFinOrder D₀ := by
+        rw [← orderOf_pos_iff, hD₀ord]; exact chief.p_prime.pos
+      have h := hfinD.pow_eq_pow_iff_modEq.mp hpoweq
+      rwa [hD₀ord] at h
+    have h1 : ((e (MulAut.conjNormal (a₀⁻¹) v) * e (MulAut.conjNormal (b₀⁻¹) v) : ℕ)
+        : ZMod chief.p) = ((1 : ℕ) : ZMod chief.p) :=
+      (ZMod.natCast_eq_natCast_iff _ _ _).mpr hmod
+    push_cast at h1
+    rw [mul_comm]; exact h1
+  -- Assemble `hantisym` with `w = b₀⁻¹ a₀`: reparametrise `v = conjNormal a₀ v'`.
+  refine ⟨b₀⁻¹ * a₀, fun v' => ?_⟩
+  set v : ↥L' := MulAut.conjNormal a₀ v' with hvdef
+  -- `conjNormal a₀⁻¹ v = v'` and `conjNormal b₀⁻¹ v = conjNormal (b₀⁻¹ a₀) v'`.
+  have hva : MulAut.conjNormal (a₀⁻¹) v = v' := by
+    rw [hvdef, ← MulAut.mul_apply, ← map_mul, inv_mul_cancel, map_one, MulAut.one_apply]
+  have hvb : MulAut.conjNormal (b₀⁻¹) v = MulAut.conjNormal (b₀⁻¹ * a₀) v' := by
+    rw [hvdef, ← MulAut.mul_apply, ← map_mul]
+  have h := hcore v
+  rw [hva, hvb] at h
+  rw [mul_comm]; exact h
 
 end CaseA
 
