@@ -67,3 +67,18 @@ cite で close (sorry 8→5 目安)。
 **⟹ POLE-2 pipeline は健全に流れている**: c が S16 を top-level まで assembly 完了 = FT 最終矛盾の骨格が
 組み上がった段階。残は b の §13 char body が S/T 両側の exact estimate を供給すれば閉じる。lane 数 3 維持。
 9000 σ-theory は divisibility/upper-bound 完成・frozen (v-value の lower bound は §13 経路ゆえ 9000 非該当)。
+
+## 🔎 追記 (2026-07-06 lane c、(14.9) char body 着手で判明) — d=1 が char body の linchpin
+
+(14.9) char body (`T_typeIII_ratio_le`) を subagent が着手 (commit aa15383d、group-theoretic 基盤 4 lemma
+= `T_derived_index_eq_p`/`T_Q_isComplement_V_derived`/`T_card_quot_Q_derived_eq_card_V` 等 sorry-free landing)。
+**判明した linchpin**: char body は `|calT1|=(|V|−1)/p` を structural に導くが、goal は `(v−1)/p`。
+両者の接続には **`v = |V|`** が要る。Lean では `Hypothesis.v` は free ℕ (`card_V_eq_vd: |V|=v·d` のみ)
+ゆえ `v=|V| ⟺ d=1 ⟺ `S15.V_inf_centralizer_Q_eq_bot` (V⊓C_G(Q)=⊥) = **Pf (13.12) T-side dual**。
+
+- **`V_inf_centralizer_Q_eq_bot` (S15:1885) は sorry + `_hTTypeII` 引数は UNUSED** (type II 非依存、nominal gating)。
+- これは lane-b が既証明の `c_eq_one` (S-side (13.12)) の **T-side dual** = (13.10)/(13.11)-dual 要 = 本 issue 案 A の
+  §13 generalization スコープ内。
+- **⟹ 案 A の generic §13 に d=1 (T-side (13.12)) を含める**と、(14.9) char body の linchpin が解ける
+  (v=|V| 接続 → `|calT1|=(v−1)/p`)。char apparatus (calT1 orbit count / S07 coherence instance / β_S bridge) は
+  d=1 と独立の large follow-on ゆえ c が |V| 版で並行 build 可 (最終 v 置換のみ d=1 待ち)。
