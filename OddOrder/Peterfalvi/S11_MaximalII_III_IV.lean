@@ -9531,6 +9531,38 @@ theorem caseA_reducible_sOf_H0_isIndHC [Finite G] (hG : OddOrder.BG.IsMinimalSim
       (hcPsi chief θbar), hcZeta_irreducible chief θbar hθ₀⟩) (θbar := θbar) rfl
   exact ⟨ψ, hψirr, hψone, hφeq.trans hψeq⟩
 
+set_option maxHeartbeats 1600000 in
+open scoped Classical in
+/-- **Peterfalvi (13.3.a) core, case-agnostic (Coq `isIndHC`)**: every *reducible* member of
+`𝒮(H₀)` is induced from a linear character of `HC` at the `M`-level — in either Clifford case
+(`clifford_dichotomy`; case (a) = `caseA_reducible_sOf_H0_isIndHC` via (9.8.b), case (b) =
+`caseB_reducible_sOf_H0_isIndHC` via (9.9.b)).  In the §13 `S`-instantiation `HC = PC`, so
+this is exactly (13.3.a)'s "`μ_j` is induced from a linear character of `PC`". -/
+theorem reducible_sOf_H0_isIndHC [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief)
+    [Fintype ↥M] [Fintype ↥(huSub data)]
+    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+      M).subgroupOf (huSub data)) : ℂ)]
+    [Invertible (Nat.card ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+      M).subgroupOf (huSub data)).map (huSub data).subtype) : ℂ)]
+    {φ : ClassFunction ↥M ℂ}
+    (hφ : φ ∈ sOf data chief.H0) (hred : ¬ IsIrreducibleCharacter φ) :
+    ∃ ψ : ClassFunction
+        ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+          (huSub data)).map (huSub data).subtype) ℂ,
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ ∧
+      ψ 1 = 1 ∧
+      φ = ClassFunction.induce
+        ((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+          (huSub data)).map (huSub data).subtype) ψ := by
+  rcases clifford_dichotomy hG chars with hA | hB
+  · obtain ⟨caseA⟩ := hA
+    exact caseA_reducible_sOf_H0_isIndHC hG caseA hφ hred
+  · obtain ⟨caseB⟩ := hB
+    exact caseB_reducible_sOf_H0_isIndHC hG chars caseB hφ hred
+
 /-- **step 5 consequence (9.8.b degree, caseA): a reducible `𝒮(H₀)`-member has degree `qu`.**  By
 `caseA_reducible_source_eq_hcZeta` the reducible `φ = Ind_{HU}^M(Ind_{HC}(hcPsi θbar))`, whose degree
 is `q·u` (`hcZeta_induceHU_apply_one`).  The degree half of `caseA_character_counts` conjunct (b). -/
