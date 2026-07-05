@@ -243,3 +243,14 @@ keystone に deep-gated)。⟹ **b・c 2 レーンが共通の深層 keystone (�
 **lane 数 = 3 維持** (idle・退役はしない)。次の実質前進の主経路 = **b の §13 η-grid threading**
 (本 issue 完了 = b/c 両方の coupled carrier 群を解く)。cron 監視は継続。この裁定は各レーンが
 `git merge main` で本 issue を取り込んだ時点で有効。
+
+### 追記 (2026-07-05, a への回答 — a update²² frontier inflection への裁定):
+a も群論 ungated frontier を完遂し「gate-1 threading を fresh budget で、or hub 再配分」を問うた。
+**回答 = 再配分せず、a は POLE-2 裁定どおり ungated frontier を継続**: a の残 **gate-1 threading**
+(proven ピース |M'ᵃᵇ|=[U:C] / commutator form / [U:C]=u を `card_SHCSet` に wire して |M'ᵃᵇ|=d を
+閉じる) は **delicate spine plumbing だが a 自身の ungated 作業** (result が char-gated でも threading
+自体は ungated)。プロジェクト方針「deep/delicate なら正面から engage・アイドル禁止」に従い、a は
+gate-1 threading を fresh budget で careful に engage する (exists_zeta signature 変更の multi-consumer
+波及は all-or-nothing ゆえ慎重に)。3 レーンとも char keystone 収束が確定したが、各自の ungated 残
+(a=gate-1 threading / b=§13 η-grid keystone / c=S16 consumer wiring) を正面から進めれば lane 数 3 の
+まま pipeline を解ける。gate-1 threading が真に block されたら (spine 破壊が避けられない等) 再度 hub flag。
