@@ -475,3 +475,26 @@ hypotheses に分解するのは net-negative)。
   4. coherence.extension = tau1S → (13.3) の tau1S_* fields を discharge。
 - **建設順**: honest Section11CharacterData (step 2) が最初の substantial build。実 support は構成可
   ((H₀⊔C')^#)、実 Dade tau が hard 部 (S04 Hypothesis for (S,(H₀C')^#))。multi-session。
+
+## 2026-07-06 更新 #4 (lane b): (13.3) tractable と判明 — chars.tau は free field + S-instance で H₀=⊥。増分 build 計画
+
+**tractability breakthrough**: `Section11CharacterData` (S11:2002) は property 制約が
+`u_eq_card_quotient` のみ、**`H0CprimeSupport`/`tau` は free data field**。ゆえ:
+- **S-instance simplification**: `toTypesIIIIIIVSetupS_chief_N_eq_bot` (S15:531) で **N=⊥, H₀=⊥**
+  (|P|=p^q=(chief.p)^q ⟹ chief.p=p, N=⊥)。⟹ honest support = (H₀⊔C')^# = **(C')^#** (C'=[C,C])。
+- **`chars.tau := Ind_S^G`** に設定可 (free field)。すると `coherent_H0C_commutator chars`
+  (sibleyTarget_H0C sorried-backed) の `IsCoherent (Ind_S^G) chars.S support` から
+  `.extension = tau1S`、`extends_on_supported: tau1S = Ind_S^G on supported span` ⟹
+  **`tau1S_apply_induce_sub` は family⊆supported で成立**。`tau1S_inner_induce` ← `extension_inner_eq`、
+  `tau1S_induce_mem_ZIrr` ← `extension_mem_ZIrr`。
+
+**増分 build 計画 (各 lemma は standalone compile → commit 可、最後に assemble)**:
+1. `Ind_S^G` を `IntegralCharacterMap ↥S G` として (ClassFunction.induce の ℤ-linear wrap)。
+2. `(C')^#` = ([C,C])^# support の TI/family-membership 性質 (Ind θ ∈ zSpan chars.S 等)。
+3. honest `mkSection11CharacterDataS_honest` (tau:=Ind_S^G, support:=(C')^#)。
+4. tau1S extraction + 4 tau1S_* fields (coherence + family membership から)。
+5. lambda (13.3.b) + mu_col_tau1 (5.8) + mu_tau1_formula → CharacterDegreeData assemble。
+6. `character_degree_analysis` = 上記 + sorried-cite sibleyTarget_H0C。
+
+**注意**: main が S11 を 338 行 restructure 済 (2026-07-06 merge)。build 前に coherent_H0C_commutator
+(現 S11:6628) の現行 signature 再確認。
