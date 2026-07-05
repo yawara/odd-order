@@ -1810,3 +1810,22 @@ W₁-gen の U inverse-conj MulAut 構成 + `phi_w1·phi_w2=1` 導出。**= (11.
 (caseB の setup パターン流用)。step 7 (phi_w12) が核心 antisymmetry、step 8 が σ 生成。
 grind は multi-iteration。**注意**: Coq は Ubar=U/H₀ で作業するが Lean の quotientMulAutHom は
 U-subgroup 直接 (H̄ 上作用が C_U(H̄) を factor) — action factoring の照合に注意。
+
+## 2026-07-05 update²⁰ (lane-a) — **caseA_commutator_chain 完全証明 (sorry-free) — commutator form 完遂 [MAJOR]**
+
+(11.7) 非Galois の commutator form (Coq FTtype34_Fcore_kernel_trivial, PFsection11:365-540) を
+background subagent が top-to-bottom 形式化 (+~490 行)、hub が htype fix + 検証 + 統合 (commit 24fa6c3d)。
+**`caseA_commutator_chain` は sorry-free** (#print axioms = [propext, Classical.choice, Quot.sound]、
+**sorryAx 無し独立検証**、full build 3929 green)。STEP0-7 = U centralize N / class-2 Ĥ=H/Q /
+D-form antisym+bilinear / exponent e:U→ℤ/p / ntrivD / phi_w12 antisymmetry / σ=conjNormal(b₀⁻¹a₀)。
+signature に hG + htype(III/IV) 追加 (type II は C_H(U)=⊥ ゆえ out-of-scope、Peterfalvi Hyp 11.2)。
+
+**重要な依存構造の発見 (検証済)**: `chief_H0_eq_bot`/`H_elementaryAbelian` は依然 **sorryAx 依存**だが、
+それは commutator form でなく **pre-existing (11.5) `secondDerived_eq_HC` → (10.8) `S_not_coherent`**
+(char endgame の深い sorry) 経由。`U_centralizes_H0` は sorry-free。⟹ **(11.7) の群論部分は完遂**、
+(11.7) bundle 全体は (11.5)/(10.8) [char/coherence] に gated (既存・想定内、本 commit 由来でない)。
+
+**含意**: (11.7)→gate-1 [U:C]=u→(11.8) の path 上の真の深い残 sorry は commutator form でなく
+**(10.8) S_not_coherent + (11.5) の char-gating + (11.8) endpoint 自身**。commutator form は
+その prerequisite の群論部品で、完遂済。次 frontier 候補: gate-1 [U:C]=u (H₀=⊥ を cite-sorried で
+先行)、または (11.8.6) coherent_Sset_of_column_identities (gate-2, 深 char)、(11.5) char-gating。
