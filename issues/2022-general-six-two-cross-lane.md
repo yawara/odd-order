@@ -710,3 +710,88 @@ vs CharacterDifferenceImage.Orthogonal) の突合が実装時の最初の確認�
   (ii) pigeonhole per-pair lemma; (iii) member-D 組み立て
   (memberDatum_of_irreducible + Orthogonal-per-pair) — 可約-χ は
   列-列 cross (muGrid_inner_cross_column 直接)。
+
+### 追記 16 (loop 51): (ii) の正道 = trichotomy 直接適用 (Bessel-3 は p=3 で不足)
+
+- 追記 15 の pigeonhole は **p = 3 で破綻** (非零列 2 本しかなく 3-等係数が組めない)。
+  Bessel-3 補題 (inner_eq_zero_of_three_equal_coeff) は残すが (ii) には使わない。
+- **正道**: T := τ(χ−χ̄) は V 上消える (χ は M'-誘導 → χdiff|_V = 0
+  (V ∩ M' = ∅: V-元は mod M' で W₁-非自明像) + τ の A0-値保存
+  (V ⊆ typePA0)) → S05 σ-係数 grid (3.7)-分離 + ‖T‖² = 2 +
+  (3.8) trichotomy (w₁, w₂ ≥ 3 で constant-row/column とも norm > 2 ✗)
+  → **全 σ-係数 0** = T ⊥ 全 ω^σ_ik ✓ (p = 3 安全)。
+- 実装: S06:643 `certainType_diff_dade_eq` の endgame ブロック
+  (grid_trichotomy + grid_no_constant_column 両向き +
+  certainType_diff_dade_eq_of_all_sigmaCoeff_zero:556) を
+  「X vanish-on-V + ⟨X,X⟩ = 2 → ∀ P, ⟨X, chiFam P⟩ = 0」形の
+  reusable lemma に S05/S12 レベルで切り出し、T に適用。
+  V-vanish の部品: tau_toDadeMap_apply_of_mem (S06:378) の
+  hyp.tau-版 (dade-値保存) + typePV ∩ M' = ∅
+  (typePData_typePV_not_mem_derived — S12-Core に既出 (10.5)-ζ-vanish
+  の部品として言及あり)。
+
+## 2026-07-05 lane-a (loop 52): sigmaCoeff_eq_zero_of_vanishOnV 閉 (S05 engine)
+
+- (ii) 核心: norm-2 V-消滅 → 全 σ-係数 0 (NC≤2 既存補題 + trichotomy 両向き)。
+- 残: T := τ(χ−χ̄) 文脈適用 (V-vanish 供給) → ⟨T, ω^σ⟩ = 0 → R(χ)⊥R(列)
+  (constituent 引数は per-pair: R-elt = ±X±-部分の直交は… ⟨T,ω⟩=0 から
+  ofDiff-R-elts の ω-成分 0 を出す小 step 要確認) → member-D 組立。
+
+### 追記 17 (loop 53): member-clause 全部品既存確認 — 残りは純組み立て
+
+- `tau_zeta_sub_conj_vanishes_on_typePV` (S12:4613) は **ζ 専用でなく任意
+  inducedFamily-irr member で成立する形で既に証明済** → T := τ(χ−χ̄) の
+  V-消滅は即 cite。
+- `inner_left_eq_zero_of_inner_sub_eq_zero` (S12:4637) = per-part 射影補題
+  (a−b ⊥ s, 各 norm-1 → a ⊥ s) — 追記 15 の constituent-懸念を直接解決。
+- 組み立て (次 iteration):
+  A. `tau_chidiff_inner_alignedOmega_eq_zero`: T-vanish (上記) + T∈ℤIrr +
+     ⟨T,T⟩=2 (χ irr-nonreal family-pairwise) → loop-52 engine
+     (sigmaCoeff_eq_zero_of_vanishOnV, tic := typePData_toTICyclicHypothesis,
+     app := canonicalFullDadeApp) → ∀pq sigmaCoeff = 0 → P-enum
+     (exists_alignedOmegaSigmaGrid_chiFam_family) で ⟨T, ω^σ_ik⟩ = 0。
+     (sigmaCoeff pq 定義 = ⟨·, chiFam pq⟩ の突合のみ注意)
+  B. per-pair: D-R-elt (OfDiff ±部分, a−b = T) + 射影補題 + ⟨T,ω⟩=0
+     → ⟨R-elt, ω⟩ = 0 → ±δ-smul で columnRImage-elt へ。
+  C. sixTwoMemberDatum_of_reducible_member / break の member-∀ とも:
+     D := memberDatum_of_irreducible (tau1-ext ✓) + B の Orthogonal;
+     可約-χ は D := (列-Da-mirror, ψ-slot 0) + 列-列直交
+     (alignedOmegaSigmaGrid_inner の cross)。
+
+## 2026-07-05 lane-a (loop 54): (A) 閉 — ⟨χdiff^τ, ω^σ⟩ = 0 (一般既約 member)
+
+- 全部品既存の組み立てで一発 (inner_self のみ inline)。
+- 残: (B) inner_left_eq_zero_of_inner_sub_eq_zero で
+  OfDiff-R-elt ⊥ ω^σ → columnRImage-elt (±δ-smul) →
+  (C) member-D (irr: memberDatum_of_irreducible + B;
+  可約: 列-列 = alignedOmegaSigmaGrid_inner cross)。
+
+## 2026-07-05 lane-a (loop 55): (B) 閉 — R-element 単位の直交確立
+
+- elt_inner_eq_zero (β := T−α 補部構成 + 射影補題)。(A)+(B) で
+  ⟨D-R-elt, ω^σ⟩ = 0 完成。残 = (C): columnRImage-elt = ±δ•ω への
+  smul-変換 + Orthogonal-def 束ね + memberDatum_of_irreducible 接続 +
+  可約-χ 側 (列-列)。
+
+## 2026-07-05 lane-a (loop 56): 可約 member-D 実構成 (2 micro-goal 残し)
+
+- ofProjection + extension-τ₁ 組み立て成功。park 2 点:
+  (1) Orthogonal: per-pair = columnRImage 分解 (Finset.mem_image, ±δ•ω 2-case)
+      → inner-smul → conj_symm → (B) elt_inner_eq_zero (R := breakDa.1.imageFamily,
+      hT2 = hψT2 (証明済 in-context!), hTs = (A) tau_chidiff_inner_alignedOmega
+      (hψind hψirr, 各 (i,kχ/kχ')), s-facts = alignedOmegaSigmaGrid_inner self +
+      mem_ZIrr)。
+  (2) tau1-rfl: `hS₁coh✝` 二重 fvar 現象 — rw-flow 後も残存。fresh 診断:
+      (a) 単独最小再現 (b) ofProjection_tau1 @[simp] 補題新設で rw-close 試行
+      (c) statement 側の hS₁coh-依存 ∃ を Da-引数化する再定式化。
+
+### 追記 18 (loop 57): member-D Orthogonal 閉 — 残 = tau1-rfl fvar 謎 1 点
+
+- Orthogonal per-pair 実証明完了 ((A)+(B) 通り)。
+- tau1-rfl: goal の hS₁coh✝ は rename_i で確認した同型 IsCoherent の別 fvar。
+  set-ext fold でも解消せず (goal 側 fvar が現 hS₁coh でない)。
+  fresh 診断案: (i) 各 tactic 直後に goal-fvar を probe して二重化点を特定
+  (rw-at-hyps の revert 連鎖 or set の abstraction が疑い);
+  (ii) 回避: 証明冒頭で `obtain ⟨ne, ext, hie, hos, hmz⟩ := hS₁coh` と
+  即分解し ext-fvar 単独で全構成 (IsCoherent を早期に開けば以後の
+  依存が単純 fvar になり fold 齟齬が消えるはず) — 有望。
