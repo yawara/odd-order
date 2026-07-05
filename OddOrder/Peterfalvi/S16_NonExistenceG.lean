@@ -178,23 +178,30 @@ degree_sq` — *not* the quotient-restricted `Irr(QV/Q)` family with a `W₁`-or
    `|QV/Q| = |V|` half; the `|V| = v` half is the missing (13.12).)
 2. **The `calT1` family + its `|calT1| = (v−1)/p` count.**  Needs (a) inflation `Irr(QV/Q) ↪
    {χ ∈ Irr QV | Q ⊆ ker}` (available: `RepresentationTheory.InflationCharacter`), (b)
-   `Ind_{QV}^T`-irreducibility for nonprincipal inflated sources via `I_T(θ) = QV` — **the sole
-   genuinely-missing piece** (see below), and (c) the `/p` **orbit count**, now landed as reusable
-   shared infra `RepresentationTheory.card_image_induce_eq_div` (`OrbitOnIrr.lean`):
+   `Ind_{QV}^T`-irreducibility for nonprincipal inflated sources via `I_T(θ) = QV` — reduced below to
+   two general rep-theory bricks, **both now available as shared infra**, so no longer missing — and
+   (c) the `/p` **orbit count**, landed as reusable shared infra
+   `RepresentationTheory.card_image_induce_eq_div` (`OrbitOnIrr.lean`):
    `|T.image (Ind_H^G)| = |T| / [G:H]` for a conjugation-invariant `T ⊆ Irr H` with `I_G(θ) = H`
    throughout — the cardinality analogue of the M-side degree-square `sum_div_normSq_induce_image_eq`,
    built from `card_filter_induce_eq_index_inertia`.  With (a)+(c) in hand the count reduces to (b).
 
    The residual (b) — `I_T(inflate θ) = QV` for nonprincipal `θ ∈ Irr(QV/Q)` (Coq
    `irr_induced_Frobenius_ker` + `injm_Frobenius_ker` through the quotient, PFsection14.v:757--762) —
-   needs two foundational rep-theory bricks the repo lacks: **(b1)** the *quotient* Frobenius
-   structure `T/Q = (QV/Q) ⋊ (W₂Q/Q)` with kernel `QV/Q ≅ V` (only the *subgroup* Frobenius
-   `V ⋊ W₂ ≤ T` exists, as a local `have` in `S15.isMulCommutative_V`; quotienting a Frobenius group by
-   a normal subgroup of its kernel is not formalized), and **(b2)** an inertia/inflation-commutation
-   lemma `I_G(inflate_N χ̄) = comap (mk' N) (I_{G/N}(χ̄))` (no `inertia`-through-quotient lemma exists).
-   Given (b1)+(b2), `inertia_eq_of_frobeniusGroup` gives `I_{T/Q}(θ̄) = QV/Q`, pulling back to
-   `I_T(inflate θ) = QV`.  Additionally `V` abelian (Coq `cVV`, type-P) is currently only ungated on
-   `IsTypeII T` (`S15.isMulCommutative_V`), so it too must be re-derived on this type-III branch.
+   rests on two general rep-theory bricks, **both now available as shared infra**: **(b1)** transport
+   of a Frobenius group across an isomorphism (`Isaacs.Ch06.isFrobeniusGroup_map_equiv`,
+   `FrobeniusGroupQuotient.lean`), which carries the *subgroup* Frobenius `V ⋊ W₂ ≤ T`
+   (`S15.isMulCommutative_V`) onto `T/Q = (QV/Q) ⋊ (W₂Q/Q)` via the iso `V ⋊ W₂ ≅ (QV/Q) ⋊ (W₂Q/Q)`
+   (available since `(V ⊔ W₂) ⊓ Q = ⊥` makes `mk' Q` injective there — the honest replacement for the
+   *false-in-general* "quotient a Frobenius group by a normal subgroup of its kernel"), and **(b2)**
+   the inertia/inflation-commutation bridge `mem_inertia_compHom_iff` (`ConjugationBrauer.lean`),
+   `g ∈ I_T(compHom q θ̄) ↔ mk' Q g ∈ I_{T/Q}(θ̄)` for a quotient-corestriction `q : ↥QV →* ↥(QV/Q)`
+   — i.e. exactly `I_T(inflate θ) = comap (mk' Q) (I_{T/Q}(θ̄))` in membership form (already consumed
+   by S08 `inertia_eq_H_of_c2`).  Given (b1)+(b2), the assembly is a direct transcription of the
+   (6.8)(c2) template `S08.inertia_eq_H_of_c2`: `inertia_eq_of_frobeniusGroup` (fed the (b1)
+   quotient-Frobenius group) gives `I_{T/Q}(θ̄) = QV/Q`, and (b2) pulls it back to `I_T(inflate θ) =
+   QV`.  Additionally `V` abelian (Coq `cVV`, type-P) is currently only ungated on `IsTypeII T`
+   (`S15.isMulCommutative_V`), so it must be re-derived on this type-III branch (Bonus b3, below).
 3. **A full `S07.Hypothesis` (5.2) instance for `calT1`** (the (12.1) T-side Dade `tauT` +
    `difference_image`/`no_real`/`pairwise_orthogonal`/`tau_isometry_diff`), to feed
    `coherent_of_constant_degree`.  This is the T-side coherence package, itself separately gated.
@@ -202,15 +209,19 @@ degree_sq` — *not* the quotient-restricted `Irr(QV/Q)` family with a `W₁`-or
    `S09.cfdot_real_vchar_even`), then `orthogonal_split` + Bessel.  `Γ` needs the full S-side
    (13.x)/(14.x) βₛ construction (cf. the `S16_NonExistenceG` βₛ-grid sorry at ~line 6377).
 
-Escape-hatch conclusion (updated 2026-07-06, lane-c): the `/p` **orbit count** (item 2c) is now
-landed as reusable shared infra (`RepresentationTheory.card_image_induce_eq_div` /
-`card_image_induce_mul_index_eq`, `OrbitOnIrr.lean`), joining the group-theoretic foundation
-(`T_derived_index_eq_p`, `T_Q_isComplement_V_derived`, `T_card_quot_Q_derived_eq_card_V`).  The
-`calT1` count `|calT1| = (|V|−1)/p` now reduces to exactly **item 2b** — the Frobenius-kernel inertia
-fact `I_T(inflate θ) = QV`, which requires the two missing rep-theory bricks (b1) the quotient
-Frobenius `T/Q = V̄ ⋊ W̄₂` and (b2) inertia/inflation commutation — plus re-deriving `V` abelian off
-the type-III branch.  Those, together with items 3--4 (T-side coherence package + S-side `Γ` bridge),
-remain the documented residual of the character body. -/
+Escape-hatch conclusion (updated 2026-07-06, lane-c): item 2b's two rep-theory bricks are now both
+landed as reusable shared infra — (b1) `Isaacs.Ch06.isFrobeniusGroup_map_equiv`
+(`FrobeniusGroupQuotient.lean`, Frobenius transport across an iso) and (b2)
+`RepresentationTheory.mem_inertia_compHom_iff` (`ConjugationBrauer.lean`, the inertia/inflation
+bridge) — joining the `/p` orbit count `card_image_induce_eq_div` (`OrbitOnIrr.lean`) and the
+group-theoretic foundation (`T_derived_index_eq_p`, `T_Q_isComplement_V_derived`,
+`T_card_quot_Q_derived_eq_card_V`).  With these, `I_T(inflate θ) = QV` is a direct transcription of
+the (6.8)(c2) assembly template `S08.inertia_eq_H_of_c2` (specialized `H = QV`, `W₁ = W₂`,
+`M = Q.subgroupOf QV`), whence `|calT1| = (|V|−1)/p`.  What remains for the character body is now
+*not* missing infra but the remaining (14.9) **assembly + gating**: item 1 (`v = |V|`, i.e. (13.12)
+`d = 1`), the Bonus-b3 type-III re-derivation of `V` abelian (Coq `cVV`, currently `IsTypeII`-gated in
+`S15.isMulCommutative_V`), item 3 (the T-side coherence package `S07.Hypothesis`) and item 4 (the
+S-side `Γ` bridge).  Those remain the documented residual of the character body. -/
 theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T) :
     ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) ≤
