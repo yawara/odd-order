@@ -221,3 +221,34 @@ lane a (10.7) も同一 (9.11) coherence で閉じる。
 これは multi-session の genuine §9 prerequisite (コスト・規模は着手基準でない、CLAUDE.md)。次 iteration は
 (9.8) dichotomy 構造 (typeP_Galois 述語 + lb_Sqa) の build に正面着手。上流 = typeP_Galois 述語 (文書順で
 先)。lane a (10.7) も同一構造依存。
+
+## 2026-07-06 更新 #7 (lane b) — ★frontier 大修正: (9.11) は「(9.8) を scratch build」でなく「既存 dichotomy+branch counts を wire」
+
+更新 #6 の「(9.8) typeP_Galois/nonGalois dichotomy を build」は **verify-first で誤りと判明** (更新 #6 の
+scoping grep が `typeP_Galois`/`lb_Sqa` の Coq 名だけで空振り → S11 の descriptive 名 machinery を見落とし。
+本 session 4 度目の同型 miss)。S11 (11,767 行) は §9 の大半を既に形式化済:
+
+**既存 (verify-first で確認)**:
+- **dichotomy**: `clifford_dichotomy` (S11:6668) = `Nonempty (CliffordCaseAData chars) ∨ Nonempty (CliffordCaseBData chars)` = Peterfalvi (9.7) の Galois/非Galois 分岐。`chiefFactor_clifford_U_dichotomy` から導出済。
+- **Galois branch の uniform degree** (これが決定的): `caseB_character_counts` (S11:11709) conjunct (a) =
+  `∀ φ ∈ 𝒮(H₀C'), φ 1 = q·u` を **`caseB_degree_qu` (S11:7584) で証明済**。→ Galois branch は uniform degree `qu`。
+- **非Galois branch**: `CliffordCaseAData` (S11:2608、Clifford 整数 `a`=`|U:C_U(H₁)|` pin 込み) + `caseA_character_counts`
+  (S11:11661)。後者の degree-`qa` 下界 count (= Coq `lb_Sqa`) は **conjunct 4 が `sorry` (S11:11691)**、`caseA_exists_irreducible_source_degree_qa` (S11:6131) に依存。
+- **coherence engine**: `coherentEqualDegree_fromDade` (S07_Coherence:6090) / `coherent_subset_of_constant_degree` (landed)。
+
+**⟹ (9.11) coherence の honest 実体**: `coherent_H0C_commutator` (sibleyTarget_H0C 経由) を、`hG` を取る新定理で
+`clifford_dichotomy` case-split して置換:
+- **Galois**: `caseB_character_counts.1` (uniform `qu`) → engine。**残 = §9 family の Dade/subcoherent hypothesis**。
+- **非Galois**: `coherentPairChain` fold + squeeze (全 landed) + `lb_Sqa` count (S11:11691 の sorry)。
+
+**唯一の共通 structural gap = §9 induced family (`𝒮(H₀C')`, τ=Ind) の Dade/subcoherent hypothesis**。
+`coherentEqualDegree_fromDade` は `S04.Hypothesis` (Dade hyp) を要し τ を構成する。type-P Dade datum は S12
+`Hypothesis` (§10) が `dadeData.dade` として持つ (`fullDadeIsometryData hyp.hconj` で Dade isometry 構成、
+S13_SixTwoBridge で多用)。`Section11CharacterData.tau` は bare `IntegralCharacterMap`。→ **次 build**: §9
+`Section11CharacterData` に type-P `dadeData` を接続する (or §9 subcoherence を直接 exhibit) → Galois branch を
+`coherentEqualDegree_fromDade` で close → 非Galois branch を pair-chain で。
+
+**consumers**: `coherent_H0C_commutator` は S15 (b, `coherent_H0Cprime_S`) と S12_MaximalIII_IV_V:4049 (c) が使用。
+→ 新 honest 定理を建て **b の S15 のみ re-point** (c の file signature は触らない、territorial)。c にも adopt を後で flag。
+
+次 iteration: §9 Dade-datum 接続を正面 build (Galois branch を close 目標)。lane a (10.7) も同一 §9 coherence 依存。
