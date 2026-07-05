@@ -757,3 +757,11 @@ vs CharacterDifferenceImage.Orthogonal) の突合が実装時の最初の確認�
      D := memberDatum_of_irreducible (tau1-ext ✓) + B の Orthogonal;
      可約-χ は D := (列-Da-mirror, ψ-slot 0) + 列-列直交
      (alignedOmegaSigmaGrid_inner の cross)。
+
+## 2026-07-05 lane-a (loop 54): (A) 閉 — ⟨χdiff^τ, ω^σ⟩ = 0 (一般既約 member)
+
+- 全部品既存の組み立てで一発 (inner_self のみ inline)。
+- 残: (B) inner_left_eq_zero_of_inner_sub_eq_zero で
+  OfDiff-R-elt ⊥ ω^σ → columnRImage-elt (±δ-smul) →
+  (C) member-D (irr: memberDatum_of_irreducible + B;
+  可約: 列-列 = alignedOmegaSigmaGrid_inner cross)。
