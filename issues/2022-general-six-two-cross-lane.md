@@ -850,3 +850,14 @@ vs CharacterDifferenceImage.Orthogonal) の突合が実装時の最初の確認�
   π-同変性は QuotientGroup.induction_on + rfl (apply lemma が rfl なので)。
 - 残: case (a) φ_w-鎖 (CliffordCaseAData ではなく raw S₀ dichotomy 分岐から直接;
   W₁-orbit 生成 + LineScalarCharacter 系で φ_w 構成) → master → S13 instantiation。
+
+## 2026-07-05 lane-a (loop 63): (11.7) case (a) 道具箱 6 補題 (commit b52ca1f8)
+
+- class-2 交換子計算 (中心 drop ×2 / 積展開 / 冪双線形 ×2) + order-p exponent +
+  closure 可換性を kernel file に sorry-free 追加。
+- case (a) 本体の設計確定: S₀-exponent 関数 e : U → ℕ (mod p) に全 translate の作用が
+  e(a⁻¹ua) で還元される (T_a = φa•S₀ 上の u-exponent = e(a⁻¹ua))。D ≠ 1 の pair (a,b) から
+  e(v)·e(c⁻¹vc) ≡ 1 (c := a⁻¹b) → v ↦ c-conj 置換の鎖 + c 奇数位数 (c ∈ ⟨c²⟩) で
+  e ≡ e∘conj → e² ≡ 1 → e ≡ 1 (odd) → U が全 translate を固定 → fixedSubgroup = ⊤ ↯
+  U_noncentral_on_quotient。D 全消滅側は commute_all_of_closure_eq_top で Ĥ 可換 ↯ |Ĥ'| = p。
+- 次 iteration: この設計で chiefKernel_caseA_false を実装。
