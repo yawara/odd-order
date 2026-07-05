@@ -43,3 +43,27 @@ cite で close (sorry 8→5 目安)。
 - `notes/peterfalvi/s16_w4_char_cascade.md` cont.⁷⁰/⁷¹
 - lane-b commit a1dc3748 (Pf 13.12 c_eq_one, (13.10)+(13.11) 組立)
 - `S16_NonExistenceG.lean`: `u_final_value:5874` (proven exact-u, (14.15) route), `key_ratio_inequality_of_caseB_data:1565`
+
+## 🧭 HUB 裁定 (2026-07-06, POLE-2 coordination — routing)
+
+**判定: 案 A (lane-b が §13 estimate を generic type-II maximal subgroup 版に一般化)**。理由:
+1. **anti-duplication doctrine** — 案 B (c が T-side dual を自 file 再導出) は lane-b S-side estimate の
+   重複ゆえ却下。
+2. **territorial に自然** — §13 estimate ((13.10)/(13.11)/(13.14)/(13.15)/c_eq_one) は b の S15_SAndT(_Setup)
+   所有・§13 keystone 領域。b は現に S-side を active building (commit a1dc3748/b6ddff8e、c_eq_one chain)、
+   その generic 化は自然な延長。新 carve-out 不要 (b 自所有ファイル内)。
+3. **c は idle にならない** — 案 C の懸念「c 別 work 不在」は不正確。c は唯一の ungated my-lane 深経路
+   **(14.9) κ(T)≠σ'(T) の type-III char exclusion** (Γ-bridge + calT1 coherence → (14.8) 矛盾、cont.⁷⁰) を
+   並行 grind 可能。b の generic §13 export が landing したら v-value/frobenius_kernel を cite で close。
+
+**分担 (確定)**:
+- **lane-b**: §13 S-side estimate を **generic type-II maximal subgroup 版に一般化** (現 `hyp.c` 等 S-side
+  hardcoded → 抽象 type-II hypothesis 上で). export した generic lemma を C が S/T 両側で instantiate。
+  b の §13 keystone (issue 3002 / 2035) work の一部として進める (優先順は b 自律、(3.9.a) fix と並走)。
+- **lane-c**: (14.9) type-III char exclusion を並行 engage (ungated my-lane)。b の generic §13 landing 後、
+  v-value ((13.15) `v=(q^p−1)/(q−1)` lower bound) + s/t_frobenius_kernel を cite で close (sorry 8→5 目安)。
+- **lane-a**: 無関係 (§10-13 char core + §5/prime-TI、本 issue 非接触)。
+
+**⟹ POLE-2 pipeline は健全に流れている**: c が S16 を top-level まで assembly 完了 = FT 最終矛盾の骨格が
+組み上がった段階。残は b の §13 char body が S/T 両側の exact estimate を供給すれば閉じる。lane 数 3 維持。
+9000 σ-theory は divisibility/upper-bound 完成・frozen (v-value の lower bound は §13 経路ゆえ 9000 非該当)。
