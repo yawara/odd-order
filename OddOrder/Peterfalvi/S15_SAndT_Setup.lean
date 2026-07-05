@@ -543,6 +543,54 @@ def Hypothesis.cprimeSharpS (hyp : Hypothesis (G := G)) : Set ↥hyp.S :=
   simp only [Hypothesis.cprimeSharpS, OddOrder.Peterfalvi.S04.mem_sharp, SetLike.mem_coe,
     Subgroup.mem_subgroupOf]
 
+/-! ### Dade-independent subcoherence inputs for the §9 induced family `𝒮`
+
+The (5.3.a) subcoherence assembler `S07.irrSubcoherent` needs, besides the Dade isometry, the family
+properties `hconj`/`hreal`/`hortho` of `𝒮 = Ind_{HU}^M 𝒳`.  These are **Dade-independent** — provable
+directly from the induced-character conjugation identity and the orthogonality of distinct-orbit
+inductions — so they can be discharged ahead of the (13.2.e) Dade-isometry foundation.  Here we land
+`hconj` (conjugate-closure); it feeds the honest §9 subcoherence assembly that re-grounds
+`coherent_H0Cprime_S` off the unsound `sibleyTarget_H0C`. -/
+
+open OddOrder.Peterfalvi.S11 in
+/-- **`𝒳` is closed under complex conjugation** (Peterfalvi (9.5)): for `χ ∈ 𝒳` (irreducible,
+`H ⊄ Ker χ`), the conjugate `χ̄` is again irreducible (`IsIrreducibleCharacter.conj`) with the same
+kernel (`characterKernel_conj`), so `H ⊄ Ker χ̄`, i.e. `χ̄ ∈ 𝒳`. -/
+theorem conj_mem_xiSet {M : Subgroup G} [Finite G] {data : TypesIIIIIIVSetup M}
+    {χ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(huSub data)}
+    (hχ : χ ∈ xiSet data) :
+    (⟨(χ : ClassFunction ↥(huSub data) ℂ).conj, χ.isIrreducible.conj⟩ :
+      OddOrder.RepresentationTheory.IrreducibleCharacter ↥(huSub data)) ∈ xiSet data := by
+  -- Membership unfolds (rfl) to a `characterKernel`-containment on the conjugate coe, which is
+  -- defeq `(↑χ).conj`; `characterKernel_conj` rewrites it back to `characterKernel ↑χ` = `hχ`.
+  show ¬ (↑(hInHu data) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+    ((χ : ClassFunction ↥(huSub data) ℂ).conj))
+  rw [OddOrder.Peterfalvi.S03.characterKernel_conj]
+  exact hχ
+
+open OddOrder.Peterfalvi.S11 in
+/-- **`𝒮` is closed under complex conjugation** (Peterfalvi (9.5), subcoherence input (5.2.a)).
+For `φ = Ind_{HU}^M χ ∈ 𝒮` with `χ ∈ 𝒳`, the conjugate is `φ̄ = Ind_{HU}^M χ̄` (`conj_induce`), and
+`χ̄ ∈ 𝒳` (`conj_mem_xiSet`), so `φ̄ ∈ 𝒮`.  This is the `hconj` input the (5.3.a) subcoherence
+assembler `S07.irrSubcoherent` consumes for the §9 induced family — a Dade-independent family
+property, provable directly from the induced-character conjugation identity `conj_induce`. -/
+theorem sSet_closedUnderConjugate {M : Subgroup G} [Finite G] (data : TypesIIIIIIVSetup M) :
+    OddOrder.Peterfalvi.S03.ClosedUnderConjugate (sSet data) := by
+  rintro _ ⟨χ, hχ, rfl⟩
+  refine ⟨⟨(χ : ClassFunction ↥(huSub data) ℂ).conj, χ.isIrreducible.conj⟩,
+    conj_mem_xiSet hχ, ?_⟩
+  -- `(Ind_{HU}^M χ)̄ = Ind_{HU}^M χ̄` (`conj_induce`); `induceHU` bakes in its own `Invertible`
+  -- instance, so `convert` absorbs the (subsingleton) instance mismatch.
+  show (induceHU data (χ : ClassFunction ↥(huSub data) ℂ)).conj
+    = induceHU data ((χ : ClassFunction ↥(huSub data) ℂ).conj)
+  letI : Fintype ↥M := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥M : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  simp only [induceHU]
+  convert OddOrder.RepresentationTheory.conj_induce (χ : ClassFunction ↥(huSub data) ℂ) using 2
+
 open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **Honest §9 character data on `S`** (issue 2035 step 3): the `mkSection11CharacterDataS`
 mirror with the *genuine* coherence inputs — `tau := Ind_S^G` (`indS`, Peterfalvi (13.2.e)) and
