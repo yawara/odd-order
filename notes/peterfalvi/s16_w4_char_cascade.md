@@ -1772,3 +1772,35 @@ betaGrid。上流優先+文書順で次は (13.19.c) lSide か。
 (citeable か要確認)。(c) 展開 assembly。(a)(c) は c-tractable かも、(b) は b-territory 要 grep。
 次 iteration で (a) の β_L norm + 境界係数の repo 有無を精査 → citeable なら assembly、無ければ
 b-coherence cite で skeleton。
+
+### cont.⁶⁴ (2026-07-05 lane c /loop) — 🎯 (13.19.c) lSide 完全 de-scaffold: signed 展開 + ±1 rigidity 実証明、deep gate を coeff carrier に isolate
+
+cont.⁶³ が「深部」と残した lSide 全展開 (`lSide_signed_eta_expansion`) を **honest 実証明化**
+(`S16_NonExistenceG.lean`, full build 3929 green、AxiomsCheck OK 新 axiom 無、S16 実 sorry 7→7)。
+Coq `FTtype2_support_coherence` (PFsection14:172) の構造を忠実分離:
+
+- **`lSide_signed_eta_expansion` (PROVEN, sorry-free)** = pure-algebra assembly。M-side
+  `betaM_expansion` を鏡映: 除去メンバ = distinguished coherent image `ζ_0^ν=ν(ζ_{zetaDistinct})`
+  (`ε=1`, `zetaDistinct≠ind1H` via `h78_ind1H_eq`)、`beta_eq_constOne_sub_zetaImage_add_delta`
+  (S09 PROVEN, β_L=1_G−ζ_0^ν+Δ_L) + grid 恒等式 `1_G+Δ_L=Σ±η_ij` の `abel` 再配置。
+- **`lSide_delta_grid_expansion` (PROVEN, sorry-free)** = **±1 rigidity 実証明**。deep gate carrier
+  `LSideGridCoeffData` (下記) の 3 fact + **PROVEN (3.7) 関係 `betaL_grid_relation`** から:
+  m_ij=⟨β_L,η_ij⟩ が (3.7) `m_ij+m_00=m_i0+m_0j` を満たす → 境界 parity (m_00=1, m_0j/m_i0 odd)
+  で全 m_ij odd (≠0) → Bessel `Σm²≤pq=#grid` で sandwich `#grid≤Σm²≤#grid` → 各 m_ij²=1=±1
+  (既 proven `all_pm_one_and_card_of_odd_sq_sum_le`、e:=pq+1 で card 適用)。
+- **`LSideGridCoeffData` (structure) + `lSideGridCoeffData` (producer, `:=sorry`)** = **単一 deep gate**。
+  型-I maximal L の grid 係数 m_ij=⟨β_L,η_ij⟩ の 3 忠実 §14 fact を bundle:
+  `coeff` (整数性 `inner_mem_ZIrr_int`) / `boundary` (m_00=1 + m_0j/m_i0 odd = Coq
+  `FTtypeI_bridge_facts` S/T bridge) / `bessel` (Σm²≤pq = Coq `ub_e`, ‖β_L‖²=e+1) /
+  `grid_mem` (1_G+Δ_L=Σm_ij η_ij = Coq `Y=0`)。concrete 構成が残 §14 obligation。
+
+**doneness** ([[scaffold-sorry-free-not-done]]): monolithic「全 signed 展開 = 1 sorry」→
+「±1 combinatorics + assembly は proven、deep gate は 3 faithful fact (boundary/Bessel/membership)
+に crisp isolate」。M-side `betaGrid` field 前例に一致。`lSide_delta_grid_expansion` は
+`L∈maximalSubgroups G` 要 (betaL_grid_relation 由来) → `nc.Ldata.L_maximal` で thread。
+
+**次 (残 lSide deep = `lSideGridCoeffData` 構成)**: (a) boundary parity = Coq `FTtypeI_bridge_facts`
+の Lean port (S/T type-P partner bridge、深 §14)。(b) Bessel = `‖β_L‖²=e+1` (7.8.b) + orthonormal
+grid split (Coq `orthonormal_span`+`ub_e`)。(c) grid_mem `Y=0` = 残差 orthogonal projection。
+これらは M-side `betaGrid`/`betaSigns` の未供給分 (exists_MHypothesis 内) と同族の §14 char。
+[[feedback-no-avoiding-hard-parts]] [[feedback-cite-sorried-lemmas-if-signature-correct]]
