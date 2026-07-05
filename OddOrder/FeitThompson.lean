@@ -164,7 +164,11 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
   mu_colSum_eq_induce : ∀ j : Fin p,
     ∃ ψ : ClassFunction ↥((derivedInG S).subgroupOf S) ℂ,
       OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ ∧
-      (∑ i : Fin q, mu i j) = ClassFunction.induce ((derivedInG S).subgroupOf S) ψ
+      (∑ i : Fin q, mu i j) = ClassFunction.induce ((derivedInG S).subgroupOf S) ψ ∧
+      (j ≠ ⟨0, p_prime.pos⟩ →
+        ¬ (((W2.subgroupOf S).subgroupOf ((derivedInG S).subgroupOf S) :
+            Set ↥((derivedInG S).subgroupOf S)) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel ψ))
   nu_definition : ∀ (i : Fin q) (j : Fin p),
     ClassFunction.induce (W.subgroupOf T)
         (ClassFunction.compHom
@@ -380,7 +384,11 @@ structure Section16CharacterData {G : Type*} [Group G] [Finite G]
   mu_colSum_eq_induce : ∀ j : Fin tp.p,
     ∃ ψ : ClassFunction ↥((derivedInG mp.S).subgroupOf mp.S) ℂ,
       OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ ∧
-      (∑ i : Fin tp.q, mu i j) = ClassFunction.induce ((derivedInG mp.S).subgroupOf mp.S) ψ
+      (∑ i : Fin tp.q, mu i j) = ClassFunction.induce ((derivedInG mp.S).subgroupOf mp.S) ψ ∧
+      (j ≠ ⟨0, tp.p_prime.pos⟩ →
+        ¬ (((tp.W2.subgroupOf mp.S).subgroupOf ((derivedInG mp.S).subgroupOf mp.S) :
+            Set ↥((derivedInG mp.S).subgroupOf mp.S)) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel ψ))
   nu_definition : ∀ (i : Fin tp.q) (j : Fin tp.p),
     ClassFunction.induce (tp.W.subgroupOf mp.T)
         (ClassFunction.compHom
@@ -2514,7 +2522,7 @@ noncomputable def section16CharacterData_of_isMinimalSimpleOdd {G : Type*} [Grou
         refine ⟨ClassFunction.restrict ((derivedInG mp.S).subgroupOf mp.S)
             (((mp.certainTypeS hG).columnFamily
               (Section16CharacterData.chi2enum hG mp tp j)).mu 0 : ClassFunction ↥mp.S ℂ),
-          ?_, ?_⟩
+          ?_, ?_, ?_⟩
         · exact (mp.certainTypeS hG).certainTypeRestrict_isIrreducible _
         · calc (∑ i : Fin tp.q, Section16CharacterData.muS hG mp tp i j)
               = ∑ i' : Fin (Nat.card ↥(mp.certainTypeS hG).W1),
@@ -2527,6 +2535,18 @@ noncomputable def section16CharacterData_of_isMinimalSimpleOdd {G : Type*} [Grou
                     (Section16CharacterData.chi2enum hG mp tp j)).mu i' :
                     ClassFunction ↥mp.S ℂ))
             _ = _ := ((mp.certainTypeS hG).induce_restrict_certainType_eq _).symm
+        · intro hjne hsub
+          have hχ₂ne : Section16CharacterData.chi2enum hG mp tp j ≠ 1 := by
+            rw [← Section16CharacterData.chi2enum_zero hG mp tp]
+            exact fun h => hjne ((Section16CharacterData.chi2enum hG mp tp).injective h)
+          refine (mp.certainTypeS hG).not_subset_characterKernel_chiRestrict_of_ne_one
+            hχ₂ne ?_
+          have hseq : ((tp.W2.subgroupOf mp.S).subgroupOf
+                ((derivedInG mp.S).subgroupOf mp.S))
+              = (((mp.certainTypeS hG).W2).subgroupOf
+                ((derivedInG mp.S).subgroupOf mp.S)) := by
+            rw [Section16CharacterData.certainTypeS_W2_eq hG mp, tp.W2_eq_Kstar hG]
+          exact hseq ▸ hsub
       nu_definition := Section16CharacterData.nuT_definition hG mp tp
       tau3_isometry := Section16CharacterData.tau3W_isometry hG mp tp
       tau3_trivial := Section16CharacterData.tau3W_trivial hG mp tp

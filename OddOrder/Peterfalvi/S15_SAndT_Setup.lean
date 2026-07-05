@@ -195,7 +195,11 @@ structure Hypothesis where
   mu_colSum_eq_induce : ∀ j : Fin p,
     ∃ ψ : ClassFunction ↥((derivedInG S).subgroupOf S) ℂ,
       OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ ∧
-      (∑ i : Fin q, mu i j) = ClassFunction.induce ((derivedInG S).subgroupOf S) ψ
+      (∑ i : Fin q, mu i j) = ClassFunction.induce ((derivedInG S).subgroupOf S) ψ ∧
+      (j ≠ ⟨0, p_prime.pos⟩ →
+        ¬ (((W2.subgroupOf S).subgroupOf ((derivedInG S).subgroupOf S) :
+            Set ↥((derivedInG S).subgroupOf S)) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel ψ))
   /-- **Peterfalvi (13.1.e)**: `Ind_W^T (ω_{ij} − ω_{i0}) = δ'_i (ν_{ij} − ν_{i0})`,
   with the canonical `Ind_W^T = ClassFunction.induce (W.subgroupOf T)` and
   `δ'_i = ±1` is `deltaPrime`. -/
