@@ -6605,6 +6605,215 @@ theorem hc_index_eq_u [Finite G] {M : Subgroup G}
   exact (index_hcInHu_eq_relindex_cInHu data chief).trans
     (index_cInHu_subgroupOf_uInHu_eq_u data chief chars)
 
+/-! ### (9.9.c) pair characters `θλ` on `HC`
+
+For the exceptional-case analysis (9.9.c)/(9.10) in Clifford case (b), the witnessing
+`𝒮(H₀C')`-member is induced from a **pair character** `ψ_{θ,λ} = (θ ∘ hcHom) · (λ-lift)` of
+`HC`: the inflation of a nontrivial chief-factor character `θ : H̄ →* ℂˣ` times the lift of a
+linear character `λ : C →* ℂˣ` along the retraction `HC → HC/H ≅ C` (`H ⊓ C = ⊥` inside `HC`).
+For `λ` trivial on `C'` the pair kills `H₀C'` but — unlike `hcPsi θ = ψ_{θ,1}` — not `C`
+(when `λ ≠ 1`), which drives the (9.9.c) contradiction: a reducible `Ind_{HU}^M ζ_{θ,λ}` would
+lie in `𝒮(H₀C)` (9.9.b), forcing `C ⊆ Ker` on the source.  Restricted to `hInHu` the pair
+agrees with `hcPsi θ` (the `λ`-factor dies on `H`), so the case-(b) inertia lift
+`inertia_eq_hcInHu` applies verbatim and `ζ_{θ,λ} = Ind_{HC}^{HU} ψ_{θ,λ}` is irreducible of
+degree `u`. -/
+
+/-- **`HC = C·H` (realized)**: the `hInHu ⊔ (realized H₀C)` spelling of the inertia subgroup
+equals `cInHu ⊔ hInHu`.  `hInHu_sup_realizedH0supC` plus `sup_comm`; the fixed spelling of the
+second-isomorphism join in the `λ`-lift channel `hcLambdaHom`. -/
+theorem hcRealized_eq_cInHu_sup_hInHu {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)
+      = cInHu data chief ⊔ hInHu data :=
+  (hInHu_sup_realizedH0supC chief).trans (sup_comm _ _)
+
+/-- `C ≤ HC` (realized): `cInHu` is contained in the `hInHu ⊔ (realized H₀C)` spelling of `HC`. -/
+theorem cInHu_le_hcRealized {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    cInHu data chief
+      ≤ hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data) :=
+  le_trans le_sup_right (hInHu_sup_realizedH0supC chief).ge
+
+/-- **The `λ`-lift `HC →* ℂˣ`** of a linear character `λ : C →* ℂˣ` (the second factor of the
+(9.9.c) pair character): `HC → HC/H ≅ C/(C ⊓ H) = C —λ→ ℂˣ`.  Composite of the spelling bridge
+`subgroupCongr`, the quotient map by `hInHu`, the reversed second isomorphism
+`quotientInfEquivProdNormalQuotient cInHu hInHu`, and the lift of `λ` over the trivial
+subgroup `H ⊓ C = ⊥` (`hInHu_inf_cInHu_eq_bot`).  Kills `hInHu`
+(`hcLambdaHom_eq_one_of_mem_hInHu`) and restricts to `λ` on `cInHu` (`hcLambdaHom_inclusion`). -/
+noncomputable def hcLambdaHom {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (lam : ↥(cInHu data chief) →* ℂˣ) :
+    ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) →* ℂˣ :=
+  letI : ((hInHu data).subgroupOf (cInHu data chief ⊔ hInHu data)).Normal :=
+    (hInHu_normal data).subgroupOf _
+  (QuotientGroup.lift ((hInHu data).subgroupOf (cInHu data chief)) lam
+      (fun x hx => by
+        have hx1 : x = 1 := by
+          have hmem : (x : ↥(huSub data)) ∈ hInHu data ⊓ cInHu data chief :=
+            ⟨Subgroup.mem_subgroupOf.mp hx, x.2⟩
+          rw [hInHu_inf_cInHu_eq_bot data chief, Subgroup.mem_bot] at hmem
+          exact Subtype.ext hmem
+        rw [hx1]
+        exact lam.ker.one_mem)).comp
+    ((QuotientGroup.quotientInfEquivProdNormalQuotient (cInHu data chief)
+        (hInHu data)).symm.toMonoidHom.comp
+      ((QuotientGroup.mk' ((hInHu data).subgroupOf (cInHu data chief ⊔ hInHu data))).comp
+        (MulEquiv.subgroupCongr (hcRealized_eq_cInHu_sup_hInHu chief)).toMonoidHom))
+
+/-- **`hcLambdaHom` kills `hInHu`**: the `λ`-lift is trivial on the `H`-part of `HC` (the
+quotient map by `hInHu` kills it).  Hence the pair character restricts on `hInHu` to the plain
+inflation `θ₀`, and the case-(b) inertia lift applies to the pair unchanged. -/
+theorem hcLambdaHom_eq_one_of_mem_hInHu {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (lam : ↥(cInHu data chief) →* ℂˣ)
+    {x : ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))}
+    (hx : x ∈ (hInHu data).subgroupOf
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))) :
+    hcLambdaHom chief lam x = 1 := by
+  letI : ((hInHu data).subgroupOf (cInHu data chief ⊔ hInHu data)).Normal :=
+    (hInHu_normal data).subgroupOf _
+  simp only [hcLambdaHom, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom,
+    QuotientGroup.mk'_apply]
+  have hmem : (MulEquiv.subgroupCongr (hcRealized_eq_cInHu_sup_hInHu chief)) x
+      ∈ (hInHu data).subgroupOf (cInHu data chief ⊔ hInHu data) :=
+    Subgroup.mem_subgroupOf.mpr (Subgroup.mem_subgroupOf.mp hx)
+  rw [(QuotientGroup.eq_one_iff _).mpr hmem, map_one, map_one]
+
+/-- **`hcLambdaHom` restricts to `λ` on `C`**: on the inclusion of `c ∈ cInHu` into `HC`, the
+`λ`-lift returns `λ c`.  The second iso sends the `cInHu`-class to the `HC`-class via inclusion
+(`hfwd`), so the reversed iso undoes the quotient map and the lift evaluates `λ`. -/
+theorem hcLambdaHom_inclusion {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (lam : ↥(cInHu data chief) →* ℂˣ) (c : ↥(cInHu data chief)) :
+    hcLambdaHom chief lam (Subgroup.inclusion (cInHu_le_hcRealized chief) c) = lam c := by
+  letI : ((hInHu data).subgroupOf (cInHu data chief ⊔ hInHu data)).Normal :=
+    (hInHu_normal data).subgroupOf _
+  have hfwd : (QuotientGroup.quotientInfEquivProdNormalQuotient (cInHu data chief)
+        (hInHu data))
+      (QuotientGroup.mk' _ c)
+      = QuotientGroup.mk' _ (Subgroup.inclusion le_sup_left c) := by
+    simp only [QuotientGroup.quotientInfEquivProdNormalQuotient,
+      QuotientGroup.quotientInfEquivProdNormalizerQuotient, MulEquiv.trans_apply,
+      QuotientGroup.quotientMulEquivOfEq_mk, QuotientGroup.quotientKerEquivOfSurjective,
+      QuotientGroup.quotientKerEquivOfRightInverse, MulEquiv.coe_mk, MulEquiv.symm_mk,
+      MonoidHom.toMulEquiv_apply, QuotientGroup.kerLift_mk]
+    rfl
+  simp only [hcLambdaHom, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom]
+  have hcongr : (MulEquiv.subgroupCongr (hcRealized_eq_cInHu_sup_hInHu chief))
+      (Subgroup.inclusion (cInHu_le_hcRealized chief) c)
+      = Subgroup.inclusion le_sup_left c := by
+    apply Subtype.ext
+    rfl
+  rw [hcongr, QuotientGroup.mk'_apply, show ((Subgroup.inclusion le_sup_left c :
+      ↥(cInHu data chief ⊔ hInHu data)) : ↥(cInHu data chief ⊔ hInHu data)
+        ⧸ (hInHu data).subgroupOf (cInHu data chief ⊔ hInHu data))
+      = QuotientGroup.mk' _ (Subgroup.inclusion le_sup_left c) from rfl, ← hfwd,
+    MulEquiv.symm_apply_apply, QuotientGroup.mk'_apply, QuotientGroup.lift_mk]
+
+/-- **The (9.9.c) pair hom `θλ : HC →* ℂˣ`**: the product of the `θ`-inflation `θ ∘ hcHom`
+(trivial on `H₀C`) and the `λ`-lift `hcLambdaHom λ` (trivial on `H`).  On `hInHu` it agrees
+with `hcHom`'s inflation alone; on `cInHu` it is `λ` (the `θ`-factor dies on `C ≤ H₀C`). -/
+noncomputable def hcPairHom [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ) (lam : ↥(cInHu data chief) →* ℂˣ) :
+    ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) →* ℂˣ :=
+  (θ.comp (hcHom chief)) * (hcLambdaHom chief lam)
+
+/-- **The `HC`-linear pair character `ψ_{θ,λ}`** of the (9.9.c) construction: the linear
+(degree-one) irreducible character of `HC` with hom `hcPairHom θ λ`.  For `λ = 1` this is
+`hcPsi θ`; for `λ ≠ 1` it does not kill `C`, the (9.9.c) lever. -/
+noncomputable def hcPsiPair [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ) (lam : ↥(cInHu data chief) →* ℂˣ) :
+    IrreducibleCharacter
+      ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) :=
+  linearIrreducibleCharacter (hcPairHom chief θ lam)
+
+/-- **`ψ_{θ,λ}|_hInHu = θ₀`** (pointwise): on the inclusion of `h ∈ hInHu` the pair character
+equals the seed's inflation `θ₀` — the `λ`-factor dies (`hcLambdaHom_eq_one_of_mem_hInHu`), and
+the `θ`-factor is `hcPsi`'s restriction (`hcHom_inclusion`).  Same right-hand side as
+`hcPsi_apply_inclusion`, so the restriction-inertia argument applies to the pair verbatim. -/
+theorem hcPsiPair_apply_inclusion [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ) (lam : ↥(cInHu data chief) →* ℂˣ) (h : ↥(hInHu data)) :
+    (hcPsiPair chief θ lam : ClassFunction
+        ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ)
+      (Subgroup.inclusion le_sup_left h)
+      = (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+        h := by
+  have hlam1 : hcLambdaHom chief lam (Subgroup.inclusion le_sup_left h) = 1 :=
+    hcLambdaHom_eq_one_of_mem_hInHu chief lam (Subgroup.mem_subgroupOf.mpr h.2)
+  simp only [hcPsiPair, hcPairHom, linearIrreducibleCharacter_apply, MonoidHom.mul_apply,
+    Units.val_mul, MonoidHom.comp_apply, ClassFunction.compHom_apply,
+    MulEquiv.coe_toMonoidHom, hcHom_inclusion, hlam1, Units.val_one, mul_one]
+
+/-- **Restriction-inertia `inertia(ψ_{θ,λ}) ≤ inertia(θ₀)`**: an element fixing the pair
+character also fixes its `hInHu`-restriction `θ₀` (`hcPsiPair_apply_inclusion`).  Mirror of
+`hcPsi_inertia_le` — the `λ`-factor is invisible on the restriction. -/
+theorem hcPsiPair_inertia_le [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ) (lam : ↥(cInHu data chief) →* ℂˣ)
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal] :
+    ClassFunction.inertia (hcPsiPair chief θ lam : ClassFunction
+        ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ)
+      ≤ ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ))) := by
+  haveI := hInHu_normal data
+  intro g hg
+  rw [ClassFunction.mem_inertia] at hg ⊢
+  ext h
+  have key : (ClassFunction.conjBy g (hcPsiPair chief θ lam : ClassFunction ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ))
+      (Subgroup.inclusion le_sup_left h)
+      = (hcPsiPair chief θ lam : ClassFunction ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ) (Subgroup.inclusion le_sup_left h) := by rw [hg]
+  rw [ClassFunction.conjBy_apply] at key ⊢
+  rw [← hcPsiPair_apply_inclusion, ← hcPsiPair_apply_inclusion, ← key]
+  congr 1
+
+/-- **`inertia(ψ_{θ,λ}) = HC`**: with the case-(b) seed `inertia(θ₀) = HC`
+(`inertia_eq_hcInHu` for nontrivial `θ`), the pair character's `HU`-inertia is exactly `HC`.
+Mirror of `hcPsi_inertia_eq_hc`. -/
+theorem hcPsiPair_inertia_eq_hc [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ) (lam : ↥(cInHu data chief) →* ℂˣ)
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal]
+    (hθ₀ : ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+        (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+          (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+        = hInHu data ⊔ cInHu data chief) :
+    ClassFunction.inertia (hcPsiPair chief θ lam : ClassFunction
+        ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ)
+      = hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data) := by
+  apply le_antisymm ?_ (ClassFunction.subgroup_le_inertia _)
+  refine le_trans (hcPsiPair_inertia_le chief θ lam) ?_
+  rw [hθ₀]
+  exact (hInHu_sup_realizedH0supC chief).ge
+
+/-- **`ζ_{θ,λ} = Ind_{HC}^{HU}(ψ_{θ,λ})` is irreducible** (degree `u`): direct from
+`isIrreducibleCharacter_induce_of_inertia_eq` and `inertia(ψ_{θ,λ}) = HC`
+(`hcPsiPair_inertia_eq_hc`).  The (9.9.c) irreducible source character over `θ₀`. -/
+theorem hcZetaPair_irreducible [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ) (lam : ↥(cInHu data chief) →* ℂˣ)
+    [Fintype ↥(huSub data)]
+    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)) : ℂ)]
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal]
+    (hθ₀ : ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+        (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+          (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+        = hInHu data ⊔ cInHu data chief) :
+    IsIrreducibleCharacter (ClassFunction.induce
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+      (hcPsiPair chief θ lam : ClassFunction
+        ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ)) :=
+  OddOrder.RepresentationTheory.isIrreducibleCharacter_induce_of_inertia_eq (hcPsiPair chief θ lam)
+    (hcPsiPair_inertia_eq_hc chief θ lam hθ₀)
+
 /-- **Inertia index of `hcPsi θ` is `u`** (regular `θ`): for a regular seed `θ` (nontrivial on each
 Clifford factor `Hpart i`), the `HU`-inertia of `ζ_θ = hcPsi θ` is `HC` (`hcPsi_inertia_eq_hc` with the
 `inertia_eq_hcInHu_caseA` seed), so `[HU : I_{HU}(hcPsi θ)] = [HU:HC] = u` (`hc_index_eq_u`).  This is
