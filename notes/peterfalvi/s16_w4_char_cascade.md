@@ -1542,3 +1542,26 @@ e·Σθᵢ(1)²=|H|−1, Mackey fiber 経由) を landing (`d6328cfe`)。
 数学的に重複気味 (Frobenius 下で相互導出可; 9010 claim 時の grep は名前不一致でヒットせず)。
 両形とも現に使われている (family_degree_sum → normEstimates 系 / 9010 → Bessel の Σdᵢ² 直接形) ので
 即統合は不急; (7.10) card_G0 (issue 0044) 着手時にどちらへ寄せるか判断。
+
+### cont.⁵⁵ (2026-07-05 lane c /loop): 🎯 (14.11.3) support 解析 — 新 leaf S16_G0Coprime、S-side core 実証明
+
+**成果 (commits 059bed2a / 9986a629 / c34aa2ba / 7c69debe)**:
+1. **betaGrid 配線修正**: exists_MHypothesis の偽 all-1 符号プレースホルダを撤去、obtain 済み
+   joint existence を fields に直結 (sorry 2→1、残 = :5394 (13.1.d) joint existence)。
+2. **新 leaf `S16_G0Coprime.lean`** — (14.11.3) 前半「G₀ 元の位数は pq と素」(issue 3002 c-side
+   の G0→order-prime 接続)。Coq PFsection14.coprime_typeP_Galois_core を精読して全分解:
+   - **実証明済**: W-bridge (W# = reg ⊔ W₁# ⊔ W₂#、W₁≤Q/W₂≤P 在庫発見) / P_ne_bot/Q_ne_bot /
+     normalizer_{P,Q}_eq_{S,T} / (13.2.e) centralizer_le_{S,T} 両側 / (q,|S'|)=1 /
+     (p,|U|)=1 / |S|=p^q(|U|q) / **P∈Syl_p(G)** (BG §10 isSylow_sylowMap_of_mem_sigma +
+     σ(S)-membership + Sylow 共役) / **S-side core 本体** (orderOf_coprime_p_of_not_mem_conj:
+     p-冪抽出 → P#-共役 → C_G(a)≤S → S'⋊W₁ 分解 → w=1 は G2、w≠1 は **(2.1)
+     exists_mem_centralizer_conj (在庫発見: GroupTheory/CoprimeConjugacy.lean)** +
+     Sdata.centralizer_W1 で W₂w ⊆ W#)。
+   - **残 named 2**: `derived_inf_centralizer_le_P` (G2 = (14.6)/(9.7.b) Frobenius kernel
+     C_{S'}(a) ≤ P; 放電経路 = **S16Core FieldNormalizerData.sigma transport** (F⋊U* の
+     FPF を injective σ で運ぶ) — FND 自体は (14.2) carrier で c 所有) /
+     `orderOf_coprime_q_of_not_mem_conj` (T-side mirror; reconciled_typePData_T の
+     sorried fields (M_complement/centralizer_W1) cite + T-side (p,|T'|) は |Q|=q^p 系
+     gate に接続予定)。
+- 消費側 (次): eta_grid_galois_facts_on_G0 の G0-接続 (orderOf_coprime_pq_of_not_mem_conj
+  は assembly 済・T-side 待ち)、b の (3.9.a/c) S15 供給着き次第 wire。
