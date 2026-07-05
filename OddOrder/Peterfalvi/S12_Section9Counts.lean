@@ -1402,4 +1402,70 @@ theorem typePData_card_derived_mul_card_C_eq [Finite G] {M : Subgroup G} (data :
   rw [← hHU, hHC]
   ring
 
+/-- **Structural core of the (11.8.1) count `|M'/M''| = |U : C|`** (`C = U ⊓ C_G(H)`).  Given the
+(11.5) identity `M'' = HC` — supplied here in the `TypePData`-expressible form
+`secondDerivedInAmbient M = H ⊔ C` — the abelianization order `|M'{}^{ab}| = |M' : M''|` equals the
+relative index `|U : C|`.
+
+Three steps, all sorry-free group theory: (1) `|M'{}^{ab}| = |M'{}^{ab}|` transports along
+`M' = (derivedInG M).subgroupOf M ≃* derivedInG M` (`MulEquiv.abelianizationCongr`); (2)
+`|(derivedInG M){}^{ab}| = |M' : M''|` because `Abelianization = quotient by the commutator` and
+`M''.subgroupOf M' = commutator ↥M'` (`comap_map_eq_self_of_injective`); (3) `|M' : HC| = |U : C|`
+by cancelling the common factor `|H|` in the structural card identity `|M'|·|C| = |HC|·|U|`
+(`typePData_card_derived_mul_card_C_eq`), mirroring the S13 `HC_relIndex_derived`.
+
+This isolates the *char-free* half of `card_SHCSet_filter_eq_charParam_n`'s remaining input
+`|M'{}^{ab}| = d`: with (11.5) discharged it reduces `d = |M'{}^{ab}|` to `|U : C| = u = d`, whose
+`|U : C| = u` half is the (11.7) `H₀ = 1` collapse `C_U(H̄) = C` and whose `u = d` half is
+`charParam_d_eq_u`. -/
+theorem typePData_card_abelianization_derived_eq_relIndex_C [Finite G] {M : Subgroup G}
+    (data : TypePData M)
+    (hM2 : secondDerivedInAmbient M
+      = data.H ⊔ (data.U ⊓ Subgroup.centralizer (data.H : Set G))) :
+    Nat.card (Abelianization ↥((derivedInG M).subgroupOf M))
+      = (data.U ⊓ Subgroup.centralizer (data.H : Set G)).relIndex data.U := by
+  classical
+  set C := data.U ⊓ Subgroup.centralizer (data.H : Set G) with hCdef
+  set HC := data.H ⊔ C with hHCdef
+  have hCleU : C ≤ data.U := inf_le_left
+  have hHCleM' : HC ≤ derivedInG M := sup_le data.H_le (hCleU.trans data.U_le)
+  -- (1) transport the abelianization along `↥(M'.subgroupOf M) ≃* ↥M'`
+  have hiso : Nat.card (Abelianization ↥((derivedInG M).subgroupOf M))
+      = Nat.card (Abelianization ↥(derivedInG M)) :=
+    Nat.card_congr (MulEquiv.abelianizationCongr
+      (Subgroup.subgroupOfEquivOfLe (Subgroup.map_subtype_le _))).toEquiv
+  -- (2) `M''.subgroupOf M' = commutator ↥M'`, so `|M'{}^{ab}| = |M' : M''|`
+  have hcomm : (secondDerivedInAmbient M).subgroupOf (derivedInG M)
+      = commutator ↥(derivedInG M) := by
+    have hdef : secondDerivedInAmbient M
+        = (commutator ↥(derivedInG M)).map (derivedInG M).subtype := rfl
+    rw [hdef, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective (derivedInG M).subtype_injective]
+  have hab : Nat.card (Abelianization ↥(derivedInG M))
+      = (secondDerivedInAmbient M).relIndex (derivedInG M) := by
+    rw [Subgroup.relIndex, hcomm]; rfl
+  -- (3) `|M' : HC| = |U : C|` by cancelling `|H|·|C|` in `|M'|·|C| = |HC|·|U|`
+  have h1 : Nat.card ↥HC * HC.relIndex (derivedInG M) = Nat.card ↥(derivedInG M) := by
+    have := Subgroup.card_mul_index (HC.subgroupOf (derivedInG M))
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHCleM').toEquiv] at this
+  have h2 : Nat.card ↥C * C.relIndex data.U = Nat.card ↥data.U := by
+    have := Subgroup.card_mul_index (C.subgroupOf data.U)
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hCleU).toEquiv] at this
+  have hcardid : Nat.card ↥(derivedInG M) * Nat.card ↥C = Nat.card ↥HC * Nat.card ↥data.U := by
+    have h := typePData_card_derived_mul_card_C_eq data
+    rw [← hCdef, ← hHCdef] at h
+    exact h
+  have hkey : Nat.card ↥HC * Nat.card ↥C * HC.relIndex (derivedInG M)
+      = Nat.card ↥HC * Nat.card ↥C * C.relIndex data.U := by
+    calc Nat.card ↥HC * Nat.card ↥C * HC.relIndex (derivedInG M)
+        = Nat.card ↥C * (Nat.card ↥HC * HC.relIndex (derivedInG M)) := by ring
+      _ = Nat.card ↥C * Nat.card ↥(derivedInG M) := by rw [h1]
+      _ = Nat.card ↥(derivedInG M) * Nat.card ↥C := by ring
+      _ = Nat.card ↥HC * Nat.card ↥data.U := hcardid
+      _ = Nat.card ↥HC * (Nat.card ↥C * C.relIndex data.U) := by rw [h2]
+      _ = Nat.card ↥HC * Nat.card ↥C * C.relIndex data.U := by ring
+  have hpos : 0 < Nat.card ↥HC * Nat.card ↥C := Nat.mul_pos Nat.card_pos Nat.card_pos
+  rw [hiso, hab, hM2]
+  exact Nat.eq_of_mul_eq_mul_left hpos hkey
+
 end OddOrder.Peterfalvi.S12

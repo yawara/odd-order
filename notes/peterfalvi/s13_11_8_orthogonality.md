@@ -1616,3 +1616,42 @@ update¹² の bridge (μ_k source ↔ §9 𝒳(H₀)) を Coq `memSred` の **c
    |𝒮(HC) 内 degree-w₁ irr| = n = (d−1)/w₁。d=u は今回の機構で出る ⟹ 残 = S₁ ↔ Iirr(U/C)\{0}
    対応 (Coq size_S1: HU/HC ≅ U/C quotient + abelian |Iirr| = |U/C| = u) + (u−1)/q count。
 2. **`coherent_Sset_of_column_identities`** ((11.8.6) τ₂=S₂ coherence、最深、leaf 3799)。
+
+## 2026-07-05 update¹⁴ (lane-a) — **gate-1 の n-count sorry を精査分解、構造核 `|M'ᵃᵇ|=|U:C|` LANDED**
+
+update¹³ で「gate-1 の残 = S₁↔Iirr(U/C) 対応」と書いたが、`card_SHCSet_filter_eq_charParam_n`
+(S12_Section9Counts:1326) の実 sorry (1343) を精読すると残 input は **`Nat.card(Abelianization
+M'.subgroupOf M) = params.d` の 1 本**。既存 helper `card_SHCSet_filter_eq_charParam_n_of_card_abelianization_eq`
+(sorry-free) が `hab:|M'ᵃᵇ|=d` を取れば n-count を出す。⟹ **gate-1 全体 = `|M'ᵃᵇ| = d` の 1 identity**。
+
+**分解** (Coq/§11 の route): `|M'ᵃᵇ| = |M'/M''| = |M'/HC| = |M':HC| = |U:C| = u = d`。各リンク:
+- **`|M'ᵃᵇ| = |M':HC|`** (given (11.5) `M''=HC`) = **本 iteration LANDED** =
+  `typePData_card_abelianization_derived_eq_relIndex_C` (S12_Section9Counts 末尾、sorry-free)。
+  `MulEquiv.abelianizationCongr` transport + `M''.subgroupOf M' = commutator ↥M'`
+  (`comap_map_eq_self_of_injective`) + `typePData_card_derived_mul_card_C_eq` の `|H|` cancel。
+  → `|M':HC| = |U:C|` (`C = U ⊓ C_G(H)`)。S13 `HC_relIndex_derived` の S12/TypePData mirror。
+- **`|U:C| = u`** (残、深) = (11.7) `H₀=1` collapse `H̄=H` → action kernel `C_U(H̄)=C_U(H)=U⊓C_G(H)=C`
+  + `u = |image of U on H̄| = [U:ker]`。⟹ chief-action kernel の同定 (`quotientMulAutHom ∘ subtype`
+  の ker = `(U⊓C_G(H)).subgroupOf(U⊔W1)`) が本体。
+- **`u = d`** = `charParam_d_eq_u` (済)。
+
+**★ 重大: (11.7) `H_elementaryAbelian` (`chief.H0=⊥`) は自身 sorry** (S13_CoreStructure:1138)。
+⟹ gate-1 の n-count は **sorried (11.7) に gated**。(11.5) `secondDerived_eq_HC` は逆に **proven
+sorry-free** (HC_le_secondDerived→coherent_quotient_bound→(6.2)/(6.3)/(10.8)、count/(11.8) endpoint
+への逆依存なし = 循環なし確認済)。だが S13 の richer `Hypothesis` (`.HC/.C/.base/.dadeData`) 上ゆえ
+S12 へ relocate 不可 → 閉じるには threading。
+
+**threading 構造** (gate-1 完了に必要): consumer `exists_zeta_residual_not_orthogonal`
+(S12_MaximalIII_IV_V:3841) は `params` を**内部**構成 (`exists_charParameters_full`) ゆえ `params.d`
+ベース仮説を signature に載せられない。→ params-free な `hM2:M''=HC` (+ (11.7) 用 `hH0:H₀=⊥`) を
+**FeitThompson 層まで** thread (`card_kappaHall_lt_of_isTypeIIIorIV` FeitThompson:458 が S13 import、
+`secondDerived_eq_HC` [済] + `H_elementaryAbelian` [sorried-cite] で discharge)。
+
+**次 iteration の 2 候補** (upstream-first):
+- **(A) (11.7) `H_elementaryAbelian`** = 真の最上流 sorry (gate-1 + `[U:C]=u` を gate)。machinery は
+  S13_ElementaryAbelianKernel.lean に既在 (BG 1.22 / class-2 / Galois refute / odd-exponent chain)。
+  Peterfalvi pp.64-65。要 tractability 調査。
+- **(B) `[U:C]=u`** = chief-action kernel 同定 (`typeP_conjAction`/`quotientMulAutHom` の ker = C_U(H))。
+  (11.7) に gated だが sorried-cite で先行可。gate-1 の残構造ピース。
+upstream-first ⟹ (A) が正筋 (両方を gate)。gate-2 (`coherent_Sset_of_column_identities` 11.8.6) は
+下流・最深で不変。
