@@ -819,3 +819,15 @@ vs CharacterDifferenceImage.Orthogonal) の突合が実装時の最初の確認�
   の全象限実証明で完結。issue 2022 の h56/(5.2.d) grid obligation 閉。
 - 残る §11-チェーン上流: S13_CoreStructure の (11.7) H_elementaryAbelian +
   (11.8) block (orthogonality_setup / not_orthogonal_mu0_sub_zeta)。
+
+## 2026-07-05 lane-a (loop 60): (11.7) 着手 — case-(b) parity kernel 完成 (issue 9012)
+
+- (11.7) 調査: 教科書 = 交代形式 2 分岐; Coq FTtype34_Fcore_kernel_trivial = 純群論再構成
+  (D = Q-coset commutator; Galois case は extraspecial + odd |Hhat| 矛盾)。
+- mathlib に交代形式偶数次元定理なし → 指標 route 採用: repo 既存の
+  sq_finrank_eq_card_quotient_center (Gor 5.5.5, class-2 一般) + 新設 faithful-存在で
+  「class-2, |Z|=p, |P|=p^{q+1} → q 偶」を実証明 (ClassTwoSquareIndex.lean, commit 12aca9b8)。
+- (9.7) 部品確認済み: chiefFactor_clifford_U_dichotomy (U-既約 ∨ S₀ 位数 p)、
+  CliffordCaseAData (Hpart ⊕分解 + orbitRep + iSupIndep) が S11 に実在。
+- 残 = S13 側 frame: Q ◁ H (index p in H₀) 構成 → Khat = H/Q class-2 化 →
+  case (b): Z(Khat) = H0hat (U-既約性) → kernel 適用; case (a): φ_w 指標の w-鎖論法。
