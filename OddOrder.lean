@@ -66,6 +66,7 @@ import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
 import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
 import OddOrder.GroupTheory.RepresentationTheory.IsReal
 import OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair
+import OddOrder.GroupTheory.RepresentationTheory.OrbitOnIrr
 import OddOrder.GroupTheory.RepresentationTheory.PermutationInvariants
 import OddOrder.GroupTheory.RepresentationTheory.RepresentationDeterminant
 import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
