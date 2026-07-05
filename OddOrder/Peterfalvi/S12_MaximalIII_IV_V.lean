@@ -3865,7 +3865,7 @@ theorem exists_zeta_residual_not_orthogonal [Finite G]
   -- (11.8.1)/(5.7) the orthonormal coherent image `R`; its cardinality `|R| = n` is the §9 count.
   obtain ⟨R, hZ, hRorth, hRmem, hRrev, hRcard⟩ := hyp.exists_coherentImage_SHC ν
   have hRn : R.card = params.n :=
-    hRcard.trans (hyp.card_SHCSet_filter_eq_charParam_n hG htype params hmu)
+    hRcard.trans (hyp.card_SHCSet_filter_eq_charParam_n hG htype params hmu hδpm)
   -- degree relations at `δ = 1`.
   have hnf : (params.n : ℤ) * (hyp.w1 : ℤ) = (params.d : ℤ) - 1 := by rw [← hδ1]; exact params.n_formula
   have hd : (params.d : ℂ) = (hyp.w1 : ℂ) * (params.n : ℂ) + 1 := by

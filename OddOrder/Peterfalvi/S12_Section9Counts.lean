@@ -782,23 +782,6 @@ theorem Hypothesis.charParam_delta_eq_one [Finite G] (hG : OddOrder.BG.IsMinimal
     have hw1Z : (3 : ℤ) ≤ (hyp.w1 : ℤ) := by exact_mod_cast hw1
     omega
 
-open scoped Classical FiniteInduce in
-/-- **Peterfalvi (11.8.1), `|S(HC)| = n`** (§9 count, named obligation).  The number of degree-`w₁`
-irreducible members of `S = inducedFamily M` equals `n = (d − δ)/w₁ = (d − 1)/w₁`.  `S(HC) = S₁`
-consists of the `(u − 1)/q` degree-`q = w₁` irreducible constituents of the constant-degree Frobenius
-family `(U/C) ⋊ W₁`, so `|S(HC)| = (u − 1)/q = (d − 1)/w₁ = n` by (11.8.1).  This is the cardinality
-matching the isometric coherent image (`exists_coherentImage_SHC`, `|R| = |S(HC)|`) to `n` — the sole
-remaining §9-gated input of the `R`-data.  §9-gated: needs the Frobenius constituent count and
-`caseB_degree_qu` (via `d = |Ū|`, `charParam_d_modEq_one`). -/
-theorem Hypothesis.card_SHCSet_filter_eq_charParam_n [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
-    (htype : IsTypeIII M ∨ IsTypeIV M)
-    (params : CharacterParameters hyp) (hmu : params.mu = hyp.muGrid hG hG.odd) :
-    (Finset.univ.filter (fun χ : IrreducibleCharacter ↥M =>
-      (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
-        ((χ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (hyp.w1 : ℂ))).card = params.n := by
-  sorry
-
 /-! ## (11.8.1) `|𝒮(HC)| = n`: linear sources and the orbit count -/
 
 /-- `M' = (derivedInG M).subgroupOf M` is normal in `↥M` (it is `commutator ↥M` under
@@ -1293,5 +1276,70 @@ theorem Hypothesis.card_abelianization_derived_eq_w1_mul_card_SHCSet_add_one [Fi
     simp only [Finset.mem_erase, Finset.mem_filter, Finset.mem_univ, true_and]
   rw [herase, Finset.card_erase_of_mem htriv,
     Nat.sub_add_cancel (Finset.card_pos.mpr ⟨_, htriv⟩)]
+
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (11.8.1), `|S(HC)| = n` — the arithmetic reduction** (sorry-free).  Given the
+abelianization order `|M'{}^{ab}| = |M'/M''| = d`, the count `|S(HC)| = n` follows purely from the
+orbit count `|M'{}^{ab}| = w₁·|S(HC)| + 1`
+(`card_abelianization_derived_eq_w1_mul_card_SHCSet_add_one`) and the index relation
+`n·w₁ = d − δ = d − 1` (`n_formula` at `δ = 1`): `w₁·|S(HC)| = d − 1 = n·w₁`, so `|S(HC)| = n`. -/
+theorem Hypothesis.card_SHCSet_filter_eq_charParam_n_of_card_abelianization_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (params : CharacterParameters hyp) (hdelta : params.delta = 1)
+    (hab : Nat.card (Abelianization ↥((derivedInG M).subgroupOf M)) = params.d) :
+    (Finset.univ.filter (fun χ : IrreducibleCharacter ↥M =>
+      (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
+        ((χ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (hyp.w1 : ℂ))).card = params.n := by
+  haveI := hyp.finiteG
+  classical
+  -- `d = w₁·|S(HC)| + 1`
+  have horbit := hyp.card_abelianization_derived_eq_w1_mul_card_SHCSet_add_one hG
+  rw [hab] at horbit
+  -- `n·w₁ = d − 1 = w₁·|S(HC)|`
+  have hnw : params.n * hyp.w1
+      = hyp.w1 * (Finset.univ.filter fun χ : IrreducibleCharacter ↥M =>
+          (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
+            ((χ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (hyp.w1 : ℂ)).card := by
+    have h := params.n_formula
+    rw [hdelta, horbit] at h
+    have : (params.n * hyp.w1 : ℤ)
+        = (hyp.w1 * (Finset.univ.filter fun χ : IrreducibleCharacter ↥M =>
+            (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
+              ((χ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (hyp.w1 : ℂ)).card : ℤ) := by
+      push_cast at h ⊢
+      linarith
+    exact_mod_cast this
+  have hw1pos : 0 < hyp.w1 := Nat.pos_of_ne_zero (NeZero.ne hyp.w1)
+  rw [mul_comm hyp.w1] at hnw
+  exact (Nat.eq_of_mul_eq_mul_right hw1pos hnw).symm
+
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (11.8.1), `|S(HC)| = n`** (§9 count, named obligation).  The number of degree-`w₁`
+irreducible members of `S = inducedFamily M` equals `n = (d − δ)/w₁ = (d − 1)/w₁`.  `S(HC) = S₁`
+consists of the `(u − 1)/q` degree-`q = w₁` irreducible constituents of the constant-degree Frobenius
+family `(U/C) ⋊ W₁`, so `|S(HC)| = (u − 1)/q = (d − 1)/w₁ = n` by (11.8.1).  This is the cardinality
+matching the isometric coherent image (`exists_coherentImage_SHC`, `|R| = |S(HC)|`) to `n`.
+
+The orbit count `|M'{}^{ab}| = w₁·|S(HC)| + 1` and the `n·w₁ = d − 1` arithmetic are discharged by
+`card_SHCSet_filter_eq_charParam_n_of_card_abelianization_eq` (sorry-free); the single remaining
+input is `|M'/M''| = d` (below). -/
+theorem Hypothesis.card_SHCSet_filter_eq_charParam_n [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M)
+    (params : CharacterParameters hyp) (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hδpm : params.delta = 1 ∨ params.delta = -1) :
+    (Finset.univ.filter (fun χ : IrreducibleCharacter ↥M =>
+      (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
+        ((χ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (hyp.w1 : ℂ))).card = params.n := by
+  haveI := hyp.finiteG
+  refine hyp.card_SHCSet_filter_eq_charParam_n_of_card_abelianization_eq hG params
+    (hyp.charParam_delta_eq_one hG htype params hmu hδpm) ?_
+  -- **The remaining (11.5)/(11.7) gate**: `|M'/M''| = u = d`.  `Abelianization M' = M'/M''`;
+  -- by (11.5) `M'' = HC` (`S13.secondDerived_eq_HC`) and (11.7) `H₀ = 1`, `M'/M'' = M'/HC ≅ U/C`,
+  -- of order `u = |Ū| = d` (`charParam_d_eq_u`).  This is the single subgroup-index equality
+  -- gating the count; (11.5)'s proof (currently S13) routes through the S12-level
+  -- `SHC_isCoherent`/`coherent_quotient_bound`, so relocating it upstream (or threading the
+  -- equality) closes this without new mathematics.  See `notes/peterfalvi/s13_11_8_orthogonality.md`.
+  sorry
 
 end OddOrder.Peterfalvi.S12
