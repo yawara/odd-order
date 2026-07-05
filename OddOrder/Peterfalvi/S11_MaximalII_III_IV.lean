@@ -2755,6 +2755,27 @@ theorem hInHu_sup_realizedH0supC {M : Subgroup G}
   exact sup_eq_left.mpr
     (Subgroup.subgroupOf_mono _ (Subgroup.subgroupOf_mono _ chief.H0_lt_H.le))
 
+/-- **The `M`-level `HC` is `(H ⊔ C).subgroupOf M`**: the `huSub`-image of the realized inertia
+subgroup `HC = hInHu ⊔ realizedH0C` (used as the source subgroup of the (13.3.a) `isIndHC`
+witness) is `(data.H ⊔ cSub).subgroupOf M`.  Via `hInHu_sup_realizedH0supC` (`= hInHu ⊔ cInHu`),
+`Subgroup.map_sup`, and `subgroupOf_map_subtype` collapsing each `⊓ huSub` (both `H.subgroupOf M`
+and `cSub.subgroupOf M` lie below `huSub`).  In the §13 `S`-instantiation this is
+`(P ⊔ C).subgroupOf S = (PC).subgroupOf S`, the `Ind_{PC}` target of (13.3.a). -/
+theorem hcRealized_map_subtype_eq [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).map
+        (huSub data).subtype
+      = (data.H ⊔ cSub data chief).subgroupOf M := by
+  have hHsub : data.H.subgroupOf M ≤ huSub data := Subgroup.subgroupOf_mono M le_sup_left
+  have hCsub : (cSub data chief).subgroupOf M ≤ huSub data :=
+    Subgroup.subgroupOf_mono M ((cSub_le_U data chief).trans le_sup_right)
+  rw [hInHu_sup_realizedH0supC, Subgroup.map_sup]
+  show (hInHu data).map (huSub data).subtype ⊔ (cInHu data chief).map (huSub data).subtype
+      = (data.H ⊔ cSub data chief).subgroupOf M
+  rw [hInHu, cInHu, Subgroup.subgroupOf_map_subtype, Subgroup.subgroupOf_map_subtype,
+    inf_of_le_left hHsub, inf_of_le_left hCsub, ← Subgroup.subgroupOf_sup (H_le_M data)
+      ((cSub_le_U data chief).trans (U_le_M data))]
+
 /-- **`H₀C ≤ M' = HU`**: `H₀ ≤ H ≤ M'` (`typeP.H_le`) and `C ≤ U ≤ M'` (`typeP.U_le`).  The second
 input (`K ≤ HU`) of the generic reducible-count hypothesis (Coq `PFsection9` `nb_redM`) for the
 quotient `M/H₀C`; combined with `chiefFactor_H0supC_inf_H_eq_H0` and `H₀C ◁ M` it makes the §9↔§6
@@ -7930,6 +7951,119 @@ theorem caseB_xiOf_H0C_eq_induce_hcPsi [Finite G] {M : Subgroup G}
 
 set_option maxHeartbeats 1600000 in
 open scoped Classical in
+/-- **Stages-flattening**: a `𝒮`-member whose (irreducible) source equals
+`Ind_{HC}^{HU}(hcPsi θbar)` is induced from a linear character of the `M`-level `HC`
+(`HC.map subtype`).  The case-split-free tail of the `isIndHC` lemmas: induction in stages
+(`induce_induce_subgroupOf`) plus the `subgroupCongr` transport
+(`induce_compHom_subgroupCongr`). -/
+theorem isIndHC_of_source_eq_induce_hcPsi [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    [Fintype ↥M] [Fintype ↥(huSub data)]
+    [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+      M).subgroupOf (huSub data)) : ℂ)]
+    [Invertible (Nat.card ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+      M).subgroupOf (huSub data)).map (huSub data).subtype) : ℂ)]
+    {ζ' : IrreducibleCharacter ↥(huSub data)}
+    {θbar : (↥data.H ⧸ chief.N) →* ℂˣ}
+    (hζ'eq : (ζ' : ClassFunction ↥(huSub data) ℂ)
+      = ClassFunction.induce
+          (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+          (hcPsi chief θbar).toClassFunction) :
+    ∃ ψ : ClassFunction
+        ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+          (huSub data)).map (huSub data).subtype) ℂ,
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ ∧
+      ψ 1 = 1 ∧
+      induceHU data (ζ' : ClassFunction ↥(huSub data) ℂ) = ClassFunction.induce
+        ((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+          (huSub data)).map (huSub data).subtype) ψ := by
+  classical
+  letI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+    (huSub data)) := Fintype.ofFinite _
+  letI : Fintype ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+    (huSub data)).map (huSub data).subtype) := Fintype.ofFinite _
+  letI : Fintype ↥(((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+    (huSub data)).map (huSub data).subtype).subgroupOf (huSub data)) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥M : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥(((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+    M).subgroupOf (huSub data)).map (huSub data).subtype).subgroupOf (huSub data)) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+    (huSub data)).Normal := hcInHu_realized_normal chief
+  have hKle : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)).map (huSub data).subtype ≤ huSub data :=
+    Subgroup.map_subtype_le _
+  have hKeq : ((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)).map (huSub data).subtype).subgroupOf (huSub data)
+      = hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data) :=
+    Subgroup.comap_map_eq_self_of_injective (huSub data).subtype_injective _
+  set f : ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)).map (huSub data).subtype) ≃*
+      ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) :=
+    (Subgroup.subgroupOfEquivOfLe hKle).symm.trans (MulEquiv.subgroupCongr hKeq) with hf
+  refine ⟨ClassFunction.compHom f.toMonoidHom
+    (hcPsi chief θbar : ClassFunction
+      ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ),
+    ?_, ?_, ?_⟩
+  · exact OddOrder.RepresentationTheory.IsIrreducibleCharacter.compHom_of_surjective
+      f.surjective (hcPsi chief θbar).isIrreducible
+  · rw [ClassFunction.compHom_apply, map_one]
+    simp [hcPsi, linearIrreducibleCharacter_apply_one]
+  · have hstages := OddOrder.RepresentationTheory.induce_induce_subgroupOf
+      (M := ↥M) (K := (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+        (huSub data)).map (huSub data).subtype) (H := huSub data) hKle
+      (ClassFunction.compHom f.toMonoidHom
+        (hcPsi chief θbar : ClassFunction
+          ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+            (huSub data)) ℂ))
+    have hfe : f.toMonoidHom.comp (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom
+        = (MulEquiv.subgroupCongr hKeq).toMonoidHom := by
+      refine MonoidHom.ext fun x => ?_
+      rw [hf]
+      simp only [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, MulEquiv.trans_apply,
+        MulEquiv.symm_apply_apply]
+    have hcomp : ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom
+        (ClassFunction.compHom f.toMonoidHom
+          (hcPsi chief θbar : ClassFunction
+            ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+              (huSub data)) ℂ))
+        = ClassFunction.compHom (MulEquiv.subgroupCongr hKeq).toMonoidHom
+          (hcPsi chief θbar : ClassFunction
+            ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+              (huSub data)) ℂ) := by
+      rw [OddOrder.RepresentationTheory.ClassFunction.compHom_comp, hfe]
+    have hinner : ClassFunction.induce (((hInHu data ⊔ ((chief.H0 ⊔ cSub data
+        chief).subgroupOf M).subgroupOf (huSub data)).map
+          (huSub data).subtype).subgroupOf (huSub data))
+        (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom
+          (ClassFunction.compHom f.toMonoidHom
+            (hcPsi chief θbar : ClassFunction
+              ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+                (huSub data)) ℂ)))
+        = ClassFunction.induce
+            (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+            (hcPsi chief θbar).toClassFunction := by
+      rw [hcomp]
+      exact OddOrder.RepresentationTheory.induce_compHom_subgroupCongr hKeq _
+    calc induceHU data (ζ' : ClassFunction ↥(huSub data) ℂ)
+        = ClassFunction.induce (huSub data) (ζ' : ClassFunction ↥(huSub data) ℂ) := by
+          unfold induceHU
+          congr! <;> exact Subsingleton.elim _ _
+      _ = ClassFunction.induce (huSub data)
+            (ClassFunction.induce (((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+              M).subgroupOf (huSub data)).map (huSub data).subtype).subgroupOf (huSub data))
+              (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom
+                (ClassFunction.compHom f.toMonoidHom
+                  (hcPsi chief θbar : ClassFunction
+                    ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+                      (huSub data)) ℂ)))) := by rw [hinner, ← hζ'eq]
+      _ = _ := hstages
+
+set_option maxHeartbeats 1600000 in
+open scoped Classical in
 /-- **Peterfalvi (13.3.a) core (Coq `PFsection9.isIndHC`)**: in Clifford case (b), every
 *reducible* member of `𝒮(H₀)` is induced from a linear character of `HC` at the `M`-level.
 Chain: (9.9.b) membership (`reducible_mem_sOf_H0C`), the `hcPsi`-exhaustion of `𝒳(H₀C)`
@@ -9366,6 +9500,89 @@ theorem caseA_reducible_source_eq_hcZeta [Finite G] {M : Subgroup G}
   have hH0C := (hχ'χ ▸ hχ'C : χ ∈ xiOf data (chief.H0 ⊔ chars.C)).2
   refine ⟨θbar, caseA_reducible_theta_regular caseA θbar χ hlo hMfix hnt, ?_⟩
   exact congrArg (induceHU data) (caseA_reducible_eq_hcZeta caseA θbar χ hlo hMfix hnt hH0C)
+
+set_option maxHeartbeats 1600000 in
+open scoped Classical in
+/-- **Peterfalvi (13.3.a) core, case (a)** (the (9.8.b)-side `isIndHC`): in Clifford case (a),
+every *reducible* member of `𝒮(H₀)` is induced from a linear character of `HC` at the
+`M`-level.  `caseA_reducible_source_eq_hcZeta` identifies the source as
+`Ind_{HC}(hcPsi θbar)` (regular seed), and the stages-flattening
+(`isIndHC_of_source_eq_induce_hcPsi`) concludes. -/
+theorem caseA_reducible_sOf_H0_isIndHC [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    [Fintype ↥M] [Fintype ↥(huSub data)]
+    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+      M).subgroupOf (huSub data)) : ℂ)]
+    [Invertible (Nat.card ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+      M).subgroupOf (huSub data)).map (huSub data).subtype) : ℂ)]
+    {φ : ClassFunction ↥M ℂ}
+    (hφ : φ ∈ sOf data chief.H0) (hred : ¬ IsIrreducibleCharacter φ) :
+    ∃ ψ : ClassFunction
+        ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+          (huSub data)).map (huSub data).subtype) ℂ,
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ ∧
+      ψ 1 = 1 ∧
+      φ = ClassFunction.induce
+        ((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+          (huSub data)).map (huSub data).subtype) ψ := by
+  classical
+  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Fintype ↥(hInHu data) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+    (huSub data)).Normal := hcInHu_realized_normal chief
+  obtain ⟨θbar, hreg, hφeq⟩ := caseA_reducible_source_eq_hcZeta caseA hG φ hφ hred
+  have hreg' : ∀ i, ∃ x ∈ caseA.Hpart i,
+      (linearIrreducibleCharacter θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+        ≠ (linearIrreducibleCharacter θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1 := by
+    intro i
+    obtain ⟨x, hx, hne⟩ := (comp_subtype_ne_one_iff_exists caseA θbar i).mp (hreg i)
+    refine ⟨x, hx, ?_⟩
+    rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one,
+      Units.val_one]
+    simpa using hne
+  have hθ₀ := inertia_eq_hcInHu_caseA data chief caseA hreg'
+  obtain ⟨ψ, hψirr, hψone, hψeq⟩ := isIndHC_of_source_eq_induce_hcPsi
+    (ζ' := ⟨ClassFunction.induce
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+      (hcPsi chief θbar), hcZeta_irreducible chief θbar hθ₀⟩) (θbar := θbar) rfl
+  exact ⟨ψ, hψirr, hψone, hφeq.trans hψeq⟩
+
+set_option maxHeartbeats 1600000 in
+open scoped Classical in
+/-- **Peterfalvi (13.3.a) core, case-agnostic (Coq `isIndHC`)**: every *reducible* member of
+`𝒮(H₀)` is induced from a linear character of `HC` at the `M`-level — in either Clifford case
+(`clifford_dichotomy`; case (a) = `caseA_reducible_sOf_H0_isIndHC` via (9.8.b), case (b) =
+`caseB_reducible_sOf_H0_isIndHC` via (9.9.b)).  In the §13 `S`-instantiation `HC = PC`, so
+this is exactly (13.3.a)'s "`μ_j` is induced from a linear character of `PC`". -/
+theorem reducible_sOf_H0_isIndHC [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief)
+    [Fintype ↥M] [Fintype ↥(huSub data)]
+    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+      M).subgroupOf (huSub data)) : ℂ)]
+    [Invertible (Nat.card ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+      M).subgroupOf (huSub data)).map (huSub data).subtype) : ℂ)]
+    {φ : ClassFunction ↥M ℂ}
+    (hφ : φ ∈ sOf data chief.H0) (hred : ¬ IsIrreducibleCharacter φ) :
+    ∃ ψ : ClassFunction
+        ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+          (huSub data)).map (huSub data).subtype) ℂ,
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ ∧
+      ψ 1 = 1 ∧
+      φ = ClassFunction.induce
+        ((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+          (huSub data)).map (huSub data).subtype) ψ := by
+  rcases clifford_dichotomy hG chars with hA | hB
+  · obtain ⟨caseA⟩ := hA
+    exact caseA_reducible_sOf_H0_isIndHC hG caseA hφ hred
+  · obtain ⟨caseB⟩ := hB
+    exact caseB_reducible_sOf_H0_isIndHC hG chars caseB hφ hred
 
 /-- **step 5 consequence (9.8.b degree, caseA): a reducible `𝒮(H₀)`-member has degree `qu`.**  By
 `caseA_reducible_source_eq_hcZeta` the reducible `φ = Ind_{HU}^M(Ind_{HC}(hcPsi θbar))`, whose degree
