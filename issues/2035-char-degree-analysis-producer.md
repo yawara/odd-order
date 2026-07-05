@@ -431,3 +431,30 @@ clean/quick な ungated leaf は現時点で枯渇。
   mu_tau1_formula (S05 (5.8) machinery threading)。
 - **次 session 推奨**: 上記 gated-endpoint body を専用 session で landing (SibleyTarget 仮説化で
   §14 依存を parallel track に切り出し、(13.3) 構成 principle を実証)。
+
+## 2026-07-06 更新 #2 (lane b, 専用エージェント調査): (13.3) の実 gate = S15→S13 bridge (sibleyTarget 診断は誤り)
+
+**gated-endpoint body (`character_degree_analysis_of_sibleyTarget`) 戦略は REFUTED** (build-capable
+agent が probe → coupling wall 確認 → 綺麗に revert、net-zero/green)。根本原因:
+- **spine は `S15.Hypothesis` を `Sset:=∅ / A0S:=∅ / tauS:=0` で instantiate** (`FeitThompson.lean:2668`、
+  vestigial・hub 裁定 `sibleyTarget_S` docstring 760-773「do not complete」)。ゆえ
+  `cohereOfSibleyTarget wit_S` の extension は `zSpan ∅ = {0}` 上でしか保証を持たず、nonzero
+  `induce θ` に無力 → **4 tau1S fields は cohereOfSibleyTarget から取れない**。
+- coherence+(5.8) machinery (`coherent_S_of_coherent_SH0C` S13:1192、`sixTwoDecompositionData`
+  `S13_SixTwoBridge.lean:814`、**両方 sorry-free**) は **`S13/S14.Hypothesis M` 世界**の
+  parameterization。honest `.base.tau`/`.base.Sset` を持つ。
+- **`sibleyTarget_H0C` は named では存在しない** (最も近いのは `coherent_S_of_coherent_SH0C`、Hypothesis M 世界)。
+  従来の「(13.3) = sibleyTarget_H0C §14-gated」診断は不正確。
+
+**⟹ (13.3) の真の gate = `S15.Hypothesis → S13.Hypothesis (hyp.S)` reduction + `hyp.mu`/`hyp.eta` ↔
+`muGrid`/`Section16CharacterData` grid reconciliation の bridge を構築すること**。この bridge が
+在れば **既 proven の `sixTwoDecompositionData`/(5.8) で `tau1S_*`/`mu_col`/`mu_tau1_formula` を discharge 可**。
+これが本物の §14 work (structural、char-analytic でない — 相対的に tractable かもしれないが multi-session)。
+
+**今 proven 可の 2 fields** (bridge 無しでも): `mu_j_linear_induced` ← `mu_j_isIndPC` (:2621) /
+`delta_eq_one` S-side ← `delta_eq_one_S` (:3537)。**別 gap**: T-side `δ'_i=1` は `deltaPrime_eq_one`
+不在 (delta_eq_one_S の T-side mirror が要る)。
+
+**次 session 推奨**: (13.3) を直接触らず、上記 **S15→S13 Hypothesis bridge + grid reconciliation** を
+専用 session で。それまで `character_degree_analysis` の単一 sorry を fan-out しない (undischargeable
+hypotheses に分解するのは net-negative)。
