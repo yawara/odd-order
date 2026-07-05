@@ -319,3 +319,30 @@ Pf の C ≠ 1 否定枝の Lean 化に必要な新規構成:
    → u = (p^q−1)/(p−1)。
 
 規模見積: 2 (積指標) が主 (~150 行)、3-5 は既存機械の適用 (~80 行)、6 は counting (~100 行)。
+
+## ✅ T-side complement disjointness `Q ⊓ V = ⊥` un-gated (it.89, 2026-07-05, commit 4ea27401)
+
+**issue の「次: T-carrier が Section16 Tdata analog から threading 可能か調査」への確定回答**:
+
+- **full T-carrier は §14 gated 確定**: `typePData_of_kappaHall_hallComplement` は `IsTypeP2 M` 必須
+  → T では `IsTypeP2 T` = (14.9) = `IsTypeII T` (§16/c-lane)。§16 constructor は T の型が構築時
+  未確定ゆえ full Tdata を供給不可 (設計通り「no T-side carrier」)。`reconciled_typePData_T` の
+  残 6 sorry (W2_le / M_complement / U_nilpotent / secondDerived_le_fitting / fitting_eq /
+  centralizer_W1) はこの §14 gate に残る。
+- **ただし complement disjointness `Q ⊓ V = ⊥` は ungated**: `exists_kappaHall_invariant_complement_to_MF`
+  (S14_TypePComplement:32) が `M_F ⊓ U = ⊥` を **`IsTypeP M`** (= `T_nonI`、(14.9) 不要) から返す。
+  §16 constructor では `hTcompl.choose_spec.2.2` として在るが、抽象 `T_deriv_eq_QV` (`T' = Q ⊔ V`) が
+  disjointness を捨てていた。
+- **実施**: honest field `V_inf_Q_eq_bot` を `Section16TypePStructure` → `Section16Inputs` →
+  `S15.Hypothesis.Q_inf_V_eq_bot` に threading (3 constructor sites とも `hTcompl` から供給)。効果:
+  - `reconciled_typePData_T.derived_complement`: 7→6 sorry (field + `T_deriv_eq_QV` で実証明)
+  - `isMulCommutative_V`: **完全 honest 化** — sorried `reconciled_typePData_T` call を除去、
+    (14.9) `IsTypeII T` 仮説のみに gated (V-side 他 lemma と同型)。(13.16) V-side subtree が解放。
+  - 循環 `Q_inf_V_eq_bot_of_reconciled` 撤去 (callers は `hyp.Q_inf_V_eq_bot` 直参照)。
+- **次の同型 win 候補**: `M_complement` (W2 が T' を T で複補) も ungated
+  (`typeP_derivedInG_isComplement_kappaHall` via `T_typeP` + W2=κ-Hall)。threading すれば
+  `coprime_card_Q_card_VW2` を full honest 化できる (W2=κ-Hall の field 追加要)。
+
+**B-lane frontier 総括 (it.89 時点)**: S15 (§13) の ungated genuine math は essentially 完了
+(S-side 全 + T-side disjointness)。残りは一律 §14 gate (`IsTypeII T` = (14.9), c-lane)
+の gated-endpoint threading + deep §13 char (complement_inf_Q/P (13.17.c) 等)。

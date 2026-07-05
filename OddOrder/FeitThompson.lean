@@ -123,6 +123,10 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
   W_cyclic : IsCyclic ↥W
   S_deriv_eq_PU : derivedInG S = maxNilpotentNormalHall S ⊔ U
   T_deriv_eq_QV : derivedInG T = maxNilpotentNormalHall T ⊔ V
+  /-- `Q ⊓ V = ⊥`: the invariant complement `V` genuinely complements `Q = T_F` in `T'` (from
+  `exists_kappaHall_invariant_complement_to_MF`, ungated by (14.9)); threaded into `S15.Hypothesis`
+  as `Q_inf_V_eq_bot`. -/
+  V_inf_Q_eq_bot : maxNilpotentNormalHall T ⊓ V = ⊥
   W1_normalizes_U : W1 ≤ Subgroup.normalizer (U : Set G)
   W2_normalizes_V : W2 ≤ Subgroup.normalizer (V : Set G)
   q : ℕ
@@ -323,6 +327,10 @@ structure Section16TypePStructure {G : Type*} [Group G] [Finite G]
   W_cyclic : IsCyclic ↥W
   S_deriv_eq_PU : derivedInG mp.S = maxNilpotentNormalHall mp.S ⊔ U
   T_deriv_eq_QV : derivedInG mp.T = maxNilpotentNormalHall mp.T ⊔ V
+  /-- `Q ⊓ V = ⊥`: the invariant complement `V` genuinely complements `Q = T_F` in `T'` (from
+  `exists_kappaHall_invariant_complement_to_MF`, ungated by (14.9)); threaded into `S15.Hypothesis`
+  as `Q_inf_V_eq_bot`. -/
+  V_inf_Q_eq_bot : maxNilpotentNormalHall mp.T ⊓ V = ⊥
   W1_normalizes_U : W1 ≤ Subgroup.normalizer (U : Set G)
   W2_normalizes_V : W2 ≤ Subgroup.normalizer (V : Set G)
   q : ℕ
@@ -909,6 +917,7 @@ noncomputable def section16TypePStructure_of_components {G : Type*} [Group G] [F
     {mp : Section16MaximalPair G} (W1 W2 U V : Subgroup G)
     (hSderiv : derivedInG mp.S = maxNilpotentNormalHall mp.S ⊔ U)
     (hTderiv : derivedInG mp.T = maxNilpotentNormalHall mp.T ⊔ V)
+    (hVinfQ : maxNilpotentNormalHall mp.T ⊓ V = ⊥)
     (hSprime : (Nat.card ↥W1).Prime) (hTprime : (Nat.card ↥W2).Prime)
     (hWjoin : mp.S ⊓ mp.T = W1 ⊔ W2)
     (hWcyc : IsCyclic ↥(mp.S ⊓ mp.T))
@@ -932,6 +941,7 @@ noncomputable def section16TypePStructure_of_components {G : Type*} [Group G] [F
   W_cyclic := hWcyc
   S_deriv_eq_PU := hSderiv
   T_deriv_eq_QV := hTderiv
+  V_inf_Q_eq_bot := hVinfQ
   W1_normalizes_U := hSnorm
   W2_normalizes_V := hTnorm
   q := Nat.card ↥W1
@@ -1037,7 +1047,7 @@ noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Gro
   have hKne : mp.K ≠ ⊥ := fun h =>
     BG.Ch4.S14.card_kappaHall_ne_one mp.S_typeP mp.K_le_S mp.K_hall (Subgroup.card_eq_one.mpr h)
   exact section16TypePStructure_of_components mp.K mp.Kstar hScompl.choose hTcompl.choose
-    hScompl.choose_spec.1 hTcompl.choose_spec.1 hprimes.1 hprimes.2
+    hScompl.choose_spec.1 hTcompl.choose_spec.1 hTcompl.choose_spec.2.2 hprimes.1 hprimes.2
     hWjoin hWcyc hbot hcomm hScompl.choose_spec.2.1 hTcompl.choose_spec.2.1 mp.K_lt_Kstar
     (typePData_of_kappaHall_hallComplement hG mp.S_maximal mp.S_typeP2 mp.K_le_S hKne mp.K_hall
       hUM hUhall hScompl.choose_spec.2.1)
@@ -2636,6 +2646,7 @@ noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [F
     W_cyclic := tp.W_cyclic
     S_deriv_eq_PU := tp.S_deriv_eq_PU
     T_deriv_eq_QV := tp.T_deriv_eq_QV
+    V_inf_Q_eq_bot := tp.V_inf_Q_eq_bot
     W1_normalizes_U := tp.W1_normalizes_U
     W2_normalizes_V := tp.W2_normalizes_V
     q := tp.q
@@ -2745,6 +2756,7 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       Q_eq_TF := rfl
       S_deriv_eq_PU := inp.S_deriv_eq_PU
       T_deriv_eq_QV := inp.T_deriv_eq_QV
+      Q_inf_V_eq_bot := inp.V_inf_Q_eq_bot
       C_eq := rfl
       D_eq := rfl
       W1_normalizes_U := inp.W1_normalizes_U
