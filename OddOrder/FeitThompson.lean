@@ -215,6 +215,14 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
   eta_complete_vanish : ∀ χ : ClassFunction G ℂ,
     (∀ (i : Fin q) (j : Fin p), ClassFunction.inner (tau3 (omega i j)) χ = 0) →
     ∀ w : G, w ∈ W → w ∉ (W1 : Set G) ∪ (W2 : Set G) → χ w = 0
+  /-- **Peterfalvi (3.4)/(3.5), the four-corner vanishing** (issue 2036): off the conjugacy
+  saturation of the regular set `Ŵ = W ∖ (W₁ ∪ W₂)`, the `(3.5)` relation collapses to
+  `1 − (τ₃ω)_{i0}(x) − (τ₃ω)_{0j}(x) + (τ₃ω)_{ij}(x) = 0` for nonzero row/column indices. -/
+  eta_fourcorner_vanish : ∀ (i : Fin q) (j : Fin p), i ≠ ⟨0, q_prime.pos⟩ →
+    j ≠ ⟨0, p_prime.pos⟩ → ∀ x : G,
+    x ∉ OddOrder.GroupTheory.conjClassSet ((W : Set G) \ ((W1 : Set G) ∪ (W2 : Set G))) →
+    (1 : ℂ) - tau3 (omega i ⟨0, p_prime.pos⟩) x - tau3 (omega ⟨0, q_prime.pos⟩ j) x
+      + tau3 (omega i j) x = 0
 
 /-! ### Partition of `Section16Inputs` into three independent producer obligations
 
@@ -399,6 +407,14 @@ structure Section16CharacterData {G : Type*} [Group G] [Finite G]
   eta_complete_vanish : ∀ χ : ClassFunction G ℂ,
     (∀ (i : Fin tp.q) (j : Fin tp.p), ClassFunction.inner (tau3 (omega i j)) χ = 0) →
     ∀ w : G, w ∈ tp.W → w ∉ (tp.W1 : Set G) ∪ (tp.W2 : Set G) → χ w = 0
+  /-- **Peterfalvi (3.4)/(3.5), the four-corner vanishing** (issue 2036): off the conjugacy
+  saturation of the regular set `Ŵ = W ∖ (W₁ ∪ W₂)`, the `(3.5)` relation collapses to
+  `1 − (τ₃ω)_{i0}(x) − (τ₃ω)_{0j}(x) + (τ₃ω)_{ij}(x) = 0` for nonzero row/column indices. -/
+  eta_fourcorner_vanish : ∀ (i : Fin tp.q) (j : Fin tp.p), i ≠ ⟨0, tp.q_prime.pos⟩ →
+    j ≠ ⟨0, tp.p_prime.pos⟩ → ∀ x : G,
+    x ∉ OddOrder.GroupTheory.conjClassSet ((tp.W : Set G) \ ((tp.W1 : Set G) ∪ (tp.W2 : Set G))) →
+    (1 : ℂ) - tau3 (omega i ⟨0, tp.p_prime.pos⟩) x - tau3 (omega ⟨0, tp.q_prime.pos⟩ j) x
+      + tau3 (omega i j) x = 0
 
 /-- **Canonical type-`P` maximal pair data** (issue 7005): for a minimal simple group of odd order,
 there is a type-`P` dual pair `S, T` together with the full κ-Hall witness data of BG Theorem 14.7
@@ -2285,6 +2301,128 @@ theorem tau3W_omegaS_fourcorner_vanish (i : Fin tp.q) (j : Fin tp.p)
           trivialClassFunction_apply]
   exact hev'.symm
 
+/-- **Peterfalvi (3.9.b), vanishing transport along the row** (issue-2036 supply): if the
+`η₁₀`-value vanishes at `x`, so do all `η_{i0}`-values for `i ≠ 0` — each `ω_{i0}` is a power
+`ω_{10}^k` with `k` coprime to `q` (`W` cyclic: the value at a generator determines the hom,
+and the nontrivial `ω_{i0}(w₀)` lie in the prime-order `μ_q = ⟨ω_{10}(w₀)⟩`), and the Galois
+twist `exists_mapRingEquiv_sigma_omega_pow` transports the vanishing. -/
+theorem tau3W_omegaS_row_vanish_of_one_zero {x : G}
+    (h0 : tau3W hG mp tp
+      (omegaS hG mp tp ⟨1, tp.q_prime.one_lt⟩ ⟨0, tp.p_prime.pos⟩) x = 0)
+    (i : Fin tp.q) (hi : i ≠ ⟨0, tp.q_prime.pos⟩) :
+    tau3W hG mp tp (omegaS hG mp tp i ⟨0, tp.p_prime.pos⟩) x = 0 := by
+  classical
+  set ξ₁ := omegaSChar hG mp tp ⟨1, tp.q_prime.one_lt⟩ ⟨0, tp.p_prime.pos⟩ with hξ₁def
+  set ξᵢ := omegaSChar hG mp tp i ⟨0, tp.p_prime.pos⟩ with hξᵢdef
+  -- the column-0 characters are `q`-th-power trivial
+  have hpow : ∀ (k : Fin tp.q), (omegaSChar hG mp tp k ⟨0, tp.p_prime.pos⟩) ^ tp.q = 1 := by
+    intro k
+    refine monoidHom_eq_of_eqOn_W1_W2 mp tp ?_ ?_ <;> intro w hw <;> refine Units.ext ?_
+    · rw [MonoidHom.pow_apply, Units.val_pow_eq_pow_val,
+        omegaSChar_val hG mp tp _ _ w, MonoidHom.one_apply, Units.val_one]
+      exact omegaS_pow_q_of_mem_W1 hG mp tp k ⟨0, tp.p_prime.pos⟩ w hw
+    · rw [MonoidHom.pow_apply, Units.val_pow_eq_pow_val,
+        omegaSChar_val hG mp tp _ _ w, MonoidHom.one_apply, Units.val_one,
+        omegaS_col_zero_apply_of_mem_W2 hG mp tp k w hw, one_pow]
+  -- distinctness along the column, and the base cases
+  have hdistinct : ∀ (k l : Fin tp.q), k ≠ l →
+      omegaSChar hG mp tp k ⟨0, tp.p_prime.pos⟩
+        ≠ omegaSChar hG mp tp l ⟨0, tp.p_prime.pos⟩ := by
+    intro k l hne heq
+    have hCF : omegaS hG mp tp k ⟨0, tp.p_prime.pos⟩
+        = omegaS hG mp tp l ⟨0, tp.p_prime.pos⟩ := by
+      rw [omegaS_eq_omega_omegaSChar, omegaS_eq_omega_omegaSChar, heq]
+    have h1 := omegaS_inner hG mp tp k l ⟨0, tp.p_prime.pos⟩ ⟨0, tp.p_prime.pos⟩
+    rw [hCF] at h1
+    have h2 := omegaS_inner hG mp tp l l ⟨0, tp.p_prime.pos⟩ ⟨0, tp.p_prime.pos⟩
+    rw [h1] at h2
+    rw [if_neg (fun h => hne h.1), if_pos ⟨rfl, rfl⟩] at h2
+    exact zero_ne_one h2
+  have hξ₀ : omegaSChar hG mp tp ⟨0, tp.q_prime.pos⟩ ⟨0, tp.p_prime.pos⟩ = 1 := by
+    refine monoidHom_eq_of_eqOn_W1_W2 mp tp ?_ ?_ <;> intro w hw <;> refine Units.ext ?_
+    · rw [omegaSChar_val hG mp tp _ _ w, MonoidHom.one_apply, Units.val_one]
+      exact omegaS_row_zero_apply_of_mem_W1 hG mp tp _ w hw
+    · rw [omegaSChar_val hG mp tp _ _ w, MonoidHom.one_apply, Units.val_one]
+      exact omegaS_col_zero_apply_of_mem_W2 hG mp tp _ w hw
+  have hξ₁ne : ξ₁ ≠ 1 := by
+    rw [hξ₁def, ← hξ₀]
+    exact hdistinct _ _ (fun h => absurd (congrArg Fin.val h) (by norm_num))
+  have hξᵢne : ξᵢ ≠ 1 := by
+    rw [hξᵢdef, ← hξ₀]
+    exact hdistinct _ _ hi
+  -- a generator of `W` and hom-extensionality on it
+  haveI := tp.W_cyclic
+  obtain ⟨w₀, hw₀⟩ := IsCyclic.exists_generator (α := ↥tp.W)
+  have hext : ∀ χ χ' : ↥tp.W →* ℂˣ, χ w₀ = χ' w₀ → χ = χ' := by
+    intro χ χ' h
+    ext w
+    obtain ⟨m, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hw₀ w)
+    rw [map_zpow, map_zpow, h]
+  -- order bookkeeping: `orderOf (ξ₁ w₀) = orderOf ξ₁ = q`
+  have hordval : ∀ χ : ↥tp.W →* ℂˣ, χ ^ tp.q = 1 → orderOf (χ w₀) = orderOf χ := by
+    intro χ _
+    refine orderOf_eq_orderOf_iff.mpr (fun n => ⟨fun h => ?_, fun h => ?_⟩)
+    · refine hext (χ ^ n) 1 ?_
+      rw [MonoidHom.pow_apply, h, MonoidHom.one_apply]
+    · rw [← MonoidHom.pow_apply, h, MonoidHom.one_apply]
+  have hord₁ : orderOf ξ₁ = tp.q := by
+    have hdvd : orderOf ξ₁ ∣ tp.q := orderOf_dvd_of_pow_eq_one (hpow ⟨1, tp.q_prime.one_lt⟩)
+    rcases (Nat.dvd_prime tp.q_prime).mp hdvd with h | h
+    · exact absurd (orderOf_eq_one_iff.mp h) hξ₁ne
+    · exact h
+  -- `ξᵢ(w₀) = ξ₁(w₀)^k` with `0 < k < q`, so `ξᵢ = ξ₁^k` with `k` coprime to `q`
+  have hζ : IsPrimitiveRoot ((ξ₁ w₀ : ℂˣ) : ℂ) tp.q := by
+    have h1 : orderOf ((ξ₁ w₀ : ℂˣ) : ℂ) = tp.q := by
+      rw [orderOf_units, hordval ξ₁ (hpow ⟨1, tp.q_prime.one_lt⟩), hord₁]
+    rw [← h1]
+    exact IsPrimitiveRoot.orderOf _
+  have hvalpow : ((ξᵢ w₀ : ℂˣ) : ℂ) ^ tp.q = 1 := by
+    rw [← Units.val_pow_eq_pow_val, ← MonoidHom.pow_apply, hpow i, MonoidHom.one_apply,
+      Units.val_one]
+  haveI : NeZero tp.q := ⟨tp.q_prime.pos.ne'⟩
+  obtain ⟨k, hklt, hk⟩ := hζ.eq_pow_of_pow_eq_one hvalpow
+  have hkhom : ξᵢ = ξ₁ ^ k := by
+    refine hext _ _ (Units.ext ?_)
+    rw [MonoidHom.pow_apply, Units.val_pow_eq_pow_val, hk]
+  have hk0 : k ≠ 0 := by
+    intro h0'
+    refine hξᵢne ?_
+    rw [hkhom, h0', pow_zero]
+  have hkcop : k.Coprime (orderOf ξ₁) := by
+    rw [hord₁]
+    exact Nat.coprime_comm.mp (tp.q_prime.coprime_iff_not_dvd.mpr
+      (Nat.not_dvd_of_pos_of_lt (Nat.pos_of_ne_zero hk0) hklt))
+  obtain ⟨u, hu, -⟩ := (tiCyclicW hG mp tp).exists_mapRingEquiv_sigma_omega_pow rfl
+    (tiCyclicWDadeApp hG mp tp) ξ₁ hkcop
+  have hid : ∀ (l : Fin tp.q),
+      tau3W hG mp tp (omegaS hG mp tp l ⟨0, tp.p_prime.pos⟩)
+        = (tiCyclicW hG mp tp).sigma rfl (tiCyclicWDadeApp hG mp tp)
+            ((tiCyclicW hG mp tp).omega (omegaSChar hG mp tp l ⟨0, tp.p_prime.pos⟩) :
+              ClassFunction ↥(tiCyclicW hG mp tp).W ℂ) := by
+    intro l
+    rw [omegaS_eq_omega_omegaSChar]
+    show (tiCyclicW hG mp tp).sigmaIntegral rfl (tiCyclicWDadeApp hG mp tp) _ = _
+    rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_apply]
+  have hgoal := congrArg (fun f : ClassFunction G ℂ => f x) (hid i)
+  simp only at hgoal
+  have huv := congrArg (fun f : ClassFunction G ℂ => f x) hu
+  simp only [OddOrder.RepresentationTheory.ClassFunction.mapRingEquiv_apply] at huv
+  have h1v := congrArg (fun f : ClassFunction G ℂ => f x) (hid ⟨1, tp.q_prime.one_lt⟩)
+  simp only at h1v
+  calc tau3W hG mp tp (omegaS hG mp tp i ⟨0, tp.p_prime.pos⟩) x
+      = (tiCyclicW hG mp tp).sigma rfl (tiCyclicWDadeApp hG mp tp)
+          ((tiCyclicW hG mp tp).omega ξᵢ :
+            ClassFunction ↥(tiCyclicW hG mp tp).W ℂ) x := hgoal
+    _ = (tiCyclicW hG mp tp).sigma rfl (tiCyclicWDadeApp hG mp tp)
+          ((tiCyclicW hG mp tp).omega (ξ₁ ^ k) :
+            ClassFunction ↥(tiCyclicW hG mp tp).W ℂ) x := by rw [hkhom]
+    _ = u ((tiCyclicW hG mp tp).sigma rfl (tiCyclicWDadeApp hG mp tp)
+          ((tiCyclicW hG mp tp).omega ξ₁ :
+            ClassFunction ↥(tiCyclicW hG mp tp).W ℂ) x) := huv
+    _ = u (tau3W hG mp tp
+          (omegaS hG mp tp ⟨1, tp.q_prime.one_lt⟩ ⟨0, tp.p_prime.pos⟩) x) := by rw [← h1v]
+    _ = 0 := by rw [h0, map_zero]
+
 end Section16CharacterData
 
 /-- **Peterfalvi §13 coherent Dade-grid producer** (`sorry`-free) — *lane-b*
@@ -2355,7 +2493,13 @@ noncomputable def section16CharacterData_of_isMinimalSimpleOdd {G : Type*} [Grou
       omega_pow_q_of_mem_W1 := Section16CharacterData.omegaS_pow_q_of_mem_W1 hG mp tp
       omega_pow_p_of_mem_W2 := Section16CharacterData.omegaS_pow_p_of_mem_W2 hG mp tp
       eta_complete_vanish := fun χ horth w hwW hnot =>
-        Section16CharacterData.tau3W_omegaS_complete_vanish hG mp tp χ horth hwW hnot }
+        Section16CharacterData.tau3W_omegaS_complete_vanish hG mp tp χ horth hwW hnot
+      eta_fourcorner_vanish := fun i j hi hj x hx =>
+        Section16CharacterData.tau3W_omegaS_fourcorner_vanish hG mp tp i j hi hj (by
+          intro hmem
+          obtain ⟨a, ha, hconj⟩ := Group.mem_conjugatesOfSet_iff.mp hmem
+          obtain ⟨c, hc⟩ := isConj_iff.mp hconj
+          exact hx (OddOrder.GroupTheory.mem_conjClassSet.mpr ⟨a, ha, c, hc⟩)) }
 
 /-- **Assembly of `Section16Inputs` from the three lane producers** (`sorry`-free).
 Each field of `Section16Inputs` is sourced from exactly one of `mp` / `tp` / `cd`;
@@ -2436,7 +2580,8 @@ noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [F
     omega_row_zero_apply_of_mem_W1 := cd.omega_row_zero_apply_of_mem_W1
     omega_pow_q_of_mem_W1 := cd.omega_pow_q_of_mem_W1
     omega_pow_p_of_mem_W2 := cd.omega_pow_p_of_mem_W2
-    eta_complete_vanish := cd.eta_complete_vanish }
+    eta_complete_vanish := cd.eta_complete_vanish
+    eta_fourcorner_vanish := cd.eta_fourcorner_vanish }
 
 /-- **Assembly of the Section 16 configuration from named inputs** (`sorry`-free).
 
@@ -2549,7 +2694,8 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       omega_row_zero_apply_of_mem_W1 := inp.omega_row_zero_apply_of_mem_W1
       omega_pow_q_of_mem_W1 := inp.omega_pow_q_of_mem_W1
       omega_pow_p_of_mem_W2 := inp.omega_pow_p_of_mem_W2
-      eta_complete_vanish := inp.eta_complete_vanish }
+      eta_complete_vanish := inp.eta_complete_vanish
+      eta_fourcorner_vanish := inp.eta_fourcorner_vanish }
   q_lt_p := inp.q_lt_p
 
 /-- **The one remaining upstream obligation.** From a minimal simple group of odd
