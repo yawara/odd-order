@@ -2208,6 +2208,48 @@ theorem mulAut_eq_id_on_of_fixes_ne_one_on_prime {Hbar : Type*} [Group Hbar] [Fi
     rw [hcx, hcy, hfix x]
   exact Subtype.ext_iff.mp (hinj hval)
 
+open OddOrder.RepresentationTheory in
+/-- **Single-factor easy inertia core (Peterfalvi (9.8.d) `C_U(H₁) ⊆ I(θ₁)`).**  Given a decomposition
+`H̄ = S₀ ⊕ W` (internal direct product: `S₀ ⊓ W = ⊥`, `S₀ ⊔ W = ⊤`) of the abelian chief factor, an
+automorphism `φg` that fixes `S₀` **pointwise** and preserves `W`, and an irreducible character `θ`
+**trivial on `W`**, then `φg` fixes `θ`: `θ (φg x) = θ x` for all `x`.  This is the easy half of the
+(9.8.d) inertia lift, complementing the hard `mulAut_eq_id_on_of_fixes_ne_one_on_prime`: a `C_U(H₁)`
+element acts trivially on `H₁ = S₀` and preserves the `U`-invariant complement `W = H₂…H_q`, so it
+fixes the character `θ₁ ∈ Irr(H̄/W)` supported on `S₀`.  Proof: `θ = χ` is linear, `x = s·w`
+(`s ∈ S₀, w ∈ W` from `S₀ ⊔ W = ⊤`), `φg x = s·(φg w)` (fixes `s`), and `χ` is `1` on `W ∋ w, φg w`,
+so `χ(φg x) = χ(s) = χ(x)`. -/
+theorem mulAut_fixes_char_of_id_on_summand_triv_complement {Hbar : Type*} [Group Hbar] [Finite Hbar]
+    [IsMulCommutative Hbar] (φg : MulAut Hbar) (S₀ W : Subgroup Hbar)
+    (hsup : S₀ ⊔ W = ⊤)
+    (hid : ∀ x ∈ S₀, φg x = x)
+    (hWinv : ∀ x ∈ W, φg x ∈ W)
+    (θ : IrreducibleCharacter Hbar)
+    (htriv : ∀ w ∈ W, (θ : ClassFunction Hbar ℂ) w = (θ : ClassFunction Hbar ℂ) 1) :
+    ∀ x, (θ : ClassFunction Hbar ℂ) (φg x) = (θ : ClassFunction Hbar ℂ) x := by
+  haveI : IsMulCommutative Hbar := inferInstance
+  obtain ⟨χ, hχ⟩ := θ.isIrreducible.exists_linearIrreducibleCharacter_eq_of_isMulCommutative
+  have hcoe : ∀ x, (θ : ClassFunction Hbar ℂ) x = (χ x : ℂ) := by
+    intro x; rw [← hχ]; exact linearIrreducibleCharacter_apply χ x
+  -- `χ = 1` on `W` (from `θ`'s triviality on `W` and `θ 1 = χ 1 = 1`).
+  have hχW : ∀ w ∈ W, χ w = 1 := by
+    intro w hw
+    apply Units.val_injective
+    have h1 := htriv w hw
+    rw [hcoe, hcoe] at h1
+    rw [h1, map_one, Units.val_one]
+  letI : CommGroup Hbar :=
+    { (inferInstance : Group Hbar) with mul_comm := isMulCommutative_iff.mp inferInstance }
+  intro x
+  -- Decompose `x = s * w` with `s ∈ S₀`, `w ∈ W`.
+  have hxmem : x ∈ S₀ ⊔ W := hsup ▸ Subgroup.mem_top x
+  rw [Subgroup.mem_sup] at hxmem
+  obtain ⟨s, hs, w, hw, rfl⟩ := hxmem
+  -- `χ (φg (s*w)) = χ (φg s) · χ (φg w) = χ s · 1 = χ s`; `χ (s*w) = χ s · 1 = χ s`.
+  have hlhs : χ (φg (s * w)) = χ s := by
+    rw [map_mul, map_mul, hid s hs, hχW (φg w) (hWinv w hw), mul_one]
+  have hrhs : χ (s * w) = χ s := by rw [map_mul, hχW w hw, mul_one]
+  rw [hcoe, hcoe, hlhs, hrhs]
+
 /-- **A prime-order abelian group has a nontrivial linear character.**  `K` is nontrivial
 (`|K| = p > 1`), so some `a ≠ 1`, and `ℂ` has enough roots of unity to separate it
 (`exists_apply_ne_one_of_hasEnoughRootsOfUnity`).  Per-factor input for the regular-`θ̄`
@@ -5205,6 +5247,93 @@ theorem inertia_inf_uInHu_le_cuInHu [Finite G] {M : Subgroup G} {data : TypesIII
   simp only [cuInHu, cuSub, Subgroup.mem_subgroupOf, Subgroup.mem_map]
   exact ⟨_, ⟨a, hker, rfl⟩, rfl⟩
 
+/-- **Peterfalvi (9.8.d): the `S₀`-summand decomposition `H̄ = S₀ ⊕ W`.**  The abelian chief factor
+`H̄ = H/H₀` is an elementary abelian `p`-group on which `U` acts coprimely (`|U| ⟂ |H̄|`), so operator
+Maschke (`exists_aInvariant_complement_of_isElementaryAbelian`) splits the `U`-invariant order-`p`
+factor `S₀ = caseA.S0` off: there is a `U`-invariant complement `W` (`= H₂…H_q` in Peterfalvi's
+notation) with `S₀ ⊓ W = ⊥`, `S₀ ⊔ W = ⊤`.  This is the *fresh* decomposition (distinct from the
+`Hpart` family — the structure does not give `S₀ = Hpart i₀`) required for the (9.8.d) source
+character `θ₁ ∈ Irr(H̄/W)` and its easy inertia direction `C_U(S₀) ⊆ I(θ₁)`. -/
+theorem chiefFactor_caseA_S0_complement [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) :
+    ∃ W : Subgroup (↥data.H ⧸ chief.N),
+      OddOrder.Isaacs.Ch03.IsAInvariant (uActionHom data chief) W ∧
+        caseA.S0 ⊓ W = ⊥ ∧ caseA.S0 ⊔ W = ⊤ := by
+  haveI := Fact.mk chief.p_prime
+  have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
+  have hpdvd : chief.p ∣ Nat.card (↥data.H ⧸ chief.N) := by
+    rw [chiefFactor_quotient_card chief]
+    exact dvd_pow_self chief.p data.nontrivial.2.1.pos.ne'
+  have hcop : Nat.Coprime
+      (Nat.card ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
+      (Nat.card (↥data.H ⧸ chief.N)) :=
+    ((typeP_coprime_H_uW1 data.typeP hU).symm.coprime_dvd_left
+      (Subgroup.card_subgroup_dvd_card _)).coprime_dvd_right
+        (Subgroup.card_quotient_dvd_card chief.N)
+  exact OddOrder.BG.Ch1_Preliminary.exists_aInvariant_complement_of_isElementaryAbelian
+    hpdvd hcop chief.quotient_elementaryAbelian caseA.S0_aInvariant
+
+/-- **Peterfalvi (9.8.d) easy inertia direction `C_U(S₀) ⊆ I_{HU}(θ₁₀)`, given an `S₀`-summand
+decomposition.**  For a `U`-invariant complement `W` of `S₀` (`S₀ ⊔ W = ⊤`) and a chief-factor
+character `θ₁ = θbar` **trivial on `W`**, every `C_U(S₀) = cuInHu`-element fixes the inflation `θ₁₀`.
+The realized easy half of the (9.8.d) inertia lift (mirror of `cInHu_le_inertia`, but where the
+`C`-element acts trivially on *all* of `H̄`, here the `C_U(S₀)`-element acts trivially on `S₀` and
+merely preserves `W`).  The algebraic heart is `mulAut_fixes_char_of_id_on_summand_triv_complement`:
+`c ∈ C_U(S₀)` gives `aInvariantRestrictAut S₀ = 1` (fixes `S₀` pointwise) and `W`-invariance gives
+`W`-preservation, so the linear `θ₁` (trivial on `W`) is fixed. -/
+theorem cuInHu_le_inertia_of_complement_triv [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    {W : Subgroup (↥data.H ⧸ chief.N)}
+    (hWinv : OddOrder.Isaacs.Ch03.IsAInvariant (uActionHom data chief) W)
+    (hsup : caseA.S0 ⊔ W = ⊤)
+    {θbar : IrreducibleCharacter (↥data.H ⧸ chief.N)}
+    (htriv : ∀ w ∈ W, (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) w
+      = (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1) :
+    cuInHu caseA ≤ ClassFunction.inertia (G := ↥(huSub data)) (H := hInHu data)
+        (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ))) := by
+  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+    IsMulCommutative.of_comm chief.quotient_elementaryAbelian.comm
+  intro c hc
+  rw [ClassFunction.mem_inertia]
+  -- unwrap `c ∈ cuInHu` to the `U`-element `a'` (in `U.subgroupOf (U ⊔ W₁)`) with
+  -- `aInvariantRestrictAut S₀ a' = 1` and `((c:M):G) = subtype a'`.
+  have hcG : ((c : ↥M) : G) ∈ cuSub caseA := by
+    simp only [cuInHu, Subgroup.mem_subgroupOf] at hc; exact hc
+  simp only [cuSub, Subgroup.mem_map] at hcG
+  obtain ⟨w, ⟨a', ha', ha'w⟩, hwc⟩ := hcG
+  have hkerAut : aInvariantRestrictAut caseA.S0_aInvariant a' = 1 := by
+    rw [← MonoidHom.mem_ker]; exact ha'
+  have hag : ((c : ↥M) : G) = (w : G) := hwc.symm
+  -- `quotientMulAutHom w = uActionHom a'` (defeq); it fixes `S₀` pointwise and preserves `W`.
+  have hid : ∀ x ∈ caseA.S0, (uActionHom data chief) a' x = x := by
+    intro x hx
+    have := aInvariantRestrictAut_coe caseA.S0_aInvariant a' ⟨x, hx⟩
+    rw [hkerAut] at this
+    simpa using this.symm
+  have hWpres : ∀ x ∈ W, (uActionHom data chief) a' x ∈ W := fun x hx => hWinv.smul_mem a' hx
+  have hfixθ : ∀ x, (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) ((uActionHom data chief) a' x)
+      = (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) x :=
+    mulAut_fixes_char_of_id_on_summand_triv_complement (uActionHom data chief a') caseA.S0 W
+      hsup hid hWpres θbar htriv
+  -- `uActionHom a' = quotientMulAutHom w` (`uActionHom = quotientMulAutHom ∘ subtype`; `subtype a' = w`)
+  have huaw : uActionHom data chief a' = quotientMulAutHom chief.N_aInvariant w := by
+    rw [show uActionHom data chief a'
+        = quotientMulAutHom chief.N_aInvariant
+            ((data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype a') from rfl, ha'w]
+  -- `H̄`-level fixing: `compHom (quotientMulAutHom w) θbar = θbar`.
+  have hHbar : ClassFunction.compHom (quotientMulAutHom chief.N_aInvariant w).toMonoidHom
+        (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)
+      = (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) := by
+    ext y
+    rw [ClassFunction.compHom_apply, ← huaw]
+    exact hfixθ y
+  -- reduce the `conjBy`-fixing to the just-established `H̄`-level fixing.
+  rw [conjBy_compHom_hInHuEquivH data w c hag, compHom_typeP_conjAction_inflation, hHbar]
+
 /-- **Peterfalvi (9.8.d) inertia lift `I_{HU}(θ₁₀) = H·C_U(S₀)`, parametrized over the easy direction**
 `C_U(S₀) ≤ I(θ₁₀)`.  The single-factor analog of `inertia_eq_hcInHu_of_inf_le`: `⊆` uses the proven
 hard direction `inertia_inf_uInHu_le_cuInHu` (`I(θ₁₀) ⊓ U ≤ C_U(S₀)`, from `θ₁` faithful on `S₀`),
@@ -5248,6 +5377,123 @@ theorem inertia_eq_hcuInHu_of_easy_le [Finite G] {M : Subgroup G} {data : TypesI
       (Subgroup.mem_sup_right (inertia_inf_uInHu_le_cuInHu caseA hreg ⟨hu_in, hu⟩))
   · rw [sup_le_iff]
     exact ⟨ClassFunction.subgroup_le_inertia θ₀, heasy⟩
+
+/-- **Peterfalvi (9.8.d) full inertia lift `I_{HU}(θ₁₀) = H·C_U(S₀)`**, given an `S₀`-summand
+decomposition and `θ₁ = θbar` supported on `S₀` (nontrivial on `S₀`, trivial on the complement `W`).
+Combines the proven hard direction (`inertia_inf_uInHu_le_cuInHu`) with the easy direction
+(`cuInHu_le_inertia_of_complement_triv`) through the assembly `inertia_eq_hcuInHu_of_easy_le`.  The
+index of `H·C_U(S₀)` in `HU` is `a` (`index_hcuInHu_eq_caseA_a`), so the source `θ₁·λ` has degree `a`
+and its `M`-induction degree `qa`. -/
+theorem inertia_eq_hcuInHu [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
+    (caseA : CliffordCaseAData chars)
+    {W : Subgroup (↥data.H ⧸ chief.N)}
+    (hWinv : OddOrder.Isaacs.Ch03.IsAInvariant (uActionHom data chief) W)
+    (hsup : caseA.S0 ⊔ W = ⊤)
+    {θbar : IrreducibleCharacter (↥data.H ⧸ chief.N)}
+    (hreg : ∃ x ∈ caseA.S0,
+      (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+        ≠ (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1)
+    (htriv : ∀ w ∈ W, (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) w
+      = (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1) :
+    ClassFunction.inertia (G := ↥(huSub data)) (H := hInHu data)
+        (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+      = hInHu data ⊔ cuInHu caseA :=
+  inertia_eq_hcuInHu_of_easy_le caseA hreg
+    (cuInHu_le_inertia_of_complement_triv caseA hWinv hsup htriv)
+
+/-- **Peterfalvi (9.8.d) source character `θ₁ ∈ Irr(H̄/W)`**: for an `S₀`-summand decomposition
+`H̄ = S₀ ⊕ W`, there is an irreducible (linear) character `θ₁` of the chief factor that is
+**nontrivial on `S₀`** (`hreg`) and **trivial on `W`** (`htriv`) — precisely the input feeding
+`inertia_eq_hcuInHu`.  This realizes Peterfalvi's `θ₁ ∈ Irr(H̄/(H₂…H_q))`, `θ₁ ≠ 1`.  Construction:
+`H̄/W` has order `p` (`W` complements the order-`p` `S₀`), hence is cyclic with a nontrivial
+character `χ̄` (`exists_ne_one_hom_of_prime_card`); pulling `χ̄` back along `mk' W` gives `θ₁`, which
+kills `W` and is nontrivial on `S₀` because `S₀` surjects onto `H̄/W` (`S₀ ⊔ W = ⊤`). -/
+theorem exists_source_char_caseA [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    {W : Subgroup (↥data.H ⧸ chief.N)}
+    (hinf : caseA.S0 ⊓ W = ⊥) (hsup : caseA.S0 ⊔ W = ⊤) :
+    ∃ θbar : IrreducibleCharacter (↥data.H ⧸ chief.N),
+      (∃ x ∈ caseA.S0, (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+        ≠ (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1) ∧
+      (∀ w ∈ W, (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) w
+        = (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1) := by
+  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+    IsMulCommutative.of_comm chief.quotient_elementaryAbelian.comm
+  letI : CommGroup (↥data.H ⧸ chief.N) :=
+    { (inferInstance : Group (↥data.H ⧸ chief.N)) with
+      mul_comm := isMulCommutative_iff.mp inferInstance }
+  haveI := Fact.mk chief.p_prime
+  haveI : W.Normal := Subgroup.normal_of_comm W
+  letI : CommGroup ((↥data.H ⧸ chief.N) ⧸ W) := inferInstance
+  -- `|H̄/W| = p`: `S₀` complements `W`, so `[H̄ : W] = |S₀| = p`.
+  have hcompl : Subgroup.IsComplement' caseA.S0 W :=
+    Subgroup.isComplement'_of_disjoint_and_mul_eq_univ (disjoint_iff.mpr hinf)
+      (by rw [← Subgroup.mul_normal caseA.S0 W, hsup]; rfl)
+  have hS0card : Nat.card ↥caseA.S0 = chief.p := by
+    have h := caseA.Hpart_order ⟨0, data.nontrivial.2.1.pos⟩
+    rwa [caseA.Hpart_orbit ⟨0, data.nontrivial.2.1.pos⟩, card_pointwise_smul] at h
+  have hcard : Nat.card ((↥data.H ⧸ chief.N) ⧸ W) = chief.p := by
+    rw [← Subgroup.index_eq_card, hcompl.index_eq_card, hS0card]
+  -- A nontrivial character `χ̄` of the order-`p` quotient `H̄/W`.
+  obtain ⟨χbar, hχbar⟩ := exists_ne_one_hom_of_prime_card (K := (↥data.H ⧸ chief.N) ⧸ W)
+    (by rw [hcard]; exact chief.p_prime)
+  -- Pull back to `H̄`: `θ = χ̄ ∘ mk' W`.
+  set θ : (↥data.H ⧸ chief.N) →* ℂˣ := χbar.comp (QuotientGroup.mk' W) with hθ
+  -- `θ` kills `W` (since `mk' W` does).
+  have hθW : ∀ w ∈ W, θ w = 1 := by
+    intro w hw
+    rw [hθ, MonoidHom.comp_apply, QuotientGroup.mk'_apply, (QuotientGroup.eq_one_iff _).mpr hw,
+      map_one]
+  refine ⟨linearIrreducibleCharacter θ, ?_, ?_⟩
+  · -- nontrivial on `S₀`: else `θ = 1` on `S₀ ⊔ W = ⊤`, forcing `χ̄ = 1` (`mk' W` surjective).
+    by_contra hall
+    push_neg at hall
+    have hθS0 : ∀ s ∈ caseA.S0, θ s = 1 := by
+      intro s hs
+      have hθs := hall s hs
+      rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one,
+        Units.val_one] at hθs
+      exact Units.val_injective (by simpa using hθs)
+    -- `θ = 1` on all of `H̄` (`S₀ ⊔ W = ⊤`, `θ` trivial on both).
+    have hθ1 : θ = 1 := by
+      refine MonoidHom.ext fun y => ?_
+      have hymem : y ∈ caseA.S0 ⊔ W := hsup ▸ Subgroup.mem_top y
+      rw [Subgroup.mem_sup] at hymem
+      obtain ⟨s, hs, w, hw, hsw⟩ := hymem
+      rw [← hsw, map_mul, hθS0 s hs, hθW w hw, mul_one, MonoidHom.one_apply]
+    -- hence `χ̄ = 1` (`θ = χ̄ ∘ mk' W`, `mk' W` surjective), contradiction.
+    exact hχbar ((MonoidHom.cancel_right (QuotientGroup.mk'_surjective W)).mp (hθ ▸ hθ1))
+  · -- trivial on `W`: `θ` kills `W` (`hθW`).
+    intro w hw
+    rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one, Units.val_one,
+      hθW w hw, Units.val_one]
+
+/-- **Peterfalvi (9.8.d): existence of a source character with inertia `H·C_U(S₀)`.**  Combining the
+`S₀`-summand decomposition (`chiefFactor_caseA_S0_complement`), the source character
+(`exists_source_char_caseA`), and the full inertia lift (`inertia_eq_hcuInHu`): there is a
+chief-factor character `θ₁ = θbar`, nontrivial on `S₀`, whose inflation `θ₁₀`'s inertia in `HU` is
+exactly `H·C_U(S₀)`.  Since `[HU : H·C_U(S₀)] = a` (`index_hcuInHu_eq_caseA_a`), the `HU`-induction of
+`θ₁·λ` (for any `λ ∈ Irr(C_U(S₀)/U')`) from `H·C_U(S₀)` is an irreducible source character of degree
+`a`, and its `M`-induction has degree `qa` — the (9.8.d) degree-`qa` members of `𝒮(H₀U')`.  This
+packages the honest inertia content of (9.8.d); the `θ₁·λ` construction and count consume it. -/
+theorem exists_source_char_inertia_eq_hcuInHu_caseA [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) :
+    ∃ θbar : IrreducibleCharacter (↥data.H ⧸ chief.N),
+      (∃ x ∈ caseA.S0, (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+        ≠ (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1) ∧
+      ClassFunction.inertia (G := ↥(huSub data)) (H := hInHu data)
+          (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+            (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+              (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+        = hInHu data ⊔ cuInHu caseA := by
+  obtain ⟨W, hWinv, hinf, hsup⟩ := chiefFactor_caseA_S0_complement caseA
+  obtain ⟨θbar, hreg, htriv⟩ := exists_source_char_caseA caseA hinf hsup
+  exact ⟨θbar, hreg, inertia_eq_hcuInHu caseA hWinv hsup hreg htriv⟩
 
 /-- **Inertia lift `I_{HU}(θ₀) = HC`, parametrized over the hard direction** `I(θ₀) ⊓ U ≤ C`.  The
 case-agnostic assembly: `⊇` from `H ≤ I(θ₀)` (`subgroup_le_inertia`) and `cInHu_le_inertia` (both
@@ -10239,23 +10485,28 @@ realization `cuSub`/`cuInHu` and its normality `hcuInHu_normal`).  The carrier's
 this genuine index `|Ū₁| = |U:C_U(S₀)|` (`CliffordCaseAData.a_eq_card_restrictAut_range`) — without
 that pin the degree-`qa` claim referenced a free field and was not honestly provable.
 
-**Inertia lift substrate (landed).**  The *hard* half of the inertia equality
-`I_{HU}(θ₁₀) = H·C_U(S₀)` is now proven: `inertia_inf_uInHu_le_cuInHu` (`I(θ₁₀) ⊓ U ≤ C_U(S₀)`, from
-`θ₁` faithful on the single summand `S₀`), whose algebraic heart is the single-factor char-inertia
-core `chiefFactor_caseA_char_inertia_single` (a `U`-element fixing `θ₁` centralizes `S₀`,
-`aInvariantRestrictAut S₀ = 1`) via the pure-algebra `mulAut_eq_id_on_of_fixes_ne_one_on_prime`.  The
-assembly `inertia_eq_hcuInHu_of_easy_le` then yields `I(θ₁₀) = H·C_U(S₀)` *given* the easy direction
-`C_U(S₀) ≤ I(θ₁₀)`.
+**Inertia lift (fully landed).**  The *full* inertia equality `I_{HU}(θ₁₀) = H·C_U(S₀)` is now
+proven for a source character `θ₁` supported on `S₀`.  Both directions:
+* *hard* `I(θ₁₀) ⊓ U ≤ C_U(S₀)` — `inertia_inf_uInHu_le_cuInHu` (from `θ₁` faithful on the single
+  summand `S₀`), whose algebraic heart is `chiefFactor_caseA_char_inertia_single`
+  (`aInvariantRestrictAut S₀ = 1`) via `mulAut_eq_id_on_of_fixes_ne_one_on_prime`;
+* *easy* `C_U(S₀) ≤ I(θ₁₀)` — `cuInHu_le_inertia_of_complement_triv`, whose algebraic heart is the
+  new `mulAut_fixes_char_of_id_on_summand_triv_complement`: a `C_U(S₀)`-element acts trivially on
+  `S₀` and preserves the `U`-invariant complement `W`, so the linear `θ₁` (trivial on `W`) is fixed.
+The `S₀`-summand decomposition `H̄ = S₀ ⊕ W` is `chiefFactor_caseA_S0_complement` (operator Maschke,
+`|U| ⟂ |H̄|`); the source character `θ₁ ∈ Irr(H̄/W)` (nontrivial on `S₀`, trivial on `W`) is
+`exists_source_char_caseA`.  These assemble into `inertia_eq_hcuInHu` and the one-shot existence
+`exists_source_char_inertia_eq_hcuInHu_caseA`: there is a `θ₁` (nontrivial on `S₀`) whose inflation's
+`HU`-inertia is exactly `H·C_U(S₀)`, of index `[HU:H·C_U(S₀)] = a` (`index_hcuInHu_eq_caseA_a`),
+giving source degree `a` and `M`-induction degree `qa`.
 
-**Still open** (next session): (i) the easy inertia direction `C_U(S₀) ≤ I(θ₁₀)` — genuine new
-infra: it holds precisely when `θ₁ ∈ Irr(H̄/(H₂…H_q))` is trivial on the complementary summands, so
-it needs the *`S₀`-based* direct-product decomposition `H̄ = S₀ ⊕ (complement)` (distinct from the
-`Hpart` family — the structure does *not* give `S₀ = Hpart i₀`); (ii) the full `θ₁·λ`
-source-character construction (mirror `hcPsi`/`hcPsiPair`: `θ₁`-inflation times `λ`-lift on
-`H·C_U(S₀)`); (iii) the membership `Ind_{HU}^M χ ∈ 𝒮(H₀U')` (θ₁ nontrivial ⟹ `H₀U' ⊆ Ker`); (iv)
-the count bijection giving `((p-1)/a)·|C_U(S₀):U'| = ((p-1)/a)·(|U|/(a|U'|))` distinct members
-(mirror `oXtheta_count`; needs `U' ≤ C_U(S₀)`, extractable from the `hcentral_triv` step of
-`chiefFactor_caseB_image_cyclic`). -/
+**Still open** (next session — the count pipeline): (ii) the full `θ₁·λ` source-character
+construction on `H·C_U(S₀)` (mirror `hcPsi`/`hcPsiPair` rewired from `cSub`=`C` to `cuSub`=`C_U(S₀)`:
+`θ₁`-inflation times the `λ`-lift for `λ ∈ Irr(C_U(S₀)/U')`), feeding `inertia_eq_hcuInHu` to the
+`hcZeta_irreducible`-analog for irreducibility; (iii) the membership `Ind_{HU}^M χ ∈ 𝒮(H₀U')` (θ₁
+nontrivial ⟹ `H₀U' ⊆ Ker`); (iv) the count bijection giving
+`((p-1)/a)·|C_U(S₀):U'| = ((p-1)/a)·(|U|/(a|U'|))` distinct members (mirror `oXtheta_count`; needs
+`U' ≤ C_U(S₀)`, extractable from the `hcentral_triv` step of `chiefFactor_caseB_image_cyclic`). -/
 theorem caseA_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     (chars : Section11CharacterData data chief) (caseA : CliffordCaseAData chars) :

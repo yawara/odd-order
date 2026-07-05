@@ -607,6 +607,82 @@ theorem Hypothesis.tau1S_ofHonest_extends_on_supported [Finite G]
   simpa [Hypothesis.tau1S_ofHonest, Hypothesis.mkSection11CharacterDataS_honest,
     Hypothesis.indS_apply] using h
 
+open scoped FiniteInduce in
+/-- **Peterfalvi (13.5) preamble / (1.5.a) — the family membership `Ind_{PC}^S θ ∈ ℤ[𝒮]`** (issue
+2035 step 5a, the *one* genuine gap).
+
+For an irreducible character `θ` of `H = PC` **whose kernel does not contain `P`**, the induced
+character `Ind_{PC}^S θ` lies in `ℤ[𝒮]` (`zSpan` of the honest §9 family `𝒮 = sSet`).  In Coq's
+`PFsection13` this is `sS1S : {subset calS1 <= 'Z[calS]}` (with `calS1 = seqIndD H S P 1`,
+`calS = seqIndD PU S P 1`), the containment used implicitly throughout (13.5)–(13.8); its proof
+`S1cases` is the prime-TI Clifford dichotomy "either `Ind_{PC}^S θ = μ_j` for some `j ≠ 0` (then in
+`𝒮` by `FTseqInd_TIred`) or it lies in `ℤ[𝒮 ∩ Irr S]`".  Peterfalvi phrases it as: in the (13.5)
+preamble `{ζ₀,…,ζ_r} = {Ind_H^S θ | θ ∈ Irr H}` with `P ⊂ Ker ζ_i` exactly for `n < i ≤ r`, and
+"for `i ≤ n`, `ζ_i ∈ ℤ[𝒮]` by (1.5.a)".  The `P ⊄ Ker θ` hypothesis is essential — for
+`P ⊆ Ker θ` the character `Ind_{PC}^S θ` has `P` in its kernel and is **not** in `ℤ[𝒮]` (every
+member of `𝒮 = Ind_{HU} 𝒳` has `P ⊄ Ker`, since `𝒳` demands `H = hInHu ⊄ Ker`).
+
+**This is a genuine §9/§13 theorem, not derivable from the present S11 lemma stock in this
+(source → family) direction** (the existing §9 `isIndHC`/`reducible_sOf_H0_isIndHC` machinery runs
+the *opposite* way, family member → `Ind_{PC}(linear)`).  Isolated here as the single sorried input
+to the (13.3) `tau1S_*` helpers; closing it needs the prime-TI residue dichotomy (`S1cases`). -/
+theorem Hypothesis.induce_H_mem_zSpan_S [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))
+    (θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ)
+    (_hθ : OddOrder.RepresentationTheory.IsIrreducibleCharacter θ)
+    (_hθP : ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
+        Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel θ)) :
+    ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ ∈
+      OddOrder.Peterfalvi.S07.zSpan (hyp.mkSection11CharacterDataS_honest hG chief).S :=
+  sorry
+
+open scoped FiniteInduce in
+/-- **(13.2.d) τ₁ isometry on the `H`-induced family** (issue 2035 step 5a): `τ₁ = tau1S_ofHonest`
+preserves inner products of `Ind_{PC}^S θ` for irreducible `θ` of `H = PC` with `P ⊄ Ker θ`.  From
+the coherence field `extension_inner_eq` (isometric on all of `ℤ[𝒮]`) together with the family
+membership `induce_H_mem_zSpan_S`.  This is the honest engine for the `CharacterDegreeData`
+`tau1S_inner_induce` field (with the `P ⊄ Ker` hypothesis the (13.3) consumers actually satisfy —
+`μ_j`, `λ` all have `P ⊄ Ker`). -/
+theorem Hypothesis.tau1S_ofHonest_inner_induce [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))
+    (θ θ' : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ)
+    (hθ : OddOrder.RepresentationTheory.IsIrreducibleCharacter θ)
+    (hθ' : OddOrder.RepresentationTheory.IsIrreducibleCharacter θ')
+    (hθP : ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
+        Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel θ))
+    (hθ'P : ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
+        Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel θ')) :
+    ClassFunction.inner
+        (hyp.tau1S_ofHonest hG chief (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ))
+        (hyp.tau1S_ofHonest hG chief (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ'))
+      = ClassFunction.inner (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ)
+          (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ') := by
+  exact (hyp.coherent_H0Cprime_S hG chief).extension_inner_eq _ _
+    (hyp.induce_H_mem_zSpan_S hG chief θ hθ hθP)
+    (hyp.induce_H_mem_zSpan_S hG chief θ' hθ' hθ'P)
+
+open scoped FiniteInduce in
+/-- **(13.2.d) τ₁ sends the `H`-induced family into `ℤ[Irr G]`** (issue 2035 step 5a): for
+irreducible `θ` of `H = PC` with `P ⊄ Ker θ`, `τ₁ (Ind_{PC}^S θ) ∈ ℤ[Irr G]`.  From the coherence
+field `extension_mem_ZIrr` (virtual-character codomain on all of `ℤ[𝒮]`) and the family membership
+`induce_H_mem_zSpan_S`.  Honest engine for the `CharacterDegreeData` `tau1S_induce_mem_ZIrr` field. -/
+theorem Hypothesis.tau1S_ofHonest_induce_mem_ZIrr [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))
+    (θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ)
+    (hθ : OddOrder.RepresentationTheory.IsIrreducibleCharacter θ)
+    (hθP : ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
+        Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel θ)) :
+    hyp.tau1S_ofHonest hG chief (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ) ∈ ZIrr G :=
+  (hyp.coherent_H0Cprime_S hG chief).extension_mem_ZIrr _
+    (hyp.induce_H_mem_zSpan_S hG chief θ hθ hθP)
+
 /-- **Peterfalvi (13.2.b), order part**: the Fitting kernel `P = S_F` has order `p^q`.
 
 This is the order half of (13.2.b) ("`P` is elementary abelian of order `p^q`").  `S` is of Type II
