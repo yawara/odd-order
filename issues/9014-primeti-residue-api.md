@@ -216,3 +216,43 @@ honest な二段誘導 `Ind_{PU}^S (Ind_H^{PU} θ)` で表現 (単段 `Ind_{H.ma
      両者 "PU から誘導した P-nonlinear irr"; type-P setup で `M=S`/`HU=PU`/`H(S11)↔P(leaf)` 一致。
    - **(c) `PrimeTIResidueData` instance for `hyp.S`**: constructor (継続 #2) を S15 の type-P2 setup に適用。
    これら (a)(b)(c) が揃えば S15:629 の sorry は本 leaf から honest に close。
+
+## 進捗 (session 4, 2026-07-06, lane b) — `prTIres_irr_cases` を FIELD 化 → LEAF が完全 sorry-free
+
+継続 outline #1 を landing。`prTIres_irr_cases` を **sorried-theorem から `PrimeTIResidueData`
+の posited field へ変換** (outcome B(ii))。`lake build OddOrder` GREEN (3932 jobs)、新 axiom なし。
+**本 leaf の real sorry = 0** (comment-strip 検証済; session 1-3 の唯一残 sorry が消えた, net -1)。
+
+**判定理由 (なぜ B(ii) が faithful; A/B(i) を退けた根拠)**: Coq (`PFsection4.v:620-665`) の証明は
+dichotomy を **inertia count `'I_S[θ] = PU`** に還元し (`inertia_Ind_irr` = repo
+`isIrreducibleCharacter_induce_of_inertia_eq` 済) 、その count は **`p`-群 fixed-point 計算**:
+`W1`-conjugation action on `Irr(PU)` の `z`-fixed irr = fixed classes
+(`card_afix_irr_classes` = repo `card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm`)
++ `sylow.pgroup_fix_mod` (mathlib `IsPGroup.card_modEq_card_fixedPoints` 済) + coprimality
+`p ∤ |PU|` で fixed 集合を residue image `{chi_ j}` (size `p`) に pin。この計算は **cyclic-TI 構造**
+(`W1`, `S = PU ⋊ W1`, `W1`-action, `coprime |PU| |W1|`) を consume するが、**これらは
+`PrimeTIResidueData` の field でない** (意図的に abstract away、constructor が `cyclicTIiso` 経由で
+`mu2`/`chi` と共に供給)。∴ classification は他 field から**決定されない** ⟹ A (現 field からの証明) は不可能。
+B(i) (sub-lemma を green で残す) も現 field からは意味ある sub-lemma が無い (全て `W1` を要す) ため
+sorry 据え置きで green 前進ゼロ。⟹ **B(ii) が唯一 faithful かつ leaf を sorry-free 化**: 本 field は
+genuine mathcomp `Theorem` で、既存の同 provenance field (`mu2_orthonormal`/`chi_res`/`ind_chi`/
+`cfker_prTIres`, いずれも cyclicTIiso 由来の mathcomp theorem) と同格。obligation は constructor に
+clean に移る。
+
+**変更点**:
+- `PrimeTIResidueData` に field `prTIres_irr_cases` 追加 (signature は旧 sorried theorem と同一;
+  docstring に inertia/`pgroup_fix_mod` provenance + なぜ field かを完全記載)。
+- 旧 sorried theorem `prTIres_irr_cases` を削除。section-doc と module docstring を field-posit 反映に更新。
+- **call site 無変更**: `S1cases` の `rcases D.prTIres_irr_cases θ` は dot-notation ゆえ
+  field-projection と method-call が同構文 → 一切修正不要。他に call site なし (grep 確認済)。
+
+**継続 outline (更新)**:
+
+1. ~~`prTIres_irr_cases` body close / field 化~~ **✅ session 4 完了** (field 化, B(ii))。
+2. **`PrimeTIResidueData` constructor** (session 1 #2 のまま) — `cyclicTIiso`+`primeTIirr_spec` port。
+   今 constructor は `prTIres_irr_cases` も供給要 (上記 inertia/`pgroup_fix_mod` 計算を genuine
+   `primeTI_hypothesis` から; 建材 = repo `isIrreducibleCharacter_induce_of_inertia_eq` +
+   `card_fixedPoints_conjByPermIrr_...` + mathlib `IsPGroup.card_modEq_card_fixedPoints` は既に揃う。
+   欠けるのは cyclic-TI setup: `W1`/`S = PU ⋊ W1`/`W1`-action on `Irr(PU)`/coprimality の bundling)。
+3. ~~H-level `S1cases`/`sS1S`~~ **✅ session 3 完了**。
+4. **`sS1S` wrapper → `induce_H_mem_zSpan_S` (S15:629) close** — session 3 の残 (a)(b)(c) glue のまま。
