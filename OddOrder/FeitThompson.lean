@@ -2203,6 +2203,88 @@ theorem omegaSChar_col_align (i : Fin tp.q) (j : Fin tp.p) :
           ((tiCyclicW hG mp tp).wFst w) * _
     rw [hfst, map_one, map_one]
 
+/-- **Peterfalvi (3.4)/(3.5), the four-corner vanishing** (issue-2036 supply): off the
+conjugacy saturation of the regular set `V = W ∖ (W₁ ∪ W₂)`,
+`1 − η_{i0}(x) − η_{0j}(x) + η_{ij}(x) = 0` for nonzero row and column indices — the `(3.5)`
+relation `τ(α_{AB}) = 1_G − χ_{A1} − χ_{1B} + χ_{AB}` evaluated where the `V`-supported
+`τ(α)` vanishes, with the `χ`-corners identified with the `η`-grid along the
+`omegaSChar`-pair alignments. -/
+theorem tau3W_omegaS_fourcorner_vanish (i : Fin tp.q) (j : Fin tp.p)
+    (hi : i ≠ ⟨0, tp.q_prime.pos⟩) (hj : j ≠ ⟨0, tp.p_prime.pos⟩) {x : G}
+    (hx : x ∉ Group.conjugatesOfSet ((tiCyclicW hG mp tp).V)) :
+    (1 : ℂ) - tau3W hG mp tp (omegaS hG mp tp i ⟨0, tp.p_prime.pos⟩) x
+      - tau3W hG mp tp (omegaS hG mp tp ⟨0, tp.q_prime.pos⟩ j) x
+      + tau3W hG mp tp (omegaS hG mp tp i j) x = 0 := by
+  classical
+  set A := ((tiCyclicW hG mp tp).omegaProdEquiv.symm (omegaSChar hG mp tp i j)).1 with hAdef
+  set B := ((tiCyclicW hG mp tp).omegaProdEquiv.symm (omegaSChar hG mp tp i j)).2 with hBdef
+  have hpair : (tiCyclicW hG mp tp).omegaProdChar A B = omegaSChar hG mp tp i j :=
+    (tiCyclicW hG mp tp).omegaProdEquiv.apply_symm_apply (omegaSChar hG mp tp i j)
+  -- distinctness of the grid forces nontrivial components
+  have hdistinct : ∀ (k : Fin tp.q) (l : Fin tp.p), (k, l) ≠ (i, j) →
+      omegaSChar hG mp tp k l ≠ omegaSChar hG mp tp i j := by
+    intro k l hne heq
+    have hCF : omegaS hG mp tp k l = omegaS hG mp tp i j := by
+      rw [omegaS_eq_omega_omegaSChar, omegaS_eq_omega_omegaSChar, heq]
+    have h1 := omegaS_inner hG mp tp k i l j
+    rw [hCF] at h1
+    have h2 := omegaS_inner hG mp tp i i j j
+    rw [h1] at h2
+    have hcond : ¬ (k = i ∧ l = j) := fun ⟨h1', h2'⟩ => hne (by rw [h1', h2'])
+    rw [if_neg hcond, if_pos ⟨rfl, rfl⟩] at h2
+    exact zero_ne_one h2
+  have hA1 : A ≠ 1 := by
+    intro h1
+    refine hdistinct ⟨0, tp.q_prime.pos⟩ j (fun hp => hi (congrArg Prod.fst hp).symm) ?_
+    rw [omegaSChar_col_align hG mp tp i j, ← hBdef, ← h1, hAdef]
+    exact hpair
+  have hB1 : B ≠ 1 := by
+    intro h1
+    refine hdistinct i ⟨0, tp.p_prime.pos⟩ (fun hp => hj (congrArg Prod.snd hp).symm) ?_
+    rw [omegaSChar_row_align hG mp tp i j, ← hAdef, ← h1, hBdef]
+    exact hpair
+  -- the (3.5) relation, evaluated at `x`
+  have hrel := ((tiCyclicW hG mp tp).chiFam_spec rfl (tiCyclicWDadeApp hG mp tp)).2.2.2
+    A B hA1 hB1
+  have hvanish : (tiCyclicWDadeApp hG mp tp).tau.toDadeMap
+      ((tiCyclicW hG mp tp).alpha rfl A B) x = 0 :=
+    OddOrder.Peterfalvi.S04.map_eq_zero_of_not_mem_conjugatesOfSet_of_forall_H_eq_bot
+      (tiCyclicWDadeApp hG mp tp).tau.toDadeIsometryData.isDadeMap (fun _ => rfl) _ hx
+  -- identify the χ-corners with the η-grid
+  have hcorner : ∀ (k : Fin tp.q) (l : Fin tp.p)
+      (pr : ((tiCyclicW hG mp tp).W1.subgroupOf (tiCyclicW hG mp tp).W →* ℂˣ)
+        × ((tiCyclicW hG mp tp).W2.subgroupOf (tiCyclicW hG mp tp).W →* ℂˣ)),
+      omegaSChar hG mp tp k l = (tiCyclicW hG mp tp).omegaProdChar pr.1 pr.2 →
+      (tiCyclicW hG mp tp).chiFam rfl (tiCyclicWDadeApp hG mp tp) pr
+        = tau3W hG mp tp (omegaS hG mp tp k l) := by
+    intro k l pr hchar
+    have h1 := (tiCyclicW hG mp tp).sigma_omega rfl (tiCyclicWDadeApp hG mp tp)
+      ((tiCyclicW hG mp tp).omegaProdChar pr.1 pr.2)
+    rw [(tiCyclicW hG mp tp).omegaProdEquiv_symm_omegaProdChar pr.1 pr.2] at h1
+    rw [← h1, ← hchar, omegaS_eq_omega_omegaSChar]
+    show _ = (tiCyclicW hG mp tp).sigmaIntegral rfl (tiCyclicWDadeApp hG mp tp) _
+    rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_apply]
+  have hc11 := hcorner i j (A, B) hpair.symm
+  have hcA1 := hcorner i ⟨0, tp.p_prime.pos⟩ (A, 1) (omegaSChar_row_align hG mp tp i j)
+  have hc1B := hcorner ⟨0, tp.q_prime.pos⟩ j (1, B) (omegaSChar_col_align hG mp tp i j)
+  have htriv := ((tiCyclicW hG mp tp).chiFam_spec rfl (tiCyclicWDadeApp hG mp tp)).1
+  -- evaluate at `x` and rearrange
+  have hev := congrArg (fun f : ClassFunction G ℂ => f x) hrel
+  simp only at hev
+  rw [hvanish] at hev
+  have hev' : (0 : ℂ) = 1 - tau3W hG mp tp (omegaS hG mp tp i ⟨0, tp.p_prime.pos⟩) x
+      - tau3W hG mp tp (omegaS hG mp tp ⟨0, tp.q_prime.pos⟩ j) x
+      + tau3W hG mp tp (omegaS hG mp tp i j) x := by
+    rw [← hcA1, ← hc1B, ← hc11]
+    calc (0 : ℂ) = (trivialClassFunction G
+          - (tiCyclicW hG mp tp).chiFam rfl (tiCyclicWDadeApp hG mp tp) (A, 1)
+          - (tiCyclicW hG mp tp).chiFam rfl (tiCyclicWDadeApp hG mp tp) (1, B)
+          + (tiCyclicW hG mp tp).chiFam rfl (tiCyclicWDadeApp hG mp tp) (A, B)) x := hev
+      _ = _ := by
+        simp only [ClassFunction.add_apply, ClassFunction.sub_apply,
+          trivialClassFunction_apply]
+  exact hev'.symm
+
 end Section16CharacterData
 
 /-- **Peterfalvi §13 coherent Dade-grid producer** (`sorry`-free) — *lane-b*
