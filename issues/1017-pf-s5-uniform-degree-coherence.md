@@ -166,3 +166,34 @@ full induction 不要で `coherent_subset_of_constant_degree` (landed) から**�
 - `lb0_le_lb1_of_degreeRatio_le` = (9.11) 底 squeeze step (Coq `lb01`) の純算術単調性。
 
 **残り (= assembly、analytic gap は解消)**: (9.11.2-9.11.5) 中間 squeeze `lb1≤lb2≤lb3≤sumnS S1'` (Coq `lb12`/`lb23`/`lb3S1'`) は ℕ-index 算術 (`two_mul_lt_sq_of_commonIndex_primePower_gap` S07:1986 + Nat index lemmas、中規模・機械的)。(9.11.1/7/8) は `coherentPairChain` を §9 induced-family Dade witnesses に対して fold (per-step `Dmem`/`hmemOrtho`/`hgen` を、§8 case-B の `sMember_degreeSqNormBound_of_not_coherent` と同型で、§9 `S_ H0C'` family 用に組む)。**⟹ (13.3) `coherent_H0Cprime_S` の sibleyTarget_H0C 置換 + (10.7) `typeII_derived_frobenius` は、§9 induced-family witnesses を thread する 1 focused multi-step session で到達圏内** (analytic content は landed、残るは family-specific 組み立て)。
+
+## 2026-07-06 更新 #5 (lane b) — (9.11) squeeze の pure-arithmetic 層が全 landed sorry-free
+
+更新 #4 で「残り = (9.11.2-9.11.5) 中間 squeeze + assembly」としたうち、**中間 squeeze (lb12/lb23) と
+lb3S1' 左端**を landed。これで **(9.11) squeeze `lb0≤lb1≤lb2≤lb3≤sumnS S1'≤sumnS S2` の pure-arithmetic
+層は全て repo に在り sorry-free**:
+
+| Coq step | Lean 補題 (S07_Subcoherent.lean) | commit |
+|---|---|---|
+| `lb01` (2·q·a·χ ≤ 2·a·q²·u) | `lb0_le_lb1_of_degreeRatio_le` | ad1c339a |
+| `lb12` (2a≤p−1、Gauss) | `two_mul_le_of_dvd_of_odd` (+`_dvd`/`_lt` companion) | ccc3351c |
+| `lb23` ([U:C]≤[U:U']、Lagrange) | `relIndex_le_relIndex_of_le` (+`_lt` companion) | ccc3351c |
+| `lb3S1'` 左端 (sumnS S1'=|S1'|·(qa)²) | `sumnS_of_norm_one_constant_degree` | 5ff2bb6d |
+| `lbS1'2` (S1'⊆S2 単調) | `sumnS_le_of_subset` | ad1c339a |
+| 発火 precondition (lb0<sumnS ⟹ 2a<∑) | `two_mul_lt_normalizedDegreeSq_of_lb0_lt_sumnS` | ad1c339a |
+| raw↔normalized 橋 | `sumnS_image_eq_anchorSq_mul` | ad1c339a |
+| extend_coherent 正engine (5.6) | `xAdjoinStepW` (S08:287、既存) | — |
+| 底 coherence (S1 uniform) | `coherent_subset_of_constant_degree` (既 landed) | 9aad60d8 |
+
+**残る唯一の gate = assembly (`coherent_H0C_commutator` S11:7788 の sibleyTarget_H0C 置換)**。engine は
+`coherentPairChain` (S07_Coherence:4907): 底 `S₀=S1` (coherent) + 隣接 pair 列挙 + per-step `hstep` を fold。
+`hstep` は上表の squeeze + `xAdjoinStepW` で組める。**genuine な残り content は 2 つだけ**:
+1. **§9 induced-family (`S_ H0C'`) の per-step Dade witness data** (`xAdjoinStepW` が要る decomposition
+   `Dmem`/`hmemOrtho`/`hgen`)。§8 case-B の `sMember_degreeSqNormBound_of_not_coherent` (S08_CaseBEnumeration)
+   と同型 shape、§9 family 用に組む。
+2. **induction bookkeeping** = (9.11.1) `without loss` + (9.11.7/8) maximality 矛盾: S3=S_H0C'∖S1 が尽きるまで
+   `lb0 < sumnS S2` が常に成り立つ (squeeze collapse が矛盾を生む) の帰納。
+
+次 iteration はこの assembly を正面から engage (§9 `Section11CharacterData`/`TypesIIIIIIVSetup` が非Galois
+setup = typeP_Galois 述語・U1/a/H1・S_H0C' Finset・lb_Sqa を expose するか確認 → fold を wiring)。
+lane a (10.7) も同一 (9.11) coherence で閉じる。
