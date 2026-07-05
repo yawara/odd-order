@@ -60,7 +60,18 @@ Pf (13.3) proof の引用 ↔ repo 在庫:
      honest Dade map (H_sharp_dadeHypothesis の H₀C'-版)、H0CprimeSupport := 実 support
 2. [ ] `sibleyTarget_H0C` (§14 structural witness) — S14 の SibleyTarget 供給
    (S14_MaximalI 機械 or type-II 側の直接構成; §14-gated の実態を precheck)
-3. [ ] (13.3.a): S11 `caseB_character_counts` の残 sorry (6252/6277) を閉じる or 迂回
+3. [ ] (13.3.a): S11 `caseB_character_counts` の残 sorry を閉じる — **精査済 (it.58)**:
+   4 conjunct 中 3 は proven (caseB_degree_qu / reducible_count_sOf_H0 /
+   reducible_mem_sOf_H0C)。残 = (9.9.c) 1 本:
+   「𝒮(H₀C′) に既約なし → C = ⊥ ∧ u = (p^q−1)/(p−1)」。Pf 証明は 2 分岐:
+   - **C ≠ 1 枝**: θ ≠ 1 (H̄-linear), λ ≠ 1 (C-linear) の積 θλ を取り
+     Ind_{HC}^{HU} 既約 (fpf-inertia = C; S11 `hcZeta_induceHU_irreducible` 系が既存)
+     + Ind_{HU}^M 既約 ((9.9.b) reducible は C ⊆ Ker 側) → 既約メンバー構成で矛盾
+   - **C = 1 枝**: Frobenius H̄⋊U の kernel-非自明既約 = (p^q−1)/u 本
+     (Isaacs 6.34-count; S11 `card_pffun_on`/oXtheta 系) が全部 reducible 誘導なら
+     (9.9.b) の p−1 本と一致 → u = (p^q−1)/(p−1)
+   次 iteration から C = 1 枝 (counting、自己完結度高) → C ≠ 1 枝の順で着手。
+   `exceptional_case_frobenius_realization` (9.10) も同素材で続けて閉じる見込み。
 4. [ ] τ₁-fields 導出: `coherent_H0C_commutator` の IsCoherent (extension_agrees /
    inner_eq_on_supported) から 2034 の 4 fields (extends-Ind は τ=Ind (H_sharp_tau_eq_induce
    の M-版) 経由; ⊥η は (5.3.b)-系)
