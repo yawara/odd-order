@@ -751,11 +751,73 @@ theorem T_typeIII_calT1_coherent [Finite G] (hyp : Hypothesis (G := G))
   · exact fun a ha b hb => by rw [hdeg a ha, hdeg b hb]
   · exact fun a ha => by rw [hdeg a ha]; exact hp_ne
 
+open scoped Classical in
+/-- **Peterfalvi (14.9), the Γ-Bessel assembly skeleton** — the *proven* structural core of the
+character body, isolating the char-cascade carriers as precisely-named hypotheses.  Coq
+`FTtypeP_min_typeII` (PFsection14.v:764--853): given the coherent `τ₁`-image family `calT1`
+(orthonormal degree-`p` induced characters, whose `|calT1| = (v−1)/p` count is the proven
+`T_typeIII_calT1_card` after the (13.12) `d = 1` substitution `v = |V|`) and the `S`-side `βₛ`
+bridge gap `Γ`, the parity fact `⟨Γ, τ₁ζ⟩ ≡ 1 (mod 2)` per `ζ` (`S09.cfdot_real_vchar_even`) makes
+each integer pairing coefficient `x ζ = ⟨Γ, τ₁ζ⟩` **nonzero**; then the orthogonal-integer Bessel
+bridge `S09.sum_rat_weights_le_of_orthogonal_integer_decomposition` (Coq's `orthogonal_split` +
+Bessel over `‖Γ‖² ≤ (u−1)/q`) gives `∑_{ζ ∈ calT1} 1 ≤ ⟨Γ,Γ⟩ ≤ (u−1)/q`, i.e.
+`|calT1| = (v−1)/p ≤ (u−1)/q`.
+
+This is the **genuinely-available** arithmetic of (14.9): everything downstream of the carriers is
+proven here (the orthonormal-family Bessel step with unit weights `m ζ = 1`, the `∑ 1 = |calT1|`
+count-collapse, and the `⟨Γ,Γ⟩ ≤ (u−1)/q` chaining).  The four hypotheses package exactly the deep
+carriers that the honest §16 build still owes, each cited from its own construction at the
+`T_typeIII_ratio_le` call site:
+
+* `hcount : (calT1.card : ℚ) = (v−1)/p` — the coherent count (proven `T_typeIII_calT1_card` in `|V|`
+  form) **after** the (13.12) `d = 1` substitution `v = |V|` (`S15.V_inf_centralizer_Q_eq_bot`, lane-b);
+* `horth` — orthonormality of the `τ₁`-images (the `calT1` **coherence** carrier, proven skeleton
+  `T_typeIII_calT1_coherent` fed a T-side `S07.Hypothesis` Dade package);
+* `hdecomp`/`hΓ₁`/`hx` — the `S`-side `βₛ` bridge gap `Γ = ∑ x_ζ·τ₁ζ + Γ₁` (`Γ₁ ⊥ τ₁ζ`), with the
+  parity nonzeroness `x_ζ ≠ 0` (Coq `nzT1_Ga` via `cfdot_real_vchar_even`);
+* `hnorm : ⟨Γ,Γ⟩.re ≤ (u−1)/q` — the `S`-side norm bound on the bridge gap.
+
+Its output `(v−1)/p ≤ (u−1)/q` is exactly the (14.9) `≤` whose `>` counterpart (14.8)
+`key_inequality` contradicts. -/
+theorem T_typeIII_ratio_le_of_gamma_bridge [Finite G]
+    [Fintype G] [Invertible (Nat.card G : ℂ)] (hyp : Hypothesis (G := G))
+    (calT1 : Finset (ClassFunction G ℂ)) (Γ Γ₁ : ClassFunction G ℂ)
+    (x : ClassFunction G ℂ → ℤ)
+    (hcount : (calT1.card : ℚ) = ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ))
+    (horth : ∀ a ∈ calT1, ∀ b ∈ calT1,
+      ClassFunction.inner a b = if a = b then (1 : ℂ) else 0)
+    (hdecomp : Γ = (∑ a ∈ calT1, (((x a : ℝ) : ℂ) • a)) + Γ₁)
+    (hΓ₁ : ∀ a ∈ calT1, ClassFunction.inner Γ₁ a = 0)
+    (hx : ∀ a ∈ calT1, x a ≠ 0)
+    (hnorm : (ClassFunction.inner Γ Γ).re ≤
+      ((((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) : ℚ) : ℝ)) :
+    ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) ≤
+      ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) := by
+  classical
+  -- Bessel over the orthonormal `calT1` (unit weights `m a = 1`, integer coeffs `x a ≠ 0`),
+  -- against the norm bound `⟨Γ,Γ⟩ ≤ (u−1)/q`: yields `∑_{a ∈ calT1} 1 ≤ (u−1)/q`.
+  have hbessel := OddOrder.Peterfalvi.S09.sum_rat_weights_le_of_orthogonal_integer_decomposition
+    (ι := ClassFunction G ℂ) calT1 (fun a => a) x (fun _ => (1 : ℚ)) Γ Γ₁
+    (((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ))
+    hdecomp
+    (fun a ha b hb => by rw [horth a ha b hb]; split <;> simp)
+    hΓ₁
+    (fun _ _ => zero_le_one)
+    hx
+    hnorm
+  -- `∑_{a ∈ calT1} 1 = |calT1|`, and `|calT1| = (v−1)/p` by the coherent count.
+  rw [Finset.sum_const, nsmul_eq_mul, mul_one, hcount] at hbessel
+  exact hbessel
+
 /-- **Peterfalvi (14.9), the character body** — the structural `≤` half of the ratio comparison, the
 sole deep obligation of (14.9).  Coq `PFsection14` `FTtypeP_min_typeII`, lines 737--853: assuming `T`
 is type III, build `calT1 = seqIndD QV T QV Q` (the degree-`p` induced characters of `T`, from
 `T' = Q ⊔ V` via `T_deriv_eq_QV`), coherent by uniform-degree coherence
-(`S07.coherent_of_constant_degree` / Coq `uniform_degree_coherence`).  Via the `S`-side `βₛ` bridge
+(`S07.coherent_of_constant_degree` / Coq `uniform_degree_coherence`).  Now **reduced to the proven
+Γ-Bessel skeleton** `T_typeIII_ratio_le_of_gamma_bridge` (above), which discharges all the
+orthonormal-family Bessel arithmetic; this theorem supplies the skeleton's four precisely-named
+char-cascade carriers (`hcount`/`horth`/`hdecomp`+`hΓ₁`+`hx`/`hnorm`), kept jointly as its single
+documented residual `sorry`.  Via the `S`-side `βₛ` bridge
 gap `Γ`, `⟨Γ, τ₁ ζ⟩ ≡ 1 (mod 2)` for each `ζ ∈ calT1` (Coq `nzT1_Ga`, using
 `cfdot_real_vchar_even`), so `|⟨Γ, τ₁ ζ⟩|² ≥ 1`; then `orthogonal_split` + Bessel give
 `(v − 1)/p = p · |calT1| ≤ ⟨Γ, Γ⟩ ≤ (u − 1)/q`.
@@ -845,7 +907,39 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) ≤
       ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) := by
   -- Coq `FTtypeP_min_typeII` body (PFsection14.v:737--853): `calT1`/coherence + Γ-Bessel.
-  sorry
+  -- Reduced to the proven Γ-Bessel skeleton `T_typeIII_ratio_le_of_gamma_bridge`; its inputs are
+  -- the precisely-named char-cascade carriers, each a genuinely-missing construction kept as a
+  -- documented residual `sorry` here (NOT a gate on `T_typeIII_ratio_le`'s honest structure — the
+  -- Bessel/orthonormality/count arithmetic is fully proven in the skeleton).
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  haveI : Invertible (Nat.card G : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  -- Carrier 1 (the coherent `τ₁`-image family): the degree-`p` `Ind_{QV}^T`-family `calT1`,
+  -- mapped by the T-side coherence `τ₁` to an orthonormal set of `G`-class functions.  Its
+  -- construction is the T-side Dade coherence package feeding `T_typeIII_calT1_coherent`
+  -- (`S07.Hypothesis`, itself separately gated).
+  obtain ⟨calT1, Γ, Γ₁, x, hcount, horth, hdecomp, hΓ₁, hx, hnorm⟩ :
+      ∃ (calT1 : Finset (ClassFunction G ℂ)) (Γ Γ₁ : ClassFunction G ℂ)
+        (x : ClassFunction G ℂ → ℤ),
+        (calT1.card : ℚ) = ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) ∧
+        (∀ a ∈ calT1, ∀ b ∈ calT1,
+          ClassFunction.inner a b = if a = b then (1 : ℂ) else 0) ∧
+        Γ = (∑ a ∈ calT1, (((x a : ℝ) : ℂ) • a)) + Γ₁ ∧
+        (∀ a ∈ calT1, ClassFunction.inner Γ₁ a = 0) ∧
+        (∀ a ∈ calT1, x a ≠ 0) ∧
+        (ClassFunction.inner Γ Γ).re ≤
+          ((((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) : ℚ) : ℝ) := by
+    -- The character-body carriers, jointly:
+    --   • `hcount` = coherent count `T_typeIII_calT1_card` (`|calT1| = (|V|−1)/p`) composed with the
+    --     (13.12) `d = 1` substitution `v = |V|` (`S15.V_inf_centralizer_Q_eq_bot`, lane-b);
+    --   • `horth`  = `calT1` **coherence** (proven skeleton `T_typeIII_calT1_coherent`, given a
+    --     T-side `S07.Hypothesis` Dade package) ⟹ `τ₁` maps `calT1` to an orthonormal set;
+    --   • `hdecomp`/`hΓ₁`/`hx` = the `S`-side `βₛ` bridge gap `Γ` with parity nonzeroness
+    --     `x_ζ = ⟨Γ, τ₁ζ⟩ ≠ 0` (Coq `nzT1_Ga`, via `S09.cfdot_real_vchar_even`);
+    --   • `hnorm`  = the `S`-side norm bound `⟨Γ,Γ⟩ ≤ (u−1)/q` on the bridge gap.
+    sorry
+  exact T_typeIII_ratio_le_of_gamma_bridge hyp calT1 Γ Γ₁ x hcount horth hdecomp hΓ₁ hx hnorm
 
 /-- **Peterfalvi (14.9), the type determination** — Coq `PFsection14`
 `have [_ _ [Ttype3 _]] := FTtype34_structure maxT TtypeP notTtype2` (line 735): a type-`P` maximal
