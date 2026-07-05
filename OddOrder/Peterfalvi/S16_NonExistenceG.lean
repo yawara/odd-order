@@ -4806,7 +4806,49 @@ theorem dadeSupport_not_coprime_card_kernel [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (dataM : TypeICoherent78Data M)
     {y : G} (hy : y ∈ (dataM.h78 hG).hyp76.hyp71.hyp.dadeSupport) :
     ¬ Nat.Coprime (orderOf y) (Nat.card ↥dataM.kernel) := by
-  sorry
+  classical
+  -- `y` is conjugate to `a·h` with `a ∈ A = M_F#`, `h ∈ H(a)` (the (8.14) signalizer)
+  rw [dataM.h78_hyp_eq hG, OddOrder.Peterfalvi.S04.Hypothesis.mem_dadeSupport_iff] at hy
+  obtain ⟨a, h, hh, hconj⟩ := hy
+  -- `a.1 ∈ M_F`, `a.1 ≠ 1` (`A = typeIA = M_F ∖ {1}`)
+  have ha2 : a.1 ∈ (dataM.kernel : Set G) \ {1} := by
+    rw [← dataM.typeIA_eq_sharp hG]; exact a.2
+  have haK : a.1 ∈ dataM.kernel := ha2.1
+  have hane : a.1 ≠ 1 := fun h1 => ha2.2 (Set.mem_singleton_iff.mpr h1)
+  have hord_ne : orderOf a.1 ≠ 1 := fun h1 => hane (orderOf_eq_one_iff.mp h1)
+  have hord_dvd : orderOf a.1 ∣ Nat.card ↥dataM.kernel := dataM.kernel.orderOf_dvd_natCard haK
+  -- `h` commutes with `a.1`: `H(a) ≤ C_G(a.1)` by `(2.2.b)` `C_G(a.1) = H(a) ⊔ C_L(a.1)`
+  have hh_cent : h ∈ Subgroup.centralizer ({a.1} : Set G) := by
+    rw [(dataM.typeIHyp.dadeData.dade).centralizer_eq_sup a]
+    exact Subgroup.mem_sup_left hh
+  have hcomm : Commute a.1 h := (Subgroup.mem_centralizer_singleton_iff.mp hh_cent).symm
+  -- `orderOf a.1` coprime `orderOf h`: `(2.2.c)` `(|H(a)|, |C_L(a.1)|) = 1`
+  have hcop_orders : Nat.Coprime (orderOf a.1) (orderOf h) := by
+    have hcc := (dataM.typeIHyp.dadeData.dade).centralizer_coprime a a
+    have hord_h : orderOf h ∣ Nat.card ↥((dataM.typeIHyp.dadeData.dade).H a) :=
+      ((dataM.typeIHyp.dadeData.dade).H a).orderOf_dvd_natCard hh
+    have haCent : a.1 ∈ OddOrder.Peterfalvi.S04.centralizerIn M a.1 :=
+      OddOrder.Peterfalvi.S04.mem_centralizerIn.mpr
+        ⟨(dataM.typeIHyp.dadeData.dade).mem_L a.2, rfl⟩
+    have hord_a : orderOf a.1 ∣ Nat.card ↥(OddOrder.Peterfalvi.S04.centralizerIn M a.1) :=
+      (OddOrder.Peterfalvi.S04.centralizerIn M a.1).orderOf_dvd_natCard haCent
+    exact (Nat.Coprime.coprime_dvd_right hord_a
+      (Nat.Coprime.coprime_dvd_left hord_h hcc)).symm
+  -- `orderOf y = orderOf(a.1·h) = orderOf a.1 · orderOf h`, so `orderOf a.1 ∣ orderOf y`
+  obtain ⟨c, hc⟩ := isConj_iff.mp hconj
+  have hsemi : SemiconjBy c (a.1 * h) y := by
+    change c * (a.1 * h) = y * c; rw [← hc]; group
+  have hordy : orderOf y = orderOf a.1 * orderOf h := by
+    rw [← SemiconjBy.orderOf_eq c hsemi,
+      hcomm.orderOf_mul_eq_mul_orderOf_of_coprime hcop_orders]
+  have hdvd_y : orderOf a.1 ∣ orderOf y := by rw [hordy]; exact dvd_mul_right _ _
+  -- `1 < orderOf a.1 ∣ gcd(orderOf y, |M_F|) = 1` is a contradiction
+  intro hcop
+  have hcop' : Nat.gcd (orderOf y) (Nat.card ↥dataM.kernel) = 1 := hcop
+  have hgcd : orderOf a.1 ∣ Nat.gcd (orderOf y) (Nat.card ↥dataM.kernel) :=
+    Nat.dvd_gcd hdvd_y hord_dvd
+  rw [hcop'] at hgcd
+  exact hord_ne (Nat.dvd_one.mp hgcd)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (13.19.a), the M-side Dade-support avoidance.**  For a type-`I` maximal
