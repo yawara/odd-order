@@ -4282,6 +4282,45 @@ theorem hcuInHu_eq_cuInHu_sup_hInHu (caseA : CliffordCaseAData chars) :
     hInHu data ⊔ cuInHu caseA = cuInHu caseA ⊔ hInHu data :=
   sup_comm _ _
 
+/-- **`|U| = a · |C_U(S₀)|`** (Peterfalvi (9.7.a)): the order of `U` splits as the Clifford index
+`a = [U:C_U(S₀)]` times the centralizer order.  Rearranges the first-isomorphism value `|U| = |Ū₁| ·
+|C_U(S₀)|` (the `hII` step of `index_cuInHu_subgroupOf_uInHu_eq_a`) using the pin `a = |Ū₁|`
+(`a_eq_card_restrictAut_range`).  The arithmetic behind the (9.8.d) domain-count identity
+`|U|/(a|U'|) = |C_U(S₀):U'|`. -/
+theorem card_U_eq_a_mul_card_cuSub [Finite G] (caseA : CliffordCaseAData chars) :
+    Nat.card ↥data.U = caseA.a * Nat.card ↥(cuSub caseA) := by
+  rw [caseA.a_eq_card_restrictAut_range]
+  have h := Subgroup.card_eq_card_quotient_mul_card_subgroup
+    (aInvariantRestrictAut caseA.S0_aInvariant).ker
+  rw [Nat.card_congr (QuotientGroup.quotientKerEquivRange
+      (aInvariantRestrictAut caseA.S0_aInvariant)).toEquiv,
+    ← card_cuSub_eq_card_ker caseA,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+      (le_sup_left : data.typeP.U ≤ data.typeP.U ⊔ data.typeP.W1)).toEquiv] at h
+  exact h
+
+/-- **`|U|/(a·|U'|) = |C_U(S₀):U'|`** (Peterfalvi (9.8.d) domain-count identity): the count
+`((p-1)/a)·(|U|/(a|U'|))` in the (9.8.d) statement equals `((p-1)/a)·|C_U(S₀):U'|`, the number of
+`(θ₁,λ)`-pairs divided by the `U`-orbit size `a`.  Since `|U| = a·|C_U(S₀)|`
+(`card_U_eq_a_mul_card_cuSub`) and `|U'| ∣ |C_U(S₀)|` (`U' ≤ C_U(S₀)`, `uprimeSub_le_cuSub`), the
+`a` cancels: `|U|/(a·|U'|) = a·|C_U(S₀)|/(a·|U'|) = |C_U(S₀)|/|U'| = [C_U(S₀):U']`.  Here
+`[C_U(S₀):U'] = (uprimeSub data).relIndex (cuSub caseA)` (the relative index of `U'` in `C_U(S₀)`,
+a genuine subgroup index since `U' ≤ C_U(S₀)`). -/
+theorem card_U_div_a_mul_card_Uprime_eq_relIndex [Finite G] (caseA : CliffordCaseAData chars) :
+    Nat.card ↥data.U / (caseA.a * Nat.card ↥(uprimeSub data))
+      = (uprimeSub data).relIndex (cuSub caseA) := by
+  have hUprime_le : uprimeSub data ≤ cuSub caseA := uprimeSub_le_cuSub caseA
+  -- `[C_U(S₀):U'] · |U'| = |C_U(S₀)|` (via `[K:H]·|H| = |K|` for `H = U'.subgroupOf C_U(S₀)`)
+  have hrel : (uprimeSub data).relIndex (cuSub caseA) * Nat.card ↥(uprimeSub data)
+      = Nat.card ↥(cuSub caseA) := by
+    have h := Subgroup.index_mul_card ((uprimeSub data).subgroupOf (cuSub caseA))
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUprime_le).toEquiv] at h
+  rw [card_U_eq_a_mul_card_cuSub caseA, ← hrel]
+  -- `a·([C_U(S₀):U']·|U'|) / (a·|U'|) = [C_U(S₀):U']`
+  rw [show caseA.a * ((uprimeSub data).relIndex (cuSub caseA) * Nat.card ↥(uprimeSub data))
+      = ((uprimeSub data).relIndex (cuSub caseA)) * (caseA.a * Nat.card ↥(uprimeSub data)) by ring]
+  exact Nat.mul_div_cancel _ (Nat.mul_pos caseA.a_pos Nat.card_pos)
+
 /-- `C_U(S₀) ≤ H·C_U(S₀)` (mirrors `cInHu_le_hcRealized`): `cuInHu` is contained in the inertia
 subgroup `hInHu ⊔ cuInHu`. -/
 theorem cuInHu_le_hcuInHu (caseA : CliffordCaseAData chars) :
@@ -7512,6 +7551,42 @@ theorem realizedH0supUprime_normal_huSub [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
     (((chief.H0 ⊔ uprimeSub data).subgroupOf M).subgroupOf (huSub data)).Normal :=
   (chiefFactor_H0supUprime_subgroupOf_normal chief).subgroupOf (huSub data)
+
+/-- **`U' ◁ M`** (Peterfalvi (9.8.d)): the derived subgroup `U' = [U,U]` is normal in `M`.  Same
+generator-class argument as `chiefFactor_H0supUprime_subgroupOf_normal` but for `U'` alone:
+`U W₁ ≤ N(U')` (`uprimeSub_normalized_by_uW1`) and `H ≤ N(U')` (`typeP_H_le_normalizer_uprimeSub`,
+`H` *centralizes* `U'`), and `M = H ⊔ (U ⊔ W₁)`.  The `HU`-conjugation stability of the `𝒮(H₀U')`
+family's `U'`-triviality condition `U' ⊆ Ker` (the (9.8.d) count (α) piece) is exactly this
+normality realized in `HU`. -/
+theorem uprimeSub_subgroupOf_M_normal [Finite G] {M : Subgroup G}
+    (data : TypesIIIIIIVSetup M) :
+    ((uprimeSub data).subgroupOf M).Normal := by
+  have hUM : uprimeSub data ≤ M := (uprimeSub_le_U data).trans (U_le_M data)
+  rw [Subgroup.normal_subgroupOf_iff_le_normalizer hUM]
+  have hUW1 : data.typeP.U ⊔ data.typeP.W1
+      ≤ Subgroup.normalizer ((uprimeSub data : Subgroup G) : Set G) :=
+    uprimeSub_normalized_by_uW1 data
+  have hH : data.typeP.H ≤ Subgroup.normalizer ((uprimeSub data : Subgroup G) : Set G) :=
+    typeP_H_le_normalizer_uprimeSub data
+  have hM'eq : derivedInG M = data.typeP.H ⊔ data.typeP.U := by
+    rw [data.typeP.derivedInG_eq_fitting_sup_U, data.typeP.H_eq]
+  have hMW1 : derivedInG M ⊔ data.typeP.W1 = M := by
+    have hmap := congrArg (Subgroup.map M.subtype) data.typeP.M_complement.sup_eq_top
+    rwa [Subgroup.map_sup, Subgroup.subgroupOf_map_subtype, Subgroup.subgroupOf_map_subtype,
+      inf_of_le_left (derivedInG_le_self M), inf_of_le_left data.typeP.W1_le,
+      ← MonoidHom.range_eq_map, Subgroup.range_subtype] at hmap
+  have hMeq : M = data.typeP.H ⊔ (data.typeP.U ⊔ data.typeP.W1) := by
+    rw [← sup_assoc, ← hM'eq, hMW1]
+  exact hMeq.le.trans (sup_le hH hUW1)
+
+/-- **realized `U' ◁ HU`** (Peterfalvi (9.8.d)): restriction of `U' ◁ M`
+(`uprimeSub_subgroupOf_M_normal`) along `huSub ≤ ↥M`.  This is the normality that makes the
+`U' ⊆ Ker χ` condition `HU`-conjugation-invariant: `Ker(χ^g) = g⁻¹·(Ker χ)·g ⊇ g⁻¹·U'·g = U'`, so the
+`𝒮(H₀U')`-family's `U'`-triviality survives conjugation — the `λ`-half of the (9.8.d) count (α). -/
+theorem uprimeInHu_normal_huSub [Finite G] {M : Subgroup G}
+    (data : TypesIIIIIIVSetup M) :
+    (((uprimeSub data).subgroupOf M).subgroupOf (huSub data)).Normal :=
+  (uprimeSub_subgroupOf_M_normal data).subgroupOf (huSub data)
 
 /-- **`H₀C' ◁ M`** (mirror of `chiefFactor_H0supC_subgroupOf_normal` for `C'`): the (9.9)
 exceptional-case kernel subgroup `H₀ ⊔ C'` is normal in `M`.  `M = H ⊔ (U ⊔ W₁)`
