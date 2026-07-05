@@ -374,3 +374,16 @@ T-carrier complements 出し切り後、別 ungated frontier: `basic_structure_g
 **session 累計 (it.89-91, 4 commits)**: T-carrier 7→5 sorry (Q⊓V + T=T'⋊W₂) + isMulCommutative_V/
 coprime_card_Q_card_VW2 完全 honest + P_elementaryAbelian。次 ungated 候補 (fresh 調査要):
 u_bound (9000 σ 依存の可能性) or chief-factor パターンの他 S-instance facts への波及。
+
+## Q_elementaryAbelian_T (T-side dual) 実証明 (it.92, 2026-07-05, commit b34ed53c)
+
+P_elementaryAbelian (S-side, ungated) の T-side dual を実装。(14.9) type-II T → reconciled
+TypePData T → TypesIIIIIIVSetup T → chief N=⊥ (|Q|=q^p Wielandt 経由) → quotient_elementaryAbelian
+(chief.p=q) transport。**gated-endpoint body** (IsTypeP2 T gated via reconciled_typePData_T、
+card_Q_eq と同 gate) — 独立仮説でなく type-P σ-structure から導出、σ-structure landing で auto-close。
+
+**frontier shift (it.89-92, 6 commits)**: 明確な ungated win (T-carrier complements +
+P_elementaryAbelian) は出し切り。以降は gated-endpoint body (IsTypeP2 T gated の T-side dual 群:
+V_inf_centralizer_Q_eq_bot=13.12 d=1 T-side 等) or deep char (13.4 orthogonality) or
+σ-producer (u_bound=9000)。次候補 = V_inf_centralizer_Q_eq_bot (S-side U_inf_centralizer_P_eq_bot
+の dual、gated-endpoint body 見込み) — fresh context で mirror 調査推奨。
