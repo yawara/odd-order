@@ -841,3 +841,58 @@ vs CharacterDifferenceImage.Orthogonal) の突合が実装時の最初の確認�
   φ.comp U.subtype 形; Q は U-pointwise-fixed ゆえ U-invariant) → parity kernel;
   case (a) = φ_w 鎖。両 case とも hUcent (U centralizes H₀, S13 側 U_centralizes_H0)
   を入力仮定に取る generic 形で書く。
+
+## 2026-07-05 lane-a (loop 62): (11.7) case (b) 完全閉鎖 — chiefKernel_caseB_false
+
+- U-既約分岐を generic (data, chief) level で sorry-free 化 (commit 参照)。
+- 技術メモ: IsAInvariant の • は change で map 化 (quotientMulAutHom の def と同型);
+  pointwise-smul の hom-algebra rw は toMonoidEnd 形に阻まれる → 要素ベース le_antisymm が正解。
+  π-同変性は QuotientGroup.induction_on + rfl (apply lemma が rfl なので)。
+- 残: case (a) φ_w-鎖 (CliffordCaseAData ではなく raw S₀ dichotomy 分岐から直接;
+  W₁-orbit 生成 + LineScalarCharacter 系で φ_w 構成) → master → S13 instantiation。
+
+## 2026-07-05 lane-a (loop 63): (11.7) case (a) 道具箱 6 補題 (commit b52ca1f8)
+
+- class-2 交換子計算 (中心 drop ×2 / 積展開 / 冪双線形 ×2) + order-p exponent +
+  closure 可換性を kernel file に sorry-free 追加。
+- case (a) 本体の設計確定: S₀-exponent 関数 e : U → ℕ (mod p) に全 translate の作用が
+  e(a⁻¹ua) で還元される (T_a = φa•S₀ 上の u-exponent = e(a⁻¹ua))。D ≠ 1 の pair (a,b) から
+  e(v)·e(c⁻¹vc) ≡ 1 (c := a⁻¹b) → v ↦ c-conj 置換の鎖 + c 奇数位数 (c ∈ ⟨c²⟩) で
+  e ≡ e∘conj → e² ≡ 1 → e ≡ 1 (odd) → U が全 translate を固定 → fixedSubgroup = ⊤ ↯
+  U_noncentral_on_quotient。D 全消滅側は commute_all_of_closure_eq_top で Ĥ 可換 ↯ |Ĥ'| = p。
+- 次 iteration: この設計で chiefKernel_caseA_false を実装。
+
+## 2026-07-05 lane-a (loop 64): (11.7) case (a) endgame 補題 (caseA_fixed_contradiction)
+
+- 「U が S₀ pointwise 固定 → False」を実証明 (translate へは conj-返しで伝播、
+  span = ⊤、(9.4.b) と矛盾)。
+- 残り = chain 部: 非可換 pair (x̂,ŷ) ∈ S_gen² → c := ⁅x̂,ŷ⁆ ∈ N̂ order p →
+  σu-固定 + 双線形性で ē₀(a⁻¹ua)·ē₀(b⁻¹ub) = 1 → c-conj 鎖 (奇数位数) → ē₀ ≡ 1 → hfix。
+  + S_gen closure = ⊤ (π-lift 帰納) + hDall dichotomy + Ĥ frame 再利用の main 組立。
+
+## 2026-07-05 lane-a (loop 65): (11.7) chain 算術 + closure 引き戻し (commit 129e7536)
+
+- chain_exponent_eq_one (f∘σ 反転 → σ 奇数冪で f²≡1 → d 奇数で x = (x²)^k·x = 1) と
+  closure_preimage_eq_top_of_closure_eq_top を sorry-free 化。
+- main 組立の設計メモ (次 iteration):
+  1. Ĥ frame (case b と同じ Q/N̂/π/σ/hπσ) を再構築
+  2. S_gen := π ⁻¹' (⋃ a, ↑(φa • S₀)); 1 ∈ ⋃ (S₀ ∋ 1); closure = ⊤ (span → closure union =
+     iSup: Subgroup.iSup_eq_closure or closure_iUnion_coe + 引き戻し補題)
+  3. by_cases 全 pair Commute → commute_all → Ĥ 可換 ↯ |Ĥ'| = p
+  4. else: pair x̂ ŷ (π x̂ ∈ φa•S₀, π ŷ ∈ φb•S₀), c := ⁅x̂,ŷ⁆ ≠ 1 ∈ N̂ 中心, orderOf c = p
+  5. e₀ choice (exists_pow_eq_of_mapsTo_of_card_prime on S₀; hS₀inv smul_mem);
+     transfer: σu x̂ = x̂^{e₀(a⁻¹ua)}·ẑ (π-同変 + ker π = N̂ 中心) → 双線形で
+     c = c^{e₀(a⁻¹ua)·e₀(b⁻¹ub)} → ZMod p 等式 ē₀(a⁻¹ua)·ē₀(b⁻¹ub) = 1
+  6. f v := ē₀(⟨a⁻¹va⟩)?? — 実際は g := fun v : ↥Usub => ē₀(conjA v) で hrel:
+     v ↦ a v a⁻¹ 代入で f v · f (σ_c v) = 1 (σ_c = conj by c := a⁻¹b in MulAut ↥Usub;
+     m := orderOf... |L| 奇数冪); chain_exponent_eq_one → ē₀∘conjA ≡ 1 → ē₀ ≡ 1
+     (conjA 全単射) → hfix (s^{e₀v} = s from ≡1 + order p) → caseA_fixed_contradiction。
+  - f の乗法性: s₀ 生成元 + pow_eq_pow_iff_modEq + ZMod.natCast_eq (mod p 抽出)。
+
+
+## 2026-07-05 lane-a (loop 66): exponent bundle (exists_exponent_fun_of_card_prime)
+
+- (i) p∤e (ii) 冪表示 (iii) mod-p 乗法性 (iv) ≡1→固定 を 1 補題に束ねた (commit 参照)。
+- main 組立に必要な部品はこれで全て: frame (loop 61-62 流用) / S_gen closure (loop 65) /
+  exponent bundle (今回) / chain (loop 65) / endgame (loop 64) / 双線形 (loop 63)。
+- 次 iteration = chiefKernel_caseA_false 本体 (設計は loop 65 ログの 6 ステップ)。
