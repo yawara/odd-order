@@ -2123,3 +2123,30 @@ consume が実例) + lanes-equivalent ゆえ char cascade に貢献可**。T-sid
 2. calT1 (seqIndD QV T QV Q, degree p) 構成 + `coherent_of_constant_degree` (S07, PROVEN) で coherence。
 3. S-side Γ-bridge gap + `⟨Γ,τ₁ζ⟩≡1(mod2)` (`cfdot_real_vchar_even` S09:144, PROVEN)。
 4. orthogonal_split (未実装 primitive、要 build) + Bessel で ≤ 完成。
+
+### cont.⁷³ (2026-07-06 lane c /loop、hub 9013 (14.9) char body engage) — ✅ calT1 count `|calT1|=(|V|−1)/p` 完全実証明 (ungated、intrinsic type-III datum route)
+
+**(14.9) char body の構造核を landing** (commit `0b711876`、full build 3932 green、`#print axioms` clean =
+{propext, Classical.choice, Quot.sound}、sorryAx 無・新 axiom 無):
+
+- **`T_typeIII_calT1_card` (:~536)**: `td : TypeIIIData T` から `|calT1| = (|V|−1)/p` を**完全実証明** (3 hyp 全 discharge)。
+- **決定的訂正**: 当初 subagent は `hyp.V` (Hypothesis 抽象 field) 経由で「reconciled_typePData_T (lane-b sorry)
+  gated」と誤結論。**intrinsic `hIII.some : TypeIIIData T` の `td.typeP` 直用**で gate 解消:
+  `td.U_commutative` (U abelian) / `typeP_uW1_frobenius td.typeP` (U⋊W₁ Frobenius、**任意 TypePData から ungated**) /
+  `card_U_eq_index`+`Q_inf_V_eq_bot` (|td.U|=|V| canonical)。⟹ V-abelian/Frobenius は type-III datum に intrinsic、
+  Hypothesis-field reconciliation 不要。
+- **landing した reusable infra** (全 sorry-free): shared leaf `OrbitOnIrr.lean` (induced-image orbit count) +
+  `FrobeniusGroupQuotient.lean` (Frobenius iso-transport) + in-file `inertia_inflate_eq_of_frobeniusQuotient` /
+  `T_typeIII_UW1_frobenius` / `T_typeIII_Q_isComplement_UW1` / `T_typeIII_quotFrobenius_kernel_eq` /
+  `calT1_image_induce_card_eq` / `T_typeIII_card_{U,W1}`。
+
+**残 `T_typeIII_ratio_le` (count 以外、深さ順)**:
+1. **v=|V|** = (13.12) d=1 = `V_inf_centralizer_Q_eq_bot` (lane-b S15 sorry)。`(|V|−1)/p → (v−1)/p` 置換。
+2. **S07 coherence instance** for calT1 (T-side Dade tauT + difference/no-real/orthogonality fields)。
+   gating 未確定 — lane-b grid fields (issue 3002: tau3_isometry/omega_orthonormal/eta_orthogonality) 依存の公算。
+3. **S-side Γ bridge** (β_S bridge gap)。M-side `betaDecomp` (S16_PairingCoherence:467) 有るが (14.9) coupling 用の
+   S-side β_S は要調査。
+4. Bessel + `⟨Γ,τ₁ζ⟩≡1(mod2)` で ≤ 完成。
+
+**教訓**: subagent の「gated」結論は intrinsic datum route を見落とすことがある → hyp 抽象 field でなく
+type-判定 data (TypeIIIData 等) の intrinsic 構造を先に当たる ([[verify-port-state-by-number-not-coq-name]])。
