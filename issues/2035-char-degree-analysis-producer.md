@@ -168,6 +168,21 @@ Res(μ₀ⱼ) は既約 (`certainTypeRestrict_isIrreducible` = (4.5.a))。
 → 1+2+3 で mem_sOf ⟨χⱼ-bundled, xiOf-mem, sum-eq⟩ → μⱼ ∈ 𝒮(H₀) →
 mu_colSum_not_irreducible (済) で reducible-𝒮 → isIndHC (済) → (13.3.a) 完成。
 
+## (13.3.a) step 3 進捗 (it.76-77)
+
+- **H₀ = ⊥ 済** (it.76 `toTypesIIIIIIVSetupS_chief_H0_eq_bot`): P 自体が chief factor
+  (card_P_eq × chiefFactor_quotient_card 突合)。kernel 条件の片方が自動化。
+- **P ⊄ Ker χⱼ の核も在庫と判明 (it.77)**: S06_CertainTypeSupport
+  `not_subset_characterKernel_chiRestrict_of_ne_one` = Pf (4.7) j≥1 kernel step
+  (χ₂ ≠ 1 → W₂ ⊄ Ker χⱼ; (4.3.c) 値公式 + kernel translation の ω-積分解論法)。
+  P-nonkernel は W₂ ≤ P の monotone で従う。
+- **残実装 (次 iteration)**: mu_colSum_eq_induce の ∃ に conjunct
+  「j ≠ 0 → ¬ P-realized ⊆ Ker ψ」を追加して 6 サイト再 threading。producer 供給 =
+  上記 S06-lemma + (i) chi2enum の nontriviality (chi2enum j ≠ 1 for j ≠ 0 —
+  0 ↦ trivial pin の確認要) + (ii) mp-level W₂ ≤ P (mp.Kstar ≤ maxNilpotentNormalHall mp.S —
+  hyp-level W2_le_P の producer-analog、要在庫確認/新規)。
+- その後: 𝒳(⊥)-membership 組立 → μⱼ ∈ 𝒮(H₀) → (13.3.a) assembly。
+
 ## (13.3.a) isIndHC-corollary build-spec (it.70 recon)
 
 **S↔§9 bridge 開通済 (it.69)**: `toTypesIIIIIIVSetupS` + `mkSection11CharacterDataS`。
