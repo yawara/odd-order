@@ -498,3 +498,24 @@ hypotheses に分解するのは net-negative)。
 
 **注意**: main が S11 を 338 行 restructure 済 (2026-07-06 merge)。build 前に coherent_H0C_commutator
 (現 S11:6628) の現行 signature 再確認。
+
+## 2026-07-06 更新 #5 (lane b): ✅ foundation (step 1-4) LANDED — τ₁ extension 実構成 (commit 0032cc7a)
+
+**tractability breakthrough は実証された** (bounded agent build、full 3929 green / AxiomsCheck OK /
+新 axiom なし / sorry 数不変):
+- ✅ `indS` : Ind_S^G を IntegralCharacterMap ↥S G として (induce_add/smul + restrictScalars ℤ)。sorry-free。
+- ✅ `Cprime`/`cprimeSharpS` : (C')^# support (H₀=⊥ 退化)。sorry-free。
+- ✅ `mkSection11CharacterDataS_honest` : tau:=Ind_S^G / support:=(C')^#。sorry-free。
+- ✅ `coherent_H0Cprime_S` → `tau1S_ofHonest` (=.extension = (13.2.d) τ₁) + `tau1S_ofHonest_extends_on_supported`
+  (τ₁=Ind_S on supported span)。sibleyTarget_H0C (§14) のみ sorried-cite。
+
+**残 (13.3) work (foundation 済ゆえ全て unblocked)**:
+- **step 5a (tau1S_* fields)**: CharacterDegreeData の `tau1S_apply_induce_sub`/`tau1S_inner_induce`/
+  `tau1S_induce_mem_ZIrr`/`tau1S_induce_inner_eta` を tau1S_ofHonest + extends_on_supported +
+  **family membership** (Ind θ ∈ zSpan chars.S、differences ∈ zSupportedSpan — 要 (7.6)-family 構造) から証明。
+- **step 5b (lambda 13.3.b)**: degree-uq irreducible λ (column sum でなく specific 既約構成)。
+- **step 5c (mu_col/mu_tau1 5.8)**: mu_col_tau1_eta_col_one + mu_tau1_formula (S05 (5.8) machinery)。
+- **step 6 (assemble)**: CharacterDegreeData 全 field → `character_degree_analysis` = 上記 + sorried-cite。
+- **T-side δ' (別 gap)**: deltaPrime_eq_one (delta_eq_one_S mirror、T-side 構造要)。
+
+**次**: step 5a (tau1S_* fields via family membership) — 最も foundation に近い増分。
