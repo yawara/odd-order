@@ -134,6 +134,89 @@ theorem Hypothesis.mkSection11CharacterData_u_modEq_one [Finite G] {M : Subgroup
     (quotientMulAutHom (N := chief.N) chief.N_aInvariant)
   rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv] at hgen
 
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+open OddOrder.Peterfalvi.S11 in
+/-- **Peterfalvi (11.8.1), the index identification `u = |U : C|`** (`C = U ⊓ C_G(H)`), under the
+(11.7) collapse `H₀ = 1` (i.e. the chief-factor kernel `chief.N = ⊥`).
+
+The genuine `u` field is `u = |Ū| = |range φ|`, where `φ : ↥(U.subgroupOf(U ⊔ W₁)) →* Aut(H̄)`
+is the `U`-action on the chief factor `H̄ = ↥H ⧸ chief.N`.  By the first isomorphism theorem
+`|range φ| = [dom : ker φ]`.  With `chief.N = ⊥` the quotient `H̄ = ↥H ⧸ ⊥` *is* `↥H`, so `φ` is the
+conjugation action of `U ⊔ W₁` on `↥H` (`typeP_conjAction`); an element `v ∈ U` acts trivially iff
+it centralizes `H`, i.e. `ker φ ≅ (C = U ⊓ C_G(H))` inside `U`.  Transporting the index along
+`↥(U.subgroupOf(U ⊔ W₁)) ≃* ↥U` gives `[dom : ker φ] = C.relIndex U = |U : C|`.
+
+This is the (11.7) `H₀ = 1` half of the (11.8.1) chain `|M'{}^{ab}| = |U : C| = u = d` feeding the
+`|𝒮(HC)| = n` count (`card_SHCSet_filter_eq_charParam_n`); the `|M'{}^{ab}| = |U : C|` structural
+half is `typePData_card_abelianization_derived_eq_relIndex_C` and `u = d` is `charParam_d_eq_u`. -/
+theorem Hypothesis.u_eq_relIndex_C [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup M)
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData data)
+    (hN : chief.N = ⊥) :
+    (hyp.mkSection11CharacterData data chief).u
+      = (data.typeP.U ⊓ Subgroup.centralizer (data.typeP.H : Set G)).relIndex data.typeP.U := by
+  classical
+  set L := data.typeP.U ⊔ data.typeP.W1 with hL
+  set C := data.typeP.U ⊓ Subgroup.centralizer (data.typeP.H : Set G) with hC
+  -- The `U`-action map on `H̄`, restricted to `U` via the inclusion `↥U →* ↥L`.
+  set φ := quotientMulAutHom (N := chief.N) chief.N_aInvariant with hφ
+  set θ := φ.comp (Subgroup.inclusion (le_sup_left : data.typeP.U ≤ L)) with hθ
+  -- (A) `u = |range φ_sub| = |range θ|`: the two restrictions of `φ` (to `U.subgroupOf L` and via
+  -- the inclusion from `↥U`) have equal range, since both restriction domains sit as `U` in `L`.
+  have hrange : ((φ.comp (data.typeP.U.subgroupOf L).subtype)).range = θ.range := by
+    rw [hθ, MonoidHom.range_comp, MonoidHom.range_comp]
+    congr 1
+    -- `(U.subgroupOf L).subtype.range = (inclusion le_sup_left).range` (both are `U` inside `L`).
+    rw [Subgroup.range_subtype, Subgroup.inclusion_range]
+  have huθ : (hyp.mkSection11CharacterData data chief).u = Nat.card ↥θ.range := by
+    change Nat.card ↥((φ.comp (data.typeP.U.subgroupOf L).subtype)).range = _
+    rw [hrange]
+  -- (B) `ker θ = C.subgroupOf U`: with `chief.N = ⊥`, `v ∈ U` acts trivially on `H̄ = ↥H` iff `↑v`
+  -- centralizes `H`, i.e. `↑v ∈ C`.
+  have hker : θ.ker = C.subgroupOf data.typeP.U := by
+    ext v
+    rw [MonoidHom.mem_ker, hθ, MonoidHom.comp_apply, Subgroup.mem_subgroupOf, hC,
+      Subgroup.mem_inf]
+    constructor
+    · intro hv
+      refine ⟨v.property, Subgroup.mem_centralizer_iff.mpr (fun g hg => ?_)⟩
+      -- `φ (incl v) = 1` ⇒ conjugation by `↑v` fixes every `⟨g, hg⟩ : ↥H`.
+      have happ : φ (Subgroup.inclusion (le_sup_left : data.typeP.U ≤ L) v)
+          ((⟨g, hg⟩ : ↥data.typeP.H) : ↥data.typeP.H ⧸ chief.N)
+          = ((⟨g, hg⟩ : ↥data.typeP.H) : ↥data.typeP.H ⧸ chief.N) := by
+        rw [hv]; rfl
+      rw [hφ, OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply,
+        QuotientGroup.eq, hN] at happ
+      have hmem : (typeP_conjAction data.typeP
+          (Subgroup.inclusion (le_sup_left : data.typeP.U ≤ L) v)
+          ⟨g, hg⟩)⁻¹ * ⟨g, hg⟩ ∈ (⊥ : Subgroup ↥data.typeP.H) := happ
+      rw [Subgroup.mem_bot, inv_mul_eq_one] at hmem
+      have hconj : (v : G) * g * (v : G)⁻¹ = g := by
+        have := Subtype.ext_iff.mp hmem
+        rwa [typeP_conjAction_apply, Subgroup.coe_inclusion] at this
+      -- `↑v * g * ↑v⁻¹ = g` ⇒ `g * ↑v = ↑v * g`.
+      exact (mul_inv_eq_iff_eq_mul.mp hconj).symm
+    · rintro ⟨-, hvC⟩
+      -- `↑v ∈ C_G(H)` ⇒ `φ (incl v) = 1` (conjugation by `↑v` fixes `↥H`, hence all of `H̄`).
+      apply MulEquiv.ext
+      intro y
+      refine QuotientGroup.induction_on y (fun g => ?_)
+      rw [hφ, OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply]
+      change ((typeP_conjAction data.typeP
+        (Subgroup.inclusion (le_sup_left : data.typeP.U ≤ L) v) g : ↥data.typeP.H)
+        : ↥data.typeP.H ⧸ chief.N) = _
+      congr 1
+      apply Subtype.ext
+      rw [typeP_conjAction_apply, Subgroup.coe_inclusion]
+      -- `↑v * ↑g * ↑v⁻¹ = ↑g` from `↑v ∈ C_G(H)`.
+      have hgH : (g : G) ∈ (data.typeP.H : Set G) := g.property
+      have hcomm : (g : G) * (v : G) = (v : G) * (g : G) :=
+        Subgroup.mem_centralizer_iff.mp hvC (g : G) hgH
+      rw [← hcomm, mul_inv_cancel_right]
+  -- (C) `|range θ| = [dom : ker θ] = C.relIndex U`.
+  rw [huθ, Nat.card_congr (QuotientGroup.quotientKerEquivRange θ).symm.toEquiv, hker]
+  rfl
+
 /-! ## (11.8.1): the μ-columns are the reducible `𝒮(H₀)`-members -/
 
 open OddOrder.Peterfalvi.S11 in
