@@ -86,3 +86,21 @@ Pf (13.3) proof の引用 ↔ repo 在庫:
 - これが通れば S11-chars の honest 再構成 (route A step 1-2) を丸ごと skip し、
   IsCoherent → τ₁ + 4 fields 導出 (extension_agrees/inner_eq_on_supported) に直行。
 - 次 iteration: S08.SibleyDadeHypothesis の fields 精読 + (S, PC)-充足性判定。
+
+## route 判定 (it.48)
+
+- **route B (Sibley 直接 (S, PC)) は死亡**: SibleyDadeHypothesis は (6.8.a) split
+  `L = H ⋊ W₁` (IsComplement') を要求 — |S| = |PC|·u·q なので H = PC は S を複補しない。
+- **route A 確定**: (9.11) = repo `coherent_H0C_commutator` ((6.8)-還元 wiring 済、
+  Pf 原文の 8 段 maximal-coherent 論法は (6.8) に subsume との設計)。
+  真の残 gap = `sibleyTarget_H0C` (S11:6304) — (6.8)-shape witness
+  (H-Sibley ≈ H₀C′、split の complement は W₁ 単独でなく合成; (c2) = Hypothesis46 側)。
+  §14-gated の構造 obligation で multi-session 級。
+- **合わせて必要**: S 用の honest Section11CharacterData (∅-placeholder 不可、it.47 caveat)。
+
+## 次の動き方
+
+campaign は正しく mapped されたが critical path (sibleyTarget_H0C + S11 caseB 2 sorry) が
+深い。上流優先の原則で、並行して **ungated な (13.9.a) `G0_nonvanishing_dichotomy`**
+(文書順は (13.3) より後だが gate なしの genuine math) を先に閉じにいく
+(Galois/cyclic-closure 論法 — GaloisRationalInteger 在庫と接続の見込み)。
