@@ -107,3 +107,112 @@ GREEN (3930 jobs, 新 axiom なし)。real sorry = **1** (`prTIres_irr_cases` bo
 **faithful verdict**: posit した field 群は `S1cases`/`S1mu`/`sS1S` が実際に consume する mathcomp
 lemma (`primeTIred`/`cfInd_prTIres`/`prTIres_irr_cases`/`cfdot_prTIred`/`prTIred_char`) と 1:1 対応。
 唯一の残欠 `cfker_prTIres` (継続 #3 で field 追加) を除き、setup は S1cases の needs に忠実。
+
+## 進捗 (session 2, 2026-07-06, lane b) — DOWNSTREAM: family `calS` + `FTseqInd_TIred` + `S1cases`
+
+継続 outline #3/#4 を landing。`lake build OddOrder` GREEN、新 axiom なし、**net real sorry = ±0**
+(依然 `prTIres_irr_cases` の 1 個のみ; 新規宣言は全て sorry-free)。
+
+**`PrimeTIResidueData` に 2 field 追加** (どちらも genuine mathcomp theorem ゆえ honest posit):
+
+- `P : Subgroup ↥PU` — Sylow `p`-subgroup (`= S_F` を PU 内で realise)、`seqIndD PU S P 1` の
+  kernel 条件を担う。継続 outline は「`H`」と書いていたが正しくは PU 内の `P`。
+- `cfker_prTIres : ∀ j, j ≠ 0 → ¬(P ⊆ characterKernel (chi j))` (Coq `PFsection4.v:801`) — j≠0 の
+  residue が `P`-nonlinear。`chi_zero` (j=0 は trivial=full kernel) と対になる。
+
+**新 derived 宣言 (全 sorry-free、`PrimeTIResidueData` 相対)**:
+
+- `calS : Set (ClassFunction S ℂ)` = `{Ind_{PU}^S ξ | ξ ∈ Irr(PU), P ⊄ ker ξ}` (Coq `seqIndD PU S P 1`)
+  + `mem_calS` iff。**repo に generic `seqIndD` は無く** (S11 `sSet` は §9 specific instance) 本 leaf で
+  `sSet` idiom に沿い定義。
+- `induce_mem_calS (θ) (P⊄ker θ) : Ind_{PU}^S θ ∈ calS` — witness `ξ = θ`。
+- `FTseqInd_TIred (j≠0) : primeTIred D j ∈ calS` (Coq `S1mu`, PFsection13.v:391) — `cfInd_prTIres` +
+  `cfker_prTIres`。
+- `S1cases (θ) (P⊄ker θ) : (∃ j≠0, Ind θ = μ_j) ∨ (IsIrreducibleCharacter (Ind θ) ∧ Ind θ ∈ calS)`
+  (Coq PFsection13.v:401-428) — `prTIres_irr_cases` を consume。residue branch で `j≠0` は
+  `chi_zero`+`characterKernel_trivialClassFunction`+`hθP` から。
+- `induce_mem_zSpan_calS (θ) (P⊄ker θ) : Ind_{PU}^S θ ∈ zSpan calS` — **PU-level `sS1S` engine**。
+  両 branch とも `calS` の generator に落ちる (`FTseqInd_TIred` / `induce_mem_calS`) ので単一 generator。
+
+**⚠ 設計上の重要注記 (PU-level vs H-level; S15 が要する差分)**: Coq の本物の `S1cases`/`sS1S` は
+`calS1 = seqIndD H S P 1` (**smaller** group `H = PC ⊊ PU` から誘導) を対象にし、`Ind_H^S θ` を
+`calS = seqIndD PU S P 1` (PU から誘導) の要素に**分類**する — induction source が違うため dichotomy が
+本質的に必要。本 session が landing した `S1cases`/`induce_mem_zSpan_calS` は **PU-level 版** (θ∈Irr(PU))
+で、この版では membership は片方向で easy だが、`prTIres_irr_cases` dichotomy 構造を忠実に port し S15
+consumer の骨格を与える。**S15 `induce_H_mem_zSpan_S` (S15:629) を実際に close するには H-level 版が要る**:
+`Ind_H^S θ = Ind_{PU}^S (Ind_H^{PU} θ)` (`cfIndInd`, transitivity) と分解し、`Ind_H^{PU} θ = ∑ constituents`
+の各既約 constituent `s ∈ Irr(PU)` に PU-level `S1cases`/`prTIres_irr_cases` を適用 (Coq `S1cases` 本体の
+`cfun_sum_constt`→`rpred_sum` の流れ)。この **cfIndInd 分解 + constituent 和** が次 session の主眼。
+
+**継続 outline (更新)**:
+
+1. **`prTIres_irr_cases` body close** (session 1 #1 のまま) — inertia `'I_S[θ]=PU` の p-group
+   fixed-point count。field 版 posit も可。
+2. **`PrimeTIResidueData` constructor** (session 1 #2 のまま) — `cyclicTIiso`+`primeTIirr_spec` port。
+   今 `P`/`cfker_prTIres` も供給要 (constructor で `P := S_F の PU 内像`、`cfker_prTIres` は
+   `PFsection4.v:801` の port)。
+3. **H-level `S1cases` / `sS1S`** (NEW, 上記注記) — `cfIndInd` 分解 + `Ind_H^{PU} θ` の constituent 和 →
+   各 constituent に PU-level `induce_mem_zSpan_calS` 適用 → `zSpan calS` は加法閉。必要 repo API:
+   `cfIndInd` (induction transitivity; `InducedCharacter.lean` に `induce_induce` 系があるか要確認)、
+   `cfun_sum_constt` 相当 (既約分解和; repo `Clifford`/`ZIrrFourier` に近いものがあるか)。
+4. **`sS1S` wrapper → `induce_H_mem_zSpan_S` (S15:629) close** — H-level `S1cases` から。
+   S15 の θ は `↥(H.subgroupOf S)` 上、`P` は `(P.subgroupOf S).subgroupOf (H.subgroupOf S)`。
+   `calS` と S15 の `sSet`-family (`mkSection11CharacterDataS_honest ... .S`) の**対応**が要:
+   S15 の family は §9 の `sSet = Ind_{HU}^M 𝒳` (M=S, HU=PU 相当) で、本 leaf の `calS = Ind_{PU}^S 𝒳'`
+   と **`𝒮 ≈ calS` の同一視** (両者 "PU から誘導した P-nonlinear irr") を橋渡しする glue lemma が S15 側で
+   必要 (session 3-4)。
+
+**`sSet ≈ calS` 対応 (S15 が要する)**: S11 `sSet data = {Ind_{HU}^M χ | χ ∈ xiSet}` (kernel 条件は
+`H = hInHu ⊄ ker`)、本 leaf `calS = {Ind_{PU}^S ξ | P ⊄ ker ξ}`。type-P setup で `M=S`・`HU=PU`・
+`H(の S11 版)` ↔ `P(本 leaf)` が一致すれば両 family は集合として等しい。この identification は S15 側
+(`mkSection11CharacterDataS_honest` が `sSet` に pin 済) で `calS D = (…).S` を示す補題として書く。
+
+## 進捗 (session 3, 2026-07-06, lane b) — H-LEVEL LIFT landed (継続 #3 完了)
+
+継続 outline #3 (H-level `S1cases`/`sS1S`) を landing。`lake build OddOrder` GREEN (3932 jobs)、新 axiom
+なし、**net real sorry = ±0** (依然 `prTIres_irr_cases` の 1 個のみ; 新規 2 宣言は全て sorry-free)。
+
+**import 追加** (両方 proven infra、再構築せず reuse): `InducedTransport` (constituent 分解
+`induce_eq_sum_inner_restrict_smul` + `induce_induce_subgroupOf`)、`S08_CoherenceCorePart1`
+(kernel 3 補題 — `characterKernel_restrict_subgroupOf`, `isCharacter_restrict`,
+`characterKernel_subset_of_isCharacter_of_inner_ne_zero`)。cycle 無し確認済。
+
+**新 derived 宣言 (全 sorry-free、`PrimeTIResidueData` 相対)**:
+
+- `constituent_P_not_subset_ker (H : Subgroup ↥PU) [Fintype ↥H] [Invertible …] (θ : ClassFunction ↥H ℂ)
+  (hθirr : IsIrreducibleCharacter θ) (hθP : ¬(D.P.subgroupOf H ⊆ ker θ)) (s : IrreducibleCharacter ↥PU)
+  (hs : ⟨θ, Res_H s⟩ ≠ 0) : ¬(D.P ⊆ ker s)` — **step 3 kernel 引数** (Coq `S1cases` 内の kernel 部分)。
+  contrapositive: `P ⊆ ker s` ⟹ `characterKernel_restrict_subgroupOf` で `Res_H s` は `P.subgroupOf H`
+  上 trivial ⟹ θ は `Res_H s` の constituent (`⟨Res_H s,θ⟩≠0`、conj symm) ゆえ
+  `characterKernel_subset_of_isCharacter_of_inner_ne_zero` で `P.subgroupOf H ⊆ ker θ`、`hθP` に矛盾。
+- `induce_H_mem_zSpan_calS (H : Subgroup ↥PU) [Fintype ↥H] [Invertible …] (θ : ClassFunction ↥H ℂ)
+  (hθirr) (hθP : ¬(D.P.subgroupOf H ⊆ ker θ)) : Ind_{PU}^S (Ind_H^{PU} θ) ∈ zSpan D.calS` —
+  **H-level `sS1S` lift** (Coq `S1cases`, PFsection13.v:401)。証明 = Coq `cfun_sum_constt`→`rpred_sum`:
+  (i) `induce_eq_sum_inner_restrict_smul` で `Ind_H^{PU} θ = ∑_{s∈Irr PU} ⟨θ,Res_H s⟩•s`、
+  (ii) `induce_sum`/`induce_smul` で `Ind_{PU}^S` を sum/scalar に通す、
+  (iii) 係数 `⟨θ,Res_H s⟩ = (k:ℂ)` (k:ℕ; `inner_conj_symm` + `IsCharacter.exists_natCast_inner_irreducible`)、
+  (iv) `k≠0` の項は `constituent_P_not_subset_ker`→`induce_mem_zSpan_calS`→`nsmul_mem`、`k=0` は `0`。
+
+**⚠ H は `Subgroup ↥PU` として framing** (S15 の `Subgroup G`/`subgroupOf S` でなく): `D.P ≤ H` が
+両者 `Subgroup ↥PU` で clean になり、`D.P.subgroupOf H` が `↥H` の対応部分群になる。`Ind_H^S θ` は
+honest な二段誘導 `Ind_{PU}^S (Ind_H^{PU} θ)` で表現 (単段 `Ind_{H.map PU.subtype}^S` との橋渡しは
+`induce_induce_subgroupOf` で S15 側; これで transitivity を本補題内に持ち込まず constituent-sum に集中)。
+
+**継続 outline (更新)**:
+
+1. **`prTIres_irr_cases` body close** (session 1 #1 のまま) — inertia `'I_S[θ]=PU` の p-group
+   fixed-point count。field 版 posit も可。
+2. **`PrimeTIResidueData` constructor** (session 1 #2 のまま) — `cyclicTIiso`+`primeTIirr_spec` port
+   (`P := S_F の PU 内像`、`cfker_prTIres` = PFsection4.v:801 port)。
+3. ~~H-level `S1cases`/`sS1S`~~ **✅ session 3 完了** (`induce_H_mem_zSpan_calS`)。
+4. **`sS1S` wrapper → `induce_H_mem_zSpan_S` (S15:629) close** — 残 2 glue が要:
+   - **(a) 単段↔二段 橋渡し**: S15 の θ は `↥(H.subgroupOf S)` 上、目標は単段 `Ind_{(H.subgroupOf S)}^S θ`。
+     `induce_induce_subgroupOf (M:=S) (hHPU : H.subgroupOf S ≤ PU) θ` で
+     `Ind_{PU}^S (Ind_{(H.subgroupOf S).subgroupOf PU}^{PU} (θ∘e)) = Ind_{(H.subgroupOf S)}^S θ`。
+     本 leaf の H-level 版は `H_leaf := (H.subgroupOf S).subgroupOf PU : Subgroup ↥PU`、
+     `θ_leaf := θ∘e` に instantiate。kernel 条件 `hθP` の subgroupOf 連鎖 transport が要
+     (`Subgroup.subgroupOf_map_subtype`/`comap_map_eq_self_of_injective` 系、S11:832-833/9266 に前例)。
+   - **(b) `calS D = (mkSection11CharacterDataS_honest …).S` (=`sSet`)**: 上記 `sSet ≈ calS` 対応。
+     両者 "PU から誘導した P-nonlinear irr"; type-P setup で `M=S`/`HU=PU`/`H(S11)↔P(leaf)` 一致。
+   - **(c) `PrimeTIResidueData` instance for `hyp.S`**: constructor (継続 #2) を S15 の type-P2 setup に適用。
+   これら (a)(b)(c) が揃えば S15:629 の sorry は本 leaf から honest に close。
