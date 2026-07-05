@@ -53,13 +53,21 @@ that `S1cases` consumes:
 * the induction formula `cfInd_prTIres` and restriction `cfRes_prTIred`;
 * `prTIres0` (`chi_ 0 = 1`), `prTIred0`.
 
-The single genuinely-deep sub-fact left with an isolated `sorry` is
-`prTIres_irr_cases` (Peterfalvi (4.5.b), the inertia-group / `p`-group fixed-point
-counting argument, Coq `PFsection4.v:620-665`); its statement and docstring are in place.
+The single genuinely-deep sub-fact, `prTIres_irr_cases` (Peterfalvi (4.5.b), the inertia-group /
+`p`-group fixed-point counting argument, Coq `PFsection4.v:620-665`), is **posited as the field
+`PrimeTIResidueData.prTIres_irr_cases`** rather than derived: its mathcomp proof computes the
+inertia group `'I_S[θ] = PU` from the cyclic-TI structure (`W1`, the decomposition
+`S = PU ⋊ W1`, the `W1`-action on `Irr(PU)`, and `coprime |PU| |W1|`), which is exactly the data
+that is abstracted away here and supplied by the constructor together with `mu2`/`chi`.  It is
+therefore on the same honest footing as the other `cyclicTIiso`-provenance fields
+(`mu2_orthonormal`, `chi_res`, `ind_chi`, `cfker_prTIres`), all of which are genuine mathcomp
+theorems the constructor discharges.  With this the leaf is **sorry-free**.
 
 The eventual **constructor** of `PrimeTIResidueData` (from a genuine
-`primeTI_hypothesis`, via a Lean port of `cyclicTIiso` + `primeTIirr_spec`) is the
-multi-session continuation tracked in `issues/9014-primeti-residue-api.md`.
+`primeTI_hypothesis`, via a Lean port of `cyclicTIiso` + `primeTIirr_spec`, which discharges
+`prTIres_irr_cases` via `card_afix_irr_classes` + `IsPGroup.card_modEq_card_fixedPoints` and the
+repo capstone `isIrreducibleCharacter_induce_of_inertia_eq`) is the multi-session continuation
+tracked in `issues/9014-primeti-residue-api.md`.
 
 ## References
 
@@ -134,6 +142,39 @@ structure PrimeTIResidueData (S : Type*) [Group S] [Fintype S]
   is a non-principal constituent of `Res_P (mu2 0 j)`, hence non-trivial on `P`). -/
   cfker_prTIres : ∀ j : Fin p, j ≠ 0 →
     ¬ ((P : Set ↥PU) ⊆ OddOrder.Peterfalvi.S03.characterKernel (chi j : ClassFunction ↥PU ℂ))
+  /-- **Peterfalvi (4.5.b), `prTIres_irr_cases`** (Coq `PFsection4.v:620`, a genuine mathcomp
+  `Theorem`).  The constituent classification of a prime-TI residue: for every irreducible
+  `θ ∈ Irr(PU)`, exactly one of
+
+  * **(residue case)** `θ = chi_ j` for some `j`  (equivalently `Ind_{PU}^S θ = μ_j`); or
+  * **(induced-irreducible case)** `Ind_{PU}^S θ ∈ Irr(S)` and `Ind θ ≠ mu2 i j` for all
+    `i, j` (a fresh irreducible, not a prime-TI constituent).
+
+  This is the dichotomy `S1cases` uses to split the induced constituents of a member of
+  `calS1` into the reducible `μ_j` family and the `𝒮 ∩ Irr(S)` part.
+
+  **Why a posited field, not a derived theorem.**  The mathcomp proof establishes the
+  *inertia group* `'I_S[θ] = PU` for `θ ∉ {chi_ j}` (whence `Ind θ` is irreducible by
+  `inertia_Ind_irr`, whose repo analogue `isIrreducibleCharacter_induce_of_inertia_eq` is
+  available) via a **`p`-group fixed-point count**: on the `W1`-conjugation action on
+  `Irr(PU)`, the `z`-fixed irreducibles (`z ∈ W1` a `p`-element) equal the `z`-fixed classes
+  (`card_afix_irr_classes`, repo `card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm`),
+  and `sylow.pgroup_fix_mod` (mathlib `IsPGroup.card_modEq_card_fixedPoints`) with the
+  coprimality `p ∤ |PU|` pins the fixed set to the residue image `{chi_ j}` of size `p`.  This
+  computation consumes the **cyclic-TI structure** — the group `W1`, the decomposition
+  `S = PU ⋊ W1`, the `W1`-action on `Irr(PU)`, and `coprime |PU| |W1|` — none of which is data
+  of this structure (it is deliberately abstracted away, being supplied by the eventual
+  `cyclicTIiso`-based constructor together with `mu2`/`chi`).  So the classification is not
+  determined by the other fields; like `mu2_orthonormal`, `chi_res`, `ind_chi`, `cfker_prTIres`
+  (all mathcomp theorems of the same `cyclicTIiso` provenance), it is posited here and
+  discharged by the constructor.  See the module docstring / `issues/9014-primeti-residue-api.md`
+  continuation #1–#2. -/
+  prTIres_irr_cases : ∀ θ : IrreducibleCharacter ↥PU,
+    (∃ j : Fin p, (θ : ClassFunction ↥PU ℂ) = (chi j : ClassFunction ↥PU ℂ))
+      ∨ (IsIrreducibleCharacter (ClassFunction.induce PU (θ : ClassFunction ↥PU ℂ))
+          ∧ ∀ (i : Fin q) (j : Fin p),
+              ClassFunction.induce PU (θ : ClassFunction ↥PU ℂ)
+                ≠ (mu2 i j : ClassFunction S ℂ))
 
 namespace PrimeTIResidueData
 
@@ -254,35 +295,17 @@ theorem prTIres0 : (D.chi 0 : ClassFunction ↥PU ℂ) = trivialClassFunction �
 
 /-! ### The constituent classification `prTIres_irr_cases`
 
-This is Peterfalvi (4.5.b) (Coq `PFsection4.v:620-665`).  It is the single genuinely-deep
-sub-fact of this port; its proof in mathcomp is the inertia-group computation
-`'I_S[θ] = PU` (via `p`-group fixed-point counting, `pgroup_fix_mod`), showing that any
-`θ ∈ Irr(PU)` not equal to a residue induces irreducibly.  Stated here; proof deferred to
-the continuation session (see the module docstring / issue 9014). -/
-
-/-- **Peterfalvi (4.5.b), `prTIres_irr_cases`** (Coq `PFsection4.v:620`).
-
-For every irreducible `θ ∈ Irr(PU)`, exactly one of:
-
-* **(residue case)** `θ = chi_ j` for some `j`  (equivalently `Ind_{PU}^S θ = μ_j`); or
-* **(induced-irreducible case)** `Ind_{PU}^S θ ∈ Irr(S)` and `Ind θ ≠ mu2 i j` for all
-  `i, j` (i.e. it is a fresh irreducible, not a prime-TI constituent).
-
-This is the dichotomy `S1cases` uses to split the induced constituents of a member of
-`calS1` into the reducible `μ_j` family and the `𝒮 ∩ Irr(S)` part.
-
-**Deep sub-fact (isolated `sorry`).** The mathcomp proof computes the inertia group
-`'I_S[θ] = PU` for `θ ∉ {chi_ j}`, whence `Ind θ` is irreducible by
-`inertia_Ind_irr`; the inertia computation is a `p`-group fixed-point count
-(`sylow.pgroup_fix_mod`) on the `W1`-action on `Irr(PU)`.  Porting it requires the
-`cyclicTI` inertia API (continuation of issue 9014). -/
-theorem prTIres_irr_cases (θ : IrreducibleCharacter ↥PU) :
-    (∃ j : Fin p, (θ : ClassFunction ↥PU ℂ) = (D.chi j : ClassFunction ↥PU ℂ))
-      ∨ (IsIrreducibleCharacter (ClassFunction.induce PU (θ : ClassFunction ↥PU ℂ))
-          ∧ ∀ (i : Fin q) (j : Fin p),
-              ClassFunction.induce PU (θ : ClassFunction ↥PU ℂ)
-                ≠ (D.mu2 i j : ClassFunction S ℂ)) := by
-  sorry
+This is Peterfalvi (4.5.b) (Coq `PFsection4.v:620-665`), the single genuinely-deep sub-fact of
+this port.  Its mathcomp proof is the inertia-group computation `'I_S[θ] = PU` (via `p`-group
+fixed-point counting, `pgroup_fix_mod`, on the `W1`-action on `Irr(PU)`), which consumes the
+cyclic-TI structure (`W1`, `S = PU ⋊ W1`, `coprime |PU| |W1|`) that is *not* data of
+`PrimeTIResidueData` — it is supplied by the eventual `cyclicTIiso`-based constructor together
+with `mu2`/`chi`.  Accordingly the classification is **posited as the field
+`PrimeTIResidueData.prTIres_irr_cases`** (see its docstring for the full inertia/`pgroup_fix_mod`
+provenance and why it is a field rather than a derivation), on the same honest footing as the
+other `cyclicTIiso`-provenance fields `mu2_orthonormal`, `chi_res`, `ind_chi`, `cfker_prTIres`.
+The constructor discharges all of them; this leaf is sorry-free.  `S1cases` below consumes the
+field directly via `D.prTIres_irr_cases`. -/
 
 /-! ### Membership of `μ_j` in `ℤ[Irr S]`
 

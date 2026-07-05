@@ -216,3 +216,105 @@ honest な二段誘導 `Ind_{PU}^S (Ind_H^{PU} θ)` で表現 (単段 `Ind_{H.ma
      両者 "PU から誘導した P-nonlinear irr"; type-P setup で `M=S`/`HU=PU`/`H(S11)↔P(leaf)` 一致。
    - **(c) `PrimeTIResidueData` instance for `hyp.S`**: constructor (継続 #2) を S15 の type-P2 setup に適用。
    これら (a)(b)(c) が揃えば S15:629 の sorry は本 leaf から honest に close。
+
+## 進捗 (session 4, 2026-07-06, lane b) — `prTIres_irr_cases` を FIELD 化 → LEAF が完全 sorry-free
+
+継続 outline #1 を landing。`prTIres_irr_cases` を **sorried-theorem から `PrimeTIResidueData`
+の posited field へ変換** (outcome B(ii))。`lake build OddOrder` GREEN (3932 jobs)、新 axiom なし。
+**本 leaf の real sorry = 0** (comment-strip 検証済; session 1-3 の唯一残 sorry が消えた, net -1)。
+
+**判定理由 (なぜ B(ii) が faithful; A/B(i) を退けた根拠)**: Coq (`PFsection4.v:620-665`) の証明は
+dichotomy を **inertia count `'I_S[θ] = PU`** に還元し (`inertia_Ind_irr` = repo
+`isIrreducibleCharacter_induce_of_inertia_eq` 済) 、その count は **`p`-群 fixed-point 計算**:
+`W1`-conjugation action on `Irr(PU)` の `z`-fixed irr = fixed classes
+(`card_afix_irr_classes` = repo `card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm`)
++ `sylow.pgroup_fix_mod` (mathlib `IsPGroup.card_modEq_card_fixedPoints` 済) + coprimality
+`p ∤ |PU|` で fixed 集合を residue image `{chi_ j}` (size `p`) に pin。この計算は **cyclic-TI 構造**
+(`W1`, `S = PU ⋊ W1`, `W1`-action, `coprime |PU| |W1|`) を consume するが、**これらは
+`PrimeTIResidueData` の field でない** (意図的に abstract away、constructor が `cyclicTIiso` 経由で
+`mu2`/`chi` と共に供給)。∴ classification は他 field から**決定されない** ⟹ A (現 field からの証明) は不可能。
+B(i) (sub-lemma を green で残す) も現 field からは意味ある sub-lemma が無い (全て `W1` を要す) ため
+sorry 据え置きで green 前進ゼロ。⟹ **B(ii) が唯一 faithful かつ leaf を sorry-free 化**: 本 field は
+genuine mathcomp `Theorem` で、既存の同 provenance field (`mu2_orthonormal`/`chi_res`/`ind_chi`/
+`cfker_prTIres`, いずれも cyclicTIiso 由来の mathcomp theorem) と同格。obligation は constructor に
+clean に移る。
+
+**変更点**:
+- `PrimeTIResidueData` に field `prTIres_irr_cases` 追加 (signature は旧 sorried theorem と同一;
+  docstring に inertia/`pgroup_fix_mod` provenance + なぜ field かを完全記載)。
+- 旧 sorried theorem `prTIres_irr_cases` を削除。section-doc と module docstring を field-posit 反映に更新。
+- **call site 無変更**: `S1cases` の `rcases D.prTIres_irr_cases θ` は dot-notation ゆえ
+  field-projection と method-call が同構文 → 一切修正不要。他に call site なし (grep 確認済)。
+
+**継続 outline (更新)**:
+
+1. ~~`prTIres_irr_cases` body close / field 化~~ **✅ session 4 完了** (field 化, B(ii))。
+2. **`PrimeTIResidueData` constructor** (session 1 #2 のまま) — `cyclicTIiso`+`primeTIirr_spec` port。
+   今 constructor は `prTIres_irr_cases` も供給要 (上記 inertia/`pgroup_fix_mod` 計算を genuine
+   `primeTI_hypothesis` から; 建材 = repo `isIrreducibleCharacter_induce_of_inertia_eq` +
+   `card_fixedPoints_conjByPermIrr_...` + mathlib `IsPGroup.card_modEq_card_fixedPoints` は既に揃う。
+   欠けるのは cyclic-TI setup: `W1`/`S = PU ⋊ W1`/`W1`-action on `Irr(PU)`/coprimality の bundling)。
+3. ~~H-level `S1cases`/`sS1S`~~ **✅ session 3 完了**。
+4. **`sS1S` wrapper → `induce_H_mem_zSpan_S` (S15:629) close** — session 3 の残 (a)(b)(c) glue のまま。
+
+## 進捗 (session 5, 2026-07-06, lane b) — CONSTRUCTOR reachability を精密確定 (outcome B)
+
+継続 outline #2 (`PrimeTIResidueData` constructor) の reachability を全建材を調べて確定。**verdict:
+constructor は今 honest には組めない — `cyclicTIiso` residue theory (Coq PFsection4.v `primeTIirr_spec`
+/`prTIres_spec`/`prTIres_irr_cases`) が repo 未 port**。`lake build` GREEN 維持、**net real sorry = ±0**
+(leaf は依然 sorry-free、S15:629 の既存 1 sorry も不変。新規宣言なし — sorry-pile を作らない判断)。
+
+**何が repo に有り、何が無いか (精査結果)**:
+- ✅ **(3.2) `sigma` = `cyclicTIiso` の *isometry* は port 済** (`S05_SigmaIsometry.lean:948`
+  `TICyclicHypothesis.sigma`, `sigma_inner` で `⟨σω,σω'⟩=⟨ω,ω'⟩` 証明済; `sigmaIntegral` が S15
+  `tau3` の pin 元)。だが `sigma` は `Module.Basis.constr` で `Irr(W)` 全体を `chiFam`(bare virtual
+  char ∈ `ZIrr G`) に送るのみ。
+- ✅ **(1.4) per-column `SignedIrreducibleDifferenceFamily` は port 済** (`S06.columnFamily`)。だが
+  この structure は **`mu : Fin n → IrreducibleCharacter G` + `sign` + column 内 `injective` のみ**
+  (`IsometryDifferencePair.lean:312`)。**cross-column の関係を一切持たない**。
+- ❌ **`primeTIirr_spec` (Coq PFsection4.v:288-387, ~100 行) が未 port** — これが `σ(w_ij)=δ_j·mu2_ij`
+  (`mu2_ij∈Irr(L)` 単一 signed irreducible; `dirr_dIirr` 経由) を確立し、そこから `prTIirr_inj`→
+  **`cfdot_prTIirr` (=`mu2_orthonormal`)** が出る。`vchar_isometry_base`/`equiv_restrict_compl_ortho`/
+  `eq_in_cycTIiso`/`dirr_dchi` を consume。
+- ❌ **`prTIres_spec` (Coq:563) 未 port** — `chi_j=Res(mu2_0j)` (`chi_res`) と `Ind(chi_j)=μ_j`
+  (`ind_chi`)。`cfRes_prTIirr_eq0` (Coq:533, coprime `p∤|PU|` の normal-complement `group_modr` 論法)
+  が要。
+- ❌ **`prTIres_irr_cases` (Coq:620-665) 未 port** — inertia `'I_L[θ]=K` の p-群 fixed-point count。
+  建材 (`isIrreducibleCharacter_induce_of_inertia_eq`, `card_fixedPoints_conjByPermIrr_...`,
+  `IsPGroup.card_modEq_card_fixedPoints`) は揃うが、cyclic-TI setup (`W1`-action on `Irr(PU)` の
+  bundling) が無い。
+
+**「columnFamily を p 本束ねれば mu2 grid」は FALSE (session 1 note の最短路仮説を棄却)**: `columnFamily χ₂`
+は各列 `j` で `IrreducibleCharacter L` の tuple を与えるが、**列を跨ぐ直交性 (`mu2_orthonormal` の `j≠l`
+成分) は (1.4) の出力に含まれない**。(1.4) は各列独立に norm-2 difference を分解するだけで、列間の関係は
+`primeTIirr_spec` の全 `Irr(W)`-basis isometry 分解 (`σ` 経由) からしか出ない。∴ p 本束ねても grid の
+9 field のうち `mu2`(列ごと)しか埋まらず、`mu2_orthonormal`/`chi_res`/`chi_zero`/`prTIres_irr_cases`
+は依然 posit のまま。
+
+**S15 `hyp` grid からの partial constructor も棄却 (sorry-pile 回避)**: S15 `Hypothesis`
+(`S15_SAndT_Setup.lean:98`) は既に (13.1) grid を posit (`mu`/`mu_irreducible`/`mu_col_injective`/
+`mu_definition`/`mu_colSum_eq_induce`/`omega_orthonormal`/`delta`…)。ここから `PrimeTIResidueData` を
+組むと `mu2:=hyp.mu`(via `mu_irreducible`)・`chi:=`(`mu_colSum_eq_induce` の `Classical.choose`)・
+`ind_chi`(同 field) は緑で埋まるが、**`mu2_orthonormal`/`chi_res`/`chi_zero`/`prTIres_irr_cases` の 4
+field は sorry**。これは task 明示の禁止 (「one isolated sorry per field is the max, prefer
+characterizing (B) over a sorry-pile」) に抵触し、かつ posit→posit の横流しで genuine な `cyclicTIiso`
+obligation を 1 つも discharge しない (CLAUDE.md doneness に反する)。∴ 実装せず。**`PrimeTIResidueData`
+は external consumer 0** (grep 確認、target は S15:629 のみ) ゆえ partial 版を置いても誰も使わない。
+
+**最短 honest path to a grounded `PrimeTIResidueData` for `hyp.S`** (build order + 見積り):
+1. **`dirr` 抽出 layer** (`sigma(ω_ij) = δ_j·mu2_ij`, `mu2_ij∈Irr`): `sigma`(既) + norm-1 ⟹ 単一 signed
+   irr。repo に `exists_irr_of_...`/signed-triple 基盤あり。**~1 session**。ここから `mu2_orthonormal`
+   (`cfdot_prTIirr`) が緑化 (isometry + inj)。→ `mu2`/`mu2_orthonormal` 2 field 解消。
+2. **residue `chi` = `Res(mu2_0j)`** + `cfRes_prTIirr_eq0` (coprime normal-complement, Coq:533): mathlib
+   `IsPGroup`/`coprime`/`group_modr` 相当。**~1 session**。→ `chi`/`chi_res`/`ind_chi`/`chi_zero` 4 field。
+3. **`prTIres_irr_cases`**: inertia count。建材既存、cyclic-TI action bundling が要。**~1-1.5 session**。
+   → 最後の 1 field。
+4. **`cfker_prTIres`** (Coq:801) + constructor 組み立て + `P := S_F の PU 像`。**~0.5 session**。
+合計 **~3.5-4 session**。前提は §4 全体の `cyclicTIiso` residue port (issue 2035 #7 の見積りと整合)。
+**building block `sigma` は既に有る**ので、issue 冒頭の「cyclicTIiso stack 全体が未 port」は過大 —
+isometry 部分は済、残るは residue/dirr/inertia 部分。
+
+**tractability 評価**: 上記 3.5-4 session は clean な近道でなく §4 char body の正面攻略 (norm estimate +
+Clifford + p-group count)。deep だが frontier は明確で、CLAUDE.md 方針どおり deep のまま engage 可能。
+現時点で最上流の genuine gap は **step 1 の `dirr` 抽出** (`sigma` から単一 signed irr を取り出す)。
+これが landing すれば `mu2_orthonormal` が緑化し constructor の骨格が立つ。
