@@ -588,6 +588,91 @@ theorem sixTwoDecompositionData_of_reducible_break [Finite G]
             (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) χ 0,
         D.imageFamily.Orthogonal Da.imageFamily ∧
         D.tau1 χ = hS₁coh.extension χ := by
+  haveI := hyp.finiteG
+  classical
+  -- ψ is a nonzero μ-column sum; pick its conjugate column
+  obtain ⟨k, hk0, hψcol⟩ := hyp.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum
+    hG htype hnt chief hψB hψred
+  subst hψcol
+  obtain ⟨k', hk'0, hk'k, hcolconj⟩ := hyp.exists_conj_column hG hG.odd hk0
+  -- `ζ` is not real (the induced family has no real characters)
+  have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+  have hzbot : params.zeta ∈ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) ⊥ := by
+    rw [← inducedFamily_eq_inducedKernelFamily_bot]
+    exact hzS
+  have hzconj : params.zeta.conj ≠ params.zeta :=
+    S08.inducedKernelFamily_hasNoRealCharacters hModd ⊥ hzbot
+  -- family memberships and distinctness
+  set ψ : ClassFunction ↥M ℂ := ∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i k with hψdef
+  have hψbot : ψ ∈ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) ⊥ :=
+    S08.inducedKernelFamily_antitone bot_le hψB
+  have hχ₁bot : χ₁ ∈ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) ⊥ := by
+    rcases hsub hχ₁S₁ with h | h
+    · exact S08.inducedKernelFamily_antitone bot_le h
+    · exact S08.inducedKernelFamily_antitone bot_le h
+  have hψconjbot : ψ.conj ∈ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) ⊥ :=
+    S08.inducedKernelFamily_closedUnderConjugate ⊥ hψbot
+  have hψχ₁ne : ψ ≠ χ₁ := fun he => hψnotS1 (he ▸ hχ₁S₁)
+  have hψcχ₁ne : ψ.conj ≠ χ₁ := fun he => hψcnotS1 (he ▸ hχ₁S₁)
+  have hψnotreal : ψ.conj ≠ ψ :=
+    S08.inducedKernelFamily_hasNoRealCharacters hModd ⊥ hψbot
+  -- degrees: `ψ̄(1) = ψ(1)` (character degrees are natural)
+  obtain ⟨θψ, -, hψeq, hψ1⟩ := S08.inducedKernelFamily_apply_one hψbot
+  obtain ⟨nθ, -, hnθ, -⟩ := θψ.isIrreducible.exists_natDegree_charValue_one_dvd_card
+  have hψ1nat : ψ 1 = ((((derivedInG M).subgroupOf M).index * nθ : ℕ) : ℂ) := by
+    rw [hψ1, hnθ]
+    push_cast
+    ring
+  have hψconj1 : ψ.conj 1 = (1 : ℕ) • ψ 1 := by
+    rw [ClassFunction.conj_apply, hψ1nat]
+    simp
+  -- supports of the sponsoring differences
+  have hsupp1 : (ψ - (1 : ℕ) • ψ.conj).support ⊆ hyp.A0 :=
+    S08.inducedKernelFamily_scaledDiff_support hyp.mderivSharp_subset_A0 hψbot hψconjbot
+      (by rw [hψconj1]; simp)
+  have hsupp1' : (ψ - ψ.conj).support ⊆ hyp.A0 := by
+    simpa using hsupp1
+  have hsupp2 : (ψ - a • χ₁).support ⊆ hyp.A0 :=
+    S08.inducedKernelFamily_scaledDiff_support hyp.mderivSharp_subset_A0 hψbot hχ₁bot
+      (by simpa using hψdeg)
+  have hSdiff : ∀ s ∈ ({ψ - ψ.conj, ψ - a • χ₁} : Set (ClassFunction ↥M ℂ)),
+      s.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (typePA0 M hyp.typeP) M := by
+    intro s hs
+    rcases hs with rfl | rfl
+    · exact hsupp1'
+    · exact hsupp2
+  -- integrality of `τ(ψ − a·χ₁)`
+  have hmemZ : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) (ψ - a • χ₁) ∈ ZIrr G := by
+    refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+      hyp.dadeData.dade hyp.hconj hsupp2 ?_
+    refine Submodule.sub_mem _ (S08.inducedKernelFamily_mem_ZIrr hψbot) ?_
+    exact nsmul_mem (S08.inducedKernelFamily_mem_ZIrr hχ₁bot) a
+  -- the three inner-product vanishings
+  have hχ₁inner : ClassFunction.inner ψ χ₁ = 0 :=
+    S08.inducedKernelFamily_pairwise_orthogonal hψbot hχ₁bot hψχ₁ne
+  have hχ₁cinner : ClassFunction.inner ψ.conj χ₁ = 0 :=
+    S08.inducedKernelFamily_pairwise_orthogonal hψconjbot hχ₁bot hψcχ₁ne
+  have hsmulcast : (a • χ₁ : ClassFunction ↥M ℂ) = (a : ℂ) • χ₁ :=
+    (Nat.cast_smul_eq_nsmul ℂ a χ₁).symm
+  have hinner1 : ClassFunction.inner ψ (a • χ₁) = 0 := by
+    rw [hsmulcast, ClassFunction.inner_smul_right, hχ₁inner, mul_zero]
+  have hinner2 : ClassFunction.inner ψ.conj (a • χ₁) = 0 := by
+    rw [hsmulcast, ClassFunction.inner_smul_right, hχ₁cinner, mul_zero]
+  have hinner3 : ClassFunction.inner ψ ψ.conj = 0 :=
+    S08.inducedKernelFamily_pairwise_orthogonal hψbot hψconjbot (Ne.symm hψnotreal)
+  -- the break decomposition via the coherence-free column image family
+  refine ⟨OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection
+    (hyp.columnImageFamilyCohFree hG hmu hzS hz1 hzconj hδpm hδj hk0 hk'0
+      (Ne.symm hk'k) hcolconj)
+    (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+    (fun φ ζ hφ hζ =>
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
+        hyp.dadeData.dade hyp.hconj hSdiff hφ hζ)
+    rfl hmemZ hinner1 hinner2 hinner3, rfl, ?_⟩
+  -- member clause: per-`χ` decomposition against the column `Da` (issue 2022, remaining)
+  intro χ hχS₁
   sorry
 
 /-- **μ-column member decomposition** (named obligation, Peterfalvi (11.8.6)/(5.8)): the
