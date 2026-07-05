@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.AppC_NormSet
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
 import OddOrder.GroupTheory.RepresentationTheory.OrbitOnIrr
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
 import OddOrder.Peterfalvi.S15_SAndT
@@ -291,6 +292,175 @@ theorem T_typeIII_card_U [Finite G] (hyp : Hypothesis (G := G))
   rw [td.typeP.card_U_eq_index, ← hyp.base.Q_eq_TF, Subgroup.index_eq_card]
   exact T_card_quot_Q_derived_eq_card_V hyp
 
+/-- **`Q = M_F` is complemented by the intrinsic `U ⊔ W₁` in `T`** (ungated): `T = Q ⋊ (U ⋊ W₁)`.
+The semidirect tower `T = T' ⋊ W₁` (`M_complement`) and `T' = M_F ⋊ U` (`derived_complement`,
+`Q = M_F`) compose to a complement of the *normal* `Q` by `U ⊔ W₁`.
+
+* **Disjoint** `Q ⊓ (U ⊔ W₁) = ⊥`: an element lies in `Q ≤ T'`, so in `(U ⊔ W₁) ⊓ T'`, which is `U`
+  (decompose in the Frobenius complement `U ⋊ W₁`: the `W₁`-part lands in `W₁ ⊓ T' = ⊥`), and then in
+  `Q ⊓ U = M_F ⊓ U = ⊥` (`derived_complement`).
+* **Order** `|Q|·|U ⊔ W₁| = |T|`: `|U ⊔ W₁| = |U|·|W₁|` (Frobenius complement), `|M_F|·|U| = |T'|`
+  (`derived_complement`), `|T'|·|W₁| = |T|` (`M_complement`).
+
+This is the iso `↥T ⧸ (Q.subgroupOf T) ≃* ↥(U ⊔ W₁)` powering the quotient Frobenius `T/Q` (via
+`isFrobeniusGroup_map_equiv` on `T_typeIII_UW1_frobenius`) feeding
+`inertia_inflate_eq_of_frobeniusQuotient`. -/
+theorem T_typeIII_Q_isComplement_UW1 [Finite G] (hyp : Hypothesis (G := G))
+    (td : OddOrder.GroupTheory.TypeIIIData hyp.base.T) :
+    Subgroup.IsComplement' (hyp.base.Q.subgroupOf hyp.base.T)
+      ((td.typeP.U ⊔ td.typeP.W1).subgroupOf hyp.base.T) := by
+  classical
+  have hHeqQ : td.typeP.H = hyp.base.Q := by rw [td.typeP.H_eq, hyp.base.Q_eq_TF]
+  have hHle : td.typeP.H ≤ derivedInG hyp.base.T := td.typeP.H_le
+  have hUleM' : td.typeP.U ≤ derivedInG hyp.base.T := td.typeP.U_le
+  have hM'leM : derivedInG hyp.base.T ≤ hyp.base.T := Subgroup.map_subtype_le _
+  have hQleM : hyp.base.Q ≤ hyp.base.T := hHeqQ ▸ (hHle.trans hM'leM)
+  have hW1leM : td.typeP.W1 ≤ hyp.base.T := td.typeP.W1_le
+  have hUW1leM : td.typeP.U ⊔ td.typeP.W1 ≤ hyp.base.T := sup_le (hUleM'.trans hM'leM) hW1leM
+  -- `W₁ ⊓ T' = ⊥` (from `M_complement`).
+  have hW1M' : td.typeP.W1 ⊓ derivedInG hyp.base.T = ⊥ := by
+    have hd := td.typeP.M_complement.disjoint; rw [disjoint_iff] at hd
+    rw [eq_bot_iff]; intro x hx; rw [Subgroup.mem_inf] at hx
+    have hxM : x ∈ hyp.base.T := hM'leM hx.2
+    have : (⟨x, hxM⟩ : ↥hyp.base.T) ∈ ((derivedInG hyp.base.T).subgroupOf hyp.base.T) ⊓
+        (td.typeP.W1.subgroupOf hyp.base.T) := by
+      rw [Subgroup.mem_inf]
+      exact ⟨Subgroup.mem_subgroupOf.mpr hx.2, Subgroup.mem_subgroupOf.mpr hx.1⟩
+    rw [hd, Subgroup.mem_bot] at this; rw [Subgroup.mem_bot]; exact Subtype.ext_iff.mp this
+  -- `M_F ⊓ U = ⊥` (from `derived_complement`).
+  have hHU : td.typeP.H ⊓ td.typeP.U = ⊥ := by
+    have hd := td.typeP.derived_complement.disjoint; rw [disjoint_iff] at hd
+    rw [eq_bot_iff]; intro x hx; rw [Subgroup.mem_inf] at hx
+    have hxM' : x ∈ derivedInG hyp.base.T := hHle hx.1
+    have : (⟨x, hxM'⟩ : ↥(derivedInG hyp.base.T)) ∈ (td.typeP.H.subgroupOf (derivedInG hyp.base.T)) ⊓
+        (td.typeP.U.subgroupOf (derivedInG hyp.base.T)) := by
+      rw [Subgroup.mem_inf]
+      exact ⟨Subgroup.mem_subgroupOf.mpr hx.1, Subgroup.mem_subgroupOf.mpr hx.2⟩
+    rw [hd, Subgroup.mem_bot] at this; rw [Subgroup.mem_bot]; exact Subtype.ext_iff.mp this
+  -- `(U ⊔ W₁) ⊓ T' ≤ U` (Frobenius decomposition).
+  have hUW1M'_le_U : (td.typeP.U ⊔ td.typeP.W1) ⊓ derivedInG hyp.base.T ≤ td.typeP.U := by
+    intro x hx; obtain ⟨hxUW1, hxM'⟩ := hx
+    have hfrob := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius td.typeP td.common.1
+    obtain ⟨⟨u, w⟩, hgw⟩ := (hfrob.isComplement.existsUnique ⟨x, hxUW1⟩).exists
+    have huU : ((u : ↥(td.typeP.U ⊔ td.typeP.W1)) : G) ∈ td.typeP.U := Subgroup.mem_subgroupOf.mp u.2
+    have hwW1 : ((w : ↥(td.typeP.U ⊔ td.typeP.W1)) : G) ∈ td.typeP.W1 :=
+      Subgroup.mem_subgroupOf.mp w.2
+    have hxeq : x = ((u : ↥(td.typeP.U ⊔ td.typeP.W1)) : G) *
+        ((w : ↥(td.typeP.U ⊔ td.typeP.W1)) : G) := by
+      have := congrArg (Subtype.val) hgw; simpa using this.symm
+    have hwM' : ((w : ↥(td.typeP.U ⊔ td.typeP.W1)) : G) ∈ derivedInG hyp.base.T := by
+      have he : ((w : ↥(td.typeP.U ⊔ td.typeP.W1)) : G) =
+          ((u : ↥(td.typeP.U ⊔ td.typeP.W1)) : G)⁻¹ * x := by rw [hxeq]; group
+      rw [he]; exact Subgroup.mul_mem _ (Subgroup.inv_mem _ (td.typeP.U_le huU)) hxM'
+    have hw1 : ((w : ↥(td.typeP.U ⊔ td.typeP.W1)) : G) = 1 := by
+      have : ((w : ↥(td.typeP.U ⊔ td.typeP.W1)) : G) ∈ td.typeP.W1 ⊓ derivedInG hyp.base.T :=
+        ⟨hwW1, hwM'⟩
+      rw [hW1M', Subgroup.mem_bot] at this; exact this
+    rw [hxeq, hw1, mul_one]; exact huU
+  -- Disjointness of the two `subgroupOf T`.
+  have hdisj : Disjoint (hyp.base.Q.subgroupOf hyp.base.T)
+      ((td.typeP.U ⊔ td.typeP.W1).subgroupOf hyp.base.T) := by
+    rw [disjoint_iff, eq_bot_iff]; intro x hx; rw [Subgroup.mem_inf] at hx
+    have hxQ : (x : G) ∈ hyp.base.Q := Subgroup.mem_subgroupOf.mp hx.1
+    have hxUW1 : (x : G) ∈ td.typeP.U ⊔ td.typeP.W1 := Subgroup.mem_subgroupOf.mp hx.2
+    have hxM' : (x : G) ∈ derivedInG hyp.base.T := hHle (hHeqQ ▸ hxQ)
+    have hxU : (x : G) ∈ td.typeP.U := hUW1M'_le_U ⟨hxUW1, hxM'⟩
+    have hmem : (x : G) ∈ td.typeP.H ⊓ td.typeP.U := ⟨hHeqQ ▸ hxQ, hxU⟩
+    rw [hHU, Subgroup.mem_bot] at hmem
+    rw [Subgroup.mem_bot]; exact Subtype.ext hmem
+  -- Cardinality `|Q|·|U ⊔ W₁| = |T|`.
+  have hcardUW1 : Nat.card ↥(td.typeP.U ⊔ td.typeP.W1) =
+      Nat.card ↥td.typeP.U * Nat.card ↥td.typeP.W1 := by
+    rw [← (OddOrder.Peterfalvi.S11.typeP_uW1_frobenius td.typeP td.common.1).isComplement.card_mul,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_left).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv]
+  have hcardM' : Nat.card ↥td.typeP.H * Nat.card ↥td.typeP.U = Nat.card ↥(derivedInG hyp.base.T) := by
+    rw [← td.typeP.derived_complement.card_mul,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHle).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUleM').toEquiv]
+  have hcardM : Nat.card ↥(derivedInG hyp.base.T) * Nat.card ↥td.typeP.W1 = Nat.card ↥hyp.base.T := by
+    rw [← td.typeP.M_complement.card_mul,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'leM).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1leM).toEquiv]
+  have hcard : Nat.card ↥(hyp.base.Q.subgroupOf hyp.base.T) *
+      Nat.card ↥((td.typeP.U ⊔ td.typeP.W1).subgroupOf hyp.base.T) = Nat.card ↥hyp.base.T := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQleM).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUW1leM).toEquiv, hcardUW1, ← hHeqQ,
+      ← mul_assoc, hcardM', hcardM]
+  exact Subgroup.isComplement'_of_card_mul_and_disjoint hcard hdisj
+
+/-- **The complement-iso `↥T ⧸ Q ≃* ↥(U ⊔ W₁)` sends `U` onto `T'/Q`** (ungated).  The iso
+`e := (subgroupOfEquivOfLe).symm.trans (QuotientMulEquiv).symm` built from the `Q`-complement
+(`T_typeIII_Q_isComplement_UW1`) satisfies `e x = mk' Q ↑x` (definitionally), and carries the
+Frobenius kernel `U.subgroupOf (U ⊔ W₁)` onto `(T'.subgroupOf T).map (mk' Q) = T'/Q`:
+
+* `⊆`: `e x = mk' Q ↑x` with `↑x ∈ U ≤ T'`;
+* `⊇`: a coset `mk' Q ↑t'` (`t' ∈ T'`) decomposes `t' = q·u` in `T' = Q ⋊ U`
+  (`derived_complement`), so `mk' Q ↑t' = mk' Q ↑u` (`q ∈ Q` killed, `u⁻¹ q u ∈ Q` by normality),
+  the image of `u ∈ U`.
+
+This is the kernel identity feeding `isFrobeniusGroup_map_equiv` (on `T_typeIII_UW1_frobenius`) to
+produce the quotient Frobenius `T/Q` with kernel `T'/Q` for
+`inertia_inflate_eq_of_frobeniusQuotient`. -/
+theorem T_typeIII_quotFrobenius_kernel_eq [Finite G] (hyp : Hypothesis (G := G))
+    (td : OddOrder.GroupTheory.TypeIIIData hyp.base.T)
+    (hQnormal : (hyp.base.Q.subgroupOf hyp.base.T).Normal)
+    (hUW1leM : td.typeP.U ⊔ td.typeP.W1 ≤ hyp.base.T) :
+    ((td.typeP.U.subgroupOf (td.typeP.U ⊔ td.typeP.W1)).map
+      ((Subgroup.subgroupOfEquivOfLe hUW1leM).symm.trans
+        (T_typeIII_Q_isComplement_UW1 hyp td).symm.QuotientMulEquiv.symm).toMonoidHom) =
+      ((derivedInG hyp.base.T).subgroupOf hyp.base.T).map
+        (QuotientGroup.mk' (hyp.base.Q.subgroupOf hyp.base.T)) := by
+  haveI := hQnormal
+  have hHeqQ : td.typeP.H = hyp.base.Q := by rw [td.typeP.H_eq, hyp.base.Q_eq_TF]
+  have hUleUW1 : td.typeP.U ≤ td.typeP.U ⊔ td.typeP.W1 := le_sup_left
+  have hQleT : hyp.base.Q ≤ hyp.base.T := hHeqQ ▸ (td.typeP.H_le.trans (Subgroup.map_subtype_le _))
+  set e : ↥(td.typeP.U ⊔ td.typeP.W1) ≃* (↥hyp.base.T ⧸ hyp.base.Q.subgroupOf hyp.base.T) :=
+    (Subgroup.subgroupOfEquivOfLe hUW1leM).symm.trans
+      (T_typeIII_Q_isComplement_UW1 hyp td).symm.QuotientMulEquiv.symm with he_def
+  have he : ∀ x : ↥(td.typeP.U ⊔ td.typeP.W1),
+      e x = QuotientGroup.mk' (hyp.base.Q.subgroupOf hyp.base.T)
+          (⟨(x : G), hUW1leM x.2⟩ : ↥hyp.base.T) := fun x => rfl
+  apply le_antisymm
+  · rintro _ ⟨x, hxU, rfl⟩
+    show e x ∈ _
+    rw [he]
+    exact Subgroup.mem_map.mpr ⟨⟨(x : G), hUW1leM x.2⟩,
+      Subgroup.mem_subgroupOf.mpr (td.typeP.U_le (Subgroup.mem_subgroupOf.mp hxU)), rfl⟩
+  · rintro _ ⟨t', ht', rfl⟩
+    have ht'M' : (t' : G) ∈ derivedInG hyp.base.T := Subgroup.mem_subgroupOf.mp ht'
+    obtain ⟨⟨qq, uu⟩, hdec⟩ :=
+      (td.typeP.derived_complement.existsUnique ⟨(t':G), ht'M'⟩).exists
+    have huuU : ((uu : ↥(derivedInG hyp.base.T)) : G) ∈ td.typeP.U :=
+      Subgroup.mem_subgroupOf.mp uu.2
+    have hqqQ : ((qq : ↥(derivedInG hyp.base.T)) : G) ∈ hyp.base.Q :=
+      hHeqQ ▸ Subgroup.mem_subgroupOf.mp qq.2
+    have hdecG : (t' : G) = ((qq : ↥(derivedInG hyp.base.T)) : G) *
+        ((uu : ↥(derivedInG hyp.base.T)) : G) := by
+      have := congrArg (Subtype.val) hdec; simpa using this.symm
+    have huuT : ((uu : ↥(derivedInG hyp.base.T)) : G) ∈ hyp.base.T := hUW1leM (hUleUW1 huuU)
+    set uUW1 : ↥(td.typeP.U ⊔ td.typeP.W1) := ⟨((uu : ↥(derivedInG hyp.base.T)) : G), hUleUW1 huuU⟩
+      with huUW1def
+    set uElt : ↥hyp.base.T := ⟨((uu : ↥(derivedInG hyp.base.T)) : G), huuT⟩ with huEltdef
+    set qElt : ↥hyp.base.T := ⟨((qq : ↥(derivedInG hyp.base.T)) : G), hQleT hqqQ⟩ with hqEltdef
+    have htElt : (⟨(t':G), t'.2⟩ : ↥hyp.base.T) = qElt * uElt := by
+      apply Subtype.ext; simpa [hqEltdef, huEltdef] using hdecG
+    refine Subgroup.mem_map.mpr ⟨uUW1, Subgroup.mem_subgroupOf.mpr
+      (Subgroup.mem_subgroupOf.mpr huuU), ?_⟩
+    show e uUW1 = _
+    rw [he]
+    have hgoaleq : (⟨((uUW1 : ↥(td.typeP.U ⊔ td.typeP.W1)) : G), hUW1leM uUW1.2⟩ : ↥hyp.base.T)
+        = uElt := rfl
+    rw [hgoaleq]
+    refine ((QuotientGroup.mk'_eq_mk' (hyp.base.Q.subgroupOf hyp.base.T)).mpr
+      ⟨uElt⁻¹ * qElt * uElt, ?_, ?_⟩)
+    · have hqQ' : qElt ∈ hyp.base.Q.subgroupOf hyp.base.T := by
+        rw [Subgroup.mem_subgroupOf]; exact hqqQ
+      have hconj := hQnormal.conj_mem qElt hqQ' uElt⁻¹
+      simpa using hconj
+    · have hg : uElt * (uElt⁻¹ * qElt * uElt) = qElt * uElt := by group
+      rw [hg, ← htElt]
+
 open scoped Classical in
 /-- **Peterfalvi (14.9): `|calT1| = (|V| − 1)/p`** (Coq `PFsection14.v:836--845`
 `size calT1 = (v.-1) %/ p`, the cardinality half) — **assembly skeleton, ungated**.
@@ -339,6 +509,155 @@ theorem T_typeIII_calT1_card_eq [Finite G] (hyp : Hypothesis (G := G))
         ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction)).card
       = (Nat.card ↥hyp.base.V - 1) / hyp.base.p := by
   rw [calT1_image_induce_card_eq hyp hQVnormal 𝒯 hconj hinertia, hcard]
+
+open scoped IsMulCommutative in
+open scoped Classical in
+/-- **Peterfalvi (14.9): `|calT1| = (|V| − 1)/p`, fully proven** (Coq `PFsection14.v:836--845`
+`size calT1 = (v.-1) %/ p`) — the cardinality half of (14.9), **end-to-end and ungated**.
+
+There *exists* a family `𝒯 ⊆ Irr(QV)` (`QV = T' = derivedInG T`) — namely the inflations along the
+corestriction `q : ↥QV →* ↥(QV/Q)` of the non-principal `Irr(QV/Q)` — whose `Ind_{QV}^T`-image
+`calT1` has `|calT1| = (|V| − 1)/p`.  All three inputs of the orbit-count engine
+`calT1_image_induce_card_eq` are discharged from the **intrinsic** type-III datum `td` (no abstract
+`V`/`W₂`, no sorried `reconciled_typePData_T`):
+
+* **inertia** `I_T(inflate θ̄) = QV`: `inertia_inflate_eq_of_frobeniusQuotient` fed the quotient
+  Frobenius `T/Q`, transported (`isFrobeniusGroup_map_equiv`) from the intrinsic `U ⋊ W₁` Frobenius
+  (`T_typeIII_UW1_frobenius`) through the complement iso `↥T/Q ≃* ↥(U ⊔ W₁)`
+  (`T_typeIII_Q_isComplement_UW1`), with kernel identified by `T_typeIII_quotFrobenius_kernel_eq`;
+* **conjugation-invariance**: `conjBy_compHom_eq_compHom_conjBy` carries conjugates of inflations to
+  inflations of conjugates, preserving non-principality;
+* **cardinality** `|𝒯| = |V| − 1`: inflation is injective (`compHom_injective_of_surjective`), and
+  `|Irr(QV/Q)| = |QV/Q| = |V|` (`QV/Q ≅ U` abelian by `td.U_commutative`,
+  `card_irreducibleCharacter_eq_card_of_commGroup`; `|U| = |V|` by `T_typeIII_card_U`), minus the
+  principal character.
+
+This closes the **cardinality** obligation of (14.9) with no parameterized hypotheses.  The full
+ratio bound `T_typeIII_ratio_le` additionally needs `v = |V|` ((13.12) `d = 1`, lane-b), the T-side
+`S07.Hypothesis` coherence package, and the S-side `Γ` bridge. -/
+theorem T_typeIII_calT1_card [Finite G] (hyp : Hypothesis (G := G))
+    [Fintype ↥hyp.base.T] [Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
+    [Invertible (Nat.card ↥hyp.base.T : ℂ)]
+    [Invertible (Nat.card ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) : ℂ)]
+    (td : TypeIIIData hyp.base.T) :
+    ∃ 𝒯 : Finset (IrreducibleCharacter ((derivedInG hyp.base.T).subgroupOf hyp.base.T)),
+      (𝒯.image (fun θ => ClassFunction.induce
+        ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction)).card
+        = (Nat.card ↥hyp.base.V - 1) / hyp.base.p := by
+  haveI := hyp.base.finiteG
+  haveI hHnormal : ((derivedInG hyp.base.T).subgroupOf hyp.base.T).Normal :=
+    T_derivedSubgroupOf_normal hyp
+  have hQnormal : (hyp.base.Q.subgroupOf hyp.base.T).Normal := by
+    have hQleT : hyp.base.Q ≤ hyp.base.T := by
+      rw [hyp.base.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.base.T
+    refine (Subgroup.normal_subgroupOf_iff_le_normalizer hQleT).mpr ?_
+    rw [hyp.base.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.base.T
+  haveI := hQnormal
+  have hUW1leM : td.typeP.U ⊔ td.typeP.W1 ≤ hyp.base.T :=
+    sup_le ((td.typeP.U_le).trans (Subgroup.map_subtype_le _)) td.typeP.W1_le
+  have hNH : hyp.base.Q.subgroupOf hyp.base.T ≤ (derivedInG hyp.base.T).subgroupOf hyp.base.T := by
+    intro x hx; rw [Subgroup.mem_subgroupOf] at hx ⊢
+    rw [hyp.base.T_deriv_eq_QV]; exact (le_sup_left : hyp.base.Q ≤ hyp.base.Q ⊔ hyp.base.V) hx
+  set mkN := QuotientGroup.mk' (hyp.base.Q.subgroupOf hyp.base.T) with hmkN
+  set Hbar := ((derivedInG hyp.base.T).subgroupOf hyp.base.T).map mkN with hHbar
+  set q : ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) →* ↥Hbar :=
+    (mkN.comp ((derivedInG hyp.base.T).subgroupOf hyp.base.T).subtype).codRestrict Hbar (fun x => Subgroup.mem_map.mpr ⟨x, x.2, rfl⟩) with hq_def
+  have hq : ∀ x : ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T), ((q x : ↥Hbar) : ↥hyp.base.T ⧸ hyp.base.Q.subgroupOf hyp.base.T) = mkN (x : ↥hyp.base.T) := fun x => rfl
+  have hq_surj : Function.Surjective q := by
+    rintro ⟨z, hz⟩; rw [hHbar, Subgroup.mem_map] at hz
+    obtain ⟨x, hxH, hxz⟩ := hz; exact ⟨⟨x, hxH⟩, Subtype.ext hxz⟩
+  have hqinj : Function.Injective
+      (ClassFunction.compHom q : ClassFunction ↥Hbar ℂ → ClassFunction ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) ℂ) :=
+    ClassFunction.compHom_injective_of_surjective hq_surj
+  -- quotient Frobenius, kernel = Hbar
+  set e : ↥(td.typeP.U ⊔ td.typeP.W1) ≃* (↥hyp.base.T ⧸ hyp.base.Q.subgroupOf hyp.base.T) :=
+    (Subgroup.subgroupOfEquivOfLe hUW1leM).symm.trans
+      (T_typeIII_Q_isComplement_UW1 hyp td).symm.QuotientMulEquiv.symm with he_def
+  have hfrobUW1 := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius td.typeP td.common.1
+  have hqfrob0 := OddOrder.Isaacs.Ch06.isFrobeniusGroup_map_equiv hfrobUW1 e
+  have himg := T_typeIII_quotFrobenius_kernel_eq hyp td hQnormal hUW1leM
+  rw [show ((Subgroup.subgroupOfEquivOfLe hUW1leM).symm.trans
+      (T_typeIII_Q_isComplement_UW1 hyp td).symm.QuotientMulEquiv.symm) = e from rfl] at himg
+  rw [himg] at hqfrob0
+  -- the inflation map on irreducibles
+  set infl : IrreducibleCharacter ↥Hbar → IrreducibleCharacter ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) :=
+    fun θbar => ⟨ClassFunction.compHom q (θbar : ClassFunction ↥Hbar ℂ),
+      IsIrreducibleCharacter.compHom_of_surjective hq_surj θbar.isIrreducible⟩ with hinfl
+  have hinfl_inj : Function.Injective infl := by
+    intro a b hab
+    have : ClassFunction.compHom q (a : ClassFunction ↥Hbar ℂ) =
+        ClassFunction.compHom q (b : ClassFunction ↥Hbar ℂ) := congrArg Subtype.val hab
+    exact IrreducibleCharacter.ext (hqinj this)
+  -- 𝒯 := image of non-principal Irr(Hbar)
+  refine ⟨(Finset.univ.filter (fun θbar : IrreducibleCharacter ↥Hbar =>
+      θbar ≠ trivialIrreducibleCharacter ↥Hbar)).image infl, ?_⟩
+  -- hconj, hinertia for members, hcard
+  set 𝒯 := (Finset.univ.filter (fun θbar : IrreducibleCharacter ↥Hbar =>
+      θbar ≠ trivialIrreducibleCharacter ↥Hbar)).image infl with h𝒯
+  -- hinertia
+  have hinertia : ∀ θ ∈ 𝒯,
+      IrreducibleCharacter.inertia (G := ↥hyp.base.T) (H := ((derivedInG hyp.base.T).subgroupOf hyp.base.T)) θ = ((derivedInG hyp.base.T).subgroupOf hyp.base.T) := by
+    intro θ hθ
+    rw [h𝒯, Finset.mem_image] at hθ
+    obtain ⟨θbar, hθbar, rfl⟩ := hθ
+    rw [Finset.mem_filter] at hθbar
+    exact inertia_inflate_eq_of_frobeniusQuotient (N := hyp.base.Q.subgroupOf hyp.base.T)
+      (H := ((derivedInG hyp.base.T).subgroupOf hyp.base.T)) hNH hqfrob0 q hq hqinj θbar hθbar.2
+  -- hconj
+  have hconj : ∀ θ ∈ 𝒯, ∀ g : ↥hyp.base.T,
+      IrreducibleCharacter.conjBy (G := ↥hyp.base.T) (H := ((derivedInG hyp.base.T).subgroupOf hyp.base.T)) g θ ∈ 𝒯 := by
+    intro θ hθ g
+    rw [h𝒯, Finset.mem_image] at hθ ⊢
+    obtain ⟨θbar, hθbar, rfl⟩ := hθ
+    rw [Finset.mem_filter] at hθbar
+    -- conjBy (infl θbar) = infl (conjBy (mk g) θbar)
+    refine ⟨IrreducibleCharacter.conjBy (G := ↥hyp.base.T ⧸ hyp.base.Q.subgroupOf hyp.base.T)
+      (H := Hbar) (mkN g) θbar, ?_, ?_⟩
+    · rw [Finset.mem_filter]
+      refine ⟨Finset.mem_univ _, ?_⟩
+      -- conjBy preserves non-triviality
+      intro hcontra
+      apply hθbar.2
+      -- conjBy (mk g) θbar = triv ⟹ θbar = triv (conjBy invertible)
+      have := congrArg (IrreducibleCharacter.conjBy (mkN g)⁻¹) hcontra
+      rwa [← IrreducibleCharacter.conjBy_mul, mul_inv_cancel, IrreducibleCharacter.conjBy_one,
+        show IrreducibleCharacter.conjBy (mkN g)⁻¹ (trivialIrreducibleCharacter ↥Hbar) =
+          trivialIrreducibleCharacter ↥Hbar from ?_] at this
+      · apply IrreducibleCharacter.ext
+        rw [IrreducibleCharacter.coe_conjBy]; ext x
+        simp [ClassFunction.conjBy_apply, trivialIrreducibleCharacter, trivialClassFunction_apply]
+    · -- infl (conjBy (mk g) θbar) = conjBy g (infl θbar)
+      apply IrreducibleCharacter.ext
+      show ClassFunction.compHom q _ = ClassFunction.conjBy g (ClassFunction.compHom q _)
+      rw [conjBy_compHom_eq_compHom_conjBy q hq]
+      rfl
+  -- hcard : 𝒯.card = |V| - 1
+  have hcard : 𝒯.card = Nat.card ↥hyp.base.V - 1 := by
+    rw [h𝒯, Finset.card_image_of_injective _ hinfl_inj]
+    -- |non-principal Irr(Hbar)| = |Irr Hbar| - 1
+    -- |Irr Hbar| = |V| (abelian)
+    haveI hUcomm : IsMulCommutative ↥(td.typeP.U.subgroupOf (td.typeP.U ⊔ td.typeP.W1)) :=
+      OddOrder.GroupTheory.isMulCommutative_of_mulEquiv
+        (Subgroup.subgroupOfEquivOfLe (le_sup_left)).symm td.U_commutative
+    have hemap : ↥(td.typeP.U.subgroupOf (td.typeP.U ⊔ td.typeP.W1)) ≃* ↥Hbar :=
+      (Subgroup.equivMapOfInjective _ e.toMonoidHom e.injective).trans
+        (MulEquiv.subgroupCongr himg)
+    haveI hHbarComm : IsMulCommutative ↥Hbar :=
+      OddOrder.GroupTheory.isMulCommutative_of_mulEquiv hemap hUcomm
+    have hIrrHbar : Nat.card (IrreducibleCharacter ↥Hbar) = Nat.card ↥hyp.base.V := by
+      rw [card_irreducibleCharacter_eq_card_of_commGroup, ← Nat.card_congr hemap.toEquiv,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left)).toEquiv, T_typeIII_card_U hyp td]
+    -- |filter (≠triv) univ| = |univ| - 1
+    have hfilter : (Finset.univ.filter (fun θbar : IrreducibleCharacter ↥Hbar =>
+        θbar ≠ trivialIrreducibleCharacter ↥Hbar)).card = Fintype.card (IrreducibleCharacter ↥Hbar) - 1 := by
+      rw [Finset.filter_ne', Finset.card_erase_of_mem (Finset.mem_univ _), Finset.card_univ]
+    rw [hfilter]
+    have : Fintype.card (IrreducibleCharacter ↥Hbar) = Nat.card ↥hyp.base.V := by
+      rw [Nat.card_eq_fintype_card] at hIrrHbar; exact hIrrHbar
+    rw [this]
+  -- wire into calT1_image_induce_card_eq
+  rw [← hcard]
+  exact calT1_image_induce_card_eq hyp hHnormal 𝒯 hconj hinertia
 
 /-- **Peterfalvi (14.9), the character body** — the structural `≤` half of the ratio comparison, the
 sole deep obligation of (14.9).  Coq `PFsection14` `FTtypeP_min_typeII`, lines 737--853: assuming `T`
