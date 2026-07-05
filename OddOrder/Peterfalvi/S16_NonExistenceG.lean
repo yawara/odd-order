@@ -4945,12 +4945,136 @@ theorem betaL_grid_relation [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   inner_eta_grid_relation hyp.base (betaL_vanishes_on_regular_W hG hLmax dataL) i j
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Faithful §14 Dade carrier for the L-side `η`-grid coefficients** (Peterfalvi (13.19.c),
+Coq `FTtype2_support_coherence` core).  Bundles the three genuinely-deep facts about the integer
+grid coefficients `m_ij = ⟨β_L, η_ij⟩` of the coherence residual `β_L = (dataL.h78 hG).beta`,
+from which `lSide_delta_grid_expansion` proves the `±1` rigidity and the grid identity:
+
+* `coeff` — the coefficients are integers, `⟨β_L, η_ij⟩ = m_ij` (a bookkeeping repackaging of the
+  proven `inner_mem_ZIrr_int`, carried so the three deep facts speak about one named grid);
+* `boundary` — **Peterfalvi (13.19.c) boundary parity** (Coq `FTtypeI_bridge_facts`, the S/T-side
+  type-P bridge): `m_00 = 1`, and `m_0j`, `m_i0` are *odd* off the principal row/column;
+* `bessel` — **the (13.19.c) Bessel bound** (Coq `orthonormal_span` + `lb_b` + `ub_e`, from
+  `‖β_L‖² = e + 1 = p q + 1`): `Σ_{ij} m_ij² ≤ p q`;
+* `grid_mem` — **the grid membership** (Coq `Y = 0`): `1_G + Δ_L = Σ_{ij} m_ij η_ij`, i.e.
+  `β_L + ζ_0^ν` equals its own orthogonal projection onto the `η`-grid.
+
+These are genuine facts about the type-I maximal `L` (its Dade isometry, coherent extension, and
+the S/T-partner bridge); their concrete construction is the remaining §14 obligation, isolated
+here away from the pure `±1` combinatorics. -/
+structure LSideGridCoeffData [Finite G] (hyp : Hypothesis (G := G))
+    {L : Subgroup G} (dataL : TypeICoherent78Data L)
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) where
+  /-- The integer grid coefficient `m_ij = ⟨β_L, η_ij⟩`. -/
+  m : Fin hyp.base.q → Fin hyp.base.p → ℤ
+  /-- `⟨β_L, η_ij⟩ = m_ij` (integrality, `inner_mem_ZIrr_int`). -/
+  coeff : ∀ i j, ClassFunction.inner (dataL.h78 hG).beta (hyp.base.eta i j) = (m i j : ℂ)
+  /-- **Boundary parity** (Coq `FTtypeI_bridge_facts`): `m_00 = 1`, and `m_0j`, `m_i0` are odd. -/
+  m_principal : m ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩ = 1
+  m_row_odd : ∀ j, j ≠ ⟨0, hyp.base.p_prime.pos⟩ → Odd (m ⟨0, hyp.base.q_prime.pos⟩ j)
+  m_col_odd : ∀ i, i ≠ ⟨0, hyp.base.q_prime.pos⟩ → Odd (m i ⟨0, hyp.base.p_prime.pos⟩)
+  /-- **Bessel bound** (Coq `ub_e`): `Σ m_ij² ≤ p q`. -/
+  bessel : ∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (m i j) ^ 2
+    ≤ (hyp.base.p * hyp.base.q : ℤ)
+  /-- **Grid membership** (Coq `Y = 0`): `1_G + Δ_L = Σ m_ij η_ij`. -/
+  grid_mem : OddOrder.Peterfalvi.S09.Hypothesis71.constOne G + (dataL.h78 hG).delta =
+    ∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (m i j : ℂ) • hyp.base.eta i j
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Faithful §14 producer of the L-side grid-coefficient data.**  The type-I maximal `L`
+carries the (13.19.c)/(7.8) grid-coefficient package `LSideGridCoeffData`; its concrete
+construction is the §14 Dade/coherence + S/T-partner-bridge layer (Coq `FTtype2_support_coherence`,
+`Dade_Ind1_sub_lin` + `FTtypeI_bridge_facts` + `orthonormal_span`), isolated as the single named
+obligation behind the L-side signed expansion. -/
+noncomputable def lSideGridCoeffData [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
+    (dataL : TypeICoherent78Data L) (hq3 : hyp.base.q = 3) (hp5 : hyp.base.p = 5) :
+    LSideGridCoeffData hyp dataL hG :=
+  sorry
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (13.19.c)/(13.1.d), the L-side `η`-grid identity of the coherence residual.**
+The residual `Δ_L = β_L − 1_G + ζ_0^ν` of the (7.8.a) Dade decomposition
+(`beta_eq_constOne_sub_zetaImage_add_delta`, PROVEN) combines with the principal `1_G` to a
+`±1`-signed sum of the whole `η`-grid: `1_G + Δ_L = Σ_{ij} ε_ij η_ij`, `ε_ij ∈ {±1}`.
+
+This is the L-analog of the `M`-side field `MHypothesis.betaGrid` (which `betaM_expansion`
+consumes), and of the Coq `FTtype2_support_coherence` core.  Here it is *proven* from the faithful
+§14 grid-coefficient carrier `LSideGridCoeffData` and the PROVEN (3.7) four-corner relation
+(`betaL_grid_relation`):
+
+* the coefficients `m_ij = ⟨β_L, η_ij⟩` satisfy `m_ij + m_00 = m_i0 + m_0j` (3.7), so with the
+  carried boundary parity (`m_00 = 1`, `m_0j`/`m_i0` odd) *every* `m_ij` is odd (hence `≠ 0`);
+* the carried Bessel bound `Σ m_ij² ≤ p q = #grid` then sandwiches `#grid ≤ Σ m_ij² ≤ #grid`, so
+  each `m_ij² = 1`, i.e. `m_ij = ±1` (`all_pm_one_and_card_of_odd_sq_sum_le`);
+* the carried grid membership `1_G + Δ_L = Σ m_ij η_ij` is the displayed identity with `±1` signs.
+
+The three deep facts are isolated in `lSideGridCoeffData`; this theorem is the honest `±1`
+rigidity assembly.  The pure-algebra rearrangement into `β_L^τ = Σ ±η_ij − ε ζ_i^ν` is
+`lSide_signed_eta_expansion`. -/
+theorem lSide_delta_grid_expansion [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {hyp : Hypothesis (G := G)} {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
+    (dataL : TypeICoherent78Data L)
+    (hq3 : hyp.base.q = 3) (hp5 : hyp.base.p = 5) :
+    ∃ signs : Fin hyp.base.q → Fin hyp.base.p → ℤ,
+      (∀ i j, signs i j = 1 ∨ signs i j = -1) ∧
+        OddOrder.Peterfalvi.S09.Hypothesis71.constOne G + (dataL.h78 hG).delta =
+          ∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p,
+            (signs i j : ℂ) • hyp.base.eta i j := by
+  classical
+  set i₀ : Fin hyp.base.q := ⟨0, hyp.base.q_prime.pos⟩ with hi₀
+  set j₀ : Fin hyp.base.p := ⟨0, hyp.base.p_prime.pos⟩ with hj₀
+  obtain ⟨m, hcoeff, hprin, hrow, hcol, hbessel, hmem⟩ :=
+    lSideGridCoeffData hG hyp hLmax dataL hq3 hp5
+  -- (3.7) four-corner relation on `m_ij` (from `betaL_grid_relation`, via the integrality bridge).
+  have hrel : ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
+      m i j + m i₀ j₀ = m i j₀ + m i₀ j := by
+    intro i j
+    have h := betaL_grid_relation hG hLmax dataL i j
+    rw [hcoeff i j, hcoeff i₀ j₀, hcoeff i j₀, hcoeff i₀ j] at h
+    exact_mod_cast h
+  -- every coefficient is odd: `m_ij = m_i0 + m_0j − m_00` with the three boundary values odd.
+  have hodd : ∀ p : Fin hyp.base.q × Fin hyp.base.p, Odd (m p.1 p.2) := by
+    rintro ⟨i, j⟩
+    by_cases hi : i = i₀ <;> by_cases hj : j = j₀
+    · subst hi; subst hj; rw [hprin]; exact ⟨0, rfl⟩
+    · subst hi; exact hrow j hj
+    · subst hj; exact hcol i hi
+    · -- `m_ij = m_i0 + m_0j − 1` (rel + `m_00 = 1`), sum of two odds minus odd is odd.
+      have h := hrel i j
+      rw [hprin] at h
+      have hval : m i j = m i j₀ + m i₀ j - 1 := by omega
+      obtain ⟨r, hr⟩ := hcol i hi
+      obtain ⟨s, hs⟩ := hrow j hj
+      exact ⟨r + s, by rw [hval, hr, hs]; ring⟩
+  -- rigidity: `Σ m_ij² ≤ pq = #grid` with all odd forces each `m_ij = ±1`.
+  have hcard : Fintype.card (Fin hyp.base.q × Fin hyp.base.p) = hyp.base.p * hyp.base.q := by
+    rw [Fintype.card_prod, Fintype.card_fin, Fintype.card_fin, Nat.mul_comm]
+  have hsq : ∑ p : Fin hyp.base.q × Fin hyp.base.p, (m p.1 p.2) ^ 2
+      ≤ ((hyp.base.p * hyp.base.q + 1 : ℕ) : ℤ) - 1 := by
+    rw [Fintype.sum_prod_type]; push_cast; linarith [hbessel]
+  have hle : ((hyp.base.p * hyp.base.q + 1 : ℕ) : ℤ)
+      ≤ (Fintype.card (Fin hyp.base.q × Fin hyp.base.p) : ℤ) + 1 := by
+    rw [hcard]; push_cast; omega
+  obtain ⟨_, hpm⟩ := all_pm_one_and_card_of_odd_sq_sum_le
+    (fun p : Fin hyp.base.q × Fin hyp.base.p => m p.1 p.2) (hyp.base.p * hyp.base.q + 1)
+    hodd hsq hle
+  exact ⟨m, fun i j => hpm (i, j), hmem⟩
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (13.19.c), the L-side signed `η`-grid expansion.**  Under case-(b)
 (`(q,p) = (3,5)`) and the two gap inequalities, (13.19.c) applied on the S- and T-sides gives
 the (14.11.2)-style signed expansion `β_L^τ = Σ_{ij} ε_ij η_ij − ε ζ_i^ν` of the L-side, with
 the removed unit-norm member an `L`-family coherent image (`i ≠ ind1H`; the `−ψ̄^{τ₁}`
-alternative is the conjugate member `conjIndex`).  Named §16 obligation (the (13.19)-type
-grid counting, issue 3002 sphere). -/
+alternative is the conjugate member `conjIndex`).
+
+De-scaffolded (lane c, mirroring the `M`-side `betaM_expansion`): the removed member is the
+distinguished coherent image `ζ_0^ν = ν(ζ_{zetaDistinct})` with `ε = 1` and
+`zetaDistinct ≠ ind1H`, and the whole content is the pure-algebra rearrangement of the (7.8.a)
+Dade decomposition `β_L = 1_G − ζ_0^ν + Δ_L` (`beta_eq_constOne_sub_zetaImage_add_delta`, PROVEN)
+together with the `η`-grid identity `1_G + Δ_L = Σ ±η_ij` (`lSide_delta_grid_expansion`, whose
+`±1` rigidity is *proven* from the (3.7) relation plus the isolated §14 grid-coefficient carrier
+`lSideGridCoeffData`). -/
 theorem lSide_signed_eta_expansion [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
     (dataL : TypeICoherent78Data nc.Ldata.L)
@@ -4969,7 +5093,17 @@ theorem lSide_signed_eta_expansion [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
           = (∑ i' : Fin hyp.base.q, ∑ j : Fin hyp.base.p,
               (signs i' j : ℂ) • hyp.base.eta i' j)
             - (ε : ℂ) • ((dataL.h78 hG).nu ((dataL.h78 hG).hyp76.zeta i)) := by
-  sorry
+  obtain ⟨signs, hsigns, hgrid⟩ :=
+    lSide_delta_grid_expansion hG nc.Ldata.L_maximal dataL hq3 hp5
+  -- the removed member is the distinguished coherent image `ζ_0^ν` (`ε = 1`, `zetaDistinct`)
+  refine ⟨signs, hsigns, (dataL.h78 hG).zetaDistinct, ?_, 1, Or.inl rfl, ?_⟩
+  · -- `zetaDistinct ≠ ind1H`
+    have h := (dataL.h78 hG).zetaDistinct_ne_ind1H
+    rwa [dataL.h78_ind1H_eq] at h
+  · -- `β_L = (1_G + Δ_L) − ζ_0^ν = Σ ±η_ij − ζ_0^ν`
+    rw [Int.cast_one, one_smul, ← hgrid,
+      (dataL.h78 hG).beta_eq_constOne_sub_zetaImage_add_delta]
+    abel
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **The (14.16) expansion input** — the §13-gated character content of the case-(b)
