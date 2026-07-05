@@ -803,3 +803,19 @@ vs CharacterDifferenceImage.Orthogonal) の突合が実装時の最初の確認�
   irr-χ: memberDatum_of_irreducible + 直交-vs-列 ((A)-for-χ + (B)-on-D(χ)-family
   で ⟨D-elt, ω⟩=0 → ±δ-smul); 可約-χ: 今回の構成の写し + 列-列直交
   (kχ ≠ kψ from χ≠ψ; aligned-inner cross)。全部品 in-context。
+
+## 2026-07-05 lane-a (loop 59): ★★(5.2.d) 完結 — sixTwoDecompositionData 全象限実証明
+
+- break 定理の member-∀ 節 (最後の sorry) を一発 green で閉鎖 (commit 1732c7c2):
+  - irr-χ: memberDatum_of_irreducible → D + tau1-clause; 直交は (B) elt_inner_eq_zero
+    (R := D.imageFamily) + (A) tau_chidiff_inner_alignedOmega_eq_zero + hT2 (χ 版 norm-2)。
+    β = ±δ•ω は inner_smul_right (star 込みで c 一括) — neg_smul 分解不要。
+  - 可約-χ: loop 58 構成の写し (hS₁coh 分解→subst hχcol→列 family ofProjection→rfl)。
+    列-列直交: {kχ, kχ'} vs {k, k'} の 4 不一致は S₁ 帰属で導出
+    (kχ≠k: χ∈S₁ vs ψ∉S₁ / kχ≠k': ψ̄∉S₁ / kχ'≠k, kχ'≠k': conj-closure)。
+    per-pair は inner_smul_left + inner_smul_right + alignedOmegaSigmaGrid_inner if_neg。
+- **S13_SixTwoBridge.lean = sorry 0**。assembly sixTwoDecompositionData は
+  irr×irr (S08 general) / irr-break×red-member (loop 58) / red-break×全 member (今回)
+  の全象限実証明で完結。issue 2022 の h56/(5.2.d) grid obligation 閉。
+- 残る §11-チェーン上流: S13_CoreStructure の (11.7) H_elementaryAbelian +
+  (11.8) block (orthogonality_setup / not_orthogonal_mu0_sub_zeta)。
