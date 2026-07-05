@@ -223,6 +223,12 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
     x ∉ OddOrder.GroupTheory.conjClassSet ((W : Set G) \ ((W1 : Set G) ∪ (W2 : Set G))) →
     (1 : ℂ) - tau3 (omega i ⟨0, p_prime.pos⟩) x - tau3 (omega ⟨0, q_prime.pos⟩ j) x
       + tau3 (omega i j) x = 0
+  /-- **Peterfalvi (3.9.b), row-vanishing transport** (issue 2036): if `(τ₃ω)₁₀` vanishes at
+  `x`, so do all `(τ₃ω)_{i0}` with `i ≠ 0` — the nontrivial row characters are Galois-conjugate
+  powers of `ω₁₀`, and the twist fixes the vanishing value. -/
+  eta_row_vanish_of_one_zero : ∀ x : G,
+    tau3 (omega ⟨1, q_prime.one_lt⟩ ⟨0, p_prime.pos⟩) x = 0 →
+    ∀ i : Fin q, i ≠ ⟨0, q_prime.pos⟩ → tau3 (omega i ⟨0, p_prime.pos⟩) x = 0
 
 /-! ### Partition of `Section16Inputs` into three independent producer obligations
 
@@ -415,6 +421,12 @@ structure Section16CharacterData {G : Type*} [Group G] [Finite G]
     x ∉ OddOrder.GroupTheory.conjClassSet ((tp.W : Set G) \ ((tp.W1 : Set G) ∪ (tp.W2 : Set G))) →
     (1 : ℂ) - tau3 (omega i ⟨0, tp.p_prime.pos⟩) x - tau3 (omega ⟨0, tp.q_prime.pos⟩ j) x
       + tau3 (omega i j) x = 0
+  /-- **Peterfalvi (3.9.b), row-vanishing transport** (issue 2036): if `(τ₃ω)₁₀` vanishes at
+  `x`, so do all `(τ₃ω)_{i0}` with `i ≠ 0` — the nontrivial row characters are Galois-conjugate
+  powers of `ω₁₀`, and the twist fixes the vanishing value. -/
+  eta_row_vanish_of_one_zero : ∀ x : G,
+    tau3 (omega ⟨1, tp.q_prime.one_lt⟩ ⟨0, tp.p_prime.pos⟩) x = 0 →
+    ∀ i : Fin tp.q, i ≠ ⟨0, tp.q_prime.pos⟩ → tau3 (omega i ⟨0, tp.p_prime.pos⟩) x = 0
 
 /-- **Canonical type-`P` maximal pair data** (issue 7005): for a minimal simple group of odd order,
 there is a type-`P` dual pair `S, T` together with the full κ-Hall witness data of BG Theorem 14.7
@@ -2499,7 +2511,9 @@ noncomputable def section16CharacterData_of_isMinimalSimpleOdd {G : Type*} [Grou
           intro hmem
           obtain ⟨a, ha, hconj⟩ := Group.mem_conjugatesOfSet_iff.mp hmem
           obtain ⟨c, hc⟩ := isConj_iff.mp hconj
-          exact hx (OddOrder.GroupTheory.mem_conjClassSet.mpr ⟨a, ha, c, hc⟩)) }
+          exact hx (OddOrder.GroupTheory.mem_conjClassSet.mpr ⟨a, ha, c, hc⟩))
+      eta_row_vanish_of_one_zero := fun x h0 i hi =>
+        Section16CharacterData.tau3W_omegaS_row_vanish_of_one_zero hG mp tp h0 i hi }
 
 /-- **Assembly of `Section16Inputs` from the three lane producers** (`sorry`-free).
 Each field of `Section16Inputs` is sourced from exactly one of `mp` / `tp` / `cd`;
@@ -2581,7 +2595,8 @@ noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [F
     omega_pow_q_of_mem_W1 := cd.omega_pow_q_of_mem_W1
     omega_pow_p_of_mem_W2 := cd.omega_pow_p_of_mem_W2
     eta_complete_vanish := cd.eta_complete_vanish
-    eta_fourcorner_vanish := cd.eta_fourcorner_vanish }
+    eta_fourcorner_vanish := cd.eta_fourcorner_vanish
+    eta_row_vanish_of_one_zero := cd.eta_row_vanish_of_one_zero }
 
 /-- **Assembly of the Section 16 configuration from named inputs** (`sorry`-free).
 
@@ -2695,7 +2710,8 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       omega_pow_q_of_mem_W1 := inp.omega_pow_q_of_mem_W1
       omega_pow_p_of_mem_W2 := inp.omega_pow_p_of_mem_W2
       eta_complete_vanish := inp.eta_complete_vanish
-      eta_fourcorner_vanish := inp.eta_fourcorner_vanish }
+      eta_fourcorner_vanish := inp.eta_fourcorner_vanish
+      eta_row_vanish_of_one_zero := inp.eta_row_vanish_of_one_zero }
   q_lt_p := inp.q_lt_p
 
 /-- **The one remaining upstream obligation.** From a minimal simple group of odd
