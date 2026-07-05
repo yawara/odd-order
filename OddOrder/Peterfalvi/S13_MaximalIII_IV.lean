@@ -109,6 +109,16 @@ structure Hypothesis (M : Subgroup G) where
   [finiteG : Finite G]
   base : OddOrder.Peterfalvi.S12.Hypothesis M
   params : OddOrder.Peterfalvi.S12.CharacterParameters base
+  /-- **(10.2)/(10.3) grid pins** (issue 2022 threading): the abstract `CharacterParameters`
+  are pinned to the canonical `μ`-grid, its column sign, and the degree-`w₁` member `ζ`.
+  `IsMinimalSimpleOdd`/`Odd` are `Prop`s, so the `∀`-quantification is proof-irrelevant. -/
+  params_mu_eq : ∀ (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hodd : Odd (Nat.card G)),
+    params.mu = base.muGrid hG hodd
+  params_delta_sign : ∀ (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hodd : Odd (Nat.card G)),
+    ∀ j : Fin base.w2, j ≠ 0 → base.muColumnSign hG hodd j = params.delta
+  params_delta_pm : params.delta = 1 ∨ params.delta = -1
+  params_zeta_mem : params.zeta ∈ OddOrder.Peterfalvi.S12.inducedFamily M
+  params_zeta_degree : params.zeta 1 = (base.w1 : ℂ)
   type_alt : IsTypeIII M ∨ IsTypeIV M
   s11Setup : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup M
   chief : OddOrder.Peterfalvi.S11.ChiefFactorData s11Setup
