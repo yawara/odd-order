@@ -318,3 +318,20 @@ isometry 部分は済、残るは residue/dirr/inertia 部分。
 Clifford + p-group count)。deep だが frontier は明確で、CLAUDE.md 方針どおり deep のまま engage 可能。
 現時点で最上流の genuine gap は **step 1 の `dirr` 抽出** (`sigma` から単一 signed irr を取り出す)。
 これが landing すれば `mu2_orthonormal` が緑化し constructor の骨格が立つ。
+
+## ⚠ HUB doneness 注記 (2026-07-06, posited field 化 commit 167b59d4 に対し)
+
+b が `prTIres_irr_cases` (Pf (4.5.b)、Coq PFsection4.v:620-665) を `PrimeTIResidueData` の **posited
+field** 化し leaf を sorry-free 化。**「leaf sorry-free」は doneness を意味しない** ([[scaffold-sorry-free-not-done]])
+— 深い prTIres_irr_cases は実証明されず posited field に isolate されただけ。**本 infra の doneness =
+posited field の discharge (= `PrimeTIResidueData` を real math から constructor で構成)** で判定する。
+
+- **現状**: derived API は sorry-free だが、`prTIres_irr_cases` field は未 discharge。consumer (a の (10.7) /
+  b の (13.3)) が本 structure を cite するときも、structure が構成されなければ vacuous。
+- **discharge の残作業 (b 追跡、session 5)**: constructor の到達性 = **dirr extraction が top-frontier**、
+  σ (cyclicTIiso 系) は既 port 済。dirr extraction を閉じれば `card_afix_irr_classes` +
+  `IsPGroup.card_modEq_card_fixedPoints` から field が実証明され、structure が real に構成される。
+- **⟹ hub 監視**: 本 field を permanent free field として放置しない。b は dirr extraction → constructor
+  discharge まで進めて **`PrimeTIResidueData` の real 構成**を landing する (それが prime-TI infra の真の完了)。
+  sorry-count の −1 は doneness 前進でなく obligation の posit への移動ゆえ、count でなく constructor
+  discharge を進捗指標とする。
