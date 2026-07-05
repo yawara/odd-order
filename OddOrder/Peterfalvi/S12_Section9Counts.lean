@@ -617,6 +617,49 @@ theorem Hypothesis.charParam_d_modEq_one [Finite G] (hG : OddOrder.BG.IsMinimalS
   rw [hdu]
   exact hyp.mkSection11CharacterData_u_modEq_one (hyp.toTypesIIIIIIVSetup htype hnt) chief hnt.1
 
+open scoped FiniteInduce in
+open OddOrder.Peterfalvi.S11 in
+/-- **Irreducible family members are orthogonal to every μ-grid entry** (degree separation
+mod `q`): an irreducible member has degree `w₁·θ(1) ≡ 0 (mod w₁)` while the grid degree is
+`d ≡ 1 (mod w₁)` ((11.8.1), `charParam_d_modEq_one`), so they are distinct irreducibles.
+This is the (5.2.e)-hypothesis feeder for member-vs-column `R`-orthogonality (issue 2022). -/
+theorem Hypothesis.muGrid_inner_irr_member_eq_zero [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M)
+    (params : CharacterParameters hyp) (hmu : params.mu = hyp.muGrid hG hG.odd)
+    {X : Subgroup ↥M} {χ : ClassFunction ↥M ℂ}
+    (hχ : χ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+      ((derivedInG M).subgroupOf M) X)
+    (hχirr : IsIrreducibleCharacter χ)
+    (i : Fin hyp.w1) {k : Fin hyp.w2} (hk0 : k ≠ 0) :
+    ClassFunction.inner (hyp.muGrid hG hG.odd i k) χ = 0 := by
+  haveI := hyp.finiteG
+  refine hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hG.odd i k hχirr ?_
+  obtain ⟨θ, -, -, hχ1⟩ := OddOrder.Peterfalvi.S08.inducedKernelFamily_apply_one hχ
+  have hd : hyp.muGrid hG hG.odd i k 1 = (params.d : ℂ) := by
+    rw [← hmu]
+    exact params.degree_independent i k hk0
+  have hdmod := hyp.charParam_d_modEq_one hG htype params hmu
+  have hidx : ((derivedInG M).subgroupOf M).index = hyp.w1 :=
+    hyp.typeP.card_W1_eq_derived_index.symm
+  obtain ⟨nθ, -, hnθ, -⟩ := θ.isIrreducible.exists_natDegree_charValue_one_dvd_card
+  rw [hd, hχ1, hidx, hnθ]
+  intro he
+  have hnat : params.d = hyp.w1 * nθ := by exact_mod_cast he
+  have hnt : TypePNontrivialCore M hyp.typeP :=
+    typePNontrivialCore_of_isTypeIIIorIV htype hyp.typeP
+  have hw1 : 2 ≤ hyp.w1 := by
+    have hprime : (Nat.card ↥hyp.typeP.W1).Prime := hnt.2.1
+    have heq : Nat.card ↥hyp.typeP.W1 = hyp.w1 := rfl
+    have := hprime.two_le
+    omega
+  have h0 : params.d % hyp.w1 = 0 := by
+    rw [hnat]
+    exact Nat.mul_mod_right _ _
+  have h1 : params.d % hyp.w1 = 1 % hyp.w1 := hdmod
+  rw [Nat.one_mod_eq_one.mpr (by omega)] at h1
+  omega
+
 /-- **Peterfalvi (11.8.1), `δ = 1`**.  The (10.3) column sign `δ ∈ {±1}` equals `1`.  From the index
 relation `n·w₁ = d − δ` (`n_formula`), `w₁ ∣ d − δ`; from the (11.8.1) residue `d ≡ 1 (mod w₁)`
 (`charParam_d_modEq_one`), `w₁ ∣ 1 − d`; adding, `w₁ ∣ 1 − δ`.  With `δ = −1` this forces `w₁ ∣ 2`,
