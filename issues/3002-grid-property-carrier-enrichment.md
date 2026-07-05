@@ -202,3 +202,15 @@ carve-out (3002 供給編集権) ブロック。threading 両半分 (3dc9306e) +
 
 c 側はこれら 3 cite の組立 (G0→order-prime 接続、(14.11.2) dual の assembly) を supply 着き次第
 実施する。form が上と乖離する場合は本節を更新してから landing を (コンフリクト回避)。
+
+## ✅ 2026-07-05 (lane c /loop): G0→order-prime 接続が完成 — b 供給の受け口 ready
+
+c-side spec 1 (eta_grid_facts_on_G0) の **G0 → order-prime 接続を新 leaf
+`S16_G0Coprime.lean` で全実証明** (commits 9986a629→485e0e4a、leaf sorry-free):
+`orderOf_coprime_pq_of_not_mem_conj` が「regular-W/P#/Q# の共役を避ける元
+(= 具体 G0 の元) は位数 pq と素」を与える (Coq coprime_typeP_Galois_core 対応、
+(2.1)+Sylow+Frobenius-kernel 全チェーン)。パラメータ 2 点 (hfrob/hfrobT =
+(14.6)/(14.4) の C_{M'}(x) ≤ M_F) は honest 明示仮説で、S-side は
+`FieldNormalizerData.derived_inf_centralizer_le_P` (proven) が (14.2.a) carrier
+着き次第放電。⟹ **b の (3.9.c) 供給は「(orderOf g).Coprime (p*q) → ∃ m : ℤ,
+eta i j g = m」形 (+ (3.9.a) conj-pair 版) がそのまま最短で刺さる**。
