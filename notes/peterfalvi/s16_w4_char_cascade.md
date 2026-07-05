@@ -1748,3 +1748,27 @@ instance mismatch。**足さず ambient に任せる** (dadeSupport_eq が前例
 s_/t_side_frobenius_kernel(carrier) / eta_grid_galois(b 3.9.c) / **lSide_signed_eta_expansion
 (13.19.c grid counting — caseB cascade の残 c-piece、cont.⁵⁸ の (3.7)/(3.8) grid 機構が使える可能性)** /
 betaGrid。上流優先+文書順で次は (13.19.c) lSide か。
+
+### cont.⁶³ (2026-07-05 lane c /loop) — (13.19.c) lSide の 2 ingredient 実証明 + (13.19.a) を M/L 両用に一般化
+
+(13.19.c) lSide 全展開 (Coq `FTtype2_support_coherence` PFsection14:172) は深い multi-part:
+β_L の grid 係数 ±1 (Bessel) + coherence decomp (`Dade_Ind1_sub_lin`) + 境界係数
+(`FTtypeI_bridge_facts` a_0j/a_i0≡1 mod2) + 展開 assembly。本 iteration は **tractable な 2 部品を
+実証明** (commit `75d1cd7c`):
+- **一般化**: `card_kernel_coprime_pq`/`mSide_dadeSupport_avoids_regular` を
+  `{M}(hMmax)(dataM)` に (nc-tie 除去; 非共役は type-I vs type-II から)。⟹ (13.19.a) を L-side
+  にも再利用可。
+- **`betaL_vanishes_on_regular_W` (PROVEN)** = Coq `betaL_W_0`: β_L が Ŵ^G 上消える
+  (`beta_support_subset_dadeSupport` (S09:2165、既 proven) + 一般化 (13.19.a) を L に)。
+- **`betaL_grid_relation` (PROVEN)** = (3.7): β_L grid 係数 four-corner relation
+  (cont.⁵⁸ `inner_eta_grid_relation` に直結)。
+
+教訓: 深い展開でも Ŵ-vanishing + (3.7) は my (13.19.a)+cont.⁵⁸ engine の再利用で即取れた
+(Dade gate と同じく「深い」評価は部品棚卸し前の early call)。
+
+**残 lSide (13.19.c) の深部** (次 iteration): (a) grid 係数 ±1 = Bessel/norm — cont.⁵⁸ engine
+は norm-2 版のみ、β_L の ‖·‖² と境界係数 (a_0j≡1 mod2 = `FTtypeI_bridge_facts` の S/T bridge) 要。
+(b) coherence decomp `Dade_Ind1_sub_lin` (τ_L β_L = ε ζ + Γ) = **b の S07 coherence 圏の可能性**
+(citeable か要確認)。(c) 展開 assembly。(a)(c) は c-tractable かも、(b) は b-territory 要 grep。
+次 iteration で (a) の β_L norm + 境界係数の repo 有無を精査 → citeable なら assembly、無ければ
+b-coherence cite で skeleton。
