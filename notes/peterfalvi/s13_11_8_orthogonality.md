@@ -1685,3 +1685,45 @@ S13_ElementaryAbelianKernel.lean に **全 sorry-free 既在**、残 = 組立:
     (未特定、次 iteration の主眼)。
 - ⟹ 残 genuine work = (i) dichotomy 分岐、(ii) case-A chain 関係、(iii) case-B action 照合。
   machinery は揃っているので **組立主体** (新規深数学は chain 関係の W₁-inversion のみ)。
+
+## 2026-07-05 update¹⁶ (lane-a) — **`chief_H0_eq_bot` 完全 assembly recipe (dichotomy source 特定・action 照合不要判明)**
+
+update¹⁵ の 3 gap を精査、**dichotomy source を特定 + case-B action 照合が不要と判明** (楽観修正)。
+次 iteration は純 execution。recipe:
+
+**dichotomy source = `chiefFactor_clifford_U_dichotomy chief`** (S11_MaximalII_III_IV:4021、proven)。返り値:
+- **left (case B)**: `∀ J:Subgroup(↥H⧸N), IsAInvariant Φ J → J=⊥∨J=⊤` (Φ =
+  `(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).φ.comp (…).U.subtype`)
+  = **`chiefKernel_caseB_false` の `hirr` と字面一致** (照合不要!)。
+- **right (case A)**: `∃ S₀, S₀≠⊥ ∧ IsAInvariant Φ S₀ ∧ |S₀|=chief.p ∧ (∀J≤S₀ inv→J=⊥∨J=S₀)`。
+
+**proof 骨格** (`chief_H0_eq_bot : hyp.chief.H0 = ⊥`):
+```
+by_contra hne  -- H0 ≠ ⊥
+have hNne : chief.N ≠ ⊥ := -- H0_eq (H0=N.map subtype) + map_eq_bot_iff, hne から
+rcases chiefFactor_clifford_U_dichotomy hyp.chief with hirrB | ⟨S₀,hS₀ne,hS₀inv,hS₀card,_⟩
+· exact chiefKernel_caseB_false hyp.chief hpK hNcomm hUcent hqodd hNne hirrB
+· exact caseA_fixed_contradiction hyp.chief hS₀ne hfix
+```
+**case-B 4 hyps (全 derivable、source 特定済)** — 但し `data = hyp.s11Setup` ゆえ `setup_typeP_eq :
+s11Setup.typeP = base.typeP` 越えの transport 要:
+- `hpK : IsPGroup chief.p ↥s11Setup.H` ← `H_isPGroup hG hyp` (=`IsPGroup hyp.p ↥hyp.H`) + `hp_eq`
+  (chief.p=hyp.p、typeIII_IV_p_eq_W2 経由) + hHH (s11Setup.H↔base.typeP.H)。
+- `hNcomm : chief.N = commutator ↥s11Setup.H` ← `H0_eq_Hprime` (chief.H0=Hprime) + `Hprime_eq`
+  (Hprime=derivedInG base.typeP.H=(commutator ↥H).map subtype) + `chief.H0_eq` (H0=N.map subtype) →
+  両辺 map subtype ⟹ `Subgroup.map_injective (subtype_injective)` で N=commutator。
+- `hUcent : ∀ u n, n∈chief.N → typeP_conjAction s11Setup.typeP ↑u n = n` ← **既存 pattern
+  S13_CoreStructure:981-990** (`typeP_conjAction_apply` = 共役 rfl + `U_centralizes_H0` + centralizer)。
+- `hqodd : Odd s11Setup.q` ← `p_q_distinct_odd_primes` (hyp.q odd) + `s11Setup_q_eq`。
+**case-A hfix (唯一の genuine gap)**: `hfix : ∀ v s, s∈S₀ → quotientMulAutHom chief.N_aInvariant ↑v s = s`
+(U が S₀ を pointwise fix)。S₀ は U-invariant order-p (1-dim F_p-submodule) = U が scalar 作用
+(→ hom U→F_p^*)。**W₁-exponent-chain** で scalar≡1 を出す: `exists_exponent_fun_of_card_prime`
+(exponent e:U→ℕ) + **chain 関係 `e(v)·e(σv)=1`** (σ=W₁-gen の U 共役、Frobenius inversion) +
+`chain_exponent_eq_one` → e≡1 → pointwise fix。**chain 関係の W₁-inversion 導出が唯一の新規数学**
+(残りは全 cite)。⚠ dichotomy の Φ (quotientCoprimeAction) と caseA/hfix の `quotientMulAutHom` の
+action 一致確認要 (caseA_fixed_contradiction は quotientMulAutHom 形、dichotomy S₀inv は
+quotientCoprimeAction 形 — S₀ の inv 仮説を hfix 用に変換 or 一致 lemma)。
+
+**評価**: 骨格 + case-B 4 hyps は純 execution (transport のみ、~100 行)。case-A hfix の chain
+関係のみ新規 (W₁ が U の H̄-作用 exponent を反転 = Frobenius 構造)。次 iteration = case-B 完全化 +
+hfix を sorried-isolate (chain を別 named lemma に) で `chief_H0_eq_bot` を「chain 1 本」に縮約。
