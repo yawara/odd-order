@@ -710,3 +710,22 @@ vs CharacterDifferenceImage.Orthogonal) の突合が実装時の最初の確認�
   (ii) pigeonhole per-pair lemma; (iii) member-D 組み立て
   (memberDatum_of_irreducible + Orthogonal-per-pair) — 可約-χ は
   列-列 cross (muGrid_inner_cross_column 直接)。
+
+### 追記 16 (loop 51): (ii) の正道 = trichotomy 直接適用 (Bessel-3 は p=3 で不足)
+
+- 追記 15 の pigeonhole は **p = 3 で破綻** (非零列 2 本しかなく 3-等係数が組めない)。
+  Bessel-3 補題 (inner_eq_zero_of_three_equal_coeff) は残すが (ii) には使わない。
+- **正道**: T := τ(χ−χ̄) は V 上消える (χ は M'-誘導 → χdiff|_V = 0
+  (V ∩ M' = ∅: V-元は mod M' で W₁-非自明像) + τ の A0-値保存
+  (V ⊆ typePA0)) → S05 σ-係数 grid (3.7)-分離 + ‖T‖² = 2 +
+  (3.8) trichotomy (w₁, w₂ ≥ 3 で constant-row/column とも norm > 2 ✗)
+  → **全 σ-係数 0** = T ⊥ 全 ω^σ_ik ✓ (p = 3 安全)。
+- 実装: S06:643 `certainType_diff_dade_eq` の endgame ブロック
+  (grid_trichotomy + grid_no_constant_column 両向き +
+  certainType_diff_dade_eq_of_all_sigmaCoeff_zero:556) を
+  「X vanish-on-V + ⟨X,X⟩ = 2 → ∀ P, ⟨X, chiFam P⟩ = 0」形の
+  reusable lemma に S05/S12 レベルで切り出し、T に適用。
+  V-vanish の部品: tau_toDadeMap_apply_of_mem (S06:378) の
+  hyp.tau-版 (dade-値保存) + typePV ∩ M' = ∅
+  (typePData_typePV_not_mem_derived — S12-Core に既出 (10.5)-ζ-vanish
+  の部品として言及あり)。
