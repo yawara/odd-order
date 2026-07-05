@@ -1213,7 +1213,7 @@ noncomputable def H_sharp_hypothesis76 [Fintype G] [Invertible (Nat.card G : ℂ
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     OddOrder.Peterfalvi.S09.Hypothesis76 G (OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G)) hyp.S := by
-  refine OddOrder.Peterfalvi.S09.Cert.hypothesis76OfDade (H_sharp_hypothesis71 hG hyp) ?_ hyp.H ?_ ?_ rfl
+  refine OddOrder.Peterfalvi.S09.Cert.hypothesis76OfDadeTrivialBase (H_sharp_hypothesis71 hG hyp) ?_ hyp.H ?_ ?_ rfl
   · exact ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData
       (H_sharp_hconj hG hyp)).toDadeIsometryData.isDadeIsometry
   · have hUS : hyp.U ≤ hyp.S := by
@@ -1229,6 +1229,22 @@ noncomputable def H_sharp_hypothesis76 [Fintype G] [Invertible (Nat.card G : ℂ
     · have hsh : h ∈ OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G) :=
         OddOrder.Peterfalvi.S04.mem_sharp.mpr ⟨hh, h1⟩
       exact (OddOrder.Peterfalvi.S04.mem_sharp.mp (S_normalizes_H_sharp hG hyp l hsh)).1
+
+open scoped FiniteInduce in
+/-- **The `H`-side family base is the induced principal character**: `ζ₀ = Ind_H^S 1_H` — the
+trivial-base normalization of `hypothesis76OfDadeTrivialBase`.  This is what forces the
+(13.5)/(13.6) distinguished `λ = Ind_H^S θ` (`P ⊄ Ker θ`) to sit at a *positive* family index
+(`exists_lambda_index`). -/
+theorem H_sharp_zeta_zero [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    (H_sharp_hypothesis76 hG hyp).zeta 0
+      = ClassFunction.induce (hyp.H.subgroupOf hyp.S)
+          ((OddOrder.RepresentationTheory.trivialIrreducibleCharacter
+              ↥(hyp.H.subgroupOf hyp.S) :
+            OddOrder.RepresentationTheory.IrreducibleCharacter _) :
+              ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ) := by
+  unfold H_sharp_hypothesis76
+  exact OddOrder.Peterfalvi.S09.Cert.hypothesis76OfDadeTrivialBase_zeta_zero _ _ _ _ _ _
 
 /-- **TI-subset `ρ`-map collapse** (the `χ = χ^ρ` bridge of Peterfalvi (13.5.a)): when the local
 subgroups of a (7.1) datum are trivial (`H(a) = ⊥`, as for the TI-subset Dade construction

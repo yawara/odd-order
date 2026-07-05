@@ -1091,6 +1091,17 @@ structure Hypothesis76 (G : Type*) [Group G] [Fintype G]
       invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
     ∃ θ : IrreducibleCharacter ↥(H.subgroupOf L),
       zeta i = ClassFunction.induce (H.subgroupOf L) (θ : ClassFunction _ ℂ)
+  /-- **Exhaustiveness of the family** (Peterfalvi (7.6): `T = {Ind_H^L θ | θ ∈ Irr H}` ranges
+  over *all* `θ`): every induced irreducible appears at some family index — the converse
+  direction to `zeta_induced`, same canonical-instance convention.  This is what places the
+  (13.5)/(13.6) distinguished `λ = Ind_H^S θ` at a family index (`exists_lambda_index`). -/
+  zeta_family_cover :
+    haveI : Fintype ↥(H.subgroupOf L) := Fintype.ofFinite _
+    haveI : Invertible (Nat.card ↥(H.subgroupOf L) : ℂ) :=
+      invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+    ∀ φ : IrreducibleCharacter ↥(H.subgroupOf L),
+      ∃ i : Fin (n + 1),
+        zeta i = ClassFunction.induce (H.subgroupOf L) (φ : ClassFunction _ ℂ)
   /-- **Peterfalvi (7.7.a) certificate.**  For every `χ ∈ CF(G)` and `x ∈ A`,
   `χ^ρ(x) = Σ_{i≥1} c̄_i / ‖ζ_i‖² · ζ_i(x)`, where
   `c_i = (ψ_i^τ, χ)_G` and `ψ_i = ζ_i - d_i ζ_0`.

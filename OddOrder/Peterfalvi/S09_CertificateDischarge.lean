@@ -827,6 +827,9 @@ noncomputable def hypothesis76OfFamily
       simp only [Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
       refine ⟨hx.1, fun h1 => hx.2 (Subtype.ext h1)⟩
     zeta_induced := fun i => ⟨θ i, by congr! <;> exact Subsingleton.elim _ _⟩
+    zeta_family_cover := fun φ => by
+      obtain ⟨i, hi⟩ := hcover φ
+      exact ⟨i, hi.trans (by congr! <;> exact Subsingleton.elim _ _)⟩
     chiRho_decomp := by
       intro χ x hx
       have hz0 : ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L) ≠ 0 :=
@@ -872,6 +875,60 @@ noncomputable def hypothesis76OfDade
     invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
   exact hypothesis76OfFamily H71 hτ H hHL hHnorm hAH (distinctInducedFamily (H.subgroupOf L)).θ
     (distinctInducedFamily (H.subgroupOf L)).inj (distinctInducedFamily (H.subgroupOf L)).cover
+
+/-- **`Hypothesis76` from `(7.1)` data with the trivial-base normalization**: the
+`distinctInducedFamily` enumeration reindexed (by a transposition) so that
+`ζ₀ = Ind_H^L 1_H` — the induced principal character sits at the base index `0`
+(`hypothesis76OfDadeTrivialBase_zeta_zero`).  The (13.5)/(13.6) distinguished-index machinery
+(`exists_lambda_index`) needs the distinguished `λ = Ind_H^L θ` (`P ⊄ Ker θ`, in particular
+`θ ≠ 1_H`) to sit at a *positive* index; pinning the base to `θ = 1_H` guarantees it. -/
+noncomputable def hypothesis76OfDadeTrivialBase
+    {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L)
+    (hτ : OddOrder.Peterfalvi.S04.IsDadeIsometry (G := G) (k := ℂ) (L := L) H71.τ)
+    (H : Subgroup G) (hHL : H ≤ L)
+    (hHnorm : ∀ (l : ↥L) {h : G}, h ∈ H → (l : G) * h * (l : G)⁻¹ ∈ H)
+    (hAH : A = (H : Set G) \ {1}) :
+    Hypothesis76 G A L :=
+  haveI hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
+  haveI : Fintype ↥(H.subgroupOf L) := Fintype.ofFinite _
+  haveI : Invertible (Nat.card ↥(H.subgroupOf L) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  hypothesis76OfFamily H71 hτ H hHL hHnorm hAH
+    (fun i => (distinctInducedFamily (H.subgroupOf L)).θ
+      (Equiv.swap 0 (Classical.choose ((distinctInducedFamily (H.subgroupOf L)).cover
+        (trivialIrreducibleCharacter ↥(H.subgroupOf L)))) i))
+    (induce_family_comp_perm_injective (distinctInducedFamily (H.subgroupOf L)).inj _)
+    (induce_family_comp_perm_covering (distinctInducedFamily (H.subgroupOf L)).cover _)
+
+/-- **The trivial-base normalization pins `ζ₀ = Ind_H^L 1_H`.** -/
+theorem hypothesis76OfDadeTrivialBase_zeta_zero
+    {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L)
+    (hτ : OddOrder.Peterfalvi.S04.IsDadeIsometry (G := G) (k := ℂ) (L := L) H71.τ)
+    (H : Subgroup G) (hHL : H ≤ L)
+    (hHnorm : ∀ (l : ↥L) {h : G}, h ∈ H → (l : G) * h * (l : G)⁻¹ ∈ H)
+    (hAH : A = (H : Set G) \ {1}) :
+    haveI : Fintype ↥(H.subgroupOf L) := Fintype.ofFinite _
+    haveI : Invertible (Nat.card ↥(H.subgroupOf L) : ℂ) :=
+      invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+    (hypothesis76OfDadeTrivialBase H71 hτ H hHL hHnorm hAH).zeta 0
+      = ClassFunction.induce (H.subgroupOf L)
+          ((trivialIrreducibleCharacter ↥(H.subgroupOf L) : IrreducibleCharacter _) :
+            ClassFunction ↥(H.subgroupOf L) ℂ) := by
+  haveI hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
+  letI : Fintype ↥(H.subgroupOf L) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥(H.subgroupOf L) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  unfold hypothesis76OfDadeTrivialBase hypothesis76OfFamily
+  dsimp only
+  rw [Equiv.swap_apply_left]
+  have h := Classical.choose_spec ((distinctInducedFamily (H.subgroupOf L)).cover
+    (trivialIrreducibleCharacter ↥(H.subgroupOf L)))
+  dsimp only at h
+  exact h
 
 /-! ### (7.8.c) building blocks: the induced principal character on `A`
 
