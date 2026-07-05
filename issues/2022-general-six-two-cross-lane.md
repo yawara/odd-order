@@ -736,3 +736,24 @@ vs CharacterDifferenceImage.Orthogonal) の突合が実装時の最初の確認�
 - 残: T := τ(χ−χ̄) 文脈適用 (V-vanish 供給) → ⟨T, ω^σ⟩ = 0 → R(χ)⊥R(列)
   (constituent 引数は per-pair: R-elt = ±X±-部分の直交は… ⟨T,ω⟩=0 から
   ofDiff-R-elts の ω-成分 0 を出す小 step 要確認) → member-D 組立。
+
+### 追記 17 (loop 53): member-clause 全部品既存確認 — 残りは純組み立て
+
+- `tau_zeta_sub_conj_vanishes_on_typePV` (S12:4613) は **ζ 専用でなく任意
+  inducedFamily-irr member で成立する形で既に証明済** → T := τ(χ−χ̄) の
+  V-消滅は即 cite。
+- `inner_left_eq_zero_of_inner_sub_eq_zero` (S12:4637) = per-part 射影補題
+  (a−b ⊥ s, 各 norm-1 → a ⊥ s) — 追記 15 の constituent-懸念を直接解決。
+- 組み立て (次 iteration):
+  A. `tau_chidiff_inner_alignedOmega_eq_zero`: T-vanish (上記) + T∈ℤIrr +
+     ⟨T,T⟩=2 (χ irr-nonreal family-pairwise) → loop-52 engine
+     (sigmaCoeff_eq_zero_of_vanishOnV, tic := typePData_toTICyclicHypothesis,
+     app := canonicalFullDadeApp) → ∀pq sigmaCoeff = 0 → P-enum
+     (exists_alignedOmegaSigmaGrid_chiFam_family) で ⟨T, ω^σ_ik⟩ = 0。
+     (sigmaCoeff pq 定義 = ⟨·, chiFam pq⟩ の突合のみ注意)
+  B. per-pair: D-R-elt (OfDiff ±部分, a−b = T) + 射影補題 + ⟨T,ω⟩=0
+     → ⟨R-elt, ω⟩ = 0 → ±δ-smul で columnRImage-elt へ。
+  C. sixTwoMemberDatum_of_reducible_member / break の member-∀ とも:
+     D := memberDatum_of_irreducible (tau1-ext ✓) + B の Orthogonal;
+     可約-χ は D := (列-Da-mirror, ψ-slot 0) + 列-列直交
+     (alignedOmegaSigmaGrid_inner の cross)。
