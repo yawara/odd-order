@@ -1838,3 +1838,31 @@ v-value=9000)。**これは POLE-2 coupled-pipeline stall** (reallocation note �
 loop を停止して報告 ([[feedback-flag-poor-progress]] [[feedback-loop-short-wakeup]] option 2)。
 **unblock 条件**: b が issue 3002 (§13 η-grid を S15.Hypothesis grid field に threading) を landing
 すれば lSideGridCoeffData/betaGrid の grid_mem+boundary が供給され (14.11.2) carrier 群が閉じる。
+
+### cont.⁶⁶ (2026-07-05 lane c /loop) — 🎯 (13.19.c) lSideGridCoeffData policy-A descent: coeff+m_00 実証明化、gate を type-P/§13 residual に縮小
+
+cont.⁶⁵ が「c の ungated frontier 枯渇 → carrier は全 field gated」と結論したが、**carrier
+`lSideGridCoeffData` の内部に降りて 4 field の gate 境界を精査 → 2 sub-fact は c で ungated 実証明可**
+と判明 (policy-A descent、commit `40e2a948`、full build 3929 green、AxiomsCheck OK 新 axiom 無)。
+monolithic `:= sorry` producer を `where` 化し、以下を in-place 実証明:
+
+- **`coeff` (PROVEN)** = `betaL_grid_coeff_int`: m_ij=⟨β_L,η_ij⟩∈ℤ (β_L∈ZIrr via
+  `betaL_mem_ZIrr`, η_ij∈ZIrr via `eta_mem_ZIrr`, `inner_mem_ZIrr_int`)。witness `m` = 整数値。
+- **`m_principal` (PROVEN)** = `betaL_grid_coeff_principal_eq_one`: m_00=⟨β_L,η_00⟩=1。
+  η_00=1_G (`eta_principal_eq_trivial`) + (7.8.a) 分解 β_L=1_G−ζ_0^ν+Δ_L pair =⟨1_G,1_G⟩
+  −⟨ζ_0^ν,1_G⟩+⟨Δ_L,1_G⟩=1−0+0 (`constOne_inner_self_eq_one` + `BetaDecomp.orth_one` +
+  `delta_orth_one`)。cont.⁶⁵ は「boundary = 全部 FTtypeI_bridge」と誤り、m_00 は Dade 分解のみで ungated。
+
+**残 gate (genuinely cross-lane、sorry 継続)**: `m_row_odd`/`m_col_odd` (off-principal parity =
+Coq `FTtypeI_bridge_facts`/`cycTIiso_cfdot_exchange`、S/T type-P bridge = b §13/§15) /
+`bessel` (Σm²≤pq: ζ_i^ν⊥η-grid = Coq `o_tauLeta` 要、β_L の grid 射影 = (Γ_L+1_G) の射影 に
+一致させ ‖Γ_L‖²≤e−1 適用 → grid_mem と同 §13 residual) / `grid_mem` (Coq Y=0、issue 3002)。
+
+**cont.⁶⁵ 訂正**: 「carrier 全 field が b/a に gated」は不正確。**coeff (整数性) + m_00 (Dade 分解)
+は c 単独 ungated**。「§13 grid gate」は 4 field 中 3 field (m_row/m_col/bessel/grid_mem) に限局し、
+これらは確かに b の type-P/§13 residual に gated。**doneness 教訓**: sorry-count は 7→10 (mechanical
++3、1 field-sorry を 4 field に分割) だが、これは regression でなく **6 sub-fact 中 2 を opaque-sorry
+から machine-checked proof に昇格**した実質前進 ([[scaffold-sorry-free-not-done]] = 指標は proof の
+積み上げであって count でない)。gated endpoint の internal descent は「frontier 枯渇」報告の前に必ず
+試すべき ([[feedback-no-avoiding-hard-parts]]: gate の外殻でなく中身の ungated 部分を実証明化)。
+**unblock 条件 (残 3 field)**: cont.⁶⁵ と同じ — b が issue 3002 landing で grid_mem+parity 供給。
