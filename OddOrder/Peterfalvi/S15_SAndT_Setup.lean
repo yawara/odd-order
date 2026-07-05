@@ -535,6 +535,45 @@ theorem Hypothesis.toTypesIIIIIIVSetupS_chief_H0_eq_bot [Finite G]
   rw [chief.H0_eq, hyp.toTypesIIIIIIVSetupS_chief_N_eq_bot hG chief]
   exact Subgroup.map_bot _
 
+/-- **Peterfalvi (13.2.b)/(11.7) for the `S`-instance**: `P = S_F` is elementary abelian of
+exponent `p`.  Assembled from the §11 chief-factor data of `S` (`exists_chiefFactorData` on
+`toTypesIIIIIIVSetupS`): the chief kernel `N = ⊥` (`toTypesIIIIIIVSetupS_chief_N_eq_bot`), so
+`P/⊥ ≅ P` *is* the chief factor and carries `ChiefFactorData.quotient_elementaryAbelian` at the
+chief prime `chief.p = p` (forced by `|P| = p^q`).  **Ungated** — the `S`-instance `H₀ = ⊥` is
+proven (`P` itself is the chief factor), unlike the generic sorried `chief_H0_eq_bot`.  Discharges
+`basic_structure_gated.P_elementaryAbelian`. -/
+theorem Hypothesis.P_elementaryAbelian [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    IsElementaryAbelian hyp.p ↥hyp.P := by
+  classical
+  obtain ⟨chief, _⟩ :=
+    OddOrder.Peterfalvi.S11.exists_chiefFactorData hG (hyp.toTypesIIIIIIVSetupS hG)
+  have hHeq : ((hyp.toTypesIIIIIIVSetupS hG).H : Subgroup G) = hyp.P := by
+    show hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
+  have hN : chief.N = ⊥ := hyp.toTypesIIIIIIVSetupS_chief_N_eq_bot hG chief
+  -- `chief.p = p` from `|P| = p^q = chief.p^q · |N|` with `|N| = 1`.
+  have hq : (hyp.toTypesIIIIIIVSetupS hG).q = hyp.q := by
+    show Nat.card ↥hyp.Sdata.W1 = hyp.q; rw [hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1]
+  have hcardH : Nat.card ↥(hyp.toTypesIIIIIIVSetupS hG).H = hyp.p ^ hyp.q := by
+    rw [hHeq]; exact hyp.card_P_eq hG hyp.Sdata_W2_eq
+  have hquot := OddOrder.Peterfalvi.S11.chiefFactor_quotient_card chief
+  rw [hq] at hquot
+  have hsplit := Subgroup.card_eq_card_quotient_mul_card_subgroup chief.N
+  rw [hquot, hcardH] at hsplit
+  have hdvd : chief.p ∣ hyp.p ^ hyp.q := by
+    refine dvd_trans (dvd_pow_self chief.p hyp.q_prime.pos.ne') ?_
+    exact hsplit ▸ Dvd.intro _ rfl
+  have hpp : chief.p = hyp.p :=
+    (Nat.prime_dvd_prime_iff_eq chief.p_prime hyp.p_prime).mp
+      (chief.p_prime.dvd_of_dvd_pow hdvd)
+  -- Transport `quotient_elementaryAbelian` along `↥H ⧸ ⊥ ≃* ↥H`, then rewrite `H = P`.
+  have hEA : IsElementaryAbelian hyp.p ↥(hyp.toTypesIIIIIIVSetupS hG).H := by
+    have h := chief.quotient_elementaryAbelian
+    rw [hpp] at h
+    exact OddOrder.GroupTheory.IsElementaryAbelian.of_mulEquiv
+      ((QuotientGroup.quotientMulEquivOfEq hN).trans QuotientGroup.quotientBot) h
+  rwa [hHeq] at hEA
+
 open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **`C_U(H̄) = C`** for the `S`-instance: the §9 kernel `cSub` (`= C_U(H̄)`) equals Peterfalvi's
 `C = C_U(P) = U ⊓ C_G(P)`.  The reverse `C ≤ cSub` is general (an element of `U` centralizing
@@ -629,7 +668,7 @@ residuals are the genuinely upstream σ-structure facts:
 noncomputable def basic_structure_gated [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) : BasicStructureGated hyp where
   U_commutative := hyp.S_U_commutative
-  P_elementaryAbelian := sorry
+  P_elementaryAbelian := hyp.P_elementaryAbelian hG
   P_order := hyp.card_P_eq hG hyp.Sdata_W2_eq
   u_bound := sorry
   A0S_TI := True

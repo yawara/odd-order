@@ -1721,3 +1721,30 @@ x∈A1=`sigmaSharp`=M_σ^# (`A1_eq_sigmaSharp_of_typeI_or_II`) ゆえ 1<orderOf 
 **orderOf x ∣ orderOf y が crux = R(x) が M_F と coprime (signalizer)**。この signalizer
 coprimality の直 lemma は **repo に不在** (§8/BG 級) → 次 iteration で `ftSupportKernel`
 (S10:592) 構造を精読して新規 or 深掘り。h78→hyp76→hyp71→hyp の A 同定 plumbing も要。
+
+### cont.⁶² (2026-07-05 lane c /loop) — ✅✅ (13.19.a) 完全証明: Dade signalizer gate 閉鎖 (sorry 8→7)
+
+cont.⁶¹ が「深い・直 lemma 不在」と評した Dade signalizer gate を **実証明で閉じた**
+(commit `103d11ef`)。cont.⁶¹ の悲観は誤り — S04 Dade Hypothesis の (2.2.b)/(2.2.c) field
+で組立可能だった。`dadeSupport_not_coprime_card_kernel`:
+- y∈dadeSupport → y~a·h (`h78_hyp_eq` rfl で dade=`typeIHyp.dadeData.dade` に、`mem_dadeSupport_iff`)。
+- a∈A=`typeIA`=M_F∖{1} (`typeIA_eq_sharp`) → orderOf a∣|M_F|, ≠1。
+- h∈H(a)≤C_G(a) (`centralizer_eq_sup` (2.2.b)) → Commute。
+- Coprime(orderOf a,orderOf h): `centralizer_coprime` (2.2.c) + a∈`centralizerIn M a`
+  (`mem_centralizerIn.mpr ⟨mem_L a.2, rfl⟩`) + `orderOf_dvd_natCard`。
+- `orderOf_mul_eq_mul_orderOf_of_coprime` → orderOf a∣orderOf y∣gcd=1 矛盾。
+
+**⟹ (13.19.a) `mSide_dadeSupport_avoids_regular` 両 ingredient 閉鎖=完全証明。
+(13.19.b) engine + (13.19.a) が W-side で完全に done** (caseB_eta_orthogonal_psi の horth
+底まで proven)。session 通算 sorry 7→7 だが (13.19.a)(13.19.b) 実体は全証明。
+
+**教訓 (2 点)**: (1) cont.⁶¹ の「直 lemma 不在=深い」は S04 field 精査前の early call
+だった — 構造体 field (centralizer_eq_sup/coprime) が既に必要部品。難所も field 棚卸しで割れる。
+(2) **Fintype 罠**: `[Finite G]` 下で `haveI : Fintype G := Fintype.ofFinite G` を足すと
+既存 canonical Fintype (dadeSupport 形成に使用) と非-defeq で競合 → mem_dadeSupport_iff rw が
+instance mismatch。**足さず ambient に任せる** (dadeSupport_eq が前例)。[[lean-instance-defeq-traps]]。
+
+**次 frontier**: 残 S16 sorry 7 = :80 T_typeII(b §13) / :175 v-value(9000) /
+s_/t_side_frobenius_kernel(carrier) / eta_grid_galois(b 3.9.c) / **lSide_signed_eta_expansion
+(13.19.c grid counting — caseB cascade の残 c-piece、cont.⁵⁸ の (3.7)/(3.8) grid 機構が使える可能性)** /
+betaGrid。上流優先+文書順で次は (13.19.c) lSide か。
