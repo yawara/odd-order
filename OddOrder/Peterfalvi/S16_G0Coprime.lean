@@ -1,4 +1,5 @@
 import OddOrder.Peterfalvi.S15_SAndT
+import OddOrder.Peterfalvi.S16_NonExistenceGCore
 import OddOrder.GroupTheory.ConjClassSet
 
 /-!
@@ -319,17 +320,86 @@ theorem exists_conj_mem_P_of_orderOf_eq_p [Finite G] (hG : OddOrder.BG.IsMinimal
   rw [← hcoe]
   exact ⟨a, hR (Subgroup.mem_zpowers a), rfl⟩
 
-/-- **Peterfalvi (14.6)/(13.12): the `U`-part of `S'` has no fixed points on `P#`** —
-`C_{S'}(x) ≤ P` for `x ∈ P#`.  In case (9.7.b) (which (14.6) forces for `S`),
-`S' = PU ≅ F ⋊ U*` with `U*` acting by field multiplication (`FieldNormalizerData`), so an
-element of `S'` centralizing a nontrivial additive point lies in the additive kernel `P`.
-Named §14 obligation (case-(9.7.b) carrier interface, issue-9000 sphere; discharge =
-transport of the Frobenius kernel property through `FieldNormalizerData.sigma`). -/
-theorem derived_inf_centralizer_le_P [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) {x : G}
-    (hx : x ∈ sharpSubgroup hyp.P) :
-    derivedInG hyp.S ⊓ Subgroup.centralizer ({x} : Set G) ≤ hyp.P := by
-  sorry
+/-- **The concrete BG Frobenius group `F ⋊ U*` has Frobenius kernel `F`** — an element
+commuting with a nontrivial additive point lies in the additive kernel.  The norm-one units
+act by field multiplication (`normOneMulAction_apply`), which is fixed-point-free on `F#`:
+`u·m = m` with `m ≠ 0` forces `u = 1`. -/
+theorem commute_inl_mem_range_inl {p q : ℕ} [Fact p.Prime]
+    {m : OddOrder.BG.AppC.NormSet.additiveFieldGroup p q} (hm : m ≠ 1)
+    {w : OddOrder.BG.AppC.NormSet.normOneFrobeniusGroup p q}
+    (hcomm : w * SemidirectProduct.inl m = SemidirectProduct.inl m * w) :
+    w ∈ (SemidirectProduct.inl :
+      OddOrder.BG.AppC.NormSet.additiveFieldGroup p q →*
+        OddOrder.BG.AppC.NormSet.normOneFrobeniusGroup p q).range := by
+  -- compare left components: `w.left · φ(w.right)(m) = m · w.left`
+  have hleft := congrArg SemidirectProduct.left hcomm
+  simp only [SemidirectProduct.mul_left, SemidirectProduct.left_inl,
+    SemidirectProduct.right_inl, map_one, MulAut.one_apply] at hleft
+  -- the additive group is commutative: cancel `w.left`
+  have hfix : OddOrder.BG.AppC.NormSet.normOneMulAction p q w.right m = m := by
+    have hcomm' : m * w.left = w.left * m := mul_comm _ _
+    rw [hcomm'] at hleft
+    exact mul_left_cancel hleft
+  -- fixed point of field multiplication with `m ≠ 0` forces the unit to be `1`
+  have hm0 : Multiplicative.toAdd m ≠ 0 := by
+    intro h0
+    exact hm (by simpa using congrArg Multiplicative.ofAdd h0)
+  have humul : ((w.right : (GaloisField p q)ˣ) : GaloisField p q)
+      * Multiplicative.toAdd m = Multiplicative.toAdd m := by
+    have h := OddOrder.BG.AppC.NormSet.normOneMulAction_apply p q w.right
+      (Multiplicative.toAdd m)
+    rw [ofAdd_toAdd] at h
+    rw [← h, hfix]
+  have hu1 : ((w.right : (GaloisField p q)ˣ) : GaloisField p q) = 1 :=
+    mul_right_cancel₀ hm0 (by rw [humul, one_mul])
+  have hright : w.right = 1 := Subtype.ext (Units.ext hu1)
+  refine ⟨w.left, ?_⟩
+  have h := SemidirectProduct.inl_left_mul_inr_right w
+  rwa [hright, map_one, mul_one] at h
+
+/-- **Peterfalvi (14.6)/(13.12), the Frobenius-kernel property of `S' = PU`, transported from
+the concrete (14.2.a) field model**: `C_{S'}(x) ≤ P` for `x ∈ P#`.  `S' = P ⊔ U` is the image
+of the concrete `F ⋊ U*` under the injective `σ` (`FieldNormalizerData`), and in the model
+every element commuting with a nontrivial kernel point lies in the kernel
+(`commute_inl_mem_range_inl`).  This discharges the `hfrob` input of
+`orderOf_coprime_p_of_not_mem_conj` as soon as the §13 supply provides the (14.2.a) carrier
+(`fieldNormalizerData_of_repr`, issue 2035/9000 sphere). -/
+theorem FieldNormalizerData.derived_inf_centralizer_le_P
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    {x : G} (hx : x ∈ sharpSubgroup hyp.base.P) :
+    derivedInG hyp.base.S ⊓ Subgroup.centralizer ({x} : Set G) ≤ hyp.base.P := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  rintro g' ⟨hg'S', hg'cent⟩
+  -- `S' = P ⊔ U` is the image of `kernel ⊔ complement` under `σ`
+  have hg'mem : g' ∈ (fieldNormalizerKernel hyp ⊔ fieldNormalizerComplement hyp).map
+      data.sigma := by
+    rw [Subgroup.map_sup, data.sigma_P_eq_P, data.sigma_U_eq_U, ← hyp.base.S_deriv_eq_PU]
+    exact hg'S'
+  obtain ⟨w, -, rfl⟩ := hg'mem
+  -- `x = σ (inl m)` for a nontrivial additive point `m`
+  have hxmem : x ∈ (fieldNormalizerKernel hyp).map data.sigma := by
+    rw [data.sigma_P_eq_P]; exact hx.1
+  obtain ⟨wx, hwx, hxeq⟩ := hxmem
+  have hwx' : wx ∈ (SemidirectProduct.inl :
+      OddOrder.BG.AppC.NormSet.additiveFieldGroup hyp.base.p hyp.base.q →*
+        fieldNormalizerFrobeniusGroup hyp).range := hwx
+  obtain ⟨m, rfl⟩ := hwx'
+  have hmne : m ≠ 1 := by
+    rintro rfl
+    refine hx.2 ?_
+    have hx1 : x = 1 := by rw [← hxeq, map_one, map_one]
+    simp [hx1]
+  -- pull the commutation back through the injective `σ`
+  have hgx : data.sigma w * x = x * data.sigma w :=
+    Subgroup.mem_centralizer_singleton_iff.mp hg'cent
+  have hcomm : w * SemidirectProduct.inl m = SemidirectProduct.inl m * w := by
+    apply data.sigma_injective
+    rw [map_mul, map_mul, hxeq]
+    exact hgx
+  -- concrete Frobenius kernel + push forward
+  obtain ⟨mw, hmw⟩ := commute_inl_mem_range_inl hmne hcomm
+  rw [← data.sigma_P_eq_P]
+  exact ⟨w, ⟨mw, hmw⟩, rfl⟩
 
 /-- **Peterfalvi (14.11.3), S-side core**: an element avoiding the conjugates of `W#` and of
 `P#` has order prime to `p`.
@@ -337,14 +407,18 @@ theorem derived_inf_centralizer_le_P [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
 Contrapositive of the textbook chain (p. 90): if `p ∣ |g|`, the order-`p` power of `g` is
 conjugate into `P#` (`exists_conj_mem_P_of_orderOf_eq_p`), so — conjugating `g` — `g ∈ C_G(a)
 ≤ S` for some `a ∈ P#` (`centralizer_le_S_of_mem_sharp_P`).  Decompose `g = d·w` along
-`S = S' ⋊ W₁` (`Sdata.M_complement`).  If `w = 1` then `g = d ∈ C_{S'}(a) ≤ P#`
-(`derived_inf_centralizer_le_P`, the case-(9.7.b) Frobenius kernel).  If `w ≠ 1` the coprime
+`S = S' ⋊ W₁` (`Sdata.M_complement`).  If `w = 1` then `g = d ∈ C_{S'}(a) ≤ P#` (the `hfrob`
+input — the case-(9.7.b) Frobenius kernel, discharged by
+`FieldNormalizerData.derived_inf_centralizer_le_P` once the (14.2.a) carrier is supplied).
+If `w ≠ 1` the coprime
 coset collapse (2.1) (`exists_mem_centralizer_conj`, with `(q, |S'|) = 1` =
 `coprime_q_card_derivedS`) conjugates `g` into `C_{S'}(w)·w = W₂·w ⊆ W#`
 (`Sdata.centralizer_W1`).  Either way `g` meets an excluded orbit.
 Coq: `PFsection14.coprime_typeP_Galois_core`. -/
 theorem orderOf_coprime_p_of_not_mem_conj [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) {g : G}
+    (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    (hfrob : ∀ x ∈ sharpSubgroup hyp.P,
+      derivedInG hyp.S ⊓ Subgroup.centralizer ({x} : Set G) ≤ hyp.P) {g : G}
     (hW : g ∉ conjClassSet (sharpSubgroup hyp.W))
     (hP : g ∉ conjClassSet (sharpSubgroup hyp.P)) :
     Nat.Coprime (orderOf g) hyp.p := by
@@ -401,8 +475,7 @@ theorem orderOf_coprime_p_of_not_mem_conj [Finite G] (hG : OddOrder.BG.IsMinimal
     have hg'derived : g' ∈ derivedInG hyp.S := by
       rw [← hg'eq, hw1]
       simpa using hdmem
-    have hg'P : g' ∈ hyp.P :=
-      derived_inf_centralizer_le_P hG hyp haP ⟨hg'derived, hg'cent⟩
+    have hg'P : g' ∈ hyp.P := hfrob a haP ⟨hg'derived, hg'cent⟩
     refine hP ⟨g', ⟨hg'P, fun h => hg'ne h⟩, y⁻¹, ?_⟩
     rw [hg'def]; group
   · -- `w ≠ 1`: the (2.1) coset collapse conjugates `g` into `W₂ · w ⊆ W#`
@@ -467,13 +540,15 @@ Dade support — has order prime to `pq`.  Assembles the `W`-orbit bridge with t
 cores.  This is the group-theoretic half of (14.11.3); the character half ((3.9.a/c) `η`-grid
 integrality/pairing on `G₀`) consumes it through `EtaGenericData`. -/
 theorem orderOf_coprime_pq_of_not_mem_conj [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) (hTII : IsTypeII hyp.T) {g : G}
+    (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) (hTII : IsTypeII hyp.T)
+    (hfrob : ∀ x ∈ sharpSubgroup hyp.P,
+      derivedInG hyp.S ⊓ Subgroup.centralizer ({x} : Set G) ≤ hyp.P) {g : G}
     (hreg : g ∉ conjClassSet ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))))
     (hP : g ∉ conjClassSet (sharpSubgroup hyp.P))
     (hQ : g ∉ conjClassSet (sharpSubgroup hyp.Q)) :
     Nat.Coprime (orderOf g) (hyp.p * hyp.q) := by
   have hW := not_mem_conjClassSet_sharp_W hG hyp hreg hP hQ
-  exact Nat.Coprime.mul_right (orderOf_coprime_p_of_not_mem_conj hG hyp hW hP)
+  exact Nat.Coprime.mul_right (orderOf_coprime_p_of_not_mem_conj hG hyp hfrob hW hP)
     (orderOf_coprime_q_of_not_mem_conj hG hyp hTII hW hQ)
 
 end OddOrder.Peterfalvi.S16
