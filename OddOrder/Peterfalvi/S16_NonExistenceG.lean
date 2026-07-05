@@ -4711,13 +4711,45 @@ structure CaseBContradictionData {hyp : Hypothesis (G := G)}
   pairing_ne_zero :
     ClassFunction.inner betaL psiImg ≠ 0
 
-/-- **Faithful §16 producer for the (14.16) case-(b) contradiction inputs.**  Under case-(b) and the
-two gap inequalities, the (14.11.2)/(13.19.c) expansion of `β_L^τ`, the (4.1) orthogonality, and the
-(14.14.b) pairing assemble into `CaseBContradictionData`.  The expansion bottoms out in the §3/§4
-Dade-isometry layer (as for `betaM_expansion_data`); the axes-odd input is the already-honest
-`exists_typeI_eta_axes_odd_of_caseB_gap`. -/
-noncomputable def caseB_contradiction_data [Finite G] [Fintype G]
-    [Invertible (Nat.card G : ℂ)] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The (14.16) expansion input** — the remaining §13-gated character content of the case-(b)
+contradiction.  Under case-(b) (`(q,p) = (3,5)`) and the two gap inequalities, (13.19.c) applies
+on both sides and assembles the (14.11.2)-style signed `η`-grid expansion of the L-side
+`β_L^τ = Σ ±η_ij − (±ζ_i^ν)` — the removed unit-norm member is an `L`-family coherent image
+(index `i ≠ ind1H`; the `−ψ̄^{τ₁}` alternative is the conjugate family member, `conjIndex`) —
+and the M-side (14.11.2) norm count makes `ψ^{τ₁} = ζ_M^ν` orthogonal to the whole `η`-grid.
+Named §16 obligation (the (13.19)-type grid counting, issue 3002 sphere). -/
+theorem caseB_expansion_input [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
+    (dataL : TypeICoherent78Data nc.Ldata.L) (dataM : TypeICoherent78Data nc.Mdata.M)
+    (hq3 : hyp.base.q = 3) (hp5 : hyp.base.p = 5)
+    (hhv :
+      ((nc.h - 1 : ℕ) : ℚ) / ((hyp.base.p * hyp.base.q : ℕ) : ℚ) >
+        ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ))
+    (hvu :
+      ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
+        ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)) :
+    ∃ signs : Fin hyp.base.q → Fin hyp.base.p → ℤ,
+      (∀ i j, signs i j = 1 ∨ signs i j = -1) ∧
+      ∃ i : Fin (dataL.n + 1), i ≠ dataL.ind1H ∧
+      ∃ ε : ℤ, (ε = 1 ∨ ε = -1) ∧
+        (dataL.h78 _hG).beta
+          = (∑ i' : Fin hyp.base.q, ∑ j : Fin hyp.base.p,
+              (signs i' j : ℂ) • hyp.base.eta i' j)
+            - (ε : ℂ) • ((dataL.h78 _hG).nu ((dataL.h78 _hG).hyp76.zeta i)) ∧
+        ∀ (i' : Fin hyp.base.q) (j : Fin hyp.base.p),
+          ClassFunction.inner (hyp.base.eta i' j)
+            ((dataM.h78 _hG).nu
+              ((dataM.h78 _hG).hyp76.zeta (dataM.h78 _hG).zetaDistinct)) = 0 := by
+  sorry
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Faithful §16 producer for the (14.16) case-(b) contradiction inputs.**  The case-(b)
+pairing comes from the enriched `OrthogonalitySwitchData.caseB_pairing` ((7.9) dichotomy);
+the `χ_L ⊥ ψ^{τ₁}` orthogonality is the proven (4.1) cross-orthogonality
+`pair_cross_orthogonal`; the remaining (13.19.c)/(14.11.2) grid content is the named
+`caseB_expansion_input`. -/
+theorem caseB_contradiction_data [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
     (data : OrthogonalitySwitchData nc) (hcaseB : data.caseB)
     (hhv :
@@ -4726,8 +4758,29 @@ noncomputable def caseB_contradiction_data [Finite G] [Fintype G]
     (hvu :
       ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
         ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)) :
-    CaseBContradictionData nc := sorry
+    Nonempty (CaseBContradictionData nc) := by
+  obtain ⟨hq3, hp5⟩ := data.caseB_params hcaseB
+  obtain ⟨dataL, dataM, hpair⟩ := data.caseB_pairing hcaseB _hG
+  obtain ⟨signs, hsigns, i, hi, ε, hε, hexp, horth⟩ :=
+    caseB_expansion_input _hG dataL dataM hq3 hp5 hhv hvu
+  have hjne : (dataM.h78 _hG).zetaDistinct ≠ dataM.ind1H := by
+    have h := (dataM.h78 _hG).zetaDistinct_ne_ind1H
+    rwa [dataM.h78_ind1H_eq] at h
+  refine ⟨{
+    betaL := (dataL.h78 _hG).beta
+    chiL := (ε : ℂ) • ((dataL.h78 _hG).nu ((dataL.h78 _hG).hyp76.zeta i))
+    psiImg := (dataM.h78 _hG).nu ((dataM.h78 _hG).hyp76.zeta (dataM.h78 _hG).zetaDistinct)
+    signs := signs
+    signs_pm_one := hsigns
+    betaL_expansion := hexp
+    eta_orthogonal_psi := horth
+    chiL_orthogonal_psi := ?_
+    pairing_ne_zero := hpair }⟩
+  rw [ClassFunction.inner_smul_left,
+    pair_cross_orthogonal dataL dataM _hG nc.Ldata.L_maximal nc.Mdata.M_maximal
+      nc.not_conj hi hjne, mul_zero]
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (14.16)**: character-theoretic endpoint of the exceptional
 case.  The two strict gap inequalities let (13.19.c) be applied on both the
 S- and T-sides, giving the same signed `eta_ij` expansion as in (14.11.2) for
@@ -4748,11 +4801,8 @@ theorem caseB_character_contradiction_of_gap_inequalities
       ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
         ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)) :
     False := by
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Invertible (Nat.card G : ℂ) :=
-    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   -- The (14.11.2)-style signed `eta_ij` expansion of `beta_L^tau` and its orthogonalities.
-  obtain ⟨betaL, chiL, psiImg, signs, _hsigns, hexp, heta_orth, hchiL_orth, hpair_ne⟩ :=
+  obtain ⟨⟨betaL, chiL, psiImg, signs, _hsigns, hexp, heta_orth, hchiL_orth, hpair_ne⟩⟩ :=
     caseB_contradiction_data _hG data hcaseB hhv hvu
   -- `(beta_L^tau, psi^tau_1) = 0` by linearity + orthogonality, contradicting case-(b).
   refine hpair_ne ?_
