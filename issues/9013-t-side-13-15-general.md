@@ -82,3 +82,24 @@ cite で close (sorry 8→5 目安)。
 - **⟹ 案 A の generic §13 に d=1 (T-side (13.12)) を含める**と、(14.9) char body の linchpin が解ける
   (v=|V| 接続 → `|calT1|=(v−1)/p`)。char apparatus (calT1 orbit count / S07 coherence instance / β_S bridge) は
   d=1 と独立の large follow-on ゆえ c が |V| 版で並行 build 可 (最終 v 置換のみ d=1 待ち)。
+
+## 🔻 追記² (2026-07-06 lane c、(14.9) char body count assembly で確定) — char body の gate = lane-b S15 reconciliation
+
+(14.9) char body の calT1 count を subagent が assemble 着手 (commit 17a5bdc7): **ungated glue は完成・green**
+(`calT1_image_induce_card_eq` = orbit-count engine [T:QV]=p 特化 / `T_derivedSubgroupOf_normal`、+ 既landing
+`OrbitOnIrr`/`FrobeniusGroupQuotient`)。だが `|calT1|=(|V|−1)/p` の残り2前提は **type-III branch で lane-b S15 gated**
+(`#print axioms` 検証済):
+
+1. **V abelian**: `typeP_hall_derived_eq_and_abelian` (BG 15.1b) は **(κ∪σ)'-Hall complement U** の abelian のみ
+   (`T'=U⊔Mσ`)。Hypothesis の **V** (Q=M_F の complement、`T'=Q⊔V`) に届くには `M_F=Mσ` = **IsTypeP2 T** 要。
+   type-III は `M_F ⊊ Mσ` 厳密ゆえ届かず。⟹ V abelian は `reconciled_typePData_T` (S15:sorried) 経由でのみ。
+2. **Frobenius V⋊W₂** (`I_T(inflate θ)=QV` 用): 唯一 source `S11.typeP_uW1_frobenius` は `.U=V,.W1=W₂` の
+   `TypePData T` 要 = `reconciled_typePData_T` (sorryAx: W2_le/centralizer_W1 消費)。
+
+⟹ **char body の 3 前提 = lane-b S15 に集約**: `reconciled_typePData_T` (V-abelian + Frobenius、Hypothesis 抽象
+V/W₂ ⇄ type-P 構造の reconciliation) + **d=1** (v=|V|)。S07 coherence / β_S bridge も同 gated facts を消費。
+
+**⟹ C は (14.9) の ungated infra を全 build 完了** (reduction→skeleton→foundation→orbit-count engine→Frobenius
+transport→structural glue、全 proven/green)。char body は lane-b の `reconciled_typePData_T` + `d=1` landing 待ち
+(consume 態勢)。案 A の §13 generalization に **`reconciled_typePData_T` の discharge (or type-III-usable な
+V-abelian/Frobenius export)** を含めれば C が即 cite で count→coherence→β_S→ratio を組める。

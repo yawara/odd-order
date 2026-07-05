@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.AppC_NormSet
+import OddOrder.GroupTheory.RepresentationTheory.OrbitOnIrr
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
 import OddOrder.Peterfalvi.S15_SAndT
 import OddOrder.Peterfalvi.S16_NonExistenceGCore
@@ -150,6 +151,60 @@ theorem T_card_quot_Q_derived_eq_card_V [Finite G] (hyp : Hypothesis (G := G)) :
   rw [Nat.card_congr (T_Q_isComplement_V_derived hyp).symm.QuotientMulEquiv.toEquiv,
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hV_le).toEquiv]
 
+/-- **`(QV = T')` is normal in `↥T` with index `p`** (`T = T' ⋊ W₂`, `p = |W₂|`).  The
+`↥T`-side normal subgroup and the `[T:QV] = p` degree/orbit factor consumed by the `calT1` count,
+repackaged from `T_derived_index_eq_p` as a statement about `(derivedInG T).subgroupOf T`
+(the shape `card_image_induce_eq_div` needs: `H.index` for `H ◁ ↥T`). -/
+theorem T_derivedSubgroupOf_normal (hyp : Hypothesis (G := G)) :
+    ((derivedInG hyp.base.T).subgroupOf hyp.base.T).Normal := by
+  rw [show (derivedInG hyp.base.T).subgroupOf hyp.base.T = _root_.commutator ↥hyp.base.T by
+    rw [derivedInG, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective hyp.base.T.subtype_injective]]
+  infer_instance
+
+open scoped Classical in
+/-- **The `calT1` orbit count, ungated engine** — Peterfalvi (14.9), Coq
+`PFsection14.v:836--845` `size calT1 = (v.-1) %/ p`, the *cardinality* half.
+
+Given any conjugation-invariant `Finset` `𝒯 ⊆ Irr(QV)` (`QV = T' = derivedInG T`, normal in `↥T`)
+whose every member induces irreducibly to `T` (equivalently has inertia `I_T(θ) = QV`), the map
+`θ ↦ Ind_{QV}^T θ` is exactly `[T:QV] = p`-to-one onto its image, so
+
+  `|{Ind_{QV}^T θ | θ ∈ 𝒯}| = |𝒯| / p`.
+
+This is the direct §16 specialization of the shared-infra orbit count
+`RepresentationTheory.card_image_induce_eq_div` with `G := ↥T`, `H := QV.subgroupOf T`, and the
+index `[T:QV] = p` plugged in via `T_derived_index_eq_p`.  It is **ungated** (no `IsTypeII`/`IsTypeP2`
+input, no `sorry`): the two facts entering are supplied by the caller as `𝒯`'s
+conjugation-invariance and irreducible-induction (inertia `= QV`) hypotheses.  For the `calT1`
+assembly `𝒯` is the non-principal inflated `Irr(QV/Q)`-family, `|𝒯| = |V| − 1`
+(the `|Irr(QV/Q)| = |QV/Q| = |V|` count, gated on `V` abelian — see the blocker map on
+`T_typeIII_ratio_le`), yielding `|calT1| = (|V| − 1)/p`.
+
+The `Fintype`/`Invertible` instances are taken explicitly (satisfiable from `Finite G`) so the
+`induce`-image in the statement type-checks, matching the shared-infra convention. -/
+theorem calT1_image_induce_card_eq [Finite G] (hyp : Hypothesis (G := G))
+    [Fintype ↥hyp.base.T] [Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
+    [Invertible (Nat.card ↥hyp.base.T : ℂ)]
+    [Invertible (Nat.card ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) : ℂ)]
+    (hQVnormal : ((derivedInG hyp.base.T).subgroupOf hyp.base.T).Normal)
+    (𝒯 : Finset (OddOrder.RepresentationTheory.IrreducibleCharacter
+      ((derivedInG hyp.base.T).subgroupOf hyp.base.T)))
+    (hconj : ∀ θ ∈ 𝒯, ∀ g : ↥hyp.base.T,
+      OddOrder.RepresentationTheory.IrreducibleCharacter.conjBy
+        (G := ↥hyp.base.T) (H := (derivedInG hyp.base.T).subgroupOf hyp.base.T) g θ ∈ 𝒯)
+    (hinertia : ∀ θ ∈ 𝒯,
+      OddOrder.RepresentationTheory.IrreducibleCharacter.inertia
+          (G := ↥hyp.base.T) (H := (derivedInG hyp.base.T).subgroupOf hyp.base.T) θ
+        = (derivedInG hyp.base.T).subgroupOf hyp.base.T) :
+    (𝒯.image (fun θ => OddOrder.RepresentationTheory.ClassFunction.induce
+        ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction)).card
+      = 𝒯.card / hyp.base.p := by
+  haveI := hQVnormal
+  -- The shared-infra orbit count `|image| = |𝒯| / [T:QV]`, with `[T:QV] = p`.
+  rw [OddOrder.RepresentationTheory.card_image_induce_eq_div 𝒯 hconj hinertia,
+    T_derived_index_eq_p hyp]
+
 /-- **Peterfalvi (14.9), the character body** — the structural `≤` half of the ratio comparison, the
 sole deep obligation of (14.9).  Coq `PFsection14` `FTtypeP_min_typeII`, lines 737--853: assuming `T`
 is type III, build `calT1 = seqIndD QV T QV Q` (the degree-`p` induced characters of `T`, from
@@ -209,19 +264,44 @@ degree_sq` — *not* the quotient-restricted `Irr(QV/Q)` family with a `W₁`-or
    `S09.cfdot_real_vchar_even`), then `orthogonal_split` + Bessel.  `Γ` needs the full S-side
    (13.x)/(14.x) βₛ construction (cf. the `S16_NonExistenceG` βₛ-grid sorry at ~line 6377).
 
-Escape-hatch conclusion (updated 2026-07-06, lane-c): item 2b's two rep-theory bricks are now both
-landed as reusable shared infra — (b1) `Isaacs.Ch06.isFrobeniusGroup_map_equiv`
-(`FrobeniusGroupQuotient.lean`, Frobenius transport across an iso) and (b2)
-`RepresentationTheory.mem_inertia_compHom_iff` (`ConjugationBrauer.lean`, the inertia/inflation
-bridge) — joining the `/p` orbit count `card_image_induce_eq_div` (`OrbitOnIrr.lean`) and the
-group-theoretic foundation (`T_derived_index_eq_p`, `T_Q_isComplement_V_derived`,
-`T_card_quot_Q_derived_eq_card_V`).  With these, `I_T(inflate θ) = QV` is a direct transcription of
-the (6.8)(c2) assembly template `S08.inertia_eq_H_of_c2` (specialized `H = QV`, `W₁ = W₂`,
-`M = Q.subgroupOf QV`), whence `|calT1| = (|V|−1)/p`.  What remains for the character body is now
-*not* missing infra but the remaining (14.9) **assembly + gating**: item 1 (`v = |V|`, i.e. (13.12)
-`d = 1`), the Bonus-b3 type-III re-derivation of `V` abelian (Coq `cVV`, currently `IsTypeII`-gated in
-`S15.isMulCommutative_V`), item 3 (the T-side coherence package `S07.Hypothesis`) and item 4 (the
-S-side `Γ` bridge).  Those remain the documented residual of the character body. -/
+Escape-hatch conclusion (**revised 2026-07-06, lane-c, axiom-verified** — supersedes the earlier
+"Bonus-b3 re-derivation" framing, which understated the gate).  The *ungated* structural glue is
+landed and green: `T_derived_index_eq_p` (`[T:QV] = p`), `T_Q_isComplement_V_derived`,
+`T_card_quot_Q_derived_eq_card_V` (`|QV/Q| = |V|`), `T_derivedSubgroupOf_normal` (`QV ◁ ↥T`), and
+the assembled orbit-count engine `calT1_image_induce_card_eq` below (a direct §16 specialization of
+the shared-infra `RepresentationTheory.card_image_induce_eq_div` with `[T:QV] = p` substituted:
+`|{Ind_{QV}^T θ | θ ∈ 𝒯}| = |𝒯|/p` for any conj-invariant `𝒯 ⊆ Irr(QV)` with inertia `= QV`).
+
+But the two facts that must feed that engine to obtain `|calT1| = (|V|−1)/p` are **both genuinely
+gated behind `IsTypeP2 T`** (equivalently `IsTypeII T`, `proposition_type_classification`), which is
+**FALSE in this type-III branch** (`IsTypeIII T ⟹ IsTypeP1 T ∧ M_F ≠ M_σ`, `¬ IsTypeP2 T`):
+
+* **`V` abelian** (needed for `|Irr(QV/Q)| = |QV/Q| = |V|`, the `𝒯.card = |V|−1` input via
+  `card_irreducibleCharacter_eq_card_of_commGroup`).  The BG 15.1(b) producer
+  `typeP_hall_derived_eq_and_abelian` proves abelianness of the `(κ∪σ)'`-**Hall** complement `U`
+  (with `T' = U ⊔ M_σ`), and its only route to abelianness of *our* `V` (the complement to
+  `Q = M_F`, `T' = Q ⊔ V`) is the type-P2 identification `M_F = M_σ`
+  (`isHall_kappaSigmaCompl_of_isTypeP2_complement`, `msigma_isNilpotent_of_isTypeP2`).  For type III
+  `M_F ⊊ M_σ` strictly, so `V ⊓ M_σ ≠ ⊥` (`|V ⊓ M_σ| ≥ |M_σ|/|M_F| > 1`) and the abelianness route
+  `⁅V,V⁆ ≤ V ⊓ M_σ = ⊥` fails; `S15.isMulCommutative_V` additionally routes through the sorried
+  `reconciled_typePData_T`.  Coq `cVV` holds for all type-P, but its type-III Lean proof needs a
+  *different* argument (not 15.1(b)) and is not landed.
+* **The Frobenius `V ⋊ W₂`** (needed for the inertia input `I_T(inflate θ) = QV` via
+  `inertia_eq_of_frobeniusGroup` ∘ `isFrobeniusGroup_map_equiv` ∘ `mem_inertia_compHom_iff`).  Its
+  only repo source is `S11.typeP_uW1_frobenius` fed a `TypePData T`.  The unique `TypePData T` with
+  `.U = V ∧ .W1 = W₂` is `reconciled_typePData_T`, which has `sorryAx` (5 sorried fields; the
+  Frobenius transitively **consumes** its sorried `W2_le` + `centralizer_W1` via `typeP_W1_fpf_U`).
+  The only *sorry-free* `TypePData T` producers (`typePData_of_kappaHall_hallComplement`,
+  `exists_typePData_W1_eq_of_isTypeP2`, `typePData_of_isTypeNonI`) either require `IsTypeP2 T` or
+  yield the intrinsic κ-Hall factors (not `V`/`W₂`).  (Verified by `#print axioms`.)
+
+So the (14.9) character-body residual is **not** merely items 3/4 plus a "bonus" re-derivation: it
+requires **new T-side type-III mathematics** — an honest type-III proof of `V` abelian and of the
+`V ⋊ W₂` Frobenius (equivalently: discharging the T-side type-P reconciliation
+`reconciled_typePData_T` for the specific abstract `V`/`W₂`), neither on the type-P2 path.  These
+join item 1 (`v = |V|`, i.e. (13.12) `d = 1`, separately lane-b-gated), item 3 (the T-side coherence
+package `S07.Hypothesis`), and item 4 (the S-side `Γ` bridge).  The count engine
+`calT1_image_induce_card_eq` isolates exactly where the two gated facts enter. -/
 theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T) :
     ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) ≤
