@@ -783,6 +783,8 @@ it is nontrivial on the `W₁`-conjugation basis `x_w` of `H̄` (as `Ĥ' ≠ 1`)
 `#|D(x_{w₁}, x_{w₂})| = p`; the exponent relation and odd `#|W₁/H₀|` then give `phi = phi⁻¹`. -/
 theorem caseA_commutator_chain [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (hpK : IsPGroup chief.p ↥data.H) (hNcomm : chief.N = commutator ↥data.H)
+    (hNne : chief.N ≠ ⊥)
     {S₀ : Subgroup (↥data.H ⧸ chief.N)} (hcardS₀ : Nat.card ↥S₀ = chief.p)
     (hmem : ∀ (v : ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))),
       ∀ s ∈ S₀, quotientMulAutHom chief.N_aInvariant ↑v s ∈ S₀) :
