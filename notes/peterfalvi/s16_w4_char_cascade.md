@@ -1565,3 +1565,27 @@ e·Σθᵢ(1)²=|H|−1, Mackey fiber 経由) を landing (`d6328cfe`)。
      gate に接続予定)。
 - 消費側 (次): eta_grid_galois_facts_on_G0 の G0-接続 (orderOf_coprime_pq_of_not_mem_conj
   は assembly 済・T-side 待ち)、b の (3.9.a/c) S15 供給着き次第 wire。
+
+### cont.⁵⁶ (2026-07-05 lane c /loop it.4-5): (14.11.3) 消費側 wiring + T-side engine + (14.16) 設計確定
+
+**landed (5ffcb7d2 / 5fb560bd)**:
+- `MHypothesis.G0_avoid` field (実供給) + `G0_orderOf_coprime` 実証明 — (14.11.3) support 半分が
+  Mdata-level で consumable。named frontier = `s_side_frobenius_kernel` ((14.6)) /
+  `t_side_frobenius_kernel` ((14.4))、両方とも放電 engine (FND / TFieldModelData transport) proven 済。
+- **T-side field-model engine**: `TFieldModelData` (minimal (14.4) carrier: σ : F_{q^p}⋊V* ↪ G,
+  kernel↦Q, complement↦V) + `derived_inf_centralizer_le_Q` transport 実証明 (generic FPF 補題の
+  (q,p)-swap 流用)。供給 = T_side_caseB_facts/9000 圏。
+- AxiomsCheck: `commute_inl_mem_range_inl` + `FieldNormalizerData.derived_inf_centralizer_le_P`
+  = **axiom-clean 登録済**。chain 5 本は W1_le_Q → reconciled_typePData_T 経由 sorryAx 継承
+  (T-side reconciliation 閉了で自動 clean、AxiomsCheck コメント記録)。
+
+**(14.16) caseB_contradiction_data の設計確定 (次 iteration 実装)**:
+- 判明: `OrthogonalitySwitchData.caseB` は opaque Prop で (q,p)=(3,5) しか運ばず、Pf (14.14.b) の
+  定義 (**case b = (β_L^τ, ψ^{τ₁}) ≠ 0**) を落としている → producer の `pairing_ne_zero` が
+  abstract data から導出不能 (betaSigns と同類の abstraction 欠損)。
+- **fix (c 所有)**: OSD に caseB-pairing 義務 field を追加 (canonical L-side β^τ と
+  nc.Mdata.tau1 nc.Mdata.psi の inner ≠ 0)。供給 = `pairing_dichotomy` (S16_PairingCoherence、
+  pairing-level で proven 露出済 ✓) を orthogonality_switch の実装で thread
+  (60b9b6b6 の L/M-識別 wiring 流用)。その後 producer を再構成: pairing = OSD field /
+  chiL 直交 = `pair_cross_orthogonal` / 残 = betaL 展開 + η⊥ψ ((13.19.c)/(14.11.2)-L、b 圏) に
+  精密 isolate。
