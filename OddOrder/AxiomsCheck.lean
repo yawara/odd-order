@@ -7177,3 +7177,15 @@ conjugacy), and the type-`P₁` core (`kstar_isHall_sigmaM_of_partner` = Coq `Pt
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.non_disjoint_signalizer_frobenius
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.kstar_isHall_sigmaM_of_partner
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.exists_conj_smul_eq_of_le_of_card_prime
+
+/-! **Peterfalvi (14.11.3) support half, axiom-clean core** (`S16_G0Coprime`, lane c/γ).
+The concrete Frobenius-kernel model (`commute_inl_mem_range_inl`: in `F ⋊ U*` an element
+commuting with a nontrivial additive point lies in the kernel) and its `σ`-transport
+(`FieldNormalizerData.derived_inf_centralizer_le_P`: `C_{S'}(x) ≤ P` for `x ∈ P#` from the
+(14.2.a) carrier) — the (14.6)/(13.12) discharge engine for the `hfrob` input of the
+(14.11.3) coprimality chain.  (The chain lemmas themselves — `not_mem_conjClassSet_sharp_W`,
+`orderOf_coprime_p_of_not_mem_conj`, … — are fully proven but inherit `sorryAx` from the
+`W₁ ≤ Q`/`reconciled_typePData_T` upstream cites; they join this list when the T-side
+reconciliation closes.) -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.commute_inl_mem_range_inl
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.derived_inf_centralizer_le_P
