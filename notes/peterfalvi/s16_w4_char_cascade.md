@@ -1701,3 +1701,23 @@ sorry が増えた (各 step は honest だが)。次は **`card_kernel_coprime_
 系。M_F の σ-primes vs {p,q}⊆σ(S)∪σ(T) の disjointness を、M≁S,T (nc) から σ-decomposition で。
 これが closable なら実 sorry 減。Dade gate 2 は §8 ftThickenedSupport 元構造 (x·R(x)) +
 signalizer coprime = より深い。
+
+### cont.⁶¹ (2026-07-05 lane c /loop) — ✅ σ-gate 閉鎖: card_kernel_coprime_pq 実証明 (sorry 9→8)
+
+cont.⁶⁰ の σ-gate を **既存 σ 機構で閉じた** (commit `a8cc5de9`、実 sorry 減):
+`Coprime |M_F| (p·q)` を組立 —
+- M_F=M_σ / S_σ=P / T_σ=Q (`maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II` +
+  `P_eq_SF`/`Q_eq_TF`)。
+- p∈σ(S) は **p=|W₂| ∣ |P|=|S_σ|** (`W2_le_P`) + `primeFactors_Msigma_eq_sigma`
+  で足りる (`card_P_eq` 経由の p^q は不要)。q∈σ(T) 対称 (`W1_le_Q`)。
+- M≁S,T = `not_conj_of_isTypeI_of_isTypeNonI` (type-I vs type-II、`isTypeII_of_isTypeP2`/
+  `T_typeII`) → `sigma_disjoint_of_nonconjugate` → p,q∉σ(M) → ∤|M_F| → Coprime。
+教訓: 「gate を割る」→「閉じる」への転換成功。既存 σ-API (S10Interface/S13/S16) が完備。
+
+**残 (13.19.a) gate = `dadeSupport_not_coprime_card_kernel` (:4809) のみ — 深い**:
+Ã(M) の元 y は ¬Coprime(orderOf y, |M_F|)。証明経路 = `dadeSupport_eq_ftThickenedSupport`
+→ y~x·r (`ftThickenedSupport` def, x∈A=typeIA, r∈`ftSupportKernel M A x`=R(x)) →
+x∈A1=`sigmaSharp`=M_σ^# (`A1_eq_sigmaSharp_of_typeI_or_II`) ゆえ 1<orderOf x ∣ |M_F| →
+**orderOf x ∣ orderOf y が crux = R(x) が M_F と coprime (signalizer)**。この signalizer
+coprimality の直 lemma は **repo に不在** (§8/BG 級) → 次 iteration で `ftSupportKernel`
+(S10:592) 構造を精読して新規 or 深掘り。h78→hyp76→hyp71→hyp の A 同定 plumbing も要。
