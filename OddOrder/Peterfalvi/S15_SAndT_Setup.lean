@@ -629,6 +629,19 @@ structure CharacterDegreeData (hyp : Hypothesis (G := G)) where
     ∀ θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ,
       OddOrder.RepresentationTheory.IsIrreducibleCharacter θ →
       tau1S (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ) ∈ ZIrr G
+  /-- **Peterfalvi (13.3.a)+(13.3.c), the distinguished `μ`-column** (issue 2035/(13.9.a)): there
+  is a column `j` whose sum `μ_j = ∑_i μ_{ij}` is induced from a linear character of `H = PC`
+  (13.3.a) and whose `τ₁`-image is `±∑_i η_{i1}` — the (13.3.c) formula routed to the `η`-column
+  `1` (`j = 1, δ = 1` normally; the `p = 3` sign-flip exception gives `δ = -1`).  What (13.9.a)
+  reads: `λ^{τ₁}` agrees with `δ ∑_i η_{i1}` on `G₀` through `Ind(μ_j − λ)`-vanishing. -/
+  mu_col_tau1_eta_col_one :
+    haveI := hyp.finiteG
+    ∃ (j : Fin hyp.p) (δ : ℤ) (θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ),
+      (δ = 1 ∨ δ = -1) ∧
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter θ ∧ θ 1 = 1 ∧
+      (∑ i : Fin hyp.q, hyp.mu i j) = ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ ∧
+      tau1S (∑ i : Fin hyp.q, hyp.mu i j)
+        = (δ : ℂ) • ∑ i : Fin hyp.q, hyp.eta i ⟨1, hyp.p_prime.one_lt⟩
   /-- **Peterfalvi (4.1)+(5.3.b): the `η`-grid is orthogonal to the τ₁-image of the induced
   family** (issue 2034): the coherence extension lands in the orthogonal complement of the
   `σ`-image grid.  With the (3.2.d) completeness (`vanish_of_inner_eta_eq_zero`) this forces
