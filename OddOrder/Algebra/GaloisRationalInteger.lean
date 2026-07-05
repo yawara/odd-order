@@ -402,4 +402,33 @@ theorem one_le_prod_normSq_of_mem_ZIrr_of_cyclicClosed {G : Type*} [Group G] [Fi
     exact_mod_cast Int.one_le_abs hz0
   nlinarith [hzabs, norm_nonneg ((z : ℂ))]
 
+open OddOrder.RepresentationTheory in
+/-- **Virtual characters have integer degree**: `φ(1) ∈ ℤ` for `φ ∈ ℤ[Irr G]` — irreducible
+characters have `χ(1) = dim ∈ ℕ` (`Representation.char_one`), and the value at `1` is
+`ℤ`-linear in `φ`. -/
+theorem exists_int_apply_one_of_mem_ZIrr {G : Type*} [Group G] [Finite G]
+    {φ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G) :
+    ∃ z : ℤ, φ 1 = (z : ℂ) := by
+  induction hφ using Submodule.span_induction with
+  | mem x hx =>
+      obtain ⟨V, _, _, _, ρ, hchar⟩ := IsIrreducibleCharacter.isCharacter hx
+      refine ⟨Module.finrank ℂ V, ?_⟩
+      rw [show x 1 = ρ.character 1 from congrFun hchar 1, Representation.char_one]
+      push_cast
+      ring
+  | zero => exact ⟨0, by simp⟩
+  | add a b _ _ ha hb =>
+      obtain ⟨za, hza⟩ := ha
+      obtain ⟨zb, hzb⟩ := hb
+      refine ⟨za + zb, ?_⟩
+      rw [ClassFunction.add_apply, hza, hzb]
+      push_cast
+      ring
+  | smul n a _ ha =>
+      obtain ⟨za, hza⟩ := ha
+      refine ⟨n * za, ?_⟩
+      rw [ClassFunction.zsmul_apply, hza, zsmul_eq_mul]
+      push_cast
+      ring
+
 end OddOrder.Algebra

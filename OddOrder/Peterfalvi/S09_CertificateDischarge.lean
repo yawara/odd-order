@@ -791,67 +791,71 @@ noncomputable def hypothesis76OfFamily
     (hcover : ∀ φ : IrreducibleCharacter ↥(H.subgroupOf L),
       ClassFunction.induce (H.subgroupOf L) (φ : ClassFunction _ ℂ) ∈
         Set.range (fun i => ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ))) :
-    Hypothesis76 G A L := by
-  classical
+    Hypothesis76 G A L :=
   haveI hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
-  -- The induced family `ζ` and degree ratios `d`.
-  set ζ : Fin (n + 1) → ClassFunction ↥L ℂ :=
-    fun i => ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ) with hζ
-  set d : Fin (n + 1) → ℂ := fun i => ζ i (1 : ↥L) / ζ 0 (1 : ↥L) with hd
-  have hz0 : ζ 0 (1 : ↥L) ≠ 0 := induce_apply_one_ne_zero _ (θ 0)
-  have hdeg : ∀ i, ζ i (1 : ↥L) = d i * ζ 0 (1 : ↥L) := fun i => by
-    rw [hd]; field_simp
-  -- Support characterization: `x ∈ supportInSubgroup A L ↔ (x:G) ∈ H ∧ (x:G) ≠ 1`.
-  have hAchar : ∀ x : ↥L, x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L ↔
-      ((x : G) ∈ H ∧ (x : G) ≠ 1) := fun x => by
-    rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup, hAH]
-    simp only [Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
-  -- `x ≠ 1` in `↥L` is equivalent to `(x:G) ≠ 1`.
-  have hne_one : ∀ x : ↥L, (x : G) ≠ 1 ↔ x ≠ 1 := fun x => by
-    rw [not_iff_not]
-    constructor
-    · intro h; exact Subtype.ext (by rw [h, Subgroup.coe_one])
-    · intro h; rw [h, Subgroup.coe_one]
-  -- `ζ_i` vanishes off `H`.
-  have hvanish : ∀ (i : Fin (n + 1)) (x : ↥L), (x : G) ∉ H → ζ i x = 0 := fun i x hxH => by
-    rw [hζ]
-    exact ClassFunction.induce_eq_zero_of_not_mem_normal _ (by rwa [Subgroup.mem_subgroupOf])
-  -- `ψ_i = ζ_i − d_i ζ_0` is supported on `A = H^#`.
-  have hpsupp : ∀ i, (ζ i - d i • ζ 0).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup A L := fun i => by
-    rw [hζ]
-    refine (induce_diff_support (θ i) (θ 0) (d i) (hdeg i)).trans ?_
-    intro x hx
-    rw [Set.mem_diff, SetLike.mem_coe, Subgroup.mem_subgroupOf, Set.mem_singleton_iff] at hx
-    rw [hAchar]
-    exact ⟨hx.1, (hne_one x).mpr hx.2⟩
-  -- Geometric inputs for `chiRho_decomp_induced`, phrased through `K = H.subgroupOf L`.
-  have hAK_off : ∀ x : ↥L, x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L →
-      x ∈ H.subgroupOf L := fun _ => supportInSubgroup_sharp_subset_subgroupOf H hAH
-  have hA_one : (1 : ↥L) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup A L :=
-    one_not_mem_supportInSubgroup_sharp H hAH
-  have hAconj : ∀ g h : ↥L,
-      h * g * h⁻¹ ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L ↔
-      g ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L :=
-    fun g h => supportInSubgroup_sharp_conj_mem_iff H hAH hHnorm g h
-  -- Assemble the structure; `chiRho_decomp` is discharged by `chiRho_decomp_induced`.
-  exact
-    { hyp71 := H71
-      isDadeIsometry := hτ
-      H := H
-      H_le_L := hHL
-      H_normal_in_L := hHnorm
-      A_eq_H_sharp := hAH
-      n := n
-      zeta := ζ
-      d := d
-      zeta_eq_zero_of_not_mem_H := hvanish
-      zeta_one_eq_d_mul := hdeg
-      psi_support := hpsupp
-      chiRho_decomp := by
-        intro χ x hx
-        exact chiRho_decomp_induced H71 (H.subgroupOf L) θ d hpsupp hinj hcover hdeg hAconj
-          hAK_off hA_one χ hx }
+  { hyp71 := H71
+    isDadeIsometry := hτ
+    H := H
+    H_le_L := hHL
+    H_normal_in_L := hHnorm
+    A_eq_H_sharp := hAH
+    n := n
+    -- The family and degree ratios are *literal* record fields (term-mode construction), so
+    -- `hypothesis76OfFamily_zeta` below is `rfl` — consumers can read the induced-ness of the
+    -- family definitionally (the Peterfalvi (13.5.a) integrality needs it).
+    zeta := fun i => ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ)
+    d := fun i => ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ) (1 : ↥L)
+      / ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L)
+    zeta_eq_zero_of_not_mem_H := fun _ x hxH =>
+      ClassFunction.induce_eq_zero_of_not_mem_normal _ (by rwa [Subgroup.mem_subgroupOf])
+    zeta_one_eq_d_mul := fun i => by
+      have hz0 : ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L) ≠ 0 :=
+        induce_apply_one_ne_zero _ (θ 0)
+      field_simp
+    psi_support := fun i => by
+      have hz0 : ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L) ≠ 0 :=
+        induce_apply_one_ne_zero _ (θ 0)
+      have hdeg : ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ) (1 : ↥L)
+          = (ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ) (1 : ↥L)
+              / ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L))
+            * ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L) := by
+        field_simp
+      refine (induce_diff_support (θ i) (θ 0) _ hdeg).trans ?_
+      intro x hx
+      rw [Set.mem_diff, SetLike.mem_coe, Subgroup.mem_subgroupOf, Set.mem_singleton_iff] at hx
+      rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup, hAH]
+      simp only [Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+      refine ⟨hx.1, fun h1 => hx.2 (Subtype.ext h1)⟩
+    zeta_induced := fun i => ⟨θ i, by congr! <;> exact Subsingleton.elim _ _⟩
+    zeta_family_cover := fun φ => by
+      obtain ⟨i, hi⟩ := hcover φ
+      exact ⟨i, hi.trans (by congr! <;> exact Subsingleton.elim _ _)⟩
+    chiRho_decomp := by
+      intro χ x hx
+      have hz0 : ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L) ≠ 0 :=
+        induce_apply_one_ne_zero _ (θ 0)
+      have hdeg : ∀ i, ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ) (1 : ↥L)
+          = (ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ) (1 : ↥L)
+              / ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L))
+            * ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L) := by
+        intro i
+        field_simp
+      have hpsupp : ∀ i, (ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ)
+          - (ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ) (1 : ↥L)
+              / ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L))
+            • ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ)).support ⊆
+          OddOrder.Peterfalvi.S04.supportInSubgroup A L := by
+        intro i
+        refine (induce_diff_support (θ i) (θ 0) _ (hdeg i)).trans ?_
+        intro y hy
+        rw [Set.mem_diff, SetLike.mem_coe, Subgroup.mem_subgroupOf, Set.mem_singleton_iff] at hy
+        rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup, hAH]
+        simp only [Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+        refine ⟨hy.1, fun h1 => hy.2 (Subtype.ext h1)⟩
+      exact chiRho_decomp_induced H71 (H.subgroupOf L) θ _ hpsupp hinj hcover hdeg
+        (fun g h => supportInSubgroup_sharp_conj_mem_iff H hAH hHnorm g h)
+        (fun _ => supportInSubgroup_sharp_subset_subgroupOf H hAH)
+        (one_not_mem_supportInSubgroup_sharp H hAH) χ hx }
 
 /-- **Construction of `Hypothesis76` from `(7.1)` data** (Peterfalvi (7.6)/(7.7.a)).  The induced
 family is the canonical `distinctInducedFamily` enumeration; this is `hypothesis76OfFamily`
@@ -871,6 +875,60 @@ noncomputable def hypothesis76OfDade
     invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
   exact hypothesis76OfFamily H71 hτ H hHL hHnorm hAH (distinctInducedFamily (H.subgroupOf L)).θ
     (distinctInducedFamily (H.subgroupOf L)).inj (distinctInducedFamily (H.subgroupOf L)).cover
+
+/-- **`Hypothesis76` from `(7.1)` data with the trivial-base normalization**: the
+`distinctInducedFamily` enumeration reindexed (by a transposition) so that
+`ζ₀ = Ind_H^L 1_H` — the induced principal character sits at the base index `0`
+(`hypothesis76OfDadeTrivialBase_zeta_zero`).  The (13.5)/(13.6) distinguished-index machinery
+(`exists_lambda_index`) needs the distinguished `λ = Ind_H^L θ` (`P ⊄ Ker θ`, in particular
+`θ ≠ 1_H`) to sit at a *positive* index; pinning the base to `θ = 1_H` guarantees it. -/
+noncomputable def hypothesis76OfDadeTrivialBase
+    {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L)
+    (hτ : OddOrder.Peterfalvi.S04.IsDadeIsometry (G := G) (k := ℂ) (L := L) H71.τ)
+    (H : Subgroup G) (hHL : H ≤ L)
+    (hHnorm : ∀ (l : ↥L) {h : G}, h ∈ H → (l : G) * h * (l : G)⁻¹ ∈ H)
+    (hAH : A = (H : Set G) \ {1}) :
+    Hypothesis76 G A L :=
+  haveI hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
+  haveI : Fintype ↥(H.subgroupOf L) := Fintype.ofFinite _
+  haveI : Invertible (Nat.card ↥(H.subgroupOf L) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  hypothesis76OfFamily H71 hτ H hHL hHnorm hAH
+    (fun i => (distinctInducedFamily (H.subgroupOf L)).θ
+      (Equiv.swap 0 (Classical.choose ((distinctInducedFamily (H.subgroupOf L)).cover
+        (trivialIrreducibleCharacter ↥(H.subgroupOf L)))) i))
+    (induce_family_comp_perm_injective (distinctInducedFamily (H.subgroupOf L)).inj _)
+    (induce_family_comp_perm_covering (distinctInducedFamily (H.subgroupOf L)).cover _)
+
+/-- **The trivial-base normalization pins `ζ₀ = Ind_H^L 1_H`.** -/
+theorem hypothesis76OfDadeTrivialBase_zeta_zero
+    {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L)
+    (hτ : OddOrder.Peterfalvi.S04.IsDadeIsometry (G := G) (k := ℂ) (L := L) H71.τ)
+    (H : Subgroup G) (hHL : H ≤ L)
+    (hHnorm : ∀ (l : ↥L) {h : G}, h ∈ H → (l : G) * h * (l : G)⁻¹ ∈ H)
+    (hAH : A = (H : Set G) \ {1}) :
+    haveI : Fintype ↥(H.subgroupOf L) := Fintype.ofFinite _
+    haveI : Invertible (Nat.card ↥(H.subgroupOf L) : ℂ) :=
+      invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+    (hypothesis76OfDadeTrivialBase H71 hτ H hHL hHnorm hAH).zeta 0
+      = ClassFunction.induce (H.subgroupOf L)
+          ((trivialIrreducibleCharacter ↥(H.subgroupOf L) : IrreducibleCharacter _) :
+            ClassFunction ↥(H.subgroupOf L) ℂ) := by
+  haveI hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
+  letI : Fintype ↥(H.subgroupOf L) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥(H.subgroupOf L) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  unfold hypothesis76OfDadeTrivialBase hypothesis76OfFamily
+  dsimp only
+  rw [Equiv.swap_apply_left]
+  have h := Classical.choose_spec ((distinctInducedFamily (H.subgroupOf L)).cover
+    (trivialIrreducibleCharacter ↥(H.subgroupOf L)))
+  dsimp only at h
+  exact h
 
 /-! ### (7.8.c) building blocks: the induced principal character on `A`
 
