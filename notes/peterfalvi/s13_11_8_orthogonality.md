@@ -1853,3 +1853,22 @@ char (typeII_coherence_contradiction_estimate) に gated、exists_zeta は gate-
   gate-1 threading (plumbing, char-gated), (11.5) char-gating (→lane-b typeII estimate)。
 - ⟹ lane-a frontier は群論 endgame から **char endgame** へ移行。深 char (gate-2, lane-b typeII) が
   真の残 FT content。次: gate-1 threading (my pieces wire, concrete) or gate-2 (deep char, 要 grind/delegate)。
+
+## 2026-07-05 update²² (lane-a) — **frontier inflection (code-level 検証): lane-a ungated 群論 完遂、残は gnarly plumbing or cross-lane-gated char**
+
+frontier 再評価 (code-level 検証済):
+- **lane-a の ungated 群論/構造は完遂**: 構造核 |M'ᵃᵇ|=[U:C] ✓ / commutator form (~490行) ✓ /
+  [U:C]=u ✓。gate-1 の全 math ピース sorry-free。
+- **gate-2 `coherent_Sset_of_column_identities` (11.8.6) は cross-lane-gated**: gluing infra
+  (coherentUnion_of_glued 等, S07) は在るが **(9.11) `sibleyTarget_H0C` (S11:6353 sorry) に gated**、
+  かつ (9.11) は docstring 明記で **§14-gated** + **lane-b の (6.8) `sibleySetup_is_coherent` proof
+  body 待ち**。⟹ 純 lane-a では埋まらない。
+- **gate-1 threading は gnarly plumbing**: card_SHCSet の |M'ᵃᵇ|=d sorry を閉じるには my pieces を
+  wire するが、(i) exists_zeta (spine) の params-internal + signature 変更 (multi-consumer)、
+  (ii) chief 非一意 (H U-irreducible→chief.N=⊥ の転送)、(iii) 結果は 11.5/11.7 経由 lane-b char-gated。
+  all-or-nothing (card_SHCSet 単独では caller exists_zeta が壊れる)。delicate、要 fresh-budget careful 実装。
+
+**⟹ inflection**: lane-a の高価値 ungated 群論 frontier 完遂。残 lane-a = (a) gate-1 threading
+(delicate spine plumbing, char-gated result), (b) gate-2/9.11 (deep char, §14/lane-b gated)。
+真の残 FT content は **char endgame** (lane-b typeII estimate, §14 structure, gate-2 char cascade)。
+次: gate-1 threading を fresh budget で careful に (my pieces を load-bearing 化)、or hub 再配分検討。
