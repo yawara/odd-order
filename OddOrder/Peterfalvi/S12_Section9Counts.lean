@@ -415,6 +415,66 @@ theorem Hypothesis.reducible_mem_sOf_H0_eq_muGrid_columnSum [Finite G]
       Equiv.apply_symm_apply, hχ₂']
     exact hind.symm
 
+open OddOrder.Peterfalvi.S11 in
+/-- **Reducible count of the full family** (`reducible_count_sOf_K` at `K = ⊥`): the full §9
+family `𝒮 = 𝒮(⊥)` has exactly `p − 1` reducible members. -/
+theorem reducible_count_sOf_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} {data : TypesIIIIIIVSetup M} (htype : IsTypeIII M ∨ IsTypeIV M)
+    (chief : ChiefFactorData data) :
+    {φ ∈ sOf data (⊥ : Subgroup G) | ¬ IsIrreducibleCharacter φ}.ncard = chief.p - 1 := by
+  classical
+  haveI : ((⊥ : Subgroup G).subgroupOf M).Normal := by
+    rw [Subgroup.bot_subgroupOf]; infer_instance
+  have hW2leM : data.W2 ≤ M := (data.typeP.W2_le.trans inf_le_left).trans (H_le_M data)
+  have hcardW2tr : Nat.card ↥(data.W2.subgroupOf M) = chief.p := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2leM).toEquiv]
+    exact chief.typeIII_IV_p_eq_W2 htype
+  have hmkinj : Function.Injective
+      (QuotientGroup.mk' ((⊥ : Subgroup G).subgroupOf M)) := by
+    rw [← MonoidHom.ker_eq_bot_iff, QuotientGroup.ker_mk', Subgroup.bot_subgroupOf]
+  refine reducible_count_sOf_K hG chief ⊥ (by rw [Subgroup.bot_subgroupOf]; exact bot_le)
+    (by rw [Subgroup.bot_subgroupOf, inf_bot_eq]) ?_ ?_
+  · intro hle
+    rw [Subgroup.bot_subgroupOf, le_bot_iff] at hle
+    have h1 : Nat.card ↥(data.W2.subgroupOf M) = 1 := by
+      rw [hle, Nat.card_eq_one_iff_unique]
+      exact ⟨inferInstance, ⟨1, rfl⟩⟩
+    rw [hcardW2tr] at h1
+    exact chief.p_prime.one_lt.ne' h1
+  · rw [Nat.card_congr (Subgroup.equivMapOfInjective _ _ hmkinj).symm.toEquiv]
+    exact hcardW2tr
+
+open OddOrder.Peterfalvi.S11 in
+/-- **Peterfalvi (9.8.a), membership**: every *reducible* member of the full family
+`𝒮 = 𝒮(⊥)` already lies in `𝒮(H₀)`.
+
+Cardinality mirror of `reducible_mem_sOf_H0C`: `𝒮(H₀) ⊆ 𝒮(⊥)` (`sOf_antitone`), the reducibles
+of both number `p − 1` (`reducible_count_sOf_K` at `K = ⊥` — the trace is trivially normal, the
+`W`-conditions degenerate, and `|W̄₂| = |W₂| = p` by (9.6) — resp. `reducible_count_sOf_H0`), so
+the two reducible sets coincide. -/
+theorem reducible_mem_sOf_bot_mem_sOf_H0 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} {data : TypesIIIIIIVSetup M} (htype : IsTypeIII M ∨ IsTypeIV M)
+    (chief : ChiefFactorData data) :
+    ∀ φ ∈ sOf data (⊥ : Subgroup G), ¬ IsIrreducibleCharacter φ →
+      φ ∈ sOf data chief.H0 := by
+  classical
+  intro φ hφ hred
+  have hBA : {ψ ∈ sOf data chief.H0 | ¬ IsIrreducibleCharacter ψ}
+      ⊆ {ψ ∈ sOf data (⊥ : Subgroup G) | ¬ IsIrreducibleCharacter ψ} := by
+    rintro ψ ⟨hψS, hψr⟩
+    exact ⟨sOf_antitone data bot_le hψS, hψr⟩
+  have hAfin : {ψ ∈ sOf data (⊥ : Subgroup G) | ¬ IsIrreducibleCharacter ψ}.Finite := by
+    refine Set.finite_of_ncard_ne_zero ?_
+    rw [reducible_count_sOf_bot hG htype chief]
+    exact Nat.sub_ne_zero_of_lt chief.p_prime.one_lt
+  have hAB : {ψ ∈ sOf data chief.H0 | ¬ IsIrreducibleCharacter ψ}
+      = {ψ ∈ sOf data (⊥ : Subgroup G) | ¬ IsIrreducibleCharacter ψ} :=
+    Set.eq_of_subset_of_ncard_le hBA (by
+      rw [reducible_count_sOf_bot hG htype chief, reducible_count_sOf_H0 hG chief]) hAfin
+  have hmem : φ ∈ {ψ ∈ sOf data (⊥ : Subgroup G) | ¬ IsIrreducibleCharacter ψ} := ⟨hφ, hred⟩
+  rw [← hAB] at hmem
+  exact hmem.1
+
 /-! ## (11.8.1): `d ≡ 1 (mod q)` and `δ = 1` -/
 
 open OddOrder.Peterfalvi.S11 in
