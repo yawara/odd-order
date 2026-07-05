@@ -1609,3 +1609,42 @@ e·Σθᵢ(1)²=|H|−1, Mackey fiber 経由) を landing (`d6328cfe`)。
 :4744 caseB_expansion_input ((13.19.c) grid counting) / :5548 betaGrid ((13.1.d) joint existence)。
 **W-side assembly の c-solo 可能分は今回の arc で全て放電し、残 7 は全部 §13/σ/9000 の
 上流供給を精密 named で待つ形に収束** — 供給着き次第 1-3 行 wire。
+
+### cont.⁵⁸ (2026-07-05 lane c 再開) — ⚡ 訂正: 「S16 W-side に ungated solo work なし」は誤り — (3.7)/(3.8)/(13.19.b) engine を新規実証明
+
+cont.⁵⁷ 末尾 + memory ft-four-fronts の「W-side assembly の c-solo 可能分は全放電・残は全て
+上流供給待ち」は **too-quick で誤り** (難所回避しない原則 + policy(A)「ungated genuine math へ
+降りる」で正面精査した結果)。**Pf §3 の grid 係数理論 ((3.6)-(3.8)) 全体が repo に未形式化で
+ungated** と判明し、新 leaf `S16_GridExpansion.lean` に実証明化 (2 commits、full build 3929 green):
+
+**a1e83dd2 — (3.7)/(3.8)/(13.19.b)-core engine**:
+- `omega_principal_eq_trivial`/`eta_principal_eq_trivial`/`eta_principal_apply_eq_one`:
+  ω₀₀=1_W, η₀₀=1_G (S16 の点値版 2 定理を撤去して dedup)。
+- `eta_mem_ZIrr`/`eta_orthonormal`: η-grid の ZIrr membership + 正規直交 (carried fields 2 行転送)。
+- `inner_eta_grid_relation` (**3.7**): Ŵ^G 上消える φ で ⟨φ,η_ij⟩+⟨φ,η₀₀⟩=⟨φ,η_i0⟩+⟨φ,η_0j⟩
+  (four-corner `eta_fourcorner_vanish` × φ vanish)。
+- `grid_eq_zero_of_relation_of_card_le_two` (**3.8 small-support 剛性**): (3.7)-rel + 非零≤2<min(q,p)
+  ⟹ 全零 (rank-1 shift, all-zero 行 → 行定数 → 非零行 p≥3)。
+- `inner_eta_eq_zero_of_vanish_of_inner_self_eq_two` (**13.19.b-core**): φ∈ZIrr, ⟨φ,φ⟩=2,
+  Ŵ^G-vanish ⟹ φ⊥η-grid 全体 (整数係数 Bessel + (3.8))。
+
+**a60e6f9b — dirr finish + (13.19.b) 完全版**:
+- `exists_sign_irr_of_inner_self_one`: norm-1 virtual char = ±単一既約。
+- `eta_orthogonal_of_norm_one_pair_vanish` (**13.19.b**): 相異 norm-1 ψ^{τ₁},ψ̄^{τ₁} で
+  差が Ŵ^G 上消えるなら ψ^{τ₁}⊥η-grid。engine (差 norm 2) → dirr finish で個別直交へ昇格。
+
+**Coq route 確定** (PFsection13 精読): cross-group (L≠S,T) の (13.19.b) は coherence でなく
+**NC/norm-2 論法** (`cycTI_NC_minn` = 本 leaf の `grid_eq_zero_...`)。S-side 対角のみ
+`coherent_ortho_cycTIiso`。∴ 本 engine が cross-group 用の正しい道具。
+
+**残 gate の再characterize** (caseB_expansion_input :4744 horth 側)**:
+本 lemma への帰着で、horth (η⊥ψ^{τ₁}) の残 named 仮説は精密に 2 点のみ:
+1. **M-side Dade-support vanishing** = (13.19.a) `Ã(M) ∩ (P^G∪W^G)=∅` ⟹ (ψ^{τ₁}−ψ̄^{τ₁}) が
+   Ŵ^G 上消える。**深い gate**: Coq `coHr`/`FT_Dade_support_partition` = 「異なる極大の Fitting
+   素集合が互いに素」(|M_F| coprime pq) = **BG §10 級 σ-decomposition** に bottom-out。
+   S16_G0Coprime の P#/Q# coprimality と類似だが M-side は別極大ゆえ新規。
+2. ψ^{τ₁}=nu(ζ) の conjugate 構造 (ψ̄^{τ₁} の同定 + norm-1/⊥)。
+残 hexp (signed 展開 (13.19.c)/(14.11.2)) は本 engine の対象外 (別途 grid counting)。
+
+**教訓**: 「ungated solo なし」評価は §単位で route を尽くしてから (難所回避せず §3 全体を
+精査したら丸ごと未形式化だった)。memory ft-four-fronts の c 節「残は上流供給待ちのみ」を訂正済。
