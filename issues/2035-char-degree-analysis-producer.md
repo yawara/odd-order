@@ -147,6 +147,27 @@ conjunct-3 type-II HU-Frobenius = 指標論的 Frobenius 判定法 (Isaacs 7 章
 → campaign step 3 ((13.3.a) の S11 側) は本質完了。次 = step 1-2 (S15↔S11 bridge の
 honest Section11CharacterData 構成 + sibleyTarget_H0C) or step 4 (τ₁ 導出)。
 
+## (13.3.a) μⱼ ∈ 𝒮(H₀) 同定チェーン (it.74 recon — 経路確定)
+
+**Coq 対応**: PFsection13 は `mu_ := primeTIred` + `FTseqInd_TIred : mu_ j ∈ calS`
+(証明 = `cfInd_prTIres`: μⱼ = Ind of its S′-restriction、prime-TI 構成的性質)。
+
+**repo 在庫 (4.5.a)-analog 発見**: `S06_CertainTypeClifford.induce_restrict_certainType_eq`
+— **Σᵢ (columnFamily χ₂).mu i = Ind_{h.K}^{L}(chiRestrict χ₂)**、chiRestrict =
+Res(μ₀ⱼ) は既約 (`certainTypeRestrict_isIrreducible` = (4.5.a))。
+
+**残チェーン (S15-側、hyp.mu = certainTypeS-columnFamily 経由)**:
+1. reindex 和恒等式: Σᵢ hyp.mu i j = Ind_{K}^{S}(chiRestrict (chi2enum j))
+   (muS-def + eqQ Equiv.sum_comp; mu_definition と同型の producer-側 supply →
+   S15.Hypothesis に `mu_colSum_eq_induce`-field として threading が最短)
+2. K-spelling 突合: certainTypeS.K = S′ = PU = huSub (toTypesIIIIIIVSetupS)
+   (K_eq-系 field/lemma 要確認)
+3. χⱼ ∈ 𝒳(H₀-of-S-instance): (i) P ⊄ Ker χⱼ (xiSet 半分)、(ii) H₀ ⊆ Ker χⱼ —
+   ω-列の nontriviality/kernel から ((13.2)-隣接の genuine math、恐らく producer-側
+   supply が正: certainType 側の facts として証明して threading)
+→ 1+2+3 で mem_sOf ⟨χⱼ-bundled, xiOf-mem, sum-eq⟩ → μⱼ ∈ 𝒮(H₀) →
+mu_colSum_not_irreducible (済) で reducible-𝒮 → isIndHC (済) → (13.3.a) 完成。
+
 ## (13.3.a) isIndHC-corollary build-spec (it.70 recon)
 
 **S↔§9 bridge 開通済 (it.69)**: `toTypesIIIIIIVSetupS` + `mkSection11CharacterDataS`。
