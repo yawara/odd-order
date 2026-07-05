@@ -3941,12 +3941,23 @@ theorem typeV_param_arithmetic {p w₁ : ℕ} (hpodd : Odd p) (hw1odd : Odd w₁
   constructor
   · omega
   · omega
+
+/-- **Peterfalvi (10.10.1)--(10.10.4)**: if Hypothesis (10.1) holds with `M` of type V, then the
+type-V parameter calculation forces `S` to be coherent.
+
+De-scaffolded: the conclusion is now the *genuine* coherence `Nonempty (IsCoherent τ S A₀)` only,
+dropping the former opaque `typeV_parameter_formula`/`typeV_coherence_formula : Prop` conjuncts
+(unprovable for generic `params`; producers set them `True`).  The remaining `sorry` is the honest
+(10.10.1)–(10.10.4) coherence argument: case (a) of Def (8.7) gives coherence by (6.8); case (b) is
+excluded by (6.5.c); case (c) (`|H| = p³`, `w₁ ∣ p+1`) runs the parameter calculation
+(`typeV_param_arithmetic` gives `p = 2w₁−1`, then `d = p`, `δ = −1`, `n = 2`) and the σ-grid column
+identities (reusing the (11.8) `muGrid`/`alignedOmegaSigmaGrid`/coherent-extension machinery).
+Gated on the §6/§8 coherence inputs (6.5.a/6.8) and the type-V `|H| = p³` structure. -/
 theorem typeV_forces_coherence [Finite G] [Fintype G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Fintype ↥M]
     [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
     {hyp : Hypothesis M} (hV : IsTypeV M) (params : CharacterParameters hyp) :
-    params.typeV_parameter_formula ∧ params.typeV_coherence_formula ∧
-      Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A0) := by
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A0) := by
   sorry
 
 open scoped FiniteInduce in
@@ -3962,7 +3973,7 @@ theorem no_typeV_maximal [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
   rintro ⟨M, hMmax, hMV⟩
   obtain ⟨hyp⟩ := exists_hypothesis_of_typeIIIorIVorV hG hMmax (Or.inr (Or.inr hMV))
   obtain ⟨params, -⟩ := w2_prime_and_parameter_independence hG hyp
-  exact S_not_coherent hG hyp (typeV_forces_coherence hG hMV params).2.2
+  exact S_not_coherent hG hyp (typeV_forces_coherence hG hMV params)
 
 /-- The case-(b) data in Peterfalvi (8.8), used in the remark (10.11). -/
 structure Theorem88CaseBData (G : Type*) [Group G] where
