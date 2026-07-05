@@ -134,3 +134,20 @@ subcoherence 精査で 2 点判明:
 **⟹ (13.3) coherence chain の tractability 上方修正**: S06 certainType_isCoherent → prDade_subcoherent
 (assemble) → FTtypeP_subcoherent (thin) → (9.11) Ptype_core_coherence (8-step、coherent_of_constant_degree
 既存) → (13.3) tau1S coherence (sibleyTarget_H0C を置換) + (10.7)[a]。次 = prDade を verify-first で assemble。
+
+## 2026-07-06 更新 #3 (lane b) — (9.11) base-case glue landed、残 gap = sumnS norm chain (a+b 共有)
+
+`subset_subcoherent` + `coherent_subset_of_constant_degree` (S07_Subcoherent.lean、sorry-free、commit
+9aad60d8) landed = (9.11) の **Galois 枝 + non-Galois base case S1**。`irrSubcoherent` と合わせ subcoherent
+→ uniform-subfamily coherence の glue 完備。
+
+**残る単一共有 gap (a+b)**: honest S-family sSet は mixed-degree ゆえ full (9.11.1-8) pair-adjoining
+induction が要。engine (coherentPairChain S07:4907 + (5.6) adjoining) は既存だが、per-step (5.6.2)
+integer-forcing `hY` = **norm-inequality chain `lb0 ≤ … ≤ sumnS S2 ≤ lb0`** (Peterfalvi extend_coherent +
+Snorm/sumnS 次数和不等式) が **repo 未在**。これが (13.3) coherent_H0Cprime_S の sibleyTarget_H0C 置換 +
+(10.7) typeII_derived_frobenius の共通 keystone。
+
+**lane a (10.7) への lead**: (10.7) の T2 が **4-element uniform-degree family** なら (issue 1017 冒頭記述)、
+full induction 不要で `coherent_subset_of_constant_degree` (landed) から**直接**閉じる可能性。要 lane-a 確認
+(T2 degree-uniformity は lane-b から未検証)。**⟹ 次: (a) lane a が T2 uniform で (10.7) を直接 close 試行、
+(b) sumnS norm chain を実装 (full (9.11) 用、shared)。** hub 裁定: sumnS chain の owner。
