@@ -3287,6 +3287,98 @@ theorem Hypothesis.mu_apply_one_eq_u [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
     exact mul_left_cancel₀ hq0 this
   rw [hyp.mu_apply_one_column_const i j, h0j]
 
+/-- **Peterfalvi `u ≡ 1 (mod q)`** (the (13.3.c) crux, (11.8.1) `|Ū| ≡ 1 mod q`).  The `S`-side
+`U W₁` is a Frobenius group (`typeP_uW1_frobenius`), so for the conjugation homomorphism
+`φ : U W₁ →* Aut(P)` the kernel-image `φ(U) = U/C_U(P) = Ū` satisfies `|Ū| ≡ 1 (mod |W₁|)`
+(`IsFrobeniusGroup.card_range_comp_subtype_modEq_one`, Isaacs Lemma 6.1); with `|Ū| = u`
+(`card_U_eq_uc`, `C = U ⊓ C_G(P)`) and `|W₁| = q` this is `u ≡ 1 (mod q)`.  Crucially **ungated**:
+uses only the (proven) `U W₁` Frobenius structure, not the case-(b) Singer field model. -/
+theorem Hypothesis.u_modEq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) : hyp.u ≡ 1 [MOD hyp.q] := by
+  haveI := hyp.finiteG
+  have hSII : IsTypeII hyp.S :=
+    OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.S_maximal hyp.S_typeP2
+  have tdata : TypeIIData hyp.S := hSII.some
+  have hSdataUne : hyp.Sdata.U ≠ ⊥ := by
+    intro hbot
+    have h1 : Nat.card ↥hyp.Sdata.U = Nat.card ↥tdata.typeP.U := by
+      rw [hyp.Sdata.card_U_eq_index, tdata.typeP.card_U_eq_index]
+    rw [hbot, Subgroup.card_bot] at h1
+    exact tdata.common.1 (Subgroup.card_eq_one.mp h1.symm)
+  have hfrob := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius hyp.Sdata hSdataUne
+  have hUW1leS : hyp.Sdata.U ⊔ hyp.Sdata.W1 ≤ hyp.S :=
+    sup_le (hyp.Sdata.U_le.trans (Subgroup.map_subtype_le _)) hyp.Sdata.W1_le
+  have hSnormP : hyp.S ≤ Subgroup.normalizer hyp.P := by
+    rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
+  have hUW1normP : hyp.Sdata.U ⊔ hyp.Sdata.W1 ≤ Subgroup.normalizer hyp.P :=
+    le_trans hUW1leS hSnormP
+  letI : MulDistribMulAction ↥(hyp.Sdata.U ⊔ hyp.Sdata.W1) ↥hyp.P :=
+    MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer hyp.P)) ↥hyp.P
+      (Subgroup.inclusion hUW1normP)
+  set φ : ↥(hyp.Sdata.U ⊔ hyp.Sdata.W1) →* MulAut ↥hyp.P :=
+    MulDistribMulAction.toMulAut ↥(hyp.Sdata.U ⊔ hyp.Sdata.W1) ↥hyp.P with hφ
+  have hmod := hfrob.card_range_comp_subtype_modEq_one φ
+  have hAcard : Nat.card ↥(hyp.Sdata.W1.subgroupOf (hyp.Sdata.U ⊔ hyp.Sdata.W1)) = hyp.q := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right :
+      hyp.Sdata.W1 ≤ hyp.Sdata.U ⊔ hyp.Sdata.W1)).toEquiv, hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1]
+  have hφapply : ∀ (a : ↥(hyp.Sdata.U ⊔ hyp.Sdata.W1)) (p : ↥hyp.P),
+      ((φ a p : ↥hyp.P) : G) = (a : G) * (p : G) * (a : G)⁻¹ := fun a p => rfl
+  have hker_iff : ∀ a : ↥(hyp.Sdata.U ⊔ hyp.Sdata.W1),
+      φ a = 1 ↔ (a : G) ∈ Subgroup.centralizer (hyp.P : Set G) := by
+    intro a
+    rw [Subgroup.mem_centralizer_iff]
+    constructor
+    · intro h1 p hp
+      have hcg := congrArg (fun e : MulAut ↥hyp.P => ((e ⟨p, hp⟩ : ↥hyp.P) : G)) h1
+      simp only [hφapply, MulAut.one_apply] at hcg
+      exact (mul_inv_eq_iff_eq_mul.mp hcg).symm
+    · intro hc
+      ext p
+      simp only [hφapply, MulAut.one_apply]
+      have hpc := hc (p : G) p.2
+      rw [← hpc]; group
+  set N := hyp.Sdata.U.subgroupOf (hyp.Sdata.U ⊔ hyp.Sdata.W1) with hN
+  set ψ : ↥N →* MulAut ↥hyp.P := φ.comp N.subtype with hψ
+  set ρ : ↥N →* G := (hyp.Sdata.U ⊔ hyp.Sdata.W1).subtype.comp N.subtype with hρ
+  have hρinj : Function.Injective ρ :=
+    (hyp.Sdata.U ⊔ hyp.Sdata.W1).subtype_injective.comp N.subtype_injective
+  have hkermap : (ψ.ker).map ρ = hyp.C := by
+    ext g
+    rw [Subgroup.mem_map]
+    constructor
+    · rintro ⟨n, hn, rfl⟩
+      rw [MonoidHom.mem_ker, hψ, MonoidHom.comp_apply] at hn
+      have hgC : (ρ n : G) ∈ Subgroup.centralizer (hyp.P : Set G) := (hker_iff _).mp hn
+      have hgU : (ρ n : G) ∈ hyp.Sdata.U := Subgroup.mem_subgroupOf.mp n.2
+      have hgU' : (ρ n : G) ∈ hyp.U := by rw [← hyp.Sdata_U_eq]; exact hgU
+      rw [hyp.C_eq]
+      exact ⟨hgU', hgC⟩
+    · intro hgC
+      rw [hyp.C_eq, Subgroup.mem_inf] at hgC
+      obtain ⟨hgU, hgc⟩ := hgC
+      have hgUS : g ∈ hyp.Sdata.U := by rw [hyp.Sdata_U_eq]; exact hgU
+      have hgUW1 : g ∈ hyp.Sdata.U ⊔ hyp.Sdata.W1 :=
+        (le_sup_left : hyp.Sdata.U ≤ _) hgUS
+      have hgN : (⟨g, hgUW1⟩ : ↥(hyp.Sdata.U ⊔ hyp.Sdata.W1)) ∈ N :=
+        Subgroup.mem_subgroupOf.mpr hgUS
+      refine ⟨⟨⟨g, hgUW1⟩, hgN⟩, ?_, rfl⟩
+      rw [MonoidHom.mem_ker, hψ, MonoidHom.comp_apply]
+      exact (hker_iff _).mpr hgc
+  have hkercard : Nat.card ↥(ψ.ker) = hyp.c := by
+    rw [hyp.c_eq_card_C, ← hkermap]
+    exact Nat.card_congr (Subgroup.equivMapOfInjective _ ρ hρinj).toEquiv
+  have hNcard : Nat.card ↥N = hyp.u * hyp.c := by
+    rw [hN, Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left :
+      hyp.Sdata.U ≤ hyp.Sdata.U ⊔ hyp.Sdata.W1)).toEquiv, hyp.Sdata_U_eq, hyp.card_U_eq_uc]
+  have hrangecard : Nat.card ↥(ψ.range) = hyp.u := by
+    have hsplit := Subgroup.card_eq_card_quotient_mul_card_subgroup ψ.ker
+    rw [Nat.card_congr (QuotientGroup.quotientKerEquivRange ψ).toEquiv, hkercard, hNcard] at hsplit
+    have hc0 : 0 < hyp.c := hyp.c_eq_card_C ▸ Nat.card_pos
+    exact (Nat.eq_of_mul_eq_mul_right hc0 hsplit).symm
+  have hru : Nat.card ↥((φ.comp N.subtype).range) = hyp.u := hrangecard
+  rw [hru, hAcard] at hmod
+  exact hmod
+
 /-- `|T| = |Q|·(vd)·p` — the `T`-side order decomposition, read off the reconciled type-`P`
 datum (`M_complement`/`derived_complement` of `reconciled_typePData_T`) with `|V| = vd` and
 `|W₂| = p`. -/
