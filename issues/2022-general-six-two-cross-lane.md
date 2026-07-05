@@ -622,3 +622,10 @@ coeff (X ∈ ℤ[R]) / Y ⊥ R。
   部品: BrauerPermutationUnconditional + typeP_uW1_frobenius +
   inertia_eq_top…) → sOf-⊥-transport lemma → ψ-同定完成 →
   ofProjection 組み立て (columnImageFamilyCohFree)。
+
+## 2026-07-05 lane-a (loop 43): bridge-family 直接分類 閉 — ψ-列同定完成
+
+- reducible_mem_inducedKernelFamily_eq_muGrid_columnSum (θ≠1 で trivial-列排除、
+  𝒳-条件・Brauer-FPF・sOf-transport 全て不要の最短路)。
+- 残 = named 2 点の ofProjection 最終組み立て (columnImageFamilyCohFree +
+  hS₁coh.extension-τ₁ + muGridAlpha_inner_* 直交)。
