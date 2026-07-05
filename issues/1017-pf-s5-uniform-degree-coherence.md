@@ -197,3 +197,27 @@ lb3S1' 左端**を landed。これで **(9.11) squeeze `lb0≤lb1≤lb2≤lb3≤
 次 iteration はこの assembly を正面から engage (§9 `Section11CharacterData`/`TypesIIIIIIVSetup` が非Galois
 setup = typeP_Galois 述語・U1/a/H1・S_H0C' Finset・lb_Sqa を expose するか確認 → fold を wiring)。
 lane a (10.7) も同一 (9.11) coherence で閉じる。
+
+## 2026-07-06 更新 #6 (lane b) — assembly scoping 結果: §9 setup の available 性を確定
+
+更新 #5 の「次: §9 setup が typeP_Galois 述語・U1/a/H1・S_H0C'・lb_Sqa を expose するか確認」を実施。
+`Section11CharacterData` (S11:2053) / `TypesIIIIIIVSetup` (S11:75) を精査:
+
+**在る (expose 済)**: `C = C_U(H̄)` (`cSub`)、`U' = [U,U]` (`uprimeSub`)、`C' = [C,C]` (`cprimeSub`)、
+`𝒳 = {χ∈Irr(HU) | H⊄Ker χ}` (`xiSet`)、`𝒮 = Ind 𝒳` (`sSet`)、`𝒳(Y)`/`𝒮(Y)` (`xiOf`/`sOf`)、
+`u = |Ū|` (`u_eq_card_quotient`)。→ subgroups + character families + u は全部 genuine に在る。
+
+**不在 (要 build)**: `typeP_Galois`/`typeP_nonGalois` **dichotomy 述語** (grep 0 in S11)、非Galois 構造
+`typeP_nonGalois_characters` の `a = [HU:H⟨U1⟩]`/`U1`/`H1` data、そして **`lb_Sqa`** (`|S1| ≥ (p−1)·[U:U']/a²`
+の下界; Coq `lb_Sqa`、(9.8)-level の deep datum)。
+
+**⟹ assembly の genuine 残 content 精緻化** (更新 #5 の「§9 witnesses を thread」より大きい):
+1. **(9.8)-level typeP_Galois/nonGalois character-structure dichotomy を build** (Coq
+   `typeP_Galois_characters` = 全 constituent degree `|M:HU|·u` / `typeP_nonGalois_characters` =
+   `a`/`U1`/`H1`/`lb_Sqa`)。これが (9.11) を 2 branch に割る前提。
+2. Galois branch: 上記 + `coherent_subset_of_constant_degree` (landed) で close。
+3. 非Galois branch: `coherentPairChain` fold + 上表 squeeze (全 landed) + per-step Dade witnesses。
+
+これは multi-session の genuine §9 prerequisite (コスト・規模は着手基準でない、CLAUDE.md)。次 iteration は
+(9.8) dichotomy 構造 (typeP_Galois 述語 + lb_Sqa) の build に正面着手。上流 = typeP_Galois 述語 (文書順で
+先)。lane a (10.7) も同一構造依存。
