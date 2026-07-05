@@ -4737,17 +4737,16 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 Deep named §13/BG §10 obligation. -/
 theorem card_kernel_coprime_pq [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
-    (nc : NonConjugateHypothesis hyp) (dataM : TypeICoherent78Data nc.Mdata.M) :
+    {M : Subgroup G} (hMmax : M ∈ maximalSubgroups G) (dataM : TypeICoherent78Data M) :
     Nat.Coprime (Nat.card ↥dataM.kernel) (hyp.base.p * hyp.base.q) := by
   classical
   -- `M`, `S`, `T` are maximal; `M` type I, `S`/`T` type II
-  have hMmax := nc.Mdata.M_maximal
-  have hMI : IsTypeI nc.Mdata.M := ⟨dataM.typeIHyp.typeI⟩
+  have hMI : IsTypeI M := ⟨dataM.typeIHyp.typeI⟩
   have hSII : IsTypeII hyp.base.S :=
     OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.base.S_maximal hyp.base.S_typeP2
   have hTII : IsTypeII hyp.base.T := T_typeII hG hyp
   -- `M_F = M_σ`, `S_σ = P`, `T_σ = Q`
-  have hMF : dataM.kernel = OddOrder.BG.Ch3.S10.Msigma nc.Mdata.M := by
+  have hMF : dataM.kernel = OddOrder.BG.Ch3.S10.Msigma M := by
     show dataM.typeIHyp.typeI.typeF.H = _
     rw [dataM.typeIHyp.typeI.typeF.H_eq]
     exact OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II
@@ -4772,10 +4771,10 @@ theorem card_kernel_coprime_pq [Finite G]
     rw [hyp.base.q_eq_card_W1]
     exact Subgroup.card_dvd_of_le (OddOrder.Peterfalvi.S15.W1_le_Q hG hyp.base)
   -- `M` is not conjugate to `S` or `T` (type I vs type non-I) ⟹ `σ`-disjointness
-  have hMnS : ¬ ∃ g : G, MulAut.conj g • nc.Mdata.M = hyp.base.S :=
+  have hMnS : ¬ ∃ g : G, MulAut.conj g • M = hyp.base.S :=
     OddOrder.Peterfalvi.S15.not_conj_of_isTypeI_of_isTypeNonI hG hMI hyp.base.S_maximal
       (Or.inl hSII)
-  have hMnT : ¬ ∃ g : G, MulAut.conj g • nc.Mdata.M = hyp.base.T :=
+  have hMnT : ¬ ∃ g : G, MulAut.conj g • M = hyp.base.T :=
     OddOrder.Peterfalvi.S15.not_conj_of_isTypeI_of_isTypeNonI hG hMI hyp.base.T_maximal
       (Or.inl hTII)
   have hdS := OddOrder.BG.Ch3.S13.sigma_disjoint_of_nonconjugate hG hMmax hyp.base.S_maximal hMnS
@@ -4861,7 +4860,7 @@ is coprime to `|M_F|` (`card_kernel_coprime_pq`); but every element of `Ã(M)` i
 ingredients are the genuine BG §10-level σ-decomposition inputs. -/
 theorem mSide_dadeSupport_avoids_regular [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
-    (nc : NonConjugateHypothesis hyp) (dataM : TypeICoherent78Data nc.Mdata.M) :
+    {M : Subgroup G} (hMmax : M ∈ maximalSubgroups G) (dataM : TypeICoherent78Data M) :
     ∀ x ∈ conjClassSet
         ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G))),
       x ∉ (dataM.h78 hG).hyp76.hyp71.hyp.dadeSupport := by
@@ -4906,8 +4905,44 @@ theorem mSide_dadeSupport_avoids_regular [Finite G]
   have hxord : orderOf x ∣ hyp.base.p * hyp.base.q := hordx ▸ hword
   -- `orderOf x` is coprime to `|M_F|`, contradicting `π(M_F)`-singularity of `Ã(M)`
   have hcop : Nat.Coprime (orderOf x) (Nat.card ↥dataM.kernel) :=
-    Nat.Coprime.coprime_dvd_left hxord (card_kernel_coprime_pq hG nc dataM).symm
+    Nat.Coprime.coprime_dvd_left hxord (card_kernel_coprime_pq hG hMmax dataM).symm
   exact dadeSupport_not_coprime_card_kernel hG dataM hdade hcop
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (14.11.2)/(13.19.a) consequence, the Coq `betaL_W_0`**: the coherence
+residual `β_L = τ_L(Ind 1_H − φ)` (`(dataL.h78 hG).beta`) vanishes on the regular-set
+saturation `Ŵ^G = (W ∖ (W₁ ∪ W₂))^G`.  `β_L` is supported in the Dade support `Ã(L)`
+(`beta_support_subset_dadeSupport`), which avoids `Ŵ^G` by the fully-proven (13.19.a)
+`mSide_dadeSupport_avoids_regular` (`L` is type-I, hence non-conjugate to the type-II
+`W`-containing maximals `S`, `T`).  This is the first ingredient of the (14.11.2)/(13.19.c)
+signed `η`-grid expansion (`lSide_signed_eta_expansion`). -/
+theorem betaL_vanishes_on_regular_W [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {hyp : Hypothesis (G := G)} {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
+    (dataL : TypeICoherent78Data L) :
+    ∀ x ∈ conjClassSet
+        ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G))),
+      (dataL.h78 hG).beta x = 0 := by
+  intro x hx
+  by_contra hval
+  exact mSide_dadeSupport_avoids_regular hG hLmax dataL x hx
+    ((dataL.h78 hG).beta_support_subset_dadeSupport (ClassFunction.mem_support.mpr hval))
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (3.7) applied to `β_L`**: the grid coefficients `a_ij = ⟨β_L, η_ij⟩` of the
+coherence residual satisfy the four-corner relation `a_ij + a_00 = a_i0 + a_0j`.  Immediate
+from the (3.7) engine `inner_eta_grid_relation` (`S16_GridExpansion`) and
+`betaL_vanishes_on_regular_W`.  This is the (3.7) linear-relation ingredient of the
+(14.11.2)/(13.19.c) signed `η`-grid expansion. -/
+theorem betaL_grid_relation [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {hyp : Hypothesis (G := G)} {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
+    (dataL : TypeICoherent78Data L) (i : Fin hyp.base.q) (j : Fin hyp.base.p) :
+    ClassFunction.inner (dataL.h78 hG).beta (hyp.base.eta i j)
+        + ClassFunction.inner (dataL.h78 hG).beta
+            (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩)
+      = ClassFunction.inner (dataL.h78 hG).beta (hyp.base.eta i ⟨0, hyp.base.p_prime.pos⟩)
+        + ClassFunction.inner (dataL.h78 hG).beta
+            (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ j) :=
+  inner_eta_grid_relation hyp.base (betaL_vanishes_on_regular_W hG hLmax dataL) i j
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (13.19.c), the L-side signed `η`-grid expansion.**  Under case-(b)
@@ -4972,7 +5007,7 @@ theorem caseB_expansion_input [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G
     lSide_signed_eta_expansion _hG dataL hq3 hp5 hhv hvu
   exact ⟨signs, hsigns, i, hi, ε, hε, hexp,
     caseB_eta_orthogonal_psi _hG hyp.base dataM
-      (mSide_dadeSupport_avoids_regular _hG nc dataM)⟩
+      (mSide_dadeSupport_avoids_regular _hG nc.Mdata.M_maximal dataM)⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Faithful §16 producer for the (14.16) case-(b) contradiction inputs.**  The case-(b)
