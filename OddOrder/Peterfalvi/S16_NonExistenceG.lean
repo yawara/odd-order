@@ -659,6 +659,98 @@ theorem T_typeIII_calT1_card [Finite G] (hyp : Hypothesis (G := G))
   rw [← hcard]
   exact calT1_image_induce_card_eq hyp hHnormal 𝒯 hconj hinertia
 
+open scoped Classical in
+/-- **Peterfalvi (14.9): `calT1` is coherent** (Coq `PFsection14.v:750--751`
+`have [tau1T cohT1]: coherent calT1 T^# tauT`, via
+`apply/(uniform_degree_coherence scohT1)/(@all_pred1_constant _ p%:R)`) — the **coherence skeleton**
+isolating the T-side type-`P` Dade setup as the single deep residual.
+
+`calT1 = {Ind_{QV}^T θ | θ ∈ 𝒯}` (`QV = T' = derivedInG T`, `Q = M_F`, `𝒯 =` non-principal inflated
+`Irr(QV/Q)`), realized here as the `Set`-coercion of the `Finset` image (matching
+`T_typeIII_calT1_card`/`calT1_image_induce_card_eq`).  Given the **Dade setup** as the input
+`hyp07 : S07.Hypothesis calT1_set A` (the Coq `subcoherent calT1 tauT rmR_T` = `FTtypeP_coh_base`,
+carrying `tauT` and the seven §5.2 fields), this produces coherence via the proven engine
+`S07.coherent_of_constant_degree` (Coq `uniform_degree_coherence`), **proving everything else** from
+`calT1`'s structure + the proven count:
+
+* `hirr` — each `ζ = Ind_{QV}^T θ (θ ∈ 𝒯)` is irreducible (`isIrreducibleCharacter_induce_of_inertia_eq`
+  fed the inertia fact `hinertia : I_T(θ) = QV`, the same input feeding the count), so `⟨ζ,ζ⟩ = 1`
+  (`IsIrreducibleCharacter.inner_self_eq_one`);
+* `hconst`/`hdeg0` — each `ζ` has degree `ζ(1) = [T:QV]·θ(1) = p·1 = p ≠ 0`
+  (`ClassFunction.induce_apply_one` + `T_derived_index_eq_p` `[T:QV] = p` + linearity
+  `hlinear : θ(1) = 1`, since `θ` inflates from the abelian `QV/Q ≅ V`), i.e. Coq's `all_pred1_constant p`;
+* `hSfin` — `calT1_set` is the image of a `Finset`, hence finite.
+
+The residual — **the T-side type-`P` Dade isometry construction** (Coq `FTtypeP_coh_base`, a from-scratch
+§4/§5 build with **no** existing type-`P` Dade base in the repo) — is precisely the input `hyp07`
+together with the three genuinely Dade/support-dependent facts, kept as explicit hypotheses (each
+cited from `hyp07`'s concrete Dade map at the call site, exactly as the §14 type-I assembly discharges
+them via `dadeIntegralCharacterMap_mem_ZIrr_of_supported` etc.):
+
+* `hZIrr : ∀ a b ∈ calT1_set, hyp07.tau (a − b) ∈ ZIrr G` — the Dade-map integrality on member
+  differences (Coq `Ztau1T` from the `subcoherent` datum);
+* `h1A : (1 : ↥T) ∉ A` and `hsuppdiff : ∀ a b ∈ calT1_set, (a − b).support ⊆ A` — the support/`A`-facts
+  (Coq `A = T^#`, so `1 ∉ A` and every member difference vanishes off `T^#`);
+* `hcard2 : 2 ≤ calT1_set.ncard` — the size bound `2 ≤ (|V|−1)/p` (arithmetic on `|V|`, from the proven
+  count `T_typeIII_calT1_card`; kept explicit since it needs a `|V|`-lower bound not carried by the
+  intrinsic datum here).
+
+This is the honest §16 coherence assembly point for (14.9): it consumes only the verified bricks
+(`isIrreducibleCharacter_induce_of_inertia_eq`, `induce_apply_one`, `T_derived_index_eq_p`,
+`coherent_of_constant_degree`) and the parameterized Dade setup, leaving the type-`P` Dade base as the
+single precisely-scoped deep obligation.  Its output feeds the (14.9) Γ-Bessel bound
+`T_typeIII_ratio_le` (Coq `cohT1` consumed at PFsection14.v:769 `have [[Itau1T Ztau1T] Dtau1T] := cohT1`). -/
+theorem T_typeIII_calT1_coherent [Finite G] (hyp : Hypothesis (G := G))
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    [Fintype ↥hyp.base.T] [Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
+    [Invertible (Nat.card ↥hyp.base.T : ℂ)]
+    [Invertible (Nat.card ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) : ℂ)]
+    (𝒯 : Finset (IrreducibleCharacter ((derivedInG hyp.base.T).subgroupOf hyp.base.T)))
+    (hinertia : ∀ θ ∈ 𝒯,
+      IrreducibleCharacter.inertia (G := ↥hyp.base.T)
+          (H := (derivedInG hyp.base.T).subgroupOf hyp.base.T) θ
+        = (derivedInG hyp.base.T).subgroupOf hyp.base.T)
+    (hlinear : ∀ θ ∈ 𝒯, (θ.toClassFunction : ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) → ℂ) 1 = 1)
+    (A : Set ↥hyp.base.T)
+    (calT1_set : Set (ClassFunction ↥hyp.base.T ℂ))
+    (hcalT1 : calT1_set = ↑(𝒯.image (fun θ => ClassFunction.induce
+      ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction)))
+    (hyp07 : OddOrder.Peterfalvi.S07.Hypothesis (L := ↥hyp.base.T) (G := G) calT1_set A)
+    (hZIrr : ∀ a ∈ calT1_set, ∀ b ∈ calT1_set, hyp07.tau (a - b) ∈ ZIrr G)
+    (h1A : (1 : ↥hyp.base.T) ∉ A)
+    (hsuppdiff : ∀ a ∈ calT1_set, ∀ b ∈ calT1_set, ((a - b : ClassFunction ↥hyp.base.T ℂ)).support ⊆ A)
+    (hcard2 : 2 ≤ calT1_set.ncard) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp07.tau calT1_set A) := by
+  haveI := hyp.base.finiteG
+  -- `calT1_set` is finite (image of a `Finset`).
+  have hSfin : calT1_set.Finite := by rw [hcalT1]; exact (Finset.finite_toSet _)
+  -- The `[T:QV] = p` index (degree factor) and its positivity.
+  have hindex : ((derivedInG hyp.base.T).subgroupOf hyp.base.T).index = hyp.base.p :=
+    T_derived_index_eq_p hyp
+  have hp_ne : (hyp.base.p : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr hyp.base.p_prime.pos.ne'
+  -- Each member `ζ = Ind_{QV}^T θ` is irreducible; extract its source `θ ∈ 𝒯` and its degree `= p`.
+  have hmem_form : ∀ a ∈ calT1_set, ∃ θ ∈ 𝒯,
+      a = ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction := by
+    intro a ha
+    rw [hcalT1, Finset.mem_coe, Finset.mem_image] at ha
+    obtain ⟨θ, hθ, rfl⟩ := ha
+    exact ⟨θ, hθ, rfl⟩
+  have hirr : ∀ ζ ∈ calT1_set, IsIrreducibleCharacter ζ := by
+    intro ζ hζ
+    obtain ⟨θ, hθ, rfl⟩ := hmem_form ζ hζ
+    exact isIrreducibleCharacter_induce_of_inertia_eq
+      (G := ↥hyp.base.T) (H := (derivedInG hyp.base.T).subgroupOf hyp.base.T) θ (hinertia θ hθ)
+  have hdeg : ∀ ζ ∈ calT1_set, (ζ : ↥hyp.base.T → ℂ) 1 = (hyp.base.p : ℂ) := by
+    intro ζ hζ
+    obtain ⟨θ, hθ, rfl⟩ := hmem_form ζ hζ
+    rw [ClassFunction.induce_apply_one, hindex, hlinear θ hθ, mul_one]
+  -- assemble and invoke the equal-degree coherence producer.
+  refine OddOrder.Peterfalvi.S07.coherent_of_constant_degree hyp07 hSfin hcard2 ?_ hZIrr ?_ ?_ h1A hsuppdiff
+  · exact fun ζ hζ => (hirr ζ hζ).inner_self_eq_one
+  · exact fun a ha b hb => by rw [hdeg a ha, hdeg b hb]
+  · exact fun a ha => by rw [hdeg a ha]; exact hp_ne
+
 /-- **Peterfalvi (14.9), the character body** — the structural `≤` half of the ratio comparison, the
 sole deep obligation of (14.9).  Coq `PFsection14` `FTtypeP_min_typeII`, lines 737--853: assuming `T`
 is type III, build `calT1 = seqIndD QV T QV Q` (the degree-`p` induced characters of `T`, from
