@@ -1804,3 +1804,14 @@ Coq `FTtype2_support_coherence` (PFsection14:172) の構造を忠実分離:
 grid split (Coq `orthonormal_span`+`ub_e`)。(c) grid_mem `Y=0` = 残差 orthogonal projection。
 これらは M-side `betaGrid`/`betaSigns` の未供給分 (exists_MHypothesis 内) と同族の §14 char。
 [[feedback-no-avoiding-hard-parts]] [[feedback-cite-sorried-lemmas-if-signature-correct]]
+
+**hub 検証済 (2026-07-05、subagent 委譲 → 親検証)**: 上 cont.⁶⁴ は fresh-context subagent の成果
+(commit `94d80f2e`、229k tok/20min) を hub (親) が独立検証して承認。確認: (1) `#print axioms` の
+2 新定理 = [propext, sorryAx, Classical.choice, Quot.sound] のみ (sorryAx は `lSideGridCoeffData`
+経由のみ、**新 custom axiom 無**)。(2) carrier `LSideGridCoeffData` の 4 field は実 β_L について
+真・充足可 (vacuous hoist でない = carrier 構成可能性 OK)。(3) rigidity core
+`all_pm_one_and_card_of_odd_sq_sum_le` + 分解 `beta_eq_constOne_sub_zetaImage_add_delta` は共に
+sorry-free proven。(4) full build 3929 green、AxiomsCheck OK、sorry 7 不変。**教訓 (orchestration)**:
+深い well-defined piece の subagent 委譲は、親が faithfulness (carrier 構成可能性) + `#print axioms`
++ build を厳密検証すれば安全に throughput を出せる (粒度: 1 deep piece = 1 subagent、乱発しない
+[[feedback-reasonable-parallelism-granularity]])。
