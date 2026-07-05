@@ -7792,6 +7792,141 @@ theorem caseB_oXtheta_count [Finite G] {M : Subgroup G}
   rw [key, hTdef, Finset.image_image] at hTeq
   exact hTeq
 
+set_option maxHeartbeats 1000000 in
+/-- **Case-(b) exhaustion of `𝒳(H₀C)` by `hcPsi`-inductions** (Clifford correspondence, the
+surjectivity half of the case-(b) `oXtheta`): every `χ ∈ 𝒳(H₀C)` equals
+`Ind_{HC}^{HU}(hcPsi θbar)` for some nontrivial seed `θbar : H̄ →* ℂˣ`.
+
+A constituent `ψ` of `Res_{HC} χ` kills `ker hcHom = H₀C` (kernel inheritance from
+`H₀C ⊆ Ker χ`), so it factors through `hcHom : HC ↠ H̄` as `ψ = hcPsi θbar` (`H̄` abelian, the
+factored character is linear).  If `θbar = 1` then `ψ` is the trivial (hence `HU`-invariant)
+character and Clifford's invariant case (`restrict_eq_restrictionMultiplicity_smul_of_invariant`)
+makes `Res_{HC} χ` constant, forcing `H ⊆ Ker χ` — contradicting `χ ∈ 𝒳`.  For `θbar ≠ 1` the
+induction `Ind_{HC}(hcPsi θbar)` is irreducible (case-(b) inertia `inertia_eq_hcInHu`), so the
+Clifford correspondence (`coe_eq_induce_of_liesOver_of_isIrreducibleCharacter_induce`) gives
+`χ = Ind_{HC}(hcPsi θbar)`. -/
+theorem caseB_xiOf_H0C_eq_induce_hcPsi [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseB : CliffordCaseBData chars)
+    [Fintype ↥(huSub data)]
+    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)) : ℂ)]
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal]
+    {χ : IrreducibleCharacter ↥(huSub data)}
+    (hχ : χ ∈ xiOf data (chief.H0 ⊔ cSub data chief)) :
+    ∃ θbar : (↥data.H ⧸ chief.N) →* ℂˣ, θbar ≠ 1 ∧
+      (χ : ClassFunction ↥(huSub data) ℂ)
+        = ClassFunction.induce
+            (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+            (hcPsi chief θbar).toClassFunction := by
+  classical
+  letI : Fintype (IrreducibleCharacter ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+    M).subgroupOf (huSub data))) := Fintype.ofFinite _
+  obtain ⟨hχX, hχK⟩ := hχ
+  obtain ⟨ψ, hψover⟩ := OddOrder.RepresentationTheory.IrreducibleCharacter.exists_liesOver
+    (H := hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) χ
+  haveI hN := realizedH0supCprime_normal_huSub chief
+  haveI hNC := realizedH0supC_normal_huSub chief
+  haveI hNsub : ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))).Normal :=
+    hNC.subgroupOf _
+  -- `ψ` kills `ker hcHom ⊆ H₀C ⊆ Ker χ`-inherited
+  have hker : ((hcHom chief).ker : Set ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+      M).subgroupOf (huSub data))) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (ψ : ClassFunction
+        ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ) := by
+    intro x hx
+    have hx1 : hcHom chief x = 1 := hx
+    have hxH0C : x ∈ (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+        (huSub data)).subgroupOf
+        (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) := by
+      rw [hcHom, MonoidHom.comp_apply] at hx1
+      have h2 : (QuotientGroup.mk' ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+          (huSub data)).subgroupOf
+          (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))) x)
+          = 1 := by
+        apply (hcQuotientEquivHbar chief).injective
+        rw [map_one]
+        exact hx1
+      rw [QuotientGroup.mk'_apply] at h2
+      exact (QuotientGroup.eq_one_iff x).mp h2
+    exact liesOver_mem_characterKernel hψover (hχK (Subgroup.mem_subgroupOf.mp hxH0C))
+  -- factor `ψ` through `hcHom` and make the factor linear
+  obtain ⟨ψbar, hψbar⟩ :=
+    OddOrder.RepresentationTheory.exists_compHom_eq_of_subset_characterKernel
+      (hcHom_surjective chief) ψ hker
+  haveI : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
+  obtain ⟨θbar, hθbar⟩ :=
+    ψbar.isIrreducible.exists_linearIrreducibleCharacter_eq_of_isMulCommutative
+  have hψeq : (ψ : ClassFunction
+      ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ)
+      = (hcPsi chief θbar : ClassFunction
+        ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ) := by
+    rw [← hψbar, ← hθbar]
+    ext x
+    simp [hcPsi, linearIrreducibleCharacter_apply, ClassFunction.compHom_apply,
+      MonoidHom.comp_apply]
+  have hψeq' : ψ = hcPsi chief θbar := IrreducibleCharacter.ext hψeq
+  rcases eq_or_ne θbar 1 with rfl | hθne
+  · -- trivial seed: `ψ` invariant, Clifford forces `H ⊆ Ker χ`, contradiction with `χ ∈ 𝒳`
+    exfalso
+    have hψtriv : (ψ : ClassFunction
+        ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ)
+        = trivialClassFunction _ := by
+      rw [hψeq]
+      ext x
+      simp [hcPsi, linearIrreducibleCharacter_apply, trivialClassFunction]
+    have hinv : ∀ g : ↥(huSub data), IrreducibleCharacter.conjBy g ψ = ψ := by
+      intro g
+      apply IrreducibleCharacter.ext
+      rw [IrreducibleCharacter.coe_conjBy, hψtriv]
+      ext x
+      simp [ClassFunction.conjBy_apply, trivialClassFunction]
+    have hres := OddOrder.RepresentationTheory.restrict_eq_restrictionMultiplicity_smul_of_invariant
+      (H := hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+      χ ψ hψover hinv
+    apply hχX
+    intro x hx
+    rw [SetLike.mem_coe] at hx
+    have hxHC : x ∈ hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+        (huSub data) := Subgroup.mem_sup_left hx
+    have h1 := congrArg (fun f : ClassFunction
+        ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ =>
+      f (⟨x, hxHC⟩ : ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+        (huSub data)))) hres
+    have h2 := congrArg (fun f : ClassFunction
+        ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ =>
+      f (1 : ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+        (huSub data)))) hres
+    simp only [ClassFunction.restrict_apply, ClassFunction.smul_apply, hψtriv] at h1 h2
+    rw [OddOrder.Peterfalvi.S03.mem_characterKernel, OddOrder.Peterfalvi.S03.characterDegree_def]
+    have htriv1 : (trivialClassFunction
+        ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) :
+        ClassFunction _ ℂ) (⟨x, hxHC⟩ : ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+          M).subgroupOf (huSub data))) = 1 := rfl
+    have htriv2 : (trivialClassFunction
+        ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) :
+        ClassFunction _ ℂ) (1 : ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+          M).subgroupOf (huSub data))) = 1 := rfl
+    rw [htriv1] at h1
+    rw [htriv2] at h2
+    exact h1.trans h2.symm
+  · -- nontrivial seed: Clifford correspondence
+    have hθbarnt : (linearIrreducibleCharacter θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)
+        ≠ trivialClassFunction _ := by
+      intro h0
+      apply hθne
+      rw [← linearIrreducibleCharacter_eq_trivial_iff]
+      exact IrreducibleCharacter.ext
+        (h0.trans (IrreducibleCharacter.coe_trivialIrreducibleCharacter).symm)
+    have hθ₀ := inertia_eq_hcInHu data chief caseB.actsIrreducibly hθbarnt
+    refine ⟨θbar, hθne, ?_⟩
+    exact OddOrder.RepresentationTheory.coe_eq_induce_of_liesOver_of_isIrreducibleCharacter_induce
+      (G := ↥(huSub data)) χ (hcPsi chief θbar)
+      (hcZeta_irreducible chief θbar hθ₀) (hψeq' ▸ hψover)
+
 /-- **`ζ(1) = u`**: the degree of `ζ = Ind_{HC}^{HU}(ψ)` is `u`.  `induce_apply_one` gives
 `ζ(1) = [HU:HC]·ψ(1) = u·1` (`hc_index_eq_u`, and `ψ` linear so `ψ(1)=1`).  This is the degree-`u`
 of the (9.8.c) irreducible; `induceHU ζ` then has degree `q·u = qu`. -/
@@ -7965,6 +8100,181 @@ theorem hcZeta_mem_xiOf [Finite G] {M : Subgroup G}
         IrreducibleCharacter ↥(huSub data)) ∈ xiOf data (chief.H0 ⊔ cSub data chief) := by
   rw [mem_xiOf]
   exact ⟨hcZeta_mem_xiSet chief θ hθnt hθ₀, hcZeta_H0supC_subset_ker chief θ⟩
+
+/-- A nontrivial linear seed has a nontrivial character coercion (the seed form consumed by the
+case-(b) inertia lift `inertia_eq_hcInHu`). -/
+theorem linearIrreducibleCharacter_coe_ne_trivial_of_ne_one {K : Type*} [Group K] [Finite K]
+    {θ : K →* ℂˣ} (hθ : θ ≠ 1) :
+    (linearIrreducibleCharacter θ : ClassFunction K ℂ) ≠ trivialClassFunction K := by
+  intro h0
+  apply hθ
+  rw [← linearIrreducibleCharacter_eq_trivial_iff]
+  exact IrreducibleCharacter.ext
+    (h0.trans (IrreducibleCharacter.coe_trivialIrreducibleCharacter).symm)
+
+/-- **A reducible `M`-induction has an `M`-invariant source** (inertia dichotomy at the prime
+index `q = [M:HU]`): if `Ind_{HU}^M ζ` is *not* irreducible, then every `M`-conjugate of
+`ζ ∈ Irr(HU)` equals `ζ`.  The inertia `I_M(ζ)` lies between `HU` and `M`
+(`subgroup_le_inertia`); `[M:HU] = q` prime (`huSub_index_eq_q`) leaves `I = HU` or `I = M`
+(`relIndex_mul_index`), and `I = HU` would make the induction irreducible
+(`isIrreducibleCharacter_induce_of_inertia_eq`).  The injectivity input of the (9.9.c)
+`|Xζ| = p−1` count. -/
+theorem conjBy_eq_self_of_not_isIrreducibleCharacter_induceHU [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M}
+    (ζ : IrreducibleCharacter ↥(huSub data))
+    (hred : ¬ IsIrreducibleCharacter (induceHU data (ζ : ClassFunction ↥(huSub data) ℂ)))
+    (w : ↥M) : IrreducibleCharacter.conjBy w ζ = ζ := by
+  letI : Fintype ↥M := Fintype.ofFinite _
+  letI : Fintype ↥(huSub data) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥M : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  have hle : huSub data ≤ ClassFunction.inertia (ζ : ClassFunction ↥(huSub data) ℂ) :=
+    ClassFunction.subgroup_le_inertia _
+  have hq : (data.q).Prime := data.nontrivial.2.1
+  have hmul := Subgroup.relIndex_mul_index (H := huSub data)
+    (K := ClassFunction.inertia (ζ : ClassFunction ↥(huSub data) ℂ)) hle
+  rw [huSub_index_eq_q] at hmul
+  have hdvd : (ClassFunction.inertia (ζ : ClassFunction ↥(huSub data) ℂ)).index ∣ data.q :=
+    ⟨_, by rw [mul_comm]; exact hmul.symm⟩
+  have htop : ClassFunction.inertia (ζ : ClassFunction ↥(huSub data) ℂ) = ⊤ := by
+    rcases (Nat.Prime.eq_one_or_self_of_dvd hq _ hdvd) with h1 | hqq
+    · exact Subgroup.index_eq_one.mp h1
+    · -- `I.index = q` forces `relIndex = 1`, i.e. `I ≤ HU`, so `I = HU` — induction irreducible.
+      exfalso
+      rw [hqq] at hmul
+      have hrel1 : (huSub data).relIndex
+          (ClassFunction.inertia (ζ : ClassFunction ↥(huSub data) ℂ)) = 1 :=
+        Nat.eq_of_mul_eq_mul_right hq.pos (hmul.trans (one_mul data.q).symm)
+      have hIle : ClassFunction.inertia (ζ : ClassFunction ↥(huSub data) ℂ) ≤ huSub data :=
+        Subgroup.relIndex_eq_one.mp hrel1
+      exact hred (OddOrder.RepresentationTheory.isIrreducibleCharacter_induce_of_inertia_eq ζ
+        (le_antisymm hIle hle))
+  have hw : w ∈ ClassFunction.inertia (ζ : ClassFunction ↥(huSub data) ℂ) :=
+    htop ▸ Subgroup.mem_top w
+  rw [ClassFunction.mem_inertia] at hw
+  exact IrreducibleCharacter.ext (by rw [IrreducibleCharacter.coe_conjBy]; exact hw)
+
+set_option maxHeartbeats 1600000 in
+open scoped Classical in
+/-- **Peterfalvi (9.9.c), the `u`-formula half**: in Clifford case (b), if `𝒮(H₀C')` contains
+no irreducible character then `u = (p^q−1)/(p−1)`.
+
+With `C = ⊥` (`caseB_no_irreducible_forces_C_bot`) all the joins collapse to `H₀`, so every
+member of `𝒮(H₀)` is reducible.  Count `𝒳(H₀)` two ways: the case-(b) `oXtheta`
+(`caseB_oXtheta_count`) gives `u·|Xζ| = p^q−1` for the set `Xζ` of `hcPsi`-inductions, which
+exhausts `𝒳(H₀)` (`caseB_xiOf_H0C_eq_induce_hcPsi`); and `Ind_{HU}^M` maps `Xζ` *bijectively*
+onto the `p−1` reducible members of `𝒮(H₀)` (`reducible_count_sOf_H0`) — injectivity because a
+reducible induction has an `M`-invariant source (`conjBy_eq_self_of_…`, prime-index inertia
+dichotomy), so `Ind ζ₁ = Ind ζ₂ ⟹ ζ₂ = ζ₁^w = ζ₁`.  Hence `u·(p−1) = p^q−1`. -/
+theorem caseB_no_irreducible_u_formula [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief) (caseB : CliffordCaseBData chars)
+    (hno : ¬ ∃ χ ∈ chars.SOf (chief.H0 ⊔ chars.Cprime), IsIrreducibleCharacter χ) :
+    chars.u = (chief.p ^ data.q - 1) / (chief.p - 1) := by
+  classical
+  have hCbot : cSub data chief = ⊥ := caseB_no_irreducible_forces_C_bot hG chars caseB hno
+  have hCpbot : cprimeSub data chief = ⊥ :=
+    le_bot_iff.mp (hCbot ▸ cprimeSub_le_C data chief)
+  have hcollapse : chief.H0 ⊔ cSub data chief = chief.H0 := by rw [hCbot, sup_bot_eq]
+  letI : Fintype ↥M := Fintype.ofFinite _
+  letI : Fintype ↥(huSub data) := Fintype.ofFinite _
+  letI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+    (huSub data)) := Fintype.ofFinite _
+  letI : Fintype ((↥data.H ⧸ chief.N) →* ℂˣ) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥M : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+    M).subgroupOf (huSub data)) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+    (huSub data)).Normal := hcInHu_realized_normal chief
+  -- `hno` in `𝒮(H₀)`-form (`C' = ⊥` collapses the join)
+  have hno' : ∀ φ ∈ sOf data chief.H0, ¬ IsIrreducibleCharacter φ := by
+    intro φ hφ hirr
+    apply hno
+    refine ⟨φ, ?_, hirr⟩
+    show φ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief)
+    rw [hCpbot, sup_bot_eq]
+    exact hφ
+  -- the case-(b) `oXtheta` count
+  have hcount := caseB_oXtheta_count (chars := chars) caseB
+  set NF := Finset.univ.filter fun θ : (↥data.H ⧸ chief.N) →* ℂˣ => θ ≠ 1 with hNF
+  set Xz := NF.image fun θ =>
+    ClassFunction.induce (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)) (hcPsi chief θ).toClassFunction with hXz
+  -- every `Xζ`-member is (the coercion of) a `𝒳(H₀)`-irreducible
+  have hXmem : ∀ φz ∈ Xz, ∃ ζ : IrreducibleCharacter ↥(huSub data),
+      (ζ : ClassFunction ↥(huSub data) ℂ) = φz ∧ ζ ∈ xiOf data chief.H0 := by
+    intro φz hφz
+    obtain ⟨θ, hθNF, rfl⟩ := Finset.mem_image.mp hφz
+    have hθne : θ ≠ 1 := (Finset.mem_filter.mp hθNF).2
+    have hθ₀ := inertia_eq_hcInHu data chief caseB.actsIrreducibly
+      (linearIrreducibleCharacter_coe_ne_trivial_of_ne_one hθne)
+    refine ⟨⟨_, hcZeta_irreducible chief θ hθ₀⟩, rfl, ?_⟩
+    have hxi := hcZeta_mem_xiOf chief θ hθne hθ₀
+    exact (congrArg (xiOf data) hcollapse) ▸ hxi
+  -- their `M`-inductions are reducible `𝒮(H₀)`-members
+  have hXred : ∀ φz ∈ Xz, induceHU data φz ∈ sOf data chief.H0
+      ∧ ¬ IsIrreducibleCharacter (induceHU data φz) := by
+    intro φz hφz
+    obtain ⟨ζ, hζcoe, hζxi⟩ := hXmem φz hφz
+    have hmem : induceHU data φz ∈ sOf data chief.H0 := by
+      rw [← hζcoe]
+      exact mem_sOf.mpr ⟨ζ, hζxi, rfl⟩
+    exact ⟨hmem, hno' _ hmem⟩
+  -- `Ind_{HU}^M` is injective on `Xζ` (reducible inductions have `M`-invariant sources)
+  have hinj : Set.InjOn (fun φz => induceHU data φz)
+      (Xz : Set (ClassFunction ↥(huSub data) ℂ)) := by
+    intro φz₁ h1 φz₂ h2 heq
+    rw [Finset.mem_coe] at h1 h2
+    obtain ⟨ζ₁, hζ₁coe, -⟩ := hXmem φz₁ h1
+    obtain ⟨ζ₂, hζ₂coe, -⟩ := hXmem φz₂ h2
+    have hred1 : ¬ IsIrreducibleCharacter (induceHU data (ζ₁ : ClassFunction _ ℂ)) := by
+      rw [hζ₁coe]
+      exact (hXred φz₁ h1).2
+    have heq' : induceHU data (ζ₁ : ClassFunction _ ℂ)
+        = induceHU data (ζ₂ : ClassFunction _ ℂ) := by
+      rw [hζ₁coe, hζ₂coe]
+      exact heq
+    obtain ⟨w, hw⟩ := (OddOrder.RepresentationTheory.induce_eq_induce_iff_conj
+      (G := ↥M) (H := huSub data) ζ₁ ζ₂).mp heq'
+    have hfix := conjBy_eq_self_of_not_isIrreducibleCharacter_induceHU ζ₁ hred1 w
+    rw [← hζ₁coe, ← hζ₂coe, ← hw, hfix]
+  -- the image is exactly the reducible part of `𝒮(H₀)` (exhaustion for `⊇`)
+  have himg : (fun φz => induceHU data φz) '' (Xz : Set (ClassFunction ↥(huSub data) ℂ))
+      = {φ ∈ sOf data chief.H0 | ¬ IsIrreducibleCharacter φ} := by
+    ext φ
+    constructor
+    · rintro ⟨φz, hφz, rfl⟩
+      rw [Finset.mem_coe] at hφz
+      exact ⟨(hXred φz hφz).1, (hXred φz hφz).2⟩
+    · rintro ⟨hφS, hφred⟩
+      obtain ⟨ζ', hζ'xi, rfl⟩ := mem_sOf.mp hφS
+      have hζ'xiC : ζ' ∈ xiOf data (chief.H0 ⊔ cSub data chief) :=
+        (congrArg (xiOf data) hcollapse).symm ▸ hζ'xi
+      obtain ⟨θbar, hθne, hζ'eq⟩ := caseB_xiOf_H0C_eq_induce_hcPsi caseB hζ'xiC
+      refine ⟨(ζ' : ClassFunction ↥(huSub data) ℂ), ?_, rfl⟩
+      rw [Finset.mem_coe, hζ'eq]
+      exact Finset.mem_image.mpr ⟨θbar,
+        Finset.mem_filter.mpr ⟨Finset.mem_univ _, hθne⟩, rfl⟩
+  -- `|Xζ| = p − 1`
+  have hXcard : Xz.card = chief.p - 1 :=
+    calc Xz.card = (Xz : Set (ClassFunction ↥(huSub data) ℂ)).ncard :=
+          (Set.ncard_coe_finset Xz).symm
+      _ = ((fun φz => induceHU data φz) '' (Xz : Set (ClassFunction ↥(huSub data) ℂ))).ncard :=
+          (Set.InjOn.ncard_image hinj).symm
+      _ = chief.p - 1 := by rw [himg]; exact reducible_count_sOf_H0 hG chief
+  -- assemble: `u·(p−1) = p^q − 1` (`set` already folded `NF`/`Xz` into `hcount`)
+  rw [hXcard] at hcount
+  have hp1 : 0 < chief.p - 1 := Nat.sub_pos_of_lt chief.p_prime.one_lt
+  rw [← hcount]
+  exact (Nat.mul_div_cancel _ hp1).symm
+
 
 /-- **Degree of the (9.8.c) `𝒮`-member**: `(Ind_{HU}^M ζ)(1) = q·u = qu`.  Combines the `HU→M`
 index `[M:HU] = q` (`induceHU_apply_one_eq_q_mul`) with `ζ(1) = u` (`hcZeta_apply_one`). -/
@@ -9200,8 +9510,8 @@ theorem caseB_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     have hmem := reducible_mem_sOf_H0C hG chars φ hφ hred
     exact ⟨forall_mem_sOf_H0C_apply_one_eq_qu hG chars caseB φ hmem, hmem⟩
   · intro hno
-    refine ⟨caseB_no_irreducible_forces_C_bot hG chars caseB hno, ?_⟩
-    sorry
+    exact ⟨caseB_no_irreducible_forces_C_bot hG chars caseB hno,
+      caseB_no_irreducible_u_formula hG chars caseB hno⟩
 
 /-- **Peterfalvi (9.10)**: in the exceptional case where `𝒮(H₀C')` contains no irreducible
 character of degree `qu`, the quotient semidirect product is Frobenius; in type II the full `H U`
