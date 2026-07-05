@@ -557,3 +557,8 @@ coeff (X ∈ ℤ[R]) / Y ⊥ R。
 - (μ_ij − μ_ik)^τ = δ(ω^σ_ij − ω^σ_ik) を CoherentHypothesis なしで閉了。
   レシピ通り (追記 9)。次 = 列和版 (Finset.sum) → coh-free columnImageFamily
   → sixTwoDecompositionData named 2 点の plumbing。
+
+## 2026-07-05 lane-a (loop 36): coh-free 列インフラ完成
+
+- tau_muGrid_columnSum_diff_cohFree + columnImageFamilyCohFree 閉。
+  残 = named 2 点の ofProjection plumbing (追記 8-9 のレシピ後半)。
