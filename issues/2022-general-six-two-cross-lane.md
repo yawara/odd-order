@@ -691,3 +691,22 @@ vs CharacterDifferenceImage.Orthogonal) の突合が実装時の最初の確認�
   そこでは ψ 既約で χ,ψ 相異なら family-pairwise が 4-cross を自動供給
   していた (列 ψ では成分-重なりが破る)。修正は可約-break 分岐にのみ影響。
 - break-Da 構成 (loop 46) 自体は影響なし (Da-半分は健全)。
+
+### 追記 15 (loop 48): ✓ 追記 14 の懸念は解消 — 無条件 obligation は健全、証明形確定
+
+- **反例は成立しない**: χ ∈ S₁ は族 member (Ind-form)。μ_ik-entry は可約 Ind の
+  既約成分であって族 member ではない。さらに次数で χ ≠ μ_ik が強制される:
+  irr-member 次数 = q·θ(1) ≡ 0 (mod q) vs d ≡ 1 (mod q)
+  (charParam_d_modEq_one) → 相異既約 → ⟨χ, μ_ik⟩ = 0 (全 i,k)。
+  よって (5.2.e)-前提 (4-cross) は文脈内で常に成立 → 無条件 member-clause 健全。
+- **per-pair R(χ)-elt ⊥ ω^σ_ik の証明形 (pigeonhole)**:
+  1. ⟨τ(χ−χ̄), τ(μ_ik − μ_ik')⟩ = ⟨χ−χ̄, μ_ik − μ_ik'⟩ = 0
+     (両 supported + dade-preserve; 源は上記 per-entry 直交)。
+  2. τ(rowdiff) = δ(ω_ik − ω_ik') (tau_muGrid_row_diff!)。
+  3. R(χ) の底既約は 2 個; ω_ik が共有されると仮定 → 各 k'≠k で
+     ⟨…⟩=0 から ω_ik' も共有 → w₂−1 ≥ 2 個の相異 ω を 2-成分が
+     カバー不能 (w₂ ≥ 3) → 矛盾 → 共有なし → ⟨α, ω^σ_ik⟩ = 0 ✓。
+- 実装順: (i) per-entry ⟨χ, μ_ik⟩ = 0 lemma (次数 mod q);
+  (ii) pigeonhole per-pair lemma; (iii) member-D 組み立て
+  (memberDatum_of_irreducible + Orthogonal-per-pair) — 可約-χ は
+  列-列 cross (muGrid_inner_cross_column 直接)。
