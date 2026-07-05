@@ -583,6 +583,36 @@ structure CharacterDegreeData (hyp : Hypothesis (G := G)) where
         lambda = ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ ∧
         ∃ x : ↥(hyp.H.subgroupOf hyp.S), ((x : ↥hyp.S) : G) ∈ hyp.P ∧
           x ∉ OddOrder.Peterfalvi.S03.characterKernel θ
+  /-- **(13.2.e)+(7.2), τ₁-extension semantics** (issue 2034): on zero-degree differences of
+  `H`-induced irreducibles (the (7.6)-family lattice `ℤ[𝒮₁, H^#]`), `τ₁` agrees with the Dade
+  isometry, which is `Ind_S^G` (the `A₀(S)` TI-subset makes `τ = Ind`). -/
+  tau1S_apply_induce_sub :
+    haveI := hyp.finiteG
+    ∀ θ θ' : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ,
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter θ →
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter θ' →
+      tau1S (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ
+          - ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ')
+        = ClassFunction.induce hyp.S
+            (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ
+              - ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ')
+  /-- **The τ₁ coherence isometry on the induced family** (issue 2034): `τ₁` preserves inner
+  products of `H`-induced irreducibles ((13.2.d)-extension isometry restricted to `𝒮₁`). -/
+  tau1S_inner_induce :
+    haveI := hyp.finiteG
+    ∀ θ θ' : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ,
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter θ →
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter θ' →
+      ClassFunction.inner (tau1S (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ))
+          (tau1S (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ'))
+        = ClassFunction.inner (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ)
+            (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ')
+  /-- **τ₁ sends family members to virtual characters** (issue 2034). -/
+  tau1S_induce_mem_ZIrr :
+    haveI := hyp.finiteG
+    ∀ θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ,
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter θ →
+      tau1S (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ) ∈ ZIrr G
   mu_j_linear_induced : Prop
   mu_j_linear_induced_holds : mu_j_linear_induced
   no_lambda_forces_caseB_S : Prop
@@ -2994,7 +3024,18 @@ theorem lambda_tau1_norm_one [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     chars.tau1S chars.lambda ∈ ZIrr G ∧
       ClassFunction.inner (chars.tau1S chars.lambda) (chars.tau1S chars.lambda) = 1 ∧
       ClassFunction.inner chars.lambda chars.lambda = 1 := by
-  sorry
+  obtain ⟨θ, hθirr, -, hlamEq, -⟩ := chars.lambda_induced_from_PC_linear
+  have hnorm : ClassFunction.inner chars.lambda chars.lambda = 1 := by
+    have h := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite
+      (⟨chars.lambda, chars.lambda_irreducible⟩ :
+        OddOrder.RepresentationTheory.IrreducibleCharacter ↥hyp.S)
+      ⟨chars.lambda, chars.lambda_irreducible⟩
+    simpa using h
+  refine ⟨?_, ?_, hnorm⟩
+  · rw [hlamEq]
+    exact chars.tau1S_induce_mem_ZIrr θ hθirr
+  · rw [hlamEq, chars.tau1S_inner_induce θ θ hθirr hθirr, ← hlamEq]
+    exact hnorm
 
 open scoped Classical in
 /-- **Sharp-set sum transport** (subgroup-of form ↔ ambient form): for `K ≤ L`, a sum over the
