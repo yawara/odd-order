@@ -551,3 +551,22 @@ support だけ差し替え)。**helper 3 は speculative sorry で前倒しせ�
 **step 5a route の判定**: helper 1/2 は family membership (gap#1) さえ閉じれば完成。helper 3 (=field
 `tau1S_apply_induce_sub`) は gap#1 に加え gap#2 (support redesign) が要る。**step 5a は未完** (2/3 landed、
 1/3 は foundation-support blocked)。tau1S_induce_inner_eta ((5.3.b) η-orthogonality) は別 harder field で今回対象外。
+
+## 2026-07-06 更新 #7 (lane b): sS1S = **prime-TI residue API** 依存と精密判明 — repo 未形式化の基盤 (~2-3 session)
+
+`induce_H_mem_zSpan_S` (sS1S / Pf (1.5.a)) を精査 (build-agent、no fake proof、tree clean、build green):
+- **本 gap = prime-TI residue machinery** (`primeTIred mu_`, `prTIres_irr_cases` = prime-TI residue の
+  constituent 分類, `cfInd_prTIres`)。**repo に未形式化** (docstring/comment のみ、mathcomp character
+  library の foundational piece)。Coq proof = `S1cases` (PFsection13.v:401-428) の prime-TI Clifford
+  dichotomy (zeta=mu_j ∈𝒮 or ∈ℤ[𝒮∩Irr])。
+- **(9.9) counts は blocker でない**: `caseB_character_counts` は sorry-free 済 (it.61-68)、かつ sS1S は
+  counts を経由せず prime-TI residue theory を経由 (orthogonal)。
+- **既存 §9 isIndHC stack は逆方向** (family→Ind_{PC}(linear)) ゆえ本 source→family 方向を供給しない
+  (`mu_j_isIndPC` も逆写像で反転不可)。
+- **建設 (~4-4.5 session)**: (1) prime-TI residue API `(W,S)` [~2-3 session、mathcomp port、**substantial
+  新 infra**] → (2) forward `FTseqInd_TIred` (mu_j∈𝒮) [~0.5] → (3) `S1cases` dichotomy assembly [~1] →
+  (4) sS1S wrapper [~1h]。**step 1 (prime-TI residue API) は §13 μ_j machinery も unblock** (broad value)。
+- downstream: `tau1S_ofHonest_inner_induce`/`_induce_mem_ZIrr` は sS1S を cite して landed 済 →
+  sS1S closure で完全 sorry-free 化。`tau1S_apply_induce_sub` は別 gap (#6 の A₀(S) support-widening)。
+
+**戦略的岐路**: (13.3) 完遂 + broad §13 は **prime-TI residue API** (major ~2-3 session infra port) に gated。
