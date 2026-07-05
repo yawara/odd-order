@@ -147,6 +147,40 @@ conjunct-3 type-II HU-Frobenius = 指標論的 Frobenius 判定法 (Isaacs 7 章
 → campaign step 3 ((13.3.a) の S11 側) は本質完了。次 = step 1-2 (S15↔S11 bridge の
 honest Section11CharacterData 構成 + sibleyTarget_H0C) or step 4 (τ₁ 導出)。
 
+## (13.3.a) isIndHC-corollary build-spec (it.70 recon)
+
+**S↔§9 bridge 開通済 (it.69)**: `toTypesIIIIIIVSetupS` + `mkSection11CharacterDataS`。
+§9-H = S_F = P、§9-HC = PC = hyp.H。
+
+**次の §9-corollary (Coq PFsection9 の `isIndHC`)**: caseB で reducible φ ∈ 𝒮(H₀) は
+Ind_{HC}^{M}(linear):
+
+```
+caseB_reducible_sOf_H0_isIndHC :
+  φ ∈ sOf data chief.H0 → ¬Irr φ →
+  ∃ ψ : CF ↥((hInHu ⊔ realizedH0C).map (huSub data).subtype) ℂ,
+    IsIrr ψ ∧ ψ 1 = 1 ∧ φ = ClassFunction.induce _ ψ
+```
+
+構成: (9.9.b) reducible_mem_sOf_H0C → ζ' ∈ 𝒳(H₀C) → exhaustion
+(caseB_xiOf_H0C_eq_induce_hcPsi) → ζ' = Ind_{HC}(hcPsi θbar) →
+段階誘導 `induce_induce_subgroupOf` (InducedTransport:74, K ≤ H ≤ M 在庫 lemma) で
+φ = Ind_{HU}(Ind_{HC} pair) = Ind_{K}(ψ)、K := HC.map subtype。
+
+transport 設計 (cast 回避):
+- hKeq : K.subgroupOf (huSub) = HC-orig via `Subgroup.comap_map_eq_self_of_injective`
+  (subtype injective; subgroupOf = comap subtype)
+- f : ↥K ≃* ↥HC-orig := (subgroupOfEquivOfLe map_subtype_le).symm.trans
+  (MulEquiv.subgroupCongr hKeq) — G-val preserving
+- ψ := compHom f.toMonoidHom (hcPsi θbar)-coe; stages-lemma の inner-term 一致は
+  compHom_comp (S11:6018 パターン) + subgroupCongr で処理; ψ linear:
+  compHom は 1 を 1 に (f 1 = 1) → ψ 1 = pair 1 = 1; Irr: compHom_of_surjective (f surj)
+
+S15-側の残 gap (それでも): μ-columns ∈ 𝒮(H₀)-linkage (hyp.mu の membership spec が
+未 pin — mu は W-side τ₃-cascade 供給、(13.1.e)-relation field のみ)。isIndHC 完成後、
+μ-column 側は「Σᵢ μᵢⱼ が S-family の reducible member」を hyp-fields から導く追加
+threading が必要 (要 recon: mu_col の degree/vanishing spec)。
+
 ## (9.9.c) branch-1 build-spec (it.60 recon)
 
 Pf の C ≠ 1 否定枝の Lean 化に必要な新規構成:
