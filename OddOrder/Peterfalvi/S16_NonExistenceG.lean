@@ -4677,13 +4677,109 @@ structure CaseBContradictionData {hyp : Hypothesis (G := G)}
     ClassFunction.inner betaL psiImg ≠ 0
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **The (14.16) expansion input** — the remaining §13-gated character content of the case-(b)
-contradiction.  Under case-(b) (`(q,p) = (3,5)`) and the two gap inequalities, (13.19.c) applies
-on both sides and assembles the (14.11.2)-style signed `η`-grid expansion of the L-side
-`β_L^τ = Σ ±η_ij − (±ζ_i^ν)` — the removed unit-norm member is an `L`-family coherent image
-(index `i ≠ ind1H`; the `−ψ̄^{τ₁}` alternative is the conjugate family member, `conjIndex`) —
-and the M-side (14.11.2) norm count makes `ψ^{τ₁} = ζ_M^ν` orthogonal to the whole `η`-grid.
-Named §16 obligation (the (13.19)-type grid counting, issue 3002 sphere). -/
+/-- **Peterfalvi (13.19.b), the M-side `η`-grid orthogonality of `ψ^{τ₁} = ζ_M^ν`.**
+
+The distinguished coherent image `ψ^{τ₁} = ζ_M^ν` (`= (dataM.h78 hG).nu (ζ_{zetaDistinct})`)
+is orthogonal to the entire `η`-grid.  This is the sorry-free (3.6)–(3.8)/(13.19.b) engine
+`eta_orthogonal_of_norm_one_pair_vanish` (`S16_GridExpansion`) applied to the conjugate pair
+`(ζ_M^ν, ζ̄_M^ν)`: the unit norms (`nu_zeta_norm_one`), the conjugate distinctness
+`⟨ζ_M^ν, ζ̄_M^ν⟩ = 0` (`nu_zeta_inner_nu_conj_eq_zero`), and the `ℤ[Irr G]` memberships
+(`coh.extension_mem_ZIrr` on `ζ ∈ 𝒮`) are all supplied by the `TypeICoherent78Data` coherence
+bundle.  The single genuine §13/§14 input is `hDadeAvoid` = **Peterfalvi (13.19.a)**: the M-side
+Dade support `Ã(M)` avoids the regular-set saturation `Ŵ^G = (W ∖ (W₁ ∪ W₂))^G`, so the
+conjugate difference `ζ_M^ν − ζ̄_M^ν` (supported in `Ã(M)`, `nu_zeta_sub_conj_support_at`)
+vanishes on `Ŵ^G`. -/
+theorem caseB_eta_orthogonal_psi [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    {M : Subgroup G} (dataM : TypeICoherent78Data M)
+    (hDadeAvoid : ∀ x ∈ conjClassSet
+        ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))),
+        x ∉ (dataM.h78 hG).hyp76.hyp71.hyp.dadeSupport) :
+    ∀ (i : Fin hyp.q) (j : Fin hyp.p),
+      ClassFunction.inner (hyp.eta i j)
+        ((dataM.h78 hG).nu ((dataM.h78 hG).hyp76.zeta (dataM.h78 hG).zetaDistinct)) = 0 := by
+  classical
+  -- distinctness datum for the distinguished index `zetaDistinct = 0` and its conjugate `i'`
+  have hjne : (dataM.h78 hG).zetaDistinct ≠ dataM.ind1H := by
+    have h := (dataM.h78 hG).zetaDistinct_ne_ind1H
+    rwa [dataM.h78_ind1H_eq] at h
+  obtain ⟨i', hi'_ne, hi'⟩ := dataM.exists_conjIndex_at hG hjne
+  -- engine inputs from the coherence bundle
+  have hpsiZ : (dataM.h78 hG).nu ((dataM.h78 hG).hyp76.zeta (dataM.h78 hG).zetaDistinct)
+      ∈ ZIrr G := by
+    rw [dataM.h78_nu_eq, dataM.h78_zetaDistinct_eq, dataM.h78_zeta_eq]
+    exact dataM.coh.extension_mem_ZIrr _
+      (Submodule.subset_span (dataM.zeta_mem_Sset (Ne.symm dataM.ind1H_ne_zero)))
+  have hconjZ : (dataM.h78 hG).nu ((dataM.h78 hG).hyp76.zeta i') ∈ ZIrr G := by
+    have hi'ne_data : i' ≠ dataM.ind1H := by rw [← dataM.h78_ind1H_eq]; exact hi'_ne
+    rw [dataM.h78_nu_eq, dataM.h78_zeta_eq]
+    exact dataM.coh.extension_mem_ZIrr _
+      (Submodule.subset_span (dataM.zeta_mem_Sset hi'ne_data))
+  have hpsi1 := dataM.nu_zeta_norm_one hG (dataM.h78 hG).zetaDistinct_ne_ind1H
+  have hconj1 := dataM.nu_zeta_norm_one hG hi'_ne
+  have hcross := dataM.nu_zeta_inner_nu_conj_eq_zero hG hG.odd hjne hi'_ne hi'
+  have hsupp := dataM.nu_zeta_sub_conj_support_at hG hjne hi'_ne hi'
+  have hvanish : ∀ x ∈ conjClassSet
+      ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))),
+      ((dataM.h78 hG).nu ((dataM.h78 hG).hyp76.zeta (dataM.h78 hG).zetaDistinct)
+        - (dataM.h78 hG).nu ((dataM.h78 hG).hyp76.zeta i')) x = 0 := by
+    intro x hx
+    by_contra hval
+    exact hDadeAvoid x hx (hsupp (ClassFunction.mem_support.mpr hval))
+  exact eta_orthogonal_of_norm_one_pair_vanish hyp hpsiZ hconjZ hpsi1 hconj1 hcross hvanish
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (13.19.a), the M-side Dade-support avoidance.**  For a type-`I` maximal
+`M` not conjugate to the `W`-containing maximals `S`, `T` (`nc.not_conj`), the Dade support
+`Ã(M)` avoids the regular-set saturation `Ŵ^G = (W ∖ (W₁ ∪ W₂))^G`.  In Peterfalvi this is
+(13.19.a) (`Ã(M)` meets neither `P^G` nor `W^G`); it bottoms out at the BG §10-level
+σ-decomposition that the Fitting-prime supports of distinct maximals are disjoint
+(Coq `FT_Dade_support_partition`).  Named §16/§13 obligation. -/
+theorem mSide_dadeSupport_avoids_regular [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (nc : NonConjugateHypothesis hyp) (dataM : TypeICoherent78Data nc.Mdata.M) :
+    ∀ x ∈ conjClassSet
+        ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G))),
+      x ∉ (dataM.h78 hG).hyp76.hyp71.hyp.dadeSupport := by
+  sorry
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (13.19.c), the L-side signed `η`-grid expansion.**  Under case-(b)
+(`(q,p) = (3,5)`) and the two gap inequalities, (13.19.c) applied on the S- and T-sides gives
+the (14.11.2)-style signed expansion `β_L^τ = Σ_{ij} ε_ij η_ij − ε ζ_i^ν` of the L-side, with
+the removed unit-norm member an `L`-family coherent image (`i ≠ ind1H`; the `−ψ̄^{τ₁}`
+alternative is the conjugate member `conjIndex`).  Named §16 obligation (the (13.19)-type
+grid counting, issue 3002 sphere). -/
+theorem lSide_signed_eta_expansion [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
+    (dataL : TypeICoherent78Data nc.Ldata.L)
+    (hq3 : hyp.base.q = 3) (hp5 : hyp.base.p = 5)
+    (hhv :
+      ((nc.h - 1 : ℕ) : ℚ) / ((hyp.base.p * hyp.base.q : ℕ) : ℚ) >
+        ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ))
+    (hvu :
+      ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
+        ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)) :
+    ∃ signs : Fin hyp.base.q → Fin hyp.base.p → ℤ,
+      (∀ i j, signs i j = 1 ∨ signs i j = -1) ∧
+      ∃ i : Fin (dataL.n + 1), i ≠ dataL.ind1H ∧
+      ∃ ε : ℤ, (ε = 1 ∨ ε = -1) ∧
+        (dataL.h78 hG).beta
+          = (∑ i' : Fin hyp.base.q, ∑ j : Fin hyp.base.p,
+              (signs i' j : ℂ) • hyp.base.eta i' j)
+            - (ε : ℂ) • ((dataL.h78 hG).nu ((dataL.h78 hG).hyp76.zeta i)) := by
+  sorry
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The (14.16) expansion input** — the §13-gated character content of the case-(b)
+contradiction, split into its two genuine textbook gates and the sorry-free (13.19.b) engine.
+Under case-(b) (`(q,p) = (3,5)`) and the two gap inequalities:
+
+* the L-side signed `η`-grid expansion `β_L^τ = Σ ±η_ij − ε ζ_i^ν` is the named (13.19.c)
+  producer `lSide_signed_eta_expansion`;
+* the M-side orthogonality `(η_ij, ψ^{τ₁}) = 0` (`ψ^{τ₁} = ζ_M^ν`) is **proven** by the
+  (3.6)–(3.8)/(13.19.b) engine `caseB_eta_orthogonal_psi`, whose one residual input is the
+  named (13.19.a) Dade-support avoidance `mSide_dadeSupport_avoids_regular`. -/
 theorem caseB_expansion_input [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
     (dataL : TypeICoherent78Data nc.Ldata.L) (dataM : TypeICoherent78Data nc.Mdata.M)
@@ -4706,7 +4802,11 @@ theorem caseB_expansion_input [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G
           ClassFunction.inner (hyp.base.eta i' j)
             ((dataM.h78 _hG).nu
               ((dataM.h78 _hG).hyp76.zeta (dataM.h78 _hG).zetaDistinct)) = 0 := by
-  sorry
+  obtain ⟨signs, hsigns, i, hi, ε, hε, hexp⟩ :=
+    lSide_signed_eta_expansion _hG dataL hq3 hp5 hhv hvu
+  exact ⟨signs, hsigns, i, hi, ε, hε, hexp,
+    caseB_eta_orthogonal_psi _hG hyp.base dataM
+      (mSide_dadeSupport_avoids_regular _hG nc dataM)⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Faithful §16 producer for the (14.16) case-(b) contradiction inputs.**  The case-(b)
