@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core
 import OddOrder.Peterfalvi.S08_SixTwoGeneral
+import OddOrder.GroupTheory.PiElementDecomposition
 
 /-!
 # Peterfalvi (11.8.1): the §9 counts for the §10 grid
@@ -1018,6 +1019,97 @@ theorem Hypothesis.inertia_eq_derived_of_linear [Finite G]
   ext x
   rw [hall x]
   rfl
+
+/-- **Peterfalvi (8.5.a)/(11.2): `C = C_U(H)` is normalized by `M`** (the `C_normalized_by_M`
+obligation of the (11.2) setup): `F(M) = H ⊔ C` (`TypePData.fitting_eq`) is `M`-invariant; `H` and
+`C` centralize each other with coprime orders (`typeP_coprime_H_uW1`), so the `M`-conjugate of a
+`C`-element, decomposed along `F(M) = H·C`, has trivial `H`-part by the uniqueness of the
+commuting coprime (`π(H)`, `π(H)'`) decomposition (`isPiElement_mul_unique`). -/
+theorem typePData_C_normalized_by_M [Finite G] {M : Subgroup G} (data : TypePData M)
+    (hU : data.U ≠ ⊥) :
+    M ≤ Subgroup.normalizer
+      ((data.U ⊓ Subgroup.centralizer (data.H : Set G) : Subgroup G) : Set G) := by
+  classical
+  -- `F(M)` mapped to `G` is normalized by all of `M`
+  have hFn : M ≤ Subgroup.normalizer
+      (((OddOrder.Isaacs.Ch01.fitting ↥M).map M.subtype : Subgroup G) : Set G) := by
+    have h := Subgroup.le_normalizer_map (H := OddOrder.Isaacs.Ch01.fitting ↥M) M.subtype
+    rwa [Subgroup.normalizer_eq_top_iff.mpr inferInstance, ← MonoidHom.range_eq_map,
+      Subgroup.range_subtype] at h
+  -- `C ≤ N(H)` (it centralizes `H`), so `↑(H ⊔ C) = ↑H * ↑C` as sets
+  have hCleNH : (data.U ⊓ Subgroup.centralizer (data.H : Set G) : Subgroup G)
+      ≤ Subgroup.normalizer (data.H : Set G) :=
+    inf_le_right.trans (Subgroup.centralizer_le_normalizer (data.H : Set G))
+  have hHC : ((data.H ⊔ (data.U ⊓ Subgroup.centralizer (data.H : Set G)) : Subgroup G) : Set G)
+      = (data.H : Set G) * ((data.U ⊓ Subgroup.centralizer (data.H : Set G) : Subgroup G) : Set G) :=
+    Subgroup.coe_mul_of_right_le_normalizer_left _ _ hCleNH
+  -- coprimality of `|H|` and `|U|`
+  have hcoHU : Nat.Coprime (Nat.card ↥data.H) (Nat.card ↥data.U) :=
+    (OddOrder.Peterfalvi.S11.typeP_coprime_H_uW1 data hU).coprime_dvd_right
+      (Subgroup.card_dvd_of_le le_sup_left)
+  -- orders of `C`-elements are `π(H)'`; orders of `H`-elements are `π(H)`
+  set π : Set ℕ := {p : ℕ | p ∣ Nat.card ↥data.H} with hπ_def
+  have hPiH : ∀ h ∈ data.H, IsPiElement π h := by
+    intro h hh p hp
+    have hdvd : orderOf h ∣ Nat.card ↥data.H := by
+      have h1 : orderOf ((⟨h, hh⟩ : ↥data.H) : G) = orderOf (⟨h, hh⟩ : ↥data.H) :=
+        orderOf_injective data.H.subtype data.H.subtype_injective ⟨h, hh⟩
+      rw [show ((⟨h, hh⟩ : ↥data.H) : G) = h from rfl] at h1
+      rw [h1]
+      exact orderOf_dvd_natCard _
+    exact (Nat.dvd_of_mem_primeFactors hp).trans hdvd
+  have hPiC : ∀ c ∈ data.U, IsPiElement πᶜ c := by
+    intro c hc p hp
+    have hdvd : orderOf c ∣ Nat.card ↥data.U := by
+      have h1 : orderOf ((⟨c, hc⟩ : ↥data.U) : G) = orderOf (⟨c, hc⟩ : ↥data.U) :=
+        orderOf_injective data.U.subtype data.U.subtype_injective ⟨c, hc⟩
+      rw [show ((⟨c, hc⟩ : ↥data.U) : G) = c from rfl] at h1
+      rw [h1]
+      exact orderOf_dvd_natCard _
+    intro hpH
+    have hprime := Nat.prime_of_mem_primeFactors hp
+    have hpU : p ∣ Nat.card ↥data.U := (Nat.dvd_of_mem_primeFactors hp).trans hdvd
+    have hgcd : p ∣ Nat.gcd (Nat.card ↥data.H) (Nat.card ↥data.U) := Nat.dvd_gcd hpH hpU
+    rw [hcoHU] at hgcd
+    exact hprime.one_lt.ne' (Nat.dvd_one.mp hgcd)
+  -- one-sided conjugation stability suffices
+  have key : ∀ g ∈ M, ∀ x ∈ (data.U ⊓ Subgroup.centralizer (data.H : Set G) : Subgroup G),
+      g * x * g⁻¹ ∈ (data.U ⊓ Subgroup.centralizer (data.H : Set G) : Subgroup G) := by
+    intro g hg x hx
+    -- the conjugate lies in `F(M) = H ⊔ C`
+    have hxF : x ∈ (OddOrder.Isaacs.Ch01.fitting ↥M).map M.subtype := by
+      rw [data.fitting_eq]
+      exact Subgroup.mem_sup_right hx
+    have hgxF : g * x * g⁻¹ ∈ (OddOrder.Isaacs.Ch01.fitting ↥M).map M.subtype :=
+      ((Subgroup.mem_normalizer_iff.mp (hFn hg)) x).mp hxF
+    rw [data.fitting_eq, ← SetLike.mem_coe, hHC, Set.mem_mul] at hgxF
+    obtain ⟨h, hh, c, hc, hhc⟩ := hgxF
+    -- `h` and `c` commute (`c` centralizes `H`)
+    have hcomm : Commute h c := Subgroup.mem_centralizer_iff.mp hc.2 h hh
+    -- the conjugate is a `π'`-element (conjugation preserves order, `x ∈ U`)
+    have hgx_pi : IsPiElement πᶜ (g * x * g⁻¹) := by
+      intro p hp
+      have horder : orderOf (g * x * g⁻¹) = orderOf x := by
+        have h1 := orderOf_injective (MulAut.conj g).toMonoidHom
+          (MulAut.conj g).injective x
+        simpa [MulAut.conj_apply] using h1
+      rw [horder] at hp
+      exact hPiC x hx.1 p hp
+    -- uniqueness of the commuting coprime decomposition: the `H`-part is trivial
+    obtain ⟨hh1, hceq⟩ := isPiElement_mul_unique (π := π) hhc hcomm
+      (hPiH h hh) (hPiC c hc.1)
+      (one_mul (g * x * g⁻¹)) (Commute.one_left _) (isPiElement_one π) hgx_pi
+    rw [← hhc, hh1, one_mul]
+    exact hc
+  intro g hg
+  rw [Subgroup.mem_normalizer_iff]
+  intro x
+  constructor
+  · intro hx
+    exact key g hg x hx
+  · intro hx
+    have h1 := key g⁻¹ (inv_mem hg) _ hx
+    simpa [mul_assoc] using h1
 
 open scoped Classical in
 /-- **The linear-character count** (Pontryagin): for a finite group `H`, the number of degree-one

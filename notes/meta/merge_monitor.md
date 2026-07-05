@@ -1,6 +1,6 @@
 # main 合流モニター — a/b/c レーン自動合流の運用手順
 
-> 横断運用ドキュメント。**標準監視ペース = 15 分間隔** (cron `7,22,37,52 * * * *`、:00/:30 回避・15 分均等、ユーザー 2026-07-02; 2026-06-29〜07-02 は 30 分 `13,43`、それ以前は 15 分)。cron は session-only ([[cron-dies-on-model-switch]]; CronCreate `durable:true` は本環境で disk 永続せず session-only 扱い) ゆえ、**再作成時は必ずこのペース `7,22,37,52` で**作る。main worktree = `/home/ywr/odd-order`。
+> 横断運用ドキュメント。**標準監視ペース = 30 分間隔** (cron `13,43 * * * *`、:00/:30 回避、**ユーザー 2026-07-05: Fable 使用中は動作が遅いため 30 分**; 2026-07-02〜07-05 は 15 分 `7,22,37,52`、2026-06-29〜07-02 は 30 分 `13,43`、それ以前は 15 分)。cron は session-only ([[cron-dies-on-model-switch]]; CronCreate `durable:true` は本環境で disk 永続せず session-only 扱い) ゆえ、**再作成時は必ずこのペース `13,43` で**作る。main worktree = `/home/ywr/odd-order`。
 > ユーザー方針: **「検証通過は自動合流」** — build green + axiom-clean + sorry regression なし + 新 axiom なしを
 > 満たすレーンを `--no-ff` で自動マージ。満たさなければ `git merge --abort` で報告。合流成立時は最後に
 > `git push origin main`（変化なし/全 abort なら push しない）。
