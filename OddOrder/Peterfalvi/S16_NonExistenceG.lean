@@ -65,24 +65,84 @@ theorem isTypeI {hyp : Hypothesis (G := G)} (Ldata : LHypothesis hyp) :
 
 end LHypothesis
 
+/-- **Peterfalvi (14.9), the character body** — the structural `≤` half of the ratio comparison, the
+sole deep obligation of (14.9).  Coq `PFsection14` `FTtypeP_min_typeII`, lines 737--853: assuming `T`
+is type III, build `calT1 = seqIndD QV T QV Q` (the degree-`p` induced characters of `T`, from
+`T' = Q ⊔ V` via `T_deriv_eq_QV`), coherent by uniform-degree coherence
+(`S07.coherent_of_constant_degree` / Coq `uniform_degree_coherence`).  Via the `S`-side `βₛ` bridge
+gap `Γ`, `⟨Γ, τ₁ ζ⟩ ≡ 1 (mod 2)` for each `ζ ∈ calT1` (Coq `nzT1_Ga`, using
+`cfdot_real_vchar_even`), so `|⟨Γ, τ₁ ζ⟩|² ≥ 1`; then `orthogonal_split` + Bessel give
+`(v − 1)/p = p · |calT1| ≤ ⟨Γ, Γ⟩ ≤ (u − 1)/q`.
+
+The `|calT1| = (v − 1)/p` step is *structural* (Coq line 836--845: `size calT1 = (v.-1) %/ p` from
+`v = |V/Q|` and the degree-`p` induction), so this bound does **not** re-derive the exact `v`-value;
+it is exactly the type-III Γ-bridge estimate whose `>` counterpart (14.8) `key_inequality` then
+contradicts.  Kept as the single precisely-named character residual of (14.9). -/
+theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T) :
+    ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) ≤
+      ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) := by
+  -- Coq `FTtypeP_min_typeII` body (PFsection14.v:737--853): `calT1`/coherence + Γ-Bessel.
+  sorry
+
+/-- **Peterfalvi (14.9), the type determination** — Coq `PFsection14`
+`have [_ _ [Ttype3 _]] := FTtype34_structure maxT TtypeP notTtype2` (line 735): a type-`P` maximal
+subgroup that is *not* type II is type III (with the type-`P` Galois property).  In σ-theoretic
+terms, `IsTypeP1 T` (equivalently `¬ IsTypeP2 T` given `IsTypeP T`) forces `T` to be structurally
+Type III — this is precisely the content of Peterfalvi/BG `FTtype34_structure`, which rules out the
+Type IV (`¬ IsMulCommutative U`) and Type V (`M_F = M_σ`) alternatives for `T`.
+
+The proven type-classification biconditional `proposition_type_classification` gives, from `IsTypeP1`,
+either Type III/IV (if `M_F ≠ M_σ`) or Type V (if `M_F = M_σ`); pinning **Type III** specifically —
+excluding IV and V — is the `FTtype34_structure` Galois-rank input, isolated here as a named
+obligation. -/
+theorem T_isTypeIII_of_isTypeP1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T) :
+    OddOrder.GroupTheory.IsTypeIII hyp.base.T := by
+  -- Coq `FTtype34_structure maxT TtypeP notTtype2 => Ttype3` (PFsection14.v:735), the type-`P`
+  -- Galois-rank determination excluding Types IV/V for `T`.
+  sorry
+
 /-- **Peterfalvi (14.9), reduced to its canonical residual** — the `T`-side dual of the `S`-side
 `(13.2.a)` carrier field `S_typeP2`.  `T` is of BG type `P₂` (`κ(T) ≠ σ'(T)`; Coq `PFsection14`
 `FTtypeP_min_typeII : FTtype T == 2`).  The `IsTypeP T` conjunct is discharged honestly from `T_nonI`
-(`isTypeP_of_isTypeNonI`).  The residual `κ(T) ≠ σ'(T)` — equivalently, `T`'s Hall `(κ ∪ σ)ᶜ`-subgroup
-is nontrivial — is the genuine (14.9) content: Peterfalvi rules out type III via the (14.8) numeric
-contradiction (`key_ratio_inequality_of_caseB_data` gives `(v−1)/p > (u−1)/q`, contradicting the
-type-III Γ-bridge estimate `(v−1)/p ≤ (u−1)/q`).  On the `S`-side this fact is *posited* as the
-`Hypothesis` field `S_typeP2`; here it is kept as an explicit honest obligation rather than hoisted to
-a carrier field. -/
+(`isTypeP_of_isTypeNonI`).
+
+The residual `κ(T) ≠ σ'(T)` is proved by the (14.9) contradiction, following Coq
+`FTtypeP_min_typeII` (`apply: contraLR v1p_gt_u1q => notTtype2`): were `κ(T) = σ'(T)` (i.e.
+`IsTypeP1 T`), then `T` is Type III (`T_isTypeIII_of_isTypeP1`, the `FTtype34_structure`
+determination), whence the character body forces `(v − 1)/p ≤ (u − 1)/q` (`T_typeIII_ratio_le`) —
+contradicting (14.8) `key_inequality`'s `(v − 1)/p > (u − 1)/q`.
+
+The two deep pieces are isolated as `T_typeIII_ratio_le` (character body) and
+`T_isTypeIII_of_isTypeP1` (type determination), both consumed below.  The `>` half is (14.8);
+because the file's `T_typeII` feeds `T_side_caseB_facts` (whose case-(9.7.b) `v`-value is what
+`key_inequality`'s `>` rests on), `T_isTypeP2` is strictly upstream of `key_inequality` in this
+file's linearization and cannot cite it — so the `>` fact is left as this theorem's single residual,
+a documented forward reference to `key_inequality` (proved later in this same file). -/
 theorem T_isTypeP2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     OddOrder.BG.Ch4.S14.IsTypeP2 hyp.base.T := by
   have hP : OddOrder.BG.Ch4.S14.IsTypeP hyp.base.T :=
     OddOrder.BG.Ch4.S16.isTypeP_of_isTypeNonI hG hyp.base.T_maximal hyp.base.T_nonI
   refine ⟨hP, ?_⟩
-  -- (14.9): `κ(T) ≠ σ'(T)`.  The deep `M'`-type-`F` structure of `T'` is *not* needed here — it is
-  -- discharged downstream by `isTypeII_of_isTypeP2` for any type-`P₂` maximal subgroup.
-  sorry
+  -- (14.9), by contradiction (Coq `contraLR v1p_gt_u1q => notTtype2`): assume `κ(T) = σ'(T)`.
+  intro hκeq
+  -- Then `T` is type `P₁`, hence (Coq `FTtype34_structure`) structurally Type III.
+  have hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T := ⟨hP, hκeq⟩
+  have hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T := T_isTypeIII_of_isTypeP1 hG hyp hP1
+  -- The character body then gives the type-III Γ-bridge estimate `(v − 1)/p ≤ (u − 1)/q`.
+  have hle : ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) ≤
+      ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) := T_typeIII_ratio_le hG hyp hIII
+  -- (14.8) `key_inequality` gives the strict `>`, contradicting `hle`.  `key_inequality` is proved
+  -- below in this file but is unreachable here (its `>` rests on the case-(9.7.b) `v`-value, which
+  -- flows through `T_side_caseB_facts ← T_typeII ← T_isTypeP2`), so the `>` is this theorem's
+  -- single documented forward residual.
+  have hgt : ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
+      ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) := by
+    -- (14.8) = `(key_inequality hG hyp).2`; forward-referenced.
+    sorry
+  exact absurd hle (not_le.mpr hgt)
 
 /-- **Peterfalvi (14.9)**: the subgroup `T` is of Type II.  Dual to the `S`-side `(13.2.a)` line
 `isTypeII_of_isTypeP2 … S_maximal S_typeP2`: `T` is of type `P₂` (`T_isTypeP2`), and *every* type-`P₂`
