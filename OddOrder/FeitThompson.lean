@@ -154,6 +154,7 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
     (∀ i : Fin q, deltaPrime i = 1 ∨ deltaPrime i = -1)
   mu_degree_modEq_delta : ∀ (i : Fin q) (j : Fin p), ∃ a : ℤ,
     mu i j 1 = (delta j : ℂ) + (q : ℂ) * (a : ℂ)
+  delta_zero_eq_one : delta ⟨0, p_prime.pos⟩ = 1
   tau3 : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥W G
   mu_definition : ∀ (i : Fin q) (j : Fin p),
     ClassFunction.induce (W.subgroupOf S)
@@ -378,6 +379,7 @@ structure Section16CharacterData {G : Type*} [Group G] [Finite G]
     (∀ i : Fin tp.q, deltaPrime i = 1 ∨ deltaPrime i = -1)
   mu_degree_modEq_delta : ∀ (i : Fin tp.q) (j : Fin tp.p), ∃ a : ℤ,
     mu i j 1 = (delta j : ℂ) + (tp.q : ℂ) * (a : ℂ)
+  delta_zero_eq_one : delta ⟨0, tp.p_prime.pos⟩ = 1
   tau3 : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥tp.W G
   mu_definition : ∀ (i : Fin tp.q) (j : Fin tp.p),
     ClassFunction.induce (tp.W.subgroupOf mp.S)
@@ -2531,6 +2533,12 @@ noncomputable def section16CharacterData_of_isMinimalSimpleOdd {G : Type*} [Grou
           rw [Section16CharacterData.cardCertainTypeS_W1 hG mp tp]
         simp only [Section16CharacterData.muS, Section16CharacterData.deltaS, hq]
         exact ha
+      delta_zero_eq_one := by
+        haveI : NeZero (Nat.card ↥(mp.certainTypeS hG).W1) :=
+          ⟨by rw [Section16CharacterData.cardCertainTypeS_W1 hG mp tp]; exact tp.q_prime.pos.ne'⟩
+        show Section16CharacterData.deltaS hG mp tp ⟨0, tp.p_prime.pos⟩ = 1
+        rw [Section16CharacterData.deltaS, Section16CharacterData.chi2enum_zero]
+        exact ((mp.certainTypeS hG).certainType_zero_column_anchor).1
       tau3 := Section16CharacterData.tau3W hG mp tp
       mu_definition := Section16CharacterData.muS_definition hG mp tp
       mu_irreducible := fun i j =>
@@ -2657,6 +2665,7 @@ noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [F
     deltaPrime := cd.deltaPrime
     delta_pm_one := cd.delta_pm_one
     mu_degree_modEq_delta := cd.mu_degree_modEq_delta
+    delta_zero_eq_one := cd.delta_zero_eq_one
     tau3 := cd.tau3
     mu_definition := cd.mu_definition
     mu_irreducible := cd.mu_irreducible
@@ -2774,6 +2783,7 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       deltaPrime := inp.deltaPrime
       delta_pm_one := inp.delta_pm_one
       mu_degree_modEq_delta := inp.mu_degree_modEq_delta
+      delta_zero_eq_one := inp.delta_zero_eq_one
       tau3 := inp.tau3
       eta_eq_tau_omega := fun _ _ => rfl
       mu_definition := inp.mu_definition

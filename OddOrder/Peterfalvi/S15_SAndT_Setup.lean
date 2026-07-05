@@ -164,6 +164,9 @@ structure Hypothesis where
   (`μ_{ij}(1) = δ_j + q·a` for an integer `a`, the `Res_{W₁}` value identity). -/
   mu_degree_modEq_delta : ∀ (i : Fin q) (j : Fin p), ∃ a : ℤ,
     mu i j 1 = (delta j : ℂ) + (q : ℂ) * (a : ℂ)
+  /-- **Peterfalvi (4.4), the `S`-side base sign**: `δ_0 = 1` (`μ_{00} = 1_S`, the trivial
+  column's `σ`-anchor). -/
+  delta_zero_eq_one : delta ⟨0, p_prime.pos⟩ = 1
   /-- The Peterfalvi (3.2)/(3.3) transfer map `τ`, typed as an integral
   (virtual-character) map via the same `IntegralCharacterMap` convention as
   `tauS`/`tauT` — faithful to `τ` being defined on the `ℤ`-lattice of virtual
@@ -3410,6 +3413,16 @@ theorem Hypothesis.delta_eq_one_of_ne_zero [Finite G] (hG : OddOrder.BG.IsMinima
     have h2le := hyp.q_prime.two_le
     have hodd := Nat.odd_iff.mp hyp.q_odd
     omega
+
+/-- **Peterfalvi (13.3.c), the `S`-side signs are all `1`**: `δ_j = 1` for every `j`.  The
+base `δ_0 = 1` is the (4.4) trivial-column anchor (`delta_zero_eq_one`); for `j ≥ 1` it is
+`delta_eq_one_of_ne_zero` (the `u ≡ 1 (mod q)` route).  This is the `S`-half of the
+`CharacterDegreeData.delta_eq_one` field. -/
+theorem Hypothesis.delta_eq_one_S [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (j : Fin hyp.p) : hyp.delta j = 1 := by
+  by_cases hj : j = ⟨0, hyp.p_prime.pos⟩
+  · rw [hj]; exact hyp.delta_zero_eq_one
+  · exact hyp.delta_eq_one_of_ne_zero hG j hj
 
 /-- `|T| = |Q|·(vd)·p` — the `T`-side order decomposition, read off the reconciled type-`P`
 datum (`M_complement`/`derived_complement` of `reconciled_typePData_T`) with `|V| = vd` and
