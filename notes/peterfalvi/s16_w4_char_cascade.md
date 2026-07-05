@@ -1589,3 +1589,23 @@ e·Σθᵢ(1)²=|H|−1, Mackey fiber 経由) を landing (`d6328cfe`)。
   (60b9b6b6 の L/M-識別 wiring 流用)。その後 producer を再構成: pairing = OSD field /
   chiL 直交 = `pair_cross_orthogonal` / 残 = betaL 展開 + η⊥ψ ((13.19.c)/(14.11.2)-L、b 圏) に
   精密 isolate。
+
+### cont.⁵⁷ (2026-07-05 lane c /loop it.6-7): 🎯 (14.14)/(14.16) pairing 復元 + caseB producer 実定理化
+
+**landed (2e289808 / 9817b377)**: cont.⁵⁶ の設計を完全実装。
+- CaseBContradictionData を psiImg-field で bundle-local 化 (矛盾計算は 4-field 純 inner-product)。
+- OSD.caseB_pairing field ((14.14.b) 定義の pairing 半分を (7.9) pairing_dichotomy から
+  coherence bundle ごと携行; ∀hG-内部量化 + haveI finiteG)。
+- orthogonality_switch_pairing_bounds を dichotomy 直結に enrich (case-b 枝 = pairing ∧ v-bound)。
+- **caseB_contradiction_data 実定理化**: pairing = OSD field / chiL := ±ζ_i^ν +
+  pair_cross_orthogonal で (4.1) 直交実証明 / Nonempty 返却。残 = named
+  `caseB_expansion_input` ((13.19.c)/(14.11.2)-L signed η-grid 展開 + η⊥ψ、issue 3002 圏)。
+- 教訓: FiniteInduce-scoped instance と [Fintype G] binder / haveI の diamond — 統一が正
+  ([[lean-instance-defeq-traps]] に追加すべき実例)。
+
+**S16 残 sorry 7** (全て既知 gate): :81 T_typeII (b §13) / :176 v-value (9000) /
+:2591+:2604 s/t_side_frobenius_kernel ((9.7.b) carrier 供給待ち、transport engine 両側 proven 済) /
+:2686 eta_grid_galois (b の (3.9.c) order-prime 形 σ-供給待ち、G0-接続 done) /
+:4744 caseB_expansion_input ((13.19.c) grid counting) / :5548 betaGrid ((13.1.d) joint existence)。
+**W-side assembly の c-solo 可能分は今回の arc で全て放電し、残 7 は全部 §13/σ/9000 の
+上流供給を精密 named で待つ形に収束** — 供給着き次第 1-3 行 wire。
