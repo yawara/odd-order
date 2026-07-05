@@ -188,6 +188,14 @@ structure Hypothesis where
   `μ_j = ∑_i μ_{ij}` sums of `q ≥ 2` distinct irreducibles — hence reducible, the (13.3.a)
   entry condition. -/
   mu_col_injective : ∀ j : Fin p, Function.Injective (fun i : Fin q => mu i j)
+  /-- **Peterfalvi (4.5.a) for the `S`-grid** (issue 2035 μ-linkage): each `μ`-column sum is
+  induced from an irreducible character of `S' = [S,S]` — the §4 certain-type identity
+  `μ_j = Ind_{S'}^S χ_j` (`induce_restrict_certainType_eq`), the constructive membership
+  shape behind (13.3.a)'s `μ_j ∈ 𝒮(H₀)`. -/
+  mu_colSum_eq_induce : ∀ j : Fin p,
+    ∃ ψ : ClassFunction ↥((derivedInG S).subgroupOf S) ℂ,
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ ∧
+      (∑ i : Fin q, mu i j) = ClassFunction.induce ((derivedInG S).subgroupOf S) ψ
   /-- **Peterfalvi (13.1.e)**: `Ind_W^T (ω_{ij} − ω_{i0}) = δ'_i (ν_{ij} − ν_{i0})`,
   with the canonical `Ind_W^T = ClassFunction.induce (W.subgroupOf T)` and
   `δ'_i = ±1` is `deltaPrime`. -/
@@ -450,6 +458,45 @@ theorem Hypothesis.card_P_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [hSdataW2, ← hyp.p_eq_card_W2]
   rw [hyp.Sdata.H_eq, ← hyp.P_eq_SF, hW2card, hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1] at hord2
   exact hord2
+
+/-- **The `S`-instance chief kernel is trivial** ((13.2.b) consequence): `P = S_F` has order
+`p^q` (`card_P_eq`), and the chief factor `H̄ = P/H₀` already has order `(chief.p)^q`
+(`chiefFactor_quotient_card`), so `chief.p = p`, `|H₀| = 1` and `H₀ = ⊥` — `P` itself is the
+chief factor.  Collapses the §9 families of the `S`-instance (`𝒳(H₀) = 𝒳(⊥)`), making the
+(13.3.a) kernel condition `H₀ ⊆ Ker χ_j` automatic. -/
+theorem Hypothesis.toTypesIIIIIIVSetupS_chief_H0_eq_bot [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
+    chief.H0 = ⊥ := by
+  haveI := chief.N_normal
+  have hHeq : (hyp.toTypesIIIIIIVSetupS hG).H = hyp.P := by
+    show hyp.Sdata.H = hyp.P
+    rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
+  have hq : (hyp.toTypesIIIIIIVSetupS hG).q = hyp.q := by
+    show Nat.card ↥hyp.Sdata.W1 = hyp.q
+    rw [hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1]
+  have hcardH : Nat.card ↥(hyp.toTypesIIIIIIVSetupS hG).H = hyp.p ^ hyp.q := by
+    rw [show ((hyp.toTypesIIIIIIVSetupS hG).H : Subgroup G) = hyp.P from hHeq]
+    exact hyp.card_P_eq hG hyp.Sdata_W2_eq
+  have hquot := OddOrder.Peterfalvi.S11.chiefFactor_quotient_card chief
+  rw [hq] at hquot
+  have hsplit := Subgroup.card_eq_card_quotient_mul_card_subgroup chief.N
+  rw [hquot, hcardH] at hsplit
+  -- `p^q = chief.p^q · |N|` forces `chief.p = p` and `|N| = 1`
+  have hdvd : chief.p ∣ hyp.p ^ hyp.q := by
+    refine dvd_trans (dvd_pow_self chief.p hyp.q_prime.pos.ne') ?_
+    exact hsplit ▸ Dvd.intro _ rfl
+  have hpp : chief.p = hyp.p :=
+    (Nat.prime_dvd_prime_iff_eq chief.p_prime hyp.p_prime).mp
+      (chief.p_prime.dvd_of_dvd_pow hdvd)
+  rw [hpp] at hsplit
+  have hN1 : Nat.card ↥chief.N = 1 := by
+    have := hsplit.symm
+    nlinarith [Nat.card_pos (α := ↥chief.N), pow_pos hyp.p_prime.pos hyp.q]
+  have hNbot : chief.N = ⊥ := Subgroup.card_eq_one.mp hN1
+  rw [chief.H0_eq, hNbot]
+  exact Subgroup.map_bot _
+
 
 /-- **Peterfalvi (13.2.b,c,e)** structural producer: the `M_F`-structure of the type-`P₂` member
 `S`.  Faithful obligation on the §16 σ-structure (`BasicStructureGated` docstring).
