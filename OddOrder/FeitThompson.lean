@@ -2077,6 +2077,132 @@ theorem tau3W_omegaS_complete_vanish (χ : ClassFunction G ℂ)
     rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_apply]
   rw [OddOrder.RepresentationTheory.inner_conj_symm _ χ, hchi, horth i j, star_zero]
 
+/-! #### The (3.4)/(3.5) four-corner relation on the `η`-grid (issue-2036 supply)
+
+`tau3W (omegaS i j)` is the `(3.5)`-family member at the hom-pair of `omegaSChar i j`; the
+`(3.5)` defining relation `τ(α_{ab}) = 1 − χ_{a1} − χ_{1b} + χ_{ab}` plus the vanishing of
+`τ(α)` off the `V`-saturation gives the four-corner identity
+`1 − η_{i0}(x) − η_{0j}(x) + η_{ij}(x) = 0` there. -/
+
+omit [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)] in
+/-- Column-independence of the `omegaS`-values on `W₁` (the row character alone survives). -/
+theorem omegaS_apply_of_mem_W1_col_eq (i : Fin tp.q) (j j' : Fin tp.p) (w : ↥tp.W)
+    (hw : (w : G) ∈ tp.W1) :
+    omegaS hG mp tp i j w = omegaS hG mp tp i j' w := by
+  have hwK : (w : G) ∈ mp.K := tp.W1_eq_K hG ▸ hw
+  rw [omegaS, omegaS, ClassFunction.compHom_apply, ClassFunction.compHom_apply,
+    MulEquiv.coe_toMonoidHom, Peterfalvi.S06.Hypothesis.chiColumn,
+    Peterfalvi.S06.Hypothesis.chiColumn, Peterfalvi.S05.TICyclicHypothesis.omega_apply,
+    Peterfalvi.S05.TICyclicHypothesis.omega_apply,
+    omegaProdCharS_apply_mem_K hG mp tp _ _ w hwK,
+    omegaProdCharS_apply_mem_K hG mp tp _ _ w hwK]
+
+omit [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)] in
+/-- Row-independence of the `omegaS`-values on `W₂` (the column character alone survives). -/
+theorem omegaS_apply_of_mem_W2_row_eq (i i' : Fin tp.q) (j : Fin tp.p) (w : ↥tp.W)
+    (hw : (w : G) ∈ tp.W2) :
+    omegaS hG mp tp i j w = omegaS hG mp tp i' j w := by
+  have hwK : (w : G) ∈ mp.Kstar := tp.W2_eq_Kstar hG ▸ hw
+  rw [omegaS, omegaS, ClassFunction.compHom_apply, ClassFunction.compHom_apply,
+    MulEquiv.coe_toMonoidHom, Peterfalvi.S06.Hypothesis.chiColumn,
+    Peterfalvi.S06.Hypothesis.chiColumn, Peterfalvi.S05.TICyclicHypothesis.omega_apply,
+    Peterfalvi.S05.TICyclicHypothesis.omega_apply,
+    omegaProdCharS_apply_mem_Kstar hG mp tp _ _ w hwK,
+    omegaProdCharS_apply_mem_Kstar hG mp tp _ _ w hwK]
+
+omit [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)] in
+/-- Values of `omegaSChar` are the `omegaS`-values. -/
+theorem omegaSChar_val (i : Fin tp.q) (j : Fin tp.p) (w : ↥tp.W) :
+    ((omegaSChar hG mp tp i j w : ℂˣ) : ℂ) = omegaS hG mp tp i j w := by
+  rw [omegaS_eq_omega_omegaSChar]
+  rfl
+
+/-- **Row alignment**: `omegaSChar i 0` is the product character of the first component of
+`omegaSChar i j`'s pair with the trivial second component. -/
+theorem omegaSChar_row_align (i : Fin tp.q) (j : Fin tp.p) :
+    omegaSChar hG mp tp i ⟨0, tp.p_prime.pos⟩
+      = (tiCyclicW hG mp tp).omegaProdChar
+          ((tiCyclicW hG mp tp).omegaProdEquiv.symm (omegaSChar hG mp tp i j)).1 1 := by
+  have hpair : (tiCyclicW hG mp tp).omegaProdChar
+      ((tiCyclicW hG mp tp).omegaProdEquiv.symm (omegaSChar hG mp tp i j)).1
+      ((tiCyclicW hG mp tp).omegaProdEquiv.symm (omegaSChar hG mp tp i j)).2
+      = omegaSChar hG mp tp i j :=
+    (tiCyclicW hG mp tp).omegaProdEquiv.apply_symm_apply (omegaSChar hG mp tp i j)
+  refine monoidHom_eq_of_eqOn_W1_W2 mp tp ?_ ?_
+  · -- on `W₁`: both equal `omegaSChar i j` there
+    intro w hw
+    have hsnd : (tiCyclicW hG mp tp).wSnd w = 1 :=
+      (tiCyclicW hG mp tp).wSnd_eq_one_of_mem_W1
+        (Subgroup.mem_subgroupOf.mpr (show (w : G) ∈ (tiCyclicW hG mp tp).W1 from hw))
+    have h1 : omegaSChar hG mp tp i ⟨0, tp.p_prime.pos⟩ w = omegaSChar hG mp tp i j w :=
+      Units.ext (by
+        rw [omegaSChar_val hG mp tp _ _ w,
+          omegaS_apply_of_mem_W1_col_eq hG mp tp i ⟨0, tp.p_prime.pos⟩ j w hw,
+          ← omegaSChar_val hG mp tp i j w])
+    refine h1.trans ((DFunLike.congr_fun hpair w).symm.trans ?_)
+    show _ * ((tiCyclicW hG mp tp).omegaProdEquiv.symm
+        (omegaSChar hG mp tp i j)).2 ((tiCyclicW hG mp tp).wSnd w)
+      = _ * (1 : (tiCyclicW hG mp tp).W2.subgroupOf (tiCyclicW hG mp tp).W →* ℂˣ)
+          ((tiCyclicW hG mp tp).wSnd w)
+    rw [hsnd, map_one, map_one]
+  · -- on `W₂`: both are `1`
+    intro w hw
+    have hfst : (tiCyclicW hG mp tp).wFst w = 1 :=
+      (tiCyclicW hG mp tp).wFst_eq_one_of_mem_W2
+        (Subgroup.mem_subgroupOf.mpr (show (w : G) ∈ (tiCyclicW hG mp tp).W2 from hw))
+    have h1 : omegaSChar hG mp tp i ⟨0, tp.p_prime.pos⟩ w = 1 :=
+      Units.ext (by
+        rw [omegaSChar_val hG mp tp _ _ w,
+          omegaS_col_zero_apply_of_mem_W2 hG mp tp i w hw, Units.val_one])
+    rw [h1]
+    show (1 : ℂˣ) = ((tiCyclicW hG mp tp).omegaProdEquiv.symm
+        (omegaSChar hG mp tp i j)).1 ((tiCyclicW hG mp tp).wFst w)
+      * (1 : (tiCyclicW hG mp tp).W2.subgroupOf (tiCyclicW hG mp tp).W →* ℂˣ)
+          ((tiCyclicW hG mp tp).wSnd w)
+    rw [hfst, map_one, MonoidHom.one_apply, one_mul]
+
+/-- **Column alignment**: `omegaSChar 0 j` is the product character of the trivial first
+component with the second component of `omegaSChar i j`'s pair. -/
+theorem omegaSChar_col_align (i : Fin tp.q) (j : Fin tp.p) :
+    omegaSChar hG mp tp ⟨0, tp.q_prime.pos⟩ j
+      = (tiCyclicW hG mp tp).omegaProdChar 1
+          ((tiCyclicW hG mp tp).omegaProdEquiv.symm (omegaSChar hG mp tp i j)).2 := by
+  have hpair : (tiCyclicW hG mp tp).omegaProdChar
+      ((tiCyclicW hG mp tp).omegaProdEquiv.symm (omegaSChar hG mp tp i j)).1
+      ((tiCyclicW hG mp tp).omegaProdEquiv.symm (omegaSChar hG mp tp i j)).2
+      = omegaSChar hG mp tp i j :=
+    (tiCyclicW hG mp tp).omegaProdEquiv.apply_symm_apply (omegaSChar hG mp tp i j)
+  refine monoidHom_eq_of_eqOn_W1_W2 mp tp ?_ ?_
+  · intro w hw
+    have hsnd : (tiCyclicW hG mp tp).wSnd w = 1 :=
+      (tiCyclicW hG mp tp).wSnd_eq_one_of_mem_W1
+        (Subgroup.mem_subgroupOf.mpr (show (w : G) ∈ (tiCyclicW hG mp tp).W1 from hw))
+    have h1 : omegaSChar hG mp tp ⟨0, tp.q_prime.pos⟩ j w = 1 :=
+      Units.ext (by
+        rw [omegaSChar_val hG mp tp _ _ w,
+          omegaS_row_zero_apply_of_mem_W1 hG mp tp j w hw, Units.val_one])
+    rw [h1]
+    show (1 : ℂˣ) = (1 : (tiCyclicW hG mp tp).W1.subgroupOf (tiCyclicW hG mp tp).W →* ℂˣ)
+        ((tiCyclicW hG mp tp).wFst w)
+      * ((tiCyclicW hG mp tp).omegaProdEquiv.symm
+          (omegaSChar hG mp tp i j)).2 ((tiCyclicW hG mp tp).wSnd w)
+    rw [hsnd, map_one, MonoidHom.one_apply, one_mul]
+  · intro w hw
+    have hfst : (tiCyclicW hG mp tp).wFst w = 1 :=
+      (tiCyclicW hG mp tp).wFst_eq_one_of_mem_W2
+        (Subgroup.mem_subgroupOf.mpr (show (w : G) ∈ (tiCyclicW hG mp tp).W2 from hw))
+    have h1 : omegaSChar hG mp tp ⟨0, tp.q_prime.pos⟩ j w = omegaSChar hG mp tp i j w :=
+      Units.ext (by
+        rw [omegaSChar_val hG mp tp _ _ w,
+          omegaS_apply_of_mem_W2_row_eq hG mp tp ⟨0, tp.q_prime.pos⟩ i j w hw,
+          ← omegaSChar_val hG mp tp i j w])
+    refine h1.trans ((DFunLike.congr_fun hpair w).symm.trans ?_)
+    show ((tiCyclicW hG mp tp).omegaProdEquiv.symm
+        (omegaSChar hG mp tp i j)).1 ((tiCyclicW hG mp tp).wFst w) * _
+      = (1 : (tiCyclicW hG mp tp).W1.subgroupOf (tiCyclicW hG mp tp).W →* ℂˣ)
+          ((tiCyclicW hG mp tp).wFst w) * _
+    rw [hfst, map_one, map_one]
+
 end Section16CharacterData
 
 /-- **Peterfalvi §13 coherent Dade-grid producer** (`sorry`-free) — *lane-b*
