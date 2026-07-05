@@ -4729,19 +4729,89 @@ theorem caseB_eta_orthogonal_psi [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
   exact eta_orthogonal_of_norm_one_pair_vanish hyp hpsiZ hconjZ hpsi1 hconj1 hcross hvanish
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (13.19.a), σ-decomposition ingredient**: the Fitting core `M_F`
+(`dataM.kernel`) of the type-`I` maximal `M`, non-conjugate to the `W`-containing maximals
+`S`, `T`, has order coprime to `p·q`.  In the Coq proof of `tiA_PWG` this is `coHp`/`coHq`
+(`coprime #|H| p`, `coprime #|H| q` with `H = M_F`), derived from `FT_Dade_support_partition`:
+`p, q ∈ σ(S) ∪ σ(T)` are disjoint from `σ(M)` for non-conjugate maximals (`nc.not_conj`).
+Deep named §13/BG §10 obligation. -/
+theorem card_kernel_coprime_pq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (nc : NonConjugateHypothesis hyp) (dataM : TypeICoherent78Data nc.Mdata.M) :
+    Nat.Coprime (Nat.card ↥dataM.kernel) (hyp.base.p * hyp.base.q) := by
+  sorry
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (13.19.a), Dade-support ingredient**: every element `y` of the Dade support
+`Ã(M) = ⋃_{x∈A(M)} (x·R(x))^G` has order *not* coprime to `|M_F|` (it is `π(M_F)`-singular).
+Indeed `y` is conjugate to `x·r` with `x ∈ A(M) = M_F^#` (type-I, `1 ≠ x ∈ M_F`) and
+`r ∈ R(x)` a signalizer commuting with `x` of order coprime to `|M_F|`, so
+`1 < orderOf x ∣ orderOf y` and `orderOf x ∣ |M_F|`.  Deep named §8/§13 obligation
+(the Dade signalizer `π`-part structure). -/
+theorem dadeSupport_not_coprime_card_kernel [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (dataM : TypeICoherent78Data M)
+    {y : G} (hy : y ∈ (dataM.h78 hG).hyp76.hyp71.hyp.dadeSupport) :
+    ¬ Nat.Coprime (orderOf y) (Nat.card ↥dataM.kernel) := by
+  sorry
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (13.19.a), the M-side Dade-support avoidance.**  For a type-`I` maximal
-`M` not conjugate to the `W`-containing maximals `S`, `T` (`nc.not_conj`), the Dade support
-`Ã(M)` avoids the regular-set saturation `Ŵ^G = (W ∖ (W₁ ∪ W₂))^G`.  In Peterfalvi this is
-(13.19.a) (`Ã(M)` meets neither `P^G` nor `W^G`); it bottoms out at the BG §10-level
-σ-decomposition that the Fitting-prime supports of distinct maximals are disjoint
-(Coq `FT_Dade_support_partition`).  Named §16/§13 obligation. -/
+`M` not conjugate to the `W`-containing maximals `S`, `T`, the Dade support `Ã(M)` avoids the
+regular-set saturation `Ŵ^G = (W ∖ (W₁ ∪ W₂))^G`.  This is the Coq `tiA_PWG`
+(`'A~(L) :&: PWG = set0`, PFsection13): every `x ∈ Ŵ^G` is conjugate to a `w ∈ W`, so (as
+`|W₁| = q`, `|W₂| = p` are prime and `W = W₁·W₂` commutes) `orderOf x ∣ p·q`, hence `orderOf x`
+is coprime to `|M_F|` (`card_kernel_coprime_pq`); but every element of `Ã(M)` is
+`π(M_F)`-singular (`dadeSupport_not_coprime_card_kernel`), a contradiction.  The two named
+ingredients are the genuine BG §10-level σ-decomposition inputs. -/
 theorem mSide_dadeSupport_avoids_regular [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
     (nc : NonConjugateHypothesis hyp) (dataM : TypeICoherent78Data nc.Mdata.M) :
     ∀ x ∈ conjClassSet
         ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G))),
       x ∉ (dataM.h78 hG).hyp76.hyp71.hyp.dadeSupport := by
-  sorry
+  intro x hx hdade
+  obtain ⟨w, ⟨hwW, _hwne⟩, g, hgx⟩ := hx
+  -- `orderOf x = orderOf w` (conjugation preserves order)
+  have hsemi : SemiconjBy g w x := by
+    change g * w = x * g
+    rw [← hgx]; group
+  have hordx : orderOf x = orderOf w := (SemiconjBy.orderOf_eq g hsemi).symm
+  -- decompose `w = a·b` with `a ∈ W₁`, `b ∈ W₂` inside the commutative `W`
+  letI := hyp.base.W_cyclic
+  letI : CommGroup ↥hyp.base.W := IsCyclic.commGroup
+  have hwWmem : w ∈ hyp.base.W := hwW
+  have hW1le : hyp.base.W1 ≤ hyp.base.W := by rw [hyp.base.W_eq_join]; exact le_sup_left
+  have hW2le : hyp.base.W2 ≤ hyp.base.W := by rw [hyp.base.W_eq_join]; exact le_sup_right
+  have hwmem : (⟨w, hwWmem⟩ : ↥hyp.base.W) ∈
+      (hyp.base.W1.subgroupOf hyp.base.W) ⊔ (hyp.base.W2.subgroupOf hyp.base.W) := by
+    have h1 : (hyp.base.W1 ⊔ hyp.base.W2).subgroupOf hyp.base.W = ⊤ := by
+      rw [← hyp.base.W_eq_join, Subgroup.subgroupOf_self]
+    rw [← Subgroup.subgroupOf_sup hW1le hW2le, h1]
+    exact Subgroup.mem_top _
+  obtain ⟨a, ha, b, hb, hab⟩ := Subgroup.mem_sup.mp hwmem
+  have hcoe : (a : G) * (b : G) = w := by
+    have h := congrArg (Subtype.val) hab; simpa using h
+  have haW1 : (a : G) ∈ hyp.base.W1 := Subgroup.mem_subgroupOf.mp ha
+  have hbW2 : (b : G) ∈ hyp.base.W2 := Subgroup.mem_subgroupOf.mp hb
+  -- `orderOf a ∣ q`, `orderOf b ∣ p` (Lagrange in the prime-order `W₁`, `W₂`)
+  have haord : orderOf (a : G) ∣ hyp.base.q := by
+    have h := hyp.base.W1.orderOf_dvd_natCard haW1
+    rwa [← hyp.base.q_eq_card_W1] at h
+  have hbord : orderOf (b : G) ∣ hyp.base.p := by
+    have h := hyp.base.W2.orderOf_dvd_natCard hbW2
+    rwa [← hyp.base.p_eq_card_W2] at h
+  have hcomm : Commute (a : G) (b : G) := hyp.base.W1_commutes_W2 _ haW1 _ hbW2
+  -- hence `orderOf x = orderOf w ∣ p·q`
+  have hword : orderOf w ∣ hyp.base.p * hyp.base.q := by
+    rw [← hcoe]
+    refine hcomm.orderOf_mul_dvd_mul_orderOf.trans ?_
+    rw [mul_comm hyp.base.p hyp.base.q]
+    exact Nat.mul_dvd_mul haord hbord
+  have hxord : orderOf x ∣ hyp.base.p * hyp.base.q := hordx ▸ hword
+  -- `orderOf x` is coprime to `|M_F|`, contradicting `π(M_F)`-singularity of `Ã(M)`
+  have hcop : Nat.Coprime (orderOf x) (Nat.card ↥dataM.kernel) :=
+    Nat.Coprime.coprime_dvd_left hxord (card_kernel_coprime_pq hG nc dataM).symm
+  exact dadeSupport_not_coprime_card_kernel hG dataM hdade hcop
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (13.19.c), the L-side signed `η`-grid expansion.**  Under case-(b)
