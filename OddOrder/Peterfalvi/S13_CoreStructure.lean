@@ -1129,13 +1129,62 @@ theorem core_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [hyp.Uprime_eq]
     exact C_eq_derivedU _hG hyp
 
-/-- **Peterfalvi (11.7)**: `H` is elementary abelian of order `p^q`, and
-`H_0 = 1`. -/
+/-- **Peterfalvi (11.7), crux — the chief kernel is trivial**: `H₀ = 1`.
+
+This is the genuine content of (11.7).  Since `H₀ = H'` ((11.6) `core_structure`), it says `H` is
+abelian; equivalently the chief factor `H̄ = H/H₀` (of order `p^q`, elementary abelian) is all of
+`H`.  Peterfalvi's proof (pp. 64-65) runs the two-case analysis on the `U`-action on `H̄`, both
+refuted by the sorry-free machinery in `S13_ElementaryAbelianKernel.lean`: the Galois/irreducible
+case by `chiefKernel_caseB_false` (parity: `|Ĥ| = p^(q+1)` with `q` odd), and the fixed-order-`p`
+case by `caseA_fixed_contradiction` fed by the exponent chain (`chain_exponent_eq_one`).  Assembling
+the dichotomy and the case-A `W₁`-chain relation is the remaining work; left as this named crux so
+the two elementary-abelian/order corollaries below are sorry-free once it lands.
+See `notes/peterfalvi/s13_11_8_orthogonality.md`. -/
+theorem chief_H0_eq_bot [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.chief.H0 = ⊥ := by
+  sorry
+
+/-- **Peterfalvi (11.7)**: `H` is elementary abelian of order `p^q`, and `H_0 = 1`.
+
+`H₀ = 1` is the crux `chief_H0_eq_bot`.  Given it, both remaining conjuncts are immediate from the
+chief-factor data: the kernel `N` (with `H₀ = N.map H.subtype`) is trivial, so `H̄ = H/N ≅ H`
+carries the chief factor's `IsElementaryAbelian p` (`ChiefFactorData.quotient_elementaryAbelian`
+transported
+by `QuotientGroup.quotientBot`), and `|H| = p^q·|H₀| = p^q` by
+`ChiefFactorData.quotient_order`. -/
 theorem H_elementaryAbelian [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) :
     IsElementaryAbelian hyp.p ↥hyp.H ∧ Nat.card ↥hyp.H = hyp.p ^ hyp.q ∧
       hyp.chief.H0 = ⊥ := by
-  sorry
+  classical
+  have hH0 : hyp.chief.H0 = ⊥ := chief_H0_eq_bot _hG hyp
+  -- `chief.p = hyp.p` (chief-factor prime = `|W₂|`)
+  have hp_eq : hyp.chief.p = hyp.p := by
+    have h2 := hyp.chief.typeIII_IV_p_eq_W2 (hyp.base.isTypeIIIorIV _hG)
+    rw [hyp.s11Setup_card_W2_eq] at h2
+    exact h2.symm
+  -- `N = ⊥` from `H₀ = N.map H.subtype = ⊥`
+  have hN : hyp.chief.N = ⊥ := by
+    have h := hyp.chief.H0_eq
+    rw [hH0, eq_comm, Subgroup.map_eq_bot_iff] at h
+    simpa using h
+  refine ⟨?_, ?_, hH0⟩
+  · -- elementary abelian: transport `quotient_elementaryAbelian` along `↥H ⧸ ⊥ ≃* ↥H`
+    have hEA : IsElementaryAbelian hyp.p ↥hyp.s11Setup.H := by
+      have h := hyp.chief.quotient_elementaryAbelian
+      rw [hp_eq] at h
+      exact IsElementaryAbelian.of_mulEquiv
+        ((QuotientGroup.quotientMulEquivOfEq hN).trans QuotientGroup.quotientBot) h
+    rwa [hyp.s11Setup_H_eq] at hEA
+  · -- order: `|H| = p^q·|H₀| = p^q`
+    have hHH : hyp.s11Setup.typeP.H = hyp.base.typeP.H := by
+      rw [hyp.s11Setup.typeP.H_eq, hyp.base.typeP.H_eq]
+    have hcardHH : Nat.card ↥hyp.s11Setup.H = Nat.card ↥hyp.base.typeP.H :=
+      congrArg (fun (X : Subgroup G) => Nat.card ↥X) hHH
+    have h := hyp.chief.quotient_order
+    rw [hcardHH, hp_eq, hyp.s11Setup_q_eq, hH0] at h
+    simpa using h
 
 /-! ## (11.8): the main orthogonality calculation -/
 
