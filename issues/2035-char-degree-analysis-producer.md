@@ -44,9 +44,20 @@ Pf (13.3) proof の引用 ↔ repo 在庫:
 ## 実装順 (upstream-first)
 
 1. [ ] **S15 ↔ S11 instantiation bridge**: hyp.S (type II) に対する
-   `TypesIIIIIIVSetup`/`ChiefFactorData`/`Section11CharacterData` の構成
-   (S15.Hypothesis の Sdata/S_typeP2 から; §9 の M = S 特殊化)。
-   これが最上流の未着手 gap — 既存の S16 producer 群 (Section16TypePStructure) との整合を precheck。
+   `TypesIIIIIIVSetup`/`ChiefFactorData`/`Section11CharacterData` の構成。
+   **precheck 済 (it.47)**: S12 に `toTypesIIIIIIVSetup` (III/IV 用 — type II 分岐
+   Or.inl は未使用だが構造は II を受容) + `mkSection11CharacterData` が既存。
+   **⚠ 重大 caveat: S12 の mk は `H0CprimeSupport := ∅` + `tau := hyp.tau` の
+   count-専用 placeholder** (docstring 明記「used only by the (9.11) coherence, not by
+   the degree fact」) — (9.11)-coherence 用途には **∅-support で IsCoherent が
+   偽/空虚化する Sset := ∅ 型の罠**。本 campaign は honest 版
+   (実 H0CprimeSupport = (H₀C')^#-support + 実 Dade tau) を新規構成する:
+   - TypesIIIIIIVSetup: maximal := S_maximal / typeP := hyp.Sdata /
+     nontrivial := TypePNontrivialCore (basic_structure の hSdataUne 系から) /
+     type_alt := Or.inl (isTypeII_of_isTypeP2)
+   - ChiefFactorData: S11.exists_chiefFactorData
+   - Section11CharacterData: u は S12-mk と同型 (rfl-pin)、tau := (S, (H₀C')^#) の
+     honest Dade map (H_sharp_dadeHypothesis の H₀C'-版)、H0CprimeSupport := 実 support
 2. [ ] `sibleyTarget_H0C` (§14 structural witness) — S14 の SibleyTarget 供給
    (S14_MaximalI 機械 or type-II 側の直接構成; §14-gated の実態を precheck)
 3. [ ] (13.3.a): S11 `caseB_character_counts` の残 sorry (6252/6277) を閉じる or 迂回
@@ -62,3 +73,16 @@ Pf (13.3) proof の引用 ↔ repo 在庫:
   producer の coherence 構成は Pf-cite の本物 (13.2.d)⇐(9.11) 経路 — placeholder Sset 非依存。
 - tau1T (T-side dual) も同型の構成 (T = type II dual, K = QD)。
 - 関連: issues/2034 (fields 設計、残 checklist), closed/2033。
+
+## route 候補 B (it.47 発見、要 precheck — 候補 A = (9.11)/H₀C′ より短い可能性)
+
+**(6.8) Sibley を (G, L := hyp.S, H := hyp.H = PC) に直接適用**:
+- `SibleyTarget` (S10_CoherenceWiring:96) = H ⊴ L + `S08.SibleyDadeHypothesis (G,L,H)` +
+  τ/family/A₀ 一致 3 等式。`coherent_of_sibleyTarget` (sorry-free) で IsCoherent。
+- (13.5)-family 𝒮₁ = {Ind_{PC}^S θ} は Sibley の base family そのもの;
+  A₀ = (PC)^#-support、τ = H_sharp Dade (= Ind、13.2.e proven)。
+- H = PC = F(S) ⊴ S ✓ / H^# TI + normalizer S ✓ (proven) — 残 = (6.8)(a)/(b)/(c) の
+  正確な条件を S08.SibleyDadeHypothesis の fields で確認し (13.2)-carrier から充足するか。
+- これが通れば S11-chars の honest 再構成 (route A step 1-2) を丸ごと skip し、
+  IsCoherent → τ₁ + 4 fields 導出 (extension_agrees/inner_eq_on_supported) に直行。
+- 次 iteration: S08.SibleyDadeHypothesis の fields 精読 + (S, PC)-充足性判定。
