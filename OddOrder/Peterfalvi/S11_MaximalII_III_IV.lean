@@ -11736,6 +11736,207 @@ theorem conjByMulEquiv_invariant_of_normal {K : Subgroup G} [K.Normal]
   rw [hval]
   exact hN g a ha
 
+/-- **Pointwise kernel transport under conjugation** (`cfker_conjg`, Peterfalvi (9.8.d) (γ)
+substrate).  For a class function `χ` on a normal subgroup `K ⊴ G` and `w : G`, an element
+`n ∈ ↥K` lies in the kernel of the conjugate `χ^w` iff its `w`-conjugate `w·n·w⁻¹` (as an element
+of `↥K`, `conjByMulEquiv w n`) lies in the kernel of `χ`:
+
+`n ∈ Ker (χ^w) ↔ conjByMulEquiv w n ∈ Ker χ`.
+
+Elementary: `(χ^w) n = χ (w·n·w⁻¹)` (`conjBy_apply`) and `characterDegree (χ^w) = characterDegree χ`
+(conjugation fixes the value at `1`).  This is the *non-invariant* counterpart of
+`subsetCharacterKernel_conjBy_of_invariant` — instead of assuming a `conjByMulEquiv w`-invariant set,
+it tracks exactly where conjugation moves the kernel.  It is the genuinely-absent `cfker_conjg`
+brick underlying the (9.8.d) `W₁`-injectivity (Coq `injXtheta`, `cfker_conjg`): a `W₁`-conjugate of
+a family member's kernel is the kernel of the conjugate, so a summand `S₀ = H₁` moved into
+`W = H₂…H_q` by a nontrivial `w₁ ∈ W₁` lands in the kernel, forcing the family member trivial on
+`H̄` — the contradiction that pins `w₁ = 1`. -/
+theorem mem_characterKernel_conjBy {K : Subgroup G} [K.Normal]
+    (w : G) (χ : ClassFunction ↥K ℂ) (n : ↥K) :
+    n ∈ OddOrder.Peterfalvi.S03.characterKernel (ClassFunction.conjBy w χ)
+      ↔ ClassFunction.conjByMulEquiv w n
+        ∈ OddOrder.Peterfalvi.S03.characterKernel χ := by
+  rw [OddOrder.Peterfalvi.S03.mem_characterKernel, OddOrder.Peterfalvi.S03.mem_characterKernel]
+  have hdeg : OddOrder.Peterfalvi.S03.characterDegree (ClassFunction.conjBy w χ)
+      = OddOrder.Peterfalvi.S03.characterDegree χ := by
+    rw [OddOrder.Peterfalvi.S03.characterDegree_def, OddOrder.Peterfalvi.S03.characterDegree_def]
+    show (ClassFunction.conjBy w χ) 1 = χ 1
+    rw [ClassFunction.conjBy_apply]
+    refine congrArg χ (Subtype.ext ?_)
+    simp only [OneMemClass.coe_one, mul_one, mul_inv_cancel]
+  rw [hdeg, ClassFunction.conjBy_apply]
+  constructor
+  · intro h; rw [← h]; congr 1
+  · intro h; rw [← h]; congr 1
+
+/-- **Subgroup-level kernel transport under conjugation** (`cfker_conjg` subset form, Peterfalvi
+(9.8.d) (γ) substrate).  A subgroup `N ≤ ↥K` (`K ⊴ G`) is contained in the kernel of the conjugate
+`χ^w` iff every `w`-conjugate `conjByMulEquiv w n` (`n ∈ N`) lies in the kernel of `χ`.  Immediate
+from the pointwise `mem_characterKernel_conjBy`.  The form consumed by the (9.8.d) injectivity: to
+show `H₁ = S₀ ⊆ Ker (ζ₂^{w₁})` it suffices that `w₁·S₀·w₁⁻¹` — a Clifford `W₁`-conjugate of `S₀`,
+contained in `W = H₂…H_q` for `w₁ ≠ 1` — is in `Ker ζ₂` (which it is, `W ⊆ Ker ζ₂`). -/
+theorem subsetCharacterKernel_conjBy_iff {K : Subgroup G} [K.Normal]
+    (w : G) (χ : ClassFunction ↥K ℂ) (N : Subgroup ↥K) :
+    (N : Set ↥K) ⊆ OddOrder.Peterfalvi.S03.characterKernel (ClassFunction.conjBy w χ)
+      ↔ ∀ n ∈ N, ClassFunction.conjByMulEquiv w n
+        ∈ OddOrder.Peterfalvi.S03.characterKernel χ := by
+  constructor
+  · intro h n hn; exact (mem_characterKernel_conjBy w χ n).mp (h hn)
+  · intro h n hn; exact (mem_characterKernel_conjBy w χ n).mpr (h n hn)
+
+/-- **`induceHU χ = Ind_{HU}^M χ`** (unfold the wrapper).  `induceHU` is definitionally
+`ClassFunction.induce (huSub data)` with an internally-chosen `Invertible` instance; that instance is
+propositional (`Subsingleton`), so the wrapper equals the raw induction for any ambient instance.
+Lets the `induceHU`-injectivity frame reuse the `induce_eq_induce_iff_conj` orbit machinery. -/
+theorem induceHU_eq_induce [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    [Fintype ↥M] [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    (χ : ClassFunction ↥(huSub data) ℂ) :
+    induceHU data χ = ClassFunction.induce (huSub data) χ := by
+  unfold induceHU
+  convert rfl using 2
+  exact Subsingleton.elim (α := Invertible (Nat.card ↥(huSub data) : ℂ)) _ _
+
+/-- **`induceHU`-equality gives an `M`-conjugation of the sources** (Peterfalvi (9.8.d) (γ) frame).
+If two irreducible `HU`-characters `χ, ψ` have equal `M`-inductions `Ind_{HU}^M`, then some
+`w ∈ M` conjugates `ψ` to `χ` (`induce_eq_induce_iff_conj` at the `induceHU` wrapper level).  The
+raw first step of the (9.8.d) injectivity: distinct inductions ⟺ distinct `M`-conjugacy orbits. -/
+theorem induceHU_eq_imp_exists_conj [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    [Fintype ↥M] [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    {χ ψ : IrreducibleCharacter ↥(huSub data)}
+    (h : induceHU data (χ : ClassFunction ↥(huSub data) ℂ)
+      = induceHU data (ψ : ClassFunction ↥(huSub data) ℂ)) :
+    ∃ w : ↥M, IrreducibleCharacter.conjBy w ψ = χ := by
+  haveI := huSub_normal data
+  letI : Fintype ↥(huSub data) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥M : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  rw [induceHU_eq_induce data (χ : ClassFunction ↥(huSub data) ℂ),
+    induceHU_eq_induce data (ψ : ClassFunction ↥(huSub data) ℂ)] at h
+  obtain ⟨w, hw⟩ := (induce_eq_induce_iff_conj ψ χ).mp h.symm
+  exact ⟨w, hw⟩
+
+/-- **`induceHU` injective on irreducibles when the conjugator lies in `HU`** (Peterfalvi (9.8.d)
+(γ) reduction — the honest frame isolating the `W₁`-content).  Given a criterion `hcrit` that *any*
+`M`-conjugation carrying `ψ` to `χ` must be by an element of `HU` (`w ∈ huSub`), the `M`-induction
+map `induceHU` is injective at `{χ, ψ}`: an `HU`-conjugation of an `HU`-character is inner
+(`conjBy_eq_self_of_mem`), so `χ = conjBy w ψ = ψ`.
+
+This reduces (9.8.d) (γ) — `Ind_{HU}^M` injective on the `ζ_{θ₁,λ}`-family up to `W₁` — to the pure
+group/kernel statement `hcrit`: two family members are non-`W₁`-conjugate.  In the Coq proof
+(`injXtheta`, `PFsection9.v` L1233-1253) `hcrit` is exactly the Frobenius `Ū ⋊ W₁` +
+`cfker`-under-`W₁`-conjugation argument: decompose `w = y·w₁` (`M = HU ⋊ W₁`), `conjBy y` inner, so
+`conjBy w₁ ψ = χ`; then `W = H₂…H_q ⊆ Ker ψ,Ker χ` (family members trivial on the summand complement)
+while a nontrivial `w₁` moves `S₀ = H₁` into `W` (Clifford permutation `H̄ = ⊕ S₀^{w}`), forcing
+`H̄ ⊆ Ker χ` (via `mem_characterKernel_conjBy`) — contradicting `H ⊄ Ker χ`; hence `w₁ = 1`, `w ∈ HU`.
+The `cfker`-conjugation half is now available (`mem_characterKernel_conjBy` /
+`subsetCharacterKernel_conjBy_iff`); the residual for `hcrit` is `W ⊆ Ker` propagation through the
+source induction plus the `S₀^{w₁} ⊆ W` orbit realization at the `HU` level. -/
+theorem induceHU_inj_of_conj_mem_huSub [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    [Fintype ↥M] [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    {χ ψ : IrreducibleCharacter ↥(huSub data)}
+    (hcrit : ∀ w : ↥M, IrreducibleCharacter.conjBy w ψ = χ → (w : ↥M) ∈ huSub data)
+    (h : induceHU data (χ : ClassFunction ↥(huSub data) ℂ)
+      = induceHU data (ψ : ClassFunction ↥(huSub data) ℂ)) :
+    χ = ψ := by
+  haveI := huSub_normal data
+  obtain ⟨w, hw⟩ := induceHU_eq_imp_exists_conj data h
+  have hwHU : (w : ↥M) ∈ huSub data := hcrit w hw
+  have hfix : IrreducibleCharacter.conjBy w ψ = ψ := by
+    apply IrreducibleCharacter.ext
+    rw [IrreducibleCharacter.coe_conjBy]
+    exact ClassFunction.conjBy_eq_self_of_mem hwHU (ψ : ClassFunction ↥(huSub data) ℂ)
+  rw [← hw, hfix]
+
+/-- **Homs trivial on `W` biject with homs of the quotient `H̄/W`** (Peterfalvi (9.8.d) (β) substrate).
+A hom `θ : H̄ →* ℂˣ` with `W ≤ Ker θ` descends uniquely to `H̄/W →* ℂˣ` (`QuotientGroup.lift`,
+inverse `comp (mk' W)`), giving `|{θ | W ≤ Ker θ}| = |H̄/W →* ℂˣ|`.  The counting bridge for the
+`θ`-numerator of the (9.8.d) domain count. -/
+theorem card_hom_triv_W_eq_card_quotient [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (W : Subgroup (↥data.H ⧸ chief.N)) [W.Normal] :
+    Nat.card {θ : (↥data.H ⧸ chief.N) →* ℂˣ // W ≤ θ.ker}
+      = Nat.card ((↥data.H ⧸ chief.N) ⧸ W →* ℂˣ) := by
+  refine Nat.card_congr
+    { toFun := fun θ => QuotientGroup.lift W θ.1
+        (fun x hx => MonoidHom.mem_ker.mp (θ.2 hx))
+      invFun := fun ρ => ⟨ρ.comp (QuotientGroup.mk' W), fun x hx => ?_⟩
+      left_inv := fun θ => ?_
+      right_inv := fun ρ => ?_ }
+  · rw [MonoidHom.mem_ker, MonoidHom.comp_apply, QuotientGroup.mk'_apply,
+      (QuotientGroup.eq_one_iff x).mpr hx, map_one]
+  · apply Subtype.ext; apply MonoidHom.ext; intro x; dsimp only
+    rw [MonoidHom.comp_apply, QuotientGroup.mk'_apply, QuotientGroup.lift_mk']
+  · apply MonoidHom.ext; intro x
+    obtain ⟨y, rfl⟩ := QuotientGroup.mk'_surjective W x
+    dsimp only
+    rw [QuotientGroup.mk'_apply, QuotientGroup.lift_mk, MonoidHom.comp_apply,
+      QuotientGroup.mk'_apply]
+
+open scoped Classical in
+/-- **θ-count** (Peterfalvi (9.8.d) (β) numerator): the number of homs `θ : H̄ →* ℂˣ` *trivial on the
+summand complement* `W` and *nontrivial on `S₀`* equals `p − 1`.
+
+Since `S₀ ⊔ W = ⊤`, `S₀ ⊓ W = ⊥` with `|S₀| = p`, the quotient `H̄/W ≅ S₀` (via the complement,
+`IsComplement'.QuotientMulEquiv`) has order `p`.  Homs trivial on `W` are exactly homs of `H̄/W`
+(`card_hom_triv_W_eq_card_quotient`), numbering `|H̄/W| = p` (Pontryagin,
+`card_monoidHom_of_hasEnoughRootsOfUnity`); among them a hom is nontrivial on `S₀` iff it is nonzero
+(a `W`-trivial, `S₀`-trivial hom is trivial on `S₀ ⊔ W = ⊤`, hence `= 1`), removing the single
+trivial hom: `p − 1`.  This is the `(p-1)` factor of the (9.8.d) domain count `(p-1)·[C_U(S₀):U']`,
+the `θ₁`-parameter count for the pair family `ψ_{θ₁,λ}` (`θ₁ ∈ Irr(H̄/W) \ {1}`). -/
+theorem card_theta_triv_W_nontriv_S0 [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    [Fintype ((↥data.H ⧸ chief.N) →* ℂˣ)]
+    {W : Subgroup (↥data.H ⧸ chief.N)} [W.Normal]
+    (hinf : caseA.S0 ⊓ W = ⊥) (hsup : caseA.S0 ⊔ W = ⊤)
+    (hS0card : Nat.card ↥caseA.S0 = chief.p) :
+    (Finset.univ.filter fun θ : (↥data.H ⧸ chief.N) →* ℂˣ =>
+        W ≤ θ.ker ∧ θ.comp caseA.S0.subtype ≠ 1).card = chief.p - 1 := by
+  letI : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
+  letI : CommGroup ((↥data.H ⧸ chief.N) ⧸ W) :=
+    { (inferInstance : Group ((↥data.H ⧸ chief.N) ⧸ W)) with
+      mul_comm := fun a b => by
+        obtain ⟨x, rfl⟩ := QuotientGroup.mk'_surjective W a
+        obtain ⟨y, rfl⟩ := QuotientGroup.mk'_surjective W b
+        rw [← map_mul, ← map_mul, chief.quotient_elementaryAbelian.1 x y] }
+  haveI : NeZero (Monoid.exponent ((↥data.H ⧸ chief.N) ⧸ W)) :=
+    ⟨Monoid.exponent_ne_zero_of_finite⟩
+  -- `#{θ | W ≤ ker θ} = |H̄/W →* ℂˣ| = |H̄/W| = p`.
+  have hcardWhom : (Finset.univ.filter fun θ : (↥data.H ⧸ chief.N) →* ℂˣ => W ≤ θ.ker).card
+      = chief.p := by
+    rw [← Fintype.card_subtype, ← Nat.card_eq_fintype_card,
+      card_hom_triv_W_eq_card_quotient W,
+      CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity ((↥data.H ⧸ chief.N) ⧸ W) ℂ]
+    letI : Fintype (↥data.H ⧸ chief.N) := Fintype.ofFinite _
+    have hcompl : Subgroup.IsComplement' caseA.S0 W :=
+      Subgroup.isComplement'_of_disjoint_and_mul_eq_univ (disjoint_iff.mpr hinf)
+        (by rw [← Subgroup.normal_mul, hsup, Subgroup.coe_top])
+    rw [← hS0card]
+    exact Nat.card_congr hcompl.QuotientMulEquiv.toEquiv
+  -- The set is `{θ | W ≤ ker θ} \ {1}` (a `W`-trivial, `S₀`-trivial hom is trivial on `⊤`).
+  have hkey : (Finset.univ.filter fun θ : (↥data.H ⧸ chief.N) →* ℂˣ =>
+        W ≤ θ.ker ∧ θ.comp caseA.S0.subtype ≠ 1)
+      = (Finset.univ.filter fun θ : (↥data.H ⧸ chief.N) →* ℂˣ => W ≤ θ.ker).erase 1 := by
+    ext θ
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_erase]
+    constructor
+    · rintro ⟨hW, hS0⟩
+      exact ⟨fun h1 => hS0 (by rw [h1]; ext x; simp), hW⟩
+    · rintro ⟨hne, hW⟩
+      refine ⟨hW, fun hS0 => hne ?_⟩
+      have hkerS0 : caseA.S0 ≤ θ.ker := fun x hx => by
+        rw [MonoidHom.mem_ker]; simpa using DFunLike.congr_fun hS0 ⟨x, hx⟩
+      have hker_top : (⊤ : Subgroup (↥data.H ⧸ chief.N)) ≤ θ.ker := by
+        rw [← hsup]; exact sup_le hkerS0 hW
+      refine MonoidHom.ext (fun x => ?_)
+      have hxk : x ∈ θ.ker := hker_top (Subgroup.mem_top x)
+      rw [MonoidHom.mem_ker] at hxk
+      rw [hxk, MonoidHom.one_apply]
+  rw [hkey, Finset.card_erase_of_mem, hcardWhom]
+  refine Finset.mem_filter.mpr ⟨Finset.mem_univ _, ?_⟩
+  rw [show ((1 : (↥data.H ⧸ chief.N) →* ℂˣ)).ker = ⊤ from MonoidHom.ker_one]
+  exact le_top
+
 /-- **step 5 (g): a `hcHom`-kernel-trivial `HC`-character is `hcPsi θbar`** (Peterfalvi (9.8.c)).
 An irreducible `HC`-character `ψ` trivial on `Ker hcHom` (`= H₀C`) inflates from `H̄ = HC/H₀C`
 (`exists_compHom_eq_of_subset_characterKernel`, `hcHom` surjective); since `H̄` is abelian the
@@ -12383,22 +12584,28 @@ route: `cfDprodl`/`cfSdprod` reconstruction of the `θ₁`- and `λ`-factors fro
 the seed `hθ₀ = inertia_eq_hcuInHu`).
 
 *(β) domain count `|T| = (p-1)·[C_U(S₀):U']`* — restriction bijection `T ≃ (Irr(H̄/W)\{1}) ×
-Irr(C_U(S₀)/U')`; `p-1` nontrivial homs of the order-`p` `H̄/W ≅ S₀` (mirror `card_ne_one_chiefFactorHom`
-+ `exists_ne_one_hom_of_prime_card`), `[C_U(S₀):U']` homs of abelian `C_U(S₀)/U'`
-(`card_monoidHom_of_hasEnoughRootsOfUnity`, `card_U_div_a_mul_card_Uprime_eq_relIndex` bridges to the
-statement RHS).
+Irr(C_U(S₀)/U')`.  The `θ₁`-numerator `p-1` is **landed** (`card_theta_triv_W_nontriv_S0`:
+`#{θ : H̄ →* ℂˣ | W ≤ Ker θ ∧ θ|_{S₀} ≠ 1} = p-1`, via `card_hom_triv_W_eq_card_quotient` +
+`IsComplement'.QuotientMulEquiv` giving `|H̄/W| = |S₀| = p`).  The `λ`-count `[C_U(S₀):U']` is homs of
+abelian `C_U(S₀)/U'` (`card_monoidHom_of_hasEnoughRootsOfUnity`, `card_U_div_a_mul_card_Uprime_eq_relIndex`
+bridges to the statement RHS).  What remains for (β): assemble the two counts through the
+`T ≃ (Irr(H̄/W)\{1}) × Irr(C_U(S₀)/U')` product bijection (needs the (α) surjective identification).
 
-*(γ) `W₁`-injectivity of `ζ ↦ Ind_{HU}^M ζ`* — genuinely absent (Coq `injXtheta`, L1233-1253): for
-`w ∈ M`, `ζ₁ = ζ₂^w` (`ζ_i ∈ Xtheta`) forces `w ∈ HU` — decompose `w = y·w₁` (`y∈HU`, `w₁∈W₁`),
-`ζ₁ = ζ₂^{w₁}`; since `H₂…H_q = W ⊆ Ker ζ_i` (`kerH1c`) yet `H₁ = S₀ ⊆ Ker(ζ₂^{w₁})` for `w₁≠1`
-(via `cfker_conjg` moving `W` to a `W₁`-conjugate containing `S₀`, using the `H̄ = ⊕ S₀^{w}` Clifford
-permutation of (9.7)), the `H₀U'`-structure + Frobenius `Ū ⋊ W₁` force `w₁=1`.  Needs new
-`cfker`-conjugation infra (`Ind`-kernel of an irreducible ↔ source kernel under `W₁`-conjugation).
+*(γ) `W₁`-injectivity of `ζ ↦ Ind_{HU}^M ζ`* (Coq `injXtheta`, L1233-1253).  **Frame landed**:
+`induceHU_inj_of_conj_mem_huSub` reduces (γ) to the pure statement `hcrit` — any `w ∈ M` with
+`ζ₂^w = ζ₁` (family members) has `w ∈ HU` — using the now-landed `cfker`-conjugation transport
+`mem_characterKernel_conjBy` / `subsetCharacterKernel_conjBy_iff` (`n ∈ Ker (χ^w) ↔ w·n·w⁻¹ ∈ Ker χ`,
+the genuinely-absent `cfker_conjg` brick).  What remains for `hcrit`: decompose `w = y·w₁`
+(`M = HU ⋊ W₁`, `data.M_complement`, `conjBy y` inner), then the Clifford core — `W = H₂…H_q ⊆ Ker ζ_i`
+(propagate `θ|_W = 1` through `Ind_{H·C_U(S₀)}^{HU}`, mirror of `hcuZetaPair_H0supUprime_subset_ker`)
+and `w₁·S₀·w₁⁻¹ ⊆ W` for `w₁ ≠ 1` (the `H̄ = ⊕ S₀^{w}` orbit realized at the `HU` level) — force
+`H̄ ⊆ Ker ζ₁` (via `subsetCharacterKernel_conjBy_iff`), contradicting `H ⊄ Ker` (`hcuZetaPair_mem_xiSet`),
+so `w₁ = 1`, `w ∈ HU`.
 
 Assembly once (α)(β)(γ) land: `card_image_induce_eq_div` ((α)+`hcuInHu_normal`) ⟹ `|𝒵| = |T|/a`;
-(γ) ⟹ `induceHU` injective on `𝒵` ⟹ `ncard{irr,qa,∈𝒮(H₀U')} ≥ |induceHU '' 𝒵| = |𝒵| = |T|/a`
-(`Set.ncard_image_of_injOn`, `Set.ncard_le_ncard`); (β)+bridge ⟹ `= ((p-1)/a)·[C_U(S₀):U']` = RHS.
-Skeleton left `sorry`. -/
+(γ) via `induceHU_inj_of_conj_mem_huSub` ⟹ `induceHU` injective on `𝒵` ⟹
+`ncard{irr,qa,∈𝒮(H₀U')} ≥ |induceHU '' 𝒵| = |𝒵| = |T|/a` (`Set.ncard_image_of_injOn`,
+`Set.ncard_le_ncard`); (β)+bridge ⟹ `= ((p-1)/a)·[C_U(S₀):U']` = RHS.  Skeleton left `sorry`. -/
 theorem caseA_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     (chars : Section11CharacterData data chief) (caseA : CliffordCaseAData chars) :

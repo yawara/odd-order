@@ -157,3 +157,52 @@ intrinsic-kernel route ((α) を `hcuPsiPair`-conjBy-descent 無しで閉じる)
   M-invariant source 用で (9.8.d) の non-invariant source に不適用)。
 - **assembly**: `card_image_induce_eq_div` ((α)+`hcuInHu_normal`) ⟹ `|𝒵|=|T|/a`; (γ) ⟹ `induceHU` inj on 𝒵
   ⟹ `ncard ≥ |𝒵| = |T|/a` (`Set.ncard_image_of_injOn`+`Set.ncard_le_ncard`); (β)+橋 ⟹ RHS。
+
+## (v) count セッション 3 (2026-07-06 続き): cfker-conjugation infra + γ reduction frame + β θ-count landed
+
+`caseA_character_counts` conjunct (d) の `sorry` は **依然 open** (S11 comment-stripped sorry = 3)。
+本セッションは (γ) の真の linchpin (genuinely-absent `cfker_conjg`) と (γ) の honest reduction frame、
+および (β) の θ-numerator を landing。**full build 3932 jobs exit 0, AxiomsCheck OK, sorry/axiom 新規 0**。
+
+### landed (build-green, sorry/axiom 無)
+
+**(γ) infra — cfker-conjugation transport (完全欠落だった brick)**:
+- `mem_characterKernel_conjBy` (S11): `n ∈ Ker(χ^w) ↔ conjByMulEquiv w n ∈ Ker χ` (汎用 K◁G)。
+  pointwise。`subsetCharacterKernel_conjBy_of_invariant` の non-invariant 版で、conjugation が kernel を
+  どこへ動かすかを正確に追う = Coq `cfker_conjg` 相当。
+- `subsetCharacterKernel_conjBy_iff` (S11): 上の subgroup subset 版
+  (`(N:Set) ⊆ Ker(χ^w) ↔ ∀ n∈N, w·n·w⁻¹ ∈ Ker χ`)。γ で `S₀ ⊆ Ker(ζ₂^{w₁})` を
+  `w₁·S₀·w₁⁻¹ ⊆ Ker ζ₂` に落とす形。
+
+**(γ) frame — injectivity の honest reduction**:
+- `induceHU_eq_induce` (S11): wrapper unfold (`induceHU χ = Ind_{HU} χ`, Invertible instance subsingleton)。
+- `induceHU_eq_imp_exists_conj` (S11): `Ind_{HU}^M χ = Ind_{HU}^M ψ ⟹ ∃w∈M, ψ^w = χ`
+  (`induce_eq_induce_iff_conj` を wrapper level で)。
+- `induceHU_inj_of_conj_mem_huSub` (S11): **(γ) を純群論命題 `hcrit` に還元** — 「family member を
+  互いに写す M-conjugation w は必ず w∈HU」を仮定すれば `induceHU` は {χ,ψ} で injective
+  (HU-conj は inner ゆえ `conjBy_eq_self_of_mem`)。これで (γ) の残りが `hcrit` 一点に集約。
+
+**(β) θ-numerator (完全)**:
+- `card_hom_triv_W_eq_card_quotient` (S11): `#{θ:H̄→*ℂˣ | W ≤ ker θ} = |H̄/W →* ℂˣ|`
+  (QuotientGroup.lift 双射)。
+- `card_theta_triv_W_nontriv_S0` (S11): `#{θ | W ≤ ker θ ∧ θ|_{S₀} ≠ 1} = p-1`
+  (`IsComplement'.QuotientMulEquiv` で `|H̄/W| = |S₀| = p`、Pontryagin、W-trivial∧S₀-trivial ⟹ trivial
+  で trivial hom 1 個除去)。= domain count の `(p-1)` factor。
+
+### 残り (次セッションの precise gap — docstring "Still open (v)" 更新済)
+
+- **(γ) `hcrit`** (frame で集約済、残る hard core 2 本):
+  1. `W = H₂…H_q ⊆ Ker ζ_i` — source hom の `θ|_W = 1` を `Ind_{H·C_U(S₀)}^{HU}` 経由で ζ に伝播
+     (`hcuZetaPair_H0supUprime_subset_ker` の W-summand-complement 版; W-lifted を HU に realize + kernel induce)。
+  2. `w₁·S₀·w₁⁻¹ ⊆ W` (w₁≠1) — (9.7) Clifford orbit `H̄=⊕_{w∈W₁} S₀^w` を **HU realized level** で。
+  + `M = HU⋊W₁` 分解 (`data.M_complement`) + `conjBy y` inner + 上の cfker-transport で組む。
+- **(α)-surjectivity** — 前セッションと同じ (Coq `def_Itheta` cfDprod/cfSdprod)。
+- **(β) 残り** — θ-count×λ-count を product bijection で組む (α 必要)。
+- **assembly** — `induceHU_inj_of_conj_mem_huSub` + `card_image_induce_eq_div` で組む (frame 準備済)。
+
+### issue 1018 訂正
+- 前セッション note の「θ-count は `card_ne_one_chiefFactorHom` の mirror」→ 実際は
+  `card_theta_triv_W_nontriv_S0` として **W-trivial 制約付きで独立に landed** (chiefFactorHom は全 H̄ 対象で
+  W-summand 版ではない)。今 build-green。
+- 「`cfker`-conjugation infra 必須」→ **本セッションで landed** (`mem_characterKernel_conjBy` /
+  `subsetCharacterKernel_conjBy_iff`)。γ は now `hcrit` の 2 本 (W⊆Ker propagation + S₀ orbit) に絞り込み済。
