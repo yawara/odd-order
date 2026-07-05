@@ -542,6 +542,100 @@ theorem caseA_fixed_contradiction [Finite G] {M : Subgroup G}
     exact iSup_le hfixT
   exact chief.U_noncentral_on_quotient htop
 
+/-- **The odd-order exponent chain** (Peterfalvi (11.7), case (a) arithmetic): a multiplicative,
+nowhere-zero `f : A → ZMod p` satisfying `f v · f (σ v) = 1` for an automorphism `σ` of odd
+exponent on a group of odd order is identically `1`.
+
+From the relation, `f ∘ σ` inverts `f`, so `f ∘ σ² = f`; as `σ = (σ²)^((m+1)/2)` for odd `m`
+with `σ^m = 1`, also `f ∘ σ = f`, whence `f v² = 1`; and `f v` has odd multiplicative order
+(`f v^(orderOf v) = 1` with `|A|` odd), so `f v = x = x^d = (x²)^k · x` forces `f v = 1`. -/
+theorem chain_exponent_eq_one {A : Type*} [Group A] [Finite A] {p : ℕ} [Fact p.Prime]
+    (f : A → ZMod p) (hmul : ∀ u v, f (u * v) = f u * f v) (hne : ∀ u, f u ≠ 0)
+    (hAodd : Odd (Nat.card A)) (σ : MulAut A) {m : ℕ} (hmodd : Odd m) (hσm : σ ^ m = 1)
+    (hrel : ∀ v, f v * f (σ v) = 1) (v : A) : f v = 1 := by
+  classical
+  -- `f 1 = 1`
+  have hf1 : f 1 = 1 := by
+    have h := hmul 1 1
+    rw [one_mul] at h
+    have h2 : f 1 * f 1 = f 1 * 1 := by rw [mul_one, ← h]
+    exact mul_left_cancel₀ (hne 1) h2
+  -- `f` of powers
+  have hpow : ∀ (w : A) (n : ℕ), f (w ^ n) = f w ^ n := by
+    intro w n
+    induction n with
+    | zero => simpa using hf1
+    | succ n ih => rw [pow_succ, pow_succ, hmul, ih]
+  -- `f ∘ σ²` fixes `f`, hence so does `f ∘ σ` (odd exponent)
+  have hστ : ∀ w, f (σ w) = (f w)⁻¹ := by
+    intro w
+    have h := congrArg (fun t => (f w)⁻¹ * t) (hrel w)
+    simpa [← mul_assoc, inv_mul_cancel₀ (hne w)] using h
+  have hσ2 : ∀ w, f ((σ ^ 2) w) = f w := by
+    intro w
+    have h1 : (σ ^ 2) w = σ (σ w) := by
+      rw [sq]
+      rfl
+    rw [h1, hστ, hστ, inv_inv]
+  have hσ2n : ∀ (n : ℕ) (w : A), f (((σ ^ 2) ^ n) w) = f w := by
+    intro n
+    induction n with
+    | zero => intro w; rfl
+    | succ n ih =>
+        intro w
+        rw [pow_succ, MulAut.mul_apply, ih, hσ2]
+  have hσfix : ∀ w, f (σ w) = f w := by
+    intro w
+    obtain ⟨k, hk⟩ := hmodd
+    have hσeq : σ = (σ ^ 2) ^ (k + 1) := by
+      rw [← pow_mul]
+      have : 2 * (k + 1) = m + 1 := by omega
+      rw [this, pow_succ, hσm, one_mul]
+    conv_lhs => rw [hσeq]
+    exact hσ2n (k + 1) w
+  -- `(f v)² = 1`
+  have hsq : f v * f v = 1 := by
+    have := hrel v
+    rwa [hσfix] at this
+  -- `f v` has odd order: `f v ^ orderOf v = 1`
+  have hvord : f v ^ orderOf v = 1 := by
+    rw [← hpow, pow_orderOf_eq_one, hf1]
+  have hdodd : Odd (orderOf v) :=
+    hAodd.of_dvd_nat (orderOf_dvd_natCard v)
+  obtain ⟨k, hk⟩ := hdodd
+  -- `f v = f v ^ (2k+1) = (f v²)^k · f v = f v` ... `1 = f v ^ d = f v`
+  calc f v = (f v * f v) ^ k * f v := by rw [hsq, one_pow, one_mul]
+    _ = f v ^ (2 * k + 1) := by ring
+    _ = f v ^ orderOf v := by rw [hk]
+    _ = 1 := hvord
+
+/-- **Closure pullback along a surjection**: if `T` generates `Γ'` and contains `1`, its
+preimage generates `Γ` (lifts of a product decomposition, kernel elements landing in the
+preimage via `1 ∈ T`). -/
+theorem closure_preimage_eq_top_of_closure_eq_top {Γ Γ' : Type*} [Group Γ] [Group Γ']
+    (π : Γ →* Γ') (hsurj : Function.Surjective π) {T : Set Γ'}
+    (h1T : (1 : Γ') ∈ T) (hT : Subgroup.closure T = ⊤) :
+    Subgroup.closure (π ⁻¹' T) = ⊤ := by
+  rw [eq_top_iff]
+  intro g _
+  have hg : π g ∈ Subgroup.closure T := hT ▸ Subgroup.mem_top _
+  refine Subgroup.closure_induction
+    (p := fun t _ => ∀ g' : Γ, π g' = t → g' ∈ Subgroup.closure (π ⁻¹' T))
+    ?_ ?_ ?_ ?_ hg g rfl
+  · intro t ht g' hg'
+    exact Subgroup.subset_closure (by simp only [Set.mem_preimage, hg']; exact ht)
+  · intro g' hg'
+    exact Subgroup.subset_closure (by simp only [Set.mem_preimage, hg']; exact h1T)
+  · intro t₁ t₂ _ _ ih₁ ih₂ g' hg'
+    obtain ⟨x, hx⟩ := hsurj t₁
+    have h2 : π (x⁻¹ * g') = t₂ := by rw [map_mul, map_inv, hx, hg']; group
+    have hmem := Subgroup.mul_mem _ (ih₁ x hx) (ih₂ _ h2)
+    simpa using hmem
+  · intro t _ ih g' hg'
+    have h2 : π g'⁻¹ = t := by rw [map_inv, hg', inv_inv]
+    have hmem := Subgroup.inv_mem _ (ih g'⁻¹ h2)
+    simpa using hmem
+
 end CaseA
 
 end OddOrder.Peterfalvi.S13
