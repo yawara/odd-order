@@ -4922,6 +4922,63 @@ theorem analyticCounting_disjointCover [Finite G] (_hG : OddOrder.BG.IsMinimalSi
   -- Assemble.
   rw [hterm3, hterm4, ← add_div, ← add_div, ← add_div, ← key, div_self hG0.ne']
 
+open scoped FiniteInduce in
+/-- **The `λ^{τ₁}`-value off the `H^#`-saturation is `±` an `η`-column sum** (Peterfalvi
+(13.9.a), first step): `(μ_j − λ)^{τ₁} = Ind_S^G(μ_j − λ)` vanishes off `(H^#)^G` — both are
+induced from linear characters of `H = PC` ((13.3.a) via `mu_col_tau1_eta_col_one`), so the
+difference is `H^#`-supported — whence `λ^{τ₁}(x) = δ ∑_i η_{i1}(x)` there by the (13.3.c)
+column formula. -/
+theorem lambda_tau1_apply_eq_of_not_mem_H_sat [Finite G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (chars : CharacterDegreeData hyp) {x : G}
+    (hx : x ∉ OddOrder.GroupTheory.conjClassSet (sharpSubgroup hyp.H)) :
+    ∃ δ : ℤ, (δ = 1 ∨ δ = -1) ∧
+      chars.tau1S chars.lambda x
+        = (δ : ℂ) * ∑ i : Fin hyp.q, hyp.eta i ⟨1, hyp.p_prime.one_lt⟩ x := by
+  classical
+  obtain ⟨j, δ, θμ, hδ, hθμirr, hθμ1, hμInd, hμτ⟩ := chars.mu_col_tau1_eta_col_one
+  obtain ⟨θl, hθlirr, hθl1, hlamEq, -⟩ := chars.lambda_induced_from_PC_linear
+  haveI hKnorm : (hyp.H.subgroupOf hyp.S).Normal := H_sharp_subgroupOf_normal hyp
+  have hdiff : chars.tau1S (∑ i : Fin hyp.q, hyp.mu i j) - chars.tau1S chars.lambda
+      = ClassFunction.induce hyp.S
+          (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θμ
+            - ClassFunction.induce (hyp.H.subgroupOf hyp.S) θl) := by
+    rw [← map_sub, hμInd, hlamEq]
+    have h := chars.tau1S_apply_induce_sub θμ θl hθμirr hθlirr
+    exact h.trans (by congr! <;> exact Subsingleton.elim _ _)
+  have hsupp : ∀ w : ↥hyp.S, (w : G) ∉ sharpSubgroup hyp.H →
+      (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θμ
+        - ClassFunction.induce (hyp.H.subgroupOf hyp.S) θl) w = 0 := by
+    intro w hw
+    rw [ClassFunction.sub_apply]
+    by_cases hwH : (w : G) ∈ hyp.H
+    · have hw1 : (w : G) = 1 := by
+        by_contra hne
+        exact hw ⟨hwH, fun h1 => hne (Set.mem_singleton_iff.mp h1)⟩
+      have hw1' : w = 1 := Subtype.ext hw1
+      subst hw1'
+      rw [OddOrder.RepresentationTheory.ClassFunction.induce_apply_one,
+        OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, hθμ1, hθl1, sub_self]
+    · rw [OddOrder.RepresentationTheory.ClassFunction.induce_eq_zero_of_not_mem_normal _
+          (fun h => hwH (Subgroup.mem_subgroupOf.mp h)),
+        OddOrder.RepresentationTheory.ClassFunction.induce_eq_zero_of_not_mem_normal _
+          (fun h => hwH (Subgroup.mem_subgroupOf.mp h)), sub_self]
+  have hvan : ClassFunction.induce hyp.S
+      (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θμ
+        - ClassFunction.induce (hyp.H.subgroupOf hyp.S) θl) x = 0 :=
+    OddOrder.GroupTheory.IsTISubset.induce_apply_of_not_mem_conjClassSet _ hsupp hx
+  refine ⟨δ, hδ, ?_⟩
+  have hdv := congrArg (fun f : ClassFunction G ℂ => f x) hdiff
+  simp only [ClassFunction.sub_apply] at hdv
+  rw [hvan] at hdv
+  have hμv := congrArg (fun f : ClassFunction G ℂ => f x) hμτ
+  simp only [ClassFunction.smul_apply, smul_eq_mul,
+    OddOrder.RepresentationTheory.ClassFunction.finset_sum_apply] at hμv
+  have hlamv : chars.tau1S chars.lambda x = chars.tau1S (∑ i : Fin hyp.q, hyp.mu i j) x :=
+    (sub_eq_zero.mp hdv).symm
+  exact hlamv.trans hμv
+
 /-- **Peterfalvi (13.9.a), nonvanishing dichotomy**: on the generic set `G₀`, the characters
 `λ^{τ₁}` and `η₁₀` do not vanish simultaneously.  Faithful producer of the textbook (13.9.a) —
 the character content bottoms out at the (13.3.c) `μ_j^{τ₁} = δ·Σηᵢ₁` formula, the (13.2.e)
