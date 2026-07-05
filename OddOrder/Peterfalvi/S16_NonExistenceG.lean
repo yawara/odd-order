@@ -65,34 +65,36 @@ theorem isTypeI {hyp : Hypothesis (G := G)} (Ldata : LHypothesis hyp) :
 
 end LHypothesis
 
-/-- **§13/§14 structural inputs for `T` type-II** (the `T`-side analogue of `basic_structure` +
-(8.6) for `S`).  For the type-`P` data of the partner `T` (from `T_nonI`), the BG type-II
-characterisation `isTypeII_of_typePData` needs: the nontrivial-core data, `U` commutative,
-`N_G(U) ⊄ T`, and the derived subgroup `T'` of type `F` with `F(T') = T_F`.  These are the genuine
-§13/§14 `T`-side residual of Peterfalvi (14.9) (dual to the `S`-side `basic_structure`/(8.6); the
-textbook routes through the type-III orthogonality contradiction, but the BG structural
-characterisation is the `M_F`-side equivalent).  Consumer-pinned signature; the body is the
-`T`-side partner character/structure theory. -/
-theorem T_typeII_structural_inputs [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (data : OddOrder.GroupTheory.TypePData hyp.base.T) :
-    OddOrder.GroupTheory.TypePNontrivialCore hyp.base.T data ∧
-      IsMulCommutative ↥data.U ∧
-      ¬ Subgroup.normalizer (data.U : Set G) ≤ hyp.base.T ∧
-      OddOrder.GroupTheory.IsTypeF (derivedInG hyp.base.T) ∧
-      maxNilpotentNormalHall (derivedInG hyp.base.T) = data.H := sorry
-
-/-- **Peterfalvi (14.9)**: the subgroup `T` is of Type II.  Built from the BG type-II
-characterisation `isTypeII_of_typePData`: `T` is non-type-I (`T_nonI`), hence carries a `TypePData`
-(`typePData_of_isTypeNonI`); applying `isTypeII_of_typePData` with the §13/§14 `T`-side structural
-inputs (`T_typeII_structural_inputs`) gives type II.  The §14-level reduction is honest; the
-remaining content is the pinned `T`-side structure.  (Placed ahead of `exists_LHypothesis` so the
-§14 `T`-side chain — `typeII_overNormalizer_frobenius` etc. — can cite `IsTypeII T` locally.) -/
-theorem T_typeII [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+/-- **Peterfalvi (14.9), reduced to its canonical residual** — the `T`-side dual of the `S`-side
+`(13.2.a)` carrier field `S_typeP2`.  `T` is of BG type `P₂` (`κ(T) ≠ σ'(T)`; Coq `PFsection14`
+`FTtypeP_min_typeII : FTtype T == 2`).  The `IsTypeP T` conjunct is discharged honestly from `T_nonI`
+(`isTypeP_of_isTypeNonI`).  The residual `κ(T) ≠ σ'(T)` — equivalently, `T`'s Hall `(κ ∪ σ)ᶜ`-subgroup
+is nontrivial — is the genuine (14.9) content: Peterfalvi rules out type III via the (14.8) numeric
+contradiction (`key_ratio_inequality_of_caseB_data` gives `(v−1)/p > (u−1)/q`, contradicting the
+type-III Γ-bridge estimate `(v−1)/p ≤ (u−1)/q`).  On the `S`-side this fact is *posited* as the
+`Hypothesis` field `S_typeP2`; here it is kept as an explicit honest obligation rather than hoisted to
+a carrier field. -/
+theorem T_isTypeP2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
-    IsTypeII hyp.base.T := by
-  obtain ⟨data⟩ := OddOrder.GroupTheory.typePData_of_isTypeNonI hyp.base.T_nonI
-  obtain ⟨hcommon, hUcomm, hnorm, hderF, hderfit⟩ := T_typeII_structural_inputs _hG hyp data
-  exact OddOrder.BG.Ch4.S16.isTypeII_of_typePData data hcommon hUcomm hnorm hderF hderfit
+    OddOrder.BG.Ch4.S14.IsTypeP2 hyp.base.T := by
+  have hP : OddOrder.BG.Ch4.S14.IsTypeP hyp.base.T :=
+    OddOrder.BG.Ch4.S16.isTypeP_of_isTypeNonI hG hyp.base.T_maximal hyp.base.T_nonI
+  refine ⟨hP, ?_⟩
+  -- (14.9): `κ(T) ≠ σ'(T)`.  The deep `M'`-type-`F` structure of `T'` is *not* needed here — it is
+  -- discharged downstream by `isTypeII_of_isTypeP2` for any type-`P₂` maximal subgroup.
+  sorry
+
+/-- **Peterfalvi (14.9)**: the subgroup `T` is of Type II.  Dual to the `S`-side `(13.2.a)` line
+`isTypeII_of_isTypeP2 … S_maximal S_typeP2`: `T` is of type `P₂` (`T_isTypeP2`), and *every* type-`P₂`
+maximal subgroup is type II by the proven BG bridge `isTypeII_of_isTypeP2`.  That bridge discharges
+the deep `M'`-type-`F` structure — `IsTypeF (derivedInG T)` and `(T')_F = T_F` — internally
+(`isTypeF_derivedInG_of_isTypeP2`), so the sole residual of (14.9) is the type-`P₂` fact `T_isTypeP2`.
+(Placed ahead of `exists_LHypothesis` so the §14 `T`-side chain — `typeII_overNormalizer_frobenius`
+etc. — can cite `IsTypeII T` locally.) -/
+theorem T_typeII [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    IsTypeII hyp.base.T :=
+  OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.base.T_maximal (T_isTypeP2 hG hyp)
 
 /-- **Peterfalvi (14.3)**: a type-I maximal subgroup `L` over `N_G(U)` exists.  Constructed by
 citing (13.17) `S15.typeII_overNormalizer_frobenius` for the type-I-over-normalizer Frobenius data

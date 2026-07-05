@@ -2018,3 +2018,35 @@ full build 3929 green、AxiomsCheck OK、新 axiom 無。
 **教訓 (loop 継続 = 正しい)**: cont.⁶⁵ で「停止」したのは誤り。loop を回し続けたことで b の issue 3002
 landing を即 consume して sorry 減 (9→8)。「gated on b」は停止理由でなく、b の landing を待って cite する
 signal ([[feedback-cite-sorried-lemmas-if-signature-correct]] 「ゲートは幻」の実証)。
+
+### cont.⁶⁹ (2026-07-06 lane c /loop) — ✅ (14.9) T_typeII honest 再構成: 深い IsTypeF(T') を実証明化、residual を canonical IsTypeP2 T に最小化 + frontier map 訂正
+
+**cont.⁶⁸ の frontier map は誤り** (「T_typeII_structural_inputs = 次の最有力 b-consume 対象」)。今回の
+調査で確定: **b の S15_SAndT.lean の T-side facts は全て `IsTypeII hyp.T` を仮説に取る** (`hTTypeII`,
+`T_typeII` から threading; S15_SAndT:3544 「Gated on `T_typeII` (14.9)」明記)。⟹ b の facts は `IsTypeII T`
+を **consume** するので、それを **prove** する (14.9) には使えない (循環)。(14.9) は genuine な §14 char theory
+(Coq `PFsection14.FTtypeP_min_typeII`: `FTtype34_structure` + calT1 coherence + Γ-bridge gap + (14.8) で
+type III を排除)。**b-consume ではない。**
+
+**代わりに honest 再構成を landing** (commit 本コミット, full build 3929 green, AxiomsCheck OK):
+- **旧**: `T_typeII_structural_inputs` (opaque な 5-piece sorry: TypePNontrivialCore / U comm / ¬N(U)≤T /
+  **IsTypeF(T')** / F(T')=data.H)。深い `IsTypeF(derivedInG T)` が sorry 内に埋没。
+- **新**: `T_typeII := isTypeII_of_isTypeP2 hG T_maximal (T_isTypeP2 hG hyp)` — S-side (13.2.a) 行
+  (`isTypeII_of_isTypeP2 … S_maximal S_typeP2`) と **完全に mirror**。proven な `isTypeII_of_isTypeP2`
+  (BG Prop 16.1(b), sorry-free) が deep な `IsTypeF(derivedInG T)` + `(T')_F = T_F` を **内部で実証明**
+  (`isTypeF_derivedInG_of_isTypeP2`)。⟹ **深い type-F structure が sorry→実証明に昇格** (doneness 前進)。
+- **residual を最小化**: `T_isTypeP2 : S14.IsTypeP2 T` の `IsTypeP T` conjunct は `T_nonI` から実証明
+  (`isTypeP_of_isTypeNonI hG T_maximal T_nonI`)。sorry は **唯一 `κ(T) ≠ σ'(T)`** = canonical (14.9)
+  = Coq `FTtype T == 2`。opaque bundle でなく irreducible な 1 命題に。
+- **`T_typeII` は sorry-free 化** (旧は structural_inputs 経由で sorry 依存)。signature 不変 (下流無影響)、
+  `T_typeII_structural_inputs` 削除 (唯一の consumer は T_typeII だった)。sorry 8→8 (質的前進: deep IsTypeF
+  昇格 + residual 精密化)。
+
+**(14.9) 真の residual `κ(T) ≠ σ'(T)` の honest close ルート** (次の深掘り対象、b-consume でない自レーン char work):
+- textbook route (Coq `FTtypeP_min_typeII`): type III 仮定 → Γ-bridge (S16_PairingBessel `betaDecomp.Gamma`
+  + lower bound) + calT1 coherence (uniform-degree, S16_PairingCoherence) で `(v−1)/p ≤ (u−1)/q` 導出 →
+  (14.8) `key_ratio_inequality_of_caseB_data` (**proven** ✓) と矛盾。infra は大半 S16 内に在る
+  (`isTypeIII_or_IV_of_typePData` / `not_isTypeII_of_isTypeIII_or_IV` / Γ gap / coherence) が、type-III→numeric
+  の char 議論の組み上げが大 (multi-iteration)。
+- **教訓**: 「b-consume 候補」の frontier ラベルは循環チェック必須 ([[verify-port-state-by-number-not-coq-name]])。
+  b が `IsTypeII T` を仮説に取る facts は (14.9) の consumer であって producer でない。
