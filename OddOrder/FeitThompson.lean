@@ -1,6 +1,7 @@
 import OddOrder.BG.AppC_FinalContradiction
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePComplement
 import OddOrder.Peterfalvi.S06_MuColumnBridge
+import OddOrder.Peterfalvi.S13_CoreStructure
 
 /-!
 # Feit-Thompson Theorem
@@ -636,9 +637,16 @@ theorem card_kappaHall_lt_of_isTypeIIIorIV {G : Type*} [Group G] [Finite G]
   have hKstarw2 : Nat.card ↥Kstar = hyp.w2 := by
     rw [hKstar]
     exact OddOrder.Peterfalvi.S10.card_Msigma_inf_centralizer_eq_card_W2 hG hS hSP hKS hK hyp.typeP
+  -- The two (11.5)/(11.7) structural facts, discharged via §13 (`secondDerived_eq_HC`,
+  -- `H_elementaryAbelian`): `M'' = H ⊔ C_U(H)` and `|H| = |W₂|^{|W₁|}`.
+  have hM2 : secondDerivedInAmbient S
+      = hyp.typeP.H ⊔ (hyp.typeP.U ⊓ Subgroup.centralizer (hyp.typeP.H : Set G)) :=
+    OddOrder.Peterfalvi.S13.secondDerived_eq_fitting_of_base hG hyp hIIIorIV
+  have hHcard : Nat.card ↥hyp.typeP.H = hyp.w2 ^ hyp.w1 :=
+    OddOrder.Peterfalvi.S13.card_H_eq_of_base hG hyp hIIIorIV
   -- `w₂ < w₁` (Peterfalvi (11.9.b), from the genuine (11.8)).
   rw [hKstarw2, hKw1]
-  exact OddOrder.Peterfalvi.S12.w2_lt_w1_of_hypothesis hG hyp hIIIorIV
+  exact OddOrder.Peterfalvi.S12.w2_lt_w1_of_hypothesis hG hyp hIIIorIV hM2 hHcard
 
 /-- **Peterfalvi (13.2.a), character core** (mmd §13, `references/peterfalvi/04.15_*`).
 

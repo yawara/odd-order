@@ -1240,6 +1240,39 @@ theorem H_elementaryAbelian [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [hcardHH, hp_eq, hyp.s11Setup_q_eq, hH0] at h
     simpa using h
 
+/-- **(11.5) for the bare §12 hypothesis**: `M'' = H ⊔ C_U(H)` for a type-III/IV maximal subgroup,
+stated directly on the §12 `Hypothesis` (not the §13 one).  Builds the §13 hypothesis via
+`exists_hypothesis_of_isTypeIIIorIV` (which pins `base = base12`), so `secondDerived_eq_HC`
+transports to the §12 `typeP`: `s13.HC = s13.H ⊔ s13.C = base12.typeP.H ⊔ (base12.typeP.U ⊓ C_G(H))`
+by `C_eq_centralizer`.  The `hM2` input to `S12.card_SHCSet_filter_eq_charParam_n`. -/
+theorem secondDerived_eq_fitting_of_base [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (base12 : OddOrder.Peterfalvi.S12.Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M) :
+    secondDerivedInAmbient M
+      = base12.typeP.H ⊔ (base12.typeP.U ⊓ Subgroup.centralizer (base12.typeP.H : Set G)) := by
+  obtain ⟨s13, hbase⟩ := exists_hypothesis_of_isTypeIIIorIV hG base12 htype
+  have hH : s13.H = base12.typeP.H := by rw [Hypothesis.H, hbase]
+  have hHC : s13.HC
+      = base12.typeP.H ⊔ (base12.typeP.U ⊓ Subgroup.centralizer (base12.typeP.H : Set G)) := by
+    rw [Hypothesis.HC, hH, s13.C_eq_centralizer, hbase]
+  rw [secondDerived_eq_HC hG s13, hHC]
+
+/-- **(11.7) order for the bare §12 hypothesis**: `|H| = |W₂|^{|W₁|}` (Peterfalvi's `p^q`), stated
+on the §12 `Hypothesis`.  Builds the §13 hypothesis (`base = base12`) and transports the order half
+of `H_elementaryAbelian` (`|H| = p^q`) to `base12.typeP.H`, with `p = w₂`, `q = w₁`.  The `hHcard`
+input to `S12.card_SHCSet_filter_eq_charParam_n`. -/
+theorem card_H_eq_of_base [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (base12 : OddOrder.Peterfalvi.S12.Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M) :
+    Nat.card ↥base12.typeP.H = base12.w2 ^ base12.w1 := by
+  obtain ⟨s13, hbase⟩ := exists_hypothesis_of_isTypeIIIorIV hG base12 htype
+  have h := (H_elementaryAbelian hG s13).2.1
+  -- `s13.H = base12.typeP.H`, `s13.p = base12.w2`, `s13.q = base12.w1` (all via `base = base12`).
+  rw [show s13.H = base12.typeP.H from by rw [Hypothesis.H, hbase],
+    show s13.p = base12.w2 from by rw [Hypothesis.p, hbase],
+    show s13.q = base12.w1 from by rw [Hypothesis.q, hbase]] at h
+  exact h
+
 /-! ## (11.8): the main orthogonality calculation -/
 
 /-- Carrier for the five substeps of Peterfalvi (11.8). -/

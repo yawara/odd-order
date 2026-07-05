@@ -3840,7 +3840,10 @@ closes `card_kappaHall_lt_of_isTypeIIIorIV` (the unique bare `feitThompson` sorr
 `notes/peterfalvi/s13_11_8_orthogonality.md` for the full formalization plan. -/
 theorem exists_zeta_residual_not_orthogonal [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
-    (htype : IsTypeIII M ∨ IsTypeIV M) :
+    (htype : IsTypeIII M ∨ IsTypeIV M)
+    (hM2 : secondDerivedInAmbient M
+      = hyp.typeP.H ⊔ (hyp.typeP.U ⊓ Subgroup.centralizer (hyp.typeP.H : Set G)))
+    (hHcard : Nat.card ↥hyp.typeP.H = hyp.w2 ^ hyp.w1) :
     ∃ ζ : ClassFunction ↥M ℂ, ζ ∈ inducedFamily M ∧ IsIrreducibleCharacter ζ ∧
       ζ 1 = (hyp.w1 : ℂ) ∧
       ¬ ∀ (i : Fin hyp.w1) (j : Fin hyp.w2),
@@ -3865,7 +3868,7 @@ theorem exists_zeta_residual_not_orthogonal [Finite G]
   -- (11.8.1)/(5.7) the orthonormal coherent image `R`; its cardinality `|R| = n` is the §9 count.
   obtain ⟨R, hZ, hRorth, hRmem, hRrev, hRcard⟩ := hyp.exists_coherentImage_SHC ν
   have hRn : R.card = params.n :=
-    hRcard.trans (hyp.card_SHCSet_filter_eq_charParam_n hG htype params hmu hδpm)
+    hRcard.trans (hyp.card_SHCSet_filter_eq_charParam_n hG htype params hmu hδpm hM2 hHcard)
   -- degree relations at `δ = 1`.
   have hnf : (params.n : ℤ) * (hyp.w1 : ℤ) = (params.d : ℤ) - 1 := by rw [← hδ1]; exact params.n_formula
   have hd : (params.d : ℂ) = (hyp.w1 : ℂ) * (params.n : ℂ) + 1 := by
@@ -3895,9 +3898,13 @@ open scoped FiniteInduce in
 coherence-free `w₂ < w₁` reduction (`w2_lt_w1_of_residual_not_orthogonal`). -/
 theorem w2_lt_w1_of_hypothesis [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
-    (htype : IsTypeIII M ∨ IsTypeIV M) :
+    (htype : IsTypeIII M ∨ IsTypeIV M)
+    (hM2 : secondDerivedInAmbient M
+      = hyp.typeP.H ⊔ (hyp.typeP.U ⊓ Subgroup.centralizer (hyp.typeP.H : Set G)))
+    (hHcard : Nat.card ↥hyp.typeP.H = hyp.w2 ^ hyp.w1) :
     hyp.w2 < hyp.w1 := by
-  obtain ⟨ζ, hζS, hζirr, hζ1, h118⟩ := exists_zeta_residual_not_orthogonal hG hyp htype
+  obtain ⟨ζ, hζS, hζirr, hζ1, h118⟩ :=
+    exists_zeta_residual_not_orthogonal hG hyp htype hM2 hHcard
   exact w2_lt_w1_of_residual_not_orthogonal hG hyp hζS hζirr hζ1 h118
 
 /-- **Peterfalvi (10.10.1), pure arithmetic**: for the type-V case (c) parameters — `p = w₂` prime,
