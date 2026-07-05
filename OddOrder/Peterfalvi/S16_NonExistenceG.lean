@@ -2642,20 +2642,29 @@ obligation still gated on the `τ₃`-Galois-equivariance (issue 3002 follow-up;
 grid primitives determine `η` on `W`-regular values but not its Galois behaviour off `W`):
 on the generic set `G₀`, the `η`-grid takes integer values (3.9.c) and pairs under the
 negation involution (3.9.a). -/
-theorem eta_grid_galois_facts_on_G0 [Finite G] (hyp : Hypothesis (G := G))
+theorem eta_grid_galois_facts_on_G0 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
     (Mdata : MHypothesis hyp) :
     (∀ g ∈ Mdata.G0, ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
       ∃ m : ℤ, hyp.base.eta i j g = (m : ℂ)) ∧
     (∀ g ∈ Mdata.G0, ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
       hyp.base.eta (finNeg hyp.base.q_prime.pos i) (finNeg hyp.base.p_prime.pos j) g
-        = hyp.base.eta i j g) := sorry
+        = hyp.base.eta i j g) := by
+  -- Now **proven** by citing the issue-3002 keystone fields threaded into `S15.Hypothesis`
+  -- by lane b (`eta_intCast_of_coprime` = (3.9.c), `eta_pair_of_coprime` = (3.9.a)), which apply
+  -- to every `g` of order coprime to `pq` — and `G₀` elements are exactly such
+  -- (`MHypothesis.G0_orderOf_coprime`).
+  refine ⟨fun g hg i j => ?_, fun g hg i j => ?_⟩
+  · exact hyp.base.eta_intCast_of_coprime g (Mdata.G0_orderOf_coprime hG hg) i j
+  · exact hyp.base.eta_pair_of_coprime g (Mdata.G0_orderOf_coprime hG hg) i j
 
 /-- **Peterfalvi (3.9.a/c) `η`-grid facts on `G₀`**: on the generic set `G₀`, the `η`-grid
 takes integer values (3.9.c), pairs under the negation involution (3.9.a), and has principal
 entry `η₀₀ = 1`.  The principal entry is now genuine (`eta_principal_apply_eq_one`, the
 issue-2033 grid-semantics payoff, `S16_GridExpansion`); the Galois half remains the named
 obligation `eta_grid_galois_facts_on_G0`. -/
-theorem eta_grid_facts_on_G0 [Finite G] (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) :
+theorem eta_grid_facts_on_G0 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) :
     (∀ g ∈ Mdata.G0, ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
       ∃ m : ℤ, hyp.base.eta i j g = (m : ℂ)) ∧
     (∀ g ∈ Mdata.G0, ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
@@ -2663,7 +2672,7 @@ theorem eta_grid_facts_on_G0 [Finite G] (hyp : Hypothesis (G := G)) (Mdata : MHy
         = hyp.base.eta i j g) ∧
     (∀ g ∈ Mdata.G0,
       hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩ g = 1) := by
-  obtain ⟨hint, hpair⟩ := eta_grid_galois_facts_on_G0 hyp Mdata
+  obtain ⟨hint, hpair⟩ := eta_grid_galois_facts_on_G0 hG hyp Mdata
   exact ⟨hint, hpair, fun g _ => eta_principal_apply_eq_one hyp.base g⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -2671,10 +2680,10 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 (`eta_grid_facts_on_G0`, the §3/§5 grid obligation) together with the **now-genuine** support
 vanishing `β_M^τ = 0` on `G₀`: `β_M = β` is a Dade image, so its support lies in `Ã(M)`
 (`beta_support_subset_dadeSupport`), while `G₀` avoids `Ã(M)` (`G0_off_dadeSupport`). -/
-theorem eta_generic_data [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+theorem eta_generic_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) :
     EtaGenericData hyp Mdata := by
-  obtain ⟨hint, hpair, hprinc⟩ := eta_grid_facts_on_G0 hyp Mdata
+  obtain ⟨hint, hpair, hprinc⟩ := eta_grid_facts_on_G0 hG hyp Mdata
   refine { eta_int := hint, eta_pair := hpair, eta_principal := hprinc, betaM_vanish := ?_ }
   -- **Peterfalvi (14.11.3)**: `β_M^τ` vanishes off its Dade support `Ã(M)`, and `G₀ ⊆ G ∖ Ã(M)`.
   intro g hg
