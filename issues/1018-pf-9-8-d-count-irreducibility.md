@@ -261,3 +261,60 @@ producer `clifford_caseA_data` で (9.7.a) 再構成を供給 (signature 変更;
   W₁-valued/free でなく choice-derived U⊔W₁ 元。core (2) は (9.7.a) 構造 (現状欠落) を要する。
 - assembly は当初「H̄⊆Ker ζ₁ で xiSet と矛盾」想定 → **kernel-is-subgroup (|χ|≤χ(1) equality, repo 未整備)
   を要するため回避**。代わりに「realized S₀ ⊄ Ker (member は θ₁≠1 on S₀)」で矛盾させ clean 化。
+
+## (v) count セッション 5 (2026-07-06 続き): (9.7.a) W₁-free-orbit を再構成 → γ の `horbit` を DISCHARGE (option B 実現)
+
+`caseA_character_counts` conjunct (d) の `sorry` は **依然 open** (S11 comment-stripped sorry = 3:
+8283 SibleyTarget / 13347 (9.8.d) / 13421 (11.7); α surjectivity + β + assembly が残るため予定通り)。
+本セッションで **γ の唯一の残 gap だった `horbit` (= Peterfalvi (9.7.a)) を完全に discharge**。
+**選択肢 (B) を実現** — `CliffordCaseAData` の signature 変更 (option A) は**不要**と確定し、既存 field
+(`S0`/`S0_aInvariant`) + `chief.quotient_chiefFactor` (U W₁-irreducibility) + Frobenius から
+standalone に (9.7.a) を再構成した。**full build 3849 jobs 相当 exit 0, AxiomsCheck OK, sorry/axiom 新規 0**。
+
+### 前セッション note の訂正 (重要)
+- 「(9.7.a) の再構成は数百行の独立 prerequisite」「W₁-orbit field 追加 (option A) で全 consumer に影響」
+  → **実際は ~200 行の standalone 補題群で足り、structure 変更ゼロ**。鍵は既存 infra の再利用:
+  - `iSup_smul_eq_top_of_irreducible` (U W₁-orbit spanning ← `chief.quotient_chiefFactor`)
+  - `iSup_phi_smul_eq_iSup_W_of_normal` (U W₁-orbit を W₁-orbit に collapse; U-invariance)
+  - `noncommPiCoprod_bijective_of_card` (spanning + `∏|S₀^w| = p^q = |H̄|` ⟹ 直積 bijective)
+  - **S₀ の U-irreducibility は不要** (|S₀|=p ゆえ自動; orbit の spanning だけ irreducibility を使う)。
+- 「core (2) は (9.7.a) 構造 (欠落) を要する」は正しかったが、その構造は **carrier に足すのでなく
+  re-derive できる** (choice-derived `Hpart`/`orbitRep` は使わず、`S0` から orbit を作り直す)。
+
+### landed (build-green, sorry/axiom 無)
+
+**汎用 brick** (S11, `noncommPiCoprod_bijective_of_card` の直後):
+- `iSupIndep_of_noncommPiCoprod_injective_comm`: CommGroup で noncommPiCoprod injective ⟹ iSupIndep
+  (mathlib は逆向き `injective_noncommPiCoprod_of_iSupIndep` のみ)。`Finset.prod_subtype` + `mulSingle`。
+
+**(9.7.a) H̄-level free orbit** (S11, `caseA_S0_card` の直後):
+- `caseA_wOrbit` (def): W₁-orbit 族 `w ↦ φ(w)•S₀` (index = `W1.subgroupOf (U⊔W1)`)。
+- `caseA_wOrbit_one`: `caseA_wOrbit 1 = S₀`。
+- `caseA_wOrbit_iSup`: W₁-orbit が H̄ を張る (U W₁-orbit spanning を W₁ に collapse)。
+- `caseA_wOrbit_iSupIndep`: W₁-orbit が iSupIndep (bijective-of-card + 上の brick)。= (9.7.a) の free 添字。
+- `caseA_wComplement` (def): `W = ⨆_{w∈W₁#} S₀^w` (Peterfalvi の `H₂…H_q`)。
+- `caseA_wComplement_aInvariant` / `caseA_S0_sup_wComplement` (`S₀⊔W=⊤`) /
+  `caseA_S0_inf_wComplement` (`S₀⊓W=⊥`, iSupIndep から)。= `H̄ = S₀ ⊕ W`, `[H̄:W]=p`。
+
+**(9.7.a) realized `horbit`** (S11, `caseA_realizedComplement_subgroupOf_huSub_normal` の直後):
+- `caseA_wOrbit_horbit`: `hcrit_of_summand_orbit` の `horbit` 仮説そのものを証明。
+  descent: `s∈realized S₀` → `x_s:↥H` (`mk'(N)x_s∈S₀`) → conjBy w₁ の H̄-像 =
+  `φ(⟨w₁⟩)•(mk' x_s) ∈ φ(⟨w₁⟩)•S₀ = S₀^{w₁}` (`quotientMulAutHom_apply_mk'`) → w₁≠1 ゆえ
+  `S₀^{w₁} = caseA_wOrbit ⟨w₁⟩ ≤ caseA_wComplement = W`。= Coq injXtheta の `H₁^w ⊆ H₂…H_q` (w∈W₁#)。
+
+**γ unconditional 化** (S11, `hcrit_of_summand_orbit` の直後):
+- `caseA_hcrit_of_member`: `W := caseA_wComplement caseA` に固定し `horbit := caseA_wOrbit_horbit` を供給した
+  **無 `horbit`-仮説版 hcrit**。member の 2 事実 (`realized S₀ ⊄ Ker ζ₁`, `realized W ⊆ Ker ζ₂`) だけで hcrit。
+  → `induceHU_inj_of_conj_mem_huSub` と合わせて **(γ) は `horbit` について unconditional**。
+
+### 残り (次セッションが直行すべき precise gap; (9.8.d) sorry を閉じるのに必要)
+
+γ の `horbit` は closed。(9.8.d) sorry を閉じる残りは **(α) surjectivity + (β) domain count + assembly** の 3 本:
+- **(α)-surjectivity**: characterized χ が全て `ψ_{θ₁,λ}` (Coq `def_Itheta` = `cfDprodl`/`cfSdprod` で
+  χ|_H, χ|_{C_U(S₀)} から θ₁/λ 復元)。member inertia = H·C_U(S₀) は `hcuPsiPair_inertia_eq_hcu` (既存)。
+- **(β) domain count** `|T| = (p-1)·[C_U(S₀):U']`: θ-count `p-1` は landed (`card_theta_triv_W_nontriv_S0`,
+  ただし **W = caseA_wComplement を使う版に instantiate 要**; `caseA_S0_sup/inf_wComplement` が入力)。
+  λ-count は abelian `C_U(S₀)/U'`。product bijection で組む (α 必要)。
+- **assembly**: `caseA_hcrit_of_member` + `hcuZetaPair_summandComplement_subset_ker`
+  (W = caseA_wComplement で `hkerW₂` 供給) + `induceHU_inj_of_conj_mem_huSub` (γ inj) +
+  `card_image_induce_eq_div` ⟹ `ncard ≥ |T|/a`; (β) + 既存算術橋で RHS。
