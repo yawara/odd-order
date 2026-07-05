@@ -1655,3 +1655,33 @@ S12 へ relocate 不可 → 閉じるには threading。
   (11.7) に gated だが sorried-cite で先行可。gate-1 の残構造ピース。
 upstream-first ⟹ (A) が正筋 (両方を gate)。gate-2 (`coherent_Sset_of_column_identities` 11.8.6) は
 下流・最深で不変。
+
+## 2026-07-05 update¹⁵ (lane-a) — **(11.7) `H_elementaryAbelian` de-scaffold: crux `chief_H0_eq_bot` 分離 + 2 corollary sorry-free**
+
+(A) に着手。`H_elementaryAbelian` (S13_CoreStructure、旧・全体 1 sorry) を精査分解:
+- **crux = `H₀=⊥` のみ**。`core_structure` (proven) が `H₀=H'` を与えるゆえ **H₀=⊥ ⟺ H abelian**。
+  残 2 conjunct (elementary abelian・|H|=p^q) は crux の trivial 系:
+  - elem abelian = `chief.quotient_elementaryAbelian` (H̄=H/N の EA) を N=⊥ collapse
+    (`quotientMulEquivOfEq hN` ∘ `quotientBot` → `IsElementaryAbelian.of_mulEquiv`) で H に transport。
+  - |H|=p^q = `chief.quotient_order` (|H|=p^q·|H₀|) に |H₀|=1。
+- **本 iteration LANDED**: `chief_H0_eq_bot` (新 named theorem, sorried) に crux 分離、
+  `H_elementaryAbelian` を sorry-free 化 (signature 不変ゆえ downstream 安全)。commit 20c86a7a。
+
+**`chief_H0_eq_bot` (H₀=⊥) の assembly plan (次 iteration)** — machinery は
+S13_ElementaryAbelianKernel.lean に **全 sorry-free 既在**、残 = 組立:
+- **背理法**: `chief.N ≠ ⊥` と仮定 (H₀=N.map subtype、H₀=H'≠⊥ = H nonabelian)。
+- H̄=H/N は F_p-vector space (`quotient_elementaryAbelian`)、|H̄|=p^q (quotient_order/|H0|)、
+  U-irreducible (`chief.quotient_chiefFactor`)。
+- **2-case** (Peterfalvi pp.64-65、(9.7) Clifford 由来):
+  - **case A** (U が order-p 部分群 S₀⊆H̄ を pointwise fix): `caseA_fixed_contradiction`
+    (proven) で即 False。S₀ 取得 + U-fix の証明が要 = `exists_exponent_fun_of_card_prime` で
+    exponent 関数 e、`chain_exponent_eq_one` で e≡1 → U fix。**要: chain 関係 `e v·e(σ v)=1`**
+    (σ=W₁-generator の U 上共役、odd exponent) の導出 = case-A の genuine gap (Frobenius/W₁ 構造)。
+  - **case B** (Galois/irreducible primitive): `chiefKernel_caseB_false` (proven) で False
+    (parity |Ĥ|=p^(q+1), q odd)。hyp = N=H' (`hNcomm`) + U cent N (core_structure) + irr。
+    **要: action encoding 照合** (`chiefKernel_caseB_false` の `hirr` は
+    `typeP_quotientCoprimeAction` 形 vs `chief.quotient_chiefFactor` は `quotientMulAutHom` 形)。
+  - **dichotomy source**: どちらの case かを与える分岐 = (9.7) clifford_dichotomy 相当を H̄ に適用
+    (未特定、次 iteration の主眼)。
+- ⟹ 残 genuine work = (i) dichotomy 分岐、(ii) case-A chain 関係、(iii) case-B action 照合。
+  machinery は揃っているので **組立主体** (新規深数学は chain 関係の W₁-inversion のみ)。
