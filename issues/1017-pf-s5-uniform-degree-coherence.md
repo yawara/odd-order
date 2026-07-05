@@ -97,3 +97,25 @@ c=S16 wiring)、lane 数 3 維持・アイドルなし。a は本 leaf 完成後
 §3/§4 基盤を named-report。結果は git log / 本 issue の次追記 / notes s13_11_8 で確認。
 **hub へ**: 本 issue の当初 scope (「§5 coherence を新設」) は誤前提。真の残 = (i) §3/§4 prime-TI 基盤
 (大, ungated, 誰の所有でもない leaf — 新設可) or (ii) (10.8) の Lean-specific 軽量 path (subagent が判定中)。
+
+## 2026-07-06 更新 (lane b, verify-first 精査) — §5 subcoherent は (13.3) coherence とも shared、sibleyTarget_H0C は likely-unsound
+
+lane b の (13.3) `character_degree_analysis` τ₁ coherence を verify-first 精査した結果、**本 issue の
+§5 subcoherent gate が (13.3) coherence とも共有**と確定:
+
+- **`uniform_degree_coherence` は実装済** — `coherent_of_constant_degree` (S07_CoherenceConstantDegree:551,
+  proven)。本 issue の「uniform_degree_coherence 不在」は **stale**。残る真の gate = **`subcoherent` /
+  `FTtypeP_subcoherent` R-datum** (Coq PFsection5) のみ (repo grep 空)。
+- **(13.3) coherence の現 route (S11 `sibleyTarget_H0C` = (6.8)/Sibley 経由) は likely-UNSOUND** (issue
+  2032 `sibleyTarget_frobI` と同 defect class): honest S-instance (family sSet=Ind_{PU}^S、support
+  (C')^#) に対し `SibleyTarget` の kernel K は family 制約で K=PU・support 制約で K=C' を同時に要求するが
+  **PU≠C'** ⟹ 数学的に不可能。加えて K nilpotent / S=K⋊W₁ / K^# TI in G も非充足。
+- **honest route (Coq `Ptype_core_coherence` PFsection9:1484 に一致)**: (9.11) は subcoherent +
+  uniform_degree_coherence + extend_coherent の (9.11.1-8) 8-step induction で証明、**(6.8)/Sibley を
+  経由しない**。⟹ `sibleyTarget_H0C` は (6.8) scaffold から外し、§5 subcoherent + coherent_of_constant_degree
+  cascade で再構築すべき (2032 fix と同型、signature 保存内部 re-proof)。
+
+**⟹ `subcoherent`/`FTtypeP_subcoherent` (§5) は (10.7)/(10.8) [a] + (13.3) coherence [b] の共有 keystone
+prerequisite。** これを実装すれば両方 un-gate。lane b の (13.3) tau1S engine (tau1S_ofHonest 系) は現在
+likely-unsound な sibleyTarget_H0C を cite しており、subcoherent 実装後に coherent_H0Cprime_S を §5 route へ
+再 grounding して健全化する必要がある。hub 裁定: subcoherent の owner/着手 (shared §5/§7 infra)。
