@@ -1838,3 +1838,73 @@ v-value=9000)。**これは POLE-2 coupled-pipeline stall** (reallocation note �
 loop を停止して報告 ([[feedback-flag-poor-progress]] [[feedback-loop-short-wakeup]] option 2)。
 **unblock 条件**: b が issue 3002 (§13 η-grid を S15.Hypothesis grid field に threading) を landing
 すれば lSideGridCoeffData/betaGrid の grid_mem+boundary が供給され (14.11.2) carrier 群が閉じる。
+
+### cont.⁶⁶ (2026-07-05 lane c /loop) — 🎯 (13.19.c) lSideGridCoeffData policy-A descent: coeff+m_00 実証明化、gate を type-P/§13 residual に縮小
+
+cont.⁶⁵ が「c の ungated frontier 枯渇 → carrier は全 field gated」と結論したが、**carrier
+`lSideGridCoeffData` の内部に降りて 4 field の gate 境界を精査 → 2 sub-fact は c で ungated 実証明可**
+と判明 (policy-A descent、commit `40e2a948`、full build 3929 green、AxiomsCheck OK 新 axiom 無)。
+monolithic `:= sorry` producer を `where` 化し、以下を in-place 実証明:
+
+- **`coeff` (PROVEN)** = `betaL_grid_coeff_int`: m_ij=⟨β_L,η_ij⟩∈ℤ (β_L∈ZIrr via
+  `betaL_mem_ZIrr`, η_ij∈ZIrr via `eta_mem_ZIrr`, `inner_mem_ZIrr_int`)。witness `m` = 整数値。
+- **`m_principal` (PROVEN)** = `betaL_grid_coeff_principal_eq_one`: m_00=⟨β_L,η_00⟩=1。
+  η_00=1_G (`eta_principal_eq_trivial`) + (7.8.a) 分解 β_L=1_G−ζ_0^ν+Δ_L pair =⟨1_G,1_G⟩
+  −⟨ζ_0^ν,1_G⟩+⟨Δ_L,1_G⟩=1−0+0 (`constOne_inner_self_eq_one` + `BetaDecomp.orth_one` +
+  `delta_orth_one`)。cont.⁶⁵ は「boundary = 全部 FTtypeI_bridge」と誤り、m_00 は Dade 分解のみで ungated。
+
+**残 gate (genuinely cross-lane、sorry 継続)**: `m_row_odd`/`m_col_odd` (off-principal parity =
+Coq `FTtypeI_bridge_facts`/`cycTIiso_cfdot_exchange`、S/T type-P bridge = b §13/§15) /
+`bessel` (Σm²≤pq: ζ_i^ν⊥η-grid = Coq `o_tauLeta` 要、β_L の grid 射影 = (Γ_L+1_G) の射影 に
+一致させ ‖Γ_L‖²≤e−1 適用 → grid_mem と同 §13 residual) / `grid_mem` (Coq Y=0、issue 3002)。
+
+**cont.⁶⁵ 訂正**: 「carrier 全 field が b/a に gated」は不正確。**coeff (整数性) + m_00 (Dade 分解)
+は c 単独 ungated**。「§13 grid gate」は 4 field 中 3 field (m_row/m_col/bessel/grid_mem) に限局し、
+これらは確かに b の type-P/§13 residual に gated。**doneness 教訓**: sorry-count は 7→10 (mechanical
++3、1 field-sorry を 4 field に分割) だが、これは regression でなく **6 sub-fact 中 2 を opaque-sorry
+から machine-checked proof に昇格**した実質前進 ([[scaffold-sorry-free-not-done]] = 指標は proof の
+積み上げであって count でない)。gated endpoint の internal descent は「frontier 枯渇」報告の前に必ず
+試すべき ([[feedback-no-avoiding-hard-parts]]: gate の外殻でなく中身の ungated 部分を実証明化)。
+**unblock 条件 (残 3 field)**: cont.⁶⁵ と同じ — b が issue 3002 landing で grid_mem+parity 供給。
+
+### b-reply (2026-07-05, lane b) — cont.⁶³(b) 「coherence decomp `Dade_Ind1_sub_lin` = S07 圏の可能性」への回答: **NO, S07 でなく S09 圏 — かつ既に cite・構成済**
+
+cont.⁶³(b) が「(τ_L β_L = ε ζ + Γ) の coherence decomp `Dade_Ind1_sub_lin` は b の S07 coherence 圏
+(citeable か要確認)」と残した点を b が精査。**結論 = citeability verdict (a): 既に citeable な
+sorry-free repo 定理 — ただし所在は S07 でなく S09、そして c は cont.⁶⁴ で既にそれを cite/構成している。
+S07 に追加すべき coherence lemma は無い**。理由:
+
+- **Coq `Dade_Ind1_sub_lin` = Pf (7.8)** (`coq/theories/PFsection7.v:345`)。PFsection13:2085 /
+  PFsection14:201 (= (13.19.c) lSide) で消費される。中身: β=(Ind1H−ζ)^τ に対し (a2)
+  `β = 1_G − νζ + a·(Σ φ(1)/(e‖φ‖²)φ^ν) + Γ` (a∈ℤ, Γ⊥calSnu∪{1_G}) + (b) norm + (c) (7.7.a) 点公式。
+- **Lean 分割**: この (7.8)/(7.8.a) は **S09 の `Hypothesis78` に形式化済**(S07 でなく)。正確な citeable identifiers:
+  - `S09.Hypothesis78.beta` (= (Ind1H−ζ)^τ) + **`beta_eq_constOne_sub_zetaImage_add_delta`**
+    (`S09_NonexistenceCertain.lean:2228`, PROVEN, `β = 1_G − ζ^ν + Δ` の rearrangement)。
+  - **`S09.Hypothesis78.BetaDecomp`** structure (`S09:2332`) = (7.8.a) の完全形
+    `β = 1_G − ζ^ν + a•weightedNuSum + Γ` (a∈ℤ, Γ⊥S^ν∪{1_G})。**構成子は proven**:
+    抽象版 `betaDecomp` (`S09_CertificateDischarge.lean:2200`)、Dade-family 版 `betaDecompOfDade`
+    (`S09_CertificateDischarge.lean:2265`)。
+  - (7.7.a) 点公式は `S09.Hypothesis76.chiRho_explicit_formula` / `chiRho_decomp`
+    (`S09_NonexistenceCertain.lean:1018/1109`)。S15 (13.5) も同 (7.7.a) shape
+    `χ(x)=(a/‖ζ₁‖²)ζ₁(x)+α(x)` を **S15 内 (`caseB_lambda_norm_core` 群)** で直接実装しており S07 非経由。
+- **c は既に S09 route で cite・構成済** (b の追加不要の決定的根拠):
+  - **`lSide_signed_eta_expansion`** (`S16_NonExistenceG.lean:5078`, cont.⁶⁴, **PROVEN sorry-free**) が
+    まさに τ_L β_L = Σ±η − ε ζ の分解で、`beta_eq_constOne_sub_zetaImage_add_delta` (S09) の
+    pure-algebra rearrangement として証明済。S07 coherence lemma は **一切呼んでいない**。
+  - さらに **`S16_PairingCoherence.betaDecomp`** (`S16_PairingCoherence.lean:467`) は proven な
+    `(data.h78 hG).BetaDecomp` を `betaDecompOfDade` で**現に構成済**(`data.coh.extension` =
+    S07 `IsCoherent.extension` を入力として渡す)。⟹ (7.8.a) は citeable どころか稼働中。
+- **S07 に該当 lemma が無いことの確認** (Explore 精査 + 直接 grep): S07_*.lean は per-pair
+  `CharacterPsiDecomposition` (χ−ψ 対 = X−Y) と (5.5) `eq_sum_of_psi_eq_zero` (S07:1624)、
+  `image_eq_of_decomposition` (S07:3911)、`retarget`/`retargetS` の coherence-building chain までで、
+  **`Ind1`-minus-linear / (7.8) 全分解 lemma は存在しない**(`Ind1|constOne|sub_lin|Dade_Ind|7.8`
+  の名前一致ゼロ)。S07 の `IsCoherent` は isometric extension を供給するのみ; (7.8.a) 分解は
+  downstream (S09) で組む設計。
+
+**⟹ b 側アクション = 無し(S07 変更不要)**。cont.⁶³ が挙げた lSide 深部 3 部品のうち **(b) coherence
+decomp は解決済**(c 自身が cont.⁶⁴ で S09 route により実証明)。残る真の gate は **(a) grid 係数 ±1
+の boundary parity + Bessel = `lSideGridCoeffData` の `boundary`/`bessel`/`grid_mem`** で、これは
+cont.⁶⁵ の判定どおり **b の §13 η-grid (issue 3002)** + a の (7.8.b) norm に gated(S07 coherence とは
+無関係)。つまり `Dade_Ind1_sub_lin` を「b の S07 territory」と見た仮説は **誤り**で、これは既に閉じた
+S09 の話。b の実 unblock 貢献は S07 でなく **issue 3002 (§13 grid → S15.Hypothesis grid field
+threading)** の landing。— lane b
