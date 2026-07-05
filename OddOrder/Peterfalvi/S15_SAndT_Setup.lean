@@ -160,6 +160,13 @@ structure Hypothesis where
   /-- **Peterfalvi (13.1.e)**: the signs `δ_j`, `δ'_i` are `±1` (the (4.3.b) `sign_eq`). -/
   delta_pm_one : (∀ j : Fin p, delta j = 1 ∨ delta j = -1) ∧
     (∀ i : Fin q, deltaPrime i = 1 ∨ deltaPrime i = -1)
+  /-- **Peterfalvi (4.3.d)**: the degree congruence `μ_{ij}(1) ≡ δ_j (mod q)`
+  (`μ_{ij}(1) = δ_j + q·a` for an integer `a`, the `Res_{W₁}` value identity). -/
+  mu_degree_modEq_delta : ∀ (i : Fin q) (j : Fin p), ∃ a : ℤ,
+    mu i j 1 = (delta j : ℂ) + (q : ℂ) * (a : ℂ)
+  /-- **Peterfalvi (4.4), the `S`-side base sign**: `δ_0 = 1` (`μ_{00} = 1_S`, the trivial
+  column's `σ`-anchor). -/
+  delta_zero_eq_one : delta ⟨0, p_prime.pos⟩ = 1
   /-- The Peterfalvi (3.2)/(3.3) transfer map `τ`, typed as an integral
   (virtual-character) map via the same `IntegralCharacterMap` convention as
   `tauS`/`tauT` — faithful to `τ` being defined on the `ℤ`-lattice of virtual
@@ -3378,6 +3385,44 @@ theorem Hypothesis.u_modEq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   have hru : Nat.card ↥((φ.comp N.subtype).range) = hyp.u := hrangecard
   rw [hru, hAcard] at hmod
   exact hmod
+
+/-- **Peterfalvi (13.3.c), the `S`-side signs are `1`**: `δ_j = 1` for `j ≥ 1`.  The (4.3.d)
+congruence `μ_{0j}(1) = δ_j + q·a` (`mu_degree_modEq_delta`) with `μ_{0j}(1) = u`
+(`mu_apply_one_eq_u`) and `u ≡ 1 (mod q)` (`u_modEq_one`) gives `q ∣ δ_j − 1`; since `δ_j = ±1`
+(`delta_pm_one`) and `q ≥ 3`, `δ_j = -1` would force `q ∣ 2`, so `δ_j = 1`. -/
+theorem Hypothesis.delta_eq_one_of_ne_zero [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (hj : j ≠ ⟨0, hyp.p_prime.pos⟩) :
+    hyp.delta j = 1 := by
+  obtain ⟨a, ha⟩ := hyp.mu_degree_modEq_delta ⟨0, hyp.q_prime.pos⟩ j
+  rw [hyp.mu_apply_one_eq_u hG ⟨0, hyp.q_prime.pos⟩ j hj] at ha
+  have haZ : (hyp.u : ℤ) = hyp.delta j + (hyp.q : ℤ) * a := by exact_mod_cast ha
+  have hqu : (hyp.q : ℤ) ∣ (hyp.u : ℤ) - 1 := by
+    have h := (Nat.modEq_iff_dvd.mp (hyp.u_modEq_one hG))
+    simpa using (dvd_neg.mpr h)
+  have hqδ : (hyp.q : ℤ) ∣ hyp.delta j - 1 := by
+    have hsub : hyp.delta j - 1 = ((hyp.u : ℤ) - 1) - (hyp.q : ℤ) * a := by
+      rw [haZ]; ring
+    rw [hsub]
+    exact dvd_sub hqu (Dvd.intro a rfl)
+  rcases hyp.delta_pm_one.1 j with h1 | hm1
+  · exact h1
+  · exfalso
+    rw [hm1] at hqδ
+    have hq2 : (hyp.q : ℤ) ∣ 2 := dvd_neg.mp (by simpa using hqδ)
+    have hqle : hyp.q ≤ 2 := Nat.le_of_dvd (by norm_num) (by exact_mod_cast hq2)
+    have h2le := hyp.q_prime.two_le
+    have hodd := Nat.odd_iff.mp hyp.q_odd
+    omega
+
+/-- **Peterfalvi (13.3.c), the `S`-side signs are all `1`**: `δ_j = 1` for every `j`.  The
+base `δ_0 = 1` is the (4.4) trivial-column anchor (`delta_zero_eq_one`); for `j ≥ 1` it is
+`delta_eq_one_of_ne_zero` (the `u ≡ 1 (mod q)` route).  This is the `S`-half of the
+`CharacterDegreeData.delta_eq_one` field. -/
+theorem Hypothesis.delta_eq_one_S [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (j : Fin hyp.p) : hyp.delta j = 1 := by
+  by_cases hj : j = ⟨0, hyp.p_prime.pos⟩
+  · rw [hj]; exact hyp.delta_zero_eq_one
+  · exact hyp.delta_eq_one_of_ne_zero hG j hj
 
 /-- `|T| = |Q|·(vd)·p` — the `T`-side order decomposition, read off the reconciled type-`P`
 datum (`M_complement`/`derived_complement` of `reconciled_typePData_T`) with `|V| = vd` and
