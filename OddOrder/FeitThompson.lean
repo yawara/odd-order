@@ -1955,6 +1955,116 @@ theorem omegaS_pow_p_of_mem_W2 (i : Fin tp.q) (j : Fin tp.p) (w : ↥tp.W)
     omegaProdCharS_apply_mem_Kstar hG mp tp _ _ w hwK, ← Units.val_pow_eq_pow_val, ← map_pow,
     hx, map_one, Units.val_one]
 
+/-! #### The (3.2.d) completeness of the `η`-grid (issue-2034 supply)
+
+The `omegaS`-family is `pq` *distinct* linear characters of the `pq`-element cyclic `↥tp.W`,
+hence exhausts them; through `sigma_omega` the `η`-grid `tau3W (omegaS i j)` therefore
+enumerates the whole `(3.5)` family `χ_{ab}`, and the S05 completeness
+(`eq_zero_of_mem_V_of_inner_chiFam_eq_zero`) transfers: any class function of `G` orthogonal
+to the whole `η`-grid vanishes on the regular set `Ŵ`. -/
+
+/-- The underlying linear character of `omegaS i j`, as a monoid hom of `↥tp.W`. -/
+noncomputable def omegaSChar (i : Fin tp.q) (j : Fin tp.p) : ↥tp.W →* ℂˣ :=
+  ((mp.certainTypeS hG).sdiffTICyclicHypothesis.omegaProdChar
+    ((mp.certainTypeS hG).w1CharEquiv (eqQ hG mp tp i)) (chi2enum hG mp tp j)).comp
+    (gridEquivE hG mp tp).toMonoidHom
+
+omit [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)] in
+/-- `omegaS i j` is the `tiCyclicW`-grid character of its underlying hom. -/
+theorem omegaS_eq_omega_omegaSChar (i : Fin tp.q) (j : Fin tp.p) :
+    omegaS hG mp tp i j
+      = ((tiCyclicW hG mp tp).omega (omegaSChar hG mp tp i j)).toClassFunction := by
+  ext w
+  simp only [omegaS, ClassFunction.compHom_apply, MulEquiv.coe_toMonoidHom,
+    Peterfalvi.S06.Hypothesis.chiColumn, Peterfalvi.S05.TICyclicHypothesis.omega_apply,
+    omegaSChar, MonoidHom.comp_apply]
+  rfl
+
+/-- **Exhaustion by counting**: every linear character of `↥tp.W` underlies some `omegaS i j` —
+the `(i,j) ↦ omegaSChar i j` map is injective (the `omegaS` are orthonormal, hence distinct)
+between types of the same cardinality `pq`. -/
+theorem exists_omegaS_eq_omega (ξ : ↥tp.W →* ℂˣ) :
+    ∃ (i : Fin tp.q) (j : Fin tp.p),
+      omegaS hG mp tp i j = ((tiCyclicW hG mp tp).omega ξ).toClassFunction := by
+  classical
+  haveI : Fintype (↥tp.W →* ℂˣ) := Fintype.ofFinite _
+  -- injectivity of the pair map
+  have hinj : Function.Injective
+      (fun ij : Fin tp.q × Fin tp.p => omegaSChar hG mp tp ij.1 ij.2) := by
+    intro ⟨i, j⟩ ⟨k, l⟩ h
+    by_contra hne
+    have hCF : omegaS hG mp tp i j = omegaS hG mp tp k l := by
+      rw [omegaS_eq_omega_omegaSChar, omegaS_eq_omega_omegaSChar]
+      exact congrArg _ (congrArg _ h)
+    have h1 := omegaS_inner hG mp tp i k j l
+    rw [hCF] at h1
+    have h2 := omegaS_inner hG mp tp k k l l
+    rw [h1] at h2
+    have hcond : ¬ (i = k ∧ j = l) := fun ⟨h1', h2'⟩ => hne (by rw [h1', h2'])
+    rw [if_neg hcond, if_pos (⟨rfl, rfl⟩ : k = k ∧ l = l)] at h2
+    exact zero_ne_one h2
+  -- cardinalities agree: `|Fin q × Fin p| = pq = |W| = |Ŵ|`
+  have hcardW : Nat.card ↥tp.W = tp.q * tp.p := by
+    have hconj : ∀ x ∈ tp.W1, ∀ a ∈ tp.W2, x * a * x⁻¹ ∈ tp.W2 := by
+      intro x hx a ha
+      have hc : Commute x a := tp.W1_commutes_W2 x hx a ha
+      have hxa : x * a * x⁻¹ = a := by rw [hc.eq]; group
+      rw [hxa]; exact ha
+    have hW1norm : tp.W1 ≤ Subgroup.normalizer (tp.W2 : Set G) := by
+      intro x hx
+      rw [Subgroup.mem_normalizer_iff]
+      intro a
+      refine ⟨fun ha => hconj x hx a ha, fun ha => ?_⟩
+      have hb := hconj x⁻¹ (tp.W1.inv_mem hx) (x * a * x⁻¹) ha
+      simpa [mul_assoc] using hb
+    rw [tp.W_eq_join,
+      OddOrder.BG.Ch3.S12.card_sup_eq_mul_of_le_normalizer_of_disjoint hW1norm
+        tp.W1_inf_W2_eq_bot,
+      ← tp.q_eq_card_W1, ← tp.p_eq_card_W2]
+  have hcardHom : Fintype.card (↥tp.W →* ℂˣ) = tp.q * tp.p := by
+    haveI := tp.W_cyclic
+    letI : CommGroup ↥tp.W := IsCyclic.commGroup
+    haveI : NeZero ((Monoid.exponent ↥tp.W : ℂ)) := ⟨Nat.cast_ne_zero.2 (NeZero.ne _)⟩
+    rw [← Nat.card_eq_fintype_card,
+      CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity ↥tp.W ℂ]
+    exact hcardW
+  have hsurj : Function.Surjective
+      (fun ij : Fin tp.q × Fin tp.p => omegaSChar hG mp tp ij.1 ij.2) := by
+    have hbij := (Fintype.bijective_iff_injective_and_card
+      (fun ij : Fin tp.q × Fin tp.p => omegaSChar hG mp tp ij.1 ij.2)).mpr
+      ⟨hinj, by simp [hcardHom]⟩
+    exact hbij.surjective
+  obtain ⟨⟨i, j⟩, hij⟩ := hsurj ξ
+  refine ⟨i, j, ?_⟩
+  rw [omegaS_eq_omega_omegaSChar]
+  exact congrArg _ (congrArg _ hij)
+
+/-- **Peterfalvi (3.2.d), `η`-grid form** (issue-2034 supply): a class function of `G`
+orthogonal to the whole grid `tau3W (omegaS i j)` vanishes on the regular set
+`Ŵ = W ∖ (W₁ ∪ W₂)`.  Transfer of the S05 completeness
+`eq_zero_of_mem_V_of_inner_chiFam_eq_zero` along the exhaustion `exists_omegaS_eq_omega`
+and the `σ`-grid identification `sigma_omega`. -/
+theorem tau3W_omegaS_complete_vanish (χ : ClassFunction G ℂ)
+    (horth : ∀ (i : Fin tp.q) (j : Fin tp.p),
+      ClassFunction.inner (tau3W hG mp tp (omegaS hG mp tp i j)) χ = 0)
+    {w : G} (hwW : w ∈ tp.W) (hnot : w ∉ (tp.W1 : Set G) ∪ (tp.W2 : Set G)) :
+    χ w = 0 := by
+  classical
+  refine OddOrder.Peterfalvi.S05.TICyclicHypothesis.eq_zero_of_mem_V_of_inner_chiFam_eq_zero
+    (tiCyclicW hG mp tp) rfl (tiCyclicWDadeApp hG mp tp) (χ := χ) ?_ (show w ∈ _ from ⟨hwW, hnot⟩)
+  intro a b
+  obtain ⟨i, j, hij⟩ := exists_omegaS_eq_omega hG mp tp
+    ((tiCyclicW hG mp tp).omegaProdChar a b)
+  have hchi : (tiCyclicW hG mp tp).chiFam rfl (tiCyclicWDadeApp hG mp tp) (a, b)
+      = tau3W hG mp tp (omegaS hG mp tp i j) := by
+    have h1 := (tiCyclicW hG mp tp).sigma_omega rfl (tiCyclicWDadeApp hG mp tp)
+      ((tiCyclicW hG mp tp).omegaProdChar a b)
+    rw [(tiCyclicW hG mp tp).omegaProdEquiv_symm_omegaProdChar a b] at h1
+    rw [← h1, ← hij]
+    show _ = (tiCyclicW hG mp tp).sigmaIntegral rfl (tiCyclicWDadeApp hG mp tp) _
+    rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_apply]
+  rw [OddOrder.RepresentationTheory.inner_conj_symm _ χ, hchi, horth i j, star_zero]
+
 end Section16CharacterData
 
 /-- **Peterfalvi §13 coherent Dade-grid producer** (`sorry`-free) — *lane-b*
