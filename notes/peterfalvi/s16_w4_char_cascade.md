@@ -2050,3 +2050,32 @@ type III を排除)。**b-consume ではない。**
   の char 議論の組み上げが大 (multi-iteration)。
 - **教訓**: 「b-consume 候補」の frontier ラベルは循環チェック必須 ([[verify-port-state-by-number-not-coq-name]])。
   b が `IsTypeII T` を仮説に取る facts は (14.9) の consumer であって producer でない。
+
+### cont.⁷⁰ (2026-07-06 lane c /loop、cont.⁶⁹ 継続) — S16 8-sorry の正確な gate-map 確定 + (14.9) 唯一の ungated my-lane 経路 = type-III char exclusion
+
+**S16_NonExistenceG の残 8 sorry を個別 trace → 全て deep-my-lane-(14.9)-char か cross-lane-gated と確定**
+(他 S16 Peterfalvi files = Bessel/Coherence/GridExpansion/Core は **全 sorry-free**、char infra は proven)。
+cont.⁶⁸ 系の「b-consume 候補」ラベルは全般に誤りだった:
+
+| sorry (line) | 内容 | 真の gate | owner |
+|---|---|---|---|
+| :85 `T_isTypeP2` | `κ(T) ≠ σ'(T)` = (14.9) canonical | **type-III char exclusion** (Γ-bridge + (14.8)) | **my-lane, ungated** |
+| :179 v-value | `v=(q^p−1)/(q−1)` exact | (13.15) Galois 正確値。S-side `caseB_order_u` (S15:6609) が **sorry** (b file) | lane b (S15) |
+| :2594 s_side_frobenius_kernel | `C_{S'}(x)≤P` | field-model carrier (`exists_pu_field_repr` は `hu_full` 要 = 正確 u 値) | 9000/2035 sphere |
+| :2607 t_side_frobenius_kernel | `C_{T'}(x)≤Q` | 同 dual (`TFieldModelData` σ 構成、正確 v 値) | 9000 sphere |
+| :5294/:5297/:5315 carrier fields | m_row/m_col/grid_mem | b の S15 grid property fields (issue 3002) | lane b |
+| :6317 1_G+Δ η-grid 展開 | ±signs joint existence | η-grid Track A (issue 3002) | lane b |
+
+**⟹ 唯一の ungated my-lane 深掘り対象 = (14.9) residual `κ(T) ≠ σ'(T)` の type-III char exclusion**
+(Bessel/Coherence proven ゆえ assemble 可能性あり)。Coq `PFsection14.FTtypeP_min_typeII` の spine:
+1. `contraLR`: `¬(T type II)` 仮定 → `FTtype34_structure` で T type III (type IV 排除)。
+2. type-III の calT1 = `seqIndD QV T QV Q` を uniform-degree (`calT1_1p`: ζ(1)=p) で coherent 化。
+3. β_{T0}=ν_0−ζ の Γ-bridge 展開: `⟨Γ, τ1 ζ⟩ ≡ 1 (mod 2)` (real vchar even) → `|⟨Γ,τ1 ζ⟩|²≥1`。
+4. orthogonal_split + Bessel lower bound `lb_Ga` で `(v−1)/p = p·|calT1| ≤ ⟨Γ,Γ⟩ ≤ (u−1)/q`。
+5. (14.8) `key_ratio_inequality_of_caseB_data` (**proven** ✓) の `(v−1)/p > (u−1)/q` と矛盾。
+- Lean 対応: Γ = `S16_PairingBessel` `betaDecomp.Gamma` (proven)、coherence = `S16_PairingCoherence`
+  (proven)、(14.8) proven。**次 iteration = これら proven export を読み、type-III→numeric lemma を
+  named で組む** (multi-step だが ungated、真の char body)。type-III/IV split = `isTypeIII_or_IV_of_typePData`
+  / `not_isTypeII_of_isTypeIII_or_IV` (proven) が下地。
+- **注意**: 他 7 sorry は b (S15 (13.15)/grid/η-grid) か 9000 (field-model) 待ち。c-lane は cite-when-landed。
+  「b-consume 候補」ラベルは循環/gate を個別確認せず貼らない ([[verify-port-state-by-number-not-coq-name]])。
