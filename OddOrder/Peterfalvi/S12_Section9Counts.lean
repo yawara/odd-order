@@ -1011,4 +1011,187 @@ theorem Hypothesis.inertia_eq_derived_of_linear [Finite G]
   rw [hall x]
   rfl
 
+open scoped Classical in
+/-- **The linear-character count** (Pontryagin): for a finite group `H`, the number of degree-one
+irreducible characters equals `|H^{ab}| = [H : H']`.  Degree-one irreducibles are exactly the
+multiplicative characters `H →* ℂˣ` (`linearIrreducibleCharacter`,
+`exists_linearIrreducibleCharacter_eq_of_apply_one_eq_one`); those factor through the
+abelianization (`Abelianization.lift`), whose dual has the same cardinality (Pontryagin,
+`CommGroup.monoidHom_mulEquiv_of_hasEnoughRootsOfUnity`).  This is the
+`#(linear sources) = |HU/HC| = |U/C| = u` input of the (11.8.1) `|S(HC)| = n` count
+(Coq `size_S1`, `card_Iirr_abelian`). -/
+theorem card_filter_degree_one_eq_card_abelianization (H : Type*) [Group H] [Finite H] :
+    (Finset.univ.filter fun θ : IrreducibleCharacter H =>
+        (θ : ClassFunction H ℂ) 1 = 1).card = Nat.card (Abelianization H) := by
+  classical
+  have hbij : Function.Bijective (fun ψ : H →* ℂˣ =>
+      (⟨linearIrreducibleCharacter ψ, linearIrreducibleCharacter_apply_one ψ⟩ :
+        {θ : IrreducibleCharacter H // (θ : ClassFunction H ℂ) 1 = 1})) := by
+    constructor
+    · intro a b hab
+      exact linearIrreducibleCharacter_injective (congrArg Subtype.val hab)
+    · rintro ⟨θ, hθ⟩
+      obtain ⟨ψ, hψ⟩ := θ.property.exists_linearIrreducibleCharacter_eq_of_apply_one_eq_one hθ
+      exact ⟨ψ, Subtype.ext (Subtype.ext hψ)⟩
+  calc (Finset.univ.filter fun θ : IrreducibleCharacter H =>
+          (θ : ClassFunction H ℂ) 1 = 1).card
+      = Nat.card {θ : IrreducibleCharacter H // (θ : ClassFunction H ℂ) 1 = 1} := by
+        rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
+    _ = Nat.card (H →* ℂˣ) := (Nat.card_eq_of_bijective _ hbij).symm
+    _ = Nat.card (Abelianization H →* ℂˣ) := Nat.card_congr Abelianization.lift
+    _ = Nat.card (Abelianization H) :=
+        Nat.card_congr (CommGroup.monoidHom_mulEquiv_of_hasEnoughRootsOfUnity
+          (Abelianization H) ℂ).some.toEquiv
+
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (11.8.1), the orbit count `#{nontrivial linear} = w₁ · |S(HC)|`** (Coq `size_S1`
+without the (11.5) arithmetic): every nontrivial linear character `θ` of `M'` induces irreducibly
+to a degree-`w₁` member of `S = inducedFamily M` (`inertia_eq_derived_of_linear` + [Is] 6.34);
+every degree-`w₁` irreducible member arises this way (the degree forces a linear source); and each
+such member has exactly `w₁ = [M : M']` sources — its conjugation orbit, free since the inertia
+group is `M'` (`card_filter_induce_eq_index_inertia`).  So the nontrivial linear characters of
+`M'` are counted with multiplicity `w₁` by the degree-`w₁` irreducible members `S(HC)` of `S`. -/
+theorem Hypothesis.card_filter_linear_eq_w1_mul_card_SHCSet_filter [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
+    (Finset.univ.filter fun θ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+        θ ≠ trivialIrreducibleCharacter ↥((derivedInG M).subgroupOf M) ∧
+          (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1).card
+      = hyp.w1 * (Finset.univ.filter fun χ : IrreducibleCharacter ↥M =>
+          (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
+            ((χ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (hyp.w1 : ℂ)).card := by
+  haveI := hyp.finiteG
+  classical
+  have hidx : ((derivedInG M).subgroupOf M).index = hyp.w1 :=
+    hyp.typeP.card_W1_eq_derived_index.symm
+  have hw1ne : (hyp.w1 : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr (NeZero.ne _)
+  -- a nontrivial linear character of `M'` induces irreducibly
+  have hirr : ∀ θ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M),
+      θ ≠ trivialIrreducibleCharacter ↥((derivedInG M).subgroupOf M) →
+      (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1 →
+      IsIrreducibleCharacter (ClassFunction.induce ((derivedInG M).subgroupOf M)
+        (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ)) := fun θ hne hdeg =>
+    isIrreducibleCharacter_induce_of_inertia_eq θ (hyp.inertia_eq_derived_of_linear hG hne hdeg)
+  -- the nontrivial linear characters are closed under `↥M`-conjugation
+  have hTinv : ∀ θ ∈ (Finset.univ.filter
+        fun θ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+          θ ≠ trivialIrreducibleCharacter ↥((derivedInG M).subgroupOf M) ∧
+            (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1),
+      ∀ g : ↥M, IrreducibleCharacter.conjBy g θ ∈ (Finset.univ.filter
+        fun θ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+          θ ≠ trivialIrreducibleCharacter ↥((derivedInG M).subgroupOf M) ∧
+            (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1) := by
+    intro θ hθ g
+    rw [Finset.mem_filter] at hθ ⊢
+    obtain ⟨-, hne, hdeg⟩ := hθ
+    refine ⟨Finset.mem_univ _, ?_, ?_⟩
+    · intro heq
+      refine hne ?_
+      have h1 : IrreducibleCharacter.conjBy (g⁻¹ : ↥M) (IrreducibleCharacter.conjBy g θ) = θ := by
+        rw [← IrreducibleCharacter.conjBy_mul]
+        simp
+      rw [heq] at h1
+      have h2 : IrreducibleCharacter.conjBy (g⁻¹ : ↥M)
+          (trivialIrreducibleCharacter ↥((derivedInG M).subgroupOf M))
+          = trivialIrreducibleCharacter ↥((derivedInG M).subgroupOf M) := by
+        apply IrreducibleCharacter.ext
+        rw [IrreducibleCharacter.coe_conjBy]
+        ext x
+        simp [ClassFunction.conjBy_apply]
+      rw [h2] at h1
+      exact h1.symm
+    · rw [conjBy_apply_one]
+      exact hdeg
+  -- fiberwise count over the induction map: each fiber is a free conjugation orbit of size `w₁`
+  rw [Finset.card_eq_sum_card_fiberwise (fun θ hθ => Finset.mem_image_of_mem
+    (fun θ' : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+      ClassFunction.induce ((derivedInG M).subgroupOf M) θ'.toClassFunction) hθ)]
+  have hfib : ∀ φ ∈ (Finset.univ.filter
+        fun θ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+          θ ≠ trivialIrreducibleCharacter ↥((derivedInG M).subgroupOf M) ∧
+            (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1).image
+        (fun θ' : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+          ClassFunction.induce ((derivedInG M).subgroupOf M) θ'.toClassFunction),
+      ((Finset.univ.filter
+        fun θ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+          θ ≠ trivialIrreducibleCharacter ↥((derivedInG M).subgroupOf M) ∧
+            (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1).filter
+        fun θ => ClassFunction.induce ((derivedInG M).subgroupOf M) θ.toClassFunction = φ).card
+        = hyp.w1 := by
+    intro φ hφ
+    obtain ⟨θ₀, hθ₀, rfl⟩ := Finset.mem_image.mp hφ
+    rw [card_filter_induce_eq_index_inertia _ hTinv θ₀ hθ₀]
+    rw [Finset.mem_filter] at hθ₀
+    rw [show IrreducibleCharacter.inertia (G := ↥M) θ₀ = (derivedInG M).subgroupOf M from
+      hyp.inertia_eq_derived_of_linear hG hθ₀.2.1 hθ₀.2.2]
+    exact hidx
+  rw [Finset.sum_congr rfl hfib, Finset.sum_const, smul_eq_mul]
+  -- identify the image with the degree-`w₁` irreducible members of `S`
+  have himage : (Finset.univ.filter
+        fun θ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+          θ ≠ trivialIrreducibleCharacter ↥((derivedInG M).subgroupOf M) ∧
+            (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1).image
+        (fun θ' : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+          ClassFunction.induce ((derivedInG M).subgroupOf M) θ'.toClassFunction)
+      = (Finset.univ.filter fun χ : IrreducibleCharacter ↥M =>
+          (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
+            ((χ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (hyp.w1 : ℂ)).image
+          (fun χ : IrreducibleCharacter ↥M => (χ : ClassFunction ↥M ℂ)) := by
+    ext φ
+    simp only [Finset.mem_image, Finset.mem_filter, Finset.mem_univ, true_and]
+    constructor
+    · rintro ⟨θ, ⟨hne, hdeg⟩, rfl⟩
+      refine ⟨⟨ClassFunction.induce ((derivedInG M).subgroupOf M)
+        (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ), hirr θ hne hdeg⟩,
+        ⟨⟨θ, hne, rfl⟩, ?_⟩, rfl⟩
+      change ((ClassFunction.induce ((derivedInG M).subgroupOf M)
+        (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) :
+          ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (hyp.w1 : ℂ)
+      rw [ClassFunction.induce_apply_one, hdeg, mul_one, hidx]
+    · rintro ⟨χ, ⟨⟨θ, hθne, hχeq⟩, hχdeg⟩, rfl⟩
+      have hθdeg : (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1 := by
+        have h1 := ClassFunction.induce_apply_one ((derivedInG M).subgroupOf M)
+          (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ)
+        rw [← hχeq] at h1
+        rw [hχdeg, hidx] at h1
+        exact mul_left_cancel₀ hw1ne (h1.symm.trans (mul_one (hyp.w1 : ℂ)).symm)
+      exact ⟨θ, ⟨hθne, hθdeg⟩, hχeq.symm⟩
+  rw [himage, Finset.card_image_of_injective _
+    (fun a b hab => IrreducibleCharacter.ext hab), Nat.mul_comm]
+
+open scoped Classical in
+/-- **Peterfalvi (11.8.1), abelianization form of the `S(HC)` count**:
+`|M'/M''| = w₁ · |S(HC)| + 1`.  The linear characters of `M'` number `|M'{}^{ab}|`
+(`card_filter_degree_one_eq_card_abelianization`); one of them is trivial, and the nontrivial
+ones are counted with multiplicity `w₁` by the degree-`w₁` irreducible members of `S`
+(`card_filter_linear_eq_w1_mul_card_SHCSet_filter`).  Downstream ((11.5) `M'' = HC`,
+`S13.secondDerived_eq_HC`) this becomes `u = w₁·|S(HC)| + 1`, i.e. `|S(HC)| = (u−1)/w₁ = n`. -/
+theorem Hypothesis.card_abelianization_derived_eq_w1_mul_card_SHCSet_add_one [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
+    Nat.card (Abelianization ↥((derivedInG M).subgroupOf M))
+      = hyp.w1 * (Finset.univ.filter fun χ : IrreducibleCharacter ↥M =>
+          (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
+            ((χ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (hyp.w1 : ℂ)).card + 1 := by
+  haveI := hyp.finiteG
+  classical
+  rw [← card_filter_degree_one_eq_card_abelianization,
+    ← hyp.card_filter_linear_eq_w1_mul_card_SHCSet_filter hG]
+  -- the trivial character is the one degree-one character excluded by the nontriviality filter
+  have htriv : trivialIrreducibleCharacter ↥((derivedInG M).subgroupOf M)
+      ∈ (Finset.univ.filter fun θ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+        (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1) := by
+    rw [Finset.mem_filter]
+    exact ⟨Finset.mem_univ _, rfl⟩
+  have herase : (Finset.univ.filter
+        fun θ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+          θ ≠ trivialIrreducibleCharacter ↥((derivedInG M).subgroupOf M) ∧
+            (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1)
+      = (Finset.univ.filter
+        fun θ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+          (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1).erase
+        (trivialIrreducibleCharacter ↥((derivedInG M).subgroupOf M)) := by
+    ext θ
+    simp only [Finset.mem_erase, Finset.mem_filter, Finset.mem_univ, true_and]
+  rw [herase, Finset.card_erase_of_mem htriv,
+    Nat.sub_add_cancel (Finset.card_pos.mpr ⟨_, htriv⟩)]
+
 end OddOrder.Peterfalvi.S12
