@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.AppC_NormSet
+import OddOrder.GroupTheory.RepresentationTheory.OrbitOnIrr
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
 import OddOrder.Peterfalvi.S15_SAndT
 import OddOrder.Peterfalvi.S16_NonExistenceGCore
@@ -150,6 +151,195 @@ theorem T_card_quot_Q_derived_eq_card_V [Finite G] (hyp : Hypothesis (G := G)) :
   rw [Nat.card_congr (T_Q_isComplement_V_derived hyp).symm.QuotientMulEquiv.toEquiv,
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hV_le).toEquiv]
 
+/-- **`(QV = T')` is normal in `↥T` with index `p`** (`T = T' ⋊ W₂`, `p = |W₂|`).  The
+`↥T`-side normal subgroup and the `[T:QV] = p` degree/orbit factor consumed by the `calT1` count,
+repackaged from `T_derived_index_eq_p` as a statement about `(derivedInG T).subgroupOf T`
+(the shape `card_image_induce_eq_div` needs: `H.index` for `H ◁ ↥T`). -/
+theorem T_derivedSubgroupOf_normal (hyp : Hypothesis (G := G)) :
+    ((derivedInG hyp.base.T).subgroupOf hyp.base.T).Normal := by
+  rw [show (derivedInG hyp.base.T).subgroupOf hyp.base.T = _root_.commutator ↥hyp.base.T by
+    rw [derivedInG, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective hyp.base.T.subtype_injective]]
+  infer_instance
+
+open scoped Classical in
+/-- **The `calT1` orbit count, ungated engine** — Peterfalvi (14.9), Coq
+`PFsection14.v:836--845` `size calT1 = (v.-1) %/ p`, the *cardinality* half.
+
+Given any conjugation-invariant `Finset` `𝒯 ⊆ Irr(QV)` (`QV = T' = derivedInG T`, normal in `↥T`)
+whose every member induces irreducibly to `T` (equivalently has inertia `I_T(θ) = QV`), the map
+`θ ↦ Ind_{QV}^T θ` is exactly `[T:QV] = p`-to-one onto its image, so
+
+  `|{Ind_{QV}^T θ | θ ∈ 𝒯}| = |𝒯| / p`.
+
+This is the direct §16 specialization of the shared-infra orbit count
+`RepresentationTheory.card_image_induce_eq_div` with `G := ↥T`, `H := QV.subgroupOf T`, and the
+index `[T:QV] = p` plugged in via `T_derived_index_eq_p`.  It is **ungated** (no `IsTypeII`/`IsTypeP2`
+input, no `sorry`): the two facts entering are supplied by the caller as `𝒯`'s
+conjugation-invariance and irreducible-induction (inertia `= QV`) hypotheses.  For the `calT1`
+assembly `𝒯` is the non-principal inflated `Irr(QV/Q)`-family, `|𝒯| = |V| − 1`
+(the `|Irr(QV/Q)| = |QV/Q| = |V|` count, gated on `V` abelian — see the blocker map on
+`T_typeIII_ratio_le`), yielding `|calT1| = (|V| − 1)/p`.
+
+The `Fintype`/`Invertible` instances are taken explicitly (satisfiable from `Finite G`) so the
+`induce`-image in the statement type-checks, matching the shared-infra convention. -/
+theorem calT1_image_induce_card_eq [Finite G] (hyp : Hypothesis (G := G))
+    [Fintype ↥hyp.base.T] [Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
+    [Invertible (Nat.card ↥hyp.base.T : ℂ)]
+    [Invertible (Nat.card ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) : ℂ)]
+    (hQVnormal : ((derivedInG hyp.base.T).subgroupOf hyp.base.T).Normal)
+    (𝒯 : Finset (OddOrder.RepresentationTheory.IrreducibleCharacter
+      ((derivedInG hyp.base.T).subgroupOf hyp.base.T)))
+    (hconj : ∀ θ ∈ 𝒯, ∀ g : ↥hyp.base.T,
+      OddOrder.RepresentationTheory.IrreducibleCharacter.conjBy
+        (G := ↥hyp.base.T) (H := (derivedInG hyp.base.T).subgroupOf hyp.base.T) g θ ∈ 𝒯)
+    (hinertia : ∀ θ ∈ 𝒯,
+      OddOrder.RepresentationTheory.IrreducibleCharacter.inertia
+          (G := ↥hyp.base.T) (H := (derivedInG hyp.base.T).subgroupOf hyp.base.T) θ
+        = (derivedInG hyp.base.T).subgroupOf hyp.base.T) :
+    (𝒯.image (fun θ => OddOrder.RepresentationTheory.ClassFunction.induce
+        ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction)).card
+      = 𝒯.card / hyp.base.p := by
+  haveI := hQVnormal
+  -- The shared-infra orbit count `|image| = |𝒯| / [T:QV]`, with `[T:QV] = p`.
+  rw [OddOrder.RepresentationTheory.card_image_induce_eq_div 𝒯 hconj hinertia,
+    T_derived_index_eq_p hyp]
+
+/-- **Inflation-through-quotient inertia via a Frobenius quotient** (general reusable brick, the
+Coq `irr_induced_Frobenius_ker` ∘ `injm_Frobenius_ker` core, PFsection14.v:757--762).
+
+For `N ◁ G`, `H ◁ G` with `N ≤ H`, if the quotient `G/N` is a **Frobenius group** with kernel
+`H/N = H.map (mk' N)` (any complement `A'`), then every *non-principal* `θ̄ ∈ Irr(H/N)` inflates
+(along a quotient-corestriction `q : ↥H →* ↥(H/N)`, `(q x : G/N) = mk' N x`) to a character of `H`
+whose inertia group in `G` is exactly `H`:
+
+  `I_G(inflate_q θ̄) = H`.
+
+Proof: `inertia_eq_of_frobeniusGroup` gives `I_{G/N}(θ̄) = H/N`; the inertia/inflation bridge
+`mem_inertia_compHom_iff` transfers `g ∈ I_G(inflate θ̄) ↔ mk' N g ∈ I_{G/N}(θ̄) = H/N`, and
+`comap (mk' N) (H.map (mk' N)) = H` (as `N = ker (mk' N) ≤ H`) closes the membership.
+
+This is the inertia input feeding the `calT1` orbit count (`calT1_image_induce_card_eq`): with
+`G := ↥T`, `N := Q.subgroupOf T`, `H := QV.subgroupOf T` (`QV = T'`), and the quotient Frobenius
+`T/Q = (QV/Q) ⋊ (W₂Q/Q)` sourced *ungated* from the intrinsic type-III datum's `U ⋊ W₁` Frobenius
+(`T_typeIII_UW1_frobenius`), it gives `I_T(inflate θ) = QV` for each non-principal inflated
+`θ ∈ Irr(QV/Q)`. -/
+theorem inertia_inflate_eq_of_frobeniusQuotient {Γ : Type*} [Group Γ] [Finite Γ]
+    {N H : Subgroup Γ} [N.Normal] [H.Normal] (hNH : N ≤ H)
+    {A' : Subgroup (Γ ⧸ N)}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (Γ ⧸ N)
+      (H.map (QuotientGroup.mk' N)) A')
+    (q : ↥H →* ↥(H.map (QuotientGroup.mk' N)))
+    (hq : ∀ x : ↥H, ((q x : Γ ⧸ N)) = QuotientGroup.mk' N (x : Γ))
+    (hqinj : Function.Injective (OddOrder.RepresentationTheory.ClassFunction.compHom q :
+      OddOrder.RepresentationTheory.ClassFunction ↥(H.map (QuotientGroup.mk' N)) ℂ →
+        OddOrder.RepresentationTheory.ClassFunction ↥H ℂ))
+    (θbar : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(H.map (QuotientGroup.mk' N)))
+    (hθne : θbar ≠ OddOrder.RepresentationTheory.trivialIrreducibleCharacter _) :
+    OddOrder.RepresentationTheory.ClassFunction.inertia (G := Γ) (H := H)
+        (OddOrder.RepresentationTheory.ClassFunction.compHom q
+          (θbar : OddOrder.RepresentationTheory.ClassFunction _ ℂ)) = H := by
+  haveI : Fintype (Γ ⧸ N) := Fintype.ofFinite _
+  haveI : Fintype ↥(H.map (QuotientGroup.mk' N)) := Fintype.ofFinite _
+  -- Frobenius ⟹ `I_{Γ/N}(θ̄) = H/N`.
+  have hIbar : OddOrder.RepresentationTheory.ClassFunction.inertia
+      (G := Γ ⧸ N) (H := H.map (QuotientGroup.mk' N))
+      (θbar : OddOrder.RepresentationTheory.ClassFunction _ ℂ) = H.map (QuotientGroup.mk' N) :=
+    OddOrder.RepresentationTheory.inertia_eq_of_frobeniusGroup hfrob hθne
+  ext g
+  rw [OddOrder.RepresentationTheory.mem_inertia_compHom_iff q hq hqinj
+    (θbar : OddOrder.RepresentationTheory.ClassFunction _ ℂ) g, hIbar]
+  constructor
+  · intro hmem
+    have hcm : g ∈ Subgroup.comap (QuotientGroup.mk' N) (H.map (QuotientGroup.mk' N)) := hmem
+    rwa [Subgroup.comap_map_eq_self (by rw [QuotientGroup.ker_mk']; exact hNH)] at hcm
+  · intro hg
+    exact Subgroup.mem_map.mpr ⟨g, hg, rfl⟩
+
+/-- **The intrinsic type-III `U ⋊ W₁` Frobenius** (ungated).  From `hIII : IsTypeIII T` take the
+*intrinsic* datum `td = hIII.some : TypeIIIData T`; its `td.typeP.U ⋊ td.typeP.W₁` is a Frobenius
+group (Peterfalvi Def (8.4), `S11.typeP_uW1_frobenius` fed the non-triviality `td.common.1`).
+
+Crucially this **avoids** the sorried T-side reconciliation `S15.reconciled_typePData_T` (which is
+what gated the abstract-`V`/`W₂` route): the datum `td` comes straight from `IsTypeIII T` with no
+reconciliation to the abstract Hypothesis fields `V`/`W₂`.  It is the ungated source of the quotient
+Frobenius `T/Q` needed for `inertia_inflate_eq_of_frobeniusQuotient`.  (Coq `frobVW2`.) -/
+theorem T_typeIII_UW1_frobenius {M : Subgroup G} (td : OddOrder.GroupTheory.TypeIIIData M) :
+    OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(td.typeP.U ⊔ td.typeP.W1)
+      (td.typeP.U.subgroupOf (td.typeP.U ⊔ td.typeP.W1))
+      (td.typeP.W1.subgroupOf (td.typeP.U ⊔ td.typeP.W1)) :=
+  OddOrder.Peterfalvi.S11.typeP_uW1_frobenius td.typeP td.common.1
+
+/-- **The intrinsic type-III cyclic factor has order `p`** (ungated): `|td.typeP.W₁| = [T:T'] = p`.
+`td.typeP.W₁` complements `T' = derivedInG T` in `T` (`M_complement`), so `|W₁| = [T:T']`
+(`card_W1_eq_derived_index`), and `[T:T'] = p` (`T_derived_index_eq_p`).  This is the orbit-size /
+degree factor of `calT1` (Coq `index_sdprod defT`, `p = |W₂|`; note the intrinsic `.W₁` is the
+`T'`-complement, matching Coq's `W₂` — the abstract-Hypothesis `W₂` — **not** the abstract `W₁`). -/
+theorem T_typeIII_card_W1 [Finite G] (hyp : Hypothesis (G := G))
+    (td : OddOrder.GroupTheory.TypeIIIData hyp.base.T) :
+    Nat.card ↥td.typeP.W1 = hyp.base.p := by
+  rw [td.typeP.card_W1_eq_derived_index, T_derived_index_eq_p hyp]
+
+/-- **The intrinsic type-III complement has order `|V|`** (ungated, canonical): `|td.typeP.U| = |V|`.
+`|td.typeP.U| = [T' : M_F]` (`card_U_eq_index`, `M_F = Q`), and `[T' : M_F] = |QV/Q| = |V|`
+(`Subgroup.index_eq_card` + `T_card_quot_Q_derived_eq_card_V`).  The equality is **canonical** — both
+sides are the intrinsic index `[T':M_F]` — so it needs *no* reconciliation of `td.typeP.U` with the
+abstract `V` (the source of `calT1`'s abelian-quotient count `size = (v−1)/p`). -/
+theorem T_typeIII_card_U [Finite G] (hyp : Hypothesis (G := G))
+    (td : OddOrder.GroupTheory.TypeIIIData hyp.base.T) :
+    Nat.card ↥td.typeP.U = Nat.card ↥hyp.base.V := by
+  rw [td.typeP.card_U_eq_index, ← hyp.base.Q_eq_TF, Subgroup.index_eq_card]
+  exact T_card_quot_Q_derived_eq_card_V hyp
+
+open scoped Classical in
+/-- **Peterfalvi (14.9): `|calT1| = (|V| − 1)/p`** (Coq `PFsection14.v:836--845`
+`size calT1 = (v.-1) %/ p`, the cardinality half) — **assembly skeleton, ungated**.
+
+`calT1` is realized as the `Ind_{QV}^T`-image of the family `𝒯` of non-principal inflated
+`Irr(QV/Q)`-characters (`QV = T' = derivedInG T`, `Q = M_F`).  Given the two remaining *ungated*
+transcription facts as hypotheses — packaged so this carries **no `sorry`** and its consumers can
+supply them from the intrinsic type-III datum `hIII.some` — the count is closed by the engine
+`calT1_image_induce_card_eq` (`|image| = |𝒯|/p`) plus `|𝒯| = |V| − 1`:
+
+* `hcard : 𝒯.card = Nat.card ↥hyp.base.V - 1` — the abelian-quotient count `|Irr(QV/Q)| = |QV/Q| =
+  |V|` minus the principal character.  Ungated from `T_typeIII_card_U`
+  (`|td.typeP.U| = |V|`, `td.U_commutative` making `QV/Q ≅ U` abelian so
+  `card_irreducibleCharacter_eq_card_of_commGroup` applies) — **no** abstract-`V` abelianness / no
+  `reconciled_typePData_T`.
+* `hconj`/`hinertia` — `𝒯` is `↥T`-conjugation invariant and every member has inertia
+  `I_T(inflate θ) = QV`.  The inertia fact is `inertia_inflate_eq_of_frobeniusQuotient` fed the
+  quotient Frobenius `T/Q = (QV/Q) ⋊ (W₂Q/Q)`, itself transported (`isFrobeniusGroup_map_equiv`)
+  from the intrinsic `U ⋊ W₁` Frobenius `T_typeIII_UW1_frobenius` through `mk' Q` (injective on
+  `U ⊔ W₁` since `Q ⊓ (U ⊔ W₁) = ⊥`) — **all ungated** (Coq `frobVW2`/`injm_Frobenius_ker`).
+
+`hp_pos` records `0 < p` (from `hyp.base.p_prime`) to discharge the `/p` division exactness.  This
+skeleton is the honest §16 assembly point: it consumes only the verified ungated bricks
+(`calT1_image_induce_card_eq`, `T_typeIII_card_U`, `T_typeIII_UW1_frobenius`,
+`inertia_inflate_eq_of_frobeniusQuotient`), leaving `hcard`/`hconj`/`hinertia` as the precisely
+scoped *transcription* residual (not a gate) — the `Q`-complement iso-transport building `𝒯` and
+its two properties.  Its output `(|V| − 1)/p` then feeds the (14.9) Γ-Bessel bound
+`T_typeIII_ratio_le` (still gated additionally on the `v = |V|` (13.12) `d=1` substitution + the
+S07 coherence package + the S-side `Γ` bridge). -/
+theorem T_typeIII_calT1_card_eq [Finite G] (hyp : Hypothesis (G := G))
+    [Fintype ↥hyp.base.T] [Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
+    [Invertible (Nat.card ↥hyp.base.T : ℂ)]
+    [Invertible (Nat.card ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) : ℂ)]
+    (hQVnormal : ((derivedInG hyp.base.T).subgroupOf hyp.base.T).Normal)
+    (𝒯 : Finset (OddOrder.RepresentationTheory.IrreducibleCharacter
+      ((derivedInG hyp.base.T).subgroupOf hyp.base.T)))
+    (hcard : 𝒯.card = Nat.card ↥hyp.base.V - 1)
+    (hconj : ∀ θ ∈ 𝒯, ∀ g : ↥hyp.base.T,
+      OddOrder.RepresentationTheory.IrreducibleCharacter.conjBy
+        (G := ↥hyp.base.T) (H := (derivedInG hyp.base.T).subgroupOf hyp.base.T) g θ ∈ 𝒯)
+    (hinertia : ∀ θ ∈ 𝒯,
+      OddOrder.RepresentationTheory.IrreducibleCharacter.inertia
+          (G := ↥hyp.base.T) (H := (derivedInG hyp.base.T).subgroupOf hyp.base.T) θ
+        = (derivedInG hyp.base.T).subgroupOf hyp.base.T) :
+    (𝒯.image (fun θ => OddOrder.RepresentationTheory.ClassFunction.induce
+        ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction)).card
+      = (Nat.card ↥hyp.base.V - 1) / hyp.base.p := by
+  rw [calT1_image_induce_card_eq hyp hQVnormal 𝒯 hconj hinertia, hcard]
+
 /-- **Peterfalvi (14.9), the character body** — the structural `≤` half of the ratio comparison, the
 sole deep obligation of (14.9).  Coq `PFsection14` `FTtypeP_min_typeII`, lines 737--853: assuming `T`
 is type III, build `calT1 = seqIndD QV T QV Q` (the degree-`p` induced characters of `T`, from
@@ -188,20 +378,16 @@ degree_sq` — *not* the quotient-restricted `Irr(QV/Q)` family with a `W₁`-or
 
    The residual (b) — `I_T(inflate θ) = QV` for nonprincipal `θ ∈ Irr(QV/Q)` (Coq
    `irr_induced_Frobenius_ker` + `injm_Frobenius_ker` through the quotient, PFsection14.v:757--762) —
-   rests on two general rep-theory bricks, **both now available as shared infra**: **(b1)** transport
-   of a Frobenius group across an isomorphism (`Isaacs.Ch06.isFrobeniusGroup_map_equiv`,
-   `FrobeniusGroupQuotient.lean`), which carries the *subgroup* Frobenius `V ⋊ W₂ ≤ T`
-   (`S15.isMulCommutative_V`) onto `T/Q = (QV/Q) ⋊ (W₂Q/Q)` via the iso `V ⋊ W₂ ≅ (QV/Q) ⋊ (W₂Q/Q)`
-   (available since `(V ⊔ W₂) ⊓ Q = ⊥` makes `mk' Q` injective there — the honest replacement for the
-   *false-in-general* "quotient a Frobenius group by a normal subgroup of its kernel"), and **(b2)**
-   the inertia/inflation-commutation bridge `mem_inertia_compHom_iff` (`ConjugationBrauer.lean`),
-   `g ∈ I_T(compHom q θ̄) ↔ mk' Q g ∈ I_{T/Q}(θ̄)` for a quotient-corestriction `q : ↥QV →* ↥(QV/Q)`
-   — i.e. exactly `I_T(inflate θ) = comap (mk' Q) (I_{T/Q}(θ̄))` in membership form (already consumed
-   by S08 `inertia_eq_H_of_c2`).  Given (b1)+(b2), the assembly is a direct transcription of the
-   (6.8)(c2) template `S08.inertia_eq_H_of_c2`: `inertia_eq_of_frobeniusGroup` (fed the (b1)
-   quotient-Frobenius group) gives `I_{T/Q}(θ̄) = QV/Q`, and (b2) pulls it back to `I_T(inflate θ) =
-   QV`.  Additionally `V` abelian (Coq `cVV`, type-P) is currently only ungated on `IsTypeII T`
-   (`S15.isMulCommutative_V`), so it must be re-derived on this type-III branch (Bonus b3, below).
+   is packaged as the reusable brick `inertia_inflate_eq_of_frobeniusQuotient` (this file):
+   `I_G(inflate θ̄) = H` from a Frobenius quotient `G/N` with kernel `H/N`, via
+   `inertia_eq_of_frobeniusGroup` (⟹ `I_{G/N}(θ̄) = H/N`) + the inertia/inflation bridge
+   `mem_inertia_compHom_iff` (`ConjugationBrauer.lean`) + `comap_map_eq_self` (`N ≤ H`).  Its input,
+   the quotient Frobenius `T/Q = (QV/Q) ⋊ (W₂Q/Q)`, is transported (`isFrobeniusGroup_map_equiv`)
+   from the **intrinsic** `U ⋊ W₁` Frobenius `T_typeIII_UW1_frobenius` through `mk' Q` (injective on
+   `U ⊔ W₁` since `Q ⊓ (U ⊔ W₁) = ⊥`) — **ungated**, replacing the earlier abstract-`V ⋊ W₂`
+   (`S15.isMulCommutative_V`) route that was gated through the sorried `reconciled_typePData_T`.
+   Likewise `U` abelian is the intrinsic `td.U_commutative` (ungated), not the gated abstract-`V`
+   abelianness.  See the (now-`UNGATED`) escape-hatch conclusion below.
 3. **A full `S07.Hypothesis` (5.2) instance for `calT1`** (the (12.1) T-side Dade `tauT` +
    `difference_image`/`no_real`/`pairwise_orthogonal`/`tau_isometry_diff`), to feed
    `coherent_of_constant_degree`.  This is the T-side coherence package, itself separately gated.
@@ -209,19 +395,40 @@ degree_sq` — *not* the quotient-restricted `Irr(QV/Q)` family with a `W₁`-or
    `S09.cfdot_real_vchar_even`), then `orthogonal_split` + Bessel.  `Γ` needs the full S-side
    (13.x)/(14.x) βₛ construction (cf. the `S16_NonExistenceG` βₛ-grid sorry at ~line 6377).
 
-Escape-hatch conclusion (updated 2026-07-06, lane-c): item 2b's two rep-theory bricks are now both
-landed as reusable shared infra — (b1) `Isaacs.Ch06.isFrobeniusGroup_map_equiv`
-(`FrobeniusGroupQuotient.lean`, Frobenius transport across an iso) and (b2)
-`RepresentationTheory.mem_inertia_compHom_iff` (`ConjugationBrauer.lean`, the inertia/inflation
-bridge) — joining the `/p` orbit count `card_image_induce_eq_div` (`OrbitOnIrr.lean`) and the
-group-theoretic foundation (`T_derived_index_eq_p`, `T_Q_isComplement_V_derived`,
-`T_card_quot_Q_derived_eq_card_V`).  With these, `I_T(inflate θ) = QV` is a direct transcription of
-the (6.8)(c2) assembly template `S08.inertia_eq_H_of_c2` (specialized `H = QV`, `W₁ = W₂`,
-`M = Q.subgroupOf QV`), whence `|calT1| = (|V|−1)/p`.  What remains for the character body is now
-*not* missing infra but the remaining (14.9) **assembly + gating**: item 1 (`v = |V|`, i.e. (13.12)
-`d = 1`), the Bonus-b3 type-III re-derivation of `V` abelian (Coq `cVV`, currently `IsTypeII`-gated in
-`S15.isMulCommutative_V`), item 3 (the T-side coherence package `S07.Hypothesis`) and item 4 (the
-S-side `Γ` bridge).  Those remain the documented residual of the character body. -/
+Escape-hatch conclusion (**revised 2026-07-06, lane-c** — the count is now known **UNGATED**; this
+corrects an earlier lane-c note that wrongly called items 2/b "gated behind `IsTypeP2 T`").  The
+`IsTypeP2` gate is **bypassed by working with the *intrinsic* type-III datum** `td = hIII.some :
+TypeIIIData T` (NOT the abstract Hypothesis `V`/`W₂`, whose reconciliation to `td` is the sorried
+`S15.reconciled_typePData_T`).  Its factors `td.typeP.U`/`td.typeP.W₁` supply, **all ungated**:
+
+* `td.U_commutative : IsMulCommutative ↥td.typeP.U` (⟹ `QV/Q ≅ U` abelian ⟹ `|Irr(QV/Q)| = |V|`);
+* `T_typeIII_UW1_frobenius` — the `U ⋊ W₁` Frobenius (`S11.typeP_uW1_frobenius td.typeP td.common.1`,
+  Coq `frobVW2`), the ungated source of the quotient Frobenius `T/Q` for the inertia fact;
+* `T_typeIII_card_W1 : |td.typeP.W₁| = p` and `T_typeIII_card_U : |td.typeP.U| = |V|` — canonical
+  (both sides are intrinsic indices `[T:T']`, `[T':M_F]`), so **no** abstract-`V`/`W₂`
+  reconciliation.
+
+Landed ungated + green: the group-theoretic foundation (`T_derived_index_eq_p`,
+`T_Q_isComplement_V_derived`, `T_card_quot_Q_derived_eq_card_V`, `T_derivedSubgroupOf_normal`), the
+orbit-count engine `calT1_image_induce_card_eq` (`|{Ind_{QV}^T θ}| = |𝒯|/p` for conj-invariant
+inertia-`QV` `𝒯`), the reusable inflation-quotient inertia brick
+`inertia_inflate_eq_of_frobeniusQuotient` (`I_G(inflate θ̄) = H` from a Frobenius quotient `G/N`,
+kernel `H/N`), the four intrinsic facts above, and the **no-`sorry` assembly skeleton**
+`T_typeIII_calT1_card_eq` producing `|calT1| = (|V|−1)/p` from the count engine + `|𝒯| = |V|−1`.
+
+The remaining `|calT1| = (|V|−1)/p` work is **pure transcription, ungated** (not a gate): discharging
+the skeleton's `hcard`/`hconj`/`hinertia` by (i) building `𝒯` = non-principal inflated `Irr(QV/Q)`,
+(ii) the `Q`-complement `IsComplement' (Q.subgroupOf T) ((U ⊔ W₁).subgroupOf T)` → iso
+`↥T/Q ≅ U ⊔ W₁` → quotient Frobenius `T/Q` via `isFrobeniusGroup_map_equiv` (feeding
+`inertia_inflate_eq_of_frobeniusQuotient`), (iii) `|𝒯| = |V|−1` via `inflate_injective` +
+`T_typeIII_card_U` + `card_irreducibleCharacter_eq_card_of_commGroup`, (iv) conj-invariance via
+`conjBy_compHom_eq_compHom_conjBy`.  All bricks for (i)-(iv) are landed/verified.
+
+Then the *full* (14.9) `T_typeIII_ratio_le` bound still needs, beyond `|calT1| = (|V|−1)/p`:
+item 1 (`v = |V|`, i.e. (13.12) `d = 1`, separately lane-b-gated — the `(|V|−1)/p → (v−1)/p`
+substitution), item 3 (the T-side coherence package `S07.Hypothesis` feeding
+`coherent_of_constant_degree`), and item 4 (the S-side `Γ` bridge + `nzT1_Ga` + `orthogonal_split`
+Bessel).  Those remain the documented residual of the character body. -/
 theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T) :
     ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) ≤
