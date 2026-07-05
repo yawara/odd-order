@@ -276,3 +276,28 @@ degree `caseB_character_counts.1` (S11:11712)・`irrSubcoherent` (5.3.a assemble
 sSet conj-closure 等の Dade-independent 小片を先に建てても subcoherence は Dade isometry で gated ゆえ
 scaffold になる → 底の Dade isometry を正面 build する (難所回避しない、CLAUDE.md)。upstream = (13.2) の
 S/T Dade 構成。lane a (10.7) は M-instance 側で `sixTwoDecompositionData` を既に持つため S-instance とは別 path。
+
+## 2026-07-06 更新 #9 (lane b) — ★★★honest path 確定 (de-risked): P2 Dade = type-I ASet bridge (9008 Option A、pieces 存在)
+
+更新 #8 の crux「(13.2.e) S-instance Dade isometry」を verify-first で更に掘り、**honest な buildable path
+を確定** (本 session 5 度目の verify-first 的中):
+
+- **type-P Dade 構成は P1 限定**: `dadeSupportHypothesisData_typePA0_of_isTypeP1` (S10:2402) は `IsTypeP1`
+  (types III/IV/V) 前提。docstring が明記: **P2 (type II) の `typePA=(S')#` 上の Dade support は
+  false-as-stated** (issue **9008** closed: mmd OCR で `M_s#`→`M#` 化けた over-claim、consumer 0 の phantom)。
+  S-instance S は **type-P2** (`S_typeP2`) ゆえ phantom を埋めてはいけない。
+- **正しい A(S) = ⋃_{x∈S_σ#} C_{S'}(x)#** (9008: `(S')#` から U# Frobenius 補元を除外、S_σ=S_F=H)。
+  **9008 Option A: 「P₂ escape は type-I ASet bridge に還元」**。
+- **type-I ASet Dade 構成は既存**: `DadeSupportHypothesisData M (typeIA M data)` (S10:2066、`Nonempty` で構成済)。
+  → honest な S-instance Dade isometry は **type-I ASet 構成を S_σ#=S_F# 上で instantiate** して得る (phantom でない)。
+- `sibleyTarget_H0C` (unsound workaround) は正にこの P2 Dade gap の穴埋めだった。
+
+**⟹ honest build path (de-risked, pieces 存在)**:
+1. S-instance の type-P 構造 data (`Sdata`/`TypePData S`) を carrier (§16、issue 4010 closed で IsTypeP2 着地済) から取得。
+2. 正しい A(S) を type-I ASet (`typeIA` over S_σ#=S_F#) で構成。
+3. `DadeSupportHypothesisData S A(S)` を type-I ASet 構成で得る → `dade : S04.Hypothesis G A(S) S`。
+4. `coherentEqualDegree_fromDade` に Galois uniform degree (`caseB_character_counts.1`) を食わせ Galois branch close、
+   非Galois は pair-chain。→ `irrSubcoherent` に Dade + 既 landed の hconj (`sSet_closedUnderConjugate`) + hreal/hortho。
+
+次 build = 上記 1-3 (S-instance P2 Dade via type-I ASet bridge)。substantial だが phantom でなく pieces 存在。
+残 Dade-independent input: hreal (`HasNoRealCharacters` S03:60 + odd-order)、hortho (`inner_induce_eq_zero_of_not_conj`)。
