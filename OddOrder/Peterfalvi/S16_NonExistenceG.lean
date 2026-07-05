@@ -7,6 +7,7 @@ import OddOrder.BG.AppC_NormSet
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
 import OddOrder.Peterfalvi.S15_SAndT
 import OddOrder.Peterfalvi.S16_NonExistenceGCore
+import OddOrder.Peterfalvi.S16_G0Coprime
 import OddOrder.Peterfalvi.S16_PairingBessel
 
 /-!
@@ -1699,6 +1700,19 @@ structure MHypothesis (hyp : Hypothesis (G := G)) where
           ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G)))
         ∪ OddOrder.GroupTheory.conjClassSet (OddOrder.GroupTheory.sharpSubgroup hyp.base.P)
         ∪ OddOrder.GroupTheory.conjClassSet (OddOrder.GroupTheory.sharpSubgroup hyp.base.Q)
+  /-- **Peterfalvi (14.11.3), avoidance half**: the generic set meets none of the three
+  singular orbits — no conjugate of the regular Weyl set `W − (W₁∪W₂)`, of `P#`, or of `Q#`.
+  Together with `G0_off_dadeSupport` this pins `G₀` inside Peterfalvi's (14.11.3) complement
+  `G − [Ã(M) ∪ (W#)^G ∪ (P#)^G ∪ (Q#)^G]`; the support half of (14.11.3) — every `g ∈ G₀`
+  has order prime to `pq` — follows through `orderOf_coprime_pq_of_not_mem_conj`
+  (`G0_orderOf_coprime` below). -/
+  G0_avoid : ∀ g ∈ G0,
+    g ∉ OddOrder.GroupTheory.conjClassSet
+        ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G)))
+      ∧ g ∉ OddOrder.GroupTheory.conjClassSet
+          (OddOrder.GroupTheory.sharpSubgroup hyp.base.P)
+      ∧ g ∉ OddOrder.GroupTheory.conjClassSet
+          (OddOrder.GroupTheory.sharpSubgroup hyp.base.Q)
   /-- **Peterfalvi §13 `normalizer_V` for the `W`-set**: `N_G(X) = W` for every nonempty
   `X ⊆ W − (W₁∪W₂)` (the type-`P` exceptional-set normalizer, from the partner structure).  The
   `hnorm` input to the `W`-orbit TI count (`orbit_sdiff_sup_normSq_term`). -/
@@ -2563,6 +2577,39 @@ theorem classFunction_sum_apply {ι : Type*} {k : Type*} [CommRing k]
   | empty => simp
   | @insert a s ha ih =>
       rw [Finset.sum_insert ha, ClassFunction.add_apply, ih, Finset.sum_insert ha]
+
+/-- **Peterfalvi (14.6)+(13.12), the S-side Frobenius kernel** — `C_{S'}(x) ≤ P` for
+`x ∈ P#`.  (14.6) puts `S` in case (9.7.b), whose field model (`FieldNormalizerData`) has
+Frobenius kernel `P`; the proven transport `FieldNormalizerData.derived_inf_centralizer_le_P`
+then gives the containment.  Named §14 obligation: what remains is the (9.7.b) resolution
+for `S` — the (14.2.a)-carrier inputs of `field_normalizer_of_U_characteristic_of_inputs`
+(§13 producers `basic_structure`/`c_eq_one`, issue 2035/9000 sphere). -/
+theorem s_side_frobenius_kernel [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    ∀ x ∈ sharpSubgroup hyp.base.P,
+      derivedInG hyp.base.S ⊓ Subgroup.centralizer ({x} : Set G) ≤ hyp.base.P := by
+  sorry
+
+/-- **Peterfalvi (14.4)+(13.12), the T-side Frobenius kernel** — `C_{T'}(x) ≤ Q` for
+`x ∈ Q#` (dual of `s_side_frobenius_kernel`: (14.4) puts `T` in case (9.7.b), and the
+T-side field model has Frobenius kernel `Q`). -/
+theorem t_side_frobenius_kernel [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    ∀ x ∈ sharpSubgroup hyp.base.Q,
+      derivedInG hyp.base.T ⊓ Subgroup.centralizer ({x} : Set G) ≤ hyp.base.Q := by
+  sorry
+
+/-- **Peterfalvi (14.11.3), support half**: every element of the generic set `G₀` has order
+prime to `pq`.  The avoidance fields of `MHypothesis` (`G0_avoid`) feed the proven
+(14.11.3) chain `orderOf_coprime_pq_of_not_mem_conj` (W-orbit bridge + per-side
+Sylow/TI/(2.1) coset collapse, `S16_G0Coprime`), with the two case-(9.7.b) Frobenius-kernel
+inputs supplied by `s_side_frobenius_kernel`/`t_side_frobenius_kernel`. -/
+theorem MHypothesis.G0_orderOf_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {hyp : Hypothesis (G := G)} (Mdata : MHypothesis hyp) {g : G} (hg : g ∈ Mdata.G0) :
+    Nat.Coprime (orderOf g) (hyp.base.p * hyp.base.q) := by
+  obtain ⟨hreg, hP, hQ⟩ := Mdata.G0_avoid g hg
+  exact orderOf_coprime_pq_of_not_mem_conj hG hyp.base (T_typeII hG hyp)
+    (s_side_frobenius_kernel hG hyp) (t_side_frobenius_kernel hG hyp) hreg hP hQ
 
 /-- **Peterfalvi (3.9.a,c) for the `η`-grid on the generic set `G₀`** (faithful §3 Dade obligation).
 For `g ∈ G₀` (an element of order prime to `pq` lying outside `Ã(M)`):
@@ -5431,6 +5478,7 @@ theorem exists_MHypothesis [Finite G]
     psi_tau1_norm_one := ?normOne
     G0_off_dadeSupport := ?offDade
     G0_orbit_cover := ?orbCover
+    G0_avoid := ?avoid
     W_normalizer_V := base_W_normalizer_V hyp
     P_isTI := base_P_isTI _hG hyp
     Q_isTI := base_Q_isTI _hG hyp hTII
@@ -5443,6 +5491,15 @@ theorem exists_MHypothesis [Finite G]
   case offDade =>
     intro g hg hin
     exact hg.2 (Set.mem_union_left _ hin)
+  -- **Peterfalvi (14.11.3)**: the concrete `G₀` avoids the three singular orbits — direct
+  -- set algebra on the defining complement.
+  case avoid =>
+    intro g hg
+    exact ⟨fun h => hg.2 (Set.mem_union_right _
+        (Set.mem_union_left _ (Set.mem_union_left _ h))),
+      fun h => hg.2 (Set.mem_union_right _
+        (Set.mem_union_left _ (Set.mem_union_right _ h))),
+      fun h => hg.2 (Set.mem_union_right _ (Set.mem_union_right _ h))⟩
   case orbCover =>
     intro g hgd hg0
     have hmem : g ∈ typeIHyp.dadeData.dade.dadeSupport ∪
