@@ -581,3 +581,9 @@ coeff (X ∈ ℤ[R]) / Y ⊥ R。
   params-引数付き補題群が材料) → columnImageFamilyCohFree → ofProjection
   (tau1 := hS₁coh.extension-系, lattice-isometry = extension_inner_eq) +
   直交 3 点 (muGridAlpha_inner_muColumn_* 系)。
+
+## 2026-07-05 lane-a (loop 38): params threading 完了
+
+- bridge 5 署名 + S13 消費 2 点に params+pins 貫通 (build green)。
+- named 2 点の本体着手条件が整った: 分岐内で params/hmu/hδj/hδpm/hzS/hz1 が
+  手元にある。次 = ψ-可約の列同定 → columnImageFamilyCohFree → ofProjection。
