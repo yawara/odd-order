@@ -188,6 +188,18 @@ structure Hypothesis where
   `μ_j = ∑_i μ_{ij}` sums of `q ≥ 2` distinct irreducibles — hence reducible, the (13.3.a)
   entry condition. -/
   mu_col_injective : ∀ j : Fin p, Function.Injective (fun i : Fin q => mu i j)
+  /-- **Peterfalvi (4.5.a) for the `S`-grid** (issue 2035 μ-linkage): each `μ`-column sum is
+  induced from an irreducible character of `S' = [S,S]` — the §4 certain-type identity
+  `μ_j = Ind_{S'}^S χ_j` (`induce_restrict_certainType_eq`), the constructive membership
+  shape behind (13.3.a)'s `μ_j ∈ 𝒮(H₀)`. -/
+  mu_colSum_eq_induce : ∀ j : Fin p,
+    ∃ ψ : ClassFunction ↥((derivedInG S).subgroupOf S) ℂ,
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ ∧
+      (∑ i : Fin q, mu i j) = ClassFunction.induce ((derivedInG S).subgroupOf S) ψ ∧
+      (j ≠ ⟨0, p_prime.pos⟩ →
+        ¬ (((W2.subgroupOf S).subgroupOf ((derivedInG S).subgroupOf S) :
+            Set ↥((derivedInG S).subgroupOf S)) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel ψ))
   /-- **Peterfalvi (13.1.e)**: `Ind_W^T (ω_{ij} − ω_{i0}) = δ'_i (ν_{ij} − ν_{i0})`,
   with the canonical `Ind_W^T = ClassFunction.induce (W.subgroupOf T)` and
   `δ'_i = ±1` is `deltaPrime`. -/
@@ -450,6 +462,46 @@ theorem Hypothesis.card_P_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [hSdataW2, ← hyp.p_eq_card_W2]
   rw [hyp.Sdata.H_eq, ← hyp.P_eq_SF, hW2card, hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1] at hord2
   exact hord2
+
+/-- **The `S`-instance chief kernel is trivial** ((13.2.b) consequence): `P = S_F` has order
+`p^q` (`card_P_eq`), and the chief factor `H̄ = P/H₀` already has order `(chief.p)^q`
+(`chiefFactor_quotient_card`), so `chief.p = p`, `|H₀| = 1` and `H₀ = ⊥` — `P` itself is the
+chief factor.  Collapses the §9 families of the `S`-instance (`𝒳(H₀) = 𝒳(⊥)`), making the
+(13.3.a) kernel condition `H₀ ⊆ Ker χ_j` automatic. -/
+theorem Hypothesis.toTypesIIIIIIVSetupS_chief_H0_eq_bot [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
+    chief.H0 = ⊥ := by
+  haveI := chief.N_normal
+  have hHeq : (hyp.toTypesIIIIIIVSetupS hG).H = hyp.P := by
+    show hyp.Sdata.H = hyp.P
+    rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
+  have hq : (hyp.toTypesIIIIIIVSetupS hG).q = hyp.q := by
+    show Nat.card ↥hyp.Sdata.W1 = hyp.q
+    rw [hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1]
+  have hcardH : Nat.card ↥(hyp.toTypesIIIIIIVSetupS hG).H = hyp.p ^ hyp.q := by
+    rw [show ((hyp.toTypesIIIIIIVSetupS hG).H : Subgroup G) = hyp.P from hHeq]
+    exact hyp.card_P_eq hG hyp.Sdata_W2_eq
+  have hquot := OddOrder.Peterfalvi.S11.chiefFactor_quotient_card chief
+  rw [hq] at hquot
+  have hsplit := Subgroup.card_eq_card_quotient_mul_card_subgroup chief.N
+  rw [hquot, hcardH] at hsplit
+  -- `p^q = chief.p^q · |N|` forces `chief.p = p` and `|N| = 1`
+  have hdvd : chief.p ∣ hyp.p ^ hyp.q := by
+    refine dvd_trans (dvd_pow_self chief.p hyp.q_prime.pos.ne') ?_
+    exact hsplit ▸ Dvd.intro _ rfl
+  have hpp : chief.p = hyp.p :=
+    (Nat.prime_dvd_prime_iff_eq chief.p_prime hyp.p_prime).mp
+      (chief.p_prime.dvd_of_dvd_pow hdvd)
+  rw [hpp] at hsplit
+  have hN1 : Nat.card ↥chief.N = 1 := by
+    have := hsplit.symm
+    nlinarith [Nat.card_pos (α := ↥chief.N), pow_pos hyp.p_prime.pos hyp.q]
+  have hNbot : chief.N = ⊥ := Subgroup.card_eq_one.mp hN1
+  rw [chief.H0_eq, hNbot]
+  exact Subgroup.map_bot _
+
+
 
 /-- **Peterfalvi (13.2.b,c,e)** structural producer: the `M_F`-structure of the type-`P₂` member
 `S`.  Faithful obligation on the §16 σ-structure (`BasicStructureGated` docstring).
@@ -2281,6 +2333,92 @@ theorem W2_le_P [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have h1 : orderOf (⟨w, hw⟩ : ↥hyp.W2) ∣ Nat.card ↥hyp.W2 := orderOf_dvd_natCard _
     rw [heq, ← hyp.p_eq_card_W2] at h1
     exact h1
+
+set_option maxHeartbeats 1600000 in
+open scoped Classical in
+/-- **`μ_j ∈ 𝒮(H₀)` for the `S`-instance** ((13.3.a) membership): the nonzero `μ`-column sum
+lies in the §9 family `𝒮(H₀)` of `toTypesIIIIIIVSetupS`.  The (4.5.a) witness `ψ`
+(`mu_colSum_eq_induce`) transports along `huSub = S'` (`huSub_eq_derivedInG_subgroupOf`,
+`induce_compHom_subgroupCongr`); the `𝒳`-conditions are `H₀ = ⊥ ⊆ Ker`
+(`toTypesIIIIIIVSetupS_chief_H0_eq_bot`) and `H = P ⊄ Ker` from the (4.7) `W₂`-nonkernel
+conjunct with `W₂ ≤ P` (`W2_le_P`). -/
+theorem Hypothesis.mu_colSum_mem_sOf_H0 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))
+    (j : Fin hyp.p) (hj : j ≠ ⟨0, hyp.p_prime.pos⟩) :
+    (∑ i : Fin hyp.q, hyp.mu i j)
+      ∈ OddOrder.Peterfalvi.S11.sOf (hyp.toTypesIIIIIIVSetupS hG) chief.H0 := by
+  classical
+  haveI := hyp.finiteG
+  letI : Fintype ↥hyp.S := Fintype.ofFinite _
+  letI : Fintype ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupS hG)) :=
+    Fintype.ofFinite _
+  letI : Fintype ↥((derivedInG hyp.S).subgroupOf hyp.S) := Fintype.ofFinite _
+  letI : Invertible
+      (Nat.card ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupS hG)) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥((derivedInG hyp.S).subgroupOf hyp.S) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  obtain ⟨ψ, hψirr, hψeq, hψker⟩ := hyp.mu_colSum_eq_induce j
+  have hKeq : OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupS hG)
+      = (derivedInG hyp.S).subgroupOf hyp.S :=
+    OddOrder.Peterfalvi.S11.huSub_eq_derivedInG_subgroupOf _
+  set χ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupS hG)) ℂ :=
+    ClassFunction.compHom (MulEquiv.subgroupCongr hKeq).toMonoidHom ψ with hχdef
+  have hχirr : OddOrder.RepresentationTheory.IsIrreducibleCharacter χ :=
+    OddOrder.RepresentationTheory.IsIrreducibleCharacter.compHom_of_surjective
+      (MulEquiv.subgroupCongr hKeq).surjective hψirr
+  rw [OddOrder.Peterfalvi.S11.mem_sOf]
+  refine ⟨⟨χ, hχirr⟩, ?_, ?_⟩
+  · rw [OddOrder.Peterfalvi.S11.mem_xiOf]
+    constructor
+    · -- `H ⊄ Ker χ` (`xiSet`): a kernel containment would violate the `W₂`-nonkernel conjunct
+      intro hsub
+      apply hψker hj
+      intro c hc
+      have hcW2 : ((c : ↥hyp.S) : G) ∈ hyp.W2 :=
+        Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp (SetLike.mem_coe.mp hc))
+      set x : ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupS hG)) :=
+        (MulEquiv.subgroupCongr hKeq).symm c with hxdef
+      have hxval : ((x : ↥hyp.S) : G) = ((c : ↥hyp.S) : G) := by
+        rw [hxdef]
+        exact congrArg Subtype.val (MulEquiv.subgroupCongr_symm_apply hKeq c)
+      have hxhInHu : x ∈ OddOrder.Peterfalvi.S11.hInHu (hyp.toTypesIIIIIIVSetupS hG) := by
+        refine Subgroup.mem_subgroupOf.mpr (Subgroup.mem_subgroupOf.mpr ?_)
+        show ((x : ↥hyp.S) : G) ∈ hyp.Sdata.H
+        rw [hxval, hyp.Sdata.H_eq, ← hyp.P_eq_SF]
+        exact W2_le_P hG hyp hcW2
+      have hxker := hsub (SetLike.mem_coe.mpr hxhInHu)
+      rw [OddOrder.Peterfalvi.S03.mem_characterKernel,
+        OddOrder.Peterfalvi.S03.characterDegree_def] at hxker
+      rw [OddOrder.Peterfalvi.S03.mem_characterKernel,
+        OddOrder.Peterfalvi.S03.characterDegree_def]
+      have hxker' : χ x = χ 1 := hxker
+      rw [hχdef, ClassFunction.compHom_apply, ClassFunction.compHom_apply, hxdef,
+        MulEquiv.coe_toMonoidHom, MulEquiv.apply_symm_apply, map_one] at hxker'
+      exact hxker'
+    · -- `H₀ = ⊥ ⊆ Ker χ`
+      rw [hyp.toTypesIIIIIIVSetupS_chief_H0_eq_bot hG chief]
+      intro x hx
+      have hx1 : x = 1 := by
+        have h2 := Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp
+          (SetLike.mem_coe.mp hx))
+        rw [Subgroup.mem_bot] at h2
+        exact Subtype.ext (Subtype.ext h2)
+      rw [hx1, OddOrder.Peterfalvi.S03.mem_characterKernel,
+        OddOrder.Peterfalvi.S03.characterDegree_def]
+  · -- `∑ μ_{ij} = Ind_{HU}^S χ`
+    rw [hψeq]
+    have h1 : OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupS hG) χ
+        = ClassFunction.induce
+            (OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupS hG)) χ := by
+      unfold OddOrder.Peterfalvi.S11.induceHU
+      congr! <;> exact Subsingleton.elim _ _
+    have h2 : ClassFunction.induce ((derivedInG hyp.S).subgroupOf hyp.S) ψ
+        = OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupS hG) χ := by
+      rw [h1, hχdef]
+      exact (OddOrder.RepresentationTheory.induce_compHom_subgroupCongr hKeq ψ).symm
+    exact h2
 
 /-- The distinguished `η₁₀ = τ₃(ω₁₀)` of the (13.7)/(13.9) estimates. -/
 noncomputable def Hypothesis.eta10 (hyp : Hypothesis (G := G)) : ClassFunction G ℂ :=

@@ -161,6 +161,14 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
   mu_irreducible : ∀ (i : Fin q) (j : Fin p),
     OddOrder.RepresentationTheory.IsIrreducibleCharacter (mu i j)
   mu_col_injective : ∀ j : Fin p, Function.Injective (fun i : Fin q => mu i j)
+  mu_colSum_eq_induce : ∀ j : Fin p,
+    ∃ ψ : ClassFunction ↥((derivedInG S).subgroupOf S) ℂ,
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ ∧
+      (∑ i : Fin q, mu i j) = ClassFunction.induce ((derivedInG S).subgroupOf S) ψ ∧
+      (j ≠ ⟨0, p_prime.pos⟩ →
+        ¬ (((W2.subgroupOf S).subgroupOf ((derivedInG S).subgroupOf S) :
+            Set ↥((derivedInG S).subgroupOf S)) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel ψ))
   nu_definition : ∀ (i : Fin q) (j : Fin p),
     ClassFunction.induce (W.subgroupOf T)
         (ClassFunction.compHom
@@ -373,6 +381,14 @@ structure Section16CharacterData {G : Type*} [Group G] [Finite G]
   mu_irreducible : ∀ (i : Fin tp.q) (j : Fin tp.p),
     OddOrder.RepresentationTheory.IsIrreducibleCharacter (mu i j)
   mu_col_injective : ∀ j : Fin tp.p, Function.Injective (fun i : Fin tp.q => mu i j)
+  mu_colSum_eq_induce : ∀ j : Fin tp.p,
+    ∃ ψ : ClassFunction ↥((derivedInG mp.S).subgroupOf mp.S) ℂ,
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ ∧
+      (∑ i : Fin tp.q, mu i j) = ClassFunction.induce ((derivedInG mp.S).subgroupOf mp.S) ψ ∧
+      (j ≠ ⟨0, tp.p_prime.pos⟩ →
+        ¬ (((tp.W2.subgroupOf mp.S).subgroupOf ((derivedInG mp.S).subgroupOf mp.S) :
+            Set ↥((derivedInG mp.S).subgroupOf mp.S)) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel ψ))
   nu_definition : ∀ (i : Fin tp.q) (j : Fin tp.p),
     ClassFunction.induce (tp.W.subgroupOf mp.T)
         (ClassFunction.compHom
@@ -2502,6 +2518,35 @@ noncomputable def section16CharacterData_of_isMinimalSimpleOdd {G : Type*} [Grou
           ((((mp.certainTypeS hG).columnFamily
             (Section16CharacterData.chi2enum hG mp tp j)).injective)
             (OddOrder.RepresentationTheory.IrreducibleCharacter.ext h))
+      mu_colSum_eq_induce := fun j => by
+        refine ⟨ClassFunction.restrict ((derivedInG mp.S).subgroupOf mp.S)
+            (((mp.certainTypeS hG).columnFamily
+              (Section16CharacterData.chi2enum hG mp tp j)).mu 0 : ClassFunction ↥mp.S ℂ),
+          ?_, ?_, ?_⟩
+        · exact (mp.certainTypeS hG).certainTypeRestrict_isIrreducible _
+        · calc (∑ i : Fin tp.q, Section16CharacterData.muS hG mp tp i j)
+              = ∑ i' : Fin (Nat.card ↥(mp.certainTypeS hG).W1),
+                  (((mp.certainTypeS hG).columnFamily
+                    (Section16CharacterData.chi2enum hG mp tp j)).mu i' :
+                    ClassFunction ↥mp.S ℂ) := by
+                simp only [Section16CharacterData.muS]
+                exact Equiv.sum_comp (Section16CharacterData.eqQ hG mp tp)
+                  (fun i' => (((mp.certainTypeS hG).columnFamily
+                    (Section16CharacterData.chi2enum hG mp tp j)).mu i' :
+                    ClassFunction ↥mp.S ℂ))
+            _ = _ := ((mp.certainTypeS hG).induce_restrict_certainType_eq _).symm
+        · intro hjne hsub
+          have hχ₂ne : Section16CharacterData.chi2enum hG mp tp j ≠ 1 := by
+            rw [← Section16CharacterData.chi2enum_zero hG mp tp]
+            exact fun h => hjne ((Section16CharacterData.chi2enum hG mp tp).injective h)
+          refine (mp.certainTypeS hG).not_subset_characterKernel_chiRestrict_of_ne_one
+            hχ₂ne ?_
+          have hseq : ((tp.W2.subgroupOf mp.S).subgroupOf
+                ((derivedInG mp.S).subgroupOf mp.S))
+              = (((mp.certainTypeS hG).W2).subgroupOf
+                ((derivedInG mp.S).subgroupOf mp.S)) := by
+            rw [Section16CharacterData.certainTypeS_W2_eq hG mp, tp.W2_eq_Kstar hG]
+          exact hseq ▸ hsub
       nu_definition := Section16CharacterData.nuT_definition hG mp tp
       tau3_isometry := Section16CharacterData.tau3W_isometry hG mp tp
       tau3_trivial := Section16CharacterData.tau3W_trivial hG mp tp
@@ -2591,6 +2636,7 @@ noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [F
     mu_definition := cd.mu_definition
     mu_irreducible := cd.mu_irreducible
     mu_col_injective := cd.mu_col_injective
+    mu_colSum_eq_induce := cd.mu_colSum_eq_induce
     nu_definition := cd.nu_definition
     q_lt_p := tp.q_lt_p
     Sdata := tp.Sdata
@@ -2706,6 +2752,7 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       mu_definition := inp.mu_definition
       mu_irreducible := inp.mu_irreducible
       mu_col_injective := inp.mu_col_injective
+      mu_colSum_eq_induce := inp.mu_colSum_eq_induce
       nu_definition := inp.nu_definition
       m := 1 - 1 / ((inp.q : ℚ) - 1) - ((inp.q : ℚ) - 1) / (inp.q : ℚ) ^ inp.p +
         1 / (((inp.q : ℚ) - 1) * (inp.q : ℚ) ^ inp.p)
