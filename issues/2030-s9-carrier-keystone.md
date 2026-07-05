@@ -108,7 +108,10 @@ carrier を genuine 化したことで、free-field 時代に **vacuous だっ�
 - [x] **A**: carrier 再設計 = families (commit `9c41978a`) + subgroups (commit `153e866a`) 全 genuine。
       残 free field = u (pin 済) / tau・H0CprimeSupport (S12-Dade layer) / quotientSemidirectFrobenius
       ((9.10) output) / CliffordCaseBData.field_model・Ubar_cyclic (下記、struct instance plumbing で True 据置)。
-- [ ] **B: case-(b) (9.9)/(9.10)** — Singer field model。**✅✅ (9.9.a) inertia `I_U(θ)⊆C` 完全 proven**
+- [x] **B: case-(b) (9.9) COMPLETE** (2026-07-06 検証、下記「2026-07-06 lane-a (β)」節): `caseB_character_counts`
+      (S11:9838) は **全 4 conjunct sorry-free** (旧「Clifford 次数が次の大ピース」は stale)。(9.10) は type-II
+      HU-Frobenius clause のみ 1 sorry 残 (S11:9893、H₀=1 gated via (11.7)←(10.8))。詳細は末尾 β 節。
+- [x] ~~**B (旧記述、達成済)**: case-(b) (9.9)/(9.10)~~ — Singer field model。**✅✅ (9.9.a) inertia `I_U(θ)⊆C` 完全 proven**
       (2026-06-28 cont.⁴⁻⁶、全 axiom-clean): `chiefFactor_caseB_action_fpf` (FPF) →
       `chiefFactor_caseB_char_inertia` (抽象 char inertia) → `compHom_typeP_conjAction_inflation` +
       `caseB_char_inertia_inflation` (inflation 還元) → `hInHuEquivH`/`conjBy_compHom_hInHuEquivH` (realization)
@@ -323,3 +326,58 @@ genuine target = この quotient-Dade bridge の構築。
 - 原典: Pf §9 = `references/peterfalvi/04.11` + (9.7)-(9.11); (10.7) 証明 = `04.12` line 71。
 - 関連: issue 2020, `notes/peterfalvi/s13_11_8_orthogonality.md`,
   `notes/peterfalvi/s12_10_8_noncoherence.md`。
+
+## 2026-07-06 lane-a /loop — (10.8) scoping が本 keystone への収束を再確認 + frontier 明確化
+
+`/loop Aレーンを進めます` で (10.8) `typeII_coherence_contradiction_estimate` (S12:453) を subagent 精査 →
+**本 2030 keystone に bottom out することを再確認** (notes/s12_10_8_noncoherence.md, commit a3f5baa3):
+- (10.8) の `∃u≥7` goal は type-II partner の `|U|` を existential bundle → **(10.7) `typeII_derived_frobenius`
+  に gated**。(10.7) の Coq `Frob_der1_type2` は partner chief factor に (9.8.b)/(9.9.b)/(9.10) を cite
+  (= 本 issue の §9 counts) **加えて** prime-TI-reducible apparatus (`primeTIred`/`FTtypeP_subcoherent`/
+  `cyclicTIiso`, Coq §3/§4) を T2 4-member family coherence 用に要する (repo 不在)。
+- ∴ (10.7) は **本 issue の §9 counts (task B/C) + 別途 prime-TI foundation** の両方を要する。
+- **一方 (11.8) 側** (gate-2 `coherent_Sset_of_column_identities`) は (9.11) `sibleyTarget_H0C` (§14-gated)
+  + carrier bridge。§9 counts (B/C) は両 obligation の共通 prerequisite。
+- **stale 訂正**: issue 1017 の「§5 uniform_degree_coherence 不在」は誤り (= `coherent_of_constant_degree`
+  完遂済)。issue 1017 RE-DIAGNOSIS 節参照。
+
+**⟹ 現 ungated lane-a frontier = task B (case-(b) §9 count) の Clifford 次数 assembly** (本 issue 上記
+task B: χ∈Irr(HU) の Res_H → realized-inflation constituent θ + 誘導次数 χ(1)=u)。infra 全存在
+(`caseB_inertia_realized` ✓ / `isIrreducibleCharacter_induce_of_inertia_eq` / `card_filter_induce_eq_index_inertia`)、
+「新 math 0・intricate realization」。次 subagent (2026-07-06 lane-a) がこの Clifford 次数 brick を build 中。
+
+## 2026-07-06 lane-a (β) — 検証: Clifford 次数 brick は既に landed、(9.9) 全体 COMPLETE (map 是正)
+
+subagent が「Clifford 次数 brick を build」しようとしたが、**読み込み検証の結果 (9.9) 全体が既に sorry-free と判明**
+(leaf build 3849 green、S11 の real sorry は 3 個のみ: 6353/9820/9893、いずれも (9.9) 外)。冒頭 task B の
+「Clifford 次数が次の大ピース・新規構築要」記述は **stale**。新規 landing 無し (誠実 = 既存を再構築しない)。
+
+**(9.9) `caseB_character_counts` (S11:9838-9856) = 全 4 conjunct sorry-free** (依存 chain 全て S11:4699-8556、
+caseA sorry 9820 より上流、build で確認):
+- **(9.9.a)** degree-qu = `caseB_degree_qu` (S11:6157)。**これが prompt の言う "Clifford-degree brick"、既に genuine**:
+  `caseB_exists_chiefFactorConstituent` (chief-factor constituent θ₀ を `exists_constituent_not_subset_characterKernel`
+  + inflation `exists_compHom_eq_of_subset_characterKernel` + inertia `inertia_eq_hcInHu`←`caseB_inertia_realized` で
+  抽出) → Clifford 次数 `apply_one_eq_index_of_liesOver_linear_inertia` で χ(1)=[HU:HC]=u → `induceHU_apply_one_eq_q_mul`
+  で qu。hoisting/false-hyp 無し。第1文 `u∣χ(1)` も `caseB_xi_H0_degree_dvd_u` で別途済。
+- **(9.9.b)** = `reducible_count_sOf_H0` (S11:5489、§9↔§6 bijection、**M/H₀ quotient-Dade bridge は已構築** — issue
+  末尾で「唯一の genuine multi-session blocker」とした M/H₀ (4.2)/(4.6) bridge は完了、これも stale) +
+  `reducible_mem_sOf_H0C` (S11:6312、cardinality 論法) + `forall_mem_sOf_H0C_apply_one_eq_qu` (S11:6274)。
+- **(9.9.c)** = `caseB_no_irreducible_forces_C_bot` (S11:7256、C=⊥ pair-character) + `caseB_no_irreducible_u_formula`
+  (S11:8430、u=(p^q−1)/(p−1)、caseB oXtheta を二重に数える genuine proof、C=⊥ で join collapse)。
+
+**S11 に残る 3 sorry (全て本 subagent の scope 外 = prompt が「別 deep brick、attempt するな」と指定した類)**:
+1. **S11:6353** `sibleyTarget_H0C` — (9.11) task D、明示的に §14-gated (Sibley/(6.8) witness)。
+2. **S11:9820** `caseA_character_counts` (9.8) conjunct **(d)**: `((p−1)/a)·(|U|/(a|U'|)) ≤ #{irr χ∈𝒮(H₀U'), deg qa}`.
+   = case-(a) の degree-**qa** count。infra **不在** (grep 確認: degree-qa/𝒳(H₀U') 用の補題は皆無、case-(b) の
+   `caseB_inertia_realized`/degree-u とは別物、parameter `a` = `CliffordCaseAData.a` 絡みの Dade 下界)。task C
+   (case-(a) Dade brick) 本体、multi-session。他 3 conjunct (b count/b deg+mem/c) は landed。
+3. **S11:9893** `exceptional_case_frobenius_realization` (9.10) の **type-II HU-Frobenius clause**
+   `IsFrobeniusGroup ↥(H⊔U) H U`。他 2 conjunct (FPF `chiefFactor_caseB_action_fpf` / u-formula
+   `caseB_no_irreducible_u_formula`) は landed。残 clause は Pf (9.10)/(10.7) が **H₀=1 を要する** (H̄=H に
+   collapse して初めて HU が kernel H で Frobenius; H₀=1 は (11.7)←(10.8) downstream)。docstring 9873 が正しく
+   gated と記述。ungated route 無し。
+
+**⟹ lane-a §9 の ungated frontier は task B ではなく尽きている** (case-(b) 完了)。次の genuine §9 work = task C
+(case-(a) (9.8.d) degree-qa Dade count、新規 infra 構築) か task D ((9.11) §14 witness、gated)。(10.7)/(10.8)・
+(11.8) の §9 依存のうち **case-(b) 分 ((9.9)/(9.9.b)/(9.9.c)) は解消済**; 残依存は (9.8.b) [済] + (9.8.d) [task C] +
+(9.10) type-II Frobenius [H₀=1 gated] + prime-TI foundation (repo 不在)。
