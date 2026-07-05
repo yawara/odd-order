@@ -763,4 +763,85 @@ theorem orderOf_coprime_pq_of_not_mem_conj [Finite G] (hG : OddOrder.BG.IsMinima
   exact Nat.Coprime.mul_right (orderOf_coprime_p_of_not_mem_conj hG hyp hfrob hW hP)
     (orderOf_coprime_q_of_not_mem_conj hG hyp hTII hfrobT hW hQ)
 
+/-! ### The T-side (14.4)/(9.7.b) field-model carrier and its Frobenius-kernel transport
+
+T-side dual of the (14.2.a) engine: `T' = Q ⋊ V ≅ F_{q^p} ⋊ V*` (in case (9.7.b) for `T`,
+which (14.4) forces, with `D = 1` and `v = (q^p−1)/(q−1)`), so `C_{T'}(x) ≤ Q` for `x ∈ Q#`
+transports from the concrete model exactly as on the S-side. -/
+
+/-- The concrete T-side Frobenius group `F_{q^p} ⋊ V*` (BG Appendix C model with the T-side
+parameters: kernel prime `q`, exponent `p`). -/
+abbrev tFieldFrobeniusGroup (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) : Type _ :=
+  letI : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
+  OddOrder.BG.AppC.NormSet.normOneFrobeniusGroup hyp.q hyp.p
+
+/-- The additive kernel `F_{q^p} ≤ F_{q^p} ⋊ V*` of the T-side model. -/
+noncomputable def tFieldKernel (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+    Subgroup (tFieldFrobeniusGroup hyp) :=
+  letI : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
+  (SemidirectProduct.inl :
+      OddOrder.BG.AppC.NormSet.additiveFieldGroup hyp.q hyp.p →*
+        tFieldFrobeniusGroup hyp).range
+
+/-- The norm-one complement `V* ≤ F_{q^p} ⋊ V*` of the T-side model. -/
+noncomputable def tFieldComplement (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+    Subgroup (tFieldFrobeniusGroup hyp) :=
+  letI : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
+  (SemidirectProduct.inr :
+      OddOrder.BG.AppC.NormSet.normOneUnits hyp.q hyp.p →*
+        tFieldFrobeniusGroup hyp).range
+
+/-- **Minimal T-side (14.4)/(9.7.b) field-model carrier** — the T-side dual of the (14.2.a)
+`FieldNormalizerData`: an injective realization of `T' = Q ⋊ V` as the concrete Frobenius
+group `F_{q^p} ⋊ V*`, with the additive kernel matching `Q` and the norm-one complement
+matching `V`.  Its supply is the (14.4)-case (9.7.b) resolution for `T` (`v = (q^p−1)/(q−1)`,
+`D = 1` — the `T_side_caseB_facts`/issue-9000 sphere); its payoff is the transport
+`TFieldModelData.derived_inf_centralizer_le_Q`, the `hfrobT` input of the (14.11.3) chain. -/
+structure TFieldModelData (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) where
+  sigma : tFieldFrobeniusGroup hyp →* G
+  sigma_injective : Function.Injective sigma
+  sigma_Q_eq_Q : (tFieldKernel hyp).map sigma = hyp.Q
+  sigma_V_eq_V : (tFieldComplement hyp).map sigma = hyp.V
+
+/-- **Peterfalvi (14.4)/(13.12)-dual, the Frobenius-kernel property of `T' = QV`, transported
+from the T-side field model**: `C_{T'}(x) ≤ Q` for `x ∈ Q#`.  Mirror of
+`FieldNormalizerData.derived_inf_centralizer_le_P` through `commute_inl_mem_range_inl`
+(which is generic in the two primes).  Discharges the `hfrobT` input of
+`orderOf_coprime_q_of_not_mem_conj` as soon as the (14.4) carrier is supplied. -/
+theorem TFieldModelData.derived_inf_centralizer_le_Q [Finite G]
+    {hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)} (data : TFieldModelData hyp)
+    {x : G} (hx : x ∈ sharpSubgroup hyp.Q) :
+    derivedInG hyp.T ⊓ Subgroup.centralizer ({x} : Set G) ≤ hyp.Q := by
+  letI : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
+  rintro g' ⟨hg'T', hg'cent⟩
+  -- `T' = Q ⊔ V` is the image of `kernel ⊔ complement` under `σ`
+  have hg'mem : g' ∈ (tFieldKernel hyp ⊔ tFieldComplement hyp).map data.sigma := by
+    rw [Subgroup.map_sup, data.sigma_Q_eq_Q, data.sigma_V_eq_V, ← hyp.T_deriv_eq_QV]
+    exact hg'T'
+  obtain ⟨w, -, rfl⟩ := hg'mem
+  -- `x = σ (inl m)` for a nontrivial additive point `m`
+  have hxmem : x ∈ (tFieldKernel hyp).map data.sigma := by
+    rw [data.sigma_Q_eq_Q]; exact hx.1
+  obtain ⟨wx, hwx, hxeq⟩ := hxmem
+  have hwx' : wx ∈ (SemidirectProduct.inl :
+      OddOrder.BG.AppC.NormSet.additiveFieldGroup hyp.q hyp.p →*
+        tFieldFrobeniusGroup hyp).range := hwx
+  obtain ⟨m, rfl⟩ := hwx'
+  have hmne : m ≠ 1 := by
+    rintro rfl
+    refine hx.2 ?_
+    have hx1 : x = 1 := by rw [← hxeq, map_one, map_one]
+    simp [hx1]
+  -- pull the commutation back through the injective `σ`
+  have hgx : data.sigma w * x = x * data.sigma w :=
+    Subgroup.mem_centralizer_singleton_iff.mp hg'cent
+  have hcomm : w * SemidirectProduct.inl m = SemidirectProduct.inl m * w := by
+    apply data.sigma_injective
+    rw [map_mul, map_mul, hxeq]
+    exact hgx
+  -- concrete Frobenius kernel + push forward
+  obtain ⟨mw, hmw⟩ := commute_inl_mem_range_inl hmne hcomm
+  rw [← data.sigma_Q_eq_Q]
+  exact ⟨w, ⟨mw, hmw⟩, rfl⟩
+
 end OddOrder.Peterfalvi.S16
