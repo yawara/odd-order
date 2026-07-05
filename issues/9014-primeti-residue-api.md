@@ -335,3 +335,47 @@ posited field の discharge (= `PrimeTIResidueData` を real math から constru
   discharge まで進めて **`PrimeTIResidueData` の real 構成**を landing する (それが prime-TI infra の真の完了)。
   sorry-count の −1 は doneness 前進でなく obligation の posit への移動ゆえ、count でなく constructor
   discharge を進捗指標とする。
+## 進捗 (session 6, 2026-07-06, lane b) — STEP 1 `dirr` 抽出 landed (mu2 + mu2_orthonormal 接地)
+
+継続 outline #2 の **step 1 (`dirr` 抽出 layer)** を landing。**`lake build OddOrder` GREEN (3932 jobs)、
+新 axiom なし** (`#print axioms` で新 3 定理が `[propext, Classical.choice, Quot.sound]` のみ = `sorryAx`
+無し確認済)、**net real sorry = ±0** (追加は全て sorry-free; S05 の凍結 sorry-free 状態を保持)。配置は
+`S05_SigmaIsometry.lean` (末尾, `namespace TICyclicHypothesis` 内) — `sigma`/`sigma_inner_irreducibleCharacter`/
+`sigma_mem_ZIrr`/`chiFam_spec` が全て scope 内、かつ import 済 `InducedIrreducible` に norm-1 classifier が有る
+ため bridge file 不要 (import cycle 回避)。124 行追加。
+
+**判定 (step 2 の norm-1⟹signed-irr lemma は既に in-repo)**: task step 2 が要求する「norm-1 の `ZIrr G`
+元 ⟹ ± single irreducible」は **`OddOrder.RepresentationTheory.exists_zsmul_irreducibleCharacter_of_inner_self_one`
+(`InducedIrreducible.lean:526`) として既に存在** (Peterfalvi (5.9.a); `exists_single_of_sum_sq_eq_one` +
+Parseval)。∴ 新規に整数線形代数を組む必要は無く、これを `σ(ω)` に適用するだけ。
+
+**新宣言 (全 sorry-free、`TICyclicHypothesis` 相対、`hVeq`/`app` 引数)**:
+- `exists_sign_smul_irr_of_sigma_omega (ω : Irr W) : ∃ (δ:ℤ)(μ:Irr G), (δ=±1) ∧ σ(ω) = δ•μ` —
+  **`dirr` 抽出 existence** (Coq `primeTIirr_spec` via `dirr_dIirr`)。`σ(ω)∈ZIrr G` (`sigma_mem_ZIrr`) +
+  `‖σ(ω)‖²=‖ω‖²=1` (`sigma_inner_irreducibleCharacter`) → 上記 classifier。
+- `mu2Grid (ω : Irr W) : IrreducibleCharacter G` (= Coq `primeTIirr`, choice of μ) +
+  `mu2GridSign (ω) : ℤ` (= δ) + specs `mu2GridSign_eq` (±1), `sigma_omega_eq_mu2GridSign_smul_mu2Grid`
+  (`σ(ω)=δ•μ`), `mu2Grid_eq_sign_smul_sigma_omega` (`μ=δ•σ(ω)`, δ²=1)。
+- **`mu2Grid_orthonormal (ω ω') : ⟨mu2Grid ω, mu2Grid ω'⟩ = [ω=ω']`** (= Coq `cfdot_prTIirr` =
+  `PrimeTIResidueData.mu2_orthonormal`) — diagonal は irreducibility; off-diagonal は
+  `mu2Grid ω=mu2Grid ω'` ⟹ `⟨σω,σω'⟩=δ_ω δ_ω'·1=±1≠0` が `⟨σω,σω'⟩=⟨ω,ω'⟩=0` (isometry, ω≠ω') に矛盾。
+- `mu2Grid_injective` (mu2Grid は Irr(W) 上単射; 直交性から)。
+
+**これで `PrimeTIResidueData` の 2 field `mu2`/`mu2_orthonormal` が `hyp` の σ から接地可能**になった
+(grid は `Irr(W)`-indexed; constructor では `Iirr W1 × Iirr W2 ≃ Irr W` = `omegaIrrEquiv` で `Fin q × Fin p`
+に読み替える — bijection は既存)。ただし `PrimeTIResidueData` を丸ごと組むには残 field
+(`chi`/`chi_res`/`ind_chi`/`chi_zero`/`cfker_prTIres`/`prTIres_irr_cases`/`P`) が要るため、本 session は
+**再利用可能な extraction lemma 群**として landing し、full constructor 組み立ては step 2-4 に残す
+(sorry-pile 回避; `PrimeTIResidueData` は依然 external consumer 0 = S15:629 のみ)。
+
+**継続 outline (更新)**:
+1. ~~`prTIres_irr_cases` field 化~~ **✅ session 4**。
+2. **`PrimeTIResidueData` constructor** の残 step:
+   - ~~**step 1 `dirr` 抽出** (`mu2`/`mu2_orthonormal`)~~ **✅ session 6** (`mu2Grid`/`mu2Grid_orthonormal`)。
+   - **step 2 residue `chi` = `Res(mu2Grid ω_{0j})`** + `cfRes_prTIirr_eq0` (coprime normal-complement,
+     Coq PFsection4.v:533)。→ `chi`/`chi_res`/`ind_chi`/`chi_zero`。**~1 session**。
+   - **step 3 `prTIres_irr_cases`** (field 済だが constructor 供給には) inertia count の cyclic-TI bundling。
+   - **step 4 `cfker_prTIres`** (Coq:801) + `P := S_F の PU 像` + 全 field 束ね + `Iirr W1×Iirr W2 ≃ Irr W`
+     で `mu2Grid` を `Fin q → Fin p → Irr G` grid に読み替え。**~0.5 session**。
+3. ~~H-level `S1cases`/`sS1S`~~ **✅ session 3**。
+4. **`sS1S` wrapper → `induce_H_mem_zSpan_S` (S15:629) close** — session 3 の残 (a)(b)(c) glue のまま。
