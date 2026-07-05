@@ -497,6 +497,72 @@ theorem sumnS_of_norm_one_constant_degree {Si : Finset (ClassFunction L ℂ)} {d
     sumnS (L := L) Si = (Si.card : ℝ) * d ^ 2 :=
   sumnS_constant fun ψ hψ => by rw [Snorm_of_inner_self_re_one (hnorm ψ hψ), hdeg ψ hψ]
 
+/-- **Peterfalvi (9.11): the `lb12` divisibility monotonicity `2a ≤ p−1` (`≤` form).**
+
+Coq `PFsection9.v:1571` `have lb12: lb1 <= lb2 ?= iff (a == p.-1./2)`, with `lb1 = 2·a·q²·u` and
+`lb2 = (p−1)·q²·u`.  After cancelling the positive `q²·u` the content is purely `ℕ`: with
+`a ∣ (p−1)` (Coq `a_dvd_pm1`), `a` odd (odd order), and `p` odd — so `p−1` even (Coq
+`Dp: p = 2·(p.-1./2)+1`) —
+Gauss's lemma (`Nat.Coprime 2 a`, `a` odd) upgrades `a ∣ m` and `2 ∣ m` to `2·a ∣ m`, hence
+`2·a ≤ m` by `Nat.le_of_dvd`.  Stated as a pure `ℕ` lemma; the caller identifies `m = p−1` and
+multiplies through by `q²·u`. -/
+theorem two_mul_le_of_dvd_of_odd {a m : ℕ} (hdvd : a ∣ m) (ha : Odd a) (hm : Even m)
+    (hm0 : 0 < m) : 2 * a ≤ m :=
+  Nat.le_of_dvd hm0 (ha.coprime_two_left.mul_dvd_of_dvd_of_dvd hm.two_dvd hdvd)
+
+/-- **Peterfalvi (9.11): the `2·a ∣ (p−1)` fact underlying `lb12`'s equality clause.**
+
+The divisibility that `two_mul_le_of_dvd_of_odd` bounds with.  Exposed separately so the caller can
+extract the `lb12` `?= iff (a == p.-1./2)` equality: `2·a ∣ m` gives `2·a = m ↔ …`, and the equality
+`2·a = m` (i.e. `a = m/2 = (p−1)/2`) is exactly the (9.11.1) `without loss` normalization forcing
+`a = (p−1)/2`.  Pure `ℕ`; identification of `m = p−1` deferred to the caller. -/
+theorem two_mul_dvd_of_dvd_of_odd {a m : ℕ} (hdvd : a ∣ m) (ha : Odd a) (hm : Even m) :
+    2 * a ∣ m :=
+  ha.coprime_two_left.mul_dvd_of_dvd_of_dvd hm.two_dvd hdvd
+
+/-- **Peterfalvi (9.11): the strict `lb12` bound `2·a < p−1` off the equality (`<` form).**
+
+The strict companion of `two_mul_le_of_dvd_of_odd`: when the `lb12` equality clause fails
+(`2·a ≠ p−1`, i.e. `a ≠ (p−1)/2`) the squeeze `lb1 ≤ lb2` is strict.  Pure `ℕ`; `m = p−1`
+deferred. -/
+theorem two_mul_lt_of_dvd_of_odd_of_ne {a m : ℕ} (hdvd : a ∣ m) (ha : Odd a) (hm : Even m)
+    (hm0 : 0 < m) (hne : 2 * a ≠ m) : 2 * a < m :=
+  lt_of_le_of_ne (two_mul_le_of_dvd_of_odd hdvd ha hm hm0) hne
+
+/-- **Peterfalvi (9.11): the `lb23` subgroup-index monotonicity `[U:C] ≤ [U:U']` (`≤` form).**
+
+Coq `PFsection9.v:1590` `have lb23: lb2 <= lb3 ?= iff (C :==: U')`, with `lb2 = (p−1)·q²·u`,
+`lb3 = (p−1)·q²·[U:U']` and `u = [U:C]`.  After cancelling `(p−1)·q²` the content is Lagrange
+monotonicity of relative index: for nested subgroups `U' ≤ C ≤ U`, the relative index `[U:C]`
+(`= C.relIndex U`) divides `[U:U']` (`Subgroup.relIndex_dvd_of_le_left`, the `U' ≤ C` half), so
+`[U:C] ≤ [U:U']` (`Nat.le_of_dvd`, `[U:U'] > 0` from finiteness).  Stated group-theoretically over
+an abstract finite group `Γ`; the caller identifies `u = [U:C]`, `[U:U']`, `p−1`, `q²` and the
+ambient group.  (`_hCU : C ≤ U` records the full `U' ≤ C ≤ U` nesting of the `lb23` datum; the `≤`
+bound itself needs only `U' ≤ C`, the strict/equality companion below uses both.) -/
+theorem relIndex_le_relIndex_of_le {Γ : Type*} [Group Γ] [Finite Γ] {U' C U : Subgroup Γ}
+    (hU'C : U' ≤ C) (_hCU : C ≤ U) : C.relIndex U ≤ U'.relIndex U :=
+  Nat.le_of_dvd (Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite)
+    (Subgroup.relIndex_dvd_of_le_left U hU'C)
+
+/-- **Peterfalvi (9.11): the strict `lb23` bound off the equality (`C ≠ U' ⟹ [U:C]<[U:U']`).**
+
+The strict companion of `relIndex_le_relIndex_of_le` supplying the `lb23` `?= iff (C:==:U')` clause.
+From `[U:U'] = [C:U']·[U:C]` (`Subgroup.relIndex_mul_relIndex`, `U' ≤ C ≤ U`), equality
+`[U:C] = [U:U']` forces `[C:U'] = 1` (cancel the positive `[U:U']`), i.e. `C ≤ U'`
+(`Subgroup.relIndex_eq_one`); with `U' ≤ C` this is `C = U'`.  Contrapositive: `C ≠ U'` makes the
+`lb23` squeeze strict.  Group-theoretic over a finite `Γ`; identification deferred to the caller. -/
+theorem relIndex_lt_relIndex_of_le_of_ne {Γ : Type*} [Group Γ] [Finite Γ] {U' C U : Subgroup Γ}
+    (hU'C : U' ≤ C) (hCU : C ≤ U) (hne : C ≠ U') : C.relIndex U < U'.relIndex U := by
+  refine lt_of_le_of_ne (relIndex_le_relIndex_of_le hU'C hCU) ?_
+  intro heq
+  have hcomp : U'.relIndex C * C.relIndex U = U'.relIndex U :=
+    Subgroup.relIndex_mul_relIndex U' C U hU'C hCU
+  rw [heq] at hcomp
+  have hpos : 0 < U'.relIndex U := Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite
+  have hone : U'.relIndex C = 1 :=
+    Nat.eq_of_mul_eq_mul_right hpos (by rw [one_mul]; exact hcomp)
+  exact hne (le_antisymm (Subgroup.relIndex_eq_one.mp hone) hU'C)
+
 /-! ### Remaining (9.11.1)-(9.11.8) induction steps (outline, honest verdict 2026-07-06)
 
 With the `Snorm`/`sumnS` quantity (above), the `extend_coherent` positive engine
@@ -505,11 +571,12 @@ firing precondition (`two_mul_lt_normalizedDegreeSq_of_lb0_lt_sumnS`), and the b
 (`lb0_le_lb1_of_degreeRatio_le`) landed, the residual for the full (9.11) non-Galois coherence is:
 
 * **(9.11.2)-(9.11.4)** — the *middle* squeeze steps `lb1 ≤ lb2 ≤ lb3` (Coq `lb12`/`lb23`,
-  `PFsection9.v:1571-1596`).  These are `ℕ`-index monotonicities forcing `a = (p−1)/2` and `C = U'`
-  (`lb12` uses `Gauss_dvd`/`dvdn_leq`; `lb23` uses `Lagrange`/`subset_leqif_cards`).  Each is a
-  self-contained arithmetic `leif` on group indices, composable from the existing `ℕ` gap leaves
-  (`two_mul_lt_sq_of_commonIndex_primePower_gap`, `S07_Coherence.lean:1986`) plus `Nat` index lemmas;
-  no new analytic content.
+  `PFsection9.v:1571-1596`).  **Landed** as pure lemmas above: `lb12` = `two_mul_le_of_dvd_of_odd`
+  (+ `two_mul_dvd_of_dvd_of_odd`/`two_mul_lt_of_dvd_of_odd_of_ne` for the `?= iff (a==p.-1./2)`
+  equality clause; `a ∣ (p−1)` + `a` odd + `p−1` even ⟹ `2·a ∣ (p−1)` by Gauss), and `lb23` =
+  `relIndex_le_relIndex_of_le` (+ `relIndex_lt_relIndex_of_le_of_ne` for the `?= iff (C:==:U')`
+  clause; Lagrange `[U:U'] = [C:U']·[U:C]` for `U' ≤ C ≤ U`).  The caller multiplies `lb12` by
+  `q²·u` and `lb23` by `(p−1)·q²` and identifies `u = [U:C]`.  No new analytic content.
 * **(9.11.5)** — `lb3 ≤ sumnS S1'` (Coq `lb3S1'`, `PFsection9.v:1596`): the uniform sub-family `S1'`
   has every member of degree `q·a`, so `Snorm ≡ (q·a)²` on it and `sumnS S1' = |S1'|·(q·a)²`; combine
   with the base-case lower bound `|S1| ≥ (p−1)·u/a²` (Coq `lb_Sqa`, the type-P `lb_Sqa` datum).  The
