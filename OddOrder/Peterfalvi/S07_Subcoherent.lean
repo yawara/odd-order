@@ -174,51 +174,41 @@ noncomputable def irrSubcoherent (τ : IntegralCharacterMap L G) (A : Set L)
 attempted in this session; each item names the Coq mirror and the existing repo
 pieces it would compose from.
 
-1. **`prDade_subcoherent`** (Coq `PFsection5.v:683`, "(5.3)(b)").  Specializes
-   `irr_subcoherent` to the **prime-Dade** setting: `S ⊆ seqIndD K L H 1`, the
-   Dade map `τ = Dade ddA`, and — crucially — pins the `R`-datum on the
-   *reducible* members `μ_j = primeTIred` to the explicit cyclic-TI value
-   `Rmu j = dsw j j ++ map -%R (dsw j (conjC_Iirr j))`.
-   *Blocked on*: the §3/§4 **prime-TI machinery** (`primeTIred`, `cyclicTIiso`,
-   `primeTIsign`, `cyclicTIirr`) — **absent in the repo** (grep 0 refs, confirmed
-   in issue 1017 RE-DIAGNOSIS).  This is the single largest missing block and is
-   an ungated, unowned shared-infra leaf (claim under a 9000-series issue before
-   building).  The irreducible-member part reuses `irrSubcoherent`; only the
-   reducible-column `Rmu` needs the new prime-TI values.
+**⚠ CORRECTED 2026-07-06** (prior draft of this note falsely claimed the prime-TI
+machinery is "absent, grep 0 refs" and listed `prDade_subcoherent` as the gate —
+both wrong, a Coq-name-grep false-negative, disproven by verify-first):
 
-2. **`FTtypeP_subcoherent`** (Coq `PFsection8.v:819`).  A thin instantiation of
-   item 1 at the Feit–Thompson type-P data: `K = M`_s`, `A = 'A(M)`,
-   `A0 = 'A0(M)`, via `FT_prDade_hyp` (`PFsection8.v:800`).  Reuses the repo's
-   `FTtypeP`/`Hypothesis M` type-P infrastructure (S08/S12).  Once item 1 lands
-   this is mechanical.
+1. **`prDade_subcoherent`** (Coq `PFsection5.v:683`) does **NOT** need building.
+   Its content is **already in the repo, sorry-free**: the prime-TI machinery is
+   present under `certainType`/`columnFamily` names — the reducible-column `Rmu`
+   R-datum is `S06.certainTypeR` (`S06_CertainTypeCoherence.lean:639`), and its
+   coherence-free form `columnImageFamilyCohFree` (`S12_…_Core.lean:5619`).  The
+   full (5.2.d)+(5.2.e) per-member R-datum + cross-orthogonality is **already
+   assembled as `sixTwoDecompositionData`** (`S13_SixTwoBridge.lean:814`,
+   sorry-free, from the issue-2022 lane-a loops).  Moreover a `prDade`-shaped
+   `S07.Hypothesis` is **impossible** (Coq `subcoherent`'s `R` is variable-length
+   — `2` for irreducibles, `2w₁` for reducible `μ_j` — while `S07.Hypothesis`'s
+   `difference_image` hardcodes a 2-element `CharacterDifferenceImage`) **and has
+   zero consumers** (every `S07.Hypothesis`/`IsCoherent` consumer takes an
+   irreducible-only family; the reducible-column coherence is consumed directly
+   as `S07.IsCoherent` via `certainType_isCoherent`, `S06:505`, in the §8 (6.8)
+   case-B capstone).  So `irrSubcoherent` (irreducible producer) is the only
+   `S07.Hypothesis`-form piece needed.
 
-3. **(9.11) `Ptype_core_coherence`** (Coq `PFsection9.v:1484`,
-   `coherent (S_ H0C') M^#`).  The honest route (issue 1017, lane-b update):
-   an 8-step induction over the derived-series filtration that at each step
-   invokes `coherent_of_constant_degree` (already proven `= uniform_degree_coherence`,
-   `S07_CoherenceConstantDegree.lean`) on a uniform-degree sub-family cut out by
-   `subset_subcoherent` from `FTtypeP_subcoherent` (item 2).  Composes from:
-   `coherent_of_constant_degree` (have), item 2 (missing), and a
-   `subset_subcoherent`-analog — i.e. **restrict `S07.Hypothesis` to a
-   `cfConjC_subset` sub-family** (Coq `subset_subcoherent`, `PFsection5.v:845`),
-   a small, ungated lemma reachable *now* on top of `irrSubcoherent`
-   (next-session candidate: `Hypothesis.restrict`).
+2. **The real gate is the (13.3) coherence route**, not `prDade`.  `coherent_H0Cprime_S`
+   (`S15_SAndT_Setup.lean:572`) → `coherent_H0C_commutator` (S11) currently routes
+   through `sibleyTarget_H0C` (S11:7775, sorried, **likely-UNSOUND** — `PU ≠ C'`
+   kernel contradiction, same defect class as the reverted issue 2032).  Honest
+   fix = re-ground it on the **(9.11) `Ptype_core_coherence`** 8-step derived-series
+   induction (Coq `PFsection9.v:1484`), which composes `subset_subcoherent`
+   (restrict a subcoherent family to a `cfConjC_subset`, Coq `PFsection5.v:845`) +
+   `coherent_of_constant_degree` (= `uniform_degree_coherence`, **already proven**,
+   `S07_CoherenceConstantDegree.lean:551`), with `sixTwoDecompositionData` as the
+   subcoherent supply.  Lane a's (10.7) `typeII_derived_frobenius` consumes the
+   same (9.11) coherence.
 
-4. **(10.7) `typeII_derived_frobenius`** (`S12_MaximalIII_IV_V_Core.lean:47`;
-   Coq `Frob_der1_type2`, `PFsection10.v:549`).  Consumes item 3's coherence on
-   the 4-element uniform family `T2` (lane a's (10.8) `typeII_coherence_..._estimate`
-   hB side).  Also needs `IsTypeF (derivedInG S)` upgrade (issue 1017 item 3).
-
-5. **(13.3) `character_degree_analysis` τ₁-coherence** (lane b).  Currently routed
-   through `sibleyTarget_H0C` (S11), flagged **likely-unsound** (issue 1017
-   2026-07-06 update: `PU ≠ C'` kernel contradiction, same defect class as issue
-   2032).  Honest fix = re-ground `coherent_H0Cprime_S` on the item 3 route
-   (subcoherent + `coherent_of_constant_degree`), a signature-preserving internal
-   re-proof, *after* items 1–3 land.
-
-**Reachable now (next session, no prime-TI needed)**: `Hypothesis.restrict`
-(item 3's `subset_subcoherent`) and further `irrSubcoherent`-based API.  Item 1
-(prime-TI) is the true gate for everything downstream and should be claimed as
-shared infra first. -/
+**Reachable now (next, no new prime-TI)**: `Hypothesis.restrict` /
+`subset_subcoherent` (small, ungated, on top of `irrSubcoherent`), then the (9.11)
+re-grounding of `coherent_H0Cprime_S`. Tracking = issue 1017. -/
 
 end OddOrder.Peterfalvi.S07
