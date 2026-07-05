@@ -4187,6 +4187,118 @@ theorem hInHu_inf_uInHu_le_cuInHu [Finite G] (caseA : CliffordCaseAData chars) :
     hInHu data ⊓ uInHu data ≤ cuInHu caseA :=
   (hInHu_inf_uInHu_le_cInHu data chief).trans (cInHu_le_cuInHu caseA)
 
+/-- **`H ⊓ C_U(S₀) = ⊥`** realized (`hInHu ⊓ cuInHu = ⊥`).  Since `C_U(S₀) ≤ U`, an element of
+`hInHu ⊓ cuInHu` has `G`-image in `H ⊓ U = ⊥` (a type-P setup, `typeP_H_inf_U`), so it is trivial.
+This is the trivial-intersection input `H ⊓ C_U(S₀) = ⊥` that makes the second isomorphism
+`(H·C_U(S₀))/C_U(S₀) ≅ H` (used to build the `θ₁·λ` source character on `H·C_U(S₀)`), mirroring
+`hInHu_inf_cInHu_eq_bot` for the (9.8.c) `hcLambdaHom`. -/
+theorem hInHu_inf_cuInHu_eq_bot [Finite G] (caseA : CliffordCaseAData chars) :
+    hInHu data ⊓ cuInHu caseA = ⊥ := by
+  rw [eq_bot_iff]
+  intro x hx
+  obtain ⟨hxH, hxC⟩ := Subgroup.mem_inf.mp hx
+  have hxU := cuInHu_le_uInHu caseA hxC
+  rw [Subgroup.mem_bot]
+  have hxH' : x ∈ (data.H.subgroupOf M).subgroupOf (huSub data) := hxH
+  have hxU' : x ∈ (data.U.subgroupOf M).subgroupOf (huSub data) := hxU
+  have keyH : ((x : ↥M) : G) ∈ data.H :=
+    Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp hxH')
+  have keyU : ((x : ↥M) : G) ∈ data.U :=
+    Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp hxU')
+  have key : ((x : ↥M) : G) ∈ data.typeP.H ⊓ data.typeP.U := ⟨keyH, keyU⟩
+  rw [typeP_H_inf_U data.typeP, Subgroup.mem_bot] at key
+  exact Subtype.ext (Subtype.ext key)
+
+/-- **`H·C_U(S₀) = C_U(S₀)·H`** (spelling bridge, mirrors `hcRealized_eq_cInHu_sup_hInHu`): the
+`sup_comm` reorientation of the (9.8.d) inertia subgroup, used to phrase the `λ`-lift channel
+`hcuLambdaHom` via the second isomorphism `(C_U(S₀)·H)/H ≅ C_U(S₀)`. -/
+theorem hcuInHu_eq_cuInHu_sup_hInHu (caseA : CliffordCaseAData chars) :
+    hInHu data ⊔ cuInHu caseA = cuInHu caseA ⊔ hInHu data :=
+  sup_comm _ _
+
+/-- `C_U(S₀) ≤ H·C_U(S₀)` (mirrors `cInHu_le_hcRealized`): `cuInHu` is contained in the inertia
+subgroup `hInHu ⊔ cuInHu`. -/
+theorem cuInHu_le_hcuInHu (caseA : CliffordCaseAData chars) :
+    cuInHu caseA ≤ hInHu data ⊔ cuInHu caseA :=
+  le_sup_right
+
+/-- **The `λ`-lift `H·C_U(S₀) →* ℂˣ`** of a linear character `λ : C_U(S₀) →* ℂˣ` (the `C`-factor of
+the (9.8.d) pair character `θ₁·λ`): the composite `H·C_U(S₀) → H·C_U(S₀)/H ≅ C_U(S₀)/(C_U(S₀) ⊓ H)
+= C_U(S₀) —λ→ ℂˣ`, using the trivial intersection `H ⊓ C_U(S₀) = ⊥` (`hInHu_inf_cuInHu_eq_bot`).
+Mirrors the (9.9.c) `hcLambdaHom` rewired from `cInHu` to `cuInHu`; `hInHu` is normal in the sup, so
+the quotient map is well-defined.  Kills `H` (`hcuLambdaHom_eq_one_of_mem_hInHu`) and restricts to
+`λ` on `C_U(S₀)` (`hcuLambdaHom_inclusion`). -/
+noncomputable def hcuLambdaHom [Finite G] (caseA : CliffordCaseAData chars)
+    (lam : ↥(cuInHu caseA) →* ℂˣ) :
+    ↥(hInHu data ⊔ cuInHu caseA) →* ℂˣ :=
+  haveI := hInHu_normal data
+  letI : ((hInHu data).subgroupOf (cuInHu caseA ⊔ hInHu data)).Normal :=
+    (hInHu_normal data).subgroupOf _
+  (QuotientGroup.lift ((hInHu data).subgroupOf (cuInHu caseA)) lam
+      (fun x hx => by
+        have hx1 : x = 1 := by
+          have hmem : (x : ↥(huSub data)) ∈ hInHu data ⊓ cuInHu caseA :=
+            ⟨Subgroup.mem_subgroupOf.mp hx, x.2⟩
+          rw [hInHu_inf_cuInHu_eq_bot caseA, Subgroup.mem_bot] at hmem
+          exact Subtype.ext hmem
+        rw [hx1]
+        exact lam.ker.one_mem)).comp
+    ((QuotientGroup.quotientInfEquivProdNormalQuotient (cuInHu caseA)
+        (hInHu data)).symm.toMonoidHom.comp
+      ((QuotientGroup.mk' ((hInHu data).subgroupOf (cuInHu caseA ⊔ hInHu data))).comp
+        (MulEquiv.subgroupCongr (hcuInHu_eq_cuInHu_sup_hInHu caseA)).toMonoidHom))
+
+/-- **`hcuLambdaHom` kills `H`** (mirrors `hcLambdaHom_eq_one_of_mem_hInHu`): the `λ`-lift is trivial
+on the `H`-part of `H·C_U(S₀)` (the quotient map by `hInHu` kills it).  So the pair character
+`θ₁·λ` restricts on `hInHu` to the plain seed inflation `θ₀`, and the (9.8.d) inertia lift
+`inertia_eq_hcuInHu` applies to the pair unchanged. -/
+theorem hcuLambdaHom_eq_one_of_mem_hInHu [Finite G] (caseA : CliffordCaseAData chars)
+    (lam : ↥(cuInHu caseA) →* ℂˣ)
+    {x : ↥(hInHu data ⊔ cuInHu caseA)}
+    (hx : x ∈ (hInHu data).subgroupOf (hInHu data ⊔ cuInHu caseA)) :
+    hcuLambdaHom caseA lam x = 1 := by
+  haveI := hInHu_normal data
+  letI : ((hInHu data).subgroupOf (cuInHu caseA ⊔ hInHu data)).Normal :=
+    (hInHu_normal data).subgroupOf _
+  simp only [hcuLambdaHom, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom,
+    QuotientGroup.mk'_apply]
+  have hmem : (MulEquiv.subgroupCongr (hcuInHu_eq_cuInHu_sup_hInHu caseA)) x
+      ∈ (hInHu data).subgroupOf (cuInHu caseA ⊔ hInHu data) :=
+    Subgroup.mem_subgroupOf.mpr (Subgroup.mem_subgroupOf.mp hx)
+  rw [(QuotientGroup.eq_one_iff _).mpr hmem, map_one, map_one]
+
+/-- **`hcuLambdaHom` restricts to `λ` on `C_U(S₀)`** (mirrors `hcLambdaHom_inclusion`): on the
+inclusion of `c ∈ cuInHu` into `H·C_U(S₀)`, the `λ`-lift returns `λ c`.  The second iso sends the
+`cuInHu`-class to the `H·C_U(S₀)`-class via inclusion (`hfwd`), so the reversed iso undoes the
+quotient map and the lift evaluates `λ`. -/
+theorem hcuLambdaHom_inclusion [Finite G] (caseA : CliffordCaseAData chars)
+    (lam : ↥(cuInHu caseA) →* ℂˣ) (c : ↥(cuInHu caseA)) :
+    hcuLambdaHom caseA lam (Subgroup.inclusion (cuInHu_le_hcuInHu caseA) c) = lam c := by
+  haveI := hInHu_normal data
+  letI : ((hInHu data).subgroupOf (cuInHu caseA ⊔ hInHu data)).Normal :=
+    (hInHu_normal data).subgroupOf _
+  have hfwd : (QuotientGroup.quotientInfEquivProdNormalQuotient (cuInHu caseA)
+        (hInHu data))
+      (QuotientGroup.mk' _ c)
+      = QuotientGroup.mk' _ (Subgroup.inclusion le_sup_left c) := by
+    simp only [QuotientGroup.quotientInfEquivProdNormalQuotient,
+      QuotientGroup.quotientInfEquivProdNormalizerQuotient, MulEquiv.trans_apply,
+      QuotientGroup.quotientMulEquivOfEq_mk, QuotientGroup.quotientKerEquivOfSurjective,
+      QuotientGroup.quotientKerEquivOfRightInverse, MulEquiv.coe_mk, MulEquiv.symm_mk,
+      MonoidHom.toMulEquiv_apply, QuotientGroup.kerLift_mk]
+    rfl
+  simp only [hcuLambdaHom, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom]
+  have hcongr : (MulEquiv.subgroupCongr (hcuInHu_eq_cuInHu_sup_hInHu caseA))
+      (Subgroup.inclusion (cuInHu_le_hcuInHu caseA) c)
+      = Subgroup.inclusion le_sup_left c := by
+    apply Subtype.ext
+    rfl
+  rw [hcongr, QuotientGroup.mk'_apply, show ((Subgroup.inclusion le_sup_left c :
+      ↥(cuInHu caseA ⊔ hInHu data)) : ↥(cuInHu caseA ⊔ hInHu data)
+        ⧸ (hInHu data).subgroupOf (cuInHu caseA ⊔ hInHu data))
+      = QuotientGroup.mk' _ (Subgroup.inclusion le_sup_left c) from rfl, ← hfwd,
+    MulEquiv.symm_apply_apply, QuotientGroup.mk'_apply, QuotientGroup.lift_mk]
+
 /-- **`U ⊓ H·C_U(S₀) = C_U(S₀)`** realized (`uInHu ⊓ (hInHu ⊔ cuInHu) = cuInHu`), the second-iso
 input for `[HU : H·C_U(S₀)] = [U : C_U(S₀)]`.  Mirrors `uInHu_inf_hcInHu_eq_cInHu`. -/
 theorem uInHu_inf_hcuInHu_eq_cuInHu [Finite G] (caseA : CliffordCaseAData chars) :
@@ -10500,11 +10612,28 @@ The `S₀`-summand decomposition `H̄ = S₀ ⊕ W` is `chiefFactor_caseA_S0_com
 `HU`-inertia is exactly `H·C_U(S₀)`, of index `[HU:H·C_U(S₀)] = a` (`index_hcuInHu_eq_caseA_a`),
 giving source degree `a` and `M`-induction degree `qa`.
 
-**Still open** (next session — the count pipeline): (ii) the full `θ₁·λ` source-character
-construction on `H·C_U(S₀)` (mirror `hcPsi`/`hcPsiPair` rewired from `cSub`=`C` to `cuSub`=`C_U(S₀)`:
-`θ₁`-inflation times the `λ`-lift for `λ ∈ Irr(C_U(S₀)/U')`), feeding `inertia_eq_hcuInHu` to the
-`hcZeta_irreducible`-analog for irreducibility; (iii) the membership `Ind_{HU}^M χ ∈ 𝒮(H₀U')` (θ₁
-nontrivial ⟹ `H₀U' ⊆ Ker`); (iv) the count bijection giving
+**Pair-character substrate (landed).**  The `C`-factor of the (9.8.d) pair character `θ₁·λ` is now
+built as `hcuLambdaHom` (`H·C_U(S₀) →* ℂˣ`, the `λ`-lift of `λ : C_U(S₀) →* ℂˣ` through the
+`H`-quotient `(C_U(S₀)·H)/H ≅ C_U(S₀)`), with `hcuLambdaHom_eq_one_of_mem_hInHu` (kills `H`) and
+`hcuLambdaHom_inclusion` (restricts to `λ`).  Its well-definedness rests on the new trivial
+intersection `hInHu_inf_cuInHu_eq_bot` (`H ⊓ C_U(S₀) = ⊥`, from `H ⊓ U = ⊥`) — the single-factor
+analog of `hInHu_inf_cInHu_eq_bot`.  These directly mirror the (9.9.c) `hcLambdaHom` channel
+(rewired `cInHu → cuInHu`), and are honest reusable substrate for the pair hom.
+
+**Still open** (next session — the count pipeline): (ii) the `θ₁`-factor and the full `θ₁·λ` pair
+hom on `H·C_U(S₀)`.  Unlike (9.8.c), the seed inflation `θ₀` **cannot** be built by killing
+`C_U(S₀)`: `C_U(S₀)` is *not* normal in `H·C_U(S₀)` (only `H` is; `H·C_U(S₀) = H ⋊ C_U(S₀)` is a
+genuine semidirect product), so there is no `hcuHom` mirror of `hcHom`.  Instead the pair hom
+`θ₁·λ = (θ₀-extension)·(hcuLambdaHom λ)` needs an *extension* of the `C_U(S₀)`-invariant linear `θ₀`
+from `H` to `H·C_U(S₀)` — the invariance is `cuInHu_le_inertia_of_complement_triv`
+(`conjBy c θ₀ = θ₀`), and the extension is either (a) `SemidirectProduct.lift` after the internal
+`H·C_U(S₀) ≃* H ⋊[φ] C_U(S₀)` from the complement `hInHu_inf_cuInHu_eq_bot` + `sup = ⊤`, with the
+`C`-invariance discharging `lift`'s `fn (φ g n) = fn n` hypothesis; or (b) Isaacs 8.16
+(`CanonicalCharacterExtension`, abelian coprime quotient `(sup)/H ≅ C_U(S₀)`, `|H| ⟂ |U|`).
+Then `inertia_eq_hcuInHu` feeds the `hcZeta_irreducible`-analog (via
+`isIrreducibleCharacter_induce_of_inertia_eq`) for irreducibility of degree `a`; (iii) the membership
+`Ind_{HU}^M χ ∈ 𝒮(H₀U')` (θ₁ nontrivial on `S₀ = H₁`, trivial on `H₂…H_q`, `λ` trivial on `U'`
+⟹ `H₀U' ⊆ Ker`); (iv) the count bijection giving
 `((p-1)/a)·|C_U(S₀):U'| = ((p-1)/a)·(|U|/(a|U'|))` distinct members (mirror `oXtheta_count`; needs
 `U' ≤ C_U(S₀)`, extractable from the `hcentral_triv` step of `chiefFactor_caseB_image_cyclic`). -/
 theorem caseA_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
