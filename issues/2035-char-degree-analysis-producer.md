@@ -458,3 +458,20 @@ agent が probe → coupling wall 確認 → 綺麗に revert、net-zero/green)�
 **次 session 推奨**: (13.3) を直接触らず、上記 **S15→S13 Hypothesis bridge + grid reconciliation** を
 専用 session で。それまで `character_degree_analysis` の単一 sorry を fan-out しない (undischargeable
 hypotheses に分解するのは net-negative)。
+
+## 2026-07-06 更新 #3 (lane b, 型検証): S13-bridge 診断は誤り — 型 II vs III/IV 不整合。route A (S11) が正
+
+更新 #2 の「S15→S13 Hypothesis bridge」推奨は **型不整合で無効と判明**:
+- `S13.Hypothesis` (S13_MaximalIII_IV.lean:108) は **`type_alt : IsTypeIII M ∨ IsTypeIV M`** (:122) を
+  要求。しかし `hyp.S` は **type II** (`S_typeP2` → `isTypeII_of_isTypeP2`)。⟹ `coherent_S_of_coherent_SH0C`
+  (:1192、S13.Hypothesis 経由ゆえ **type III/IV 専用**) は type-II `hyp.S` に**適用不可**。S13 route は dead-end。
+- **正しい (13.3) type-II path = route A via S11** (issue 冒頭の設計に回帰):
+  1. `toTypesIIIIIIVSetupS` (S15:458, **sorry-free 既存**) で S15→S11.TypesIIIIIIVSetup(hyp.S) — type II/III/IV 汎用ゆえ type-II OK。
+  2. **honest `Section11CharacterData` for hyp.S** — ∅-placeholder (`mkSection11CharacterDataS` は
+     H0CprimeSupport:=∅/count-only) を避け、実 H0CprimeSupport = (H₀ ⊔ C')^# + 実 Dade tau
+     (S15 `H_sharp_dadeHypothesis` の (S,(H₀C')^#)-版を mirror)。**これが実 gate**。
+  3. `coherent_H0C_commutator` (S11:6361, TypesIIIIIIVSetup 汎用) → `IsCoherent`。`sibleyTarget_H0C`
+     (S11:6348 sorried §14) を sorried-cite。
+  4. coherence.extension = tau1S → (13.3) の tau1S_* fields を discharge。
+- **建設順**: honest Section11CharacterData (step 2) が最初の substantial build。実 support は構成可
+  ((H₀⊔C')^#)、実 Dade tau が hard 部 (S04 Hypothesis for (S,(H₀C')^#))。multi-session。
