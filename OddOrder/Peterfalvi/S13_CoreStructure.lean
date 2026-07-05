@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S13_MaximalIII_IV
+import OddOrder.Peterfalvi.S13_ElementaryAbelianKernel
 
 /-!
 # Peterfalvi Section 13: the core structure of `H` and `U` ((11.6)--(11.8))
@@ -1140,10 +1141,53 @@ case by `caseA_fixed_contradiction` fed by the exponent chain (`chain_exponent_e
 the dichotomy and the case-A `W₁`-chain relation is the remaining work; left as this named crux so
 the two elementary-abelian/order corollaries below are sorry-free once it lands.
 See `notes/peterfalvi/s13_11_8_orthogonality.md`. -/
-theorem chief_H0_eq_bot [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+theorem chief_H0_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) :
     hyp.chief.H0 = ⊥ := by
-  sorry
+  classical
+  by_contra hne
+  -- `s11Setup.typeP.H = base.typeP.H` (the (11.2) shared type-`P` structure)
+  have hHH : hyp.s11Setup.typeP.H = hyp.base.typeP.H := by rw [hyp.setup_typeP_eq]
+  -- `chief.N ≠ ⊥` (else `H₀ = N.map subtype = ⊥`)
+  have hNne : hyp.chief.N ≠ ⊥ := by
+    intro hN0
+    exact hne (by rw [hyp.chief.H0_eq, hN0, Subgroup.map_bot])
+  -- `chief.p = hyp.p = |W₂|`
+  have hp_eq : hyp.chief.p = hyp.p := by
+    have h2 := hyp.chief.typeIII_IV_p_eq_W2 (hyp.base.isTypeIIIorIV hG)
+    rw [hyp.s11Setup_card_W2_eq] at h2
+    exact h2.symm
+  -- `H₀ = H' = derivedInG (s11Setup.typeP.H)` ((11.6) `H0_eq_Hprime`)
+  have hH0deriv : hyp.chief.H0 = derivedInG hyp.s11Setup.typeP.H := by
+    rw [hyp.H0_eq_Hprime hG, hyp.Hprime_eq, ← hHH]
+  -- **case-B hypotheses of `chiefKernel_caseB_false`**
+  have hpK : IsPGroup hyp.chief.p ↥hyp.s11Setup.H := by
+    show IsPGroup hyp.chief.p ↥hyp.s11Setup.typeP.H
+    rw [hp_eq, hHH]; exact hyp.H_isPGroup hG
+  have hNcomm : hyp.chief.N = commutator ↥hyp.s11Setup.H := by
+    apply Subgroup.map_injective (hyp.s11Setup.typeP.H).subtype_injective
+    rw [← hyp.chief.H0_eq, hH0deriv]; rfl
+  have hqodd : Odd hyp.s11Setup.q := by
+    rw [hyp.s11Setup_q_eq]; exact (hyp.p_q_distinct_odd_primes hG).2.2.2.1
+  rcases OddOrder.Peterfalvi.S11.chiefFactor_clifford_U_dichotomy hyp.chief with
+    hirrB | ⟨S₀, hS₀ne, _hS₀inv, _hS₀card, _hS₀sub⟩
+  · -- **case (b)**: `U` acts irreducibly on `H̄`; parity `|Ĥ| = p^{q+1}` (`q` odd) is impossible.
+    -- `U` centralizes `chief.N` (via `U_centralizes_H0`: conjugation of `H₀`-elements is trivial).
+    refine chiefKernel_caseB_false hyp.chief hpK hNcomm ?_ hqodd hNne hirrB
+    intro u n hn
+    have hnH0 : (n : G) ∈ hyp.chief.H0 := by rw [hyp.chief.H0_eq]; exact ⟨n, hn, rfl⟩
+    have huU : ((↑u : ↥(hyp.s11Setup.typeP.U ⊔ hyp.s11Setup.typeP.W1)) : G) ∈ hyp.U := by
+      rw [← hyp.s11Setup_U_eq]
+      exact Subgroup.mem_subgroupOf.mp u.2
+    refine Subtype.ext ?_
+    rw [OddOrder.Peterfalvi.S11.typeP_conjAction_apply hyp.s11Setup.typeP ↑u n]
+    have hcent := Subgroup.mem_centralizer_iff.mp (U_centralizes_H0 hyp huU) (n : G) hnH0
+    rw [← hcent]; group
+  · -- **case (a)**: `U` fixes the order-`p` factor `S₀` pointwise — the `W₁`-exponent-chain content
+    -- (`exists_exponent_fun_of_card_prime` + the Frobenius chain relation `e(v)·e(σv)=1` +
+    -- `chain_exponent_eq_one`), the sole genuine remaining input; then `caseA_fixed_contradiction`.
+    refine caseA_fixed_contradiction hyp.chief hS₀ne ?_
+    sorry
 
 /-- **Peterfalvi (11.7)**: `H` is elementary abelian of order `p^q`, and `H_0 = 1`.
 
