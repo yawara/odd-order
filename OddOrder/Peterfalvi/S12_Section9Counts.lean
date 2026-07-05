@@ -1396,34 +1396,6 @@ theorem Hypothesis.card_SHCSet_filter_eq_charParam_n_of_card_abelianization_eq [
   rw [mul_comm hyp.w1] at hnw
   exact (Nat.eq_of_mul_eq_mul_right hw1pos hnw).symm
 
-open scoped Classical FiniteInduce in
-/-- **Peterfalvi (11.8.1), `|S(HC)| = n`** (§9 count, named obligation).  The number of degree-`w₁`
-irreducible members of `S = inducedFamily M` equals `n = (d − δ)/w₁ = (d − 1)/w₁`.  `S(HC) = S₁`
-consists of the `(u − 1)/q` degree-`q = w₁` irreducible constituents of the constant-degree Frobenius
-family `(U/C) ⋊ W₁`, so `|S(HC)| = (u − 1)/q = (d − 1)/w₁ = n` by (11.8.1).  This is the cardinality
-matching the isometric coherent image (`exists_coherentImage_SHC`, `|R| = |S(HC)|`) to `n`.
-
-The orbit count `|M'{}^{ab}| = w₁·|S(HC)| + 1` and the `n·w₁ = d − 1` arithmetic are discharged by
-`card_SHCSet_filter_eq_charParam_n_of_card_abelianization_eq` (sorry-free); the single remaining
-input is `|M'/M''| = d` (below). -/
-theorem Hypothesis.card_SHCSet_filter_eq_charParam_n [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
-    (htype : IsTypeIII M ∨ IsTypeIV M)
-    (params : CharacterParameters hyp) (hmu : params.mu = hyp.muGrid hG hG.odd)
-    (hδpm : params.delta = 1 ∨ params.delta = -1) :
-    (Finset.univ.filter (fun χ : IrreducibleCharacter ↥M =>
-      (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
-        ((χ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (hyp.w1 : ℂ))).card = params.n := by
-  haveI := hyp.finiteG
-  refine hyp.card_SHCSet_filter_eq_charParam_n_of_card_abelianization_eq hG params
-    (hyp.charParam_delta_eq_one hG htype params hmu hδpm) ?_
-  -- **The remaining (11.5)/(11.7) gate**: `|M'/M''| = u = d`.  `Abelianization M' = M'/M''`;
-  -- by (11.5) `M'' = HC` (`S13.secondDerived_eq_HC`) and (11.7) `H₀ = 1`, `M'/M'' = M'/HC ≅ U/C`,
-  -- of order `u = |Ū| = d` (`charParam_d_eq_u`).  This is the single subgroup-index equality
-  -- gating the count; (11.5)'s proof (currently S13) routes through the S12-level
-  -- `SHC_isCoherent`/`coherent_quotient_bound`, so relocating it upstream (or threading the
-  -- equality) closes this without new mathematics.  See `notes/peterfalvi/s13_11_8_orthogonality.md`.
-  sorry
 
 /-- **Structural index identity for the (11.8.1) count**: `|M'|·|C| = |HC|·|U|`, where
 `C = U ⊓ C_G(H)` and `HC = H ⊔ C`.  Since `M' = H ⋊ U` (`derived_complement`; `H ⊴ M'`,
@@ -1560,7 +1532,7 @@ Chains the three sorry-free pieces: `|M'{}^{ab}| = |U : C|`
 (`typePData_card_abelianization_derived_eq_relIndex_C`, given `M'' = HC`), `|U : C| = u`
 (`u_eq_relIndex_C`, given `H₀ = 1`), and `u = d` (`charParam_d_eq_u`).  The two hypotheses are
 Peterfalvi (11.5) `secondDerived_eq_HC` and (11.7) `H_elementaryAbelian` — proven in `S13`
-(downstream of this file), so `card_SHCSet_filter_eq_charParam_n` (above) discharges its
+(downstream of this file), so `card_SHCSet_filter_eq_charParam_n` (below) discharges its
 `|M'/M''| = d` obligation by threading them from the `FeitThompson` layer where `S13` is available. -/
 theorem Hypothesis.card_abelianization_derived_eq_charParam_d [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
@@ -1582,4 +1554,60 @@ theorem Hypothesis.card_abelianization_derived_eq_charParam_d [Finite G]
     hyp.charParam_d_eq_u hG htype params hmu hnt chief
   rw [h1, ← h2, h3]
 
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (11.8.1), `|S(HC)| = n`** (§9 count, named obligation).  The number of degree-`w₁`
+irreducible members of `S = inducedFamily M` equals `n = (d − δ)/w₁ = (d − 1)/w₁`.  `S(HC) = S₁`
+consists of the `(u − 1)/q` degree-`q = w₁` irreducible constituents of the constant-degree Frobenius
+family `(U/C) ⋊ W₁`, so `|S(HC)| = (u − 1)/q = (d − 1)/w₁ = n` by (11.8.1).  This is the cardinality
+matching the isometric coherent image (`exists_coherentImage_SHC`, `|R| = |S(HC)|`) to `n`.
+
+The orbit count `|M'{}^{ab}| = w₁·|S(HC)| + 1` and the `n·w₁ = d − 1` arithmetic are discharged by
+`card_SHCSet_filter_eq_charParam_n_of_card_abelianization_eq` (sorry-free); the remaining
+`|M'/M''| = d` input is assembled by `card_abelianization_derived_eq_charParam_d` from the two (11.5)/
+(11.7) structural facts threaded here: `hM2` (`M'' = HC`, Peterfalvi (11.5) `S13.secondDerived_eq_HC`)
+and `hHcard` (`|H| = |W₂|^{|W₁|} = p^q`, Peterfalvi (11.7)/(13.2.b) `S13.H_elementaryAbelian`), which
+force any chief kernel `N ◁ H` to be trivial (`H/N` has order `p^q = |H|`, so `|N| = 1`).  Both are
+`params`-free and expressed in the §12 `Hypothesis`; they are discharged at the `FeitThompson` layer
+(where `S13` is available).  See `notes/peterfalvi/s13_11_8_orthogonality.md`. -/
+theorem Hypothesis.card_SHCSet_filter_eq_charParam_n [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M)
+    (params : CharacterParameters hyp) (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hM2 : secondDerivedInAmbient M
+      = hyp.typeP.H ⊔ (hyp.typeP.U ⊓ Subgroup.centralizer (hyp.typeP.H : Set G)))
+    (hHcard : Nat.card ↥hyp.typeP.H = hyp.w2 ^ hyp.w1) :
+    (Finset.univ.filter (fun χ : IrreducibleCharacter ↥M =>
+      (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
+        ((χ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (hyp.w1 : ℂ))).card = params.n := by
+  haveI := hyp.finiteG
+  classical
+  refine hyp.card_SHCSet_filter_eq_charParam_n_of_card_abelianization_eq hG params
+    (hyp.charParam_delta_eq_one hG htype params hmu hδpm) ?_
+  -- **The remaining (11.5)/(11.7) gate**: `|M'/M''| = u = d`.  Obtain the §11 chief factor on
+  -- `M`, prove its kernel `N = ⊥` from `|H| = |W₂|^{|W₁|}` (any proper chief kernel would make
+  -- `|H/N| < |H|`), then assemble `|M'{}^{ab}| = d` via `card_abelianization_derived_eq_charParam_d`.
+  have hnt : TypePNontrivialCore M hyp.typeP :=
+    typePNontrivialCore_of_isTypeIIIorIV htype hyp.typeP
+  obtain ⟨chief, -⟩ := OddOrder.Peterfalvi.S11.exists_chiefFactorData hG
+    (hyp.toTypesIIIIIIVSetup htype hnt)
+  -- `chief.N = ⊥`: `|H/N| = chief.p ^ q = |W₂|^q = |H|`, so `|N| = 1`.
+  have hN : chief.N = ⊥ := by
+    haveI := chief.N_normal
+    -- `chief.p = |W₂| = w₂` for type III/IV.
+    have hpW2 : chief.p = hyp.w2 := (chief.typeIII_IV_p_eq_W2 htype).symm
+    -- `data.H = H` and `data.q = w₁` hold by `rfl` through the `TypesIIIIIIVSetup` projections.
+    have hHcard' : Nat.card ↥(hyp.toTypesIIIIIIVSetup htype hnt).typeP.H = hyp.w2 ^ hyp.w1 :=
+      hHcard
+    have hq : (hyp.toTypesIIIIIIVSetup htype hnt).q = hyp.w1 := rfl
+    have hquot : Nat.card (↥(hyp.toTypesIIIIIIVSetup htype hnt).typeP.H ⧸ chief.N)
+        = hyp.w2 ^ hyp.w1 := by
+      rw [OddOrder.Peterfalvi.S11.chiefFactor_quotient_card chief, hpW2, hq]
+    have hsplit := Subgroup.card_eq_card_quotient_mul_card_subgroup chief.N
+    rw [hquot, hHcard'] at hsplit
+    have hN1 : Nat.card ↥chief.N = 1 := by
+      have hpos : 0 < hyp.w2 ^ hyp.w1 := hHcard' ▸ Nat.card_pos
+      nlinarith [Nat.card_pos (α := ↥chief.N), hsplit, hpos]
+    exact Subgroup.card_eq_one.mp hN1
+  exact hyp.card_abelianization_derived_eq_charParam_d hG htype params hmu hnt chief hM2 hN
 end OddOrder.Peterfalvi.S12

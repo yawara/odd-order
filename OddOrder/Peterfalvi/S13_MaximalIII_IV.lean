@@ -166,7 +166,7 @@ theorem exists_hypothesis_of_isTypeIIIorIV [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)
     (htype : IsTypeIII M ∨ IsTypeIV M) :
-    Nonempty (Hypothesis M) := by
+    ∃ s13 : Hypothesis M, s13.base = hyp := by
   haveI := hyp.finiteG
   classical
   have hnt : OddOrder.GroupTheory.TypePNontrivialCore M hyp.typeP :=
@@ -199,7 +199,7 @@ theorem exists_hypothesis_of_isTypeIIIorIV [Finite G]
     SOf_eq := fun _ => rfl
     notOrthogonalFormula := fun _ => True
     finalOrthogonalityFormula := fun _ => True
-    caseB_of_97 := True }⟩
+    caseB_of_97 := True }, rfl⟩
 
 namespace Hypothesis
 
