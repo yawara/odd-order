@@ -68,6 +68,7 @@ import OddOrder.GroupTheory.RepresentationTheory.IsReal
 import OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair
 import OddOrder.GroupTheory.RepresentationTheory.OrbitOnIrr
 import OddOrder.GroupTheory.RepresentationTheory.PermutationInvariants
+import OddOrder.GroupTheory.RepresentationTheory.PrimeTIResidue
 import OddOrder.GroupTheory.RepresentationTheory.RepresentationDeterminant
 import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
@@ -101,6 +102,7 @@ import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch05_Transfer.Main
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Isaacs.Ch04_Commutators.Main
