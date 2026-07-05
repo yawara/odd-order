@@ -61,6 +61,130 @@ theorem sigmaCoeff_trichotomy (hyp : TICyclicHypothesis G) [Fintype hyp.W]
   · rw [hyp.card_charGroup_subgroupOf hyp.W1_le_W]
     exact hNC
 
+open scoped Classical in
+/-- **All σ-coefficients of a norm-`2` `V`-vanishing virtual character vanish** — the
+degenerate all-zero case of the (4.8)/(10.5) trichotomy.  `ŵ₁, ŵ₂ ≥ 3`, both odd and
+coprime, so a `+2`-gap holds in one orientation; `NC(X) ≤ 2 < 3 ≤ min(ŵ₁, ŵ₂)` kills the
+constant-row/column branches of `grid_trichotomy`. -/
+theorem sigmaCoeff_eq_zero_of_vanishOnV (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    {X : ClassFunction G ℂ} (hXZ : X ∈ ZIrr G) (hX2 : ClassFunction.inner X X = 2)
+    (hXV : ∀ v ∈ hyp.V, X v = 0) :
+    ∀ pq, hyp.sigmaCoeff hVeq app X pq = 0 := by
+  haveI : Finite G := Finite.of_fintype G
+  haveI : Nonempty ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := ⟨1⟩
+  haveI : Nonempty ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := ⟨1⟩
+  haveI : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  haveI : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  set a : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) → ℂ :=
+    fun pq => hyp.sigmaCoeff hVeq app X pq with ha
+  have hadd : ∀ p p' q q', a (p, q) + a (p', q') = a (p, q') + a (p', q) :=
+    fun p p' q q' => hyp.sigmaCoeff_add_eq hVeq app hXV p p' q q'
+  have hNC : {x | a x ≠ 0}.ncard ≤ 2 :=
+    hyp.ncard_sigmaCoeff_ne_zero_le_two hVeq app hXZ hX2
+  have hcard1 : Nat.card ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) = Nat.card hyp.W1 :=
+    hyp.card_charGroup_subgroupOf hyp.W1_le_W
+  have hcard2 : Nat.card ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) = Nat.card hyp.W2 :=
+    hyp.card_charGroup_subgroupOf hyp.W2_le_W
+  have h31 := hyp.three_le_card_W1
+  have h32 := hyp.three_le_card_W2
+  have hodd1 : Odd (Nat.card hyp.W1) :=
+    hyp.W_card_odd.of_dvd_nat (Subgroup.card_dvd_of_le hyp.W1_le_W)
+  have hodd2 : Odd (Nat.card hyp.W2) :=
+    hyp.W_card_odd.of_dvd_nat (Subgroup.card_dvd_of_le hyp.W2_le_W)
+  have hcop := hyp.W_card_coprime
+  have hwne : Nat.card hyp.W1 ≠ Nat.card hyp.W2 := by
+    intro he
+    rw [he, Nat.Coprime, Nat.gcd_self] at hcop
+    omega
+  -- branch killers: a constant nonzero row/column of length `≥ 3` contradicts `NC ≤ 2`
+  have hkill1 : ∀ (j₀ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) (c : ℂ), c ≠ 0 →
+      (∀ p, a (p, j₀) = c) → False := by
+    intro j₀ c hc0 hcol
+    have hsub : (Set.image (fun p : (hyp.W1.subgroupOf hyp.W) →* ℂˣ => (p, j₀))
+        Set.univ) ⊆ {x | a x ≠ 0} := by
+      rintro _ ⟨p, -, rfl⟩
+      rw [Set.mem_setOf_eq, hcol p]
+      exact hc0
+    have hge : 3 ≤ {x | a x ≠ 0}.ncard := by
+      have himg : (Set.image (fun p : (hyp.W1.subgroupOf hyp.W) →* ℂˣ => (p, j₀))
+          Set.univ).ncard
+          = Nat.card ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := by
+        rw [Set.ncard_image_of_injective _
+          (fun x y h => (Prod.mk.injEq _ _ _ _).mp h |>.1), Set.ncard_univ]
+      calc 3 ≤ Nat.card ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := by rw [hcard1]; omega
+        _ = _ := himg.symm
+        _ ≤ _ := Set.ncard_le_ncard hsub (Set.toFinite _)
+    omega
+  have hkill2 : ∀ (i₀ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (c : ℂ), c ≠ 0 →
+      (∀ q, a (i₀, q) = c) → False := by
+    intro i₀ c hc0 hrow
+    have hsub : (Set.image (fun q : (hyp.W2.subgroupOf hyp.W) →* ℂˣ => (i₀, q))
+        Set.univ) ⊆ {x | a x ≠ 0} := by
+      rintro _ ⟨q, -, rfl⟩
+      rw [Set.mem_setOf_eq, hrow q]
+      exact hc0
+    have hge : 3 ≤ {x | a x ≠ 0}.ncard := by
+      have himg : (Set.image (fun q : (hyp.W2.subgroupOf hyp.W) →* ℂˣ => (i₀, q))
+          Set.univ).ncard
+          = Nat.card ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := by
+        rw [Set.ncard_image_of_injective _
+          (fun x y h => (Prod.mk.injEq _ _ _ _).mp h |>.2), Set.ncard_univ]
+      calc 3 ≤ Nat.card ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := by rw [hcard2]; omega
+        _ = _ := himg.symm
+        _ ≤ _ := Set.ncard_le_ncard hsub (Set.toFinite _)
+    omega
+  intro pq
+  by_contra hne0
+  rcases lt_or_gt_of_ne hwne with hlt | hgt
+  · -- `ŵ₁ < ŵ₂`: gap in the standard orientation
+    have hgap : Nat.card ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) + 2
+        ≤ Nat.card ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := by
+      rw [hcard1, hcard2]
+      rcases hodd1 with ⟨m, hm⟩
+      rcases hodd2 with ⟨n, hn⟩
+      omega
+    have hlt2 : {x | a x ≠ 0}.ncard
+        < 2 * Nat.card ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := by
+      rw [hcard1]
+      omega
+    rcases grid_trichotomy a hadd hgap hlt2 with hz | ⟨j₀, c, hc0, hcol, -⟩
+      | ⟨i₀, c, hc0, hrow, -⟩
+    · exact hne0 (hz pq)
+    · exact hkill1 j₀ c hc0 hcol
+    · exact hkill2 i₀ c hc0 hrow
+  · -- `ŵ₂ < ŵ₁`: transpose the grid
+    set a' : ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) → ℂ :=
+      fun qp => a (qp.2, qp.1) with ha'
+    have hadd' : ∀ q q' p p', a' (q, p) + a' (q', p') = a' (q, p') + a' (q', p) :=
+      fun q q' p p' => (hadd p p' q q').trans (add_comm _ _)
+    have hsetE : {x | a' x ≠ 0} = Prod.swap '' {x | a x ≠ 0} := by
+      ext y
+      constructor
+      · intro hy
+        exact ⟨(y.2, y.1), hy, rfl⟩
+      · rintro ⟨z, hz, rfl⟩
+        exact hz
+    have hNC' : {x | a' x ≠ 0}.ncard ≤ 2 := by
+      rw [hsetE, Set.ncard_image_of_injective _ Prod.swap_injective]
+      exact hNC
+    have hgap' : Nat.card ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) + 2
+        ≤ Nat.card ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := by
+      rw [hcard1, hcard2]
+      rcases hodd1 with ⟨m, hm⟩
+      rcases hodd2 with ⟨n, hn⟩
+      omega
+    have hlt2' : {x | a' x ≠ 0}.ncard
+        < 2 * Nat.card ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := by
+      rw [hcard2]
+      omega
+    rcases grid_trichotomy a' hadd' hgap' hlt2' with hz | ⟨p₀, c, hc0, hcol, -⟩
+      | ⟨q₀, c, hc0, hrow, -⟩
+    · exact hne0 (hz (pq.2, pq.1))
+    · exact hkill2 p₀ c hc0 (fun q => hcol q)
+    · exact hkill1 q₀ c hc0 (fun p => hrow p)
+
 /-! ### The norm-`2` Dade-image trichotomy endgame (Peterfalvi (4.8)/(10.5))
 
 The §6 certain-type isometry (4.8) and the §10 (10.5) Dade-image identity share the same endgame:
