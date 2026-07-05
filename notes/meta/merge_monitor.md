@@ -304,6 +304,23 @@
 
 ## 現状メモ
 
+- **2026-07-05 (夜) — 監視停止 (ユーザー指示「loopを停止して」)**: cron ad5e5815 を CronDelete。
+  ⛔ 停止 (問題起因) ではないので**自動再開しない** — 次の監視再開はユーザー指示を待って
+  `7,22,37,52 * * * *` で再作成する。停止時点: main = `334e0bf2` (push 済・tree clean・origin 同期)、
+  実 sorry = 101。**未マージ残 (次回再開時にまず合流): `main..a` = 0, `main..b` = 0, `main..c` = 3**
+  (c は S16 consumer wiring 系の見込み、範囲は再開 tick で通常判定)。
+  **⚠ 再開時の重点 open item (POLE-2 coordination 進行中)**:
+  (1) **b の (3.9.a) unsound-carrier fix** — Step-D fallback で landing した `eta_pair_of_coprime` の
+      finNeg 形が likely-FALSE ゆえ、次回 A (honest rowInv/colInv 反転形へ書換 + S06 chiColumn_conj から
+      sorry-free 証明 + `section16CharacterData_of_isMinimalSimpleOdd` の AxiomsCheck assert 再有効化) or
+      B (field 完全撤去) で解消 = **spine axiom-clean 回復の条件** (issue 3002)。b が A/B fix を実 commit で
+      landing するか注視。
+  (2) **issue 1017 (§5 coherence) = 着手 lane a** (hub 裁定): a が新規 §5 leaf (uniform_degree_coherence +
+      subcoherence) を新設し (10.7)→(10.8) char capstone を閉じる。b の S07_Coherence* 非接触。
+  (3) **3 レーン並行 deep-engage 中** (a=§5 coherence / b=§13 η-grid keystone [(3.9.a) fix 含む] /
+      c=S16 consumer wiring)、lane 数 3 維持。本セッション成果: sorry 104→101、a が gate-1 CLOSED
+      (11.8.1 count 全 threading) + 群論 ungated frontier 完遂、b が §13 η-grid (3.9) fields landing
+      (Step-D)、c が S16 (13.19) を precise carrier まで de-scaffold + POLE-2 stall の coupled 構造を確定。
 - **2026-07-05 (3) — tick: b の §13 η-grid keystone Step-D fallback (spine axiom 表明無効化) を STOP→ユーザー受理 + issue 1017 (§5 coherence) hub 裁定**:
   HUB 裁定 (POLE-2) どおり b が §13 η-grid keystone に着手 (issue 3002): Section16Inputs/CharacterData に
   Pf (3.9) η-grid Dade fields を threading。**副作用で spine producer `section16CharacterData_of_isMinimalSimpleOdd`
