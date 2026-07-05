@@ -2150,3 +2150,64 @@ spine から reachable に。
 **注意**: params は existential ゆえ S12版 params.d と producer版 s13.params.d の同一性は degree_independent+params_mu_eq
 で follow (両 = muGrid 列 degree)。供給補題は re-home 後の `exists_zeta_residual` 内 params に対して直接証明するのが
 安全 (params 選択の二重化を避ける)。
+
+## 2026-07-05 update¹⁵ (lane-a, opus) — ⚠ 重要: count は (10.8)/(11.7) に gated (単独閉包不可)
+
+構造 iso `typePData_card_derived_mul_card_C_eq` (|M'|·|C| = |HC|·|U|, sorry-free, commit 3f44d4ed) を landing
+後、供給補題 `|M'^ab| = d` の依存を精査して **count は独立に閉じられない**ことが判明:
+
+**依存チェーン (確認済)**:
+- 供給 `|M'^ab| = |M'/M''| = |M'/HC| = |U/C|` は **(11.5) `secondDerived_eq_HC`** (M''=HC) を要する。
+- `|U/C| = u = d` の u-match は **(11.7) `H_elementaryAbelian`** (chief.H0 = ⊥、H₀=1) を要する
+  (`.u = |U/C_U(H̄)|`、H̄=H/H₀ ゆえ C_U(H̄)=C_U(H)=C は H₀=1 が要る)。
+- **(11.7) `H_elementaryAbelian` は sorry** (S13_CoreStructure)。
+- **(11.5) → (11.3) `S_H0C_not_coherent` → (10.8) `S12.S_not_coherent` → `typeII_coherence_contradiction_estimate`
+  (§7 norm estimate、sorry)**。`HC_le_secondDerived` → `coherent_quotient_bound` → `S_H0C_not_coherent` の鎖。
+
+⟹ **count `|M'^ab|=d`・τ₂ 両 gate とも究極的に (10.8) に依存**。しかも `exists_zeta_residual_not_orthogonal`
+自身が末尾で `S_not_coherent` (10.8) を矛盾に使う。⟹ **「re-home で count を閉じる」計画 (update¹⁴) は
+(10.8) が sorry ゆえブロック** — re-home は sorry 依存を移すだけで honest close にならない。
+
+**真の terminal (ungated leaves、これが本当の上流)**:
+- **(10.7) `typeII_derived_frobenius`** (S12:47) — [S,S] Frobenius、type-II partner 構造。`kernel_is_SF:Prop`
+  は opaque scaffold field。
+- **(10.8) `typeII_coherence_contradiction_estimate`** (S12:445) — §7 norm-counting 解析 (family_inequality
+  (7.5) + (10.6.b) proven + (7.8.b) + TI-counting)。(10.8) `S_not_coherent` が全 (11.x) の根。
+- **(10.10) `typeV_forces_coherence`** / **τ₂ `coherent_Sset_of_column_identities`** ((9.11)/(6.8) cross-lane)。
+
+**redirect**: count の orbit-count/構造 iso/producer は genuine 上流 math として landing 済 (無駄でない;
+(10.8)/(11.7) が閉じた瞬間に count が sorry-free で follow する形に整備済)。次の genuine work は
+**(10.8) §7 norm estimate または (10.7) partner Frobenius を正面から** (upstream-first)。
+
+## 2026-07-05 update¹⁶ (lane-a, opus) — ⚠⚠ lane-a frontier 全数診断: 全て issue-2030 research-grade + 一部 spine 未接続/cross-lane/gated
+
+update¹⁵ の「count は (10.8) gated」を受け、lane-a の全 open sorry を spine 接続性込みで精査:
+
+**spine 接続の open sorry (FT に効く) — 全て (10.8) coherence cluster に収束**:
+- `typeV_forces_coherence` (10.10, S12:3905): `no_typeV_maximal`→`isTypeIIIorIV` 経由で spine 接続。
+  ただし conjunct 1/2 = `typeV_parameter_formula`/`typeV_coherence_formula` は **opaque Prop field**
+  (CharacterParameters、generic params で証明不能 = scaffold)。conjunct 3 (S coherent) のみ genuine。
+- `typeII_coherence_contradiction_estimate` (10.8, S12:445): `S_not_coherent` 経由 spine 接続 = **cluster の根**。
+  残 gate = (7.8.b) norm bound [**§7 coherence = lane b**] + TI-counting + (10.7)。mechanical spine は proven。
+- `typeII_derived_frobenius` (10.7, S12:47): `S_not_coherent` が partner に消費。book proof = §9 (9.8.b/9.9.b/9.10)
+  + (5.7)/(5.8) coherence + (8.8) partner。`kernel_is_SF:Prop` opaque。
+
+**spine 未接続の open sorry (現状 FT に効かない、消費者 grep=0)**:
+- `caseA_character_counts` (9.8, S11): 残 conjunct = (9.8.d) count 下界。opaque `quotient_factors_cyclic_order_a`
+  /`Ubar_embeds_product` (CliffordCaseAData) に依存 = (9.7)(a) 形式化要。
+- `exceptional_case_frobenius_realization` (9.10, S11): 2 sorry = (1) opaque `quotientSemidirectFrobenius`
+  (Section11CharacterData field、generic chars で証明不能; producer は `True`) + (2) type-II HU-Frobenius
+  (= 10.7、H₀=1 (11.7←10.8) gated)。u-formula は proven。
+- `sibleyTarget_H0C` (9.11, S11): §14 structural witness (cross-lane)。
+
+**結論 (戦略 redirect)**: lane-a の remaining は全て **(A) 深い §9 Clifford/character proof** + **(B) carrier
+de-scaffold (opaque Prop field: quotientSemidirectFrobenius / typeV_*_formula / quotient_factors_cyclic_order_a
+/ Ubar_embeds_product / kernel_is_SF)** + **(C) cross-lane ((7.8.b)=b coherence, sibleyTarget=§14)** +
+**(D) gated (count←11.5←10.8, 9.10.2←11.7←10.8)** の組合せ。**quick-fill は皆無**、issue 2030 の research-grade
+multi-session が正体。sorry-free 上流 (orbit count/構造 iso/producer/d=u) は landing 済で、(10.8)/(11.7) が
+閉じた瞬間 count が follow する形。
+
+**hub への flag**: F1 の「(11.8) 3 gates」framing は count を独立 gate とみなすが、実際は count・τ₂ とも
+(10.8) coherence cluster に gated。lane-a が spine を前進させる唯一の道 = **(10.8) cluster の根**
+((10.7) partner Frobenius via §9 + (7.8.b)[b] + TI-counting) を正面から、または carrier de-scaffold を
+9000 claim で。次 iteration はこのどちらかに sustained commit すべき (再調査でなく)。
