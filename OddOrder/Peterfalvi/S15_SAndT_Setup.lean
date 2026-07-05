@@ -3220,7 +3220,149 @@ theorem lambda_tau1_cCoeff [Fintype G] [Invertible (Nat.card G : ℂ)]
         ¬ ((hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
           OddOrder.Peterfalvi.S03.characterKernel ((H_sharp_hypothesis76 hG hyp).zeta i)) →
         (H_sharp_hypothesis76 hG hyp).cCoeff (chars.tau1S chars.lambda) i = 0) := by
-  sorry
+  classical
+  obtain ⟨θl, hθlirr, -, hlamEq, x₀, hx₀P, hx₀ker⟩ := chars.lambda_induced_from_PC_linear
+  set K : Subgroup ↥hyp.S := (H_sharp_hypothesis76 hG hyp).H.subgroupOf hyp.S with hKdef
+  -- the one-time spelling bridge (`(H76).H = hyp.H` definitionally)
+  have hKJ : K = hyp.H.subgroupOf hyp.S := rfl
+  haveI hKnorm : K.Normal := by rw [hKJ]; exact H_sharp_subgroupOf_normal hyp
+  -- `K ≅ H` abelian ⟹ all family degrees are `[S:K]` ⟹ `d ≡ 1`
+  haveI hKcomm : IsMulCommutative ↥K := by
+    rw [hKJ]
+    have hH := hyp.H_mulCommutative hG
+    have e := Subgroup.subgroupOfEquivOfLe (show hyp.H ≤ hyp.S from hyp.H_le_S)
+    exact ⟨⟨fun a b => e.injective (by
+      rw [map_mul, map_mul]
+      exact hH.is_comm.comm (e a) (e b))⟩⟩
+  have hzeta_one : ∀ j : Fin ((H_sharp_hypothesis76 hG hyp).n + 1),
+      (H_sharp_hypothesis76 hG hyp).zeta j 1 = (K.index : ℂ) := by
+    intro j
+    obtain ⟨θ, hθ⟩ := (H_sharp_hypothesis76 hG hyp).zeta_induced j
+    have hθ1 : (θ : ClassFunction ↥K ℂ) 1 = 1 :=
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter.apply_one_eq_one_of_isMulCommutative
+        θ.2
+    rw [hθ, OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, hθ1, mul_one]
+  have hidx0 : (K.index : ℂ) ≠ 0 := by
+    exact_mod_cast Subgroup.index_ne_zero_of_finite (H := K)
+  have hd1 : ∀ j : Fin ((H_sharp_hypothesis76 hG hyp).n + 1),
+      (H_sharp_hypothesis76 hG hyp).d j = 1 := by
+    intro j
+    have h := (H_sharp_hypothesis76 hG hyp).zeta_one_eq_d_mul j
+    rw [hzeta_one j, hzeta_one 0] at h
+    field_simp at h
+    exact h.symm
+  -- distinct induced characters of `K` are orthogonal
+  have hInd0 : ∀ θ ψ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥K,
+      ClassFunction.induce K (θ : ClassFunction ↥K ℂ)
+          ≠ ClassFunction.induce K (ψ : ClassFunction ↥K ℂ) →
+      ClassFunction.inner (ClassFunction.induce K (θ : ClassFunction ↥K ℂ))
+        (ClassFunction.induce K (ψ : ClassFunction ↥K ℂ)) = 0 := by
+    intro θ ψ hne
+    refine OddOrder.RepresentationTheory.inner_induce_eq_zero_of_not_conj θ ψ
+      (fun g heq => hne ?_)
+    have h1 : ClassFunction.induce K
+        ((OddOrder.RepresentationTheory.IrreducibleCharacter.conjBy g θ :
+          OddOrder.RepresentationTheory.IrreducibleCharacter ↥K) : ClassFunction ↥K ℂ)
+        = ClassFunction.induce K (θ : ClassFunction ↥K ℂ) := by
+      rw [OddOrder.RepresentationTheory.IrreducibleCharacter.coe_conjBy]
+      exact OddOrder.RepresentationTheory.ClassFunction.induce_conjBy_eq
+        (G := ↥hyp.S) (H := K) g _
+    rw [← h1, heq]
+  -- the field-side data, transported into the `K`-spelling (syntactic via `hKJ`)
+  have hθlK : ∃ θK : OddOrder.RepresentationTheory.IrreducibleCharacter ↥K,
+      chars.lambda = ClassFunction.induce K (θK : ClassFunction ↥K ℂ) := by
+    rw [hKJ]
+    exact ⟨⟨θl, hθlirr⟩, hlamEq⟩
+  obtain ⟨θlK, hlamK⟩ := hθlK
+  have hζ0K : (H_sharp_hypothesis76 hG hyp).zeta 0
+      = ClassFunction.induce K
+          ((OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥K :
+            OddOrder.RepresentationTheory.IrreducibleCharacter ↥K) :
+              ClassFunction ↥K ℂ) := by
+    rw [hKJ]
+    exact H_sharp_zeta_zero hG hyp
+  have hfield1 : ∀ θ θ' : OddOrder.RepresentationTheory.IrreducibleCharacter ↥K,
+      chars.tau1S (ClassFunction.induce K (θ : ClassFunction ↥K ℂ)
+          - ClassFunction.induce K (θ' : ClassFunction ↥K ℂ))
+        = ClassFunction.induce hyp.S
+            (ClassFunction.induce K (θ : ClassFunction ↥K ℂ)
+              - ClassFunction.induce K (θ' : ClassFunction ↥K ℂ)) := by
+    rw [hKJ]
+    intro θ θ'
+    have h := chars.tau1S_apply_induce_sub _ _ θ.2 θ'.2
+    exact h.trans (by congr! <;> exact Subsingleton.elim _ _)
+  have hfield2 : ∀ θ θ' : OddOrder.RepresentationTheory.IrreducibleCharacter ↥K,
+      ClassFunction.inner (chars.tau1S (ClassFunction.induce K (θ : ClassFunction ↥K ℂ)))
+          (chars.tau1S (ClassFunction.induce K (θ' : ClassFunction ↥K ℂ)))
+        = ClassFunction.inner (ClassFunction.induce K (θ : ClassFunction ↥K ℂ))
+            (ClassFunction.induce K (θ' : ClassFunction ↥K ℂ)) := by
+    rw [hKJ]
+    intro θ θ'
+    have h := chars.tau1S_inner_induce _ _ θ.2 θ'.2
+    convert h using 1 <;> congr! <;> exact Subsingleton.elim _ _
+  -- `λ ≠ ζ₀` (positivity of `i₁` + injectivity), so `⟨ζ₀, λ⟩ = 0`
+  have hζi₁K : (H_sharp_hypothesis76 hG hyp).zeta i₁
+      = ClassFunction.induce K (θlK : ClassFunction ↥K ℂ) := by
+    rw [hi₁eq]
+    exact hlamK
+  have hθl_ne_triv : ClassFunction.induce K (θlK : ClassFunction ↥K ℂ)
+      ≠ ClassFunction.induce K
+          ((OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥K :
+            OddOrder.RepresentationTheory.IrreducibleCharacter ↥K) :
+              ClassFunction ↥K ℂ) := by
+    intro heq
+    have hzz : (H_sharp_hypothesis76 hG hyp).zeta i₁ = (H_sharp_hypothesis76 hG hyp).zeta 0 := by
+      rw [hζi₁K, hζ0K, heq]
+    exact (Fin.pos_iff_ne_zero.mp hi₁pos) ((H_sharp_hypothesis76 hG hyp).zeta_injective hzz)
+  have hz0lam : ClassFunction.inner ((H_sharp_hypothesis76 hG hyp).zeta 0) chars.lambda = 0 := by
+    rw [hζ0K, hlamK]
+    exact hInd0 _ _ (Ne.symm hθl_ne_triv)
+  -- the generic coefficient computation for a family index with known inducing character
+  have hcoeff : ∀ (j : Fin ((H_sharp_hypothesis76 hG hyp).n + 1))
+      (θ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥K),
+      (H_sharp_hypothesis76 hG hyp).zeta j = ClassFunction.induce K (θ : ClassFunction ↥K ℂ) →
+      (H_sharp_hypothesis76 hG hyp).cCoeff (chars.tau1S chars.lambda) j
+        = ClassFunction.inner ((H_sharp_hypothesis76 hG hyp).zeta j) chars.lambda
+          - ClassFunction.inner ((H_sharp_hypothesis76 hG hyp).zeta 0) chars.lambda := by
+    intro j θ hζj
+    rw [show (H_sharp_hypothesis76 hG hyp).cCoeff (chars.tau1S chars.lambda) j
+        = ClassFunction.inner
+            ((H_sharp_hypothesis76 hG hyp).hyp71.τ ((H_sharp_hypothesis76 hG hyp).psiSupp j))
+            (chars.tau1S chars.lambda) from rfl]
+    rw [show (H_sharp_hypothesis76 hG hyp).hyp71.τ = (H_sharp_hypothesis71 hG hyp).τ from rfl,
+      H_sharp_tau_eq_induce hG hyp]
+    have hψ : ((H_sharp_hypothesis76 hG hyp).psiSupp j : ClassFunction ↥hyp.S ℂ)
+        = ClassFunction.induce K (θ : ClassFunction ↥K ℂ)
+          - ClassFunction.induce K
+              ((OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥K :
+                OddOrder.RepresentationTheory.IrreducibleCharacter ↥K) :
+                  ClassFunction ↥K ℂ) := by
+      rw [OddOrder.Peterfalvi.S09.Hypothesis76.psiSupp_coe, hd1 j, one_smul, hζj, hζ0K]
+    rw [hψ, ← hfield1 θ _, map_sub, ClassFunction.inner_sub_left, hlamK,
+      hfield2 θ θlK, hfield2 _ θlK, ← hlamK, ← hζj, ← hζ0K]
+  -- conjunct 1: `c_{i₁} = ⟨λ,λ⟩ − ⟨ζ₀,λ⟩ = 1 − 0`
+  have hlamIrr : ClassFunction.inner chars.lambda chars.lambda = 1 := by
+    have h := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite
+      (⟨chars.lambda, chars.lambda_irreducible⟩ :
+        OddOrder.RepresentationTheory.IrreducibleCharacter ↥hyp.S)
+      ⟨chars.lambda, chars.lambda_irreducible⟩
+    simpa using h
+  refine ⟨?_, ?_⟩
+  · rw [hcoeff i₁ θlK hζi₁K, hi₁eq, hlamIrr, hz0lam, sub_zero]
+  · intro i hipos hine _
+    obtain ⟨θi0, hθi0⟩ := (H_sharp_hypothesis76 hG hyp).zeta_induced i
+    have hθi : (H_sharp_hypothesis76 hG hyp).zeta i
+        = ClassFunction.induce K (θi0 : ClassFunction ↥K ℂ) := by
+      rw [hθi0]
+    rw [hcoeff i θi0 hθi, hz0lam, sub_zero]
+    have hne : ClassFunction.induce K (θi0 : ClassFunction ↥K ℂ)
+        ≠ ClassFunction.induce K (θlK : ClassFunction ↥K ℂ) := by
+      intro heq
+      refine hine ((H_sharp_hypothesis76 hG hyp).zeta_injective ?_)
+      rw [hθi, hζi₁K]
+      exact heq
+    rw [hθi, hlamK]
+    exact hInd0 θi0 θlK hne
 
 open scoped Classical in
 open scoped FiniteInduce in

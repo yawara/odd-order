@@ -826,6 +826,7 @@ noncomputable def hypothesis76OfFamily
       rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup, hAH]
       simp only [Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
       refine ⟨hx.1, fun h1 => hx.2 (Subtype.ext h1)⟩
+    zeta_injective := hinj
     zeta_induced := fun i => ⟨θ i, by congr! <;> exact Subsingleton.elim _ _⟩
     zeta_family_cover := fun φ => by
       obtain ⟨i, hi⟩ := hcover φ

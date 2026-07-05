@@ -1091,6 +1091,10 @@ structure Hypothesis76 (G : Type*) [Group G] [Fintype G]
       invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
     ∃ θ : IrreducibleCharacter ↥(H.subgroupOf L),
       zeta i = ClassFunction.induce (H.subgroupOf L) (θ : ClassFunction _ ℂ)
+  /-- **Distinctness of the family** (Peterfalvi (7.6): the `ζ_i` are *distinct* induced
+  characters): the enumeration is injective.  What pins "`i ≠ i₁ ⟹ ζ_i ≠ λ`" in the (13.5)
+  middle-coefficient computation (`lambda_tau1_cCoeff`). -/
+  zeta_injective : Function.Injective zeta
   /-- **Exhaustiveness of the family** (Peterfalvi (7.6): `T = {Ind_H^L θ | θ ∈ Irr H}` ranges
   over *all* `θ`): every induced irreducible appears at some family index — the converse
   direction to `zeta_induced`, same canonical-instance convention.  This is what places the
