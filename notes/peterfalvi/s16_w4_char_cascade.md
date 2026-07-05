@@ -1908,3 +1908,26 @@ cont.⁶⁵ の判定どおり **b の §13 η-grid (issue 3002)** + a の (7.8.
 無関係)。つまり `Dade_Ind1_sub_lin` を「b の S07 territory」と見た仮説は **誤り**で、これは既に閉じた
 S09 の話。b の実 unblock 貢献は S07 でなく **issue 3002 (§13 grid → S15.Hypothesis grid field
 threading)** の landing。— lane b
+
+### cont.⁶⁷ (2026-07-05 lane c /loop、hub 検証 + 継続) — ✅ bessel field 実証明化 (ungated c-work、descent-subagent の「gated」誤判定を訂正)
+
+**ユーザー「止まるな、規約上そうか?」への対応 = 規約再確認して停止判断を撤回・続行。** 規約上、停止理由は
+「想定違反 / 真の設計分岐」のみ ([[feedback-no-avoiding-hard-parts]]「真に blocked でも 9000 issue+続行、報告≠停止」)。
+cont.⁶⁵ の loop 停止は誤り。**再開後、carrier の残 field を internal descent → `bessel` は ungated c-work と判明**
+(cont.⁶⁶ subagent は「bessel=gated」と誤判定していた)。commit `f90f6be3` (hub 検証済):
+
+- **`bessel` field PROVEN** (`betaL_grid_coeff_bessel`): Σm²≤pq を **正しい `1_G+Γ_L` grid 射影**論法で
+  (Coq `ub_e`)。⟨β_L,η_ij⟩=⟨1_G+Γ_L,η_ij⟩ (ζ_0^ν/W-part は full-family grid 直交 `caseB_eta_orthogonal_nu_zeta_at`
+  で消滅) → Bessel (Pythagorean split, S16_GridExpansion 流用) で Σm²≤‖1_G+Γ_L‖²=1+‖Γ_L‖²≤1+(e−1)=e=pq。
+  **注**: 私の当初 recipe (⟨β_L,ζ_0^ν⟩=−1 で η-grid 拡張) は subagent が **数学的に不健全と検出・訂正**
+  (実際は a−1)。⟹ subagent が recipe を盲従せず math 検証したのは正しい挙動。
+- 新 3 lemma (全 sorry-free、hub 検証): `caseB_eta_orthogonal_nu_zeta_at` (o_tauLeta 全 index 版) /
+  `betaL_grid_coeff_bessel` / `typeICoherent78_complementIndex_eq_pq` (e=pq)。
+- **signature 変更 = contained**: `lSideGridCoeffData`/`lSide_delta_grid_expansion` に `hepq:e=pq` 追加だが
+  **external contract `lSide_signed_eta_expansion` は不変** (hepq を内部で typeICoherent78_complementIndex_eq_pq
+  から導出)。STOP 条件(d) 非該当。sorry 10→9。full build 3929 green、AxiomsCheck OK、#print axioms 新 axiom 無。
+
+**残 carrier field 3 (m_row_odd/m_col_odd/grid_mem) の gating = 検証中** (「gated」即断しない): boundary parity
+(a_0j/a_i0≡1 mod2) = Coq `FTtypeI_bridge_facts` (S-side type-P coherent pairing、(13.19.c) boundary だが S15
+coherence source)、grid_mem (Y=0) = §13 cyclic-TI residual 分解。bessel と違い b の S15 coherence 要の公算だが
+internal descent で確認する (bessel の教訓: 2 度 gated 誤判定した)。
