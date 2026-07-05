@@ -9862,18 +9862,23 @@ The trigger set is `𝒮(H₀C')` (`chief.H0 ⊔ chars.Cprime`) — the `H₀C'`
 (count-statement audit, issue 2030); the missing character is required *irreducible* of degree `qu`
 (matching the negation of the (9.8.c)/(9.9) existence).  The degree condition is redundant given
 case (b) — every `𝒮(H₀C')`-member has degree `qu` (`caseB_degree_qu`) — so the trigger reduces
-to the (9.9.c) one and the `u`-formula conjunct is `caseB_no_irreducible_u_formula`.  The two
-Frobenius conjuncts remain: `quotientSemidirectFrobenius` is an *opaque `Prop` field* (the S12
-count-bridge supplies `True`; its honest content `H̄ ⋊ Ū` Frobenius is carried by the real
-`chiefFactor_caseB_action_fpf` — de-opacification tracked in issues 1012/2035), and the type-II
-`HU`-Frobenius clause is the genuine character-theoretic Frobenius criterion (deep). -/
+to the (9.9.c) one and the `u`-formula conjunct is `caseB_no_irreducible_u_formula`.
+
+The first Frobenius conjunct is now the **genuine** `H̄ ⋊ Ū`-Frobenius content — every nontrivial
+`Ū`-action `uActionHom g` acts fixed-point-freely on the chief factor `H̄ = H/H₀`
+(`chiefFactor_caseB_action_fpf`, from `caseB.actsIrreducibly`), replacing the former opaque
+`quotientSemidirectFrobenius : Prop` field (de-scaffold, issues 1012/2035).  The remaining type-II
+`HU`-Frobenius clause (`[S,S]` Frobenius with kernel `S_F`, Peterfalvi (10.7)) is the genuine
+character-theoretic Frobenius criterion, gated on `H₀ = 1` ((11.7) ← (10.8)); left `sorry`. -/
 theorem exceptional_case_frobenius_realization [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     (chars : Section11CharacterData data chief) (caseB : CliffordCaseBData chars)
     (hno : ¬ ∃ χ ∈ chars.SOf (chief.H0 ⊔ chars.Cprime),
         IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * chars.u : ℕ) : ℂ)) :
-    chars.quotientSemidirectFrobenius ∧
+    (∀ g : ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)),
+        uActionHom data chief g ≠ 1 →
+          MonoidHom.FixedPointFree (uActionHom data chief g)) ∧
       chars.u = (chief.p ^ data.q - 1) / (chief.p - 1) ∧
       (IsTypeII M →
         OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(data.H ⊔ data.U)
@@ -9882,8 +9887,8 @@ theorem exceptional_case_frobenius_realization [Finite G]
   have hno' : ¬ ∃ χ ∈ chars.SOf (chief.H0 ⊔ chars.Cprime), IsIrreducibleCharacter χ := by
     rintro ⟨χ, hmem, hirr⟩
     exact hno ⟨χ, hmem, hirr, caseB_degree_qu hG chars caseB χ hmem⟩
-  refine ⟨?_, caseB_no_irreducible_u_formula hG chars caseB hno', ?_⟩
-  · sorry
-  · sorry
+  refine ⟨fun g hg => chiefFactor_caseB_action_fpf chief caseB.actsIrreducibly g hg,
+    caseB_no_irreducible_u_formula hG chars caseB hno', ?_⟩
+  sorry
 
 end OddOrder.Peterfalvi.S11
