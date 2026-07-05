@@ -729,3 +729,10 @@ vs CharacterDifferenceImage.Orthogonal) の突合が実装時の最初の確認�
   hyp.tau-版 (dade-値保存) + typePV ∩ M' = ∅
   (typePData_typePV_not_mem_derived — S12-Core に既出 (10.5)-ζ-vanish
   の部品として言及あり)。
+
+## 2026-07-05 lane-a (loop 52): sigmaCoeff_eq_zero_of_vanishOnV 閉 (S05 engine)
+
+- (ii) 核心: norm-2 V-消滅 → 全 σ-係数 0 (NC≤2 既存補題 + trichotomy 両向き)。
+- 残: T := τ(χ−χ̄) 文脈適用 (V-vanish 供給) → ⟨T, ω^σ⟩ = 0 → R(χ)⊥R(列)
+  (constituent 引数は per-pair: R-elt = ±X±-部分の直交は… ⟨T,ω⟩=0 から
+  ofDiff-R-elts の ω-成分 0 を出す小 step 要確認) → member-D 組立。
