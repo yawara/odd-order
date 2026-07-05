@@ -121,6 +121,32 @@ campaign は正しく mapped されたが critical path (sibleyTarget_H0C + S11 
 (文書順は (13.3) より後だが gate なしの genuine math) を先に閉じにいく
 (Galois/cyclic-closure 論法 — GaloisRationalInteger 在庫と接続の見込み)。
 
+## ✅ (9.9.c) 完全証明 + (9.10) u-conjunct (it.61-68, 2026-07-05)
+
+**caseB_character_counts (Pf 9.9) が全 4 conjuncts sorry-free** (実装順):
+
+1. it.61-62: hcPsiPair (θ,λ)-積指標 + inertia/既約性 + H₀C′ ◁ M + kernel 3 段 +
+   ζ_{θ,λ} ∈ 𝒳(H₀C′) (`hcZetaPair_mem_xiOf`)
+2. it.63: 存在補題 (θ ≠ 1 dual-card / λ ≠ 1 + C′-kill: solvable abelianization +
+   cInHuEquivC transport)
+3. it.64: **C = ⊥ 半分** (`caseB_no_irreducible_forces_C_bot`) — reducible → 𝒮(H₀C) →
+   source M-共役 → H₀C ◁ M kernel 転送 → kernel descent → λ = 1 ⟂
+4. it.65: caseB oXtheta (`caseB_oXtheta_count`: u·|Xζ| = p^q−1)
+5. it.66: exhaustion (`caseB_xiOf_H0C_eq_induce_hcPsi`: Clifford 対応 + trivial-seed 排除)
+6. it.67: **u-formula** (`caseB_no_irreducible_u_formula`) — prime-index inertia dichotomy
+   (`conjBy_eq_self_of_not_isIrreducibleCharacter_induceHU`) で単射、exhaustion で全射 →
+   |Xζ| = p−1 → u·(p−1) = p^q−1
+7. it.68: (9.10) の u-conjunct 実配線 (degree 条件は caseB_degree_qu で冗長 → hno-bridge)
+
+**(9.10) 残 sorry 2**: conjunct-1 `quotientSemidirectFrobenius` = opaque Prop field
+(de-opacify 設計判断: 実 content は `chiefFactor_caseB_action_fpf` が既に carry;
+field 差し替えは S12-bridge 供給と要調整 — 統一 restate は hub 相談推奨) /
+conjunct-3 type-II HU-Frobenius = 指標論的 Frobenius 判定法 (Isaacs 7 章級の新規 machinery、
+今 campaign の資材 [全 𝒳(H₀)-member が H-induced] が主入力になる見込み)。
+
+→ campaign step 3 ((13.3.a) の S11 側) は本質完了。次 = step 1-2 (S15↔S11 bridge の
+honest Section11CharacterData 構成 + sibleyTarget_H0C) or step 4 (τ₁ 導出)。
+
 ## (9.9.c) branch-1 build-spec (it.60 recon)
 
 Pf の C ≠ 1 否定枝の Lean 化に必要な新規構成:
