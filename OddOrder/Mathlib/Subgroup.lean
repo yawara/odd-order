@@ -260,6 +260,17 @@ theorem pow_closure_characteristic {G : Type*} [Group G] (n : ℕ) :
   rintro _ ⟨_, ⟨x, rfl⟩, rfl⟩
   exact subset_closure ⟨φ x, by simp [map_pow]⟩
 
+/-- In a finite subgroup of prime order, every nonidentity element generates the subgroup. -/
+theorem zpowers_eq_of_prime_card {G : Type*} [Group G] [Finite G] {R : Subgroup G}
+    (hp : (Nat.card R).Prime) {r : G} (hr : r ∈ R) (hr1 : r ≠ 1) :
+    zpowers r = R := by
+  have hle : zpowers r ≤ R := (zpowers_le).mpr hr
+  have hord : orderOf r = Nat.card R := by
+    rcases (Nat.dvd_prime hp).mp (R.orderOf_dvd_natCard hr) with h1 | h
+    · exact absurd (orderOf_eq_one_iff.mp h1) hr1
+    · exact h
+  exact eq_of_le_of_card_ge hle (le_of_eq (by rw [Nat.card_zpowers, hord]))
+
 /-- **`Nat.card (↥K ⧸ N.subgroupOf K) = Nat.card (K.map qmk_N)`** via first iso.
 `f := (QuotientGroup.mk' N).comp K.subtype` has `ker = N.subgroupOf K`, `range = K.map qmk_N`.
 `quotientKerEquivRange` gives the equiv, take Nat.card_congr. -/
