@@ -531,3 +531,20 @@ sorry-free) は standalone §4 building block として残す (docstring を lea
 **教訓** ([[verify-port-state-by-number-not-coq-name]] 強化済): multi-session の新 infra port 前に
 概念名 (Coq 名でなく) で S0x を exhaustive grep + 該当 § file 通読。1 scan ミスが 6 session を溶かした。
 claim 撤回、本 issue close。
+
+## 2026-07-06 更新 (lane b) — ★restructure (裁定 item 1-4) 完了、held merge unblock
+
+hub 裁定 fcfc0644 の restructure を lane-b が実行完了 (prior commit 4948ff00 の巻き戻し + mu2Grid 移設):
+
+- ✅ **PrimeTIResidue.lean 復元** (528 行、4948ff00^ から) + OddOrder.lean import 復元 (commit 45f610ac)。
+- ✅ **9014 を open へ戻す** (closed/ → issues/、commit 45f610ac)。
+- ✅ **mu2Grid を S05_SigmaIsometry → PrimeTIResidue へ移設** (124 行、namespace/API 不変、
+  `import S05_SigmaIsometry` + variable + open 追加で受け入れ、commit af2a1a23)。external ref 0、
+  #print axioms 標準3のみ、full build GREEN 3933 jobs。lane-a の S05 は clean。
+
+⟹ **held merge の restructure 前提は解消**。残 = **item 5 constructor 完成 (優先タスク)**:
+`cyclicTIiso` port + `primeTIirr_spec` (mu2Grid の実体) + `prTIres_irr_cases` discharge →
+posited field (`primeTIred` の residue 二分律) を実構成に置換 ([[scaffold-sorry-free-not-done]] の
+genuine doneness)。これが §10 (10.7) `Frob_der1_type2` = lane-a frontier と §13 μ_j machinery の共通
+基盤。次 lane-b iteration はこの constructor に正面着手する (規模大・多 session でも淡々と build、
+CLAUDE.md「コスト/規模は着手基準でない」)。
