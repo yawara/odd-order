@@ -530,6 +530,289 @@ open scoped FiniteInduce in
 `S`-instance kernel `cSub = C` identification (`toTypesIIIIIIVSetupS_cSub_eq_C`) is applied. -/
 def Hypothesis.Cprime (hyp : Hypothesis (G := G)) : Subgroup G := derivedInG hyp.C
 
+/-! ### (13.2.e) The honest type-`P₂` Dade support `A(S)` and its (2.2) hypothesis
+
+Peterfalvi (8.10) defines the type-`P` support as `A(M) = ⋃_{x∈M_σ^#} C_{M'}(x)^#`, indexed over
+the **core** `M_σ^#`.  For the type-`P₂` maximal `S` this is `A(S) = centralizerSupport (M_σ^#) S'`
+— the nonidentity elements of `S' = [S,S]` centralizing some nonidentity element of `S_σ = S_F`.
+This is the honest (13.2.e) Dade-support set; the earlier `typePA = (S')^#` over-claim (issue 9008)
+included the Frobenius-complement points `U^#` (`C_{S_σ} = 1`), which is false-as-stated for `P₂`.
+
+Following 9008 Option A, `A(S)` reduces to the type-I `ASet` bridge: `A(S) ⊆ ASet S U₀` for a matched
+`(κ∪σ)'`-Hall `U₀` (`typeP2_exists_matched_kappa_hall_pair`), since `S' = U₀ ⊔ S_σ`
+(`typeP_hall_derived_eq_and_abelian`) and every `A(S)`-point centralizes a nonidentity `S_σ`-element
+(so lies in `\widehat{S_σ}`).  The three (8.13) obligations then flow through the type-agnostic BG
+Theorem-II machinery, exactly as in the type-I `dadeSupportHypotheses_typeI` assembly. -/
+
+/-- **Peterfalvi (8.10), the honest type-`P₂` support `A(M) = ⋃_{x∈M_σ^#} C_{M'}(x)^#`.**  The
+nonidentity elements of the derived subgroup `M' = derivedInG M` centralizing some nonidentity
+element of `M_σ`.  This is the correct type-`P₂` `A(M)` (issue 9008), strictly smaller than the
+`typePA = (M')^#` over-claim (it excludes the Frobenius-complement points `U^#`). -/
+def honestTypeP2ASet (M : Subgroup G) : Set G :=
+  OddOrder.GroupTheory.centralizerSupport
+    (OddOrder.GroupTheory.sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma M)) (derivedInG M)
+
+@[simp] theorem mem_honestTypeP2ASet {M : Subgroup G} {y : G} :
+    y ∈ honestTypeP2ASet M ↔
+      y ∈ derivedInG M ∧ y ≠ 1 ∧
+        ∃ x ∈ OddOrder.GroupTheory.sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma M),
+          y ∈ Subgroup.centralizer ({x} : Set G) :=
+  Iff.rfl
+
+/-- Every element of `A(S)` is a nonidentity element of `G`. -/
+theorem honestTypeP2ASet_subset_sharp {M : Subgroup G} :
+    honestTypeP2ASet M ⊆ OddOrder.Peterfalvi.S04.sharp (Set.univ : Set G) := by
+  rintro y ⟨-, hy1, -⟩
+  exact OddOrder.Peterfalvi.S04.mem_sharp.mpr ⟨Set.mem_univ y, hy1⟩
+
+/-- `A(S) ⊆ M'` (the support lives in the derived subgroup). -/
+theorem honestTypeP2ASet_subset_derived {M : Subgroup G} :
+    honestTypeP2ASet M ⊆ (derivedInG M : Set G) := fun _ hy => hy.1
+
+/-- `A(S) ⊆ M`. -/
+theorem honestTypeP2ASet_subset {M : Subgroup G} :
+    honestTypeP2ASet M ⊆ (M : Set G) := fun _ hy =>
+  Subgroup.map_subtype_le _ hy.1
+
+/-- **`A(S)` is `M`-conjugation invariant.**  Both `M_σ` (`Msigma`) and `M' = derivedInG M` are
+`M`-normal, so conjugating `y ∈ A(S)` and its centralized `M_σ`-witness by `m ∈ M` stays in `A(S)`. -/
+theorem honestTypeP2ASet_conj_mem [Finite G] {M : Subgroup G} {m : G} (hm : m ∈ M) {y : G}
+    (hy : y ∈ honestTypeP2ASet M) : m * y * m⁻¹ ∈ honestTypeP2ASet M := by
+  obtain ⟨hyM', hy1, x, hxσ, hyC⟩ := hy
+  have hmM' : m ∈ Subgroup.normalizer ((derivedInG M : Subgroup G) : Set G) :=
+    OddOrder.BG.Ch3.S10.le_normalizer_derivedInG M hm
+  have hmMσ : m ∈ Subgroup.normalizer ((OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) := by
+    rw [OddOrder.BG.Ch3.S10.Msigma]
+    exact OddOrder.GroupTheory.le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M hm
+  refine ⟨?_, ?_, m * x * m⁻¹, ?_, ?_⟩
+  · -- `m·y·m⁻¹ ∈ M'` since `m ∈ M ≤ N_G(M')`.
+    exact (Subgroup.mem_normalizer_iff.mp hmM' y).mp hyM'
+  · exact fun h => hy1 (by
+      have hyeq : y = m⁻¹ * (m * y * m⁻¹) * m := by group
+      rw [hyeq, h]; group)
+  · exact OddOrder.Peterfalvi.S10.sharpSubgroup_conj_mem hmMσ hxσ
+  · -- `m·y·m⁻¹` centralizes `m·x·m⁻¹`.
+    rw [Subgroup.mem_centralizer_singleton_iff] at hyC ⊢
+    calc m * y * m⁻¹ * (m * x * m⁻¹)
+        = m * (y * x) * m⁻¹ := by group
+      _ = m * (x * y) * m⁻¹ := by rw [hyC]
+      _ = m * x * m⁻¹ * (m * y * m⁻¹) := by group
+
+/-- **`A(S) ⊆ hatMsigma S`** (BG Theorem-E notation): every `A(S)`-point centralizes a nonidentity
+`M_σ`-element, so `M_σ ⊓ C_G(y) ≠ ⊥`, and lies in `M' ≤ M`. -/
+theorem honestTypeP2ASet_subset_hatMsigma [Finite G] {M : Subgroup G} :
+    honestTypeP2ASet M ⊆ OddOrder.BG.Ch4.S16.hatMsigma M := by
+  rintro y ⟨hyM', -, x, hxσ, hyC⟩
+  obtain ⟨hxMσ, hx1⟩ := (Set.mem_diff _).mp hxσ
+  refine ⟨Subgroup.map_subtype_le _ hyM', ?_⟩
+  -- `x ∈ M_σ ⊓ C_G(y)` is a nonidentity witness (`y ∈ C_G(x) ↔ x ∈ C_G(y)`).
+  intro hbot
+  have hxCy : x ∈ Subgroup.centralizer ({y} : Set G) := by
+    rw [Subgroup.mem_centralizer_singleton_iff] at hyC ⊢
+    exact hyC.symm
+  have : x ∈ OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({y} : Set G) :=
+    Subgroup.mem_inf.mpr ⟨SetLike.mem_coe.mp hxMσ, hxCy⟩
+  rw [hbot] at this
+  exact hx1 (Set.mem_singleton_iff.mpr (Subgroup.mem_bot.mp this))
+
+/-- **The type-`P₂` `ASet` bridge (9008 Option A): `A(S) ⊆ ASet S U₀`** for a matched `(κ∪σ)'`-Hall
+`U₀`.  Since `A(S) ⊆ M' = U₀ ⊔ M_σ` (`typeP_hall_derived_eq_and_abelian`, BG Lemma 15.1(b)) and
+`A(S) ⊆ hatMsigma M` (each point centralizes a nonidentity `M_σ`-element), the definitional
+`ASet M U₀ = hatMsigma M ∩ (U₀ ⊔ M_σ)` receives `A(S)`.  This is the reduction of the honest
+type-`P₂` support to BG's type-agnostic Theorem-E set, feeding `theoremII_tame_embedding` and
+`mem_sigmaSharp_of_mem_aSet_of_escape`. -/
+theorem honestTypeP2ASet_subset_ASet [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K₀ U₀ : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K₀ ≤ M) (hUM : U₀ ≤ M)
+    (hKne : K₀ ≠ ⊥)
+    (hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M) (K₀.subgroupOf M))
+    (hU : OddOrder.Isaacs.Ch03.IsHallSubgroup
+      ((OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U₀.subgroupOf M)) :
+    honestTypeP2ASet M ⊆ OddOrder.BG.Ch4.S16.ASet M U₀ := by
+  have hderiv : derivedInG M = U₀ ⊔ OddOrder.BG.Ch3.S10.Msigma M :=
+    (OddOrder.BG.Ch4.S15.typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKne hK hU).1
+  intro y hy
+  refine ⟨honestTypeP2ASet_subset_hatMsigma hy, ?_⟩
+  have hyM' : y ∈ derivedInG M := hy.1
+  rw [hderiv] at hyM'
+  exact hyM'
+
+/-- **(8.13.b) for the type-`P₂` support: escaping `A(S)`-points are `σ`-sharp.**  An escaping point
+of `A(S)` lies in `ASet S U₀` (`honestTypeP2ASet_subset_ASet`), so BG Theorem-II's `D ⊆ M_σ^#`
+reduction (`mem_sigmaSharp_of_mem_aSet_of_escape`, type-agnostic) puts it in `M_σ^#`. -/
+theorem escaping_honestTypeP2ASet_mem_sigmaSharp [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K₀ U₀ : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K₀ ≤ M) (hUM : U₀ ≤ M)
+    (hKne : K₀ ≠ ⊥)
+    (hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M) (K₀.subgroupOf M))
+    (hU : OddOrder.Isaacs.Ch03.IsHallSubgroup
+      ((OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U₀.subgroupOf M))
+    {a : G} (ha : a ∈ OddOrder.GroupTheory.escapingCentralizerSet M (honestTypeP2ASet M)) :
+    a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M := by
+  obtain ⟨haA, haesc⟩ := ha
+  exact OddOrder.BG.Ch4.S16.mem_sigmaSharp_of_mem_aSet_of_escape hG hM hKM hUM hK hU (Or.inl rfl)
+    (honestTypeP2ASet_subset_ASet hG hM hKM hUM hKne hK hU haA) haA.2.1 haesc
+
+/-- **(8.13.c2) coprimality for the type-`P₂` support** (the `σ`-decomposition core, `P₂` form).  For
+an escaping `a ∈ M_σ^#` and any `w ∈ A(S)`, no prime `p ∈ σ(N[a])` divides `|C_S(w)|`.  Mirrors the
+type-I `escaping_sigma_disjoint_centralizer`: a common prime `p ∈ σ(N[a]) ∩ π(S)` fires
+`non_disjoint_signalizer_frobenius`, making `S` Frobenius with kernel `S_σ`; the `A(S)`-point `w`
+centralizes a nonidentity `S_σ`-element, so Frobenius-kernel absorption
+(`IsFrobeniusGroup.centralizer_kernel_le`) gives `w ∈ S_σ`, whence the `σ`-generic
+`escaping_sigmaSharp_disjoint_centralizer` closes the contradiction. -/
+theorem coprime_FT_signalizer_centralizerIn_honestTypeP2ASet [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {a : G} (haσ : a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M)
+    (haesc : ¬ Subgroup.centralizer ({a} : Set G) ≤ M)
+    {w : G} (hw : w ∈ honestTypeP2ASet M) :
+    Nat.Coprime (Nat.card (OddOrder.BG.Ch4.S16.FT_signalizer a))
+      (Nat.card (OddOrder.Peterfalvi.S04.centralizerIn M w)) := by
+  classical
+  by_contra hnc
+  obtain ⟨p, hpp, hpR, hpC⟩ := Nat.Prime.not_coprime_iff_dvd.mp hnc
+  -- `p ∈ σ(N[a])` since `p ∣ |R(a)| ∣ |M_σ(N[a])|`.
+  have hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma (OddOrder.BG.Ch4.S16.FT_signalizerBase a) := by
+    refine OddOrder.BG.Ch3.S10.Msigma_isPiGroup (OddOrder.BG.Ch4.S16.FT_signalizerBase a) p
+      (Nat.mem_primeFactors.mpr ⟨hpp, ?_, Nat.card_pos.ne'⟩)
+    refine hpR.trans (Subgroup.card_dvd_of_le ?_)
+    rw [OddOrder.BG.Ch4.S16.FT_signalizer]
+    exact inf_le_left
+  -- escape ⟹ `1 < |𝓜_σ(a)|`.
+  have ha1 : a ≠ 1 := haσ.2
+  have hgt : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement a).ncard := by
+    by_contra h
+    exact haesc (OddOrder.BG.Ch4.S16.centralizer_le_of_maximalSigma_le_one hG hM haσ.1 ha1
+      (not_lt.mp h))
+  -- `p ∈ π(S)` (it divides `|C_S(w)| ∣ |S|`), so Lemma 14.13(a) fires.
+  have hpS : p ∈ OddOrder.BG.Ch4.S14.piSet M := by
+    refine Nat.mem_primeFactors.mpr ⟨hpp, hpC.trans ?_, Nat.card_pos.ne'⟩
+    exact Subgroup.card_dvd_of_le inf_le_left
+  obtain ⟨-, -, Ufr, -, hfrobU⟩ :=
+    OddOrder.BG.Ch4.S16.non_disjoint_signalizer_frobenius hG hM haσ hgt ⟨p, hpσ, hpS⟩
+  -- Frobenius kernel absorption: a `w`-point centralizing a nonidentity `M_σ`-element lands in `M_σ`.
+  have hker : ∀ {u v : G}, u ∈ M → v ∈ OddOrder.BG.Ch3.S10.Msigma M → v ≠ 1 →
+      Commute u v → u ∈ OddOrder.BG.Ch3.S10.Msigma M := by
+    intro u v huM hvMσ hv1 hcomm
+    have hvM : v ∈ M := OddOrder.BG.Ch3.S10.Msigma_le M hvMσ
+    have hcent := OddOrder.Isaacs.Ch06.IsFrobeniusGroup.centralizer_kernel_le hfrobU
+      (⟨v, hvM⟩ : ↥M) (Subgroup.mem_subgroupOf.mpr hvMσ)
+      (fun h1 => hv1 (congrArg Subtype.val h1))
+    have humem : (⟨u, huM⟩ : ↥M) ∈ Subgroup.centralizer ({(⟨v, hvM⟩ : ↥M)} : Set ↥M) := by
+      rw [Subgroup.mem_centralizer_singleton_iff]
+      exact Subtype.ext hcomm.eq
+    exact Subgroup.mem_subgroupOf.mp (hcent humem)
+  -- `w ∈ M_σ`: `w ∈ A(S)` centralizes a nonidentity `M_σ`-element `x`.
+  obtain ⟨hwM', hw1, x, hxσ, hwC⟩ := hw
+  obtain ⟨hxMσ, hx1⟩ := (Set.mem_diff _).mp hxσ
+  have hx1' : x ≠ 1 := fun he => hx1 (Set.mem_singleton_iff.mpr he)
+  have hwM : w ∈ M := Subgroup.map_subtype_le _ hwM'
+  have hwMσ : w ∈ OddOrder.BG.Ch3.S10.Msigma M := by
+    refine hker hwM (SetLike.mem_coe.mp hxMσ) hx1' ?_
+    have := Subgroup.mem_centralizer_singleton_iff.mp hwC
+    exact (Commute.symm (this : Commute w x)).symm
+  exact OddOrder.Peterfalvi.S10.escaping_sigmaSharp_disjoint_centralizer hG hM haσ haesc hwMσ hw1
+    hpp hpσ hpC
+
+/-- **(8.13.a) for the type-`P₂` support: `G`-conjugate `A(S)`-points are `M`-conjugate.**  BG §16
+Theorem II conjunct 1 (`theoremII_tame_embedding`, first conjunct), whose `X = ASet M U₀` branch
+receives `A(S)` via `honestTypeP2ASet_subset_ASet`.  The matched κ-Hall / `(κ∪σ)'`-Hall inputs are
+`K₀`/`U₀`. -/
+theorem honestTypeP2ASet_isConj_conj_in_M [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K₀ U₀ : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K₀ ≤ M) (hUM : U₀ ≤ M)
+    (hKne : K₀ ≠ ⊥)
+    (hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M) (K₀.subgroupOf M))
+    (hU : OddOrder.Isaacs.Ch03.IsHallSubgroup
+      ((OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U₀.subgroupOf M))
+    {a b : G} (ha : a ∈ honestTypeP2ASet M) (hb : b ∈ honestTypeP2ASet M) (hab : IsConj a b) :
+    ∃ m : G, m ∈ M ∧ m * a * m⁻¹ = b := by
+  have hII := OddOrder.BG.Ch4.S16.theoremII_tame_embedding hG hM hKM hUM hK hU
+    (X := OddOrder.BG.Ch4.S16.ASet M U₀) (Or.inl rfl)
+  obtain ⟨g, hg⟩ := isConj_iff.mp hab
+  obtain ⟨m, hmM, hmb⟩ := hII.1 a (honestTypeP2ASet_subset_ASet hG hM hKM hUM hKne hK hU ha)
+    b (honestTypeP2ASet_subset_ASet hG hM hKM hUM hKne hK hU hb) ⟨g, hg.symm⟩
+  exact ⟨m, hmM, hmb.symm⟩
+
+/-- **Peterfalvi (8.15) for the type-`P₂` support `A(S)`: the Dade (2.2) support hypotheses hold.**
+The honest (13.2.e) foundation.  Assembles the `σ`-decomposition-generic engine
+(`dadeSupportHypothesisData_of_subset_escaping_sigmaSharp`) with the type-`P₂` pins obtained from the
+matched κ-Hall / `(κ∪σ)'`-Hall pair (`typeP2_exists_matched_kappa_hall_pair`): escaping points are
+`σ`-sharp (`escaping_honestTypeP2ASet_mem_sigmaSharp`, (8.13.b)), `G`-conjugacy is `M`-conjugacy
+(`honestTypeP2ASet_isConj_conj_in_M`, (8.13.a)), and the coprimality
+(`coprime_FT_signalizer_centralizerIn_honestTypeP2ASet`, (8.13.c2)), plus the set-facts (`A(S) ⊆ M`,
+non-identity, nonempty, `M`-conjugation-invariant).
+
+This is the honest type-`P₂` Dade support (issue 9008 Option A / issue 1017 update #9): its `.dade`
+field is the `S04.Hypothesis G (A(S)) M` (the `τ = Ind_M^G` Dade isometry lives on `A(S)`), replacing
+the likely-unsound `sibleyTarget_H0C` route for the (13.3) `S`-instance coherence. -/
+theorem dadeSupportHypothesisData_honestTypeP2ASet [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP2 : OddOrder.BG.Ch4.S14.IsTypeP2 M) :
+    Nonempty (OddOrder.Peterfalvi.S10.DadeSupportHypothesisData M (honestTypeP2ASet M)) := by
+  classical
+  obtain ⟨K₀, U₀, hKM, hUM, hUne, hK, hU, -, -⟩ :=
+    OddOrder.BG.Ch4.S16.typeP2_exists_matched_kappa_hall_pair hG hM hP2
+  -- `K₀ ≠ ⊥` (else `κ(M)` is empty, contradicting type `P₂ ⟹ κ(M) ≠ ∅`).
+  have hKne : K₀ ≠ ⊥ := by
+    intro hK0bot
+    obtain ⟨p, hp⟩ := (OddOrder.BG.Ch4.S14.isTypeP_of_isTypeP2 hP2)
+    -- `p ∈ κ(M) ⊆ π(M) = primeFactors |M|` (a κ-prime has `pRank_M p = 1 > 0`).
+    haveI : Fact p.Prime := ⟨OddOrder.BG.Ch4.S14.prime_of_mem_kappa hp⟩
+    have hprk : 0 < pRank ↥M p := by
+      rcases OddOrder.BG.Ch4.S14.kappa_subset_tau1_union_tau3 hp with hτ1 | hτ3
+      · rw [((OddOrder.BG.Ch3.S12.mem_tau1_iff M p).mp hτ1).2.2]; norm_num
+      · rw [((OddOrder.BG.Ch3.S12.mem_tau3_iff M p).mp hτ3).2.2]; norm_num
+    have hppi : p ∈ (Nat.card ↥M).primeFactors :=
+      OddOrder.BG.Ch2.S09.mem_primeFactors_card_of_pos_pRank hprk
+    obtain ⟨hpp, hpdvdM, hMne⟩ := Nat.mem_primeFactors.mp hppi
+    -- `κ(M)`-Hall `K₀.subgroupOf M`: as `p ∈ κ(M)`, `p` avoids the index, so `p ∣ |K₀.subgroupOf M|`.
+    have hcardMeq : Nat.card ↥(K₀.subgroupOf M) * (K₀.subgroupOf M).index = Nat.card ↥M :=
+      Subgroup.card_mul_index _
+    have hpKcard : p ∣ Nat.card ↥(K₀.subgroupOf M) := by
+      rcases (hpp.dvd_mul.mp (hcardMeq ▸ hpdvdM)) with h | h
+      · exact h
+      · exact absurd hp (hK.2 p (Nat.mem_primeFactors.mpr
+          ⟨hpp, h, Subgroup.index_ne_zero_of_finite⟩))
+    -- but `K₀ = ⊥` makes `K₀.subgroupOf M = ⊥` of order `1`, which `p` cannot divide.
+    rw [hK0bot, Subgroup.bot_subgroupOf, Subgroup.card_bot] at hpKcard
+    exact hpp.one_lt.ne' (Nat.dvd_one.mp hpKcard)
+  refine OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_of_subset_escaping_sigmaSharp hG hM
+    honestTypeP2ASet_subset (fun x hx => hx.2.1)
+    (fun a ha => escaping_honestTypeP2ASet_mem_sigmaSharp hG hM hKM hUM hKne hK hU ha)
+    (fun a ha b hb hab => honestTypeP2ASet_isConj_conj_in_M hG hM hKM hUM hKne hK hU ha hb hab)
+    (fun a ha b hb => coprime_FT_signalizer_centralizerIn_honestTypeP2ASet hG hM
+      (escaping_honestTypeP2ASet_mem_sigmaSharp hG hM hKM hUM hKne hK hU ha) ha.2 hb)
+    ?_ ?_
+  · -- `A(S)` nonempty: `M_σ^# ⊆ A(S)` (a nonidentity `M_σ`-element centralizes itself).
+    obtain ⟨a, ha1⟩ :=
+      Subgroup.ne_bot_iff_exists_ne_one.mp (OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM)
+    have ha1' : (a : G) ≠ 1 := fun h => ha1 (Subtype.ext h)
+    have haMσ : (a : G) ∈ OddOrder.BG.Ch3.S10.Msigma M := a.2
+    have haM' : (a : G) ∈ derivedInG M := OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM haMσ
+    refine ⟨a.1, haM', ha1', a.1, ?_, ?_⟩
+    · exact (Set.mem_diff _).mpr ⟨SetLike.mem_coe.mpr haMσ, fun h => ha1' (Set.mem_singleton_iff.mp h)⟩
+    · exact Subgroup.mem_centralizer_singleton_iff.mpr rfl
+  · -- `M`-conjugation invariance.
+    intro m x hm
+    exact ⟨fun h => by
+      have := honestTypeP2ASet_conj_mem (inv_mem hm) h
+      rwa [show m⁻¹ * (m * x * m⁻¹) * m⁻¹⁻¹ = x from by group] at this,
+      fun h => honestTypeP2ASet_conj_mem hm h⟩
+
+/-- **(13.2.e) `S`-instance Dade hypothesis** (issue 1017 update #10, step 1): the `Hypothesis`-level
+instantiation of `dadeSupportHypothesisData_honestTypeP2ASet` at the type-`P₂` maximal `S`
+(via `hyp.S_maximal`/`hyp.S_typeP2`), packaging the honest §16 support
+`A(S) = ⋃_{x∈S_σ#} C_{S'}(x)#` (`honestTypeP2ASet hyp.S`) as an `S04.Hypothesis`.  This is the concrete
+`S04` Dade datum for `S` (previously only available as the standalone theorem taking `hM`/`hP2`); its
+`.fullDadeIsometryData` (given the support's `HConjInvariant`) materialises the Dade isometry
+`τ = Ind_S^G` on the `ℤ`-lattice of virtual characters — the (13.2.e) foundation the §9 subcoherence
+assembly (`S07.irrSubcoherent`) consumes to re-ground `coherent_H0Cprime_S` off the unsound
+`sibleyTarget_H0C`.  (Sorry-provenance parity with `dadeSupportHypothesisData_honestTypeP2ASet`: the
+inherited shared BG §16 Theorem-II pins, at exact parity with the accepted on-path
+`dadeSupportHypotheses_typeI`; no lane-`b` sorry introduced.) -/
+noncomputable def Hypothesis.dadeHypS [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    OddOrder.Peterfalvi.S04.Hypothesis G (honestTypeP2ASet hyp.S) hyp.S :=
+  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.S_maximal hyp.S_typeP2).some.dade
+
 /-- **The honest `(H₀ ⊔ C')^#`-support for the `S`-instance, `= (C')^#`** (issue 2035 step 2).
 For the `S`-instance the chief kernel is trivial (`toTypesIIIIIIVSetupS_chief_N_eq_bot`, giving
 `H₀ = ⊥`), so the §9 `H₀C'`-support degenerates to `(C')^#` — the non-identity elements of
@@ -542,6 +825,111 @@ def Hypothesis.cprimeSharpS (hyp : Hypothesis (G := G)) : Set ↥hyp.S :=
     x ∈ hyp.cprimeSharpS ↔ (x : G) ∈ hyp.Cprime ∧ x ≠ 1 := by
   simp only [Hypothesis.cprimeSharpS, OddOrder.Peterfalvi.S04.mem_sharp, SetLike.mem_coe,
     Subgroup.mem_subgroupOf]
+
+/-! ### Dade-independent subcoherence inputs for the §9 induced family `𝒮`
+
+The (5.3.a) subcoherence assembler `S07.irrSubcoherent` needs, besides the Dade isometry, the family
+properties `hconj`/`hreal`/`hortho` of `𝒮 = Ind_{HU}^M 𝒳`.  These are **Dade-independent** — provable
+directly from the induced-character conjugation identity and the orthogonality of distinct-orbit
+inductions — so they can be discharged ahead of the (13.2.e) Dade-isometry foundation.  Here we land
+`hconj` (conjugate-closure); it feeds the honest §9 subcoherence assembly that re-grounds
+`coherent_H0Cprime_S` off the unsound `sibleyTarget_H0C`. -/
+
+open OddOrder.Peterfalvi.S11 in
+/-- **`𝒳` is closed under complex conjugation** (Peterfalvi (9.5)): for `χ ∈ 𝒳` (irreducible,
+`H ⊄ Ker χ`), the conjugate `χ̄` is again irreducible (`IsIrreducibleCharacter.conj`) with the same
+kernel (`characterKernel_conj`), so `H ⊄ Ker χ̄`, i.e. `χ̄ ∈ 𝒳`. -/
+theorem conj_mem_xiSet {M : Subgroup G} [Finite G] {data : TypesIIIIIIVSetup M}
+    {χ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(huSub data)}
+    (hχ : χ ∈ xiSet data) :
+    (⟨(χ : ClassFunction ↥(huSub data) ℂ).conj, χ.isIrreducible.conj⟩ :
+      OddOrder.RepresentationTheory.IrreducibleCharacter ↥(huSub data)) ∈ xiSet data := by
+  -- Membership unfolds (rfl) to a `characterKernel`-containment on the conjugate coe, which is
+  -- defeq `(↑χ).conj`; `characterKernel_conj` rewrites it back to `characterKernel ↑χ` = `hχ`.
+  show ¬ (↑(hInHu data) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+    ((χ : ClassFunction ↥(huSub data) ℂ).conj))
+  rw [OddOrder.Peterfalvi.S03.characterKernel_conj]
+  exact hχ
+
+open OddOrder.Peterfalvi.S11 in
+/-- **`𝒮` is closed under complex conjugation** (Peterfalvi (9.5), subcoherence input (5.2.a)).
+For `φ = Ind_{HU}^M χ ∈ 𝒮` with `χ ∈ 𝒳`, the conjugate is `φ̄ = Ind_{HU}^M χ̄` (`conj_induce`), and
+`χ̄ ∈ 𝒳` (`conj_mem_xiSet`), so `φ̄ ∈ 𝒮`.  This is the `hconj` input the (5.3.a) subcoherence
+assembler `S07.irrSubcoherent` consumes for the §9 induced family — a Dade-independent family
+property, provable directly from the induced-character conjugation identity `conj_induce`. -/
+theorem sSet_closedUnderConjugate {M : Subgroup G} [Finite G] (data : TypesIIIIIIVSetup M) :
+    OddOrder.Peterfalvi.S03.ClosedUnderConjugate (sSet data) := by
+  rintro _ ⟨χ, hχ, rfl⟩
+  refine ⟨⟨(χ : ClassFunction ↥(huSub data) ℂ).conj, χ.isIrreducible.conj⟩,
+    conj_mem_xiSet hχ, ?_⟩
+  -- `(Ind_{HU}^M χ)̄ = Ind_{HU}^M χ̄` (`conj_induce`); `induceHU` bakes in its own `Invertible`
+  -- instance, so `convert` absorbs the (subsingleton) instance mismatch.
+  show (induceHU data (χ : ClassFunction ↥(huSub data) ℂ)).conj
+    = induceHU data ((χ : ClassFunction ↥(huSub data) ℂ).conj)
+  letI : Fintype ↥M := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥M : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  simp only [induceHU]
+  convert OddOrder.RepresentationTheory.conj_induce (χ : ClassFunction ↥(huSub data) ℂ) using 2
+
+open OddOrder.Peterfalvi.S11 in
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **`𝒮` is pairwise orthogonal** (Peterfalvi (9.5), subcoherence input (5.2)).  Distinct members
+`Ind_{HU}^M χ ≠ Ind_{HU}^M χ'` arise from non-`M`-conjugate irreducible sources `χ ≁ χ'`
+(`induce_eq_induce_iff_conj`), so the cross-Mackey orthogonality `inner_induce_eq_zero_of_not_conj`
+gives `⟨Ind χ, Ind χ'⟩ = 0` — a Dade-independent family property (the `𝒮`-instance of the general
+`inducedKernelFamily_pairwise_orthogonal`).  The `FiniteInduce`-scoped `Fintype`/`Invertible`
+instances are the ones `induceHU` bakes in, so `induceHU = Ind` reduces definitionally.  This is the
+`pairwise_orthogonal` input the (5.3.a) assembler `S07.irrSubcoherent` consumes for the honest §9
+induced family. -/
+theorem sSet_pairwiseOrthogonal {M : Subgroup G} [Finite G] (data : TypesIIIIIIVSetup M) :
+    OddOrder.Peterfalvi.S03.PairwiseOrthogonal (sSet data) := by
+  rintro _ _ ⟨χ, hχ, rfl⟩ ⟨χ', hχ', rfl⟩ hne
+  -- non-conjugate sources: else the inductions—hence the members—coincide, contradicting `hne`.
+  have hnc : ∀ g : ↥M, IrreducibleCharacter.conjBy g χ ≠ χ' := fun g hg => hne (by
+    show ClassFunction.induce (huSub data) (χ : ClassFunction ↥(huSub data) ℂ)
+      = ClassFunction.induce (huSub data) (χ' : ClassFunction ↥(huSub data) ℂ)
+    exact (induce_eq_induce_iff_conj χ χ').mpr ⟨g, hg⟩)
+  show ClassFunction.inner (ClassFunction.induce (huSub data) (χ : ClassFunction ↥(huSub data) ℂ))
+      (ClassFunction.induce (huSub data) (χ' : ClassFunction ↥(huSub data) ℂ)) = 0
+  exact inner_induce_eq_zero_of_not_conj χ χ' hnc
+
+open OddOrder.Peterfalvi.S11 in
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **`𝒮` has no real members** (Peterfalvi (9.5)/(1.1), subcoherence input (5.2)), for `M` of odd
+order.  A real `Ind_{HU}^M χ` would force `χ̄ = χ^g` for some `g ∈ M` (`induce_conj` +
+`induce_eq_induce_iff_conj`), impossible in odd order (`conjBy_ne_conj_of_odd`: a nontrivial
+irreducible of an odd-order group is never `M`-conjugate to its dual).  `𝒳`-membership `H ⊄ Ker χ`
+supplies the nontriviality (`Ker 1 = univ ⊇ hInHu`).  The `𝒮`-instance of the general
+`inducedKernelFamily_hasNoRealCharacters`; the `no_real_characters` input for `S07.irrSubcoherent`. -/
+theorem sSet_hasNoRealCharacters {M : Subgroup G} [Finite G] (data : TypesIIIIIIVSetup M)
+    (hodd : Odd (Nat.card ↥M)) :
+    OddOrder.Peterfalvi.S03.HasNoRealCharacters (sSet data) := by
+  rintro _ ⟨χ, hχ, rfl⟩ hreal
+  -- `χ` nontrivial: else `Ker χ = univ ⊇ hInHu`, contradicting `χ ∈ 𝒳`.
+  have hχne : (χ : ClassFunction ↥(huSub data) ℂ) ≠ trivialClassFunction ↥(huSub data) := by
+    intro h
+    apply hχ
+    rw [h, OddOrder.Peterfalvi.S03.characterKernel_trivialClassFunction]
+    exact Set.subset_univ _
+  let χc : IrreducibleCharacter ↥(huSub data) :=
+    ⟨(χ : ClassFunction ↥(huSub data) ℂ).conj, χ.isIrreducible.conj⟩
+  -- realness of `Ind χ` transfers to the sources: `Ind χ = (Ind χ)̄ = Ind χ̄`.
+  have hind : ClassFunction.induce (huSub data) (χ : ClassFunction ↥(huSub data) ℂ)
+      = ClassFunction.induce (huSub data) (χc : ClassFunction ↥(huSub data) ℂ) := by
+    have h1 : (ClassFunction.induce (huSub data) (χ : ClassFunction ↥(huSub data) ℂ)).conj
+        = ClassFunction.induce (huSub data) (χ : ClassFunction ↥(huSub data) ℂ) := hreal
+    calc ClassFunction.induce (huSub data) (χ : ClassFunction ↥(huSub data) ℂ)
+        = (ClassFunction.induce (huSub data) (χ : ClassFunction ↥(huSub data) ℂ)).conj := h1.symm
+      _ = ClassFunction.induce (huSub data) (χc : ClassFunction ↥(huSub data) ℂ) :=
+          ClassFunction.induce_conj (huSub data) (χ : ClassFunction ↥(huSub data) ℂ)
+  obtain ⟨g, hg⟩ := (induce_eq_induce_iff_conj χ χc).mp hind
+  refine conjBy_ne_conj_of_odd hodd χ.isIrreducible hχne g ?_
+  have hcoe := congrArg
+    (fun η : IrreducibleCharacter ↥(huSub data) => (η : ClassFunction ↥(huSub data) ℂ)) hg
+  simpa [IrreducibleCharacter.coe_conjBy, χc] using hcoe
 
 open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **Honest §9 character data on `S`** (issue 2035 step 3): the `mkSection11CharacterDataS`
@@ -607,36 +995,176 @@ theorem Hypothesis.tau1S_ofHonest_extends_on_supported [Finite G]
   simpa [Hypothesis.tau1S_ofHonest, Hypothesis.mkSection11CharacterDataS_honest,
     Hypothesis.indS_apply] using h
 
+set_option linter.unusedFintypeInType false in
+/-- **Constituent kernel step for (1.5.a)** (Coq `S1cases` inner kernel argument), stated
+generically.  For subgroups `P0, K'` of a finite group `Γ`, an irreducible `s ∈ Irr(Γ)`, and an
+irreducible `θ'` of `K'` with `P0.subgroupOf K' ⊄ ker θ'`: if `θ'` is a constituent of
+`Res_{K'} s` (`⟨θ', Res_{K'} s⟩ ≠ 0`), then `P0 ⊄ ker s`.
+
+**Contrapositive.**  `P0 ⊆ ker s` makes `Res_{K'} s` trivial on `P0.subgroupOf K'`
+(`characterKernel_restrict_subgroupOf`); `θ'`, a constituent of the genuine character `Res_{K'} s`
+(`isCharacter_restrict`), inherits the containment
+(`characterKernel_subset_of_isCharacter_of_inner_ne_zero`), so `P0.subgroupOf K' ⊆ ker θ'`,
+contradicting the hypothesis.  This is the `S`-instance analogue of the leaf
+`PrimeTIResidue.constituent_P_not_subset_ker`, grounded on the honest `S'`-family — no
+`PrimeTIResidueData` and no prime-TI dichotomy is used. -/
+private theorem constituent_P_not_subset_characterKernel {Γ : Type*} [Group Γ] [Fintype Γ]
+    [Invertible (Nat.card Γ : ℂ)] (P0 K' : Subgroup Γ) [Fintype ↥K']
+    [Invertible (Nat.card ↥K' : ℂ)]
+    (θ' : ClassFunction ↥K' ℂ)
+    (hθ'irr : OddOrder.RepresentationTheory.IsIrreducibleCharacter θ')
+    (hθ'P : ¬ ((P0.subgroupOf K' : Set ↥K') ⊆ OddOrder.Peterfalvi.S03.characterKernel θ'))
+    (s : OddOrder.RepresentationTheory.IrreducibleCharacter Γ)
+    (hs : ClassFunction.inner θ' (ClassFunction.restrict K' (s : ClassFunction Γ ℂ)) ≠ 0) :
+    ¬ ((P0 : Set Γ) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (s : ClassFunction Γ ℂ)) := by
+  intro hker
+  have hResChar : IsCharacter (ClassFunction.restrict K' (s : ClassFunction Γ ℂ)) :=
+    OddOrder.Peterfalvi.S08.isCharacter_restrict s.isIrreducible.isCharacter K'
+  have hinner' : ClassFunction.inner
+      (ClassFunction.restrict K' (s : ClassFunction Γ ℂ)) θ' ≠ 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm]
+    exact star_ne_zero.mpr hs
+  have hResker : ((P0.subgroupOf K') : Set ↥K') ⊆
+      OddOrder.Peterfalvi.S03.characterKernel
+        (ClassFunction.restrict K' (s : ClassFunction Γ ℂ)) :=
+    OddOrder.Peterfalvi.S08.characterKernel_restrict_subgroupOf K' hker
+  exact hθ'P fun x hx =>
+    OddOrder.Peterfalvi.S08.characterKernel_subset_of_isCharacter_of_inner_ne_zero
+      hResChar hθ'irr hinner' (hResker hx)
+
 open scoped FiniteInduce in
-/-- **Peterfalvi (13.5) preamble / (1.5.a) — the family membership `Ind_{PC}^S θ ∈ ℤ[𝒮]`** (issue
-2035 step 5a, the *one* genuine gap).
+/-- **Peterfalvi (13.5) preamble / (1.5.a) — the family membership `Ind_{PC}^S θ ∈ ℤ[𝒮]`**
+(issue 2035 step 5a).
 
 For an irreducible character `θ` of `H = PC` **whose kernel does not contain `P`**, the induced
-character `Ind_{PC}^S θ` lies in `ℤ[𝒮]` (`zSpan` of the honest §9 family `𝒮 = sSet`).  In Coq's
-`PFsection13` this is `sS1S : {subset calS1 <= 'Z[calS]}` (with `calS1 = seqIndD H S P 1`,
-`calS = seqIndD PU S P 1`), the containment used implicitly throughout (13.5)–(13.8); its proof
-`S1cases` is the prime-TI Clifford dichotomy "either `Ind_{PC}^S θ = μ_j` for some `j ≠ 0` (then in
-`𝒮` by `FTseqInd_TIred`) or it lies in `ℤ[𝒮 ∩ Irr S]`".  Peterfalvi phrases it as: in the (13.5)
-preamble `{ζ₀,…,ζ_r} = {Ind_H^S θ | θ ∈ Irr H}` with `P ⊂ Ker ζ_i` exactly for `n < i ≤ r`, and
-"for `i ≤ n`, `ζ_i ∈ ℤ[𝒮]` by (1.5.a)".  The `P ⊄ Ker θ` hypothesis is essential — for
-`P ⊆ Ker θ` the character `Ind_{PC}^S θ` has `P` in its kernel and is **not** in `ℤ[𝒮]` (every
-member of `𝒮 = Ind_{HU} 𝒳` has `P ⊄ Ker`, since `𝒳` demands `H = hInHu ⊄ Ker`).
+character `Ind_{PC}^S θ` lies in `ℤ[𝒮]` (`zSpan` of the honest §9 family `𝒮 = sSet`).  In
+Coq's `PFsection13` this is `sS1S : {subset calS1 <= 'Z[calS]}` (with `calS1 = seqIndD H S P 1`,
+`calS = seqIndD PU S P 1`), used implicitly throughout (13.5)–(13.8).
 
-**This is a genuine §9/§13 theorem, not derivable from the present S11 lemma stock in this
-(source → family) direction** (the existing §9 `isIndHC`/`reducible_sOf_H0_isIndHC` machinery runs
-the *opposite* way, family member → `Ind_{PC}(linear)`).  Isolated here as the single sorried input
-to the (13.3) `tau1S_*` helpers; closing it needs the prime-TI residue dichotomy (`S1cases`). -/
+**Honest proof, grounded on the S06 §4 residue theory** (issue 9014 session 8).  The family
+`𝒮 = sSet = {Ind_{S'}^S χ | χ ∈ Irr(S'), P ⊄ ker χ}` is *exactly* the set of inductions
+from the derived subgroup `S' = huSub` of `P`-nonlinear irreducibles (`P = data.H`), so **membership
+is by witness** — no dichotomy on the induced character is needed.  Writing the single-stage
+`Ind_{PC}^S θ` as the two-stage `Ind_{S'}^S (Ind_{PC'}^{S'} θ')` (`induce_induce_subgroupOf`, with
+`PC' = (PC).subgroupOf S'` and `θ'` the transport of `θ`) and expanding the inner induction into
+`S'`-constituents `Ind_{PC'}^{S'} θ' = ∑_{s ∈ Irr(S')} ⟨θ', Res s⟩ • s`
+(`induce_eq_sum_inner_restrict_smul`), each constituent `s` with nonzero (necessarily `ℕ`)
+coefficient has `P ⊄ ker s` (`constituent_P_not_subset_characterKernel`), so `Ind_{S'}^S s`
+lies in `sSet` by witness `s`; the coefficient-weighted `ℤ`-sum lands in `zSpan sSet`.  This
+grounds the family
+membership on the proven S06 setup (`typePData_toS06Hypothesis` for `S` supplies the certain-type
+Hypothesis, though only its `S'`-family shape is needed here); no prime-TI residue dichotomy is used. -/
 theorem Hypothesis.induce_H_mem_zSpan_S [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))
     (θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ)
-    (_hθ : OddOrder.RepresentationTheory.IsIrreducibleCharacter θ)
-    (_hθP : ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
+    (hθ : OddOrder.RepresentationTheory.IsIrreducibleCharacter θ)
+    (hθP : ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
         Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
       OddOrder.Peterfalvi.S03.characterKernel θ)) :
     ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ ∈
-      OddOrder.Peterfalvi.S07.zSpan (hyp.mkSection11CharacterDataS_honest hG chief).S :=
-  sorry
+      OddOrder.Peterfalvi.S07.zSpan (hyp.mkSection11CharacterDataS_honest hG chief).S := by
+  classical
+  haveI := hyp.finiteG
+  letI : Fintype ↥hyp.S := Fintype.ofFinite _
+  letI : Fintype ↥((derivedInG hyp.S).subgroupOf hyp.S) := Fintype.ofFinite _
+  letI : Fintype ↥(hyp.H.subgroupOf hyp.S) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥hyp.S : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥((derivedInG hyp.S).subgroupOf hyp.S) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥(hyp.H.subgroupOf hyp.S) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  -- Target family is `sSet data` with `data = toTypesIIIIIIVSetupS hG`.
+  rw [OddOrder.Peterfalvi.S11.Section11CharacterData.S_eq]
+  set data := hyp.toTypesIIIIIIVSetupS hG with hdata
+  -- Work with the §9 induction carrier `HU = huSub data`, equal to `S' = derivedInG S` in `↥S`.
+  set HU : Subgroup ↥hyp.S := OddOrder.Peterfalvi.S11.huSub data with hHU
+  have hHUeq : HU = (derivedInG hyp.S).subgroupOf hyp.S :=
+    OddOrder.Peterfalvi.S11.huSub_eq_derivedInG_subgroupOf data
+  letI : Fintype ↥HU := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥HU : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  -- `PC = H.subgroupOf S ≤ S' = HU`.
+  have hHderiv : hyp.H ≤ derivedInG hyp.S := by
+    show hyp.P ⊔ hyp.C ≤ derivedInG hyp.S
+    rw [hyp.S_deriv_eq_PU]
+    exact sup_le le_sup_left (le_trans (hyp.C_eq ▸ inf_le_left) le_sup_right)
+  have hKle : hyp.H.subgroupOf hyp.S ≤ HU := by
+    rw [hHUeq]; exact Subgroup.subgroupOf_mono hyp.S hHderiv
+  letI : Fintype ↥((hyp.H.subgroupOf hyp.S).subgroupOf HU) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥((hyp.H.subgroupOf hyp.S).subgroupOf HU) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  -- The transport `θ' = θ ∘ e` of `θ` onto `PC' = (PC).subgroupOf HU ≤ HU`.
+  have hθ'irr : OddOrder.RepresentationTheory.IsIrreducibleCharacter
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom θ) :=
+    OddOrder.RepresentationTheory.IsIrreducibleCharacter.compHom_of_surjective
+      (Subgroup.subgroupOfEquivOfLe hKle).surjective hθ
+  -- Two-stage induction: `Ind_{PC}^S θ = Ind_{HU}^S (Ind_{PC'}^{HU} θ')`.
+  rw [← OddOrder.RepresentationTheory.induce_induce_subgroupOf hKle θ]
+  -- Expand the inner induction into `HU`-constituents and push `Ind_{HU}^S` inside.
+  rw [OddOrder.RepresentationTheory.induce_eq_sum_inner_restrict_smul
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom θ),
+    ClassFunction.induce_sum]
+  refine Submodule.sum_mem _ fun s _ => ?_
+  rw [ClassFunction.induce_smul]
+  -- The coefficient `⟨θ', Res s⟩` is a non-negative integer `(k : ℂ)`.
+  have hResChar : IsCharacter (ClassFunction.restrict
+      ((hyp.H.subgroupOf hyp.S).subgroupOf HU) (s : ClassFunction ↥HU ℂ)) :=
+    OddOrder.Peterfalvi.S08.isCharacter_restrict s.isIrreducible.isCharacter _
+  obtain ⟨k, hk⟩ := hResChar.exists_natCast_inner_irreducible hθ'irr
+  have hc : ClassFunction.inner
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom θ)
+      (ClassFunction.restrict ((hyp.H.subgroupOf hyp.S).subgroupOf HU)
+        (s : ClassFunction ↥HU ℂ)) = (k : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hk, star_natCast]
+  rw [hc, Nat.cast_smul_eq_nsmul ℂ k (ClassFunction.induce HU (s : ClassFunction ↥HU ℂ))]
+  rcases Nat.eq_zero_or_pos k with hk0 | hk0
+  · simp [hk0]
+  · refine nsmul_mem ?_ k
+    -- `P (in HU) ⊄ ker s`: kernel step from `P ⊄ ker θ'` (from `hθP`) and constituent `θ'`.
+    have hθ'P : ¬ ((((hyp.P.subgroupOf hyp.S).subgroupOf HU).subgroupOf
+          ((hyp.H.subgroupOf hyp.S).subgroupOf HU) :
+        Set ↥((hyp.H.subgroupOf hyp.S).subgroupOf HU)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel
+        (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom θ)) := by
+      rw [OddOrder.RepresentationTheory.subset_characterKernel_compHom_iff]
+      -- The image of `((P.subgroupOf S).subgroupOf HU).subgroupOf (PC.subgroupOf HU)` under `e`
+      -- is `(P.subgroupOf S).subgroupOf (PC.subgroupOf S)`, which `hθP` does not kill.
+      have himg : (((hyp.P.subgroupOf hyp.S).subgroupOf HU).subgroupOf
+            ((hyp.H.subgroupOf hyp.S).subgroupOf HU)).map
+            (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom
+          = (hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) := by
+        ext y
+        rw [Subgroup.mem_map_equiv, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf,
+          Subgroup.mem_subgroupOf]
+        rfl
+      rw [himg]; exact hθP
+    refine Submodule.subset_span ?_
+    rw [OddOrder.Peterfalvi.S11.mem_sSet]
+    refine ⟨s, ?_, rfl⟩
+    -- `s ∈ xiSet data`: `hInHu data ⊄ ker s`, with `hInHu = (P.subgroupOf S).subgroupOf HU`.
+    show ¬ ((OddOrder.Peterfalvi.S11.hInHu data : Set ↥HU) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (s : ClassFunction ↥HU ℂ))
+    have hHInHu : (OddOrder.Peterfalvi.S11.hInHu data : Set ↥HU)
+        = ((hyp.P.subgroupOf hyp.S).subgroupOf HU : Set ↥HU) := by
+      congr 1
+      show (data.H.subgroupOf hyp.S).subgroupOf HU = (hyp.P.subgroupOf hyp.S).subgroupOf HU
+      have hPeq : data.H = hyp.P := by
+        show hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
+      rw [hPeq]
+    rw [hHInHu]
+    -- The generic kernel step: `θ'` is a constituent of `Res s` (coefficient `k > 0`), and
+    -- `P (in HU) ⊄ ker θ'` (`hθ'P`), so `P (in HU) ⊄ ker s`.
+    have hs : ClassFunction.inner
+        (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom θ)
+        (ClassFunction.restrict ((hyp.H.subgroupOf hyp.S).subgroupOf HU)
+          (s : ClassFunction ↥HU ℂ)) ≠ 0 := by
+      rw [hc]; exact_mod_cast hk0.ne'
+    exact constituent_P_not_subset_characterKernel ((hyp.P.subgroupOf hyp.S).subgroupOf HU)
+      ((hyp.H.subgroupOf hyp.S).subgroupOf HU)
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom θ) hθ'irr hθ'P s hs
 
 open scoped FiniteInduce in
 /-- **(13.2.d) τ₁ isometry on the `H`-induced family** (issue 2035 step 5a): `τ₁ = tau1S_ofHonest`

@@ -371,3 +371,180 @@ posited field の discharge (= `PrimeTIResidueData` を real math から constru
   discharge まで進めて **`PrimeTIResidueData` の real 構成**を landing する (それが prime-TI infra の真の完了)。
   sorry-count の −1 は doneness 前進でなく obligation の posit への移動ゆえ、count でなく constructor
   discharge を進捗指標とする。
+## 進捗 (session 6, 2026-07-06, lane b) — STEP 1 `dirr` 抽出 landed (mu2 + mu2_orthonormal 接地)
+
+継続 outline #2 の **step 1 (`dirr` 抽出 layer)** を landing。**`lake build OddOrder` GREEN (3932 jobs)、
+新 axiom なし** (`#print axioms` で新 3 定理が `[propext, Classical.choice, Quot.sound]` のみ = `sorryAx`
+無し確認済)、**net real sorry = ±0** (追加は全て sorry-free; S05 の凍結 sorry-free 状態を保持)。配置は
+`S05_SigmaIsometry.lean` (末尾, `namespace TICyclicHypothesis` 内) — `sigma`/`sigma_inner_irreducibleCharacter`/
+`sigma_mem_ZIrr`/`chiFam_spec` が全て scope 内、かつ import 済 `InducedIrreducible` に norm-1 classifier が有る
+ため bridge file 不要 (import cycle 回避)。124 行追加。
+
+**判定 (step 2 の norm-1⟹signed-irr lemma は既に in-repo)**: task step 2 が要求する「norm-1 の `ZIrr G`
+元 ⟹ ± single irreducible」は **`OddOrder.RepresentationTheory.exists_zsmul_irreducibleCharacter_of_inner_self_one`
+(`InducedIrreducible.lean:526`) として既に存在** (Peterfalvi (5.9.a); `exists_single_of_sum_sq_eq_one` +
+Parseval)。∴ 新規に整数線形代数を組む必要は無く、これを `σ(ω)` に適用するだけ。
+
+**新宣言 (全 sorry-free、`TICyclicHypothesis` 相対、`hVeq`/`app` 引数)**:
+- `exists_sign_smul_irr_of_sigma_omega (ω : Irr W) : ∃ (δ:ℤ)(μ:Irr G), (δ=±1) ∧ σ(ω) = δ•μ` —
+  **`dirr` 抽出 existence** (Coq `primeTIirr_spec` via `dirr_dIirr`)。`σ(ω)∈ZIrr G` (`sigma_mem_ZIrr`) +
+  `‖σ(ω)‖²=‖ω‖²=1` (`sigma_inner_irreducibleCharacter`) → 上記 classifier。
+- `mu2Grid (ω : Irr W) : IrreducibleCharacter G` (= Coq `primeTIirr`, choice of μ) +
+  `mu2GridSign (ω) : ℤ` (= δ) + specs `mu2GridSign_eq` (±1), `sigma_omega_eq_mu2GridSign_smul_mu2Grid`
+  (`σ(ω)=δ•μ`), `mu2Grid_eq_sign_smul_sigma_omega` (`μ=δ•σ(ω)`, δ²=1)。
+- **`mu2Grid_orthonormal (ω ω') : ⟨mu2Grid ω, mu2Grid ω'⟩ = [ω=ω']`** (= Coq `cfdot_prTIirr` =
+  `PrimeTIResidueData.mu2_orthonormal`) — diagonal は irreducibility; off-diagonal は
+  `mu2Grid ω=mu2Grid ω'` ⟹ `⟨σω,σω'⟩=δ_ω δ_ω'·1=±1≠0` が `⟨σω,σω'⟩=⟨ω,ω'⟩=0` (isometry, ω≠ω') に矛盾。
+- `mu2Grid_injective` (mu2Grid は Irr(W) 上単射; 直交性から)。
+
+**これで `PrimeTIResidueData` の 2 field `mu2`/`mu2_orthonormal` が `hyp` の σ から接地可能**になった
+(grid は `Irr(W)`-indexed; constructor では `Iirr W1 × Iirr W2 ≃ Irr W` = `omegaIrrEquiv` で `Fin q × Fin p`
+に読み替える — bijection は既存)。ただし `PrimeTIResidueData` を丸ごと組むには残 field
+(`chi`/`chi_res`/`ind_chi`/`chi_zero`/`cfker_prTIres`/`prTIres_irr_cases`/`P`) が要るため、本 session は
+**再利用可能な extraction lemma 群**として landing し、full constructor 組み立ては step 2-4 に残す
+(sorry-pile 回避; `PrimeTIResidueData` は依然 external consumer 0 = S15:629 のみ)。
+
+**継続 outline (更新)**:
+1. ~~`prTIres_irr_cases` field 化~~ **✅ session 4**。
+2. **`PrimeTIResidueData` constructor** の残 step:
+   - ~~**step 1 `dirr` 抽出** (`mu2`/`mu2_orthonormal`)~~ **✅ session 6** (`mu2Grid`/`mu2Grid_orthonormal`)。
+   - **step 2 residue `chi` = `Res(mu2Grid ω_{0j})`** + `cfRes_prTIirr_eq0` (coprime normal-complement,
+     Coq PFsection4.v:533)。→ `chi`/`chi_res`/`ind_chi`/`chi_zero`。**~1 session**。
+   - **step 3 `prTIres_irr_cases`** (field 済だが constructor 供給には) inertia count の cyclic-TI bundling。
+   - **step 4 `cfker_prTIres`** (Coq:801) + `P := S_F の PU 像` + 全 field 束ね + `Iirr W1×Iirr W2 ≃ Irr W`
+     で `mu2Grid` を `Fin q → Fin p → Irr G` grid に読み替え。**~0.5 session**。
+3. ~~H-level `S1cases`/`sS1S`~~ **✅ session 3**。
+4. **`sS1S` wrapper → `induce_H_mem_zSpan_S` (S15:629) close** — session 3 の残 (a)(b)(c) glue のまま。
+
+## 🛑 進捗 (session 7, 2026-07-06, lane b) — STEP 2 は **既に S06 で ported 済** と判明 → 再構築中止 (outcome B)
+
+継続 outline #2 step 2 (residue `chi`/`chi_res`/`ind_chi`/`chi_zero`, key = `cfRes_prTIirr_eq0`) を
+着手する前に **claim-before-build スキャン** (CLAUDE.md「既存を再構築しない」/[[verify-port-state-by-number-not-coq-name]])
+を実施した結果、**§4 prime-TI residue theory (4.5.a + 4.5.b) は既に `OddOrder/Peterfalvi/S06_*` に
+完全 port 済・sorry-free** と確定。`lake build OddOrder.Peterfalvi.S06_CertainTypeClifford
+OddOrder.Peterfalvi.S06_CertainTypeSupport` GREEN (3460 jobs, style linter warn のみ; real sorry=0)。
+**本 session は Lean 無変更・net real sorry ±0** (S05 の凍結 sorry-free 状態不変、S15:629 の 1 sorry も不変)。
+
+**決定 (なぜ再構築しない)**: `PrimeTIResidueData` の 4 field が要求する residue 数学は、`S06.Hypothesis`
+(= Coq `primeTI_hypothesis` の repo 版; `K ⋊ W1 = L`・`K_normal`・`card_coprime`・`W2 ≤ K` を bundle)
+の上で **既に honest に証明されている**。`S = L`・`PU = K` として 1:1 対応 (grep+読解で全数確認):
+
+| `PrimeTIResidueData` field / Coq | S06 の proven 定理 (sorry-free) | file:line |
+|---|---|---|
+| `chi j` / `primeTIres` | `chiRestrict χ₂ : IrreducibleCharacter ↥K` | S06_CertainTypeClifford:772 |
+| **`chi_res` (i 独立) / `cfRes_prTIirr_eq0` (Coq:533)** | **`restrict_certainType_eq`** (`Res_K μ_ij = Res_K μ_0j`) + `certainTypeRestrict_isIrreducible` | :608 / :732 |
+| `ind_chi` / `cfInd_prTIres` | `induce_restrict_certainType_eq` (`Ind_K^L χ_j = ∑_i μ_ij`) | :743 |
+| `chi_zero` / `prTIres0` | `chiRestrict_one_eq_trivial` (`chiRestrict 1 = 1_K`) | S06_CertainTypeSupport:287 |
+| `cfker_prTIres` (Coq:801) | `not_subset_characterKernel_chiRestrict_of_ne_one` (`W₂ ⊄ ker χ_j`, j≠0) | S06_CertainTypeSupport:182 |
+| `prTIres_irr_cases` (Coq:620) | `exists_eq_certainType_or_induce` + `induce_isIrreducible_of_forall_chiRestrict_ne` (inertia `I_L(χ)=K` 実証済 via `inertia_eq_K_of_forall_chiRestrict_ne`) | :964 / :913 / :868 |
+| `mu2_orthonormal` / `cfdot_prTIirr` | `columnFamily` (`.mu i` = μ_ij) + `columnFamily_mu_ne`/cross-orth 群 | S06_CertainTypeCharacters:432+ |
+
+- **key の `cfRes_prTIirr_eq0` (i-independence) は proved**: `restrict_certainType_eq` が Coq 論法
+  (`Ind_W^L(ω_ij−ω_0j)` の support が `W−W₂` の conjugate に限られ `K` を外す ⟹ `μ_ij−μ_0j` は `K` 上 0)
+  を **`induce_chiColumnDiff_eq_zero_of_mem_K` (:560) + `mem_W2_of_mem_sup_of_mem_K` (`W⊓K=W₂`, :371)**
+  で忠実に実証。engine `cfInd_sub_prTIirr` (=`Ind(ω_ij−ω_0j)=δ_j•(μ_ij−μ_0j)`) は **`columnFamily_spec`**
+  として在る (S05 `mu2Grid` route には無い; 下記)。
+- **既に FT spine が consume**: `FeitThompson.lean:2726/2731`・`S08_CaseB*`・`S12`・`S15.mu_definition`
+  が上記 S06 定理群を直接 cite。§13/§15 は `mu_definition` (Coq shape `Ind(ω_ij−ω_0j)=δ_j•(μ_ij−μ_0j)`,
+  = `S06_MuColumnBridge.induce_chiColumn_diff_mu_diff`) 経由で residue を得ており、`PrimeTIResidueData`
+  は経由しない。
+
+**なぜ `mu2Grid` route (本 issue の leaf) では step 2 を green に組めないか (技術的核心)**:
+`PrimeTIResidueData`/`mu2Grid` は `TICyclicHypothesis G` レベルで、**`PU=K` を持たない** (構造に normal
+subgroup field が無い)。かつ `cfRes_prTIirr_eq0` の engine は **column-uniform sign `δ_j`** を要すが、
+session 6 の `mu2Grid` は per-`ω` sign (`mu2GridSign ω`) しか持たず **column-uniform 性は未証明**
+(= Coq `primeTIirr_spec`, 未 port)。S06 は sign uniformity を **別 route** = (1.4) `columnFamily` +
+degree-congruence (4.3.d) `certainType_sign_eq_of_degree_eq` で得ている。`mu2Grid ↔ columnFamily` の
+bridge は **repo に存在しない** (grep: `mu2Grid` は S05 + 本 leaf のみ) 上、両者は ambient group
+(`G` vs `L`)・V-set (`W−(W₁∪W₂)` vs `W−W₂`)・induction 方向が異なり、bridge 自体が大きな独立 port。
+∴ `mu2Grid` からの step 2 は「clean な近道が無い」でなく **正しい層でない** (S06 が正しい層)。
+
+**⟹ 結論・handoff**:
+1. **step 2 は再実装しない** (S06 に proven 済; 再構築は CLAUDE.md 違反の重複)。本 issue の `PrimeTIResidue.lean`
+   leaf (sessions 1-6) は S06 residue theory の **parallel re-derivation** で、`S1cases`/`induce_H_mem_zSpan_calS`
+   等の下流 skeleton は有用だが、`mu2`/`chi`/... の field-grounding は S06 定理で置換すべき。
+2. **真の残作業 = S15:629 `induce_H_mem_zSpan_S` の close** は、`PrimeTIResidueData` 構成 (from `mu2Grid`)
+   ではなく、**S06 の proven residue 定理 (上表) を S15 の type-P2 setup に instantiate** して行うのが
+   honest かつ非重複な path。session 3 の H-level lift (`induce_H_mem_zSpan_calS`) は
+   `PrimeTIResidueData` を hypothesis に取る engine ゆえ、その `D` を **S06 由来で構成** (or S06 定理で
+   直接 `zSpan` membership を組む) すればよい。次 session はこの「S06 residue → S15:629」glue に注力する。
+3. `PrimeTIResidueData` の constructor を作るなら **source は `mu2Grid` でなく `columnFamily`/`chiRestrict`**
+   (index は `Ŵ₂ × Fin |W₁|`; `Fin q × Fin p` への読み替えは `card_charGroup_W2` 等で bijection)。
+   ただし `PrimeTIResidueData` は external consumer 0 ゆえ、S15:629 を S06 定理で直接閉じるなら
+   `PrimeTIResidueData` 構成自体が不要になる可能性が高い (次 session が判断)。
+
+## ✅ 進捗 (session 8, 2026-07-06, lane b) — S15:629 を **S06-grounded で sorry-free close** → leaf REDUNDANT 確定
+
+継続 outline #4 (`sS1S` wrapper → `induce_H_mem_zSpan_S`) を **honest かつ非重複に landing**。
+`lake build OddOrder` **GREEN (3932 jobs, 新 axiom なし)**、S15 real sorry **20→19 (net −1)**。
+`#print axioms Hypothesis.induce_H_mem_zSpan_S` = `[propext, Classical.choice, Quot.sound]` (**sorryAx 無**)。
+
+**核心的発見 (session 7 の悲観 + 本 issue 全体の前提を訂正)**: S15:629 の close に **prime-TI residue
+dichotomy (`S1cases`/`prTIres_irr_cases`) も `PrimeTIResidueData` も一切不要**。理由 = 目標族
+`𝒮 = sSet = {Ind_{S'}^S χ | χ ∈ Irr(S'), P ⊄ ker χ}` は「S' から誘導した P-nonlinear irreducible の
+induction 全体」で、**membership は witness で即座に成立**する (`mem_sSet`; induction の可約/既約や
+`μ_j`-type かは問われない)。∴ Coq `S1cases` の dichotomy は `seqIndD` の定義形状 (可約 or family-member)
+ゆえに必要だったが、repo の `sSet` は最初から「全 P-nonlinear induction」なので dichotomy 不要。leaf の
+`induce_mem_calS` (witness membership, sorry 無) が本質で、`S1cases`/`prTIres_irr_cases` 経路は
+**over-engineered だった**。
+
+**実際の証明 (S15_SAndT_Setup.lean:668 `Hypothesis.induce_H_mem_zSpan_S`, sorry-free)**:
+1. `Ind_{PC}^S θ = Ind_{S'}^S (Ind_{PC'}^{S'} θ')` — 二段誘導 `induce_induce_subgroupOf` (`PC ≤ S' = HU`,
+   `θ' = θ ∘ subgroupOfEquivOfLe`)。
+2. `Ind_{PC'}^{S'} θ' = ∑_{s∈Irr(S')} ⟨θ', Res s⟩ • s` — `induce_eq_sum_inner_restrict_smul`、
+   `Ind_{S'}^S` を sum/scalar に通す。
+3. 係数 `⟨θ', Res s⟩ = (k:ℕ)` (`exists_natCast_inner_irreducible` + `inner_conj_symm`)。
+4. `k≠0` の各 `s`: `P ⊄ ker s` (新 generic helper `constituent_P_not_subset_characterKernel` =
+   S08 kernel 3 補題の contrapositive、leaf `constituent_P_not_subset_ker` の generic 版)、ゆえ
+   `Ind_{S'}^S s ∈ sSet` (witness `s`) → `zSpan sSet`、`nsmul_mem` で ℕ 倍も残る。`k=0` は `0`。
+- 使用建材: **すべて既存 proven** — `InducedTransport` (`induce_induce_subgroupOf`,
+  `induce_eq_sum_inner_restrict_smul`)、S08 kernel 補題、S11 `sSet`/`huSub_eq_derivedInG_subgroupOf`/
+  `mem_sSet`、`typePData_toS06Hypothesis` (S12; type-P Hypothesis 供給は S' 族形状の grounding 用、ただし
+  本証明では `sSet` 定義が既に S' 族なので S06 dichotomy は呼ばず)。**`PrimeTIResidue.lean` を import せず**。
+- 下流 consumer (`tau1S_ofHonest_inner_induce`/`_induce_mem_ZIrr`) は本 theorem を cite; それらの残 sorryAx は
+  §14 `sibleyTarget_H0C` gate (別件、本 task scope 外) のみ。
+
+**⟹ LEAF-FATE 裁定: `OddOrder/GroupTheory/RepresentationTheory/PrimeTIResidue.lean` は REDUNDANT**:
+- **importer 0 / code consumer 0** (grep 確認; S05/S15 の `PrimeTIResidueData` 言及は全て docstring のみ)。
+- (b) S15:629 は本 leaf 無しで close 済 (上記)。
+- (a) lane a issue 1017 の (10.7) `typeII_derived_frobenius` は、issue 1017 本文の精密診断では
+  **§5 `uniform_degree_coherence`/`subcoherent` (Coq PFsection5) が blocker** で、**prime-TI residue の
+  dichotomy ではない** (issue 1017: 「(10.7) は §9 counts 不使用、`uniform_degree_coherence` で local
+  partner coherence」)。9014 hub 注記の「a も prime-TI に gated」は `uniform_prTIred_coherent` の名前を
+  §5 uniform-coherence と混同したもの。⟹ a も本 leaf を必要としない。
+- **推奨 = delete** (`PrimeTIResidue.lean` 全体 + `PrimeTIResidueData` structure)。sessions 1-6 の
+  `mu2Grid` extraction (S05_SigmaIsometry.lean 内、leaf 外) は S05 の `sigma` 上の再利用可能 lemma 群として
+  残せるが、これも現状 external consumer 0。**leaf 削除は本 task scope 外 (fate 決定は保留と明記されたため
+  削除せず report のみ)**。9014 は本 session で **実質完了** (S15:629 close 達成); leaf 削除を別 issue 化推奨。
+
+## ✅ RESOLVED / claim 撤回 (2026-07-06, session 8) — leaf 削除、S15:629 は S06 から non-dup 実証明
+
+**結論**: prime-TI residue API leaf は**不要だった**。(1) §4 residue theory は S06 に既存 (session 7)、
+(2) さらに target `induce_H_mem_zSpan_S` (S15:629, sS1S) は **sSet の witness 論法**で閉じ、prime-TI
+dichotomy 自体が不要 (session 8、commit 51751aa3、sorry-free)。⟹ **`PrimeTIResidue.lean` (6-session leaf)
+を削除** (consumer 0、OddOrder.lean import 除去)。lane a (10.7) も §5 uniform_degree_coherence が gate
+であり prime-TI residue でない (issue 1017 診断) → a も本 leaf 不要。
+
+**残置**: S05 の `mu2Grid`/`exists_sign_smul_irr_of_sigma_omega` (σ→signed-irr dirr extraction、
+sorry-free) は standalone §4 building block として残す (docstring を leaf 非依存に reword、現 unconsumed)。
+
+**教訓** ([[verify-port-state-by-number-not-coq-name]] 強化済): multi-session の新 infra port 前に
+概念名 (Coq 名でなく) で S0x を exhaustive grep + 該当 § file 通読。1 scan ミスが 6 session を溶かした。
+claim 撤回、本 issue close。
+
+## 2026-07-06 更新 (lane b) — ★restructure (裁定 item 1-4) 完了、held merge unblock
+
+hub 裁定 fcfc0644 の restructure を lane-b が実行完了 (prior commit 4948ff00 の巻き戻し + mu2Grid 移設):
+
+- ✅ **PrimeTIResidue.lean 復元** (528 行、4948ff00^ から) + OddOrder.lean import 復元 (commit 45f610ac)。
+- ✅ **9014 を open へ戻す** (closed/ → issues/、commit 45f610ac)。
+- ✅ **mu2Grid を S05_SigmaIsometry → PrimeTIResidue へ移設** (124 行、namespace/API 不変、
+  `import S05_SigmaIsometry` + variable + open 追加で受け入れ、commit af2a1a23)。external ref 0、
+  #print axioms 標準3のみ、full build GREEN 3933 jobs。lane-a の S05 は clean。
+
+⟹ **held merge の restructure 前提は解消**。残 = **item 5 constructor 完成 (優先タスク)**:
+`cyclicTIiso` port + `primeTIirr_spec` (mu2Grid の実体) + `prTIres_irr_cases` discharge →
+posited field (`primeTIred` の residue 二分律) を実構成に置換 ([[scaffold-sorry-free-not-done]] の
+genuine doneness)。これが §10 (10.7) `Frob_der1_type2` = lane-a frontier と §13 μ_j machinery の共通
+基盤。次 lane-b iteration はこの constructor に正面着手する (規模大・多 session でも淡々と build、
+CLAUDE.md「コスト/規模は着手基準でない」)。
