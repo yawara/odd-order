@@ -50,6 +50,7 @@ mathlib `lcs 0 = ⊤ = G^1`, `lcs 1 = G' = G^2`, `lcs n = G^{n+1}`.
 namespace OddOrder.Isaacs.Ch04
 
 open scoped commutatorElement
+open scoped Pointwise
 
 variable {G : Type*} [Group G]
 
@@ -4301,6 +4302,79 @@ theorem actionCommutator_eq_bot_of_fitting_le_fixedPoints
     exact Subgroup.mem_fixedPointsOfMulAut.mp (hF_le_fixed (hAC_le_F hh)) a
   exact actionCommutator_eq_bot_of_acts_trivially_on_self_of_coprime
     hCop (Or.inr inferInstance) htriv
+
+/-- **BG Proposition 1.5(a)**: if a finite solvable group `G` is acted on by a finite
+operator group `A` with coprime orders, then `A` fixes some Hall `π`-subgroup of `G`.
+
+This is the Hall-subgroup specialization of Glauberman's fixed-point theorem: `G` acts
+transitively on its Hall `π`-subgroups by Hall conjugacy, and the given `A`-action is
+compatible with that conjugation action. -/
+theorem exists_aInvariant_hall
+    {G A : Type*} [Group G] [Finite G] [IsSolvable G]
+    [Group A] [Finite A] {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G)) (π : Set ℕ) :
+    ∃ H : Subgroup G, OddOrder.Isaacs.Ch03.IsHallSubgroup π H ∧
+      OddOrder.Isaacs.Ch03.IsAInvariant φ H := by
+  let Ω := OddOrder.Isaacs.Ch03.HallSubgroups π G
+  letI : MulAction A Ω := MulAction.compHom Ω φ
+  haveI hΩ_nonempty : Nonempty Ω := by
+    obtain ⟨H, hH⟩ := OddOrder.Isaacs.Ch03.hall_E_exists (G := G) π
+    exact ⟨⟨H, hH⟩⟩
+  have hcompat : IsCompatibleMulAction φ Ω := by
+    intro a g H
+    apply Subtype.ext
+    change (φ a) • (MulAut.conj g • H.1) =
+      MulAut.conj ((φ a) g) • ((φ a) • H.1)
+    rw [← mul_smul, ← mul_smul]
+    congr 1
+    ext x
+    simp [MulAut.conj_apply, map_mul, map_inv]
+  obtain ⟨H, hH_fix⟩ :=
+    glauberman_fixed_point_exists
+      (G := G) (A := A) (φ := φ) hCop (Or.inr inferInstance)
+      (Ω := Ω) hcompat (OddOrder.Isaacs.Ch03.HallSubgroups.conjAction_pretransitive π)
+  refine ⟨H.1, H.2, ?_⟩
+  intro a
+  exact congrArg Subtype.val (hH_fix a)
+
+/-- **BG Proposition 1.5(e)**: if `C_G(A)` contains a Hall `π'`-subgroup, then the
+action commutator `[G,A]` lies in the `π`-core of `G`.
+
+Choose an `A`-invariant Hall `π`-subgroup `H`.  Since `K` is a Hall `π'`-subgroup,
+`K` complements `H`, so every generator `g⁻¹ * (φ a) g` of `[G,A]` reduces to an
+element of `H`.  The action commutator is normal and a `π`-group, hence it lies in
+`O_π(G)`. -/
+theorem actionCommutator_le_oPiCore_of_fixedPoints_contains_hallComplement
+    {G A : Type*} [Group G] [Finite G] [IsSolvable G]
+    [Group A] [Finite A] {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    {π : Set ℕ} {K : Subgroup G}
+    (hK_hall : OddOrder.Isaacs.Ch03.IsHallSubgroup {p | p ∉ π} K)
+    (hK_le_fixed : K ≤ Subgroup.fixedPointsOfMulAut φ) :
+    actionCommutator φ ≤ OddOrder.Isaacs.Ch03.oPiCore π G := by
+  obtain ⟨H, hH_hall, hH_inv⟩ := exists_aInvariant_hall hCop π
+  have hCompl : Subgroup.IsComplement' K H :=
+    hK_hall.isComplement_of_compl hH_hall
+  have hAC_le_H : actionCommutator φ ≤ H := by
+    exact (actionCommutator_le_iff_left φ H).mpr
+      (fun a g => by
+        obtain ⟨⟨k, h⟩, hg⟩ := hCompl.2 g
+        have hk_fix : (φ a) (k : G) = k :=
+          (Subgroup.mem_fixedPointsOfMulAut.mp (hK_le_fixed k.2)) a
+        have hh_smul : (φ a) (h : G) ∈ H := hH_inv.smul_mem a h.2
+        rw [← hg]
+        change (((k : G) * (h : G))⁻¹ * (φ a) ((k : G) * (h : G))) ∈ H
+        rw [map_mul, hk_fix]
+        have hcalc :
+            ((k : G) * (h : G))⁻¹ * ((k : G) * (φ a) (h : G)) =
+              (h : G)⁻¹ * (φ a) (h : G) := by
+          group
+        rw [hcalc]
+        exact H.mul_mem (H.inv_mem h.2) hh_smul)
+  have hAC_pi :
+      OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π (actionCommutator φ) :=
+    OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.le hAC_le_H hH_hall.1
+  exact OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.le_oPiCore hAC_pi
 
 /-- **Isaacs Thm 4.36 (class ≤ 2 case)** ⭐: A acts on p-群 G of class ≤ 2 (p > 2),
 A is p'-group, A fixes every order-p element of G ⇒ A trivial on G.
