@@ -844,6 +844,40 @@ def Hypothesis.cprimeSharpS (hyp : Hypothesis (G := G)) : Set ↥hyp.S :=
   simp only [Hypothesis.cprimeSharpS, OddOrder.Peterfalvi.S04.mem_sharp, SetLike.mem_coe,
     Subgroup.mem_subgroupOf]
 
+/-- **`(C')^# ⊆ A(S)` (as an `S`-support)** (issue 1017): the honest §9 coherence support `(C')^#`
+is contained in the `S`-restriction of the Dade support `A(S) = ⋃_{x∈S_σ#} C_{S'}(x)#`.  `C' = [C,C]
+≤ C ≤ U ≤ S' = derivedInG S` gives the derived-membership; and `C ≤ C_S(P)` (from `C = U ⊓ C_S(P)`)
+with `P = S_σ` (type-II `maxNilpotentNormalHall S = M_σ`) puts every `(C')^#`-element in `C_{S'}(z)`
+for any `z ∈ S_σ^#` (nonempty by `Msigma_ne_bot`).  This bridges the coherence support to the Dade
+support — the `hdiffsupp` half the (5.3.a) R-datum `dadeCharacterDifferenceImageOfDiff` needs (its
+support hypothesis is w.r.t. `A(S)`, while the §9 family differences are `(C')^#`-supported). -/
+theorem Hypothesis.cprimeSharpS_subset_supportA [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    hyp.cprimeSharpS ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S := by
+  have hPeq : hyp.P = OddOrder.BG.Ch3.S10.Msigma hyp.S := by
+    rw [hyp.P_eq_SF]
+    exact OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II hG hyp.S_maximal
+      (Or.inr (OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.S_maximal hyp.S_typeP2))
+  have hCcentP : hyp.C ≤ Subgroup.centralizer (hyp.P : Set G) := by
+    rw [hyp.C_eq]; exact inf_le_right
+  have hCderiv : hyp.C ≤ derivedInG hyp.S := by
+    rw [hyp.S_deriv_eq_PU, hyp.C_eq]; exact le_trans inf_le_left le_sup_right
+  have hCpC : hyp.Cprime ≤ hyp.C := Subgroup.map_subtype_le _
+  obtain ⟨z, hz1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp
+    (OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hyp.S_maximal)
+  have hz1' : (z : G) ≠ 1 := fun h => hz1 (Subtype.ext h)
+  intro x hx
+  rw [hyp.mem_cprimeSharpS] at hx
+  obtain ⟨hxCp, hxne⟩ := hx
+  have hxC : (x : G) ∈ hyp.C := hCpC hxCp
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup, mem_honestTypeP2ASet]
+  refine ⟨hCderiv hxC, fun h => hxne (Subtype.ext h), (z : G),
+    (Set.mem_diff _).mpr ⟨SetLike.mem_coe.mpr z.2, fun h => hz1' (Set.mem_singleton_iff.mp h)⟩, ?_⟩
+  rw [Subgroup.mem_centralizer_singleton_iff]
+  have hzP : (z : G) ∈ hyp.P := by rw [hPeq]; exact z.2
+  exact (Subgroup.mem_centralizer_iff.mp (hCcentP hxC) (z : G) hzP).symm
+
 /-! ### Dade-independent subcoherence inputs for the §9 induced family `𝒮`
 
 The (5.3.a) subcoherence assembler `S07.irrSubcoherent` needs, besides the Dade isometry, the family

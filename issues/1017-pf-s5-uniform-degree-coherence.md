@@ -447,3 +447,21 @@ constructor (9014) 完了後、S15 R-datum (coherent_H0Cprime_S 再grounding の
 sSet_hasNoRealCharacters / hortho。**残**: (a) uniform 既約 subfamily の特定 (𝒮 の既約部、degree qu) +
 その Fin n enumeration、(b) hsuppdiff (φ_j−φ_0 の support ⊆ A(S))、(c) reducible residues の別処理 (pair-chain)、
 (d) coherent_H0Cprime_S を組んで re-point。genuine な (9.11) mixed-family coherence、multi-session。
+
+## 2026-07-06 更新 #14 (lane b) — hdiffsupp 構造確定 + (C')^#⊆A(S) bridge landed
+
+R1_diffsupp (S14:710) template を精査 → hdiffsupp の構造確定:
+- **hdiffsupp** = `(φ.conj−φ).support ⊆ supportInSubgroup A(S) S`。R1_diffsupp の鍵入力は
+  `data.supported : support φ ⊆ A ∪ {1}` (family member が A∪{1} 外で消える)。
+- **2 support の区別**: A(S)=honestTypeP2ASet (Dade support、R-datum の support hyp) vs
+  (C')^#=cprimeSharpS (§9 coherence support、H0CprimeSupport)。**(C')^# ⊆ A(S)**。
+- **landed 更新 #14**: `cprimeSharpS_subset_supportA` ((C')^# ⊆ supportInSubgroup A(S) S、
+  sorry-free)。= hdiffsupp の「A(S) 側」半分。
+- **残 hdiffsupp 半分 (deeper)**: `support(Ind ξ) ⊆ (C')^# ∪ {1}` (family member 𝒮 が
+  (C')^# 外で消える)。これは induced character Ind_{HU}^S ξ の support 構造 = §9 family の
+  vanishing 性 (genuine、要 S-instance 構造)。
+
+**R-datum inputs 現状**: dadeHypS / dadeHypS_hconj / h1notA / sSet_hasNoRealCharacters / hortho /
+**cprimeSharpS_subset_supportA (hdiffsupp A(S)側)**。残: (a) 𝒮 member irreducibility (mixed family
+の既約部特定)、(b) support(Ind ξ)⊆(C')^#∪{1} (hdiffsupp 残半分)、(c) mixed-family (9.11) induction。
+次 = (b) の family vanishing 性 or (a) の既約部特定。genuine (9.11)、multi-session。
