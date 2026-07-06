@@ -55,6 +55,19 @@ theorem aInvariant_normal_map_of_characteristic {N : Subgroup H} [N.Normal]
   ⟨aInvariant_map_subtype_of_restrict hN (IsAInvariant.of_characteristic hN.restrict),
     ConjAct.normal_of_characteristic_of_normal, Subgroup.map_subtype_le K⟩
 
+/-- **Minimal nontrivial `L`-invariant normal subgroup.**  A nontrivial finite group
+with an `L`-action has a minimal nontrivial normal subgroup invariant under that action. -/
+theorem exists_minimal_aInvariant_normal [Finite H] [Nontrivial H] :
+    ∃ N : Subgroup H, N ≠ ⊥ ∧ N.Normal ∧ IsAInvariant φ N ∧
+      ∀ M : Subgroup H, M.Normal → IsAInvariant φ M → M ≤ N → M ≠ ⊥ → N ≤ M := by
+  classical
+  set S : Set (Subgroup H) := {N | N ≠ ⊥ ∧ N.Normal ∧ IsAInvariant φ N}
+  have hS_ne : S.Nonempty := ⟨⊤, top_ne_bot, inferInstance, IsAInvariant.top φ⟩
+  obtain ⟨N, ⟨hN_ne, hN_normal, hN_inv⟩, hN_min⟩ := (Set.toFinite S).exists_minimal hS_ne
+  refine ⟨N, hN_ne, hN_normal, hN_inv, ?_⟩
+  intro M hM_normal hM_inv hM_le hM_ne
+  exact hN_min ⟨hM_ne, hM_normal, hM_inv⟩ hM_le
+
 /-- **Existence of an elementary-abelian `L`-invariant normal subgroup.**  A nontrivial finite
 solvable group `H` carrying an action `φ : L →* MulAut H` has a nontrivial `L`-invariant normal
 subgroup `N ◁ H` that is elementary abelian (of some prime exponent `p`). -/
@@ -63,16 +76,14 @@ theorem exists_aInvariant_normal_isElementaryAbelian [Finite H] [IsSolvable H]
     ∃ (N : Subgroup H) (p : ℕ), p.Prime ∧ N ≠ ⊥ ∧ N.Normal ∧ IsAInvariant φ N ∧
       IsElementaryAbelian p ↥N := by
   classical
-  -- A minimal element of the finite poset of nontrivial `L`-invariant normal subgroups.
-  set S : Set (Subgroup H) := {N | N ≠ ⊥ ∧ N.Normal ∧ IsAInvariant φ N} with hS_def
-  have hS_ne : S.Nonempty := ⟨⊤, top_ne_bot, inferInstance, IsAInvariant.top φ⟩
-  obtain ⟨N, ⟨hN_ne, hN_normal, hN_inv⟩, hN_min⟩ := (Set.toFinite S).exists_minimal hS_ne
+  obtain ⟨N, hN_ne, hN_normal, hN_inv, hN_min⟩ :=
+    exists_minimal_aInvariant_normal (φ := φ)
   -- Minimality kill: an `L`-invariant normal subgroup `≤ N` is either trivial or all of `N`.
   have hkill : ∀ M : Subgroup H, M.Normal → IsAInvariant φ M → M ≤ N → M = ⊥ ∨ M = N := by
     intro M hMnorm hMinv hMle
     by_cases hM0 : M = ⊥
     · exact Or.inl hM0
-    · exact Or.inr (le_antisymm hMle (hN_min ⟨hM0, hMnorm, hMinv⟩ hMle))
+    · exact Or.inr (le_antisymm hMle (hN_min M hMnorm hMinv hMle hM0))
   haveI : N.Normal := hN_normal
   haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN_ne
   haveI : IsSolvable ↥N := inferInstance
