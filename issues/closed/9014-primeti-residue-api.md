@@ -7,6 +7,42 @@ created: 2026-07-06
 
 # shared-infra claim: prime-TI residue API (primeTIred/prTIres_irr_cases) — §13 μ_j machinery + (13.3) sS1S の共通基盤
 
+## ⚖️ HUB RULING (2026-07-06, 監視 hub + ユーザー裁可) — **KEEP、本 issue は OPEN 維持**
+
+lane-a「(10.7) 用 prime-TI 機構は repo 不在」vs lane-b「S06 が所有ゆえ PrimeTIResidue は重複、削除」の
+**食い違いを code-level で調査 (2 subagent + Coq trace) → 両診断とも別の層を指した talking-past と確定**:
+
+- **lane-b「S06 が prime-TI residue を所有」= 誤り**: S06 は certain-type 既約グリッド `{μ_ij}` + 既約側
+  coherence (`certainType_isCoherent`, `S06_CertainTypeCoherence:505`) を持つが、**residue 二分律
+  `prTIres_irr_cases` も cyclicTIiso ベースの `primeTIred` も持たない** (S06 の column-sum `μ_j` は
+  by-product、cyclicTIiso 由来の residue とは別物)。
+- **lane-a「grep 0」= 半分誤り**: `primeTIred`(28 refs)・`cyclicTIiso`(9 refs) は**存在する** —
+  ただし **`PrimeTIResidue.lean` 1 ファイル内のみ (= b が削除中のファイル)**。真に 0 なのは
+  `uniform_prTIred_coherent`/`FTtypeP_coherent_TIred` (§5/§8 coherence upgrade)。
+- **Coq 依存連鎖 (確定)**: `cyclicTIiso → primeTIred (§4) → uniform_prTIred_coherent (§4/§5,
+  PFsection4.v:902) → FTtypeP_coherent_TIred (§8, PFsection8.v:852) → Frob_der1_type2 = (10.7) §10
+  (PFsection10.v:549)`。`Frob_der1_type2` は line 576 で `primeTIred` を直接使用 + 629/656 で
+  `FTtypeP_coherent_TIred` を呼ぶ。**residue primitive は coherence upgrade の前提部品 (独立でない)**。
+
+**⟹ 帰結 (両レーンが見落とし)**: `PrimeTIResidue.lean` は §13 専用でなく **§10 (10.7) の coherence
+upgrade も build する共有 prime-TI 基盤**。b の §13 consumer (S15:629 `induce_H_mem_zSpan_S`) が
+witness 論法で別途 closed (b commit `51751aa3`、独立に妥当・不変) でも、**§10 (10.7) = lane-a の live
+frontier が同じ `primeTIred` の consumer**。∴ **b の削除は §13 局所で妥当だが §10 を見落とした点で
+globally 時期尚早**。CLAUDE.md が「mathcomp prime-TI residue API の port」を "複数 downstream を
+unblock する genuine prerequisite、淡々と build せよ" の実例に明示している通り、これは捨てる scaffold でなく
+**完成させる基盤**。
+
+**裁定 (ユーザー 2026-07-06「keep + 9014 再開」)**:
+1. **b の PrimeTIResidue.lean 削除は合流しない (KEEP)**。本ファイルは shared prime-TI foundation
+   (RepTheory leaf、§13 + §10 両 consumer)。
+2. **本 issue 9014 は OPEN 維持** (b の branch は closed へ move するが、その move は合流しない)。
+3. **§10 coherence upgrade** (`uniform_prTIred_coherent` / `FTtypeP_coherent_TIred`) は posited
+   `primeTIred` 上に signature-contract で build (constructor 完成を待たない)。
+4. **S05_SigmaIsometry の mu2Grid** は "orphan dead code" でなく **constructor (mu2 の σ-grounding)
+   の down-payment**。lane-a の S05 に居るのが問題ゆえ **削除でなく本 leaf (PrimeTIResidue) へ移設**。
+5. **constructor (cyclicTIiso port + primeTIirr_spec、`prTIres_irr_cases` の discharge) 完成が
+   優先タスク** — posited field を実構成に置換する genuine な doneness ([[scaffold-sorry-free-not-done]])。
+
 ## 背景
 
 <!-- なぜこの issue を立てたか. ROADMAP / notes / コミット等への参照. -->

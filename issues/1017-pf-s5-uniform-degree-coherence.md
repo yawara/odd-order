@@ -367,3 +367,44 @@ S04:3821 から取る) の 2 点。
 
 hconj/hreal/hortho の Dade-independent 三点が揃ったので、次 iteration は step 1 の `fullDadeIsometryData`
 配線 + R-datum 構築に正面着手する (R-datum が残る唯一の deep crux、difficulty は着手基準でない CLAUDE.md)。
+## ⚖️ HUB 裁定 (2026-07-06, 監視 hub) — lane-b の §5 coherence 実装の帰属
+
+lane-b の未マージ commit (`main..b`) が §5 coherence 実装を含むため、監視 tick で帰属を裁定:
+
+1. **`S07_Subcoherent.lean` (新規 +603) → lane-b carve-out GRANTED**。理由: 既存 b 所有
+   `S07_Coherence` / `S07_CoherenceConstantDegree` を import する **coherence infra**、subcoherence
+   assembler `irrSubcoherent` を提供 (§5 (5.3.a))。module note に "Nothing here is posited" 明記
+   (各 R(χ) は keystone から抽出、(5.2.e) は difference-isometry から導出)。b の `S15_SAndT_Setup`
+   が consume (`:815`, `:842` — "assembler `S07.irrSubcoherent` consumes for the §9 induced family")。
+   **先例 = carve-out 0090** (`S09_CertificateDischarge`: b が a の S09 namespace に coherence infra 新設)。
+   ⟹ step-1.5 で b が `S07_Subcoherent.lean` を編集しても逸脱でない (a が編集したら逸脱)。b の
+   coherence-infra 例外 glob を `S07_{Coherence*,Subcoherent}` に拡張 (merge_monitor は b 合流時に更新)。
+
+2. **`S05_SigmaIsometry.lean` mu2Grid 追加 (+125, commit `a1735d6a`) → 要撤去 (HOLD 原因)**。
+   `mu2Grid`/`mu2GridSign`/`sigma_omega_eq_mu2GridSign_smul_mu2Grid`/`mu2Grid_orthonormal`/
+   `mu2Grid_injective` 等 8 宣言。**9014 (PrimeTIResidue) 撤回後 orphan** (`mu2Grid` の参照 31 件
+   全て S05 内・external 0)。**S05_SigmaIsometry は lane-a 所有の σ-theory 本丸** (ft_lane_reallocation
+   line 48 "σ-theory tail/dedup" = a の distinguishing cluster)、carve-out 無。
+   ⟹ **lane-b は次 sync で mu2Grid ブロックを S05 から除去** (dead code + a ファイルへの territorial
+   intrusion)。もし将来 subcoherence が σ-extraction を要するなら a-owned S05 でなく shared
+   `GroupTheory/**` leaf か b-owned file に置く。除去後 b は clean に合流可。
+
+3. **合流状態 (2026-07-06 tick)**: **a** (9.8.d S11) + **c** (14.9 S16) は build-green (3932 jobs,
+   AxiomsCheck OK) で local main 合流済 (push は harness 分類器が default-branch 保護で保留 →
+   ユーザー裁可待ち)。**b は #2 の mu2Grid 撤去まで HELD**。
+
+4. **⚠ cross-lane coordination flag**: 本 issue 1017 は **lane-a background /loop (agentId a8e14…) が
+   §5/prime-TI を現在 再診断中**。lane-b の §5 coherence 実装と**同一ゾーン**。特に **prime-TI 基盤の
+   存否で食い違い**: lane-a 再診断 = 「prime-TI-reducible coherence 機構 (`primeTIred` 等) は repo 不在
+   (grep 0 refs)」 / lane-b = 「S06 が prime-TI residue theory を完全所有ゆえ 9014 leaf は duplication」
+   と撤回。**両者は同じ §5/prime-TI を別診断**しており、重複・矛盾のリスク → hub/user がデコンフリクト
+   要 (どちらの診断が正しいか = code-level 検証で決着可、別 tick で subagent 精査推奨)。
+
+   **✅ RESOLVED (2026-07-06, hub 調査 + ユーザー裁可)**: 2 subagent + Coq trace で決着。**両診断とも
+   別の層を指した talking-past** — lane-b「S06 が residue 所有」は誤り (S06 は既約グリッドのみ、
+   residue 二分律・cyclicTIiso なし)、lane-a「grep 0」は半分誤り (`primeTIred` は PrimeTIResidue.lean
+   内に存在、真に 0 は §5/§8 coherence upgrade)。**Coq: (10.7) は `primeTIred` を transitively 必要**
+   (residue = coherence upgrade の前提部品)。⟹ **PrimeTIResidue.lean は KEEP** (§10+§13 共有基盤)、
+   **9014 OPEN 維持**、mu2Grid は削除でなく PrimeTIResidue へ移設。詳細裁定 = **issue 9014 の HUB RULING**。
+   lane-b の held merge は「PrimeTIResidue 削除を含めない + mu2Grid を S05 から PrimeTIResidue へ移設 +
+   9014 を close しない」に restructure 要 (S07_Subcoherent carve-out・S15:629 witness closure は不変)。
