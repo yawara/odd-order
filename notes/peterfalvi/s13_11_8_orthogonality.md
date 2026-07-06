@@ -2266,3 +2266,22 @@ landed (sorry-free foundational): `induce_derived_apply_one_eq_w1_mul` (Ind θ 1
    → bundled §9 sorry を hS2deg cite で discharge、残 = (9.5)/(9.8) の named obligations。
 ∴ world-bridge の残 gap は **(9.5)/(11.5) family identification** (reducible/irr inclusion) +
 **(9.8)/(9.9) irr-degree 完全性** = deep §9 char (major)。foundational + reduction は landing 済。
+
+## 2026-07-06 update³⁴ (lane-a /loop) — hS2deg assembled: world-bridge uniform-degree → 2 精密 §9 obligation
+
+`Hypothesis.Sset_diff_SHCSet_apply_one_eq_qu` (landed): `∀ y ∈ Sset\SHCSet, y 1 = q·u = qu`。
+by_cases irr で分解:
+- **reducible** → `inducedFamily_reducible_apply_one_eq_qu` (consume、(9.5)/(11.5) reducible-inclusion sorried)。
+- **irr** (∉ SHCSet ⟹ deg≠w₁) → (9.8)/(9.9) irr-degree 完全性 (sorried、inline)。
+
+∴ world-bridge の uniform-degree (hgen_of_S2_uniform_degree の hS2deg 入力) は **2 つの精密 §9
+obligation** に還元完了:
+1. **(9.5)/(11.5) reducible-inclusion**: reducible inducedFamily-member → sOf(H₀) (= μ-column、
+   `reducible_mem_sOf_H0_eq_muGrid_columnSum` の逆方向 + family identification)。
+2. **(9.8)/(9.9) irr-degree 完全性**: irr inducedFamily-member of deg≠w₁ → deg qu。
+
+landed (world-bridge、全 build-green): degree-factoring (`induce_derived_apply_one_eq_w1_mul`) +
+column-degree (`muGrid_column_sum_apply_one_eq_qu`) + reducible-side (`inducedFamily_reducible_apply_one_eq_qu`) +
+**hS2deg assembly** (`Sset_diff_SHCSet_apply_one_eq_qu`)。残 = 上記 2 §9 obligation (deep、repo 不在) +
+capstone threading (htype/hnt/chief signature 拡張 + d=u (`charParam_d_eq_u`) + ψ₀ column witness で
+bundled §9 sorry を hS2deg cite で discharge)。
