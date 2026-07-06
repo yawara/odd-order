@@ -530,6 +530,273 @@ open scoped FiniteInduce in
 `S`-instance kernel `cSub = C` identification (`toTypesIIIIIIVSetupS_cSub_eq_C`) is applied. -/
 def Hypothesis.Cprime (hyp : Hypothesis (G := G)) : Subgroup G := derivedInG hyp.C
 
+/-! ### (13.2.e) The honest type-`P₂` Dade support `A(S)` and its (2.2) hypothesis
+
+Peterfalvi (8.10) defines the type-`P` support as `A(M) = ⋃_{x∈M_σ^#} C_{M'}(x)^#`, indexed over
+the **core** `M_σ^#`.  For the type-`P₂` maximal `S` this is `A(S) = centralizerSupport (M_σ^#) S'`
+— the nonidentity elements of `S' = [S,S]` centralizing some nonidentity element of `S_σ = S_F`.
+This is the honest (13.2.e) Dade-support set; the earlier `typePA = (S')^#` over-claim (issue 9008)
+included the Frobenius-complement points `U^#` (`C_{S_σ} = 1`), which is false-as-stated for `P₂`.
+
+Following 9008 Option A, `A(S)` reduces to the type-I `ASet` bridge: `A(S) ⊆ ASet S U₀` for a matched
+`(κ∪σ)'`-Hall `U₀` (`typeP2_exists_matched_kappa_hall_pair`), since `S' = U₀ ⊔ S_σ`
+(`typeP_hall_derived_eq_and_abelian`) and every `A(S)`-point centralizes a nonidentity `S_σ`-element
+(so lies in `\widehat{S_σ}`).  The three (8.13) obligations then flow through the type-agnostic BG
+Theorem-II machinery, exactly as in the type-I `dadeSupportHypotheses_typeI` assembly. -/
+
+/-- **Peterfalvi (8.10), the honest type-`P₂` support `A(M) = ⋃_{x∈M_σ^#} C_{M'}(x)^#`.**  The
+nonidentity elements of the derived subgroup `M' = derivedInG M` centralizing some nonidentity
+element of `M_σ`.  This is the correct type-`P₂` `A(M)` (issue 9008), strictly smaller than the
+`typePA = (M')^#` over-claim (it excludes the Frobenius-complement points `U^#`). -/
+def honestTypeP2ASet (M : Subgroup G) : Set G :=
+  OddOrder.GroupTheory.centralizerSupport
+    (OddOrder.GroupTheory.sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma M)) (derivedInG M)
+
+@[simp] theorem mem_honestTypeP2ASet {M : Subgroup G} {y : G} :
+    y ∈ honestTypeP2ASet M ↔
+      y ∈ derivedInG M ∧ y ≠ 1 ∧
+        ∃ x ∈ OddOrder.GroupTheory.sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma M),
+          y ∈ Subgroup.centralizer ({x} : Set G) :=
+  Iff.rfl
+
+/-- Every element of `A(S)` is a nonidentity element of `G`. -/
+theorem honestTypeP2ASet_subset_sharp {M : Subgroup G} :
+    honestTypeP2ASet M ⊆ OddOrder.Peterfalvi.S04.sharp (Set.univ : Set G) := by
+  rintro y ⟨-, hy1, -⟩
+  exact OddOrder.Peterfalvi.S04.mem_sharp.mpr ⟨Set.mem_univ y, hy1⟩
+
+/-- `A(S) ⊆ M'` (the support lives in the derived subgroup). -/
+theorem honestTypeP2ASet_subset_derived {M : Subgroup G} :
+    honestTypeP2ASet M ⊆ (derivedInG M : Set G) := fun _ hy => hy.1
+
+/-- `A(S) ⊆ M`. -/
+theorem honestTypeP2ASet_subset {M : Subgroup G} :
+    honestTypeP2ASet M ⊆ (M : Set G) := fun _ hy =>
+  Subgroup.map_subtype_le _ hy.1
+
+/-- **`A(S)` is `M`-conjugation invariant.**  Both `M_σ` (`Msigma`) and `M' = derivedInG M` are
+`M`-normal, so conjugating `y ∈ A(S)` and its centralized `M_σ`-witness by `m ∈ M` stays in `A(S)`. -/
+theorem honestTypeP2ASet_conj_mem [Finite G] {M : Subgroup G} {m : G} (hm : m ∈ M) {y : G}
+    (hy : y ∈ honestTypeP2ASet M) : m * y * m⁻¹ ∈ honestTypeP2ASet M := by
+  obtain ⟨hyM', hy1, x, hxσ, hyC⟩ := hy
+  have hmM' : m ∈ Subgroup.normalizer ((derivedInG M : Subgroup G) : Set G) :=
+    OddOrder.BG.Ch3.S10.le_normalizer_derivedInG M hm
+  have hmMσ : m ∈ Subgroup.normalizer ((OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) := by
+    rw [OddOrder.BG.Ch3.S10.Msigma]
+    exact OddOrder.GroupTheory.le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M hm
+  refine ⟨?_, ?_, m * x * m⁻¹, ?_, ?_⟩
+  · -- `m·y·m⁻¹ ∈ M'` since `m ∈ M ≤ N_G(M')`.
+    exact (Subgroup.mem_normalizer_iff.mp hmM' y).mp hyM'
+  · exact fun h => hy1 (by
+      have hyeq : y = m⁻¹ * (m * y * m⁻¹) * m := by group
+      rw [hyeq, h]; group)
+  · exact OddOrder.Peterfalvi.S10.sharpSubgroup_conj_mem hmMσ hxσ
+  · -- `m·y·m⁻¹` centralizes `m·x·m⁻¹`.
+    rw [Subgroup.mem_centralizer_singleton_iff] at hyC ⊢
+    calc m * y * m⁻¹ * (m * x * m⁻¹)
+        = m * (y * x) * m⁻¹ := by group
+      _ = m * (x * y) * m⁻¹ := by rw [hyC]
+      _ = m * x * m⁻¹ * (m * y * m⁻¹) := by group
+
+/-- **`A(S) ⊆ hatMsigma S`** (BG Theorem-E notation): every `A(S)`-point centralizes a nonidentity
+`M_σ`-element, so `M_σ ⊓ C_G(y) ≠ ⊥`, and lies in `M' ≤ M`. -/
+theorem honestTypeP2ASet_subset_hatMsigma [Finite G] {M : Subgroup G} :
+    honestTypeP2ASet M ⊆ OddOrder.BG.Ch4.S16.hatMsigma M := by
+  rintro y ⟨hyM', -, x, hxσ, hyC⟩
+  obtain ⟨hxMσ, hx1⟩ := (Set.mem_diff _).mp hxσ
+  refine ⟨Subgroup.map_subtype_le _ hyM', ?_⟩
+  -- `x ∈ M_σ ⊓ C_G(y)` is a nonidentity witness (`y ∈ C_G(x) ↔ x ∈ C_G(y)`).
+  intro hbot
+  have hxCy : x ∈ Subgroup.centralizer ({y} : Set G) := by
+    rw [Subgroup.mem_centralizer_singleton_iff] at hyC ⊢
+    exact hyC.symm
+  have : x ∈ OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({y} : Set G) :=
+    Subgroup.mem_inf.mpr ⟨SetLike.mem_coe.mp hxMσ, hxCy⟩
+  rw [hbot] at this
+  exact hx1 (Set.mem_singleton_iff.mpr (Subgroup.mem_bot.mp this))
+
+/-- **The type-`P₂` `ASet` bridge (9008 Option A): `A(S) ⊆ ASet S U₀`** for a matched `(κ∪σ)'`-Hall
+`U₀`.  Since `A(S) ⊆ M' = U₀ ⊔ M_σ` (`typeP_hall_derived_eq_and_abelian`, BG Lemma 15.1(b)) and
+`A(S) ⊆ hatMsigma M` (each point centralizes a nonidentity `M_σ`-element), the definitional
+`ASet M U₀ = hatMsigma M ∩ (U₀ ⊔ M_σ)` receives `A(S)`.  This is the reduction of the honest
+type-`P₂` support to BG's type-agnostic Theorem-E set, feeding `theoremII_tame_embedding` and
+`mem_sigmaSharp_of_mem_aSet_of_escape`. -/
+theorem honestTypeP2ASet_subset_ASet [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K₀ U₀ : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K₀ ≤ M) (hUM : U₀ ≤ M)
+    (hKne : K₀ ≠ ⊥)
+    (hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M) (K₀.subgroupOf M))
+    (hU : OddOrder.Isaacs.Ch03.IsHallSubgroup
+      ((OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U₀.subgroupOf M)) :
+    honestTypeP2ASet M ⊆ OddOrder.BG.Ch4.S16.ASet M U₀ := by
+  have hderiv : derivedInG M = U₀ ⊔ OddOrder.BG.Ch3.S10.Msigma M :=
+    (OddOrder.BG.Ch4.S15.typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKne hK hU).1
+  intro y hy
+  refine ⟨honestTypeP2ASet_subset_hatMsigma hy, ?_⟩
+  have hyM' : y ∈ derivedInG M := hy.1
+  rw [hderiv] at hyM'
+  exact hyM'
+
+/-- **(8.13.b) for the type-`P₂` support: escaping `A(S)`-points are `σ`-sharp.**  An escaping point
+of `A(S)` lies in `ASet S U₀` (`honestTypeP2ASet_subset_ASet`), so BG Theorem-II's `D ⊆ M_σ^#`
+reduction (`mem_sigmaSharp_of_mem_aSet_of_escape`, type-agnostic) puts it in `M_σ^#`. -/
+theorem escaping_honestTypeP2ASet_mem_sigmaSharp [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K₀ U₀ : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K₀ ≤ M) (hUM : U₀ ≤ M)
+    (hKne : K₀ ≠ ⊥)
+    (hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M) (K₀.subgroupOf M))
+    (hU : OddOrder.Isaacs.Ch03.IsHallSubgroup
+      ((OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U₀.subgroupOf M))
+    {a : G} (ha : a ∈ OddOrder.GroupTheory.escapingCentralizerSet M (honestTypeP2ASet M)) :
+    a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M := by
+  obtain ⟨haA, haesc⟩ := ha
+  exact OddOrder.BG.Ch4.S16.mem_sigmaSharp_of_mem_aSet_of_escape hG hM hKM hUM hK hU (Or.inl rfl)
+    (honestTypeP2ASet_subset_ASet hG hM hKM hUM hKne hK hU haA) haA.2.1 haesc
+
+/-- **(8.13.c2) coprimality for the type-`P₂` support** (the `σ`-decomposition core, `P₂` form).  For
+an escaping `a ∈ M_σ^#` and any `w ∈ A(S)`, no prime `p ∈ σ(N[a])` divides `|C_S(w)|`.  Mirrors the
+type-I `escaping_sigma_disjoint_centralizer`: a common prime `p ∈ σ(N[a]) ∩ π(S)` fires
+`non_disjoint_signalizer_frobenius`, making `S` Frobenius with kernel `S_σ`; the `A(S)`-point `w`
+centralizes a nonidentity `S_σ`-element, so Frobenius-kernel absorption
+(`IsFrobeniusGroup.centralizer_kernel_le`) gives `w ∈ S_σ`, whence the `σ`-generic
+`escaping_sigmaSharp_disjoint_centralizer` closes the contradiction. -/
+theorem coprime_FT_signalizer_centralizerIn_honestTypeP2ASet [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {a : G} (haσ : a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M)
+    (haesc : ¬ Subgroup.centralizer ({a} : Set G) ≤ M)
+    {w : G} (hw : w ∈ honestTypeP2ASet M) :
+    Nat.Coprime (Nat.card (OddOrder.BG.Ch4.S16.FT_signalizer a))
+      (Nat.card (OddOrder.Peterfalvi.S04.centralizerIn M w)) := by
+  classical
+  by_contra hnc
+  obtain ⟨p, hpp, hpR, hpC⟩ := Nat.Prime.not_coprime_iff_dvd.mp hnc
+  -- `p ∈ σ(N[a])` since `p ∣ |R(a)| ∣ |M_σ(N[a])|`.
+  have hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma (OddOrder.BG.Ch4.S16.FT_signalizerBase a) := by
+    refine OddOrder.BG.Ch3.S10.Msigma_isPiGroup (OddOrder.BG.Ch4.S16.FT_signalizerBase a) p
+      (Nat.mem_primeFactors.mpr ⟨hpp, ?_, Nat.card_pos.ne'⟩)
+    refine hpR.trans (Subgroup.card_dvd_of_le ?_)
+    rw [OddOrder.BG.Ch4.S16.FT_signalizer]
+    exact inf_le_left
+  -- escape ⟹ `1 < |𝓜_σ(a)|`.
+  have ha1 : a ≠ 1 := haσ.2
+  have hgt : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement a).ncard := by
+    by_contra h
+    exact haesc (OddOrder.BG.Ch4.S16.centralizer_le_of_maximalSigma_le_one hG hM haσ.1 ha1
+      (not_lt.mp h))
+  -- `p ∈ π(S)` (it divides `|C_S(w)| ∣ |S|`), so Lemma 14.13(a) fires.
+  have hpS : p ∈ OddOrder.BG.Ch4.S14.piSet M := by
+    refine Nat.mem_primeFactors.mpr ⟨hpp, hpC.trans ?_, Nat.card_pos.ne'⟩
+    exact Subgroup.card_dvd_of_le inf_le_left
+  obtain ⟨-, -, Ufr, -, hfrobU⟩ :=
+    OddOrder.BG.Ch4.S16.non_disjoint_signalizer_frobenius hG hM haσ hgt ⟨p, hpσ, hpS⟩
+  -- Frobenius kernel absorption: a `w`-point centralizing a nonidentity `M_σ`-element lands in `M_σ`.
+  have hker : ∀ {u v : G}, u ∈ M → v ∈ OddOrder.BG.Ch3.S10.Msigma M → v ≠ 1 →
+      Commute u v → u ∈ OddOrder.BG.Ch3.S10.Msigma M := by
+    intro u v huM hvMσ hv1 hcomm
+    have hvM : v ∈ M := OddOrder.BG.Ch3.S10.Msigma_le M hvMσ
+    have hcent := OddOrder.Isaacs.Ch06.IsFrobeniusGroup.centralizer_kernel_le hfrobU
+      (⟨v, hvM⟩ : ↥M) (Subgroup.mem_subgroupOf.mpr hvMσ)
+      (fun h1 => hv1 (congrArg Subtype.val h1))
+    have humem : (⟨u, huM⟩ : ↥M) ∈ Subgroup.centralizer ({(⟨v, hvM⟩ : ↥M)} : Set ↥M) := by
+      rw [Subgroup.mem_centralizer_singleton_iff]
+      exact Subtype.ext hcomm.eq
+    exact Subgroup.mem_subgroupOf.mp (hcent humem)
+  -- `w ∈ M_σ`: `w ∈ A(S)` centralizes a nonidentity `M_σ`-element `x`.
+  obtain ⟨hwM', hw1, x, hxσ, hwC⟩ := hw
+  obtain ⟨hxMσ, hx1⟩ := (Set.mem_diff _).mp hxσ
+  have hx1' : x ≠ 1 := fun he => hx1 (Set.mem_singleton_iff.mpr he)
+  have hwM : w ∈ M := Subgroup.map_subtype_le _ hwM'
+  have hwMσ : w ∈ OddOrder.BG.Ch3.S10.Msigma M := by
+    refine hker hwM (SetLike.mem_coe.mp hxMσ) hx1' ?_
+    have := Subgroup.mem_centralizer_singleton_iff.mp hwC
+    exact (Commute.symm (this : Commute w x)).symm
+  exact OddOrder.Peterfalvi.S10.escaping_sigmaSharp_disjoint_centralizer hG hM haσ haesc hwMσ hw1
+    hpp hpσ hpC
+
+/-- **(8.13.a) for the type-`P₂` support: `G`-conjugate `A(S)`-points are `M`-conjugate.**  BG §16
+Theorem II conjunct 1 (`theoremII_tame_embedding`, first conjunct), whose `X = ASet M U₀` branch
+receives `A(S)` via `honestTypeP2ASet_subset_ASet`.  The matched κ-Hall / `(κ∪σ)'`-Hall inputs are
+`K₀`/`U₀`. -/
+theorem honestTypeP2ASet_isConj_conj_in_M [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K₀ U₀ : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K₀ ≤ M) (hUM : U₀ ≤ M)
+    (hKne : K₀ ≠ ⊥)
+    (hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M) (K₀.subgroupOf M))
+    (hU : OddOrder.Isaacs.Ch03.IsHallSubgroup
+      ((OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U₀.subgroupOf M))
+    {a b : G} (ha : a ∈ honestTypeP2ASet M) (hb : b ∈ honestTypeP2ASet M) (hab : IsConj a b) :
+    ∃ m : G, m ∈ M ∧ m * a * m⁻¹ = b := by
+  have hII := OddOrder.BG.Ch4.S16.theoremII_tame_embedding hG hM hKM hUM hK hU
+    (X := OddOrder.BG.Ch4.S16.ASet M U₀) (Or.inl rfl)
+  obtain ⟨g, hg⟩ := isConj_iff.mp hab
+  obtain ⟨m, hmM, hmb⟩ := hII.1 a (honestTypeP2ASet_subset_ASet hG hM hKM hUM hKne hK hU ha)
+    b (honestTypeP2ASet_subset_ASet hG hM hKM hUM hKne hK hU hb) ⟨g, hg.symm⟩
+  exact ⟨m, hmM, hmb.symm⟩
+
+/-- **Peterfalvi (8.15) for the type-`P₂` support `A(S)`: the Dade (2.2) support hypotheses hold.**
+The honest (13.2.e) foundation.  Assembles the `σ`-decomposition-generic engine
+(`dadeSupportHypothesisData_of_subset_escaping_sigmaSharp`) with the type-`P₂` pins obtained from the
+matched κ-Hall / `(κ∪σ)'`-Hall pair (`typeP2_exists_matched_kappa_hall_pair`): escaping points are
+`σ`-sharp (`escaping_honestTypeP2ASet_mem_sigmaSharp`, (8.13.b)), `G`-conjugacy is `M`-conjugacy
+(`honestTypeP2ASet_isConj_conj_in_M`, (8.13.a)), and the coprimality
+(`coprime_FT_signalizer_centralizerIn_honestTypeP2ASet`, (8.13.c2)), plus the set-facts (`A(S) ⊆ M`,
+non-identity, nonempty, `M`-conjugation-invariant).
+
+This is the honest type-`P₂` Dade support (issue 9008 Option A / issue 1017 update #9): its `.dade`
+field is the `S04.Hypothesis G (A(S)) M` (the `τ = Ind_M^G` Dade isometry lives on `A(S)`), replacing
+the likely-unsound `sibleyTarget_H0C` route for the (13.3) `S`-instance coherence. -/
+theorem dadeSupportHypothesisData_honestTypeP2ASet [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP2 : OddOrder.BG.Ch4.S14.IsTypeP2 M) :
+    Nonempty (OddOrder.Peterfalvi.S10.DadeSupportHypothesisData M (honestTypeP2ASet M)) := by
+  classical
+  obtain ⟨K₀, U₀, hKM, hUM, hUne, hK, hU, -, -⟩ :=
+    OddOrder.BG.Ch4.S16.typeP2_exists_matched_kappa_hall_pair hG hM hP2
+  -- `K₀ ≠ ⊥` (else `κ(M)` is empty, contradicting type `P₂ ⟹ κ(M) ≠ ∅`).
+  have hKne : K₀ ≠ ⊥ := by
+    intro hK0bot
+    obtain ⟨p, hp⟩ := (OddOrder.BG.Ch4.S14.isTypeP_of_isTypeP2 hP2)
+    -- `p ∈ κ(M) ⊆ π(M) = primeFactors |M|` (a κ-prime has `pRank_M p = 1 > 0`).
+    haveI : Fact p.Prime := ⟨OddOrder.BG.Ch4.S14.prime_of_mem_kappa hp⟩
+    have hprk : 0 < pRank ↥M p := by
+      rcases OddOrder.BG.Ch4.S14.kappa_subset_tau1_union_tau3 hp with hτ1 | hτ3
+      · rw [((OddOrder.BG.Ch3.S12.mem_tau1_iff M p).mp hτ1).2.2]; norm_num
+      · rw [((OddOrder.BG.Ch3.S12.mem_tau3_iff M p).mp hτ3).2.2]; norm_num
+    have hppi : p ∈ (Nat.card ↥M).primeFactors :=
+      OddOrder.BG.Ch2.S09.mem_primeFactors_card_of_pos_pRank hprk
+    obtain ⟨hpp, hpdvdM, hMne⟩ := Nat.mem_primeFactors.mp hppi
+    -- `κ(M)`-Hall `K₀.subgroupOf M`: as `p ∈ κ(M)`, `p` avoids the index, so `p ∣ |K₀.subgroupOf M|`.
+    have hcardMeq : Nat.card ↥(K₀.subgroupOf M) * (K₀.subgroupOf M).index = Nat.card ↥M :=
+      Subgroup.card_mul_index _
+    have hpKcard : p ∣ Nat.card ↥(K₀.subgroupOf M) := by
+      rcases (hpp.dvd_mul.mp (hcardMeq ▸ hpdvdM)) with h | h
+      · exact h
+      · exact absurd hp (hK.2 p (Nat.mem_primeFactors.mpr
+          ⟨hpp, h, Subgroup.index_ne_zero_of_finite⟩))
+    -- but `K₀ = ⊥` makes `K₀.subgroupOf M = ⊥` of order `1`, which `p` cannot divide.
+    rw [hK0bot, Subgroup.bot_subgroupOf, Subgroup.card_bot] at hpKcard
+    exact hpp.one_lt.ne' (Nat.dvd_one.mp hpKcard)
+  refine OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_of_subset_escaping_sigmaSharp hG hM
+    honestTypeP2ASet_subset (fun x hx => hx.2.1)
+    (fun a ha => escaping_honestTypeP2ASet_mem_sigmaSharp hG hM hKM hUM hKne hK hU ha)
+    (fun a ha b hb hab => honestTypeP2ASet_isConj_conj_in_M hG hM hKM hUM hKne hK hU ha hb hab)
+    (fun a ha b hb => coprime_FT_signalizer_centralizerIn_honestTypeP2ASet hG hM
+      (escaping_honestTypeP2ASet_mem_sigmaSharp hG hM hKM hUM hKne hK hU ha) ha.2 hb)
+    ?_ ?_
+  · -- `A(S)` nonempty: `M_σ^# ⊆ A(S)` (a nonidentity `M_σ`-element centralizes itself).
+    obtain ⟨a, ha1⟩ :=
+      Subgroup.ne_bot_iff_exists_ne_one.mp (OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM)
+    have ha1' : (a : G) ≠ 1 := fun h => ha1 (Subtype.ext h)
+    have haMσ : (a : G) ∈ OddOrder.BG.Ch3.S10.Msigma M := a.2
+    have haM' : (a : G) ∈ derivedInG M := OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM haMσ
+    refine ⟨a.1, haM', ha1', a.1, ?_, ?_⟩
+    · exact (Set.mem_diff _).mpr ⟨SetLike.mem_coe.mpr haMσ, fun h => ha1' (Set.mem_singleton_iff.mp h)⟩
+    · exact Subgroup.mem_centralizer_singleton_iff.mpr rfl
+  · -- `M`-conjugation invariance.
+    intro m x hm
+    exact ⟨fun h => by
+      have := honestTypeP2ASet_conj_mem (inv_mem hm) h
+      rwa [show m⁻¹ * (m * x * m⁻¹) * m⁻¹⁻¹ = x from by group] at this,
+      fun h => honestTypeP2ASet_conj_mem hm h⟩
+
 /-- **The honest `(H₀ ⊔ C')^#`-support for the `S`-instance, `= (C')^#`** (issue 2035 step 2).
 For the `S`-instance the chief kernel is trivial (`toTypesIIIIIIVSetupS_chief_N_eq_bot`, giving
 `H₀ = ⊥`), so the §9 `H₀C'`-support degenerates to `(C')^#` — the non-identity elements of
