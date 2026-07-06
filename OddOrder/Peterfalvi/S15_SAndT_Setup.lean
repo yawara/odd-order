@@ -4018,6 +4018,88 @@ theorem normalizer_H_eq_S [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     OddOrder.BG.Ch4.S16.normalizer_fittingInAmbient_eq_self hG hyp.S_maximal
   rw [hHF]; exact hnorm
 
+/-- **`V` is nilpotent** — the `U`-factor of `T`'s reconciled type-`P` datum.  `V` and any type-`P`
+complement `tpd0.U` (from `typePData_of_isTypeNonI T_nonI`) both complement `Q = T_F` in `T' = QV`
+(`derived_complement` / `Q_inf_V_eq_bot` + `T_deriv_eq_QV`), so Schur–Zassenhaus conjugacy inside
+`↥T'` (`IsComplement'.exists_conj_of_coprime`, coprimality from `Q` being Hall in `T`) conjugates
+`tpd0.U` onto `V`, transporting `Group.IsNilpotent` (`tpd0.U_nilpotent`).  Structurally the mirror of
+the `S16` complement-conjugacy transport `isMulCommutative_typePData_U_of_V`.  Discharges the
+`U_nilpotent` field of `reconciled_typePData_T` without matching the full `T`-side type-`P` datum. -/
+theorem Hypothesis.isNilpotent_V [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) : Group.IsNilpotent ↥hyp.V := by
+  obtain ⟨tpd0⟩ := OddOrder.GroupTheory.typePData_of_isTypeNonI hyp.T_nonI
+  have hQtpd : tpd0.H = hyp.Q := by rw [tpd0.H_eq, ← hyp.Q_eq_TF]
+  have hQ_le : hyp.Q ≤ derivedInG hyp.T := by rw [hyp.T_deriv_eq_QV]; exact le_sup_left
+  have hV_le : hyp.V ≤ derivedInG hyp.T := by rw [hyp.T_deriv_eq_QV]; exact le_sup_right
+  have hU_le : tpd0.U ≤ derivedInG hyp.T := tpd0.U_le
+  have hM'_le_T : derivedInG hyp.T ≤ hyp.T := Subgroup.map_subtype_le _
+  have hQ_le_T : hyp.Q ≤ hyp.T := by
+    rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.T
+  have hT_le_NQ : hyp.T ≤ Subgroup.normalizer (hyp.Q : Set G) := by
+    rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.T
+  haveI hQn_normal : (hyp.Q.subgroupOf (derivedInG hyp.T)).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hQ_le).mpr (hM'_le_T.trans hT_le_NQ)
+  -- `Q` complements `V` in `T'`.
+  have hVcompl : (hyp.Q.subgroupOf (derivedInG hyp.T)).IsComplement'
+      (hyp.V.subgroupOf (derivedInG hyp.T)) := by
+    refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
+    · rw [disjoint_iff]
+      ext ⟨x, hx⟩
+      simp only [Subgroup.mem_inf, Subgroup.mem_subgroupOf, Subgroup.mem_bot, Subtype.ext_iff,
+        OneMemClass.coe_one]
+      refine ⟨fun ⟨hxQ, hxV⟩ => ?_, fun h => by simp [h]⟩
+      have hxQV : x ∈ (hyp.Q ⊓ hyp.V : Subgroup G) := ⟨hxQ, hxV⟩
+      rwa [hyp.Q_inf_V_eq_bot, Subgroup.mem_bot] at hxQV
+    · have hsup : (hyp.Q.subgroupOf (derivedInG hyp.T)) ⊔
+          (hyp.V.subgroupOf (derivedInG hyp.T)) = ⊤ := by
+        rw [← Subgroup.subgroupOf_sup hQ_le hV_le, hyp.T_deriv_eq_QV.symm, Subgroup.subgroupOf_self]
+      have hmul := Subgroup.normal_mul (hyp.Q.subgroupOf (derivedInG hyp.T))
+        (hyp.V.subgroupOf (derivedInG hyp.T))
+      rw [hsup, Subgroup.coe_top] at hmul
+      exact hmul.symm
+  -- `Q` complements `tpd0.U` in `T'` (from `tpd0.derived_complement`, `tpd0.H = Q`).
+  have hUcompl : (hyp.Q.subgroupOf (derivedInG hyp.T)).IsComplement'
+      (tpd0.U.subgroupOf (derivedInG hyp.T)) := by
+    rw [← hQtpd]; exact tpd0.derived_complement
+  have hcop : Nat.Coprime (Nat.card ↥(hyp.Q.subgroupOf (derivedInG hyp.T)))
+      ((hyp.Q.subgroupOf (derivedInG hyp.T)).index) := by
+    have hHall := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall hyp.T
+    rw [← hyp.Q_eq_TF] at hHall
+    have h0 := OddOrder.Isaacs.Ch03.IsHallSubgroup.coprime_index hHall
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQ_le_T).toEquiv] at h0
+    have hcard : Nat.card ↥(hyp.Q.subgroupOf (derivedInG hyp.T)) = Nat.card ↥hyp.Q :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQ_le).toEquiv
+    have hdvd : (hyp.Q.subgroupOf (derivedInG hyp.T)).index ∣
+        (hyp.Q.subgroupOf hyp.T).index := by
+      have htower : hyp.Q.relIndex (derivedInG hyp.T) *
+          (derivedInG hyp.T).relIndex hyp.T = hyp.Q.relIndex hyp.T :=
+        Subgroup.relIndex_mul_relIndex hyp.Q (derivedInG hyp.T) hyp.T hQ_le hM'_le_T
+      show hyp.Q.relIndex (derivedInG hyp.T) ∣ hyp.Q.relIndex hyp.T
+      exact ⟨(derivedInG hyp.T).relIndex hyp.T, htower.symm⟩
+    rw [hcard]
+    exact Nat.Coprime.coprime_dvd_right hdvd h0
+  have hQ_lt_top : hyp.Q < ⊤ :=
+    lt_of_le_of_lt hQ_le_T (lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hyp.T_maximal).1)
+  haveI hQsolv : IsSolvable ↥hyp.Q := hG.solvable_of_lt_top hyp.Q hQ_lt_top
+  have hsolv : IsSolvable ↥(hyp.Q.subgroupOf (derivedInG hyp.T)) ∨
+      IsSolvable (↥(derivedInG hyp.T) ⧸ hyp.Q.subgroupOf (derivedInG hyp.T)) :=
+    Or.inl (solvable_of_solvable_injective
+      (f := (Subgroup.subgroupOfEquivOfLe hQ_le).toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe hQ_le).injective)
+  -- Schur–Zassenhaus conjugates `tpd0.U` onto `V` inside `T'`; push nilpotency forward.
+  obtain ⟨n, _hnQ, hn⟩ :=
+    Subgroup.IsComplement'.exists_conj_of_coprime hcop hsolv hUcompl hVcompl
+  haveI : Group.IsNilpotent ↥tpd0.U := tpd0.U_nilpotent
+  have h1 : Group.IsNilpotent ↥(tpd0.U.subgroupOf (derivedInG hyp.T)) :=
+    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hU_le).symm
+  haveI := h1
+  have h2 : Group.IsNilpotent
+      ↥((tpd0.U.subgroupOf (derivedInG hyp.T)).map (MulAut.conj n).toMonoidHom) :=
+    nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ _ (MulAut.conj n).injective)
+  have h3 : Group.IsNilpotent ↥(hyp.V.subgroupOf (derivedInG hyp.T)) := hn ▸ h2
+  haveI := h3
+  exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hV_le)
+
 /-- **T-side type-`P` structure reconciled to the abstract `V`/`W₂`** (the honest replacement for the
 withdrawn `Tdata` spine carrier; HUB tick² 2026-06-30).  `T` is type non-I (`T_nonI`), hence type-`P`,
 and the §16-chosen complement `V` (κ-Hall-invariant) / cyclic factor `W₂` form a type-`P`
@@ -4032,7 +4114,7 @@ the reconciliation itself, so this stays a clean §13 obligation.)  It lives **o
 `V`-side helpers cite this obligation, keeping `section16TypePStructure_of_isMinimalSimpleOdd`
 sorry-free.  Gated on §13; declared sorried.  (Relocated from `S15_SAndT` for the (13.9)/(13.10)
 counting layer — the type-V exclusion of `Q_sharp_isTISubset` and the `|T|` decomposition read it.) -/
-theorem reconciled_typePData_T [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+theorem reconciled_typePData_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     ∃ data : TypePData hyp.T, data.U = hyp.V ∧ data.W1 = hyp.W2 ∧ data.W2 = hyp.W1 := by
   -- `W₂, W₁ ≤ W` from the (13.1) join `W = W₁ ⊔ W₂`, and `W ≤ T` from `W = S ⊓ T`.
@@ -4073,7 +4155,7 @@ theorem reconciled_typePData_T [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd 
     -- `typeP_derivedInG_isComplement_kappaHall`).  No longer `sorry`.
     M_complement := hyp.W2_isComplement_T_deriv
     W1_normalizes_U := hyp.W2_normalizes_V
-    U_nilpotent := sorry
+    U_nilpotent := hyp.isNilpotent_V hG
     -- `V` complements `Q = T_F` in `T'`: disjointness is the honest field `Q_inf_V_eq_bot`
     -- (ungated, threaded from the §16 `exists_kappaHall_invariant_complement_to_MF`); the join
     -- `Q ⊔ V = T'` is `T_deriv_eq_QV`.  No longer `sorry`.
