@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Isaacs FGT Ch.6 (Frobenius actions) — finite abelian Z-groups, Lemma 6.16, Frobenius group Thm 6.4 (pp. 184-193)
@@ -248,6 +249,30 @@ structure IsFrobeniusGroup (G : Type*) [Group G] (N A : Subgroup G) : Prop where
   ne_bot_complement : A ≠ ⊥
   /-- The conjugation action of `A` on `N` is Frobenius (Isaacs Thm 6.4 condition (1)). -/
   conj_frobenius : ∀ a ∈ A, a ≠ 1 → ∀ n ∈ N, n ≠ 1 → a * n * a⁻¹ ≠ n
+
+/-- If `N ◁ G` has a prime-order complement `A` and no nonidentity element of `N` is
+centralized by all of `A`, then `G = NA` is a Frobenius group. -/
+theorem isFrobeniusGroup_of_prime_complement_fixedFree
+    {G : Type*} [Group G] [Finite G] {N A : Subgroup G} [N.Normal]
+    (hcompl : Subgroup.IsComplement' N A) (hp : (Nat.card A).Prime) (hNne : N ≠ ⊥)
+    (hFix : ∀ n ∈ N, (∀ a ∈ A, a * n * a⁻¹ = n) → n = 1) :
+    IsFrobeniusGroup G N A where
+  isNormal := ‹N.Normal›
+  isComplement := hcompl
+  ne_bot_kernel := hNne
+  ne_bot_complement :=
+    (Subgroup.nontrivial_iff_ne_bot A).mp (Finite.one_lt_card_iff_nontrivial.mp hp.one_lt)
+  conj_frobenius := by
+    intro a haA ha n hnN hn hconj
+    apply hn
+    refine hFix n hnN (fun b hbA => ?_)
+    have hcomm : Commute a n := by
+      have h := congrArg (· * a) hconj
+      simpa [mul_assoc] using h
+    have hgen : Subgroup.zpowers a = A := Subgroup.zpowers_eq_of_prime_card hp haA ha
+    rw [← hgen, Subgroup.mem_zpowers_iff] at hbA
+    obtain ⟨j, rfl⟩ := hbA
+    rw [(hcomm.zpow_left j).eq, mul_inv_cancel_right]
 
 namespace IsFrobeniusGroup
 

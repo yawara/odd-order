@@ -305,6 +305,34 @@ theorem map_subtype_lt_of_ne_top {G : Type*} [Group G] {K : Subgroup G}
     rw [← MonoidHom.range_eq_map, K.range_subtype]
   exact map_injective K.subtype_injective (heq.trans hKeq)
 
+/-- If `K` and `R` complement each other in `G`, and `N ◁ G` lies in `K`, then their
+images in `G / N` still complement each other. -/
+theorem IsComplement'.map_quotient_of_normal_le_left {G : Type*} [Group G]
+    {K R N : Subgroup G} [K.Normal] [N.Normal] (hC : IsComplement' K R) (hNK : N ≤ K) :
+    IsComplement' (K.map (QuotientGroup.mk' N)) (R.map (QuotientGroup.mk' N)) := by
+  haveI : (K.map (QuotientGroup.mk' N)).Normal :=
+    (inferInstance : K.Normal).map (QuotientGroup.mk' N) (QuotientGroup.mk'_surjective N)
+  refine isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
+  · rw [disjoint_iff, eq_bot_iff]
+    rintro y hy
+    rw [mem_inf] at hy
+    obtain ⟨⟨k, hkK, hk⟩, ⟨r, hrR, hr⟩⟩ := hy
+    rw [mem_bot]
+    have heq : (QuotientGroup.mk' N) k = (QuotientGroup.mk' N) r := hk.trans hr.symm
+    rw [QuotientGroup.mk'_apply, QuotientGroup.mk'_apply, QuotientGroup.eq] at heq
+    have hrK : r ∈ K := by
+      have hmem : k * (k⁻¹ * r) ∈ K := mul_mem hkK (hNK heq)
+      simpa using hmem
+    have hrKR : r ∈ K ⊓ R := ⟨hrK, hrR⟩
+    rw [disjoint_iff.mp hC.disjoint, mem_bot] at hrKR
+    rw [← hr, hrKR, map_one]
+  · have hsup : K.map (QuotientGroup.mk' N) ⊔ R.map (QuotientGroup.mk' N) = ⊤ := by
+      rw [← map_sup, hC.sup_eq_top,
+        map_top_of_surjective _ (QuotientGroup.mk'_surjective N)]
+    have hmul := normal_mul (K.map (QuotientGroup.mk' N)) (R.map (QuotientGroup.mk' N))
+    rw [hsup, coe_top] at hmul
+    exact hmul.symm
+
 /-- Mapping `B ≤ A ≤ H` through `H.subtype` commutes with viewing `B` as a subgroup
 of `A`. -/
 theorem subgroupOf_map_subtype_eq_map_subgroupOf {H : Subgroup G} {A B : Subgroup H}
