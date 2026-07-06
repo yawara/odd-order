@@ -845,6 +845,53 @@ def Hypothesis.cprimeSharpS (hyp : Hypothesis (G := G)) : Set ↥hyp.S :=
   simp only [Hypothesis.cprimeSharpS, OddOrder.Peterfalvi.S04.mem_sharp, SetLike.mem_coe,
     Subgroup.mem_subgroupOf]
 
+/-- **`C' = [C, C] = ⊥` for the type-`P₂` maximal `S`** (Peterfalvi (13.2.a): `abelian U`).
+`C ≤ U` (`C = U ⊓ C_S(P)`) and `U` is abelian (`S_U_commutative`, BG Lemma 15.1(b)), so `C` is
+abelian, whence its derived subgroup `C' = derivedInG C = (commutator ↥C).map C.subtype = ⊥`.
+
+This is the exact repo analogue of the Coq step `derG1P (abelianS _ cUU)` in `FTtypeP_facts`
+(PFsection13.v:221), which reduces the `H0C'` coherence support to `H0` alone in the type-`P₂`
+case.  It dissolves **Blocker 2** (the `dade = Ind` bridge on the `(C')^#`-supported span): with
+`C' = ⊥` the coherence support `(C')^# = cprimeSharpS` is *empty* (`cprimeSharpS_eq_empty`), so the
+`IsCoherent.extends_on_supported` obligation carries no content that would require the Dade
+isometry to agree with plain induction on any nonzero function. -/
+theorem Hypothesis.Cprime_eq_bot (hyp : Hypothesis (G := G)) : hyp.Cprime = ⊥ := by
+  have hCab : IsMulCommutative ↥hyp.C := by
+    have hCU : hyp.C ≤ hyp.U := hyp.C_eq ▸ inf_le_left
+    exact ⟨⟨fun a b => Subtype.ext (by
+      have h := hyp.S_U_commutative.is_comm.comm
+        (⟨(a : G), hCU a.2⟩ : ↥hyp.U) ⟨(b : G), hCU b.2⟩
+      simpa using congrArg Subtype.val h)⟩⟩
+  -- `↥C` commutative ⇒ `commutator ↥C = ⊥`, so `derivedInG C = (⊥).map _ = ⊥`.
+  have hcomm : commutator ↥hyp.C = ⊥ := by
+    rw [eq_bot_iff]
+    refine (Subgroup.commutator_le (H₁ := ⊤) (H₂ := ⊤) (H₃ := ⊥)).mpr (fun a _ b _ => ?_)
+    rw [Subgroup.mem_bot, commutatorElement_eq_one_iff_commute]
+    exact hCab.is_comm.comm a b
+  show derivedInG hyp.C = ⊥
+  rw [derivedInG, hcomm, Subgroup.map_bot]
+
+/-- **`(C')^#` is empty for the type-`P₂` maximal `S`** (immediate from `Cprime_eq_bot`).  Since
+`C' = ⊥`, the `S`-restriction `(C').subgroupOf S = ⊥`, whose only element is `1`, so its sharp part
+`cprimeSharpS = ({1} : Set ↥S) \ {1} = ∅`.
+
+Consequence for the honest §9 coherence route (issue 1017, Blocker 2): the coherence support
+`H0CprimeSupport = cprimeSharpS` of `mkSection11CharacterDataS_honest` is empty, hence
+`zSupportedSpan 𝒮 ∅ = {0}` and `IsCoherent.extends_on_supported` is vacuous on that support.  The
+`dade = Ind` identity the downstream `tau1S_apply_induce_sub` needs is therefore *not* required on
+`(C')^#`; the genuine support of the equal-degree family differences is the honest Dade support
+`A(S)` (via `sSet_member_diffsupp`), which is where the actual `dade = Ind` question lives — but the
+`(C')^#`-support degeneration this lemma records means that particular blocker framing is a
+misdirection. -/
+theorem Hypothesis.cprimeSharpS_eq_empty (hyp : Hypothesis (G := G)) :
+    hyp.cprimeSharpS = (∅ : Set ↥hyp.S) := by
+  ext x
+  simp only [hyp.mem_cprimeSharpS, Set.mem_empty_iff_false, iff_false, not_and]
+  intro hx hxne
+  -- `x ∈ C' = ⊥` forces `x = 1` in `↥S`, contradicting `x ≠ 1`.
+  rw [hyp.Cprime_eq_bot, Subgroup.mem_bot] at hx
+  exact hxne (Subtype.ext hx)
+
 /-- **`(C')^# ⊆ A(S)` (as an `S`-support)** (issue 1017): the honest §9 coherence support `(C')^#`
 is contained in the `S`-restriction of the Dade support `A(S) = ⋃_{x∈S_σ#} C_{S'}(x)#`.  `C' = [C,C]
 ≤ C ≤ U ≤ S' = derivedInG S` gives the derived-membership; and `C ≤ C_S(P)` (from `C = U ⊓ C_S(P)`)
