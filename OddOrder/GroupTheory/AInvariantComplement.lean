@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2026 OddOrder contributors. All rights reserved.
 -/
-import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
+import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 
 /-!
 # Invariant Schur–Zassenhaus (complement form)
@@ -118,7 +118,7 @@ theorem exists_aInvariant_complement_within_normal {G : Type*} [Group G] [Finite
       Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hN_le] at this
   · -- `K ≤ N_G(U'.map M'.subtype)`, from `φ`-invariance of `U'` and `φ a` = conjugation.
     intro k hk
-    exact OddOrder.BG.Ch1.S03f.mem_normalizer_map_subtype_of_smul_val hU'inv (hφval ⟨k, hk⟩)
+    exact hU'inv.mem_normalizer_map_subtype_of_smul_val (hφval ⟨k, hk⟩)
   · -- `N ⊓ U'.map M'.subtype = ⊥`, mapping the complement disjointness `N' ⊓ U' = ⊥` up to `M'`.
     have hdisj : (N.subgroupOf M') ⊓ U' = ⊥ := disjoint_iff.mp hU'compl.disjoint
     have := congrArg (Subgroup.map M'.subtype) hdisj

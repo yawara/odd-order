@@ -3509,6 +3509,25 @@ theorem IsAInvariant.inv_smul_mem {A : Type*} [Group A] {φ : A →* MulAut G} {
   have : (φ a)⁻¹ g ∈ (φ a)⁻¹ • H := ⟨g, hg, rfl⟩
   rwa [hHinv] at this
 
+/-- If an invariant subgroup of `W` is acted on by an automorphism whose underlying value is
+conjugation by `g` in the ambient group, then `g` normalizes its image under `W.subtype`. -/
+theorem IsAInvariant.mem_normalizer_map_subtype_of_smul_val {W : Subgroup G}
+    {A : Type*} [Group A] {φ : A →* MulAut W} {L : Subgroup W}
+    (hL : IsAInvariant φ L) {a : A} {g : G}
+    (hval : ∀ k : W, ((φ a k : W) : G) = g * (k : G) * g⁻¹) :
+    g ∈ Subgroup.normalizer ((L.map W.subtype : Subgroup G) : Set G) := by
+  rw [Subgroup.mem_normalizer_iff]
+  intro x
+  constructor
+  · rintro ⟨k, hk, rfl⟩
+    exact ⟨φ a k, hL.smul_mem _ hk, hval k⟩
+  · rintro ⟨k, hk, hkeq⟩
+    refine ⟨(φ a)⁻¹ k, hL.inv_smul_mem _ hk, ?_⟩
+    have hv2 := hval ((φ a)⁻¹ k)
+    rw [MulAut.apply_inv_self] at hv2
+    have h3 := hv2.symm.trans hkeq
+    exact mul_left_cancel (mul_right_cancel h3)
+
 /-- ⊤ は常に A-不変. -/
 theorem IsAInvariant.top {A : Type*} [Group A] (φ : A →* MulAut G) :
     IsAInvariant φ (⊤ : Subgroup G) := fun a => by
