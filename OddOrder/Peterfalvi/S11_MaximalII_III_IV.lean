@@ -13610,6 +13610,77 @@ theorem hcuPsiPair_family_inertia_eq [Finite G] {M : Subgroup G}
   exact hcuPsiPair_inertia_eq_hcu caseA θ (hcuSeedHom_hinv_of_wComplement_triv caseA θ hθW) lam hθ₀
 
 
+/-- **Peterfalvi (9.8.d)** (count substrate, `hS0notker` member fact).  A member `ζ_{θ,λ} =
+Ind_{H·C_U(S₀)}^{HU} ψ_{θ,λ}` whose seed `θ` is *nontrivial on `S₀`* is **not** trivial on the
+realized `S₀`: `realized S₀ ⊄ Ker ζ`.  If it were, then (`liesOver_mem_characterKernel`, `ζ` lying
+over `ψ`) `ψ` would vanish on the realized `S₀ ⊆ H·C_U(S₀)`, i.e. `θ₀ = 1` on `S₀`
+(`hcuPsiPair_apply_inclusion`, with `mk'(N)∘hInHuEquivH` surjective onto `S₀`), contradicting
+`θ|_S₀ ≠ 1`.  Single-`S₀` restriction of the `H ⊄ Ker` argument `hcuZetaPair_mem_xiSet`; supplies the
+`hS0notker` input of `caseA_hcrit_of_member` (the (γ) `W₁`-injectivity). -/
+theorem caseA_hcuZetaPair_realizedS0_not_subset_ker [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    (hinv : ∀ c : ↥(cuInHu caseA), ∀ h : ↥(hInHu data),
+      hcuSeedHom (chief := chief) θ
+          ⟨(c : ↥(huSub data)) * (h : ↥(huSub data)) * (c : ↥(huSub data))⁻¹,
+            (hInHu_normal data).conj_mem _ h.2 (c : ↥(huSub data))⟩
+        = hcuSeedHom (chief := chief) θ h)
+    (lam : ↥(cuInHu caseA) →* ℂˣ)
+    (hθS0 : θ.comp caseA.S0.subtype ≠ 1)
+    [Fintype ↥(huSub data)]
+    [Fintype ↥(hInHu data ⊔ cuInHu caseA)]
+    [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    [Invertible (Nat.card ↥(hInHu data ⊔ cuInHu caseA) : ℂ)]
+    [(hInHu data ⊔ cuInHu caseA).Normal]
+    (hθ₀ : ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+        (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+          (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+        = hInHu data ⊔ cuInHu caseA) :
+    ¬ (((caseA_realizedComplement chief caseA.S0).subgroupOf M).subgroupOf (huSub data) :
+        Set ↥(huSub data)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel
+        (ClassFunction.induce (hInHu data ⊔ cuInHu caseA)
+          (hcuPsiPair caseA θ hinv lam) : ClassFunction ↥(huSub data) ℂ) := by
+  classical
+  set ζ : IrreducibleCharacter ↥(huSub data) :=
+    ⟨ClassFunction.induce (hInHu data ⊔ cuInHu caseA) (hcuPsiPair caseA θ hinv lam),
+      hcuZetaPair_irreducible caseA θ hinv lam hθ₀⟩ with hζdef
+  have hcoe : (ζ : ClassFunction ↥(huSub data) ℂ) = ClassFunction.induce
+      (hInHu data ⊔ cuInHu caseA) (hcuPsiPair caseA θ hinv lam) := by rw [hζdef]
+  have hlo : OddOrder.RepresentationTheory.IrreducibleCharacter.LiesOver
+      (hInHu data ⊔ cuInHu caseA) ζ (hcuPsiPair caseA θ hinv lam) := by
+    rw [← OddOrder.RepresentationTheory.IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver]
+    rw [← hcoe, OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite ζ ζ, if_pos rfl]
+    exact one_ne_zero
+  intro hsub
+  apply hθS0
+  have hfsurj : Function.Surjective
+      ((QuotientGroup.mk' chief.N).comp (hInHuEquivH data).toMonoidHom) :=
+    (QuotientGroup.mk'_surjective chief.N).comp (hInHuEquivH data).surjective
+  refine MonoidHom.ext fun s => ?_
+  obtain ⟨h, hhs⟩ := hfsurj (caseA.S0.subtype s)
+  have hgmem : ((Subgroup.inclusion
+      (le_sup_left : hInHu data ≤ hInHu data ⊔ cuInHu caseA) h :
+      ↥(hInHu data ⊔ cuInHu caseA)) : ↥(huSub data))
+      ∈ (((caseA_realizedComplement chief caseA.S0).subgroupOf M).subgroupOf (huSub data)) := by
+    rw [Subgroup.coe_inclusion, ← Subgroup.mem_subgroupOf,
+      caseA_realizedComplement_subgroupOf_hInHu_eq_comap chief caseA.S0, Subgroup.mem_comap, hhs]
+    exact s.2
+  have hψker := liesOver_mem_characterKernel hlo (by rw [hcoe]; exact hsub hgmem)
+  have hψ1 : (hcuPsiPair caseA θ hinv lam : ClassFunction ↥(hInHu data ⊔ cuInHu caseA) ℂ)
+      1 = 1 := by simp [hcuPsiPair]
+  rw [OddOrder.Peterfalvi.S03.mem_characterKernel, OddOrder.Peterfalvi.S03.characterDegree_def,
+    hcuPsiPair_apply_inclusion caseA θ hinv lam h, hψ1,
+    ClassFunction.compHom_apply, ClassFunction.compHom_apply, MulEquiv.coe_toMonoidHom,
+    linearIrreducibleCharacter_apply] at hψker
+  have hqeq : (QuotientGroup.mk' chief.N) ((hInHuEquivH data) h) = caseA.S0.subtype s := hhs
+  rw [hqeq] at hψker
+  show θ (caseA.S0.subtype s) = (1 : ℂˣ)
+  refine Units.ext ?_
+  rw [Units.val_one]
+  exact hψker
+
 /-- **Peterfalvi (9.8)**: character-count consequences in Clifford case (a).
 
 Faithful to Peterfalvi (9.8.b,c,d) (count-statement audit, issue 2030):
