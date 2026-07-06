@@ -71,6 +71,40 @@ capstone を bounded-coherence route で構築 (uniform-degree の偽 sorry を�
 
 ⟹ finding 確定。uniform-degree route は放棄し bounded-coherence route へ。
 
+## 🔍 SCOPE 調査 (2026-07-07、ユーザー「まず scope 調査」要請) — ★ 大 port 不要、redesign は小さい
+
+**当初「bounded_seqIndD_coherence を port する大仕事」と見積もったが、既に repo にある**と判明:
+
+- **bounded-coherence 本体 = `S08.six_three_of_six_two_oracle` (Pf (6.2)/(6.3)) は完全 sorry-free**
+  (`#print axioms` = `[propext, Classical.choice, Quot.sound]`)。size bound (11.4) `coherent_quotient_bound`
+  + `four_mul_sq_add_one < p^q` も landed。
+- **拡張 `S13.coherent_S_of_coherent_SH0C`** (`coherent(S(H₀C)) → coherent(inducedFamily)`) は**配線済み・
+  本体 sorry-free**。`six_three_of_six_two_oracle` に `(K,H,M,H₁)=(M',HC,⊥,H₀C)` を instantiate + nilpotency
+  + size bound + (5.6) break-member oracle を供給。
+- `coherent_S_of_coherent_SH0C` の transitive sorryAx は **`exists_source_of_coherence_dichotomy` (§11
+  (5.6) dichotomy 供給)** 経由 = **別 gate** (bounded-coherence 機構ではない)。
+- `S13.S_H0C_not_coherent` も配線済み (= `coherent_S_of_coherent_SH0C` + `S12.S_not_coherent`)。
+  `S_not_coherent` (10.8) は別途 sorried (既知 deep gate)。
+
+### ⟹ redesign の正体 = capstone を **S(H₀C) 族に re-target** (uniform-degree は S(H₀C) で真)
+Peterfalvi の本当の `S₂ = S(H₀C) − S(HC)` は **狭い C-kernel 族**で、そこでは uniform degree qu が
+**genuinely 真** (`S11.forall_mem_sOf_H0C_apply_one_eq_qu`: 𝒮(H₀C) 全member が degree qu; qa 既約は
+**広い inducedFamily 側**に居て S(H₀C) の外)。∴ repo の誤りは「uniform-degree を inducedFamily に適用」
+だけで、**S(H₀C) に適用すれば正しい**。
+
+redesign 手順 (bounded、multi-session port ではない):
+1. capstone `coherent_Sset_of_column_identities` を **`coherent(hyp.SOf hyp.H0C)` を結論**する版に re-target
+   (現 inducedFamily 版を置換)。union-glue (ν/hmixed/hDτ/coherentUnion) は S(H₀C)=S(HC)∪(S(H₀C)−S(HC))
+   に適用。uniform-degree は `forall_mem_sOf_H0C_apply_one_eq_qu` (S(H₀C) で真) で供給。
+2. `coherent_S_of_coherent_SH0C` (配線済) で inducedFamily coherence に拡張 → `S_not_coherent` 矛盾。
+   or 直接 `S_H0C_not_coherent` と矛盾。
+3. **再利用**: reducible-inclusion (landed)、ψ₀ witness、union-glue、bounded-coherence (全て既存)。
+   **新規に偽の uniform-degree-on-inducedFamily を証明する必要は消える** (S(H₀C) で真になる)。
+
+**工数見積り: 1–2 focused session** (capstone chain の family 差し替え + S(H₀C) uniform-degree の配線)。
+当初の「multi-session port」から大幅縮小。残る deep gate (§11 (5.6) dichotomy / (10.8)) は本 redesign の
+外 (既存 sorry、別途)。
+
 ## 参照
 
 - notes/peterfalvi/s13_11_8_orthogonality.md update³⁷
