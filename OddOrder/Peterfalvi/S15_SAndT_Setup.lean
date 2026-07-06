@@ -832,6 +832,43 @@ theorem Hypothesis.dadeHypS_hconj [Fintype G] [Finite G]
     (hyp.dadeHypS hG).HConjInvariant :=
   (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.S_maximal hyp.S_typeP2).some.hconj
 
+open scoped FiniteInduce in
+/-- **(13.2.e) `S`-instance `dade = Ind` bridge** (issue 1017): for the honest type-`P₂` maximal `S`,
+on a class function `f` supported in a trivial-`H` sub-support `A₁ ⊆ A(S)` (an `S`-invariant subset
+on which the `S`-instance Dade stabilizers vanish), the honest (13.2.e) Dade isometry
+`τ = dadeIntegralCharacterMap (dadeHypS hG) …` acts as plain induction `Ind_S^G`.  This is the exact
+`S`-instance analogue of the type-I bridge `S14.typeI_tau_eq_induce_of_supported_trivial_H`,
+instantiating the general step-3 bridge `S14.dadeMap_eq_induce_of_supported_on_trivial_H` at the
+`S`-instance Dade map `dadeHypS hG` (via `dadeIntegralCharacterMap_apply_of_support`, which rewrites
+the lifted integral map as the §4 `dadeMap` on the supported carrier; `inclusion` widens the support
+from `A₁` to `A(S)`).  The trivial-`H` sub-support facts (`hA₁A`, `hA₁norm`, `hH₁`, `hf`) are taken
+as hypotheses, exactly as the type-I version defers them to the caller.  This is the `dade = Ind`
+identity the (13.2.e)/(7.2) coherence route (`τ = Ind_S^G`, Peterfalvi (13.2.e)) rests on, matching
+the honest `indS` value. -/
+theorem Hypothesis.sInstance_dade_eq_induce_of_supported_trivial_H [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {A₁ : Set G} (hA₁A : A₁ ⊆ honestTypeP2ASet hyp.S)
+    (hA₁norm : ∀ (l : ↥hyp.S) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁)
+    (hH₁ : ∀ a, ((hyp.dadeHypS hG).restrict hA₁A hA₁norm).H a = ⊥)
+    {f : ClassFunction ↥hyp.S ℂ}
+    (hf : f.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A₁ hyp.S) :
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) f
+      = ClassFunction.induce hyp.S f := by
+  have hfA : f.support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S :=
+    hf.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono hA₁A)
+  have h1 : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) f
+      = (hyp.dadeHypS hG).dadeMap (k := ℂ)
+        ⟨f, (ClassFunction.mem_supportedSubmodule).mpr hfA⟩ :=
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support (hyp.dadeHypS hG)
+      ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) hfA
+  rw [h1]
+  -- `⟨f, hfA⟩` is defeq to `inclusion hA₁A ⟨f, hf⟩` (same carrier `f`), so step 3 applies directly.
+  exact OddOrder.Peterfalvi.S14.dadeMap_eq_induce_of_supported_on_trivial_H (hyp.dadeHypS hG)
+    hA₁A hA₁norm hH₁ ⟨f, (ClassFunction.mem_supportedSubmodule).mpr hf⟩
+
 /-- **The honest `(H₀ ⊔ C')^#`-support for the `S`-instance, `= (C')^#`** (issue 2035 step 2).
 For the `S`-instance the chief kernel is trivial (`toTypesIIIIIIVSetupS_chief_N_eq_bot`, giving
 `H₀ = ⊥`), so the §9 `H₀C'`-support degenerates to `(C')^#` — the non-identity elements of
