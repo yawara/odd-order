@@ -797,6 +797,22 @@ theorem dadeSupportHypothesisData_honestTypeP2ASet [Fintype G] [Finite G]
       rwa [show m⁻¹ * (m * x * m⁻¹) * m⁻¹⁻¹ = x from by group] at this,
       fun h => honestTypeP2ASet_conj_mem hm h⟩
 
+/-- **(13.2.e) `S`-instance Dade hypothesis** (issue 1017 update #10, step 1): the `Hypothesis`-level
+instantiation of `dadeSupportHypothesisData_honestTypeP2ASet` at the type-`P₂` maximal `S`
+(via `hyp.S_maximal`/`hyp.S_typeP2`), packaging the honest §16 support
+`A(S) = ⋃_{x∈S_σ#} C_{S'}(x)#` (`honestTypeP2ASet hyp.S`) as an `S04.Hypothesis`.  This is the concrete
+`S04` Dade datum for `S` (previously only available as the standalone theorem taking `hM`/`hP2`); its
+`.fullDadeIsometryData` (given the support's `HConjInvariant`) materialises the Dade isometry
+`τ = Ind_S^G` on the `ℤ`-lattice of virtual characters — the (13.2.e) foundation the §9 subcoherence
+assembly (`S07.irrSubcoherent`) consumes to re-ground `coherent_H0Cprime_S` off the unsound
+`sibleyTarget_H0C`.  (Sorry-provenance parity with `dadeSupportHypothesisData_honestTypeP2ASet`: the
+inherited shared BG §16 Theorem-II pins, at exact parity with the accepted on-path
+`dadeSupportHypotheses_typeI`; no lane-`b` sorry introduced.) -/
+noncomputable def Hypothesis.dadeHypS [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    OddOrder.Peterfalvi.S04.Hypothesis G (honestTypeP2ASet hyp.S) hyp.S :=
+  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.S_maximal hyp.S_typeP2).some.dade
+
 /-- **The honest `(H₀ ⊔ C')^#`-support for the `S`-instance, `= (C')^#`** (issue 2035 step 2).
 For the `S`-instance the chief kernel is trivial (`toTypesIIIIIIVSetupS_chief_N_eq_bot`, giving
 `H₀ = ⊥`), so the §9 `H₀C'`-support degenerates to `(C')^#` — the non-identity elements of
