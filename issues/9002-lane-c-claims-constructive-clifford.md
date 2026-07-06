@@ -208,9 +208,12 @@ Coq (1.7)(b) `cfInd_central_Inertia` の hypothesis は `abelian (T/H)` (T=I(θ)
       新 instance `Finite (G →* Mˣ)`、norm = inertia 公式、collapse = capstone。sorry-free
       axiom-clean。**Lean 教訓: 商の CommGroup instance は letI (haveI だと .toGroup が opaque
       になり ambient Quotient.group と defeq 切れで下流全滅)**。
-- [ ] **type-F 適用**: `typeF_inertia_commutator_le` (I(θ)/H abelian) を (G3) に投入。
-- [ ] **(1.5.a)/(1.2) 台**: 各構成要素 φ の台 ⊆ A(L)∪{1}。非実 = 奇数位数 (`not_isReal_of_ne_trivial_of_odd_card'`)。
-- [ ] `typeI_induced_char_constituents` (S14:472) を上記 cite で sorry-free 化。lane b (12.14) は cite。
+- [x] **type-F 適用**: `typeF_inertia_inf_le_U1` / `exists_extension_induce_eq_sum_distinct_of_inertia_inf_le`
+      を S14 に投入済み (lane b loop¹¹⁴)。
+- [x] **(1.5.a)/(1.2) 台**: support は
+      `S03b_Vanishing.irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot`、非実は
+      `forall_mem_not_isReal_of_induce_eq_sum_of_odd` で discharge 済み。
+- [x] `typeI_induced_char_constituents` (current S14:L442) を上記 cite で sorry-free 化済み (lane b loop¹¹⁴)。
 
 ## 次の frontier + 判明した真の上流 bottleneck (2026-07-02 cont.³; 更新 2026-07-03 cont.¹⁸)
 

@@ -72,3 +72,10 @@ AxiomsCheck OK。→ **DONE** (この commit)。
 (`S15.isMulCommutative_V`; Coq `cVV` は type-P ungated)。type-III 分岐での再導出は
 `S15_SAndT_Setup.lean` の型-P Hall-derived-abelian data (`typeP_hall_derived_eq_and_abelian`,
 BG 15.1(b)) を type-III 経路に通す必要があり lane-b (S15) 領域 → 別 issue / lane-b (9013 T-side) と協調。
+
+## 2026-07-06 lane-d closure
+
+Current-state audit: the stated shared orbit-count API is landed in
+`OddOrder/GroupTheory/RepresentationTheory/OrbitOnIrr.lean`. The remaining `V`-abelian/type-III
+reconciliation is tracked by lane-b/c coordination (`9013`) and is not part of this shared orbit-count
+claim. Move to `issues/closed/`.

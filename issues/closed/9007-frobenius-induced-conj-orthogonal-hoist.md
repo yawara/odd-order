@@ -29,12 +29,10 @@ relocate する別refactor が要 (deps は全て InducedCharacter/IsReal に有
 
 - [x] lane-a: 新 lane-a leaf `OddOrder/Peterfalvi/S09_FrobeniusEstimate.lean` に
   `inner_induce_conj_eq_zero_of_frobenius_of_odd` をホスト (S14 の証明を移送、S08 の induce_conj に到達可)。
-  imports = `S09_FrobeniusHypothesis78` + `BrauerPermutationUnconditional`。namespace = `OddOrder.RepresentationTheory`
+  imports were originally `S09_FrobeniusHypothesis78` + `BrauerPermutationUnconditional`; after full dedup, S09 no longer needs the direct Brauer import. namespace = `OddOrder.RepresentationTheory`
   (一般 rep-theory fact ゆえ; ファイルは Peterfalvi 下だが fact は汎用)。
-- [ ] **defer (低優先)**: `induce_conj` chain を `InducedCharacter.lean` へ relocate → その後
-  `inner_induce_conj_...` を真の shared RepresentationTheory leaf へ移動 → S09/S14 両方が cite (完全 dedup)。
-  現状は S09 (lane-a) と S14 (lane-b) に 2 コピー併存 (証明同一、害小)。lane-b は必要なら S09 版を cite 可
-  (S14 は S09_CertificateDischarge を import 済ゆえ S09 名前空間に到達可)。
+- [x] **complete (2026-07-06 lane d)**: `induce_conj` chain を `InducedCharacter.lean` へ relocate →
+  `inner_induce_conj_...` を `InducedIrreducible.lean` へ移動 → S09/S14 両方が shared copy を cite。
 
 ## 2026-07-06 lane d — `induce_conj` chain relocated
 
@@ -49,14 +47,22 @@ D moved the three complex-conjugation induction helpers from
 `S08_CoherenceCorePart1` now cites the shared declarations by import. Verified:
 `lake build OddOrder.GroupTheory.RepresentationTheory.InducedCharacter OddOrder.Peterfalvi.S08_CoherenceCorePart1`.
 
-Remaining 9007 cleanup: move `inner_induce_conj_eq_zero_of_frobenius_of_odd`
-to a true shared `RepresentationTheory` leaf and rewire S09/S14 consumers to cite
-the shared copy.
+## 2026-07-06 lane d — full dedup completed
+
+D moved `inner_induce_conj_eq_zero_of_frobenius_of_odd` to
+`OddOrder/GroupTheory/RepresentationTheory/InducedIrreducible.lean`, then removed the
+duplicate copies from `S09_FrobeniusEstimate.lean` and `S14_MaximalI.lean`.
+Both consumers now cite the shared `OddOrder.RepresentationTheory` theorem.
+
+Verified:
+`lake build OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible OddOrder.Peterfalvi.S09_FrobeniusEstimate OddOrder.Peterfalvi.S14_MaximalI`
+and, after removing the stale direct S09 import,
+`lake build OddOrder.Peterfalvi.S09_FrobeniusEstimate`.
 
 ## 完了条件
 
 - lane-a: `S09_FrobeniusEstimate.lean` が build green、(7.8.b) hzeta0nu が cite。✅ 相当
-- (defer) 完全 dedup: induce_conj relocate + shared 移動 + S14 cite 切替。
+- (defer) 完全 dedup: induce_conj relocate + shared 移動 + S14 cite 切替。✅
 
 ## 参照
 

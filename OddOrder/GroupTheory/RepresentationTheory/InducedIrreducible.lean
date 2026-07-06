@@ -8,6 +8,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Inertia
 import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
 import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
+import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 
 /-!
@@ -601,6 +602,67 @@ theorem inner_self_induce_eq_one_of_frobeniusGroup {W : Subgroup G}
   have h := card_mul_inner_self_induce_eq_card_inertia θ
   rw [inertia_eq_of_frobeniusGroup hF hθ_ne] at h
   exact mul_left_cancel₀ hcardH (by rw [h, mul_one])
+
+open scoped Classical in
+/-- **Odd-order Frobenius: a nontrivial induced irreducible is orthogonal to its complex
+conjugate.**  In a Frobenius group `G` of odd order with kernel `H`, for `θ ∈ Irr H`, `θ ≠ 1`,
+the induced `Ind_H^G θ` is irreducible (`isIrreducibleCharacter_induce_of_frobeniusGroup`) and
+nontrivial (`⟨Ind θ, 1_G⟩ = ⟨θ, 1_H⟩ = 0 ≠ 1`), hence — `G` odd — not real
+(`not_isReal_of_ne_trivial_of_odd_card'`): `(Ind θ)‾ = Ind θ̄ ≠ Ind θ`.  Distinct irreducibles are
+orthogonal, so `⟨Ind θ, Ind θ̄⟩ = 0`. -/
+theorem inner_induce_conj_eq_zero_of_frobenius_of_odd {W : Subgroup G}
+    (hodd : Odd (Nat.card G)) (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G H W)
+    (θ : IrreducibleCharacter H) (hθ : θ ≠ trivialIrreducibleCharacter H) :
+    ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction H ℂ))
+      (ClassFunction.induce H ((θ : ClassFunction H ℂ).conj)) = 0 := by
+  -- `θ̄` is again a nontrivial irreducible character of `H`.
+  have hθbar_ne : (⟨(θ : ClassFunction H ℂ).conj, θ.isIrreducible.conj⟩ :
+      IrreducibleCharacter H) ≠ trivialIrreducibleCharacter H := by
+    intro h
+    apply hθ
+    have hcoe : (θ : ClassFunction H ℂ).conj = trivialClassFunction H := by
+      have h2 := congrArg (fun c : IrreducibleCharacter H => (c : ClassFunction H ℂ)) h
+      simpa using h2
+    apply Subtype.ext
+    show (θ : ClassFunction H ℂ) = trivialClassFunction H
+    rw [← ClassFunction.conj_conj (θ : ClassFunction H ℂ), hcoe]
+    exact trivialClassFunction_isReal
+  have hirr := isIrreducibleCharacter_induce_of_frobeniusGroup hF θ hθ
+  have hirr' := isIrreducibleCharacter_induce_of_frobeniusGroup hF
+    (⟨(θ : ClassFunction H ℂ).conj, θ.isIrreducible.conj⟩ : IrreducibleCharacter H) hθbar_ne
+  -- `Ind θ` is nontrivial: `⟨Ind θ, 1_G⟩ = ⟨θ, 1_H⟩ = 0`, but `⟨1_G, 1_G⟩ = 1`.
+  have hne_triv : (⟨ClassFunction.induce H (θ : ClassFunction H ℂ), hirr⟩ :
+      IrreducibleCharacter G) ≠ trivialIrreducibleCharacter G := by
+    intro h
+    have hrestrict : ClassFunction.restrict H
+          (trivialIrreducibleCharacter G : ClassFunction G ℂ)
+        = (trivialIrreducibleCharacter H : ClassFunction H ℂ) := by
+      ext x
+      simp [ClassFunction.restrict_apply, IrreducibleCharacter.coe_trivialIrreducibleCharacter,
+        trivialClassFunction_apply]
+    have hzero : ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction H ℂ))
+        (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 0 := by
+      rw [ClassFunction.inner_induce_eq_inner_restrict, hrestrict,
+        irreducibleCharacter_inner_eq_ite, if_neg hθ]
+    have hcf : ClassFunction.induce H (θ : ClassFunction H ℂ)
+        = (trivialIrreducibleCharacter G : ClassFunction G ℂ) :=
+      congrArg (fun c : IrreducibleCharacter G => (c : ClassFunction G ℂ)) h
+    rw [hcf, irreducibleCharacter_inner_eq_ite, if_pos rfl] at hzero
+    exact one_ne_zero hzero
+  -- Odd order gives `(Ind θ)‾ ≠ Ind θ`.
+  have hnotreal := not_isReal_of_ne_trivial_of_odd_card' hodd hne_triv
+  have hconj_eq : (ClassFunction.induce H (θ : ClassFunction H ℂ)).conj
+      = ClassFunction.induce H ((θ : ClassFunction H ℂ).conj) :=
+    ClassFunction.induce_conj H (θ : ClassFunction H ℂ)
+  have hne : ClassFunction.induce H (θ : ClassFunction H ℂ)
+      ≠ ClassFunction.induce H ((θ : ClassFunction H ℂ).conj) :=
+    fun heq => hnotreal (hconj_eq.trans heq.symm)
+  -- Distinct irreducibles are orthogonal.
+  have hii := irreducibleCharacter_inner_eq_ite
+    (⟨ClassFunction.induce H (θ : ClassFunction H ℂ), hirr⟩ : IrreducibleCharacter G)
+    ⟨ClassFunction.induce H ((θ : ClassFunction H ℂ).conj), hirr'⟩
+  rwa [if_neg (fun h => hne (congrArg (fun c : IrreducibleCharacter G =>
+    (c : ClassFunction G ℂ)) h))] at hii
 
 omit hH [Fintype G] [Invertible (Nat.card G : ℂ)] in
 /-- **Degree from restriction multiplicities** (the degree side of Clifford's theorem).  For

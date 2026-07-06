@@ -35,3 +35,10 @@ created: 2026-07-05
 consumer: S13 (11.7) H_elementaryAbelian の Galois case。S08 の
 isNilpotent_normal_inf_center_ne_bot と役割が近い (nilpotent 一般 vs p-群+存在形) が、
 GroupTheory→Peterfalvi の逆 import を避けるため p-群版を local に実証明 (重複でなく別 statement)。
+
+## 2026-07-06 lane-d closure
+
+Current-state audit: the promised shared leaf
+`OddOrder/GroupTheory/RepresentationTheory/ClassTwoSquareIndex.lean` exists and exports the listed
+sorry-free API (`exists_faithful_irreducible_of_card_center_eq_prime`,
+`card_quotient_center_isSquare_of_class_two`, and the parity consumers). Move to `issues/closed/`.

@@ -111,7 +111,9 @@ lane c (cont.⁴³) が「deep char frontier は 9001 shared coherence infra に
   を `hdiff` 版に (= S14 `xFamily_inner_dade` を subsume)、unused `tau_inner_eq` 削除。
   **`coherent_of_constant_degree` が Dade-compatible に**。full build green (3893 jobs, axioms OK)。
   S07.Hypothesis は未 construction ゆえ lane-a regression なし。
-- [ ] lane b: (6.5.c) coherence を 9000 番台で claim → build (shared leaf)。
+- [x] lane b: (6.5.c) coherence producer is built (D audit 2026-07-06): generic engine
+  `S08.nonempty_coherent_SOf_bot_of_index_dvd` + S14 consumer
+  `frobenius_typeI_coherent_of_cyclicQuotient`.  The earlier "9000 番台 claim" reminder is stale.
 - ~~lane b: 構成的 Clifford~~ → **lane c に再配分済** (下記「HUB 再裁定」節、issue 9002 で lane c が claim)。
   lane b は Clifford を build しない (dup 回避)。
 
@@ -125,9 +127,11 @@ refactor で `coherent_of_constant_degree` が witness Dade map で使えるよ�
 - **要 build (witness char body, deep)**: `no_real_characters`, `pairwise_orthogonal`, `hirr` (Ind_H^L θ
   irreducible for Frobenius abelian kernel), `hconst` (等次数 [L:H]), `hsuppdiff` (差 A(L)-supported)。
   Frobenius 群指標論 (Ind from abelian kernel = irreducible, 等次数) が中核。multi-turn 想定。
-- [ ] α: 着手前に open 9000 issue を scan、coherence/Clifford は lane b leaf を cite (再構築しない)。
-- [ ] lane c: idle 回避。σ-theory-dual structural (S16:166/3431/3511) を lane d leaf cite で discharge +
-  coherence-gated deep char を signature-first で skeleton。coherence は再構築しない。
+- [x] α/lane c: 着手前の open-9000 scan と再構築禁止 reminder は実施済み運用へ吸収
+  (9002 claim + 9005/9013 で追跡、下記 HUB 再裁定で更新済み)。
+- [x] ~~lane c: σ-theory-dual structural (S16:166/3431/3511) を lane d leaf cite で discharge~~
+  — **撤回済**。lane c の file:line 検証が正しく、正しい後続は 9002 constructive Clifford と
+  9013/S16 W-side assembly consume 路線。
 
 ## 参照
 - issues/2032 (sibleyTarget_frobI unsound 詳細), issue 0026 (Clifford core)
@@ -225,9 +229,12 @@ policy 8 で回避すべき。⟹ **lane b の plate から構成的 Clifford (i
 **やること 更新**:
 - [x] σ-theory-dual guidance 撤回 (hub 誤り、lane c 正当)。
 - [x] lane c: 構成的 Clifford を 9000 番台 claim → build (issue 9002 で claim 済、infra 進行中)。lane b は cite。
-- [ ] lane c: §14-16 assembly を signature-first で skeleton 前倒し (宣言済 signature 範囲)。
-- [ ] lane b: (6.5.c) + (5.7)-S07 refactor に集中 (Clifford は lane c へ移管)。
-  ⚠ (5.7)-S07 は完了済 (`d31b9763`)、**(6.5.c) の 9000 番台 claim は依然未起票** (9003 でも 2 回リマインド済)。
+- [x] lane c: §14-16 assembly を signature-first で skeleton 前倒し済み。現在の正本は
+  9013「S16 `nonexistence_of_G` top-level assembly 完了、残 8 sorry は lane-b §13/§15 gated」。
+- [x] lane b: (6.5.c) + (5.7)-S07 refactor complete (Clifford は lane c へ移管)。
+  (5.7)-S07 は完了済 (`d31b9763`)、(6.5.c) は
+  `S08.nonempty_coherent_SOf_bot_of_index_dvd` / `S14.frobenius_typeI_coherent_of_cyclicQuotient`
+  で landed。旧 "9000 番台 claim 未起票" reminder は stale。
 - ~~lane c: σ-theory-dual structural (S16:166/3431/3511) を lane d leaf cite で discharge~~
   (**撤回済** — 上記「✅ HUB 再裁定」節参照。行のみ残存していたため 2026-07-02 に strike)
 
@@ -237,8 +244,9 @@ docs/plan レビューで「lane c の記録上の gate = 『§7 coherence は l
 scope は §12 向け ((6.5.c) + S07 generic) のみ」というスコープずれを検出。binding pole が誰も約束して
 いない納品物を待つ構図を排除するため、供給を明示分割する:
 
-- **lane b の納品物** = (6.5.c) coherence producer (shared leaf、**9000 番台 claim を今すぐ起票** —
-  本 issue + 9003 に続き 3 度目のリマインド) + S07 generic producer 群 (lattice-relative refactor は
+- **lane b の納品物** = (6.5.c) coherence producer (**DONE**:
+  `S08.nonempty_coherent_SOf_bot_of_index_dvd` + `S14.frobenius_typeI_coherent_of_cyclicQuotient`;
+  旧 9000 番台 claim reminder は stale) + S07 generic producer 群 (lattice-relative refactor は
   完了済)。**γ cascade の M 向け char 入力は b の scope 外。**
 - **lane c の担当** = 自所有 S15/S16 内の **η-grid honest 化 + M 向け `Hypothesis78`/Dade instantiation**
   (`exists_MHypothesis`/`betaM_expansion_data`/(14.11.4) norm 入力)。upstream-first でこれらを §14.11
