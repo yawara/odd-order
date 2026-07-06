@@ -282,3 +282,20 @@ Phase D core 消費 を全て gate。⟹ **B/C middle の残り全体が Step 4 
 **次アクション候補** (hub 判断): (a) BG §6 の Lemma 6.5(a) `pprod_focal_coprime` を Isaacs Ch05 focal から
 port (shared-infra、複数 BG consumer: S12 Cor 12.16 も使用) → 9000 issue で claim。(b) それまで Step 4-6 は
 inline sorried-cite skeleton で前倒し。Step 1/2/3(nilpotent)/def_q1-engine の 5 helper は既に sorry-free 着地済。
+
+## 2026-07-06 更新 #8 (lane b, /loop) — ★★訂正: BG Lemma 6.5(a) は既存 (#7 の「未 port」は naming-trap 誤診断)
+
+更新 #7 subagent の「Step 4 blocker = BG Lemma 6.5(a) `pprod_focal_coprime` は未 port の real API gap」は **誤り** ([[verify-port-state-by-number-not-coq-name]] の罠、本セッション 3 度目)。BG Lemma 6.5(a) は **既に port 済**:
+**`OddOrder.BG.Ch1.S06.inf_commutator_eq_of_coprime`** (`S06_Additional.lean:485`、docstring「**BG Lemma
+6.5(a)** (mmd L2054): G 可解, K⊴G, G=KU, H≤U, (|H|,|K|)=1 ⟹ H∩G' = H∩U'」、sorry-free theorem)。
+signature: `[IsSolvable G] {K U H} [K.Normal] (hKU : K⊔U=⊤) (hHU : H≤U) (hcop : Coprime |H| |K|) :
+H ⊓ commutator G = H ⊓ ⁅U,U⁆`。subagent は `pprod_focal`/`focal`/`coprime` で grep して `inf_commutator_*` を miss。
+
+⟹ **B/C middle は blocked でない — buildable**。残り (def_q1 engine `eq_of_uniquelyMaximal_centralized_by_rank2_le`
++ Steps 1-3 は landed):
+- **Step 4 (Q nonabelian)**: ↥(M*_σ) 内で `inf_commutator_eq_of_coprime` (G:=M*_σ, K:=O_{q'}(M*_σ), U:=Q=O_q).
+  Q abelian ⟹ Q∩(M*_σ)' = Q∩⁅Q,Q⁆ = Q∩1 = 1 ⟹ K ⊆ Q∩(M*_σ)' = 1 矛盾 (K≠1)。
+- **二次 prereq `K ⊆ (M*_σ)'`** (Coq `sKLs'`/`Ptype_cyclics`): repo で要確認 (naming-trap 警戒 — 概念で検索)。
+  `S10_LocalLemmasCore:480` に `IsCyclic (C(M_σ)⊓K⊓derivedInG M)` 系あり、`typeP_structure` clause か小 derivation。
+- **Step 5 (Q∈𝒰)**: `nonabelian_pgroup_isUniquelyMaximal` (S12_Theorem1213:862、Q nonabelian のみ要、Q Sylow 不要)。
+- **Step 6**: def_q1 (engine が Q∈𝒰 消費) + τ₂(H)={q} (`tau2_singleton_of_nonabelianSylow`) + escape witness `C_G(U)⊄M` → Phase D core。
