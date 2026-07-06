@@ -1199,6 +1199,34 @@ theorem fitting_map_mulEquiv {A B : Type*} [Group A] [Group B] [Finite A] (e : A
     fitting_map_mulEquiv_le e.symm (by simpa using Subgroup.mem_map_of_mem e.symm.toMonoidHom hy)
   simpa using Subgroup.mem_map_of_mem e.toMonoidHom hpre
 
+/-- The Fitting subgroup of `A.subgroupOf S`, pushed into `S`, is the restriction
+of the Fitting subgroup of `A`, pushed into the ambient group. -/
+theorem fitting_subgroupOf_map_subtype_eq [Finite G] {A S : Subgroup G} (hAS : A ≤ S) :
+    (fitting ↥(A.subgroupOf S)).map (A.subgroupOf S).subtype =
+      ((fitting ↥A).map A.subtype).subgroupOf S := by
+  apply Subgroup.map_injective S.subtype_injective
+  have hLS : (fitting ↥A).map A.subtype ≤ S :=
+    (Subgroup.map_subtype_le _).trans hAS
+  have hcomp : S.subtype.comp (A.subgroupOf S).subtype =
+      A.subtype.comp (Subgroup.subgroupOfEquivOfLe hAS).toMonoidHom := by
+    ext a'
+    rfl
+  rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hLS, Subgroup.map_map, hcomp,
+    ← Subgroup.map_map, fitting_map_mulEquiv]
+
+/-- The Fitting subgroup of the image of a subgroup under `K.subtype` is the image
+of the Fitting subgroup under the composed subtype map. -/
+theorem fitting_map_map_subtype [Finite G] {K : Subgroup G} {P : Subgroup K} :
+    (fitting ↥(P.map K.subtype)).map (P.map K.subtype).subtype =
+      ((fitting ↥P).map P.subtype).map K.subtype := by
+  have hcomp : (P.map K.subtype).subtype.comp
+      (Subgroup.equivMapOfInjective P K.subtype K.subtype_injective).toMonoidHom =
+      K.subtype.comp P.subtype := by
+    ext a
+    rfl
+  rw [← fitting_map_mulEquiv (Subgroup.equivMapOfInjective P K.subtype K.subtype_injective),
+    Subgroup.map_map, hcomp, ← Subgroup.map_map]
+
 end -- 1D
 
 section /- 1E: Small-order groups, normal subgroup of index 2 (pp. 31-34) -/
