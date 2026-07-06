@@ -1910,6 +1910,15 @@ theorem Subgroup.IsPiGroup.map_equiv {G H : Type*} [Group G] [Group H] (φ : G �
   rw [hcard] at hp
   exact hK p hp
 
+/-- A `π`-subgroup remains a `π`-subgroup after mapping to a quotient. -/
+theorem Subgroup.IsPiGroup.map_quotient {G : Type*} [Group G] [Finite G] {π : Set ℕ}
+    {N K : Subgroup G} [N.Normal] (hK : Subgroup.IsPiGroup π K) :
+    Subgroup.IsPiGroup π (K.map (QuotientGroup.mk' N)) := by
+  intro p hp
+  apply hK
+  rw [Nat.mem_primeFactors] at hp ⊢
+  exact ⟨hp.1, hp.2.1.trans (Subgroup.card_map_dvd _ _), Nat.card_pos.ne'⟩
+
 /-- **IsPiGroup は subgroupOf で保持**: `B ≤ K ≤ G` で `B` が π-group (as `Subgroup G`)
 ⇒ `B.subgroupOf K` も π-group (as `Subgroup ↥K`).
 
