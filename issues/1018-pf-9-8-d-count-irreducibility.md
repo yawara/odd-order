@@ -318,3 +318,73 @@ standalone に (9.7.a) を再構成した。**full build 3849 jobs 相当 exit 0
 - **assembly**: `caseA_hcrit_of_member` + `hcuZetaPair_summandComplement_subset_ker`
   (W = caseA_wComplement で `hkerW₂` 供給) + `induceHU_inj_of_conj_mem_huSub` (γ inj) +
   `card_image_induce_eq_div` ⟹ `ncard ≥ |T|/a`; (β) + 既存算術橋で RHS。
+
+## (v) count セッション 6 (2026-07-06 続き): def_Itheta 完全実装 + 両 numerator (θ-count/λ-count) landed — count の数学的コアが全て在庫
+
+`caseA_character_counts` conjunct (d) の `sorry` は **依然 open** (S11 comment-stripped sorry = 3)。
+だが本セッションで **(9.8.d) count の数学的コア全体を landing**: **def_Itheta 復元 (mission が
+"the last genuinely-substantial piece" と呼んだ (α) surjectivity) を完全実装**し、さらに **(β) の
+両 numerator (θ-count は既存 landed、λ-count を新規 landing)** と **family-inertia helper** を追加。
+**full build 3932 jobs exit 0, AxiomsCheck OK, sorry/axiom 新規 0**。残るは assembly wiring のみ。
+
+### 重要な発見 (Coq 精読で確定): count は IMAGE-family + injectivity 方式 (surjectivity 不要な Route も可)
+
+`PFsection9.v` L1149-1254 (`typeP_nonGalois_characters` 第2ブロック = (9.8.d)) を精読:
+- `Mtheta := [set mod_Iirr (cfIirr (theta i j)) | i in [set~ 0], j in setT]` = **pair-param の IMAGE**
+  (`theta i j := cfSdprod defHCH1 (cfDprod defH1CH1 'chi_i (lam j))`)。
+- `|Mtheta| = (p-1)·|Clam|` は **injectivity** で (cfSdprodK/dprod_IirrK)。**intrinsic 特徴づけ (def_Itheta
+  surjectivity) は Coq では不使用** — conjBy-closure は explicit pair-conjBy-descent (`conjg_Iirr i yb`,
+  L1210-1224) で示す。
+- `card_imset_Ind_irr` (= Lean `card_image_induce_eq_div`/`_mul_index_eq`) で `|Mtheta|=|Xtheta|·a`。
+- 最終 bound は `≤ count` (uniq_leq_size) — image ⊆ target の inclusion + injXtheta。
+- **arithmetic に floor 問題なし**: `lb_d | lb_n` を先に証明、`a | (p-1)·|Clam|` は `|Mtheta|=|Xtheta|·a` から自動。
+
+Lean では conjBy-closure を **def_Itheta (intrinsic) 経由**で得る方が pair-conjBy-descent より易しい
+(kernel-stability は landed 済) と判断し Route I (intrinsic-T + def_Itheta) を採用。
+
+### landed (build-green, sorry/axiom 無, full build 3932 jobs exit 0)
+
+**def_Itheta 復元 (α surjectivity — mission の "last genuinely-substantial piece" 完了)**:
+- `hom_eq_of_eqOn_hInHu_cuInHu`: join 上の hom は H-制限と C-制限で一意 (`MonoidHom.eq_of_eqOn_denseM`,
+  `H ⋊ C_U(S₀)` complement)。復元の linchpin。
+- `exists_hcuSeedHom_eq_of_realizedH0_ker`: `f_H : hInHu→*ℂˣ` (realizedH0 ⊆ ker) → `θ:H̄→*ℂˣ` で
+  `hcuSeedHom θ = f_H` (H̄=H/N へ factor)。
+- `hcuSeedHom_hinv_of_comp`: hinv 互換は **abelian ℂˣ への任意の hom で成立** (conjugation inner)。
+- `exists_pairHom_eq_of_realizedH0_ker`: hom-form def_Itheta core — `f` (realizedH0 ⊆ ker(f|_H)) =
+  `hcuPairHom θ λ` (θ from f|_H, λ := f|_C)。
+- `mem_characterKernel_linearIrreducibleCharacter`: linear char の characterKernel = hom の ker。
+- `exists_hcuPsiPair_eq_of_linear_realizedH0_ker`: **char-level def_Itheta (surjectivity)** — linear
+  `χ` (realizedH0 ⊆ Ker) = `hcuPsiPair θ (hinv) λ`。
+- `hcuPsiPair_injective_pair`: pair-param injectivity (restriction で θ,λ 復元; `hcuSeedHom_injective`)。
+- `hcuPsiPair_apply_inclusion_cuInHu`: pair char の C-制限 = λ。
+
+**(β) numerator 両方**:
+- `card_theta_triv_W_nontriv_S0` (既存): θ-count = p-1。
+- `card_hom_triv_N_eq_card_quotient_general` (新, 汎用): `#{f:K→*ℂˣ | N ≤ ker f} = |K/N →*ℂˣ|`。
+- `commutator_cuInHu_le_uprimeRealized` (新): `⁅cuInHu,cuInHu⁆ ≤ U'-realized` (cuInHu≤U ⟹ [.,.]≤[U,U]=U')。
+- `card_lambda_triv_uprime` (新): **λ-count = [C_U(S₀):U']** (`= (uprimeSub).relIndex(cuSub)`;
+  cuInHu/U' abelian → Pontryagin → relIndex_subgroupOf 2 回)。
+
+**family-inertia helper**:
+- `hcuPsiPair_family_inertia_eq` (新): θ (W-triv on `caseA_wComplement` + S₀-nontriv) の pair char
+  inertia = `H·C_U(S₀)` (`inertia_eq_hcuInHu` + `hcuPsiPair_inertia_eq_hcu`)。fold の入力。
+
+### 残り (次セッションが直行すべき precise gap = assembly wiring のみ)
+
+数学的コアは全て在庫。残るは **mechanical な assembly** (推定 ~150-200 行):
+1. **family Finset `Mtheta`**: `(Dθ ×ˢ Dλ)` の `.attach` 上で `(θ,hθ,λ) ↦ hcuPsiPair θ (hinv from hθ) λ`
+   の image。`|Mtheta| = |Dθ|·|Dλ| = (p-1)·[C:U']` (`hcuPsiPair_injective_pair` + 上の 2 count)。
+2. **conjBy-closure** (`card_image_induce_mul_index_eq` の `hT`): `conjBy g ψ ∈ Mtheta`。
+   `conjBy g ψ` は linear ∧ 4 kernel 条件 (realizedH0/W/U'⊆Ker, |_H≠1; **全て conjBy-stable** ←
+   `subsetCharacterKernel_conjBy_of_invariant`+`conjByMulEquiv_invariant_of_normal` landed) →
+   `exists_hcuPsiPair_eq_of_linear_realizedH0_ker` で pair char → kernel 条件を domain 条件 (θ' W-triv,
+   S₀-nontriv, λ' U'-triv) に翻訳して `(θ',λ')∈Dθ×Dλ`。**翻訳の逆補題** (realizedW⊆Ker ⟺ θ W-triv 等)
+   が要 (一部 landed: `hcuPsiPair_realizedComplement_subset_characterKernel`)。
+3. **fold**: `card_image_induce_mul_index_eq` (H:=hInHu⊔cuInHu ◁ huSub; conjBy-closure + inertia
+   `hcuPsiPair_family_inertia_eq`) ⟹ `|𝒴|·a = |Mtheta|`。
+4. **target-membership**: `𝒴` の各 `Ind_{HCH1}^{HU} ψ` を `Ind^M` した member が irreducible ∧ deg qa ∧
+   ∈𝒮(H₀U') (`hcuZetaPair_induceHU_mem_sOf` + `caseA_exists_irreducible_source_degree_qa_induceHU_irreducible`)。
+5. **γ inj**: `induceHU` inj on 𝒴 (`caseA_hcrit_of_member` + `induceHU_inj_of_conj_mem_huSub`)。
+6. **ncard bound**: `Set.ncard_le_ncard` (subset) + `InjOn.ncard_image` ⟹ `ncard ≥ |𝒴| = |Mtheta|/a`。
+7. **arithmetic**: `((p-1)/a)·(|U|/(a|U'|)) ≤ (p-1)·[C:U']/a = |𝒴|` via `Nat.le_div_iff_mul_le` +
+   `Nat.div_mul_le_self` + `card_U_div_a_mul_card_Uprime_eq_relIndex`。
