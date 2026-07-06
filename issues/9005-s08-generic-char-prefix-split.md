@@ -44,6 +44,10 @@ prefix-split (凍結済 generic 宣言を上流 GroupTheory leaf へ移し、S08
       split 後に S11 側を新 leaf cite に置換できるか lane a/hub で判定 (できれば統合)。S11 は lane a 所有のため、
       lane d は fresh carve-out なしに Lean 側の置換へ入らない。
       2026-07-06 D read-only audit: both S11 declarations still exist, so the residual stays open.
+      Current API mismatch is precise: shared `InducedTransport.inner_compHom_of_mulEquiv` takes a
+      `MulEquiv`, while S11 `inner_compHom_of_bijective` is an endomorphism + bijectivity lemma used
+      with `hInHuConj`. A future cleanup needs lane-a/hub to either build the local `MulEquiv` bridge
+      or generalize the shared lemma; this is not a thin cite replacement for lane d to perform.
 
 ## lane c の並行対応 (待たない)
 
