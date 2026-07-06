@@ -2264,3 +2264,26 @@ norm-cascade link を見落とし):
 **⟹ hub frontier map は #5(循環)・#3(gated) で over-optimistic** (cont.⁷²「config-provable」誤ラベルと同型)。
 genuine ungated upstream = **`basic_structure` の 1 sorry を descend** or **issue 9013 T-side producer skeleton** —
 両者 deep build ゆえ次 iteration で engage。hub 再裁定用に evidence 保存 ([[scaffold-sorry-free-not-done]])。
+
+### ✅ HUB 再裁定 (2026-07-06, 監視 hub) — **lane-c の #5 循環 finding は正しい。my directive #5/#3 を撤回**
+
+lane-c の pushback を hub が検証 → **c が正しい**。決定的証拠 = c の `#print axioms field_normalizer_structure`
+に **`sorryAx` が含まれる** (= carrier は transitively sorry 依存)。hub 独立確認: `#print axioms` は循環/sorry
+依存の authoritative check で、engine `derived_inf_centralizer_le_P` は 3 allowlist axiom で proven (no sorryAx、
+AxiomsCheck 出力で確認) だが、**carrier `field_normalizer_structure` は norm-cascade 経由で `s_side_frobenius_kernel`
+自身に推移依存** → それで s_side を証明するのは自己循環。**私の HUB DIRECTIVE #5 (block 移設 + carrier cite)
+は誤り**、subagent の "circular dep なし" は static grep が深い推移依存を見落とした (static grep は循環判定に
+不適 — `#print axioms` を使うべきだった)。#3 も c/cont.⁷⁵ の通り typeII 循環で gated。
+
+**⟹ 訂正後の C の genuine ungated 作業 (c の finding どおり、hub 承認)**:
+- **`basic_structure` (S15:1448、その `basic_structure_gated` S15:1430) の sorry を descend** — s_side の正しい
+  route は上流 (14.2.a) 場モデル `field_normalizer_of_U_characteristic_of_fpf` (S16:2247、s_side より上流ゆえ
+  **非循環**)。gate = basic_structure sorry + (14.7) fpf 合同 + (14.2.b) 入力。**これが真の ungated upstream**。
+- or **issue 9013 T-side (13.15) producer skeleton** (`Nonempty (TFieldModelData hyp)` 構築)。
+- 両者 deep build。**C は idle-wait でなくこれを engage** (spirit は達成 — directive の #5 具体処方が誤りでも、
+  「gated で止まらず ungated upstream に降りる」目的は c が正しく実行)。
+
+**教訓 (hub 自省)**: cross-lane の「ungated/循環」裁定は **`#print axioms` で検証すべき** (static grep の
+dependency trace は深い推移依存を見落とす — subagent がこれで誤った)。lane が hub 指示に技術反証を出したら
+(c の `#print axioms` 提示)、hub は再検証して**誤りなら即撤回**する ([[scaffold-sorry-free-not-done]]
+「hub 指示が技術分析と矛盾したら flag」の lane 側実践 + hub 側の受容)。
