@@ -13681,6 +13681,63 @@ theorem caseA_hcuZetaPair_realizedS0_not_subset_ker [Finite G] {M : Subgroup G}
   rw [Units.val_one]
   exact hψker
 
+/-- **Peterfalvi (9.8.d)** (count substrate, per-member irreducibility).  For a member seed `θ`
+trivial on the `W₁`-orbit complement `caseA_wComplement` and nontrivial on `S₀`, the double
+induction `Ind_{HU}^M (Ind_{H·C_U(S₀)}^{HU} ψ_{θ,λ})` is *irreducible*.  If `ζ = Ind ψ` were
+`M`-fixed (`inertia ζ = ⊤`), then for a nontrivial `w₁ ∈ W₁` the orbit summand
+`caseA_wOrbit w₁ = w₁•S₀ ≤ caseA_wComplement ≤ Ker θ`, so `(θ∘aut w₁)|_{S₀} = 1`, which for a fixed
+`ζ` (`caseA_theta_comp_quotient_on_S0_eq_one_iff_of_fixed`) forces `θ|_{S₀} = 1` — contradicting the
+member's `θ|_{S₀} ≠ 1`; hence `inertia ζ ≠ ⊤` and `induceHU ζ` is irreducible
+(`hcuZetaPair_induceHU_irreducible`).  The `W₁`-orbit analogue of the `Hpart`-based
+`hcuZetaPair_induceHU_irreducible_of_nonRegular` (whose `hnonreg` on an arbitrary *carrier* summand
+is not available for a `caseA_wComplement`-trivial member — the two summand systems differ). -/
+theorem caseA_member_induceHU_irreducible [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    (hinv : ∀ c : ↥(cuInHu caseA), ∀ h : ↥(hInHu data),
+      hcuSeedHom (chief := chief) θ
+          ⟨(c : ↥(huSub data)) * (h : ↥(huSub data)) * (c : ↥(huSub data))⁻¹,
+            (hInHu_normal data).conj_mem _ h.2 (c : ↥(huSub data))⟩
+        = hcuSeedHom (chief := chief) θ h)
+    (lam : ↥(cuInHu caseA) →* ℂˣ)
+    (hθW : caseA_wComplement caseA ≤ θ.ker)
+    (hθS0 : θ.comp caseA.S0.subtype ≠ 1)
+    [Fintype ↥(huSub data)]
+    [Fintype ↥(hInHu data ⊔ cuInHu caseA)]
+    [Fintype ↥(hInHu data)]
+    [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    [Invertible (Nat.card ↥(hInHu data ⊔ cuInHu caseA) : ℂ)]
+    [Invertible (Nat.card ↥(hInHu data) : ℂ)]
+    [(hInHu data ⊔ cuInHu caseA).Normal]
+    (hθ₀ : ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+        (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+          (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+        = hInHu data ⊔ cuInHu caseA) :
+    IsIrreducibleCharacter (induceHU data (ClassFunction.induce (hInHu data ⊔ cuInHu caseA)
+      (hcuPsiPair caseA θ hinv lam) : ClassFunction ↥(huSub data) ℂ)) := by
+  refine hcuZetaPair_induceHU_irreducible caseA θ hinv lam hθ₀ ?_
+  intro hMfix
+  have hlo := hcuZetaPair_liesOver_hInHu caseA θ hinv lam hθ₀
+  -- a nontrivial `w₁ ∈ W₁` (as an index of the `W₁`-orbit `caseA_wOrbit`).
+  obtain ⟨wg, hwgW1, hwgne⟩ :=
+    (data.typeP.W1.bot_or_exists_ne_one).resolve_left data.typeP.W1_nontrivial
+  set w₁ : ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) :=
+    ⟨⟨wg, Subgroup.mem_sup_right hwgW1⟩, Subgroup.mem_subgroupOf.mpr hwgW1⟩ with hw₁def
+  have hw₁ne : w₁ ≠ 1 := by
+    intro h
+    refine hwgne ?_
+    have h2 : ((w₁ : ↥(data.typeP.U ⊔ data.typeP.W1)) : G) = wg := rfl
+    rw [h] at h2; simpa using h2.symm
+  -- `caseA_wOrbit w₁ = w₁•S₀ ≤ caseA_wComplement ≤ Ker θ`.
+  have hle : caseA_wOrbit caseA w₁ ≤ θ.ker :=
+    (le_iSup₂ (f := fun w (_ : w ≠ 1) => caseA_wOrbit caseA w) w₁ hw₁ne).trans hθW
+  have hwtriv : θ.comp (caseA_wOrbit caseA w₁).subtype = 1 := by
+    ext s; simpa using MonoidHom.mem_ker.mp (hle s.2)
+  rw [caseA_wOrbit, comp_subtype_pointwise_smul_eq_one_iff,
+    caseA_theta_comp_quotient_on_S0_eq_one_iff_of_fixed caseA θ _ hlo hMfix ↑w₁] at hwtriv
+  exact hθS0 hwtriv
+
 /-- **Peterfalvi (9.8)**: character-count consequences in Clifford case (a).
 
 Faithful to Peterfalvi (9.8.b,c,d) (count-statement audit, issue 2030):
