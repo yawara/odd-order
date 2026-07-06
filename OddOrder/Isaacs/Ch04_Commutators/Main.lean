@@ -4376,6 +4376,24 @@ theorem actionCommutator_le_oPiCore_of_fixedPoints_contains_hallComplement
     OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.le hAC_le_H hH_hall.1
   exact OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.le_oPiCore hAC_pi
 
+/-- **BG Proposition 1.6(c)**: if `[G,A,A] = 1`, then `[G,A] = 1`.
+
+This is the direct Γ-form consequence of Isaacs Lemma 4.29: under coprime action,
+the second iterated commutator equals the first. -/
+theorem iterCommutator_inl_inr_one_eq_bot_of_two_eq_bot
+    {G A : Type*} [Group G] [Finite G] [Group A] [Finite A]
+    {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G)
+    (h_two : iterCommutator
+        (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+        (SemidirectProduct.inr : A →* G ⋊[φ] A).range 2 = ⊥) :
+    iterCommutator
+        (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+        (SemidirectProduct.inr : A →* G ⋊[φ] A).range 1 = ⊥ := by
+  have h_eq := iterCommutator_inl_inr_two_eq_one (φ := φ) hCop hSolv
+  rw [← h_eq, h_two]
+
 /-- **Isaacs Thm 4.36 (class ≤ 2 case)** ⭐: A acts on p-群 G of class ≤ 2 (p > 2),
 A is p'-group, A fixes every order-p element of G ⇒ A trivial on G.
 
