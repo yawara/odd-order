@@ -73,6 +73,14 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > **非問題（通常継続）= ** 「変化なし」/ 新 decl の faithful scaffold sorry 増 / 独立追記コンフリクトの両保持解決
 > / 共有ファイル編集（AxiomsCheck.lean 追記・OddOrder.lean import・`OddOrder/GroupTheory/**`・`OddOrder/Mathlib/**` 共有 infra・notes・issues）。
 >
+> **🔧 範囲逸脱の是正 = 成果を無駄にせず軌道修正（ユーザー方針 2026-07-06）**: レーン範囲逸脱で halt+flag した後、
+> その逸脱に **genuine output（実証明・実構成・sorry-free work）が含まれるなら discard/revert せず、hub が軌道修正で
+> 保全する** — 正しい file/leaf へ移設 / carve-out 付与 / owner 再割当 / 下流再配線。「軌道修正できれば十分」で、
+> genuine math を破棄しない（territorial ルールは coordination 保護であって成果 gate-keep でない）。先例 = lane b の
+> `S07_Subcoherent`=carve-out / `mu2Grid`=S05→PrimeTIResidue 移設 / `PrimeTIResidue` 削除=撤回（全て保全）。
+> ⚠ 保全対象は **genuine output のみ**; unsound carrier・新 axiom・sorry regression・signature 無断改変 は
+> 別カテゴリ（保全すべき成果でない、halt のまま）。正本 = CLAUDE.md「進捗の測り方」の該当 bullet。
+>
 > **♻ 問題解決後はループ自動再開（ユーザー方針 2026-06-23, 永続）**: 上記 ⛔ で停止した監視ループは、
 > **問題が解決したら必ず再開する**。具体的には: (a) 停止した問題（build 失敗 / コンフリクト / sorry
 > regression / 新規 axiom / push 失敗 / 想定外 git 状態 / レーン範囲逸脱）が、**ユーザーの指示か hub の
