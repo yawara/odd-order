@@ -127,3 +127,18 @@ complement-conjugacy で closable なものを実証明** (commit `fc2a1523`):
 
 **⟹ lane-b へ**: `U_nilpotent` は済 (重複回避)。残 4 field の内 `fitting_eq`/`secondDerived_le_fitting` は
 上記 recipe で c が続行、`W2_le`/`centralizer_W1` の topology 解消 (下流移動 or hoist) は設計判断。
+
+### 追記⁴ (2026-07-06 同 /loop、subagent 実装完了) — `reconciled_typePData_T` **5→2** 達成
+
+`fitting_eq` + `secondDerived_le_fitting` も **実証明・landed** (commit `d3917274`、build green 3882 jobs)。
+新 helper `Hypothesis.exists_typePData_U_eq_V` (`∃ d:TypePData T, d.U=V ∧ d.H=Q`、TypePData.conj で U-共役を
+whole-datum transport) から両 field を rw で discharge。**reconciled_typePData_T は 5→2 sorries**
+(U-conjugacy-derivable な U/intrinsic 3 field を全 close)。
+
+**残 2 field は verified 深部 σ-structure (lane-b 領域、c 導出不可)**:
+- `W2_le` (W₁≤Q⊓T'') は **PRIMARY fact** — `W1_le_Q` (S15_SAndT:1218) 自身が `reconciled_typePData_T` の
+  `W2_le` を消費して W₁≤Q を出す ⟹ W2_le を W1_le_Q で埋めると**循環**。W2_le は §16 T-side 構造から直接要。
+- `centralizer_W1` (∀x∈W₂#, T'⊓C_G(x)=W₁ = 双対 cyclic factor 特性) も同様。
+- S-side は carried `Sdata` (§16 construction 供給) から両 field を無料取得。T-side は carrier 不在 (設計)
+  ゆえ reconciled が代替、この 2 field のみ §16 T-side 構造 (W-factor simultaneous conjugacy or
+  intrinsic W₁ characterization) を要 = lane-b σ-structure。c は U-side を出し切った (principled stop)。
