@@ -1319,6 +1319,104 @@ noncomputable def Hypothesis.sSetIrrDeg_subcoherent [Fintype G] [Finite G]
     exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
       (hyp.dadeHypS hG) (hyp.dadeHypS_hconj hG) hdiff_supp hab hcd
 
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **(9.11) base / Galois coherence of the uniform-degree irreducible sub-family `S₁(d)`**
+(issue 1017, update #18 — the honest (9.11) base coherence).  Feeds the landed subcoherence
+`sSetIrrDeg_subcoherent` into `coherent_subset_of_constant_degree` (Peterfalvi (5.7)∘(5.3.a),
+`S07_Subcoherent.lean:246`) with `S' = S = sSetIrrDeg d` (the uniform subset of itself), producing
+`Nonempty (IsCoherent τ (S₁ d) A)` for the honest Dade map `τ = Ind_S^G` (`dadeHypS`) and support
+`A(S)`.  This is the whole **Galois case** (`d = q·u`) and the **base case `S₁`** (`d = q·a`) of the
+(9.11) `Ptype_core_coherence` derived-series induction (Coq `PFsection9.v:1484`).
+
+The `coherent_subset_of_constant_degree` hypotheses discharge as follows, all *internally* from the
+landed §9 family lemmas — **except `hcard` (≥ 2 membership)**, which is *exposed as a parameter*
+`h2`: no `2 ≤ (S₁ d).ncard` fact exists yet in the repo (the degree-`d` count is the §9 (9.8.d)
+counting content — `caseA_exists_irreducible_source_degree_qa`, `S11:6437`, and its `M`-induction
+strengthening at `S11:12250`, give an *existence* `∃ ζ`, not two distinct members).  Exposing it
+keeps this def sorry-free and defers the genuine upstream count to the caller — the honest pattern.
+
+Internal discharges:
+* `hconj'` = `sSetIrrDeg_subcoherent`'s own `.conjugate_closed` field (conj of a degree-`d`
+  irreducible member is again one, uses `star d = d`);
+* `hSfin` = `S₁ d ⊆ range (IrreducibleCharacter.toClassFunction)` (finite range of a `Finite` type);
+* `hirr` = `IsIrreducibleCharacter.inner_self_eq_one` (each member is irreducible by definition);
+* `hZIrr` = `dadeIntegralCharacterMap_mem_ZIrr_of_supported` — the member difference `a − b` is
+  `A(S)`-supported (equal degree, vanishes at `1`) and a virtual character (difference of two
+  irreducibles), so the honest Dade map sends it into `ℤ[Irr G]`;
+* `hconst` = definitional uniform degree `φ(1) = d`;
+* `hdeg0` = exposed `d ≠ 0`;
+* `h1A` = `honestTypeP2ASet_one_not_mem` (`1 ∉ A(S)`);
+* `hsuppdiff` = the equal-degree two-member support fact (member differences `A(S)`-supported),
+  the same argument `sSetIrrDeg_subcoherent`'s `hiso` uses internally. -/
+noncomputable def Hypothesis.sSetIrrDeg_coherent [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    [Fintype ↥hyp.S] [Invertible (Nat.card ↥hyp.S : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (d : ℂ) (hd : star d = d) (hd0 : d ≠ 0)
+    (h2 : 2 ≤ (hyp.sSetIrrDeg hG d).ncard) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)))
+      (hyp.sSetIrrDeg hG d)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)) := by
+  classical
+  set A := OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S with hA
+  -- The landed (5.3.a) subcoherence structure on `S₁(d)`; its `.tau` is the honest Dade map.
+  set hyp' := hyp.sSetIrrDeg_subcoherent hG d hd with hhyp'
+  -- `hSfin`: `S₁(d)` injects into `IrreducibleCharacter ↥S` (a `Finite` type).
+  have hSfin : (hyp.sSetIrrDeg hG d).Finite := by
+    apply Set.Finite.subset (Set.finite_range
+      (fun χ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥hyp.S =>
+        (χ : ClassFunction ↥hyp.S ℂ)))
+    rintro φ ⟨_, hirr, _⟩
+    exact ⟨⟨φ, hirr⟩, rfl⟩
+  -- `hirr`: each member is an irreducible character, so has self-inner `1`.
+  have hirr : ∀ ζ ∈ hyp.sSetIrrDeg hG d, ClassFunction.inner ζ ζ = 1 :=
+    fun ζ hζ => hζ.2.1.inner_self_eq_one
+  -- `hconst`: uniform degree `φ(1) = d` (definitional membership).
+  have hconst : ∀ a ∈ hyp.sSetIrrDeg hG d, ∀ b ∈ hyp.sSetIrrDeg hG d,
+      ((a : ClassFunction ↥hyp.S ℂ) : ↥hyp.S → ℂ) 1 = ((b : ClassFunction ↥hyp.S ℂ) : ↥hyp.S → ℂ) 1 :=
+    fun a ha b hb => by rw [ha.2.2, hb.2.2]
+  -- `hdeg0`: nonzero degree (exposed `d ≠ 0`).
+  have hdeg0 : ∀ a ∈ hyp.sSetIrrDeg hG d, ((a : ClassFunction ↥hyp.S ℂ) : ↥hyp.S → ℂ) 1 ≠ 0 :=
+    fun a ha => by rw [ha.2.2]; exact hd0
+  -- `h1A`: `1 ∉ A(S)`.
+  have h1A : (1 : ↥hyp.S) ∉ A := by
+    rw [hA, OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+    simpa using honestTypeP2ASet_one_not_mem (M := hyp.S)
+  -- `hsuppdiff`: for `x, y ∈ S₁(d)`, `(x − y).support ⊆ A(S)` (equal degree ⇒ vanish at `1`).
+  have hmem_supp : ∀ φ ∈ hyp.sSetIrrDeg hG d, φ.support ⊆ A ∪ {1} := by
+    rintro φ ⟨hφsSet, _⟩
+    obtain ⟨hξ, hφeq⟩ := hφsSet.choose_spec
+    rw [hφeq]
+    exact hyp.sSet_member_support_subset_A hG hξ
+  have hsuppdiff : ∀ x ∈ hyp.sSetIrrDeg hG d, ∀ y ∈ hyp.sSetIrrDeg hG d,
+      ((x - y : ClassFunction ↥hyp.S ℂ)).support ⊆ A := by
+    intro x hx y hy z hz
+    have hz0 : (x - y) z ≠ 0 := hz
+    have hdeg : (x : ↥hyp.S → ℂ) 1 = (y : ↥hyp.S → ℂ) 1 := by rw [hx.2.2, hy.2.2]
+    rcases (ClassFunction.support_sub_subset x y hz) with h | h
+    · rcases hmem_supp x hx h with h' | h'
+      · exact h'
+      · exfalso; rw [Set.mem_singleton_iff] at h'; subst h'
+        exact hz0 (by rw [ClassFunction.sub_apply, hdeg, sub_self])
+    · rcases hmem_supp y hy h with h' | h'
+      · exact h'
+      · exfalso; rw [Set.mem_singleton_iff] at h'; subst h'
+        exact hz0 (by rw [ClassFunction.sub_apply, hdeg, sub_self])
+  -- `hZIrr`: the honest Dade map sends `A(S)`-supported virtual-character differences into `ℤ[Irr G]`.
+  have hZIrr : ∀ a ∈ hyp.sSetIrrDeg hG d, ∀ b ∈ hyp.sSetIrrDeg hG d,
+      hyp'.tau (a - b) ∈ OddOrder.RepresentationTheory.ZIrr G := by
+    intro a ha b hb
+    have hab_supp : (a - b : ClassFunction ↥hyp.S ℂ).support ⊆ A := hsuppdiff a ha b hb
+    have hab_Z : (a - b : ClassFunction ↥hyp.S ℂ) ∈ OddOrder.RepresentationTheory.ZIrr ↥hyp.S :=
+      Submodule.sub_mem _ ha.2.1.mem_ZIrr hb.2.1.mem_ZIrr
+    exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+      (hyp.dadeHypS hG) (hyp.dadeHypS_hconj hG) hab_supp hab_Z
+  -- Fire the (5.7)∘(5.3.a) uniform-degree coherence producer on `S' = S = S₁(d)`.
+  exact OddOrder.Peterfalvi.S07.coherent_subset_of_constant_degree hyp'
+    (subset_refl _) hyp'.conjugate_closed hSfin h2 hirr hZIrr hconst hdeg0 h1A hsuppdiff
+
 open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **Honest §9 character data on `S`** (issue 2035 step 3): the `mkSection11CharacterDataS`
 mirror with the *genuine* coherence inputs — `tau := Ind_S^G` (`indS`, Peterfalvi (13.2.e)) and
