@@ -531,3 +531,12 @@ type-F wiring: `complement.symm.index_eq_card` (card U=[L:K]) / `complement.sup_
   (K⊄Ker φ from mult-one + C_K(x)=⊥→typeIA)。
 hG thread → `character_decomposition_and_dade_domain`。**一般 type-I maximal の (12.2.a) carrier が
 sorry-free 化 → 非-Frobenius N の (12.3)/(12.4)/(12.15) が un-gate**。s14_typeI_induced_assembly_wip.txt 削除。
+
+## ✅ HUB CLOSURE (2026-07-06 夕, c FOLD 裁定 wf_00a0db07) — 完了条件 met、closed
+
+分担監査 (4-agent) で確定: 構成的 Clifford core は全 sorry-free landed
+(CliffordSingleOrbit/CliffordCorrespondence/CliffordDecomposition/GallagherDecomposition/CharacterProduct/
+CyclicCharacterExtension)、consumer `typeI_induced_char_constituents` (S14_MaximalI:442) は **body sorry-free**
+(台 clause ⊆A(L)∪{1} = Pf(1.2) で in-place 証明済、lane b が landed)。唯一の transitive sorryAx =
+`typeF_inertia_inf_le_U1` = (8.2.c) = **lane-b の §8 grandfather bound** (本 issue の Clifford 範囲外)。
+⟹ 9002 の deliverable (cite-ready 構成的 Clifford signature) は **達成**。closed へ。
