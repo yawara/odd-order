@@ -68,6 +68,28 @@ theorem exists_minimal_aInvariant_normal [Finite H] [Nontrivial H] :
   intro M hM_normal hM_inv hM_le hM_ne
   exact hN_min ⟨hM_ne, hM_normal, hM_inv⟩ hM_le
 
+/-- A minimal nontrivial `L`-invariant normal subgroup of a finite solvable group is
+commutative. -/
+theorem isMulCommutative_of_minimal_aInvariant_normal [Finite H] [IsSolvable H]
+    {N : Subgroup H} [N.Normal]
+    (hN_inv : IsAInvariant φ N)
+    (hN_ne_bot : N ≠ ⊥)
+    (hN_min : ∀ M : Subgroup H, M.Normal → IsAInvariant φ M → M ≤ N → M ≠ ⊥ → N ≤ M) :
+    IsMulCommutative N := by
+  have hcomm_lt : ⁅N, N⁆ < N := IsSolvable.commutator_lt_of_ne_bot hN_ne_bot
+  have hcomm_bot : (⁅N, N⁆ : Subgroup H) = ⊥ := by
+    by_contra hcomm_ne_bot
+    have hN_le_comm : N ≤ ⁅N, N⁆ :=
+      hN_min ⁅N, N⁆ (Subgroup.commutator_normal N N)
+        (hN_inv.commutator hN_inv) hcomm_lt.le hcomm_ne_bot
+    exact hcomm_lt.not_ge hN_le_comm
+  rw [Subgroup.commutator_eq_bot_iff_le_centralizer] at hcomm_bot
+  refine IsMulCommutative.of_comm ?_
+  intro x y
+  have hx_cent : (x : H) ∈ Subgroup.centralizer N := hcomm_bot x.2
+  rw [Subgroup.mem_centralizer_iff] at hx_cent
+  exact Subtype.ext ((hx_cent y y.2).symm)
+
 /-- **Existence of an elementary-abelian `L`-invariant normal subgroup.**  A nontrivial finite
 solvable group `H` carrying an action `φ : L →* MulAut H` has a nontrivial `L`-invariant normal
 subgroup `N ◁ H` that is elementary abelian (of some prime exponent `p`). -/
@@ -87,23 +109,10 @@ theorem exists_aInvariant_normal_isElementaryAbelian [Finite H] [IsSolvable H]
   haveI : N.Normal := hN_normal
   haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN_ne
   haveI : IsSolvable ↥N := inferInstance
-  -- Step 1: `↥N` is abelian (`commutator ↥N = ⊥`).
-  have hcomm_bot : commutator ↥N = ⊥ := by
-    obtain ⟨hinv, hnorm, hle⟩ := aInvariant_normal_map_of_characteristic hN_inv (commutator ↥N)
-    rcases hkill _ hnorm hinv hle with h | h
-    · exact Subgroup.map_injective N.subtype_injective (by rw [h, Subgroup.map_bot])
-    · -- `(commutator ↥N).map = N` would force `commutator ↥N = ⊤`, contradicting solvability.
-      have htop : commutator ↥N = ⊤ := by
-        apply Subgroup.map_injective N.subtype_injective
-        rw [h, ← MonoidHom.range_eq_map, N.range_subtype]
-      exact absurd htop (IsSolvable.commutator_lt_top_of_nontrivial (G := ↥N)).ne
-  have hab : ∀ x y : ↥N, x * y = y * x := by
-    intro x y
-    rw [← commutatorElement_eq_one_iff_mul_comm]
-    have hmem : ⁅x, y⁆ ∈ commutator ↥N :=
-      Subgroup.commutator_mem_commutator (Subgroup.mem_top x) (Subgroup.mem_top y)
-    rw [hcomm_bot, Subgroup.mem_bot] at hmem
-    exact hmem
+  -- Step 1: `↥N` is abelian.
+  have hN_comm : IsMulCommutative ↥N :=
+    isMulCommutative_of_minimal_aInvariant_normal hN_inv hN_ne hN_min
+  have hab : ∀ x y : ↥N, x * y = y * x := fun x y => hN_comm.is_comm.comm x y
   -- Step 2: `↥N` has prime exponent `p` (the subgroup of `p`-th powers is trivial).
   letI : CommGroup ↥N := { (inferInstance : Group ↥N) with mul_comm := hab }
   obtain ⟨p, hp, hpdvd⟩ :=
