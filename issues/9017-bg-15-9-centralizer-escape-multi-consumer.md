@@ -331,3 +331,34 @@ build 3120 jobs OK):
 `Ptype_structure`-P1 系の未形式化内容に依存。conditional assembly helper (この 2 点を hypothesis 化して残りを
 sorry-free chain) も検討したが、`K⊆(M*_σ)'` 導出が type-P1 経由でさらに複雑化するため、clean な 2 engine を
 優先 landing (fragile な 100+行 assembly で build を壊すより doneness 判定に忠実)。
+
+## 2026-07-06 更新 #10 (lane b, /loop) — ★★訂正: Thm 15.2 も既存 (#9 gap(1) は naming-trap)、Thm 15.8 は完全 assemblable
+
+更新 #9 subagent の「gap(1) = `Fcore_structure` (Thm 15.2) は repo analog 無し」は **誤り** (本セッション 4 度目の
+naming-trap [[verify-port-state-by-number-not-coq-name]])。**Thm 15.2 は既存**: `mf_ne_msigma_typeP1_structure`
+(`S15_MF.lean:6769`、mmd L4190-4202、docstring「Theorem 15.2 の構造内容は built」S15_MF:1783) + `isTypeP1_of_mf_ne_msigma`
+(S15_MF:2098)。加えて `Msigma_nilpotent_of_tau2` (Thm 12.5、M_σ nilpotent from τ₂ witness) も存在。
+
+⟹ **Thm 15.8 は missing theorem 無し、既存 machinery で完全 assemblable**。全 landed helper (Phase A/B + Steps 1-4 +
+def_q1 engine `eq_of_uniquelyMaximal_centralized_by_rank2_le` + Step 6 core `le_centralizer_opiCore_of_msigma_nilpotent`
++ Step 4 `partner_opiCore_nonabelian` + Phase D core `not_prime_mem_tau2_of_centralizer_kappaCompl_not_le`) と、
+以下の verified lemma で最終 assembly:
+
+**残り assembly step (全 piece 特定済み、naming-trap 訂正済)**:
+1. **M* type-P1** (Coq `P1maxL`): q∉β(M*) + `typeP_structure` (P2 でない ⟹ q∈β の対偶)。q∉β(M*) は Coq `b'q` =
+   `tau2_not_beta` (q1∉β(G)) を σ(M*) 経由で。β theory = `S10.beta` (既存, `mem_beta_iff` 等)。
+2. **M*_σ nilpotent** (Coq `nilLs`): M_F=M_σ ⟺ nilpotent (`maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent`);
+   M_F≠M_σ なら `mf_ne_msigma_typeP1_structure` (Thm 15.2) が q∈β(M*) を出す ⟹ b'q と矛盾 ⟹ M_F=M_σ ⟹ nilpotent。
+3. **K ⊆ (M*_σ)'**: `Msigma_inf_centralizer_le_derivedDerived_of_isComplement'` (subagent 確認、Ptype_cyclics 相当)。
+4. Q=O_q(M*) Sylow (`exists_sylow_eq_opiCore_of_mem_sigma_of_msigma_nilpotent`、step 2 の nilpotent 供給)。
+5. Q nonabelian (`partner_opiCore_nonabelian`、step 3 の K⊆(M*_σ)' 供給)。
+6. Q∈𝒰 (`nonabelian_pgroup_isUniquelyMaximal`、Q nonabelian のみ要)。
+7. def_q1 (q1=q): by_contra q1≠q → `le_centralizer_opiCore_of_msigma_nilpotent` (A≤C(Q)) → engine
+   `eq_of_uniquelyMaximal_centralized_by_rank2_le` (H=M*) → H≠M* 矛盾。
+8. τ₂(H)={q} prime 形 + **escape witness `C_G(U)⊄M`**: `tau2_singleton_of_nonabelianSylow` (S12_Theorem127d:550)
+   の出力 X=A⊓C(H_σ) (|X|=q, X⊄M via ℰ¹ escaping clause) から、U⊆H_σ が X を中心化 ⟹ C_G(U)⊄M。
+9. 最終 tuple: `card_kappaHall_prime` + `not_prime_mem_tau2_of_centralizer_kappaCompl_not_le` (escape witness) +
+   q∈τ₂(H) + singleton。
+
+**教訓**: 本 chain で subagent が 4 回 naming-trap で「missing」誤診断 (Ptype_embedding/tau2_not_beta/6.5(a)/Fcore_structure)。
+全て既存だった。最終 assembly は上記 verified 名で intricate だが完全に構築可能。
