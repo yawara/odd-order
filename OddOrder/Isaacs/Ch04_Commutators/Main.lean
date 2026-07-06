@@ -624,6 +624,30 @@ theorem frattini_le_iff_isElementaryAbelian_quotient_of_pgroup
   ⟨isElementaryAbelian_quotient_of_frattini_le_of_pgroup hP,
    frattini_le_of_isElementaryAbelian_quotient_of_pgroup hP⟩
 
+/-- **BG Lemma 1.7(c)**: for a finite `p`-group `R`, `Φ(R) = 1` iff `R` is
+elementary abelian.
+
+This is the bottom-subgroup specialization of Isaacs Lemma 4.5, transported across
+`R/⊥ ≃ R`. -/
+theorem frattini_eq_bot_iff_isElementaryAbelian
+    {p : ℕ} [Fact p.Prime] {R : Type*} [Group R] [Finite R]
+    (hR : IsPGroup p R) :
+    frattini R = ⊥ ↔ OddOrder.GroupTheory.IsElementaryAbelian p R := by
+  refine ⟨?_, ?_⟩
+  · intro hFrat
+    have hle : frattini R ≤ (⊥ : Subgroup R) := by
+      rw [hFrat]
+    have hquot : OddOrder.GroupTheory.IsElementaryAbelian p (R ⧸ (⊥ : Subgroup R)) :=
+      (frattini_le_iff_isElementaryAbelian_quotient_of_pgroup
+        (P := R) (p := p) (N := (⊥ : Subgroup R)) hR).mp hle
+    exact OddOrder.GroupTheory.IsElementaryAbelian.of_mulEquiv
+      (QuotientGroup.quotientBot (G := R)) hquot
+  · intro hElem
+    have hle : frattini R ≤ (⊥ : Subgroup R) :=
+      (frattini_le_iff_isElementaryAbelian_quotient_of_pgroup
+        (P := R) (p := p) (N := (⊥ : Subgroup R)) hR).mpr hElem.quotient_bot
+    exact le_antisymm hle bot_le
+
 /-- **Isaacs Lemma 4.4 final conclusion** (`thus Φ(P) ⊆ Z(P)`):
 For finite `p`-group `P` of class ≤ 2 with `commutator P` `p`-elementary abelian,
 `Φ(P) ⊆ Z(P)`.
