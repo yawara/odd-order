@@ -141,6 +141,19 @@ theorem centralizer_sup (H K : Subgroup G) :
   ext g
   simp only [mem_centralizer_iff, Set.mem_union, mem_inf, or_imp, forall_and]
 
+/-- If `K ≤ C_G(F)`, then `K ∩ F`, viewed as a subgroup of `K`, lies in `Z(K)`. -/
+theorem inf_subgroupOf_le_center_of_le_centralizer {K F : Subgroup G}
+    (hK_le_C : K ≤ centralizer (F : Set G)) :
+    (K ⊓ F).subgroupOf K ≤ center K := by
+  intro x hx
+  rw [mem_center_iff]
+  intro y
+  apply Subtype.ext
+  have hx_inf : (x : G) ∈ K ⊓ F := hx
+  have hxF : (x : G) ∈ F := hx_inf.2
+  have hyC : (y : G) ∈ centralizer (F : Set G) := hK_le_C y.2
+  exact (mem_centralizer_iff.mp hyC (x : G) hxF).symm
+
 /-- **`MulAut` 作用の固定点部分群**: `φ : A →* MulAut G` の下で `∀ a, (φ a) g = g` を
 満たす要素全体. mathlib `MulAction.fixedPoints` は Set だが, MulAut 作用の場合は
 group 構造を持つので Subgroup として bundle.
