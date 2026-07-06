@@ -455,6 +455,68 @@ CLAUDE.md mathlib ラッパー方針に従い, 純粋なリネームは書かな
   Isaacs 自身の証明は短い. mathlib に直接の対応があるか調査が必要.
 -/
 
+/-- A normal subgroup meeting a prime-order complement trivially lies in the normal Hall kernel.
+
+If `K ◁ G` has complement `R` of prime order and `|K|` is coprime to `|R|`, then any
+normal subgroup `N ◁ G` with `N ⊓ R = ⊥` satisfies `N ≤ K`. -/
+theorem normal_le_of_complement_prime_of_inf_eq_bot
+    {G : Type*} [Group G] [Finite G] {K N R : Subgroup G} [K.Normal] [N.Normal]
+    (hcompl : Subgroup.IsComplement' K R) (hp : (Nat.card R).Prime)
+    (hcop : Nat.Coprime (Nat.card K) (Nat.card R)) (hNR : N ⊓ R = ⊥) :
+    N ≤ K := by
+  haveI : Fact (Nat.card R).Prime := ⟨hp⟩
+  have hpK : ¬ (Nat.card R) ∣ Nat.card K := (hp.coprime_iff_not_dvd).mp hcop.symm
+  have hcard_mul : Nat.card K * Nat.card R = Nat.card G := hcompl.card_mul
+  have hquot : Nat.card (G ⧸ K) = Nat.card R := by
+    have h1 : Nat.card G = Nat.card (G ⧸ K) * Nat.card K :=
+      Subgroup.card_eq_card_quotient_mul_card_subgroup K
+    have h2 : Nat.card (G ⧸ K) * Nat.card K = Nat.card R * Nat.card K := by
+      rw [← h1, ← hcard_mul, mul_comm]
+    exact Nat.eq_of_mul_eq_mul_right Nat.card_pos h2
+  have hfact : (Nat.card G).factorization (Nat.card R) = 1 := by
+    rw [← hcard_mul, Nat.factorization_mul (Nat.ne_of_gt Nat.card_pos)
+      (Nat.ne_of_gt Nat.card_pos), Finsupp.coe_add, Pi.add_apply,
+      Nat.factorization_eq_zero_of_not_dvd hpK, hp.factorization_self, zero_add]
+  let Rsyl : Sylow (Nat.card R) G := Sylow.ofCard R (by rw [hfact, pow_one])
+  have hpN : ¬ (Nat.card R) ∣ Nat.card N := by
+    intro hdvd
+    obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' (G := N) (Nat.card R) hdvd
+    have hxG : orderOf ((x : G)) = Nat.card R := by
+      rw [← hx]; exact orderOf_injective N.subtype N.subtype_injective x
+    have hPgroup : IsPGroup (Nat.card R) (Subgroup.zpowers ((x : G))) :=
+      IsPGroup.of_card (((Nat.card_zpowers _).trans hxG).trans (pow_one _).symm)
+    obtain ⟨Q, hQ⟩ := hPgroup.exists_le_sylow
+    obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G Q Rsyl
+    have hxQ : (x : G) ∈ (Q : Subgroup G) := hQ (Subgroup.mem_zpowers _)
+    have hcompute : (MulAut.conj g)⁻¹ • (g * (x : G) * g⁻¹) = (x : G) := by
+      rw [← map_inv]
+      change (MulAut.conj g⁻¹) (g * (x : G) * g⁻¹) = (x : G)
+      rw [MulAut.conj_apply]; group
+    have hconjR : g * (x : G) * g⁻¹ ∈ R := by
+      have hRsyl : (Rsyl : Subgroup G) = R := rfl
+      rw [← hRsyl, ← hg, Sylow.coe_subgroup_smul,
+        Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+      simpa [hcompute] using hxQ
+    have hconjN : g * (x : G) * g⁻¹ ∈ N :=
+      (inferInstance : N.Normal).conj_mem (x : G) x.2 g
+    have hmem : g * (x : G) * g⁻¹ ∈ N ⊓ R := ⟨hconjN, hconjR⟩
+    rw [hNR, Subgroup.mem_bot] at hmem
+    have hx1 : (x : G) = 1 := by
+      have hc : (MulAut.conj g) (x : G) = 1 := by rw [MulAut.conj_apply]; exact hmem
+      exact (MulEquiv.map_eq_one_iff _).mp hc
+    rw [hx1, orderOf_one] at hxG
+    exact hp.one_lt.ne hxG
+  have hdvd1 : Nat.card (N.map (QuotientGroup.mk' K)) ∣ Nat.card N :=
+    Subgroup.card_map_dvd _ _
+  have hdvd2 : Nat.card (N.map (QuotientGroup.mk' K)) ∣ Nat.card R := by
+    rw [← hquot]; exact Subgroup.card_subgroup_dvd_card _
+  have hcop2 : Nat.Coprime (Nat.card N) (Nat.card R) := ((hp.coprime_iff_not_dvd).mpr hpN).symm
+  have hone : Nat.card (N.map (QuotientGroup.mk' K)) = 1 :=
+    Nat.eq_one_of_dvd_coprimes hcop2 hdvd1 hdvd2
+  have hbot : N.map (QuotientGroup.mk' K) = ⊥ := Subgroup.card_eq_one.mp hone
+  rw [Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk'] at hbot
+  exact hbot
+
 /-! **Elementary Abelian p-Group** の def は `OddOrder/GroupTheory/ElementaryAbelian.lean`
 に移動 (2026-05-23). Ch.3, Ch.6, Ch.7 共通の shared concept として独立 module 化.
 本ファイルでは `OddOrder.GroupTheory.IsElementaryAbelian` (whole-group form) と
