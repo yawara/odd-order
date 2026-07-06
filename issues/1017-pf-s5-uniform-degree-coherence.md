@@ -465,3 +465,36 @@ R1_diffsupp (S14:710) template を精査 → hdiffsupp の構造確定:
 **cprimeSharpS_subset_supportA (hdiffsupp A(S)側)**。残: (a) 𝒮 member irreducibility (mixed family
 の既約部特定)、(b) support(Ind ξ)⊆(C')^#∪{1} (hdiffsupp 残半分)、(c) mixed-family (9.11) induction。
 次 = (b) の family vanishing 性 or (a) の既約部特定。genuine (9.11)、multi-session。
+
+## 2026-07-06 更新 #15 (lane b, subagent 検証) — ★★(9.11) route 確定 + update #14 訂正 + 最後の gap 特定
+
+background subagent が Coq PFsection9 `Ptype_core_coherence` (:1484) + repo engine を verify-first 精査、確定:
+
+**(A) 実 (9.11) route (mixed family は subcoherent level で処理)**:
+- Coq は per-member irrSubcoherent を全 𝒮 に適用しない。`subcoherent (S_ H0C') tau R` を **variable-length R-data**
+  で供給 (既約=2元、reducible residue μ_j=2w₁元、cyclic-TI sigma 由来)。producer=`prDade_subcoherent`
+  (PFsection5:683) が irr_subcoherent の 2元 R-data (既約部) と explicit Rmu (reducible部) を glue。
+  **reducibles は irreducible-only producer に渡さない — subcoherent supply に乗る**。
+- Galois: 全 𝒮 uniform-degree → `coherent_subset_of_constant_degree` (landed) 直接。
+- 非Galois: base S1 (uniform 既約) → 同 + pair-adjoining induction (`coherentPairChain` S07:4907 + 済 squeeze)。
+  reducible μ_j は S3 の q·u block として `coherent_subset_of_constant_degree` で処理。
+- **per-member R-datum (dadeCharacterDifferenceImageOfDiff) は route 上、但し既約 member 限定**。
+
+**(B) update #14 訂正**: hdiffsupp の target は **A(S)∪{1} 直接** (NOT (C')^#)。Coq `prDade_Ind_irr_on`
+= `S_ H0C' ⊆ 'CF(M, 1|:'A(M))` (PFsection9:1991)。⟹ **`cprimeSharpS_subset_supportA` (更新#14 landed) は
+true だが hdiffsupp route 上でない** (off-route、有効な構造 fact ではある)。
+
+**(C) 最後の genuine gap = S-instance (4.7) induced-support lemma (Dade-free、tractable)**:
+`∀ ξ∈xiSet, Supp(Ind ξ) ⊆ supportInSubgroup A(S) S ∪ {1}`。repo に既存の (4.7)
+= `S06.induce_apply_eq_zero_of_not_mem_union_of_not_subset_characterKernel` (S06_CertainTypeSupport:131)、
+Dade-free core = `mem_A_of_apply_ne_zero_of_covers` (S06:49、covering `A_covers` のみ要、Dade isometry 不要)。
+S-instance の構造同定: K=huSub=derivedInG S (=HU=S', S11:1494 (9.2))、subH=Msigma S=P (P_eq_SF)、
+A(S)=centralizerSupport(sharpSubgroup(Msigma S))(derivedInG S) ⟹ A_covers は essentially definitional
+(witness x=h)。`support_induce_subset_conjugatesIntoSet` (InducedCharacter:424) + `honestTypeP2ASet_conj_mem`
+(landed、L_normalizes_A の代替) で induced-form を mirror。
+
+**⟹ 残 = (i) 上記 (4.7) lemma (最後の構造 gap、substantial だが全 piece 済) → (ii) per-member hdiffsupp
+→ dadeCharacterDifferenceImageOfDiff → irrSubcoherent (既約部) → S07.Hypothesis → (iii) clifford_dichotomy
+case-split + coherent_subset_of_constant_degree + coherentPairChain で NEW IsCoherent 構築 → (iv)
+coherent_H0Cprime_S を re-point (coherent_H0C_commutator は触らない、lane-c 共有 territorial)。**
+subagent が (i) を tractable と確認 (全 piece 存在) だが multi-lemma wiring ゆえ本 session 未 build。次 = (i)。
