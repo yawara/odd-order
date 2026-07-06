@@ -236,3 +236,49 @@ repo の `tau2 M = {p | p∉σ M ∧ pRank M p = 2}` は **ℕ 上** (素数限�
   (`nonabelian_pgroup_isUniquelyMaximal` S12_Theorem1213:862 / Thm 12.13) → Uniqueness Thm (S09) で H=M* 矛盾。
 - τ₂(H)={q} (`tau2_singleton_of_nonabelianSylow` S12_Theorem127d:550、Q nonabelian 供給)。
 - X=C_A(H_σ)、|X|=q、X≠K → X⊄M → **escape witness `C_G(U)⊄M`** (Phase D core へ)。
+
+## 2026-07-06 更新 #7 (lane b, subagent orchestration) — B/C middle: 4 step を sorry-free 化、Step 4 (Q nonabelian) の blocker を精密特定
+
+**landed 追加** (build green 3120 jobs, sorry 2 不変、S15_MF):
+- `partner_kappaHall_le_Msigma_of_isTypeP2` (63f682f4): **Step 1** (Coq `sKLs`/`sLq`, :1300-1307) —
+  partner 構造から `K ≤ M*_σ` かつ `q:=|K| ∈ σ(M*)`。
+- `eq_of_uniquelyMaximal_centralized_by_rank2_le` (63f682f4): **def_q1 uniqueness engine** (:1329-1338) —
+  `Q∈𝒰` + `A∈ℰ²_{q₁}`(A≤C(Q)) + A≤H + A≤M* ⟹ H=M*。★key finding: **`cent_uniq_Uniqueness` =
+  `OddOrder.BG.Ch2.S09.isUniquelyMaximal_of_le_centralizer_of_two_le_rank`** (S09_Corollaries:35, BG Cor 9.2):
+  `L∈𝒰` + `K≤C_G(L)` + `rank K≥2` ⟹ `K∈𝒰`。これで def_q1 の uniqueness 側は完全に repo 内で閉じる。
+- `mem_tau2_of_elemAb_rank_two_le_E` (c1729716): **= Coq `sigma'2Elem_tau2`** (BGsection12.v:209、
+  repo に**存在しなかった**converse) — σ(M)'-Hall E-setup 内の rank-2 elem-ab `A≤E` (prime p) ⟹ `p∈τ₂(M)`。
+  `SubgroupESetup.mem_tau_union_of_mem_primeFactors` + `le_pRank` で τ₁/τ₃ 排除。
+- `exists_sylow_eq_opiCore_of_mem_sigma_of_msigma_nilpotent` (c1729716): **Step 3 の nilpotent case のみ**
+  (Coq `Fcore_pcore_Sylow` の `defLF` branch, :1317-1324) — `q∈σ(M)` + `M_σ` nilpotent ⟹ `Q=O_q(M)` は
+  M の Sylow-q (∃ Sylow witness)。`oPiCore_isHall_of_isNilpotent` + `Msigma_subgroupOf_isHall` + index tower +
+  既存 `exists_sylow_eq_opiCore`。
+- `mem_sigma_and_le_Msigma_of_rank2_centralizer_kappa` (d6d4280d): **Step 2 完全版** (Coq `sLq1`/`sALs`,
+  :1307-1316) — M* type-P + K≤M*_σ + q∈σ(M*) + rank-2 `A∈ℰ²_{q₁}`(A≤C(K),A≤M*) ⟹ `q₁∈σ(M*)` ∧ `A≤M*_σ`。
+  上の `mem_tau2_of_elemAb_rank_two_le_E` + `centralizer_le_E_of_tau2` で矛盾を組む。
+
+### ★★ Step 4 (Q nonabelian) の PRECISE BLOCKER = BG Lemma 6.5(a) 未 port
+Coq `not_cQQ` (BGsection15.v:1358-1367) は `abelian Q ⟹ K=1` (contra `ntK`) を **focal-coprime 定理**で証明:
+```
+apply: contra ntK => cQQ; rewrite -subG1 -(derG1P cQQ) -subsetIidl.
+rewrite -(pprod_focal_coprime defLs) ?subsetIidl ?pcore_normal //.  -- ← ここ
+by rewrite coprime_sym (coprimeSg sKQ) ?coprime_pcoreC.
+```
+`pprod_focal_coprime` = **BG Lemma 6.5(a)** (BGsection6.v:138): coprime product `G=U·H` (H Hall) で
+`H ∩ G' = H ∩ U'`。数学的内容: `M*_σ=O_{q'}(M*_σ)·Q` (Q Sylow-q) で `Q∩(M*_σ)' = Q∩(O_{q'})'·Q'`。
+Q abelian ⟹ Q'=1 ⟹ `Q∩(M*_σ)' = Q∩(O_{q'})' = 1` (q-group ∩ q'-group) ⟹ `K⊆Q∩(M*_σ)'=1`。
+
+**repo 状態**: 一般 Focal Subgroup Theorem (`Isaacs.Ch05.commutator_inf_eq_focalSubgroup` = Thm 5.21、
+`G'∩P = P.focalSubgroup` for P Sylow) は**存在**。しかし **coprime-product 特殊形 BG Lemma 6.5(a)
+(`Q∩G'=Q∩U'` for `G=U·Q` coprime, Q Hall) は未 port** (BG §6 は FT 経路の必要分のみ port 済で 6.5 は未着手)。
+これは genuine な未形式化 prerequisite (research gap でなく形式化労力 — Coq/BG に証明あり)。
+加えて Coq は `sKLs': K⊆(M*_σ)'` (`Ptype_cyclics hallKs`) も使う — これも要確認 (typeP1 だと
+`typeP1_msigma_eq_derivedInG` で M*_σ=M*' だが K⊆(M*_σ)' は別)。
+
+**依存連鎖**: Step 4 が Step 5 (`Q∈𝒰` via `nonabelian_pgroup_isUniquelyMaximal` — Q nonabelian のみ要、
+Sylow 不要!) → escape witness (`tau2_singleton_of_nonabelianSylow` part(c): C_G(X)⊄M) → def_q1 完成 →
+Phase D core 消費 を全て gate。⟹ **B/C middle の残り全体が Step 4 = BG Lemma 6.5(a) port に依存**。
+
+**次アクション候補** (hub 判断): (a) BG §6 の Lemma 6.5(a) `pprod_focal_coprime` を Isaacs Ch05 focal から
+port (shared-infra、複数 BG consumer: S12 Cor 12.16 も使用) → 9000 issue で claim。(b) それまで Step 4-6 は
+inline sorried-cite skeleton で前倒し。Step 1/2/3(nilpotent)/def_q1-engine の 5 helper は既に sorry-free 着地済。
