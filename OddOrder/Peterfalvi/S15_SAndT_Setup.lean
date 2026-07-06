@@ -565,6 +565,13 @@ theorem honestTypeP2ASet_subset_sharp {M : Subgroup G} :
   rintro y ⟨-, hy1, -⟩
   exact OddOrder.Peterfalvi.S04.mem_sharp.mpr ⟨Set.mem_univ y, hy1⟩
 
+/-- **`1 ∉ A(S)`**: the honest support consists of non-identity elements (it lies in
+`sharp univ`, `honestTypeP2ASet_subset_sharp`).  This is the `h1notA` input the Dade-coherence
+producer `S07.coherentEqualDegree_fromDade` requires (`1 ∉ A` guarantees the induced difference
+`τ(χ_j − χ_0)` sees the whole Dade support). -/
+theorem honestTypeP2ASet_one_not_mem {M : Subgroup G} : (1 : G) ∉ honestTypeP2ASet M := fun h =>
+  (OddOrder.Peterfalvi.S04.mem_sharp.mp (honestTypeP2ASet_subset_sharp h)).2 rfl
+
 /-- `A(S) ⊆ M'` (the support lives in the derived subgroup). -/
 theorem honestTypeP2ASet_subset_derived {M : Subgroup G} :
     honestTypeP2ASet M ⊆ (derivedInG M : Set G) := fun _ hy => hy.1

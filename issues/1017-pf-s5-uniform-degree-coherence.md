@@ -428,3 +428,22 @@ constructor (9014) 完了後、S15 R-datum (coherent_H0Cprime_S 再grounding の
 
 次 = (a) subcoherence family の既約性を精査 (𝒮 の member 既約性 or 既約 subfamily の特定) + (b) hdiffsupp。
 これが R-datum の残 genuine content。
+
+## 2026-07-06 更新 #13 (lane b) — ★重要訂正: 𝒮 は mixed family (p−1 reducible residues)、coherence は full (9.11)
+
+更新 #12 の「coherentEqualDegree_fromDade で直接」は楽観的すぎた。verify-first で訂正:
+
+- **`coherentEqualDegree_fromDade` (S07:6090)** は `χ : Fin n → IrreducibleCharacter L` の
+  **uniform-degree 既約** family を要す (Dade + hconj + hsuppdiff + h1notA から coherence を内部生成、
+  別途 R-datum/irrSubcoherent 不要)。← Galois uniform 既約 subfamily には直接使える。
+- **但し 𝒮(H₀C') は mixed**: `{φ ∈ sOf | ¬IsIrreducible φ}.ncard = p−1` (S11:7160/7306/8225) —
+  ちょうど **p−1 個の reducible member (= residue induction μ_j, j≠0)** + 残り既約。∴ 𝒮 全体に
+  coherentEqualDegree_fromDade は適用不可。honest coherence = **full (9.11) subcoherent + pair-chain
+  induction** (mixed family を扱う、reducible residues を別処理)。
+- **connection**: 𝒮 の reducible members = prime-TI residues μ_j = 本 session で構成した
+  PrimeTIResidueData/prTIres_irr_cases が記述するもの。S-instance の 𝒮 reducible 部 ↔ prime-TI residue theory。
+
+**揃った input** (coherence 用): dadeHypS / dadeHypS_hconj (更新 #12) / **h1notA (honestTypeP2ASet_one_not_mem, landed 更新 #13)** /
+sSet_hasNoRealCharacters / hortho。**残**: (a) uniform 既約 subfamily の特定 (𝒮 の既約部、degree qu) +
+その Fin n enumeration、(b) hsuppdiff (φ_j−φ_0 の support ⊆ A(S))、(c) reducible residues の別処理 (pair-chain)、
+(d) coherent_H0Cprime_S を組んで re-point。genuine な (9.11) mixed-family coherence、multi-session。
