@@ -197,6 +197,26 @@ theorem TypePData.derivedInG_eq_fitting_sup_U {M : Subgroup G} (data : TypePData
   rw [← Subgroup.subgroupOf_sup data.H_le data.U_le] at hsup
   exact Subgroup.subgroupOf_eq_top.mp hsup
 
+/-- The Fitting kernel `M_F` and the complement `U` of a `TypePData` intersect trivially.
+
+This is the ambient-subgroup form of the disjoint half of `data.derived_complement`, using
+`data.H_eq : data.H = M_F`. -/
+theorem TypePData.fitting_inf_U_eq_bot {M : Subgroup G} (data : TypePData M) :
+    maxNilpotentNormalHall M ⊓ data.U = ⊥ := by
+  rw [← data.H_eq, eq_bot_iff]
+  intro x hx
+  rw [Subgroup.mem_inf] at hx
+  have hxD : x ∈ derivedInG M := data.H_le hx.1
+  have hmem : (⟨x, hxD⟩ : ↥(derivedInG M)) ∈
+      (data.H.subgroupOf (derivedInG M)) ⊓ (data.U.subgroupOf (derivedInG M)) := by
+    rw [Subgroup.mem_inf]
+    exact ⟨Subgroup.mem_subgroupOf.mpr hx.1, Subgroup.mem_subgroupOf.mpr hx.2⟩
+  have hd := data.derived_complement.disjoint
+  rw [disjoint_iff] at hd
+  rw [hd, Subgroup.mem_bot] at hmem
+  rw [Subgroup.mem_bot]
+  exact Subtype.ext_iff.mp hmem
+
 /-- Common type II--IV hypotheses from Peterfalvi (8.6). -/
 def TypePNontrivialCore (M : Subgroup G) (data : TypePData M) : Prop :=
   data.U ≠ ⊥ ∧ (Nat.card ↥data.W1).Prime ∧
