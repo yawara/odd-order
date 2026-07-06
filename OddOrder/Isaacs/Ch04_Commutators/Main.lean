@@ -2310,6 +2310,36 @@ noncomputable def OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom
     (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN a) (g : G ⧸ N) =
       ((φ a) g : G ⧸ N) := rfl
 
+/-- **Isaacs Corollary 3.28 / BG Proposition 1.5(d), subgroup form**: for a coprime
+action `φ : A → MulAut G` and an `A`-invariant normal subgroup `N`, the fixed points of
+the induced action on `G/N` are exactly the image of the fixed points in `G`. -/
+theorem fixedPointsOfMulAut_quotientMulAutHom_eq_map
+    {G A : Type*} [Group G] [Finite G] [Group A] [Finite A] {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G)) (hSolv : IsSolvable A ∨ IsSolvable G)
+    {N : Subgroup G} [N.Normal] (hN : OddOrder.Isaacs.Ch03.IsAInvariant φ N) :
+    Subgroup.fixedPointsOfMulAut (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN) =
+      (Subgroup.fixedPointsOfMulAut φ).map (QuotientGroup.mk' N) := by
+  refine le_antisymm ?_ ?_
+  · intro q hq
+    obtain ⟨g, rfl⟩ := QuotientGroup.mk'_surjective N q
+    rw [Subgroup.mem_fixedPointsOfMulAut] at hq
+    have hg_fix : ∀ a : A, ∃ n ∈ N, (φ a) g = g * n := by
+      intro a
+      have hga := hq a
+      rw [OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk',
+        QuotientGroup.mk'_apply, QuotientGroup.mk'_apply, QuotientGroup.eq] at hga
+      exact ⟨g⁻¹ * (φ a) g, by simpa using N.inv_mem hga, by group⟩
+    obtain ⟨c, hc_fix, n, hn, hcn⟩ := coprime_fixedPoints_quotient hCop hSolv hN hg_fix
+    refine Subgroup.mem_map.mpr ⟨c, Subgroup.mem_fixedPointsOfMulAut.mpr hc_fix, ?_⟩
+    rw [QuotientGroup.mk'_apply, QuotientGroup.mk'_apply, QuotientGroup.eq, hcn]
+    simpa using N.inv_mem hn
+  · rw [Subgroup.map_le_iff_le_comap]
+    intro c hc
+    rw [Subgroup.mem_fixedPointsOfMulAut] at hc
+    rw [Subgroup.mem_comap, Subgroup.mem_fixedPointsOfMulAut]
+    intro a
+    rw [OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk', hc a]
+
 /-- An `A`-invariant subgroup maps to an invariant subgroup in an
 `A`-invariant quotient. -/
 theorem _root_.OddOrder.Isaacs.Ch03.IsAInvariant.map_quotient
