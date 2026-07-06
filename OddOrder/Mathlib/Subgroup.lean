@@ -387,6 +387,32 @@ theorem isComplement'_subgroupOf_of_disjoint_mul_eq_univ {G : Type*} [Group G]
     ext
     exact hmh
 
+/-- For a surjective homomorphism `f : G →* H`, the preimage of a subgroup has cardinality
+`|K.comap f| = |K| * |ker f|`. -/
+theorem card_comap_eq_card_mul_card_ker {G H : Type*} [Group G] [Group H]
+    [Finite G] [Finite H] (f : G →* H) (hf : Function.Surjective f) (K : Subgroup H) :
+    Nat.card (K.comap f) = Nat.card K * Nat.card f.ker := by
+  have h1 : (K.comap f).index = K.index := K.index_comap_of_surjective hf
+  have h2 : (K.comap f).index * Nat.card (K.comap f) = Nat.card G :=
+    (K.comap f).index_mul_card
+  have h3 : K.index * Nat.card K = Nat.card H := K.index_mul_card
+  have h4 : Nat.card G = Nat.card H * Nat.card f.ker := by
+    rw [card_eq_card_quotient_mul_card_subgroup f.ker]
+    exact congrArg (· * _)
+      (Nat.card_congr (QuotientGroup.quotientKerEquivOfSurjective f hf).toEquiv)
+  have hidx_ne : K.index ≠ 0 := by
+    rw [index_eq_card]
+    exact Nat.ne_of_gt Nat.card_pos
+  have hstep : K.index * Nat.card (K.comap f) = K.index * (Nat.card K * Nat.card f.ker) := by
+    calc
+      K.index * Nat.card (K.comap f)
+          = (K.comap f).index * Nat.card (K.comap f) := by rw [h1]
+      _ = Nat.card G := h2
+      _ = Nat.card H * Nat.card f.ker := h4
+      _ = (K.index * Nat.card K) * Nat.card f.ker := by rw [h3]
+      _ = K.index * (Nat.card K * Nat.card f.ker) := mul_assoc _ _ _
+  exact Nat.eq_of_mul_eq_mul_left (Nat.pos_of_ne_zero hidx_ne) hstep
+
 /-- A finite quotient by a nontrivial subgroup has strictly smaller cardinality.
 
 This is the induction/minimal-counterexample termination bridge used repeatedly when passing
