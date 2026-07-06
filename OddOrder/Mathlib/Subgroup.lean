@@ -322,6 +322,14 @@ theorem nat_card_quotient_bot_subgroupOf_eq {H : Subgroup G} :
   rw [bot_subgroupOf]
   exact Nat.card_congr QuotientGroup.quotientBot.toEquiv
 
+/-- A subgroup `V` complementing the normal `N` in `G` (`N ⊓ V = ⊥`, `N ⊔ V = ⊤`) has
+`|N| * |V| = |G|`. -/
+theorem card_mul_card_of_complement_normal {G : Type*} [Group G] [Finite G] {N V : Subgroup G}
+    [N.Normal] (hinf : N ⊓ V = ⊥) (hsup : N ⊔ V = ⊤) :
+    Nat.card N * Nat.card V = Nat.card G :=
+  (Subgroup.isComplement'_of_disjoint_and_mul_eq_univ (disjoint_iff.mpr hinf)
+    (by rw [← Subgroup.normal_mul, hsup, Subgroup.coe_top])).card_mul
+
 /-- A finite quotient by a nontrivial subgroup has strictly smaller cardinality.
 
 This is the induction/minimal-counterexample termination bridge used repeatedly when passing
