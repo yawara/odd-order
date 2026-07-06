@@ -37,6 +37,8 @@
 最軽量レーン: 純群論の Hall-lemma relocation (issue 9006、全 body proven・on-path・char 無)。d の触る
 FeitThompson/S10/S11 は 9006 hub 裁定 (owner 固定せず issue+LAUNCH awareness で誰でも実施可) の例外ゆえ
 **FeitThompson からの削除 commit を逸脱 flag しない** (9006 を根拠に shared-infra hygiene として合流)。
+Codex sandbox では未承認の単純読み取りが `bwrap: loopback: Failed RTM_NEWADDR` で落ちることがあるため、
+`CLAUDE.md` の「Codex sandbox 運用」に従い、`rg` 優先 + 再発する読み取りは初回から狭い `prefix_rule` approval を使う (失敗してから retry しない)。
 
 **signature-first interface (ゲートは幻)**: 上流が sorried signature を export → 下流が cite。各レーンは独立クラスタを
 正面から埋め、cross-cluster は signature contract で媒介 (待たない)。詳細 = ft_lane_reallocation_2026_06_28.md。
