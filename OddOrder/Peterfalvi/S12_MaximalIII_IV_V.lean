@@ -3778,6 +3778,28 @@ theorem Hypothesis.induce_derived_apply_one_eq_w1_mul [Finite G] {M : Subgroup G
   rw [ClassFunction.induce_apply_one, hidx]
 
 open scoped FiniteInduce in
+/-- **(11.8.1) column degree**: for `k ≠ 0`, the μ-grid column sum `μ_k = ∑ᵢ μ_{ik}` has degree
+`q·u` (= `w₁·|Ū| = qu`).  `muGrid_column_sum_mem_sOf_H0_and_reducible` (μ_k is a reducible
+`𝒮(H₀)`-member) composed with `reducible_mem_sOf_H0_apply_one_eq_qu` (reducible `𝒮(H₀)`-members have
+degree `q·u`, §9 (9.8.b)/(9.9.b)).  This is the concrete `ψ₀`-witness degree for the (11.8.6) `hgen`
+bundled `S₂`-structure: a column `μ_k ∈ Sset \ SHCSet` (reducible → not in the irreducible `SHCSet`,
+`muGrid_column_sum_mem_inducedFamily`) of degree `qu`. -/
+theorem Hypothesis.muGrid_column_sum_apply_one_eq_qu [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M) (hnt : TypePNontrivialCore M hyp.typeP)
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetup htype hnt))
+    (k : Fin hyp.w2) (hk : k ≠ 0) :
+    (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i k) (1 : ↥M)
+      = (((hyp.toTypesIIIIIIVSetup htype hnt).q *
+          (hyp.mkSection11CharacterData (hyp.toTypesIIIIIIVSetup htype hnt) chief).u : ℕ) : ℂ) := by
+  haveI := hyp.finiteG
+  obtain ⟨hmem, hred⟩ :=
+    hyp.muGrid_column_sum_mem_sOf_H0_and_reducible hG htype hnt chief k hk
+  exact reducible_mem_sOf_H0_apply_one_eq_qu hG
+    (hyp.mkSection11CharacterData (hyp.toTypesIIIIIIVSetup htype hnt) chief)
+    (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i k) hmem hred
+
+open scoped FiniteInduce in
 /-- **Degree of an `S₁ = S(HC)`-span element is an integer multiple of `w₁`.**  Every member of
 `SHCSet` has degree `w₁` (by definition, third conjunct), so `ψ ∈ ℤ[S(HC)]` has `ψ(1) = s·w₁` with
 `s ∈ ℤ` the coefficient sum (`span_induction`).  This is the `S₁`-side degree-ratio input of the
