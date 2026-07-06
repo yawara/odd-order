@@ -3492,6 +3492,17 @@ theorem IsAInvariant.sup {A : Type*} [Group A] {φ : A →* MulAut G} {H K : Sub
     (hH : IsAInvariant φ H) (hK : IsAInvariant φ K) : IsAInvariant φ (H ⊔ K) := fun a => by
   rw [Subgroup.smul_sup, hH a, hK a]
 
+/-- Conjugating an `A`-invariant subgroup by an `A`-fixed element preserves invariance. -/
+theorem IsAInvariant.mulAut_conj_smul_of_fixed {A : Type*} [Group A] {φ : A →* MulAut G}
+    {H : Subgroup G} (hH : IsAInvariant φ H) {c : G} (hc : ∀ a : A, (φ a) c = c) :
+    IsAInvariant φ (MulAut.conj c • H) := by
+  rw [isAInvariant_iff_smul_mem]
+  intro a x hx
+  rw [Subgroup.pointwise_smul_def, Subgroup.mem_map] at hx ⊢
+  obtain ⟨y, hy, rfl⟩ := hx
+  refine ⟨(φ a) y, hH.smul_mem a hy, ?_⟩
+  simp [MulAut.conj_apply, map_mul, map_inv, hc a]
+
 /-- **Characteristic 部分群は常に A-不変**: H.Characteristic ⇒ IsAInvariant φ H for any φ.
 mathlib `characteristic_iff_map_eq` 経由. -/
 theorem IsAInvariant.of_characteristic {A : Type*} [Group A] (φ : A →* MulAut G)
