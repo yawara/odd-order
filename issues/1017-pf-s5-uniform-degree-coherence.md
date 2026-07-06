@@ -654,3 +654,31 @@ type-I template (S14:2235-2278): x が escaping ⟹ escaping ⊆ σ-sharp
 mechanically 構成可 (H_eq_ftSupportKernel S10:675 + ftSupportKernel_eq_bot_of_not_escaping S10:600 +
 honestTypeP2ASet_conj_mem S15:587 + escapingCentralizerSet_conj_mem S10:1259)。
 次 = この non-escaping support 補題を build (or 差が P 上 vanish しないなら真の構造を named-report)。
+
+## 2026-07-06 更新 #22 (lane b, /loop verify-first) — ★★★決定的訂正: #21 の non-escaping route は誤り、単一 gate = **A(S) が TI-set**
+
+subagent が Rung 3 (§9 差が A(S)∖escaping に supported、type-I `constituent_diff_support_subset_nonescaping` 模倣) を
+verify-first で **反証**: S-instance の差は **φ̄−φ** (単一 member の共役差、type-I の「1 つの χ の 2 constituents」でない)
+ゆえ σ-sharp=H^# 上 vanish には **φ が H=S_σ 上 real** が要り、これは偽 (φ は non-real、φ,φ̄ は共通 source 無しの共役既約)。
+⟹ #21 の「non-escaping support 補題」route は**構造的に閉じない**。Rungs 1-2 (A(S)∖escaping の S-invariance/trivial-H、
+sorry-free だったが wrong-framing) は **revert 済** (uncommitted のまま drop)。
+
+**★正しい route (code+Coq verify-first で確定)**: dade=Ind は **A(S)∖escaping 上の per-difference vanishing でなく、
+A(S) 全体の TI-set 性**から来る (Coq `FTtypeP_facts` PFsection13.v:198/223: 結論(e)=`normedTI 'A0(S) ∧ {in CF(S,A0(S)),
+tau=1 Ind}`、`suffices normedTI … apply: Dade_Ind`)。**repo に route-2 機構は既在**:
+`S04.isDadeMap_induce_of_forall_H_eq_bot` (S14:2072、`∀a, H a=⊥` ⟹ Ind=dadeMap)、`induce_apply_eq_self_of_mem_tiSubset`
+(S14:2025、TI-set 上 Ind self-value)、`S04.of_isTISubset` (S04:267) / `isTISubset_iff_exists_hypothesis_with_trivial_H`
+(S04:314)。⟹ **iteration-1 の `sInstance_dade_eq_induce_of_supported_trivial_H` (cd6beac7) は ON-ROUTE**、
+ただし **A₁ = A(S) 全体** (∖escaping でない) で instantiate: `hf` = §9 差の full-A(S) support は既 landed
+(`sSet_member_diffsupp`)、`hH₁ : ∀a, dadeHypS.H a=⊥` が唯一の未証明入力。
+
+**⟹ 単一 gate G2 = `IsTISubset (honestTypeP2ASet S) S`** (⟺ `∀a∈A(S), dadeHypS.H a=⊥` ⟺ A(S) に escaping 点なし)。
+現 `dadeSupportHypothesisData_honestTypeP2ASet` は defensive な escaping 分岐 (S15:785 `_of_subset_escaping_sigmaSharp`)
+で構成ゆえ H の trivial 性は未知。escaping 点は σ-sharp に confined (`escaping_honestTypeP2ASet_mem_sigmaSharp` S15:650、
+既 landed) だが「escaping 点なし」は未証明。**= Coq `FTtypeP_facts` normedTI 証明 (PFsection13.v:223-234、
+`normedTI_memJ_P` + escaping 点の `typePF_exclusion`∘`Frobenius_of_typeF` 矛盾) の port** = genuine BG-§13 content、substantial。
+
+**残 2 gate (両 genuine、character_degree_analysis (13.3) が gate)**: **G1** = honest coherence の full mixed-family 拡張
+(sSetIrrDeg_coherent base → coherentPairChain、tau=dade map の isometry route、subagent 確認どおり dade=Ind 不要;
+≥2 count は §9(9.8.d) upstream sub-gate)。**G2** = A(S) TI-set (上記、bridge が A₁=A(S) で消費 → dade=Ind →
+tau1S_apply_induce_sub)。G1+G2 で (13.3) の tau1S fields honest 化。**次 = G2 (A(S) TI、normedTI port)** を正面 build。
