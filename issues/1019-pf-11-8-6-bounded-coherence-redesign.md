@@ -105,6 +105,55 @@ redesign 手順 (bounded、multi-session port ではない):
 当初の「multi-session port」から大幅縮小。残る deep gate (§11 (5.6) dichotomy / (10.8)) は本 redesign の
 外 (既存 sorry、別途)。
 
+## 🏗️ 実装計画 (2026-07-07、ユーザー「redesign に着手」) — architecture 確定 + foundation 確認済
+
+### 確認済 (sorry-free、redesign の土台)
+- `S08.six_three_of_six_two_oracle` (bounded-coherence) — sorry-free ✅
+- `S11.forall_mem_sOf_H0C_apply_one_eq_qu` (S(H₀C) 全member degree qu) — **sorry-free** ✅ (load-bearing)
+- `S13.coherent_S_of_coherent_SH0C` (S(H₀C)→inducedFamily coherence) — 本体 sorry-free (S13、transitive
+  sorry は §11 (5.6) dichotomy = 別 gate)
+
+### ⚠ import 制約 (確定)
+- (11.8) endgame `exists_zeta_residual_not_orthogonal` + `w2_lt_w1_*` は **S12** (consumer = FeitThompson:649
+  `S12.w2_lt_w1_of_hypothesis`)。bounded-coherence の `coherent_S_of_coherent_SH0C`/`S_H0C_not_coherent`
+  は **S13** (下流) → **S12 から直接呼べない (循環)**。
+- ただし oracle 本体 `six_three_of_six_two_oracle` は **S08 (S12 上流)** ゆえ S12 から使用可。
+- `exists_zeta` は既に `hM2 : secondDerivedInAmbient M = H ⊔ (U ⊓ C_G(H))` を保持 ⟹ C = U⊓C_G(H) は S12 で表現可。
+  H0C = chief.H0 ⊔ C。`inducedFamily_eq_inducedKernelFamily_bot` (S12) で SOf ⊥ = inducedFamily。
+
+### 実装ステップ (S12 内で完結、次 iteration)
+1. **S12 bounded-coherence bridge** `coherent_inducedFamily_of_coherent_sOf_H0C` を新設 (S13
+   `coherent_S_of_coherent_SH0C` の S12 版): `coherent(inducedKernelFamily M' (H0C.subgroupOf M))` →
+   `six_three_of_six_two_oracle` (K=M', H=HC, M=⊥, H₁=H0C) → `coherent(inducedFamily M)`。
+   要 S12 で: (a) HC/H0C の subgroup 表現 + normality、(b) hbound `4q²+1 < p^q` (= `|HC:H0C|=p^q` +
+   `prime_pow_gt_four_mul_sq_add_one`; `|HC:H0C|=p^q` を S12 で導出 or chief から)、(c) h56 = (5.6)
+   dichotomy (`hyp.exists_source_of_coherence_dichotomy`、S12 method、既存)。**S13 版をテンプレに移植**。
+2. **capstone を S(H₀C) union-glue に re-target**: `coherent_SH0C_of_column_identities` (現
+   `coherent_Sset_of_column_identities` を置換 or 併設): S(H₀C) = S(HC) ∪ (S(H₀C)−S(HC)) を union-glue。
+   uniform-degree は `forall_mem_sOf_H0C_apply_one_eq_qu` (S(H₀C) で真) で供給 (現 `Sset_diff_SHCSet_apply_one_eq_qu`
+   の inducedFamily 版=偽 を置換)。ν/hmixed/hDτ/reducible-inclusion/ψ₀ は再利用。
+3. **`exists_zeta_residual_not_orthogonal` を再配線**: column identities → step2 で coherent(S(H₀C)) →
+   step1 bridge で coherent(inducedFamily) → `S_not_coherent` 矛盾。
+4. 旧 uniform-degree-on-inducedFamily 足場 (`Sset_diff_SHCSet_apply_one_eq_qu` irr-side sorry 等) を撤去。
+
+**工数: 1–2 session。** step 1 (bridge) が最初の buildable。難所は step 1(b) の `|HC:H0C|=p^q` の S12 導出。
+
+### ★ architecture 決定 (2026-07-07 追調査): endgame を **S13 へ移す**のが clean
+step 1(b) の `|HC:H0C| = p^q` = `S13.H0C_relIndex_HC` (S13:630) は `hyp.s11Setup`/`hyp.H0C`/`hyp.HC`
+に依存 = **S13-locked** (S12 で純粋 replicate すると H0C/HC/s11Setup setup + `H0C_relIndex_HC` の
+再導出が要り重い)。∴ S12 内 replicate より **endgame を S13 に移設**が clean:
+- `exists_zeta_residual_not_orthogonal` + `w2_lt_w1_of_residual_not_orthogonal` + `w2_lt_w1_of_hypothesis`
+  を **S13 に移設** (S12 の column-identity 機構は `hyp.base` 経由で呼ぶ)。consumer = FeitThompson:649 を
+  `S13.w2_lt_w1_of_hypothesis` に更新 (1 箇所)。
+- S13 では `coherent_S_of_coherent_SH0C` / `S_H0C_not_coherent` / `SOf` / `H0C` / `forall_mem_sOf_H0C_apply_one_eq_qu`
+  が全て可用 ⟹ 「column identities → coherent(S(H₀C)) → coherent_S_of_coherent_SH0C → coherent(inducedFamily)
+  → S_not_coherent」を素直に組める (S12 facts の再導出不要)。
+- 移設は大きめだが機械的 (`hyp.` → `hyp.base.`)。column identities → coherent(S(H₀C)) の union-glue
+  (narrow 族、uniform-degree 真) が genuine な新規部分。
+- 代替 (S12 replicate) は `H0C_relIndex_HC` 等の S13 facts port が必要でむしろ重い ⟹ 移設を採る。
+
+**次 iteration = S13 に (11.8) endgame を移設 + narrow-族 union-glue で coherent(S(H₀C)) を構成。**
+
 ## 参照
 
 - notes/peterfalvi/s13_11_8_orthogonality.md update³⁷
