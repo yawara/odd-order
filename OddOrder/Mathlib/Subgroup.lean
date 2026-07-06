@@ -395,6 +395,18 @@ theorem card_quotient_lt_of_ne_bot {G : Type*} [Group G] [Finite G]
       (Nat.mul_lt_mul_left hQ_pos).mpr hK_gt
     _ = Nat.card G := h_eq
 
+/-- If a finite group's order is coprime to `|A|`, then every subgroup order is too. -/
+theorem coprime_card_subgroup_right {A G : Type*} [Group A] [Group G] [Finite G]
+    (H : Subgroup G) (hCop : Nat.Coprime (Nat.card A) (Nat.card G)) :
+    Nat.Coprime (Nat.card A) (Nat.card H) :=
+  hCop.coprime_dvd_right (card_subgroup_dvd_card H)
+
+/-- If a finite group's order is coprime to `|A|`, then every quotient order is too. -/
+theorem coprime_card_quotient_right {A G : Type*} [Group A] [Group G] [Finite G]
+    (N : Subgroup G) [N.Normal] (hCop : Nat.Coprime (Nat.card A) (Nat.card G)) :
+    Nat.Coprime (Nat.card A) (Nat.card (G ⧸ N)) :=
+  hCop.coprime_dvd_right (card_quotient_dvd_card N)
+
 /-- **`H` is normal when complement of normal `N` with elementwise commute**:
 `N ⊴ G`, `H` complement of `N`, `∀ n ∈ N h ∈ H, n*h = h*n` ⇒ `H ⊴ G`.
 
