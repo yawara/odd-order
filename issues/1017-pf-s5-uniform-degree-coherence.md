@@ -498,3 +498,36 @@ A(S)=centralizerSupport(sharpSubgroup(Msigma S))(derivedInG S) ⟹ A_covers は 
 case-split + coherent_subset_of_constant_degree + coherentPairChain で NEW IsCoherent 構築 → (iv)
 coherent_H0Cprime_S を re-point (coherent_H0C_commutator は触らない、lane-c 共有 territorial)。**
 subagent が (i) を tractable と確認 (全 piece 存在) だが multi-lemma wiring ゆえ本 session 未 build。次 = (i)。
+
+## 2026-07-06 更新 #16 (lane b, subagent 検証) — ★★重要訂正: 「all inputs landed」は誤り、CORE keystone 2 つが未 build
+
+assembly subagent が verify-first で確定 (honest STOP、sorry-hoist せず tree clean 保持)。更新 #12-15 の
+「残 = wiring/assembly」は楽観的すぎた。coherent_H0Cprime_S の goal
+`IsCoherent indS sSet (C')^#` (全 mixed family、plain induction、(C')^# support) に対し、
+**genuine な CORE keystone が 2 つ未 build**:
+
+**Blocker 1 — 全 mixed-family subcoherence producer (prDade_subcoherent-analog) 不在**:
+- `.S = sSet` は全 mixed family (caseB でも `{φ∈SOf|¬Irr}.ncard = p−1` の reducible residues 含む)。
+- `irrSubcoherent` は `∀χ∈S, CharacterDifferenceImage τ χ` を要すが、`CharacterDifferenceImage` は
+  **single (mu,nu) pair** 構造。reducible residue μ_j の difference image は Coq Rmu = **2w₁ 元**で
+  single-pair に収まらない ⟹ irrSubcoherent は構造的に mixed family を扱えない。
+- `coherent_subset_of_constant_degree`/`coherentEqualDegree_fromDade` は uniform-degree **subset** のみ。
+- Coq の mixed-family glue = `prDade_subcoherent` (variable-length R: 既約 2元 + reducible Rmu) は
+  **repo 不在** (S07_Subcoherent:322 が "assemble せよ" と TODO 記載のみ、producer 未 build)。
+  ⟹ 全 sSet の subcoherent/coherence を組む keystone が要 build (prime-TI residue machinery で Rmu を組む)。
+
+**Blocker 2 — (C')^# 上の dade=Ind bridge 不在**:
+- 下流 `tau1S_apply_induce_sub` (S15:1795) は `extension φ = Ind_S^G φ` を intrinsic に要求。
+  だが coherence engine が産む extension は **Dade map** 一致 (Dade map = (2.10) Möbius sum、plain
+  induction と非defeq、nontrivial stabilizer `ftSupportKernel S A(S) a`)。
+- repo の dade=Ind bridge = `H_sharp_tau_eq_induce` (S15:2603) / `dadeMap_eq_induce_of_supported_on_trivial_H`
+  (S14:2104) は **trivial stabilizer (H^#, H a=⊥)** 前提。(C')^# + dadeHypS (nontrivial stabilizer) 版は不在。
+  ⟹ type-P2 で Dade stabilizers が (C')^# supported span 上で消えることを示す genuine (2.2)/(4.7) TI content が要。
+
+**非-blocker**: (C')^# ⊆ A(S) は済 (cprimeSharpS_subset_supportA)、per-irreducible-member R-datum は構成可
+(但し Blocker 1 で全 family に compose 不可)。
+
+**⟹ 状態訂正**: landed inputs (dadeHypS/hconj/hreal/hortho/hdiffsupp/(4.7)) は本物だが、coherent_H0Cprime_S
+を閉じるには CORE keystone 2 つ (Blocker 1 mixed-family coherence 機構 + Blocker 2 (C')^# dade=Ind bridge) が
+残る。両者 genuine multi-lemma FT content (wiring でない)。S15 coherence は genuine multi-session frontier。
+次 = Blocker 1 (mixed-family coherence 機構、prime-TI residue Rmu 活用) を優先 (Blocker 2 より central)。
