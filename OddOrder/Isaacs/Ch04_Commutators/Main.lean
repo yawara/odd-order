@@ -2139,6 +2139,60 @@ theorem actionCommutator_comp_le
   rintro _ ⟨g, b, rfl⟩
   exact Subgroup.subset_closure ⟨g, i b, rfl⟩
 
+/-- Push-forward of the conjugation-action commutator: for `K ≤ N_Γ(P)`, the
+`actionCommutator` of the conjugation action of `K` on `P` realizes the ambient subgroup
+commutator `⁅P, K⁆`. -/
+theorem actionCommutator_conj_map_subtype {Γ : Type*} [Group Γ] {P K : Subgroup Γ}
+    (hKP : K ≤ Subgroup.normalizer (P : Set Γ)) :
+    (actionCommutator ((Subgroup.normalizerMonoidHom P).comp (Subgroup.inclusion hKP))).map
+      P.subtype = ⁅P, K⁆ := by
+  rw [actionCommutator, MonoidHom.map_closure, Subgroup.commutator_def]
+  congr 1
+  ext y
+  constructor
+  · rintro ⟨_, ⟨g, a, rfl⟩, rfl⟩
+    refine ⟨(g : Γ), g.2, (a : Γ), a.2, ?_⟩
+    rw [commutatorElement_def]
+    have hcoe : (P.subtype
+          (g * ((Subgroup.normalizerMonoidHom P).comp (Subgroup.inclusion hKP)) a g⁻¹) : Γ)
+        = (g : Γ) * ((a : Γ) * (g : Γ)⁻¹ * (a : Γ)⁻¹) := rfl
+    rw [hcoe]
+    group
+  · rintro ⟨g, hg, a, ha, rfl⟩
+    refine ⟨(⟨g, hg⟩ : P) *
+      ((Subgroup.normalizerMonoidHom P).comp (Subgroup.inclusion hKP)) ⟨a, ha⟩ ⟨g, hg⟩⁻¹,
+      ⟨⟨g, hg⟩, ⟨a, ha⟩, rfl⟩, ?_⟩
+    rw [commutatorElement_def]
+    have hcoe : (P.subtype
+          ((⟨g, hg⟩ : P) *
+            ((Subgroup.normalizerMonoidHom P).comp (Subgroup.inclusion hKP)) ⟨a, ha⟩
+              (⟨g, hg⟩ : P)⁻¹) : Γ)
+        = g * (a * g⁻¹ * a⁻¹) := rfl
+    rw [hcoe]
+    group
+
+/-- Push-forward of the conjugation-action fixed points: fixed points of the conjugation
+action of `K` on `P` map to `C_Γ(K) ⊓ P`. -/
+theorem fixedPointsOfMulAut_conj_map_subtype {Γ : Type*} [Group Γ] {P K : Subgroup Γ}
+    (hKP : K ≤ Subgroup.normalizer (P : Set Γ)) :
+    (Subgroup.fixedPointsOfMulAut
+        ((Subgroup.normalizerMonoidHom P).comp (Subgroup.inclusion hKP))).map P.subtype =
+      Subgroup.centralizer (K : Set Γ) ⊓ P := by
+  ext y
+  simp only [Subgroup.mem_map, Subgroup.mem_inf, Subgroup.mem_centralizer_iff]
+  constructor
+  · rintro ⟨x, hx, rfl⟩
+    refine ⟨fun k hk => ?_, x.2⟩
+    have hfix := Subgroup.mem_fixedPointsOfMulAut.mp hx ⟨k, hk⟩
+    have hcoe : k * (x : Γ) * k⁻¹ = (x : Γ) := congrArg Subtype.val hfix
+    calc k * (x : Γ) = (k * x * k⁻¹) * k := by group
+    _ = (x : Γ) * k := by rw [hcoe]
+  · rintro ⟨hy, hyP⟩
+    refine ⟨⟨y, hyP⟩, Subgroup.mem_fixedPointsOfMulAut.mpr fun a => Subtype.ext ?_, rfl⟩
+    change (a : Γ) * y * (a : Γ)⁻¹ = y
+    rw [hy (a : Γ) a.2]
+    group
+
 /-- **`actionCommutator φ` は G で normal subgroup**.
 
 経路: `actionCommutator_map_inl` で `(actionCommutator φ).map inl = ⁅inl.range, inr.range⁆`,
