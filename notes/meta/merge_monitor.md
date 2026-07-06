@@ -354,6 +354,20 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-07 (tick 2) — a 合流 (progress) + ⛔ d REJECT (BG S01 dup relocation で full-build break) → 監視 HALT**:
+  a=2 (Pf 11.8.6 capstone ψ₀ column-witness、hgen algebra sorry-free 化 = **-1 sorry**) を合流 `a8474c50`、
+  build green 3933、push 済 (origin 同期)。**d=3 commits を REJECT** (issue 9071 HUB RULING): d の
+  `ForwardFromCh03.lean` 追加 5 theorem が**全て BG `S01_Solvable.lean` の逐語コピー**
+  (`coprime_actsTrivially_of_normal_and_quotient`=S01:1771 / `coprime_stabilizes_chain_trivial`=S01:1803 /
+  `coprime_nilpotent_acts_trivially_of_centralizer_self`=S01:1895 / `burnside_operator`=S01:1720 /
+  `mulAut_eq_one_of_coprime_orderOf_of_frattini`=S01:1735)。d の意図は "Move to Isaacs Ch04" relocation だが
+  **追加半分だけ・S01 原本削除せず・caller rewire せず** → `S04e_GorThm37.lean:183` Ambiguous term で
+  **full build FAIL**。d の dup-scan が frozen BG を除外 + leaf build のみで検証 → 見落とし。**churn (新数学 0)
+  + claim-before-build 違反 + build-break** ゆえ hub 裁定 = REJECT (trajectory 保全対象でない = genuine output
+  でなく dup)。trial merge を abort、main は a の green 状態を保持。**d は 3 commits を drop 要** (949d5e27 まで
+  reset; 5 補題は S01 に既存ゆえ何も失われない)。**build failure STOP ゆえ監視 cron を CronDelete して HALT**
+  (次 tick で同 break を繰り返さない)。d が branch を fix したら stop→resolve→resume で cron 再作成。
+  再発防止 (9071): d の重複 scan は repo 全体 grep + shared-infra 追加は commit 前 full build。sorry = 88 (a -1)。
 - **2026-07-07 — 監視再開 (ユーザー「各レーンを監視します」) + tick d 合流 + ⚠ push 18-commit drift 露見**:
   cron 死亡確認 (CronList 空) → 新 cron `c50d5c72` を規定ペース `7,22,37,52` で作成。初回 tick:
   a/b/c=0 (b/c は main に**遅れ** = lane 側の `git merge main` 待ち、逸脱でない)、**d=7 commits**
