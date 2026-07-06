@@ -299,3 +299,35 @@ H ⊓ commutator G = H ⊓ ⁅U,U⁆`。subagent は `pprod_focal`/`focal`/`copr
   `S10_LocalLemmasCore:480` に `IsCyclic (C(M_σ)⊓K⊓derivedInG M)` 系あり、`typeP_structure` clause か小 derivation。
 - **Step 5 (Q∈𝒰)**: `nonabelian_pgroup_isUniquelyMaximal` (S12_Theorem1213:862、Q nonabelian のみ要、Q Sylow 不要)。
 - **Step 6**: def_q1 (engine が Q∈𝒰 消費) + τ₂(H)={q} (`tau2_singleton_of_nonabelianSylow`) + escape witness `C_G(U)⊄M` → Phase D core。
+
+## 2026-07-07 更新 #9 (lane b, /loop) — Step 4 + Step 6-def_q1 を sorry-free 着地; 残 gap を確定
+
+更新 #8 の方針に沿って **2 つの genuine sorry-free engine を landed** (S15_MF.lean、real sorry count 2 不変、
+build 3120 jobs OK):
+
+- **`partner_opiCore_nonabelian`** (Step 4, Coq `not_cQQ`): `L` maximal, `q∈σ(L)`, `L_σ` nilpotent,
+  `|K|=q`, `K≤O_q(L)`, `K≤(L_σ)'` ⟹ `¬IsMulCommutative ↥(opiCoreInG {q} L)`。↥(L_σ) 内で
+  `oPiCore_sup_compl_eq_top` (L_σ=O_{q'}·Q) + `inf_commutator_eq_of_coprime` (BG 6.5(a)):
+  Q abelian ⟹ K = K⊓(L_σ)' = K⊓⁅Q,Q⁆ = ⊥ 矛盾。
+- **`le_centralizer_opiCore_of_msigma_nilpotent`** (Step 6 def_q1-centralize, Coq `sub_nilpotent_cent2`):
+  `L_σ` nilpotent, `q∈σ(L)`, `A≤L_σ` が `q₁`-group で `q₁≠q` ⟹ `A ≤ C_G(O_q(L))`。↥(L_σ) 内で
+  既存 `commutator_eq_bot_of_isNilpotent_of_normal_isPGroup` (S15:3703) で `⁅Q̄,Ā⁆=⊥`。
+
+**確定した残り deep gap (full assembly を gate、この 1 sorry)**:
+1. **`M*` type-P1** (Coq `P1maxL`): `q∉β(G)` (=`¬idealPrime q G`、`tau2_prime_mem_sigma_diff_beta` 内の
+   `hqideal` 系で `tau2` から取得可) + `Ptype_structure` の「¬P1⟹q∈β」節。repo に P-type→P1 の
+   clean lemma 無 (`isTypeP1_of_mf_ne_msigma` は逆向き)。type-P1 が (a) `M*_σ` nilpotent (Coq `nilLs`、
+   `Fcore_structure` M_F 構造定理経由 — S16:2353 が「deeper unformalized」と記録) と
+   (b) `M*'=M*_σ` (`typeP1_msigma_eq_derivedInG`、これは repo に有) を与える。(b) + `K=M*_σ⊓C(Ks)≤M*''`
+   (`Msigma_inf_centralizer_le_derivedDerived_of_isComplement'` を `typeP_duality` complement に適用) ⟹
+   `K⊆(M*_σ)'` = Step 4 の `hKderiv` 入力。
+2. **escape witness `C_G(U)⊄M`** (Coq `not_sCUM`): `X=C_A(H_σ)`, `|X|=q` (`tau2_singleton_of_nonabelianSylow`),
+   `X≠K`, `X⊄M` (`sdprod_sigma`/`eq_mmax` + κ-Hall 極大性), `X≤C(U)` (U⊆H_σ)。
+
+`K≤O_q(M*)` (Coq `sKQ`) は routine (`isPiGroup_le_of_normal_isHallSubgroup` で normal Sylow が吸収)。
+`Ptype_cyclics` の `K⊆(M*_σ)'` 自体は上記 route (2nd-derived + typeP1) で導出可、独立 port 不要。
+
+**⟹ B/C middle 全体は「M* type-P1 (⟹ nilpotency) + escape witness」の 2 点に帰着**。両方 `Fcore_structure`/
+`Ptype_structure`-P1 系の未形式化内容に依存。conditional assembly helper (この 2 点を hypothesis 化して残りを
+sorry-free chain) も検討したが、`K⊆(M*_σ)'` 導出が type-P1 経由でさらに複雑化するため、clean な 2 engine を
+優先 landing (fragile な 100+行 assembly で build を壊すより doneness 判定に忠実)。

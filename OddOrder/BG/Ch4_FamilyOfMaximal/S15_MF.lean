@@ -9842,6 +9842,155 @@ theorem mem_sigma_and_le_Msigma_of_rank2_centralizer_kappa [Finite G]
   rwa [Subgroup.map_subgroupOf_eq_of_le hAMstar,
     Subgroup.map_subgroupOf_eq_of_le (OddOrder.BG.Ch3.S10.Msigma_le Mstar)] at hmap
 
+/-- **Phase B/C step 4 of BG Theorem 15.8** (Coq `tau2_P2type_signalizer`, BGsection15.v:1358--1367,
+the `not_cQQ` block): with the partner `L` type-`P₁` (so `L_σ` nilpotent, `L' = L_σ`), `q ∈ σ(L)`,
+the `q`-core `Q = O_q(L)` a Sylow `q`-subgroup of `L` (Step 3), and the `κ`-Hall `K` with `|K| = q`
+prime, `K ≤ Q` and `K ≤ (L_σ)'`, the Sylow `Q` is **nonabelian**.
+
+Proof (Coq `not_cQQ`, working inside `↥(L_σ)`): the nilpotent `L_σ` factors as
+`L_σ = O_{q'}(L_σ)·Q` (`oPiCore_sup_compl_eq_top`, since `Q.subgroupOf L_σ = O_q(↥L_σ)`).  BG Lemma
+6.5(a) (`inf_commutator_eq_of_coprime`) with the normal `q'`-part `O_{q'}(↥L_σ)`, `U = Q`, `H = K`
+gives `K ⊓ (L_σ)' = K ⊓ ⁅Q, Q⁆`.  If `Q` were abelian, `⁅Q, Q⁆ = ⊥`, so `K ⊓ (L_σ)' = ⊥`; but
+`K ≤ (L_σ)'` gives `K ⊓ (L_σ)' = K`, forcing `K = ⊥`, contradicting `|K| = q > 1`. -/
+theorem partner_opiCore_nonabelian [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L K : Subgroup G} {q : ℕ} [Fact q.Prime]
+    (hL : L ∈ maximalSubgroups G) (hqσ : q ∈ OddOrder.BG.Ch3.S10.sigma L)
+    (hnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma L))
+    (hKcard : Nat.card ↥K = q)
+    (hKQ : K ≤ opiCoreInG ({q} : Set ℕ) L)
+    (hKderiv : K ≤ derivedInG (OddOrder.BG.Ch3.S10.Msigma L)) :
+    ¬ IsMulCommutative ↥(opiCoreInG ({q} : Set ℕ) L) := by
+  classical
+  intro hQab
+  set Ls : Subgroup G := OddOrder.BG.Ch3.S10.Msigma L with hLsdef
+  set Q : Subgroup G := opiCoreInG ({q} : Set ℕ) L with hQdef
+  have hMσM : Ls ≤ L := OddOrder.BG.Ch3.S10.Msigma_le L
+  have hMnormMσ : L ≤ Subgroup.normalizer (Ls : Set G) :=
+    OddOrder.GroupTheory.le_normalizer_opiCoreInG _ L
+  -- `Q ≤ L_σ` and `Q = O_q(L_σ)`.
+  have hQMσ : Q ≤ Ls := by
+    rw [hQdef, hLsdef]; exact OddOrder.BG.Ch3.S10.opiCoreInG_singleton_le_Msigma_of_mem_sigma hqσ
+  have hQeqMσ : Q = opiCoreInG ({q} : Set ℕ) Ls := by
+    rw [hQdef, hLsdef]
+    exact opiCoreInG_eq_of_normal_le hMσM hMnormMσ (hQdef ▸ hLsdef ▸ hQMσ)
+  haveI : Group.IsNilpotent ↥Ls := hLsdef ▸ hnil
+  -- Inside `↥(L_σ)`: `Q̄ = O_q(↥L_σ)`, `Ō = O_{q'}(↥L_σ)`, with `Ō ⊔ Q̄ = ⊤`.
+  have hQsub_eq : Q.subgroupOf Ls = Ch03.oPiCore ({q} : Set ℕ) ↥Ls := by
+    rw [hQeqMσ, OddOrder.BG.Ch3.S10.opiCoreInG_subgroupOf]
+  have hKMσ : K ≤ Ls := hKQ.trans hQMσ
+  set Qbar : Subgroup ↥Ls := Q.subgroupOf Ls with hQbardef
+  set Obar : Subgroup ↥Ls := Ch03.oPiCore ({q}ᶜ : Set ℕ) ↥Ls with hObardef
+  set Kbar : Subgroup ↥Ls := K.subgroupOf Ls with hKbardef
+  haveI hObarN : Obar.Normal := hObardef ▸ Ch03.oPiCore.normal _ _
+  have hsup : Obar ⊔ Qbar = ⊤ := by
+    have h := oPiCore_sup_compl_eq_top (K := ↥Ls) ({q}ᶜ : Set ℕ)
+    rw [compl_compl] at h
+    rw [hObardef, hQsub_eq]; exact h
+  -- `K̄ = K.subgroupOf L_σ ≤ Q̄`; coprime `(|K̄|, |Ō|)` (`q`-group vs `q'`-group).
+  have hKbarQ : Kbar ≤ Qbar := Subgroup.subgroupOf_mono Ls hKQ
+  have hKbarcard : Nat.card ↥Kbar = q := by
+    rw [hKbardef, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKMσ).toEquiv]; exact hKcard
+  have hObarpi : Ch03.Subgroup.IsPiGroup ({q}ᶜ : Set ℕ) Obar :=
+    hObardef ▸ Ch03.oPiCore.isPiGroup ({q}ᶜ : Set ℕ)
+  have hcop : Nat.Coprime (Nat.card ↥Kbar) (Nat.card ↥Obar) := by
+    refine coprime_of_forall_prime_not_dvd (fun r hr hrK hrO => ?_)
+    have hrq : r = q := by
+      have hmem : r ∈ (q : ℕ).primeFactors := by
+        rw [hKbarcard] at hrK
+        exact Nat.mem_primeFactors.mpr ⟨hr, hrK, (Fact.out : q.Prime).ne_zero⟩
+      rw [(Fact.out : q.Prime).primeFactors, Finset.mem_singleton] at hmem; exact hmem
+    have hrOmem : r ∈ ({q}ᶜ : Set ℕ) :=
+      hObarpi r (Nat.mem_primeFactors.mpr ⟨hr, hrO, Nat.card_pos.ne'⟩)
+    exact hrOmem (by rw [hrq]; rfl)
+  -- BG Lemma 6.5(a): `K̄ ⊓ commutator ↥L_σ = K̄ ⊓ ⁅Q̄, Q̄⁆`.
+  have hfocal := OddOrder.BG.Ch1.S06.inf_commutator_eq_of_coprime (K := Obar) (U := Qbar)
+    (H := Kbar) hsup hKbarQ hcop
+  -- `Q` abelian ⟹ `Q̄` abelian ⟹ `⁅Q̄, Q̄⁆ = ⊥`, so RHS `= ⊥`.
+  have hQbarab : IsMulCommutative ↥Qbar :=
+    OddOrder.BG.Ch3.S11.isMulCommutative_of_mulEquiv
+      (Subgroup.subgroupOfEquivOfLe hQMσ).symm hQab
+  have hQQbot : ⁅Qbar, Qbar⁆ = ⊥ := by
+    rw [Subgroup.commutator_eq_bot_iff_le_centralizer]
+    intro x hx; rw [Subgroup.mem_centralizer_iff]; intro y hy
+    exact congrArg Subtype.val (hQbarab.is_comm.comm ⟨y, hy⟩ ⟨x, hx⟩)
+  -- `K̄ ≤ commutator ↥L_σ` (from `K ≤ (L_σ)'`).
+  have hKbarComm : Kbar ≤ commutator ↥Ls := by
+    have hid : (derivedInG Ls).subgroupOf Ls = commutator ↥Ls :=
+      Subgroup.comap_map_eq_self_of_injective Ls.subtype_injective (commutator ↥Ls)
+    rw [hKbardef, ← hid]
+    exact Subgroup.subgroupOf_mono Ls (hLsdef ▸ hKderiv)
+  -- `K̄ = K̄ ⊓ commutator = K̄ ⊓ ⁅Q̄,Q̄⁆ = K̄ ⊓ ⊥ = ⊥`, contradicting `|K̄| = q > 1`.
+  have hKbot : Kbar = ⊥ := by
+    have h1 : Kbar ⊓ commutator ↥Ls = Kbar := inf_eq_left.mpr hKbarComm
+    rw [hfocal, hQQbot, inf_bot_eq] at h1
+    exact h1.symm
+  rw [hKbot, Subgroup.card_bot] at hKbarcard
+  exact (Fact.out : q.Prime).one_lt.ne' hKbarcard.symm
+
+/-- **Phase B/C step 6 `def_q1` centralization of BG Theorem 15.8** (Coq `tau2_P2type_signalizer`,
+BGsection15.v:1336--1338, the `sub_nilpotent_cent2` step): with the partner `L`'s `σ`-core `L_σ`
+**nilpotent**, its `q`-core `Q = O_q(L) ≤ L_σ`, and a `q₁`-subgroup `A ≤ L_σ` with `q₁ ≠ q`
+(`q₁` prime), one has `A ≤ C_G(Q)`.
+
+Proof (Coq `sub_nilpotent_cent2 (Fitting_nil L)`): working inside the nilpotent `↥(L_σ)`,
+`Q.subgroupOf L_σ = O_q(↥L_σ)` is a *normal* `q`-subgroup and `A.subgroupOf L_σ` is a `q₁`-group
+with `q₁ ≠ q` (so `q ∤ |A|`); `commutator_eq_bot_of_isNilpotent_of_normal_isPGroup` gives
+`⁅Q̄, Ā⁆ = ⊥`, i.e. `Ā ≤ C(Q̄)`, which pushes out to `A ≤ C_G(Q)`. -/
+theorem le_centralizer_opiCore_of_msigma_nilpotent [Finite G]
+    {L A : Subgroup G} {q q1 : ℕ} [Fact q.Prime]
+    (hnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma L))
+    (hqσ : q ∈ OddOrder.BG.Ch3.S10.sigma L)
+    (hAMσ : A ≤ OddOrder.BG.Ch3.S10.Msigma L)
+    (hq1prime : q1.Prime) (hq1ne : q1 ≠ q) (hApg : IsPGroup q1 ↥A) :
+    A ≤ Subgroup.centralizer (opiCoreInG ({q} : Set ℕ) L : Set G) := by
+  classical
+  haveI : Fact q1.Prime := ⟨hq1prime⟩
+  set Ls : Subgroup G := OddOrder.BG.Ch3.S10.Msigma L with hLsdef
+  set Q : Subgroup G := opiCoreInG ({q} : Set ℕ) L with hQdef
+  have hMσM : Ls ≤ L := OddOrder.BG.Ch3.S10.Msigma_le L
+  have hMnormMσ : L ≤ Subgroup.normalizer (Ls : Set G) :=
+    OddOrder.GroupTheory.le_normalizer_opiCoreInG _ L
+  have hQMσ : Q ≤ Ls := by
+    rw [hQdef, hLsdef]; exact OddOrder.BG.Ch3.S10.opiCoreInG_singleton_le_Msigma_of_mem_sigma hqσ
+  have hQeqMσ : Q = opiCoreInG ({q} : Set ℕ) Ls := by
+    rw [hQdef, hLsdef]
+    exact opiCoreInG_eq_of_normal_le hMσM hMnormMσ (hQdef ▸ hLsdef ▸ hQMσ)
+  haveI : Group.IsNilpotent ↥Ls := hLsdef ▸ hnil
+  -- `Q̄ = Q.subgroupOf L_σ = O_q(↥L_σ)`, a normal `q`-subgroup of `↥L_σ`.
+  have hQsub_eq : Q.subgroupOf Ls = Ch03.oPiCore ({q} : Set ℕ) ↥Ls := by
+    rw [hQeqMσ, OddOrder.BG.Ch3.S10.opiCoreInG_subgroupOf]
+  haveI hQbarN : (Q.subgroupOf Ls).Normal := by rw [hQsub_eq]; exact Ch03.oPiCore.normal _ _
+  have hQbarpg : IsPGroup q ↥(Q.subgroupOf Ls) :=
+    (isPGroup_opiCoreInG_singleton L (q := q)).of_equiv
+      (Subgroup.subgroupOfEquivOfLe hQMσ).symm
+  -- `Ā = A.subgroupOf L_σ` is a `q₁`-group; `q ∉ π(|Ā|)` since `q ≠ q₁`.
+  have hAbarpg : IsPGroup q1 ↥(A.subgroupOf Ls) :=
+    hApg.of_equiv (Subgroup.subgroupOfEquivOfLe hAMσ).symm
+  have hqnotA : q ∉ (Nat.card ↥(A.subgroupOf Ls)).primeFactors := by
+    intro hq
+    obtain ⟨n, hn⟩ := hAbarpg.exists_card_eq
+    rw [hn, Nat.mem_primeFactors] at hq
+    have := (Nat.prime_dvd_prime_iff_eq (Fact.out : q.Prime) hq1prime).mp
+      (hq.1.dvd_of_dvd_pow hq.2.1)
+    exact hq1ne this.symm
+  -- `⁅Q̄, Ā⁆ = ⊥` (nilpotent, normal `q`-part vs `q'`-part), so `Ā ≤ C(Q̄)`.
+  have hcommbot : ⁅Q.subgroupOf Ls, A.subgroupOf Ls⁆ = ⊥ :=
+    commutator_eq_bot_of_isNilpotent_of_normal_isPGroup hQbarpg hqnotA
+  have hAbarC : A.subgroupOf Ls ≤ Subgroup.centralizer ((Q.subgroupOf Ls : Subgroup ↥Ls) : Set ↥Ls) :=
+    Subgroup.commutator_eq_bot_iff_le_centralizer.mp
+      (by rw [Subgroup.commutator_comm]; exact hcommbot)
+  -- Push out to the ambient: `A ≤ C_G(Q)`.
+  intro a ha
+  rw [Subgroup.mem_centralizer_iff]
+  intro g hg
+  have haLs : a ∈ Ls := hAMσ ha
+  have hgLs : g ∈ Ls := hQMσ hg
+  have haA : (⟨a, haLs⟩ : ↥Ls) ∈ A.subgroupOf Ls := Subgroup.mem_subgroupOf.mpr ha
+  have hgQ : (⟨g, hgLs⟩ : ↥Ls) ∈ Q.subgroupOf Ls := Subgroup.mem_subgroupOf.mpr hg
+  have haC := hAbarC haA
+  have hcomm := Subgroup.mem_centralizer_iff.mp haC (⟨g, hgLs⟩ : ↥Ls) hgQ
+  exact congrArg Subtype.val hcomm
+
 /-- **Phase B/C uniqueness core of BG Theorem 15.8** (Coq `tau2_P2type_signalizer`,
 BGsection15.v:1329--1338, the `def_q1` argument): if a uniqueness subgroup `Q ∈ 𝒰`
 (`IsUniquelyMaximal Q`) is centralized by a rank-2 elementary abelian `A ∈ ℰ²_{q₁}(G)`, and `A`
@@ -9909,21 +10058,35 @@ Proof spine (Coq `tau2_P2type_signalizer`): pick `q₁ ∈ τ₂(H)`; extract `A
 `|X| = q` and `τ₂(H) = {q}` (Thm 12.7 `nonabelian_tau2` = `tau2_singleton_of_nonabelianSylow`);
 finally `X ≠ K`, `C_G(U) ⊄ M`, and the `τ₂(M)`-Sylow argument give `τ₂(M) = ∅`.
 
-⚠ **Proof gap (2026-07-06, being assembled — issue 9017 更新 #4):** the corrected statement is
-sound and matches Coq exactly; the ~130-line Coq proof is **being assembled inline**, not blocked.
-**The cited §9/§12/§14/§15 machinery is present** in the repo under descriptive names (verified
-Coq→repo map in issue 9017; an earlier "not yet ported" inventory was a naming-trap false negative
-— `Ptype_embedding` = `S14.typeP_duality`, `tau2_not_beta` = `S12.tau2_prime_mem_sigma_diff_beta`,
-`Fcore_structure` = `maxNilpotentNormalHall_*`, `cent_uniq_Uniqueness` = `S09_Theorem91`, etc.).
-The two dropped Cor 14.12 clauses `K ⊆ F(E)` / σ(H)′-Hall `E` are **exported** by
-`typeP2_neighbor_is_typeF_of_mem`.  Landed sorry-free: Phase A (Coq `cKA`) =
+⚠ **Proof status (2026-07-07, issue 9017 更新 #7):** the corrected statement is sound and matches
+Coq exactly.  Landed sorry-free, in document order: Phase A (Coq `cKA`) =
 `exists_rank2_elemAb_le_centralizer_kappa_of_tau2`; Phase B foundation =
-`typeP2_partner_structure_of_mem`; Phase D core = `centralizer_kappaCompl_le_of_mem_tau2` +
-`not_prime_mem_tau2_of_centralizer_kappaCompl_not_le` (given the escape witness `C_G(U) ⊄ M`,
-prime-form `τ₂(M) = ∅`).  The remaining **B/C middle** (`def_q1` q₁ = q via the Uniqueness Theorem;
-`Q = O_q(M*)` nonabelian via `Msigma_inf_conj_inf_derived_eq_bot`; `τ₂(H) = {q}` and `X = C_A(H_σ)`,
-`|X| = q` via `tau2_singleton_of_nonabelianSylow`; the escape witness `C_G(U) ⊄ M`) produces the
-input the Phase D core consumes.  This `sorry` is the pre-existing one, **not new**. -/
+`typeP2_partner_structure_of_mem`; Step 1 = `partner_kappaHall_le_Msigma_of_isTypeP2`; Step 2 =
+`mem_sigma_and_le_Msigma_of_rank2_centralizer_kappa`; Step 3 (nilpotent case) =
+`exists_sylow_eq_opiCore_of_mem_sigma_of_msigma_nilpotent`; **Step 4** (Coq `not_cQQ`, `Q = O_q(M*)`
+nonabelian) = `partner_opiCore_nonabelian` (focal Lemma 6.5(a) inside `↥M*_σ`); **Step 5** (`Q ∈ 𝒰`)
+= `S12.nonabelian_pgroup_isUniquelyMaximal` (a nonabelian Sylow-`q` of `G` over `Q`); **Step 6**
+`def_q1` centralization (Coq `sub_nilpotent_cent2`) = `le_centralizer_opiCore_of_msigma_nilpotent`
++ engine `eq_of_uniquelyMaximal_centralized_by_rank2_le`; the `τ₂(H) = {q}` singleton =
+`S12.tau2_singleton_of_nonabelianSylow`; Phase D core = `centralizer_kappaCompl_le_of_mem_tau2` +
+`not_prime_mem_tau2_of_centralizer_kappaCompl_not_le` (given the escape witness `C_G(U) ⊄ M`).
+
+**Two genuinely deep §15 inputs remain unformalized** and gate the inline assembly (this single
+`sorry`):
+1. **`M*` type-`P₁`** (Coq `P1maxL`, BGsection15.v:1343) — from `q ∉ β(G)` (`¬ idealPrime q G`, via
+   `tau2` maximality, obtainable) + `Ptype_structure`'s "not-`P₁` ⟹ `q ∈ β`" clause.  Type-`P₁`
+   then yields (a) `M*_σ` **nilpotent** (Coq `nilLs`, via the `Fcore_structure` `M_F`-structure
+   theorem — recorded in S16 as the deeper unformalized content) and (b) `M*′ = M*_σ`
+   (`typeP1_msigma_eq_derivedInG`), which with `K = M*_σ ⊓ C(Ks) ≤ M*″`
+   (`Msigma_inf_centralizer_le_derivedDerived_of_isComplement'` on the `typeP_duality` complement)
+   gives `K ⊆ (M*_σ)′` — the `hKderiv` input of Step 4.
+2. **escape witness `C_G(U) ⊄ M`** (Coq `not_sCUM`, BGsection15.v:1368--1382) — from `X = C_A(H_σ)`,
+   `|X| = q` (`tau2_singleton_of_nonabelianSylow`), `X ≠ K`, `X ⊄ M` (via `sdprod_sigma`/`eq_mmax`
+   + `κ`-Hall maximality), `X ≤ C(U)` (`U ⊆ H_σ`).
+
+The remaining `K ≤ O_q(M*)` (Coq `sKQ`) is routine (`K` a `q`-group in `M*_σ`, absorbed by the
+normal Sylow `O_q(M*)` via `isPiGroup_le_of_normal_isHallSubgroup`).  This `sorry` is the
+pre-existing one, **not new**. -/
 theorem tau2_transfer_constraint [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M Mstar U K R H : Subgroup G} {r : ℕ}
     (hM : M ∈ maximalSubgroups G) (hP2 : S14.IsTypeP2 M)
