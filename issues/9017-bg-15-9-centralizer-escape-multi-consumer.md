@@ -148,3 +148,45 @@ S15 で再derive 不能)。これは **actively-worked S14_TypePCounting への 
 は S16→S15 hoist (hub-level)。⟹ **chain 全体は tractable、残るは 2 つの cross-lane coordination のみ (S14 re-export +
 S16→S15 hoist) = hub-territory** ([[hub-arbitrates-cross-lane-autonomously]])。lane b の unilateral 部分
 (char-side wiring + sound signature + spine 補題 + β 確認) は完遂。hub は S14 拡張 + S16→S15 hoist の allocation を裁定可。
+
+## 2026-07-06 更新 #4 (lane b, /loop 再開) — ★S14 export 完了 + Thm 15.8 Phase A landed (sorry-free) + 前 inventory の naming-trap 訂正
+
+**⚠ 前 subagent inventory ("8 lemmas NOT YET PORTED") は STALE な docstring の parrot で誤り** ([[verify-port-state-by-number-not-coq-name]]
+の罠、本 issue でも再発)。BG 番号 + descriptive 名で直接検証したところ **Thm 15.8 の machinery はほぼ全て repo に存在** (更新 #2 の慎重 inventory と一致)。
+
+### 2 commit landed (build green, sorry-free)
+1. **`typeP2_neighbor_is_typeF_of_mem`** (S14_TypePCounting、103c4a8a): Cor 14.12 を **H-parameterized** 化 + dropped
+   2 clauses を export = **`∃ E E₁ E₂ E₃, SubgroupESetup H E… ∧ K≤E ∧ K⊆F(E)`**。内部で既に確立済 (`hEsetup`+`hsK_FE`)
+   だったので additive。従来の ∃-form `typeP2_neighbor_is_typeF` は coatom で H を選ぶ薄い wrapper として残置 →
+   S16 の 2 consumer 不変。**「S14 で再derive 不能」だった dropped clauses は export で解決**(更新 #3 の懸念は解消、S14 signature 拡張のみで足りた)。
+2. **`exists_rank2_elemAb_le_centralizer_kappa_of_tau2`** (S15_MF、75006c8e): **Thm 15.8 Phase A** (Coq `cKA` まで)。
+   `SubgroupESetup H` + `K⊆F(E)` + prime `q₁∈τ₂(H)` → `∃ A∈ℰ²_{q₁}(E), A≤E ∧ A⊆C(K)`。
+
+### 検証済 Coq→repo 補題マップ (Thm 15.8 `tau2_P2type_signalizer` の残 Phase B/C/D)
+| Coq step | repo lemma (verified present) |
+|---|---|
+| `Ptype_structure` (prime q) | `card_kappaHall_prime_of_isTypeP2` (S15_MF、既 landed) / `S14.typeP_structure` |
+| `ex_tau2Elem` | `S12.exists_elemAb_rank_two_le_E_of_tau2` (SubgroupESetup 取る) |
+| `tau2_compl_context` (A⊴E) | `S12.elemAb_normal_in_E_of_tau2` (S12_Corollary126:379) |
+| `sigma'_nil_abelian` | `S12.nilpotent_sigmaComplement_abelian` (S12_Corollary1210:158).1 |
+| `tau2_not_beta` (q∉β) | `S12.tau2_prime_mem_sigma_diff_beta` (S12_Lemma1211:390、q∈σ(Mst)\β(Mst) 形) |
+| `Ptype_embedding` (L=M* 構造) | `S14.typeP_duality` (S14 で使用中) |
+| Cor 12.6(a)(b) | `S12_Corollary126` (`centralizer_le_E_of_tau2` 等) |
+| `Fcore_structure` (M*_σ nil / Sylow Q⊆F) | S15_MF `maxNilpotentNormalHall_*` + Thm 15.2 machinery |
+| Uniqueness Thm 9.6 (`cent_uniq_Uniqueness`) | `BG/Ch2_Uniqueness/S09_Theorem91` |
+| `nonabelian_pgroup_isUniquelyMaximal` (Thm 12.13) | `S12_Theorem1213` |
+| `nonabelian_tau2` (τ₂(H)={q}, |X|=q) | `S12.tau2_singleton_of_nonabelianSylow` (S12_Theorem127d:550、大 bundle) |
+| `Ptype_cyclics` (K≠1, K⊆(L_σ)') | `S14.typeP_structure` / Ptype cyclic clause |
+| `kappa_structure` / `kappa_compl_context` (τ₂(M)=∅) | `S14.kappa_*` 系 |
+| `pprod_focal_coprime` (Q nonabelian) | 要 grep (focal/coprime、§12 内) |
+
+### 残 Thm 15.8 (Phase B/C/D、= 一続きの assembly、次 iteration)
+- **B**: A⊆C(K)⊆M* (`sAL`、hMstar から C(K)⊆Mstar) → A⊆M*_σ (Cor 12.6(b)) → L-structure (`typeP_duality`) →
+  q,q1∈σ(L)、Q=O_q(L) Sylow → **def_q1: q1=q** (Uniqueness `cent_uniq_Uniqueness` + Q∈𝒰) → **τ₂(H)={q}**。
+- **C**: P1maxL / nilLs (Fcore_structure) / K⊆(L_σ)' (Ptype_cyclics) / Q nonabelian (pprod_focal) / |X|=q
+  (`tau2_singleton_of_nonabelianSylow`)。
+- **D**: X≠K → X⊄M → C(U)⊄M → **τ₂(M)=∅** (`kappa_compl_context` + tau2_compl_context)。
+これらは standalone helper に切りにくい一続きの論証ゆえ、Thm 15.8 本体を inline で assemble する (Phase A helper を cite)。
+- **Cor 15.9** (`centralizer_escape_final_local`): Coq `nonFtype_signalizer_base` (BGsection15:1399)。
+  `FT_signalizer_context` (Thm 14.4) → `typeP2_neighbor_is_typeF_of_mem` (M∈𝓜_𝓕) → **Thm 15.8** で E2=1 →
+  Thm 15.7 (`nonTI_Fitting_structure`) で E3=1/cyclic → Frobenius M。S16→S15 hoist は **b 所有** (S16_MainResults も b) ゆえ territory 内。
