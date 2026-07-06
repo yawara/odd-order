@@ -395,6 +395,18 @@ theorem card_quotient_lt_of_ne_bot {G : Type*} [Group G] [Finite G]
       (Nat.mul_lt_mul_left hQ_pos).mpr hK_gt
     _ = Nat.card G := h_eq
 
+/-- A proper subgroup of a finite group has strictly smaller cardinality. -/
+theorem card_lt_card_of_ne_top {G : Type*} [Group G] [Finite G]
+    {H : Subgroup G} (hH : H ≠ ⊤) :
+    Nat.card H < Nat.card G := by
+  have hindex_ne_one : H.index ≠ 1 := fun hidx => hH (Subgroup.index_eq_one.mp hidx)
+  have hindex_gt_one : 1 < H.index :=
+    Nat.one_lt_iff_ne_zero_and_ne_one.mpr
+      ⟨Subgroup.index_ne_zero_of_finite, hindex_ne_one⟩
+  calc
+    Nat.card H < Nat.card H * H.index := lt_mul_of_one_lt_right Nat.card_pos hindex_gt_one
+    _ = Nat.card G := Subgroup.card_mul_index H
+
 /-- If a finite group's order is coprime to `|A|`, then every subgroup order is too. -/
 theorem coprime_card_subgroup_right {A G : Type*} [Group A] [Group G] [Finite G]
     (H : Subgroup G) (hCop : Nat.Coprime (Nat.card A) (Nat.card G)) :
