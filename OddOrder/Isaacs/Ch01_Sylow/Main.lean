@@ -1169,6 +1169,27 @@ theorem fitting_map_subtype_le_fitting [Finite G] {M : Subgroup G} [M.Normal] :
       M.subtype_injective)
   exact nilpotent_normal_le_fitting
 
+/-- The image of the Fitting subgroup under a group isomorphism is contained in the Fitting
+subgroup of the codomain. -/
+theorem fitting_map_mulEquiv_le {A B : Type*} [Group A] [Group B] [Finite A] [Finite B]
+    (e : A ≃* B) :
+    (fitting A).map e.toMonoidHom ≤ fitting B := by
+  haveI : Group.IsNilpotent (fitting A) := fitting.isNilpotent
+  haveI : Group.IsNilpotent ↥((fitting A).map e.toMonoidHom) :=
+    nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ e.toMonoidHom e.injective)
+  haveI : ((fitting A).map e.toMonoidHom).Normal :=
+    (fitting.normal A).map e.toMonoidHom e.surjective
+  exact nilpotent_normal_le_fitting
+
+/-- The Fitting subgroup is preserved by group isomorphisms. -/
+theorem fitting_map_mulEquiv {A B : Type*} [Group A] [Group B] [Finite A] (e : A ≃* B) :
+    (fitting A).map e.toMonoidHom = fitting B := by
+  haveI : Finite B := Finite.of_equiv A e.toEquiv
+  refine le_antisymm (fitting_map_mulEquiv_le e) (fun y hy => ?_)
+  have hpre : e.symm y ∈ fitting A :=
+    fitting_map_mulEquiv_le e.symm (by simpa using Subgroup.mem_map_of_mem e.symm.toMonoidHom hy)
+  simpa using Subgroup.mem_map_of_mem e.toMonoidHom hpre
+
 end -- 1D
 
 section /- 1E: Small-order groups, normal subgroup of index 2 (pp. 31-34) -/
