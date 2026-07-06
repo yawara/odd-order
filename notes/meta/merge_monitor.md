@@ -30,13 +30,16 @@
 | **a** | `a` | `odd-order-a` | α **S12 (11.8) unique feitThompson sorry** + §7 on-path norm (2026-07-04 再々編) | `Peterfalvi/S(0[3-9]|1[0-3])*` + `FeitThompson.lean` (全体) | 1000 |
 | **b** | `b` | `odd-order-b` | β **§16 endgame char cascade = S15 (13.9)-(13.19)** (2026-07-04 再々編; §12 Dade は完遂・cite-only) | `Peterfalvi/{S15_SAndT_Setup, S15_SAndT}.lean` (c→b, 2026-07-04) + `S14_MaximalI.lean` + coherence file 群 + carve-out 0090/0096 | 2000 |
 | **c** | `c` | `odd-order-c` | γ **S16 非存在 = W-side (14.x) norm cascade + parity 矛盾** (2026-07-04 再々編; off-path T-side carrier 退役) | `Peterfalvi/S16_NonExistenceG.lean` (S15 は b へ移管、c は import cite) + 構成的 Clifford (issue 9002) | 3000 |
-| **d** | `d` | `odd-order-d` | δ **最軽量 = issue 9006 Hall-lemma relocation** (2026-07-06 復活、**codex 運用**) | shared `OddOrder/Mathlib/Subgroup.lean` + `OddOrder/GroupTheory/MaximalSubgroupType.lean` (自由追加) + `FeitThompson.lean`/`S10_BGInterface.lean`/`S11_MaximalII_III_IV.lean` は 9006 列挙の relocate+migrate のみ (hub 裁定で例外化) | **4000** |
+| **d** | `d` | `odd-order-d` | δ **codex shared-infra hygiene / no active Lean frontier after 9006+9007** (2026-07-06) | `issues/**` + `notes/**` maintenance; new `OddOrder/GroupTheory/**` / `OddOrder/Mathlib/**` / `OddOrder/Algebra/**` shared claims only after open-9000 scan. **Do not edit Peterfalvi/BG S-files without a fresh issue/carve-out.** | **4000** |
 
 例外・共有・凍結の正確な判定は下の 🔒 所有マップが正。**lane d は 2026-07-06 復活** (2026-07-02〜07-06 退役、
 旧 branch `d` は削除済ゆえ `git worktree add /home/ywr/odd-order-d -b d` で新規作成)。**d = codex 運用**の
-最軽量レーン: 純群論の Hall-lemma relocation (issue 9006、全 body proven・on-path・char 無)。d の触る
-FeitThompson/S10/S11 は 9006 hub 裁定 (owner 固定せず issue+LAUNCH awareness で誰でも実施可) の例外ゆえ
-**FeitThompson からの削除 commit を逸脱 flag しない** (9006 を根拠に shared-infra hygiene として合流)。
+最軽量レーンとして復活した 9006 Hall-lemma relocation は完了済み (closed/9006)。続く 9007 induced-conjugation
+hoist も完了済み (closed/9007)。2026-07-06 lane-d audit では shared foundation
+(`OddOrder/GroupTheory/**`, `OddOrder/Mathlib/**`, `OddOrder/Algebra/**`, `OddOrder/Isaacs/**`) に bare
+`sorry` は無く、残る bare `sorry` は a/b/c 所有の Peterfalvi frontier に集中している。従って d は新しい
+open shared claim が立つまで **issue/notes hygiene + open-9000 scan** に限定し、Peterfalvi/BG S-file へは
+新 carve-out なしで入らない。
 
 **signature-first interface (ゲートは幻)**: 上流が sorried signature を export → 下流が cite。各レーンは独立クラスタを
 正面から埋め、cross-cluster は signature contract で媒介 (待たない)。詳細 = ft_lane_reallocation_2026_06_28.md。

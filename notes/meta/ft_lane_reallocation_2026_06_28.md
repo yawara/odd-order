@@ -64,6 +64,10 @@
 > （自由追加）+ FeitThompson/S10_BGInterface/S11 は 9006 列挙の relocate のみ（9006 hub 裁定の例外）。d は
 > Claude でなく codex が動かすため最軽量・checklist 完備のタスクを選定（他 light 候補 9011/9012/9015/9005 は
 > 納品済 stale、9007 高衝突、9014 deep）。正本 checklist = `issues/9006-*.md`。worktree = `/home/ywr/odd-order-d`。
+> **2026-07-06 lane-d audit update**: 9006 と 9007 は完了・closed。9011/9012/9015 は納品済 stale として
+> closed、9014 も constructor 完成で shared foundation claim は closed。shared foundation 側に bare `sorry` は
+> 残っていないため、d は新 shared claim が立つまで issue/notes hygiene + open-9000 scan に限定し、a/b/c 所有
+> Peterfalvi S-file へは新 carve-out なしで入らない。
 
 > **⚠ 2026-07-01 再々配分 (issue 4014 hub 裁定, 履歴) → 2026-07-02 に上記 3 レーン再編で superseded**: lane d は §15 S&T setup / δ BG §14–16 の
 > **on-feitThompson-spine な ungated genuine work が枯渇** (code-level 確証)。残 on-spine 前進は全て他レーン

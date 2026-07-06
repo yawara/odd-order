@@ -615,3 +615,10 @@ S06 の signature 無改変。posited field は全て実構成に置換済 = Pri
 9014 の prime-TI residue foundation は honest に構成可能と確定。§10 (10.7、lane-a) が primeTIred を
 consume するとき本 constructor + PrimeTIResidueData API が使える。**本 issue は constructor 完了ゆえ
 close 候補** (hub 判断; foundation 完成、残 consumer wiring は §10 lane-a 側)。
+
+## 2026-07-06 lane-d closure
+
+Current-state audit: `PrimeTIResidueData.ofS06Hypothesis` is present in
+`OddOrder/GroupTheory/RepresentationTheory/PrimeTIResidue.lean`, the issue's item 1-5 ruling is
+implemented, and the remaining §10 consumer wiring belongs to lane-a's downstream issue rather than
+this shared foundation claim. Move to `issues/closed/`.
