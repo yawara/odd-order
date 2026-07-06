@@ -25,6 +25,10 @@ landed) ⟹ **trajectory 保全としてこの drift を追認、BG §15/§16 no
 1. **owner = lane b**。`OddOrder/BG/Ch4_FamilyOfMaximal/{S15_MF.lean §15.8/15.9 部, S16_MainResults.lean}` の
    BG §15/§16 残 sorry は **b の active territory** (merge_monitor 🔒 マップ + owned_re を更新、「BG=共有凍結」は
    この node について解除)。他 BG/** は従来どおり共有凍結。
+   - **carve-out 拡張 (2026-07-06 合流 tick)**: `S14_TypePCounting.lean` の Cor 14.12 (`typeP2_neighbor_is_typeF`
+     + 新 `_of_mem` variant、Thm 15.8 が要する `K⊆F(E)` export) も **b territory に拡張**。既存 theorem の
+     signature 保持・sorry 2→2 regression なし・他 owner なし・new axiom なしを hub が検証 → 軌道保全 (STOP でない)。
+     b は今後 §14 への追加編集を hub に proactive flag すること (今回は事後追認)。
 2. **Thm 15.8 `tau2_transfer_constraint` の signature 訂正を承認** (更新 #2 coordination point (ii))。現 signature は
    `H` を `hHtau` のみで導入し M との signalizer-neighbour link を欠く = **unsound (tau2 H={|K|} 導出不能)**、
    かつ **consumer 0**。Coq 準拠 (Mstar/U/r/R/H∈𝓜(N(R)) witness bind) への訂正は「unsound carrier の是正 + consumer 0」
