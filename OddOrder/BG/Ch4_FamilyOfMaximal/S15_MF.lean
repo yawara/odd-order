@@ -9402,6 +9402,91 @@ theorem tau2_transfer_constraint [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
     tau2 M = ∅ ∧ ∃ q : ℕ, q.Prime ∧ Nat.card ↥K = q ∧ tau2 H = {q} := by
   sorry
 
+/-- **`N_G(F(M)) ≤ M` for a maximal `M`** (`F(M)` is "self-normalizing modulo `M`"): the ambient
+Fitting subgroup of a maximal subgroup of a minimal simple group has normalizer contained in `M`.
+
+Proof: `M ≤ N_G(F(M))` (any `m ∈ M` normalizes `F(M)`, `mem_normalizer_fittingInG_of_mem`).  If the
+containment were strict, maximality (`IsCoatom M`) would force `N_G(F(M)) = ⊤`, i.e. `F(M) ⊴ G`; but
+`F(M) ≠ ⊥` (the proper subgroup `M < ⊤` is solvable and nontrivial, so `F(M) = F(↥M).map ι ≠ ⊥` by
+`fitting_ne_bot_of_solvable_nontrivial`), so a nontrivial normal `F(M) ⊴ G` in a simple `G` must be
+`⊤`, whence `G ≅ ↥F(M)` is nilpotent — contradicting `¬ IsSolvable G`.  So `N_G(F(M)) = M`.
+
+`F(M) ≠ ⊥` is proved unconditionally (no `M_σ`-nilpotency needed): `↥M` is solvable
+(`solvable_of_mem_maximalSubgroups`) and nontrivial (`M ≠ ⊥`, else `M` a coatom equal to `⊥` makes
+every nontrivial subgroup `⊤`, forcing `G` cyclic hence solvable), so `F(↥M) ≠ ⊥`, and the
+injective `M.subtype`-image `fittingInG M` is `≠ ⊥`. -/
+theorem normalizer_fittingInG_le_self [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    Subgroup.normalizer ((fittingInAmbient M : Subgroup G) : Set G) ≤ M := by
+  have hco : IsCoatom M := mem_maximalSubgroups.mp hM
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  -- `M ≠ ⊥` (a `⊥` coatom would make `G` cyclic, hence solvable).
+  have hMne : M ≠ ⊥ := by
+    intro hMbot
+    have hco' : ∀ b : Subgroup G, ⊥ < b → b = ⊤ := by rw [← hMbot]; exact hco.2
+    haveI : Nontrivial G := hG.simple.toNontrivial
+    obtain ⟨g, hg1⟩ := exists_ne (1 : G)
+    have hgtop : Subgroup.zpowers g = ⊤ :=
+      hco' _ (bot_lt_iff_ne_bot.mpr (fun h => hg1 (Subgroup.zpowers_eq_bot.mp h)))
+    exact hG.notSolvable (isSolvable_of_comm fun a b => by
+      obtain ⟨i, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hgtop ▸ Subgroup.mem_top a)
+      obtain ⟨j, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hgtop ▸ Subgroup.mem_top b)
+      rw [← zpow_add, ← zpow_add, add_comm])
+  haveI : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hMne
+  -- `M ≤ N_G(F(M))`.
+  have hM_le_N : M ≤ Subgroup.normalizer ((fittingInAmbient M : Subgroup G) : Set G) :=
+    fun m hm => OddOrder.BG.Ch2.S08.mem_normalizer_fittingInG_of_mem hm
+  rcases eq_or_lt_of_le hM_le_N with heq | hlt
+  · exact heq.ge
+  · exfalso
+    -- Strict `⟹` `N_G(F(M)) = ⊤` (maximality), i.e. `F(M) ⊴ G`.
+    have hFnorm : (fittingInAmbient M).Normal :=
+      Subgroup.normalizer_eq_top_iff.mp (hco.2 _ hlt)
+    -- `F(M) ≠ ⊥`: `↥M` solvable + nontrivial ⟹ `F(↥M) ≠ ⊥` ⟹ its injective image `≠ ⊥`.
+    have hFne : fittingInAmbient M ≠ ⊥ := by
+      have hFMne : OddOrder.Isaacs.Ch01.fitting ↥M ≠ ⊥ :=
+        OddOrder.Isaacs.Ch01.fitting_ne_bot_of_solvable_nontrivial ↥M
+      show OddOrder.BG.Ch2.S08.fittingInG M ≠ ⊥
+      rw [OddOrder.BG.Ch2.S08.fittingInG]
+      exact fun h => hFMne ((Subgroup.map_eq_bot_iff_of_injective _ M.subtype_injective).mp h)
+    -- `F(M) ⊴ G`, `F(M) ≠ ⊥`, `G` simple ⟹ `F(M) = ⊤` ⟹ `G` nilpotent ⟹ solvable, contradiction.
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (fittingInAmbient M) hFnorm with hbot | htop
+    · exact hFne hbot
+    · -- `F(M) = ⊤`: `G ≃ ↥F(M)` is nilpotent, hence solvable.
+      haveI : Group.IsNilpotent ↥(fittingInAmbient M) := by
+        show Group.IsNilpotent ↥(OddOrder.BG.Ch2.S08.fittingInG M)
+        exact OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M
+      haveI : Group.IsNilpotent (↥(⊤ : Subgroup G)) := htop ▸ this
+      haveI : Group.IsNilpotent G := nilpotent_of_mulEquiv Subgroup.topEquiv
+      exact hG.notSolvable IsNilpotent.to_isSolvable
+
+/-- **`F(M)` fails to be TI once a centralizer of one of its nonidentity elements escapes `M`**
+(BG Corollary 15.9, mmd L4320: *"`x ∈ M_σ ⊆ F(M)` and `C_G(x) ⊄ M`.  Hence `F(M)` is not a
+`TI`-subgroup of `G`."*).  Stated in the BG-faithful generality on `x ∈ F(M)^#` (Corollary 15.9
+supplies this from `x ∈ M_σ^#` once `M_σ ⊆ F(M)`, i.e. after `M ∈ 𝓜_𝓕` makes `M_σ` nilpotent).
+
+Proof: pick `y ∈ C_G(x) ∖ M`.  As `y` centralizes `x`, `y·x·y⁻¹ = x`; so the *same* nonidentity
+`x ∈ F(M)^#` witnesses an overlap `∃ a ∈ F(M)^#, y·a·y⁻¹ ∈ F(M)^#`.  Were `F(M)` a TI-subset with
+normalizer-bound `N_G(F(M))`, this would force `y ∈ N_G(F(M)) ≤ M` (`normalizer_fittingInG_le_self`),
+contradicting `y ∉ M`. -/
+theorem not_fittingIsTI_of_mem_fittingSharp_of_centralizer_not_le [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {x : G} (hxF : x ∈ fittingSharp M)
+    (hesc : ¬ Subgroup.centralizer ({x} : Set G) ≤ M) :
+    ¬ FittingIsTI M := by
+  intro hTI
+  -- `y ∈ C_G(x) ∖ M`.
+  obtain ⟨y, hyC, hyM⟩ := Set.not_subset.mp hesc
+  -- `y` centralizes `x`: `y·x·y⁻¹ = x` (from `x·y = y·x`).
+  have hyx : y * x * y⁻¹ = x := by
+    have hxy : x * y = y * x := (Subgroup.mem_centralizer_iff.mp hyC) x (Set.mem_singleton x)
+    rw [← hxy, mul_assoc, mul_inv_cancel, mul_one]
+  -- The overlap `∃ a ∈ F(M)^#, y·a·y⁻¹ ∈ F(M)^#` (both equal to `x`).
+  have hoverlap : ∃ a ∈ fittingSharp M, y * a * y⁻¹ ∈ fittingSharp M :=
+    ⟨x, hxF, by rw [hyx]; exact hxF⟩
+  -- TI forces `y ∈ N_G(F(M)) ≤ M`, contradicting `y ∉ M`.
+  exact hyM (normalizer_fittingInG_le_self hG hM (hTI y hoverlap))
+
 /-- **BG Corollary 15.9** (mmd L4240): final local landing point for a centralizer
 escaping `M`.  This is the Sibley/Feit--Thompson package used by §16. -/
 theorem centralizer_escape_final_local [Finite G]
