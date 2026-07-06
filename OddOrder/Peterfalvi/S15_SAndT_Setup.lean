@@ -874,6 +874,63 @@ theorem sSet_closedUnderConjugate {M : Subgroup G} [Finite G] (data : TypesIIIII
   simp only [induceHU]
   convert OddOrder.RepresentationTheory.conj_induce (χ : ClassFunction ↥(huSub data) ℂ) using 2
 
+open OddOrder.Peterfalvi.S11 in
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **`𝒮` is pairwise orthogonal** (Peterfalvi (9.5), subcoherence input (5.2)).  Distinct members
+`Ind_{HU}^M χ ≠ Ind_{HU}^M χ'` arise from non-`M`-conjugate irreducible sources `χ ≁ χ'`
+(`induce_eq_induce_iff_conj`), so the cross-Mackey orthogonality `inner_induce_eq_zero_of_not_conj`
+gives `⟨Ind χ, Ind χ'⟩ = 0` — a Dade-independent family property (the `𝒮`-instance of the general
+`inducedKernelFamily_pairwise_orthogonal`).  The `FiniteInduce`-scoped `Fintype`/`Invertible`
+instances are the ones `induceHU` bakes in, so `induceHU = Ind` reduces definitionally.  This is the
+`pairwise_orthogonal` input the (5.3.a) assembler `S07.irrSubcoherent` consumes for the honest §9
+induced family. -/
+theorem sSet_pairwiseOrthogonal {M : Subgroup G} [Finite G] (data : TypesIIIIIIVSetup M) :
+    OddOrder.Peterfalvi.S03.PairwiseOrthogonal (sSet data) := by
+  rintro _ _ ⟨χ, hχ, rfl⟩ ⟨χ', hχ', rfl⟩ hne
+  -- non-conjugate sources: else the inductions—hence the members—coincide, contradicting `hne`.
+  have hnc : ∀ g : ↥M, IrreducibleCharacter.conjBy g χ ≠ χ' := fun g hg => hne (by
+    show ClassFunction.induce (huSub data) (χ : ClassFunction ↥(huSub data) ℂ)
+      = ClassFunction.induce (huSub data) (χ' : ClassFunction ↥(huSub data) ℂ)
+    exact (induce_eq_induce_iff_conj χ χ').mpr ⟨g, hg⟩)
+  show ClassFunction.inner (ClassFunction.induce (huSub data) (χ : ClassFunction ↥(huSub data) ℂ))
+      (ClassFunction.induce (huSub data) (χ' : ClassFunction ↥(huSub data) ℂ)) = 0
+  exact inner_induce_eq_zero_of_not_conj χ χ' hnc
+
+open OddOrder.Peterfalvi.S11 in
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **`𝒮` has no real members** (Peterfalvi (9.5)/(1.1), subcoherence input (5.2)), for `M` of odd
+order.  A real `Ind_{HU}^M χ` would force `χ̄ = χ^g` for some `g ∈ M` (`induce_conj` +
+`induce_eq_induce_iff_conj`), impossible in odd order (`conjBy_ne_conj_of_odd`: a nontrivial
+irreducible of an odd-order group is never `M`-conjugate to its dual).  `𝒳`-membership `H ⊄ Ker χ`
+supplies the nontriviality (`Ker 1 = univ ⊇ hInHu`).  The `𝒮`-instance of the general
+`inducedKernelFamily_hasNoRealCharacters`; the `no_real_characters` input for `S07.irrSubcoherent`. -/
+theorem sSet_hasNoRealCharacters {M : Subgroup G} [Finite G] (data : TypesIIIIIIVSetup M)
+    (hodd : Odd (Nat.card ↥M)) :
+    OddOrder.Peterfalvi.S03.HasNoRealCharacters (sSet data) := by
+  rintro _ ⟨χ, hχ, rfl⟩ hreal
+  -- `χ` nontrivial: else `Ker χ = univ ⊇ hInHu`, contradicting `χ ∈ 𝒳`.
+  have hχne : (χ : ClassFunction ↥(huSub data) ℂ) ≠ trivialClassFunction ↥(huSub data) := by
+    intro h
+    apply hχ
+    rw [h, OddOrder.Peterfalvi.S03.characterKernel_trivialClassFunction]
+    exact Set.subset_univ _
+  let χc : IrreducibleCharacter ↥(huSub data) :=
+    ⟨(χ : ClassFunction ↥(huSub data) ℂ).conj, χ.isIrreducible.conj⟩
+  -- realness of `Ind χ` transfers to the sources: `Ind χ = (Ind χ)̄ = Ind χ̄`.
+  have hind : ClassFunction.induce (huSub data) (χ : ClassFunction ↥(huSub data) ℂ)
+      = ClassFunction.induce (huSub data) (χc : ClassFunction ↥(huSub data) ℂ) := by
+    have h1 : (ClassFunction.induce (huSub data) (χ : ClassFunction ↥(huSub data) ℂ)).conj
+        = ClassFunction.induce (huSub data) (χ : ClassFunction ↥(huSub data) ℂ) := hreal
+    calc ClassFunction.induce (huSub data) (χ : ClassFunction ↥(huSub data) ℂ)
+        = (ClassFunction.induce (huSub data) (χ : ClassFunction ↥(huSub data) ℂ)).conj := h1.symm
+      _ = ClassFunction.induce (huSub data) (χc : ClassFunction ↥(huSub data) ℂ) :=
+          ClassFunction.induce_conj (huSub data) (χ : ClassFunction ↥(huSub data) ℂ)
+  obtain ⟨g, hg⟩ := (induce_eq_induce_iff_conj χ χc).mp hind
+  refine conjBy_ne_conj_of_odd hodd χ.isIrreducible hχne g ?_
+  have hcoe := congrArg
+    (fun η : IrreducibleCharacter ↥(huSub data) => (η : ClassFunction ↥(huSub data) ℂ)) hg
+  simpa [IrreducibleCharacter.coe_conjBy, χc] using hcoe
+
 open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **Honest §9 character data on `S`** (issue 2035 step 3): the `mkSection11CharacterDataS`
 mirror with the *genuine* coherence inputs — `tau := Ind_S^G` (`indS`, Peterfalvi (13.2.e)) and
