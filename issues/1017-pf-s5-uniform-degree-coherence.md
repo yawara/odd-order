@@ -632,3 +632,25 @@ escaping 点の矛盾を導く) で TI 性を確立。⟹ 本物の残 = **`hone
 **recommended path**: (1) H0CprimeSupport を S^# に変更 [small, but 要 downstream re-check] →
 (2) `A(S)` dade=Ind: type-I 類推で「等次数 sSet 差は A(S)∖escaping に supported」を [Is]6.2 類推で示す
 [genuine, S14 pattern] → (3) NEW `IsCoherent indS 𝒮 S^#` 組成 → coherent_H0Cprime_S re-point。
+
+## 2026-07-06 更新 #21 (lane b, /loop) — ★(13.2.e) dade=Ind bridge LANDED (sInstance_dade_eq_induce_of_supported_trivial_H)
+
+update #20 が「本当の残 gap」と特定した **A(S) 上 dade=Ind** の honest core piece を landed (commit cd6beac7):
+- `Hypothesis.sInstance_dade_eq_induce_of_supported_trivial_H` (S15:848、+37、leaf GREEN 3882 jobs):
+  type-P₂ S の (13.2.e) Dade isometry `dadeIntegralCharacterMap (dadeHypS)` が trivial-H sub-support
+  `A₁ ⊆ A(S)` 上で `Ind_S^G` に一致。type-I `typeI_tau_eq_induce_of_supported_trivial_H` (S14:2125) の
+  S-instance analogue、general `dadeMap_eq_induce_of_supported_on_trivial_H` (S14:2104) を dadeHypS で
+  instantiate (`dadeIntegralCharacterMap_apply_of_support` → §4 `dadeMap` → step-3 bridge)。trivial-H facts
+  (hA₁A/hA₁norm/hH₁/hf) は type-I 同様 hypotheses に defer。#print axioms の sorryAx は dadeHypS 由来のみ
+  (proof body の sorry 導入 0、accepted BG §16 Theorem-II pins・on-path `dadeSupportHypotheses_typeI` と parity)。
+
+**残る唯一の missing fact (trivial-H discharge を non-vacuous にする)** = **S-instance analogue of
+`constituent_diff_support_subset_nonescaping` (S14:2235)**: §9 member differences が **non-escaping**
+部 `A(S) ∖ escaping` に supported (現 `sSet_member_diffsupp` S15:1093 は full A(S) 止まり)。
+type-I template (S14:2235-2278): x が escaping ⟹ escaping ⊆ σ-sharp
+(`escaping_honestTypeP2ASet_mem_sigmaSharp` S15:650、既 landed) ⟹ そこで family 差が vanish
+(type-I は `restrict_eq_of_mem_constituents` で H 上一致 → 差=0)。**S-instance の「差が σ-sharp=S_σ^#=P^#
+上 vanish」= 残 genuine content** (family 差が P 上どう振る舞うかの構造)。A₁=A(S)∖escaping / hA₁norm / hH₁ は
+mechanically 構成可 (H_eq_ftSupportKernel S10:675 + ftSupportKernel_eq_bot_of_not_escaping S10:600 +
+honestTypeP2ASet_conj_mem S15:587 + escapingCentralizerSet_conj_mem S10:1259)。
+次 = この non-escaping support 補題を build (or 差が P 上 vanish しないなら真の構造を named-report)。
