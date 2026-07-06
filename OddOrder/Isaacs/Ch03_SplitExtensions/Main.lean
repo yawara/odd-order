@@ -649,6 +649,41 @@ theorem IsHallSubgroup.mulAut_smul [Finite G] {π : Set ℕ} {H : Subgroup G}
     rw [hidx]
     exact hH.2
 
+/-- A Hall subgroup of a subgroup whose ambient index is a `π'`-number stays Hall after
+pushing it back to the whole ambient group. -/
+theorem IsHallSubgroup.map_subtype_of_index_no_pi [Finite G] {π : Set ℕ}
+    {H : Subgroup G} {L : Subgroup H} (hL : IsHallSubgroup π L)
+    (hH_index : ∀ p ∈ H.index.primeFactors, p ∉ π) :
+    IsHallSubgroup π (L.map H.subtype) := by
+  have hcard : Nat.card ↥(L.map H.subtype) = Nat.card ↥L :=
+    (Nat.card_congr
+      (Subgroup.equivMapOfInjective L H.subtype H.subtype_injective).toEquiv).symm
+  have hindex : (L.map H.subtype).index = L.index * H.index := by
+    have hpos : 0 < Nat.card ↥L := Nat.card_pos
+    have hmul : Nat.card ↥L * (L.map H.subtype).index =
+        Nat.card ↥L * (L.index * H.index) := by
+      calc
+        Nat.card ↥L * (L.map H.subtype).index
+            = Nat.card ↥(L.map H.subtype) * (L.map H.subtype).index := by rw [hcard]
+        _ = Nat.card G := Subgroup.card_mul_index (L.map H.subtype)
+        _ = Nat.card H * H.index := (Subgroup.card_mul_index H).symm
+        _ = (Nat.card ↥L * L.index) * H.index := by rw [Subgroup.card_mul_index L]
+        _ = Nat.card ↥L * (L.index * H.index) := by ring
+    exact Nat.mul_left_cancel hpos hmul
+  refine ⟨?_, ?_⟩
+  · intro p hp
+    rw [hcard] at hp
+    exact hL.1 p hp
+  · intro p hp hp_pi
+    rw [hindex] at hp
+    rw [Nat.mem_primeFactors] at hp
+    obtain ⟨hp_prime, hp_dvd, _⟩ := hp
+    rcases hp_prime.dvd_mul.mp hp_dvd with hp_L | hp_H
+    · exact hL.2 p
+        (Nat.mem_primeFactors.mpr ⟨hp_prime, hp_L, Subgroup.index_ne_zero_of_finite⟩) hp_pi
+    · exact hH_index p
+        (Nat.mem_primeFactors.mpr ⟨hp_prime, hp_H, Subgroup.index_ne_zero_of_finite⟩) hp_pi
+
 /-- `⊤` は π-Hall ⇔ `G` が π-group (`|G|` の全素因子が π に属す). -/
 theorem IsHallSubgroup.top_iff (π : Set ℕ) :
     IsHallSubgroup π (⊤ : Subgroup G) ↔ ∀ p ∈ (Nat.card G).primeFactors, p ∈ π := by
