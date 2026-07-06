@@ -3760,6 +3760,24 @@ theorem Hypothesis.SHCSet_orthonormal [Finite G] {M : Subgroup G} (hyp : Hypothe
   irr_cf_inner (mem_irreducibleCharacters.mpr hφ.2.1) (mem_irreducibleCharacters.mpr hψ.2.1)
 
 open scoped FiniteInduce in
+/-- **Degree of an `inducedFamily` member factors through `w₁`**: `Ind_{M'}^M θ (1) = w₁ · θ(1)`,
+since `[M : M'] = w₁` (`TypePData.card_W1_eq_derived_index`; `M' = derivedInG M`).  This is the
+foundational (11.8.1) degree-factoring for the world-bridge: the degree of any member `y = Ind θ`
+of `S = inducedFamily M` is `w₁` times a source degree `θ(1)`, so the two-degree-class structure
+`{w₁, qu = d·w₁}` of `𝒮(C)` reduces to `θ(1) ∈ {1, d}`.  (The reducible members' `θ(1) = d` is the
+§9 `reducible_mem_sOf_H0_apply_one_eq_qu` content; this lemma supplies the `[M:M']`-factoring half.) -/
+theorem Hypothesis.induce_derived_apply_one_eq_w1_mul [Finite G] {M : Subgroup G}
+    (hyp : Hypothesis M)
+    (θ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M)) :
+    (ClassFunction.induce ((derivedInG M).subgroupOf M)
+        (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ)) (1 : ↥M)
+      = (hyp.w1 : ℂ) * (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) (1 : ↥((derivedInG M).subgroupOf M)) := by
+  haveI := hyp.finiteG
+  have hidx : ((derivedInG M).subgroupOf M).index = hyp.w1 :=
+    hyp.typeP.card_W1_eq_derived_index.symm
+  rw [ClassFunction.induce_apply_one, hidx]
+
+open scoped FiniteInduce in
 /-- **Degree of an `S₁ = S(HC)`-span element is an integer multiple of `w₁`.**  Every member of
 `SHCSet` has degree `w₁` (by definition, third conjunct), so `ψ ∈ ℤ[S(HC)]` has `ψ(1) = s·w₁` with
 `s ∈ ℤ` the coefficient sum (`span_induction`).  This is the `S₁`-side degree-ratio input of the
