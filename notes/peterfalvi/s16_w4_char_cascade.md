@@ -2307,3 +2307,35 @@ sorried-cite endpoint に整理済 (この session +3 commit: type-det / #5訂�
 §9 landing を待って cite**、or **hub-coordinated fresh C drive** (issue 9000 block分解を C が S11 でなく shared
 leaf で build、但し lane-a active §9 と dup 注意)。C context 枯渇ゆえ deep build は fresh session 推奨
 ([[feedback-loop-short-wakeup]] 空転禁止 = 停止+報告)。
+
+### cont.⁷⁶ (2026-07-06 lane c 再開、fresh session) — 🔧 σ§9 conflation 訂正 + carrier-landing 検証 (none) + hub 7-agent reshape「c=thin cite-sink」整合
+
+再開時 `git merge main` = fast-forward (23 commits、うち hub の **7-agent 分担監査 reshape `4fe5010c`**)。
+検証 3 点:
+
+1. **σ§9 conflation 訂正 (genuine map fix、未記録)**: cont.⁷⁵ / issue 9000 hub 注記 (line 265-285) は C の
+   V-abelian gate を「**σ-theory §9 block 分解 (issue 9000)** + (11.9) typeP_Galois char body」と束ねたが、
+   **前者は C の V-abelian を unblock しない**。S16 docstring (`T_not_isTypeIV_of_isTypeP1`, commit `cb252c14`
+   の Coq-verified map) が精密: `IsMulCommutative V ⟸ cyclic V ⟸ typeP_Galois T` で、`typeP_Galois` =「V が
+   Hbar に **既約に**作用」= (11.9) **η-grid 射影 `a₁₁=a₁₀=0`** (Coq PFsection11.v:1041-1126、§3–§11
+   coherence/Dade/prime-TI 全 apparatus)。σ-engine `card_le_cyclotomicQuotient_of_faithful_fpf`
+   (TypePGaloisUBound:42) は **`[CommGroup U]` を typeclass 仮定で consume** = 可換性を*消費*し*証明しない*
+   (= (13.2.c) u-bound `|V|≤(p^q−1)/(p−1)`)。**⟹ issue 9000 σ-theory §9 は C の V-abelian route に無関係**
+   (lane-a の (10.7)/(10.8) capstone + S-side u-bound の consumer)。C の V-abelian gate = **§11 typeP_Galois
+   char body** (別物、lane-a §11、§5–§9 coherence/Dade に bottom-out)。hub reshape も prime-TI/§5 を
+   code-verified で non-gate と確定済ゆえ本訂正と整合。
+
+2. **carrier-landing 検証 = none**: C の最終 S16 touch (`cb252c14`) 以降、S16 の cite 先 carrier は**未 landing**:
+   `V_inf_centralizer_Q_eq_bot` (d=1、S15:1887) = 依然 sorry + `_hTTypeII` 要 / unconditional `isMulCommutative_V`
+   = 不在 (S15:1388 は `IsTypeII` 要) / `caseB_order_u` (v-value) = 依然 sorry。b が landing したのは BG 15.8/15.9
+   spine (`card_kappaHall_prime_of_isTypeP2`, Cor 15.9 spine 2 補題) + Pf 13.2.e TI-set reduction = **real
+   bottleneck (BG §15/§16) の前進だが C の carrier を discharge しない中間段**。S16 real sorry = 10 で不変。
+
+3. **hub 7-agent reshape (`4fe5010c`) と整合**: reshape は coupled-pipeline stall 再発を確定 (a=stale/**c=downstream
+   sink**/d=busywork/b のみ生産)、真の gate = unowned BG §15/§16 (b 追認)、**c = thin downstream cite-sink
+   (成果 in-place 保全、carrier landing 後 cite-assembly で再起動)**、d=DORMANT (停止+報告・busywork 禁止)、
+   「新規レーンを 9014 に張り付けない」。⟹ **本 session の検証は hub 裁定を code-level で追認**: C は非-dup・
+   非-busywork な ungated work 皆無 (両 real gate = BG §15/§16=b・gate-2=a に freshly 割当・active、C help=dup)。
+   force-engage (σ§9/§5/§11 char body) は 7-agent 監査が診断した stall の再発。**⟹ C は preserved cite-sink
+   維持が hub-aligned な正解**。carrier (b の BG §15/§16 → C の d=1/v-value/coherence) landing で cite-assembly
+   再起動。ユーザーが C を明示再開したため状態を報告し方向指示を仰ぐ (allocation override は lane-c 権限外)。
