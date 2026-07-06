@@ -88,6 +88,31 @@ BG §15/§16 (9017) の owner を追認され負荷過多。⟹ **負荷分散 +
 - `4dd6f3c8` note update²⁷。
 - full build green (feitThompson single sorry 不変、新 axiom 無)。
 
+## ✅ obligation-2 LANDED (2026-07-06, lane-a, commit a39e2934) — non-orthonormal `ν` constructor DONE
+
+HUB RULING の obligation-2 (a への S07 carve-out) を **sorry-free で完遂**。教科書 Peterfalvi (6.8.1)
++ mathcomp `bridge_coherent` (PFsection5.v `Zisometry_of_cfnorm`) で **2 route 裏取り済み**: τ₃ は
+「X 上 τ₂ / Y 上 τ₁ に一致する ℤ-線形写像」で、族は **pairwise-orthogonal だが orthonormal 不要**
+(norm > 1 可)。∴ 当初「deep char 本体」framing は **過大評価**で、実体は orthonormal→orthogonal の
+線形代数一般化 (各 Fourier 係数を squared-norm `⟨χⱼ,χⱼ⟩` で割る) だった。
+
+**landed (additive、b の orthonormal glue S07:3196/3229 非接触)**:
+- `S07.IntegralCharacterMap.coherentImageMap_apply_eq_of_orthogonal` — 正規化再構成 χₖ↦Xₖ。
+- `S07.IntegralCharacterMap.coherentImageMapGlueOrthogonal` (+ `_apply_left`/`_right`) — τ₃ 本体。
+- `S07.IntegralCharacterMap.exists_integralCharacterMap_glue_of_orthogonal` — 集合版存在
+  (`ν` + hagreeX/hagreeY、orthonormality 落とす)。
+- `S12_Core.inducedFamily_finite` / `inducedFamily_inner_self_ne_zero` — call-site prereq (ungated)。
+- `S12.Hypothesis.exists_glue_nu` — **obligation-2 を gate-2 世界で discharge**: coh + hY から
+  (11.8.6) `ν` を直接構成 (S₁,S₂ ⊆ pairwise-orth 𝒮 of nonzero norm, S₁⊥S₂)。honest doneness =
+  constructor が dead でなく実際に使えることを実証。
+
+**gate-2 residual の更新**: `coherent_Sset_of_column_identities` は今や
+`coherent_Sset_of_glued coh hY (exists_glue_nu coh hY).choose …` で ν 部分を discharge 可能。
+残るは **(1) hY** (§9/§14-gated = `coherent_Sset_diff_SHCSet`、b/§14) + **(2) (6.8.1) `b≡0` char
+content** = `hmixed` (image-side ⊥) / `D`/`hDτ`/`hgen` (`hcol` column identities driven)。
+**ν-construction obligation は residual から消えた**。(2) は hcol→these の (6.8.1) 導出で、これは
+deep char body だが hcol は capstone の hypothesis ゆえ call-site で利用可 (未導出)。
+
 ## 完了条件
 
 gate-2 `coherent_Sset_of_column_identities` の sorry が `coherent_Sset_of_glued coh hY ν …` で閉じる
