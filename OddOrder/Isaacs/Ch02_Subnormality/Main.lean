@@ -257,6 +257,23 @@ theorem exists_isMinimalNormal_le_of_normal [Finite G] (N : Subgroup G) [N.Norma
       obtain ⟨M, hMmin, hMleK⟩ := ih K hKnorm hcard_K_le hKne_bot
       exact ⟨M, hMmin, hMleK.trans hKleN⟩
 
+/-- A finite normal subgroup `C` not contained in `F` contains a normal subgroup minimal
+among those not contained in `F`. -/
+theorem exists_normal_le_not_le_minimal [Finite G] {C F : Subgroup G} [C.Normal]
+    (hC_not_le_F : ¬ C ≤ F) :
+    ∃ K : Subgroup G, K.Normal ∧ K ≤ C ∧ ¬ K ≤ F ∧
+      ∀ K' : Subgroup G, K'.Normal → K' ≤ K → ¬ K' ≤ F → K ≤ K' := by
+  classical
+  let S : Set (Subgroup G) := {K | K.Normal ∧ K ≤ C ∧ ¬ K ≤ F}
+  have hS_fin : S.Finite := Set.toFinite S
+  have hS_nonempty : S.Nonempty := ⟨C, inferInstance, le_rfl, hC_not_le_F⟩
+  obtain ⟨K, hK_min⟩ := hS_fin.exists_minimal hS_nonempty
+  obtain ⟨⟨hK_normal, hK_le_C, hK_not_le_F⟩, hK_minimal⟩ := hK_min
+  refine ⟨K, hK_normal, hK_le_C, hK_not_le_F, ?_⟩
+  intro K' hK'_normal hK'_le hK'_not_le_F
+  have hK'_mem : K' ∈ S := ⟨hK'_normal, hK'_le.trans hK_le_C, hK'_not_le_F⟩
+  exact hK_minimal hK'_mem hK'_le
+
 /-- 非自明な有限群は socle が非自明. (Thm 2.6 Case 2 で使う.) -/
 theorem socle_ne_bot_of_nontrivial [Finite G] [Nontrivial G] : socle G ≠ ⊥ := by
   obtain ⟨M, hM, _⟩ := exists_isMinimalNormal_le_of_normal (⊤ : Subgroup G) top_ne_bot
