@@ -595,3 +595,23 @@ S06 の descriptive 名を見落とした Coq 名 grep の罠、[[verify-port-st
 indexing: p := Nat.card h.W2、q := Nat.card h.W1、`Fin p ≃ Ŵ2` を card_charGroup_W2 + trivial↦0 pin
 (chiRestrict_one_eq_trivial で chi_zero)。P field = W2 ⊆ H ≤ K の任意 H (FT app では Fitting)。
 ⟹ constructor 完成は pure wiring。background subagent に委任 (mechanical、context 節約)。
+
+## 2026-07-06 更新 #4 (lane b) — ★★constructor LANDED: PrimeTIResidueData.ofS06Hypothesis (裁定 item 5 完了)
+
+`PrimeTIResidueData.ofS06Hypothesis` を landed (subagent 実装 + 親 verify)。裁定 item 5「constructor 完成 —
+posited field を実構成に置換」達成:
+
+```
+ofS06Hypothesis [Fintype ↥h.K] (H : Subgroup ↥h.K) (hW2H : h.W2.subgroupOf h.K ≤ H) :
+  PrimeTIResidueData L h.K (Nat.card h.W1) (Nat.card h.W2)
+```
+(h : S06.Hypothesis L から)。全 9 field を genuine S06 定理で実構成 (更新 #3 の mapping table 通り)、
++ index bridge `charGroupW2Equiv : Fin (Nat.card h.W2) ≃ Ŵ2` (card_charGroup_W2 + trivial↦0 pin)。
+**#print axioms = 標準3のみ (sorryAx 無)、leaf GREEN 3486 / full GREEN 3933**。PrimeTIResidueData /
+S06 の signature 無改変。posited field は全て実構成に置換済 = PrimeTIResidueData carrier の構成可能性
+実証 ([[scaffold-sorry-free-not-done]] の genuine doneness)。
+
+**⟹ 裁定 (fcfc0644) の全 item 完了**: item 1-4 restructure (復元/再open/mu2Grid移設) + item 5 constructor。
+9014 の prime-TI residue foundation は honest に構成可能と確定。§10 (10.7、lane-a) が primeTIred を
+consume するとき本 constructor + PrimeTIResidueData API が使える。**本 issue は constructor 完了ゆえ
+close 候補** (hub 判断; foundation 完成、残 consumer wiring は §10 lane-a 側)。

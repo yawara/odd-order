@@ -565,6 +565,13 @@ theorem honestTypeP2ASet_subset_sharp {M : Subgroup G} :
   rintro y ⟨-, hy1, -⟩
   exact OddOrder.Peterfalvi.S04.mem_sharp.mpr ⟨Set.mem_univ y, hy1⟩
 
+/-- **`1 ∉ A(S)`**: the honest support consists of non-identity elements (it lies in
+`sharp univ`, `honestTypeP2ASet_subset_sharp`).  This is the `h1notA` input the Dade-coherence
+producer `S07.coherentEqualDegree_fromDade` requires (`1 ∉ A` guarantees the induced difference
+`τ(χ_j − χ_0)` sees the whole Dade support). -/
+theorem honestTypeP2ASet_one_not_mem {M : Subgroup G} : (1 : G) ∉ honestTypeP2ASet M := fun h =>
+  (OddOrder.Peterfalvi.S04.mem_sharp.mp (honestTypeP2ASet_subset_sharp h)).2 rfl
+
 /-- `A(S) ⊆ M'` (the support lives in the derived subgroup). -/
 theorem honestTypeP2ASet_subset_derived {M : Subgroup G} :
     honestTypeP2ASet M ⊆ (derivedInG M : Set G) := fun _ hy => hy.1
@@ -812,6 +819,17 @@ noncomputable def Hypothesis.dadeHypS [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     OddOrder.Peterfalvi.S04.Hypothesis G (honestTypeP2ASet hyp.S) hyp.S :=
   (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.S_maximal hyp.S_typeP2).some.dade
+
+/-- **(13.2.e) `S`-instance Dade `H`-conjugation invariance** (issue 1017): the `HConjInvariant` of
+`dadeHypS`, carried by the underlying `DadeSupportHypothesisData` (Peterfalvi (8.14)/(8.15), the
+kernels `R(x)` are `S`-conjugation equivariant `R(x^m) = R(x)^m`).  This is the `hconj` input the
+(5.3.a) R-datum constructor `S07.dadeCharacterDifferenceImageOfDiff` consumes to build each family
+member's `CharacterDifferenceImage` `τ(φ − φ̄) = ±(μ − ν)` — the same `.some` witness as `dadeHypS`,
+so the isometry `dadeHypS.fullDadeIsometryData dadeHypS_hconj` is well-defined. -/
+theorem Hypothesis.dadeHypS_hconj [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    (hyp.dadeHypS hG).HConjInvariant :=
+  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.S_maximal hyp.S_typeP2).some.hconj
 
 /-- **The honest `(H₀ ⊔ C')^#`-support for the `S`-instance, `= (C')^#`** (issue 2035 step 2).
 For the `S`-instance the chief kernel is trivial (`toTypesIIIIIIVSetupS_chief_N_eq_bot`, giving
