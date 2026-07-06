@@ -41,9 +41,24 @@
 (2) **新規 `axiom` 宣言は abort + ユーザー承認**。(3) **起動時 main 同期** = `git merge main` (3-way、`--ff-only` 禁止)。
 `lake update` 禁止。コミットは main のみ。マージ順 = **a → b → c** (独立ゆえ形式的)。
 
-**🧭 方向性・cross-lane 判断は HUB 宛 issue 起票 → hub 解決** (title に "HUB:" 冠、選択肢明記)。hub は各 tick で
-新 HUB issue を別枠報告し解決 (read-only 監査 + 必要ならユーザーへ)。軽微な signature 不足通知は notes でよい
-([[cross-lane-sync-via-notes]] の上位版)。**🔁 lane 自己復帰**: lane が hub 待ちで停止しても自走再開しうる
+**🧭 方向性・cross-lane 判断は HUB が自律裁定する (ユーザーに聞きに来ない、ユーザー 2026-07-06)**。
+レーンが frontier を自律判断するのと対称に、hub は **(a) レーン間の診断の食い違い** (「X は repo に在るか」
+「どちらの grep/診断が正しいか」等) と **(b) レーン方針・cross-lane 設計判断** (carve-out 付与・ファイルの
+keep/delete・所有/優先順位・重複解消) を、**hub 自身が必要な調査 (code-level grep・`coq/` の Coq trace・
+subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該当 shared-infra issue) と notes に記録する。
+**この種の裁定に AskUserQuestion を使わない** — 「食い違いがある / 方針が割れている」自体は escalation 理由でなく、
+**調査して裁定する**のが hub の仕事。調査もユーザーに投げない。
+- **ユーザー escalation は narrow に予約**: (i) 新 `axiom` 宣言、(ii) unsound carrier・signature 無断変更、
+  (iii) build 破壊・sorry regression・想定外 git 状態 = **merge-safety STOP** (下記 ⛔、halt+報告)、
+  (iv) 既存規約+徹底調査を尽くしてなお真に underdetermined かつ不可逆・影響大の戦略選択 (稀)。
+- **先例 (2026-07-06)**: lane-a/lane-b の prime-TI 診断食い違いを hub が 2 subagent + Coq trace で調査し
+  「PrimeTIResidue KEEP + 9014 OPEN」を裁定 (issue 9014 HUB RULING)。当初 hub は AskUserQuestion で
+  keep/delete を聞いたが、**既存規約 (CLAUDE.md の prime-TI port must-build) + 調査結果で "keep" は既に
+  determined** ゆえ聞くべきでなかった — 以後この種は自律裁定 ([[hub-arbitrates-cross-lane-autonomously]])。
+- lane が HUB 宛 issue を起票してもよい (title に "HUB:" 冠、選択肢明記) が、hub は待たず各 tick で拾って裁定。
+  軽微な signature 不足通知は notes でよい ([[cross-lane-sync-via-notes]] の上位版)。
+
+**🔁 lane 自己復帰**: lane が hub 待ちで停止しても自走再開しうる
 (hub の合流手順は不変、lane の自己復帰は通常の作業再開ゆえ区別不要)。
 
 ## 各イテレーションの手順
