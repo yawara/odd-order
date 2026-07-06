@@ -155,6 +155,38 @@ theorem inf_subgroupOf_le_center_of_le_centralizer {K F : Subgroup G}
   have hyC : (y : G) ∈ centralizer (F : Set G) := hK_le_C y.2
   exact (mem_centralizer_iff.mp hyC (x : G) hxF).symm
 
+/-- The centralizer inside a subgroup is the restriction of the ambient centralizer of the
+subtype image. -/
+theorem centralizer_subgroupOf {S : Subgroup G} (T : Set S) :
+    centralizer T = (centralizer (S.subtype '' T)).subgroupOf S := by
+  ext s
+  rw [mem_centralizer_iff, mem_subgroupOf, mem_centralizer_iff]
+  constructor
+  · rintro hs g ⟨t, ht, rfl⟩
+    simpa only [map_mul] using congrArg S.subtype (hs t ht)
+  · intro hs t ht
+    apply Subtype.ext
+    rw [Subgroup.coe_mul, Subgroup.coe_mul]
+    exact hs (S.subtype t) ⟨t, ht, rfl⟩
+
+/-- If a nontrivial subgroup `R₀ ≤ R` has the same singleton-centralizer intersection
+as `R` for every nonidentity element of `R`, then `R₀` has the same centralizer
+intersection as `R`. -/
+theorem centralizer_inf_eq_of_le_of_singleton_inf_eq {K R₀ R : Subgroup G}
+    (hR₀R : R₀ ≤ R) (hR₀ : R₀ ≠ ⊥)
+    (hcent : ∀ x ∈ (R : Set G), x ≠ 1 →
+      centralizer ({x} : Set G) ⊓ K = centralizer (R : Set G) ⊓ K) :
+    centralizer (R₀ : Set G) ⊓ K = centralizer (R : Set G) ⊓ K := by
+  haveI : Nontrivial R₀ := (Subgroup.nontrivial_iff_ne_bot R₀).mpr hR₀
+  obtain ⟨y, hy⟩ := exists_ne (1 : R₀)
+  refine le_antisymm ?_ ?_
+  · calc centralizer (R₀ : Set G) ⊓ K
+        ≤ centralizer ({(y : G)} : Set G) ⊓ K :=
+          inf_le_inf_right K (Subgroup.centralizer_le (Set.singleton_subset_iff.mpr y.2))
+      _ = centralizer (R : Set G) ⊓ K :=
+          hcent (y : G) (hR₀R y.2) (mt OneMemClass.coe_eq_one.mp hy)
+  · exact inf_le_inf_right K (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hR₀R))
+
 /-- **`MulAut` 作用の固定点部分群**: `φ : A →* MulAut G` の下で `∀ a, (φ a) g = g` を
 満たす要素全体. mathlib `MulAction.fixedPoints` は Set だが, MulAut 作用の場合は
 group 構造を持つので Subgroup として bundle.
