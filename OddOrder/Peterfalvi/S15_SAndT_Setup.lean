@@ -1141,6 +1141,72 @@ theorem sSet_hasNoRealCharacters {M : Subgroup G} [Finite G] (data : TypesIIIIII
     (fun η : IrreducibleCharacter ↥(huSub data) => (η : ClassFunction ↥(huSub data) ℂ)) hg
   simpa [IrreducibleCharacter.coe_conjBy, χc] using hcoe
 
+/-- **`Odd |S|`** for the maximal subgroup `S` of the minimal simple group `G` of odd order
+(issue 1017, subcoherence input for the §9 induced family).  `|S| ∣ |G|` (subgroup) and `|G|` is odd
+(`hG.odd`), so `|S|` is odd — the hypothesis `sSet_hasNoRealCharacters` (the (5.2.a) realness input)
+needs. -/
+theorem Hypothesis.oddCardS [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    Odd (Nat.card ↥hyp.S) := by
+  rcases hG.odd with ⟨k, hk⟩
+  -- From `|S| ∣ |G|` and `|G|` odd, deduce `|S|` odd (a divisor of an odd number is odd).
+  have hdvd : Nat.card ↥hyp.S ∣ Nat.card G := Subgroup.card_subgroup_dvd_card hyp.S
+  rcases Nat.even_or_odd (Nat.card ↥hyp.S) with heven | hodd
+  · exfalso
+    have h2 : (2 : ℕ) ∣ Nat.card G := (even_iff_two_dvd.mp heven).trans hdvd
+    rw [hk] at h2
+    omega
+  · exact hodd
+
+open OddOrder.Peterfalvi.S11 in
+/-- **The per-irreducible-member Dade `CharacterDifferenceImage` for a `𝒮 = sSet`-member**
+(Peterfalvi (5.3.a) R-datum, issue 1017 Part B).  Given an irreducible source `ξ ∈ 𝒳` whose induced
+`Ind_{HU}^S ξ` is **itself irreducible** (the irreducible sub-family of the mixed §9 family — the
+reducible residues `μ_j` are handled separately, as a `CharacterPsiDecomposition.imageFamily` of
+variable length, *not* through this 2-element `CharacterDifferenceImage`), this packages the signed
+difference image `(Ind ξ − (Ind ξ)̄)^τ = ±(μ − ν)` under the honest (13.2.e) Dade map
+`τ = dadeIntegralCharacterMap (dadeHypS hG) …`.
+
+Assembled entirely from landed inputs:
+* the Dade hypothesis `dadeHypS hG` and its `HConjInvariant` `dadeHypS_hconj hG`;
+* the member's non-realness `sSet_hasNoRealCharacters` (needs `oddCardS`);
+* the difference support `sSet_member_diffsupp` (`((Ind ξ)̄ − Ind ξ).support ⊆ A(S)`),
+  fed through `dadeCharacterDifferenceImageOfDiff`.
+
+This is the exact `S`-instance analogue of the §14 `R1cdi` (`S14_MaximalI.lean:744`), which builds
+the same per-member R-datum for the (12.2) family via `dadeCharacterDifferenceImageOfDiff`.  It is
+the per-member piece that `S07.irrSubcoherent` consumes on the irreducible sub-family (the (9.11)
+base + Galois glue), and the (9.11) pair-adjoining induction consumes (as `Da`/`Dmem` decomposition
+data) for the whole family. -/
+noncomputable def Hypothesis.sSet_member_differenceImage [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    [Fintype ↥hyp.S] [Invertible (Nat.card ↥hyp.S : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {ξ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(huSub (hyp.toTypesIIIIIIVSetupS hG))}
+    (hξ : ξ ∈ xiSet (hyp.toTypesIIIIIIVSetupS hG))
+    (hirr : OddOrder.RepresentationTheory.IsIrreducibleCharacter
+      (induceHU (hyp.toTypesIIIIIIVSetupS hG)
+        (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupS hG)) ℂ))) :
+    OddOrder.Peterfalvi.S07.CharacterDifferenceImage (L := ↥hyp.S) (G := G)
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)))
+      (induceHU (hyp.toTypesIIIIIIVSetupS hG)
+        (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupS hG)) ℂ)) := by
+  -- Bundle the (irreducible) member as an `IrreducibleCharacter ↥S`.
+  set φ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥hyp.S :=
+    ⟨induceHU (hyp.toTypesIIIIIIVSetupS hG)
+      (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupS hG)) ℂ), hirr⟩ with hφ_def
+  -- Non-realness of the member (the `¬IsReal` input), from the family property + `Odd |S|`.
+  have hreal : ¬ ClassFunction.IsReal (φ : ClassFunction ↥hyp.S ℂ) :=
+    sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupS hG) (hyp.oddCardS hG) ⟨ξ, hξ, rfl⟩
+  -- The difference support `((φ)̄ − φ).support ⊆ supportInSubgroup A(S) S` (the `hdiffsupp` input).
+  have hdiffsupp :
+      ((φ : ClassFunction ↥hyp.S ℂ).conj - (φ : ClassFunction ↥hyp.S ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S :=
+    hyp.sSet_member_diffsupp hG hξ
+  -- Package via the general (5.3.a) Dade R-datum constructor.
+  exact OddOrder.Peterfalvi.S07.dadeCharacterDifferenceImageOfDiff
+    (hyp.dadeHypS hG) (hyp.dadeHypS_hconj hG) φ hreal hdiffsupp
+
 open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **Honest §9 character data on `S`** (issue 2035 step 3): the `mkSection11CharacterDataS`
 mirror with the *genuine* coherence inputs — `tau := Ind_S^G` (`indS`, Peterfalvi (13.2.e)) and

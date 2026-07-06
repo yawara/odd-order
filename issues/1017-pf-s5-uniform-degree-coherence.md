@@ -531,3 +531,28 @@ assembly subagent が verify-first で確定 (honest STOP、sorry-hoist せず t
 を閉じるには CORE keystone 2 つ (Blocker 1 mixed-family coherence 機構 + Blocker 2 (C')^# dade=Ind bridge) が
 残る。両者 genuine multi-lemma FT content (wiring でない)。S15 coherence は genuine multi-session frontier。
 次 = Blocker 1 (mixed-family coherence 機構、prime-TI residue Rmu 活用) を優先 (Blocker 2 より central)。
+
+## 2026-07-06 更新 #17 (lane b, subagent 検証) — ★★Blocker 1 訂正: mixed family は coherentPairChain で扱える (新構造 不要)
+
+更新 #16 の Blocker 1 (「全 mixed-family subcoherent 構造が要 build」) は verify-first で**部分的に誤り**と判明:
+
+- **whole-family subcoherent は不要**: repo の per-step adjoining engine
+  `retarget_isCoherent_of_decompositions_and_memberFamily` (S07_Coherence:4083) / `coherentPairChain`
+  (:4907) は whole-family subcoherent でなく **`IsCoherent` + per-member `CharacterPsiDecomposition`** を
+  consume。`CharacterPsiDecomposition.imageFamily : OrthonormalCharacterImageFamily` は
+  `imageSet : Finset` = **可変長** (:780)。⟹ reducible residue μ_j は 2w₁-元 imageFamily で
+  pair-chain に adjoin 可 (2-元 CharacterDifferenceImage に収める必要なし)。**新構造 build 不要**。
+- **Coq skeleton 一致** (PFsection9:1484-1660): S1 uniform base (`uniform_degree_coherence`) →
+  `extend_coherent` で S3 の conjugate pairs を degree 順に adjoin (elim: nS 帰納)。
+- **repo route (3 stage、engine 全 landed)**: base = `coherent_subset_of_constant_degree` (irrSubcoherent +
+  per-member CharacterDifferenceImage) on S1={χ∈sSet|χ(1)=q·a} / induction = `coherentPairChain`
+  (reducibles as CharacterPsiDecomposition) / norm chain = landed (Snorm/sumnS/xAdjoinStepW)。
+- **注意**: `coherentUnion_of_glued` (S07:4508) は (6.8) two-block glue で shape 違い、(9.11) には不適。
+
+**landed 更新 #17**: `oddCardS` + `sSet_member_differenceImage` (per-irreducible-member R-datum、上記 base の入力)。
+
+**⟹ Blocker 1 は「新構造」でなく「既存 coherentPairChain engine を §9 sSet に wire」= substantial だが
+tractable assembly**。Blocker 2 ((C')^# dade=Ind bridge、下流 tau1S_apply_induce 用) は依然 separate。
+次 = irreducible sub-family の S07.Hypothesis (irrSubcoherent、sSet_member_differenceImage を Rdatum に
+wrap、per-member irreducibility を prTIres_irr_dichotomy/inertia から) → coherent_subset_of_constant_degree
+で S1 base coherence。
