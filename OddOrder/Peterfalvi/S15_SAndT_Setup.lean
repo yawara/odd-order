@@ -997,6 +997,45 @@ theorem Hypothesis.sSet_member_support_subset_A [Fintype G] [Finite G]
   rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup, hxeq]
   exact honestTypeP2ASet_conj_mem c.2 hwA
 
+open OddOrder.Peterfalvi.S11 in
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(5.3.a) per-member difference support** (issue 1017): the Dade-image support hypothesis
+`((Ind ξ)̄ − Ind ξ).support ⊆ A(S)` (as an `S`-support) that `S07.dadeCharacterDifferenceImageOfDiff`
+consumes to build the `CharacterDifferenceImage` of an irreducible §9 member.  From
+`sSet_member_support_subset_A` (support `⊆ A(S) ∪ {1}`), removing the identity: the difference
+`(Ind ξ)̄ − Ind ξ` vanishes at `1` (the degree `Ind ξ(1) = q·ξ(1)` is a positive real, self-conjugate).
+This is the `hdiffsupp` half of the R-datum — the S-instance `R1_diffsupp` (Peterfalvi §12/§5). -/
+theorem Hypothesis.sSet_member_diffsupp [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {ξ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(huSub (hyp.toTypesIIIIIIVSetupS hG))}
+    (hξ : ξ ∈ xiSet (hyp.toTypesIIIIIIVSetupS hG)) :
+    ((induceHU (hyp.toTypesIIIIIIVSetupS hG)
+          (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupS hG)) ℂ)).conj
+        - induceHU (hyp.toTypesIIIIIIVSetupS hG)
+          (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupS hG)) ℂ)).support
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S := by
+  set φ : ClassFunction ↥hyp.S ℂ :=
+    induceHU (hyp.toTypesIIIIIIVSetupS hG)
+      (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupS hG)) ℂ) with hφ
+  have hsupp_eq : φ.conj.support = φ.support := by
+    ext y
+    simp only [ClassFunction.mem_support, ne_eq, ClassFunction.conj_apply, star_eq_zero]
+  intro x hx
+  have hx0 : (φ.conj - φ) x ≠ 0 := hx
+  have hxsupp : x ∈ φ.support := by
+    have hxU := ClassFunction.support_sub_subset _ _ hx
+    rwa [hsupp_eq, Set.union_self] at hxU
+  rcases hyp.sSet_member_support_subset_A hG hξ (hφ ▸ hxsupp) with h | h
+  · exact h
+  · exfalso
+    rw [Set.mem_singleton_iff] at h
+    subst h
+    obtain ⟨d, _, hd⟩ :=
+      OddOrder.RepresentationTheory.irreducibleCharacter_apply_one_eq_pos_natCast ξ
+    apply hx0
+    rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hφ, induceHU_apply_one_eq_q_mul, hd,
+      star_mul', star_natCast, star_natCast, sub_self]
+
 /-! ### Dade-independent subcoherence inputs for the §9 induced family `𝒮`
 
 The (5.3.a) subcoherence assembler `S07.irrSubcoherent` needs, besides the Dade isometry, the family
