@@ -4188,8 +4188,13 @@ the deep step this `sorry` still stands for.  See `notes/peterfalvi/s13_11_8_ort
 theorem Hypothesis.coherent_Sset_of_column_identities [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
+    (htype : IsTypeIII M ∨ IsTypeIV M) (hnt : TypePNontrivialCore M hyp.typeP)
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetup htype hnt))
+    (hw2 : 2 ≤ hyp.w2)
+    (hd1 : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muGrid hG hG.odd 0 j 1 ≠ 1)
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
     (hζ1 : ζ 1 = (hyp.w1 : ℂ)) {d : ℕ}
+    (hdu : (d : ℂ) = ((hyp.mkSection11CharacterData (hyp.toTypesIIIIIIVSetup htype hnt) chief).u : ℂ))
     (hcol : ∀ j : Fin hyp.w2, j ≠ 0 →
       hyp.tau ((∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j) - (d : ℂ) • ζ)
         = (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hG.odd i j)
@@ -4226,15 +4231,28 @@ theorem Hypothesis.coherent_Sset_of_column_identities [Finite G]
     -- column witness `ψ₀ = ∑ᵢ μ_{ij₀} ∈ D` — bundled here as a single §9 obligation (NOT a vacuous
     -- hoist: it is the genuine (11.8.1) two-degree-class structure of `𝒮(C)`, §9/world-bridge-gated).
     have hζmem : ζ ∈ hyp.SHCSet := ⟨hζS, hζirr, hζ1⟩
-    obtain ⟨qu, ψ₀, hqune, hqu, hS2deg, hψ₀, hDmem⟩ :
-        ∃ (qu : ℕ) (ψ₀ : ClassFunction ↥M ℂ), (qu : ℂ) ≠ 0 ∧
-          (qu : ℂ) = (d : ℂ) * (hyp.w1 : ℂ) ∧
-          (∀ y ∈ hyp.Sset \ hyp.SHCSet, (y : ↥M → ℂ) 1 = (qu : ℂ)) ∧
-          ψ₀ ∈ hyp.Sset \ hyp.SHCSet ∧
-          (ψ₀ - (d : ℂ) • ζ) ∈ {φ | ∃ j : Fin hyp.w2, j ≠ 0 ∧
-            φ = (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j) - (d : ℂ) • ζ} := by
-      sorry
-    exact hyp.hgen_of_S2_uniform_degree hG hqune hqu hS2deg hζmem hψ₀ _ hDmem
+    obtain ⟨ψ₀, hψ₀, hDmem⟩ : ∃ ψ₀ ∈ hyp.Sset \ hyp.SHCSet,
+        (ψ₀ - (d : ℂ) • ζ) ∈ {φ : ClassFunction ↥M ℂ | ∃ j : Fin hyp.w2, j ≠ 0 ∧
+          φ = (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j) - (d : ℂ) • ζ} := by
+      -- column witness: a nonzero μ-column `μ_{j₀}` (`w₂ ≥ 2`) is reducible
+      -- (`muGrid_column_sum_mem_sOf_H0_and_reducible` ⟹ ∉ `SHCSet`) and `∈ inducedFamily`
+      -- (`muGrid_column_sum_mem_inducedFamily`), with `μ_{j₀} − dζ ∈ D` by definition of `D`.
+      obtain ⟨j₀, hj₀⟩ : ∃ j₀ : Fin hyp.w2, j₀ ≠ 0 :=
+        ⟨⟨1, by omega⟩, Fin.ne_of_val_ne (by simp)⟩
+      exact ⟨∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j₀,
+        ⟨hyp.muGrid_column_sum_mem_inducedFamily hG hG.odd j₀ (hd1 j₀ hj₀),
+          fun hmem => (hyp.muGrid_column_sum_mem_sOf_H0_and_reducible hG htype hnt chief j₀ hj₀).2
+            hmem.2.1⟩,
+        j₀, hj₀, rfl⟩
+    refine hyp.hgen_of_S2_uniform_degree hG ?_ ?_
+      (fun y hy => hyp.Sset_diff_SHCSet_apply_one_eq_qu hG htype hnt chief hy) hζmem hψ₀ _ hDmem
+    · -- `hqune`: `q·u ≠ 0` (both positive cardinalities).
+      have hqpos : 0 < (hyp.toTypesIIIIIIVSetup htype hnt).q := by
+        change 0 < hyp.w1; exact Nat.card_pos
+      exact_mod_cast Nat.mul_ne_zero hqpos.ne' Nat.card_pos.ne'
+    · -- `hqu`: `(q·u : ℂ) = d·w₁` via `q = w₁` (rfl) and `hdu` (`d = u`).
+      have hq : (hyp.toTypesIIIIIIVSetup htype hnt).q = hyp.w1 := rfl
+      rw [Nat.cast_mul, hq, ← hdu]; ring
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8), the genuine non-orthogonality** (lane-b W3 obligation, issue 2020).
@@ -4303,8 +4321,26 @@ theorem exists_zeta_residual_not_orthogonal [Finite G]
       params.zeta_irreducible hz1 params.w2_prime hd hnf hdegall hμ0all hδjj params.two_le_n
       hRn hZ hRorth hRmem hRrev h114
   -- (11.8.6) the τ₂ union makes `S = S(C)` coherent, contradicting (10.8) `S_not_coherent`.
+  -- Thread the §9 datum (htype ⟹ hnt, chief) and `d = u` (`charParam_d_eq_u`) into the capstone so
+  -- its `hgen` consumes the world-bridge `Sset_diff_SHCSet_apply_one_eq_qu` (this session).
+  have hnt : TypePNontrivialCore M hyp.typeP := typePNontrivialCore_of_isTypeIIIorIV htype hyp.typeP
+  obtain ⟨chief, -⟩ :=
+    OddOrder.Peterfalvi.S11.exists_chiefFactorData hG (hyp.toTypesIIIIIIVSetup htype hnt)
+  have hdu : (params.d : ℂ)
+      = ((hyp.mkSection11CharacterData (hyp.toTypesIIIIIIVSetup htype hnt) chief).u : ℂ) := by
+    exact_mod_cast hyp.charParam_d_eq_u hG htype params hmu hnt chief
+  -- `w₂ ≥ 2` (`params.w2_prime`) and the μ-grid degree `μ_{0j}(1) = d > 1` (`degree_independent` +
+  -- `d_gt_one`) feed the capstone's `ψ₀` column witness (reducible `μ_{j₀} ∈ Sset \ SHCSet`).
+  have hw2 : 2 ≤ hyp.w2 := params.w2_prime.two_le
+  have hd1 : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muGrid hG hG.odd 0 j 1 ≠ 1 := by
+    intro j hj
+    have hdeg : hyp.muGrid hG hG.odd 0 j 1 = (params.d : ℂ) :=
+      hmu ▸ params.degree_independent 0 j hj
+    rw [hdeg]
+    exact_mod_cast (show params.d ≠ 1 by have := params.d_gt_one; omega)
   exact S_not_coherent hG hyp
-    (hyp.coherent_Sset_of_column_identities hG ν hzS params.zeta_irreducible hz1 hcol)
+    (hyp.coherent_Sset_of_column_identities hG ν htype hnt chief hw2 hd1 hzS
+      params.zeta_irreducible hz1 hdu hcol)
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.9.b)**: for the §10 hypothesis on a type-III/IV/V maximal subgroup, `w₂ < w₁`
