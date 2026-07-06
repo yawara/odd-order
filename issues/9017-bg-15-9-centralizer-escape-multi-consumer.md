@@ -194,3 +194,22 @@ S16→S15 hoist) = hub-territory** ([[hub-arbitrates-cross-lane-autonomously]])�
 - **Cor 15.9** (`centralizer_escape_final_local`): Coq `nonFtype_signalizer_base` (BGsection15:1399)。
   `FT_signalizer_context` (Thm 14.4) → `typeP2_neighbor_is_typeF_of_mem` (M∈𝓜_𝓕) → **Thm 15.8** で E2=1 →
   Thm 15.7 (`nonTI_Fitting_structure`) で E3=1/cyclic → Frobenius M。S16→S15 hoist は **b 所有** (S16_MainResults も b) ゆえ territory 内。
+
+## 2026-07-06 更新 #5 (lane b, /loop) — ★Thm 15.8 Phase D core landed sorry-free (2 補題) + ★composite-label finding
+
+commit `f82e4c7e` (S15_MF、build GREEN full 3933 jobs、axiom-clean = [propext, Classical.choice, Quot.sound]、real sorry count 2→2 不変)。Phase D (Coq BGsection15.v:1383-1392 の `apply/pgroupP` τ₂(M)=∅ step) の**再利用可能 core を実証明**:
+
+1. **`centralizer_kappaCompl_le_of_mem_tau2`** (S15_MF:9614): 型-P2 の abelian (κ∪σ)'-Hall `U` + κ-Hall `K` (K≤N(U)) について、各 prime `r∈τ₂(M)` (r∣|U|) で **`C_G(U) ≤ M`**。証明 = Coq 準拠に既存 machinery を assemble: r∈(κ∪σ)' (κ⊆τ₁∪τ₃ pRank≤1 vs τ₂ pRank 2 ⟹ r∉κ) → E-setup E⊇U (`exists_subgroupESetup_with_le`) → B∈ℰ²_r(E) (`exists_elemAb_rank_two_le_E_of_tau2`) → B⊴E (`elemAb_normal_in_E_of_tau2`) + C_G(B)≤E≤M (Cor 12.6b `centralizer_le_E_of_tau2`) → ↥E 内で **B⊆U** (`Subgroup.IsPiGroup.normal_le_hall` = Coq `normal_sub_max_pgroup`; B.subgroupOf E は normal (κ∪σ)'-subgroup、U.subgroupOf E は (κ∪σ)'-Hall (hU から `relIndex_mul_relIndex` で ↥E に transfer)) → C_G(U)⊆C_G(B)⊆M。
+2. **`not_prime_mem_tau2_of_centralizer_kappaCompl_not_le`** (S15_MF:9633): escape witness `¬(C_G(U)≤M)` から **`∀ r, r.Prime → r∉τ₂(M)`**。prime r∈τ₂ は r∣|M| (`S09.mem_primeFactors_card_of_pos_pRank`) + r∈(κ∪σ)' ⟹ r∣|U| (Hall index) で上の core を適用 → 矛盾。
+
+⟹ **Phase D は「escape witness さえ得れば prime τ₂(M) は空」まで landed** (last-mile engine 完成、gated endpoint pattern)。残 gate = escape witness `¬(C_G(U)≤M)` を Phase B/C から得る deep 部分。
+
+### ★重要 finding: literal `tau2 M = ∅` は Coq より強い (composite-label)
+repo の `tau2 M = {p | p∉σ M ∧ pRank M p = 2}` は **ℕ 上** (素数限定でない)。Coq `\tau2` は nat_pred で暗黙に prime 限定ゆえ Coq `\tau2(M) =i ∅` は prime のみ主張。**repo の literal `tau2 M = ∅` は composite p も排除する必要があり、Coq より真に強い**。composite odd p (例 p=15: A=C₃×C₃×C₅×C₅, |A|=225=15², log₁₅225=2 で pRank=2 が abstract には成立) は `pRank M p=2` を持ちうる ⟹ `p∈τ₂ M`。`centralizer_kappaCompl_le_of_mem_tau2` は `[Fact r.Prime]` (ℰ² 抽出) を要すゆえ composite に直接適用不能。⟹ **full theorem の `tau2 M=∅` は (a) prime 側 = 本 helper で閉じる、(b) composite 側 = 別途「型-P2 の M で composite p は pRank≠2」を要する** (S12 の τ₂-primality 慣例と同根、要 group-theory)。**次 session は conclusion を `∀ p, p.Prime → p∉τ₂ M` の prime 形に緩めるか、composite 排除補題を別途 build するか要判断** (consumer 0 ゆえ downstream 破壊なし; ただし Cor 15.9 が literal を要するなら composite 側も要)。
+
+### 残 Thm 15.8 gate (次 iteration、= Phase B/C の deep 一続き)
+- escape witness = Phase C の X⊄M (X=A⊓C(H_σ), |X|=q) + X⊆C(H_σ)⊆C(U) (U⊆H_σ)。
+- Phase C = |X|=q + τ₂(H)={q} (`tau2_singleton_of_nonabelianSylow` を neighbour H に適用、要 ∃ Sylow-q G nonabelian)。
+- **def_q1 (q1=q)** = Uniqueness Theorem (Q∈𝒰 + A⊆C(Q) coprime ⟹ H=L 矛盾)。Q∈𝒰 は Coq では `Ptype_structure` の Sylow に対する rank3_Uniqueness (BGsection12.v:2642)。repo `S14.typeP_structure` は Q∈𝒰 clause を直接 export せず ⟹ rank-3 uniqueness or nonabelian 経由が要。
+- Q nonabelian = `Msigma_inf_conj_inf_derived_eq_bot` (S12_Lemma1217:150) + focal/coprime。
+これらは L-structure (`typeP2_partner_structure_of_mem` = 既 landed Phase B) の上に積む deep assembly。standalone 化しにくく inline assemble 要 (更新 #4 の評価と一致)。
