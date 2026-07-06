@@ -2285,3 +2285,36 @@ column-degree (`muGrid_column_sum_apply_one_eq_qu`) + reducible-side (`inducedFa
 **hS2deg assembly** (`Sset_diff_SHCSet_apply_one_eq_qu`)。残 = 上記 2 §9 obligation (deep、repo 不在) +
 capstone threading (htype/hnt/chief signature 拡張 + d=u (`charParam_d_eq_u`) + ψ₀ column witness で
 bundled §9 sorry を hS2deg cite で discharge)。
+
+## 2026-07-07 update³⁵ (lane-a /loop, ユーザー裁定「§9 head-on 継続」) — capstone threading 設計確定 (hnt blocker 解消)
+
+world-bridge assembly (hS2deg) を capstone の bundled §9 sorry に配線する threading 設計を code-level 確定:
+
+### ★ enabling blocker 解消: hnt 導出可能
+`typePNontrivialCore_of_isTypeIIIorIV (htype : IsTypeIII ∨ IsTypeIV) (data) : TypePNontrivialCore M data`
+(MaximalSubgroupType:303)。∴ capstone に **htype を thread すれば hnt := typePNontrivialCore_of_isTypeIIIorIV
+htype hyp.typeP** で導出。exists_zeta は htype 保持。
+
+### ★ threading pieces (全 verified)
+- `q = w₁` **rfl** (`(toTypesIIIIIIVSetup htype hnt).q = hyp.w1`、S12_Sec9:686/1602)。
+- `exists_chiefFactorData hG (toTypes htype hnt)` で chief obtain。
+- `w₂ ≥ 2`: `params.w2_prime.two_le` (ψ₀ column witness 用)。
+- hS2deg: `Sset_diff_SHCSet_apply_one_eq_qu hG htype hnt chief` (landed)。degree = q·u = w₁·u。
+
+### ★ chief-consistency subtlety (要注意、設計制約)
+capstone の `d` は abstract ({d:ℕ}、caller の params.d)。qu = q·u = w₁·chars.u だが bundled ∃ は
+qu = d·w₁ を要す → **chars.u = d** が必要 = `charParam_d_eq_u` (params.d = chars.u、S12_Sec9:643)。
+これは **params + 特定 chief** を要し、capstone は params 無 + 自前 chief は caller の chief と別物 →
+u 不整合リスク。∴ **caller (exists_zeta) から chief + `hdu:(d:ℂ)=chars.u` を thread** (同一 chief で
+u-consistency 保証) する設計が clean。
+
+### 次 iteration の threading edit (設計確定済)
+1. capstone signature に `(htype) (hnt) (chief : ChiefFactorData (toTypes htype hnt))
+   (hdu : (d:ℂ) = (mkSection11 (toTypes htype hnt) chief).u)` 追加。
+2. hgen bullet: bundled ∃ を discharge — hS2deg=`Sset_diff_SHCSet_apply_one_eq_qu`, qu=q·u,
+   hqu via hdu+q=w₁(rfl), ψ₀=column j₀ (w₂≥2, `muGrid_column_sum_mem_inducedFamily` + reducible∉SHCSet),
+   hD by D-def。
+3. caller (exists_zeta): htype(有)/hnt(導出)/chief(exists_chiefFactorData)/hdu(charParam_d_eq_u) 供給。
+⟹ capstone の bundled §9 sorry を discharge、残 = hS2deg 内の 2 §9 obligation ((9.5)/(9.8)) + capstone
+の hmixed/hDτ (§14)。deep §9 crux = (9.5) reducible-inclusion (Frobenius: H⊆Ker θ → Ind θ irr、
+repo 不在) + (9.8) irr-degree 完全性。
