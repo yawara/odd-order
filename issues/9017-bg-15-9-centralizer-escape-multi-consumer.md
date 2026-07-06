@@ -25,6 +25,10 @@ landed) ⟹ **trajectory 保全としてこの drift を追認、BG §15/§16 no
 1. **owner = lane b**。`OddOrder/BG/Ch4_FamilyOfMaximal/{S15_MF.lean §15.8/15.9 部, S16_MainResults.lean}` の
    BG §15/§16 残 sorry は **b の active territory** (merge_monitor 🔒 マップ + owned_re を更新、「BG=共有凍結」は
    この node について解除)。他 BG/** は従来どおり共有凍結。
+   - **carve-out 拡張 (2026-07-06 合流 tick)**: `S14_TypePCounting.lean` の Cor 14.12 (`typeP2_neighbor_is_typeF`
+     + 新 `_of_mem` variant、Thm 15.8 が要する `K⊆F(E)` export) も **b territory に拡張**。既存 theorem の
+     signature 保持・sorry 2→2 regression なし・他 owner なし・new axiom なしを hub が検証 → 軌道保全 (STOP でない)。
+     b は今後 §14 への追加編集を hub に proactive flag すること (今回は事後追認)。
 2. **Thm 15.8 `tau2_transfer_constraint` の signature 訂正を承認** (更新 #2 coordination point (ii))。現 signature は
    `H` を `hHtau` のみで導入し M との signalizer-neighbour link を欠く = **unsound (tau2 H={|K|} 導出不能)**、
    かつ **consumer 0**。Coq 準拠 (Mstar/U/r/R/H∈𝓜(N(R)) witness bind) への訂正は「unsound carrier の是正 + consumer 0」
@@ -131,3 +135,62 @@ work 中ゆえ territorial 回避、"derivable if needed" 記載)。(2) `tau2_tr
 chain は bounded ゆえ lane b が Thm 15.8 まで build 継続 (multi-consumer、high-leverage)、Cor 15.9 の hoist は hub 裁定待ち。
 
 次: Thm 15.8 を build (dropped clauses 再derive + signature 訂正 + §12 assembly)。
+
+## 2026-07-06 更新 #3 (lane b, /loop 再開) — ★訂正: β theory は既存 (subagent の「absent」は Coq名grep miss)、Thm 15.8 は tractable
+
+前 subagent の「`tau2_not_beta` / global β は repo 不在」は **誤り** ([[verify-port-state-by-number-not-coq-name]] の
+罠、本 project 再発)。**β-radical theory は BG §10 に完全形式化済**: `S10.beta M` (`S10_BetaRadicalGlobal.lean` +
+`S10_BetaRadicalCore.lean`)、`S10.mem_beta_iff`、`S10.Mbeta_isPiGroup`、Lemma 10.8(c)
+`derived_msigma_hasNormalPComplement_of_not_mem_beta`、`isNarrow_sylow_of_not_mem_beta`。S12/S13 で多用
+(S12_E:359 `q∉S10.beta M`・S12_Proposition1215:672/701 `r,q∉S10.beta`・S13_Theorem1310:808
+`factorization_inf_centralizer_Q_eq_of_not_beta` が inline 導出済)。⟹ Thm 15.8 の `q∉β(G)` (Uniqueness Thm)
+step は **既存 S10.beta machinery で導出可**、foundational gap 無。
+
+**⟹ Thm 15.8 の真の残 blocker は 1 点のみ = §14 Cor 14.12 (`typeP2_neighbor_is_typeF`) の dropped 2 clauses
+(`K⊆F(H∩M*)` / `H∩M*=σ(H)'-complement`) の re-export** (S14 内部 Mstar-依存 ~400行ゆえ S14 signature 拡張が要、
+S15 で再derive 不能)。これは **actively-worked S14_TypePCounting への additive edit = coordination**。加えて Cor 15.9
+は S16→S15 hoist (hub-level)。⟹ **chain 全体は tractable、残るは 2 つの cross-lane coordination のみ (S14 re-export +
+S16→S15 hoist) = hub-territory** ([[hub-arbitrates-cross-lane-autonomously]])。lane b の unilateral 部分
+(char-side wiring + sound signature + spine 補題 + β 確認) は完遂。hub は S14 拡張 + S16→S15 hoist の allocation を裁定可。
+
+## 2026-07-06 更新 #4 (lane b, /loop 再開) — ★S14 export 完了 + Thm 15.8 Phase A landed (sorry-free) + 前 inventory の naming-trap 訂正
+
+**⚠ 前 subagent inventory ("8 lemmas NOT YET PORTED") は STALE な docstring の parrot で誤り** ([[verify-port-state-by-number-not-coq-name]]
+の罠、本 issue でも再発)。BG 番号 + descriptive 名で直接検証したところ **Thm 15.8 の machinery はほぼ全て repo に存在** (更新 #2 の慎重 inventory と一致)。
+
+### 2 commit landed (build green, sorry-free)
+1. **`typeP2_neighbor_is_typeF_of_mem`** (S14_TypePCounting、103c4a8a): Cor 14.12 を **H-parameterized** 化 + dropped
+   2 clauses を export = **`∃ E E₁ E₂ E₃, SubgroupESetup H E… ∧ K≤E ∧ K⊆F(E)`**。内部で既に確立済 (`hEsetup`+`hsK_FE`)
+   だったので additive。従来の ∃-form `typeP2_neighbor_is_typeF` は coatom で H を選ぶ薄い wrapper として残置 →
+   S16 の 2 consumer 不変。**「S14 で再derive 不能」だった dropped clauses は export で解決**(更新 #3 の懸念は解消、S14 signature 拡張のみで足りた)。
+2. **`exists_rank2_elemAb_le_centralizer_kappa_of_tau2`** (S15_MF、75006c8e): **Thm 15.8 Phase A** (Coq `cKA` まで)。
+   `SubgroupESetup H` + `K⊆F(E)` + prime `q₁∈τ₂(H)` → `∃ A∈ℰ²_{q₁}(E), A≤E ∧ A⊆C(K)`。
+
+### 検証済 Coq→repo 補題マップ (Thm 15.8 `tau2_P2type_signalizer` の残 Phase B/C/D)
+| Coq step | repo lemma (verified present) |
+|---|---|
+| `Ptype_structure` (prime q) | `card_kappaHall_prime_of_isTypeP2` (S15_MF、既 landed) / `S14.typeP_structure` |
+| `ex_tau2Elem` | `S12.exists_elemAb_rank_two_le_E_of_tau2` (SubgroupESetup 取る) |
+| `tau2_compl_context` (A⊴E) | `S12.elemAb_normal_in_E_of_tau2` (S12_Corollary126:379) |
+| `sigma'_nil_abelian` | `S12.nilpotent_sigmaComplement_abelian` (S12_Corollary1210:158).1 |
+| `tau2_not_beta` (q∉β) | `S12.tau2_prime_mem_sigma_diff_beta` (S12_Lemma1211:390、q∈σ(Mst)\β(Mst) 形) |
+| `Ptype_embedding` (L=M* 構造) | `S14.typeP_duality` (S14 で使用中) |
+| Cor 12.6(a)(b) | `S12_Corollary126` (`centralizer_le_E_of_tau2` 等) |
+| `Fcore_structure` (M*_σ nil / Sylow Q⊆F) | S15_MF `maxNilpotentNormalHall_*` + Thm 15.2 machinery |
+| Uniqueness Thm 9.6 (`cent_uniq_Uniqueness`) | `BG/Ch2_Uniqueness/S09_Theorem91` |
+| `nonabelian_pgroup_isUniquelyMaximal` (Thm 12.13) | `S12_Theorem1213` |
+| `nonabelian_tau2` (τ₂(H)={q}, |X|=q) | `S12.tau2_singleton_of_nonabelianSylow` (S12_Theorem127d:550、大 bundle) |
+| `Ptype_cyclics` (K≠1, K⊆(L_σ)') | `S14.typeP_structure` / Ptype cyclic clause |
+| `kappa_structure` / `kappa_compl_context` (τ₂(M)=∅) | `S14.kappa_*` 系 |
+| `pprod_focal_coprime` (Q nonabelian) | 要 grep (focal/coprime、§12 内) |
+
+### 残 Thm 15.8 (Phase B/C/D、= 一続きの assembly、次 iteration)
+- **B**: A⊆C(K)⊆M* (`sAL`、hMstar から C(K)⊆Mstar) → A⊆M*_σ (Cor 12.6(b)) → L-structure (`typeP_duality`) →
+  q,q1∈σ(L)、Q=O_q(L) Sylow → **def_q1: q1=q** (Uniqueness `cent_uniq_Uniqueness` + Q∈𝒰) → **τ₂(H)={q}**。
+- **C**: P1maxL / nilLs (Fcore_structure) / K⊆(L_σ)' (Ptype_cyclics) / Q nonabelian (pprod_focal) / |X|=q
+  (`tau2_singleton_of_nonabelianSylow`)。
+- **D**: X≠K → X⊄M → C(U)⊄M → **τ₂(M)=∅** (`kappa_compl_context` + tau2_compl_context)。
+これらは standalone helper に切りにくい一続きの論証ゆえ、Thm 15.8 本体を inline で assemble する (Phase A helper を cite)。
+- **Cor 15.9** (`centralizer_escape_final_local`): Coq `nonFtype_signalizer_base` (BGsection15:1399)。
+  `FT_signalizer_context` (Thm 14.4) → `typeP2_neighbor_is_typeF_of_mem` (M∈𝓜_𝓕) → **Thm 15.8** で E2=1 →
+  Thm 15.7 (`nonTI_Fitting_structure`) で E3=1/cyclic → Frobenius M。S16→S15 hoist は **b 所有** (S16_MainResults も b) ゆえ territory 内。

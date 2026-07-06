@@ -9419,31 +9419,98 @@ theorem card_kappaHall_prime_of_isTypeP2 [Finite G]
     (S14.typeP_structure hG hM hP2.1 hKM hK rfl hU).2.2.2.2.1 hP2
   exact ⟨q, hq, hKq⟩
 
-/-- **BG Theorem 15.8** (mmd L4264; Feit--Thompson 1991): in the Corollary 14.12 setup,
-nonempty `tau_2(H)` forces `tau_2(M) = ∅`, `q := |K|` prime, and `tau_2(H) = {q}`.
+/-- **Phase A of BG Theorem 15.8** (Coq `tau2_P2type_signalizer`, up to `cKA`): from the
+σ(H)′-Hall `E`-setup of a maximal `H` (the Corollary 14.12 signalizer neighbour supplied by
+`typeP2_neighbor_is_typeF_of_mem`), a `κ`-Hall `K ⊆ F(E)`, and a prime `q₁ ∈ τ₂(H)`,
+there is a rank-2 elementary abelian `A ≤ E` for `q₁` that centralizes `K`.
 
-Faithfulness fix (Lane G): the previous scaffold had a spurious third maximal `N` and concluded
-`tau_2(N) = {q}` (mmd: the singleton is `tau_2(H)`) and dropped `q = |K|`.
+Proof (Coq `cKA`): extract `A ∈ ℰ²_{q₁}(E)` (`exists_elemAb_rank_two_le_E_of_tau2`); then
+`A ⊴ E` (`elemAb_normal_in_E_of_tau2`) and `A` is a `q₁`-group, so `A ⊆ F(E)`
+(`le_fittingInG_of_normal_isPiSubgroup_singleton`).  `F(E)` is a nilpotent σ(H)′-subgroup of `H`,
+hence abelian (`nilpotent_sigmaComplement_abelian`, BG Cor 12.10).  As `A, K ⊆ F(E)` abelian,
+`A ⊆ C(K)`. -/
+theorem exists_rank2_elemAb_le_centralizer_kappa_of_tau2 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {H K E E₁ E₂ E₃ : Subgroup G}
+    (hEsetup : SubgroupESetup H E E₁ E₂ E₃)
+    (hKFE : K ≤ OddOrder.BG.Ch2.S08.fittingInG E)
+    {q1 : ℕ} (hq1prime : q1.Prime) (hq1 : q1 ∈ tau2 H) :
+    ∃ A : Subgroup G, A ∈ elemAbelianOfRank G q1 2 ∧ A ≤ E ∧
+      A ≤ Subgroup.centralizer (K : Set G) := by
+  classical
+  haveI : Fact q1.Prime := ⟨hq1prime⟩
+  obtain ⟨A, hA_elem, hAE⟩ := exists_elemAb_rank_two_le_E_of_tau2 hG hEsetup hq1
+  refine ⟨A, hA_elem, hAE, ?_⟩
+  -- `A ⊴ E` (Coq `nsAD`).
+  have hEnA : E ≤ Subgroup.normalizer (A : Set G) :=
+    ((elemAb_normal_in_E_of_tau2 hG hEsetup hq1 hA_elem hAE).1).1
+  have hAnormE : (A.subgroupOf E).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hAE).mpr hEnA
+  -- `A` is a `q₁`-group, so `A ⊆ F(E)`.
+  obtain ⟨hAea, hAcard⟩ := mem_elemAbelianOfRank.mp hA_elem
+  have hApi : Subgroup.IsPiSubgroup ({q1} : Set ℕ) A :=
+    isPiSubgroup_singleton_of_isPGroup hAea.isPGroup
+  have hAFE : A ≤ OddOrder.BG.Ch2.S08.fittingInG E :=
+    OddOrder.BG.Ch2.S08.le_fittingInG_of_normal_isPiSubgroup_singleton hAE hAnormE hApi
+  -- `F(E)` is a nilpotent σ(H)′-subgroup of `H`, hence abelian (Coq `sigma'_nil_abelian`).
+  have hFEnil : Group.IsNilpotent ↥(OddOrder.BG.Ch2.S08.fittingInG E) :=
+    OddOrder.BG.Ch2.S08.fittingInG_isNilpotent E
+  have hFEleH : OddOrder.BG.Ch2.S08.fittingInG E ≤ H :=
+    (OddOrder.BG.Ch2.S08.fittingInG_le E).trans hEsetup.E_le
+  have hFEpi : Subgroup.IsPiSubgroup ((OddOrder.BG.Ch3.S10.sigma H)ᶜ)
+      (OddOrder.BG.Ch2.S08.fittingInG E) := fun p hp =>
+    hEsetup.isPiGroup_sigma_compl hG p
+      (Nat.primeFactors_mono (Subgroup.card_dvd_of_le (OddOrder.BG.Ch2.S08.fittingInG_le E))
+        Nat.card_pos.ne' hp)
+  have hFEab : IsMulCommutative ↥(OddOrder.BG.Ch2.S08.fittingInG E) :=
+    (nilpotent_sigmaComplement_abelian hG hEsetup).1 _ hFEleH hFEpi hFEnil
+  -- `A, K ⊆ F(E)` abelian ⟹ `A ⊆ C(K)`.
+  exact le_centralizer_of_le_of_le hFEab hAFE hKFE
 
-⚠ **UNDER-HYPOTHESIZED relative to BG/Coq (blocked; do not close as stated).**  The Coq source
-(`tau2_P2type_signalizer`, BGsection15.v:1262) binds *seven* variables `M Mstar U K r R H` with the
-structural hypotheses `kappa_complement M U K`, `Mstar ∈ 'M('C(K))`, `r.-Sylow(U) R`, and crucially
-`H ∈ 'M('N(R))` — i.e. `H` is the *signalizer neighbour* of `M`'s `κ`-complement, produced by the
-Corollary 14.12 construction (`typeP2_neighbor_is_typeF`).  The proof then works inside
-`D := H ∩ Mstar`, using `K ⊆ F(D)` and `D` a `σ(H)'`-complement of `H` — both delivered by Cor 14.12
-in BG but **omitted from the repo `typeP2_neighbor_is_typeF` conclusion** (its docstring: *"the two
-remaining BG clauses `K ⊆ F(H ∩ M*)` and `σ(H)'-Hall(H)(H ∩ M*)` … are omitted"*).  Here `H` enters
-*only* through `hHtau : (tau2 H).Nonempty`, with **no witness tying `H` to `M`**, so the conclusion
-`tau2 H = {|K|}` is not derivable: an arbitrary maximal `H` with `τ₂(H) ≠ ∅` need not have `|K|` in
-its `τ₂`.  To close 15.8 faithfully the signature must first regain the Cor 14.12 witnesses
-(`Mstar`, `U`, `r`, `R`, `H ∈ 𝓜(N_G(R))`), which in turn requires **re-exporting the two dropped
-Cor 14.12 clauses** from `typeP2_neighbor_is_typeF` (the single most-upstream missing piece; a §14
-signature extension, not a foundational §12/Uniqueness gap).  The `|K| = q` prime conjunct alone is
-sorry-free and available via `card_kappaHall_prime_of_isTypeP2` (above). -/
+/-- **BG Theorem 15.8** (mmd L4264; Feit--Thompson 1991, `tau2_P2type_signalizer`,
+BGsection15.v:1262): in the Corollary 14.12 signalizer setup — a type-`P₂` maximal `M` with
+`κ`-complement `K` (a Hall `κ(M)`-subgroup), `U` the abelian Hall `(κ(M)∪σ(M))'`-factor
+(Proposition 14.2(a)), `M* ∈ 𝓜(C_G(K))`, `R` a Sylow `r`-subgroup of `U`, and `H ∈ 𝓜(N_G(R))` the
+signalizer neighbour — nonempty `τ₂(H)` forces `q := |K|` prime, `τ₂(H) = {q}`, and `τ₂(M) = ∅`.
+
+**Signature correction (2026-07-06, Lane b, authorized).**  The previous scaffold hypothesized
+only `(τ₂ H).Nonempty` with **no witness tying `H` to `M`**, under which the conclusion
+`τ₂ H = {|K|}` is *not derivable* (an arbitrary maximal `H` with `τ₂(H) ≠ ∅` need not have
+`|K| ∈ τ₂(H)`).  The hypotheses are now the genuine Coq `tau2_P2type_signalizer` ones:
+`kappa_complement M U K` (unbundled as `hK`/`hU`/`hUM`/`hKM`/`hUab`/`hKNU`, matching
+`typeP2_neighbor_is_typeF`), `M* ∈ 𝓜(C_G(K))` (`hMstar`), `r`-Sylow `R ≤ U` (`hr`/`hRU`/`hR`), and
+crucially **`H ∈ 𝓜(N_G(R))`** (`hH`) — the missing link making `H` the Cor 14.12 signalizer
+neighbour.  `(τ₂ H).Nonempty` faithfully renders Coq `~~ \tau2(H)^'.-group H` (every `p ∈ τ₂(H)`
+has `pRank_M(H,p) = 2 > 0`, so `p ∣ |H|`).  `tau2_transfer_constraint` has **zero code consumers**
+(only docstrings/AxiomsCheck comments cite it), so the signature change breaks nothing downstream.
+
+Proof spine (Coq `tau2_P2type_signalizer`): pick `q₁ ∈ τ₂(H)`; extract `A ∈ ℰ²_{q₁}(D)` for a
+`σ(H)'`-Hall `D ∋ K` of `H` (Cor 14.12 `hallD`, Thm 12.7 `exists_elemAb_rank_two_le_E_of_tau2`);
+`A ⊆ C(K)` (Cor 14.12 `sKFD`: `K ⊆ F(D)`, `A ⊴ D`, `F(D)` abelian), so `A ⊆ C(K) ⊆ M*` (Prop
+14.2(d)); `q₁ ∉ β(G)` (Uniqueness / Lemma 12.1(g)); `M*` type-`P₁`, `M*_σ` nilpotent; `q₁ = q`;
+`Q = O_q(M*)` nonabelian (Thm 12.13 `nonabelian_pgroup_isUniquelyMaximal`) ⟹ `X = C_A(H_σ)` has
+`|X| = q` and `τ₂(H) = {q}` (Thm 12.7 `nonabelian_tau2` = `tau2_singleton_of_nonabelianSylow`);
+finally `X ≠ K`, `C_G(U) ⊄ M`, and the `τ₂(M)`-Sylow argument give `τ₂(M) = ∅`.
+
+⚠ **Proof gap (2026-07-06):** the corrected statement is now sound and matches Coq exactly, but
+the ~130-line Coq proof is **not yet reconstructed** (it cites ~18 §10/§12/§14 Coq lemmas, several
+of which — the global `β(G)` / `tau2_not_beta` = Lemma 12.1(g), `Ptype_structure`,
+`Ptype_embedding`, `Ptype_cyclics`, `Fcore_structure`, `kappa_structure`, `pprod_focal_coprime`,
+`cent_uniq_Uniqueness` — are not yet ported as bundled repo lemmas; and the two dropped Cor 14.12
+clauses `K ⊆ F(H ∩ M*)` / `σ(H)'-Hall(H)(H ∩ M*)`, which the proof needs as `sKFD`/`hallD`,
+require §14 internals `typeP2_neighbor_is_typeF` establishes but does not export — see report).
+This `sorry` is the pre-existing one (the statement is re-hypothesized to be sound), **not new**. -/
 theorem tau2_transfer_constraint [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M H K : Subgroup G} (hM : M ∈ maximalSubgroups G) (hH : H ∈ maximalSubgroups G)
-    (hP2 : S14.IsTypeP2 M)
+    {M Mstar U K R H : Subgroup G} {r : ℕ}
+    (hM : M ∈ maximalSubgroups G) (hP2 : S14.IsTypeP2 M)
+    (hKM : K ≤ M) (hUM : U ≤ M)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hUab : ∀ a ∈ U, ∀ b ∈ U, a * b = b * a)
+    (hMstar : Mstar ∈ maximalSubgroupsContaining (Subgroup.centralizer (K : Set G)))
+    (hr : r ∈ S14.piSet U) (hRU : R ≤ U)
+    (hR : Ch03.IsHallSubgroup ({r} : Set ℕ) (R.subgroupOf U))
+    (hKNU : K ≤ Subgroup.normalizer (U : Set G))
+    (hH : H ∈ maximalSubgroupsContaining (Subgroup.normalizer (R : Set G)))
     (hHtau : (tau2 H).Nonempty) :
     tau2 M = ∅ ∧ ∃ q : ℕ, q.Prime ∧ Nat.card ↥K = q ∧ tau2 H = {q} := by
   sorry
