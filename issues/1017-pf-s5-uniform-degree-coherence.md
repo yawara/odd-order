@@ -575,3 +575,23 @@ Galois=q·u。hiso は `dadeIntegralCharacterMap_inner_eq_on_supported_span` (A-
 4. NEW IsCoherent → coherent_H0Cprime_S re-point。
 
 subcoherence structure 自体 (genuine deliverable) は built & honest。次 = S1 base coherence (要 degree 機構)。
+
+## 2026-07-06 更新 #19 (lane b) — S1 base coherence LANDED (sSetIrrDeg_coherent)、≥2 count は §9(9.8.d) gate
+
+`sSetIrrDeg_coherent : Nonempty (IsCoherent τ (sSetIrrDeg d) A)` landed (base 段の IsCoherent、
+sSetIrrDeg_subcoherent → coherent_subset_of_constant_degree)。8/9 hypotheses は landed で internal
+discharge、**h2 (2≤ncard) と hd0 (d≠0) は parameter 露出** (honest deferral)。
+
+**★≥2 count は genuine upstream gate**: `2 ≤ (sSetIrrDeg d).ncard` (2 distinct degree-d 既約 member) の
+補題は repo 不在。degree-qa source (caseA_exists_irreducible_source_degree_qa S11:6437 + M-induction 版
+S11:12250) は共に sorry-free だが **existence 1 member のみ**、count ≥2 は §9 (9.8.d) counting content で
+未形式化。h2 露出でこの upstream fact を caller に defer (def は sorry-free)。
+
+**S15 coherence keystone の現状 (本 session の到達点)**:
+- ✅ landed: dadeHypS/hconj/hreal/hortho/hdiffsupp/(4.7) support/per-member R-datum
+  (sSet_member_differenceImage)/base subcoherence (sSetIrrDeg_subcoherent)/base coherence (sSetIrrDeg_coherent)。
+- 🔲 残 (genuine multi-session): (a) §9 (9.8.d) ≥2 count (h2 の供給、upstream)、
+  (b) coherentPairChain induction (S3 conjugate pairs adjoin、reducibles as CharacterPsiDecomposition) で
+  全 sSet coherence へ、(c) Blocker 2 ((C')^# dade=Ind bridge、下流 tau1S_apply_induce 用、genuine TI content)、
+  (d) NEW IsCoherent 組成 → coherent_H0Cprime_S re-point。
+route は完全確定・engine 全 landed、残は上記 4 点 (partly gated on 他レーン §9 sorried lemma + Blocker 2 TI)。
