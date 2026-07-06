@@ -57,6 +57,25 @@ repo に無い**。⟹ gate-2 は single §14 sorry に還元 **不可能**。ob
    共有 supported lattice 上で `τ` に restrict する `ν` を作る」)。**これが (11.8.6) の deep char 本体**。
    S07 は lane-b carve-out だがこの constructor は不在 → **lane-b coherence infra として要 build**。
 
+## ⚖️ HUB RULING (2026-07-06 夕, レーン分担監査 + ユーザー裁可) — obligation-2 (`τ₃` glue-map constructor) を **lane a に carve-out**
+
+レーン分担監査で、a の gate-2 は真の carrier gate に collapse (obligation-1 hY は §14-gated、obligation-2 の
+`ν`-constructor は repo 不在) = **a に正面から進められる ungated work が無い**状態と確定。同時に lane b は
+BG §15/§16 (9017) の owner を追認され負荷過多。⟹ **負荷分散 + a の idling 防止**のため、obligation-2 を
+当初案 (b へ carve) から **lane a への temporary S07 carve-out** に変更 (hub 裁定、ユーザー裁可):
+
+1. **obligation-2 = non-orthonormal `S₂` 用 `τ₃`/`ν` glue-map constructor** を **lane a が build**。
+   `OddOrder/Peterfalvi/S07_*` へ新規 coherence 宣言を追加する **temporary carve-out を a に付与**
+   (b の active S07 領域 = orthonormal glue `S07:3196/3229` 系には非接触、additive のみ)。
+   これは a 自身の gate-2 obligation で context も a が最も持つ。**genuinely-missing infra を規模を問わず
+   正面から build** (CLAUDE.md「コスト/規模は非基準」)。
+2. **obligation-1 hY** (`coherent_Sset_diff_SHCSet`、S₂ difference-coherence) は **b の `S07_Subcoherent`
+   (9.11) squeeze chain** が producer (signature-contract、a は sorried-cite で待たない)。核 coherence は
+   BG §15 (9017、b 所有) に bottom out。
+3. ⟹ a は「fold して idle」でなく **ν-constructor を head-on ungated target** として持つ。carrier 2 本
+   (a の ν-constructor + b の hY/BG§15) が landing 次第、a が `coherent_Sset_of_glued` 経由で
+   `exists_zeta_residual_not_orthogonal` を cite-assembly (唯一 bare feitThompson sorry を close)。
+
 ## landed this session (lane-a, build-green)
 
 - `dc7a7792` set-decomposition primitives `SHCSet_subset_Sset` / `Sset_eq_SHCSet_union_diff`

@@ -707,3 +707,18 @@ local-analysis (Sibley 1991)、**multi-consumer**: S16 `exists_RData_escape_stru
 tau=dade map の isometry route、**BG §15 に non-gated**、§9 (9.8.d) ≥2 count sub-gate のみ) / **G2** = 上記 BG §15。
 **bridge (cd6beac7) + Rung B (d375f39c) で G2 の char-side wiring は完備、残 core は純 BG §15 群論**。
 次判断: (a) BG §15 Cor 15.9 claim+build (upstream-most・multi-consumer) vs (b) G1 (in-cluster・§9-gated) — 9000 scan 後に決定。
+
+## ⚖️ HUB RULING (2026-07-06 夕, レーン分担監査 + ユーザー裁可) — **§5-arith DONE、本 issue は BG §15 (9017) に収束**
+
+分担監査で code-verified: **§5 subcoherence arithmetic は build 済** — item 1 `uniform_degree_coherence`
+= `coherent_of_constant_degree` (S07_CoherenceConstantDegree:551) sorry-free、item 2 subcoherent =
+`S07_Subcoherent.lean` (0 bare sorry、(9.11) Snorm/sumnS squeeze 全 landing)。**∴ 本 issue の §5 部は
+実質完了**。残 2 gate の帰属を確定:
+
+- **G2 (BG §15 Cor 15.9 / Thm 15.8)** = 真の cross-cluster bottleneck。**issue 9017 に移管、owner = lane b**
+  (drift 追認、ユーザー裁可 2026-07-06)。本 issue 側は G2 の char-side wiring 完備 (bridge cd6beac7 +
+  Rung B d375f39c) ゆえ、9017 の BG 群論が landing 次第 sorried-cite で dade=Ind が honest 化。
+- **G1 (full-mixed-family coherence 拡張)** = b の in-cluster work (§9 (9.8.d) ≥2 count が唯一の sub-gate、
+  BG §15 に non-gated)。b が正面から build。
+
+⟹ 本 issue は「§5-arith 完了 + G2→9017 移管 + G1=b in-cluster」で整理。新規レーン割当不要 (a/b で消化)。

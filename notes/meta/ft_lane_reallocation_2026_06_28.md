@@ -293,3 +293,38 @@ witness 3 本 + missing §8 facts は **honest FT の必要部品** = b の Wave
 
 旧 9009 裁定 (「a が threading」) は本節で**更新** (a 過負荷の実態に合わせ b へ)。issue 9009/3002 の
 fix-owner 注記も同時更新。
+
+## レーン分担監査 + reshape (2026-07-06 夕, ユーザー「この分担で問題ないか」→ hub 7-agent 監査 → ユーザー裁可)
+
+**契機**: ユーザーが現 4 レーン (a/b/c/d) 分担の健全性を hub に検証依頼。hub が 7-agent workflow
+(レーン別 branch-tip code 監査 + 依存構造 cross-cut → 統合裁定 → adversarial critic) を実施。
+
+**判明した実態 (branch tip code-verified、監査正本 = 本セッション workflow `wf_7215f527-50c`)**:
+- **a**: tip = main の祖先 (0 ahead / 76 behind)、非生産。11.8 は assembled 済 → gate-2 (11.8.6) が真の
+  carrier gate に collapse (obligation-1 hY = §14-gated / obligation-2 = repo 不在の非直交 ν-constructor)。
+  正面から進む ungated work 無し。
+- **b**: 唯一の生産レーン (3 ahead)。だが 3 commit は BG §15.8/15.9 (9017) = 担当 char cascade から drift。
+- **c**: 純 downstream sink (0 ahead / 22 behind)。S16 残 sorry は全て b/a の真の gate。直近 commit は docs-only
+  「gate pin」(frontier-thin、#print axioms で自 route の循環を自証)。
+- **d**: アイドル (0 ahead)。直近 ~5 commit が `chore: refresh checklist` = CLAUDE.md 禁止の busywork。
+- **当初仮説 (prime-TI 9014 / §5 coherence 1017 が gate) は STALE**: 両者 code-verified で 0-sorry・build 済
+  (PrimeTIResidue.lean `ofS06Hypothesis` constructor / S07_Subcoherent.lean (9.11) squeeze)。1017 が ~23
+  iteration 後に収束した先 = **BG §15/§16 (9017)** が真の unowned bottleneck (b の Pf §13 + BG-side S16 を binding)。
+
+**裁定 (2026-07-02 教訓「lane 数 = ungated frontier 供給」の再適用 + CLAUDE.md「genuine 未形式化 prerequisite は
+規模問わず正面 build」)**: honest な ungated deep frontier は ~2 本 (BG §15/§16 + b の §13 mixed-family coherence)。
+4 レーン過剰供給の是正:
+
+| lane | 2026-07-06 夕〜の役割 | 変更 |
+|---|---|---|
+| **b** | **BG §15/§16 node (9017) の owner を追認** (drift 保全) + §13 mixed-family coherence G1 + S15 cascade + S14 witness | drift を正式 owner 化。Thm 15.8 signature 訂正 (unsound→Coq準拠, consumer 0) + S16→S15 hoist 承認 (9017 RULING) |
+| **a** | **S07 非直交 ν/τ₃ glue-map constructor (gate-2 obligation-2) を temporary S07 carve-out で build** (issue 9016) | a の唯一 ungated head-on target。idle 回避 + b 負荷分散。当初「b へ carve」案を追認帰結で a へ変更 |
+| **c** | **thin downstream cite-sink** (成果 in-place 保全)。carrier landing 後に cite-assembly で再起動 | full producing lane から除外 (fault/discard しない)。§9 block-decomposition (9000) redirect は選択肢 |
+| **d** | **DORMANT** (停止+報告、busywork 禁止) | BG §15/§16 が b 追認で d の rescue にならず、他 unclaimed leaf も無し → charter どおり停止。worktree 保持 (idle 継続なら retire 検討) |
+
+**doneness マーキング**: issue 9014 (prime-TI foundation) = build 済・frontier gate でない (KEEP+OPEN は §10
+coherence upgrade のみ)。issue 1017 §5-arith = 完了・G2→9017 移管・G1=b in-cluster。**「3002 uniform gate」
+framing は stale** (grid fields は S15.Hypothesis に threading 済 sorry-free、FeitThompson:2654/2659 供給)。
+
+全て hub-arbitrable な可逆運用 reshape (ユーザー escalation 事項なし)。ユーザーは「b の drift 追認」を裁可、
+残りは hub 裁定。正本 = 本節 + issues 9017/9016/9014/1017 の HUB RULING + merge_monitor 🔒 マップ。
