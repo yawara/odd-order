@@ -28,10 +28,11 @@ divisibility/upper-bound は完成・frozen)。内訳:
 lane-b が §13 S-side estimate ((13.10)/(13.11)/(13.12) `c_eq_one`) を **active に building** (commit a1dc3748,
 2026-07-05)。だが lane-b の版は **S-side hardcoded** (`hyp.c` 等)。T-side (13.15) v-value を閉じるには:
 
-- [ ] **(案 A, 推奨) lane-b が §13 estimate ((13.10)/(13.11)/(13.14)/(13.15)) を generic type-II maximal
-  subgroup 版に generalize** → C が S/T 両側で instantiate (cite)。非重複・signature-contract 準拠。
-- [ ] (案 B) C が T-side dual を自 file で re-derive → **lane-b S-side と重複** (anti-doctrine, 非推奨)。
-- [ ] (案 C) C は landing 待ちで別 ungated work へ (但し C 自クラスタは assembly 完了ゆえ別 work 不在)。
+- [x] **案 A 採択 (HUB 裁定 2026-07-06)**: lane-b が §13 estimate
+  ((13.10)/(13.11)/(13.14)/(13.15)) を generic type-II maximal subgroup 版に generalize
+  → C が S/T 両側で instantiate (cite)。非重複・signature-contract 準拠。
+- [x] 案 B は却下: C が T-side dual を自 file で re-derive すると lane-b S-side と重複する。
+- [x] 案 C は却下: C は (14.9) type-III char exclusion の ungated infra を並行 engage。
 
 ## 完了条件
 

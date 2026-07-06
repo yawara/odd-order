@@ -127,9 +127,11 @@ refactor で `coherent_of_constant_degree` が witness Dade map で使えるよ�
 - **要 build (witness char body, deep)**: `no_real_characters`, `pairwise_orthogonal`, `hirr` (Ind_H^L θ
   irreducible for Frobenius abelian kernel), `hconst` (等次数 [L:H]), `hsuppdiff` (差 A(L)-supported)。
   Frobenius 群指標論 (Ind from abelian kernel = irreducible, 等次数) が中核。multi-turn 想定。
-- [ ] α: 着手前に open 9000 issue を scan、coherence/Clifford は lane b leaf を cite (再構築しない)。
-- [ ] lane c: idle 回避。σ-theory-dual structural (S16:166/3431/3511) を lane d leaf cite で discharge +
-  coherence-gated deep char を signature-first で skeleton。coherence は再構築しない。
+- [x] α/lane c: 着手前の open-9000 scan と再構築禁止 reminder は実施済み運用へ吸収
+  (9002 claim + 9005/9013 で追跡、下記 HUB 再裁定で更新済み)。
+- [x] ~~lane c: σ-theory-dual structural (S16:166/3431/3511) を lane d leaf cite で discharge~~
+  — **撤回済**。lane c の file:line 検証が正しく、正しい後続は 9002 constructive Clifford と
+  9013/S16 W-side assembly consume 路線。
 
 ## 参照
 - issues/2032 (sibleyTarget_frobI unsound 詳細), issue 0026 (Clifford core)
@@ -227,7 +229,8 @@ policy 8 で回避すべき。⟹ **lane b の plate から構成的 Clifford (i
 **やること 更新**:
 - [x] σ-theory-dual guidance 撤回 (hub 誤り、lane c 正当)。
 - [x] lane c: 構成的 Clifford を 9000 番台 claim → build (issue 9002 で claim 済、infra 進行中)。lane b は cite。
-- [ ] lane c: §14-16 assembly を signature-first で skeleton 前倒し (宣言済 signature 範囲)。
+- [x] lane c: §14-16 assembly を signature-first で skeleton 前倒し済み。現在の正本は
+  9013「S16 `nonexistence_of_G` top-level assembly 完了、残 8 sorry は lane-b §13/§15 gated」。
 - [x] lane b: (6.5.c) + (5.7)-S07 refactor complete (Clifford は lane c へ移管)。
   (5.7)-S07 は完了済 (`d31b9763`)、(6.5.c) は
   `S08.nonempty_coherent_SOf_bot_of_index_dvd` / `S14.frobenius_typeI_coherent_of_cyclicQuotient`
