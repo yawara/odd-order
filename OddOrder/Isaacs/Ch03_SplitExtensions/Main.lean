@@ -1804,6 +1804,21 @@ theorem Subgroup.IsPiGroup.le {G : Type*} [Group G] [Finite G] {π : Set ℕ}
   have hdvd : Nat.card ↥H ∣ Nat.card ↥K := Subgroup.card_dvd_of_le hHK
   exact hK p (Nat.primeFactors_mono hdvd Nat.card_pos.ne' hp)
 
+/-- A finite `p`-group is a `π`-group once `p ∈ π`. -/
+theorem Subgroup.IsPiGroup.of_isPGroup_of_mem {G : Type*} [Group G] [Finite G]
+    {π : Set ℕ} {H : Subgroup G} {p : ℕ} [Fact p.Prime]
+    (hH : IsPGroup p H) (hpπ : p ∈ π) :
+    Subgroup.IsPiGroup π H := by
+  intro q hq
+  obtain ⟨n, hn⟩ := (IsPGroup.iff_card (G := H)).mp hH
+  rw [hn] at hq
+  by_cases hn0 : n = 0
+  · simp [hn0] at hq
+  · rw [Nat.primeFactors_prime_pow hn0 Fact.out] at hq
+    rw [Finset.mem_singleton] at hq
+    rw [hq]
+    exact hpπ
+
 /-- **`oPiCore π G = ⊥` ⇒ G で normal π-subgroup は ⊥ のみ**.
 `Subgroup.IsPiGroup.le_oPiCore` + `oPiCore = ⊥` の chain.
 
@@ -1829,6 +1844,26 @@ theorem Nat.coprime_of_isPiGroup_of_isPiGroup_compl
   rw [← Nat.disjoint_primeFactors hn hm, Finset.disjoint_left]
   intro p hp_n hp_m
   exact absurd (hnPi p hp_n) (hmPi' p hp_m)
+
+/-- A `π`-subgroup has trivial intersection with a `p`-group for `p ∉ π`. -/
+theorem Subgroup.IsPiGroup.inf_eq_bot_of_isPGroup_not_mem {G : Type*} [Group G]
+    [Finite G] {π : Set ℕ} {K M : Subgroup G} {p : ℕ} [Fact p.Prime]
+    (hK : Subgroup.IsPiGroup π K) (hM : IsPGroup p M) (hp_notπ : p ∉ π) :
+    K ⊓ M = ⊥ := by
+  apply Subgroup.eq_bot_of_card_eq
+  have hM_pi' : Subgroup.IsPiGroup {q | q ∉ π} M :=
+    Subgroup.IsPiGroup.of_isPGroup_of_mem hM hp_notπ
+  have hdvdK : Nat.card ↥(K ⊓ M : Subgroup G) ∣ Nat.card K :=
+    Subgroup.card_dvd_of_le inf_le_left
+  have hdvdM : Nat.card ↥(K ⊓ M : Subgroup G) ∣ Nat.card M :=
+    Subgroup.card_dvd_of_le inf_le_right
+  have hcop : Nat.Coprime (Nat.card K) (Nat.card M) :=
+    Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      Nat.card_pos.ne' Nat.card_pos.ne' hK hM_pi'
+  have hdvd_gcd : Nat.card ↥(K ⊓ M : Subgroup G) ∣ Nat.gcd (Nat.card K) (Nat.card M) :=
+    Nat.dvd_gcd hdvdK hdvdM
+  rw [hcop] at hdvd_gcd
+  exact Nat.dvd_one.mp hdvd_gcd
 
 /-- Complementary Hall subgroups have coprime orders. -/
 theorem IsHallSubgroup.card_coprime_of_compl [Finite G] {π : Set ℕ} {K H : Subgroup G}
