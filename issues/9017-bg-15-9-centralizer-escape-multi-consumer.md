@@ -107,3 +107,20 @@ work 中ゆえ territorial 回避、"derivable if needed" 記載)。(2) `tau2_tr
 chain は bounded ゆえ lane b が Thm 15.8 まで build 継続 (multi-consumer、high-leverage)、Cor 15.9 の hoist は hub 裁定待ち。
 
 次: Thm 15.8 を build (dropped clauses 再derive + signature 訂正 + §12 assembly)。
+
+## 2026-07-06 更新 #3 (lane b, /loop 再開) — ★訂正: β theory は既存 (subagent の「absent」は Coq名grep miss)、Thm 15.8 は tractable
+
+前 subagent の「`tau2_not_beta` / global β は repo 不在」は **誤り** ([[verify-port-state-by-number-not-coq-name]] の
+罠、本 project 再発)。**β-radical theory は BG §10 に完全形式化済**: `S10.beta M` (`S10_BetaRadicalGlobal.lean` +
+`S10_BetaRadicalCore.lean`)、`S10.mem_beta_iff`、`S10.Mbeta_isPiGroup`、Lemma 10.8(c)
+`derived_msigma_hasNormalPComplement_of_not_mem_beta`、`isNarrow_sylow_of_not_mem_beta`。S12/S13 で多用
+(S12_E:359 `q∉S10.beta M`・S12_Proposition1215:672/701 `r,q∉S10.beta`・S13_Theorem1310:808
+`factorization_inf_centralizer_Q_eq_of_not_beta` が inline 導出済)。⟹ Thm 15.8 の `q∉β(G)` (Uniqueness Thm)
+step は **既存 S10.beta machinery で導出可**、foundational gap 無。
+
+**⟹ Thm 15.8 の真の残 blocker は 1 点のみ = §14 Cor 14.12 (`typeP2_neighbor_is_typeF`) の dropped 2 clauses
+(`K⊆F(H∩M*)` / `H∩M*=σ(H)'-complement`) の re-export** (S14 内部 Mstar-依存 ~400行ゆえ S14 signature 拡張が要、
+S15 で再derive 不能)。これは **actively-worked S14_TypePCounting への additive edit = coordination**。加えて Cor 15.9
+は S16→S15 hoist (hub-level)。⟹ **chain 全体は tractable、残るは 2 つの cross-lane coordination のみ (S14 re-export +
+S16→S15 hoist) = hub-territory** ([[hub-arbitrates-cross-lane-autonomously]])。lane b の unilateral 部分
+(char-side wiring + sound signature + spine 補題 + β 確認) は完遂。hub は S14 拡張 + S16→S15 hoist の allocation を裁定可。
