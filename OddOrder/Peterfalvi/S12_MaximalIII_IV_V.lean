@@ -3778,6 +3778,52 @@ theorem Hypothesis.induce_derived_apply_one_eq_w1_mul [Finite G] {M : Subgroup G
   rw [ClassFunction.induce_apply_one, hidx]
 
 open scoped FiniteInduce in
+/-- **(11.8.1) column degree**: for `k ≠ 0`, the μ-grid column sum `μ_k = ∑ᵢ μ_{ik}` has degree
+`q·u` (= `w₁·|Ū| = qu`).  `muGrid_column_sum_mem_sOf_H0_and_reducible` (μ_k is a reducible
+`𝒮(H₀)`-member) composed with `reducible_mem_sOf_H0_apply_one_eq_qu` (reducible `𝒮(H₀)`-members have
+degree `q·u`, §9 (9.8.b)/(9.9.b)).  This is the concrete `ψ₀`-witness degree for the (11.8.6) `hgen`
+bundled `S₂`-structure: a column `μ_k ∈ Sset \ SHCSet` (reducible → not in the irreducible `SHCSet`,
+`muGrid_column_sum_mem_inducedFamily`) of degree `qu`. -/
+theorem Hypothesis.muGrid_column_sum_apply_one_eq_qu [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M) (hnt : TypePNontrivialCore M hyp.typeP)
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetup htype hnt))
+    (k : Fin hyp.w2) (hk : k ≠ 0) :
+    (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i k) (1 : ↥M)
+      = (((hyp.toTypesIIIIIIVSetup htype hnt).q *
+          (hyp.mkSection11CharacterData (hyp.toTypesIIIIIIVSetup htype hnt) chief).u : ℕ) : ℂ) := by
+  haveI := hyp.finiteG
+  obtain ⟨hmem, hred⟩ :=
+    hyp.muGrid_column_sum_mem_sOf_H0_and_reducible hG htype hnt chief k hk
+  exact reducible_mem_sOf_H0_apply_one_eq_qu hG
+    (hyp.mkSection11CharacterData (hyp.toTypesIIIIIIVSetup htype hnt) chief)
+    (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i k) hmem hred
+
+open scoped FiniteInduce in
+/-- **Reducible members of `S = inducedFamily M` have degree `q·u = qu`** — the reducible-side of the
+(11.8.1) uniform-degree structure of `𝒮₂ = Sset \ SHCSet`.  Once a reducible `inducedFamily`-member
+is shown to lie in `𝒮(H₀) = sOf ... chief.H0`, `reducible_mem_sOf_H0_apply_one_eq_qu` gives degree
+`q·u`.  The `sOf`-membership is the **one §9/(11.5)-gated obligation** (the family identification:
+reducible `inducedFamily`-members = reducible `𝒮(H₀)`-members = the μ-columns; `sSet = 𝒳-family
+⊊ inducedFamily`, so this needs the (9.5)/(11.5) `𝒳 ↔ non-trivial-irr` bridge, repo-absent — a
+correctly-typed obligation, NOT a vacuous hoist).  With this, `𝒮₂`'s degree reduces to its
+irreducible-side (the (9.8)/(9.9) irreducible-degree completeness), the remaining world-bridge gap. -/
+theorem Hypothesis.inducedFamily_reducible_apply_one_eq_qu [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M) (hnt : TypePNontrivialCore M hyp.typeP)
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetup htype hnt))
+    {y : ClassFunction ↥M ℂ} (hyS : y ∈ inducedFamily M) (hred : ¬ IsIrreducibleCharacter y) :
+    y (1 : ↥M) = (((hyp.toTypesIIIIIIVSetup htype hnt).q *
+        (hyp.mkSection11CharacterData (hyp.toTypesIIIIIIVSetup htype hnt) chief).u : ℕ) : ℂ) := by
+  haveI := hyp.finiteG
+  have hmem : y ∈ OddOrder.Peterfalvi.S11.sOf (hyp.toTypesIIIIIIVSetup htype hnt) chief.H0 := by
+    -- (9.5)/(11.5) family identification: a reducible `inducedFamily`-member lies in `𝒮(H₀)`.
+    -- (`sSet = 𝒳-family ⊊ inducedFamily`; reducible members are the μ-columns ∈ `𝒮(H₀)`.)
+    sorry
+  exact reducible_mem_sOf_H0_apply_one_eq_qu hG
+    (hyp.mkSection11CharacterData (hyp.toTypesIIIIIIVSetup htype hnt) chief) y hmem hred
+
+open scoped FiniteInduce in
 /-- **Degree of an `S₁ = S(HC)`-span element is an integer multiple of `w₁`.**  Every member of
 `SHCSet` has degree `w₁` (by definition, third conjunct), so `ψ ∈ ℤ[S(HC)]` has `ψ(1) = s·w₁` with
 `s ∈ ℤ` the coefficient sum (`span_induction`).  This is the `S₁`-side degree-ratio input of the

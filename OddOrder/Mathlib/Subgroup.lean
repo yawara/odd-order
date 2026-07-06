@@ -305,6 +305,34 @@ theorem map_subtype_lt_of_ne_top {G : Type*} [Group G] {K : Subgroup G}
     rw [← MonoidHom.range_eq_map, K.range_subtype]
   exact map_injective K.subtype_injective (heq.trans hKeq)
 
+/-- If `K` and `R` complement each other in `G`, and `N ◁ G` lies in `K`, then their
+images in `G / N` still complement each other. -/
+theorem IsComplement'.map_quotient_of_normal_le_left {G : Type*} [Group G]
+    {K R N : Subgroup G} [K.Normal] [N.Normal] (hC : IsComplement' K R) (hNK : N ≤ K) :
+    IsComplement' (K.map (QuotientGroup.mk' N)) (R.map (QuotientGroup.mk' N)) := by
+  haveI : (K.map (QuotientGroup.mk' N)).Normal :=
+    (inferInstance : K.Normal).map (QuotientGroup.mk' N) (QuotientGroup.mk'_surjective N)
+  refine isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
+  · rw [disjoint_iff, eq_bot_iff]
+    rintro y hy
+    rw [mem_inf] at hy
+    obtain ⟨⟨k, hkK, hk⟩, ⟨r, hrR, hr⟩⟩ := hy
+    rw [mem_bot]
+    have heq : (QuotientGroup.mk' N) k = (QuotientGroup.mk' N) r := hk.trans hr.symm
+    rw [QuotientGroup.mk'_apply, QuotientGroup.mk'_apply, QuotientGroup.eq] at heq
+    have hrK : r ∈ K := by
+      have hmem : k * (k⁻¹ * r) ∈ K := mul_mem hkK (hNK heq)
+      simpa using hmem
+    have hrKR : r ∈ K ⊓ R := ⟨hrK, hrR⟩
+    rw [disjoint_iff.mp hC.disjoint, mem_bot] at hrKR
+    rw [← hr, hrKR, map_one]
+  · have hsup : K.map (QuotientGroup.mk' N) ⊔ R.map (QuotientGroup.mk' N) = ⊤ := by
+      rw [← map_sup, hC.sup_eq_top,
+        map_top_of_surjective _ (QuotientGroup.mk'_surjective N)]
+    have hmul := normal_mul (K.map (QuotientGroup.mk' N)) (R.map (QuotientGroup.mk' N))
+    rw [hsup, coe_top] at hmul
+    exact hmul.symm
+
 /-- Mapping `B ≤ A ≤ H` through `H.subtype` commutes with viewing `B` as a subgroup
 of `A`. -/
 theorem subgroupOf_map_subtype_eq_map_subgroupOf {H : Subgroup G} {A B : Subgroup H}
@@ -406,6 +434,21 @@ theorem isComplement'_subgroupOf_of_disjoint_mul_eq_univ {G : Type*} [Group G]
     refine ⟨⟨m, hM_le_U hmM⟩, hmM, ⟨h, hH_le_U hhH⟩, hhH, ?_⟩
     ext
     exact hmh
+
+/-- If `A` is normal and disjoint from `B`, then the restrictions of `A` and `B`
+to `A ⊔ B` are complements. -/
+theorem isComplement'_subgroupOf_sup_of_normal {G : Type*} [Group G]
+    {A B : Subgroup G} [A.Normal] (hAB : Disjoint A B) :
+    (A.subgroupOf (A ⊔ B)).IsComplement' (B.subgroupOf (A ⊔ B)) := by
+  refine isComplement'_subgroupOf_of_disjoint_mul_eq_univ
+    (U := A ⊔ B) (H := B) (M := A) le_sup_right le_sup_left ?_ ?_
+  · rw [inf_comm, hAB.eq_bot]
+  · intro x hx
+    have hxmul : (x : G) ∈ (↑A : Set G) * (↑B : Set G) := by
+      rw [← Subgroup.normal_mul A B]
+      exact hx
+    obtain ⟨a, ha, b, hb, hab⟩ := hxmul
+    exact ⟨a, ha, b, hb, hab⟩
 
 /-- For a surjective homomorphism `f : G →* H`, the preimage of a subgroup has cardinality
 `|K.comap f| = |K| * |ker f|`. -/
@@ -509,6 +552,26 @@ theorem comap_le_of_le_map_quotient {G : Type*} [Group G]
         Subgroup.comap_mono hK
     _ = B ⊔ C := QuotientGroup.comap_map_mk' B C
     _ = C := by rw [sup_comm]; exact sup_of_le_left hBC
+
+/-- If `K / N` is a `p`-group, then the image of `K` in the ambient quotient by
+`N.map K.subtype` is a `p`-group. -/
+theorem isPGroup_map_quotient_subtype_of_isPGroup_quotient {G : Type*} [Group G]
+    {K : Subgroup G} {N : Subgroup K} [N.Normal] [(N.map K.subtype).Normal] {p : ℕ}
+    (hN : IsPGroup p (K ⧸ N)) :
+    IsPGroup p (K.map (QuotientGroup.mk' (N.map K.subtype))) := by
+  intro x
+  obtain ⟨g, hgK, hgx⟩ := x.2
+  obtain ⟨n, hn⟩ := hN (QuotientGroup.mk' N ⟨g, hgK⟩)
+  refine ⟨n, ?_⟩
+  have hgN : (⟨g, hgK⟩ : K) ^ p ^ n ∈ N := by
+    rw [← QuotientGroup.eq_one_iff, ← QuotientGroup.mk'_apply, map_pow]
+    exact hn
+  have hgL : (g : G) ^ p ^ n ∈ N.map K.subtype := by
+    simpa using Subgroup.mem_map_of_mem K.subtype hgN
+  apply Subtype.ext
+  change ((x : G ⧸ N.map K.subtype)) ^ p ^ n = 1
+  rw [← hgx, ← map_pow, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+  exact hgL
 
 /-- **`G ⧸ N` nontrivial iff `N ≠ ⊤`** (有限 G で): mathlib `Subgroup.index_eq_one`
 + `Finite.one_lt_card_iff_nontrivial` を結合.
