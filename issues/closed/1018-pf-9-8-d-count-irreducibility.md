@@ -7,6 +7,25 @@ created: 2026-07-06
 
 # Pf (9.8.d): (iv) Ind^M ζ irreducibility + (v) U-orbit/W1 count — close the last (d) sorry
 
+## ✅ RESOLVED (2026-07-06)
+
+`caseA_character_counts` conjunct (d) の `sorry` は **CLOSED** (S11: 3→2 sorries;
+full build 3932 jobs exit 0, AxiomsCheck OK, sorry/axiom 新規 0)。commit `127217ef`。
+
+**採用 route (下記の想定より単純)**: (v) count は **intrinsic-T + def_Itheta surjectivity を
+使わない**。鍵は新 general lemma `card_image_induce_ge_div` (`OrbitOnIrr`) — 下界 `|image| ≥ |T|/[G:H]`
+は各 induction fibre が conjByOrbit (size `[G:H]`) に埋まることだけで従い、**conjBy-closure `hT` が不要**。
+これで下記 note が難所とした「hT の reverse kernel-translations」「def_Itheta surjectivity の family 適用」
+を丸ごと bypass。`exists_hcuPsiPair_eq_of_linear_realizedH0_ker` 等は landed substrate として残るが count 本体では未使用。
+
+closure の全 brick (commit 順): `card_image_induce_ge_div` (e7c73cc3) / `hS0notker` =
+`caseA_hcuZetaPair_realizedS0_not_subset_ker` (ca70d835) / per-member irreducibility
+`caseA_member_induceHU_irreducible` = W₁-orbit non-regularity, **not** Hpart (3442dd39) /
+assembly + `caseA_member_seed_inertia_eq` (127217ef)。詳細は `caseA_character_counts` docstring
+"(v) count — LANDED"。
+
+以下は closure 前の調査 note (歴史的記録)。
+
 ## 背景
 
 `OddOrder/Peterfalvi/S11_MaximalII_III_IV.lean` の `caseA_character_counts` conjunct (d) の
