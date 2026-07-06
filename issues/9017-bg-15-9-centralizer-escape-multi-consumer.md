@@ -213,3 +213,26 @@ repo の `tau2 M = {p | p∉σ M ∧ pRank M p = 2}` は **ℕ 上** (素数限�
 - **def_q1 (q1=q)** = Uniqueness Theorem (Q∈𝒰 + A⊆C(Q) coprime ⟹ H=L 矛盾)。Q∈𝒰 は Coq では `Ptype_structure` の Sylow に対する rank3_Uniqueness (BGsection12.v:2642)。repo `S14.typeP_structure` は Q∈𝒰 clause を直接 export せず ⟹ rank-3 uniqueness or nonabelian 経由が要。
 - Q nonabelian = `Msigma_inf_conj_inf_derived_eq_bot` (S12_Lemma1217:150) + focal/coprime。
 これらは L-structure (`typeP2_partner_structure_of_mem` = 既 landed Phase B) の上に積む deep assembly。standalone 化しにくく inline assemble 要 (更新 #4 の評価と一致)。
+
+## 2026-07-06 更新 #6 (lane b, /loop) — prime-form restatement 完了 + 残 = B/C middle (def_q1)
+
+**landed 追加** (build green, sorry 2 不変):
+- `typeP2_partner_structure_of_mem` (98ebe90a): Phase B foundation (M* partner 構造)。
+- `centralizer_kappaCompl_le_of_mem_tau2` + `not_prime_mem_tau2_of_centralizer_kappaCompl_not_le`
+  (f82e4c7e, subagent): **Phase D core** — escape witness `C_G(U)⊄M` から prime-form `∀ p prime, p∉τ₂(M)`。
+- **prime-form restatement** (b8f6f10c): `tau2_transfer_constraint` を Coq 準拠の prime-限定形に訂正。
+  ★composite finding: repo `tau2 M = {p | p∉σ ∧ pRank=2}` は ℕ-valued (`IsElementaryAbelian p := abelian
+  ∧ x^p=1` が composite 指数を許す ⟹ 例 p=15 が C₃²×C₅² 経由で pRank=2)。literal `tau2 M=∅`/`={q}` は
+  Coq (τ₂=素数集合) より強く ℰ²-論証で証明不能。→ hyp `∃ p prime ∈ τ₂(H)`、concl `(∀ p prime, p∉τ₂(M)) ∧
+  ∃ q, q.Prime ∧ |K|=q ∧ q∈τ₂(H) ∧ (∀ p prime ∈ τ₂(H), p=q)`。**S12_Theorem127/127d の確立済み convention と一致**
+  (consumer 0、9017 ruling の Coq-conformance 訂正範囲内)。⚠ **ℕ-valued tau2 def は latent shared-infra
+  観点** = global に def を prime-restrict するのが deeper fix (hub 判断、当面は conclusion 側 convention で回避)。
+
+**残 = B/C middle** (一続きの assembly、Phase D core が消費する escape witness を生む):
+- sLq1 (`q1∈σ(M*)`、Coq 1307-1314: contra via `sigma'2Elem_tau2`+`tau2_compl_context`) → `A⊆M*_σ`。
+- `Q:=O_q(M*)` Sylow (Coq 1317-1326, `Fcore_structure`/Thm 15.2)。
+- **def_q1 (q1=q) = 主 blocker**: `Q∈𝒰` が `S14.typeP_structure` から未 expose (前 subagent 確認)。route:
+  Q nonabelian (`Msigma_inf_conj_inf_derived_eq_bot` S12_Lemma1217:150 / Lemma 12.17) → `Q∈𝒰`
+  (`nonabelian_pgroup_isUniquelyMaximal` S12_Theorem1213:862 / Thm 12.13) → Uniqueness Thm (S09) で H=M* 矛盾。
+- τ₂(H)={q} (`tau2_singleton_of_nonabelianSylow` S12_Theorem127d:550、Q nonabelian 供給)。
+- X=C_A(H_σ)、|X|=q、X≠K → X⊄M → **escape witness `C_G(U)⊄M`** (Phase D core へ)。
