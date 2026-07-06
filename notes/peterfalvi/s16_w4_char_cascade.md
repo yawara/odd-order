@@ -2205,3 +2205,37 @@ clean 分解。** landing (build 3901 green、net sorry 10 不変 = opaque 1 →
 **教訓**: cont.⁷² 型の「config-provable」ラベルは、判別子 (`IsMulCommutative U`) の入手経路 (`isMulCommutative_V`
 が IsTypeII 要求で循環) と Coq の深さ (`FTtype34_structure` @PFsection11) を確認せず貼ると誤る。**mislabel 訂正も
 genuine 進捗** (CLAUDE.md「規約が不完全/ミスリードなら訂正」)。
+
+### 🧭 HUB DIRECTIVE (2026-07-06, 監視 hub) — **C は「やることがない」のではない**。idle-wait 停止、下記を順に engage
+
+ユーザーが「C がやることがなくなってる」と観測 → hub が subagent frontier map で S16 の 8 genuine sorry を精査。
+**結論: C の frontier は「全部 lane-b gated」ではない。ungated な genuine win が複数ある**。C が (11.9) を
+「§11 だから lane-a」と punt (issue 2018) し「残り全部 gated」と結論して idle-wait に入ったのは**誤診断**
+([[feedback-no-avoiding-hard-parts]]: 自レーン endpoint が上流 gated でも ungated upstream に降りて実証明する)。
+
+**順に engage せよ (上流優先 + ungated 優先):**
+1. **【即・ungated win】#5 `s_side_frobenius_kernel` (S16:3534) を実証明で閉じる**。statement
+   `∀ x∈P#, C_{S'}(x)⊓S' ≤ P` は **proven engine `FieldNormalizerData.derived_inf_centralizer_le_P`
+   (`S16_G0Coprime:367`) と完全一致**、carrier producer `field_normalizer_structure` (S16:7368) は
+   **unconditional no-sorry** で `Nonempty (FieldNormalizerData hyp)` を供給。circular dep なし (hub 検証済:
+   field_normalizer_structure の推移依存は s_side/t_side_frobenius_kernel/G0_orderOf_coprime を cite しない)。
+   **fix**: 前方参照回避のため block (`s_side_frobenius_kernel` + `t_side_frobenius_kernel` +
+   `MHypothesis.G0_orderOf_coprime` + η-grid consumers 3604/3605) を `field_normalizer_structure` (7368)
+   直下へ移設 → `obtain ⟨d⟩ := field_normalizer_structure hG hyp; exact fun x hx => d.derived_inf_centralizer_le_P hx`。
+   single-lemma + 機械的 block move。**これで #5 は honest 実証明になる (sorried-cite でない)**。
+2. **【ungated 構造】#3 `T_isTypeP2` (S16:1007) の circular forward-ref を解消**。inequality の math は
+   proven (`key_ratio_inequality_of_caseB_data`, AxiomsCheck-clean); 循環は carrier-from-hyp 抽出だけ。
+   `CaseBForTData` をパラメータ threading するか宣言順を組み替えて解く。char-gated でなく構造。
+3. **【deep だが c-drivable — idle-wait でなく drive】** #6/#4 の T-side (13.15) field-model carrier。
+   engine `TFieldModelData.derived_inf_centralizer_le_Q` (`S16_G0Coprime:811`) は proven だが
+   `Nonempty (TFieldModelData hyp)` の producer が repo に不在 (S-side と非対称)。これは **issue 9013
+   (T-side (13.15) generalize、shared-infra)** = C が claim+build 可能な自分の blocker。構築すれば
+   #4→#6→#1 の `v`-substitution を unblock。(11.9)/#2 は **issue 9000 (typeP_Galois σ-foundation)** gated
+   で、これも shared σ-theory ゆえ C が drive 可 (「lane-a 待ち」でなく)。
+
+**park してよいもの (正当な sorried-cite)**: #1(14.9 ratio, T-side Dade coherence + βₛ Γ bridge)・#7/#8
+(13.1.d η-grid, issue 3002) は lane-b §13/§15 char cascade に genuine gated ゆえ skeleton のまま可。
+**但し #5・#3 を放置して「全部 gated」と報告するのは NG** — まず 1・2 を landing、次に 3 を drive。
+**territorial 誤読を正す**: 「§11=lane-a / §13=lane-b」で判断するな。下の char/group machinery は shared
+`GroupTheory/**` leaf に置ける (FT-path policy B: 未所有 leaf 新設は consumer が他レーンでも in-scope)。
+issue 2018 の「(11.9)=lane-a」は「lane-a を待つ」意味なら誤り (C が 9000 を drive するか、#5→#3 を先に)。

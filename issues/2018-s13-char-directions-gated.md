@@ -80,3 +80,13 @@ standalone 版を **lane-h が §6/§8 新 leaf で生産** (relane #7、issue 2
   **S13 char directions の wire = lane a** (Pf S03–S13 所有; 旧 lane-h/lane-c 行は stale)。
   **(6.2)/(6.3)/h56 producer 側 = lane b** (coherence infra; cf issue 2022)。
 - 本文の **gate map 本体は有効なまま** — lane 名だけ上記に読み替えること。
+
+## 🔗 lane-c consumer 明示 (2026-07-06, (11.9) 型判定 = C の (14.9) の上流残)
+
+lane-c が Pf (14.9) 型判定 `T_isTypeIII_of_isTypeP1` を **完全証明化** (S16_NonExistenceG:978、`no_typeV_maximal`
+(10.10) + `proposition_type_classification` clause-3 で III/IV に還元)。**唯一の残 residual = Type-IV 排除**
+`T_not_isTypeIV_of_isTypeP1` (S16_NonExistenceG:963) = 「T の U-factor (=V) abelian」= Coq `FTtype34_structure`
+(Pf (11.9)) の `typeP_Galois` char 論法。これは本 issue の **(11.9) 行 (「最も深い char gate」)** の T-side 具体
+consumer。lane-a が (11.9)/typeP_Galois 判定を landing したら、lane-c は `T_not_isTypeIV_of_isTypeP1` を
+それで discharge (cite)。σ-theory engine (issue 9000、sorry-free) は u_bound/dichotomy を供給するが「どちらの
+case か (typeP_Galois の可否)」の判定は (11.9) char 論法 = lane-a 本体。C 側で dup 構築しない (claim-before-build)。
