@@ -9774,6 +9774,74 @@ theorem mem_tau2_of_elemAb_rank_two_le_E [Finite G]
   · exact h2
   · exact absurd (tau3_pRank_eq_one h3) (by omega)
 
+/-- **Phase B/C step 2 of BG Theorem 15.8** (Coq `tau2_P2type_signalizer`, BGsection15.v:1307--1316,
+the `sLq1`/`sALs` block): with the partner `M*` type-`P`, `K ≤ M*_σ`, `q := |K| ∈ σ(M*)`, and a
+rank-2 elementary abelian `A ∈ ℰ²_{q₁}(G)` (`q₁` prime) with `A ≤ C(K)` and `A ≤ M*`, one has
+`q₁ ∈ σ(M*)` and `A ≤ M*_σ`.
+
+Proof (Coq `sLq1`): by contradiction — if `q₁ ∉ σ(M*)`, then `A` is a `σ(M*)'`-group, so it lies in
+a `σ(M*)'`-Hall `E`-setup (`exists_subgroupESetup_with_le`).  Then `q₁ ∈ τ₂(M*)`
+(`mem_tau2_of_elemAb_rank_two_le_E`), so `C_G(A) ≤ E` (Cor 12.6(b), `centralizer_le_E_of_tau2`).
+But `K ≤ C_G(A)` (`A ≤ C(K)` symmetrised), so `K ≤ E`, a `σ(M*)'`-group; yet `q = |K| ∈ σ(M*)`
+divides `|K|` — contradiction.  Then `A ⊆ M*_σ` (`sALs`): `A` is a `σ(M*)`-group (`q₁ ∈ σ(M*)`) in
+`M*`, absorbed by the normal `σ(M*)`-Hall `M*_σ` (`isPiGroup_le_of_normal_isHallSubgroup`). -/
+theorem mem_sigma_and_le_Msigma_of_rank2_centralizer_kappa [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {Mstar K A : Subgroup G} {q q1 : ℕ}
+    (hMstar : Mstar ∈ maximalSubgroups G) (hqprime : q.Prime) (hKcard : Nat.card ↥K = q)
+    (hqσ : q ∈ OddOrder.BG.Ch3.S10.sigma Mstar)
+    (hq1prime : q1.Prime) (hA : A ∈ elemAbelianOfRank G q1 2)
+    (hACK : A ≤ Subgroup.centralizer (K : Set G)) (hAMstar : A ≤ Mstar) :
+    q1 ∈ OddOrder.BG.Ch3.S10.sigma Mstar ∧ A ≤ OddOrder.BG.Ch3.S10.Msigma Mstar := by
+  classical
+  haveI : Fact q1.Prime := ⟨hq1prime⟩
+  obtain ⟨hAea, hAcard⟩ := mem_elemAbelianOfRank.mp hA
+  -- `K ≤ C_G(A)` (symmetrise `A ≤ C_G(K)`).
+  have hKCA : K ≤ Subgroup.centralizer (A : Set G) := by
+    intro k hk
+    rw [Subgroup.mem_centralizer_iff]
+    intro a ha
+    exact (Subgroup.mem_centralizer_iff.mp (hACK ha) k hk).symm
+  -- `q₁ ∈ σ(M*)`, by contradiction.
+  have hq1σ : q1 ∈ OddOrder.BG.Ch3.S10.sigma Mstar := by
+    by_contra hq1nσ
+    -- `A` is a `σ(M*)'`-subgroup (a `q₁`-group with `q₁ ∉ σ(M*)`).
+    have hApi : Subgroup.IsPiSubgroup ((OddOrder.BG.Ch3.S10.sigma Mstar)ᶜ) A := by
+      intro p hp
+      have hpq1 : p = q1 := by
+        have hpd : p ∈ (q1 ^ 2).primeFactors := hAcard ▸ hp
+        rw [Nat.primeFactors_prime_pow (by norm_num) hq1prime, Finset.mem_singleton] at hpd
+        exact hpd
+      exact hpq1 ▸ hq1nσ
+    -- a `σ(M*)'`-Hall `E`-setup with `A ≤ E`.
+    obtain ⟨E, E₁, E₂, E₃, hEsetup, hAE, _hEpi⟩ :=
+      exists_subgroupESetup_with_le hG hMstar hAMstar hApi
+    -- `q₁ ∈ τ₂(M*)`, so `C_G(A) ≤ E`.
+    have hq1τ2 : q1 ∈ tau2 Mstar := mem_tau2_of_elemAb_rank_two_le_E hG hEsetup hq1prime hA hAE
+    have hCAE : Subgroup.centralizer (A : Set G) ≤ E :=
+      (centralizer_le_E_of_tau2 hG hEsetup hq1τ2 hA hAE).1
+    -- `K ≤ C_G(A) ≤ E`, so `q ∣ |K|` lies in `π(E) ⊆ σ(M*)'` — contradicting `q ∈ σ(M*)`.
+    have hKE : K ≤ E := hKCA.trans hCAE
+    have hqπE : q ∈ (Nat.card ↥E).primeFactors :=
+      Nat.mem_primeFactors.mpr ⟨hqprime, (hKcard ▸ Subgroup.card_dvd_of_le hKE), Nat.card_pos.ne'⟩
+    exact hEsetup.not_mem_sigma_of_mem_primeFactors hG hqπE hqσ
+  refine ⟨hq1σ, ?_⟩
+  -- `A ⊆ M*_σ`: `A` a `σ(M*)`-group in `M*`, absorbed by the normal `σ(M*)`-Hall `M*_σ`.
+  have hMσHall : Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma Mstar)
+      ((OddOrder.BG.Ch3.S10.Msigma Mstar).subgroupOf Mstar) :=
+    OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hMstar
+  have hApiσ : Ch03.Subgroup.IsPiGroup (OddOrder.BG.Ch3.S10.sigma Mstar) (A.subgroupOf Mstar) := by
+    intro p hp
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAMstar).toEquiv, hAcard,
+      Nat.primeFactors_prime_pow (by norm_num) hq1prime, Finset.mem_singleton] at hp
+    exact hp ▸ hq1σ
+  haveI : ((OddOrder.BG.Ch3.S10.Msigma Mstar).subgroupOf Mstar).Normal := by
+    rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
+  have hAsubMσ : A.subgroupOf Mstar ≤ (OddOrder.BG.Ch3.S10.Msigma Mstar).subgroupOf Mstar :=
+    OddOrder.BG.Ch3.S10.isPiGroup_le_of_normal_isHallSubgroup hMσHall hApiσ
+  have hmap := Subgroup.map_mono (f := Mstar.subtype) hAsubMσ
+  rwa [Subgroup.map_subgroupOf_eq_of_le hAMstar,
+    Subgroup.map_subgroupOf_eq_of_le (OddOrder.BG.Ch3.S10.Msigma_le Mstar)] at hmap
+
 /-- **Phase B/C uniqueness core of BG Theorem 15.8** (Coq `tau2_P2type_signalizer`,
 BGsection15.v:1329--1338, the `def_q1` argument): if a uniqueness subgroup `Q ∈ 𝒰`
 (`IsUniquelyMaximal Q`) is centralized by a rank-2 elementary abelian `A ∈ ℰ²_{q₁}(G)`, and `A`
