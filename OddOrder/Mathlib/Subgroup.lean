@@ -155,6 +155,20 @@ theorem inf_subgroupOf_le_center_of_le_centralizer {K F : Subgroup G}
   have hyC : (y : G) ∈ centralizer (F : Set G) := hK_le_C y.2
   exact (mem_centralizer_iff.mp hyC (x : G) hxF).symm
 
+/-- The centralizer inside a subgroup is the restriction of the ambient centralizer of the
+subtype image. -/
+theorem centralizer_subgroupOf {S : Subgroup G} (T : Set S) :
+    centralizer T = (centralizer (S.subtype '' T)).subgroupOf S := by
+  ext s
+  rw [mem_centralizer_iff, mem_subgroupOf, mem_centralizer_iff]
+  constructor
+  · rintro hs g ⟨t, ht, rfl⟩
+    simpa only [map_mul] using congrArg S.subtype (hs t ht)
+  · intro hs t ht
+    apply Subtype.ext
+    rw [Subgroup.coe_mul, Subgroup.coe_mul]
+    exact hs (S.subtype t) ⟨t, ht, rfl⟩
+
 /-- **`MulAut` 作用の固定点部分群**: `φ : A →* MulAut G` の下で `∀ a, (φ a) g = g` を
 満たす要素全体. mathlib `MulAction.fixedPoints` は Set だが, MulAut 作用の場合は
 group 構造を持つので Subgroup として bundle.
