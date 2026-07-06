@@ -9651,6 +9651,63 @@ theorem not_prime_mem_tau2_of_centralizer_kappaCompl_not_le [Finite G] (hG : IsM
     rwa [piSet, Set.mem_setOf_eq, ← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv]
   exact hesc (centralizer_kappaCompl_le_of_mem_tau2 hG hM hKM hUM hU hKNU hrprime hr hrU)
 
+/-- **Phase B/C step 1 of BG Theorem 15.8** (Coq `tau2_P2type_signalizer`, BGsection15.v:1300--1307,
+the `sKLs`/`sLq` block): from the partner structure of the type-`P₂` maximal `M` (via
+`typeP2_partner_structure_of_mem`), the `κ`-Hall `K` embeds into `M*_σ`, and `q := |K|` (prime)
+lies in `σ(M*)`.
+
+Proof (Coq `sKLs`, `sLq`): the partner structure gives `K = M*_σ ⊓ C(Ks)` (with
+`Ks = M_σ ⊓ C(K)`), so `K ≤ M*_σ` (`inf_le_left`).  As `|K| = q` is prime and `q ∣ |M*_σ|`
+(`K ≤ M*_σ`), and `M*_σ` is a `σ(M*)`-group (`Msigma_isPiGroup`), we get `q ∈ σ(M*)`. -/
+theorem partner_kappaHall_le_Msigma_of_isTypeP2 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Mstar : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP2 : S14.IsTypeP2 M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hMstar : Mstar ∈ maximalSubgroupsContaining (Subgroup.centralizer (K : Set G))) :
+    K ≤ OddOrder.BG.Ch3.S10.Msigma Mstar ∧
+      ∀ q : ℕ, q.Prime → Nat.card ↥K = q → q ∈ OddOrder.BG.Ch3.S10.sigma Mstar := by
+  obtain ⟨_hMstP, _hKsHall, hKeq⟩ :=
+    typeP2_partner_structure_of_mem hG hM hP2 hKM hK hMstar
+  -- `K = M*_σ ⊓ C(Ks) ≤ M*_σ`.
+  have hKMσstar : K ≤ OddOrder.BG.Ch3.S10.Msigma Mstar := by rw [hKeq]; exact inf_le_left
+  refine ⟨hKMσstar, fun q hqprime hKcard => ?_⟩
+  -- `q ∣ |M*_σ|`, and `M*_σ` is a `σ(M*)`-group.
+  have hqdvd : q ∣ Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma Mstar) := by
+    rw [← hKcard]; exact Subgroup.card_dvd_of_le hKMσstar
+  exact OddOrder.BG.Ch3.S10.Msigma_isPiGroup Mstar q
+    (Nat.mem_primeFactors.mpr ⟨hqprime, hqdvd, Nat.card_pos.ne'⟩)
+
+/-- **Phase B/C uniqueness core of BG Theorem 15.8** (Coq `tau2_P2type_signalizer`,
+BGsection15.v:1329--1338, the `def_q1` argument): if a uniqueness subgroup `Q ∈ 𝒰`
+(`IsUniquelyMaximal Q`) is centralized by a rank-2 elementary abelian `A ∈ ℰ²_{q₁}(G)`, and `A`
+lies in two maximal subgroups `H` and `Mstar`, then `H = Mstar`.
+
+This is the engine behind `def_q1`: in the theorem, `Q = O_q(M*)` is a uniqueness subgroup
+(Thm 12.13), `A ⊆ C(Q)` (both in the nilpotent `F(M*)`, coprime when `q₁ ≠ q`), and `A ⊆ H`,
+`A ⊆ M*`; the conclusion `H = M*` contradicts `H ≠ M*`, forcing `q₁ = q`.
+
+Proof (Coq `cent_uniq_Uniqueness` + `eq_uniq_mmax`): `A` is a rank-2 (`≥ 2`) subgroup of `C_G(Q)`,
+so `A ∈ 𝒰` by BG Corollary 9.2 (`isUniquelyMaximal_of_le_centralizer_of_two_le_rank`).  Then both
+`H` and `Mstar`, being maximal subgroups over `A`, equal `A.uniqueMaximalSubgroup`, hence are
+equal. -/
+theorem eq_of_uniquelyMaximal_centralized_by_rank2_le [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {Q A H Mstar : Subgroup G} {q1 : ℕ}
+    (hq1prime : q1.Prime)
+    (hQU : IsUniquelyMaximal Q) (hACQ : A ≤ Subgroup.centralizer (Q : Set G))
+    (hA : A ∈ elemAbelianOfRank G q1 2) (hHmax : H ∈ maximalSubgroups G) (hAH : A ≤ H)
+    (hMstarmax : Mstar ∈ maximalSubgroups G) (hAMstar : A ≤ Mstar) :
+    H = Mstar := by
+  haveI : Fact q1.Prime := ⟨hq1prime⟩
+  -- `A ∈ 𝒰` (BG Corollary 9.2: rank-2 subgroup of `C_G(Q)` with `Q ∈ 𝒰`).
+  have hAU : IsUniquelyMaximal A :=
+    OddOrder.BG.Ch2.S09.isUniquelyMaximal_of_le_centralizer_of_two_le_rank hG hQU hACQ
+      (two_le_rank_of_mem_elemAbelianOfRank_two hA)
+  -- Both maximal subgroups over `A` are `A.uniqueMaximalSubgroup`, hence equal.
+  have hH := hAU.eq_uniqueMaximalSubgroup_of_isCoatom_of_le (mem_maximalSubgroups.mp hHmax) hAH
+  have hMst :=
+    hAU.eq_uniqueMaximalSubgroup_of_isCoatom_of_le (mem_maximalSubgroups.mp hMstarmax) hAMstar
+  rw [hH, hMst]
+
 /-- **BG Theorem 15.8** (mmd L4264; Feit--Thompson 1991, `tau2_P2type_signalizer`,
 BGsection15.v:1262): in the Corollary 14.12 signalizer setup — a type-`P₂` maximal `M` with
 `κ`-complement `K` (a Hall `κ(M)`-subgroup), `U` the abelian Hall `(κ(M)∪σ(M))'`-factor
