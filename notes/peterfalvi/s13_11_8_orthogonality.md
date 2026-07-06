@@ -2164,3 +2164,25 @@ parameterized lemma として build (ungated algebra、deferred payoff だが po
 gate-2 hgen sorry を「S₂-structure world-bridge」まで還元。(ii) §9↔§10 world-bridge を claim-before-build
 (9000) で shared infra 化 (hY/hgen 双方が要す最上流) — ただし b の §9/§14 と衝突注意。
 hub 再評価があれば従う ([[hub-arbitrates-cross-lane-autonomously]])。
+
+## 2026-07-06 update³⁰ (lane-a /loop) — ★ hgen 生成 algebra LANDED: gate-2 の **ungated algebra 完成**
+
+update²⁹ で hgen を「S₂ uniform-degree world-bridge に gated」と判定したが、生成 **algebra 自体は
+ungated** (S₂-uniform-degree を仮説化すれば pure lattice/degree 代数) と切り分け、実装 (commit d6f021ce):
+- `SHCSet_span_apply_one_eq_intMul` / `Sset_diff_span_apply_one_eq_intMul` — ℤ[S₁]/ℤ[S₂] の degree
+  = `s·w₁` / `s·qu` (uniform-degree 係数抽出、S08 `certainTypeSet_span_apply_one_eq_intMul` 型)。
+- `Sset_diff_zSpan_vanish_support` — degree-0 ℤ[S₂] combos は A₀-supported (`SHC_zSpan_vanish_support`
+  の S₂ 版、`inducedFamily_sub_support` 経由)。
+- `hgen_of_S2_uniform_degree` — (6.8.1) 生成: supported `φ=φ_X+φ_Y` は `s_X=−s_Y·d` (supportedness
+  + qu=d·w₁) ゆえ `φ=(φ_X+(s_Y·d)ζ)+(φ_Y−s_Y·ψ₀)+s_Y·(ψ₀−dζ)`。capstone の hgen goal と型一致
+  (applicable、`coherent_Sset_of_glued` の hgen を直接 discharge)。
+
+### ★ milestone: **a の ungated gate-2 algebra は全て landed**
+- **ν** (obligation-2 非直交 constructor + `exists_glue_nu`): DONE (a39e2934)。
+- **hgen** (生成 algebra): DONE (d6f021ce)、残 input = S₂ uniform-degree (§9)。
+∴ gate-2 の残余は **純粋に §9/§14 char content** = **hY** (`coherent_Sset_diff_SHCSet`、§9/§14) +
+**hmixed** ((6.7) hY image 構造、§14) + **hDτ** ((5.8) hY.ext column identity、§14) +
+**S₂ uniform-degree** ((11.8.1)、§9 world-bridge)。**全て b/c/§14 territory**。a が正面から埋められる
+ungated algebra は尽くした (ν-constructor + hgen 両 engine 完備、capstone skeleton が consume 準備済)。
+次: capstone hgen への `hgen_of_S2_uniform_degree` 配線 (engine consume + hgen sorry を §9 S₂-degree
+の単一 fact まで還元)、または §9 S₂-structure world-bridge の claim-before-build (collision 注意、b §9)。

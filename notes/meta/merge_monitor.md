@@ -30,7 +30,7 @@
 | **a** | `a` | `odd-order-a` | α **S12 (11.8) unique feitThompson sorry** + §7 on-path norm (2026-07-04 再々編) | `Peterfalvi/S(0[3-9]|1[0-3])*` + `FeitThompson.lean` (全体) | 1000 |
 | **b** | `b` | `odd-order-b` | β **§16 endgame char cascade = S15 (13.9)-(13.19)** (2026-07-04 再々編; §12 Dade は完遂・cite-only) | `Peterfalvi/{S15_SAndT_Setup, S15_SAndT}.lean` (c→b, 2026-07-04) + `S14_MaximalI.lean` + coherence file 群 + carve-out 0090/0096 | 2000 |
 | **c** | `c` | `odd-order-c` | γ **S16 非存在 — 2026-07-06 夕 DORMANT cite-sink 化** (領域枯渇、下記) | `Peterfalvi/S16_NonExistenceG.lean` (S15 は b へ移管、c は import cite) + 構成的 Clifford (issue 9002、完了) | 3000 |
-| **d** | `d` | `odd-order-d` | δ **codex shared-infra hygiene / no active Lean frontier after 9006+9007** (2026-07-06) | `issues/**` + `notes/**` maintenance; new `OddOrder/GroupTheory/**` / `OddOrder/Mathlib/**` / `OddOrder/Algebra/**` shared claims only after open-9000 scan. **Do not edit Peterfalvi/BG S-files without a fresh issue/carve-out.** | **4000** |
+| **d** | `d` | `odd-order-d` | δ **codex 運用 shared-infra レーン (2026-07-06 夕 DORMANT→再活性化)** — coprime-action/minimal-invariant/Hall/π-group foundational 群論 API | `OddOrder/GroupTheory/**` / `OddOrder/Mathlib/**` / `OddOrder/Algebra/**` / `OddOrder/Isaacs/**` へ additive shared claim (claim-before-build: 着手前 9000系 issue 起票 + open-9000 scan)。**Do not edit Peterfalvi/BG S-files without a fresh issue/carve-out.** | **4000** |
 
 > **⚠ 2026-07-06 夕 — lane c DORMANT cite-sink 化 (hub 裁定, 4-agent 調査 wf_00a0db07)**: c の S16 領域は枯渇
 > (0 ahead、S16_NonExistenceG の 10 bare sorry は**全て true carrier gate** = a の typeP_Galois (9000) or b の
@@ -50,6 +50,16 @@ hoist も完了済み (closed/9007)。2026-07-06 lane-d audit では shared foun
 `sorry` は無く、残る bare `sorry` は a/b/c 所有の Peterfalvi frontier に集中している。従って d は新しい
 open shared claim が立つまで **issue/notes hygiene + open-9000 scan** に限定し、Peterfalvi/BG S-file へは
 新 carve-out なしで入らない。
+
+> **♻ 2026-07-06 夕 — lane d DORMANT→再活性化 (hub 裁定)**: DORMANT 化後、d は 4 tick 連続で **genuine な
+> shared 群論 API を sorry-free additive に生産** (claim 9018-9031: normal Hall uniqueness / mulAut invariance /
+> complementary Hall / **MinimalInvariantNormal** / minimal invariant p-group・commutativity / π-group disjoint /
+> Hall action / invariant conjugation 等、Isaacs/GroupTheory/Mathlib)。内容は **coprime-action / minimal-invariant
+> subgroup = FT local analysis (typeP_Galois 9000 の σ-theory 基盤含む) が使う foundational 群論**で、chore-churn
+> busywork ではない。⟹ 「DORMANT / idle 待機」判定は実態と乖離ゆえ撤回、**d = codex 運用の active shared-infra
+> レーン**に再活性化。claim-before-build 継続。**⚠ make-work 化防止**: hub は d の新 API が FT 経路 (特に 9000 /
+> BG local analysis) に接続するかを定期確認する (0-consumer 自体は off-path 根拠にしないが、FT-relevance の追跡は
+> 続ける)。正本 = 本ブロック + ft_lane_reallocation「lane d 再活性化」節。
 
 **signature-first interface (ゲートは幻)**: 上流が sorried signature を export → 下流が cite。各レーンは独立クラスタを
 正面から埋め、cross-cluster は signature contract で媒介 (待たない)。詳細 = ft_lane_reallocation_2026_06_28.md。

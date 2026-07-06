@@ -357,3 +357,21 @@ parity (3002)**。c の成果 (Clifford 9002 / reconciled U-side / S16 sorried-c
 frontier は実質 **a の typeP_Galois 9000 + b の BG §15/§16** の 2 workstream に集中。a が 9000 を landing すれば
 c/b 下流が一気に unblock されるゆえ、**最高 leverage = a の typeP_Galois 9000**。a landing 後に b→c 再配分
 (v-value export 等を c へ) の余地を hub が再検討。hub-arbitrable、ユーザー escalation 事項なし。
+
+## lane d 再活性化 (2026-07-06 夕, DORMANT 判定撤回, hub 裁定)
+
+reshape で d を DORMANT (停止・busywork 禁止) としたが、その後 **4 tick 連続で d は genuine な shared 群論 API を
+sorry-free additive に生産** (claim 9018-9031、Isaacs/GroupTheory/Mathlib): normal Hall uniqueness / mulAut
+invariance / complementary Hall / subtype transfer / **MinimalInvariantNormal** / minimal invariant p-group・
+commutativity・normal witness / π-group disjoint / Hall subgroup action / invariant fixed conjugation 等。
+
+**判定**: 内容は **coprime-action / minimal-invariant subgroup / Hall / π-group = FT local analysis (BG §10-13 +
+typeP_Galois 9000 の σ-theory 基盤) が実際に使う foundational 群論**で、chore-churn busywork ではない (claim 手順
+遵守・全 sorry-free)。「DORMANT / idle なら停止」の前提 (= d に genuine shared frontier なし) は**経験的に偽**。
+⟹ **DORMANT 判定を撤回、d = codex 運用の active shared-infra レーン**に再活性化 (所有 = GroupTheory/Mathlib/
+Algebra/Isaacs へ additive shared claim、claim-before-build 継続)。
+
+**⚠ make-work 化の歯止め (CLAUDE.md「0-consumer は off-path 根拠にしない」を尊重しつつ)**: hub は d の新 API が
+FT 経路に接続するかを **定期確認** (特に typeP_Galois 9000 / BG local analysis の consumer になるか)。0-consumer
+それ自体は停止理由にしないが、FT-relevance 追跡を続け、明らかに spine と無関係な generic API 量産に転じたら
+再度 flag。正本 = 本節 + merge_monitor d 行/note。
