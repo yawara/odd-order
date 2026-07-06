@@ -633,6 +633,22 @@ theorem IsHallSubgroup.map_quotient [Finite G] {π : Set ℕ} {N : Subgroup G}
       hp.2.1.trans (H.index_map_dvd (QuotientGroup.mk'_surjective N)),
       Subgroup.index_ne_zero_of_finite⟩
 
+/-- A `π`-Hall subgroup stays `π`-Hall under any automorphism of the ambient group. -/
+theorem IsHallSubgroup.mulAut_smul [Finite G] {π : Set ℕ} {H : Subgroup G}
+    (hH : IsHallSubgroup π H) (φ : MulAut G) : IsHallSubgroup π (φ • H) := by
+  rw [show (φ • H : Subgroup G) = H.map (φ : G →* G) by
+    rw [Subgroup.pointwise_smul_def]
+    rfl]
+  refine ⟨?_, ?_⟩
+  · have hcard : Nat.card ↥(H.map (φ : G →* G)) = Nat.card ↥H :=
+      (Nat.card_congr (Subgroup.equivMapOfInjective H _ φ.injective).toEquiv).symm
+    rw [hcard]
+    exact hH.1
+  · have hidx : (H.map (φ : G →* G)).index = H.index :=
+      Subgroup.index_map_equiv H φ
+    rw [hidx]
+    exact hH.2
+
 /-- `⊤` は π-Hall ⇔ `G` が π-group (`|G|` の全素因子が π に属す). -/
 theorem IsHallSubgroup.top_iff (π : Set ℕ) :
     IsHallSubgroup π (⊤ : Subgroup G) ↔ ∀ p ∈ (Nat.card G).primeFactors, p ∈ π := by
