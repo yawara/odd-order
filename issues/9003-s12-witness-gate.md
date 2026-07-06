@@ -195,9 +195,10 @@ S10_BGInterface bridge 追加) を issue 0096 carve-out の範囲で**正面か�
 Cluster A の type-classification structural ((8.16)/(10.10)/(11.6)/(9.7.b)/(8.6.a)) は従来通り
 S14 に pin して cite (lane a territory、carve-out 対象外)。
 
-**3. リマインド**: (a) 9001 裁定の **(6.5.c) coherence producer の 9000 番台 claim が未起票** —
-build 着手前に必ず `bin/new-issue --base 9000` で起票 (policy 6)。(b) b は main に 17 commits
-遅れ (最終 merge 44ccb169; 本 tick 合流でさらに進む) — **次 leaf 着手前に `git merge main`**
+**3. リマインド (2026-07-06 D audit で stale 化)**: (a) 9001 裁定の
+**(6.5.c) coherence producer** は `S08.nonempty_coherent_SOf_bot_of_index_dvd` と
+`S14.frobenius_typeI_coherent_of_cyclicQuotient` で landed 済み。旧 "9000 番台 claim 未起票" reminder は
+stale。(b) b の main 遅れ reminder も historical; 各 lane は通常どおり次 leaf 着手前に `git merge main`
 (CLAUDE.md 同期規則)。
 
 ## 🚀 lane b 進捗 (2026-07-03, loop¹⁰⁰) — (12.3) bar-trick descent 完成: `nonconjugate_diffImage_inner_zero` 実証明化

@@ -134,7 +134,8 @@ carrier 宣言とその consumer が複数レーンの所有ファイルに跨�
   `complement_cyclic_order_dvd` (12.12)・`exists_counterexample_dade_data` (12.16 chain)・
   `constituent_diff_support_subset_nonescaping`・`rho_constant_on_H_minus_Hprime`・`psi_constant_on_xK`・
   `rhoM_integer_values`・`sibleyTarget_frobI` (**TI-case 限定**、2032)・`typeI_induced_char_constituents`
-  (9002 = c の Clifford を cite)。+ **(6.5.c) coherence producer (9000 番台 claim 起票が先決)**。
+  (9002 = c の Clifford を cite)。+ **(6.5.c) coherence producer DONE**
+  (`S08.nonempty_coherent_SOf_bot_of_index_dvd` + `S14.frobenius_typeI_coherent_of_cyclicQuotient`)。
   headline `theorem88_caseB_holds`/`counterexample_contradiction` (12.16)/(12.6) tower は sorry-free。
 - **γ (lane-c)** 【binding = 最長 pole】 — 実 sorry 32 (Setup 15 / S15 8 / S16 9):
   **最深**: `orthogonality_switch` (14.14)・`exists_MHypothesis` (14.10)・`eta_generic_data`・

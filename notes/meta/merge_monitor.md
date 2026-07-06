@@ -479,7 +479,7 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
   (1) issue 整理 — 0086/0088/0092/0093/4014 close (supersede/解消注記)、8022 の d-carve-out 失効注記、
   9000 claim を lane a へ承継注記。(2) 裁定 (issue 9003) — b の `65a2be52` (S10 `support_mutual_exclusion`
   実証明 = false-statement 修正) を**受理 (keep in S10)**、**§8 Dade-support 宣言群を lane b に carve-out
-  (issue 0096)**、(6.5.c) claim 未起票と b の main 17 遅れをリマインド。(3) 本ファイル +
+  (issue 0096)**、当時の (6.5.c) 未処理 claim (2026-07-06 D audit で landed 済み/stale) と b の main 17 遅れをリマインド。(3) 本ファイル +
   ft_lane_reallocation + ft_path_policy の 3 レーン整合化 (旧 4 レーン operative 記述を修正/履歴化)。
   検証: on-path unowned sorry = 0、`FeitThompson.lean` 0 sorry、共有ゾーン 0 sorry (comment-strip census
   103 sorry: a 28 / b 13 / c 32 / BG 凍結 15 / Pf Appendices 凍結 15)。
