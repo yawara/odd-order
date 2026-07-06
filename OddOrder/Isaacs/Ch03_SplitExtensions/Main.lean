@@ -1226,6 +1226,16 @@ theorem hall_C [Finite G] [IsSolvable G] {π : Set ℕ} {H K : Subgroup G}
     ∃ g : G, H.map (MulAut.conj g).toMonoidHom = K :=
   hall_C_strong_aux (Nat.card G) G le_rfl hH hK
 
+/-- A normal `π`-Hall subgroup of a finite solvable group is the unique `π`-Hall subgroup.
+This is the standard immediate consequence of Hall conjugacy: every other `π`-Hall subgroup is a
+conjugate of the normal one, hence is equal to it. -/
+theorem IsHallSubgroup.eq_of_normal [Finite G] [IsSolvable G] {π : Set ℕ} {H K : Subgroup G}
+    (hH : IsHallSubgroup π H) (hK : IsHallSubgroup π K) (hN : H.Normal) : H = K := by
+  haveI := hN
+  obtain ⟨g, hg⟩ := hall_C hH hK
+  rw [← hg]
+  exact (Subgroup.Normal.conj_smul_eq_self g H).symm
+
 /-- **Schur-Zassenhaus D-part (抽象版)**: `M ⊴ G` が可解で補群 `K` を持つとき, `|M|` と
 位数が互いに素な部分群 `U` は `K` の共役 `Kˣ` に含まれる.
 
