@@ -9664,9 +9664,20 @@ only `(τ₂ H).Nonempty` with **no witness tying `H` to `M`**, under which the 
 `kappa_complement M U K` (unbundled as `hK`/`hU`/`hUM`/`hKM`/`hUab`/`hKNU`, matching
 `typeP2_neighbor_is_typeF`), `M* ∈ 𝓜(C_G(K))` (`hMstar`), `r`-Sylow `R ≤ U` (`hr`/`hRU`/`hR`), and
 crucially **`H ∈ 𝓜(N_G(R))`** (`hH`) — the missing link making `H` the Cor 14.12 signalizer
-neighbour.  `(τ₂ H).Nonempty` faithfully renders Coq `~~ \tau2(H)^'.-group H` (every `p ∈ τ₂(H)`
-has `pRank_M(H,p) = 2 > 0`, so `p ∣ |H|`).  `tau2_transfer_constraint` has **zero code consumers**
-(only docstrings/AxiomsCheck comments cite it), so the signature change breaks nothing downstream.
+neighbour.  `tau2_transfer_constraint` has **zero code consumers** (only docstrings/AxiomsCheck
+comments cite it), so the signature change breaks nothing downstream.
+
+**Prime-restricted form (2026-07-06 #6, matching the `S12_Theorem127`/`127d` convention).**  The
+repo's `tau2 M := {p | p ∉ σ M ∧ pRank ↥M p = 2}` is `ℕ`-valued, not prime-restricted: a
+*composite* odd `p` (e.g. `p = 15`, `A = C₃²×C₅²`, `|A| = 15²`, `pRank = 2` since
+`IsElementaryAbelian 15 A`) can lie in `tau2 M` abstractly.  So the literal `tau2 M = ∅` /
+`tau2 H = {q}` over-state Coq (whose `\tau2` is implicitly a set of *primes*) and are unprovable by
+the `ℰ²`-argument (which needs `Fact p.Prime`).  So the hypothesis and both `tau2` conclusions
+are prime-restricted: `∃ p prime ∈ τ₂(H)`; `∀ p prime, p ∉ τ₂(M)`; and `q ∈ τ₂(H)` with every
+prime of `τ₂(H)` equal to `q`.  These are faithful to Coq `~~ \tau2(H)^'.-group H` /
+`\tau2(M)^'.-group M` / `\tau2(H) =i q`, and sufficient downstream
+(`fittingInAmbient_eq_Msigma_of_..._tau2_empty` kills only `Y.primeFactors`, which are primes).
+The `ℕ`-valued `tau2` def is a latent shared-infra issue flagged in issue 9017.
 
 Proof spine (Coq `tau2_P2type_signalizer`): pick `q₁ ∈ τ₂(H)`; extract `A ∈ ℰ²_{q₁}(D)` for a
 `σ(H)'`-Hall `D ∋ K` of `H` (Cor 14.12 `hallD`, Thm 12.7 `exists_elemAb_rank_two_le_E_of_tau2`);
@@ -9682,12 +9693,15 @@ sound and matches Coq exactly; the ~130-line Coq proof is **being assembled inli
 Coq→repo map in issue 9017; an earlier "not yet ported" inventory was a naming-trap false negative
 — `Ptype_embedding` = `S14.typeP_duality`, `tau2_not_beta` = `S12.tau2_prime_mem_sigma_diff_beta`,
 `Fcore_structure` = `maxNilpotentNormalHall_*`, `cent_uniq_Uniqueness` = `S09_Theorem91`, etc.).
-The two dropped Cor 14.12 clauses `K ⊆ F(E)` / σ(H)′-Hall `E` are now **exported** by
-`typeP2_neighbor_is_typeF_of_mem`.  Phase A (up to Coq `cKA`) is landed sorry-free as
-`exists_rank2_elemAb_le_centralizer_kappa_of_tau2`; Phases B/C/D (L-structure via `typeP_duality`,
-`def_q1` via the Uniqueness Theorem, `τ₂(H) = {q}` via `tau2_singleton_of_nonabelianSylow`,
-`τ₂(M) = ∅`) remain.  This `sorry` is the pre-existing one (statement re-hypothesized sound),
-**not new**. -/
+The two dropped Cor 14.12 clauses `K ⊆ F(E)` / σ(H)′-Hall `E` are **exported** by
+`typeP2_neighbor_is_typeF_of_mem`.  Landed sorry-free: Phase A (Coq `cKA`) =
+`exists_rank2_elemAb_le_centralizer_kappa_of_tau2`; Phase B foundation =
+`typeP2_partner_structure_of_mem`; Phase D core = `centralizer_kappaCompl_le_of_mem_tau2` +
+`not_prime_mem_tau2_of_centralizer_kappaCompl_not_le` (given the escape witness `C_G(U) ⊄ M`,
+prime-form `τ₂(M) = ∅`).  The remaining **B/C middle** (`def_q1` q₁ = q via the Uniqueness Theorem;
+`Q = O_q(M*)` nonabelian via `Msigma_inf_conj_inf_derived_eq_bot`; `τ₂(H) = {q}` and `X = C_A(H_σ)`,
+`|X| = q` via `tau2_singleton_of_nonabelianSylow`; the escape witness `C_G(U) ⊄ M`) produces the
+input the Phase D core consumes.  This `sorry` is the pre-existing one, **not new**. -/
 theorem tau2_transfer_constraint [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M Mstar U K R H : Subgroup G} {r : ℕ}
     (hM : M ∈ maximalSubgroups G) (hP2 : S14.IsTypeP2 M)
@@ -9700,8 +9714,10 @@ theorem tau2_transfer_constraint [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
     (hR : Ch03.IsHallSubgroup ({r} : Set ℕ) (R.subgroupOf U))
     (hKNU : K ≤ Subgroup.normalizer (U : Set G))
     (hH : H ∈ maximalSubgroupsContaining (Subgroup.normalizer (R : Set G)))
-    (hHtau : (tau2 H).Nonempty) :
-    tau2 M = ∅ ∧ ∃ q : ℕ, q.Prime ∧ Nat.card ↥K = q ∧ tau2 H = {q} := by
+    (hHtau : ∃ p : ℕ, p.Prime ∧ p ∈ tau2 H) :
+    (∀ p : ℕ, p.Prime → p ∉ tau2 M) ∧
+      ∃ q : ℕ, q.Prime ∧ Nat.card ↥K = q ∧ q ∈ tau2 H ∧
+        ∀ p : ℕ, p.Prime → p ∈ tau2 H → p = q := by
   sorry
 
 /-- **`N_G(F(M)) ≤ M` for a maximal `M`** (`F(M)` is "self-normalizing modulo `M`"): the ambient
