@@ -354,6 +354,18 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-07 — 監視再開 (ユーザー「各レーンを監視します」) + tick d 合流 + ⚠ push 18-commit drift 露見**:
+  cron 死亡確認 (CronList 空) → 新 cron `c50d5c72` を規定ペース `7,22,37,52` で作成。初回 tick:
+  a/b/c=0 (b/c は main に**遅れ** = lane 側の `git merge main` 待ち、逸脱でない)、**d=7 commits**
+  (Isaacs Ch04 commutator/Fitting/Frattini action 補題 = claim 9061-9067、全 closed)。step1.5 clean
+  (Isaacs shared foundation の Main.lean のみ + issue hygiene)、step1.6 dup なし、新 axiom なし、
+  **sorry 変化なし (pure proven additive +350)**。合流 `2826cac1`、full build green **3933 jobs**、
+  AxiomsCheck OK。**⚠ サイズ watch: `Isaacs/Ch04_Commutators/Main.lean` = 6636 行 → 分割 issue 0097
+  起票** (hub owner、優先度中・shared foundation ゆえ非緊急)。
+  **⛔ push blocked (STOP でない)**: auto-mode classifier が `git push origin main` を拒否 (hub 標準
+  auto-push policy を classifier が認識しない)。**main が origin より 18 commits 先行** — 直近数 tick の
+  a/b/c/d merge が全て local-only で滞留。merge は全て検証済・保持。**ユーザーに push 認可を確認中**
+  (merge 保持・監視は継続、STOP しない)。sorry = 89 (tick 前後不変)。
 - **2026-07-05 (夜) — 監視停止 (ユーザー指示「loopを停止して」)**: cron ad5e5815 を CronDelete。
   ⛔ 停止 (問題起因) ではないので**自動再開しない** — 次の監視再開はユーザー指示を待って
   `7,22,37,52 * * * *` で再作成する。停止時点: main = `334e0bf2` (push 済・tree clean・origin 同期)、
