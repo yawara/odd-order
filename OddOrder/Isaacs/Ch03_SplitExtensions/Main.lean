@@ -649,6 +649,28 @@ theorem IsHallSubgroup.mulAut_smul [Finite G] {π : Set ℕ} {H : Subgroup G}
     rw [hidx]
     exact hH.2
 
+/-- The type of `π`-Hall subgroups of `G`. -/
+abbrev HallSubgroups (π : Set ℕ) (G : Type*) [Group G] :=
+  {H : Subgroup G // IsHallSubgroup π H}
+
+/-- Ambient automorphisms act on the type of `π`-Hall subgroups. -/
+instance HallSubgroups.mulAutAction [Finite G] (π : Set ℕ) :
+    MulAction (MulAut G) (HallSubgroups π G) where
+  smul φ H := ⟨φ • H.1, H.2.mulAut_smul φ⟩
+  one_smul H := by
+    apply Subtype.ext
+    change (1 : MulAut G) • H.1 = H.1
+    simp
+  mul_smul φ ψ H := by
+    apply Subtype.ext
+    change (φ * ψ) • H.1 = φ • (ψ • H.1)
+    simp [mul_smul]
+
+/-- The conjugation action of `G` on its `π`-Hall subgroups. -/
+instance HallSubgroups.conjAction [Finite G] (π : Set ℕ) :
+    MulAction G (HallSubgroups π G) :=
+  MulAction.compHom (HallSubgroups π G) (MulAut.conj : G →* MulAut G)
+
 /-- A Hall subgroup of a subgroup whose ambient index is a `π'`-number stays Hall after
 pushing it back to the whole ambient group. -/
 theorem IsHallSubgroup.map_subtype_of_index_no_pi [Finite G] {π : Set ℕ}
@@ -1276,6 +1298,21 @@ theorem hall_C [Finite G] [IsSolvable G] {π : Set ℕ} {H K : Subgroup G}
     (hH : IsHallSubgroup π H) (hK : IsHallSubgroup π K) :
     ∃ g : G, H.map (MulAut.conj g).toMonoidHom = K :=
   hall_C_strong_aux (Nat.card G) G le_rfl hH hK
+
+/-- The conjugation action on Hall `π`-subgroups of a finite solvable group is transitive. -/
+theorem HallSubgroups.conjAction_pretransitive [Finite G] [IsSolvable G] (π : Set ℕ) :
+    MulAction.IsPretransitive G (HallSubgroups π G) := by
+  constructor
+  intro H K
+  obtain ⟨g, hg⟩ := hall_C (π := π) H.2 K.2
+  refine ⟨g, ?_⟩
+  apply Subtype.ext
+  change MulAut.conj g • H.1 = K.1
+  rw [show (MulAut.conj g • H.1 : Subgroup G) =
+      H.1.map (MulAut.conj g : G →* G) by
+    rw [Subgroup.pointwise_smul_def]
+    rfl]
+  exact hg
 
 /-- A normal `π`-Hall subgroup of a finite solvable group is the unique `π`-Hall subgroup.
 This is the standard immediate consequence of Hall conjugacy: every other `π`-Hall subgroup is a
