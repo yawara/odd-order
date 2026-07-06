@@ -139,6 +139,14 @@ theorem induceTerm_conj (H : Subgroup G) (θ : ClassFunction ↥H k) (x g h : G)
       exact hx (by rwa [← heq])
     rw [dif_neg hx, dif_neg hy]
 
+/-- The induction summand commutes with complex conjugation. -/
+theorem induceTerm_conjStar (H : Subgroup G) (θ : ClassFunction ↥H ℂ) (x g : G) :
+    star (induceTerm H θ x g) = induceTerm H θ.conj x g := by
+  classical
+  by_cases hx : x⁻¹ * g * x ∈ H
+  · rw [induceTerm_of_mem θ hx, induceTerm_of_mem θ.conj hx, conj_apply]
+  · rw [induceTerm_of_not_mem θ hx, induceTerm_of_not_mem θ.conj hx, star_zero]
+
 @[simp] theorem induceTerm_zero (H : Subgroup G) (x g : G) :
     induceTerm H (0 : ClassFunction ↥H k) x g = 0 := by
   classical
@@ -197,6 +205,13 @@ def induceSum (H : Subgroup G) (θ : ClassFunction ↥H k) : ClassFunction G k w
 
 @[simp] theorem induceSum_apply (H : Subgroup G) (θ : ClassFunction ↥H k) (g : G) :
     induceSum H θ g = ∑ x : G, induceTerm H θ x g := rfl
+
+/-- The unnormalized induction sum commutes with complex conjugation. -/
+theorem induceSum_conj (H : Subgroup G) (θ : ClassFunction ↥H ℂ) :
+    (induceSum H θ).conj = induceSum H θ.conj := by
+  ext g
+  rw [conj_apply, induceSum_apply, induceSum_apply, star_sum]
+  exact Finset.sum_congr rfl fun x _ => induceTerm_conjStar H θ x g
 
 open scoped Classical in
 /-- **Peterfalvi (2.10.3)** (transversal value, unscaled form).  Only those `x ∈ G`
@@ -267,6 +282,18 @@ def induce (H : Subgroup G) [Invertible (Nat.card H : k)]
     (θ : ClassFunction ↥H k) (g : G) :
     induce H θ g = ⅟(Nat.card H : k) * ∑ x : G, induceTerm H θ x g :=
   rfl
+
+/-- The normalized induced class function commutes with complex conjugation. -/
+theorem induce_conj (H : Subgroup G) [Invertible (Nat.card H : ℂ)]
+    (θ : ClassFunction ↥H ℂ) :
+    (induce H θ).conj = induce H θ.conj := by
+  ext g
+  rw [conj_apply, induce_apply, induce_apply, star_mul', star_sum]
+  have hscale : star (⅟(Nat.card H : ℂ)) = ⅟(Nat.card H : ℂ) := by
+    rw [invOf_eq_inv, star_inv₀, star_natCast]
+  rw [hscale]
+  exact congrArg (fun z => ⅟(Nat.card H : ℂ) * z)
+    (Finset.sum_congr rfl fun x _ => induceTerm_conjStar H θ x g)
 
 open scoped Classical in
 /-- **Peterfalvi (2.10.3)** (transversal value, normalized form).  The normalized

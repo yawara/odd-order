@@ -41,37 +41,6 @@ namespace OddOrder.RepresentationTheory
 
 namespace ClassFunction
 
-variable {Γ : Type*} [Group Γ]
-
-/-- The induction summand commutes with complex conjugation. -/
-theorem induceTerm_conjStar (H : Subgroup Γ) (θ : ClassFunction ↥H ℂ) (x g : Γ) :
-    star (induceTerm H θ x g) = induceTerm H θ.conj x g := by
-  classical
-  by_cases hx : x⁻¹ * g * x ∈ H
-  · rw [induceTerm_of_mem θ hx, induceTerm_of_mem θ.conj hx, conj_apply]
-  · rw [induceTerm_of_not_mem θ hx, induceTerm_of_not_mem θ.conj hx, star_zero]
-
-variable [Fintype Γ]
-
-/-- The unnormalized induction sum commutes with complex conjugation. -/
-theorem induceSum_conj (H : Subgroup Γ) (θ : ClassFunction ↥H ℂ) :
-    (induceSum H θ).conj = induceSum H θ.conj := by
-  ext g
-  rw [conj_apply, induceSum_apply, induceSum_apply, star_sum]
-  exact Finset.sum_congr rfl fun x _ => induceTerm_conjStar H θ x g
-
-/-- The normalized induced class function commutes with complex conjugation. -/
-theorem induce_conj (H : Subgroup Γ) [Invertible (Nat.card H : ℂ)]
-    (θ : ClassFunction ↥H ℂ) :
-    (induce H θ).conj = induce H θ.conj := by
-  ext g
-  rw [conj_apply, induce_apply, induce_apply, star_mul', star_sum]
-  have hscale : star (⅟(Nat.card H : ℂ)) = ⅟(Nat.card H : ℂ) := by
-    rw [invOf_eq_inv, star_inv₀, star_natCast]
-  rw [hscale]
-  exact congrArg (fun z => ⅟(Nat.card H : ℂ) * z)
-    (Finset.sum_congr rfl fun x _ => induceTerm_conjStar H θ x g)
-
 end ClassFunction
 
 variable {Γ : Type*} [Group Γ] [Fintype Γ] [Invertible (Nat.card Γ : ℂ)]

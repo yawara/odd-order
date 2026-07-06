@@ -36,6 +36,23 @@ relocate する別refactor が要 (deps は全て InducedCharacter/IsReal に有
   現状は S09 (lane-a) と S14 (lane-b) に 2 コピー併存 (証明同一、害小)。lane-b は必要なら S09 版を cite 可
   (S14 は S09_CertificateDischarge を import 済ゆえ S09 名前空間に到達可)。
 
+## 2026-07-06 lane d — `induce_conj` chain relocated
+
+D moved the three complex-conjugation induction helpers from
+`OddOrder/Peterfalvi/S08_CoherenceCorePart1.lean` to
+`OddOrder/GroupTheory/RepresentationTheory/InducedCharacter.lean` unchanged:
+
+- `ClassFunction.induceTerm_conjStar`
+- `ClassFunction.induceSum_conj`
+- `ClassFunction.induce_conj`
+
+`S08_CoherenceCorePart1` now cites the shared declarations by import. Verified:
+`lake build OddOrder.GroupTheory.RepresentationTheory.InducedCharacter OddOrder.Peterfalvi.S08_CoherenceCorePart1`.
+
+Remaining 9007 cleanup: move `inner_induce_conj_eq_zero_of_frobenius_of_odd`
+to a true shared `RepresentationTheory` leaf and rewire S09/S14 consumers to cite
+the shared copy.
+
 ## 完了条件
 
 - lane-a: `S09_FrobeniusEstimate.lean` が build green、(7.8.b) hzeta0nu が cite。✅ 相当
