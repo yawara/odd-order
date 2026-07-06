@@ -3801,6 +3801,26 @@ theorem Hypothesis.span_inner_SHCSet_diff_eq_zero [Finite G] {M : Subgroup G} (h
       rw [← Int.cast_smul_eq_zsmul ℂ a x, ClassFunction.inner_smul_left, ih, mul_zero]
 
 open scoped FiniteInduce in
+/-- **`S(HC) ⊆ S`** (the `X ⊆ X ∪ Y` inclusion for the (11.8.6) union): every member of
+`S(HC) = {φ ∈ S | φ irreducible, φ(1) = w₁}` is in `S = inducedFamily M` by the first conjunct of
+its defining comprehension.  Trivial, but named so the (11.8.6) set-decomposition
+`Sset_eq_SHCSet_union_diff` and future gluing consumers can cite it. -/
+theorem Hypothesis.SHCSet_subset_Sset [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.SHCSet ⊆ hyp.Sset :=
+  fun _ hφ => hφ.1
+
+open scoped FiniteInduce in
+/-- **`S(C) = S(HC) ∪ (S(C) − S(HC))`** (the set-level decomposition `S = S₁ ∪ S₂` of the (11.8.6)
+union): `S(HC) ⊆ S` (`SHCSet_subset_Sset`), so `S = S(HC) ∪ (S ∖ S(HC))` by `Set.union_diff_cancel`.
+This is the exact `rw` that turns the (11.8.6) goal `IsCoherent τ S A₀` into the union form
+`IsCoherent τ (S(HC) ∪ S₂) A₀` the S07 gluing engine
+(`coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal`) concludes — with `X = S(HC)`
+(coherent by `coh`), `Y = S₂ = S ∖ S(HC)` (coherent by (9.11)/(11.7)). -/
+theorem Hypothesis.Sset_eq_SHCSet_union_diff [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.Sset = hyp.SHCSet ∪ (hyp.Sset \ hyp.SHCSet) :=
+  (Set.union_diff_cancel hyp.SHCSet_subset_Sset).symm
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.6), the τ₂ union-coherence** (the deep capstone step, named obligation).
 From the column identities `(μ_j − dζ)^τ = ∑_i ω_{ij}^σ − dζ^{τ₁}` (`0 < j`, all rows; `τ₁ = coh`),
 the whole family `S = S(C) = inducedFamily M` is coherent.  Peterfalvi's argument: `S₂ = S(C) − S(HC)`
