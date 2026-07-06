@@ -3893,14 +3893,24 @@ theorem Hypothesis.inducedFamily_reducible_apply_one_eq_qu [Finite G]
     (hyp.mkSection11CharacterData (hyp.toTypesIIIIIIVSetup htype hnt) chief) y hmem hred
 
 open scoped FiniteInduce in
-/-- **(11.8.1) uniform degree of `𝒮₂ = Sset \ SHCSet`** (the `hS2deg` input of the (11.8.6)
-generation `hgen_of_S2_uniform_degree`): every member has degree `q·u = qu`.  Split by reducibility:
-* **reducible** members → `inducedFamily_reducible_apply_one_eq_qu` (reduces to the (9.5)/(11.5)
-  `reducible → 𝒮(H₀)` inclusion);
-* **irreducible** members are `∉ SHCSet ⟹ degree ≠ w₁`, so the (9.8)/(9.9) irreducible-degree
-  completeness gives degree `qu` (irr `inducedFamily`-members of degree `≠ w₁` have degree `qu` —
-  the remaining §9 obligation, sorried).
-This assembles the world-bridge's degree claim, reducing it to the two §9 inclusions. -/
+/-- ⚠️ **OVER-STRONG — this uniform-degree statement is FALSE for non-Galois type III/IV; do NOT
+build new work on it or attempt to close its remaining `sorry`.**  See **issue 1019** and
+`notes/peterfalvi/s13_11_8_orthogonality.md` update³⁷.
+
+The claim "`∀ y ∈ Sset \ SHCSet, y(1) = qu`" (`Sset = inducedFamily M`) requires the whole non-`SHCSet`
+part of `S = S_1` to have the single degree `qu`.  But in the **non-Galois** case Peterfalvi (9.8)
+(Coq `typeP_nonGalois_characters`, PFsection9.v:845–855) produces irreducibles of degree `q·a` with
+`a := |U : C_U(·)| > 1` and `q·a ≠ q·u` (the parameters `u = |Ū|` and `a` genuinely differ); these lie
+in `inducedFamily M \ SHCSet` with degree `≠ qu`, so the irreducible-side below is **not provable**.
+The correct mechanism (Coq PFsection11.v:104/206) treats `S_1` as merely `subcoherent` and extends
+coherence from the smaller `S(H₀C)` via `bounded_seqIndD_coherence` (Pf (6.x)) — **no uniform degree**.
+This lemma (and its consumer `hgen_of_S2_uniform_degree`, hence the `hgen` bullet of
+`coherent_Sset_of_column_identities`) is the deprecated uniform-degree route; it is to be replaced by
+the bounded-coherence redesign (issue 1019).
+
+**The reducible half is genuinely true** and stays sorry-free
+(`inducedFamily_reducible_apply_one_eq_qu`: reducible members ARE the degree-`qu` μ-columns); only the
+irreducible half is the false over-statement. -/
 theorem Hypothesis.Sset_diff_SHCSet_apply_one_eq_qu [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     (htype : IsTypeIII M ∨ IsTypeIV M) (hnt : TypePNontrivialCore M hyp.typeP)
@@ -3910,8 +3920,9 @@ theorem Hypothesis.Sset_diff_SHCSet_apply_one_eq_qu [Finite G]
         (hyp.mkSection11CharacterData (hyp.toTypesIIIIIIVSetup htype hnt) chief).u : ℕ) : ℂ) := by
   haveI := hyp.finiteG
   by_cases hirr : IsIrreducibleCharacter y
-  · -- irreducible ∈ `Sset \ SHCSet` ⟹ degree ≠ w₁ (else `y ∈ SHCSet`); the (9.8)/(9.9)
-    -- irreducible-degree completeness gives degree `qu`.
+  · -- ⚠️ FALSE branch (issue 1019): an irreducible `y ∈ Sset \ SHCSet` of degree `≠ w₁` need NOT have
+    -- degree `qu` — in the non-Galois case (9.8)(d) it can have degree `q·a` (`a > 1`, `q·a ≠ q·u`).
+    -- This `sorry` is unclosable; the (11.8.6) coherence must instead use `bounded_seqIndD_coherence`.
     sorry
   · exact hyp.inducedFamily_reducible_apply_one_eq_qu hG htype hnt chief hy.1 hirr
 
@@ -4019,7 +4030,14 @@ theorem Hypothesis.Sset_eq_SHCSet_union_diff [Finite G] {M : Subgroup G} (hyp : 
   (Set.union_diff_cancel hyp.SHCSet_subset_Sset).symm
 
 open scoped FiniteInduce in
-/-- **Peterfalvi (11.8.6) prerequisite: `S₂ = S(C) − S(HC)` is coherent** (the `hY` gluing input;
+/-- ⚠️ **Over-broad family, part of the uniform-degree route (issue 1019).**  Here `S₂` is taken as
+`hyp.Sset \ hyp.SHCSet = inducedFamily M \ S(HC) = S_1 \ S(HC)`, but Peterfalvi's `S₂` is the narrower
+`S(C) \ S(HC)` (with the `C`-kernel condition).  The coherence of the full `S_1 \ S(HC)` is not a
+standalone fact — in Coq `S_1` is merely `subcoherent`, and its coherence is *derived* from `S(H₀C)`
+coherence via `bounded_seqIndD_coherence`.  This obligation should be re-scoped in the redesign
+(narrow to `S(C)` / `S(H₀C)`, then extend via bounded coherence).
+
+**Peterfalvi (11.8.6) prerequisite: `S₂ = S(C) − S(HC)` is coherent** (the `hY` gluing input;
 §9/§14-gated, named obligation).
 
 This is Peterfalvi's "By (9.11), `𝒮(H₀C') − 𝒮(HC')` is coherent, whence `𝒮₂` is coherent by (11.7)"
@@ -4154,7 +4172,15 @@ theorem Hypothesis.Sset_diff_zSpan_vanish_support [Finite G] {M : Subgroup G}
       exact (ClassFunction.support_smul_subset _ _).trans hx
 
 open scoped FiniteInduce in
-/-- **(11.8.6) generation `hgen`** — the ungated degree-0 sublattice generation, given `S₂` has
+/-- ⚠️ **Deprecated uniform-degree route (issue 1019).**  This lemma is true *as stated* (it is
+conditional on `hS2deg`), but its hypothesis `hS2deg` = "`S₂ = Sset \ SHCSet` has uniform degree `qu`"
+is **`Sset_diff_SHCSet_apply_one_eq_qu`, which is FALSE for non-Galois type III/IV** (degree-`qa`
+irreducibles, `qa ≠ qu`).  So this generator can only be *applied* in the Galois case and is part of
+the deprecated uniform-degree strategy; the (11.8.6) redesign replaces it with the Coq route
+`bounded_seqIndD_coherence` (Pf (6.x)).  Kept for now because the reducible-side degree fact it
+relies on is genuine; do not build new consumers on the `hS2deg` interface.
+
+**(11.8.6) generation `hgen`** — the ungated degree-0 sublattice generation, given `S₂` has
 uniform degree `qu = d·w₁` (the (11.8.1) reducible degree, §9-gated hypothesis `hS2deg`) with a
 witness column `ψ₀`.  Peterfalvi (6.8.1) generation for the (11.8.6) union: the degree-0 sublattice
 of `ℤ[S₁ ∪ S₂]` is generated by the supported sublattices `ℤ[S₁,A₀]`, `ℤ[S₂,A₀]` and the single
@@ -4231,7 +4257,15 @@ theorem Hypothesis.hgen_of_S2_uniform_degree [Finite G] {M : Subgroup G}
   · exact Submodule.smul_mem _ _ (Submodule.subset_span (Set.mem_union_right _ hD))
 
 open scoped FiniteInduce in
-/-- **Peterfalvi (11.8.6), the τ₂ union-coherence** (the deep capstone step, named obligation).
+/-- ⚠️ **Its `hgen` bullet is on the deprecated uniform-degree route (issue 1019).**  That bullet
+cites `Sset_diff_SHCSet_apply_one_eq_qu`, whose irreducible half is FALSE for non-Galois type III/IV,
+so the capstone cannot be completed as designed.  The target (coherence of `inducedFamily M = S_1`,
+contradicting (10.8)) is correct, but the route must be rebuilt via `bounded_seqIndD_coherence`
+(Pf (6.x), Coq PFsection11.v:206): establish coherence of the smaller `S(H₀C)` and *extend* it to
+`S_1` by the nilpotency/size bound — no uniform degree.  The `ν`-glue, `hmixed`/`hDτ` scaffolding and
+the `hgen` algebra are reusable pieces of the redesign; the uniform-degree `hS2deg` input is not.
+
+**Peterfalvi (11.8.6), the τ₂ union-coherence** (the deep capstone step, named obligation).
 From the column identities `(μ_j − dζ)^τ = ∑_i ω_{ij}^σ − dζ^{τ₁}` (`0 < j`, all rows; `τ₁ = coh`),
 the whole family `S = S(C) = inducedFamily M` is coherent.  Peterfalvi's argument: `S₂ = S(C) − S(HC)`
 is coherent (`τ₂`) by (11.7)/(9.11) (`coherent_Sset_diff_SHCSet`); the column identities give
