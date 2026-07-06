@@ -435,6 +435,21 @@ theorem isComplement'_subgroupOf_of_disjoint_mul_eq_univ {G : Type*} [Group G]
     ext
     exact hmh
 
+/-- If `A` is normal and disjoint from `B`, then the restrictions of `A` and `B`
+to `A ⊔ B` are complements. -/
+theorem isComplement'_subgroupOf_sup_of_normal {G : Type*} [Group G]
+    {A B : Subgroup G} [A.Normal] (hAB : Disjoint A B) :
+    (A.subgroupOf (A ⊔ B)).IsComplement' (B.subgroupOf (A ⊔ B)) := by
+  refine isComplement'_subgroupOf_of_disjoint_mul_eq_univ
+    (U := A ⊔ B) (H := B) (M := A) le_sup_right le_sup_left ?_ ?_
+  · rw [inf_comm, hAB.eq_bot]
+  · intro x hx
+    have hxmul : (x : G) ∈ (↑A : Set G) * (↑B : Set G) := by
+      rw [← Subgroup.normal_mul A B]
+      exact hx
+    obtain ⟨a, ha, b, hb, hab⟩ := hxmul
+    exact ⟨a, ha, b, hb, hab⟩
+
 /-- For a surjective homomorphism `f : G →* H`, the preimage of a subgroup has cardinality
 `|K.comap f| = |K| * |ker f|`. -/
 theorem card_comap_eq_card_mul_card_ker {G H : Type*} [Group G] [Group H]
