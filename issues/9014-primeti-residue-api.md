@@ -575,3 +575,23 @@ S06 の descriptive 名を見落とした Coq 名 grep の罠、[[verify-port-st
   restrict_certainType_eq 等、大半 S06 に proven)。
 これは「from-scratch port」でなく既存 S06 grid 定理の field-mapping ⟹ 規模は当初想定より遥かに小。
 次 = ofS06Hypothesis bridge の field 群 (indexing Fin p ↔ Ŵ₂ / Fin q ↔ Fin|W1| + 各 field の S06 定理接続)。
+
+## 2026-07-06 更新 #3 (lane b) — ★constructor は 100% mechanical assembly と確定 (全 field の S06 source 特定)
+
+`ofS06Hypothesis` constructor の全 9 field が S06 に既存 (0 new math、残は Fin-indexing wiring のみ):
+
+| PrimeTIResidueData field | S06 source (file:定理) |
+|---|---|
+| mu2 | `columnFamily.mu` (S06_CertainTypeCharacters:432) |
+| chi | `chiRestrict` (S06_CertainTypeClifford:772) |
+| mu2_orthonormal | columnFamily 正規直交 (columnFamily_mu 系) |
+| chi_res | `coe_chiRestrict` (:778, rfl) |
+| ind_chi | `induce_restrict_certainType_eq` (:743) |
+| chi_zero | `chiRestrict_one_eq_trivial` (S06_CertainTypeSupport:287) |
+| cfker_prTIres | `not_subset_characterKernel_chiRestrict_of_ne_one` ((4.7)) |
+| prTIres_irr_cases | `prTIres_irr_dichotomy` (landed, PrimeTIResidue.lean) |
+| card fact |Ŵ₂|=|W₂| | `card_charGroup_W2` |
+
+indexing: p := Nat.card h.W2、q := Nat.card h.W1、`Fin p ≃ Ŵ2` を card_charGroup_W2 + trivial↦0 pin
+(chiRestrict_one_eq_trivial で chi_zero)。P field = W2 ⊆ H ≤ K の任意 H (FT app では Fitting)。
+⟹ constructor 完成は pure wiring。background subagent に委任 (mechanical、context 節約)。
