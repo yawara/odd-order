@@ -1957,3 +1957,82 @@ prime-TI 基盤不在 / gate-2 skeleton は carrier bridge 要マップ)。「qu
 background subagent (agentId a8e14…) が (10.8) 最小 path を scope+build 中 (prime-TI 全機構回避可否を判定)。
 **次 iteration**: subagent 結果を検証 → clean build なら commit; 深基盤要なら §3/§4 prime-TI leaf を新設着手
 (ungated・未所有 leaf ゆえ in-scope) or hub と scope 再調整。
+
+## 2026-07-06 update²⁶ (lane-a /loop) — ★ gate-2 carrier bridge **完全マップ**: (9.11) は support+family 二重ずれで gate-2 に直結不可
+
+gate-2 `coherent_Sset_of_column_identities` (S12_MaximalIII_IV_V:3813) の carrier bridge を
+code-level で完全マップ。**結論: (9.11) `coherent_H0C_commutator` は 3 つ組 `(τ, S, A)` の
+うち τ のみ一致し、S と A は両方ずれる。∴ (9.11) を単純 cite しても gate-2 の shape に合わない
+(sorried-cite でも shape 不一致)。** 詳細:
+
+### 2 世界の 3 つ組
+- **gate-2 が要すもの** (`Hypothesis` 世界): `IsCoherent hyp.tau (hyp.Sset \ hyp.SHCSet) hyp.A0`
+  を `hX=coh` (`IsCoherent hyp.tau hyp.SHCSet hyp.A0`) と glue して
+  `IsCoherent hyp.tau hyp.Sset hyp.A0` を出す (S07 gluing engine `coherentUnion_of_glued*`)。
+  ここで `hyp.Sset = inducedFamily M`, `hyp.SHCSet = {φ∈inducedFamily M | irr, φ(1)=w₁}`,
+  `hyp.A0 = supportInSubgroup (typePA0 M) M`。
+- **(9.11) が出すもの** (`Section11CharacterData` 世界): `coherent_H0C_commutator chars :
+  IsCoherent chars.tau chars.S chars.H0CprimeSupport`。ここで
+  `chars.S = sSet data = {Ind_{HU}^M χ | χ∈𝒳}` (𝒳={χ∈Irr(HU) | H⊄Ker χ}),
+  `chars.tau`/`chars.H0CprimeSupport` は **free field** (structure S11:2054-2066)。
+
+### bridge constructor は在る が support を潰す
+`Hypothesis.mkSection11CharacterData` (S12_Section9Counts:57) が
+`Hypothesis M → Section11CharacterData data chief` を与え、free field を:
+- **`tau := hyp.tau`** ✅ → `chars.tau = hyp.tau` は **defeq** (rfl)。**τ 側は一致。**
+- **`H0CprimeSupport := ∅`** ❌ → `chars.H0CprimeSupport = ∅ ≠ hyp.A0`。
+これは §9 count 用の placeholder (docstring 明記: "support/`Prop` are placeholders for the count
+use")。∴ この constructor 経由の (9.11) coherence は **support `∅`**。
+
+### ❌ 致命傷 1: support `∅` は `IsCoherent` の `nonzero` を **unconstructible** にする
+`zSupportedSpan S ∅ = {φ∈zSpan S | φ.support ⊆ ∅} = {0}` (S07:44)。`IsCoherent` の第 1 field
+`nonzero : ∃ φ ∈ zSupportedSpan S A, φ ≠ 0` (S07:1663) は support=∅ では **証明不可** (0 しか無い)。
+∴ `hyp.mkSection11CharacterData … |> coherent_H0C_commutator` は sorried-cite でも
+**`IsCoherent hyp.tau chars.S ∅` の shape** で、gate-2 が要す `hyp.A0`-support 版と別物。
+support を `∅→hyp.A0` に載せ替える bridge は存在しない (かつ `H0CprimeSupport` を `hyp.A0` に pin
+する構成は (9.11) 側 free field ゆえ新規に要構成 = §14 Sibley setup の genuine support)。
+
+### ❌ 致命傷 2: family `chars.S = sSet data ≠ hyp.Sset \ hyp.SHCSet`
+- `inducedFamily M` (S12_Core:79) = `{Ind_{M'}^M θ | θ∈Irr M', θ≠1}` (source = M', 全非自明既約)。
+- `sSet data` (S11:1595) = `{Ind_{HU}^M χ | χ∈𝒳}` (source = HU, 𝒳-constituent のみ)。
+- HU = H⊔U = M' は (11.5) `derivedInG_eq_fitting_sup_U` で成立するが、**induction source の
+  subgroup 同一視 + 𝒳 = (全非自明既約) の identification は substantial theorem** (Peterfalvi (11.5)/
+  S=𝒮 identification)。repo に `inducedFamily ↔ sSet` を繋ぐ lemma は **皆無** (grep 0)。
+- さらに (9.11) の S は `sSet data` (**full 𝒮**) であって、Peterfalvi (11.8.6) 本文が使う
+  **S(H₀C')−S(HC')** (= (11.7) で S₂ に翻訳) ではない。(11.7) collapse (`H₀=1`/`chief.N=⊥`) を
+  経て `sOf data (H₀C') = sOf data C'` 等の set identity を要し、これも repo 未形式化
+  (S12_Section9Counts:140 は (11.7) `H₀=1` を **degree count** にしか使っておらず、
+  set-level S₂ identification は無い)。
+
+### ∴ gate-2 を honest に閉じるのに必要な未形式化 prerequisite (正確な signature)
+gate-2 は S07 gluing engine `coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal`
+(S07:4685) に `hX=coh`, `hY=[S₂ coherence]`, ν=glued map, orthogonality (既に proven:
+`span_inner_SHCSet_diff_eq_zero` S12:3781), diagonal `hDτ`, `hgen` を渡せば組める。**唯一の
+genuine 穴 = `hY : IsCoherent hyp.tau (hyp.Sset \ hyp.SHCSet) hyp.A0`** で、これを (9.11) から
+得るには次の 3 本が要る (どれも lane-a 未所有 or §14/lane-b gated):
+
+1. **`H0CprimeSupport = hyp.A0` に pin した Section11CharacterData 構成** (支持の genuine 化)。
+   現 `mkSection11CharacterData` は `∅` placeholder。§14 Sibley setup の実支持を要する。
+   signature: `hyp.mkSection11CharacterData'` で `H0CprimeSupport := hyp.A0` (かつ (9.11) が
+   その支持で成立することの証明 = §14 gated)。
+2. **family identity `sSet data = hyp.Sset \ hyp.SHCSet`** (または (9.11) の実 S = S(H₀C')−S(HC')
+   を経た `= hyp.Sset \ hyp.SHCSet`)。Peterfalvi (11.5) HU=M' + S=𝒮 + (11.7) S₂ 翻訳。
+   signature: `theorem sSet_eq_Sset_diff_SHCSet : sSet data = hyp.Sset \ hyp.SHCSet` (未形式化)。
+3. **(9.11) 自身の sorry** (`sibleyTarget_H0C` S11:8279, §14 + lane-b (6.8) gated) — これは
+   policy 上 cite-sorried 可、但し **上記 1+2 が無いと cite しても gate-2 の shape に嵌らない**。
+
+### 判定
+gate-2 の honest close は **(9.11) の sorry だけでなく、carrier bridge 2 本 (support pin +
+family identity) の genuine 形式化**を要す。これらは (a) §14 Sibley support (lane-b/§14 領域)、
+(b) Peterfalvi (11.5)/(11.7) の set-level S=𝒮/S₂ 翻訳 (lane-a 可能だが substantial な新規 char
+body、現状 repo 皆無) に gated。**∴ 「(9.11) を gluing engine に流す sorried-cite skeleton」は
+carrier bridge 2 本が無い今は build-green で組めない** (support-∅ が `nonzero` を塞ぎ、family
+mismatch が `hX∪hY` を塞ぐ)。churn 回避のため、本 iteration は **新 sorry を撃たず** gate-2 は
+`sorry` のまま据え置き、上記 3 本を残ギャップとして精密記録する。build-green で landing 可能な
+副産物 (orthogonality bridge `SHCSet_inner_diff_eq_zero` / `span_inner_SHCSet_diff_eq_zero`) は
+**既に landed** (S12:3768/3781) ゆえ追加なし。
+
+**次 iteration 候補**: family identity `sSet data = hyp.Sset \ hyp.SHCSet` (bridge #2) が lane-a
+単独で形式化可能かを精査 (Peterfalvi (11.5) HU=M' は `derivedInG_eq_fitting_sup_U` で proven ゆえ
+induction-source 同一視は射程内、但し 𝒳=全非自明既約 の identification が (9.5)/(11.5) の
+character-theory 内容で要精査)。bridge #1 (support pin) は §14 Sibley setup ゆえ lane-b/hub 調整。
