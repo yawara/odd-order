@@ -2136,3 +2136,31 @@ update²⁷ は ν constructor を「(11.8.6) の genuine な深部」と評し�
 全て `hcol` (column identities、capstone hypothesis ゆえ call-site 利用可) から (6.8.1) 論法で導出。
 **ν-construction obligation は residual から消滅**。次の deep frontier = (2) の hcol→(6.8.1) 導出。
 full build green (3933 jobs, feitThompson sorry 1 本不変・新 axiom 無し)。
+
+## 2026-07-06 update²⁹ (lane-a /loop) — ★ gate-2 残余は **全 3 obligation が §9/§14-gated** と確定 (obligation-2 が a の最後の ungated head-on)
+
+capstone skeleton (5da020ea) で gate-2 を `coherent_Sset_of_glued` に還元し、残 3 obligation を
+精密 isolate した後、各の gate 性を code-level 検証:
+
+- **hmixed → (6.7) `⟨coh.ext x, hY.ext y⟩ = 0`**: coherent image 側直交は「異なる coherence の像」
+  ゆえ自動でない (coherence は族内 inner のみ保存)。Peterfalvi (6.7) b≡0 congruence = hY の像構造
+  (Sibley R(χ) 分解) を要す ⟹ **§14-gated** (hY は bare `Nonempty`、像構造 unexposed)。
+- **hDτ → (5.8) `hY.ext(∑ᵢμ_{ij}) = ∑ᵢω^σ_{ij}`**: hcol で base τ は書き換わるが、ν(column) =
+  hY.ext(column) (column ∈ S₂) が ∑ω^σ に一致すること = hY 拡張の (5.8) column identity ⟹ **§14-gated**。
+- **hgen → (6.8.1) 生成**: 生成 algebra 自体は ungated (S08 `hgen_withDiagonal_certainTypeSet`
+  template) だが、`Sset \ SHCSet` の生の degree 構造が非自明。生成が**真**であるには
+  `S₂ = 一様 degree qu の column sums` ((11.8.1) の reducible-member 分解) が要り、これは §9
+  `caseB_degree_qu`/`forall_sOf_H0Cprime_degree_qu_caseB` の §9↔§10 **world-bridge** (update²⁶ の
+  carrier obstruction #2 と同根) ⟹ **§9-gated**。生の column-D では S₂ に非-column member があれば
+  生成は偽。
+
+**∴ 判定**: gate-2 の残余は全て §9/§14/BG-§15 (hY の Sibley 構造 + S₂ world-bridge) に gated =
+**b/c/§14 territory**。obligation-2 (非直交 ν-constructor) は **a の最後の ungated head-on target**
+だった (2026-07-06 夕 reshape の想定通り: obligation-2 は「a の唯一 ungated head-on」)。a は自クラスタ
+hard body (ν-constructor + capstone skeleton) を正面から build 済で、残余は真に gated (放置でなく検証)。
+
+**a の genuine 継続候補** (loop): (i) **hgen 生成 algebra** を S₂-uniform-degree を仮説化した
+parameterized lemma として build (ungated algebra、deferred payoff だが policy 上 build 可) →
+gate-2 hgen sorry を「S₂-structure world-bridge」まで還元。(ii) §9↔§10 world-bridge を claim-before-build
+(9000) で shared infra 化 (hY/hgen 双方が要す最上流) — ただし b の §9/§14 と衝突注意。
+hub 再評価があれば従う ([[hub-arbitrates-cross-lane-autonomously]])。

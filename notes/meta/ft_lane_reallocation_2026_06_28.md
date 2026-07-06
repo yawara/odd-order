@@ -328,3 +328,32 @@ framing は stale** (grid fields は S15.Hypothesis に threading 済 sorry-free
 
 全て hub-arbitrable な可逆運用 reshape (ユーザー escalation 事項なし)。ユーザーは「b の drift 追認」を裁可、
 残りは hub 裁定。正本 = 本節 + issues 9017/9016/9014/1017 の HUB RULING + merge_monitor 🔒 マップ。
+
+## lane c FOLD → DORMANT cite-sink (2026-07-06 夕, ユーザー「c やることなくなった」→ hub 4-agent 調査 wf_00a0db07)
+
+**契機**: ユーザーが c の idle を flag。hub が 4-agent 調査 (c idle 検証 + ungated 行き先スキャン + b 過負荷吸収スキャン
+→ ruling) を実施、code-grounded に確定:
+
+- **c は自領域枯渇 (0 ahead)**: S16_NonExistenceG の **10 bare sorry は全て true carrier gate** (carrier/signature
+  が repo 不在)、**sorried-cite assemblable はゼロ**。T_isTypeP2 (:1154) は一見 in-file cite だが**真に循環**
+  (Lean-rejected)、真の gate は v-value (:1249)。Clifford 9002 は**完了** (`typeI_induced_char_constituents`
+  body sorry-free、consumer b が landed)。reconciled_typePData_T は U-side 3 field 済、残 W2_le/centralizer_W1 =
+  b の §13/§16 T-side W-factor σ-structure (principled stop)。
+- **ungated 行き先も無し**: (1) §9 u-bound/typeP_Galois = a の S11 territory (9000、過去に a-vs-d 衝突前科)。
+  (2) gate-2 hY = a file (S12) + b active (S07_Subcoherent)。(3) shared leaf (GroupTheory/RepTheory/Algebra) =
+  全 0-sorry frozen、shared-infra slot は d が占有。(4) (6.8.1) char content = a の hcol 駆動 call-site。
+  b-overload も移管で re-coupling ゆえ transfer 不可。
+- **⟹ ruling = FOLD c を DORMANT cite-sink** (07-02 教訓「char endgame の coupled pipeline では ungated frontier
+  にレーン数を合わせる」の再適用)。active 生産レーン = **3** (a §9-13 char core + typeP_Galois 9000 / b §14+coherence+
+  BG§15/§16+§13 export / d shared Isaacs Hall API) + **c DORMANT**。
+
+**c reactivation trigger** (いずれか landing で自動再開 → S16 W-side norm cascade + parity 矛盾を assemble):
+**a: typeP_Galois (9000, multi-consumer root gate — a の (10.7)/(10.8) + c の (14.9) + S/T frobenius kernel を
+一括 unblock)** / **b: §13 v-value lower-bound export (9013) / §15-16 W-factor σ-structure (9017) / S-T partner
+parity (3002)**。c の成果 (Clifford 9002 / reconciled U-side / S16 sorried-cite skeleton) は全 **in-place 保全**
+(revert しない)。
+
+**残る非対称 (次の判断材料)**: b は依然 **OVERLOADED** (BG §15/§16 + S15 cascade + S14 + coherence)、endgame
+frontier は実質 **a の typeP_Galois 9000 + b の BG §15/§16** の 2 workstream に集中。a が 9000 を landing すれば
+c/b 下流が一気に unblock されるゆえ、**最高 leverage = a の typeP_Galois 9000**。a landing 後に b→c 再配分
+(v-value export 等を c へ) の余地を hub が再検討。hub-arbitrable、ユーザー escalation 事項なし。
