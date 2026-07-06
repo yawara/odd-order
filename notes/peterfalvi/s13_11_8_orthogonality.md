@@ -2318,3 +2318,27 @@ u-consistency 保証) する設計が clean。
 ⟹ capstone の bundled §9 sorry を discharge、残 = hS2deg 内の 2 §9 obligation ((9.5)/(9.8)) + capstone
 の hmixed/hDτ (§14)。deep §9 crux = (9.5) reducible-inclusion (Frobenius: H⊆Ker θ → Ind θ irr、
 repo 不在) + (9.8) irr-degree 完全性。
+
+## 2026-07-07 update³⁶ (lane-a /loop) — ★ capstone threading LANDED: ψ₀ column-witness sorry-free (net −1)
+
+update³⁵ の threading 設計を **build-green で landing** (commit 18344eb5, S12 real sorry 9→8):
+- **capstone `coherent_Sset_of_column_identities`** に `hw2 : 2 ≤ w₂` + `hd1 : ∀ j≠0, μ_{0,j}(1)≠1`
+  を signature threading (htype/hnt/chief/hdu は前 session で landed)。
+- **ψ₀ column-witness sorry を実構成で discharge**: `j₀ := ⟨1,_⟩ ≠ 0` (w₂≥2)、`ψ₀ = ∑ᵢ μ_{i,j₀}`。
+  - `∈ Sset` = `muGrid_column_sum_mem_inducedFamily hG hG.odd j₀ (hd1 j₀ hj₀)` (Sset = inducedFamily M defeq)。
+  - `∉ SHCSet` = `muGrid_column_sum_mem_sOf_H0_and_reducible …).2` (¬IsIrreducible) vs SHCSet の IsIrr conjunct。
+  - `ψ₀ − dζ ∈ D` = D-def の j₀ 列で `rfl`。
+- caller `exists_zeta_residual_not_orthogonal`: `hw2 := params.w2_prime.two_le`、
+  `hd1` は `hmu ▸ params.degree_independent 0 j hj` (= μ_{0,j}(1)=d) + `params.d_gt_one` で。
+  ⚠ gotcha: `rw [hmu ▸ …]` は期待型不明で metavariable 化 → `have hdeg : … = (d:ℂ) := hmu ▸ …; rw [hdeg]`。
+
+∴ **(11.8.6) capstone の `hgen` (generation) bullet は完全 assemble** = `hgen_of_S2_uniform_degree`
+(ungated (6.8.1) algebra, sorry-free) + world-bridge uniform-degree `Sset_diff_SHCSet_apply_one_eq_qu`。
+残 (11.8) sorry (次 frontier、上流優先で ①):
+1. **`Sset_diff_SHCSet_apply_one_eq_qu` の 2 §9 obligation** (S12:3822/3846、これが上流):
+   - **(9.5)/(11.5) reducible-inclusion** (`inducedFamily_reducible_apply_one_eq_qu` 内 3822): reducible
+     `inducedFamily`-member → `sOf(H₀)`。Frobenius `H⊆Ker θ → Ind θ irr` の対偶 + `sSet=𝒳 ⊊ inducedFamily`。
+   - **(9.8)/(9.9) irr-degree 完全性** (3846): irr `inducedFamily`-member of deg≠w₁ → deg qu。
+2. capstone `hmixed`/`hDτ` (S12:4219/4227、§14/BG §15-gated、cross-lane)。
+3. `coherent_Sset_diff_SHCSet` (S12:3975、§14 S₂ coherence)。
+**次 = ① (9.5) reducible-inclusion (S12:3822)** — ユーザー裁定「§9 head-on 継続」に沿う上流 crux。
