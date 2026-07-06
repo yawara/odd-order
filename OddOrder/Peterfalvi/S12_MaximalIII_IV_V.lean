@@ -3878,6 +3878,40 @@ noncomputable def Hypothesis.coherent_Sset_of_glued [Finite G] {M : Subgroup G} 
     coh hY ν hagreeX hagreeY
     (fun _ hu _ hv => hyp.span_inner_SHCSet_diff_eq_zero hu hv) hmixed D hDτ hgen
 
+open scoped Classical FiniteInduce in
+/-- **(11.8.6) `τ₃` glue map `ν` exists** — obligation-2 of the capstone, discharged (issue 9016).
+From the two coherences `coh` (`S₁ = S(HC)`) and `hY` (`S₂ = S(C) − S(HC)`) there is an integral
+map `ν` agreeing with `coh.extension` on `S₁` and with `hY.extension` on `S₂` (Peterfalvi's `τ₃`).
+
+Both `S₁` and `S₂` are subsets of `S = inducedFamily M`, which is **pairwise orthogonal**
+(`inducedFamily_pairwiseOrthogonal`) with members of **nonzero norm** (`inducedFamily_inner_self_ne_zero`)
+and **finite** (`inducedFamily_finite`); and `S₁ ⊥ S₂` (`SHCSet_inner_diff_eq_zero`).  So the S07
+non-orthonormal glue `exists_integralCharacterMap_glue_of_orthogonal` applies **directly** — the
+reducible degree-`qu` members of `S₂` are handled by the norm-rescaling in
+`coherentImageMapGlueOrthogonal`, so no orthonormality of `S₂` is needed.
+
+This supplies the `ν` + `hagreeX`/`hagreeY` inputs of `coherent_Sset_of_glued`, reducing the
+(11.8.6) residual to the genuine (6.8.1) character content — the mixed isometry `hmixed`
+(image-side orthogonality, the `b ≡ 0` congruence) and the supported cross-diagonals `D`/`hDτ`/`hgen`
+fed by the column identities `hcol`, together with `hY` itself (the §9/§14-gated `S₂` coherence). -/
+theorem Hypothesis.exists_glue_nu [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
+    (hY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Sset \ hyp.SHCSet) hyp.A0) :
+    ∃ ν : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G,
+      (∀ x ∈ hyp.SHCSet, ν x = coh.extension x) ∧
+      (∀ y ∈ hyp.Sset \ hyp.SHCSet, ν y = hY.extension y) := by
+  haveI := hyp.finiteG
+  classical
+  have hSfin : (inducedFamily M).Finite := inducedFamily_finite
+  exact OddOrder.Peterfalvi.S07.IntegralCharacterMap.exists_integralCharacterMap_glue_of_orthogonal
+    (hSfin.subset fun _ hx => hx.1) (hSfin.subset fun _ hy => hy.1)
+    (fun _ hx _ hx' hne => inducedFamily_pairwiseOrthogonal hx.1 hx'.1 hne)
+    (fun _ hx => inducedFamily_inner_self_ne_zero hx.1)
+    (fun _ hy _ hy' hne => inducedFamily_pairwiseOrthogonal hy.1 hy'.1 hne)
+    (fun _ hy => inducedFamily_inner_self_ne_zero hy.1)
+    (fun _ hx _ hy => hyp.SHCSet_inner_diff_eq_zero hx hy)
+    coh.extension hY.extension
+
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.6), the τ₂ union-coherence** (the deep capstone step, named obligation).
 From the column identities `(μ_j − dζ)^τ = ∑_i ω_{ij}^σ − dζ^{τ₁}` (`0 < j`, all rows; `τ₁ = coh`),
