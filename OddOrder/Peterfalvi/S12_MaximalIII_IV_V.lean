@@ -3946,10 +3946,34 @@ theorem Hypothesis.coherent_Sset_of_column_identities [Finite G]
         = (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hG.odd i j)
           - (d : ℂ) • coh.extension ζ) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A0) := by
-  -- Reduces to `coherent_Sset_of_glued coh (coherent_Sset_diff_SHCSet hG hyp).some ν …` once the
-  -- `τ₃` glue data (`ν`, `hagreeX/Y`, `hmixed`, `D = {∑ᵢ μ_{ij} − dζ}`, `hDτ` from `hcol`, `hgen`)
-  -- is constructed — the deep non-orthonormal-`S₂` glue that is the remaining (11.8.6) content.
-  sorry
+  haveI := hyp.finiteG
+  classical
+  -- **obligation-2 (`ν`) is discharged** by `exists_glue_nu` (issue 9016); `hY` is the §9/§14-gated
+  -- `S₂`-coherence (sorried-cite via `coherent_Sset_diff_SHCSet`).  The `τ₃` glue then reduces the
+  -- (11.8.6) union-coherence to exactly the genuine (6.7)/(5.8) character content, isolated below.
+  obtain ⟨hY⟩ := hyp.coherent_Sset_diff_SHCSet hG
+  obtain ⟨ν, hagreeX, hagreeY⟩ := hyp.exists_glue_nu coh hY
+  refine ⟨hyp.coherent_Sset_of_glued coh hY ν hagreeX hagreeY ?_
+    {φ | ∃ j : Fin hyp.w2, j ≠ 0 ∧
+      φ = (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j) - (d : ℂ) • ζ} ?_ ?_⟩
+  · -- `hmixed` → the **(6.7) image-side orthogonality**: after `hagreeX`/`hagreeY` and the source
+    -- orthogonality `⟨x,y⟩ = 0` (`SHCSet_inner_diff_eq_zero`), the residual is
+    -- `⟨coh.extension x, hY.extension y⟩ = 0` — Peterfalvi's `b ≡ 0` congruence, a property of the
+    -- two coherent extensions beyond bare `IsCoherent` (§14/BG §15-gated via `hY`'s Sibley structure).
+    intro x hx y hy
+    rw [hagreeX x hx, hagreeY y hy, hyp.SHCSet_inner_diff_eq_zero hx hy]
+    sorry
+  · -- `hDτ` → the **(5.8) column identity**: on the cross-diagonal `∑ᵢ μ_{ij} − dζ`, `hcol` rewrites
+    -- the base map `τ`, leaving `ν (∑ᵢ μ_{ij} − dζ) = ∑ᵢ ω^σ_{ij} − d·coh.extension ζ`.  Via
+    -- `hagreeX` (ζ ∈ S₁) and `hagreeY` (the reducible column sum ∈ S₂) this is
+    -- `hY.extension (∑ᵢ μ_{ij}) = ∑ᵢ ω^σ_{ij}` — the (5.8) identity for `hY`'s extension (§14-gated).
+    intro d' hd'
+    obtain ⟨j, hj, rfl⟩ := hd'
+    rw [hcol j hj]
+    sorry
+  · -- `hgen` → the **(6.8.1) degree-0 sublattice generation** (ungated set-algebra; adapts the S08
+    -- `hgen_withDiagonal_certainTypeSet` template to the per-column cross-diagonals `D`).
+    sorry
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8), the genuine non-orthogonality** (lane-b W3 obligation, issue 2020).
