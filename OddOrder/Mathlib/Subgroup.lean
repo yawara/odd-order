@@ -9,6 +9,7 @@ import Mathlib.GroupTheory.QuotientGroup.Basic
 import Mathlib.GroupTheory.Coset.Card
 import Mathlib.GroupTheory.Complement
 import Mathlib.GroupTheory.Index
+import Mathlib.GroupTheory.Nilpotent
 import Mathlib.Data.Finite.Card
 import Mathlib.Data.Setoid.Basic
 import Mathlib.Tactic.Group
@@ -334,6 +335,18 @@ theorem nat_card_quotient_bot_subgroupOf_eq {H : Subgroup G} :
     Nat.card (H ⧸ ((⊥ : Subgroup G).subgroupOf H)) = Nat.card H := by
   rw [bot_subgroupOf]
   exact Nat.card_congr QuotientGroup.quotientBot.toEquiv
+
+/-- Nilpotence is inherited by the image of a subgroup. -/
+theorem isNilpotent_map {H : Type*} [Group H] (K : Subgroup G) [Group.IsNilpotent K]
+    (f : G →* H) :
+    Group.IsNilpotent (K.map f) := by
+  let φ : K →* K.map f :=
+    { toFun := fun k => ⟨f k.1, ⟨k.1, k.2, rfl⟩⟩
+      map_one' := Subtype.ext (map_one f)
+      map_mul' := fun x y => Subtype.ext (map_mul f x.1 y.1) }
+  exact nilpotent_of_surjective φ (by
+    rintro ⟨_, x, hx, rfl⟩
+    exact ⟨⟨x, hx⟩, rfl⟩)
 
 /-- A subgroup `V` complementing the normal `N` in `G` (`N ⊓ V = ⊥`, `N ⊔ V = ⊤`) has
 `|N| * |V| = |G|`. -/
