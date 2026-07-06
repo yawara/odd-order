@@ -2186,3 +2186,38 @@ ungated** (S₂-uniform-degree を仮説化すれば pure lattice/degree 代数)
 ungated algebra は尽くした (ν-constructor + hgen 両 engine 完備、capstone skeleton が consume 準備済)。
 次: capstone hgen への `hgen_of_S2_uniform_degree` 配線 (engine consume + hgen sorry を §9 S₂-degree
 の単一 fact まで還元)、または §9 S₂-structure world-bridge の claim-before-build (collision 注意、b §9)。
+
+## 2026-07-06 update³¹ (lane-a /loop, ユーザー裁定「a が §9 world-bridge に挑戦」) — world-bridge 精密マップ + degree-factoring landed
+
+capstone の bundled §9 sorry (`∀ y ∈ Sset\SHCSet, y 1 = qu`) を discharge する world-bridge を
+code-level 精査。**Explore の「straightforward identity」は誤りと訂正**:
+
+### ★ family mismatch (update²⁶ 致命傷 2 を確認)
+- `sSet data = {induceHU χ | χ ∈ xiSet data}`、`xiSet data = 𝒳 = {χ∈Irr(HU) | H⊄Ker χ}` (S11:1528) =
+  **H⊄Ker の既約のみ**。一方 `Sset = inducedFamily M = {Ind θ | θ∈Irr M', θ≠1}` = **全非自明既約**。
+- `huSub = M' = derivedInG` は証明済 (`huSub_eq_derivedInG_subgroupOf` S11:1505) だが、`𝒳 ⊊ {θ≠1}`
+  (M'/H ≅ U が非自明なら H⊆Ker の非自明 θ が在る) ゆえ **sSet ⊊ inducedFamily** (genuine mismatch)。
+  ∴ §9 facts (sOf world) を inducedFamily に直接転用不可。
+
+### ★ cleaner degree path (this session の key 発見): **[M:M'] = w₁ は証明済**
+`TypePData.card_W1_eq_derived_index` (S12_Sec9:819)。∴ `induce_apply_one` で
+**`Ind θ (1) = [M:M']·θ(1) = w₁·θ(1)`**。→ **`Hypothesis.induce_derived_apply_one_eq_w1_mul`
+(landed, sorry-free)**。degree 構造は θ(1) に帰着: `y 1 = qu = d·w₁ ⟺ θ(1) = d`、`y ∈ SHCSet` (deg w₁)
+⟺ `θ(1)=1 ∧ Ind θ irr`。
+
+### ★ 残 gap (degree claim `∀ y ∈ Sset\SHCSet, y 1 = qu` の分解)
+`y ∈ Sset\SHCSet` = ¬(irr ∧ deg w₁) = reducible ∨ (irr ∧ deg≠w₁):
+1. **reducible → qu**: `reducible_mem_sOf_H0_apply_one_eq_qu` (S12_Sec9:228、chars=Section11CharacterData
+   要、dichotomy-free) が sOf world で与える。inducedFamily→sOf の reducible bridge が要
+   (family mismatch: reducible member が sOf(⊥) に入るかの identification、`reducible_mem_sOf_bot_mem_sOf_H0` 系)。
+2. **irr non-w₁ → qu**: 「inducedFamily の既約は degree w₁ か qu のみ」= (9.8)/(9.9) 既約 degree 完全性 =
+   **repo に fact 不在** (grep 0)。S11:13138 に irr-qu 例 (hcZeta) は在るが完全性は未形式化。**最深 gap**。
+
+### 次 iteration
+(1) reducible bridge (inducedFamily reducible ↔ sOf reducible、`reducible_mem_sOf_bot_mem_sOf_H0` +
+family-mismatch の reducible-side) を build → reducible-side degree qu を inducedFamily world で確立。
+(2) irr-degree 完全性は (9.8)/(9.9) の substantial char work (要新規形式化、§9 territory)。
+htype/chars は caller (`exists_zeta_residual_not_orthogonal`) が保持ゆえ capstone に threading 可能
+(signature 拡張)。⚠ **carrier 留意**: `Sset := inducedFamily ⊋ 𝒮=sSet` の mismatch は spine 全体に
+影響しうる (§14 hY も同 mismatch を踏む) — 世界統一 (sSet↔inducedFamily の (11.5)/(9.5) identification)
+が根治だが deep。
