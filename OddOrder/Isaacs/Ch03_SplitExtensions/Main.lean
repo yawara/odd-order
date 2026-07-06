@@ -1795,6 +1795,61 @@ theorem Nat.coprime_of_isPiGroup_of_isPiGroup_compl
   intro p hp_n hp_m
   exact absurd (hnPi p hp_n) (hmPi' p hp_m)
 
+/-- Complementary Hall subgroups have coprime orders. -/
+theorem IsHallSubgroup.card_coprime_of_compl [Finite G] {π : Set ℕ} {K H : Subgroup G}
+    (hK : IsHallSubgroup {p | p ∉ π} K) (hH : IsHallSubgroup π H) :
+    Nat.Coprime (Nat.card K) (Nat.card H) := by
+  have hHK : Nat.Coprime (Nat.card H) (Nat.card K) :=
+    Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      Nat.card_pos.ne' Nat.card_pos.ne'
+      hH.1
+      (fun p hp => by simpa using hK.1 p hp)
+  exact hHK.symm
+
+/-- The index of a `π'`-Hall subgroup and the index of a `π`-Hall subgroup are coprime. -/
+theorem IsHallSubgroup.index_coprime_of_compl [Finite G] {π : Set ℕ} {K H : Subgroup G}
+    (hK : IsHallSubgroup {p | p ∉ π} K) (hH : IsHallSubgroup π H) :
+    Nat.Coprime K.index H.index := by
+  refine Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+    Subgroup.index_ne_zero_of_finite Subgroup.index_ne_zero_of_finite ?_ hH.2
+  intro p hp
+  by_contra hp_not
+  exact hK.2 p hp hp_not
+
+/-- If `K` is Hall `π'` and `H` is Hall `π`, then `|K| * |H| = |G|`. -/
+theorem IsHallSubgroup.card_mul_of_compl [Finite G] {π : Set ℕ} {K H : Subgroup G}
+    (hK : IsHallSubgroup {p | p ∉ π} K) (hH : IsHallSubgroup π H) :
+    Nat.card K * Nat.card H = Nat.card G := by
+  have h_card_cop : Nat.Coprime (Nat.card K) (Nat.card H) :=
+    hK.card_coprime_of_compl hH
+  have h_index_cop : Nat.Coprime H.index K.index :=
+    (hK.index_coprime_of_compl hH).symm
+  have hK_dvd_Hindex : Nat.card K ∣ H.index := by
+    have hdiv : Nat.card K ∣ Nat.card H * H.index := by
+      rw [Subgroup.card_mul_index H]
+      exact Subgroup.card_subgroup_dvd_card K
+    rw [mul_comm] at hdiv
+    exact h_card_cop.dvd_of_dvd_mul_right hdiv
+  have hHindex_dvd_K : H.index ∣ Nat.card K := by
+    have hdivG : H.index ∣ Nat.card G :=
+      ⟨Nat.card H, by rw [mul_comm, Subgroup.card_mul_index H]⟩
+    have hdiv : H.index ∣ Nat.card K * K.index := by
+      rwa [← Subgroup.card_mul_index K] at hdivG
+    exact h_index_cop.dvd_of_dvd_mul_right hdiv
+  have hK_card_eq : Nat.card K = H.index :=
+    Nat.dvd_antisymm hK_dvd_Hindex hHindex_dvd_K
+  calc
+    Nat.card K * Nat.card H = H.index * Nat.card H := by rw [hK_card_eq]
+    _ = Nat.card H * H.index := by rw [mul_comm]
+    _ = Nat.card G := Subgroup.card_mul_index H
+
+/-- Complementary Hall subgroups form an internal complement pair. -/
+theorem IsHallSubgroup.isComplement_of_compl [Finite G] {π : Set ℕ} {K H : Subgroup G}
+    (hK : IsHallSubgroup {p | p ∉ π} K) (hH : IsHallSubgroup π H) :
+    Subgroup.IsComplement' K H :=
+  Subgroup.isComplement'_of_coprime (hK.card_mul_of_compl hH)
+    (hK.card_coprime_of_compl hH)
+
 /-- **Hall-Higman 3.21 case π core**: `K ⊴ G` π-group + `K ≤ C_G(O_π(G))` ⇒
 `K ≤ C_G(O_π(G)) ⊓ O_π(G)`.
 
