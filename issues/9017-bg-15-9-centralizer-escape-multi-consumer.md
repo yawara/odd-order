@@ -58,3 +58,31 @@ created: 2026-07-06
   TI-set reduction 4 lemma (d375f39c)、`signalizer_structure_of_mem_sigmaSharp` (S16:271 sorry-free)、
   `isTypeF_iff_not_isTypeP` (S14:169 sorry-free)。
 - issue 1017 更新 #20-#23 (full trace)。
+
+## 2026-07-06 更新 #1 (lane b, /loop) — Cor 15.9 dependency map 確定 + spine 2 補題 landed、真の gate = Thm 15.8 + 構造 refactor
+
+subagent が mmd (L4298-4326) + Coq (`nonFtype_signalizer_base` BGsection15.v:1399) + repo §15 精査。**Cor 15.9
+spine の 2 sub-lemma landed sorry-free** (S15_MF、build GREEN 3120 jobs、axiom-clean):
+`normalizer_fittingInG_le_self` (N_G(F(M))≤M) + `not_fittingIsTI_of_mem_fittingSharp_of_centralizer_not_le`
+(x∈F(M)#,C_G(x)⊄M ⟹ ¬FittingIsTI M = mmd L4320 opening step)。
+
+**Cor 15.9 dependency map**:
+| sub-lemma | status |
+|---|---|
+| signalizer context (14.4) {N}=𝓜(C_G(x))、N type-P2、r∈τ2(N)∩σ(M) | **EXISTS** `signalizer_structure_of_mem_sigmaSharp` (S16、sorry-free) |
+| M∈𝓜_𝓕 from Cor 14.12 (escape ⟹ M type-F) | **MISSING** (Coq `P2type_signalizer`) |
+| F(M) not TI | **LANDED** (本更新) |
+| τ2(M)=∅ (Thm 15.8) | **SORRY** `tau2_transfer_constraint` (S15_MF:9397) |
+| E cyclic (Thm 15.7(d)) | PARTIAL |
+| M Frobenius (kernel M_σ, cyclic compl) | **EXISTS but S16-downstream** `typeF_frobenius_of_tau2_prime_free` (S16_Lemma1413、import cycle) |
+| P2+τ2=∅ collapse | **EXISTS** sorry-free |
+
+**⟹ Cor 15.9 の 2 真 gate**: **(a) `tau2_transfer_constraint` (Thm 15.8)** = deep bare sorry、要 BG §12
+prereq (ℰ²(D)/Cor 12.6/Uniqueness Theorem q∉β(G)/Thm 12.13 nonabelian Q; subagent 曰く「several §12 prereq は
+既存」) — **次 build target**。**(b) 構造 refactor**: M-Frobenius builder `typeF_frobenius_of_tau2_prime_free`
+が S16 downstream ゆえ Cor 15.9 (S15) から cite 不可 (import cycle) → S16→S15 hoist or Cor 15.9 relocate =
+**hub-level 裁定** (lane c の S16 に跨る)。⚠ 本 chain は BG §12→§15 の major multi-session 群論 sub-project、
+multi-consumer — hub は allocation (lane b 継続 vs 専用 BG lane vs lane c) を裁定可。lane b は policy 通り
+ungated upstream を descend+build 継続中。
+
+次: `tau2_transfer_constraint` (Thm 15.8) の §12 prereq を inventory → build。
