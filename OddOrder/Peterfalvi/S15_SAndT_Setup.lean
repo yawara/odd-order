@@ -4436,9 +4436,27 @@ theorem reconciled_typePData_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     H_le := by rw [hyp.T_deriv_eq_QV]; exact le_sup_left
     U_le := by rw [hyp.T_deriv_eq_QV]; exact le_sup_right
     W1_le := hW2W.trans hWT
-    -- The following are the genuine §13/§14 type-`P` structure of `T` (the `T`-side analogue of what
-    -- `Section16TypePStructure` establishes for `S` when it builds `Sdata`).  No `T`-side carrier
-    -- exists by design (`FeitThompson:276`), so these stay gated on the §13/§14 σ-structure theory.
+    -- **Precise residual (`W2_le`, goal `hyp.W1 ≤ hyp.Q ⊓ secondDerivedInAmbient hyp.T`).**
+    -- This is the T-side dual of the *carried* S-side field `Sdata.W2_le` (`W₂ ≤ P ⊓ S''`).  Both
+    -- halves are `IsTypeP2 hyp.T` (≡ `IsTypeII hyp.T`, BG (14.9))-gated, which is unavailable at
+    -- §13 (`IsTypeII hyp.T` lives in `S16` = import-downstream; see `T_typeII`):
+    --   • `hyp.W1 ≤ hyp.Q`: needs `hyp.q ∣ Nat.card ↥hyp.Q`; every route (`card_Q_eq`,
+    --     `exists_sylow_coe_eq_Q`, `pgroup_le_of_normal_coprime_index` dualizing `W2_le_P`) requires
+    --     `IsTypeII hyp.T` — `q ∣ |Q|` is provably NOT derivable from `hG`+`hyp` alone.  (The S-side
+    --     `W2_le_P` is likewise NOT type-free: it consumes `|P| = p^q` from `card_P_eq`, which uses
+    --     the *carried* `S_typeP2` field.  `T` has no analogous carrier.)
+    --   • `hyp.W1 ≤ secondDerivedInAmbient hyp.T`: needs the intrinsic identification
+    --     `hyp.W1 = tpd.W2 = C_{T'}(W₂#)` for a type-`P` datum `tpd` whose `.W1 = W₂`.  The datum
+    --     `d` from `exists_typePData_U_eq_V` only pins `d.U = V`, `d.H = Q` (the Schur–Zassenhaus
+    --     conjugator controls the *complement*, not the cyclic factors), so `d.W1`/`d.W2` need not be
+    --     the abstract `W₂`/`W₁`.  The alignment is the `typeP_pair` content (Coq PFsection8
+    --     `FTtypeP_pair_witness`/`of_typeP_pair`: the shared `W = S ⊓ T` forces T's swapped
+    --     decomposition `xdefW : W₂ \x W₁ = W`, whose (8.4.d) component gives `W₁ ⊆ H ⊓ T''`) —
+    --     unported to Lean, and equivalent to supplying `IsTypeP2 hyp.T`.
+    -- MISSING BRIDGE: a `TypePData hyp.T` with `.W1 = hyp.W2` (e.g. via
+    -- `typePData_of_kappaHall_hallComplement` at `M := T`, which requires `IsTypeP2 hyp.T`), OR a
+    -- Lean port of `typeP_cent_compl`/`typeP_pair_sym`.  No `T`-side carrier exists by design
+    -- (`FeitThompson:276`); this stays honestly gated on the §13/§14 σ-structure theory / (14.9).
     W2_le := sorry
     W_eq := by rw [hyp.W_eq_join, sup_comm]
     W_cyclic := hyp.W_cyclic
@@ -4498,6 +4516,17 @@ theorem reconciled_typePData_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     fitting_eq := by
       obtain ⟨d, hU, hH⟩ := hyp.exists_typePData_U_eq_V hG
       have := d.fitting_eq; rwa [hH, hU] at this
+    -- **Precise residual (`centralizer_W1`, goal after instantiation `W1 := hyp.W2`, `W2 := hyp.W1`,
+    -- `M := hyp.T`): `∀ x ∈ hyp.W2, x ≠ 1 → derivedInG hyp.T ⊓ Subgroup.centralizer ({x}) = hyp.W1`.**
+    -- This is the dual cyclic-factor law `C_{T'}(W₂#) = W₁` (Coq (8.4.d) `{in W1^#, C_M'[·] = W2}`
+    -- with the swapped `xdefW`).  It is the T-side reflection of the *carried* S-side field
+    -- `Sdata.centralizer_W1` (`∀ x ∈ W₁#, S' ⊓ C(x) = W₂`; see its use in
+    -- `normalizer_U_inf_W2_eq_bot_of_data`, which crucially also cites the carried `Sdata_W2_eq`).
+    -- The ungated general-type-`P` centralizer law `typeP_centralizer_kappaElement_eq`
+    -- (`M ⊓ C_G(k) = K ⊔ K*` for `k ∈ K#`, only `IsTypeP M`) would apply to `T` with `K := W₂`,
+    -- but ONLY once `W₂` is known to be a κ-Hall of `T` and `K* = M_σ(T) ⊓ C(W₂) = W₁` — precisely
+    -- the `typeP_pair` reconciliation (≡ `IsTypeP2 hyp.T`), which the abstract `Hypothesis` does not
+    -- carry (no `Tdata`).  Same gate as `W2_le`; honestly `IsTypeII hyp.T`/(14.9)-gated at §13.
     centralizer_W1 := sorry
     normalizer_V := by
       -- The `W`-exceptional-set normalizer `N_G(X) = W` is symmetric in `W₁`/`W₂`, so it is read off
