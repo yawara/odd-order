@@ -9517,6 +9517,140 @@ theorem exists_rank2_elemAb_le_centralizer_kappa_of_tau2 [Finite G]
   -- `A, K ⊆ F(E)` abelian ⟹ `A ⊆ C(K)`.
   exact le_centralizer_of_le_of_le hFEab hAFE hKFE
 
+/-- **Phase D core of BG Theorem 15.8** (Coq `tau2_P2type_signalizer`, the `apply/pgroupP` step,
+BGsection15.v:1383--1392): for a maximal `M` with an abelian Hall `(κ(M)∪σ(M))'`-subgroup `U ≤ M`
+(Proposition 14.2(a); `κ`-Hall `K` normalizing `U`), *every* prime `r ∈ τ₂(M)` that divides `|U|`
+has `C_G(U) ≤ M`.
+
+This is the reusable per-prime heart of the final `τ₂(M) = ∅` argument: given the escape witness
+`¬(C_G(U) ≤ M)`, it forces `τ₂(M)` to contain no such prime.
+
+Proof (Coq): `r ∈ τ₂(M) ⊆ σ(M)'` and `r ∉ κ(M)` (κ-primes have `pRank ≤ 1`, `r` has `pRank 2`),
+so `r ∈ (κ(M)∪σ(M))'`, the prime class of `U`.  Take a §12 `E`-setup with `M_σ`-complement `E ⊇ U`
+(`exists_subgroupESetup_with_le`, `U` a `σ(M)'`-subgroup), and a rank-2 `B ∈ ℰ²_r(E)`
+(`exists_elemAb_rank_two_le_E_of_tau2`).  Then `B ⊴ E` (`elemAb_normal_in_E_of_tau2`) and
+`C_G(B) ≤ E ≤ M` (`centralizer_le_E_of_tau2`, = Corollary 12.6(b)).  Inside `↥E`, `B.subgroupOf E`
+is a *normal* `(κ∪σ)'`-subgroup and `U.subgroupOf E` is a `(κ∪σ)'`-Hall (transferred from
+`hU`), so `B ⊆ U` (`Subgroup.IsPiGroup.normal_le_hall`, Coq `normal_sub_max_pgroup`).  Hence
+`C_G(U) ≤ C_G(B) ≤ M`. -/
+theorem centralizer_kappaCompl_le_of_mem_tau2 [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M U K : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hKM : K ≤ M) (hUM : U ≤ M)
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hKNU : K ≤ Subgroup.normalizer (U : Set G))
+    {r : ℕ} (hrprime : r.Prime) (hr : r ∈ tau2 M) (hrU : r ∈ piSet U) :
+    Subgroup.centralizer (U : Set G) ≤ M := by
+  classical
+  haveI : Fact r.Prime := ⟨hrprime⟩
+  -- `r ∉ κ(M)`: κ-primes lie in `τ₁ ∪ τ₃` (`pRank ≤ 1`), but `r ∈ τ₂` has `pRank = 2`.
+  have hrκ : r ∉ kappa M := by
+    intro hrk
+    rcases kappa_subset_tau1_union_tau3 hrk with h1 | h3
+    · have := tau1_pRank_eq_one h1; have := tau2_pRank_eq_two hr; omega
+    · have := tau3_pRank_eq_one h3; have := tau2_pRank_eq_two hr; omega
+  have hrσ : r ∉ OddOrder.BG.Ch3.S10.sigma M := tau2_subset_sigma_compl M hr
+  have hrκσ : r ∈ (kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ := fun h => h.elim hrκ hrσ
+  -- `U` is a `σ(M)'`-subgroup (its prime class `(κ∪σ)'` is contained in `σ'`).
+  have hU_pi : Subgroup.IsPiSubgroup ((OddOrder.BG.Ch3.S10.sigma M)ᶜ) U := by
+    intro p hp
+    rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv] at hp
+    exact fun hpσ => hU.1 p hp (Or.inr hpσ)
+  -- A §12 `E`-setup with `M_σ`-complement `E ⊇ U`.
+  obtain ⟨E, E₁, E₂, E₃, hEsetup, hUE, _hEpi⟩ :=
+    exists_subgroupESetup_with_le hG hM hUM hU_pi
+  -- A rank-2 elementary abelian `B ∈ ℰ²_r(E)`.
+  obtain ⟨B, hB_elem, hBE⟩ := exists_elemAb_rank_two_le_E_of_tau2 hG hEsetup hr
+  -- `C_G(B) ≤ E ≤ M` (Cor 12.6(b)).
+  have hCBE : Subgroup.centralizer (B : Set G) ≤ E :=
+    (centralizer_le_E_of_tau2 hG hEsetup hr hB_elem hBE).1
+  have hCBM : Subgroup.centralizer (B : Set G) ≤ M := hCBE.trans hEsetup.E_le
+  -- `B ⊴ E` (Coq `nsBUK`).
+  have hEnB : E ≤ Subgroup.normalizer (B : Set G) :=
+    ((elemAb_normal_in_E_of_tau2 hG hEsetup hr hB_elem hBE).1).1
+  have hBnormE : (B.subgroupOf E).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hBE).mpr hEnB
+  -- `B ⊆ U`: `B.subgroupOf E` is a normal `(κ∪σ)'`-subgroup of `↥E`, and `U.subgroupOf E` is a
+  -- `(κ∪σ)'`-Hall of `↥E`, so the normal π-subgroup lands inside the Hall.
+  have hBU : B ≤ U := by
+    -- `B` is a `{r}`-group with `r ∈ (κ∪σ)'`, hence a `(κ∪σ)'`-group.
+    have hB_pi : Ch03.Subgroup.IsPiGroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) B := by
+      intro p hp
+      obtain ⟨hae, hcard⟩ := mem_elemAbelianOfRank.mp hB_elem
+      have hpr : p = r := by
+        have hpd : p ∈ (r ^ 2).primeFactors := hcard ▸ hp
+        rw [Nat.primeFactors_prime_pow (by norm_num) hrprime, Finset.mem_singleton] at hpd
+        exact hpd
+      exact hpr ▸ hrκσ
+    have hB_piE : Ch03.Subgroup.IsPiGroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+        (B.subgroupOf E) := Ch03.Subgroup.IsPiGroup.subgroupOf hBE hB_pi
+    -- `U.subgroupOf E` is a `(κ∪σ)'`-Hall of `↥E`: prime factors of `|U|` stay in the class, and
+    -- `[E : U] ∣ [M : U]` has no primes in the class.
+    have hUhallE : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+        (U.subgroupOf E) := by
+      refine ⟨fun p hp => ?_, fun p hp hpπ => ?_⟩
+      · rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUE).toEquiv] at hp
+        rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv] at hp
+        exact hU.1 p hp
+      · have hdvd : (U.subgroupOf E).index ∣ (U.subgroupOf M).index := by
+          have hmul : U.relIndex E * E.relIndex M = U.relIndex M :=
+            Subgroup.relIndex_mul_relIndex U E M hUE hEsetup.E_le
+          exact ⟨E.relIndex M, hmul.symm⟩
+        refine hU.2 p ?_ hpπ
+        rw [Nat.mem_primeFactors] at hp ⊢
+        exact ⟨hp.1, hp.2.1.trans hdvd, Subgroup.index_ne_zero_of_finite⟩
+    have := (hB_piE.normal_le_hall hUhallE)
+    intro x hx
+    have hxE : x ∈ E := hBE hx
+    have : (⟨x, hxE⟩ : ↥E) ∈ U.subgroupOf E := this (Subgroup.mem_subgroupOf.mpr hx)
+    exact Subgroup.mem_subgroupOf.mp this
+  -- `C_G(U) ≤ C_G(B) ≤ M`.
+  exact (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hBU)).trans hCBM
+
+/-- **BG Theorem 15.8, final `τ₂(M) = ∅` step for primes** (Coq `tau2_P2type_signalizer`,
+BGsection15.v:1383, the `pgroupP` conclusion): under the signalizer escape witness
+`¬(C_G(U) ≤ M)`, no *prime* lies in `τ₂(M)`.
+
+Proof: for a prime `r ∈ τ₂(M)`, `r ∣ |M|` (positive `pRank`) and `r ∈ (κ(M)∪σ(M))'`, so `r ∣ |U|`
+(`U` is the `(κ∪σ)'`-Hall of `M`, whose order carries the full `r`-part of `|M|`); then
+`centralizer_kappaCompl_le_of_mem_tau2` gives `C_G(U) ≤ M`, contradicting the escape witness.
+
+(Stated in prime form `∀ r, r.Prime → r ∉ τ₂(M)`, matching how the repo threads `τ₂` primality
+throughout §12; the literal set-equality `τ₂(M) = ∅` additionally rules out composite labels via
+the `pRank`-of-non-prime degeneracy, handled where the full theorem is assembled.) -/
+theorem not_prime_mem_tau2_of_centralizer_kappaCompl_not_le [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M U K : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hKM : K ≤ M) (hUM : U ≤ M)
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hKNU : K ≤ Subgroup.normalizer (U : Set G))
+    (hesc : ¬ (Subgroup.centralizer (U : Set G) ≤ M)) :
+    ∀ r : ℕ, r.Prime → r ∉ tau2 M := by
+  intro r hrprime hr
+  haveI : Fact r.Prime := ⟨hrprime⟩
+  -- `r ∈ (κ(M)∪σ(M))'` (as in `centralizer_kappaCompl_le_of_mem_tau2`).
+  have hrκ : r ∉ kappa M := by
+    intro hrk
+    rcases kappa_subset_tau1_union_tau3 hrk with h1 | h3
+    · have := tau1_pRank_eq_one h1; have := tau2_pRank_eq_two hr; omega
+    · have := tau3_pRank_eq_one h3; have := tau2_pRank_eq_two hr; omega
+  have hrσ : r ∉ OddOrder.BG.Ch3.S10.sigma M := tau2_subset_sigma_compl M hr
+  have hrκσ : r ∈ (kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ := fun h => h.elim hrκ hrσ
+  -- `r ∣ |M|` (positive `pRank`), and `r ∤ [M : U]` (Hall), so `r ∣ |U| = |U.subgroupOf M|`.
+  have hrM : r ∈ (Nat.card ↥M).primeFactors :=
+    OddOrder.BG.Ch2.S09.mem_primeFactors_card_of_pos_pRank
+      (by rw [tau2_pRank_eq_two hr]; norm_num)
+  have hrUsub : r ∈ (Nat.card ↥(U.subgroupOf M)).primeFactors := by
+    have hlag : Nat.card ↥(U.subgroupOf M) * (U.subgroupOf M).index = Nat.card ↥M :=
+      Subgroup.card_mul_index _
+    have hridx : ¬ r ∣ (U.subgroupOf M).index := fun hd =>
+      hU.2 r (Nat.mem_primeFactors.mpr ⟨hrprime, hd, Subgroup.index_ne_zero_of_finite⟩) hrκσ
+    have hrdvdM : r ∣ Nat.card ↥M := Nat.dvd_of_mem_primeFactors hrM
+    have hrU : r ∣ Nat.card ↥(U.subgroupOf M) :=
+      ((Nat.Prime.dvd_mul hrprime).mp (by rw [hlag]; exact hrdvdM)).resolve_right hridx
+    exact Nat.mem_primeFactors.mpr ⟨hrprime, hrU, Nat.card_pos.ne'⟩
+  have hrU : r ∈ piSet U := by
+    rwa [piSet, Set.mem_setOf_eq, ← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv]
+  exact hesc (centralizer_kappaCompl_le_of_mem_tau2 hG hM hKM hUM hU hKNU hrprime hr hrU)
+
 /-- **BG Theorem 15.8** (mmd L4264; Feit--Thompson 1991, `tau2_P2type_signalizer`,
 BGsection15.v:1262): in the Corollary 14.12 signalizer setup — a type-`P₂` maximal `M` with
 `κ`-complement `K` (a Hall `κ(M)`-subgroup), `U` the abelian Hall `(κ(M)∪σ(M))'`-factor
