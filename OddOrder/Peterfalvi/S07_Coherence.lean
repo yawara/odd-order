@@ -3272,6 +3272,132 @@ theorem exists_integralCharacterMap_glue_of_orthonormal
       ⟨hYfin.toFinset.equivFin ⟨y, hYfin.mem_toFinset.mpr hy⟩, by simp [χY]⟩
     exact coherentImageMapGlue_apply_right horthY hYXfam j
 
+/-! ### Peterfalvi (6.8.1) `τ₃` glue for **non-orthonormal** (merely pairwise-orthogonal) families
+
+The Fourier glue `coherentImageMapGlue` / `exists_integralCharacterMap_glue_of_orthonormal` above
+reproduces `νX`/`νY` on the source families only when those families are **orthonormal** (Parseval
+is exact only for unit norms).  Peterfalvi's coherence families (e.g. the induced-character set
+`𝒮`, and its (11.8.6) piece `S₂ = 𝒮(C) − 𝒮(HC)`) are **pairwise orthogonal but reducible** — their
+members have `‖·‖² > 1` (`subcoherent` (c) in mathcomp `PFsection5.v` asks only
+`pairwise_orthogonal S`, not `orthonormal`).  The following generalizes the glue to that setting:
+each Fourier coefficient is divided by the (nonzero) squared norm `⟨χⱼ,χⱼ⟩`, so `ν χⱼ = Xⱼ` still
+holds.  This is the constructor of the `ν` (`hagreeX`/`hagreeY`) that `coherentUnion_of_glued*`
+consumes; the isometry / `himg_ortho` / diagonal `hDτ` data remain the caller's genuine
+character-theoretic inputs (Peterfalvi's `b ≡ 0` congruence), exactly as in the orthonormal case. -/
+
+/-- **Orthogonal (non-normalized) Fourier reconstruction** sends `χₖ ↦ Xₖ`.  For a *pairwise-
+orthogonal* family `χ` (distinct members orthogonal, each of nonzero norm — **not** required
+orthonormal), the norm-rescaled map `φ ↦ ∑ⱼ ⟨φ, χⱼ⟩ • (⟨χⱼ,χⱼ⟩⁻¹ • Xⱼ)` sends `χₖ ↦ Xₖ`: the cross
+terms vanish by orthogonality and the diagonal term is `⟨χₖ,χₖ⟩ • ⟨χₖ,χₖ⟩⁻¹ • Xₖ = Xₖ` (norm
+nonzero).  This is the `orthonormal → orthogonal` generalization of `coherentImageMap_apply_eq`
+(there `⟨χⱼ,χⱼ⟩ = 1` makes the rescaling trivial). -/
+theorem coherentImageMap_apply_eq_of_orthogonal {n : ℕ} {χ : Fin n → ClassFunction L ℂ}
+    {X : Fin n → ClassFunction G ℂ}
+    (horthχ : ∀ i j, i ≠ j → ClassFunction.inner (χ i) (χ j) = 0)
+    (hnorm : ∀ j, ClassFunction.inner (χ j) (χ j) ≠ 0) (k : Fin n) :
+    coherentImageMap (L := L) (G := G) χ
+        (fun j => (ClassFunction.inner (χ j) (χ j))⁻¹ • X j) (χ k) = X k := by
+  classical
+  simp only [coherentImageMap_apply]
+  rw [Finset.sum_eq_single k]
+  · rw [smul_smul, mul_inv_cancel₀ (hnorm k), one_smul]
+  · intro j _ hjk
+    rw [horthχ k j fun h => hjk h.symm, zero_smul]
+  · intro h; exact absurd (Finset.mem_univ k) h
+
+/-- **Two-family orthogonal glue** — the `τ₃` of Peterfalvi (6.8.1) for *non-normalized* families.
+`ν = [norm-rescaled reconstruction of νX over χX] + [norm-rescaled reconstruction of νY over χY]`.
+For pairwise-orthogonal `χX`, `χY` (each of nonzero norm) with mutually orthogonal ranges it sends
+`χXₖ ↦ νX(χXₖ)` and `χYₖ ↦ νY(χYₖ)`; the cross terms vanish by `⟨χXₖ,χYⱼ⟩ = 0`.  Unlike
+`coherentImageMapGlue` this does **not** require the families orthonormal. -/
+noncomputable def coherentImageMapGlueOrthogonal {n m : ℕ} (χX : Fin n → ClassFunction L ℂ)
+    (χY : Fin m → ClassFunction L ℂ) (νX νY : IntegralCharacterMap L G) :
+    IntegralCharacterMap L G :=
+  coherentImageMap (L := L) (G := G) χX
+      (fun i => (ClassFunction.inner (χX i) (χX i))⁻¹ • νX (χX i))
+    + coherentImageMap (L := L) (G := G) χY
+      (fun j => (ClassFunction.inner (χY j) (χY j))⁻¹ • νY (χY j))
+
+/-- The orthogonal glue sends `χXₖ ↦ νX(χXₖ)`: the `νX`-reconstruction is exact for the orthogonal
+family `χX` (`coherentImageMap_apply_eq_of_orthogonal`), the `νY`-reconstruction vanishes
+(`χXₖ ⊥ χYⱼ`). -/
+theorem coherentImageMapGlueOrthogonal_apply_left {n m : ℕ} {χX : Fin n → ClassFunction L ℂ}
+    {χY : Fin m → ClassFunction L ℂ} {νX νY : IntegralCharacterMap L G}
+    (horthX : ∀ i j, i ≠ j → ClassFunction.inner (χX i) (χX j) = 0)
+    (hnormX : ∀ i, ClassFunction.inner (χX i) (χX i) ≠ 0)
+    (hXY : ∀ (k : Fin n) (j : Fin m), ClassFunction.inner (χX k) (χY j) = 0) (k : Fin n) :
+    coherentImageMapGlueOrthogonal (L := L) (G := G) χX χY νX νY (χX k) = νX (χX k) := by
+  rw [coherentImageMapGlueOrthogonal, LinearMap.add_apply,
+    coherentImageMap_apply_eq_of_orthogonal horthX hnormX k]
+  simp only [coherentImageMap_apply]
+  rw [Finset.sum_eq_zero fun j _ => by rw [hXY k j, zero_smul], add_zero]
+
+/-- The orthogonal glue sends `χYₖ ↦ νY(χYₖ)` (symmetric to
+`coherentImageMapGlueOrthogonal_apply_left`). -/
+theorem coherentImageMapGlueOrthogonal_apply_right {n m : ℕ} {χX : Fin n → ClassFunction L ℂ}
+    {χY : Fin m → ClassFunction L ℂ} {νX νY : IntegralCharacterMap L G}
+    (horthY : ∀ i j, i ≠ j → ClassFunction.inner (χY i) (χY j) = 0)
+    (hnormY : ∀ i, ClassFunction.inner (χY i) (χY i) ≠ 0)
+    (hYX : ∀ (i : Fin n) (k : Fin m), ClassFunction.inner (χY k) (χX i) = 0) (k : Fin m) :
+    coherentImageMapGlueOrthogonal (L := L) (G := G) χX χY νX νY (χY k) = νY (χY k) := by
+  rw [coherentImageMapGlueOrthogonal, LinearMap.add_apply,
+    coherentImageMap_apply_eq_of_orthogonal horthY hnormY k]
+  simp only [coherentImageMap_apply]
+  rw [Finset.sum_eq_zero fun i _ => by rw [hYX i k, zero_smul], zero_add]
+
+open scoped Classical in
+/-- **Existence of the two-family glue over pairwise-orthogonal (non-normalized) sets**
+(Peterfalvi (6.8.1) `τ₃`, the form (11.8.6) needs).  For finite, mutually orthogonal sets `X`,
+`Y ⊆ CF(L)` that are each *pairwise orthogonal* with members of nonzero norm (**not** required
+orthonormal — Peterfalvi's `S₂ = 𝒮(C) − 𝒮(HC)` is a family of reducible induced characters), and
+integral maps `νX`, `νY`, there is an `IntegralCharacterMap ν` agreeing with `νX` on `X` and `νY`
+on `Y`.  This is the `ν` (`hagreeX`/`hagreeY`) that `coherentUnion_of_glued*` takes; it strengthens
+`exists_integralCharacterMap_glue_of_orthonormal` by dropping the orthonormality of both families
+(the diagonal normalization `⟨·,·⟩⁻¹` in `coherentImageMapGlueOrthogonal` absorbs the non-unit
+norms).  Mirrors mathcomp `bridge_coherent`'s `Zisometry_of_cfnorm` extension over the merely
+`pairwise_orthogonal` source and image sequences. -/
+theorem exists_integralCharacterMap_glue_of_orthogonal
+    {X Y : Set (ClassFunction L ℂ)} (hXfin : X.Finite) (hYfin : Y.Finite)
+    (hXorth : ∀ x ∈ X, ∀ x' ∈ X, x ≠ x' → ClassFunction.inner x x' = 0)
+    (hXnorm : ∀ x ∈ X, ClassFunction.inner x x ≠ 0)
+    (hYorth : ∀ y ∈ Y, ∀ y' ∈ Y, y ≠ y' → ClassFunction.inner y y' = 0)
+    (hYnorm : ∀ y ∈ Y, ClassFunction.inner y y ≠ 0)
+    (hXY : ∀ x ∈ X, ∀ y ∈ Y, ClassFunction.inner x y = 0)
+    (νX νY : IntegralCharacterMap L G) :
+    ∃ ν : IntegralCharacterMap L G, (∀ x ∈ X, ν x = νX x) ∧ (∀ y ∈ Y, ν y = νY y) := by
+  classical
+  let χX : Fin hXfin.toFinset.card → ClassFunction L ℂ :=
+    fun i => ↑(hXfin.toFinset.equivFin.symm i)
+  let χY : Fin hYfin.toFinset.card → ClassFunction L ℂ :=
+    fun j => ↑(hYfin.toFinset.equivFin.symm j)
+  have hχX_mem : ∀ i, χX i ∈ X := fun i =>
+    hXfin.mem_toFinset.mp (hXfin.toFinset.equivFin.symm i).2
+  have hχY_mem : ∀ j, χY j ∈ Y := fun j =>
+    hYfin.mem_toFinset.mp (hYfin.toFinset.equivFin.symm j).2
+  have horthX : ∀ i j, i ≠ j → ClassFunction.inner (χX i) (χX j) = 0 := fun i j hij =>
+    hXorth (χX i) (hχX_mem i) (χX j) (hχX_mem j)
+      (fun hx => hij (hXfin.toFinset.equivFin.symm.injective (Subtype.ext hx)))
+  have horthY : ∀ i j, i ≠ j → ClassFunction.inner (χY i) (χY j) = 0 := fun i j hij =>
+    hYorth (χY i) (hχY_mem i) (χY j) (hχY_mem j)
+      (fun hy => hij (hYfin.toFinset.equivFin.symm.injective (Subtype.ext hy)))
+  have hnormX : ∀ i, ClassFunction.inner (χX i) (χX i) ≠ 0 := fun i => hXnorm (χX i) (hχX_mem i)
+  have hnormY : ∀ j, ClassFunction.inner (χY j) (χY j) ≠ 0 := fun j => hYnorm (χY j) (hχY_mem j)
+  have hXYfam : ∀ (k : Fin hXfin.toFinset.card) (j : Fin hYfin.toFinset.card),
+      ClassFunction.inner (χX k) (χY j) = 0 :=
+    fun k j => hXY (χX k) (hχX_mem k) (χY j) (hχY_mem j)
+  have hYXfam : ∀ (i : Fin hXfin.toFinset.card) (k : Fin hYfin.toFinset.card),
+      ClassFunction.inner (χY k) (χX i) = 0 := fun i k => by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hXYfam i k, star_zero]
+  refine ⟨coherentImageMapGlueOrthogonal χX χY νX νY, ?_, ?_⟩
+  · intro x hx
+    obtain ⟨i, rfl⟩ : ∃ i, χX i = x :=
+      ⟨hXfin.toFinset.equivFin ⟨x, hXfin.mem_toFinset.mpr hx⟩, by simp [χX]⟩
+    exact coherentImageMapGlueOrthogonal_apply_left horthX hnormX hXYfam i
+  · intro y hy
+    obtain ⟨j, rfl⟩ : ∃ j, χY j = y :=
+      ⟨hYfin.toFinset.equivFin ⟨y, hYfin.mem_toFinset.mpr hy⟩, by simp [χY]⟩
+    exact coherentImageMapGlueOrthogonal_apply_right horthY hnormY hYXfam j
+
 /-- **Fourier expansion on the integral span of an orthonormal family.**
 Every `φ ∈ ℤ[range χ]` equals `∑ⱼ ⟨φ, χⱼ⟩ • χⱼ`. -/
 theorem eq_sum_inner_smul_of_mem_span {n : ℕ} {χ : Fin n → ClassFunction L ℂ}

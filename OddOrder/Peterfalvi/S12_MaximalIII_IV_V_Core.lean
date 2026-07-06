@@ -290,6 +290,48 @@ theorem inducedFamily_pairwiseOrthogonal {M : Subgroup G} [Finite G] :
   exact inner_induce_eq_zero_of_not_conj θ θ'
     (fun g hg => hne ((induce_eq_induce_iff_conj θ θ').mpr ⟨g, hg⟩))
 
+open scoped FiniteInduce in
+/-- **The induced family `S = inducedFamily M` is finite**: it is contained in the image of the
+finite type `IrreducibleCharacter M'` (`finite_irreducibleCharacter`, `M' = [M,M]`) under
+`Ind_{M'}^M`, hence a finite set.  This is the `hXfin`/`hYfin` input when the (11.8.6) union
+instantiates the S07 orthogonal glue `exists_integralCharacterMap_glue_of_orthogonal`. -/
+theorem inducedFamily_finite {M : Subgroup G} [Finite G] : (inducedFamily M).Finite := by
+  classical
+  haveI : Finite (IrreducibleCharacter ↥((derivedInG M).subgroupOf M)) :=
+    finite_irreducibleCharacter
+  refine Set.Finite.subset (Set.finite_range
+    (fun θ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+      ClassFunction.induce ((derivedInG M).subgroupOf M)
+        (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ))) ?_
+  rintro χ ⟨θ, -, rfl⟩
+  exact ⟨θ, rfl⟩
+
+open scoped FiniteInduce in
+/-- **Members of `S = inducedFamily M` have nonzero norm.**  `Ind_{M'}^M θ (1) = [M:M']·θ(1) ≠ 0`
+(positive index `Subgroup.index_ne_zero_of_finite`, positive irreducible degree
+`exists_apply_one_eq_pos_natCast`), so `Ind_{M'}^M θ ≠ 0`, whence `⟨φ,φ⟩ ≠ 0` by positive-
+definiteness (`eq_zero_of_inner_self_re_eq_zero`).  This is the `hXnorm`/`hYnorm` input (nonzero
+self-inner) the S07 orthogonal glue needs — the non-orthonormal analogue of
+`SHCSet_orthonormal`'s `⟨φ,φ⟩ = 1` for the reducible members of `S₂ = 𝒮(C) − 𝒮(HC)`. -/
+theorem inducedFamily_inner_self_ne_zero {M : Subgroup G} [Finite G]
+    {φ : ClassFunction ↥M ℂ} (hφ : φ ∈ inducedFamily M) :
+    ClassFunction.inner φ φ ≠ 0 := by
+  classical
+  obtain ⟨θ, -, rfl⟩ := hφ
+  have hne0 : ClassFunction.induce ((derivedInG M).subgroupOf M)
+      (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) ≠ 0 := by
+    intro hzero
+    have h1 : ClassFunction.induce ((derivedInG M).subgroupOf M)
+        (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) (1 : ↥M) = 0 := by
+      rw [hzero]; rfl
+    rw [ClassFunction.induce_apply_one] at h1
+    obtain ⟨d, hd, hθ1⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+    rw [hθ1] at h1
+    exact mul_ne_zero (Nat.cast_ne_zero.mpr Subgroup.index_ne_zero_of_finite)
+      (Nat.cast_ne_zero.mpr hd.ne') h1
+  intro hself
+  exact hne0 (eq_zero_of_inner_self_re_eq_zero (by rw [hself]; exact Complex.zero_re))
+
 /-! ## (10.1): the type III/IV/V hypothesis -/
 
 open scoped FiniteInduce in
