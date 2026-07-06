@@ -9927,6 +9927,70 @@ theorem partner_opiCore_nonabelian [Finite G]
   rw [hKbot, Subgroup.card_bot] at hKbarcard
   exact (Fact.out : q.Prime).one_lt.ne' hKbarcard.symm
 
+/-- **Phase B/C step 6 `def_q1` centralization of BG Theorem 15.8** (Coq `tau2_P2type_signalizer`,
+BGsection15.v:1336--1338, the `sub_nilpotent_cent2` step): with the partner `L`'s `σ`-core `L_σ`
+**nilpotent**, its `q`-core `Q = O_q(L) ≤ L_σ`, and a `q₁`-subgroup `A ≤ L_σ` with `q₁ ≠ q`
+(`q₁` prime), one has `A ≤ C_G(Q)`.
+
+Proof (Coq `sub_nilpotent_cent2 (Fitting_nil L)`): working inside the nilpotent `↥(L_σ)`,
+`Q.subgroupOf L_σ = O_q(↥L_σ)` is a *normal* `q`-subgroup and `A.subgroupOf L_σ` is a `q₁`-group
+with `q₁ ≠ q` (so `q ∤ |A|`); `commutator_eq_bot_of_isNilpotent_of_normal_isPGroup` gives
+`⁅Q̄, Ā⁆ = ⊥`, i.e. `Ā ≤ C(Q̄)`, which pushes out to `A ≤ C_G(Q)`. -/
+theorem le_centralizer_opiCore_of_msigma_nilpotent [Finite G]
+    {L A : Subgroup G} {q q1 : ℕ} [Fact q.Prime]
+    (hnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma L))
+    (hqσ : q ∈ OddOrder.BG.Ch3.S10.sigma L)
+    (hAMσ : A ≤ OddOrder.BG.Ch3.S10.Msigma L)
+    (hq1prime : q1.Prime) (hq1ne : q1 ≠ q) (hApg : IsPGroup q1 ↥A) :
+    A ≤ Subgroup.centralizer (opiCoreInG ({q} : Set ℕ) L : Set G) := by
+  classical
+  haveI : Fact q1.Prime := ⟨hq1prime⟩
+  set Ls : Subgroup G := OddOrder.BG.Ch3.S10.Msigma L with hLsdef
+  set Q : Subgroup G := opiCoreInG ({q} : Set ℕ) L with hQdef
+  have hMσM : Ls ≤ L := OddOrder.BG.Ch3.S10.Msigma_le L
+  have hMnormMσ : L ≤ Subgroup.normalizer (Ls : Set G) :=
+    OddOrder.GroupTheory.le_normalizer_opiCoreInG _ L
+  have hQMσ : Q ≤ Ls := by
+    rw [hQdef, hLsdef]; exact OddOrder.BG.Ch3.S10.opiCoreInG_singleton_le_Msigma_of_mem_sigma hqσ
+  have hQeqMσ : Q = opiCoreInG ({q} : Set ℕ) Ls := by
+    rw [hQdef, hLsdef]
+    exact opiCoreInG_eq_of_normal_le hMσM hMnormMσ (hQdef ▸ hLsdef ▸ hQMσ)
+  haveI : Group.IsNilpotent ↥Ls := hLsdef ▸ hnil
+  -- `Q̄ = Q.subgroupOf L_σ = O_q(↥L_σ)`, a normal `q`-subgroup of `↥L_σ`.
+  have hQsub_eq : Q.subgroupOf Ls = Ch03.oPiCore ({q} : Set ℕ) ↥Ls := by
+    rw [hQeqMσ, OddOrder.BG.Ch3.S10.opiCoreInG_subgroupOf]
+  haveI hQbarN : (Q.subgroupOf Ls).Normal := by rw [hQsub_eq]; exact Ch03.oPiCore.normal _ _
+  have hQbarpg : IsPGroup q ↥(Q.subgroupOf Ls) :=
+    (isPGroup_opiCoreInG_singleton L (q := q)).of_equiv
+      (Subgroup.subgroupOfEquivOfLe hQMσ).symm
+  -- `Ā = A.subgroupOf L_σ` is a `q₁`-group; `q ∉ π(|Ā|)` since `q ≠ q₁`.
+  have hAbarpg : IsPGroup q1 ↥(A.subgroupOf Ls) :=
+    hApg.of_equiv (Subgroup.subgroupOfEquivOfLe hAMσ).symm
+  have hqnotA : q ∉ (Nat.card ↥(A.subgroupOf Ls)).primeFactors := by
+    intro hq
+    obtain ⟨n, hn⟩ := hAbarpg.exists_card_eq
+    rw [hn, Nat.mem_primeFactors] at hq
+    have := (Nat.prime_dvd_prime_iff_eq (Fact.out : q.Prime) hq1prime).mp
+      (hq.1.dvd_of_dvd_pow hq.2.1)
+    exact hq1ne this.symm
+  -- `⁅Q̄, Ā⁆ = ⊥` (nilpotent, normal `q`-part vs `q'`-part), so `Ā ≤ C(Q̄)`.
+  have hcommbot : ⁅Q.subgroupOf Ls, A.subgroupOf Ls⁆ = ⊥ :=
+    commutator_eq_bot_of_isNilpotent_of_normal_isPGroup hQbarpg hqnotA
+  have hAbarC : A.subgroupOf Ls ≤ Subgroup.centralizer ((Q.subgroupOf Ls : Subgroup ↥Ls) : Set ↥Ls) :=
+    Subgroup.commutator_eq_bot_iff_le_centralizer.mp
+      (by rw [Subgroup.commutator_comm]; exact hcommbot)
+  -- Push out to the ambient: `A ≤ C_G(Q)`.
+  intro a ha
+  rw [Subgroup.mem_centralizer_iff]
+  intro g hg
+  have haLs : a ∈ Ls := hAMσ ha
+  have hgLs : g ∈ Ls := hQMσ hg
+  have haA : (⟨a, haLs⟩ : ↥Ls) ∈ A.subgroupOf Ls := Subgroup.mem_subgroupOf.mpr ha
+  have hgQ : (⟨g, hgLs⟩ : ↥Ls) ∈ Q.subgroupOf Ls := Subgroup.mem_subgroupOf.mpr hg
+  have haC := hAbarC haA
+  have hcomm := Subgroup.mem_centralizer_iff.mp haC (⟨g, hgLs⟩ : ↥Ls) hgQ
+  exact congrArg Subtype.val hcomm
+
 /-- **Phase B/C uniqueness core of BG Theorem 15.8** (Coq `tau2_P2type_signalizer`,
 BGsection15.v:1329--1338, the `def_q1` argument): if a uniqueness subgroup `Q ∈ 𝒰`
 (`IsUniquelyMaximal Q`) is centralized by a rank-2 elementary abelian `A ∈ ℰ²_{q₁}(G)`, and `A`
