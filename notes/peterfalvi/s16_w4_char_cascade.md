@@ -2239,3 +2239,28 @@ genuine 進捗** (CLAUDE.md「規約が不完全/ミスリードなら訂正」)
 **territorial 誤読を正す**: 「§11=lane-a / §13=lane-b」で判断するな。下の char/group machinery は shared
 `GroupTheory/**` leaf に置ける (FT-path policy B: 未所有 leaf 新設は consumer が他レーンでも in-scope)。
 issue 2018 の「(11.9)=lane-a」は「lane-a を待つ」意味なら誤り (C が 9000 を drive するか、#5→#3 を先に)。
+
+### ⚠ lane-c 検証 (2026-07-06) — hub の spirit 受諾 (idle-wait は誤りだった) だが #5 は **循環 (compile 不可)**、#3 は gated
+
+「idle-wait 停止」は受諾。但し **#5 の具体処方 (block を `field_normalizer_structure` 直下へ移設し cite) は
+現ファイルで circular、compile 不可**。airtight 検証: 全 link を grep 確認 +
+`#print axioms field_normalizer_structure` = `[propext, `**`sorryAx`**`, Classical.choice, Quot.sound]`。
+
+**field_normalizer_structure は s_side/t_side/G0_orderOf_coprime に推移依存** (hub の「cite しない」は深い
+norm-cascade link を見落とし):
+`field_normalizer_structure → field_normalizer_of_L_conj_M → H_cyclic_of_L_conj_M → MHypothesis_kernel_cyclic
+→ K_eq_V_index_pq → contradiction_of_K_ne_V → normCascadeBound_of_charData → normCascadeData
+→ chiRhoNormSq_psi_le_line83 → generic_character_bound → eta_generic_data → eta_grid_facts_on_G0
+→ eta_grid_galois_facts_on_G0 → G0_orderOf_coprime → s_side/t_side_frobenius_kernel`。
+⟹ s_side を field_normalizer_structure の engine で証明 = 自己依存の循環。移設すれば forward-ref で壊れる。
+
+**s_side の正しい route** (元 docstring 通り) = 上流の (14.2.a) 場モデル `field_normalizer_of_U_characteristic_of_fpf`
+(2247、s_side より上流ゆえ非循環)。gate = `basic_structure`(S15:909、**1 sorry**) + (14.7) fpf 合同 + (14.2.b) 入力。
+`c_eq_one` は proven。
+
+**#3 (`T_isTypeP2`)**: → `T_typeII`(:1041) → `T_side_caseB_facts.1`(D=⊥ = `V_inf_centralizer_Q_eq_bot`、**IsTypeII 要求**)
+→ 循環。CaseBForTData thread でも非循環 D=⊥(typeII 非依存版)+v-value が要り lane-b §13 gated (cont.⁷⁵ 分析と一致)。
+
+**⟹ hub frontier map は #5(循環)・#3(gated) で over-optimistic** (cont.⁷²「config-provable」誤ラベルと同型)。
+genuine ungated upstream = **`basic_structure` の 1 sorry を descend** or **issue 9013 T-side producer skeleton** —
+両者 deep build ゆえ次 iteration で engage。hub 再裁定用に evidence 保存 ([[scaffold-sorry-free-not-done]])。
