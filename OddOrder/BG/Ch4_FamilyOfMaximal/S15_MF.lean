@@ -9491,14 +9491,18 @@ Proof spine (Coq `tau2_P2type_signalizer`): pick `q₁ ∈ τ₂(H)`; extract `A
 `|X| = q` and `τ₂(H) = {q}` (Thm 12.7 `nonabelian_tau2` = `tau2_singleton_of_nonabelianSylow`);
 finally `X ≠ K`, `C_G(U) ⊄ M`, and the `τ₂(M)`-Sylow argument give `τ₂(M) = ∅`.
 
-⚠ **Proof gap (2026-07-06):** the corrected statement is now sound and matches Coq exactly, but
-the ~130-line Coq proof is **not yet reconstructed** (it cites ~18 §10/§12/§14 Coq lemmas, several
-of which — the global `β(G)` / `tau2_not_beta` = Lemma 12.1(g), `Ptype_structure`,
-`Ptype_embedding`, `Ptype_cyclics`, `Fcore_structure`, `kappa_structure`, `pprod_focal_coprime`,
-`cent_uniq_Uniqueness` — are not yet ported as bundled repo lemmas; and the two dropped Cor 14.12
-clauses `K ⊆ F(H ∩ M*)` / `σ(H)'-Hall(H)(H ∩ M*)`, which the proof needs as `sKFD`/`hallD`,
-require §14 internals `typeP2_neighbor_is_typeF` establishes but does not export — see report).
-This `sorry` is the pre-existing one (the statement is re-hypothesized to be sound), **not new**. -/
+⚠ **Proof gap (2026-07-06, being assembled — issue 9017 更新 #4):** the corrected statement is
+sound and matches Coq exactly; the ~130-line Coq proof is **being assembled inline**, not blocked.
+**The cited §9/§12/§14/§15 machinery is present** in the repo under descriptive names (verified
+Coq→repo map in issue 9017; an earlier "not yet ported" inventory was a naming-trap false negative
+— `Ptype_embedding` = `S14.typeP_duality`, `tau2_not_beta` = `S12.tau2_prime_mem_sigma_diff_beta`,
+`Fcore_structure` = `maxNilpotentNormalHall_*`, `cent_uniq_Uniqueness` = `S09_Theorem91`, etc.).
+The two dropped Cor 14.12 clauses `K ⊆ F(E)` / σ(H)′-Hall `E` are now **exported** by
+`typeP2_neighbor_is_typeF_of_mem`.  Phase A (up to Coq `cKA`) is landed sorry-free as
+`exists_rank2_elemAb_le_centralizer_kappa_of_tau2`; Phases B/C/D (L-structure via `typeP_duality`,
+`def_q1` via the Uniqueness Theorem, `τ₂(H) = {q}` via `tau2_singleton_of_nonabelianSylow`,
+`τ₂(M) = ∅`) remain.  This `sorry` is the pre-existing one (statement re-hypothesized sound),
+**not new**. -/
 theorem tau2_transfer_constraint [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M Mstar U K R H : Subgroup G} {r : ℕ}
     (hM : M ∈ maximalSubgroups G) (hP2 : S14.IsTypeP2 M)
