@@ -2221,3 +2221,24 @@ htype/chars は caller (`exists_zeta_residual_not_orthogonal`) が保持ゆえ c
 (signature 拡張)。⚠ **carrier 留意**: `Sset := inducedFamily ⊋ 𝒮=sSet` の mismatch は spine 全体に
 影響しうる (§14 hY も同 mismatch を踏む) — 世界統一 (sSet↔inducedFamily の (11.5)/(9.5) identification)
 が根治だが deep。
+
+## 2026-07-06 update³² (lane-a /loop) — column-degree landed + world-bridge full-scope honest report
+
+`Hypothesis.muGrid_column_sum_apply_one_eq_qu` (landed, sorry-free): for k≠0, `μ_k (1) = q·u = qu`
+(既存 §9 facts の合成: `muGrid_column_sum_mem_sOf_H0_and_reducible` + `reducible_mem_sOf_H0_apply_one_eq_qu`)。
+bundled §9 sorry の **ψ₀-witness degree** を供給 (column μ_k ∈ Sset\SHCSet of degree qu)。
+
+### ★ world-bridge の full scope (honest report — 想定より major と判明)
+capstone の bundled §9 sorry `∀ y ∈ Sset\SHCSet, y 1 = qu` の完全 discharge は、実質 Peterfalvi
+**(9.5)/(9.8)/(11.5)/(11.8.1) の Clifford degree 解析 + family 同定**の形式化 = **major multi-iteration**。
+landed 済 (foundational): `induce_derived_apply_one_eq_w1_mul` (Ind θ 1 = w₁·θ(1)) +
+`muGrid_column_sum_apply_one_eq_qu` (μ_k 1 = qu)。残:
+1. **reducible bridge**: reducible inducedFamily member = column (counting `reducible_count` = p-1
+   両側一致 or family 同定)。→ reducible-side degree qu を inducedFamily world で確立。
+2. **irr-degree 完全性 ((9.8)/(9.9))**: inducedFamily の既約は degree w₁ か qu のみ (M' の source degree
+   構造 a/qa の Clifford 解析、repo 不在)。**最深**。
+3. **family mismatch (sSet=𝒳 ⊊ inducedFamily)**: 世界統一の (11.5)/(9.5) 同定 (𝒳=H⊄Ker ↔ 相当)。
+   ⚠ この mismatch は spine 全体 (§14 hY も) に影響しうる carrier 論点。
+
+各 piece は互いに依存 + 深い §9 char 本体。foundational 2 lemma は landed だが full hS2deg は多 iteration。
+htype/chars は caller (`exists_zeta_residual_not_orthogonal`) 保持ゆえ capstone に threading 可能。
