@@ -57,6 +57,14 @@
 > σ-theory generic leaf は `OddOrder/GroupTheory/**` 共有ゾーンに残置、lane a が tail を完成 + S11 dedup を実施。
 > **ISSUE_BASE 4000 は退役** (9000 shared-infra レンジは全レーン継続)。詳細 = 本節 + merge_monitor 現状メモ。
 
+> **♻ 2026-07-06 lane d 復活 (4 レーン体制、ユーザー承認 + hub 6-agent 調査)**: lane d を**最軽量・codex 運用**
+> で復活。クラスタ δ = **issue 9006 Hall-lemma relocation**（FeitThompson.lean の誤配置 proven 群論補題 3 本を
+> shared leaf へ relocate + S11 `_hall` migrate、全 body proven・on-path・純群論で char 無）。**ISSUE_BASE 4000
+> 復活**。所有 = shared `OddOrder/Mathlib/Subgroup.lean` + `OddOrder/GroupTheory/MaximalSubgroupType.lean`
+> （自由追加）+ FeitThompson/S10_BGInterface/S11 は 9006 列挙の relocate のみ（9006 hub 裁定の例外）。d は
+> Claude でなく codex が動かすため最軽量・checklist 完備のタスクを選定（他 light 候補 9011/9012/9015/9005 は
+> 納品済 stale、9007 高衝突、9014 deep）。正本 checklist = `issues/9006-*.md`。worktree = `/home/ywr/odd-order-d`。
+
 > **⚠ 2026-07-01 再々配分 (issue 4014 hub 裁定, 履歴) → 2026-07-02 に上記 3 レーン再編で superseded**: lane d は §15 S&T setup / δ BG §14–16 の
 > **on-feitThompson-spine な ungated genuine work が枯渇** (code-level 確証)。残 on-spine 前進は全て他レーン
 > 上流に gated (typeP_Galois 未実装 / lane a §11 H_elementaryAbelian sorried / §9 Singer / lane b (6.8)
