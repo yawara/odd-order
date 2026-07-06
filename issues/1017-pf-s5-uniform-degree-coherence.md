@@ -130,3 +130,12 @@ lane-b の未マージ commit (`main..b`) が §5 coherence 実装を含むた�
    (grep 0 refs)」 / lane-b = 「S06 が prime-TI residue theory を完全所有ゆえ 9014 leaf は duplication」
    と撤回。**両者は同じ §5/prime-TI を別診断**しており、重複・矛盾のリスク → hub/user がデコンフリクト
    要 (どちらの診断が正しいか = code-level 検証で決着可、別 tick で subagent 精査推奨)。
+
+   **✅ RESOLVED (2026-07-06, hub 調査 + ユーザー裁可)**: 2 subagent + Coq trace で決着。**両診断とも
+   別の層を指した talking-past** — lane-b「S06 が residue 所有」は誤り (S06 は既約グリッドのみ、
+   residue 二分律・cyclicTIiso なし)、lane-a「grep 0」は半分誤り (`primeTIred` は PrimeTIResidue.lean
+   内に存在、真に 0 は §5/§8 coherence upgrade)。**Coq: (10.7) は `primeTIred` を transitively 必要**
+   (residue = coherence upgrade の前提部品)。⟹ **PrimeTIResidue.lean は KEEP** (§10+§13 共有基盤)、
+   **9014 OPEN 維持**、mu2Grid は削除でなく PrimeTIResidue へ移設。詳細裁定 = **issue 9014 の HUB RULING**。
+   lane-b の held merge は「PrimeTIResidue 削除を含めない + mu2Grid を S05 から PrimeTIResidue へ移設 +
+   9014 を close しない」に restructure 要 (S07_Subcoherent carve-out・S15:629 witness closure は不変)。
