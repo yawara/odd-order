@@ -1178,6 +1178,23 @@ theorem fitting_map_subtype_le_fitting [Finite G] {M : Subgroup G} [M.Normal] :
       M.subtype_injective)
   exact nilpotent_normal_le_fitting
 
+/-- If a normal subgroup contains `F(G)`, then its Fitting subgroup maps onto
+`F(G)`. -/
+theorem fitting_map_eq_of_normal_of_fitting_le [Finite G] {M : Subgroup G} [M.Normal]
+    (hFM : fitting G ≤ M) :
+    (fitting ↥M).map M.subtype = fitting G := by
+  refine le_antisymm fitting_map_subtype_le_fitting ?_
+  haveI : Group.IsNilpotent ↥(fitting G) := fitting.isNilpotent
+  haveI : Group.IsNilpotent ↥((fitting G).subgroupOf M) :=
+    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hFM).symm
+  have hle : (fitting G).subgroupOf M ≤ fitting ↥M :=
+    nilpotent_normal_le_fitting
+  calc fitting G
+      = fitting G ⊓ M := (inf_eq_left.mpr hFM).symm
+    _ = ((fitting G).subgroupOf M).map M.subtype :=
+        (Subgroup.subgroupOf_map_subtype _ M).symm
+    _ ≤ (fitting ↥M).map M.subtype := Subgroup.map_mono hle
+
 /-- The image of the Fitting subgroup under a group isomorphism is contained in the Fitting
 subgroup of the codomain. -/
 theorem fitting_map_mulEquiv_le {A B : Type*} [Group A] [Group B] [Finite A] [Finite B]
