@@ -383,35 +383,6 @@ theorem hall_maxNilpotentNormalHall_and_mainSubgroup [Finite G]
         (mainSubgroup M tau) := by
   sorry
 
-/-- **Peterfalvi (8.12.b)**: type I/II Sylow-complement centralizer control.
-
-If `M` is of type I or II and `U` is the relevant complement (`M = H ⋊ U` for type I,
-`[M,M] = H ⋊ U` for type II), then for every non-empty subset `X` of `U#` such that
-`C_H(X) ≠ 1` (i.e. `M_F ⊓ C_G(X) ≠ ⊥`), **`M` is the unique maximal subgroup of `G` which
-contains `C_G(X)`** — recorded as `C_G(X) ≤ M` together with `IsUniquelyMaximal (C_G(X))`
-(the unique coatom above `C_G(X)` being `M`).
-
-The earlier formulation recorded only `IsUniquelyMaximal (C_G(X))`, which is strictly weaker:
-for type II `C_G(X)` need not lie in `M`, so without the `C_G(X) ≤ M` clause the result cannot
-identify the unique maximal as `M` (as (9.3) requires).  Reference: [BG], §16, Theorem B and
-Proposition 16.1.
-
-⚠ **This scaffold form (`hUle : U ≤ M`) is `false`-as-stated** (loop¹⁰⁵ finding): BG (8.12.b) needs
-`U` to be *the* `(κ ∪ σ)ᶜ`-Hall complement, not an arbitrary subgroup.  With `U = M` and an escaping
-`σ`-element `x ∈ M_σ#`, `M_σ ⊓ C_G(x) ⊇ ⟨x⟩ ≠ ⊥` holds yet `C_G(x) ⊄ M`, breaking the conclusion.
-The faithful, `sorry`-free form is `typeI_or_typeII_centralizer_unique_hall` (adds the Hall
-hypothesis; its `⟨X⟩ ≤ U` a `(κ ∪ σ)ᶜ`-subgroup, so BG Theorem B(4) applies).  **Migrate the sole
-remaining caller (`S11.typeII_centralizer_U_eq_bot`) to `_hall`** once the type-`P₂` complement
-Hall witness `isHall_kappaSigmaCompl_of_isTypeP2_complement` (currently in the downstream
-`FeitThompson.lean`) is relocated upstream of §11 (loop¹⁰⁵ follow-up, issue 9003). -/
-theorem typeI_or_typeII_centralizer_unique [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M U : Subgroup G}
-    (hM : M ∈ maximalSubgroups G) (hType : IsTypeI M ∨ IsTypeII M) (hUle : U ≤ M) :
-    ∀ X : Set G, X.Nonempty → X ⊆ sharpSubgroup U →
-      maxNilpotentNormalHall M ⊓ Subgroup.centralizer X ≠ ⊥ →
-        Subgroup.centralizer X ≤ M ∧ IsUniquelyMaximal (Subgroup.centralizer X) := by
-  sorry
-
 /-- **Peterfalvi (8.12.b)**, faithful form: type I/II Sylow-complement centralizer control.
 
 For `M` of type I or II, its genuine `(κ ∪ σ)ᶜ`-Hall complement `U` (`M = H ⋊ U` for type I,

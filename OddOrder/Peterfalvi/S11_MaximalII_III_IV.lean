@@ -524,7 +524,7 @@ private theorem maximal_normalizer_eq_self [Finite G] (hG : OddOrder.BG.IsMinima
 the Frobenius kernel `U` acts fixed-point-freely on `H = M_F`, i.e. `C_H(U) = 1`.
 
 *Proof.* If `C_H(U) ≠ 1` then, taking `X = U#` (`C_G(X) = C_G(U)`), Peterfalvi (8.12.b)
-(`S10.typeI_or_typeII_centralizer_unique`) makes `M` the unique maximal subgroup containing
+(`S10.typeI_or_typeII_centralizer_unique_hall`) makes `M` the unique maximal subgroup containing
 `C_G(U)`.  Since `g ∈ N_G(U)` fixes `C_G(U)` (it normalizes `U`), conjugation by `g` carries that
 unique maximal to itself, so `g` normalizes `M`; as `M` is self-normalizing,
 `N_G(U) ⊆ M`.  This contradicts (8.6.b II) (`S10.typeII_normalizer_not_le_of_typePData`), so
@@ -533,6 +533,8 @@ theorem typeII_centralizer_U_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimple
     {M : Subgroup G} (data : TypePData M) (hM : M ∈ maximalSubgroups G) (hII : IsTypeII M) :
     data.H ⊓ Subgroup.centralizer (data.U : Set G) = ⊥ := by
   by_contra hne
+  have hP2 : OddOrder.BG.Ch4.S14.IsTypeP2 M :=
+    ((OddOrder.BG.Ch4.S16.proposition_type_classification hG hM).2.1.mp hII)
   obtain ⟨dataII⟩ := hII
   -- `data.U ≠ ⊥`: `|U| = [M' : M_F]` is independent of the type-`P` witness, and the `IsTypeII`
   -- witness has `U ≠ 1`.
@@ -556,9 +558,13 @@ theorem typeII_centralizer_U_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimple
   have hUleM : data.U ≤ M := data.U_le.trans (Subgroup.map_subtype_le _)
   have hCHne : maxNilpotentNormalHall M ⊓ Subgroup.centralizer (sharpSubgroup data.U) ≠ ⊥ := by
     rw [← data.H_eq, hCeq]; exact hne
+  have hUhall : Ch03.IsHallSubgroup
+      ((OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (data.U.subgroupOf M) :=
+    OddOrder.Peterfalvi.S10Interface.isHall_kappaSigmaCompl_of_isTypeP2_complement hG hM hP2
+      hUleM data.derivedInG_eq_fitting_sup_U data.fitting_inf_U_eq_bot
   obtain ⟨hCleM, hUniq⟩ :=
-    OddOrder.Peterfalvi.S10.typeI_or_typeII_centralizer_unique hG hM (Or.inr ⟨dataII⟩) hUleM
-      (sharpSubgroup data.U) ⟨x, hxU, hx1⟩ le_rfl hCHne
+    OddOrder.Peterfalvi.S10.typeI_or_typeII_centralizer_unique_hall hG hM (Or.inr ⟨dataII⟩)
+      hUleM hUhall (sharpSubgroup data.U) ⟨x, hxU, hx1⟩ le_rfl hCHne
   -- `N_G(U) ⊆ M`.
   have hNleM : Subgroup.normalizer (data.U : Set G) ≤ M := by
     intro g hg
