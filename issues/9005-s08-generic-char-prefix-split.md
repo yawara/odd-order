@@ -41,7 +41,8 @@ prefix-split (凍結済 generic 宣言を上流 GroupTheory leaf へ移し、S08
 - [x] `OddOrder.lean` root に新 leaf を追加。full build green (3903 jobs) + AxiomsCheck OK。
 - [ ] **重複検出の付記 (残タスク: split 済み後の統合判定)**: `S11_MaximalII_III_IV.lean` に `inner_compHom_of_bijective` (L7310) /
       `inner_compHom_mulEquiv` (L7755) — S08 の `inner_compHom_of_mulEquiv` と同内容の可能性。
-      split 後に S11 側を新 leaf cite に置換できるか lane b/hub で判定 (できれば統合)。
+      split 後に S11 側を新 leaf cite に置換できるか lane a/hub で判定 (できれば統合)。S11 は lane a 所有のため、
+      lane d は fresh carve-out なしに Lean 側の置換へ入らない。
 
 ## lane c の並行対応 (待たない)
 
