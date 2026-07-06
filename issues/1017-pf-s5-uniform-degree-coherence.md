@@ -301,3 +301,31 @@ S/T Dade 構成。lane a (10.7) は M-instance 側で `sixTwoDecompositionData` 
 
 次 build = 上記 1-3 (S-instance P2 Dade via type-I ASet bridge)。substantial だが phantom でなく pieces 存在。
 残 Dade-independent input: hreal (`HasNoRealCharacters` S03:60 + odd-order)、hortho (`inner_induce_eq_zero_of_not_conj`)。
+
+## 2026-07-06 更新 #10 (lane b) — ★★★★(13.2.e) foundation LANDED: honest P2 Dade support (commit fd5ccff9)
+
+更新 #9 の crux「S-instance P2 Dade isometry を type-I ASet bridge で構成」を **landed** (subagent + 検証)。
+6 iteration の drilling の到達点。
+
+**landed (S15_SAndT_Setup.lean、+267 行、commit fd5ccff9)**:
+- honest support `A(S) = ⋃_{x∈S_σ#} C_{S'}(x)# = centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)`
+  (9008-correct、phantom `typePA=(S')#` でない。A1=S_σ# では不足 — (C')#⊄S_σ#、(C')#⊆A(S) 検証済)。
+- 4 substantive P2 lemma (`_subset_ASet` bridge / `coprime_FT_signalizer...` (8.13.c2) / `_subset_hatMsigma` /
+  `_conj_mem`) は **axiom-clean** (標準3公理のみ)。
+- `dadeSupportHypothesisData_honestTypeP2ASet (hP2 : IsTypeP2 M) : Nonempty (DadeSupportHypothesisData M (A(S)))`
+  = (13.2.e) 基盤、`.dade : S04.Hypothesis G (A(S)) M` を産む。
+- **sorryAx provenance 検証済 (honest)**: top-level は sorryAx を持つが pre-existing shared BG §16 Theorem II
+  pins (`theoremII_tame_embedding`/`mem_sigmaSharp_of_mem_aSet_of_escape`) からの inheritance で、accepted
+  on-path `dadeSupportHypotheses_typeI` と **exact parity** (#print axioms 一致)。lane-b 導入 sorry 0。
+- enabler: `typeP2_exists_matched_kappa_hall_pair` (S16:1319)。S10/S11/S12 無改変。build GREEN 3932。
+
+**残 wiring (次 iteration、全て pieces 存在)**:
+1. `Hypothesis`-level wrapper: 構成を `hyp.S`/`hyp.S_typeP2`/`hyp.S_maximal` に instantiate → `hyp` に
+   concrete Dade hypothesis for S。
+2. Dade-independent inputs 残: `hreal` (`HasNoRealCharacters` S03:60 + odd-order)、`hortho`
+   (`inner_induce_eq_zero_of_not_conj` CliffordDecomposition:509)。hconj は landed (b8a37625)。
+3. `irrSubcoherent` で S07.Hypothesis 組成 (Dade + hconj/hreal/hortho) → §9 subcoherence。
+4. `clifford_dichotomy` (S11:6668) case-split: Galois = `caseB_character_counts.1` uniform degree +
+   `coherentEqualDegree_fromDade` / `coherent_subset_of_constant_degree`、非Galois = pair-chain + squeeze (landed)。
+5. `coherent_H0Cprime_S` (S15:572) を上記 honest route に re-point (現 sibleyTarget_H0C 経由を置換; ordering
+   注意 — 構成 746 が 572 より後ゆえ、re-grounding は new def or 構成を前方移動)。lane a (10.7) も同一 (9.11) coherence。
