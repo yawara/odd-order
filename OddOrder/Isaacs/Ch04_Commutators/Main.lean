@@ -125,6 +125,38 @@ theorem commutator_normal_of_sup_eq_top {H K : Subgroup G} (hsup : H ⊔ K = ⊤
 `f : G →* G'` の像での commutator は元の像の commutator.
 **mathlib `Subgroup.map_commutator` 直接利用**. wrapper 不要. -/
 
+/-- If a commutator-to-Fitting bound holds after restricting `A` and `B` to
+`A ⊔ B`, then it pushes forward to the ambient group. -/
+theorem commutator_le_fitting_of_subgroupOf_sup {G : Type*} [Group G] [Finite G]
+    {A B : Subgroup G}
+    (h : ⁅A.subgroupOf (A ⊔ B), B.subgroupOf (A ⊔ B)⁆ ≤
+      (OddOrder.Isaacs.Ch01.fitting ↥(A.subgroupOf (A ⊔ B))).map
+        (A.subgroupOf (A ⊔ B)).subtype) :
+    ⁅A, B⁆ ≤ (OddOrder.Isaacs.Ch01.fitting ↥A).map A.subtype := by
+  have hAS : A ≤ A ⊔ B := le_sup_left
+  have hBS : B ≤ A ⊔ B := le_sup_right
+  set e := Subgroup.subgroupOfEquivOfLe hAS with he
+  have hcomp : (A ⊔ B).subtype.comp (A.subgroupOf (A ⊔ B)).subtype =
+      A.subtype.comp e.toMonoidHom := by
+    ext a'
+    rfl
+  have key : ((OddOrder.Isaacs.Ch01.fitting ↥(A.subgroupOf (A ⊔ B))).map
+        (A.subgroupOf (A ⊔ B)).subtype).map (A ⊔ B).subtype =
+      (OddOrder.Isaacs.Ch01.fitting ↥A).map A.subtype := by
+    rw [Subgroup.map_map, hcomp, ← Subgroup.map_map,
+      OddOrder.Isaacs.Ch01.fitting_map_mulEquiv e]
+  have hcomm :
+      (⁅A.subgroupOf (A ⊔ B), B.subgroupOf (A ⊔ B)⁆).map (A ⊔ B).subtype =
+        ⁅A, B⁆ := by
+    rw [Subgroup.map_commutator, Subgroup.subgroupOf_map_subtype,
+      Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hAS, inf_eq_left.mpr hBS]
+  calc ⁅A, B⁆
+      = (⁅A.subgroupOf (A ⊔ B), B.subgroupOf (A ⊔ B)⁆).map (A ⊔ B).subtype :=
+        hcomm.symm
+    _ ≤ ((OddOrder.Isaacs.Ch01.fitting ↥(A.subgroupOf (A ⊔ B))).map
+          (A.subgroupOf (A ⊔ B)).subtype).map (A ⊔ B).subtype := Subgroup.map_mono h
+    _ = (OddOrder.Isaacs.Ch01.fitting ↥A).map A.subtype := key
+
 /-- **Isaacs Lemma 4.3** (片向き): `⁅H, K⁆ ≤ H` ⇒ `K ≤ N(H)`. -/
 theorem le_normalizer_of_commutator_le {H K : Subgroup G}
     (h : ⁅H, K⁆ ≤ H) : K ≤ Subgroup.normalizer H := by
