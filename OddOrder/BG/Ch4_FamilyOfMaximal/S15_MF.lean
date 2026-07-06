@@ -9842,6 +9842,91 @@ theorem mem_sigma_and_le_Msigma_of_rank2_centralizer_kappa [Finite G]
   rwa [Subgroup.map_subgroupOf_eq_of_le hAMstar,
     Subgroup.map_subgroupOf_eq_of_le (OddOrder.BG.Ch3.S10.Msigma_le Mstar)] at hmap
 
+/-- **Phase B/C step 4 of BG Theorem 15.8** (Coq `tau2_P2type_signalizer`, BGsection15.v:1358--1367,
+the `not_cQQ` block): with the partner `L` type-`P₁` (so `L_σ` nilpotent, `L' = L_σ`), `q ∈ σ(L)`,
+the `q`-core `Q = O_q(L)` a Sylow `q`-subgroup of `L` (Step 3), and the `κ`-Hall `K` with `|K| = q`
+prime, `K ≤ Q` and `K ≤ (L_σ)'`, the Sylow `Q` is **nonabelian**.
+
+Proof (Coq `not_cQQ`, working inside `↥(L_σ)`): the nilpotent `L_σ` factors as
+`L_σ = O_{q'}(L_σ)·Q` (`oPiCore_sup_compl_eq_top`, since `Q.subgroupOf L_σ = O_q(↥L_σ)`).  BG Lemma
+6.5(a) (`inf_commutator_eq_of_coprime`) with the normal `q'`-part `O_{q'}(↥L_σ)`, `U = Q`, `H = K`
+gives `K ⊓ (L_σ)' = K ⊓ ⁅Q, Q⁆`.  If `Q` were abelian, `⁅Q, Q⁆ = ⊥`, so `K ⊓ (L_σ)' = ⊥`; but
+`K ≤ (L_σ)'` gives `K ⊓ (L_σ)' = K`, forcing `K = ⊥`, contradicting `|K| = q > 1`. -/
+theorem partner_opiCore_nonabelian [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L K : Subgroup G} {q : ℕ} [Fact q.Prime]
+    (hL : L ∈ maximalSubgroups G) (hqσ : q ∈ OddOrder.BG.Ch3.S10.sigma L)
+    (hnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma L))
+    (hKcard : Nat.card ↥K = q)
+    (hKQ : K ≤ opiCoreInG ({q} : Set ℕ) L)
+    (hKderiv : K ≤ derivedInG (OddOrder.BG.Ch3.S10.Msigma L)) :
+    ¬ IsMulCommutative ↥(opiCoreInG ({q} : Set ℕ) L) := by
+  classical
+  intro hQab
+  set Ls : Subgroup G := OddOrder.BG.Ch3.S10.Msigma L with hLsdef
+  set Q : Subgroup G := opiCoreInG ({q} : Set ℕ) L with hQdef
+  have hMσM : Ls ≤ L := OddOrder.BG.Ch3.S10.Msigma_le L
+  have hMnormMσ : L ≤ Subgroup.normalizer (Ls : Set G) :=
+    OddOrder.GroupTheory.le_normalizer_opiCoreInG _ L
+  -- `Q ≤ L_σ` and `Q = O_q(L_σ)`.
+  have hQMσ : Q ≤ Ls := by
+    rw [hQdef, hLsdef]; exact OddOrder.BG.Ch3.S10.opiCoreInG_singleton_le_Msigma_of_mem_sigma hqσ
+  have hQeqMσ : Q = opiCoreInG ({q} : Set ℕ) Ls := by
+    rw [hQdef, hLsdef]
+    exact opiCoreInG_eq_of_normal_le hMσM hMnormMσ (hQdef ▸ hLsdef ▸ hQMσ)
+  haveI : Group.IsNilpotent ↥Ls := hLsdef ▸ hnil
+  -- Inside `↥(L_σ)`: `Q̄ = O_q(↥L_σ)`, `Ō = O_{q'}(↥L_σ)`, with `Ō ⊔ Q̄ = ⊤`.
+  have hQsub_eq : Q.subgroupOf Ls = Ch03.oPiCore ({q} : Set ℕ) ↥Ls := by
+    rw [hQeqMσ, OddOrder.BG.Ch3.S10.opiCoreInG_subgroupOf]
+  have hKMσ : K ≤ Ls := hKQ.trans hQMσ
+  set Qbar : Subgroup ↥Ls := Q.subgroupOf Ls with hQbardef
+  set Obar : Subgroup ↥Ls := Ch03.oPiCore ({q}ᶜ : Set ℕ) ↥Ls with hObardef
+  set Kbar : Subgroup ↥Ls := K.subgroupOf Ls with hKbardef
+  haveI hObarN : Obar.Normal := hObardef ▸ Ch03.oPiCore.normal _ _
+  have hsup : Obar ⊔ Qbar = ⊤ := by
+    have h := oPiCore_sup_compl_eq_top (K := ↥Ls) ({q}ᶜ : Set ℕ)
+    rw [compl_compl] at h
+    rw [hObardef, hQsub_eq]; exact h
+  -- `K̄ = K.subgroupOf L_σ ≤ Q̄`; coprime `(|K̄|, |Ō|)` (`q`-group vs `q'`-group).
+  have hKbarQ : Kbar ≤ Qbar := Subgroup.subgroupOf_mono Ls hKQ
+  have hKbarcard : Nat.card ↥Kbar = q := by
+    rw [hKbardef, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKMσ).toEquiv]; exact hKcard
+  have hObarpi : Ch03.Subgroup.IsPiGroup ({q}ᶜ : Set ℕ) Obar :=
+    hObardef ▸ Ch03.oPiCore.isPiGroup ({q}ᶜ : Set ℕ)
+  have hcop : Nat.Coprime (Nat.card ↥Kbar) (Nat.card ↥Obar) := by
+    refine coprime_of_forall_prime_not_dvd (fun r hr hrK hrO => ?_)
+    have hrq : r = q := by
+      have hmem : r ∈ (q : ℕ).primeFactors := by
+        rw [hKbarcard] at hrK
+        exact Nat.mem_primeFactors.mpr ⟨hr, hrK, (Fact.out : q.Prime).ne_zero⟩
+      rw [(Fact.out : q.Prime).primeFactors, Finset.mem_singleton] at hmem; exact hmem
+    have hrOmem : r ∈ ({q}ᶜ : Set ℕ) :=
+      hObarpi r (Nat.mem_primeFactors.mpr ⟨hr, hrO, Nat.card_pos.ne'⟩)
+    exact hrOmem (by rw [hrq]; rfl)
+  -- BG Lemma 6.5(a): `K̄ ⊓ commutator ↥L_σ = K̄ ⊓ ⁅Q̄, Q̄⁆`.
+  have hfocal := OddOrder.BG.Ch1.S06.inf_commutator_eq_of_coprime (K := Obar) (U := Qbar)
+    (H := Kbar) hsup hKbarQ hcop
+  -- `Q` abelian ⟹ `Q̄` abelian ⟹ `⁅Q̄, Q̄⁆ = ⊥`, so RHS `= ⊥`.
+  have hQbarab : IsMulCommutative ↥Qbar :=
+    OddOrder.BG.Ch3.S11.isMulCommutative_of_mulEquiv
+      (Subgroup.subgroupOfEquivOfLe hQMσ).symm hQab
+  have hQQbot : ⁅Qbar, Qbar⁆ = ⊥ := by
+    rw [Subgroup.commutator_eq_bot_iff_le_centralizer]
+    intro x hx; rw [Subgroup.mem_centralizer_iff]; intro y hy
+    exact congrArg Subtype.val (hQbarab.is_comm.comm ⟨y, hy⟩ ⟨x, hx⟩)
+  -- `K̄ ≤ commutator ↥L_σ` (from `K ≤ (L_σ)'`).
+  have hKbarComm : Kbar ≤ commutator ↥Ls := by
+    have hid : (derivedInG Ls).subgroupOf Ls = commutator ↥Ls :=
+      Subgroup.comap_map_eq_self_of_injective Ls.subtype_injective (commutator ↥Ls)
+    rw [hKbardef, ← hid]
+    exact Subgroup.subgroupOf_mono Ls (hLsdef ▸ hKderiv)
+  -- `K̄ = K̄ ⊓ commutator = K̄ ⊓ ⁅Q̄,Q̄⁆ = K̄ ⊓ ⊥ = ⊥`, contradicting `|K̄| = q > 1`.
+  have hKbot : Kbar = ⊥ := by
+    have h1 : Kbar ⊓ commutator ↥Ls = Kbar := inf_eq_left.mpr hKbarComm
+    rw [hfocal, hQQbot, inf_bot_eq] at h1
+    exact h1.symm
+  rw [hKbot, Subgroup.card_bot] at hKbarcard
+  exact (Fact.out : q.Prime).one_lt.ne' hKbarcard.symm
+
 /-- **Phase B/C uniqueness core of BG Theorem 15.8** (Coq `tau2_P2type_signalizer`,
 BGsection15.v:1329--1338, the `def_q1` argument): if a uniqueness subgroup `Q ∈ 𝒰`
 (`IsUniquelyMaximal Q`) is centralized by a rank-2 elementary abelian `A ∈ ℰ²_{q₁}(G)`, and `A`
