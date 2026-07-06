@@ -8,6 +8,7 @@ import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
 import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 import OddOrder.Peterfalvi.S05_SigmaIsometry
+import OddOrder.Peterfalvi.S06_CertainTypeClifford
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S08_CoherenceCorePart1
 
@@ -526,6 +527,48 @@ theorem induce_H_mem_zSpan_calS
 end PrimeTIResidueData
 
 end OddOrder.RepresentationTheory
+
+/-! ## The `prTIres_irr_cases` dichotomy, assembled over the S06 certain-type `Hypothesis`
+
+The genuinely-deep constituent classification `prTIres_irr_cases` (Peterfalvi (4.5.b)) — the crux the
+`PrimeTIResidueData` structure posits — is **already proven** as the inertia computation in
+`S06_CertainTypeClifford`: a `χ ∈ Irr(K)` not among the residues `χ_j` has full inertia `I_L(χ) = K`
+(`inertia_eq_K_of_forall_chiRestrict_ne`, the `p`-group fixed-point count via
+`card_fixedPoints_conjByPermIrr…` + `IsPGroup.card_modEq_card_fixedPoints`), whence `Ind χ` is a fresh
+irreducible (`induce_isIrreducible_of_forall_chiRestrict_ne`) distinct from every `μ_{ij}`
+(`induce_ne_certainType_of_forall_chiRestrict_ne`).  Assembling the residue case (by definition) with
+that induced-irreducible case gives exactly the dichotomy `PrimeTIResidueData.prTIres_irr_cases`
+posits.  So the constructor of `PrimeTIResidueData` is a **bridge from an `S06.Hypothesis`**, not a
+from-scratch `cyclicTIiso` port (issue 9014): the single genuinely-deep field is discharged by
+`prTIres_irr_dichotomy` below. -/
+
+namespace OddOrder.Peterfalvi.S06.Hypothesis
+
+open OddOrder.RepresentationTheory
+
+variable {L : Type*} [Group L] [Fintype L] (h : Hypothesis L)
+  [Invertible (Nat.card L : ℂ)] [Fintype ↥(h.W1 ⊔ h.W2)]
+  [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)] [Invertible (Nat.card ↥h.K : ℂ)]
+
+/-- **Peterfalvi (4.5.b) `prTIres_irr_cases`, assembled.**  Every `χ ∈ Irr(K)` is either a residue
+`χ_j` (`= chiRestrict χ₂` for some `W₂`-column `χ₂`) or induces to a *fresh* irreducible of `L`
+distinct from every certain-type character `μ_{ij}`.  The residue case is by definition; the
+induced-irreducible case is the S06 inertia computation (`induce_isIrreducible_of_forall_chiRestrict_ne`
++ `induce_ne_certainType_of_forall_chiRestrict_ne`).  This is the deep field of a `PrimeTIResidueData`
+constructor built from an `S06.Hypothesis` (issue 9014). -/
+theorem prTIres_irr_dichotomy [NeZero (Nat.card h.W1)] (χ : IrreducibleCharacter ↥h.K) :
+    (∃ χ₂, h.chiRestrict χ₂ = χ) ∨
+      (IsIrreducibleCharacter (ClassFunction.induce h.K (χ : ClassFunction ↥h.K ℂ)) ∧
+        ∀ (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)),
+          ClassFunction.induce h.K (χ : ClassFunction ↥h.K ℂ)
+            ≠ ((h.columnFamily χ₂).mu i : ClassFunction L ℂ)) := by
+  by_cases hcase : ∃ χ₂, h.chiRestrict χ₂ = χ
+  · exact Or.inl hcase
+  · push_neg at hcase
+    exact Or.inr ⟨h.induce_isIrreducible_of_forall_chiRestrict_ne hcase,
+      fun χ₂ i => h.induce_ne_certainType_of_forall_chiRestrict_ne hcase χ₂ i⟩
+
+end OddOrder.Peterfalvi.S06.Hypothesis
 
 /-! ## Relocated from `S05_SigmaIsometry` (hub ruling 9014/fcfc0644): the `μ` extraction grid
 
