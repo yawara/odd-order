@@ -55,6 +55,22 @@ Coq (11.3) `FTtype34_noncoherence` (PFsection11.v:206-223) は uniform-degree �
 `card_kappaHall_lt_of_isTypeIIIorIV` (FeitThompson の唯一 bare sorry) が honest に close される
 capstone を bounded-coherence route で構築 (uniform-degree の偽 sorry を排除)。
 
+## ✅ 検証 (2026-07-07、ユーザー「先に検証」要請、独立 3 角度で確定)
+
+1. **★ smoking gun — Coq が uniform-degree を使わない**: `FTtypeP_subcoherent` 経由で
+   **`scoh1 : subcoherent (S_ 1) tau R`** (PFsection11.v:104) — S_1 は **subcoherent** (Pf (5.x) の弱い構造)
+   としてのみ扱われ、uniform-degree でも coherent でもない。(11.3) はそこから `bounded_seqIndD_coherence`
+   で coherent(S_1) を導く。**(11.8)/(11.3) を type III/IV で形式化した本家 (Gonthier et al.) が
+   uniform-degree を採らない** = それが type III/IV で成立しない決定的証拠 (成立するなら簡単なので使ったはず)。
+2. **a ≠ u が genuine**: `u := |Ubar|` (PFsection9.v:203)、`a := |U : C_U(H1|'Q)|` (:331/:846) は別量。
+   非Galois で `a > 1` (:855 `a_gt1`)。(9.8)(c) は degree-qu 既約、(9.8)(d) は degree-qa 既約 (a>1) を
+   同時に与える (両方 `S_H0U'⊆inducedFamily`、両方 > w₁=q ゆえ ∉ SHCSet、qa≠qu) ⟹ S_1\SHC は非均一。
+3. **Galois gating 無し**: Coq §11 の (11.3)/`scoh1` は無条件 (Galois 仮定なし; :428/:1139 の Galois 言及は
+   別の structural 補題内)。repo (11.8) `Hypothesis` にも Galois field 無し。∴ `Sset_diff_SHCSet_apply_one_eq_qu`
+   は無条件主張ゆえ非Galois で**無条件に偽**。(S12 の "Galois-equivariance" 言及は複素共役×τ の別概念、無関係。)
+
+⟹ finding 確定。uniform-degree route は放棄し bounded-coherence route へ。
+
 ## 参照
 
 - notes/peterfalvi/s13_11_8_orthogonality.md update³⁷
