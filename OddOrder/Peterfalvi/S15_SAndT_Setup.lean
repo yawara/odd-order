@@ -813,6 +813,17 @@ noncomputable def Hypothesis.dadeHypS [Fintype G] [Finite G]
     OddOrder.Peterfalvi.S04.Hypothesis G (honestTypeP2ASet hyp.S) hyp.S :=
   (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.S_maximal hyp.S_typeP2).some.dade
 
+/-- **(13.2.e) `S`-instance Dade `H`-conjugation invariance** (issue 1017): the `HConjInvariant` of
+`dadeHypS`, carried by the underlying `DadeSupportHypothesisData` (Peterfalvi (8.14)/(8.15), the
+kernels `R(x)` are `S`-conjugation equivariant `R(x^m) = R(x)^m`).  This is the `hconj` input the
+(5.3.a) R-datum constructor `S07.dadeCharacterDifferenceImageOfDiff` consumes to build each family
+member's `CharacterDifferenceImage` `τ(φ − φ̄) = ±(μ − ν)` — the same `.some` witness as `dadeHypS`,
+so the isometry `dadeHypS.fullDadeIsometryData dadeHypS_hconj` is well-defined. -/
+theorem Hypothesis.dadeHypS_hconj [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    (hyp.dadeHypS hG).HConjInvariant :=
+  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.S_maximal hyp.S_typeP2).some.hconj
+
 /-- **The honest `(H₀ ⊔ C')^#`-support for the `S`-instance, `= (C')^#`** (issue 2035 step 2).
 For the `S`-instance the chief kernel is trivial (`toTypesIIIIIIVSetupS_chief_N_eq_bot`, giving
 `H₀ = ⊥`), so the §9 `H₀C'`-support degenerates to `(C')^#` — the non-identity elements of
