@@ -941,23 +941,51 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     sorry
   exact T_typeIII_ratio_le_of_gamma_bridge hyp calT1 Γ Γ₁ x hcount horth hdecomp hΓ₁ hx hnorm
 
+/-- **Peterfalvi (11.9)/(14.9), the Type-IV exclusion residual** — the genuine deep content of the
+type determination.  Coq `FTtype34_structure` (Peterfalvi (11.9), `PFsection11.v:1001`, consumed at
+`PFsection14.v:735`) pins a non-type-II type-`P` maximal `T` to Type III (not IV) via the
+character/Galois argument `suffices galM : typeP_Galois MtypeP` (`PFsection11.v:1139`) — the
+`η`-grid projection computation `a₁₁ = a₁₀ = 0`.  In this formalisation the III/IV discriminator is
+`IsMulCommutative U` (`TypeIIIData` carries `U_commutative`, `TypeIVData` its negation), so the
+(11.9) content is exactly: *`T`'s derived complement `U`-factor (`= V`) is abelian*.
+
+This is genuine §11 character theory — **not** a σ-structural config fact — and is formalised
+nowhere in this repo (the §11/§13 layer `S13_MaximalIII_IV` only ever *posits* `IsTypeIII M ∨
+IsTypeIV M`, and there is no universal Type-IV exclusion analogous to the proven Type-V one
+`no_typeV_maximal`).  Isolated here as the *single* residual of the (14.9) type determination:
+everything else (Type-V exclusion, the III/IV structural wiring incl. `normalizer_le`) is proven in
+`T_isTypeIII_of_isTypeP1` below. -/
+theorem T_not_isTypeIV_of_isTypeP1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T) :
+    ¬ OddOrder.GroupTheory.IsTypeIV hyp.base.T := by
+  -- Coq (11.9) `FTtype34_structure` ⟹ `typeP_Galois T` ⟹ (in the `IsMulCommutative U` presentation)
+  -- the `U = V` factor is abelian, so `T` is Type III not IV.  The deep character/projection argument.
+  sorry
+
 /-- **Peterfalvi (14.9), the type determination** — Coq `PFsection14`
 `have [_ _ [Ttype3 _]] := FTtype34_structure maxT TtypeP notTtype2` (line 735): a type-`P` maximal
-subgroup that is *not* type II is type III (with the type-`P` Galois property).  In σ-theoretic
-terms, `IsTypeP1 T` (equivalently `¬ IsTypeP2 T` given `IsTypeP T`) forces `T` to be structurally
-Type III — this is precisely the content of Peterfalvi/BG `FTtype34_structure`, which rules out the
-Type IV (`¬ IsMulCommutative U`) and Type V (`M_F = M_σ`) alternatives for `T`.
+subgroup that is *not* type II is type III.  In σ-theoretic terms, `IsTypeP1 T` (equivalently
+`¬ IsTypeP2 T` given `IsTypeP T`) forces `T` to be structurally Type III.
 
-The proven type-classification biconditional `proposition_type_classification` gives, from `IsTypeP1`,
-either Type III/IV (if `M_F ≠ M_σ`) or Type V (if `M_F = M_σ`); pinning **Type III** specifically —
-excluding IV and V — is the `FTtype34_structure` Galois-rank input, isolated here as a named
-obligation. -/
+**Fully reduced to the single (11.9) residual `T_not_isTypeIV_of_isTypeP1`.**  The type dictionary
+`proposition_type_classification` (BG Prop 16.1, proven) gives, from `IsTypeP1 T`, either Type III/IV
+(if `M_F ≠ M_σ`) or Type V (if `M_F = M_σ`).  **Type V is excluded outright** by Peterfalvi (10.10)
+`no_typeV_maximal` (proven — no maximal subgroup of a minimal simple group of odd order is Type V),
+so `M_F ≠ M_σ` and `T` is Type III or IV.  Excluding Type IV — the genuine (11.9) Galois/character
+content — is the isolated residual `T_not_isTypeIV_of_isTypeP1`.  The Type-V exclusion and the III/IV
+structural wiring (incl. the `TypeIIIData.normalizer_le` field, bundled into the clause-(c)
+disjunction) are proven here. -/
 theorem T_isTypeIII_of_isTypeP1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T) :
     OddOrder.GroupTheory.IsTypeIII hyp.base.T := by
-  -- Coq `FTtype34_structure maxT TtypeP notTtype2 => Ttype3` (PFsection14.v:735), the type-`P`
-  -- Galois-rank determination excluding Types IV/V for `T`.
-  sorry
+  -- Type dictionary (BG Prop 16.1): `IsTypeP1 T` ⟹ III/IV (`M_F ≠ M_σ`) or V (`M_F = M_σ`).
+  obtain ⟨_, _, hcIII_IV, hdV, _, _⟩ :=
+    OddOrder.BG.Ch4.S16.proposition_type_classification hG hyp.base.T_maximal
+  -- Type V excluded universally by Peterfalvi (10.10) `no_typeV_maximal`, so `M_F ≠ M_σ`.
+  have hMF : OddOrder.BG.Ch4.S15.MF hyp.base.T ≠ OddOrder.BG.Ch3.S10.Msigma hyp.base.T := fun h =>
+    OddOrder.Peterfalvi.S12.no_typeV_maximal hG ⟨hyp.base.T, hyp.base.T_maximal, hdV.mpr ⟨hP1, h⟩⟩
+  -- `T` is Type III or IV; exclude IV by the (11.9) residual.
+  exact (hcIII_IV.mpr ⟨hP1, hMF⟩).resolve_right (T_not_isTypeIV_of_isTypeP1 hG hyp hP1)
 
 /-- **Peterfalvi (14.9), reduced to its canonical residual** — the `T`-side dual of the `S`-side
 `(13.2.a)` carrier field `S_typeP2`.  `T` is of BG type `P₂` (`κ(T) ≠ σ'(T)`; Coq `PFsection14`
