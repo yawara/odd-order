@@ -85,4 +85,61 @@ theorem card_image_induce_eq_div
     exact (Nat.card_pos (α := G)).ne' hmc.symm
   rw [← card_image_induce_mul_index_eq T hT hinertia, Nat.mul_div_cancel _ hidx]
 
+open scoped Classical in
+/-- **The irreducibly-induced image has cardinality at least `|T| / [G:H]`** (lower-bound form; no
+conjugation-invariance of `T` needed).  For *any* Finset `T ⊆ Irr H` (`H ⊴ G`) whose every member
+`θ` has inertia `I_G(θ) = H`, each induction fibre `{θ ∈ T | Ind θ = Ind θ₀}` embeds into the
+`G`-conjugation orbit of `θ₀` (`induce_eq_induce_iff_conj`), whose size is `[G:I_G(θ₀)] = [G:H]`; so
+`|T| ≤ |image|·[G:H]`, giving `|T| / [G:H] ≤ |image|`.
+
+Unlike `card_image_induce_eq_div`, this drops the `hT` conjugation-closure hypothesis: a lower bound
+suffices for the Peterfalvi (9.8.d) family count `|𝒵| ≥ |T|/a`, and dropping `hT` lets the family be
+merely inertia-pinned (each member induces irreducibly) rather than a full conjugation-closed set —
+sidestepping the `def_Itheta` conjugation-descent entirely. -/
+theorem card_image_induce_ge_div
+    (T : Finset (IrreducibleCharacter H))
+    (hinertia : ∀ θ ∈ T, IrreducibleCharacter.inertia (G := G) (H := H) θ = H) :
+    T.card / H.index ≤ (T.image (fun θ => induce H θ.toClassFunction)).card := by
+  classical
+  have hidx : 0 < H.index := Nat.pos_of_ne_zero fun h0 => by
+    have hmc := H.index_mul_card
+    rw [h0, zero_mul] at hmc
+    exact (Nat.card_pos (α := G)).ne' hmc.symm
+  -- `|T| = ∑_{χ ∈ image} |fibre_χ| ≤ |image|·[G:H]` (each fibre embeds in a `[G:H]`-orbit).
+  have hle : T.card
+      ≤ (T.image (fun θ => induce H θ.toClassFunction)).card * H.index := by
+    rw [Finset.card_eq_sum_card_image (fun θ => induce H θ.toClassFunction) T]
+    calc ∑ χ ∈ T.image (fun θ => induce H θ.toClassFunction),
+            (T.filter fun θ => induce H θ.toClassFunction = χ).card
+        ≤ ∑ _χ ∈ T.image (fun θ => induce H θ.toClassFunction), H.index := by
+          refine Finset.sum_le_sum fun χ hχ => ?_
+          obtain ⟨θ₀, hθ₀T, hθ₀eq⟩ := Finset.mem_image.mp hχ
+          -- the fibre over `χ` embeds into `conjByOrbit θ₀`, of size `[G:I(θ₀)] = [G:H]`.
+          have hO : (IrreducibleCharacter.conjByOrbit (G := G) (H := H) θ₀).Finite := by
+            unfold IrreducibleCharacter.conjByOrbit; exact Set.finite_range _
+          have hFsub : (T.filter fun θ => induce H θ.toClassFunction = χ) ⊆ hO.toFinset := by
+            intro θ hθ
+            rw [Finset.mem_filter] at hθ
+            rw [Set.Finite.mem_toFinset, IrreducibleCharacter.mem_conjByOrbit]
+            have h2 : induce H θ.toClassFunction = induce H θ₀.toClassFunction :=
+              hθ.2.trans hθ₀eq.symm
+            obtain ⟨g, hg⟩ := (induce_eq_induce_iff_conj θ θ₀).mp h2
+            exact ⟨g⁻¹, by rw [← hg, ← IrreducibleCharacter.conjBy_mul]; simp⟩
+          calc (T.filter fun θ => induce H θ.toClassFunction = χ).card
+              ≤ hO.toFinset.card := Finset.card_le_card hFsub
+            _ = (IrreducibleCharacter.conjByOrbit (G := G) (H := H) θ₀).ncard :=
+                (Set.ncard_eq_toFinset_card _ hO).symm
+            _ = Nat.card (IrreducibleCharacter.conjByOrbit (G := G) (H := H) θ₀) :=
+                (Nat.card_coe_set_eq _).symm
+            _ = (IrreducibleCharacter.inertia (G := G) (H := H) θ₀).index :=
+                card_conjByOrbit_eq_index_inertia θ₀
+            _ = H.index := by rw [hinertia θ₀ hθ₀T]
+      _ = (T.image (fun θ => induce H θ.toClassFunction)).card * H.index := by
+          rw [Finset.sum_const, smul_eq_mul]
+  -- `|T| ≤ |image|·[G:H]` ⟹ `|T|/[G:H] ≤ |image|`.
+  calc T.card / H.index
+      ≤ ((T.image (fun θ => induce H θ.toClassFunction)).card * H.index) / H.index :=
+        Nat.div_le_div_right hle
+    _ = (T.image (fun θ => induce H θ.toClassFunction)).card := Nat.mul_div_cancel _ hidx
+
 end OddOrder.RepresentationTheory

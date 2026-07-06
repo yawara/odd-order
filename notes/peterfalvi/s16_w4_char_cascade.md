@@ -2177,3 +2177,31 @@ C の (14.9)-specific assembly は完遂。C は carrier landing を consume す
 
 **教訓 (再確認)**: 「from-scratch/gated」結論は既存 char-cascade route (S12.Hypothesis / S09 lemma /
 intrinsic typeP) を見落とすことが多い → 結論前に S12/S09/typeP を当たる ([[verify-port-state-by-number-not-coq-name]])。
+
+### cont.⁷⁵ (2026-07-06 lane c /loop) — ✅ (14.9) 型判定 `T_isTypeIII_of_isTypeP1` 完全証明化 + cont.⁷² の「config-provable」誤ラベル訂正
+
+**上流最優先 sorry = `T_isTypeIII_of_isTypeP1`** (Pf (11.9)、S16_NonExistenceG:960。(11.9) は (14.9) より
+文書上流 ⟹ ratio_le より優先)。cont.⁷² は「config (V abelian `isMulCommutative_V` + V≠⊥) から provable」と
+ラベルしたが **これは誤り** (notes 常習の over-optimistic mislabel、[[verify-port-state-by-number-not-coq-name]] 系)。
+精査で判明:
+- `isMulCommutative_V` (S15:1388) は **`IsTypeII T` を要求** → type-P1 branch では循環 (II↔P2、P1 は¬II)。
+- III vs IV の Lean 判別子は `IsMulCommutative U` **のみ** (`TypeIIIData.U_commutative` vs `TypeIVData.U_not_commutative`、
+  両者とも `normalizer_le`)。Coq では type 3 vs 4 = `typeP_Galois` (`FTtype34_structure` = Pf (11.9)、
+  `PFsection11.v:1001`、結論 `suffices galM : typeP_Galois` @1139 = η-grid 射影 `a₁₁=a₁₀=0` の**深い char 論法**)。
+- `reconciled_typePData_T` (S15_Setup:3119) は `data.U = V` を与えるが **内部 3 sorry** (`W2_le`/`U_nilpotent`/…、§13/14 σ-structure gated)。
+- **普遍的 Type-IV 排除は Lean に無い** (proven `no_typeV_maximal` の IV 版は不在; S13_MaximalIII_IV は `III∨IV` を**posit**するのみ)。
+
+**⟹ (14.9) 型判定は「Type-V 排除 (proven) + III/IV 構造結線 (proven) + Type-IV 排除 (genuine (11.9) residual)」に
+clean 分解。** landing (build 3901 green、net sorry 10 不変 = opaque 1 → named 1):
+- **`T_isTypeIII_of_isTypeP1` (:978): 完全証明化 (sorry-free body)**。`proposition_type_classification` clause 3
+  (`(III∨IV) ↔ P1 ∧ MF≠Msigma`、proven) + **`no_typeV_maximal`** (Pf (10.10)、proven、MF≠Msigma を universal に供給) +
+  `.resolve_right`。`normalizer_le` は clause-(c) disjunction に bundle 済ゆえ別 residual でない (当初懸念は誤り)。
+  パターンは `FeitThompson.card_kappaHall_lt_of_isTypeP1:672-677` を mirror。
+- **`T_not_isTypeIV_of_isTypeP1` (:963): 唯一の genuine residual** = Pf (11.9) `FTtype34_structure` の
+  `typeP_Galois`/char 論法 (= 「T の U-factor (=V) abelian」)。**deep §11 char、config でない**。Lean 未形式化。
+
+**真の path forward** = Pf (11.9) `FTtype34_structure` の形式化 (§11 char: coherence + orthogonal_split +
+η-grid 射影)。Bessel/Coherence は proven (cont.⁷⁰) ゆえ組立可能性あり、但し multi-iteration。
+**教訓**: cont.⁷² 型の「config-provable」ラベルは、判別子 (`IsMulCommutative U`) の入手経路 (`isMulCommutative_V`
+が IsTypeII 要求で循環) と Coq の深さ (`FTtype34_structure` @PFsection11) を確認せず貼ると誤る。**mislabel 訂正も
+genuine 進捗** (CLAUDE.md「規約が不完全/ミスリードなら訂正」)。

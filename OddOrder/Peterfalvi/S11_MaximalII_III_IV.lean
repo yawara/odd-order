@@ -13610,6 +13610,134 @@ theorem hcuPsiPair_family_inertia_eq [Finite G] {M : Subgroup G}
   exact hcuPsiPair_inertia_eq_hcu caseA θ (hcuSeedHom_hinv_of_wComplement_triv caseA θ hθW) lam hθ₀
 
 
+/-- **Peterfalvi (9.8.d)** (count substrate, `hS0notker` member fact).  A member `ζ_{θ,λ} =
+Ind_{H·C_U(S₀)}^{HU} ψ_{θ,λ}` whose seed `θ` is *nontrivial on `S₀`* is **not** trivial on the
+realized `S₀`: `realized S₀ ⊄ Ker ζ`.  If it were, then (`liesOver_mem_characterKernel`, `ζ` lying
+over `ψ`) `ψ` would vanish on the realized `S₀ ⊆ H·C_U(S₀)`, i.e. `θ₀ = 1` on `S₀`
+(`hcuPsiPair_apply_inclusion`, with `mk'(N)∘hInHuEquivH` surjective onto `S₀`), contradicting
+`θ|_S₀ ≠ 1`.  Single-`S₀` restriction of the `H ⊄ Ker` argument `hcuZetaPair_mem_xiSet`; supplies the
+`hS0notker` input of `caseA_hcrit_of_member` (the (γ) `W₁`-injectivity). -/
+theorem caseA_hcuZetaPair_realizedS0_not_subset_ker [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    (hinv : ∀ c : ↥(cuInHu caseA), ∀ h : ↥(hInHu data),
+      hcuSeedHom (chief := chief) θ
+          ⟨(c : ↥(huSub data)) * (h : ↥(huSub data)) * (c : ↥(huSub data))⁻¹,
+            (hInHu_normal data).conj_mem _ h.2 (c : ↥(huSub data))⟩
+        = hcuSeedHom (chief := chief) θ h)
+    (lam : ↥(cuInHu caseA) →* ℂˣ)
+    (hθS0 : θ.comp caseA.S0.subtype ≠ 1)
+    [Fintype ↥(huSub data)]
+    [Fintype ↥(hInHu data ⊔ cuInHu caseA)]
+    [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    [Invertible (Nat.card ↥(hInHu data ⊔ cuInHu caseA) : ℂ)]
+    [(hInHu data ⊔ cuInHu caseA).Normal]
+    (hθ₀ : ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+        (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+          (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+        = hInHu data ⊔ cuInHu caseA) :
+    ¬ (((caseA_realizedComplement chief caseA.S0).subgroupOf M).subgroupOf (huSub data) :
+        Set ↥(huSub data)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel
+        (ClassFunction.induce (hInHu data ⊔ cuInHu caseA)
+          (hcuPsiPair caseA θ hinv lam) : ClassFunction ↥(huSub data) ℂ) := by
+  classical
+  set ζ : IrreducibleCharacter ↥(huSub data) :=
+    ⟨ClassFunction.induce (hInHu data ⊔ cuInHu caseA) (hcuPsiPair caseA θ hinv lam),
+      hcuZetaPair_irreducible caseA θ hinv lam hθ₀⟩ with hζdef
+  have hcoe : (ζ : ClassFunction ↥(huSub data) ℂ) = ClassFunction.induce
+      (hInHu data ⊔ cuInHu caseA) (hcuPsiPair caseA θ hinv lam) := by rw [hζdef]
+  have hlo : OddOrder.RepresentationTheory.IrreducibleCharacter.LiesOver
+      (hInHu data ⊔ cuInHu caseA) ζ (hcuPsiPair caseA θ hinv lam) := by
+    rw [← OddOrder.RepresentationTheory.IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver]
+    rw [← hcoe, OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite ζ ζ, if_pos rfl]
+    exact one_ne_zero
+  intro hsub
+  apply hθS0
+  have hfsurj : Function.Surjective
+      ((QuotientGroup.mk' chief.N).comp (hInHuEquivH data).toMonoidHom) :=
+    (QuotientGroup.mk'_surjective chief.N).comp (hInHuEquivH data).surjective
+  refine MonoidHom.ext fun s => ?_
+  obtain ⟨h, hhs⟩ := hfsurj (caseA.S0.subtype s)
+  have hgmem : ((Subgroup.inclusion
+      (le_sup_left : hInHu data ≤ hInHu data ⊔ cuInHu caseA) h :
+      ↥(hInHu data ⊔ cuInHu caseA)) : ↥(huSub data))
+      ∈ (((caseA_realizedComplement chief caseA.S0).subgroupOf M).subgroupOf (huSub data)) := by
+    rw [Subgroup.coe_inclusion, ← Subgroup.mem_subgroupOf,
+      caseA_realizedComplement_subgroupOf_hInHu_eq_comap chief caseA.S0, Subgroup.mem_comap, hhs]
+    exact s.2
+  have hψker := liesOver_mem_characterKernel hlo (by rw [hcoe]; exact hsub hgmem)
+  have hψ1 : (hcuPsiPair caseA θ hinv lam : ClassFunction ↥(hInHu data ⊔ cuInHu caseA) ℂ)
+      1 = 1 := by simp [hcuPsiPair]
+  rw [OddOrder.Peterfalvi.S03.mem_characterKernel, OddOrder.Peterfalvi.S03.characterDegree_def,
+    hcuPsiPair_apply_inclusion caseA θ hinv lam h, hψ1,
+    ClassFunction.compHom_apply, ClassFunction.compHom_apply, MulEquiv.coe_toMonoidHom,
+    linearIrreducibleCharacter_apply] at hψker
+  have hqeq : (QuotientGroup.mk' chief.N) ((hInHuEquivH data) h) = caseA.S0.subtype s := hhs
+  rw [hqeq] at hψker
+  show θ (caseA.S0.subtype s) = (1 : ℂˣ)
+  refine Units.ext ?_
+  rw [Units.val_one]
+  exact hψker
+
+/-- **Peterfalvi (9.8.d)** (count substrate, per-member irreducibility).  For a member seed `θ`
+trivial on the `W₁`-orbit complement `caseA_wComplement` and nontrivial on `S₀`, the double
+induction `Ind_{HU}^M (Ind_{H·C_U(S₀)}^{HU} ψ_{θ,λ})` is *irreducible*.  If `ζ = Ind ψ` were
+`M`-fixed (`inertia ζ = ⊤`), then for a nontrivial `w₁ ∈ W₁` the orbit summand
+`caseA_wOrbit w₁ = w₁•S₀ ≤ caseA_wComplement ≤ Ker θ`, so `(θ∘aut w₁)|_{S₀} = 1`, which for a fixed
+`ζ` (`caseA_theta_comp_quotient_on_S0_eq_one_iff_of_fixed`) forces `θ|_{S₀} = 1` — contradicting the
+member's `θ|_{S₀} ≠ 1`; hence `inertia ζ ≠ ⊤` and `induceHU ζ` is irreducible
+(`hcuZetaPair_induceHU_irreducible`).  The `W₁`-orbit analogue of the `Hpart`-based
+`hcuZetaPair_induceHU_irreducible_of_nonRegular` (whose `hnonreg` on an arbitrary *carrier* summand
+is not available for a `caseA_wComplement`-trivial member — the two summand systems differ). -/
+theorem caseA_member_induceHU_irreducible [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    (hinv : ∀ c : ↥(cuInHu caseA), ∀ h : ↥(hInHu data),
+      hcuSeedHom (chief := chief) θ
+          ⟨(c : ↥(huSub data)) * (h : ↥(huSub data)) * (c : ↥(huSub data))⁻¹,
+            (hInHu_normal data).conj_mem _ h.2 (c : ↥(huSub data))⟩
+        = hcuSeedHom (chief := chief) θ h)
+    (lam : ↥(cuInHu caseA) →* ℂˣ)
+    (hθW : caseA_wComplement caseA ≤ θ.ker)
+    (hθS0 : θ.comp caseA.S0.subtype ≠ 1)
+    [Fintype ↥(huSub data)]
+    [Fintype ↥(hInHu data ⊔ cuInHu caseA)]
+    [Fintype ↥(hInHu data)]
+    [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    [Invertible (Nat.card ↥(hInHu data ⊔ cuInHu caseA) : ℂ)]
+    [Invertible (Nat.card ↥(hInHu data) : ℂ)]
+    [(hInHu data ⊔ cuInHu caseA).Normal]
+    (hθ₀ : ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+        (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+          (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+        = hInHu data ⊔ cuInHu caseA) :
+    IsIrreducibleCharacter (induceHU data (ClassFunction.induce (hInHu data ⊔ cuInHu caseA)
+      (hcuPsiPair caseA θ hinv lam) : ClassFunction ↥(huSub data) ℂ)) := by
+  refine hcuZetaPair_induceHU_irreducible caseA θ hinv lam hθ₀ ?_
+  intro hMfix
+  have hlo := hcuZetaPair_liesOver_hInHu caseA θ hinv lam hθ₀
+  -- a nontrivial `w₁ ∈ W₁` (as an index of the `W₁`-orbit `caseA_wOrbit`).
+  obtain ⟨wg, hwgW1, hwgne⟩ :=
+    (data.typeP.W1.bot_or_exists_ne_one).resolve_left data.typeP.W1_nontrivial
+  set w₁ : ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) :=
+    ⟨⟨wg, Subgroup.mem_sup_right hwgW1⟩, Subgroup.mem_subgroupOf.mpr hwgW1⟩ with hw₁def
+  have hw₁ne : w₁ ≠ 1 := by
+    intro h
+    refine hwgne ?_
+    have h2 : ((w₁ : ↥(data.typeP.U ⊔ data.typeP.W1)) : G) = wg := rfl
+    rw [h] at h2; simpa using h2.symm
+  -- `caseA_wOrbit w₁ = w₁•S₀ ≤ caseA_wComplement ≤ Ker θ`.
+  have hle : caseA_wOrbit caseA w₁ ≤ θ.ker :=
+    (le_iSup₂ (f := fun w (_ : w ≠ 1) => caseA_wOrbit caseA w) w₁ hw₁ne).trans hθW
+  have hwtriv : θ.comp (caseA_wOrbit caseA w₁).subtype = 1 := by
+    ext s; simpa using MonoidHom.mem_ker.mp (hle s.2)
+  rw [caseA_wOrbit, comp_subtype_pointwise_smul_eq_one_iff,
+    caseA_theta_comp_quotient_on_S0_eq_one_iff_of_fixed caseA θ _ hlo hMfix ↑w₁] at hwtriv
+  exact hθS0 hwtriv
+
 /-- **Peterfalvi (9.8)**: character-count consequences in Clifford case (a).
 
 Faithful to Peterfalvi (9.8.b,c,d) (count-statement audit, issue 2030):
