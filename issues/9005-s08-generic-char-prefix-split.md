@@ -39,10 +39,11 @@ prefix-split (凍結済 generic 宣言を上流 GroupTheory leaf へ移し、S08
 - [x] `S08_CaseBCoherence2.lean` は新 leaf を import (宣言削除 + 移設注記 + import 1 行)。
       Peterfalvi 文脈の docstring ((6.8.2.3) 対応) は S08 側に移設注記として温存。
 - [x] `OddOrder.lean` root に新 leaf を追加。full build green (3903 jobs) + AxiomsCheck OK。
-- [ ] **重複検出の付記 (残タスク: split 済み後の統合判定)**: `S11_MaximalII_III_IV.lean` に `inner_compHom_of_bijective` (L7310) /
-      `inner_compHom_mulEquiv` (L7755) — S08 の `inner_compHom_of_mulEquiv` と同内容の可能性。
+- [ ] **重複検出の付記 (残タスク: split 済み後の統合判定)**: `S11_MaximalII_III_IV.lean` に `inner_compHom_of_bijective` (current L11415) /
+      `inner_compHom_mulEquiv` (current L11860) — S08 の `inner_compHom_of_mulEquiv` と同内容の可能性。
       split 後に S11 側を新 leaf cite に置換できるか lane a/hub で判定 (できれば統合)。S11 は lane a 所有のため、
       lane d は fresh carve-out なしに Lean 側の置換へ入らない。
+      2026-07-06 D read-only audit: both S11 declarations still exist, so the residual stays open.
 
 ## lane c の並行対応 (待たない)
 
