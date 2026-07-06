@@ -60,6 +60,40 @@ commit が出たら hub は本 issue を根拠に**逸脱でなく shared-infra 
 FeitThompson=lane a 所有ゆえ flag するが、本裁定で当該 relocate は例外)。(4) 完了で本 issue close + LAUNCH
 周知行を除去。**要点はレーン間の awareness (issue+LAUNCH) であり、owner の固定ではない。**
 
+## 🎯 LANE-D 割当 (2026-07-06, hub 6-agent 調査 + Opus 敵対的検証 + ユーザー承認) — codex 運用
+
+4 レーン復帰。**本 9006 = lane d のクラスタ**。lane d = **codex 運用**(Claude でなく、本 hub session の
+deep context を持たない)ゆえ**最軽量・自己完結・checklist 完備**の本 issue を割当。hub 調査で
+「唯一の open で全 body proven・on-path・live collision 0」の最軽量 cluster と確定(他 light 候補
+9011/9012/9015/9005 は全て納品済 stale、9007 は lane-a active S08 削除で高衝突、9014 は deep)。
+
+**lane d 諸元**: branch `d` / worktree `/home/ywr/odd-order-d` / issue base **4000** / 実行タスク = 本 9006。
+
+**codex handoff spec (self-contained、行番号は drift ゆえ全て decl 名で re-grep すること)**:
+- **① 初回タスク (ungated・即 green、S11 tail と独立)**: order 補題 2 本 `isHallSubgroup_of_card_eq`
+  (現 FeitThompson.lean **:754**) / `card_mul_card_of_complement_normal` (**:766**) を shared
+  `OddOrder/Mathlib/Subgroup.lean` へ**逐語移設**。依存は mathlib (`Subgroup.card_mul_index` /
+  `isComplement'_of_disjoint_and_mul_eq_univ`) + `Ch03.IsHallSubgroup` のみ(S09+/char 無、確認済)。
+  consumer に import 追加 → leaf + consumer を `lake build` green。ここで codex は即 landing を 1 本得る。
+- **② 本体**: 上記「やること」1-5。`isHall_kappaSigmaCompl_of_isTypeP2_complement` (:779) →
+  `S10_BGInterface` (import-sound 確認済: S11→S10_MinimalSimpleStructure→S10_BGInterface)。
+  FeitThompson の in-file cite site = **:826/:827/:831/:940/:1092/:1248**。
+- **③ 唯一の非機械的ステップ (flag)**: `TypePData.fitting_inf_U_eq_bot` を `MaximalSubgroupType.lean`
+  に追加する際、`data.derived_complement` は `derivedInG M` (subgroupOf 経由) で述べられるが caller は
+  `maxNilpotentNormalHall M ⊓ data.U = ⊥` を **G で**要求 → sibling `TypePData.derivedInG_eq_fitting_sup_U`
+  (MaximalSubgroupType.lean **:191-198**) と同じく `subgroupOf` 越し transport
+  (`data.H_eq` + `Subgroup.subgroupOf_inf`/`bot_subgroupOf`、disjoint は `data.derived_complement.disjoint`)。
+- **④ 必須手順**: 着手前に `git merge main`(3-way、`--ff-only` 禁止)→ `typeII_centralizer_U_eq_bot` と
+  3 補題名を re-grep(drift 対策)。**FeitThompson 削除を伴う commit の前に lane-a の LAUNCH.md へ
+  awareness 1 行**(本 protocol)。新 `axiom` 禁止・statement 不改変(relocate は signature 逐語保存)。
+  完了で本 issue close + LAUNCH 周知行除去。
+- **⑤ 境界**: shared `OddOrder/Mathlib/Subgroup.lean` + `OddOrder/GroupTheory/MaximalSubgroupType.lean`
+  は**自由に追加可**。`FeitThompson.lean` / `S10_BGInterface.lean` / `S11_MaximalII_III_IV.lean` は
+  **本 issue 列挙の relocate+migrate のみ**(hub 裁定で例外化、上記 ✅ HUB 裁定)。**a の S12/S13 core・
+  b の S15/S14/S07_Subcoherent・c の S16_NonExistenceG は不可触**。
+- **on-path 確認済**: `typeII_centralizer_U_eq_bot` → S11:637 → S13/S15/S16 endgame → `feitThompson`。
+  完了で spine sorry **S10:413** を 1 つ消す(genuine doneness、sorry シャッフルでない)。
+
 ## 参照
 
 - issue 9003「loop¹⁰⁵」節 (finding + landing 詳細)
