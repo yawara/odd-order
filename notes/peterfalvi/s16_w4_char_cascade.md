@@ -2123,3 +2123,57 @@ consume が実例) + lanes-equivalent ゆえ char cascade に貢献可**。T-sid
 2. calT1 (seqIndD QV T QV Q, degree p) 構成 + `coherent_of_constant_degree` (S07, PROVEN) で coherence。
 3. S-side Γ-bridge gap + `⟨Γ,τ₁ζ⟩≡1(mod2)` (`cfdot_real_vchar_even` S09:144, PROVEN)。
 4. orthogonal_split (未実装 primitive、要 build) + Bessel で ≤ 完成。
+
+### cont.⁷³ (2026-07-06 lane c /loop、hub 9013 (14.9) char body engage) — ✅ calT1 count `|calT1|=(|V|−1)/p` 完全実証明 (ungated、intrinsic type-III datum route)
+
+**(14.9) char body の構造核を landing** (commit `0b711876`、full build 3932 green、`#print axioms` clean =
+{propext, Classical.choice, Quot.sound}、sorryAx 無・新 axiom 無):
+
+- **`T_typeIII_calT1_card` (:~536)**: `td : TypeIIIData T` から `|calT1| = (|V|−1)/p` を**完全実証明** (3 hyp 全 discharge)。
+- **決定的訂正**: 当初 subagent は `hyp.V` (Hypothesis 抽象 field) 経由で「reconciled_typePData_T (lane-b sorry)
+  gated」と誤結論。**intrinsic `hIII.some : TypeIIIData T` の `td.typeP` 直用**で gate 解消:
+  `td.U_commutative` (U abelian) / `typeP_uW1_frobenius td.typeP` (U⋊W₁ Frobenius、**任意 TypePData から ungated**) /
+  `card_U_eq_index`+`Q_inf_V_eq_bot` (|td.U|=|V| canonical)。⟹ V-abelian/Frobenius は type-III datum に intrinsic、
+  Hypothesis-field reconciliation 不要。
+- **landing した reusable infra** (全 sorry-free): shared leaf `OrbitOnIrr.lean` (induced-image orbit count) +
+  `FrobeniusGroupQuotient.lean` (Frobenius iso-transport) + in-file `inertia_inflate_eq_of_frobeniusQuotient` /
+  `T_typeIII_UW1_frobenius` / `T_typeIII_Q_isComplement_UW1` / `T_typeIII_quotFrobenius_kernel_eq` /
+  `calT1_image_induce_card_eq` / `T_typeIII_card_{U,W1}`。
+
+**残 `T_typeIII_ratio_le` (count 以外、深さ順)**:
+1. **v=|V|** = (13.12) d=1 = `V_inf_centralizer_Q_eq_bot` (lane-b S15 sorry)。`(|V|−1)/p → (v−1)/p` 置換。
+2. **S07 coherence instance** for calT1 (T-side Dade tauT + difference/no-real/orthogonality fields)。
+   gating 未確定 — lane-b grid fields (issue 3002: tau3_isometry/omega_orthonormal/eta_orthogonality) 依存の公算。
+3. **S-side Γ bridge** (β_S bridge gap)。M-side `betaDecomp` (S16_PairingCoherence:467) 有るが (14.9) coupling 用の
+   S-side β_S は要調査。
+4. Bessel + `⟨Γ,τ₁ζ⟩≡1(mod2)` で ≤ 完成。
+
+**教訓**: subagent の「gated」結論は intrinsic datum route を見落とすことがある → hyp 抽象 field でなく
+type-判定 data (TypeIIIData 等) の intrinsic 構造を先に当たる ([[verify-port-state-by-number-not-coq-name]])。
+
+### cont.⁷⁴ (2026-07-06 lane c /loop) — ✅✅ (14.9) char body 完全 skeleton 化: T_typeIII_ratio_le を 4 char-cascade carrier に還元、(14.9)-specific math 全実証明
+
+**hub 9013 裁定の (14.9) type-III char exclusion を、C 側 assembly 完遂**。commit chain
+`aa15383d→eca5af0f→0b711876→dd270b47→7062c120` (全 build 3932 green、AxiomsCheck OK、新 axiom 無):
+
+- **`T_typeIII_calT1_card`** (:536): `|calT1|=(|V|−1)/p` **完全実証明** (ungated、intrinsic `hIII.typeP` route)。
+- **`T_typeIII_calT1_coherent`** (:703): calT1 coherence skeleton (Dade setup parameterize)。
+- **`T_typeIII_ratio_le_of_gamma_bridge`** (:782): Γ-Bessel assembly **完全実証明** — coherent calT1 + count +
+  S-side βₛ bridge Γ から `(v−1)/p ≤ (u−1)/q` を導出。**`orthogonal_split` は欠落でなかった** =
+  `S09.sum_rat_weights_le_of_orthogonal_integer_decomposition` (:4254、M-side (14.14) と同 bridge)。
+- **`T_typeIII_ratio_le`** (:905): 上記 skeleton を consume、単一 sorry = **4 carrier の joint existential**:
+  1. `hcount` = count (proven) ∘ **d=1** (v=|V|、`S15.V_inf_centralizer_Q_eq_bot`、lane-b)。
+  2. `horth` = calT1 coherence (proven skeleton) + **T-side Dade package** (`S07.Hypothesis`/`S12.Hypothesis T` =
+     (8.15) Dade data、char-cascade carrier、lane-a S12)。
+  3. `hdecomp`/`hΓ₁`/`hx` = **S-side βₛ bridge gap Γ** (M-side betaDecomp と別物 = S-side (13.x)/(14.x) βₛ、lane-b)。
+  4. `hnorm` = S-side norm bound `⟨Γ,Γ⟩≤(u−1)/q` (char-cascade carrier)。
+
+**⟹ (14.9) の (14.9)-specific math (count/coherence/Bessel arithmetic) は全実証明。**残 = 4 carrier = 全て
+**shared char-cascade** (T-side Dade package = lane-a S12、S-side βₛ bridge + norm = lane-b S15) + **d=1** (lane-b)。
+C の (14.9)-specific assembly は完遂。C は carrier landing を consume する態勢。
+
+**landing した reusable shared infra** (全 sorry-free): `OrbitOnIrr.lean` (orbit count) +
+`FrobeniusGroupQuotient.lean` (Frobenius iso-transport) + in-file ~12 bricks。
+
+**教訓 (再確認)**: 「from-scratch/gated」結論は既存 char-cascade route (S12.Hypothesis / S09 lemma /
+intrinsic typeP) を見落とすことが多い → 結論前に S12/S09/typeP を当たる ([[verify-port-state-by-number-not-coq-name]])。
