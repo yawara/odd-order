@@ -329,3 +329,41 @@ S/T Dade 構成。lane a (10.7) は M-instance 側で `sixTwoDecompositionData` 
    `coherentEqualDegree_fromDade` / `coherent_subset_of_constant_degree`、非Galois = pair-chain + squeeze (landed)。
 5. `coherent_H0Cprime_S` (S15:572) を上記 honest route に re-point (現 sibleyTarget_H0C 経由を置換; ordering
    注意 — 構成 746 が 572 より後ゆえ、re-grounding は new def or 構成を前方移動)。lane a (10.7) も同一 (9.11) coherence。
+
+## 2026-07-06 更新 #11 (lane b) — ★★★★★残 wiring step 1+2 LANDED: dadeHypS + hortho/hreal (Dade-independent inputs 完備)
+
+更新 #10 が示した「残 wiring (次 iteration、全て pieces 存在)」の **step 1 + step 2 の Dade-independent 部分**を landed:
+
+- **step 1**: `Hypothesis.dadeHypS` (S15_SAndT_Setup、commit 7dac2e77) —
+  `dadeSupportHypothesisData_honestTypeP2ASet hG hyp.S_maximal hyp.S_typeP2 |>.some.dade`
+  で S-instance の concrete `S04.Hypothesis G (A(S)) hyp.S` を Hypothesis レベルで取得。
+  `.fullDadeIsometryData` で Dade isometry `τ = Ind_S^G` を materialise する底。
+  sorry-provenance = dadeSupportHypothesisData_honestTypeP2ASet と exact parity (lane-b 導入 sorry 0)。
+- **step 2 (Dade-independent inputs 全完備)**: `sSet_pairwiseOrthogonal` (hortho) + `sSet_hasNoRealCharacters`
+  (hreal) landed (commit 589880fe、**#print axioms = 標準3公理のみ、sorryAx 無**)。hconj
+  (`sSet_closedUnderConjugate`) は既 landed (b8a37625)。⟹ **irrSubcoherent が要る 3 つの Dade-independent
+  家族性 hconj/hreal/hortho が全て揃った**。
+  - 技術: induceHU が bake する `Fintype.ofFinite`/`invertibleOfNonzero` は `S12.FiniteInduce` scoped
+    instance と一致 → `open scoped OddOrder.Peterfalvi.S12.FiniteInduce` 下で `induceHU = ClassFunction.induce`
+    が定義的還元 → 一般 `inducedKernelFamily_pairwise_orthogonal`/`_hasNoRealCharacters` (S08_SixTwoGeneral)
+    の 𝒮-instance として convert/bridge 不要でクリーンに証明。
+
+**⟹ 残る唯一の genuine crux = per-member R-datum**: `irrSubcoherent (τ) (A) (Rdatum) hconj hreal hortho hiso`
+のうち、揃っていないのは **(a) `Rdatum : ∀ χ ∈ 𝒮, CharacterDifferenceImage τ χ`** (各 member `Ind χ` に対し
+`τ(χ − χ̄)` を 2 既約の signed difference として与える deep family-specific data、Coq PFsection5 の R-datum)
+と **(b) `hiso`** (`τ = Ind_S^G` の difference 上 isometry、`dadeHypS.fullDadeIsometryData` の `inner_eq`
+S04:3821 から取る) の 2 点。
+
+**次 build (step 3-5)**:
+1. `dadeHypS.fullDadeIsometryData` (要 `HConjInvariant` of A(S)) → Dade isometry `τ` + `hiso`。
+2. per-member R-datum を 𝒮 に対して構築 (S08 case-B の `sMember_degreeSqNormBound...` / §9 induced-family
+   witnesses の pattern; **これが残る genuine deep content**)。
+3. `irrSubcoherent τ (A(S)) Rdatum hconj hreal hortho hiso` → `S07.Hypothesis` (§9 subcoherence)。
+4. `clifford_dichotomy` (S11:6668) case-split: Galois = `caseB_character_counts.1` uniform degree +
+   `coherentEqualDegree_fromDade`/`coherent_subset_of_constant_degree`、非Galois = `coherentPairChain` +
+   squeeze (全 landed)。
+5. `coherent_H0Cprime_S` (S15_SAndT_Setup:887) を上記 honest route に re-point (現 `sibleyTarget_H0C` 経由置換;
+   ordering 注意)。lane a (10.7) も同一 (9.11) coherence。
+
+hconj/hreal/hortho の Dade-independent 三点が揃ったので、次 iteration は step 1 の `fullDadeIsometryData`
+配線 + R-datum 構築に正面着手する (R-datum が残る唯一の deep crux、difficulty は着手基準でない CLAUDE.md)。
