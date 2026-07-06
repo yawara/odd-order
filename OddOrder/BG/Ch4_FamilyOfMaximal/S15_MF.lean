@@ -10058,21 +10058,35 @@ Proof spine (Coq `tau2_P2type_signalizer`): pick `q₁ ∈ τ₂(H)`; extract `A
 `|X| = q` and `τ₂(H) = {q}` (Thm 12.7 `nonabelian_tau2` = `tau2_singleton_of_nonabelianSylow`);
 finally `X ≠ K`, `C_G(U) ⊄ M`, and the `τ₂(M)`-Sylow argument give `τ₂(M) = ∅`.
 
-⚠ **Proof gap (2026-07-06, being assembled — issue 9017 更新 #4):** the corrected statement is
-sound and matches Coq exactly; the ~130-line Coq proof is **being assembled inline**, not blocked.
-**The cited §9/§12/§14/§15 machinery is present** in the repo under descriptive names (verified
-Coq→repo map in issue 9017; an earlier "not yet ported" inventory was a naming-trap false negative
-— `Ptype_embedding` = `S14.typeP_duality`, `tau2_not_beta` = `S12.tau2_prime_mem_sigma_diff_beta`,
-`Fcore_structure` = `maxNilpotentNormalHall_*`, `cent_uniq_Uniqueness` = `S09_Theorem91`, etc.).
-The two dropped Cor 14.12 clauses `K ⊆ F(E)` / σ(H)′-Hall `E` are **exported** by
-`typeP2_neighbor_is_typeF_of_mem`.  Landed sorry-free: Phase A (Coq `cKA`) =
+⚠ **Proof status (2026-07-07, issue 9017 更新 #7):** the corrected statement is sound and matches
+Coq exactly.  Landed sorry-free, in document order: Phase A (Coq `cKA`) =
 `exists_rank2_elemAb_le_centralizer_kappa_of_tau2`; Phase B foundation =
-`typeP2_partner_structure_of_mem`; Phase D core = `centralizer_kappaCompl_le_of_mem_tau2` +
-`not_prime_mem_tau2_of_centralizer_kappaCompl_not_le` (given the escape witness `C_G(U) ⊄ M`,
-prime-form `τ₂(M) = ∅`).  The remaining **B/C middle** (`def_q1` q₁ = q via the Uniqueness Theorem;
-`Q = O_q(M*)` nonabelian via `Msigma_inf_conj_inf_derived_eq_bot`; `τ₂(H) = {q}` and `X = C_A(H_σ)`,
-`|X| = q` via `tau2_singleton_of_nonabelianSylow`; the escape witness `C_G(U) ⊄ M`) produces the
-input the Phase D core consumes.  This `sorry` is the pre-existing one, **not new**. -/
+`typeP2_partner_structure_of_mem`; Step 1 = `partner_kappaHall_le_Msigma_of_isTypeP2`; Step 2 =
+`mem_sigma_and_le_Msigma_of_rank2_centralizer_kappa`; Step 3 (nilpotent case) =
+`exists_sylow_eq_opiCore_of_mem_sigma_of_msigma_nilpotent`; **Step 4** (Coq `not_cQQ`, `Q = O_q(M*)`
+nonabelian) = `partner_opiCore_nonabelian` (focal Lemma 6.5(a) inside `↥M*_σ`); **Step 5** (`Q ∈ 𝒰`)
+= `S12.nonabelian_pgroup_isUniquelyMaximal` (a nonabelian Sylow-`q` of `G` over `Q`); **Step 6**
+`def_q1` centralization (Coq `sub_nilpotent_cent2`) = `le_centralizer_opiCore_of_msigma_nilpotent`
++ engine `eq_of_uniquelyMaximal_centralized_by_rank2_le`; the `τ₂(H) = {q}` singleton =
+`S12.tau2_singleton_of_nonabelianSylow`; Phase D core = `centralizer_kappaCompl_le_of_mem_tau2` +
+`not_prime_mem_tau2_of_centralizer_kappaCompl_not_le` (given the escape witness `C_G(U) ⊄ M`).
+
+**Two genuinely deep §15 inputs remain unformalized** and gate the inline assembly (this single
+`sorry`):
+1. **`M*` type-`P₁`** (Coq `P1maxL`, BGsection15.v:1343) — from `q ∉ β(G)` (`¬ idealPrime q G`, via
+   `tau2` maximality, obtainable) + `Ptype_structure`'s "not-`P₁` ⟹ `q ∈ β`" clause.  Type-`P₁`
+   then yields (a) `M*_σ` **nilpotent** (Coq `nilLs`, via the `Fcore_structure` `M_F`-structure
+   theorem — recorded in S16 as the deeper unformalized content) and (b) `M*′ = M*_σ`
+   (`typeP1_msigma_eq_derivedInG`), which with `K = M*_σ ⊓ C(Ks) ≤ M*″`
+   (`Msigma_inf_centralizer_le_derivedDerived_of_isComplement'` on the `typeP_duality` complement)
+   gives `K ⊆ (M*_σ)′` — the `hKderiv` input of Step 4.
+2. **escape witness `C_G(U) ⊄ M`** (Coq `not_sCUM`, BGsection15.v:1368--1382) — from `X = C_A(H_σ)`,
+   `|X| = q` (`tau2_singleton_of_nonabelianSylow`), `X ≠ K`, `X ⊄ M` (via `sdprod_sigma`/`eq_mmax`
+   + `κ`-Hall maximality), `X ≤ C(U)` (`U ⊆ H_σ`).
+
+The remaining `K ≤ O_q(M*)` (Coq `sKQ`) is routine (`K` a `q`-group in `M*_σ`, absorbed by the
+normal Sylow `O_q(M*)` via `isPiGroup_le_of_normal_isHallSubgroup`).  This `sorry` is the
+pre-existing one, **not new**. -/
 theorem tau2_transfer_constraint [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M Mstar U K R H : Subgroup G} {r : ℕ}
     (hM : M ∈ maximalSubgroups G) (hP2 : S14.IsTypeP2 M)
