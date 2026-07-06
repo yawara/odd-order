@@ -538,6 +538,26 @@ theorem comap_le_of_le_map_quotient {G : Type*} [Group G]
     _ = B ⊔ C := QuotientGroup.comap_map_mk' B C
     _ = C := by rw [sup_comm]; exact sup_of_le_left hBC
 
+/-- If `K / N` is a `p`-group, then the image of `K` in the ambient quotient by
+`N.map K.subtype` is a `p`-group. -/
+theorem isPGroup_map_quotient_subtype_of_isPGroup_quotient {G : Type*} [Group G]
+    {K : Subgroup G} {N : Subgroup K} [N.Normal] [(N.map K.subtype).Normal] {p : ℕ}
+    (hN : IsPGroup p (K ⧸ N)) :
+    IsPGroup p (K.map (QuotientGroup.mk' (N.map K.subtype))) := by
+  intro x
+  obtain ⟨g, hgK, hgx⟩ := x.2
+  obtain ⟨n, hn⟩ := hN (QuotientGroup.mk' N ⟨g, hgK⟩)
+  refine ⟨n, ?_⟩
+  have hgN : (⟨g, hgK⟩ : K) ^ p ^ n ∈ N := by
+    rw [← QuotientGroup.eq_one_iff, ← QuotientGroup.mk'_apply, map_pow]
+    exact hn
+  have hgL : (g : G) ^ p ^ n ∈ N.map K.subtype := by
+    simpa using Subgroup.mem_map_of_mem K.subtype hgN
+  apply Subtype.ext
+  change ((x : G ⧸ N.map K.subtype)) ^ p ^ n = 1
+  rw [← hgx, ← map_pow, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+  exact hgL
+
 /-- **`G ⧸ N` nontrivial iff `N ≠ ⊤`** (有限 G で): mathlib `Subgroup.index_eq_one`
 + `Finite.one_lt_card_iff_nontrivial` を結合.
 
