@@ -9,6 +9,7 @@ import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
 import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 import OddOrder.Peterfalvi.S05_SigmaIsometry
 import OddOrder.Peterfalvi.S06_CertainTypeClifford
+import OddOrder.Peterfalvi.S06_CertainTypeSupport
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S08_CoherenceCorePart1
 
@@ -549,6 +550,7 @@ open OddOrder.RepresentationTheory
 variable {L : Type*} [Group L] [Fintype L] (h : Hypothesis L)
   [Invertible (Nat.card L : ℂ)] [Fintype ↥(h.W1 ⊔ h.W2)]
   [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)] [Invertible (Nat.card ↥h.K : ℂ)]
+  [NeZero (Nat.card h.W1)] [NeZero (Nat.card h.W2)]
 
 /-- **Peterfalvi (4.5.b) `prTIres_irr_cases`, assembled.**  Every `χ ∈ Irr(K)` is either a residue
 `χ_j` (`= chiRestrict χ₂` for some `W₂`-column `χ₂`) or induces to a *fresh* irreducible of `L`
@@ -556,7 +558,7 @@ distinct from every certain-type character `μ_{ij}`.  The residue case is by de
 induced-irreducible case is the S06 inertia computation (`induce_isIrreducible_of_forall_chiRestrict_ne`
 + `induce_ne_certainType_of_forall_chiRestrict_ne`).  This is the deep field of a `PrimeTIResidueData`
 constructor built from an `S06.Hypothesis` (issue 9014). -/
-theorem prTIres_irr_dichotomy [NeZero (Nat.card h.W1)] (χ : IrreducibleCharacter ↥h.K) :
+theorem prTIres_irr_dichotomy (χ : IrreducibleCharacter ↥h.K) :
     (∃ χ₂, h.chiRestrict χ₂ = χ) ∨
       (IsIrreducibleCharacter (ClassFunction.induce h.K (χ : ClassFunction ↥h.K ℂ)) ∧
         ∀ (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)),
@@ -567,6 +569,77 @@ theorem prTIres_irr_dichotomy [NeZero (Nat.card h.W1)] (χ : IrreducibleCharacte
   · push_neg at hcase
     exact Or.inr ⟨h.induce_isIrreducible_of_forall_chiRestrict_ne hcase,
       fun χ₂ i => h.induce_ne_certainType_of_forall_chiRestrict_ne hcase χ₂ i⟩
+
+/-! ### The `PrimeTIResidueData` constructor from an `S06.Hypothesis`
+
+The residue grid `S = L`, `PU = K`, `q = |W₁|`, `p = |W₂|`.  The S06 grid is indexed by
+`W₂`-columns `χ₂ ∈ Ŵ₂` (`h.columnFamily`/`h.chiRestrict`), of which there are exactly `|W₂| = p`
+(`card_charGroup_W2`).  The bridge to the `Fin p` residue index is the equiv
+`charGroupW2Equiv` below, normalized so the trivial column `1 : Ŵ₂` maps to index `0`
+(so that `chi 0 = chiRestrict 1 = 1_K`, matching the `chi_zero` field). -/
+
+/-- **Index bridge `Fin p ≃ Ŵ₂`** for the `PrimeTIResidueData` constructor.  From
+`card_charGroup_W2 : |Ŵ₂| = |W₂| = p` we get an equiv `Fin p ≃ Ŵ₂`, then compose with a
+transposition so that the trivial column `1 : Ŵ₂` sits at index `0` (`charGroupW2Equiv_zero`). -/
+noncomputable def charGroupW2Equiv :
+    Fin (Nat.card h.W2) ≃ ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :=
+  haveI : Fintype ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) := Fintype.ofFinite _
+  letI e0 : Fin (Nat.card h.W2) ≃ ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :=
+    (Fintype.equivFinOfCardEq
+      (by rw [← Nat.card_eq_fintype_card, h.card_charGroup_W2])).symm
+  (Equiv.swap 0 (e0.symm 1)).trans e0
+
+@[simp] theorem charGroupW2Equiv_zero :
+    h.charGroupW2Equiv 0 = 1 := by
+  classical
+  simp only [charGroupW2Equiv, Equiv.trans_apply, Equiv.swap_apply_left, Equiv.apply_symm_apply]
+
+/-- **`PrimeTIResidueData` from the certain-type `S06.Hypothesis`** (the bridge of issue 9014,
+discharging the deep field `prTIres_irr_cases` via `prTIres_irr_dichotomy`).  Given a subgroup
+`H : Subgroup ↥h.K` with `W₂ ≤ H` (the (4.6.c) covering condition on the kernel family `P := H`),
+assembles the residue grid `S = L`, `PU = K`, `q = |W₁|`, `p = |W₂|` from the S06 column machinery:
+`mu2 i j := (columnFamily (e j)).mu i`, `chi j := chiRestrict (e j)` (`e = charGroupW2Equiv`).
+Every field is a genuine S06 theorem — orthonormality (`columnFamily_mu_ne` + `injective`),
+restriction (`coe_chiRestrict`), induction (`induce_restrict_certainType_eq`), the trivial residue
+(`chiRestrict_one_eq_trivial` via `charGroupW2Equiv_zero`), the `(4.7)` kernel non-containment
+(`not_subset_characterKernel_chiRestrict_of_ne_one`), and the `(4.5.b)` dichotomy
+(`prTIres_irr_dichotomy`). -/
+noncomputable def _root_.OddOrder.RepresentationTheory.PrimeTIResidueData.ofS06Hypothesis
+    [Fintype ↥h.K] (H : Subgroup ↥h.K) (hW2H : h.W2.subgroupOf h.K ≤ H) :
+    PrimeTIResidueData L h.K (Nat.card h.W1) (Nat.card h.W2) :=
+  { mu2 := fun i j => (h.columnFamily (h.charGroupW2Equiv j)).mu i
+    chi := fun j => h.chiRestrict (h.charGroupW2Equiv j)
+    mu2_orthonormal := fun i i' j j' => by
+      classical
+      rw [irreducibleCharacter_inner_eq_ite]
+      by_cases hjj' : j = j'
+      · subst hjj'
+        by_cases hii' : i = i'
+        · subst hii'; simp
+        · rw [if_neg (fun hc => hii' ((h.columnFamily (h.charGroupW2Equiv j)).injective hc)),
+            if_neg (by simp [hii'])]
+      · rw [if_neg (h.columnFamily_mu_ne (fun hc => hjj' (h.charGroupW2Equiv.injective hc)) i i'),
+          if_neg (by simp [hjj'])]
+    chi_res := fun j => h.coe_chiRestrict (h.charGroupW2Equiv j)
+    ind_chi := fun j => by
+      rw [h.coe_chiRestrict (h.charGroupW2Equiv j),
+        h.induce_restrict_certainType_eq (h.charGroupW2Equiv j)]
+    chi_zero := by
+      rw [charGroupW2Equiv_zero, h.chiRestrict_one_eq_trivial,
+        IrreducibleCharacter.coe_trivialIrreducibleCharacter]
+    P := H
+    cfker_prTIres := fun j hj => by
+      have hne1 : h.charGroupW2Equiv j ≠ 1 := by
+        rw [← charGroupW2Equiv_zero (h := h)]
+        exact fun hc => hj (h.charGroupW2Equiv.injective hc)
+      intro hHker
+      exact h.not_subset_characterKernel_chiRestrict_of_ne_one hne1
+        (Set.Subset.trans (SetLike.coe_subset_coe.mpr hW2H) hHker)
+    prTIres_irr_cases := fun θ => by
+      rcases h.prTIres_irr_dichotomy θ with ⟨χ₂, hχ₂⟩ | ⟨hirr, hne⟩
+      · refine Or.inl ⟨h.charGroupW2Equiv.symm χ₂, ?_⟩
+        rw [Equiv.apply_symm_apply, hχ₂]
+      · exact Or.inr ⟨hirr, fun i j => hne (h.charGroupW2Equiv j) i⟩ }
 
 end OddOrder.Peterfalvi.S06.Hypothesis
 
