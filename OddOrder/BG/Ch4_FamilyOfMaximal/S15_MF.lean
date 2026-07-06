@@ -9419,6 +9419,53 @@ theorem card_kappaHall_prime_of_isTypeP2 [Finite G]
     (S14.typeP_structure hG hM hP2.1 hKM hK rfl hU).2.2.2.2.1 hP2
   exact ⟨q, hq, hKq⟩
 
+/-- **Phase A of BG Theorem 15.8** (Coq `tau2_P2type_signalizer`, up to `cKA`): from the
+σ(H)′-Hall `E`-setup of a maximal `H` (the Corollary 14.12 signalizer neighbour supplied by
+`typeP2_neighbor_is_typeF_of_mem`), a `κ`-Hall `K ⊆ F(E)`, and a prime `q₁ ∈ τ₂(H)`,
+there is a rank-2 elementary abelian `A ≤ E` for `q₁` that centralizes `K`.
+
+Proof (Coq `cKA`): extract `A ∈ ℰ²_{q₁}(E)` (`exists_elemAb_rank_two_le_E_of_tau2`); then
+`A ⊴ E` (`elemAb_normal_in_E_of_tau2`) and `A` is a `q₁`-group, so `A ⊆ F(E)`
+(`le_fittingInG_of_normal_isPiSubgroup_singleton`).  `F(E)` is a nilpotent σ(H)′-subgroup of `H`,
+hence abelian (`nilpotent_sigmaComplement_abelian`, BG Cor 12.10).  As `A, K ⊆ F(E)` abelian,
+`A ⊆ C(K)`. -/
+theorem exists_rank2_elemAb_le_centralizer_kappa_of_tau2 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {H K E E₁ E₂ E₃ : Subgroup G}
+    (hEsetup : SubgroupESetup H E E₁ E₂ E₃)
+    (hKFE : K ≤ OddOrder.BG.Ch2.S08.fittingInG E)
+    {q1 : ℕ} (hq1prime : q1.Prime) (hq1 : q1 ∈ tau2 H) :
+    ∃ A : Subgroup G, A ∈ elemAbelianOfRank G q1 2 ∧ A ≤ E ∧
+      A ≤ Subgroup.centralizer (K : Set G) := by
+  classical
+  haveI : Fact q1.Prime := ⟨hq1prime⟩
+  obtain ⟨A, hA_elem, hAE⟩ := exists_elemAb_rank_two_le_E_of_tau2 hG hEsetup hq1
+  refine ⟨A, hA_elem, hAE, ?_⟩
+  -- `A ⊴ E` (Coq `nsAD`).
+  have hEnA : E ≤ Subgroup.normalizer (A : Set G) :=
+    ((elemAb_normal_in_E_of_tau2 hG hEsetup hq1 hA_elem hAE).1).1
+  have hAnormE : (A.subgroupOf E).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hAE).mpr hEnA
+  -- `A` is a `q₁`-group, so `A ⊆ F(E)`.
+  obtain ⟨hAea, hAcard⟩ := mem_elemAbelianOfRank.mp hA_elem
+  have hApi : Subgroup.IsPiSubgroup ({q1} : Set ℕ) A :=
+    isPiSubgroup_singleton_of_isPGroup hAea.isPGroup
+  have hAFE : A ≤ OddOrder.BG.Ch2.S08.fittingInG E :=
+    OddOrder.BG.Ch2.S08.le_fittingInG_of_normal_isPiSubgroup_singleton hAE hAnormE hApi
+  -- `F(E)` is a nilpotent σ(H)′-subgroup of `H`, hence abelian (Coq `sigma'_nil_abelian`).
+  have hFEnil : Group.IsNilpotent ↥(OddOrder.BG.Ch2.S08.fittingInG E) :=
+    OddOrder.BG.Ch2.S08.fittingInG_isNilpotent E
+  have hFEleH : OddOrder.BG.Ch2.S08.fittingInG E ≤ H :=
+    (OddOrder.BG.Ch2.S08.fittingInG_le E).trans hEsetup.E_le
+  have hFEpi : Subgroup.IsPiSubgroup ((OddOrder.BG.Ch3.S10.sigma H)ᶜ)
+      (OddOrder.BG.Ch2.S08.fittingInG E) := fun p hp =>
+    hEsetup.isPiGroup_sigma_compl hG p
+      (Nat.primeFactors_mono (Subgroup.card_dvd_of_le (OddOrder.BG.Ch2.S08.fittingInG_le E))
+        Nat.card_pos.ne' hp)
+  have hFEab : IsMulCommutative ↥(OddOrder.BG.Ch2.S08.fittingInG E) :=
+    (nilpotent_sigmaComplement_abelian hG hEsetup).1 _ hFEleH hFEpi hFEnil
+  -- `A, K ⊆ F(E)` abelian ⟹ `A ⊆ C(K)`.
+  exact le_centralizer_of_le_of_le hFEab hAFE hKFE
+
 /-- **BG Theorem 15.8** (mmd L4264; Feit--Thompson 1991, `tau2_P2type_signalizer`,
 BGsection15.v:1262): in the Corollary 14.12 signalizer setup — a type-`P₂` maximal `M` with
 `κ`-complement `K` (a Hall `κ(M)`-subgroup), `U` the abelian Hall `(κ(M)∪σ(M))'`-factor
