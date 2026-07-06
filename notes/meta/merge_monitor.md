@@ -364,8 +364,10 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
   **追加半分だけ・S01 原本削除せず・caller rewire せず** → `S04e_GorThm37.lean:183` Ambiguous term で
   **full build FAIL**。d の dup-scan が frozen BG を除外 + leaf build のみで検証 → 見落とし。**churn (新数学 0)
   + claim-before-build 違反 + build-break** ゆえ hub 裁定 = REJECT (trajectory 保全対象でない = genuine output
-  でなく dup)。trial merge を abort、main は a の green 状態を保持。**d は 3 commits を drop 要** (949d5e27 まで
-  reset; 5 補題は S01 に既存ゆえ何も失われない)。**build failure STOP ゆえ監視 cron を CronDelete して HALT**
+  でなく dup)。trial merge を abort、main は a の green 状態を保持。**⚠ d は live で tick 中に 3→6 commit に進行**
+  (main-merge b8931593 + nilpotent[=S01:1895 dup] + p-group[86e4684b, **同名 repo 無 = genuine 可能性**]) →
+  blanket-drop でなく**選別**: dup 5 除去 + p-group は content 検証し genuine なら S01 cite で保全。unmerged base
+  = **e21db660** (`949d5e27` でない = 前 tick batch 中間)。**build failure STOP ゆえ監視 cron を CronDelete して HALT**
   (次 tick で同 break を繰り返さない)。d が branch を fix したら stop→resolve→resume で cron 再作成。
   再発防止 (9071): d の重複 scan は repo 全体 grep + shared-infra 追加は commit 前 full build。sorry = 88 (a -1)。
 - **2026-07-07 — 監視再開 (ユーザー「各レーンを監視します」) + tick d 合流 + ⚠ push 18-commit drift 露見**:
