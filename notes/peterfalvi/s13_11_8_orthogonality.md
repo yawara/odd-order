@@ -2036,3 +2036,27 @@ mismatch が `hX∪hY` を塞ぐ)。churn 回避のため、本 iteration は **
 単独で形式化可能かを精査 (Peterfalvi (11.5) HU=M' は `derivedInG_eq_fitting_sup_U` で proven ゆえ
 induction-source 同一視は射程内、但し 𝒳=全非自明既約 の identification が (9.5)/(11.5) の
 character-theory 内容で要精査)。bridge #1 (support pin) は §14 Sibley setup ゆえ lane-b/hub 調整。
+
+### ★ 致命傷 3 (mmd 精読で判明、bridge #2 の再診断): (9.11) は **full 𝒮 でなく difference** が正
+mmd `04.13` L67 原文: 「Let 𝒮₂ = 𝒮(C)−𝒮(HC). **By (9.11), 𝒮(H₀C')−𝒮(HC') is coherent**, whence
+𝒮₂ is coherent by (11.7)」。∴ Peterfalvi (9.11) が coherent と言うのは **difference
+`𝒮(H₀C')−𝒮(HC')`** であって full 𝒮 ではない。ところが repo `coherent_H0C_commutator`
+(S11:8292) の結論は `IsCoherent chars.tau chars.S chars.H0CprimeSupport` で
+**`chars.S = sSet data` = full 𝒮** (`S_eq` simp)。**⟹ repo の (9.11) は Peterfalvi (11.8.6) が
+consume する set と型が違う** (over-strong な full-𝒮 版で、difference 版でない)。かつ full-𝒮
+coherent ⟹ difference coherent も自明でない (difference は単一 `𝒮(Y)` でない subset ゆえ
+coherence restriction が直には効かぬ)。
+
+∴ bridge #2 は「`sSet = Sset∖SHCSet`」ではなく、正しくは:
+- (9.11) を **difference `𝒮(H₀C')−𝒮(HC')` の coherence** として得る (repo 版は full-𝒮 で不適合、
+  差分版の (9.11) を別途要すか、full→difference の coherence-restriction を要形式化)、
+- **(11.7) collapse `H₀=1`** で `𝒮(H₀C')−𝒮(HC') = 𝒮(C')−𝒮(HC')` を経て
+  `= 𝒮(C)−𝒮(HC) = 𝒮₂` の set identity (`sOf`-difference レベル)、
+- **`𝒮₂ = hyp.Sset ∖ hyp.SHCSet`** の identification (§9 `sOf` world ↔ §10 `inducedFamily` world)。
+
+これらは全て deep で lane-a 単独 sorry-free 化は非現実的 (§14 + (11.7) set algebra + world bridge)。
+**S13 の `SOf`-filtration (`inducedKernelFamily`, Coq `seqIndD`) は cleaner carrier** で
+`SHCSet = SOf(M'')` (S13 `SOf_secondDerived_eq` ✅) / `Sset = SOf(⊥)` (✅) が既にあり、
+`S₂ = SOf(⊥)∖SOf(M'')` と表せる。**理想的 next step = (9.11) を S13 `SOf` world で
+`SOf(C)∖SOf(HC)` coherence として再ポート** (現 S11 `sSet`/`∅`-support 版は gate-2 不適合)。
+これは §9 char analysis を §13 `SOf` filtration に載せ替える major work (lane-b/§14 協調)。
