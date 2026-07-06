@@ -2492,6 +2492,35 @@ theorem actionCommutator_quotient_eq_bot_of_le
   simpa [mul_inv_rev] using
     N.inv_mem ((actionCommutator_le_iff_left φ N).mp h_le a g)
 
+/-- If `R` normalizes `K` and `⁅K, R⁆ ≤ F(K)`, then the conjugation action of `R`
+on `K/F(K)` fixes every quotient element. -/
+theorem fixedPoints_quotient_eq_top_of_commutator_le_fitting
+    {G : Type*} [Group G] [Finite G] {K R : Subgroup G} [K.Normal]
+    (hRK : R ≤ Subgroup.normalizer (K : Set G))
+    (hcomm : ⁅K, R⁆ ≤ (OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype) :
+    Subgroup.fixedPointsOfMulAut
+      (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom
+        (OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic
+          (H := OddOrder.Isaacs.Ch01.fitting ↥K)
+          ((Subgroup.normalizerMonoidHom K).comp (Subgroup.inclusion hRK)))) = ⊤ := by
+  set φ : R →* MulAut K := (Subgroup.normalizerMonoidHom K).comp (Subgroup.inclusion hRK)
+    with hφ
+  have hFinv : OddOrder.Isaacs.Ch03.IsAInvariant φ (OddOrder.Isaacs.Ch01.fitting ↥K) :=
+    OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic φ
+  have hac_le : actionCommutator φ ≤ OddOrder.Isaacs.Ch01.fitting ↥K := by
+    have h := actionCommutator_conj_map_subtype hRK
+    rw [← h] at hcomm
+    exact Subgroup.map_le_map_iff_of_injective K.subtype_injective |>.mp hcomm
+  have hbot : actionCommutator (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hFinv) =
+      ⊥ := by
+    rw [actionCommutator_quotient_eq_map, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']
+    exact hac_le
+  rw [Subgroup.eq_top_iff']
+  intro g
+  rw [Subgroup.mem_fixedPointsOfMulAut]
+  intro a
+  exact (actionCommutator_eq_bot_iff_acts_trivially _).mp hbot a g
+
 /-- **Isaacs Corollary 4.21**: For `H ≤ G`, the following are equivalent:
 (a) `∀ a x, (φ a) x ∈ Hx` (right coset is A-invariant in element form);
 (b) `∀ a x, (φ a) x ∈ xH` (left coset is A-invariant in element form);
