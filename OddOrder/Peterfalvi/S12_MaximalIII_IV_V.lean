@@ -3760,6 +3760,48 @@ theorem Hypothesis.SHCSet_orthonormal [Finite G] {M : Subgroup G} (hyp : Hypothe
   irr_cf_inner (mem_irreducibleCharacters.mpr hφ.2.1) (mem_irreducibleCharacters.mpr hψ.2.1)
 
 open scoped FiniteInduce in
+/-- **Degree of an `S₁ = S(HC)`-span element is an integer multiple of `w₁`.**  Every member of
+`SHCSet` has degree `w₁` (by definition, third conjunct), so `ψ ∈ ℤ[S(HC)]` has `ψ(1) = s·w₁` with
+`s ∈ ℤ` the coefficient sum (`span_induction`).  This is the `S₁`-side degree-ratio input of the
+(11.8.6) generation `hgen` — the analogue of S08 `certainTypeSet_span_apply_one_eq_intMul`. -/
+theorem Hypothesis.SHCSet_span_apply_one_eq_intMul [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    {ψ : ClassFunction ↥M ℂ} (hψ : ψ ∈ Submodule.span ℤ hyp.SHCSet) :
+    ∃ s : ℤ, ψ 1 = (s : ℂ) * (hyp.w1 : ℂ) := by
+  classical
+  induction hψ using Submodule.span_induction with
+  | mem x hx => exact ⟨1, by rw [hx.2.2]; push_cast; ring⟩
+  | zero => exact ⟨0, by simp⟩
+  | add x y _ _ hx hy =>
+      obtain ⟨sx, hsx⟩ := hx; obtain ⟨sy, hsy⟩ := hy
+      exact ⟨sx + sy, by rw [ClassFunction.add_apply, hsx, hsy]; push_cast; ring⟩
+  | smul c x _ hx =>
+      obtain ⟨sx, hsx⟩ := hx
+      exact ⟨c * sx, by
+        rw [← Int.cast_smul_eq_zsmul ℂ c x, ClassFunction.smul_apply, hsx]; push_cast; ring⟩
+
+open scoped FiniteInduce in
+/-- **Degree of an `S₂ = S(C) − S(HC)`-span element is an integer multiple of `qu`**, given that all
+`S₂` members share degree `qu` (the (11.8.1) uniform reducible degree — supplied as a hypothesis,
+§9-gated).  `span_induction`, as `SHCSet_span_apply_one_eq_intMul`.  The `S₂`-side degree-ratio input
+of the (11.8.6) generation `hgen`. -/
+theorem Hypothesis.Sset_diff_span_apply_one_eq_intMul [Finite G] {M : Subgroup G}
+    (hyp : Hypothesis M) {qu : ℕ}
+    (hS2deg : ∀ y ∈ hyp.Sset \ hyp.SHCSet, (y : ↥M → ℂ) 1 = (qu : ℂ))
+    {ψ : ClassFunction ↥M ℂ} (hψ : ψ ∈ Submodule.span ℤ (hyp.Sset \ hyp.SHCSet)) :
+    ∃ s : ℤ, ψ 1 = (s : ℂ) * (qu : ℂ) := by
+  classical
+  induction hψ using Submodule.span_induction with
+  | mem x hx => exact ⟨1, by rw [hS2deg x hx]; push_cast; ring⟩
+  | zero => exact ⟨0, by simp⟩
+  | add x y _ _ hx hy =>
+      obtain ⟨sx, hsx⟩ := hx; obtain ⟨sy, hsy⟩ := hy
+      exact ⟨sx + sy, by rw [ClassFunction.add_apply, hsx, hsy]; push_cast; ring⟩
+  | smul c x _ hx =>
+      obtain ⟨sx, hsx⟩ := hx
+      exact ⟨c * sx, by
+        rw [← Int.cast_smul_eq_zsmul ℂ c x, ClassFunction.smul_apply, hsx]; push_cast; ring⟩
+
+open scoped FiniteInduce in
 /-- **`S(HC) ⊥ (S − S(HC))`** (the source-orthogonality `hsrc_ortho` input for the (11.8.6) union):
 `S(HC)` and `S₂ = S(C) − S(HC)` are disjoint subsets of `S = inducedFamily M`, so a member of each
 is a distinct pair of `inducedFamily` characters, orthogonal by `inducedFamily_pairwiseOrthogonal`.
@@ -3911,6 +3953,126 @@ theorem Hypothesis.exists_glue_nu [Finite G] {M : Subgroup G} (hyp : Hypothesis 
     (fun _ hy => inducedFamily_inner_self_ne_zero hy.1)
     (fun _ hx _ hy => hyp.SHCSet_inner_diff_eq_zero hx hy)
     coh.extension hY.extension
+
+open scoped FiniteInduce in
+/-- **`ℤ[S₂]`-vanishing-at-`1` combinations are `A_0`-supported**, given `S₂ = S(C) − S(HC)` has
+uniform degree `qu` (the (11.8.1) reducible degree — supplied as a §9-gated hypothesis) with a
+witness member `ψ₀`.  The `S₂`-analogue of `SHC_zSpan_vanish_support`: `φ = ∑ eⱼ ψⱼ ∈ ℤ[S₂]` with
+`φ(1) = 0` has `qu·∑eⱼ = 0`, so `∑eⱼ = 0`, collapsing `φ` to `A_0`-supported differences `ψ − ψ₀`
+(`inducedFamily_sub_support`, equal degree `qu`).  `span_induction` on the strengthened invariant
+`(ψ − (ψ(1)·qu⁻¹)·ψ₀).support ⊆ A_0`.  The `S₂`-side `A_0`-support input of the (11.8.6) `hgen`. -/
+theorem Hypothesis.Sset_diff_zSpan_vanish_support [Finite G] {M : Subgroup G}
+    (hyp : Hypothesis M) {qu : ℕ} (hqune : (qu : ℂ) ≠ 0)
+    (hS2deg : ∀ y ∈ hyp.Sset \ hyp.SHCSet, (y : ↥M → ℂ) 1 = (qu : ℂ))
+    {ψ₀ : ClassFunction ↥M ℂ} (hψ₀ : ψ₀ ∈ hyp.Sset \ hyp.SHCSet)
+    {φ : ClassFunction ↥M ℂ}
+    (hφ : φ ∈ Submodule.span ℤ (hyp.Sset \ hyp.SHCSet)) (hφ1 : φ 1 = 0) :
+    φ.support ⊆ hyp.A0 := by
+  haveI := hyp.finiteG
+  classical
+  have hψ₀S : ψ₀ ∈ inducedFamily M := hψ₀.1
+  have hψ₀1 : (ψ₀ : ↥M → ℂ) 1 = (qu : ℂ) := hS2deg ψ₀ hψ₀
+  suffices hstrong : ∀ ψ ∈ Submodule.span ℤ (hyp.Sset \ hyp.SHCSet),
+      (ψ - (ψ 1 * (qu : ℂ)⁻¹) • ψ₀).support ⊆ hyp.A0 by
+    have h := hstrong φ hφ
+    rwa [hφ1, zero_mul, zero_smul, sub_zero] at h
+  intro ψ hψ
+  induction hψ using Submodule.span_induction with
+  | mem x hx =>
+      have hxS : x ∈ inducedFamily M := hx.1
+      have hx1 : (x : ↥M → ℂ) 1 = (qu : ℂ) := hS2deg x hx
+      rw [hx1, mul_inv_cancel₀ hqune, one_smul]
+      exact hyp.inducedFamily_sub_support hxS hψ₀S (hx1.trans hψ₀1.symm)
+  | zero => simp
+  | add x y _ _ hx hy =>
+      have hrw : (x + y - ((x + y) 1 * (qu : ℂ)⁻¹) • ψ₀)
+          = (x - (x 1 * (qu : ℂ)⁻¹) • ψ₀) + (y - (y 1 * (qu : ℂ)⁻¹) • ψ₀) := by
+        rw [ClassFunction.add_apply]; module
+      rw [hrw]
+      exact (ClassFunction.support_add_subset _ _).trans (Set.union_subset hx hy)
+  | smul c x _ hx =>
+      have hrw : (c • x - ((c • x) 1 * (qu : ℂ)⁻¹) • ψ₀)
+          = (c : ℂ) • (x - (x 1 * (qu : ℂ)⁻¹) • ψ₀) := by
+        rw [← Int.cast_smul_eq_zsmul ℂ c x, ClassFunction.smul_apply]; module
+      rw [hrw]
+      exact (ClassFunction.support_smul_subset _ _).trans hx
+
+open scoped FiniteInduce in
+/-- **(11.8.6) generation `hgen`** — the ungated degree-0 sublattice generation, given `S₂` has
+uniform degree `qu = d·w₁` (the (11.8.1) reducible degree, §9-gated hypothesis `hS2deg`) with a
+witness column `ψ₀`.  Peterfalvi (6.8.1) generation for the (11.8.6) union: the degree-0 sublattice
+of `ℤ[S₁ ∪ S₂]` is generated by the supported sublattices `ℤ[S₁,A₀]`, `ℤ[S₂,A₀]` and the single
+cross-diagonal `ψ₀ − dζ ∈ D`.  A supported `φ = φ_X + φ_Y` (`φ(1) = 0`) has `φ_X(1) = s_X·w₁`,
+`φ_Y(1) = s_Y·qu`, and supportedness forces `s_X = −s_Y·d` (since `qu = d·w₁`, `w₁ ≠ 0`); then
+`φ = (φ_X + (s_Y·d)ζ) + (φ_Y − s_Y·ψ₀) + s_Y·(ψ₀ − dζ)` with the first two supported (degree 0) and
+in `ℤ[S₁]`/`ℤ[S₂]` (`SHC_zSpan_vanish_support` / `Sset_diff_zSpan_vanish_support`), the third in
+`ℤ[D]`.  Only the `S₂` uniform-degree structure `hS2deg` is §9-gated; the generation itself is
+pure lattice/degree algebra.  This discharges the `hgen` input of `coherent_Sset_of_glued`. -/
+theorem Hypothesis.hgen_of_S2_uniform_degree [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {qu d : ℕ} (hqune : (qu : ℂ) ≠ 0) (hqu : (qu : ℂ) = (d : ℂ) * (hyp.w1 : ℂ))
+    (hS2deg : ∀ y ∈ hyp.Sset \ hyp.SHCSet, (y : ↥M → ℂ) 1 = (qu : ℂ))
+    {ζ : ClassFunction ↥M ℂ} (hζ : ζ ∈ hyp.SHCSet)
+    {ψ₀ : ClassFunction ↥M ℂ} (hψ₀ : ψ₀ ∈ hyp.Sset \ hyp.SHCSet)
+    (D : Set (ClassFunction ↥M ℂ)) (hD : (ψ₀ - (d : ℂ) • ζ) ∈ D) :
+    OddOrder.Peterfalvi.S07.zSupportedSpan (hyp.SHCSet ∪ (hyp.Sset \ hyp.SHCSet)) hyp.A0 ⊆
+      Submodule.span ℤ (OddOrder.Peterfalvi.S07.zSupportedSpan hyp.SHCSet hyp.A0 ∪
+        OddOrder.Peterfalvi.S07.zSupportedSpan (hyp.Sset \ hyp.SHCSet) hyp.A0 ∪ D) := by
+  haveI := hyp.finiteG
+  classical
+  have hw1ne : (hyp.w1 : ℂ) ≠ 0 := by
+    have h1lt : 1 < hyp.w1 := (Subgroup.one_lt_card_iff_ne_bot _).mpr hyp.typeP.W1_nontrivial
+    exact_mod_cast Nat.cast_ne_zero.mpr (by omega : hyp.w1 ≠ 0)
+  have hζ1 : (ζ : ↥M → ℂ) 1 = (hyp.w1 : ℂ) := hζ.2.2
+  intro φ hφ
+  obtain ⟨hφspan, hφsupp⟩ := hφ
+  have hφ1 : (φ : ↥M → ℂ) 1 = 0 := by
+    by_contra h
+    have hmem : ((1 : ↥M) : G) ∈ typePA0 M hyp.typeP :=
+      hφsupp (ClassFunction.mem_support.mpr h)
+    exact hyp.dadeData.dade.ne_one hmem (by simp)
+  rw [OddOrder.Peterfalvi.S07.zSpan, Submodule.span_union] at hφspan
+  obtain ⟨φX, hφX, φY, hφY, hsum⟩ := Submodule.mem_sup.mp hφspan
+  obtain ⟨sX, hsX⟩ := hyp.SHCSet_span_apply_one_eq_intMul hφX
+  obtain ⟨sY, hsY⟩ := hyp.Sset_diff_span_apply_one_eq_intMul hS2deg hφY
+  have hdeg0 : (sX : ℂ) * hyp.w1 + (sY : ℂ) * qu = 0 := by
+    have hc := congrArg (fun ψ : ClassFunction ↥M ℂ => (ψ : ↥M → ℂ) 1) hsum
+    simp only [ClassFunction.add_apply] at hc
+    rw [hsX, hsY, hφ1] at hc
+    exact hc
+  have hsX_eq : (sX : ℂ) = -((sY : ℂ) * (d : ℂ)) := by
+    have hthis := hdeg0; rw [hqu] at hthis
+    have h0 : ((sX : ℂ) + (sY : ℂ) * (d : ℂ)) * (hyp.w1 : ℂ) = 0 := by linear_combination hthis
+    have h1 := (mul_eq_zero.mp h0).resolve_right hw1ne
+    linear_combination h1
+  have hAX1 : ((φX + (sY * (d : ℤ)) • ζ) : ClassFunction ↥M ℂ) 1 = 0 := by
+    rw [ClassFunction.add_apply, hsX, ← Int.cast_smul_eq_zsmul ℂ (sY * d) ζ,
+      ClassFunction.smul_apply, hζ1]
+    push_cast
+    linear_combination (hyp.w1 : ℂ) * hsX_eq
+  have hAY1 : ((φY - (sY : ℤ) • ψ₀) : ClassFunction ↥M ℂ) 1 = 0 := by
+    rw [ClassFunction.sub_apply, hsY, ← Int.cast_smul_eq_zsmul ℂ sY ψ₀,
+      ClassFunction.smul_apply, hS2deg ψ₀ hψ₀]
+    push_cast; ring
+  have hAXspan : (φX + (sY * (d : ℤ)) • ζ) ∈ Submodule.span ℤ hyp.SHCSet :=
+    Submodule.add_mem _ hφX (Submodule.smul_mem _ _ (Submodule.subset_span hζ))
+  have hAYspan : (φY - (sY : ℤ) • ψ₀) ∈ Submodule.span ℤ (hyp.Sset \ hyp.SHCSet) :=
+    Submodule.sub_mem _ hφY (Submodule.smul_mem _ _ (Submodule.subset_span hψ₀))
+  have hAXsupp : (φX + (sY * (d : ℤ)) • ζ).support ⊆ hyp.A0 :=
+    hyp.SHC_zSpan_vanish_support hG hAXspan hAX1
+  have hAYsupp : (φY - (sY : ℤ) • ψ₀).support ⊆ hyp.A0 :=
+    hyp.Sset_diff_zSpan_vanish_support hqune hS2deg hψ₀ hAYspan hAY1
+  have hφeq : φ = (φX + (sY * (d : ℤ)) • ζ) + (φY - (sY : ℤ) • ψ₀)
+      + (sY : ℤ) • (ψ₀ - (d : ℂ) • ζ) := by
+    rw [← hsum, ← Int.cast_smul_eq_zsmul ℂ (sY * d) ζ, ← Int.cast_smul_eq_zsmul ℂ sY ψ₀,
+      ← Int.cast_smul_eq_zsmul ℂ sY (ψ₀ - (d : ℂ) • ζ)]
+    push_cast
+    module
+  rw [hφeq]
+  refine Submodule.add_mem _ (Submodule.add_mem _ ?_ ?_) ?_
+  · exact Submodule.subset_span (Set.mem_union_left _ (Set.mem_union_left _ ⟨hAXspan, hAXsupp⟩))
+  · exact Submodule.subset_span (Set.mem_union_left _ (Set.mem_union_right _ ⟨hAYspan, hAYsupp⟩))
+  · exact Submodule.smul_mem _ _ (Submodule.subset_span (Set.mem_union_right _ hD))
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.6), the τ₂ union-coherence** (the deep capstone step, named obligation).
