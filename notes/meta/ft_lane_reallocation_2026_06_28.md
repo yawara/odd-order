@@ -41,13 +41,14 @@
 
 ---
 
-## 1. 3 クラスタ × 3 レーン (🔒 ownership; 2026-07-02 再編後 — 初版は 4×4、下記履歴注記参照)
+## 1. レーン所有マップ (🔒 ownership; 2026-07-06 lane d 復活反映)
 
 | lane | worktree | クラスタ | 主所有ファイル | ODD_ISSUE_BASE |
 |---|---|---|---|---|
 | **a** | `odd-order-a` | **α** Pf §10–13 中央指標核 **+ σ-theory tail/dedup** | `Peterfalvi/S(0[3-9]|1[0-3])*` 全体 (= S03–S13; 例外 = b carve-out 0090 `S09_CertificateDischarge` / 0096 S10 §8 Dade-support 宣言群 / coherence infra `S07_Coherence*`+`S08_PGroupReduction` = b) + `FeitThompson.lean` **全体** (d 退役で fold) + σ-theory tail (S11 dup 3定理 retire→generic leaf cite + assembly, issue 9000 承継)。prefix-split の `*_Core` leaf は親の owner に従う (例 S12_MaximalIII_IV_V_Core = a) | 1000 |
-| **b** | `odd-order-b` | **β** Pf §12 all-Type-I Dade tower **+ coherence infra** | `Peterfalvi/S14_MaximalI.lean` (全体、旧 carve-out 0088 `exists_typeICovering` 解消) + coherence infra ((6.5.c), S07 refactor 済) | 2000 |
-| **c** | `odd-order-c` | **γ** POLE-2 §15–16 chain **一本化 + Clifford** | `Peterfalvi/{S15_SAndT_Setup, S15_SAndT, S16_NonExistenceG}.lean` (§15→16 全 chain) + 構成的 Clifford (issue 9002) | 3000 |
+| **b** | `odd-order-b` | **β** §16 endgame char cascade = S15 (13.9)-(13.19) **+ S14/coherence cite-only** | `Peterfalvi/{S15_SAndT_Setup, S15_SAndT}.lean` (c→b, 2026-07-04) + `Peterfalvi/S14_MaximalI.lean` + coherence infra (`S07_Coherence*` / `S08_PGroupReduction`) + carve-out 0090/0096 | 2000 |
+| **c** | `odd-order-c` | **γ** S16 非存在 = W-side (14.x) norm cascade + parity contradiction **+ Clifford** | `Peterfalvi/S16_NonExistenceG.lean` (S15 は b へ移管、c は import cite) + 構成的 Clifford (issue 9002) + `S15_SAndT_Setup.lean` の T-side `reconciled_typePData_T` carve-out (issue 9013) | 3000 |
+| **d** | `odd-order-d` | **δ** codex shared-infra hygiene / no active Lean frontier after 9006+9007 | `issues/**` + `notes/**` maintenance; new `OddOrder/GroupTheory/**` / `OddOrder/Mathlib/**` / `OddOrder/Algebra/**` / `OddOrder/Isaacs/**` shared claims only after open-9000 scan. Peterfalvi/BG S-file は fresh issue/carve-out なしで編集しない。 | 4000 |
 
 > **⚠⚠ 2026-07-02 3 レーン再編 (ユーザー裁定) — lane d 退役**: char endgame が「4 独立クラスタ」でなく密結合
 > パイプライン (coherence→σ-theory→§10-13→§13-16→S16) と判明。ungated frontier は上流集中で下流 (c/d) が

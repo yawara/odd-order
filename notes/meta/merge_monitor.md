@@ -23,7 +23,7 @@
 > S07 を新規再作成**した場合のみ逸脱。判定: `git log main..b --no-merges` の commit が S07 への新規宣言
 > 追加か (= 再作成) / 既存 S07 への追記止まり (= 残存) か。混在・不明なら skip+報告。
 
-## レーン (2026-07-02 3 レーン再編: a/b/c、lane d 退役)
+## レーン (2026-07-06 current: a/b/c + lane d shared-infra hygiene)
 
 | lane | branch | worktree | クラスタ | 主所有 .lean | issue base |
 |---|---|---|---|---|---|
