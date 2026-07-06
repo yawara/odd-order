@@ -3824,6 +3824,29 @@ theorem Hypothesis.inducedFamily_reducible_apply_one_eq_qu [Finite G]
     (hyp.mkSection11CharacterData (hyp.toTypesIIIIIIVSetup htype hnt) chief) y hmem hred
 
 open scoped FiniteInduce in
+/-- **(11.8.1) uniform degree of `𝒮₂ = Sset \ SHCSet`** (the `hS2deg` input of the (11.8.6)
+generation `hgen_of_S2_uniform_degree`): every member has degree `q·u = qu`.  Split by reducibility:
+* **reducible** members → `inducedFamily_reducible_apply_one_eq_qu` (reduces to the (9.5)/(11.5)
+  `reducible → 𝒮(H₀)` inclusion);
+* **irreducible** members are `∉ SHCSet ⟹ degree ≠ w₁`, so the (9.8)/(9.9) irreducible-degree
+  completeness gives degree `qu` (irr `inducedFamily`-members of degree `≠ w₁` have degree `qu` —
+  the remaining §9 obligation, sorried).
+This assembles the world-bridge's degree claim, reducing it to the two §9 inclusions. -/
+theorem Hypothesis.Sset_diff_SHCSet_apply_one_eq_qu [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M) (hnt : TypePNontrivialCore M hyp.typeP)
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetup htype hnt))
+    {y : ClassFunction ↥M ℂ} (hy : y ∈ hyp.Sset \ hyp.SHCSet) :
+    y (1 : ↥M) = (((hyp.toTypesIIIIIIVSetup htype hnt).q *
+        (hyp.mkSection11CharacterData (hyp.toTypesIIIIIIVSetup htype hnt) chief).u : ℕ) : ℂ) := by
+  haveI := hyp.finiteG
+  by_cases hirr : IsIrreducibleCharacter y
+  · -- irreducible ∈ `Sset \ SHCSet` ⟹ degree ≠ w₁ (else `y ∈ SHCSet`); the (9.8)/(9.9)
+    -- irreducible-degree completeness gives degree `qu`.
+    sorry
+  · exact hyp.inducedFamily_reducible_apply_one_eq_qu hG htype hnt chief hy.1 hirr
+
+open scoped FiniteInduce in
 /-- **Degree of an `S₁ = S(HC)`-span element is an integer multiple of `w₁`.**  Every member of
 `SHCSet` has degree `w₁` (by definition, third conjunct), so `ψ ∈ ℤ[S(HC)]` has `ψ(1) = s·w₁` with
 `s ∈ ℤ` the coefficient sum (`span_induction`).  This is the `S₁`-side degree-ratio input of the
