@@ -143,3 +143,10 @@ whole-datum transport) から両 field を rw で discharge。**reconciled_typeP
 - S-side は carried `Sdata` (§16 construction 供給) から両 field を無料取得。T-side は carrier 不在 (設計)
   ゆえ reconciled が代替、この 2 field のみ §16 T-side 構造 (W-factor simultaneous conjugacy or
   intrinsic W₁ characterization) を要 = lane-b σ-structure。c は U-side を出し切った (principled stop)。
+
+## ⚖️ HUB 補足 (2026-07-06 夕, c FOLD 裁定, wf_00a0db07)
+
+c の S16 領域枯渇で **c を DORMANT cite-sink 化** (正本 = ft_lane_reallocation「lane c FOLD」節)。本 issue の残 2 gate の
+帰属を確定: **W2_le / centralizer_W1 = lane-b** (§15-16 T-side W-factor σ-structure、9017 と連動)、**§13 v-value
+lower-bound export (案 A) = lane-b**。これらが landing すれば **c が reactivation trigger で自動再開**し S16 の
+`reconciled_typePData_T` 残 field + T-side cascade を assemble。c は本 issue で新規 build しない (b 待ち)。
