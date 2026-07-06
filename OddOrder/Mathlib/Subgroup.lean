@@ -296,6 +296,15 @@ theorem nat_card_quotient_subgroupOf_eq_card_map {G : Type*} [Group G] [Finite G
   conv_rhs => rw [show K.map (QuotientGroup.mk' N) = f0.range from hrange.symm]
   exact hEq
 
+/-- The image under `K.subtype` of a proper subgroup of `K` is still proper in `K`,
+viewed as a subgroup of the ambient group. -/
+theorem map_subtype_lt_of_ne_top {G : Type*} [Group G] {K : Subgroup G}
+    {N : Subgroup K} (hN : N ≠ ⊤) : N.map K.subtype < K := by
+  refine lt_of_le_of_ne (map_subtype_le N) (fun heq => hN ?_)
+  have hKeq : K = (⊤ : Subgroup K).map K.subtype := by
+    rw [← MonoidHom.range_eq_map, K.range_subtype]
+  exact map_injective K.subtype_injective (heq.trans hKeq)
+
 /-- Mapping `B ≤ A ≤ H` through `H.subtype` commutes with viewing `B` as a subgroup
 of `A`. -/
 theorem subgroupOf_map_subtype_eq_map_subgroupOf {H : Subgroup G} {A B : Subgroup H}
