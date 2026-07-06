@@ -2242,3 +2242,27 @@ landed 済 (foundational): `induce_derived_apply_one_eq_w1_mul` (Ind θ 1 = w₁
 
 各 piece は互いに依存 + 深い §9 char 本体。foundational 2 lemma は landed だが full hS2deg は多 iteration。
 htype/chars は caller (`exists_zeta_residual_not_orthogonal`) 保持ゆえ capstone に threading 可能。
+
+## 2026-07-06 update³³ (lane-a /loop) — reducible-side degree lemma landed; crux = (9.5)/(11.5) family identification
+
+`Hypothesis.inducedFamily_reducible_apply_one_eq_qu` (landed): reducible `inducedFamily`-member →
+degree `q·u = qu`, reducing to **one §9/(11.5)-gated obligation** = `reducible y ∈ inducedFamily →
+y ∈ sOf(H₀)` (the (9.5)/(11.5) family-inclusion, sorried; sOf-degree machinery
+`reducible_mem_sOf_H0_apply_one_eq_qu` consumed). Per ユーザー direction「§14-side は sorried-cite」。
+
+### ★ world-bridge の crux 確定 = (9.5)/(11.5) family identification
+foundational pieces 全て bottom out に **`inducedFamily ↔ sSet/sOf` の family identification**
+(`sSet = 𝒳-family = {H⊄Ker} ⊊ inducedFamily = 全非自明`) を持つ。repo 不在の major result。
+landed (sorry-free foundational): `induce_derived_apply_one_eq_w1_mul` (Ind θ 1 = w₁·θ(1)) +
+`muGrid_column_sum_apply_one_eq_qu` (μ_k 1 = qu)。landed (gated-endpoint, 1 sorry):
+`inducedFamily_reducible_apply_one_eq_qu` (reducible → qu, (9.5) inclusion sorried)。
+
+### hS2deg 完成の plan (残)
+1. **irr-side lemma**: irr non-w₁ inducedFamily-member → degree qu ((9.8)/(9.9) 既約 degree 完全性、
+   sorried) — reducible-side と対称。
+2. **hS2deg assemble**: `∀ y ∈ Sset\SHCSet, y 1 = qu` = reducible-side ∪ irr-side (SHCSet 除外で
+   deg≠w₁ or reducible)。
+3. **capstone thread**: htype/hnt/chief を `exists_zeta` から capstone に threading (signature 拡張)
+   → bundled §9 sorry を hS2deg cite で discharge、残 = (9.5)/(9.8) の named obligations。
+∴ world-bridge の残 gap は **(9.5)/(11.5) family identification** (reducible/irr inclusion) +
+**(9.8)/(9.9) irr-degree 完全性** = deep §9 char (major)。foundational + reduction は landing 済。
