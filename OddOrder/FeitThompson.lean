@@ -748,27 +748,6 @@ noncomputable def section16MaximalPair_of_isMinimalSimpleOdd {G : Type*} [Group 
       K_lt_Kstar := hKlt
       S_typeP2 := isTypeP2_of_typeP_kappaHall_lt hG hSmax hStypeP hKleS hKhall hKstareq hKlt }
 
-/-- `IsHallSubgroup` is order-determined: equal cardinality transfers the Hall property
-(`H.index` is `|ambient| / |H|`, so equal `|H|` gives equal index, and both Hall conditions are
-prime-factor conditions on `|H|` and `H.index`). -/
-theorem isHallSubgroup_of_card_eq {H : Type*} [Group H] [Finite H] {π : Set ℕ}
-    {A B : Subgroup H} (hB : Ch03.IsHallSubgroup π B) (hc : Nat.card A = Nat.card B) :
-    Ch03.IsHallSubgroup π A := by
-  have hidx : A.index = B.index := by
-    have key : Nat.card A * A.index = Nat.card B * B.index := by
-      rw [Subgroup.card_mul_index, Subgroup.card_mul_index]
-    rw [hc] at key
-    exact Nat.eq_of_mul_eq_mul_left Nat.card_pos key
-  exact ⟨fun p hp => hB.1 p (hc ▸ hp), fun p hp => hB.2 p (hidx ▸ hp)⟩
-
-/-- A subgroup `V` complementing the normal `N` in `H` (`N ⊓ V = ⊥`, `N ⊔ V = ⊤`) has
-`|N| * |V| = |H|` — built as an `IsComplement'` (normal product is the join). -/
-theorem card_mul_card_of_complement_normal {H : Type*} [Group H] [Finite H] {N V : Subgroup H}
-    [N.Normal] (hinf : N ⊓ V = ⊥) (hsup : N ⊔ V = ⊤) :
-    Nat.card N * Nat.card V = Nat.card H :=
-  (Subgroup.isComplement'_of_disjoint_and_mul_eq_univ (disjoint_iff.mpr hinf)
-    (by rw [← Subgroup.normal_mul, hsup, Subgroup.coe_top])).card_mul
-
 /-- **The `K`-invariant complement `U` to `M_F` is the `(κ∪σ)'`-Hall** (type-`P₂`; POLE-1 carrier,
 issue 4008).  For a type-`P₂` maximal subgroup `M`, `M_F = M_σ`, and the complement `U` to `M_σ` in
 `M'` produced by `exists_kappaHall_invariant_complement_to_MF` shares the order `[M':M_σ]` with the
@@ -823,12 +802,12 @@ theorem isHall_kappaSigmaCompl_of_isTypeP2_complement {G : Type*} [Group G] [Fin
     rw [show (BG.Ch3.S10.Msigma M).subgroupOf (derivedInG M) ⊓ U₀.subgroupOf (derivedInG M)
         = (BG.Ch3.S10.Msigma M ⊓ U₀).subgroupOf (derivedInG M) from (Subgroup.comap_inf _ _ _).symm,
       Subgroup.inf_eq_bot_of_coprime (by rw [Nat.coprime_comm]; exact hcopU₀), Subgroup.bot_subgroupOf]
-  have hcU := card_mul_card_of_complement_normal hinfU hsupU
-  have hcU₀ := card_mul_card_of_complement_normal hinfU₀ hsupU₀
+  have hcU := Subgroup.card_mul_card_of_complement_normal hinfU hsupU
+  have hcU₀ := Subgroup.card_mul_card_of_complement_normal hinfU₀ hsupU₀
   have hcard : Nat.card ↥(U.subgroupOf (derivedInG M)) = Nat.card ↥(U₀.subgroupOf (derivedInG M)) :=
     Nat.eq_of_mul_eq_mul_left Nat.card_pos (hcU.trans hcU₀.symm)
   -- transfer the Hall property from `U₀` (order-determined).
-  refine isHallSubgroup_of_card_eq (B := U₀.subgroupOf M) hU₀hall ?_
+  refine Ch03.isHallSubgroup_of_card_eq (B := U₀.subgroupOf M) hU₀hall ?_
   rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv,
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_trans hU₀M' (Subgroup.map_subtype_le _))).toEquiv,
     ← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM').toEquiv,
@@ -1245,7 +1224,7 @@ theorem card_mul_eq_of_disjoint_sup_le_isCyclic {G : Type*} [Group G] [Finite G]
     rw [Subgroup.mem_bot]; exact Subtype.ext hxAB
   have hsup' : (A.subgroupOf W) ⊔ (B.subgroupOf W) = ⊤ := by
     rw [← Subgroup.subgroupOf_sup hAW hBW, hsup, Subgroup.subgroupOf_self]
-  have h := card_mul_card_of_complement_normal hinf' hsup'
+  have h := Subgroup.card_mul_card_of_complement_normal hinf' hsup'
   rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAW).toEquiv,
        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hBW).toEquiv] at h
 

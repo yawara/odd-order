@@ -589,6 +589,19 @@ theorem IsHallSubgroup.primeFactors_card_subset {π : Set ℕ} {H : Subgroup G}
 theorem IsHallSubgroup.index_no_pi {π : Set ℕ} {H : Subgroup G}
     (h : IsHallSubgroup π H) : ∀ p ∈ H.index.primeFactors, p ∉ π := h.2
 
+/-- `IsHallSubgroup` is order-determined: equal cardinality transfers the Hall property
+(`H.index` is `|ambient| / |H|`, so equal `|H|` gives equal index, and both Hall conditions are
+prime-factor conditions on `|H|` and `H.index`). -/
+theorem isHallSubgroup_of_card_eq [Finite G] {π : Set ℕ} {A B : Subgroup G}
+    (hB : IsHallSubgroup π B) (hc : Nat.card A = Nat.card B) :
+    IsHallSubgroup π A := by
+  have hidx : A.index = B.index := by
+    have key : Nat.card A * A.index = Nat.card B * B.index := by
+      rw [Subgroup.card_mul_index, Subgroup.card_mul_index]
+    rw [hc] at key
+    exact Nat.eq_of_mul_eq_mul_left Nat.card_pos key
+  exact ⟨fun p hp => hB.1 p (hc ▸ hp), fun p hp => hB.2 p (hidx ▸ hp)⟩
+
 /-- π-Hall ⇒ Coprime `|H|` `|G:H|`. 標準的: 共通素因子は π と π' 両方に属し矛盾. -/
 theorem IsHallSubgroup.coprime_index [Finite G] {π : Set ℕ} {H : Subgroup G}
     (h : IsHallSubgroup π H) : Nat.Coprime (Nat.card H) H.index := by
