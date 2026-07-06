@@ -9419,6 +9419,57 @@ theorem card_kappaHall_prime_of_isTypeP2 [Finite G]
     (S14.typeP_structure hG hM hP2.1 hKM hK rfl hU).2.2.2.2.1 hP2
   exact ⟨q, hq, hKq⟩
 
+/-- **Phase B foundation of BG Theorem 15.8** (Coq `Ptype_embedding` step): the type-`P₂`
+maximal `M`'s partner `M*` — realized as any maximal `Mstar ∈ 𝓜(C(K))` — is type-`P`, has
+`κ(Mstar)`-Hall `Ks := M_σ ⊓ C(K)`, and satisfies `K = Mstar_σ ⊓ C(Ks)`.
+
+Proof: `typeP_duality` supplies the unique nonconjugate type-`P` partner `Mst` with exactly this
+structure; `typeP_structure` (conjunct 6, with `K ∈ ℰ_q¹`) gives `𝓜(C(K)) = {Mst}`, so the
+given `Mstar ∈ 𝓜(C(K))` equals `Mst`. -/
+theorem typeP2_partner_structure_of_mem [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Mstar : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP2 : S14.IsTypeP2 M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hMstar : Mstar ∈ maximalSubgroupsContaining (Subgroup.centralizer (K : Set G))) :
+    S14.IsTypeP Mstar ∧
+      Ch03.IsHallSubgroup (S14.kappa Mstar)
+        ((OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)).subgroupOf Mstar) ∧
+      K = OddOrder.BG.Ch3.S10.Msigma Mstar ⊓ Subgroup.centralizer
+        ((OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G) :
+          Subgroup G) : Set G) := by
+  classical
+  have hP : S14.IsTypeP M := hP2.1
+  set Kstar : Subgroup G := OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)
+    with hKstardef
+  obtain ⟨q, hqprime, hKcard⟩ := card_kappaHall_prime_of_isTypeP2 hG hM hP2 hKM hK
+  haveI : Fact q.Prime := ⟨hqprime⟩
+  haveI hKcyc : IsCyclic ↥K := isCyclic_of_prime_card hKcard
+  have hKelemq : K ∈ elemAbelianOfRank G q 1 :=
+    mem_elemAbelianOfRank.mpr
+      ⟨Subgroup.IsElementaryAbelian.of_card_prime hKcard, by rw [hKcard, pow_one]⟩
+  -- The unique nonconjugate type-`P` partner `Mst` (Theorem 14.7 / `typeP_duality`).
+  obtain ⟨Mst, hMstprop, _hMstuniq⟩ := (S14.typeP_duality hG hM hP hKM hK hKstardef).2.2
+  obtain ⟨hMstmax, hMstP, _hMnc, hMstpair, _hZcyc, _hZti, _hP2or, _hcover⟩ := hMstprop
+  -- `𝓜(C(K)) = {Mst}` (`typeP_structure` conjunct 6 for `Mst`, rank-one `K ∈ ℰ_q¹`).
+  have huniqMst : maximalSubgroupsContaining (Subgroup.centralizer (K : Set G)) = {Mst} := by
+    haveI hMstsol : IsSolvable ↥Mst := hG.solvable_of_mem_maximalSubgroups hMstmax
+    obtain ⟨UMst, hUMsthall⟩ : ∃ UMst : Subgroup G, Ch03.IsHallSubgroup
+        ((S14.kappa Mst ∪ OddOrder.BG.Ch3.S10.sigma Mst)ᶜ) (UMst.subgroupOf Mst) := by
+      obtain ⟨U', hU'hall, -⟩ := Ch03.hall_D (G := ↥Mst)
+        (π := (S14.kappa Mst ∪ OddOrder.BG.Ch3.S10.sigma Mst)ᶜ) (U := (⊥ : Subgroup ↥Mst))
+        (fun p hp => by simp at hp)
+      have hUeq : (U'.map Mst.subtype).subgroupOf Mst = U' :=
+        Subgroup.comap_map_eq_self_of_injective Mst.subtype_injective U'
+      exact ⟨U'.map Mst.subtype, by rw [hUeq]; exact hU'hall⟩
+    exact (S14.typeP_structure hG hMstmax hMstP hMstpair.1 hMstpair.2.1 hMstpair.2.2
+      hUMsthall).2.2.2.2.2.1 q hqprime K hKelemq le_rfl
+  -- `Mstar = Mst`, so it inherits `Mst`'s partner structure.
+  have hMstarEq : Mstar = Mst := by
+    have hmem : Mstar ∈ ({Mst} : Set (Subgroup G)) := huniqMst ▸ hMstar
+    exact Set.eq_of_mem_singleton hmem
+  subst hMstarEq
+  exact ⟨hMstP, hMstpair.2.1, hMstpair.2.2⟩
+
 /-- **Phase A of BG Theorem 15.8** (Coq `tau2_P2type_signalizer`, up to `cKA`): from the
 σ(H)′-Hall `E`-setup of a maximal `H` (the Corollary 14.12 signalizer neighbour supplied by
 `typeP2_neighbor_is_typeF_of_mem`), a `κ`-Hall `K ⊆ F(E)`, and a prime `q₁ ∈ τ₂(H)`,
