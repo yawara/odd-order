@@ -9389,11 +9389,57 @@ theorem maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2 [Finite G]
       have hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M := hHallM.1 p (by rw [hcardM]; exact hpπ)
       exact hHallM.2 p hpidxM hpσ
 
+/-- **BG Theorem 14.7(f) / Proposition 14.2(g), type-`P₂` case** (mmd L4264, the first sentence of
+Theorem 15.8's proof: *"By Theorem 14.7(f), `|K| = q`"*): for a type-`P₂` maximal subgroup `M` and a
+Hall `κ(M)`-subgroup `K ≤ M`, the order `|K|` is prime.
+
+This is the `∃ q, q.Prime ∧ |K| = q` half of the Proposition 14.2(g) clause packaged inside
+`typeP_structure`, specialised to the *given* `K` (rather than the partner's `Kstar`, as in
+`kstar_card_prime_of_inputs`).  Proof: build the required Hall `(κ(M) ∪ σ(M))'`-subgroup `U` of the
+solvable `M` by Hall's theorem (`Ch03.hall_E_exists`) and set `Kstar = C_{M_σ}(K)`; then the
+`IsTypeP2 M →` conjunct of `typeP_structure` delivers `∃ q, q.Prime ∧ Nat.card ↥K = q`. -/
+theorem card_kappaHall_prime_of_isTypeP2 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP2 : S14.IsTypeP2 M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M)) :
+    ∃ q : ℕ, q.Prime ∧ Nat.card ↥K = q := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  -- A Hall `(κ(M) ∪ σ(M))'`-subgroup `U` of the solvable `M` (Hall's theorem), lifted to an
+  -- ambient `U' ≤ M` with `(U'.map).subgroupOf M` Hall (as in `exists_typeP_data`).
+  obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥M)
+    ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+  have hUeq : (U'.map M.subtype).subgroupOf M = U' :=
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective U'
+  have hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+      ((U'.map M.subtype).subgroupOf M) := by rw [hUeq]; exact hU'
+  -- `typeP_structure` on `M` with the *given* `K`; its `IsTypeP2 M →` conjunct is
+  -- `σ(M) = β(M) ∧ ∃ q, q.Prime ∧ Nat.card ↥K = q ∧ IsTISubset …`.
+  obtain ⟨_hσβ, q, hq, hKq, _hTI⟩ :=
+    (S14.typeP_structure hG hM hP2.1 hKM hK rfl hU).2.2.2.2.1 hP2
+  exact ⟨q, hq, hKq⟩
+
 /-- **BG Theorem 15.8** (mmd L4264; Feit--Thompson 1991): in the Corollary 14.12 setup,
 nonempty `tau_2(H)` forces `tau_2(M) = ∅`, `q := |K|` prime, and `tau_2(H) = {q}`.
 
 Faithfulness fix (Lane G): the previous scaffold had a spurious third maximal `N` and concluded
-`tau_2(N) = {q}` (mmd: the singleton is `tau_2(H)`) and dropped `q = |K|`. -/
+`tau_2(N) = {q}` (mmd: the singleton is `tau_2(H)`) and dropped `q = |K|`.
+
+⚠ **UNDER-HYPOTHESIZED relative to BG/Coq (blocked; do not close as stated).**  The Coq source
+(`tau2_P2type_signalizer`, BGsection15.v:1262) binds *seven* variables `M Mstar U K r R H` with the
+structural hypotheses `kappa_complement M U K`, `Mstar ∈ 'M('C(K))`, `r.-Sylow(U) R`, and crucially
+`H ∈ 'M('N(R))` — i.e. `H` is the *signalizer neighbour* of `M`'s `κ`-complement, produced by the
+Corollary 14.12 construction (`typeP2_neighbor_is_typeF`).  The proof then works inside
+`D := H ∩ Mstar`, using `K ⊆ F(D)` and `D` a `σ(H)'`-complement of `H` — both delivered by Cor 14.12
+in BG but **omitted from the repo `typeP2_neighbor_is_typeF` conclusion** (its docstring: *"the two
+remaining BG clauses `K ⊆ F(H ∩ M*)` and `σ(H)'-Hall(H)(H ∩ M*)` … are omitted"*).  Here `H` enters
+*only* through `hHtau : (tau2 H).Nonempty`, with **no witness tying `H` to `M`**, so the conclusion
+`tau2 H = {|K|}` is not derivable: an arbitrary maximal `H` with `τ₂(H) ≠ ∅` need not have `|K|` in
+its `τ₂`.  To close 15.8 faithfully the signature must first regain the Cor 14.12 witnesses
+(`Mstar`, `U`, `r`, `R`, `H ∈ 𝓜(N_G(R))`), which in turn requires **re-exporting the two dropped
+Cor 14.12 clauses** from `typeP2_neighbor_is_typeF` (the single most-upstream missing piece; a §14
+signature extension, not a foundational §12/Uniqueness gap).  The `|K| = q` prime conjunct alone is
+sorry-free and available via `card_kappaHall_prime_of_isTypeP2` (above). -/
 theorem tau2_transfer_constraint [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M H K : Subgroup G} (hM : M ∈ maximalSubgroups G) (hH : H ∈ maximalSubgroups G)
     (hP2 : S14.IsTypeP2 M)
@@ -9401,6 +9447,91 @@ theorem tau2_transfer_constraint [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
     (hHtau : (tau2 H).Nonempty) :
     tau2 M = ∅ ∧ ∃ q : ℕ, q.Prime ∧ Nat.card ↥K = q ∧ tau2 H = {q} := by
   sorry
+
+/-- **`N_G(F(M)) ≤ M` for a maximal `M`** (`F(M)` is "self-normalizing modulo `M`"): the ambient
+Fitting subgroup of a maximal subgroup of a minimal simple group has normalizer contained in `M`.
+
+Proof: `M ≤ N_G(F(M))` (any `m ∈ M` normalizes `F(M)`, `mem_normalizer_fittingInG_of_mem`).  If the
+containment were strict, maximality (`IsCoatom M`) would force `N_G(F(M)) = ⊤`, i.e. `F(M) ⊴ G`; but
+`F(M) ≠ ⊥` (the proper subgroup `M < ⊤` is solvable and nontrivial, so `F(M) = F(↥M).map ι ≠ ⊥` by
+`fitting_ne_bot_of_solvable_nontrivial`), so a nontrivial normal `F(M) ⊴ G` in a simple `G` must be
+`⊤`, whence `G ≅ ↥F(M)` is nilpotent — contradicting `¬ IsSolvable G`.  So `N_G(F(M)) = M`.
+
+`F(M) ≠ ⊥` is proved unconditionally (no `M_σ`-nilpotency needed): `↥M` is solvable
+(`solvable_of_mem_maximalSubgroups`) and nontrivial (`M ≠ ⊥`, else `M` a coatom equal to `⊥` makes
+every nontrivial subgroup `⊤`, forcing `G` cyclic hence solvable), so `F(↥M) ≠ ⊥`, and the
+injective `M.subtype`-image `fittingInG M` is `≠ ⊥`. -/
+theorem normalizer_fittingInG_le_self [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    Subgroup.normalizer ((fittingInAmbient M : Subgroup G) : Set G) ≤ M := by
+  have hco : IsCoatom M := mem_maximalSubgroups.mp hM
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  -- `M ≠ ⊥` (a `⊥` coatom would make `G` cyclic, hence solvable).
+  have hMne : M ≠ ⊥ := by
+    intro hMbot
+    have hco' : ∀ b : Subgroup G, ⊥ < b → b = ⊤ := by rw [← hMbot]; exact hco.2
+    haveI : Nontrivial G := hG.simple.toNontrivial
+    obtain ⟨g, hg1⟩ := exists_ne (1 : G)
+    have hgtop : Subgroup.zpowers g = ⊤ :=
+      hco' _ (bot_lt_iff_ne_bot.mpr (fun h => hg1 (Subgroup.zpowers_eq_bot.mp h)))
+    exact hG.notSolvable (isSolvable_of_comm fun a b => by
+      obtain ⟨i, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hgtop ▸ Subgroup.mem_top a)
+      obtain ⟨j, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hgtop ▸ Subgroup.mem_top b)
+      rw [← zpow_add, ← zpow_add, add_comm])
+  haveI : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hMne
+  -- `M ≤ N_G(F(M))`.
+  have hM_le_N : M ≤ Subgroup.normalizer ((fittingInAmbient M : Subgroup G) : Set G) :=
+    fun m hm => OddOrder.BG.Ch2.S08.mem_normalizer_fittingInG_of_mem hm
+  rcases eq_or_lt_of_le hM_le_N with heq | hlt
+  · exact heq.ge
+  · exfalso
+    -- Strict `⟹` `N_G(F(M)) = ⊤` (maximality), i.e. `F(M) ⊴ G`.
+    have hFnorm : (fittingInAmbient M).Normal :=
+      Subgroup.normalizer_eq_top_iff.mp (hco.2 _ hlt)
+    -- `F(M) ≠ ⊥`: `↥M` solvable + nontrivial ⟹ `F(↥M) ≠ ⊥` ⟹ its injective image `≠ ⊥`.
+    have hFne : fittingInAmbient M ≠ ⊥ := by
+      have hFMne : OddOrder.Isaacs.Ch01.fitting ↥M ≠ ⊥ :=
+        OddOrder.Isaacs.Ch01.fitting_ne_bot_of_solvable_nontrivial ↥M
+      show OddOrder.BG.Ch2.S08.fittingInG M ≠ ⊥
+      rw [OddOrder.BG.Ch2.S08.fittingInG]
+      exact fun h => hFMne ((Subgroup.map_eq_bot_iff_of_injective _ M.subtype_injective).mp h)
+    -- `F(M) ⊴ G`, `F(M) ≠ ⊥`, `G` simple ⟹ `F(M) = ⊤` ⟹ `G` nilpotent ⟹ solvable, contradiction.
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (fittingInAmbient M) hFnorm with hbot | htop
+    · exact hFne hbot
+    · -- `F(M) = ⊤`: `G ≃ ↥F(M)` is nilpotent, hence solvable.
+      haveI : Group.IsNilpotent ↥(fittingInAmbient M) := by
+        show Group.IsNilpotent ↥(OddOrder.BG.Ch2.S08.fittingInG M)
+        exact OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M
+      haveI : Group.IsNilpotent (↥(⊤ : Subgroup G)) := htop ▸ this
+      haveI : Group.IsNilpotent G := nilpotent_of_mulEquiv Subgroup.topEquiv
+      exact hG.notSolvable IsNilpotent.to_isSolvable
+
+/-- **`F(M)` fails to be TI once a centralizer of one of its nonidentity elements escapes `M`**
+(BG Corollary 15.9, mmd L4320: *"`x ∈ M_σ ⊆ F(M)` and `C_G(x) ⊄ M`.  Hence `F(M)` is not a
+`TI`-subgroup of `G`."*).  Stated in the BG-faithful generality on `x ∈ F(M)^#` (Corollary 15.9
+supplies this from `x ∈ M_σ^#` once `M_σ ⊆ F(M)`, i.e. after `M ∈ 𝓜_𝓕` makes `M_σ` nilpotent).
+
+Proof: pick `y ∈ C_G(x) ∖ M`.  As `y` centralizes `x`, `y·x·y⁻¹ = x`; so the *same* nonidentity
+`x ∈ F(M)^#` witnesses an overlap `∃ a ∈ F(M)^#, y·a·y⁻¹ ∈ F(M)^#`.  Were `F(M)` a TI-subset with
+normalizer-bound `N_G(F(M))`, this would force `y ∈ N_G(F(M)) ≤ M` (`normalizer_fittingInG_le_self`),
+contradicting `y ∉ M`. -/
+theorem not_fittingIsTI_of_mem_fittingSharp_of_centralizer_not_le [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {x : G} (hxF : x ∈ fittingSharp M)
+    (hesc : ¬ Subgroup.centralizer ({x} : Set G) ≤ M) :
+    ¬ FittingIsTI M := by
+  intro hTI
+  -- `y ∈ C_G(x) ∖ M`.
+  obtain ⟨y, hyC, hyM⟩ := Set.not_subset.mp hesc
+  -- `y` centralizes `x`: `y·x·y⁻¹ = x` (from `x·y = y·x`).
+  have hyx : y * x * y⁻¹ = x := by
+    have hxy : x * y = y * x := (Subgroup.mem_centralizer_iff.mp hyC) x (Set.mem_singleton x)
+    rw [← hxy, mul_assoc, mul_inv_cancel, mul_one]
+  -- The overlap `∃ a ∈ F(M)^#, y·a·y⁻¹ ∈ F(M)^#` (both equal to `x`).
+  have hoverlap : ∃ a ∈ fittingSharp M, y * a * y⁻¹ ∈ fittingSharp M :=
+    ⟨x, hxF, by rw [hyx]; exact hxF⟩
+  -- TI forces `y ∈ N_G(F(M)) ≤ M`, contradicting `y ∉ M`.
+  exact hyM (normalizer_fittingInG_le_self hG hM (hTI y hoverlap))
 
 /-- **BG Corollary 15.9** (mmd L4240): final local landing point for a centralizer
 escaping `M`.  This is the Sibley/Feit--Thompson package used by §16. -/

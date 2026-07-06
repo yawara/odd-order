@@ -682,3 +682,28 @@ tau=1 Ind}`、`suffices normedTI … apply: Dade_Ind`)。**repo に route-2 機�
 (sSetIrrDeg_coherent base → coherentPairChain、tau=dade map の isometry route、subagent 確認どおり dade=Ind 不要;
 ≥2 count は §9(9.8.d) upstream sub-gate)。**G2** = A(S) TI-set (上記、bridge が A₁=A(S) で消費 → dade=Ind →
 tau1S_apply_induce_sub)。G1+G2 で (13.3) の tau1S fields honest 化。**次 = G2 (A(S) TI、normedTI port)** を正面 build。
+
+## 2026-07-06 更新 #23 (lane b, /loop) — ★★G2 (TI-set) は BG §15 Cor 15.9 (Sibley/FT package) に bottom out、multi-consumer gate
+
+**Rung B (TI-set reduction) landed sorry-free (commit d375f39c、S15:878-931)**: dade=Ind on A(S) ⟸ `IsTISubset(A(S)) S`
+⟸ no escaping。4 lemma (dadeHypS_H_eq_ftSupportKernel / forall_dadeHypS_H_eq_bot_of_{not_escaping,isTISubset} /
+isTISubset_honestTypeP2ASet_iff_forall_dadeHypS_H_eq_bot 3-way 同値)、#axioms は dadeHypS 継承のみ。
+
+**G2 core (IsTISubset の escaping-exclusion、Coq FTtypeP_facts (e) PFsection13.v:224-234 port) を subagent が trace**:
+escaping a ⟹ σ-sharp (landed) ⟹ signalizer N (IsTypeF∨IsTypeP2、`signalizer_structure_of_mem_sigmaSharp` S16:271
+sorry-free)。
+- **case P2**: (S type-F)⟹¬type-P (`isTypeF_iff_not_isTypeP` S14:169 sorry-free) が要る。唯一の producer
+  `exists_RData_escape_structure` (S16:5695) は **`centralizer_escape_final_local` (S15_MF:9407 = BG Cor 15.9,
+  bare sorry, "Sibley/FT package for §16") 経由で sorryAx-tainted**。
+- **case F**: `FTtype1_Frobenius` kernel-regularity analogue **不在** (repo type-F N は `frobenius_HU0` のみ、
+  global Frobenius 無 — Coq FT-type-1 は BG type-F より narrow)。
+
+**⟹ G2 (S-instance dade=Ind、tau1S_apply_induce_sub) は BG §15 Cor 15.9 (`centralizer_escape_final_local`) +
+Thm 15.8 (`tau2_transfer_constraint` S15_MF:9397 bare sorry) + FTtype1_Frobenius analogue に gated**。deep BG
+local-analysis (Sibley 1991)、**multi-consumer**: S16 `exists_RData_escape_structure` (BG side) + 本 Pf §13 coherence
+(char side) が共に消費 ⟹ high-leverage cross-cluster gate。
+
+**残 2 独立 gate**: **G1** = honest coherence の full-mixed-family 拡張 (sSetIrrDeg_coherent base → coherentPairChain、
+tau=dade map の isometry route、**BG §15 に non-gated**、§9 (9.8.d) ≥2 count sub-gate のみ) / **G2** = 上記 BG §15。
+**bridge (cd6beac7) + Rung B (d375f39c) で G2 の char-side wiring は完備、残 core は純 BG §15 群論**。
+次判断: (a) BG §15 Cor 15.9 claim+build (upstream-most・multi-consumer) vs (b) G1 (in-cluster・§9-gated) — 9000 scan 後に決定。

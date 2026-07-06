@@ -869,6 +869,66 @@ theorem Hypothesis.sInstance_dade_eq_induce_of_supported_trivial_H [Fintype G] [
   exact OddOrder.Peterfalvi.S14.dadeMap_eq_induce_of_supported_on_trivial_H (hyp.dadeHypS hG)
     hA₁A hA₁norm hH₁ ⟨f, (ClassFunction.mem_supportedSubmodule).mpr hf⟩
 
+/-- **(Rung B, reduction step 1) `dadeHypS.H a = ftSupportKernel S (A(S)) a`.**  The `S`-instance Dade
+stabilizer at a support point `a` is the faithful per-`x` (8.14) signalizer kernel
+`R(a) = ftSupportKernel S (A(S)) a`, read off the `H_eq_ftSupportKernel` field of the underlying
+`DadeSupportHypothesisData` (the very `.some` witness `dadeHypS` is projected from).  This is the
+concrete formula `H(a) = R(a)` of Peterfalvi (8.15)/(8.14), specialised to the honest type-`P₂`
+support `A(S)`. -/
+theorem Hypothesis.dadeHypS_H_eq_ftSupportKernel [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (a : {a : G // a ∈ honestTypeP2ASet hyp.S}) :
+    (hyp.dadeHypS hG).H a =
+      OddOrder.Peterfalvi.S10.ftSupportKernel hyp.S (honestTypeP2ASet hyp.S) a.1 :=
+  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.S_maximal hyp.S_typeP2).some.H_eq_ftSupportKernel a
+
+/-- **(Rung B, reduction) No escaping `A(S)`-points ⟹ all `S`-instance Dade stabilizers vanish.**
+For the honest type-`P₂` support, `dadeHypS.H a = ftSupportKernel S (A(S)) a`
+(`dadeHypS_H_eq_ftSupportKernel`), and the faithful kernel is `⊥` off the escaping set
+(`ftSupportKernel_eq_bot_of_not_escaping`).  So if `A(S)` has no escaping point
+(`∀ a ∈ A(S), a ∉ escapingCentralizerSet S (A(S))`, the Coq `FTtypeP_facts` (e) `normedTI` core,
+Rung C), then `∀ a, dadeHypS.H a = ⊥` — the exact input `S04.isDadeMap_induce_of_forall_H_eq_bot` /
+`sInstance_dade_eq_induce_of_supported_trivial_H` need to run `τ = Ind_S^G` on the *full* `A(S)`. -/
+theorem Hypothesis.forall_dadeHypS_H_eq_bot_of_not_escaping [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hno : ∀ a ∈ honestTypeP2ASet hyp.S,
+      a ∉ OddOrder.GroupTheory.escapingCentralizerSet hyp.S (honestTypeP2ASet hyp.S)) :
+    ∀ a : {a : G // a ∈ honestTypeP2ASet hyp.S}, (hyp.dadeHypS hG).H a = ⊥ := by
+  intro a
+  rw [hyp.dadeHypS_H_eq_ftSupportKernel hG a]
+  exact OddOrder.Peterfalvi.S10.ftSupportKernel_eq_bot_of_not_escaping (hno a.1 a.2)
+
+/-- **(Rung B, reduction) `IsTISubset (A(S)) S ⟹ all `S`-instance Dade stabilizers vanish.**  A
+TI-subset `A` has `C_G(x) ≤ L` for every `x ∈ A` (`IsTISubset.centralizer_le`), so no `A(S)`-point
+escapes `S`; then `forall_dadeHypS_H_eq_bot_of_not_escaping` applies.  This is the direction of
+Peterfalvi (2.3) that turns the `normedTI` conclusion (Rung C/D) into the trivial-stabilizer datum
+the honest `dade = Ind` bridge consumes. -/
+theorem Hypothesis.forall_dadeHypS_H_eq_bot_of_isTISubset [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hTI : OddOrder.GroupTheory.IsTISubset (honestTypeP2ASet hyp.S) hyp.S) :
+    ∀ a : {a : G // a ∈ honestTypeP2ASet hyp.S}, (hyp.dadeHypS hG).H a = ⊥ :=
+  hyp.forall_dadeHypS_H_eq_bot_of_not_escaping hG
+    (fun a ha hesc => hesc.2 (hTI.centralizer_le ha))
+
+/-- **(Rung B, the equivalence, Peterfalvi (2.3) for the honest `S`-instance)**: the three forms of
+the (13.2.e) `normedTI` gate coincide —
+`IsTISubset (A(S)) S` ⟺ every `A(S)`-point is non-escaping ⟺ every `S`-instance Dade stabilizer
+`dadeHypS.H a` is trivial.
+
+The `A(S)`-set is sharp (`honestTypeP2ASet_subset_sharp`, `1 ∉ A(S)`), lies in `S`
+(`honestTypeP2ASet_subset`), and is `S`-conjugation invariant (`honestTypeP2ASet_conj_mem`), so the
+general `S04.isTISubset_iff_exists_hypothesis_with_trivial_H` (2.3) applies; but here we get the
+*specific* `dadeHypS` stabilizers, via the (8.14) kernel formula.  This closes Rung B: reducing the
+missing input of `sInstance_dade_eq_induce_of_supported_trivial_H` (with `A₁ = A(S)` full) to the
+single TI fact `IsTISubset (A(S)) S` = Coq `FTtypeP_facts` (e). -/
+theorem Hypothesis.isTISubset_honestTypeP2ASet_iff_forall_dadeHypS_H_eq_bot [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    OddOrder.GroupTheory.IsTISubset (honestTypeP2ASet hyp.S) hyp.S ↔
+      ∀ a : {a : G // a ∈ honestTypeP2ASet hyp.S}, (hyp.dadeHypS hG).H a = ⊥ := by
+  refine ⟨hyp.forall_dadeHypS_H_eq_bot_of_isTISubset hG, fun hH => ?_⟩
+  -- The reverse direction is Peterfalvi (2.3): trivial Dade stabilizers ⟹ TI.
+  exact (hyp.dadeHypS hG).isTISubset_of_forall_H_eq_bot hH
+
 /-- **The honest `(H₀ ⊔ C')^#`-support for the `S`-instance, `= (C')^#`** (issue 2035 step 2).
 For the `S`-instance the chief kernel is trivial (`toTypesIIIIIIVSetupS_chief_N_eq_bot`, giving
 `H₀ = ⊥`), so the §9 `H₀C'`-support degenerates to `(C')^#` — the non-identity elements of
