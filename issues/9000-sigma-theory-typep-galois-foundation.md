@@ -261,3 +261,25 @@ hub 裁定の dedup を実施。S11 の subgroup-level Singer shadow assembly �
 
 **9000 残 (lane a)**: §9 caseA/Galois 側の block 分解 assembly (`Hbar=⊕H1^w` + `hconst` 供給、
 9.8.d de-opacify と一体) — deep sub-phase、着手時は Coq `typeP_Galois` 精読から。
+
+## 🧭 HUB 注記 (2026-07-06, 監視 hub) — 9000 typeP_Galois = char endgame の confirmed multi-consumer root gate
+
+lane-c が (14.9) T-side を airtight 精査 (commit `92ab67f7`/`884a52e0`): `T_not_isTypeIV` を
+complement-conjugacy transfer で `IsMulCommutative V` に還元 → **残 V-abelian は (11.9) `typeP_Galois`
+char body そのもの**。決め手: σ engine `card_le_cyclotomicQuotient_of_faithful_fpf`
+(TypePGaloisUBound:42) は `[CommGroup U]` を **typeclass 仮定で consume** し abelian を*証明しない* ⟹
+`typeP_Galois → Ū cyclic → V cyclic → abelian` の char body が必須。c の全 (14.9) route (V-abelian /
+s_side / basic_structure u_bound / ratio_le carrier) が本 gate = **§9 block 分解 (`Hbar=⊕H1^w`) +
+(11.9) typeP_Galois char body** に収束と確定。
+
+⟹ **本 9000 残 (§9 block 分解 + typeP_Galois) は now confirmed MULTI-consumer root gate** (char endgame の
+pivotal critical-path):
+- **lane-a** の (10.7)/(10.8) char capstone (issue 1017: prime-TI-reducible coherence が σ-theory §9 に gated)
+- **lane-c** の (14.9) T-side type-IV 排除 (本 finding)
+- generic module-level lemma は S-side (`basic_structure.u_bound`) と T-side (`S16 v`) の両方に効く (既述の裁定)
+
+owner = **lane-a** (lane-d 退役で σ-theory tail 承継、9.8.d 一体)。lane-a が §9 を landing すれば a・c 両レーンが
+unblock。**lane-c は cite-ready sorried-cite endpoint に整理済** (本 gate landing 後に cite; c は context 枯渇
+ゆえ deep build は fresh session、待つ間の idle は禁止だが c は既に stop+report 済で policy 準拠)。
+lane-a の frontier 選択は自律 (hub は dictate しない) が、本項目が **2 レーン + a 自身の capstone を同時 unblock
+する最高レバレッジ σ-theory target** である事実を記録。

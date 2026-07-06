@@ -2287,3 +2287,23 @@ AxiomsCheck 出力で確認) だが、**carrier `field_normalizer_structure` は
 dependency trace は深い推移依存を見落とす — subagent がこれで誤った)。lane が hub 指示に技術反証を出したら
 (c の `#print axioms` 提示)、hub は再検証して**誤りなら即撤回**する ([[scaffold-sorry-free-not-done]]
 「hub 指示が技術分析と矛盾したら flag」の lane 側実践 + hub 側の受容)。
+
+### ⚠ lane-c 検証 (2026-07-06 続) — C の (14.9) 全 route は **lane-a σ-theory §9** に収束 (verified root gate)
+
+進捗: `T_not_isTypeIV_of_isTypeP1` を complement-conjugacy transfer で **`IsMulCommutative V` に還元**
+(commit 92ab67f7、helper sorry-free)。残 `hVcomm : IsMulCommutative V` を精査 → **hub の「C drives V-abelian
+via issue 9000」は不可**と判明 (airtight): σ-theory engine `card_le_cyclotomicQuotient_of_faithful_fpf`
+(TypePGaloisUBound:42) は **`[CommGroup U]` を typeclass 仮定** — abelian を *consume* して u-bound を出す engine で、
+abelian を *証明しない*。⟹ `IsMulCommutative V` (Type-IV 排除) は (11.9) `typeP_Galois` char body そのもの
+(typeP_Galois → Ū cyclic → faithful なら V cyclic → abelian)。**lane-a §11 (issue 2018)**。
+
+hub の corrected directive「basic_structure descent」も同 gate: `basic_structure_gated.u_bound`
+(S15:1430) = σ-theory engine の**非-Galois branch `hReducible` = block 分解 = lane-a §9 assembly**
+(issue 9000 残「lane a assembly W₁依存」)。かつ basic_structure は **S15 = lane-b file** (territory)。
+
+**⟹ root gate = lane-a σ-theory §9 (block 分解 `Hbar=⊕H1^w` + (11.9) `typeP_Galois` char body)。C の全 (14.9)
+route (V-abelian / s_side / basic_structure u_bound / ratio_le carrier-1) はここに収束。** C は cite-ready の
+sorried-cite endpoint に整理済 (この session +3 commit: type-det / #5訂正 / V-abelian還元)。次は **lane-a の
+§9 landing を待って cite**、or **hub-coordinated fresh C drive** (issue 9000 block分解を C が S11 でなく shared
+leaf で build、但し lane-a active §9 と dup 注意)。C context 枯渇ゆえ deep build は fresh session 推奨
+([[feedback-loop-short-wakeup]] 空転禁止 = 停止+報告)。
