@@ -762,6 +762,15 @@ theorem opCore_le_fitting (p : Nat.Primes) (G : Type*) [Group G] :
     opCore (p : ℕ) G ≤ fitting G :=
   le_iSup (fun q : Nat.Primes => opCore (q : ℕ) G) p
 
+/-- If `F(G)` is not contained in `S`, then some prime core `O_p(G)` is not
+contained in `S`. -/
+theorem exists_opCore_not_le_of_fitting_not_le {G : Type*} [Group G] {S : Subgroup G}
+    (hS : ¬ fitting G ≤ S) :
+    ∃ p : Nat.Primes, ¬ opCore (p : ℕ) G ≤ S := by
+  by_contra h
+  push Not at h
+  exact hS (iSup_le h)
+
 /-- `F(G)` は `G` で特性的. 各 `opCore p G` が特性的 (`opCore.characteristic`) で,
 特性的部分群の sup は特性的 (`Subgroup.map_iSup` + `iSup_congr`). -/
 instance fitting.characteristic (G : Type*) [Group G] : (fitting G).Characteristic := by
@@ -1168,6 +1177,27 @@ theorem fitting_map_subtype_le_fitting [Finite G] {M : Subgroup G} [M.Normal] :
     nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective (fitting ↥M) M.subtype
       M.subtype_injective)
   exact nilpotent_normal_le_fitting
+
+/-- The image of the Fitting subgroup under a group isomorphism is contained in the Fitting
+subgroup of the codomain. -/
+theorem fitting_map_mulEquiv_le {A B : Type*} [Group A] [Group B] [Finite A] [Finite B]
+    (e : A ≃* B) :
+    (fitting A).map e.toMonoidHom ≤ fitting B := by
+  haveI : Group.IsNilpotent (fitting A) := fitting.isNilpotent
+  haveI : Group.IsNilpotent ↥((fitting A).map e.toMonoidHom) :=
+    nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ e.toMonoidHom e.injective)
+  haveI : ((fitting A).map e.toMonoidHom).Normal :=
+    (fitting.normal A).map e.toMonoidHom e.surjective
+  exact nilpotent_normal_le_fitting
+
+/-- The Fitting subgroup is preserved by group isomorphisms. -/
+theorem fitting_map_mulEquiv {A B : Type*} [Group A] [Group B] [Finite A] (e : A ≃* B) :
+    (fitting A).map e.toMonoidHom = fitting B := by
+  haveI : Finite B := Finite.of_equiv A e.toEquiv
+  refine le_antisymm (fitting_map_mulEquiv_le e) (fun y hy => ?_)
+  have hpre : e.symm y ∈ fitting A :=
+    fitting_map_mulEquiv_le e.symm (by simpa using Subgroup.mem_map_of_mem e.symm.toMonoidHom hy)
+  simpa using Subgroup.mem_map_of_mem e.toMonoidHom hpre
 
 end -- 1D
 
