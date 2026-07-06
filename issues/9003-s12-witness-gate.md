@@ -47,15 +47,21 @@ BG piece `conjClassSet_Mtilde_disjoint` (BG S14_TypePCounting:8042)・`conjClass
   Dade vanishing (supp(τ(φ−φ̄))⊆dadeSupport) + `constituentDiff_support_subset` + `inner_eq_zero_of_disjoint_support`
   で inner=0 を実証明。唯一の残 sorry = **`dadeSupport_disjoint_of_nonconjugate`** (S14:665) = §10 M̃ geometry
   (`dadeSupport⊆𝒞_G(M̃)` + `conjClassSet_Mtilde_disjoint`)。
-- [ ] **`dadeSupport_disjoint_of_nonconjugate`** (§10、最後の Cluster B piece): M̃ 機構が S14 から到達不可
-  (0 uses)。relocate to S10 (hub 要調整) か S14 import 追加 (巨大 rebuild) か lane a 所有化。→ (12.16) 閉じる。
-- [ ] Cluster A ((12.10) type-analysis) は §8-§11 の大きな multi-theorem effort。§-owning lane に割当?
+- [x] **旧 `dadeSupport_disjoint_of_nonconjugate` task は stale**: S14 から M̃ 機構到達可と確認後、
+  (8.18.c)/(12.3) bar-trick descent を実証明化。Cluster B の P1 側は解決、P2 側は 9008 で
+  phantom として棄却済み (下記 loop⁹⁹--loop¹⁹⁴ 参照)。
+- [x] **旧 Cluster A gate map は stale**: (12.10)--(12.12) chain は body-sorry-free に実証明化済み。
+  現在の真の残 upstream は witness-tied な §8--§11 pin 6 本に isolate 済み (下記 2026-07-04 update)。
 
 ## 完了条件
 
 hub が裁定: (a) β が `support_mutual_exclusion` (§10, policy A/B で cross-lane) を pick up、または
 (b) §8-§11 structural (8.16/8.6.a/9.7.b/10.10/11.x) を §-owning lane に割当。
 (12.6) coherence deliverable はどちらでも完了済; これは §12 *下流*の話。
+
+**2026-07-06 D audit update**: 上記完了条件は後段の hub/lane-b 進捗で superseded。
+`support_mutual_exclusion`・(8.18.c)/(12.3) は landed、(12.10)--(12.12) は
+body-sorry-free assembly 済み。未完は precise pin 群として S14/S10/S11/S12 の現宣言へ分解済み。
 
 ## 参照
 
