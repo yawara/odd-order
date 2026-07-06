@@ -4251,6 +4251,57 @@ theorem actionCommutator_eq_bot_of_acts_trivially_on_self_of_coprime
   -- h_eq : c * x = g, hc_fix : c ∈ fixedPoints, hx_ac : x ∈ actionCommutator
   rw [← h_eq, map_mul, hc_fix a, h_triv a x hx_ac]
 
+/-- **BG Proposition 1.4** (kernel form): if a finite coprime automorphism group fixes the
+Fitting subgroup pointwise, then the action is trivial on the whole finite solvable group.
+
+This combines the Fitting self-centralizing theorem with Isaacs Ch.4's action-commutator
+decomposition. It is the practical form needed later: the kernel of the action on the
+Fitting subgroup is also the kernel of the action on the whole group. -/
+theorem actionCommutator_eq_bot_of_fitting_le_fixedPoints
+    {G A : Type*} [Group G] [Finite G] [IsSolvable G]
+    [Group A] [Finite A] {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hF_le_fixed : OddOrder.Isaacs.Ch01.fitting G ≤ Subgroup.fixedPointsOfMulAut φ) :
+    actionCommutator φ = ⊥ := by
+  classical
+  set F : Subgroup G := OddOrder.Isaacs.Ch01.fitting G with hF_def
+  have hAC_le_cent : actionCommutator φ ≤ Subgroup.centralizer (F : Set G) := by
+    rw [actionCommutator_le_iff_left]
+    intro a g
+    rw [Subgroup.mem_centralizer_iff]
+    intro f hf
+    let x : G := g⁻¹ * (φ a) g
+    change f * x = x * f
+    have hgf : g * f * g⁻¹ ∈ F := by
+      rw [hF_def]
+      exact (OddOrder.Isaacs.Ch01.fitting.normal G).conj_mem f hf g
+    have hf_fix : (φ a) f = f :=
+      Subgroup.mem_fixedPointsOfMulAut.mp (hF_le_fixed hf) a
+    have hfix : (φ a) (g * f * g⁻¹) = g * f * g⁻¹ :=
+      Subgroup.mem_fixedPointsOfMulAut.mp (hF_le_fixed hgf) a
+    have hxconj : x * f * x⁻¹ = f := by
+      calc
+        x * f * x⁻¹ = g⁻¹ * (φ a) g * f * ((φ a) g)⁻¹ * g := by
+          dsimp [x]
+          group
+        _ = g⁻¹ * (φ a) g * (φ a) f * ((φ a) g)⁻¹ * g := by rw [hf_fix]
+        _ = g⁻¹ * (φ a) (g * f * g⁻¹) * g := by
+          rw [map_mul, map_mul, map_inv]
+          group
+        _ = g⁻¹ * (g * f * g⁻¹) * g := by rw [hfix]
+        _ = f := by group
+    rw [mul_inv_eq_iff_eq_mul] at hxconj
+    exact hxconj.symm
+  have hAC_le_F : actionCommutator φ ≤ F :=
+    hAC_le_cent.trans (by
+      rw [hF_def]
+      exact centralizer_fitting_le_fitting)
+  have htriv : ∀ a : A, ∀ h ∈ actionCommutator φ, (φ a) h = h := by
+    intro a h hh
+    exact Subgroup.mem_fixedPointsOfMulAut.mp (hF_le_fixed (hAC_le_F hh)) a
+  exact actionCommutator_eq_bot_of_acts_trivially_on_self_of_coprime
+    hCop (Or.inr inferInstance) htriv
+
 /-- **Isaacs Thm 4.36 (class ≤ 2 case)** ⭐: A acts on p-群 G of class ≤ 2 (p > 2),
 A is p'-group, A fixes every order-p element of G ⇒ A trivial on G.
 
