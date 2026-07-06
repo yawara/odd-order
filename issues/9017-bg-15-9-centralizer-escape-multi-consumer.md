@@ -86,3 +86,24 @@ multi-consumer — hub は allocation (lane b 継続 vs 専用 BG lane vs lane c
 ungated upstream を descend+build 継続中。
 
 次: `tau2_transfer_constraint` (Thm 15.8) の §12 prereq を inventory → build。
+
+## 2026-07-06 更新 #2 (lane b, /loop) — ★★BG §15 chain は BOUNDED (foundations 全存在)、Thm 15.8 blocker = signature gap
+
+subagent inventory: **BG Thm 15.8 の §12 prereq は全て sorry-free 既存** — ℰ²(D) (`exists_elemAb_rank_two_le_E_of_tau2` S12_Theorem127:86) / Cor 12.6(a)(b) (S12_Corollary126:68/156/295) / **Uniqueness Thm 9.6 `q∉β(G)` (`tau2_not_beta`、make-or-break piece 存在)** / Thm 12.13 (`nonabelian_pgroup_isUniquelyMaximal` S12_Theorem1213:862) / Lemma 12.17 (S12_Lemma1217) / Cor 9.2 / Thm 12.7(b) / Thm 14.7(f) (`typeP_structure` P2 clause)。⟹ **chain は bottomless でない、foundational gap 無**。
+
+**landed (本更新、sorry-free)**: `card_kappaHall_prime_of_isTypeP2` (S15_MF、Thm 15.8 第一行 |K|=q prime)。
+
+**★Thm 15.8 の真 blocker = signature gap (foundational でない)**: repo の `tau2_transfer_constraint` は `H` を
+`hHtau:(tau2 H).Nonempty` のみで導入、**M との signalizer-neighbour link 無** (Coq は `H∈𝓜(N(R))`)。⟹
+`tau2 H={|K|}` は現状 **導出不能・close は unsound**。fix: (1) Cor 14.12 (`typeP2_neighbor_is_typeF` S14:11396)
+の dropped 2 clauses (`K⊆F(H∩M*)` + `H∩M*=σ(H)'-complement`) を **S15_MF に再derive** (S14 は active BG §14
+work 中ゆえ territorial 回避、"derivable if needed" 記載)。(2) `tau2_transfer_constraint` signature を Coq 準拠に
+**訂正** (Mstar/U/r/R/H∈𝓜(N(R)) witness bind; **code consumer 0 ゆえ安全、unsound statement の訂正**)。(3) 既存
+§12 infra で Thm 15.8 を prove。
+
+**coordination points (hub 可視化)**: (i) S14_TypePCounting は active (回避で再derive)、(ii) Thm 15.8 signature
+訂正 (unsound→sound、consumer 0)、(iii) **Cor 15.9 は Thm 15.8 に加えて S16→S15 architectural hoist
+(`typeF_frobenius_of_tau2_prime_free` を S16 から S15 上流へ) が要 = lane c S16 に跨る hub-level 裁定**。
+chain は bounded ゆえ lane b が Thm 15.8 まで build 継続 (multi-consumer、high-leverage)、Cor 15.9 の hoist は hub 裁定待ち。
+
+次: Thm 15.8 を build (dropped clauses 再derive + signature 訂正 + §12 assembly)。
