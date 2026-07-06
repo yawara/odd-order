@@ -330,6 +330,28 @@ theorem card_mul_card_of_complement_normal {G : Type*} [Group G] [Finite G] {N V
   (Subgroup.isComplement'_of_disjoint_and_mul_eq_univ (disjoint_iff.mpr hinf)
     (by rw [← Subgroup.normal_mul, hsup, Subgroup.coe_top])).card_mul
 
+/-- Package complementary subgroups inside a specified ambient subgroup. -/
+theorem isComplement'_subgroupOf_of_disjoint_mul_eq_univ {G : Type*} [Group G]
+    {U H M : Subgroup G} (hH_le_U : H ≤ U) (hM_le_U : M ≤ U)
+    (hHM_bot : H ⊓ M = ⊥)
+    (hmul : ∀ x ∈ U, ∃ m ∈ M, ∃ h ∈ H, m * h = x) :
+    IsComplement' (M.subgroupOf U) (H.subgroupOf U) := by
+  apply isComplement'_of_disjoint_and_mul_eq_univ
+  · rw [disjoint_iff]
+    ext x
+    simp only [mem_inf, mem_subgroupOf, mem_bot, Subtype.ext_iff, OneMemClass.coe_one]
+    refine ⟨?_, fun hx => by simp [hx]⟩
+    rintro ⟨hxM, hxH⟩
+    have hx : (x : G) ∈ H ⊓ M := ⟨hxH, hxM⟩
+    rw [hHM_bot, mem_bot] at hx
+    exact hx
+  · rw [Set.eq_univ_iff_forall]
+    intro x
+    obtain ⟨m, hmM, h, hhH, hmh⟩ := hmul x x.2
+    refine ⟨⟨m, hM_le_U hmM⟩, hmM, ⟨h, hH_le_U hhH⟩, hhH, ?_⟩
+    ext
+    exact hmh
+
 /-- A finite quotient by a nontrivial subgroup has strictly smaller cardinality.
 
 This is the induction/minimal-counterexample termination bridge used repeatedly when passing
