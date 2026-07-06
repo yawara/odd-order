@@ -103,3 +103,27 @@ V/W₂ ⇄ type-P 構造の reconciliation) + **d=1** (v=|V|)。S07 coherence / 
 transport→structural glue、全 proven/green)。char body は lane-b の `reconciled_typePData_T` + `d=1` landing 待ち
 (consume 態勢)。案 A の §13 generalization に **`reconciled_typePData_T` の discharge (or type-III-usable な
 V-abelian/Frobenius export)** を含めれば C が即 cite で count→coherence→β_S→ratio を組める。
+
+## 🟢 追記³ (2026-07-06 lane c /loop) — `reconciled_typePData_T` を complement-conjugacy で partial discharge (5→4)
+
+`reconciled_typePData_T` (S15_SAndT_Setup:4035) の 5 structural sorried field を精査、**upstream-only な
+complement-conjugacy で closable なものを実証明** (commit `fc2a1523`):
+
+- ✅ **`U_nilpotent` (V nilpotent) landed** — 新 `Hypothesis.isNilpotent_V`: `V` と bare 型-P complement
+  `tpd0.U` (`typePData_of_isTypeNonI T_nonI`) は共に `Q=T_F` を `T'=QV` で complement → Schur–Zassenhaus
+  共役 (`exists_conj_of_coprime`, coprimality from `Q` Hall) が `tpd0.U → V` を写し `IsNilpotent` を transport。
+  S16 `isMulCommutative_typePData_U_of_V` の mirror。**upstream-only facts のみ**ゆえ Setup 位置で証明可能。
+
+- ⏭ **`fitting_eq` / `secondDerived_le_fitting` は同 U-conjugacy で closable (次 iteration 実装予定)**:
+  `TypePData.conj (MulAut.conj g)` (g = 上記共役元、g∈T ゆえ `(conj g)•T=T`) で `tpd0` を写すと `d.U=V`,
+  `d.H=Q` (Q は conj-invariant) → `d.fitting_eq`/`d.secondDerived_le_fitting` が reconciled 版を直接供給
+  (Q/F(T)/T'' は char/normal ゆえ conj-invariant、U-factor のみ V に写る)。要 subgroupOf→G-level lift
+  (`map_map` + `map_subgroupOf_eq_of_le` + `pointwise_mulAut_smul_eq_map`) + cast (`eq_rec_constant`)。
+
+- 🔒 **`W2_le` (W₁≤Q⊓T'') / `centralizer_W1` は残 gate**: W-factor alignment (`tpd0.W1^g=W₂`) 要 =
+  full simultaneous reconciliation、OR downstream `W1_le_Q` (S15_SAndT:1218) の上流 hoist。**file topology
+  block**: reconciled は Setup(上流)、ingredient は S15_SAndT/S13(下流) → reconciled を下流移動 or
+  ingredient 上流 hoist が要 (lane-b/hub 設計判断)。
+
+**⟹ lane-b へ**: `U_nilpotent` は済 (重複回避)。残 4 field の内 `fitting_eq`/`secondDerived_le_fitting` は
+上記 recipe で c が続行、`W2_le`/`centralizer_W1` の topology 解消 (下流移動 or hoist) は設計判断。

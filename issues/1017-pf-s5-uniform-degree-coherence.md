@@ -595,3 +595,40 @@ S11:12250) は共に sorry-free だが **existence 1 member のみ**、count ≥
   全 sSet coherence へ、(c) Blocker 2 ((C')^# dade=Ind bridge、下流 tau1S_apply_induce 用、genuine TI content)、
   (d) NEW IsCoherent 組成 → coherent_H0Cprime_S re-point。
 route は完全確定・engine 全 landed、残は上記 4 点 (partly gated on 他レーン §9 sorried lemma + Blocker 2 TI)。
+
+## 2026-07-06 更新 #20 (lane b, subagent VERIFY-FIRST) — ★★Blocker 2 誤診断訂正: (C')^# = ∅ (C'=[C,C]=⊥, type-P₂)
+
+更新 #16/#19 の Blocker 2 (「(C')^# 上 dade=Ind bridge = genuine deep TI content」) は **verify-first で
+誤り** と判明。Coq `FTtypeP_facts` (PFsection13.v:221) の `derG1P (abelianS _ cUU)` を repo で再現:
+
+**LANDED (sorry-free, axioms = [propext, Classical.choice, Quot.sound]、S15 build green 3882 jobs)**:
+- `Hypothesis.Cprime_eq_bot` (S15:~863): type-P₂ で `C' = [C,C] = ⊥`。`C ≤ U` (C_eq) + `U` abelian
+  (`S_U_commutative` = BG 15.1(b)) ⟹ `C` abelian ⟹ `commutator ↥C = ⊥` ⟹ `derivedInG C = ⊥`。**hG 不要**
+  (構造 field のみ)。dadeHypS より clean (§14 sorry-provenance を運ばない)。
+- `Hypothesis.cprimeSharpS_eq_empty` (S15:~888): `C'=⊥` ⟹ `(C').subgroupOf S = ⊥` ⟹
+  `cprimeSharpS = sharp({1}) = {1}\{1} = ∅`。
+
+**⟹ Blocker 2 は誤枠組み**: `H0CprimeSupport = cprimeSharpS = ∅` (type-P₂)。
+`zSupportedSpan 𝒮 ∅ = {0}` ⟹ `IsCoherent.extends_on_supported` は **∅-support 上 vacuous** (0 関数のみ)。
+`(C')^#` 上で dade=Ind を要求する下流は無い。Blocker 2 が言う「(C')^# dade=Ind bridge」は不要。
+
+**★但し本当の gap は別: `H0CprimeSupport = (C')^#` 自体が退化した support 選択**。Coq (13.2.d) の実 coherence
+support は `S^#` (`coherent calS S^# tau`, PFsection13:197)。下流 `tau1S_apply_induce_sub` が要する
+`tau1S(Ind θ − Ind θ')=Ind(...)` は等次数差 (H^#-supported, 1 で消える) 上で、Coq は
+`Dtau1S`(coherent_with agreement on `Z[calS,S^#]`) + `H^# ⊆ A0(S)` 上 `tau=Ind` (normedTI `Dade_Ind`) で discharge
+(PFsection13:1024-1028)。repo の `tau1S_ofHonest_extends_on_supported` は `H0CprimeSupport=(C')^#=∅` を使うため、
+0 関数にしか効かず、等次数差 (≠0) に効かない。
+
+**⟹ 修正すべきは (a) `mkSection11CharacterDataS_honest.H0CprimeSupport` を `(C')^#`→`S^#` (Coq 準拠) に変更、
+かつ (b) `A(S)` 上 `dade=Ind` を確立** (これが本来の Blocker 2、Coq の `normedTI 'A0(S)` = `Dade_Ind` に対応)。
+(b) は type-P₂ で `A(S)=honestTypeP2ASet S` が **TI-set かどうか**が crux — repo は escaping 分岐
+(`dadeSupportHypothesisData_of_subset_escaping_sigmaSharp`, FT_signalizer nontrivial local subgroup) 経由で
+構成しており、`IsTISubset.centralizer_le` が要求する「A(S) 全点 non-escaping」を満たすかは未検証。Coq は
+`FTtypeP_facts` normedTI 証明 (PFsection13:224-238、`FTsupport_facts`+`typePF_exclusion`+type-1 Frobenius で
+escaping 点の矛盾を導く) で TI 性を確立。⟹ 本物の残 = **`honestTypeP2ASet S` の TI-set 性** (or 等次数差が
+非escaping 部分に supported: type-I `constituent_diff_support_subset_nonescaping` の type-P₂ 類推) を示し、
+`dadeMap_eq_induce_of_supported_on_trivial_H` (S14:2104) を適用。これは genuine multi-lemma BG-§16 content。
+
+**recommended path**: (1) H0CprimeSupport を S^# に変更 [small, but 要 downstream re-check] →
+(2) `A(S)` dade=Ind: type-I 類推で「等次数 sSet 差は A(S)∖escaping に supported」を [Is]6.2 類推で示す
+[genuine, S14 pattern] → (3) NEW `IsCoherent indS 𝒮 S^#` 組成 → coherent_H0Cprime_S re-point。
