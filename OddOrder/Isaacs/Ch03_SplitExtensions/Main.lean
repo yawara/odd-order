@@ -1968,6 +1968,21 @@ theorem Subgroup.IsPiGroup.subgroupOf {G : Type*} [Group G] {π : Set ℕ}
   rw [hcard] at hp
   exact hB p hp
 
+/-- A complement to a `π'`-subgroup is a Hall `π`-subgroup of the ambient subgroup. -/
+theorem isHallSubgroup_subgroupOf_of_complement_pi_pi' [Finite G] {π : Set ℕ}
+    {U H M : Subgroup G} (hH_le_U : H ≤ U) (hM_le_U : M ≤ U)
+    (hH_pi : Subgroup.IsPiGroup π H)
+    (hM_pi' : Subgroup.IsPiGroup {p | p ∉ π} M)
+    (hComp : Subgroup.IsComplement' (M.subgroupOf U) (H.subgroupOf U)) :
+    IsHallSubgroup π (H.subgroupOf U) := by
+  refine ⟨?_, ?_⟩
+  · exact Subgroup.IsPiGroup.subgroupOf hH_le_U hH_pi
+  · have hMsub_pi' : Subgroup.IsPiGroup {p | p ∉ π} (M.subgroupOf U) :=
+      Subgroup.IsPiGroup.subgroupOf hM_le_U hM_pi'
+    intro q hq hq_pi
+    rw [hComp.index_eq_card] at hq
+    exact hMsub_pi' q hq hq_pi
+
 /-- **π-group extension**: `N ⊴ H` で `N` も `H/N` も π-group ⇒ `H` は π-group.
 mathlib `card_eq_card_quotient_mul_card_subgroup` (`|H| = |H/N| * |N|`) +
 `primeFactors_mul` で primes |H| ⊆ primes |H/N| ∪ primes |N| ⊆ π. -/
