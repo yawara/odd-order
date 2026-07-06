@@ -941,6 +941,99 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     sorry
   exact T_typeIII_ratio_le_of_gamma_bridge hyp calT1 Γ Γ₁ x hcount horth hdecomp hΓ₁ hx hnorm
 
+/-- **Complement-conjugacy transfer of commutativity `V → d.U`** (`T`-side, ungated by (14.9)).
+Given that the `κ`-Hall complement `V` of `Q = T_F` in `T' = [T,T]` is abelian, *any* type-`P`
+witness `d` on `T` has its own derived complement `d.U` (the `H = M_F` complement in `T'`) abelian
+too.  Both `V` and `d.U` complement the *same* normal Hall subgroup `Q = d.H` in `T'` (`Q ⋊ V = T' =
+Q ⋊ d.U`), so Schur–Zassenhaus conjugacy inside `↥T'` (`IsComplement'.exists_conj_of_coprime`,
+coprimality from `Q` being Hall in `T`) conjugates `V` onto `d.U`, transporting `IsMulCommutative`.
+
+Structurally the mirror of `S15.isMulCommutative_V` (which runs `d.U → V`); the sole difference is
+that the `(|Q|, |V|)`-coprimality is sourced from `maxNilpotentNormalHall_isHall` +
+`IsHallSubgroup.coprime_index` (with `|V| = [T':Q] ∣ [T:Q]` via the tower law) rather than from a
+`TypeIIData`, so it is available for a *generic* `TypePData d`. -/
+theorem isMulCommutative_typePData_U_of_V [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (d : OddOrder.GroupTheory.TypePData hyp.base.T)
+    (hVcomm : IsMulCommutative ↥hyp.base.V) :
+    IsMulCommutative ↥d.U := by
+  have hdisj : hyp.base.Q ⊓ hyp.base.V = ⊥ := hyp.base.Q_inf_V_eq_bot
+  have hQH : hyp.base.Q = d.H := by rw [hyp.base.Q_eq_TF, d.H_eq]
+  have hQ_le : hyp.base.Q ≤ derivedInG hyp.base.T := by
+    rw [hyp.base.T_deriv_eq_QV]; exact le_sup_left
+  have hV_le : hyp.base.V ≤ derivedInG hyp.base.T := by
+    rw [hyp.base.T_deriv_eq_QV]; exact le_sup_right
+  have hM'_le_T : derivedInG hyp.base.T ≤ hyp.base.T := Subgroup.map_subtype_le _
+  have hQ_le_T : hyp.base.Q ≤ hyp.base.T := by
+    rw [hyp.base.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.base.T
+  have hT_le_NQ : hyp.base.T ≤ Subgroup.normalizer (hyp.base.Q : Set G) := by
+    rw [hyp.base.Q_eq_TF]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.base.T
+  haveI hQn_normal : (hyp.base.Q.subgroupOf (derivedInG hyp.base.T)).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hQ_le).mpr (hM'_le_T.trans hT_le_NQ)
+  have hVcompl : (hyp.base.Q.subgroupOf (derivedInG hyp.base.T)).IsComplement'
+      (hyp.base.V.subgroupOf (derivedInG hyp.base.T)) := by
+    refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
+    · rw [disjoint_iff]
+      ext ⟨x, hx⟩
+      simp only [Subgroup.mem_inf, Subgroup.mem_subgroupOf, Subgroup.mem_bot, Subtype.ext_iff,
+        OneMemClass.coe_one]
+      refine ⟨fun ⟨hxQ, hxV⟩ => ?_, fun h => by simp [h]⟩
+      have hxQV : x ∈ (hyp.base.Q ⊓ hyp.base.V : Subgroup G) := ⟨hxQ, hxV⟩
+      rwa [hdisj, Subgroup.mem_bot] at hxQV
+    · have hsup : (hyp.base.Q.subgroupOf (derivedInG hyp.base.T)) ⊔
+          (hyp.base.V.subgroupOf (derivedInG hyp.base.T)) = ⊤ := by
+        rw [← Subgroup.subgroupOf_sup hQ_le hV_le, hyp.base.T_deriv_eq_QV.symm,
+          Subgroup.subgroupOf_self]
+      have hmul := Subgroup.normal_mul (hyp.base.Q.subgroupOf (derivedInG hyp.base.T))
+        (hyp.base.V.subgroupOf (derivedInG hyp.base.T))
+      rw [hsup, Subgroup.coe_top] at hmul
+      exact hmul.symm
+  have hV'compl : (hyp.base.Q.subgroupOf (derivedInG hyp.base.T)).IsComplement'
+      (d.U.subgroupOf (derivedInG hyp.base.T)) := by
+    rw [hQH]; exact d.derived_complement
+  have hcop : Nat.Coprime (Nat.card ↥(hyp.base.Q.subgroupOf (derivedInG hyp.base.T)))
+      ((hyp.base.Q.subgroupOf (derivedInG hyp.base.T)).index) := by
+    -- `|Q|` (Hall in `T`) is coprime to `[T:Q]`; and `[T':Q] ∣ [T:Q]` by the tower law
+    -- (`Q ≤ T' ≤ T`).  `(Q.subgroupOf T').index = Q.relIndex T' ∣ Q.relIndex T`.
+    have hHall := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall hyp.base.T
+    rw [← hyp.base.Q_eq_TF] at hHall
+    have h0 := OddOrder.Isaacs.Ch03.IsHallSubgroup.coprime_index hHall
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQ_le_T).toEquiv] at h0
+    -- `h0 : Nat.Coprime (Nat.card ↥Q) (Q.relIndex T)`
+    have hcard : Nat.card ↥(hyp.base.Q.subgroupOf (derivedInG hyp.base.T)) = Nat.card ↥hyp.base.Q :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQ_le).toEquiv
+    have hdvd : (hyp.base.Q.subgroupOf (derivedInG hyp.base.T)).index ∣
+        (hyp.base.Q.subgroupOf hyp.base.T).index := by
+      have htower : hyp.base.Q.relIndex (derivedInG hyp.base.T) *
+          (derivedInG hyp.base.T).relIndex hyp.base.T = hyp.base.Q.relIndex hyp.base.T :=
+        Subgroup.relIndex_mul_relIndex hyp.base.Q (derivedInG hyp.base.T) hyp.base.T hQ_le hM'_le_T
+      show hyp.base.Q.relIndex (derivedInG hyp.base.T) ∣ hyp.base.Q.relIndex hyp.base.T
+      exact ⟨(derivedInG hyp.base.T).relIndex hyp.base.T, htower.symm⟩
+    rw [hcard]
+    exact Nat.Coprime.coprime_dvd_right hdvd h0
+  have hQ_lt_top : hyp.base.Q < ⊤ :=
+    lt_of_le_of_lt hQ_le_T (lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hyp.base.T_maximal).1)
+  haveI hQsolv : IsSolvable ↥hyp.base.Q := hG.solvable_of_lt_top hyp.base.Q hQ_lt_top
+  have hsolv : IsSolvable ↥(hyp.base.Q.subgroupOf (derivedInG hyp.base.T)) ∨
+      IsSolvable (↥(derivedInG hyp.base.T) ⧸ hyp.base.Q.subgroupOf (derivedInG hyp.base.T)) :=
+    Or.inl (solvable_of_solvable_injective
+      (f := (Subgroup.subgroupOfEquivOfLe hQ_le).toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe hQ_le).injective)
+  obtain ⟨n, _hnQ, hn⟩ :=
+    Subgroup.IsComplement'.exists_conj_of_coprime hcop hsolv hVcompl hV'compl
+  -- `hn : (V.subgroupOf T').map (conj n) = d.U.subgroupOf T'`.  Push `V` commutative forward.
+  have hVsub : IsMulCommutative ↥(hyp.base.V.subgroupOf (derivedInG hyp.base.T)) :=
+    OddOrder.GroupTheory.isMulCommutative_of_mulEquiv
+      (Subgroup.subgroupOfEquivOfLe hV_le).symm hVcomm
+  have hmapped : IsMulCommutative
+      ↥((hyp.base.V.subgroupOf (derivedInG hyp.base.T)).map (MulAut.conj n).toMonoidHom) :=
+    OddOrder.GroupTheory.isMulCommutative_of_mulEquiv
+      (Subgroup.equivMapOfInjective _ _ (MulAut.conj n).injective) hVsub
+  rw [hn] at hmapped
+  exact OddOrder.GroupTheory.isMulCommutative_of_mulEquiv
+    (Subgroup.subgroupOfEquivOfLe d.U_le) hmapped
+
 /-- **Peterfalvi (11.9)/(14.9), the Type-IV exclusion residual** — the genuine deep content of the
 type determination.  Coq `FTtype34_structure` (Peterfalvi (11.9), `PFsection11.v:1001`, consumed at
 `PFsection14.v:735`) pins a non-type-II type-`P` maximal `T` to Type III (not IV) via the
@@ -959,8 +1052,12 @@ theorem T_not_isTypeIV_of_isTypeP1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
     (hyp : Hypothesis (G := G)) (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T) :
     ¬ OddOrder.GroupTheory.IsTypeIV hyp.base.T := by
   -- Coq (11.9) `FTtype34_structure` ⟹ `typeP_Galois T` ⟹ (in the `IsMulCommutative U` presentation)
-  -- the `U = V` factor is abelian, so `T` is Type III not IV.  The deep character/projection argument.
-  sorry
+  -- the `U = V` factor is abelian, so `T` is Type III not IV.  The deep character/projection argument
+  -- is now isolated to the single residual `hVcomm` (`V` abelian); everything else is the honest
+  -- complement-conjugacy transfer `isMulCommutative_typePData_U_of_V`.
+  have hVcomm : IsMulCommutative ↥hyp.base.V := sorry  -- (11.9)/(9.7) σ-theory residual: V (=T's U-factor) abelian
+  rintro ⟨d⟩
+  exact d.U_not_commutative (isMulCommutative_typePData_U_of_V hG hyp d.typeP hVcomm)
 
 /-- **Peterfalvi (14.9), the type determination** — Coq `PFsection14`
 `have [_ _ [Ttype3 _]] := FTtype34_structure maxT TtypeP notTtype2` (line 735): a type-`P` maximal
