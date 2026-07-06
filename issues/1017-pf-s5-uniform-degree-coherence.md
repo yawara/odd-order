@@ -408,3 +408,23 @@ lane-b の未マージ commit (`main..b`) が §5 coherence 実装を含むた�
    **9014 OPEN 維持**、mu2Grid は削除でなく PrimeTIResidue へ移設。詳細裁定 = **issue 9014 の HUB RULING**。
    lane-b の held merge は「PrimeTIResidue 削除を含めない + mu2Grid を S05 から PrimeTIResidue へ移設 +
    9014 を close しない」に restructure 要 (S07_Subcoherent carve-out・S15:629 witness closure は不変)。
+
+## 2026-07-06 更新 #12 (lane b) — R-datum route 確定: dadeCharacterDifferenceImageOfDiff + hconj landed
+
+constructor (9014) 完了後、S15 R-datum (coherent_H0Cprime_S 再grounding の残 crux) を精査:
+
+- **R-datum の一般 constructor は存在**: `S07.dadeCharacterDifferenceImageOfDiff` (S07_Coherence:5603) —
+  `(hyp : S04.Hypothesis) (hconj) (χ : IrreducibleCharacter L) (hreal : ¬IsReal χ) (hdiffsupp : (χ̄-χ).support ⊆ supportInSubgroup A L)` から
+  `CharacterDifferenceImage τ χ` (= `τ(χ-χ̄)=±(μ-ν)`) を産む。S14 の R1cdi (S14:744) が同 pattern で使用。
+- **揃った入力**: dadeHypS (S04.Hypothesis, landed) / **dadeHypS_hconj (hconj, landed 更新 #12)** /
+  sSet_hasNoRealCharacters (hreal, landed) / τ+hiso = `dadeHypS.fullDadeIsometryData dadeHypS_hconj`。
+- **残 R-datum 入力 2 点**: (a) **family member の irreducibility** — dadeCharacterDifferenceImageOfDiff は
+  `χ : IrreducibleCharacter L` を要す。𝒮={Ind ξ} の member が既約か要確認 (residue Ind は reducible=μ_j ゆえ
+  𝒮 全体は非既約混在の可能性 → subcoherence family は既約 constituent か既約 subfamily の要精査)。
+  (b) **hdiffsupp** — support(φ̄-φ) ⊆ supportInSubgroup A(S) (A(S)=honestTypeP2ASet、構造的)。
+- **その後**: R-datum → `irrSubcoherent τ A(S) Rdatum hconj hreal hortho hiso` → S07.Hypothesis →
+  clifford_dichotomy case-split (Galois=caseB uniform degree + coherentEqualDegree_fromDade / 非Galois=pair-chain) →
+  coherent_H0Cprime_S を honest route へ re-point。
+
+次 = (a) subcoherence family の既約性を精査 (𝒮 の member 既約性 or 既約 subfamily の特定) + (b) hdiffsupp。
+これが R-datum の残 genuine content。
