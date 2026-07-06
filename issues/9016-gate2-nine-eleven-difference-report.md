@@ -43,20 +43,44 @@ gate-2 は gluing engine に `hY : IsCoherent hyp.tau (hyp.Sset \ hyp.SHCSet) hy
 - [ ] gluing: `coherentUnion_of_glued_withDiagonal` (S07:4628; S₂ は orthonormal でないので
   `_of_orthonormal` 版は不可、`hcol` から `hDτ` を供給)。
 
-## landed this session (lane-a, build-green, sorry/axiom 新規 0)
+## ★ update (skeleton 執行で判明): gate-2 は **2 obligation** — §14 だけでない
+
+gated-endpoint skeleton を実際に組んで判明した decisive な追加 blocker:
+**S07 の gluing engine は全て glued map `ν` を _input_ で取り、唯一の `ν` _constructor_
+(`coherentImageMapGlue`/`exists_integralCharacterMap_glue_of_orthonormal`) は両 family orthonormal を要求する。**
+gate-2 の `S₂` は **non-orthonormal** (reducible/degree-`qu` の induced `μ_j`) ゆえ **`ν` を構成する術が
+repo に無い**。⟹ gate-2 は single §14 sorry に還元 **不可能**。obligation は 2 本:
+
+1. **`hY` = S₂ coherence** (§14/§9-gated, 上記「診断」)。
+2. **non-orthonormal `S₂` 用の `τ₃` glue-map constructor** = **genuinely-missing S07 infra**
+   (Pf (5.3.b)/(5.5)/(6.8.1)-style; 「非 orthonormal な Y-side をもつ 2 coherence extension を貼り合わせ、
+   共有 supported lattice 上で `τ` に restrict する `ν` を作る」)。**これが (11.8.6) の deep char 本体**。
+   S07 は lane-b carve-out だがこの constructor は不在 → **lane-b coherence infra として要 build**。
+
+## landed this session (lane-a, build-green)
 
 - `dc7a7792` set-decomposition primitives `SHCSet_subset_Sset` / `Sset_eq_SHCSet_union_diff`
   (gluing engine の set-level 入力、reusable) + carrier-bridge map (note update²⁶)。
 - `3cab3822` note refinement (致命傷 3 = difference vs full 𝒮)。
+- `40919f42` **`coherent_Sset_of_glued`** (sorry-free glue wrapper: `coh`+`hY`+τ₃-data → gate-2 goal;
+  gluing engine が (11.8.6) union で compose することを実証) + **`coherent_Sset_diff_SHCSet`**
+  (correctly-typed §14-gated `hY` obligation, 唯一の新 sorry, false-hoist でない)。gate-2 body は
+  `ν` 未構成ゆえ依然 sorried (reduction path を comment 化)。
+- `4dd6f3c8` note update²⁷。
+- full build green (feitThompson single sorry 不変、新 axiom 無)。
 
 ## 完了条件
 
-gate-2 `coherent_Sset_of_column_identities` の sorry が (9.11)-difference cite で閉じる
-(= 上記 4 ステップ landed、(9.11) 本体は §14/sibleyTarget で継続 sorried でも skeleton 可)。
+gate-2 `coherent_Sset_of_column_identities` の sorry が `coherent_Sset_of_glued coh hY ν …` で閉じる
+= **両 obligation** landing: (1) `hY` (§14/sibleyTarget で sorried skeleton 可) + (2) `ν` constructor
+(non-orthonormal glue, missing S07 infra、lane-b coherence 領域)。片方だけでは閉じない。
 
 ## 参照
 
-- 正本 note: `notes/peterfalvi/s13_11_8_orthogonality.md` (update²⁶ + 致命傷 1-3)。
-- 関連: 7001 (sibleyTarget §14 gate)、2030 (S9 carrier keystone)、9014 (lane-b prime-TI, 別 gate 10.7/10.8)。
-- hub 含意: lane-a ungated 群論 frontier 完遂済 (roadmap update²²-²⁵)。次 lane-a 方針 = この deep re-port に
-  fresh budget を割くか、§14/lane-b unblock を待って redirect するか要 hub 判断。
+- 正本 note: `notes/peterfalvi/s13_11_8_orthogonality.md` (update²⁶ + 致命傷 1-3 + update²⁷)。
+- 関連: 7001 (sibleyTarget §14 gate)、2030 (S9 carrier keystone)、9014 (lane-b prime-TI, 別 gate 10.7/10.8)、
+  1017 (lane-b coherence infra)。
+- **hub 含意**: gate-2 の 2 obligation は共に **cross-lane** — (1) §14 sibleyTarget (lane-c/§14)、
+  (2) non-orthonormal glue-map constructor (**lane-b の S07 coherence carve-out**)。lane-a の on-path
+  frontier (群論 + gluing wrapper + obligation 分離) は**完遂**。次は lane-b/§14 の 2 obligation build 待ち、
+  または hub が (2) の non-orthonormal glue constructor を lane-b にアサイン。
