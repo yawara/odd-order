@@ -2098,3 +2098,41 @@ coordinator が「(9.11) sorry に還元する build-green skeleton を組め (g
 `coherent_Sset_diff_SHCSet`)、(ii) 非直交 τ₃ glue-map constructor (新 S07 infra)。
 wrapper `coherent_Sset_of_glued` が両者を受けて full coherence を出す骨格は sorry-free で landed。
 full build green (3931 jobs, AxiomsCheck OK, feitThompson sorry 1 本不変・新 axiom 無し)。
+
+## 2026-07-06 update²⁸ (lane-a /loop, HUB RULING obl.2) — ★ 非直交 `ν` constructor **LANDED** (commit a39e2934)
+
+update²⁷ が「真の残 gap = 非直交 S₂ 上の ν constructor 不在」と特定した obligation-2 を **完遂**。
+2 route で教科書裏取り (2 並列 Explore):
+- **Peterfalvi (6.8.1)** (mmd `04.8` L176): 「τ₃ = the ℤ-linear mapping from ℤ[X∪Y] which
+  coincides with τ₁ on Y and with τ₂ on X」。族は **pairwise orthogonal だが orthonormal 不要**
+  ((5.6)(c)/(5.2) は `pairwise_orthogonal` のみ要求)。抽象的線形拡張であって dual-basis/projection
+  の明示式ではない。
+- **mathcomp `bridge_coherent`** (`PFsection5.v:1000`): `Zisometry_of_cfnorm oS3 oY normY Z_Y` で
+  「直交源列 S1++S2 + 直交像列 tau1(S1)++tau2(S2) + norm 一致 → isometry tau3, tau3=τ₁ on S1,
+  =τ₂ on S2」。`subcoherent` (c) = `pairwise_orthogonal S` (norm > 1 可)。
+
+### ★ framing 訂正: obligation-2 は「deep char 本体」でなく線形代数だった
+update²⁷ は ν constructor を「(11.8.6) の genuine な深部」と評したが、engine
+`coherentUnion_of_glued*` が `hmixed`(=himg_ortho, (6.7) 合同) と `hDτ`((6.8.1) b≡0) を **別引数**で
+受け取るので、ν constructor が背負うのは **hagreeX+hagreeY のみ**。orthonormal 版
+`coherentImageMap η X φ = ∑ⱼ⟨φ,χⱼ⟩•Xⱼ` の一般化 = 各 Fourier 係数を squared-norm `⟨χⱼ,χⱼ⟩` で割る
+= `coherentImageMap η (fun j => ⟨χⱼ,χⱼ⟩⁻¹ • Xⱼ)`。直交族で `ν(χₖ)=⟨χₖ,χₖ⟩•⟨χₖ,χₖ⟩⁻¹•Xₖ=Xₖ`
+(cross term は ⊥ で消える、`⟨χₖ,χₖ⟩≠0` 要)。deep char は `hmixed`/`hDτ` 側 (別 obligation)。
+
+### landed (sorry-free, additive)
+- `S07.IntegralCharacterMap.coherentImageMap_apply_eq_of_orthogonal` / `coherentImageMapGlueOrthogonal`
+  (+ `_apply_left`/`_right`) / `exists_integralCharacterMap_glue_of_orthogonal` (集合版存在)。
+  b の orthonormal glue (S07:3196/3229) 非接触。
+- `S12_Core.inducedFamily_finite` (𝒮 = 有限 Irr(M') の Ind 像) / `inducedFamily_inner_self_ne_zero`
+  (Ind θ(1)=[M:M']·θ(1)≠0 → 正定値で ⟨φ,φ⟩≠0)。
+- `S12.Hypothesis.exists_glue_nu` — coh + hY から (11.8.6) `ν` を **直接構成**
+  (S₁,S₂ ⊆ pairwise-orth 𝒮 of nonzero norm, S₁⊥S₂ = SHCSet_inner_diff_eq_zero)。honest doneness
+  実証 = constructor は dead infra でなく gate-2 世界で使える。
+
+### gate-2 residual (更新)
+`coherent_Sset_of_column_identities` は `coherent_Sset_of_glued coh hY (exists_glue_nu coh hY).choose …`
+で **ν 部分を discharge 可能**。残 = **(1) hY** (`coherent_Sset_diff_SHCSet`、§9/§14-gated、b/§14)
++ **(2) (6.8.1) b≡0 char content** = `hmixed`(image ⊥)・`D`/`hDτ`(cross-diagonal)・`hgen`(generation)、
+全て `hcol` (column identities、capstone hypothesis ゆえ call-site 利用可) から (6.8.1) 論法で導出。
+**ν-construction obligation は residual から消滅**。次の deep frontier = (2) の hcol→(6.8.1) 導出。
+full build green (3933 jobs, feitThompson sorry 1 本不変・新 axiom 無し)。
