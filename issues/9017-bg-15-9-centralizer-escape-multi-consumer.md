@@ -12,6 +12,30 @@ created: 2026-07-06
 > gate と判明。lane b (Pf §13 coherence) と lane c (S16) が共に下流。**現状どのレーンも未 claim** (9000 scan 済)。
 > owner/分担は hub 裁定。本 issue = gate の可視化 + dedup。
 
+## ⚖️ HUB RULING (2026-07-06 夕, レーン分担監査 + ユーザー裁可「b の drift 追認」) — **owner = lane b**
+
+7-agent レーン分担監査 (branch tip code-level 検証 + adversarial critic) で、BG §15/§16 が
+「**共有凍結**」と誤ラベルされたまま **計 4 bare sorry** (`S15_MF.lean` の Thm 15.8 `tau2_transfer_constraint`
++ Cor 15.9 `centralizer_escape_final_local`、`S16_MainResults.lean` の 2 本) を残し、b の Pf §13 coherence
+(1017 G2) と BG-side S16 endgame の**両方を binding する真の bottleneck** かつ **どのレーンも正式 owner でない**
+と確定。b は既に本 chain を ad-hoc に drive 済 (更新 #1/#2: chain BOUNDED を確定・`card_kappaHall_prime_of_isTypeP2`
+landed) ⟹ **trajectory 保全としてこの drift を追認、BG §15/§16 node の owner = lane b** (ユーザー裁可 2026-07-06)。
+
+**裁定内容**:
+1. **owner = lane b**。`OddOrder/BG/Ch4_FamilyOfMaximal/{S15_MF.lean §15.8/15.9 部, S16_MainResults.lean}` の
+   BG §15/§16 残 sorry は **b の active territory** (merge_monitor 🔒 マップ + owned_re を更新、「BG=共有凍結」は
+   この node について解除)。他 BG/** は従来どおり共有凍結。
+2. **Thm 15.8 `tau2_transfer_constraint` の signature 訂正を承認** (更新 #2 coordination point (ii))。現 signature は
+   `H` を `hHtau` のみで導入し M との signalizer-neighbour link を欠く = **unsound (tau2 H={|K|} 導出不能)**、
+   かつ **consumer 0**。Coq 準拠 (Mstar/U/r/R/H∈𝓜(N(R)) witness bind) への訂正は「unsound carrier の是正 + consumer 0」
+   ゆえ STOP 条件でなく**推奨**。b は訂正後の sound signature で build してよい (訂正内容は本 issue に記録)。
+3. **S16→S15 architectural hoist を承認** (更新 #1/#2 coordination point (iii))。`typeF_frobenius_of_tau2_prime_free`
+   を S16_Lemma1413 から S15 上流へ hoist (or Cor 15.9 relocate)。BG-side S16 は本裁定で **b 所有**ゆえ import cycle
+   解消の hoist は b の territory 内 (lane c の Peterfalvi `S16_NonExistenceG.lean` には**跨らない** — critic 検証:
+   c の所有 file は本 escape node を参照 0)。
+4. **prime-TI (9014) / §5 coherence (1017-arith) は本 gate ではない** (監査で code-verified: PrimeTIResidue.lean /
+   S07_Subcoherent.lean 共 0-sorry、Merge 'b' で landed)。1017 が ~23 iteration 後に収束した先が本 node。
+
 ## 何が gate か
 
 **`centralizer_escape_final_local` (`OddOrder/BG/Ch4_FamilyOfMaximal/S15_MF.lean:9407`) = BG Cor 15.9**

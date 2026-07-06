@@ -622,3 +622,13 @@ Current-state audit: `PrimeTIResidueData.ofS06Hypothesis` is present in
 `OddOrder/GroupTheory/RepresentationTheory/PrimeTIResidue.lean`, the issue's item 1-5 ruling is
 implemented, and the remaining §10 consumer wiring belongs to lane-a's downstream issue rather than
 this shared foundation claim. Move to `issues/closed/`.
+
+## ⚖️ HUB 補足 (2026-07-06 夕, レーン分担監査) — **KEEP+OPEN 維持、frontier gate ではない**
+
+上の lane-d closure 提案は hub が却下済 (commit `8167ab01` reopen; codex 越権是正)。分担監査で code-verified:
+**`PrimeTIResidue.lean` = 0 bare sorry、`ofS06Hypothesis` constructor 実装済** ⟹ **foundation は build 済、
+現 FT frontier の gate ではない**。当セッション冒頭で hub が「prime-TI が a/b の open な bottleneck」と仮説した
+のは **stale** (訂正済); 真の gate は BG §15/§16 (issue 9017、lane b owner)。本 9014 が OPEN なのは
+**§5/§8/§10 downstream coherence upgrade** (`uniform_prTIred_coherent` / `FTtypeP_coherent_TIred`、posited
+`primeTIred` 上に signature-contract で build、(10.7) `typeII_derived_frobenius` feeder = lane-a §10 path)
+が未 build ゆえのみ。**新規レーンを本 issue に張り付けない** (9000 型の a-vs-d 重複衝突を招く)。
