@@ -3821,15 +3821,87 @@ theorem Hypothesis.Sset_eq_SHCSet_union_diff [Finite G] {M : Subgroup G} (hyp : 
   (Set.union_diff_cancel hyp.SHCSet_subset_Sset).symm
 
 open scoped FiniteInduce in
+/-- **Peterfalvi (11.8.6) prerequisite: `S₂ = S(C) − S(HC)` is coherent** (the `hY` gluing input;
+§9/§14-gated, named obligation).
+
+This is Peterfalvi's "By (9.11), `𝒮(H₀C') − 𝒮(HC')` is coherent, whence `𝒮₂` is coherent by (11.7)"
+(mmd 04.13 L67).  It is the `S₂`-side coherence `hY` that `coherent_Sset_of_glued` and the (11.8.6)
+capstone `coherent_Sset_of_column_identities` consume — with `S₂ = hyp.Sset \ hyp.SHCSet` (the
+`S(C) − S(HC)` difference of the pinned §10 induced family).
+
+Reduction status (see `notes/peterfalvi/s13_11_8_orthogonality.md` update²⁶): the underlying content
+is (9.11) `S11.coherent_H0C_commutator`, itself gated on `S11.sibleyTarget_H0C` (§14 Sibley setup +
+lane-b (6.8)).  Three carrier obstructions block a direct sorry-free cite of (9.11) here:
+(1) the `S11.Section11CharacterData` bridge `mkSection11CharacterData` sets `H0CprimeSupport := ∅`,
+but `IsCoherent … ∅` is unconstructible (`zSupportedSpan S ∅ = {0}` kills `nonzero`);
+(2) (9.11) is stated for the *difference* `𝒮(H₀C') − 𝒮(HC')`, whereas the repo's
+`coherent_H0C_commutator` concludes on the *full* `chars.S = sSet data`;
+(3) the world-bridge `sSet`/`sOf` (§9) ↔ `inducedFamily` (§10) `𝒮₂ = hyp.Sset ∖ hyp.SHCSet` is
+unformalized.  Honest close = re-port (9.11) as `SOf`-difference coherence + (11.7) collapse, deep
+char work coordinated with §14/lane-b.  Left as a single §14-gated `sorry` of the correct
+difference-coherence signature (NOT a false-hypothesis hoist). -/
+theorem Hypothesis.coherent_Sset_diff_SHCSet [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Sset \ hyp.SHCSet) hyp.A0) := by
+  sorry
+
+open scoped Classical FiniteInduce in
+/-- **(11.8.6) gluing wrapper: `S(C) = S(HC) ∪ S₂` coherence from the glued `τ₃` data** (sorry-free).
+The pure-algebra half of Peterfalvi (11.8.6): given the two coherences `coh` (`S(HC) = S₁`, `τ₁`) and
+`hY` (`S₂ = S(C) − S(HC)`, `τ₂`), a glued integral map `ν` agreeing with `coh.extension` on `S₁` and
+with `hY.extension` on `S₂` (`hagreeX`/`hagreeY` — Peterfalvi's `τ₃`), the mixed isometry `hmixed`,
+and the supported cross-diagonal set `D` on which `ν = τ` (`hDτ`, the `hcol` column identities feed
+this) with the enlarged generation hypothesis `hgen`, the full family `S = S(C)` is coherent.
+
+This packages the S07 gluing engine `coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal`
+for the (11.8.6) union: the source-orthogonality `hsrc_ortho` is discharged internally from the
+landed `span_inner_SHCSet_diff_eq_zero` (`S₁ ⊥ S₂` at span level), and the conclusion is rewritten
+from the union form to `hyp.Sset` via `Sset_eq_SHCSet_union_diff`.  What remains for the caller is
+exactly the genuine (11.8.6) glue data: `hY` (the §9/§14-gated `S₂` coherence) and the `τ₃`
+construction (`ν`, `hagreeX`, `hagreeY`, `hmixed`, `D`, `hDτ`, `hgen`) driven by `hcol`. -/
+noncomputable def Hypothesis.coherent_Sset_of_glued [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
+    (hY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Sset \ hyp.SHCSet) hyp.A0)
+    (ν : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G)
+    (hagreeX : ∀ x ∈ hyp.SHCSet, ν x = coh.extension x)
+    (hagreeY : ∀ y ∈ hyp.Sset \ hyp.SHCSet, ν y = hY.extension y)
+    (hmixed : ∀ x ∈ hyp.SHCSet, ∀ y ∈ hyp.Sset \ hyp.SHCSet,
+      ClassFunction.inner (ν x) (ν y) = ClassFunction.inner x y)
+    (D : Set (ClassFunction ↥M ℂ)) (hDτ : ∀ d ∈ D, ν d = hyp.tau d)
+    (hgen : OddOrder.Peterfalvi.S07.zSupportedSpan (hyp.SHCSet ∪ (hyp.Sset \ hyp.SHCSet)) hyp.A0 ⊆
+      Submodule.span ℤ (OddOrder.Peterfalvi.S07.zSupportedSpan hyp.SHCSet hyp.A0 ∪
+        OddOrder.Peterfalvi.S07.zSupportedSpan (hyp.Sset \ hyp.SHCSet) hyp.A0 ∪ D)) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A0 := by
+  haveI := hyp.finiteG
+  rw [hyp.Sset_eq_SHCSet_union_diff]
+  exact OddOrder.Peterfalvi.S07.coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal
+    coh hY ν hagreeX hagreeY
+    (fun _ hu _ hv => hyp.span_inner_SHCSet_diff_eq_zero hu hv) hmixed D hDτ hgen
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.6), the τ₂ union-coherence** (the deep capstone step, named obligation).
 From the column identities `(μ_j − dζ)^τ = ∑_i ω_{ij}^σ − dζ^{τ₁}` (`0 < j`, all rows; `τ₁ = coh`),
 the whole family `S = S(C) = inducedFamily M` is coherent.  Peterfalvi's argument: `S₂ = S(C) − S(HC)`
-is coherent (`τ₂`) by (11.7)/(9.11); the column identities give `μ_j^{τ₂} = ∑_i ω_{ij}^σ` (via
-(4.9)/(5.8)), so the `τ₁` (= `coh`) and `τ₂` extensions glue into a coherent extension of the whole
-`S(C) = S₁ ∪ S₂` — the glued map is `exists_integralCharacterMap_glue_of_orthonormal` (S₁ orthonormal
-irreducibles), `coherentUnion_of_glued` discharges the two `IsCoherent` obligations, and
-`S₁^{τ₁} ⊥ S₂^{τ₂}` is (5.3.b)/(5.5).  This is the sole deep §9-gated remainder of (11.8): `S₂`
-coherence (9.11/11.7) and the `μ_j^{τ₂}` identification. -/
+is coherent (`τ₂`) by (11.7)/(9.11) (`coherent_Sset_diff_SHCSet`); the column identities give
+`μ_j^{τ₂} = ∑_i ω_{ij}^σ` (via (4.9)/(5.8)), so the `τ₁` (= `coh`) and `τ₂` extensions glue into a
+coherent extension of the whole `S(C) = S₁ ∪ S₂`.
+
+**Reduction (this session)**: the pure-algebra glue is factored out as the sorry-free wrapper
+`coherent_Sset_of_glued` (decomposition `Sset_eq_SHCSet_union_diff` → S07
+`coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal`, with `S₁ ⊥ S₂` supplied by
+`span_inner_SHCSet_diff_eq_zero`).  What that wrapper still needs from here is exactly two things:
+* `hY` = `coherent_Sset_diff_SHCSet` — the §9/§14-gated `S₂`-coherence (see there for the carrier
+  obstructions);
+* the `τ₃` glue data — a glued integral map `ν` agreeing with `coh.extension` on `S₁` and with
+  `hY.extension` on `S₂`, plus the supported cross-diagonals `D = {∑_i μ_{ij} − dζ}` on which
+  `ν = τ` (`hDτ`, fed by `hcol`) and the enlarged generation `hgen`.
+
+The `ν` construction is the genuine remaining (11.8.6) content: since `S₂` is **not** orthonormal
+(its members are the reducible/degree-`qu` induced `μ_j`), the Fourier glue
+`exists_integralCharacterMap_glue_of_orthonormal` does **not** apply, and no general "glue two
+coherence extensions over a non-orthonormal family" constructor exists in `S07` — building it (the
+τ₃ that restricts to `τ` on the shared supported lattice, Peterfalvi (5.3.b)/(5.5)/(6.8.1) style) is
+the deep step this `sorry` still stands for.  See `notes/peterfalvi/s13_11_8_orthogonality.md`. -/
 theorem Hypothesis.coherent_Sset_of_column_identities [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
@@ -3840,6 +3912,9 @@ theorem Hypothesis.coherent_Sset_of_column_identities [Finite G]
         = (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hG.odd i j)
           - (d : ℂ) • coh.extension ζ) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A0) := by
+  -- Reduces to `coherent_Sset_of_glued coh (coherent_Sset_diff_SHCSet hG hyp).some ν …` once the
+  -- `τ₃` glue data (`ν`, `hagreeX/Y`, `hmixed`, `D = {∑ᵢ μ_{ij} − dζ}`, `hDτ` from `hcol`, `hgen`)
+  -- is constructed — the deep non-orthonormal-`S₂` glue that is the remaining (11.8.6) content.
   sorry
 
 open scoped FiniteInduce in

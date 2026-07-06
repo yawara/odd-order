@@ -2060,3 +2060,41 @@ coherence restriction が直には効かぬ)。
 `S₂ = SOf(⊥)∖SOf(M'')` と表せる。**理想的 next step = (9.11) を S13 `SOf` world で
 `SOf(C)∖SOf(HC)` coherence として再ポート** (現 S11 `sSet`/`∅`-support 版は gate-2 不適合)。
 これは §9 char analysis を §13 `SOf` filtration に載せ替える major work (lane-b/§14 協調)。
+**注意: S13 は S12 を import する (下流) ので、gate-2 (S12) から S13 の `SOf`/`SOf_secondDerived_eq`/
+`exists_hypothesis_of_isTypeIIIorIV` は呼べない**。world-bridge を gate-2 で使うなら S12/S11/S08
+primitive で再構成要 (`inducedFamily_eq_inducedKernelFamily_bot` も S13_SixTwoBridge = 下流)。
+
+## 2026-07-06 update²⁷ (lane-a /loop, coordinator 指示) — ★ gate-2 gated-endpoint skeleton **landed** (commit 40919f42)
+
+coordinator が「(9.11) sorry に還元する build-green skeleton を組め (gated-endpoint pattern)、
+`hY` の 1 sorry のみ authorize」と指示。empirical に組んで landed:
+
+**追加した 2 本 (additive, signature 変更なし)**:
+1. `Hypothesis.coherent_Sset_of_glued` (S12:3862, **sorry-free**) — (11.8.6) の pure-algebra glue
+   wrapper。`coh` + `hY` + 明示 τ₃ glue data (`ν`, `hagreeX/Y`, `hmixed`, `D`, `hDτ`, `hgen`) →
+   full `IsCoherent hyp.tau hyp.Sset hyp.A0`。内部 = `Sset_eq_SHCSet_union_diff` rw +
+   `span_inner_SHCSet_diff_eq_zero` (hsrc_ortho) +
+   `coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal`。**gluing engine が clean に
+   通ることを実証** (instance synth も OK)。
+2. `Hypothesis.coherent_Sset_diff_SHCSet` (S12:3843, **§14-gated 1 sorry** = 唯一の authorized new
+   sorry) — `Nonempty (IsCoherent hyp.tau (hyp.Sset ∖ hyp.SHCSet) hyp.A0)`。correct difference-
+   coherence signature の honest §14 sorry。3 obstruction (∅-support / full-𝒮-vs-diff / world bridge)
+   を docstring 明記。
+
+**gate-2 本体は依然 pre-existing `sorry`** (新規でない)。docstring+comment で還元先を精密記録:
+`coherent_Sset_of_glued coh hY ν … D hDτ hgen` に還元、残りは **τ₃ glue data 構成**。
+
+### ★ 判明した真の残 gap (最重要, 次 iteration の core): **非直交 S₂ 上の ν constructor 不在**
+`coherentUnion_of_glued*` は全て `ν` を **input** に取る (agreement `hagreeX/Y` 付き)。この `ν` を
+構成する repo の手段は `coherentImageMapGlue` / `exists_integralCharacterMap_glue_of_orthonormal`
+(S07:3196/3229) のみで、**両族 orthonormal を要す** (Fourier/Parseval-exact ゆえ `νY` と `χY` 上で
+一致するのは `χY` orthonormal のとき)。**gate-2 の Y=S₂ は非直交** (reducible/deg-qu の `μ_j`) ⟹
+この glue 不適用。**S07 に「非直交族上で coherence 拡張 2 本を glue する ν」constructor 皆無**。
+∴ gate-2 の残 `sorry` の核心 = **Peterfalvi の τ₃ (shared supported lattice 上で `=τ`、
+(5.3.b)/(5.5)/(6.8.1) 流) を非直交 S₂ 向けに構成する S07 infra**。これは (11.8.6) の genuine な
+深部で、`hY` (§14) とは独立の **新 S07 coherence-infra** (lane-b/S07 carve-out 領域だが本体不在)。
+
+**⟹ gate-2 の 2 大残 gap が named lemma で isolate 済**: (i) `hY` = S₂ coherence (§14-gated,
+`coherent_Sset_diff_SHCSet`)、(ii) 非直交 τ₃ glue-map constructor (新 S07 infra)。
+wrapper `coherent_Sset_of_glued` が両者を受けて full coherence を出す骨格は sorry-free で landed。
+full build green (3931 jobs, AxiomsCheck OK, feitThompson sorry 1 本不変・新 axiom 無し)。
