@@ -11393,18 +11393,20 @@ BG Theorem C(1) = `theoremC_paired_structure` conjunct 2): `N_H(U) = H ⊓ N_G(U
 are omitted; the proof establishes `H ∩ M* = D` internally, so they are derivable if needed.
 Translates the Coq `P2type_signalizer` (BGsection14.v L2243).  See `notes/bg/s14_typeP_counting.md`.
 -/
-theorem typeP2_neighbor_is_typeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M K U R : Subgroup G} {r : ℕ} (hM : M ∈ maximalSubgroups G) (hP2 : IsTypeP2 M)
+theorem typeP2_neighbor_is_typeF_of_mem [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K U R H : Subgroup G} {r : ℕ} (hM : M ∈ maximalSubgroups G) (hP2 : IsTypeP2 M)
     (hKM : K ≤ M) (hUM : U ≤ M)
     (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
     (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
     (hUab : ∀ a ∈ U, ∀ b ∈ U, a * b = b * a) (hr : r ∈ piSet U) (hRU : R ≤ U)
     (hR : Ch03.IsHallSubgroup ({r} : Set ℕ) (R.subgroupOf U))
-    (hKNU : K ≤ Subgroup.normalizer (U : Set G)) :
-    ∃ H : Subgroup G,
-      H ∈ maximalSubgroupsContaining (Subgroup.normalizer (R : Set G)) ∧
+    (hKNU : K ≤ Subgroup.normalizer (U : Set G))
+    (hH : H ∈ maximalSubgroupsContaining (Subgroup.normalizer (R : Set G))) :
       IsTypeF H ∧ U ≤ OddOrder.BG.Ch3.S10.Msigma H ∧ M ⊓ H = U ⊔ K ∧
-      ¬ ((H ⊓ Subgroup.normalizer (U : Set G) : Subgroup G) ≤ M) := by
+      ¬ ((H ⊓ Subgroup.normalizer (U : Set G) : Subgroup G) ≤ M) ∧
+      ∃ E E₁ E₂ E₃ : Subgroup G,
+        OddOrder.BG.Ch3.S12.SubgroupESetup H E E₁ E₂ E₃ ∧ K ≤ E ∧
+          K ≤ OddOrder.BG.Ch2.S08.fittingInG E := by
   classical
   have hP : IsTypeP M := hP2.1
   haveI : Fact r.Prime := ⟨Nat.prime_of_mem_primeFactors hr⟩
@@ -11433,13 +11435,8 @@ theorem typeP2_neighbor_is_typeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
     with hKstardef
   obtain ⟨Mst, hMstprop, hMstuniq⟩ := (typeP_duality hG hM hP hKM hK hKstardef).2.2
   obtain ⟨hMstmax, hMstP, hMnc, hMstpair, hZcyc, hZti, hP2or, hcover⟩ := hMstprop
-  -- `H ∈ 𝓜(N_G(R))`: `N_G(R) < ⊤` (since `R ≤ M`, `R ≠ ⊥`, `G` simple), so it has a maximal overgroup.
-  have hNR_lt : Subgroup.normalizer (R : Set G) < ⊤ :=
-    normalizer_lt_top_of_le_of_ne_bot hG hM hRM hRne
-  obtain ⟨H, hHcoatom, hNRH⟩ := (eq_top_or_exists_le_coatom _).resolve_left hNR_lt.ne
-  have hHmax : H ∈ maximalSubgroups G := hHcoatom
-  have hHmem : H ∈ maximalSubgroupsContaining (Subgroup.normalizer (R : Set G)) :=
-    mem_maximalSubgroupsContaining.mpr ⟨hHcoatom, hNRH⟩
+  -- `H ∈ 𝓜(N_G(R))` is now a hypothesis (`hH`); extract maximality and `N_G(R) ≤ H`.
+  obtain ⟨hHmax, hNRH⟩ := mem_maximalSubgroupsContaining.mp hH
   -- `R ≤ H` (from `N_G(R) ≤ H`).
   have hRH : R ≤ H := (Subgroup.le_normalizer).trans hNRH
   -- `K ≤ H` (Coq `sEH`/`sKH`): `R = O_r(U)` is characteristic in abelian `U` (a normal Sylow
@@ -11848,7 +11845,7 @@ theorem typeP2_neighbor_is_typeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
       hcop.dvd_of_dvd_mul_right (hlag ▸ Subgroup.card_dvd_of_le inf_le_left)
     exact (Subgroup.eq_of_le_of_card_ge (le_inf hUM hUFu)
       (Nat.le_of_dvd Nat.card_pos hVdvdU)).symm.le
-  refine ⟨H, hHmem, hFmaxH, hUMsH, ?_, ?_⟩
+  refine ⟨hFmaxH, hUMsH, ?_, ?_, E, E₁, E₂, E₃, hEsetup, hKE, hsK_FE⟩
   · -- Conjunct 3 (`M ⊓ H = U ⊔ K`, Coq L2375-2380): `⊇` is immediate; `⊆` is
     -- `M ⊓ H ⊆ N_M(U) = U ⊔ K` (`defNMU`, BG 6.5(b): `M = M_σ ⋊ (U⊔K)`, `C_{M_σ}(U) = 1`).
     classical
@@ -12021,6 +12018,53 @@ theorem typeP2_neighbor_is_typeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
       · exact absurd ((mem_maximalSubgroups.mp hHmax).2 M hlt) (mem_maximalSubgroups.mp hM).1
       · exact heq
     exact notMGH (by rw [hHeqM])
+
+/-- **BG Corollary 14.12** (mmd L4230), existential form.  For a type-`P₂` maximal `M` with
+`κ`-complement `K` and abelian Hall `(κ ∪ σ)′`-factor `U`, and a Sylow `r`-subgroup `R ≤ U`,
+there is a maximal `H ⊇ N_G(R)` that is type-`F`, with `U ≤ H_σ`, `M ⊓ H = U ⊔ K`, and
+`N_H(U) ⊄ M`.
+
+Convenience wrapper over `typeP2_neighbor_is_typeF_of_mem`: it picks `H` as a maximal overgroup
+of `N_G(R)` (via `eq_top_or_exists_le_coatom`) and drops the `E`-setup export.  Consumers needing
+the σ(H)′-Hall `E` / `K ⊆ F(E)` clauses (Theorem 15.8) call `_of_mem` with their own `H`. -/
+theorem typeP2_neighbor_is_typeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K U R : Subgroup G} {r : ℕ} (hM : M ∈ maximalSubgroups G) (hP2 : IsTypeP2 M)
+    (hKM : K ≤ M) (hUM : U ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hUab : ∀ a ∈ U, ∀ b ∈ U, a * b = b * a) (hr : r ∈ piSet U) (hRU : R ≤ U)
+    (hR : Ch03.IsHallSubgroup ({r} : Set ℕ) (R.subgroupOf U))
+    (hKNU : K ≤ Subgroup.normalizer (U : Set G)) :
+    ∃ H : Subgroup G,
+      H ∈ maximalSubgroupsContaining (Subgroup.normalizer (R : Set G)) ∧
+      IsTypeF H ∧ U ≤ OddOrder.BG.Ch3.S10.Msigma H ∧ M ⊓ H = U ⊔ K ∧
+      ¬ ((H ⊓ Subgroup.normalizer (U : Set G) : Subgroup G) ≤ M) := by
+  classical
+  haveI : Fact r.Prime := ⟨Nat.prime_of_mem_primeFactors hr⟩
+  have hrprime : r.Prime := Fact.out
+  have hRM : R ≤ M := hRU.trans hUM
+  -- `R ≠ ⊥`: `r ∣ |U|` and (Hall) `r ∤ [U : R]`, so `r ∣ |R|`.
+  have hRne : R ≠ ⊥ := by
+    have hlag : Nat.card ↥(R.subgroupOf U) * (R.subgroupOf U).index = Nat.card ↥U :=
+      Subgroup.card_mul_index _
+    have hridx : ¬ r ∣ (R.subgroupOf U).index := fun hd =>
+      hR.2 r (Nat.mem_primeFactors.mpr ⟨hrprime, hd, Subgroup.index_ne_zero_of_finite⟩) rfl
+    have hrSub : r ∣ Nat.card ↥(R.subgroupOf U) :=
+      ((Nat.Prime.dvd_mul hrprime).mp
+        (by rw [hlag]; exact Nat.dvd_of_mem_primeFactors hr)).resolve_right hridx
+    have hrR : r ∣ Nat.card ↥R := by
+      rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hRU).toEquiv] at hrSub
+    intro h; rw [h, Subgroup.card_bot] at hrR
+    exact hrprime.one_lt.ne' (Nat.eq_one_of_dvd_one hrR ▸ rfl)
+  -- `N_G(R) < ⊤` (since `R ≤ M`, `R ≠ ⊥`, `G` simple), so it has a maximal overgroup `H`.
+  have hNR_lt : Subgroup.normalizer (R : Set G) < ⊤ :=
+    normalizer_lt_top_of_le_of_ne_bot hG hM hRM hRne
+  obtain ⟨H, hHcoatom, hNRH⟩ := (eq_top_or_exists_le_coatom _).resolve_left hNR_lt.ne
+  have hH : H ∈ maximalSubgroupsContaining (Subgroup.normalizer (R : Set G)) :=
+    mem_maximalSubgroupsContaining.mpr ⟨hHcoatom, hNRH⟩
+  obtain ⟨hF, hUMsH, hMH, hnorm, -⟩ :=
+    typeP2_neighbor_is_typeF_of_mem hG hM hP2 hKM hUM hK hU hUab hr hRU hR hKNU hH
+  exact ⟨H, hH, hF, hUMsH, hMH, hnorm⟩
 
 /-- **BG Lemma 14.13** (mmd L4059): extension of Theorem 14.4.  In the specified
 multi-maximal sigma-length-one situation, `M` is Frobenius type, `tau_2(M)` is
