@@ -41,13 +41,14 @@
 
 ---
 
-## 1. 3 クラスタ × 3 レーン (🔒 ownership; 2026-07-02 再編後 — 初版は 4×4、下記履歴注記参照)
+## 1. レーン所有マップ (🔒 ownership; 2026-07-06 lane d 復活反映)
 
 | lane | worktree | クラスタ | 主所有ファイル | ODD_ISSUE_BASE |
 |---|---|---|---|---|
 | **a** | `odd-order-a` | **α** Pf §10–13 中央指標核 **+ σ-theory tail/dedup** | `Peterfalvi/S(0[3-9]|1[0-3])*` 全体 (= S03–S13; 例外 = b carve-out 0090 `S09_CertificateDischarge` / 0096 S10 §8 Dade-support 宣言群 / coherence infra `S07_Coherence*`+`S08_PGroupReduction` = b) + `FeitThompson.lean` **全体** (d 退役で fold) + σ-theory tail (S11 dup 3定理 retire→generic leaf cite + assembly, issue 9000 承継)。prefix-split の `*_Core` leaf は親の owner に従う (例 S12_MaximalIII_IV_V_Core = a) | 1000 |
-| **b** | `odd-order-b` | **β** Pf §12 all-Type-I Dade tower **+ coherence infra** | `Peterfalvi/S14_MaximalI.lean` (全体、旧 carve-out 0088 `exists_typeICovering` 解消) + coherence infra ((6.5.c), S07 refactor 済) | 2000 |
-| **c** | `odd-order-c` | **γ** POLE-2 §15–16 chain **一本化 + Clifford** | `Peterfalvi/{S15_SAndT_Setup, S15_SAndT, S16_NonExistenceG}.lean` (§15→16 全 chain) + 構成的 Clifford (issue 9002) | 3000 |
+| **b** | `odd-order-b` | **β** §16 endgame char cascade = S15 (13.9)-(13.19) **+ S14/coherence cite-only** | `Peterfalvi/{S15_SAndT_Setup, S15_SAndT}.lean` (c→b, 2026-07-04) + `Peterfalvi/S14_MaximalI.lean` + coherence infra (`S07_Coherence*` / `S08_PGroupReduction`) + carve-out 0090/0096 | 2000 |
+| **c** | `odd-order-c` | **γ** S16 非存在 = W-side (14.x) norm cascade + parity contradiction **+ Clifford** | `Peterfalvi/S16_NonExistenceG.lean` (S15 は b へ移管、c は import cite) + 構成的 Clifford (issue 9002) + `S15_SAndT_Setup.lean` の T-side `reconciled_typePData_T` carve-out (issue 9013) | 3000 |
+| **d** | `odd-order-d` | **δ** codex shared-infra hygiene / no active Lean frontier after 9006+9007 | `issues/**` + `notes/**` maintenance; new `OddOrder/GroupTheory/**` / `OddOrder/Mathlib/**` / `OddOrder/Algebra/**` / `OddOrder/Isaacs/**` shared claims only after open-9000 scan. Peterfalvi/BG S-file は fresh issue/carve-out なしで編集しない。 | 4000 |
 
 > **⚠⚠ 2026-07-02 3 レーン再編 (ユーザー裁定) — lane d 退役**: char endgame が「4 独立クラスタ」でなく密結合
 > パイプライン (coherence→σ-theory→§10-13→§13-16→S16) と判明。ungated frontier は上流集中で下流 (c/d) が
@@ -64,6 +65,12 @@
 > （自由追加）+ FeitThompson/S10_BGInterface/S11 は 9006 列挙の relocate のみ（9006 hub 裁定の例外）。d は
 > Claude でなく codex が動かすため最軽量・checklist 完備のタスクを選定（他 light 候補 9011/9012/9015/9005 は
 > 納品済 stale、9007 高衝突、9014 deep）。正本 checklist = `issues/9006-*.md`。worktree = `/home/ywr/odd-order-d`。
+> **2026-07-06 lane-d audit update**: 9006 と 9007 は完了・closed。9011/9012/9015 は納品済 stale として
+> closed。**⚠ 9014 は codex が誤って closed へ移したが hub が reopen (2026-07-06)** — 9014 は hub RULING で
+> **KEEP+OPEN** と裁定済 (prime-TI constructor は `ofS06Hypothesis` landed も downstream = §10 coherence upgrade
+> `uniform_prTIred_coherent` 等が継続、b/a の active shared 基盤)。**codex は他レーンの issue を close/編集しない**
+> (issue hygiene は自クラスタ範囲に限定; 越権是正)。shared foundation 側に bare `sorry` は残っていないため、
+> d は新 shared claim が立つまで待機だが、**issue/notes hygiene で busywork を作らない** (アイドルなら停止+報告)。
 
 > **⚠ 2026-07-01 再々配分 (issue 4014 hub 裁定, 履歴) → 2026-07-02 に上記 3 レーン再編で superseded**: lane d は §15 S&T setup / δ BG §14–16 の
 > **on-feitThompson-spine な ungated genuine work が枯渇** (code-level 確証)。残 on-spine 前進は全て他レーン
@@ -130,7 +137,8 @@ carrier 宣言とその consumer が複数レーンの所有ファイルに跨�
   `complement_cyclic_order_dvd` (12.12)・`exists_counterexample_dade_data` (12.16 chain)・
   `constituent_diff_support_subset_nonescaping`・`rho_constant_on_H_minus_Hprime`・`psi_constant_on_xK`・
   `rhoM_integer_values`・`sibleyTarget_frobI` (**TI-case 限定**、2032)・`typeI_induced_char_constituents`
-  (9002 = c の Clifford を cite)。+ **(6.5.c) coherence producer (9000 番台 claim 起票が先決)**。
+  (9002 = c の Clifford を cite)。+ **(6.5.c) coherence producer DONE**
+  (`S08.nonempty_coherent_SOf_bot_of_index_dvd` + `S14.frobenius_typeI_coherent_of_cyclicQuotient`)。
   headline `theorem88_caseB_holds`/`counterexample_contradiction` (12.16)/(12.6) tower は sorry-free。
 - **γ (lane-c)** 【binding = 最長 pole】 — 実 sorry 32 (Setup 15 / S15 8 / S16 9):
   **最深**: `orthogonality_switch` (14.14)・`exists_MHypothesis` (14.10)・`eta_generic_data`・

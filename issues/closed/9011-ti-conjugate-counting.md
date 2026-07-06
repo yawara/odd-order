@@ -63,3 +63,9 @@ residual) から cite 可能。将来の hub 整理候補: BG S14 の ncard 版 
 - `IsTISubset.induce_apply_of_mem_conj`: A-supported α の Ind_L^G は飽和上で α(a)
   (非零 summand = coset yL ちょうど、|L| 個 → 正規化で collapse)
 - `IsTISubset.induce_apply_of_not_mem_conjClassSet`: 飽和外で 0
+
+## 2026-07-06 lane-d closure
+
+Current-state audit: all checklist items are landed and consumed. `IsTISubset.sum_conjClassSet`
+and the two TI-induce value lemmas are present in `OddOrder/GroupTheory/TISubsetCounting.lean`,
+with downstream references in `S15_SAndT_Setup.lean`. Move to `issues/closed/`.

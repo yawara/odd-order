@@ -23,20 +23,23 @@
 > S07 を新規再作成**した場合のみ逸脱。判定: `git log main..b --no-merges` の commit が S07 への新規宣言
 > 追加か (= 再作成) / 既存 S07 への追記止まり (= 残存) か。混在・不明なら skip+報告。
 
-## レーン (2026-07-02 3 レーン再編: a/b/c、lane d 退役)
+## レーン (2026-07-06 current: a/b/c + lane d shared-infra hygiene)
 
 | lane | branch | worktree | クラスタ | 主所有 .lean | issue base |
 |---|---|---|---|---|---|
 | **a** | `a` | `odd-order-a` | α **S12 (11.8) unique feitThompson sorry** + §7 on-path norm (2026-07-04 再々編) | `Peterfalvi/S(0[3-9]|1[0-3])*` + `FeitThompson.lean` (全体) | 1000 |
 | **b** | `b` | `odd-order-b` | β **§16 endgame char cascade = S15 (13.9)-(13.19)** (2026-07-04 再々編; §12 Dade は完遂・cite-only) | `Peterfalvi/{S15_SAndT_Setup, S15_SAndT}.lean` (c→b, 2026-07-04) + `S14_MaximalI.lean` + coherence file 群 + carve-out 0090/0096 | 2000 |
 | **c** | `c` | `odd-order-c` | γ **S16 非存在 = W-side (14.x) norm cascade + parity 矛盾** (2026-07-04 再々編; off-path T-side carrier 退役) | `Peterfalvi/S16_NonExistenceG.lean` (S15 は b へ移管、c は import cite) + 構成的 Clifford (issue 9002) | 3000 |
-| **d** | `d` | `odd-order-d` | δ **最軽量 = issue 9006 Hall-lemma relocation** (2026-07-06 復活、**codex 運用**) | shared `OddOrder/Mathlib/Subgroup.lean` + `OddOrder/GroupTheory/MaximalSubgroupType.lean` (自由追加) + `FeitThompson.lean`/`S10_BGInterface.lean`/`S11_MaximalII_III_IV.lean` は 9006 列挙の relocate+migrate のみ (hub 裁定で例外化) | **4000** |
+| **d** | `d` | `odd-order-d` | δ **codex shared-infra hygiene / no active Lean frontier after 9006+9007** (2026-07-06) | `issues/**` + `notes/**` maintenance; new `OddOrder/GroupTheory/**` / `OddOrder/Mathlib/**` / `OddOrder/Algebra/**` shared claims only after open-9000 scan. **Do not edit Peterfalvi/BG S-files without a fresh issue/carve-out.** | **4000** |
 
 例外・共有・凍結の正確な判定は下の 🔒 所有マップが正。**lane d は 2026-07-06 復活** (2026-07-02〜07-06 退役、
 旧 branch `d` は削除済ゆえ `git worktree add /home/ywr/odd-order-d -b d` で新規作成)。**d = codex 運用**の
-最軽量レーン: 純群論の Hall-lemma relocation (issue 9006、全 body proven・on-path・char 無)。d の触る
-FeitThompson/S10/S11 は 9006 hub 裁定 (owner 固定せず issue+LAUNCH awareness で誰でも実施可) の例外ゆえ
-**FeitThompson からの削除 commit を逸脱 flag しない** (9006 を根拠に shared-infra hygiene として合流)。
+最軽量レーンとして復活した 9006 Hall-lemma relocation は完了済み (closed/9006)。続く 9007 induced-conjugation
+hoist も完了済み (closed/9007)。2026-07-06 lane-d audit では shared foundation
+(`OddOrder/GroupTheory/**`, `OddOrder/Mathlib/**`, `OddOrder/Algebra/**`, `OddOrder/Isaacs/**`) に bare
+`sorry` は無く、残る bare `sorry` は a/b/c 所有の Peterfalvi frontier に集中している。従って d は新しい
+open shared claim が立つまで **issue/notes hygiene + open-9000 scan** に限定し、Peterfalvi/BG S-file へは
+新 carve-out なしで入らない。
 
 **signature-first interface (ゲートは幻)**: 上流が sorried signature を export → 下流が cite。各レーンは独立クラスタを
 正面から埋め、cross-cluster は signature contract で媒介 (待たない)。詳細 = ft_lane_reallocation_2026_06_28.md。
@@ -93,7 +96,7 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > 「監視ループ再開（cron id <new-id>）」を 1 行記録する。**この stop→resolve→resume サイクルが監視ループの
 > 正規ライフサイクル**であり、停止は一時退避でしかない。
 
-> **🔒 レーン所有マップ (step 1.5 範囲逸脱チェック用、2026-07-02 3 レーン再編 a/b/c、lane d 退役)**:
+> **🔒 レーン所有マップ (step 1.5 範囲逸脱チェック用、2026-07-06 lane d 復活を反映)**:
 > 正本 = [`ft_lane_reallocation_2026_06_28.md`](ft_lane_reallocation_2026_06_28.md)。
 > | lane | クラスタ | 所有 .lean（これ以外の Pf/BG S-ファイル編集 = 逸脱→停止） |
 > |---|---|---|
@@ -101,7 +104,7 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > | **b** | β Pf §12 Dade tower + coherence infra | `OddOrder/Peterfalvi/S14_MaximalI.lean`（**全体**、旧 carve-out 0088 `exists_typeICovering` は b に解消）+ **coherence infra** = `S07_Coherence*`/`S08_PGroupReduction`（既存 coherence file、(5.7)/(6.5.c)/(6.8) case-B 系、hub authorized 2026-07-02）+ GroupTheory/** coherence leaf。⚠ これらは nominal に a の `S0[3-9]` regex に掛かるが **coherence infra ゆえ b 担当（逸脱でない）**、a の active territory は §9-13 char 核で S07/S08 coherence は非接触。**⚠ b の例外 glob は正確に `S07_Coherence*` + `S08_PGroupReduction` の 2 つのみ** (正本 ft_lane_reallocation §レーン表): `S08_CaseB*`/`S08_CoherenceTheorems` 等その他の S07/S08 file は **lane a 所有** — 2026-07-03 tick で a の `S08_CaseBCoherence2` 1 行追従を「b 所有では」と誤読しかけた (glob 照合で解消、逸脱でない) |
 > | **c** | γ **S16 非存在 (W-side (14.x) cascade)** | `OddOrder/Peterfalvi/S16_NonExistenceG.lean`（**2026-07-04 再々編: S15_SAndT_Setup + S15_SAndT は c→b 移管**、c は S16 に集約し S15 を import cite）+ 構成的 Clifford (issue 9002、GroupTheory/** shared) + **carve-out (2026-07-06, hub 裁定, issue 9013)**: `S15_SAndT_Setup.lean` 内の `reconciled_typePData_T` T-side carrier ブロック（現 S15:~4018–4260、`isNilpotent_V` 等の T-side type-P data field discharge）は **c 所有**（退役解除 — c の (14.9) T-side type-IV 排除が本 carrier を要求すると 884a52e0 airtight 分析で確定、on-path 復活）。⟹ step-1.5 で c が S15 の**この T-side 領域のみ**を編集しても逸脱でない（c が S15 の char-family 領域 = b の active `cprimeSharpS`/(C')# 系 ~845 を触ったら逸脱）。b は逆に T-side 領域を触らない。恒久解（reconciled_typePData_T を c-owned/shared T-side leaf へ移設し S15 二重所有を解消）は issue 9013 で追跡 |
 > | **b 追加所有 (2026-07-04)** | β §16 char cascade | `OddOrder/Peterfalvi/{S15_SAndT_Setup, S15_SAndT}.lean`（c→b 移管、(13.9)-(13.19) on-path parity/構造/norm を b が担当; off-path S-side cascade 13.5-13.10 は退役）|
-> | **~~d~~ 退役** | — | **2026-07-02 退役**。σ-theory leaf (`GroupTheory/**`, sorry-free) は共有ゾーンに残置 (a が tail 完成)。BG/** は完了・共有凍結。FeitThompson carrier は a に fold。**branch `d` は git に温存 (作業は全 merge 済)、worktree セッションは停止**。 |
+> | **d** | δ codex shared-infra hygiene | **2026-07-06 復活**。9006 Hall relocation / 9007 induced-conjugation hoist は完了済み。現状態は `issues/**` + `notes/**` maintenance と open-9000 scan; 新しい shared claim が立つまで Lean frontier は持たない。`OddOrder/GroupTheory/**` / `OddOrder/Mathlib/**` / `OddOrder/Algebra/**` / `OddOrder/Isaacs/**` は shared claim 後に加算可。**Peterfalvi/BG S-file は fresh issue/carve-out なしに編集しない**。 |
 > | **共有（全 lane 可）** | — | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / `OddOrder/Mathlib/**` / `OddOrder/Algebra/**` / **`OddOrder/Isaacs/**`**（全 lane 加算可）/ `OddOrder/BG/**`（完了・共有凍結）/ `notes/**` / `issues/**`。**⚠ Isaacs 追加 (2026-07-04 hub 裁定)**: `OddOrder/Isaacs/**` は基盤 finite-group-theory ライブラリで**どのレーンの active territory でもない**ゆえ shared foundation として扱う (consumer が proven 補題を additive に加算可、GroupTheory/Algebra 同格)。precedent = c の Isaacs 6.11 使用 / a の (7.8.b) 用 `IsFrobeniusGroup.two_mul_card_complement_add_one_le_card_kernel` 追加 (commit 9f41b6f7)。既存 Isaacs 宣言の statement 改変は要 hub flag (additive のみ非逸脱)。|
 > | **凍結 scaffold** | — | `OddOrder/Peterfalvi/Appendices/**`（off-path・consumer 0、2026-07-02 census 検証済: Huppert 1 / NearFields 2 / Suzuki 5 / Suzuki2Groups 4 / FeitSibley 3 sorry。**どのレーンも編集しない**。σ-theory near-field 等が App B/C を cite する必要が生じたら、その時点で hub が owner 割当 — 自然候補 = a の σ-theory tail 系）|
 >
@@ -476,7 +479,7 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
   (1) issue 整理 — 0086/0088/0092/0093/4014 close (supersede/解消注記)、8022 の d-carve-out 失効注記、
   9000 claim を lane a へ承継注記。(2) 裁定 (issue 9003) — b の `65a2be52` (S10 `support_mutual_exclusion`
   実証明 = false-statement 修正) を**受理 (keep in S10)**、**§8 Dade-support 宣言群を lane b に carve-out
-  (issue 0096)**、(6.5.c) claim 未起票と b の main 17 遅れをリマインド。(3) 本ファイル +
+  (issue 0096)**、当時の (6.5.c) 未処理 claim (2026-07-06 D audit で landed 済み/stale) と b の main 17 遅れをリマインド。(3) 本ファイル +
   ft_lane_reallocation + ft_path_policy の 3 レーン整合化 (旧 4 レーン operative 記述を修正/履歴化)。
   検証: on-path unowned sorry = 0、`FeitThompson.lean` 0 sorry、共有ゾーン 0 sorry (comment-strip census
   103 sorry: a 28 / b 13 / c 32 / BG 凍結 15 / Pf Appendices 凍結 15)。

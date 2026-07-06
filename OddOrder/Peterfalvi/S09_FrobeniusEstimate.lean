@@ -3,7 +3,6 @@ Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import OddOrder.Peterfalvi.S09_FrobeniusHypothesis78
-import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
 import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
 
 /-!
@@ -13,82 +12,10 @@ Downstream of `S09_FrobeniusHypothesis78` (the (7.8) structure `Hypothesis78 G H
 (7.8.b) norm bound `1 - e_i/h_i ≤ zetaNuRhoNormSq` for each Frobenius family member, en route to the
 `card_G0_lower_bound` (7.10) character estimate (issue 0044).
 
-First, a general representation-theory helper `inner_induce_conj_eq_zero_of_frobenius_of_odd` (the
-`⟨ζ_0, ζ̄_0⟩ = 0` input for the (7.8.a) `⊥ 1_G` fact `coherence_extension_orthogonal_constOne`).  It
-mirrors the local `S14.inner_induce_conj_eq_zero_of_frobenius_of_odd` (lane-b); a shared
-`RepresentationTheory` home is blocked because `ClassFunction.induce_conj` lives in `S08`, upstream of
-which the shared file cannot reach — tracked for a future `induce_conj` relocation + dedup in
-issue 9007.
+Uses the shared representation-theory helper
+`inner_induce_conj_eq_zero_of_frobenius_of_odd` for the `⟨ζ_0, ζ̄_0⟩ = 0` input to the
+(7.8.a) `⊥ 1_G` fact `coherence_extension_orthogonal_constOne`.
 -/
-
-namespace OddOrder.RepresentationTheory
-
-open scoped Classical in
-/-- **Odd-order Frobenius: a nontrivial induced irreducible is orthogonal to its complex
-conjugate.**  In a Frobenius group `Γ` of odd order with kernel `H`, for `θ ∈ Irr H`, `θ ≠ 1`,
-the induced `Ind_H^Γ θ` is irreducible (`isIrreducibleCharacter_induce_of_frobeniusGroup`) and
-nontrivial (`⟨Ind θ, 1_Γ⟩ = ⟨θ, 1_H⟩ = 0 ≠ 1`), hence — `Γ` odd — **not real**
-(`not_isReal_of_ne_trivial_of_odd_card'`): `(Ind θ)‾ = Ind θ̄ ≠ Ind θ`.  Distinct irreducibles are
-orthogonal, so `⟨Ind θ, Ind θ̄⟩ = 0`.  This is the `⟨ζ_0, ζ̄_0⟩ = 0` input for the §7 (7.8.a)
-`⊥ 1_G` argument.  Stated with **explicit** `Fintype`/`Invertible` binders so the `induce`/`inner`
-coercions stay `whnf`-cheap. -/
-theorem inner_induce_conj_eq_zero_of_frobenius_of_odd {Γ : Type*} [Group Γ] [Fintype Γ]
-    [Invertible (Nat.card Γ : ℂ)] {H : Subgroup Γ} [H.Normal] [Fintype ↥H]
-    [Invertible (Nat.card ↥H : ℂ)] (hodd : Odd (Nat.card Γ)) {W : Subgroup Γ}
-    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup Γ H W)
-    (θ : IrreducibleCharacter ↥H) (hθ : θ ≠ trivialIrreducibleCharacter ↥H) :
-    ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
-      (ClassFunction.induce H ((θ : ClassFunction ↥H ℂ).conj)) = 0 := by
-  -- `θ̄` is again a nontrivial irreducible character of `H`.
-  have hθbar_ne : (⟨(θ : ClassFunction ↥H ℂ).conj, θ.isIrreducible.conj⟩ :
-      IrreducibleCharacter ↥H) ≠ trivialIrreducibleCharacter ↥H := by
-    intro h
-    apply hθ
-    have hcoe : (θ : ClassFunction ↥H ℂ).conj = trivialClassFunction ↥H := by
-      have h2 := congrArg (fun c : IrreducibleCharacter ↥H => (c : ClassFunction ↥H ℂ)) h
-      simpa using h2
-    apply Subtype.ext
-    show (θ : ClassFunction ↥H ℂ) = trivialClassFunction ↥H
-    rw [← ClassFunction.conj_conj (θ : ClassFunction ↥H ℂ), hcoe]
-    exact trivialClassFunction_isReal
-  have hirr := isIrreducibleCharacter_induce_of_frobeniusGroup hF θ hθ
-  have hirr' := isIrreducibleCharacter_induce_of_frobeniusGroup hF
-    (⟨(θ : ClassFunction ↥H ℂ).conj, θ.isIrreducible.conj⟩ : IrreducibleCharacter ↥H) hθbar_ne
-  -- `Ind θ` is nontrivial: `⟨Ind θ, 1_Γ⟩ = ⟨θ, 1_H⟩ = 0`, but `⟨1_Γ, 1_Γ⟩ = 1`.
-  have hne_triv : (⟨ClassFunction.induce H (θ : ClassFunction ↥H ℂ), hirr⟩ :
-      IrreducibleCharacter Γ) ≠ trivialIrreducibleCharacter Γ := by
-    intro h
-    have hrestrict : ClassFunction.restrict H
-          (trivialIrreducibleCharacter Γ : ClassFunction Γ ℂ)
-        = (trivialIrreducibleCharacter ↥H : ClassFunction ↥H ℂ) := by
-      ext x
-      simp [ClassFunction.restrict_apply, IrreducibleCharacter.coe_trivialIrreducibleCharacter,
-        trivialClassFunction_apply]
-    have hzero : ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
-        (trivialIrreducibleCharacter Γ : ClassFunction Γ ℂ) = 0 := by
-      rw [ClassFunction.inner_induce_eq_inner_restrict, hrestrict,
-        irreducibleCharacter_inner_eq_ite, if_neg hθ]
-    have hcf : ClassFunction.induce H (θ : ClassFunction ↥H ℂ)
-        = (trivialIrreducibleCharacter Γ : ClassFunction Γ ℂ) :=
-      congrArg (fun c : IrreducibleCharacter Γ => (c : ClassFunction Γ ℂ)) h
-    rw [hcf, irreducibleCharacter_inner_eq_ite, if_pos rfl] at hzero
-    exact one_ne_zero hzero
-  -- Odd order ⟹ `Ind θ` not real ⟹ `(Ind θ)‾ ≠ Ind θ`.
-  have hnotreal := not_isReal_of_ne_trivial_of_odd_card' hodd hne_triv
-  have hconj_eq : (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj
-      = ClassFunction.induce H ((θ : ClassFunction ↥H ℂ).conj) :=
-    ClassFunction.induce_conj H (θ : ClassFunction ↥H ℂ)
-  have hne : ClassFunction.induce H (θ : ClassFunction ↥H ℂ)
-      ≠ ClassFunction.induce H ((θ : ClassFunction ↥H ℂ).conj) :=
-    fun heq => hnotreal (hconj_eq.trans heq.symm)
-  -- Distinct irreducibles are orthogonal.
-  have hii := irreducibleCharacter_inner_eq_ite
-    (⟨ClassFunction.induce H (θ : ClassFunction ↥H ℂ), hirr⟩ : IrreducibleCharacter Γ)
-    ⟨ClassFunction.induce H ((θ : ClassFunction ↥H ℂ).conj), hirr'⟩
-  rwa [if_neg (fun h => hne (congrArg (fun c : IrreducibleCharacter Γ =>
-    (c : ClassFunction Γ ℂ)) h))] at hii
-
-end OddOrder.RepresentationTheory
 
 namespace OddOrder.Peterfalvi.S09
 
