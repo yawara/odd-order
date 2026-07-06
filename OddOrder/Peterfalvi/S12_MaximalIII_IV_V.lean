@@ -4133,9 +4133,21 @@ theorem Hypothesis.coherent_Sset_of_column_identities [Finite G]
     obtain ⟨j, hj, rfl⟩ := hd'
     rw [hcol j hj]
     sorry
-  · -- `hgen` → the **(6.8.1) degree-0 sublattice generation** (ungated set-algebra; adapts the S08
-    -- `hgen_withDiagonal_certainTypeSet` template to the per-column cross-diagonals `D`).
-    sorry
+  · -- `hgen` → **discharged by `hgen_of_S2_uniform_degree`** (this session): the (6.8.1) generation
+    -- ALGEBRA is landed sorry-free.  Its only §9-gated input is the `S₂` uniform-degree structure —
+    -- `S₂ = S(C) − S(HC)` all of degree `qu = d·w₁` (the (11.8.1) reducible decomposition) with a
+    -- column witness `ψ₀ = ∑ᵢ μ_{ij₀} ∈ D` — bundled here as a single §9 obligation (NOT a vacuous
+    -- hoist: it is the genuine (11.8.1) two-degree-class structure of `𝒮(C)`, §9/world-bridge-gated).
+    have hζmem : ζ ∈ hyp.SHCSet := ⟨hζS, hζirr, hζ1⟩
+    obtain ⟨qu, ψ₀, hqune, hqu, hS2deg, hψ₀, hDmem⟩ :
+        ∃ (qu : ℕ) (ψ₀ : ClassFunction ↥M ℂ), (qu : ℂ) ≠ 0 ∧
+          (qu : ℂ) = (d : ℂ) * (hyp.w1 : ℂ) ∧
+          (∀ y ∈ hyp.Sset \ hyp.SHCSet, (y : ↥M → ℂ) 1 = (qu : ℂ)) ∧
+          ψ₀ ∈ hyp.Sset \ hyp.SHCSet ∧
+          (ψ₀ - (d : ℂ) • ζ) ∈ {φ | ∃ j : Fin hyp.w2, j ≠ 0 ∧
+            φ = (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j) - (d : ℂ) • ζ} := by
+      sorry
+    exact hyp.hgen_of_S2_uniform_degree hG hqune hqu hS2deg hζmem hψ₀ _ hDmem
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8), the genuine non-orthogonality** (lane-b W3 obligation, issue 2020).
