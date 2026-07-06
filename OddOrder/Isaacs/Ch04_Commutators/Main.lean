@@ -4394,6 +4394,32 @@ theorem iterCommutator_inl_inr_one_eq_bot_of_two_eq_bot
   have h_eq := iterCommutator_inl_inr_two_eq_one (φ := φ) hCop hSolv
   rw [← h_eq, h_two]
 
+/-- **BG Proposition 1.6(d)**: if `G` is abelian, then
+`G = C_G(A) × [G,A]`.
+
+Lean packages the internal direct product as a complement: multiplication from
+`C_G(A) × [G,A]` onto `G` is bijective. -/
+theorem fixedPoints_isComplement_actionCommutator_of_abelian
+    {G A : Type*} [CommGroup G] [Finite G] [IsSolvable G]
+    [Group A] [Finite A] {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G)) :
+    Subgroup.IsComplement' (Subgroup.fixedPointsOfMulAut φ) (actionCommutator φ) := by
+  have hsup : Subgroup.fixedPointsOfMulAut φ ⊔ actionCommutator φ = ⊤ :=
+    fixedPoints_sup_actionCommutator_eq_top (φ := φ) hCop (Or.inr inferInstance)
+  have hinf : Subgroup.fixedPointsOfMulAut φ ⊓ actionCommutator φ = ⊥ :=
+    fixedPoints_inf_actionCommutator_eq_bot_of_abelian φ hCop
+  apply Subgroup.isComplement'_of_disjoint_and_mul_eq_univ
+  · rw [disjoint_iff]
+    exact hinf
+  · rw [Set.eq_univ_iff_forall]
+    intro g
+    have hg : g ∈ Subgroup.fixedPointsOfMulAut φ ⊔ actionCommutator φ := by
+      rw [hsup]
+      trivial
+    rw [Subgroup.mem_sup_of_normal_right] at hg
+    obtain ⟨c, hc, d, hd, hcd⟩ := hg
+    exact ⟨c, hc, d, hd, hcd⟩
+
 /-- **Isaacs Thm 4.36 (class ≤ 2 case)** ⭐: A acts on p-群 G of class ≤ 2 (p > 2),
 A is p'-group, A fixes every order-p element of G ⇒ A trivial on G.
 
