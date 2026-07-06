@@ -1,39 +1,126 @@
-#!/usr/bin/env bash
-#
-# bin/count-sorry — 実 tactic `sorry` を数える (docstring/コメントの prose 偽陽性を除外)
-#
-# 旧来の `grep -rnE '(^|[^a-zA-Z-])sorry' OddOrder/` は prose を大量に誤検出していた
-# (2026-06-15 実測: 259 hit vs 実 141)。偽陽性源は systematic に:
-#   - `sorry-free`  (証明済の注記)        → 後続 `-` で除外
-#   - `sorry'd`     (口語「sorry を持つ」) → 後続 `'` で除外
-#   - `sorryAx`     (Lean の実 axiom 名)   → 後続 letter で除外
-#   - `` `sorry` `` (backtick 引用の言及)  → 前後 backtick で除外
-# これらを lookbehind/lookahead で落とすと 146(実 141 に対し +5、ほぼ一致)。
-# 残差 +5 は block-comment 内 prose / 複数 sorry を持つ宣言で、いずれも安定 ⟹
-# merge gate の **delta 検出**(マージ前後の差)は prose 追加に騙されず正確。
-#
-# ⚠ 絶対数の ground truth は Lean elaborator の警告:
-#     lake build OddOrder 2>&1 | grep -c 'uses `sorry`'
-#   ただし full(非 incremental)build が要る。本スクリプトはその軽量 proxy。
-#
-# Usage:
-#   bin/count-sorry            # 件数のみ
-#   bin/count-sorry --list     # file:line:text を列挙
-#   bin/count-sorry --help
-set -euo pipefail
+#!/usr/bin/env python3
+"""bin/count-sorry — count real `sorry` tokens, stripping Lean comments FIRST.
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PAT='(?<![A-Za-z\x60-])sorry(?![A-Za-z\x27\x60-])'   # \x60=` \x27='
-DIR="OddOrder/"
+Naive `grep sorry` over-counts ~5x: docstrings say "sorry-free", "the deep
+sorry", `sorry`, and code references `sorryAx`. The old regex-only version
+excluded `sorry-free`/`sorryAx`/backtick but still caught other docstring prose
+("the deep sorry", "reduced to one sorry", ...). This version strips ALL Lean
+comments (line `--` and NESTED block `/- -/`, incl. `/-!` and `/--` docstrings)
+and then counts the bare `sorry` token (word boundary; excludes `sorryAx` and
+identifiers). Docstrings may freely say whatever they want — the count is not
+fooled, so there is no need to police the word "sorry" in comments.
 
-case "${1:-}" in
-  --help|-h)
-    grep -E '^#' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
-    exit 0 ;;
-  --list)
-    cd "$ROOT"; grep -rnP "$PAT" "$DIR" ;;
-  "")
-    cd "$ROOT"; grep -rnP "$PAT" "$DIR" | wc -l | tr -d ' ' ;;
-  *)
-    echo "count-sorry: unknown arg '$1' (try --help)" >&2; exit 2 ;;
-esac
+Ground truth for the absolute number is the Lean elaborator warning
+    lake build OddOrder 2>&1 | grep -c "declaration uses 'sorry'"
+(per DECLARATION; needs a full non-incremental build). This script is the fast
+proxy (per TOKEN; a decl with N sorries counts N).
+
+Usage:
+  bin/count-sorry                 total only (just the number)
+  bin/count-sorry -b|--breakdown  total + by-area + on-path/off-path + top files
+  bin/count-sorry -l|--list       file:line:text of every real sorry
+  bin/count-sorry [PATH ...]      restrict to given files/dirs (default OddOrder/)
+"""
+import sys, os, re, glob
+
+TOKEN = re.compile(r"(?<![A-Za-z0-9_'])sorry(?![A-Za-z0-9_'])")
+
+
+def non_comment_chars(src):
+    """(orig_index, char) for chars outside Lean comments (nested /- -/ + line --)."""
+    out, i, n, depth = [], 0, len(src), 0
+    while i < n:
+        two = src[i:i + 2]
+        if depth > 0:
+            if two == '/-':
+                depth += 1; i += 2
+            elif two == '-/':
+                depth -= 1; i += 2
+            else:
+                i += 1
+        else:
+            if two == '/-':
+                depth += 1; i += 2
+            elif two == '--':
+                j = src.find('\n', i); i = j if j != -1 else n
+            else:
+                out.append((i, src[i])); i += 1
+    return out
+
+
+def sorry_lines(path):
+    with open(path, encoding='utf-8') as f:
+        src = f.read()
+    pairs = non_comment_chars(src)
+    stripped = ''.join(c for _, c in pairs)
+    idx = [p for p, _ in pairs]
+    return src, [src.count('\n', 0, idx[m.start()]) + 1 for m in TOKEN.finditer(stripped)]
+
+
+def area_of(path):
+    p = path.split('/')
+    if 'Appendices' in p:
+        return 'Peterfalvi/Appendices (off-path 凍結)'
+    if len(p) >= 3 and p[1] == 'BG' and p[2].startswith('App'):
+        return 'BG/App* (off-path 凍結)'
+    if len(p) >= 2 and p[1] == 'Peterfalvi':
+        return 'Peterfalvi (§10-16 char endgame)'
+    if len(p) >= 2 and p[1] == 'BG':
+        return 'BG (Ch1-4)'
+    return p[1] if len(p) > 1 else path
+
+
+def main():
+    mode, paths = 'count', []
+    for a in sys.argv[1:]:
+        if a in ('-h', '--help'):
+            print(__doc__); return
+        elif a in ('-l', '--list'):
+            mode = 'list'
+        elif a in ('-b', '--breakdown'):
+            mode = 'breakdown'
+        elif a.startswith('-'):
+            sys.stderr.write(f"count-sorry: unknown arg '{a}' (try --help)\n"); sys.exit(2)
+        else:
+            paths.append(a)
+    os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    files = []
+    for pth in (paths or ['OddOrder']):
+        if os.path.isdir(pth):
+            files += glob.glob(pth + '/**/*.lean', recursive=True)
+        elif pth.endswith('.lean') and os.path.exists(pth):
+            files.append(pth)
+    files = sorted(set(files))
+
+    total, per_area, per_file, listing = 0, {}, [], []
+    for path in files:
+        src, lns = sorry_lines(path)
+        if not lns:
+            continue
+        total += len(lns)
+        per_file.append((len(lns), path))
+        per_area[area_of(path)] = per_area.get(area_of(path), 0) + len(lns)
+        if mode == 'list':
+            srclines = src.splitlines()
+            for ln in lns:
+                listing.append(f"{path}:{ln}: {srclines[ln - 1].strip()[:90]}")
+
+    if mode == 'list':
+        print('\n'.join(listing))
+        print(f"# {total} real sorry (comment-stripped)", file=sys.stderr)
+        return
+
+    print(total)
+    if mode == 'breakdown':
+        onp = sum(c for a, c in per_area.items() if '凍結' not in a)
+        print(f"\nby area:")
+        for a, c in sorted(per_area.items(), key=lambda x: -x[1]):
+            print(f"  {c:4d}  {a}")
+        print(f"\non-path (FT critical): {onp}   /   off-path 凍結 appendices: {total - onp}")
+        print(f"\ntop files:")
+        for c, p in sorted(per_file, reverse=True)[:12]:
+            print(f"  {c:4d}  {p}")
+
+
+if __name__ == '__main__':
+    main()
