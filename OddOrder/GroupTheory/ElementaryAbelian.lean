@@ -80,6 +80,12 @@ theorem of_mulEquiv {A B : Type*} [Group A] [Group B] (e : A ≃* B)
     have h2 := congrArg e this
     simpa using h2
 
+/-- Quotienting an elementary abelian group by the bottom subgroup preserves elementary
+abelianness. -/
+theorem quotient_bot (h : IsElementaryAbelian p G) :
+    IsElementaryAbelian p (G ⧸ (⊥ : Subgroup G)) :=
+  of_mulEquiv (QuotientGroup.quotientBot (G := G)).symm h
+
 /-- A noncyclic finite group of order `p^2` is elementary abelian. -/
 theorem of_card_prime_sq_of_not_isCyclic
     [Finite G] (hp : p.Prime) (hCard : Nat.card G = p ^ 2)

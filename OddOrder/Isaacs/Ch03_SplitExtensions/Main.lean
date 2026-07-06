@@ -3720,6 +3720,48 @@ theorem IsAInvariant.subgroupOf {A : Type*} [Group A] {φ : A →* MulAut G}
     change (φ a)⁻¹ g ∈ K
     exact hK.inv_smul_mem a hg_K
 
+/-- Lift a Hall subgroup found inside an invariant overgroup back to the ambient group. -/
+theorem lift_hall_from_invariant_overgroup [Finite G] {A : Type*} [Group A]
+    {φ : A →* MulAut G} {π : Set ℕ} {K H : Subgroup G}
+    (hH_inv : IsAInvariant φ H)
+    (hH_index : ∀ p ∈ H.index.primeFactors, p ∉ π)
+    (hK_le_H : K ≤ H) {L : Subgroup H}
+    (hL_hall : IsHallSubgroup π L)
+    (hL_inv : IsAInvariant hH_inv.restrict L)
+    (hK_sub_le_L : K.subgroupOf H ≤ L) :
+    ∃ Lg : Subgroup G, IsHallSubgroup π Lg ∧ IsAInvariant φ Lg ∧ K ≤ Lg := by
+  refine ⟨L.map H.subtype, hL_hall.map_subtype_of_index_no_pi hH_index, ?_, ?_⟩
+  · rw [isAInvariant_iff_smul_mem]
+    rintro a _ ⟨l, hl, rfl⟩
+    exact ⟨(hH_inv.restrict a) l, hL_inv.smul_mem a hl,
+      IsAInvariant.restrict_apply_val hH_inv a l⟩
+  · intro k hk
+    rw [Subgroup.mem_map]
+    exact ⟨⟨k, hK_le_H hk⟩, hK_sub_le_L (by simpa [Subgroup.mem_subgroupOf] using hk), rfl⟩
+
+/-- Assemble a proper invariant-overgroup induction step for invariant Hall overgroups. -/
+theorem proper_overgroup_branch_frame [Finite G] {A : Type*} [Group A]
+    {φ : A →* MulAut G} {π : Set ℕ} {K H : Subgroup G}
+    (hH_inv : IsAInvariant φ H)
+    (hH_index : ∀ p ∈ H.index.primeFactors, p ∉ π)
+    (hK_pi : Subgroup.IsPiGroup π K)
+    (hK_inv : IsAInvariant φ K)
+    (hK_le_H : K ≤ H)
+    (hIH_H : ∀ {Ksub : Subgroup H},
+      Subgroup.IsPiGroup π Ksub →
+        IsAInvariant hH_inv.restrict Ksub →
+        ∃ L : Subgroup H, IsHallSubgroup π L ∧
+          IsAInvariant hH_inv.restrict L ∧ Ksub ≤ L) :
+    ∃ Lg : Subgroup G, IsHallSubgroup π Lg ∧ IsAInvariant φ Lg ∧ K ≤ Lg := by
+  let Ksub : Subgroup H := K.subgroupOf H
+  have hKsub_pi : Subgroup.IsPiGroup π Ksub :=
+    Subgroup.IsPiGroup.subgroupOf hK_le_H hK_pi
+  have hKsub_inv : IsAInvariant hH_inv.restrict Ksub :=
+    hH_inv.subgroupOf hK_inv
+  obtain ⟨L, hL_hall, hL_inv, hKsub_le_L⟩ := hIH_H hKsub_pi hKsub_inv
+  exact lift_hall_from_invariant_overgroup hH_inv hH_index hK_le_H
+    hL_hall hL_inv hKsub_le_L
+
 /-- `fixedPointsOfMulAut φ` は (同じ) `φ` 作用下で A-不変 (定義より trivially). -/
 theorem IsAInvariant.fixedPointsOfMulAut {A : Type*} [Group A] (φ : A →* MulAut G) :
     IsAInvariant φ (Subgroup.fixedPointsOfMulAut φ) := fun a => by
