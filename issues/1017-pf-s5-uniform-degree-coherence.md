@@ -556,3 +556,22 @@ tractable assembly**。Blocker 2 ((C')^# dade=Ind bridge、下流 tau1S_apply_in
 次 = irreducible sub-family の S07.Hypothesis (irrSubcoherent、sSet_member_differenceImage を Rdatum に
 wrap、per-member irreducibility を prTIres_irr_dichotomy/inertia から) → coherent_subset_of_constant_degree
 で S1 base coherence。
+
+## 2026-07-06 更新 #18 (lane b) — ★(9.11) base subcoherence LANDED (sSetIrrDeg_subcoherent) + degree-parametrize 訂正
+
+honest 第一段 landed: `sSetIrrDeg_subcoherent : S07.Hypothesis (sSetIrrDeg d) (supportInSubgroup A(S) S)`
+(uniform-degree 既約 subfamily `sSetIrrDeg d = {φ∈sSet|IsIrr φ ∧ φ(1)=d}` の subcoherence)。
+
+**★scope 訂正 (更新 #17→#18)**: 「全 irreducible subfamily で S07.Hypothesis」は不整合 — irreducible member
+`Ind ξ` は degree `q·ξ(1)` で mixed-degree、S07.Hypothesis の isometry field は uniform degree を構造的に要す
+(hiso = member diff の A-supportedness = `a(1)=b(1)`)。⟹ **degree `d` で parametrize** が正。base case=q·a、
+Galois=q·u。hiso は `dadeIntegralCharacterMap_inner_eq_on_supported_span` (A-supported diff で成立)。
+
+**残 (次段)**:
+1. **S1 base coherence** = `coherent_subset_of_constant_degree` を sSetIrrDeg (q·a) に適用。要 d=q·a の
+   ≥2-membership (`caseA_exists_irreducible_source_degree_qa`、S11:11691 で sorried per 更新#7) + h1A (landed)。
+2. **coherentPairChain induction** で S3 の conjugate pairs を adjoin (reducibles as CharacterPsiDecomposition)。
+3. **Blocker 2**: (C')^# 上の dade=Ind bridge (下流 tau1S_apply_induce 用)。
+4. NEW IsCoherent → coherent_H0Cprime_S re-point。
+
+subcoherence structure 自体 (genuine deliverable) は built & honest。次 = S1 base coherence (要 degree 機構)。
