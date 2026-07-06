@@ -2139,6 +2139,60 @@ theorem actionCommutator_comp_le
   rintro _ ⟨g, b, rfl⟩
   exact Subgroup.subset_closure ⟨g, i b, rfl⟩
 
+/-- Push-forward of the conjugation-action commutator: for `K ≤ N_Γ(P)`, the
+`actionCommutator` of the conjugation action of `K` on `P` realizes the ambient subgroup
+commutator `⁅P, K⁆`. -/
+theorem actionCommutator_conj_map_subtype {Γ : Type*} [Group Γ] {P K : Subgroup Γ}
+    (hKP : K ≤ Subgroup.normalizer (P : Set Γ)) :
+    (actionCommutator ((Subgroup.normalizerMonoidHom P).comp (Subgroup.inclusion hKP))).map
+      P.subtype = ⁅P, K⁆ := by
+  rw [actionCommutator, MonoidHom.map_closure, Subgroup.commutator_def]
+  congr 1
+  ext y
+  constructor
+  · rintro ⟨_, ⟨g, a, rfl⟩, rfl⟩
+    refine ⟨(g : Γ), g.2, (a : Γ), a.2, ?_⟩
+    rw [commutatorElement_def]
+    have hcoe : (P.subtype
+          (g * ((Subgroup.normalizerMonoidHom P).comp (Subgroup.inclusion hKP)) a g⁻¹) : Γ)
+        = (g : Γ) * ((a : Γ) * (g : Γ)⁻¹ * (a : Γ)⁻¹) := rfl
+    rw [hcoe]
+    group
+  · rintro ⟨g, hg, a, ha, rfl⟩
+    refine ⟨(⟨g, hg⟩ : P) *
+      ((Subgroup.normalizerMonoidHom P).comp (Subgroup.inclusion hKP)) ⟨a, ha⟩ ⟨g, hg⟩⁻¹,
+      ⟨⟨g, hg⟩, ⟨a, ha⟩, rfl⟩, ?_⟩
+    rw [commutatorElement_def]
+    have hcoe : (P.subtype
+          ((⟨g, hg⟩ : P) *
+            ((Subgroup.normalizerMonoidHom P).comp (Subgroup.inclusion hKP)) ⟨a, ha⟩
+              (⟨g, hg⟩ : P)⁻¹) : Γ)
+        = g * (a * g⁻¹ * a⁻¹) := rfl
+    rw [hcoe]
+    group
+
+/-- Push-forward of the conjugation-action fixed points: fixed points of the conjugation
+action of `K` on `P` map to `C_Γ(K) ⊓ P`. -/
+theorem fixedPointsOfMulAut_conj_map_subtype {Γ : Type*} [Group Γ] {P K : Subgroup Γ}
+    (hKP : K ≤ Subgroup.normalizer (P : Set Γ)) :
+    (Subgroup.fixedPointsOfMulAut
+        ((Subgroup.normalizerMonoidHom P).comp (Subgroup.inclusion hKP))).map P.subtype =
+      Subgroup.centralizer (K : Set Γ) ⊓ P := by
+  ext y
+  simp only [Subgroup.mem_map, Subgroup.mem_inf, Subgroup.mem_centralizer_iff]
+  constructor
+  · rintro ⟨x, hx, rfl⟩
+    refine ⟨fun k hk => ?_, x.2⟩
+    have hfix := Subgroup.mem_fixedPointsOfMulAut.mp hx ⟨k, hk⟩
+    have hcoe : k * (x : Γ) * k⁻¹ = (x : Γ) := congrArg Subtype.val hfix
+    calc k * (x : Γ) = (k * x * k⁻¹) * k := by group
+    _ = (x : Γ) * k := by rw [hcoe]
+  · rintro ⟨hy, hyP⟩
+    refine ⟨⟨y, hyP⟩, Subgroup.mem_fixedPointsOfMulAut.mpr fun a => Subtype.ext ?_, rfl⟩
+    change (a : Γ) * y * (a : Γ)⁻¹ = y
+    rw [hy (a : Γ) a.2]
+    group
+
 /-- **`actionCommutator φ` は G で normal subgroup**.
 
 経路: `actionCommutator_map_inl` で `(actionCommutator φ).map inl = ⁅inl.range, inr.range⁆`,
@@ -2310,6 +2364,36 @@ noncomputable def OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom
     (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN a) (g : G ⧸ N) =
       ((φ a) g : G ⧸ N) := rfl
 
+/-- **Isaacs Corollary 3.28 / BG Proposition 1.5(d), subgroup form**: for a coprime
+action `φ : A → MulAut G` and an `A`-invariant normal subgroup `N`, the fixed points of
+the induced action on `G/N` are exactly the image of the fixed points in `G`. -/
+theorem fixedPointsOfMulAut_quotientMulAutHom_eq_map
+    {G A : Type*} [Group G] [Finite G] [Group A] [Finite A] {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G)) (hSolv : IsSolvable A ∨ IsSolvable G)
+    {N : Subgroup G} [N.Normal] (hN : OddOrder.Isaacs.Ch03.IsAInvariant φ N) :
+    Subgroup.fixedPointsOfMulAut (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN) =
+      (Subgroup.fixedPointsOfMulAut φ).map (QuotientGroup.mk' N) := by
+  refine le_antisymm ?_ ?_
+  · intro q hq
+    obtain ⟨g, rfl⟩ := QuotientGroup.mk'_surjective N q
+    rw [Subgroup.mem_fixedPointsOfMulAut] at hq
+    have hg_fix : ∀ a : A, ∃ n ∈ N, (φ a) g = g * n := by
+      intro a
+      have hga := hq a
+      rw [OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk',
+        QuotientGroup.mk'_apply, QuotientGroup.mk'_apply, QuotientGroup.eq] at hga
+      exact ⟨g⁻¹ * (φ a) g, by simpa using N.inv_mem hga, by group⟩
+    obtain ⟨c, hc_fix, n, hn, hcn⟩ := coprime_fixedPoints_quotient hCop hSolv hN hg_fix
+    refine Subgroup.mem_map.mpr ⟨c, Subgroup.mem_fixedPointsOfMulAut.mpr hc_fix, ?_⟩
+    rw [QuotientGroup.mk'_apply, QuotientGroup.mk'_apply, QuotientGroup.eq, hcn]
+    simpa using N.inv_mem hn
+  · rw [Subgroup.map_le_iff_le_comap]
+    intro c hc
+    rw [Subgroup.mem_fixedPointsOfMulAut] at hc
+    rw [Subgroup.mem_comap, Subgroup.mem_fixedPointsOfMulAut]
+    intro a
+    rw [OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk', hc a]
+
 /-- An `A`-invariant subgroup maps to an invariant subgroup in an
 `A`-invariant quotient. -/
 theorem _root_.OddOrder.Isaacs.Ch03.IsAInvariant.map_quotient
@@ -2407,6 +2491,35 @@ theorem actionCommutator_quotient_eq_bot_of_le
   rw [QuotientGroup.eq]
   simpa [mul_inv_rev] using
     N.inv_mem ((actionCommutator_le_iff_left φ N).mp h_le a g)
+
+/-- If `R` normalizes `K` and `⁅K, R⁆ ≤ F(K)`, then the conjugation action of `R`
+on `K/F(K)` fixes every quotient element. -/
+theorem fixedPoints_quotient_eq_top_of_commutator_le_fitting
+    {G : Type*} [Group G] [Finite G] {K R : Subgroup G} [K.Normal]
+    (hRK : R ≤ Subgroup.normalizer (K : Set G))
+    (hcomm : ⁅K, R⁆ ≤ (OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype) :
+    Subgroup.fixedPointsOfMulAut
+      (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom
+        (OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic
+          (H := OddOrder.Isaacs.Ch01.fitting ↥K)
+          ((Subgroup.normalizerMonoidHom K).comp (Subgroup.inclusion hRK)))) = ⊤ := by
+  set φ : R →* MulAut K := (Subgroup.normalizerMonoidHom K).comp (Subgroup.inclusion hRK)
+    with hφ
+  have hFinv : OddOrder.Isaacs.Ch03.IsAInvariant φ (OddOrder.Isaacs.Ch01.fitting ↥K) :=
+    OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic φ
+  have hac_le : actionCommutator φ ≤ OddOrder.Isaacs.Ch01.fitting ↥K := by
+    have h := actionCommutator_conj_map_subtype hRK
+    rw [← h] at hcomm
+    exact Subgroup.map_le_map_iff_of_injective K.subtype_injective |>.mp hcomm
+  have hbot : actionCommutator (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hFinv) =
+      ⊥ := by
+    rw [actionCommutator_quotient_eq_map, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']
+    exact hac_le
+  rw [Subgroup.eq_top_iff']
+  intro g
+  rw [Subgroup.mem_fixedPointsOfMulAut]
+  intro a
+  exact (actionCommutator_eq_bot_iff_acts_trivially _).mp hbot a g
 
 /-- **Isaacs Corollary 4.21**: For `H ≤ G`, the following are equivalent:
 (a) `∀ a x, (φ a) x ∈ Hx` (right coset is A-invariant in element form);

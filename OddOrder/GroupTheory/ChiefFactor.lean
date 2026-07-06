@@ -11,6 +11,7 @@ import Mathlib.GroupTheory.Nilpotent
 import Mathlib.Data.SetLike.Fintype
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
 
 /-!
 # Chief factors
@@ -161,6 +162,83 @@ theorem le_iff_commutator_le :
   ⟨commutator_le_of_le, le_of_commutator_le⟩
 
 end chiefFactorCentralizer
+
+/-- The conjugation action of `G` on a chief-factor quotient `U/V`, written on the
+model `↥U ⧸ V.subgroupOf U`. -/
+@[reducible]
+noncomputable def chiefFactorConjAction (U V : Subgroup G) [U.Normal] [V.Normal] :
+    MulDistribMulAction G (↥U ⧸ V.subgroupOf U) :=
+  letI : MulDistribMulAction (ConjAct G) (↥U ⧸ V.subgroupOf U) :=
+    OddOrder.Isaacs.Ch06.IsFrobeniusAction.invariantQuotientMulDistribMulAction
+      (V.subgroupOf U) (by
+        intro a m hm
+        rw [Subgroup.mem_subgroupOf] at hm ⊢
+        change ConjAct.ofConjAct a * (↑m : G) * (ConjAct.ofConjAct a)⁻¹ ∈ V
+        exact (‹V.Normal›).conj_mem _ hm _)
+  MulDistribMulAction.compHom _ (ConjAct.toConjAct (G := G)).toMonoidHom
+
+/-- The chief-factor conjugation action sends the class of `x` to the class of its
+conjugate. -/
+theorem chiefFactorConjAction_smul_mk {U V : Subgroup G} [U.Normal] [V.Normal]
+    (g : G) (x : U) :
+    letI := chiefFactorConjAction U V
+    (g • (QuotientGroup.mk x : U ⧸ V.subgroupOf U)) =
+      QuotientGroup.mk (ConjAct.toConjAct g • x) :=
+  rfl
+
+/-- An element acts trivially on the chief-factor conjugation action iff it lies in
+the ambient centralizer `C_G(U/V)`. -/
+theorem chiefFactorConjAction_smul_eq_self_iff_mem {U V : Subgroup G}
+    [U.Normal] [V.Normal] (g : G) :
+    letI := chiefFactorConjAction U V
+    (∀ v : U ⧸ V.subgroupOf U, g • v = v) ↔ g ∈ chiefFactorCentralizer U V := by
+  letI := chiefFactorConjAction U V
+  have hcoe : ∀ x : U, (↑(ConjAct.toConjAct g • x) : G) = g * ↑x * g⁻¹ := fun _ => rfl
+  have hL : (∀ v : U ⧸ V.subgroupOf U, g • v = v)
+      ↔ ∀ x : U, (g * (↑x)⁻¹ * g⁻¹ * ↑x : G) ∈ V := by
+    constructor
+    · intro h x
+      have hv := h (QuotientGroup.mk x)
+      rw [chiefFactorConjAction_smul_mk, QuotientGroup.eq, Subgroup.mem_subgroupOf,
+        Subgroup.coe_mul, Subgroup.coe_inv, hcoe] at hv
+      have heq : ((g * ↑x * g⁻¹)⁻¹ * ↑x : G) = g * (↑x)⁻¹ * g⁻¹ * ↑x := by group
+      rwa [heq] at hv
+    · intro h v
+      induction v using QuotientGroup.induction_on with
+      | _ x =>
+        rw [chiefFactorConjAction_smul_mk, QuotientGroup.eq, Subgroup.mem_subgroupOf,
+          Subgroup.coe_mul, Subgroup.coe_inv, hcoe]
+        have heq : ((g * ↑x * g⁻¹)⁻¹ * ↑x : G) = g * (↑x)⁻¹ * g⁻¹ * ↑x := by group
+        rw [heq]
+        exact h x
+  have hR : g ∈ chiefFactorCentralizer U V
+      ↔ ∀ x : U, (g * ↑x * g⁻¹ * (↑x)⁻¹ : G) ∈ V := by
+    rw [chiefFactorCentralizer.mem_iff, Subgroup.mem_centralizer_iff]
+    constructor
+    · intro h x
+      have hcomm := h ((QuotientGroup.mk' V) (↑x : G)) ⟨↑x, x.2, rfl⟩
+      have hgoal : (QuotientGroup.mk' V) (g * ↑x * g⁻¹ * (↑x)⁻¹) = 1 := by
+        simp only [map_mul, map_inv]
+        rw [← hcomm]
+        group
+      exact (QuotientGroup.eq_one_iff _).mp hgoal
+    · intro h q hq
+      obtain ⟨x, hx, rfl⟩ := hq
+      have hy : (QuotientGroup.mk' V) (g * ↑x * g⁻¹ * (↑x)⁻¹) = 1 := by
+        rw [QuotientGroup.mk'_apply]
+        exact (QuotientGroup.eq_one_iff _).mpr (h ⟨x, hx⟩)
+      simp only [map_mul, map_inv] at hy
+      rw [mul_inv_eq_one] at hy
+      rw [mul_inv_eq_iff_eq_mul] at hy
+      exact hy.symm
+  rw [hL, hR]
+  constructor
+  · intro h x
+    have := h x⁻¹
+    simpa using this
+  · intro h x
+    have := h x⁻¹
+    simpa using this
 
 /-! ## Chief series inside a normal subgroup
 
