@@ -548,3 +548,70 @@ posited field (`primeTIred` の residue 二分律) を実構成に置換 ([[scaf
 genuine doneness)。これが §10 (10.7) `Frob_der1_type2` = lane-a frontier と §13 μ_j machinery の共通
 基盤。次 lane-b iteration はこの constructor に正面着手する (規模大・多 session でも淡々と build、
 CLAUDE.md「コスト/規模は着手基準でない」)。
+
+## 2026-07-06 更新 #2 (lane b) — ★★constructor 大幅 de-risk: deep field prTIres_irr_cases は S06 に既存、bridge で discharge 可
+
+constructor (裁定 item 5) を verify-first 精査 → **「6-session cyclicTIiso port」の前提は誤り**。
+`PrimeTIResidueData` の唯一の genuinely-deep field `prTIres_irr_cases` (4.5.b constituent classification =
+inertia I_S[θ]=PU の p-group fixed-point count) は **S06_CertainTypeClifford に既に完全 port 済**:
+
+- `inertia_eq_K_of_forall_chiRestrict_ne` (S06:907) = 非residue χ の inertia I_L(χ)=K (deep p-group 計算、
+  `card_fixedPoints_conjByPermIrr…` + `IsPGroup.card_modEq_card_fixedPoints`)。
+- `induce_isIrreducible_of_forall_chiRestrict_ne` (S06:931) = 非residue χ ⟹ Ind χ 既約
+  (+ `isIrreducibleCharacter_induce_of_inertia_eq`)。
+- `induce_ne_certainType_of_forall_chiRestrict_ne` (S06:943) = Ind χ ≠ μ_{ij}。
+
+**3 discharge primitives (docstring 記載) は全て repo に存在** (前 subagent の「cyclicTIiso 機構 unbuilt」は
+S06 の descriptive 名を見落とした Coq 名 grep の罠、[[verify-port-state-by-number-not-coq-name]])。
+
+**landed (PrimeTIResidue.lean、commit 次)**: `S06.Hypothesis.prTIres_irr_dichotomy` — 上記 S06 定理を
+組んで dichotomy `(∃ χ₂, chiRestrict χ₂ = χ) ∨ (Ind χ 既約 ∧ ∀ χ₂ i, Ind χ ≠ μ_{ij})` を証明
+(sorry-free、#print axioms 標準3のみ)。= `PrimeTIResidueData.prTIres_irr_cases` field の実体。
+
+**⟹ constructor の真の形 = `PrimeTIResidueData.ofS06Hypothesis` bridge** (S06.Hypothesis → PrimeTIResidueData):
+- mu2 ← S06 columnFamily grid (or 移設済 mu2Grid)、chi ← h.chiRestrict、
+- prTIres_irr_cases ← `prTIres_irr_dichotomy` (landed)、
+- mu2_orthonormal/chi_res/ind_chi/chi_zero/cfker_prTIres ← S06 の対応 grid 定理群 (columnFamily 正規直交・
+  restrict_certainType_eq 等、大半 S06 に proven)。
+これは「from-scratch port」でなく既存 S06 grid 定理の field-mapping ⟹ 規模は当初想定より遥かに小。
+次 = ofS06Hypothesis bridge の field 群 (indexing Fin p ↔ Ŵ₂ / Fin q ↔ Fin|W1| + 各 field の S06 定理接続)。
+
+## 2026-07-06 更新 #3 (lane b) — ★constructor は 100% mechanical assembly と確定 (全 field の S06 source 特定)
+
+`ofS06Hypothesis` constructor の全 9 field が S06 に既存 (0 new math、残は Fin-indexing wiring のみ):
+
+| PrimeTIResidueData field | S06 source (file:定理) |
+|---|---|
+| mu2 | `columnFamily.mu` (S06_CertainTypeCharacters:432) |
+| chi | `chiRestrict` (S06_CertainTypeClifford:772) |
+| mu2_orthonormal | columnFamily 正規直交 (columnFamily_mu 系) |
+| chi_res | `coe_chiRestrict` (:778, rfl) |
+| ind_chi | `induce_restrict_certainType_eq` (:743) |
+| chi_zero | `chiRestrict_one_eq_trivial` (S06_CertainTypeSupport:287) |
+| cfker_prTIres | `not_subset_characterKernel_chiRestrict_of_ne_one` ((4.7)) |
+| prTIres_irr_cases | `prTIres_irr_dichotomy` (landed, PrimeTIResidue.lean) |
+| card fact |Ŵ₂|=|W₂| | `card_charGroup_W2` |
+
+indexing: p := Nat.card h.W2、q := Nat.card h.W1、`Fin p ≃ Ŵ2` を card_charGroup_W2 + trivial↦0 pin
+(chiRestrict_one_eq_trivial で chi_zero)。P field = W2 ⊆ H ≤ K の任意 H (FT app では Fitting)。
+⟹ constructor 完成は pure wiring。background subagent に委任 (mechanical、context 節約)。
+
+## 2026-07-06 更新 #4 (lane b) — ★★constructor LANDED: PrimeTIResidueData.ofS06Hypothesis (裁定 item 5 完了)
+
+`PrimeTIResidueData.ofS06Hypothesis` を landed (subagent 実装 + 親 verify)。裁定 item 5「constructor 完成 —
+posited field を実構成に置換」達成:
+
+```
+ofS06Hypothesis [Fintype ↥h.K] (H : Subgroup ↥h.K) (hW2H : h.W2.subgroupOf h.K ≤ H) :
+  PrimeTIResidueData L h.K (Nat.card h.W1) (Nat.card h.W2)
+```
+(h : S06.Hypothesis L から)。全 9 field を genuine S06 定理で実構成 (更新 #3 の mapping table 通り)、
++ index bridge `charGroupW2Equiv : Fin (Nat.card h.W2) ≃ Ŵ2` (card_charGroup_W2 + trivial↦0 pin)。
+**#print axioms = 標準3のみ (sorryAx 無)、leaf GREEN 3486 / full GREEN 3933**。PrimeTIResidueData /
+S06 の signature 無改変。posited field は全て実構成に置換済 = PrimeTIResidueData carrier の構成可能性
+実証 ([[scaffold-sorry-free-not-done]] の genuine doneness)。
+
+**⟹ 裁定 (fcfc0644) の全 item 完了**: item 1-4 restructure (復元/再open/mu2Grid移設) + item 5 constructor。
+9014 の prime-TI residue foundation は honest に構成可能と確定。§10 (10.7、lane-a) が primeTIred を
+consume するとき本 constructor + PrimeTIResidueData API が使える。**本 issue は constructor 完了ゆえ
+close 候補** (hub 判断; foundation 完成、残 consumer wiring は §10 lane-a 側)。

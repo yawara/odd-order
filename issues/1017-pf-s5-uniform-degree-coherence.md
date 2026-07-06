@@ -408,3 +408,60 @@ lane-b の未マージ commit (`main..b`) が §5 coherence 実装を含むた�
    **9014 OPEN 維持**、mu2Grid は削除でなく PrimeTIResidue へ移設。詳細裁定 = **issue 9014 の HUB RULING**。
    lane-b の held merge は「PrimeTIResidue 削除を含めない + mu2Grid を S05 から PrimeTIResidue へ移設 +
    9014 を close しない」に restructure 要 (S07_Subcoherent carve-out・S15:629 witness closure は不変)。
+
+## 2026-07-06 更新 #12 (lane b) — R-datum route 確定: dadeCharacterDifferenceImageOfDiff + hconj landed
+
+constructor (9014) 完了後、S15 R-datum (coherent_H0Cprime_S 再grounding の残 crux) を精査:
+
+- **R-datum の一般 constructor は存在**: `S07.dadeCharacterDifferenceImageOfDiff` (S07_Coherence:5603) —
+  `(hyp : S04.Hypothesis) (hconj) (χ : IrreducibleCharacter L) (hreal : ¬IsReal χ) (hdiffsupp : (χ̄-χ).support ⊆ supportInSubgroup A L)` から
+  `CharacterDifferenceImage τ χ` (= `τ(χ-χ̄)=±(μ-ν)`) を産む。S14 の R1cdi (S14:744) が同 pattern で使用。
+- **揃った入力**: dadeHypS (S04.Hypothesis, landed) / **dadeHypS_hconj (hconj, landed 更新 #12)** /
+  sSet_hasNoRealCharacters (hreal, landed) / τ+hiso = `dadeHypS.fullDadeIsometryData dadeHypS_hconj`。
+- **残 R-datum 入力 2 点**: (a) **family member の irreducibility** — dadeCharacterDifferenceImageOfDiff は
+  `χ : IrreducibleCharacter L` を要す。𝒮={Ind ξ} の member が既約か要確認 (residue Ind は reducible=μ_j ゆえ
+  𝒮 全体は非既約混在の可能性 → subcoherence family は既約 constituent か既約 subfamily の要精査)。
+  (b) **hdiffsupp** — support(φ̄-φ) ⊆ supportInSubgroup A(S) (A(S)=honestTypeP2ASet、構造的)。
+- **その後**: R-datum → `irrSubcoherent τ A(S) Rdatum hconj hreal hortho hiso` → S07.Hypothesis →
+  clifford_dichotomy case-split (Galois=caseB uniform degree + coherentEqualDegree_fromDade / 非Galois=pair-chain) →
+  coherent_H0Cprime_S を honest route へ re-point。
+
+次 = (a) subcoherence family の既約性を精査 (𝒮 の member 既約性 or 既約 subfamily の特定) + (b) hdiffsupp。
+これが R-datum の残 genuine content。
+
+## 2026-07-06 更新 #13 (lane b) — ★重要訂正: 𝒮 は mixed family (p−1 reducible residues)、coherence は full (9.11)
+
+更新 #12 の「coherentEqualDegree_fromDade で直接」は楽観的すぎた。verify-first で訂正:
+
+- **`coherentEqualDegree_fromDade` (S07:6090)** は `χ : Fin n → IrreducibleCharacter L` の
+  **uniform-degree 既約** family を要す (Dade + hconj + hsuppdiff + h1notA から coherence を内部生成、
+  別途 R-datum/irrSubcoherent 不要)。← Galois uniform 既約 subfamily には直接使える。
+- **但し 𝒮(H₀C') は mixed**: `{φ ∈ sOf | ¬IsIrreducible φ}.ncard = p−1` (S11:7160/7306/8225) —
+  ちょうど **p−1 個の reducible member (= residue induction μ_j, j≠0)** + 残り既約。∴ 𝒮 全体に
+  coherentEqualDegree_fromDade は適用不可。honest coherence = **full (9.11) subcoherent + pair-chain
+  induction** (mixed family を扱う、reducible residues を別処理)。
+- **connection**: 𝒮 の reducible members = prime-TI residues μ_j = 本 session で構成した
+  PrimeTIResidueData/prTIres_irr_cases が記述するもの。S-instance の 𝒮 reducible 部 ↔ prime-TI residue theory。
+
+**揃った input** (coherence 用): dadeHypS / dadeHypS_hconj (更新 #12) / **h1notA (honestTypeP2ASet_one_not_mem, landed 更新 #13)** /
+sSet_hasNoRealCharacters / hortho。**残**: (a) uniform 既約 subfamily の特定 (𝒮 の既約部、degree qu) +
+その Fin n enumeration、(b) hsuppdiff (φ_j−φ_0 の support ⊆ A(S))、(c) reducible residues の別処理 (pair-chain)、
+(d) coherent_H0Cprime_S を組んで re-point。genuine な (9.11) mixed-family coherence、multi-session。
+
+## 2026-07-06 更新 #14 (lane b) — hdiffsupp 構造確定 + (C')^#⊆A(S) bridge landed
+
+R1_diffsupp (S14:710) template を精査 → hdiffsupp の構造確定:
+- **hdiffsupp** = `(φ.conj−φ).support ⊆ supportInSubgroup A(S) S`。R1_diffsupp の鍵入力は
+  `data.supported : support φ ⊆ A ∪ {1}` (family member が A∪{1} 外で消える)。
+- **2 support の区別**: A(S)=honestTypeP2ASet (Dade support、R-datum の support hyp) vs
+  (C')^#=cprimeSharpS (§9 coherence support、H0CprimeSupport)。**(C')^# ⊆ A(S)**。
+- **landed 更新 #14**: `cprimeSharpS_subset_supportA` ((C')^# ⊆ supportInSubgroup A(S) S、
+  sorry-free)。= hdiffsupp の「A(S) 側」半分。
+- **残 hdiffsupp 半分 (deeper)**: `support(Ind ξ) ⊆ (C')^# ∪ {1}` (family member 𝒮 が
+  (C')^# 外で消える)。これは induced character Ind_{HU}^S ξ の support 構造 = §9 family の
+  vanishing 性 (genuine、要 S-instance 構造)。
+
+**R-datum inputs 現状**: dadeHypS / dadeHypS_hconj / h1notA / sSet_hasNoRealCharacters / hortho /
+**cprimeSharpS_subset_supportA (hdiffsupp A(S)側)**。残: (a) 𝒮 member irreducibility (mixed family
+の既約部特定)、(b) support(Ind ξ)⊆(C')^#∪{1} (hdiffsupp 残半分)、(c) mixed-family (9.11) induction。
+次 = (b) の family vanishing 性 or (a) の既約部特定。genuine (9.11)、multi-session。
