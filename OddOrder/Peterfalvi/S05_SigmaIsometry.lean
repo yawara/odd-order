@@ -2038,6 +2038,7 @@ theorem exists_intCast_sigma_omega_apply (hyp : TICyclicHypothesis G) [Fintype h
   obtain ⟨n, hn⟩ := isIntegral_rat_imp_int (hq ▸ hint)
   exact ⟨n, hq.trans hn⟩
 
+
 end TICyclicHypothesis
 
 end OddOrder.Peterfalvi.S05

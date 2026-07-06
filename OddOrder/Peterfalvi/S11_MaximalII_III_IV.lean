@@ -18,6 +18,7 @@ import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
 import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
 import OddOrder.Peterfalvi.S08_CoherenceCorePart1
 import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
+import OddOrder.GroupTheory.RepresentationTheory.OrbitOnIrr
 
 /-!
 # Peterfalvi Section 11: Maximal Subgroups of Types II, III, and IV
@@ -13738,6 +13739,39 @@ theorem caseA_member_induceHU_irreducible [Finite G] {M : Subgroup G}
     caseA_theta_comp_quotient_on_S0_eq_one_iff_of_fixed caseA θ _ hlo hMfix ↑w₁] at hwtriv
   exact hθS0 hwtriv
 
+/-- **Peterfalvi (9.8.d)** (count substrate, member seed inertia).  For a member seed `θ` trivial on
+`caseA_wComplement` and nontrivial on `S₀`, the inflation `θ₀`'s `HU`-inertia is `H·C_U(S₀)`
+(`inertia_eq_hcuInHu` at `W = caseA_wComplement`, `H̄ = S₀ ⊕ W`).  Deduplicates the `hθ₀` input
+shared by `caseA_hcuZetaPair_realizedS0_not_subset_ker`, `caseA_member_induceHU_irreducible`, and
+`hcuZetaPair_induceHU_mem_sOf` in the (9.8.d) count assembly. -/
+theorem caseA_member_seed_inertia_eq [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    (hθW : caseA_wComplement caseA ≤ θ.ker)
+    (hθS0 : θ.comp caseA.S0.subtype ≠ 1) :
+    ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+        (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+          (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+      = hInHu data ⊔ cuInHu caseA := by
+  have htriv : ∀ w ∈ caseA_wComplement caseA,
+      (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) w
+        = (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1 := by
+    intro w hw
+    rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one,
+      MonoidHom.mem_ker.mp (hθW hw), Units.val_one]
+  have hreg : ∃ x ∈ caseA.S0,
+      (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+        ≠ (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1 := by
+    rw [Ne, MonoidHom.ext_iff, not_forall] at hθS0
+    obtain ⟨x, hx⟩ := hθS0
+    simp only [MonoidHom.comp_apply, Subgroup.subtype_apply, MonoidHom.one_apply] at hx
+    refine ⟨x, x.2, ?_⟩
+    simp only [linearIrreducibleCharacter_apply, map_one, Units.val_one, ne_eq, Units.val_eq_one]
+    exact hx
+  exact inertia_eq_hcuInHu caseA (caseA_wComplement_aInvariant caseA)
+    (caseA_S0_sup_wComplement caseA) hreg htriv
+
 /-- **Peterfalvi (9.8)**: character-count consequences in Clifford case (a).
 
 Faithful to Peterfalvi (9.8.b,c,d) (count-statement audit, issue 2030):
@@ -13829,67 +13863,32 @@ hypothesis (`hcuZetaPair_induceHU_irreducible_of_nonRegular`,
 summand `S₀ = H₁` supporting `θ₁ ∈ Irr(H̄/(H₂…H_q))` is moved off itself by the `W₁`-transitive summand
 permutation.
 
-**(v) count status (def_Itheta LANDED; mechanical assembly remains).**  The count
-`((p-1)/a)·|C_U(S₀):U'| = ((p-1)/a)·(|U|/(a|U'|))`.  Since `H·C_U(S₀) ◁ HU` (`hcuInHu_normal`), the
-`U`-orbit step *is* a `card_image_induce_eq_div` (`OrbitOnIrr`) over `H·C_U(S₀)` giving `|image| =
-|T|/[HU:H·C_U(S₀)] = |T|/a`.  Mirrors the Coq `typeP_nonGalois_characters` (9.8.d) proof
-(`PFsection9.v` L1112-1254: `Mtheta`/`Xtheta`/`injXtheta`).  Note Coq builds `Mtheta` as the *image*
-of the pair-param and proves conjBy-closure by an explicit pair-conjBy-descent; the Lean route instead
-uses the *intrinsic* `T` (conjBy-closed for free) with `def_Itheta` surjectivity — now landed (α).
-The three pieces (α)(γ) are discharged; only the (β) domain count and the final assembly remain:
+**(v) count — LANDED** (no `sorry`).  `𝒮(H₀U')` contains `≥ ((p-1)/a)·(|U|/(a|U'|))` irreducibles
+of degree `qa`.  The assembly (in `caseA_character_counts`'s (d) branch):
 
-*(α) `def_Itheta` reconstruction — LANDED.*  The `T`-invariance uses the intrinsic characterization
-`T = {χ ∈ Irr(H·C_U(S₀)) linear | H₀-realized ⊆ Ker χ ∧ W-lifted ⊆ Ker χ ∧ χ|_H ≠ 1 ∧ U'-realized ⊆
-Ker χ}`, conjBy-closed via `subsetCharacterKernel_conjBy_of_invariant` + `conjByMulEquiv_invariant_of_normal`
-(each realized kernel condition is `HU`-stable, all `≤ H·C_U(S₀)`).  The **surjectivity** `T ⊆
-image(pair-param)` — every characterized `χ` *is* a `ψ_{θ₁,λ}` — is now **fully proven** as
-`exists_hcuPsiPair_eq_of_linear_realizedH0_ker` (Coq `def_Itheta`, `PFsection9.v` L1149-1224): a linear
-`χ` on the join (`χ = linearIrr f`) with realized `H₀ ⊆ Ker` reconstructs `θ` from `f|_H` (factoring
-through `H̄ = H/N`, `exists_hcuSeedHom_eq_of_realizedH0_ker`) and `λ := f|_C`, giving `f = hcuPairHom θ λ`
-(`exists_pairHom_eq_of_realizedH0_ker`) by the join-uniqueness `hom_eq_of_eqOn_hInHu_cuInHu`
-(`H ⋊ C_U(S₀)` complement, `MonoidHom.eq_of_eqOn_denseM`) — the `hinv` compatibility holding for *any*
-hom into abelian `ℂˣ` (`hcuSeedHom_hinv_of_comp`).  The **injectivity** of the pair-param is
-`hcuPsiPair_injective_pair` (restrictions recover `θ`/`λ` via `hcuSeedHom_injective`), and each
-member's inertia `= H·C_U(S₀)` is `hcuPsiPair_inertia_eq_hcu` (given `hθ₀ = inertia_eq_hcuInHu`).  So
-the `def_Itheta` bijection `(Irr(H̄/W)\{1}) × Irr(C_U(S₀)/U') ≃ T` — the hard geometric core of the
-count — is discharged.
-
-*(β) domain count `|T| = (p-1)·[C_U(S₀):U']`* — restriction bijection `T ≃ (Irr(H̄/W)\{1}) ×
-Irr(C_U(S₀)/U')`.  The `θ₁`-numerator `p-1` is **landed** (`card_theta_triv_W_nontriv_S0`:
-`#{θ : H̄ →* ℂˣ | W ≤ Ker θ ∧ θ|_{S₀} ≠ 1} = p-1`, via `card_hom_triv_W_eq_card_quotient` +
-`IsComplement'.QuotientMulEquiv` giving `|H̄/W| = |S₀| = p`).  The `λ`-count `[C_U(S₀):U']` is homs of
-abelian `C_U(S₀)/U'` (`[cuInHu, cuInHu] ≤ U'` as `cuInHu ≤ U`, so `card_monoidHom_of_hasEnoughRootsOfUnity`
-applies; `card_U_div_a_mul_card_Uprime_eq_relIndex` bridges `[C_U(S₀):U'] = |U|/(a|U'|)` to the RHS).
-What remains for (β): the `λ`-numerator `|{λ : cuInHu →* ℂˣ | U'-realized ⊆ Ker λ}| = [C_U(S₀):U']`
-(a generic-quotient mirror of the `H̄`-specific `card_hom_triv_W_eq_card_quotient`, then abelian
-Pontryagin on `cuInHu/U'`), and assembling both numerators through the `def_Itheta` product bijection
-`(Irr(H̄/W)\{1}) × Irr(C_U(S₀)/U') ≃ T` (α is landed — `hcuPsiPair_injective_pair` +
-`exists_hcuPsiPair_eq_of_linear_realizedH0_ker` give the two directions).
-
-*(γ) `W₁`-injectivity of `ζ ↦ Ind_{HU}^M ζ`* (Coq `injXtheta`, L1233-1253).  **Fully assembled and
-`horbit` discharged**: `induceHU_inj_of_conj_mem_huSub` reduces (γ) to `hcrit`, and
-`caseA_hcrit_of_member` (the unconditional `hcrit_of_summand_orbit`) proves `hcrit` from only two
-member facts — `hS0notker` (a member's seed is `≠ 1` on `S₀`, so `realized S₀ ⊄ Ker ζ₁`, always true)
-and `hkerW₂` (`realized W ⊆ Ker ζ₂` at `W = caseA_wComplement caseA`, discharged by core (1)
-`hcuZetaPair_summandComplement_subset_ker`).  The third input `horbit` (a nontrivial `w₁ ∈ W₁` moves
-`realized S₀` into `realized W`) is now supplied by `caseA_wOrbit_horbit`: the Peterfalvi (9.7.a)
-free-`W₁`-orbit `H̄ = ⊕_{w ∈ W₁} S₀^w` is **reconstructed** (`caseA_wOrbit_iSupIndep` +
-`caseA_S0_sup_wComplement` + `caseA_S0_inf_wComplement`) directly from `S₀` (order `p`, `U`-invariant)
-and `chief.quotient_chiefFactor` (`U W₁`-irreducible), needing no `CliffordCaseAData` enrichment.  The
-`hcrit` proof is the exact `injXtheta` logic: decompose `w = a·w₁` (`M = HU ⋊ W₁`,
-`data.typeP.M_complement`, `conjBy a` inner), so `conjBy w₁ ζ₂ = ζ₁`; a nontrivial `w₁` forces
-`realized S₀ ⊆ Ker ζ₁` (via `mem_characterKernel_conjBy`: `s ∈ Ker (conjBy w₁ ζ₂) ⟺ w₁·s·w₁⁻¹ ∈ Ker
-ζ₂`, and `w₁·s·w₁⁻¹ ∈ S₀^{w₁} ⊆ realized W ⊆ Ker ζ₂`), contradicting `hS0notker`; so `w₁ = 1`,
-`w ∈ HU`.  What remains for (γ)'s *use* here is only wiring the family members' `hkerW₂`/`hS0notker`
-into the `≥` count via `induceHU_inj_of_conj_mem_huSub` (α surjectivity + β domain count still open).
-
-Assembly (α landed, γ landed; needs β + the wiring): `card_image_induce_mul_index_eq`
-((α)-family conjBy-closed + inertia `= H·C_U(S₀)` + `hcuInHu_normal`) ⟹ `|𝒴|·a = |T| = (p-1)·[C_U(S₀):U']`;
-(γ) via `induceHU_inj_of_conj_mem_huSub` + `caseA_hcrit_of_member` ⟹ `induceHU` injective on `𝒴` ⟹
-`ncard{irr,qa,∈𝒮(H₀U')} ≥ |induceHU '' 𝒴| = |𝒴|` (`Set.ncard_image_of_injOn`, `Set.ncard_le_ncard`,
-with membership `hcuZetaPair_induceHU_mem_sOf` + degree `caseA_exists_irreducible_source_degree_qa_induceHU_irreducible`);
-and `((p-1)/a)·[C_U(S₀):U'] ≤ (p-1)·[C_U(S₀):U']/a = |𝒴|` by `Nat.div_mul_le_...`.  Skeleton left `sorry`
-pending (β) + this final wiring. -/
+* **family** `T := (Dθ ×ˢ Dλ).image ψ_{·,·} ⊆ Irr(H·C_U(S₀))`, where `Dθ = {θ | W ≤ Ker θ ∧
+  θ|_{S₀} ≠ 1}` (`W = caseA_wComplement`) and `Dλ = {λ | U'-realized ≤ Ker λ}`.  `|T| = |Dθ|·|Dλ| =
+  (p-1)·[C_U(S₀):U']` — injectivity `hcuPsiPair_injective_pair`, numerators `card_theta_triv_W_nontriv_S0`
+  (`= p-1`) and `card_lambda_triv_uprime` (`= [C_U(S₀):U']`).
+* **first induction (`/a`)** — the *hypothesis-light* orbit count `card_image_induce_ge_div`
+  (`OrbitOnIrr`) gives `|image₁| ≥ |T|/[HU:H·C_U(S₀)] = |T|/a` from *only* the per-member inertia
+  `= H·C_U(S₀)` (`hcuPsiPair_family_inertia_eq`, index `a` = `index_hcuInHu_eq_caseA_a`).  A lower
+  bound suffices, so the family need **not** be conjugation-closed — this drops the Coq
+  `Mtheta`-conjBy-descent *and* the intrinsic-`T` `def_Itheta` surjectivity route (the surjectivity
+  lemma `exists_hcuPsiPair_eq_of_linear_realizedH0_ker` and reverse kernel-translations are landed
+  substrate but unused by the final count).
+* **second induction (γ, injective)** — `induceHU` is injective on `image₁` via
+  `induceHU_inj_of_conj_mem_huSub` + `caseA_hcrit_of_member` (its `hS0notker` =
+  `caseA_hcuZetaPair_realizedS0_not_subset_ker`; its `hkerW₂` = `hcuZetaPair_summandComplement_subset_ker`
+  at `W = caseA_wComplement`; the (9.7.a) `horbit` is the reconstructed `caseA_wOrbit_horbit`).
+* **target membership** — each `induceHU ζ` is in `𝒮(H₀U')` (`hcuZetaPair_induceHU_mem_sOf`),
+  irreducible (`caseA_member_induceHU_irreducible`, the `W₁`-orbit non-regularity), of degree `qa`
+  (`hcuZetaPair_induceHU_apply_one`).
+* **assembly** — `ncard ≥ |induceHU '' image₁| = |image₁| ≥ |T|/a = (p-1)·[C_U(S₀):U']/a ≥
+  ((p-1)/a)·[C_U(S₀):U']` (`Set.ncard_le_ncard` + `Set.ncard_coe_finset` + `Finset.card_image_of_injOn`;
+  floor step `Nat.le_div_iff_mul_le` + `Nat.div_mul_le_self`), and `((p-1)/a)·(|U|/(a|U'|)) =
+  ((p-1)/a)·[C_U(S₀):U']` by `card_U_div_a_mul_card_Uprime_eq_relIndex`.  Mirrors the Coq
+  `typeP_nonGalois_characters` (9.8.d) `Mtheta`/`Xtheta`/`injXtheta` (`PFsection9.v` L1112-1254). -/
 theorem caseA_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     (chars : Section11CharacterData data chief) (caseA : CliffordCaseAData chars) :
@@ -13920,7 +13919,158 @@ theorem caseA_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     haveI : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
       (huSub data)).Normal := hcInHu_realized_normal chief
     exact caseA_exists_irreducible_sOf_H0C caseA hG
-  · sorry
+  · -- (d) 9.8.d: `𝒮(H₀U')` has `≥ ((p-1)/a)·[C_U(S₀):U']` irreducibles of degree `qa`.
+    classical
+    haveI : (hInHu data ⊔ cuInHu caseA).Normal := hcuInHu_normal caseA
+    letI : Fintype ↥(huSub data) := Fintype.ofFinite _
+    letI : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
+    letI : Fintype ↥(hInHu data) := Fintype.ofFinite _
+    letI : Fintype ((↥data.H ⧸ chief.N) →* ℂˣ) := Fintype.ofFinite _
+    letI : Fintype (↥(cuInHu caseA) →* ℂˣ) := Fintype.ofFinite _
+    letI : Fintype ↥M := Fintype.ofFinite _
+    letI : Fintype ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) := Fintype.ofFinite _
+    letI : Fintype (IrreducibleCharacter ↥(huSub data)) := Fintype.ofFinite _
+    letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+      invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+    letI : Invertible (Nat.card ↥(hInHu data ⊔ cuInHu caseA) : ℂ) :=
+      invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+    letI : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
+      invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+    letI : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
+    haveI hWnorm : (caseA_wComplement caseA).Normal := Subgroup.normal_of_isMulCommutative _
+    have ha_pos : 0 < caseA.a := by
+      rw [← index_hcuInHu_eq_caseA_a caseA]
+      exact Nat.pos_of_ne_zero fun h0 => by
+        have hmc := (hInHu data ⊔ cuInHu caseA).index_mul_card
+        rw [h0, zero_mul] at hmc
+        exact (Nat.card_pos (α := ↥(huSub data))).ne' hmc.symm
+    -- domain finsets `Dθ`, `Dlam` and the pair family `T ⊆ Irr(H·C_U(S₀))`.
+    set Dθ := Finset.univ.filter (fun θ : (↥data.H ⧸ chief.N) →* ℂˣ =>
+      caseA_wComplement caseA ≤ θ.ker ∧ θ.comp caseA.S0.subtype ≠ 1) with hDθdef
+    set Dlam := Finset.univ.filter (fun lam : ↥(cuInHu caseA) →* ℂˣ =>
+      (((uprimeSub data).subgroupOf M).subgroupOf (huSub data)).subgroupOf (cuInHu caseA)
+        ≤ lam.ker) with hDlamdef
+    have hmemDθ : ∀ θ ∈ Dθ, caseA_wComplement caseA ≤ θ.ker ∧ θ.comp caseA.S0.subtype ≠ 1 := by
+      intro θ hθ; rw [hDθdef, Finset.mem_filter] at hθ; exact hθ.2
+    have hmemDlam : ∀ lam ∈ Dlam,
+        (((uprimeSub data).subgroupOf M).subgroupOf (huSub data)).subgroupOf (cuInHu caseA)
+          ≤ lam.ker := by
+      intro lam hlam; rw [hDlamdef, Finset.mem_filter] at hlam; exact hlam.2
+    set pmap : {θ // θ ∈ Dθ} × (↥(cuInHu caseA) →* ℂˣ) →
+        IrreducibleCharacter ↥(hInHu data ⊔ cuInHu caseA) :=
+      fun p => hcuPsiPair caseA p.1.1
+        (hcuSeedHom_hinv_of_wComplement_triv caseA p.1.1 (hmemDθ p.1.1 p.1.2).1) p.2 with hpmap
+    set T := (Dθ.attach ×ˢ Dlam).image pmap with hTdef
+    -- `|T| = |Dθ|·|Dlam| = (p-1)·[C_U(S₀):U']`.
+    have hDθcard : Dθ.card = chief.p - 1 := by
+      rw [hDθdef]
+      exact card_theta_triv_W_nontriv_S0 caseA (caseA_S0_inf_wComplement caseA)
+        (caseA_S0_sup_wComplement caseA) (caseA_S0_card caseA)
+    have hDlamcard : Dlam.card = (uprimeSub data).relIndex (cuSub caseA) := by
+      rw [hDlamdef, ← Fintype.card_subtype, ← Nat.card_eq_fintype_card]
+      exact card_lambda_triv_uprime caseA
+    have hinjmap : Set.InjOn pmap ↑(Dθ.attach ×ˢ Dlam) := by
+      intro p _ q _ heq
+      simp only [hpmap] at heq
+      obtain ⟨hθeq, hlameq⟩ := hcuPsiPair_injective_pair caseA heq
+      exact Prod.ext (Subtype.ext hθeq) hlameq
+    have hTcard : T.card = (chief.p - 1) * (uprimeSub data).relIndex (cuSub caseA) := by
+      rw [hTdef, Finset.card_image_of_injOn hinjmap, Finset.card_product, Finset.card_attach,
+        hDθcard, hDlamcard]
+    -- each member `ψ_{θ,λ}` has inertia `H·C_U(S₀)`.
+    have hinertia : ∀ ψ ∈ T, IrreducibleCharacter.inertia (G := ↥(huSub data))
+        (H := hInHu data ⊔ cuInHu caseA) ψ = hInHu data ⊔ cuInHu caseA := by
+      intro ψ hψ
+      rw [hTdef, Finset.mem_image] at hψ
+      obtain ⟨p, _, rfl⟩ := hψ
+      exact hcuPsiPair_family_inertia_eq caseA p.1.1 (hmemDθ p.1.1 p.1.2).1
+        (hmemDθ p.1.1 p.1.2).2 p.2
+    -- the ζ-image and the hypothesis-light orbit-count `≥` engine.
+    set I1 := T.image (fun ψ => ClassFunction.induce (hInHu data ⊔ cuInHu caseA)
+      ψ.toClassFunction) with hI1def
+    have hengine : T.card / (hInHu data ⊔ cuInHu caseA).index ≤ I1.card :=
+      OddOrder.RepresentationTheory.card_image_induce_ge_div T hinertia
+    -- (γ) `induceHU` injective on `I1`.
+    have hinjHU : Set.InjOn (induceHU data) ↑I1 := by
+      intro ζ₁ hζ₁ ζ₂ hζ₂ heq
+      rw [Finset.mem_coe, hI1def, Finset.mem_image] at hζ₁ hζ₂
+      obtain ⟨ψ₁, hψ₁T, rfl⟩ := hζ₁
+      obtain ⟨ψ₂, hψ₂T, rfl⟩ := hζ₂
+      rw [hTdef, Finset.mem_image] at hψ₁T hψ₂T
+      obtain ⟨p₁, _, rfl⟩ := hψ₁T
+      obtain ⟨p₂, _, rfl⟩ := hψ₂T
+      have hθ₀₁ := caseA_member_seed_inertia_eq caseA p₁.1.1 (hmemDθ p₁.1.1 p₁.1.2).1
+        (hmemDθ p₁.1.1 p₁.1.2).2
+      have hθ₀₂ := caseA_member_seed_inertia_eq caseA p₂.1.1 (hmemDθ p₂.1.1 p₂.1.2).1
+        (hmemDθ p₂.1.1 p₂.1.2).2
+      set χ₁ : IrreducibleCharacter ↥(huSub data) :=
+        ⟨ClassFunction.induce (hInHu data ⊔ cuInHu caseA) (pmap p₁).toClassFunction,
+          hcuZetaPair_irreducible caseA p₁.1.1 _ p₁.2 hθ₀₁⟩ with hχ₁def
+      set χ₂ : IrreducibleCharacter ↥(huSub data) :=
+        ⟨ClassFunction.induce (hInHu data ⊔ cuInHu caseA) (pmap p₂).toClassFunction,
+          hcuZetaPair_irreducible caseA p₂.1.1 _ p₂.2 hθ₀₂⟩ with hχ₂def
+      have hcrit := caseA_hcrit_of_member data caseA (ζ₁ := χ₁) (ζ₂ := χ₂)
+        (caseA_hcuZetaPair_realizedS0_not_subset_ker caseA p₁.1.1 _ p₁.2
+          (hmemDθ p₁.1.1 p₁.1.2).2 hθ₀₁)
+        (hcuZetaPair_summandComplement_subset_ker caseA p₂.1.1 _ p₂.2
+          (caseA_wComplement_aInvariant caseA)
+          (fun w hw => MonoidHom.mem_ker.mp ((hmemDθ p₂.1.1 p₂.1.2).1 hw)))
+      exact congrArg IrreducibleCharacter.toClassFunction
+        (induceHU_inj_of_conj_mem_huSub data hcrit heq)
+    -- each `induceHU ζ` is in the target set (member ∈ 𝒮(H₀U'), irreducible, degree `qa`).
+    have himgsub : (↑(I1.image (induceHU data)) : Set (ClassFunction ↥M ℂ)) ⊆
+        {χ ∈ chars.SOf (chief.H0 ⊔ chars.Uprime) |
+          IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * caseA.a : ℕ) : ℂ)} := by
+      intro φ hφ
+      rw [Finset.mem_coe, Finset.mem_image] at hφ
+      obtain ⟨ζ, hζI1, rfl⟩ := hφ
+      rw [hI1def, Finset.mem_image] at hζI1
+      obtain ⟨ψ, hψT, rfl⟩ := hζI1
+      rw [hTdef, Finset.mem_image] at hψT
+      obtain ⟨p, hp, rfl⟩ := hψT
+      have hθ₀ := caseA_member_seed_inertia_eq caseA p.1.1 (hmemDθ p.1.1 p.1.2).1
+        (hmemDθ p.1.1 p.1.2).2
+      have hθnt : p.1.1 ≠ 1 :=
+        fun h => (hmemDθ p.1.1 p.1.2).2 (by rw [h]; exact MonoidHom.one_comp _)
+      refine ⟨?_, ?_, ?_⟩
+      · exact hcuZetaPair_induceHU_mem_sOf caseA p.1.1 hθnt _ p.2
+          (fun c hc => MonoidHom.mem_ker.mp
+            ((hmemDlam p.2 (Finset.mem_product.mp hp).2) (Subgroup.mem_subgroupOf.mpr hc))) hθ₀
+      · exact caseA_member_induceHU_irreducible caseA p.1.1 _ p.2 (hmemDθ p.1.1 p.1.2).1
+          (hmemDθ p.1.1 p.1.2).2 hθ₀
+      · exact hcuZetaPair_induceHU_apply_one caseA p.1.1 _ p.2
+    -- the target set is finite (`⊆ 𝒮 = induceHU '' 𝒳`).
+    have htargetFin : {χ ∈ chars.SOf (chief.H0 ⊔ chars.Uprime) |
+        IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}.Finite := by
+      refine Set.Finite.subset ((Set.toFinite (xiOf data (chief.H0 ⊔ chars.Uprime))).image
+        (fun χ : IrreducibleCharacter ↥(huSub data) =>
+          induceHU data (χ : ClassFunction ↥(huSub data) ℂ))) ?_
+      intro φ hφ
+      obtain ⟨hφS, -⟩ := hφ
+      rw [Section11CharacterData.SOf_eq, mem_sOf] at hφS
+      obtain ⟨χ, hχ, rfl⟩ := hφS
+      exact ⟨χ, hχ, rfl⟩
+    -- arithmetic: `((p-1)/a)·[C:U'] ≤ (p-1)·[C:U']/a = |T|/a ≤ |I1| = |induceHU '' I1| ≤ ncard`.
+    have harith : Nat.card ↥data.U / (caseA.a * Nat.card ↥chars.Uprime)
+        = (uprimeSub data).relIndex (cuSub caseA) := card_U_div_a_mul_card_Uprime_eq_relIndex caseA
+    calc ((chief.p - 1) / caseA.a)
+            * (Nat.card ↥data.U / (caseA.a * Nat.card ↥chars.Uprime))
+        = ((chief.p - 1) / caseA.a) * ((uprimeSub data).relIndex (cuSub caseA)) := by rw [harith]
+      _ ≤ ((chief.p - 1) * (uprimeSub data).relIndex (cuSub caseA)) / caseA.a := by
+          rw [Nat.le_div_iff_mul_le ha_pos]
+          calc ((chief.p - 1) / caseA.a * (uprimeSub data).relIndex (cuSub caseA)) * caseA.a
+              = (chief.p - 1) / caseA.a * caseA.a
+                  * (uprimeSub data).relIndex (cuSub caseA) := by ring
+            _ ≤ (chief.p - 1) * (uprimeSub data).relIndex (cuSub caseA) :=
+                Nat.mul_le_mul_right _ (Nat.div_mul_le_self _ _)
+      _ = T.card / (hInHu data ⊔ cuInHu caseA).index := by
+          rw [hTcard, index_hcuInHu_eq_caseA_a]
+      _ ≤ I1.card := hengine
+      _ = (I1.image (induceHU data)).card := (Finset.card_image_of_injOn hinjHU).symm
+      _ ≤ {χ ∈ chars.SOf (chief.H0 ⊔ chars.Uprime) |
+            IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}.ncard := by
+          rw [← Set.ncard_coe_finset (I1.image (induceHU data))]
+          exact Set.ncard_le_ncard himgsub htargetFin
 
 /-- **Peterfalvi (9.9)**: character-count consequences in Clifford case (b).
 

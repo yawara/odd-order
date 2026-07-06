@@ -98,6 +98,275 @@ c=S16 wiring)、lane 数 3 維持・アイドルなし。a は本 leaf 完成後
 **hub へ**: 本 issue の当初 scope (「§5 coherence を新設」) は誤前提。真の残 = (i) §3/§4 prime-TI 基盤
 (大, ungated, 誰の所有でもない leaf — 新設可) or (ii) (10.8) の Lean-specific 軽量 path (subagent が判定中)。
 
+## 2026-07-06 更新 (lane b, verify-first 精査) — §5 subcoherent は (13.3) coherence とも shared、sibleyTarget_H0C は likely-unsound
+
+lane b の (13.3) `character_degree_analysis` τ₁ coherence を verify-first 精査した結果、**本 issue の
+§5 subcoherent gate が (13.3) coherence とも共有**と確定:
+
+- **`uniform_degree_coherence` は実装済** — `coherent_of_constant_degree` (S07_CoherenceConstantDegree:551,
+  proven)。本 issue の「uniform_degree_coherence 不在」は **stale**。残る真の gate = **`subcoherent` /
+  `FTtypeP_subcoherent` R-datum** (Coq PFsection5) のみ (repo grep 空)。
+- **(13.3) coherence の現 route (S11 `sibleyTarget_H0C` = (6.8)/Sibley 経由) は likely-UNSOUND** (issue
+  2032 `sibleyTarget_frobI` と同 defect class): honest S-instance (family sSet=Ind_{PU}^S、support
+  (C')^#) に対し `SibleyTarget` の kernel K は family 制約で K=PU・support 制約で K=C' を同時に要求するが
+  **PU≠C'** ⟹ 数学的に不可能。加えて K nilpotent / S=K⋊W₁ / K^# TI in G も非充足。
+- **honest route (Coq `Ptype_core_coherence` PFsection9:1484 に一致)**: (9.11) は subcoherent +
+  uniform_degree_coherence + extend_coherent の (9.11.1-8) 8-step induction で証明、**(6.8)/Sibley を
+  経由しない**。⟹ `sibleyTarget_H0C` は (6.8) scaffold から外し、§5 subcoherent + coherent_of_constant_degree
+  cascade で再構築すべき (2032 fix と同型、signature 保存内部 re-proof)。
+
+**⟹ `subcoherent`/`FTtypeP_subcoherent` (§5) は (10.7)/(10.8) [a] + (13.3) coherence [b] の共有 keystone
+prerequisite。** これを実装すれば両方 un-gate。lane b の (13.3) tau1S engine (tau1S_ofHonest 系) は現在
+likely-unsound な sibleyTarget_H0C を cite しており、subcoherent 実装後に coherent_H0Cprime_S を §5 route へ
+再 grounding して健全化する必要がある。hub 裁定: subcoherent の owner/着手 (shared §5/§7 infra)。
+
+## 2026-07-06 更新 #2 (lane b) — prime-TI は S06 に存在 (certainType 名)、prDade は assemblable + irrSubcoherent landed
+
+subcoherence 精査で 2 点判明:
+- **subcoherent structure は既 port 済** (S07.Hypothesis)。欠けは assembler のみ → `irrSubcoherent`
+  (S07_Subcoherent.lean、Coq irr_subcoherent、sorry-free) を landed。**FTtypeP_subcoherent は PFsection8:819** (PFsection5 でなく)。
+- **⚠ prime-TI machinery は「absent (0 refs)」でない — S06 に certainType 名で存在** (Coq 名 grep の見落とし、
+  本セッション 2 度目)。`certainType_isCoherent` (S06_CertainTypeCoherence:505 = 型-P family の coherence!)、
+  `certainType_columnSum_conj`/`certainType_columnSign_eq`/`certainType_nonzero`/`columnFamily_mu_injective`/
+  `Hypothesis46` 等。⟹ **item 1 `prDade_subcoherent` は S06 certainType_isCoherent + irrSubcoherent から
+  assemble 可能 (large 新 prime-TI port 不要)**。
+
+**⟹ (13.3) coherence chain の tractability 上方修正**: S06 certainType_isCoherent → prDade_subcoherent
+(assemble) → FTtypeP_subcoherent (thin) → (9.11) Ptype_core_coherence (8-step、coherent_of_constant_degree
+既存) → (13.3) tau1S coherence (sibleyTarget_H0C を置換) + (10.7)[a]。次 = prDade を verify-first で assemble。
+
+## 2026-07-06 更新 #3 (lane b) — (9.11) base-case glue landed、残 gap = sumnS norm chain (a+b 共有)
+
+`subset_subcoherent` + `coherent_subset_of_constant_degree` (S07_Subcoherent.lean、sorry-free、commit
+9aad60d8) landed = (9.11) の **Galois 枝 + non-Galois base case S1**。`irrSubcoherent` と合わせ subcoherent
+→ uniform-subfamily coherence の glue 完備。
+
+**残る単一共有 gap (a+b)**: honest S-family sSet は mixed-degree ゆえ full (9.11.1-8) pair-adjoining
+induction が要。engine (coherentPairChain S07:4907 + (5.6) adjoining) は既存だが、per-step (5.6.2)
+integer-forcing `hY` = **norm-inequality chain `lb0 ≤ … ≤ sumnS S2 ≤ lb0`** (Peterfalvi extend_coherent +
+Snorm/sumnS 次数和不等式) が **repo 未在**。これが (13.3) coherent_H0Cprime_S の sibleyTarget_H0C 置換 +
+(10.7) typeII_derived_frobenius の共通 keystone。
+
+**lane a (10.7) への lead**: (10.7) の T2 が **4-element uniform-degree family** なら (issue 1017 冒頭記述)、
+full induction 不要で `coherent_subset_of_constant_degree` (landed) から**直接**閉じる可能性。要 lane-a 確認
+(T2 degree-uniformity は lane-b から未検証)。**⟹ 次: (a) lane a が T2 uniform で (10.7) を直接 close 試行、
+(b) sumnS norm chain を実装 (full (9.11) 用、shared)。** hub 裁定: sumnS chain の owner。
+
+## 2026-07-06 更新 #4 (lane b, subagent) — sumnS/Snorm quantity + extend_coherent 整数強制 bridge landed (sorry-free)
+
+**verify-first で前提を 1 つ訂正**: 「sumnS norm chain は repo 未在」は**部分的に誤り**だった (本セッション 3 度目の Coq 名 grep 見落とし class)。
+- **Snorm/sumnS の名前** は確かに未在 → 本更新で導入。
+- **extend_coherent の正方向 engine は既存・sorry-free** = `xAdjoinStepW` (S08_CoherenceWeighted:287): `hDeg : 2·a < ∑ᵢ deg(i)²/mc(i)` から `coherent(S₁∪{χ,χ̄})` を産む = Peterfalvi (5.6) = Coq `extend_coherent_with`。その contrapositive = `coherentDegreeSqNormBound_of_not_coherentW` (:635)、raw-degree `sumnS` bound `∑ᵢ χᵢ(1).re²/‖χᵢ‖² ≤ 2·ψ(1).re·η(1).re` は §8 case-B family 用に `sMember_degreeSqNormReBound_of_not_coherent` (S08_CaseBEnumeration:1080) が既に組んでいる。
+
+**landed (S07_Subcoherent.lean、+164 行、sorry-free、`#print axioms`=標準3公理のみ、`lake build OddOrder` GREEN 3932 jobs)**:
+- `Snorm ψ := (ψ 1).re²/⟨ψ,ψ⟩.re` (Coq `Snorm`, PFsection9:1534) + `sumnS Si := ∑_{ψ∈Si} Snorm ψ` (Coq `sumnS`, :1535)。
+- `Snorm_nonneg`/`sumnS_nonneg`/`sumnS_empty`/`sumnS_le_of_subset` (= Coq `lbS1'2` の (9.11.6) `S1'⊆S2` 単調性)。
+- **`sumnS_image_eq_anchorSq_mul`** = raw↔normalized 橋 `sumnS = η²·∑(deg²/mc)` (§8 が inline 重複していた calc を factor out; これが raw `sumnS` squeeze を `xAdjoinStepW` の normalized `hDeg` に繋ぐ load-bearing piece)。
+- **`two_mul_lt_normalizedDegreeSq_of_lb0_lt_sumnS`** = extend_coherent 発火 precondition: `lb0=2·a·η² < sumnS` から `2·a < ∑(deg²/mc)` を導く (η²>0 で cancel)。
+- `lb0_le_lb1_of_degreeRatio_le` = (9.11) 底 squeeze step (Coq `lb01`) の純算術単調性。
+
+**残り (= assembly、analytic gap は解消)**: (9.11.2-9.11.5) 中間 squeeze `lb1≤lb2≤lb3≤sumnS S1'` (Coq `lb12`/`lb23`/`lb3S1'`) は ℕ-index 算術 (`two_mul_lt_sq_of_commonIndex_primePower_gap` S07:1986 + Nat index lemmas、中規模・機械的)。(9.11.1/7/8) は `coherentPairChain` を §9 induced-family Dade witnesses に対して fold (per-step `Dmem`/`hmemOrtho`/`hgen` を、§8 case-B の `sMember_degreeSqNormBound_of_not_coherent` と同型で、§9 `S_ H0C'` family 用に組む)。**⟹ (13.3) `coherent_H0Cprime_S` の sibleyTarget_H0C 置換 + (10.7) `typeII_derived_frobenius` は、§9 induced-family witnesses を thread する 1 focused multi-step session で到達圏内** (analytic content は landed、残るは family-specific 組み立て)。
+
+## 2026-07-06 更新 #5 (lane b) — (9.11) squeeze の pure-arithmetic 層が全 landed sorry-free
+
+更新 #4 で「残り = (9.11.2-9.11.5) 中間 squeeze + assembly」としたうち、**中間 squeeze (lb12/lb23) と
+lb3S1' 左端**を landed。これで **(9.11) squeeze `lb0≤lb1≤lb2≤lb3≤sumnS S1'≤sumnS S2` の pure-arithmetic
+層は全て repo に在り sorry-free**:
+
+| Coq step | Lean 補題 (S07_Subcoherent.lean) | commit |
+|---|---|---|
+| `lb01` (2·q·a·χ ≤ 2·a·q²·u) | `lb0_le_lb1_of_degreeRatio_le` | ad1c339a |
+| `lb12` (2a≤p−1、Gauss) | `two_mul_le_of_dvd_of_odd` (+`_dvd`/`_lt` companion) | ccc3351c |
+| `lb23` ([U:C]≤[U:U']、Lagrange) | `relIndex_le_relIndex_of_le` (+`_lt` companion) | ccc3351c |
+| `lb3S1'` 左端 (sumnS S1'=|S1'|·(qa)²) | `sumnS_of_norm_one_constant_degree` | 5ff2bb6d |
+| `lbS1'2` (S1'⊆S2 単調) | `sumnS_le_of_subset` | ad1c339a |
+| 発火 precondition (lb0<sumnS ⟹ 2a<∑) | `two_mul_lt_normalizedDegreeSq_of_lb0_lt_sumnS` | ad1c339a |
+| raw↔normalized 橋 | `sumnS_image_eq_anchorSq_mul` | ad1c339a |
+| extend_coherent 正engine (5.6) | `xAdjoinStepW` (S08:287、既存) | — |
+| 底 coherence (S1 uniform) | `coherent_subset_of_constant_degree` (既 landed) | 9aad60d8 |
+
+**残る唯一の gate = assembly (`coherent_H0C_commutator` S11:7788 の sibleyTarget_H0C 置換)**。engine は
+`coherentPairChain` (S07_Coherence:4907): 底 `S₀=S1` (coherent) + 隣接 pair 列挙 + per-step `hstep` を fold。
+`hstep` は上表の squeeze + `xAdjoinStepW` で組める。**genuine な残り content は 2 つだけ**:
+1. **§9 induced-family (`S_ H0C'`) の per-step Dade witness data** (`xAdjoinStepW` が要る decomposition
+   `Dmem`/`hmemOrtho`/`hgen`)。§8 case-B の `sMember_degreeSqNormBound_of_not_coherent` (S08_CaseBEnumeration)
+   と同型 shape、§9 family 用に組む。
+2. **induction bookkeeping** = (9.11.1) `without loss` + (9.11.7/8) maximality 矛盾: S3=S_H0C'∖S1 が尽きるまで
+   `lb0 < sumnS S2` が常に成り立つ (squeeze collapse が矛盾を生む) の帰納。
+
+次 iteration はこの assembly を正面から engage (§9 `Section11CharacterData`/`TypesIIIIIIVSetup` が非Galois
+setup = typeP_Galois 述語・U1/a/H1・S_H0C' Finset・lb_Sqa を expose するか確認 → fold を wiring)。
+lane a (10.7) も同一 (9.11) coherence で閉じる。
+
+## 2026-07-06 更新 #6 (lane b) — assembly scoping 結果: §9 setup の available 性を確定
+
+更新 #5 の「次: §9 setup が typeP_Galois 述語・U1/a/H1・S_H0C'・lb_Sqa を expose するか確認」を実施。
+`Section11CharacterData` (S11:2053) / `TypesIIIIIIVSetup` (S11:75) を精査:
+
+**在る (expose 済)**: `C = C_U(H̄)` (`cSub`)、`U' = [U,U]` (`uprimeSub`)、`C' = [C,C]` (`cprimeSub`)、
+`𝒳 = {χ∈Irr(HU) | H⊄Ker χ}` (`xiSet`)、`𝒮 = Ind 𝒳` (`sSet`)、`𝒳(Y)`/`𝒮(Y)` (`xiOf`/`sOf`)、
+`u = |Ū|` (`u_eq_card_quotient`)。→ subgroups + character families + u は全部 genuine に在る。
+
+**不在 (要 build)**: `typeP_Galois`/`typeP_nonGalois` **dichotomy 述語** (grep 0 in S11)、非Galois 構造
+`typeP_nonGalois_characters` の `a = [HU:H⟨U1⟩]`/`U1`/`H1` data、そして **`lb_Sqa`** (`|S1| ≥ (p−1)·[U:U']/a²`
+の下界; Coq `lb_Sqa`、(9.8)-level の deep datum)。
+
+**⟹ assembly の genuine 残 content 精緻化** (更新 #5 の「§9 witnesses を thread」より大きい):
+1. **(9.8)-level typeP_Galois/nonGalois character-structure dichotomy を build** (Coq
+   `typeP_Galois_characters` = 全 constituent degree `|M:HU|·u` / `typeP_nonGalois_characters` =
+   `a`/`U1`/`H1`/`lb_Sqa`)。これが (9.11) を 2 branch に割る前提。
+2. Galois branch: 上記 + `coherent_subset_of_constant_degree` (landed) で close。
+3. 非Galois branch: `coherentPairChain` fold + 上表 squeeze (全 landed) + per-step Dade witnesses。
+
+これは multi-session の genuine §9 prerequisite (コスト・規模は着手基準でない、CLAUDE.md)。次 iteration は
+(9.8) dichotomy 構造 (typeP_Galois 述語 + lb_Sqa) の build に正面着手。上流 = typeP_Galois 述語 (文書順で
+先)。lane a (10.7) も同一構造依存。
+
+## 2026-07-06 更新 #7 (lane b) — ★frontier 大修正: (9.11) は「(9.8) を scratch build」でなく「既存 dichotomy+branch counts を wire」
+
+更新 #6 の「(9.8) typeP_Galois/nonGalois dichotomy を build」は **verify-first で誤りと判明** (更新 #6 の
+scoping grep が `typeP_Galois`/`lb_Sqa` の Coq 名だけで空振り → S11 の descriptive 名 machinery を見落とし。
+本 session 4 度目の同型 miss)。S11 (11,767 行) は §9 の大半を既に形式化済:
+
+**既存 (verify-first で確認)**:
+- **dichotomy**: `clifford_dichotomy` (S11:6668) = `Nonempty (CliffordCaseAData chars) ∨ Nonempty (CliffordCaseBData chars)` = Peterfalvi (9.7) の Galois/非Galois 分岐。`chiefFactor_clifford_U_dichotomy` から導出済。
+- **Galois branch の uniform degree** (これが決定的): `caseB_character_counts` (S11:11709) conjunct (a) =
+  `∀ φ ∈ 𝒮(H₀C'), φ 1 = q·u` を **`caseB_degree_qu` (S11:7584) で証明済**。→ Galois branch は uniform degree `qu`。
+- **非Galois branch**: `CliffordCaseAData` (S11:2608、Clifford 整数 `a`=`|U:C_U(H₁)|` pin 込み) + `caseA_character_counts`
+  (S11:11661)。後者の degree-`qa` 下界 count (= Coq `lb_Sqa`) は **conjunct 4 が `sorry` (S11:11691)**、`caseA_exists_irreducible_source_degree_qa` (S11:6131) に依存。
+- **coherence engine**: `coherentEqualDegree_fromDade` (S07_Coherence:6090) / `coherent_subset_of_constant_degree` (landed)。
+
+**⟹ (9.11) coherence の honest 実体**: `coherent_H0C_commutator` (sibleyTarget_H0C 経由) を、`hG` を取る新定理で
+`clifford_dichotomy` case-split して置換:
+- **Galois**: `caseB_character_counts.1` (uniform `qu`) → engine。**残 = §9 family の Dade/subcoherent hypothesis**。
+- **非Galois**: `coherentPairChain` fold + squeeze (全 landed) + `lb_Sqa` count (S11:11691 の sorry)。
+
+**唯一の共通 structural gap = §9 induced family (`𝒮(H₀C')`, τ=Ind) の Dade/subcoherent hypothesis**。
+`coherentEqualDegree_fromDade` は `S04.Hypothesis` (Dade hyp) を要し τ を構成する。type-P Dade datum は S12
+`Hypothesis` (§10) が `dadeData.dade` として持つ (`fullDadeIsometryData hyp.hconj` で Dade isometry 構成、
+S13_SixTwoBridge で多用)。`Section11CharacterData.tau` は bare `IntegralCharacterMap`。→ **次 build**: §9
+`Section11CharacterData` に type-P `dadeData` を接続する (or §9 subcoherence を直接 exhibit) → Galois branch を
+`coherentEqualDegree_fromDade` で close → 非Galois branch を pair-chain で。
+
+**consumers**: `coherent_H0C_commutator` は S15 (b, `coherent_H0Cprime_S`) と S12_MaximalIII_IV_V:4049 (c) が使用。
+→ 新 honest 定理を建て **b の S15 のみ re-point** (c の file signature は触らない、territorial)。c にも adopt を後で flag。
+
+次 iteration: §9 Dade-datum 接続を正面 build (Galois branch を close 目標)。lane a (10.7) も同一 §9 coherence 依存。
+
+## 2026-07-06 更新 #8 (lane b) — ★★定義的 crux 確定: (13.3) coherence の底 = §9/S-instance Dade subcoherence (13.2.e Dade isometry 基盤)
+
+更新 #7 の「§9 family の Dade/subcoherent hypothesis を build → Galois branch close」を掘り下げ、
+crux を定義的に確定。verify-first で以下を確認:
+- **S-instance の τ は placeholder**: S15 `Hypothesis` (S15:98) は `tauS : IntegralCharacterMap` を
+  **bare で持ち** (`tauS_eq_induction : Prop` の placeholder のみ)、**Dade isometry でない**。`dadeData` field なし
+  (S12 `Hypothesis` は `dadeData.dade` を持つが S15 は持たない)。
+- **§9/S-instance Dade isometry (`FTtypeP_coh_base`/`FTtypeP_subcoherent` analogue) は grep 皆無** = 真に不在。
+- **per-step pair-chain data `sixTwoDecompositionData` (S13:814) は存在するが M-instance 用** (`hyp.dadeData.dade`、
+  type-P maximal M の Dade context)。S-instance には未接続。
+- sSet family 基本性質 (conj-closed/no-real/orthogonal) も named lemma 不在 (`sSet_subset_ZIrr` S11:1636 のみ);
+  ただし `induce_eq_induce_iff_conj` (distinct-orbit ⟹ distinct-induced) 機構は在る。
+
+**⟹ (13.3) `coherent_H0Cprime_S` の honest 再grounding の底 = (13.2.e) S-instance Dade isometry
+`τ = Ind_S^G is a Dade isometry` + それに載る §9 subcoherence**。これが唯一の foundational gate。
+その上は全 ready/landed: squeeze arithmetic (全 landed)・`clifford_dichotomy` (S11:6668)・Galois uniform
+degree `caseB_character_counts.1` (S11:11712)・`irrSubcoherent` (5.3.a assembler, landed)・
+`coherentPairChain` engine (S07:4907)・`coherent_subset_of_constant_degree` (landed)。
+
+**次 build = (13.2.e) S-instance Dade isometry (foundational、substantial、lane-b (13.x) territory)**。
+sSet conj-closure 等の Dade-independent 小片を先に建てても subcoherence は Dade isometry で gated ゆえ
+scaffold になる → 底の Dade isometry を正面 build する (難所回避しない、CLAUDE.md)。upstream = (13.2) の
+S/T Dade 構成。lane a (10.7) は M-instance 側で `sixTwoDecompositionData` を既に持つため S-instance とは別 path。
+
+## 2026-07-06 更新 #9 (lane b) — ★★★honest path 確定 (de-risked): P2 Dade = type-I ASet bridge (9008 Option A、pieces 存在)
+
+更新 #8 の crux「(13.2.e) S-instance Dade isometry」を verify-first で更に掘り、**honest な buildable path
+を確定** (本 session 5 度目の verify-first 的中):
+
+- **type-P Dade 構成は P1 限定**: `dadeSupportHypothesisData_typePA0_of_isTypeP1` (S10:2402) は `IsTypeP1`
+  (types III/IV/V) 前提。docstring が明記: **P2 (type II) の `typePA=(S')#` 上の Dade support は
+  false-as-stated** (issue **9008** closed: mmd OCR で `M_s#`→`M#` 化けた over-claim、consumer 0 の phantom)。
+  S-instance S は **type-P2** (`S_typeP2`) ゆえ phantom を埋めてはいけない。
+- **正しい A(S) = ⋃_{x∈S_σ#} C_{S'}(x)#** (9008: `(S')#` から U# Frobenius 補元を除外、S_σ=S_F=H)。
+  **9008 Option A: 「P₂ escape は type-I ASet bridge に還元」**。
+- **type-I ASet Dade 構成は既存**: `DadeSupportHypothesisData M (typeIA M data)` (S10:2066、`Nonempty` で構成済)。
+  → honest な S-instance Dade isometry は **type-I ASet 構成を S_σ#=S_F# 上で instantiate** して得る (phantom でない)。
+- `sibleyTarget_H0C` (unsound workaround) は正にこの P2 Dade gap の穴埋めだった。
+
+**⟹ honest build path (de-risked, pieces 存在)**:
+1. S-instance の type-P 構造 data (`Sdata`/`TypePData S`) を carrier (§16、issue 4010 closed で IsTypeP2 着地済) から取得。
+2. 正しい A(S) を type-I ASet (`typeIA` over S_σ#=S_F#) で構成。
+3. `DadeSupportHypothesisData S A(S)` を type-I ASet 構成で得る → `dade : S04.Hypothesis G A(S) S`。
+4. `coherentEqualDegree_fromDade` に Galois uniform degree (`caseB_character_counts.1`) を食わせ Galois branch close、
+   非Galois は pair-chain。→ `irrSubcoherent` に Dade + 既 landed の hconj (`sSet_closedUnderConjugate`) + hreal/hortho。
+
+次 build = 上記 1-3 (S-instance P2 Dade via type-I ASet bridge)。substantial だが phantom でなく pieces 存在。
+残 Dade-independent input: hreal (`HasNoRealCharacters` S03:60 + odd-order)、hortho (`inner_induce_eq_zero_of_not_conj`)。
+
+## 2026-07-06 更新 #10 (lane b) — ★★★★(13.2.e) foundation LANDED: honest P2 Dade support (commit fd5ccff9)
+
+更新 #9 の crux「S-instance P2 Dade isometry を type-I ASet bridge で構成」を **landed** (subagent + 検証)。
+6 iteration の drilling の到達点。
+
+**landed (S15_SAndT_Setup.lean、+267 行、commit fd5ccff9)**:
+- honest support `A(S) = ⋃_{x∈S_σ#} C_{S'}(x)# = centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)`
+  (9008-correct、phantom `typePA=(S')#` でない。A1=S_σ# では不足 — (C')#⊄S_σ#、(C')#⊆A(S) 検証済)。
+- 4 substantive P2 lemma (`_subset_ASet` bridge / `coprime_FT_signalizer...` (8.13.c2) / `_subset_hatMsigma` /
+  `_conj_mem`) は **axiom-clean** (標準3公理のみ)。
+- `dadeSupportHypothesisData_honestTypeP2ASet (hP2 : IsTypeP2 M) : Nonempty (DadeSupportHypothesisData M (A(S)))`
+  = (13.2.e) 基盤、`.dade : S04.Hypothesis G (A(S)) M` を産む。
+- **sorryAx provenance 検証済 (honest)**: top-level は sorryAx を持つが pre-existing shared BG §16 Theorem II
+  pins (`theoremII_tame_embedding`/`mem_sigmaSharp_of_mem_aSet_of_escape`) からの inheritance で、accepted
+  on-path `dadeSupportHypotheses_typeI` と **exact parity** (#print axioms 一致)。lane-b 導入 sorry 0。
+- enabler: `typeP2_exists_matched_kappa_hall_pair` (S16:1319)。S10/S11/S12 無改変。build GREEN 3932。
+
+**残 wiring (次 iteration、全て pieces 存在)**:
+1. `Hypothesis`-level wrapper: 構成を `hyp.S`/`hyp.S_typeP2`/`hyp.S_maximal` に instantiate → `hyp` に
+   concrete Dade hypothesis for S。
+2. Dade-independent inputs 残: `hreal` (`HasNoRealCharacters` S03:60 + odd-order)、`hortho`
+   (`inner_induce_eq_zero_of_not_conj` CliffordDecomposition:509)。hconj は landed (b8a37625)。
+3. `irrSubcoherent` で S07.Hypothesis 組成 (Dade + hconj/hreal/hortho) → §9 subcoherence。
+4. `clifford_dichotomy` (S11:6668) case-split: Galois = `caseB_character_counts.1` uniform degree +
+   `coherentEqualDegree_fromDade` / `coherent_subset_of_constant_degree`、非Galois = pair-chain + squeeze (landed)。
+5. `coherent_H0Cprime_S` (S15:572) を上記 honest route に re-point (現 sibleyTarget_H0C 経由を置換; ordering
+   注意 — 構成 746 が 572 より後ゆえ、re-grounding は new def or 構成を前方移動)。lane a (10.7) も同一 (9.11) coherence。
+
+## 2026-07-06 更新 #11 (lane b) — ★★★★★残 wiring step 1+2 LANDED: dadeHypS + hortho/hreal (Dade-independent inputs 完備)
+
+更新 #10 が示した「残 wiring (次 iteration、全て pieces 存在)」の **step 1 + step 2 の Dade-independent 部分**を landed:
+
+- **step 1**: `Hypothesis.dadeHypS` (S15_SAndT_Setup、commit 7dac2e77) —
+  `dadeSupportHypothesisData_honestTypeP2ASet hG hyp.S_maximal hyp.S_typeP2 |>.some.dade`
+  で S-instance の concrete `S04.Hypothesis G (A(S)) hyp.S` を Hypothesis レベルで取得。
+  `.fullDadeIsometryData` で Dade isometry `τ = Ind_S^G` を materialise する底。
+  sorry-provenance = dadeSupportHypothesisData_honestTypeP2ASet と exact parity (lane-b 導入 sorry 0)。
+- **step 2 (Dade-independent inputs 全完備)**: `sSet_pairwiseOrthogonal` (hortho) + `sSet_hasNoRealCharacters`
+  (hreal) landed (commit 589880fe、**#print axioms = 標準3公理のみ、sorryAx 無**)。hconj
+  (`sSet_closedUnderConjugate`) は既 landed (b8a37625)。⟹ **irrSubcoherent が要る 3 つの Dade-independent
+  家族性 hconj/hreal/hortho が全て揃った**。
+  - 技術: induceHU が bake する `Fintype.ofFinite`/`invertibleOfNonzero` は `S12.FiniteInduce` scoped
+    instance と一致 → `open scoped OddOrder.Peterfalvi.S12.FiniteInduce` 下で `induceHU = ClassFunction.induce`
+    が定義的還元 → 一般 `inducedKernelFamily_pairwise_orthogonal`/`_hasNoRealCharacters` (S08_SixTwoGeneral)
+    の 𝒮-instance として convert/bridge 不要でクリーンに証明。
+
+**⟹ 残る唯一の genuine crux = per-member R-datum**: `irrSubcoherent (τ) (A) (Rdatum) hconj hreal hortho hiso`
+のうち、揃っていないのは **(a) `Rdatum : ∀ χ ∈ 𝒮, CharacterDifferenceImage τ χ`** (各 member `Ind χ` に対し
+`τ(χ − χ̄)` を 2 既約の signed difference として与える deep family-specific data、Coq PFsection5 の R-datum)
+と **(b) `hiso`** (`τ = Ind_S^G` の difference 上 isometry、`dadeHypS.fullDadeIsometryData` の `inner_eq`
+S04:3821 から取る) の 2 点。
+
+**次 build (step 3-5)**:
+1. `dadeHypS.fullDadeIsometryData` (要 `HConjInvariant` of A(S)) → Dade isometry `τ` + `hiso`。
+2. per-member R-datum を 𝒮 に対して構築 (S08 case-B の `sMember_degreeSqNormBound...` / §9 induced-family
+   witnesses の pattern; **これが残る genuine deep content**)。
+3. `irrSubcoherent τ (A(S)) Rdatum hconj hreal hortho hiso` → `S07.Hypothesis` (§9 subcoherence)。
+4. `clifford_dichotomy` (S11:6668) case-split: Galois = `caseB_character_counts.1` uniform degree +
+   `coherentEqualDegree_fromDade`/`coherent_subset_of_constant_degree`、非Galois = `coherentPairChain` +
+   squeeze (全 landed)。
+5. `coherent_H0Cprime_S` (S15_SAndT_Setup:887) を上記 honest route に re-point (現 `sibleyTarget_H0C` 経由置換;
+   ordering 注意)。lane a (10.7) も同一 (9.11) coherence。
+
+hconj/hreal/hortho の Dade-independent 三点が揃ったので、次 iteration は step 1 の `fullDadeIsometryData`
+配線 + R-datum 構築に正面着手する (R-datum が残る唯一の deep crux、difficulty は着手基準でない CLAUDE.md)。
 ## ⚖️ HUB 裁定 (2026-07-06, 監視 hub) — lane-b の §5 coherence 実装の帰属
 
 lane-b の未マージ commit (`main..b`) が §5 coherence 実装を含むため、監視 tick で帰属を裁定:

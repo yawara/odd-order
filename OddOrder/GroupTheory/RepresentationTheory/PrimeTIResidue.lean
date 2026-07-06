@@ -7,6 +7,8 @@ import OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair
 import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
 import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+import OddOrder.Peterfalvi.S05_SigmaIsometry
+import OddOrder.Peterfalvi.S06_CertainTypeClifford
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S08_CoherenceCorePart1
 
@@ -526,3 +528,184 @@ end PrimeTIResidueData
 
 end OddOrder.RepresentationTheory
 
+/-! ## The `prTIres_irr_cases` dichotomy, assembled over the S06 certain-type `Hypothesis`
+
+The genuinely-deep constituent classification `prTIres_irr_cases` (Peterfalvi (4.5.b)) — the crux the
+`PrimeTIResidueData` structure posits — is **already proven** as the inertia computation in
+`S06_CertainTypeClifford`: a `χ ∈ Irr(K)` not among the residues `χ_j` has full inertia `I_L(χ) = K`
+(`inertia_eq_K_of_forall_chiRestrict_ne`, the `p`-group fixed-point count via
+`card_fixedPoints_conjByPermIrr…` + `IsPGroup.card_modEq_card_fixedPoints`), whence `Ind χ` is a fresh
+irreducible (`induce_isIrreducible_of_forall_chiRestrict_ne`) distinct from every `μ_{ij}`
+(`induce_ne_certainType_of_forall_chiRestrict_ne`).  Assembling the residue case (by definition) with
+that induced-irreducible case gives exactly the dichotomy `PrimeTIResidueData.prTIres_irr_cases`
+posits.  So the constructor of `PrimeTIResidueData` is a **bridge from an `S06.Hypothesis`**, not a
+from-scratch `cyclicTIiso` port (issue 9014): the single genuinely-deep field is discharged by
+`prTIres_irr_dichotomy` below. -/
+
+namespace OddOrder.Peterfalvi.S06.Hypothesis
+
+open OddOrder.RepresentationTheory
+
+variable {L : Type*} [Group L] [Fintype L] (h : Hypothesis L)
+  [Invertible (Nat.card L : ℂ)] [Fintype ↥(h.W1 ⊔ h.W2)]
+  [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)] [Invertible (Nat.card ↥h.K : ℂ)]
+
+/-- **Peterfalvi (4.5.b) `prTIres_irr_cases`, assembled.**  Every `χ ∈ Irr(K)` is either a residue
+`χ_j` (`= chiRestrict χ₂` for some `W₂`-column `χ₂`) or induces to a *fresh* irreducible of `L`
+distinct from every certain-type character `μ_{ij}`.  The residue case is by definition; the
+induced-irreducible case is the S06 inertia computation (`induce_isIrreducible_of_forall_chiRestrict_ne`
++ `induce_ne_certainType_of_forall_chiRestrict_ne`).  This is the deep field of a `PrimeTIResidueData`
+constructor built from an `S06.Hypothesis` (issue 9014). -/
+theorem prTIres_irr_dichotomy [NeZero (Nat.card h.W1)] (χ : IrreducibleCharacter ↥h.K) :
+    (∃ χ₂, h.chiRestrict χ₂ = χ) ∨
+      (IsIrreducibleCharacter (ClassFunction.induce h.K (χ : ClassFunction ↥h.K ℂ)) ∧
+        ∀ (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)),
+          ClassFunction.induce h.K (χ : ClassFunction ↥h.K ℂ)
+            ≠ ((h.columnFamily χ₂).mu i : ClassFunction L ℂ)) := by
+  by_cases hcase : ∃ χ₂, h.chiRestrict χ₂ = χ
+  · exact Or.inl hcase
+  · push_neg at hcase
+    exact Or.inr ⟨h.induce_isIrreducible_of_forall_chiRestrict_ne hcase,
+      fun χ₂ i => h.induce_ne_certainType_of_forall_chiRestrict_ne hcase χ₂ i⟩
+
+end OddOrder.Peterfalvi.S06.Hypothesis
+
+/-! ## Relocated from `S05_SigmaIsometry` (hub ruling 9014/fcfc0644): the `μ` extraction grid
+
+The signed-irreducible extraction `ω^σ = ±μ` (`mu2Grid`) is the σ-grounding down-payment on the
+prime-TI constructor (`cyclicTIiso` port), so it belongs with the prime-TI residue foundation
+here rather than in lane-a's `S05_SigmaIsometry`.  Namespace and API are unchanged
+(`TICyclicHypothesis.mu2Grid` etc.); only the file location moved. -/
+
+namespace OddOrder.Peterfalvi.S05.TICyclicHypothesis
+
+open OddOrder.RepresentationTheory
+
+variable {G : Type*} [Group G] [Fintype G]
+
+/-! ### The signed-irreducible extraction of (3.2): `ω^σ = ±μ` (the `dirr` step)
+
+Peterfalvi §4 / Feit–Thompson §13 (Coq `primeTIirr_spec`, `PFsection4.v:288-387`, via
+`dirr_dIirr`) refine the isometry (3.2) by showing that each basis image `ω^σ` is not merely a
+virtual character but a **single signed irreducible** `δ · μ` (`δ = ±1`, `μ ∈ Irr(G)`), so that the
+`μ` form an orthonormal system indexed by `Irr(W)` — the prime-TI irreducibles `mu2_ i j`.
+
+This is exactly the norm-`1` classifier applied to `ω^σ`: `ω^σ ∈ ZIrr G` (`sigma_mem_ZIrr`) and
+`‖ω^σ‖² = ‖ω‖² = 1` (isometry, `sigma_inner_irreducibleCharacter`), so by
+`exists_zsmul_irreducibleCharacter_of_inner_self_one` (Peterfalvi (5.9.a)) it is `δ · μ`.  The
+grid `mu2Grid`/`mu2GridSign` packages the extracted `μ`/`δ`, and `mu2Grid_orthonormal`
+(= Coq `cfdot_prTIirr`) reads the orthonormality of the `μ` straight off the isometry.
+
+These are reusable `σ`-side building blocks for the Peterfalvi §4 `dirr` extraction (the signed
+irreducibles `μ` of the prime-TI grid, read off the (3.2) isometry).  Standalone, `sorry`-free;
+currently unconsumed (the §4 prime-TI residue grid itself is carried by `S06`'s `certainType`/
+`columnFamily` machinery, so these are kept only as a self-contained `σ`→signed-irreducible API). -/
+
+/-- **Peterfalvi §4 `dirr` step** (existence form).  Each basis image `ω^σ` of the (3.2) isometry
+is a single signed irreducible: there are a sign `δ = ±1` and an irreducible `μ ∈ Irr(G)` with
+`ω^σ = δ • μ`.  (Coq `primeTIirr_spec` via `dirr_dIirr`: a norm-`1` element of `ℤ[Irr G]` lies in
+`± Irr(G)`.) -/
+theorem exists_sign_smul_irr_of_sigma_omega (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (ω : IrreducibleCharacter hyp.W) :
+    ∃ (δ : ℤ) (μ : IrreducibleCharacter G), (δ = 1 ∨ δ = -1) ∧
+      hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ) = δ • (μ : ClassFunction G ℂ) := by
+  have hσZ : hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ) ∈ ZIrr G :=
+    hyp.sigma_mem_ZIrr hVeq app (IsIrreducibleCharacter.mem_ZIrr ω.2)
+  have hσ1 : ClassFunction.inner (hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ))
+      (hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ)) = 1 := by
+    rw [hyp.sigma_inner_irreducibleCharacter hVeq app, irreducibleCharacter_inner_eq_ite,
+      if_pos rfl]
+  exact exists_zsmul_irreducibleCharacter_of_inner_self_one hσZ hσ1
+
+/-- **Peterfalvi §4 `dirr` step, grid form**: the extracted prime-TI irreducible `μ = mu2Grid ω`
+(Coq `primeTIirr`), a choice of the single irreducible `μ` with `ω^σ = ±μ`
+(`exists_sign_smul_irr_of_sigma_omega`). -/
+noncomputable def mu2Grid (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (ω : IrreducibleCharacter hyp.W) : IrreducibleCharacter G :=
+  (hyp.exists_sign_smul_irr_of_sigma_omega hVeq app ω).choose_spec.choose
+
+/-- The extracted sign `δ = mu2GridSign ω ∈ {±1}` of the `dirr` step. -/
+noncomputable def mu2GridSign (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (ω : IrreducibleCharacter hyp.W) : ℤ :=
+  (hyp.exists_sign_smul_irr_of_sigma_omega hVeq app ω).choose
+
+theorem mu2GridSign_eq (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (ω : IrreducibleCharacter hyp.W) :
+    hyp.mu2GridSign hVeq app ω = 1 ∨ hyp.mu2GridSign hVeq app ω = -1 :=
+  (hyp.exists_sign_smul_irr_of_sigma_omega hVeq app ω).choose_spec.choose_spec.1
+
+/-- The defining relation of the `dirr` extraction: `ω^σ = δ • μ` at the extracted `δ`/`μ`. -/
+theorem sigma_omega_eq_mu2GridSign_smul_mu2Grid (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (ω : IrreducibleCharacter hyp.W) :
+    hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ)
+      = hyp.mu2GridSign hVeq app ω • (hyp.mu2Grid hVeq app ω : ClassFunction G ℂ) :=
+  (hyp.exists_sign_smul_irr_of_sigma_omega hVeq app ω).choose_spec.choose_spec.2
+
+/-- The extracted `μ = mu2Grid ω` recovers `ω^σ` up to its sign: `μ = δ • ω^σ` (using `δ² = 1`). -/
+theorem mu2Grid_eq_sign_smul_sigma_omega (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (ω : IrreducibleCharacter hyp.W) :
+    (hyp.mu2Grid hVeq app ω : ClassFunction G ℂ)
+      = hyp.mu2GridSign hVeq app ω • hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ) := by
+  rw [hyp.sigma_omega_eq_mu2GridSign_smul_mu2Grid hVeq app ω, smul_smul]
+  rcases hyp.mu2GridSign_eq hVeq app ω with h | h <;> rw [h] <;> simp
+
+open scoped Classical in
+/-- **Peterfalvi (4.3.b) / Coq `cfdot_prTIirr`** (extraction form): the prime-TI irreducibles
+`mu2Grid ω` form an orthonormal system indexed by `Irr(W)`,
+`⟨mu2Grid ω, mu2Grid ω'⟩ = [ω = ω']`.  The diagonal is irreducibility; off the diagonal, if
+`mu2Grid ω = mu2Grid ω'` then `⟨ω^σ, ω'^σ⟩ = δ_ω δ_ω' · 1 = ±1 ≠ 0`, contradicting
+`⟨ω^σ, ω'^σ⟩ = ⟨ω, ω'⟩ = 0` (isometry). -/
+theorem mu2Grid_orthonormal (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (ω ω' : IrreducibleCharacter hyp.W) :
+    ClassFunction.inner (hyp.mu2Grid hVeq app ω : ClassFunction G ℂ)
+        (hyp.mu2Grid hVeq app ω' : ClassFunction G ℂ)
+      = if ω = ω' then 1 else 0 := by
+  by_cases hωω' : ω = ω'
+  · subst hωω'
+    rw [if_pos rfl, irreducibleCharacter_inner_eq_ite, if_pos rfl]
+  · rw [if_neg hωω', irreducibleCharacter_inner_eq_ite]
+    -- Off-diagonal: show `mu2Grid ω ≠ mu2Grid ω'`, hence the `ite` is `0`.
+    rw [if_neg ?_]
+    intro hμ
+    -- If the extracted irreducibles coincide, `⟨ω^σ, ω'^σ⟩` is a nonzero sign, but it is `0`.
+    have hcross : ClassFunction.inner (hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ))
+        (hyp.sigma hVeq app (ω' : ClassFunction hyp.W ℂ)) = 0 := by
+      rw [hyp.sigma_inner_irreducibleCharacter hVeq app, irreducibleCharacter_inner_eq_ite,
+        if_neg hωω']
+    rw [hyp.sigma_omega_eq_mu2GridSign_smul_mu2Grid hVeq app ω,
+      hyp.sigma_omega_eq_mu2GridSign_smul_mu2Grid hVeq app ω', hμ,
+      ← Int.cast_smul_eq_zsmul ℂ, ← Int.cast_smul_eq_zsmul ℂ,
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+      irreducibleCharacter_inner_eq_ite, if_pos rfl, mul_one, star_intCast] at hcross
+    -- `hcross : (δ_ω : ℂ) * (δ_ω' : ℂ) = 0`, impossible for signs `±1`.
+    rcases hyp.mu2GridSign_eq hVeq app ω with hδ | hδ <;>
+      rcases hyp.mu2GridSign_eq hVeq app ω' with hδ' | hδ' <;>
+      rw [hδ, hδ'] at hcross <;> norm_num at hcross
+
+/-- The grid `mu2Grid` is injective on `Irr(W)`: distinct linear characters `ω` give distinct
+prime-TI irreducibles (immediate from `mu2Grid_orthonormal`). -/
+theorem mu2Grid_injective (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp) :
+    Function.Injective (hyp.mu2Grid hVeq app) := by
+  intro ω ω' hμ
+  by_contra hne
+  have h := hyp.mu2Grid_orthonormal hVeq app ω ω'
+  rw [hμ, irreducibleCharacter_inner_eq_ite, if_pos rfl, if_neg hne] at h
+  exact one_ne_zero h
+
+end OddOrder.Peterfalvi.S05.TICyclicHypothesis
