@@ -762,6 +762,15 @@ theorem opCore_le_fitting (p : Nat.Primes) (G : Type*) [Group G] :
     opCore (p : ℕ) G ≤ fitting G :=
   le_iSup (fun q : Nat.Primes => opCore (q : ℕ) G) p
 
+/-- If `F(G)` is not contained in `S`, then some prime core `O_p(G)` is not
+contained in `S`. -/
+theorem exists_opCore_not_le_of_fitting_not_le {G : Type*} [Group G] {S : Subgroup G}
+    (hS : ¬ fitting G ≤ S) :
+    ∃ p : Nat.Primes, ¬ opCore (p : ℕ) G ≤ S := by
+  by_contra h
+  push Not at h
+  exact hS (iSup_le h)
+
 /-- `F(G)` は `G` で特性的. 各 `opCore p G` が特性的 (`opCore.characteristic`) で,
 特性的部分群の sup は特性的 (`Subgroup.map_iSup` + `iSup_congr`). -/
 instance fitting.characteristic (G : Type*) [Group G] : (fitting G).Characteristic := by
