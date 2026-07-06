@@ -2278,6 +2278,39 @@ noncomputable def OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom
     (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN a) (g : G ⧸ N) =
       ((φ a) g : G ⧸ N) := rfl
 
+/-- An `A`-invariant subgroup maps to an invariant subgroup in an
+`A`-invariant quotient. -/
+theorem _root_.OddOrder.Isaacs.Ch03.IsAInvariant.map_quotient
+    {A G : Type*} [Group A] [Group G] {φ : A →* MulAut G}
+    {N : Subgroup G} [N.Normal]
+    (hN : OddOrder.Isaacs.Ch03.IsAInvariant φ N)
+    {H : Subgroup G} (hH : OddOrder.Isaacs.Ch03.IsAInvariant φ H) :
+    OddOrder.Isaacs.Ch03.IsAInvariant
+      (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN)
+      (H.map (QuotientGroup.mk' N)) := by
+  rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+  intro a q hq
+  rw [Subgroup.mem_map] at hq ⊢
+  obtain ⟨g, hg, rfl⟩ := hq
+  exact ⟨(φ a) g, hH.smul_mem a hg, by
+    rw [OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk']⟩
+
+/-- The preimage of an invariant subgroup of an `A`-invariant quotient is
+invariant in the original group. -/
+theorem _root_.OddOrder.Isaacs.Ch03.IsAInvariant.comap_quotient
+    {A G : Type*} [Group A] [Group G] {φ : A →* MulAut G}
+    {N : Subgroup G} [N.Normal]
+    (hN : OddOrder.Isaacs.Ch03.IsAInvariant φ N)
+    {Y : Subgroup (G ⧸ N)}
+    (hY : OddOrder.Isaacs.Ch03.IsAInvariant
+      (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN) Y) :
+    OddOrder.Isaacs.Ch03.IsAInvariant φ (Y.comap (QuotientGroup.mk' N)) := by
+  rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+  intro a g hg
+  rw [Subgroup.mem_comap] at hg ⊢
+  rw [← OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk']
+  exact hY.smul_mem a hg
+
 /-- The action commutator descends to quotients as the image of the action commutator. -/
 theorem actionCommutator_quotient_eq_map
     {A G : Type*} [Group A] [Group G] {φ : A →* MulAut G}
