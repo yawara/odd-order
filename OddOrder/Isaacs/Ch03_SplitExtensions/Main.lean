@@ -633,6 +633,22 @@ theorem IsHallSubgroup.map_quotient [Finite G] {π : Set ℕ} {N : Subgroup G}
       hp.2.1.trans (H.index_map_dvd (QuotientGroup.mk'_surjective N)),
       Subgroup.index_ne_zero_of_finite⟩
 
+/-- A `π`-Hall subgroup stays `π`-Hall under any automorphism of the ambient group. -/
+theorem IsHallSubgroup.mulAut_smul [Finite G] {π : Set ℕ} {H : Subgroup G}
+    (hH : IsHallSubgroup π H) (φ : MulAut G) : IsHallSubgroup π (φ • H) := by
+  rw [show (φ • H : Subgroup G) = H.map (φ : G →* G) by
+    rw [Subgroup.pointwise_smul_def]
+    rfl]
+  refine ⟨?_, ?_⟩
+  · have hcard : Nat.card ↥(H.map (φ : G →* G)) = Nat.card ↥H :=
+      (Nat.card_congr (Subgroup.equivMapOfInjective H _ φ.injective).toEquiv).symm
+    rw [hcard]
+    exact hH.1
+  · have hidx : (H.map (φ : G →* G)).index = H.index :=
+      Subgroup.index_map_equiv H φ
+    rw [hidx]
+    exact hH.2
+
 /-- `⊤` は π-Hall ⇔ `G` が π-group (`|G|` の全素因子が π に属す). -/
 theorem IsHallSubgroup.top_iff (π : Set ℕ) :
     IsHallSubgroup π (⊤ : Subgroup G) ↔ ∀ p ∈ (Nat.card G).primeFactors, p ∈ π := by
@@ -1225,6 +1241,16 @@ theorem hall_C [Finite G] [IsSolvable G] {π : Set ℕ} {H K : Subgroup G}
     (hH : IsHallSubgroup π H) (hK : IsHallSubgroup π K) :
     ∃ g : G, H.map (MulAut.conj g).toMonoidHom = K :=
   hall_C_strong_aux (Nat.card G) G le_rfl hH hK
+
+/-- A normal `π`-Hall subgroup of a finite solvable group is the unique `π`-Hall subgroup.
+This is the standard immediate consequence of Hall conjugacy: every other `π`-Hall subgroup is a
+conjugate of the normal one, hence is equal to it. -/
+theorem IsHallSubgroup.eq_of_normal [Finite G] [IsSolvable G] {π : Set ℕ} {H K : Subgroup G}
+    (hH : IsHallSubgroup π H) (hK : IsHallSubgroup π K) (hN : H.Normal) : H = K := by
+  haveI := hN
+  obtain ⟨g, hg⟩ := hall_C hH hK
+  rw [← hg]
+  exact (Subgroup.Normal.conj_smul_eq_self g H).symm
 
 /-- **Schur-Zassenhaus D-part (抽象版)**: `M ⊴ G` が可解で補群 `K` を持つとき, `|M|` と
 位数が互いに素な部分群 `U` は `K` の共役 `Kˣ` に含まれる.
