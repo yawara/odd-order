@@ -1771,6 +1771,68 @@ noncomputable def certainTypeSet_isCoherent_A0 [Finite G]
     exact ⟨φ, ⟨hφspan, hφsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
       Set.subset_union_left)⟩, hφne⟩
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.11), all-reducible corner ((9.9)(c))**: if every member of `𝒮(H₀C′)` is
+reducible, the family is coherent on `A₀(M)`.  In this corner the family consists entirely of
+μ-grid column sums (`reducible_mem_inducedKernelFamily_mem_certainTypeSet`, through `𝒮 ⊆ S =
+inducedKernelFamily` by `sOf_subset_SOf`), i.e. it lies in the certain-type set `𝒯` at any
+nonzero reference column — so the (4.9)(b) coherence `certainTypeSet_isCoherent_A0` restricts
+along `isCoherent_of_subset`.  The nonzero supported witness is the conjugate difference
+`ζ̄ − ζ` of any member (`hne`; conjugation preserves `𝒮(H₀C′)` by `sOf_closedUnderConjugate`,
+the difference is `A₀`-supported by `inducedKernelFamily_conjDiff_support` and nonzero since odd
+order admits no real characters).
+
+This closes the base of the (9.11) `Ptype_core_coherence` induction in the corner where no
+irreducible seed exists (`sOf_degreeSubfamily_isCoherent` is empty-cut there); the complementary
+mixed corner proceeds by irreducible-cut base + `xAdjoinStepW_k` column-pair adjunction. -/
+noncomputable def coherent_sOf_H0Cprime_of_allReducible [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
+    {kref : Fin hyp.base.w2} (hkref : kref ≠ 0)
+    (hallred : ∀ φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
+      ¬ IsIrreducibleCharacter φ)
+    (hne : (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime).Nonempty) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+      (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) hyp.base.A0 := by
+  haveI := hyp.base.finiteG
+  classical
+  -- the certain-type coherence at the reference column
+  have hcohT := certainTypeSet_isCoherent_A0 hG hyp.base hG.odd
+    (hyp.base.muColumnChar_ne_one hG hG.odd hkref)
+  -- `𝒮(H₀C′) ⊆ 𝒯` (every member is reducible, hence a μ-grid column sum)
+  have hsub : OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime ⊆
+      OddOrder.Peterfalvi.S06.certainTypeSet (hyp.base.toHypothesis46 hG hG.odd)
+        (hyp.base.muColumnChar hG hG.odd kref) := by
+    intro φ hφ
+    have hφSK : φ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) (hyp.H0Cprime.subgroupOf M) := by
+      have h := hyp.sOf_subset_SOf hyp.H0Cprime hφ
+      rwa [hyp.SOf_eq] at h
+    exact hyp.base.reducible_mem_inducedKernelFamily_mem_certainTypeSet hG hyp.type_alt
+      (OddOrder.GroupTheory.typePNontrivialCore_of_isTypeIIIorIV hyp.type_alt hyp.base.typeP)
+      (OddOrder.Peterfalvi.S11.exists_chiefFactorData hG _).choose
+      hyp.params.w2_prime hkref hφSK (hallred φ hφ)
+  -- the nonzero supported witness `ζ̄ − ζ` (`Prop`-confined)
+  have hwit : ∃ φ : ClassFunction ↥M ℂ,
+      φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan
+        (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) hyp.base.A0 ∧ φ ≠ 0 := by
+    obtain ⟨ζ, hζ⟩ := hne
+    have hζc : ζ.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime :=
+      Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0Cprime hζ
+    have hζSK : ζ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) (hyp.H0Cprime.subgroupOf M) := by
+      have h := hyp.sOf_subset_SOf hyp.H0Cprime hζ
+      rwa [hyp.SOf_eq] at h
+    refine ⟨ζ.conj - ζ, ⟨?_, ?_⟩, ?_⟩
+    · exact Submodule.sub_mem _
+        (Submodule.subset_span hζc) (Submodule.subset_span hζ)
+    · exact OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support
+        hyp.base.mderivSharp_subset_A0 hζSK
+    · intro h
+      exact OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters
+        (hyp.base.card_odd_of_isMinimalSimpleOdd hG) _ hζSK (sub_eq_zero.mp h)
+  exact isCoherent_of_subset hcohT hsub hwit
+
 /-- **Peterfalvi (11.8): `S(HC)` is coherent** (sorry-free).  `S(HC) = SOf HC` is the subfamily of
 the degree-`w₁` family `S(M'')` cut out by the *larger* kernel condition (`M'' ≤ HC`,
 `secondDerived_le_HC`, so `S(HC) ⊆ S(M'')` by kernel-antitonicity), so it inherits the coherent
