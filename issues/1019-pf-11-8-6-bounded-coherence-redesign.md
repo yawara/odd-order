@@ -579,3 +579,24 @@ base-case constant-degree → coherentPairChain extension)。同定は (11.7) ci
 ⟹ 見積 40-80 行 (step 3-4 が crux)。**次 iteration = C_eq_cSub を書く** (step 1 landed、path 明確)。
 これで capstone hY family (sOf(H0 ⊔ hyp.C)) = (9.11) family (sOf(H0 ⊔ cSub)、H0=⊥ で cprimeSub=
 derivedInG cSub=derivedInG hyp.C=H0Cprime) が一致 → (9.11) port が hcoh を直接供給。
+
+## 🔬 update⁴⁹ (2026-07-07 lane-a /loop) — ★ C_eq_cSub LANDED (同定完了) — capstone family = (9.11) family
+
+同定 `S13_CoreStructure.C_eq_cSub : hyp.C = S11.cSub hyp.s11Setup hyp.chief` を **sorry-free landing**
+(full build green, axiom-clean)。update⁴⁸ の 4-step path を実装:
+- **forward** (`C_U(H) ≤ cSub`): `S11.mem_cSub_of_mem_U_of_centralizes` (既存、centralize H ⟹ H̄ trivial)。
+- **reverse** (`cSub ≤ C_U(H)`, N=⊥ 使用): x∈cSub の ker(uActionHom) 成員 a を unfold →
+  `quotientMulAutHom_apply_mk'` で coset action → `chief_N_eq_bot` (N=⊥) で `mk' N` injective
+  (`ker_eq_bot_iff` + `ker_mk'`) → `typeP_conjAction l ⟨g,·⟩ = ⟨g,·⟩` → `typeP_conjAction_apply`
+  (conjugation) で `x*g*x⁻¹=g` → `mul_inv_eq_iff_eq_mul` で `g*x=x*g`。s11Setup↔base は
+  `setup_typeP_eq` で bridge。
+
+### ⟹ hY route の同定 gate CLOSED。残 = (9.11) port のみ (ungated genuine math)
+同定完了で **capstone hY family `sOf(hyp.H0C)` と (9.11) family が cSub 経由で一致**。残る hY
+obligation は:
+- **hcoh = coherent(sOf(hyp.H0Cprime))** = (9.11) `Ptype_core_coherence` port (engine assembly、
+  update⁴⁵ 在庫の irrSubcoherent → coherent_subset_of_constant_degree → coherentPairChain)。
+  H0Cprime = chief.H0 ⊔ derivedInG hyp.C、C_eq_cSub で = chief.H0 ⊔ cprimeSub (S11) と一致可。
+- **hwit = 𝒮(H₀C) nonemptiness** = `caseA_exists_irreducible_sOf_H0C` (case split)。
+両方 lane-a §9-11 ungated。**次 iteration = (9.11) port assembly か hwit** に着手。
+(capstone は加えて §14 glue も要、lane-a 単独では非閉 — 既知。)
