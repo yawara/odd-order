@@ -10278,11 +10278,19 @@ via the chief-factor action forces `A ⊆ C_{L_σ}(Q/Q₀) = F(L)`.
 
 ⚠ **Genuinely gated §15 input** (the third `sAFL`/`sylQ` clause, now the *only* remaining gate of
 `typeP_partner_sylow_uniquelyMaximal_bundle` — `sylQ` = `opiCore_index_coprime_of_typeP` and `uniqQ`
-= `opiCore_isUniquelyMaximal_of_isSylow` are proved).  The repo `mf_ne_msigma_typeP1_structure`
-exposes `F(L) = Q·C_M(Q)` and the complement `Q ⋊ D`, but not the `C_{L_σ}(Q/Q₀)` characterization
-nor the "`A` centralizes the chief factor `Q/Q₀`" fact (Coq's `quotient_cents` step: `⁅a, y⁆ ∈ Q₀`
-for `a ∈ A`, `y ∈ Q`); porting it needs the detailed `Fcore_structure` chief-factor output.
-(issue 9017 update #12/#15.) -/
+= `opiCore_isUniquelyMaximal_of_isSylow` are proved).
+
+**Reconstruction plan** (Coq `Fcore_structure` eq3 `C_Ms(Ks/Q₀|'Q)=F(M)`, BGsection15.v:579-593):
+the repo has eq2 (`centralizer_msigma_quotient_le_fittingInAmbient`: `x∈M_σ` centralizing `Q̄=Q/Q₀`
+⟹ `x∈F(L)`) but **not** eq3.  Coq derives eq3 from eq2 by the minimality lifting
+`C_{M_σ}(K̄|'Q) = C_{M_σ}(Q̄|'Q)` (both `=F(L)`): `⊇` is trivial (`K̄⊆Q̄`); `⊆` uses that
+`C_{M_σ}(K̄|'Q)` is `M`-normal and `Q̄` is minimal normal in `M/Q₀`
+(`chiefFactor_Q0_normal_minimal_of_inputs`, `isElementaryAbelian_chiefFactor_of_minimalNormal`),
+so `[Q̄, C_{M_σ}(K̄)] ⊴ M` is `⊆Q̄`, hence `=1` or `Q̄`; `=Q̄` contradicts `C` centralizing the
+nontrivial `K̄⊆Q̄`.  Then `hACK : A⊆C(K)` ⟹ `Ā` centralizes `K̄` ⟹ (lifting) `Ā` centralizes `Q̄`
+⟹ (eq2) `A⊆F(L)`.  The chief-factor context (`Q,Q₀,D,minnormal Q̄`) is reconstructed as in
+`opiCore_index_coprime_of_typeP`'s non-nil branch / `mf_ne_msigma_typeP1_structure`'s internals.
+(issue 9017 update #12/#15/#16.) -/
 theorem A_le_fittingInAmbient_of_typeP1_nonnil [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L Ks K A : Subgroup G} {q1 : ℕ}
     (hL : L ∈ maximalSubgroups G) (hP : S14.IsTypeP L) (hKsL : Ks ≤ L)
