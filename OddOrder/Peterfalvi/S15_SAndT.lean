@@ -3560,23 +3560,29 @@ theorem exists_M_structural [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 /-- Carrier for the virtual character `beta_j` and `Gamma_j` in Peterfalvi (13.18).
 
-**De-opacified (W3 §15).**  This carrier previously held six free `_formula : Prop` placeholders
-(the [[scaffold-sorry-free-not-done]] convention).  Since `BetaData` has no external consumers (only
-`beta_support_norm_and_remainder` produces it), the placeholder fields are now the **genuine
-Peterfalvi (13.18) statements** about `β_j`/`Γ_j`, tied to `hyp`, the grid `hyp.eta`, and `S`:
+**De-opacified (W3 §15); faithful to Peterfalvi (13.18) after the issue-3003 correction.**  This
+carrier previously held six free `_formula : Prop` placeholders (the
+[[scaffold-sorry-free-not-done]] convention).  Since `BetaData` has no external consumers (only
+`beta_support_norm_and_remainder` produces it), the fields are now the **genuine Peterfalvi (13.18)
+statements** about `β_j`/`Γ`, tied to `hyp`, the grid `hyp.eta`, and `S`:
 
-* `Gamma_real` — `Γ_j` is real (`Γ_j.conj = Γ_j`);
-* `Gamma_orthogonal_one` — `(Γ_j, 1_G) = 0`, the residual is orthogonal to the principal character;
+* `support_formula` — **(13.18.a)** the support of `β_j` is contained in `S`'s η-carrier support;
 * `norm_formula` — **(13.18.b)** `‖β_j‖²_S = (u−1)/q + 2` (its Frobenius `Ind` half is the sorry-free
   `norm_induce_one_frobenius`);
-* `support_formula` — the support of `β_j` is contained in `S`'s η-carrier support (the grid-side
-  support control of (13.18.a));
-* `Gamma_independent` — `Γ_j` is orthogonal to the whole η-grid `{η_ij}` (independence from the
-  Dade images, (13.18.a));
-* `Y_norm_bound` — `‖Γ_j‖² ≤ (u−1)/q + 1`, the residual-norm bound feeding the (13.10) cascade.
+* `Gamma_orthogonal_one` — **(13.18.c)** `(Γ, 1_G) = 0`, the residual is orthogonal to the principal;
+* `Gamma_real` — **(13.18.c)** `Γ` is real (`Γ.conj = Γ`);
+* `Y_norm_bound` — **(13.18.d)** for any split `Γ = X + Y` (`X ⊥ Y`, `Y ⊥` grid), `‖Y‖² ≤ (u−1)/q`.
+
+The remaining half of **(13.18.c)** — `Γ`'s `j`-independence (`defGamma`) — is the standalone proven
+`gammaGrid_defGamma` (not a field here, to keep the `FiniteInduce` `τ_S` instances out of this
+structure's explicit inner-product binders).  ⚠ The **removed** fields `Gamma_independent`
+(`⟨Γ,η_ik⟩ = 0`) and the old `Y_norm_bound` (`‖Γ‖² ≤ (u−1)/q + 1`) were **overstatements** — (13.18.c)
+says `Γ` is independent of `j`, not grid-orthogonal, and (13.18.d) bounds the grid-orthogonal part
+`Y`, not `‖Γ‖²` (issue 3003).
 
 The genuine grid/Dade content bottoms out at the (3.2) τ-isometry (`tau3`, σ-pinned 2026-06-15) and
-the (13.18.b) Frobenius norm; it is isolated into the single faithful producer `betaData_of_grid`. -/
+the (13.18.b) Frobenius norm; it is isolated into the single faithful producer
+`betaData_of_grid`. -/
 structure BetaData (hyp : Hypothesis (G := G)) where
   j : Fin hyp.p
   j_ne_zero : (j : ℕ) ≠ 0
@@ -3590,20 +3596,22 @@ structure BetaData (hyp : Hypothesis (G := G)) where
     ∀ [Fintype ↥hyp.S] [Invertible (Nat.card ↥hyp.S : ℂ)],
       ClassFunction.inner beta beta
         = ((((hyp.u : ℚ) - 1) / (hyp.q : ℚ) + 2 : ℚ) : ℂ)
-  /-- **(13.18.a)** independence: `Γ_j` is orthogonal to the whole `η`-grid. -/
-  Gamma_independent :
-    ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
-      ∀ (i : Fin hyp.q) (k : Fin hyp.p), ClassFunction.inner Gamma (hyp.eta i k) = 0
-  /-- **(13.18)** `Γ_j` is orthogonal to the principal character `1_G`. -/
+  /-- **(13.18)** `Γ_j` is orthogonal to the principal character `1_G` (part of (13.18.c)). -/
   Gamma_orthogonal_one :
     ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
       ClassFunction.inner Gamma (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G) = 0
-  /-- **(13.18)** `Γ_j` is a real virtual character. -/
+  /-- **(13.18.c)** `Γ_j` is a real virtual character. -/
   Gamma_real : Gamma.conj = Gamma
-  /-- **(13.18)** residual-norm bound `‖Γ_j‖² ≤ (u−1)/q + 1` feeding the (13.10) cascade. -/
+  /-- **(13.18.d)** residual-norm bound: for any split `Γ = X + Y` with `X ⊥ Y` and `Y` orthogonal
+  to the whole `η`-grid, `‖Y‖² ≤ (u−1)/q`.  This is the genuine (13.18.d) feeding the (14.14)
+  case-`(c1)`/`(c2)` orthogonality switch.  (The previous field `‖Γ‖² ≤ (u−1)/q + 1` was **not**
+  this statement — an overstatement, since `‖Γ‖² = ‖X‖² + ‖Y‖²` with `X` the nonzero grid-component;
+  see issue 3003.  The (13.18.c) `j`-independence half is the standalone `gammaGrid_defGamma`.) -/
   Y_norm_bound :
     ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
-      (ClassFunction.inner Gamma Gamma).re ≤ ((hyp.u : ℚ) - 1) / (hyp.q : ℚ) + 1
+      ∀ (X Y : ClassFunction G ℂ), Gamma = X + Y → ClassFunction.inner X Y = 0 →
+        (∀ (i : Fin hyp.q) (k : Fin hyp.p), ClassFunction.inner Y (hyp.eta i k) = 0) →
+        (ClassFunction.inner Y Y).re ≤ ((hyp.u : ℚ) - 1) / (hyp.q : ℚ)
 
 /-- **`U ⋊ W₁` complements `P` in `S`** (structural bridge for (13.18.b), `S`-side form).  From the
 `Sdata` complements `M' ⋊ W₁ = S` and `P ⋊ U = M'`, the subgroup `U ⊔ W₁` intersects `P = S_F`
@@ -3985,18 +3993,72 @@ theorem betaGrid_norm [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   push_cast
   ring
 
-/-- **(13.18.a) grid-independence**: `⟨Γ, η_{ik}⟩ = 0` for every grid entry.
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(4.8)/(5.3) prime-`TI` Dade cross-relation, `S`-side row-`0` form**:
+`τ_S(μ_{0j} − μ_{01}) = η_{0j} − η_{01}` for `j ≠ 0`.
 
-⚠ DEEP §13 RESIDUAL, isolated obligation.  `Γ = τ_S(β_{#1}) − 1_G + η_{01}`.  The hard term is
-`⟨τ_S(β_{#1}), η_{ik}⟩`: the `S`-side Dade image `τ_S` and the `W`-side grid `η = τ₃∘ω` are
-different Dade maps, linked by the (13.1.e)/(5.3) cross-relation `τ_S(μ_{ij} − μ_{0j}) =
-δ_j(η_{ij} − η_{0j})` (Coq `prDade_sub_TIirr`, `Dtau`), which forces `Γ` orthogonal to the whole
-`σ`-image `{η_{ik}}`.  No repo field yet supplies this `S`↔`W` Dade cross-relation. -/
-theorem gammaGrid_independent [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
-    ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
-      ∀ (i : Fin hyp.q) (k : Fin hyp.p),
-        ClassFunction.inner (GammaGrid hG hyp) (hyp.eta i k) = 0 := sorry
+⚠ DEEP §4/§5 RESIDUAL, isolated obligation (issue 3003).  This is Coq `prDade_sub_TIirr`
+(`PFsection4.v:870`) `τ(μ2_{ij} − μ2_{ik}) = δ_j·(η_{ij} − η_{ik})` specialized to row `i = 0`,
+columns `j` and `#1`, with the `FT`-context sign `δ_j = 1` (Coq `FTprTIsign`).  Mathematically it is
+the compatibility of the `S`-side Dade isometry `τ_S` with the (3.2) `σ`-transfer `τ₃` on the
+`ω`-grid: `τ_S ∘ Ind_W^S = τ₃` on `ω`-differences.  No repo field supplies this cross-**column**
+relation — `mu_definition` is the cross-**row** axis, and the prime-`TI` Dade machinery
+`prDade_sub_TIirr` is not yet ported (`PrimeTIResidue.lean` has only the residue two-way split).
+It is the single deep input behind (13.18.c)'s `j`-independence `gammaGrid_defGamma`. -/
+theorem tauS_mu_row0_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (_hj : (j : ℕ) ≠ 0) :
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG))
+        (hyp.mu ⟨0, hyp.q_prime.pos⟩ j
+          - hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)
+      = hyp.eta ⟨0, hyp.q_prime.pos⟩ j
+          - hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩ := sorry
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(13.18.c), `j`-independence** (`defGamma`): for every column `j ≠ 0`, the bridge residual
+`τ_S(β_j) − 1_G + η_{0j}` equals the fixed gap `Γ = GammaGrid` (defined at column `#1`).
+
+This is exactly Peterfalvi (13.18.c)'s "`Γ` is independent of `j`" (Coq `defGamma`,
+`PFsection13.v:1905`), **NOT** grid-orthogonality: the previous scaffold field
+`Gamma_independent : ⟨Γ, η_{ik}⟩ = 0` was an **overstatement** (issue 3003), refuted by the genuine
+(13.18.d) `X + Y` decomposition where `Γ`'s grid-component `X` is nonzero.
+
+Proof (sorry-free glue, one isolated obligation): `τ_S(β_j) − τ_S(β_{#1}) = τ_S(β_j − β_{#1})` by
+`ℤ`-linearity of the Dade map (`map_sub`), and `β_j − β_{#1} = μ_{01} − μ_{0j} = −(μ_{0j} − μ_{01})`
+(both share the `Ind_{PW₁}^S 1` positive part), so `τ_S(β_j − β_{#1}) = −(η_{0j} − η_{01}) =
+η_{01} − η_{0j}` by the (4.8)/(5.3) cross-relation `tauS_mu_row0_cross`.  Cancelling the `−1_G`'s and
+`abel` closes the goal. -/
+theorem gammaGrid_defGamma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) (betaGrid hyp j)
+        - OddOrder.Peterfalvi.S09.Hypothesis71.constOne G + hyp.eta ⟨0, hyp.q_prime.pos⟩ j
+      = GammaGrid hG hyp := by
+  have hcross := tauS_mu_row0_cross hG hyp j hj
+  have hbeta : betaGrid hyp j - betaGrid hyp ⟨1, by have := hyp.three_le_p; omega⟩
+      = -(hyp.mu ⟨0, hyp.q_prime.pos⟩ j
+          - hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩) := by
+    simp only [betaGrid]; abel
+  have key : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) (betaGrid hyp j)
+      - OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+          ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG))
+          (betaGrid hyp ⟨1, by have := hyp.three_le_p; omega⟩)
+      = hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩
+        - hyp.eta ⟨0, hyp.q_prime.pos⟩ j := by
+    rw [← map_sub, hbeta, map_neg, hcross]; abel
+  simp only [GammaGrid, tauSbetaGrid]
+  set D := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+    ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) with hD
+  rw [← sub_eq_zero, show
+      (D (betaGrid hyp j) - OddOrder.Peterfalvi.S09.Hypothesis71.constOne G
+          + hyp.eta ⟨0, hyp.q_prime.pos⟩ j)
+        - (D (betaGrid hyp ⟨1, by have := hyp.three_le_p; omega⟩)
+          - OddOrder.Peterfalvi.S09.Hypothesis71.constOne G
+          + hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)
+      = (D (betaGrid hyp j) - D (betaGrid hyp ⟨1, by have := hyp.three_le_p; omega⟩))
+        - (hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩
+          - hyp.eta ⟨0, hyp.q_prime.pos⟩ j) by abel, key, sub_self]
 
 /-- **(13.18.c)** `⟨Γ, 1_G⟩ = 0`.
 
@@ -4022,30 +4084,36 @@ theorem gammaGrid_real [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     (GammaGrid hG hyp).conj = GammaGrid hG hyp := sorry
 
-/-- **(13.18.d) residual-norm bound**: `Re⟨Γ,Γ⟩ ≤ (u−1)/q + 1`.
+/-- **(13.18.d) residual-norm bound**: for any split `Γ = X + Y` with `X ⊥ Y` and `Y` orthogonal to
+the whole `η`-grid `{η_{ik}}`, `‖Y‖² ≤ (u−1)/q`.
 
-⚠ DEEP §13 RESIDUAL, isolated obligation.  Coq's (13.18.d) argument bounds `‖Γ‖²` using
-`‖β_{#1}‖² = (u−1)/q + 2` (`betaGrid_norm`), the Dade isometry `‖τ_S β‖² = ‖β‖²` on `A₀(S)`-support
-(`dadeIntegralCharacterMap_inner_eq_on_supported_span`), and the decomposition
-`β_{#1} = Γ − η_{01} + 1_G` with the `η_{01}`/`1_G` orthogonalities peeled off (`cfnormDd`).  It
-needs the (13.18.a,c) orthogonalities above plus the on-support isometry, hence gated on the same
-`A₀(S)` normedTI content. -/
-theorem gammaGrid_norm_bound [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+⚠ DEEP §13 RESIDUAL, isolated obligation.  Coq's (13.18.d) argument (`PFsection13.v:1915-1934`)
+bounds `‖Y‖²` using `‖β_{#1}‖² = (u−1)/q + 2` (`betaGrid_norm`), the Dade isometry
+`‖τ_S β‖² = ‖β‖²` on `A₀(S)`-support (`dadeIntegralCharacterMap_inner_eq_on_supported_span`), and the
+decomposition `β_{#1} = Γ − η_{01} + 1_G` with the `η_{01}`/`1_G` orthogonalities peeled off, then
+splits off the grid-projection `X` (a `≠ 0` combination of the `η_{ik}`, whence the `X + Y` framing —
+`‖Γ‖²` itself is **not** bounded, correcting the earlier `Re⟨Γ,Γ⟩ ≤ (u−1)/q + 1` overstatement,
+issue 3003).  It needs the (13.18.a,c) orthogonalities plus the on-support isometry, hence gated on
+the same `A₀(S)` normedTI content. -/
+theorem gammaGrid_Y_norm_bound [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
-      (ClassFunction.inner (GammaGrid hG hyp) (GammaGrid hG hyp)).re
-        ≤ ((hyp.u : ℚ) - 1) / (hyp.q : ℚ) + 1 := sorry
+      ∀ (X Y : ClassFunction G ℂ), GammaGrid hG hyp = X + Y →
+        ClassFunction.inner X Y = 0 →
+        (∀ (i : Fin hyp.q) (k : Fin hyp.p), ClassFunction.inner Y (hyp.eta i k) = 0) →
+        (ClassFunction.inner Y Y).re ≤ ((hyp.u : ℚ) - 1) / (hyp.q : ℚ) := sorry
 
-/-- **Faithful §13 producer for Peterfalvi (13.18).**  The (13.18) virtual characters `β_j`/`Γ_j`
-and all six of their genuine properties (support (13.18.a), the (13.18.b) norm `‖β_j‖² = (u−1)/q + 2`,
-grid-independence, orthogonality to `1_G`, reality, and the residual bound) are supplied here.  The
-concrete `β_j = betaGrid hyp j` and `Γ = GammaGrid hG hyp` are built from the honest `S`-side Dade
-isometry `τ_S` (`hyp.dadeHypS`, **not** the `= 0` placeholder `hyp.tauS`) and the induced trivial
-character `Ind_{PW₁}^S 1`.  The six properties are the precisely-isolated §13 obligations
-`betaGrid_support` / `betaGrid_norm` / `gammaGrid_independent` / `gammaGrid_orthogonal_one` /
-`gammaGrid_real` / `gammaGrid_norm_bound`, each stating the genuine (13.18) fact about the concrete
-`β_j`/`Γ`; their deep content bottoms out at the (13.2.e) `A₀(S)` normedTI Dade=Ind bridge, the
-(5.3) `S`↔`W` Dade cross-relation, and the Frobenius norm `norm_induce_one_frobenius`. -/
+/-- **Faithful §13 producer for Peterfalvi (13.18).**  The (13.18) virtual characters `β_j`/`Γ`
+and their genuine properties (support (13.18.a), the (13.18.b) norm `‖β_j‖² = (u−1)/q + 2`,
+orthogonality of `Γ` to `1_G`, reality, and the (13.18.d) `‖Y‖²` residual bound) are supplied here.
+The concrete `β_j = betaGrid hyp j` and `Γ = GammaGrid hG hyp` are built from the honest `S`-side
+Dade isometry `τ_S` (`hyp.dadeHypS`, **not** the `= 0` placeholder `hyp.tauS`) and the induced
+trivial character `Ind_{PW₁}^S 1`.  The bundled properties are the precisely-isolated §13 obligations
+`betaGrid_support` / `betaGrid_norm` / `gammaGrid_orthogonal_one` / `gammaGrid_real` /
+`gammaGrid_Y_norm_bound`; the (13.18.c) `j`-independence is the standalone `gammaGrid_defGamma`
+(proven, modulo the (4.8)/(5.3) cross-relation `tauS_mu_row0_cross`).  Their deep content bottoms out
+at the (13.2.e) `A₀(S)` normedTI Dade=Ind bridge, the (5.3) `S`↔`W` Dade cross-relation, and the
+Frobenius norm `norm_induce_one_frobenius`. -/
 noncomputable def betaData_of_grid [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
@@ -4056,20 +4124,22 @@ noncomputable def betaData_of_grid [Finite G]
   Gamma := GammaGrid hG hyp
   support_formula := betaGrid_support hG hyp j hj
   norm_formula := betaGrid_norm hG hyp j hj
-  Gamma_independent := gammaGrid_independent hG hyp
   Gamma_orthogonal_one := gammaGrid_orthogonal_one hG hyp
   Gamma_real := gammaGrid_real hG hyp
-  Y_norm_bound := gammaGrid_norm_bound hG hyp
+  Y_norm_bound := gammaGrid_Y_norm_bound hG hyp
 
 /-- **Peterfalvi (13.18)**: the virtual character `beta_j` has controlled
 support, norm, and orthogonal remainder.
 
-De-opacified (W3 §15): the six conclusions are now the genuine (13.18) statements — `β_j`'s support
-control (13.18.a), the (13.18.b) norm `‖β_j‖² = (u−1)/q + 2`, and the residual `Γ_j`'s
-grid-independence, orthogonality to `1_G`, reality, and norm bound — each about the produced
+De-opacified (W3 §15): the conclusions are the genuine (13.18) statements — `β_j`'s support
+control (13.18.a), the (13.18.b) norm `‖β_j‖² = (u−1)/q + 2`, and the residual `Γ`'s orthogonality
+to `1_G` (13.18.c), reality (13.18.c), and the (13.18.d) `‖Y‖²` bound — each about the produced
 characters `data.beta`/`data.Gamma`.  They are the genuine fields of the faithful producer
 `betaData_of_grid`; the (13.18.b) Frobenius induced-trivial norm half is the already-proven
-`norm_induce_one_frobenius`. -/
+`norm_induce_one_frobenius`.  The (13.18.c) `j`-independence half is the standalone
+`gammaGrid_defGamma` (kept separate to avoid mixing the `FiniteInduce` `τ_S` instances with the
+explicit inner-product instance binders here).  (The earlier grid-orthogonality and `‖Γ‖²`
+conjuncts were overstatements — issue 3003.) -/
 theorem beta_support_norm_and_remainder [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     ∃ data : BetaData hyp,
@@ -4078,21 +4148,19 @@ theorem beta_support_norm_and_remainder [Finite G]
           ClassFunction.inner data.beta data.beta
             = ((((hyp.u : ℚ) - 1) / (hyp.q : ℚ) + 2 : ℚ) : ℂ)) ∧
         (∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
-          ∀ (i : Fin hyp.q) (k : Fin hyp.p),
-            ClassFunction.inner data.Gamma (hyp.eta i k) = 0) ∧
-        (∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
           ClassFunction.inner data.Gamma
             (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G) = 0) ∧
         data.Gamma.conj = data.Gamma ∧
         (∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
-          (ClassFunction.inner data.Gamma data.Gamma).re
-            ≤ ((hyp.u : ℚ) - 1) / (hyp.q : ℚ) + 1) := by
+          ∀ (X Y : ClassFunction G ℂ), data.Gamma = X + Y →
+            ClassFunction.inner X Y = 0 →
+            (∀ (i : Fin hyp.q) (k : Fin hyp.p), ClassFunction.inner Y (hyp.eta i k) = 0) →
+            (ClassFunction.inner Y Y).re ≤ ((hyp.u : ℚ) - 1) / (hyp.q : ℚ)) := by
   -- The principal index `j = 1` (nonzero, using `p ≥ 3`).
   have hp3 : 3 ≤ hyp.p := hyp.three_le_p
   refine ⟨betaData_of_grid _hG hyp ⟨1, by omega⟩ (by simp),
     (betaData_of_grid _hG hyp ⟨1, by omega⟩ (by simp)).support_formula,
     (betaData_of_grid _hG hyp ⟨1, by omega⟩ (by simp)).norm_formula,
-    (betaData_of_grid _hG hyp ⟨1, by omega⟩ (by simp)).Gamma_independent,
     (betaData_of_grid _hG hyp ⟨1, by omega⟩ (by simp)).Gamma_orthogonal_one,
     (betaData_of_grid _hG hyp ⟨1, by omega⟩ (by simp)).Gamma_real,
     (betaData_of_grid _hG hyp ⟨1, by omega⟩ (by simp)).Y_norm_bound⟩
