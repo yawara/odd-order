@@ -1148,6 +1148,103 @@ noncomputable def Hypothesis.SHC_isCoherent [Finite G]
   rw [hrange] at hcoh
   exact hcoh
 
+open scoped FiniteInduce in
+/-- **General constant-degree coherence** — the degree-`d` irreducible subfamily of `S =
+inducedFamily M` is coherent.  Generalizes `SHC_isCoherent` (which fixes `d = w₁`) to an arbitrary
+degree `d`: the irreducible degree-`d` members of `S` form an equal-degree family, so the R-datum-free
+(5.7)/Dade constant-degree engine `inducedFamily_isCoherent_of_equalDegreeFamily` applies.  `≥ 2`
+members follow from one witness `ζ` (`hex`) plus its distinct conjugate `ζ̄` (odd order ⇒ no real
+characters, `inducedFamily_hasNoRealCharacters`).  This is the constant-degree base case of the
+Peterfalvi (9.11) `Ptype_core_coherence` induction (the degree-`qa`/`qu` uniform subfamily on which
+`uniform_degree_coherence` fires before the conjugate-pair extension). -/
+noncomputable def Hypothesis.inducedFamily_degreeSubfamily_isCoherent [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) (d : ℕ)
+    (hex : ∃ ζ : ClassFunction ↥M ℂ, ζ ∈ inducedFamily M ∧ IsIrreducibleCharacter ζ ∧
+      ((ζ : ↥M → ℂ) 1 = (d : ℂ))) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      {φ : ClassFunction ↥M ℂ | φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+        ((φ : ↥M → ℂ) 1 = (d : ℂ))} hyp.A0 := by
+  haveI := hyp.finiteG
+  classical
+  have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+  set p : IrreducibleCharacter ↥M → Prop := fun χ =>
+    (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
+      ((χ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (d : ℂ) with hp
+  set s : Finset (IrreducibleCharacter ↥M) := Finset.univ.filter p with hs_def
+  have hmem_s : ∀ χ, χ ∈ s ↔ p χ := fun χ => by
+    rw [hs_def, Finset.mem_filter]; exact and_iff_right (Finset.mem_univ _)
+  set χfam : Fin s.card → IrreducibleCharacter ↥M :=
+    fun j => (s.equivFin.symm j : IrreducibleCharacter ↥M) with hχfam
+  have hχfam_mem : ∀ j, χfam j ∈ s := fun j => (s.equivFin.symm j).2
+  have hinj : Function.Injective χfam := fun a b h =>
+    s.equivFin.symm.injective (Subtype.ext h)
+  have hmem : ∀ j, (χfam j : ClassFunction ↥M ℂ) ∈ inducedFamily M := fun j =>
+    ((hmem_s _).mp (hχfam_mem j)).1
+  have hdegfam : ∀ j, ((χfam j : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (d : ℂ) := fun j =>
+    ((hmem_s _).mp (hχfam_mem j)).2
+  have hcard : 2 ≤ s.card := by
+    obtain ⟨ζ, hζS, hζirr, hζ1⟩ := hex
+    have hζcS : ζ.conj ∈ inducedFamily M := inducedFamily_closedUnderConjugate M hζS
+    have hζc1 : ((ζ.conj : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (d : ℂ) := by
+      rw [ClassFunction.conj_apply, hζ1, star_natCast]
+    have hζi_s : (⟨ζ, hζirr⟩ : IrreducibleCharacter ↥M) ∈ s := (hmem_s _).mpr ⟨hζS, hζ1⟩
+    have hζci_s : (⟨ζ.conj, hζirr.conj⟩ : IrreducibleCharacter ↥M) ∈ s :=
+      (hmem_s _).mpr ⟨hζcS, hζc1⟩
+    have hne : (⟨ζ.conj, hζirr.conj⟩ : IrreducibleCharacter ↥M) ≠ ⟨ζ, hζirr⟩ := by
+      intro h
+      exact inducedFamily_hasNoRealCharacters hModd hζS (congrArg Subtype.val h)
+    have hsub : ({⟨ζ.conj, hζirr.conj⟩, ⟨ζ, hζirr⟩} : Finset (IrreducibleCharacter ↥M)) ⊆ s := by
+      intro x hx
+      rcases Finset.mem_insert.mp hx with rfl | hx'
+      · exact hζci_s
+      · rw [Finset.mem_singleton] at hx'; exact hx' ▸ hζi_s
+    exact (Finset.card_pair hne).symm.trans_le (Finset.card_le_card hsub)
+  haveI : NeZero s.card := ⟨by omega⟩
+  have hdeg : ∀ j, ((χfam j : ClassFunction ↥M ℂ) : ↥M → ℂ) 1
+      = ((χfam 0 : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 := fun j => by rw [hdegfam j, hdegfam 0]
+  have hcoh := hyp.inducedFamily_isCoherent_of_equalDegreeFamily hcard χfam hinj hmem hdeg
+  have hrange : (Set.range fun j => (χfam j : ClassFunction ↥M ℂ)) =
+      {φ : ClassFunction ↥M ℂ | φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+        ((φ : ↥M → ℂ) 1 = (d : ℂ))} := by
+    ext φ
+    constructor
+    · rintro ⟨j, rfl⟩
+      exact ⟨hmem j, (χfam j).2, hdegfam j⟩
+    · rintro ⟨hφS, hφirr, hφ1⟩
+      have hsφ : (⟨φ, hφirr⟩ : IrreducibleCharacter ↥M) ∈ s := (hmem_s _).mpr ⟨hφS, hφ1⟩
+      exact ⟨s.equivFin ⟨⟨φ, hφirr⟩, hsφ⟩, by simp [hχfam]⟩
+  rw [hrange] at hcoh
+  exact hcoh
+
+open scoped FiniteInduce in
+/-- **Per-member `R`-datum for an irreducible `S = inducedFamily M`-member** (the (5.2.d)
+`CharacterDifferenceImage` for `τ`).  For an irreducible `χ ∈ S`, the conjugate-pair keystone
+`{χ, χ̄}` has `A₀`-supported difference (`inducedFamily_sub_support`, `χ̄` a member of equal degree)
+and `χ` is non-real (odd order, `inducedFamily_hasNoRealCharacters`), so `dadeCharacterDifferenceImageOfDiff`
+produces the (5.2.d) image datum for the genuine Dade map `τ = dadeIntegralCharacterMap …`.  This is
+the irreducible half of the `subcoherent(S_ H0C')` `R`-datum feeding the Peterfalvi (9.11)
+core-coherence induction (the reducible `μ`-column half is separate, `tau_muGrid_row_diff`). -/
+noncomputable def Hypothesis.inducedFamily_irreducible_Rdatum [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (χ : IrreducibleCharacter ↥M) (hχ : (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M) :
+    OddOrder.Peterfalvi.S07.CharacterDifferenceImage hyp.tau (χ : ClassFunction ↥M ℂ) := by
+  haveI := hyp.finiteG
+  classical
+  have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+  have hne : (χ : ClassFunction ↥M ℂ).conj ≠ (χ : ClassFunction ↥M ℂ) :=
+    inducedFamily_hasNoRealCharacters hModd hχ
+  have hreal : ¬ ClassFunction.IsReal (χ : ClassFunction ↥M ℂ) := fun h => hne h
+  have hcS : (χ : ClassFunction ↥M ℂ).conj ∈ inducedFamily M :=
+    inducedFamily_closedUnderConjugate M hχ
+  have hdeg : ((χ : ClassFunction ↥M ℂ).conj : ↥M → ℂ) 1 = ((χ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 := by
+    obtain ⟨d, _, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast χ
+    simp only [ClassFunction.conj_apply, hd, star_natCast]
+  have hdiffsupp : ((χ : ClassFunction ↥M ℂ).conj - (χ : ClassFunction ↥M ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (typePA0 M hyp.typeP) M :=
+    hyp.inducedFamily_sub_support hcS hχ hdeg
+  exact OddOrder.Peterfalvi.S07.dadeCharacterDifferenceImageOfDiff hyp.dadeData.dade hyp.hconj χ
+    hreal hdiffsupp
+
 /-- **`ℤ[S(HC)]`-vanishing-at-`1` combinations are `A_0`-supported** (the Peterfalvi (5.x)
 `ℤ[S, M^#] = ℤ[S, A_0]` condition for the uniform degree-`w₁` family `S(HC)`).  Since every member
 `χ ∈ S(HC)` has the same degree `χ(1) = w₁`, any `φ = ∑ c_χ χ ∈ ℤ[S(HC)]` with `φ(1) = 0` has
