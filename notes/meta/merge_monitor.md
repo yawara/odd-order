@@ -354,6 +354,32 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-07 (tick 3) — 統合 tick (ユーザー「各レーンを統合します」): a/b/c 合流 = 3 genuine landing、d = net-zero churn ゆえ非合流**:
+  - **a 合流** (`6cdefc8e`, in-progress merge の完了): Pf (9.5)/(4.5.b) reducible S-member = μ-column を
+    S06 residue theory で実証明 (`0969af79`)、**S12 real sorry 8→7**。+ issue 1019 (11.8.6 uniform-degree
+    足場が非Galois type III/IV で over-strong と検証確定 → bounded-coherence redesign、scope 済)。
+    merge_monitor コンフリクトは両側 07-07 ログ append-both で解決。
+  - **b 合流** (`1fe64571`, クリーン): BG Thm 15.8 `tau2_transfer_constraint` を 3 keystone に分解、
+    keystone B を実証明で close して assemble (`5020dad7`)。S15_MF.lean のみ (disjoint)。残 A/C は
+    honest named-keystone skeleton (gated-endpoint pattern、regression でない)。S15 real sorry = 3。
+  - **c 合流** (`a2b2de98`, クリーン): Pf (13.15) case-B order side-agnostic numeric-elimination engine を
+    新 leaf `S16_CaseBOrder.lean` に landing (`65e90bd8`、202 行・**sorry-free**)、OddOrder.lean 登録。
+    c は S12/Main.lean 未編集 (`git log main..c -- <file>` 空) = main 版保持、取りこぼし無し。
+  - **⛔ d = 非合流 (churn、genuine output ゼロ ゆえ trajectory 保全対象でない)**: d の tick 中 10 commit
+    (5 feat + 2 main-merge + drop-all `e089f6b4` + 2 chore) は **net Lean diff = 0**。追加 6 theorem 全てが
+    既存 sorry-free 補題の重複と確定: 5 件が S01 逐語コピー (9071 既裁定) + p-group `coprime_pgroup_acts_
+    trivially_of_order_p_fixed_centralizer` (86e4684b、"BG Cor 1.12") も **`S01:2039 corollary_1_12` と署名・
+    証明とも逐語一致** (corollary_1_12 は S06:1414 に実消費者あり)。d の blanket-drop は結果的に正しい。
+    **d をマージする価値ゼロ + issue bookkeeping (9071 renumber) の衝突コストのみ** ゆえ非合流。
+    d branch は統合後 main へ re-sync 推奨 (churn 履歴は net-zero ゆえ reset で失うもの無し)。
+  - **build**: full build green **3934 jobs**、AxiomsCheck OK (全 allowlist 内、新 axiom 無し)。**real sorry = 88** (bin/count-sorry)。
+    a:S12 −、b:15.8 gap を named keystone に分割 +、c:+0。proven spine の regression 無し。
+  - **push 済** (`c13d2a24`, origin ahead=0): 滞留 15 commits を push。**★ユーザー方針 (2026-07-07)**:
+    「push も自己判断してほしい、毎回でなくても要所で」= hub は verified 統合後 (build green + AxiomsCheck OK)
+    の `git push origin main` を**自己判断で実行してよい (毎回認可を聞かない)**。前 tick の classifier block は解消。
+  - **d = 現状維持 (ユーザー裁定 2026-07-07)**: d branch は reset せず。次 tick で d 自身が `git merge main`
+    (churn 履歴 + 9071 issue 衝突は d/hub が合流時に解決)。guardrails (repo全体 dup-scan + commit前 full build)
+    は 9071 に記録済、次 shared-infra 追加前に適用。
 - **2026-07-07 (tick 2) — a 合流 (progress) + ⛔ d REJECT (BG S01 dup relocation で full-build break) → 監視 HALT**:
   a=2 (Pf 11.8.6 capstone ψ₀ column-witness、hgen algebra sorry-free 化 = **-1 sorry**) を合流 `a8474c50`、
   build green 3933、push 済 (origin 同期)。**d=3 commits を REJECT** (issue 9071 HUB RULING): d の
