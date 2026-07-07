@@ -206,6 +206,13 @@ case-A では: reducible → `caseA_reducible_induceHU_apply_one_eq_qu` (S11:130
   HU=M' 確定 → sOf⊆SOf の induce-transport が tractable)。case-A uniform-qu の真偽は並行して §9 で解決
   (それが真なら Route 1 の generation、偽なら Coq per-ζ / core-coherence generation)。
 
+### ⑥ ✅ landed (2026-07-07, commit e1ef5bdb) — step ③ subset 方向
+`S13.Hypothesis.sOf_subset_SOf` (`sOf hyp.s11Setup Y ⊆ hyp.SOf Y`) sorry-free。`rw [← hHU]`
+(HU=M' carrier 一致) で witness=χ、θ≠trivial=xiSet の H⊄ker、kernel=xiOf、induce-eq=`induceHU_eq_induce`。
+予測した induce-transport の motive 障害は発生せず (carrier rw 成功)。**残 world-bridge = 逆方向**
+(`SOf(H₀C)` の member が SHCSet か sOf(H₀C) に入る H≤ker 分割 = decomposition)。次候補 = 逆方向 or
+step① SHC coherence を SOf-版に接続。
+
 ### ⑤ 訂正後の実装 sequence (deeper than 1-2 session; multi-part)
 1. **case-A/B ∀-uniform-qu on `sOf(H0C)`** (S11): case-split (`CliffordCaseAData`∨`CliffordCaseBData`
    dichotomy) → caseB `forall_mem_sOf_H0C_apply_one_eq_qu` / caseA reducible+irreducible。← genuine §9。
