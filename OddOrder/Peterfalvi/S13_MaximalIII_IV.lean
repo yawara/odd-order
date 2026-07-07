@@ -1806,6 +1806,64 @@ noncomputable def SOf_degreeSubfamily_isCoherent [Finite G]
         (hyp.base.card_odd_of_isMinimalSimpleOdd hG) _ hζSK (sub_eq_zero.mp h)
   exact isCoherent_of_subset hcoh hsub hwit
 
+/-- **(9.11) constant-degree base case on the §9 family `𝒮(Y) = sOf`** — the form the (9.11)
+`Ptype_core_coherence` induction actually consumes.  ⚠ The Coq §9 family is `S_ Y = seqIndD M' M
+M`_\F Y` (third argument `H = M`_\F`, PFsection9.v:209): sources are nontrivial **on `H`** (the
+`𝒳`-condition of `xiSet`), *not* merely nontrivial — so the (9.11) target is the `𝒳`-side family
+`sOf`, not the kernel-filter family `SOf` (`seqIndD HU M HU` is the *§11* notation,
+PFsection11.v:90; issue 1019 update⁵⁸ corrects update⁵⁰ on this point).
+
+The degree-`d` irreducible subfamily of `𝒮(Y)` is coherent, given one degree-`d` irreducible
+member: `𝒮(Y) ⊆ S(Y)` (`sOf_subset_SOf`) cuts the subfamily out of the `SOf`-version
+(`SOf_degreeSubfamily_isCoherent`), and the nonzero supported witness is again the conjugate
+difference `ζ̄ − ζ` (conjugation preserves `𝒮(Y)`-membership by `sOf_closedUnderConjugate`). -/
+noncomputable def sOf_degreeSubfamily_isCoherent [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (Y : Subgroup G) (d : ℕ)
+    (hex : ∃ ζ : ClassFunction ↥M ℂ, ζ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup Y ∧
+      IsIrreducibleCharacter ζ ∧ ((ζ : ↥M → ℂ) 1 = (d : ℂ))) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+      {φ : ClassFunction ↥M ℂ | φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup Y ∧
+        IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))} hyp.base.A0 := by
+  haveI := hyp.base.finiteG
+  classical
+  -- transport the witness to the `SOf`-cut and fire the `SOf`-version
+  have hexS : ∃ ζ : ClassFunction ↥M ℂ, ζ ∈ hyp.SOf Y ∧ IsIrreducibleCharacter ζ ∧
+      ((ζ : ↥M → ℂ) 1 = (d : ℂ)) := by
+    obtain ⟨ζ, hζ, hi, hd⟩ := hex
+    exact ⟨ζ, hyp.sOf_subset_SOf Y hζ, hi, hd⟩
+  have hcoh := SOf_degreeSubfamily_isCoherent hG hyp Y d hexS
+  -- the `𝒮(Y)`-cut is a subfamily of the `S(Y)`-cut
+  have hsub : {φ : ClassFunction ↥M ℂ | φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup Y ∧
+      IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))} ⊆
+      {φ : ClassFunction ↥M ℂ | φ ∈ hyp.SOf Y ∧ IsIrreducibleCharacter φ ∧
+        ((φ : ↥M → ℂ) 1 = (d : ℂ))} :=
+    fun φ hφ => ⟨hyp.sOf_subset_SOf Y hφ.1, hφ.2.1, hφ.2.2⟩
+  -- the nonzero supported witness `ζ̄ − ζ` inside the `𝒮(Y)`-cut (`Prop`-confined)
+  have hwit : ∃ φ : ClassFunction ↥M ℂ,
+      φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan
+        {φ : ClassFunction ↥M ℂ | φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup Y ∧
+          IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))} hyp.base.A0 ∧ φ ≠ 0 := by
+    obtain ⟨ζ, hζ, hζirr, hζ1⟩ := hex
+    have hζc : ζ.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup Y :=
+      Hypothesis.sOf_closedUnderConjugate hyp.s11Setup Y hζ
+    have hζc1 : ((ζ.conj : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (d : ℂ) := by
+      rw [ClassFunction.conj_apply, hζ1, star_natCast]
+    have hζSK : ζ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) (Y.subgroupOf M) := by
+      have h := hyp.sOf_subset_SOf Y hζ
+      rwa [hyp.SOf_eq] at h
+    refine ⟨ζ.conj - ζ, ⟨?_, ?_⟩, ?_⟩
+    · exact Submodule.sub_mem _
+        (Submodule.subset_span ⟨hζc, hζirr.conj, hζc1⟩)
+        (Submodule.subset_span ⟨hζ, hζirr, hζ1⟩)
+    · exact OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support
+        hyp.base.mderivSharp_subset_A0 hζSK
+    · intro h
+      exact OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters
+        (hyp.base.card_odd_of_isMinimalSimpleOdd hG) _ hζSK (sub_eq_zero.mp h)
+  exact isCoherent_of_subset hcoh hsub hwit
+
 /-- **(9.11) `hY`-route subset step**: the capstone's `𝒮(H₀C)`-coherence input (`hY`) follows from
 the (9.11) coherence of the smaller-kernel family `𝒮(H₀C')` (`coherent_H0C_commutator`'s honest
 target, the Coq `Ptype_core_coherence` induction) by `isCoherent_of_subset` along `𝒮(H₀C) ⊆
