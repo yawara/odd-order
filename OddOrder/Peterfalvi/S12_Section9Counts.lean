@@ -1797,4 +1797,85 @@ theorem Hypothesis.reducible_mem_inducedKernelFamily_mem_certainTypeSet [Finite 
     (hyp.muColumnChar_ne_one hG hG.odd hk0)
     (hyp.muColumnChar_columnSum_apply_one_eq hG hG.odd hw2 hk0 hkref)
 
+open scoped FiniteInduce in
+/-- **Every nontrivial `W₂`-dual is a μ-grid column dual** (`muColumnChar` is onto the nontrivial
+duals): for `χ₂ ≠ 1` there is a nonzero column index `k` with `muColumnChar k = χ₂`.  Inverse of
+the Pontryagin reindex (`finCardEquivCharacterGroup`), with `k ≠ 0` from the zero-normalization
+(`finCardEquivCharacterGroup_zero`). -/
+theorem Hypothesis.exists_muColumnChar_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M)
+    {χ₂ : ((hyp.toHypothesis46 hG hG.odd).W2.subgroupOf
+      ((hyp.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.toHypothesis46 hG hG.odd).W2)) →* ℂˣ}
+    (hχ₂ : χ₂ ≠ 1) :
+    ∃ k : Fin hyp.w2, k ≠ 0 ∧ hyp.muColumnChar hG hG.odd k = χ₂ := by
+  haveI := hyp.finiteG
+  classical
+  -- instances and the card identification, phrased at the `toHypothesis46` spelling (the type
+  -- of `χ₂`), definitionally the `toCertainTypeHypothesis` chain of the `muColumnChar` body
+  haveI : IsCyclic ↥((hyp.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.toHypothesis46 hG hG.odd).W2) :=
+    (hyp.toCertainTypeHypothesis hG hG.odd).toHypothesis.isCyclic_sup
+  letI : CommGroup ↥((hyp.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.toHypothesis46 hG hG.odd).W2) :=
+    IsCyclic.commGroup
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW2sub : Nat.card ↥((hyp.toHypothesis46 hG hG.odd).W2.subgroupOf
+      ((hyp.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.toHypothesis46 hG hG.odd).W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI : NeZero (Nat.card ↥((hyp.toHypothesis46 hG hG.odd).W2.subgroupOf
+      ((hyp.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.toHypothesis46 hG hG.odd).W2))) :=
+    ⟨Nat.card_pos.ne'⟩
+  refine ⟨finCongr hcardW2sub ((finCardEquivCharacterGroup _).symm χ₂), ?_, ?_⟩
+  · -- `k ≠ 0`: else `χ₂ = fCECG 0 = 1`
+    intro h0
+    apply hχ₂
+    have hs0 : (finCardEquivCharacterGroup
+        ↥((hyp.toHypothesis46 hG hG.odd).W2.subgroupOf
+          ((hyp.toHypothesis46 hG hG.odd).W1 ⊔
+            (hyp.toHypothesis46 hG hG.odd).W2))).symm χ₂ = 0 := by
+      have := congrArg (finCongr hcardW2sub.symm) h0
+      simpa using this
+    rw [← Equiv.apply_symm_apply (finCardEquivCharacterGroup
+        ↥((hyp.toHypothesis46 hG hG.odd).W2.subgroupOf
+          ((hyp.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.toHypothesis46 hG hG.odd).W2))) χ₂,
+      hs0, finCardEquivCharacterGroup_zero]
+  · -- `muColumnChar k = χ₂` (definitional chain + `finCongr` round-trip)
+    have hchar : hyp.muColumnChar hG hG.odd
+        (finCongr hcardW2sub ((finCardEquivCharacterGroup _).symm χ₂))
+        = finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm
+            (finCongr hcardW2sub ((finCardEquivCharacterGroup _).symm χ₂))) := by
+      unfold Hypothesis.muColumnChar
+      with_unfolding_all rfl
+    rw [hchar, show finCongr hcardW2sub.symm
+        (finCongr hcardW2sub ((finCardEquivCharacterGroup _).symm χ₂))
+        = (finCardEquivCharacterGroup _).symm χ₂ from by simp]
+    exact Equiv.apply_symm_apply _ _
+
+open scoped FiniteInduce in
+/-- **A certain-type column sum is orthogonal to every irreducible kernel-filter member**
+(the `hμ_S1` input of the (9.11) column-pair adjunction `adjoin_muColumnPair_of_irrFamily`):
+`⟨columnSum χ₂, x⟩ = 0` for `χ₂ ≠ 1` and irreducible `x ∈ S(X)`.  Via `exists_muColumnChar_eq`
+and the world-join `muGrid_columnSum_eq_columnSum` the column sum is `∑ᵢ muGrid i k` (`k ≠ 0`),
+and each grid entry is orthogonal to `x` by the degree separation
+`muGrid_inner_irr_member_eq_zero` ((11.8.1) `d ≡ 1 (mod w₁)` vs `x(1) = w₁·n`). -/
+theorem Hypothesis.columnSum_inner_irr_member_eq_zero [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M)
+    (params : CharacterParameters hyp) (hmu : params.mu = hyp.muGrid hG hG.odd)
+    [NeZero (Nat.card (hyp.toHypothesis46 hG hG.odd).W1)]
+    {χ₂ : ((hyp.toHypothesis46 hG hG.odd).W2.subgroupOf
+      ((hyp.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.toHypothesis46 hG hG.odd).W2)) →* ℂˣ}
+    (hχ₂ : χ₂ ≠ 1)
+    {X : Subgroup ↥M} {x : ClassFunction ↥M ℂ}
+    (hx : x ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+      ((derivedInG M).subgroupOf M) X)
+    (hxirr : IsIrreducibleCharacter x) :
+    ClassFunction.inner
+      (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂) x = 0 := by
+  haveI := hyp.finiteG
+  classical
+  obtain ⟨k, hk0, hkeq⟩ := hyp.exists_muColumnChar_eq hG hχ₂
+  rw [← hkeq, ← hyp.muGrid_columnSum_eq_columnSum hG hG.odd k, inner_sum_left]
+  exact Finset.sum_eq_zero (fun i _ =>
+    hyp.muGrid_inner_irr_member_eq_zero hG htype params hmu hx hxirr i hk0)
+
 end OddOrder.Peterfalvi.S12
