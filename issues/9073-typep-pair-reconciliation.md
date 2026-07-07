@@ -120,3 +120,12 @@ unique partner `Mstar` が **Fact A (W₂ κ-Hall of Mstar) + Fact B (W₁ = M_�
 - Lean 既存機構: `S16_MainResults.lean:3090` (`typeP_derivedInG_inf_centralizer_kappaElement_eq`)、
   `typeP_kstar_in_mf`、`typeP_centralizer_kappaElement_eq` (`S14_TypePCounting.lean:10847`)
 - carve-out: `S15_SAndT_Setup.lean:4476` (`reconciled_typePData_T`)
+
+## 🧭 HUB 注記 (2026-07-07 tick): S15_SAndT_Setup carve-out 範囲の明確化
+
+c の kickoff commit `7b12a4f6` は b 所有 S15_SAndT_Setup.lean に additive helper
+(`subgroup_le_of_normal_coprime_index_prime` 一般化版 + `Hypothesis.W1_le_derivedInG_T`) を追加した。
+0098 の carve-out 文言は reconciled_typePData_T decl 領域 (:4520/:4590) 限定だったが、**hub 裁定 = 受理 +
+範囲明確化**: carve-out は「reconciled_typePData_T の discharge に必要な supporting helper の *additive* 追加」
+を含む (既存宣言の signature 改変は不可 — `pgroup_le_of_normal_coprime_index` は無傷と検証済み)。
+b の active frontier (9013 案A §13 estimate) と非衝突。
