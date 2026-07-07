@@ -508,40 +508,14 @@ theorem escapingCentralizers_control [Finite G]
 
 /-! ## (8.14)--(8.17): support notation and TI-covering facts -/
 
-/-- **Peterfalvi (8.16)**: for a maximal subgroup of Type II, the three sets
-`A_0(M)`, `A(M)`, and `A_1(M)` are TI-subsets of `G` with normalizer `M`.
-
-This is the directly usable part of the PDF-recovered missing page.  The proof is
-BG Section 16 / Peterfalvi (2.3), not a local character-theoretic argument.
-
-⚠ **Overstated / `false`-as-stated (loop¹⁰⁶ finding; currently unconsumed).**  Pf (8.10)/(8.12.c)
-(mmd 04.10 L119/L131) only asserts that `A(M) − A_1(M)` is `TI` (= BG Theorem B(5),
-`OddOrder.BG.Ch4.S16.theoremB_A_minus_Msigma_isTISubset`, **proved**).  The *full* sets `A(M) =
-(M')#` and `A_1(M) = M_σ#` are **not** `TI`: `M_σ` is only *tamely* imbedded (BG Theorem II),
-`M_σ ∩ M_σ^g` being cyclic (Theorem D(2)) rather than trivial, and escaping `σ`-elements
-(`C_G(x) ⊄ M`) exist.  The faithful content is: `A(M) − A_1(M)` TI (B(5)) + the tame embedding
-(`theoremII_tame_embedding`).  Retire or restate to `A(M) − A_1(M)` before wiring any consumer. -/
-theorem typeII_A_sets_TI [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    (hM : M ∈ maximalSubgroups G) (data : TypeIIData M) :
-    IsTISubset (typePA0 M data.typeP) M ∧
-      IsTISubset (typePA M data.typeP) M ∧
-        IsTISubset (A1 M PeterfalviType.II) M := by
-  sorry
-
-/-- **Peterfalvi (8.16)**, normalizer form: for Type II, the normalizers of
-`A_0(M)`, `A(M)`, and `A_1(M)` are all `M`.
-
-⚠ **Overstated / unconsumed** (loop¹⁰⁶): same caveat as `typeII_A_sets_TI` — `N_G(M_σ#) = M`
-would make `M_σ` a `TI`-subgroup, contradicting the tame (not trivial-intersection) embedding of
-`M_σ` (BG Theorem II / Theorem D(2)).  Retire or restate before wiring. -/
-theorem typeII_A_sets_normalizer [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    (hM : M ∈ maximalSubgroups G) (data : TypeIIData M) :
-    Subgroup.normalizer (typePA0 M data.typeP) = M ∧
-      Subgroup.normalizer (typePA M data.typeP) = M ∧
-        Subgroup.normalizer (A1 M PeterfalviType.II) = M := by
-  sorry
+/- **Peterfalvi (8.16) — RETIRED** (false-as-stated + unconsumed; loop¹⁰⁶ finding, executed lane-a
+/loop 2026-07-07).  The former `typeII_A_sets_TI` / `typeII_A_sets_normalizer` claimed the *full*
+type-II sets `A(M) = (M')#`, `A_1(M) = M_σ#` are TI-subsets of `G` with normalizer `M`.  This is
+**false**: `M_σ` is only *tamely* imbedded (BG Theorem II), `M_σ ∩ M_σ^g` cyclic (Theorem D(2))
+rather than trivial, with escaping `σ`-elements (`C_G(x) ⊄ M`).  The *faithful* content — `A(M) − M_σ`
+is a TI-subset — is Pf (8.10)/(8.12.c) = BG Theorem B(5), **proved** as
+`OddOrder.BG.Ch4.S16.theoremB_A_minus_Msigma_isTISubset`; cite that directly.  The false sorries are
+removed to prevent a bogus-witness false pin (cf. the `sibleyTarget`/`frobI` precedents). -/
 
 /-- **Peterfalvi (8.14)**: the subgroup `R(x)`, shared as
 `OddOrder.GroupTheory.supportKernel`. -/
