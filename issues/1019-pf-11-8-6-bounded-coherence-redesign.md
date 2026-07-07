@@ -1447,3 +1447,59 @@ caseA = b / caseB 一様 route = a (landed 済) / full assembly = a (S12/S13 か
 ⟹ **a は caseA を自前組立しない** (queue から除去)。1019 の残 = caseB named §9 facts
 (hμmem/hunif/hDeg/anchor) + full assembly 配線のみ。完了次第 **ft_endgame_plan_2026_07_07.md の R1**
 (9000 typeP_Galois instance tail pivot、W9 は c へ) に移行する。
+
+## 🔬 update⁸⁴ (2026-07-08 lane-a /loop) — ★★★ caseB (9.11) 端点 assembly LANDED: 残 = hDeg 1 本
+
+fold (update⁸³) の named 入力を同 session で 3/4 discharge し、caseB branch の端点まで組み上げ:
+
+### ✅ landed (3 commits: 4046ec99, 2615824c, e51eb7cf)
+1. **hμmem** = `S13.columnSum_muColumnChar_mem_sOf_H0Cprime` (S13_CoreStructure):
+   (11.8.1) muGrid 数え上げ [sorry-free] → 𝒮(⊥) 緩和 → **`S11.TypesIIIIIIVSetup.eq_of_typeP_eq`
+   (新規 sorry-free: typeP 同一 → setup 同一、他 field 全部 Prop)** で s11Setup world へ →
+   H₀=⊥ (`chief_H0_eq_bot`) → (9.9.b) `reducible_mem_sOf_H0C` [sorry-free] → `C_eq_cSub` で
+   𝒮(H₀C) → antitone。⚠ 配置は S13_CoreStructure (chief_H0_eq_bot/C_eq_cSub が
+   S13_MaximalIII_IV の下流のため)。
+2. **hunif** = `S13.caseB_forall_mem_sOf_H0Cprime_apply_one_eq_qu`: `caseB_degree_qu` (S11
+   (9.9.a)、sorry-free) の instantiate。cprimeSub = derivedInG cSub = [C,C] 同定。d = q·u。
+3. **assembly** = `S13.caseB_coherent_sOf_H0Cprime` (Nonempty 包み): ∃-irr で by_cases —
+   ∃ → anchor 導出 (deg は hunif が pin) + fold / ¬∃ → all-reducible corner (landed) +
+   μ₁ 証人。**anchor が named から消滅** ((9.9.c) 構造: irr 無し corner は C=⊥ 経路でなく
+   all-reducible corner が直接処理)。
+
+### 残 (caseB (9.11) を閉じるのに必要なもの)
+- **hDeg 1 本のみ**: ∃-irr 時に `2 < |irrCut(𝒮(H₀C′), qu)|` (Coq PFsection9 (9.9)(c) の
+  irr count)。純 §9 counting — 次 iteration の一点集中対象。
+- transitive sorryAx は既知 §13 core gate (`chief_H0_eq_bot`/`C_eq_cSub` = (11.7)) のみ。
+  §9/counting/fold 側は全て sorry-free。
+- その先 (hub 0101 裁定に従い訂正): **caseA は b 所有** (`S11_NineElevenCoherence`) — a は
+  自前組立しない。a の残 = hDeg → **(9.11) full assembly 配線** (clifford_dichotomy で
+  caseA[b leaf を cite]/caseB[本 assembly] を束ね) → hY packaging → capstone → R1 pivot。
+
+## 🔬 update⁸⁵ (2026-07-08 lane-a /loop) — ★★ ROUTE 訂正: hDeg は route 人工物 → norm-general (5.7) port へ (claim 9075)
+
+### 発見 (Coq 権威、code-level)
+- **Coq (9.11) の Galois(=caseB) 枝 = `uniform_degree_coherence scohS0` 一発**
+  (PFsection9.v:1510-1513): 家族 𝒮(H₀C′) **全体** (可約 μ 込み、全 deg qu) に適用。
+  count 不要・pair-chain 不要・anchor 不要。非Galois 枝のみ S1 (deg-qa cut) + (9.11.1-8)
+  帰納 (= b の caseA 担当分)。
+- **Coq `uniform_degree_coherence` は norm N 一般** (PFsection5.v:1256-1264: N=⟨χ₁,χ₁⟩、
+  R-datum 2N)。**Lean 港 `coherent_of_constant_degree` は norm-1 限定** (`hirr : ⟨ζ,ζ⟩=1`)
+  — μ (norm q) を受けられない。これが fold route (irr-cut anchor + μ-pair adjoin) と
+  hDeg (2 < |irr-cut|) が生えた根因。
+- **hDeg は §9 事実でない**: (9.9) `typeP_Galois_characters` に irr-count conjunct は無く、
+  |irr-cut| = 2 の corner で偽の恐れ (weighted adjoin でも初段 2(qu)² < 2(qu)² で strict
+  失敗、irr→μ-族 adjoin も 2q < p−1 必要で type III の q > p と矛盾 — 全 incremental 路が
+  |cut|=2 で死ぬ)。**hDeg の §9 count 証明は中止** (偽 hoist リスク)。
+
+### 正 route = norm-general (5.7) port (shared S07 infra、claim = issues/9075)
+1. `pivotCoherence` (Coq pivot_coherence :588): **明示式** `ν φ := s(φ)•ζ₁ + τ(φ − s(φ)•η₁)`、
+   s(φ) = 直交係数和 (pairwise 直交ゆえ freeness/basis 不要で構成可能と設計確認済)。
+   extends は φ(1)=0 → s=0 で即。
+2. (5.7) 一般版: ζ₁ = R(χ₁) 半分和の構成 ((5.4) subcoherent_split/norm minimality、
+   Coq :1265-1330)。
+3. caseB 適用: 全族 pairwise-orthogonal/conj-closed/no-real/hunif[landed] →
+   `caseB_coherent_sOf_H0Cprime` rewire (hDeg 撤去)。fold (update⁸²) と部品は landed のまま
+   残置 (caseA-style 局面の再利用資産; assembly からの消費は差し替え)。
+
+### status
+- 9075 claim 済。次 iteration = pivotCoherence の CODE (S07_Subcoherent 追記 or 新 leaf)。
