@@ -717,3 +717,32 @@ degree eq は irreducibleCharacter_apply_one_eq_pos_natCast + star_natCast) を�
 
 ⟹ 直近 2 iteration で (9.11) port の base engine (update⁵³) + irreducible R-datum (本) を landing。
 circling から concrete landing に復帰。次 = reducible R-datum か subcoherent 組立。
+
+## 🔬 update⁵⁵ (2026-07-07 lane-a /loop) — ★★ 重大: (9.11) は lane-b (S15) が並行構築済 + mixed-degree extension は S07 Hypothesis の isometry で構造的にブロック
+
+### ① lane-b (S15) が (9.11) base + Galois を並行構築済 (coordination miss)
+`S15.Hypothesis.sSetIrrDeg_subcoherent` (S15:~1393、lane b) が **degree-d irreducible subfamily の
+subcoherent** を irrSubcoherent + per-member R-datum (`sSet_member_differenceImage`) で構築済。
+docstring: 「ready for `coherent_subset_of_constant_degree` (the (9.11) base + Galois)」。
+- ⟹ **私の S12 `inducedFamily_degreeSubfamily_isCoherent` + `inducedFamily_irreducible_Rdatum` は
+  §11.8 family (`inducedFamily M`) 向けの並行構築** — S15 を先に確認すべきだった (claim-before-build 違反)。
+  ただし family は異なる (§11.8 の inducedFamily vs S15 §13 の hyp.S) ので literal 重複でなく、
+  §11.8 lane-a work として genuine (保全)。理想は family-parameterized 一般化 + lane-b と coordinate。
+
+### ② ★ mixed-degree extension の構造的ブロッカー (両レーン共通)
+- **S07.Hypothesis (subcoherent) の `tau_isometry_diff` (S07:1777) は全 member 差分の isometry を要求**
+  (`∀ a b c d ∈ S, ⟨τ(a-b),τ(c-d)⟩=⟨a-b,c-d⟩`)。docstring (S07:1774): FT Dade map は global isometry
+  でなく **A-supported 差分でのみ成立** = **equal-degree family 限定**。
+- ∴ `sSetIrrDeg_subcoherent` (degree-d = equal-degree) は OK だが、**full mixed `S_ H0C'` (qa+qu+reducible)
+  は S07.Hypothesis を組めない** (mixed 差分は non-supported、isometry 偽)。
+- Coq (9.11) の subcoherent は **degree-0 (L^#-supported) isometry** (5.2) で mixed でも成立。
+  Lean S07.Hypothesis は all-differences に **over-specified** ⟹ mixed 不可。
+- ⟹ **(9.11) non-Galois mixed extension は Lean に無い degree-0-isometry subcoherent 構造を要する** =
+  構造的 deep work (S07 = lane b の isometry field 弱化 or 新構造)。base+Galois は両レーンで済むが、
+  non-Galois mixed が両レーンで未達 (= isometry 構造ブロック)。
+
+### ⟹ 帰結 (honest)
+- (9.11) hY route の deep 核 = **mixed-degree subcoherent 構造** (degree-0 isometry) = 未構築、S07 (lane b) 絡み。
+- 私の S12 base+R-datum は §11.8 向けに genuine だが lane-b と並行 (要 coordinate/一般化)。
+- **これは incremental lane-a landing でなく、cross-lane 構造判断** (S07 isometry の弱化 or 新 mixed subcoherent)。
+  hub/lane-b coordination 案件。次: reducible R-datum は mixed subcoherent が要るので、それ以前に構造を要解決。
