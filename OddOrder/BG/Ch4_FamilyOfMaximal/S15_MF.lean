@@ -11045,43 +11045,6 @@ theorem not_fittingIsTI_of_mem_fittingSharp_of_centralizer_not_le [Finite G]
   -- TI forces `y ∈ N_G(F(M)) ≤ M`, contradicting `y ∉ M`.
   exact hyM (normalizer_fittingInG_le_self hG hM (hTI y hoverlap))
 
-/-- **BG Corollary 15.9** (mmd L4240; Coq `nonFtype_signalizer_base`, BGsection15.v:1399, parts
-(a)(b), due to Sibley and Feit--Thompson): the final local landing point for a centralizer escaping
-`M`.  Given `x ∈ M_σ^#` with `C_G(x) ⊄ M` and the signalizer neighbour `N ⊇ C_G(x)` that is *not*
-type-`F`, then `M` is type-`F`, `F(M)` is not `TI`, `N` is type-`P₂`, and `M = M_σ ⋊ E` is a
-Frobenius group with cyclic `σ(M)′`-Hall complement `E`.  The Sibley/Feit--Thompson package used
-by §16.
-
-⚠ **Statement corrected (2026-07-07, issue 9017 更新 #19)**: an earlier draft over-specified an
-`∃ r prime ∈ τ₂(N), N_G(⟨x⟩) ≤ E ⊓ N` localization conjunct.  That is **unsound** — `x ∈ ⟨x⟩ ≤
-N_G(⟨x⟩)` but `x ∈ M_σ` is disjoint from the complement `E` (`M_σ ⊓ E = 1`), so `N_G(⟨x⟩) ⊄ E` —
-and it is neither part of Coq 15.9(a)(b) nor consumed downstream (`exists_RData_escape_structure`
-discards it).  Dropped.
-
-**Proof plan** (Coq `nonFtype_signalizer_base`): `IsTypeP2 N` from the signalizer dichotomy
-`IsTypeF N ∨ IsTypeP2 N` (`signalizer_structure_of_mem_sigmaSharp`) with `¬IsTypeF N`.  Fix a prime
-`r ∣ ord(x)` (so `r ∈ τ₂(N)`, signalizer conjunct); the matched `κ(N)` / `(κ∪σ)(N)′`-Hall pair
-`K, U` (`typeP2_exists_matched_kappa_hall_pair`) has an `r`-Sylow `R ≤ U` of `r`-rank 2 (noncyclic),
-and `N_G(R) ≤ M` (`norm_noncyclic_sigma`, since `r ∈ σ(M)` via `τ₂(N) ∩ π(N) ⊆ σ(M)`).  Then
-`typeP2_neighbor_is_typeF_of_mem` (Coq `P2type_signalizer`) with `H := M` gives `IsTypeF M`;
-`tau2_transfer_constraint` (Thm 15.8) forces `τ₂(M) = ∅` (else its first conjunct gives `τ₂(N) = ∅`,
-contradicting `r ∈ τ₂(N)`); `typeF_frobenius_of_tau2_prime_free` builds the Frobenius `E`; and
-`¬FittingIsTI M` follows from `not_fittingIsTI_of_mem_fittingSharp_of_centralizer_not_le`
-(`x ∈ M_σ^# ⊆ F(M)^#`, `M_σ` nilpotent for type-`F`). -/
-theorem centralizer_escape_final_local [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M N : Subgroup G}
-    (hM : M ∈ maximalSubgroups G) (hN : N ∈ maximalSubgroups G) {x : G}
-    (hx : x ∈ sigmaSharp M) (hesc : ¬ Subgroup.centralizer ({x} : Set G) ≤ M)
-    (hNmem : N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)))
-    (hNnotF : ¬ S14.IsTypeF N) :
-    S14.IsTypeF M ∧ ¬ FittingIsTI M ∧ S14.IsTypeP2 N ∧
-      ∃ E : Subgroup G,
-        E ≤ M ∧ Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
-          (E.subgroupOf M) ∧ IsCyclic ↥E ∧
-        OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M
-          ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (E.subgroupOf M) := by
-  sorry
-
 /-- **The `hfratt` input of `mf_hall_centralizer_control_of_inputs`** (BG Corollary 15.3(b),
 mmd L4213): when a nonidentity Hall subgroup `H ≤ M_σ` is **not** normal in `M`, the Frattini
 factorization `M = N_M(H)·Q` holds for the normal `q`-subgroup `Q = O_q(M)`.
