@@ -107,3 +107,21 @@ shared leaf、claim-before-build) の順で継続予定。
 - issues/9000 (σ-theory 土台、a 保持 + scope 注記)、issues/9013 (de-scope 反映)、issues/3002 (b 保持)、
   issues/closed/9072 (c の horth discharge)、issues/1019 (a capstone)、issues/9017 (b Keystone)
 - notes/meta/merge_monitor.md レーン表 + [[lanes-are-equivalent-no-specialty]]
+
+## 🔬 item 1 gating 解決 (2026-07-07 lane c, loop) — docstring の「IsTypeP2 等価」は過度に悲観的、port は doable
+
+item 1 着手前検証。`W2_le` (S15_SAndT_Setup:4520) / `centralizer_W1` (:4590) の docstring は両者を
+「typeP_pair reconciliation ≡ IsTypeP2 hyp.T」に gated と記すが、**Coq 実体で反証**:
+
+- **`FTtypeP_pair_witness` (PFsection8.v:713)** は `MtypeP` (type-P) のみを context に取り、`FTtypeP_pair_cases`
+  /`typeP_pairW`/`typeP_cent_compl`/`of_typeP_compl_conj` で **任意の type-P M に partner T の
+  `typeP_pair M T defW` + `of_typeP T V xdefW` を構成** — **type-II/type-P2 非依存**。
+- **`typeP_cent_compl` (PFsection8.v:229): `C_M'(W1) = W2`** も `MtypeP` のみ (centralizer_W1 の直接の内容)。
+- ⟹ **0098 の「item 1 doable」が正しい**。docstring の悲観 (「IsTypeP2 等価」) は、抽象 `hyp.W1/W2` を
+  type-P κ-Hall 構造に同定する reconciliation を「carrier 無しでは不能」と誤読したもの。実際は canonical
+  maximal-pair (hyp.S/hyp.T, W=W₁×W₂) から `typeP_pair` 構造が port で従う。
+
+**port scope (新 shared leaf, claim-before-build)**: PFsection8 の typeP_pair 理論
+(`typeP_pair`/`typeP_pairW`/`FTtypeP_pair_cases`/`FTtypeP_pair_witness`/`of_typeP_pair`/`typeP_cent_compl`
+/`of_typeP_compl_conj`) を `OddOrder/GroupTheory/**` へ port し、hyp.S/hyp.T の pair 構造から
+W2_le/centralizer_W1 を discharge。substantial (multi-session)。**次 loop iteration で 9000 番台 claim 起票 → leaf 構築**。
