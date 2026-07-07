@@ -354,6 +354,77 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-07 (tick 3) — 統合 tick (ユーザー「各レーンを統合します」): a/b/c 合流 = 3 genuine landing、d = net-zero churn ゆえ非合流**:
+  - **a 合流** (`6cdefc8e`, in-progress merge の完了): Pf (9.5)/(4.5.b) reducible S-member = μ-column を
+    S06 residue theory で実証明 (`0969af79`)、**S12 real sorry 8→7**。+ issue 1019 (11.8.6 uniform-degree
+    足場が非Galois type III/IV で over-strong と検証確定 → bounded-coherence redesign、scope 済)。
+    merge_monitor コンフリクトは両側 07-07 ログ append-both で解決。
+  - **b 合流** (`1fe64571`, クリーン): BG Thm 15.8 `tau2_transfer_constraint` を 3 keystone に分解、
+    keystone B を実証明で close して assemble (`5020dad7`)。S15_MF.lean のみ (disjoint)。残 A/C は
+    honest named-keystone skeleton (gated-endpoint pattern、regression でない)。S15 real sorry = 3。
+  - **c 合流** (`a2b2de98`, クリーン): Pf (13.15) case-B order side-agnostic numeric-elimination engine を
+    新 leaf `S16_CaseBOrder.lean` に landing (`65e90bd8`、202 行・**sorry-free**)、OddOrder.lean 登録。
+    c は S12/Main.lean 未編集 (`git log main..c -- <file>` 空) = main 版保持、取りこぼし無し。
+  - **⛔ d = 非合流 (churn、genuine output ゼロ ゆえ trajectory 保全対象でない)**: d の tick 中 10 commit
+    (5 feat + 2 main-merge + drop-all `e089f6b4` + 2 chore) は **net Lean diff = 0**。追加 6 theorem 全てが
+    既存 sorry-free 補題の重複と確定: 5 件が S01 逐語コピー (9071 既裁定) + p-group `coprime_pgroup_acts_
+    trivially_of_order_p_fixed_centralizer` (86e4684b、"BG Cor 1.12") も **`S01:2039 corollary_1_12` と署名・
+    証明とも逐語一致** (corollary_1_12 は S06:1414 に実消費者あり)。d の blanket-drop は結果的に正しい。
+    **d をマージする価値ゼロ + issue bookkeeping (9071 renumber) の衝突コストのみ** ゆえ非合流。
+    d branch は統合後 main へ re-sync 推奨 (churn 履歴は net-zero ゆえ reset で失うもの無し)。
+  - **build**: full build green **3934 jobs**、AxiomsCheck OK (全 allowlist 内、新 axiom 無し)。**real sorry = 88** (bin/count-sorry)。
+    a:S12 −、b:15.8 gap を named keystone に分割 +、c:+0。proven spine の regression 無し。
+  - **⚠ push**: main は origin より **未 push が積み上がり** (前 tick の 18 + 今回 a/b/c merge 3 + notes)。
+    outward-facing ゆえユーザー push 認可待ち (merge は全て local に検証済・保持)。
+- **2026-07-07 (tick 2) — a 合流 (progress) + ⛔ d REJECT (BG S01 dup relocation で full-build break) → 監視 HALT**:
+  a=2 (Pf 11.8.6 capstone ψ₀ column-witness、hgen algebra sorry-free 化 = **-1 sorry**) を合流 `a8474c50`、
+  build green 3933、push 済 (origin 同期)。**d=3 commits を REJECT** (issue 9071 HUB RULING): d の
+  `ForwardFromCh03.lean` 追加 5 theorem が**全て BG `S01_Solvable.lean` の逐語コピー**
+  (`coprime_actsTrivially_of_normal_and_quotient`=S01:1771 / `coprime_stabilizes_chain_trivial`=S01:1803 /
+  `coprime_nilpotent_acts_trivially_of_centralizer_self`=S01:1895 / `burnside_operator`=S01:1720 /
+  `mulAut_eq_one_of_coprime_orderOf_of_frattini`=S01:1735)。d の意図は "Move to Isaacs Ch04" relocation だが
+  **追加半分だけ・S01 原本削除せず・caller rewire せず** → `S04e_GorThm37.lean:183` Ambiguous term で
+  **full build FAIL**。d の dup-scan が frozen BG を除外 + leaf build のみで検証 → 見落とし。**churn (新数学 0)
+  + claim-before-build 違反 + build-break** ゆえ hub 裁定 = REJECT (trajectory 保全対象でない = genuine output
+  でなく dup)。trial merge を abort、main は a の green 状態を保持。**⚠ d は live で tick 中に 3→6 commit に進行**
+  (main-merge b8931593 + nilpotent[=S01:1895 dup] + p-group[86e4684b, **同名 repo 無 = genuine 可能性**]) →
+  blanket-drop でなく**選別**: dup 5 除去 + p-group は content 検証し genuine なら S01 cite で保全。unmerged base
+  = **e21db660** (`949d5e27` でない = 前 tick batch 中間)。**build failure STOP ゆえ監視 cron を CronDelete して HALT**
+  (次 tick で同 break を繰り返さない)。d が branch を fix したら stop→resolve→resume で cron 再作成。
+  再発防止 (9071): d の重複 scan は repo 全体 grep + shared-infra 追加は commit 前 full build。sorry = 88 (a -1)。
+- **2026-07-07 — 監視再開 (ユーザー「各レーンを監視します」) + tick d 合流 + ⚠ push 18-commit drift 露見**:
+  cron 死亡確認 (CronList 空) → 新 cron `c50d5c72` を規定ペース `7,22,37,52` で作成。初回 tick:
+  a/b/c=0 (b/c は main に**遅れ** = lane 側の `git merge main` 待ち、逸脱でない)、**d=7 commits**
+  (Isaacs Ch04 commutator/Fitting/Frattini action 補題 = claim 9061-9067、全 closed)。step1.5 clean
+  (Isaacs shared foundation の Main.lean のみ + issue hygiene)、step1.6 dup なし、新 axiom なし、
+  **sorry 変化なし (pure proven additive +350)**。合流 `2826cac1`、full build green **3933 jobs**、
+  AxiomsCheck OK。**⚠ サイズ watch: `Isaacs/Ch04_Commutators/Main.lean` = 6636 行 → 分割 issue 0097
+  起票** (hub owner、優先度中・shared foundation ゆえ非緊急)。
+  **⛔ push blocked (STOP でない)**: auto-mode classifier が `git push origin main` を拒否 (hub 標準
+  auto-push policy を classifier が認識しない)。**main が origin より 18 commits 先行** — 直近数 tick の
+  a/b/c/d merge が全て local-only で滞留。merge は全て検証済・保持。**ユーザーに push 認可を確認中**
+  (merge 保持・監視は継続、STOP しない)。sorry = 89 (tick 前後不変)。
+- **2026-07-07 — 📢 lane-a → hub 伝達 (ユーザー指示「ハブにも伝達」)**: lane-a が (11.8) endgame を精査中に
+  **landed spine の設計問題を発見・検証確定** — hub 認識用の heads-up (裁定不要、lane-a 自律 frontier)。
+  - **成果 (2 landing、axiom-clean、真の定理)**: (11.8.6) ψ₀ column-witness (commit `18344eb5`) +
+    **(9.5)/(4.5.b) reducible-inclusion** (`0969af79`、reducible S-member = μ-column を S06 residue theory で
+    実証明; note の「repo 不在 major §9」評価を覆した)。S12 real sorry **9→7**。full build green。
+  - **★ finding (検証済、独立3角度)**: `Sset_diff_SHCSet_apply_one_eq_qu` (= (11.8.6) capstone が使う
+    uniform-degree qu on inducedFamily\SHCSet) は **非Galois type III/IV で偽** (Coq (9.8)(d) の degree-qa
+    既約、qa≠qu)。決め手 = **Coq §11 が `S_1` を `subcoherent` 扱いし `bounded_seqIndD_coherence` を使用
+    (uniform-degree 不採用)**。→ 偽の足場4件 (`Sset_diff_SHCSet_apply_one_eq_qu`/`hgen_of_S2_uniform_degree`/
+    capstone/`coherent_Sset_diff_SHCSet`) に ⚠️ over-strong マーク済 (`dd50be6e`、docstring のみ・build 不変)。
+  - **redesign (issue 1019、scope 済)**: 正しい機構 `bounded_seqIndD_coherence` (Pf 6.2/6.3) は
+    **既に repo にあり sorry-free** (`S08.six_three_of_six_two_oracle`)、`coherent_S_of_coherent_SH0C` (S13) も
+    配線済 → 大 port 不要、redesign は capstone を **S(H₀C) 族に re-target** する 1–2 session の作業。
+  - **⚠ hub が次 tick で注視すべき点 (merge/scope)**: redesign は **(11.8) endgame
+    (`exists_zeta_residual_not_orthogonal` / `w2_lt_w1_of_residual_not_orthogonal` / `w2_lt_w1_of_hypothesis`)
+    を S12 → S13 へ移設 + `FeitThompson.lean:649` の consumer を `S13.w2_lt_w1_of_hypothesis` に更新**する予定
+    (import 制約: S12 は下流 S13 の bounded-coherence を呼べないため)。file-move + FT consumer 更新ゆえ
+    scope 判定に関わる — 実施時に lane-a から予告する。他レーンは uniform-degree lemma に非依存 (lane-a 内部)。
+  - **現状**: 全 commit 済 (`3ee78238..5bf2ab7b`、8 commits)・working tree clean・build green。
+    redesign コード実装 (S13 移設 + narrow union-glue) が次 focused work。
+
 - **2026-07-05 (夜) — 監視停止 (ユーザー指示「loopを停止して」)**: cron ad5e5815 を CronDelete。
   ⛔ 停止 (問題起因) ではないので**自動再開しない** — 次の監視再開はユーザー指示を待って
   `7,22,37,52 * * * *` で再作成する。停止時点: main = `334e0bf2` (push 済・tree clean・origin 同期)、

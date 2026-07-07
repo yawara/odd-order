@@ -2318,3 +2318,71 @@ u-consistency 保証) する設計が clean。
 ⟹ capstone の bundled §9 sorry を discharge、残 = hS2deg 内の 2 §9 obligation ((9.5)/(9.8)) + capstone
 の hmixed/hDτ (§14)。deep §9 crux = (9.5) reducible-inclusion (Frobenius: H⊆Ker θ → Ind θ irr、
 repo 不在) + (9.8) irr-degree 完全性。
+
+## 2026-07-07 update³⁶ (lane-a /loop) — ★ capstone threading LANDED: ψ₀ column-witness sorry-free (net −1)
+
+update³⁵ の threading 設計を **build-green で landing** (commit 18344eb5, S12 real sorry 9→8):
+- **capstone `coherent_Sset_of_column_identities`** に `hw2 : 2 ≤ w₂` + `hd1 : ∀ j≠0, μ_{0,j}(1)≠1`
+  を signature threading (htype/hnt/chief/hdu は前 session で landed)。
+- **ψ₀ column-witness sorry を実構成で discharge**: `j₀ := ⟨1,_⟩ ≠ 0` (w₂≥2)、`ψ₀ = ∑ᵢ μ_{i,j₀}`。
+  - `∈ Sset` = `muGrid_column_sum_mem_inducedFamily hG hG.odd j₀ (hd1 j₀ hj₀)` (Sset = inducedFamily M defeq)。
+  - `∉ SHCSet` = `muGrid_column_sum_mem_sOf_H0_and_reducible …).2` (¬IsIrreducible) vs SHCSet の IsIrr conjunct。
+  - `ψ₀ − dζ ∈ D` = D-def の j₀ 列で `rfl`。
+- caller `exists_zeta_residual_not_orthogonal`: `hw2 := params.w2_prime.two_le`、
+  `hd1` は `hmu ▸ params.degree_independent 0 j hj` (= μ_{0,j}(1)=d) + `params.d_gt_one` で。
+  ⚠ gotcha: `rw [hmu ▸ …]` は期待型不明で metavariable 化 → `have hdeg : … = (d:ℂ) := hmu ▸ …; rw [hdeg]`。
+
+∴ **(11.8.6) capstone の `hgen` (generation) bullet は完全 assemble** = `hgen_of_S2_uniform_degree`
+(ungated (6.8.1) algebra, sorry-free) + world-bridge uniform-degree `Sset_diff_SHCSet_apply_one_eq_qu`。
+残 (11.8) sorry (次 frontier、上流優先で ①):
+1. **`Sset_diff_SHCSet_apply_one_eq_qu` の 2 §9 obligation** (S12:3822/3846、これが上流):
+   - **(9.5)/(11.5) reducible-inclusion** (`inducedFamily_reducible_apply_one_eq_qu` 内 3822): reducible
+     `inducedFamily`-member → `sOf(H₀)`。Frobenius `H⊆Ker θ → Ind θ irr` の対偶 + `sSet=𝒳 ⊊ inducedFamily`。
+   - **(9.8)/(9.9) irr-degree 完全性** (3846): irr `inducedFamily`-member of deg≠w₁ → deg qu。
+2. capstone `hmixed`/`hDτ` (S12:4219/4227、§14/BG §15-gated、cross-lane)。
+3. `coherent_Sset_diff_SHCSet` (S12:3975、§14 S₂ coherence)。
+**次 = ① (9.5) reducible-inclusion (S12:3822)** — ユーザー裁定「§9 head-on 継続」に沿う上流 crux。
+
+## 2026-07-07 update³⁷ (lane-a /loop) — ★ (9.5) reducible-inclusion LANDED + ⚠ 重要 finding: uniform-degree 設計が over-strong
+
+### ✅ landed: (9.5)/(4.5.b) reducible-inclusion sorry-free (S12 8→7、commit 0969af79)
+`exists_muGrid_column_eq_of_inducedFamily_reducible`: reducible `inducedFamily`-member `Ind_{M'}θ`
+(θ≠1) は nonzero μ-column `∑ᵢμ_{ik}` (k≠0)。`M'=HU=h.K` (defeq) → (4.5.b) `induce_not_isIrreducible_iff`
+の対偶で θ=chiRestrict χ₂ → `induce_restrict_certainType_eq` で = column → `chiRestrict_one_eq_trivial`
+で k≠0。⟹ `inducedFamily_reducible_apply_one_eq_qu` 完全 sorry-free (axiom-clean)。**note の「(9.5) は
+repo 不在 major §9」評価は誤り — S06 residue theory (session 7 で port 済) で closeable だった。**
+
+### ⚠ CRITICAL finding: `Sset_diff_SHCSet_apply_one_eq_qu` (irr-side, S12:3915) は **非Galois で偽** — 設計 over-strong
+irr-side (irr `inducedFamily`-member of deg≠w₁ → deg qu) を精査した結果、**この主張は非Galois type III/IV で
+偽**と Coq 精読で確定 (crying-wolf でなく code-level 確証):
+- **Coq (9.8) `typeP_nonGalois_characters` (PFsection9:845-852)**: 非Galois では `a := |U:C_U(x)|`,
+  **`a > 1`** (L855 `a_gt1`)、(d) `irr_qa := [zeta∈irr M | zeta 1 == q·a]` の count ≥ `(p-1)|U|/(a²|U'|)` ≥ 1
+  ⟹ **degree `q·a` (a>1, ≠w₁, generically ≠u) の irreducible が `S_H0U' ⊆ inducedFamily` に存在**。
+- これらは `inducedFamily M`-member (Ind of deg-a θ, θ≠1)、deg qa≠w₁ ⟹ `∉ SHCSet` ⟹ `∈ Sset\SHCSet`、
+  deg qa≠qu。∴ `∀ y∈Sset\SHCSet, y 1 = qu` は **偽** (反例 = qa irreducible)。
+- **Coq (9.9) `typeP_Galois_characters` (PFsection9:1258-1264)**: Galois では X_H0C' は deg ちょうど `u`
+  (qa なし) → uniform-qu は **Galois に限り真**。type III/IV は非Galois もあり得る (PFsection11:428 `gal'M`)。
+
+### ★ 正しい機構 = `bounded_seqIndD_coherence` (Pf (6.x)、Coq PFsection6:115) — uniform-degree 不要
+Coq (11.3) `FTtype34_noncoherence` (PFsection11:206-223) は **uniform-degree を使わない**:
+`coherent(S_H0C) --[bounded_seqIndD_coherence]--> coherent(S_1) --[(10.8)矛盾]`。
+`bounded_seqIndD_coherence`: `M<|L,H<|L,H1<|L` + `M⊆H1⊆H⊆K` + `nilpotent(H/M)` + `coherent(S H1)` +
+`|H:H1| > 4|L:K|²+1` ⟹ `coherent(S M)`。= 小さい族 S_H0C の coherence を **nilpotency + size bound** で
+大きい族 S_1 に拡張 (degree 均一性は不要)。repo S08_CoherenceCorePart2 に (6.7)/(6.8) の degree-sum bound
+(`∑χ(1)²≤2a`) が部分的にある。
+
+### ⟹ (11.8.6) capstone の設計判断 (redesign 要)
+現 capstone `coherent_Sset_of_column_identities` の `hgen` bullet は `hgen_of_S2_uniform_degree` +
+`Sset_diff_SHCSet_apply_one_eq_qu` (uniform qu) に依存 → **irr-side sorry は閉じられない (偽)**。
+target (coherent inducedFamily=S_1、(10.8) と矛盾) は正しいが、到達 method が over-strong。
+**correct path = Coq 準拠の bounded-coherence redesign**:
+- S₂ = **S(C) or S_H0C** (C-kernel 条件付き、狭い族) の coherence を確立 (現 `coherent_Sset_diff_SHCSet` は
+  inducedFamily\SHCSet で広すぎ; C-kernel 版に narrow)。
+- `bounded_seqIndD_coherence` (Pf (6.x)) を port/wire して S_H0C → S_1 (inducedFamily) に拡張。
+- reducible-side (`exists_muGrid_column_eq_of_inducedFamily_reducible`、本 session landed) は **正しい定理
+  (μ-column は genuinely deg qu ∈ sOf H0)** ゆえ redesign 後も再利用。ψ₀ witness + hgen algebra も真。
+- 現 uniform-degree 足場 (`hgen_of_S2_uniform_degree`/`Sset_diff_SHCSet_apply_one_eq_qu`) は Galois 限定でしか
+  真でないので、bounded-coherence route に置換。
+
+**次 iteration = bounded_seqIndD_coherence (Pf 6.x) の repo 状態確認 → S08 (6.7)/(6.8) degree-bound を
+土台に port → capstone を bounded-coherence route に redesign。** issue 1018 で追跡。
