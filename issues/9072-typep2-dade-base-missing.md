@@ -1,14 +1,57 @@
 ---
 id: 9072
 slug: typep2-dade-base-missing
-title: "char-core prerequisite: T-side type-P₂/III Dade isometry base (FTtypeP_coh_base) missing — blocks Pf 14.9 coherence"
+title: "Pf 14.9 T-side coherence: construct type-P-generic Dade isometry (ungated σ-sharp engine) — SOUND, buildable by C"
 created: 2026-07-07
 ---
 
-# char-core prerequisite: T-side type-P₂/III Dade isometry base (FTtypeP_coh_base) missing — blocks Pf 14.9 coherence
+# Pf 14.9 T-side coherence base — construct type-P-generic Dade isometry (SOUND, not a 4001 dead-end)
 
-**起票者**: lane c (ユーザー「C レーン再開」+「見落としタスクは hub に報告」)。**判断者**: hub / char-core lane。
-**種別**: cross-lane prerequisite (char-core §4/§5 Dade)。
+**起票者**: lane c (ユーザー「C レーン再開」+「見落としタスクは hub に報告」)。**判断者**: hub (裁定済 2026-07-07)。
+**種別**: lane c frontier work (char-core §4/§5 Dade 構成、C 実施可)。
+
+## 🧭 HUB VERDICT (2026-07-07, 敵対的検証 workflow `wf_455f8a09`、confidence HIGH)
+
+**結論: (14.9) T-side coherence route は SOUND。verdict 4001 とは矛盾しない。C はこれを build せよ。**
+(4 角度 reader = Lean route / 4001 scope / Coq PFsection14 / 教科書 + 3 敵対的 skeptic が全て refute 失敗で収束。)
+
+- **dead-end 懸念は用語衝突による誤報**: 本 issue 旧タイトルの「type-P₂/III Dade base」と、4001 が禁じる
+  「`IsTypeP2 T` carrier」は**別物**。「type-P2/III」自体が**圏違い** (type-P2 = Peterfalvi type II、type III と
+  disjoint)。必要なのは **type-P-generic** (`of_typeP`) な base であって type-P2 版ではない。
+- **4001 が禁じるのは狭く 1 点だけ** (issues/4001:163-181 で逐語確認): sorry-free spine constructor
+  `section16TypePStructure_of_isMinimalSimpleOdd` に `IsTypeP2 mp.T := sorry` を注入し `Tdata` field を追加する
+  こと (= sorry regression + (14.9) は `TypeIIData mp.T` を**出力**ゆえ type-P2 を**入力**化する設計逆転、かつ
+  `IsTypeP2 mp.T` は一般に偽で埋まらない)。**T-side coherence route・Dade 構成・T が type-III であることは
+  一切禁じていない** (4001 は V-side helper 構成を genuine と明示保全)。
+- **Coq が決定的**: `FTtypeP_coh_base` (PFsection8.v:811-819) は `of_typeP` のみでパラメトライズ (P1/P2 gate 無し)、
+  `rmR_T := FTtypeP_coh_base maxT TtypeP` (PFsection14.v:724) は `notTtype2`/`Ttype3` の下 = **type-III の T に対して
+  base を構築**、S 側 (`rmR_S` :459) と `of_typeP` レベルで対称。coherence は degree-p uniform subfamily `calT1` に
+  `subset_subcoherent` + `uniform_degree_coherence` ((5.7) equal-degree route)。
+- **必要な部品は ungated で既存**: `dadeSupportHypothesisData_of_subset_sigmaSharp` (S10:2160、IsTypeP1 不要) が
+  全 type で σ-sharp 台上の genuine `DadeSupportHypothesisData` を産する。`dadeSupportHypotheses_typeP` の `hA1`
+  branch は既にこれを hP1 無しで使用。**IsTypeP1-gated なのは `typePA` branch のみ**で、それは 9008 で偽と判明、
+  かつ T^# coherence が要するものではない。
+- **critical path 確認**: `T_typeIII_ratio_le` は feitThompson → … → `T_isTypeP2` (:1147) → 本 sorry (S16:942) で
+  **transitively 必要** (vestigial でない)。※ vestigial なのは別 object の `hyp.base.tauT` free field
+  (`tauT:=0`、FeitThompson.lean:2562-2571 で off-path)。`T_typeIII_ratio_le` は `tauT` を読まず、局所の
+  `hyp07 : S07.Hypothesis calT1_set A` を組む (両者は別物)。
+
+### C への具体 build plan (6 step)
+
+1. **spine を触らない**: `Tdata`/`IsTypeP2 mp.T` field 追加や `section16TypePStructure_of_isMinimalSimpleOdd`
+   への sorry 注入は**禁止** (= 4001 の唯一の禁止事項)。T の type-P witness は off-spine の
+   `reconciled_typePData_T` を使う。
+2. **T-side Dade isometry を構成**: ungated な `dadeSupportHypothesisData_of_subset_sigmaSharp` (S10:2160) から
+   `DadeSupportHypothesisData` を得て、`tau := dadeIntegralCharacterMap dadeData.dade` を type-I パターン
+   (S14_MaximalI.lean:153-157) に倣って構成。difference-image は `dadeCharacterDifferenceImageOfDiff` (S14:3799)。
+3. **`S07.Hypothesis calT1_set A` (= `T_typeIII_calT1_coherent` の局所 `hyp07`、S16:719) を組む**: landed の
+   `irrSubcoherent` assembler (S07_Subcoherent.lean:148) に τ + per-member difference image + isometry を threading
+   → S16:942 sorry 内の coherence carrier (`horth`) を discharge。
+4. 本 issue は**再タイトル済** (「type-P2/III missing」→「type-P-generic 構成、SOUND」)。旧「dead-end/blocks」枠は撤回。
+5. **A-set 確定 (build で)**: coherence は T^# 上、σ-sharp datum は A1(T)=T_σ^#、Coq betaT0∈CF(T,A0(T))
+   (PFsection14.v:789) は A0(T) を示唆 → `hsuppdiff` を満たす A を build で確定。
+6. **残 residual は分離維持**: `T_typeIII_ratio_le` の他の残 (v=|V| via (13.12) d=1 = lane-b gated / S-side Γ
+   bridge + norm) は coherence base とは別物ゆえ conflate しない。
 
 ## 背景 (2026-07-07 lane c, 徹底調査で root-cause 確定)
 
