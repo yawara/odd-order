@@ -101,13 +101,25 @@ unique partner `Mstar` が **Fact A (W₂ κ-Hall of Mstar) + Fact B (W₁ = M_�
 
 ⟹ item 1 は **global port でなく typeP_duality + alignment** (multi-session, type-P only)。頭から engage。
 
+## 進捗 (2026-07-07 lane c loop³ — step 5 十分性 verify + skeleton wire)
+
+**landed (commit `58bbee50`, full build 3934 green, AxiomsCheck OK)**: `typeP_partner_structure`
+(S14:9270) が partner に **Fact A (κ-Hall) + Fact B (Kstar 同定)** を直接供給すると判明 (manual
+alignment 不要)。⟹ step 5 を前倒しで verify:
+- 新 `Hypothesis.reconciled_residuals_of_pairing_facts` (**sorry-free**): Fact A ∧ Fact B →
+  両 field (`W₁≤Q⊓T''` / `∀x∈W₂#, T'⊓C(x)=W₁`) を既存機構 (`typeP_kstar_in_mf` /
+  `typeP_derivedInG_inf_centralizer_kappaElement_eq`) で discharge。
+- `reconciled_typePData_T` を wire: 2 opaque sorry → 精密な `hFactA`/`hFactB` (sorry 数不変、doneness↑)。
+
+⟹ 残余は Fact A + Fact B を供給する step 1–4 のみ (十分性は確定)。
+
 ## やること (残り)
 
-- [x] 9000-range claim + generic 部品 build (loop¹) + route 精密化 typeP_duality 経由確定 (loop²)
+- [x] 9000-range claim + generic 部品 (loop¹) + route typeP_duality 確定 (loop²) + step5 十分性 verify (loop³)
 - [ ] **step 1**: S-side κ-Hall setup (`IsHallSubgroup (kappa S) (W₁.subgroupOf S)`, `W₂=M_σ(S)⊓C(W₁)`)
-- [ ] **step 2–4**: `typeP_duality S` → Mstar + covering + alignment (T=Mstar^g fixing W₂)
-- [ ] **step 5**: Facts A/B(T) で `reconciled_typePData_T` の 2 sorry discharge
-- 補助: `¬ IsConjugateSubgroup S T` (covering→T~Mstar 用)、`W ⊓ T' = W₁` (local)
+- [ ] **step 2–4**: `typeP_partner_structure S` (or `typeP_duality`) → Mstar=T + Z-family covering
+      (`theorem88_caseB` 経由) → Facts A/B(T) を `hFactA`/`hFactB` に供給
+- 補助: `IsZFamilyMember S W₁ T` (partner 同定)、`¬ IsConjugateSubgroup S T`
 
 ## 完了条件
 
