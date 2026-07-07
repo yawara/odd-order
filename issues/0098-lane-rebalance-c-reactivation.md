@@ -84,18 +84,19 @@ hub が 4 並列 subagent (wf_d4994964) で a queue / b queue / c gate-map / 900
   route (a): S の型-P 構造 → partner (typeP_duality) → Fact A (W₁ κ-Hall of S) + Fact B (M_σ(S)⊓C(W₁)=W₂)
   → partner Fact B → q∈σ(T) で W₁≤M_σ(T) + fix-W transport で cardinality equality。(14.9)/IsTypeP2 T 非依存。
 - **item 5 (hcard2)** — ✅ 完了 (commit `bf3b21f4`)。
-- **item 3 (S-side βₛ bridge 13.18 / `betaData_of_grid`)** — 🔶 **de-opacify 済** (commit `93c2867a`)。
-  opaque な `:= sorry` を **具体 β/Γ 構成 + (13.18.b) norm 実証明 + 7 精密 named obligation** に分解:
-  * `betaGrid j = Ind_{(P⊔W₁)}^S 1 − μ_{0j}` / `GammaGrid = τ_S(β_{#1}) − 1_G + η_{01}` (τ_S = genuine
-    `dadeHypS` Dade isometry、placeholder `tauS` 回避)。
-  * **`betaGrid_norm` (13.18.b) sorry-free**、深部 2 fact に還元。
-  * 残 7 sorry (S15_SAndT.lean): **(A) 比較的 tractable** = `indPW1_inner_self` (‖Ind‖²=(u−1)/q+1、
-    route: `norm_induce_one_frobenius` + `UW1_frobenius` + P-inflation bridge。`InflationCharacter.lean`
-    在り) / `indPW1_inner_mu` (⟨Ind,μ_{0j}⟩=0、constituent/kernel 解析)。**(B) deep Γ-facts** =
-    `gammaGrid_{independent,orthogonal_one,real,norm_bound}` + `betaGrid_support` = **(5.3) S↔W Dade
-    cross-relation** `τ_S(μ_{ij}−μ_{0j})=δ_j(η_{ij}−η_{0j})` + (13.2.e) A₀(S) normedTI Dade=Ind bridge に bottom-out。
-  * **次の upstream target**: (A) の 2 fact を閉じて (13.18.b) 完全 sorry-free 化 → その後 (5.3) cross-relation
-    (5 Γ-facts 一斉 unblock) or item 4 assembly。
+- **item 3 (S-side βₛ bridge 13.18 / `betaData_of_grid`)** — ✅ **(A) 完了: (13.18.b) 実証明** (2026-07-07)。
+  * de-opacify (commit `93c2867a`): opaque `:= sorry` を 具体 β/Γ 構成 + 7 named obligation に分解。
+  * **(A) 完了** — `indPW1_inner_self` (commit `cc01d946`) + `indPW1_inner_mu` (commit `dcda9592`) 実証明
+    ⟹ **`betaGrid_norm` (13.18.b) 実証明**。shared infra = **issue 9074 P1/P2/P3**
+    (`InflationInduction.lean`: quotient inflation isometry + trivial-char induction-inflation commute
+    + inflated⊥irreducible)、+ `uW1_isComplement_P` (S̄=S/P≅U⋊W₁ の complement) + `norm_induce_one_frobenius`
+    + `typeP_uW1_frobenius` transport + `c_eq_one` (13.12)。
+    `P_not_subset_characterKernel_mu` (P⊄ker μ_{0j}) は Clifford (`characterKernel_subset_of_isCharacter_
+    of_inner_ne_zero`) 経由。**inner_mu / P1/P2/P3 / uW1_isComplement_P は完全 clean; inner_self/betaGrid_norm
+    の残 sorryAx は (13.12) `c_eq_one` (既存上流 gate) のみ** (spurious §16 `basic_structure` 依存は除去)。
+  * **残: (B) deep Γ-facts** = `gammaGrid_{independent,orthogonal_one,real,norm_bound}` + `betaGrid_support`
+    = **(5.3) S↔W Dade cross-relation** `τ_S(μ_{ij}−μ_{0j})=δ_j(η_{ij}−η_{0j})` + (13.2.e) A₀(S) normedTI
+    Dade=Ind bridge に bottom-out。**次 target = (B) 5.3 cross-relation** (5 Γ-facts 一斉 unblock)。
 - **item 4 (§14 Γ-bridge nzT1_Ga assembly)** — 未着手。`T_typeIII_ratio_le` (S16:1641) は Γ-Bessel skeleton
   還元済だが item 1(v=|V| lane-b) + item 3 coherence + S-side Γ bridge に multi-gated。item 3 の後。
 - **item 2 (generic semilinear (9.7.b) field-model 新 shared leaf)** — 未着手。独立 infra、claim-before-build。
