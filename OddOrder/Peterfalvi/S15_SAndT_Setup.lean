@@ -8251,6 +8251,31 @@ theorem c_eq_one_final_case [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rw [hCcard, hPcard] at hdvd
   norm_num at hdvd
 
+/-- **The analytic core of Peterfalvi (13.12)** (side-agnostic, pure `ℚ`-arithmetic).
+
+From the `(13.10)` analytic inequality `u/c > m·a^(b−1)/b` and the `(13.2.c)` Singer *upper*
+bound `u·(a−1) ≤ a^b − 1`, derive the upper bound `m < b·(a^b−1) / (c·a^(b−1)·(a−1))` that
+(with the fixed-point-free lower bound `c ≥ 2b+1`) feeds the finite numeric elimination.
+
+Both the `S`-side `c = 1` finish (`c_eq_one`, `a = p, b = q, u = u, c = c`) and the `T`-side
+`d = 1` dual (`a = q, b = p, u = v, c = d`) instantiate this same core; extracted per issue
+9013 (案A: generalize the §13 estimate so both sides `cite` it).  Uses only the Singer *upper*
+bound, so it is ungated (the `T`-side lower-bound gate of the (13.15) `v`-value is a different
+consumer — the ratio inequality — and does not enter here). -/
+theorem analytic_singer_m_bound {a b u c : ℕ} {m : ℚ}
+    (hbR : (0 : ℚ) < b) (hcR : (0 : ℚ) < c) (haR : (1 : ℚ) < a)
+    (hanalytic : (u : ℚ) / c > m * (a : ℚ) ^ (b - 1) / b)
+    (hsinger : (u : ℚ) * ((a : ℚ) - 1) ≤ (a : ℚ) ^ b - 1) :
+    m < (b : ℚ) * ((a : ℚ) ^ b - 1)
+      / ((c : ℚ) * (a : ℚ) ^ (b - 1) * ((a : ℚ) - 1)) := by
+  have haR0 : (0 : ℚ) < (a : ℚ) := by linarith
+  have hp1R : (0 : ℚ) < (a : ℚ) - 1 := by linarith
+  -- From (13.10): `m · a^(b-1) · c < u · b`.
+  rw [gt_iff_lt, div_lt_div_iff₀ hbR hcR] at hanalytic
+  rw [lt_div_iff₀ (by positivity)]
+  nlinarith [mul_lt_mul_of_pos_right hanalytic hp1R,
+    mul_le_mul_of_nonneg_left hsinger (le_of_lt hbR)]
+
 /-- **Peterfalvi (13.12)**: the centralizer parameter `c` is `1`.
 
 The numeric elimination `c_eq_one_forces_params` — fed the (13.10) analytic inequality
@@ -8287,20 +8312,14 @@ theorem c_eq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have e2 : ((hyp.p ^ hyp.q - 1 : ℕ) : ℚ) = (hyp.p : ℚ) ^ hyp.q - 1 := by
       push_cast [Nat.cast_sub hpq1]; ring
     rw [e1, e2] at h1; exact h1
-  -- Positivity.
+  -- Positivity, then the side-agnostic analytic core (`analytic_singer_m_bound`) assembles the
+  -- abstract bound `m < q(p^q-1)/(c p^(q-1)(p-1))` from (13.10) + the Singer bound.
   have hqR : (0 : ℚ) < (hyp.q : ℚ) := by exact_mod_cast hyp.q_prime.pos
   have hcRpos : (0 : ℚ) < (hyp.c : ℚ) := by exact_mod_cast (show 0 < hyp.c by omega)
-  have hp1R : (0 : ℚ) < (hyp.p : ℚ) - 1 := by
+  have haR : (1 : ℚ) < (hyp.p : ℚ) := by
     have : (3 : ℚ) ≤ (hyp.p : ℚ) := by exact_mod_cast hyp.three_le_p
     linarith
-  -- From (13.10): `m · p^(q-1) · c < u · q`.
-  rw [gt_iff_lt, div_lt_div_iff₀ hqR hcRpos] at h1310
-  -- Assemble the abstract bound `m < q(p^q-1)/(c p^(q-1)(p-1))`.
-  have hbound : hyp.m < (hyp.q : ℚ) * ((hyp.p : ℚ) ^ hyp.q - 1)
-      / ((hyp.c : ℚ) * (hyp.p : ℚ) ^ (hyp.q - 1) * ((hyp.p : ℚ) - 1)) := by
-    rw [lt_div_iff₀ (by positivity)]
-    nlinarith [mul_lt_mul_of_pos_right h1310 hp1R,
-      mul_le_mul_of_nonneg_left huPR (le_of_lt hqR)]
+  have hbound := analytic_singer_m_bound hqR hcRpos haR h1310 huPR
   -- Numeric elimination forces `p = 5, q = 3, c = 7`.
   obtain ⟨hp5, hq3, hc7⟩ := c_eq_one_forces_params hyp.p_prime hyp.q_prime hyp.three_le_p
     hyp.q_ne_two hyp.p_ne_q hc_ge (hyp.two_mul_q_dvd_c_pred hG)
