@@ -516,3 +516,27 @@ Fcore_structure (Thm 15.2) conjunct (g) の第3式 `'C_Ms(Ks/Q0 | 'Q) = 'F(M)`**
 (centralize K̄ ⇏ centralize Q̄、K̄⊆Q̄ minimal normal だが normal closure 経由で一致しない)。
 ⟹ eq3 を独立に再構成する要 (deep §15.2 port) — repo の chief-factor engine
 (`chiefFactor_engine_of_inputs`, `card_centralizer_quotient_eq_of_kstar` = |C_{Q̄}(K)|=q 等) を使う。
+
+## 2026-07-07 更新 #17 (lane b, /loop) — non-nil sAFL を pure minimality-lifting hLift に reduce (context+eq2 実証明)、hLift port path 詳細
+
+`A_le_fittingInAmbient_of_typeP1_nonnil` の chief-factor context を完全再構成し (type-P1、Q=O_q(L)、
+D via `exists_kInvariant_qComplement`、Q0、hmin via `chiefFactor_Q0_normal_minimal_of_inputs`、
+Q̄ elem abelian → hQab、eq2 `centralizer_msigma_quotient_le_fittingInAmbient` → hsecFit)、
+assembly も実証明。**残 sorry = `hLift` 1 本** (build GREEN、commit 5d2cb907):
+
+  `hLift : ∀ x∈Ms, (∀k∈K ⁅x,k⁆∈Q0) → (∀y∈Q ⁅x,y⁆∈Q0)`  (= Coq Fcore eq3 の C_Ms(K̄)⊆C_Ms(Q̄))
+
+### hLift port path (詳細、~80-100 行の intricate quotient/minimal-normal port)
+1. `H := C_Ms(K̄) = {x∈Ms : ∀k∈K ⁅x,k⁆∈Q0}` を Subgroup 化 (astab 構成、
+   `centralizer_msigma_quotient_le_fittingInAmbient` proof の `S`-subgroup pattern L5328-5344 を複製)。
+2. **H が M-normal** (Coq `nCMsKsbM`、これが crux):
+   - `Ms ⊆ N(H)` via `sub_der1_norm`: `Ms' = L'' ⊆ F(L) ⊆ C_Ms(Q̄) ⊆ C_Ms(K̄) = H`
+     (`derivedDerived_le_fittingInAmbient` + F⊆C_Ms(Q̄) [F=Q⊔(C(Q)⊓M), Q̄ abelian] + K̄⊆Q̄)。
+   - `Ks ⊆ N(H)`: Ks は K=C_Ms(Ks) を normalize ⟹ K̄ ⟹ C_Ms(K̄)=H。
+   - `M = Ms·Ks` (type-P1 a: Ms ⋊ Ks = L)。
+3. `W := {y∈Q : ∀x∈H ⁅x,y⁆∈Q0}` を Subgroup 化。**W M-normal** ⟸ H M-invariant + Q0/Q M-normal
+   (⁅x,gyg⁻¹⁆ = g⁅g⁻¹xg,y⁆g⁻¹、g⁻¹xg∈H)。
+4. `K ≤ W` (∀x∈H ⁅x,k⁆∈Q0 by def H、k∈K⊆Q via hKstarQ)、`K ⊄ Q0` (hKstarNotQ0) ⟹ `Q0 < W`。
+5. `hmin W (Q0<W) (W≤Q) (W M-normal) → Q ≤ W` ⟹ ∀y∈Q ∀x∈H ⁅x,y⁆∈Q0 ⟹ 特に MY x で結論。
+
+repo 機構は全 available (S-subgroup pattern、chiefFactor engine、hmin)。intricate だが bounded。
