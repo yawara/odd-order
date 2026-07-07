@@ -93,3 +93,11 @@ tau_isometry_diff : ∀ φ ψ, φ ∈ zSupportedSpan S A → ψ ∈ zSupportedSp
 
 - 調査 = workflow wf_4f8e7eca-b3b (coq:subcoherent-interface / lean:s07-consumer-census)、2026-07-07
 - issues/1019 update⁵⁵ (a の flag)、issues/0098 (レーン再点検)、coq/theories/PFsection5.v:486-494・PFsection9.v:1484
+
+## HUB 追認 (2026-07-07 合流 tick)
+
+b による S16_NonExistenceG:T_typeIII_hyp07 の instantiation-lambda swap (裁定では c 分担) を
+**非逸脱として追認**: (i) 0099 裁定の実質範囲内 (work item 自体は裁定済、executor のみ変更)、
+(ii) field 弱化と atomic でないと build が壊れる必要性が genuine、(iii) 機械的 3 行 swap のみで
+新宣言・設計内容ゼロ、(iv) issue で self-flag 済み。c は次回 sync 時に review し自所有の形に調整可
+(調整不要ならそのまま)。merge = 57887d84。
