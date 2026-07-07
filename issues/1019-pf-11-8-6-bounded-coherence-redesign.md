@@ -702,3 +702,18 @@ degree-`d` の irreducible subfamily `{φ∈inducedFamily | irr ∧ φ1=d}` の 
 ### ⚠ 実務ノート (この iteration の教訓)
 IsCoherent を返す S12 lemma は **`open scoped FiniteInduce in`** が必須 (Fintype/Invertible の
 scoped instance 供給; 無いと signature で `Fintype ↥M` synth 失敗)。
+
+## 🔬 update⁵⁴ (2026-07-07 lane-a /loop) — ★ inducedFamily_irreducible_Rdatum landed = subcoherent R-datum の irreducible 半分
+
+`S12.Hypothesis.inducedFamily_irreducible_Rdatum (χ : IrreducibleCharacter) (hχ : χ∈inducedFamily) :
+CharacterDifferenceImage hyp.tau χ` を sorry-free landing。`dadeCharacterDifferenceImageOfDiff`
+(S07:5729, Dade R-datum producer) に hyp.tau (= dadeIntegralCharacterMap hyp.dadeData.dade …,
+S12_Core:404) + hreal (inducedFamily_hasNoRealCharacters) + hdiffsupp (inducedFamily_sub_support、
+degree eq は irreducibleCharacter_apply_one_eq_pos_natCast + star_natCast) を供給。
+
+= **subcoherent(S_ H0C') R-datum の irreducible 半分** ((9.11) induction の extension が要する)。
+残 = **reducible (mu_j) の R-datum** (tau_muGrid_row_diff 経由、deep) + subcoherent 組立 (irrSubcoherent)
++ induction (coherentPairChain) + hmixed/hDτ (σ-grid)。
+
+⟹ 直近 2 iteration で (9.11) port の base engine (update⁵³) + irreducible R-datum (本) を landing。
+circling から concrete landing に復帰。次 = reducible R-datum か subcoherent 組立。
