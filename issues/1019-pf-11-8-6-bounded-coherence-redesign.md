@@ -830,3 +830,35 @@ witness = ζ̄−ζ (conj 保存 + conjDiff support + no-real)。∃-witness は
   Lean 対応要確認) + norm-chain squeeze (S07_Subcoherent 在庫) + S3 enumeration。
 次 iteration = **(A) caseB assembly に着手** (hex witness 供給 → family 分解 → 1-pair adjoin
 instantiation の順)。
+
+## 🔬 update⁵⁸ (2026-07-07 lane-a /loop) — ★★ (9.11) target 訂正: sOf (𝒳-系) が正、SOf でない (update⁵⁰ 撤回) + sOf 版 base landed
+
+### ① ★ target 訂正 (Coq 精読)
+- **Coq §9 の `S_ Y := seqIndD M^`(1) M M`_\F Y`** (PFsection9.v:209) — **第 3 引数 = M`_\F = H**:
+  source は「H ⊄ Ker θ」(𝒳-条件、`X_ Y = Iirr_kerD M' H Y` :208) を課される。∴ **(9.11)
+  `Ptype_core_coherence` の family = 𝒳-系 = Lean `sOf`**。
+- update⁵⁰ の「target = SOf(H0Cprime) = inducedKernelFamily」は **§11 の notation
+  (`S_ := seqIndD HU M HU`, PFsection11.v:90 — nontrivial のみ) との混同で誤り**。撤回。
+- 整合確認: `forall_sOf_H0Cprime_degree_qu_caseB` (S12_Section9Counts:77) の family = chars.SOf =
+  𝒳-系。SOf (kernel-filter) だと deg-q member (S(HC) 系、H-killing) が混ざり「全 member deg qu」
+  は偽 — 𝒳-系だから成立。教科書側の一貫性 ✓。
+- **bridges への影響**: `coherent_sOf_H0C_of_coherent_sOf_H0Cprime` (update⁴⁶、sOf 版) が**本線に
+  復帰**。SOf 版 bridge (update⁵⁰) は不使用 (無害残置; SOf coherence はより強い主張で (9.11) は
+  それを与えない)。SOf 版 base (update⁵⁷ landed) は S(HC)/SOf 系の中間量として有用残置。
+
+### ✅ landed: `S13.sOf_degreeSubfamily_isCoherent` (sorry-free, axiom-clean, commit 7d0ab806)
+(9.11) が実際に消費する base: 𝒮(Y) の deg-d 既約 subfamily coherence。sOf-cut ⊆ SOf-cut
+(sOf_subset_SOf) で update⁵⁷ の SOf 版から restrict。witness = ζ̄−ζ (sOf_closedUnderConjugate)。
+
+### ② ★ all-reducible ケースの発見 — irr-witness は常には立たない
+Coq (9.9)(c): `all redM (S_ H0C') → C=1 ∧ u=(p^q−1)/(p−1) ∧ Frobenius(HU/H0)` — **S_ H0C' が
+全 member reducible の退化ケースが排除されていない** (その場合の特殊構造を export するのみ)。
+Coq (9.11) は subcoherent (可変長 R-datum) ゆえ irreducibility 不要で場合分けなし。Lean-native
+route (irr-cut base) は all-reducible で base が立たない ⟹ **μ-pair base (reducible conj-pair
+{μ, μ̄} の 2-element coherence) が caseB assembly の必要部品**:
+- 供給源: R(μ) = `certainTypeR` (σ-image family、S06) → extension ν(μ) = R の half-sum
+  (‖ν(μ)‖² = ‖μ‖² が orthonormal half-sum で合う)。`coherentPair` (S07) の norm-mc 一般化
+  or `certainTypeDecompositionDa` からの直接組立。
+- caseB assembly 全体 = seed (irr-pair [coherentPair_fromDade] or μ-pair [新規]) + 残り pairs を
+  xAdjoinStepW / xAdjoinStepW_k で adjoin + coherentOfPairChainCover fold。
+次 = **μ-pair base の設計調査** (coherentPair の一般化可能性、certainTypeR half-sum 構造)。
