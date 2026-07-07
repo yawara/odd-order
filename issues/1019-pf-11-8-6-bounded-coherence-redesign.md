@@ -600,3 +600,29 @@ obligation は:
 - **hwit = 𝒮(H₀C) nonemptiness** = `caseA_exists_irreducible_sOf_H0C` (case split)。
 両方 lane-a §9-11 ungated。**次 iteration = (9.11) port assembly か hwit** に着手。
 (capstone は加えて §14 glue も要、lane-a 単独では非閉 — 既知。)
+
+## 🔬 update⁵⁰ (2026-07-07 lane-a /loop) — ★ (9.11) port target を訂正: SOf(H0Cprime) = inducedKernelFamily (Coq S_ H0C')
+
+Coq family variant を精査 → **(9.11) port target は `SOf(H0Cprime)` (= §10 inducedKernelFamily =
+Coq `S_ H0C' = seqIndD HU M HU H0C'`)** であり、`sOf(H0Cprime)` (H-version) でない、と確定。
+これで port が S08 subcoherent/witness 機構 (coherent_SOf_HC が使う inducedKernelFamily 系) を
+再利用可 = **port の de-risk**。
+
+- Coq (11.3) `cohS2 = coherent(S2=sOf(H0C))` は `subset_coherent(Ptype_core_coherence)` で、
+  Ptype_core_coherence = coherent(`S_ H0C'` = seqIndD HU M **HU** H0C')。sOf(H0C) ⊆ S_ H0C' を
+  seqIndS で直接 restrict (H-version sOf(H0Cprime) を経由しない)。
+- Lean 対応: `SOf(Y) = inducedKernelFamily((derivedInG M).subgroupOf M)(Y.subgroupOf M) = S_ Y`
+  (HU=M'=derivedInG M)。∴ (9.11) port = coherent(`hyp.SOf hyp.H0Cprime`)。
+
+### ✅ landed 本 iteration: `coherent_sOf_H0C_of_coherent_SOf_H0Cprime` (S13, 正しい bridge)
+`coherent(SOf(H0Cprime)) + 𝒮(H₀C) witness → hY`。subset `𝒮(H₀C) ⊆ SOf(H0Cprime)` =
+`sOf_subset_SOf` (sOf⊆SOf) + `inducedKernelFamily_antitone` (H0Cprime≤H0C) → isCoherent_of_subset。
+旧 `coherent_sOf_H0C_of_coherent_sOf_H0Cprime` (sOf(H0Cprime) 経由) は superseded (残置、無害)。
+
+### ⟹ 残 hY obligation (訂正後)
+- **hcoh = coherent(`hyp.SOf hyp.H0Cprime`)** = (9.11) port。target = inducedKernelFamily(H0Cprime)
+  ⟹ subcoherent 組立は S08 inducedKernelFamily 機構 (pairwise_orthogonal/hasNoRealCharacters/
+  closedUnderConjugate) を直接使える (coherent_SOf_HC の witness pattern と同型)。
+- **hwit = 𝒮(H₀C) nonzero witness** = 別途 (reducible_mem_sOf_H0C で member、sOf conjugate-closure +
+  conjDiff support + no-real で ζ.conj-ζ)。sOf-world witness 機構要 (~50 行)。
+次 = (9.11) port (SOf(H0Cprime) の subcoherent → constant-degree base → pair-chain) か hwit。
