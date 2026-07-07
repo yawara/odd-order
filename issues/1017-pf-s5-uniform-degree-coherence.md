@@ -722,3 +722,24 @@ tau=dade map の isometry route、**BG §15 に non-gated**、§9 (9.8.d) ≥2 c
   BG §15 に non-gated)。b が正面から build。
 
 ⟹ 本 issue は「§5-arith 完了 + G2→9017 移管 + G1=b in-cluster」で整理。新規レーン割当不要 (a/b で消化)。
+
+## ✅ 2026-07-07 (lane b): G2 CLOSED — A(S) TI-set (13.2.e normedTI) 実証明 (commit 76d1b27b)
+
+9017 (BG Cor 15.9 sorry-free 化) の un-gate を受け、G2 wiring を完遂:
+- **Rung C** `escaping_honestTypeP2ASet_eq_empty` (S15_SAndT_Setup): type-P₂ maximal の A(M) に
+  escaping 点なし。Coq `FTtypeP_facts` (e) PFsection13.v:224-238 の port —
+  escaping a ⟹ σ-sharp (8.13.b) ⟹ BG D(4) `exists_RData_escape_structure` (9017 で axiom-clean 化)
+  の neighbour N で分岐: N type-P₂ ⟹ (D(4) tail) M type-F、M type-P₂ と矛盾 / N type-F ⟹
+  Prop 16.1 dictionary + Pf (12.7) `typeI_frobenius` で N は kernel N_σ の Frobenius、
+  Â_σ(N)-点 a は kernel regularity (Isaacs 6.4) で N_σ に落ち a ∉ N_σ と矛盾。
+- **Hypothesis-level payoff**: `isTISubset_honestTypeP2ASet` (= normedTI TI 半分、G2 本体) +
+  `forall_dadeHypS_H_eq_bot` + **`sInstance_dade_eq_induce`** (= isometry 半分、full-A(S) で
+  dade = Ind_S^G — bridge cd6beac7 + Rung B d375f39c の唯一の未証明入力 hH₁ を放電)。
+- 本体 sorry 導入 0。継承 sorryAx = (i) BG §16 Theorem-II pins (dadeHypS と exact parity、
+  accepted)、(ii) Pf (12.7) の (12.8)-(12.16) machinery のみ (新規依存クラス)。
+
+**⟹ (13.3) 残 = G1 のみ**: base `sSetIrrDeg_coherent` (landed) → coherentPairChain induction
+(mixed family: reducible μ_j は CharacterPsiDecomposition、既約は conjugate pairs) + ≥2 count
+sub-gate ((9.8.d)、S11:11691 sorried-cite 可) → NEW IsCoherent → `coherent_H0Cprime_S` re-point
+→ CharacterDegreeData の tau1S 3 fields (extension= G1、差分上 Ind 一致 = G2 `sInstance_dade_eq_induce`
++ `sSet_member_diffsupp`)。SibleyTarget route (S15:2237) は G1+G2 完成時に置換・retire。

@@ -140,6 +140,66 @@ theorem exists_apply_one_eq_card_mul_of_vanishing_off_one {H : Type*} [Group H] 
   rw [hsum, hm] at hcard
   exact hcard.symm
 
+/-! ### Power enumeration of a finite cyclic group
+
+`Fin |D| ≃ D` sending `i ↦ γ^i` for a generator `γ` — the **structure-preserving** enumeration
+under which index negation `(|D| − i) % |D|` is element inversion
+(`cyclicPowEnum_eq_inv_of_add_mod_eq_zero`).  Used to realize the character-grid enumerations
+(`w1CharEquiv` below, `chi2enum` in `FeitThompson`) as Peterfalvi's own power indexing of the
+`ω`-grid ((3.5): `ω_{ij} = ω₁^i ω₂^j`), which makes the combinatorial `finNeg`-pairing of the
+`η`-grid ((3.9.a)) literally the character-inversion pairing.  (Issue 3002: with an *arbitrary*
+enumeration the (3.9.a) `finNeg` statement is false; with the power enumeration it is honest.) -/
+
+section CyclicPowEnum
+
+variable (D : Type*) [Group D] [Finite D] [IsCyclic D]
+
+open Subgroup in
+/-- A generator of a finite cyclic group (a choice fixed once and for all). -/
+noncomputable def cyclicGenerator : D :=
+  (IsCyclic.exists_generator (α := D)).choose
+
+open Subgroup in
+theorem forall_mem_zpowers_cyclicGenerator : ∀ x : D, x ∈ zpowers (cyclicGenerator D) :=
+  (IsCyclic.exists_generator (α := D)).choose_spec
+
+theorem orderOf_cyclicGenerator : orderOf (cyclicGenerator D) = Nat.card D :=
+  orderOf_eq_card_of_forall_mem_zpowers (forall_mem_zpowers_cyclicGenerator D)
+
+variable {D} {n : ℕ}
+
+/-- The power enumeration `i ↦ γ^i : Fin n ≃ D` of a finite cyclic group of order `n`. -/
+noncomputable def cyclicPowEnum (hn : Nat.card D = n) : Fin n ≃ D :=
+  Equiv.ofBijective (fun i => cyclicGenerator D ^ (i : ℕ)) (by
+    classical
+    have hord : orderOf (cyclicGenerator D) = n := (orderOf_cyclicGenerator D).trans hn
+    constructor
+    · intro i j hij
+      exact Fin.ext (pow_injOn_Iio_orderOf
+        (by rw [hord]; exact i.2) (by rw [hord]; exact j.2) hij)
+    · intro x
+      have hx := forall_mem_zpowers_cyclicGenerator D x
+      rw [mem_zpowers_iff_mem_range_orderOf] at hx
+      obtain ⟨k, hk, hkx⟩ := Finset.mem_image.mp hx
+      exact ⟨⟨k, hord ▸ Finset.mem_range.mp hk⟩, hkx⟩)
+
+@[simp] theorem cyclicPowEnum_apply (hn : Nat.card D = n) (i : Fin n) :
+    cyclicPowEnum hn i = cyclicGenerator D ^ (i : ℕ) :=
+  rfl
+
+/-- The power enumeration pairs indices summing to `0 (mod n)` into inverse elements — the
+abstract form of "index negation = inversion". -/
+theorem cyclicPowEnum_eq_inv_of_add_mod_eq_zero (hn : Nat.card D = n) {i j : Fin n}
+    (hij : ((i : ℕ) + (j : ℕ)) % n = 0) :
+    cyclicPowEnum hn i = (cyclicPowEnum hn j)⁻¹ := by
+  have hord : orderOf (cyclicGenerator D) = n := (orderOf_cyclicGenerator D).trans hn
+  have key : cyclicPowEnum hn i * cyclicPowEnum hn j = 1 := by
+    show cyclicGenerator D ^ (i : ℕ) * cyclicGenerator D ^ (j : ℕ) = 1
+    rw [← pow_add, ← pow_mod_orderOf, hord, hij, pow_zero]
+  exact mul_eq_one_iff_eq_inv.mp key
+
+end CyclicPowEnum
+
 namespace Hypothesis
 
 variable (h : Hypothesis L)
@@ -179,26 +239,45 @@ theorem one_lt_card_W1 : 1 < Nat.card h.W1 := by
   have h3 : 3 ≤ Nat.card h.W1 := h.sdiffTICyclicHypothesis.three_le_card_W1
   omega
 
-/-- An arbitrary reindexing `Fin w₁ ≃ Ŵ₁` of the `W₁`-dual, from the cardinality match
-(Pontryagin self-duality `card_charGroup_subgroupOf`: `|Ŵ₁| = |W₁| = w₁`). -/
-noncomputable def w1BaseEquiv :
-    Fin (Nat.card h.W1) ≃ ((h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :=
-  haveI : Fintype ((h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) := Fintype.ofFinite _
-  (Fintype.equivFinOfCardEq (by
-    rw [← Nat.card_eq_fintype_card]
-    exact h.sdiffTICyclicHypothesis.card_charGroup_subgroupOf
-      h.sdiffTICyclicHypothesis.W1_le_W)).symm
+/-- The `W₁`-dual is cyclic (`isCyclic_charGroup_subgroupOf`), recorded for the power
+enumeration below. -/
+theorem isCyclic_w1CharGroup : IsCyclic ((h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :=
+  h.sdiffTICyclicHypothesis.isCyclic_charGroup_subgroupOf h.sdiffTICyclicHypothesis.W1_le_W
 
-/-- The reindexing `Fin w₁ ≃ Ŵ₁` pinned at `0 ↦ 1` (trivial character).  Composing the
-base equiv with the transposition swapping `0` and the preimage of `1` moves the trivial
-character to the distinguished index `0`, as the (1.4) machinery (indexed by `Fin w₁`
-with base index `0`) requires for the column family `i ↦ ω_{e i, j}`. -/
+/-- The reindexing `Fin w₁ ≃ Ŵ₁`, realized as the **power enumeration** `i ↦ γ^i` of a fixed
+generator `γ` of the cyclic dual (`isCyclic_w1CharGroup`, Pontryagin self-duality
+`card_charGroup_subgroupOf`: `|Ŵ₁| = |W₁| = w₁`).  This is Peterfalvi's own indexing of the
+grid by character powers ((3.5)): `0 ↦ γ^0 = 1` keeps the distinguished base index of the
+(1.4) machinery (`w1CharEquiv_zero`), and index negation is character inversion
+(`w1CharEquiv_finNeg`) — the honest form of the (3.9.a) grid pairing (issue 3002; an
+arbitrary enumeration falsifies the `finNeg` pairing). -/
 noncomputable def w1CharEquiv [NeZero (Nat.card h.W1)] :
     Fin (Nat.card h.W1) ≃ ((h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :=
-  (Equiv.swap (0 : Fin (Nat.card h.W1)) (h.w1BaseEquiv.symm 1)).trans h.w1BaseEquiv
+  haveI := h.isCyclic_w1CharGroup
+  cyclicPowEnum (h.sdiffTICyclicHypothesis.card_charGroup_subgroupOf
+    h.sdiffTICyclicHypothesis.W1_le_W)
 
 @[simp] theorem w1CharEquiv_zero [NeZero (Nat.card h.W1)] : h.w1CharEquiv 0 = 1 := by
-  rw [w1CharEquiv, Equiv.trans_apply, Equiv.swap_apply_left, Equiv.apply_symm_apply]
+  haveI := h.isCyclic_w1CharGroup
+  rw [w1CharEquiv, cyclicPowEnum_apply]
+  simp
+
+/-- **Index negation is character inversion** (Peterfalvi (3.5)/(3.9.a) power-grid pairing):
+`w1CharEquiv ((w₁ − i) % w₁) = (w1CharEquiv i)⁻¹`.  The `(3.9.a)` `finNeg`-pairing of the
+`η`-grid is honest precisely because the enumeration satisfies this. -/
+theorem w1CharEquiv_finNeg [NeZero (Nat.card h.W1)] (i : Fin (Nat.card h.W1)) :
+    h.w1CharEquiv ⟨(Nat.card h.W1 - (i : ℕ)) % Nat.card h.W1,
+        Nat.mod_lt _ (Nat.pos_of_ne_zero (NeZero.ne _))⟩
+      = (h.w1CharEquiv i)⁻¹ := by
+  haveI := h.isCyclic_w1CharGroup
+  rw [w1CharEquiv]
+  refine cyclicPowEnum_eq_inv_of_add_mod_eq_zero _ ?_
+  show ((Nat.card h.W1 - (i : ℕ)) % Nat.card h.W1 + (i : ℕ)) % Nat.card h.W1 = 0
+  rcases Nat.eq_zero_or_pos (i : ℕ) with h0 | hpos
+  · simp [h0]
+  · have hi : (i : ℕ) < Nat.card h.W1 := i.2
+    rw [Nat.mod_eq_of_lt (by omega : Nat.card h.W1 - (i : ℕ) < Nat.card h.W1),
+      Nat.sub_add_cancel hi.le, Nat.mod_self]
 
 theorem w1CharEquiv_injective [NeZero (Nat.card h.W1)] :
     Function.Injective h.w1CharEquiv :=

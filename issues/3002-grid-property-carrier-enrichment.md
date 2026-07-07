@@ -382,3 +382,30 @@ consumer は `one_le_norm_signed_paired_sum` (抽象 `Equiv.Perm` を取る) 経
 (honest 反転 involution) が landing すれば c-side は restatement のみ** (`eta_pair` を同 involution で restate)。
 C は integrality+principal wiring は済/可、pairing involution の landing 待ち。lane-b の §13/§15 type-P layer
 landing 次第、上記 1・2 は薄い cite で close (C が assemble)。
+
+## ✅ 2026-07-07 (lane b): (3.9.a) unsound carrier 完全解消 — 構造保存 enumeration (commit df1ff47f)
+
+上記「⚠ (3.9.a) 未解決ハンドオフ」を **option (a) = 構造保存 enumeration** で honest close
+(A/B いずれでもなく、FT 旧 docstring が明記していた第 3 の sanctioned path):
+
+- `w1CharEquiv`/`chi2enum` を **生成元 power enumeration** (`S06.cyclicPowEnum`、新設 generic
+  block) に再定義。Peterfalvi 自身の (3.5) grid 添字 `ω_ij = ω₁^i ω₂^j` そのもので、
+  **combinatorial `finNeg` = character inversion が定義から成立** (`w1CharEquiv_finNeg` /
+  `chi2enum_finNeg` / `omegaSChar_finNeg`)。dual の cyclicity は新 S05 補題
+  `isCyclic_charGroup_subgroupOf` (Pontryagin self-duality の cyclicity 半分)。
+- `tau3W_omegaS_pair_of_coprime` の sorry を実証明に置換: ω_{−i,−j} = conj(ω_ij)
+  (`galoisMap_conj_omega`) + σ Galois 等変性 (`sigma_mapRingEquiv_comm`) + (3.9.c) 整数値
+  ⟹ η_{−i,−j}(g) = conj(η_ij(g)) = η_ij(g)。**#print axioms = 標準 3 公理のみ**。
+- **AxiomsCheck assert 再有効化** (`section16CharacterData_of_isMinimalSimpleOdd` axiom-clean、
+  endgame plan §4 完成条件 item 2 を discharge)。
+- **signature 変更ゼロ**: `S15.Hypothesis.eta_pair_of_coprime` (finNeg 形) は不変のまま真に。
+  **c-side (`EtaGenericData.eta_pair` finNeg 形) は restatement 不要** — そのまま honest 充填
+  可能 (option A で必要だった c-side 作業が消滅)。上記「c は pairing involution の landing 待ち」
+  は解消 — c は即 wire 可。
+- self-flag: S05/S06 は a 所有 — S05 追加は純 additive (omega_inner precedent)、S06 の
+  w1CharEquiv 再定義は signature/API 完全保存 (`w1CharEquiv_zero`/`_injective` statement 不変、
+  w1BaseEquiv 削除のみ)。hub review 対象として commit message にも明記。
+
+**⟹ 本 issue の b-side 供給は全完了** (grid property fields + (3.9) 3 fields すべて sorry-free
+供給、assert 全 green)。残 = c-side consumer 組立 (`lSideGridCoeffData` 残 3 field /
+`exists_MHypothesis` betaGrid、上記 2026-07-07 lane c 節)。
