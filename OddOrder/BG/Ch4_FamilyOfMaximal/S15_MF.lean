@@ -10396,7 +10396,60 @@ theorem A_le_fittingInAmbient_of_typeP1_nonnil [Finite G]
   -- `Q ≤ W` (`hmin`), i.e. every `x` centralizing `K̄` centralizes `Q̄`.  (issue 9017 #16.)
   have hLift : ∀ x ∈ OddOrder.BG.Ch3.S10.Msigma L,
       (∀ k ∈ K, ⁅x, k⁆ ∈ Q0) → (∀ y ∈ Q, ⁅x, y⁆ ∈ Q0) := by
-    sorry
+    have hMσnormQ0 : OddOrder.BG.Ch3.S10.Msigma L ≤ Subgroup.normalizer (Q0 : Set G) :=
+      hMσL.trans hMNQ0
+    have hQnormQ0 : Q ≤ Subgroup.normalizer (Q0 : Set G) := hQMσ.trans hMσnormQ0
+    -- `H = C_{M_σ}(K̄)`, the `M_σ`-elements centralizing `K` modulo `Q₀`.
+    let H : Subgroup G :=
+      { carrier := {x | x ∈ OddOrder.BG.Ch3.S10.Msigma L ∧ ∀ k ∈ K, ⁅x, k⁆ ∈ Q0}
+        one_mem' := ⟨(OddOrder.BG.Ch3.S10.Msigma L).one_mem, fun k _ => by
+          rw [commutatorElement_one_left]; exact Q0.one_mem⟩
+        mul_mem' := fun {x x'} hx hx' => ⟨(OddOrder.BG.Ch3.S10.Msigma L).mul_mem hx.1 hx'.1,
+          fun k hk => by
+            have heq : ⁅x * x', k⁆ = (x * ⁅x', k⁆ * x⁻¹) * ⁅x, k⁆ := by
+              rw [commutatorElement_def, commutatorElement_def, commutatorElement_def]; group
+            rw [heq]
+            have hxN0 : x ∈ Subgroup.normalizer (Q0 : Set G) := hMσnormQ0 hx.1
+            exact Q0.mul_mem ((Subgroup.mem_normalizer_iff.mp hxN0 ⁅x', k⁆).mp (hx'.2 k hk))
+              (hx.2 k hk)⟩
+        inv_mem' := fun {x} hx => ⟨(OddOrder.BG.Ch3.S10.Msigma L).inv_mem hx.1, fun k hk => by
+          have heq : ⁅x⁻¹, k⁆ = x⁻¹ * ⁅x, k⁆⁻¹ * (x⁻¹)⁻¹ := by
+            rw [commutatorElement_def, commutatorElement_def]; group
+          rw [heq]
+          have hxN0 : x ∈ Subgroup.normalizer (Q0 : Set G) := hMσnormQ0 hx.1
+          exact (Subgroup.mem_normalizer_iff.mp ((Subgroup.normalizer (Q0 : Set G)).inv_mem hxN0)
+            ⁅x, k⁆⁻¹).mp (Q0.inv_mem (hx.2 k hk))⟩ }
+    have hHle : H ≤ OddOrder.BG.Ch3.S10.Msigma L := fun x hx => hx.1
+    -- `W = {y ∈ Q : ∀ x ∈ H, ⁅x,y⁆ ∈ Q₀}`, the `Q̄`-elements fixed by `H`.
+    let W : Subgroup G :=
+      { carrier := {y | y ∈ Q ∧ ∀ x ∈ H, ⁅x, y⁆ ∈ Q0}
+        one_mem' := ⟨Q.one_mem, fun x _ => by rw [commutatorElement_one_right]; exact Q0.one_mem⟩
+        mul_mem' := fun {y y'} hy hy' => ⟨Q.mul_mem hy.1 hy'.1, fun x hx => by
+          have heq : ⁅x, y * y'⁆ = ⁅x, y⁆ * (y * ⁅x, y'⁆ * y⁻¹) := by
+            rw [commutatorElement_def, commutatorElement_def, commutatorElement_def]; group
+          rw [heq]
+          have hyN0 : y ∈ Subgroup.normalizer (Q0 : Set G) := hQnormQ0 hy.1
+          exact Q0.mul_mem (hy.2 x hx)
+            ((Subgroup.mem_normalizer_iff.mp hyN0 ⁅x, y'⁆).mp (hy'.2 x hx))⟩
+        inv_mem' := fun {y} hy => ⟨Q.inv_mem hy.1, fun x hx => by
+          have heq : ⁅x, y⁻¹⁆ = y⁻¹ * ⁅x, y⁆⁻¹ * (y⁻¹)⁻¹ := by
+            rw [commutatorElement_def, commutatorElement_def]; group
+          rw [heq]
+          have hyN0 : y ∈ Subgroup.normalizer (Q0 : Set G) := hQnormQ0 hy.1
+          exact (Subgroup.mem_normalizer_iff.mp ((Subgroup.normalizer (Q0 : Set G)).inv_mem hyN0)
+            ⁅x, y⁆⁻¹).mp (Q0.inv_mem (hy.2 x hx))⟩ }
+    have hWle : W ≤ Q := fun y hy => hy.1
+    have hKW : K ≤ W := fun k hk => ⟨hKstarQ hk, fun x hx => hx.2 k hk⟩
+    have hQ0W : Q0 ≤ W := fun z hz => ⟨hQ0Q hz, fun x hx => by
+      have hxN0 : x ∈ Subgroup.normalizer (Q0 : Set G) := hMσnormQ0 (hHle hx)
+      rw [commutatorElement_def]
+      exact Q0.mul_mem ((Subgroup.mem_normalizer_iff.mp hxN0 z).mp hz) (Q0.inv_mem hz)⟩
+    have hQ0ltW : Q0 < W := lt_of_le_of_ne hQ0W (fun heq => hKstarNotQ0 (le_of_le_of_eq hKW heq.symm))
+    -- `W` is `M`-normal (from the `M`-invariance of `H`); the deep chief-factor step.
+    have hWnorm : (W.subgroupOf L).Normal := by sorry
+    have hQW : Q ≤ W := hmin W hQ0ltW hWle hWnorm
+    intro x hxMs hxK y hyQ
+    exact (hQW hyQ).2 x ⟨hxMs, hxK⟩
   -- `A ⊆ F(L)`: each `a ∈ A` is in `M_σ`, centralizes `K̄` (trivially, `A ⊆ C(K)`), hence by the
   -- lifting centralizes `Q̄`, hence lies in `F(L)` (`hsecFit`).
   intro a ha
