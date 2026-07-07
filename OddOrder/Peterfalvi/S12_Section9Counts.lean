@@ -1652,6 +1652,45 @@ theorem toHypothesis46_toHypothesis [Finite G] (hG : OddOrder.BG.IsMinimalSimple
   rfl
 
 open scoped FiniteInduce in
+/-- **A nontrivial μ-grid column has a nontrivial `W₂`-dual**: `muColumnChar j ≠ 1` for `j ≠ 0`.
+The Pontryagin reindex `finCardEquivCharacterGroup` is normalized to send `0` to the trivial
+character (`finCardEquivCharacterGroup_zero`), so by injectivity a nonzero column index gives a
+nontrivial dual.  This is the `χ₂ ≠ 1` input of `columnSum_mem_certainTypeSet` for the μ-grid
+column sums. -/
+theorem Hypothesis.muColumnChar_ne_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    {j : Fin hyp.w2} (hj : j ≠ 0) :
+    hyp.muColumnChar hG hodd j ≠ 1 := by
+  haveI := hyp.finiteG
+  classical
+  -- rebuild the `muColumnChar` definition chain (instance-defeq trap §5)
+  set h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis with hhdef
+  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  set χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
+    finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j) with hχ₂def
+  have hchar : hyp.muColumnChar hG hodd j = χ₂ := by
+    unfold Hypothesis.muColumnChar
+    rfl
+  rw [hchar, hχ₂def]
+  intro heq
+  -- `1 = fCECG 0`, so injectivity forces `finCongr … j = 0`, i.e. `j = 0`
+  have heq' : finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j)
+      = finCardEquivCharacterGroup (↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) 0 := by
+    rw [finCardEquivCharacterGroup_zero]
+    exact heq
+  have hj0 : finCongr hcardW2sub.symm j = 0 :=
+    (finCardEquivCharacterGroup _).injective heq'
+  apply hj
+  ext
+  simpa using congrArg Fin.val hj0
+
+open scoped FiniteInduce in
 /-- **§10 μ-grid column sum = §6 certain-type column sum** (the world-joining identification):
 `∑ᵢ muGrid i j = columnSum (toHypothesis46 …) (muColumnChar j)`.  Both sides enumerate the same
 §6 `columnFamily` column — `muGrid` through the `finCongr` row-reindex (a bijection, so
@@ -1700,5 +1739,62 @@ theorem Hypothesis.muGrid_columnSum_eq_columnSum [Finite G]
     rfl
   rw [hstep1, OddOrder.Peterfalvi.S06.columnSum_def, hchar]
   with_unfolding_all rfl
+
+open scoped FiniteInduce in
+/-- **Cross-column degree constancy at the §6 interface** (Peterfalvi (10.3)): two nontrivial
+μ-grid columns have equal column-sum degrees, phrased on the §6 `columnFamily` sums that
+`columnSum_mem_certainTypeSet` consumes.  Via `muGrid_columnSum_eq_columnSum` (evaluated at `1`)
+this is `∑ᵢ muGrid i j (1) = ∑ᵢ muGrid i k (1)`, which is `muGrid_apply_one_eq` entrywise. -/
+theorem Hypothesis.muColumnChar_columnSum_apply_one_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) [NeZero (Nat.card (hyp.toHypothesis46 hG hodd).W1)]
+    (hw2 : (hyp.w2).Prime) {j k : Fin hyp.w2} (hj : j ≠ 0) (hk : k ≠ 0) :
+    (∑ i, (((hyp.toHypothesis46 hG hodd).columnFamily (hyp.muColumnChar hG hodd j)).mu i
+        : ClassFunction ↥M ℂ) 1)
+      = (∑ i, (((hyp.toHypothesis46 hG hodd).columnFamily (hyp.muColumnChar hG hodd k)).mu i
+        : ClassFunction ↥M ℂ) 1) := by
+  haveI := hyp.finiteG
+  classical
+  rw [← OddOrder.Peterfalvi.S06.columnSum_apply_one, ← OddOrder.Peterfalvi.S06.columnSum_apply_one,
+    ← hyp.muGrid_columnSum_eq_columnSum hG hodd j, ← hyp.muGrid_columnSum_eq_columnSum hG hodd k]
+  -- `(Σᵢ muGrid i j) 1 = (Σᵢ muGrid i k) 1` — sum-apply + per-entry (10.3)
+  have hsum : ∀ j' : Fin hyp.w2, (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j') 1
+      = ∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j' 1 := fun j' =>
+    map_sum (AddMonoidHom.mk' (fun φ : ClassFunction ↥M ℂ => φ (1 : ↥M)) (fun _ _ => rfl))
+      (fun i => hyp.muGrid hG hodd i j') Finset.univ
+  rw [hsum j, hsum k]
+  exact Finset.sum_congr rfl (fun i _ => hyp.muGrid_apply_one_eq hG hodd hw2 i i hj hk)
+
+
+open scoped FiniteInduce in
+/-- **A reducible kernel-filter member lies in the certain-type set** (the all-reducible-corner
+membership composite, issue 1019 update⁶³): a reducible member `ψ` of any kernel filtration
+`S(B) = inducedKernelFamily M' B` is a nontrivial μ-grid column sum
+(`reducible_mem_inducedKernelFamily_eq_muGrid_columnSum`), which under the world-join
+`muGrid_columnSum_eq_columnSum` is the §6 `columnSum` at the nontrivial dual
+(`muColumnChar_ne_one`) of matching degree (`muColumnChar_columnSum_apply_one_eq`), hence lies in
+`certainTypeSet (toHypothesis46 …) (muColumnChar kref)` for any nonzero reference column `kref`.
+Feeding `isCoherent_of_subset` on `certainTypeSet_isCoherent_A0`, this closes the reducible side
+of the (9.11) family coherence. -/
+theorem Hypothesis.reducible_mem_inducedKernelFamily_mem_certainTypeSet [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M) (hnt : TypePNontrivialCore M hyp.typeP)
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetup htype hnt))
+    [NeZero (Nat.card (hyp.toHypothesis46 hG hG.odd).W1)]
+    (hw2 : (hyp.w2).Prime) {kref : Fin hyp.w2} (hkref : kref ≠ 0)
+    {B : Subgroup ↥M} {ψ : ClassFunction ↥M ℂ}
+    (hψ : ψ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+      ((derivedInG M).subgroupOf M) B)
+    (hred : ¬ IsIrreducibleCharacter ψ) :
+    ψ ∈ OddOrder.Peterfalvi.S06.certainTypeSet (hyp.toHypothesis46 hG hG.odd)
+      (hyp.muColumnChar hG hG.odd kref) := by
+  haveI := hyp.finiteG
+  classical
+  obtain ⟨k, hk0, rfl⟩ :=
+    hyp.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum hG htype hnt chief hψ hred
+  rw [hyp.muGrid_columnSum_eq_columnSum hG hG.odd k]
+  exact OddOrder.Peterfalvi.S06.columnSum_mem_certainTypeSet _
+    (hyp.muColumnChar_ne_one hG hG.odd hk0)
+    (hyp.muColumnChar_columnSum_apply_one_eq hG hG.odd hw2 hk0 hkref)
 
 end OddOrder.Peterfalvi.S12
