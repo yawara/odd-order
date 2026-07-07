@@ -10159,6 +10159,141 @@ theorem opiCore_isUniquelyMaximal_of_isSylow [Finite G] (hG : OddOrder.BG.IsMini
   rw [hMQ, Set.mem_singleton_iff] at hNmem
   exact hNmem
 
+/-- **`O_q(L)` is a Sylow-`q` of `L` (`q ∤ [L : O_q(L)]`)** for a type-`P` maximal `L` with
+`κ(L)`-Hall `Ks`, `K = L_σ ⊓ C(Ks)`, `q ∈ π(K) ∩ σ(L)` (Coq `sylQ`, `tau2_P2type_signalizer`
+BGsection15.v:1319).  Reduces to `q ∤ [L_σ : Q]` (index tower with `q ∤ [L:L_σ]`, `σ`-Hall); the
+`q`-core `Q = O_q(L) = O_q(L_σ)` is a Sylow-`q` of `L_σ` in both cases: `L_σ` nilpotent ⟹ `Q` a
+Hall `{q}`-subgroup (`oPiCore_isHall_of_isNilpotent`); `L_σ` non-nilpotent ⟹ `L` type-`P₁`
+(Thm 15.2) with a `K`-invariant `q'`-complement `D` of `Q` in `L_σ`
+(`exists_kInvariant_qComplement`), so `[L_σ:Q] = |D|` is a `q'`-number. -/
+theorem opiCore_index_coprime_of_typeP [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {L Ks K : Subgroup G} {q : ℕ} [Fact q.Prime]
+    (hL : L ∈ maximalSubgroups G) (hP : S14.IsTypeP L) (hKsL : Ks ≤ L)
+    (hKs : Ch03.IsHallSubgroup (S14.kappa L) (Ks.subgroupOf L))
+    (hKdef : K = OddOrder.BG.Ch3.S10.Msigma L ⊓ Subgroup.centralizer (Ks : Set G))
+    (hqπK : q ∈ S14.piSet K) (hqσ : q ∈ OddOrder.BG.Ch3.S10.sigma L) :
+    ¬ q ∣ ((opiCoreInG ({q} : Set ℕ) L).subgroupOf L).index := by
+  classical
+  haveI : IsSolvable ↥L := hG.solvable_of_mem_maximalSubgroups hL
+  set Q : Subgroup G := opiCoreInG ({q} : Set ℕ) L with hQdef
+  have hMσL : OddOrder.BG.Ch3.S10.Msigma L ≤ L := OddOrder.BG.Ch3.S10.Msigma_le L
+  have hQMσ : Q ≤ OddOrder.BG.Ch3.S10.Msigma L := by
+    rw [hQdef]; exact OddOrder.BG.Ch3.S10.opiCoreInG_singleton_le_Msigma_of_mem_sigma hqσ
+  have hMnormQ : L ≤ Subgroup.normalizer (Q : Set G) := by
+    rw [hQdef]; exact OddOrder.GroupTheory.le_normalizer_opiCoreInG _ L
+  have hQpg : IsPGroup q ↥Q := by rw [hQdef]; exact isPGroup_opiCoreInG_singleton L
+  -- `q ∤ [L_σ : Q]`.
+  have hqidxMσ : ¬ q ∣ (Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma L)).index := by
+    by_cases hnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma L)
+    · -- nilpotent: `Q = O_q(L_σ)` is a Hall `{q}`-subgroup of `L_σ`.
+      have hMnormMσ : L ≤ Subgroup.normalizer ((OddOrder.BG.Ch3.S10.Msigma L : Subgroup G) : Set G) :=
+        (Subgroup.normal_subgroupOf_iff_le_normalizer hMσL).mp
+          (by rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance)
+      have hQeqMσ : Q = opiCoreInG ({q} : Set ℕ) (OddOrder.BG.Ch3.S10.Msigma L) := by
+        rw [hQdef]; exact opiCoreInG_eq_of_normal_le hMσL hMnormMσ (hQdef ▸ hQMσ)
+      have hQsub_eq : Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma L)
+          = Ch03.oPiCore ({q} : Set ℕ) ↥(OddOrder.BG.Ch3.S10.Msigma L) := by
+        rw [hQeqMσ, OddOrder.BG.Ch3.S10.opiCoreInG_subgroupOf]
+      haveI : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma L) := hnil
+      have hHall : Ch03.IsHallSubgroup ({q} : Set ℕ)
+          (Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma L)) := by
+        rw [hQsub_eq]; exact OddOrder.BG.Ch3.S10.oPiCore_isHall_of_isNilpotent ({q} : Set ℕ)
+      exact fun hd => hHall.2 q (Nat.mem_primeFactors.mpr
+        ⟨Fact.out, hd, Subgroup.index_ne_zero_of_finite⟩) (Set.mem_singleton q)
+    · -- non-nilpotent: type-`P₁`; `Q` has a `K`-invariant `q'`-complement `D` in `L_σ`.
+      have hne : MF L ≠ OddOrder.BG.Ch3.S10.Msigma L := fun heq =>
+        hnil ((maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent hG hL).mp heq)
+      have hP1 : S14.IsTypeP1 L := isTypeP1_of_mf_ne_msigma hG hL hne
+      have hKprime : (Nat.card ↥K).Prime :=
+        kstar_card_prime_of_inputs hG hL hP1 hKsL hKs hKdef
+      have hKcard : Nat.card ↥K = q :=
+        ((Nat.prime_dvd_prime_iff_eq Fact.out hKprime).mp (Nat.dvd_of_mem_primeFactors hqπK)).symm
+      have hMσderived : OddOrder.BG.Ch3.S10.Msigma L = derivedInG L :=
+        typeP1_msigma_eq_derivedInG hG hL hP1 hKsL hKs hKdef
+      obtain ⟨hcomplDer, _, _⟩ := S14.typeP_duality hG hL hP hKsL hKs hKdef
+      have hcomplMσ : Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma L).subgroupOf L)
+          (Ks.subgroupOf L) := by rw [hMσderived]; exact hcomplDer
+      have hcop_sub : Nat.Coprime (Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma L).subgroupOf L))
+          (Nat.card ↥(Ks.subgroupOf L)) := by
+        have h := coprime_card_derived_kappaHall_of_isComplement' hKs hcomplDer
+        rwa [← hMσderived] at h
+      have hcond2 := actsPrimeManner_subgroupOf_of_typeP hG hL hP hKsL hKs hKdef
+      have hqG : (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma L
+          ⊓ Subgroup.centralizer (Ks : Set G))).Prime := by rw [← hKdef]; exact hKprime
+      have hKstarQ : K ≤ Q := by
+        have h := kstar_le_opiCore_of_inputs hG hL hKsL hcomplMσ hcop_sub.symm hcond2 hne hqG
+        rw [← hKdef, hKcard, ← hQdef] at h; exact h
+      have hcopKMσ : Nat.Coprime (Nat.card ↥Ks) (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma L)) := by
+        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMσL).toEquiv,
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKsL).toEquiv] at hcop_sub
+        exact hcop_sub.symm
+      have hKMσdisj : Disjoint Ks (OddOrder.BG.Ch3.S10.Msigma L) := by
+        rw [disjoint_iff]
+        exact Subgroup.card_eq_one.mp (Nat.eq_one_of_dvd_coprimes hcopKMσ
+          (Subgroup.card_dvd_of_le inf_le_left) (Subgroup.card_dvd_of_le inf_le_right))
+      have hKsne : Ks ≠ ⊥ := by
+        intro h0
+        apply hnil
+        have hKeqMσ : K = OddOrder.BG.Ch3.S10.Msigma L := by
+          rw [hKdef, h0]
+          have hc : Subgroup.centralizer ((⊥ : Subgroup G) : Set G) = ⊤ := by
+            rw [Subgroup.coe_bot]; ext g; simp [Subgroup.mem_centralizer_iff]
+          rw [hc, inf_top_eq]
+        exact (IsPGroup.of_card (show Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma L) = q ^ 1 by
+          rw [pow_one, ← hKcard, hKeqMσ])).isNilpotent
+      have hQneMσ : Q ≠ OddOrder.BG.Ch3.S10.Msigma L := fun hQeq =>
+        hnil (hQeq ▸ hQpg.isNilpotent)
+      obtain ⟨D, hDMσ, -, -, hcomplD, -, -, hDq'⟩ :=
+        exists_kInvariant_qComplement hG hL hP hKsL hKs hKdef hQdef hQMσ hMnormQ hKstarQ hQneMσ
+          hKsne hKMσdisj hcopKMσ
+      rw [hcomplD.symm.index_eq_card, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hDMσ).toEquiv]
+      exact fun hd => hDq' (Nat.mem_primeFactors.mpr ⟨Fact.out, hd, Nat.card_pos.ne'⟩)
+  -- Tower `[L:Q] = [L_σ:Q]·[L:L_σ]` with `q ∤ [L:L_σ]` (`σ`-Hall).
+  have hMσHall : Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma L)
+      ((OddOrder.BG.Ch3.S10.Msigma L).subgroupOf L) :=
+    OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hL
+  have hqidxMσL : ¬ q ∣ ((OddOrder.BG.Ch3.S10.Msigma L).subgroupOf L).index := fun hd =>
+    hMσHall.2 q (Nat.mem_primeFactors.mpr ⟨Fact.out, hd, Subgroup.index_ne_zero_of_finite⟩) hqσ
+  intro hd
+  have htower : Q.relIndex (OddOrder.BG.Ch3.S10.Msigma L)
+      * (OddOrder.BG.Ch3.S10.Msigma L).relIndex L = Q.relIndex L :=
+    Subgroup.relIndex_mul_relIndex Q (OddOrder.BG.Ch3.S10.Msigma L) L hQMσ hMσL
+  have hd' : q ∣ Q.relIndex (OddOrder.BG.Ch3.S10.Msigma L)
+      * (OddOrder.BG.Ch3.S10.Msigma L).relIndex L := htower ▸ hd
+  rcases (Nat.Prime.dvd_mul Fact.out).mp hd' with h1 | h2
+  · exact hqidxMσ h1
+  · exact hqidxMσL h2
+
+/-- **BG Theorem 15.2 `sAFL`, non-nilpotent case** (Coq `tau2_P2type_signalizer` sAFL step,
+BGsection15.v:1322 via `Fcore_structure`): for a type-`P` maximal `L` with non-nilpotent `L_σ`
+(`M_F ≠ M_σ`, so `L` is type-`P₁`), `κ(L)`-Hall `Ks`, `K = L_σ ⊓ C(Ks)`, a rank-2 elementary
+abelian `A ≤ L_σ` lies in `F(L)`.  `A` centralizes the chief factor `Q/Q₀` (`Q = O_q(L)`,
+`Q₀ = C_Q(D)`, `D` the `q'`-complement), so `A ⊆ C_{L_σ}(Q/Q₀) = F(L)`
+(`centralizer_msigma_quotient_le_fittingInAmbient`).
+
+The hypothesis `A ≤ C(K)` (`K = C_{L_σ}(Ks)`) is Coq's `cKA` — **essential for soundness**: the
+bare statement "every rank-2 `A ≤ L_σ` lies in `F(L)`" is *false* when `q1 ≠ q` (an `A ≤ D` in the
+`q'`-complement acting non-innerly on `Q` escapes `F(L) = Q·C(Q)`); Coq's `A` centralizes `K`, which
+via the chief-factor action forces `A ⊆ C_{L_σ}(Q/Q₀) = F(L)`.
+
+⚠ **Genuinely gated §15 input** (the third `sAFL`/`sylQ` clause, now the *only* remaining gate of
+`typeP_partner_sylow_uniquelyMaximal_bundle` — `sylQ` = `opiCore_index_coprime_of_typeP` and `uniqQ`
+= `opiCore_isUniquelyMaximal_of_isSylow` are proved).  The repo `mf_ne_msigma_typeP1_structure`
+exposes `F(L) = Q·C_M(Q)` and the complement `Q ⋊ D`, but not the `C_{L_σ}(Q/Q₀)` characterization
+nor the "`A` centralizes the chief factor `Q/Q₀`" fact (Coq's `quotient_cents` step: `⁅a, y⁆ ∈ Q₀`
+for `a ∈ A`, `y ∈ Q`); porting it needs the detailed `Fcore_structure` chief-factor output.
+(issue 9017 update #12/#15.) -/
+theorem A_le_fittingInAmbient_of_typeP1_nonnil [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L Ks K A : Subgroup G} {q1 : ℕ}
+    (hL : L ∈ maximalSubgroups G) (hP : S14.IsTypeP L) (hKsL : Ks ≤ L)
+    (hKs : Ch03.IsHallSubgroup (S14.kappa L) (Ks.subgroupOf L))
+    (hKdefL : K = OddOrder.BG.Ch3.S10.Msigma L ⊓ Subgroup.centralizer (Ks : Set G))
+    (hne : MF L ≠ OddOrder.BG.Ch3.S10.Msigma L)
+    (hA : A ∈ elemAbelianOfRank G q1 2) (hAMσ : A ≤ OddOrder.BG.Ch3.S10.Msigma L)
+    (hACK : A ≤ Subgroup.centralizer (K : Set G)) :
+    A ≤ fittingInAmbient L := by
+  sorry
+
 /-- **BG Theorem 12.15 / `Ptype_structure` + `Fcore_structure` `sylQ`/`sAFL`/`uniqQ` bundle**
 (Coq `tau2_P2type_signalizer`, BGsection15.v:1315--1333): for a type-`P` maximal `L` with
 `κ(L)`-Hall `Ks`, `K = L_σ ⊓ C(Ks)` (`|K| = q` prime, `q ∈ σ(L)`), and a rank-2 elementary abelian
@@ -10183,16 +10318,37 @@ consequence of Coq `Ptype_structure`/`Fcore_structure`. (issue 9017 update #12.)
 theorem typeP_partner_sylow_uniquelyMaximal_bundle [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {L Ks K A : Subgroup G} {q q1 : ℕ} [Fact q.Prime]
-    (hL : L ∈ maximalSubgroups G) (hP : S14.IsTypeP L)
+    (hL : L ∈ maximalSubgroups G) (hP : S14.IsTypeP L) (hKsL : Ks ≤ L)
     (hKs : Ch03.IsHallSubgroup (S14.kappa L) (Ks.subgroupOf L))
     (hKdefL : K = OddOrder.BG.Ch3.S10.Msigma L ⊓ Subgroup.centralizer (Ks : Set G))
     (hqπ : q ∈ S14.piSet K) (hqσ : q ∈ OddOrder.BG.Ch3.S10.sigma L)
     (hq1prime : q1.Prime) (hA : A ∈ elemAbelianOfRank G q1 2)
-    (hAMσ : A ≤ OddOrder.BG.Ch3.S10.Msigma L) :
+    (hAMσ : A ≤ OddOrder.BG.Ch3.S10.Msigma L)
+    (hACK : A ≤ Subgroup.centralizer (K : Set G)) :
     A ≤ fittingInAmbient L ∧
       (∃ P : Sylow q ↥L, opiCoreInG ({q} : Set ℕ) L = (P : Subgroup ↥L).map L.subtype) ∧
       IsUniquelyMaximal (opiCoreInG ({q} : Set ℕ) L) := by
-  sorry
+  classical
+  have hQidx : ¬ q ∣ ((opiCoreInG ({q} : Set ℕ) L).subgroupOf L).index :=
+    opiCore_index_coprime_of_typeP hG hL hP hKsL hKs hKdefL hqπ hqσ
+  have hMσL : OddOrder.BG.Ch3.S10.Msigma L ≤ L := OddOrder.BG.Ch3.S10.Msigma_le L
+  have hQMσ : opiCoreInG ({q} : Set ℕ) L ≤ OddOrder.BG.Ch3.S10.Msigma L :=
+    OddOrder.BG.Ch3.S10.opiCoreInG_singleton_le_Msigma_of_mem_sigma hqσ
+  have hQL : opiCoreInG ({q} : Set ℕ) L ≤ L := hQMσ.trans hMσL
+  have hMnormQ : L ≤ Subgroup.normalizer ((opiCoreInG ({q} : Set ℕ) L : Subgroup G) : Set G) :=
+    OddOrder.GroupTheory.le_normalizer_opiCoreInG _ L
+  have hQpg : IsPGroup q ↥(opiCoreInG ({q} : Set ℕ) L) := isPGroup_opiCoreInG_singleton L
+  refine ⟨?_, exists_sylow_eq_opiCore rfl hQL hMnormQ hQpg hQidx,
+    opiCore_isUniquelyMaximal_of_isSylow hG hL hP hKsL hKs hKdefL hqπ hqσ hQidx⟩
+  -- `sAFL`: `A ⊆ F(L)`, by cases on nilpotency of `L_σ`.
+  by_cases hnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma L)
+  · -- nilpotent: `A ≤ L_σ ≤ M_F ≤ F(L)`.
+    exact hAMσ.trans ((Msigma_le_maxNilpotentNormalHall_of_nilpotent hG hL hnil).trans
+      (maxNilpotentNormalHall_le_fittingInG L))
+  · -- non-nilpotent: type-`P₁`; the isolated chief-factor lemma.
+    have hne : MF L ≠ OddOrder.BG.Ch3.S10.Msigma L := fun heq =>
+      hnil ((maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent hG hL).mp heq)
+    exact A_le_fittingInAmbient_of_typeP1_nonnil hG hL hP hKsL hKs hKdefL hne hA hAMσ hACK
 
 /-- **BG `Ptype_structure` "not-`P₁` ⟹ `q ∈ β`" clause** (Coq `tau2_P2type_signalizer` `P1maxL`,
 BGsection15.v:1342--1344): a type-`P` maximal `L` with `κ(L)`-Hall `Ks`, `K = L_σ ⊓ C(Ks)`
@@ -10369,8 +10525,8 @@ theorem tau2_transfer_constraint [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
     rw [hQdef]; exact OddOrder.GroupTheory.le_normalizer_opiCoreInG _ Mstar
   -- **`sAFL` + `sylQ` + `uniqQ`** (Keystone A): `A ≤ F(M*)`, `Q = O_q(M*)` a Sylow of `M*`, `Q ∈ 𝒰`.
   obtain ⟨hAFL, ⟨P, hPQ⟩, hQU⟩ :=
-    typeP_partner_sylow_uniquelyMaximal_bundle hG hMstarmax hMstP hKsHall hKeq hqπK hqσL
-      hq1prime hA_elem hAMσstar
+    typeP_partner_sylow_uniquelyMaximal_bundle hG hMstarmax hMstP hKsMstar hKsHall hKeq hqπK hqσL
+      hq1prime hA_elem hAMσstar hACK
   -- **`def_q1`** (Coq lines 1329--1338): `q₁ = q`.  If `q₁ ≠ q`, `A ⊆ C(Q)` (both in the nilpotent
   -- `F(M*)`, coprime) makes `H = M*` (uniqueness engine), contradicting `H ≠ M*`.
   have hneqHL : H ≠ Mstar := fun hHL => tau2_subset_sigma_compl Mstar (hHL ▸ hq1) hq1σL

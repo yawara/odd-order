@@ -466,3 +466,39 @@ Coq `P2type_signalizer` は `H ∩ M* = D` (D=σ(H)'-Hall) の**厳密同定**�
   `Ptype_structure` の Sylow→𝒰 clause port。**唯一の残 deep gate**。次の作業対象 (C 済ゆえ文書順で A へ)。
 - **Cor 15.9** `centralizer_escape_final_local` (S15_MF:10569 sorried): Thm 15.8 (assembled) + Thm 15.7
   を cite。`typeF_frobenius_of_tau2_prime_free` の S16→S15 hoist が要。
+
+## 2026-07-07 更新 #15 (lane b, /loop) — ★Keystone A の 2/3 gated clause (sylQ + uniqQ) 実証明で閉じ、bundle assembled
+
+**`typeP_partner_sylow_uniquelyMaximal_bundle` (Keystone A) を assemble** — 自身の bare sorry を
+除去。3 gated clause のうち **2 本 (uniqQ, sylQ) を sorry-free で実証明**、nilpotent sAFL も実証明、
+残 gate は non-nilpotent sAFL 1 本のみ (sharp sub-lemma に隔離)。build GREEN (S15 3120 jobs)。
+
+### ★docstring の circularity 恐怖は誤りだった (uniqQ)
+Keystone A docstring は「uniqQ の唯一 route = `nonabelian_pgroup_isUniquelyMaximal` (def_q1 に
+circular)」と恐れたが**誤り**。§13 の **Lemma 13.6 `maximalContaining_eq_singleton_of_E1`** が
+`𝓜(S)={M}` を直接与える (Coq clause (e) の repo 実体)。
+
+### 新 lemma 3 本
+- **`opiCore_isUniquelyMaximal_of_isSylow`** (uniqQ, sorry-free): Q=O_q(L) が Sylow-q ⟹ Q∈𝒰。
+  Lemma 13.6 (X=⟨w⟩≤K, P=E₁ from `exists_typePESetup_kappaHall`) → 𝓜(Q)={L} → `of_unique_maximal`。
+- **`opiCore_index_coprime_of_typeP`** (sylQ, sorry-free): Q=O_q(L) は L の Sylow-q (q∤[L:Q])。
+  case split: nilpotent L_σ ⟹ Q Hall (`oPiCore_isHall_of_isNilpotent`); non-nil ⟹ type-P1、
+  `exists_kInvariant_qComplement` の q'-complement D で [L_σ:Q]=|D| が q'-数。tower で [L:Q]。
+- **`A_le_fittingInAmbient_of_typeP1_nonnil`** (non-nil sAFL, **sorried** — 残 gate): Coq
+  `quotient_cents` step (A が chief factor Q/Q₀ を centralize、`⁅a,y⁆∈Q₀`)。repo Thm 15.2 は
+  `F(L)=Q·C(Q)` と complement は expose するが `C_{L_σ}(Q/Q₀)` characterization / chief-factor
+  centralization は未 expose。`centralizer_msigma_quotient_le_fittingInAmbient` に食わせる
+  `⁅a,y⁆∈C(D)` が genuine gap。
+
+### 残 keystone 状況 (更新)
+- **Keystone A**: bundle assembled、残 = non-nil sAFL (`A_le_fittingInAmbient_of_typeP1_nonnil`) のみ。
+- **Cor 15.9** (`centralizer_escape_final_local`、S15_MF:10790 sorried): Thm 15.8 (assembled) を cite。
+
+### ⚠ 更新 #15 補足: sAFL sub-lemma の soundness 修正 (hACK 追加)
+初版の `A_le_fittingInAmbient_of_typeP1_nonnil` は `A ∈ ℰ²(L_σ)` のみで `A ⊆ F(L)` を主張したが
+**q1≠q で unsound** (q'-complement D 内で Q に non-inner に作用する A は F(L)=Q·C(Q) を逃れる)。
+Coq の A は `cKA : A ⊆ C(K)` (K=M の κ-complement) を持つ ⟹ chief-factor 作用経由で
+`A ⊆ C_{L_σ}(Q/Q₀)=F(L)`。sub-lemma + bundle に `hACK : A ≤ C(K)` を追加し Coq 準拠の sound な
+statement に修正 (consumer は `exists_rank2_elemAb_le_centralizer_kappa_of_tau2` の hACK を供給)。
+build GREEN 3120。⟹ 残 gate = `A_le_fittingInAmbient_of_typeP1_nonnil` (sound, sorried, Fcore
+chief-factor port 要) の 1 本 + Cor 15.9。
