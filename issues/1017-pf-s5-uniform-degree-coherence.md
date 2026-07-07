@@ -743,3 +743,33 @@ tau=dade map の isometry route、**BG §15 に non-gated**、§9 (9.8.d) ≥2 c
 sub-gate ((9.8.d)、S11:11691 sorried-cite 可) → NEW IsCoherent → `coherent_H0Cprime_S` re-point
 → CharacterDegreeData の tau1S 3 fields (extension= G1、差分上 Ind 一致 = G2 `sInstance_dade_eq_induce`
 + `sSet_member_diffsupp`)。SibleyTarget route (S15:2237) は G1+G2 完成時に置換・retire。
+
+## 2026-07-08 更新 #24 (lane b, /loop 再開) — ★(9.11) port 着工: skeleton + 最初の §9 brick landed
+
+**G1 の正体を確定**: (13.3) G1 = **Pf (9.11) `Ptype_core_coherence` の本体 port** (Coq PFsection9.v:1484-2227
+精読 + 書籍 mmd 04.11 (9.11.1)-(9.11.8) 全読)。9016 HUB RULING で hY producer = b 確定済 → claim 済扱いで着工。
+
+**構造 (書籍準拠)**: Clifford (9.7) 二分。case (b) = 全 member 次数 qu (`caseB_degree_qu` 済) → 一様次数
++ 混合ノルム (μ_j はノルム q) の adjoin。case (a) = maximality 帰納 — S₁ (次数 qa cut) → maximal coherent
+conj-closed S₂ → S₃ ≠ ∅ なら (9.11.1) squeeze: strict 枝 = `xAdjoinStepW`(_k) 発火で maximality 矛盾 /
+equality 枝 = 特殊配置 (a=(p-1)/2, C=U', S₂=S₁, |S₁|=2u/a, S₃ 全次数 qu) を (9.11.2)-(9.11.8) で反証
+((9.11.2) 慣性論法 U₁∩U₁^w=C・u≤a² / (9.11.3) |S₄| count / (9.11.4) γ=Ind 1_{HU₁}, α=γ-ψ₁ ノルム /
+(9.11.5) 算術矛盾 2^q>q+2 / (9.11.6)-(9.11.8) τ₁/τ₃ 直交性代数)。
+
+**設計裁定 (lane a 1019 と非重複)**: (9.11) core は **Dade pair (S04.Hypothesis + hconj) パラメータ化**で
+§9 world に build (per-member Dmem/hortho は入力として受ける — a の §12 部品 (columnBreakDa /
+irrFamilyMemberDecomposition / R⊥R §12) と衝突しない; a の gate-2 hY 消費は S12→本 leaf の import が
+必要になるため **本 leaf は S12/S13 を import しない** (循環回避、家族 fact は S11 直 or 入力)。
+
+**landed (両 commit sorry-free, axiom-clean)**:
+- d84ea453 (S07_Subcoherent): maximality skeleton 3 定理 — `exists_maximal_coherent_between` /
+  `coherent_of_maximal_coherent_refuted` / `coherent_of_maximal_coherent_pair_refuted` (書籍 (9.11)
+  冒頭の reduction; refuter は「S₃ nonempty + 全 pair adjoin 不能」の (9.11) 状況を受ける)。
+- 1e178611 (S11_NineElevenCoherence 新設): `xiOf_H0Cprime_source_apply_one_le_u` (χ(1) ≤ u、書籍
+  (9.11.1) 第1段落 / Coq lb01 内側) + member 形 `sOf_H0Cprime_apply_one_le_qu` (φ(1) ≤ qu)。
+
+**次 (文書順)**: (i) 𝒮(H₀C') family facts (finite / S₁ = deg-qa cut の family 化)、(ii) (9.11.1) squeeze
+assembly (lb0≤lb1 は上記 bound + a∣χ(1) [case (a) a_dv_XH0 = 要 port]、lb12/lb23/lb3S1'/lbS1'2 は
+S07_Subcoherent 済部品 + §9 counting 接続)、(iii) strict 枝の member-data bundle (XAdjoinStepInputW
+構成; S-instance 供給は S15 の sSetIrrDeg_subcoherent 内部部品 + μ_j 側 R-data)、(iv) equality 枝
+(9.11.2)-(9.11.8)。case (b) 一様 route は a の 1019 特殊化と重なるため hub 経由で分担確認しつつ進む。
