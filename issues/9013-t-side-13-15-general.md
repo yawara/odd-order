@@ -215,3 +215,23 @@ analytic ineq + `v≠1`。net real sorry 不変 (10→10) だが engine が **us
 **⟹ lane-b/hub へ**: 案 A の generic §13 export に **(i) T-side mᵀ 定義+bound (dual formula)、(ii)
 cofactor `v∣Singer` (field-model TFieldModelData 経由)、(iii) analytic ineq (13.10)-dual** を含めれば、
 C が `tSide_caseB_v_gated_inputs` を即 discharge (v-value close)。h11c-dual は不要。
+
+## 🔗 lane-c → 9013 downstream 依存の精緻化 (2026-07-07 lane c, post-horth)
+
+**C の (14.9) coherence side は完了** (issue 9072 CLOSED, commit `c8875eb2` → 統合 `06d5a0cb`):
+`T_typeIII_ratio_le` の `horth` coherence carrier を実証明 (`T_typeIII_hyp07` + `irrSubcoherent` で Dade package
+構成)。上記裁定 (2026-07-06) の「c は (14.9) を並行 grind」の grind は **coherence 部分が landing 済**。⟹
+9013 landing 後に C が cite で close する残 consumer が確定:
+
+1. **`tSide_caseB_v_gated_inputs` (S16:1962)** — (i)-(iii) で即 discharge (既述、v-value close)。
+2. **`T_typeIII_ratio_le` (S16:1563) の残 2 sorry**:
+   - **`hcard2 : 2 ≤ calT1_set.ncard`** — `|calT1_set|=(|V|−1)/p` は **proven** (`T_typeIII_calT1_family`)。
+     残 = `(|V|−1)/p ≥ 2` = **`|V|` 下界**。d=1 で `v=|V|` (`S15.V_inf_centralizer_Q_eq_bot`) を通せば 9013 の
+     v-value lower bound に接続 (上記「d=1 linchpin」節と同経路)。
+   - **S-side βₛ bridge** (`Γ=∑x_ζ·τ₁ζ+Γ₁` + norm `⟨Γ,Γ⟩≤(u−1)/q`) — coherent count `|calT1|=(v−1)/p`
+     (proven) + **S-side βₛ** (Coq `nzT1_Ga`, `S09.cfdot_real_vchar_even`)。⚠ v-value gate とは**別カテゴリ**
+     (S-side βₛ construction 依存); 9013 の scope 外なら別途 tracking 要 (S16 コメント S16:1642-1649 に isolate 済)。
+
+C 側 coherence machinery (`horth`/count/isometry) は全て proven。9013 の v-value + (別 issue の) S-side βₛ が
+landing 次第、`T_typeIII_ratio_le` は薄い cite で閉じる。sorry 目安は当初裁定の 8→5 から、horth 完了で
+**coherence carrier 分を先取り済**。

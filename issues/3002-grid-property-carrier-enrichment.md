@@ -363,3 +363,22 @@ keystone (d7cb137a) は **(3.9.c) integrality + (3.9) principal を honest 供�
 (先行 subagent が A を着手し Section16Inputs 更新中で停止 → incomplete edit は破棄済、
 d7cb137a の documented-gate 状態から再開)。**c は integrality+principal の wiring は今すぐ可**
 (それらは honest)。pairing のみ上記 fix 待ち。
+
+## 🔗 lane-c → 3002 downstream 依存の精緻化 (2026-07-07 lane c, post-horth)
+
+**C の (14.9) coherence side は完了** (issue 9072 CLOSED, commit `c8875eb2`)。3002 (η-grid Track A) が
+landing すると unblock する C の残 S16 consumer は以下 2 箇所:
+
+1. **`lSideGridCoeffData` (S16:7092) の `m_row_odd`/`m_col_odd`/`grid_mem`** — `coeff`/`m_principal`/`bessel`
+   は **proven in-place** (lane-c-available)。残 3 field は Coq `FTtypeI_bridge_facts` (S/T type-P partner
+   parity, PFsection13.v:1987) + `Y=0` grid membership (PFsection14.v:212-251) に gated。S16:7112-7143 に
+   "Verified c-unreachable" 分析記載済 (c の唯一の parity primitive `cfdot_real_vchar_even` は η 実性が無く
+   逆 parity を与える)。
+2. **`exists_MHypothesis` (S16:8131)** の η-grid ±1 signs (`1_G+Δ=∑ signs_ij·η_ij`) — Track A、S16:8138-8146。
+   構造/σ-counting/set 部分は全 proven; 残るは η-grid 展開の ±1 sign の honest joint existence のみ。
+
+**⚠ (3.9.a) `EtaGenericData.eta_pair` 未解決ハンドオフ (上記 A/B 節) との関係**: C の `EtaGenericData`
+consumer は `one_le_norm_signed_paired_sum` (抽象 `Equiv.Perm` を取る) 経由。上記通知どおり **option A
+(honest 反転 involution) が landing すれば c-side は restatement のみ** (`eta_pair` を同 involution で restate)。
+C は integrality+principal wiring は済/可、pairing involution の landing 待ち。lane-b の §13/§15 type-P layer
+landing 次第、上記 1・2 は薄い cite で close (C が assemble)。
