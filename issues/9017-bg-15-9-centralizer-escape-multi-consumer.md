@@ -421,3 +421,19 @@ hub 検証): sylQ → uniqQ[keystone] → def_q1 (F(L) nilpotent) → b'q → P1
 - **Cor 15.9** (`centralizer_escape_final_local`、S15_MF:10595 依然 sorried): Thm 15.8 (now assembled) を
   cite して E2=1 → Thm 15.7 (E3=1/cyclic) → Frobenius M。`typeF_frobenius_of_tau2_prime_free` の
   S16→S15 hoist が要 (b territory)。live consumer = S16_MainResults:5764 `exists_RData_escape_structure`。
+
+## 2026-07-07 更新 #13 (lane b, /loop) — Keystone C の port target 特定: Coq P2type_signalizer 最終 clause
+
+Keystone C (`signalizer_msigma_sup_inf_partner_eq`, H_σ⊔(H∩Mstar)=H) の閉鎖経路を特定。**Coq
+`P2type_signalizer` (BGsection14.v:2243、= repo `typeP2_neighbor_is_typeF_of_mem` の source) の結論
+最終 clause が `\sigma(H)^'.-Hall(H) (H :&: Mstar)`** を明示証明: 「H∩Mstar は H の σ(H)'-Hall」。
+repo の `typeP2_neighbor_is_typeF_of_mem` (S14:11396) は**この concrete な H∩Mstar を generic E-setup
+(`exists_subgroupESetup_with_le`) で置換して deviate** しており、H∩Mstar-Hall fact を expose しない。
+
+⟹ Keystone C は **genuine な Coq 内容の port** (新規数学でない): (1) 「H∩Mstar は σ(H)'-Hall of H」を
+port (Coq P2type_signalizer 証明の該当部, 2243+; repo 内部 Mst=typeP_duality partner=Mstar)、(2) 一般
+「H = H_σ ⋊ (σ(H)'-Hall)」(Coq `sdprod_sigma`) で H_σ⊔(H∩Mstar)=H。signature 破壊回避のため新 standalone
+lemma を推奨 (既存神経 lemma の caller 群を壊さない)。
+
+**残 keystone 状況**: A (§14 Ptype_structure clause (e) = `p∈π(Kstar), S p-Sylow(M) ⟹ 𝓜(S)={M}`、
+BGsection14.v:456-473 の comp 4.2、multi-consumer 15/16 で再利用) と C (本更新)。文書順 C(14.12系)<A。

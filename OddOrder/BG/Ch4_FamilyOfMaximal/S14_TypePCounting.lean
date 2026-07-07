@@ -12138,5 +12138,89 @@ theorem exists_sigmaDecomposition_length_le_two [Finite G]
       obtain ⟨M, hMmax, hgM⟩ := hgsharp
       exact hMtilde M hMmax hgM
 
+/-! ### Subnormal closure into the `C(K)`-unique maximal (Coq `snK_sMst`)
+
+Coq `P2type_signalizer` (BGsection14.v:2283) uses `snK_sMst L : K <|<| L → L ⊆ Mst`: any
+subgroup `L` in which the `κ`-Hall `K` is *subnormal* is contained in the unique maximal `Mst`
+over `C_G(K)`.  We port it here (S14 territory) via the base uniqueness `sK_uniqMst`
+(`∀ a, K ≤ Mst^a → a ∈ Mst`) and a strong induction on `|L|` peeling normal layers
+(`IsSubnormal.exists_normal_and_le_and_lt_top_of_ne`).  It supplies `E ⊆ Mst` (Coq `sDMst`)
+for the signalizer decomposition Keystone C. -/
+
+/-- **Coq `snK_sMst` single step**: if `N ⊆ Mstar`, `K ≤ N`, `L` normalizes `N`, and `K` has
+the uniqueness property `∀ a, K ≤ Mstar^a → a ∈ Mstar` (Coq `sK_uniqMst`), then `L ⊆ Mstar`.
+For `a ∈ L`, `a` normalizes `N`, so `N^{a⁻¹} = N`, whence `K^{a⁻¹} ≤ N^{a⁻¹} = N ⊆ Mstar`,
+i.e. `K ≤ Mstar^a`, so `a ∈ Mstar`. -/
+theorem le_partner_of_normalizes_of_le_of_uniq {K Mstar N L : Subgroup G}
+    (hNMstar : N ≤ Mstar) (hKN : K ≤ N) (hLN : L ≤ Subgroup.normalizer (N : Set G))
+    (huniq : ∀ a : G, K ≤ MulAut.conj a • Mstar → a ∈ Mstar) :
+    L ≤ Mstar := by
+  intro a ha
+  -- `a⁻¹` normalizes `N`, so `conj a⁻¹ • N = N`.
+  have haN : MulAut.conj a⁻¹ • N = N :=
+    OddOrder.GroupTheory.conj_smul_eq_self_of_mem_normalizer
+      (Subgroup.inv_mem _ (hLN ha))
+  -- `conj a⁻¹ • K ≤ conj a⁻¹ • N = N ≤ Mstar`.
+  have hKconj : MulAut.conj a⁻¹ • K ≤ Mstar :=
+    (Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hKN).trans (haN.le.trans hNMstar)
+  -- Rewrite as `K ≤ conj a • Mstar` and apply the uniqueness hypothesis.
+  have hKMstar : K ≤ MulAut.conj a • Mstar := by
+    have := Subgroup.pointwise_smul_le_pointwise_smul_iff (a := MulAut.conj a).mpr hKconj
+    rwa [← mul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul] at this
+  exact huniq a hKMstar
+
+/-- **Coq `snK_sMst`** (BGsection14.v:2283): if `K` is *subnormal* in `L` (`K ≤ L`,
+`(K.subgroupOf L).IsSubnormal`), `K ≤ Mstar`, and `K` has the uniqueness property
+`∀ a, K ≤ Mstar^a → a ∈ Mstar`, then `L ⊆ Mstar`.  Strong induction on `|L|`: if `K = L`,
+done; otherwise peel a proper `↥L`-normal overgroup `N̄` of `K.subgroupOf L`
+(`exists_normal_and_le_and_lt_top_of_ne`), so `N := N̄.map L.subtype` is a proper subgroup with
+`K ≤ N`, `K` subnormal in `N` (restriction), `L ≤ N_G(N)` (`N̄ ◁ ↥L`); the induction hypothesis
+gives `N ⊆ Mstar`, and the single-step lemma lifts it to `L ⊆ Mstar`. -/
+theorem le_partner_of_subnormal_of_uniq [Finite G] {K Mstar : Subgroup G}
+    (huniq : ∀ a : G, K ≤ MulAut.conj a • Mstar → a ∈ Mstar) (hKMstar : K ≤ Mstar) :
+    ∀ L : Subgroup G, K ≤ L → (K.subgroupOf L).IsSubnormal → L ≤ Mstar := by
+  intro L
+  induction hcard : Nat.card ↥L using Nat.strong_induction_on generalizing L with
+  | _ n ih =>
+    intro hKL hsub
+    by_cases hKLtop : K.subgroupOf L = ⊤
+    · -- `K = L` (as `K ≤ L`), so `L = K ≤ Mstar`.
+      have hLK : L ≤ K := by
+        intro x hx
+        have hmem : (⟨x, hx⟩ : ↥L) ∈ K.subgroupOf L := by rw [hKLtop]; exact Subgroup.mem_top _
+        exact (Subgroup.mem_subgroupOf).mp hmem
+      exact hLK.trans hKMstar
+    · -- Peel a proper `↥L`-normal overgroup `N̄` of `K.subgroupOf L`.
+      obtain ⟨Nbar, hNbarnorm, hKNbar, hNbarlt⟩ :=
+        hsub.exists_normal_and_le_and_lt_top_of_ne hKLtop
+      haveI := hNbarnorm
+      set N : Subgroup G := Nbar.map L.subtype with hNdef
+      have hNL : N ≤ L := Subgroup.map_subtype_le _
+      have hNbar_eq : N.subgroupOf L = Nbar :=
+        Subgroup.comap_map_eq_self_of_injective L.subtype_injective Nbar
+      -- `K ≤ N`.
+      have hKN : K ≤ N := by
+        have hmm : (K.subgroupOf L).map L.subtype ≤ N := Subgroup.map_mono hKNbar
+        rwa [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hKL] at hmm
+      -- `|N| < |L|` (proper).
+      have hNlt : Nat.card ↥N < Nat.card ↥L := by
+        have hNbne : N ≠ L := by
+          intro h
+          apply hNbarlt.ne
+          rw [← hNbar_eq, h, Subgroup.subgroupOf_self]
+        refine lt_of_le_of_ne (Nat.le_of_dvd Nat.card_pos (Subgroup.card_dvd_of_le hNL))
+          (fun heq => hNbne (Subgroup.eq_of_le_of_card_ge hNL heq.ge))
+      -- `K` subnormal in `N` (restrict the subnormal series along `N ≤ L`).
+      have hKNsub : (K.subgroupOf N).IsSubnormal := by
+        have hcomap := hsub.comap (Subgroup.inclusion hNL)
+        rwa [Subgroup.comap_inclusion_subgroupOf hNL] at hcomap
+      -- Induction hypothesis: `N ⊆ Mstar`.
+      have hNMstar : N ≤ Mstar := ih (Nat.card ↥N) (hcard ▸ hNlt) N rfl hKN hKNsub
+      -- `L ≤ N_G(N)` (`N̄ ◁ ↥L`), so the single-step lemma gives `L ⊆ Mstar`.
+      have hLnN : L ≤ Subgroup.normalizer (N : Set G) := by
+        rw [← Subgroup.normal_subgroupOf_iff_le_normalizer hNL, hNbar_eq]
+        exact hNbarnorm
+      exact le_partner_of_normalizes_of_le_of_uniq hNMstar hKN hLnN huniq
+
 end OddOrder.BG.Ch4.S14
 
