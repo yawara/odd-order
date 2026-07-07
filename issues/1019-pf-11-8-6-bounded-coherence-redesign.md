@@ -1151,3 +1151,30 @@ adjoin_muColumnPair_of_irrFamily の hgen 引数 → hdeganchor (μ(1)=χ₁(1))
 - hdeganchor/hdiffasuppχ/hμZ: caseB uniform-qu 特殊化時に §9 facts から
 次 = **end-to-end caseB 特殊化 skeleton** (s = irr-cut、pieces を束ね、named = hDeg + hortho_mem
 の 2 つだけの assembly) or hortho_mem §12 化。
+
+## 🔬 update⁷¹ (2026-07-08 lane-a /loop) — 節目 full build green + caseB 特殊化の設計 map (handoff)
+
+### ✅ full build 検証 (commit 群 0865d818〜0a550775 の節目)
+lake build OddOrder green、2m07s、sorry warnings 84 (regression なし; 直近の (9.11) 追加は全て
+sorry-free)。
+
+### caseB end-to-end 特殊化 `caseB_adjoinOneColumnPair` の設計 map (次 iteration で build)
+target: s = irr-cut (`{φ ∈ sOf(H0Cprime) | irr ∧ deg d}`) + 1 column pair の adjoin を
+`adjoin_muColumnPair_of_irrFamily` の特殊化として。
+- **Finset 化**: irr-cut は finite (⊆ inducedFamily finite via sOf_subset_SOf + subset_bot +
+  inducedKernelFamily_finite) → `hfin.toFinset`、coercion は `Set.Finite.coe_toFinset`。
+- **hS₁**: `sOf_degreeSubfamily_isCoherent` (landed) — Finset coercion 越しに family 一致。
+- **hsub**: irr-cut ⊆ sOf ⊆ SOf = IKF ⊆ IKF ⊥ = inducedFamily (landed 鎖)。
+- **hconjS**: sOf_closedUnderConjugate + irr.conj + deg conj (star_natCast) — ~10 行。
+- **hdegmem**: 全 member deg d (cut 定義) + anchor も deg d → x 1 = χ₁ 1。
+- **hμ_S1/hμbar_S1**: `columnSum_inner_irr_member_eq_zero` (piece 4) — x ∈ cut → IKF member
+  (sOf_subset_SOf + SOf_eq) + irr。params/hmu は S13.Hypothesis の params/params_mu_eq。
+- **Dmem** = `irrFamilyMemberDecomposition` (piece 1)、htau1Dmem = rfl。
+- **Da** = `columnBreakDa` (piece 2; anchor χ₁ ∈ IKF は同鎖)、hDatau1 = rfl。
+- **残 named (真の外部入力)**: ①hDeg (2 < |irr-cut|、§9 counting)、②hortho_mem (§12 化未、
+  caseB_member_orthoDatum_columnBreak mirror)、③hdegcol (columnSum χ₂ 1 = (d:ℂ)、caseB
+  uniform-qu の §9 fact)、④hμZ (columnSum ∈ ZIrr — Σ irr で組立可、小)、⑤hdiffasuppχ
+  ((μ−χ₁).support ⊆ A0 — μ ∈ inducedFamily [muGrid_column_sum_mem_inducedFamily + world-join、
+  hdk1 = nontrivial column deg ≠ 1 前提] + scaledDiff、caseB では ③ から)。
+④⑤は特殊化内で supply 可能見込み (⑤は μ ∈ IKF ⊥ 経由の scaledDiff_support、③から deg 一致)。
+∴ 特殊化後の真の残 = ①hDeg counting + ②hortho_mem + ③hdegcol (全て §9/caseB facts)。
