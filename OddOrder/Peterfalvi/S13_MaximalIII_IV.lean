@@ -38,6 +38,73 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce
 
 variable {G : Type*} [Group G]
 
+/-! ## Character-kernel subgroup (general helper)
+
+The character kernel `ker φ = {g | φ(g) = φ(1)}` of a **genuine** character `φ` is a subgroup:
+if `φ = χ_ρ` for a representation `ρ`, the keystone `rep_eq_id_of_character_eq_one` makes
+`ρ g = id` exactly on `ker φ`, and `{g | ρ g = id}` is closed under the group operations.  This
+is the general fact used by the (11.8.6) world-bridge decomposition below (to push a join
+`H ⊔ C` into a single kernel condition).  It is stated for a general finite group and is a
+candidate for hoisting to `S03_PreliminaryCharacter` once a second consumer appears. -/
+section CharacterKernelSubgroup
+
+open OddOrder.Peterfalvi.S03
+
+variable {Γ : Type*} [Group Γ] [Finite Γ]
+
+/-- **`ker φ` is closed under multiplication for a genuine character `φ`.**  Writing `φ = χ_ρ`,
+`rep_eq_id_of_character_eq_one` turns `x, y ∈ ker φ` into `ρ x = ρ y = id`, so `ρ (xy) = id` and
+`φ(xy) = tr(id) = φ(1)`. -/
+theorem characterKernel_mul_mem {φ : ClassFunction Γ ℂ} (hφ : IsCharacter φ)
+    {x y : Γ} (hx : x ∈ characterKernel φ) (hy : y ∈ characterKernel φ) :
+    x * y ∈ characterKernel φ := by
+  classical
+  obtain ⟨V, _, _, _, ρ, hchar⟩ := hφ
+  have hval : ∀ g : Γ, φ g = ρ.character g := fun g => congrFun hchar g
+  rw [mem_characterKernel, characterDegree_def] at hx hy
+  have hidx : ρ x = LinearMap.id :=
+    rep_eq_id_of_character_eq_one ρ (by simp only [← hval]; exact hx)
+  have hidy : ρ y = LinearMap.id :=
+    rep_eq_id_of_character_eq_one ρ (by simp only [← hval]; exact hy)
+  have hidxy : ρ (x * y) = LinearMap.id := by
+    rw [map_mul, hidx, hidy]; ext v; simp
+  rw [mem_characterKernel, characterDegree_def, hval (x * y), hval 1,
+    show ρ.character (x * y) = LinearMap.trace ℂ V (ρ (x * y)) from rfl, hidxy,
+    Representation.char_one, LinearMap.trace_id]
+
+/-- **`ker φ` is closed under inversion for a genuine character `φ`.**  From `ρ x = id`,
+`ρ x⁻¹ = (ρ x)⁻¹ = id` (via `ρ x⁻¹ · ρ x = ρ 1 = 1`). -/
+theorem characterKernel_inv_mem {φ : ClassFunction Γ ℂ} (hφ : IsCharacter φ)
+    {x : Γ} (hx : x ∈ characterKernel φ) : x⁻¹ ∈ characterKernel φ := by
+  classical
+  obtain ⟨V, _, _, _, ρ, hchar⟩ := hφ
+  have hval : ∀ g : Γ, φ g = ρ.character g := fun g => congrFun hchar g
+  rw [mem_characterKernel, characterDegree_def] at hx
+  have hidx : ρ x = LinearMap.id :=
+    rep_eq_id_of_character_eq_one ρ (by simp only [← hval]; exact hx)
+  have hidinv : ρ x⁻¹ = LinearMap.id := by
+    have h1 : ρ x⁻¹ * ρ x = 1 := by rw [← map_mul, inv_mul_cancel, map_one]
+    rw [hidx, show (LinearMap.id : V →ₗ[ℂ] V) = 1 from rfl, mul_one] at h1
+    rw [h1]; rfl
+  rw [mem_characterKernel, characterDegree_def, hval x⁻¹, hval 1,
+    show ρ.character x⁻¹ = LinearMap.trace ℂ V (ρ x⁻¹) from rfl, hidinv,
+    Representation.char_one, LinearMap.trace_id]
+
+/-- **The character kernel of a genuine character, packaged as a subgroup.** -/
+def characterKernelSubgroup {φ : ClassFunction Γ ℂ} (hφ : IsCharacter φ) : Subgroup Γ where
+  carrier := characterKernel φ
+  one_mem' := one_mem_characterKernel φ
+  mul_mem' hx hy := characterKernel_mul_mem hφ hx hy
+  inv_mem' hx := characterKernel_inv_mem hφ hx
+
+@[simp] theorem mem_characterKernelSubgroup {φ : ClassFunction Γ ℂ} (hφ : IsCharacter φ)
+    {g : Γ} : g ∈ characterKernelSubgroup hφ ↔ g ∈ characterKernel φ := Iff.rfl
+
+theorem coe_characterKernelSubgroup {φ : ClassFunction Γ ℂ} (hφ : IsCharacter φ) :
+    (characterKernelSubgroup hφ : Set Γ) = characterKernel φ := rfl
+
+end CharacterKernelSubgroup
+
 /-! ## (11.1): the auxiliary prime inequality -/
 
 /-- For `n >= 5`, the elementary estimate used in **Peterfalvi (11.1)**. -/
@@ -281,6 +348,87 @@ theorem sOf_subset_SOf [Finite G] {M : Subgroup G} (hyp : Hypothesis M) (Y : Sub
   refine ⟨χ, ?_, hχ.2, OddOrder.Peterfalvi.S11.induceHU_eq_induce hyp.s11Setup χ⟩
   intro htriv
   exact hχ.1 (by rw [htriv]; simp [OddOrder.Peterfalvi.S03.characterKernel])
+
+/-- **World-bridge decomposition (reverse of `sOf_subset_SOf`, S12:4055)**: the §10/§13
+kernel-filtered family `S(H₀C) = SOf(H₀C)` decomposes as the degree-`q` family `S(HC) = SOf(HC)`
+together with the §9 family `𝒮(H₀C) = sOf(H₀C)`.  This is Peterfalvi's `S(H₀C) = S₁ ⊔ S₂` (11.8,
+`S₁ = S(HC)`, `S₂ = 𝒮(H₀C)`), split by whether the source contains `H` in its kernel.
+
+*Covering.* A source `θ` of `SOf(H₀C)` (irreducible, `θ ≠ 1`, `H₀C ≤ Ker θ`): if `H ≤ Ker θ` then,
+since `C ≤ H₀C ≤ Ker θ` and `Ker θ` is a subgroup for the genuine `θ` (`characterKernelSubgroup`),
+`HC = H ⊔ C ≤ Ker θ`, so `Ind θ ∈ SOf(HC)`; if `H ⊄ Ker θ` then `θ ∈ 𝒳` and `Ind θ ∈ sOf(H₀C)`.
+*Reverse.* `SOf(HC) ⊆ SOf(H₀C)` (kernel antitone, `H₀C ≤ HC`) and `sOf(H₀C) ⊆ SOf(H₀C)`
+(`sOf_subset_SOf`).  This is the second half of the world-bridge; the (11.8.6) capstone glues the
+`S(HC)`-coherence (`SHC_isCoherent`) and the `𝒮(H₀C)`-coherence (9.11) along this decomposition. -/
+theorem SOf_H0C_eq_SOf_HC_union_sOf [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.SOf hyp.H0C
+      = hyp.SOf hyp.HC ∪ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C := by
+  classical
+  have hHU : OddOrder.Peterfalvi.S11.huSub hyp.s11Setup = (derivedInG M).subgroupOf M :=
+    OddOrder.Peterfalvi.S11.huSub_eq_derivedInG_subgroupOf hyp.s11Setup
+  have hHM : hyp.H ≤ M := hyp.base.typeP.H_le.trans (Subgroup.map_subtype_le _)
+  have hCM : hyp.C ≤ M :=
+    (hyp.C_le_U.trans hyp.base.typeP.U_le).trans (Subgroup.map_subtype_le _)
+  have hH0C_le_HC : hyp.H0C ≤ hyp.HC := by
+    have hH0H : hyp.chief.H0 ≤ hyp.H := by
+      have h : hyp.chief.H0 < hyp.s11Setup.typeP.H := hyp.chief.H0_lt_H
+      rw [hyp.setup_typeP_eq] at h
+      exact h.le
+    exact sup_le_sup_right hH0H hyp.C
+  have hH_huSub : hyp.H.subgroupOf M ≤ OddOrder.Peterfalvi.S11.huSub hyp.s11Setup := by
+    rw [hHU]; exact Subgroup.subgroupOf_mono M hyp.base.typeP.H_le
+  have hC_huSub : hyp.C.subgroupOf M ≤ OddOrder.Peterfalvi.S11.huSub hyp.s11Setup := by
+    rw [hHU]; exact Subgroup.subgroupOf_mono M (hyp.C_le_U.trans hyp.base.typeP.U_le)
+  apply Set.Subset.antisymm
+  · -- covering: `SOf(H₀C) ⊆ SOf(HC) ∪ sOf(H₀C)`
+    intro φ hφ
+    rw [hyp.SOf_eq, ← hHU, OddOrder.Peterfalvi.S08.mem_inducedKernelFamily] at hφ
+    obtain ⟨θ, hθne, hθker, rfl⟩ := hφ
+    by_cases hH :
+        (OddOrder.Peterfalvi.S11.hInHu hyp.s11Setup :
+            Set ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup))
+          ⊆ OddOrder.Peterfalvi.S03.characterKernel
+            (θ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ)
+    · -- `H ≤ Ker θ`: `Ind θ ∈ SOf(HC)`
+      left
+      rw [hyp.SOf_eq, ← hHU, OddOrder.Peterfalvi.S08.mem_inducedKernelFamily]
+      refine ⟨θ, hθne, ?_, rfl⟩
+      rw [← coe_characterKernelSubgroup θ.isIrreducible.isCharacter, SetLike.coe_subset_coe]
+      have hHCeq :
+          (hyp.HC.subgroupOf M).subgroupOf (OddOrder.Peterfalvi.S11.huSub hyp.s11Setup)
+            = (hyp.H.subgroupOf M).subgroupOf (OddOrder.Peterfalvi.S11.huSub hyp.s11Setup)
+              ⊔ (hyp.C.subgroupOf M).subgroupOf (OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) := by
+        rw [show hyp.HC = hyp.H ⊔ hyp.C from rfl, Subgroup.subgroupOf_sup hHM hCM,
+          Subgroup.subgroupOf_sup hH_huSub hC_huSub]
+      rw [hHCeq]
+      refine sup_le ?_ ?_
+      · -- `H`-trace ≤ Ker θ : this is `hInHu` (using `s11Setup.H = H`), which is `hH`
+        have hhin : OddOrder.Peterfalvi.S11.hInHu hyp.s11Setup
+            = (hyp.H.subgroupOf M).subgroupOf (OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) := by
+          show (hyp.s11Setup.typeP.H.subgroupOf M).subgroupOf
+                (OddOrder.Peterfalvi.S11.huSub hyp.s11Setup)
+              = (hyp.base.typeP.H.subgroupOf M).subgroupOf
+                (OddOrder.Peterfalvi.S11.huSub hyp.s11Setup)
+          rw [hyp.setup_typeP_eq]
+        rw [← hhin]
+        intro x hx
+        exact hH hx
+      · -- `C`-trace ≤ Ker θ : `C ≤ H₀C` and `hθker`
+        intro x hx
+        have hCH0C : hyp.C ≤ hyp.H0C := le_sup_right
+        exact hθker (Subgroup.subgroupOf_mono _ (Subgroup.subgroupOf_mono M hCH0C) hx)
+    · -- `H ⊄ Ker θ`: `Ind θ ∈ sOf(H₀C)`
+      right
+      rw [OddOrder.Peterfalvi.S11.mem_sOf]
+      exact ⟨θ, ⟨hH, hθker⟩,
+        (OddOrder.Peterfalvi.S11.induceHU_eq_induce hyp.s11Setup
+          (θ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ)).symm⟩
+  · -- reverse: both families sit inside `SOf(H₀C)`
+    apply Set.union_subset
+    · simp only [hyp.SOf_eq]
+      exact OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone
+        (Subgroup.subgroupOf_mono M hH0C_le_HC)
+    · exact hyp.sOf_subset_SOf hyp.H0C
 
 /-- **`M` normalizes `H₀C`** (`H₀ ⊴ M` from the chief data, `C ⊴ M` from (8.5.a)). -/
 theorem H0C_normalized_by_M {M : Subgroup G} (hyp : Hypothesis M) :
