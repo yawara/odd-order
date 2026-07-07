@@ -5163,6 +5163,83 @@ theorem Q_sharp_isTISubset [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [hU, vdata.U_eq_bot, Subgroup.card_bot, hyp.card_V_eq_vd] at hcardU
     exact hvd hcardU
 
+/-- **(13.2.a)-on-`T`, router form**: `T` is of type II, III or IV — the `T_nonI` classification
+minus type V, which is excluded by `|V| = v·d ≠ 1` (a type-V witness has `U = ⊥`, and `|V| =
+|tpd.U|` for the reconciled datum by the witness-independence `card_U_eq_index`; the same
+exclusion as `Q_sharp_isTISubset`).  This is what the §9 machinery's `TypesIIIIIIVSetup.type_alt`
+consumes — the finer (13.2.a) "II or III" (type-IV exclusion, Pf (11.9.b,c) on `T`) is not needed
+for the router. -/
+theorem Hypothesis.T_typeII_or_III_or_IV [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hvd : hyp.v * hyp.d ≠ 1) :
+    IsTypeII hyp.T ∨ IsTypeIII hyp.T ∨ IsTypeIV hyp.T := by
+  rcases hyp.T_nonI with h | h | h | h
+  · exact Or.inl h
+  · exact Or.inr (Or.inl h)
+  · exact Or.inr (Or.inr h)
+  · exfalso
+    obtain ⟨tpd, hU', -, -⟩ := reconciled_typePData_T hG hyp
+    have vdata := h.some
+    have hcardU : Nat.card ↥tpd.U = Nat.card ↥vdata.typeP.U := by
+      rw [tpd.card_U_eq_index, vdata.typeP.card_U_eq_index]
+    rw [hU', vdata.U_eq_bot, Subgroup.card_bot, hyp.card_V_eq_vd] at hcardU
+    exact hvd hcardU
+
+open scoped Classical in
+/-- **The §9 setup on `T`** (the (13.4) gate-3 router, issue 9013): the `TypesIIIIIIVSetup T`
+carrier assembled from the **reconciled** type-`P` datum (`reconciled_typePData_T`), so its
+`U`/`W1`/`W2` are the hypothesis's `V`/`W₂`/`W₁` (companions `toTypesIIIIIIVSetupT_U_eq` etc.)
+and its kernel is `H = T_F = Q` (`toTypesIIIIIIVSetupT_H_eq`).  Nontriviality: `U = V ≠ ⊥` from
+`|V| = v·d ≠ 1`; `|W1| = |W₂| = p` prime; the `M_F`-TI component of `TypePNontrivialCore` is
+datum-independent, read off any non-V type witness (`T_typeII_or_III_or_IV`).  Opens the §9
+machinery ((9.7)–(9.9), `typeII_III_IV_order_relations`, the `hcPsi` degree analysis) on `T` —
+the (13.3.b)-on-`T` route of the (13.4) θ-package.  Mirrors `toTypesIIIIIIVSetupS`; extracts the
+inline construction of `Q_elementaryAbelian_T` (`S15_SAndT`) without its `IsTypeII` hypothesis. -/
+noncomputable def Hypothesis.toTypesIIIIIIVSetupT [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1) :
+    OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup hyp.T where
+  maximal := hyp.T_maximal
+  typeP := (reconciled_typePData_T hG hyp).choose
+  nontrivial := by
+    obtain ⟨hU, hW1, -⟩ := (reconciled_typePData_T hG hyp).choose_spec
+    refine ⟨?_, ?_, ?_⟩
+    · rw [hU]
+      intro hbot
+      apply hvd
+      rw [← hyp.card_V_eq_vd, hbot, Subgroup.card_bot]
+    · rw [hW1, ← hyp.p_eq_card_W2]
+      exact hyp.p_prime
+    · rcases hyp.T_typeII_or_III_or_IV hG hvd with h | h | h
+      · exact h.some.common.2.2
+      · exact h.some.common.2.2
+      · exact h.some.common.2.2
+  type_alt := hyp.T_typeII_or_III_or_IV hG hvd
+
+theorem Hypothesis.toTypesIIIIIIVSetupT_U_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1) :
+    (hyp.toTypesIIIIIIVSetupT hG hvd).U = hyp.V :=
+  (reconciled_typePData_T hG hyp).choose_spec.1
+
+theorem Hypothesis.toTypesIIIIIIVSetupT_W1_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1) :
+    (hyp.toTypesIIIIIIVSetupT hG hvd).W1 = hyp.W2 :=
+  (reconciled_typePData_T hG hyp).choose_spec.2.1
+
+theorem Hypothesis.toTypesIIIIIIVSetupT_W2_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1) :
+    (hyp.toTypesIIIIIIVSetupT hG hvd).W2 = hyp.W1 :=
+  (reconciled_typePData_T hG hyp).choose_spec.2.2
+
+theorem Hypothesis.toTypesIIIIIIVSetupT_H_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1) :
+    ((hyp.toTypesIIIIIIVSetupT hG hvd).H : Subgroup G) = hyp.Q := by
+  show (reconciled_typePData_T hG hyp).choose.H = hyp.Q
+  rw [(reconciled_typePData_T hG hyp).choose.H_eq, hyp.Q_eq_TF]
+
 /-- **`q ∤ |H|`** — the order-theoretic core of the `(H^#)^G ∩ (Q^#)^G = ∅` disjointness:
 `H = PC ≤ S' = PU` has order dividing `|P|·|U|` (`derived_complement`), `q ∤ |P| = p^q`
 (`p ≠ q`), and `q ∤ |U|` (the `U W₁` Frobenius structure has coprime kernel and complement,
