@@ -6722,21 +6722,17 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- so the placeholders add no unsound dependency.  Closes one of the three POLE-1 producers
 -- (`mp`/`tp`/`charData`).
 --
--- ⚠ **issue-3002 keystone (2026-07-05, lane b)**: the producer now also supplies the three
--- Peterfalvi (3.9) η-grid Dade fields (`eta_intCast_of_coprime` (3.9.c) / `eta_principal_of_coprime`
--- (3.9) / `eta_pair_of_coprime` (3.9.a)).  Integrality + principal are supplied `sorry`-free
--- (`tau3W_omegaS_intCast_of_coprime` via S05 `exists_intCast_sigma_omega_apply`;
--- `tau3W_omegaS_principal_of_coprime` via `tau3W_trivial`).  The **(3.9.a) conjugate-pair
--- symmetry in `finNeg` form** (`tau3W_omegaS_pair_of_coprime`) carries **one documented `sorry`**
--- (the honest gate: `finNeg` = combinatorial index negation ≠ character inversion `rowInv` for the
--- nonconstructive `w1CharEquiv`/`chi2enum` enumerations — see the lemma docstring in
--- `FeitThompson.lean` and `notes/peterfalvi/s16_w4_char_cascade.md` "b progress 2026-07-05").
--- Hence the producer is **no longer axiom-clean** (transits `sorryAx` through the (3.9.a) field);
--- the assertion is disabled pending the honest close of the pairing gate (c-side restatement over
--- `rowInv`/`colInv`, which `one_le_norm_signed_paired_sum` already supports, or a
--- structure-preserving character enumeration).  The Step-D fallback is hub-sanctioned (issue 3002)
--- to land the FIELDS and unblock the c-lane's `EtaGenericData` wiring immediately.
--- #assert_only_allowed_axioms OddOrder.section16CharacterData_of_isMinimalSimpleOdd
+-- ✅ **issue-3002 keystone (2026-07-05 landed; 2026-07-07 honest close, lane b)**: the producer
+-- also supplies the three Peterfalvi (3.9) η-grid Dade fields (`eta_intCast_of_coprime` (3.9.c) /
+-- `eta_principal_of_coprime` (3.9) / `eta_pair_of_coprime` (3.9.a)), now **all `sorry`-free**.
+-- The former (3.9.a) gate (`finNeg` index negation ≠ character inversion for the old
+-- nonconstructive enumerations) was closed by rebuilding `w1CharEquiv`/`chi2enum` as
+-- **power enumerations** of the cyclic duals (`S06.cyclicPowEnum` — Peterfalvi's own (3.5) grid
+-- indexing `ω_{ij} = ω₁^i ω₂^j`), under which `finNeg` *is* character inversion
+-- (`w1CharEquiv_finNeg`/`chi2enum_finNeg` → `omegaSChar_finNeg`), so
+-- `tau3W_omegaS_pair_of_coprime` follows from Galois-equivariance (`sigma_mapRingEquiv_comm` +
+-- `galoisMap_conj_omega`) and (3.9.c) integrality.  Assertion re-enabled.
+#assert_only_allowed_axioms OddOrder.section16CharacterData_of_isMinimalSimpleOdd
 
 -- **Peterfalvi (5.7) standalone constant-degree coherence producer** —
 -- `coherent_of_constant_degree`: under Hypothesis (5.2) + equal degree, `S` is coherent.  Proven by

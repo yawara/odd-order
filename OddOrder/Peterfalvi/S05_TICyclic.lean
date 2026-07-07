@@ -941,6 +941,24 @@ theorem card_charGroup_subgroupOf (hyp : TICyclicHypothesis G) {H : Subgroup G}
     exact CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity ↥(H.subgroupOf hyp.W) ℂ
   rw [key, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHW).toEquiv]
 
+/-- **Pontryagin self-duality, cyclicity half**: the character group of a cyclic factor of `W` is
+itself cyclic — it is (noncanonically) isomorphic to the underlying group
+(`CommGroup.monoidHom_mulEquiv_of_hasEnoughRootsOfUnity`; `ℂˣ` has enough roots of unity).  With
+`card_charGroup_subgroupOf` this pins the dual as cyclic of order `|H|`, so it admits a
+*power enumeration* by a generator — the structure-preserving grid indexing of Peterfalvi (3.5)
+under which index negation is character inversion ((3.9.a)). -/
+theorem isCyclic_charGroup_subgroupOf (hyp : TICyclicHypothesis G) {H : Subgroup G}
+    (hHW : H ≤ hyp.W) :
+    IsCyclic ((H.subgroupOf hyp.W) →* ℂˣ) := by
+  haveI := hyp.W_cyclic
+  haveI : Finite G := Finite.of_fintype G
+  letI : CommGroup ↥(H.subgroupOf hyp.W) := IsCyclic.commGroup
+  haveI : NeZero ((Monoid.exponent ↥(H.subgroupOf hyp.W) : ℂ)) :=
+    ⟨Nat.cast_ne_zero.2 (NeZero.ne _)⟩
+  obtain ⟨e⟩ :=
+    CommGroup.monoidHom_mulEquiv_of_hasEnoughRootsOfUnity ↥(H.subgroupOf hyp.W) ℂ
+  exact isCyclic_of_surjective e.symm.toMonoidHom e.symm.surjective
+
 /-- **Peterfalvi (3.4), linear independence**: the family `(α_{ij})` (`1 ≤ i < w₁`, `1 ≤ j < w₂`,
 indexed by nontrivial character pairs) is linearly independent in `CF(W, V)`.  Proof by the
 biorthogonal system: the dual functional `⟨·, ω_{ij}⟩` evaluates `α_{kl}` to `δ_{(k,l),(i,j)}`

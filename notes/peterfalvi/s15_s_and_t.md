@@ -1340,3 +1340,36 @@ hub 裁定 (9009 選択肢 2) の実施完了 (commit 3dc9306e, full 3917 green 
   依存: (13.3)/(13.4) `character_degree_analysis` (λ 存在+counting) の現状確認から。
   hu (2u≤|P|-1, 13.2.c) = issue 9000 producer を sorried-cite 可。
 - 9009 は close (routing 完了)。3002 は wiring 完了まで open。
+
+---
+
+## ✅ LIVE STATUS (2026-07-07, lane b) — G2 (13.2.e normedTI) CLOSED + (3.9.a) unsound carrier 解消
+
+**本日 2 landing で S15 frontier が変形** (詳細 = issues/1017 末尾 + issues/3002 末尾):
+
+1. **G2 CLOSED (commit 76d1b27b)**: `escaping_honestTypeP2ASet_eq_empty` (Rung C、Coq
+   FTtypeP_facts (e) port) → `Hypothesis.isTISubset_honestTypeP2ASet` (A(S) TI = normedTI TI 半分)
+   + `Hypothesis.sInstance_dade_eq_induce` (isometry 半分: full-A(S) supported f 上で
+   dade = Ind_S^G)。9017 (BG Cor 15.9) の landing が case-P₂ 枝を、Pf (12.7) typeI_frobenius +
+   Isaacs 6.4 kernel regularity が case-F 枝を閉じた。
+2. **(3.9.a) honest close (commit df1ff47f)**: `w1CharEquiv`/`chi2enum` を生成元 power
+   enumeration (`S06.cyclicPowEnum`) に組替え (signature 完全保存) → finNeg = 文字反転が定義から
+   成立 → `tau3W_omegaS_pair_of_coprime` sorry-free (σ Galois 等変 + (3.9.c) 整数値)。
+   **AxiomsCheck assert 再有効化** (endgame plan §4 完成条件 item 2 discharge)。unsound carrier
+   ゼロに。c-side (EtaGenericData.eta_pair finNeg 形) は restatement 不要で即 wire 可。
+
+**次の frontier (文書順)**:
+- **(13.3) = G1 assembly のみ残**: base `sSetIrrDeg_coherent` (landed、h2/hd0 露出) →
+  `coherentPairChain` で mixed family (reducible μ_j = CharacterPsiDecomposition / 既約 conjugate
+  pairs) を adjoin → NEW IsCoherent → `coherent_H0Cprime_S` (S15:~1010) re-point →
+  `CharacterDegreeData` (S15:2316) の tau1S 3 fields = G1 extension + G2 dade=Ind
+  (`sInstance_dade_eq_induce` + `sSet_member_diffsupp`) で discharge → (13.3.a/c) μ-column
+  formulas。≥2 count sub-gate = (9.8.d) S11:11691 (sorried-cite 可)。
+- **(13.4) 残 gate 1** (`QD_sharp_centralizer_le_T` S15:5949) = A₀(T)-TI。Rung C の一般定理は
+  IsTypeP₂ M を取る — T 側は `T_typeII_or_III_or_IV` (type II/III/IV) で IsTypeP2 T は未 carry
+  (14.9 循環回避)。type-II case は Rung C がそのまま刺さる; type-III/IV (P₁) は matched κ-Hall
+  pair の一般 type-P 版 (`typeP2_exists_matched_kappa_hall_pair` の P₁ analogue) が要調査。
+  (Q⊔D)^# ⊆ A(T) は D = C_V(Q) 中心化で elementary。
+- **(13.4) 残 gate 3** (`tSide_theta_package_of_not_caseB` S15:6070) = (13.3.b,c)-on-T θ-package
+  — T-instance の §9 data は gate-3 router (`mkSection11CharacterDataT`、88237b38) で供給済、
+  中身は (13.3)-on-T ゆえ G1 の T-side mirror に帰着見込み。
