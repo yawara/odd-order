@@ -2315,4 +2315,231 @@ theorem C_eq_derivedU [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rw [hceq, hh1, one_mul]
   exact hu'
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(9.11) mixed-corner column-pair adjunction, §12 instantiation** (issue 1019 update⁶⁶): a
+coherent equal-degree irreducible family `s` (with anchor `χ₁ ∈ s`) absorbs one reducible
+certain-type column pair `{μ, μ̄}` (`μ = columnSum χ₂`, `μ̄ = μ_{χ₂⁻¹}` via `columnSum_conj_eq`),
+staying coherent on `A₀(M)`.  This is `xAdjoinStepW_k` instantiated at the §12 Dade data
+(`τ = hyp.tau`, `A = A₀(M)`, both definitional) with `a = 1` (uniform degree: `μ(1) = χ₁(1)`).
+
+The χ-side inner products, supports and the member-family data (`ι = ClassFunction`, `χmem = id`,
+`deg ≡ 1`, `mc ≡ 1`) are discharged here from the §6 column API (`columnFamily_mu_sum_inner`,
+`column_inv_ne_self`, `columnDiff_support_subset`) and the induced-family support machinery
+(`inducedKernelFamily_scaledDiff_support`).  The genuinely deep inputs stay as parameters:
+* `Dmem`/`Da`/`hortho_mem` — the (5.4)/(5.2.e) decomposition data (per-member ψ=0 via
+  `memberExtensionDecomposition`, break via `certainTypeDecompositionDa`, cross-orthogonality =
+  the §12 analogue of `certainTypeR_imageSet_orthogonal_dadeOfDiff`, a separate piece);
+* `hDeg` — the (5.6.c) counting `2 < |s|` (§9 size lower bound);
+* `hgen` — the supported-span generation (uniform-degree collapse, a separate piece);
+* `hμ_S1`/`hμbar_S1` — `μ ⊥ s` (at the irreducible-cut specialization:
+  `muGrid_inner_irr_member_eq_zero`). -/
+noncomputable def adjoin_muColumnPair_of_irrFamily [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)
+    [NeZero (Nat.card (hyp.toHypothesis46 hG hG.odd).W1)]
+    (s : Finset (ClassFunction ↥M ℂ))
+    (hS₁ : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (↑s) hyp.A0)
+    (hsub : (↑s : Set (ClassFunction ↥M ℂ)) ⊆ OddOrder.Peterfalvi.S12.inducedFamily M)
+    (hirr : ∀ x ∈ s, IsIrreducibleCharacter x)
+    {χ₁ : ClassFunction ↥M ℂ} (hχ₁s : χ₁ ∈ s)
+    {χ₂ : ((hyp.toHypothesis46 hG hG.odd).W2.subgroupOf
+      ((hyp.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.toHypothesis46 hG hG.odd).W2)) →* ℂˣ}
+    (hχ₂ : χ₂ ≠ 1)
+    (hdegmem : ∀ x ∈ s, x 1 = χ₁ 1)
+    (hμ_S1 : ∀ x ∈ s, ClassFunction.inner
+      (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂) x = 0)
+    (hμbar_S1 : ∀ x ∈ s, ClassFunction.inner
+      (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂).conj x = 0)
+    (Dmem : ∀ x ∈ s, OddOrder.Peterfalvi.S07.CharacterPsiDecomposition
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) x 0)
+    (htau1Dmem : ∀ x (hx : x ∈ s), (Dmem x hx).tau1 x = hS₁.extension x)
+    (Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+      (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂) (1 • χ₁))
+    (hDatau1 : Da.tau1 = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+    (hortho_mem : ∀ x (hx : x ∈ s), (Dmem x hx).imageFamily.Orthogonal Da.imageFamily)
+    (hdiffasuppχ : ((OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂
+      - χ₁ : ClassFunction ↥M ℂ)).support ⊆ hyp.A0)
+    (hμZ : OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂ ∈ ZIrr ↥M)
+    (hDeg : (2 : ℝ) < s.card)
+    (hdeganchor : OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂ 1
+      = χ₁ 1) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      ((↑s : Set (ClassFunction ↥M ℂ)) ∪
+        {OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂,
+         (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂).conj})
+      hyp.A0 := by
+  haveI := hyp.finiteG
+  classical
+  -- degree symmetry of the conjugate column pair
+  have hdegsym := OddOrder.Peterfalvi.S06.columnSum_inv_apply_one
+    (hyp.toHypothesis46 hG hG.odd) χ₂
+  have hconjcol : (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂).conj
+      = OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂⁻¹ :=
+    OddOrder.Peterfalvi.S06.columnSum_conj_eq (hyp.toHypothesis46 hG hG.odd) χ₂
+  -- χ-side inner products from the §6 column Gram (`⟨μ_j, μ_l⟩ = w₁·δ`)
+  have hχχne : ClassFunction.inner
+      (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂)
+      (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂) ≠ 0 := by
+    rw [OddOrder.Peterfalvi.S06.columnSum_def,
+      OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl]
+    exact Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  have hχbarχbarne : ClassFunction.inner
+      (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂).conj
+      (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂).conj ≠ 0 := by
+    rw [hconjcol, OddOrder.Peterfalvi.S06.columnSum_def,
+      OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl]
+    exact Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  have hχχbar : ClassFunction.inner
+      (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂)
+      (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂).conj = 0 := by
+    rw [hconjcol, OddOrder.Peterfalvi.S06.columnSum_def,
+      OddOrder.Peterfalvi.S06.columnSum_def,
+      OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner]
+    exact if_neg (OddOrder.Peterfalvi.S06.column_inv_ne_self
+      (hyp.toHypothesis46 hG hG.odd) hχ₂).symm
+  have hχbarχ : ClassFunction.inner
+      (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂).conj
+      (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂) = 0 := by
+    rw [hconjcol, OddOrder.Peterfalvi.S06.columnSum_def,
+      OddOrder.Peterfalvi.S06.columnSum_def,
+      OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner]
+    exact if_neg (OddOrder.Peterfalvi.S06.column_inv_ne_self
+      (hyp.toHypothesis46 hG hG.odd) hχ₂)
+  -- χ-side support: the conjugate column difference is `A(M)`-supported, hence `A₀`-supported
+  have hdiffsuppχ : (((OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂).conj
+      - OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂
+      : ClassFunction ↥M ℂ)).support ⊆ hyp.A0 := by
+    rw [hconjcol]
+    exact (OddOrder.Peterfalvi.S06.columnDiff_support_subset (hyp.toHypothesis46 hG hG.odd)
+      (inv_ne_one.mpr hχ₂) hχ₂ hdegsym).trans
+      (OddOrder.Peterfalvi.S04.supportInSubgroup_mono Set.subset_union_left)
+  -- members are `S(⊥)`-members (for the scaled-difference support machinery)
+  have hmemIKF : ∀ x ∈ s, x ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+      ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) := fun x hx => by
+    have h := hsub hx
+    rwa [OddOrder.Peterfalvi.S12.inducedFamily_eq_inducedKernelFamily_bot] at h
+  -- member-side: equal-degree differences against the anchor are `A₀`-supported
+  have hmemdegdiffsupp : ∀ x ∈ s,
+      ((x - (1 : ℕ) • χ₁ : ClassFunction ↥M ℂ)).support ⊆ hyp.A0 := fun x hx => by
+    refine OddOrder.Peterfalvi.S08.inducedKernelFamily_scaledDiff_support
+      hyp.mderivSharp_subset_A0 (hmemIKF x hx) (hmemIKF χ₁ hχ₁s) ?_
+    rw [Nat.cast_one, one_mul]
+    exact hdegmem x hx
+  -- member-side Gram: distinct irreducibles are orthonormal (`mc ≡ 1`)
+  have hmemortho : ∀ x ∈ s, ∀ y ∈ s, ClassFunction.inner x y
+      = if x = y then ((1 : ℝ) : ℂ) else 0 := fun x hx y hy => by
+    have h := irreducibleCharacter_inner_eq_ite ⟨x, hirr x hx⟩ ⟨y, hirr y hy⟩
+    simpa [IrreducibleCharacter.ext_iff] using h
+  -- `μ − χ₁` is an `A₀`-supported virtual character, so its Dade image is integral
+  have hμχ₁Z : (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂
+      - (1 : ℕ) • χ₁ : ClassFunction ↥M ℂ) ∈ ZIrr ↥M := by
+    rw [one_smul]
+    exact Submodule.sub_mem _ hμZ (hirr χ₁ hχ₁s).mem_ZIrr
+  have hdiffasupp' : ((OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂
+      - (1 : ℕ) • χ₁ : ClassFunction ↥M ℂ)).support ⊆ hyp.A0 := by
+    rw [one_smul]; exact hdiffasuppχ
+  have htau1_memaχ : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)
+      (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂
+        - (1 : ℕ) • χ₁) ∈ ZIrr G :=
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp.dadeData.dade
+      hyp.hconj hdiffasupp' hμχ₁Z
+  -- the (5.6.c) weighted degree bound: `2·1 < ∑ 1²/1 = |s|`
+  have hDeg' : 2 * ((1 : ℕ) : ℝ) < ∑ _x ∈ s, ((1 : ℕ) : ℝ) ^ 2 / (1 : ℝ) := by
+    simpa using hDeg
+  -- span generation: `ℤ[s] ⊆ ℤ[ℤ[s, A₀] ∪ {χ₁}]` (equal degrees collapse to the anchor)
+  have hSgen : Submodule.span ℤ (↑s : Set (ClassFunction ↥M ℂ)) ≤ Submodule.span ℤ
+      (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥M) (↑s) hyp.A0 ∪ {χ₁}) := by
+    rw [Submodule.span_le]
+    intro x hx
+    have hxs : x ∈ s := hx
+    have hdiff : x - χ₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥M) (↑s) hyp.A0 := by
+      refine ⟨Submodule.sub_mem _ (Submodule.subset_span hx)
+        (Submodule.subset_span (Finset.mem_coe.mpr hχ₁s)), ?_⟩
+      have h := hmemdegdiffsupp x hxs
+      rwa [one_smul] at h
+    have hx' : x = (x - χ₁) + χ₁ := by abel
+    rw [SetLike.mem_coe, hx']
+    exact Submodule.add_mem _
+      (Submodule.subset_span (Set.mem_union_left _ hdiff))
+      (Submodule.subset_span (Set.mem_union_right _ rfl))
+  -- span generation for the adjoined pair (`hgen`): the generic anchor-generation producer,
+  -- fed the degree matching `μ(1) = 1·χ₁(1)` and `μ̄(1) = μ(1)`
+  have hbar1 : (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂).conj 1
+      = OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂ 1 := by
+    rw [hconjcol, OddOrder.Peterfalvi.S06.columnSum_apply_one,
+      OddOrder.Peterfalvi.S06.columnSum_apply_one]
+    exact hdegsym
+  have hchi1_ne : χ₁ 1 ≠ 0 := by
+    obtain ⟨d, hd, hd1⟩ := irreducibleCharacter_apply_one_eq_pos_natCast ⟨χ₁, hirr χ₁ hχ₁s⟩
+    rw [show χ₁ 1 = ((⟨χ₁, hirr χ₁ hχ₁s⟩ : IrreducibleCharacter ↥M) : ClassFunction ↥M ℂ) 1
+      from rfl, hd1]
+    exact_mod_cast hd.ne'
+  have hgen := OddOrder.Peterfalvi.S07.zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration
+    (χ := OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂)
+    (chibar := (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂).conj)
+    (a := 1) hSgen
+    (by rw [Nat.cast_one, one_mul]; exact hdeganchor) hbar1 hchi1_ne hyp.one_notMem_A0
+  -- fire the reducible-break weighted adjoin engine
+  exact OddOrder.Peterfalvi.S08.xAdjoinStepW_k hyp.dadeData.dade hyp.hconj hS₁
+    (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂) hdiffsuppχ
+    hχχne hχbarχbarne hχχbar hχbarχ hμ_S1 hμbar_S1 s id (fun _ => 1) χ₁ hχ₁s
+    hmemdegdiffsupp (fun x hx => Finset.mem_coe.mpr hx) (fun _ => (1 : ℝ))
+    (fun _ _ => one_pos) hmemortho rfl Dmem Da hDatau1 hortho_mem htau1Dmem
+    hdiffasupp' htau1_memaχ rfl hDeg' hSgen hgen
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Per-member `ψ = 0` decompositions for a conjugate-closed irreducible subfamily of the
+induced family** (the `Dmem` input of `adjoin_muColumnPair_of_irrFamily`): each member `x` of a
+conjugate-closed irreducible `s ⊆ S` carries the (5.5) `ψ = 0` decomposition whose auxiliary
+isometry is the running coherent extension (`memberExtensionDecomposition`; its `tau1` is
+`hS₁.extension` definitionally, so the engine's `htau1Dmem` is `rfl`).  The inputs are discharged
+from the family facts: non-reality and `⟨x, x̄⟩ = 0` from the odd order
+(`inducedFamily_hasNoRealCharacters` + `inducedKernelFamily_pairwise_orthogonal`), the conjugate
+difference support from `inducedKernelFamily_conjDiff_support`, and the integral extension value
+from the coherence field `extension_mem_ZIrr`. -/
+noncomputable def irrFamilyMemberDecomposition [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)
+    (s : Finset (ClassFunction ↥M ℂ))
+    (hS₁ : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) (↑s) hyp.A0)
+    (hsub : (↑s : Set (ClassFunction ↥M ℂ)) ⊆ OddOrder.Peterfalvi.S12.inducedFamily M)
+    (hirr : ∀ x ∈ s, IsIrreducibleCharacter x)
+    (hconjS : ∀ x ∈ s, x.conj ∈ s)
+    {x : ClassFunction ↥M ℂ} (hx : x ∈ s) :
+    OddOrder.Peterfalvi.S07.CharacterPsiDecomposition
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) x 0 := by
+  haveI := hyp.finiteG
+  classical
+  have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+  have hxfam : x ∈ OddOrder.Peterfalvi.S12.inducedFamily M := hsub hx
+  have hxIKF : x ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+      ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) := by
+    have h := hxfam
+    rwa [OddOrder.Peterfalvi.S12.inducedFamily_eq_inducedKernelFamily_bot] at h
+  have hne : x.conj ≠ x :=
+    OddOrder.Peterfalvi.S12.inducedFamily_hasNoRealCharacters hModd hxfam
+  have hreal : ¬ ClassFunction.IsReal x := fun h => hne h
+  have hdiffsupp : ((x.conj - x : ClassFunction ↥M ℂ)).support ⊆ hyp.A0 :=
+    OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support
+      hyp.mderivSharp_subset_A0 hxIKF
+  have hνZ : hS₁.extension x ∈ ZIrr G :=
+    hS₁.extension_mem_ZIrr x (Submodule.subset_span (Finset.mem_coe.mpr hx))
+  have hχχbar : ClassFunction.inner x x.conj = 0 := by
+    have hxc : x.conj ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) :=
+      OddOrder.Peterfalvi.S08.inducedKernelFamily_closedUnderConjugate _ hxIKF
+    exact OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal hxIKF hxc
+      (fun h => hne h.symm)
+  exact OddOrder.Peterfalvi.S08.memberExtensionDecomposition hyp.dadeData.dade hyp.hconj hS₁
+    ⟨x, hirr x hx⟩ hreal hdiffsupp (Finset.mem_coe.mpr hx)
+    (Finset.mem_coe.mpr (hconjS x hx)) hνZ hχχbar
+
 end OddOrder.Peterfalvi.S13

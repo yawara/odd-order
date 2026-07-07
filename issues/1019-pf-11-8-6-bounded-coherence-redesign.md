@@ -1056,3 +1056,98 @@ hypothesis で前倒しし、§9 counting は別 piece。次 iteration = composi
 - **追加発見**: `muGrid_inner_irr_member_eq_zero` (S12_Section9Counts:802、既存) — hχ_S1 の
   supply がほぼ直接ある (μ-grid ⊥ irr member)。
 ⟹ composite の named hypotheses = **hDeg counting + hortho_mem** の 2 つ、他 15 項目は実 supply。
+
+## 🔬 update⁶⁶ (2026-07-07 lane-a /loop) — ★ mixed corner 1-pair adjoin composite LANDED
+
+### ✅ landed: `S13.adjoin_muColumnPair_of_irrFamily` (commit 0cc0a2e5, sorry-free, axiom-clean)
+xAdjoinStepW_k の §12 instantiation (τ = hyp.tau defeq、A₀(M)、a = 1): coherent 既約等次数族
+s (Finset 直接、anchor χ₁ ∈ s) + certain-type column pair {columnSum χ₂, columnSum χ₂⁻¹} →
+IsCoherent hyp.tau (↑s ∪ {μ, μ̄}) A₀。実 supply 済 = χ-side Gram/support、member scaled-diff
+support、member 直交、τ(μ−χ₁) ∈ ZIrr、hSgen。**named 残 (次 pieces)**:
+1. **Dmem** — `memberExtensionDecomposition` の per-member instantiation (conj-closure ほか)
+2. **Da** — `certainTypeDecompositionDa` (ψ = 1•χ₁; hμη₁supp/htau1_mema/hχψ 系の supply)
+3. **hortho_mem** — R(irr) ⊥ R(μ) の §12 版 (S08_CaseBHortho の Sibley→typePA0 一般化)
+4. **hμ_S1/hμbar_S1** — muGrid_inner_irr_member_eq_zero からの変換
+5. **hDeg** (2 < |s|、§9 counting) / **hgen** (span 分解 ~30 行) / hdiffasuppχ / hμZ (μ ∈ ZIrr)
+
+### Lean 教訓 (traps §5 続き、メモリ反映予定)
+- set 変数 (μ/h46) は structure 型引数・Eq RHS の unify を阻む → **生式統一が根治**
+  (supply have も呼び出しも同一の unfolded 式で)。
+- 引数に取る decomposition (Da/Dmem) の型は **engine-native (dadeICM) 形で statement に書く**
+  — hyp.tau 形だと projection 親項の τ 差で application mismatch。
+次 iteration = named 残の supply pieces (上流順: 4 → 2 → 1 → 5-hgen; 3 は §12 化の独立 work、
+5-hDeg は §9 counting)。
+
+## 🔬 update⁶⁷ (2026-07-07 lane-a /loop) — ★ piece 4 (hμ_S1) LANDED
+
+### ✅ landed (S12_Section9Counts, sorry-free ×2, commit 57300af6)
+- **`exists_muColumnChar_eq`**: muColumnChar は非自明 W₂-dual への全射 (fCECG 逆像 + k≠0)。
+- **`columnSum_inner_irr_member_eq_zero`**: ⟨columnSum χ₂, x⟩ = 0 (χ₂≠1、irr x ∈ S(X)) —
+  composite の hμ_S1 直接 supply (hμbar_S1 は conj_eq + inv_ne_one 経由)。
+- traps §5 追補: 証明内 instance/card 同定は **statement 引数の型表記 (toHypothesis46) に統一**
+  しないと fCECG の Equiv unify が metavariable のまま全滅。tactic-def unfold の rfl は
+  with_unfolding_all で。
+
+### 残 pieces (adjoin composite の named 入力)
+2. **Da** = certainTypeDecompositionDa instantiation (ψ=1•χ₁; hμη₁supp の suppIn(A∪V^L) 形 ↔
+   typePA0 同定、htau1_mema、hχψ = piece 4 の系)
+1. **Dmem** = memberExtensionDecomposition per-member (conj-closure/no-real/pairwise を
+   irr-cut 特殊化で discharge)
+5. **hgen** (span 分解 ~30 行) / **hDeg** (|s| ≥ 3、§9 counting)
+3. **hortho_mem** (R⊥R の §12 化、S08_CaseBHortho 一般化 — 独立 work)
+次 iteration = piece 2 (Da)。
+
+## 🔬 update⁶⁸ (2026-07-07 lane-a /loop) — ★ piece 2 (Da) LANDED
+
+### ✅ landed: `S12.Hypothesis.columnBreakDa` (commit 9d0421ba, sorry-free, axiom-clean)
+certainTypeDecompositionDa の §12 instantiation (ψ = 1•χ₁)。**support seam は全 defeq で消滅**:
+h46.tic.V = typePV M (toHypothesis46 の tic literal projection) ⟹ suppIn (A(M) ∪ tic.V^M) M =
+suppIn typePA0 M = hyp.A0 — `exact` 素通り。anchor 直交は piece 4 で discharge。
+
+### 残 pieces
+1. **Dmem** = memberExtensionDecomposition per-member (次 iteration): conj-closure hconjS +
+   no-real (inducedFamily_hasNoRealCharacters) + pairwise (⟨x,x̄⟩=0) + diffsupp
+   (conjDiff_support) + hνZ (extension_mem_ZIrr) を irr-family 仮定から discharge する
+   per-member supply lemma。
+5. **hgen** (span 分解 ~30 行、equal-deg collapse の 3-generator 版) / **hDeg** (|s| ≥ 3 counting、§9)
+3. **hortho_mem** (R⊥R §12 化、S08_CaseBHortho 一般化 — 独立 work、最重)
+
+## 🔬 update⁶⁹ (2026-07-07 lane-a /loop) — ★ piece 1 (Dmem) LANDED + piece 5-hgen/piece 3 の既存 producer 発見
+
+### ✅ landed: `S13.irrFamilyMemberDecomposition` (commit 0865d818, sorry-free, axiom-clean)
+Dmem supply: conj-closed irr subfamily ⊆ inducedFamily の per-member ψ=0 decomposition
+(memberExtensionDecomposition instantiation; tau1 = hS₁.extension literal → htau1Dmem = rfl)。
+
+### ★ 在庫再発見 (S08_CaseBEnumeration:1020-1075 = xAdjoinStepW_k 系の完全使用 template)
+- **`S07.zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration`** (S07_Coherence:208):
+  **hgen の generic producer が既存** — 入力 = hSgen (composite 内 supply 済) + 次数算術
+  (hχ1: μ(1)=a·χ₁(1)、hbar1: μ̄(1)=μ(1)、hchi1_ne、h1A = one_notMem_A0)。
+  ⟹ **piece 5-hgen は「composite の hgen 引数を hdeganchor (μ(1)=χ₁(1)) に置換して in-proof
+  supply」の改良 1 手** (~15 行)。hbar1 は columnSum_conj 1-値 (columnSum_inv_apply_one 系)。
+- **`caseB_member_orthoDatum_columnBreak`** (S08_CaseBEnumeration): Dmem+hortho_mem+htau1 の
+  **bundled datum producer (Sibley world)** — piece 3 (hortho_mem §12 化) の完全 template。
+  `columnDecompositionTau` (Da の hyp.tau 版) も同居。§12 版は sharpImage H → typePA0 の
+  読み替え (certainTypeSet_isCoherent_A0/columnBreakDa と同じ defeq seam の見込み)。
+
+### 残 (composite の named → 実 supply 化)
+- hgen: 上記改良 (次 iteration、~15 行)
+- hortho_mem: caseB_member_orthoDatum_columnBreak の §12 mirror (中規模)
+- hDeg: |s| ≥ 3 counting (§9、genuine)
+- 特殊化: s = irr-cut (sOf_degreeSubfamily_isCoherent) + hμ_S1 (piece 4) + Da (piece 2) +
+  Dmem (piece 1) を束ねた caseB 1-pair adjoin の end-to-end instantiation
+
+## 🔬 update⁷⁰ (2026-07-07 lane-a /loop) — ★ piece 5-hgen 内蔵化 LANDED (composite の構造 named は hDeg + hortho_mem のみに)
+
+### ✅ landed: hgen 内蔵 (commit 0a550775, sorry-free)
+adjoin_muColumnPair_of_irrFamily の hgen 引数 → hdeganchor (μ(1)=χ₁(1)) に置換、
+`zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration` (S07:208) で in-proof supply。
+
+### composite 入力の現況 (named 残の全リスト)
+- **hDeg** (2 < |s|): §9 counting — genuine 残
+- **Dmem/htau1Dmem**: `irrFamilyMemberDecomposition` (piece 1 landed) で supply 可 (htau1Dmem = rfl)
+- **Da/hDatau1**: `columnBreakDa` (piece 2 landed) で supply 可 (hDatau1 = rfl 系)
+- **hortho_mem**: §12 化未 (caseB_member_orthoDatum_columnBreak の mirror) — genuine 残
+- **hμ_S1/hμbar_S1**: `columnSum_inner_irr_member_eq_zero` (piece 4 landed) で supply 可
+- hdeganchor/hdiffasuppχ/hμZ: caseB uniform-qu 特殊化時に §9 facts から
+次 = **end-to-end caseB 特殊化 skeleton** (s = irr-cut、pieces を束ね、named = hDeg + hortho_mem
+の 2 つだけの assembly) or hortho_mem §12 化。
