@@ -29,11 +29,15 @@
 |---|---|---|---|---|---|
 | **a** | `a` | `odd-order-a` | α **S12 (11.8) unique feitThompson sorry** + §7 on-path norm (2026-07-04 再々編) | `Peterfalvi/S(0[3-9]|1[0-3])*` + `FeitThompson.lean` (全体) | 1000 |
 | **b** | `b` | `odd-order-b` | β **§16 endgame char cascade = S15 (13.9)-(13.19)** (2026-07-04 再々編; §12 Dade は完遂・cite-only) | `Peterfalvi/{S15_SAndT_Setup, S15_SAndT}.lean` (c→b, 2026-07-04) + `S14_MaximalI.lean` + coherence file 群 + carve-out 0090/0096 | 2000 |
-| **c** | `c` | `odd-order-c` | γ **S16 非存在 — 2026-07-06 夕 DORMANT cite-sink 化** (領域枯渇、下記) | `Peterfalvi/S16_NonExistenceG.lean` (S15 は b へ移管、c は import cite) + 構成的 Clifford (issue 9002、完了) | 3000 |
+| **c** | `c` | `odd-order-c` | γ **S16 非存在 + ♻ 2026-07-07 REACTIVATE (issue 0098 パッケージ 5 件)**: typeP_pair port (§8 新 shared leaf) / semilinear (9.7.b) field-model leaf / S-side βₛ bridge carve-out (S15_SAndT.lean:3616 BetaData 領域) / §14 Γ-bridge assembly / hcard2 verify | `Peterfalvi/S16_NonExistenceG.lean` + 構成的 Clifford (9002 完了) + carve-out: reconciled_typePData_T 残 field (S15_SAndT_Setup:4520/:4590) ・BetaData 領域 (S15_SAndT:3616) + 新 shared leaf (claim-before-build) | 3000 |
 | ~~**d**~~ | — | — | ⚰ **退役 (2026-07-07, ユーザー裁定)** — codex 運用 shared-infra レーン。worktree/branch 削除済 | — | — |
 
 > **⚰ 2026-07-07 — lane d (codex) 退役 (ユーザー裁定)**: 徹底調査で **FT frontier (Peterfalvi 72 + BG 15 実 sorry) に codex 単独で閉じられる genuine・on-path・非衝突・非gated な実 sorry は存在しない**と確定 (Peterfalvi=全て gated/深いchar/a-b-c衝突/偽/off-path; BG 非b分=AppD/AppE 全て consumer 0・unimported の off-path scaffold)。構造的理由: FT 残 frontier は深く密結合な char/local-analysis で「切り出せる mechanical leaf」がほぼ無く、codex に軽タスクを与えると dup relocation の churn に流れる (直近 2 tick = 計 14 補題が全て既存 S01 補題の複製、net-genuine 0)。⟹ 3 レーン (a/b/c) に集約。worktree `/home/ywr/odd-order-d` + branch `d` 削除 (churn は net-zero、reflog 復元可)。**♻ 再活性化トリガー (将来)**: (i) proven S-side の **T-side dual** (`V_inf_centralizer_Q_eq_bot` 等) の gate ((14.9) T-typeII 構造) が a/b で landing → codex が template を mirror; (ii) a/b/c が特定 group-theory helper を明示 pull-request。いずれか発生時に `git worktree add /home/ywr/odd-order-d -b d` で再作成 (issue base 4000)。**⚠ ユーザーは codex の /loop セッションを停止すること** (worktree 消失後は codex が git エラーで空転)。
 
+> **♻ SUPERSEDED (2026-07-07, issue 0098)**: 下記 DORMANT 化は解除 — 4-agent 再調査 (wf_d4994964) で
+> ungated genuine work 5 件 (typeP_pair port / semilinear field-model leaf / βₛ bridge carve-out / §14 Γ-assembly /
+> hcard2 verify) を確定し c を REACTIVATE。9013 item (i) mᵀ は c へ de-scope。9000 claim は a 保持 (scope 注記済)。
+>
 > **⚠ 2026-07-06 夕 — lane c DORMANT cite-sink 化 (hub 裁定, 4-agent 調査 wf_00a0db07)**: c の S16 領域は枯渇
 > (0 ahead、S16_NonExistenceG の 10 bare sorry は**全て true carrier gate** = a の typeP_Galois (9000) or b の
 > §13/§15/§16 char cascade に gated、sorried-cite assemblable はゼロ; Clifford 9002 完了; reconciled_typePData_T
@@ -356,6 +360,17 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-07 (夕) — レーン役割再点検 (ユーザー提起) → HUB 裁定 issue 0098: c REACTIVATE + b de-scope**:
+  4 並列調査 (wf_d4994964) で a=1019 収束中だが queue 深/9000 instance tail は a territory (1017 計画と一体、
+  再配分は dup 再演ゆえ棄却)、b=velocity 高いが 9 クラスタ保有+c の gate 7 本で overload 継続、c=遊休は gate 形状
+  だが ungated genuine 5 件存在 (うち S-side βₛ bridge は未 claim の ownership gap = 隠れ long-pole) と確定。
+  裁定 (判断軸 = レーン等価 + 価値×独立性のみ、適性レトリック禁止を memory 追記): **a 変更なし / b active 変更なし
+  + 9013(i) mᵀ を c へ de-scope + βₛ bridge を c へ carve-out / c REACTIVATE (0098 パッケージ 5 件)**。
+  shared leaf の interface guard (module-level generic・singerAdapter 再利用・claim-before-build) を 9000/0098 に明記。
+  レーン表 c 行更新、9013/9000 に転記。⚠ aSets_support_slice (BG S16_MainResults:2123) は UNDERSPECIFIED —
+  restatement が証明に先行 (どのレーンも as-is で証明しない)。cron は Fable 切替に伴い 30 分 `13,43` (d38bcde8) に
+  再ペース (前例 2026-07-05)。本日 a 追加合流 1 件 (S(HC)⊆SHCSet sorry-free, S13 +15, build green 3934・push 済
+  `06838f6c..5dc355ab`)。
 - **2026-07-07 (tick 7) — a/b/c 統合 (cron tick, 全レーン自走分)**: 全レーン merge-base==main HEAD の clean 先行、
   conflict 皆無・新 axiom なし。
   - **a** (`f31df00d`, genuine): Pf (11.8) `coherent(S(HC))` を **sorry-free** に landing — `coherent(S(M''))` の

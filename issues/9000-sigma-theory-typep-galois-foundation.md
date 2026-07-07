@@ -302,3 +302,17 @@ coherence carrier を実証明 (`T_typeIII_hyp07` + `irrSubcoherent`)。⟹ **90
 C 側は **cite-ready sorried-cite endpoint に整理済** — 9000 の typeP_Galois/field-model が landing 次第、
 上記は薄い cite で close 可能 (C が assemble)。9000 の owner=lane-a は本項目を dictate されないが、C の
 type-determination 全体が 1・2 に gated である事実を downstream 影響として記録。
+
+## 🧭 HUB scope 注記 (2026-07-07, issue 0098 レーン再点検)
+
+**claim は lane a が保持** (instance tail = S11 §9 block-decomposition + S13 (11.9) char body は a territory
+かつ issue 1017 計画と一体 — 他レーン並行構築は 2026-07-02 dup 事故の predicate-level 再演ゆえ禁止)。
+ただし **generic 側の隣接 2 パッケージは本 claim の scope 外として lane c が別 claim で build する**
+(0098 パッケージ item 1-2、着手時に 9000 番台 claim 起票 = claim-before-build):
+
+1. **typeP_pair port** (Coq PFsection8 FTtypeP_pair_witness/of_typeP_pair/typeP_cent_compl) — 新 shared leaf。
+2. **generic semilinear (9.7.b) field-model package** (SingerField の exists_galoisField_repr 拡張、
+   F_{q^p}⋊V* 実現 interface) — 新 shared leaf (例 RepresentationTheory/SemilinearFieldModel.lean)。
+
+**interface guard (必須)**: shared leaf は module-level generic のみ (side-specific predicate 禁止)、
+a の S12/S13 と c の S16 が同一 formulation を両側 instantiate。S11 dedup の thin singerAdapter パターン再利用。
