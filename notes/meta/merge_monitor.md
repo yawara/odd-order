@@ -356,7 +356,16 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
-- **2026-07-07 (tick 4) — ⚰ lane d (codex) 退役 + d の dup batch 清掃 (ユーザー裁定)**:
+- **2026-07-07 (tick 5) — a/b/c 第2次統合 (ユーザー「いますぐ取り込みましょう」)**: tick3 統合後にレーンが
+  自走して出した新規分を合流。3 レーン体制 (d 退役後) の初統合。
+  - **a** (`7a6190bf`): issue 1019 (11.8.6) soundness refinement + Coq 精読で Route 1 確定 (docs のみ、Lean 不変)。
+  - **b** (`b245d446`, genuine): BG Thm 15.8/15.9 **Keystone C** を実証明で close — `signalizer_msigma_sup_inf_partner_eq`
+    (H_σ⊔(H∩M*)=H) + Coq `snK_sMst` port (S14_TypePCounting)。**S15_MF real sorry 3→2**。b 領域 (S14/S15)。
+  - **c** (`7c1f06e4`, genuine): Pf (13.15) case-B order dichotomy 完成 (p≡1 branch) + (14.4) T-side v-value を
+    proven engine に wire (S16_CaseBOrder/S16_NonExistenceG)。Main.lean は c 未編集ゆえ tick4 の清掃済み版を保持
+    (dup 再導入なし = 3-way merge で検証)。
+  - **build/sorry**: full build green **3934 jobs**、AxiomsCheck OK、新 axiom なし。real sorry **88→87**
+    (b Keystone C 分 -1、c は sorry-free)。Main.lean dup 清掃も維持 (6286 行、再導入なし)。push 済。
   ユーザーが d の genuine 席を探索 (Peterfalvi 内 sorry 指定 → BG 側探索) した結果、hub 徹底調査で
   **FT frontier に codex 単独 closeable な genuine sorry 不在**と確定 → 退役裁定。詳細 = 上記レーン表 ⚰ 節。
   - **退役実施**: worktree `/home/ywr/odd-order-d` remove + branch `d` 削除 (was `e4c6ec3c`、churn net-zero・
