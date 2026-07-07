@@ -1474,3 +1474,32 @@ fold (update⁸³) の named 入力を同 session で 3/4 discharge し、caseB 
 - その先 (hub 0101 裁定に従い訂正): **caseA は b 所有** (`S11_NineElevenCoherence`) — a は
   自前組立しない。a の残 = hDeg → **(9.11) full assembly 配線** (clifford_dichotomy で
   caseA[b leaf を cite]/caseB[本 assembly] を束ね) → hY packaging → capstone → R1 pivot。
+
+## 🔬 update⁸⁵ (2026-07-08 lane-a /loop) — ★★ ROUTE 訂正: hDeg は route 人工物 → norm-general (5.7) port へ (claim 9075)
+
+### 発見 (Coq 権威、code-level)
+- **Coq (9.11) の Galois(=caseB) 枝 = `uniform_degree_coherence scohS0` 一発**
+  (PFsection9.v:1510-1513): 家族 𝒮(H₀C′) **全体** (可約 μ 込み、全 deg qu) に適用。
+  count 不要・pair-chain 不要・anchor 不要。非Galois 枝のみ S1 (deg-qa cut) + (9.11.1-8)
+  帰納 (= b の caseA 担当分)。
+- **Coq `uniform_degree_coherence` は norm N 一般** (PFsection5.v:1256-1264: N=⟨χ₁,χ₁⟩、
+  R-datum 2N)。**Lean 港 `coherent_of_constant_degree` は norm-1 限定** (`hirr : ⟨ζ,ζ⟩=1`)
+  — μ (norm q) を受けられない。これが fold route (irr-cut anchor + μ-pair adjoin) と
+  hDeg (2 < |irr-cut|) が生えた根因。
+- **hDeg は §9 事実でない**: (9.9) `typeP_Galois_characters` に irr-count conjunct は無く、
+  |irr-cut| = 2 の corner で偽の恐れ (weighted adjoin でも初段 2(qu)² < 2(qu)² で strict
+  失敗、irr→μ-族 adjoin も 2q < p−1 必要で type III の q > p と矛盾 — 全 incremental 路が
+  |cut|=2 で死ぬ)。**hDeg の §9 count 証明は中止** (偽 hoist リスク)。
+
+### 正 route = norm-general (5.7) port (shared S07 infra、claim = issues/9075)
+1. `pivotCoherence` (Coq pivot_coherence :588): **明示式** `ν φ := s(φ)•ζ₁ + τ(φ − s(φ)•η₁)`、
+   s(φ) = 直交係数和 (pairwise 直交ゆえ freeness/basis 不要で構成可能と設計確認済)。
+   extends は φ(1)=0 → s=0 で即。
+2. (5.7) 一般版: ζ₁ = R(χ₁) 半分和の構成 ((5.4) subcoherent_split/norm minimality、
+   Coq :1265-1330)。
+3. caseB 適用: 全族 pairwise-orthogonal/conj-closed/no-real/hunif[landed] →
+   `caseB_coherent_sOf_H0Cprime` rewire (hDeg 撤去)。fold (update⁸²) と部品は landed のまま
+   残置 (caseA-style 局面の再利用資産; assembly からの消費は差し替え)。
+
+### status
+- 9075 claim 済。次 iteration = pivotCoherence の CODE (S07_Subcoherent 追記 or 新 leaf)。
