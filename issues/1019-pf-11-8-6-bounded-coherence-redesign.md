@@ -206,6 +206,13 @@ case-A では: reducible → `caseA_reducible_induceHU_apply_one_eq_qu` (S11:130
   HU=M' 確定 → sOf⊆SOf の induce-transport が tractable)。case-A uniform-qu の真偽は並行して §9 で解決
   (それが真なら Route 1 の generation、偽なら Coq per-ζ / core-coherence generation)。
 
+### ⑥ ✅ landed (2026-07-07, commit e1ef5bdb) — step ③ subset 方向
+`S13.Hypothesis.sOf_subset_SOf` (`sOf hyp.s11Setup Y ⊆ hyp.SOf Y`) sorry-free。`rw [← hHU]`
+(HU=M' carrier 一致) で witness=χ、θ≠trivial=xiSet の H⊄ker、kernel=xiOf、induce-eq=`induceHU_eq_induce`。
+予測した induce-transport の motive 障害は発生せず (carrier rw 成功)。**残 world-bridge = 逆方向**
+(`SOf(H₀C)` の member が SHCSet か sOf(H₀C) に入る H≤ker 分割 = decomposition)。次候補 = 逆方向 or
+step① SHC coherence を SOf-版に接続。
+
 ### ⑤ 訂正後の実装 sequence (deeper than 1-2 session; multi-part)
 1. **case-A/B ∀-uniform-qu on `sOf(H0C)`** (S11): case-split (`CliffordCaseAData`∨`CliffordCaseBData`
    dichotomy) → caseB `forall_mem_sOf_H0C_apply_one_eq_qu` / caseA reducible+irreducible。← genuine §9。
@@ -227,3 +234,72 @@ case-A では: reducible → `caseA_reducible_induceHU_apply_one_eq_qu` (S11:130
 - Coq: PFsection9.v:845 (9.8), :1258 (9.9); PFsection11.v:206 (11.3); PFsection6.v:115 (bounded coherence)
 - S12_MaximalIII_IV_V.lean: `Sset_diff_SHCSet_apply_one_eq_qu` (:3904 irr-side sorry),
   `coherent_Sset_of_column_identities` (:4188 capstone), `hgen_of_S2_uniform_degree` (:4098)
+
+## 🔬 update³⁹ (2026-07-07 lane-a /loop) — ★ world-bridge 集合等式 COMPLETE (逆方向 landed)
+
+step ③ の逆方向 (covering) を landing (commit f3d93d1a、S13、axiom-clean)。subset 方向
+(`sOf_subset_SOf`, e1ef5bdb) と合わせ **world-bridge の集合等式が完成**:
+
+- **`S13.Hypothesis.SOf_H0C_eq_SOf_HC_union_sOf`**: `SOf(H₀C) = SOf(HC) ∪ sOf(H₀C)`
+  (Peterfalvi の `S(H₀C) = S₁ ⊔ S₂`, S₁=S(HC), S₂=𝒮(H₀C))。source θ を `H ≤ Ker θ` で分割:
+  H≤ker → HC=H⊔C ≤ Ker θ → SOf(HC); H⊄ker → θ∈𝒳 → sOf(H₀C)。逆向き = kernel antitone +
+  `sOf_subset_SOf`。carrier transport は subset 方向と同型に `← hHU` で huSub world 統一。
+  **route-independent で sound** (uniform-degree の偽 route に非依存 = ④ の懸念を回避; SOf(HC)
+  形なので degree/irreducibility を主張せず純 kernel-bookkeeping)。
+- **前提 infra (foundational, hoist candidate → S03)**: `characterKernel_mul_mem` /
+  `characterKernel_inv_mem` / `characterKernelSubgroup` — genuine character の kernel が subgroup。
+  `rep_eq_id_of_character_eq_one` (χ_ρ(g)=χ_ρ(1) → ρ g = id) 経由。HC=H⊔C の join を単一 kernel
+  条件に押し込むのに必要だった (既存に無かった)。
+
+### 次 step の precise map (残 = 全て deep §9 or §14-gated)
+world-bridge が済んだので capstone re-target (step ③→④) に必要な残ピース:
+1. **coherent(SOf(HC))** = landed `SHC_isCoherent` (SHCSet 上) を **SOf(HC) 上**に移す =
+   **`SHCSet = SOf(HC)` identification** (deep §9/§11、ungated だが要証明)。真である根拠:
+   SOf(HC) の source θ は HC=H·C を kill → M'/HC ≅ U/C で factor、U/C は abelian
+   (`derivedU_le_C` = U'≤C landed ⟹ U/C は U/U' の商) ⟹ θ linear (deg 1) ⟹ Ind θ deg q。
+   Ind θ irreducible = Clifford (type-P inertia=M')。⟹ SOf(HC) = deg-q irreducibles = SHCSet。
+   ← **次の ungated 上流候補** (Clifford irreducibility + linear-source が repo にあるか要確認)。
+2. **coherent(sOf(H₀C))** = (9.11) `S11.coherent_H0C_commutator` = **§14-gated**
+   (`sibleyTarget_H0C := sorry`, issue 7001)。sorried-cite。
+3. **union-glue** (SHCSet/SOf(HC), sOf(H₀C)) の hmixed/hDτ = §14/BG §15-gated。
+4. capstone `coherent_SOf_H0C_of_column_identities` (S13) → `S_H0C_not_coherent` 矛盾 + endgame 移設。
+
+## 🔬 update⁴⁰ (2026-07-07 lane-a /loop) — ★ capstone gate 構造を code-level 確定: coherent(SOf(HC)) は sorry-free 到達可能
+
+world-bridge (update³⁹) 後、capstone re-target に必要な coherence 入力を精査。**旧 update³⁹ の
+「SHCSet↔SOf(HC) は deep §9」評価は過小**: 前セッションが既に土台を landing 済で、
+**coherent(SOf(HC)) は sorry-free に到達可能**と判明。
+
+### ★ 既存 (sorry-free、prior lane-a): SOf(M'') = SHCSet + coherent
+- **`S13.Hypothesis.SOf_secondDerived_eq`** (S13:1047, axiom-clean): `SOf(M'') = SHCSet`
+  (= degree-w₁ 既約 subfamily)。証明は `inertia_eq_derived_of_linear` (linear char の Clifford irr) +
+  `charValue_one_eq_one_of_commutator_le_ker` (M''≤ker → linear)。← **Clifford-irr 機構は在った**。
+- **`S13.Hypothesis.secondDerived_coherent`** (S13:1103, axiom-clean): `coherent(SOf(M''))`
+  = `SHC_isCoherent` を `SOf_secondDerived_eq` で rewrite。
+
+### ★ coherent(SOf(HC)) の sorry-free path (次 iteration で build)
+`SOf(HC) ⊆ SOf(M'')` (antitone、`M''⊆HC` = `secondDerived_le_HC` **sorry-free**) + `secondDerived_coherent`
+[sorry-free] + **IsCoherent subset-restriction**。⟹ coherent(SOf(HC)) は M''=HC gate 不要で sorry-free。
+- **build 手順** (~40-50 行):
+  1. `isCoherent_of_subset` (S07.IsCoherent の restriction): `IsCoherent τ S A → S'⊆S →
+     (∃φ∈zSupportedSpan S' A, φ≠0) → IsCoherent τ S' A`。extension 同一、inner_eq/extends/mem_ZIrr は
+     `Submodule.span_mono` (zSpan=span ℤ) + `zSupportedSpan_mono_left` (S07:96) で restrict。
+  2. nonzero witness (SOf(HC)): `exists_inducedKernelFamily_member_degree_index` (S08:142、要
+     `[((HC.subgroupOf M).subgroupOf K).Normal]` = `HC_subgroupOf_normal.subgroupOf` +
+     `commutator(K/HC)≠⊤` = M''≤HC ⟹ ⊥ かつ HC⊊M'=HU via `C_lt_U`) で deg-w₁ member ζ →
+     `inducedKernelFamily_hasNoRealCharacters` で ζ≠ζ.conj → `inducedKernelFamily_conjDiff_support`
+     (S08:286) で ζ-ζ.conj ∈ zSupportedSpan A₀、≠0。
+- **注**: world-bridge は `SOf(HC)` 形が正 (H≤ker part は SOf(M'') でなく SOf(HC); SOf(M'')=SHCSet は
+  H を kill しない deg-w₁ 既約も含むため SOf(H0C) に非包含 → `SOf(H0C)=SOf(M'')∪sOf(H0C)` は偽)。
+
+### capstone re-target `coherent_SOf_H0C_of_column_identities` (S13) の残 gate
+1. **coherent(SOf(HC))** = ↑ sorry-free path (次 iteration)。
+2. **coherent(sOf(H0C))** = (9.11) `S11.coherent_H0C_commutator` = §14-gated (`sibleyTarget_H0C` sorry、
+   ⚠ S07_Subcoherent note で likely-UNSOUND 指摘あり = issue 7001; 本来 (9.11) Ptype_core_coherence
+   8-step induction で honest 化すべき)。sorried-cite。
+3. **union-glue** (SHCSet/SOf(HC), sOf(H0C)) の hmixed/hDτ = §14/BG §15-gated。
+4. `SOf_H0C_eq_SOf_HC_union_sOf` (update³⁹ landed) で SOf(H0C)=SOf(HC)∪sOf(H0C) に書き換え → union-glue →
+   coherent(SOf(H0C)) → `coherent_S_of_coherent_SH0C` → inducedFamily → `S_not_coherent` 矛盾 + endgame 移設。
+
+⟹ **本 session landed**: world-bridge 集合等式 (update³⁹) + characterKernel subgroup infra。
+**次 = coherent(SOf(HC)) sorry-free build (path 確定) → capstone skeleton (gate 2/3 は sorried-cite)。**
