@@ -382,6 +382,27 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
   auto-push policy を classifier が認識しない)。**main が origin より 18 commits 先行** — 直近数 tick の
   a/b/c/d merge が全て local-only で滞留。merge は全て検証済・保持。**ユーザーに push 認可を確認中**
   (merge 保持・監視は継続、STOP しない)。sorry = 89 (tick 前後不変)。
+- **2026-07-07 — 📢 lane-a → hub 伝達 (ユーザー指示「ハブにも伝達」)**: lane-a が (11.8) endgame を精査中に
+  **landed spine の設計問題を発見・検証確定** — hub 認識用の heads-up (裁定不要、lane-a 自律 frontier)。
+  - **成果 (2 landing、axiom-clean、真の定理)**: (11.8.6) ψ₀ column-witness (commit `18344eb5`) +
+    **(9.5)/(4.5.b) reducible-inclusion** (`0969af79`、reducible S-member = μ-column を S06 residue theory で
+    実証明; note の「repo 不在 major §9」評価を覆した)。S12 real sorry **9→7**。full build green。
+  - **★ finding (検証済、独立3角度)**: `Sset_diff_SHCSet_apply_one_eq_qu` (= (11.8.6) capstone が使う
+    uniform-degree qu on inducedFamily\SHCSet) は **非Galois type III/IV で偽** (Coq (9.8)(d) の degree-qa
+    既約、qa≠qu)。決め手 = **Coq §11 が `S_1` を `subcoherent` 扱いし `bounded_seqIndD_coherence` を使用
+    (uniform-degree 不採用)**。→ 偽の足場4件 (`Sset_diff_SHCSet_apply_one_eq_qu`/`hgen_of_S2_uniform_degree`/
+    capstone/`coherent_Sset_diff_SHCSet`) に ⚠️ over-strong マーク済 (`dd50be6e`、docstring のみ・build 不変)。
+  - **redesign (issue 1019、scope 済)**: 正しい機構 `bounded_seqIndD_coherence` (Pf 6.2/6.3) は
+    **既に repo にあり sorry-free** (`S08.six_three_of_six_two_oracle`)、`coherent_S_of_coherent_SH0C` (S13) も
+    配線済 → 大 port 不要、redesign は capstone を **S(H₀C) 族に re-target** する 1–2 session の作業。
+  - **⚠ hub が次 tick で注視すべき点 (merge/scope)**: redesign は **(11.8) endgame
+    (`exists_zeta_residual_not_orthogonal` / `w2_lt_w1_of_residual_not_orthogonal` / `w2_lt_w1_of_hypothesis`)
+    を S12 → S13 へ移設 + `FeitThompson.lean:649` の consumer を `S13.w2_lt_w1_of_hypothesis` に更新**する予定
+    (import 制約: S12 は下流 S13 の bounded-coherence を呼べないため)。file-move + FT consumer 更新ゆえ
+    scope 判定に関わる — 実施時に lane-a から予告する。他レーンは uniform-degree lemma に非依存 (lane-a 内部)。
+  - **現状**: 全 commit 済 (`3ee78238..5bf2ab7b`、8 commits)・working tree clean・build green。
+    redesign コード実装 (S13 移設 + narrow union-glue) が次 focused work。
+
 - **2026-07-05 (夜) — 監視停止 (ユーザー指示「loopを停止して」)**: cron ad5e5815 を CronDelete。
   ⛔ 停止 (問題起因) ではないので**自動再開しない** — 次の監視再開はユーザー指示を待って
   `7,22,37,52 * * * *` で再作成する。停止時点: main = `334e0bf2` (push 済・tree clean・origin 同期)、
