@@ -531,3 +531,28 @@ group-theoretic 具体化) が genuine work。
 
 ⟹ **残 2 obligation**: (a) 同定 `hyp.C = cSub` ((11.6) C=U' 経由)、(b) (9.11) induction port (engine assembly)。
 両方 lane-a §11 ungated。(a) が (b) の前提 (family 一致) ゆえ次は (a)。
+
+## 🔬 update⁴⁷ (2026-07-07 lane-a /loop) — ★ 同定 `hyp.C = cSub` の正確な route = (11.7) H0=1 (update⁴⁶ の (11.6) 予想を訂正)
+
+Coq PFsection11.v 精読で同定 route を確定。**update⁴⁶ の「(11.6) C=U' 経由」は不正確**、正しくは
+**(11.7) H0=1 経由** (Coq `Ptype_Fcompl_kernel_cent`)。
+
+- **Coq §11 C = `'C_U(H)`** (PFsection11.v:82) = **Lean `hyp.C` と一致** (S13 `C_eq_centralizer`)。設計は正しい。
+- **同定 `cSub = hyp.C` = Coq `Ptype_Fcompl_kernel_cent`** (PFsection11.v:543):
+  `Ptype_Fcompl_kernel MtypeP :=: C`。`Ptype_Fcompl_kernel` = U-action on H̄ の kernel = **cSub** (Lean)。
+  証明は **`H0_1` (H0=1) を使う** (:545 `group_inj H0_1`)。H0=1 ⟹ H̄=H ⟹ cSub = C_U(H̄) = C_U(H) = hyp.C。
+- **H0=1 は Coq §11 の section 事実** (PFsection11.v:541 `Let H0_1 : H0 :=: 1%g` via
+  `FTtype34_Fcore_kernel_trivial`) = **Peterfalvi (11.7)** (:396 `p.-abelem H ∧ |H|=p^q ∧ H0=1`)。
+  (11.7) は (10.8) gated。Lean 側 = `S13.core_structure` (11.7、S13:332、**sorried** = 既知 deep gate)。
+
+### ⟹ hY route の依存鎖 (完全確定)
+`hY = coherent(sOf(H0C))`
+  ⟸ `coherent(sOf(H0Cprime))` [(9.11) port, ungated] + `𝒮(H₀C) witness` [nonemptiness]  ← **landed bridge**
+  ⟸ 同定 `hyp.C = cSub` [(11.7) H0=1 経由、`Ptype_Fcompl_kernel_cent` port] ← **(11.7) sorried gate cite 可**
+  ⟸ (11.7) H0=1 [core_structure, sorried] ⟸ (10.8) [deep]。
+
+∴ hY の **ungated genuine math = (9.11) induction port** (engine assembly、cSub-based family)。
+同定は (11.7) を cite して port (proof は `ker(uActionHom)=C_U(H)` の unfold、H0=1 で H̄=H、~30-50 行)。
+capstone は加えて §14 glue (ν/hmixed/hDτ) も要 (lane b/c/§14 Dade) ゆえ lane-a 単独では閉じない
+(既知)。**次 iteration = (9.11) port の genuine assembly に着手** (subcoherent(sOf(H0C')) 組立 →
+base-case constant-degree → coherentPairChain extension)。同定は (11.7) cite で並行 or 後続。
