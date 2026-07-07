@@ -437,3 +437,32 @@ lemma を推奨 (既存神経 lemma の caller 群を壊さない)。
 
 **残 keystone 状況**: A (§14 Ptype_structure clause (e) = `p∈π(Kstar), S p-Sylow(M) ⟹ 𝓜(S)={M}`、
 BGsection14.v:456-473 の comp 4.2、multi-consumer 15/16 で再利用) と C (本更新)。文書順 C(14.12系)<A。
+
+## 2026-07-07 更新 #14 (lane b, /loop) — ★Keystone C 実証明で閉じた (sorry-free) → 残 A + Cor 15.9
+
+**Keystone C `signalizer_msigma_sup_inf_partner_eq` を sorry-free で landing**。`S15_MF` の局所 sorried
+lemma を削除し、実証明を `S14_TypePCounting` に移設 (Cor 14.12 の σ-分解ゆえ §14 が正しい所在、かつ
+uniqueness の private helper `partner_inf_and_uniq`/`msigma_inf_partner_eq_kstar` が同ファイル内で可視)。
+`tau2_transfer_constraint` の唯一の cite (S15:10416) を `S14.signalizer_msigma_sup_inf_partner_eq` に再配線。
+build GREEN (S14 3116 / S15 3120 jobs)。
+
+### ★設計上の鍵: repo goal は Coq より弱く、hard な `H_σ ∩ M* = 1` step 不要
+Coq `P2type_signalizer` は `H ∩ M* = D` (D=σ(H)'-Hall) の**厳密同定**を `suffices ->: H :&: Mst = D`
+で証明 (Hall/Fitting clause に必要) — その最難 step が `H_σ ∩ M* = 1`。だが repo Keystone C の goal は
+**join 等式** `M_σ(H) ⊔ (H ∩ M*) = H` のみ ⟹ 易しい包含 `E ⊆ H ∩ M*` で足りる (`H ∩ M* ⊆ D` 方向不要)。
+⟹ Coq の tau2-context/nregHsK/`H_σ∩M*=1` 論法を**丸ごと回避**でき、大幅に短い実証明で閉じた。
+
+### 実証明の構成 (3 新 decl, 全 S14, sorry-free)
+1. `isSubnormal_of_isNilpotent` (一般): 有限 nilpotent 群の任意部分群は subnormal
+   (normalizer condition + index 強帰納 + `IsSubnormal.step`)。mathlib 未所有の general fact。
+2. `isSubnormal_of_le_normal_nilpotent` (一般): `H ≤ N ⊴ Γ`、N nilpotent ⟹ H subnormal (上記 + `trans`)。
+3. `signalizer_msigma_sup_inf_partner_eq` (Keystone C 本体): neighbour lemma `typeP2_neighbor_is_typeF_of_mem`
+   の E-setup (`M_σ(H) ⊔ E = H`, `K ≤ E`, `K ≤ F(E)`) を取得 → `K ⊴⊴ E` (K≤F(E) nilpotent normal) →
+   更新 #13 の `snK_sMst` port (`le_partner_of_subnormal_of_uniq`) で `E ≤ Mst` → `E ⊆ H ∩ Mst` →
+   `H = M_σ(H)⊔E ⊆ M_σ(H)⊔(H∩Mst)`。Mstar=Mst は `𝓜(C(K))={Mst}` (Prop 14.2(d)) で同定。
+
+### 残 = Keystone A + Cor 15.9 (共 S15)
+- **Keystone A** `typeP_partner_sylow_uniquelyMaximal_bundle` (S15_MF:10111 sorried) = deep §12/§14
+  `Ptype_structure` の Sylow→𝒰 clause port。**唯一の残 deep gate**。次の作業対象 (C 済ゆえ文書順で A へ)。
+- **Cor 15.9** `centralizer_escape_final_local` (S15_MF:10569 sorried): Thm 15.8 (assembled) + Thm 15.7
+  を cite。`typeF_frobenius_of_tau2_prime_free` の S16→S15 hoist が要。
