@@ -321,3 +321,56 @@ Pf §13 の依存構造を原文精査 (04.15 mmd:49-58/144-180/206-232/258+) �
 - 実装形: `lambda_forces_T_caseB := by by_contra` → (a)(b)(c) を **精密 sorried T-side producer 1 本**
   (「¬結論 ⟹ θ+ν-grid+TI」bundle) に隔離 → (d) を実証明。reconciled_typePData_T と同じ
   precise-reduction パターン。
+
+### ✅ 追記⁶ 実施 (2026-07-07 lane b) — (13.4) `lambda_forces_T_caseB` **本体組立 PROVEN** (bare sorry → typed gates 3 本)
+
+campaign (a)-(d) を実施、`lambda_forces_T_caseB` は **sorry-free 組立**になった (S15_SAndT_Setup、
+full build green 3934 jobs)。landed bricks (全て実証明):
+
+- `Hypothesis.P_le_centralizer_of_mem_H` — x ∈ H = PC ⟹ P ≤ C_G(x) (H abelian 経由)
+- `Hypothesis.eta_orthonormal` — η-grid 直交正規性 (tau3_isometry + omega_orthonormal)
+- `eta_cross_expansion_ne_zero` — endgame: ⟨λ°−δΣᵢη_is, θ°−δ'Σⱼη_rj⟩ = δδ' ≠ 0
+- `disjoint_conjugatesIntoSet_of_centralizer` — 共役非交差 core (abstract、gates 仮説化)
+- `inner_induce_induce_eq_zero_of_disjoint` — 非交差支持 ⟹ (α^τ, β^τ) = 0
+- 本体: α = λ − μ_{j₀} の H^#-支持 (H ⊴ S = `H_sharp_subgroupOf_normal` + 等次数) +
+  τ₁-additivity + (13.3.c) column formula で α^τ = λ° − δΣᵢη_{i1} に書換え → 矛盾。
+
+**残 gate 3 本 (typed sorry、S15 内 sorry 11→13 net +2 = bare→精密の交換)**:
+1. `QD_sharp_centralizer_le_T` — (13.2.e)-on-T: K^# = (QD)^# 点の中心化 ≤ T (A₀(T)-TI の
+   materialize。proven `Q_sharp_isTISubset` は D=⊥ 特殊形)
+2. `P_conj_forall_not_le_T` — p-part: P^w ≰ T (|P| = p^q > p = |T|_p; |Q| q-群性 =
+   reconciled_typePData_T 圏)
+3. `tSide_theta_package_of_not_caseB` — (13.3.b,c)-on-T char package (¬結論 ⟹ θ ∈ 𝒯 +
+   ν_r-row grid formula + η/λ° 直交)。**§9-on-T (9.8.c)/(9.9.a,c) + T-side τ₁T 意味論が実体**
+   — c の 9073 typeP_pair port / reconciled と同圏の T-side char 構造。
+
+⟹ S-side (13.10) chain (analyticEstimate_* 5 cite) と T-side d=1+v-full の唯一上流が
+bare 1 本から**構造 3 gate に精密化**され、うち 2 本 (TI/p-part) は group-theoretic
+(char 不要)。次: gate 2 本の group-theoretic 攻略 (Q_sharp_isTISubset の一般化 route) →
+gate 3 は §9-on-T の形式化計画とセット。
+
+### 🔓 9073 完結 (c、reconciled_typePData_T 完全 sorry-free) による gate unlock map (2026-07-07 lane b 調査)
+
+merge 700f92d4 で `reconciled_typePData_T` が sorry-free になり、(13.4) 残 gate の材料が大きく前進:
+
+- **gate 2 `P_conj_forall_not_le_T` は discharge 可能になった (route 確定)**:
+  `|Q| = q^p` は `card_Q_eq` (S15_SAndT:2241) / `Q_elementaryAbelian_T` (:1823、**proven**、内部で
+  Wielandt (9.3) order relation `|H| = |W₂|^|W₁|` を reconciled-setupT 経由で計算)。`p ∤ |V|` は
+  V⋊W₂ Frobenius (reconciled + `typeP_uW1_frobenius`、`centralizer_W2_inf_V_eq_bot` :1299 が
+  access パターンの実例) の kernel-complement 互素性。`|T| = |T'|·p` は `W2_isComplement_T_deriv`、
+  `|T'| = |Q|·|V|` は `Q_inf_V_eq_bot` + `T_deriv_eq_QV`。⟹ v_p(|T|) = 1 < q ⟹ P^w ≤ T 不可能。
+  **⚠ 設計注意**: この route は `hTTypeII : IsTypeII hyp.T` を要する (Q_elementaryAbelian_T /
+  card_Q_eq の前提、TypeIIData.common の V≠⊥ + Wielandt type-II branch)。だが
+  `lambda_forces_T_caseB` は現 signature に T-type hypothesis を持たない ((13.2.a)-on-T は
+  「T type II **or III**」)。選択肢: (i) gate 2/1 に hTTypeII を持たせ (13.4) にも threading
+  (5 cite site 修正、S16 は T_typeII proven 済で供給可)、(ii) type III branch でも同じ order
+  relation が成るか typeII_III_IV_order_relations .2 を確認して II∨III で閉じる。
+  **次 iteration の最初の設計判断**。
+- **gate 3 の router が実在**: `Q_elementaryAbelian_T` の証明が `setupT : TypesIIIIIIVSetup hyp.T`
+  を reconciled tpd から**インライン構築済み** (S15_SAndT:1837-1841)。これを def
+  `toTypesIIIIIIVSetupT` に抽出すれば §9 machinery ((9.8)/(9.9)、typeII_III_IV_order_relations
+  等) が T 側で cite 可能になる = θ-package ((13.3.b)-on-T) の形式化基盤。
+- gate 1 (A₀(T)-TI) は unlock 対象外 (TI は σ-structure の別系統、Q_sharp_isTISubset の
+  一般化 or A1_eq_sigmaSharp 系 route)。
+- 別途: S15_SAndT の reconciled-gated だった b-queue (`complement_inf_Q_structure`:3060 等) も
+  再点検対象 (V_inf:1887 は analytic chain 要で対象外のまま)。
