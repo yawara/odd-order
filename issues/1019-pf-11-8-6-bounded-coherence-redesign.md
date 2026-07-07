@@ -796,3 +796,37 @@ S07.Hypothesis 可変長化 (Coq-faithful) は不要につき起こさない。
 ### ⟹ 次 iteration = step 1 (base case) の CODE: SOf(H0Cprime) 版 degree-subfamily coherence
 S13 に `SOf_degreeSubfamily_isCoherent` (SOf(Y) の deg-d irr subfamily coherence) を build
 (update⁵³ の S12 版 mirror; witness 機構は coherent_SOf_HC の inducedKernelFamily パターン踏襲)。
+
+## 🔬 update⁵⁷ (2026-07-07 lane-a) — ★ base case LANDED + adjoin engine 在庫の再発見 (update⁵⁶ の missing 評価を訂正)
+
+### ✅ landed: `S13.SOf_degreeSubfamily_isCoherent` (sorry-free, axiom-clean, commit 97766644)
+(9.11) base case の SOf-world 版: SOf(Y) の deg-d 既約 subfamily coherence。SOf(Y) ⊆ inducedFamily
+(kernel-antitone + bot 同定) で S12 engine を ambient 発火 → isCoherent_of_subset で restrict。
+witness = ζ̄−ζ (conj 保存 + conjDiff support + no-real)。∃-witness は Prop-confined
+(Type-valued goal での obtain 不可 — S12:1112 と同じ罠を踏んで修正)。
+
+### ★ 在庫再発見 — update⁵⁶ の「missing piece (i)(ii)」は既に landed 済みだった
+- **(i) reducible adjoin engine = `xAdjoinStepW_k`** (S08_CoherenceWeighted:459、commit 577a0d69、
+  (6.8.3) reducible-break 用に構築済): break pair {χ,χ̄} が reducible column μ_j でよい (5.6)
+  weighted adjoin。break decomposition `Da : CharacterPsiDecomposition` をパラメータで受ける。
+- **(ii) μ_j R-datum producer = `certainTypeDecompositionDa`** (S06_CertainTypeCoherence:723) +
+  S12 bridge `toHypothesis46` (S12_Core:1088) + Ind-form recast `columnConstituentDecomposition`
+  (S08_CaseBCoherence2:1691)。
+- **chain fold**: `coherentOfPairChainCover` (S07) / `xChainCoherentW` (S08_CoherenceWeighted:786、
+  irreducible-pair 版 bundle — mixed chain は coherentOfPairChainCover 直使いで step ごとに
+  xAdjoinStepW / xAdjoinStepW_k を発火すれば新 engine 不要)。
+- **§9 counting 在庫 (S12_Section9Counts)**: `forall_sOf_H0Cprime_degree_qu_caseB` (caseB で
+  SOf(H0⊔C′) 全 member deg qu) / `muGrid_column_sum_mem_sOf_H0_and_reducible` /
+  `reducible_mem_inducedKernelFamily_eq_muGrid_columnSum` (reducible member = μ-column sum) /
+  `mkSection11CharacterData` (§10→§9 bridge)。
+
+### ⟹ (9.11) の残 = assembly そのもの (部品はほぼ完備)
+- **(A) caseB assembly** (Galois 対応枝、部品完備で着手可能): family 全 member deg qu →
+  irr-cut base (landed) + μ-column pairs を xAdjoinStepW_k で 1 対ずつ adjoin + chain fold。
+  必要入力: hex (deg-qu irr ∈ SOf(H0Cprime) の存在 witness、caseB (9.9) 系)、per-pair の
+  hDeg (2·qu·anchor < Σ deg²/mc、uniform-qu family で計算可)、hgen (span generation)、
+  Da instantiation (toHypothesis46 経由)。
+- **(B) caseA assembly** (non-Galois、(9.11.1)-(9.11.8)): deg-qa counting ((9.8)(d) lb_Sqa の
+  Lean 対応要確認) + norm-chain squeeze (S07_Subcoherent 在庫) + S3 enumeration。
+次 iteration = **(A) caseB assembly に着手** (hex witness 供給 → family 分解 → 1-pair adjoin
+instantiation の順)。
