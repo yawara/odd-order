@@ -2339,3 +2339,28 @@ leaf で build、但し lane-a active §9 と dup 注意)。C context 枯渇ゆ�
    force-engage (σ§9/§5/§11 char body) は 7-agent 監査が診断した stall の再発。**⟹ C は preserved cite-sink
    維持が hub-aligned な正解**。carrier (b の BG §15/§16 → C の d=1/v-value/coherence) landing で cite-assembly
    再起動。ユーザーが C を明示再開したため状態を報告し方向指示を仰ぐ (allocation override は lane-c 権限外)。
+
+### cont.⁷⁷ (2026-07-07 lane c 再開、ユーザー裁可) — 🎯 (13.15) numeric-elimination engine LANDED (S16_CaseBOrder, sorry-free)
+
+ユーザー C 明示再開 → 精密 trace で v-value の root gate を確定し、ungated 部分を engine 化。
+
+**精密 root-cause trace (今回確定、hub FOLD 判定を code-level 追認 + 精緻化)**:
+`v-value (T_side_caseB_facts.2, 13.15) → (13.12) c=1/d=1 (analytic ineq を u-only 形にするのに必須) →
+`c_eq_one` → `c_eq_one_final_case` → `pc_le_maxNilpotentNormalHall` (S15:8140, **bare sorry**,
+docstring「typeP_Galois-gated」) → typeP_Galois (issue 9000)`。**V-abelian (T_not_isTypeIV) と同根**。
+S-side `caseB_order_u` (S15:8390) も bare sorry — (13.15) exact 値は**両側とも未形式化**、b proven lemma の
+dup でなく fresh。
+
+**landing (新 c-owned leaf `OddOrder/Peterfalvi/S16_CaseBOrder.lean`, full build green, sorry-free)**:
+- `caseB_order_x_absurd_of_ge` = (13.15) の `x≥2q+1` elimination。`c_eq_one_forces_params` と同型
+  (analytic ineq + m-bounds → q=3 → p∈{5,7}) + **純算術 endgame** (`x∣(p²+p+1)∈{31,57}`, u≠1, q∤u) =
+  **structural residual なし** (13.12 と違い pc_le sorry を要さない)。
+- `caseB_order_u_full_of_not_modEq` = 非-(p≡1 mod q) → `u=(p^q−1)/(p−1)`。(13.14) divisor-congruence
+  (proven) で x≡1 mod q + x odd ⟹ x=1。
+- char/σ 入力 (m-value 13.9・analytic ineq 13.10 with c=1・13.11.c) は**全て仮説パラメータ** ⟹ engine ungated
+  (gated-endpoint skeleton)。T-side v-value = **p↔q instance + q≢1 mod p** で `caseB_order_u_full_of_not_modEq`
+  に直結、caller が analytic ineq を供給 (→ 9000 bottom-out)。
+
+**残 = 9000 landing 待ちの caller wiring** (S16 T-side v-value instantiation + S15 caseB_order_u)。
+9000 (typeP_Galois, d claim/a-dup) = multi-consumer root gate (v-value + V-abelian + (10.7)/(10.8) + S/T
+frobenius)。allocation は hub/ユーザー事項。詳細 = issue 9013 追記⁴。

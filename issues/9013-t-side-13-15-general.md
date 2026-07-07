@@ -150,3 +150,32 @@ c の S16 領域枯渇で **c を DORMANT cite-sink 化** (正本 = ft_lane_real
 帰属を確定: **W2_le / centralizer_W1 = lane-b** (§15-16 T-side W-factor σ-structure、9017 と連動)、**§13 v-value
 lower-bound export (案 A) = lane-b**。これらが landing すれば **c が reactivation trigger で自動再開**し S16 の
 `reconciled_typePData_T` 残 field + T-side cascade を assemble。c は本 issue で新規 build しない (b 待ち)。
+
+## 🟢 追記⁴ (2026-07-07 lane c, ユーザー裁可「(13.15) numeric engine を build + 9000 flag」) — engine LANDED
+
+ユーザーが C 明示再開 → v-value の精密 trace で **v-value → (13.15) → (13.12) c=1/d=1 →
+`pc_le_maxNilpotentNormalHall` (bare sorry) → typeP_Galois (issue 9000)** を確定 (V-abelian と同根)。
+S-side `caseB_order_u` (13.15) も bare sorry (両側とも (13.15) exact 値は未形式化) で、b の proven lemma の
+dup でなく fresh formalization。ユーザー裁可に従い **genuine・ungated・非-dup な (13.15) numeric-elimination
+engine を新 c-owned leaf `OddOrder/Peterfalvi/S16_CaseBOrder.lean` に実証明** (sorry-free, build green):
+
+- **`caseB_order_x_absurd_of_ge`**: cofactor `x ≥ 2q+1` は不可能。`c_eq_one_forces_params` (13.12) と
+  同型 (analytic ineq (13.10) + (13.11) m-bounds → q=3 → p∈{5,7}) だが **endgame は純算術** —
+  `x ∣ (p²+p+1) ∈ {31,57}` with `u≠1`, `q∤u`。**structural residual なし** (13.12 と対照的、後者は
+  `pc_le_maxNilpotentNormalHall` = typeP_Galois gated)。
+- **`caseB_order_u_full_of_not_modEq`**: 非-(p≡1 mod q) branch → `u = (p^q−1)/(p−1)`。(13.14)
+  divisor-congruence (`cyclotomic_quotient_dvd_modEq_one_of_not_modEq_one` = proven) で `x≡1 mod q`,
+  x odd ⟹ x=1。
+- `cyclotomic_quotient_three` helper ((p³−1)/(p−1)=p²+p+1)。
+
+**char/σ-theory 入力は全て仮説パラメータ**: m-value (13.9)・analytic ineq (13.10) with c=1/d=1・
+(13.11.c) bound は engine の hypothesis (gated-endpoint skeleton pattern)。⟹ **engine は ungated**。
+T-side v-value `v=(q^p−1)/(q−1)` (14.4) は **p↔q instance + `q≢1 mod p`** で `caseB_order_u_full_of_not_modEq`
+に直結 (caller が analytic ineq を供給、それが 9000 に bottom-out)。
+
+**⚠ 9000 FLAG (ユーザー裁可の「9000 flag」部分)**: v-value + V-abelian (T_not_isTypeIV) + a の (10.7)/(10.8)
++ S/T frobenius kernel が **全て typeP_Galois (issue 9000, d claim 済・a と dup 履歴の deep σ-theory
+= semilinear/near-field dichotomy Pf 9.7) に収束** = multi-consumer root gate。9000 が landing すれば
+本 engine を cite して v-value + caseB_order_u 両側が閉じる。9000 の allocation (d claim vs a-dup vs 優先度)
+は hub/ユーザーの cross-lane 判断事項。**c は本 engine で (13.15) の ungated 部分を前倒し完了**、9000 landing
+待ちで caller wiring (S16 T-side + S15 caseB_order_u instantiation) を assemble。

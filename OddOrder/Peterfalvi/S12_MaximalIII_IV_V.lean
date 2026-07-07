@@ -3800,14 +3800,80 @@ theorem Hypothesis.muGrid_column_sum_apply_one_eq_qu [Finite G]
     (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i k) hmem hred
 
 open scoped FiniteInduce in
+/-- **Peterfalvi (9.5)/(4.5.b): a reducible `S = inducedFamily M`-member is a nonzero μ-column.**
+For `y = Ind_{M'}^M θ ∈ inducedFamily M` (`θ ∈ Irr(M')`, `θ ≠ 1`) with `Ind_{M'}^M θ` *reducible*,
+there is a column index `k ≠ 0` with `y = ∑ᵢ μ_{ik}`.
+
+This is the (9.5)/(11.5) family identification, closed via the §6 residue theory rather than a
+prime-TI port.  Since `M' = HU = h.K` (`toCertainTypeHypothesis`), `θ` is an irreducible of `K`, and
+the (4.5.b) reducibility criterion `induce_not_isIrreducible_iff` forces `θ = chiRestrict χ₂` (a
+column `χ_j`, via the inertia computation `I_L(χ) = K`).  Then `induce_restrict_certainType_eq`
+identifies `Ind_K^M (chiRestrict χ₂) = ∑ᵢ μ_{ik}` (the μ-grid column), where `k` is the column of
+`χ₂`; `θ ≠ 1` excludes the trivial column (`chiRestrict_one_eq_trivial`, `finCardEquivCharacterGroup`
+sends `0` to `1`), giving `k ≠ 0`. -/
+theorem Hypothesis.exists_muGrid_column_eq_of_inducedFamily_reducible [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G))
+    {y : ClassFunction ↥M ℂ} (hyS : y ∈ inducedFamily M)
+    (hred : ¬ IsIrreducibleCharacter y) :
+    ∃ k : Fin hyp.w2, k ≠ 0 ∧ y = ∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k := by
+  haveI := hyp.finiteG
+  classical
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  -- `y = Ind_{h.K} θ` (`h.K = M'` defeq), `θ ≠ 1`.
+  obtain ⟨θ, hθne, hyeq⟩ := hyS
+  rw [hyeq] at hred
+  -- (4.5.b) reducibility criterion: `θ = chiRestrict χ₂` for some column `χ₂`.
+  obtain ⟨χ₂, hχ₂⟩ := (h.induce_not_isIrreducible_iff θ).mp hred
+  -- the column index of `χ₂`.
+  set k : Fin hyp.w2 := finCongr hcardW2sub ((finCardEquivCharacterGroup _).symm χ₂) with hkdef
+  have hχ₂k : finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm k) = χ₂ := by
+    have hkk : finCongr hcardW2sub.symm k = (finCardEquivCharacterGroup _).symm χ₂ := by
+      rw [hkdef]; ext; simp
+    rw [hkk, Equiv.apply_symm_apply]
+  refine ⟨k, ?_, ?_⟩
+  · -- `k ≠ 0`: else `χ₂ = 1` and `θ = chiRestrict 1 = 1`, contradicting `θ ≠ 1`.
+    intro hk0
+    apply hθne
+    have hχ₂1 : χ₂ = 1 := by
+      rw [← hχ₂k, hk0]
+      have h0 : finCongr hcardW2sub.symm (0 : Fin hyp.w2) = 0 := by ext; simp
+      rw [h0, finCardEquivCharacterGroup_zero]
+    rw [← hχ₂, hχ₂1]
+    -- `chiRestrict 1 = trivial ↥h.K`, defeq to `trivial ↥M'`.
+    exact h.chiRestrict_one_eq_trivial
+  · -- `y = ∑ᵢ μ_{ik}` via `Ind_K^M (chiRestrict χ₂) = ∑ᵢ μ_{ik}`.
+    have h2 : (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k)
+        = ClassFunction.induce h.K (h.chiRestrict χ₂ : ClassFunction ↥h.K ℂ) := by
+      rw [h.coe_chiRestrict, h.induce_restrict_certainType_eq,
+        ← Equiv.sum_comp (finCongr hcardW1.symm)
+          (fun i' => ((h.columnFamily χ₂).mu i' : ClassFunction ↥M ℂ))]
+      refine Finset.sum_congr rfl (fun i _ => ?_)
+      rw [show hyp.muGrid hG hodd i k
+        = ((h.columnFamily (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm k))).mu
+            (finCongr hcardW1.symm i) : ClassFunction ↥M ℂ) from by unfold Hypothesis.muGrid; rfl,
+        hχ₂k]
+    -- `y = Ind_{M'} θ = Ind_{h.K} (chiRestrict χ₂) = ∑ᵢ μ_{ik}` (last `induce` step defeq via `M' = h.K`).
+    rw [h2, hχ₂]
+    exact hyeq
+
+open scoped FiniteInduce in
 /-- **Reducible members of `S = inducedFamily M` have degree `q·u = qu`** — the reducible-side of the
-(11.8.1) uniform-degree structure of `𝒮₂ = Sset \ SHCSet`.  Once a reducible `inducedFamily`-member
-is shown to lie in `𝒮(H₀) = sOf ... chief.H0`, `reducible_mem_sOf_H0_apply_one_eq_qu` gives degree
-`q·u`.  The `sOf`-membership is the **one §9/(11.5)-gated obligation** (the family identification:
-reducible `inducedFamily`-members = reducible `𝒮(H₀)`-members = the μ-columns; `sSet = 𝒳-family
-⊊ inducedFamily`, so this needs the (9.5)/(11.5) `𝒳 ↔ non-trivial-irr` bridge, repo-absent — a
-correctly-typed obligation, NOT a vacuous hoist).  With this, `𝒮₂`'s degree reduces to its
-irreducible-side (the (9.8)/(9.9) irreducible-degree completeness), the remaining world-bridge gap. -/
+(11.8.1) uniform-degree structure of `𝒮₂ = Sset \ SHCSet`.  A reducible `inducedFamily`-member is a
+nonzero μ-column (`exists_muGrid_column_eq_of_inducedFamily_reducible`, the (9.5)/(4.5.b) family
+identification), which lies in `𝒮(H₀) = sOf ... chief.H0` (`muGrid_column_sum_mem_sOf_H0_and_reducible`);
+then `reducible_mem_sOf_H0_apply_one_eq_qu` gives degree `q·u`. -/
 theorem Hypothesis.inducedFamily_reducible_apply_one_eq_qu [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     (htype : IsTypeIII M ∨ IsTypeIV M) (hnt : TypePNontrivialCore M hyp.typeP)
@@ -3817,21 +3883,34 @@ theorem Hypothesis.inducedFamily_reducible_apply_one_eq_qu [Finite G]
         (hyp.mkSection11CharacterData (hyp.toTypesIIIIIIVSetup htype hnt) chief).u : ℕ) : ℂ) := by
   haveI := hyp.finiteG
   have hmem : y ∈ OddOrder.Peterfalvi.S11.sOf (hyp.toTypesIIIIIIVSetup htype hnt) chief.H0 := by
-    -- (9.5)/(11.5) family identification: a reducible `inducedFamily`-member lies in `𝒮(H₀)`.
-    -- (`sSet = 𝒳-family ⊊ inducedFamily`; reducible members are the μ-columns ∈ `𝒮(H₀)`.)
-    sorry
+    -- (9.5)/(4.5.b) family identification: the reducible `inducedFamily`-member is a nonzero
+    -- μ-column (`exists_muGrid_column_eq_of_inducedFamily_reducible`), which lies in `𝒮(H₀)`.
+    obtain ⟨k, hk, hyk⟩ :=
+      hyp.exists_muGrid_column_eq_of_inducedFamily_reducible hG hG.odd hyS hred
+    rw [hyk]
+    exact (hyp.muGrid_column_sum_mem_sOf_H0_and_reducible hG htype hnt chief k hk).1
   exact reducible_mem_sOf_H0_apply_one_eq_qu hG
     (hyp.mkSection11CharacterData (hyp.toTypesIIIIIIVSetup htype hnt) chief) y hmem hred
 
 open scoped FiniteInduce in
-/-- **(11.8.1) uniform degree of `𝒮₂ = Sset \ SHCSet`** (the `hS2deg` input of the (11.8.6)
-generation `hgen_of_S2_uniform_degree`): every member has degree `q·u = qu`.  Split by reducibility:
-* **reducible** members → `inducedFamily_reducible_apply_one_eq_qu` (reduces to the (9.5)/(11.5)
-  `reducible → 𝒮(H₀)` inclusion);
-* **irreducible** members are `∉ SHCSet ⟹ degree ≠ w₁`, so the (9.8)/(9.9) irreducible-degree
-  completeness gives degree `qu` (irr `inducedFamily`-members of degree `≠ w₁` have degree `qu` —
-  the remaining §9 obligation, sorried).
-This assembles the world-bridge's degree claim, reducing it to the two §9 inclusions. -/
+/-- ⚠️ **OVER-STRONG — this uniform-degree statement is FALSE for non-Galois type III/IV; do NOT
+build new work on it or attempt to close its remaining `sorry`.**  See **issue 1019** and
+`notes/peterfalvi/s13_11_8_orthogonality.md` update³⁷.
+
+The claim "`∀ y ∈ Sset \ SHCSet, y(1) = qu`" (`Sset = inducedFamily M`) requires the whole non-`SHCSet`
+part of `S = S_1` to have the single degree `qu`.  But in the **non-Galois** case Peterfalvi (9.8)
+(Coq `typeP_nonGalois_characters`, PFsection9.v:845–855) produces irreducibles of degree `q·a` with
+`a := |U : C_U(·)| > 1` and `q·a ≠ q·u` (the parameters `u = |Ū|` and `a` genuinely differ); these lie
+in `inducedFamily M \ SHCSet` with degree `≠ qu`, so the irreducible-side below is **not provable**.
+The correct mechanism (Coq PFsection11.v:104/206) treats `S_1` as merely `subcoherent` and extends
+coherence from the smaller `S(H₀C)` via `bounded_seqIndD_coherence` (Pf (6.x)) — **no uniform degree**.
+This lemma (and its consumer `hgen_of_S2_uniform_degree`, hence the `hgen` bullet of
+`coherent_Sset_of_column_identities`) is the deprecated uniform-degree route; it is to be replaced by
+the bounded-coherence redesign (issue 1019).
+
+**The reducible half is genuinely true** and stays sorry-free
+(`inducedFamily_reducible_apply_one_eq_qu`: reducible members ARE the degree-`qu` μ-columns); only the
+irreducible half is the false over-statement. -/
 theorem Hypothesis.Sset_diff_SHCSet_apply_one_eq_qu [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     (htype : IsTypeIII M ∨ IsTypeIV M) (hnt : TypePNontrivialCore M hyp.typeP)
@@ -3841,8 +3920,9 @@ theorem Hypothesis.Sset_diff_SHCSet_apply_one_eq_qu [Finite G]
         (hyp.mkSection11CharacterData (hyp.toTypesIIIIIIVSetup htype hnt) chief).u : ℕ) : ℂ) := by
   haveI := hyp.finiteG
   by_cases hirr : IsIrreducibleCharacter y
-  · -- irreducible ∈ `Sset \ SHCSet` ⟹ degree ≠ w₁ (else `y ∈ SHCSet`); the (9.8)/(9.9)
-    -- irreducible-degree completeness gives degree `qu`.
+  · -- ⚠️ FALSE branch (issue 1019): an irreducible `y ∈ Sset \ SHCSet` of degree `≠ w₁` need NOT have
+    -- degree `qu` — in the non-Galois case (9.8)(d) it can have degree `q·a` (`a > 1`, `q·a ≠ q·u`).
+    -- This `sorry` is unclosable; the (11.8.6) coherence must instead use `bounded_seqIndD_coherence`.
     sorry
   · exact hyp.inducedFamily_reducible_apply_one_eq_qu hG htype hnt chief hy.1 hirr
 
@@ -3950,7 +4030,14 @@ theorem Hypothesis.Sset_eq_SHCSet_union_diff [Finite G] {M : Subgroup G} (hyp : 
   (Set.union_diff_cancel hyp.SHCSet_subset_Sset).symm
 
 open scoped FiniteInduce in
-/-- **Peterfalvi (11.8.6) prerequisite: `S₂ = S(C) − S(HC)` is coherent** (the `hY` gluing input;
+/-- ⚠️ **Over-broad family, part of the uniform-degree route (issue 1019).**  Here `S₂` is taken as
+`hyp.Sset \ hyp.SHCSet = inducedFamily M \ S(HC) = S_1 \ S(HC)`, but Peterfalvi's `S₂` is the narrower
+`S(C) \ S(HC)` (with the `C`-kernel condition).  The coherence of the full `S_1 \ S(HC)` is not a
+standalone fact — in Coq `S_1` is merely `subcoherent`, and its coherence is *derived* from `S(H₀C)`
+coherence via `bounded_seqIndD_coherence`.  This obligation should be re-scoped in the redesign
+(narrow to `S(C)` / `S(H₀C)`, then extend via bounded coherence).
+
+**Peterfalvi (11.8.6) prerequisite: `S₂ = S(C) − S(HC)` is coherent** (the `hY` gluing input;
 §9/§14-gated, named obligation).
 
 This is Peterfalvi's "By (9.11), `𝒮(H₀C') − 𝒮(HC')` is coherent, whence `𝒮₂` is coherent by (11.7)"
@@ -4085,7 +4172,15 @@ theorem Hypothesis.Sset_diff_zSpan_vanish_support [Finite G] {M : Subgroup G}
       exact (ClassFunction.support_smul_subset _ _).trans hx
 
 open scoped FiniteInduce in
-/-- **(11.8.6) generation `hgen`** — the ungated degree-0 sublattice generation, given `S₂` has
+/-- ⚠️ **Deprecated uniform-degree route (issue 1019).**  This lemma is true *as stated* (it is
+conditional on `hS2deg`), but its hypothesis `hS2deg` = "`S₂ = Sset \ SHCSet` has uniform degree `qu`"
+is **`Sset_diff_SHCSet_apply_one_eq_qu`, which is FALSE for non-Galois type III/IV** (degree-`qa`
+irreducibles, `qa ≠ qu`).  So this generator can only be *applied* in the Galois case and is part of
+the deprecated uniform-degree strategy; the (11.8.6) redesign replaces it with the Coq route
+`bounded_seqIndD_coherence` (Pf (6.x)).  Kept for now because the reducible-side degree fact it
+relies on is genuine; do not build new consumers on the `hS2deg` interface.
+
+**(11.8.6) generation `hgen`** — the ungated degree-0 sublattice generation, given `S₂` has
 uniform degree `qu = d·w₁` (the (11.8.1) reducible degree, §9-gated hypothesis `hS2deg`) with a
 witness column `ψ₀`.  Peterfalvi (6.8.1) generation for the (11.8.6) union: the degree-0 sublattice
 of `ℤ[S₁ ∪ S₂]` is generated by the supported sublattices `ℤ[S₁,A₀]`, `ℤ[S₂,A₀]` and the single
@@ -4162,7 +4257,15 @@ theorem Hypothesis.hgen_of_S2_uniform_degree [Finite G] {M : Subgroup G}
   · exact Submodule.smul_mem _ _ (Submodule.subset_span (Set.mem_union_right _ hD))
 
 open scoped FiniteInduce in
-/-- **Peterfalvi (11.8.6), the τ₂ union-coherence** (the deep capstone step, named obligation).
+/-- ⚠️ **Its `hgen` bullet is on the deprecated uniform-degree route (issue 1019).**  That bullet
+cites `Sset_diff_SHCSet_apply_one_eq_qu`, whose irreducible half is FALSE for non-Galois type III/IV,
+so the capstone cannot be completed as designed.  The target (coherence of `inducedFamily M = S_1`,
+contradicting (10.8)) is correct, but the route must be rebuilt via `bounded_seqIndD_coherence`
+(Pf (6.x), Coq PFsection11.v:206): establish coherence of the smaller `S(H₀C)` and *extend* it to
+`S_1` by the nilpotency/size bound — no uniform degree.  The `ν`-glue, `hmixed`/`hDτ` scaffolding and
+the `hgen` algebra are reusable pieces of the redesign; the uniform-degree `hS2deg` input is not.
+
+**Peterfalvi (11.8.6), the τ₂ union-coherence** (the deep capstone step, named obligation).
 From the column identities `(μ_j − dζ)^τ = ∑_i ω_{ij}^σ − dζ^{τ₁}` (`0 < j`, all rows; `τ₁ = coh`),
 the whole family `S = S(C) = inducedFamily M` is coherent.  Peterfalvi's argument: `S₂ = S(C) − S(HC)`
 is coherent (`τ₂`) by (11.7)/(9.11) (`coherent_Sset_diff_SHCSet`); the column identities give
