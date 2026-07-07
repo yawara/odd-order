@@ -914,3 +914,28 @@ hagree 引数。imageFamily = certainTypeR transport (image_eq 差し替え)。
   (2·qu·anchor < Σdeg²/mc) の counting、④ hgen (span generation)。
 次 iteration = ① の在庫確認 (toHypothesis46 の中身、CaseBCoherence2 の bridge 実装) →
 mixed-corner 1-pair adjoin instantiation。
+
+## 🔬 update⁶¹ (2026-07-07 lane-a /loop) — ★ instantiation work ② COMPLETE: μ-column coherence が hyp.tau/A₀(M) interface で landed
+
+### ✅ landed 本 iteration (S13, 全 sorry-free / axiom-clean)
+- **`isCoherent_of_supportedSpan_le`** (commit b8584ac5): support 変更版 restriction
+  (ℤ[S,A₂] ⊆ ℤ[S,A₁] なら同一 extension で transport)。
+- **`certainTypeSet_isCoherent_A0`** (commit 5d2c6b22): `IsCoherent hyp.tau
+  (certainTypeSet (hyp.toHypothesis46 hG hodd) k) hyp.A0` — **update⁶⁰ の instantiation work ②
+  が完了**。2 つの seam が予想以上に軽かった:
+  - **τ seam = defeq 消滅**: `toHypothesis46` の `dade0 := hyp.dadeData.dade` /
+    `tau := ….fullDadeIsometryData hyp.hconj` は `S12.Hypothesis.tau` (S12_Core:404) の構成要素
+    そのもの → `certainType_isCoherent` が `IsCoherent hyp.tau …` として**直接型付け成功**
+    (congrMap 不要; SibleyDade 側の hmapagree パターンより単純)。
+  - **support seam A(M)→A₀(M)**: μ_j は A(M)∪{1} 外で消える (columnSum_support_subset →
+    supportedSubmodule 論法で ℤ[𝒯] へ) + 1∉A₀ (one_notMem_A0) ⟹ ℤ[𝒯,A₀] ⊆ ℤ[𝒯,A(M)]。
+    witness = certainType_nonzero の μ_{k⁻¹}−μ_k (A⊆A₀ mono)。
+
+### ⟹ 残 instantiation work = ① family 同定が両 corner の共通 prerequisite
+- **① certainTypeSet ↔ §9 sOf(H0Cprime) の μ-part**: sOf(H0Cprime) の reducible member =
+  μ-column sum (S12_Section9Counts `reducible_mem_inducedKernelFamily_eq_muGrid_columnSum` が
+  muGrid 形で保持) — **S12.muGrid columnSum ↔ S06.columnSum (toHypothesis46) の同定**が核。
+  muGrid の定義が toHypothesis46 の columnFamily 経由なら defeq 級 (要確認)。
+- all-reducible corner: 同定① → `isCoherent_of_subset` で closed (3 段完成)。
+- mixed corner: irr-cut base + xAdjoinStepW_k adjoin (③ hDeg counting / ④ hgen が per-pair 入力)。
+次 iteration = ① muGrid ↔ S06 columnSum の定義 trace → 同定 lemma。
