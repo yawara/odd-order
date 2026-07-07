@@ -5240,6 +5240,61 @@ theorem Hypothesis.toTypesIIIIIIVSetupT_H_eq [Finite G]
   show (reconciled_typePData_T hG hyp).choose.H = hyp.Q
   rw [(reconciled_typePData_T hG hyp).choose.H_eq, hyp.Q_eq_TF]
 
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+/-- **§9 character data on `T`** (the T-mirror of `mkSection11CharacterDataS`, over the
+`toTypesIIIIIIVSetupT` router; issue 9013 gate 3): `u = |V̄|` is rfl-pinned to the `V`-action
+image on the chief factor of `Q`; `tau := hyp.tauT`; `H0CprimeSupport := ∅` and
+`quotientSemidirectFrobenius := True` are the same documented count/degree-only placeholders as
+the `S`-instance (NOT for coherence consumption).  Opens the §9 (9.8)/(9.9) counts — in
+particular the (13.3.b) dichotomy glue `caseB_of_no_irreducible_sOf_H0Cprime` — on `T`. -/
+noncomputable def Hypothesis.mkSection11CharacterDataT [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1)
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd)) :
+    OddOrder.Peterfalvi.S11.Section11CharacterData (hyp.toTypesIIIIIIVSetupT hG hvd) chief where
+  u := Nat.card ↥(((quotientMulAutHom (N := chief.N) chief.N_aInvariant).comp
+      (((hyp.toTypesIIIIIIVSetupT hG hvd).typeP.U.subgroupOf
+        ((hyp.toTypesIIIIIIVSetupT hG hvd).typeP.U
+          ⊔ (hyp.toTypesIIIIIIVSetupT hG hvd).typeP.W1)).subtype)).range)
+  u_eq_card_quotient := rfl
+  H0CprimeSupport := ∅
+  tau := hyp.tauT
+  quotientSemidirectFrobenius := True
+
+/-- **Peterfalvi (13.3.b), dichotomy glue** (§9-generic, issue 9013 gate 3): if the §9 family
+`𝒮(H₀C')` contains **no** irreducible character, then case (9.7.b) holds
+(a `CliffordCaseBData` — carrying the Singer facts `Ū` cyclic, `u ∣ (p^q−1)/(p−1)`, irreducible
+action), with `C = ⊥` and the full value `u = (p^q − 1)/(p − 1)`.
+
+Assembly of the sorry-free §9 endpoints: `clifford_dichotomy` splits into the two Clifford cases;
+in case (a) the (9.8.c) witness (`caseA_character_counts` conjunct (c)) is an irreducible member
+of `𝒮(H₀C) ⊆ 𝒮(H₀C')` (`sOf_antitone`, `C' ≤ C`) — contradicting the hypothesis; in case (b) the
+(9.9.c) conjunct (d) of `caseB_character_counts` delivers both values.  This is the C=1/u-full
+half of (13.3.b); the "case (9.7.b) holds"半 is the returned `CliffordCaseBData` itself.  Stated
+generically over `M` so both the `S`- and `T`-instances (via `toTypesIIIIIIVSetupS` /
+`toTypesIIIIIIVSetupT`) can cite it — the T-instance is the (13.4) θ-package's (13.3.b)-on-`T`
+input (contrapositive form). -/
+theorem caseB_of_no_irreducible_sOf_H0Cprime [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup M}
+    {chief : OddOrder.Peterfalvi.S11.ChiefFactorData data}
+    (chars : OddOrder.Peterfalvi.S11.Section11CharacterData data chief)
+    (hno : ¬ ∃ χ ∈ chars.SOf (chief.H0 ⊔ chars.Cprime),
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter χ) :
+    ∃ _caseB : OddOrder.Peterfalvi.S11.CliffordCaseBData chars,
+      chars.C = ⊥ ∧ chars.u = (chief.p ^ data.q - 1) / (chief.p - 1) := by
+  rcases OddOrder.Peterfalvi.S11.clifford_dichotomy hG chars with hA | hB
+  · exfalso
+    obtain ⟨caseA⟩ := hA
+    obtain ⟨-, -, ⟨χ, hχmem, hχirr, -⟩, -⟩ :=
+      OddOrder.Peterfalvi.S11.caseA_character_counts hG chars caseA
+    exact hno ⟨χ,
+      OddOrder.Peterfalvi.S11.sOf_antitone data
+        (sup_le_sup_left chars.Cprime_le_C chief.H0) hχmem, hχirr⟩
+  · obtain ⟨caseB⟩ := hB
+    exact ⟨caseB,
+      (OddOrder.Peterfalvi.S11.caseB_character_counts hG chars caseB).2.2.2 hno⟩
+
 /-- **`q ∤ |H|`** — the order-theoretic core of the `(H^#)^G ∩ (Q^#)^G = ∅` disjointness:
 `H = PC ≤ S' = PU` has order dividing `|P|·|U|` (`derived_complement`), `q ∤ |P| = p^q`
 (`p ≠ q`), and `q ∤ |U|` (the `U W₁` Frobenius structure has coprime kernel and complement,
