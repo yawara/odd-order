@@ -192,9 +192,19 @@ case-A では: reducible → `caseA_reducible_induceHU_apply_one_eq_qu` (S11:130
   honest §9 obligation として correct-signature で cite/prove。
 - **Route 2 (却下)**: Coq の per-ζ core-coherence route (uniform-degree 回避)。両ケースで確実だが
   glue 機構の major rewrite で現投資を破棄 → narrow-族が sound な今は不要。
-- subagent は「case-A で S(H₀C) は caseB でのみ uniform と proven」と caution したが、これは **proof-
-  availability の話** (caseB_degree_qu のみ proven) で、**数学的には qa 除外ゆえ両ケース uniform** (verdict②)。
-  ∴ Route 1 の narrow uniform-degree は unsound でない (偽 wide とは異なる)。
+- ⚠ **訂正 (caseA_character_counts 精査)**: 上で「数学的に qa 除外ゆえ両ケース uniform」と書いたのは
+  **過剰主張**。`caseA_character_counts` (S11:13898) は case-A で SOf(H0C) の (b) reducible=qu + (c)
+  **∃**-irreducible=qu のみ与え、(d) qa 既約は **larger 𝒮(H₀U')** に置く。**`∀ φ∈SOf(H0C) irr, deg qu`
+  は無い**。qa-source は U' を kill するが「C (⊋U') を kill するか」= C-族 SOf(H0C) に qa が入るかは
+  **未形式化・真偽未確定** (deep §9)。∴ **Route 1 の narrow uniform-degree は「qa が C を kill しない」
+  という未証明命題に依存** — 真なら §9 obligation、偽なら narrow 族でも false-hoist。Coq が S2 に
+  uniform-degree を使わず core-coherence を使う事実がこの不確実性と整合。
+- ⟹ **修正した進め方**: Route 1 の uniform-degree に commit せず、**route-independent で sound な piece
+  を先に**: ① `S(HC)` coherence = (5.7) `SHC_isCoherent` (landed) ② `sOf(H0C)` coherence = (9.11)
+  `coherent_H0C_commutator` (core-coherence, carrier obstruction 別途) ③ world-bridge 分解
+  `S13.SOf(H0C) = SHCSet ⊔ sOf(H0C)` (★ enabler = `huSub_eq_derivedInG_subgroupOf` S11:1505 で
+  HU=M' 確定 → sOf⊆SOf の induce-transport が tractable)。case-A uniform-qu の真偽は並行して §9 で解決
+  (それが真なら Route 1 の generation、偽なら Coq per-ζ / core-coherence generation)。
 
 ### ⑤ 訂正後の実装 sequence (deeper than 1-2 session; multi-part)
 1. **case-A/B ∀-uniform-qu on `sOf(H0C)`** (S11): case-split (`CliffordCaseAData`∨`CliffordCaseBData`
