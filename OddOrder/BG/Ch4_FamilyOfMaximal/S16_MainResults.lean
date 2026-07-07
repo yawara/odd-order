@@ -2124,22 +2124,69 @@ have the TI and support properties used by the downstream character-theory inter
 This is a separate Peterfalvi-facing slice, not a replacement for BG Theorem E; the
 full local counting/partition statement is `theoremE_sigma_partition_and_counting`.
 
-⚠ **UNDERSPECIFIED — do not prove as-is.**  Like `theoremA_maximal_structure`, this omits `U ≤ M`
-and the `(κ∪σ)′`-Hall hypothesis on `U`, so conjuncts 2–3 (involving `A(M) = ASet M U`) are not
-forced (for a free `U`, `A(M)` can contain `κ`-elements).  A faithful version adds `hUM : U ≤ M` and
-`hU : IsHallSubgroup ((κ∪σ)′) (U.subgroupOf M)`; then all three are provable: conjunct 1 (zTilde TI)
-from `typeP_duality` (type-`F`: `K = ⊥`, `zTilde = ∅`); conjunct 2 (`A_0(M)−A(M)` TI) from
-`theoremC_paired_structure`; conjunct 3 (`Supports = A(M) ⊆ 𝒞_G(zTilde ∪ A_0(M))`) reduces to
-`A(M) ⊆ A_0(M)` — `A(M)`-elements are `κ(M)′`-elements (`mem_U_sup_Msigma_iff_isPiElement_kappa_compl`),
-hence not conjugate to the `κ(M)`-elements of `K#`, so they avoid `𝒞_G(K#)`. -/
+**Faithfully restated (2026-07-07, issue 0098 b-task, post Cor 15.9).**  The prior form omitted `U ≤ M`
+and the `(κ∪σ)′`-Hall hypothesis on `U`, so conjuncts 2–3 were not forced (a free `U` lets `A(M)`
+contain `κ`-elements) and it stood as a `sorry` placeholder.  This type-`P` (`K ≠ ⊥`) version adds
+`hKM`/`hUM`/`hU`, and all three are proved: conjuncts 1 (`zTilde` TI) and 2 (`A_0(M)−A(M)` TI) are the
+matching conjuncts of `theoremC_paired_structure` (via the paired partner `M*`); conjunct 3
+(`Supports = A(M) ⊆ 𝒞_G(zTilde ∪ A_0(M))`) reduces to `A(M) ⊆ A_0(M)` — an `A(M)`-element `y ∈ U ⊔ M_σ`
+is a `κ(M)′`-element (`mem_U_sup_Msigma_iff_isPiElement_kappa_compl`), while `𝒞_G(K#)`-elements are
+`κ(M)`-elements (`K` a `κ`-Hall, `isPiElement_conj`); a nonidentity element cannot be both. -/
 theorem aSets_support_slice [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKne : K ≠ ⊥)
+    (hKM : K ≤ M) (hUM : U ≤ M)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
-    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
     IsTISubset (S14.zTilde K Kstar) (K ⊔ Kstar) ∧
       IsTISubset (A0Set M K \ ASet M U) M ∧
       Supports (ASet M U) (S14.zTilde K Kstar ∪ A0Set M K) := by
-  sorry
+  classical
+  have hcpq := theoremC_paired_structure hG hM hKne hKM hUM hK hKstar hU
+  obtain ⟨_, _, _, _, _, _, hM'eq, _, hdual, hA0TI, _, _⟩ := hcpq
+  -- Conjunct 1 (zTilde TI): the paired-structure `M*` conjunct.
+  obtain ⟨Mstar, ⟨_, _, _, _, _, hzTI, _, _⟩, _⟩ := hdual
+  refine ⟨hzTI, hA0TI, ?_⟩
+  -- Conjunct 3: `A(M) ⊆ A_0(M) ⊆ zTilde ∪ A_0(M) ⊆ 𝒞_G(zTilde ∪ A_0(M))`.
+  -- `U ⊔ M_σ = M'` is normal in `M`, so `mem_U_sup_Msigma_iff_isPiElement_kappa_compl` applies.
+  have hnorm : ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal := by
+    rw [← hM'eq]
+    have hid : (derivedInG M).subgroupOf M = commutator ↥M :=
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective (commutator ↥M)
+    rw [hid]; infer_instance
+  intro y hy
+  obtain ⟨hyhat, hyUM⟩ := hy
+  have hyM : y ∈ M := (le_trans (sup_le hUM (OddOrder.BG.Ch3.S10.Msigma_le M)) le_rfl) hyUM
+  have hyκ' : IsPiElement (S14.kappa M)ᶜ y :=
+    (mem_U_sup_Msigma_iff_isPiElement_kappa_compl hG hM hUM hU hnorm hyM).mp hyUM
+  -- `y ∉ 𝒞_G(K#)`: else `y` is a `κ(M)`-element (conjugate of a `K#`-element).
+  have hyA0 : y ∈ A0Set M K := by
+    refine ⟨hyhat, ?_⟩
+    rintro ⟨t, ⟨htK, ht1⟩, g, hgt⟩
+    have hyt_ord : orderOf y = orderOf t := by
+      rw [← hgt]
+      have hoi := orderOf_injective (MulAut.conj g).toMonoidHom (MulAut.conj g).injective t
+      simpa only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply] using hoi
+    have hy1 : y ≠ 1 := by
+      intro h; rw [h, orderOf_one] at hyt_ord
+      exact ht1 (orderOf_eq_one_iff.mp hyt_ord.symm)
+    have htκ : IsPiElement (S14.kappa M) t := by
+      intro p hp
+      have hpord : p ∣ orderOf t := Nat.dvd_of_mem_primeFactors hp
+      have hordt : orderOf t ∣ Nat.card ↥K := by
+        have he : orderOf t = orderOf (⟨t, htK⟩ : ↥K) :=
+          orderOf_injective K.subtype K.subtype_injective ⟨t, htK⟩
+        rw [he]; exact orderOf_dvd_natCard _
+      refine hK.1 p ?_
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv]
+      exact Nat.mem_primeFactors.mpr ⟨Nat.prime_of_mem_primeFactors hp,
+        hpord.trans hordt, Nat.card_pos.ne'⟩
+    have hyκ : IsPiElement (S14.kappa M) y := hgt ▸ isPiElement_conj g htκ
+    obtain ⟨p, hpp, hpy⟩ := Nat.exists_prime_and_dvd (fun h => hy1 (orderOf_eq_one_iff.mp h))
+    have hpf : p ∈ (orderOf y).primeFactors :=
+      Nat.mem_primeFactors.mpr ⟨hpp, hpy, (orderOf_pos y).ne'⟩
+    exact hyκ' p hpf (hyκ p hpf)
+  exact mem_conjClassSet.mpr ⟨y, Or.inr hyA0, 1, by group⟩
 
 /-! ## Proposition 16.1 forward bridges: constructing the shared type data -/
 
