@@ -356,6 +356,17 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-07 (tick 7) — a/b/c 統合 (cron tick, 全レーン自走分)**: 全レーン merge-base==main HEAD の clean 先行、
+  conflict 皆無・新 axiom なし。
+  - **a** (`f31df00d`, genuine): Pf (11.8) `coherent(S(HC))` を **sorry-free** に landing — `coherent(S(M''))` の
+    subset-restriction + conjDiff witness (S13 +106/−38)。a 領域。
+  - **b** (`943e55ed`, genuine ★milestone): **9017 Keystone A 完了** — sAFL の `hWnorm` (W M-normal) を実証明し
+    前 tick の残 1 sorry を discharge ⟹ **BG Thm 15.8 `tau2_transfer_constraint` 完全 sorry-free**
+    (`#print axioms` = [propext, Classical.choice, Quot.sound])。残 = Cor 15.9 のみ (S15_MF +108/−20)。9017 claim。
+  - **c** (`918ad873`+`255148aa`, bookkeeping): issue 9072 CLOSE (Pf 14.9 horth carrier discharged 記録) +
+    post-horth gate 状態を lane-a (9000) / lane-b (9013,3002) に cross-lane 共有 (append のみ、.lean 不変)。
+  - **build/sorry**: full build green **3934 jobs** (3m21s)、AxiomsCheck OK、新 axiom なし。census **88→87**
+    (b Keystone A discharge −1、a sorry-free additive、c issue のみ)。push 済。
 - **2026-07-07 (tick 6) — 監視再開 (ユーザー「各レーンを監視します」) + a/b/c 第3次統合**: tick5 (夜) 以降 cron
   unset だった (session-only ゆえ前回停止で消滅) → 規定ペース `7,22,37,52` で cron `984c2a22` 再作成。tick5 後に
   3 レーンが自走して出した新規分を合流。全レーン merge-base==main HEAD (`80d1655a`) の clean な先行、conflict 皆無・
