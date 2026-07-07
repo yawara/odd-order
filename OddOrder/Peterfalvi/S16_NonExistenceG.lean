@@ -660,6 +660,105 @@ theorem T_typeIII_calT1_card [Finite G] (hyp : Hypothesis (G := G))
   rw [← hcard]
   exact calT1_image_induce_card_eq hyp hHnormal 𝒯 hconj hinertia
 
+/-! ### T-side type-`P` Dade isometry foundation (14.9), issue 9072
+
+The (14.9) coherence carrier `horth` in `T_typeIII_ratio_le` needs a T-side Dade package
+`S07.Hypothesis calT1_set A` carrying the isometry `tauT`.  The three lemmas below build that
+package's **foundation** — the genuine §10 Dade support datum on `T`, the resulting integral
+character map `τ_T`, and its difference-isometry property — from the **ungated** σ-sharp Dade
+support builder `S10.dadeSupportHypothesisData_of_subset_sigmaSharp` (issue 9072 hub verdict).
+
+The support set is `A = A₁(T) = T_σ^# = sigmaSharp T` (BG `M̃`-core), which trivially satisfies the
+builder's `X ⊆ sigmaSharp T` (reflexivity) and is `T`-conjugation-invariant (`M_σ ⊴ T`), and is
+nonempty (`M_σ ≠ ⊥`).  This mirrors the type-I `S14.Hypothesis.tau`/`Sset_tau_isometry_diff`
+assembly (built from `S10.dadeSupportHypotheses_typeI`) but is driven by the σ-generic engine so it
+does not need a `TypeIData`/`TypePData` witness. -/
+
+/-- **T-side (8.15) Dade support datum on `A₁(T) = T_σ^#`** (issue 9072 foundation, step 1).
+The ungated σ-sharp Dade builder `S10.dadeSupportHypothesisData_of_subset_sigmaSharp` applied at
+`X = sigmaSharp T`: `hXσ` is reflexivity, `hXne` follows from `M_σ ≠ ⊥`
+(`S10.Msigma_ne_bot`), and `hXiff` is `T`-conjugation invariance of `T_σ^#` via
+`sharpSubgroup_conj_mem` (`M_σ ⊴ T`, `le_normalizer_opiCoreInG`). -/
+theorem tSideDadeSupport_nonempty [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    Nonempty (OddOrder.Peterfalvi.S10.DadeSupportHypothesisData hyp.base.T
+      (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T)) := by
+  haveI := hyp.base.finiteG
+  -- `T ≤ N_G(M_σ(T))` (`M_σ = O_{σ}(T)` is normal in `T`), so `M_σ^#` is `T`-conj-invariant.
+  have hTnorm : hyp.base.T ≤ Subgroup.normalizer
+      ((OddOrder.BG.Ch3.S10.Msigma hyp.base.T : Subgroup G) : Set G) :=
+    le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma hyp.base.T) hyp.base.T
+  refine OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_of_subset_sigmaSharp hG
+    hyp.base.T_maximal (fun _ h => h) ?_ ?_
+  · -- Nonempty: pick a nonidentity element of `M_σ(T) ≠ ⊥`.
+    obtain ⟨a, ha1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp
+      (OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hyp.base.T_maximal)
+    have ha1' : (a : G) ≠ 1 := fun h => ha1 (Subtype.ext h)
+    exact ⟨a.1, (Set.mem_diff _).mpr
+      ⟨SetLike.mem_coe.mpr a.2, fun h => ha1' (Set.mem_singleton_iff.mp h)⟩⟩
+  · -- `T`-conjugation invariance of `T_σ^# = sharpSubgroup (M_σ T)`.
+    intro m x hm
+    refine ⟨fun h => ?_, fun h => ?_⟩
+    · have h2 := OddOrder.Peterfalvi.S10.sharpSubgroup_conj_mem
+        (H := OddOrder.BG.Ch3.S10.Msigma hyp.base.T) (hTnorm (inv_mem hm)) h
+      have h3 : m⁻¹ * (m * x * m⁻¹) * m⁻¹⁻¹ = x := by group
+      rwa [h3] at h2
+    · exact OddOrder.Peterfalvi.S10.sharpSubgroup_conj_mem
+        (H := OddOrder.BG.Ch3.S10.Msigma hyp.base.T) (hTnorm hm) h
+
+open scoped Classical in
+/-- **T-side type-`P` Dade integral character map `τ_T`** (issue 9072 foundation, step 2).
+The genuine §7 integral character map of the (8.15) support datum
+(`tSideDadeSupport_nonempty`), pinned exactly as the type-I `S14.Hypothesis.tau`:
+`τ_T = dadeIntegralCharacterMap dadeData.dade (dadeData.dade.fullDadeIsometryData dadeData.hconj)`.
+This is the `tauT` field of the T-side `S07.Hypothesis calT1_set (sigmaSharp T)` package that
+`T_typeIII_calT1_coherent`/`T_typeIII_ratio_le`'s `horth` carrier consumes. -/
+noncomputable def tSideDadeMap (hyp : Hypothesis (G := G)) [Fintype G] [Fintype ↥hyp.base.T]
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥hyp.base.T : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥hyp.base.T) G :=
+  haveI := hyp.base.finiteG
+  OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (tSideDadeSupport_nonempty hG hyp).some.dade
+    ((tSideDadeSupport_nonempty hG hyp).some.dade.fullDadeIsometryData
+      (tSideDadeSupport_nonempty hG hyp).some.hconj)
+
+open scoped Classical in
+/-- **`τ_T` is a difference-isometry on any `A₁(T)`-supported family** (issue 9072 foundation,
+step 3) — the `tau_isometry_diff`/`hiso` input of `S07.irrSubcoherent` (and of
+`coherent_of_constant_degree`).  For a family `S` all of whose member-difference class functions
+`a − b` (`a, b ∈ S`) are supported in `supportInSubgroup (sigmaSharp T) T = A₁(T)`, the genuine §10
+Dade isometry preserves their inner products, via
+`S07.dadeIntegralCharacterMap_inner_eq_on_supported_span`.  This mirrors `S14.Sset_tau_isometry_diff`
+exactly (both reduce to the same supported-span inner-preservation lemma); the family-supportedness
+hypothesis packages the (14.9) fact that `calT1` member differences vanish off `T^#`. -/
+theorem tSideDadeMap_isometry_diff (hyp : Hypothesis (G := G)) [Fintype G] [Fintype ↥hyp.base.T]
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥hyp.base.T : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {S : Set (ClassFunction ↥hyp.base.T ℂ)}
+    (hSsupp : ∀ a ∈ S, ∀ b ∈ S, ((a - b : ClassFunction ↥hyp.base.T ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T)
+    {a b c d : ClassFunction ↥hyp.base.T ℂ}
+    (ha : a ∈ S) (hb : b ∈ S) (hc : c ∈ S) (hd : d ∈ S) :
+    ClassFunction.inner (tSideDadeMap hyp hG (a - b)) (tSideDadeMap hyp hG (c - d))
+      = ClassFunction.inner (a - b) (c - d) := by
+  haveI := hyp.base.finiteG
+  -- Both differences live in the supported subspace `CF(T, A₁(T))`; unfold `τ_T` and apply the
+  -- Dade supported-span inner-preservation lemma (the same brick `S14.Sset_tau_isometry_diff` uses).
+  have hS : ∀ s ∈ ({a - b, c - d} : Set (ClassFunction ↥hyp.base.T ℂ)),
+      s.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T := by
+    intro s hs
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+    rcases hs with rfl | rfl
+    · exact hSsupp a ha b hb
+    · exact hSsupp c hc d hd
+  simp only [tSideDadeMap]
+  exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
+    (tSideDadeSupport_nonempty hG hyp).some.dade (tSideDadeSupport_nonempty hG hyp).some.hconj
+    hS (Submodule.subset_span (Set.mem_insert _ _))
+    (Submodule.subset_span (Set.mem_insert_of_mem _ rfl))
+
 open scoped Classical in
 /-- **Peterfalvi (14.9): `calT1` is coherent** (Coq `PFsection14.v:750--751`
 `have [tau1T cohT1]: coherent calT1 T^# tauT`, via
