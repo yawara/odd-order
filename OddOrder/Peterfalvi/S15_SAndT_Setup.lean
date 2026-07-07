@@ -3694,6 +3694,23 @@ theorem Hypothesis.H_mulCommutative [Finite G] (hG : OddOrder.BG.IsMinimalSimple
   rw [sup_comm]
   exact OddOrder.BG.Ch4.S15.isMulCommutative_sup_of_le_centralizer hCab hPab hCP
 
+/-- **`P` centralizes every element of `H = PC`** (Peterfalvi (13.4), disjointness ingredient):
+for `x ∈ H`, `P ≤ C_G(x)`.  Immediate from `H` abelian (`H_mulCommutative`) and `P ≤ H`.  This is
+the first half of the (13.4) conjugate-disjointness `(H^#)^G ∩ (K^#)^G = ∅`: a common point `x`
+would have `P ≤ C_G(x) ≤ T^g` (the `A₀(T^g)` TI-property), impossible since `|P| = p^q` exceeds
+the `p`-part `p` of `|T|`. -/
+theorem Hypothesis.P_le_centralizer_of_mem_H [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) {x : G} (hx : x ∈ hyp.H) :
+    hyp.P ≤ Subgroup.centralizer ({x} : Set G) := by
+  intro y hy
+  rw [Subgroup.mem_centralizer_iff]
+  intro z hz
+  rw [Set.mem_singleton_iff] at hz
+  rw [hz]
+  have hyH : y ∈ hyp.H := (le_sup_left : hyp.P ≤ hyp.P ⊔ hyp.C) hy
+  have hcomm := (hyp.H_mulCommutative hG).is_comm.comm (⟨x, hx⟩ : ↥hyp.H) ⟨y, hyH⟩
+  simpa using congrArg Subtype.val hcomm
+
 open scoped Classical in
 /-- **Sharp-set Parseval bookkeeping** (the `s + d² = |H|·n` shape of Peterfalvi (13.7)): for a
 function `f` agreeing on `K` with a class function `ψ` of self inner product `n`, the
