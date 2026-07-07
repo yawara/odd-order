@@ -305,7 +305,7 @@ character `φ ∈ ZIrr G` with `‖φ‖² = 2` is a **signed sum of two distinc
 Assembled from the layer-2 Fourier API: `mem_ZIrr_inner_self_eq_sum_sq` writes `‖φ‖²` as the sum of
 squared integer Fourier coefficients over `c.support ⊆ Irr G`, and `exists_pair_of_sum_sq_eq_two`
 forces exactly two nonzero coefficients, each `±1`.  This is the constituent-count input to the §3
-rigidity lemma `eq_signed_sub_cTIiso` (issue 9075). -/
+rigidity lemma `eq_signed_sub_cTIiso` (issue 9076). -/
 theorem exists_signed_pair_of_mem_ZIrr_inner_self_eq_two {φ : ClassFunction G ℂ}
     (hφ : φ ∈ ZIrr G) (hnorm : ClassFunction.inner φ φ = 2) :
     ∃ (α β : ClassFunction G ℂ) (εα εβ : ℤ),
