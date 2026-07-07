@@ -356,6 +356,28 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-07 (tick 6) — 監視再開 (ユーザー「各レーンを監視します」) + a/b/c 第3次統合**: tick5 (夜) 以降 cron
+  unset だった (session-only ゆえ前回停止で消滅) → 規定ペース `7,22,37,52` で cron `984c2a22` 再作成。tick5 後に
+  3 レーンが自走して出した新規分を合流。全レーン merge-base==main HEAD (`80d1655a`) の clean な先行、conflict 皆無・
+  新 axiom なし。
+  - **a** (`550985df`, genuine): Pf (11.8.6) redesign — world-bridge decomposition `SOf(H0C)=SOf(HC)∪sOf(H0C)`
+    を **sorry-free** に landing (`f3d93d1a`、S13_MaximalIII_IV +165) + capstone gate 構造確定・`coherent(SOf(HC))`
+    sorry-free path (issue 1019)。a 領域。
+  - **b** (`5d25e42e`, genuine): BG 15.8/15.9 **Keystone A** — `sylQ`/`uniqQ` (`opiCore_isUniquelyMaximal_of_isSylow`)
+    を実証明 + non-nil sAFL を pure minimality-lifting (hLift) に reduce (S15_MF +398/−5)。外側 bare sorry を閉じ
+    内側 `hWnorm` (W M-normal) 1 本に精緻化 = net sorry 0 (regression でない)。issue 9017 (shared-infra claim, BG §15)。
+  - **c** (`142df918`, genuine): Pf 14.9 **T-side type-P Dade isometry foundation** (S16_NonExistenceG +99)。
+    main HEAD `80d1655a` の hub-verdict (9072) = 「T-side coherence route は SOUND, 4001 dead-end でない、C が build」
+    に沿った landing。c reactivation trigger の一つが発火した形。c 領域。
+  - **build/sorry**: full build green **3934 jobs** (3m25s)、AxiomsCheck OK (全 axiom allowlist 内、新 axiom なし)。
+    real sorry census (comment-strip) **87 不変** (on-path 64 / off-path 凍結 23)、regression なし。push 済
+    (`80d1655a..8ff14bd9`)。
+  - **follow-up 合流 (c 自走分)**: build/merge 中に c が 2 commit 追加 (`c8875eb2` = Pf 14.9 の T-side `horth`
+    coherence carrier を **discharge** — `calT1` を `T_typeIII_calT1_family` で構成 + `hcount` を
+    `T_typeIII_calT1_card` で proven 化 + `horth` を T-side `S07.Hypothesis` Dade package で discharge、S16 +634/−17)。
+    従来 opaque な多-carrier `obtain … := sorry` を **de-opacify** し、残 sorry は lane-b §13/§15 に真に gated な
+    S-side βₛ bridge 1 本のみ。regression (証明済→sorry) でなく genuine 構成。合流 (`0e…` merge)、full build green
+    3934 jobs (46s、S16+下流のみ)、AxiomsCheck OK。census **87→88** (de-opacify で露出した residual、指標でない)。
 - **2026-07-07 (tick 5) — a/b/c 第2次統合 (ユーザー「いますぐ取り込みましょう」)**: tick3 統合後にレーンが
   自走して出した新規分を合流。3 レーン体制 (d 退役後) の初統合。
   - **a** (`7a6190bf`): issue 1019 (11.8.6) soundness refinement + Coq 精読で Route 1 確定 (docs のみ、Lean 不変)。

@@ -466,3 +466,77 @@ Coq `P2type_signalizer` は `H ∩ M* = D` (D=σ(H)'-Hall) の**厳密同定**�
   `Ptype_structure` の Sylow→𝒰 clause port。**唯一の残 deep gate**。次の作業対象 (C 済ゆえ文書順で A へ)。
 - **Cor 15.9** `centralizer_escape_final_local` (S15_MF:10569 sorried): Thm 15.8 (assembled) + Thm 15.7
   を cite。`typeF_frobenius_of_tau2_prime_free` の S16→S15 hoist が要。
+
+## 2026-07-07 更新 #15 (lane b, /loop) — ★Keystone A の 2/3 gated clause (sylQ + uniqQ) 実証明で閉じ、bundle assembled
+
+**`typeP_partner_sylow_uniquelyMaximal_bundle` (Keystone A) を assemble** — 自身の bare sorry を
+除去。3 gated clause のうち **2 本 (uniqQ, sylQ) を sorry-free で実証明**、nilpotent sAFL も実証明、
+残 gate は non-nilpotent sAFL 1 本のみ (sharp sub-lemma に隔離)。build GREEN (S15 3120 jobs)。
+
+### ★docstring の circularity 恐怖は誤りだった (uniqQ)
+Keystone A docstring は「uniqQ の唯一 route = `nonabelian_pgroup_isUniquelyMaximal` (def_q1 に
+circular)」と恐れたが**誤り**。§13 の **Lemma 13.6 `maximalContaining_eq_singleton_of_E1`** が
+`𝓜(S)={M}` を直接与える (Coq clause (e) の repo 実体)。
+
+### 新 lemma 3 本
+- **`opiCore_isUniquelyMaximal_of_isSylow`** (uniqQ, sorry-free): Q=O_q(L) が Sylow-q ⟹ Q∈𝒰。
+  Lemma 13.6 (X=⟨w⟩≤K, P=E₁ from `exists_typePESetup_kappaHall`) → 𝓜(Q)={L} → `of_unique_maximal`。
+- **`opiCore_index_coprime_of_typeP`** (sylQ, sorry-free): Q=O_q(L) は L の Sylow-q (q∤[L:Q])。
+  case split: nilpotent L_σ ⟹ Q Hall (`oPiCore_isHall_of_isNilpotent`); non-nil ⟹ type-P1、
+  `exists_kInvariant_qComplement` の q'-complement D で [L_σ:Q]=|D| が q'-数。tower で [L:Q]。
+- **`A_le_fittingInAmbient_of_typeP1_nonnil`** (non-nil sAFL, **sorried** — 残 gate): Coq
+  `quotient_cents` step (A が chief factor Q/Q₀ を centralize、`⁅a,y⁆∈Q₀`)。repo Thm 15.2 は
+  `F(L)=Q·C(Q)` と complement は expose するが `C_{L_σ}(Q/Q₀)` characterization / chief-factor
+  centralization は未 expose。`centralizer_msigma_quotient_le_fittingInAmbient` に食わせる
+  `⁅a,y⁆∈C(D)` が genuine gap。
+
+### 残 keystone 状況 (更新)
+- **Keystone A**: bundle assembled、残 = non-nil sAFL (`A_le_fittingInAmbient_of_typeP1_nonnil`) のみ。
+- **Cor 15.9** (`centralizer_escape_final_local`、S15_MF:10790 sorried): Thm 15.8 (assembled) を cite。
+
+### ⚠ 更新 #15 補足: sAFL sub-lemma の soundness 修正 (hACK 追加)
+初版の `A_le_fittingInAmbient_of_typeP1_nonnil` は `A ∈ ℰ²(L_σ)` のみで `A ⊆ F(L)` を主張したが
+**q1≠q で unsound** (q'-complement D 内で Q に non-inner に作用する A は F(L)=Q·C(Q) を逃れる)。
+Coq の A は `cKA : A ⊆ C(K)` (K=M の κ-complement) を持つ ⟹ chief-factor 作用経由で
+`A ⊆ C_{L_σ}(Q/Q₀)=F(L)`。sub-lemma + bundle に `hACK : A ≤ C(K)` を追加し Coq 準拠の sound な
+statement に修正 (consumer は `exists_rank2_elemAb_le_centralizer_kappa_of_tau2` の hACK を供給)。
+build GREEN 3120。⟹ 残 gate = `A_le_fittingInAmbient_of_typeP1_nonnil` (sound, sorried, Fcore
+chief-factor port 要) の 1 本 + Cor 15.9。
+
+## 2026-07-07 更新 #16 (lane b, /loop) — non-nil sAFL の port 経路確定: Fcore_structure eq3 (K̄-centralizer)
+
+`A_le_fittingInAmbient_of_typeP1_nonnil` (残 gate) の Coq 証明経路を精査。**Coq sAFL は
+Fcore_structure (Thm 15.2) conjunct (g) の第3式 `'C_Ms(Ks/Q0 | 'Q) = 'F(M)`** を使う
+(M:=L で Fcore の Ks = C_{L_σ}(L の κ-Hall) = 本 lemma の K)。⟹ **F(L) = C_{L_σ}(K̄ | 'Q)**
+(K̄ = K の L_σ/Q0 への像)、`A ⊆ C(K)` (hACK/cKA) から `A ⊆ F(L)` が sub_astabQ + quotient_cents で従う。
+
+**repo gap**: repo の F(L) characterization は全て **Q 経由** (`F=Q⊔(C(Q)⊓M)` eq1、
+`centralizer_msigma_quotient_le_fittingInAmbient` = eq2 の Q̄-centralize→F)。Coq の eq3
+(**K̄ 経由**) は未 expose。eq2 (C_{Ms}(Q̄)) と eq3 (C_{Ms}(K̄)) は**異なる部分群がどちらも F(L)**
+(centralize K̄ ⇏ centralize Q̄、K̄⊆Q̄ minimal normal だが normal closure 経由で一致しない)。
+⟹ eq3 を独立に再構成する要 (deep §15.2 port) — repo の chief-factor engine
+(`chiefFactor_engine_of_inputs`, `card_centralizer_quotient_eq_of_kstar` = |C_{Q̄}(K)|=q 等) を使う。
+
+## 2026-07-07 更新 #17 (lane b, /loop) — non-nil sAFL を pure minimality-lifting hLift に reduce (context+eq2 実証明)、hLift port path 詳細
+
+`A_le_fittingInAmbient_of_typeP1_nonnil` の chief-factor context を完全再構成し (type-P1、Q=O_q(L)、
+D via `exists_kInvariant_qComplement`、Q0、hmin via `chiefFactor_Q0_normal_minimal_of_inputs`、
+Q̄ elem abelian → hQab、eq2 `centralizer_msigma_quotient_le_fittingInAmbient` → hsecFit)、
+assembly も実証明。**残 sorry = `hLift` 1 本** (build GREEN、commit 5d2cb907):
+
+  `hLift : ∀ x∈Ms, (∀k∈K ⁅x,k⁆∈Q0) → (∀y∈Q ⁅x,y⁆∈Q0)`  (= Coq Fcore eq3 の C_Ms(K̄)⊆C_Ms(Q̄))
+
+### hLift port path (詳細、~80-100 行の intricate quotient/minimal-normal port)
+1. `H := C_Ms(K̄) = {x∈Ms : ∀k∈K ⁅x,k⁆∈Q0}` を Subgroup 化 (astab 構成、
+   `centralizer_msigma_quotient_le_fittingInAmbient` proof の `S`-subgroup pattern L5328-5344 を複製)。
+2. **H が M-normal** (Coq `nCMsKsbM`、これが crux):
+   - `Ms ⊆ N(H)` via `sub_der1_norm`: `Ms' = L'' ⊆ F(L) ⊆ C_Ms(Q̄) ⊆ C_Ms(K̄) = H`
+     (`derivedDerived_le_fittingInAmbient` + F⊆C_Ms(Q̄) [F=Q⊔(C(Q)⊓M), Q̄ abelian] + K̄⊆Q̄)。
+   - `Ks ⊆ N(H)`: Ks は K=C_Ms(Ks) を normalize ⟹ K̄ ⟹ C_Ms(K̄)=H。
+   - `M = Ms·Ks` (type-P1 a: Ms ⋊ Ks = L)。
+3. `W := {y∈Q : ∀x∈H ⁅x,y⁆∈Q0}` を Subgroup 化。**W M-normal** ⟸ H M-invariant + Q0/Q M-normal
+   (⁅x,gyg⁻¹⁆ = g⁅g⁻¹xg,y⁆g⁻¹、g⁻¹xg∈H)。
+4. `K ≤ W` (∀x∈H ⁅x,k⁆∈Q0 by def H、k∈K⊆Q via hKstarQ)、`K ⊄ Q0` (hKstarNotQ0) ⟹ `Q0 < W`。
+5. `hmin W (Q0<W) (W≤Q) (W M-normal) → Q ≤ W` ⟹ ∀y∈Q ∀x∈H ⁅x,y⁆∈Q0 ⟹ 特に MY x で結論。
+
+repo 機構は全 available (S-subgroup pattern、chiefFactor engine、hmin)。intricate だが bounded。
