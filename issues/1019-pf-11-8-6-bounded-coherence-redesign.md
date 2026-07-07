@@ -883,3 +883,34 @@ reducible 共役対 {χ,χ̄} の単独 coherence seed — coherentPair の ‖�
 2. **τ seam**: certainTypeR 系は enlarged Dade (h46.dade0) 上 — hyp.tau への retarget は
    S08_CaseBCoherence2 の (6.8.2.3) seam パターン踏襲。
 3. seed 組立: retargetTargetPair_gen + coherentPair_k + μ−μ̄ support/nonzero (muGrid API)。
+
+## 🔬 update⁶⁰ (2026-07-07 lane-a /loop) — ★ seedDecomposition landed + all-reducible corner は既存 3 部品で閉じる構図が確定
+
+### ✅ landed: `S06.certainTypeSeedDecomposition` (sorry-free, commit 41a72280)
+ψ=0 の `CharacterPsiDecomposition τ' (columnSum χ₂) 0`、coherent-set anchor 不要。
+τ₁ = `certainTypeExtension` (σ-extension) 自身: ℤ[𝒯] isometry (`certainTypeExtension_inner_eq`、
+基準列 k=χ₂ に μ, μ̄=μ_{χ₂⁻¹} 両方入る)、μ−μ̄ 上 Dade 一致 (columnDiff_eq_dade)、τ' seam は
+hagree 引数。imageFamily = certainTypeR transport (image_eq 差し替え)。
+
+### ★ 発見: all-reducible corner は seed 経由より直接的な既存 route がある
+- **`S06.certainType_isCoherent`** ((4.9)(b)): `IsCoherent (dadeICM h.dade0 h.tau)
+  (certainTypeSet h k) (supportInSubgroup A L)` — **𝒯 全体 (equal-deg μ-columns) の coherence が
+  sorry-free で既存**。
+- **`S07.IsCoherent.congrMap`** (S08_CaseBCoherence2:1469): zSupportedSpan 上一致する τ' への
+  IsCoherent transport — τ seam 部品も既存。
+- ⟹ **all-reducible corner = certainType_isCoherent → congrMap (τ' = hyp.tau) →
+  isCoherent_of_subset (family = sOf(H0Cprime) ⊆ 𝒯 同定)** の 3 段。coherentPair_k /
+  seedDecomposition 経由の pair-chain は不要 (両部品は保全: coherentPair_k は generic (5.6.3)
+  seed、seedDecomposition は mixed-corner の Dmem/break 供給部品として (9.11) chain で使う)。
+
+### caseB assembly の確定 map (全部品在庫確認済み)
+- **mixed corner** (irr あり): irr-cut base (`sOf_degreeSubfamily_isCoherent` landed) +
+  μ-pairs を `xAdjoinStepW_k` で adjoin (anchor = irr norm-1 ✓、break Da =
+  `certainTypeDecompositionDa`、S₁-side μ の Dmem = `certainTypeMemberDecomposition`)。
+- **all-reducible corner**: 上記 3 段 restrict。
+- **残る instantiation work (genuine)**: ①§9 family ↔ certainTypeSet 同定 (S12 muGrid columnSum
+  ↔ S06 columnSum、`toHypothesis46` 経由 — S08_CaseBCoherence2 の (6.8) case-B が同じ bridge を
+  張った前例あり)、② A0 ↔ supportInSubgroup 同定 + congrMap の一致証明、③ per-pair hDeg
+  (2·qu·anchor < Σdeg²/mc) の counting、④ hgen (span generation)。
+次 iteration = ① の在庫確認 (toHypothesis46 の中身、CaseBCoherence2 の bridge 実装) →
+mixed-corner 1-pair adjoin instantiation。
