@@ -400,6 +400,218 @@ theorem caseA_source_degree_dvd_a (caseA : CliffordCaseAData chars)
   -- Conclude by the `S₀`-witness form applied to `χ'`.
   exact caseA_source_degree_dvd_a_of_S0_witness caseA hover' hS0 hd'
 
+/-- **The Clifford integer `a` is odd** (Coq `odd_a`, `PFsection9.v:1536`): `a = [HU : H·C_U(S₀)]`
+divides `|HU| ∣ |M| ∣ |G|`, and `|G|` is odd.  The parity input of the (9.11.1) `lb12` squeeze
+step `2a ≤ p − 1` (`two_mul_le_of_dvd_of_odd`: `a ∣ p−1` odd + `p−1` even ⟹ `2a ∣ p−1`). -/
+theorem caseA_a_odd (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) :
+    Odd caseA.a := by
+  have hdvd : caseA.a ∣ Nat.card G := by
+    rw [← index_hcuInHu_eq_caseA_a caseA]
+    exact ((hInHu data ⊔ cuInHu caseA).index_dvd_card).trans
+      ((Subgroup.card_subgroup_dvd_card (huSub data)).trans
+        (Subgroup.card_subgroup_dvd_card M))
+  rcases Nat.even_or_odd caseA.a with heven | hodd
+  · exfalso
+    obtain ⟨k, hk⟩ := hG.odd
+    have h2 : (2 : ℕ) ∣ Nat.card G := (even_iff_two_dvd.mp heven).trans hdvd
+    omega
+  · exact hodd
+
+/-- **`a·|U′| ∣ |U|`** (the (9.11) `szS1′` exactness, half 1).  `a = [U : C_U(S₀)]` (realized:
+`(cuInHu.subgroupOf uInHu).index`), so `|U| = |C_U(S₀)|·a` (Lagrange), and `|U′| ∣ |C_U(S₀)|`
+(`U′ ≤ C_U(S₀)`, `uprimeSub_le_cuSub`).  Makes the ℕ-division in the landed (9.8.d) count
+(`caseA_character_counts` part (d): `((p−1)/a)·(|U|/(a·|U′|))`) **exact**, aligning it with the
+Coq `szS1′ = (p−1)·[U:U′]/a²` of the (9.11.1) squeeze (Coq `dv_lb`, `PFsection9.v:1596`). -/
+theorem caseA_a_mul_card_uprime_dvd_card_U [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) :
+    caseA.a * Nat.card ↥(uprimeSub data) ∣ Nat.card ↥data.U := by
+  classical
+  -- Lagrange in `uInHu`: `|C_U(S₀)-realized| · a = |uInHu| = |U|`.
+  have hmul : Nat.card ↥((cuInHu caseA).subgroupOf (uInHu data)) * caseA.a
+      = Nat.card ↥(uInHu data) := by
+    have h := Subgroup.card_mul_index ((cuInHu caseA).subgroupOf (uInHu data))
+    rwa [index_cuInHu_subgroupOf_uInHu_eq_a caseA, ← caseA.a_eq_card_restrictAut_range] at h
+  -- `|U′|` equals the card of its double realization inside `uInHu`.
+  have hle1 : ((uprimeSub data).subgroupOf M).subgroupOf (huSub data) ≤ uInHu data :=
+    Subgroup.subgroupOf_mono _ (Subgroup.subgroupOf_mono _ (uprimeSub_le_U data))
+  have hcardU' : Nat.card ↥((((uprimeSub data).subgroupOf M).subgroupOf
+        (huSub data)).subgroupOf (uInHu data))
+      = Nat.card ↥(uprimeSub data) := by
+    have hle2 : (uprimeSub data).subgroupOf M ≤ huSub data :=
+      Subgroup.subgroupOf_mono _ ((uprimeSub_le_U data).trans le_sup_right)
+    have hle3 : uprimeSub data ≤ M := (uprimeSub_le_U data).trans (U_le_M data)
+    calc Nat.card ↥((((uprimeSub data).subgroupOf M).subgroupOf
+          (huSub data)).subgroupOf (uInHu data))
+        = Nat.card ↥(((uprimeSub data).subgroupOf M).subgroupOf (huSub data)) :=
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle1).toEquiv
+      _ = Nat.card ↥((uprimeSub data).subgroupOf M) :=
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle2).toEquiv
+      _ = Nat.card ↥(uprimeSub data) :=
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle3).toEquiv
+  -- `U′-realized ≤ C_U(S₀)-realized` inside `uInHu`, so `|U′| ∣ |C_U(S₀)-realized|`.
+  have hdvdC : Nat.card ↥(uprimeSub data)
+      ∣ Nat.card ↥((cuInHu caseA).subgroupOf (uInHu data)) := by
+    rw [← hcardU']
+    exact Subgroup.card_dvd_of_le (Subgroup.subgroupOf_mono _
+      (Subgroup.subgroupOf_mono _ (Subgroup.subgroupOf_mono _ (uprimeSub_le_cuSub caseA))))
+  -- Assemble: `a·|U′| ∣ a·|C_U(S₀)| = |uInHu| = |U|`.
+  rw [← card_uInHu_eq data, ← hmul]
+  obtain ⟨k, hk⟩ := hdvdC
+  exact ⟨k, by rw [hk]; ring⟩
+
+/-- **`a²·|U′| ∣ (p−1)·|U|`** (Coq `dv_lb`/`lb_d ∣ lb_n`, the (9.8.d)/(9.11.5) count-denominator
+exactness): from `a ∣ p−1` (`a_dvd_p_sub_one`) and `a·|U′| ∣ |U|`
+(`caseA_a_mul_card_uprime_dvd_card_U`).  This is what turns the landed count's iterated
+ℕ-division `((p−1)/a)·(|U|/(a·|U′|))` into the exact `(p−1)·|U| / (a²·|U′|)` of the (9.11.1)
+squeeze's `lb3 ≤ sumnS S₁′` step. -/
+theorem caseA_sq_mul_card_uprime_dvd [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) :
+    caseA.a * caseA.a * Nat.card ↥(uprimeSub data)
+      ∣ (chief.p - 1) * Nat.card ↥data.U := by
+  have h1 : caseA.a ∣ chief.p - 1 := caseA.a_dvd_p_sub_one
+  have h2 := caseA_a_mul_card_uprime_dvd_card_U caseA
+  calc caseA.a * caseA.a * Nat.card ↥(uprimeSub data)
+      = caseA.a * (caseA.a * Nat.card ↥(uprimeSub data)) := by ring
+    _ ∣ (chief.p - 1) * Nat.card ↥data.U := mul_dvd_mul h1 h2
+
 end CaseADivisibility
+
+/-! ### The (9.11.1) squeeze: arithmetic core
+
+Book (9.11.1): with `𝒮₂` maximal and `χ ∈ 𝒮₃`, *"By Theorem (5.6) and by (9.8.a, d),
+`(p−1)|U:U′|q² ≤ ∑_{ψ∈𝒮₁∩𝒮(H₀U′)∩Irr M} ψ(1)²/‖ψ‖² ≤ ∑_{ψ∈𝒮₂} ψ(1)²/‖ψ‖² ≤ 2q²aχ(1) ≤ 2q²au`.
+Thus `((p−1)/2)|C:U′| ≤ a`.  As `a` divides `p−1` and is odd, `a ≤ (p−1)/2`.  It follows that
+`C = U′` and `a = (p−1)/2`.  Furthermore, the inequalities above are equalities."*
+
+This subsection isolates the **closed-circle arithmetic**: six real quantities linked by the
+squeeze inequalities whose composition returns to the start, forcing every step to be an
+equality; the cancellations then extract the (9.11.1) conclusions.  The quantities are abstract
+naturals here (`p−1`, `q`, `a`, `u`, `[U:U′]`, the `𝒮₃`-member source degree, `|𝒮₁′|`) plus the
+real `sumnS 𝒮₂`; the §9 identifications and the (5.6)-contrapositive input
+`sumnS 𝒮₂ ≤ 2q²a·χdeg` (the pair-refuted clause through the weighted adjoin engine) are supplied
+by the caller. -/
+
+section SqueezeArithmetic
+
+/-- **Peterfalvi (9.11.1), the closed squeeze circle** (arithmetic core).
+
+Inputs: the divisibility/parity facts making `2a ≤ p−1` (`two_mul_le_of_dvd_of_odd`), the degree
+bound `χdeg ≤ u` (9.11.1 preamble), the index bound `u ≤ [U:U′]` (Lagrange), the (9.8.d) count
+`(p−1)·[U:U′] ≤ n₁·a²` (exact form), the `sumnS` lower bound `n₁·(qa)² ≤ s₂` ((9.11.5)-(9.11.6):
+uniform `Snorm` on `𝒮₁′` + subset monotonicity), and the pair-refuted upper bound
+`s₂ ≤ 2q²a·χdeg` (the (5.6) contrapositive).  The chain
+`(p−1)[U:U′]q² ≤ n₁(qa)² ≤ s₂ ≤ 2q²a·χdeg ≤ 2q²au ≤ (p−1)q²u ≤ (p−1)q²[U:U′]`
+closes into a circle, so every inequality is an equality; cancellation extracts the (9.11.1)
+conclusions `χdeg = u`, `2a = p−1`, `u = [U:U′]`, `n₁·a² = (p−1)·[U:U′]`, `s₂ = n₁(qa)²`. -/
+theorem nineElevenOne_squeeze_arithmetic
+    {p1 q a u iUU' χdeg n₁ : ℕ} {s₂ : ℝ}
+    (hq : 0 < q) (ha : 0 < a) (hu : 0 < u) (hp1 : 0 < p1)
+    (hadvd : a ∣ p1) (haodd : Odd a) (hpeven : Even p1)
+    (hχu : χdeg ≤ u)
+    (hule : u ≤ iUU')
+    (hcount : p1 * iUU' ≤ n₁ * (a * a))
+    (hs1' : (n₁ : ℝ) * ((q * a : ℕ) : ℝ) ^ 2 ≤ s₂)
+    (hpair : s₂ ≤ 2 * (q : ℝ) ^ 2 * a * χdeg) :
+    χdeg = u ∧ 2 * a = p1 ∧ u = iUU' ∧ n₁ * (a * a) = p1 * iUU' ∧
+      s₂ = (n₁ : ℝ) * ((q * a : ℕ) : ℝ) ^ 2 := by
+  -- `2a ≤ p−1` (Gauss: `a` odd divides the even `p1`).
+  have h2a : 2 * a ≤ p1 :=
+    OddOrder.Peterfalvi.S07.two_mul_le_of_dvd_of_odd hadvd haodd hpeven hp1
+  -- The six nodes of the circle, as reals.
+  set r₀ : ℝ := (p1 : ℝ) * iUU' * q ^ 2 with hr₀
+  set r₁ : ℝ := (n₁ : ℝ) * ((q * a : ℕ) : ℝ) ^ 2 with hr₁
+  set r₂ : ℝ := 2 * (q : ℝ) ^ 2 * a * χdeg with hr₂
+  set r₃ : ℝ := 2 * (q : ℝ) ^ 2 * a * u with hr₃
+  set r₄ : ℝ := (p1 : ℝ) * q ^ 2 * u with hr₄
+  -- The circle: `r₀ ≤ r₁ ≤ s₂ ≤ r₂ ≤ r₃ ≤ r₄ ≤ r₀`.
+  have h01 : r₀ ≤ r₁ := by
+    have hc : ((p1 : ℝ) * iUU') ≤ (n₁ : ℝ) * (a * a) := by exact_mod_cast hcount
+    calc r₀ = ((p1 : ℝ) * iUU') * (q : ℝ) ^ 2 := by rw [hr₀]; try ring
+      _ ≤ ((n₁ : ℝ) * (a * a)) * (q : ℝ) ^ 2 :=
+          mul_le_mul_of_nonneg_right hc (by positivity)
+      _ = r₁ := by rw [hr₁]; push_cast; try ring
+  have h23 : r₂ ≤ r₃ := by
+    have hχu' : (χdeg : ℝ) ≤ (u : ℝ) := by exact_mod_cast hχu
+    rw [hr₂, hr₃]
+    exact mul_le_mul_of_nonneg_left hχu' (by positivity)
+  have h34 : r₃ ≤ r₄ := by
+    have h2a' : ((2 * a : ℕ) : ℝ) ≤ (p1 : ℝ) := by exact_mod_cast h2a
+    calc r₃ = ((2 * a : ℕ) : ℝ) * ((q : ℝ) ^ 2 * u) := by rw [hr₃]; push_cast; try ring
+      _ ≤ (p1 : ℝ) * ((q : ℝ) ^ 2 * u) :=
+          mul_le_mul_of_nonneg_right h2a' (by positivity)
+      _ = r₄ := by rw [hr₄]; try ring
+  have h40 : r₄ ≤ r₀ := by
+    have hule' : (u : ℝ) ≤ (iUU' : ℝ) := by exact_mod_cast hule
+    calc r₄ = ((p1 : ℝ) * (q : ℝ) ^ 2) * u := by rw [hr₄]; try ring
+      _ ≤ ((p1 : ℝ) * (q : ℝ) ^ 2) * iUU' :=
+          mul_le_mul_of_nonneg_left hule' (by positivity)
+      _ = r₀ := by rw [hr₀]; try ring
+  -- Close the circle: each adjacent pair is an equality.
+  have e1s : r₁ = s₂ := le_antisymm hs1'
+    (hpair.trans (h23.trans (h34.trans (h40.trans h01))))
+  have es2 : s₂ = r₂ := le_antisymm hpair
+    (h23.trans (h34.trans (h40.trans (h01.trans hs1'))))
+  have e23 : r₂ = r₃ := le_antisymm h23
+    (h34.trans (h40.trans (h01.trans (hs1'.trans hpair))))
+  have e34 : r₃ = r₄ := le_antisymm h34
+    (h40.trans (h01.trans (hs1'.trans (hpair.trans h23))))
+  have e40 : r₄ = r₀ := le_antisymm h40
+    (h01.trans (hs1'.trans (hpair.trans (h23.trans h34))))
+  have e01 : r₀ = r₁ := le_antisymm h01
+    (hs1'.trans (hpair.trans (h23.trans (h34.trans h40))))
+  -- Cancellation constants.
+  have hqR : (0 : ℝ) < (q : ℝ) := by exact_mod_cast hq
+  have haR : (0 : ℝ) < (a : ℝ) := by exact_mod_cast ha
+  have huR : (0 : ℝ) < (u : ℝ) := by exact_mod_cast hu
+  have hp1R : (0 : ℝ) < (p1 : ℝ) := by exact_mod_cast hp1
+  -- (E1) `χdeg = u` from `r₂ = r₃`.
+  have hE1 : χdeg = u := by
+    have h : (χdeg : ℝ) = (u : ℝ) := by
+      have h2q2a : (0 : ℝ) < 2 * (q : ℝ) ^ 2 * a := by positivity
+      have := e23
+      rw [hr₂, hr₃] at this
+      exact mul_left_cancel₀ h2q2a.ne' this
+    exact_mod_cast h
+  -- (E2) `2a = p1` from `r₃ = r₄`.
+  have hE2 : 2 * a = p1 := by
+    have h : (2 * a : ℝ) = (p1 : ℝ) := by
+      have hq2u : (0 : ℝ) < (q : ℝ) ^ 2 * u := by positivity
+      have := e34
+      rw [hr₃, hr₄] at this
+      -- `2q²au = p1·q²u` ⟹ `2a = p1` (cancel `q²u`).
+      have h' : (2 * (a : ℝ)) * ((q : ℝ) ^ 2 * u) = (p1 : ℝ) * ((q : ℝ) ^ 2 * u) := by
+        linear_combination this
+      exact mul_right_cancel₀ hq2u.ne' h'
+    exact_mod_cast h
+  -- (E3) `u = iUU'` from `r₄ = r₀`.
+  have hE3 : u = iUU' := by
+    have h : (u : ℝ) = (iUU' : ℝ) := by
+      have hpq : (0 : ℝ) < (p1 : ℝ) * (q : ℝ) ^ 2 := by positivity
+      have := e40
+      rw [hr₄, hr₀] at this
+      have h' : ((p1 : ℝ) * (q : ℝ) ^ 2) * (u : ℝ)
+          = ((p1 : ℝ) * (q : ℝ) ^ 2) * (iUU' : ℝ) := by linear_combination this
+      exact mul_left_cancel₀ hpq.ne' h'
+    exact_mod_cast h
+  -- (E4) `n₁·a² = p1·iUU'` from `r₀ = r₁`.
+  have hE4 : n₁ * (a * a) = p1 * iUU' := by
+    have h : ((n₁ * (a * a) : ℕ) : ℝ) = ((p1 * iUU' : ℕ) : ℝ) := by
+      have hq2 : (0 : ℝ) < (q : ℝ) ^ 2 := by positivity
+      have := e01
+      rw [hr₀, hr₁] at this
+      have h' : ((p1 : ℝ) * iUU') * (q : ℝ) ^ 2 = ((n₁ : ℝ) * (a * a)) * (q : ℝ) ^ 2 := by
+        push_cast at this ⊢
+        linear_combination this
+      have := mul_right_cancel₀ hq2.ne' h'
+      push_cast
+      linear_combination this.symm
+    exact_mod_cast h
+  exact ⟨hE1, hE2, hE3, hE4, e1s.symm⟩
+
+end SqueezeArithmetic
 
 end OddOrder.Peterfalvi.S11
