@@ -2483,4 +2483,54 @@ noncomputable def adjoin_muColumnPair_of_irrFamily [Finite G]
     (fun _ _ => one_pos) hmemortho rfl Dmem Da hDatau1 hortho_mem htau1Dmem
     hdiffasupp' htau1_memaχ rfl hDeg' hSgen hgen
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Per-member `ψ = 0` decompositions for a conjugate-closed irreducible subfamily of the
+induced family** (the `Dmem` input of `adjoin_muColumnPair_of_irrFamily`): each member `x` of a
+conjugate-closed irreducible `s ⊆ S` carries the (5.5) `ψ = 0` decomposition whose auxiliary
+isometry is the running coherent extension (`memberExtensionDecomposition`; its `tau1` is
+`hS₁.extension` definitionally, so the engine's `htau1Dmem` is `rfl`).  The inputs are discharged
+from the family facts: non-reality and `⟨x, x̄⟩ = 0` from the odd order
+(`inducedFamily_hasNoRealCharacters` + `inducedKernelFamily_pairwise_orthogonal`), the conjugate
+difference support from `inducedKernelFamily_conjDiff_support`, and the integral extension value
+from the coherence field `extension_mem_ZIrr`. -/
+noncomputable def irrFamilyMemberDecomposition [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)
+    (s : Finset (ClassFunction ↥M ℂ))
+    (hS₁ : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) (↑s) hyp.A0)
+    (hsub : (↑s : Set (ClassFunction ↥M ℂ)) ⊆ OddOrder.Peterfalvi.S12.inducedFamily M)
+    (hirr : ∀ x ∈ s, IsIrreducibleCharacter x)
+    (hconjS : ∀ x ∈ s, x.conj ∈ s)
+    {x : ClassFunction ↥M ℂ} (hx : x ∈ s) :
+    OddOrder.Peterfalvi.S07.CharacterPsiDecomposition
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) x 0 := by
+  haveI := hyp.finiteG
+  classical
+  have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+  have hxfam : x ∈ OddOrder.Peterfalvi.S12.inducedFamily M := hsub hx
+  have hxIKF : x ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+      ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) := by
+    have h := hxfam
+    rwa [OddOrder.Peterfalvi.S12.inducedFamily_eq_inducedKernelFamily_bot] at h
+  have hne : x.conj ≠ x :=
+    OddOrder.Peterfalvi.S12.inducedFamily_hasNoRealCharacters hModd hxfam
+  have hreal : ¬ ClassFunction.IsReal x := fun h => hne h
+  have hdiffsupp : ((x.conj - x : ClassFunction ↥M ℂ)).support ⊆ hyp.A0 :=
+    OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support
+      hyp.mderivSharp_subset_A0 hxIKF
+  have hνZ : hS₁.extension x ∈ ZIrr G :=
+    hS₁.extension_mem_ZIrr x (Submodule.subset_span (Finset.mem_coe.mpr hx))
+  have hχχbar : ClassFunction.inner x x.conj = 0 := by
+    have hxc : x.conj ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) :=
+      OddOrder.Peterfalvi.S08.inducedKernelFamily_closedUnderConjugate _ hxIKF
+    exact OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal hxIKF hxc
+      (fun h => hne h.symm)
+  exact OddOrder.Peterfalvi.S08.memberExtensionDecomposition hyp.dadeData.dade hyp.hconj hS₁
+    ⟨x, hirr x hx⟩ hreal hdiffsupp (Finset.mem_coe.mpr hx)
+    (Finset.mem_coe.mpr (hconjS x hx)) hνZ hχχbar
+
 end OddOrder.Peterfalvi.S13
