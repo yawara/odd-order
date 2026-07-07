@@ -773,3 +773,16 @@ assembly (lb0≤lb1 は上記 bound + a∣χ(1) [case (a) a_dv_XH0 = 要 port]�
 S07_Subcoherent 済部品 + §9 counting 接続)、(iii) strict 枝の member-data bundle (XAdjoinStepInputW
 構成; S-instance 供給は S15 の sSetIrrDeg_subcoherent 内部部品 + μ_j 側 R-data)、(iv) equality 枝
 (9.11.2)-(9.11.8)。case (b) 一様 route は a の 1019 特殊化と重なるため hub 経由で分担確認しつつ進む。
+
+## ✅ 2026-07-08 (lane b) — 0101 HUB 裁定確認: caseB 非再構築を confirm
+
+0101 裁定 (S11_NineElevenCoherence = b carve-out / caseA = b / caseB = a / full assembly = a) を
+確認・受諾。**b は caseB (9.7.b) 一様 route を再構築しない** — a の S13 landed 群
+(`caseB_coherent_sOf_H0Cprime_of_mixed` 系) を cite or hypothesis 入力で受ける。b の本 leaf scope =
+**caseA (9.7.a) maximality 帰納のみ** ((9.11.1) squeeze + (9.11.2)-(9.11.8) 反証)。
+⚠ 将来 flag: b の (13.3) 消費 (S-instance、dadeHypS/A(S) world) は a の gate-2 (base.tau/A0 world) と
+別 world のため、S-instance 側 assembly の world-bridge が task #3 で要調整 (hub 相談予定、今は caseA 進行)。
+
+**進捗 (本日 iteration 2)**: commit 7eedf681 — caseA a-divisibility の S0-witness 形
+(`inertia_le_hcuInHu` + `caseA_source_degree_dvd_a_of_S0_witness`、sorry-free/axiom-clean)。
+次 = W1-conj transport で S0-witness 仮定を外す (Coq a_dv_XH0 完成形)。
