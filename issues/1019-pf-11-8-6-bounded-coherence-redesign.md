@@ -1002,3 +1002,44 @@ hw2 = params.w2_prime) → isCoherent_of_subset (witness ζ̄−ζ)。
   ここが Coq (9.11.1)-(9.11.8) の本体 (norm-chain wlog 込み) で、caseB (uniform-qu) を先に
   (全 member 同 deg で hDeg 計算が単純)、非 Galois caseA (qa/qu mixed) を後に。
 次 iteration = mixed corner の 1-pair adjoin instantiation (caseB 形から)。
+
+## 🔬 update⁶⁵ (2026-07-07 lane-a /loop) — mixed corner 1-pair adjoin の入力→supply 完全 map (handoff、composite は次 iteration で build)
+
+xAdjoinStepW_k (S08_CoherenceWeighted:459-599) を精読し全入力の supply 元を確定。composite
+`adjoin_muColumnPair_of_irrCut` (S13、~200 行) の設計:
+
+### 設計判断: adjoin pair は S06 columnSum 表記で組む
+χ = `columnSum h46 χ₂` (χ₂ = muColumnChar k / 一般 W₂-dual、χ₂ ≠ 1)、χ̄ = `columnSum h46 χ₂⁻¹`
+(columnSum_conj_eq)。§12 muGrid 表記への変換は family 分解側で world-join を使う (adjoin engine
+自体は S06 表記が最短)。τ = hyp.tau は dadeICM hyp.dadeData.dade (fullDadeIsometryData hyp.hconj)
+と defeq (S04.Hypothesis 引数 = hyp.dadeData.dade、hconj = hyp.hconj、A = typePA0 →
+suppIn = hyp.A0 ✓ certainTypeSet_isCoherent_A0 で実証済)。
+
+### 入力 → supply 元 (17 項目)
+| 入力 | supply | 状態 |
+|---|---|---|
+| hS₁ | `sOf_degreeSubfamily_isCoherent` (irr-cut, d=qu) | ✅ landed |
+| hdiffsuppχ | `columnDiff_support_subset` (S06:302) + columnSum_conj_eq + A(M)→A₀ mono | ✅ 組める |
+| hχχne | columnSum_def + `columnFamily_mu_sum_inner` 対角 = w1 ≠ 0 | ✅ 組める |
+| hχbarχbarne | conj 側同様 (χ₂⁻¹ 対角) | ✅ |
+| hχχbar/hχbarχ | mu_sum_inner off-diag + `column_inv_ne_self` | ✅ |
+| hχ_S1/hχbar_S1 | μ ∈ inducedFamily (`muGrid_column_sum_mem_inducedFamily`+world-join or 直) ⊥ irr-cut member (distinct: reducible vs irr) via `inducedKernelFamily_pairwise_orthogonal` | ✅ 組める |
+| s/χmem/deg/i₁ | irr-cut の Finset enumeration (equivFin パターン、deg ≡ 1) + anchor 選択 | 機械的 |
+| hmemdegdiffsupp | equal-deg (qu) 差の support = `inducedKernelFamily_scaledDiff_support` 系 | ✅ |
+| hmemS1/hmemortho/hanchorNorm | irr-cut 定義 + `irreducibleCharacter_inner_eq_ite` (mc ≡ 1) | ✅ |
+| **a** | = 1 (caseB: μ(1) = w1·u = qu = anchor(1) — uniform-qu で係数 1) | ✅ |
+| Dmem | `memberExtensionDecomposition` (irr member 用 ψ=0、S07/S08 — 所在確認) | 要確認 |
+| Da | `certainTypeDecompositionDa` (ψ=a·η₁=χ₁; hμη₁supp = equal-deg diff support ✓、htau1_mema = Dade ZIrr ✓、hχψ/hχbarψ = μ⊥χ₁ ✓) | ✅ 組める |
+| hDatau1 | rfl (ofProjection の tau1 = dadeICM) | ✅ |
+| hortho_mem | `certainTypeR_imageSet_orthogonal_dadeOfDiff` (S06、column ⊥ irr-break の向き確認) | 要確認 |
+| htau1Dmem | memberExtensionDecomposition 設計で rfl | 要確認 |
+| htau1_memaχ | `dadeIntegralCharacterMap_mem_ZIrr_of_supported` (μ−χ₁ supported + ZIrr) | ✅ |
+| ha1 | rfl (deg ≡ 1) | ✅ |
+| **hDeg** | 2·1 < Σ 1²/1 = \|irr-cut\| ⟹ **\|irr-cut\| ≥ 3 の counting** | **named hypothesis** |
+| hSgen | equal-deg family: x = (x−χ₁)+χ₁、x−χ₁ supported | ✅ (`zSupportedSpan_range_subset_span_sub_zero` 系) |
+| hgen | uniform-deg collapse (S₁∪pair 全員 deg qu) | ✅ 組める (~30 行) |
+
+### ⟹ 残る genuine gap = hDeg counting (\|irr-cut\| ≥ 3) のみ、他は組立
+counting は §9 の X_H0C' サイズ下界 ((9.9)(a) Galois / (9.8)(d) 非Galois lb_Sqa) — named
+hypothesis で前倒しし、§9 counting は別 piece。次 iteration = composite を上記 map 通りに build
+(Dmem/hortho_mem の 2 「要確認」を先に grep)。
