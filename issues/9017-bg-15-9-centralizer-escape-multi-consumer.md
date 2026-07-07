@@ -565,3 +565,41 @@ port path をそのまま実装:
 (BG Cor 15.9)** の bare sorry 1 本 (S15_MF.lean:11061)。full build 3934 GREEN + AxiomsCheck OK。
 次: Cor 15.9 (Sibley package) に着手。Thm 15.8 が honest 化したので Cor 15.9 は Thm 15.8 を
 sorry-free に cite できる。
+
+## 2026-07-07 更新 #19 (lane b, /loop) — Cor 15.9 完全 reconstruction map + unsound conjunct 削除
+
+**(A) unsound conjunct 削除済** (commit で statement 訂正): `∃ r prime ∈ τ₂(N), N_G(⟨x⟩) ≤ E⊓N` は
+x∈⟨x⟩≤N_G(⟨x⟩) かつ x∈M_σ (M_σ⊓E=⊥ ゆえ x∉E) で **false**、Coq 15.9(a)(b) に無く consumer-0。削除。
+新 statement = Coq-faithful `IsTypeF M ∧ ¬FittingIsTI M ∧ IsTypeP2 N ∧ (E cyclic σ'-Hall, Frobenius)`。
+
+**(B) 証明 map (Coq `nonFtype_signalizer_base` BGsection15.v:1399-1506)**。全依存 repo に存在:
+- **IsTypeP2 N**: `signalizer_structure_of_mem_sigmaSharp` (S16 L271、証明済) が
+  `IsTypeF N ∨ IsTypeP2 N` (conjunct 6) + `¬IsTypeF N` → `.resolve_left hNnotF`。**trivial**。
+  - N の同定: given N ∈ maxContaining(C(x)) = {signalizer N'} (`maximalContaining_centralizer_eq_singleton_of_tau2_element` S14 L3164、consumer L5730 と同型) → N=N'。escape → `1<|𝓜_σ(x)|` は `centralizer_le_of_maximalSigma_le_one` の contrapositive (consumer L5720-5723)。
+- **IsTypeF M**: `typeP2_neighbor_is_typeF_of_mem` (S14 L11396、Coq P2type_signalizer、axiom-clean) の
+  第1出力。要 setup: N type-P2 + κ-Hall K + (κ∪σ)'-Hall U (abelian, K≤N(U)) + r∈π(U) + R≤U r-Sylow +
+  **M ∈ maxContaining(N(R))** (= N(R)≤M)。
+- **τ₂(M)=∅**: `tau2_transfer_constraint` (Thm 15.8、**landed #18**) を **N に適用** (its-M=N, its-H=M)。
+  背理法: `¬(τ₂(M)=∅)` = ∃p prime∈τ₂(M) を hHtau に渡す → 第1 conjunct `∀p prime,p∉τ₂(N)` = τ₂(N)=∅、
+  r∈τ₂(N) と矛盾。同一 K/U/r/R setup を共用。
+- **E cyclic Frobenius**: ⚠ `typeF_frobenius_of_tau2_prime_free` (S16_Lemma1413 L244) は Frobenius を与えるが
+  **cyclic を与えない**。cyclic は Coq で E=E1 (E2=E3=1) + E1 cyclic (sigma_compl_context)。**E3=1 が
+  Thm 15.7 (`fitting_not_ti_cases` S15 L9028) の escape 経由** (Coq: ntX=F(M)∩F(M)^y≠1 from cxy)。
+  → cyclic-E は Thm 15.7 + sigma_compl の追加 assembly を要する (最重量ピース)。
+- **¬FittingIsTI M**: `not_fittingIsTI_of_mem_fittingSharp_of_centralizer_not_le` (S15 L11030、証明済) に
+  `x ∈ fittingSharp M` を渡す。x∈sigmaSharp M=M_σ^#、type-F ⟹ M_σ nilpotent (`maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent`) → M_σ⊆F(M) (`nilpotent_normal_le_fitting`) → x∈F(M)^#=fittingSharp M。
+
+**(C) 🔑 key gotcha — R の M-localization** (次 iteration 必読):
+`norm_noncyclic_sigma` (S12_ExceptionalBridge L1191) は **R≤M** + r∈σ(M) + R **noncyclic** を要求し N(R)≤M を与える。
+- R noncyclic: r∈τ₂(N) ⟹ r-rank(N)=2 ⟹ R (r-Sylow of N) rank2 → noncyclic (`odd_pgroup_rank1_cyclic` 系)。
+- r∈σ(M): signalizer conjunct 7a `τ₂(N)∩π(N)⊆σ(M')` (M'=M∈𝓜_σ(x)) に r∈τ₂(N)∩π(N) (r|ord x, x∈N)。
+- **R≤M が問題**: matched pair `typeP2_exists_matched_kappa_hall_pair` (S16 L1319) の U は U≤N であって
+  U≤M で**ない**。R≤U≤N。norm_noncyclic は R≤M を要求。
+  **解**: R = **M∩N の r-Sylow** に取る (M∩N は σ(N)'-complement of N_σ = signalizer conjunct 7c ゆえ
+  r∈σ(N)' の r-part を full に含む → R=r-Sylow of N かつ R≤M∩N≤M)。その後 Hall 共役で matched pair
+  (K₀,U₀) を R≤U₀^g に合わせる (∃g, R≤U₀^g; (K₀^g,U₀^g) も abelian+K≤N(U) を保つ)。R=r-Sylow of U₀^g (Hall)。
+
+**(D) 残作業見積り**: ~150-200 行。setup (r/R/localization/共役 ~60行) + IsTypeF M (~5) + τ₂=∅ (~20) +
+cyclic-E via Thm 15.7 (~40-60、最重) + ¬FittingIsTI (~10) + assembly。build は常に GREEN 維持
+(theorem body は完成まで sorry)。次: signalizer setup + IsTypeP2 N から着手 (低リスク)、R-localization、
+最後に cyclic-E。
