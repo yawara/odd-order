@@ -263,3 +263,43 @@ world-bridge が済んだので capstone re-target (step ③→④) に必要な
    (`sibleyTarget_H0C := sorry`, issue 7001)。sorried-cite。
 3. **union-glue** (SHCSet/SOf(HC), sOf(H₀C)) の hmixed/hDτ = §14/BG §15-gated。
 4. capstone `coherent_SOf_H0C_of_column_identities` (S13) → `S_H0C_not_coherent` 矛盾 + endgame 移設。
+
+## 🔬 update⁴⁰ (2026-07-07 lane-a /loop) — ★ capstone gate 構造を code-level 確定: coherent(SOf(HC)) は sorry-free 到達可能
+
+world-bridge (update³⁹) 後、capstone re-target に必要な coherence 入力を精査。**旧 update³⁹ の
+「SHCSet↔SOf(HC) は deep §9」評価は過小**: 前セッションが既に土台を landing 済で、
+**coherent(SOf(HC)) は sorry-free に到達可能**と判明。
+
+### ★ 既存 (sorry-free、prior lane-a): SOf(M'') = SHCSet + coherent
+- **`S13.Hypothesis.SOf_secondDerived_eq`** (S13:1047, axiom-clean): `SOf(M'') = SHCSet`
+  (= degree-w₁ 既約 subfamily)。証明は `inertia_eq_derived_of_linear` (linear char の Clifford irr) +
+  `charValue_one_eq_one_of_commutator_le_ker` (M''≤ker → linear)。← **Clifford-irr 機構は在った**。
+- **`S13.Hypothesis.secondDerived_coherent`** (S13:1103, axiom-clean): `coherent(SOf(M''))`
+  = `SHC_isCoherent` を `SOf_secondDerived_eq` で rewrite。
+
+### ★ coherent(SOf(HC)) の sorry-free path (次 iteration で build)
+`SOf(HC) ⊆ SOf(M'')` (antitone、`M''⊆HC` = `secondDerived_le_HC` **sorry-free**) + `secondDerived_coherent`
+[sorry-free] + **IsCoherent subset-restriction**。⟹ coherent(SOf(HC)) は M''=HC gate 不要で sorry-free。
+- **build 手順** (~40-50 行):
+  1. `isCoherent_of_subset` (S07.IsCoherent の restriction): `IsCoherent τ S A → S'⊆S →
+     (∃φ∈zSupportedSpan S' A, φ≠0) → IsCoherent τ S' A`。extension 同一、inner_eq/extends/mem_ZIrr は
+     `Submodule.span_mono` (zSpan=span ℤ) + `zSupportedSpan_mono_left` (S07:96) で restrict。
+  2. nonzero witness (SOf(HC)): `exists_inducedKernelFamily_member_degree_index` (S08:142、要
+     `[((HC.subgroupOf M).subgroupOf K).Normal]` = `HC_subgroupOf_normal.subgroupOf` +
+     `commutator(K/HC)≠⊤` = M''≤HC ⟹ ⊥ かつ HC⊊M'=HU via `C_lt_U`) で deg-w₁ member ζ →
+     `inducedKernelFamily_hasNoRealCharacters` で ζ≠ζ.conj → `inducedKernelFamily_conjDiff_support`
+     (S08:286) で ζ-ζ.conj ∈ zSupportedSpan A₀、≠0。
+- **注**: world-bridge は `SOf(HC)` 形が正 (H≤ker part は SOf(M'') でなく SOf(HC); SOf(M'')=SHCSet は
+  H を kill しない deg-w₁ 既約も含むため SOf(H0C) に非包含 → `SOf(H0C)=SOf(M'')∪sOf(H0C)` は偽)。
+
+### capstone re-target `coherent_SOf_H0C_of_column_identities` (S13) の残 gate
+1. **coherent(SOf(HC))** = ↑ sorry-free path (次 iteration)。
+2. **coherent(sOf(H0C))** = (9.11) `S11.coherent_H0C_commutator` = §14-gated (`sibleyTarget_H0C` sorry、
+   ⚠ S07_Subcoherent note で likely-UNSOUND 指摘あり = issue 7001; 本来 (9.11) Ptype_core_coherence
+   8-step induction で honest 化すべき)。sorried-cite。
+3. **union-glue** (SHCSet/SOf(HC), sOf(H0C)) の hmixed/hDτ = §14/BG §15-gated。
+4. `SOf_H0C_eq_SOf_HC_union_sOf` (update³⁹ landed) で SOf(H0C)=SOf(HC)∪sOf(H0C) に書き換え → union-glue →
+   coherent(SOf(H0C)) → `coherent_S_of_coherent_SH0C` → inducedFamily → `S_not_coherent` 矛盾 + endgame 移設。
+
+⟹ **本 session landed**: world-bridge 集合等式 (update³⁹) + characterKernel subgroup infra。
+**次 = coherent(SOf(HC)) sorry-free build (path 確定) → capstone skeleton (gate 2/3 は sorried-cite)。**
