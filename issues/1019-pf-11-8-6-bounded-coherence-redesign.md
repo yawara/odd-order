@@ -1503,3 +1503,24 @@ fold (update⁸³) の named 入力を同 session で 3/4 discharge し、caseB 
 
 ### status
 - 9075 claim 済。次 iteration = pivotCoherence の CODE (S07_Subcoherent 追記 or 新 leaf)。
+
+## 🔬 update⁸⁶ (2026-07-08 lane-a /loop) — ★ pivotCoherence engine LANDED (9075 part 1, sorry-free)
+
+`S07_PivotCoherence.lean` 新 leaf (commit b648b01c, 322 行, axiom-clean)。norm-general
+uniform-degree coherence の核 = Coq `pivot_coherence` の等次数特化を**明示式**で port:
+`ν φ := s(φ)•ζ₁ + τ(φ − s(φ)•η₁)`、s = 直交係数和 functional。基底 freeness 不要
+(pairwise 直交で係数 = inner product)。IsCoherent 全 5 field 構成済。
+
+- Lean 教訓: ① `zsmul_eq_mul` は ClassFunction (ring) の `c • x` に先に食い付く —
+  scalar 側の書き換えは isolated `have` で。② `ClassFunction.smul_apply` は `c * φ g` 形
+  (smul でなく mul) — `smul_eq_mul` 不要。③ span_induction の 4 case とも δφ-rearrangement
+  (`hδadd`/`hδsmul`) を先に抽出すると全補題が `rw` 一列で閉じる。
+
+### 次 (9075 part 2) — ζ₁ の供給
+caseB 適用には pivot 条件 `⟨τ(η−η₁), ζ₁⟩ = −N` ∀η の ζ₁ が要る。route 候補:
+(a) **(5.4) 一般 port** (Coq subcoherent_split :863 / subcoherent_norm :881 → haveX
+    :1265-1330): S07.Hypothesis の R-datum から X = R(χ₁) 半分和を構成。汎用・本命。
+(b) **caseB 特化**: η₁ := μ₁ (常在, p−1≥2)、R(μ₁) = S06.certainTypeR (landed) の
+    X-側半分和 — §6 の既存 Dade 展開 (dadeICM_columnDiff_eq_sum 系) から直接計算できる
+    可能性 (irr member への cross 内積は §12/§13 の columnBreak/orthoDatum 資産)。
+まず (b) の在庫確認 (certainTypeR の X-半分と ⟨τ(χ−μ₁), X⟩ 計算素材) → 足りなければ (a)。
