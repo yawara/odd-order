@@ -31,15 +31,19 @@ not yet in this file" と明記; grep で `eq_signed_sub`/`dirr_small_norm` は 
 
 ## やること (multi-piece §3 port、substantial multi-session)
 
-- [ ] **piece 1 `dirr_small_norm`**: `φ ∈ ZIrr G`, `‖φ‖²=2` ⟹ φ は相異 2 既約の ±和差
-  (`φ = ±χ_a ± χ_b`)。**一般 char theory** (Parseval + 整数係数: ∑ coeff² = 2 ⟹ 2 個が ±1)。
-  repo に一般 virtual-char Fourier decomposition (φ=∑⟨φ,χ⟩χ, coeff∈ℤ, Parseval) が必要
-  (`ZIrrFourier` 断片あり S07_Coherence:1204、`CharacterPsiDecomposition` 用の Parseval は 1434、
-  ただし汎用でない)。→ 新 shared leaf `OddOrder/GroupTheory/RepresentationTheory/**` 候補。
-- [ ] **piece 2 (3.8) cyclicTI NC bound**: cyclicTI grid に対する class function の "number of components"
-  bound。deep §3 cyclicTI (Coq `cycTI_NC`/`small_cycTI_NC`)。σ-isometry (`S05.TICyclicHypothesis.sigma`
-  = 既存) の image の rigidity。
-- [ ] **piece 3 `eq_signed_sub_cTIiso`**: piece 1+2 の assembly。
+- [x] **piece 1 `dirr_small_norm`** — ✅ **完了 (2026-07-08)**: `exists_signed_pair_of_mem_ZIrr_inner_self_eq_two`
+  (`ZIrrFourier.lean`)。`φ ∈ ZIrr G`, `‖φ‖²=2` ⟹ `φ = ε_α•α + ε_β•β` (α≠β 既約, ε∈{±1})。**sorry-free**。
+  判明: 必要 infra は `ZIrrFourier.lean` に**既に全部あった** (旧 issue 0025 layer-2): `mem_ZIrr_repr`
+  (φ=∑c(a)•a, c:→₀ℤ) / `mem_ZIrr_inner_self_eq_sum_sq` (Parseval ‖φ‖²=∑(c a)²) /
+  `exists_pair_of_sum_sq_eq_two` (整数 combinatorial core: 全非零・平方和2 ⟹ 相異2元各±1)。
+  → 新 leaf 不要、既存 file に assembly のみ追加 (build 3152 jobs green)。
+- [ ] **piece 2 (3.8) cyclicTI NC theory** (deep §3、次の主 frontier): `cyclicTI_NC φ := #|{(i,j) : ⟨φ,η_ij⟩≠0}|`
+  (η-grid 構成数、Coq PFsection3.v:1525) + bounds `cycTI_NC_{opp,sign,iso,irr,dirr,sub,norm}` +
+  **(3.8) `small_cycTI_NC`** (PFsection3.v:1673 近傍、φ が V 上消えて小 norm ⟹ NC 小)。σ-isometry
+  `S05.TICyclicHypothesis.sigmaIntegral` (既存) の η-grid に対して port。repo 不在 (from-scratch)。
+  `eq_signed_sub_cTIiso` が要するのは `NC(φ−ρ) < 2·min(w1,w2)` (via `cycTI_NC_sub` + `cycTI_NC_norm`)。
+- [ ] **piece 3 `eq_signed_sub_cTIiso`**: piece 1 (`exists_signed_pair_...` ✅) + piece 2 の assembly
+  (Coq PFsection3.v:1685-: ψ=φ−ρ の dirr_constt を NC bound で η-grid 内に閉じ込め、V-agreement で符号確定)。
 - [ ] **piece 4 `prDade_sub_TIirr`**: Dade norm (‖μ2_ij−μ2_ik‖²=2) + V-value + piece 3 ⟹ cross-relation。
   → `tauS_mu_row0_cross` (S15_SAndT.lean, 3003) を discharge。
 

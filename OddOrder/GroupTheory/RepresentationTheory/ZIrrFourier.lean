@@ -298,6 +298,36 @@ theorem exists_pair_of_sum_sq_eq_two {ι : Type*} [DecidableEq ι] {s : Finset �
   · rw [pow_two] at hα1; exact mul_self_eq_one_iff.mp hα1
   · rw [pow_two] at hβ1; exact mul_self_eq_one_iff.mp hβ1
 
+/-- **`dirr_small_norm` (Peterfalvi §3, mathcomp `dirr_small_norm`), norm-`2` case.**  A virtual
+character `φ ∈ ZIrr G` with `‖φ‖² = 2` is a **signed sum of two distinct irreducible characters**:
+`φ = ε_α·α + ε_β·β` with `α, β ∈ Irr G`, `α ≠ β`, and signs `ε_α, ε_β ∈ {±1}`.
+
+Assembled from the layer-2 Fourier API: `mem_ZIrr_inner_self_eq_sum_sq` writes `‖φ‖²` as the sum of
+squared integer Fourier coefficients over `c.support ⊆ Irr G`, and `exists_pair_of_sum_sq_eq_two`
+forces exactly two nonzero coefficients, each `±1`.  This is the constituent-count input to the §3
+rigidity lemma `eq_signed_sub_cTIiso` (issue 9076). -/
+theorem exists_signed_pair_of_mem_ZIrr_inner_self_eq_two {φ : ClassFunction G ℂ}
+    (hφ : φ ∈ ZIrr G) (hnorm : ClassFunction.inner φ φ = 2) :
+    ∃ (α β : ClassFunction G ℂ) (εα εβ : ℤ),
+      IsIrreducibleCharacter α ∧ IsIrreducibleCharacter β ∧ α ≠ β ∧
+      (εα = 1 ∨ εα = -1) ∧ (εβ = 1 ∨ εβ = -1) ∧
+      φ = (εα : ℂ) • α + (εβ : ℂ) • β := by
+  classical
+  obtain ⟨c, hsupp, hrepr, hnorm_sum⟩ := mem_ZIrr_inner_self_eq_sum_sq hφ
+  rw [hnorm] at hnorm_sum
+  -- `‖φ‖² = ∑_{a ∈ supp} (c a)²` in `ℂ`, and `= 2`, so the integer sum of squares is `2`.
+  have hsum_int : ∑ a ∈ c.support, (c a) ^ 2 = 2 := by
+    have hc : ((∑ a ∈ c.support, (c a) ^ 2 : ℤ) : ℂ) = 2 := by
+      push_cast; exact hnorm_sum.symm
+    exact_mod_cast hc
+  have hne : ∀ a ∈ c.support, c a ≠ 0 := fun a ha => Finsupp.mem_support_iff.mp ha
+  obtain ⟨α, β, hαβ, hsupport_eq, hα1, hβ1⟩ := exists_pair_of_sum_sq_eq_two hne hsum_int
+  rw [hsupport_eq, Finset.sum_pair hαβ] at hrepr
+  have hα_mem : α ∈ (↑c.support : Set (ClassFunction G ℂ)) := by rw [hsupport_eq]; simp
+  have hβ_mem : β ∈ (↑c.support : Set (ClassFunction G ℂ)) := by rw [hsupport_eq]; simp
+  exact ⟨α, β, c α, c β, mem_irreducibleCharacters.mp (hsupp hα_mem),
+    mem_irreducibleCharacters.mp (hsupp hβ_mem), hαβ, hα1, hβ1, hrepr⟩
+
 /-! ### Integer Cauchy–Schwarz on a coefficient vector
 
 The numeric core of Peterfalvi §7 (5.4): for an integer `c`, `c ≤ c²`, with
