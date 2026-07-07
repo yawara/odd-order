@@ -5686,6 +5686,77 @@ theorem maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2 [Finite G]
   · exact hcls.2.2.2.2.2.mpr (Or.inl (hcls.1.mpr hF))
   · exact hcls.2.2.2.2.2.mpr (Or.inr (Or.inl (hcls.2.1.mpr hP2)))
 
+/-- **BG Corollary 15.9** (mmd L4240; Coq `nonFtype_signalizer_base`, BGsection15.v:1399, parts
+(a)(b), due to Sibley and Feit--Thompson): the final local landing point for a centralizer escaping
+`M`.  Given `x ∈ M_σ^#` with `C_G(x) ⊄ M` and the signalizer neighbour `N ⊇ C_G(x)` that is *not*
+type-`F`, then `M` is type-`F`, `F(M)` is not `TI`, `N` is type-`P₂`, and `M = M_σ ⋊ E` is a
+Frobenius group with cyclic `σ(M)′`-Hall complement `E`.  The Sibley/Feit--Thompson package used
+by §16.
+
+⚠ **Statement corrected (2026-07-07, issue 9017 更新 #19)**: an earlier draft over-specified an
+`∃ r prime ∈ τ₂(N), N_G(⟨x⟩) ≤ E ⊓ N` localization conjunct.  That is **unsound** — `x ∈ ⟨x⟩ ≤
+N_G(⟨x⟩)` but `x ∈ M_σ` is disjoint from the complement `E` (`M_σ ⊓ E = 1`), so `N_G(⟨x⟩) ⊄ E` —
+and it is neither part of Coq 15.9(a)(b) nor consumed downstream (`exists_RData_escape_structure`
+discards it).  Dropped.
+
+**Proof plan** (Coq `nonFtype_signalizer_base`): `IsTypeP2 N` from the signalizer dichotomy
+`IsTypeF N ∨ IsTypeP2 N` (`signalizer_structure_of_mem_sigmaSharp`) with `¬IsTypeF N`.  Fix a prime
+`r ∣ ord(x)` (so `r ∈ τ₂(N)`, signalizer conjunct); the matched `κ(N)` / `(κ∪σ)(N)′`-Hall pair
+`K, U` (`typeP2_exists_matched_kappa_hall_pair`) has an `r`-Sylow `R ≤ U` of `r`-rank 2 (noncyclic),
+and `N_G(R) ≤ M` (`norm_noncyclic_sigma`, since `r ∈ σ(M)` via `τ₂(N) ∩ π(N) ⊆ σ(M)`).  Then
+`typeP2_neighbor_is_typeF_of_mem` (Coq `P2type_signalizer`) with `H := M` gives `IsTypeF M`;
+`tau2_transfer_constraint` (Thm 15.8) forces `τ₂(M) = ∅` (else its first conjunct gives `τ₂(N) = ∅`,
+contradicting `r ∈ τ₂(N)`); `typeF_frobenius_of_tau2_prime_free` builds the Frobenius `E`; and
+`¬FittingIsTI M` follows from `not_fittingIsTI_of_mem_fittingSharp_of_centralizer_not_le`
+(`x ∈ M_σ^# ⊆ F(M)^#`, `M_σ` nilpotent for type-`F`). -/
+theorem centralizer_escape_final_local [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M N : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hN : N ∈ maximalSubgroups G) {x : G}
+    (hx : x ∈ sigmaSharp M) (hesc : ¬ Subgroup.centralizer ({x} : Set G) ≤ M)
+    (hNmem : N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)))
+    (hNnotF : ¬ S14.IsTypeF N) :
+    S14.IsTypeF M ∧ ¬ FittingIsTI M ∧ S14.IsTypeP2 N ∧
+      ∃ E : Subgroup G,
+        E ≤ M ∧ Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+          (E.subgroupOf M) ∧ IsCyclic ↥E ∧
+        OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M
+          ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (E.subgroupOf M) := by
+  classical
+  have hx1 : x ≠ 1 := hx.2
+  have hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma M := hx.1
+  -- The escape gives `1 < |𝓜_σ(x)|`, and the signalizer structure yields the unique neighbour `N'`.
+  have hgt : 1 < (S14.maximalSigmaSubgroupsOfElement x).ncard := by
+    by_contra h
+    push_neg at h
+    exact hesc (centralizer_le_of_maximalSigma_le_one hG hM hxMσ hx1 h)
+  obtain ⟨N', hNstruct, -⟩ := signalizer_structure_of_mem_sigmaSharp hG hM hx hgt
+  obtain ⟨hNmax', hCN', hRne', hRhall', hxtau2', hNtype', hforall'⟩ := hNstruct
+  have hxN' : x ∈ N' := hCN' (Subgroup.mem_centralizer_iff.mpr
+    (fun y hy => by rw [Set.mem_singleton_iff.mp hy]))
+  -- Our given `N ⊇ C_G(x)` is that unique neighbour (`ℳ(C_G(x)) = {N'}`).
+  have hNeq : N = N' := Set.mem_singleton_iff.mp
+    ((maximalContaining_centralizer_eq_singleton_of_tau2_element hG hNmax' hxN' hx1 hxtau2' hRne')
+      ▸ hNmem)
+  subst hNeq
+  -- `N` is type-`P₂` (signalizer dichotomy `IsTypeF N ∨ IsTypeP2 N` with `¬IsTypeF N`).
+  have hP2N : S14.IsTypeP2 N := hNtype'.resolve_left hNnotF
+  -- `IsTypeF M` via `typeP2_neighbor_is_typeF_of_mem` (Coq `P2type_signalizer`); issue 9017 #19.
+  have hFM : S14.IsTypeF M := by sorry
+  -- `¬FittingIsTI M`: `x ∈ M_σ^# ⊆ F(M)^#` (type-`F` ⟹ `M_σ = M_F` nilpotent normal `⊆ F(M)`).
+  have hnotTI : ¬ FittingIsTI M := by
+    haveI : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
+      (maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent hG hM).mp
+        (maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2 hG hM (Or.inl hFM))
+    have hMσF : OddOrder.BG.Ch3.S10.Msigma M ≤ fittingInAmbient M :=
+      le_fittingInAmbient_of_subgroupOf_normal_of_isNilpotent
+        (OddOrder.BG.Ch3.S10.Msigma_le M)
+        ((Subgroup.normal_subgroupOf_iff_le_normalizer (OddOrder.BG.Ch3.S10.Msigma_le M)).mpr
+          (OddOrder.GroupTheory.le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M))
+    exact not_fittingIsTI_of_mem_fittingSharp_of_centralizer_not_le hG hM ⟨hMσF hx.1, hx.2⟩ hesc
+  refine ⟨hFM, hnotTI, hP2N, ?_⟩
+  -- Cyclic Frobenius `E` (type-`F` + `τ₂(M)=∅` (Thm 15.8) + `E₃=1` (Thm 15.7)); issue 9017 #19.
+  sorry
+
 /-- **BG Theorem D(4), the escape structure** (the `hD4` conjunct of
 `theoremD_msigma_conjugacy_and_centralizers`): for `x ∈ M_σ^#` whose centralizer escapes `M`, the
 normal-complement data `R(x)` exists and is attached to a *unique* maximal `N ⊇ C_G(x)` of type `F`
@@ -5760,7 +5831,7 @@ theorem exists_RData_escape_structure [Finite G]
     have hNnotF : ¬ S14.IsTypeF N := fun hF => S14.not_isTypeP_and_isTypeF ⟨hP2.1, hF⟩
     have hNmem : N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) := by
       rw [hMC]; rfl
-    obtain ⟨hFM, hnotTI, -, E, hEM, hEcompl, hEcyc, hEfrob, -⟩ :=
+    obtain ⟨hFM, hnotTI, -, E, hEM, hEcompl, hEcyc, hEfrob⟩ :=
       centralizer_escape_final_local hG hM hNmax hx hesc hNmem hNnotF
     exact ⟨hFM, hnotTI, E, hEM, hEcyc, hEcompl, hEfrob⟩
   · rintro N' ⟨hN'mem, -⟩
