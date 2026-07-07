@@ -1226,10 +1226,16 @@ noncomputable def T_typeIII_hyp07 [Finite G] (hyp : Hypothesis (G := G))
     OddOrder.Peterfalvi.S07.dadeCharacterDifferenceImageOfDiff
       (tSideDadeSupport_nonempty hG hyp).some.dade (tSideDadeSupport_nonempty hG hyp).some.hconj
       ⟨χ, hirr χ hχ⟩ (hreal hχ) (hconjDiff_supp _ hχ)
-  -- Assemble via the (5.3)(a) `irrSubcoherent`.
+  -- Assemble via the (5.3)(a) `irrSubcoherent` (0099 form: `hconjsupp` + `zSupportedSpan` isometry,
+  -- the latter unconditional from the Dade pair brick).
   exact OddOrder.Peterfalvi.S07.irrSubcoherent (S := calT1_set) (tSideDadeMap hyp hG) _ Rdatum
     hconj hreal hortho
-    (fun _ _ _ _ ha hb hc hd => tSideDadeMap_isometry_diff hyp hG hdiff_supp ha hb hc hd)
+    (fun χ hχ => hdiff_supp χ hχ χ.conj (hconj hχ))
+    (fun φ ψ hφ hψ => by
+      simp only [tSideDadeMap]
+      exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
+        (tSideDadeSupport_nonempty hG hyp).some.dade (tSideDadeSupport_nonempty hG hyp).some.hconj
+        hφ.2 hψ.2)
 
 open scoped Classical in
 /-- **Peterfalvi (14.9): `calT1` is coherent** (Coq `PFsection14.v:750--751`

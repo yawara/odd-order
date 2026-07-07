@@ -8,6 +8,22 @@
 
 ---
 
+## 🗺️ FRONTIER MAP 更新² (2026-07-07 夕, lane b — 0099 landing 後の §13 原文精査)
+
+- **✅ 0099 HUB 裁定実装 landing** (commit de2642d6): S07 `tau_isometry_diff` を zSupportedSpan 形へ
+  in-place 弱化 + (5.7) chain hsuppdiff threading + 4 instantiation swap (S16 分は build-green 原子性で
+  b が機械的 swap、issue 0099 に flag)。mixed-degree family で S07.Hypothesis が組めるようになった
+  (a の 1019 (9.11) mixed route の構造ブロック解消)。
+- **⭐ b 次 frontier = (13.4) `lambda_forces_T_caseB` (S15:2300, sorried)** — 案A (iii) の実装前の
+  原文精査で判明 (正本 = issue 9013 追記⁶): (13.4) は **T-side d=1 + v-full を λ-branch で一発供給**
+  し、かつ **S-side (13.10) の h2/TT 計数の唯一上流** (S15 内 5 箇所が既に cite)。文書順でも
+  (13.10)-dual より上流。campaign 分解 (a)-(d) は 9013 追記⁶ 参照 — T-side gates (θ-dichotomy /
+  ν₁-grid / A₀(T)-TI) を精密 sorried producer 1 本に隔離し、b-buildable core (TI 非交差 +
+  disjoint-support 直交 + grid 展開) を実証明する precise-reduction パターン。
+- T-side (13.10)-dual full cascade ((13.12)/(13.15)-on-T) が真に要るのは case 3 (𝒮 に λ 無し ∧ 𝒯 に
+  θ 有り) のみ — 案A (ii)/(iii) の残りはその scope で再評価 (c の engine は S-side (13.15) +
+  case 3 の consumer として健在)。
+
 ## 🗺️ FRONTIER MAP (2026-07-07, lane b — escape package 完遂後の char pivot 精査)
 
 **escape package (BG Cor 15.9) 完全 sorry-free 化後**の S15_SAndT / S14_MaximalI frontier 実測 (survey は over-optimistic だった):
