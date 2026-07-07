@@ -55,3 +55,55 @@ caseB (9.11) `caseB_coherent_sOf_H0Cprime` が hDeg 無しで閉じ、fold 版�
 
 - issues/1019 update⁸⁵ / Coq PFsection5.v:588 (pivot), :1234 (5.7), :863/:881 ((5.4))
 - PFsection9.v:1510-1513 (Galois 枝)
+
+## 🔬 part 2 実装 plan (2026-07-08 在庫確認済 — 全 (5.4) 部品 landed、route (a) 採用)
+
+### 在庫 (S07_Coherence、全て sorry-free)
+- `CharacterPsiDecomposition τ χ ψ` (:1212) = (5.4) setup (R(χ) family + τ₁ + split
+  τ₁(χ−ψ) = X−Y、X ∈ ℤ[R(χ)] coeff 付き、Y ⊥ R(χ)、直交 scalar 3 本)。
+- **`CharacterPsiDecomposition.ofProjection`** (:1290 付近) = subcoherent_split の port:
+  `htau1_mem : (χ−ψ)^{τ₁} ∈ ZIrr G` から X/Y/coeff を射影で**計算** (posit しない)。
+- `inner_self_chi_re_le_inner_self_X` = (5.4.a) ‖X‖² ≥ ‖χ‖²。
+- **`norm_eq_and_X_eq_sum_of_norm_Y_ge`** (:1571) = (5.4.b): ‖Y‖²≥‖ψ‖² → 等号 +
+  **X = ∑_{α∈E} α、E ⊆ R(χ)、|E| = ‖χ‖²** (coeff ∈ {0,1} tightness)。
+- `eq_sum_of_psi_eq_zero` (:1624) = (5.5) (ψ=0: Y=0, τ₁χ = X = E-sum)。
+- 生射影: `exists_intProjection_of_orthonormal_ZIrr` (residual 二次 split 用)。
+- subcoherent `Hypothesis` (S07 :定義): fields = tau_isometry_diff / conjugate_closed /
+  no_real_characters / pairwise_orthogonal / difference_image (per-member
+  CharacterDifferenceImage = R-datum) / difference_images_orthogonal ((5.2.e))。
+
+### step 1: `exists_pivot_partner` (S07_PivotCoherence 追記)
+statement: hyp : S07.Hypothesis S A + hSfin + 等次数 + h1A + (χ₁ ∈ S) →
+`∃ ζ₁ ∈ ZIrr G, ⟨ζ₁,ζ₁⟩ = ⟨χ₁,χ₁⟩ ∧ ∀ η ∈ S, η ≠ χ₁ → ⟨τ(η−χ₁), ζ₁⟩ = −⟨χ₁,χ₁⟩`
+(Coq haveX/XDspec :1265-1330 mirror; D ξ := τ(χ₁−ξ)、⟨τ(η−χ₁),X⟩ = −⟨D η, X⟩)。
+- (o) N := ⟨χ₁,χ₁⟩ ∈ ℕ (genuine character norm; hyp から Num.nat — inner_self 自然数性は
+  `Cnat_cfdot_char` 対応の repo 補題を確認)。|R(χ₁)| = 2N (dotD + orthonormal)。
+- (a) **χ̄₁ 条件は X ⊆ R(χ₁)-部分和なら自動**: ⟨τ(χ̄₁−χ₁), X⟩ = −⟨∑R, ∑E⟩ = −|E| = −N。
+- (b) degenerate S ⊆ {χ₁, χ̄₁}: X := 任意の N-元部分集合の和 (Finset.exists_subset_card?
+  |R|=2N ≥ N)。
+- (c) haveX (ξ ∈ S∖{χ₁,χ̄₁}): D₁ := ofProjection (R(χ₁), τ₁:=τ, iso from
+  tau_isometry_diff [ℤ[χ₁−χ̄₁, χ₁−ξ] ⊆ ℤ[S,A]: 等次数差 supported]、直交 scalar =
+  pairwise_orthogonal) → split D ξ = X_ξ − Y₁。Y₁ を R(ξ) へ生射影 → X₁ − Y。
+  norm 勘定: ⟨Y₁⟩ = ⟨X₁⟩+⟨Y⟩ ≥ ⟨ξ⟩ ((5.4.a) 第 2 instance via ofProjection (ξ, χ₁) 型
+  or 直接) → (5.4.b) D₁ → ⟨X_ξ⟩=N ∧ X_ξ = E_ξ-sum ∧ ⟨X_ξ, D ξ⟩ = N (tau1_image 展開 +
+  Y₁ ⊥ X_ξ)。
+- (d) common X: ξ₁ 固定、X := X_{ξ₁}; 他 ξ: ⟨X − X_ξ⟩ = 0 (Coq :1315-1330 の
+  dotD/oR 計算 — R(χ₁)⊥R(ξ) は difference_images_orthogonal、dotD =
+  N + ⟨ξ₁,ξ⟩ は tau_isometry_diff)。
+- 結論 ∀η: η = χ̄₁ → (a); else Xi_spec (c-d)。
+
+### step 2: `uniform_degree_coherence_of_subcoherent` (norm-general (5.7) 完成)
+hyp subcoherent + hSfin + 等次数 + h1A + hsuppdiff + (∃ η₂ ∈ S, η₂ ≠ η₁ 用の
+nonempty/conj-closed/no-real から pair) → Nonempty (IsCoherent τ S A)
+:= exists_pivot_partner + pivotCoherence (hiso := tau_isometry_diff 変換、
+hZdiff := 差の ZIrr [isometry→ZIrr field?  hyp の tau_isometry_diff は isometry のみ —
+ZIrr 像は `difference_image`.image_eq 経由 or 別 field — 要確認: Coq IZtau = isometry+to
+ℤ[Irr]; Lean Hypothesis に Ztau 対応 field があるか grep)。
+
+### step 3: caseB rewire (S13_CoreStructure)
+𝒮(H₀C′) 上の S07.Hypothesis 構築: R-datum = μ: S06.certainTypeR / irr:
+dadeOrthonormalCharacterImageFamilyOfDiff (landed)、cross-ortho =
+certainTypeR_imageSet_orthogonal_dadeOfDiff_typeP (S13:2828 landed) + irr-irr 側
+(memberExtensionDecomposition 系)、isometry = Dade (dadeICM_inner_eq...)。
+→ `caseB_coherent_sOf_H0Cprime` から hDeg/∃-irr 分岐を撤去し全族一発に置換
+(all-reducible corner も統合可; fold は landed 資産として残置)。
