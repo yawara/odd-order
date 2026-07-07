@@ -234,3 +234,32 @@ step① SHC coherence を SOf-版に接続。
 - Coq: PFsection9.v:845 (9.8), :1258 (9.9); PFsection11.v:206 (11.3); PFsection6.v:115 (bounded coherence)
 - S12_MaximalIII_IV_V.lean: `Sset_diff_SHCSet_apply_one_eq_qu` (:3904 irr-side sorry),
   `coherent_Sset_of_column_identities` (:4188 capstone), `hgen_of_S2_uniform_degree` (:4098)
+
+## 🔬 update³⁹ (2026-07-07 lane-a /loop) — ★ world-bridge 集合等式 COMPLETE (逆方向 landed)
+
+step ③ の逆方向 (covering) を landing (commit f3d93d1a、S13、axiom-clean)。subset 方向
+(`sOf_subset_SOf`, e1ef5bdb) と合わせ **world-bridge の集合等式が完成**:
+
+- **`S13.Hypothesis.SOf_H0C_eq_SOf_HC_union_sOf`**: `SOf(H₀C) = SOf(HC) ∪ sOf(H₀C)`
+  (Peterfalvi の `S(H₀C) = S₁ ⊔ S₂`, S₁=S(HC), S₂=𝒮(H₀C))。source θ を `H ≤ Ker θ` で分割:
+  H≤ker → HC=H⊔C ≤ Ker θ → SOf(HC); H⊄ker → θ∈𝒳 → sOf(H₀C)。逆向き = kernel antitone +
+  `sOf_subset_SOf`。carrier transport は subset 方向と同型に `← hHU` で huSub world 統一。
+  **route-independent で sound** (uniform-degree の偽 route に非依存 = ④ の懸念を回避; SOf(HC)
+  形なので degree/irreducibility を主張せず純 kernel-bookkeeping)。
+- **前提 infra (foundational, hoist candidate → S03)**: `characterKernel_mul_mem` /
+  `characterKernel_inv_mem` / `characterKernelSubgroup` — genuine character の kernel が subgroup。
+  `rep_eq_id_of_character_eq_one` (χ_ρ(g)=χ_ρ(1) → ρ g = id) 経由。HC=H⊔C の join を単一 kernel
+  条件に押し込むのに必要だった (既存に無かった)。
+
+### 次 step の precise map (残 = 全て deep §9 or §14-gated)
+world-bridge が済んだので capstone re-target (step ③→④) に必要な残ピース:
+1. **coherent(SOf(HC))** = landed `SHC_isCoherent` (SHCSet 上) を **SOf(HC) 上**に移す =
+   **`SHCSet = SOf(HC)` identification** (deep §9/§11、ungated だが要証明)。真である根拠:
+   SOf(HC) の source θ は HC=H·C を kill → M'/HC ≅ U/C で factor、U/C は abelian
+   (`derivedU_le_C` = U'≤C landed ⟹ U/C は U/U' の商) ⟹ θ linear (deg 1) ⟹ Ind θ deg q。
+   Ind θ irreducible = Clifford (type-P inertia=M')。⟹ SOf(HC) = deg-q irreducibles = SHCSet。
+   ← **次の ungated 上流候補** (Clifford irreducibility + linear-source が repo にあるか要確認)。
+2. **coherent(sOf(H₀C))** = (9.11) `S11.coherent_H0C_commutator` = **§14-gated**
+   (`sibleyTarget_H0C := sorry`, issue 7001)。sorried-cite。
+3. **union-glue** (SHCSet/SOf(HC), sOf(H₀C)) の hmixed/hDτ = §14/BG §15-gated。
+4. capstone `coherent_SOf_H0C_of_column_identities` (S13) → `S_H0C_not_coherent` 矛盾 + endgame 移設。
