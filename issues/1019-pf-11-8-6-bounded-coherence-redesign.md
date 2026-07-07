@@ -862,3 +862,24 @@ route (irr-cut base) は all-reducible で base が立たない ⟹ **μ-pair ba
 - caseB assembly 全体 = seed (irr-pair [coherentPair_fromDade] or μ-pair [新規]) + 残り pairs を
   xAdjoinStepW / xAdjoinStepW_k で adjoin + coherentOfPairChainCover fold。
 次 = **μ-pair base の設計調査** (coherentPair の一般化可能性、certainTypeR half-sum 構造)。
+
+## 🔬 update⁵⁹ (2026-07-07 lane-a /loop) — ★ coherentPair_k landed: μ-pair seed の generic 部品
+
+### ✅ landed: `S07.coherentPair_k` (S07_RetargetScaled 末尾, sorry-free, commit 5f68e0a8)
+reducible 共役対 {χ,χ̄} の単独 coherence seed — coherentPair の ‖χ‖²≠1 一般化 (S₁=∅、anchor
+不要)。Gram-matched X,X̄ を受けて ν := retargetS で構成。調査確定事項:
+- `retarget_isCoherent_S`/`retarget_isCoherent_of_extensionImage_k` は **anchor χ₁∈S₁ 必須**で
+  seed 不可 → 本 lemma が gap を埋めた。
+- **`retargetTargetPair_gen`** (S07_RetargetScaled、既存): ψ=0 `CharacterPsiDecomposition` から
+  Gram-matched pair (‖X‖²=‖χ‖² 等) を**計算で**出す producer — coherentPair_k の入力供給源。
+- S07_RetargetScaled / S08_RetargetReducible / S08_CoherenceWeighted は **lane a 所有** (b glob は
+  S07_Coherence* + S08_PGroupReduction のみ) — この線の build は全て自所有内。
+
+### μ-pair seed の残り (次 iteration)
+1. **ψ=0 certain-type decomposition**: `CharacterPsiDecomposition τ_enl μ 0` の producer
+   (`certainTypeDecompositionDa` は ψ=a•η₁ 形で ψ=0 にすると support 前提が偽 → 別途組む)。
+   部品は S06 に完備: `certainTypeExtension_columnSum` (tau1(μ) = δΣω^σ = X、Y=0)、
+   `certainTypeRImage`/`certainTypeR` (imageFamily)、`certainTypeOmegaSigma_inner` (isometry)。
+2. **τ seam**: certainTypeR 系は enlarged Dade (h46.dade0) 上 — hyp.tau への retarget は
+   S08_CaseBCoherence2 の (6.8.2.3) seam パターン踏襲。
+3. seed 組立: retargetTargetPair_gen + coherentPair_k + μ−μ̄ support/nonzero (muGrid API)。
