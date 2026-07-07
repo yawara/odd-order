@@ -8,6 +8,20 @@
 
 ---
 
+## 🗺️ FRONTIER MAP (2026-07-07, lane b — escape package 完遂後の char pivot 精査)
+
+**escape package (BG Cor 15.9) 完全 sorry-free 化後**の S15_SAndT / S14_MaximalI frontier 実測 (survey は over-optimistic だった):
+- **escape-adjacent char = ✅ DONE**: `dadeSupportHypothesisData_honestTypeP2ASet` (S15_SAndT_Setup:754) は
+  refactored `typeP2_exists_matched_kappa_hall_pair` + escaping-exclusion 3 本 (`escaping_..._mem_sigmaSharp` /
+  `..._isConj_conj_in_M` / `coprime_...`) で **既に実 assembly 済** (sorry-free)。(13.2.e) S-instance dade support 完了。
+- **T-side sorry群 (V_inf_centralizer_Q_eq_bot:1887 / complement_inf_Q_structure:3060 / card_Q_eq / tConjugate_fitting_data)**
+  = **`reconciled_typePData_T` gated** (T が type-P と assert されず Q=T_F elem abelian 等が無い)。**c が active discharge 中**
+  (5→4→2 sorries、直近 commit d3917274/ab75ba94)。b は待ち; c 完遂後に V_inf 等を close。**⚠ survey の "V_inf は 20 行 mirror" は誤り**:
+  d_eq_one = 分析的 c_eq_one chain の T-side dual (Singer/two_mul_q_dvd/(13.10)) が要 = 深い。
+- **深い ungated b-side**: `exists_M_structural`/BetaData (S15_SAndT:3616、§13.18 norm) + `eta_axes_odd_of_caseC2_pair`
+  (:3795、grid orthogonality)。深い char (norm 推定・直交グリッド)、multi-iteration。次に engage する候補。
+- ⚠ 旧 notes (2026-07-05 以前) の "issue 2033/3001 が next front" は **stale** (両 issue closed)。
+
 ## ✅✅ LIVE STATUS (2026-07-06 loop, lane **b**): (13.12) `c_eq_one` 数値消去を実証明 — bare sorry → 構造残余のみ
 
 - **(13.12) `c_eq_one` (a1dc3748)**: §16 `S16_NonExistenceG` が多所 (198/696/794/1315) で consume する
