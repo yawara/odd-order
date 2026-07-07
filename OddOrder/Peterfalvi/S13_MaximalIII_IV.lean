@@ -2571,4 +2571,49 @@ theorem irrCut_conjClosed [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
   refine ⟨Hypothesis.sOf_closedUnderConjugate hyp.s11Setup Y hmem, hirr.conj, ?_⟩
   rw [ClassFunction.conj_apply, hdeg, star_natCast]
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The §12 Dade image of an `A(M)`-supported function vanishes on the exceptional set `V`**
+(the §12 analogue of `tau_apply_eq_zero_of_mem_ticVdiffV`, by a *different* route — issue 1019
+update⁷³/⁷⁴): for `α` supported on `A(M) = (M')^#` and `v ∈ (ticVdiff h46).V = W ∖ (W₁ ∪ W₂) =
+typePV M`, the image `α^τ` vanishes at `v`.
+
+Unlike the Sibley case (where `V` avoids the Dade support and the image vanishes for lack of a
+base point), here `V^M ⊆ A₀(M)` — `v` **is** a Dade base point.  The explicit (2.5) evaluation
+(`dadeValue_eq` with the witness `a = v`, `h = 1`) gives `α^τ(v) = α(v)`, which vanishes because
+`v ∉ M'` (`typePData_typePV_not_mem_derived`) while `α` is supported on `(M')^# ⊆ M'`.  This is
+the anchor of the §12 cross-orthogonality `R(μ_j) ⊥ R(χ)` (the `hortho_mem` input of the (9.11)
+column-pair adjunction). -/
+theorem tau_apply_eq_zero_of_mem_typePV [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)
+    {α : ClassFunction ↥M ℂ}
+    (hαsupp : α.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (OddOrder.GroupTheory.typePA M hyp.typeP) M)
+    {v : G}
+    (hv : v ∈ (OddOrder.Peterfalvi.S06.ticVdiff (hyp.toHypothesis46 hG hG.odd)).V) :
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) α v = 0 := by
+  haveI := hyp.finiteG
+  classical
+  -- `v ∈ typePV M` (the `ticVdiff` exceptional set is definitionally `W ∖ (W₁ ∪ W₂)`)
+  have hvPV : v ∈ OddOrder.GroupTheory.typePV M hyp.typeP := hv
+  -- `v ∈ A₀(M)` (the `V^M`-part, conjugator `1`)
+  have hvA0 : v ∈ OddOrder.GroupTheory.typePA0 M hyp.typeP :=
+    Or.inr ⟨v, hvPV, 1, M.one_mem, by group⟩
+  -- `α` is `A₀`-supported (monotone from `A(M)`-supported)
+  have hαA0 : α.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (OddOrder.GroupTheory.typePA0 M hyp.typeP) M :=
+    hαsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono Set.subset_union_left)
+  -- evaluate the explicit (2.5) Dade map at the base point `a = v`, `h = 1`
+  rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support hyp.dadeData.dade _ hαA0,
+    OddOrder.Peterfalvi.S04.Hypothesis.dadeMap_apply,
+    hyp.dadeData.dade.dadeValue_eq _ (a := ⟨v, hvA0⟩)
+      (Subgroup.one_mem _) (by rw [mul_one])]
+  -- `α(v) = 0`: `v ∉ M'` while `α` is `(M')^#`-supported
+  by_contra hne
+  have hmem := hαsupp (ClassFunction.mem_support.mpr hne)
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup,
+    OddOrder.GroupTheory.typePA_eq_sharpSubgroup_derivedInG] at hmem
+  exact OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived hyp.typeP hvPV hmem.1
+
 end OddOrder.Peterfalvi.S13
