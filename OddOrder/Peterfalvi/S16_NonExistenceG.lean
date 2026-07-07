@@ -1498,6 +1498,53 @@ theorem T_typeIII_ratio_le_of_gamma_bridge [Finite G]
   rw [Finset.sum_const, nsmul_eq_mul, mul_one, hcount] at hbessel
   exact hbessel
 
+open scoped Classical in
+/-- **(14.9) Γ-bridge extraction engine** (issue 0098 item 4, de-serialization skeleton).  Given the
+`S`-side gap `Γ` whose inner products against the orthonormal coherent family `calT1` are the integer
+coefficients `x_ζ = ⟨Γ, ζ⟩` (each `≠ 0` — the `nzT1_Ga` parity input), plus the norm bound
+`⟨Γ,Γ⟩ ≤ (u−1)/q`, the orthogonal projection `Γ₁ := Γ − ∑_ζ x_ζ·ζ` is `calT1`-orthogonal
+(`hΓ₁`, from orthonormality), so the proven Bessel skeleton `T_typeIII_ratio_le_of_gamma_bridge`
+closes the ratio.
+
+This isolates the **genuine assembly** — the orthogonal split (`hdecomp`/`hΓ₁`) — from the
+lane-b-gated `S`-side `βₛ` content (the gap `Γ` with its parity `hx` and norm `hnorm`), which enters
+as hypotheses.  `T_typeIII_ratio_le`'s residual then reduces to *just* the `βₛ`-gap existence, ready
+to cite once the `S`-side `βₛ` bridge (item 3 / issue 9013) lands. -/
+theorem T_typeIII_ratio_le_of_sSide_gap [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hyp : Hypothesis (G := G)) (calT1 : Finset (ClassFunction G ℂ))
+    (horth : ∀ a ∈ calT1, ∀ b ∈ calT1,
+      ClassFunction.inner a b = if a = b then (1 : ℂ) else 0)
+    (hcount : (calT1.card : ℚ) = ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ))
+    (Γ : ClassFunction G ℂ) (x : ClassFunction G ℂ → ℤ)
+    (hxcoe : ∀ a ∈ calT1, ClassFunction.inner Γ a = ((x a : ℝ) : ℂ))
+    (hx : ∀ a ∈ calT1, x a ≠ 0)
+    (hnorm : (ClassFunction.inner Γ Γ).re ≤
+      ((((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) : ℚ) : ℝ)) :
+    ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) ≤
+      ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) := by
+  classical
+  set Γ₁ : ClassFunction G ℂ := Γ - ∑ a ∈ calT1, ((x a : ℝ) : ℂ) • a with hΓ₁def
+  have hdecomp : Γ = (∑ a ∈ calT1, (((x a : ℝ) : ℂ) • a)) + Γ₁ := by rw [hΓ₁def]; abel
+  -- `Γ₁` is orthogonal to every member: `⟨Γ₁, b⟩ = ⟨Γ, b⟩ − ∑_a x_a·⟨a,b⟩ = x_b − x_b = 0`
+  -- (inner is linear in the first argument, `inner_smul_left : ⟨c•φ,ψ⟩ = c·⟨φ,ψ⟩`).
+  have hΓ₁ : ∀ a ∈ calT1, ClassFunction.inner Γ₁ a = 0 := by
+    intro b hb
+    have hsum_left : ∀ (s : Finset (ClassFunction G ℂ)),
+        ClassFunction.inner (∑ a ∈ s, ((x a : ℝ) : ℂ) • a) b
+          = ∑ a ∈ s, ClassFunction.inner (((x a : ℝ) : ℂ) • a) b := by
+      intro s
+      induction s using Finset.induction_on with
+      | empty => simp
+      | @insert c s hc ih =>
+          rw [Finset.sum_insert hc, ClassFunction.inner_add_left, ih, Finset.sum_insert hc]
+    rw [hΓ₁def, ClassFunction.inner_sub_left, hsum_left calT1, hxcoe b hb,
+      Finset.sum_eq_single b
+        (fun a ha hab => by
+          rw [ClassFunction.inner_smul_left, horth a ha b hb, if_neg hab, mul_zero])
+        (fun hbni => absurd hb hbni),
+      ClassFunction.inner_smul_left, horth b hb b hb, if_pos rfl, mul_one, sub_self]
+  exact T_typeIII_ratio_le_of_gamma_bridge hyp calT1 Γ Γ₁ x hcount horth hdecomp hΓ₁ hx hnorm
+
 /-- **Peterfalvi (14.9), the character body** — the structural `≤` half of the ratio comparison, the
 sole deep obligation of (14.9).  Coq `PFsection14` `FTtypeP_min_typeII`, lines 737--853: assuming `T`
 is type III, build `calT1 = seqIndD QV T QV Q` (the degree-`p` induced characters of `T`, from
@@ -1677,24 +1724,25 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           hτ.extension_inner_eq ζ ζ (Submodule.subset_span hζT) (Submodule.subset_span hζT)]
       rw [hsrc, if_neg hζζ', (hirr ζ hζT).inner_self_eq_one] at h1
       exact one_ne_zero h1.symm
-  -- **The gated `S`-side `βₛ` bridge carriers**, jointly (one documented residual `sorry`):
-  --   • `hcount`  = `|calT1| = (v−1)/p` — the coherent count `_hcount_V` (`|calT1_set| = (|V|−1)/p`,
+  -- **The gated `S`-side `βₛ` bridge content** (one documented residual `sorry`), now reduced by the
+  -- `T_typeIII_ratio_le_of_sSide_gap` extraction engine to *just* the `βₛ`-gap facts — the orthogonal
+  -- split (`Γ₁`/`hdecomp`/`hΓ₁`) is **no longer** part of the residual (the engine derives it):
+  --   • `hcount`  = `|calT1| = (v−1)/p` — the coherent count `hcount_V` (`|calT1_set| = (|V|−1)/p`,
   --     proven, via `T_typeIII_calT1_family`) composed with the (13.12) `d = 1` substitution
   --     `v = |V|` (`S15.V_inf_centralizer_Q_eq_bot`, lane-b);
-  --   • `hdecomp`/`hΓ₁`/`hx` = the `S`-side bridge gap `Γ = ∑ x_ζ·τ₁ζ + Γ₁` with parity nonzeroness
-  --     `x_ζ = ⟨Γ, τ₁ζ⟩ ≠ 0` (Coq `nzT1_Ga`, via `S09.cfdot_real_vchar_even`);
+  --   • `hxcoe`/`hx` = the `S`-side gap coefficients `⟨Γ, ζ⟩ = x_ζ ∈ ℤ` with parity nonzeroness
+  --     `x_ζ ≠ 0` (Coq `nzT1_Ga`, via `S09.cfdot_real_vchar_even`);
   --   • `hnorm`   = the `S`-side norm bound `⟨Γ,Γ⟩ ≤ (u−1)/q` on the bridge gap.
-  -- (`horth` above is NOT part of this residual — it is discharged from the (14.9) coherence.)
-  obtain ⟨Γ, Γ₁, x, hcount, hdecomp, hΓ₁, hx, hnorm⟩ :
-      ∃ (Γ Γ₁ : ClassFunction G ℂ) (x : ClassFunction G ℂ → ℤ),
+  -- (`horth` is discharged from the (14.9) coherence; `hdecomp`/`hΓ₁` from the engine.)
+  obtain ⟨Γ, x, hcount, hxcoe, hx, hnorm⟩ :
+      ∃ (Γ : ClassFunction G ℂ) (x : ClassFunction G ℂ → ℤ),
         (calT1.card : ℚ) = ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) ∧
-        Γ = (∑ a ∈ calT1, (((x a : ℝ) : ℂ) • a)) + Γ₁ ∧
-        (∀ a ∈ calT1, ClassFunction.inner Γ₁ a = 0) ∧
+        (∀ a ∈ calT1, ClassFunction.inner Γ a = ((x a : ℝ) : ℂ)) ∧
         (∀ a ∈ calT1, x a ≠ 0) ∧
         (ClassFunction.inner Γ Γ).re ≤
           ((((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) : ℚ) : ℝ) := by
     sorry
-  exact T_typeIII_ratio_le_of_gamma_bridge hyp calT1 Γ Γ₁ x hcount horth hdecomp hΓ₁ hx hnorm
+  exact T_typeIII_ratio_le_of_sSide_gap hyp calT1 horth hcount Γ x hxcoe hx hnorm
 
 /-- **Complement-conjugacy transfer of commutativity `V → d.U`** (`T`-side, ungated by (14.9)).
 Given that the `κ`-Hall complement `V` of `Q = T_F` in `T' = [T,T]` is abelian, *any* type-`P`
