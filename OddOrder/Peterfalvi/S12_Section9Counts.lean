@@ -1610,4 +1610,95 @@ theorem Hypothesis.card_SHCSet_filter_eq_charParam_n [Finite G]
       nlinarith [Nat.card_pos (α := ↥chief.N), hsplit, hpos]
     exact Subgroup.card_eq_one.mp hN1
   exact hyp.card_abelianization_derived_eq_charParam_d hG htype params hmu hnt chief hM2 hN
+
+/-! ## The §10 μ-grid column ↔ §6 certain-type column identification (issue 1019 update⁶²)
+
+The (9.11) reducible-side coherence lives on the §6 `certainTypeSet`
+(`certainTypeSet_isCoherent_A0`), while the §9/§10 family facts
+(`reducible_mem_inducedKernelFamily_eq_muGrid_columnSum`) name the reducible members as μ-grid
+column sums `∑ᵢ muGrid i j`.  These are the *same* characters: `muGrid` reads column `j` off the
+§6 `columnFamily` at the Pontryagin-reindexed `W₂`-dual character.  The next two declarations
+extract that dual character (`muColumnChar`) and record the identification
+(`muGrid_columnSum_eq_columnSum`), so the two worlds can be joined by `rw`. -/
+
+open scoped FiniteInduce in
+/-- **The `Fin w₂`-indexed `W₂`-dual character of the §10 μ-grid**: column `j` of `muGrid` is the
+§6 `columnFamily` at this character (`muGrid_columnSum_eq_columnSum`).  Extracted from the `muGrid`
+definition (the `finCardEquivCharacterGroup`-reindex of `j`) so the §6 ↔ §10 column identification
+can be *stated*. -/
+noncomputable def Hypothesis.muColumnChar [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) (j : Fin hyp.w2) :
+    ((hyp.toHypothesis46 hG hodd).W2.subgroupOf
+      ((hyp.toHypothesis46 hG hodd).W1 ⊔ (hyp.toHypothesis46 hG hodd).W2)) →* ℂˣ := by
+  haveI := hyp.finiteG
+  classical
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  exact finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j)
+
+open scoped FiniteInduce in
+/-- The §10→§6 bridge's `Hypothesis46` carries the very (4.4) hypothesis of
+`toCertainTypeHypothesis` (definitional, structure-literal projection). -/
+theorem toHypothesis46_toHypothesis [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) :
+    (hyp.toHypothesis46 hG hodd).toHypothesis
+      = (hyp.toCertainTypeHypothesis hG hodd).toHypothesis :=
+  rfl
+
+open scoped FiniteInduce in
+/-- **§10 μ-grid column sum = §6 certain-type column sum** (the world-joining identification):
+`∑ᵢ muGrid i j = columnSum (toHypothesis46 …) (muColumnChar j)`.  Both sides enumerate the same
+§6 `columnFamily` column — `muGrid` through the `finCongr` row-reindex (a bijection, so
+`Equiv.sum_comp` collapses the sum), `columnSum` directly.  Through this equation the
+`certainTypeSet` coherence (`certainTypeSet_isCoherent_A0`) applies to the μ-grid column sums
+named by `reducible_mem_inducedKernelFamily_eq_muGrid_columnSum`. -/
+theorem Hypothesis.muGrid_columnSum_eq_columnSum [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G))
+    [NeZero (Nat.card (hyp.toHypothesis46 hG hodd).W1)]
+    (j : Fin hyp.w2) :
+    (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j)
+      = OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hodd)
+          (hyp.muColumnChar hG hodd j) := by
+  haveI := hyp.finiteG
+  classical
+  -- rebuild the very `let`/`have` chain of the `muGrid`/`muColumnChar` definitions, so the
+  -- entrywise `unfold …; rfl` identifications fire against syntactically matching variables
+  set h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis with hhdef
+  haveI : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  set χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
+    finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j) with hχ₂def
+  -- entrywise: `muGrid i j = (h.columnFamily χ₂).mu (finCongr … i)`
+  have hstep1 : (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j)
+      = ∑ i' : Fin (Nat.card ↥h.W1), ((h.columnFamily χ₂).mu i' : ClassFunction ↥M ℂ) := by
+    rw [← Equiv.sum_comp (finCongr hcardW1.symm)
+      (fun i' => ((h.columnFamily χ₂).mu i' : ClassFunction ↥M ℂ))]
+    refine Finset.sum_congr rfl (fun i _ => ?_)
+    show hyp.muGrid hG hodd i j
+      = ((h.columnFamily χ₂).mu ((finCongr hcardW1.symm) i) : ClassFunction ↥M ℂ)
+    unfold Hypothesis.muGrid
+    rfl
+  -- the extracted dual character is the same `χ₂`
+  have hchar : hyp.muColumnChar hG hodd j = χ₂ := by
+    unfold Hypothesis.muColumnChar
+    rfl
+  rw [hstep1, OddOrder.Peterfalvi.S06.columnSum_def, hchar]
+  with_unfolding_all rfl
+
 end OddOrder.Peterfalvi.S12
