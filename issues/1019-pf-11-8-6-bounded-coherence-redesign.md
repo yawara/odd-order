@@ -556,3 +556,73 @@ Coq PFsection11.v 精読で同定 route を確定。**update⁴⁶ の「(11.6) 
 capstone は加えて §14 glue (ν/hmixed/hDτ) も要 (lane b/c/§14 Dade) ゆえ lane-a 単独では閉じない
 (既知)。**次 iteration = (9.11) port の genuine assembly に着手** (subcoherent(sOf(H0C')) 組立 →
 base-case constant-degree → coherentPairChain extension)。同定は (11.7) cite で並行 or 後続。
+
+## 🔬 update⁴⁸ (2026-07-07 lane-a /loop) — ★ 同定 `hyp.C = cSub` の proof path 完全確定 + step 1 landed
+
+同定に要る全 lemma を code-level 確定。**(11.7) H0=1 は既に landed/citable** (S13_CoreStructure):
+- `chief_H0_eq_bot` (S13_CoreStructure:1144): `chief.H0 = ⊥` = (11.7) crux (case-B/A dichotomy assembly、
+  sorried の可能性あるが signature 正)。`H_elementaryAbelian` (:1210) が corollary。
+- **★ landed 本 iteration**: `chief_N_eq_bot` (S13_CoreStructure): `chief.N = ⊥` (H0=⊥ + H0_eq +
+  map_eq_bot_iff)。H_elementaryAbelian の inline を抽出 + refactor (de-dup)。= 同定の step 1。
+
+### 同定 `Hypothesis.C_eq_cSub : hyp.C = S11.cSub hyp.s11Setup hyp.chief` の proof path (4 step)
+1. **`chief.N = ⊥`** — `chief_N_eq_bot` (landed)。
+2. **`cSub = (U.subgroupOf L ⊓ ker(quotientMulAutHom)).map L.subtype`** — S11 `cSub_normalized_by_uW1`
+   proof 内の `hcSub` (S11:1741、要抽出 or 再証明)。L = U⊔W1。
+3. **`ker(quotientMulAutHom chief.N_aInvariant) = ker(typeP_conjAction)` (N=⊥ 時)** — `quotientMulAutHom_apply`
+   (Isaacs Ch04:2360, `qMAH a (g:H⧸N) = (φ a g : H⧸N)`) + N=⊥ ⟹ `(x:H⧸⊥)=(y:H⧸⊥) ↔ x=y`
+   (QuotientGroup.mk mod ⊥) ⟹ `qMAH a = 1 ↔ φ a = 1`。φ = `typeP_conjAction`。
+4. **`ker(typeP_conjAction) realized in U = C_U(H) = hyp.C`** — `typeP_conjAction_apply` (S11:209,
+   = conjugation `(a:G)*x*(a:G)⁻¹`) ⟹ `φ a = 1 ↔ a ∈ centralizer(H)`; `C_eq_centralizer`
+   (`hyp.C = U ⊓ centralizer(H)`) で結合。
+
+⟹ 見積 40-80 行 (step 3-4 が crux)。**次 iteration = C_eq_cSub を書く** (step 1 landed、path 明確)。
+これで capstone hY family (sOf(H0 ⊔ hyp.C)) = (9.11) family (sOf(H0 ⊔ cSub)、H0=⊥ で cprimeSub=
+derivedInG cSub=derivedInG hyp.C=H0Cprime) が一致 → (9.11) port が hcoh を直接供給。
+
+## 🔬 update⁴⁹ (2026-07-07 lane-a /loop) — ★ C_eq_cSub LANDED (同定完了) — capstone family = (9.11) family
+
+同定 `S13_CoreStructure.C_eq_cSub : hyp.C = S11.cSub hyp.s11Setup hyp.chief` を **sorry-free landing**
+(full build green, axiom-clean)。update⁴⁸ の 4-step path を実装:
+- **forward** (`C_U(H) ≤ cSub`): `S11.mem_cSub_of_mem_U_of_centralizes` (既存、centralize H ⟹ H̄ trivial)。
+- **reverse** (`cSub ≤ C_U(H)`, N=⊥ 使用): x∈cSub の ker(uActionHom) 成員 a を unfold →
+  `quotientMulAutHom_apply_mk'` で coset action → `chief_N_eq_bot` (N=⊥) で `mk' N` injective
+  (`ker_eq_bot_iff` + `ker_mk'`) → `typeP_conjAction l ⟨g,·⟩ = ⟨g,·⟩` → `typeP_conjAction_apply`
+  (conjugation) で `x*g*x⁻¹=g` → `mul_inv_eq_iff_eq_mul` で `g*x=x*g`。s11Setup↔base は
+  `setup_typeP_eq` で bridge。
+
+### ⟹ hY route の同定 gate CLOSED。残 = (9.11) port のみ (ungated genuine math)
+同定完了で **capstone hY family `sOf(hyp.H0C)` と (9.11) family が cSub 経由で一致**。残る hY
+obligation は:
+- **hcoh = coherent(sOf(hyp.H0Cprime))** = (9.11) `Ptype_core_coherence` port (engine assembly、
+  update⁴⁵ 在庫の irrSubcoherent → coherent_subset_of_constant_degree → coherentPairChain)。
+  H0Cprime = chief.H0 ⊔ derivedInG hyp.C、C_eq_cSub で = chief.H0 ⊔ cprimeSub (S11) と一致可。
+- **hwit = 𝒮(H₀C) nonemptiness** = `caseA_exists_irreducible_sOf_H0C` (case split)。
+両方 lane-a §9-11 ungated。**次 iteration = (9.11) port assembly か hwit** に着手。
+(capstone は加えて §14 glue も要、lane-a 単独では非閉 — 既知。)
+
+## 🔬 update⁵⁰ (2026-07-07 lane-a /loop) — ★ (9.11) port target を訂正: SOf(H0Cprime) = inducedKernelFamily (Coq S_ H0C')
+
+Coq family variant を精査 → **(9.11) port target は `SOf(H0Cprime)` (= §10 inducedKernelFamily =
+Coq `S_ H0C' = seqIndD HU M HU H0C'`)** であり、`sOf(H0Cprime)` (H-version) でない、と確定。
+これで port が S08 subcoherent/witness 機構 (coherent_SOf_HC が使う inducedKernelFamily 系) を
+再利用可 = **port の de-risk**。
+
+- Coq (11.3) `cohS2 = coherent(S2=sOf(H0C))` は `subset_coherent(Ptype_core_coherence)` で、
+  Ptype_core_coherence = coherent(`S_ H0C'` = seqIndD HU M **HU** H0C')。sOf(H0C) ⊆ S_ H0C' を
+  seqIndS で直接 restrict (H-version sOf(H0Cprime) を経由しない)。
+- Lean 対応: `SOf(Y) = inducedKernelFamily((derivedInG M).subgroupOf M)(Y.subgroupOf M) = S_ Y`
+  (HU=M'=derivedInG M)。∴ (9.11) port = coherent(`hyp.SOf hyp.H0Cprime`)。
+
+### ✅ landed 本 iteration: `coherent_sOf_H0C_of_coherent_SOf_H0Cprime` (S13, 正しい bridge)
+`coherent(SOf(H0Cprime)) + 𝒮(H₀C) witness → hY`。subset `𝒮(H₀C) ⊆ SOf(H0Cprime)` =
+`sOf_subset_SOf` (sOf⊆SOf) + `inducedKernelFamily_antitone` (H0Cprime≤H0C) → isCoherent_of_subset。
+旧 `coherent_sOf_H0C_of_coherent_sOf_H0Cprime` (sOf(H0Cprime) 経由) は superseded (残置、無害)。
+
+### ⟹ 残 hY obligation (訂正後)
+- **hcoh = coherent(`hyp.SOf hyp.H0Cprime`)** = (9.11) port。target = inducedKernelFamily(H0Cprime)
+  ⟹ subcoherent 組立は S08 inducedKernelFamily 機構 (pairwise_orthogonal/hasNoRealCharacters/
+  closedUnderConjugate) を直接使える (coherent_SOf_HC の witness pattern と同型)。
+- **hwit = 𝒮(H₀C) nonzero witness** = 別途 (reducible_mem_sOf_H0C で member、sOf conjugate-closure +
+  conjDiff support + no-real で ζ.conj-ζ)。sOf-world witness 機構要 (~50 行)。
+次 = (9.11) port (SOf(H0Cprime) の subcoherent → constant-degree base → pair-chain) か hwit。
