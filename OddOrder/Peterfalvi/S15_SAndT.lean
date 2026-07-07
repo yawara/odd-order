@@ -3853,16 +3853,98 @@ theorem indPW1_inner_self [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   convert indPW1_inner_self_aux _hG hyp using 2
   exact Subsingleton.elim _ _
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **`P ⊄ ker μ_{0j}`** (Pf (13.18.b) kernel step, `S`-side).  For `j ≠ 0`, the base-row grid
+irreducible `μ_{0j}` does not have the Fitting kernel `P` in its character kernel.
+
+Contrapositive of Peterfalvi's argument (mirroring `PrimeTIResidue.constituent_P_not_subset_ker`):
+if `P ⊆ ker μ_{0j}` then `W₂ ⊆ P ⊆ ker μ_{0j}`, so `Res_{S'} μ_{0j}` is trivial on the `W₂`-part
+(`characterKernel_restrict_subgroupOf`); its constituent `ψ` — the (4.5.a) source of
+`μ_j = ∑_i μ_{ij} = Ind_{S'} ψ`, with `⟨Res_{S'} μ_{0j}, ψ⟩ = 1` by Frobenius reciprocity — inherits
+that kernel containment (`characterKernel_subset_of_isCharacter_of_inner_ne_zero`), contradicting the
+`mu_colSum_eq_induce` clause `W₂ ⊄ ker ψ`. -/
+theorem P_not_subset_characterKernel_mu [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
+    ¬ ((hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (hyp.mu ⟨0, hyp.q_prime.pos⟩ j)) := by
+  classical
+  set μ0 := hyp.mu ⟨0, hyp.q_prime.pos⟩ j with hμ0
+  have hW2_le_P : hyp.W2 ≤ hyp.P := by
+    have h := hyp.Sdata.W2_le
+    rw [hyp.Sdata_W2_eq, hyp.Sdata.H_eq, ← hyp.P_eq_SF] at h
+    exact h.trans inf_le_left
+  intro hPker
+  obtain ⟨psiS, hpsiIrr, hpsiInd, hpsiW2⟩ := hyp.mu_colSum_eq_induce j
+  have hj' : j ≠ ⟨0, hyp.p_prime.pos⟩ := fun h => hj (by rw [h])
+  have hW2notpsi := hpsiW2 hj'
+  have hW2Sker : (hyp.W2.subgroupOf hyp.S : Set ↥hyp.S) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel μ0 :=
+    fun x hx => hPker (Subgroup.comap_mono hW2_le_P hx)
+  have hRker := OddOrder.Peterfalvi.S08.characterKernel_restrict_subgroupOf
+    ((derivedInG hyp.S).subgroupOf hyp.S) hW2Sker
+  have hResChar := OddOrder.Peterfalvi.S08.isCharacter_restrict
+    (hyp.mu_irreducible ⟨0, hyp.q_prime.pos⟩ j).isCharacter
+    ((derivedInG hyp.S).subgroupOf hyp.S)
+  -- `⟨∑_i μ_{ij}, μ_{0j}⟩ = 1` (orthonormality: only the `i = 0` term survives).
+  have hmul : ClassFunction.inner (∑ i, hyp.mu i j) μ0 = 1 := by
+    rw [inner_sum_left]
+    refine (Finset.sum_eq_single ⟨0, hyp.q_prime.pos⟩ (fun i _ hi => ?_)
+      (fun h => absurd (Finset.mem_univ _) h)).trans ?_
+    · have h := irreducibleCharacter_inner_eq_ite
+        (⟨hyp.mu i j, hyp.mu_irreducible i j⟩ : IrreducibleCharacter ↥hyp.S)
+        ⟨μ0, hyp.mu_irreducible ⟨0, hyp.q_prime.pos⟩ j⟩
+      rw [if_neg (fun heq => hi (hyp.mu_col_injective j
+        (congrArg (fun χ : IrreducibleCharacter ↥hyp.S => (χ : ClassFunction ↥hyp.S ℂ)) heq)))] at h
+      exact h
+    · have h := irreducibleCharacter_inner_eq_ite
+        (⟨μ0, hyp.mu_irreducible ⟨0, hyp.q_prime.pos⟩ j⟩ : IrreducibleCharacter ↥hyp.S)
+        ⟨μ0, hyp.mu_irreducible ⟨0, hyp.q_prime.pos⟩ j⟩
+      simpa using h
+  have hfrob := ClassFunction.inner_induce_eq_inner_restrict
+    ((derivedInG hyp.S).subgroupOf hyp.S) psiS μ0
+  rw [← hpsiInd, hmul] at hfrob
+  have hinner : ClassFunction.inner
+      (ClassFunction.restrict ((derivedInG hyp.S).subgroupOf hyp.S) μ0) psiS ≠ 0 := by
+    rw [RepresentationTheory.inner_conj_symm, ← hfrob]; simp
+  exact hW2notpsi (fun x hx =>
+    OddOrder.Peterfalvi.S08.characterKernel_subset_of_isCharacter_of_inner_ne_zero
+      hResChar hpsiIrr hinner (hRker hx))
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(13.18.b) orthogonality half** (`FiniteInduce`-instance form). -/
+private theorem indPW1_inner_mu_aux [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
+      ClassFunction.inner (indPW1 hyp) (hyp.mu ⟨0, hyp.q_prime.pos⟩ j) = 0 := by
+  classical
+  have hP_le_S : hyp.P ≤ hyp.S :=
+    (by rw [hyp.S_deriv_eq_PU]; exact le_sup_left : hyp.P ≤ derivedInG hyp.S).trans
+      (Subgroup.map_subtype_le _)
+  have hS_norm_P : hyp.S ≤ Subgroup.normalizer (hyp.P : Set G) := by
+    rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
+  haveI hPnorm : (hyp.P.subgroupOf hyp.S).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hP_le_S).mpr hS_norm_P
+  have hNA : hyp.P.subgroupOf hyp.S ≤ (hyp.P ⊔ hyp.W1).subgroupOf hyp.S :=
+    Subgroup.comap_mono le_sup_left
+  rw [show indPW1 hyp = ClassFunction.induce ((hyp.P ⊔ hyp.W1).subgroupOf hyp.S)
+        (trivialClassFunction _) from rfl,
+    OddOrder.RepresentationTheory.induce_one_eq_compHom_induce_one_of_le hNA]
+  exact OddOrder.RepresentationTheory.inner_compHom_mk'_irreducible_eq_zero_of_not_subset_ker _
+    ⟨hyp.mu ⟨0, hyp.q_prime.pos⟩ j, hyp.mu_irreducible ⟨0, hyp.q_prime.pos⟩ j⟩
+    (P_not_subset_characterKernel_mu _hG hyp j hj)
+
 /-- **(13.18.b), orthogonality half**: `⟨Ind_{PW₁}^S 1, μ_{0j}⟩ = 0` for `j ≠ 0`.
 
-⚠ DEEP §13 RESIDUAL, isolated obligation.  Coq `cfnormBd`/`cfker_prTIres`: `μ_{0j}` for `j ≠ 0`
-is not a constituent of the `P`-inflated permutation character `Ind_{PW₁}^S 1` (its kernel does not
-contain the whole of `P`, whereas every constituent of the inflation is `P`-trivial).  No repo API
-yet supplies this constituent/kernel analysis. -/
+`Ind_{PW₁}^S 1 = (Ind_{Ā}^{S̄} 1) ∘ mk'` (P2) is inflated from `S̄ = S/P`, so all its irreducible
+constituents kill `P`; `μ_{0j}` does not (`P_not_subset_characterKernel_mu`), so they are orthogonal
+(`inner_compHom_mk'_irreducible_eq_zero_of_not_subset_ker`).  `_aux` carries the `FiniteInduce`
+instances; the wrapper bridges to the caller's (`Subsingleton`). -/
 theorem indPW1_inner_mu [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (_hj : (j : ℕ) ≠ 0) :
     ∀ [Fintype ↥hyp.S] [Invertible (Nat.card ↥hyp.S : ℂ)],
-      ClassFunction.inner (indPW1 hyp) (hyp.mu ⟨0, hyp.q_prime.pos⟩ j) = 0 := sorry
+      ClassFunction.inner (indPW1 hyp) (hyp.mu ⟨0, hyp.q_prime.pos⟩ j) = 0 := by
+  intro _ _
+  convert indPW1_inner_mu_aux _hG hyp j _hj using 2
+  exact Subsingleton.elim _ _
 
 /-- **(13.18.b) norm**: `‖β_j‖²_S = (u−1)/q + 2`.
 
