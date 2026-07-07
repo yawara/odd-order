@@ -3756,7 +3756,14 @@ private theorem indPW1_inner_self_aux [Finite G] (_hG : OddOrder.BG.IsMinimalSim
     OddOrder.RepresentationTheory.induce_one_eq_compHom_induce_one_of_le hNA,
     OddOrder.RepresentationTheory.inner_compHom_mk'_eq]
   -- Step 2: `S̄ = S/P` is Frobenius via the iso `e : ↥(U⊔W₁) ≃* S̄`.
-  obtain ⟨data, _⟩ := basic_structure _hG hyp
+  -- The `U ⋊ W₁` Frobenius, read off `Sdata` sorry-free (`typeP_uW1_frobenius`), avoiding the
+  -- §16-gated `basic_structure` so this stays honestly sorry-free.
+  have hSdataUne : hyp.Sdata.U ≠ ⊥ := (hyp.toTypesIIIIIIVSetupS _hG).nontrivial.1
+  have hUW1frob : Ch06.IsFrobeniusGroup ↥(hyp.U ⊔ hyp.W1)
+      (hyp.U.subgroupOf (hyp.U ⊔ hyp.W1)) (hyp.W1.subgroupOf (hyp.U ⊔ hyp.W1)) := by
+    have h := S11.typeP_uW1_frobenius hyp.Sdata hSdataUne
+    rw [hyp.Sdata_U_eq, hyp.Sdata_W1_eq] at h
+    exact h
   set f : ↥(hyp.U ⊔ hyp.W1) →* (↥hyp.S ⧸ hyp.P.subgroupOf hyp.S) :=
     (QuotientGroup.mk' (hyp.P.subgroupOf hyp.S)).comp (Subgroup.inclusion hUW1_le_S) with hf
   have he_apply : ∀ w : ↥(hyp.U ⊔ hyp.W1),
@@ -3784,7 +3791,7 @@ private theorem indPW1_inner_self_aux [Finite G] (_hG : OddOrder.BG.IsMinimalSim
     MulEquiv.ofBijective f ((Fintype.bijective_iff_injective_and_card f).mpr ⟨hinj, hcard⟩) with he
   have he_toMonoidHom : ∀ w, e.toMonoidHom w = f w := fun _ => rfl
   -- Transport the `U ⋊ W₁` Frobenius structure to `S̄`.
-  have hFrob := Ch06.isFrobeniusGroup_map_equiv data.UW1_frobenius e
+  have hFrob := Ch06.isFrobeniusGroup_map_equiv hUW1frob e
   -- The transported complement `W̄₁.map e` equals the (13.18) induction subgroup `Ā = (PW₁)/P`.
   have hAmatch : (hyp.W1.subgroupOf (hyp.U ⊔ hyp.W1)).map e.toMonoidHom
       = ((hyp.P ⊔ hyp.W1).subgroupOf hyp.S).map
