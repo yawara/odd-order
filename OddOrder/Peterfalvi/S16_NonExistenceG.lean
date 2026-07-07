@@ -866,6 +866,37 @@ theorem T_typeIII_calT1_family [Finite G] (hyp : Hypothesis (G := G))
     rw [← hcard]
     exact calT1_image_induce_card_eq hyp hHnormal 𝒯 hconj hinertia
 
+/-- **The intrinsic type-III kernel size bound `2p + 1 ≤ |V|`** (ungated, the crude `hcard2` input).
+The intrinsic `U ⋊ W₁` Frobenius (`T_typeIII_UW1_frobenius`) has odd kernel `U` (`|U| = |V|`,
+`T_typeIII_card_U`) and odd complement `W₁` (`|W₁| = p`, `T_typeIII_card_W1`); the odd-order Frobenius
+size condition `IsFrobeniusGroup.two_mul_card_complement_add_one_le_card_kernel` (`|A| ∣ |N|−1`, and
+`|N|−1` even with `|A|` odd forces `|N|−1 ≥ 2|A|`) then gives `2p + 1 ≤ |V|`.
+
+This is the **ungated** source of the `calT1` crude size bound `2 ≤ (|V|−1)/p` (`hcard2` in
+`T_typeIII_ratio_le`): it needs only oddness (subgroups of the odd `G`) plus the intrinsic Frobenius
+index `[T:T'] = p` — **not** the lane-b-gated `|V|`-lower-bound `v = (q^p−1)/(q−1)` (13.15).  (The
+`v`-value is still needed for the *exact* count `(v−1)/p`, but the coherence input `hcard2` only needs
+`≥ 2`.) -/
+theorem T_typeIII_two_p_add_one_le_card_V [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (td : OddOrder.GroupTheory.TypeIIIData hyp.base.T) :
+    2 * hyp.base.p + 1 ≤ Nat.card ↥hyp.base.V := by
+  haveI := hyp.base.finiteG
+  have hfrob := T_typeIII_UW1_frobenius td
+  have hVodd : Odd (Nat.card ↥hyp.base.V) :=
+    hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card hyp.base.V)
+  -- Kernel `|U.subgroupOf| = |U| = |V|`, complement `|W₁.subgroupOf| = |W₁| = p`.
+  have hcardN : Nat.card ↥(td.typeP.U.subgroupOf (td.typeP.U ⊔ td.typeP.W1))
+      = Nat.card ↥hyp.base.V := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left)).toEquiv, T_typeIII_card_U hyp td]
+  have hcardA : Nat.card ↥(td.typeP.W1.subgroupOf (td.typeP.U ⊔ td.typeP.W1)) = hyp.base.p := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv, T_typeIII_card_W1 hyp td]
+  have hNodd : Odd (Nat.card ↥(td.typeP.U.subgroupOf (td.typeP.U ⊔ td.typeP.W1))) := by
+    rw [hcardN]; exact hVodd
+  have hAodd : Odd (Nat.card ↥(td.typeP.W1.subgroupOf (td.typeP.U ⊔ td.typeP.W1))) := by
+    rw [hcardA]; exact hyp.base.p_odd
+  have h := hfrob.two_mul_card_complement_add_one_le_card_kernel hNodd hAodd hfrob.ne_bot_kernel
+  rwa [hcardN, hcardA] at h
+
 /-! ### T-side type-`P` Dade isometry foundation (14.9), issue 9072
 
 The (14.9) coherence carrier `horth` in `T_typeIII_ratio_le` needs a T-side Dade package
@@ -1587,7 +1618,7 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   -- the coherent map `τ₁ = hτ.extension`.  Its image `calT1 := τ₁(calT1_set)` is an **orthonormal**
   -- set of `G`-class functions (`horth`), because `τ₁` is an isometry on `ℤ[calT1_set]`
   -- (`IsCoherent.extension_inner_eq`) and the source members are orthonormal irreducibles.
-  obtain ⟨𝒯, hinertia, hne, hlinear, hconj𝒯, _hcount_V⟩ :=
+  obtain ⟨𝒯, hinertia, hne, hlinear, hconj𝒯, hcount_V⟩ :=
     T_typeIII_calT1_family hyp hIII.some
   set calT1_set : Set (ClassFunction ↥hyp.base.T ℂ) :=
     ↑(𝒯.image (fun θ => ClassFunction.induce
@@ -1600,10 +1631,17 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     obtain ⟨θ, hθ, rfl⟩ := hχ
     exact isIrreducibleCharacter_induce_of_inertia_eq
       (G := ↥hyp.base.T) (H := (derivedInG hyp.base.T).subgroupOf hyp.base.T) θ (hinertia θ hθ)
-  -- `hcard2 : 2 ≤ |calT1_set|` — the size bound `(|V|−1)/p ≥ 2`, needing a `|V|`-lower bound not
-  -- carried by the intrinsic datum (the same gate that blocks `hcount` below; lane-b (13.x)).
+  -- `hcard2 : 2 ≤ |calT1_set|` — the crude size bound `(|V|−1)/p ≥ 2`, **ungated**: from the
+  -- intrinsic `2p + 1 ≤ |V|` (`T_typeIII_two_p_add_one_le_card_V`, odd-order Frobenius `U ⋊ W₁`)
+  -- and the count `|calT1_set| = (|V|−1)/p` (`hcount_V`), via `2 ≤ (|V|−1)/p ⟺ 2p ≤ |V|−1`.  The
+  -- lane-b `|V|`-lower-bound (`v = (q^p−1)/(q−1)`, 13.15) is only needed for the *exact* count, not
+  -- this `≥ 2`.
   have hcard2 : 2 ≤ calT1_set.ncard := by
-    sorry
+    have hV := T_typeIII_two_p_add_one_le_card_V hG hyp hIII.some
+    have hncard : calT1_set.ncard = (Nat.card ↥hyp.base.V - 1) / hyp.base.p := by
+      rw [hcalT1, Set.ncard_coe_finset]; exact hcount_V
+    rw [hncard, Nat.le_div_iff_mul_le hyp.base.p_prime.pos]
+    omega
   -- The T-side coherence: `τ₁ = hτ.extension`, `IsCoherent (tSideDadeMap) calT1_set A₁(T)`.
   obtain ⟨hyp07, _htau, ⟨hτ⟩⟩ :=
     T_typeIII_calT1_isCoherent hyp hG hIII 𝒯 hinertia hlinear hne hconj𝒯 calT1_set hcalT1 hcard2
