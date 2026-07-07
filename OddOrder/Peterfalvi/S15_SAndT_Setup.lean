@@ -2290,6 +2290,122 @@ theorem character_degree_analysis [Finite G]
     Nonempty (CharacterDegreeData hyp) := by
   sorry
 
+open scoped FiniteInduce in
+/-- **The `η`-grid is orthonormal** ((13.1.d) + (3.2)/(3.3), issue 9013 (13.4)-prep): the grid
+`η_{ij} = ω_{ij}^{τ₃}` inherits the (3.3) orthonormality of the `ω`-grid through the (3.2)
+isometry `τ₃`.  The bookkeeping input of the (13.4) cross-expansion. -/
+theorem Hypothesis.eta_orthonormal [Finite G] (hyp : Hypothesis (G := G))
+    (i k : Fin hyp.q) (j l : Fin hyp.p) :
+    ClassFunction.inner (hyp.eta i j) (hyp.eta k l)
+      = if i = k ∧ j = l then 1 else 0 := by
+  rw [hyp.eta_eq_tau_omega, hyp.eta_eq_tau_omega, hyp.tau3_isometry.inner_eq,
+    hyp.omega_orthonormal]
+
+/-- **Peterfalvi (13.4), inner-product endgame** (abstract bookkeeping, issue 9013 追記⁶ core (d)):
+for an orthonormal grid `η` and vectors `λ°, θ°` orthogonal to each other and to every grid
+member, `⟨λ° − δ·∑ᵢ η_{is}, θ° − δ'·∑ⱼ η_{rj}⟩ = δ·δ' ≠ 0` for signs `δ, δ' = ±1` — the only
+surviving term of the bilinear expansion is the shared grid entry `⟨η_{rs}, η_{rs}⟩ = 1`.
+
+In (13.4) the left side is `(α^τ, β^τ)` for `α = λ − μ_s ∈ ℤ[𝒮, H^#]`, `β = θ − ν_r ∈ ℤ[𝒯, K^#]`,
+which *vanishes* because `(H^#)^G` and `(K^#)^G` are disjoint TI-supports — the contradiction
+closing (13.4). -/
+theorem eta_cross_expansion_ne_zero [Fintype G] [Invertible (Nat.card G : ℂ)] {q p : ℕ}
+    (eta : Fin q → Fin p → ClassFunction G ℂ)
+    (horth : ∀ (i k : Fin q) (j l : Fin p),
+      ClassFunction.inner (eta i j) (eta k l) = if i = k ∧ j = l then 1 else 0)
+    (lam theta : ClassFunction G ℂ) (r : Fin q) (s : Fin p)
+    (hlam_eta : ∀ (i : Fin q) (j : Fin p), ClassFunction.inner lam (eta i j) = 0)
+    (heta_theta : ∀ (i : Fin q) (j : Fin p), ClassFunction.inner (eta i j) theta = 0)
+    (hlam_theta : ClassFunction.inner lam theta = 0)
+    {δ δ' : ℤ} (hδ : δ = 1 ∨ δ = -1) (hδ' : δ' = 1 ∨ δ' = -1) :
+    ClassFunction.inner (lam - (δ : ℂ) • ∑ i : Fin q, eta i s)
+      (theta - (δ' : ℂ) • ∑ j : Fin p, eta r j) ≠ 0 := by
+  have hgrid : ClassFunction.inner (∑ i : Fin q, eta i s) (∑ j : Fin p, eta r j) = 1 := by
+    rw [OddOrder.RepresentationTheory.inner_sum_left]
+    have hrow : ∀ i : Fin q,
+        ClassFunction.inner (eta i s) (∑ j : Fin p, eta r j)
+          = if i = r then (1 : ℂ) else 0 := by
+      intro i
+      rw [OddOrder.RepresentationTheory.inner_sum_right]
+      by_cases hir : i = r
+      · subst hir
+        simp only [horth]
+        simp
+      · simp only [horth]
+        simp [hir]
+    rw [Finset.sum_congr rfl fun i _ => hrow i]
+    simp
+  have hexp : ClassFunction.inner (lam - (δ : ℂ) • ∑ i : Fin q, eta i s)
+      (theta - (δ' : ℂ) • ∑ j : Fin p, eta r j) = (δ : ℂ) * (δ' : ℂ) := by
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right, ClassFunction.inner_smul_left,
+      ClassFunction.inner_smul_right, ClassFunction.inner_smul_left,
+      ClassFunction.inner_smul_right, star_intCast, hlam_theta, hgrid]
+    have hlam_sum : ClassFunction.inner lam (∑ j : Fin p, eta r j) = 0 := by
+      rw [OddOrder.RepresentationTheory.inner_sum_right]
+      exact Finset.sum_eq_zero fun j _ => hlam_eta r j
+    have hsum_theta : ClassFunction.inner (∑ i : Fin q, eta i s) theta = 0 := by
+      rw [OddOrder.RepresentationTheory.inner_sum_left]
+      exact Finset.sum_eq_zero fun i _ => heta_theta i s
+    rw [hlam_sum, hsum_theta]
+    ring
+  rw [hexp]
+  rcases hδ with rfl | rfl <;> rcases hδ' with rfl | rfl <;> norm_num
+
+/-- **Peterfalvi (13.4), conjugate-disjointness core** (abstract form, issue 9013 追記⁶ core (d)):
+if every point of `A_M ⊆ M` is centralized by `R`, every point of `A_N ⊆ N` has its centralizer
+inside `N` (the TI-shape), and no conjugate of `R` fits inside `N`, then no element of `G` is
+simultaneously conjugate into `A_M` and into `A_N`.
+
+In (13.4): `M = S`, `A_M = H^#` with `R = P` (`P_le_centralizer_of_mem_H`); `N = T`,
+`A_N = K^# ⊆ A₀(T)` (the (13.2.e) TI-property for `T` bounds the centralizers); and `P^w ≤ T` is
+impossible since `|P| = p^q` exceeds the `p`-part `p` of `|T|` — the latter two are the T-side
+gates of the (13.4) reduction. -/
+theorem disjoint_conjugatesIntoSet_of_centralizer {M N R : Subgroup G}
+    {A_M : Set ↥M} {A_N : Set ↥N}
+    (hcent : ∀ y ∈ A_M, R ≤ Subgroup.centralizer ({((y : ↥M) : G)} : Set G))
+    (hTI : ∀ z ∈ A_N, Subgroup.centralizer ({((z : ↥N) : G)} : Set G) ≤ N)
+    (hnot : ∀ w : G, ¬ ∀ r ∈ R, w⁻¹ * r * w ∈ N) :
+    Disjoint (ClassFunction.conjugatesIntoSet M A_M)
+      (ClassFunction.conjugatesIntoSet N A_N) := by
+  rw [Set.disjoint_left]
+  rintro g ⟨a, ha, hyA⟩ ⟨b, hb, hzA⟩
+  -- The `A_M`-point is `a⁻¹ g a`, the `A_N`-point is `b⁻¹ g b = w⁻¹ (a⁻¹ g a) w` for `w = a⁻¹ b`.
+  -- Every `R`-conjugate `w⁻¹ r w` centralizes it, hence lies in `N` — contradicting `hnot`.
+  refine hnot (a⁻¹ * b) fun r hr => ?_
+  have hrx : (a⁻¹ * g * a) * r = r * (a⁻¹ * g * a) := by
+    have h := hcent _ hyA hr
+    rw [Subgroup.mem_centralizer_iff] at h
+    exact h (a⁻¹ * g * a) rfl
+  refine hTI _ hzA ?_
+  rw [Subgroup.mem_centralizer_iff]
+  intro s hs
+  have hs' : s = b⁻¹ * g * b := hs
+  rw [hs']
+  calc (b⁻¹ * g * b) * ((a⁻¹ * b)⁻¹ * r * (a⁻¹ * b))
+      = (a⁻¹ * b)⁻¹ * ((a⁻¹ * g * a) * r) * (a⁻¹ * b) := by group
+    _ = (a⁻¹ * b)⁻¹ * (r * (a⁻¹ * g * a)) * (a⁻¹ * b) := by rw [hrx]
+    _ = ((a⁻¹ * b)⁻¹ * r * (a⁻¹ * b)) * (b⁻¹ * g * b) := by group
+
+open scoped FiniteInduce in
+/-- **Cross-Dade inner-product vanishing on disjoint conjugate supports** ((13.4) core (d)):
+the inductions of `α` (supported in `A_M ⊆ M`) and `β` (supported in `A_N ⊆ N`) to `G` have
+disjoint supports when nothing is conjugate into both `A_M` and `A_N`, so their inner product
+vanishes.  This is Peterfalvi's `(α^τ, β^τ) = 0` for `α ∈ ℤ[𝒮, H^#]`, `β ∈ ℤ[𝒯, K^#]` (both Dade
+isometries being `Ind` by (13.2.e), the supports lie in `(H^#)^G` resp. `(K^#)^G`). -/
+theorem inner_induce_induce_eq_zero_of_disjoint [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {M N : Subgroup G}
+    [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card ↥N : ℂ)]
+    {A_M : Set ↥M} {A_N : Set ↥N}
+    {α : ClassFunction ↥M ℂ} {β : ClassFunction ↥N ℂ}
+    (hα : α.support ⊆ A_M) (hβ : β.support ⊆ A_N)
+    (hdisj : Disjoint (ClassFunction.conjugatesIntoSet M A_M)
+      (ClassFunction.conjugatesIntoSet N A_N)) :
+    ClassFunction.inner (ClassFunction.induce M α) (ClassFunction.induce N β) = 0 :=
+  ClassFunction.inner_eq_zero_of_disjoint_support
+    (hdisj.mono (ClassFunction.support_induce_subset_conjugatesIntoSet hα)
+      (ClassFunction.support_induce_subset_conjugatesIntoSet hβ))
+
 /-- **Peterfalvi (13.4)**: if `S` contains a degree-`u q` character induced
 from a linear character of `P C`, then case (9.7.b) holds for `T`, with
 `D = 1` and `v = (q^p - 1) / (q - 1)`.
