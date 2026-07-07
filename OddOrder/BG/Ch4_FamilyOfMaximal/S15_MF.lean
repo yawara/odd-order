@@ -7752,10 +7752,12 @@ theorem E3_eq_bot_of_tau3_eq_empty [Finite G] {M E E₁ E₂ E₃ : Subgroup G}
   exact hmem
 
 /-- **`E₂ = ⊥` from `τ₂(M) = ∅`**: the `τ₂(M)`-Hall factor `E₂` of any `σ(M)'`-complement `E`-setup is
-trivial when `M` has no `τ₂`-primes (Theorem 15.8's `τ₂(M) = ∅` for the Corollary 15.9 escape).
-`τ₂`-analogue of `E3_eq_bot_of_tau3_eq_empty`. -/
+trivial when `M` has no `τ₂`-*primes* (Theorem 15.8's `τ₂(M) = ∅` for the Corollary 15.9 escape, in
+the `∀ p, p.Prime → p ∉ τ₂(M)` form output by `tau2_transfer_constraint`).  `τ₂`-analogue of
+`E3_eq_bot_of_tau3_eq_empty`. -/
 theorem E2_eq_bot_of_tau2_eq_empty [Finite G] {M E E₁ E₂ E₃ : Subgroup G}
-    (hsetup : OddOrder.BG.Ch3.S12.SubgroupESetup M E E₁ E₂ E₃) (htau2 : tau2 M = ∅) :
+    (hsetup : OddOrder.BG.Ch3.S12.SubgroupESetup M E E₁ E₂ E₃)
+    (htau2 : ∀ p : ℕ, p.Prime → p ∉ tau2 M) :
     E₂ = ⊥ := by
   classical
   rw [← Subgroup.card_eq_one]
@@ -7764,9 +7766,7 @@ theorem E2_eq_bot_of_tau2_eq_empty [Finite G] {M E E₁ E₂ E₃ : Subgroup G}
   have hpsub : p ∈ (Nat.card ↥(E₂.subgroupOf E)).primeFactors := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hsetup.E₂_le).toEquiv]
     exact Nat.mem_primeFactors.mpr ⟨hp, hpdvd, Nat.card_pos.ne'⟩
-  have hmem : p ∈ tau2 M := hsetup.E₂_hall.1 p hpsub
-  rw [htau2] at hmem
-  exact hmem
+  exact htau2 p hp (hsetup.E₂_hall.1 p hpsub)
 
 /-- **Type-`P₂` `M_F`-internal Fitting decomposition** (BG Corollary 15.5; the `M' = M_F × U`
 form feeding Proposition 16.1's forward bridges).  For a type-`P₂` maximal subgroup `M` with
