@@ -265,6 +265,23 @@ theorem HC_le_derived {M : Subgroup G} (hyp : Hypothesis M) :
     hyp.HC ≤ derivedInG M :=
   sup_le hyp.base.typeP.H_le (hyp.C_le_U.trans hyp.base.typeP.U_le)
 
+/-- **World-bridge (subset direction, S12:4055)**: the §9 induced family `𝒮(Y) = sOf` (induced from
+`HU`-sources nontrivial on `H` and killing `Y`) is contained in the §10/§13 kernel-filtered family
+`S(Y) = SOf Y = inducedKernelFamily M' Y` (induced from *all* nontrivial `M'`-sources killing `Y`).
+Both induce from `M' = HU` (`huSub_eq_derivedInG_subgroupOf`); the `H ⊄ Ker` condition of `xiSet`
+gives the `θ ≠ 1` of `inducedKernelFamily`.  This is one half of the world-bridge; the reverse
+decomposition `SOf(H₀C) = SHCSet ⊔ sOf(H₀C)` is the remaining direction. -/
+theorem sOf_subset_SOf [Finite G] {M : Subgroup G} (hyp : Hypothesis M) (Y : Subgroup G) :
+    OddOrder.Peterfalvi.S11.sOf hyp.s11Setup Y ⊆ hyp.SOf Y := by
+  classical
+  have hHU : OddOrder.Peterfalvi.S11.huSub hyp.s11Setup = (derivedInG M).subgroupOf M :=
+    OddOrder.Peterfalvi.S11.huSub_eq_derivedInG_subgroupOf hyp.s11Setup
+  rintro _ ⟨χ, hχ, rfl⟩
+  rw [hyp.SOf_eq, ← hHU, OddOrder.Peterfalvi.S08.mem_inducedKernelFamily]
+  refine ⟨χ, ?_, hχ.2, OddOrder.Peterfalvi.S11.induceHU_eq_induce hyp.s11Setup χ⟩
+  intro htriv
+  exact hχ.1 (by rw [htriv]; simp [OddOrder.Peterfalvi.S03.characterKernel])
+
 /-- **`M` normalizes `H₀C`** (`H₀ ⊴ M` from the chief data, `C ⊴ M` from (8.5.a)). -/
 theorem H0C_normalized_by_M {M : Subgroup G} (hyp : Hypothesis M) :
     M ≤ Subgroup.normalizer ((hyp.H0C : Subgroup G) : Set G) :=
