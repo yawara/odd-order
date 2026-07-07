@@ -3804,23 +3804,18 @@ theorem normSqSumQ_spec {H : Type*} [Group H] {A : Finset H} {χ : ClassFunction
   rw [normSqSumQ, dif_pos h]
   exact_mod_cast Classical.choose_spec h
 
-/-- **A `p`-subgroup lies in a normal subgroup of coprime-to-`p` index.**  If `W ≤ S`,
-`P.subgroupOf S ⊴ S`, `[S : P]` is coprime to `|P|`, and `p ∣ |P|`, then every element of `W` of
-order dividing `p` lies in `P`: its image in `S/P` has order dividing both `p` and `[S : P]`, hence
-`1`.  Generic group theory (used to place the prime-order factors `W₁`, `W₂` inside the Fitting
-kernels `Q`, `P`). -/
-theorem pgroup_le_of_normal_coprime_index [Finite G]
-    {S P W : Subgroup G} {p : ℕ} (hp : p.Prime)
+/-- **A subgroup of coprime `p`-order lies in a normal subgroup of `p`-coprime index.**  If
+`W ≤ S`, `P.subgroupOf S ⊴ S`, `p` is coprime to `[S : P]`, and every `w ∈ W` has order dividing
+`p`, then `W ≤ P`: each `w`'s image in `S/P` has order dividing both `p` and `[S : P]`, hence `1`.
+This is the substantive core of `pgroup_le_of_normal_coprime_index`, taking the prime-vs-index
+coprimality **directly** (so it applies when `p ∣ |P|` is unknown/false but `p ∤ [S : P]`, e.g. to
+place `W₁` — of order `q ≠ p` — inside `T'` whose index is `p`). -/
+theorem subgroup_le_of_normal_coprime_index_prime [Finite G]
+    {S P W : Subgroup G} {p : ℕ}
     (hWS : W ≤ S) (hPnorm : (P.subgroupOf S).Normal)
-    (hcop : Nat.Coprime (Nat.card ↥P) (P.subgroupOf S).index)
-    (hpP : p ∣ Nat.card ↥P) (hWp : ∀ w ∈ W, orderOf w ∣ p) : W ≤ P := by
+    (hcop : Nat.Coprime p (P.subgroupOf S).index)
+    (hWp : ∀ w ∈ W, orderOf w ∣ p) : W ≤ P := by
   haveI := hPnorm
-  have hp_not_index : ¬ p ∣ (P.subgroupOf S).index := by
-    intro hdvd
-    have : p ∣ 1 := hcop ▸ Nat.dvd_gcd hpP hdvd
-    exact Nat.Prime.not_dvd_one hp this
-  have hcop2 : Nat.Coprime p (P.subgroupOf S).index :=
-    (hp.coprime_iff_not_dvd).mpr hp_not_index
   intro w hw
   have hwS : w ∈ S := hWS hw
   have horder : orderOf w ∣ p := hWp w hw
@@ -3833,11 +3828,27 @@ theorem pgroup_le_of_normal_coprime_index [Finite G]
       exact horder
     have hd2 : orderOf (QuotientGroup.mk' (P.subgroupOf S) ⟨w, hwS⟩) ∣
         (P.subgroupOf S).index := orderOf_dvd_natCard _
-    exact Nat.dvd_one.mp (hcop2 ▸ Nat.dvd_gcd hd1 hd2)
+    exact Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hd1 hd2)
   have hmem : (⟨w, hwS⟩ : ↥S) ∈ P.subgroupOf S := by
     rw [← QuotientGroup.eq_one_iff, ← QuotientGroup.mk'_apply]
     exact hmk
   rwa [Subgroup.mem_subgroupOf] at hmem
+
+/-- **A `p`-subgroup lies in a normal subgroup of coprime-to-`p` index.**  If `W ≤ S`,
+`P.subgroupOf S ⊴ S`, `[S : P]` is coprime to `|P|`, and `p ∣ |P|`, then every element of `W` of
+order dividing `p` lies in `P`: its image in `S/P` has order dividing both `p` and `[S : P]`, hence
+`1`.  Generic group theory (used to place the prime-order factors `W₁`, `W₂` inside the Fitting
+kernels `Q`, `P`).  Reduces to `subgroup_le_of_normal_coprime_index_prime` via `Coprime |P| [S:P]`
+and `p ∣ |P|` ⟹ `p ∤ [S:P]` ⟹ `Coprime p [S:P]`. -/
+theorem pgroup_le_of_normal_coprime_index [Finite G]
+    {S P W : Subgroup G} {p : ℕ} (hp : p.Prime)
+    (hWS : W ≤ S) (hPnorm : (P.subgroupOf S).Normal)
+    (hcop : Nat.Coprime (Nat.card ↥P) (P.subgroupOf S).index)
+    (hpP : p ∣ Nat.card ↥P) (hWp : ∀ w ∈ W, orderOf w ∣ p) : W ≤ P := by
+  have hcop2 : Nat.Coprime p (P.subgroupOf S).index :=
+    (hp.coprime_iff_not_dvd).mpr fun hdvd =>
+      Nat.Prime.not_dvd_one hp (hcop ▸ Nat.dvd_gcd hpP hdvd)
+  exact subgroup_le_of_normal_coprime_index_prime hWS hPnorm hcop2 hWp
 
 /-- **Peterfalvi (13.2.b)/(14.2.a): `W₂ ≤ P`.**  `W₂` is a `p`-group (`|W₂| = p`) inside `S`
 (`W₂ ≤ W = S ⊓ T ≤ S`), while `P = S_F` is the normal Hall `p`-subgroup of `S` of order `p^q`
@@ -4206,6 +4217,36 @@ theorem Hypothesis.p_ne_q [Finite G] (hyp : Hypothesis (G := G)) : hyp.p ≠ hyp
   rw [Nat.totient_prime hyp.q_prime] at hle
   have := hyp.q_prime.two_le
   omega
+
+/-- **`W₁ ≤ T'`** (local, pairing-free): the cyclic factor `W₁` (prime order `q`) lies in the derived
+subgroup `T'`.  `W₁ ≤ W ≤ T`, `T' ⊴ T` with index `[T : T'] = |W₂| = p` (`W2_isComplement_T_deriv`),
+and `q ≠ p` (`p_ne_q`); so the `q`-group `W₁` lands in the `p`-coprime-index normal `T'`
+(`subgroup_le_of_normal_coprime_index_prime`).  Unlike the `T`-side `W₁ ≤ Q` (which needs the (8.4.d)
+dual pairing), this containment is immediate from the abstract `Hypothesis` and feeds the `W₂`-side
+centralizer localisation `W₁ ≤ T' ⊓ C(W₂)` used by `reconciled_typePData_T`. -/
+theorem Hypothesis.W1_le_derivedInG_T [Finite G] (hyp : Hypothesis (G := G)) :
+    hyp.W1 ≤ derivedInG hyp.T := by
+  have hW1W : hyp.W1 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_left
+  have hWT : hyp.W ≤ hyp.T := by rw [hyp.W_eq_inter]; exact inf_le_right
+  have hW2W : hyp.W2 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_right
+  have hW2T : hyp.W2 ≤ hyp.T := hW2W.trans hWT
+  -- `T' ⊴ T`
+  have hid : (derivedInG hyp.T).subgroupOf hyp.T = commutator ↥hyp.T :=
+    Subgroup.comap_map_eq_self_of_injective hyp.T.subtype_injective (commutator ↥hyp.T)
+  haveI hM'norm : ((derivedInG hyp.T).subgroupOf hyp.T).Normal := by rw [hid]; infer_instance
+  -- `[T : T'] = |W₂| = p`
+  have hindex : ((derivedInG hyp.T).subgroupOf hyp.T).index = hyp.p := by
+    rw [hyp.W2_isComplement_T_deriv.symm.index_eq_card,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2T).toEquiv, ← hyp.p_eq_card_W2]
+  refine subgroup_le_of_normal_coprime_index_prime (p := hyp.q) (hW1W.trans hWT) hM'norm ?_ ?_
+  · rw [hindex]
+    exact (Nat.coprime_primes hyp.q_prime hyp.p_prime).mpr hyp.p_ne_q.symm
+  · intro w hw
+    have heq : orderOf (⟨w, hw⟩ : ↥hyp.W1) = orderOf w :=
+      (orderOf_injective hyp.W1.subtype Subtype.coe_injective ⟨w, hw⟩).symm
+    have h1 : orderOf (⟨w, hw⟩ : ↥hyp.W1) ∣ Nat.card ↥hyp.W1 := orderOf_dvd_natCard _
+    rw [heq, ← hyp.q_eq_card_W1] at h1
+    exact h1
 
 /-- `Q = T_F` is nontrivial: any type-`P` witness on `T` (available from `T_nonI` via
 `typePData_of_isTypeNonI`) records `H = T_F` noncyclic, and `⊥` is cyclic. -/
