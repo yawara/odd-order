@@ -41,14 +41,25 @@ hypothesis: `M ∈ 𝓜`, `g ∉ M`, `X := F(M) ⊓ F(M)^g ≠ 1` (= `¬FittingI
 - ⚠ **part (d) 本体 (E₃=1) は未形式化** (S16:4065-4070 docstring が確認)。W₁-divisibility
   (part e の |W₁|∣p∓1) は不要 — **part (d) のみ**が cyclic-E に要る。
 
-## やること
+## 進捗 (2026-07-07 lane b, 更新 #2) — 下流半分 (τ₃=∅ → E₃=⊥) を実証明化
 
-- [ ] Coq `nonTI_Fitting_structure` の part (d) 証明 (BGsection15.v:939-1245) を精読し、E₃=1 の
-      derivation が依存する上流 (part a/b/c + F(M) 構造) を repo 資産にマップ。
-- [ ] part (d) を `sigma_complement_structure_of_not_fittingIsTI` (仮) として形式化
-      (`M ∈ 𝓜`, `¬FittingIsTI M`, E-setup ⟹ E₃=1 ∧ E₂◁E ∧ cyclic(E/E₂))。
-- [ ] issue 9017 cyclic-E: setup を hFM の上に hoist (matched pair・R・hHmem 共有) → τ₂(M)=∅ (Thm 15.8)
-      + E₃=1 (本 issue) + E₁ cyclic → `∃ E cyclic Frobenius` を close。
+Coq part (d) の E₃=1 を精読 → **`E₃=1 ⟸ τ₃(M)=∅ ⟸ M' ≤ F(M)`** に還元 (Coq `sE3F`+`coprime_TIg`:
+`E₃ ⊆ E' ⊆ M' ⊆ F(M) = F(M_σ)×Y`、Y=O_σ'(F(M)) は τ₂、τ₃ ⊥ σ∪τ₂ ⟹ τ₃=∅)。**下流 2 補題を landing** (S15_MF、sorry-free):
+- `tau3_eq_empty_of_derivedInG_le_fittingInAmbient (hM'F : M' ≤ F(M)) : tau3 M = ∅`
+  (`fitting_decomposition` の F=F(M_σ)×Y + `opiCoreInG_sigmaCompl_..._subset_tau2` + τ₂ pRank=2 で prime-set 論法)。
+- `E3_eq_bot_of_tau3_eq_empty (hsetup) (htau3 : tau3 M = ∅) : E₃ = ⊥` (τ₃-Hall が空 prime-set)。
+
+⟹ **残る唯一の gate = `M' ≤ F(M)`** (Coq part (c) `sM'F`: `M' nilpotent` ⟸ `M_β=1` (type F、`H=M_σ` + β⊆σ)
++ `derivedQuotientMbeta_isNilpotent` (repo に有) + `Fitting_max`)。`M_β=1` for type-F が唯一の未確認ピース。
+
+## やること (残)
+
+- [ ] **`M' ≤ F(M)` for type-F ¬FittingIsTI M** を形式化 (crux): `M_β = ⊥` (type F) を確立 →
+      `derivedQuotientMbeta_isNilpotent` で `M' nilpotent` → `fittingInAmbient` は max nilpotent normal で `M' ≤ F(M)`。
+      `M_β=⊥` は Coq `-defH partG_eq1` (H=M_σ、beta_sub_sigma) を repo にマップ。
+- [ ] E₂=1: τ₂(M)=∅ (`tau2_transfer_constraint` = Thm 15.8) → E₂ (τ₂-Hall) = ⊥ (E3 と同じ論法の τ₂ 版)。
+- [ ] issue 9017 cyclic-E: setup を hFM の上に hoist (matched pair・R・hHmem 共有) → E=E₁ cyclic
+      (`E1_isCyclic`、E₂=E₃=⊥) + Frobenius (`typeF_frobenius_of_tau2_prime_free`) → `∃ E cyclic Frobenius` を close。
 
 ## 完了条件
 
