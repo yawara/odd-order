@@ -260,3 +260,25 @@ hub 裁定 (詳細 = issues/0098-lane-rebalance-c-reactivation.md、調査 = wf_
 commit `bf3b21f4`、0098 item 5)。9013 の `v`-value lower bound は **exact count `(v−1)/p` にのみ必要**で、
 coherence input の `≥2` には不要。⟹ **9013 が unblock する C の `T_typeIII_ratio_le` consumer は S-side βₛ
 Γ-bridge 1本のみ** (`hcard2` は除外)。
+
+## ✅ 案A item (iii) 部分 landing (2026-07-07 lane b, /loop) — 側非依存 analytic core を抽出
+
+案A の deliverable (b が §13 estimate を generic type-II 版に一般化) の**中核**を landing:
+
+- **新 sorry-free 定理 `analytic_singer_m_bound`** (`S15_SAndT_Setup.lean`, `c_eq_one` 直前) —
+  (13.12) の**側非依存 analytic core**を pure `ℚ`-arithmetic として抽出:
+  ```
+  {a b u c : ℕ} {m : ℚ} (hbR : 0<b) (hcR : 0<c) (haR : 1<a)
+    (hanalytic : u/c > m·a^(b−1)/b)      -- (13.10)
+    (hsinger   : u·(a−1) ≤ a^b − 1)      -- (13.2.c) Singer UPPER
+    ⊢ m < b·(a^b−1) / (c·a^(b−1)·(a−1))
+  ```
+- **`c_eq_one` を refactor して cite** (S-side = `a=p, b=q, u=u, c=c`) — faithful 化を build で実証
+  (leaf green 3882 jobs、S15_SAndT_Setup real sorry 12→12 不変 = 純増分の proven 補題)。
+- **c への含意**: T-side `d = 1` (`V_inf_centralizer_Q_eq_bot`) は同 core を `a=q, b=p, u=v, c=d` で
+  instantiate すれば assembly が済む。**core は Singer UPPER のみ使用ゆえ ungated** — c は (14.9) type-II
+  structure が landing 次第、T-side の (13.10)-dual + T-side Singer を供給して cite するだけ。
+  (9013 の `v`-value LOWER bound gate は ratio 不等式 = 別 consumer で、この core には入らない。)
+- **残 (案A の未 landing 部分)**: (ii) cofactor `v ∣ Singer`、T-side numeric elimination
+  (`c_eq_one_forces_params` の T 版 = q^p vs p^q で非対称ゆえ別途要)、および V_inf 本体の
+  (14.9)-gate。これらは c の (14.9) landing 待ち。
