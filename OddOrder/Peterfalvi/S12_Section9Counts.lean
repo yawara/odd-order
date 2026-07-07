@@ -1740,4 +1740,30 @@ theorem Hypothesis.muGrid_columnSum_eq_columnSum [Finite G]
   rw [hstep1, OddOrder.Peterfalvi.S06.columnSum_def, hchar]
   with_unfolding_all rfl
 
+open scoped FiniteInduce in
+/-- **Cross-column degree constancy at the §6 interface** (Peterfalvi (10.3)): two nontrivial
+μ-grid columns have equal column-sum degrees, phrased on the §6 `columnFamily` sums that
+`columnSum_mem_certainTypeSet` consumes.  Via `muGrid_columnSum_eq_columnSum` (evaluated at `1`)
+this is `∑ᵢ muGrid i j (1) = ∑ᵢ muGrid i k (1)`, which is `muGrid_apply_one_eq` entrywise. -/
+theorem Hypothesis.muColumnChar_columnSum_apply_one_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) [NeZero (Nat.card (hyp.toHypothesis46 hG hodd).W1)]
+    (hw2 : (hyp.w2).Prime) {j k : Fin hyp.w2} (hj : j ≠ 0) (hk : k ≠ 0) :
+    (∑ i, (((hyp.toHypothesis46 hG hodd).columnFamily (hyp.muColumnChar hG hodd j)).mu i
+        : ClassFunction ↥M ℂ) 1)
+      = (∑ i, (((hyp.toHypothesis46 hG hodd).columnFamily (hyp.muColumnChar hG hodd k)).mu i
+        : ClassFunction ↥M ℂ) 1) := by
+  haveI := hyp.finiteG
+  classical
+  rw [← OddOrder.Peterfalvi.S06.columnSum_apply_one, ← OddOrder.Peterfalvi.S06.columnSum_apply_one,
+    ← hyp.muGrid_columnSum_eq_columnSum hG hodd j, ← hyp.muGrid_columnSum_eq_columnSum hG hodd k]
+  -- `(Σᵢ muGrid i j) 1 = (Σᵢ muGrid i k) 1` — sum-apply + per-entry (10.3)
+  have hsum : ∀ j' : Fin hyp.w2, (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j') 1
+      = ∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j' 1 := fun j' =>
+    map_sum (AddMonoidHom.mk' (fun φ : ClassFunction ↥M ℂ => φ (1 : ↥M)) (fun _ _ => rfl))
+      (fun i => hyp.muGrid hG hodd i j') Finset.univ
+  rw [hsum j, hsum k]
+  exact Finset.sum_congr rfl (fun i _ => hyp.muGrid_apply_one_eq hG hodd hw2 i i hj hk)
+
+
 end OddOrder.Peterfalvi.S12
