@@ -10276,21 +10276,24 @@ bare statement "every rank-2 `A ≤ L_σ` lies in `F(L)`" is *false* when `q1 �
 `q'`-complement acting non-innerly on `Q` escapes `F(L) = Q·C(Q)`); Coq's `A` centralizes `K`, which
 via the chief-factor action forces `A ⊆ C_{L_σ}(Q/Q₀) = F(L)`.
 
-⚠ **Genuinely gated §15 input** (the third `sAFL`/`sylQ` clause, now the *only* remaining gate of
-`typeP_partner_sylow_uniquelyMaximal_bundle` — `sylQ` = `opiCore_index_coprime_of_typeP` and `uniqQ`
-= `opiCore_isUniquelyMaximal_of_isSylow` are proved).
+✅ **Landed sorry-free** (2026-07-07, issue 9017 更新 #18; `#print axioms` =
+`[propext, Classical.choice, Quot.sound]`).  This was the third `sAFL` clause and the *last* gate of
+`typeP_partner_sylow_uniquelyMaximal_bundle` (hence of `tau2_transfer_constraint` = BG Thm 15.8, now
+also sorry-free); `sylQ` = `opiCore_index_coprime_of_typeP` and `uniqQ` =
+`opiCore_isUniquelyMaximal_of_isSylow` were already proved.
 
-**Reconstruction plan** (Coq `Fcore_structure` eq3 `C_Ms(Ks/Q₀|'Q)=F(M)`, BGsection15.v:579-593):
-the repo has eq2 (`centralizer_msigma_quotient_le_fittingInAmbient`: `x∈M_σ` centralizing `Q̄=Q/Q₀`
-⟹ `x∈F(L)`) but **not** eq3.  Coq derives eq3 from eq2 by the minimality lifting
-`C_{M_σ}(K̄|'Q) = C_{M_σ}(Q̄|'Q)` (both `=F(L)`): `⊇` is trivial (`K̄⊆Q̄`); `⊆` uses that
-`C_{M_σ}(K̄|'Q)` is `M`-normal and `Q̄` is minimal normal in `M/Q₀`
-(`chiefFactor_Q0_normal_minimal_of_inputs`, `isElementaryAbelian_chiefFactor_of_minimalNormal`),
-so `[Q̄, C_{M_σ}(K̄)] ⊴ M` is `⊆Q̄`, hence `=1` or `Q̄`; `=Q̄` contradicts `C` centralizing the
-nontrivial `K̄⊆Q̄`.  Then `hACK : A⊆C(K)` ⟹ `Ā` centralizes `K̄` ⟹ (lifting) `Ā` centralizes `Q̄`
-⟹ (eq2) `A⊆F(L)`.  The chief-factor context (`Q,Q₀,D,minnormal Q̄`) is reconstructed as in
-`opiCore_index_coprime_of_typeP`'s non-nil branch / `mf_ne_msigma_typeP1_structure`'s internals.
-(issue 9017 update #12/#15/#16.) -/
+**Proof** (Coq `Fcore_structure` eq3 `C_Ms(Ks/Q₀|'Q)=F(M)`, BGsection15.v:579-593): the repo has eq2
+(`centralizer_msigma_quotient_le_fittingInAmbient`: `x∈M_σ` centralizing `Q̄=Q/Q₀` ⟹ `x∈F(L)`); eq3
+is derived by the **minimality lifting** `C_{M_σ}(K̄|'Q) = C_{M_σ}(Q̄|'Q)`.  `W = {y∈Q : ∀x∈H, ⁅x,y⁆
+∈Q₀}` for `H = C_{M_σ}(K̄) = {x∈M_σ : ∀k∈K, ⁅x,k⁆∈Q₀}` satisfies `K ≤ W`, `Q₀ < W ≤ Q`, and is
+`L`-normal, so `hmin` (minimality of the chief factor `Q/Q₀`) forces `Q ≤ W`, i.e. every `x`
+centralizing `K̄` centralizes `Q̄`.  The keystone `hWnorm` (`W` is `L`-normal) reduces to `H` being
+`L`-normal via the conjugation identity `⁅x, g y g⁻¹⁆ = g ⁅g⁻¹ x g, y⁆ g⁻¹` (`L` normalizes `Q`,
+`Q₀`).  `H ⊴ L` splits over `L = M_σ ⊔ Ks` (`hcomplMσ`): (1) `M_σ ≤ N(H)` since
+`M_σ' = ⁅M_σ,M_σ⁆ ⊆ Q ⊔ ⁅D,D⁆ ⊆ H ⊆ M_σ` (`derivedInG_le_sup_of_normal`, `hDcomm`,
+`commutator_le_iff_le_normalizer`); (2) `Ks ≤ N(H)` since `Ks` centralizes `K` (`K ⊆ C(Ks)`, so
+`s⁻¹ k s = k`) and normalizes `M_σ`, `Q₀`.  Then `hACK : A⊆C(K)` ⟹ `Ā` centralizes `K̄` ⟹ (lifting)
+`Ā` centralizes `Q̄` ⟹ (eq2) `A⊆F(L)`.  (issue 9017 update #12/#15/#16/#18.) -/
 theorem A_le_fittingInAmbient_of_typeP1_nonnil [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L Ks K A : Subgroup G} {q1 : ℕ}
     (hL : L ∈ maximalSubgroups G) (hP : S14.IsTypeP L) (hKsL : Ks ≤ L)
@@ -10446,7 +10449,92 @@ theorem A_le_fittingInAmbient_of_typeP1_nonnil [Finite G]
       exact Q0.mul_mem ((Subgroup.mem_normalizer_iff.mp hxN0 z).mp hz) (Q0.inv_mem hz)⟩
     have hQ0ltW : Q0 < W := lt_of_le_of_ne hQ0W (fun heq => hKstarNotQ0 (le_of_le_of_eq hKW heq.symm))
     -- `W` is `M`-normal (from the `M`-invariance of `H`); the deep chief-factor step.
-    have hWnorm : (W.subgroupOf L).Normal := by sorry
+    have hWnorm : (W.subgroupOf L).Normal := by
+      -- `L` normalizes `M_σ = O_{σ(L)}(L)`.
+      have hLnormMσ : L ≤ Subgroup.normalizer
+          ((OddOrder.BG.Ch3.S10.Msigma L : Subgroup G) : Set G) :=
+        OddOrder.GroupTheory.le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma L) L
+      -- `hDcomm`: `⁅D, D⁆` centralizes the chief factor `Q̄` (chief-factor engine).
+      obtain ⟨_, _, hDcomm, _⟩ :=
+        chiefFactor_engine_of_inputs hG hL hP1 hKsL hKs hKdefL hQdef hQMσ hMnormQ hKstarQ hKsne
+          hKMσdisj hcopKMσ hDq' hDMσ hKnormD hQDdisj hDne hQ0def hMNQ0 hKstarNotQ0 hQ0ltQ hmin
+      -- **(1) `M_σ ≤ N(H)`.**  `M_σ' = ⁅M_σ, M_σ⁆ ⊆ Q ⊔ ⁅D, D⁆ ⊆ H ⊆ M_σ`, so `H ⊴ M_σ`
+      -- (a subgroup between `M_σ'` and `M_σ` is `M_σ`-normal).  `Q`, `⁅D, D⁆` centralize `K̄ ⊆ Q̄`.
+      have hQH : Q ≤ H := fun x hxQ => ⟨hQMσ hxQ, fun k hk => hQab x hxQ k (hKstarQ hk)⟩
+      have hDDMσ : ⁅D, D⁆ ≤ OddOrder.BG.Ch3.S10.Msigma L := by
+        rw [Subgroup.commutator_le]
+        intro a ha b hb
+        rw [commutatorElement_def]
+        exact mul_mem (mul_mem (mul_mem (hDMσ ha) (hDMσ hb)) (inv_mem (hDMσ ha))) (inv_mem (hDMσ hb))
+      have hDDH : ⁅D, D⁆ ≤ H := fun g hg => ⟨hDDMσ hg, fun k hk => hDcomm g hg k (hKstarQ hk)⟩
+      have hsup : Q ⊔ D = OddOrder.BG.Ch3.S10.Msigma L := by
+        have h := congrArg (Subgroup.map (OddOrder.BG.Ch3.S10.Msigma L).subtype) hcomplD.sup_eq_top
+        rwa [Subgroup.map_sup, Subgroup.subgroupOf_map_subtype, Subgroup.subgroupOf_map_subtype,
+          inf_eq_left.mpr hQMσ, inf_eq_left.mpr hDMσ, ← MonoidHom.range_eq_map,
+          Subgroup.range_subtype] at h
+      have hQnMσ : (Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma L)).Normal :=
+        (Subgroup.normal_subgroupOf_iff_le_normalizer hQMσ).mpr (hMσL.trans hMnormQ)
+      have hsigmaprime : derivedInG (OddOrder.BG.Ch3.S10.Msigma L) ≤ Q ⊔ ⁅D, D⁆ := by
+        have hle := OddOrder.BG.Ch3.S13.derivedInG_le_sup_of_normal hQMσ hDMσ hsup hQnMσ
+        rwa [show derivedInG D = ⁅D, D⁆ from Subgroup.map_subtype_commutator D] at hle
+      have hMσ'H : derivedInG (OddOrder.BG.Ch3.S10.Msigma L) ≤ H :=
+        hsigmaprime.trans (sup_le hQH hDDH)
+      have hHMσ' : ⁅H, OddOrder.BG.Ch3.S10.Msigma L⁆ ≤ H := by
+        refine (Subgroup.commutator_mono hHle le_rfl).trans ?_
+        rw [← show derivedInG (OddOrder.BG.Ch3.S10.Msigma L) =
+          ⁅OddOrder.BG.Ch3.S10.Msigma L, OddOrder.BG.Ch3.S10.Msigma L⁆ from
+          Subgroup.map_subtype_commutator _]
+        exact hMσ'H
+      have hMσN : OddOrder.BG.Ch3.S10.Msigma L ≤ Subgroup.normalizer (H : Set G) :=
+        OddOrder.Isaacs.Ch04.commutator_le_iff_le_normalizer.mp hHMσ'
+      -- **(2) `Ks ≤ N(H)`.**  `Ks` centralizes `K` (`K ⊆ C(Ks)`, so `s⁻¹ k s = k`), normalizes
+      -- `M_σ` and `Q₀`; hence conjugation by `Ks` fixes the defining condition of `H`.
+      have hKsCentK : ∀ s ∈ Ks, ∀ k ∈ K, s * k = k * s := fun s hs k hk =>
+        (Subgroup.mem_centralizer_iff.mp (Subgroup.mem_inf.mp (hKdefL ▸ hk)).2) s hs
+      have hconjH_Ks : ∀ s ∈ Ks, ∀ x, x ∈ H → s * x * s⁻¹ ∈ H := by
+        intro s hs x hx
+        refine ⟨(Subgroup.mem_normalizer_iff.mp (hLnormMσ (hKsL hs)) x).mp hx.1, fun k hk => ?_⟩
+        have hskk : s⁻¹ * k * s = k := by rw [mul_assoc, ← hKsCentK s hs k hk]; group
+        have hgen : ⁅s * x * s⁻¹, k⁆ = s * ⁅x, s⁻¹ * k * s⁆ * s⁻¹ := by
+          simp only [commutatorElement_def]; group
+        rw [hgen, hskk]
+        exact (Subgroup.mem_normalizer_iff.mp (hMNQ0 (hKsL hs)) ⁅x, k⁆).mp (hx.2 k hk)
+      have hKsN : Ks ≤ Subgroup.normalizer (H : Set G) := by
+        intro s hs
+        rw [Subgroup.mem_normalizer_iff]
+        refine fun x => ⟨fun hx => hconjH_Ks s hs x hx, fun hx => ?_⟩
+        have hconj := hconjH_Ks s⁻¹ (Ks.inv_mem hs) (s * x * s⁻¹) hx
+        have hsimp : s⁻¹ * (s * x * s⁻¹) * s⁻¹⁻¹ = x := by group
+        rwa [hsimp] at hconj
+      -- `L = M_σ ⊔ Ks` (complement), so `L ≤ N(H)`.
+      have hLsup : OddOrder.BG.Ch3.S10.Msigma L ⊔ Ks = L := by
+        have h := congrArg (Subgroup.map L.subtype) hcomplMσ.sup_eq_top
+        rwa [Subgroup.map_sup, Subgroup.subgroupOf_map_subtype, Subgroup.subgroupOf_map_subtype,
+          inf_eq_left.mpr hMσL, inf_eq_left.mpr hKsL, ← MonoidHom.range_eq_map,
+          Subgroup.range_subtype] at h
+      have hHnorm : L ≤ Subgroup.normalizer (H : Set G) := by
+        rw [← hLsup]; exact sup_le hMσN hKsN
+      -- **`W` is `L`-normal** from the `L`-invariance of `H`, `Q`, `Q₀`
+      -- (conjugation identity `⁅x, g y g⁻¹⁆ = g ⁅g⁻¹ x g, y⁆ g⁻¹`).
+      have hconjW : ∀ g ∈ L, ∀ y, y ∈ W → g * y * g⁻¹ ∈ W := by
+        intro g hg y hy
+        refine ⟨(Subgroup.mem_normalizer_iff.mp (hMnormQ hg) y).mp hy.1, fun x hxH => ?_⟩
+        have hxconj : g⁻¹ * x * g ∈ H := by
+          have h := (Subgroup.mem_normalizer_iff.mp
+            ((Subgroup.normalizer (H : Set G)).inv_mem (hHnorm hg)) x).mp hxH
+          simpa only [inv_inv] using h
+        have hgen : ⁅x, g * y * g⁻¹⁆ = g * ⁅g⁻¹ * x * g, y⁆ * g⁻¹ := by
+          simp only [commutatorElement_def]; group
+        rw [hgen]
+        exact (Subgroup.mem_normalizer_iff.mp (hMNQ0 hg) ⁅g⁻¹ * x * g, y⁆).mp
+          (hy.2 (g⁻¹ * x * g) hxconj)
+      refine (Subgroup.normal_subgroupOf_iff_le_normalizer (hWle.trans hQL)).mpr ?_
+      intro g hg
+      rw [Subgroup.mem_normalizer_iff]
+      refine fun y => ⟨fun hy => hconjW g hg y hy, fun hy => ?_⟩
+      have hconj := hconjW g⁻¹ (L.inv_mem hg) (g * y * g⁻¹) hy
+      have hsimp : g⁻¹ * (g * y * g⁻¹) * g⁻¹⁻¹ = y := by group
+      rwa [hsimp] at hconj
     have hQW : Q ≤ W := hmin W hQ0ltW hWle hWnorm
     intro x hxMs hxK y hyQ
     exact (hQW hyQ).2 x ⟨hxMs, hxK⟩
@@ -10626,10 +10714,10 @@ via **Keystone C** `signalizer_msigma_sup_inf_partner_eq` = Coq's `H = H_σ ⋊ 
 `κ`-Hall maximality `IsHallSubgroup.card_dvd_of_isPiGroup`, `X ⊆ C(U)` via `U ⊆ H_σ`) → Phase D
 (`not_prime_mem_tau2_of_centralizer_kappaCompl_not_le`).
 
-**The three remaining `sorry`s are exactly the keystones A/B/C** (each a clause of Coq
-`Ptype_structure`/`Fcore_structure`/`P2type_signalizer` not exposed by the repo `typeP_structure`);
-`tau2_transfer_constraint` itself is sorry-free, depending only on them
-(`#print axioms` = `[propext, sorryAx, Classical.choice, Quot.sound]`). -/
+✅ **All three keystones A/B/C are now landed sorry-free** (Keystone C/B in earlier commits;
+**Keystone A** `A_le_fittingInAmbient_of_typeP1_nonnil` (Coq `Fcore_structure` eq3 minimality
+lifting) landed 2026-07-07, issue 9017 更新 #18).  Hence `tau2_transfer_constraint` is **fully
+sorry-free**: `#print axioms tau2_transfer_constraint = [propext, Classical.choice, Quot.sound]`. -/
 theorem tau2_transfer_constraint [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M Mstar U K R H : Subgroup G} {r : ℕ}
     (hM : M ∈ maximalSubgroups G) (hP2 : S14.IsTypeP2 M)

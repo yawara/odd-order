@@ -88,11 +88,12 @@ C の (14.9) char body `T_typeIII_ratio_le` (`S16_NonExistenceG.lean:906`) の�
 
 ## やること
 
-- [ ] char-core lane (or hub 裁定) が **type-P₂/III Dade support base** を build する:
-  `dadeSupportHypotheses_typeP` を type-P₁ 専用から一般 type-P (P₂/III 含む) に拡張、または T-side 専用の
-  `DadeSupportHypothesisData T` を新設 (Coq `FTtypeP_coh_base` 相当、PFsection14)。
-- [ ] それを `hyp.base.tauT` に genuine Dade map として供給 (現 `tauT := 0` free field を実構成に置換)、
-  または C が cite 可能な形で export。
+> ⚠ 下記は起票時の framing。hub verdict (🧭 節) が route を明確化し、**局所 `hyp07` を `tSideDadeMap` で
+> 構築する**方針に更新された (`tauT` free-field 供給は不要と判明)。実装は下記でなく hub verdict の 6-step。
+
+- [x] ~~`hyp.base.tauT` に genuine Dade map を供給~~ → **superseded**: `T_typeIII_ratio_le` は `tauT` を
+  読まず、局所 `hyp07 : S07.Hypothesis calT1_set A` を `tSideDadeMap` (§10 Dade integral char map) から構築。
+- [x] C が `irrSubcoherent` で `hyp07` を構築 → `horth` coherence carrier を discharge (commit `c8875eb2`)。
 
 ## 完了条件
 
@@ -109,3 +110,28 @@ S-side βₛ bridge + norm)。
 - `OddOrder/Peterfalvi/S14_MaximalI.lean:153` (type-I genuine Dade map pattern)
 - `OddOrder/Peterfalvi/S10_MinimalSimpleStructure.lean:2451` (`dadeSupportHypotheses_typeP`, IsTypeP1-gated)
 - 関連: issue 4001 (Tdata 非対称裁定), 9013 (T-side residual), 9000 (typeP_Galois), note `s16_w4_char_cascade.md`
+
+## ✅ 完了 (2026-07-07 lane c、commit `c8875eb2` → hub 統合 `06d5a0cb`)
+
+**完了条件 (coherence carrier の close) 達成**。hub verdict の 6-step build plan (step 2/3/5) を実装し、
+`T_typeIII_ratio_le` の `horth` coherence carrier を **posited 仮説から実証明に置換** (de-opacify)。
+実装は hub verdict どおり **局所 `hyp07` を `tSideDadeMap` で構築** (旧「やること」の `tauT` free-field
+供給案は不採用 = superseded; `T_typeIII_ratio_le` は `tauT` を読まない)。追加した sorry-free 構成:
+
+- `T_typeIII_calT1_family` (S16:677) — coherence assembler の全入力 (`hinertia`/`hne`/`hlinear`/`hconj𝒯`
+  + count) を公開。inflated non-principal linear `Irr(QV/Q)` を quotient corestriction `q` で持ち上げ。
+- `T_typeIII_sigmaSharp_eq` (S16:979) — 台恒等式 `sigmaSharp T = (derivedInG T)^#` (= `(T')^#`)、
+  `A1_eq_sigmaSharp` + `mainSubgroup .III = derivedInG` 経由。member `Ind_{QV}^T θ` が正規 `QV=T'` の外で
+  消えることが Dade domain を保証する linchpin。
+- `T_typeIII_hyp07` (S16:1017) — landed `S07.irrSubcoherent` に `τ = tSideDadeMap` + family predicates
+  + per-member `dadeCharacterDifferenceImageOfDiff` + isometry `tSideDadeMap_isometry_diff` を threading
+  して `S07.Hypothesis calT1_set A` を構築 (ungated、S-side βₛ / (13.12) 入力不要)。
+- `T_typeIII_calT1_isCoherent` (S16:1312) — end-to-end `hyp07 ∘ T_typeIII_calT1_coherent`。
+
+`T_typeIII_ratio_le` の `horth` は inline で discharge (`IsCoherent.extension_inner_eq` の isometry +
+orthonormal irreducible sources)。build green (leaf 3903 / full 3934 jobs)、新 axiom 無し、signature 不変。
+
+**残 residual (別 issue で追跡、本 issue の scope 外)**: `T_typeIII_ratio_le` の `hcard2` (`(|V|−1)/p ≥ 2`、
+`|V|` 下界 = lane-b (13.x) gated) + S-side βₛ bridge (`Γ = ∑ x_ζ·τ₁ζ + Γ₁` + norm) = **issue 9013**。
+これらは coherence base とは別物 (step 6)。T-side (14.9) route の残り (`hVcomm` 等) は **issue 9000**
+(typeP_Galois char body, lane-a owned) に収束 — C の ungated (14.9) coherence work は本 commit で完了。
