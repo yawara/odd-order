@@ -7688,6 +7688,69 @@ theorem opiCoreInG_sigmaCompl_fittingInAmbient_primeFactors_subset_tau2 [Finite 
     rw [← hkey, sup_comm, ← hF_eq2, inf_eq_right.mpr hDF]
   rw [hDY]; exact hYtau2
 
+/-- **BG Theorem 15.7(d), the `τ₃(M) = ∅` prime-set core**: if `M' ≤ F(M)` then `τ₃(M) = ∅`.
+
+`F(M) = F(M_σ) × O_{σ'}(F(M))` (`fitting_decomposition`, an internal direct product) with `F(M_σ)`
+a `σ(M)`-group (`= O_σ(F(M))`) and `O_{σ'}(F(M))` a `τ₂(M)`-group, so every prime of `M' ≤ F(M)` is
+in `σ(M) ∪ τ₂(M)`.  A `τ₃(M)`-prime is `∉ σ(M)` (hence `∈ τ₂(M)`, `r_p = 2`) yet lies in `π(M')`
+with `r_p = 1` — contradiction.
+
+This is the `defE`/`E3_1` prime-set half of Corollary 15.9's cyclic Frobenius complement (Coq
+`nonTI_Fitting_structure` part (d)): once `τ₃(M) = ∅` the `τ₃`-Hall `E₃` of any `σ(M)'`-complement is
+trivial (`E3_eq_bot_of_tau3_eq_empty`), so `E = E₁E₂` and — with `τ₂(M) = ∅` (Theorem 15.8) — `E = E₁`
+is cyclic.  The remaining upstream gate is the `¬FittingIsTI`-specific `M' ≤ F(M)` (`M'` nilpotency;
+issue 2037). -/
+theorem tau3_eq_empty_of_derivedInG_le_fittingInAmbient [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hM'F : derivedInG M ≤ fittingInAmbient M) : tau3 M = ∅ := by
+  classical
+  obtain ⟨Y, -, hYtau2, -, -, -, hF6, hF7, hF8, -, -, -⟩ := fitting_decomposition hG hM
+  set Fσ : Subgroup G := fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M) with hFσdef
+  -- `F(M) = F(M_σ) × Y` ⟹ `|F(M)| = |F(M_σ)| · |Y|`.
+  have hFσnormY : Fσ ≤ Subgroup.normalizer (Y : Set G) :=
+    (Subgroup.commutator_eq_bot_iff_le_centralizer.mp hF8).trans
+      (Subgroup.centralizer_le_normalizer _)
+  have hcard : Nat.card ↥(fittingInAmbient M) = Nat.card ↥Fσ * Nat.card ↥Y := by
+    rw [hF6]; exact card_sup_eq_mul_of_le_normalizer_of_disjoint hFσnormY hF7
+  -- `π(F(M_σ)) ⊆ σ(M)` (`F(M_σ) = O_σ(F(M))`, a `σ`-core).
+  have hFσσ : ∀ p ∈ (Nat.card ↥Fσ).primeFactors, p ∈ OddOrder.BG.Ch3.S10.sigma M := by
+    intro p hp
+    rw [hFσdef, ← opiCoreInG_sigma_fittingInAmbient_eq_fittingInAmbient_Msigma] at hp
+    exact OddOrder.GroupTheory.isPiSubgroup_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M)
+      (fittingInAmbient M) p hp
+  -- No `τ₃`-prime survives.
+  ext p
+  simp only [Set.mem_empty_iff_false, iff_false]
+  rw [mem_tau3_iff]
+  rintro ⟨hpσ, hpM', hp1⟩
+  have hpprime : p.Prime := Nat.prime_of_mem_primeFactors hpM'
+  have hpF : p ∈ (Nat.card ↥(fittingInAmbient M)).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨hpprime,
+      (Nat.dvd_of_mem_primeFactors hpM').trans (Subgroup.card_dvd_of_le hM'F), Nat.card_pos.ne'⟩
+  rw [hcard, Nat.primeFactors_mul Nat.card_pos.ne' Nat.card_pos.ne', Finset.mem_union] at hpF
+  rcases hpF with h | h
+  · exact hpσ (hFσσ p h)
+  · have hp2 : pRank ↥M p = 2 := ((mem_tau2_iff M p).mp (hYtau2 (Finset.mem_coe.mpr h))).2
+    omega
+
+/-- **`E₃ = ⊥` from `τ₃(M) = ∅`**: the `τ₃(M)`-Hall factor `E₃` of any `σ(M)'`-complement `E`-setup
+is trivial when `M` has no `τ₃`-primes.  A `{τ₃}`-Hall subgroup of the empty prime set has order
+coprime to every prime, hence order `1`.  Companion to
+`tau3_eq_empty_of_derivedInG_le_fittingInAmbient` (BG Theorem 15.7(d), `E3_1`). -/
+theorem E3_eq_bot_of_tau3_eq_empty [Finite G] {M E E₁ E₂ E₃ : Subgroup G}
+    (hsetup : OddOrder.BG.Ch3.S12.SubgroupESetup M E E₁ E₂ E₃) (htau3 : tau3 M = ∅) :
+    E₃ = ⊥ := by
+  classical
+  rw [← Subgroup.card_eq_one]
+  by_contra hne
+  obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hne
+  have hpsub : p ∈ (Nat.card ↥(E₃.subgroupOf E)).primeFactors := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hsetup.E₃_le).toEquiv]
+    exact Nat.mem_primeFactors.mpr ⟨hp, hpdvd, Nat.card_pos.ne'⟩
+  have hmem : p ∈ tau3 M := hsetup.E₃_hall.1 p hpsub
+  rw [htau3] at hmem
+  exact hmem
+
 /-- **Type-`P₂` `M_F`-internal Fitting decomposition** (BG Corollary 15.5; the `M' = M_F × U`
 form feeding Proposition 16.1's forward bridges).  For a type-`P₂` maximal subgroup `M` with
 `κ`-Hall `K` and `(κ ∪ σ)'`-Hall `U`, the derived subgroup `M'` is the internal direct product of
