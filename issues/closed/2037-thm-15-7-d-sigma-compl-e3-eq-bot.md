@@ -73,7 +73,26 @@ Coq part (d) の E₃=1 を精読 → **`E₃=1 ⟸ τ₃(M)=∅ ⟸ M' ≤ F(M)
 未消費** (Thm D(4) consumer S16:6343 が `_` で discard)。ただし faithful BG Cor 15.9(b) の一部ゆえ close は
 escape spine を honest 化する (方針どおり実施)。
 
-## やること (残 — cyclic-E assembly in `centralizer_escape_final_local` / S16_MainResults)
+## ✅ 完了 (2026-07-07 lane b, 更新 #5) — cyclic-E close → **Cor 15.9 完全 sorry-free**
+
+cyclic-E assembly を landing → **`centralizer_escape_final_local` (BG Cor 15.9) が完全 sorry-free**
+(S16_MainResults 実 sorry 3→2、残 2 は無関係の theoremB 行)。実施:
+- hFM の R-localization setup を hoist (matched pair K₀/U₀・R・hRhall・hHmem を共有)。
+- **τ₂(M)=∅**: `tau2_transfer_constraint` (Thm 15.8、M_lemma=N/H_lemma=M) を prime witness で apply、
+  τ₂(N)=∅ → r∈τ₂(N) 矛盾。`Mstar ∈ 𝓜(C_G(E₁))` は `centralizer_singleton_lt_top` (E₁≠⊥ の元) で存在。
+- **E≠⊥ は free**: `SubgroupESetup.E_ne_bot` (M=M_σ ⟹ M perfect+solvable ⟹ trivial 矛盾) — C_U(K)=1 不要。
+- **cyclic-E**: `exists_subgroupESetup hG hM` → `E2_eq_bot_of_tau2_eq_empty` (∀prime 形に変更) +
+  `E3_eq_bot_of_not_fittingIsTI` → E₂=E₃=⊥ → `eq_sup` で E=E₁ → `E1_isCyclic` →
+  `typeF_frobenius_of_esetup` → `⟨E, E≤M, IsComplement', IsCyclic, Frobenius⟩`。
+- **import cycle 解消**: `typeF_frobenius_of_esetup` core を S16_Lemma1413 (下流) → S16_MainResults (上流)
+  へ移設 (ruling の承認済 hoist)。wrapper `typeF_frobenius_of_tau2_prime_free` は S16_Lemma1413 に残置
+  (上流 core を cite)。
+
+⟹ `exists_RData_escape_structure` / `theoremD_msigma_conjugacy_and_centralizers` の escape 構造が
+honest 化 (sorryAx-taint 除去) → char side (issue 1017 dade=Ind) の escaping-exclusion が unblock。
+**本 issue の目的 (BG Thm 15.7(d) E₃=1 → Cor 15.9 cyclic-E) 完遂**。
+
+## (旧) やること — cyclic-E assembly in `centralizer_escape_final_local` / S16_MainResults
 
 - [ ] **hoist**: hFM の R-localization setup (matched pair K₀/U₀・R・hRhall・hHmem) を `refine ⟨hFM,…,?_⟩`
       の上に移動 (τ₂=∅ 導出と共有)。hFM は `exact (typeP2_neighbor_is_typeF_of_mem …).1` に短縮。

@@ -7,6 +7,12 @@ created: 2026-07-06
 
 # shared-infra claim: BG §15 Cor 15.9 (Sibley/FT escape package) — S16 + Pf §13 の multi-consumer gate
 
+> ## ✅ BG-side 完遂 (2026-07-07 lane b) — `centralizer_escape_final_local` + `tau2_transfer_constraint` 完全 sorry-free
+> BG Cor 15.9 escape package を **完全実証明化** (hFM → E₃=1 (Thm 15.7d 新規 4 補題) → cyclic-E)。
+> `centralizer_escape_final_local`・`tau2_transfer_constraint` 共 sorry-free。詳細 = **issue 2037** (closed)。
+> ⟹ `exists_RData_escape_structure` / Thm D の escape 構造が honest 化 → **char side (issue 1017 G2 =
+> Pf §13 dade=Ind の escaping-exclusion) が unblock**。残 = 1017 側の wiring (別 issue、char lane)。
+
 > **claim-before-build (lane b, issue 1017 /loop から派生)**。BG §15 の残 bare sorry
 > `centralizer_escape_final_local` (BG Cor 15.9) が **2 クラスタ**から consume される cross-cluster
 > gate と判明。lane b (Pf §13 coherence) と lane c (S16) が共に下流。**現状どのレーンも未 claim** (9000 scan 済)。
