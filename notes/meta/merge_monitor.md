@@ -374,8 +374,12 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
     d branch は統合後 main へ re-sync 推奨 (churn 履歴は net-zero ゆえ reset で失うもの無し)。
   - **build**: full build green **3934 jobs**、AxiomsCheck OK (全 allowlist 内、新 axiom 無し)。**real sorry = 88** (bin/count-sorry)。
     a:S12 −、b:15.8 gap を named keystone に分割 +、c:+0。proven spine の regression 無し。
-  - **⚠ push**: main は origin より **未 push が積み上がり** (前 tick の 18 + 今回 a/b/c merge 3 + notes)。
-    outward-facing ゆえユーザー push 認可待ち (merge は全て local に検証済・保持)。
+  - **push 済** (`c13d2a24`, origin ahead=0): 滞留 15 commits を push。**★ユーザー方針 (2026-07-07)**:
+    「push も自己判断してほしい、毎回でなくても要所で」= hub は verified 統合後 (build green + AxiomsCheck OK)
+    の `git push origin main` を**自己判断で実行してよい (毎回認可を聞かない)**。前 tick の classifier block は解消。
+  - **d = 現状維持 (ユーザー裁定 2026-07-07)**: d branch は reset せず。次 tick で d 自身が `git merge main`
+    (churn 履歴 + 9071 issue 衝突は d/hub が合流時に解決)。guardrails (repo全体 dup-scan + commit前 full build)
+    は 9071 に記録済、次 shared-infra 追加前に適用。
 - **2026-07-07 (tick 2) — a 合流 (progress) + ⛔ d REJECT (BG S01 dup relocation で full-build break) → 監視 HALT**:
   a=2 (Pf 11.8.6 capstone ψ₀ column-witness、hgen algebra sorry-free 化 = **-1 sorry**) を合流 `a8474c50`、
   build green 3933、push 済 (origin 同期)。**d=3 commits を REJECT** (issue 9071 HUB RULING): d の
