@@ -3150,4 +3150,241 @@ noncomputable def caseB_chainStep [Finite G]
     hdiffasuppχ hμZ hDeg
     (by rw [hunif _ hμmem, hχ₁deg])
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The (9.11) caseB column-pair enumeration**: the `j`-th adjoined pair is the certain-type
+column pair `(μ_{j+1}, μ̄_{j+1})` at the nonzero column index `j + 1 < w₂` (out of range: junk
+`(0, 0)`, never consumed — the chain length is `w₂ − 1`).  This enumerates *all* nontrivial
+μ-columns rather than an inverse-pair transversal; conjugate columns appear twice
+(`μ̄_k = μ_{k⁻¹}`), which the fold absorbs by skipping already-adjoined pairs
+(`caseB_chainStep` only fires on fresh pairs) — issue 1019 update⁸⁰. -/
+noncomputable def caseBPair [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)] (j : ℕ) :
+    ClassFunction ↥M ℂ × ClassFunction ↥M ℂ :=
+  if h : j + 1 < hyp.base.w2 then
+    (OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
+       (hyp.base.muColumnChar hG hG.odd ⟨j + 1, h⟩),
+     (OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
+       (hyp.base.muColumnChar hG hG.odd ⟨j + 1, h⟩)).conj)
+  else (0, 0)
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- `caseBPair` at an in-range index `j + 1 < w₂` is the column pair `(μ_{j+1}, μ̄_{j+1})`. -/
+theorem caseBPair_of_lt [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
+    {j : ℕ} (h : j + 1 < hyp.base.w2) :
+    caseBPair hG hyp j =
+      (OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
+         (hyp.base.muColumnChar hG hG.odd ⟨j + 1, h⟩),
+       (OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
+         (hyp.base.muColumnChar hG hG.odd ⟨j + 1, h⟩)).conj) :=
+  dif_pos h
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- The `j`-th adjoined pair, as the two-element set `{μ_{j+1}, μ̄_{j+1}}` (the `pairSet` form
+consumed by the chain-cover engine). -/
+theorem caseBPairSet_of_lt [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
+    {j : ℕ} (h : j + 1 < hyp.base.w2) :
+    OddOrder.Peterfalvi.S07.pairSet (L := ↥M) (caseBPair hG hyp) j =
+      {OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
+         (hyp.base.muColumnChar hG hG.odd ⟨j + 1, h⟩),
+       (OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
+         (hyp.base.muColumnChar hG hG.odd ⟨j + 1, h⟩)).conj} := by
+  rw [OddOrder.Peterfalvi.S07.pairSet, caseBPair_of_lt hG hyp h]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.11), caseB mixed corner: `𝒮(H₀C′)` is coherent on `A₀(M)`.**
+
+The final fold of the caseB (9.11) chain (issue 1019 update⁸⁰–⁸³): starting from the coherent
+degree-`d` irreducible cut (`sOf_degreeSubfamily_isCoherent`), adjoin the certain-type column
+pairs `{μ_k, μ̄_k}` (`k = 1, …, w₂ − 1`) one at a time (`caseB_chainStep`), skipping pairs
+already absorbed (conjugate columns enumerate twice, `μ̄_k = μ_{k⁻¹}`, so a pair may reappear);
+the caseB member dichotomy (`caseB_sOf_member_dichotomy`) certifies that the cut and the column
+pairs cover the family, and the `coherentOfPairChainCover` engine folds the steps.  Freshness of
+*both* components at an adjoining step is extracted from the failure of the skip test by
+conjugation-closure of the accumulator (the cut is conjugate-closed and each pair is a conjugate
+pair).
+
+The named hypotheses are the remaining caseB §9 facts (issue 1019 update⁸²):
+* `hunif` — the caseB uniform degree (every `𝒮(H₀C′)`-member has degree `d = qu`);
+* the anchor `χ₁` — a degree-`d` irreducible member (seed of the cut coherence);
+* `hDeg` — the (5.6.c) counting `2 < |cut|`;
+* `hμmem` — every nontrivial column sum `μ_k` is an `𝒮(H₀C′)`-member ((9.5)/(9.8):
+  `μ_k ∈ 𝒮(H₀C) ⊆ 𝒮(H₀C′)`, the column source kills `H₀C′`). -/
+noncomputable def caseB_coherent_sOf_H0Cprime_of_mixed [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
+    (d : ℕ)
+    (hunif : ∀ φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
+      (φ : ClassFunction ↥M ℂ) 1 = (d : ℂ))
+    {χ₁ : ClassFunction ↥M ℂ}
+    (hχ₁mem : χ₁ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime)
+    (hχ₁irr : IsIrreducibleCharacter χ₁)
+    (hχ₁deg : ((χ₁ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (d : ℂ))
+    (hDeg : (2 : ℝ) < (irrCut_finite hyp hyp.H0Cprime d).toFinset.card)
+    (hμmem : ∀ k : Fin hyp.base.w2, k ≠ 0 →
+      OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
+          (hyp.base.muColumnChar hG hG.odd k)
+        ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+      (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) hyp.base.A0 := by
+  haveI := hyp.base.finiteG
+  classical
+  -- membership repackaging for the cut
+  have hmemiff : ∀ x : ClassFunction ↥M ℂ,
+      x ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset ↔
+      (x ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime ∧
+        IsIrreducibleCharacter x ∧ ((x : ↥M → ℂ) 1 = (d : ℂ))) := fun x =>
+    (irrCut_finite hyp hyp.H0Cprime d).mem_toFinset
+  -- in-range chain indices are nonzero column indices
+  have hfin : ∀ {j : ℕ} (h : j + 1 < hyp.base.w2),
+      (⟨j + 1, h⟩ : Fin hyp.base.w2) ≠ 0 := by
+    intro j h heq
+    have := congrArg Fin.val heq
+    simp at this
+  -- the cover data: base and pairs land in `𝒮(H₀C′)`
+  have hS₀X : (↑(irrCut_finite hyp hyp.H0Cprime d).toFinset : Set (ClassFunction ↥M ℂ)) ⊆
+      OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime := fun x hx =>
+    ((hmemiff x).mp (Finset.mem_coe.mp hx)).1
+  have hpairsX : ∀ j, j < hyp.base.w2 - 1 →
+      OddOrder.Peterfalvi.S07.pairSet (L := ↥M) (caseBPair hG hyp) j ⊆
+      OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime := by
+    intro j hj x hx
+    have hlt : j + 1 < hyp.base.w2 := by omega
+    rw [caseBPairSet_of_lt hG hyp hlt] at hx
+    rcases Set.mem_insert_iff.mp hx with rfl | hx
+    · exact hμmem _ (hfin hlt)
+    · rw [Set.mem_singleton_iff] at hx
+      subst hx
+      exact Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0Cprime
+        (hμmem _ (hfin hlt))
+  -- the cover: every member is in the cut or in an enumerated pair (member dichotomy)
+  have hcover : ∀ φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
+      φ ∈ (↑(irrCut_finite hyp hyp.H0Cprime d).toFinset : Set (ClassFunction ↥M ℂ)) ∨
+      ∃ j, j < hyp.base.w2 - 1 ∧
+        φ ∈ OddOrder.Peterfalvi.S07.pairSet (L := ↥M) (caseBPair hG hyp) j := by
+    intro φ hφ
+    rcases caseB_sOf_member_dichotomy hG hyp d hunif hφ with hcut | ⟨k, hk0, hkeq⟩
+    · exact Or.inl (Finset.mem_coe.mpr ((hmemiff φ).mpr hcut))
+    · have hkval : (k : ℕ) ≠ 0 := fun h0 => hk0 (Fin.ext (by simp [h0]))
+      have hklt : (k : ℕ) < hyp.base.w2 := k.isLt
+      have hlt : (k : ℕ) - 1 + 1 < hyp.base.w2 := by omega
+      refine Or.inr ⟨(k : ℕ) - 1, by omega, ?_⟩
+      rw [caseBPairSet_of_lt hG hyp hlt]
+      have hkeq' : (⟨(k : ℕ) - 1 + 1, hlt⟩ : Fin hyp.base.w2) = k := by
+        apply Fin.ext
+        change (k : ℕ) - 1 + 1 = (k : ℕ)
+        omega
+      rw [hkeq', ← hkeq]
+      exact Set.mem_insert _ _
+  -- fold the chain
+  refine OddOrder.Peterfalvi.S07.coherentOfPairChainCover (caseBPair hG hyp)
+    (hyp.base.w2 - 1) hS₀X hpairsX hcover
+    (by rw [Set.Finite.coe_toFinset]
+        exact sOf_degreeSubfamily_isCoherent hG hyp hyp.H0Cprime d
+          ⟨χ₁, hχ₁mem, hχ₁irr, hχ₁deg⟩)
+    ?_
+  intro i hi hcoh
+  have hlt : i + 1 < hyp.base.w2 := by omega
+  by_cases hskip : OddOrder.Peterfalvi.S07.pairSet (L := ↥M) (caseBPair hG hyp) i ⊆
+      OddOrder.Peterfalvi.S07.pairUnion (L := ↥M)
+        (↑(irrCut_finite hyp hyp.H0Cprime d).toFinset) (caseBPair hG hyp) i
+  · -- skip: the pair was already adjoined (conjugate column enumerated earlier)
+    rw [OddOrder.Peterfalvi.S07.pairUnion_succ, Set.union_eq_left.mpr hskip]
+    exact hcoh
+  · -- adjoin a fresh pair via `caseB_chainStep`
+    -- accumulator invariants
+    have hS₁sub : OddOrder.Peterfalvi.S07.pairUnion (L := ↥M)
+        (↑(irrCut_finite hyp hyp.H0Cprime d).toFinset) (caseBPair hG hyp) i ⊆
+        OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime := by
+      intro x hx
+      rcases OddOrder.Peterfalvi.S07.mem_pairUnion.mp hx with hb | ⟨j, hji, hj⟩
+      · exact hS₀X hb
+      · exact hpairsX j (by omega) hj
+    have hS₁cut : (↑(irrCut_finite hyp hyp.H0Cprime d).toFinset :
+        Set (ClassFunction ↥M ℂ)) ⊆
+        OddOrder.Peterfalvi.S07.pairUnion (L := ↥M)
+          (↑(irrCut_finite hyp hyp.H0Cprime d).toFinset) (caseBPair hG hyp) i :=
+      OddOrder.Peterfalvi.S07.pairUnion_mono _ _ (Nat.zero_le i)
+    have hS₁mu : ∀ x ∈ OddOrder.Peterfalvi.S07.pairUnion (L := ↥M)
+        (↑(irrCut_finite hyp hyp.H0Cprime d).toFinset) (caseBPair hG hyp) i,
+        x ∉ (↑(irrCut_finite hyp hyp.H0Cprime d).toFinset : Set (ClassFunction ↥M ℂ)) →
+        ∃ χ₂' : ((hyp.base.toHypothesis46 hG hG.odd).W2.subgroupOf
+          ((hyp.base.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.base.toHypothesis46 hG hG.odd).W2))
+            →* ℂˣ,
+          x = OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd) χ₂' := by
+      intro x hx hxcut
+      rcases OddOrder.Peterfalvi.S07.mem_pairUnion.mp hx with hb | ⟨j, hji, hj⟩
+      · exact absurd hb hxcut
+      · have hltj : j + 1 < hyp.base.w2 := by omega
+        rw [caseBPairSet_of_lt hG hyp hltj] at hj
+        rcases Set.mem_insert_iff.mp hj with rfl | hj
+        · exact ⟨_, rfl⟩
+        · rw [Set.mem_singleton_iff] at hj
+          subst hj
+          exact ⟨_, OddOrder.Peterfalvi.S06.columnSum_conj_eq _ _⟩
+    -- the accumulator is conjugation-closed (cut conjugate-closed; pairs are conjugate pairs)
+    have hconjacc : ∀ x ∈ OddOrder.Peterfalvi.S07.pairUnion (L := ↥M)
+        (↑(irrCut_finite hyp hyp.H0Cprime d).toFinset) (caseBPair hG hyp) i,
+        x.conj ∈ OddOrder.Peterfalvi.S07.pairUnion (L := ↥M)
+          (↑(irrCut_finite hyp hyp.H0Cprime d).toFinset) (caseBPair hG hyp) i := by
+      intro x hx
+      rcases OddOrder.Peterfalvi.S07.mem_pairUnion.mp hx with hb | ⟨j, hji, hj⟩
+      · exact OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl (Finset.mem_coe.mpr
+          ((hmemiff _).mpr (irrCut_conjClosed hyp hyp.H0Cprime d
+            ((hmemiff x).mp (Finset.mem_coe.mp hb))))))
+      · have hltj : j + 1 < hyp.base.w2 := by omega
+        rw [caseBPairSet_of_lt hG hyp hltj] at hj
+        refine OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inr ⟨j, hji, ?_⟩)
+        rw [caseBPairSet_of_lt hG hyp hltj]
+        rcases Set.mem_insert_iff.mp hj with rfl | hj
+        · exact Set.mem_insert_iff.mpr (Or.inr rfl)
+        · rw [Set.mem_singleton_iff] at hj
+          subst hj
+          rw [ClassFunction.conj_conj]
+          exact Set.mem_insert _ _
+    -- freshness of both components from the failed skip test (`Prop`-confined: the goal is
+    -- `Type`-valued, so the `∃`-witness of `Set.not_subset` may not escape this `have`)
+    have hfresh : OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
+          (hyp.base.muColumnChar hG hG.odd ⟨i + 1, hlt⟩) ∉
+          OddOrder.Peterfalvi.S07.pairUnion (L := ↥M)
+            (↑(irrCut_finite hyp hyp.H0Cprime d).toFinset) (caseBPair hG hyp) i ∧
+        (OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
+          (hyp.base.muColumnChar hG hG.odd ⟨i + 1, hlt⟩)).conj ∉
+          OddOrder.Peterfalvi.S07.pairUnion (L := ↥M)
+            (↑(irrCut_finite hyp hyp.H0Cprime d).toFinset) (caseBPair hG hyp) i := by
+      obtain ⟨y, hy, hynot⟩ := Set.not_subset.mp hskip
+      rw [caseBPairSet_of_lt hG hyp hlt] at hy
+      constructor
+      · intro hc
+        rcases Set.mem_insert_iff.mp hy with rfl | hy'
+        · exact hynot hc
+        · rw [Set.mem_singleton_iff] at hy'
+          subst hy'
+          exact hynot (hconjacc _ hc)
+      · intro hc
+        rcases Set.mem_insert_iff.mp hy with rfl | hy'
+        · have h2 := hconjacc _ hc
+          rw [ClassFunction.conj_conj] at h2
+          exact hynot h2
+        · rw [Set.mem_singleton_iff] at hy'
+          subst hy'
+          exact hynot hc
+    -- fire the chain step and re-shape onto the accumulator
+    have hpair0 : (caseBPair hG hyp i).1 =
+        OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
+          (hyp.base.muColumnChar hG hG.odd ⟨i + 1, hlt⟩) := by
+      rw [caseBPair_of_lt hG hyp hlt]
+    have hpair1 : (caseBPair hG hyp i).2 =
+        (OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
+          (hyp.base.muColumnChar hG hG.odd ⟨i + 1, hlt⟩)).conj := by
+      rw [caseBPair_of_lt hG hyp hlt]
+    rw [OddOrder.Peterfalvi.S07.pairUnion_succ_eq_union_pair hpair0 hpair1]
+    exact caseB_chainStep hG hyp d hunif hχ₁mem hχ₁irr hχ₁deg hDeg hS₁sub hS₁cut hS₁mu hcoh
+      (hyp.base.muColumnChar_ne_one hG hG.odd (hfin hlt)) (hμmem _ (hfin hlt))
+      hfresh.1 hfresh.2
+
 end OddOrder.Peterfalvi.S13
