@@ -1096,3 +1096,18 @@ support、member 直交、τ(μ−χ₁) ∈ ZIrr、hSgen。**named 残 (次 pie
 5. **hgen** (span 分解 ~30 行) / **hDeg** (|s| ≥ 3、§9 counting)
 3. **hortho_mem** (R⊥R の §12 化、S08_CaseBHortho 一般化 — 独立 work)
 次 iteration = piece 2 (Da)。
+
+## 🔬 update⁶⁸ (2026-07-07 lane-a /loop) — ★ piece 2 (Da) LANDED
+
+### ✅ landed: `S12.Hypothesis.columnBreakDa` (commit 9d0421ba, sorry-free, axiom-clean)
+certainTypeDecompositionDa の §12 instantiation (ψ = 1•χ₁)。**support seam は全 defeq で消滅**:
+h46.tic.V = typePV M (toHypothesis46 の tic literal projection) ⟹ suppIn (A(M) ∪ tic.V^M) M =
+suppIn typePA0 M = hyp.A0 — `exact` 素通り。anchor 直交は piece 4 で discharge。
+
+### 残 pieces
+1. **Dmem** = memberExtensionDecomposition per-member (次 iteration): conj-closure hconjS +
+   no-real (inducedFamily_hasNoRealCharacters) + pairwise (⟨x,x̄⟩=0) + diffsupp
+   (conjDiff_support) + hνZ (extension_mem_ZIrr) を irr-family 仮定から discharge する
+   per-member supply lemma。
+5. **hgen** (span 分解 ~30 行、equal-deg collapse の 3-generator 版) / **hDeg** (|s| ≥ 3 counting、§9)
+3. **hortho_mem** (R⊥R §12 化、S08_CaseBHortho 一般化 — 独立 work、最重)
