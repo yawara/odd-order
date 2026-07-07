@@ -1652,6 +1652,45 @@ theorem toHypothesis46_toHypothesis [Finite G] (hG : OddOrder.BG.IsMinimalSimple
   rfl
 
 open scoped FiniteInduce in
+/-- **A nontrivial μ-grid column has a nontrivial `W₂`-dual**: `muColumnChar j ≠ 1` for `j ≠ 0`.
+The Pontryagin reindex `finCardEquivCharacterGroup` is normalized to send `0` to the trivial
+character (`finCardEquivCharacterGroup_zero`), so by injectivity a nonzero column index gives a
+nontrivial dual.  This is the `χ₂ ≠ 1` input of `columnSum_mem_certainTypeSet` for the μ-grid
+column sums. -/
+theorem Hypothesis.muColumnChar_ne_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    {j : Fin hyp.w2} (hj : j ≠ 0) :
+    hyp.muColumnChar hG hodd j ≠ 1 := by
+  haveI := hyp.finiteG
+  classical
+  -- rebuild the `muColumnChar` definition chain (instance-defeq trap §5)
+  set h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis with hhdef
+  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  set χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
+    finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j) with hχ₂def
+  have hchar : hyp.muColumnChar hG hodd j = χ₂ := by
+    unfold Hypothesis.muColumnChar
+    rfl
+  rw [hchar, hχ₂def]
+  intro heq
+  -- `1 = fCECG 0`, so injectivity forces `finCongr … j = 0`, i.e. `j = 0`
+  have heq' : finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j)
+      = finCardEquivCharacterGroup (↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) 0 := by
+    rw [finCardEquivCharacterGroup_zero]
+    exact heq
+  have hj0 : finCongr hcardW2sub.symm j = 0 :=
+    (finCardEquivCharacterGroup _).injective heq'
+  apply hj
+  ext
+  simpa using congrArg Fin.val hj0
+
+open scoped FiniteInduce in
 /-- **§10 μ-grid column sum = §6 certain-type column sum** (the world-joining identification):
 `∑ᵢ muGrid i j = columnSum (toHypothesis46 …) (muColumnChar j)`.  Both sides enumerate the same
 §6 `columnFamily` column — `muGrid` through the `finCongr` row-reindex (a bijection, so
