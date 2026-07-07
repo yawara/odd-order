@@ -11045,24 +11045,6 @@ theorem not_fittingIsTI_of_mem_fittingSharp_of_centralizer_not_le [Finite G]
   -- TI forces `y ∈ N_G(F(M)) ≤ M`, contradicting `y ∉ M`.
   exact hyM (normalizer_fittingInG_le_self hG hM (hTI y hoverlap))
 
-/-- **BG Corollary 15.9** (mmd L4240): final local landing point for a centralizer
-escaping `M`.  This is the Sibley/Feit--Thompson package used by §16. -/
-theorem centralizer_escape_final_local [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M N : Subgroup G}
-    (hM : M ∈ maximalSubgroups G) (hN : N ∈ maximalSubgroups G) {x : G}
-    (hx : x ∈ sigmaSharp M) (hesc : ¬ Subgroup.centralizer ({x} : Set G) ≤ M)
-    (hNmem : N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)))
-    (hNnotF : ¬ S14.IsTypeF N) :
-    S14.IsTypeF M ∧ ¬ FittingIsTI M ∧ S14.IsTypeP2 N ∧
-      ∃ E : Subgroup G,
-        E ≤ M ∧ Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
-          (E.subgroupOf M) ∧ IsCyclic ↥E ∧
-        OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M
-          ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (E.subgroupOf M) ∧
-        ∃ r : ℕ, r.Prime ∧ r ∈ tau2 N ∧
-          Subgroup.normalizer (Subgroup.closure ({x} : Set G)) ≤ E ⊓ N := by
-  sorry
-
 /-- **The `hfratt` input of `mf_hall_centralizer_control_of_inputs`** (BG Corollary 15.3(b),
 mmd L4213): when a nonidentity Hall subgroup `H ≤ M_σ` is **not** normal in `M`, the Frattini
 factorization `M = N_M(H)·Q` holds for the normal `q`-subgroup `Q = O_q(M)`.

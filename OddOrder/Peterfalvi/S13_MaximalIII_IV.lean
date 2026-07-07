@@ -1679,6 +1679,135 @@ theorem SOf_HC_subset_SHCSet [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (Subgroup.subgroupOf_mono M hyp.secondDerived_le_HC)
   rwa [hyp.SOf_secondDerived_eq hG] at hsub
 
+/-- **World-bridge source orthogonality (pairwise)**: a member of `S(HC)` is orthogonal to a member
+of `𝒮(H₀C) = sOf`.  Both are `Ind_{HU}`-members of the pairwise-orthogonal §10 family
+`inducedKernelFamily HU` (`sOf ⊆ SOf` via `sOf_subset_SOf`), and they are **distinct**: an
+`S(HC)`-source `θ` kills `H` (`H ≤ HC ≤ Ker θ`), while an `𝒮(H₀C)`-source `χ'` lies in `𝒳`
+(`H ⊄ Ker χ'`).  If `Ind θ = Ind χ'` then `θ, χ'` are `M`-conjugate (`induce_eq_induce_iff_conj`),
+and `H ⊴ M` conjugation-invariance (`subsetCharacterKernel_conjBy_of_invariant`, via
+`hSubgroupOfM_normal`) transports `H ≤ Ker θ` to `H ≤ Ker χ'` — contradicting `χ' ∈ 𝒳`.  This is the
+`hsrc_ortho` input of the (11.8.6) world-bridge union-glue engine. -/
+theorem SOf_HC_inner_sOf_H0C_eq_zero [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    {x y : ClassFunction ↥M ℂ} (hx : x ∈ hyp.SOf hyp.HC)
+    (hy : y ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C) :
+    ClassFunction.inner x y = 0 := by
+  classical
+  have hHU : OddOrder.Peterfalvi.S11.huSub hyp.s11Setup = (derivedInG M).subgroupOf M :=
+    OddOrder.Peterfalvi.S11.huSub_eq_derivedInG_subgroupOf hyp.s11Setup
+  -- both sit in the pairwise-orthogonal `inducedKernelFamily HU`
+  have hxIKF : x ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+      (OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) (hyp.HC.subgroupOf M) := by
+    have h := hx; rw [hyp.SOf_eq, ← hHU] at h; exact h
+  have hyIKF : y ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+      (OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) (hyp.H0C.subgroupOf M) := by
+    have h := hyp.sOf_subset_SOf hyp.H0C hy; rw [hyp.SOf_eq, ← hHU] at h; exact h
+  refine OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal hxIKF hyIKF ?_
+  -- distinctness `x ≠ y`
+  intro hxy
+  -- `H` realized inside `HU`
+  have hhin : OddOrder.Peterfalvi.S11.hInHu hyp.s11Setup
+      = (hyp.H.subgroupOf M).subgroupOf (OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) := by
+    show (hyp.s11Setup.typeP.H.subgroupOf M).subgroupOf _
+        = (hyp.base.typeP.H.subgroupOf M).subgroupOf _
+    rw [hyp.setup_typeP_eq]
+  -- `x`-source `θ` kills `hInHu` (`H ≤ HC`)
+  obtain ⟨θ, hθne, hθker, hxeq⟩ := hxIKF
+  have hHθ : (OddOrder.Peterfalvi.S11.hInHu hyp.s11Setup : Set ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ) := by
+    rw [hhin]
+    refine subset_trans (SetLike.coe_subset_coe.mpr (Subgroup.subgroupOf_mono _
+      (Subgroup.subgroupOf_mono M (le_sup_left : hyp.H ≤ hyp.HC)))) hθker
+  -- `y`-source `χ'` lies in `𝒳`: `¬ hInHu ⊆ Ker χ'`
+  obtain ⟨χ', hχ'xiOf, hyeq⟩ := hy
+  have hχ'xi : ¬ ((OddOrder.Peterfalvi.S11.hInHu hyp.s11Setup : Set ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (χ' : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ)) := hχ'xiOf.1
+  -- `Ind θ = Ind χ'`, so the sources are `M`-conjugate
+  rw [OddOrder.Peterfalvi.S11.induceHU_eq_induce] at hyeq
+  have heqInd := hxeq.symm.trans (hxy.trans hyeq)
+  obtain ⟨g, hg⟩ := (induce_eq_induce_iff_conj θ χ').mp heqInd
+  -- `hInHu` is `M`-conjugation-invariant (`H ⊴ M`)
+  have hAinv : ∀ a ∈ (OddOrder.Peterfalvi.S11.hInHu hyp.s11Setup : Set ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup)),
+      ClassFunction.conjByMulEquiv g a ∈ (OddOrder.Peterfalvi.S11.hInHu hyp.s11Setup : Set ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup)) := by
+    intro a ha
+    simp only [SetLike.mem_coe] at ha ⊢
+    rw [OddOrder.Peterfalvi.S11.hInHu, Subgroup.mem_subgroupOf] at ha ⊢
+    rw [ClassFunction.conjByMulEquiv_apply]
+    exact (OddOrder.Peterfalvi.S11.hSubgroupOfM_normal hyp.s11Setup).conj_mem _ ha g
+  -- transport `hInHu ⊆ Ker θ` to `hInHu ⊆ Ker (conjBy g θ) = Ker χ'`
+  have hHχ' : (OddOrder.Peterfalvi.S11.hInHu hyp.s11Setup : Set ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel
+        (ClassFunction.conjBy g (θ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ)) :=
+    OddOrder.Peterfalvi.S11.subsetCharacterKernel_conjBy_of_invariant g _ _ hAinv hHθ
+  rw [← IrreducibleCharacter.coe_conjBy, hg] at hHχ'
+  exact hχ'xi hHχ'
+
+/-- **World-bridge source orthogonality (span level)** — the `hsrc_ortho` input of the (11.8.6)
+union-glue engine `coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal`:
+`ℤ[S(HC)] ⊥ ℤ[𝒮(H₀C)]`.  Bilinear extension of the pairwise `SOf_HC_inner_sOf_H0C_eq_zero`
+(double `span_induction`, additivity + `ℤ`-linearity of the inner product). -/
+theorem span_inner_SOf_HC_sOf_H0C_eq_zero [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    {u v : ClassFunction ↥M ℂ}
+    (hu : u ∈ Submodule.span ℤ (hyp.SOf hyp.HC))
+    (hv : v ∈ Submodule.span ℤ (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C)) :
+    ClassFunction.inner u v = 0 := by
+  classical
+  have hright : ∀ x ∈ hyp.SOf hyp.HC,
+      ∀ w ∈ Submodule.span ℤ (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C),
+      ClassFunction.inner x w = 0 := by
+    intro x hx w hw
+    induction hw using Submodule.span_induction with
+    | mem y hy => exact SOf_HC_inner_sOf_H0C_eq_zero hyp hx hy
+    | zero => rw [ClassFunction.inner_zero_right]
+    | add y z _ _ ihy ihz => rw [ClassFunction.inner_add_right, ihy, ihz, add_zero]
+    | smul a y _ ih =>
+        rw [← Int.cast_smul_eq_zsmul ℂ a y,
+          OddOrder.RepresentationTheory.inner_smul_right, ih, mul_zero]
+  induction hu using Submodule.span_induction with
+  | mem x hx => exact hright x hx v hv
+  | zero => rw [ClassFunction.inner_zero_left]
+  | add x z _ _ ihx ihz => rw [ClassFunction.inner_add_left, ihx, ihz, add_zero]
+  | smul a x _ ih =>
+      rw [← Int.cast_smul_eq_zsmul ℂ a x, ClassFunction.inner_smul_left, ih, mul_zero]
+
+/-- **Peterfalvi (11.8.6) world-bridge capstone (glued form)**: `S(H₀C)` is coherent, assembled from
+the two side-coherences along the world-bridge decomposition `S(H₀C) = S(HC) ∪ 𝒮(H₀C)`
+(`SOf_H0C_eq_SOf_HC_union_sOf`).
+
+This is the world-bridge analogue of `S12.Hypothesis.coherent_Sset_of_glued`.  The `S07` union-glue
+engine `coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal` is fed:
+- `coh` — the degree-`q` side `S(HC)`-coherence (**landed**, `coherent_SOf_HC`);
+- `hY` — the `𝒮(H₀C)`-coherence (§14-gated, (9.11) `Ptype_core_coherence` route);
+- `hsrc_ortho` — the source orthogonality `ℤ[S(HC)] ⊥ ℤ[𝒮(H₀C)]` (**landed, discharged here**,
+  `span_inner_SOf_HC_sOf_H0C_eq_zero`);
+- the `τ₃` glue map `ν` with its `hagreeX`/`hagreeY`/`hmixed`/`hDτ`/`hgen` inputs (§14/§9-gated —
+  the (6.7) image-orthogonality, (5.8) column identity, and (6.8.1) generation).
+
+The genuine world-bridge wiring (set-decomposition rewrite + engine instantiation + the
+source-orthogonality discharge) is proven here; only the §14/§9 glue inputs remain as parameters,
+to be supplied once the `𝒮(H₀C)`-side character theory lands.  Downstream, `coherent(S(H₀C))` feeds
+`coherent_S_of_coherent_SH0C` (**already sorry-free**) to give `coherent(S)`, contradicting (11.3). -/
+noncomputable def coherent_SOf_H0C_of_glued [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau (hyp.SOf hyp.HC) hyp.base.A0)
+    (hY : OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+      (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C) hyp.base.A0)
+    (ν : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G)
+    (hagreeX : ∀ x ∈ hyp.SOf hyp.HC, ν x = coh.extension x)
+    (hagreeY : ∀ y ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C, ν y = hY.extension y)
+    (hmixed : ∀ x ∈ hyp.SOf hyp.HC, ∀ y ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C,
+      ClassFunction.inner (ν x) (ν y) = ClassFunction.inner x y)
+    (D : Set (ClassFunction ↥M ℂ)) (hDτ : ∀ d ∈ D, ν d = hyp.base.tau d)
+    (hgen : OddOrder.Peterfalvi.S07.zSupportedSpan
+        (hyp.SOf hyp.HC ∪ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C) hyp.base.A0 ⊆
+      Submodule.span ℤ (OddOrder.Peterfalvi.S07.zSupportedSpan (hyp.SOf hyp.HC) hyp.base.A0 ∪
+        OddOrder.Peterfalvi.S07.zSupportedSpan
+          (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C) hyp.base.A0 ∪ D)) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0 := by
+  haveI := hyp.base.finiteG
+  rw [hyp.SOf_H0C_eq_SOf_HC_union_sOf]
+  exact OddOrder.Peterfalvi.S07.coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal
+    coh hY ν hagreeX hagreeY
+    (fun _ hu _ hv => span_inner_SOf_HC_sOf_H0C_eq_zero hyp hu hv) hmixed D hDτ hgen
+
 /-- **Peterfalvi (11.5), reverse inclusion `HC ⊆ M''`** (named obligation): the coherence content
 of (11.5).  Since `M'/M''` is abelian, `S(M'')` is coherent by (5.7); the quotient bound (11.4)
 together with (11.1)/(9.6) then forces `M'' = HC`.  Char-gated — it bottoms out in Theorem (10.8)
