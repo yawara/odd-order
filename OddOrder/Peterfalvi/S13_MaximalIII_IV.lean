@@ -3021,4 +3021,133 @@ theorem sOf_anchor_diff_support [Finite G]
     (by rw [Nat.cast_one, one_mul, hunif x hx, hunif χ₁ hχ₁mem])
   rwa [one_smul] at h
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(9.11) caseB chain step**: a chain accumulator `S₁` (the irreducible cut plus previously
+adjoined column pairs, `hS₁mu`) absorbs one *fresh* column pair (`hnotin`/`hnotin'`), staying
+coherent.  The per-step inputs of `adjoin_muColumnPair_of_irrFamily` are discharged uniformly:
+`hdegS₁diff` from the family-wide `sOf_anchor_diff_support` (`S₁ ⊆ 𝒮(H₀C′)`), `hμ_S1` by the
+accumulator dichotomy (cut member ⟶ `columnSum_inner_irr_member_eq_zero`; old column ⟶
+`columnSum_inner_columnSum_eq_zero`, the dual distinctness extracted from set-level freshness by
+`columnSum_injective`), the break data from `columnBreakDa`/`irrFamilyMemberOrthoDatum`, and the
+degrees from the uniform `hunif`.  This is the `hstep` core of the (9.11) caseB fold; the fold
+itself only has to maintain the accumulator invariants. -/
+noncomputable def caseB_chainStep [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
+    (d : ℕ)
+    (hunif : ∀ φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
+      (φ : ClassFunction ↥M ℂ) 1 = (d : ℂ))
+    {χ₁ : ClassFunction ↥M ℂ}
+    (hχ₁mem : χ₁ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime)
+    (hχ₁irr : IsIrreducibleCharacter χ₁)
+    (hχ₁deg : ((χ₁ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (d : ℂ))
+    (hDeg : (2 : ℝ) < (irrCut_finite hyp hyp.H0Cprime d).toFinset.card)
+    {S₁ : Set (ClassFunction ↥M ℂ)}
+    (hS₁sub : S₁ ⊆ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime)
+    (hS₁cut : (↑(irrCut_finite hyp hyp.H0Cprime d).toFinset : Set (ClassFunction ↥M ℂ)) ⊆ S₁)
+    (hS₁mu : ∀ x ∈ S₁,
+      x ∉ (↑(irrCut_finite hyp hyp.H0Cprime d).toFinset : Set (ClassFunction ↥M ℂ)) →
+      ∃ χ₂' : ((hyp.base.toHypothesis46 hG hG.odd).W2.subgroupOf
+        ((hyp.base.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.base.toHypothesis46 hG hG.odd).W2)) →* ℂˣ,
+        x = OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd) χ₂')
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau S₁ hyp.base.A0)
+    {χ₂ : ((hyp.base.toHypothesis46 hG hG.odd).W2.subgroupOf
+      ((hyp.base.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.base.toHypothesis46 hG hG.odd).W2)) →* ℂˣ}
+    (hχ₂ : χ₂ ≠ 1)
+    (hμmem : OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd) χ₂
+      ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime)
+    (hnotin : OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd) χ₂ ∉ S₁)
+    (hnotin' : (OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd) χ₂).conj
+      ∉ S₁) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+      (S₁ ∪
+        {OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd) χ₂,
+         (OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd) χ₂).conj})
+      hyp.base.A0 := by
+  haveI := hyp.base.finiteG
+  classical
+  -- membership repackaging for the cut
+  have hmemiff : ∀ x : ClassFunction ↥M ℂ,
+      x ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset ↔
+      (x ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime ∧
+        IsIrreducibleCharacter x ∧ ((x : ↥M → ℂ) 1 = (d : ℂ))) := fun x =>
+    (irrCut_finite hyp hyp.H0Cprime d).mem_toFinset
+  have hirr : ∀ x ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset,
+      IsIrreducibleCharacter x := fun x hx => ((hmemiff x).mp hx).2.1
+  have hconjS : ∀ x ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset,
+      x.conj ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset := fun x hx =>
+    (hmemiff _).mpr (irrCut_conjClosed hyp hyp.H0Cprime d ((hmemiff x).mp hx))
+  have hχ₁s : χ₁ ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset :=
+    (hmemiff χ₁).mpr ⟨hχ₁mem, hχ₁irr, hχ₁deg⟩
+  have hdegmem : ∀ x ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset,
+      (x : ClassFunction ↥M ℂ) 1 = χ₁ 1 := fun x hx => by
+    rw [((hmemiff x).mp hx).2.2, hχ₁deg]
+  -- kernel-filter memberships
+  have hmemIKFH : ∀ y ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
+      y ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) (hyp.H0Cprime.subgroupOf M) := fun y hy => by
+    have h := hyp.sOf_subset_SOf hyp.H0Cprime hy
+    rwa [hyp.SOf_eq] at h
+  -- anchor differences over `S₁` (uniform, family-wide)
+  have hdegS₁diff : ∀ x ∈ S₁, ((x - χ₁ : ClassFunction ↥M ℂ)).support ⊆ hyp.base.A0 :=
+    fun x hx => sOf_anchor_diff_support hG hyp d hunif hχ₁mem (hS₁sub hx)
+  -- `μ_new ⊥ S₁` (accumulator dichotomy)
+  have hμ_S1 : ∀ x ∈ S₁, ClassFunction.inner
+      (OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd) χ₂) x = 0 := by
+    intro x hx
+    by_cases hcut : x ∈ (↑(irrCut_finite hyp hyp.H0Cprime d).toFinset
+        : Set (ClassFunction ↥M ℂ))
+    · exact hyp.base.columnSum_inner_irr_member_eq_zero hG hyp.type_alt hyp.params
+        (hyp.params_mu_eq hG hG.odd) hχ₂
+        (hmemIKFH x (hS₁sub hx)) (hirr x (Finset.mem_coe.mp hcut))
+    · obtain ⟨χ₂', rfl⟩ := hS₁mu x hx hcut
+      exact hyp.base.columnSum_inner_columnSum_eq_zero hG
+        (fun heq => hnotin (heq ▸ hx))
+  have hμbar_S1 : ∀ x ∈ S₁, ClassFunction.inner
+      (OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd) χ₂).conj x
+      = 0 := by
+    intro x hx
+    rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq]
+    by_cases hcut : x ∈ (↑(irrCut_finite hyp hyp.H0Cprime d).toFinset
+        : Set (ClassFunction ↥M ℂ))
+    · exact hyp.base.columnSum_inner_irr_member_eq_zero hG hyp.type_alt hyp.params
+        (hyp.params_mu_eq hG hG.odd) (inv_ne_one.mpr hχ₂)
+        (hmemIKFH x (hS₁sub hx)) (hirr x (Finset.mem_coe.mp hcut))
+    · obtain ⟨χ₂', rfl⟩ := hS₁mu x hx hcut
+      refine hyp.base.columnSum_inner_columnSum_eq_zero hG (fun heq => hnotin' ?_)
+      rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq, heq]
+      exact hx
+  -- cut ⊆ induced family (for the member datum)
+  have hsub : (↑(irrCut_finite hyp hyp.H0Cprime d).toFinset : Set (ClassFunction ↥M ℂ)) ⊆
+      OddOrder.Peterfalvi.S12.inducedFamily M := by
+    intro x hx
+    have h := hmemIKFH x ((hmemiff x).mp (Finset.mem_coe.mp hx)).1
+    rw [OddOrder.Peterfalvi.S12.inducedFamily_eq_inducedKernelFamily_bot]
+    exact OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone bot_le h
+  -- bundled per-member datum and the break decomposition
+  have hdegb := (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one
+    (hyp.base.toHypothesis46 hG hG.odd) χ₂).symm
+  let datum := fun (x : ClassFunction ↥M ℂ)
+      (hx : x ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset) =>
+    irrFamilyMemberOrthoDatum hG hyp.base S₁ hcoh
+      (irrCut_finite hyp hyp.H0Cprime d).toFinset hS₁cut
+      hsub hirr hconjS hχ₂ hdegb hx
+  have hμZ := hyp.base.columnSum_mem_ZIrr hG χ₂
+  have hdiffasuppχ : ((OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd) χ₂
+      - χ₁ : ClassFunction ↥M ℂ)).support ⊆ hyp.base.A0 :=
+    sOf_anchor_diff_support hG hyp d hunif hχ₁mem hμmem
+  let Da := hyp.base.columnBreakDa hG hyp.type_alt hyp.params (hyp.params_mu_eq hG hG.odd)
+    hχ₂ (hmemIKFH χ₁ hχ₁mem) hχ₁irr hdiffasuppχ hμZ
+  -- fire the (S₁-separated) composite
+  exact adjoin_muColumnPair_of_irrFamily hG hyp.base S₁ hcoh
+    (irrCut_finite hyp hyp.H0Cprime d).toFinset hS₁cut hirr hχ₁s hχ₂ hdegmem
+    hdegS₁diff hμ_S1 hμbar_S1
+    (fun x hx => (datum x hx).1)
+    (fun x hx => (datum x hx).2.2)
+    Da (by with_unfolding_all rfl)
+    (fun x hx => fun α hα β hβ => by
+      with_unfolding_all exact (datum x hx).2.1 α hα β hβ)
+    hdiffasuppχ hμZ hDeg
+    (by rw [hunif _ hμmem, hχ₁deg])
+
 end OddOrder.Peterfalvi.S13
