@@ -2542,4 +2542,33 @@ noncomputable def irrFamilyMemberDecomposition [Finite G]
     ⟨x, hirr x hx⟩ hreal hdiffsupp (Finset.mem_coe.mpr hx)
     (Finset.mem_coe.mpr (hconjS x hx)) hνZ hχχbar
 
+/-- **The degree-`d` irreducible cut of `𝒮(Y)` is finite** (Finset-ification input of the (9.11)
+column-pair adjunction): it sits inside the finite kernel filtration `S(Y)`
+(`sOf_subset_SOf` + `inducedKernelFamily_finite`). -/
+theorem irrCut_finite [Finite G] {M : Subgroup G} (hyp : Hypothesis M) (Y : Subgroup G) (d : ℕ) :
+    {φ : ClassFunction ↥M ℂ | φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup Y ∧
+      IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))}.Finite := by
+  haveI := hyp.base.finiteG
+  classical
+  letI : Fintype ↥M := Fintype.ofFinite _
+  refine (OddOrder.Peterfalvi.S08.inducedKernelFamily_finite
+    (K := (derivedInG M).subgroupOf M) (Y.subgroupOf M)).subset ?_
+  intro φ hφ
+  have h := hyp.sOf_subset_SOf Y hφ.1
+  rwa [hyp.SOf_eq] at h
+
+/-- **The degree-`d` irreducible cut of `𝒮(Y)` is conjugate-closed** (the `hconjS` input of the
+(9.11) column-pair adjunction): conjugation preserves `𝒮(Y)`-membership
+(`sOf_closedUnderConjugate`), irreducibility, and the natural degree (`star_natCast`). -/
+theorem irrCut_conjClosed [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    (Y : Subgroup G) (d : ℕ) {x : ClassFunction ↥M ℂ}
+    (hx : x ∈ {φ : ClassFunction ↥M ℂ | φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup Y ∧
+      IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))}) :
+    x.conj ∈ {φ : ClassFunction ↥M ℂ | φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup Y ∧
+      IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))} := by
+  haveI := hyp.base.finiteG
+  obtain ⟨hmem, hirr, hdeg⟩ := hx
+  refine ⟨Hypothesis.sOf_closedUnderConjugate hyp.s11Setup Y hmem, hirr.conj, ?_⟩
+  rw [ClassFunction.conj_apply, hdeg, star_natCast]
+
 end OddOrder.Peterfalvi.S13
