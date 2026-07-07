@@ -362,3 +362,62 @@ def_q1 engine `eq_of_uniquelyMaximal_centralized_by_rank2_le` + Step 6 core `le_
 
 **教訓**: 本 chain で subagent が 4 回 naming-trap で「missing」誤診断 (Ptype_embedding/tau2_not_beta/6.5(a)/Fcore_structure)。
 全て既存だった。最終 assembly は上記 verified 名で intricate だが完全に構築可能。
+
+## 2026-07-07 更新 #11 (lane b, /loop 再開) — ★★訂正: update #10「完全 assemblable」は over-optimistic、真の gate = uniqQ (type-P Sylow→𝒰 clause) の 1 点
+
+update #10 の「Thm 15.8 は既存 machinery で完全 assemblable」は **circularity を見落としていた**。Coq `tau2_P2type_signalizer` (BGsection15.v:1262-1392) を repo 補題 availability と突き合わせて精査した結果、以下を確定:
+
+### 真の依存グラフ (repo 補題ベース)
+- **def_q1 (q1=q)** ← **uniqQ (Q=O_q(L)∈𝒰)** が必須。
+- repo で `IsUniquelyMaximal Q` を得る route は **`nonabelian_pgroup_isUniquelyMaximal` (Q nonabelian 要) のみ** (grep 済、type-P Sylow→𝒰 の clean lemma は不在)。
+- **Q nonabelian (`not_cQQ`)** ← nilLs (L_σ nilpotent) + sKLs' (K⊆(L_σ)')。
+- **nilLs / P1maxL / sKLs'(via defL')** は Coq で**すべて def_q1 に依存** (b'q_L = q∉β(L) 経由)。
+⟹ **nonabelian route は circular** (def_q1→uniqQ→Q-nonab→nilLs→b'q_L→def_q1)。update #10 の reorder (nilLs→Q-nonab→uniqQ→def_q1) はこの circularity ゆえ**成立しない**。
+
+### Coq が circularity を破る方法 = repo に欠けている clause
+Coq は uniqQ を **`Ptype_structure` の Sylow→𝒰 clause** (BGsection12、`[_ _ _ [_ uniqQ _] _]`, L1330-1333) から得る: 「type-P L の q-Sylow Q (q∈π(Ks)) は 𝒰」。これは **sylQ のみに依存** (nilLs/def_q1 不要)。**repo `typeP_structure` (S14:2336-2347) はこの clause を expose していない** (6 conjunct を確認: prime action / Kstar≠⊥ / N_M(X)=K⊔Kstar / conj-triv / P2⟹σ=β∧TISubset / 𝓜(C(X))={M} / Kstar≠M_σ — Sylow→𝒰 は無い)。
+
+### さらに update #10 step 7 の誤り (L_σ vs F(L))
+def_q1 の A⊆C(Q) centralization は Coq (L1337) で **`Fitting_nil L` (= F(L) nilpotent、常に真)** + `sQFL`(Q⊆F(L)) + `sAFL`(A⊆F(L)) を使う。update #10 が指定した `le_centralizer_opiCore_of_msigma_nilpotent` (**L_σ nilpotent 要**) ではない。⟹ この step は **nilLs 不要**で closable (F(L) nilpotent 版の小 helper を作るだけ)。
+
+### ⟹ 真の gate = uniqQ (type-P Sylow→𝒰) の 1 点のみ、残りは全 closable
+非 circular ordering: **sylQ** (Thm 15.2 `mf_ne_msigma_typeP1_structure` の complement 構造から抽出) → **uniqQ [=唯一の deep gate]** → def_q1 (F(L) nilpotent, coprime) → b'q_L → P1maxL → nilLs → defL' → sKLs' → not_cQQ (`partner_opiCore_nonabelian`) → oX=q (`tau2_singleton_of_nonabelianSylow`, Q⊆Sylow-q-of-G nonabelian) → escape witness (同 lemma の ℰ¹ escaping clause + U⊆H_σ) → τ₂(M)=∅ prime 形 (`not_prime_mem_tau2_of_centralizer_kappaCompl_not_le`)。
+
+**次アクション**: `tau2_transfer_constraint` を上記 ordering で assemble し、uniqQ を **精密に stated な sorried keystone lemma `sylow_typeP_isUniquelyMaximal` (Coq `Ptype_structure` uniqQ component、BGsection12) として isolate**、残りは sorry-free。これは doneness 前進 (opaque bare sorry → full honest assembly + 精密に特定された 1 keystone)。keystone (type-P Sylow→𝒰) の port は次の独立 unit (deep BG §12)。
+
+## 2026-07-07 更新 #12 (lane b, /loop) — ★★Thm 15.8 assembled sorry-free、3 keystone isolate → 1 (B) を実証明で閉じ 2 残 (A/C)
+
+**`tau2_transfer_constraint` (BG Thm 15.8) は sorry-free 着地** (S15_MF、build GREEN 3120 jobs、
+axiom = `[propext, sorryAx, Classical.choice, Quot.sound]` = 標準 3 + keystone 由来 sorryAx、新 axiom 無)。
+Coq `tau2_P2type_signalizer` の spine を非circular ordering で inline assemble (subagent orchestration +
+hub 検証): sylQ → uniqQ[keystone] → def_q1 (F(L) nilpotent) → b'q → P1maxL[keystone B→閉] → nilLs
+(Thm 15.2 contrapositive) → sKLs' → not_cQQ (`partner_opiCore_nonabelian`) → oX/singleton
+(`tau2_singleton_of_nonabelianSylow`) → escape witness (κ-Hall 極大性) → τ₂(M)=∅。
+
+### 新 helper (sorry-free)
+- **`le_centralizer_opiCore_of_fittingInAmbient_nilpotent`** (S15_MF:10041): def_q1 の A≤C(Q) を
+  **F(L) nilpotent (常に真、`fittingInG_isNilpotent`)** 経由で導く = **def_q1/nilLs circularity を破る鍵**
+  (更新 #11 の finding を実装; `le_centralizer_opiCore_of_msigma_nilpotent` の F(L) 版)。
+- `typeP2_partner_structure_of_mem` を `Ks ≤ Mstar` も返すよう拡張。
+
+### keystone 3 本 → B を閉じ 2 残
+更新 #11 の「真の gate = uniqQ 1 点」は **不完全だった** (subagent が full 依存解析で 3 clause を検出):
+- **Keystone A `typeP_partner_sylow_uniquelyMaximal_bundle`** (S15_MF:10111、**sorried**): Coq
+  `Ptype_structure`/`Fcore_structure` の sAFL+sylQ+**uniqQ** (type-P L の q-Sylow Q は 𝒰) bundle。
+  **真の deep gate** = repo `typeP_structure` 非expose の Sylow→𝒰 clause (更新 #11 通り)。sylQ 非nilpotent
+  case も Thm 15.2 (`mf_ne_msigma_typeP1_structure`) から Sylow witness 抽出が要ゆえ bundle。
+- **Keystone B `typeP_isTypeP1_of_not_mem_beta`** (S15_MF:10137、**✅ 実証明で閉じた**): subagent は
+  「typeP_structure 6 conjunct から recover 不能」としたが**誤り**。type-P L → P1∨P2
+  (`isTypeP_iff_isTypeP1_or_isTypeP2`)、P2 なら conjunct 5 (`IsTypeP2⟹σ=β`) で σ(L)=β(L)、q∈σ(L) と
+  q∉β(L) が矛盾 → ¬P2 → P1。署名に `Ks ≤ L` 追加のみで sorry-free。
+- **Keystone C `signalizer_msigma_sup_inf_partner_eq`** (S15_MF:10160、**sorried**): `H_σ ⊔ (H∩M*) = H`
+  (Coq `sdprod_sigma maxH hallD`, D=H∩L)。escape witness の hneqXK で使用。repo `typeP2_neighbor_is_typeF_of_mem`
+  (Cor 14.12) は **generic σ(H)'-E-setup を返し H∩M* と同定しない** → S14 neighbour lemma を強化して
+  「H∩M* が σ(H)'-Hall」を expose すれば閉じる (S14 territory 内)。
+
+### 残 = 2 keystone port + Cor 15.9
+- **Keystone A** = deep §12 `Ptype_structure` の Sylow-uniqueness clause の port (最重要 gate)。
+- **Keystone C** = S14 `typeP2_neighbor_is_typeF_of_mem` を強化し H∩M* を σ(H)'-Hall として expose。
+- **Cor 15.9** (`centralizer_escape_final_local`、S15_MF:10595 依然 sorried): Thm 15.8 (now assembled) を
+  cite して E2=1 → Thm 15.7 (E3=1/cyclic) → Frobenius M。`typeF_frobenius_of_tau2_prime_free` の
+  S16→S15 hoist が要 (b territory)。live consumer = S16_MainResults:5764 `exists_RData_escape_structure`。
