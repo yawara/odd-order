@@ -63,13 +63,27 @@ Coq part (d) の E₃=1 を精読 → **`E₃=1 ⟸ τ₃(M)=∅ ⟸ M' ≤ F(M)
 - `tau3_eq_empty_of_derivedInG_le_fittingInAmbient` / `E3_eq_bot_of_tau3_eq_empty` (更新 #2、下流)。
 - `E3_eq_bot_of_not_fittingIsTI (hnotTI) (hsetup) : E₃ = ⊥` (合成、cyclic-E が直接 cite する形)。
 
-## やること (残 — cyclic-E assembly のみ)
+## 進捗 (2026-07-07 lane b, 更新 #4) — cyclic-E 土台 (E-setup Frobenius core) 抽出
 
-- [ ] E₂=1: τ₂(M)=∅ (`tau2_transfer_constraint` = Thm 15.8、escape setup で apply) → E₂ (τ₂-Hall) = ⊥
-      (`E3_eq_bot_of_tau3_eq_empty` の τ₂ 版 helper `E2_eq_bot_of_tau2_eq_empty` を追加)。
-- [ ] issue 9017 cyclic-E: `centralizer_escape_final_local` の setup を hFM の上に hoist
-      (matched pair・R・hHmem・hMstar 共有) → E-setup で E₂=E₃=⊥ → E=E₁ cyclic (`E1_isCyclic`) +
-      Frobenius (`typeF_frobenius_of_tau2_prime_free`) → `∃ E cyclic Frobenius` を close。
+`typeF_frobenius_of_tau2_prime_free` を **`typeF_frobenius_of_esetup`** (E-setup + `E≠⊥` 引数、
+`IsComplement' ∧ Frobenius` を返す core) に抽出 (commit 876d214b、既存版は thin wrapper 化・signature 不変)。
+これで cyclic-E が自前 E-setup (E₂=E₃=⊥ ⟹ E=E₁ cyclic) で Frobenius を取れる。
+
+**scoping 判明 (重要)**: cyclic-E conjunct は Cor 15.9 → RData → Thm D に thread されるが **downstream で
+未消費** (Thm D(4) consumer S16:6343 が `_` で discard)。ただし faithful BG Cor 15.9(b) の一部ゆえ close は
+escape spine を honest 化する (方針どおり実施)。
+
+## やること (残 — cyclic-E assembly in `centralizer_escape_final_local` / S16_MainResults)
+
+- [ ] **hoist**: hFM の R-localization setup (matched pair K₀/U₀・R・hRhall・hHmem) を `refine ⟨hFM,…,?_⟩`
+      の上に移動 (τ₂=∅ 導出と共有)。hFM は `exact (typeP2_neighbor_is_typeF_of_mem …).1` に短縮。
+- [ ] **τ₂(M)=∅**: `hMstar ∈ 𝓜(C_G(K₀))` を obtain → `tau2_transfer_constraint hG hN hP2N … hMstar …
+      ⟨p,hpp,hpM⟩` (M_lemma=N/H_lemma=M) が τ₂(N)=∅ → r∈τ₂(N) 矛盾の対偶で τ₂(M)=∅。
+- [ ] **E≠⊥** (M の σ'-complement 非自明): Coq `ntE` = K₀ ≤ E (K₀=κ(N)-Hall≠⊥ かつ σ(M)'-group) via
+      Hall_superset。K₀ σ(M)' の確認が要 (κ(N)∩σ(M)=∅ or K₀ の prime 解析)。← assembly の crux。
+- [ ] **cyclic-E**: `exists_subgroupESetup hG hM` → `E2_eq_bot_of_tau2_eq_empty` (τ₂=∅) +
+      `E3_eq_bot_of_not_fittingIsTI` (hnotTI) で E₂=E₃=⊥ → E=E₁ (E_eq_sup) cyclic (`E1_isCyclic`) →
+      `typeF_frobenius_of_esetup hG hM hFM ht2 hsetup hEne` → `⟨E, E≤M, IsComplement', IsCyclic, Frobenius⟩`。
 
 ## 完了条件
 
