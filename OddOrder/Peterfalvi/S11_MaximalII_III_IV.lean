@@ -103,6 +103,18 @@ def W2 {M : Subgroup G} (data : TypesIIIIIIVSetup M) : Subgroup G :=
 noncomputable def q {M : Subgroup G} (data : TypesIIIIIIVSetup M) : ℕ :=
   Nat.card ↥data.W1
 
+/-- Two `TypesIIIIIIVSetup`s over the same `M` with the same type-`P` structure are equal: every
+other field (`maximal`, `nontrivial`, `type_alt`) is propositional, so the setup is determined by
+`typeP` up to proof irrelevance.  This identifies a §13 `Hypothesis.s11Setup` (pinned only by
+`setup_typeP_eq`) with the producer `toTypesIIIIIIVSetup`, transporting §9 facts stated over the
+producer setup into the §13 world. -/
+theorem eq_of_typeP_eq {M : Subgroup G} {data data' : TypesIIIIIIVSetup M}
+    (h : data.typeP = data'.typeP) : data = data' := by
+  cases data
+  cases data'
+  cases h
+  rfl
+
 end TypesIIIIIIVSetup
 
 /-! ## (9.1) ⇒ (9.3): the Frobenius action of `U W₁` on `H` and Wielandt's order relation

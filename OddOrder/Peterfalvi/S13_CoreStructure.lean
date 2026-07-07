@@ -1376,6 +1376,53 @@ theorem not_orthogonal_mu0_sub_zeta [Finite G]
     hyp.notOrthogonalFormula data.zeta := by
   sorry
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.5)/(9.9.b): the nontrivial column sums `μ_k` are `𝒮(H₀C′)`-members** — the
+`hμmem` input of the (9.11) caseB chain fold (`caseB_coherent_sOf_H0Cprime_of_mixed`).
+
+The chain: `μ_k ∈ 𝒮(H₀^prod)` and is reducible by the (11.8.1) count
+(`muGrid_column_sum_mem_sOf_H0_and_reducible`, at a producer chief over `toTypesIIIIIIVSetup`);
+the family relaxes to `𝒮(⊥)` (kernel antitone) where it is setup-independent, and the §13 setup
+agrees with the producer (`TypesIIIIIIVSetup.eq_of_typeP_eq`, `setup_typeP_eq`); `H₀ = ⊥` in
+types III/IV (`chief_H0_eq_bot`), so this is `𝒮(H₀)`-membership over `hyp.s11Setup`; a reducible
+`𝒮(H₀)`-member lies in `𝒮(H₀ ⊔ cSub)` by the (9.9.b) count (`reducible_mem_sOf_H0C`); `cSub = C`
+(`C_eq_cSub`) identifies that family with `𝒮(H₀C)`, and `𝒮(H₀C) ⊆ 𝒮(H₀C′)` (kernel antitone,
+`C′ ≤ C`). -/
+theorem columnSum_muColumnChar_mem_sOf_H0Cprime [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
+    (k : Fin hyp.base.w2) (hk : k ≠ 0) :
+    OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
+        (hyp.base.muColumnChar hG hG.odd k)
+      ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime := by
+  haveI := hyp.base.finiteG
+  classical
+  have hnt : OddOrder.GroupTheory.TypePNontrivialCore M hyp.base.typeP :=
+    OddOrder.GroupTheory.typePNontrivialCore_of_isTypeIIIorIV hyp.type_alt hyp.base.typeP
+  -- the §9 setups agree (`typeP` pinned, all other fields propositional)
+  have heq : hyp.s11Setup = hyp.base.toTypesIIIIIIVSetup hyp.type_alt hnt :=
+    OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup.eq_of_typeP_eq hyp.setup_typeP_eq
+  -- (11.8.1) at a producer chief: `μ_k ∈ 𝒮(H₀^prod)`, reducible
+  obtain ⟨chief₀, -⟩ := OddOrder.Peterfalvi.S11.exists_chiefFactorData hG
+    (hyp.base.toTypesIIIIIIVSetup hyp.type_alt hnt)
+  have hgrid := hyp.base.muGrid_column_sum_mem_sOf_H0_and_reducible hG hyp.type_alt hnt
+    chief₀ k hk
+  rw [hyp.base.muGrid_columnSum_eq_columnSum hG hG.odd k] at hgrid
+  -- transport to `𝒮(H₀)` over `hyp.s11Setup`: relax to `𝒮(⊥)` and use `H₀ = ⊥` (types III/IV)
+  have hmemH0 : OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
+      (hyp.base.muColumnChar hG hG.odd k)
+      ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.chief.H0 := by
+    rw [chief_H0_eq_bot hG hyp, heq]
+    exact OddOrder.Peterfalvi.S11.sOf_antitone _ bot_le hgrid.1
+  -- (9.9.b): a reducible `𝒮(H₀)`-member lies in `𝒮(H₀ ⊔ cSub)`
+  have hH0C := OddOrder.Peterfalvi.S11.reducible_mem_sOf_H0C hG
+    (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief) _ hmemH0 hgrid.2
+  -- `H₀ ⊔ cSub = H₀C` (`C = cSub`), and `𝒮(H₀C) ⊆ 𝒮(H₀C′)` (kernel antitone)
+  apply hyp.sOf_H0C_subset_sOf_H0Cprime
+  change _ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup (hyp.chief.H0 ⊔ hyp.C)
+  rw [C_eq_cSub hG hyp]
+  exact hH0C
+
 /-! ## (11.9): final Type III conclusion -/
 
 /-- **Peterfalvi (11.9)**: the final three conclusions of §13: the symmetric
