@@ -939,3 +939,31 @@ mixed-corner 1-pair adjoin instantiation。
 - all-reducible corner: 同定① → `isCoherent_of_subset` で closed (3 段完成)。
 - mixed corner: irr-cut base + xAdjoinStepW_k adjoin (③ hDeg counting / ④ hgen が per-pair 入力)。
 次 iteration = ① muGrid ↔ S06 columnSum の定義 trace → 同定 lemma。
+
+## 🔬 update⁶² (2026-07-07 lane-a 再開) — ★ instantiation work ① 核 LANDED: muGrid 列和 = S06 columnSum (world-join)
+
+### ✅ landed (S12_Section9Counts + S13, 全 sorry-free / axiom-clean, commits 2aff3dc5 / 0c6b15e7)
+- **`toHypothesis46_toHypothesis`**: (toHypothesis46).toHypothesis = (toCertainTypeHypothesis).toHypothesis
+  (projection rfl term)。
+- **`Hypothesis.muColumnChar`**: μ-grid 列 j の W₂-dual character 抽出 (muGrid 定義内の
+  `finCardEquivCharacterGroup (finCongr …) j` を statement 可能な def に)。
+- **`Hypothesis.muGrid_columnSum_eq_columnSum`**: `Σᵢ muGrid i j = S06.columnSum (toHypothesis46 …)
+  (muColumnChar j)` — **§10 ↔ §6 world-join の核**。これで `certainTypeSet_isCoherent_A0` が
+  `reducible_mem_inducedKernelFamily_eq_muGrid_columnSum` の μ-列和に接続。
+- S13 `certainTypeSet_isCoherent_A0` の data instance を statement から除去 (scoped 統一 refactor)。
+
+### ⚠ Lean 罠 (メモリ lean-instance-defeq-traps §5 に恒久記録)
+statement 明示の [Fintype ↥(W1⊔W2)] 等 data instance は**全称自由変数**となり証明内 scoped
+FiniteInduce instance と unify 不能 (data ゆえ irrelevance 無し) — `with_unfolding_all rfl` の
+@-explicit エラー表示で初めて可視化。fix = data instance を落とし scoped 統一 (NeZero は Prop で残害無)。
+tactic-def 同士の同定は「同一 let/have 列を set で再構築 → show → unfold; rfl」(rw[set-def] は
+h-依存 haveI で motive 破綻)。
+
+### 残 (all-reducible corner 3 段の最終 piece)
+sOf(H0Cprime) reducible member → certainTypeSet membership の合成で残るのは:
+1. **`muColumnChar j ≠ 1 ⟺ j ≠ 0`** (finCardEquivCharacterGroup_zero + Equiv injectivity、小)。
+2. **deg 条件** (基準列 k との一致): (10.3) cross-column constancy = `muGrid_apply_one_eq` (hw2
+   prime 要)。
+3. 合成 lemma: reducible φ ∈ SOf/sOf(H0Cprime) → φ ∈ certainTypeSet h46 k (1+2+S12_Section9Counts:572
+   +update⁶² world-join)。
+その後 mixed corner (③ hDeg / ④ hgen)。次 iteration = 残 1→2→3。
