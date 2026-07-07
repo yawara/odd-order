@@ -939,3 +939,120 @@ mixed-corner 1-pair adjoin instantiation。
 - all-reducible corner: 同定① → `isCoherent_of_subset` で closed (3 段完成)。
 - mixed corner: irr-cut base + xAdjoinStepW_k adjoin (③ hDeg counting / ④ hgen が per-pair 入力)。
 次 iteration = ① muGrid ↔ S06 columnSum の定義 trace → 同定 lemma。
+
+## 🔬 update⁶² (2026-07-07 lane-a 再開) — ★ instantiation work ① 核 LANDED: muGrid 列和 = S06 columnSum (world-join)
+
+### ✅ landed (S12_Section9Counts + S13, 全 sorry-free / axiom-clean, commits 2aff3dc5 / 0c6b15e7)
+- **`toHypothesis46_toHypothesis`**: (toHypothesis46).toHypothesis = (toCertainTypeHypothesis).toHypothesis
+  (projection rfl term)。
+- **`Hypothesis.muColumnChar`**: μ-grid 列 j の W₂-dual character 抽出 (muGrid 定義内の
+  `finCardEquivCharacterGroup (finCongr …) j` を statement 可能な def に)。
+- **`Hypothesis.muGrid_columnSum_eq_columnSum`**: `Σᵢ muGrid i j = S06.columnSum (toHypothesis46 …)
+  (muColumnChar j)` — **§10 ↔ §6 world-join の核**。これで `certainTypeSet_isCoherent_A0` が
+  `reducible_mem_inducedKernelFamily_eq_muGrid_columnSum` の μ-列和に接続。
+- S13 `certainTypeSet_isCoherent_A0` の data instance を statement から除去 (scoped 統一 refactor)。
+
+### ⚠ Lean 罠 (メモリ lean-instance-defeq-traps §5 に恒久記録)
+statement 明示の [Fintype ↥(W1⊔W2)] 等 data instance は**全称自由変数**となり証明内 scoped
+FiniteInduce instance と unify 不能 (data ゆえ irrelevance 無し) — `with_unfolding_all rfl` の
+@-explicit エラー表示で初めて可視化。fix = data instance を落とし scoped 統一 (NeZero は Prop で残害無)。
+tactic-def 同士の同定は「同一 let/have 列を set で再構築 → show → unfold; rfl」(rw[set-def] は
+h-依存 haveI で motive 破綻)。
+
+### 残 (all-reducible corner 3 段の最終 piece)
+sOf(H0Cprime) reducible member → certainTypeSet membership の合成で残るのは:
+1. **`muColumnChar j ≠ 1 ⟺ j ≠ 0`** (finCardEquivCharacterGroup_zero + Equiv injectivity、小)。
+2. **deg 条件** (基準列 k との一致): (10.3) cross-column constancy = `muGrid_apply_one_eq` (hw2
+   prime 要)。
+3. 合成 lemma: reducible φ ∈ SOf/sOf(H0Cprime) → φ ∈ certainTypeSet h46 k (1+2+S12_Section9Counts:572
+   +update⁶² world-join)。
+その後 mixed corner (③ hDeg / ④ hgen)。次 iteration = 残 1→2→3。
+
+## 🔬 update⁶³ (2026-07-07 lane-a /loop) — ★ all-reducible corner の membership pieces 完備 (残 1→2→3 全 landed)
+
+### ✅ landed (S12_Section9Counts, sorry-free ×3, commit 83092b0c ほか)
+- **`muColumnChar_ne_one`**: j ≠ 0 → μ-列の W₂-dual ≠ 1 (fCECG_zero + Equiv injectivity)。
+  ⚠ `rw [← fCECG_zero] at heq` は instance 表記差で pattern 不一致 → goal 方向 rw + exact に変更。
+- **`muColumnChar_columnSum_apply_one_eq`**: (10.3) cross-column deg 一致を §6 columnFamily
+  interface で (world-join を 1 で評価、map_sum AddMonoidHom.mk' + muGrid_apply_one_eq entrywise)。
+- **`reducible_mem_inducedKernelFamily_mem_certainTypeSet`**: 任意 kernel filter S(B) の reducible
+  member ψ → ψ ∈ certainTypeSet (toHypothesis46) (muColumnChar kref) (kref ≠ 0 任意、hw2 prime)。
+
+### ⟹ all-reducible corner の残り = S13 family-level assembly のみ (~40 行)
+「sOf(H0Cprime) が all-reducible ⟹ coherent(sOf(H0Cprime), A0)」: sOf ⊆ SOf = inducedKernelFamily
+(sOf_subset_SOf + SOf_eq) → per-member 上記合成で ⊆ certainTypeSet → `certainTypeSet_isCoherent_A0`
++ `isCoherent_of_subset` (witness = sOf の μ̄−μ、conjDiff 系 landed パターン)。
+mixed corner (③ hDeg counting / ④ hgen) は別途。次 iteration = S13 assembly。
+
+## 🔬 update⁶⁴ (2026-07-07 lane-a /loop) — ★★ (9.11) all-reducible corner CLOSED (end-to-end sorry-free)
+
+### ✅ landed: `S13.coherent_sOf_H0Cprime_of_allReducible` (commit 2343f0f7, axiom-clean)
+(9.9)(c) corner: `𝒮(H₀C′)` 全 member reducible ⟹ `IsCoherent hyp.base.tau (sOf … H0Cprime) A₀`。
+一発 green。組立 = certainTypeSet_isCoherent_A0 (基準列 muColumnChar kref、ne_one) → per-member
+membership (sOf→SOf→inducedKernelFamily→reducible 合成、chief = exists_chiefFactorData.choose、
+hw2 = params.w2_prime) → isCoherent_of_subset (witness ζ̄−ζ)。
+
+### (9.11) base 側の到達状況 (両 corner 完備)
+- **irr seed あり**: `sOf_degreeSubfamily_isCoherent` (update⁵⁸) — deg-d 既約 cut coherence。
+- **all-reducible**: 本 lemma。
+- **残る (9.11) 本体 = mixed corner の induction**: irr-cut base に μ-column pairs を
+  `xAdjoinStepW_k` で adjoin する chain — per-pair 入力 (③ hDeg = 2·deg·anchor < Σdeg²/mc の
+  counting、④ hgen = span generation、Da = certainTypeDecompositionDa/seedDecomposition、
+  hortho_mem = certainTypeR 直交系) の instantiation + fold (coherentOfPairChainCover)。
+  ここが Coq (9.11.1)-(9.11.8) の本体 (norm-chain wlog 込み) で、caseB (uniform-qu) を先に
+  (全 member 同 deg で hDeg 計算が単純)、非 Galois caseA (qa/qu mixed) を後に。
+次 iteration = mixed corner の 1-pair adjoin instantiation (caseB 形から)。
+
+## 🔬 update⁶⁵ (2026-07-07 lane-a /loop) — mixed corner 1-pair adjoin の入力→supply 完全 map (handoff、composite は次 iteration で build)
+
+xAdjoinStepW_k (S08_CoherenceWeighted:459-599) を精読し全入力の supply 元を確定。composite
+`adjoin_muColumnPair_of_irrCut` (S13、~200 行) の設計:
+
+### 設計判断: adjoin pair は S06 columnSum 表記で組む
+χ = `columnSum h46 χ₂` (χ₂ = muColumnChar k / 一般 W₂-dual、χ₂ ≠ 1)、χ̄ = `columnSum h46 χ₂⁻¹`
+(columnSum_conj_eq)。§12 muGrid 表記への変換は family 分解側で world-join を使う (adjoin engine
+自体は S06 表記が最短)。τ = hyp.tau は dadeICM hyp.dadeData.dade (fullDadeIsometryData hyp.hconj)
+と defeq (S04.Hypothesis 引数 = hyp.dadeData.dade、hconj = hyp.hconj、A = typePA0 →
+suppIn = hyp.A0 ✓ certainTypeSet_isCoherent_A0 で実証済)。
+
+### 入力 → supply 元 (17 項目)
+| 入力 | supply | 状態 |
+|---|---|---|
+| hS₁ | `sOf_degreeSubfamily_isCoherent` (irr-cut, d=qu) | ✅ landed |
+| hdiffsuppχ | `columnDiff_support_subset` (S06:302) + columnSum_conj_eq + A(M)→A₀ mono | ✅ 組める |
+| hχχne | columnSum_def + `columnFamily_mu_sum_inner` 対角 = w1 ≠ 0 | ✅ 組める |
+| hχbarχbarne | conj 側同様 (χ₂⁻¹ 対角) | ✅ |
+| hχχbar/hχbarχ | mu_sum_inner off-diag + `column_inv_ne_self` | ✅ |
+| hχ_S1/hχbar_S1 | μ ∈ inducedFamily (`muGrid_column_sum_mem_inducedFamily`+world-join or 直) ⊥ irr-cut member (distinct: reducible vs irr) via `inducedKernelFamily_pairwise_orthogonal` | ✅ 組める |
+| s/χmem/deg/i₁ | irr-cut の Finset enumeration (equivFin パターン、deg ≡ 1) + anchor 選択 | 機械的 |
+| hmemdegdiffsupp | equal-deg (qu) 差の support = `inducedKernelFamily_scaledDiff_support` 系 | ✅ |
+| hmemS1/hmemortho/hanchorNorm | irr-cut 定義 + `irreducibleCharacter_inner_eq_ite` (mc ≡ 1) | ✅ |
+| **a** | = 1 (caseB: μ(1) = w1·u = qu = anchor(1) — uniform-qu で係数 1) | ✅ |
+| Dmem | `memberExtensionDecomposition` (irr member 用 ψ=0、S07/S08 — 所在確認) | 要確認 |
+| Da | `certainTypeDecompositionDa` (ψ=a·η₁=χ₁; hμη₁supp = equal-deg diff support ✓、htau1_mema = Dade ZIrr ✓、hχψ/hχbarψ = μ⊥χ₁ ✓) | ✅ 組める |
+| hDatau1 | rfl (ofProjection の tau1 = dadeICM) | ✅ |
+| hortho_mem | `certainTypeR_imageSet_orthogonal_dadeOfDiff` (S06、column ⊥ irr-break の向き確認) | 要確認 |
+| htau1Dmem | memberExtensionDecomposition 設計で rfl | 要確認 |
+| htau1_memaχ | `dadeIntegralCharacterMap_mem_ZIrr_of_supported` (μ−χ₁ supported + ZIrr) | ✅ |
+| ha1 | rfl (deg ≡ 1) | ✅ |
+| **hDeg** | 2·1 < Σ 1²/1 = \|irr-cut\| ⟹ **\|irr-cut\| ≥ 3 の counting** | **named hypothesis** |
+| hSgen | equal-deg family: x = (x−χ₁)+χ₁、x−χ₁ supported | ✅ (`zSupportedSpan_range_subset_span_sub_zero` 系) |
+| hgen | uniform-deg collapse (S₁∪pair 全員 deg qu) | ✅ 組める (~30 行) |
+
+### ⟹ 残る genuine gap = hDeg counting (\|irr-cut\| ≥ 3) のみ、他は組立
+counting は §9 の X_H0C' サイズ下界 ((9.9)(a) Galois / (9.8)(d) 非Galois lb_Sqa) — named
+hypothesis で前倒しし、§9 counting は別 piece。次 iteration = composite を上記 map 通りに build
+(Dmem/hortho_mem の 2 「要確認」を先に grep)。
+
+### 「要確認」2 点の確認結果 (2026-07-07 次 iteration 冒頭)
+- **`memberExtensionDecomposition`** (S08_CoherenceCorePart1:1554) ✅ そのまま使える: 入力 =
+  hS₁ + χ irr ∈ S₁ + χ̄ ∈ S₁ + non-real + diffsupp + hνZ (hS₁.extension_mem_ZIrr で discharge 可)
+  + hχχbar。tau1 = hS₁.extension (htau1Dmem は rfl 系)、imageFamily = dadeOrthonormalCharacterImageFamilyOfDiff。
+- **`certainTypeR_imageSet_orthogonal_dadeOfDiff`** (S08_CaseBHortho:44) ⚠ **Sibley world 前提**
+  (hyp : SibleyDadeHypothesis G L H、A = sharpImage H、hHK : h46.K = H) — §12 world (A = typePA0)
+  では直接使えない。証明核 (ticVdiff key brick、⟨ω^σ, ·⟩ = 0 の disjointness) は W-world の話で
+  A への依存は τ の家経由。**対応 = composite では hortho_mem を named hypothesis 化**し、§12 版
+  supply (S08_CaseBHortho の typePA0 一般化 or §12 instantiation、a 所有ゆえ可) を別 piece に。
+- **追加発見**: `muGrid_inner_irr_member_eq_zero` (S12_Section9Counts:802、既存) — hχ_S1 の
+  supply がほぼ直接ある (μ-grid ⊥ irr member)。
+⟹ composite の named hypotheses = **hDeg counting + hortho_mem** の 2 つ、他 15 項目は実 supply。
