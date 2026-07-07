@@ -283,3 +283,22 @@ unblock。**lane-c は cite-ready sorried-cite endpoint に整理済** (本 gate
 ゆえ deep build は fresh session、待つ間の idle は禁止だが c は既に stop+report 済で policy 準拠)。
 lane-a の frontier 選択は自律 (hub は dictate しない) が、本項目が **2 レーン + a 自身の capstone を同時 unblock
 する最高レバレッジ σ-theory target** である事実を記録。
+
+## 🔗 lane-c → 9000 downstream 依存の精緻化 (2026-07-07 lane c, post-horth)
+
+**C の (14.9) coherence side は完了** (issue 9072 CLOSED, commit `c8875eb2` → 統合 `06d5a0cb`): `horth`
+coherence carrier を実証明 (`T_typeIII_hyp07` + `irrSubcoherent`)。⟹ **9000 landing が unblock する C の
+残 S16 consumer は coherence でなく以下に限定**:
+
+1. **`T_not_isTypeIV_of_isTypeP1` (S16:1768) の `hVcomm : IsMulCommutative V`** — `typeP_Galois T →
+   cyclic V → abelian V` char body。σ engine `card_le_cyclotomicQuotient_of_faithful_fpf` は `[CommGroup U]`
+   を **仮定 consume** し abelian を*証明しない*ので、9000 の §9 block 分解 + typeP_Galois が必須
+   (S16:1776-1803 に Coq `FTtype34_structure`/`PFsection9,11` の exact reduction を記載済)。これが landing
+   すれば `T_isTypeIII_of_isTypeP1` → `T_isTypeP2` → `T_typeII` の type-determination chain が閉じる。
+2. **`s_side_frobenius_kernel` (S16:4419) / `t_side_frobenius_kernel` (S16:4432)** — (9.7.b) 場-model
+   (`FieldNormalizerData`/`TFieldModelData`, issue 2035/9000 sphere) の `derived_inf_centralizer_le_{P,Q}`。
+   engine は proven (`S16_G0Coprime`); 欠けているのは field-model carrier (Q=Frobenius kernel の injective σ)。
+
+C 側は **cite-ready sorried-cite endpoint に整理済** — 9000 の typeP_Galois/field-model が landing 次第、
+上記は薄い cite で close 可能 (C が assemble)。9000 の owner=lane-a は本項目を dictate されないが、C の
+type-determination 全体が 1・2 に gated である事実を downstream 影響として記録。
