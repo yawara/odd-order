@@ -52,14 +52,38 @@ Coq part (d) の E₃=1 を精読 → **`E₃=1 ⟸ τ₃(M)=∅ ⟸ M' ≤ F(M)
 ⟹ **残る唯一の gate = `M' ≤ F(M)`** (Coq part (c) `sM'F`: `M' nilpotent` ⟸ `M_β=1` (type F、`H=M_σ` + β⊆σ)
 + `derivedQuotientMbeta_isNilpotent` (repo に有) + `Fitting_max`)。`M_β=1` for type-F が唯一の未確認ピース。
 
-## やること (残)
+## 進捗 (2026-07-07 lane b, 更新 #3) — ✅ E₃=1 完全実証明 (part d 完了)
 
-- [ ] **`M' ≤ F(M)` for type-F ¬FittingIsTI M** を形式化 (crux): `M_β = ⊥` (type F) を確立 →
-      `derivedQuotientMbeta_isNilpotent` で `M' nilpotent` → `fittingInAmbient` は max nilpotent normal で `M' ≤ F(M)`。
-      `M_β=⊥` は Coq `-defH partG_eq1` (H=M_σ、beta_sub_sigma) を repo にマップ。
-- [ ] E₂=1: τ₂(M)=∅ (`tau2_transfer_constraint` = Thm 15.8) → E₂ (τ₂-Hall) = ⊥ (E3 と同じ論法の τ₂ 版)。
-- [ ] issue 9017 cyclic-E: setup を hFM の上に hoist (matched pair・R・hHmem 共有) → E=E₁ cyclic
-      (`E1_isCyclic`、E₂=E₃=⊥) + Frobenius (`typeF_frobenius_of_tau2_prime_free`) → `∃ E cyclic Frobenius` を close。
+`M' ≤ F(M)` crux を landing → **BG Thm 15.7(d) E₃=1 が完全 sorry-free**。S15_MF に 4 補題:
+- `derivedInG_le_fittingInAmbient_of_not_fittingIsTI (hnotTI) : M' ≤ F(M)` (crux、part c)。
+  `M_β=⊥` は **`Mbeta ≤ Msigma=M_F` (normal σ-subgroup、`le_opiCoreInG_of_normal_of_isPiSubgroup`) +
+  `piSet_mf_inf_beta_disjoint` (π(M_F)∩β=∅) ⟹ π(M_β)⊆∅`** で確立 (Coq `partG_eq1` を forward に置換)。
+  `M'/M_β ≅ M'` nilpotent (`derivedQuotientMbeta_isNilpotent` + `quotientMulEquivOfEq`+`quotientBot`) →
+  `le_fittingInAmbient_of_subgroupOf_normal_of_isNilpotent`。
+- `tau3_eq_empty_of_derivedInG_le_fittingInAmbient` / `E3_eq_bot_of_tau3_eq_empty` (更新 #2、下流)。
+- `E3_eq_bot_of_not_fittingIsTI (hnotTI) (hsetup) : E₃ = ⊥` (合成、cyclic-E が直接 cite する形)。
+
+## 進捗 (2026-07-07 lane b, 更新 #4) — cyclic-E 土台 (E-setup Frobenius core) 抽出
+
+`typeF_frobenius_of_tau2_prime_free` を **`typeF_frobenius_of_esetup`** (E-setup + `E≠⊥` 引数、
+`IsComplement' ∧ Frobenius` を返す core) に抽出 (commit 876d214b、既存版は thin wrapper 化・signature 不変)。
+これで cyclic-E が自前 E-setup (E₂=E₃=⊥ ⟹ E=E₁ cyclic) で Frobenius を取れる。
+
+**scoping 判明 (重要)**: cyclic-E conjunct は Cor 15.9 → RData → Thm D に thread されるが **downstream で
+未消費** (Thm D(4) consumer S16:6343 が `_` で discard)。ただし faithful BG Cor 15.9(b) の一部ゆえ close は
+escape spine を honest 化する (方針どおり実施)。
+
+## やること (残 — cyclic-E assembly in `centralizer_escape_final_local` / S16_MainResults)
+
+- [ ] **hoist**: hFM の R-localization setup (matched pair K₀/U₀・R・hRhall・hHmem) を `refine ⟨hFM,…,?_⟩`
+      の上に移動 (τ₂=∅ 導出と共有)。hFM は `exact (typeP2_neighbor_is_typeF_of_mem …).1` に短縮。
+- [ ] **τ₂(M)=∅**: `hMstar ∈ 𝓜(C_G(K₀))` を obtain → `tau2_transfer_constraint hG hN hP2N … hMstar …
+      ⟨p,hpp,hpM⟩` (M_lemma=N/H_lemma=M) が τ₂(N)=∅ → r∈τ₂(N) 矛盾の対偶で τ₂(M)=∅。
+- [ ] **E≠⊥** (M の σ'-complement 非自明): Coq `ntE` = K₀ ≤ E (K₀=κ(N)-Hall≠⊥ かつ σ(M)'-group) via
+      Hall_superset。K₀ σ(M)' の確認が要 (κ(N)∩σ(M)=∅ or K₀ の prime 解析)。← assembly の crux。
+- [ ] **cyclic-E**: `exists_subgroupESetup hG hM` → `E2_eq_bot_of_tau2_eq_empty` (τ₂=∅) +
+      `E3_eq_bot_of_not_fittingIsTI` (hnotTI) で E₂=E₃=⊥ → E=E₁ (E_eq_sup) cyclic (`E1_isCyclic`) →
+      `typeF_frobenius_of_esetup hG hM hFM ht2 hsetup hEne` → `⟨E, E≤M, IsComplement', IsCyclic, Frobenius⟩`。
 
 ## 完了条件
 
