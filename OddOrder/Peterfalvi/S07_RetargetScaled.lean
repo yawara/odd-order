@@ -502,4 +502,78 @@ noncomputable def retargetTargetPair_gen
 
 end TargetPairGen
 
+/-- **Peterfalvi (5.6.3) seed: a lone conjugate pair `{χ, χ̄}` of a possibly reducible `χ` is
+coherent** — the `‖χ‖² ≠ 1` analogue of `coherentPair` (`S07_Coherence`), and the `S₁ = ∅` seed
+missing from `retarget_isCoherent_S` (which adjoins to an existing coherent `S₁` via an anchor
+`χ₁ ∈ S₁`).  Needed by the (9.11) `Ptype_core_coherence` assembly in the all-reducible corner
+((9.9)(c)): when the degree-`qu` family `𝒮(H₀C')` has no irreducible member, the pair-adjoin chain
+must start from a reducible column pair `{μ, μ̄}`.
+
+Given Gram-matched targets `X, X̄ ∈ ℤ[Irr G]` (`‖X‖² = ‖χ‖²`, `‖X̄‖² = ‖χ̄‖²`, `⟨X,X̄⟩ = 0`,
+`X̄ = X − (χ−χ̄)^τ` — e.g. from `retargetTargetPair_gen` on a ψ=0 `CharacterPsiDecomposition`),
+the extension is `ν := retargetS τ χ χ̄ X X̄`: an isometry on `ℤ[{χ,χ̄}]` (the `S₁ = ∅` case of
+`retargetS_inner_eq_on_zSpan_union`), agreeing with `τ` on the supported span `ℤ[{χ,χ̄}, A] =
+ℤ·(χ−χ̄)` (`hgen`, equal degrees), with `ℤ[Irr G]` values on the pair. -/
+noncomputable def coherentPair_k
+    {τ : IntegralCharacterMap L G} {χ chibar : ClassFunction L ℂ} {A : Set L}
+    {X Xbar : ClassFunction G ℂ}
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hχχne : ClassFunction.inner χ χ ≠ 0)
+    (hχbarχbarne : ClassFunction.inner chibar chibar ≠ 0)
+    (hχχbar : ClassFunction.inner χ chibar = 0)
+    (hχbarχ : ClassFunction.inner chibar χ = 0)
+    (hXX : ClassFunction.inner X X = ClassFunction.inner χ χ)
+    (hXbarXbar : ClassFunction.inner Xbar Xbar = ClassFunction.inner chibar chibar)
+    (hXXbar : ClassFunction.inner X Xbar = 0) (hXbarX : ClassFunction.inner Xbar X = 0)
+    (hXZ : X ∈ ZIrr G) (hXbarZ : Xbar ∈ ZIrr G)
+    (hXbar_def : Xbar = X - τ (χ - chibar))
+    (hne : χ - chibar ≠ 0)
+    (hsupp : (χ - chibar).support ⊆ A)
+    (hgen : zSupportedSpan (L := L) {χ, chibar} A ⊆
+      Submodule.span ℤ ({χ - chibar} : Set _)) :
+    IsCoherent τ {χ, chibar} A := by
+  classical
+  set ν := retargetS τ χ chibar X Xbar with hνdef
+  have hνdiff : ν (χ - chibar) = τ (χ - chibar) := by
+    rw [hνdef, map_sub, retargetS_apply_left hχχne hχχbar,
+      retargetS_apply_right hχbarχ hχbarχbarne, hXbar_def]
+    abel
+  have hχ_mem : χ ∈ zSpan (L := L) {χ, chibar} := Submodule.subset_span (by simp)
+  have hχbar_mem : chibar ∈ zSpan (L := L) {χ, chibar} := Submodule.subset_span (by simp)
+  refine ⟨⟨χ - chibar, ⟨Submodule.sub_mem _ hχ_mem hχbar_mem, hsupp⟩, hne⟩, ν, ?_, ?_, ?_⟩
+  · -- isometry on `zSpan {χ, χ̄}` (the `S₁ = ∅` case of `retargetS_inner_eq_on_zSpan_union`).
+    intro φ ψ hφ hψ
+    rw [hνdef]
+    refine retargetS_inner_eq_on_zSpan_union (S₁ := ∅) (fun u v hu hv => ?_)
+      hχχne hχbarχbarne hχχbar hχbarχ hXX hXbarXbar hXXbar hXbarX
+      (fun x hx => hx.elim) (fun x hx => hx.elim) (fun ξ hξ => ?_) (fun ξ hξ => ?_) ?_ ?_
+    · rw [Submodule.span_empty, Submodule.mem_bot] at hu hv
+      rw [hu, hv]; simp
+    · rw [Submodule.span_empty, Submodule.mem_bot] at hξ
+      rw [hξ, map_zero, ClassFunction.inner_zero_left]
+    · rw [Submodule.span_empty, Submodule.mem_bot] at hξ
+      rw [hξ, map_zero, ClassFunction.inner_zero_left]
+    · rw [Set.empty_union]; exact hφ
+    · rw [Set.empty_union]; exact hψ
+  · -- extends_on_supported: `ν = τ` on `χ − χ̄`, hence on `ℤ[χ − χ̄] ⊇ ℤ[{χ,χ̄}, A]` (`hgen`).
+    intro φ hφ
+    rw [hνdef]
+    refine IntegralCharacterMap.eq_on_zSpan_of_eq_on (T := ({χ - chibar} : Set _)) ?_ (hgen hφ)
+    intro x hx
+    rw [Set.mem_singleton_iff] at hx
+    rw [hx, ← hνdef]
+    exact hνdiff
+  · -- extension_mem_ZIrr: `χ ↦ X`, `χ̄ ↦ X̄`, so `ℤ[{χ, χ̄}]` maps into `ℤ[Irr G]`.
+    intro φ hφ
+    rw [hνdef]
+    induction hφ using Submodule.span_induction with
+    | mem y hy =>
+        simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hy
+        rcases hy with rfl | rfl
+        · rw [retargetS_apply_left hχχne hχχbar]; exact hXZ
+        · rw [retargetS_apply_right hχbarχ hχbarχbarne]; exact hXbarZ
+    | zero => rw [map_zero]; exact Submodule.zero_mem _
+    | add y z _ _ ihy ihz => rw [map_add]; exact Submodule.add_mem _ ihy ihz
+    | smul c y _ ih => rw [map_zsmul]; exact Submodule.smul_mem _ c ih
+
 end OddOrder.Peterfalvi.S07

@@ -1686,6 +1686,153 @@ noncomputable def isCoherent_of_subset {L : Type*} [Group L] [Fintype L] [Fintyp
   extension_mem_ZIrr := fun a ha =>
     h.extension_mem_ZIrr a (Submodule.span_mono hsub ha)
 
+/-- **Coherence transports along a support change that shrinks the supported lattice**
+(the support-side companion of `isCoherent_of_subset`: same family `S`, different support set).
+If `S` is coherent on `A₁` and every `A₂`-supported lattice element is already `A₁`-supported
+(`ℤ[S, A₂] ⊆ ℤ[S, A₁]`), then `S` is coherent on `A₂` with the *same* extension — only the
+`nonzero` witness must be re-supplied on `A₂`.
+
+The (9.11)/(6.8) use: the certain-type coherence (4.9)(b) lives on `A(M)`
+(`supportInSubgroup (typePA M) M`) while the §10–§13 coherence interface uses
+`A₀(M) ⊇ A(M)`; the column characters `μ_j` vanish off `A ∪ {1}` and `1 ∉ A₀`, so an
+`A₀`-supported `ℤ[𝒯]`-combination is automatically `A`-supported and the lattices agree. -/
+noncomputable def isCoherent_of_supportedSpan_le {L : Type*} [Group L] [Fintype L] [Fintype G]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    {S : Set (ClassFunction L ℂ)} {A₁ A₂ : Set L}
+    (h : OddOrder.Peterfalvi.S07.IsCoherent τ S A₁)
+    (hle : OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) S A₂ ⊆
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) S A₁)
+    (hwit : ∃ φ : ClassFunction L ℂ,
+      φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) S A₂ ∧ φ ≠ 0) :
+    OddOrder.Peterfalvi.S07.IsCoherent τ S A₂ where
+  nonzero := hwit
+  extension := h.extension
+  extension_inner_eq := h.extension_inner_eq
+  extends_on_supported := fun a ha => h.extends_on_supported a (hle ha)
+  extension_mem_ZIrr := h.extension_mem_ZIrr
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(4.9)(b) certain-type coherence, §10 interface form**: the certain-type column set
+`𝒯 = certainTypeSet (hyp.toHypothesis46 …) k` is coherent for the §10 Dade map `hyp.tau` on the
+§10 support `A₀(M)`.  This is the reducible-μ-side coherence input of the (9.11) `caseB`/
+all-reducible assembly (issue 1019 update⁶⁰) — the §12-world analogue of the (6.8) case-(B)
+`SibleyDadeHypothesis.certainTypeSet_isCoherent_tau`.
+
+No `congrMap` seam is needed: under `toHypothesis46` the certain-type Dade map
+`dadeIntegralCharacterMap h46.dade0 h46.tau` is *definitionally* `hyp.tau`
+(`dade0 := hyp.dadeData.dade` and `tau := ….fullDadeIsometryData hyp.hconj` are the very
+components of `S12.Hypothesis.tau`).  The support moves from `A(M)` to `A₀(M) = A(M) ∪ V^M` by
+`isCoherent_of_supportedSpan_le`: every column `μ_j` vanishes off `A(M) ∪ {1}`
+(`columnSum_support_subset`), so an `A₀`-supported `ℤ[𝒯]`-combination is automatically
+`A(M)`-supported (`1 ∉ A₀`, `one_notMem_A0`); the `A₀`-witness is the `A(M)`-supported
+`μ_{k⁻¹} − μ_k` of `certainType_nonzero`, enlarged along `A(M) ⊆ A₀(M)`. -/
+noncomputable def certainTypeSet_isCoherent_A0 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : OddOrder.Peterfalvi.S12.Hypothesis M) (hodd : Odd (Nat.card G))
+    [NeZero (Nat.card (hyp.toHypothesis46 hG hodd).W1)]
+    {k : ((hyp.toHypothesis46 hG hodd).W2.subgroupOf
+      ((hyp.toHypothesis46 hG hodd).W1 ⊔ (hyp.toHypothesis46 hG hodd).W2)) →* ℂˣ}
+    (hk : k ≠ 1) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (OddOrder.Peterfalvi.S06.certainTypeSet (hyp.toHypothesis46 hG hodd) k) hyp.A0 := by
+  haveI := hyp.finiteG
+  classical
+  -- (4.9)(b) on `A(M)`; the certain-type Dade map is definitionally `hyp.tau`
+  have hbase : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (OddOrder.Peterfalvi.S06.certainTypeSet (hyp.toHypothesis46 hG hodd) k)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.GroupTheory.typePA M hyp.typeP) M) :=
+    OddOrder.Peterfalvi.S06.certainType_isCoherent (hyp.toHypothesis46 hG hodd) hk
+  refine isCoherent_of_supportedSpan_le hbase ?_ ?_
+  · -- `ℤ[𝒯, A₀] ⊆ ℤ[𝒯, A(M)]`: members vanish off `A(M) ∪ {1}` and `1 ∉ A₀`
+    rintro φ ⟨hφspan, hφsupp⟩
+    refine ⟨hφspan, ?_⟩
+    have hsupp1 : φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.GroupTheory.typePA M hyp.typeP) M ∪ {1} := by
+      have hle : OddOrder.Peterfalvi.S07.zSpan (L := ↥M)
+          (OddOrder.Peterfalvi.S06.certainTypeSet (hyp.toHypothesis46 hG hodd) k) ≤
+          (ClassFunction.supportedSubmodule (G := ↥M) (k := ℂ)
+            (OddOrder.Peterfalvi.S04.supportInSubgroup
+              (OddOrder.GroupTheory.typePA M hyp.typeP) M ∪ {1})).restrictScalars ℤ := by
+        refine Submodule.span_le.mpr (fun s hs => ?_)
+        obtain ⟨χ₂, hχ₂, -, rfl⟩ := hs
+        simpa only [Submodule.restrictScalars_mem, ClassFunction.mem_supportedSubmodule]
+          using OddOrder.Peterfalvi.S06.columnSum_support_subset
+            (hyp.toHypothesis46 hG hodd) hχ₂
+      exact (ClassFunction.mem_supportedSubmodule).mp (hle hφspan)
+    intro x hx
+    rcases hsupp1 hx with hA | h1
+    · exact hA
+    · exact absurd (h1 ▸ hφsupp hx) hyp.one_notMem_A0
+  · -- the `A₀`-witness: `μ_{k⁻¹} − μ_k`, `A(M)`-supported ⊆ `A₀`-supported
+    obtain ⟨φ, ⟨hφspan, hφsupp⟩, hφne⟩ :=
+      OddOrder.Peterfalvi.S06.certainType_nonzero (hyp.toHypothesis46 hG hodd) hk
+    exact ⟨φ, ⟨hφspan, hφsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
+      Set.subset_union_left)⟩, hφne⟩
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.11), all-reducible corner ((9.9)(c))**: if every member of `𝒮(H₀C′)` is
+reducible, the family is coherent on `A₀(M)`.  In this corner the family consists entirely of
+μ-grid column sums (`reducible_mem_inducedKernelFamily_mem_certainTypeSet`, through `𝒮 ⊆ S =
+inducedKernelFamily` by `sOf_subset_SOf`), i.e. it lies in the certain-type set `𝒯` at any
+nonzero reference column — so the (4.9)(b) coherence `certainTypeSet_isCoherent_A0` restricts
+along `isCoherent_of_subset`.  The nonzero supported witness is the conjugate difference
+`ζ̄ − ζ` of any member (`hne`; conjugation preserves `𝒮(H₀C′)` by `sOf_closedUnderConjugate`,
+the difference is `A₀`-supported by `inducedKernelFamily_conjDiff_support` and nonzero since odd
+order admits no real characters).
+
+This closes the base of the (9.11) `Ptype_core_coherence` induction in the corner where no
+irreducible seed exists (`sOf_degreeSubfamily_isCoherent` is empty-cut there); the complementary
+mixed corner proceeds by irreducible-cut base + `xAdjoinStepW_k` column-pair adjunction. -/
+noncomputable def coherent_sOf_H0Cprime_of_allReducible [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
+    {kref : Fin hyp.base.w2} (hkref : kref ≠ 0)
+    (hallred : ∀ φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
+      ¬ IsIrreducibleCharacter φ)
+    (hne : (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime).Nonempty) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+      (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) hyp.base.A0 := by
+  haveI := hyp.base.finiteG
+  classical
+  -- the certain-type coherence at the reference column
+  have hcohT := certainTypeSet_isCoherent_A0 hG hyp.base hG.odd
+    (hyp.base.muColumnChar_ne_one hG hG.odd hkref)
+  -- `𝒮(H₀C′) ⊆ 𝒯` (every member is reducible, hence a μ-grid column sum)
+  have hsub : OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime ⊆
+      OddOrder.Peterfalvi.S06.certainTypeSet (hyp.base.toHypothesis46 hG hG.odd)
+        (hyp.base.muColumnChar hG hG.odd kref) := by
+    intro φ hφ
+    have hφSK : φ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) (hyp.H0Cprime.subgroupOf M) := by
+      have h := hyp.sOf_subset_SOf hyp.H0Cprime hφ
+      rwa [hyp.SOf_eq] at h
+    exact hyp.base.reducible_mem_inducedKernelFamily_mem_certainTypeSet hG hyp.type_alt
+      (OddOrder.GroupTheory.typePNontrivialCore_of_isTypeIIIorIV hyp.type_alt hyp.base.typeP)
+      (OddOrder.Peterfalvi.S11.exists_chiefFactorData hG _).choose
+      hyp.params.w2_prime hkref hφSK (hallred φ hφ)
+  -- the nonzero supported witness `ζ̄ − ζ` (`Prop`-confined)
+  have hwit : ∃ φ : ClassFunction ↥M ℂ,
+      φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan
+        (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) hyp.base.A0 ∧ φ ≠ 0 := by
+    obtain ⟨ζ, hζ⟩ := hne
+    have hζc : ζ.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime :=
+      Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0Cprime hζ
+    have hζSK : ζ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) (hyp.H0Cprime.subgroupOf M) := by
+      have h := hyp.sOf_subset_SOf hyp.H0Cprime hζ
+      rwa [hyp.SOf_eq] at h
+    refine ⟨ζ.conj - ζ, ⟨?_, ?_⟩, ?_⟩
+    · exact Submodule.sub_mem _
+        (Submodule.subset_span hζc) (Submodule.subset_span hζ)
+    · exact OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support
+        hyp.base.mderivSharp_subset_A0 hζSK
+    · intro h
+      exact OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters
+        (hyp.base.card_odd_of_isMinimalSimpleOdd hG) _ hζSK (sub_eq_zero.mp h)
+  exact isCoherent_of_subset hcohT hsub hwit
+
 /-- **Peterfalvi (11.8): `S(HC)` is coherent** (sorry-free).  `S(HC) = SOf HC` is the subfamily of
 the degree-`w₁` family `S(M'')` cut out by the *larger* kernel condition (`M'' ≤ HC`,
 `secondDerived_le_HC`, so `S(HC) ⊆ S(M'')` by kernel-antitonicity), so it inherits the coherent
@@ -1738,6 +1885,131 @@ theorem coherent_SOf_HC [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     intro h
     exact OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters
       (hyp.base.card_odd_of_isMinimalSimpleOdd hG) _ hζ (sub_eq_zero.mp h)
+
+/-- **(9.11) constant-degree base case on the kernel filtration `S(Y)`**: the degree-`d`
+irreducible subfamily of `S(Y) = SOf Y` is coherent, given one degree-`d` irreducible member.
+This is the `SOf`-world form of `S12.inducedFamily_degreeSubfamily_isCoherent` — the base case
+of the Peterfalvi (9.11) `Ptype_core_coherence` induction at the family `S(H₀C')` (Coq: the
+degree-`qa` uniform subfamily `S1` on which `uniform_degree_coherence` fires before the
+conjugate-pair extension, `PFsection9.v:1538-1546`; in the Galois case the whole family).
+
+Every `S(Y)`-member lies in the full induced family `S = S(⊥)` (`inducedKernelFamily_antitone`,
+`inducedFamily_eq_inducedKernelFamily_bot`), so the ambient degree-`d` irreducible subfamily of
+`S` is coherent by the R-datum-free (5.7)/Dade engine, and the `S(Y)`-cut restricts along
+`isCoherent_of_subset`; the nonzero supported witness is the conjugate difference `ζ̄ − ζ` of the
+given member (conjugation preserves membership, irreducibility and degree; the difference is
+`A₀`-supported by `inducedKernelFamily_conjDiff_support` and nonzero since odd order admits no
+real characters). -/
+noncomputable def SOf_degreeSubfamily_isCoherent [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (Y : Subgroup G) (d : ℕ)
+    (hex : ∃ ζ : ClassFunction ↥M ℂ, ζ ∈ hyp.SOf Y ∧ IsIrreducibleCharacter ζ ∧
+      ((ζ : ↥M → ℂ) 1 = (d : ℂ))) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+      {φ : ClassFunction ↥M ℂ | φ ∈ hyp.SOf Y ∧ IsIrreducibleCharacter φ ∧
+        ((φ : ↥M → ℂ) 1 = (d : ℂ))} hyp.base.A0 := by
+  haveI := hyp.base.finiteG
+  classical
+  -- `S(Y) ⊆ S = S(⊥)` (the `⊥`-kernel condition is vacuous)
+  have hsubfam : hyp.SOf Y ⊆ OddOrder.Peterfalvi.S12.inducedFamily M := by
+    rw [hyp.SOf_eq, OddOrder.Peterfalvi.S12.inducedFamily_eq_inducedKernelFamily_bot]
+    exact OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone bot_le
+  -- the ambient degree-`d` irreducible subfamily of `S` is coherent (S12 engine); the
+  -- `∃`-witness eliminations stay inside `Prop`-valued `have`s (the goal is `Type`-valued)
+  have hex' : ∃ ζ : ClassFunction ↥M ℂ,
+      ζ ∈ OddOrder.Peterfalvi.S12.inducedFamily M ∧ IsIrreducibleCharacter ζ ∧
+      ((ζ : ↥M → ℂ) 1 = (d : ℂ)) := by
+    obtain ⟨ζ, hζS, hζirr, hζ1⟩ := hex
+    exact ⟨ζ, hsubfam hζS, hζirr, hζ1⟩
+  have hcoh := hyp.base.inducedFamily_degreeSubfamily_isCoherent hG d hex'
+  -- the `S(Y)`-cut is a subfamily of the ambient cut
+  have hsub : {φ : ClassFunction ↥M ℂ | φ ∈ hyp.SOf Y ∧ IsIrreducibleCharacter φ ∧
+      ((φ : ↥M → ℂ) 1 = (d : ℂ))} ⊆
+      {φ : ClassFunction ↥M ℂ | φ ∈ OddOrder.Peterfalvi.S12.inducedFamily M ∧
+        IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))} :=
+    fun φ hφ => ⟨hsubfam hφ.1, hφ.2.1, hφ.2.2⟩
+  -- the nonzero supported witness `ζ̄ − ζ` for the cut (again `Prop`-confined)
+  have hwit : ∃ φ : ClassFunction ↥M ℂ,
+      φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan
+        {φ : ClassFunction ↥M ℂ | φ ∈ hyp.SOf Y ∧ IsIrreducibleCharacter φ ∧
+          ((φ : ↥M → ℂ) 1 = (d : ℂ))} hyp.base.A0 ∧ φ ≠ 0 := by
+    obtain ⟨ζ, hζS, hζirr, hζ1⟩ := hex
+    have hζSK : ζ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) (Y.subgroupOf M) := by
+      rwa [hyp.SOf_eq] at hζS
+    have hζcS : ζ.conj ∈ hyp.SOf Y := by
+      rw [hyp.SOf_eq]
+      exact OddOrder.Peterfalvi.S08.inducedKernelFamily_closedUnderConjugate _ hζSK
+    have hζc1 : ((ζ.conj : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (d : ℂ) := by
+      rw [ClassFunction.conj_apply, hζ1, star_natCast]
+    refine ⟨ζ.conj - ζ, ⟨?_, ?_⟩, ?_⟩
+    · exact Submodule.sub_mem _
+        (Submodule.subset_span ⟨hζcS, hζirr.conj, hζc1⟩)
+        (Submodule.subset_span ⟨hζS, hζirr, hζ1⟩)
+    · exact OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support
+        hyp.base.mderivSharp_subset_A0 hζSK
+    · intro h
+      exact OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters
+        (hyp.base.card_odd_of_isMinimalSimpleOdd hG) _ hζSK (sub_eq_zero.mp h)
+  exact isCoherent_of_subset hcoh hsub hwit
+
+/-- **(9.11) constant-degree base case on the §9 family `𝒮(Y) = sOf`** — the form the (9.11)
+`Ptype_core_coherence` induction actually consumes.  ⚠ The Coq §9 family is `S_ Y = seqIndD M' M
+M`_\F Y` (third argument `H = M`_\F`, PFsection9.v:209): sources are nontrivial **on `H`** (the
+`𝒳`-condition of `xiSet`), *not* merely nontrivial — so the (9.11) target is the `𝒳`-side family
+`sOf`, not the kernel-filter family `SOf` (`seqIndD HU M HU` is the *§11* notation,
+PFsection11.v:90; issue 1019 update⁵⁸ corrects update⁵⁰ on this point).
+
+The degree-`d` irreducible subfamily of `𝒮(Y)` is coherent, given one degree-`d` irreducible
+member: `𝒮(Y) ⊆ S(Y)` (`sOf_subset_SOf`) cuts the subfamily out of the `SOf`-version
+(`SOf_degreeSubfamily_isCoherent`), and the nonzero supported witness is again the conjugate
+difference `ζ̄ − ζ` (conjugation preserves `𝒮(Y)`-membership by `sOf_closedUnderConjugate`). -/
+noncomputable def sOf_degreeSubfamily_isCoherent [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (Y : Subgroup G) (d : ℕ)
+    (hex : ∃ ζ : ClassFunction ↥M ℂ, ζ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup Y ∧
+      IsIrreducibleCharacter ζ ∧ ((ζ : ↥M → ℂ) 1 = (d : ℂ))) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+      {φ : ClassFunction ↥M ℂ | φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup Y ∧
+        IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))} hyp.base.A0 := by
+  haveI := hyp.base.finiteG
+  classical
+  -- transport the witness to the `SOf`-cut and fire the `SOf`-version
+  have hexS : ∃ ζ : ClassFunction ↥M ℂ, ζ ∈ hyp.SOf Y ∧ IsIrreducibleCharacter ζ ∧
+      ((ζ : ↥M → ℂ) 1 = (d : ℂ)) := by
+    obtain ⟨ζ, hζ, hi, hd⟩ := hex
+    exact ⟨ζ, hyp.sOf_subset_SOf Y hζ, hi, hd⟩
+  have hcoh := SOf_degreeSubfamily_isCoherent hG hyp Y d hexS
+  -- the `𝒮(Y)`-cut is a subfamily of the `S(Y)`-cut
+  have hsub : {φ : ClassFunction ↥M ℂ | φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup Y ∧
+      IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))} ⊆
+      {φ : ClassFunction ↥M ℂ | φ ∈ hyp.SOf Y ∧ IsIrreducibleCharacter φ ∧
+        ((φ : ↥M → ℂ) 1 = (d : ℂ))} :=
+    fun φ hφ => ⟨hyp.sOf_subset_SOf Y hφ.1, hφ.2.1, hφ.2.2⟩
+  -- the nonzero supported witness `ζ̄ − ζ` inside the `𝒮(Y)`-cut (`Prop`-confined)
+  have hwit : ∃ φ : ClassFunction ↥M ℂ,
+      φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan
+        {φ : ClassFunction ↥M ℂ | φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup Y ∧
+          IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))} hyp.base.A0 ∧ φ ≠ 0 := by
+    obtain ⟨ζ, hζ, hζirr, hζ1⟩ := hex
+    have hζc : ζ.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup Y :=
+      Hypothesis.sOf_closedUnderConjugate hyp.s11Setup Y hζ
+    have hζc1 : ((ζ.conj : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (d : ℂ) := by
+      rw [ClassFunction.conj_apply, hζ1, star_natCast]
+    have hζSK : ζ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) (Y.subgroupOf M) := by
+      have h := hyp.sOf_subset_SOf Y hζ
+      rwa [hyp.SOf_eq] at h
+    refine ⟨ζ.conj - ζ, ⟨?_, ?_⟩, ?_⟩
+    · exact Submodule.sub_mem _
+        (Submodule.subset_span ⟨hζc, hζirr.conj, hζc1⟩)
+        (Submodule.subset_span ⟨hζ, hζirr, hζ1⟩)
+    · exact OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support
+        hyp.base.mderivSharp_subset_A0 hζSK
+    · intro h
+      exact OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters
+        (hyp.base.card_odd_of_isMinimalSimpleOdd hG) _ hζSK (sub_eq_zero.mp h)
+  exact isCoherent_of_subset hcoh hsub hwit
 
 /-- **(9.11) `hY`-route subset step**: the capstone's `𝒮(H₀C)`-coherence input (`hY`) follows from
 the (9.11) coherence of the smaller-kernel family `𝒮(H₀C')` (`coherent_H0C_commutator`'s honest

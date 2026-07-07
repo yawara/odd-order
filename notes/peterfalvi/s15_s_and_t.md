@@ -8,6 +8,20 @@
 
 ---
 
+## 🗺️ FRONTIER MAP 更新³ (2026-07-07 夜, lane b — (13.4) 組立 landing + gate 2 discharge)
+
+- **✅ (13.4) `lambda_forces_T_caseB` = 実証明** (bare sorry → typed gate、commit 95be831a):
+  core 4 bricks (eta_orthonormal / eta_cross_expansion_ne_zero /
+  disjoint_conjugatesIntoSet_of_centralizer / inner_induce_induce_eq_zero_of_disjoint) +
+  by_contra 本体組立。**gate 2 (p-part) も type-free で discharge 済** (commit 62fb13a8、
+  9073 完結の card_T_eq/Frobenius/Hall unlock を消化、hTTypeII threading 不要と確定)。
+- **残 gate 2 本** (正本 = issue 9013 追記⁶ + gate 2 完了記録): gate 1 `QD_sharp_centralizer_le_T`
+  ((13.2.e)-on-T A₀(T)-TI; S10 DadeSupportHypothesisData は per-point C_G(a) = C_M(a)·H(a) 分解で
+  full-TI より弱い — H(a)=1 抽出 or Q_sharp_isTISubset 機構の (QD)^# 拡張が要調査) と gate 3
+  `tSide_theta_package_of_not_caseB` ((13.3.b,c)-on-T; **先決 = (13.2.a)-on-T の T-type II∨III
+  materialization** [basic_structure の T-mirror] — TypesIIIIIIVSetup T router の type_alt field が要求)。
+- 0099 は a の検証込みで全 checkbox 完 (close 可)。
+
 ## 🗺️ FRONTIER MAP 更新² (2026-07-07 夕, lane b — 0099 landing 後の §13 原文精査)
 
 - **✅ 0099 HUB 裁定実装 landing** (commit de2642d6): S07 `tau_isometry_diff` を zSupportedSpan 形へ

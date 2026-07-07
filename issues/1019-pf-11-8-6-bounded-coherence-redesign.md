@@ -796,3 +796,263 @@ S07.Hypothesis 可変長化 (Coq-faithful) は不要につき起こさない。
 ### ⟹ 次 iteration = step 1 (base case) の CODE: SOf(H0Cprime) 版 degree-subfamily coherence
 S13 に `SOf_degreeSubfamily_isCoherent` (SOf(Y) の deg-d irr subfamily coherence) を build
 (update⁵³ の S12 版 mirror; witness 機構は coherent_SOf_HC の inducedKernelFamily パターン踏襲)。
+
+## 🔬 update⁵⁷ (2026-07-07 lane-a) — ★ base case LANDED + adjoin engine 在庫の再発見 (update⁵⁶ の missing 評価を訂正)
+
+### ✅ landed: `S13.SOf_degreeSubfamily_isCoherent` (sorry-free, axiom-clean, commit 97766644)
+(9.11) base case の SOf-world 版: SOf(Y) の deg-d 既約 subfamily coherence。SOf(Y) ⊆ inducedFamily
+(kernel-antitone + bot 同定) で S12 engine を ambient 発火 → isCoherent_of_subset で restrict。
+witness = ζ̄−ζ (conj 保存 + conjDiff support + no-real)。∃-witness は Prop-confined
+(Type-valued goal での obtain 不可 — S12:1112 と同じ罠を踏んで修正)。
+
+### ★ 在庫再発見 — update⁵⁶ の「missing piece (i)(ii)」は既に landed 済みだった
+- **(i) reducible adjoin engine = `xAdjoinStepW_k`** (S08_CoherenceWeighted:459、commit 577a0d69、
+  (6.8.3) reducible-break 用に構築済): break pair {χ,χ̄} が reducible column μ_j でよい (5.6)
+  weighted adjoin。break decomposition `Da : CharacterPsiDecomposition` をパラメータで受ける。
+- **(ii) μ_j R-datum producer = `certainTypeDecompositionDa`** (S06_CertainTypeCoherence:723) +
+  S12 bridge `toHypothesis46` (S12_Core:1088) + Ind-form recast `columnConstituentDecomposition`
+  (S08_CaseBCoherence2:1691)。
+- **chain fold**: `coherentOfPairChainCover` (S07) / `xChainCoherentW` (S08_CoherenceWeighted:786、
+  irreducible-pair 版 bundle — mixed chain は coherentOfPairChainCover 直使いで step ごとに
+  xAdjoinStepW / xAdjoinStepW_k を発火すれば新 engine 不要)。
+- **§9 counting 在庫 (S12_Section9Counts)**: `forall_sOf_H0Cprime_degree_qu_caseB` (caseB で
+  SOf(H0⊔C′) 全 member deg qu) / `muGrid_column_sum_mem_sOf_H0_and_reducible` /
+  `reducible_mem_inducedKernelFamily_eq_muGrid_columnSum` (reducible member = μ-column sum) /
+  `mkSection11CharacterData` (§10→§9 bridge)。
+
+### ⟹ (9.11) の残 = assembly そのもの (部品はほぼ完備)
+- **(A) caseB assembly** (Galois 対応枝、部品完備で着手可能): family 全 member deg qu →
+  irr-cut base (landed) + μ-column pairs を xAdjoinStepW_k で 1 対ずつ adjoin + chain fold。
+  必要入力: hex (deg-qu irr ∈ SOf(H0Cprime) の存在 witness、caseB (9.9) 系)、per-pair の
+  hDeg (2·qu·anchor < Σ deg²/mc、uniform-qu family で計算可)、hgen (span generation)、
+  Da instantiation (toHypothesis46 経由)。
+- **(B) caseA assembly** (non-Galois、(9.11.1)-(9.11.8)): deg-qa counting ((9.8)(d) lb_Sqa の
+  Lean 対応要確認) + norm-chain squeeze (S07_Subcoherent 在庫) + S3 enumeration。
+次 iteration = **(A) caseB assembly に着手** (hex witness 供給 → family 分解 → 1-pair adjoin
+instantiation の順)。
+
+## 🔬 update⁵⁸ (2026-07-07 lane-a /loop) — ★★ (9.11) target 訂正: sOf (𝒳-系) が正、SOf でない (update⁵⁰ 撤回) + sOf 版 base landed
+
+### ① ★ target 訂正 (Coq 精読)
+- **Coq §9 の `S_ Y := seqIndD M^`(1) M M`_\F Y`** (PFsection9.v:209) — **第 3 引数 = M`_\F = H**:
+  source は「H ⊄ Ker θ」(𝒳-条件、`X_ Y = Iirr_kerD M' H Y` :208) を課される。∴ **(9.11)
+  `Ptype_core_coherence` の family = 𝒳-系 = Lean `sOf`**。
+- update⁵⁰ の「target = SOf(H0Cprime) = inducedKernelFamily」は **§11 の notation
+  (`S_ := seqIndD HU M HU`, PFsection11.v:90 — nontrivial のみ) との混同で誤り**。撤回。
+- 整合確認: `forall_sOf_H0Cprime_degree_qu_caseB` (S12_Section9Counts:77) の family = chars.SOf =
+  𝒳-系。SOf (kernel-filter) だと deg-q member (S(HC) 系、H-killing) が混ざり「全 member deg qu」
+  は偽 — 𝒳-系だから成立。教科書側の一貫性 ✓。
+- **bridges への影響**: `coherent_sOf_H0C_of_coherent_sOf_H0Cprime` (update⁴⁶、sOf 版) が**本線に
+  復帰**。SOf 版 bridge (update⁵⁰) は不使用 (無害残置; SOf coherence はより強い主張で (9.11) は
+  それを与えない)。SOf 版 base (update⁵⁷ landed) は S(HC)/SOf 系の中間量として有用残置。
+
+### ✅ landed: `S13.sOf_degreeSubfamily_isCoherent` (sorry-free, axiom-clean, commit 7d0ab806)
+(9.11) が実際に消費する base: 𝒮(Y) の deg-d 既約 subfamily coherence。sOf-cut ⊆ SOf-cut
+(sOf_subset_SOf) で update⁵⁷ の SOf 版から restrict。witness = ζ̄−ζ (sOf_closedUnderConjugate)。
+
+### ② ★ all-reducible ケースの発見 — irr-witness は常には立たない
+Coq (9.9)(c): `all redM (S_ H0C') → C=1 ∧ u=(p^q−1)/(p−1) ∧ Frobenius(HU/H0)` — **S_ H0C' が
+全 member reducible の退化ケースが排除されていない** (その場合の特殊構造を export するのみ)。
+Coq (9.11) は subcoherent (可変長 R-datum) ゆえ irreducibility 不要で場合分けなし。Lean-native
+route (irr-cut base) は all-reducible で base が立たない ⟹ **μ-pair base (reducible conj-pair
+{μ, μ̄} の 2-element coherence) が caseB assembly の必要部品**:
+- 供給源: R(μ) = `certainTypeR` (σ-image family、S06) → extension ν(μ) = R の half-sum
+  (‖ν(μ)‖² = ‖μ‖² が orthonormal half-sum で合う)。`coherentPair` (S07) の norm-mc 一般化
+  or `certainTypeDecompositionDa` からの直接組立。
+- caseB assembly 全体 = seed (irr-pair [coherentPair_fromDade] or μ-pair [新規]) + 残り pairs を
+  xAdjoinStepW / xAdjoinStepW_k で adjoin + coherentOfPairChainCover fold。
+次 = **μ-pair base の設計調査** (coherentPair の一般化可能性、certainTypeR half-sum 構造)。
+
+## 🔬 update⁵⁹ (2026-07-07 lane-a /loop) — ★ coherentPair_k landed: μ-pair seed の generic 部品
+
+### ✅ landed: `S07.coherentPair_k` (S07_RetargetScaled 末尾, sorry-free, commit 5f68e0a8)
+reducible 共役対 {χ,χ̄} の単独 coherence seed — coherentPair の ‖χ‖²≠1 一般化 (S₁=∅、anchor
+不要)。Gram-matched X,X̄ を受けて ν := retargetS で構成。調査確定事項:
+- `retarget_isCoherent_S`/`retarget_isCoherent_of_extensionImage_k` は **anchor χ₁∈S₁ 必須**で
+  seed 不可 → 本 lemma が gap を埋めた。
+- **`retargetTargetPair_gen`** (S07_RetargetScaled、既存): ψ=0 `CharacterPsiDecomposition` から
+  Gram-matched pair (‖X‖²=‖χ‖² 等) を**計算で**出す producer — coherentPair_k の入力供給源。
+- S07_RetargetScaled / S08_RetargetReducible / S08_CoherenceWeighted は **lane a 所有** (b glob は
+  S07_Coherence* + S08_PGroupReduction のみ) — この線の build は全て自所有内。
+
+### μ-pair seed の残り (次 iteration)
+1. **ψ=0 certain-type decomposition**: `CharacterPsiDecomposition τ_enl μ 0` の producer
+   (`certainTypeDecompositionDa` は ψ=a•η₁ 形で ψ=0 にすると support 前提が偽 → 別途組む)。
+   部品は S06 に完備: `certainTypeExtension_columnSum` (tau1(μ) = δΣω^σ = X、Y=0)、
+   `certainTypeRImage`/`certainTypeR` (imageFamily)、`certainTypeOmegaSigma_inner` (isometry)。
+2. **τ seam**: certainTypeR 系は enlarged Dade (h46.dade0) 上 — hyp.tau への retarget は
+   S08_CaseBCoherence2 の (6.8.2.3) seam パターン踏襲。
+3. seed 組立: retargetTargetPair_gen + coherentPair_k + μ−μ̄ support/nonzero (muGrid API)。
+
+## 🔬 update⁶⁰ (2026-07-07 lane-a /loop) — ★ seedDecomposition landed + all-reducible corner は既存 3 部品で閉じる構図が確定
+
+### ✅ landed: `S06.certainTypeSeedDecomposition` (sorry-free, commit 41a72280)
+ψ=0 の `CharacterPsiDecomposition τ' (columnSum χ₂) 0`、coherent-set anchor 不要。
+τ₁ = `certainTypeExtension` (σ-extension) 自身: ℤ[𝒯] isometry (`certainTypeExtension_inner_eq`、
+基準列 k=χ₂ に μ, μ̄=μ_{χ₂⁻¹} 両方入る)、μ−μ̄ 上 Dade 一致 (columnDiff_eq_dade)、τ' seam は
+hagree 引数。imageFamily = certainTypeR transport (image_eq 差し替え)。
+
+### ★ 発見: all-reducible corner は seed 経由より直接的な既存 route がある
+- **`S06.certainType_isCoherent`** ((4.9)(b)): `IsCoherent (dadeICM h.dade0 h.tau)
+  (certainTypeSet h k) (supportInSubgroup A L)` — **𝒯 全体 (equal-deg μ-columns) の coherence が
+  sorry-free で既存**。
+- **`S07.IsCoherent.congrMap`** (S08_CaseBCoherence2:1469): zSupportedSpan 上一致する τ' への
+  IsCoherent transport — τ seam 部品も既存。
+- ⟹ **all-reducible corner = certainType_isCoherent → congrMap (τ' = hyp.tau) →
+  isCoherent_of_subset (family = sOf(H0Cprime) ⊆ 𝒯 同定)** の 3 段。coherentPair_k /
+  seedDecomposition 経由の pair-chain は不要 (両部品は保全: coherentPair_k は generic (5.6.3)
+  seed、seedDecomposition は mixed-corner の Dmem/break 供給部品として (9.11) chain で使う)。
+
+### caseB assembly の確定 map (全部品在庫確認済み)
+- **mixed corner** (irr あり): irr-cut base (`sOf_degreeSubfamily_isCoherent` landed) +
+  μ-pairs を `xAdjoinStepW_k` で adjoin (anchor = irr norm-1 ✓、break Da =
+  `certainTypeDecompositionDa`、S₁-side μ の Dmem = `certainTypeMemberDecomposition`)。
+- **all-reducible corner**: 上記 3 段 restrict。
+- **残る instantiation work (genuine)**: ①§9 family ↔ certainTypeSet 同定 (S12 muGrid columnSum
+  ↔ S06 columnSum、`toHypothesis46` 経由 — S08_CaseBCoherence2 の (6.8) case-B が同じ bridge を
+  張った前例あり)、② A0 ↔ supportInSubgroup 同定 + congrMap の一致証明、③ per-pair hDeg
+  (2·qu·anchor < Σdeg²/mc) の counting、④ hgen (span generation)。
+次 iteration = ① の在庫確認 (toHypothesis46 の中身、CaseBCoherence2 の bridge 実装) →
+mixed-corner 1-pair adjoin instantiation。
+
+## 🔬 update⁶¹ (2026-07-07 lane-a /loop) — ★ instantiation work ② COMPLETE: μ-column coherence が hyp.tau/A₀(M) interface で landed
+
+### ✅ landed 本 iteration (S13, 全 sorry-free / axiom-clean)
+- **`isCoherent_of_supportedSpan_le`** (commit b8584ac5): support 変更版 restriction
+  (ℤ[S,A₂] ⊆ ℤ[S,A₁] なら同一 extension で transport)。
+- **`certainTypeSet_isCoherent_A0`** (commit 5d2c6b22): `IsCoherent hyp.tau
+  (certainTypeSet (hyp.toHypothesis46 hG hodd) k) hyp.A0` — **update⁶⁰ の instantiation work ②
+  が完了**。2 つの seam が予想以上に軽かった:
+  - **τ seam = defeq 消滅**: `toHypothesis46` の `dade0 := hyp.dadeData.dade` /
+    `tau := ….fullDadeIsometryData hyp.hconj` は `S12.Hypothesis.tau` (S12_Core:404) の構成要素
+    そのもの → `certainType_isCoherent` が `IsCoherent hyp.tau …` として**直接型付け成功**
+    (congrMap 不要; SibleyDade 側の hmapagree パターンより単純)。
+  - **support seam A(M)→A₀(M)**: μ_j は A(M)∪{1} 外で消える (columnSum_support_subset →
+    supportedSubmodule 論法で ℤ[𝒯] へ) + 1∉A₀ (one_notMem_A0) ⟹ ℤ[𝒯,A₀] ⊆ ℤ[𝒯,A(M)]。
+    witness = certainType_nonzero の μ_{k⁻¹}−μ_k (A⊆A₀ mono)。
+
+### ⟹ 残 instantiation work = ① family 同定が両 corner の共通 prerequisite
+- **① certainTypeSet ↔ §9 sOf(H0Cprime) の μ-part**: sOf(H0Cprime) の reducible member =
+  μ-column sum (S12_Section9Counts `reducible_mem_inducedKernelFamily_eq_muGrid_columnSum` が
+  muGrid 形で保持) — **S12.muGrid columnSum ↔ S06.columnSum (toHypothesis46) の同定**が核。
+  muGrid の定義が toHypothesis46 の columnFamily 経由なら defeq 級 (要確認)。
+- all-reducible corner: 同定① → `isCoherent_of_subset` で closed (3 段完成)。
+- mixed corner: irr-cut base + xAdjoinStepW_k adjoin (③ hDeg counting / ④ hgen が per-pair 入力)。
+次 iteration = ① muGrid ↔ S06 columnSum の定義 trace → 同定 lemma。
+
+## 🔬 update⁶² (2026-07-07 lane-a 再開) — ★ instantiation work ① 核 LANDED: muGrid 列和 = S06 columnSum (world-join)
+
+### ✅ landed (S12_Section9Counts + S13, 全 sorry-free / axiom-clean, commits 2aff3dc5 / 0c6b15e7)
+- **`toHypothesis46_toHypothesis`**: (toHypothesis46).toHypothesis = (toCertainTypeHypothesis).toHypothesis
+  (projection rfl term)。
+- **`Hypothesis.muColumnChar`**: μ-grid 列 j の W₂-dual character 抽出 (muGrid 定義内の
+  `finCardEquivCharacterGroup (finCongr …) j` を statement 可能な def に)。
+- **`Hypothesis.muGrid_columnSum_eq_columnSum`**: `Σᵢ muGrid i j = S06.columnSum (toHypothesis46 …)
+  (muColumnChar j)` — **§10 ↔ §6 world-join の核**。これで `certainTypeSet_isCoherent_A0` が
+  `reducible_mem_inducedKernelFamily_eq_muGrid_columnSum` の μ-列和に接続。
+- S13 `certainTypeSet_isCoherent_A0` の data instance を statement から除去 (scoped 統一 refactor)。
+
+### ⚠ Lean 罠 (メモリ lean-instance-defeq-traps §5 に恒久記録)
+statement 明示の [Fintype ↥(W1⊔W2)] 等 data instance は**全称自由変数**となり証明内 scoped
+FiniteInduce instance と unify 不能 (data ゆえ irrelevance 無し) — `with_unfolding_all rfl` の
+@-explicit エラー表示で初めて可視化。fix = data instance を落とし scoped 統一 (NeZero は Prop で残害無)。
+tactic-def 同士の同定は「同一 let/have 列を set で再構築 → show → unfold; rfl」(rw[set-def] は
+h-依存 haveI で motive 破綻)。
+
+### 残 (all-reducible corner 3 段の最終 piece)
+sOf(H0Cprime) reducible member → certainTypeSet membership の合成で残るのは:
+1. **`muColumnChar j ≠ 1 ⟺ j ≠ 0`** (finCardEquivCharacterGroup_zero + Equiv injectivity、小)。
+2. **deg 条件** (基準列 k との一致): (10.3) cross-column constancy = `muGrid_apply_one_eq` (hw2
+   prime 要)。
+3. 合成 lemma: reducible φ ∈ SOf/sOf(H0Cprime) → φ ∈ certainTypeSet h46 k (1+2+S12_Section9Counts:572
+   +update⁶² world-join)。
+その後 mixed corner (③ hDeg / ④ hgen)。次 iteration = 残 1→2→3。
+
+## 🔬 update⁶³ (2026-07-07 lane-a /loop) — ★ all-reducible corner の membership pieces 完備 (残 1→2→3 全 landed)
+
+### ✅ landed (S12_Section9Counts, sorry-free ×3, commit 83092b0c ほか)
+- **`muColumnChar_ne_one`**: j ≠ 0 → μ-列の W₂-dual ≠ 1 (fCECG_zero + Equiv injectivity)。
+  ⚠ `rw [← fCECG_zero] at heq` は instance 表記差で pattern 不一致 → goal 方向 rw + exact に変更。
+- **`muColumnChar_columnSum_apply_one_eq`**: (10.3) cross-column deg 一致を §6 columnFamily
+  interface で (world-join を 1 で評価、map_sum AddMonoidHom.mk' + muGrid_apply_one_eq entrywise)。
+- **`reducible_mem_inducedKernelFamily_mem_certainTypeSet`**: 任意 kernel filter S(B) の reducible
+  member ψ → ψ ∈ certainTypeSet (toHypothesis46) (muColumnChar kref) (kref ≠ 0 任意、hw2 prime)。
+
+### ⟹ all-reducible corner の残り = S13 family-level assembly のみ (~40 行)
+「sOf(H0Cprime) が all-reducible ⟹ coherent(sOf(H0Cprime), A0)」: sOf ⊆ SOf = inducedKernelFamily
+(sOf_subset_SOf + SOf_eq) → per-member 上記合成で ⊆ certainTypeSet → `certainTypeSet_isCoherent_A0`
++ `isCoherent_of_subset` (witness = sOf の μ̄−μ、conjDiff 系 landed パターン)。
+mixed corner (③ hDeg counting / ④ hgen) は別途。次 iteration = S13 assembly。
+
+## 🔬 update⁶⁴ (2026-07-07 lane-a /loop) — ★★ (9.11) all-reducible corner CLOSED (end-to-end sorry-free)
+
+### ✅ landed: `S13.coherent_sOf_H0Cprime_of_allReducible` (commit 2343f0f7, axiom-clean)
+(9.9)(c) corner: `𝒮(H₀C′)` 全 member reducible ⟹ `IsCoherent hyp.base.tau (sOf … H0Cprime) A₀`。
+一発 green。組立 = certainTypeSet_isCoherent_A0 (基準列 muColumnChar kref、ne_one) → per-member
+membership (sOf→SOf→inducedKernelFamily→reducible 合成、chief = exists_chiefFactorData.choose、
+hw2 = params.w2_prime) → isCoherent_of_subset (witness ζ̄−ζ)。
+
+### (9.11) base 側の到達状況 (両 corner 完備)
+- **irr seed あり**: `sOf_degreeSubfamily_isCoherent` (update⁵⁸) — deg-d 既約 cut coherence。
+- **all-reducible**: 本 lemma。
+- **残る (9.11) 本体 = mixed corner の induction**: irr-cut base に μ-column pairs を
+  `xAdjoinStepW_k` で adjoin する chain — per-pair 入力 (③ hDeg = 2·deg·anchor < Σdeg²/mc の
+  counting、④ hgen = span generation、Da = certainTypeDecompositionDa/seedDecomposition、
+  hortho_mem = certainTypeR 直交系) の instantiation + fold (coherentOfPairChainCover)。
+  ここが Coq (9.11.1)-(9.11.8) の本体 (norm-chain wlog 込み) で、caseB (uniform-qu) を先に
+  (全 member 同 deg で hDeg 計算が単純)、非 Galois caseA (qa/qu mixed) を後に。
+次 iteration = mixed corner の 1-pair adjoin instantiation (caseB 形から)。
+
+## 🔬 update⁶⁵ (2026-07-07 lane-a /loop) — mixed corner 1-pair adjoin の入力→supply 完全 map (handoff、composite は次 iteration で build)
+
+xAdjoinStepW_k (S08_CoherenceWeighted:459-599) を精読し全入力の supply 元を確定。composite
+`adjoin_muColumnPair_of_irrCut` (S13、~200 行) の設計:
+
+### 設計判断: adjoin pair は S06 columnSum 表記で組む
+χ = `columnSum h46 χ₂` (χ₂ = muColumnChar k / 一般 W₂-dual、χ₂ ≠ 1)、χ̄ = `columnSum h46 χ₂⁻¹`
+(columnSum_conj_eq)。§12 muGrid 表記への変換は family 分解側で world-join を使う (adjoin engine
+自体は S06 表記が最短)。τ = hyp.tau は dadeICM hyp.dadeData.dade (fullDadeIsometryData hyp.hconj)
+と defeq (S04.Hypothesis 引数 = hyp.dadeData.dade、hconj = hyp.hconj、A = typePA0 →
+suppIn = hyp.A0 ✓ certainTypeSet_isCoherent_A0 で実証済)。
+
+### 入力 → supply 元 (17 項目)
+| 入力 | supply | 状態 |
+|---|---|---|
+| hS₁ | `sOf_degreeSubfamily_isCoherent` (irr-cut, d=qu) | ✅ landed |
+| hdiffsuppχ | `columnDiff_support_subset` (S06:302) + columnSum_conj_eq + A(M)→A₀ mono | ✅ 組める |
+| hχχne | columnSum_def + `columnFamily_mu_sum_inner` 対角 = w1 ≠ 0 | ✅ 組める |
+| hχbarχbarne | conj 側同様 (χ₂⁻¹ 対角) | ✅ |
+| hχχbar/hχbarχ | mu_sum_inner off-diag + `column_inv_ne_self` | ✅ |
+| hχ_S1/hχbar_S1 | μ ∈ inducedFamily (`muGrid_column_sum_mem_inducedFamily`+world-join or 直) ⊥ irr-cut member (distinct: reducible vs irr) via `inducedKernelFamily_pairwise_orthogonal` | ✅ 組める |
+| s/χmem/deg/i₁ | irr-cut の Finset enumeration (equivFin パターン、deg ≡ 1) + anchor 選択 | 機械的 |
+| hmemdegdiffsupp | equal-deg (qu) 差の support = `inducedKernelFamily_scaledDiff_support` 系 | ✅ |
+| hmemS1/hmemortho/hanchorNorm | irr-cut 定義 + `irreducibleCharacter_inner_eq_ite` (mc ≡ 1) | ✅ |
+| **a** | = 1 (caseB: μ(1) = w1·u = qu = anchor(1) — uniform-qu で係数 1) | ✅ |
+| Dmem | `memberExtensionDecomposition` (irr member 用 ψ=0、S07/S08 — 所在確認) | 要確認 |
+| Da | `certainTypeDecompositionDa` (ψ=a·η₁=χ₁; hμη₁supp = equal-deg diff support ✓、htau1_mema = Dade ZIrr ✓、hχψ/hχbarψ = μ⊥χ₁ ✓) | ✅ 組める |
+| hDatau1 | rfl (ofProjection の tau1 = dadeICM) | ✅ |
+| hortho_mem | `certainTypeR_imageSet_orthogonal_dadeOfDiff` (S06、column ⊥ irr-break の向き確認) | 要確認 |
+| htau1Dmem | memberExtensionDecomposition 設計で rfl | 要確認 |
+| htau1_memaχ | `dadeIntegralCharacterMap_mem_ZIrr_of_supported` (μ−χ₁ supported + ZIrr) | ✅ |
+| ha1 | rfl (deg ≡ 1) | ✅ |
+| **hDeg** | 2·1 < Σ 1²/1 = \|irr-cut\| ⟹ **\|irr-cut\| ≥ 3 の counting** | **named hypothesis** |
+| hSgen | equal-deg family: x = (x−χ₁)+χ₁、x−χ₁ supported | ✅ (`zSupportedSpan_range_subset_span_sub_zero` 系) |
+| hgen | uniform-deg collapse (S₁∪pair 全員 deg qu) | ✅ 組める (~30 行) |
+
+### ⟹ 残る genuine gap = hDeg counting (\|irr-cut\| ≥ 3) のみ、他は組立
+counting は §9 の X_H0C' サイズ下界 ((9.9)(a) Galois / (9.8)(d) 非Galois lb_Sqa) — named
+hypothesis で前倒しし、§9 counting は別 piece。次 iteration = composite を上記 map 通りに build
+(Dmem/hortho_mem の 2 「要確認」を先に grep)。
+
+### 「要確認」2 点の確認結果 (2026-07-07 次 iteration 冒頭)
+- **`memberExtensionDecomposition`** (S08_CoherenceCorePart1:1554) ✅ そのまま使える: 入力 =
+  hS₁ + χ irr ∈ S₁ + χ̄ ∈ S₁ + non-real + diffsupp + hνZ (hS₁.extension_mem_ZIrr で discharge 可)
+  + hχχbar。tau1 = hS₁.extension (htau1Dmem は rfl 系)、imageFamily = dadeOrthonormalCharacterImageFamilyOfDiff。
+- **`certainTypeR_imageSet_orthogonal_dadeOfDiff`** (S08_CaseBHortho:44) ⚠ **Sibley world 前提**
+  (hyp : SibleyDadeHypothesis G L H、A = sharpImage H、hHK : h46.K = H) — §12 world (A = typePA0)
+  では直接使えない。証明核 (ticVdiff key brick、⟨ω^σ, ·⟩ = 0 の disjointness) は W-world の話で
+  A への依存は τ の家経由。**対応 = composite では hortho_mem を named hypothesis 化**し、§12 版
+  supply (S08_CaseBHortho の typePA0 一般化 or §12 instantiation、a 所有ゆえ可) を別 piece に。
+- **追加発見**: `muGrid_inner_irr_member_eq_zero` (S12_Section9Counts:802、既存) — hχ_S1 の
+  supply がほぼ直接ある (μ-grid ⊥ irr member)。
+⟹ composite の named hypotheses = **hDeg counting + hortho_mem** の 2 つ、他 15 項目は実 supply。

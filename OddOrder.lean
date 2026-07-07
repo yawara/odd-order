@@ -59,6 +59,7 @@ import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
 import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Inertia
 import OddOrder.GroupTheory.RepresentationTheory.InertiaAbelianQuotient
+import OddOrder.GroupTheory.RepresentationTheory.InflationInduction
 import OddOrder.GroupTheory.RepresentationTheory.InducedDegreeSum
 import OddOrder.GroupTheory.RepresentationTheory.InducedInvariantConstituent
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
