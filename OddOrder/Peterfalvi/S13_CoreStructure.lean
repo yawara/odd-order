@@ -1199,6 +1199,65 @@ theorem chief_H0_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (caseA_fixes_of_action_chain hyp.chief hS₀card (fun v s hs => hS₀inv.smul_mem v hs)
         hAodd σ hmodd hσm hchain)
 
+/-- **(11.7) corollary — the chief kernel `N ◁ H` is trivial**: `N = ⊥`.  The chief kernel realised
+inside `↥H` is trivial because its `G`-image `H₀ = N.map H.subtype` is trivial (`chief_H0_eq_bot`)
+and `H.subtype` is injective.  Hence the chief factor `H̄ = ↥H ⧸ N ≅ ↥H` (used to transport the
+elementary-abelian/order data, and — via `H̄ = H` — to identify `C = C_U(H̄)` with `C_U(H) = hyp.C`
+for the (9.11) `hY` route). -/
+theorem chief_N_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.chief.N = ⊥ := by
+  have h := hyp.chief.H0_eq
+  rw [chief_H0_eq_bot hG hyp, eq_comm, Subgroup.map_eq_bot_iff] at h
+  simpa using h
+
+/-- **Identification `C = cSub`** (Coq `Ptype_Fcompl_kernel_cent`): the §11 Fitting-complement
+`C = C_U(H)` (`hyp.C`, `C_eq_centralizer`) equals the §9 chief-factor action kernel `cSub = C_U(H̄)`.
+Forward (`C_U(H) ≤ cSub`) is `mem_cSub_of_mem_U_of_centralizes` (centralizing `H` ⟹ trivial on `H̄`).
+Reverse (`cSub ≤ C_U(H)`) uses `H₀ = 1` (`chief_N_eq_bot`: `N = ⊥`, so `H̄ = H/⊥`, and a `cSub`-element
+— acting trivially on `H̄` — centralizes `H` since the quotient by `⊥` is injective).  This makes the
+capstone family `𝒮(H₀ ⊔ C)` coincide with the (9.11) family `𝒮(H₀ ⊔ cSub)`, the connector for the
+`hY` route (issue 1019 update⁴⁸). -/
+theorem C_eq_cSub [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : Hypothesis M) :
+    hyp.C = OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief := by
+  have hHeq : hyp.s11Setup.typeP.H = hyp.base.typeP.H := by rw [hyp.setup_typeP_eq]
+  have hUeq : hyp.s11Setup.typeP.U = hyp.base.typeP.U := by rw [hyp.setup_typeP_eq]
+  apply le_antisymm
+  · -- forward: `C_U(H) ≤ cSub`
+    intro x hx
+    rw [hyp.C_eq_centralizer, Subgroup.mem_inf] at hx
+    exact OddOrder.Peterfalvi.S11.mem_cSub_of_mem_U_of_centralizes hyp.s11Setup hyp.chief
+      (hUeq ▸ hx.1) (hHeq ▸ hx.2)
+  · -- reverse: `cSub ≤ C_U(H)` (needs `N = ⊥`)
+    have hN : hyp.chief.N = ⊥ := chief_N_eq_bot hG hyp
+    intro x hx
+    rw [hyp.C_eq_centralizer, Subgroup.mem_inf]
+    refine ⟨hUeq ▸ OddOrder.Peterfalvi.S11.cSub_le_U hyp.s11Setup hyp.chief hx, ?_⟩
+    rw [Subgroup.mem_centralizer_iff]
+    intro g hgH
+    have hgH' : g ∈ hyp.s11Setup.typeP.H := hHeq ▸ hgH
+    -- unfold `x ∈ cSub` to a kernel element `a`
+    simp only [OddOrder.Peterfalvi.S11.cSub, Subgroup.mem_map] at hx
+    obtain ⟨y, ⟨a, hker, rfl⟩, rfl⟩ := hx
+    set l := (hyp.s11Setup.typeP.U.subgroupOf
+      (hyp.s11Setup.typeP.U ⊔ hyp.s11Setup.typeP.W1)).subtype a with hl
+    -- `a ∈ ker(uActionHom)` ⟹ conjugation by `l` fixes `g` mod `N`
+    rw [MonoidHom.mem_ker] at hker
+    have happ := DFunLike.congr_fun hker (QuotientGroup.mk' hyp.chief.N ⟨g, hgH'⟩)
+    rw [OddOrder.Peterfalvi.S11.uActionHom, MonoidHom.comp_apply,
+      OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk',
+      MulAut.one_apply] at happ
+    -- `N = ⊥` ⟹ the quotient map is injective ⟹ `typeP_conjAction l ⟨g,·⟩ = ⟨g,·⟩`
+    have hinj : Function.Injective (QuotientGroup.mk' hyp.chief.N) := by
+      rw [← MonoidHom.ker_eq_bot_iff, QuotientGroup.ker_mk']; exact hN
+    have hconj := hinj happ
+    -- `typeP_conjAction_apply`: `x * g * x⁻¹ = g`
+    have hval := congrArg (Subtype.val) hconj
+    rw [OddOrder.Peterfalvi.S11.typeP_conjAction_apply] at hval
+    -- `hval : (l : G) * g * (l : G)⁻¹ = g`; `(l : G) = x`
+    exact (mul_inv_eq_iff_eq_mul.mp hval).symm
+
 /-- **Peterfalvi (11.7)**: `H` is elementary abelian of order `p^q`, and `H_0 = 1`.
 
 `H₀ = 1` is the crux `chief_H0_eq_bot`.  Given it, both remaining conjuncts are immediate from the
@@ -1218,11 +1277,8 @@ theorem H_elementaryAbelian [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have h2 := hyp.chief.typeIII_IV_p_eq_W2 (hyp.base.isTypeIIIorIV _hG)
     rw [hyp.s11Setup_card_W2_eq] at h2
     exact h2.symm
-  -- `N = ⊥` from `H₀ = N.map H.subtype = ⊥`
-  have hN : hyp.chief.N = ⊥ := by
-    have h := hyp.chief.H0_eq
-    rw [hH0, eq_comm, Subgroup.map_eq_bot_iff] at h
-    simpa using h
+  -- `N = ⊥` (`chief_N_eq_bot`)
+  have hN : hyp.chief.N = ⊥ := chief_N_eq_bot _hG hyp
   refine ⟨?_, ?_, hH0⟩
   · -- elementary abelian: transport `quotient_elementaryAbelian` along `↥H ⧸ ⊥ ≃* ↥H`
     have hEA : IsElementaryAbelian hyp.p ↥hyp.s11Setup.H := by

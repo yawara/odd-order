@@ -1722,6 +1722,30 @@ noncomputable def coherent_sOf_H0C_of_coherent_sOf_H0Cprime [Finite G] {M : Subg
       (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C) hyp.base.A0 :=
   isCoherent_of_subset hcoh hyp.sOf_H0C_subset_sOf_H0Cprime hwit
 
+/-- **(9.11) `hY`-route bridge, `SOf`-target form** (the Coq/authoritative intermediate).  The
+capstone's `𝒮(H₀C)`-coherence input (`hY`) follows from the (9.11) coherence of the §10
+`inducedKernelFamily` family `SOf(H₀C') = S_ H0C'` (Coq's `Ptype_core_coherence` target — the
+`HU`-induced family that carries the S08 subcoherent/witness machinery) by `isCoherent_of_subset`
+along `𝒮(H₀C) ⊆ SOf(H₀C')` (`sOf ⊆ SOf` via `sOf_subset_SOf`, then `SOf`-antitone since `H₀C' ≤
+H₀C`), once a nonzero `A₀`-supported `𝒮(H₀C)` witness is supplied.  This is preferred over
+`coherent_sOf_H0C_of_coherent_sOf_H0Cprime` (which threads the smaller `𝒮(H₀C')` intermediate):
+the (9.11) induction naturally lands `SOf(H₀C')`, so this bridge is the direct connector. -/
+noncomputable def coherent_sOf_H0C_of_coherent_SOf_H0Cprime [Finite G] {M : Subgroup G}
+    (hyp : Hypothesis M)
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+      (hyp.SOf hyp.H0Cprime) hyp.base.A0)
+    (hwit : ∃ φ : ClassFunction ↥M ℂ,
+      φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan
+        (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C) hyp.base.A0 ∧ φ ≠ 0) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+      (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C) hyp.base.A0 := by
+  refine isCoherent_of_subset hcoh ?_ hwit
+  have hSOf : hyp.SOf hyp.H0C ⊆ hyp.SOf hyp.H0Cprime := by
+    rw [hyp.SOf_eq, hyp.SOf_eq]
+    exact OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone
+      (Subgroup.subgroupOf_mono M hyp.H0Cprime_le_H0C)
+  exact (hyp.sOf_subset_SOf hyp.H0C).trans hSOf
+
 /-- **`S(HC)` is a subfamily of `SHCSet = S(M'')` = the degree-`w₁` irreducibles** (world-bridge
 `S₁`-identification): every member of `S(HC)` kills `HC ⊇ M''`, so it kills `M''` and lies in
 `S(M'')`, which is exactly the degree-`w₁` irreducible family `SHCSet` (`SOf_secondDerived_eq`).
