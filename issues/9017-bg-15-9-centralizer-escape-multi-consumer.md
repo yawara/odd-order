@@ -502,3 +502,17 @@ Coq の A は `cKA : A ⊆ C(K)` (K=M の κ-complement) を持つ ⟹ chief-fac
 statement に修正 (consumer は `exists_rank2_elemAb_le_centralizer_kappa_of_tau2` の hACK を供給)。
 build GREEN 3120。⟹ 残 gate = `A_le_fittingInAmbient_of_typeP1_nonnil` (sound, sorried, Fcore
 chief-factor port 要) の 1 本 + Cor 15.9。
+
+## 2026-07-07 更新 #16 (lane b, /loop) — non-nil sAFL の port 経路確定: Fcore_structure eq3 (K̄-centralizer)
+
+`A_le_fittingInAmbient_of_typeP1_nonnil` (残 gate) の Coq 証明経路を精査。**Coq sAFL は
+Fcore_structure (Thm 15.2) conjunct (g) の第3式 `'C_Ms(Ks/Q0 | 'Q) = 'F(M)`** を使う
+(M:=L で Fcore の Ks = C_{L_σ}(L の κ-Hall) = 本 lemma の K)。⟹ **F(L) = C_{L_σ}(K̄ | 'Q)**
+(K̄ = K の L_σ/Q0 への像)、`A ⊆ C(K)` (hACK/cKA) から `A ⊆ F(L)` が sub_astabQ + quotient_cents で従う。
+
+**repo gap**: repo の F(L) characterization は全て **Q 経由** (`F=Q⊔(C(Q)⊓M)` eq1、
+`centralizer_msigma_quotient_le_fittingInAmbient` = eq2 の Q̄-centralize→F)。Coq の eq3
+(**K̄ 経由**) は未 expose。eq2 (C_{Ms}(Q̄)) と eq3 (C_{Ms}(K̄)) は**異なる部分群がどちらも F(L)**
+(centralize K̄ ⇏ centralize Q̄、K̄⊆Q̄ minimal normal だが normal closure 経由で一致しない)。
+⟹ eq3 を独立に再構成する要 (deep §15.2 port) — repo の chief-factor engine
+(`chiefFactor_engine_of_inputs`, `card_centralizer_quotient_eq_of_kstar` = |C_{Q̄}(K)|=q 等) を使う。
