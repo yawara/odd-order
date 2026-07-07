@@ -332,7 +332,7 @@ world-bridge の **S₁ = S(HC) 側は coherence + 構造同定が完了**、残
   X=SOf(HC), Y=sOf(H0C) で instantiate → `SOf_H0C_eq_SOf_HC_union_sOf` (landed) で
   SOf(H0C)=SOf(HC)∪sOf(H0C) に rewrite → coherent(SOf(H0C))。engine 入力の gate 内訳:
   - `hX` = coherent(SOf(HC)) — ✅ **landed** (本 session)
-  - `hsrc_ortho` (SOf(HC) ⊥ sOf(H0C)) — **★ungated (要 build)**。当初「sOf(H0C)⊆Sset∖SHCSet に還元」と
+  - `hsrc_ortho` (SOf(HC) ⊥ sOf(H0C)) — ✅ **landed** (update⁴², commit 645622e4)。当初「sOf(H0C)⊆Sset∖SHCSet に還元」と
     書いたのは誤: update⁴⁰ 通り SHCSet=SOf(M'') は H を kill しない deg-w₁ 既約を含むため
     sOf(H0C)⊆Sset∖SHCSet は不明/偽の恐れ → SHCSet route 不可。**正しい ungated route = source-level
     H-kernel distinctness**: SOf(HC) 成員 x=induce_K θ は hInHu(=H-trace in K=HU) ≤ ker θ (H≤HC≤ker),
@@ -353,3 +353,34 @@ world-bridge の **S₁ = S(HC) 側は coherence + 構造同定が完了**、残
   ((9.11) Ptype_core_coherence, sibleyTarget bypass); (b) §14 glue (ν/hmixed/hDτ)。
   S₁ 側の coherence/構造同定は本 session で打ち止め (これ以上の ungated S₁ work 無し)、
   残る ungated は hsrc_ortho のみで、それ以外は §14/§9 深部。
+
+## 🔬 update⁴² (2026-07-07 lane-a /loop) — ★ hsrc_ortho landed: capstone の ungated 入力が完備
+
+update⁴¹ で ungated と判明した `hsrc_ortho` (SOf(HC) ⊥ sOf(H0C)) を **sorry-free landing**
+(commit 645622e4, axiom-clean)。これで world-bridge union-glue engine
+`S07.coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal` (S07:4811) の
+**ungated 入力は全て完備** (hX=coherent(S(HC))=landed, hsrc_ortho=landed)。
+
+### ✅ landed 本 iteration (S13, axiom-clean)
+- **`SOf_HC_inner_sOf_H0C_eq_zero`** (pairwise): S(HC) 成員 ⊥ 𝒮(H0C) 成員。両者は pairwise 直交な
+  §10 族 `inducedKernelFamily HU` の Ind_HU 成員 (`sOf_subset_SOf` で sOf⊆SOf) で **相異**:
+  S(HC)-source θ は H を kill (H≤HC≤ker θ, `hInHu ⊆ ker θ`)、sOf-source χ' は 𝒳 (¬hInHu⊆ker χ',
+  `xiSet` 定義)。Ind θ=Ind χ' なら `induce_eq_induce_iff_conj` で θ,χ' が M-共役 → H⊴M 共役不変
+  (`subsetCharacterKernel_conjBy_of_invariant` + `hSubgroupOfM_normal`, hInHu invariance は
+  `hInHuConj` の toFun パターン) で hInHu⊆ker χ' を強制 → χ'∈𝒳 矛盾 →
+  `inducedKernelFamily_pairwise_orthogonal`。
+- **`span_inner_SOf_HC_sOf_H0C_eq_zero`** (span): ℤ[S(HC)]⊥ℤ[𝒮(H0C)] = engine の hsrc_ortho 引数の
+  正確な形。pairwise の double `span_induction` bilinear 拡張 (`span_inner_SHCSet_diff_eq_zero` mirror)。
+
+### 残 capstone gate = 全て §14/§9-deep (ungated S₁-side work は完全に打ち止め)
+capstone `coherent_SOf_H0C_of_column_identities` (未作成) の engine 入力で残るのは:
+- `hY` = coherent(sOf(H0C), A0) — §14-gated + packaging mismatch (`coherent_H0C_commutator` は
+  coherent(chars.S, H0CprimeSupport)、bridging 要、sibleyTarget_H0C=likely-UNSOUND/7001)
+- `ν`+`hagreeX`/`hagreeY` (glue map) — §14 (exists_glue_nu の world-bridge 版)
+- `hmixed` (6.7 image-side 直交) — §14/BG§15
+- `hDτ` (5.8 column identity) — §14
+- `hgen` — §9 generation (hgen_of_S2_uniform_degree の world-bridge 版)
+⟹ **本 session (3 commit) で S₁-side = coherence + S₁-同定 + 直交 を完全 landing**。
+capstone は上記 §14/§9 gated 入力を仮説パラメータ化した skeleton で前倒し可能 (次 iteration 候補) —
+ただし ungated な genuine 数学は S₁-side で尽きたので、それ以降は §14 (lane b/c 領域) / §9 深部との
+協調が必要。
