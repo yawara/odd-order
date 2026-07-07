@@ -1376,6 +1376,132 @@ theorem not_orthogonal_mu0_sub_zeta [Finite G]
     hyp.notOrthogonalFormula data.zeta := by
   sorry
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.5)/(9.9.b): the nontrivial column sums `μ_k` are `𝒮(H₀C′)`-members** — the
+`hμmem` input of the (9.11) caseB chain fold (`caseB_coherent_sOf_H0Cprime_of_mixed`).
+
+The chain: `μ_k ∈ 𝒮(H₀^prod)` and is reducible by the (11.8.1) count
+(`muGrid_column_sum_mem_sOf_H0_and_reducible`, at a producer chief over `toTypesIIIIIIVSetup`);
+the family relaxes to `𝒮(⊥)` (kernel antitone) where it is setup-independent, and the §13 setup
+agrees with the producer (`TypesIIIIIIVSetup.eq_of_typeP_eq`, `setup_typeP_eq`); `H₀ = ⊥` in
+types III/IV (`chief_H0_eq_bot`), so this is `𝒮(H₀)`-membership over `hyp.s11Setup`; a reducible
+`𝒮(H₀)`-member lies in `𝒮(H₀ ⊔ cSub)` by the (9.9.b) count (`reducible_mem_sOf_H0C`); `cSub = C`
+(`C_eq_cSub`) identifies that family with `𝒮(H₀C)`, and `𝒮(H₀C) ⊆ 𝒮(H₀C′)` (kernel antitone,
+`C′ ≤ C`). -/
+theorem columnSum_muColumnChar_mem_sOf_H0Cprime [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
+    (k : Fin hyp.base.w2) (hk : k ≠ 0) :
+    OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
+        (hyp.base.muColumnChar hG hG.odd k)
+      ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime := by
+  haveI := hyp.base.finiteG
+  classical
+  have hnt : OddOrder.GroupTheory.TypePNontrivialCore M hyp.base.typeP :=
+    OddOrder.GroupTheory.typePNontrivialCore_of_isTypeIIIorIV hyp.type_alt hyp.base.typeP
+  -- the §9 setups agree (`typeP` pinned, all other fields propositional)
+  have heq : hyp.s11Setup = hyp.base.toTypesIIIIIIVSetup hyp.type_alt hnt :=
+    OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup.eq_of_typeP_eq hyp.setup_typeP_eq
+  -- (11.8.1) at a producer chief: `μ_k ∈ 𝒮(H₀^prod)`, reducible
+  obtain ⟨chief₀, -⟩ := OddOrder.Peterfalvi.S11.exists_chiefFactorData hG
+    (hyp.base.toTypesIIIIIIVSetup hyp.type_alt hnt)
+  have hgrid := hyp.base.muGrid_column_sum_mem_sOf_H0_and_reducible hG hyp.type_alt hnt
+    chief₀ k hk
+  rw [hyp.base.muGrid_columnSum_eq_columnSum hG hG.odd k] at hgrid
+  -- transport to `𝒮(H₀)` over `hyp.s11Setup`: relax to `𝒮(⊥)` and use `H₀ = ⊥` (types III/IV)
+  have hmemH0 : OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
+      (hyp.base.muColumnChar hG hG.odd k)
+      ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.chief.H0 := by
+    rw [chief_H0_eq_bot hG hyp, heq]
+    exact OddOrder.Peterfalvi.S11.sOf_antitone _ bot_le hgrid.1
+  -- (9.9.b): a reducible `𝒮(H₀)`-member lies in `𝒮(H₀ ⊔ cSub)`
+  have hH0C := OddOrder.Peterfalvi.S11.reducible_mem_sOf_H0C hG
+    (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief) _ hmemH0 hgrid.2
+  -- `H₀ ⊔ cSub = H₀C` (`C = cSub`), and `𝒮(H₀C) ⊆ 𝒮(H₀C′)` (kernel antitone)
+  apply hyp.sOf_H0C_subset_sOf_H0Cprime
+  change _ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup (hyp.chief.H0 ⊔ hyp.C)
+  rw [C_eq_cSub hG hyp]
+  exact hH0C
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.9.a), caseB uniform degree on `𝒮(H₀C′)`** — the `hunif` input of the (9.11)
+caseB chain fold (`caseB_coherent_sOf_H0Cprime_of_mixed`): in Clifford case (b), every
+`𝒮(H₀C′)`-member has degree `qu`.  This is `caseB_degree_qu` instantiated at the §13 hypothesis,
+with the §9 trigger kernel `H₀ ⊔ C′ = H₀ ⊔ cprimeSub` identified with `hyp.H0Cprime =
+H₀ ⊔ [C,C]` along `C = cSub` (`C_eq_cSub`, so `cprimeSub = [cSub,cSub] = [C,C]`). -/
+theorem caseB_forall_mem_sOf_H0Cprime_apply_one_eq_qu [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (caseB : OddOrder.Peterfalvi.S11.CliffordCaseBData
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief)) :
+    ∀ φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
+      (φ : ClassFunction ↥M ℂ) 1 =
+        ((hyp.s11Setup.q *
+          (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u : ℕ) : ℂ) := by
+  haveI := hyp.base.finiteG
+  intro φ hφ
+  refine OddOrder.Peterfalvi.S11.caseB_degree_qu hG _ caseB φ ?_
+  change φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup
+    (hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.cprimeSub hyp.s11Setup hyp.chief)
+  have hCp : OddOrder.Peterfalvi.S11.cprimeSub hyp.s11Setup hyp.chief
+      = derivedInG hyp.C := by
+    change derivedInG (OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief) = derivedInG hyp.C
+    rw [C_eq_cSub hG hyp]
+  rw [hCp]
+  exact hφ
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.11), caseB: `𝒮(H₀C′)` is coherent on `A₀(M)`** — the caseB branch of the
+`Ptype_core_coherence` induction, assembled from the two landed corners:
+
+* **no irreducible member** — the family is all-reducible, so it lies in the certain-type set
+  and the (4.9)(b) coherence restricts (`coherent_sOf_H0Cprime_of_allReducible`); nonemptiness
+  is witnessed by the column sum `μ₁` (`columnSum_muColumnChar_mem_sOf_H0Cprime`);
+* **some irreducible member** — that member anchors the degree-`qu` irreducible cut (its degree
+  pinned by the caseB uniform degree `caseB_forall_mem_sOf_H0Cprime_apply_one_eq_qu`), and the
+  chain fold `caseB_coherent_sOf_H0Cprime_of_mixed` adjoins the column pairs.
+
+The one remaining genuine §9 input is `hDeg` — the (9.9.c)-side count that the degree-`qu`
+irreducible cut has more than two members in the mixed corner (Coq `PFsection9` (9.9)(c)); the
+conclusion is `Nonempty`-wrapped so the irreducible anchor may be extracted from the case split
+(`IsCoherent` is data). -/
+theorem caseB_coherent_sOf_H0Cprime [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
+    (caseB : OddOrder.Peterfalvi.S11.CliffordCaseBData
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief))
+    (hDeg : (∃ χ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
+        IsIrreducibleCharacter χ) →
+      (2 : ℝ) < (OddOrder.Peterfalvi.S13.irrCut_finite hyp hyp.H0Cprime
+        (hyp.s11Setup.q *
+          (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u)).toFinset.card) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+      (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) hyp.base.A0) := by
+  haveI := hyp.base.finiteG
+  classical
+  -- a nonzero column index (`w₂ = p` is prime, so `1 < w₂`)
+  have hw2 : 1 < hyp.base.w2 := hyp.params.w2_prime.one_lt
+  have hk1 : (⟨1, hw2⟩ : Fin hyp.base.w2) ≠ 0 := by
+    intro heq
+    have := congrArg Fin.val heq
+    simp at this
+  by_cases hex : ∃ χ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
+      IsIrreducibleCharacter χ
+  · -- mixed corner: the irreducible member anchors the cut, the chain fold concludes
+    obtain ⟨χ₁, hχ₁mem, hχ₁irr⟩ := hex
+    exact ⟨OddOrder.Peterfalvi.S13.caseB_coherent_sOf_H0Cprime_of_mixed hG hyp
+      (hyp.s11Setup.q * (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u)
+      (caseB_forall_mem_sOf_H0Cprime_apply_one_eq_qu hG hyp caseB)
+      hχ₁mem hχ₁irr
+      (caseB_forall_mem_sOf_H0Cprime_apply_one_eq_qu hG hyp caseB χ₁ hχ₁mem)
+      (hDeg ⟨χ₁, hχ₁mem, hχ₁irr⟩)
+      (fun k hk => columnSum_muColumnChar_mem_sOf_H0Cprime hG hyp k hk)⟩
+  · -- all-reducible corner: (4.9)(b) certain-type coherence restricts
+    push_neg at hex
+    exact ⟨OddOrder.Peterfalvi.S13.coherent_sOf_H0Cprime_of_allReducible hG hyp hk1 hex
+      ⟨OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
+          (hyp.base.muColumnChar hG hG.odd ⟨1, hw2⟩),
+        columnSum_muColumnChar_mem_sOf_H0Cprime hG hyp ⟨1, hw2⟩ hk1⟩⟩
+
 /-! ## (11.9): final Type III conclusion -/
 
 /-- **Peterfalvi (11.9)**: the final three conclusions of §13: the symmetric

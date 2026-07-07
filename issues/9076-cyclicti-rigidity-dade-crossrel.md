@@ -1,5 +1,5 @@
 ---
-id: 9075
+id: 9076
 slug: cyclicti-rigidity-dade-crossrel
 title: "shared-infra claim: §3 cyclicTI rigidity (eq_signed_sub_cTIiso) → prDade_sub_TIirr Dade cross-relation — (13.18)/(10.5)/(11.8) 共通 gate"
 created: 2026-07-08
@@ -72,3 +72,11 @@ not yet in this file" と明記; grep で `eq_signed_sub`/`dirr_small_norm` は 
 - 既存 σ-isometry: `OddOrder/Peterfalvi/S05_IntegralSigma.lean` (`TICyclicHypothesis.sigmaIntegral`)。
 - 関連 issue: 3003 (13.18 faithful 化 + cross-relation isolate)、9014 (prime-TI residue、隣接)、
   0098 (lane c package item 3)、9000 (σ-theory typeP_Galois、別)。
+
+## ⚠ HUB renumber (2026-07-08 合流 tick)
+
+本 issue は lane c が **9075** として起票したが、lane a が同 tick で独立に 9075
+(`9075-s07-pivot-coherence-norm-general`, (5.7) norm-general port) を採番しており衝突。
+merge 順 (a→c) により a が 9075 を保持、本 issue を **9076 へ renumber** (c の参照ファイル
+3003/s15 notes 内の言及も置換済)。lane c は次回 main sync で本 rename を取り込むこと。
+両 claim は別 ref ((5.7) vs §3 cyclicTI) で重複建設ではない。
