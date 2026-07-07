@@ -1997,4 +1997,31 @@ theorem Hypothesis.columnSum_muColumnChar_mem_inducedFamily [Finite G]
   rw [← h1, ← hmu]
   exact (params.degree_independent 0 k hk0).symm
 
+open scoped FiniteInduce in
+/-- **Certain-type column sums are injective in the `W₂`-dual** (`columnSum χ₂ = columnSum χ₂' →
+χ₂ = χ₂'`): if the sums agree, the Gram `columnFamily_mu_sum_inner` evaluates their inner product
+both as `w₁ ≠ 0` (diagonal) and as `0` if `χ₂ ≠ χ₂'` — forcing equality.  Turns the set-level
+distinctness `μ_new ∉ pairUnion` into dual-level distinctness for the (9.11) chain fold. -/
+theorem Hypothesis.columnSum_injective [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.toHypothesis46 hG hG.odd).W1)]
+    {χ₂ χ₂' : ((hyp.toHypothesis46 hG hG.odd).W2.subgroupOf
+      ((hyp.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.toHypothesis46 hG hG.odd).W2)) →* ℂˣ}
+    (heq : OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂
+      = OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂') :
+    χ₂ = χ₂' := by
+  haveI := hyp.finiteG
+  classical
+  by_contra hne
+  have h0 := hyp.columnSum_inner_columnSum_eq_zero hG (χ₂ := χ₂) (χ₂' := χ₂') hne
+  rw [heq] at h0
+  have hw1 : ClassFunction.inner
+      (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂')
+      (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂')
+      = (Nat.card (hyp.toHypothesis46 hG hG.odd).W1 : ℂ) := by
+    rw [OddOrder.Peterfalvi.S06.columnSum_def,
+      OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl]
+  rw [h0] at hw1
+  exact Nat.cast_ne_zero.mpr Nat.card_pos.ne' hw1.symm
+
 end OddOrder.Peterfalvi.S12

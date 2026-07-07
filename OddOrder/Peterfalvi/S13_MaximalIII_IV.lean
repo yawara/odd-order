@@ -2991,4 +2991,34 @@ theorem caseB_sOf_member_dichotomy [Finite G]
       (OddOrder.Peterfalvi.S11.exists_chiefFactorData hG _).choose hφIKF hirr
     exact ⟨k, hk0, hkeq.trans (hyp.base.muGrid_columnSum_eq_columnSum hG hG.odd k)⟩
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Uniform anchor-difference support over `𝒮(H₀C′)`** (the `hdegS₁diff` supply of every (9.11)
+chain step, uniform over the whole family): under the caseB uniform degree (`hunif`), the
+difference of any member against the anchor `χ₁ ∈ 𝒮(H₀C′)` is `A₀`-supported — both are
+`S(⊥)`-members of equal degree, so `inducedKernelFamily_scaledDiff_support` applies at `d = 1`.
+Since every chain accumulator `S₁ = pairUnion S₀ pair i` is a subfamily of `𝒮(H₀C′)`, this one
+lemma feeds `hdegS₁diff` at every step. -/
+theorem sOf_anchor_diff_support [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (d : ℕ)
+    (hunif : ∀ φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
+      (φ : ClassFunction ↥M ℂ) 1 = (d : ℂ))
+    {χ₁ : ClassFunction ↥M ℂ}
+    (hχ₁mem : χ₁ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime)
+    {x : ClassFunction ↥M ℂ}
+    (hx : x ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) :
+    ((x - χ₁ : ClassFunction ↥M ℂ)).support ⊆ hyp.base.A0 := by
+  haveI := hyp.base.finiteG
+  classical
+  have hIKF : ∀ y ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
+      y ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) := fun y hy => by
+    have h := hyp.sOf_subset_SOf hyp.H0Cprime hy
+    rw [hyp.SOf_eq] at h
+    exact OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone bot_le h
+  have h := OddOrder.Peterfalvi.S08.inducedKernelFamily_scaledDiff_support
+    hyp.base.mderivSharp_subset_A0 (hIKF x hx) (hIKF χ₁ hχ₁mem) (d := 1)
+    (by rw [Nat.cast_one, one_mul, hunif x hx, hunif χ₁ hχ₁mem])
+  rwa [one_smul] at h
+
 end OddOrder.Peterfalvi.S13
