@@ -18,8 +18,13 @@
   = **`reconciled_typePData_T` gated** (T が type-P と assert されず Q=T_F elem abelian 等が無い)。**c が active discharge 中**
   (5→4→2 sorries、直近 commit d3917274/ab75ba94)。b は待ち; c 完遂後に V_inf 等を close。**⚠ survey の "V_inf は 20 行 mirror" は誤り**:
   d_eq_one = 分析的 c_eq_one chain の T-side dual (Singer/two_mul_q_dvd/(13.10)) が要 = 深い。
-- **深い ungated b-side**: `exists_M_structural`/BetaData (S15_SAndT:3616、§13.18 norm) + `eta_axes_odd_of_caseC2_pair`
-  (:3795、grid orthogonality)。深い char (norm 推定・直交グリッド)、multi-iteration。次に engage する候補。
+- **⚠ 訂正 (同 07-07、issue 0098/9013 HUB 裁定を精読)**: 上の "deep b-side = BetaData/grid" は**誤り**。
+  hub 裁定で **`betaData_of_grid` (S15_SAndT:3616) は c へ de-scope** (S-side βₛ bridge carve-out、0098 de-scope②)。
+  **b の genuine 現行 work = issue 9013 案A**: §13 S-side analytic estimate ((13.10)/(13.11)/(13.14)/(13.15)/
+  `c_eq_one`) を **S-side hardcoded (hyp.c 等) → generic type-II maximal subgroup 版に一般化** (c が S/T 両側で
+  instantiate)。具体 = (ii) cofactor v∣Singer + (iii) (13.10)-dual analytic ineq。**genericization refactor** ゆえ
+  proven S-side が template (typeP2_matched_kappa_hall_pair_of_esetup / typeF_frobenius_of_esetup と同型の抽象化)。
+  V_inf (:1885) は b 保持だが c の typeP_pair port gated。次 iteration で 9013 案A に着手。
 - ⚠ 旧 notes (2026-07-05 以前) の "issue 2033/3001 が next front" は **stale** (両 issue closed)。
 
 ## ✅✅ LIVE STATUS (2026-07-06 loop, lane **b**): (13.12) `c_eq_one` 数値消去を実証明 — bare sorry → 構造残余のみ
