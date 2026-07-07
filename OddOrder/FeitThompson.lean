@@ -1380,33 +1380,50 @@ noncomputable def eqQ : Fin tp.q ≃ Fin (Nat.card ↥(mp.certainTypeS hG).W1) :
 the `sdiffTICyclicHypothesis.W₂/W` forms (defeq to `certainTypeS.W₂` / `W₁ ⊔ W₂`) so that both
 `chiColumn` and `card_charGroup_subgroupOf` consume it directly.  An arbitrary bijection; the column-`0`
 normalization is applied in `chi2enum`. -/
-noncomputable def chi2baseEnum :
-    Fin tp.p ≃ (((mp.certainTypeS hG).sdiffTICyclicHypothesis.W2.subgroupOf
-      (mp.certainTypeS hG).sdiffTICyclicHypothesis.W) →* ℂˣ) :=
-  haveI : Fintype (((mp.certainTypeS hG).sdiffTICyclicHypothesis.W2.subgroupOf
-      (mp.certainTypeS hG).sdiffTICyclicHypothesis.W) →* ℂˣ) := Fintype.ofFinite _
-  (Fintype.equivFinOfCardEq (by
-    rw [← Nat.card_eq_fintype_card,
-      (mp.certainTypeS hG).sdiffTICyclicHypothesis.card_charGroup_subgroupOf
-        (mp.certainTypeS hG).sdiffTICyclicHypothesis.W2_le_W]
-    exact cardCertainTypeS_W2 hG mp tp)).symm
+theorem cardChi2CharGroup :
+    Nat.card (((mp.certainTypeS hG).sdiffTICyclicHypothesis.W2.subgroupOf
+      (mp.certainTypeS hG).sdiffTICyclicHypothesis.W) →* ℂˣ) = tp.p := by
+  rw [(mp.certainTypeS hG).sdiffTICyclicHypothesis.card_charGroup_subgroupOf
+    (mp.certainTypeS hG).sdiffTICyclicHypothesis.W2_le_W]
+  exact cardCertainTypeS_W2 hG mp tp
 
-/-- The `W₂`-column enumeration `Fin tp.p ≃ Ŵ₂` normalized so that column `0` is the trivial character
-(`chi2enum_zero`), mirroring the `w1CharEquiv` convention (`w1CharEquiv 0 = 1`).  Composing
-`chi2baseEnum` with the transposition swapping `⟨0, p_prime.pos⟩` and the preimage of `1` moves the
-trivial `W₂`-dual to the distinguished column index `0` — the `j = 0` base of the `nu_definition`
-(T-side) difference.  The `muS_definition` proof fixes the column `j` and is invariant under the choice
-of column enumeration, so this renormalization does not affect it. -/
+/-- The `W₂`-column enumeration `Fin tp.p ≃ Ŵ₂`, realized as the **power enumeration** `j ↦ γ^j`
+of a fixed generator `γ` of the cyclic dual (`S05.isCyclic_charGroup_subgroupOf` +
+`cardCertainTypeS_W2`: `|Ŵ₂| = |W₂| = p`), mirroring the `w1CharEquiv` convention: column `0` is
+the trivial character (`chi2enum_zero`, the `j = 0` base of the `nu_definition` T-side
+difference), and column negation is character inversion (`chi2enum_finNeg`) — the honest (3.9.a)
+grid pairing (issue 3002).  The `muS_definition` proof fixes the column `j` and is invariant
+under the choice of column enumeration. -/
 noncomputable def chi2enum :
     Fin tp.p ≃ (((mp.certainTypeS hG).sdiffTICyclicHypothesis.W2.subgroupOf
-      (mp.certainTypeS hG).sdiffTICyclicHypothesis.W) →* ℂˣ) :=
-  (Equiv.swap (⟨0, tp.p_prime.pos⟩ : Fin tp.p) ((chi2baseEnum hG mp tp).symm 1)).trans
-    (chi2baseEnum hG mp tp)
+      (mp.certainTypeS hG).sdiffTICyclicHypothesis.W) →* ℂˣ) := by
+  haveI := (mp.certainTypeS hG).sdiffTICyclicHypothesis.isCyclic_charGroup_subgroupOf
+    (mp.certainTypeS hG).sdiffTICyclicHypothesis.W2_le_W
+  exact OddOrder.Peterfalvi.S06.cyclicPowEnum (cardChi2CharGroup hG mp tp)
 
 /-- The normalized column enumeration sends column `0` to the trivial character (Peterfalvi's
 column-`0` convention; the `j = 0` base of `nu_definition`). -/
 @[simp] theorem chi2enum_zero : chi2enum hG mp tp ⟨0, tp.p_prime.pos⟩ = 1 := by
-  rw [chi2enum, Equiv.trans_apply, Equiv.swap_apply_left, Equiv.apply_symm_apply]
+  haveI := (mp.certainTypeS hG).sdiffTICyclicHypothesis.isCyclic_charGroup_subgroupOf
+    (mp.certainTypeS hG).sdiffTICyclicHypothesis.W2_le_W
+  rw [chi2enum, OddOrder.Peterfalvi.S06.cyclicPowEnum_apply]
+  simp
+
+/-- **Column negation is character inversion** (Peterfalvi (3.5)/(3.9.a) power-grid pairing,
+`W₂`-column half): `chi2enum ((p − j) % p) = (chi2enum j)⁻¹`. -/
+theorem chi2enum_finNeg (j : Fin tp.p) :
+    chi2enum hG mp tp (OddOrder.Peterfalvi.S15.finNeg tp.p_prime.pos j)
+      = (chi2enum hG mp tp j)⁻¹ := by
+  haveI := (mp.certainTypeS hG).sdiffTICyclicHypothesis.isCyclic_charGroup_subgroupOf
+    (mp.certainTypeS hG).sdiffTICyclicHypothesis.W2_le_W
+  rw [chi2enum]
+  refine OddOrder.Peterfalvi.S06.cyclicPowEnum_eq_inv_of_add_mod_eq_zero _ ?_
+  show ((tp.p - (j : ℕ)) % tp.p + (j : ℕ)) % tp.p = 0
+  rcases Nat.eq_zero_or_pos (j : ℕ) with h0 | hpos
+  · simp [h0]
+  · have hj : (j : ℕ) < tp.p := j.2
+    rw [Nat.mod_eq_of_lt (by omega : tp.p - (j : ℕ) < tp.p),
+      Nat.sub_add_cancel hj.le, Nat.mod_self]
 
 include hG in
 /-- The key subgroup identity: `tp.W.subgroupOf mp.S = certainTypeS.sdiff.W`.  Both equal
@@ -2154,34 +2171,88 @@ theorem tau3W_omegaS_principal_of_coprime {g : G}
     tau3W hG mp tp (omegaS hG mp tp ⟨0, tp.q_prime.pos⟩ ⟨0, tp.p_prime.pos⟩) g = 1 := by
   rw [omegaS_principal_eq_trivial, tau3W_trivial, trivialClassFunction_apply]
 
+/-- **The `eqQ` reindex commutes with index negation**: `eqQ` is a `finCongr` (value-preserving
+cast along `|W₁| = q`), so the `S15.finNeg` negation on `Fin tp.q` transports to the explicit
+`(w₁ − ·) % w₁` negation on `Fin |W₁|` — the index form of `w1CharEquiv_finNeg`. -/
+theorem eqQ_finNeg (i : Fin tp.q) :
+    eqQ hG mp tp (OddOrder.Peterfalvi.S15.finNeg tp.q_prime.pos i)
+      = ⟨(Nat.card ↥(mp.certainTypeS hG).W1 - ((eqQ hG mp tp i : Fin _) : ℕ))
+            % Nat.card ↥(mp.certainTypeS hG).W1,
+          Nat.mod_lt _ (Nat.pos_of_ne_zero (NeZero.ne _))⟩ := by
+  apply Fin.ext
+  simp only [eqQ, finCongr_apply, Fin.coe_cast, OddOrder.Peterfalvi.S15.finNeg]
+  rw [cardCertainTypeS_W1 hG mp tp]
+
+/-- **Index negation is character inversion for the S-side grid characters** (Peterfalvi (3.5):
+the grid is indexed by character powers, so `ω_{−i,−j} = ω_{ij}⁻¹`).  Assembled from the two
+power-enumeration halves (`w1CharEquiv_finNeg` via the `eqQ` cast, `chi2enum_finNeg`) and the
+coordinatewise inversion `omegaProdChar_inv`. -/
+theorem omegaSChar_finNeg (i : Fin tp.q) (j : Fin tp.p) :
+    omegaSChar hG mp tp (OddOrder.Peterfalvi.S15.finNeg tp.q_prime.pos i)
+        (OddOrder.Peterfalvi.S15.finNeg tp.p_prime.pos j)
+      = (omegaSChar hG mp tp i j)⁻¹ := by
+  rw [omegaSChar, omegaSChar, eqQ_finNeg hG mp tp i,
+    (mp.certainTypeS hG).w1CharEquiv_finNeg (eqQ hG mp tp i),
+    chi2enum_finNeg hG mp tp j]
+  -- `(ω(χ₁⁻¹, χ₂⁻¹)).comp e = (ω(χ₁, χ₂).comp e)⁻¹`: pointwise, `ℂˣ` values invert
+  -- coordinatewise (`omegaProdChar` is the product of the two coordinate pullbacks).
+  ext w
+  simp only [MonoidHom.comp_apply, MonoidHom.inv_apply,
+    OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaProdChar, MonoidHom.mul_apply,
+    Units.val_mul, Units.val_inv_eq_inv_val, mul_inv]
+  -- the row factor's `⁻¹` sits at the (defeq) `W₁ ⊔ W₂`-form hom type, where the `simp`
+  -- lemmas do not fire syntactically; close it by definitional unfolding of the pointwise inv.
+  congr 1
+  exact Units.val_inv_eq_inv_val _
+
 /-- **Peterfalvi (3.9.a) conjugate-pair symmetry on generic elements** (issue-3002 supply):
 for `g` of order prime to `pq`, the `η`-grid pairs under the index negation `(i,j) ↦ (−i,−j)`
 (`S15.finNeg`), `(τ₃ω)_{−i,−j}(g) = (τ₃ω)_{ij}(g)`.
 
-**REMAINING SUPPLY OBLIGATION (issue-3002 keystone, honest gate — see notes).**  Peterfalvi's
-(3.9.a) genuine content is that the *complex conjugate* of `η_{ij}` is the grid character at the
-**character-inverse** index `(rowInv i, colInv j)` (`S06.chiColumn_conj`, `galoisMap_conj_omega`);
-combined with (3.9.c) (the value at a `pq`-coprime `g` is a real integer, so equals its own
-conjugate) this gives `η_{rowInv i, colInv j}(g) = η_{ij}(g)`.  The pairing therefore holds under
-the **character-inversion** involution `rowInv`/`colInv`, whose unique fixed point is the principal
-index (`w1CharEquiv 0 = 1`, `chi2enum 0 = 1`, `1⁻¹ = 1`).  Matching it to the **combinatorial**
-index negation `S15.finNeg = ⟨(n−i) % n, _⟩` requires `omegaSChar (finNeg i)(finNeg j) =
-(omegaSChar i j)⁻¹`, i.e. `w1CharEquiv (finNeg i) = (w1CharEquiv i)⁻¹`
-(= `w1CharEquiv (rowInv i)`) and likewise for `chi2enum`.  This is **false** for the nonconstructive
-enumerations `w1BaseEquiv`/`chi2baseEnum` (`Fintype.equivFinOfCardEq`, carrying no group
-structure): `finNeg` and `rowInv` are generically distinct permutations.  Closing this field
-honestly requires either (a) rebuilding `w1CharEquiv`/`chi2enum` as **structure-preserving**
-enumerations for which `finNeg = rowInv` (a `ZMod`-style power-map enumeration of the cyclic
-character group), or (b) the c-side restating `EtaGenericData.eta_pair` /
-`one_le_norm_eta_grid_signed_sum` over the honest `rowInv`/`colInv` involution (which
-`one_le_norm_signed_paired_sum` already supports as an abstract `Equiv.Perm`).  The integrality
-(3.9.c) and principal (3.9) fields are supplied `sorry`-free above. -/
+Peterfalvi's (3.9.a) content: the negated-index grid character is the *inverse* linear character
+(`omegaSChar_finNeg` — honest because the enumerations are **power enumerations**, Peterfalvi's
+own (3.5) grid indexing), whose `ω` is the complex conjugate (`galoisMap_conj_omega`); `σ`
+intertwines coefficientwise Galois action ((3.9.a), `sigma_mapRingEquiv_comm`), so
+`η_{−i,−j}(g) = conj (η_{ij}(g))`; and the value `η_{ij}(g)` is a rational **integer** by (3.9.c)
+(`exists_intCast_sigma_omega_apply`, `Coprime(ord g, pq)`), hence conjugation-fixed. -/
 theorem tau3W_omegaS_pair_of_coprime (i : Fin tp.q) (j : Fin tp.p) {g : G}
-    (_hg : Nat.Coprime (orderOf g) (tp.p * tp.q)) :
+    (hg : Nat.Coprime (orderOf g) (tp.p * tp.q)) :
     tau3W hG mp tp (omegaS hG mp tp (OddOrder.Peterfalvi.S15.finNeg tp.q_prime.pos i)
         (OddOrder.Peterfalvi.S15.finNeg tp.p_prime.pos j)) g
       = tau3W hG mp tp (omegaS hG mp tp i j) g := by
-  sorry
+  classical
+  haveI : Fintype ↥tp.W := Fintype.ofFinite _
+  -- (3.9.c): the σ-value at the base index is a rational integer.
+  have hdvd : orderOf (omegaSChar hG mp tp i j) ∣ tp.p * tp.q := by
+    set ξ := omegaSChar hG mp tp i j with hξ
+    have hpow : ξ ^ Fintype.card ↥tp.W = 1 := by
+      ext w
+      rw [MonoidHom.pow_apply, MonoidHom.one_apply, ← map_pow, pow_card_eq_one, map_one]
+    have hcardW : Fintype.card ↥tp.W = tp.p * tp.q := by
+      rw [← Nat.card_eq_fintype_card, cardTPW mp tp, Nat.mul_comm]
+    rw [← hcardW]
+    exact orderOf_dvd_of_pow_eq_one hpow
+  obtain ⟨n, hn⟩ := (tiCyclicW hG mp tp).exists_intCast_sigma_omega_apply rfl
+    (tiCyclicWDadeApp hG mp tp) (omegaSChar hG mp tp i j) (hg.coprime_dvd_right hdvd)
+  -- the negated-index grid character is the Galois conjugate of the base one
+  have homega : (tiCyclicW hG mp tp).omega (omegaSChar hG mp tp
+        (OddOrder.Peterfalvi.S15.finNeg tp.q_prime.pos i)
+        (OddOrder.Peterfalvi.S15.finNeg tp.p_prime.pos j))
+      = IrreducibleCharacter.galoisMap Complex.conjAe.toRingEquiv
+          ((tiCyclicW hG mp tp).omega (omegaSChar hG mp tp i j)) := by
+    rw [OddOrder.Peterfalvi.S06.galoisMap_conj_omega]
+    exact congrArg _ (omegaSChar_finNeg hG mp tp i j)
+  rw [omegaS_eq_omega_omegaSChar, omegaS_eq_omega_omegaSChar]
+  show (tiCyclicW hG mp tp).sigmaIntegral rfl (tiCyclicWDadeApp hG mp tp) _ g
+    = (tiCyclicW hG mp tp).sigmaIntegral rfl (tiCyclicWDadeApp hG mp tp) _ g
+  rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_apply,
+    OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_apply, homega,
+    ← (tiCyclicW hG mp tp).sigma_mapRingEquiv_comm rfl (tiCyclicWDadeApp hG mp tp),
+    OddOrder.RepresentationTheory.ClassFunction.mapRingEquiv_apply]
+  have hv : (tiCyclicW hG mp tp).sigma rfl (tiCyclicWDadeApp hG mp tp)
+      ((tiCyclicW hG mp tp).omega (omegaSChar hG mp tp i j)).toClassFunction g = (n : ℂ) := hn
+  rw [hv]
+  exact map_intCast _ n
 
 /-- **Peterfalvi (3.2.d), `η`-grid form** (issue-2034 supply): a class function of `G`
 orthogonal to the whole grid `tau3W (omegaS i j)` vanishes on the regular set
