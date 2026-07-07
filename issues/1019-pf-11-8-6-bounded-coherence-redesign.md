@@ -1225,3 +1225,21 @@ inner_smul_chiFam_eq_zero_of_diff_vanishOnV、CharacterDifferenceImage 分解、
 ### 代替 (先行可能): bundled datum を named のまま特殊化 assembly を先に組む
 hortho §12 化と独立に、caseB 特殊化 (irr-cut Finset 化 + pieces 束ね) は Dmem/Da/hortho を
 引数のまま組める — どちらを先にするかは次 iteration の自律判断 (上流優先なら anchor から)。
+
+## 🔬 update⁷⁴ (2026-07-08 lane-a /loop) — ★ §12 V-vanishing anchor LANDED (hortho 化の核心突破)
+
+### ✅ landed: `S13.tau_apply_eq_zero_of_mem_typePV` (commit 8467027c, sorry-free, 一発 green)
+A(M)-supported α の §12 Dade image が ticVdiff.V 上 0。**Sibley と別理路で分離補題不要**:
+- ticVdiff.V = typePV M は defeq (tic literal projection、`hvPV := hv` 直通)
+- v ∈ V^M ⊆ A₀ = Dade base point → `dadeValue_eq` (witness 供給形: a=v、h=1∈H_a、conj=1) で
+  α^τ(v) = α(v) → v ∉ M′ (`typePData_typePV_not_mem_derived`) + α は (M′)^#-supported → 0。
+
+### 残 (hortho §12 化の続き、機械化された)
+1. **`certainTypeR_imageSet_orthogonal_dadeOfDiff_typeP`**: S08_CaseBHortho:44 の証明 mirror —
+   唯一の Sibley 依存 (`tau_apply_eq_zero_of_mem_ticVdiffV`) を本 anchor に差し替え。
+   `key` (inner_smul_chiFam_eq_zero_of_diff_vanishOnV)/CharacterDifferenceImage 分解/hmin
+   (three_le_card) は全て h46-generic で流用可。χ−χ̄ の A(M)-supported は
+   `inducedKernelFamily_conjDiff_support` の A(M) 版 (typePA ⊆ typePA0 の逆は不要 — S08 の
+   `mderivSharp` 系が (M′)^# 直で出す — conjDiff の supp ⊆ (M′)^# ∪ … 要確認、hdiffsuppχ の
+   supported 前提を A(M) 形で受ければよい)。
+2. bundled datum §12 版 (irrFamilyMemberDecomposition + 1) → 3. 特殊化 assembly。
