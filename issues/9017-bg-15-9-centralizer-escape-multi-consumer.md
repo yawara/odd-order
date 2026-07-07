@@ -540,3 +540,28 @@ assembly も実証明。**残 sorry = `hLift` 1 本** (build GREEN、commit 5d2c
 5. `hmin W (Q0<W) (W≤Q) (W M-normal) → Q ≤ W` ⟹ ∀y∈Q ∀x∈H ⁅x,y⁆∈Q0 ⟹ 特に MY x で結論。
 
 repo 機構は全 available (S-subgroup pattern、chiefFactor engine、hmin)。intricate だが bounded。
+
+## 2026-07-07 更新 #18 (lane b, /loop) — ✅ Keystone A (sAFL) landing → BG Thm 15.8 完全 sorry-free
+
+hLift の最後の sorry `hWnorm : (W.subgroupOf L).Normal` を実証明 (commit 943e55ed)。更新 #17 の
+port path をそのまま実装:
+
+- **H ◁ L** (Coq `nCMsKsbM`) を `L = M_σ ⊔ Ks` (hcomplMσ) で分割:
+  - `M_σ ≤ N(H)`: `M_σ' = ⁅M_σ,M_σ⁆ ⊆ Q ⊔ ⁅D,D⁆ ⊆ H ⊆ M_σ` ⟹ H◁M_σ。M_σ'⊆Q⊔D' は
+    `derivedInG_le_sup_of_normal` (S13) + hsup (Q⊔D=M_σ via hcomplD)、Q⊆H・⁅D,D⁆⊆H は
+    `chiefFactor_engine_of_inputs` の hDcomm (D' が Q̄ を中心化) + K⊆Q。最後に
+    `commutator_le_iff_le_normalizer` (Isaacs 4.3) で ⁅H,M_σ⁆⊆⁅M_σ,M_σ⁆=M_σ'⊆H から M_σ≤N(H)。
+  - `Ks ≤ N(H)`: **Ks が K を中心化** (K=M_σ⊓C(Ks) ⟹ K⊆C(Ks) ⟹ Ks⊆C(K) ⟹ s⁻¹ks=k) ので
+    共役 ⁅sxs⁻¹,k⁆ = s⁅x,k⁆s⁻¹ ∈ Q0 (s∈N(Q0))。sxs⁻¹∈M_σ (s∈N(M_σ) via le_normalizer_opiCoreInG)。
+- **W ◁ L** ⟸ H◁L + Q,Q₀ ◁L、共役恒等式 `⁅x, gyg⁻¹⁆ = g⁅g⁻¹xg,y⁆g⁻¹` (group tactic)。
+- `hmin W (Q0<W) (W≤Q) hWnorm → Q ≤ W` ⟹ 結論。
+
+**結果** (`#print axioms` で検証、いずれも `[propext, Classical.choice, Quot.sound]`、sorryAx 無):
+- `A_le_fittingInAmbient_of_typeP1_nonnil` (Keystone A / sAFL) ✅
+- `typeP_partner_sylow_uniquelyMaximal_bundle` (sAFL+sylQ+uniqQ) ✅
+- **`tau2_transfer_constraint` (BG Thm 15.8) 完全 sorry-free ✅**
+
+⟹ 9017 の 2 ゲートのうち **Thm 15.8 側が閉じた**。残 = **`centralizer_escape_final_local`
+(BG Cor 15.9)** の bare sorry 1 本 (S15_MF.lean:11061)。full build 3934 GREEN + AxiomsCheck OK。
+次: Cor 15.9 (Sibley package) に着手。Thm 15.8 が honest 化したので Cor 15.9 は Thm 15.8 を
+sorry-free に cite できる。
