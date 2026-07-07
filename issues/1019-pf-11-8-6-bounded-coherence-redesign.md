@@ -1196,3 +1196,32 @@ hortho_mem の型は内部構築 Dmem (証明項依存の imageFamily) に依存
 ### 残 (caseB end-to-end)
 ① bundled-datum §12 版 (直交本体の §12 化込み、中規模) ② hDeg counting (§9) ③ hdegcol
 (caseB uniform-qu) ④ 特殊化 assembly (①-③ 後は機械的)。
+
+## 🔬 update⁷³ (2026-07-08 lane-a /loop) — hortho §12 化の理路確定 (V-vanishing anchor の §12 版)
+
+### 依存点の切り分け (S08_CaseBHortho:44 の証明精読)
+`certainTypeR_imageSet_orthogonal_dadeOfDiff` の Sibley 依存は **`tau_apply_eq_zero_of_mem_ticVdiffV`
+1 点のみ** (S08_CaseBCoherence2:1046)。他は全て h46 + generic Dade で完結 (`key` =
+inner_smul_chiFam_eq_zero_of_diff_vanishOnV、CharacterDifferenceImage 分解、ticVdiff 機構)。
+
+### Sibley 版 vs §12 版の理路の違い
+- Sibley 版: `dade_H_eq_bot` (local triviality) → 「image は conjugatesOfSet(H^#) 外で 0」+
+  「V ∉ conjugates(K^G)」。**§12 では V^M ⊆ A₀ ゆえこの route は不成立** (v ∈ conjugates(A₀))。
+- **§12 理路 (新)**: v ∈ V ⊆ A₀ ⊆ dadeSupport → `dadeMap_apply`/`dadeValue_eq` で
+  τ(α)(v) = α(a) (a = v の Dade base point) → **a は A₀ = typePA ⊔ V^M の V^M-part に落ちる**
+  (typePA ↔ typePV の G-共役分離、W₁-part order 論法) → α(a) = 0 (α は typePA-supported)。
+
+### 必要な新補題 (§12 anchor の部品)
+1. **typePA/typePV 共役分離**: x ∈ typePA = (M')^#、y ∈ conjClassSetIn M (typePV) → ¬IsConj x y
+   (or: v ∈ V^M ∩ dadeSupport の base point は typePA に入らない)。§8 A₀ 設計
+   (`dadeSupportHypothesisData_typePA0_of_isTypeP1`) に既存の可能性 — 先に grep。
+2. dadeValue の base-point 特定 API (`mem_dadeSupport_iff` の witness + `dadeValue_eq`)。
+3. §12 anchor: `tau_apply_eq_zero_of_mem_ticVdiffV_typeP` — α typePA-supported →
+   τ(α) が (ticVdiff h46).V 上 0。**⚠ α の support 前提は typePA (A(M)) — composite の
+   χ−χ̄ diff は columnDiff_support_subset で typePA-supported ✓ 整合**。
+4. その上で `certainTypeR_imageSet_orthogonal_dadeOfDiff_typeP` (Sibley 版の証明 mirror、
+   anchor 差し替えのみ) → bundled datum §12 版 → 特殊化 assembly。
+
+### 代替 (先行可能): bundled datum を named のまま特殊化 assembly を先に組む
+hortho §12 化と独立に、caseB 特殊化 (irr-cut Finset 化 + pieces 束ね) は Dmem/Da/hortho を
+引数のまま組める — どちらを先にするかは次 iteration の自律判断 (上流優先なら anchor から)。
