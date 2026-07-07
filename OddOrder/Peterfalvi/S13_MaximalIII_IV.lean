@@ -1731,12 +1731,6 @@ noncomputable def certainTypeSet_isCoherent_A0 [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hyp : OddOrder.Peterfalvi.S12.Hypothesis M) (hodd : Odd (Nat.card G))
     [NeZero (Nat.card (hyp.toHypothesis46 hG hodd).W1)]
-    [Invertible (Nat.card ↥(hyp.toHypothesis46 hG hodd).K : ℂ)]
-    [Fintype ↥((hyp.toHypothesis46 hG hodd).W1 ⊔ (hyp.toHypothesis46 hG hodd).W2)]
-    [Invertible (Nat.card ↥((hyp.toHypothesis46 hG hodd).W1 ⊔
-      (hyp.toHypothesis46 hG hodd).W2) : ℂ)]
-    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff (hyp.toHypothesis46 hG hodd)).W]
-    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff (hyp.toHypothesis46 hG hodd)).W : ℂ)]
     {k : ((hyp.toHypothesis46 hG hodd).W2.subgroupOf
       ((hyp.toHypothesis46 hG hodd).W1 ⊔ (hyp.toHypothesis46 hG hodd).W2)) →* ℂˣ}
     (hk : k ≠ 1) :
