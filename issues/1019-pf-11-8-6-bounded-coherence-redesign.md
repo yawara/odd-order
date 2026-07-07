@@ -1135,3 +1135,19 @@ Dmem supply: conj-closed irr subfamily ⊆ inducedFamily の per-member ψ=0 dec
 - hDeg: |s| ≥ 3 counting (§9、genuine)
 - 特殊化: s = irr-cut (sOf_degreeSubfamily_isCoherent) + hμ_S1 (piece 4) + Da (piece 2) +
   Dmem (piece 1) を束ねた caseB 1-pair adjoin の end-to-end instantiation
+
+## 🔬 update⁷⁰ (2026-07-07 lane-a /loop) — ★ piece 5-hgen 内蔵化 LANDED (composite の構造 named は hDeg + hortho_mem のみに)
+
+### ✅ landed: hgen 内蔵 (commit 0a550775, sorry-free)
+adjoin_muColumnPair_of_irrFamily の hgen 引数 → hdeganchor (μ(1)=χ₁(1)) に置換、
+`zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration` (S07:208) で in-proof supply。
+
+### composite 入力の現況 (named 残の全リスト)
+- **hDeg** (2 < |s|): §9 counting — genuine 残
+- **Dmem/htau1Dmem**: `irrFamilyMemberDecomposition` (piece 1 landed) で supply 可 (htau1Dmem = rfl)
+- **Da/hDatau1**: `columnBreakDa` (piece 2 landed) で supply 可 (hDatau1 = rfl 系)
+- **hortho_mem**: §12 化未 (caseB_member_orthoDatum_columnBreak の mirror) — genuine 残
+- **hμ_S1/hμbar_S1**: `columnSum_inner_irr_member_eq_zero` (piece 4 landed) で supply 可
+- hdeganchor/hdiffasuppχ/hμZ: caseB uniform-qu 特殊化時に §9 facts から
+次 = **end-to-end caseB 特殊化 skeleton** (s = irr-cut、pieces を束ね、named = hDeg + hortho_mem
+の 2 つだけの assembly) or hortho_mem §12 化。
