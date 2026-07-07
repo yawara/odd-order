@@ -1400,3 +1400,41 @@ named (§9/caseB facts): hunif (∀ deg d) / hDeg (2 < |cut|) / hdne1 (d ≠ 1) 
   or named hμmem : ∀ k ≠ 0, columnSum (muColumnChar k) ∈ sOf(H0Cprime) として §9 fact 化)。
 - hstep: by_cases skip / adjoin (supply = update⁸⁰-⁸¹ 部品)。
 まず hμmem を named にして fold を先に閉じ、hμmem の実証明 (source kernel 計算) は後続。
+
+## 🔬 update⁸² (2026-07-08 lane-a /loop) — ★ chain step LANDED (fold 本体は薄い帰納のみに)
+
+### ✅ landed: `S13.caseB_chainStep` (commit 947e432e, sorry-free, 一発 green)
+S₁ (cut ∪ 既 pairs) + fresh column pair の adjoin。dual 相異は set-freshness から直接
+(heq ▸ hx、injective 不要)。named = hunif/hDeg/anchor + freshness (hnotin/hnotin') +
+hS₁mu (accumulator の μ-part 特徴付け)。
+
+### fold 本体の残り (最終 assembly、~80 行)
+coherentOfPairChainCover instantiation:
+- pair j := dite (j+1 < w2) ((columnSum (muColumnChar ⟨j+1,_⟩), conj)) (0,0)、N = w2−1
+- hcover = dichotomy (update⁷⁹) → pairSet 第 1 成分 (j := k−1、Fin cast)
+- hpairs = hμmem (named) + sOf_closedUnderConjugate
+- h0 = sOf_degreeSubfamily_isCoherent (coe_toFinset ▸)
+- hstep = by_cases skip (pairSet ⊆ pairUnion → union_eq cast) / caseB_chainStep
+  (帰納維持: hS₁sub/hS₁cut/hS₁mu は mem_pairUnion 分解、freshness = ¬skip + pair conj-閉、
+  pairUnion_succ_eq_union_pair で結論形合わせ)
+named 集約: hunif/hDeg/hdne1(不要化済)/hμmem/anchor。
+
+## 🔬 update⁸³ (2026-07-08 lane-a /loop) — ★★ (9.11) caseB chain fold LANDED: mixed corner が named §9 facts に帰着
+
+### ✅ landed: `S13.caseB_coherent_sOf_H0Cprime_of_mixed` (commit 31224b47, sorry-free, axiom-clean)
+coherentOfPairChainCover instantiation が閉じ、**caseB mixed corner の coherence
+`coherent(𝒮(H₀C′), A₀)` が end-to-end で導出可能に** (named §9 facts を除く)。
+- `caseBPair` (+ `_of_lt`/`PairSet_of_lt`): 全 nonzero column 列挙 (dite、代表系不要)。
+- hcover = dichotomy (update⁷⁹)、j := k−1 の Fin cast は `Fin.ext` + `change` defeq 展開
+  (omega は Fin.val ⟨…⟩ を還元しない — 教訓)。
+- hstep = by_cases skip (`Set.union_eq_left`) / `caseB_chainStep`。freshness 両成分は
+  accumulator conj-閉性 (cut conj-closed + pair conj-pair) から。**∃-witness は Prop-confined
+  have に閉じ込め** (Type-valued goal への ∃-elim は不可 — 一度 build error で確認)。
+
+### caseB (9.11) の残 = named §9/caseB facts のみ (全て Prop、fold は組立済)
+| named | 内容 | supply 見込み |
+|---|---|---|
+| **hμmem** | ∀ k ≠ 0, columnSum (muColumnChar k) ∈ 𝒮(H₀C′) | ★次 iteration: μ ∈ sOf(H0C) (source = HC-linear induce、C ⊆ ker) → `sOf_H0C_subset_sOf_H0Cprime`。S12_Section9Counts `muGrid_column_sum_mem_sOf_H0_and_reducible` (:256) の H0C 版 |
+| **hunif** | ∀ φ ∈ 𝒮(H₀C′), φ 1 = d | caseB uniform-qu: `forall_mem_sOf_H0C_apply_one_eq_qu` (S11:8211, caseB) の H0Cprime 版 |
+| **hDeg** | 2 < \|irr-cut\| | §9 counting ((9.8) count ≥ (p−1)u/… 系) — genuine |
+| anchor χ₁ | deg-d irr member | hDeg ⟹ cut nonempty から (or §9 (c) 直接) |
