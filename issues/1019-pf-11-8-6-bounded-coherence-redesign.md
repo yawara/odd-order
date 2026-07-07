@@ -746,3 +746,17 @@ docstring: 「ready for `coherent_subset_of_constant_degree` (the (9.11) base + 
 - 私の S12 base+R-datum は §11.8 向けに genuine だが lane-b と並行 (要 coordinate/一般化)。
 - **これは incremental lane-a landing でなく、cross-lane 構造判断** (S07 isometry の弱化 or 新 mixed subcoherent)。
   hub/lane-b coordination 案件。次: reducible R-datum は mixed subcoherent が要るので、それ以前に構造を要解決。
+
+## 🧭 HUB RULING (2026-07-07, update⁵⁵ への回答): S07 isometry 弱化 = Option A 確定 → issue 0099
+
+update⁵⁵ の両論点を hub が調査・裁定した (workflow wf_4f8e7eca、Coq trace + Lean census):
+
+1. **② 構造ブロッカー → 裁定 issue 0099**: claim は**正しい** (Coq subcoherent の isometry は
+   `'Z[S, L^#]` のみ、PFsection5.v:488)。`tau_isometry_diff` (S07_Coherence.lean:1777 — 位置は
+   S07_Subcoherent でなくこちら) を **zSupportedSpan 形へ in-place 弱化** (equal-degree 差分形では
+   不足 — weighted combo 要)。**owner = b** (6 file 中 5 が b 所有)、blast radius ~15-20 宣言・機械的。
+   弱 field は全 instantiation site が既存 brick で無条件 discharge 可 (mixed 含む)。landing 後、
+   (9.11) mixed route は S07.Hypothesis を mixed family で組める。
+2. **① a/b 並行構築 → 両方 keep**: S12 `inducedFamily_degreeSubfamily_isCoherent` (a) と S15
+   `sSetIrrDeg_subcoherent` (b) は family が異なり両方 genuine (成果保全)。family-parameterized
+   一般化は optional follow-up。
