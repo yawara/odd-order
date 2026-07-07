@@ -1939,4 +1939,19 @@ noncomputable def Hypothesis.columnBreakDa [Finite G]
   exact OddOrder.Peterfalvi.S06.certainTypeDecompositionDa (hyp.toHypothesis46 hG hG.odd)
     hχ₂ hdeg hsupp1 htau1_mema hχψ hχbarψ
 
+open scoped FiniteInduce in
+/-- **A certain-type column sum is a virtual character** (`hμZ` input of the (9.11) column-pair
+adjunction): `columnSum χ₂ = ∑ᵢ μ_{iχ₂} ∈ ℤ[Irr M]` — a sum of irreducible characters. -/
+theorem Hypothesis.columnSum_mem_ZIrr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.toHypothesis46 hG hG.odd).W1)]
+    (χ₂ : ((hyp.toHypothesis46 hG hG.odd).W2.subgroupOf
+      ((hyp.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.toHypothesis46 hG hG.odd).W2)) →* ℂˣ) :
+    OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂ ∈ ZIrr ↥M := by
+  haveI := hyp.finiteG
+  classical
+  rw [OddOrder.Peterfalvi.S06.columnSum_def]
+  exact Submodule.sum_mem _
+    (fun i _ => (((hyp.toHypothesis46 hG hG.odd).columnFamily χ₂).mu i).mem_ZIrr)
+
 end OddOrder.Peterfalvi.S12

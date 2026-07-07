@@ -1151,3 +1151,113 @@ adjoin_muColumnPair_of_irrFamily の hgen 引数 → hdeganchor (μ(1)=χ₁(1))
 - hdeganchor/hdiffasuppχ/hμZ: caseB uniform-qu 特殊化時に §9 facts から
 次 = **end-to-end caseB 特殊化 skeleton** (s = irr-cut、pieces を束ね、named = hDeg + hortho_mem
 の 2 つだけの assembly) or hortho_mem §12 化。
+
+## 🔬 update⁷¹ (2026-07-08 lane-a /loop) — 節目 full build green + caseB 特殊化の設計 map (handoff)
+
+### ✅ full build 検証 (commit 群 0865d818〜0a550775 の節目)
+lake build OddOrder green、2m07s、sorry warnings 84 (regression なし; 直近の (9.11) 追加は全て
+sorry-free)。
+
+### caseB end-to-end 特殊化 `caseB_adjoinOneColumnPair` の設計 map (次 iteration で build)
+target: s = irr-cut (`{φ ∈ sOf(H0Cprime) | irr ∧ deg d}`) + 1 column pair の adjoin を
+`adjoin_muColumnPair_of_irrFamily` の特殊化として。
+- **Finset 化**: irr-cut は finite (⊆ inducedFamily finite via sOf_subset_SOf + subset_bot +
+  inducedKernelFamily_finite) → `hfin.toFinset`、coercion は `Set.Finite.coe_toFinset`。
+- **hS₁**: `sOf_degreeSubfamily_isCoherent` (landed) — Finset coercion 越しに family 一致。
+- **hsub**: irr-cut ⊆ sOf ⊆ SOf = IKF ⊆ IKF ⊥ = inducedFamily (landed 鎖)。
+- **hconjS**: sOf_closedUnderConjugate + irr.conj + deg conj (star_natCast) — ~10 行。
+- **hdegmem**: 全 member deg d (cut 定義) + anchor も deg d → x 1 = χ₁ 1。
+- **hμ_S1/hμbar_S1**: `columnSum_inner_irr_member_eq_zero` (piece 4) — x ∈ cut → IKF member
+  (sOf_subset_SOf + SOf_eq) + irr。params/hmu は S13.Hypothesis の params/params_mu_eq。
+- **Dmem** = `irrFamilyMemberDecomposition` (piece 1)、htau1Dmem = rfl。
+- **Da** = `columnBreakDa` (piece 2; anchor χ₁ ∈ IKF は同鎖)、hDatau1 = rfl。
+- **残 named (真の外部入力)**: ①hDeg (2 < |irr-cut|、§9 counting)、②hortho_mem (§12 化未、
+  caseB_member_orthoDatum_columnBreak mirror)、③hdegcol (columnSum χ₂ 1 = (d:ℂ)、caseB
+  uniform-qu の §9 fact)、④hμZ (columnSum ∈ ZIrr — Σ irr で組立可、小)、⑤hdiffasuppχ
+  ((μ−χ₁).support ⊆ A0 — μ ∈ inducedFamily [muGrid_column_sum_mem_inducedFamily + world-join、
+  hdk1 = nontrivial column deg ≠ 1 前提] + scaledDiff、caseB では ③ から)。
+④⑤は特殊化内で supply 可能見込み (⑤は μ ∈ IKF ⊥ 経由の scaledDiff_support、③から deg 一致)。
+∴ 特殊化後の真の残 = ①hDeg counting + ②hortho_mem + ③hdegcol (全て §9/caseB facts)。
+
+## 🔬 update⁷² (2026-07-08 lane-a /loop) — caseB 特殊化 supply ×3 landed + bundled-datum 設計確定
+
+### ✅ landed (commit 7648bbe3, sorry-free ×3, axiom-clean)
+- `columnSum_mem_ZIrr` (S12_Section9Counts) — composite hμZ 供給
+- `irrCut_finite` / `irrCut_conjClosed` (S13) — Finset 化 + hconjS 供給
+
+### ★ 設計確定: hortho_mem は bundled-datum 方式で
+hortho_mem の型は内部構築 Dmem (証明項依存の imageFamily) に依存 → 直接 named 化不可。
+**S08_CaseBEnumeration の `caseB_member_orthoDatum_columnBreak` パターン** (Sibley world) の
+§12 mirror = 「per-member subtype datum: { D : CharacterPsiDecomposition τ x 0 //
+(D.imageFamily ⊥ certainTypeR …) ∧ D.tau1 x = hS₁.extension x }」を作るのが正解。
+その §12 版の中身は irrFamilyMemberDecomposition (piece 1) + **R(irr) ⊥ R(μ) の直交本体**
+(certainTypeR_imageSet_orthogonal_dadeOfDiff の Sibley 前提 [sharpImage H] を typePA0 に
+読み替え) — 直交本体の §12 化が真の残 work (V-vanishing 機構の A 依存度を精査)。
+### 残 (caseB end-to-end)
+① bundled-datum §12 版 (直交本体の §12 化込み、中規模) ② hDeg counting (§9) ③ hdegcol
+(caseB uniform-qu) ④ 特殊化 assembly (①-③ 後は機械的)。
+
+## 🔬 update⁷³ (2026-07-08 lane-a /loop) — hortho §12 化の理路確定 (V-vanishing anchor の §12 版)
+
+### 依存点の切り分け (S08_CaseBHortho:44 の証明精読)
+`certainTypeR_imageSet_orthogonal_dadeOfDiff` の Sibley 依存は **`tau_apply_eq_zero_of_mem_ticVdiffV`
+1 点のみ** (S08_CaseBCoherence2:1046)。他は全て h46 + generic Dade で完結 (`key` =
+inner_smul_chiFam_eq_zero_of_diff_vanishOnV、CharacterDifferenceImage 分解、ticVdiff 機構)。
+
+### Sibley 版 vs §12 版の理路の違い
+- Sibley 版: `dade_H_eq_bot` (local triviality) → 「image は conjugatesOfSet(H^#) 外で 0」+
+  「V ∉ conjugates(K^G)」。**§12 では V^M ⊆ A₀ ゆえこの route は不成立** (v ∈ conjugates(A₀))。
+- **§12 理路 (新)**: v ∈ V ⊆ A₀ ⊆ dadeSupport → `dadeMap_apply`/`dadeValue_eq` で
+  τ(α)(v) = α(a) (a = v の Dade base point) → **a は A₀ = typePA ⊔ V^M の V^M-part に落ちる**
+  (typePA ↔ typePV の G-共役分離、W₁-part order 論法) → α(a) = 0 (α は typePA-supported)。
+
+### 必要な新補題 (§12 anchor の部品)
+1. **typePA/typePV 共役分離**: x ∈ typePA = (M')^#、y ∈ conjClassSetIn M (typePV) → ¬IsConj x y
+   (or: v ∈ V^M ∩ dadeSupport の base point は typePA に入らない)。§8 A₀ 設計
+   (`dadeSupportHypothesisData_typePA0_of_isTypeP1`) に既存の可能性 — 先に grep。
+2. dadeValue の base-point 特定 API (`mem_dadeSupport_iff` の witness + `dadeValue_eq`)。
+3. §12 anchor: `tau_apply_eq_zero_of_mem_ticVdiffV_typeP` — α typePA-supported →
+   τ(α) が (ticVdiff h46).V 上 0。**⚠ α の support 前提は typePA (A(M)) — composite の
+   χ−χ̄ diff は columnDiff_support_subset で typePA-supported ✓ 整合**。
+4. その上で `certainTypeR_imageSet_orthogonal_dadeOfDiff_typeP` (Sibley 版の証明 mirror、
+   anchor 差し替えのみ) → bundled datum §12 版 → 特殊化 assembly。
+
+### 代替 (先行可能): bundled datum を named のまま特殊化 assembly を先に組む
+hortho §12 化と独立に、caseB 特殊化 (irr-cut Finset 化 + pieces 束ね) は Dmem/Da/hortho を
+引数のまま組める — どちらを先にするかは次 iteration の自律判断 (上流優先なら anchor から)。
+
+## 🔬 update⁷⁴ (2026-07-08 lane-a /loop) — ★ §12 V-vanishing anchor LANDED (hortho 化の核心突破)
+
+### ✅ landed: `S13.tau_apply_eq_zero_of_mem_typePV` (commit 8467027c, sorry-free, 一発 green)
+A(M)-supported α の §12 Dade image が ticVdiff.V 上 0。**Sibley と別理路で分離補題不要**:
+- ticVdiff.V = typePV M は defeq (tic literal projection、`hvPV := hv` 直通)
+- v ∈ V^M ⊆ A₀ = Dade base point → `dadeValue_eq` (witness 供給形: a=v、h=1∈H_a、conj=1) で
+  α^τ(v) = α(v) → v ∉ M′ (`typePData_typePV_not_mem_derived`) + α は (M′)^#-supported → 0。
+
+### 残 (hortho §12 化の続き、機械化された)
+1. **`certainTypeR_imageSet_orthogonal_dadeOfDiff_typeP`**: S08_CaseBHortho:44 の証明 mirror —
+   唯一の Sibley 依存 (`tau_apply_eq_zero_of_mem_ticVdiffV`) を本 anchor に差し替え。
+   `key` (inner_smul_chiFam_eq_zero_of_diff_vanishOnV)/CharacterDifferenceImage 分解/hmin
+   (three_le_card) は全て h46-generic で流用可。χ−χ̄ の A(M)-supported は
+   `inducedKernelFamily_conjDiff_support` の A(M) 版 (typePA ⊆ typePA0 の逆は不要 — S08 の
+   `mderivSharp` 系が (M′)^# 直で出す — conjDiff の supp ⊆ (M′)^# ∪ … 要確認、hdiffsuppχ の
+   supported 前提を A(M) 形で受ければよい)。
+2. bundled datum §12 版 (irrFamilyMemberDecomposition + 1) → 3. 特殊化 assembly。
+
+## 🔬 update⁷⁵ (2026-07-08 lane-a /loop) — ★★ hortho §12 化の本体 LANDED (R(μ_j) ⊥ R(χ))
+
+### ✅ landed: `S13.certainTypeR_imageSet_orthogonal_dadeOfDiff_typeP` (commit 90176fb9, sorry-free, 一発 green)
+S08_CaseBHortho:44 の完全 mirror — 唯一の Sibley 依存を §12 anchor (update⁷⁴) に差し替え、
+disjointness machine / R(χ) 抽象化 / 4-case は h46-generic 流用。conj-diff は A(M) + A₀ の
+2-supported 引数。
+
+### (9.11) mixed corner の残り (全部品が見えた)
+1. **bundled datum §12 版**: irrFamilyMemberDecomposition (piece 1) + 本 R⊥R を束ね、
+   「{ D // (D.imageFamily ⊥ certainTypeR …) ∧ D.tau1 x = ext x }」per-member subtype を返す
+   (S08_CaseBEnumeration の caseB_member_orthoDatum_columnBreak mirror)。Dmem の imageFamily =
+   dadeOrthonormalCharacterImageFamilyOfDiff (memberExtensionDecomposition 経由) — その imageSet
+   と本 R⊥R の β-side family の一致 (同じ dadeOfDiff、A₀ 形) の確認が接続点。向き注意:
+   composite の hortho_mem は (Dmem).Orthogonal (Da) — Da.imageFamily = certainTypeR (columnBreakDa
+   経由、transport 済) — 向きの swap は conj 対称 (Orthogonal の def と inner_conj_symm)。
+2. **特殊化 assembly** (irr-cut Finset 化 + 全 pieces 束ね、named 残 = hDeg + hdegcol)。
+3. hDeg counting (§9、genuine)。
