@@ -983,3 +983,22 @@ sOf(H0Cprime) reducible member → certainTypeSet membership の合成で残る�
 (sOf_subset_SOf + SOf_eq) → per-member 上記合成で ⊆ certainTypeSet → `certainTypeSet_isCoherent_A0`
 + `isCoherent_of_subset` (witness = sOf の μ̄−μ、conjDiff 系 landed パターン)。
 mixed corner (③ hDeg counting / ④ hgen) は別途。次 iteration = S13 assembly。
+
+## 🔬 update⁶⁴ (2026-07-07 lane-a /loop) — ★★ (9.11) all-reducible corner CLOSED (end-to-end sorry-free)
+
+### ✅ landed: `S13.coherent_sOf_H0Cprime_of_allReducible` (commit 2343f0f7, axiom-clean)
+(9.9)(c) corner: `𝒮(H₀C′)` 全 member reducible ⟹ `IsCoherent hyp.base.tau (sOf … H0Cprime) A₀`。
+一発 green。組立 = certainTypeSet_isCoherent_A0 (基準列 muColumnChar kref、ne_one) → per-member
+membership (sOf→SOf→inducedKernelFamily→reducible 合成、chief = exists_chiefFactorData.choose、
+hw2 = params.w2_prime) → isCoherent_of_subset (witness ζ̄−ζ)。
+
+### (9.11) base 側の到達状況 (両 corner 完備)
+- **irr seed あり**: `sOf_degreeSubfamily_isCoherent` (update⁵⁸) — deg-d 既約 cut coherence。
+- **all-reducible**: 本 lemma。
+- **残る (9.11) 本体 = mixed corner の induction**: irr-cut base に μ-column pairs を
+  `xAdjoinStepW_k` で adjoin する chain — per-pair 入力 (③ hDeg = 2·deg·anchor < Σdeg²/mc の
+  counting、④ hgen = span generation、Da = certainTypeDecompositionDa/seedDecomposition、
+  hortho_mem = certainTypeR 直交系) の instantiation + fold (coherentOfPairChainCover)。
+  ここが Coq (9.11.1)-(9.11.8) の本体 (norm-chain wlog 込み) で、caseB (uniform-qu) を先に
+  (全 member 同 deg で hDeg 計算が単純)、非 Galois caseA (qa/qu mixed) を後に。
+次 iteration = mixed corner の 1-pair adjoin instantiation (caseB 形から)。
