@@ -217,6 +217,43 @@ theorem TypePData.fitting_inf_U_eq_bot {M : Subgroup G} (data : TypePData M) :
   rw [Subgroup.mem_bot]
   exact Subtype.ext_iff.mp hmem
 
+/-- **Peterfalvi (8.4.d) / Coq `PFsection8.typeP_cent_compl`**: `C_{M'}(W₁) = W₂` — the centralizer
+in the derived subgroup of the *whole* cyclic factor `W₁` (not merely of a single `k ∈ W₁#`) is
+exactly the dual cyclic factor `W₂`.
+
+Both inclusions are immediate from the datum, no generator needed:
+* `⊆`: pick any `g ∈ W₁#` (`W₁` nontrivial); `C(W₁) ≤ C({g})` by monotonicity, and
+  `M' ⊓ C({g}) = W₂` is the `centralizer_W1` field.
+* `⊇`: `W₂ ≤ H ≤ M'` (`W2_le`/`H_le`) and `W₂ ≤ C(W₁)` because `W₁, W₂ ≤ W` with `W` cyclic hence
+  abelian, so the two factors commute.
+
+This is the reusable form consumed by the type-`P` *pairing* reconciliation: the partner `T` of `M`
+(sharing the cyclic `W = W₁ × W₂`) carries the swapped law `C_{T'}(W₂) = W₁`, which is exactly this
+lemma applied to `T`'s type-`P` datum with the roles of `W₁`, `W₂` exchanged. -/
+theorem TypePData.derivedInG_inf_centralizer_W1_eq {M : Subgroup G} (data : TypePData M) :
+    derivedInG M ⊓ Subgroup.centralizer (data.W1 : Set G) = data.W2 := by
+  refine le_antisymm ?_ ?_
+  · -- `⊆`: any nontrivial `g ∈ W₁` gives `C(W₁) ≤ C({g})`, then the `centralizer_W1` field.
+    obtain ⟨g, hgW1, hgne⟩ : ∃ g ∈ data.W1, g ≠ 1 := by
+      haveI : Nontrivial ↥data.W1 := (Subgroup.nontrivial_iff_ne_bot _).mpr data.W1_nontrivial
+      obtain ⟨y, hy⟩ := exists_ne (1 : ↥data.W1)
+      exact ⟨y, y.2, fun h => hy (Subtype.ext h)⟩
+    have hle : Subgroup.centralizer (data.W1 : Set G) ≤ Subgroup.centralizer ({g} : Set G) :=
+      Subgroup.centralizer_le (Set.singleton_subset_iff.mpr hgW1)
+    calc derivedInG M ⊓ Subgroup.centralizer (data.W1 : Set G)
+        ≤ derivedInG M ⊓ Subgroup.centralizer ({g} : Set G) := inf_le_inf_left _ hle
+      _ = data.W2 := data.centralizer_W1 g hgW1 hgne
+  · -- `⊇`: `W₂ ≤ M'` and `W₂ ≤ C(W₁)` (the two cyclic factors of the abelian `W` commute).
+    refine le_inf (le_trans data.W2_le (le_trans inf_le_left data.H_le)) ?_
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff]
+    intro h hh
+    have hxW : x ∈ data.W := data.W_eq ▸ Subgroup.mem_sup_right hx
+    have hhW : h ∈ data.W := data.W_eq ▸ Subgroup.mem_sup_left hh
+    haveI := data.W_cyclic
+    letI : CommGroup ↥data.W := IsCyclic.commGroup
+    exact congrArg Subtype.val (mul_comm (⟨h, hhW⟩ : ↥data.W) ⟨x, hxW⟩)
+
 /-- Common type II--IV hypotheses from Peterfalvi (8.6). -/
 def TypePNontrivialCore (M : Subgroup G) (data : TypePData M) : Prop :=
   data.U ≠ ⊥ ∧ (Nat.card ↥data.W1).Prime ∧
