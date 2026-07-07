@@ -1686,6 +1686,97 @@ noncomputable def isCoherent_of_subset {L : Type*} [Group L] [Fintype L] [Fintyp
   extension_mem_ZIrr := fun a ha =>
     h.extension_mem_ZIrr a (Submodule.span_mono hsub ha)
 
+/-- **Coherence transports along a support change that shrinks the supported lattice**
+(the support-side companion of `isCoherent_of_subset`: same family `S`, different support set).
+If `S` is coherent on `A₁` and every `A₂`-supported lattice element is already `A₁`-supported
+(`ℤ[S, A₂] ⊆ ℤ[S, A₁]`), then `S` is coherent on `A₂` with the *same* extension — only the
+`nonzero` witness must be re-supplied on `A₂`.
+
+The (9.11)/(6.8) use: the certain-type coherence (4.9)(b) lives on `A(M)`
+(`supportInSubgroup (typePA M) M`) while the §10–§13 coherence interface uses
+`A₀(M) ⊇ A(M)`; the column characters `μ_j` vanish off `A ∪ {1}` and `1 ∉ A₀`, so an
+`A₀`-supported `ℤ[𝒯]`-combination is automatically `A`-supported and the lattices agree. -/
+noncomputable def isCoherent_of_supportedSpan_le {L : Type*} [Group L] [Fintype L] [Fintype G]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    {S : Set (ClassFunction L ℂ)} {A₁ A₂ : Set L}
+    (h : OddOrder.Peterfalvi.S07.IsCoherent τ S A₁)
+    (hle : OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) S A₂ ⊆
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) S A₁)
+    (hwit : ∃ φ : ClassFunction L ℂ,
+      φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) S A₂ ∧ φ ≠ 0) :
+    OddOrder.Peterfalvi.S07.IsCoherent τ S A₂ where
+  nonzero := hwit
+  extension := h.extension
+  extension_inner_eq := h.extension_inner_eq
+  extends_on_supported := fun a ha => h.extends_on_supported a (hle ha)
+  extension_mem_ZIrr := h.extension_mem_ZIrr
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(4.9)(b) certain-type coherence, §10 interface form**: the certain-type column set
+`𝒯 = certainTypeSet (hyp.toHypothesis46 …) k` is coherent for the §10 Dade map `hyp.tau` on the
+§10 support `A₀(M)`.  This is the reducible-μ-side coherence input of the (9.11) `caseB`/
+all-reducible assembly (issue 1019 update⁶⁰) — the §12-world analogue of the (6.8) case-(B)
+`SibleyDadeHypothesis.certainTypeSet_isCoherent_tau`.
+
+No `congrMap` seam is needed: under `toHypothesis46` the certain-type Dade map
+`dadeIntegralCharacterMap h46.dade0 h46.tau` is *definitionally* `hyp.tau`
+(`dade0 := hyp.dadeData.dade` and `tau := ….fullDadeIsometryData hyp.hconj` are the very
+components of `S12.Hypothesis.tau`).  The support moves from `A(M)` to `A₀(M) = A(M) ∪ V^M` by
+`isCoherent_of_supportedSpan_le`: every column `μ_j` vanishes off `A(M) ∪ {1}`
+(`columnSum_support_subset`), so an `A₀`-supported `ℤ[𝒯]`-combination is automatically
+`A(M)`-supported (`1 ∉ A₀`, `one_notMem_A0`); the `A₀`-witness is the `A(M)`-supported
+`μ_{k⁻¹} − μ_k` of `certainType_nonzero`, enlarged along `A(M) ⊆ A₀(M)`. -/
+noncomputable def certainTypeSet_isCoherent_A0 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : OddOrder.Peterfalvi.S12.Hypothesis M) (hodd : Odd (Nat.card G))
+    [NeZero (Nat.card (hyp.toHypothesis46 hG hodd).W1)]
+    [Invertible (Nat.card ↥(hyp.toHypothesis46 hG hodd).K : ℂ)]
+    [Fintype ↥((hyp.toHypothesis46 hG hodd).W1 ⊔ (hyp.toHypothesis46 hG hodd).W2)]
+    [Invertible (Nat.card ↥((hyp.toHypothesis46 hG hodd).W1 ⊔
+      (hyp.toHypothesis46 hG hodd).W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff (hyp.toHypothesis46 hG hodd)).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff (hyp.toHypothesis46 hG hodd)).W : ℂ)]
+    {k : ((hyp.toHypothesis46 hG hodd).W2.subgroupOf
+      ((hyp.toHypothesis46 hG hodd).W1 ⊔ (hyp.toHypothesis46 hG hodd).W2)) →* ℂˣ}
+    (hk : k ≠ 1) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (OddOrder.Peterfalvi.S06.certainTypeSet (hyp.toHypothesis46 hG hodd) k) hyp.A0 := by
+  haveI := hyp.finiteG
+  classical
+  -- (4.9)(b) on `A(M)`; the certain-type Dade map is definitionally `hyp.tau`
+  have hbase : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (OddOrder.Peterfalvi.S06.certainTypeSet (hyp.toHypothesis46 hG hodd) k)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.GroupTheory.typePA M hyp.typeP) M) :=
+    OddOrder.Peterfalvi.S06.certainType_isCoherent (hyp.toHypothesis46 hG hodd) hk
+  refine isCoherent_of_supportedSpan_le hbase ?_ ?_
+  · -- `ℤ[𝒯, A₀] ⊆ ℤ[𝒯, A(M)]`: members vanish off `A(M) ∪ {1}` and `1 ∉ A₀`
+    rintro φ ⟨hφspan, hφsupp⟩
+    refine ⟨hφspan, ?_⟩
+    have hsupp1 : φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.GroupTheory.typePA M hyp.typeP) M ∪ {1} := by
+      have hle : OddOrder.Peterfalvi.S07.zSpan (L := ↥M)
+          (OddOrder.Peterfalvi.S06.certainTypeSet (hyp.toHypothesis46 hG hodd) k) ≤
+          (ClassFunction.supportedSubmodule (G := ↥M) (k := ℂ)
+            (OddOrder.Peterfalvi.S04.supportInSubgroup
+              (OddOrder.GroupTheory.typePA M hyp.typeP) M ∪ {1})).restrictScalars ℤ := by
+        refine Submodule.span_le.mpr (fun s hs => ?_)
+        obtain ⟨χ₂, hχ₂, -, rfl⟩ := hs
+        simpa only [Submodule.restrictScalars_mem, ClassFunction.mem_supportedSubmodule]
+          using OddOrder.Peterfalvi.S06.columnSum_support_subset
+            (hyp.toHypothesis46 hG hodd) hχ₂
+      exact (ClassFunction.mem_supportedSubmodule).mp (hle hφspan)
+    intro x hx
+    rcases hsupp1 hx with hA | h1
+    · exact hA
+    · exact absurd (h1 ▸ hφsupp hx) hyp.one_notMem_A0
+  · -- the `A₀`-witness: `μ_{k⁻¹} − μ_k`, `A(M)`-supported ⊆ `A₀`-supported
+    obtain ⟨φ, ⟨hφspan, hφsupp⟩, hφne⟩ :=
+      OddOrder.Peterfalvi.S06.certainType_nonzero (hyp.toHypothesis46 hG hodd) hk
+    exact ⟨φ, ⟨hφspan, hφsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
+      Set.subset_union_left)⟩, hφne⟩
+
 /-- **Peterfalvi (11.8): `S(HC)` is coherent** (sorry-free).  `S(HC) = SOf HC` is the subfamily of
 the degree-`w₁` family `S(M'')` cut out by the *larger* kernel condition (`M'' ≤ HC`,
 `secondDerived_le_HC`, so `S(HC) ⊆ S(M'')` by kernel-antitonicity), so it inherits the coherent
