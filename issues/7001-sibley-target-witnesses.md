@@ -68,6 +68,35 @@ landing に gate されるので、段階的に close 可。
 3. `sibleyTarget_S` (13.2.d, lane c) は **vestigial 判定済 (closed/1004)** — 完成させず、
    s16_w4_char_cascade.md の「HUB 裁定 (2026-07-02)」節の W-side restate/retire 判定に従う。
 
+## ✅ 2032 型 soundness 監査 COMPLETE (2026-07-07, lane-a /loop) — 裁定②の必須監査、判定 = **UNSOUND**
+
+裁定②の「着工前 soundness 監査」を実施し、**`sibleyTarget_H0C` は unsound (= 偽 field 要求、frobI と
+同一 failure mode)** と確定。**この witness の `sorry` は埋めてはならない。**
+
+### 監査結果 (三重確証)
+1. **`SibleyDadeHypothesis` (S08:3234) の TI field は無条件**: `H_sharp_ti : IsTISubset (sharpImage H) L`
+   (S08:3248) と `dade_H_eq_bot : ∀ a, dade.H a = ⊥` (S08:3258) は **top-level field** = (c1) Frobenius /
+   (c2) Hypothesis46 の**どちらの枝でも必須**。∴ (6.8) は常に `H^#` TI in `G` を要求。裁定②が想定した
+   「Hypothesis46 (c2) 枝なら TI 回避」は**不可** — c2 でも `H_sharp_ti` は必須 field。
+2. **S(H₀C') の Sibley kernel `H = HC` は非TI**: `HC ⊆ F(M)` (nilpotent Hall)、`HC^#` は G で TI でない
+   (centralizer が M を escape)。∴ `H_sharp_ti`・`dade_H_eq_bot` はともに偽 → witness unprovable。
+   **frobI (2032) と完全に同一** (非TI witness → 偽 `dade_H_eq_bot` → unprovable; docstring の
+   「(6.8) 適用可」は overclaim)。
+3. **★ smoking gun — Coq が (6.8) を使わない**: `Ptype_core_coherence` (Pf (9.11), `PFsection9.v:1484-1571`)
+   は coherent(S_ H0C') を **(6.8) 抜きの 8-step induction** で証明。Galois 枝 = `uniform_degree_coherence`
+   (uniform-qu 真); 非Galois 枝 = degree-`qa` subfamily を filter → `uniform_degree_coherence` (qa uniform) →
+   conjugate-pair を 1 組ずつ帰納的に extend し maximality に矛盾。**(6.8) が適用可なら Gonthier et al. は
+   短い (6.8) route を採ったはず** — 採らなかった = (6.8) が S(H₀C') に適用不可の決定的証拠。
+
+### ⟹ honest route (裁定更新) = Coq (9.11) 8-step induction の port
+- **`sibleyTarget_H0C` は撤回** (fill しない; sorry は wiring type-check のためだけに残置)。
+- **`coherent_H0C_commutator` は `cohereOfSibleyTarget` cite を捨て**、Coq `Ptype_core_coherence` の
+  induction を Lean に port して再証明する (Galois/非Galois split + `uniform_degree_coherence` on
+  uniform subfamilies + coherence-extension induction)。**次 lane-a iteration の本体作業**。
+- in-code に警告注記済 (S11 `sibleyTarget_H0C` / `coherent_H0C_commutator` docstring、本 commit)。
+- 監査自体が裁定②の mandated deliverable ゆえ完了扱い。checklist の `sibleyTarget_H0C` は
+  **「fill」でなく「induction port で置換」** に読み替え。
+
 ## 参照
 
 - `notes/meta/ft_path_policy.md` §4(endpoint A)

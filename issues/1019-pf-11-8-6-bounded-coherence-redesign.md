@@ -420,3 +420,90 @@ capstone `coherent_SOf_H0C_of_glued` の仮説パラメータ (供給すれば c
 hgen (case-A §9 uniform 構造 = qa/C-kernel 未確定) / hY (§14 (9.11) core-coherence) /
 ν・hmixed・hDτ (§14/BG§15 glue)。これらは lane b/c 領域 or §9 深部との協調が必要 (単独 ungated build 不可)。
 次 iteration は §9 case-A 構造 (qa が C を kill するか) か §14 gate 協調に降りる — いずれも deep frontier。
+
+## 🔬 update⁴⁴ (2026-07-07 lane-a /loop) — ★ hY gate の honest route 確定 + hgen-uniform の非健全性を Coq で決着
+
+残 gate のうち **hY (coherent(sOf(H0C))) の honest route を Coq PFsection9/11 精読で確定**。加えて hgen の
+uniform-degree route が case-A で非健全であることを Coq S2 構造で裏取り。両者は同一の Coq 権威に帰着:
+**Peterfalvi は S₂=S(H₀C) 側 coherence を uniform-degree で作らず、(9.11) core-coherence の 8-step
+induction で作る**。
+
+### ① hY = coherent(sOf(H0C)) の honest route = **(9.11) 8-step induction** (≠ sibleyTarget shortcut)
+- **Coq `cohS2` (PFsection11.v:660-664)**: `S2 = seqIndD HU M H H0C` (= sOf(H0C)) の coherence は
+  `subset_coherent (Ptype_core_coherence)` = **(9.11) core-coherence** 経由。uniform-degree は使わない
+  (uniform は cohS1 = S(HC) 専用、`uniform_degree_coherence`, PFsection11.v:607-611)。
+- **`Ptype_core_coherence` (Pf (9.11), PFsection9.v:1484-1571)** = coherent(S_ H0C')。証明は **(6.8) 抜きの
+  8-step induction**: Galois → `uniform_degree_coherence` (S(H₀C') uniform-qu); 非Galois → degree-`qa`
+  subfamily を filter → `uniform_degree_coherence` (qa uniform) → conjugate-pair を 1 組ずつ帰納 extend し
+  maximality 矛盾。
+- ∴ Lean `S11.coherent_H0C_commutator` の現 `cohereOfSibleyTarget (sibleyTarget_H0C)` wiring は **honest でない**
+  (下記②)。**honest hY = この 8-step induction を Lean に port** (次 iteration の本体作業)。
+
+### ② ★ `sibleyTarget_H0C` は UNSOUND — 7001 mandated 監査 COMPLETE (verdict UNSOUND, frobI-parallel)
+7001 裁定②の必須 soundness 監査を実施 → **偽 field 要求で unprovable** と airtight 確定 (詳細 = issue 7001
+「2032 型 soundness 監査 COMPLETE」節):
+- `SibleyDadeHypothesis` (S08:3234) の `H_sharp_ti` (S08:3248) + `dade_H_eq_bot` (S08:3258) は **無条件 field**
+  = (c1)/(c2) 両枝で `H^#` TI in `G` 必須。S(H₀C') の Sibley kernel `HC ⊆ F(M)` (nilpotent Hall) は非TI ⟹
+  両 field 偽 ⟹ unprovable (frobI/2032 と同一)。
+- **∴ `sibleyTarget_H0C` の sorry は fill しない**。in-code に⚠注記済 (本 commit、S11 docstring 2 箇所)。
+
+### ③ hgen-uniform も case-A で非健全 (①と同根)
+- capstone `coherent_SOf_H0C_of_glued` の `hgen` を旧 `hgen_of_S2_uniform_degree` (S₂ uniform-qu) で供給する
+  route は **case-A で偽**: Coq S2 の**既約**成員が uniform-qu である保証は無い (Coq は `memS2red`
+  PFsection11.v:684 で S2 の**可約**成員のみ `mu_j` deg qu と同定; 既約は (9.11) induction で扱う)。
+  非Galois で degree-qa 既約が存在し得る (9.8.d)。
+- ∴ hgen も uniform-degree でなく **①の core-coherence route と整合する generation** で供給すべき
+  (D-set で mixed 項を honest に吸収、uniform 非依存)。case-B 限定なら uniform (5.11:8211) で供給可 (部分的)。
+
+### ⟹ 次 lane-a iteration = **(9.11) 8-step induction の Lean port** (honest hY の本体)
+- port の第一 ingredient (Coq PFsection9.v:1549-1551 mirror): S(H₀C') の uniform subfamily
+  (Galois 全体 / 非Galois は degree-qa filter) の coherence を Lean `uniform_degree_coherence` engine
+  (在庫確認要) で構成。次に coherence-extension induction。
+- deep だが **lane-a 所有 (S11) の ungated genuine math** (§14/lane-b gate でない = 7001 裁定①)。
+- capstone の hY 引数は、この honest `coherent_H0C_commutator` から (packaging bridge chars.S↔sOf,
+  H0CprimeSupport↔A0 を付けて) 供給する。
+
+## 🔬 update⁴⁵ (2026-07-07 lane-a /loop) — ★ (9.11) engine 在庫確認 = 全 sorry-free + 正しい port target を確定
+
+subagent で S07 coherence infra を精査 → **(9.11) induction の engine 群は既に全部 landed (sorry-free)**。
+同時に `coherent_H0C_commutator` の現 signature が **誤り (dead statement)** と判明。port は「deep multi-session
+build」でなく **既存 engine の assembly** に縮小、ただし target を訂正する必要あり。
+
+### ① ★ (9.11) engine 在庫 (全 sorry-free、S07/S08) — port は assembly
+| engine | 場所 | 役割 |
+|---|---|---|
+| `coherent_of_constant_degree` | S07_CoherenceConstantDegree:551 | uniform-degree → coherent (Coq `uniform_degree_coherence`) |
+| `coherent_subset_of_constant_degree` | S07_Subcoherent:246 | restrict + uniform coherence = **base case (Galois 全体 / 非Galois qa-subfamily)** |
+| `irrSubcoherent` | S07_Subcoherent:148 | subcoherent `Hypothesis` 組立 (Coq `irr_subcoherent`) |
+| `Snorm`/`sumnS` + `two_mul_lt_normalizedDegreeSq_of_lb0_lt_sumnS` | S07_Subcoherent:383/390/445 | (9.11) norm-chain + extend 発火前提 (`lb0<sumnS ⟹ 2a<∑deg²/mc`) |
+| squeeze lemmas `lb0_le_lb1`/`two_mul_le_of_dvd_of_odd`/`relIndex_le_relIndex_of_le` | S07_Subcoherent:468/509/542 | (9.11.2-9.11.4) 中間 squeeze |
+| `retarget_isCoherent_of_decompositions_and_memberFamily` | S07_Coherence:4209 | per-step 1 conjugate-pair adjoin ((5.6.3)) |
+| `xAdjoinStepW` | S08_CoherenceWeighted:287 | (5.6) extend_coherent (norm-weighted) |
+| `coherentPairChain` | S07_Coherence:5033 | induction fold (9.11.1/7/8) |
+
+残 = **assembly のみ** (~200-300 行): irrSubcoherent で Hypothesis 組立 → base = constant-degree →
+coherentPairChain で norm-chain-gated adjoin を fold。§9 family-specific arithmetic (各 squeeze の
+group-theoretic 具体化) が genuine work。
+
+### ② ★ port target 訂正 — `coherent_H0C_commutator` は dead statement (使わない)
+- `chars.S = sSet data` = **full family** {Ind χ | χ∈𝒳, H⊄ker} (S11:1601)。`coherent_H0C_commutator`
+  (S11:8317) は `IsCoherent tau chars.S chars.H0CprimeSupport` を主張するが: (a) full family の coherence は
+  **偽** (= Coq `FTtype345_noncoherence`: `S_ 1` 非coherent)、(b) `mkSection11CharacterData` が
+  `H0CprimeSupport := ∅` を pin → `IsCoherent … ∅` は `zSupportedSpan S ∅={0}` で **unconstructible**
+  (S12:4051-4054 が明記)。∴ **`coherent_H0C_commutator` は port target でない** (sibleyTarget unsound に加え
+  signature も dead)。
+- **正しい hY target (S13 capstone `coherent_SOf_H0C_of_glued` が消費)** = `IsCoherent hyp.base.tau
+  (S11.sOf hyp.s11Setup hyp.H0C) hyp.base.A0` = **subfamily sOf(H0C) の coherence on 実 support A0**。
+
+### ③ ★ honest route (確定) = (9.11) port → subset-restrict
+1. **(9.11) induction port**: `coherent(sOf(H0C'), A0)` を上記 engine assembly で構成 (Coq
+   `Ptype_core_coherence` PFsection9.v:1484-1571 の mirror; §9 sOf world = Coq `S_ H0C'` と同 induce-from-HU)。
+2. **subset-restrict**: `C' ≤ C ⟹ H0C' ≤ H0C ⟹ sOf(H0C) ⊆ sOf(H0C')` (`sOf_antitone`) →
+   `coherent(sOf(H0C), A0)` を subset-restriction (`isCoherent_of_subset` + nonzero witness) で。
+   ⟹ capstone hY 完成。
+- 両 step とも **lane-a §9 ungated** (§14/lane-b gate でない)。step 1 が本体 (assembly)、step 2 は小。
+- (別 world の S12 `coherent_Sset_diff_SHCSet` (S12:4059、§10 inducedFamily world、正 signature の honest
+  sorry) は世界橋 obstruction #3 経由の代替 target; S13 sOf-route が本線。)
+
+### ⟹ 次 iteration = **step 1 の assembly を CODE 開始** (irrSubcoherent で sOf(H0C') の Hypothesis 組立
+→ base-case constant-degree coherence)。調査は打ち止め、engine 在庫確定ゆえ Lean を書く段階。
