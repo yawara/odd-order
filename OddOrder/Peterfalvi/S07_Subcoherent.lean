@@ -610,4 +610,132 @@ rather than §8 case-B).  This is **one focused multi-step session** for lane b'
 are threaded, and the same (9.11) coherence closes lane a's (10.7) `typeII_derived_frobenius`.
 Tracking = issue 1017. -/
 
+/-! ### Peterfalvi (9.11): the maximal-coherent-subfamily skeleton
+
+The (9.11) non-Galois induction opens (mmd 04.11, (9.11) proof): *"Let `𝒮₂` be maximal such that
+`𝒮₁ ⊂ 𝒮₂ ⊂ 𝒮(H₀C′)`, `𝒮₂` is coherent and `𝒮₂` is closed under complex conjugation.  Let
+`𝒮₃ = 𝒮(H₀C′) − 𝒮₂`.  Suppose that `𝒮₃ ≠ ∅`."* — and the eight steps (9.11.1)–(9.11.8) refute
+that supposition, so `𝒮₂ = 𝒮(H₀C′)` and the family is coherent.  (Coq `Ptype_core_coherence`
+runs the same argument as an induction on `|𝒮₃|`, `PFsection9.v:1516-1540`; the maximal-subfamily
+form is the book's, and is what we formalize.)
+
+This subsection provides the **family-agnostic skeleton** of that argument:
+
+* `exists_maximal_coherent_between` — a maximal coherent conjugation-closed intermediate `𝒮₂`
+  exists (finiteness of the ambient family; the analogue for coherent subfamilies of
+  `exists_maximal_normal_between`);
+* `coherent_of_maximal_coherent_refuted` — if every maximal *proper* `𝒮₂` is absurd, the full
+  family is coherent;
+* `coherent_of_maximal_coherent_pair_refuted` — the conjugate-pair specialization: the refuter
+  receives exactly the (9.11) situation — a proper coherent conj-closed `𝒮₂ ⊇ 𝒮₁` with `𝒮₃ ≠ ∅`
+  such that **no conjugate pair `{χ, χ̄}`, `χ ∈ 𝒮₃`, can be adjoined coherently** — and must
+  derive `False`.
+
+The (9.11.1) squeeze discharges the refuter: either the degree bound `lb0 < sumnS 𝒮₂` fires the
+(5.6) adjoining engine (`xAdjoinStepW`/`xAdjoinStepW_k`) on some `χ ∈ 𝒮₃` — contradicting the
+pair clause — or all squeeze inequalities are equalities, a configuration refuted by
+(9.11.2)–(9.11.8).  Consumers: lane b's (13.3) `coherent_H0Cprime_S` re-grounding (S-instance),
+lane a's gate-2 `hY` (`coherent_Sset_diff_SHCSet`, issue 9016) and (10.7)
+`typeII_derived_frobenius`. -/
+
+/-- **Peterfalvi (9.11): a maximal coherent conjugation-closed subfamily exists.**
+
+*"Let `𝒮₂` be maximal such that `𝒮₁ ⊂ 𝒮₂ ⊂ 𝒮(H₀C′)`, `𝒮₂` is coherent and `𝒮₂` is closed
+under complex conjugation."*  For a finite ambient family `S`, the collection of coherent
+conjugation-closed intermediates `S₁ ⊆ S₂ ⊆ S` is finite and contains `S₁`, so a maximal one
+exists (`Set.Finite.exists_maximalFor` on subset order).  The maximality clause is stated in the
+"any bigger candidate collapses" form consumed by the refutation skeleton. -/
+theorem exists_maximal_coherent_between
+    {τ : IntegralCharacterMap L G} {A : Set L}
+    {S S₁ : Set (ClassFunction L ℂ)} (hSfin : S.Finite) (hS₁S : S₁ ⊆ S)
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
+    (h0 : Nonempty (IsCoherent τ S₁ A)) :
+    ∃ S₂ : Set (ClassFunction L ℂ), S₁ ⊆ S₂ ∧ S₂ ⊆ S ∧
+      OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₂ ∧ Nonempty (IsCoherent τ S₂ A) ∧
+      ∀ S' : Set (ClassFunction L ℂ), S' ⊆ S →
+        OddOrder.Peterfalvi.S03.ClosedUnderConjugate S' → Nonempty (IsCoherent τ S' A) →
+        S₂ ⊆ S' → S' = S₂ := by
+  classical
+  obtain ⟨S₂, hmem, hmax⟩ :=
+    Set.Finite.exists_maximalFor (id : Set (ClassFunction L ℂ) → Set (ClassFunction L ℂ))
+      {T | S₁ ⊆ T ∧ T ⊆ S ∧ OddOrder.Peterfalvi.S03.ClosedUnderConjugate T ∧
+        Nonempty (IsCoherent τ T A)}
+      (hSfin.finite_subsets.subset fun _ hT => hT.2.1)
+      ⟨S₁, subset_rfl, hS₁S, hS₁conj, h0⟩
+  obtain ⟨hS₁S₂, hS₂S, hS₂conj, hS₂coh⟩ := hmem
+  refine ⟨S₂, hS₁S₂, hS₂S, hS₂conj, hS₂coh, fun S' hS'S hS'conj hS'coh hS₂S' => ?_⟩
+  exact le_antisymm (hmax ⟨hS₁S₂.trans hS₂S', hS'S, hS'conj, hS'coh⟩ hS₂S') hS₂S'
+
+/-- **Peterfalvi (9.11): the refute-the-maximal-subfamily skeleton.**
+
+If every *proper* maximal coherent conjugation-closed intermediate `S₁ ⊆ S₂ ⊊ S` is absurd
+(`hrefute` receives its maximality clause and must produce `False`), then the full family `S` is
+coherent.  This is the outermost reduction of the (9.11) proof: the maximal `S₂` of
+`exists_maximal_coherent_between` either equals `S` (done) or is handed to the refuter. -/
+theorem coherent_of_maximal_coherent_refuted
+    {τ : IntegralCharacterMap L G} {A : Set L}
+    {S S₁ : Set (ClassFunction L ℂ)} (hSfin : S.Finite) (hS₁S : S₁ ⊆ S)
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
+    (h0 : Nonempty (IsCoherent τ S₁ A))
+    (hrefute : ∀ S₂ : Set (ClassFunction L ℂ), S₁ ⊆ S₂ → S₂ ⊆ S →
+      OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₂ → Nonempty (IsCoherent τ S₂ A) →
+      S₂ ≠ S →
+      (∀ S' : Set (ClassFunction L ℂ), S' ⊆ S →
+        OddOrder.Peterfalvi.S03.ClosedUnderConjugate S' → Nonempty (IsCoherent τ S' A) →
+        S₂ ⊆ S' → S' = S₂) → False) :
+    Nonempty (IsCoherent τ S A) := by
+  obtain ⟨S₂, hS₁S₂, hS₂S, hS₂conj, hS₂coh, hS₂max⟩ :=
+    exists_maximal_coherent_between hSfin hS₁S hS₁conj h0
+  by_cases hS₂eq : S₂ = S
+  · exact hS₂eq ▸ hS₂coh
+  · exact (hrefute S₂ hS₁S₂ hS₂S hS₂conj hS₂coh hS₂eq hS₂max).elim
+
+/-- **Peterfalvi (9.11): the conjugate-pair form of the maximal-subfamily refutation.**
+
+The specialization the (9.11) argument actually runs: the refuter receives a proper coherent
+conjugation-closed `S₁ ⊆ S₂ ⊊ S` together with `𝒮₃ = S \ S₂ ≠ ∅` and the fact that **no
+conjugate pair `{χ, χ̄}` with `χ ∈ 𝒮₃` can be coherently adjoined** — the negation of what the
+(5.6) adjoining engine would produce.  Maximality converts a successful adjoining
+`IsCoherent τ (S₂ ∪ {χ, χ̄}) A` into `S₂ ∪ {χ, χ̄} = S₂`, contradicting `χ ∉ S₂`; so the pair
+clause holds for the maximal `S₂` and the refuter applies.  Requires the ambient family to be
+conjugation-closed (so the adjoined pair stays inside `S`). -/
+theorem coherent_of_maximal_coherent_pair_refuted
+    {τ : IntegralCharacterMap L G} {A : Set L}
+    {S S₁ : Set (ClassFunction L ℂ)} (hSfin : S.Finite)
+    (hSconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S) (hS₁S : S₁ ⊆ S)
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
+    (h0 : Nonempty (IsCoherent τ S₁ A))
+    (hrefute : ∀ S₂ : Set (ClassFunction L ℂ), S₁ ⊆ S₂ → S₂ ⊆ S →
+      OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₂ → Nonempty (IsCoherent τ S₂ A) →
+      (S \ S₂).Nonempty →
+      (∀ χ ∈ S \ S₂, ¬ Nonempty (IsCoherent τ (S₂ ∪ {χ, χ.conj}) A)) → False) :
+    Nonempty (IsCoherent τ S A) := by
+  refine coherent_of_maximal_coherent_refuted hSfin hS₁S hS₁conj h0 ?_
+  intro S₂ hS₁S₂ hS₂S hS₂conj hS₂coh hS₂ne hS₂max
+  have hS₃ne : (S \ S₂).Nonempty := by
+    rcases Set.eq_empty_or_nonempty (S \ S₂) with he | hne
+    · exact absurd (Set.Subset.antisymm hS₂S (fun ψ hψ => by
+        by_contra hψ₂
+        exact Set.notMem_empty ψ (he ▸ Set.mem_diff_of_mem hψ hψ₂))) hS₂ne
+    · exact hne
+  refine hrefute S₂ hS₁S₂ hS₂S hS₂conj hS₂coh hS₃ne ?_
+  rintro χ ⟨hχS, hχS₂⟩ ⟨hcoh'⟩
+  have hS'S : S₂ ∪ {χ, χ.conj} ⊆ S := by
+    rintro ψ (hψ | hψ)
+    · exact hS₂S hψ
+    · rcases hψ with rfl | hψ
+      · exact hχS
+      · rw [Set.mem_singleton_iff] at hψ
+        exact hψ ▸ hSconj hχS
+  have hS'conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate (S₂ ∪ {χ, χ.conj}) := by
+    rintro ψ (hψ | hψ)
+    · exact Or.inl (hS₂conj hψ)
+    · rcases hψ with rfl | hψ
+      · exact Or.inr (Set.mem_insert_of_mem _ rfl)
+      · rw [Set.mem_singleton_iff] at hψ
+        subst hψ
+        exact Or.inr (Set.mem_insert_iff.mpr (Or.inl (ClassFunction.conj_conj χ)))
+  have heq := hS₂max _ hS'S hS'conj ⟨hcoh'⟩ Set.subset_union_left
+  exact hχS₂ (heq ▸ Set.mem_union_right _ (Set.mem_insert _ _))
+
 end OddOrder.Peterfalvi.S07
