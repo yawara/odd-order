@@ -1664,6 +1664,21 @@ theorem coherent_SOf_HC [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters
       (hyp.base.card_odd_of_isMinimalSimpleOdd hG) _ hζ (sub_eq_zero.mp h)
 
+/-- **`S(HC)` is a subfamily of `SHCSet = S(M'')` = the degree-`w₁` irreducibles** (world-bridge
+`S₁`-identification): every member of `S(HC)` kills `HC ⊇ M''`, so it kills `M''` and lies in
+`S(M'')`, which is exactly the degree-`w₁` irreducible family `SHCSet` (`SOf_secondDerived_eq`).
+Concretely `S(HC) ⊆ S(M'')` (kernel-antitone, `M'' ≤ HC`) and `S(M'') = SHCSet`.  This exhibits the
+world-bridge `S₁ = S(HC)` as the uniform-degree-`q` part and lets the (11.8.6) capstone reuse the
+`SHCSet` orthogonality/generation infrastructure on `S(HC)`. -/
+theorem SOf_HC_subset_SHCSet [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.SOf hyp.HC ⊆ hyp.base.SHCSet := by
+  have hsub : hyp.SOf hyp.HC ⊆ hyp.SOf (secondDerivedInAmbient M) := by
+    rw [hyp.SOf_eq, hyp.SOf_eq]
+    exact OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone
+      (Subgroup.subgroupOf_mono M hyp.secondDerived_le_HC)
+  rwa [hyp.SOf_secondDerived_eq hG] at hsub
+
 /-- **Peterfalvi (11.5), reverse inclusion `HC ⊆ M''`** (named obligation): the coherence content
 of (11.5).  Since `M'/M''` is abelian, `S(M'')` is coherent by (5.7); the quotient bound (11.4)
 together with (11.1)/(9.6) then forces `M'' = HC`.  Char-gated — it bottoms out in Theorem (10.8)
