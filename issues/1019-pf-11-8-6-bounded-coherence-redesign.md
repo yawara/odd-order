@@ -1111,3 +1111,27 @@ suppIn typePA0 M = hyp.A0 — `exact` 素通り。anchor 直交は piece 4 で d
    per-member supply lemma。
 5. **hgen** (span 分解 ~30 行、equal-deg collapse の 3-generator 版) / **hDeg** (|s| ≥ 3 counting、§9)
 3. **hortho_mem** (R⊥R §12 化、S08_CaseBHortho 一般化 — 独立 work、最重)
+
+## 🔬 update⁶⁹ (2026-07-07 lane-a /loop) — ★ piece 1 (Dmem) LANDED + piece 5-hgen/piece 3 の既存 producer 発見
+
+### ✅ landed: `S13.irrFamilyMemberDecomposition` (commit 0865d818, sorry-free, axiom-clean)
+Dmem supply: conj-closed irr subfamily ⊆ inducedFamily の per-member ψ=0 decomposition
+(memberExtensionDecomposition instantiation; tau1 = hS₁.extension literal → htau1Dmem = rfl)。
+
+### ★ 在庫再発見 (S08_CaseBEnumeration:1020-1075 = xAdjoinStepW_k 系の完全使用 template)
+- **`S07.zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration`** (S07_Coherence:208):
+  **hgen の generic producer が既存** — 入力 = hSgen (composite 内 supply 済) + 次数算術
+  (hχ1: μ(1)=a·χ₁(1)、hbar1: μ̄(1)=μ(1)、hchi1_ne、h1A = one_notMem_A0)。
+  ⟹ **piece 5-hgen は「composite の hgen 引数を hdeganchor (μ(1)=χ₁(1)) に置換して in-proof
+  supply」の改良 1 手** (~15 行)。hbar1 は columnSum_conj 1-値 (columnSum_inv_apply_one 系)。
+- **`caseB_member_orthoDatum_columnBreak`** (S08_CaseBEnumeration): Dmem+hortho_mem+htau1 の
+  **bundled datum producer (Sibley world)** — piece 3 (hortho_mem §12 化) の完全 template。
+  `columnDecompositionTau` (Da の hyp.tau 版) も同居。§12 版は sharpImage H → typePA0 の
+  読み替え (certainTypeSet_isCoherent_A0/columnBreakDa と同じ defeq seam の見込み)。
+
+### 残 (composite の named → 実 supply 化)
+- hgen: 上記改良 (次 iteration、~15 行)
+- hortho_mem: caseB_member_orthoDatum_columnBreak の §12 mirror (中規模)
+- hDeg: |s| ≥ 3 counting (§9、genuine)
+- 特殊化: s = irr-cut (sOf_degreeSubfamily_isCoherent) + hμ_S1 (piece 4) + Da (piece 2) +
+  Dmem (piece 1) を束ねた caseB 1-pair adjoin の end-to-end instantiation
