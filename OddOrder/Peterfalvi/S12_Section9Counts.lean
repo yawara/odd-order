@@ -1878,4 +1878,65 @@ theorem Hypothesis.columnSum_inner_irr_member_eq_zero [Finite G]
   exact Finset.sum_eq_zero (fun i _ =>
     hyp.muGrid_inner_irr_member_eq_zero hG htype params hmu hx hxirr i hk0)
 
+open scoped FiniteInduce in
+/-- **The break decomposition `Da` for a certain-type column pair against an irreducible anchor**
+(the `Da` input of `adjoin_muColumnPair_of_irrFamily`, at `a = 1`): the (5.4) decomposition
+`Da : CharacterPsiDecomposition τ (columnSum χ₂) (1 • χ₁)` produced by
+`certainTypeDecompositionDa`.  The §6 support shape `A(M) ∪ (tic.V)^M` is definitionally
+`A₀(M)` (`tic.V = typePV M` by the `toHypothesis46` construction, and
+`typePA0 = typePA ∪ conjClassSetIn M (typePV M)`), so the caller's `A₀`-support of
+`columnSum χ₂ − χ₁` feeds through; the anchor orthogonalities are piece-4
+(`columnSum_inner_irr_member_eq_zero`), and the integral image is the Dade
+`ZIrr`-preservation on the supported difference. -/
+noncomputable def Hypothesis.columnBreakDa [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M)
+    (params : CharacterParameters hyp) (hmu : params.mu = hyp.muGrid hG hG.odd)
+    [NeZero (Nat.card (hyp.toHypothesis46 hG hG.odd).W1)]
+    {χ₂ : ((hyp.toHypothesis46 hG hG.odd).W2.subgroupOf
+      ((hyp.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.toHypothesis46 hG hG.odd).W2)) →* ℂˣ}
+    (hχ₂ : χ₂ ≠ 1)
+    {X : Subgroup ↥M} {χ₁ : ClassFunction ↥M ℂ}
+    (hχ₁ : χ₁ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+      ((derivedInG M).subgroupOf M) X)
+    (hχ₁irr : IsIrreducibleCharacter χ₁)
+    (hdiffsupp : ((OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂
+      - χ₁ : ClassFunction ↥M ℂ)).support ⊆ hyp.A0)
+    (hμZ : OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂ ∈ ZIrr ↥M) :
+    OddOrder.Peterfalvi.S07.CharacterPsiDecomposition
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+      (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂)
+      ((1 : ℕ) • χ₁) := by
+  haveI := hyp.finiteG
+  classical
+  have hdeg := (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one
+    (hyp.toHypothesis46 hG hG.odd) χ₂).symm
+  have hsupp1 : ((OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂
+      - (1 : ℕ) • χ₁ : ClassFunction ↥M ℂ)).support ⊆ hyp.A0 := by
+    rw [one_smul]; exact hdiffsupp
+  have hZ : (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂
+      - (1 : ℕ) • χ₁ : ClassFunction ↥M ℂ) ∈ ZIrr ↥M := by
+    rw [one_smul]
+    exact Submodule.sub_mem _ hμZ hχ₁irr.mem_ZIrr
+  have htau1_mema : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)
+      (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂
+        - (1 : ℕ) • χ₁) ∈ ZIrr G :=
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp.dadeData.dade
+      hyp.hconj hsupp1 hZ
+  have hχψ : ClassFunction.inner
+      (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂)
+      (((1 : ℕ) • χ₁ : ClassFunction ↥M ℂ)) = 0 := by
+    rw [one_smul]
+    exact hyp.columnSum_inner_irr_member_eq_zero hG htype params hmu hχ₂ hχ₁ hχ₁irr
+  have hχbarψ : ClassFunction.inner
+      (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂).conj
+      (((1 : ℕ) • χ₁ : ClassFunction ↥M ℂ)) = 0 := by
+    rw [one_smul, OddOrder.Peterfalvi.S06.columnSum_conj_eq]
+    exact hyp.columnSum_inner_irr_member_eq_zero hG htype params hmu
+      (inv_ne_one.mpr hχ₂) hχ₁ hχ₁irr
+  exact OddOrder.Peterfalvi.S06.certainTypeDecompositionDa (hyp.toHypothesis46 hG hG.odd)
+    hχ₂ hdeg hsupp1 htau1_mema hχψ hχbarψ
+
 end OddOrder.Peterfalvi.S12
