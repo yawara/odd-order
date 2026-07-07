@@ -1261,3 +1261,27 @@ disjointness machine / R(χ) 抽象化 / 4-case は h46-generic 流用。conj-di
    経由、transport 済) — 向きの swap は conj 対称 (Orthogonal の def と inner_conj_symm)。
 2. **特殊化 assembly** (irr-cut Finset 化 + 全 pieces 束ね、named 残 = hDeg + hdegcol)。
 3. hDeg counting (§9、genuine)。
+
+## 🔬 update⁷⁶ (2026-07-08 lane-a /loop) — ★ bundled datum LANDED: composite の構造 supply 完備
+
+### ✅ landed: `S13.irrFamilyMemberOrthoDatum` (commit 066929f0, sorry-free, 一発 green)
+Dmem+hortho_mem+htau1Dmem の per-member subtype package。memberExtensionDecomposition 直接
+構成 (R⊥R の証明項/family 完全一致)、conj-symm swap で向き解決、A₀/A(M) 両 support は
+conjDiff_support の hKsupp 差し替えで。
+
+### (9.11) mixed corner の総括 — 残る真の外部入力は §9 facts のみ
+adjoin composite (`adjoin_muColumnPair_of_irrFamily`) の全入力の供給状況:
+| 入力 | 供給 | |
+|---|---|---|
+| hS₁/hsub/hirr/hconjS | sOf_degreeSubfamily_isCoherent + irrCut_finite/conjClosed | ✅ |
+| Dmem/htau1Dmem/hortho_mem | irrFamilyMemberOrthoDatum | ✅ |
+| Da/hDatau1 | columnBreakDa | ✅ |
+| hμ_S1/hμbar_S1 | columnSum_inner_irr_member_eq_zero (+conj) | ✅ |
+| hμZ | columnSum_mem_ZIrr | ✅ |
+| hgen | 内蔵 (anchorGeneration producer) | ✅ |
+| hdegmem | cut 定義 | ✅ |
+| **hDeg** (2 < \|irr-cut\|) | **§9 counting — genuine 残** | ⏳ |
+| **hdegcol** (columnSum χ₂ 1 = d) | **caseB uniform-qu (§9 fact) — genuine 残** | ⏳ |
+| **hdiffasuppχ** ((μ−χ₁).support ⊆ A₀) | μ ∈ inducedFamily + scaledDiff (hdegcol から) — 組立可 | ⏳ |
+次 = 特殊化 assembly (`caseB_adjoinOneColumnPair`、上表の ✅ を束ね named = hDeg/hdegcol の
+2 つ + hdiffasuppχ in-proof) → その後 chain 化 (§9 counting と合流)。
