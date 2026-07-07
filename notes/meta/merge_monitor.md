@@ -360,6 +360,14 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-07 (夜) — FT endgame 計画制定 (ユーザー依頼の総ざらい)**: 6-agent workflow (wf_4d2d6126) で
+  sorry census (87 = on-path 64 / 凍結 23) / opacity (free carrier 残 = TFieldModelData のみ、axiom 0) /
+  frontier 幅 (現在 8–9 → 終盤 S16 直列 spine に収束) / velocity / issues を総点検し、
+  **[`ft_endgame_plan_2026_07_07.md`](ft_endgame_plan_2026_07_07.md)** を制定。骨子: **3 レーン維持・拡張なし
+  (E1 条件付き)** / R1 = W2 (9000 instance tail) 直列化解消 (trigger = a の (9.11) 組立 landing or c の 0098
+  消化の早い方、基本線 a pivot + W9 を c へ) / R2 = b は 3002 unsound fix を 9013 gate より先に /
+  縮小トリガー C2 (幅≤2 で 3→2)・C3 (Wave 3 で実質 1)。issue close: 0099・9017。9071 は d 退役で moot
+  (branch/worktree 削除確認済)。
 - **2026-07-07 (夕) — レーン役割再点検 (ユーザー提起) → HUB 裁定 issue 0098: c REACTIVATE + b de-scope**:
   4 並列調査 (wf_d4994964) で a=1019 収束中だが queue 深/9000 instance tail は a territory (1017 計画と一体、
   再配分は dup 再演ゆえ棄却)、b=velocity 高いが 9 クラスタ保有+c の gate 7 本で overload 継続、c=遊休は gate 形状
