@@ -678,3 +678,27 @@ docstring (S12:4370): hmixed/hDτ = 「**the sole remaining genuine §11 charact
 
 hmixed/hDτ (1,2) は hY.extension の specific 性質ゆえ hY 構築後。∴ **hY が依然 upstream**。ただし
 generic (9.11) coherence が hDτ の σ-grid 性質を与えるかは要検討 (与えないなら Dade 構築が別途要)。
+
+## 🔬 update⁵³ (2026-07-07 lane-a /loop) — ★ inducedFamily_degreeSubfamily_isCoherent landed = (9.11) 定次数 base-case engine
+
+(9.11) port の subcoherent base を精査 → **SHC_isCoherent が使う `inducedFamily_isCoherent_of_equalDegreeFamily`
+(S12:1044) は R-datum-free** (Dade constant-degree engine `coherentEqualDegree_fromDade`)。∴ **定次数
+subfamily の coherence は R-datum 無しで作れる** (full mixed-degree の induction とは別)。
+
+### ✅ landed (S12, axiom-clean, full build green)
+`S12.Hypothesis.inducedFamily_degreeSubfamily_isCoherent (d : ℕ) (hex : ∃ ζ∈inducedFamily, irr ∧ deg d)`:
+degree-`d` の irreducible subfamily `{φ∈inducedFamily | irr ∧ φ1=d}` の coherence。SHC_isCoherent
+(d=w₁ 固定) を任意 `d` に一般化 (enumerate via equivFin + conjugate-pair で ≥2 + equalDegree engine)。
+= **(9.11) induction の constant-degree base case** (Coq `filter [deg==qa] S_ H0C'` → `uniform_degree_coherence`
+に対応)。
+
+### ⟹ (9.11) port の構造 (再確認)
+- **base**: `inducedFamily_degreeSubfamily_isCoherent` (landed) で定次数 subfamily (Galois 全体 qu /
+  非Galois qa-subfamily) の coherence。R-datum-free。
+- **extension**: qa-base から full `S_ H0C'` へ `coherentPairChain` + `xAdjoinStepW` で 1 pair ずつ拡張。
+  **reducible 成員 (mu_j) を含むため、この extension は full R-datum (Dade image) を要する = deep**。
+- ⟹ base は landed、extension (reducible 込 + σ-grid) が残 deep content。
+
+### ⚠ 実務ノート (この iteration の教訓)
+IsCoherent を返す S12 lemma は **`open scoped FiniteInduce in`** が必須 (Fintype/Invertible の
+scoped instance 供給; 無いと signature で `Fintype ↥M` synth 失敗)。
