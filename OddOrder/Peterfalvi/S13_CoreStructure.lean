@@ -1423,6 +1423,32 @@ theorem columnSum_muColumnChar_mem_sOf_H0Cprime [Finite G]
   rw [C_eq_cSub hG hyp]
   exact hH0C
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.9.a), caseB uniform degree on `𝒮(H₀C′)`** — the `hunif` input of the (9.11)
+caseB chain fold (`caseB_coherent_sOf_H0Cprime_of_mixed`): in Clifford case (b), every
+`𝒮(H₀C′)`-member has degree `qu`.  This is `caseB_degree_qu` instantiated at the §13 hypothesis,
+with the §9 trigger kernel `H₀ ⊔ C′ = H₀ ⊔ cprimeSub` identified with `hyp.H0Cprime =
+H₀ ⊔ [C,C]` along `C = cSub` (`C_eq_cSub`, so `cprimeSub = [cSub,cSub] = [C,C]`). -/
+theorem caseB_forall_mem_sOf_H0Cprime_apply_one_eq_qu [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (caseB : OddOrder.Peterfalvi.S11.CliffordCaseBData
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief)) :
+    ∀ φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
+      (φ : ClassFunction ↥M ℂ) 1 =
+        ((hyp.s11Setup.q *
+          (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u : ℕ) : ℂ) := by
+  haveI := hyp.base.finiteG
+  intro φ hφ
+  refine OddOrder.Peterfalvi.S11.caseB_degree_qu hG _ caseB φ ?_
+  change φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup
+    (hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.cprimeSub hyp.s11Setup hyp.chief)
+  have hCp : OddOrder.Peterfalvi.S11.cprimeSub hyp.s11Setup hyp.chief
+      = derivedInG hyp.C := by
+    change derivedInG (OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief) = derivedInG hyp.C
+    rw [C_eq_cSub hG hyp]
+  rw [hCp]
+  exact hφ
+
 /-! ## (11.9): final Type III conclusion -/
 
 /-- **Peterfalvi (11.9)**: the final three conclusions of §13: the symmetric
