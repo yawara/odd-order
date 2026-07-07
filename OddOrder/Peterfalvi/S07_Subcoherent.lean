@@ -132,17 +132,20 @@ Given
 * `τ` a base integral character map,
 * a family `S` that is conjugate-closed (`hconj`), has no real members (`hreal`),
   and is pairwise orthogonal (`hortho`),
-* `τ` a lattice-relative difference isometry on `S` (`hiso`), and
+* `A`-supportedness of the conjugate differences `χ − χ̄` (`hconjsupp` — Coq's
+  `'Z[S, L^#]` membership of the (5.2.d) differences),
+* `τ` a lattice-relative isometry on `ℤ[S, A]` (`hiso`, the (0099) `zSupportedSpan`
+  form of Coq's `{in 'Z[S, L^#], isometry tau}`), and
 * per-member difference images `Rdatum χ : CharacterDifferenceImage τ χ` whose
   underlying map is `τ` and whose image obeys `τ(χ − χ̄) = ε·(μ − ν)`,
 
-this constructs the subcoherent `S07.Hypothesis` record on `S` with base `τ` and
-`A = L^#` (here any `A`; the isometry field is `A`-agnostic).  This is the missing
-top-level producer that every §7/§14 consumer currently hand-assembles.
+this constructs the subcoherent `S07.Hypothesis` record on `S` with base `τ`.
+This is the top-level producer that every §7/§14 consumer hand-assembled before.
 
 Field (e) `difference_images_orthogonal` is derived: from `⟨φ, χ⟩ = 0` and
 `⟨φ, χ̄⟩ = 0`, `inner_conjugateDifference_eq_zero` gives `⟨φ − φ̄, χ − χ̄⟩ = 0`;
-the difference isometry `hiso` transports this to `⟨(φ−φ̄)^τ, (χ−χ̄)^τ⟩ = 0`, i.e.
+the lattice isometry `hiso` (fed the `ℤ[S, A]`-membership of the conjugate
+differences, via `hconjsupp`) transports this to `⟨(φ−φ̄)^τ, (χ−χ̄)^τ⟩ = 0`, i.e.
 `⟨signedDiff φ, signedDiff χ⟩ = 0` (via `image_eq`), feeding
 `orthogonal_of_signedDifference_inner_eq_zero`. -/
 noncomputable def irrSubcoherent (τ : IntegralCharacterMap L G) (A : Set L)
@@ -150,8 +153,10 @@ noncomputable def irrSubcoherent (τ : IntegralCharacterMap L G) (A : Set L)
     (hconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S)
     (hreal : OddOrder.Peterfalvi.S03.HasNoRealCharacters S)
     (hortho : OddOrder.Peterfalvi.S03.PairwiseOrthogonal S)
-    (hiso : ∀ ⦃a b c d : ClassFunction L ℂ⦄, a ∈ S → b ∈ S → c ∈ S → d ∈ S →
-      ClassFunction.inner (τ (a - b)) (τ (c - d)) = ClassFunction.inner (a - b) (c - d)) :
+    (hconjsupp : ∀ χ ∈ S, ((χ - χ.conj : ClassFunction L ℂ)).support ⊆ A)
+    (hiso : ∀ ⦃φ ψ : ClassFunction L ℂ⦄, φ ∈ zSupportedSpan (L := L) S A →
+      ψ ∈ zSupportedSpan (L := L) S A →
+      ClassFunction.inner (τ φ) (τ ψ) = ClassFunction.inner φ ψ) :
     Hypothesis (L := L) (G := G) S A where
   tau := τ
   tau_isometry_diff := hiso
@@ -164,8 +169,13 @@ noncomputable def irrSubcoherent (τ : IntegralCharacterMap L G) (A : Set L)
     refine (Rdatum φ hφ).orthogonal_of_signedDifference_inner_eq_zero (Rdatum χ hχ) ?_
     -- Rewrite both signed differences as `τ` applied to the conjugate differences.
     rw [← (Rdatum φ hφ).image_eq_signedDifference, ← (Rdatum χ hχ).image_eq_signedDifference]
+    -- Conjugate differences lie in `ℤ[S, A]` (members + `hconjsupp`).
+    have hmem : ∀ ⦃ψ : ClassFunction L ℂ⦄, ψ ∈ S →
+        ψ - ψ.conj ∈ zSupportedSpan (L := L) S A := fun ψ hψ =>
+      ⟨Submodule.sub_mem _ (Submodule.subset_span hψ) (Submodule.subset_span (hconj hψ)),
+        hconjsupp _ hψ⟩
     -- Isometry: `⟨τ(φ−φ̄), τ(χ−χ̄)⟩ = ⟨φ−φ̄, χ−χ̄⟩`, then source orthogonality.
-    rw [hiso hφ (hconj hφ) hχ (hconj hχ)]
+    rw [hiso (hmem hφ) (hmem hχ)]
     exact inner_conjugateDifference_eq_zero h1 h2
 
 /-! ### `subset_subcoherent`: restricting a subcoherent family (Coq `PFsection5.v:845`)
@@ -199,8 +209,8 @@ noncomputable def Hypothesis.restrict (hyp : Hypothesis (L := L) (G := G) S A)
     (hconj' : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S') :
     Hypothesis (L := L) (G := G) S' A where
   tau := hyp.tau
-  tau_isometry_diff := fun {_a _b _c _d} ha hb hc hd =>
-    hyp.tau_isometry_diff (hsub ha) (hsub hb) (hsub hc) (hsub hd)
+  tau_isometry_diff := fun {_φ _ψ} hφ hψ =>
+    hyp.tau_isometry_diff (zSupportedSpan_mono_left hsub hφ) (zSupportedSpan_mono_left hsub hψ)
   conjugate_closed := hconj'
   no_real_characters := fun {_χ} hχ => hyp.no_real_characters (hsub hχ)
   pairwise_orthogonal := fun {_χ _ψ} hχ hψ hne => hyp.pairwise_orthogonal (hsub hχ) (hsub hψ) hne

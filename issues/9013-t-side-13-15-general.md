@@ -282,3 +282,42 @@ coherence input の `≥2` には不要。⟹ **9013 が unblock する C の `T
 - **残 (案A の未 landing 部分)**: (ii) cofactor `v ∣ Singer`、T-side numeric elimination
   (`c_eq_one_forces_params` の T 版 = q^p vs p^q で非対称ゆえ別途要)、および V_inf 本体の
   (14.9)-gate。これらは c の (14.9) landing 待ち。
+
+## 🟢 追記⁶ (2026-07-07 lane b、0099 landing 後の §13 原文精査) — **(13.4) が T-side d=1 + v-full の最短供給路** (案A の再スコープ材料)
+
+0099 (S07 isometry 弱化、mixed-family S07.Hypothesis unblock) を landing した後、案A (iii) の実装前に
+Pf §13 の依存構造を原文精査 (04.15 mmd:49-58/144-180/206-232/258+) して確定した load-bearing 事実:
+
+1. **Pf (13.4) の内容 = 「𝒮 が deg-uq induced-from-linear-of-PC な irreducible λ を含む ⟹ case (9.7.b)
+   for M=T, D=1, v=(q^p−1)/(q−1)」**。つまり **T-side の d=1 と v-full は、T-side (13.10)-dual cascade
+   を経ずに (13.4) 一発で出る** (λ-branch)。証明は短い grid 直交性論法: (H^#)^G ∩ (K^#)^G = ∅
+   (K=QD) + disjoint-support Dade 直交 (α^τ,β^τ)=0 + (13.3.c) 両側 grid 展開 → 0 = ±(η_rs,η_rs) = ±1 矛盾。
+2. **§13 の branch 構造**: (13.3.b) = 「族に induced-linear irreducible が**無ければ** (9.7.b)+trivial
+   centralizer+full value がタダで従う」(per side、§9 (9.8.c)/(9.9.a,c))。(13.4) = λ ∈ 𝒮 なら T-side が
+   タダ。∴ T-side (13.10)-dual cascade ((13.12)/(13.15)-on-T) が真に要るのは
+   **case 3 (𝒮 に λ 無し ∧ 𝒯 に θ 有り) のみ**。
+3. **(13.4) は S-side (13.10) の唯一上流でもある**: (13.10) の h2/TT 計数
+   (`TT = 1/p − 1/(p(q−1)) + 1/(p(q−1)q^p)`) は「By (13.4), D=1 and v=(q^p−1)/(q−1)」を代入して得る
+   (mmd:174)。Lean 側も同構造: `lambda_forces_T_caseB` (S15:2300, **sorried**) を
+   `analyticEstimate_*`/counting chain が 4+1 箇所で cite (S15:6903/7063/7101/7179/7314)。
+   ∴ **(13.4) は 案A (iii) より文書順・依存順の両方で上流** — b の次 frontier はこれ。
+4. **c の wiring への含意** (拘束でなく option): `T_side_caseB_facts` (S16:2069) の 2 conjunct は
+   λ-branch では (13.4)+(13.3.b)-dichotomy 直 cite で閉じ得る (V_inf/`tSide_caseB_v_gated_inputs` 経由の
+   (13.15)-on-T route は case 3 用に残る)。engine (S16_CaseBOrder) は無駄にならない (case 3 + S-side
+   (13.15) 本体が consumer)。
+
+**campaign 分解 (13.4 = `lambda_forces_T_caseB` S15:2300)**:
+- (a) **T-side (13.3.b) dichotomy producer** [gate: §9-on-T (9.8.c)/(9.9.a,c) — by_contra branch で
+  θ ∈ 𝒯 (irreducible, induced from linear of K=QD, deg vp) を供給]
+- (b) **T-side ν₁-grid formula** [(13.3.c)-on-T: ν₁^{τ₁T} = ±Σⱼ η_{rj} — CharacterDegreeData は tau1T を
+  carry 済みだが T-side property fields 未搭載 → 追加 or T-side data 構造]
+- (c) **A₀(T)-TI の materialize** [(13.2.e)-on-T: 現状 `A0S_TI` は opaque Prop (:= True) パターン;
+  proven `Q_sharp_isTISubset` (S15:4768) は D=⊥ 特殊形 — by_contra branch では K=QD ⊇ Q ゆえ
+  K^# ⊆ A₀(T) の TI が要る]
+- (d) **b-buildable core (ungated)**: H^#/(K^#)^g 非交差 (x ∈ H^# ⟹ P ≤ C_G(x) [P elem-abelian
+  (13.2.b) + C = C_U(P)] + C_G(x) ≤ T^g [TI] + |P|=p^q > p = T の p-part 矛盾) +
+  disjoint-support 内積 0 (元素的) + grid 展開の直交 bookkeeping (η pairwise orthogonal
+  (tau1S_induce_inner_eta 既 field) + λ^{τ₁}⊥θ^{τ₁T})。
+- 実装形: `lambda_forces_T_caseB := by by_contra` → (a)(b)(c) を **精密 sorried T-side producer 1 本**
+  (「¬結論 ⟹ θ+ν-grid+TI」bundle) に隔離 → (d) を実証明。reconciled_typePData_T と同じ
+  precise-reduction パターン。

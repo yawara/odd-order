@@ -3717,9 +3717,10 @@ theorem SsubFiltration_commutator_diff_supported [Finite G] {L : Subgroup G} (hy
     ⟨Subgroup.mem_subgroupOf.mpr hxH, hx1⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **The witness Dade map is a difference-isometry on `S(H′)`** — the `tau_isometry_diff` field of
-the subfamily `S07.Hypothesis` (`hab`-free), mirroring `Sset_tau_isometry_diff` via
-`SsubFiltration_commutator_diff_supported`. -/
+/-- **The witness Dade map is a difference-isometry on `S(H′)`** (`hab`-free), mirroring
+`Sset_tau_isometry_diff` via `SsubFiltration_commutator_diff_supported`.  Standalone member-difference
+fact; the `S07.Hypothesis` field is discharged in its (0099) `zSupportedSpan` form via
+`dadeIntegralCharacterMap_inner_eq_of_supported`. -/
 theorem SsubFiltration_commutator_tau_isometry_diff [Finite G] {L : Subgroup G}
     (hyp : Hypothesis L) (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
     {a b c d : ClassFunction ↥L ℂ}
@@ -3745,10 +3746,12 @@ theorem SsubFiltration_commutator_tau_isometry_diff [Finite G] {L : Subgroup G}
     (Submodule.subset_span (Set.mem_insert_of_mem _ rfl))
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **The witness Dade map is a difference-isometry on `S`** — the `tau_isometry_diff` field of the
-lattice-relative `S07.Hypothesis` (issue 9001).  For members `a, b, c, d ∈ S`, both differences are
-`A(L)`-supported (`Sset_diff_supported`), so the genuine §10 Dade isometry preserves their inner
-product (`dadeIntegralCharacterMap_inner_eq_on_supported_span`).  No global isometry is used. -/
+/-- **The witness Dade map is a difference-isometry on `S`** (issue 9001).  For members
+`a, b, c, d ∈ S`, both differences are `A(L)`-supported (`Sset_diff_supported`), so the genuine §10
+Dade isometry preserves their inner product (`dadeIntegralCharacterMap_inner_eq_on_supported_span`).
+No global isometry is used.  Standalone member-difference fact; the `S07.Hypothesis` field is
+discharged in its (0099) `zSupportedSpan` form via
+`dadeIntegralCharacterMap_inner_eq_of_supported`. -/
 theorem Sset_tau_isometry_diff [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
     (hab : IsMulCommutative ↥hyp.typeI.typeF.H)
     (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
@@ -4029,7 +4032,9 @@ theorem frobenius_typeI_coherent_of_abelianKernel [Finite G]
   -- assemble the §5.2 hypothesis and invoke the equal-degree coherence producer.
   refine OddOrder.Peterfalvi.S07.coherent_of_constant_degree
     { tau := hyp.tau
-      tau_isometry_diff := fun _ _ _ _ ha hb hc hd => Sset_tau_isometry_diff hyp hab hAH ha hb hc hd
+      tau_isometry_diff := fun _ _ hφ hψ =>
+        OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
+          hyp.dadeData.dade hyp.hconj hφ.2 hψ.2
       conjugate_closed := Sset_closedUnderConjugate hyp
       no_real_characters := Sset_hasNoRealCharacters hyp hodd hfrob
       pairwise_orthogonal := Sset_pairwiseOrthogonal hyp hodd hfrob
@@ -4128,8 +4133,9 @@ theorem SsubFiltration_commutator_coherent [Finite G] {L : Subgroup G}
       _ ≤ _ := Set.ncard_le_ncard (by rintro x (rfl | rfl); exacts [hχ0S, hχ0cS]) hSfin
   refine OddOrder.Peterfalvi.S07.coherent_of_constant_degree
     { tau := hyp.tau
-      tau_isometry_diff := fun _ _ _ _ ha hb hc hd =>
-        SsubFiltration_commutator_tau_isometry_diff hyp hAH ha hb hc hd
+      tau_isometry_diff := fun _ _ hφ hψ =>
+        OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
+          hyp.dadeData.dade hyp.hconj hφ.2 hψ.2
       conjugate_closed := fun _ hχ => SsubFiltration_commutator_closedUnderConjugate hyp hχ
       no_real_characters := fun _ hχ =>
         Sset_hasNoRealCharacters hyp hodd hfrob (hyp.SsubFiltration_subset_Sset hχ)

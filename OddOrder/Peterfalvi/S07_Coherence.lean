@@ -1768,14 +1768,18 @@ structure Hypothesis (S : Set (ClassFunction L ℂ)) (A : Set L)
     [Fintype L] [Fintype G]
     [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)] where
   tau : IntegralCharacterMap L G
-  /-- **Lattice-relative (5.2) isometry** (issue 9001): `τ` preserves the inner products of
-  *differences of `S`-members* `a − b`, `c − d`.  This is the difference-isometry weakening of a
-  global `IsIntegralIsometry`, which does **not** exist for the Feit–Thompson Dade map
-  (`dim CF(L) > dim CF(G)`) but *does* hold on the `A`-supported member differences.  Any global
-  isometry supplies it trivially (`fun _ _ _ _ => iso.inner_eq _ _`); the §14 Dade witness supplies it
-  from `dadeIntegralCharacterMap_inner_eq_on_supported_span` together with equal-degree support. -/
-  tau_isometry_diff : ∀ ⦃a b c d : ClassFunction L ℂ⦄, a ∈ S → b ∈ S → c ∈ S → d ∈ S →
-    ClassFunction.inner (tau (a - b)) (tau (c - d)) = ClassFunction.inner (a - b) (c - d)
+  /-- **Lattice-relative (5.2)(b) isometry on the `A`-supported sublattice** (issues 9001, 0099):
+  `τ` preserves inner products on `ℤ[S, A] = {f ∈ ℤ[S] | supp f ⊆ A}` — Coq `subcoherent`
+  clause (b) `{in 'Z[S, L^#], isometry tau}` (`PFsection5.v:488`).  A *global* `IsIntegralIsometry`
+  does **not** exist for the Feit–Thompson Dade map (`dim CF(L) > dim CF(G)`), and the pre-0099
+  all-member-difference form is **false** for mixed-degree families (`a − b` with `a(1) ≠ b(1)` is
+  not `A`-supported) — while every extension mechanism ((5.4)/(5.6)/(5.7)/(5.9a)) only ever
+  consumes `A`-supported `ℤ`-combinations.  The Dade witnesses supply this field *unconditionally*
+  (any family, mixed degrees included) via `dadeIntegralCharacterMap_inner_eq_of_supported`;
+  member-difference consumers use the derived `tau_isometry_memberDiff`. -/
+  tau_isometry_diff : ∀ ⦃φ ψ : ClassFunction L ℂ⦄,
+    φ ∈ zSupportedSpan (L := L) S A → ψ ∈ zSupportedSpan (L := L) S A →
+    ClassFunction.inner (tau φ) (tau ψ) = ClassFunction.inner φ ψ
   conjugate_closed : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S
   no_real_characters : OddOrder.Peterfalvi.S03.HasNoRealCharacters S
   pairwise_orthogonal : OddOrder.Peterfalvi.S03.PairwiseOrthogonal S
@@ -1795,6 +1799,21 @@ variable [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
 /-- The map carried by a §7 hypothesis, as a coherence predicate target. -/
 abbrev IsCoherentTarget (hyp : Hypothesis (L := L) (G := G) S A) :=
   IsCoherent hyp.tau S A
+
+/-- **Member-difference form of the (5.2)(b) lattice isometry** (the pre-0099 field shape, now
+derived).  For members `a, b, c, d ∈ S` whose differences are `A`-supported, `τ` preserves
+`⟨a − b, c − d⟩`: such differences lie in `ℤ[S, A]`, where `tau_isometry_diff` applies.
+Equal-degree consumers discharge the support inputs from `a(1) = b(1)` (the difference vanishes at
+`1` and off the family support). -/
+theorem tau_isometry_memberDiff (hyp : Hypothesis (L := L) (G := G) S A)
+    ⦃a b c d : ClassFunction L ℂ⦄ (ha : a ∈ S) (hb : b ∈ S) (hc : c ∈ S) (hd : d ∈ S)
+    (hab : ((a - b : ClassFunction L ℂ)).support ⊆ A)
+    (hcd : ((c - d : ClassFunction L ℂ)).support ⊆ A) :
+    ClassFunction.inner (hyp.tau (a - b)) (hyp.tau (c - d))
+      = ClassFunction.inner (a - b) (c - d) :=
+  hyp.tau_isometry_diff
+    ⟨Submodule.sub_mem _ (Submodule.subset_span ha) (Submodule.subset_span hb), hab⟩
+    ⟨Submodule.sub_mem _ (Submodule.subset_span hc) (Submodule.subset_span hd), hcd⟩
 
 /-- The signed irreducible-difference image of `χ - χ̄` supplied by a §7
 hypothesis. -/
@@ -5553,6 +5572,30 @@ theorem dadeIntegralCharacterMap_inner_eq_on_supported_span
     (⟨ζ, (ClassFunction.mem_supportedSubmodule).mpr hζsupp⟩ :
       S04.SupportedClassFunctions (G := G) ℂ A L)
   rwa [hyp.dadeIsometryData_toDadeMap hconj] at hiso
+
+/-- **Pair form of `dadeIntegralCharacterMap_inner_eq_on_supported_span`** (issue 0099): the Dade
+base map preserves the inner product of any two **`A`-supported** class functions — no ambient
+family or span membership needed (apply the span lemma to the pair `{φ, ζ}` itself).  This is the
+unconditional supply for the `S07.Hypothesis.tau_isometry_diff` field in its (0099)
+`zSupportedSpan` form: an instantiation site passes the supportedness halves `hφ.2`/`hζ.2` of
+`ℤ[S, A]`-membership, and the `ℤ[S]` halves are not needed at all — so this works for **any**
+family, mixed degrees included. -/
+theorem dadeIntegralCharacterMap_inner_eq_of_supported
+    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {φ ζ : ClassFunction (↥L) ℂ}
+    (hφ : φ.support ⊆ supportInSubgroup A L) (hζ : ζ.support ⊆ supportInSubgroup A L) :
+    ClassFunction.inner
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) φ)
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) ζ) =
+      ClassFunction.inner φ ζ := by
+  refine dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj
+    (S := {φ, ζ}) ?_ (Submodule.subset_span (Set.mem_insert _ _))
+    (Submodule.subset_span (Set.mem_insert_of_mem _ rfl))
+  intro s hs
+  simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+  rcases hs with rfl | rfl
+  · exact hφ
+  · exact hζ
 
 /-- **Inner-product preservation for the Dade base map, from any isometry datum.**  Generalises
 `dadeIntegralCharacterMap_inner_eq_on_supported_span`: the lift preserves inner products on the

@@ -760,3 +760,39 @@ update⁵⁵ の両論点を hub が調査・裁定した (workflow wf_4f8e7eca�
 2. **① a/b 並行構築 → 両方 keep**: S12 `inducedFamily_degreeSubfamily_isCoherent` (a) と S15
    `sSetIrrDeg_subcoherent` (b) は family が異なり両方 genuine (成果保全)。family-parameterized
    一般化は optional follow-up。
+
+## 🔬 update⁵⁶ (2026-07-07 lane-a 再開) — ★ 0099 検証完了: 第二 field 障害の特定 + (9.11) Lean-native route 確定 (全 pieces = lane a 圏)
+
+0099 最終 checkbox「mixed family で S07.Hypothesis を組めるか」を検証 → **完了** (詳細 = 0099
+「検証記録」節)。要点:
+
+### ① 検証結果: literal mixed 組立は依然 NO — `difference_image` が第二の field 障害
+- `CharacterDifferenceImage` (S07_Coherence:395) = `τ(χ−χ̄) = ε(μ−ν)` の **2-element 固定**
+  (‖image‖²=2)。reducible μ_j (‖μ_j‖²≥2) では 0099 弱形 isometry から ‖τ(μ_j−μ̄_j)‖² = 2‖μ_j‖² ≥ 4
+  → **norm 矛盾で unconstructible** (2032/frobI 型偽 field)。family は genuinely mixed
+  (μ_j ∈ S_H0C ⊆ S_H0C′、Coq 9.5/9.8) ゆえ S07.Hypothesis の mixed 組立は不可のまま。
+- Coq subcoherent (d) の R ξ は**可変長** orthonormal seq — 2-element は既約特殊化。
+  (5.4)/(5.6)/(5.7) は可変長を本質使用。**(9.11) induction は extend_coherent (5.6) 一本で
+  chi の既約性を使わず reducible μ_j も adjoin** (PFsection9.v:1658-1667 を精読確認)。
+
+### ② しかし (9.11) port は mixed S07.Hypothesis を必要としない — Lean-native route
+Lean の extension 機構は S07.Hypothesis 非依存 (S04 Dade 直接) で、可変長 R-datum の対応物
+**`CharacterPsiDecomposition.imageFamily`** (ofProjection producer) が既存。`xAdjoinStepW`
+(S08_CoherenceWeighted:287) は S₁-side member の reducible (mc>1、Dmem で R-datum 受領) を
+設計済み — 未対応は **adjoin 対象 χ の既約性固定のみ**。
+
+### ③ (9.11) port の missing pieces (全て lane a 圏、Coq 文書順)
+1. **base case**: SOf(H0Cprime) の deg-d irreducible subfamily coherence — update⁵³ S12 engine の
+   SOf 版 (irrSubcoherent [S07_Subcoherent = **a 所有**] + 0099 弱形 isometry)。
+2. **(9.11.1) wlog + norm-chain**: S1=qa-subfamily counting (typeP_nonGalois_characters (d) 系)
+   + squeeze 在庫 (S07_Subcoherent:445-542、sorry-free)。
+3. **extension loop**: irreducible adjoin = xAdjoinStepW 現形 / **reducible μ_j adjoin =
+   xAdjoinStepW の χ-既約性 (hχχ : ‖χ‖²=1) を norm-mc 化した一般化** (S08_CoherenceWeighted =
+   **a 所有** — b の coherence 例外 glob は S07_Coherence*+S08_PGroupReduction のみ)。
+4. **μ_j R-datum**: CharacterPsiDecomposition via ofProjection + σ-image family (S12 muGrid = a)。
+S07_Coherence (b 所有) は既存 def の cite のみで**構造変更不要** → cross-lane 裁定不要。
+S07.Hypothesis 可変長化 (Coq-faithful) は不要につき起こさない。
+
+### ⟹ 次 iteration = step 1 (base case) の CODE: SOf(H0Cprime) 版 degree-subfamily coherence
+S13 に `SOf_degreeSubfamily_isCoherent` (SOf(Y) の deg-d irr subfamily coherence) を build
+(update⁵³ の S12 版 mirror; witness 機構は coherent_SOf_HC の inducedKernelFamily パターン踏襲)。

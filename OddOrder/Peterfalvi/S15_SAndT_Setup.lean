@@ -1356,12 +1356,14 @@ open OddOrder.Peterfalvi.S11 in
 /-- **The uniform-degree irreducible sub-family `S₁(d) = {φ ∈ 𝒮 | φ irreducible, φ(1) = d}`**
 (issue 1017, the (9.11) base / Galois glue per update #17).  The honest §9 family `𝒮 = sSet` is
 *mixed*-degree — both across the `p−1` reducible residues `μ_j` and across the irreducible members
-`Ind ξ` of source degree `ξ(1)` (degree `q·ξ(1)`).  The (5.2)-subcoherence `S07.Hypothesis` cannot be
-built on the whole irreducible family, because its `tau_isometry_diff` field requires member
-*differences* `a − b` to be `A(S)`-supported, i.e. to vanish at `1` — which forces `a(1) = b(1)`
-(equal degree).  Fixing a single degree value `d` carves out the uniform-degree conjugate-closed
-irreducible sub-family on which the assembler *does* apply; the (9.11) base case (`d = q·a`) and the
-whole Galois case (`d = q·u`) are the two instances the coherence route consumes. -/
+`Ind ξ` of source degree `ξ(1)` (degree `q·ξ(1)`).  Since the (0099) weakening, the
+(5.2)-subcoherence `S07.Hypothesis` *is* instantiable on mixed-degree families (its
+`tau_isometry_diff` field only demands the isometry on the `A(S)`-supported sublattice `ℤ[S, A]`);
+what still needs equal degrees is the **(5.7) equal-degree coherence producer**
+(`coherent_of_constant_degree`'s `hconst`/`hsuppdiff` inputs — member differences must vanish at
+`1`).  Fixing a single degree value `d` carves out the uniform-degree conjugate-closed irreducible
+sub-family on which that producer fires; the (9.11) base case (`d = q·a`) and the whole Galois case
+(`d = q·u`) are the two instances the coherence route consumes. -/
 noncomputable def Hypothesis.sSetIrrDeg [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (d : ℂ) : Set (ClassFunction ↥hyp.S ℂ) :=
   { φ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) |
@@ -1383,9 +1385,11 @@ Dade-independent family inputs:
   conjugate `φ̄` is irreducible with `φ̄(1) = conj(φ(1)) = d` as `d = q·s` is a positive real);
 * `hreal` = `sSet_hasNoRealCharacters` (via `oddCardS`), restricted to `S₁(d) ⊆ 𝒮`;
 * `hortho` = `sSet_pairwiseOrthogonal`, restricted to `S₁(d) ⊆ 𝒮`;
-* `hiso` = the difference-isometry of `τ` on member differences: for `a, b ∈ S₁(d)`, `a(1) = d = b(1)`
-  so `(a − b)(1) = 0`, whence `a − b` is `A(S)`-supported (`sSet_member_support_subset_A` minus the
-  identity), and `dadeIntegralCharacterMap_inner_eq_on_supported_span` gives the isometry.
+* `hconjsupp` = conjugate differences `χ − χ̄` are `A(S)`-supported: `χ̄ ∈ S₁(d)` (conj-closedness,
+  `star d = d`) and equal degrees make the difference vanish at `1`
+  (`sSet_member_support_subset_A` minus the identity);
+* `hiso` = the (0099) `zSupportedSpan`-form lattice isometry, unconditional from the Dade pair
+  brick `dadeIntegralCharacterMap_inner_eq_of_supported` (only the supportedness halves are used).
 
 The `hconj` field requires `d` to be real (`star d = d`); this holds for the genuine degree values
 `d = q·s` (positive natural), supplied by the caller.  This is the (5.3.a) subcoherence hypothesis on
@@ -1401,9 +1405,36 @@ noncomputable def Hypothesis.sSetIrrDeg_subcoherent [Fintype G] [Finite G]
   -- The honest (13.2.e) Dade isometry `τ = Ind_S^G`.
   set τ := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
     ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) with hτ
+  -- Conjugation stability of `S₁(d)` (uses `star d = d`).
+  have hconjmem : ∀ φ ∈ hyp.sSetIrrDeg hG d, φ.conj ∈ hyp.sSetIrrDeg hG d := by
+    intro φ hφ
+    refine ⟨sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupS hG) hφ.1, hφ.2.1.conj, ?_⟩
+    rw [ClassFunction.conj_apply, hφ.2.2, hd]
+  -- Members are supported in `A(S) ∪ {1}`.
+  have hmem_supp : ∀ φ ∈ hyp.sSetIrrDeg hG d,
+      φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S ∪ {1} := by
+    rintro φ ⟨hφsSet, _⟩
+    obtain ⟨hξ, hφeq⟩ := hφsSet.choose_spec
+    rw [hφeq]
+    exact hyp.sSet_member_support_subset_A hG hξ
+  -- `x - y` with `x, y ∈ S₁(d)` (hence `x(1) = d = y(1)`) is supported in `A(S)`.
+  have hdiff_of_mem : ∀ x ∈ hyp.sSetIrrDeg hG d, ∀ y ∈ hyp.sSetIrrDeg hG d,
+      (x - y).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S := by
+    intro x hx y hy z hz
+    have hz0 : (x - y) z ≠ 0 := hz
+    have hdeg : (x : ↥hyp.S → ℂ) 1 = (y : ↥hyp.S → ℂ) 1 := by rw [hx.2.2, hy.2.2]
+    rcases (ClassFunction.support_sub_subset x y hz) with h | h
+    · rcases hmem_supp x hx h with h' | h'
+      · exact h'
+      · exfalso; rw [Set.mem_singleton_iff] at h'; subst h'
+        exact hz0 (by rw [ClassFunction.sub_apply, hdeg, sub_self])
+    · rcases hmem_supp y hy h with h' | h'
+      · exact h'
+      · exfalso; rw [Set.mem_singleton_iff] at h'; subst h'
+        exact hz0 (by rw [ClassFunction.sub_apply, hdeg, sub_self])
   refine OddOrder.Peterfalvi.S07.irrSubcoherent τ
     (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)
-    (fun φ hφ => ?_) ?_ ?_ ?_ ?_
+    (fun φ hφ => ?_) ?_ ?_ ?_ ?_ ?_
   · -- `Rdatum`: `φ ∈ S₁(d) ⇒ ∃ ξ ∈ 𝒳, φ = Ind ξ` (irreducible).  The `∃` witness is extracted via
     -- `choose` (not `obtain`) so it may be eliminated into the data goal `CharacterDifferenceImage`.
     have hφsSet : φ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) := hφ.1
@@ -1413,8 +1444,7 @@ noncomputable def Hypothesis.sSetIrrDeg_subcoherent [Fintype G] [Finite G]
     exact hyp.sSet_member_differenceImage hG hξ hirr
   · -- `hconj`: conjugate of a degree-`d` irreducible member of `𝒮` is again one (uses `star d = d`).
     intro φ hφ
-    refine ⟨sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupS hG) hφ.1, hφ.2.1.conj, ?_⟩
-    rw [ClassFunction.conj_apply, hφ.2.2, hd]
+    exact hconjmem φ hφ
   · -- `hreal`: no real members, restricted to `S₁(d) ⊆ 𝒮`.
     exact (sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupS hG) (hyp.oddCardS hG)).mono
       (hyp.sSetIrrDeg_subset_sSet hG d)
@@ -1423,45 +1453,14 @@ noncomputable def Hypothesis.sSetIrrDeg_subcoherent [Fintype G] [Finite G]
     intro φ ψ hφ hψ hne
     convert sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupS hG) hφ.1 hψ.1 hne using 2 <;>
       exact Subsingleton.elim _ _
-  · -- `hiso`: the difference-isometry of the honest Dade map on member differences.  For `a,b ∈ S₁(d)`
-    -- the equal degree `a(1) = d = b(1)` makes `(a-b)(1) = 0`, so `a-b` is `A(S)`-supported.
-    intro a b c d' ha hb hc hd'
-    have hmem_supp : ∀ φ ∈ hyp.sSetIrrDeg hG d,
-        φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S ∪ {1} := by
-      rintro φ ⟨hφsSet, _⟩
-      obtain ⟨hξ, hφeq⟩ := hφsSet.choose_spec
-      rw [hφeq]
-      exact hyp.sSet_member_support_subset_A hG hξ
-    -- `x - y` with `x, y ∈ S₁(d)` (hence `x(1) = d = y(1)`) is supported in `A(S)`.
-    have hdiff_of_mem : ∀ x ∈ hyp.sSetIrrDeg hG d, ∀ y ∈ hyp.sSetIrrDeg hG d,
-        (x - y).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S := by
-      intro x hx y hy z hz
-      have hz0 : (x - y) z ≠ 0 := hz
-      have hdeg : (x : ↥hyp.S → ℂ) 1 = (y : ↥hyp.S → ℂ) 1 := by rw [hx.2.2, hy.2.2]
-      rcases (ClassFunction.support_sub_subset x y hz) with h | h
-      · rcases hmem_supp x hx h with h' | h'
-        · exact h'
-        · exfalso; rw [Set.mem_singleton_iff] at h'; subst h'
-          exact hz0 (by rw [ClassFunction.sub_apply, hdeg, sub_self])
-      · rcases hmem_supp y hy h with h' | h'
-        · exact h'
-        · exfalso; rw [Set.mem_singleton_iff] at h'; subst h'
-          exact hz0 (by rw [ClassFunction.sub_apply, hdeg, sub_self])
-    have hdiff_supp : ∀ s ∈ ({a - b, c - d'} : Set (ClassFunction ↥hyp.S ℂ)),
-        s.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S := by
-      intro s hs
-      rcases hs with rfl | hs
-      · exact hdiff_of_mem a ha b hb
-      · rw [Set.mem_singleton_iff] at hs; subst hs
-        exact hdiff_of_mem c hc d' hd'
-    have hab : a - b ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.S)
-        ({a - b, c - d'} : Set (ClassFunction ↥hyp.S ℂ)) :=
-      Submodule.subset_span (Set.mem_insert _ _)
-    have hcd : c - d' ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.S)
-        ({a - b, c - d'} : Set (ClassFunction ↥hyp.S ℂ)) :=
-      Submodule.subset_span (Set.mem_insert_of_mem _ (Set.mem_singleton _))
-    exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-      (hyp.dadeHypS hG) (hyp.dadeHypS_hconj hG) hdiff_supp hab hcd
+  · -- `hconjsupp`: the conjugate difference `χ − χ̄` is `A(S)`-supported (`χ̄ ∈ S₁(d)` + equal degree).
+    intro χ hχ
+    exact hdiff_of_mem χ hχ χ.conj (hconjmem χ hχ)
+  · -- `hiso`: the (0099) `zSupportedSpan`-form lattice isometry — unconditional from the Dade
+    -- pair brick (only the supportedness halves of the `ℤ[S₁(d), A(S)]` memberships are used).
+    intro φ ψ hφ hψ
+    exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
+      (hyp.dadeHypS hG) (hyp.dadeHypS_hconj hG) hφ.2 hψ.2
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
@@ -3694,6 +3693,23 @@ theorem Hypothesis.H_mulCommutative [Finite G] (hG : OddOrder.BG.IsMinimalSimple
   show IsMulCommutative ↥(hyp.P ⊔ hyp.C)
   rw [sup_comm]
   exact OddOrder.BG.Ch4.S15.isMulCommutative_sup_of_le_centralizer hCab hPab hCP
+
+/-- **`P` centralizes every element of `H = PC`** (Peterfalvi (13.4), disjointness ingredient):
+for `x ∈ H`, `P ≤ C_G(x)`.  Immediate from `H` abelian (`H_mulCommutative`) and `P ≤ H`.  This is
+the first half of the (13.4) conjugate-disjointness `(H^#)^G ∩ (K^#)^G = ∅`: a common point `x`
+would have `P ≤ C_G(x) ≤ T^g` (the `A₀(T^g)` TI-property), impossible since `|P| = p^q` exceeds
+the `p`-part `p` of `|T|`. -/
+theorem Hypothesis.P_le_centralizer_of_mem_H [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) {x : G} (hx : x ∈ hyp.H) :
+    hyp.P ≤ Subgroup.centralizer ({x} : Set G) := by
+  intro y hy
+  rw [Subgroup.mem_centralizer_iff]
+  intro z hz
+  rw [Set.mem_singleton_iff] at hz
+  rw [hz]
+  have hyH : y ∈ hyp.H := (le_sup_left : hyp.P ≤ hyp.P ⊔ hyp.C) hy
+  have hcomm := (hyp.H_mulCommutative hG).is_comm.comm (⟨x, hx⟩ : ↥hyp.H) ⟨y, hyH⟩
+  simpa using congrArg Subtype.val hcomm
 
 open scoped Classical in
 /-- **Sharp-set Parseval bookkeeping** (the `s + d² = |H|·n` shape of Peterfalvi (13.7)): for a
