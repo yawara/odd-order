@@ -642,3 +642,39 @@ induceHU(χ.conj) ∈ sOf(Y): `characterKernel_conj` で xiSet (H⊄ker) + Y-ker
   (ζ∈SOf(H0C)=inducedKernelFamily via `sOf_subset_SOf`)。
 - ⏳ C_eq_cSub bridge: sOf(hyp.H0C) = sOf(chief.H0 ⊔ chars.C) (hyp.C=cSub=chars.C)。
 ⟹ 次 = hwit assembly (chars 構成 + 上記結合) or (9.11) port。
+
+## 🔬 update⁵² (2026-07-07 lane-a /loop) — ★ capstone gate の正確な picture + §14 label 訂正 (ユーザー質問契機)
+
+ユーザー「§14 glue は誰の担当?」→ 精査で **glue は全部 lane a 自身 (S12) の担当**と判明。過去 update の
+「§14/lane b/c gated」は**私 (lane a) の誤り** (prior session の不正確な hedge label を過度一般化)。
+
+### ✅ capstone `coherent_Sset_of_column_identities` (S12:4291) の実際の gate (全 lane a)
+proof (4306-4358) を精読 → 残 sorry は**厳密に 2 つ** + unsound hgen cite:
+- **`hmixed`** (S12:4322 sorry): `⟨coh.extension x, hY.extension y⟩ = 0` = (6.7) image-side 直交
+  ("b≡0 congruence")。両 coherent extension の像の直交 = "beyond bare IsCoherent" の Dade content。
+- **`hDτ`** (S12:4330 sorry): `hY.extension(∑μ) = ∑ω^σ` = (5.8) column identity。hY.ext が μ-column を
+  σ-grid ω^σ に送る specific 性質 = Dade content。
+- **hgen**: `hgen_of_S2_uniform_degree` (algebra は landed sorry-free) だが `Sset_diff_SHCSet_apply_one_eq_qu`
+  (= 非Galois で偽 uniform-degree) を cite → **unsound route** (world-bridge が置換)。
+- **hY**: `coherent_Sset_diff_SHCSet` (S12:4059 sorry) = §10 world の (9.11) difference coherence。
+- **ν**: `exists_glue_nu` (S12:4113) = **landed sorry-free**。
+
+docstring (S12:4370): hmixed/hDτ = 「**the sole remaining genuine §11 character content**」。
+
+### ⚠ 2-world 状況 (重要) — active path は §10、私の S13 work は redesign
+- **active bare-sorry path** = `exists_zeta_residual_not_orthogonal` (S12:4460) → **S12 §10-world capstone**
+  `coherent_Sset_of_column_identities` → hY = `coherent_Sset_diff_SHCSet` (§10 inducedFamily world) +
+  unsound hgen。
+- **私の S13 §9-world work** (C_eq_cSub / SOf-bridge / sOf_closedUnderConjugate) = **world-bridge redesign**
+  で、S12 の unsound uniform-degree を sound な (9.11) route に置換するもの。だが**まだ bare sorry に
+  wire されていない** — S13 capstone `coherent_SOf_H0C_of_glued` を bare sorry に再配線する必要。
+
+### ⟹ 正確な残 work (全 lane a、§14 でない)
+1. **hmixed** (6.7 image 直交、b≡0) — 両 extension の像直交。Dade content、deep。
+2. **hDτ** (5.8 column identity) — hY.ext(∑μ)=∑ω^σ。Dade/σ-grid content、deep。
+3. **hY** (9.11 coherence) — §9 world (私が構築中) or §10 world (`coherent_Sset_diff_SHCSet`)。
+4. **hgen sound 化** — world-bridge で uniform-degree を置換 (進行中)。
+5. **re-wiring** — bare sorry を S13 world-bridge capstone に接続。
+
+hmixed/hDτ (1,2) は hY.extension の specific 性質ゆえ hY 構築後。∴ **hY が依然 upstream**。ただし
+generic (9.11) coherence が hDτ の σ-grid 性質を与えるかは要検討 (与えないなら Dade 構築が別途要)。
