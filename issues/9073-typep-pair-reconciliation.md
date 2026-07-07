@@ -78,13 +78,36 @@ K*:=M_σ(T)⊓C(W₂) で instantiate すれば discharge、**前提は Fact A +
   (W1_le_derivedInG_T + W1_commutes_W2)、逆包含 `C_{T'}(W₂) ≤ W₁` (≡ `C_{T'}(W₂) ≤ W`) が pairing crux。
   Coq の非循環源は global `FTtypeP_pair_cases` (BGsummaryI)。
 
+## 進捗 (2026-07-07 lane c loop² — route 精密化: typeP_duality 経由と確定)
+
+**local coprimality route は gated と実証確認**: `W2_card_coprime_Q_card` (S16_NonExistenceGCore:2122)
+= `Coprime |W₂| |Q|` は `FieldNormalizerData` (→ `Q_elementaryAbelian`, `|Q|=q^k`) を要求。⟹
+alignment coprimality `p∤|T'|` は abstract Hypothesis から local に出ず、深い §13 (FieldNormalizerData/
+IsTypeII T) gated。**docstring の gating 記述は正しい**。
+
+**⟹ honest route = 既存 `typeP_duality` の partner** (global port 不要、type-P only, issue 0098 と整合):
+`typeP_duality` (S14_TypePCounting:9928) を **S に適用** (κ-Hall K=W₁, Kstar:=M_σ(S)⊓C(W₁)=W₂) すると、
+unique partner `Mstar` が **Fact A (W₂ κ-Hall of Mstar) + Fact B (W₁ = M_σ(Mstar)⊓C(W₂))** を both 満たす
+(∃! の conjunct そのもの)。さらに ∃! の最終 conjunct = covering `∀H type-P, conj H S ∨ conj H Mstar`。
+- **step 1 (次)**: S-side κ-Hall setup — `IsHallSubgroup (kappa S) (W₁.subgroupOf S)` + `W₂ = M_σ(S)⊓C(W₁)`
+  を S_typeP2/Sdata から確立 (Sdata.W1=W₁ が κ-Hall である identification; `card_P_eq` が内部で
+  `typePData_of_kappaHall_hallComplement_W2` 経由で使う κ-Hall を expose する必要)。
+- **step 2**: `typeP_duality S` → Mstar + Facts A/B(Mstar) + covering。
+- **step 3**: covering + `¬conj(S,T)` → `T ~ Mstar`。
+- **step 4 (alignment)**: `T = Mstar^g`、g が W₂ を固定 (W₂ κ-Hall 一意性) → Facts A/B が W₂,W₁ 保ったまま
+  T へ transfer。= Coq `FTtypeP_pair_witness` の alignment 構造の Lean 版 (既存 typeP_duality 上に build)。
+- **step 5**: Facts A/B(T) → `typeP_derivedInG_inf_centralizer_kappaElement_eq` / `typeP_kstar_in_mf` で
+  `centralizer_W1` / `W2_le` を discharge。
+
+⟹ item 1 は **global port でなく typeP_duality + alignment** (multi-session, type-P only)。頭から engage。
+
 ## やること (残り)
 
-- [x] 9000-range claim 起票 + alignment 機構調査 + generic 部品 build (loop¹)
-- [ ] **Fact A** (W₂ κ-Hall of T) を確立 — これで alignment coprimality + typeP_duality が開く
-- [ ] Fact A 後: alignment (datum conj で d'.W1=W₂) → `typeP_kstar_in_mf` で **W2_le 実証明**
-- [ ] **Fact B** (`C_{T'}(W₂) = W₁`) — Fact A + pairing で `centralizer_W1` 実証明
-- [ ] `reconciled_typePData_T` の 2 sorry discharge
+- [x] 9000-range claim + generic 部品 build (loop¹) + route 精密化 typeP_duality 経由確定 (loop²)
+- [ ] **step 1**: S-side κ-Hall setup (`IsHallSubgroup (kappa S) (W₁.subgroupOf S)`, `W₂=M_σ(S)⊓C(W₁)`)
+- [ ] **step 2–4**: `typeP_duality S` → Mstar + covering + alignment (T=Mstar^g fixing W₂)
+- [ ] **step 5**: Facts A/B(T) で `reconciled_typePData_T` の 2 sorry discharge
+- 補助: `¬ IsConjugateSubgroup S T` (covering→T~Mstar 用)、`W ⊓ T' = W₁` (local)
 
 ## 完了条件
 
