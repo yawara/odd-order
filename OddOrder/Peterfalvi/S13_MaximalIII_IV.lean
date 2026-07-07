@@ -1559,6 +1559,111 @@ theorem coherent_quotient_bound [Finite G]
           = 2 * hyp.base.w1 * hyp.C.relIndex hyp.U + 1
         ring
 
+/-- **`HC < M'`** (sorry-free): if `HC = M'` then `U ≤ HC = H·C`; decomposing `u = a·b`
+(`a ∈ H`, `b ∈ C`) along the normal `H`-factor forces `a ∈ H ∩ U = ⊥`, so `u = b ∈ C`,
+contradicting `C ⊊ U` (`C_lt_U`).  The strict inclusion feeds the (11.4)/(11.5) quotient bound
+and the `𝒮(HC)`-nonemptiness (`coherent_SOf_HC`). -/
+theorem HC_lt_derived [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.HC < derivedInG M := by
+  refine lt_of_le_of_ne hyp.HC_le_derived ?_
+  intro hEq
+  refine (hyp.C_lt_U).not_ge ?_
+  intro u hu
+  have huHC : u ∈ hyp.HC := by rw [hEq]; exact hyp.base.typeP.U_le hu
+  -- decompose `u = h·c` along the normal `H`-factor inside `↥M`
+  have hHle : hyp.base.typeP.H ≤ M := hyp.base.typeP.H_le.trans (Subgroup.map_subtype_le _)
+  have hCle : hyp.C ≤ M := (hyp.C_le_U.trans hyp.base.typeP.U_le).trans
+    (Subgroup.map_subtype_le _)
+  haveI hHn : ((hyp.base.typeP.H).subgroupOf M).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hHle).mpr hyp.H_normalized_by_M
+  have huM : u ∈ M := (hyp.HC_le_derived.trans (Subgroup.map_subtype_le _)) huHC
+  have hmem : (⟨u, huM⟩ : ↥M) ∈
+      (hyp.base.typeP.H).subgroupOf M ⊔ hyp.C.subgroupOf M := by
+    rw [← Subgroup.subgroupOf_sup hHle hCle]
+    exact Subgroup.mem_subgroupOf.mpr huHC
+  rw [← SetLike.mem_coe, Subgroup.normal_mul, Set.mem_mul] at hmem
+  obtain ⟨a, ha, b, hb, hab⟩ := hmem
+  have haH : ((a : ↥M) : G) ∈ hyp.base.typeP.H := Subgroup.mem_subgroupOf.mp ha
+  have hbC : ((b : ↥M) : G) ∈ hyp.C := Subgroup.mem_subgroupOf.mp hb
+  -- `a = u·b⁻¹ ∈ H ∩ U = ⊥`, so `u = b ∈ C`
+  have haU : ((a : ↥M) : G) ∈ hyp.base.typeP.U := by
+    have haeq : (a : ↥M) = ⟨u, huM⟩ * (b : ↥M)⁻¹ := by rw [← hab]; group
+    have hcoe : ((a : ↥M) : G) = u * ((b : ↥M) : G)⁻¹ := by rw [haeq]; rfl
+    rw [hcoe]
+    exact Subgroup.mul_mem _ hu (Subgroup.inv_mem _ (hyp.C_le_U hbC))
+  have ha1 : ((a : ↥M) : G) = 1 := by
+    have := hyp.H_inf_U_eq_bot.le ⟨haH, haU⟩
+    rwa [Subgroup.mem_bot] at this
+  have hueq : u = ((b : ↥M) : G) := by
+    have h1 : (⟨u, huM⟩ : ↥M) = a * b := hab.symm
+    have h2 : u = ((a * b : ↥M) : G) := congrArg Subtype.val h1
+    rw [h2]
+    change ((a : ↥M) : G) * ((b : ↥M) : G) = ((b : ↥M) : G)
+    rw [ha1, one_mul]
+  rw [hueq]
+  exact hbC
+
+/-- **Peterfalvi (11.8): `S(HC)` is coherent** (sorry-free).  `S(HC) = SOf HC` is the subfamily of
+the degree-`w₁` family `S(M'')` cut out by the *larger* kernel condition (`M'' ≤ HC`,
+`secondDerived_le_HC`, so `S(HC) ⊆ S(M'')` by kernel-antitonicity), so it inherits the coherent
+extension of `S(M'')` (`secondDerived_coherent`) verbatim — the isometry/`τ`-agreement/`ZIrr`-codomain
+laws transport along `zSpan`/`zSupportedSpan` monotonicity.  The one genuinely new input is the
+`nonzero` supported witness `ζ̄ − ζ` for a member `ζ ∈ S(HC)`: existence of `ζ` from
+`inducedKernelFamily_nonempty_of_commutator_ne_top` at the proper trace `HC ⊊ M'` (`HC_lt_derived`),
+its conjugate difference being `A₀`-supported (`mderivSharp_subset_A0`) and nonzero (odd order has no
+real characters, `inducedKernelFamily_hasNoRealCharacters`).  This is the `S(HC)`-coherence input of
+the (11.8.6) world-bridge capstone (glued with the `𝒮(H₀C)`-coherence along
+`SOf_H0C_eq_SOf_HC_union_sOf`). -/
+theorem coherent_SOf_HC [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.HC) hyp.base.A0) := by
+  classical
+  -- coherence of the larger degree-`w₁` family `S(M'')` (5.7)
+  obtain ⟨hM''coh⟩ := hyp.secondDerived_coherent hG
+  -- `S(HC) ⊆ S(M'')`  (`M'' ≤ HC`, kernel antitone)
+  have hsub : hyp.SOf hyp.HC ⊆ hyp.SOf (secondDerivedInAmbient M) := by
+    rw [hyp.SOf_eq, hyp.SOf_eq]
+    exact OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone
+      (Subgroup.subgroupOf_mono M hyp.secondDerived_le_HC)
+  -- a genuine member `ζ ∈ S(HC)` from the proper trace `HC ⊊ M'`
+  haveI hHCKnorm : ((hyp.HC.subgroupOf M).subgroupOf ((derivedInG M).subgroupOf M)).Normal :=
+    hyp.HC_subgroupOf_normal.subgroupOf _
+  have hne : (hyp.HC.subgroupOf M).subgroupOf ((derivedInG M).subgroupOf M) ≠ ⊤ := by
+    rw [Ne, Subgroup.subgroupOf_eq_top]
+    intro hle
+    have hdle : derivedInG M ≤ M := Subgroup.map_subtype_le _
+    have hMle : derivedInG M ≤ hyp.HC := fun x hx =>
+      Subgroup.mem_subgroupOf.mp
+        (hle (show (⟨x, hdle hx⟩ : ↥M) ∈ (derivedInG M).subgroupOf M from hx))
+    exact (HC_lt_derived hyp).ne (le_antisymm hyp.HC_le_derived hMle)
+  obtain ⟨ζ, hζ⟩ : (hyp.SOf hyp.HC).Nonempty := by
+    rw [hyp.SOf_eq]
+    exact OddOrder.Peterfalvi.S08.inducedKernelFamily_nonempty_of_commutator_ne_top
+      (hyp.base.commutator_quotient_ne_top hG hne)
+  rw [hyp.SOf_eq] at hζ
+  have hζc := OddOrder.Peterfalvi.S08.inducedKernelFamily_closedUnderConjugate _ hζ
+  -- assemble the restricted coherence, reusing `S(M'')`'s coherent extension
+  refine ⟨{
+    nonzero := ⟨ζ.conj - ζ, ⟨?_, ?_⟩, ?_⟩
+    extension := hM''coh.extension
+    extension_inner_eq := fun a b ha hb =>
+      hM''coh.extension_inner_eq a b (Submodule.span_mono hsub ha) (Submodule.span_mono hsub hb)
+    extends_on_supported := fun a ha =>
+      hM''coh.extends_on_supported a (OddOrder.Peterfalvi.S07.zSupportedSpan_mono_left hsub ha)
+    extension_mem_ZIrr := fun a ha =>
+      hM''coh.extension_mem_ZIrr a (Submodule.span_mono hsub ha) }⟩
+  · -- `ζ̄ − ζ ∈ ℤ[S(HC)]`
+    rw [hyp.SOf_eq]
+    exact Submodule.sub_mem _ (Submodule.subset_span hζc) (Submodule.subset_span hζ)
+  · -- `ζ̄ − ζ` is `A₀`-supported
+    exact OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support
+      hyp.base.mderivSharp_subset_A0 hζ
+  · -- `ζ̄ − ζ ≠ 0` (odd order ⇒ no real characters)
+    intro h
+    exact OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters
+      (hyp.base.card_odd_of_isMinimalSimpleOdd hG) _ hζ (sub_eq_zero.mp h)
+
 /-- **Peterfalvi (11.5), reverse inclusion `HC ⊆ M''`** (named obligation): the coherence content
 of (11.5).  Since `M'/M''` is abelian, `S(M'')` is coherent by (5.7); the quotient bound (11.4)
 together with (11.1)/(9.6) then forces `M'' = HC`.  Char-gated — it bottoms out in Theorem (10.8)
@@ -1569,44 +1674,7 @@ theorem HC_le_secondDerived [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   classical
   rw [← Subgroup.relIndex_eq_one]
   -- `HC < M'` (else `U ≤ HC` forces `U ≤ C`, contradicting `C ⊊ U`)
-  have hHCltM' : hyp.HC < derivedInG M := by
-    refine lt_of_le_of_ne hyp.HC_le_derived ?_
-    intro hEq
-    refine (hyp.C_lt_U).not_ge ?_
-    intro u hu
-    have huHC : u ∈ hyp.HC := by rw [hEq]; exact hyp.base.typeP.U_le hu
-    -- decompose `u = h·c` along the normal `H`-factor inside `↥M`
-    have hHle : hyp.base.typeP.H ≤ M := hyp.base.typeP.H_le.trans (Subgroup.map_subtype_le _)
-    have hCle : hyp.C ≤ M := (hyp.C_le_U.trans hyp.base.typeP.U_le).trans
-      (Subgroup.map_subtype_le _)
-    haveI hHn : ((hyp.base.typeP.H).subgroupOf M).Normal :=
-      (Subgroup.normal_subgroupOf_iff_le_normalizer hHle).mpr hyp.H_normalized_by_M
-    have huM : u ∈ M := (hyp.HC_le_derived.trans (Subgroup.map_subtype_le _)) huHC
-    have hmem : (⟨u, huM⟩ : ↥M) ∈
-        (hyp.base.typeP.H).subgroupOf M ⊔ hyp.C.subgroupOf M := by
-      rw [← Subgroup.subgroupOf_sup hHle hCle]
-      exact Subgroup.mem_subgroupOf.mpr huHC
-    rw [← SetLike.mem_coe, Subgroup.normal_mul, Set.mem_mul] at hmem
-    obtain ⟨a, ha, b, hb, hab⟩ := hmem
-    have haH : ((a : ↥M) : G) ∈ hyp.base.typeP.H := Subgroup.mem_subgroupOf.mp ha
-    have hbC : ((b : ↥M) : G) ∈ hyp.C := Subgroup.mem_subgroupOf.mp hb
-    -- `a = u·b⁻¹ ∈ H ∩ U = ⊥`, so `u = b ∈ C`
-    have haU : ((a : ↥M) : G) ∈ hyp.base.typeP.U := by
-      have haeq : (a : ↥M) = ⟨u, huM⟩ * (b : ↥M)⁻¹ := by rw [← hab]; group
-      have hcoe : ((a : ↥M) : G) = u * ((b : ↥M) : G)⁻¹ := by rw [haeq]; rfl
-      rw [hcoe]
-      exact Subgroup.mul_mem _ hu (Subgroup.inv_mem _ (hyp.C_le_U hbC))
-    have ha1 : ((a : ↥M) : G) = 1 := by
-      have := hyp.H_inf_U_eq_bot.le ⟨haH, haU⟩
-      rwa [Subgroup.mem_bot] at this
-    have hueq : u = ((b : ↥M) : G) := by
-      have h1 : (⟨u, huM⟩ : ↥M) = a * b := hab.symm
-      have h2 : u = ((a * b : ↥M) : G) := congrArg Subtype.val h1
-      rw [h2]
-      change ((a : ↥M) : G) * ((b : ↥M) : G) = ((b : ↥M) : G)
-      rw [ha1, one_mul]
-    rw [hueq]
-    exact hbC
+  have hHCltM' : hyp.HC < derivedInG M := HC_lt_derived hyp
   -- `(11.4)` at `H₁ := M''` with `(5.7)`
   have hM''lt : secondDerivedInAmbient M < derivedInG M :=
     lt_of_le_of_lt hyp.secondDerived_le_HC hHCltM'
