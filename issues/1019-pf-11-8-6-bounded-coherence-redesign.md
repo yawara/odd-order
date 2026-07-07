@@ -507,3 +507,27 @@ group-theoretic 具体化) が genuine work。
 
 ### ⟹ 次 iteration = **step 1 の assembly を CODE 開始** (irrSubcoherent で sOf(H0C') の Hypothesis 組立
 → base-case constant-degree coherence)。調査は打ち止め、engine 在庫確定ゆえ Lean を書く段階。
+
+## 🔬 update⁴⁶ (2026-07-07 lane-a /loop) — ★ hY-route subset step LANDED + hyp.C vs cSub 同定 gap を特定
+
+**landed (S13, axiom-clean, build green)** — hY route の subset-restrict 部分を配線:
+- `S13.isCoherent_of_subset` (前 commit, general L): `IsCoherent τ S A + S'⊆S + (S' nonzero witness) →
+  IsCoherent τ S' A` (coherent_SOf_HC の inline restriction を抽出、同 refactor で validation)。
+- `S13.Hypothesis.H0Cprime` = `chief.H0 ⊔ derivedInG C` (C'=[C,C]、Coq `S_ H0C'` trigger)。
+- `S13.Hypothesis.sOf_H0C_subset_sOf_H0Cprime`: `𝒮(H₀C) ⊆ 𝒮(H₀C')` (`sOf_antitone` + C'≤C)。
+- `S13.coherent_sOf_H0C_of_coherent_sOf_H0Cprime`: **capstone の hY 型** (`IsCoherent tau (sOf H0C) A0`)
+  を `coherent(sOf(H0Cprime)) + 𝒮(H₀C) witness` から供給 (isCoherent_of_subset 適用)。
+  ⟹ **hY ⟸ (9.11 coherence of 𝒮(H₀C')) + (𝒮(H₀C) nonemptiness)** に還元完了。
+
+### ⚠ 特定した同定 gap (次の焦点) — `hyp.C` (S13) = `cSub` (S11) か?
+- **`hyp.C = C_U(H)`** (S13 `C_eq_centralizer`: `U ⊓ centralizer(H)`) だが **`chars.C = cSub = C_U(H̄)`**
+  (S11:1660, chief factor `H̄=H/H₀` 上の U-action kernel)。`C_U(H) ≤ C_U(H̄)` (一般) ゆえ **未同定なら
+  capstone の family `sOf(chief.H0 ⊔ hyp.C)` は (9.11) の `sOf(chief.H0 ⊔ cSub)` と別物**。
+- 予想: **Peterfalvi (11.6) `C = U'`** (`derivedU_le_C` S13:313 = U'≤C の逆) で `hyp.C = U'`、かつ
+  `cSub = U'` も設定内で成立 ⟹ `hyp.C = cSub = U'` で同定成立。だが **repo に `hyp.C = cSub` 補題は無い**
+  (grep 済) → **次 iteration の焦点 = この同定を (11.6) 経由で確立** (これが (9.11)→capstone 接続の要)。
+  同定後、`coherent_sOf_H0C_of_coherent_sOf_H0Cprime` の hcoh は (9.11) port、hwit は
+  `caseA_exists_irreducible_sOf_H0C` (chars.C = hyp.C 同定後に適用可) で埋まる。
+
+⟹ **残 2 obligation**: (a) 同定 `hyp.C = cSub` ((11.6) C=U' 経由)、(b) (9.11) induction port (engine assembly)。
+両方 lane-a §11 ungated。(a) が (b) の前提 (family 一致) ゆえ次は (a)。

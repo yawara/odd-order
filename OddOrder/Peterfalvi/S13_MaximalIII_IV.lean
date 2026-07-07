@@ -294,6 +294,26 @@ def H0C {M : Subgroup G} (hyp : Hypothesis M) : Subgroup G :=
 def HC {M : Subgroup G} (hyp : Hypothesis M) : Subgroup G :=
   hyp.H ⊔ hyp.C
 
+/-- Peterfalvi's `H₀C' = H₀ ⊔ C'` with `C' = [C, C]` (`derivedInG C`) — the (9.11)
+`Ptype_core_coherence` trigger set (`Coq S_ H0C'`). -/
+noncomputable def H0Cprime {M : Subgroup G} (hyp : Hypothesis M) : Subgroup G :=
+  hyp.chief.H0 ⊔ derivedInG hyp.C
+
+/-- `H₀C' ≤ H₀C` since `C' = [C, C] ≤ C`. -/
+theorem H0Cprime_le_H0C {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.H0Cprime ≤ hyp.H0C := by
+  show hyp.chief.H0 ⊔ derivedInG hyp.C ≤ hyp.chief.H0 ⊔ hyp.C
+  exact sup_le_sup_left (Subgroup.map_subtype_le _) hyp.chief.H0
+
+/-- **World-bridge subset `𝒮(H₀C) ⊆ 𝒮(H₀C')`** (kernel antitone, `C' = [C,C] ≤ C`, so
+`H₀C' ≤ H₀C`).  Composed with `isCoherent_of_subset` this restricts the (9.11) coherence of the
+`H₀C'` family to the capstone's `hY = coherent(𝒮(H₀C))` input (once a nonzero `𝒮(H₀C)` witness is
+supplied).  The `hY`-route subset step (`coherent(𝒮(H₀C')) → coherent(𝒮(H₀C))`). -/
+theorem sOf_H0C_subset_sOf_H0Cprime [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
+    OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C
+      ⊆ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime :=
+  OddOrder.Peterfalvi.S11.sOf_antitone hyp.s11Setup hyp.H0Cprime_le_H0C
+
 /-- **Peterfalvi (11.5), inclusion `M'' ⊆ HC` (= (8.4.c)/(8.5.a))**: the second derived
 subgroup is contained in `HC`.  This is the unconditional half of (11.5); it follows from
 the type-`P` Fitting bound `TypePData.secondDerived_le_fitting` (`M'' ≤ H ⊔ (U ∩ C_G(H))`,
@@ -1680,6 +1700,27 @@ theorem coherent_SOf_HC [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     intro h
     exact OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters
       (hyp.base.card_odd_of_isMinimalSimpleOdd hG) _ hζ (sub_eq_zero.mp h)
+
+/-- **(9.11) `hY`-route subset step**: the capstone's `𝒮(H₀C)`-coherence input (`hY`) follows from
+the (9.11) coherence of the smaller-kernel family `𝒮(H₀C')` (`coherent_H0C_commutator`'s honest
+target, the Coq `Ptype_core_coherence` induction) by `isCoherent_of_subset` along `𝒮(H₀C) ⊆
+𝒮(H₀C')`, once a nonzero `A₀`-supported `𝒮(H₀C)` witness is supplied.  This wires the (9.11) result
+to the world-bridge capstone `coherent_SOf_H0C_of_glued`'s `hY` parameter.
+
+Two named obligations remain: `hcoh` = coherent(`𝒮(H₀C')`) (the (9.11) induction port over the
+sorry-free S07/S08 engines — `coherent_subset_of_constant_degree` base + `coherentPairChain` /
+`xAdjoinStepW` extension), and `hwit` = a nonzero `𝒮(H₀C)` witness (nonemptiness via
+`S11.caseA_exists_irreducible_sOf_H0C` + a Clifford case split).  See issue 1019 update⁴⁵/⁴⁶. -/
+noncomputable def coherent_sOf_H0C_of_coherent_sOf_H0Cprime [Finite G] {M : Subgroup G}
+    (hyp : Hypothesis M)
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+      (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) hyp.base.A0)
+    (hwit : ∃ φ : ClassFunction ↥M ℂ,
+      φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan
+        (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C) hyp.base.A0 ∧ φ ≠ 0) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+      (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C) hyp.base.A0 :=
+  isCoherent_of_subset hcoh hyp.sOf_H0C_subset_sOf_H0Cprime hwit
 
 /-- **`S(HC)` is a subfamily of `SHCSet = S(M'')` = the degree-`w₁` irreducibles** (world-bridge
 `S₁`-identification): every member of `S(HC)` kills `HC ⊇ M''`, so it kills `M''` and lies in
