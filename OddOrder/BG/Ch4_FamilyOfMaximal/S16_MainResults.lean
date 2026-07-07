@@ -5740,13 +5740,22 @@ theorem centralizer_escape_final_local [Finite G]
   subst hNeq
   -- `N` is type-`P₂` (signalizer dichotomy `IsTypeF N ∨ IsTypeP2 N` with `¬IsTypeF N`).
   have hP2N : S14.IsTypeP2 N := hNtype'.resolve_left hNnotF
-  refine ⟨?_, ?_, hP2N, ?_⟩
-  · -- `IsTypeF M` via `typeP2_neighbor_is_typeF_of_mem` (Coq `P2type_signalizer`); issue 9017 #19.
-    sorry
-  · -- `¬FittingIsTI M` from `x ∈ M_σ^# ⊆ F(M)^#` (type-`F` ⟹ `M_σ` nilpotent); issue 9017 #19.
-    sorry
-  · -- Cyclic Frobenius `E` (type-`F` + `τ₂(M)=∅` (Thm 15.8) + `E₃=1` (Thm 15.7)); issue 9017 #19.
-    sorry
+  -- `IsTypeF M` via `typeP2_neighbor_is_typeF_of_mem` (Coq `P2type_signalizer`); issue 9017 #19.
+  have hFM : S14.IsTypeF M := by sorry
+  -- `¬FittingIsTI M`: `x ∈ M_σ^# ⊆ F(M)^#` (type-`F` ⟹ `M_σ = M_F` nilpotent normal `⊆ F(M)`).
+  have hnotTI : ¬ FittingIsTI M := by
+    haveI : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
+      (maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent hG hM).mp
+        (maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2 hG hM (Or.inl hFM))
+    have hMσF : OddOrder.BG.Ch3.S10.Msigma M ≤ fittingInAmbient M :=
+      le_fittingInAmbient_of_subgroupOf_normal_of_isNilpotent
+        (OddOrder.BG.Ch3.S10.Msigma_le M)
+        ((Subgroup.normal_subgroupOf_iff_le_normalizer (OddOrder.BG.Ch3.S10.Msigma_le M)).mpr
+          (OddOrder.GroupTheory.le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M))
+    exact not_fittingIsTI_of_mem_fittingSharp_of_centralizer_not_le hG hM ⟨hMσF hx.1, hx.2⟩ hesc
+  refine ⟨hFM, hnotTI, hP2N, ?_⟩
+  -- Cyclic Frobenius `E` (type-`F` + `τ₂(M)=∅` (Thm 15.8) + `E₃=1` (Thm 15.7)); issue 9017 #19.
+  sorry
 
 /-- **BG Theorem D(4), the escape structure** (the `hD4` conjunct of
 `theoremD_msigma_conjugacy_and_centralizers`): for `x ∈ M_σ^#` whose centralizer escapes `M`, the
