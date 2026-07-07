@@ -52,14 +52,24 @@ Coq part (d) の E₃=1 を精読 → **`E₃=1 ⟸ τ₃(M)=∅ ⟸ M' ≤ F(M)
 ⟹ **残る唯一の gate = `M' ≤ F(M)`** (Coq part (c) `sM'F`: `M' nilpotent` ⟸ `M_β=1` (type F、`H=M_σ` + β⊆σ)
 + `derivedQuotientMbeta_isNilpotent` (repo に有) + `Fitting_max`)。`M_β=1` for type-F が唯一の未確認ピース。
 
-## やること (残)
+## 進捗 (2026-07-07 lane b, 更新 #3) — ✅ E₃=1 完全実証明 (part d 完了)
 
-- [ ] **`M' ≤ F(M)` for type-F ¬FittingIsTI M** を形式化 (crux): `M_β = ⊥` (type F) を確立 →
-      `derivedQuotientMbeta_isNilpotent` で `M' nilpotent` → `fittingInAmbient` は max nilpotent normal で `M' ≤ F(M)`。
-      `M_β=⊥` は Coq `-defH partG_eq1` (H=M_σ、beta_sub_sigma) を repo にマップ。
-- [ ] E₂=1: τ₂(M)=∅ (`tau2_transfer_constraint` = Thm 15.8) → E₂ (τ₂-Hall) = ⊥ (E3 と同じ論法の τ₂ 版)。
-- [ ] issue 9017 cyclic-E: setup を hFM の上に hoist (matched pair・R・hHmem 共有) → E=E₁ cyclic
-      (`E1_isCyclic`、E₂=E₃=⊥) + Frobenius (`typeF_frobenius_of_tau2_prime_free`) → `∃ E cyclic Frobenius` を close。
+`M' ≤ F(M)` crux を landing → **BG Thm 15.7(d) E₃=1 が完全 sorry-free**。S15_MF に 4 補題:
+- `derivedInG_le_fittingInAmbient_of_not_fittingIsTI (hnotTI) : M' ≤ F(M)` (crux、part c)。
+  `M_β=⊥` は **`Mbeta ≤ Msigma=M_F` (normal σ-subgroup、`le_opiCoreInG_of_normal_of_isPiSubgroup`) +
+  `piSet_mf_inf_beta_disjoint` (π(M_F)∩β=∅) ⟹ π(M_β)⊆∅`** で確立 (Coq `partG_eq1` を forward に置換)。
+  `M'/M_β ≅ M'` nilpotent (`derivedQuotientMbeta_isNilpotent` + `quotientMulEquivOfEq`+`quotientBot`) →
+  `le_fittingInAmbient_of_subgroupOf_normal_of_isNilpotent`。
+- `tau3_eq_empty_of_derivedInG_le_fittingInAmbient` / `E3_eq_bot_of_tau3_eq_empty` (更新 #2、下流)。
+- `E3_eq_bot_of_not_fittingIsTI (hnotTI) (hsetup) : E₃ = ⊥` (合成、cyclic-E が直接 cite する形)。
+
+## やること (残 — cyclic-E assembly のみ)
+
+- [ ] E₂=1: τ₂(M)=∅ (`tau2_transfer_constraint` = Thm 15.8、escape setup で apply) → E₂ (τ₂-Hall) = ⊥
+      (`E3_eq_bot_of_tau3_eq_empty` の τ₂ 版 helper `E2_eq_bot_of_tau2_eq_empty` を追加)。
+- [ ] issue 9017 cyclic-E: `centralizer_escape_final_local` の setup を hFM の上に hoist
+      (matched pair・R・hHmem・hMstar 共有) → E-setup で E₂=E₃=⊥ → E=E₁ cyclic (`E1_isCyclic`) +
+      Frobenius (`typeF_frobenius_of_tau2_prime_free`) → `∃ E cyclic Frobenius` を close。
 
 ## 完了条件
 
