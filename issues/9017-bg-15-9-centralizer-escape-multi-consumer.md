@@ -603,3 +603,26 @@ x∈⟨x⟩≤N_G(⟨x⟩) かつ x∈M_σ (M_σ⊓E=⊥ ゆえ x∉E) で **fal
 cyclic-E via Thm 15.7 (~40-60、最重) + ¬FittingIsTI (~10) + assembly。build は常に GREEN 維持
 (theorem body は完成まで sorry)。次: signalizer setup + IsTypeP2 N から着手 (低リスク)、R-localization、
 最後に cyclic-E。
+
+## 2026-07-07 更新 #20 (lane b, /loop) — Cor 15.9 を S16 へ移設 + signalizer/IsTypeP2 N/¬FittingIsTI 実証明
+
+**移設**: `centralizer_escape_final_local` は signalizer machinery (S16 定義) を要し S15 から import 順で
+到達不可 → issue point 3 承認済の S16 relocate 実施 (S16_MainResults の consumer 直前)。副産物
+**S15_MF.lean 完全 sorry-free**。
+
+**実証明済** (S16 で全 dep 到達可):
+- signalizer setup: escape → 1<|𝓜_σ(x)| → neighbour N' + 全 conjunct → given N=N' (uniqueness)。
+- **IsTypeP2 N** (dichotomy + ¬IsTypeF N)。
+- **¬FittingIsTI M**: type-F ⟹ M_σ nilpotent (`maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent`) +
+  M_σ◁M ⟹ M_σ⊆F(M) → x∈M_σ^#⊆F(M)^# → `not_fittingIsTI_of_mem_fittingSharp...`。hFM を have 化して依存。
+
+**残 2 hole** (escape theorem body):
+1. **hFM : IsTypeF M** — `typeP2_neighbor_is_typeF_of_mem` (H:=M)。要 R-localization setup (更新 #19 (C)):
+   matched pair (`typeP2_exists_matched_kappa_hall_pair`) + r|ord(x)∈τ₂(N) (hxtau2') + R=M∩N の r-Sylow
+   (≤M, rank2 noncyclic) + r∈σ(M) (hforall' conjunct 7a) + N(R)≤M (`norm_noncyclic_sigma`) + matched pair を
+   Hall 共役で R∋U に合わせる。**最も intricate** (~60行、要: r-Sylow-of-(M∩N)=r-Sylow-of-N、rank2→noncyclic、Hall 共役)。
+2. **cyclic Frobenius E** — `typeF_frobenius_of_tau2_prime_free` は Frobenius (非 cyclic)。cyclic は
+   E=E1 (E2=E3=1): E2=1=τ₂(M)=∅ (`tau2_transfer_constraint` を N に適用、更新 #19)、
+   E3=1 (Thm 15.7 `fitting_not_ti_cases`、escape F(M)∩F(M)^y≠1)、E1 cyclic (sigma_compl_context)。**最重**。
+
+次 iteration: hFM (R-localization) → cyclic-E。両者とも repo に全 dep 存在、intricate だが bounded。
