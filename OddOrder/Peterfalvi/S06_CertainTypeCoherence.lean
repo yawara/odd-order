@@ -823,4 +823,67 @@ noncomputable def certainTypeMemberDecomposition (h : Hypothesis46 A L) [NeZero 
     (by simp)
     hχχbar
 
+/-- **Seed `ψ = 0` decomposition for a reducible certain-type column `μ_j`** (Peterfalvi (5.5) at
+`ψ = 0`, no coherent-set anchor).
+
+The seed analogue of `certainTypeMemberDecomposition`: builds
+`D : CharacterPsiDecomposition τ' (columnSum χ₂) 0` **without** any coherent set `S₁` — the
+auxiliary isometry `τ₁` is the certain-type `σ`-extension `certainTypeExtension` itself, which is
+an isometry on `ℤ[𝒯]` (`certainTypeExtension_inner_eq`, with `{μ − μ̄, μ} ⊆ ℤ[𝒯]` at the reference
+column `k = χ₂`), maps `μ_j` into `ℤ[Irr G]` (`certainTypeExtension_columnSum_mem_ZIrr`), and
+agrees with the Dade map — hence with `τ'` via `hagree` — on the conjugate column difference
+(`certainTypeExtension_columnDiff_eq_dade` through `columnSum_conj_eq`).
+
+Feeding `retargetTargetPair_gen` and `coherentPair_k`, this produces the *initial* coherent pair
+`{μ_j, μ̄_j}` of the Peterfalvi (9.11) pair-adjoin chain in the all-reducible corner ((9.9)(c)),
+where the uniform degree-`qu` family `𝒮(H₀C')` has no irreducible member to seed from. -/
+noncomputable def certainTypeSeedDecomposition (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1)
+    (hdeg : (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1)
+      = (∑ i, ((h.columnFamily χ₂⁻¹).mu i : ClassFunction ↥L ℂ) 1))
+    {τ' : S07.IntegralCharacterMap (↥L) G}
+    (hagree : τ' (columnSum h χ₂ - (columnSum h χ₂).conj)
+      = S07.dadeIntegralCharacterMap h.dade0 h.tau
+          (columnSum h χ₂ - (columnSum h χ₂).conj)) :
+    S07.CharacterPsiDecomposition τ' (columnSum h χ₂) 0 := by
+  -- `μ, μ̄ ∈ 𝒯` at the reference column `k = χ₂` (`μ̄ = μ_{χ₂⁻¹}` by degree symmetry `hdeg`)
+  have hμT : columnSum h χ₂ ∈ certainTypeSet h χ₂ :=
+    columnSum_mem_certainTypeSet h hχ₂ rfl
+  have hμbarT : columnSum h χ₂⁻¹ ∈ certainTypeSet h χ₂ :=
+    columnSum_mem_certainTypeSet h (inv_ne_one.mpr hχ₂) hdeg.symm
+  -- the (5.4) sponsoring lattice `ℤ[{μ − μ̄, μ − 0}]` sits inside `ℤ[𝒯]`
+  have hle : Submodule.span ℤ ({columnSum h χ₂ - (columnSum h χ₂).conj, columnSum h χ₂ - 0} :
+      Set (ClassFunction ↥L ℂ)) ≤ Submodule.span ℤ (certainTypeSet h χ₂) := by
+    rw [Submodule.span_le]
+    intro s hs
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+    rcases hs with rfl | rfl
+    · rw [columnSum_conj_eq]
+      exact Submodule.sub_mem _ (Submodule.subset_span hμT) (Submodule.subset_span hμbarT)
+    · rw [sub_zero]; exact Submodule.subset_span hμT
+  have hχχbar : ClassFunction.inner (columnSum h χ₂) (columnSum h χ₂).conj = 0 := by
+    rw [columnSum_conj_eq, columnSum_def, columnSum_def, columnFamily_mu_sum_inner,
+      if_neg (column_inv_ne_self h hχ₂).symm]
+  -- τ₁-agreement on the conjugate difference: `σ`-extension = Dade = `τ'` (via `hagree`)
+  have hagree' : certainTypeExtension h (columnSum h χ₂ - (columnSum h χ₂).conj)
+      = τ' (columnSum h χ₂ - (columnSum h χ₂).conj) := by
+    rw [hagree, columnSum_conj_eq]
+    exact certainTypeExtension_columnDiff_eq_dade h hχ₂ (inv_ne_one.mpr hχ₂) hdeg
+  exact S07.CharacterPsiDecomposition.ofProjection
+    ({ imageSet := (certainTypeR h hχ₂ hdeg).imageSet
+       mem_ZIrr := (certainTypeR h hχ₂ hdeg).mem_ZIrr
+       orthonormal := (certainTypeR h hχ₂ hdeg).orthonormal
+       image_eq := by rw [hagree]; exact (certainTypeR h hχ₂ hdeg).image_eq } :
+      S07.OrthonormalCharacterImageFamily τ' (columnSum h χ₂))
+    (certainTypeExtension h)
+    (fun φ ζ hφ hζ => certainTypeExtension_inner_eq h χ₂ (hle hφ) (hle hζ))
+    hagree'
+    (by rw [sub_zero]; exact certainTypeExtension_columnSum_mem_ZIrr h χ₂)
+    (by simp)
+    (by simp)
+    hχχbar
+
 end OddOrder.Peterfalvi.S06
