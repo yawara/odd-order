@@ -1438,3 +1438,29 @@ coherentOfPairChainCover instantiation が閉じ、**caseB mixed corner の cohe
 | **hunif** | ∀ φ ∈ 𝒮(H₀C′), φ 1 = d | caseB uniform-qu: `forall_mem_sOf_H0C_apply_one_eq_qu` (S11:8211, caseB) の H0Cprime 版 |
 | **hDeg** | 2 < \|irr-cut\| | §9 counting ((9.8) count ≥ (p−1)u/… 系) — genuine |
 | anchor χ₁ | deg-d irr member | hDeg ⟹ cut nonempty から (or §9 (c) 直接) |
+
+## 🔬 update⁸⁴ (2026-07-08 lane-a /loop) — ★★★ caseB (9.11) 端点 assembly LANDED: 残 = hDeg 1 本
+
+fold (update⁸³) の named 入力を同 session で 3/4 discharge し、caseB branch の端点まで組み上げ:
+
+### ✅ landed (3 commits: 4046ec99, 2615824c, e51eb7cf)
+1. **hμmem** = `S13.columnSum_muColumnChar_mem_sOf_H0Cprime` (S13_CoreStructure):
+   (11.8.1) muGrid 数え上げ [sorry-free] → 𝒮(⊥) 緩和 → **`S11.TypesIIIIIIVSetup.eq_of_typeP_eq`
+   (新規 sorry-free: typeP 同一 → setup 同一、他 field 全部 Prop)** で s11Setup world へ →
+   H₀=⊥ (`chief_H0_eq_bot`) → (9.9.b) `reducible_mem_sOf_H0C` [sorry-free] → `C_eq_cSub` で
+   𝒮(H₀C) → antitone。⚠ 配置は S13_CoreStructure (chief_H0_eq_bot/C_eq_cSub が
+   S13_MaximalIII_IV の下流のため)。
+2. **hunif** = `S13.caseB_forall_mem_sOf_H0Cprime_apply_one_eq_qu`: `caseB_degree_qu` (S11
+   (9.9.a)、sorry-free) の instantiate。cprimeSub = derivedInG cSub = [C,C] 同定。d = q·u。
+3. **assembly** = `S13.caseB_coherent_sOf_H0Cprime` (Nonempty 包み): ∃-irr で by_cases —
+   ∃ → anchor 導出 (deg は hunif が pin) + fold / ¬∃ → all-reducible corner (landed) +
+   μ₁ 証人。**anchor が named から消滅** ((9.9.c) 構造: irr 無し corner は C=⊥ 経路でなく
+   all-reducible corner が直接処理)。
+
+### 残 (caseB (9.11) を閉じるのに必要なもの)
+- **hDeg 1 本のみ**: ∃-irr 時に `2 < |irrCut(𝒮(H₀C′), qu)|` (Coq PFsection9 (9.9)(c) の
+  irr count)。純 §9 counting — 次 iteration の一点集中対象。
+- transitive sorryAx は既知 §13 core gate (`chief_H0_eq_bot`/`C_eq_cSub` = (11.7)) のみ。
+  §9/counting/fold 側は全て sorry-free。
+- その先: caseA (非Galois (9.11.1)-(9.11.8) norm-chain、engine 在庫は update⁴⁵ で確認済) →
+  clifford_dichotomy で (9.11) 全体 → hY packaging → capstone。
