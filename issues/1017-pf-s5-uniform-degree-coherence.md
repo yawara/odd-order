@@ -786,3 +786,41 @@ S07_Subcoherent 済部品 + §9 counting 接続)、(iii) strict 枝の member-da
 **進捗 (本日 iteration 2)**: commit 7eedf681 — caseA a-divisibility の S0-witness 形
 (`inertia_le_hcuInHu` + `caseA_source_degree_dvd_a_of_S0_witness`、sorry-free/axiom-clean)。
 次 = W1-conj transport で S0-witness 仮定を外す (Coq a_dv_XH0 完成形)。
+
+## 2026-07-08 更新 #25 (lane b, /loop iter 2-4) — (9.11.1) 入力群の実証明 + 供給状況の全数調査
+
+**landed (全て S11_NineElevenCoherence、sorry-free/axiom-clean)**:
+- iter 2 (7eedf681): `inertia_le_hcuInHu` + `caseA_source_degree_dvd_a_of_S0_witness` (S0-witness 形)。
+- iter 3 (96d2efd8): `exists_summand_witness_of_ne_one` + **`caseA_source_degree_dvd_a` = Coq a_dv_XH0 完成**
+  (W1-transport: conjBy m 移送 + LiesOver transport 降下鎖 + S0-witness 帰着)。
+- iter 4: `caseA_a_odd` (Coq odd_a)。
+
+**(9.11.1) squeeze 部品の供給状況 (全数調査済)**:
+| Coq | 内容 | repo 状態 |
+|---|---|---|
+| lb01 内側 | χ(1) ≤ u on X(H0C') | ✅ `xiOf_H0Cprime_source_apply_one_le_u` (iter 1) |
+| a_dv_XH0 | a ∣ χ(1) on X(H0) | ✅ `caseA_source_degree_dvd_a` (iter 3) |
+| odd_a | Odd a | ✅ `caseA_a_odd` (iter 4) |
+| a_dv_p1 | a ∣ p−1 | ✅ CliffordCaseAData.a_dvd_p_sub_one (field) |
+| sU'C | U' ≤ C | ✅ `uprimeSub_le_cSub` (S11:1791) |
+| U' ≤ C_U(S0) | | ✅ `uprimeSub_le_cuSub` (S11:4288) |
+| **lb_Sqa (9.8.d count)** | (p−1)/a·(\|U\|/(a\|U'\|)) ≤ #{deg-qa irr in S(H0U')} | ✅ **`caseA_character_counts` part (d) LANDED** (S11:13917、notes の「(9.8.d) sorried-cite」情報は stale — 実カウント済) |
+| lb12/lb23 純算術 | | ✅ S07_Subcoherent (two_mul_le_of_dvd_of_odd / relIndex_le_relIndex_of_le) |
+| squeeze 骨格 | maximality skeleton | ✅ S07_Subcoherent 3 定理 (iter 1) |
+
+**残 brick (次 iteration 以降、文書順)**:
+1. **除算 exact 化**: `a·|U'| ∣ |U|` (uprimeSub_le_cuSub + a=[U:C_U(S0)] realization 経由) →
+   a²|U'| ∣ (p−1)|U| → landed count の ℕ-除算 ((p−1)/a·(|U|/(a|U'|))) を Coq szS1' 形
+   (p−1)[U:U']/a² と一致させる (equality 抽出に必須)。realization: `index_cuInHu_subgroupOf_uInHu_eq_a`
+   (S11:4515) + card 転送 (card_cuInHu_eq/card_cuSub_eq_card_ker)。
+2. **(9.11.1) squeeze assembly**: maximal S₂ + χ ∈ S₃ (isn't_qu 選択) + pair-refuted 節 →
+   [strict 枝 = member-data bundle (世界固有、入力) + two_mul_lt_normalizedDegreeSq_of_lb0_lt_sumnS +
+   xAdjoinStepW(_k) → 矛盾] or [equality 配置 struct 抽出]。equality 配置 = S₂=S₁⊆S(H0C)∩Irr /
+   a=(p−1)/2 / C=U' / S₃ 全 deg qu / |S₁|=(p−1)u/a²=2u/a。
+3. (9.11.2)-(9.11.8) 反証 (equality 配置 → False)。
+4. S-instance 消費: world-bridge (0101 で hub 相談予定)。
+
+⚠ 注意: S15 の `sSet_closedUnderConjugate`/`sSet_pairwiseOrthogonal`/`sSet_hasNoRealCharacters` は
+generic (data : TypesIIIIIIVSetup M) だが S15 在住 (FiniteInduce scope 依存)。(9.11) assembly が
+sOf 版を要するときは S15 から leaf への移設 or sOf 直証明を検討 (S15 は b 所有ゆえ移設可、
+ただし S12.FiniteInduce scope import の循環チェック要)。
