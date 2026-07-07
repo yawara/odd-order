@@ -251,3 +251,12 @@ hub 裁定 (詳細 = issues/0098-lane-rebalance-c-reactivation.md、調査 = wf_
 3. 追記³ の file-topology 分岐 (reconciled downstream 移設 vs ingredients hoist) は **hoist-upstream で解消方向**:
    c が typeP_pair port (Pf §8, 新 shared leaf, claim-before-build) を build し、自身の carve-out 内
    W2_le (S15_SAndT_Setup:4520) / centralizer_W1 (:4590) を discharge する (0098 パッケージ item 1)。
+
+## 🔧 訂正 (2026-07-07 lane c, commit `bf3b21f4`) — `hcard2` は 9013 非依存だった
+
+上の「🔗 lane-c → 9013 downstream」節で `T_typeIII_ratio_le` の `hcard2` を 9013 consumer に挙げたが、
+**これは誤り**。`hcard2 : 2 ≤ (|V|−1)/p` の **crude ≥2** は odd-order Frobenius `U⋊W₁` (|U|=|V| odd,
+|W₁|=p odd) の size 条件 `2p+1 ≤ |V|` から **ungated で従う** (新 lemma `T_typeIII_two_p_add_one_le_card_V`、
+commit `bf3b21f4`、0098 item 5)。9013 の `v`-value lower bound は **exact count `(v−1)/p` にのみ必要**で、
+coherence input の `≥2` には不要。⟹ **9013 が unblock する C の `T_typeIII_ratio_le` consumer は S-side βₛ
+Γ-bridge 1本のみ** (`hcard2` は除外)。
