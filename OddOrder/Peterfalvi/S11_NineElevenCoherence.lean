@@ -400,6 +400,25 @@ theorem caseA_source_degree_dvd_a (caseA : CliffordCaseAData chars)
   -- Conclude by the `S₀`-witness form applied to `χ'`.
   exact caseA_source_degree_dvd_a_of_S0_witness caseA hover' hS0 hd'
 
+/-- **The Clifford integer `a` is odd** (Coq `odd_a`, `PFsection9.v:1536`): `a = [HU : H·C_U(S₀)]`
+divides `|HU| ∣ |M| ∣ |G|`, and `|G|` is odd.  The parity input of the (9.11.1) `lb12` squeeze
+step `2a ≤ p − 1` (`two_mul_le_of_dvd_of_odd`: `a ∣ p−1` odd + `p−1` even ⟹ `2a ∣ p−1`). -/
+theorem caseA_a_odd (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) :
+    Odd caseA.a := by
+  have hdvd : caseA.a ∣ Nat.card G := by
+    rw [← index_hcuInHu_eq_caseA_a caseA]
+    exact ((hInHu data ⊔ cuInHu caseA).index_dvd_card).trans
+      ((Subgroup.card_subgroup_dvd_card (huSub data)).trans
+        (Subgroup.card_subgroup_dvd_card M))
+  rcases Nat.even_or_odd caseA.a with heven | hodd
+  · exfalso
+    obtain ⟨k, hk⟩ := hG.odd
+    have h2 : (2 : ℕ) ∣ Nat.card G := (even_iff_two_dvd.mp heven).trans hdvd
+    omega
+  · exact hodd
+
 end CaseADivisibility
 
 end OddOrder.Peterfalvi.S11
