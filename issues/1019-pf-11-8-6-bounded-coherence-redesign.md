@@ -1178,3 +1178,21 @@ target: s = irr-cut (`{φ ∈ sOf(H0Cprime) | irr ∧ deg d}`) + 1 column pair �
   hdk1 = nontrivial column deg ≠ 1 前提] + scaledDiff、caseB では ③ から)。
 ④⑤は特殊化内で supply 可能見込み (⑤は μ ∈ IKF ⊥ 経由の scaledDiff_support、③から deg 一致)。
 ∴ 特殊化後の真の残 = ①hDeg counting + ②hortho_mem + ③hdegcol (全て §9/caseB facts)。
+
+## 🔬 update⁷² (2026-07-08 lane-a /loop) — caseB 特殊化 supply ×3 landed + bundled-datum 設計確定
+
+### ✅ landed (commit 7648bbe3, sorry-free ×3, axiom-clean)
+- `columnSum_mem_ZIrr` (S12_Section9Counts) — composite hμZ 供給
+- `irrCut_finite` / `irrCut_conjClosed` (S13) — Finset 化 + hconjS 供給
+
+### ★ 設計確定: hortho_mem は bundled-datum 方式で
+hortho_mem の型は内部構築 Dmem (証明項依存の imageFamily) に依存 → 直接 named 化不可。
+**S08_CaseBEnumeration の `caseB_member_orthoDatum_columnBreak` パターン** (Sibley world) の
+§12 mirror = 「per-member subtype datum: { D : CharacterPsiDecomposition τ x 0 //
+(D.imageFamily ⊥ certainTypeR …) ∧ D.tau1 x = hS₁.extension x }」を作るのが正解。
+その §12 版の中身は irrFamilyMemberDecomposition (piece 1) + **R(irr) ⊥ R(μ) の直交本体**
+(certainTypeR_imageSet_orthogonal_dadeOfDiff の Sibley 前提 [sharpImage H] を typePA0 に
+読み替え) — 直交本体の §12 化が真の残 work (V-vanishing 機構の A 依存度を精査)。
+### 残 (caseB end-to-end)
+① bundled-datum §12 版 (直交本体の §12 化込み、中規模) ② hDeg counting (§9) ③ hdegcol
+(caseB uniform-qu) ④ 特殊化 assembly (①-③ 後は機械的)。
