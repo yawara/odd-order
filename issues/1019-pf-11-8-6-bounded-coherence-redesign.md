@@ -303,3 +303,53 @@ world-bridge (update³⁹) 後、capstone re-target に必要な coherence 入�
 
 ⟹ **本 session landed**: world-bridge 集合等式 (update³⁹) + characterKernel subgroup infra。
 **次 = coherent(SOf(HC)) sorry-free build (path 確定) → capstone skeleton (gate 2/3 は sorried-cite)。**
+
+## 🔬 update⁴¹ (2026-07-07 lane-a /loop) — ★ S₁-side 完成: coherent(S(HC)) + S₁-identification landed
+
+update⁴⁰ の path 通り **coherent(S(HC)) を sorry-free landing**、加えて S₁-identification も landing。
+world-bridge の **S₁ = S(HC) 側は coherence + 構造同定が完了**、残る障害は全て **sOf(H0C)=S₂ 側**に移った。
+
+### ✅ landed 本 session (commits f31df00d, e3420cf4 — 全 axiom-clean)
+- **`S13.coherent_SOf_HC`** (S13): `Nonempty (IsCoherent tau (SOf HC) A0)`。S(HC) は S(M'') の
+  kernel-拡大部分族 (M''≤HC=`secondDerived_le_HC` ⟹ S(HC)⊆S(M'') kernel-antitone) ゆえ S(M'') の
+  coherent 拡張 (`secondDerived_coherent`) を **inline で restrict** (isometry/τ-agreement/ZIrr は
+  span_mono/zSupportedSpan_mono_left で transport)。唯一の新規入力 = nonzero witness ζ̄−ζ:
+  member ζ∈S(HC) 存在は `inducedKernelFamily_nonempty_of_commutator_ne_top` を proper trace
+  HC⊊M' (`HC_lt_derived`) 経由の `commutator_quotient_ne_top` で、conjDiff は A₀-supported
+  (`mderivSharp_subset_A0`)・nonzero (odd order 実指標なし)。
+- **`S13.HC_lt_derived`** (S13): HC⊊M' を `HC_le_secondDerived` から top-level 抽出 (前 session の
+  未 commit refactor を確定)。U≤HC=H·C を normal H-factor 分解 → a∈H∩U=⊥ → u∈C で C⊊U 矛盾。
+- **`S13.SOf_HC_subset_SHCSet`** (S13): S(HC) ⊆ SHCSet。S(HC)⊆S(M'') + `SOf_secondDerived_eq`
+  (S(M'')=SHCSet=degree-w₁ 既約族)。S₁=S(HC) を uniform-degree-q 部分族として同定 → capstone が
+  SHCSet の直交/generation infra を S(HC) 上で再利用する橋渡し。
+
+### ★ 次 step の精密 map (endpoint は既に sorry-free と判明)
+- **判明: `coherent_S_of_coherent_SH0C` (S13:1357) は既に sorry-free** (coherent(SOf(H0C)) →
+  coherent(Sset) を (6.3) `six_three_of_six_two_oracle` で assemble 済)。∴ missing link は
+  **coherent(SOf(H0C)) を作る capstone のみ**。
+- **capstone `coherent_SOf_H0C_of_column_identities` (未作成, S13)**: 汎用 engine
+  `S07.coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal` (S07:4811) を
+  X=SOf(HC), Y=sOf(H0C) で instantiate → `SOf_H0C_eq_SOf_HC_union_sOf` (landed) で
+  SOf(H0C)=SOf(HC)∪sOf(H0C) に rewrite → coherent(SOf(H0C))。engine 入力の gate 内訳:
+  - `hX` = coherent(SOf(HC)) — ✅ **landed** (本 session)
+  - `hsrc_ortho` (SOf(HC) ⊥ sOf(H0C)) — **★ungated (要 build)**。当初「sOf(H0C)⊆Sset∖SHCSet に還元」と
+    書いたのは誤: update⁴⁰ 通り SHCSet=SOf(M'') は H を kill しない deg-w₁ 既約を含むため
+    sOf(H0C)⊆Sset∖SHCSet は不明/偽の恐れ → SHCSet route 不可。**正しい ungated route = source-level
+    H-kernel distinctness**: SOf(HC) 成員 x=induce_K θ は hInHu(=H-trace in K=HU) ≤ ker θ (H≤HC≤ker),
+    sOf(H0C) 成員 y=induceHU χ'=induce_K χ'' は ¬(hInHu⊆ker χ'') (`xiSet` 定義条件)。x=y なら
+    `induce_eq_induce_iff_conj` で θ~χ'' → `hInHu_normal` ゆえ ker 共役不変で hInHu≤ker χ'' → 矛盾
+    → x≠y → `inducedKernelFamily_pairwise_orthogonal`。span 化は `span_inner_SHCSet_diff_eq_zero` と
+    同じ double `span_induction`。carrier bridge は `sOf_subset_SOf` (huSub=K, `induceHU_eq_induce`)
+    踏襲。**gate でなく形式化労力のみ** — 次 iteration の第一候補。
+  - `hY` = coherent(sOf(H0C), A0) — §14-gated + **packaging mismatch**: `S11.coherent_H0C_commutator`
+    (S11:8298) は coherent(`chars.S`, `H0CprimeSupport`) を与え (sOf(H0C), A0) でない。
+    bridging (chars.S↔sOf(H0C), H0CprimeSupport↔A0) 要。sibleyTarget_H0C 経由 = likely-UNSOUND(7001)。
+  - `ν`+`hagreeX`/`hagreeY` (glue map) — §14 (旧 route `exists_glue_nu`=9016 の world-bridge 版)
+  - `hmixed` (6.7 image-side 直交) — §14/BG§15
+  - `hDτ` (5.8 column identity) — §14
+  - `hgen` — §9 generation (旧 route `hgen_of_S2_uniform_degree` landed の world-bridge 版)
+- **⟹ 残 work の分類**: (0) **ungated・要 build = `hsrc_ortho` (SOf(HC)⊥sOf(H0C), source-level
+  H-kernel distinctness, 上記)** ← 次 iteration 第一候補; (a) §14 coherent(sOf(H0C),A0) honest 化
+  ((9.11) Ptype_core_coherence, sibleyTarget bypass); (b) §14 glue (ν/hmixed/hDτ)。
+  S₁ 側の coherence/構造同定は本 session で打ち止め (これ以上の ungated S₁ work 無し)、
+  残る ungated は hsrc_ortho のみで、それ以外は §14/§9 深部。
