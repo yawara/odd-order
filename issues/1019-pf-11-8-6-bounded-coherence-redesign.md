@@ -556,3 +556,26 @@ Coq PFsection11.v 精読で同定 route を確定。**update⁴⁶ の「(11.6) 
 capstone は加えて §14 glue (ν/hmixed/hDτ) も要 (lane b/c/§14 Dade) ゆえ lane-a 単独では閉じない
 (既知)。**次 iteration = (9.11) port の genuine assembly に着手** (subcoherent(sOf(H0C')) 組立 →
 base-case constant-degree → coherentPairChain extension)。同定は (11.7) cite で並行 or 後続。
+
+## 🔬 update⁴⁸ (2026-07-07 lane-a /loop) — ★ 同定 `hyp.C = cSub` の proof path 完全確定 + step 1 landed
+
+同定に要る全 lemma を code-level 確定。**(11.7) H0=1 は既に landed/citable** (S13_CoreStructure):
+- `chief_H0_eq_bot` (S13_CoreStructure:1144): `chief.H0 = ⊥` = (11.7) crux (case-B/A dichotomy assembly、
+  sorried の可能性あるが signature 正)。`H_elementaryAbelian` (:1210) が corollary。
+- **★ landed 本 iteration**: `chief_N_eq_bot` (S13_CoreStructure): `chief.N = ⊥` (H0=⊥ + H0_eq +
+  map_eq_bot_iff)。H_elementaryAbelian の inline を抽出 + refactor (de-dup)。= 同定の step 1。
+
+### 同定 `Hypothesis.C_eq_cSub : hyp.C = S11.cSub hyp.s11Setup hyp.chief` の proof path (4 step)
+1. **`chief.N = ⊥`** — `chief_N_eq_bot` (landed)。
+2. **`cSub = (U.subgroupOf L ⊓ ker(quotientMulAutHom)).map L.subtype`** — S11 `cSub_normalized_by_uW1`
+   proof 内の `hcSub` (S11:1741、要抽出 or 再証明)。L = U⊔W1。
+3. **`ker(quotientMulAutHom chief.N_aInvariant) = ker(typeP_conjAction)` (N=⊥ 時)** — `quotientMulAutHom_apply`
+   (Isaacs Ch04:2360, `qMAH a (g:H⧸N) = (φ a g : H⧸N)`) + N=⊥ ⟹ `(x:H⧸⊥)=(y:H⧸⊥) ↔ x=y`
+   (QuotientGroup.mk mod ⊥) ⟹ `qMAH a = 1 ↔ φ a = 1`。φ = `typeP_conjAction`。
+4. **`ker(typeP_conjAction) realized in U = C_U(H) = hyp.C`** — `typeP_conjAction_apply` (S11:209,
+   = conjugation `(a:G)*x*(a:G)⁻¹`) ⟹ `φ a = 1 ↔ a ∈ centralizer(H)`; `C_eq_centralizer`
+   (`hyp.C = U ⊓ centralizer(H)`) で結合。
+
+⟹ 見積 40-80 行 (step 3-4 が crux)。**次 iteration = C_eq_cSub を書く** (step 1 landed、path 明確)。
+これで capstone hY family (sOf(H0 ⊔ hyp.C)) = (9.11) family (sOf(H0 ⊔ cSub)、H0=⊥ で cprimeSub=
+derivedInG cSub=derivedInG hyp.C=H0Cprime) が一致 → (9.11) port が hcoh を直接供給。

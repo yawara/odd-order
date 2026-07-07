@@ -1199,6 +1199,18 @@ theorem chief_H0_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (caseA_fixes_of_action_chain hyp.chief hS₀card (fun v s hs => hS₀inv.smul_mem v hs)
         hAodd σ hmodd hσm hchain)
 
+/-- **(11.7) corollary — the chief kernel `N ◁ H` is trivial**: `N = ⊥`.  The chief kernel realised
+inside `↥H` is trivial because its `G`-image `H₀ = N.map H.subtype` is trivial (`chief_H0_eq_bot`)
+and `H.subtype` is injective.  Hence the chief factor `H̄ = ↥H ⧸ N ≅ ↥H` (used to transport the
+elementary-abelian/order data, and — via `H̄ = H` — to identify `C = C_U(H̄)` with `C_U(H) = hyp.C`
+for the (9.11) `hY` route). -/
+theorem chief_N_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.chief.N = ⊥ := by
+  have h := hyp.chief.H0_eq
+  rw [chief_H0_eq_bot hG hyp, eq_comm, Subgroup.map_eq_bot_iff] at h
+  simpa using h
+
 /-- **Peterfalvi (11.7)**: `H` is elementary abelian of order `p^q`, and `H_0 = 1`.
 
 `H₀ = 1` is the crux `chief_H0_eq_bot`.  Given it, both remaining conjuncts are immediate from the
@@ -1218,11 +1230,8 @@ theorem H_elementaryAbelian [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have h2 := hyp.chief.typeIII_IV_p_eq_W2 (hyp.base.isTypeIIIorIV _hG)
     rw [hyp.s11Setup_card_W2_eq] at h2
     exact h2.symm
-  -- `N = ⊥` from `H₀ = N.map H.subtype = ⊥`
-  have hN : hyp.chief.N = ⊥ := by
-    have h := hyp.chief.H0_eq
-    rw [hH0, eq_comm, Subgroup.map_eq_bot_iff] at h
-    simpa using h
+  -- `N = ⊥` (`chief_N_eq_bot`)
+  have hN : hyp.chief.N = ⊥ := chief_N_eq_bot _hG hyp
   refine ⟨?_, ?_, hH0⟩
   · -- elementary abelian: transport `quotient_elementaryAbelian` along `↥H ⧸ ⊥ ≃* ↥H`
     have hEA : IsElementaryAbelian hyp.p ↥hyp.s11Setup.H := by
