@@ -3603,17 +3603,185 @@ structure BetaData (hyp : Hypothesis (G := G)) where
     ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
       (ClassFunction.inner Gamma Gamma).re ≤ ((hyp.u : ℚ) - 1) / (hyp.q : ℚ) + 1
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The induced trivial character** `Ind_{P⋊W₁}^S(1)` of the subgroup `P ⋊ W₁ ≤ S`, the
+positive part of the (13.18) bridge character `β_j`.  Its squared `S`-norm is the Frobenius
+value `(u−1)/q + 1` (`norm_induce_one_frobenius` composed with the `S̄ = S/P = U⋊W₁` inflation). -/
+noncomputable def indPW1 [Finite G] (hyp : Hypothesis (G := G)) : ClassFunction ↥hyp.S ℂ :=
+  ClassFunction.induce ((hyp.P ⊔ hyp.W1).subgroupOf hyp.S)
+    (trivialClassFunction ↥((hyp.P ⊔ hyp.W1).subgroupOf hyp.S))
+
+/-- **Peterfalvi (13.18) `S`-side virtual character** `β_j := Ind_{P⋊W₁}^S(1) − μ_{0j}`
+(Coq `PFsection13.FTtypeP_bridge`).  The induced trivial character `indPW1 hyp` of `P ⋊ W₁ ≤ S`
+minus the base-row grid irreducible `μ_{0j} = hyp.mu 0 j`. -/
+noncomputable def betaGrid [Finite G] (hyp : Hypothesis (G := G)) (j : Fin hyp.p) :
+    ClassFunction ↥hyp.S ℂ :=
+  indPW1 hyp - hyp.mu ⟨0, hyp.q_prime.pos⟩ j
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The genuine `S`-side Dade image** `τ_S(β_{#1})` of the (13.18) bridge character at column
+`#1`.  Uses the honest (13.2.e) Dade isometry `τ_S = dadeIntegralCharacterMap (hyp.dadeHypS hG) …`
+— the `S`-instance of the (5.3) Dade map — **NOT** the off-path `= 0` placeholder `hyp.tauS`. -/
+noncomputable def tauSbetaGrid [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    ClassFunction G ℂ :=
+  OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+      ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG))
+    (betaGrid hyp ⟨1, by have := hyp.three_le_p; omega⟩)
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (13.18) residual** `Γ := τ_S(β_{#1}) − 1_G + η_{01}` (Coq
+`PFsection13.FTtypeP_bridge_gap`).  `η_{01} = hyp.eta 0 1` is the (3.3) grid image `τ₃(ω_{01})`;
+`1_G = constOne G`.  Note `Γ` does not depend on the column `j` of `βData`. -/
+noncomputable def GammaGrid [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    ClassFunction G ℂ :=
+  tauSbetaGrid hG hyp - OddOrder.Peterfalvi.S09.Hypothesis71.constOne G
+    + hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩
+
+/-- **(13.18.a) support control** (`S`-side, grid form): `supp(β_j) ⊆ ⋃_i supp(μ_{ij})`.
+
+⚠ DEEP §13 RESIDUAL, isolated obligation.  This is Coq's `PVSbeta`/`A0beta` (`β_j ∈ CF(S, P^# ∪
+V_S) ⊆ CF(S, A₀(S))`), restated here in the grid-support form the (13.19)/(14.9) consumers use:
+off `⋃_i supp(μ_{ij})` the induced permutation character `Ind_{PW₁}^S 1` exactly cancels `μ_{0j}`.
+The cancellation is the `normedTI` structure of the `W₁`-classes in `S̄ = S/P` (Coq `gammaW1`,
+`Ptype_Fcore_sdprod`); no repo API yet supplies it. -/
+theorem betaGrid_support [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (_hj : (j : ℕ) ≠ 0) :
+    (betaGrid hyp j).support ⊆ ⋃ (i : Fin hyp.q), (hyp.mu i j).support := sorry
+
+/-- **(13.18.b), Frobenius half**: `‖Ind_{PW₁}^S 1‖²_S = (u−1)/q + 1`.
+
+⚠ DEEP §13 RESIDUAL, isolated obligation.  This is the norm of the induced trivial character.
+By the inflation `Ind_{PW₁}^S 1 = (Ind_{W̄₁}^{S̄} 1) %% P` (Coq `Dgamma`, `cfIndMod`; `P` lies in
+the kernel), its `S`-norm equals `‖Ind_{W̄₁}^{S̄} 1‖²` in the Frobenius quotient `S̄ = S/P = U⋊W₁`,
+which the sorry-free `norm_induce_one_frobenius` (on `BasicStructureData.UW1_frobenius`) evaluates
+to `(|U|−1)/|W₁| + 1 = (u−1)/q + 1`.  The missing repo API is the `P`-inflation/quotient-norm
+bridge (`cfMod_iso`). -/
+theorem indPW1_inner_self [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    ∀ [Fintype ↥hyp.S] [Invertible (Nat.card ↥hyp.S : ℂ)],
+      ClassFunction.inner (indPW1 hyp) (indPW1 hyp)
+        = ((((hyp.u : ℚ) - 1) / (hyp.q : ℚ) + 1 : ℚ) : ℂ) := sorry
+
+/-- **(13.18.b), orthogonality half**: `⟨Ind_{PW₁}^S 1, μ_{0j}⟩ = 0` for `j ≠ 0`.
+
+⚠ DEEP §13 RESIDUAL, isolated obligation.  Coq `cfnormBd`/`cfker_prTIres`: `μ_{0j}` for `j ≠ 0`
+is not a constituent of the `P`-inflated permutation character `Ind_{PW₁}^S 1` (its kernel does not
+contain the whole of `P`, whereas every constituent of the inflation is `P`-trivial).  No repo API
+yet supplies this constituent/kernel analysis. -/
+theorem indPW1_inner_mu [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (_hj : (j : ℕ) ≠ 0) :
+    ∀ [Fintype ↥hyp.S] [Invertible (Nat.card ↥hyp.S : ℂ)],
+      ClassFunction.inner (indPW1 hyp) (hyp.mu ⟨0, hyp.q_prime.pos⟩ j) = 0 := sorry
+
+/-- **(13.18.b) norm**: `‖β_j‖²_S = (u−1)/q + 2`.
+
+Genuine reduction: `β_j = Ind_{PW₁}^S 1 − μ_{0j}`, so by bilinearity
+`‖β_j‖² = ‖Ind‖² − ⟨Ind,μ_{0j}⟩ − ⟨μ_{0j},Ind⟩ + ‖μ_{0j}‖²`.  Here `‖μ_{0j}‖² = 1` is **proven**
+from `hyp.mu_irreducible` (via `irreducibleCharacter_inner_eq_ite`), `⟨μ_{0j},Ind⟩ = 0` follows
+from `⟨Ind,μ_{0j}⟩ = 0` by conjugate symmetry, and the remaining `‖Ind‖² = (u−1)/q + 1`
+(`indPW1_inner_self`) and `⟨Ind,μ_{0j}⟩ = 0` (`indPW1_inner_mu`) are the isolated §13 obligations.
+`(u−1)/q + 1 + 1 = (u−1)/q + 2`. -/
+theorem betaGrid_norm [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
+    ∀ [Fintype ↥hyp.S] [Invertible (Nat.card ↥hyp.S : ℂ)],
+      ClassFunction.inner (betaGrid hyp j) (betaGrid hyp j)
+        = ((((hyp.u : ℚ) - 1) / (hyp.q : ℚ) + 2 : ℚ) : ℂ) := by
+  intro _ _
+  set μ := hyp.mu ⟨0, hyp.q_prime.pos⟩ j with hμdef
+  have hμμ : ClassFunction.inner μ μ = 1 := by
+    have hite := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite
+      (⟨μ, hyp.mu_irreducible ⟨0, hyp.q_prime.pos⟩ j⟩ :
+        OddOrder.RepresentationTheory.IrreducibleCharacter ↥hyp.S)
+      (⟨μ, hyp.mu_irreducible ⟨0, hyp.q_prime.pos⟩ j⟩)
+    simpa using hite
+  have hIμ : ClassFunction.inner (indPW1 hyp) μ = 0 := indPW1_inner_mu hG hyp j hj
+  have hμI : ClassFunction.inner μ (indPW1 hyp) = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hIμ, star_zero]
+  have hII : ClassFunction.inner (indPW1 hyp) (indPW1 hyp)
+      = ((((hyp.u : ℚ) - 1) / (hyp.q : ℚ) + 1 : ℚ) : ℂ) := indPW1_inner_self hG hyp
+  have hbeta : betaGrid hyp j = indPW1 hyp - μ := rfl
+  rw [hbeta, ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_sub_right, hII, hIμ, hμI, hμμ]
+  push_cast
+  ring
+
+/-- **(13.18.a) grid-independence**: `⟨Γ, η_{ik}⟩ = 0` for every grid entry.
+
+⚠ DEEP §13 RESIDUAL, isolated obligation.  `Γ = τ_S(β_{#1}) − 1_G + η_{01}`.  The hard term is
+`⟨τ_S(β_{#1}), η_{ik}⟩`: the `S`-side Dade image `τ_S` and the `W`-side grid `η = τ₃∘ω` are
+different Dade maps, linked by the (13.1.e)/(5.3) cross-relation `τ_S(μ_{ij} − μ_{0j}) =
+δ_j(η_{ij} − η_{0j})` (Coq `prDade_sub_TIirr`, `Dtau`), which forces `Γ` orthogonal to the whole
+`σ`-image `{η_{ik}}`.  No repo field yet supplies this `S`↔`W` Dade cross-relation. -/
+theorem gammaGrid_independent [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
+      ∀ (i : Fin hyp.q) (k : Fin hyp.p),
+        ClassFunction.inner (GammaGrid hG hyp) (hyp.eta i k) = 0 := sorry
+
+/-- **(13.18.c)** `⟨Γ, 1_G⟩ = 0`.
+
+⚠ DEEP §13 RESIDUAL, isolated obligation.  Coq `oGamma1`: `⟨Γ,1⟩ = ⟨τ_S β,1⟩ − 1 + ⟨η_{01},1⟩`;
+`⟨η_{01},1⟩ = 0` (grid orthogonality) and `⟨τ_S β,1⟩ = 1` via the Dade=Ind bridge
+(`hyp.sInstance_dade_eq_induce_of_supported_trivial_H`, gated on the (13.2.e) `A₀(S)` normedTI) +
+Frobenius reciprocity + `⟨μ_{0j},1_S⟩ = 0`.  The Dade=Ind bridge's normedTI hypotheses are the
+missing content. -/
+theorem gammaGrid_orthogonal_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
+      ClassFunction.inner (GammaGrid hG hyp)
+        (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G) = 0 := sorry
+
+/-- **(13.18.c)** `Γ` is real: `Γ.conj = Γ`.
+
+⚠ DEEP §13 RESIDUAL, isolated obligation.  Coq `GammaReal`: conjugation commutes with `Ind` and
+with the Dade map (`cfAutInd`, `Dtau`), and sends grid entries to their conjugate index
+(`prTIirr_aut`, `cfAut_cycTIiso`: `η̄_{0j} = η_{0,-j}`, `μ̄_{0j} = μ_{0,-j}`), so
+`Γ̄ = τ_S(β̄_{#1}) − 1_G + η̄_{01}` collapses back to `Γ` via `defGamma` at the conjugate column.
+The Dade/grid conjugation-commutation facts are not yet in the repo. -/
+theorem gammaGrid_real [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    (GammaGrid hG hyp).conj = GammaGrid hG hyp := sorry
+
+/-- **(13.18.d) residual-norm bound**: `Re⟨Γ,Γ⟩ ≤ (u−1)/q + 1`.
+
+⚠ DEEP §13 RESIDUAL, isolated obligation.  Coq's (13.18.d) argument bounds `‖Γ‖²` using
+`‖β_{#1}‖² = (u−1)/q + 2` (`betaGrid_norm`), the Dade isometry `‖τ_S β‖² = ‖β‖²` on `A₀(S)`-support
+(`dadeIntegralCharacterMap_inner_eq_on_supported_span`), and the decomposition
+`β_{#1} = Γ − η_{01} + 1_G` with the `η_{01}`/`1_G` orthogonalities peeled off (`cfnormDd`).  It
+needs the (13.18.a,c) orthogonalities above plus the on-support isometry, hence gated on the same
+`A₀(S)` normedTI content. -/
+theorem gammaGrid_norm_bound [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
+      (ClassFunction.inner (GammaGrid hG hyp) (GammaGrid hG hyp)).re
+        ≤ ((hyp.u : ℚ) - 1) / (hyp.q : ℚ) + 1 := sorry
+
 /-- **Faithful §13 producer for Peterfalvi (13.18).**  The (13.18) virtual characters `β_j`/`Γ_j`
 and all six of their genuine properties (support (13.18.a), the (13.18.b) norm `‖β_j‖² = (u−1)/q + 2`,
 grid-independence, orthogonality to `1_G`, reality, and the residual bound) are supplied here.  The
-content bottoms out at the (3.2) grid `τ`-isometry (`hyp.tau3`, σ-pinned via `S05_IntegralSigma`) and
-the sorry-free Frobenius norm `norm_induce_one_frobenius`; that deep §3/§13 character theory is the
-single isolated obligation.  Mirrors the `betaM_expansion_data` / `analyticInequalityEstimates`
-faithful-producer pattern. -/
+concrete `β_j = betaGrid hyp j` and `Γ = GammaGrid hG hyp` are built from the honest `S`-side Dade
+isometry `τ_S` (`hyp.dadeHypS`, **not** the `= 0` placeholder `hyp.tauS`) and the induced trivial
+character `Ind_{PW₁}^S 1`.  The six properties are the precisely-isolated §13 obligations
+`betaGrid_support` / `betaGrid_norm` / `gammaGrid_independent` / `gammaGrid_orthogonal_one` /
+`gammaGrid_real` / `gammaGrid_norm_bound`, each stating the genuine (13.18) fact about the concrete
+`β_j`/`Γ`; their deep content bottoms out at the (13.2.e) `A₀(S)` normedTI Dade=Ind bridge, the
+(5.3) `S`↔`W` Dade cross-relation, and the Frobenius norm `norm_induce_one_frobenius`. -/
 noncomputable def betaData_of_grid [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
-    BetaData hyp := sorry
+    BetaData hyp where
+  j := j
+  j_ne_zero := hj
+  beta := betaGrid hyp j
+  Gamma := GammaGrid hG hyp
+  support_formula := betaGrid_support hG hyp j hj
+  norm_formula := betaGrid_norm hG hyp j hj
+  Gamma_independent := gammaGrid_independent hG hyp
+  Gamma_orthogonal_one := gammaGrid_orthogonal_one hG hyp
+  Gamma_real := gammaGrid_real hG hyp
+  Y_norm_bound := gammaGrid_norm_bound hG hyp
 
 /-- **Peterfalvi (13.18)**: the virtual character `beta_j` has controlled
 support, norm, and orthogonal remainder.
