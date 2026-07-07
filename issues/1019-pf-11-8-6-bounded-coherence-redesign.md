@@ -796,3 +796,90 @@ S07.Hypothesis 可変長化 (Coq-faithful) は不要につき起こさない。
 ### ⟹ 次 iteration = step 1 (base case) の CODE: SOf(H0Cprime) 版 degree-subfamily coherence
 S13 に `SOf_degreeSubfamily_isCoherent` (SOf(Y) の deg-d irr subfamily coherence) を build
 (update⁵³ の S12 版 mirror; witness 機構は coherent_SOf_HC の inducedKernelFamily パターン踏襲)。
+
+## 🔬 update⁵⁷ (2026-07-07 lane-a) — ★ base case LANDED + adjoin engine 在庫の再発見 (update⁵⁶ の missing 評価を訂正)
+
+### ✅ landed: `S13.SOf_degreeSubfamily_isCoherent` (sorry-free, axiom-clean, commit 97766644)
+(9.11) base case の SOf-world 版: SOf(Y) の deg-d 既約 subfamily coherence。SOf(Y) ⊆ inducedFamily
+(kernel-antitone + bot 同定) で S12 engine を ambient 発火 → isCoherent_of_subset で restrict。
+witness = ζ̄−ζ (conj 保存 + conjDiff support + no-real)。∃-witness は Prop-confined
+(Type-valued goal での obtain 不可 — S12:1112 と同じ罠を踏んで修正)。
+
+### ★ 在庫再発見 — update⁵⁶ の「missing piece (i)(ii)」は既に landed 済みだった
+- **(i) reducible adjoin engine = `xAdjoinStepW_k`** (S08_CoherenceWeighted:459、commit 577a0d69、
+  (6.8.3) reducible-break 用に構築済): break pair {χ,χ̄} が reducible column μ_j でよい (5.6)
+  weighted adjoin。break decomposition `Da : CharacterPsiDecomposition` をパラメータで受ける。
+- **(ii) μ_j R-datum producer = `certainTypeDecompositionDa`** (S06_CertainTypeCoherence:723) +
+  S12 bridge `toHypothesis46` (S12_Core:1088) + Ind-form recast `columnConstituentDecomposition`
+  (S08_CaseBCoherence2:1691)。
+- **chain fold**: `coherentOfPairChainCover` (S07) / `xChainCoherentW` (S08_CoherenceWeighted:786、
+  irreducible-pair 版 bundle — mixed chain は coherentOfPairChainCover 直使いで step ごとに
+  xAdjoinStepW / xAdjoinStepW_k を発火すれば新 engine 不要)。
+- **§9 counting 在庫 (S12_Section9Counts)**: `forall_sOf_H0Cprime_degree_qu_caseB` (caseB で
+  SOf(H0⊔C′) 全 member deg qu) / `muGrid_column_sum_mem_sOf_H0_and_reducible` /
+  `reducible_mem_inducedKernelFamily_eq_muGrid_columnSum` (reducible member = μ-column sum) /
+  `mkSection11CharacterData` (§10→§9 bridge)。
+
+### ⟹ (9.11) の残 = assembly そのもの (部品はほぼ完備)
+- **(A) caseB assembly** (Galois 対応枝、部品完備で着手可能): family 全 member deg qu →
+  irr-cut base (landed) + μ-column pairs を xAdjoinStepW_k で 1 対ずつ adjoin + chain fold。
+  必要入力: hex (deg-qu irr ∈ SOf(H0Cprime) の存在 witness、caseB (9.9) 系)、per-pair の
+  hDeg (2·qu·anchor < Σ deg²/mc、uniform-qu family で計算可)、hgen (span generation)、
+  Da instantiation (toHypothesis46 経由)。
+- **(B) caseA assembly** (non-Galois、(9.11.1)-(9.11.8)): deg-qa counting ((9.8)(d) lb_Sqa の
+  Lean 対応要確認) + norm-chain squeeze (S07_Subcoherent 在庫) + S3 enumeration。
+次 iteration = **(A) caseB assembly に着手** (hex witness 供給 → family 分解 → 1-pair adjoin
+instantiation の順)。
+
+## 🔬 update⁵⁸ (2026-07-07 lane-a /loop) — ★★ (9.11) target 訂正: sOf (𝒳-系) が正、SOf でない (update⁵⁰ 撤回) + sOf 版 base landed
+
+### ① ★ target 訂正 (Coq 精読)
+- **Coq §9 の `S_ Y := seqIndD M^`(1) M M`_\F Y`** (PFsection9.v:209) — **第 3 引数 = M`_\F = H**:
+  source は「H ⊄ Ker θ」(𝒳-条件、`X_ Y = Iirr_kerD M' H Y` :208) を課される。∴ **(9.11)
+  `Ptype_core_coherence` の family = 𝒳-系 = Lean `sOf`**。
+- update⁵⁰ の「target = SOf(H0Cprime) = inducedKernelFamily」は **§11 の notation
+  (`S_ := seqIndD HU M HU`, PFsection11.v:90 — nontrivial のみ) との混同で誤り**。撤回。
+- 整合確認: `forall_sOf_H0Cprime_degree_qu_caseB` (S12_Section9Counts:77) の family = chars.SOf =
+  𝒳-系。SOf (kernel-filter) だと deg-q member (S(HC) 系、H-killing) が混ざり「全 member deg qu」
+  は偽 — 𝒳-系だから成立。教科書側の一貫性 ✓。
+- **bridges への影響**: `coherent_sOf_H0C_of_coherent_sOf_H0Cprime` (update⁴⁶、sOf 版) が**本線に
+  復帰**。SOf 版 bridge (update⁵⁰) は不使用 (無害残置; SOf coherence はより強い主張で (9.11) は
+  それを与えない)。SOf 版 base (update⁵⁷ landed) は S(HC)/SOf 系の中間量として有用残置。
+
+### ✅ landed: `S13.sOf_degreeSubfamily_isCoherent` (sorry-free, axiom-clean, commit 7d0ab806)
+(9.11) が実際に消費する base: 𝒮(Y) の deg-d 既約 subfamily coherence。sOf-cut ⊆ SOf-cut
+(sOf_subset_SOf) で update⁵⁷ の SOf 版から restrict。witness = ζ̄−ζ (sOf_closedUnderConjugate)。
+
+### ② ★ all-reducible ケースの発見 — irr-witness は常には立たない
+Coq (9.9)(c): `all redM (S_ H0C') → C=1 ∧ u=(p^q−1)/(p−1) ∧ Frobenius(HU/H0)` — **S_ H0C' が
+全 member reducible の退化ケースが排除されていない** (その場合の特殊構造を export するのみ)。
+Coq (9.11) は subcoherent (可変長 R-datum) ゆえ irreducibility 不要で場合分けなし。Lean-native
+route (irr-cut base) は all-reducible で base が立たない ⟹ **μ-pair base (reducible conj-pair
+{μ, μ̄} の 2-element coherence) が caseB assembly の必要部品**:
+- 供給源: R(μ) = `certainTypeR` (σ-image family、S06) → extension ν(μ) = R の half-sum
+  (‖ν(μ)‖² = ‖μ‖² が orthonormal half-sum で合う)。`coherentPair` (S07) の norm-mc 一般化
+  or `certainTypeDecompositionDa` からの直接組立。
+- caseB assembly 全体 = seed (irr-pair [coherentPair_fromDade] or μ-pair [新規]) + 残り pairs を
+  xAdjoinStepW / xAdjoinStepW_k で adjoin + coherentOfPairChainCover fold。
+次 = **μ-pair base の設計調査** (coherentPair の一般化可能性、certainTypeR half-sum 構造)。
+
+## 🔬 update⁵⁹ (2026-07-07 lane-a /loop) — ★ coherentPair_k landed: μ-pair seed の generic 部品
+
+### ✅ landed: `S07.coherentPair_k` (S07_RetargetScaled 末尾, sorry-free, commit 5f68e0a8)
+reducible 共役対 {χ,χ̄} の単独 coherence seed — coherentPair の ‖χ‖²≠1 一般化 (S₁=∅、anchor
+不要)。Gram-matched X,X̄ を受けて ν := retargetS で構成。調査確定事項:
+- `retarget_isCoherent_S`/`retarget_isCoherent_of_extensionImage_k` は **anchor χ₁∈S₁ 必須**で
+  seed 不可 → 本 lemma が gap を埋めた。
+- **`retargetTargetPair_gen`** (S07_RetargetScaled、既存): ψ=0 `CharacterPsiDecomposition` から
+  Gram-matched pair (‖X‖²=‖χ‖² 等) を**計算で**出す producer — coherentPair_k の入力供給源。
+- S07_RetargetScaled / S08_RetargetReducible / S08_CoherenceWeighted は **lane a 所有** (b glob は
+  S07_Coherence* + S08_PGroupReduction のみ) — この線の build は全て自所有内。
+
+### μ-pair seed の残り (次 iteration)
+1. **ψ=0 certain-type decomposition**: `CharacterPsiDecomposition τ_enl μ 0` の producer
+   (`certainTypeDecompositionDa` は ψ=a•η₁ 形で ψ=0 にすると support 前提が偽 → 別途組む)。
+   部品は S06 に完備: `certainTypeExtension_columnSum` (tau1(μ) = δΣω^σ = X、Y=0)、
+   `certainTypeRImage`/`certainTypeR` (imageFamily)、`certainTypeOmegaSigma_inner` (isometry)。
+2. **τ seam**: certainTypeR 系は enlarged Dade (h46.dade0) 上 — hyp.tau への retarget は
+   S08_CaseBCoherence2 の (6.8.2.3) seam パターン踏襲。
+3. seed 組立: retargetTargetPair_gen + coherentPair_k + μ−μ̄ support/nonzero (muGrid API)。
