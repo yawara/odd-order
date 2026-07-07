@@ -2616,4 +2616,141 @@ theorem tau_apply_eq_zero_of_mem_typePV [Finite G]
     OddOrder.GroupTheory.typePA_eq_sharpSubgroup_derivedInG] at hmem
   exact OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived hyp.typeP hvPV hmem.1
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(5.2.e) certain-type column vs irreducible break cross-orthogonality, §12 form**
+`R(μ_j) ⊥ R(χ)` — the §12 (`A₀(M)`-Dade) analogue of
+`certainTypeR_imageSet_orthogonal_dadeOfDiff` (S08_CaseBHortho, Sibley world).  The proof is a
+mirror: the disjointness machine (`inner_smul_chiFam_eq_zero_of_diff_vanishOnV` on
+`ticVdiff (toHypothesis46 …)`) and the two-element `R(χ)` capture are `h46`-generic; the single
+Sibley-specific anchor — vanishing of `(χ − χ̄)^τ` on the exceptional `V` — is replaced by the
+§12 anchor `tau_apply_eq_zero_of_mem_typePV` (base-point evaluation, `V^M ⊆ A₀`).  The conjugate
+difference is `A(M)`-supported (`hdiffsuppχA`, feeding the anchor) and `A₀(M)`-supported
+(`hdiffsuppχ`, defining the Dade image family `R(χ)`).  This is the `hortho_mem` core of the
+(9.11) column-pair adjunction. -/
+theorem certainTypeR_imageSet_orthogonal_dadeOfDiff_typeP [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)
+    [NeZero (Nat.card (hyp.toHypothesis46 hG hG.odd).W1)]
+    {χ₂ : ((hyp.toHypothesis46 hG hG.odd).W2.subgroupOf
+      ((hyp.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.toHypothesis46 hG hG.odd).W2)) →* ℂˣ}
+    (hχ₂ : χ₂ ≠ 1)
+    (hdeg : (∑ i, (((hyp.toHypothesis46 hG hG.odd).columnFamily χ₂).mu i
+        : ClassFunction ↥M ℂ) 1)
+      = (∑ i, (((hyp.toHypothesis46 hG hG.odd).columnFamily χ₂⁻¹).mu i
+        : ClassFunction ↥M ℂ) 1))
+    (χ : IrreducibleCharacter ↥M)
+    (hrealχ : ¬ ClassFunction.IsReal (χ : ClassFunction ↥M ℂ))
+    (hdiffsuppχA : (((χ : ClassFunction ↥M ℂ).conj - (χ : ClassFunction ↥M ℂ)
+      : ClassFunction ↥M ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (OddOrder.GroupTheory.typePA M hyp.typeP) M)
+    (hdiffsuppχ : (((χ : ClassFunction ↥M ℂ).conj - (χ : ClassFunction ↥M ℂ)
+      : ClassFunction ↥M ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (OddOrder.GroupTheory.typePA0 M hyp.typeP) M) :
+    ∀ α ∈ (OddOrder.Peterfalvi.S06.certainTypeR (hyp.toHypothesis46 hG hG.odd)
+        hχ₂ hdeg).imageSet,
+    ∀ β ∈ (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp.dadeData.dade
+        hyp.hconj χ hrealχ hdiffsuppχ).imageSet,
+      ClassFunction.inner α β = 0 := by
+  haveI := hyp.finiteG
+  classical
+  -- `hmin`: `2 < min(w₁, w₂)` for the `ticVdiff` exceptional structure.
+  have hmin : 2 < min
+      (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff (hyp.toHypothesis46 hG hG.odd)).W1)
+      (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff (hyp.toHypothesis46 hG hG.odd)).W2) := by
+    have h1 := (OddOrder.Peterfalvi.S06.ticVdiff (hyp.toHypothesis46 hG hG.odd)).three_le_card_W1
+    have h2 := (OddOrder.Peterfalvi.S06.ticVdiff (hyp.toHypothesis46 hG hG.odd)).three_le_card_W2
+    omega
+  -- core disjointness brick (mirror of the Sibley `key`)
+  have key : ∀ (χ₂' : ((hyp.toHypothesis46 hG hG.odd).W2.subgroupOf
+      ((hyp.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.toHypothesis46 hG hG.odd).W2)) →* ℂˣ)
+      (i : Fin (Nat.card (hyp.toHypothesis46 hG hG.odd).W1)) {c c' : ℂ}
+      {ξ ξ' : ClassFunction G ℂ},
+      ξ ∈ ZIrr G → ClassFunction.inner ξ ξ = 1 → ξ' ∈ ZIrr G →
+      ClassFunction.inner ξ' ξ' = 1 →
+      ClassFunction.inner ξ ξ' = 0 → c ≠ 0 →
+      (∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff (hyp.toHypothesis46 hG hG.odd)).V,
+        (c • ξ - c' • ξ') v = 0) →
+      ClassFunction.inner (c • ξ)
+        (OddOrder.Peterfalvi.S06.certainTypeOmegaSigma (hyp.toHypothesis46 hG hG.odd) χ₂' i)
+        = 0 := by
+    intro χ₂' i c c' ξ ξ' hξZ hξ1 hξ'Z hξ'1 hξξ' hc hvanish
+    rw [OddOrder.Peterfalvi.S06.certainTypeOmegaSigma_eq_chiFam]
+    exact OddOrder.Peterfalvi.S08.inner_smul_chiFam_eq_zero_of_diff_vanishOnV
+      (OddOrder.Peterfalvi.S06.ticVdiff (hyp.toHypothesis46 hG hG.odd)) rfl
+      (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication (hyp.toHypothesis46 hG hG.odd))
+      hξZ hξ1 hξ'Z hξ'1 hξξ' hc hvanish hmin _
+  -- `(χ − χ̄)^τ` vanishes on `V` (the §12 anchor, base-point evaluation)
+  have hsuppsub : (((χ : ClassFunction ↥M ℂ) - (χ : ClassFunction ↥M ℂ).conj
+      : ClassFunction ↥M ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (OddOrder.GroupTheory.typePA M hyp.typeP) M := by
+    rw [show (χ : ClassFunction ↥M ℂ) - (χ : ClassFunction ↥M ℂ).conj =
+        -((χ : ClassFunction ↥M ℂ).conj - (χ : ClassFunction ↥M ℂ)) by abel,
+      ClassFunction.support_neg]
+    exact hdiffsuppχA
+  have htauvanish : ∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff (hyp.toHypothesis46 hG hG.odd)).V,
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)
+        ((χ : ClassFunction ↥M ℂ) - (χ : ClassFunction ↥M ℂ).conj) v = 0 :=
+    fun v hv => tau_apply_eq_zero_of_mem_typePV hG hyp hsuppsub hv
+  -- capture the two-element `R(χ)` abstractly
+  obtain ⟨cd, hcd⟩ :
+      ∃ cd : OddOrder.Peterfalvi.S07.CharacterDifferenceImage (G := G)
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) (χ : ClassFunction ↥M ℂ),
+        OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp.dadeData.dade
+            hyp.hconj χ hrealχ hdiffsuppχ
+          = cd.toOrthonormalImage := ⟨_, rfl⟩
+  have hcdimg : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)
+      ((χ : ClassFunction ↥M ℂ) - (χ : ClassFunction ↥M ℂ).conj)
+      = (cd.sign : ℂ) • cd.muClassFunction - (cd.sign : ℂ) • cd.nuClassFunction := by
+    rw [cd.image_eq, smul_sub, Int.cast_smul_eq_zsmul, Int.cast_smul_eq_zsmul]
+  have hμZ : cd.muClassFunction ∈ ZIrr G := cd.mu.mem_ZIrr
+  have hνZ : cd.nuClassFunction ∈ ZIrr G := cd.nu.mem_ZIrr
+  have hμ1 : ClassFunction.inner cd.muClassFunction cd.muClassFunction = 1 := by
+    have h := irreducibleCharacter_inner_eq_ite cd.mu cd.mu; rwa [if_pos rfl] at h
+  have hν1 : ClassFunction.inner cd.nuClassFunction cd.nuClassFunction = 1 := by
+    have h := irreducibleCharacter_inner_eq_ite cd.nu cd.nu; rwa [if_pos rfl] at h
+  have hμν : ClassFunction.inner cd.muClassFunction cd.nuClassFunction = 0 := by
+    have h := irreducibleCharacter_inner_eq_ite cd.mu cd.nu; rwa [if_neg cd.distinct] at h
+  have hνμ : ClassFunction.inner cd.nuClassFunction cd.muClassFunction = 0 := by
+    have h := irreducibleCharacter_inner_eq_ite cd.nu cd.mu
+    rwa [if_neg (Ne.symm cd.distinct)] at h
+  have hsignC : (cd.sign : ℂ) ≠ 0 := by rcases cd.sign_eq with h | h <;> simp [h]
+  have hnsignC : (-(cd.sign : ℂ)) ≠ 0 := by rcases cd.sign_eq with h | h <;> simp [h]
+  intro α hα β hβ
+  rw [hcd] at hβ
+  simp only [OddOrder.Peterfalvi.S07.CharacterDifferenceImage.toOrthonormalImage,
+    Finset.mem_insert, Finset.mem_singleton] at hβ
+  simp only [OddOrder.Peterfalvi.S06.certainTypeR, Finset.mem_image] at hα
+  obtain ⟨⟨b, i⟩, _, rfl⟩ := hα
+  have hvanishμν : ∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff (hyp.toHypothesis46 hG hG.odd)).V,
+      ((cd.sign : ℂ) • cd.muClassFunction - (cd.sign : ℂ) • cd.nuClassFunction) v = 0 := by
+    intro v hv; rw [← hcdimg]; exact htauvanish v hv
+  have hvanishνμ : ∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff (hyp.toHypothesis46 hG hG.odd)).V,
+      ((-(cd.sign : ℂ)) • cd.nuClassFunction - (-(cd.sign : ℂ)) • cd.muClassFunction) v = 0 := by
+    intro v hv
+    rw [show (-(cd.sign : ℂ)) • cd.nuClassFunction - (-(cd.sign : ℂ)) • cd.muClassFunction
+        = (cd.sign : ℂ) • cd.muClassFunction - (cd.sign : ℂ) • cd.nuClassFunction by
+      rw [neg_smul, neg_smul]; abel]
+    exact hvanishμν v hv
+  have hμcast : cd.sign • cd.muClassFunction = (cd.sign : ℂ) • cd.muClassFunction :=
+    (Int.cast_smul_eq_zsmul ℂ cd.sign cd.muClassFunction).symm
+  have hνcast : (-cd.sign) • cd.nuClassFunction = (-(cd.sign : ℂ)) • cd.nuClassFunction := by
+    rw [← Int.cast_smul_eq_zsmul ℂ (-cd.sign) cd.nuClassFunction, Int.cast_neg]
+  rcases hβ with rfl | rfl <;> cases b <;>
+    simp only [OddOrder.Peterfalvi.S06.certainTypeRImage]
+  · rw [hμcast, OddOrder.RepresentationTheory.inner_conj_symm,
+      OddOrder.RepresentationTheory.inner_smul_right,
+      key χ₂ i hμZ hμ1 hνZ hν1 hμν hsignC hvanishμν, mul_zero, star_zero]
+  · rw [hμcast, OddOrder.RepresentationTheory.inner_conj_symm,
+      OddOrder.RepresentationTheory.inner_smul_right,
+      key χ₂⁻¹ i hμZ hμ1 hνZ hν1 hμν hsignC hvanishμν, mul_zero, star_zero]
+  · rw [hνcast, OddOrder.RepresentationTheory.inner_conj_symm,
+      OddOrder.RepresentationTheory.inner_smul_right,
+      key χ₂ i hνZ hν1 hμZ hμ1 hνμ hnsignC hvanishνμ, mul_zero, star_zero]
+  · rw [hνcast, OddOrder.RepresentationTheory.inner_conj_symm,
+      OddOrder.RepresentationTheory.inner_smul_right,
+      key χ₂⁻¹ i hνZ hν1 hμZ hμ1 hνμ hnsignC hvanishνμ, mul_zero, star_zero]
+
 end OddOrder.Peterfalvi.S13
