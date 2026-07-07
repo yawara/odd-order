@@ -967,3 +967,19 @@ sOf(H0Cprime) reducible member → certainTypeSet membership の合成で残る�
 3. 合成 lemma: reducible φ ∈ SOf/sOf(H0Cprime) → φ ∈ certainTypeSet h46 k (1+2+S12_Section9Counts:572
    +update⁶² world-join)。
 その後 mixed corner (③ hDeg / ④ hgen)。次 iteration = 残 1→2→3。
+
+## 🔬 update⁶³ (2026-07-07 lane-a /loop) — ★ all-reducible corner の membership pieces 完備 (残 1→2→3 全 landed)
+
+### ✅ landed (S12_Section9Counts, sorry-free ×3, commit 83092b0c ほか)
+- **`muColumnChar_ne_one`**: j ≠ 0 → μ-列の W₂-dual ≠ 1 (fCECG_zero + Equiv injectivity)。
+  ⚠ `rw [← fCECG_zero] at heq` は instance 表記差で pattern 不一致 → goal 方向 rw + exact に変更。
+- **`muColumnChar_columnSum_apply_one_eq`**: (10.3) cross-column deg 一致を §6 columnFamily
+  interface で (world-join を 1 で評価、map_sum AddMonoidHom.mk' + muGrid_apply_one_eq entrywise)。
+- **`reducible_mem_inducedKernelFamily_mem_certainTypeSet`**: 任意 kernel filter S(B) の reducible
+  member ψ → ψ ∈ certainTypeSet (toHypothesis46) (muColumnChar kref) (kref ≠ 0 任意、hw2 prime)。
+
+### ⟹ all-reducible corner の残り = S13 family-level assembly のみ (~40 行)
+「sOf(H0Cprime) が all-reducible ⟹ coherent(sOf(H0Cprime), A0)」: sOf ⊆ SOf = inducedKernelFamily
+(sOf_subset_SOf + SOf_eq) → per-member 上記合成で ⊆ certainTypeSet → `certainTypeSet_isCoherent_A0`
++ `isCoherent_of_subset` (witness = sOf の μ̄−μ、conjDiff 系 landed パターン)。
+mixed corner (③ hDeg counting / ④ hgen) は別途。次 iteration = S13 assembly。
