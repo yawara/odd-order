@@ -1307,3 +1307,22 @@ hdegcol (μ deg = d) + hdiffasuppχ の §9/caseB facts のみ**。
    composite の hS₁/s を分離する軽微な一般化が要る** (S₁ : Set 引数 + s : Finset ⊆ S₁)。
 2. **hDeg/hdegcol の §9 supply** (caseB counting/uniform-qu)。
 3. caseA (non-Galois) は (9.11.1)-(9.11.8) norm-chain — 別フェーズ。
+
+## 🔬 update⁷⁸ (2026-07-08 lane-a /loop) — s/S₁ 分離一般化 landed (chain 化 ready)
+
+### ✅ landed (commit ebb22747, sorry-free ×3 維持)
+adjoin composite / bundled datum / caseB caller を (S₁ : Set) + (s : Finset ⊆ S₁) に分離。
+S₁ は step ごとに成長、s = irr-cut (anchor family) 固定 — chain fold の各 step で同じ s を
+使い回せる形。hdegS₁diff (S₁ 全体の anchor-diff support) が新 named (caseB では全 member
+deg d で scaledDiff から供給、初段 caller で実証済)。
+
+### 次: chain fold (`caseB_coherent_sOf_H0Cprime_of_mixed`)
+- pair enumeration: 非自明 column の inverse-pair 代表系 (Fin ((w2−1)/2) or
+  {χ₂ // χ₂ ≠ 1} / inverse 同一視) — columnSum 全列の被覆と sOf(H0Cprime) = cut ∪ ⋃ pairs
+  (caseB) の family 同定 (all-reducible corner の membership 合成の mixed 版)。
+- fold: coherentOfPairChainCover (S07) — pairUnion 形に合わせる。
+- 各 step の hdegS₁diff: S₁ = cut ∪ 既 pairs — μ 系の deg = d (hdegcol) で保存 ✓。
+- 各 step の hμ_S1 (S₁ 全体): cut 部 = columnSum_inner_irr…、μ 部 = 列違い直交
+  (columnFamily_mu_sum_inner off-diag) ✓ 部品あり。
+- 残る genuine: hDeg (counting) / hdegcol (uniform-qu) / family 同定 (caseB の
+  sOf = cut ⊔ μ-pairs 分割)。
