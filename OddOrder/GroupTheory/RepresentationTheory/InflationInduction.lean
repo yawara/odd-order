@@ -180,4 +180,39 @@ theorem induce_one_eq_compHom_induce_one_of_le {N A : Subgroup G} [N.Normal] (hN
   rw [invOf_eq_inv, invOf_eq_inv, hcardA, mul_inv, mul_comm ((Nat.card ↥N : ℂ))⁻¹,
     mul_assoc, inv_mul_cancel₀ hneN, mul_one]
 
+/-- **P3 — inflated class functions are orthogonal to irreducibles not killing `N`.**  For `N ⊴ G`,
+any class function `φ` of `G ⧸ N` inflates to something orthogonal to every irreducible character
+`ψ` of `G` whose kernel does **not** contain `N`: `⟨φ ∘ mk', ψ⟩_G = 0`.
+
+Peterfalvi's "(13.18.b) `Ind_{PW₁}^S 1 ⊥ μ_{0j}` because `P ⊄ ker μ_{0j}`": expand `φ` in the
+`Irr(G ⧸ N)` basis (`sum_inner_irreducibleCharacter_smul`); each `compHom (mk' N) χ̄` is the
+irreducible `inflate N χ̄` with `N ⊆ ker` (`subset_characterKernel_inflate`), so it differs from `ψ`
+(which has `N ⊄ ker`) and is orthogonal to it (`irreducibleCharacter_inner_eq_ite`). -/
+theorem inner_compHom_mk'_irreducible_eq_zero_of_not_subset_ker {N : Subgroup G} [N.Normal]
+    [Fintype G] [Fintype (G ⧸ N)] [Fintype (IrreducibleCharacter (G ⧸ N))]
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card (G ⧸ N) : ℂ)]
+    (φ : ClassFunction (G ⧸ N) ℂ) (ψ : IrreducibleCharacter G)
+    (hψ : ¬ ((N : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel (ψ : ClassFunction G ℂ))) :
+    ClassFunction.inner (ClassFunction.compHom (QuotientGroup.mk' N) φ)
+        (ψ : ClassFunction G ℂ) = 0 := by
+  have compHom_sum : ∀ (s : Finset (IrreducibleCharacter (G ⧸ N)))
+      (a : IrreducibleCharacter (G ⧸ N) → ℂ),
+      ClassFunction.compHom (QuotientGroup.mk' N)
+          (∑ χ ∈ s, a χ • (χ : ClassFunction (G ⧸ N) ℂ))
+        = ∑ χ ∈ s, a χ •
+            ClassFunction.compHom (QuotientGroup.mk' N) (χ : ClassFunction (G ⧸ N) ℂ) := by
+    intro s a
+    induction s using Finset.induction with
+    | empty => simp [ClassFunction.compHom_zero]
+    | @insert χ s hχ ih =>
+        rw [Finset.sum_insert hχ, ClassFunction.compHom_add, ClassFunction.compHom_smul, ih,
+          Finset.sum_insert hχ]
+  conv_lhs => rw [← sum_inner_irreducibleCharacter_smul φ, compHom_sum]
+  rw [inner_sum_left]
+  refine Finset.sum_eq_zero (fun χ _ => ?_)
+  have hne : inflate N χ ≠ ψ := fun heq =>
+    hψ (heq ▸ subset_characterKernel_inflate N χ)
+  rw [ClassFunction.inner_smul_left, ← inflate_coe N χ, irreducibleCharacter_inner_eq_ite,
+    if_neg hne, mul_zero]
+
 end OddOrder.RepresentationTheory
