@@ -150,4 +150,140 @@ theorem sOf_H0Cprime_apply_one_le_qu {data : TypesIIIIIIVSetup M}
 
 end DegreeBound
 
+/-! ### (9.11.1) preamble: the case-(a) divisibility `a ∣ χ(1)` on `𝒳(H₀)` (Coq `a_dv_XH0`)
+
+Coq `typeP_nonGalois_characters` part (a) (`PFsection9.v:884-916`): *for `s ∈ 𝒳(H₀)`,
+`a ∣ χ_s(1)`*.  The (9.11.1) squeeze consumes it for the anchor ratio: every strict-branch
+adjoining `χ − (χ(1)/qa)·χ₁` needs `qa ∣ χ(1)`, i.e. `a ∣ (source degree)`.
+
+The Coq proof: a constituent `θ` of `Res_H χ` descends to a linear `θ̄ ≠ 1` of `H̄`; `θ̄` is
+nontrivial on some Clifford summand `Hpart w`; the inertia `T = I_{HU}(θ)` then satisfies
+`T ∩ U ≤ C_U(Hpart w)`, so `a = [HU : H·C_U(Hpart w)] ∣ [HU : T]`; and the Clifford degree
+formula `χ(1) = e·[HU:T]·θ(1)` gives `[HU:T] ∣ χ(1)`.
+
+This subsection lands the **`S₀`-witness form** (the summand is the orbit generator `S₀`): the
+inertia containment `I(θ₀) ≤ H·C_U(S₀)` (`inertia_le_hcuInHu`, the modular assembly over the
+landed hard direction `inertia_inf_uInHu_le_cuInHu`) and the divisibility
+(`caseA_source_degree_dvd_a_of_S0_witness`).  The general-summand case reduces to this one by a
+`W₁`-conjugation transport of `χ` (the summands are the `W₁`-orbit of `S₀`,
+`CliffordCaseAData.Hpart_orbit`) — the next brick. -/
+
+section CaseADivisibility
+
+variable [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+  {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
+
+/-- **The inertia of an `S₀`-nontrivial chief-factor character lies in `H·C_U(S₀)`**
+(Peterfalvi (9.8.d)/(9.11.2) inertia containment, one-sided form).
+
+The modular assembly over the landed hard direction `inertia_inf_uInHu_le_cuInHu`: decompose
+`g ∈ I(θ₀)` as `g = h·u` (`H ⊔ U = ⊤` in `HU`, `H ◁ HU`); `h ∈ H ≤ I(θ₀)` always, so
+`u = h⁻¹g ∈ I(θ₀) ⊓ U ≤ C_U(S₀)` by the single-factor stabilizer analysis.  This is the
+containment half of the (9.8.d) inertia lift `I = H·C_U(S₀)` — sufficient for the (9.11.1)
+divisibility, which only needs `[HU : H·C_U(S₀)] ∣ [HU : I(θ₀)]`. -/
+theorem inertia_le_hcuInHu [Fintype ↥(hInHu data)] (caseA : CliffordCaseAData chars)
+    {θbar : IrreducibleCharacter (↥data.H ⧸ chief.N)}
+    (hreg : ∃ x ∈ caseA.S0,
+      (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+        ≠ (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1) :
+    ClassFunction.inertia (G := ↥(huSub data)) (H := hInHu data)
+        (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+      ≤ hInHu data ⊔ cuInHu caseA := by
+  set θ₀ := ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+    (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+      (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)) with hθ₀
+  intro g hg
+  have hgtop : g ∈ hInHu data ⊔ uInHu data := hInHu_sup_uInHu_eq_top data ▸ Subgroup.mem_top g
+  rw [Subgroup.mem_sup_of_normal_left] at hgtop
+  obtain ⟨h, hh, u, hu, rfl⟩ := hgtop
+  have hh_in : h ∈ ClassFunction.inertia (H := hInHu data) θ₀ :=
+    ClassFunction.subgroup_le_inertia θ₀ hh
+  have hu_in : u ∈ ClassFunction.inertia (H := hInHu data) θ₀ := by
+    have hmem : h⁻¹ * (h * u) ∈ ClassFunction.inertia (H := hInHu data) θ₀ :=
+      mul_mem (inv_mem hh_in) hg
+    rwa [inv_mul_cancel_left] at hmem
+  exact mul_mem (Subgroup.mem_sup_left hh)
+    (Subgroup.mem_sup_right (inertia_inf_uInHu_le_cuInHu caseA hreg ⟨hu_in, hu⟩))
+
+open scoped Classical in
+/-- **Peterfalvi (9.11.1)/(9.8.a) case-(a) divisibility, `S₀`-witness form: `a ∣ χ(1)`.**
+
+For `χ ∈ Irr(HU)` lying over the inflation of a linear `θ̄ : H̄ →* ℂˣ` that is **nontrivial on
+the orbit generator `S₀`**, the Clifford integer `a = |U : C_U(S₀)|` divides the degree of `χ`:
+the inertia `I(θ₀)` is contained in `H·C_U(S₀)` (`inertia_le_hcuInHu`), so
+`a = [HU : H·C_U(S₀)]` (`index_hcuInHu_eq_caseA_a`) divides `[HU : I(θ₀)]`
+(`Subgroup.index_dvd_of_le`), which divides `χ(1) = e·[HU:I(θ₀)]·θ₀(1)`
+(`apply_one_eq_restrictionMultiplicity_mul_index_inertia`, `θ₀(1) = 1`).
+
+This is Coq `a_dv_XH0` (`PFsection9.v:884-916`) with the summand pinned to `S₀`; the general
+`𝒳(H₀)`-member reduces to this by `W₁`-transport (the summands are the `W₁`-orbit of `S₀`). -/
+theorem caseA_source_degree_dvd_a_of_S0_witness
+    [Fintype ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
+    (caseA : CliffordCaseAData chars)
+    {χ : IrreducibleCharacter ↥(huSub data)}
+    {θbar : (↥data.H ⧸ chief.N) →* ℂˣ}
+    (hover : IrreducibleCharacter.LiesOver (hInHu data) χ
+      (linearIrreducibleCharacter (θbar.comp ((QuotientGroup.mk' chief.N).comp
+        (hInHuEquivH data).toMonoidHom))))
+    (hS0 : ∃ x ∈ caseA.S0, θbar x ≠ 1)
+    {d : ℕ} (hd : (χ : ClassFunction ↥(huSub data) ℂ) (1 : ↥(huSub data)) = (d : ℂ)) :
+    caseA.a ∣ d := by
+  classical
+  haveI : Fintype ↥M := Fintype.ofFinite _
+  haveI : Fintype ↥(huSub data) := Fintype.ofFinite _
+  haveI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : Fintype (IrreducibleCharacter ↥(hInHu data)) := Fintype.ofFinite _
+  -- The realized constituent `θ₀ = linear(θ̄ ∘ mk'N ∘ equiv)` and its inflated `compHom` form.
+  set θ₀ : IrreducibleCharacter ↥(hInHu data) :=
+    linearIrreducibleCharacter (θbar.comp ((QuotientGroup.mk' chief.N).comp
+      (hInHuEquivH data).toMonoidHom)) with hθ₀def
+  have hform : (θ₀ : ClassFunction ↥(hInHu data) ℂ)
+      = ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            ((linearIrreducibleCharacter θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ))) := by
+    rw [ClassFunction.compHom_linearIrreducibleCharacter,
+      ClassFunction.compHom_linearIrreducibleCharacter, MonoidHom.comp_assoc]
+  -- The regularity witness in irreducible-character form.
+  have hreg : ∃ x ∈ caseA.S0,
+      ((linearIrreducibleCharacter θbar : IrreducibleCharacter (↥data.H ⧸ chief.N)) :
+        ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+        ≠ ((linearIrreducibleCharacter θbar : IrreducibleCharacter (↥data.H ⧸ chief.N)) :
+          ClassFunction (↥data.H ⧸ chief.N) ℂ) 1 := by
+    obtain ⟨x, hx, hne⟩ := hS0
+    refine ⟨x, hx, ?_⟩
+    rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one,
+      Units.val_one]
+    exact fun h => hne (Units.val_eq_one.mp h)
+  -- Inertia containment `I(θ₀) ≤ H·C_U(S₀)`, hence `a ∣ [HU : I(θ₀)]`.
+  have hcont : IrreducibleCharacter.inertia (G := ↥(huSub data)) (H := hInHu data) θ₀
+      ≤ hInHu data ⊔ cuInHu caseA := by
+    show ClassFunction.inertia (θ₀ : ClassFunction ↥(hInHu data) ℂ)
+      ≤ hInHu data ⊔ cuInHu caseA
+    rw [hform]
+    exact inertia_le_hcuInHu caseA hreg
+  have hdvd_idx : caseA.a
+      ∣ (IrreducibleCharacter.inertia (G := ↥(huSub data)) (H := hInHu data) θ₀).index := by
+    rw [← index_hcuInHu_eq_caseA_a caseA]
+    exact Subgroup.index_dvd_of_le hcont
+  -- Clifford degree formula `χ(1) = e·[HU:I(θ₀)]·θ₀(1)` with `θ₀(1) = 1`.
+  have key := OddOrder.RepresentationTheory.apply_one_eq_restrictionMultiplicity_mul_index_inertia
+    (H := hInHu data) χ θ₀ hover
+  obtain ⟨e, he⟩ :=
+    OddOrder.RepresentationTheory.IrreducibleCharacter.restrictionMultiplicity_natCast
+      (H := hInHu data) χ θ₀
+  have hθ₀1 : (θ₀ : ClassFunction ↥(hInHu data) ℂ) (1 : ↥(hInHu data)) = 1 := by
+    rw [hθ₀def, linearIrreducibleCharacter_apply, map_one, Units.val_one]
+  rw [he, hθ₀1, hd, mul_one] at key
+  -- `(d : ℂ) = e·[HU:I]`, so `d = e·[HU:I]` in `ℕ` and `a ∣ [HU:I] ∣ d`.
+  have hdeq : d = e * (IrreducibleCharacter.inertia (G := ↥(huSub data))
+      (H := hInHu data) θ₀).index := by
+    exact_mod_cast key
+  rw [hdeq]
+  exact Dvd.dvd.mul_left hdvd_idx e
+
+end CaseADivisibility
+
 end OddOrder.Peterfalvi.S11
