@@ -1439,6 +1439,15 @@ coherentOfPairChainCover instantiation が閉じ、**caseB mixed corner の cohe
 | **hDeg** | 2 < \|irr-cut\| | §9 counting ((9.8) count ≥ (p−1)u/… 系) — genuine |
 | anchor χ₁ | deg-d irr member | hDeg ⟹ cut nonempty から (or §9 (c) 直接) |
 
+## 📢 HUB 裁定通知 (2026-07-08, issue 0101): (9.11) caseA は b へ — a は caseB 完結 + 9000 pivot
+
+b が 9016 hY-producer 裁定の実施として `S11_NineElevenCoherence.lean` (b 所有 carve-out) で
+(9.11) caseA maximality 帰納 ((9.11.1)-(9.11.8)) の port に着工した。**分担境界 (issues/0101)**:
+caseA = b / caseB 一様 route = a (landed 済) / full assembly = a (S12/S13 から b leaf を import 可)。
+⟹ **a は caseA を自前組立しない** (queue から除去)。1019 の残 = caseB named §9 facts
+(hμmem/hunif/hDeg/anchor) + full assembly 配線のみ。完了次第 **ft_endgame_plan_2026_07_07.md の R1**
+(9000 typeP_Galois instance tail pivot、W9 は c へ) に移行する。
+
 ## 🔬 update⁸⁴ (2026-07-08 lane-a /loop) — ★★★ caseB (9.11) 端点 assembly LANDED: 残 = hDeg 1 本
 
 fold (update⁸³) の named 入力を同 session で 3/4 discharge し、caseB branch の端点まで組み上げ:
@@ -1462,5 +1471,6 @@ fold (update⁸³) の named 入力を同 session で 3/4 discharge し、caseB 
   irr count)。純 §9 counting — 次 iteration の一点集中対象。
 - transitive sorryAx は既知 §13 core gate (`chief_H0_eq_bot`/`C_eq_cSub` = (11.7)) のみ。
   §9/counting/fold 側は全て sorry-free。
-- その先: caseA (非Galois (9.11.1)-(9.11.8) norm-chain、engine 在庫は update⁴⁵ で確認済) →
-  clifford_dichotomy で (9.11) 全体 → hY packaging → capstone。
+- その先 (hub 0101 裁定に従い訂正): **caseA は b 所有** (`S11_NineElevenCoherence`) — a は
+  自前組立しない。a の残 = hDeg → **(9.11) full assembly 配線** (clifford_dichotomy で
+  caseA[b leaf を cite]/caseB[本 assembly] を束ね) → hY packaging → capstone → R1 pivot。

@@ -201,6 +201,14 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > (iii) 用途が 3002/9009 供給 chain、(iv) issue/notes で self-flag。**3002 供給完了で失効**
 > (以後の b の S05 等 lane-a ファイル編集は通常どおり逸脱)。
 >
+> **carve-out (issue 0101, hub 裁定 2026-07-08 監視 tick)**: `OddOrder/Peterfalvi/S11_NineElevenCoherence.lean`
+> (lane b が新規作成、(9.11) Ptype_core_coherence port の Dade-pair パラメータ化 leaf) は名目上 lane a の
+> S11 namespace パターンに掛かるが **lane b 所有**として扱う (9016 hY-producer 裁定の実施 + 1017 G1)。
+> ⟹ step 1.5 で b がこのファイルを編集しても逸脱でない (a が編集したら逸脱; b が他の S11 ファイルを
+> 編集したら従来どおり逸脱)。**分担境界: caseA (9.7.a) maximality 帰納 = b (本 leaf) / caseB (9.7.b)
+> 一様 route = a (S13 landed 済、b は再構築禁止) / full assembly = a (S12/S13 側で S11 leaf を import)**。
+> 詳細 = issues/0101。
+>
 > **⟹ 拡張 #2 (ユーザー裁定 2026-07-05 tick(3) — Hypothesis76 (7.6) 忠実化 field の包括許可)**:
 > 同型逸脱 3 連発 (issue 0091 Hypothesis78 / zeta_induced / zeta_injective、各回ユーザー受理) の
 > 反復解消として、**issue 2034/3002 の (13.5) 供給作業中に限り、b による `S09_NonexistenceCertain`
