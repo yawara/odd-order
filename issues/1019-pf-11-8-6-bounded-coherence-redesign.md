@@ -1077,3 +1077,22 @@ support、member 直交、τ(μ−χ₁) ∈ ZIrr、hSgen。**named 残 (次 pie
   — hyp.tau 形だと projection 親項の τ 差で application mismatch。
 次 iteration = named 残の supply pieces (上流順: 4 → 2 → 1 → 5-hgen; 3 は §12 化の独立 work、
 5-hDeg は §9 counting)。
+
+## 🔬 update⁶⁷ (2026-07-07 lane-a /loop) — ★ piece 4 (hμ_S1) LANDED
+
+### ✅ landed (S12_Section9Counts, sorry-free ×2, commit 57300af6)
+- **`exists_muColumnChar_eq`**: muColumnChar は非自明 W₂-dual への全射 (fCECG 逆像 + k≠0)。
+- **`columnSum_inner_irr_member_eq_zero`**: ⟨columnSum χ₂, x⟩ = 0 (χ₂≠1、irr x ∈ S(X)) —
+  composite の hμ_S1 直接 supply (hμbar_S1 は conj_eq + inv_ne_one 経由)。
+- traps §5 追補: 証明内 instance/card 同定は **statement 引数の型表記 (toHypothesis46) に統一**
+  しないと fCECG の Equiv unify が metavariable のまま全滅。tactic-def unfold の rfl は
+  with_unfolding_all で。
+
+### 残 pieces (adjoin composite の named 入力)
+2. **Da** = certainTypeDecompositionDa instantiation (ψ=1•χ₁; hμη₁supp の suppIn(A∪V^L) 形 ↔
+   typePA0 同定、htau1_mema、hχψ = piece 4 の系)
+1. **Dmem** = memberExtensionDecomposition per-member (conj-closure/no-real/pairwise を
+   irr-cut 特殊化で discharge)
+5. **hgen** (span 分解 ~30 行) / **hDeg** (|s| ≥ 3、§9 counting)
+3. **hortho_mem** (R⊥R の §12 化、S08_CaseBHortho 一般化 — 独立 work)
+次 iteration = piece 2 (Da)。
