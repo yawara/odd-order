@@ -2365,16 +2365,8 @@ noncomputable def adjoin_muColumnPair_of_irrFamily [Finite G]
       - χ₁ : ClassFunction ↥M ℂ)).support ⊆ hyp.A0)
     (hμZ : OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂ ∈ ZIrr ↥M)
     (hDeg : (2 : ℝ) < s.card)
-    (hgen : OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥M)
-        ((↑s : Set (ClassFunction ↥M ℂ)) ∪
-          {OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂,
-           (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂).conj})
-        hyp.A0 ⊆
-      Submodule.span ℤ (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥M)
-          (↑s : Set (ClassFunction ↥M ℂ)) hyp.A0 ∪
-        {OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂
-          - (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂).conj,
-         OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂ - 1 • χ₁})) :
+    (hdeganchor : OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂ 1
+      = χ₁ 1) :
     OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
       ((↑s : Set (ClassFunction ↥M ℂ)) ∪
         {OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂,
@@ -2475,6 +2467,23 @@ noncomputable def adjoin_muColumnPair_of_irrFamily [Finite G]
     exact Submodule.add_mem _
       (Submodule.subset_span (Set.mem_union_left _ hdiff))
       (Submodule.subset_span (Set.mem_union_right _ rfl))
+  -- span generation for the adjoined pair (`hgen`): the generic anchor-generation producer,
+  -- fed the degree matching `μ(1) = 1·χ₁(1)` and `μ̄(1) = μ(1)`
+  have hbar1 : (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂).conj 1
+      = OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂ 1 := by
+    rw [hconjcol, OddOrder.Peterfalvi.S06.columnSum_apply_one,
+      OddOrder.Peterfalvi.S06.columnSum_apply_one]
+    exact hdegsym
+  have hchi1_ne : χ₁ 1 ≠ 0 := by
+    obtain ⟨d, hd, hd1⟩ := irreducibleCharacter_apply_one_eq_pos_natCast ⟨χ₁, hirr χ₁ hχ₁s⟩
+    rw [show χ₁ 1 = ((⟨χ₁, hirr χ₁ hχ₁s⟩ : IrreducibleCharacter ↥M) : ClassFunction ↥M ℂ) 1
+      from rfl, hd1]
+    exact_mod_cast hd.ne'
+  have hgen := OddOrder.Peterfalvi.S07.zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration
+    (χ := OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂)
+    (chibar := (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂).conj)
+    (a := 1) hSgen
+    (by rw [Nat.cast_one, one_mul]; exact hdeganchor) hbar1 hchi1_ne hyp.one_notMem_A0
   -- fire the reducible-break weighted adjoin engine
   exact OddOrder.Peterfalvi.S08.xAdjoinStepW_k hyp.dadeData.dade hyp.hconj hS₁
     (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂) hdiffsuppχ
