@@ -1603,6 +1603,31 @@ theorem HC_lt_derived [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
   rw [hueq]
   exact hbC
 
+/-- **Coherence restricts to a subfamily** (Peterfalvi (5.2) monotonicity).  If `S` is coherent and
+`S' ⊆ S` carries a nonzero `A`-supported witness, then `S'` is coherent with the *same* coherent
+extension: the isometry (`extension_inner_eq`), `τ`-agreement (`extends_on_supported`) and
+`ZIrr`-codomain (`extension_mem_ZIrr`) laws all transport along the `zSpan` / `zSupportedSpan`
+monotonicity (`Submodule.span_mono` / `zSupportedSpan_mono_left`); only the `nonzero` witness must be
+re-supplied for `S'`.  This extracts the restriction pattern shared by `coherent_SOf_HC` (`S(HC) ⊆
+S(M'')`) and the world-bridge `𝒮(H₀C)`-coherence subset step (`sOf(H₀C) ⊆ sOf(H₀C')`, the (9.11)
+`hY` route). -/
+noncomputable def isCoherent_of_subset {L : Type*} [Group L] [Fintype L] [Fintype G]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    {S S' : Set (ClassFunction L ℂ)} {A : Set L}
+    (h : OddOrder.Peterfalvi.S07.IsCoherent τ S A) (hsub : S' ⊆ S)
+    (hwit : ∃ φ : ClassFunction L ℂ,
+      φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) S' A ∧ φ ≠ 0) :
+    OddOrder.Peterfalvi.S07.IsCoherent τ S' A where
+  nonzero := hwit
+  extension := h.extension
+  extension_inner_eq := fun a b ha hb =>
+    h.extension_inner_eq a b (Submodule.span_mono hsub ha) (Submodule.span_mono hsub hb)
+  extends_on_supported := fun a ha =>
+    h.extends_on_supported a (OddOrder.Peterfalvi.S07.zSupportedSpan_mono_left hsub ha)
+  extension_mem_ZIrr := fun a ha =>
+    h.extension_mem_ZIrr a (Submodule.span_mono hsub ha)
+
 /-- **Peterfalvi (11.8): `S(HC)` is coherent** (sorry-free).  `S(HC) = SOf HC` is the subfamily of
 the degree-`w₁` family `S(M'')` cut out by the *larger* kernel condition (`M'' ≤ HC`,
 `secondDerived_le_HC`, so `S(HC) ⊆ S(M'')` by kernel-antitonicity), so it inherits the coherent
@@ -1643,16 +1668,8 @@ theorem coherent_SOf_HC [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (hyp.base.commutator_quotient_ne_top hG hne)
   rw [hyp.SOf_eq] at hζ
   have hζc := OddOrder.Peterfalvi.S08.inducedKernelFamily_closedUnderConjugate _ hζ
-  -- assemble the restricted coherence, reusing `S(M'')`'s coherent extension
-  refine ⟨{
-    nonzero := ⟨ζ.conj - ζ, ⟨?_, ?_⟩, ?_⟩
-    extension := hM''coh.extension
-    extension_inner_eq := fun a b ha hb =>
-      hM''coh.extension_inner_eq a b (Submodule.span_mono hsub ha) (Submodule.span_mono hsub hb)
-    extends_on_supported := fun a ha =>
-      hM''coh.extends_on_supported a (OddOrder.Peterfalvi.S07.zSupportedSpan_mono_left hsub ha)
-    extension_mem_ZIrr := fun a ha =>
-      hM''coh.extension_mem_ZIrr a (Submodule.span_mono hsub ha) }⟩
+  -- assemble the restricted coherence, reusing `S(M'')`'s coherent extension (`isCoherent_of_subset`)
+  refine ⟨isCoherent_of_subset hM''coh hsub ⟨ζ.conj - ζ, ⟨?_, ?_⟩, ?_⟩⟩
   · -- `ζ̄ − ζ ∈ ℤ[S(HC)]`
     rw [hyp.SOf_eq]
     exact Submodule.sub_mem _ (Submodule.subset_span hζc) (Submodule.subset_span hζ)
