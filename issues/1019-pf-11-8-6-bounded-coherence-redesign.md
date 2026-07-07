@@ -626,3 +626,19 @@ Coq `S_ H0C' = seqIndD HU M HU H0C'`)** であり、`sOf(H0Cprime)` (H-version) 
 - **hwit = 𝒮(H₀C) nonzero witness** = 別途 (reducible_mem_sOf_H0C で member、sOf conjugate-closure +
   conjDiff support + no-real で ζ.conj-ζ)。sOf-world witness 機構要 (~50 行)。
 次 = (9.11) port (SOf(H0Cprime) の subcoherent → constant-degree base → pair-chain) か hwit。
+
+## 🔬 update⁵¹ (2026-07-07 lane-a /loop) — ★ sOf_closedUnderConjugate landed (hwit step 1)
+
+`S13.sOf_closedUnderConjugate` (`ClosedUnderConjugate (sOf data Y)`) を sorry-free landing
+(inducedKernelFamily_closedUnderConjugate S08 を mirror)。φ=induceHU χ ∈ sOf(Y) → φ.conj =
+induceHU(χ.conj) ∈ sOf(Y): `characterKernel_conj` で xiSet (H⊄ker) + Y-kernel 条件 保存、
+`induceHU_eq_induce` + `ClassFunction.induce_conj` で induce∘conj 交換。= hwit の conjugate-closure。
+
+### hwit (𝒮(H₀C) nonzero witness) の残ピース
+- ✅ conjugate-closure: `sOf_closedUnderConjugate` (本 iteration)。
+- ⏳ member ζ ∈ sOf(H0C): `reducible_mem_sOf_H0C` (reducible member、reducible_count_sOf_H0=p-1>0)。
+  **要 `Section11CharacterData` の hyp からの構成** (hyp に chars field あるか要確認、無ければ構成)。
+- ⏳ ζ.conj-ζ A0-support + ≠0: `inducedKernelFamily_conjDiff_support` / `_hasNoRealCharacters`
+  (ζ∈SOf(H0C)=inducedKernelFamily via `sOf_subset_SOf`)。
+- ⏳ C_eq_cSub bridge: sOf(hyp.H0C) = sOf(chief.H0 ⊔ chars.C) (hyp.C=cSub=chars.C)。
+⟹ 次 = hwit assembly (chars 構成 + 上記結合) or (9.11) port。
