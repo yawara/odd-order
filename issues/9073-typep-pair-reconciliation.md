@@ -113,13 +113,28 @@ alignment 不要)。⟹ step 5 を前倒しで verify:
 
 ⟹ 残余は Fact A + Fact B を供給する step 1–4 のみ (十分性は確定)。
 
+## 進捗 (2026-07-07 lane c loop⁴ — 🎯 Fact A 実証明化 (ungated)、残 Fact B のみ)
+
+**loop² の「p∤|T'| は gated」結論は誤りと判明・訂正**: κ-Hall route で ungated と実証:
+- `coprime_card_derivedInG_index_of_isTypeP` (**sorry-free**, 汎用): type-P M で `Coprime |M'| [M:M']`。
+  産出 κ-Hall (`exists_isHallSubgroup_kappa_ge`, X:=⊥) が cyclic (`typeP_duality`) かつ M' complement
+  (`typeP_derivedInG_isComplement_kappaHall`) → `coprime_card_derived_kappaHall_of_isComplement'`。
+  **FieldNormalizerData 不要** (W2_card_coprime_Q_card 経由の悲観は過剰)。
+- `Hypothesis.W2_isKappaHall_T` (**sorry-free**) = **Fact A**: W₂ complement T' + 産出 κ-Hall K を
+  Schur–Zassenhaus (`exists_conj_of_coprime`, 上記 coprimality) で共役 → Hall-ness 転送
+  (`IsHallSubgroup.mulAut_smul`)。**ungated、(14.9) 不要**。
+- `reconciled_typePData_T` に wire: `hFactA` を W2_isKappaHall_T で **discharge** → 残 sorry は
+  **`hFactB` 1 本のみ** (2→1)。commit 予定。
+
+⟹ **残余 = Fact B (`W₁ = M_σ(T)⊓C(W₂)`) のみ**。W₁ ≤ Fact-B-RHS は local
+(`W1_le_derivedInG_T` + `W1_commutes_W2` で W₁ ≤ T'⊓C(W₂)、M_σ(T)⊆T' 経由要検討)。逆包含が crux。
+
 ## やること (残り)
 
-- [x] 9000-range claim + generic 部品 (loop¹) + route typeP_duality 確定 (loop²) + step5 十分性 verify (loop³)
-- [ ] **step 1**: S-side κ-Hall setup (`IsHallSubgroup (kappa S) (W₁.subgroupOf S)`, `W₂=M_σ(S)⊓C(W₁)`)
-- [ ] **step 2–4**: `typeP_partner_structure S` (or `typeP_duality`) → Mstar=T + Z-family covering
-      (`theorem88_caseB` 経由) → Facts A/B(T) を `hFactA`/`hFactB` に供給
-- 補助: `IsZFamilyMember S W₁ T` (partner 同定)、`¬ IsConjugateSubgroup S T`
+- [x] claim + generic 部品 (loop¹) + route (loop²) + step5 verify (loop³) + **Fact A 実証明 (loop⁴)**
+- [ ] **Fact B** (`hFactB`: `W₁ = M_σ(T) ⊓ C(W₂)`) — 唯一の残 sorry。route 候補:
+      (a) `typeP_partner_structure S` の Fact B 出力 (S-side κ-Hall + Z-family covering wiring)、
+      (b) Fact A 済につき aligned datum d' (d'.W1=W₂) で `d'.W2 = C_{T'}(W₂)`、`d'.W2 ≤ W₁` の逆包含を local 攻略。
 
 ## 完了条件
 

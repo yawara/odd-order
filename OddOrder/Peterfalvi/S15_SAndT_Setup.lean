@@ -4500,6 +4500,84 @@ theorem Hypothesis.exists_typePData_U_eq_V [Finite G] (hG : OddOrder.BG.IsMinima
   · rw [hcastH hgT, show (tpd0.conj (MulAut.conj g)).H = (MulAut.conj g) • tpd0.H from rfl, hQtpd,
       hgQ]
 
+/-- **`M'` is a Hall subgroup of a type-`P` maximal** (`Coprime |M'| [M:M']`).  A `κ(M)`-Hall `K`
+exists (`exists_isHallSubgroup_kappa_ge`, `X := ⊥`), is cyclic (Theorem 14.7 `typeP_duality`:
+`K ⊔ K*` cyclic) and complements `M'` (`typeP_derivedInG_isComplement_kappaHall`); then
+`coprime_card_derived_kappaHall_of_isComplement'` gives `(|M'|, |K|) = 1` with `|K| = [M : M']`.
+
+This is the coprimality behind the Schur–Zassenhaus conjugacy of complements to `M'` — it is
+**ungated** (needs only `IsTypeP M`), so the earlier belief that `p ∤ |T'|` requires
+`FieldNormalizerData` (via `W2_card_coprime_Q_card`/`Q_elementaryAbelian`) was too pessimistic: the
+`κ`-Hall route supplies it directly.  Used to align a type-`P` datum's `κ`-factor to any given
+complement of `M'` (e.g. the abstract `W₂` on `T`, `W2_isComplement_T_deriv`). -/
+theorem coprime_card_derivedInG_index_of_isTypeP [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP : OddOrder.BG.Ch4.S14.IsTypeP M) :
+    Nat.Coprime (Nat.card ↥(derivedInG M)) ((derivedInG M).subgroupOf M).index := by
+  classical
+  obtain ⟨K, hKM, hKhall, -⟩ :=
+    OddOrder.BG.Ch4.S14.exists_isHallSubgroup_kappa_ge hG hM (bot_le (a := M))
+      (fun q hq => by rw [Subgroup.card_bot] at hq; simp at hq)
+  set Kstar : Subgroup G :=
+    OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G) with hKstar
+  haveI hKcyc : IsCyclic ↥K := by
+    obtain ⟨_, _, _, ⟨_, _, _, _, hcyc, _, _, _⟩, _⟩ :=
+      OddOrder.BG.Ch4.S14.typeP_duality hG hM hP hKM hKhall hKstar
+    haveI : IsCyclic ↥(K ⊔ Kstar) := hcyc
+    exact Subgroup.isCyclic_of_le (le_sup_left : K ≤ K ⊔ Kstar)
+  have hcompl :=
+    OddOrder.BG.Ch4.S14.typeP_derivedInG_isComplement_kappaHall hG hM hP hKM hKhall
+  have hcop :=
+    OddOrder.BG.Ch4.S14.coprime_card_derived_kappaHall_of_isComplement' hKhall hcompl
+  have h1 : Nat.card ↥((derivedInG M).subgroupOf M) = Nat.card ↥(derivedInG M) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (Subgroup.map_subtype_le _)).toEquiv
+  have h2 : Nat.card ↥(K.subgroupOf M) = ((derivedInG M).subgroupOf M).index :=
+    (hcompl.symm.index_eq_card).symm
+  rwa [h1, h2] at hcop
+
+/-- **Fact A: `W₂` is a `κ`-Hall of `T`** (ungated).  `W₂` complements `T'`
+(`W2_isComplement_T_deriv`); a produced `κ(T)`-Hall `K` (`exists_isHallSubgroup_kappa_ge`, cyclic,
+also complementing `T'`) is `T`-conjugate to `W₂` by Schur–Zassenhaus
+(`IsComplement'.exists_conj_of_coprime`, coprimality `coprime_card_derivedInG_index_of_isTypeP`);
+Hall-ness transfers along the conjugation (`IsHallSubgroup.mulAut_smul`).  This discharges the `hFactA`
+residual of `reconciled_typePData_T` with no `FieldNormalizerData`/(14.9) input. -/
+theorem Hypothesis.W2_isKappaHall_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa hyp.T)
+      (hyp.W2.subgroupOf hyp.T) := by
+  classical
+  have hP := OddOrder.BG.Ch4.S16.isTypeP_of_isTypeNonI hG hyp.T_maximal hyp.T_nonI
+  obtain ⟨K, hKM, hKhall, -⟩ :=
+    OddOrder.BG.Ch4.S14.exists_isHallSubgroup_kappa_ge hG hyp.T_maximal (bot_le (a := hyp.T))
+      (fun q hq => by rw [Subgroup.card_bot] at hq; simp at hq)
+  set Kstar : Subgroup G :=
+    OddOrder.BG.Ch3.S10.Msigma hyp.T ⊓ Subgroup.centralizer (K : Set G) with hKstar
+  haveI hKcyc : IsCyclic ↥K := by
+    obtain ⟨_, _, _, ⟨_, _, _, _, hcyc, _, _, _⟩, _⟩ :=
+      OddOrder.BG.Ch4.S14.typeP_duality hG hyp.T_maximal hP hKM hKhall hKstar
+    haveI : IsCyclic ↥(K ⊔ Kstar) := hcyc
+    exact Subgroup.isCyclic_of_le (le_sup_left : K ≤ K ⊔ Kstar)
+  have hcomplK :=
+    OddOrder.BG.Ch4.S14.typeP_derivedInG_isComplement_kappaHall hG hyp.T_maximal hP hKM hKhall
+  haveI : IsSolvable ↥hyp.T := hG.solvable_of_mem_maximalSubgroups hyp.T_maximal
+  haveI hNnorm : ((derivedInG hyp.T).subgroupOf hyp.T).Normal := by
+    rw [show (derivedInG hyp.T).subgroupOf hyp.T = commutator ↥hyp.T from
+      Subgroup.comap_map_eq_self_of_injective hyp.T.subtype_injective (commutator ↥hyp.T)]
+    infer_instance
+  have hcop : Nat.Coprime (Nat.card ↥((derivedInG hyp.T).subgroupOf hyp.T))
+      ((derivedInG hyp.T).subgroupOf hyp.T).index := by
+    have hderivM_le : derivedInG hyp.T ≤ hyp.T := Subgroup.map_subtype_le _
+    have hcard : Nat.card ↥((derivedInG hyp.T).subgroupOf hyp.T) = Nat.card ↥(derivedInG hyp.T) :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hderivM_le).toEquiv
+    rw [hcard]
+    exact coprime_card_derivedInG_index_of_isTypeP hG hyp.T_maximal hP
+  obtain ⟨n, -, hn⟩ := Subgroup.IsComplement'.exists_conj_of_coprime hcop (Or.inl inferInstance)
+    hcomplK hyp.W2_isComplement_T_deriv
+  have hHall := hKhall.mulAut_smul (MulAut.conj n)
+  rw [pointwise_mulAut_smul_eq_map] at hHall
+  rw [show ((MulAut.conj n).toMonoidHom : ↥hyp.T →* ↥hyp.T) = ↑(MulAut.conj n) from rfl] at hn
+  rwa [hn] at hHall
+
 /-- **`reconciled_typePData_T` の 2 residual を pairing facts から** (Fact A ∧ Fact B → 両 field, 実証明).
 `W₂` が `T` の `κ`-Hall (**Fact A**) かつ `W₁ = M_σ(T) ⊓ C(W₂)` (**Fact B**) — `typeP_partner_structure`
 (`S14`) が `S` の partner に対して供給する 2 つの (8.4.d)-dual pairing facts — があれば、既存の一般
@@ -4566,8 +4644,10 @@ theorem reconciled_typePData_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   -- `typeP_derivedInG_inf_centralizer_kappaElement_eq`); the two residuals are honestly gated on the
   -- §13 `typeP_partner` port (issue 9073) whose remaining step wires `typeP_partner_structure`'s inputs
   -- (S-side κ-Hall + Z-family covering) from the abstract `Hypothesis`.
-  have hFactA : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa hyp.T)
-      (hyp.W2.subgroupOf hyp.T) := sorry
+  -- **Fact A** (`W₂` κ-Hall of `T`) is now proven ungated (`W2_isKappaHall_T`, via the produced
+  -- κ-Hall + Schur–Zassenhaus).  **Fact B** (`W₁ = M_σ(T) ⊓ C(W₂)`) remains the sole residual — the
+  -- reverse cyclic-factor identification, supplied by `typeP_partner_structure` applied to `S`.
+  have hFactA := hyp.W2_isKappaHall_T hG
   have hFactB : hyp.W1 =
       OddOrder.BG.Ch3.S10.Msigma hyp.T ⊓ Subgroup.centralizer (hyp.W2 : Set G) := sorry
   obtain ⟨hW2le_pf, hCentW1_pf⟩ := hyp.reconciled_residuals_of_pairing_facts hG hFactA hFactB
