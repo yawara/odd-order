@@ -1243,3 +1243,21 @@ A(M)-supported α の §12 Dade image が ticVdiff.V 上 0。**Sibley と別理�
    `mderivSharp` 系が (M′)^# 直で出す — conjDiff の supp ⊆ (M′)^# ∪ … 要確認、hdiffsuppχ の
    supported 前提を A(M) 形で受ければよい)。
 2. bundled datum §12 版 (irrFamilyMemberDecomposition + 1) → 3. 特殊化 assembly。
+
+## 🔬 update⁷⁵ (2026-07-08 lane-a /loop) — ★★ hortho §12 化の本体 LANDED (R(μ_j) ⊥ R(χ))
+
+### ✅ landed: `S13.certainTypeR_imageSet_orthogonal_dadeOfDiff_typeP` (commit 90176fb9, sorry-free, 一発 green)
+S08_CaseBHortho:44 の完全 mirror — 唯一の Sibley 依存を §12 anchor (update⁷⁴) に差し替え、
+disjointness machine / R(χ) 抽象化 / 4-case は h46-generic 流用。conj-diff は A(M) + A₀ の
+2-supported 引数。
+
+### (9.11) mixed corner の残り (全部品が見えた)
+1. **bundled datum §12 版**: irrFamilyMemberDecomposition (piece 1) + 本 R⊥R を束ね、
+   「{ D // (D.imageFamily ⊥ certainTypeR …) ∧ D.tau1 x = ext x }」per-member subtype を返す
+   (S08_CaseBEnumeration の caseB_member_orthoDatum_columnBreak mirror)。Dmem の imageFamily =
+   dadeOrthonormalCharacterImageFamilyOfDiff (memberExtensionDecomposition 経由) — その imageSet
+   と本 R⊥R の β-side family の一致 (同じ dadeOfDiff、A₀ 形) の確認が接続点。向き注意:
+   composite の hortho_mem は (Dmem).Orthogonal (Da) — Da.imageFamily = certainTypeR (columnBreakDa
+   経由、transport 済) — 向きの swap は conj 対称 (Orthogonal の def と inner_conj_symm)。
+2. **特殊化 assembly** (irr-cut Finset 化 + 全 pieces 束ね、named 残 = hDeg + hdegcol)。
+3. hDeg counting (§9、genuine)。
