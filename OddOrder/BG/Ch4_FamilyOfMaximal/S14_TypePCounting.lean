@@ -12138,5 +12138,212 @@ theorem exists_sigmaDecomposition_length_le_two [Finite G]
       obtain ⟨M, hMmax, hgM⟩ := hgsharp
       exact hMtilde M hMmax hgM
 
+/-! ### Subnormal closure into the `C(K)`-unique maximal (Coq `snK_sMst`)
+
+Coq `P2type_signalizer` (BGsection14.v:2283) uses `snK_sMst L : K <|<| L → L ⊆ Mst`: any
+subgroup `L` in which the `κ`-Hall `K` is *subnormal* is contained in the unique maximal `Mst`
+over `C_G(K)`.  We port it here (S14 territory) via the base uniqueness `sK_uniqMst`
+(`∀ a, K ≤ Mst^a → a ∈ Mst`) and a strong induction on `|L|` peeling normal layers
+(`IsSubnormal.exists_normal_and_le_and_lt_top_of_ne`).  It supplies `E ⊆ Mst` (Coq `sDMst`)
+for the signalizer decomposition Keystone C. -/
+
+/-- **Coq `snK_sMst` single step**: if `N ⊆ Mstar`, `K ≤ N`, `L` normalizes `N`, and `K` has
+the uniqueness property `∀ a, K ≤ Mstar^a → a ∈ Mstar` (Coq `sK_uniqMst`), then `L ⊆ Mstar`.
+For `a ∈ L`, `a` normalizes `N`, so `N^{a⁻¹} = N`, whence `K^{a⁻¹} ≤ N^{a⁻¹} = N ⊆ Mstar`,
+i.e. `K ≤ Mstar^a`, so `a ∈ Mstar`. -/
+theorem le_partner_of_normalizes_of_le_of_uniq {K Mstar N L : Subgroup G}
+    (hNMstar : N ≤ Mstar) (hKN : K ≤ N) (hLN : L ≤ Subgroup.normalizer (N : Set G))
+    (huniq : ∀ a : G, K ≤ MulAut.conj a • Mstar → a ∈ Mstar) :
+    L ≤ Mstar := by
+  intro a ha
+  -- `a⁻¹` normalizes `N`, so `conj a⁻¹ • N = N`.
+  have haN : MulAut.conj a⁻¹ • N = N :=
+    OddOrder.GroupTheory.conj_smul_eq_self_of_mem_normalizer
+      (Subgroup.inv_mem _ (hLN ha))
+  -- `conj a⁻¹ • K ≤ conj a⁻¹ • N = N ≤ Mstar`.
+  have hKconj : MulAut.conj a⁻¹ • K ≤ Mstar :=
+    (Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hKN).trans (haN.le.trans hNMstar)
+  -- Rewrite as `K ≤ conj a • Mstar` and apply the uniqueness hypothesis.
+  have hKMstar : K ≤ MulAut.conj a • Mstar := by
+    have := Subgroup.pointwise_smul_le_pointwise_smul_iff (a := MulAut.conj a).mpr hKconj
+    rwa [← mul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul] at this
+  exact huniq a hKMstar
+
+/-- **Coq `snK_sMst`** (BGsection14.v:2283): if `K` is *subnormal* in `L` (`K ≤ L`,
+`(K.subgroupOf L).IsSubnormal`), `K ≤ Mstar`, and `K` has the uniqueness property
+`∀ a, K ≤ Mstar^a → a ∈ Mstar`, then `L ⊆ Mstar`.  Strong induction on `|L|`: if `K = L`,
+done; otherwise peel a proper `↥L`-normal overgroup `N̄` of `K.subgroupOf L`
+(`exists_normal_and_le_and_lt_top_of_ne`), so `N := N̄.map L.subtype` is a proper subgroup with
+`K ≤ N`, `K` subnormal in `N` (restriction), `L ≤ N_G(N)` (`N̄ ◁ ↥L`); the induction hypothesis
+gives `N ⊆ Mstar`, and the single-step lemma lifts it to `L ⊆ Mstar`. -/
+theorem le_partner_of_subnormal_of_uniq [Finite G] {K Mstar : Subgroup G}
+    (huniq : ∀ a : G, K ≤ MulAut.conj a • Mstar → a ∈ Mstar) (hKMstar : K ≤ Mstar) :
+    ∀ L : Subgroup G, K ≤ L → (K.subgroupOf L).IsSubnormal → L ≤ Mstar := by
+  intro L
+  induction hcard : Nat.card ↥L using Nat.strong_induction_on generalizing L with
+  | _ n ih =>
+    intro hKL hsub
+    by_cases hKLtop : K.subgroupOf L = ⊤
+    · -- `K = L` (as `K ≤ L`), so `L = K ≤ Mstar`.
+      have hLK : L ≤ K := by
+        intro x hx
+        have hmem : (⟨x, hx⟩ : ↥L) ∈ K.subgroupOf L := by rw [hKLtop]; exact Subgroup.mem_top _
+        exact (Subgroup.mem_subgroupOf).mp hmem
+      exact hLK.trans hKMstar
+    · -- Peel a proper `↥L`-normal overgroup `N̄` of `K.subgroupOf L`.
+      obtain ⟨Nbar, hNbarnorm, hKNbar, hNbarlt⟩ :=
+        hsub.exists_normal_and_le_and_lt_top_of_ne hKLtop
+      haveI := hNbarnorm
+      set N : Subgroup G := Nbar.map L.subtype with hNdef
+      have hNL : N ≤ L := Subgroup.map_subtype_le _
+      have hNbar_eq : N.subgroupOf L = Nbar :=
+        Subgroup.comap_map_eq_self_of_injective L.subtype_injective Nbar
+      -- `K ≤ N`.
+      have hKN : K ≤ N := by
+        have hmm : (K.subgroupOf L).map L.subtype ≤ N := Subgroup.map_mono hKNbar
+        rwa [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hKL] at hmm
+      -- `|N| < |L|` (proper).
+      have hNlt : Nat.card ↥N < Nat.card ↥L := by
+        have hNbne : N ≠ L := by
+          intro h
+          apply hNbarlt.ne
+          rw [← hNbar_eq, h, Subgroup.subgroupOf_self]
+        refine lt_of_le_of_ne (Nat.le_of_dvd Nat.card_pos (Subgroup.card_dvd_of_le hNL))
+          (fun heq => hNbne (Subgroup.eq_of_le_of_card_ge hNL heq.ge))
+      -- `K` subnormal in `N` (restrict the subnormal series along `N ≤ L`).
+      have hKNsub : (K.subgroupOf N).IsSubnormal := by
+        have hcomap := hsub.comap (Subgroup.inclusion hNL)
+        rwa [Subgroup.comap_inclusion_subgroupOf hNL] at hcomap
+      -- Induction hypothesis: `N ⊆ Mstar`.
+      have hNMstar : N ≤ Mstar := ih (Nat.card ↥N) (hcard ▸ hNlt) N rfl hKN hKNsub
+      -- `L ≤ N_G(N)` (`N̄ ◁ ↥L`), so the single-step lemma gives `L ⊆ Mstar`.
+      have hLnN : L ≤ Subgroup.normalizer (N : Set G) := by
+        rw [← Subgroup.normal_subgroupOf_iff_le_normalizer hNL, hNbar_eq]
+        exact hNbarnorm
+      exact le_partner_of_normalizes_of_le_of_uniq hNMstar hKN hLnN huniq
+
+/-! ### Subnormality in nilpotent groups (mathcomp `nilpotent_subnormal`)
+
+Two general group-theory facts used to feed `le_partner_of_subnormal_of_uniq` in the signalizer
+decomposition below (Coq `nilpotent_subnormal (Fitting_nil D) sK_FD`).  Not `S14`-specific. -/
+
+/-- **Every subgroup of a finite nilpotent group is subnormal** (mathcomp `nilpotent_subnormal`).
+Strong induction on the index: for `H ≠ ⊤` the normalizer condition
+(`normalizerCondition_of_isNilpotent`) gives `H < N(H)`, `H ⊴ N(H)` (`normal_in_normalizer`), and
+`[Γ : N(H)] < [Γ : H]` (`index_strictAnti`), so the IH makes `N(H)` subnormal;
+then `IsSubnormal.step`. -/
+theorem isSubnormal_of_isNilpotent {Γ : Type*} [Group Γ] [Finite Γ] [Group.IsNilpotent Γ]
+    (H : Subgroup Γ) : H.IsSubnormal := by
+  have hnc : NormalizerCondition Γ := normalizerCondition_of_isNilpotent
+  induction hidx : H.index using Nat.strong_induction_on generalizing H with
+  | _ n ih =>
+    by_cases hHtop : H = ⊤
+    · exact hHtop ▸ Subgroup.IsSubnormal.top
+    · have hlt : H < Subgroup.normalizer (H : Set Γ) := hnc H (lt_top_iff_ne_top.mpr hHtop)
+      have hidxlt : (Subgroup.normalizer (H : Set Γ)).index < n := by
+        rw [← hidx]; exact Subgroup.index_strictAnti hlt
+      have hstep : (Subgroup.normalizer (H : Set Γ)).IsSubnormal :=
+        ih _ hidxlt (Subgroup.normalizer (H : Set Γ)) rfl
+      exact Subgroup.IsSubnormal.step H (Subgroup.normalizer (H : Set Γ)) hlt.le hstep
+        Subgroup.normal_in_normalizer
+
+/-- **A subgroup contained in a normal, nilpotent subgroup is subnormal** in the ambient group
+(mathcomp `nilpotent_subnormal` + `normal_subnormal` + transitivity): `H ≤ N ⊴ Γ` with `N` nilpotent
+gives `H.subgroupOf N` subnormal in `↥N` (previous lemma), `N` subnormal in `Γ`
+(`Normal.isSubnormal`), so `IsSubnormal.trans`. -/
+theorem isSubnormal_of_le_normal_nilpotent {Γ : Type*} [Group Γ] [Finite Γ] {H N : Subgroup Γ}
+    (hHN : H ≤ N) (hNnorm : N.Normal) (hNnil : Group.IsNilpotent ↥N) : H.IsSubnormal := by
+  haveI := hNnil
+  exact Subgroup.IsSubnormal.trans hHN (isSubnormal_of_isNilpotent (H.subgroupOf N))
+    hNnorm.isSubnormal
+
+/-- **Signalizer σ-decomposition `H_σ ⊔ (H ∩ M*) = H` for BG Theorem 15.8** (Coq
+`tau2_P2type_signalizer`, `set D := H :&: L` + `sdprod_sigma maxH hallD`, BGsection15.v:1273/1374,
+resting on `P2type_signalizer`, BGsection14.v:2283/2374): for the Corollary 14.12 signalizer
+neighbour `H` of the type-`P₂` maximal `M` (with `M* ∈ 𝓜(C_G(K))`, `H ∈ 𝓜(N_G(R))`), the
+`E`-setup complement `E` of `H_σ` (which contains `K` with `K ⊆ F(E)`, from
+`typeP2_neighbor_is_typeF_of_mem`) lies in `M*`, so `H_σ ⊔ (H ∩ M*) ⊇ H_σ ⊔ E = H`.
+
+**Proof (weaker than Coq's exact `H ∩ M* = D`).**  Coq proves the exact identity `H ∩ M* = D` (its
+σ(H)′-Hall) via the harder `H_σ ∩ M* = 1` step, needed for its Hall/Fitting clauses.  The repo goal
+is only the *join* `H_σ ⊔ (H ∩ M*) = H`, so the easy inclusion `E ⊆ H ∩ M*` suffices.  `E ⊆ M*`
+comes from `le_partner_of_subnormal_of_uniq` (Coq `snK_sMst`): `K` is subnormal in `E`
+(`K ⊆ F(E)`, `F(E)` normal nilpotent, `isSubnormal_of_le_normal_nilpotent`), `K ⊆ M*`
+(`K ⊆ M*_σ`), and the uniqueness `K ≤ M*^a → a ∈ M*` (Coq `sK_uniqMst`, `partner_inf_and_uniq`);
+`M* = Mst` (the dual partner) since `𝓜(C(K)) = {Mst}` (Prop 14.2(d)).  (issue 9017 更新 #12/#13.) -/
+theorem signalizer_msigma_sup_inf_partner_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M Mstar U K R H : Subgroup G} {r : ℕ}
+    (hM : M ∈ maximalSubgroups G) (hP2 : IsTypeP2 M)
+    (hKM : K ≤ M) (hUM : U ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hUab : ∀ a ∈ U, ∀ b ∈ U, a * b = b * a)
+    (hMstar : Mstar ∈ maximalSubgroupsContaining (Subgroup.centralizer (K : Set G)))
+    (hr : r ∈ piSet U) (hRU : R ≤ U)
+    (hR : Ch03.IsHallSubgroup ({r} : Set ℕ) (R.subgroupOf U))
+    (hKNU : K ≤ Subgroup.normalizer (U : Set G))
+    (hH : H ∈ maximalSubgroupsContaining (Subgroup.normalizer (R : Set G))) :
+    OddOrder.BG.Ch3.S10.Msigma H ⊔ (H ⊓ Mstar) = H := by
+  classical
+  have hP : IsTypeP M := hP2.1
+  -- Dual partner `Mst` (Theorem 14.7 / `typeP_duality`).
+  set Kstar : Subgroup G := OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)
+    with hKstardef
+  obtain ⟨Mst, hMstprop, hMstuniq⟩ := (typeP_duality hG hM hP hKM hK hKstardef).2.2
+  obtain ⟨hMstmax, hMstP, hMnc, hMstpair, hZcyc, hZti, hP2or, hcover⟩ := hMstprop
+  -- Uniqueness `sK_uniqMst : K ≤ Mst^a → a ∈ Mst` (Coq), and `K ≤ M*_σ` (⟹ `K ≤ Mst`).
+  have hKMsigmaMst : K ≤ OddOrder.BG.Ch3.S10.Msigma Mst :=
+    (le_of_eq hMstpair.2.2).trans inf_le_left
+  have hMsMst : OddOrder.BG.Ch3.S10.Msigma M ⊓ Mst = Kstar :=
+    msigma_inf_partner_eq_kstar hG hM hP2 hKM hKstardef hMstmax hKMsigmaMst hMstpair.1 hMnc
+  have hKstarM : Kstar ≤ M := by
+    rw [hKstardef]; exact inf_le_left.trans (OddOrder.BG.Ch3.S10.Msigma_le M)
+  have hKstarNe : Kstar ≠ ⊥ := (typeP_structure hG hM hP hKM hK hKstardef hU).2.1
+  have hKNe : K ≠ ⊥ := fun h => card_kappaHall_ne_one hP hKM hK (by rw [h, Subgroup.card_bot])
+  obtain ⟨hziMMst, hsKuniq⟩ := partner_inf_and_uniq hG hMstmax hMstP hMstpair.1 hMstpair.2.1
+    hMstpair.2.2 hKMsigmaMst hKM hKstarM hZcyc hKstarNe hKNe hMsMst
+  -- `𝓜(C(K)) = {Mst}` (Prop 14.2(d) for `Mst`), so `Mstar = Mst`.
+  obtain ⟨-, -, -, -, hP2struct, -, -⟩ := typeP_structure hG hM hP hKM hK hKstardef hU
+  obtain ⟨-, q, hqprime, hKcard, -⟩ := hP2struct hP2
+  haveI : Fact q.Prime := ⟨hqprime⟩
+  have hKelemq : K ∈ elemAbelianOfRank G q 1 :=
+    mem_elemAbelianOfRank.mpr ⟨Subgroup.IsElementaryAbelian.of_card_prime hKcard,
+      by rw [hKcard, pow_one]⟩
+  have huniqMst : maximalSubgroupsContaining (Subgroup.centralizer (K : Set G)) = {Mst} := by
+    haveI hMstsol : IsSolvable ↥Mst := hG.solvable_of_mem_maximalSubgroups hMstmax
+    obtain ⟨UMst, hUMsthall⟩ : ∃ UMst : Subgroup G, Ch03.IsHallSubgroup
+        ((kappa Mst ∪ OddOrder.BG.Ch3.S10.sigma Mst)ᶜ) (UMst.subgroupOf Mst) := by
+      obtain ⟨U', hU'hall, -⟩ := Ch03.hall_D (G := ↥Mst)
+        (π := (kappa Mst ∪ OddOrder.BG.Ch3.S10.sigma Mst)ᶜ) (U := (⊥ : Subgroup ↥Mst))
+        (fun p hp => by simp at hp)
+      have hUeq : (U'.map Mst.subtype).subgroupOf Mst = U' :=
+        Subgroup.comap_map_eq_self_of_injective Mst.subtype_injective U'
+      exact ⟨U'.map Mst.subtype, by rw [hUeq]; exact hU'hall⟩
+    exact (typeP_structure hG hMstmax hMstP hMstpair.1 hMstpair.2.1 hMstpair.2.2
+      hUMsthall).2.2.2.2.2.1 q hqprime K hKelemq le_rfl
+  have hMstarEq : Mstar = Mst := by
+    have hmem := hMstar; rw [huniqMst] at hmem; exact Set.mem_singleton_iff.mp hmem
+  rw [hMstarEq]
+  -- `E`-setup from the neighbour lemma: `M_σ(H) ⊔ E = H`, `K ≤ E`, `K ≤ F(E)`.
+  obtain ⟨-, -, -, -, E, E₁, E₂, E₃, hEsetup, hKE, hKFE⟩ :=
+    typeP2_neighbor_is_typeF_of_mem hG hM hP2 hKM hUM hK hU hUab hr hRU hR hKNU hH
+  -- `E ≤ Mst` via subnormal closure (Coq `snK_sMst`): `K ⊴⊴ E`, `K ≤ Mst`, uniqueness.
+  have hKMst : K ≤ Mst := hKMsigmaMst.trans (OddOrder.BG.Ch3.S10.Msigma_le Mst)
+  have hKsubnormal : (K.subgroupOf E).IsSubnormal := by
+    haveI : Group.IsNilpotent ↥(OddOrder.BG.Ch2.S08.fittingInG E) :=
+      OddOrder.BG.Ch2.S08.fittingInG_isNilpotent E
+    refine isSubnormal_of_le_normal_nilpotent
+      (N := (OddOrder.BG.Ch2.S08.fittingInG E).subgroupOf E) ?_
+      (OddOrder.BG.Ch2.S08.fittingInG_subgroupOf_normal E)
+      (nilpotent_of_mulEquiv
+        (Subgroup.subgroupOfEquivOfLe (OddOrder.BG.Ch2.S08.fittingInG_le E)).symm)
+    exact Subgroup.comap_mono hKFE
+  have hEMst : E ≤ Mst := le_partner_of_subnormal_of_uniq hsKuniq hKMst E hKE hKsubnormal
+  -- Conclude: `E ⊆ H ∩ Mst` and `M_σ(H) ⊔ E = H`.
+  refine le_antisymm (sup_le (OddOrder.BG.Ch3.S10.Msigma_le H) inf_le_left) ?_
+  calc H = OddOrder.BG.Ch3.S10.Msigma H ⊔ E := hEsetup.E_compl_sup.symm
+    _ ≤ OddOrder.BG.Ch3.S10.Msigma H ⊔ (H ⊓ Mst) :=
+        sup_le_sup_left (le_inf hEsetup.E_le hEMst) _
+
 end OddOrder.BG.Ch4.S14
 

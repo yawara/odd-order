@@ -10166,34 +10166,6 @@ theorem typeP_isTypeP1_of_not_mem_beta [Finite G] (hG : OddOrder.BG.IsMinimalSim
     obtain ⟨hσβ, _⟩ := (S14.typeP_structure hG hL hP hKsL hKs hKdefL hU).2.2.2.2.1 hP2
     exact hqβ (hσβ ▸ hqσ)
 
-/-- **Signalizer semidirect decomposition `H = H_σ ⋊ (H ∩ M*)` for BG Theorem 15.8** (Coq
-`tau2_P2type_signalizer`, `set D := H :&: L` + `sdprod_sigma maxH hallD`, BGsection15.v:1273/1374):
-for the Corollary 14.12 signalizer neighbour `H` of the type-`P₂` maximal `M` (with `M* ∈ 𝓜(C_G(K))`,
-`H ∈ 𝓜(N_G(R))`), the intersection `H ∩ M*` is a σ(H)′-complement, so `H_σ ⊔ (H ∩ M*) = H`.
-
-⚠ **Third genuinely unformalized §15 input of BG Theorem 15.8** — the *only* gated part of the
-escape witness `C_G(U) ⊄ M` (Coq `not_sXM`/`not_sCUM`).  Coq's `P2type_signalizer` (Cor 14.12)
-supplies its σ(H)′-Hall as `D = H :&: L` (`= H ∩ M*`); the repo `typeP2_neighbor_is_typeF_of_mem`
-instead returns a *generic* σ(H)′-`E`-setup, not identified with `H ∩ M*`, so this decomposition is
-missing.  With it, the escape witness is derived inline in `tau2_transfer_constraint`: `X = A₀`
-(`|X| = q`), `X ⊆ C(K)`, `X ≠ K` (else `H = H_σ·(H∩M*) ⊆ C(K) ⊆ M*`, so `H = M*`, contra `H ≠ M*`),
-`X ⊄ M` (`κ`-Hall maximality), `C_G(U) ⊄ M` (`U ⊆ H_σ`).  Sound: exactly Coq's `sdprod_sigma`
-identity.  (issue 9017 update #12.) -/
-theorem signalizer_msigma_sup_inf_partner_eq [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M Mstar U K R H : Subgroup G} {r : ℕ}
-    (hM : M ∈ maximalSubgroups G) (hP2 : S14.IsTypeP2 M)
-    (hKM : K ≤ M) (hUM : U ≤ M)
-    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
-    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
-    (hUab : ∀ a ∈ U, ∀ b ∈ U, a * b = b * a)
-    (hMstar : Mstar ∈ maximalSubgroupsContaining (Subgroup.centralizer (K : Set G)))
-    (hr : r ∈ S14.piSet U) (hRU : R ≤ U)
-    (hR : Ch03.IsHallSubgroup ({r} : Set ℕ) (R.subgroupOf U))
-    (hKNU : K ≤ Subgroup.normalizer (U : Set G))
-    (hH : H ∈ maximalSubgroupsContaining (Subgroup.normalizer (R : Set G))) :
-    OddOrder.BG.Ch3.S10.Msigma H ⊔ (H ⊓ Mstar) = H := by
-  sorry
-
 /-- **BG Theorem 15.8** (mmd L4264; Feit--Thompson 1991, `tau2_P2type_signalizer`,
 BGsection15.v:1262): in the Corollary 14.12 signalizer setup — a type-`P₂` maximal `M` with
 `κ`-complement `K` (a Hall `κ(M)`-subgroup), `U` the abelian Hall `(κ(M)∪σ(M))'`-factor
@@ -10441,7 +10413,7 @@ theorem tau2_transfer_constraint [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
       exact (Subgroup.mem_centralizer_iff.mp (hXcHs hz) y hy).symm
     -- `H = H_σ ⊔ (H ∩ M*)`, and both summands are `⊆ M*`.
     have hHsup : OddOrder.BG.Ch3.S10.Msigma H ⊔ (H ⊓ Mstar) = H :=
-      signalizer_msigma_sup_inf_partner_eq hG hM hP2 hKM hUM hK hU hUab hMstar hr hRU hR hKNU hH
+      S14.signalizer_msigma_sup_inf_partner_eq hG hM hP2 hKM hUM hK hU hUab hMstar hr hRU hR hKNU hH
     have hHMstar : H ≤ Mstar := by
       rw [← hHsup]
       exact sup_le (hHsCK.trans hCKMstar) inf_le_right

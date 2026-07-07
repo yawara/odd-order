@@ -179,3 +179,39 @@ T-side v-value `v=(q^p−1)/(q−1)` (14.4) は **p↔q instance + `q≢1 mod p`
 本 engine を cite して v-value + caseB_order_u 両側が閉じる。9000 の allocation (d claim vs a-dup vs 優先度)
 は hub/ユーザーの cross-lane 判断事項。**c は本 engine で (13.15) の ungated 部分を前倒し完了**、9000 landing
 待ちで caller wiring (S16 T-side + S15 caseB_order_u instantiation) を assemble。
+
+## 🟢 追記⁵ (2026-07-07 lane c 再開、ユーザー「C レーン再開」) — engine dichotomy 完成 + T-side v-value に WIRED (gate isolate)
+
+前 session の未コミット WIP (`caseB_order_u_div_q_of_modEq`) を完結させ、engine を FT spine に**実接続**。
+
+**(1) (13.15) dichotomy 完成** (commit `5476b09b`, `S16_CaseBOrder` sorry-free green):
+- `caseB_order_u_div_q_of_modEq` (**`p ≡ 1 mod q` 分岐** → `u=(p^q−1)/(q(p−1))`): (13.14)
+  `cyclotomic_quotient_dvd_of_modEq_one` で `q ∣ Singer=u·x` + `q∤u` ⟹ `q∣x`; `x=q·t`, x odd ⟹ t odd,
+  `t≠1` ⟹ `t≥3` ⟹ `x≥3q≥2q+1` を `caseB_order_x_absurd_of_ge` で排除 ⟹ `x=q`。
+- `caseB_order_u_value`: 両分岐を **`caseB_order_u` (S15:8390 bare sorry) と同一 conjunction 形**に組立
+  (9000 landing 後に Hypothesis データで instantiate → discharge 可能な shape)。
+
+**(2) T-side v-value を engine に WIRED** (commit `6dd5f456`, `S16_NonExistenceG` green 3903 jobs):
+`T_side_caseB_facts.2` = Pf (14.4) `v=(q^p−1)/(q−1)` が **`caseB_order_u_full_of_not_modEq` を p↔q swap で
+cite**。ungated arithmetic を call site で honest に discharge: primality/oddness/branch-selector
+(`q_not_modEq_one_mod_p`) + **`¬p∣v`** ((13.14)-dual divisor congruence: `p∣v∣Singer ⟹ p≡1 mod p` 矛盾) +
+**`h11c` は T-side で vacuous** (p≥5≠3, `five_le_p`)。gate は **1 命名 lemma `tSide_caseB_v_gated_inputs`**
+に isolate: cofactor `x` (`v·x=Singer`) + T-side norm param `mᵀ` の (13.11)-dual bounds + (13.10)-dual
+analytic ineq + `v≠1`。net real sorry 不変 (10→10) だが engine が **used** + gate typed。
+
+**(3) 検証済み findings (issue の従来分析を精緻化)**:
+- **Peterfalvi 04.16 p.87 精読**: (14.4) の v-value は (13.15) の **直接 black-box 適用** (「q≢1 mod p, and so
+  v=(q^p−1)/(q−1) by (13.15)」)。engine が正しいツールと確定。char inputs は (13.15) **内部証明**の一部で,
+  T-side 適用時は generic §13 estimate (案 A) が供給 = gated。
+- **⚠ 従来「T-side = p↔q instance (同一 m)」は不正確**: engine の m-bound `hm5:5≤(engine-q=p)→7/10<m` は
+  p≥5 常成立ゆえ `7/10<m` を無条件要求するが、**q=3 のとき S-side m≈0.5<0.7** (formula
+  `m=1−1/(q−1)−…`)。⟹ T-side は S-side と同一 m では通らず **T-side 固有の mᵀ** (dual formula, p≥5 で
+  `7/10<mᵀ` は arithmetic) を要する。案 A の generic §13 は **T-side mᵀ + その bound** を含む必要あり
+  (単純な変数 rename でない)。
+- **h11c は T-side 不要** (vacuous, p≠3) — 案 A の T-side instantiation で (13.11.c)-dual bound は不要。
+- **最終矛盾の算術 core は既 proven** (`caseB_forces_q_three_and_p_five`:6700 / `pq_lt_v`:2494 /
+  `norm_cascade_contradiction`:2980、全 ungated)。C の残 10 sorry は全て char/field/grid gated。
+
+**⟹ lane-b/hub へ**: 案 A の generic §13 export に **(i) T-side mᵀ 定義+bound (dual formula)、(ii)
+cofactor `v∣Singer` (field-model TFieldModelData 経由)、(iii) analytic ineq (13.10)-dual** を含めれば、
+C が `tSide_caseB_v_gated_inputs` を即 discharge (v-value close)。h11c-dual は不要。
