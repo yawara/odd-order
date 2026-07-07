@@ -50,13 +50,23 @@ Peterfalvi (13.18) の overstatement**。教科書原文 (`04.15_pp_75_86` line 
 - [ ] **(3) `gammaGrid_norm_bound` → genuine (13.18.d)** 文faithful restate (sorried、deep: isometry+support gated)。
 - [ ] notes/peterfalvi/s15_s_and_t.md に finding 追記。
 
-## 残る deep obligation (このセッション後の isolated sorry)
-- `tauS_mu_row0_cross` = (4.8)/(5.3) prime-TI Dade cross-relation。**repo 不在** (mu_definition は
-  cross-**row** 軸; PrimeTIResidue.lean は residue 二分律のみで Dade cross-relation `prDade_sub_TIirr` 無)。
-  → 将来 shared-infra claim 候補 (§4/§5 prime-TI Dade 機構 port)。
-- `betaGrid_support` (13.18.a) = Frobenius `gammaW1` cancellation on S̄=S/P (Coq `PVSbeta`)。deep, 未着手。
-- `gammaGrid_orthogonal_one` (⟨Γ,1⟩=0) = Dade=Ind bridge (`sInstance_dade_eq_induce` 既存) + support gated on (a)。
-- `gammaGrid_real` = conjugation-commutation of τ_S/grid (Coq `cfAutInd`/`prTIirr_aut`)。deep。
+## 残る deep obligation — ★全て §3 cyclicTI rigidity に bottom-out (issue 9075 に claim 済)
+
+**2026-07-08 精査確定**: 下記 4 obligation は**全て同一 gate = §3 cyclicTI rigidity
+`eq_signed_sub_cTIiso` (Coq PFsection3.v:1681) → `prDade_sub_TIirr` (PFsection4.v:870)** に還元。
+= issue **9075** (shared-infra claim、§4/§10/§11/§13 broad consumer) で multi-piece port を追跡。
+
+- `tauS_mu_row0_cross` = (4.8) cross-relation `τ_S(μ_0j−μ_01)=η_0j−η_01`。Coq defGamma が
+  `prDade_sub_TIirr` で discharge → `eq_signed_sub_cTIiso` 適用。**repo 不在** (9075 piece 4)。
+- `betaGrid_support` (13.18.a) = Frobenius `gammaW1` cancellation (Coq `PVSbeta` PFsection13.v:1833)
+  も `cfRes_prTIirr`/`prTIirr_id` prime-TI 値を使用 → 同じ cyclicTIiso stack。
+- `gammaGrid_orthogonal_one` (⟨Γ,1⟩=0) = Dade=Ind bridge (`sInstance_dade_eq_induce` 既存) +
+  `betaGrid_support` gated (∴ 間接的に 9075 gated)。
+- `gammaGrid_real` = conjugation-commutation (Coq `cfAutInd`/`prTIirr_aut`) → 同 stack。
+
+**σ-isometry 土台は既存** (`S05.TICyclicHypothesis.sigmaIntegral`、旧 lane d)。9075 = その image の
+**rigidity** (norm-2 characterization、9014 residue API とは別層だが同 provenance)。着手前に lane-a
+(§10-13 consumer) と coordination 要 (2026-07-02 dup 予防、9075 interface guard)。
 
 ## 完了条件
 - overstatement 2 フィールドが genuine (13.18) statement に置換され、build green + AxiomsCheck OK。
