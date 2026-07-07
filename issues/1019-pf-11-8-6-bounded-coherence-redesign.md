@@ -154,6 +154,73 @@ step 1(b) の `|HC:H0C| = p^q` = `S13.H0C_relIndex_HC` (S13:630) は `hyp.s11Set
 
 **次 iteration = S13 に (11.8) endgame を移設 + narrow-族 union-glue で coherent(S(H₀C)) を構成。**
 
+## 🔬 update³⁸ (2026-07-07 lane-a) — Coq 精読 + 族構造 code-level 確定 → SCOPE 訂正 + Route 確定
+
+上記 SCOPE (「uniform-degree qu は S(H₀C) で genuinely 真・1-2 session」) を Coq PFsection11.v 精読
++ S11 族構造の subagent 精査で検証した結果、**方向は正しいが SCOPE は楽観的**と判明。訂正:
+
+### ① Coq (11.8) の権威的構造 (PFsection11.v)
+- `S1 := S_ HC` (deg q, `cohS1` via `uniform_degree_coherence`)、`S2 := seqIndD HU M H H0C`
+  (`defS2`, = `sOf(H0C)`, deg qu)。**`S(H₀C) = S1 ⊔ S2`** (H≤ker で分割)。
+- **★ `cohS2` (S2 coherence) は `subset_coherent (Ptype_core_coherence)` = (9.11)/(11.7) 経由で、
+  `uniform_degree_coherence` を使わない。** uniform-degree は `cohS1` (S(HC)) 専用。
+- (11.3) `FTtype34_noncoherence` (~coherent S_H0C) は `bounded_seqIndD_coherence` で直接 = Lean
+  `S13.S_H0C_not_coherent` (配線済)。
+- (11.8) `FTtype34_not_ortho_cycTIiso` は Coq では **per-ζ α-grid 直接計算** (「rearranged」)。
+  Peterfalvi 本 (11.8.6) = 「coherent(S(H₀C)) 構成 → (11.3) 矛盾」= 現 Lean が踏襲する版。
+
+### ② 族構造 verdict (code-level 確定)
+- `cSub` = **C = C_U(H̄)** (chief-factor H̄ 上の U-action の kernel; S11:1660)。`cprimeSub` = **[C,C] =
+  derivedInG(cSub)** ⊊ cSub (S11:1677)。`uprimeSub` = U' = [U,U]。**U' ≤ C** (`uprimeSub_le_cSub`)。
+  cSub ≠ cprimeSub (proper)、cprimeSub と uprimeSub は order 関係なし。
+- **degree-qa 非Galois既約 (9.8.d) は `𝒮(H₀U')` に属し `𝒮(H₀C)` から除外** (`hcuZetaPair_induceHU_mem_sOf`
+  S11:9710 → H₀U')。qa-source は U' を kill するが larger C を generically kill しない (C ⊋ U')。
+- `caseA_character_counts` (c): 𝒮(H₀C) 既約は degree **qu** (regular source) / (d): qa 既約は larger
+  𝒮(H₀U') (non-regular θ₁)。**disjoint parametrization** ⟹ **𝒮(H₀C) は両ケースで uniform-qu** (qa 除外)。
+
+### ③ ★ SCOPE 訂正 — narrow-族の uniform-qu は真だが case-A ∀-lemma は未証明の §9 obligation
+`forall_mem_sOf_H0C_apply_one_eq_qu` (S11:8211) は **case-B 専用** (`CliffordCaseBData` = 既約 U-action)。
+case-A では: reducible → `caseA_reducible_induceHU_apply_one_eq_qu` (S11:13010, ✅)、∃-irreducible-qu →
+`caseA_exists_irreducible_sOf_H0C` (S11:13139, ✅) のみ。**case-A の `∀ φ∈sOf(H0C) irr, φ 1=qu` は未証明**
+(counts (c) から assemble 可能な見込みだが genuine §9 work)。⟹ redesign は「偽の wide uniform-degree を
+**真の narrow uniform-degree** に置換」= honest。ただし case-A ∀-uniform-qu 自体が §9 obligation。
+
+### ④ ★ Route 判断 (lane-a 自律裁定) = Route 1 (narrow 族 + Book union-glue 維持)
+- **Route 1 (採用)**: capstone を `sOf(H0C)` に re-target、現 glue 機構 (`coherent_Sset_of_glued` /
+  `exists_glue_nu` / `hgen_of_S2_uniform_degree`) を **narrow S2=sOf(H0C) に適用**。narrow-族は sound
+  (qa 除外で uniform-qu 真)、既存 α-grid inner lemma 投資を再利用、rewrite 最小。case-A ∀-uniform-qu は
+  honest §9 obligation として correct-signature で cite/prove。
+- **Route 2 (却下)**: Coq の per-ζ core-coherence route (uniform-degree 回避)。両ケースで確実だが
+  glue 機構の major rewrite で現投資を破棄 → narrow-族が sound な今は不要。
+- ⚠ **訂正 (caseA_character_counts 精査)**: 上で「数学的に qa 除外ゆえ両ケース uniform」と書いたのは
+  **過剰主張**。`caseA_character_counts` (S11:13898) は case-A で SOf(H0C) の (b) reducible=qu + (c)
+  **∃**-irreducible=qu のみ与え、(d) qa 既約は **larger 𝒮(H₀U')** に置く。**`∀ φ∈SOf(H0C) irr, deg qu`
+  は無い**。qa-source は U' を kill するが「C (⊋U') を kill するか」= C-族 SOf(H0C) に qa が入るかは
+  **未形式化・真偽未確定** (deep §9)。∴ **Route 1 の narrow uniform-degree は「qa が C を kill しない」
+  という未証明命題に依存** — 真なら §9 obligation、偽なら narrow 族でも false-hoist。Coq が S2 に
+  uniform-degree を使わず core-coherence を使う事実がこの不確実性と整合。
+- ⟹ **修正した進め方**: Route 1 の uniform-degree に commit せず、**route-independent で sound な piece
+  を先に**: ① `S(HC)` coherence = (5.7) `SHC_isCoherent` (landed) ② `sOf(H0C)` coherence = (9.11)
+  `coherent_H0C_commutator` (core-coherence, carrier obstruction 別途) ③ world-bridge 分解
+  `S13.SOf(H0C) = SHCSet ⊔ sOf(H0C)` (★ enabler = `huSub_eq_derivedInG_subgroupOf` S11:1505 で
+  HU=M' 確定 → sOf⊆SOf の induce-transport が tractable)。case-A uniform-qu の真偽は並行して §9 で解決
+  (それが真なら Route 1 の generation、偽なら Coq per-ζ / core-coherence generation)。
+
+### ⑤ 訂正後の実装 sequence (deeper than 1-2 session; multi-part)
+1. **case-A/B ∀-uniform-qu on `sOf(H0C)`** (S11): case-split (`CliffordCaseAData`∨`CliffordCaseBData`
+   dichotomy) → caseB `forall_mem_sOf_H0C_apply_one_eq_qu` / caseA reducible+irreducible。← genuine §9。
+2. **world-bridge 分解 `S13.SOf(H0C) = SHCSet ⊔ sOf(H0C)`** (S12:4055 で未形式化と明記): S11 `sOf` ↔
+   S13 `SOf`(=inducedKernelFamily M') の identification + H≤ker 分割。← genuine bridge work。
+3. **capstone re-target** `coherent_SOf_H0C_of_column_identities` (S13): S07 engine
+   `coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal` を (SHCSet, sOf(H0C)) に適用。
+   uniform-qu = step①、S2 coherence = (9.11) `coherent_H0C_commutator` (core-coherence)、hmixed/hDτ =
+   §14-gated (narrow 族)。
+4. **endgame 移設 S12→S13**: `exists_zeta_residual_not_orthogonal` + `w2_lt_w1_of_hypothesis` を S13 へ
+   (`w2_lt_w1_of_residual_not_orthogonal` は S12 に残置、S13 から cite)。coherent(SOf(H0C)) →
+   `S_H0C_not_coherent` と直接矛盾。FeitThompson:649 を `S13.w2_lt_w1_of_hypothesis` に更新 (S13.Hypothesis
+   を `exists_hypothesis_of_isTypeIIIorIV` で構築、hM2/hHcard transport)。
+5. 旧 wide uniform-degree 足場 (`Sset_diff_SHCSet_apply_one_eq_qu` irr-side sorry 等) を撤去。
+
 ## 参照
 
 - notes/peterfalvi/s13_11_8_orthogonality.md update³⁷
