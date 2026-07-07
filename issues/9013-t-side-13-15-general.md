@@ -374,3 +374,25 @@ merge 700f92d4 で `reconciled_typePData_T` が sorry-free になり、(13.4) �
   一般化 or A1_eq_sigmaSharp 系 route)。
 - 別途: S15_SAndT の reconciled-gated だった b-queue (`complement_inf_Q_structure`:3060 等) も
   再点検対象 (V_inf:1887 は analytic chain 要で対象外のまま)。
+
+### ✅ gate 2 discharge 完了 (2026-07-07 lane b、commit 62fb13a8) — (13.4) 残 gate 3→2
+
+**`P_conj_forall_not_le_T` を type-free で実証明** — 上記「⚠ 設計注意」の hTTypeII threading は
+**不要と確定** (route を type-free に組み替え): p ∤ |Q| は **Hall 性** (maxNilpotentNormalHall_isHall +
+index = (v·d)·p、type 不問)、p ∤ |V| は **V⋊W₂ Frobenius** (typeP_uW1_frobenius は TypePData のみ要 +
+card_kernel_modEq_one、V=⊥ 場合分け) — どちらも IsTypeII 不要。|T| = |Q|·(v·d)·p (card_T_eq、
+reconciled 消費) + Lagrange + 純 Nat 算術で v_p(|T|) = 1 < q。(13.4) block は card_T_eq 後方へ移動。
+
+**残 gate 2 本の攻略 route (次 iteration)**:
+1. **gate 1 `QD_sharp_centralizer_le_T`**: 有望 route = **c の 9072 S10 機構**。
+   `S10.dadeSupportHypothesisData_of_subset_sigmaSharp` (ungated、hub 検証済) が
+   `X ⊆ sigmaSharp T` に対し Dade support datum を返す — その TI/centralizer 性質 field を確認し、
+   `(QD)^# ⊆ sigmaSharp T` (Q = T_F ≤ M_σ ✓; **D ≤ M_σ(T) が要検証** — D = V⊓C(Q) の σ-性) を
+   併せれば gate 1 が S10 cite で閉じる可能性。要調査: DadeSupportHypothesisData の fields +
+   sigmaSharp の TI property (`Msigma_TI`?)。
+2. **gate 3 `tSide_theta_package_of_not_caseB`**: router = TypesIIIIIIVSetup T の抽出だが、
+   `type_alt : IsTypeII ∨ IsTypeIII` field が **T の型判定を要求** — S15 レベルでは T_nonI のみ
+   carry (IsTypeII T は S16 (14.9) 結果で forward-sorry 付き)。選択肢: (a) (13.2.a)-on-T
+   (「T type II∨III」 = (10.10)+(11.9.b,c) on T) を S15 で materialize (basic_structure の T-mirror、
+   type V/IV 排除)、(b) θ-package の statement に type_alt を仮説として持たせ S16 から供給。
+   文書順は (a) が本筋 ((13.2.a) は §13 冒頭)。その上で (9.8.c)/(9.9.a,c)-on-T の cite 網を確認。
