@@ -2957,4 +2957,38 @@ noncomputable def caseB_adjoinOneColumnPair [Finite G]
     hdiffasuppχ hμZ hDeg
     (by rw [hdegcol, hχ₁deg])
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **caseB member dichotomy** (the `hcover` core of the (9.11) chain fold): under the caseB
+uniform degree (`hunif`, every `𝒮(H₀C′)`-member has degree `d`), each member either lies in the
+degree-`d` irreducible cut, or is a nontrivial μ-grid column sum
+(`reducible_mem_inducedKernelFamily_eq_muGrid_columnSum` + the world-join
+`muGrid_columnSum_eq_columnSum`). -/
+theorem caseB_sOf_member_dichotomy [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
+    (d : ℕ)
+    (hunif : ∀ φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
+      (φ : ClassFunction ↥M ℂ) 1 = (d : ℂ))
+    {φ : ClassFunction ↥M ℂ}
+    (hφ : φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) :
+    φ ∈ {ψ : ClassFunction ↥M ℂ | ψ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime ∧
+        IsIrreducibleCharacter ψ ∧ ((ψ : ↥M → ℂ) 1 = (d : ℂ))} ∨
+      ∃ k : Fin hyp.base.w2, k ≠ 0 ∧
+        φ = OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
+          (hyp.base.muColumnChar hG hG.odd k) := by
+  haveI := hyp.base.finiteG
+  classical
+  by_cases hirr : IsIrreducibleCharacter φ
+  · exact Or.inl ⟨hφ, hirr, hunif φ hφ⟩
+  · right
+    have hφIKF : φ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) (hyp.H0Cprime.subgroupOf M) := by
+      have h := hyp.sOf_subset_SOf hyp.H0Cprime hφ
+      rwa [hyp.SOf_eq] at h
+    obtain ⟨k, hk0, hkeq⟩ := hyp.base.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum hG
+      hyp.type_alt (OddOrder.GroupTheory.typePNontrivialCore_of_isTypeIIIorIV hyp.type_alt
+        hyp.base.typeP)
+      (OddOrder.Peterfalvi.S11.exists_chiefFactorData hG _).choose hφIKF hirr
+    exact ⟨k, hk0, hkeq.trans (hyp.base.muGrid_columnSum_eq_columnSum hG hG.odd k)⟩
+
 end OddOrder.Peterfalvi.S13
