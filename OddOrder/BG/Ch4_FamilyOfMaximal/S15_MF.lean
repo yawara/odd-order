@@ -7751,6 +7751,23 @@ theorem E3_eq_bot_of_tau3_eq_empty [Finite G] {M E E₁ E₂ E₃ : Subgroup G}
   rw [htau3] at hmem
   exact hmem
 
+/-- **`E₂ = ⊥` from `τ₂(M) = ∅`**: the `τ₂(M)`-Hall factor `E₂` of any `σ(M)'`-complement `E`-setup is
+trivial when `M` has no `τ₂`-primes (Theorem 15.8's `τ₂(M) = ∅` for the Corollary 15.9 escape).
+`τ₂`-analogue of `E3_eq_bot_of_tau3_eq_empty`. -/
+theorem E2_eq_bot_of_tau2_eq_empty [Finite G] {M E E₁ E₂ E₃ : Subgroup G}
+    (hsetup : OddOrder.BG.Ch3.S12.SubgroupESetup M E E₁ E₂ E₃) (htau2 : tau2 M = ∅) :
+    E₂ = ⊥ := by
+  classical
+  rw [← Subgroup.card_eq_one]
+  by_contra hne
+  obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hne
+  have hpsub : p ∈ (Nat.card ↥(E₂.subgroupOf E)).primeFactors := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hsetup.E₂_le).toEquiv]
+    exact Nat.mem_primeFactors.mpr ⟨hp, hpdvd, Nat.card_pos.ne'⟩
+  have hmem : p ∈ tau2 M := hsetup.E₂_hall.1 p hpsub
+  rw [htau2] at hmem
+  exact hmem
+
 /-- **Type-`P₂` `M_F`-internal Fitting decomposition** (BG Corollary 15.5; the `M' = M_F × U`
 form feeding Proposition 16.1's forward bridges).  For a type-`P₂` maximal subgroup `M` with
 `κ`-Hall `K` and `(κ ∪ σ)'`-Hall `U`, the derived subgroup `M'` is the internal direct product of
@@ -8997,6 +9014,71 @@ theorem mf_eq_msigma_of_not_fittingIsTI [Finite G]
     (hnotTI : ¬ FittingIsTI M) : MF M = OddOrder.BG.Ch3.S10.Msigma M :=
   mf_eq_msigma_of_piSet_inf_beta_disjoint hG hM
     (piSet_mf_inf_beta_disjoint_of_not_fittingIsTI hG hM hnotTI)
+
+/-- **BG Theorem 15.7(c), `M' ≤ F(M)` for `¬FittingIsTI M`** (Coq `nonTI_Fitting_structure` `sM'F`):
+the derived subgroup of a maximal subgroup whose Fitting subgroup is *not* `TI` is nilpotent, hence
+`≤ F(M)`.
+
+`M_F = M_σ` (`mf_eq_msigma_of_not_fittingIsTI`), and `M_β ≤ M_σ = M_F` is a `β(M)`-group
+(`Mbeta_isPiGroup`; `β ⊆ α ⊆ σ` via `alpha_subset_sigma`), so `π(M_β) ⊆ π(M_F) ∩ β(M) = ∅`
+(`piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`), forcing `M_β = 1`.  Then `M'/M_β ≅ M'` is nilpotent
+(`derivedQuotientMbeta_isNilpotent`), and the nilpotent normal `M'` lies in the Fitting subgroup
+(`le_fittingInAmbient_of_subgroupOf_normal_of_isNilpotent`).  Sole upstream gate of the `E₃ = 1`
+chain feeding Corollary 15.9's cyclic Frobenius complement (with
+`tau3_eq_empty_of_derivedInG_le_fittingInAmbient` + `E3_eq_bot_of_tau3_eq_empty`). -/
+theorem derivedInG_le_fittingInAmbient_of_not_fittingIsTI [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hnotTI : ¬ FittingIsTI M) : derivedInG M ≤ fittingInAmbient M := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hMFMσ : MF M = OddOrder.BG.Ch3.S10.Msigma M := mf_eq_msigma_of_not_fittingIsTI hG hM hnotTI
+  -- `M_β ≤ M_σ`: `M_β` is a normal `σ(M)`-subgroup (`β ⊆ α ⊆ σ`).
+  have hMβσ : Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma M)
+      (OddOrder.BG.Ch3.S10.Mbeta M) := fun p hp =>
+    OddOrder.BG.Ch3.S10.alpha_subset_sigma hG hM (OddOrder.BG.Ch3.S10.Mbeta_isPiGroup M p hp).1
+  have hMβnorm : ((OddOrder.BG.Ch3.S10.Mbeta M).subgroupOf M).Normal := by
+    rw [OddOrder.BG.Ch3.S10.Mbeta, OddOrder.BG.Ch3.S10.opiCoreInG_subgroupOf]; infer_instance
+  have hMβMσ : OddOrder.BG.Ch3.S10.Mbeta M ≤ OddOrder.BG.Ch3.S10.Msigma M :=
+    le_opiCoreInG_of_normal_of_isPiSubgroup (OddOrder.BG.Ch3.S10.Mbeta_le M) hMβnorm hMβσ
+  -- `M_β = ⊥`: `π(M_β) ⊆ π(M_F) ∩ β(M) = ∅`.
+  have hMβbot : OddOrder.BG.Ch3.S10.Mbeta M = ⊥ := by
+    rw [← Subgroup.card_eq_one]
+    by_contra hne
+    obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hne
+    have hpMβ : p ∈ (Nat.card ↥(OddOrder.BG.Ch3.S10.Mbeta M)).primeFactors :=
+      Nat.mem_primeFactors.mpr ⟨hp, hpdvd, Nat.card_pos.ne'⟩
+    have hpβ : p ∈ OddOrder.BG.Ch3.S10.beta M := OddOrder.BG.Ch3.S10.Mbeta_isPiGroup M p hpMβ
+    have hpMF : p ∈ S14.piSet (MF M) := by
+      show p ∈ (Nat.card ↥(MF M)).primeFactors
+      rw [hMFMσ]
+      exact Nat.primeFactors_mono (Subgroup.card_dvd_of_le hMβMσ) Nat.card_pos.ne' hpMβ
+    exact piSet_mf_inf_beta_disjoint_of_not_fittingIsTI hG hM hnotTI p hpMF hpβ
+  -- `M'` nilpotent: `M'/M_β ≅ M'` (`M_β = ⊥`), and `M'/M_β` is nilpotent (Corollary 10.7).
+  have heq : (OddOrder.BG.Ch3.S10.Mbeta M).subgroupOf (derivedInG M) = ⊥ := by
+    rw [hMβbot, Subgroup.bot_subgroupOf]
+  haveI hnorm2 : ((OddOrder.BG.Ch3.S10.Mbeta M).subgroupOf (derivedInG M)).Normal := by
+    rw [heq]; infer_instance
+  haveI := OddOrder.BG.Ch3.S10.derivedQuotientMbeta_isNilpotent hG hM
+  haveI hM'nil : Group.IsNilpotent ↥(derivedInG M) :=
+    nilpotent_of_mulEquiv ((QuotientGroup.quotientMulEquivOfEq heq).trans QuotientGroup.quotientBot)
+  -- `M'` normal in `M` + nilpotent ⟹ `M' ≤ F(M)`.
+  have hid : (derivedInG M).subgroupOf M = commutator ↥M :=
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective (commutator ↥M)
+  haveI hM'norm : ((derivedInG M).subgroupOf M).Normal := by rw [hid]; infer_instance
+  exact le_fittingInAmbient_of_subgroupOf_normal_of_isNilpotent (Subgroup.map_subtype_le _) hM'norm
+
+/-- **BG Theorem 15.7(d), `E₃ = 1`** (Coq `nonTI_Fitting_structure` `E3_1`): the `τ₃(M)`-Hall factor of
+any `σ(M)'`-complement `E`-setup is trivial when `F(M)` is not `TI`.  Composes the three parts:
+`M' ≤ F(M)` (`derivedInG_le_fittingInAmbient_of_not_fittingIsTI`, part (c)) → `τ₃(M) = ∅`
+(`tau3_eq_empty_of_derivedInG_le_fittingInAmbient`) → `E₃ = ⊥` (`E3_eq_bot_of_tau3_eq_empty`).  With
+`τ₂(M) = ∅` (Theorem 15.8) forcing `E₂ = 1` too, `E = E₁` is cyclic (`E1_isCyclic`) — the cyclic
+Frobenius complement of Corollary 15.9. -/
+theorem E3_eq_bot_of_not_fittingIsTI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (hM : M ∈ maximalSubgroups G) (hnotTI : ¬ FittingIsTI M)
+    (hsetup : OddOrder.BG.Ch3.S12.SubgroupESetup M E E₁ E₂ E₃) : E₃ = ⊥ :=
+  E3_eq_bot_of_tau3_eq_empty hsetup
+    (tau3_eq_empty_of_derivedInG_le_fittingInAmbient hG hM
+      (derivedInG_le_fittingInAmbient_of_not_fittingIsTI hG hM hnotTI))
 
 /-- **BG Theorem A(8), the `FittingIsTI` clause** (mmd L4274, schematic proof: Theorem 15.7(a)(b)):
 if `M_F ≠ M_σ`, then `F(M)` is a TI-subgroup of `G`.  This is the contrapositive of the

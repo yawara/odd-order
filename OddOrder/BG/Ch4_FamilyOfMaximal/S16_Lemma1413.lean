@@ -241,49 +241,31 @@ outside `σ(M)` (so the complement is nontrivial), then `M = M_σ ⋊ E` is a Fr
 A fixed point `n ∈ M_σ^#` of `e ∈ E^#` would give a prime `r` of `orderOf e` — necessarily
 in `τ₁(M) ∪ τ₃(M)` by the `π(E)`-partition (Lemma 12.1) and `τ₂`-freeness — a rank-one
 subgroup `X ≤ ⟨e⟩` with `C_{M_σ}(X) ≠ 1`, i.e. `r ∈ κ(M)` — contradiction. -/
-theorem typeF_frobenius_of_tau2_prime_free [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+theorem typeF_frobenius_of_esetup [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M E E₁ E₂ E₃ : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (hF : S14.IsTypeF M)
     (ht2 : ∀ p : ℕ, p.Prime → p ∉ tau2 M)
-    {q : ℕ} (hqπ : q ∈ S14.piSet M) (hqσ : q ∉ OddOrder.BG.Ch3.S10.sigma M) :
-    ∃ U : Subgroup G,
-      Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
-        (U.subgroupOf M) ∧
+    (hsetup : OddOrder.BG.Ch3.S12.SubgroupESetup M E E₁ E₂ E₃)
+    (hEne : E.subgroupOf M ≠ ⊥) :
+    Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (E.subgroupOf M) ∧
       OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M
-        ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (U.subgroupOf M) := by
+        ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (E.subgroupOf M) := by
   classical
-  obtain ⟨E, E₁, E₂, E₃, hsetup⟩ := OddOrder.BG.Ch3.S12.exists_subgroupESetup hG hM
   have hcompl : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).IsComplement'
       (E.subgroupOf M) := hsetup.isComplement'_subgroupOf
-  -- `q ∣ |E|`: `q ∈ π(M) ∖ σ(M)` and `M_σ` is the `σ`-Hall of `M`.
   have hMσhall : Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M)
       ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) :=
     OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall_of_isHall
       (OddOrder.BG.Ch3.S10.Msigma_isHall hG hM)
   have hcardE : Nat.card ↥(E.subgroupOf M) =
       ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index := (hcompl.symm.index_eq_card).symm
-  have hqE : q ∣ Nat.card ↥(E.subgroupOf M) := by
-    rw [hcardE]
-    have hq_prime : q.Prime := Nat.prime_of_mem_primeFactors hqπ
-    -- `q ∣ |M| = |M_σ| ⬝ [M : M_σ]` and `q ∤ |M_σ|` (a `σ`-group).
-    have hdvdM : q ∣ Nat.card ↥M := (Nat.mem_primeFactors.mp hqπ).2.1
-    have hprod : Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) *
-        ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index = Nat.card ↥M :=
-      Subgroup.card_mul_index _
-    rcases (Nat.Prime.dvd_mul hq_prime).mp (hprod ▸ hdvdM) with h | h
-    · exact absurd (hMσhall.1 q (Nat.mem_primeFactors.mpr ⟨hq_prime, h, Nat.card_pos.ne'⟩)) hqσ
-    · exact h
-  have hEne : E.subgroupOf M ≠ ⊥ := by
-    intro hbot
-    rw [hbot, Subgroup.card_bot, Nat.dvd_one] at hqE
-    exact (Nat.prime_of_mem_primeFactors hqπ).one_lt.ne' hqE
   -- `π(E) ⊆ σ(M)ᶜ` (the complement realizes the `σ'`-index).
   have hEpi : ∀ r ∈ (Nat.card ↥(E.subgroupOf M)).primeFactors,
       r ∉ OddOrder.BG.Ch3.S10.sigma M := by
     intro r hr
     rw [hcardE] at hr
     exact hMσhall.2 r hr
-  refine ⟨E, hcompl, ?_⟩
+  refine ⟨hcompl, ?_⟩
   refine
     { isNormal := ?_
       isComplement := hcompl
@@ -368,6 +350,46 @@ theorem typeF_frobenius_of_tau2_prime_free [Finite G]
     have hrκ : r ∈ S14.kappa M := ⟨hr_prime, hrτ13, X, hXelem, hXM, hne⟩
     rw [hF] at hrκ
     exact Set.notMem_empty r hrκ
+
+/-- **BG Corollary 15.6, Frobenius form (existential)**: a type-`F` maximal `M` with `τ₂(M) = ∅` and
+some prime `q ∈ π(M) ∖ σ(M)` (so its `σ(M)'`-complement is nontrivial) is a Frobenius group
+`M = M_σ ⋊ E`.  Obtains an arbitrary `E`-setup, derives `E ≠ ⊥` from `q ∣ |E|`, and reads off the
+Frobenius structure via `typeF_frobenius_of_esetup`.  Consumers needing the *specific* cyclic
+complement (`E = E₁` when additionally `E₂ = E₃ = ⊥`, Corollary 15.9) call `_of_esetup` with their
+own setup. -/
+theorem typeF_frobenius_of_tau2_prime_free [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hF : S14.IsTypeF M)
+    (ht2 : ∀ p : ℕ, p.Prime → p ∉ tau2 M)
+    {q : ℕ} (hqπ : q ∈ S14.piSet M) (hqσ : q ∉ OddOrder.BG.Ch3.S10.sigma M) :
+    ∃ U : Subgroup G,
+      Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (U.subgroupOf M) ∧
+      OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M
+        ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (U.subgroupOf M) := by
+  classical
+  obtain ⟨E, E₁, E₂, E₃, hsetup⟩ := OddOrder.BG.Ch3.S12.exists_subgroupESetup hG hM
+  have hMσhall : Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M)
+      ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) :=
+    OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall_of_isHall
+      (OddOrder.BG.Ch3.S10.Msigma_isHall hG hM)
+  have hcardE : Nat.card ↥(E.subgroupOf M) =
+      ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index :=
+    (hsetup.isComplement'_subgroupOf.symm.index_eq_card).symm
+  have hEne : E.subgroupOf M ≠ ⊥ := by
+    have hqE : q ∣ Nat.card ↥(E.subgroupOf M) := by
+      rw [hcardE]
+      have hq_prime : q.Prime := Nat.prime_of_mem_primeFactors hqπ
+      have hdvdM : q ∣ Nat.card ↥M := (Nat.mem_primeFactors.mp hqπ).2.1
+      have hprod : Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) *
+          ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index = Nat.card ↥M :=
+        Subgroup.card_mul_index _
+      rcases (Nat.Prime.dvd_mul hq_prime).mp (hprod ▸ hdvdM) with h | h
+      · exact absurd (hMσhall.1 q (Nat.mem_primeFactors.mpr ⟨hq_prime, h, Nat.card_pos.ne'⟩)) hqσ
+      · exact h
+    intro hbot
+    rw [hbot, Subgroup.card_bot, Nat.dvd_one] at hqE
+    exact (Nat.prime_of_mem_primeFactors hqπ).one_lt.ne' hqE
+  exact ⟨E, typeF_frobenius_of_esetup hG hM hF ht2 hsetup hEne⟩
 
 /-! ## BG Lemma 14.13(a) -/
 
