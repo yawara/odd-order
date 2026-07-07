@@ -1285,3 +1285,25 @@ adjoin composite (`adjoin_muColumnPair_of_irrFamily`) の全入力の供給状�
 | **hdiffasuppχ** ((μ−χ₁).support ⊆ A₀) | μ ∈ inducedFamily + scaledDiff (hdegcol から) — 組立可 | ⏳ |
 次 = 特殊化 assembly (`caseB_adjoinOneColumnPair`、上表の ✅ を束ね named = hDeg/hdegcol の
 2 つ + hdiffasuppχ in-proof) → その後 chain 化 (§9 counting と合流)。
+
+## 🔬 update⁷⁷ (2026-07-08 lane-a /loop) — ★★ caseB 1-pair adjoin END-TO-END LANDED
+
+### ✅ landed: `S13.caseB_adjoinOneColumnPair` (commit 4d2647ec, sorry-free)
+(9.11) mixed corner の 1-pair step が閉じた: deg-d irr-cut + column pair {μ, μ̄} → coherent
+(A₀)。全構造入力は landed 鎖から discharge。**残る genuine 入力 = hDeg (2 < |cut|) +
+hdegcol (μ deg = d) + hdiffasuppχ の §9/caseB facts のみ**。
+- Lean 教訓 (traps §5 追補、メモリ反映済): Type-valued data は have で束縛すると opaque
+  (with_unfolding_all も不達) — **let 必須**。
+
+### (9.11) caseB 全体の残り
+1. **chain 化**: 1-pair step を全 column pairs (k = 1..(w2−1)/2 の代表) に fold
+   (coherentOfPairChainCover) → family 全体 = cut ∪ all-μ-pairs = sOf(H0Cprime) (caseB) の
+   coherence。pair enumeration (inverse-pair 代表系) + step ごとの hDeg 単調性 (cut は step で
+   増えない — S₁ は成長するが cut-card ベースの bound は同じ… ⚠ chain の各 step の S₁ は
+   前 step の union — xAdjoinStepW_k の hDeg は「S₁ 内の等次数既約 s 部分」で測る — 各 step で
+   同じ irr-cut を s に使えるか [S₁ ⊇ cut は維持、hmemS1 ✓ — irr-cut を s に固定し S₁ だけ
+   成長させる形で composite は既に対応済 (hmemS1 : ∀ i ∈ s, χmem i ∈ S₁)] — **⚠ composite の
+   現 signature は hS₁ : IsCoherent ↑s — s = S₁ 全体を要求! chain では S₁ ⊋ s になる —
+   composite の hS₁/s を分離する軽微な一般化が要る** (S₁ : Set 引数 + s : Finset ⊆ S₁)。
+2. **hDeg/hdegcol の §9 supply** (caseB counting/uniform-qu)。
+3. caseA (non-Galois) は (9.11.1)-(9.11.8) norm-chain — 別フェーズ。
