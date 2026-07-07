@@ -384,3 +384,39 @@ capstone `coherent_SOf_H0C_of_column_identities` (未作成) の engine 入力�
 capstone は上記 §14/§9 gated 入力を仮説パラメータ化した skeleton で前倒し可能 (次 iteration 候補) —
 ただし ungated な genuine 数学は S₁-side で尽きたので、それ以降は §14 (lane b/c 領域) / §9 深部との
 協調が必要。
+
+## 🔬 update⁴³ (2026-07-07 lane-a /loop) — ★ capstone skeleton landed: world-bridge route 全配線
+
+`coherent_SOf_H0C_of_glued` (S13, axiom-clean, commit 1b7f282d) を landing。汎用 engine
+`S07.coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal` を (S(HC), 𝒮(H0C)) で
+instantiate + `SOf_H0C_eq_SOf_HC_union_sOf` (landed) rewrite → coherent(SOf(H0C))。
+**world-bridge route が end-to-end で配線完了**:
+`coh[landed] + hY[gate] + glue[gate] → coherent(SOf(H0C)) → coherent_S_of_coherent_SH0C[既 sorry-free]
+→ coherent(Sset) → (11.3) 矛盾`。
+
+### ✅ 本 session 総括 (6 landing, 全 axiom-clean, full build green)
+S₁-side + route の ungated 部分を**完全 landing**:
+- `coherent_SOf_HC` — coherent(S(HC)) [f31df00d]
+- `HC_lt_derived` — HC⊊M' 抽出 [f31df00d]
+- `SOf_HC_subset_SHCSet` — S₁-同定 (S(HC)⊆SHCSet) [e3420cf4]
+- `SOf_HC_inner_sOf_H0C_eq_zero` + `span_inner_SOf_HC_sOf_H0C_eq_zero` — hsrc_ortho [645622e4]
+- `coherent_SOf_H0C_of_glued` — capstone skeleton [1b7f282d]
+
+### 残 gate (⚠ 訂正: hgen も cleanly ungated でない — 全て §9/§14 gated)
+capstone `coherent_SOf_H0C_of_glued` の仮説パラメータ (供給すれば coherent(SOf(H0C)) が閉じる):
+- **`hgen`** — ⚠ **cleanly ungated でない (当初 update 訂正)**。world-bridge 版は S₂=sOf(H0C) の
+  uniform-degree qu を要するが、**`forall_mem_sOf_H0C_apply_one_eq_qu` (S11:8211) は
+  `caseB : CliffordCaseBData` を要求 = case-B 限定**。**case A は qa 既約 (deg qa≠qu) を含み uniform
+  でない** (update⁴⁰ の §9 obligation; qa が C を kill するか未確定)。∴ hgen は **case-A/B dichotomy +
+  case-A の §9 uniform 構造**に依存 → §9-gated。case-B side のみ ungated (部分的)。
+- **`coh`** = coherent(S(HC)) [landed, caller が `coherent_SOf_HC` で供給]。
+- **`hY`** = coherent(𝒮(H0C), A0) — §14-gated ((9.11) Ptype_core_coherence; sibleyTarget bypass 要;
+  packaging bridge chars.S↔sOf, H0CprimeSupport↔A0 も要)。deep §9/§14。
+- **`ν`+hagreeX/hagreeY** (glue map τ₃) — §14 (`exists_glue_nu`=9016 の world-bridge 版)。
+- **`hmixed`** (6.7 image-side 直交) — §14/BG§15。
+- **`hDτ`** (5.8 column identity) — §14。
+
+⟹ **S₁-side の ungated work は本 session で完全に尽きた**。残 gate は**全て §9/§14 深部**:
+hgen (case-A §9 uniform 構造 = qa/C-kernel 未確定) / hY (§14 (9.11) core-coherence) /
+ν・hmixed・hDτ (§14/BG§15 glue)。これらは lane b/c 領域 or §9 深部との協調が必要 (単独 ungated build 不可)。
+次 iteration は §9 case-A 構造 (qa が C を kill するか) か §14 gate 協調に降りる — いずれも deep frontier。
