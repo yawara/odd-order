@@ -40,6 +40,27 @@ landed) ⟹ **trajectory 保全としてこの drift を追認、BG §15/§16 no
 4. **prime-TI (9014) / §5 coherence (1017-arith) は本 gate ではない** (監査で code-verified: PrimeTIResidue.lean /
    S07_Subcoherent.lean 共 0-sorry、Merge 'b' で landed)。1017 が ~23 iteration 後に収束した先が本 node。
 
+## 更新 #21 (2026-07-07 lane b) — `hFM : IsTypeF M` 実証明化 (R-localization → P2type_signalizer)
+
+`centralizer_escape_final_local` (現 `S16_MainResults.lean`) の残 2 hole のうち **hFM (IsTypeF M) を実証明**。
+Coq `nonFtype_signalizer_base` の R-localization を忠実に port:
+- signalizer structure の `hforall' M` から `M ⊓ N` = `N_σ` の σ(N)'-complement (`IsComplement'`) を取得 →
+  `subgroupESetup_of_complement hG hN` で **E-setup を `E = M ⊓ N` に pin** (これで matched pair `U₀ = E₂⊔E₃ ≤ M⊓N ≤ M`、
+  R = O_r(U₀) が M に落ちる = norm_noncyclic_sigma の `R ≤ M` を供給)。
+- `typeP2_exists_matched_kappa_hall_pair` を **E-setup パラメータ化 core `typeP2_matched_kappa_hall_pair_of_esetup`
+  に refactor** (既存 existential 版は wrapper 化、consumer `isTypeII_of_isTypeP2_of_derived_typeF` は signature 不変)。
+- r = pdiv(ord x) ∈ τ₂(N) (signalizer conjunct `hxtau2'`)、r ∈ σ(M) (x ∈ M_σ)、`pRank_eq_of_le_of_not_dvd_index`
+  2 段 (R ≤ U₀ ≤ N、coprime index) で `pRank_R r = pRank_N r = 2` → `¬IsCyclic R` → `norm_noncyclic_sigma` で
+  `N_G(R) ≤ M` → `typeP2_neighbor_is_typeF_of_mem` (H := M) で **IsTypeF M**。
+- S16_MainResults の実 sorry: **4 → 3** (build green, 3129 jobs)。
+
+**残 1 hole = cyclic-E** (L5776 付近): `∃ E, E ≤ M ∧ IsComplement' ∧ IsCyclic E ∧ IsFrobeniusGroup`。
+必要: (i) **τ₂(M)=∅** (`tau2_transfer_constraint` = Thm 15.8 を M_lemma=N/H_lemma=M で apply し
+`τ₂(N)=∅` を導き r∈τ₂(N) と矛盾 → 対偶で τ₂(M)=∅; hMstar = 𝓜(C_G(K₀)) が要)、(ii) **E₃=1** (Thm 15.7
+`nonTI_Fitting_structure`、¬FittingIsTI M から)、(iii) E=E₁ cyclic (`sigma_compl_context`)。
+→ **hFM の R-localization setup を `refine ⟨hFM,…,?_⟩` の上に hoist して共有**する restructure が必要
+(matched pair・R・hHmem を cyclic-E と共用)。次 iteration。
+
 ## 何が gate か
 
 **`centralizer_escape_final_local` (`OddOrder/BG/Ch4_FamilyOfMaximal/S15_MF.lean:9407`) = BG Cor 15.9**
