@@ -77,9 +77,23 @@ hub が 4 並列 subagent (wf_d4994964) で a queue / b queue / c gate-map / 900
   inline fork 禁止。
 - **claim-before-build** (CLAUDE.md (C)): 着手前に既存 grep → 9000 番台 claim → open 9000 scan。
 
+## パッケージ進捗サマリ (2026-07-07 lane c, item 1 landing 後)
+
+- **item 1 (typeP_pair port / 9073)** — ✅ **完了** (commit `32581410`, issue 9073 closed)。
+  `reconciled_typePData_T` 完全 sorry-free + axiom-clean (`#print axioms` = 標準 3 公理のみ、sorryAx 無し)。
+  route (a): S の型-P 構造 → partner (typeP_duality) → Fact A (W₁ κ-Hall of S) + Fact B (M_σ(S)⊓C(W₁)=W₂)
+  → partner Fact B → q∈σ(T) で W₁≤M_σ(T) + fix-W transport で cardinality equality。(14.9)/IsTypeP2 T 非依存。
+- **item 5 (hcard2)** — ✅ 完了 (commit `bf3b21f4`)。
+- **item 3 (S-side βₛ bridge 13.18 / `betaData_of_grid` S15_SAndT.lean:3613)** — 未着手。**次の優先**
+  (upstream-first: item 4 の上流 + 文書順 §13<§14)。deep §13/§3 char 構成 (β_j/Γ_j を Dade grid τ₃ から
+  構築 + 6 norm/orthogonality facts)。既存 producer の mirror でなく from-scratch ⟹ multi-session、fresh context 推奨。
+- **item 4 (§14 Γ-bridge nzT1_Ga assembly)** — 未着手。`T_typeIII_ratio_le` (S16:1641) は Γ-Bessel skeleton
+  還元済だが item 1(v=|V| lane-b) + item 3 coherence + S-side Γ bridge に multi-gated。item 3 の後。
+- **item 2 (generic semilinear (9.7.b) field-model 新 shared leaf)** — 未着手。独立 infra、claim-before-build。
+
 ## 完了条件
 
-- [x] c が package item ≥1 に着手 — **item 5 (hcard2) 完了** (2026-07-07, commit `bf3b21f4`)
+- [x] c が package item ≥1 に着手 — **item 1 (9073) + item 5 (hcard2) 完了** (2026-07-07)
 - [ ] 9013 に de-scope①/②を反映 (本 issue から転記) — 済 (追記参照)
 - [ ] merge_monitor.md レーン表の c 行を REACTIVATE に更新 — 済
 - [ ] b/c の次回 main sync で本裁定が伝播 (レーンは open issue を scan)

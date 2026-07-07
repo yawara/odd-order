@@ -132,13 +132,40 @@ alignment 不要)。⟹ step 5 を前倒しで verify:
 ## やること (残り)
 
 - [x] claim + generic 部品 (loop¹) + route (loop²) + step5 verify (loop³) + **Fact A 実証明 (loop⁴)**
-- [ ] **Fact B** (`hFactB`: `W₁ = M_σ(T) ⊓ C(W₂)`) — 唯一の残 sorry。route 候補:
-      (a) `typeP_partner_structure S` の Fact B 出力 (S-side κ-Hall + Z-family covering wiring)、
-      (b) Fact A 済につき aligned datum d' (d'.W1=W₂) で `d'.W2 = C_{T'}(W₂)`、`d'.W2 ≤ W₁` の逆包含を local 攻略。
+- [x] **Fact B** (`hFactB`: `W₁ = M_σ(T) ⊓ C(W₂)`) — **DONE (loop⁵, 2026-07-07)**。route (a) で実証明化。
 
-## 完了条件
+## 進捗 (2026-07-07 lane c loop⁵ — 🎯🎯 Fact B 実証明化 → `reconciled_typePData_T` 完全 sorry-free)
 
-`reconciled_typePData_T` の `W2_le`/`centralizer_W1` sorry 解消、`lake build` 緑、AxiomsCheck OK、新 axiom なし。
+**Fact B (`W₁ = M_σ(T) ⊓ C(W₂)`) を実証明** (`Hypothesis.W1_eq_Msigma_T_inf_centralizer_W2`,
+S15_SAndT_Setup.lean、**sorryAx 無し**)。route (a) 完遂 — Coq `FTtypeP_pair_witness`/`typeP_cent_compl`
+の Lean 版を、S の型-P 構造から partner 経由で (14.9 非依存に) 構築:
+
+1. **S-side Fact A** (`Hypothesis.W1_isKappaHall_S`): `W₁` κ-Hall of `S`。generic
+   `isKappaHall_of_isComplement_derivedInG` (`W2_isKappaHall_T` を一般化抽出) に carried `Sdata.M_complement`
+   を渡す。
+2. **S-side Fact B** (`Hypothesis.Msigma_S_inf_centralizer_W1_eq_W2`): `M_σ(S) ⊓ C(W₁) = W₂`。
+   `Sdata.derivedInG_inf_centralizer_W1_eq` + `M_σ(S) ≤ S'` + type-II `S` で `M_F(S) = M_σ(S)`。
+   ⟹ `Kstar = W₂` の同定。
+3. **partner** (`typeP_duality`/`exists_partner`/`typeP_partner_structure` を `S` に適用): partner `Mstar`
+   が Fact B *for Mstar* (`W₁ = M_σ(Mstar) ⊓ C(W₂)`) + `W₂` κ-Hall of `Mstar` + nonconjugate-to-`S` を供給。
+4. **`Mstar ~ T`**: `theorem88_caseB` を `Mstar` に適用 (type-P ⟹ 非-I via `proposition_type_classification`,
+   `≁ S` via `typeP_family_pairwise_nonconjugate`) → `∃g, Mstarᵍ = T`。
+5. **⊇** (`W₁ ≤ M_σ(T) ⊓ C(W₂)`): `q ∈ σ(Mstar) = σ(T)` (`kappaHall_primes_subset_sigma_partner` +
+   `sigma_conj_smul_eq`) ⟹ `q`-群 `W₁ ≤ T` は normal Hall `σ(T)`-部分群 `M_σ(T)` に landing
+   (`sigma_subgroup_le_Msigma_of_isHall`); `W₁ ≤ C(W₂)` (`W1_commutes_W2`)。
+6. **⊆/cardinality** (fix-`W` transport): 2 つの κ-Hall `W₂` (`T`, `Mstar`) を
+   `exists_conj_eq_of_isHall_subgroupOf` で合わせ、`n` (`Tⁿ = Mstar`, `W₂ⁿ = W₂`) を得る。新 public helper
+   `Msigma_conj_smul_eq`/`opiCoreInG_conj_smul` (S14/S10 の private を public 化) で
+   `(M_σ(T) ⊓ C(W₂))ⁿ = M_σ(Mstar) ⊓ C(W₂) = W₁` ⟹ `|M_σ(T) ⊓ C(W₂)| = |W₁|` ⟹ `eq_of_le_of_card_ge` で equality。
+
+**結果**: `reconciled_typePData_T` は **完全 sorry-free + axiom-clean** (`#print axioms` = `[propext,
+Classical.choice, Quot.sound]`, sorryAx 無し)。W2_le/centralizer_W1 の 2 residual が両方 genuine に discharge。
+full build 3934 green、AxiomsCheck OK、新 axiom なし。
+
+## 完了条件 ✅
+
+`reconciled_typePData_T` の `W2_le`/`centralizer_W1` sorry 解消 (DONE)、`lake build` 緑 (DONE)、
+AxiomsCheck OK (DONE)、新 axiom なし (DONE、sorryAx すら無し)。
 
 ## 参照
 

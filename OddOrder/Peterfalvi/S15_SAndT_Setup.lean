@@ -4594,6 +4594,252 @@ theorem Hypothesis.W2_isKappaHall_T [Finite G] (hG : OddOrder.BG.IsMinimalSimple
   rw [show ((MulAut.conj n).toMonoidHom : ↥hyp.T →* ↥hyp.T) = ↑(MulAut.conj n) from rfl] at hn
   rwa [hn] at hHall
 
+/-- **A complement of `M'` in a type-`P` maximal is a `κ(M)`-Hall subgroup** (ungated, generic).
+Extracted from the `W₂`/`T` argument (`W2_isKappaHall_T`): a produced `κ(M)`-Hall `K` is cyclic and
+complements `M'` (`typeP_derivedInG_isComplement_kappaHall`); Schur–Zassenhaus
+(`coprime_card_derivedInG_index_of_isTypeP`) conjugates it onto any given complement `W` of `M'` in
+`M`, and Hall-ness transfers along the conjugation (`IsHallSubgroup.mulAut_smul`).  Used for the
+`S`-side Fact A (`W₁` κ-Hall of `S`, via the carried `Sdata.M_complement`). -/
+theorem isKappaHall_of_isComplement_derivedInG [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M W : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : OddOrder.BG.Ch4.S14.IsTypeP M)
+    (hWcompl : Subgroup.IsComplement' ((derivedInG M).subgroupOf M) (W.subgroupOf M)) :
+    OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M) (W.subgroupOf M) := by
+  classical
+  obtain ⟨K, hKM, hKhall, -⟩ :=
+    OddOrder.BG.Ch4.S14.exists_isHallSubgroup_kappa_ge hG hM (bot_le (a := M))
+      (fun q hq => by rw [Subgroup.card_bot] at hq; simp at hq)
+  set Kstar : Subgroup G :=
+    OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G) with hKstar
+  haveI hKcyc : IsCyclic ↥K := by
+    obtain ⟨_, _, _, ⟨_, _, _, _, hcyc, _, _, _⟩, _⟩ :=
+      OddOrder.BG.Ch4.S14.typeP_duality hG hM hP hKM hKhall hKstar
+    haveI : IsCyclic ↥(K ⊔ Kstar) := hcyc
+    exact Subgroup.isCyclic_of_le (le_sup_left : K ≤ K ⊔ Kstar)
+  have hcomplK :=
+    OddOrder.BG.Ch4.S14.typeP_derivedInG_isComplement_kappaHall hG hM hP hKM hKhall
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  haveI hNnorm : ((derivedInG M).subgroupOf M).Normal := by
+    rw [show (derivedInG M).subgroupOf M = commutator ↥M from
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective (commutator ↥M)]
+    infer_instance
+  have hcop : Nat.Coprime (Nat.card ↥((derivedInG M).subgroupOf M))
+      ((derivedInG M).subgroupOf M).index := by
+    have hderivM_le : derivedInG M ≤ M := Subgroup.map_subtype_le _
+    have hcard : Nat.card ↥((derivedInG M).subgroupOf M) = Nat.card ↥(derivedInG M) :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hderivM_le).toEquiv
+    rw [hcard]
+    exact coprime_card_derivedInG_index_of_isTypeP hG hM hP
+  obtain ⟨n, -, hn⟩ := Subgroup.IsComplement'.exists_conj_of_coprime hcop (Or.inl inferInstance)
+    hcomplK hWcompl
+  have hHall := hKhall.mulAut_smul (MulAut.conj n)
+  rw [pointwise_mulAut_smul_eq_map] at hHall
+  rw [show ((MulAut.conj n).toMonoidHom : ↥M →* ↥M) = ↑(MulAut.conj n) from rfl] at hn
+  rwa [hn] at hHall
+
+/-- **Fact A (`S`-side): `W₁` is a `κ`-Hall of `S`** (ungated).  `W₁` complements `S'`
+(the carried `Sdata.M_complement`, reconciled to `W₁` via `Sdata_W1_eq`), so
+`isKappaHall_of_isComplement_derivedInG` applies.  The `S`-side companion of `W2_isKappaHall_T`,
+used to feed `typeP_duality`/`exists_partner`/`kappaHall_primes_subset_sigma_partner` on `S`. -/
+theorem Hypothesis.W1_isKappaHall_S [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa hyp.S)
+      (hyp.W1.subgroupOf hyp.S) := by
+  have hPS := OddOrder.BG.Ch4.S16.isTypeP_of_isTypeNonI hG hyp.S_maximal hyp.S_nonI
+  have hW1compl : Subgroup.IsComplement' ((derivedInG hyp.S).subgroupOf hyp.S)
+      (hyp.W1.subgroupOf hyp.S) := by
+    have h := hyp.Sdata.M_complement
+    rwa [hyp.Sdata_W1_eq] at h
+  exact isKappaHall_of_isComplement_derivedInG hG hyp.S_maximal hPS hW1compl
+
+/-- **Fact B (`S`-side): `M_σ(S) ⊓ C_G(W₁) = W₂`** (the (8.4.d) centralizer law for `S`, ungated).
+`⊆`: `M_σ(S) ≤ S'` (`Msigma_le_derived`), then `S' ⊓ C(W₁) = W₂` is the carried datum
+`Sdata.derivedInG_inf_centralizer_W1_eq` (reconciled via `Sdata_W1_eq`/`Sdata_W2_eq`).  `⊇`:
+`W₂ = Sdata.W2 ≤ Sdata.H = M_F(S) = M_σ(S)` (type-II `S`, `maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II`)
+and `W₂ ≤ C(W₁)` (`W1_commutes_W2`).  This is the `Kstar = W₂` identification that lets
+`typeP_duality`/`typeP_partner_structure` on `S` output Fact B (`W₁ = M_σ(Mstar) ⊓ C(W₂)`) for the
+partner. -/
+theorem Hypothesis.Msigma_S_inf_centralizer_W1_eq_W2 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    OddOrder.BG.Ch3.S10.Msigma hyp.S ⊓ Subgroup.centralizer (hyp.W1 : Set G) = hyp.W2 := by
+  classical
+  have hSder : derivedInG hyp.S ⊓ Subgroup.centralizer (hyp.W1 : Set G) = hyp.W2 := by
+    have h := hyp.Sdata.derivedInG_inf_centralizer_W1_eq
+    rw [hyp.Sdata_W1_eq, hyp.Sdata_W2_eq] at h
+    exact h
+  have hMFeq : maxNilpotentNormalHall hyp.S = OddOrder.BG.Ch3.S10.Msigma hyp.S :=
+    OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II hG hyp.S_maximal
+      (Or.inr (OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.S_maximal hyp.S_typeP2))
+  refine le_antisymm ?_ (le_inf ?_ ?_)
+  · calc OddOrder.BG.Ch3.S10.Msigma hyp.S ⊓ Subgroup.centralizer (hyp.W1 : Set G)
+        ≤ derivedInG hyp.S ⊓ Subgroup.centralizer (hyp.W1 : Set G) :=
+          inf_le_inf_right _ (OddOrder.BG.Ch3.S10.Msigma_le_derived hG hyp.S_maximal)
+      _ = hyp.W2 := hSder
+  · rw [← hMFeq]
+    calc hyp.W2 = hyp.Sdata.W2 := hyp.Sdata_W2_eq.symm
+      _ ≤ hyp.Sdata.H := le_trans hyp.Sdata.W2_le inf_le_left
+      _ = maxNilpotentNormalHall hyp.S := hyp.Sdata.H_eq
+  · intro y hy
+    rw [Subgroup.mem_centralizer_iff]
+    intro x hx
+    exact hyp.W1_commutes_W2 x hx y hy
+
+/-- **`opiCoreInG` is conjugation-equivariant** (public form of the S14/S10 private helpers, needed
+for the `Msigma` conjugation used in the `S15` pairing carve-out).  `φ • O_π(H) = O_π(φ • H)` via
+`oPiCore.map_eq_of_mulEquiv` transported along the conjugation isomorphism `↥H ≃* ↥(φ • H)`. -/
+theorem opiCoreInG_conj_smul [Finite G] (π : Set ℕ) (φ : MulAut G) (H : Subgroup G) :
+    φ • OddOrder.GroupTheory.opiCoreInG π H
+      = OddOrder.GroupTheory.opiCoreInG π (φ • H) := by
+  have hHmap : H.map (φ : G →* G) = φ • H := (pointwise_mulAut_smul_eq_map φ H).symm
+  let e : ↥H ≃* ↥(φ • H) :=
+    (Subgroup.equivMapOfInjective H (φ : G →* G) φ.injective).trans
+      (MulEquiv.subgroupCongr hHmap)
+  have hcomp : (φ • H).subtype.comp (e : ↥H →* ↥(φ • H)) = (φ : G →* G).comp H.subtype := by
+    ext x; rfl
+  calc φ • OddOrder.GroupTheory.opiCoreInG π H
+      = (OddOrder.GroupTheory.opiCoreInG π H).map (φ : G →* G) := pointwise_mulAut_smul_eq_map φ _
+    _ = ((OddOrder.Isaacs.Ch03.oPiCore π ↥H).map H.subtype).map (φ : G →* G) := rfl
+    _ = (OddOrder.Isaacs.Ch03.oPiCore π ↥H).map ((φ : G →* G).comp H.subtype) := by
+        rw [Subgroup.map_map]
+    _ = (OddOrder.Isaacs.Ch03.oPiCore π ↥H).map
+          ((φ • H).subtype.comp (e : ↥H →* ↥(φ • H))) := by rw [hcomp]
+    _ = ((OddOrder.Isaacs.Ch03.oPiCore π ↥H).map (e : ↥H →* ↥(φ • H))).map
+          (φ • H).subtype := by rw [← Subgroup.map_map]
+    _ = (OddOrder.Isaacs.Ch03.oPiCore π ↥(φ • H)).map (φ • H).subtype := by
+        rw [OddOrder.Isaacs.Ch03.oPiCore.map_eq_of_mulEquiv]
+
+/-- **`M_σ` is conjugation-equivariant** (`M_σ(Mᵍ) = M_σ(M)ᵍ`, public form).  From
+`opiCoreInG_conj_smul` and `sigma_conj_smul_eq` (`σ(Mᵍ) = σ(M)`). -/
+theorem Msigma_conj_smul_eq [Finite G] (g : G) (M : Subgroup G) :
+    OddOrder.BG.Ch3.S10.Msigma (MulAut.conj g • M)
+      = MulAut.conj g • OddOrder.BG.Ch3.S10.Msigma M := by
+  simp only [OddOrder.BG.Ch3.S10.Msigma]
+  rw [OddOrder.BG.Ch4.S14.sigma_conj_smul_eq, ← opiCoreInG_conj_smul]
+
+/-- **Fact B (`T`-side): `W₁ = M_σ(T) ⊓ C_G(W₂)`** (the (8.4.d)-dual centralizer law for `T`, ungated
+via the type-`P` pairing — Coq `PFsection8` `typeP_cent_compl`/`FTtypeP_pair_witness`).
+
+This is the last residual of `reconciled_typePData_T` (issue 9073); it is genuine §13 pairing content
+proved *without* assuming `(14.9)`/`IsTypeII T`, by descending to `S`'s type-`P` structure:
+
+* Apply `typeP_duality`/`exists_partner`/`typeP_partner_structure` to `S` (`hKS` = Fact A for `S`,
+  `hKstarSW2` = Fact B for `S`, `Kstar = W₂`): the partner `Mstar` satisfies Fact B *for* `Mstar`,
+  `W₁ = M_σ(Mstar) ⊓ C(W₂)` (`hKeq`), plus `W₂` is a `κ`-Hall of `Mstar` and the pair is
+  nonconjugate to `S`.
+* `Mstar` is `G`-conjugate to `T`: `theorem88_caseB` at `Mstar` (type-`P`, non-`I`, `≁ S`) leaves
+  only `∃g, Mstarᵍ = T`.
+* `⊇`: `q ∈ σ(Mstar) = σ(T)` (`kappaHall_primes_subset_sigma_partner` + `sigma_conj_smul_eq`), so the
+  `q`-group `W₁ ≤ T` lands in the normal Hall `σ(T)`-subgroup `M_σ(T)`
+  (`sigma_subgroup_le_Msigma_of_isHall`), and `W₁ ≤ C(W₂)` (`W1_commutes_W2`).
+* `⊆`/cardinality: a fix-`W` correction (`exists_conj_eq_of_isHall_subgroupOf`, matching the two
+  `κ`-Halls `W₂` of `T`, `Mstar`) gives `n` with `Tⁿ = Mstar`, `W₂ⁿ = W₂`, whence
+  `(M_σ(T) ⊓ C(W₂))ⁿ = M_σ(Mstar) ⊓ C(W₂) = W₁`, so `|M_σ(T) ⊓ C(W₂)| = |W₁|`; with `⊇` and
+  `eq_of_le_of_card_ge` this forces equality. -/
+theorem Hypothesis.W1_eq_Msigma_T_inf_centralizer_W2 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    hyp.W1 = OddOrder.BG.Ch3.S10.Msigma hyp.T ⊓ Subgroup.centralizer (hyp.W2 : Set G) := by
+  classical
+  -- `S`-side data.
+  have hPS := OddOrder.BG.Ch4.S16.isTypeP_of_isTypeNonI hG hyp.S_maximal hyp.S_nonI
+  have hW1S : hyp.W1 ≤ hyp.S :=
+    (by rw [hyp.W_eq_join]; exact le_sup_left : hyp.W1 ≤ hyp.W).trans
+      (by rw [hyp.W_eq_inter]; exact inf_le_left)
+  have hW2T : hyp.W2 ≤ hyp.T :=
+    (by rw [hyp.W_eq_join]; exact le_sup_right : hyp.W2 ≤ hyp.W).trans
+      (by rw [hyp.W_eq_inter]; exact inf_le_right)
+  have hKS := hyp.W1_isKappaHall_S hG
+  set KstarS : Subgroup G :=
+    OddOrder.BG.Ch3.S10.Msigma hyp.S ⊓ Subgroup.centralizer (hyp.W1 : Set G) with hKstarSdef
+  have hKstarSW2 : KstarS = hyp.W2 := by
+    rw [hKstarSdef]; exact hyp.Msigma_S_inf_centralizer_W1_eq_W2 hG
+  haveI : IsSolvable ↥hyp.S := hG.solvable_of_mem_maximalSubgroups hyp.S_maximal
+  obtain ⟨US, hUS'⟩ := OddOrder.Isaacs.Ch03.hall_E_exists (G := ↥hyp.S)
+    ((OddOrder.BG.Ch4.S14.kappa hyp.S ∪ OddOrder.BG.Ch3.S10.sigma hyp.S)ᶜ)
+  have hU_S : OddOrder.Isaacs.Ch03.IsHallSubgroup
+      ((OddOrder.BG.Ch4.S14.kappa hyp.S ∪ OddOrder.BG.Ch3.S10.sigma hyp.S)ᶜ)
+      ((US.map hyp.S.subtype).subgroupOf hyp.S) := by
+    have hUSeq : (US.map hyp.S.subtype).subgroupOf hyp.S = US :=
+      Subgroup.comap_map_eq_self_of_injective hyp.S.subtype_injective US
+    rw [hUSeq]; exact hUS'
+  -- Partner `Mstar` of `S` (Theorem 14.7), with Fact B *for* `Mstar`.
+  obtain ⟨Mstar, hMstarne, hmem, hpart⟩ :=
+    OddOrder.BG.Ch4.S14.exists_partner hG (OddOrder.BG.Ch4.S14.dummySigmaDecomposition G)
+      hyp.S_maximal hPS hW1S hKS hKstarSdef hU_S
+  obtain ⟨hMstarmax, hMstarP, hKstarleMstar, hKstar_hall, hKeq⟩ :=
+    OddOrder.BG.Ch4.S14.typeP_partner_structure hG hyp.S_maximal hPS hW1S hKS hKstarSdef hU_S
+      hmem hMstarne hpart
+  rw [hKstarSW2] at hKeq hKstarleMstar hKstar_hall
+  -- `hKeq : W₁ = M_σ(Mstar) ⊓ C(W₂)`; `hKstar_hall : W₂ κ-Hall of Mstar`; `W₂ ≤ Mstar`.
+  have hncSMstar : ¬ OddOrder.BG.Ch4.S14.IsConjugateSubgroup hyp.S Mstar :=
+    OddOrder.BG.Ch4.S14.typeP_family_pairwise_nonconjugate hG hyp.S_maximal hPS hW1S hKS
+      hKstarSdef hU_S (Or.inl rfl) hmem (Ne.symm hMstarne)
+  have hMstarNotI : ¬ OddOrder.GroupTheory.IsTypeI Mstar := by
+    intro hI
+    exact absurd ((OddOrder.BG.Ch4.S16.proposition_type_classification hG hMstarmax).1.mp hI)
+      (Set.nonempty_iff_ne_empty.mp hMstarP)
+  -- `Mstar` is `G`-conjugate to `T`.
+  obtain ⟨g, hg⟩ : ∃ g : G, MulAut.conj g • Mstar = hyp.T := by
+    rcases hyp.theorem88_caseB Mstar hMstarmax with hI | hS | hT
+    · exact absurd hI hMstarNotI
+    · exact absurd
+        (OddOrder.BG.Ch4.S14.IsConjugateSubgroup.symm
+          (hS : OddOrder.BG.Ch4.S14.IsConjugateSubgroup Mstar hyp.S)) hncSMstar
+    · exact hT
+  -- `q ∈ σ(T)`, hence `W₁ ≤ M_σ(T)` (normal Hall `σ`-subgroup contains every `σ`-subgroup).
+  have hqK : hyp.q ∣ Nat.card ↥hyp.W1 := ⟨1, by rw [mul_one]; exact hyp.q_eq_card_W1.symm⟩
+  have hqMstar : hyp.q ∈ OddOrder.BG.Ch3.S10.sigma Mstar :=
+    OddOrder.BG.Ch4.S14.kappaHall_primes_subset_sigma_partner hG hyp.S_maximal hPS hW1S hKS
+      hKstarSdef hU_S hpart hyp.q_prime hqK
+  have hqT : hyp.q ∈ OddOrder.BG.Ch3.S10.sigma hyp.T := by
+    rw [← hg, OddOrder.BG.Ch4.S14.sigma_conj_smul_eq]; exact hqMstar
+  have hW1T : hyp.W1 ≤ hyp.T :=
+    (by rw [hyp.W_eq_join]; exact le_sup_left : hyp.W1 ≤ hyp.W).trans
+      (by rw [hyp.W_eq_inter]; exact inf_le_right)
+  have hW1piT : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup
+      (OddOrder.BG.Ch3.S10.sigma hyp.T) hyp.W1 := by
+    intro r hr
+    have hpf : (Nat.card ↥hyp.W1).primeFactors = {hyp.q} := by
+      rw [← hyp.q_eq_card_W1, Nat.Prime.primeFactors hyp.q_prime]
+    rw [hpf, Finset.mem_singleton] at hr
+    rw [hr]; exact hqT
+  have hW1MsigmaT : hyp.W1 ≤ OddOrder.BG.Ch3.S10.Msigma hyp.T :=
+    OddOrder.BG.Ch3.S10.sigma_subgroup_le_Msigma_of_isHall
+      (OddOrder.BG.Ch3.S10.Msigma_isHall hG hyp.T_maximal) hW1T hW1piT
+  have hSupset : hyp.W1 ≤ OddOrder.BG.Ch3.S10.Msigma hyp.T ⊓ Subgroup.centralizer (hyp.W2 : Set G) :=
+    le_inf hW1MsigmaT (by
+      intro x hx
+      rw [Subgroup.mem_centralizer_iff]
+      intro y hy
+      exact (hyp.W1_commutes_W2 x hx y hy).symm.eq)
+  -- fix-`W` correction: a conjugator `n` with `Tⁿ = Mstar` and `W₂ⁿ = W₂`.
+  have hg0 : MulAut.conj g⁻¹ • hyp.T = Mstar := by
+    rw [← hg, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+  have hW2hallT := hyp.W2_isKappaHall_T hG
+  have hconjW2hall := OddOrder.BG.Ch4.S14.isHall_kappa_subgroupOf_conj g⁻¹ hg0 hW2T hW2hallT
+  have hconjW2le : MulAut.conj g⁻¹ • hyp.W2 ≤ Mstar := by
+    rw [← hg0]; exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hW2T
+  haveI : IsSolvable ↥Mstar := hG.solvable_of_mem_maximalSubgroups hMstarmax
+  obtain ⟨w, hwMstar, hw⟩ := OddOrder.BG.Ch1.S06.exists_conj_eq_of_isHall_subgroupOf
+    inferInstance hconjW2le hKstarleMstar hconjW2hall hKstar_hall
+  set n : G := w * g⁻¹ with hn_def
+  have hnW2 : MulAut.conj n • hyp.W2 = hyp.W2 := by
+    rw [hn_def, map_mul, mul_smul]; exact hw
+  have hnT : MulAut.conj n • hyp.T = Mstar := by
+    rw [hn_def, map_mul, mul_smul, hg0]
+    exact conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hwMstar)
+  -- `(M_σ(T) ⊓ C(W₂))ⁿ = M_σ(Mstar) ⊓ C(W₂) = W₁`.
+  have hconj_eq : MulAut.conj n •
+      (OddOrder.BG.Ch3.S10.Msigma hyp.T ⊓ Subgroup.centralizer (hyp.W2 : Set G)) = hyp.W1 := by
+    rw [Subgroup.smul_inf, centralizer_pointwise_smul, ← coe_pointwise_smul, hnW2,
+      ← Msigma_conj_smul_eq, hnT]
+    exact hKeq.symm
+  -- cardinality: `|M_σ(T) ⊓ C(W₂)| = |W₁|`, and with `⊇`, equality.
+  have hcard : Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma hyp.T ⊓
+      Subgroup.centralizer (hyp.W2 : Set G)) = Nat.card ↥hyp.W1 := by
+    rw [← hconj_eq, Subgroup.pointwise_smul_def]
+    exact Nat.card_congr (Subgroup.equivMapOfInjective _ _ (MulAut.conj n).injective).toEquiv
+  exact Subgroup.eq_of_le_of_card_ge hSupset (le_of_eq hcard)
+
 /-- **`reconciled_typePData_T` の 2 residual を pairing facts から** (Fact A ∧ Fact B → 両 field, 実証明).
 `W₂` が `T` の `κ`-Hall (**Fact A**) かつ `W₁ = M_σ(T) ⊓ C(W₂)` (**Fact B**) — `typeP_partner_structure`
 (`S14`) が `S` の partner に対して供給する 2 つの (8.4.d)-dual pairing facts — があれば、既存の一般
@@ -4665,7 +4911,8 @@ theorem reconciled_typePData_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   -- reverse cyclic-factor identification, supplied by `typeP_partner_structure` applied to `S`.
   have hFactA := hyp.W2_isKappaHall_T hG
   have hFactB : hyp.W1 =
-      OddOrder.BG.Ch3.S10.Msigma hyp.T ⊓ Subgroup.centralizer (hyp.W2 : Set G) := sorry
+      OddOrder.BG.Ch3.S10.Msigma hyp.T ⊓ Subgroup.centralizer (hyp.W2 : Set G) :=
+    hyp.W1_eq_Msigma_T_inf_centralizer_W2 hG
   obtain ⟨hW2le_pf, hCentW1_pf⟩ := hyp.reconciled_residuals_of_pairing_facts hG hFactA hFactB
   refine ⟨{
     H := hyp.Q
