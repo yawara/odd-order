@@ -1369,3 +1369,34 @@ reducible_mem_…_eq_muGrid_columnSum + world-join。
   (d ≠ 1) / **hdegcol 系** (columnSum deg = d — hunif+membership or 直接)。
 - fold = coherentOfPairChainCover (pair j := (columnSum (muColumnChar (j+1 as Fin)), .conj)、
   N := w2 − 1、hcover = dichotomy [update⁷⁹] + pairSet 第 1/2 成分)。
+
+## 🔬 update⁸¹ (2026-07-08 lane-a /loop) — chain 部品完備 (fold 本体のみ残)
+
+### ✅ landed (commit 1ba4ddde ほか, sorry-free)
+- `columnSum_injective` (S12_Section9Counts): columnSum の dual-単射 — set 相異 → dual 相異。
+- `sOf_anchor_diff_support` (S13): X-統一 hdegS₁diff — hunif 下で全 member の anchor-diff が
+  A₀-supported (S₁ ⊆ X ゆえ全 step 共通供給)。
+- `mem_pairUnion` は S07:4998 に既存確認。
+
+### fold 本体 `caseB_coherent_sOf_H0Cprime_of_mixed` の設計 (次 iteration、一点集中)
+named (§9/caseB facts): hunif (∀ deg d) / hDeg (2 < |cut|) / hdne1 (d ≠ 1) / anchor
+(hχ₁mem/irr/deg)。構成:
+- pair j := (columnSum (muColumnChar kⱼ), conj) where kⱼ = Fin-cast (j+1)、N := w2 − 1
+- hcover: dichotomy → k ≠ 0 → j := k−1 < N、φ = pair.1; conj は sOf closure で X ⊆
+- hpairs: columnSum ∈ sOf? — **⚠ 要確認: μ = columnSum (muColumnChar k) ∈ sOf(H0Cprime) が
+  hpairs (pairSet ⊆ X) に必要** — all-reducible corner では membership は逆向き (member →
+  certainTypeSet) だった。caseB での「columnSum ∈ sOf(H0Cprime)」= μ-column が family に属す
+  (Coq (9.5)/(9.8): μ_j ∈ S_H0C ⊆ S_H0C′) — **S12_Section9Counts の
+  muGrid_column_sum_mem_sOf_H0_and_reducible (:256) が sOf(H0) 版!** sOf(H0) ⊆ sOf(H0Cprime)?
+  向き注意: H0 ≤ H0Cprime → kernel 条件は antitone (sOf_antitone: 大きい Y ⊆ 小さい Y…
+  sOf(H0Cprime) ⊇ sOf(H0C) [update⁴⁶ hyp.sOf_H0C_subset_sOf_H0Cprime] — H0 ≤ H0C′ →
+  sOf(H0Cprime) ⊆ sOf(H0)! 逆向き!) — **μ ∈ sOf(H0Cprime) は sOf(H0) membership からは出ない**
+  (H0Cprime-kernel はより強い条件)。μ の source の kernel が H0C′ ⊇ H0 を含むか = μ の source
+  θ_k は H0C′ を kill するか — Coq: μ_j ∈ S_ H0C (H0C-kernel) ⊆ S_ H0C′ ✓ (H0C′ ≤ H0C、
+  antitone で S_H0C ⊆ S_H0C′) — Lean: sOf(H0C) ⊆ sOf(H0Cprime) (sOf_H0C_subset_sOf_H0Cprime
+  landed ✓) — ∴ **μ ∈ sOf(H0C) を確立** → ⊆ で H0Cprime へ。μ ∈ sOf(H0C):
+  muGrid_column_sum_mem_sOf_H0_and_reducible は sOf(H0) — H0C 版が必要 (source kernel が
+  C も kill: μ の source は HC-linear の induce ゆえ C ⊆ ker ✓ 数学的には真、Lean 補題要 —
+  or named hμmem : ∀ k ≠ 0, columnSum (muColumnChar k) ∈ sOf(H0Cprime) として §9 fact 化)。
+- hstep: by_cases skip / adjoin (supply = update⁸⁰-⁸¹ 部品)。
+まず hμmem を named にして fold を先に閉じ、hμmem の実証明 (source kernel 計算) は後続。
