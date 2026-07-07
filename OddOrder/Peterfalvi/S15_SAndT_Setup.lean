@@ -3814,128 +3814,6 @@ theorem Hypothesis.P_le_centralizer_of_mem_H [Finite G] (hG : OddOrder.BG.IsMini
   have hcomm := (hyp.H_mulCommutative hG).is_comm.comm (⟨x, hx⟩ : ↥hyp.H) ⟨y, hyH⟩
   simpa using congrArg Subtype.val hcomm
 
-/-- **(13.2.e)-for-`T`, `K^# = (QD)^#` TI-centralizer gate** ((13.4) structural gate, issue 9013
-追記⁶ (c)): every nonidentity element of `K = QD ⊆ A₀(T)` has its `G`-centralizer inside `T` —
-the `A₀(T)` TI-subset property of (13.2.e) applied to the `K^#`-points.  The proven
-`Q_sharp_isTISubset` is the `D = ⊥` special case; the general form (live in the (13.4)
-contradiction branch, where `D` may be nontrivial) needs the `A₀(T)`-TI materialization. -/
-theorem QD_sharp_centralizer_le_T [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
-    ∀ z : ↥hyp.T, (z : G) ∈ hyp.Q ⊔ hyp.D → z ≠ 1 →
-      Subgroup.centralizer ({(z : G)} : Set G) ≤ hyp.T := by
-  sorry
-
-/-- **No conjugate of `P` fits inside `T`** ((13.4) structural gate, issue 9013 追記⁶ (c)):
-`|P| = p^q` (13.2.b) exceeds the `p`-part `p = |W₂|` of `|T| = |Q|·|V|·p` (`p ∤ |Q|·|V|`, the
-`T`-side kernel/complement coprimality), so `P^w ≤ T` is impossible.  Gated on the `T`-side
-order facts (`|Q| = q^p`-adjacent σ-structure, `reconciled_typePData_T` sphere). -/
-theorem P_conj_forall_not_le_T [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
-    ∀ w : G, ¬ ∀ r ∈ hyp.P, w⁻¹ * r * w ∈ hyp.T := by
-  sorry
-
-open scoped FiniteInduce in
-/-- **(13.3.b,c)-for-`T` θ-package** ((13.4) character gate, issue 9013 追記⁶ (a)+(b)): if the
-(13.4) conclusion fails, then by (13.3.b) applied to `T` the family `𝒯` contains an irreducible
-character `θ` induced from a linear character of `K = QD`, and (13.3.c) for `T` writes the
-`τ₁`-image of the distinguished `ν`-row sum as a signed `η`-row.  Packaged in the exact form the
-(13.4) contradiction consumes:
-
-* `θT − ν_r` is `K^#`-supported ((13.3.a) for `T`: both are `K`-induced of equal degree `vp`);
-* its Dade image (`τ = Ind_T^G` by (13.2.e) for `T`) is `θ° − δ'·∑ⱼ η_{rj}` ((13.3.c) for `T`,
-  `τ₁`-additivity);
-* `θ° = θ^{τ₁}` is orthogonal to the `η`-grid and to `λ^{τ₁}` ((4.1) + (5.3.b) pairwise
-  orthogonality of `η_{ij}`, `λ^{τ₁}`, `θ^{τ₁}`). -/
-theorem tSide_theta_package_of_not_caseB [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
-    (chars : CharacterDegreeData hyp)
-    (_hne : ¬ (hyp.D = ⊥ ∧ hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) ∧
-      Nat.card ↥hyp.Q = hyp.q ^ hyp.p)) :
-    ∃ (θT : ClassFunction ↥hyp.T ℂ) (r : Fin hyp.q) (δ' : ℤ) (θG : ClassFunction G ℂ),
-      (δ' = 1 ∨ δ' = -1) ∧
-      ((θT - ∑ j : Fin hyp.p, hyp.nu r j).support ⊆
-        {z : ↥hyp.T | (z : G) ∈ hyp.Q ⊔ hyp.D ∧ z ≠ 1}) ∧
-      (ClassFunction.induce hyp.T (θT - ∑ j : Fin hyp.p, hyp.nu r j)
-        = θG - (δ' : ℂ) • ∑ j : Fin hyp.p, hyp.eta r j) ∧
-      (∀ (i : Fin hyp.q) (j : Fin hyp.p), ClassFunction.inner (hyp.eta i j) θG = 0) ∧
-      ClassFunction.inner (chars.tau1S chars.lambda) θG = 0 := by
-  sorry
-
-open scoped FiniteInduce in
-/-- **Peterfalvi (13.4)**: if `S` contains a degree-`u q` character induced
-from a linear character of `P C`, then case (9.7.b) holds for `T`, with
-`D = 1` and `v = (q^p - 1) / (q - 1)`.
-
-The third conjunct `|Q| = q^p` is the kernel-order component of "case (9.7.b) holds for `T`"
-(the (9.7.b) field model identifies `Q̄` with a field of cardinality `q^p`); it is what the
-(13.10) counting reads off ((13.10.3) computes `|Q^#|/|T| = (q^p−1)/(pq^p v)`).
-
-**Proof structure** (issue 9013 追記⁶, textbook 04.15 mmd:49-58): by contradiction.  The T-side
-θ-package (`tSide_theta_package_of_not_caseB`, (13.3.b,c)-for-`T`) supplies `β = θ − ν_r` with
-`K^#`-support and Dade image `θ° − δ'·∑ⱼ η_{rj}`; the carried S-side (13.3) data give
-`α = λ − μ_{j₀}` with `H^#`-support (`H ⊴ S`, equal degrees) and Dade image `λ° − δ·∑ᵢ η_{i1}`.
-`(H^#)^G ∩ (K^#)^G = ∅` (`P` centralizes `H`-points, the `K^#`-centralizers lie in `T`, and no
-conjugate of `P` fits in `T`), so `(α^τ, β^τ) = 0` — but the bilinear expansion leaves the shared
-grid entry `δδ'·⟨η_{r1}, η_{r1}⟩ = ±1`.  Contradiction (`eta_cross_expansion_ne_zero`). -/
-theorem lambda_forces_T_caseB [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
-    (chars : CharacterDegreeData hyp) :
-    hyp.D = ⊥ ∧ hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) ∧
-      Nat.card ↥hyp.Q = hyp.q ^ hyp.p := by
-  haveI := hyp.finiteG
-  by_contra hne
-  -- T-side θ-package from the (13.3.b,c)-for-`T` gate.
-  obtain ⟨θT, r, δ', θG, hδ', hβsupp, hβform, hηθ, hLamTheta⟩ :=
-    tSide_theta_package_of_not_caseB hG chars hne
-  -- S-side (13.3) data: `λ = Ind thetaL` and the distinguished `μ`-column `μ_{j₀} = Ind θlin` with
-  -- `τ₁`-image `δ·∑ᵢ η_{i1}`.
-  obtain ⟨thetaL, hthetaLirr, hthetaL1, hlamEq, -⟩ := chars.lambda_induced_from_PC_linear
-  obtain ⟨j₀, δ, θlin, hδ, hθlinirr, hθlin1, hμeq, hμtau⟩ := chars.mu_col_tau1_eta_col_one
-  -- `α = λ − μ_{j₀}` is supported on `H^#` (`H ⊴ S`; both terms `H`-induced of equal degree).
-  have hαsupp : (chars.lambda - ∑ i : Fin hyp.q, hyp.mu i j₀).support ⊆
-      {y : ↥hyp.S | (y : G) ∈ hyp.H ∧ y ≠ 1} := by
-    intro s hs
-    have hs0 : (chars.lambda - ∑ i : Fin hyp.q, hyp.mu i j₀) s ≠ 0 := hs
-    refine ⟨?_, ?_⟩
-    · by_contra hsH
-      apply hs0
-      have hsH' : s ∉ hyp.H.subgroupOf hyp.S := fun h => hsH (Subgroup.mem_subgroupOf.mp h)
-      rw [ClassFunction.sub_apply, hlamEq, hμeq,
-        ClassFunction.induce_eq_zero_of_not_mem_normal _ hsH',
-        ClassFunction.induce_eq_zero_of_not_mem_normal _ hsH', sub_zero]
-    · rintro rfl
-      apply hs0
-      rw [ClassFunction.sub_apply, hlamEq, hμeq, ClassFunction.induce_apply_one,
-        ClassFunction.induce_apply_one, hthetaL1, hθlin1, sub_self]
-  -- The conjugate closures of `H^#` and `K^#` are disjoint.
-  have hdisj := disjoint_conjugatesIntoSet_of_centralizer
-    (A_M := {y : ↥hyp.S | (y : G) ∈ hyp.H ∧ y ≠ 1})
-    (A_N := {z : ↥hyp.T | (z : G) ∈ hyp.Q ⊔ hyp.D ∧ z ≠ 1})
-    (fun _y hy => hyp.P_le_centralizer_of_mem_H hG hy.1)
-    (fun z hz => QD_sharp_centralizer_le_T hG hyp z hz.1 hz.2)
-    (P_conj_forall_not_le_T hG hyp)
-  -- Hence `(α^τ, β^τ) = 0`.
-  have h0 : ClassFunction.inner
-      (ClassFunction.induce hyp.S (chars.lambda - ∑ i : Fin hyp.q, hyp.mu i j₀))
-      (ClassFunction.induce hyp.T (θT - ∑ j : Fin hyp.p, hyp.nu r j)) = 0 :=
-    inner_induce_induce_eq_zero_of_disjoint hαsupp hβsupp hdisj
-  -- Rewrite `α^τ = λ° − δ·∑ᵢ η_{i1}` ((13.2.e)+τ₁-additivity + the (13.3.c) column formula).
-  have hαform : ClassFunction.induce hyp.S (chars.lambda - ∑ i : Fin hyp.q, hyp.mu i j₀)
-      = chars.tau1S chars.lambda
-        - (δ : ℂ) • ∑ i : Fin hyp.q, hyp.eta i ⟨1, hyp.p_prime.one_lt⟩ := by
-    conv_lhs => rw [hlamEq, hμeq]
-    rw [← chars.tau1S_apply_induce_sub thetaL θlin hthetaLirr hθlinirr, map_sub, ← hlamEq, ← hμeq, hμtau]
-  -- The `λ°`-side grid orthogonality, flipped to the expansion brick's slot order.
-  have hLamEta : ∀ (i : Fin hyp.q) (j : Fin hyp.p),
-      ClassFunction.inner (chars.tau1S chars.lambda) (hyp.eta i j) = 0 := by
-    intro i j
-    have h := chars.tau1S_induce_inner_eta i j thetaL hthetaLirr
-    rw [← hlamEq] at h
-    rw [OddOrder.RepresentationTheory.inner_conj_symm, h, star_zero]
-  -- The bilinear expansion is `δ·δ' ≠ 0` — contradiction.
-  rw [hαform, hβform] at h0
-  exact eta_cross_expansion_ne_zero hyp.eta (fun i k j l => hyp.eta_orthonormal i k j l)
-    (chars.tau1S chars.lambda) θG r ⟨1, hyp.p_prime.one_lt⟩ hLamEta hηθ hLamTheta hδ hδ' h0
 
 open scoped Classical in
 /-- **Sharp-set Parseval bookkeeping** (the `s + d² = |H|·n` shape of Peterfalvi (13.7)): for a
@@ -5808,6 +5686,214 @@ theorem Hypothesis.card_T_eq_deriv_mul_p [Finite G] (hG : OddOrder.BG.IsMinimalS
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe tpd.W1_le).toEquiv,
     hW1, ← hyp.p_eq_card_W2] at h
   exact h.symm
+
+/-- **(13.2.e)-for-`T`, `K^# = (QD)^#` TI-centralizer gate** ((13.4) structural gate, issue 9013
+追記⁶ (c)): every nonidentity element of `K = QD ⊆ A₀(T)` has its `G`-centralizer inside `T` —
+the `A₀(T)` TI-subset property of (13.2.e) applied to the `K^#`-points.  The proven
+`Q_sharp_isTISubset` is the `D = ⊥` special case; the general form (live in the (13.4)
+contradiction branch, where `D` may be nontrivial) needs the `A₀(T)`-TI materialization. -/
+theorem QD_sharp_centralizer_le_T [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    ∀ z : ↥hyp.T, (z : G) ∈ hyp.Q ⊔ hyp.D → z ≠ 1 →
+      Subgroup.centralizer ({(z : G)} : Set G) ≤ hyp.T := by
+  sorry
+
+/-- **No conjugate of `P` fits inside `T`** ((13.4) structural gate, issue 9013 追記⁶ (c),
+discharged type-free post-9073): `|P| = p^q` (13.2.b) exceeds the `p`-part `p = |W₂|` of
+`|T| = |Q|·(v·d)·p` (`card_T_eq`): `p ∤ |Q|` because `Q = T_F` is a Hall subgroup of `T` whose
+index `(v·d)·p` is divisible by `p`, and `p ∤ v·d = |V|` because `V ⋊ W₂` is a Frobenius group
+(`|V| ≡ 1 (mod p)`; trivially if `V = ⊥`).  So `v_p(|T|) = 1 < q`, and a conjugate `P^w ≤ T`
+would give `p^q ∣ |T|` by Lagrange — impossible. -/
+theorem P_conj_forall_not_le_T [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    ∀ w : G, ¬ ∀ r ∈ hyp.P, w⁻¹ * r * w ∈ hyp.T := by
+  intro w hall
+  haveI := hyp.finiteG
+  -- `|P| = p^q` (13.2.b).
+  obtain ⟨-, -, -, hPcard, -, -⟩ := basic_structure hG hyp
+  -- The conjugate `P^w = (conj w⁻¹)(P)` lies in `T` and has order `p^q`; Lagrange.
+  set f : G →* G := (MulAut.conj w⁻¹).toMonoidHom with hf
+  have hle : hyp.P.map f ≤ hyp.T := by
+    rintro - ⟨r, hr, rfl⟩
+    simpa [hf, MulAut.conj_apply] using hall r hr
+  have hcardmap : Nat.card ↥(hyp.P.map f) = hyp.p ^ hyp.q := by
+    rw [← hPcard]
+    exact (Nat.card_congr
+      (Subgroup.equivMapOfInjective hyp.P f (MulAut.conj w⁻¹).injective).toEquiv).symm
+  have hdvd : hyp.p ^ hyp.q ∣ Nat.card ↥hyp.T := by
+    rw [← hcardmap]
+    exact Subgroup.card_dvd_of_le hle
+  rw [hyp.card_T_eq hG] at hdvd
+  -- `p ∤ v·d = |V|`: Frobenius `V ⋊ W₂` gives `|V| ≡ 1 (mod p)` (trivial if `V = ⊥`).
+  have hpV : ¬ hyp.p ∣ hyp.v * hyp.d := by
+    rw [← hyp.card_V_eq_vd]
+    by_cases hVbot : hyp.V = ⊥
+    · rw [hVbot, Subgroup.card_bot]
+      intro h
+      exact hyp.p_prime.one_lt.ne' (Nat.dvd_one.mp h)
+    · obtain ⟨tpd, htpdU, htpdW1, -⟩ := reconciled_typePData_T hG hyp
+      have hUne : tpd.U ≠ ⊥ := by rw [htpdU]; exact hVbot
+      have hfrob := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius tpd hUne
+      rw [htpdU, htpdW1] at hfrob
+      have hmod := hfrob.card_kernel_modEq_one
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+            (le_sup_left : hyp.V ≤ hyp.V ⊔ hyp.W2)).toEquiv,
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+            (le_sup_right : hyp.W2 ≤ hyp.V ⊔ hyp.W2)).toEquiv,
+          ← hyp.p_eq_card_W2] at hmod
+      intro hpdvd
+      have hV1 : 1 ≤ Nat.card ↥hyp.V := Nat.card_pos
+      have hsub : hyp.p ∣ Nat.card ↥hyp.V - 1 := (Nat.modEq_iff_dvd' hV1).mp hmod.symm
+      have hone : hyp.p ∣ 1 := by
+        have := Nat.dvd_sub hpdvd hsub
+        rwa [Nat.sub_sub_self hV1] at this
+      exact hyp.p_prime.one_lt.ne' (Nat.dvd_one.mp hone)
+  -- `p ∤ |Q|`: `Q = T_F` is Hall in `T` and `p` divides its index `(v·d)·p`.
+  have hpQ : ¬ hyp.p ∣ Nat.card ↥hyp.Q := by
+    have hQ_le_T : hyp.Q ≤ hyp.T := hyp.Q_eq_TF ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le _
+    have hHall := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall hyp.T
+    rw [← hyp.Q_eq_TF] at hHall
+    have hcard_eq : Nat.card ↥(hyp.Q.subgroupOf hyp.T) = Nat.card ↥hyp.Q :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQ_le_T).toEquiv
+    have hcopIdx : Nat.Coprime (Nat.card ↥hyp.Q) (hyp.Q.subgroupOf hyp.T).index :=
+      hcard_eq ▸ OddOrder.Isaacs.Ch03.IsHallSubgroup.coprime_index hHall
+    -- `index · |Q| = |T| = |Q|·(v·d)·p ⟹ index = (v·d)·p`, so `p ∣ index`.
+    have hidx : (hyp.Q.subgroupOf hyp.T).index * Nat.card ↥hyp.Q
+        = Nat.card ↥hyp.Q * (hyp.v * hyp.d) * hyp.p := by
+      rw [← hyp.card_T_eq hG, ← hcard_eq]
+      exact Subgroup.index_mul_card _
+    have hQpos : 0 < Nat.card ↥hyp.Q := Nat.card_pos
+    have hidx' : (hyp.Q.subgroupOf hyp.T).index = hyp.v * hyp.d * hyp.p := by
+      have h : (hyp.Q.subgroupOf hyp.T).index * Nat.card ↥hyp.Q
+          = hyp.v * hyp.d * hyp.p * Nat.card ↥hyp.Q := by
+        rw [hidx]; ring
+      exact Nat.eq_of_mul_eq_mul_right hQpos h
+    intro hpdvd
+    have hpidx : hyp.p ∣ (hyp.Q.subgroupOf hyp.T).index := by
+      rw [hidx']; exact dvd_mul_left hyp.p (hyp.v * hyp.d)
+    have hp1 := Nat.dvd_gcd hpdvd hpidx
+    rw [Nat.Coprime.gcd_eq_one hcopIdx] at hp1
+    exact hyp.p_prime.one_lt.ne' (Nat.dvd_one.mp hp1)
+  -- `p^q ∣ (|Q|·(v·d))·p` with `p` prime to `|Q|·(v·d)` forces `p ∣ |Q|·(v·d)` (`q ≥ 2`) — absurd.
+  have hK : ¬ hyp.p ∣ Nat.card ↥hyp.Q * (hyp.v * hyp.d) := by
+    intro h
+    rcases (Nat.Prime.dvd_mul hyp.p_prime).mp h with h' | h'
+    exacts [hpQ h', hpV h']
+  have hpow : hyp.p ^ hyp.q = hyp.p ^ (hyp.q - 1) * hyp.p := by
+    rw [← pow_succ]
+    congr 1
+    have := hyp.q_prime.two_le
+    omega
+  rw [hpow] at hdvd
+  have hcancel : hyp.p ^ (hyp.q - 1) ∣ Nat.card ↥hyp.Q * (hyp.v * hyp.d) :=
+    (Nat.mul_dvd_mul_iff_right hyp.p_prime.pos).mp hdvd
+  have hq1 : hyp.q - 1 ≠ 0 := by
+    have := hyp.q_prime.two_le
+    omega
+  exact hK (dvd_trans (dvd_pow_self hyp.p hq1) hcancel)
+
+open scoped FiniteInduce in
+/-- **(13.3.b,c)-for-`T` θ-package** ((13.4) character gate, issue 9013 追記⁶ (a)+(b)): if the
+(13.4) conclusion fails, then by (13.3.b) applied to `T` the family `𝒯` contains an irreducible
+character `θ` induced from a linear character of `K = QD`, and (13.3.c) for `T` writes the
+`τ₁`-image of the distinguished `ν`-row sum as a signed `η`-row.  Packaged in the exact form the
+(13.4) contradiction consumes:
+
+* `θT − ν_r` is `K^#`-supported ((13.3.a) for `T`: both are `K`-induced of equal degree `vp`);
+* its Dade image (`τ = Ind_T^G` by (13.2.e) for `T`) is `θ° − δ'·∑ⱼ η_{rj}` ((13.3.c) for `T`,
+  `τ₁`-additivity);
+* `θ° = θ^{τ₁}` is orthogonal to the `η`-grid and to `λ^{τ₁}` ((4.1) + (5.3.b) pairwise
+  orthogonality of `η_{ij}`, `λ^{τ₁}`, `θ^{τ₁}`). -/
+theorem tSide_theta_package_of_not_caseB [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (chars : CharacterDegreeData hyp)
+    (_hne : ¬ (hyp.D = ⊥ ∧ hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) ∧
+      Nat.card ↥hyp.Q = hyp.q ^ hyp.p)) :
+    ∃ (θT : ClassFunction ↥hyp.T ℂ) (r : Fin hyp.q) (δ' : ℤ) (θG : ClassFunction G ℂ),
+      (δ' = 1 ∨ δ' = -1) ∧
+      ((θT - ∑ j : Fin hyp.p, hyp.nu r j).support ⊆
+        {z : ↥hyp.T | (z : G) ∈ hyp.Q ⊔ hyp.D ∧ z ≠ 1}) ∧
+      (ClassFunction.induce hyp.T (θT - ∑ j : Fin hyp.p, hyp.nu r j)
+        = θG - (δ' : ℂ) • ∑ j : Fin hyp.p, hyp.eta r j) ∧
+      (∀ (i : Fin hyp.q) (j : Fin hyp.p), ClassFunction.inner (hyp.eta i j) θG = 0) ∧
+      ClassFunction.inner (chars.tau1S chars.lambda) θG = 0 := by
+  sorry
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (13.4)**: if `S` contains a degree-`u q` character induced
+from a linear character of `P C`, then case (9.7.b) holds for `T`, with
+`D = 1` and `v = (q^p - 1) / (q - 1)`.
+
+The third conjunct `|Q| = q^p` is the kernel-order component of "case (9.7.b) holds for `T`"
+(the (9.7.b) field model identifies `Q̄` with a field of cardinality `q^p`); it is what the
+(13.10) counting reads off ((13.10.3) computes `|Q^#|/|T| = (q^p−1)/(pq^p v)`).
+
+**Proof structure** (issue 9013 追記⁶, textbook 04.15 mmd:49-58): by contradiction.  The T-side
+θ-package (`tSide_theta_package_of_not_caseB`, (13.3.b,c)-for-`T`) supplies `β = θ − ν_r` with
+`K^#`-support and Dade image `θ° − δ'·∑ⱼ η_{rj}`; the carried S-side (13.3) data give
+`α = λ − μ_{j₀}` with `H^#`-support (`H ⊴ S`, equal degrees) and Dade image `λ° − δ·∑ᵢ η_{i1}`.
+`(H^#)^G ∩ (K^#)^G = ∅` (`P` centralizes `H`-points, the `K^#`-centralizers lie in `T`, and no
+conjugate of `P` fits in `T`), so `(α^τ, β^τ) = 0` — but the bilinear expansion leaves the shared
+grid entry `δδ'·⟨η_{r1}, η_{r1}⟩ = ±1`.  Contradiction (`eta_cross_expansion_ne_zero`). -/
+theorem lambda_forces_T_caseB [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (chars : CharacterDegreeData hyp) :
+    hyp.D = ⊥ ∧ hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) ∧
+      Nat.card ↥hyp.Q = hyp.q ^ hyp.p := by
+  haveI := hyp.finiteG
+  by_contra hne
+  -- T-side θ-package from the (13.3.b,c)-for-`T` gate.
+  obtain ⟨θT, r, δ', θG, hδ', hβsupp, hβform, hηθ, hLamTheta⟩ :=
+    tSide_theta_package_of_not_caseB hG chars hne
+  -- S-side (13.3) data: `λ = Ind thetaL` and the distinguished `μ`-column `μ_{j₀} = Ind θlin` with
+  -- `τ₁`-image `δ·∑ᵢ η_{i1}`.
+  obtain ⟨thetaL, hthetaLirr, hthetaL1, hlamEq, -⟩ := chars.lambda_induced_from_PC_linear
+  obtain ⟨j₀, δ, θlin, hδ, hθlinirr, hθlin1, hμeq, hμtau⟩ := chars.mu_col_tau1_eta_col_one
+  -- `α = λ − μ_{j₀}` is supported on `H^#` (`H ⊴ S`; both terms `H`-induced of equal degree).
+  have hαsupp : (chars.lambda - ∑ i : Fin hyp.q, hyp.mu i j₀).support ⊆
+      {y : ↥hyp.S | (y : G) ∈ hyp.H ∧ y ≠ 1} := by
+    intro s hs
+    have hs0 : (chars.lambda - ∑ i : Fin hyp.q, hyp.mu i j₀) s ≠ 0 := hs
+    refine ⟨?_, ?_⟩
+    · by_contra hsH
+      apply hs0
+      have hsH' : s ∉ hyp.H.subgroupOf hyp.S := fun h => hsH (Subgroup.mem_subgroupOf.mp h)
+      rw [ClassFunction.sub_apply, hlamEq, hμeq,
+        ClassFunction.induce_eq_zero_of_not_mem_normal _ hsH',
+        ClassFunction.induce_eq_zero_of_not_mem_normal _ hsH', sub_zero]
+    · rintro rfl
+      apply hs0
+      rw [ClassFunction.sub_apply, hlamEq, hμeq, ClassFunction.induce_apply_one,
+        ClassFunction.induce_apply_one, hthetaL1, hθlin1, sub_self]
+  -- The conjugate closures of `H^#` and `K^#` are disjoint.
+  have hdisj := disjoint_conjugatesIntoSet_of_centralizer
+    (A_M := {y : ↥hyp.S | (y : G) ∈ hyp.H ∧ y ≠ 1})
+    (A_N := {z : ↥hyp.T | (z : G) ∈ hyp.Q ⊔ hyp.D ∧ z ≠ 1})
+    (fun _y hy => hyp.P_le_centralizer_of_mem_H hG hy.1)
+    (fun z hz => QD_sharp_centralizer_le_T hG hyp z hz.1 hz.2)
+    (P_conj_forall_not_le_T hG hyp)
+  -- Hence `(α^τ, β^τ) = 0`.
+  have h0 : ClassFunction.inner
+      (ClassFunction.induce hyp.S (chars.lambda - ∑ i : Fin hyp.q, hyp.mu i j₀))
+      (ClassFunction.induce hyp.T (θT - ∑ j : Fin hyp.p, hyp.nu r j)) = 0 :=
+    inner_induce_induce_eq_zero_of_disjoint hαsupp hβsupp hdisj
+  -- Rewrite `α^τ = λ° − δ·∑ᵢ η_{i1}` ((13.2.e)+τ₁-additivity + the (13.3.c) column formula).
+  have hαform : ClassFunction.induce hyp.S (chars.lambda - ∑ i : Fin hyp.q, hyp.mu i j₀)
+      = chars.tau1S chars.lambda
+        - (δ : ℂ) • ∑ i : Fin hyp.q, hyp.eta i ⟨1, hyp.p_prime.one_lt⟩ := by
+    conv_lhs => rw [hlamEq, hμeq]
+    rw [← chars.tau1S_apply_induce_sub thetaL θlin hthetaLirr hθlinirr, map_sub, ← hlamEq, ← hμeq, hμtau]
+  -- The `λ°`-side grid orthogonality, flipped to the expansion brick's slot order.
+  have hLamEta : ∀ (i : Fin hyp.q) (j : Fin hyp.p),
+      ClassFunction.inner (chars.tau1S chars.lambda) (hyp.eta i j) = 0 := by
+    intro i j
+    have h := chars.tau1S_induce_inner_eta i j thetaL hthetaLirr
+    rw [← hlamEq] at h
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, h, star_zero]
+  -- The bilinear expansion is `δ·δ' ≠ 0` — contradiction.
+  rw [hαform, hβform] at h0
+  exact eta_cross_expansion_ne_zero hyp.eta (fun i k j l => hyp.eta_orthonormal i k j l)
+    (chars.tau1S chars.lambda) θG r ⟨1, hyp.p_prime.one_lt⟩ hLamEta hηθ hLamTheta hδ hδ' h0
 
 open scoped Classical in
 /-- `|K^#| = |K| − 1`, `Finset` form. -/
