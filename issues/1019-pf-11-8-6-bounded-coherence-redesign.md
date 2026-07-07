@@ -1043,3 +1043,16 @@ suppIn = hyp.A0 ✓ certainTypeSet_isCoherent_A0 で実証済)。
 counting は §9 の X_H0C' サイズ下界 ((9.9)(a) Galois / (9.8)(d) 非Galois lb_Sqa) — named
 hypothesis で前倒しし、§9 counting は別 piece。次 iteration = composite を上記 map 通りに build
 (Dmem/hortho_mem の 2 「要確認」を先に grep)。
+
+### 「要確認」2 点の確認結果 (2026-07-07 次 iteration 冒頭)
+- **`memberExtensionDecomposition`** (S08_CoherenceCorePart1:1554) ✅ そのまま使える: 入力 =
+  hS₁ + χ irr ∈ S₁ + χ̄ ∈ S₁ + non-real + diffsupp + hνZ (hS₁.extension_mem_ZIrr で discharge 可)
+  + hχχbar。tau1 = hS₁.extension (htau1Dmem は rfl 系)、imageFamily = dadeOrthonormalCharacterImageFamilyOfDiff。
+- **`certainTypeR_imageSet_orthogonal_dadeOfDiff`** (S08_CaseBHortho:44) ⚠ **Sibley world 前提**
+  (hyp : SibleyDadeHypothesis G L H、A = sharpImage H、hHK : h46.K = H) — §12 world (A = typePA0)
+  では直接使えない。証明核 (ticVdiff key brick、⟨ω^σ, ·⟩ = 0 の disjointness) は W-world の話で
+  A への依存は τ の家経由。**対応 = composite では hortho_mem を named hypothesis 化**し、§12 版
+  supply (S08_CaseBHortho の typePA0 一般化 or §12 instantiation、a 所有ゆえ可) を別 piece に。
+- **追加発見**: `muGrid_inner_irr_member_eq_zero` (S12_Section9Counts:802、既存) — hχ_S1 の
+  supply がほぼ直接ある (μ-grid ⊥ irr member)。
+⟹ composite の named hypotheses = **hDeg counting + hortho_mem** の 2 つ、他 15 項目は実 supply。
