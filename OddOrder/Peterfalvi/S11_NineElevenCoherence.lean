@@ -50,6 +50,8 @@ Reference note: `issues/1017-pf-s5-uniform-degree-coherence.md` (G1),
 namespace OddOrder.Peterfalvi.S11
 
 open OddOrder.RepresentationTheory
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
+open scoped Pointwise
 
 variable {G : Type*} [Group G]
 
@@ -283,6 +285,120 @@ theorem caseA_source_degree_dvd_a_of_S0_witness
     exact_mod_cast key
   rw [hdeq]
   exact Dvd.dvd.mul_left hdvd_idx e
+
+/-- **A nontrivial `H̄`-hom is nontrivial on some Clifford summand.**  The summands span
+(`Hpart_iSup : ⨆ i, Hpart i = ⊤`), so a hom `θ̄` trivial on every `Hpart i` is trivial on all of
+`H̄` (`Subgroup.iSup_induction`).  Selects the summand `w` of Coq `a_dv_XH0`'s
+`/exists_inP[w W1w nt_t_w]` step. -/
+theorem exists_summand_witness_of_ne_one (caseA : CliffordCaseAData chars)
+    {θbar : (↥data.H ⧸ chief.N) →* ℂˣ} (hne : θbar ≠ 1) :
+    ∃ w : Fin data.q, ∃ x ∈ caseA.Hpart w, θbar x ≠ 1 := by
+  by_contra hall
+  push_neg at hall
+  apply hne
+  refine MonoidHom.ext fun y => ?_
+  rw [MonoidHom.one_apply]
+  have hy : y ∈ ⨆ i, caseA.Hpart i := caseA.Hpart_iSup ▸ Subgroup.mem_top y
+  refine Subgroup.iSup_induction (C := fun z => θbar z = 1) caseA.Hpart hy
+    (fun i z hz => hall i z hz) (map_one θbar) ?_
+  intro a b ha hb
+  rw [map_mul, ha, hb, mul_one]
+
+open scoped Classical in
+/-- **Peterfalvi (9.8.a)/(9.11.1) case-(a) divisibility: `a ∣ χ(1)` on `𝒳(H₀)`** (Coq
+`a_dv_XH0`, `typeP_nonGalois_characters` part (a), `PFsection9.v:884-916`).
+
+Every `χ ∈ 𝒳` with `H₀ ⊆ Ker χ` has degree divisible by the Clifford integer
+`a = |U : C_U(S₀)|`.  Extraction (`exists_hom_constituent_of_mem_xiSet_H0`) yields a nontrivial
+linear seed `θ̄` with `χ` lying over its inflation; `θ̄` is nontrivial on some summand
+`Hpart w = φ(rep_w)•S₀` (`exists_summand_witness_of_ne_one`); conjugating `χ` by the
+`M`-realization `m` of `rep_w` twists the seed to `θ̄∘φ(rep_w)` — nontrivial on `S₀` — while
+preserving irreducibility and degree, so the `S₀`-witness form
+(`caseA_source_degree_dvd_a_of_S0_witness`) applies to `χ^m` and `a ∣ χ^m(1) = χ(1)`.
+
+This is the anchor-ratio divisibility of the (9.11.1) squeeze: every strict-branch adjoining
+`χ − (χ(1)/qa)·χ₁` needs `a ∣ (source degree of χ)`. -/
+theorem caseA_source_degree_dvd_a (caseA : CliffordCaseAData chars)
+    {χ : IrreducibleCharacter ↥(huSub data)}
+    (hχX : χ ∈ xiSet data)
+    (hχH0 : ((chief.H0.subgroupOf M).subgroupOf (huSub data) : Set ↥(huSub data)) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction ↥(huSub data) ℂ))
+    {d : ℕ} (hd : (χ : ClassFunction ↥(huSub data) ℂ) (1 : ↥(huSub data)) = (d : ℂ)) :
+    caseA.a ∣ d := by
+  classical
+  haveI : Fintype ↥M := Fintype.ofFinite _
+  haveI : Fintype ↥(huSub data) := Fintype.ofFinite _
+  haveI : Fintype ↥(hInHu data) := Fintype.ofFinite _
+  haveI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  -- Extraction: a nontrivial linear seed `θ̄` with `χ` over its inflation.
+  obtain ⟨θbar, hθbarne, hover⟩ := exists_hom_constituent_of_mem_xiSet_H0 hχX hχH0
+  -- `θ̄` is nontrivial on some summand `Hpart w = φ(rep_w) • S₀`.
+  obtain ⟨w, y, hyHw, hyne⟩ := exists_summand_witness_of_ne_one caseA hθbarne
+  -- The twisted seed `θ̄ ∘ φ(rep_w)` is nontrivial on `S₀`.
+  set φw := quotientMulAutHom chief.N_aInvariant (caseA.orbitRep w) with hφw
+  set θbarw : (↥data.H ⧸ chief.N) →* ℂˣ := θbar.comp φw.toMonoidHom with hθbarw
+  have hS0 : ∃ x ∈ caseA.S0, θbarw x ≠ 1 := by
+    refine ⟨φw⁻¹ • y, ?_, ?_⟩
+    · rw [caseA.Hpart_orbit w, ← hφw] at hyHw
+      exact Subgroup.mem_pointwise_smul_iff_inv_smul_mem.mp hyHw
+    · rw [hθbarw, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom]
+      show θbar (φw (φw⁻¹ • y)) ≠ 1
+      simpa [MulAut.smul_def] using hyne
+  -- The `M`-realization `m` of `rep_w` and the conjugated character `χ' = χ^m`.
+  have hUW1M : data.typeP.U ⊔ data.typeP.W1 ≤ M := sup_le (U_le_M data) data.typeP.W1_le
+  set m : ↥M := ⟨(caseA.orbitRep w : G), hUW1M (caseA.orbitRep w).2⟩ with hm
+  have hmb : ((m : ↥M) : G) = ((caseA.orbitRep w : ↥(data.typeP.U ⊔ data.typeP.W1)) : G) := rfl
+  haveI := huSub_normal data
+  set χ' : IrreducibleCharacter ↥(huSub data) :=
+    ⟨ClassFunction.conjBy (G := ↥M) (H := huSub data) m (χ : ClassFunction ↥(huSub data) ℂ),
+      ClassFunction.IsIrreducibleCharacter.conjBy (H := huSub data) χ.isIrreducible m⟩
+    with hχ'
+  -- `χ'` lies over the inflation of the twisted seed.
+  have hover' : IrreducibleCharacter.LiesOver (hInHu data) χ'
+      (linearIrreducibleCharacter (θbarw.comp ((QuotientGroup.mk' chief.N).comp
+        (hInHuEquivH data).toMonoidHom))) := by
+    -- `Res χ' = compHom (hInHuConj m) (Res χ)` and the twisted target is the
+    -- `compHom (hInHuConj m)`-image of the original target; inner products transport.
+    have htarget : (linearIrreducibleCharacter (θbarw.comp ((QuotientGroup.mk' chief.N).comp
+          (hInHuEquivH data).toMonoidHom)) : ClassFunction ↥(hInHu data) ℂ)
+        = ClassFunction.compHom (hInHuConj data m)
+            (linearIrreducibleCharacter (θbar.comp ((QuotientGroup.mk' chief.N).comp
+              (hInHuEquivH data).toMonoidHom)) : ClassFunction ↥(hInHu data) ℂ) := by
+      rw [show (linearIrreducibleCharacter (θbar.comp ((QuotientGroup.mk' chief.N).comp
+            (hInHuEquivH data).toMonoidHom)) : ClassFunction ↥(hInHu data) ℂ)
+          = ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+              (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+                ((linearIrreducibleCharacter θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ))) by
+        rw [ClassFunction.compHom_linearIrreducibleCharacter,
+          ClassFunction.compHom_linearIrreducibleCharacter, MonoidHom.comp_assoc]]
+      rw [compHom_hInHuConj_hInHuEquivH data (caseA.orbitRep w) m hmb,
+        compHom_typeP_conjAction_inflation,
+        ClassFunction.compHom_linearIrreducibleCharacter,
+        ClassFunction.compHom_linearIrreducibleCharacter,
+        ClassFunction.compHom_linearIrreducibleCharacter, ← hφw, ← hθbarw]
+      rfl
+    show OddOrder.RepresentationTheory.ClassFunction.restrictionMultiplicity _
+      (χ' : ClassFunction ↥(huSub data) ℂ) _ ≠ 0
+    rw [OddOrder.RepresentationTheory.ClassFunction.restrictionMultiplicity_def, htarget, hχ']
+    show ClassFunction.inner (ClassFunction.restrict (hInHu data)
+        (ClassFunction.conjBy (G := ↥M) (H := huSub data) m
+          (χ : ClassFunction ↥(huSub data) ℂ)))
+      (ClassFunction.compHom (hInHuConj data m) _) ≠ 0
+    rw [hInHuConj_restrict_conjBy data m (χ : ClassFunction ↥(huSub data) ℂ),
+      inner_compHom_of_bijective (hInHuConj data m) (hInHuConj_bijective data m)]
+    exact hover
+  -- `χ'(1) = χ(1) = d` (conjugation fixes the identity).
+  have hd' : (χ' : ClassFunction ↥(huSub data) ℂ) (1 : ↥(huSub data)) = (d : ℂ) := by
+    rw [hχ']
+    show (ClassFunction.conjBy (G := ↥M) (H := huSub data) m
+      (χ : ClassFunction ↥(huSub data) ℂ)) 1 = (d : ℂ)
+    rw [ClassFunction.conjBy_apply, ← hd]
+    exact congrArg _ (by simp)
+  -- Conclude by the `S₀`-witness form applied to `χ'`.
+  exact caseA_source_degree_dvd_a_of_S0_witness caseA hover' hS0 hd'
 
 end CaseADivisibility
 
