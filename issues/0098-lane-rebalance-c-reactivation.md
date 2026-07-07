@@ -79,10 +79,27 @@ hub が 4 並列 subagent (wf_d4994964) で a queue / b queue / c gate-map / 900
 
 ## 完了条件
 
-- [ ] c が package item ≥1 に着手 (claim 起票 or carve-out 領域で実装開始)
+- [x] c が package item ≥1 に着手 — **item 5 (hcard2) 完了** (2026-07-07, commit `bf3b21f4`)
 - [ ] 9013 に de-scope①/②を反映 (本 issue から転記) — 済 (追記参照)
 - [ ] merge_monitor.md レーン表の c 行を REACTIVATE に更新 — 済
 - [ ] b/c の次回 main sync で本裁定が伝播 (レーンは open issue を scan)
+
+## ✅ item 5 完了 (2026-07-07 lane c, commit `bf3b21f4`) — hcard2 は ungated と確定
+
+hub の「b-gated ラベルは crude ≥2 bound には過剰の可能性 — 検証優先」仮説は **正しかった**。
+`T_typeIII_ratio_le` の `hcard2 : 2 ≤ calT1_set.ncard` を **9013 非依存で discharge**:
+
+- 新 sorry-free lemma `T_typeIII_two_p_add_one_le_card_V : 2*p+1 ≤ |V|` — 内在の `U ⋊ W₁` Frobenius
+  (`T_typeIII_UW1_frobenius`、odd kernel `|U|=|V|` + odd complement `|W₁|=p`) に odd-order Frobenius
+  size 条件 `IsFrobeniusGroup.two_mul_card_complement_add_one_le_card_kernel` を適用。
+- `hcard2` = `calT1_set.ncard=(|V|−1)/p` (`hcount_V`) + `2≤(|V|−1)/p ⟺ 2p≤|V|−1` (`Nat.le_div_iff_mul_le`)
+  → `omega`。**lane-b の `|V|`-lower-bound (v-value 13.15) は exact count にのみ必要で、crude ≥2 には不要**。
+
+S16 tactic sorry 11→10。`T_typeIII_ratio_le` の残 sorry は **S-side βₛ Γ-bridge 1本のみ** (item 4 / 9013)。
+⟹ 9013 の「hcard2 は 9013-gated」記述は **訂正済** (hcard2 は 9013 非依存)。leaf build green (3903)、新 axiom 無し。
+
+**次**: item 4 (§14 Γ-bridge nzT1_Ga assembly、自ファイル、9072 coherence で buildable) → item 1/2 (新
+shared leaf、claim-before-build) の順で継続予定。
 
 ## 参照
 
