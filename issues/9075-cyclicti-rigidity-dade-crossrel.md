@@ -37,10 +37,13 @@ not yet in this file" と明記; grep で `eq_signed_sub`/`dirr_small_norm` は 
   (φ=∑c(a)•a, c:→₀ℤ) / `mem_ZIrr_inner_self_eq_sum_sq` (Parseval ‖φ‖²=∑(c a)²) /
   `exists_pair_of_sum_sq_eq_two` (整数 combinatorial core: 全非零・平方和2 ⟹ 相異2元各±1)。
   → 新 leaf 不要、既存 file に assembly のみ追加 (build 3152 jobs green)。
-- [ ] **piece 2 (3.8) cyclicTI NC bound**: cyclicTI grid に対する class function の "number of components"
-  bound。deep §3 cyclicTI (Coq `cycTI_NC`/`small_cycTI_NC`)。σ-isometry (`S05.TICyclicHypothesis.sigma`
-  = 既存) の image の rigidity。
-- [ ] **piece 3 `eq_signed_sub_cTIiso`**: piece 1+2 の assembly。
+- [ ] **piece 2 (3.8) cyclicTI NC theory** (deep §3、次の主 frontier): `cyclicTI_NC φ := #|{(i,j) : ⟨φ,η_ij⟩≠0}|`
+  (η-grid 構成数、Coq PFsection3.v:1525) + bounds `cycTI_NC_{opp,sign,iso,irr,dirr,sub,norm}` +
+  **(3.8) `small_cycTI_NC`** (PFsection3.v:1673 近傍、φ が V 上消えて小 norm ⟹ NC 小)。σ-isometry
+  `S05.TICyclicHypothesis.sigmaIntegral` (既存) の η-grid に対して port。repo 不在 (from-scratch)。
+  `eq_signed_sub_cTIiso` が要するのは `NC(φ−ρ) < 2·min(w1,w2)` (via `cycTI_NC_sub` + `cycTI_NC_norm`)。
+- [ ] **piece 3 `eq_signed_sub_cTIiso`**: piece 1 (`exists_signed_pair_...` ✅) + piece 2 の assembly
+  (Coq PFsection3.v:1685-: ψ=φ−ρ の dirr_constt を NC bound で η-grid 内に閉じ込め、V-agreement で符号確定)。
 - [ ] **piece 4 `prDade_sub_TIirr`**: Dade norm (‖μ2_ij−μ2_ik‖²=2) + V-value + piece 3 ⟹ cross-relation。
   → `tauS_mu_row0_cross` (S15_SAndT.lean, 3003) を discharge。
 
