@@ -23,14 +23,16 @@
 > S07 を新規再作成**した場合のみ逸脱。判定: `git log main..b --no-merges` の commit が S07 への新規宣言
 > 追加か (= 再作成) / 既存 S07 への追記止まり (= 残存) か。混在・不明なら skip+報告。
 
-## レーン (2026-07-06 current: a/b/c + lane d shared-infra hygiene)
+## レーン (2026-07-07 current: a/b/c — ⚰ lane d 退役)
 
 | lane | branch | worktree | クラスタ | 主所有 .lean | issue base |
 |---|---|---|---|---|---|
 | **a** | `a` | `odd-order-a` | α **S12 (11.8) unique feitThompson sorry** + §7 on-path norm (2026-07-04 再々編) | `Peterfalvi/S(0[3-9]|1[0-3])*` + `FeitThompson.lean` (全体) | 1000 |
 | **b** | `b` | `odd-order-b` | β **§16 endgame char cascade = S15 (13.9)-(13.19)** (2026-07-04 再々編; §12 Dade は完遂・cite-only) | `Peterfalvi/{S15_SAndT_Setup, S15_SAndT}.lean` (c→b, 2026-07-04) + `S14_MaximalI.lean` + coherence file 群 + carve-out 0090/0096 | 2000 |
 | **c** | `c` | `odd-order-c` | γ **S16 非存在 — 2026-07-06 夕 DORMANT cite-sink 化** (領域枯渇、下記) | `Peterfalvi/S16_NonExistenceG.lean` (S15 は b へ移管、c は import cite) + 構成的 Clifford (issue 9002、完了) | 3000 |
-| **d** | `d` | `odd-order-d` | δ **codex 運用 shared-infra レーン (2026-07-06 夕 DORMANT→再活性化)** — coprime-action/minimal-invariant/Hall/π-group foundational 群論 API | `OddOrder/GroupTheory/**` / `OddOrder/Mathlib/**` / `OddOrder/Algebra/**` / `OddOrder/Isaacs/**` へ additive shared claim (claim-before-build: 着手前 9000系 issue 起票 + open-9000 scan)。**Do not edit Peterfalvi/BG S-files without a fresh issue/carve-out.** | **4000** |
+| ~~**d**~~ | — | — | ⚰ **退役 (2026-07-07, ユーザー裁定)** — codex 運用 shared-infra レーン。worktree/branch 削除済 | — | — |
+
+> **⚰ 2026-07-07 — lane d (codex) 退役 (ユーザー裁定)**: 徹底調査で **FT frontier (Peterfalvi 72 + BG 15 実 sorry) に codex 単独で閉じられる genuine・on-path・非衝突・非gated な実 sorry は存在しない**と確定 (Peterfalvi=全て gated/深いchar/a-b-c衝突/偽/off-path; BG 非b分=AppD/AppE 全て consumer 0・unimported の off-path scaffold)。構造的理由: FT 残 frontier は深く密結合な char/local-analysis で「切り出せる mechanical leaf」がほぼ無く、codex に軽タスクを与えると dup relocation の churn に流れる (直近 2 tick = 計 14 補題が全て既存 S01 補題の複製、net-genuine 0)。⟹ 3 レーン (a/b/c) に集約。worktree `/home/ywr/odd-order-d` + branch `d` 削除 (churn は net-zero、reflog 復元可)。**♻ 再活性化トリガー (将来)**: (i) proven S-side の **T-side dual** (`V_inf_centralizer_Q_eq_bot` 等) の gate ((14.9) T-typeII 構造) が a/b で landing → codex が template を mirror; (ii) a/b/c が特定 group-theory helper を明示 pull-request。いずれか発生時に `git worktree add /home/ywr/odd-order-d -b d` で再作成 (issue base 4000)。**⚠ ユーザーは codex の /loop セッションを停止すること** (worktree 消失後は codex が git エラーで空転)。
 
 > **⚠ 2026-07-06 夕 — lane c DORMANT cite-sink 化 (hub 裁定, 4-agent 調査 wf_00a0db07)**: c の S16 領域は枯渇
 > (0 ahead、S16_NonExistenceG の 10 bare sorry は**全て true carrier gate** = a の typeP_Galois (9000) or b の
@@ -354,6 +356,26 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-07 (tick 5) — a/b/c 第2次統合 (ユーザー「いますぐ取り込みましょう」)**: tick3 統合後にレーンが
+  自走して出した新規分を合流。3 レーン体制 (d 退役後) の初統合。
+  - **a** (`7a6190bf`): issue 1019 (11.8.6) soundness refinement + Coq 精読で Route 1 確定 (docs のみ、Lean 不変)。
+  - **b** (`b245d446`, genuine): BG Thm 15.8/15.9 **Keystone C** を実証明で close — `signalizer_msigma_sup_inf_partner_eq`
+    (H_σ⊔(H∩M*)=H) + Coq `snK_sMst` port (S14_TypePCounting)。**S15_MF real sorry 3→2**。b 領域 (S14/S15)。
+  - **c** (`7c1f06e4`, genuine): Pf (13.15) case-B order dichotomy 完成 (p≡1 branch) + (14.4) T-side v-value を
+    proven engine に wire (S16_CaseBOrder/S16_NonExistenceG)。Main.lean は c 未編集ゆえ tick4 の清掃済み版を保持
+    (dup 再導入なし = 3-way merge で検証)。
+  - **build/sorry**: full build green **3934 jobs**、AxiomsCheck OK、新 axiom なし。real sorry **88→87**
+    (b Keystone C 分 -1、c は sorry-free)。Main.lean dup 清掃も維持 (6286 行、再導入なし)。push 済。
+  ユーザーが d の genuine 席を探索 (Peterfalvi 内 sorry 指定 → BG 側探索) した結果、hub 徹底調査で
+  **FT frontier に codex 単独 closeable な genuine sorry 不在**と確定 → 退役裁定。詳細 = 上記レーン表 ⚰ 節。
+  - **退役実施**: worktree `/home/ywr/odd-order-d` remove + branch `d` 削除 (was `e4c6ec3c`、churn net-zero・
+    reflog 復元可)。a/b/c 3 レーンに集約。ユーザーは codex `/loop` 停止予定。
+  - **dup 清掃**: d 前 tick batch (`2826cac1` 経由の 7 commit、Isaacs Ch04 Main.lean +350) の **全 10 decl が
+    既存 S01/GroupTheory 補題の dup (defs≥2、genuine 0)** と確定 → 7 commit の Main.lean 追加を reverse-patch で
+    除去 (`git apply -R`、−350)。full build green 検証後 commit。消費者は S01/GroupTheory 版に解決 (Isaacs 内
+    生存 decl の巻き込みは batch 内で完結)。issue bookkeeping (9061-9067 closed) は保持。
+  - **♻ 再活性化トリガー**: (i) T-side dual (`V_inf_centralizer_Q_eq_bot` 等) の gate ((14.9) T-typeII) が
+    a/b で landing → codex が proven S-side を mirror; (ii) a/b/c の helper pull-request。→ base 4000 で worktree 再作成。
 - **2026-07-07 (tick 3) — 統合 tick (ユーザー「各レーンを統合します」): a/b/c 合流 = 3 genuine landing、d = net-zero churn ゆえ非合流**:
   - **a 合流** (`6cdefc8e`, in-progress merge の完了): Pf (9.5)/(4.5.b) reducible S-member = μ-column を
     S06 residue theory で実証明 (`0969af79`)、**S12 real sorry 8→7**。+ issue 1019 (11.8.6 uniform-degree
