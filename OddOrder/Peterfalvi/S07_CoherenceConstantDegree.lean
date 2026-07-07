@@ -173,8 +173,8 @@ noncomputable abbrev imageFam (hyp : Hypothesis (L := L) (G := G) S A)
 inner-product equalities `⟨τ dᵢ, τ dⱼ⟩ = ⟨dᵢ, dⱼ⟩` (`i, j ∈ {1, 2}`), the isometry holds on every
 `ℤ`-combination `φ, ψ ∈ zSpan {d₁, d₂}`, by bilinear expansion (`τ` is `ℤ`-linear, `⟨·,·⟩` is
 `ℤ`-sesquilinear).  This feeds the lattice-relative `ofProjection` isometry input from the
-difference-isometry field `Hypothesis.tau_isometry_diff` (issue 9001), replacing the former global
-`IsIntegralIsometry`. -/
+member-difference isometry `Hypothesis.tau_isometry_memberDiff` (issues 9001, 0099), replacing the
+former global `IsIntegralIsometry`. -/
 theorem inner_eq_on_zSpan_pair {τ : IntegralCharacterMap L G} {d₁ d₂ : ClassFunction L ℂ}
     (h₁₁ : ClassFunction.inner (τ d₁) (τ d₁) = ClassFunction.inner d₁ d₁)
     (h₁₂ : ClassFunction.inner (τ d₁) (τ d₂) = ClassFunction.inner d₁ d₂)
@@ -197,20 +197,25 @@ theorem inner_eq_on_zSpan_pair {τ : IntegralCharacterMap L G} {d₁ d₂ : Clas
 supported-difference virtual-character fact `(χ − ζ)^τ ∈ ℤ[Irr G]`, the (5.4) decomposition of
 `(χ − ζ)^τ` against `R(χ)`, built against the fixed Dade isometry `τ` (`tau1 := τ`).  The
 `ofProjection` isometry input on `zSpan {χ − χ̄, χ − ζ}` comes from the lattice-relative
-difference-isometry `hyp.tau_isometry_diff` (issue 9001) via `inner_eq_on_zSpan_pair` — no global
-`IsIntegralIsometry` is needed, so this applies to the Feit–Thompson Dade map. -/
+difference-isometry `hyp.tau_isometry_memberDiff` (issues 9001, 0099; the member-difference support
+inputs come from `hsuppdiff`) via `inner_eq_on_zSpan_pair` — no global `IsIntegralIsometry` is
+needed, so this applies to the Feit–Thompson Dade map. -/
 noncomputable def pairDecomp (hyp : Hypothesis (L := L) (G := G) S A)
+    (hsuppdiff : ∀ a ∈ S, ∀ b ∈ S, ((a - b : ClassFunction L ℂ)).support ⊆ A)
     {χ ζ : ClassFunction L ℂ} (hχ : χ ∈ S) (hζ : ζ ∈ S)
     (hχζ : ClassFunction.inner χ ζ = 0) (hχbarζ : ClassFunction.inner χ.conj ζ = 0)
     (hZ : hyp.tau (χ - ζ) ∈ ZIrr G) :
     CharacterPsiDecomposition (L := L) (G := G) hyp.tau χ ζ :=
+  have hs1 : ((χ - χ.conj : ClassFunction L ℂ)).support ⊆ A :=
+    hsuppdiff _ hχ _ (hyp.conjugate_mem hχ)
+  have hs2 : ((χ - ζ : ClassFunction L ℂ)).support ⊆ A := hsuppdiff _ hχ _ hζ
   CharacterPsiDecomposition.ofProjection (imageFam hyp hχ) hyp.tau
     (fun _ _ hφ hψ =>
       inner_eq_on_zSpan_pair
-        (hyp.tau_isometry_diff hχ (hyp.conjugate_mem hχ) hχ (hyp.conjugate_mem hχ))
-        (hyp.tau_isometry_diff hχ (hyp.conjugate_mem hχ) hχ hζ)
-        (hyp.tau_isometry_diff hχ hζ hχ (hyp.conjugate_mem hχ))
-        (hyp.tau_isometry_diff hχ hζ hχ hζ)
+        (hyp.tau_isometry_memberDiff hχ (hyp.conjugate_mem hχ) hχ (hyp.conjugate_mem hχ) hs1 hs1)
+        (hyp.tau_isometry_memberDiff hχ (hyp.conjugate_mem hχ) hχ hζ hs1 hs2)
+        (hyp.tau_isometry_memberDiff hχ hζ hχ (hyp.conjugate_mem hχ) hs2 hs1)
+        (hyp.tau_isometry_memberDiff hχ hζ hχ hζ hs2 hs2)
         hφ hψ)
     rfl hZ hχζ hχbarζ
     (hyp.pairwise_orthogonal hχ (hyp.conjugate_mem hχ) (hyp.ne_conj hχ))
@@ -344,19 +349,22 @@ theorem DiffPair.imageFam_orthogonal (hyp : Hypothesis (L := L) (G := G) S A)
 
 /-- The per-pair decomposition `pairDecomp` for two members `χ, ζ` in *different* conjugate pairs. -/
 noncomputable def pairDecomp' (hyp : Hypothesis (L := L) (G := G) S A)
+    (hsuppdiff : ∀ a ∈ S, ∀ b ∈ S, ((a - b : ClassFunction L ℂ)).support ⊆ A)
     {χ ζ : ClassFunction L ℂ} (h : DiffPair χ ζ) (hχ : χ ∈ S) (hζ : ζ ∈ S)
     (hZ : hyp.tau (χ - ζ) ∈ ZIrr G) :
     CharacterPsiDecomposition (L := L) (G := G) hyp.tau χ ζ :=
-  pairDecomp hyp hχ hζ (hyp.pairwise_orthogonal hχ hζ h.1)
+  pairDecomp hyp hsuppdiff hχ hζ (hyp.pairwise_orthogonal hχ hζ h.1)
     (hyp.pairwise_orthogonal (hyp.conjugate_mem hχ) hζ h.conj_ne) hZ
 
 /-- The defining image equation `(χ − ζ)^τ = D.X − D.Y` for `D = pairDecomp' …` (the `tau1_image`
 field of `ofProjection`, with the fixed `tau1 = τ`). -/
 theorem pairDecomp'_image (hyp : Hypothesis (L := L) (G := G) S A)
+    (hsuppdiff : ∀ a ∈ S, ∀ b ∈ S, ((a - b : ClassFunction L ℂ)).support ⊆ A)
     {χ ζ : ClassFunction L ℂ} (h : DiffPair χ ζ) (hχ : χ ∈ S) (hζ : ζ ∈ S)
     (hZ : hyp.tau (χ - ζ) ∈ ZIrr G) :
-    hyp.tau (χ - ζ) = (pairDecomp' hyp h hχ hζ hZ).X - (pairDecomp' hyp h hχ hζ hZ).Y :=
-  (pairDecomp' hyp h hχ hζ hZ).tau1_image
+    hyp.tau (χ - ζ) = (pairDecomp' hyp hsuppdiff h hχ hζ hZ).X
+      - (pairDecomp' hyp hsuppdiff h hχ hζ hZ).Y :=
+  (pairDecomp' hyp hsuppdiff h hχ hζ hZ).tau1_image
 
 /-- `⟨D.X, ∑_{β ∈ R'} β⟩ = 0` for an orthogonal second family `R'` (`R(χ) ⊥ R'`). -/
 theorem inner_X_sum_imageFam_eq_zero {τ : IntegralCharacterMap L G} {χ χ' ψ : ClassFunction L ℂ}
@@ -374,55 +382,62 @@ fixed reference member `ζ₀` in a different conjugate pair from `χ₀`.  By `
 is a single element of `R(χ₀)` of norm one; Peterfalvi (5.7) shows it is *independent* of `ζ₀`. -/
 noncomputable def commonImage (hyp : Hypothesis (L := L) (G := G) S A)
     (hZIrr : ∀ a ∈ S, ∀ b ∈ S, hyp.tau (a - b) ∈ ZIrr G)
+    (hsuppdiff : ∀ a ∈ S, ∀ b ∈ S, ((a - b : ClassFunction L ℂ)).support ⊆ A)
     {χ₀ ζ₀ : ClassFunction L ℂ} (hdp : DiffPair χ₀ ζ₀) (hχ₀ : χ₀ ∈ S) (hζ₀ : ζ₀ ∈ S) :
     ClassFunction G ℂ :=
-  (pairDecomp' hyp hdp hχ₀ hζ₀ (hZIrr χ₀ hχ₀ ζ₀ hζ₀)).X
+  (pairDecomp' hyp hsuppdiff hdp hχ₀ hζ₀ (hZIrr χ₀ hχ₀ ζ₀ hζ₀)).X
 
 /-- The two-sided norm facts for `pairDecomp'`: `‖D.X‖² = 1` and `D.Y = D'.X` (the symmetric
 decomposition), from `pairDecomp_two_sided`. -/
 theorem pairDecomp'_two_sided (hyp : Hypothesis (L := L) (G := G) S A)
     (hirr : ∀ ζ ∈ S, ClassFunction.inner ζ ζ = 1)
     (hZIrr : ∀ a ∈ S, ∀ b ∈ S, hyp.tau (a - b) ∈ ZIrr G)
+    (hsuppdiff : ∀ a ∈ S, ∀ b ∈ S, ((a - b : ClassFunction L ℂ)).support ⊆ A)
     {χ ζ : ClassFunction L ℂ} (h : DiffPair χ ζ) (hχ : χ ∈ S) (hζ : ζ ∈ S) :
-    ClassFunction.inner (pairDecomp' hyp h hχ hζ (hZIrr χ hχ ζ hζ)).X
-        (pairDecomp' hyp h hχ hζ (hZIrr χ hχ ζ hζ)).X = 1 ∧
-      (pairDecomp' hyp h hχ hζ (hZIrr χ hχ ζ hζ)).Y =
-        (pairDecomp' hyp h.symm hζ hχ (hZIrr ζ hζ χ hχ)).X :=
-  pairDecomp_two_sided (pairDecomp' hyp h hχ hζ (hZIrr χ hχ ζ hζ))
-    (pairDecomp' hyp h.symm hζ hχ (hZIrr ζ hζ χ hχ))
+    ClassFunction.inner (pairDecomp' hyp hsuppdiff h hχ hζ (hZIrr χ hχ ζ hζ)).X
+        (pairDecomp' hyp hsuppdiff h hχ hζ (hZIrr χ hχ ζ hζ)).X = 1 ∧
+      (pairDecomp' hyp hsuppdiff h hχ hζ (hZIrr χ hχ ζ hζ)).Y =
+        (pairDecomp' hyp hsuppdiff h.symm hζ hχ (hZIrr ζ hζ χ hχ)).X :=
+  pairDecomp_two_sided (pairDecomp' hyp hsuppdiff h hχ hζ (hZIrr χ hχ ζ hζ))
+    (pairDecomp' hyp hsuppdiff h.symm hζ hχ (hZIrr ζ hζ χ hχ))
     (hirr χ hχ) (hirr ζ hζ) (h.imageFam_orthogonal hyp hχ hζ)
-    (pairDecomp'_image hyp h hχ hζ (hZIrr χ hχ ζ hζ))
-    (pairDecomp'_image hyp h.symm hζ hχ (hZIrr ζ hζ χ hχ))
+    (pairDecomp'_image hyp hsuppdiff h hχ hζ (hZIrr χ hχ ζ hζ))
+    (pairDecomp'_image hyp hsuppdiff h.symm hζ hχ (hZIrr ζ hζ χ hχ))
 
 /-- **(5.7) fact (A): `‖β‖² = 1`.** -/
 theorem commonImage_self (hyp : Hypothesis (L := L) (G := G) S A)
     (hirr : ∀ ζ ∈ S, ClassFunction.inner ζ ζ = 1)
     (hZIrr : ∀ a ∈ S, ∀ b ∈ S, hyp.tau (a - b) ∈ ZIrr G)
+    (hsuppdiff : ∀ a ∈ S, ∀ b ∈ S, ((a - b : ClassFunction L ℂ)).support ⊆ A)
     {χ₀ ζ₀ : ClassFunction L ℂ} (hdp : DiffPair χ₀ ζ₀) (hχ₀ : χ₀ ∈ S) (hζ₀ : ζ₀ ∈ S) :
-    ClassFunction.inner (commonImage hyp hZIrr hdp hχ₀ hζ₀)
-      (commonImage hyp hZIrr hdp hχ₀ hζ₀) = 1 :=
-  (pairDecomp'_two_sided hyp hirr hZIrr hdp hχ₀ hζ₀).1
+    ClassFunction.inner (commonImage hyp hZIrr hsuppdiff hdp hχ₀ hζ₀)
+      (commonImage hyp hZIrr hsuppdiff hdp hχ₀ hζ₀) = 1 :=
+  (pairDecomp'_two_sided hyp hirr hZIrr hsuppdiff hdp hχ₀ hζ₀).1
 
 /-- **(5.7) fact (B) at the reference `ζ₀`: `⟨β, (χ₀ − ζ₀)^τ⟩ = 1`.**  `= ⟨D₀.X, D₀.X − D₀.Y⟩ =
 ‖D₀.X‖² − 0`. -/
 theorem commonImage_inner_ref (hyp : Hypothesis (L := L) (G := G) S A)
     (hirr : ∀ ζ ∈ S, ClassFunction.inner ζ ζ = 1)
     (hZIrr : ∀ a ∈ S, ∀ b ∈ S, hyp.tau (a - b) ∈ ZIrr G)
+    (hsuppdiff : ∀ a ∈ S, ∀ b ∈ S, ((a - b : ClassFunction L ℂ)).support ⊆ A)
     {χ₀ ζ₀ : ClassFunction L ℂ} (hdp : DiffPair χ₀ ζ₀) (hχ₀ : χ₀ ∈ S) (hζ₀ : ζ₀ ∈ S) :
-    ClassFunction.inner (commonImage hyp hZIrr hdp hχ₀ hζ₀) (hyp.tau (χ₀ - ζ₀)) = 1 := by
-  rw [commonImage, pairDecomp'_image hyp hdp hχ₀ hζ₀ (hZIrr χ₀ hχ₀ ζ₀ hζ₀),
-    ClassFunction.inner_sub_right, (pairDecomp' hyp hdp hχ₀ hζ₀ (hZIrr χ₀ hχ₀ ζ₀ hζ₀)).inner_X_Y,
-    sub_zero, (pairDecomp'_two_sided hyp hirr hZIrr hdp hχ₀ hζ₀).1]
+    ClassFunction.inner (commonImage hyp hZIrr hsuppdiff hdp hχ₀ hζ₀) (hyp.tau (χ₀ - ζ₀)) = 1 := by
+  rw [commonImage, pairDecomp'_image hyp hsuppdiff hdp hχ₀ hζ₀ (hZIrr χ₀ hχ₀ ζ₀ hζ₀),
+    ClassFunction.inner_sub_right,
+    (pairDecomp' hyp hsuppdiff hdp hχ₀ hζ₀ (hZIrr χ₀ hχ₀ ζ₀ hζ₀)).inner_X_Y,
+    sub_zero, (pairDecomp'_two_sided hyp hirr hZIrr hsuppdiff hdp hχ₀ hζ₀).1]
 
 /-- **(5.7) fact (B) at `χ̄₀`: `⟨β, (χ₀ − χ̄₀)^τ⟩ = 1`.**  `(χ₀ − χ̄₀)^τ = ∑_{R(χ₀)} α`, and
 `⟨β, ∑ α⟩ = ∑ coeff = ‖χ₀‖² = 1` (the keystone). -/
 theorem commonImage_inner_conj (hyp : Hypothesis (L := L) (G := G) S A)
     (hirr : ∀ ζ ∈ S, ClassFunction.inner ζ ζ = 1)
     (hZIrr : ∀ a ∈ S, ∀ b ∈ S, hyp.tau (a - b) ∈ ZIrr G)
+    (hsuppdiff : ∀ a ∈ S, ∀ b ∈ S, ((a - b : ClassFunction L ℂ)).support ⊆ A)
     {χ₀ ζ₀ : ClassFunction L ℂ} (hdp : DiffPair χ₀ ζ₀) (hχ₀ : χ₀ ∈ S) (hζ₀ : ζ₀ ∈ S) :
-    ClassFunction.inner (commonImage hyp hZIrr hdp hχ₀ hζ₀) (hyp.tau (χ₀ - χ₀.conj)) = 1 := by
+    ClassFunction.inner (commonImage hyp hZIrr hsuppdiff hdp hχ₀ hζ₀)
+      (hyp.tau (χ₀ - χ₀.conj)) = 1 := by
   rw [commonImage]
-  set D₀ := pairDecomp' hyp hdp hχ₀ hζ₀ (hZIrr χ₀ hχ₀ ζ₀ hζ₀) with hD₀
+  set D₀ := pairDecomp' hyp hsuppdiff hdp hχ₀ hζ₀ (hZIrr χ₀ hχ₀ ζ₀ hζ₀) with hD₀
   rw [D₀.imageFamily.image_eq, D₀.inner_X_sum, ← D₀.inner_self_chi_eq_sum_coeff, hirr χ₀ hχ₀]
 
 /-- **(5.7) fact (B) at `ζ̄₀`: `⟨β, (χ₀ − ζ̄₀)^τ⟩ = 1`.**  `(χ₀ − ζ̄₀)^τ = (χ₀ − ζ₀)^τ + (ζ₀ − ζ̄₀)^τ`;
@@ -430,13 +445,15 @@ the first gives `1` (reference), the second is `∑_{R(ζ₀)} α ⊥ R(χ₀)`.
 theorem commonImage_inner_refconj (hyp : Hypothesis (L := L) (G := G) S A)
     (hirr : ∀ ζ ∈ S, ClassFunction.inner ζ ζ = 1)
     (hZIrr : ∀ a ∈ S, ∀ b ∈ S, hyp.tau (a - b) ∈ ZIrr G)
+    (hsuppdiff : ∀ a ∈ S, ∀ b ∈ S, ((a - b : ClassFunction L ℂ)).support ⊆ A)
     {χ₀ ζ₀ : ClassFunction L ℂ} (hdp : DiffPair χ₀ ζ₀) (hχ₀ : χ₀ ∈ S) (hζ₀ : ζ₀ ∈ S) :
-    ClassFunction.inner (commonImage hyp hZIrr hdp hχ₀ hζ₀) (hyp.tau (χ₀ - ζ₀.conj)) = 1 := by
+    ClassFunction.inner (commonImage hyp hZIrr hsuppdiff hdp hχ₀ hζ₀)
+      (hyp.tau (χ₀ - ζ₀.conj)) = 1 := by
   have hsplit : χ₀ - ζ₀.conj = (χ₀ - ζ₀) + (ζ₀ - ζ₀.conj) := by abel
   rw [hsplit, map_add, ClassFunction.inner_add_right,
-    commonImage_inner_ref hyp hirr hZIrr hdp hχ₀ hζ₀, commonImage,
+    commonImage_inner_ref hyp hirr hZIrr hsuppdiff hdp hχ₀ hζ₀, commonImage,
     (imageFam hyp hζ₀).image_eq,
-    inner_X_sum_imageFam_eq_zero (pairDecomp' hyp hdp hχ₀ hζ₀ (hZIrr χ₀ hχ₀ ζ₀ hζ₀))
+    inner_X_sum_imageFam_eq_zero (pairDecomp' hyp hsuppdiff hdp hχ₀ hζ₀ (hZIrr χ₀ hχ₀ ζ₀ hζ₀))
       (imageFam hyp hζ₀) (hdp.imageFam_orthogonal hyp hχ₀ hζ₀), add_zero]
 
 /-- **(5.7) fact (B) at a member `ζ` in a *third* pair: `⟨β, (χ₀ − ζ)^τ⟩ = 1`.**  The independence
@@ -446,27 +463,31 @@ pairs, `pairDecomp_two_sided`). -/
 theorem commonImage_inner_other (hyp : Hypothesis (L := L) (G := G) S A)
     (hirr : ∀ ζ ∈ S, ClassFunction.inner ζ ζ = 1)
     (hZIrr : ∀ a ∈ S, ∀ b ∈ S, hyp.tau (a - b) ∈ ZIrr G)
+    (hsuppdiff : ∀ a ∈ S, ∀ b ∈ S, ((a - b : ClassFunction L ℂ)).support ⊆ A)
     {χ₀ ζ₀ ζ : ClassFunction L ℂ} (hdp : DiffPair χ₀ ζ₀) (hχ₀ : χ₀ ∈ S) (hζ₀ : ζ₀ ∈ S)
     (hζ : ζ ∈ S) (hdpχ : DiffPair χ₀ ζ) (hdpζ : DiffPair ζ₀ ζ) :
-    ClassFunction.inner (commonImage hyp hZIrr hdp hχ₀ hζ₀) (hyp.tau (χ₀ - ζ)) = 1 := by
-  rw [commonImage, pairDecomp'_image hyp hdpχ hχ₀ hζ (hZIrr χ₀ hχ₀ ζ hζ),
+    ClassFunction.inner (commonImage hyp hZIrr hsuppdiff hdp hχ₀ hζ₀)
+      (hyp.tau (χ₀ - ζ)) = 1 := by
+  rw [commonImage, pairDecomp'_image hyp hsuppdiff hdpχ hχ₀ hζ (hZIrr χ₀ hχ₀ ζ hζ),
     ClassFunction.inner_sub_right]
-  set D₀ := pairDecomp' hyp hdp hχ₀ hζ₀ (hZIrr χ₀ hχ₀ ζ₀ hζ₀) with hD₀
-  set Dζ := pairDecomp' hyp hdpχ hχ₀ hζ (hZIrr χ₀ hχ₀ ζ hζ) with hDζ
+  set D₀ := pairDecomp' hyp hsuppdiff hdp hχ₀ hζ₀ (hZIrr χ₀ hχ₀ ζ₀ hζ₀) with hD₀
+  set Dζ := pairDecomp' hyp hsuppdiff hdpχ hχ₀ hζ (hZIrr χ₀ hχ₀ ζ hζ) with hDζ
   -- `⟨D₀.X, Dζ.Y⟩ = 0` (`Dζ.Y ⊥ R(χ₀)`), so the goal is `⟨D₀.X, Dζ.X⟩ = 1`.
   rw [inner_X_perp D₀ Dζ.Y_orthogonal, sub_zero]
   -- isometry: `⟨(χ₀−ζ₀)^τ, (χ₀−ζ)^τ⟩ = ⟨χ₀−ζ₀, χ₀−ζ⟩`.
   have hiso : ClassFunction.inner (hyp.tau (χ₀ - ζ₀)) (hyp.tau (χ₀ - ζ))
-      = ClassFunction.inner (χ₀ - ζ₀) (χ₀ - ζ) := hyp.tau_isometry_diff hχ₀ hζ₀ hχ₀ hζ
-  rw [pairDecomp'_image hyp hdp hχ₀ hζ₀ (hZIrr χ₀ hχ₀ ζ₀ hζ₀),
-    pairDecomp'_image hyp hdpχ hχ₀ hζ (hZIrr χ₀ hχ₀ ζ hζ)] at hiso
+      = ClassFunction.inner (χ₀ - ζ₀) (χ₀ - ζ) :=
+    hyp.tau_isometry_memberDiff hχ₀ hζ₀ hχ₀ hζ
+      (hsuppdiff _ hχ₀ _ hζ₀) (hsuppdiff _ hχ₀ _ hζ)
+  rw [pairDecomp'_image hyp hsuppdiff hdp hχ₀ hζ₀ (hZIrr χ₀ hχ₀ ζ₀ hζ₀),
+    pairDecomp'_image hyp hsuppdiff hdpχ hχ₀ hζ (hZIrr χ₀ hχ₀ ζ hζ)] at hiso
   -- the cross terms.
   have hXY : ClassFunction.inner D₀.X Dζ.Y = 0 := inner_X_perp D₀ Dζ.Y_orthogonal
   have hYX : ClassFunction.inner D₀.Y Dζ.X = 0 := by
     rw [OddOrder.RepresentationTheory.inner_conj_symm, inner_X_perp Dζ D₀.Y_orthogonal, star_zero]
   have hYY : ClassFunction.inner D₀.Y Dζ.Y = 0 := by
-    rw [(pairDecomp'_two_sided hyp hirr hZIrr hdp hχ₀ hζ₀).2,
-      (pairDecomp'_two_sided hyp hirr hZIrr hdpχ hχ₀ hζ).2]
+    rw [(pairDecomp'_two_sided hyp hirr hZIrr hsuppdiff hdp hχ₀ hζ₀).2,
+      (pairDecomp'_two_sided hyp hirr hZIrr hsuppdiff hdpχ hχ₀ hζ).2]
     exact inner_X_X'_eq_zero _ _ (hdpζ.imageFam_orthogonal hyp hζ₀ hζ)
   -- the right-hand side `⟨χ₀−ζ₀, χ₀−ζ⟩ = 1`.
   have hLHS : ClassFunction.inner (χ₀ - ζ₀) (χ₀ - ζ) = 1 := by
@@ -482,20 +503,22 @@ theorem commonImage_inner_other (hyp : Hypothesis (L := L) (G := G) S A)
 theorem commonImage_inner (hyp : Hypothesis (L := L) (G := G) S A)
     (hirr : ∀ ζ ∈ S, ClassFunction.inner ζ ζ = 1)
     (hZIrr : ∀ a ∈ S, ∀ b ∈ S, hyp.tau (a - b) ∈ ZIrr G)
+    (hsuppdiff : ∀ a ∈ S, ∀ b ∈ S, ((a - b : ClassFunction L ℂ)).support ⊆ A)
     {χ₀ ζ₀ : ClassFunction L ℂ} (hdp : DiffPair χ₀ ζ₀) (hχ₀ : χ₀ ∈ S) (hζ₀ : ζ₀ ∈ S)
     {ζ : ClassFunction L ℂ} (hζ : ζ ∈ S) (hζne : ζ ≠ χ₀) :
-    ClassFunction.inner (commonImage hyp hZIrr hdp hχ₀ hζ₀) (hyp.tau (χ₀ - ζ)) = 1 := by
+    ClassFunction.inner (commonImage hyp hZIrr hsuppdiff hdp hχ₀ hζ₀)
+      (hyp.tau (χ₀ - ζ)) = 1 := by
   by_cases hc1 : ζ = χ₀.conj
-  · rw [hc1]; exact commonImage_inner_conj hyp hirr hZIrr hdp hχ₀ hζ₀
+  · rw [hc1]; exact commonImage_inner_conj hyp hirr hZIrr hsuppdiff hdp hχ₀ hζ₀
   have hdpχ : DiffPair χ₀ ζ :=
     ⟨hζne.symm, fun h => hc1 (by rw [← ClassFunction.conj_conj ζ, ← h])⟩
   by_cases hc2 : ζ = ζ₀
-  · rw [hc2]; exact commonImage_inner_ref hyp hirr hZIrr hdp hχ₀ hζ₀
+  · rw [hc2]; exact commonImage_inner_ref hyp hirr hZIrr hsuppdiff hdp hχ₀ hζ₀
   by_cases hc3 : ζ = ζ₀.conj
-  · rw [hc3]; exact commonImage_inner_refconj hyp hirr hZIrr hdp hχ₀ hζ₀
+  · rw [hc3]; exact commonImage_inner_refconj hyp hirr hZIrr hsuppdiff hdp hχ₀ hζ₀
   have hdpζ : DiffPair ζ₀ ζ :=
     ⟨fun h => hc2 h.symm, fun h => hc3 (by rw [h, ClassFunction.conj_conj] : ζ₀.conj = ζ).symm⟩
-  exact commonImage_inner_other hyp hirr hZIrr hdp hχ₀ hζ₀ hζ hdpχ hdpζ
+  exact commonImage_inner_other hyp hirr hZIrr hsuppdiff hdp hχ₀ hζ₀ hζ hdpχ hdpζ
 
 /-- **(5.7) the retargeted family is an isometric image of the source.**  For the auxiliary isometry
 `τ₁` of (5.7) given by `χⱼ^{τ₁} = X j := β − (χ₀ − χⱼ)^τ` (`χ₀ := χ 0`, `β = χ₀^{τ₁}`), one has
@@ -589,7 +612,7 @@ theorem coherent_of_constant_degree
       · exact hdpab.2 (h1 ▸ h2)
       · exact hdpab.2 (by rw [← ClassFunction.conj_conj a, ← h1, h2])
       · exact hdpab.1 (by rw [← ClassFunction.conj_conj a, ← h1, h2, ClassFunction.conj_conj])
-    set β := commonImage hyp hZIrr hdp0 (hmem 0) hζ₀S with hβdef
+    set β := commonImage hyp hZIrr hsuppdiff hdp0 (hmem 0) hζ₀S with hβdef
     set X : Fin n → ClassFunction G ℂ := fun j => β - hyp.tau (χ 0 - χ j) with hXdef
     -- the uniform form of (B): `⟨β, (χ₀ − χⱼ)^τ⟩ = 1 − ⟨χ₀, χⱼ⟩`.
     have hB : ∀ j, ClassFunction.inner β (hyp.tau (χ 0 - χ j))
@@ -597,7 +620,7 @@ theorem coherent_of_constant_degree
       intro j
       by_cases hj : χ j = χ 0
       · rw [hj, sub_self, map_zero, ClassFunction.inner_zero_right, hirr (χ 0) (hmem 0)]; ring
-      · rw [hβdef, commonImage_inner hyp hirr hZIrr hdp0 (hmem 0) hζ₀S (hmem j) hj,
+      · rw [hβdef, commonImage_inner hyp hirr hZIrr hsuppdiff hdp0 (hmem 0) hζ₀S (hmem j) hj,
           hyp.pairwise_orthogonal (hmem 0) (hmem j) (Ne.symm hj)]; ring
     have horthχ : ∀ i j, ClassFunction.inner (χ i) (χ j) = if i = j then (1 : ℂ) else 0 := by
       intro i j
@@ -610,8 +633,10 @@ theorem coherent_of_constant_degree
       · -- `horthX`: `⟨Xᵢ, Xⱼ⟩ = ⟨χᵢ, χⱼ⟩` (`xFamily_inner`), then `horthχ`.
         intro i j
         rw [hXdef,
-          xFamily_inner χ β (fun p q => hyp.tau_isometry_diff (hmem 0) (hmem p) (hmem 0) (hmem q))
-            (commonImage_self hyp hirr hZIrr hdp0 (hmem 0) hζ₀S) hB i j]
+          xFamily_inner χ β (fun p q =>
+              hyp.tau_isometry_memberDiff (hmem 0) (hmem p) (hmem 0) (hmem q)
+                (hsuppdiff _ (hmem 0) _ (hmem p)) (hsuppdiff _ (hmem 0) _ (hmem q)))
+            (commonImage_self hyp hirr hZIrr hsuppdiff hdp0 (hmem 0) hζ₀S) hB i j]
         exact horthχ i j
       · -- `himg`: `(χⱼ − χ₀)^τ = Xⱼ − X₀`.
         intro j

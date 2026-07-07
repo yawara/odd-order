@@ -63,9 +63,31 @@ tau_isometry_diff : ∀ φ ψ, φ ∈ zSupportedSpan S A → ψ ∈ zSupportedSp
 
 ## 完了条件
 
-- [ ] b が S07_Coherence.lean:1777 の field を zSupportedSpan 形に弱化 + consumer threading (build green)
-- [ ] 4 instantiation site の discharge を弱 field 経由に swap (S14×2/S15 = b、S16 = c)
+- [x] b が S07_Coherence.lean:1777 の field を zSupportedSpan 形に弱化 + consumer threading (build green)
+- [x] 4 instantiation site の discharge を弱 field 経由に swap (S14×2/S15 = b、S16 = c)
 - [ ] a の (9.11) mixed route が S07.Hypothesis を mixed family で組めることを確認 (1019 側で検証)
+
+## 実施記録 (lane b、2026-07-07)
+
+- **field 弱化 + 供給 brick**: `tau_isometry_diff` を zSupportedSpan 形へ in-place 弱化
+  (S07_Coherence)。派生補題 `Hypothesis.tau_isometry_memberDiff` (旧 member-差分形、support
+  引数 2 本付き) と **pair-form brick `dadeIntegralCharacterMap_inner_eq_of_supported`**
+  (支持条件 2 本だけで無条件供給 — mixed family 含む) を追加。
+- **(5.7) chain threading**: S07_CoherenceConstantDegree の 11 declarations
+  (pairDecomp / pairDecomp' / pairDecomp'_image / commonImage / pairDecomp'_two_sided /
+  commonImage_self / _inner_ref / _inner_conj / _inner_refconj / _inner_other / _inner) に
+  `hsuppdiff` を threading。`coherent_of_constant_degree` の外部 signature は**不変** (裁定通り)。
+- **irrSubcoherent**: hiso を弱形へ + `hconjsupp` 引数 1 本 (共役差分の A-支持)。
+  `Hypothesis.restrict` は `zSupportedSpan_mono_left` 経由に。
+- **4 instantiation site swap 完了**: S14:2 site + S15 sSetIrrDeg_subcoherent + **S16
+  T_typeIII_hyp07 (c 分担分)**。⚠ S16 分は裁定で c 割当だが、field 変更と原子的でないと
+  build が壊れるため **b が同 commit で機械的 lambda swap のみ実施** (3 行、設計内容ゼロ、
+  `hdiff_supp`+pair brick 経由)。c は次回 sync 時に review し、必要なら自所有の形に調整可。
+  witness lemma (Sset_tau_isometry_diff / SsubFiltration_commutator_tau_isometry_diff /
+  tSideDadeMap_isometry_diff) は裁定通り standalone fact として温存。
+- 検証: full build green (3934 jobs、clean rebuild 5m03s)、sorry 数 78 = 78 (regression なし)、
+  AxiomsCheck 全 OK。mixed-degree family での S07.Hypothesis 組立てが構造的に可能になった
+  (a の 1019 検証待ち → 最後の checkbox)。
 
 ## 参照
 
