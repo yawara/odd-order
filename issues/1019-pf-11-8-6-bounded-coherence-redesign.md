@@ -1326,3 +1326,25 @@ deg d で scaledDiff から供給、初段 caller で実証済)。
   (columnFamily_mu_sum_inner off-diag) ✓ 部品あり。
 - 残る genuine: hDeg (counting) / hdegcol (uniform-qu) / family 同定 (caseB の
   sOf = cut ⊔ μ-pairs 分割)。
+
+## 🔬 update⁷⁹ (2026-07-08 lane-a /loop) — chain fold 部品: member dichotomy landed
+
+### ✅ landed: `S13.caseB_sOf_member_dichotomy` (commit fa01da1c, sorry-free)
+hcover の核: hunif (caseB uniform-deg、§9 fact named) の下で 𝒮(H₀C′) member は irr-cut ∨
+∃ k ≠ 0, = columnSum (muColumnChar k)。irr 側 = cut 定義、red 側 =
+reducible_mem_…_eq_muGrid_columnSum + world-join。
+
+### chain fold の残り設計 (次 iteration)
+- **pair enumeration**: pair : ℕ → CF × CF で pair j = (columnSum (muColumnChar kⱼ),
+  columnSum (muColumnChar kⱼ)⁻¹-対応)。**inverse-pair 被覆の注意**: dichotomy は「ある k ≠ 0 の
+  columnSum」を返すが pair は代表 k と逆 k⁻ の両方をカバーする必要 —
+  (columnSum χ₂).conj = columnSum χ₂⁻¹ ゆえ pairSet j = {μⱼ, μ̄ⱼ} = {columnSum(χ₂ⱼ),
+  columnSum(χ₂ⱼ⁻¹)}。代表系: Fin w2 の nonzero index を全部 pair に使い (代表系にせず
+  重複 adjoin も chain 上は無害 — pairSet ⊆ X と hcover が満たせれば良い、既 coherent への
+  再 adjoin は…xAdjoinStepW_k は χ ∉ S₁ を要求しない? hχ_S1 : ∀ x ∈ S₁, ⟨μ,x⟩ = 0 —
+  μ ∈ S₁ (既 adjoin 済) だと ⟨μ,μ⟩ = w1 ≠ 0 で hμ_S1 が偽 → **重複 adjoin 不可、真の代表系
+  (k と inv(k) から 1 つ) が必要**)。inv-index: muColumnChar k の逆 = muColumnChar (invk k)
+  の対応 (fCECG と inv の compat) — enumeration 補題群 (~50 行)。
+- **hstep**: caseB_adjoinOneColumnPair の chain 版 (S₁ = pairUnion S₀ pair i、per-step
+  hdegS₁diff/hμ_S1 の帰納的維持 — S₁ の全 member deg d [hunif] + pairwise column 直交)。
+- 残 genuine: hDeg / hdegcol / hunif (全て caseB §9 facts)。
