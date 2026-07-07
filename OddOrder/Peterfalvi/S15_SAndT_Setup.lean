@@ -4500,6 +4500,38 @@ theorem Hypothesis.exists_typePData_U_eq_V [Finite G] (hG : OddOrder.BG.IsMinima
   · rw [hcastH hgT, show (tpd0.conj (MulAut.conj g)).H = (MulAut.conj g) • tpd0.H from rfl, hQtpd,
       hgQ]
 
+/-- **`reconciled_typePData_T` の 2 residual を pairing facts から** (Fact A ∧ Fact B → 両 field, 実証明).
+`W₂` が `T` の `κ`-Hall (**Fact A**) かつ `W₁ = M_σ(T) ⊓ C(W₂)` (**Fact B**) — `typeP_partner_structure`
+(`S14`) が `S` の partner に対して供給する 2 つの (8.4.d)-dual pairing facts — があれば、既存の一般
+type-`P` 機構 (`typeP_kstar_in_mf` / `typeP_derivedInG_inf_centralizer_kappaElement_eq`, いずれも
+`M := T`, `K := W₂`, `K* := W₁`) が `reconciled_typePData_T` の両 field を discharge する:
+`W₁ ≤ Q ⊓ T''` (`W2_le` field) と `∀ x ∈ W₂#, T' ⊓ C(x) = W₁` (`centralizer_W1` field)。
+
+これは gated-endpoint skeleton (issue 9073): 2 sorry を **精密な pairing 2 facts** (κ-Hall + Kstar 同定)
+に還元し、その **十分性を実証明で verify**。残余 Fact A + Fact B は `typeP_partner_structure` を `S` に
+適用 (κ-Hall `W₁`, `Kstar = M_σ(S)⊓C(W₁) = W₂`) すれば partner `Mstar = T` に対し供給される
+(S-side κ-Hall setup + Z-family covering の wiring が次段)。 -/
+theorem Hypothesis.reconciled_residuals_of_pairing_facts [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hFactA : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa hyp.T)
+      (hyp.W2.subgroupOf hyp.T))
+    (hFactB : hyp.W1 = OddOrder.BG.Ch3.S10.Msigma hyp.T ⊓ Subgroup.centralizer (hyp.W2 : Set G)) :
+    hyp.W1 ≤ hyp.Q ⊓ secondDerivedInAmbient hyp.T ∧
+      (∀ x ∈ hyp.W2, x ≠ 1 →
+        derivedInG hyp.T ⊓ Subgroup.centralizer ({x} : Set G) = hyp.W1) := by
+  have hW2T : hyp.W2 ≤ hyp.T :=
+    (by rw [hyp.W_eq_join]; exact le_sup_right : hyp.W2 ≤ hyp.W).trans
+      (by rw [hyp.W_eq_inter]; exact inf_le_right)
+  have hP := OddOrder.BG.Ch4.S16.isTypeP_of_isTypeNonI hG hyp.T_maximal hyp.T_nonI
+  refine ⟨?_, ?_⟩
+  · -- `W2_le`: `W₁ = K* ≤ M_F(T) ⊓ T''` from `typeP_kstar_in_mf` (Corollary 15.6).
+    have hk := OddOrder.BG.Ch4.S15.typeP_kstar_in_mf hG hyp.T_maximal hP hW2T hFactA hFactB
+    rw [hyp.Q_eq_TF]
+    exact le_inf hk.2.2.1 hk.2.2.2.1
+  · -- `centralizer_W1`: `T' ⊓ C(x) = K* = W₁` for `x ∈ W₂#` (Theorem A(5) + Dedekind).
+    exact OddOrder.BG.Ch4.S16.typeP_derivedInG_inf_centralizer_kappaElement_eq
+      hG hyp.T_maximal hP hW2T hFactA hFactB
+
 /-- **T-side type-`P` structure reconciled to the abstract `V`/`W₂`** (the honest replacement for the
 withdrawn `Tdata` spine carrier; HUB tick² 2026-06-30).  `T` is type non-I (`T_nonI`), hence type-`P`,
 and the §16-chosen complement `V` (κ-Hall-invariant) / cyclic factor `W₂` form a type-`P`
@@ -4527,6 +4559,18 @@ theorem reconciled_typePData_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     isCyclic_of_surjective _ (Subgroup.subgroupOfEquivOfLe hW2W).surjective
   have hW1cyc : IsCyclic ↥hyp.W1 :=
     isCyclic_of_surjective _ (Subgroup.subgroupOfEquivOfLe hW1W).surjective
+  -- **(8.4.d)-dual pairing residuals** for the `W2_le`/`centralizer_W1` fields.  These are exactly the
+  -- two facts `typeP_partner_structure` (applied to `S`) supplies for its partner `T`: `W₂` a `κ`-Hall
+  -- of `T` (**Fact A**) and `W₁ = M_σ(T) ⊓ C(W₂)` (**Fact B**).  Their *sufficiency* is verified by
+  -- `reconciled_residuals_of_pairing_facts` (via `typeP_kstar_in_mf` /
+  -- `typeP_derivedInG_inf_centralizer_kappaElement_eq`); the two residuals are honestly gated on the
+  -- §13 `typeP_partner` port (issue 9073) whose remaining step wires `typeP_partner_structure`'s inputs
+  -- (S-side κ-Hall + Z-family covering) from the abstract `Hypothesis`.
+  have hFactA : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa hyp.T)
+      (hyp.W2.subgroupOf hyp.T) := sorry
+  have hFactB : hyp.W1 =
+      OddOrder.BG.Ch3.S10.Msigma hyp.T ⊓ Subgroup.centralizer (hyp.W2 : Set G) := sorry
+  obtain ⟨hW2le_pf, hCentW1_pf⟩ := hyp.reconciled_residuals_of_pairing_facts hG hFactA hFactB
   refine ⟨{
     H := hyp.Q
     U := hyp.V
@@ -4554,11 +4598,10 @@ theorem reconciled_typePData_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     --     `FTtypeP_pair_witness`/`of_typeP_pair`: the shared `W = S ⊓ T` forces T's swapped
     --     decomposition `xdefW : W₂ \x W₁ = W`, whose (8.4.d) component gives `W₁ ⊆ H ⊓ T''`) —
     --     unported to Lean, and equivalent to supplying `IsTypeP2 hyp.T`.
-    -- MISSING BRIDGE: a `TypePData hyp.T` with `.W1 = hyp.W2` (e.g. via
-    -- `typePData_of_kappaHall_hallComplement` at `M := T`, which requires `IsTypeP2 hyp.T`), OR a
-    -- Lean port of `typeP_cent_compl`/`typeP_pair_sym`.  No `T`-side carrier exists by design
-    -- (`FeitThompson:276`); this stays honestly gated on the §13/§14 σ-structure theory / (14.9).
-    W2_le := sorry
+    -- Discharged from the pairing residuals `hFactA`/`hFactB` via the verified reduction
+    -- `reconciled_residuals_of_pairing_facts` (`typeP_kstar_in_mf`: `K* ≤ M_F ⊓ M''`).  See the
+    -- preamble; the residual is now the precise Fact A + Fact B (`typeP_partner_structure` inputs).
+    W2_le := hW2le_pf
     W_eq := by rw [hyp.W_eq_join, sup_comm]
     W_cyclic := hyp.W_cyclic
     W1_nontrivial := by
@@ -4627,8 +4670,9 @@ theorem reconciled_typePData_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     -- (`M ⊓ C_G(k) = K ⊔ K*` for `k ∈ K#`, only `IsTypeP M`) would apply to `T` with `K := W₂`,
     -- but ONLY once `W₂` is known to be a κ-Hall of `T` and `K* = M_σ(T) ⊓ C(W₂) = W₁` — precisely
     -- the `typeP_pair` reconciliation (≡ `IsTypeP2 hyp.T`), which the abstract `Hypothesis` does not
-    -- carry (no `Tdata`).  Same gate as `W2_le`; honestly `IsTypeII hyp.T`/(14.9)-gated at §13.
-    centralizer_W1 := sorry
+    -- carry (no `Tdata`).  Discharged from `hFactA`/`hFactB` via the verified reduction
+    -- `reconciled_residuals_of_pairing_facts` (`typeP_derivedInG_inf_centralizer_kappaElement_eq`).
+    centralizer_W1 := hCentW1_pf
     normalizer_V := by
       -- The `W`-exceptional-set normalizer `N_G(X) = W` is symmetric in `W₁`/`W₂`, so it is read off
       -- the S-side carrier `Sdata.normalizer_V` (same fact as `base_W_normalizer_V`, inlined since S15
