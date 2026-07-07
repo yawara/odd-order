@@ -65,7 +65,44 @@ tau_isometry_diff : ∀ φ ψ, φ ∈ zSupportedSpan S A → ψ ∈ zSupportedSp
 
 - [x] b が S07_Coherence.lean:1777 の field を zSupportedSpan 形に弱化 + consumer threading (build green)
 - [x] 4 instantiation site の discharge を弱 field 経由に swap (S14×2/S15 = b、S16 = c)
-- [ ] a の (9.11) mixed route が S07.Hypothesis を mixed family で組めることを確認 (1019 側で検証)
+- [x] a の (9.11) mixed route が S07.Hypothesis を mixed family で組めることを確認 (1019 側で検証)
+      → **検証完了 (2026-07-07 lane a、下記「検証記録」)**
+
+## 検証記録 (lane a、2026-07-07)
+
+**問い**: S07.Hypothesis を mixed family (`SOf(H0Cprime)` ∋ reducible μ_j) で組めるか。
+
+**答え: literal には NO (第二の field 障害)、しかし (9.11) port には literal mixed 組立は不要 —
+route は前進可能で、0099 弱化はそのために必要十分だった。**
+
+1. **第二の field 障害 (norm 論法)**: `CharacterDifferenceImage` (S07_Coherence:395) は
+   `τ(χ−χ̄) = ε(μ−ν)` (μ,ν 既約ちょうど 2 個、‖image‖²=2) を固定。reducible μ_j
+   (‖μ_j‖² ≥ 2) では isometry (0099 弱形が適用可: μ_j−μ̄_j は degree-0 で A0-supported) から
+   ‖τ(μ_j−μ̄_j)‖² = 2‖μ_j‖² ≥ 4 ≠ 2 → `difference_image` field が **unconstructible**
+   (2032/frobI 型の偽 field)。μ_j ∈ S_H0C ⊆ S_H0C' は non-Galois で実在 (Coq 9.5/9.8) ゆえ
+   family は genuinely mixed。∴ S07.Hypothesis の literal mixed 組立は 0099 後も不可。
+2. **Coq 対比**: Coq subcoherent clause (d) (PFsection5.v:486-494) の R ξ は**可変長** orthonormal
+   seq (`tau (xi − xi^*) = Σ_{α∈R ξ} α`) で 2-element は既約特殊化。(5.4)/(5.6)/(5.7) は可変長を
+   本質使用 (R-span 直交分解・zchar_expansion・subseq 選択)。(9.11) の induction step は
+   `extend_coherent` (5.6) 一本で **chi の既約性を使わない** (reducible μ_j も同機構で adjoin、
+   PFsection9.v:1658-1667 の `apply: (extend_coherent scohS0 ...)`)。
+3. **Lean の可変長対応物は既存**: `CharacterPsiDecomposition.imageFamily` (S07_Coherence) が
+   Coq R ξ 相当 (orthonormal family、`ofProjection` producer)。`xAdjoinStepW`
+   (S08_CoherenceWeighted:287) は S₁-side member に reducible (mc i = ‖·‖² > 1) を許し
+   `Dmem : CharacterPsiDecomposition` で R-datum を受ける設計済み — docstring 明記
+   「a non-anchor member may be a reducible certain-type column μⱼ」。
+4. **∴ (9.11) Lean-native 組立** (S07.Hypothesis の mixed 組立を経由しない):
+   base = deg-qa irreducible subfamily の coherence (S07.Hypothesis は irreducible family で組める、
+   0099 弱形 isometry で discharge) → extension = Hypothesis-free adjoin
+   (irreducible: xAdjoinStepW 現形 / **reducible μ_j: xAdjoinStepW の χ-既約性を外した一般化が
+   missing piece** — S08_CoherenceWeighted = **lane a 所有** [b の coherence 例外 glob は
+   `S07_Coherence*`+`S08_PGroupReduction` のみ、merge_monitor 🔒] ゆえ a が直接 build) + μ_j の
+   CharacterPsiDecomposition 供給 (σ-image family、S12 muGrid infra = a)。
+   **全 missing pieces が lane a 圏** (S07_Coherence [b] は既存 def の cite のみ、構造変更不要)。
+5. **S07.Hypothesis の可変長 R-datum 化 (Coq-faithful subcoherent) は (9.11) に不要**ゆえ本 issue
+   では起こさない (将来 (5.4)/(5.6) の direct port が要る場面が来たら別 issue で設計)。
+
+⟹ 本 issue の完了条件は全て充足 → **closed 移行可** (hub 合流 tick にて)。
 
 ## 実施記録 (lane b、2026-07-07)
 
