@@ -419,6 +419,65 @@ theorem caseA_a_odd (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     omega
   · exact hodd
 
+/-- **`a·|U′| ∣ |U|`** (the (9.11) `szS1′` exactness, half 1).  `a = [U : C_U(S₀)]` (realized:
+`(cuInHu.subgroupOf uInHu).index`), so `|U| = |C_U(S₀)|·a` (Lagrange), and `|U′| ∣ |C_U(S₀)|`
+(`U′ ≤ C_U(S₀)`, `uprimeSub_le_cuSub`).  Makes the ℕ-division in the landed (9.8.d) count
+(`caseA_character_counts` part (d): `((p−1)/a)·(|U|/(a·|U′|))`) **exact**, aligning it with the
+Coq `szS1′ = (p−1)·[U:U′]/a²` of the (9.11.1) squeeze (Coq `dv_lb`, `PFsection9.v:1596`). -/
+theorem caseA_a_mul_card_uprime_dvd_card_U [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) :
+    caseA.a * Nat.card ↥(uprimeSub data) ∣ Nat.card ↥data.U := by
+  classical
+  -- Lagrange in `uInHu`: `|C_U(S₀)-realized| · a = |uInHu| = |U|`.
+  have hmul : Nat.card ↥((cuInHu caseA).subgroupOf (uInHu data)) * caseA.a
+      = Nat.card ↥(uInHu data) := by
+    have h := Subgroup.card_mul_index ((cuInHu caseA).subgroupOf (uInHu data))
+    rwa [index_cuInHu_subgroupOf_uInHu_eq_a caseA, ← caseA.a_eq_card_restrictAut_range] at h
+  -- `|U′|` equals the card of its double realization inside `uInHu`.
+  have hle1 : ((uprimeSub data).subgroupOf M).subgroupOf (huSub data) ≤ uInHu data :=
+    Subgroup.subgroupOf_mono _ (Subgroup.subgroupOf_mono _ (uprimeSub_le_U data))
+  have hcardU' : Nat.card ↥((((uprimeSub data).subgroupOf M).subgroupOf
+        (huSub data)).subgroupOf (uInHu data))
+      = Nat.card ↥(uprimeSub data) := by
+    have hle2 : (uprimeSub data).subgroupOf M ≤ huSub data :=
+      Subgroup.subgroupOf_mono _ ((uprimeSub_le_U data).trans le_sup_right)
+    have hle3 : uprimeSub data ≤ M := (uprimeSub_le_U data).trans (U_le_M data)
+    calc Nat.card ↥((((uprimeSub data).subgroupOf M).subgroupOf
+          (huSub data)).subgroupOf (uInHu data))
+        = Nat.card ↥(((uprimeSub data).subgroupOf M).subgroupOf (huSub data)) :=
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle1).toEquiv
+      _ = Nat.card ↥((uprimeSub data).subgroupOf M) :=
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle2).toEquiv
+      _ = Nat.card ↥(uprimeSub data) :=
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle3).toEquiv
+  -- `U′-realized ≤ C_U(S₀)-realized` inside `uInHu`, so `|U′| ∣ |C_U(S₀)-realized|`.
+  have hdvdC : Nat.card ↥(uprimeSub data)
+      ∣ Nat.card ↥((cuInHu caseA).subgroupOf (uInHu data)) := by
+    rw [← hcardU']
+    exact Subgroup.card_dvd_of_le (Subgroup.subgroupOf_mono _
+      (Subgroup.subgroupOf_mono _ (Subgroup.subgroupOf_mono _ (uprimeSub_le_cuSub caseA))))
+  -- Assemble: `a·|U′| ∣ a·|C_U(S₀)| = |uInHu| = |U|`.
+  rw [← card_uInHu_eq data, ← hmul]
+  obtain ⟨k, hk⟩ := hdvdC
+  exact ⟨k, by rw [hk]; ring⟩
+
+/-- **`a²·|U′| ∣ (p−1)·|U|`** (Coq `dv_lb`/`lb_d ∣ lb_n`, the (9.8.d)/(9.11.5) count-denominator
+exactness): from `a ∣ p−1` (`a_dvd_p_sub_one`) and `a·|U′| ∣ |U|`
+(`caseA_a_mul_card_uprime_dvd_card_U`).  This is what turns the landed count's iterated
+ℕ-division `((p−1)/a)·(|U|/(a·|U′|))` into the exact `(p−1)·|U| / (a²·|U′|)` of the (9.11.1)
+squeeze's `lb3 ≤ sumnS S₁′` step. -/
+theorem caseA_sq_mul_card_uprime_dvd [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) :
+    caseA.a * caseA.a * Nat.card ↥(uprimeSub data)
+      ∣ (chief.p - 1) * Nat.card ↥data.U := by
+  have h1 : caseA.a ∣ chief.p - 1 := caseA.a_dvd_p_sub_one
+  have h2 := caseA_a_mul_card_uprime_dvd_card_U caseA
+  calc caseA.a * caseA.a * Nat.card ↥(uprimeSub data)
+      = caseA.a * (caseA.a * Nat.card ↥(uprimeSub data)) := by ring
+    _ ∣ (chief.p - 1) * Nat.card ↥data.U := mul_dvd_mul h1 h2
+
 end CaseADivisibility
 
 end OddOrder.Peterfalvi.S11
