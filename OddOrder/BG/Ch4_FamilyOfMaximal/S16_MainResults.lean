@@ -5760,7 +5760,7 @@ theorem exists_RData_escape_structure [Finite G]
     have hNnotF : ¬ S14.IsTypeF N := fun hF => S14.not_isTypeP_and_isTypeF ⟨hP2.1, hF⟩
     have hNmem : N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) := by
       rw [hMC]; rfl
-    obtain ⟨hFM, hnotTI, -, E, hEM, hEcompl, hEcyc, hEfrob, -⟩ :=
+    obtain ⟨hFM, hnotTI, -, E, hEM, hEcompl, hEcyc, hEfrob⟩ :=
       centralizer_escape_final_local hG hM hNmax hx hesc hNmem hNnotF
     exact ⟨hFM, hnotTI, E, hEM, hEcyc, hEcompl, hEfrob⟩
   · rintro N' ⟨hN'mem, -⟩
