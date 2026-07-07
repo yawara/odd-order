@@ -1348,3 +1348,24 @@ reducible_mem_…_eq_muGrid_columnSum + world-join。
 - **hstep**: caseB_adjoinOneColumnPair の chain 版 (S₁ = pairUnion S₀ pair i、per-step
   hdegS₁diff/hμ_S1 の帰納的維持 — S₁ の全 member deg d [hunif] + pairwise column 直交)。
 - 残 genuine: hDeg / hdegcol / hunif (全て caseB §9 facts)。
+
+## 🔬 update⁸⁰ (2026-07-08 lane-a /loop) — chain 部品 ×2 landed + 代表系不要の設計確定
+
+### ✅ landed (commit bfc32a52, sorry-free ×2)
+- `columnSum_inner_columnSum_eq_zero` (χ₂ ≠ χ₂' → μ ⊥ μ')
+- `columnSum_muColumnChar_mem_inducedFamily` (k≠0 + hdne1 [d≠1、caseB = u>1] → μ ∈ S)
+
+### ★ chain 設計の簡略化確定 (代表系不要)
+全 nonzero index k = 1..w2−1 を pair 列挙し、hstep 内 by_cases:
+- pairSet i ⊆ pairUnion i → identity step (union_eq_self cast)
+- else → 実 adjoin: 両成分 ∉ (pairUnion は per-pair conj-閉) → χ₂_new ∉ {χ₂_old 系} →
+  相異直交で hμ_S1 の μ-part、cut-part は piece 4。
+
+### chain fold 本体の残入力 (次 iteration で assembly)
+- hdegS₁diff の帰納維持: S₁ = cut ∪ pairs — cut 部 = scaledDiff (landed 路)、μ 部 =
+  columnSum_muColumnChar_mem_inducedFamily + scaledDiff (hunif で deg d)。
+- hμ_S1 の帰納維持: cut 部 (piece 4) + μ 部 (相異直交、本 update)。
+- named 残 (§9/caseB facts): **hunif** (uniform-deg d) / **hDeg** (2 < |cut|) / **hdne1**
+  (d ≠ 1) / **hdegcol 系** (columnSum deg = d — hunif+membership or 直接)。
+- fold = coherentOfPairChainCover (pair j := (columnSum (muColumnChar (j+1 as Fin)), .conj)、
+  N := w2 − 1、hcover = dichotomy [update⁷⁹] + pairSet 第 1/2 成分)。
