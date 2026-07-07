@@ -10087,6 +10087,78 @@ theorem le_centralizer_opiCore_of_fittingInAmbient_nilpotent [Finite G]
   have hcomm := Subgroup.mem_centralizer_iff.mp haC (⟨g, hgF⟩ : ↥F) hgQ
   exact congrArg Subtype.val hcomm
 
+/-- **BG Prop 14.2(e) uniqueness (`O_q(L) ∈ 𝒰`)** — the `uniqQ` clause the repo `typeP_structure`
+omits, recovered from Lemma 13.6.  Coq `Ptype_structure` clause (e) `uniqQ` (BGsection14.v), used at
+the `uniqQ` step of `tau2_P2type_signalizer` (BGsection15.v:1330).  For a type-`P` maximal `L` with
+`κ(L)`-Hall `Ks`, `K = L_σ ⊓ C(Ks)`, `q ∈ π(K) ∩ σ(L)`, if `Q = O_q(L)` is a Sylow-`q` of `L`
+(`q ∤ [L:Q]`) then `Q` is uniquely maximal.
+
+Proof: `Q ≤ L_σ` is a Sylow-`q` of `L_σ` too (`q ∈ σ ⟹ q ∤ [L:L_σ]`, so `|Q| = q^{v_q|L_σ|}`,
+giving the maximal-`q`-subgroup property `hSmax`); a rank-1 `q`-witness `X = ⟨w⟩ ≤ K ≤ L_σ ⊓ C(E₁)`
+(as `E₁ ≤ Ks` and `K ≤ C(Ks)`) feeds Lemma 13.6 (`maximalContaining_eq_singleton_of_E1`,
+`P = E₁ ≠ ⊥` from the type-`P` `E`-setup) giving `𝓜(Q) = {L}`; conclude via
+`IsUniquelyMaximal.of_unique_maximal`.  Avoids the (circular) `nonabelian` route. -/
+theorem opiCore_isUniquelyMaximal_of_isSylow [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {L Ks K : Subgroup G} {q : ℕ} [Fact q.Prime]
+    (hL : L ∈ maximalSubgroups G) (hP : S14.IsTypeP L) (hKsL : Ks ≤ L)
+    (hKsHall : Ch03.IsHallSubgroup (S14.kappa L) (Ks.subgroupOf L))
+    (hKdef : K = OddOrder.BG.Ch3.S10.Msigma L ⊓ Subgroup.centralizer (Ks : Set G))
+    (hqπK : q ∈ S14.piSet K) (hqσ : q ∈ OddOrder.BG.Ch3.S10.sigma L)
+    (hQidx : ¬ q ∣ ((opiCoreInG ({q} : Set ℕ) L).subgroupOf L).index) :
+    IsUniquelyMaximal (opiCoreInG ({q} : Set ℕ) L) := by
+  classical
+  set Q : Subgroup G := opiCoreInG ({q} : Set ℕ) L with hQdef
+  have hQMσ : Q ≤ OddOrder.BG.Ch3.S10.Msigma L := by
+    rw [hQdef]; exact OddOrder.BG.Ch3.S10.opiCoreInG_singleton_le_Msigma_of_mem_sigma hqσ
+  have hMσL : OddOrder.BG.Ch3.S10.Msigma L ≤ L := OddOrder.BG.Ch3.S10.Msigma_le L
+  have hQL : Q ≤ L := hQMσ.trans hMσL
+  have hQpg : IsPGroup q ↥Q := by rw [hQdef]; exact isPGroup_opiCoreInG_singleton L
+  -- `|Q| = q ^ v_q(|L|) = q ^ v_q(|L_σ|)` (Sylow of `L`; `q ∈ σ ⟹ q ∤ [L:L_σ]`).
+  have hQsubL : IsPGroup q ↥(Q.subgroupOf L) := hQpg.comap_subtype
+  have hcardL : Nat.card ↥Q = q ^ (Nat.card ↥L).factorization q := by
+    rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQL).toEquiv]
+    have hc := (hQsubL.toSylow hQidx).card_eq_multiplicity
+    rwa [hQsubL.toSylow_coe hQidx] at hc
+  have hMσHall : Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma L)
+      ((OddOrder.BG.Ch3.S10.Msigma L).subgroupOf L) :=
+    OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hL
+  have hqidxMσ : ¬ q ∣ ((OddOrder.BG.Ch3.S10.Msigma L).subgroupOf L).index := fun hd =>
+    hMσHall.2 q (Nat.mem_primeFactors.mpr ⟨Fact.out, hd, Subgroup.index_ne_zero_of_finite⟩) hqσ
+  have hQcard : Nat.card ↥Q = q ^ (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma L)).factorization q := by
+    rw [hcardL]
+    congr 1
+    have hcardmul := Subgroup.card_mul_index ((OddOrder.BG.Ch3.S10.Msigma L).subgroupOf L)
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMσL).toEquiv] at hcardmul
+    rw [← hcardmul, Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
+      Finsupp.add_apply, Nat.factorization_eq_zero_of_not_dvd hqidxMσ, add_zero]
+  have hSmax : ∀ T : Subgroup G, T ≤ OddOrder.BG.Ch3.S10.Msigma L → IsPGroup q ↥T →
+      Q ≤ T → Q = T :=
+    fun T hT hTq hQT =>
+      OddOrder.BG.Ch3.S13.eq_of_le_of_isPGroup_card_eq_factorization hQcard hT hTq hQT
+  -- Type-`P` `E`-setup and a rank-1 `q`-witness `X = ⟨w⟩ ≤ K`.
+  obtain ⟨E, E₁, E₂, E₃, hE, hE1Ks, hKsE, hE1ne⟩ :=
+    S14.exists_typePESetup_kappaHall hG hL hP hKsL hKsHall
+  have hqdvdK : q ∣ Nat.card ↥K := Nat.dvd_of_mem_primeFactors hqπK
+  obtain ⟨w, hw⟩ := exists_prime_orderOf_dvd_card' q hqdvdK
+  have hXcard : Nat.card ↥(Subgroup.zpowers (w : G)) = q := by
+    rw [Nat.card_zpowers]; exact (orderOf_injective _ K.subtype_injective w).trans hw
+  have hXelem : Subgroup.zpowers (w : G) ∈ elemAbelianOfRank G q 1 :=
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hXcard, by rw [hXcard, pow_one]⟩
+  have hXK : Subgroup.zpowers (w : G) ≤ K := Subgroup.zpowers_le.mpr w.2
+  have hXC : Subgroup.zpowers (w : G) ≤
+      OddOrder.BG.Ch3.S10.Msigma L ⊓ Subgroup.centralizer (E₁ : Set G) := by
+    refine hXK.trans (le_inf (hKdef ▸ inf_le_left) ?_)
+    exact (show K ≤ Subgroup.centralizer (Ks : Set G) from hKdef ▸ inf_le_right).trans
+      (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hE1Ks))
+  have hMQ : maximalSubgroupsContaining Q = {L} :=
+    (OddOrder.BG.Ch3.S13.maximalContaining_eq_singleton_of_E1 hG hE hqσ (le_refl E₁) hE1ne
+      hXelem hXC hQMσ hQpg hSmax).2
+  refine IsUniquelyMaximal.of_unique_maximal
+    (lt_of_le_of_lt hQL (mem_maximalSubgroups.mp hL).lt_top) hL hQL (fun N hN hQN => ?_)
+  have hNmem : N ∈ maximalSubgroupsContaining Q := ⟨mem_maximalSubgroups.mp hN, hQN⟩
+  rw [hMQ, Set.mem_singleton_iff] at hNmem
+  exact hNmem
+
 /-- **BG Theorem 12.15 / `Ptype_structure` + `Fcore_structure` `sylQ`/`sAFL`/`uniqQ` bundle**
 (Coq `tau2_P2type_signalizer`, BGsection15.v:1315--1333): for a type-`P` maximal `L` with
 `κ(L)`-Hall `Ks`, `K = L_σ ⊓ C(Ks)` (`|K| = q` prime, `q ∈ σ(L)`), and a rank-2 elementary abelian
