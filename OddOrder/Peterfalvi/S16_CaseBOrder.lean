@@ -199,4 +199,82 @@ theorem caseB_order_u_full_of_not_modEq {p q x u : ℕ} {m : ℚ}
   rw [hx1, mul_one] at hux
   exact hux
 
+/-- **Peterfalvi (13.15), the `p ≡ 1 (mod q)` branch** (side-agnostic): in case (9.7.b), if
+`p ≡ 1 (mod q)` then the complement order is `u = (p^q − 1)/(q(p − 1))`.
+
+The cofactor `x` (with `u·x = (p^q − 1)/(p − 1)`) is divisible by `q`: by (13.14)
+`cyclotomic_quotient_dvd_of_modEq_one`, `q ∣ (p^q − 1)/(p − 1) = u·x`, and `q ∤ u` (coprimality)
+forces `q ∣ x`.  Writing `x = q·t`, oddness of `x` (it divides the odd cyclotomic quotient) forces
+`t` odd; with `t ≠ 1` this gives `t ≥ 3`, i.e. `x ≥ 3q ≥ 2q + 1`, ruled out by
+`caseB_order_x_absurd_of_ge`.  Hence `x = q` and `u = (p^q − 1)/(q(p − 1))`. -/
+theorem caseB_order_u_div_q_of_modEq {p q x u : ℕ} {m : ℚ}
+    (hp : p.Prime) (hq : q.Prime) (hp3 : 3 ≤ p) (hq2 : q ≠ 2) (hpq : p ≠ q)
+    (hpodd : Odd p) (hqodd : Odd q) (hmod : p ≡ 1 [MOD q])
+    (hux : u * x = (p ^ q - 1) / (p - 1))
+    (hu_ne_one : u ≠ 1) (hu_cop_q : ¬ q ∣ u) (_hx0 : x ≠ 0)
+    (hm5 : 5 ≤ q → (7 : ℚ) / 10 < m) (hm7 : 7 ≤ q → (8 : ℚ) / 10 < m)
+    (h11c : q = 3 → ((p : ℚ) ^ 2 - 1) / 6 < (u : ℚ))
+    (hanalytic : m < (q : ℚ) * ((p : ℚ) ^ q - 1)
+      / ((p : ℚ) ^ (q - 1) * (x : ℚ) * ((p : ℚ) - 1))) :
+    u = (p ^ q - 1) / (q * (p - 1)) := by
+  have hqpos : 0 < q := hq.pos
+  have hxq : x = q := by
+    by_contra hxne
+    have hqdvd_val : q ∣ (p ^ q - 1) / (p - 1) := cyclotomic_quotient_dvd_of_modEq_one hp hmod
+    have hvalodd : Odd ((p ^ q - 1) / (p - 1)) := cyclotomic_quotient_odd hp hpodd hqodd
+    have hxdvd : x ∣ (p ^ q - 1) / (p - 1) := ⟨u, by rw [← hux]; ring⟩
+    have hcop : Nat.Coprime q u := hq.coprime_iff_not_dvd.mpr hu_cop_q
+    have hqx : q ∣ x := hcop.dvd_of_dvd_mul_left (by rw [hux]; exact hqdvd_val)
+    obtain ⟨t, ht⟩ := hqx  -- `x = q * t`
+    have hxodd : Odd x := by
+      rcases Nat.even_or_odd x with he | ho
+      · exact absurd (even_iff_two_dvd.mpr (he.two_dvd.trans hxdvd))
+          (Nat.not_even_iff_odd.mpr hvalodd)
+      · exact ho
+    have htodd : Odd t := by
+      rcases Nat.even_or_odd t with he | ho
+      · exact absurd (show Even x by rw [ht]; exact Nat.even_mul.mpr (Or.inr he))
+          (Nat.not_even_iff_odd.mpr hxodd)
+      · exact ho
+    have ht_ne : t ≠ 1 := fun h1 => hxne (by rw [ht, h1, Nat.mul_one])
+    have ht3 : 3 ≤ t := by obtain ⟨s, hs⟩ := htodd; omega
+    have hx_ge : 2 * q + 1 ≤ x := by
+      have h3q : 3 * q ≤ q * t := by
+        calc 3 * q = q * 3 := by ring
+          _ ≤ q * t := by gcongr
+      rw [ht]; omega
+    exact caseB_order_x_absurd_of_ge hp hq hp3 hq2 hpq hx_ge hux hu_ne_one hu_cop_q
+      hm5 hm7 h11c hanalytic
+  rw [hxq] at hux  -- `hux : u * q = (p^q - 1)/(p - 1)`
+  have hval : u = (p ^ q - 1) / (p - 1) / q := by
+    rw [← hux, Nat.mul_comm u q, Nat.mul_div_cancel_left u hqpos]
+  rw [hval, Nat.div_div_eq_div_mul, Nat.mul_comm (p - 1) q]
+
+/-- **Peterfalvi (13.15)** (side-agnostic numeric engine, assembled dichotomy): in case (9.7.b),
+the complement order `u` is the Singer cyclotomic value
+`u = (p^q − 1)/(p − 1)` when `p ≢ 1 (mod q)`, or `u = (p^q − 1)/(q(p − 1))` when `p ≡ 1 (mod q)`.
+
+This packages the two branches `caseB_order_u_div_q_of_modEq` (the `p ≡ 1 (mod q)` case) and
+`caseB_order_u_full_of_not_modEq` (the `p ≢ 1 (mod q)` case) into the exact conjunction shape of the
+`S`-side statement `S15.caseB_order_u`: once the char/`σ`-theory inputs (`hanalytic`, the (13.11)
+`m`-lower bounds, `h11c`) are supplied for the concrete `Hypothesis` data — which bottom out in the
+analytic inequality (13.10) with `c = 1`/`d = 1`, i.e. `typeP_Galois`, issue 9000 — this engine
+discharges `caseB_order_u` by instantiation, and the `T`-side `v`-value `v = (q^p − 1)/(q − 1)` of
+(14.4) is the `p ↔ q` instance.  The engine itself is *ungated* (all char content is hypotheses). -/
+theorem caseB_order_u_value {p q x u : ℕ} {m : ℚ}
+    (hp : p.Prime) (hq : q.Prime) (hp3 : 3 ≤ p) (hq2 : q ≠ 2) (hpq : p ≠ q)
+    (hpodd : Odd p) (hqodd : Odd q)
+    (hux : u * x = (p ^ q - 1) / (p - 1))
+    (hu_ne_one : u ≠ 1) (hu_cop_q : ¬ q ∣ u) (hx0 : x ≠ 0)
+    (hm5 : 5 ≤ q → (7 : ℚ) / 10 < m) (hm7 : 7 ≤ q → (8 : ℚ) / 10 < m)
+    (h11c : q = 3 → ((p : ℚ) ^ 2 - 1) / 6 < (u : ℚ))
+    (hanalytic : m < (q : ℚ) * ((p : ℚ) ^ q - 1)
+      / ((p : ℚ) ^ (q - 1) * (x : ℚ) * ((p : ℚ) - 1))) :
+    (p ≡ 1 [MOD q] → u = (p ^ q - 1) / (q * (p - 1))) ∧
+      (¬ p ≡ 1 [MOD q] → u = (p ^ q - 1) / (p - 1)) :=
+  ⟨fun hmod => caseB_order_u_div_q_of_modEq hp hq hp3 hq2 hpq hpodd hqodd hmod hux
+      hu_ne_one hu_cop_q hx0 hm5 hm7 h11c hanalytic,
+    fun hnotmod => caseB_order_u_full_of_not_modEq hp hq hp3 hq2 hpq hpodd hqodd hnotmod hux
+      hu_ne_one hu_cop_q hx0 hm5 hm7 h11c hanalytic⟩
+
 end OddOrder.Peterfalvi.S15
