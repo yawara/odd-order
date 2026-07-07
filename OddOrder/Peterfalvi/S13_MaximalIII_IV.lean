@@ -2834,4 +2834,113 @@ noncomputable def irrFamilyMemberOrthoDatum [Finite G]
     certainTypeR_imageSet_orthogonal_dadeOfDiff_typeP hG hyp hχ₂b hdegb ⟨x, hirr x hx⟩
       hreal hdiffsuppA hdiffsupp0 β hβ α hα, star_zero]
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(9.11) caseB one-pair step, end-to-end**: the degree-`d` irreducible cut of `𝒮(H₀C′)`
+absorbs one certain-type column pair `{μ, μ̄}`, staying coherent on `A₀(M)`.  This instantiates
+`adjoin_muColumnPair_of_irrFamily` with every structural input discharged from the landed
+supply chain (issue 1019 update⁷⁷):
+
+* `hS₁` = `sOf_degreeSubfamily_isCoherent` (the anchor `χ₁` is the degree-`d` witness);
+* family facts = `irrCut_finite`/`irrCut_conjClosed` + the cut definition;
+* `Dmem`/`htau1Dmem`/`hortho_mem` = `irrFamilyMemberOrthoDatum`;
+* `Da`/`hDatau1` = `columnBreakDa`;
+* `hμ_S1`/`hμbar_S1` = `columnSum_inner_irr_member_eq_zero` (+ conjugate column);
+* `hμZ` = `columnSum_mem_ZIrr`; `hdeganchor` from `hdegcol` + the anchor degree.
+
+The remaining *genuine* inputs are the §9/caseB facts: `hDeg` (the cut has `> 2` members, the
+(5.6.c) counting), `hdegcol` (the column degree matches the cut degree — caseB uniform-`qu`),
+and `hdiffasuppχ` (the `A₀`-support of `μ − χ₁`, equal-degree difference). -/
+noncomputable def caseB_adjoinOneColumnPair [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
+    (d : ℕ)
+    {χ₁ : ClassFunction ↥M ℂ}
+    (hχ₁mem : χ₁ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime)
+    (hχ₁irr : IsIrreducibleCharacter χ₁)
+    (hχ₁deg : ((χ₁ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (d : ℂ))
+    {χ₂ : ((hyp.base.toHypothesis46 hG hG.odd).W2.subgroupOf
+      ((hyp.base.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.base.toHypothesis46 hG hG.odd).W2)) →* ℂˣ}
+    (hχ₂ : χ₂ ≠ 1)
+    (hdegcol : OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd) χ₂ 1
+      = (d : ℂ))
+    (hdiffasuppχ : ((OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd) χ₂
+      - χ₁ : ClassFunction ↥M ℂ)).support ⊆ hyp.base.A0)
+    (hDeg : (2 : ℝ) < (irrCut_finite hyp hyp.H0Cprime d).toFinset.card) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+      ((↑(irrCut_finite hyp hyp.H0Cprime d).toFinset : Set (ClassFunction ↥M ℂ)) ∪
+        {OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd) χ₂,
+         (OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd) χ₂).conj})
+      hyp.base.A0 := by
+  haveI := hyp.base.finiteG
+  classical
+  -- the coherent irreducible cut, transported onto the Finset coercion
+  have hS₁ : OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+      (↑(irrCut_finite hyp hyp.H0Cprime d).toFinset : Set (ClassFunction ↥M ℂ))
+      hyp.base.A0 := by
+    rw [Set.Finite.coe_toFinset]
+    exact sOf_degreeSubfamily_isCoherent hG hyp hyp.H0Cprime d ⟨χ₁, hχ₁mem, hχ₁irr, hχ₁deg⟩
+  -- membership repackaging helpers
+  have hmemiff : ∀ x : ClassFunction ↥M ℂ,
+      x ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset ↔
+      (x ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime ∧
+        IsIrreducibleCharacter x ∧ ((x : ↥M → ℂ) 1 = (d : ℂ))) := fun x =>
+    (irrCut_finite hyp hyp.H0Cprime d).mem_toFinset
+  have hsub : (↑(irrCut_finite hyp hyp.H0Cprime d).toFinset : Set (ClassFunction ↥M ℂ)) ⊆
+      OddOrder.Peterfalvi.S12.inducedFamily M := by
+    intro x hx
+    have hcut := (hmemiff x).mp hx
+    have h := hyp.sOf_subset_SOf hyp.H0Cprime hcut.1
+    rw [hyp.SOf_eq] at h
+    rw [OddOrder.Peterfalvi.S12.inducedFamily_eq_inducedKernelFamily_bot]
+    exact OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone bot_le h
+  have hirr : ∀ x ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset,
+      IsIrreducibleCharacter x := fun x hx => ((hmemiff x).mp hx).2.1
+  have hconjS : ∀ x ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset,
+      x.conj ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset := fun x hx =>
+    (hmemiff _).mpr (irrCut_conjClosed hyp hyp.H0Cprime d ((hmemiff x).mp hx))
+  have hχ₁s : χ₁ ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset :=
+    (hmemiff χ₁).mpr ⟨hχ₁mem, hχ₁irr, hχ₁deg⟩
+  have hdegmem : ∀ x ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset,
+      (x : ClassFunction ↥M ℂ) 1 = χ₁ 1 := fun x hx => by
+    rw [((hmemiff x).mp hx).2.2, hχ₁deg]
+  -- member ∈ kernel filtration (for the μ ⊥ member orthogonality)
+  have hmemIKFH : ∀ x ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset,
+      x ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) (hyp.H0Cprime.subgroupOf M) := fun x hx => by
+    have h := hyp.sOf_subset_SOf hyp.H0Cprime ((hmemiff x).mp hx).1
+    rwa [hyp.SOf_eq] at h
+  have hμ_S1 : ∀ x ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset,
+      ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum
+        (hyp.base.toHypothesis46 hG hG.odd) χ₂) x = 0 := fun x hx =>
+    hyp.base.columnSum_inner_irr_member_eq_zero hG hyp.type_alt hyp.params
+      (hyp.params_mu_eq hG hG.odd) hχ₂ (hmemIKFH x hx) (hirr x hx)
+  have hμbar_S1 : ∀ x ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset,
+      ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum
+        (hyp.base.toHypothesis46 hG hG.odd) χ₂).conj x = 0 := fun x hx => by
+    rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq]
+    exact hyp.base.columnSum_inner_irr_member_eq_zero hG hyp.type_alt hyp.params
+      (hyp.params_mu_eq hG hG.odd) (inv_ne_one.mpr hχ₂) (hmemIKFH x hx) (hirr x hx)
+  -- the bundled per-member datum (Dmem + cross-orthogonality + tau1)
+  have hdegb := (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one
+    (hyp.base.toHypothesis46 hG hG.odd) χ₂).symm
+  let datum := fun (x : ClassFunction ↥M ℂ)
+      (hx : x ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset) =>
+    irrFamilyMemberOrthoDatum hG hyp.base (irrCut_finite hyp hyp.H0Cprime d).toFinset hS₁
+      hsub hirr hconjS hχ₂ hdegb hx
+  -- the break decomposition
+  have hμZ := hyp.base.columnSum_mem_ZIrr hG χ₂
+  let Da := hyp.base.columnBreakDa hG hyp.type_alt hyp.params (hyp.params_mu_eq hG hG.odd)
+    hχ₂ (hmemIKFH χ₁ hχ₁s) hχ₁irr hdiffasuppχ hμZ
+  -- fire the composite
+  exact adjoin_muColumnPair_of_irrFamily hG hyp.base
+    (irrCut_finite hyp hyp.H0Cprime d).toFinset hS₁ hsub hirr hχ₁s hχ₂ hdegmem
+    hμ_S1 hμbar_S1
+    (fun x hx => (datum x hx).1)
+    (fun x hx => (datum x hx).2.2)
+    Da (by with_unfolding_all rfl)
+    (fun x hx => fun α hα β hβ => by
+      with_unfolding_all exact (datum x hx).2.1 α hα β hβ)
+    hdiffasuppχ hμZ hDeg
+    (by rw [hdegcol, hχ₁deg])
+
 end OddOrder.Peterfalvi.S13
