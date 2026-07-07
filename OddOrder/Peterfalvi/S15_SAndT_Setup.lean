@@ -5240,6 +5240,27 @@ theorem Hypothesis.toTypesIIIIIIVSetupT_H_eq [Finite G]
   show (reconciled_typePData_T hG hyp).choose.H = hyp.Q
   rw [(reconciled_typePData_T hG hyp).choose.H_eq, hyp.Q_eq_TF]
 
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+/-- **§9 character data on `T`** (the T-mirror of `mkSection11CharacterDataS`, over the
+`toTypesIIIIIIVSetupT` router; issue 9013 gate 3): `u = |V̄|` is rfl-pinned to the `V`-action
+image on the chief factor of `Q`; `tau := hyp.tauT`; `H0CprimeSupport := ∅` and
+`quotientSemidirectFrobenius := True` are the same documented count/degree-only placeholders as
+the `S`-instance (NOT for coherence consumption).  Opens the §9 (9.8)/(9.9) counts — in
+particular the (13.3.b) dichotomy glue `caseB_of_no_irreducible_sOf_H0Cprime` — on `T`. -/
+noncomputable def Hypothesis.mkSection11CharacterDataT [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1)
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd)) :
+    OddOrder.Peterfalvi.S11.Section11CharacterData (hyp.toTypesIIIIIIVSetupT hG hvd) chief where
+  u := Nat.card ↥(((quotientMulAutHom (N := chief.N) chief.N_aInvariant).comp
+      (((hyp.toTypesIIIIIIVSetupT hG hvd).typeP.U.subgroupOf
+        ((hyp.toTypesIIIIIIVSetupT hG hvd).typeP.U
+          ⊔ (hyp.toTypesIIIIIIVSetupT hG hvd).typeP.W1)).subtype)).range)
+  u_eq_card_quotient := rfl
+  H0CprimeSupport := ∅
+  tau := hyp.tauT
+  quotientSemidirectFrobenius := True
+
 /-- **Peterfalvi (13.3.b), dichotomy glue** (§9-generic, issue 9013 gate 3): if the §9 family
 `𝒮(H₀C')` contains **no** irreducible character, then case (9.7.b) holds
 (a `CliffordCaseBData` — carrying the Singer facts `Ū` cyclic, `u ∣ (p^q−1)/(p−1)`, irreducible
