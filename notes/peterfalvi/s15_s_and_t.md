@@ -8,6 +8,33 @@
 
 ---
 
+## ✅✅ LIVE STATUS (2026-07-08, lane **c**): (13.18) faithful 化 — overstatement 2 件除去 + `defGamma` 実証明 (issue 3003)
+
+item 3 (B) (5.3) cross-relation 着手時に、`BetaData` carve-out (c 所有) の 2 フィールドが
+**Peterfalvi (13.18) の overstatement** と判明 (教科書 mmd:292-300 + Coq `FTtypeP_bridge_facts`
+PFsection13.v:1792 と照合):
+
+- **`Gamma_independent : ∀ i k, ⟨Γ,η_ik⟩ = 0`** = **FALSE**。(13.18.c) の "independent of **j**"
+  (= `defGamma`: `∀ j≠0, τ_S(β_j) − 1 + η_0j = Γ`) を「grid 直交」と誤読。反証: Coq (13.18.d) は
+  `Γ = X+Y` (X∈span grid≠0) の非自明分解で `‖Y‖²` を bound (`a := ⟨Γ,η01⟩` を一般整数で使用、
+  PFsection13.v:1915)。Γ 直交なら X=0 で (d) 自明 = 矛盾。
+- **`Y_norm_bound : Re⟨Γ,Γ⟩ ≤ (u−1)/q + 1`** = genuine (13.18.d) でない。正しくは grid-直交成分
+  `Y` のみの `‖Y‖² ≤ (u−1)/q` (`‖Γ‖²=‖X‖²+‖Y‖²`、`‖Γ‖²` proxy は X≠0 で偽の可能性)。
+
+**修正 (commit, build 3935 jobs green + AxiomsCheck OK)**:
+- `Gamma_independent` 削除 → 分離 sorried `tauS_mu_row0_cross` (= (4.8)/(5.3) `τ_S(μ_0j−μ_01)=η_0j−η_01`,
+  Coq `prDade_sub_TIirr` PFsection4.v:870, FT で δ=1) + **`gammaGrid_defGamma` 実証明** (glue =
+  Dade map の ℤ-linearity `map_sub` + `betaGrid j − betaGrid #1 = μ_01 − μ_0j`)。
+- `gammaGrid_norm_bound` → `gammaGrid_Y_norm_bound` (genuine (13.18.d) X+Y form, sorried deep)。
+- structure/producer/headline を faithful に更新 (consumer 0 ゆえ contract 破壊なし; (13.18) は
+  Coq で §14 が consume する on-path、Lean consumer は 0098 item 4 予定)。
+
+**残 (13.18) deep obligation** (opaque でなく named + docstring で性質明示):
+`tauS_mu_row0_cross` (prime-TI Dade 機構 port — repo 不在、将来 shared-infra claim) /
+`betaGrid_support` (13.18.a, Frobenius gammaW1 cancellation) / `gammaGrid_orthogonal_one`
+(Dade=Ind bridge `sInstance_dade_eq_induce` 既存 + betaGrid_support gated) / `gammaGrid_real`
+(conjugation-commutation)。教訓: scaffold の "genuine statement" ラベルを鵜呑みにせず教科書+Coq と照合せよ。
+
 ## 🗺️ FRONTIER MAP 更新³ (2026-07-07 夜, lane b — (13.4) 組立 landing + gate 2 discharge)
 
 - **✅ (13.4) `lambda_forces_T_caseB` = 実証明** (bare sorry → typed gate、commit 95be831a):
