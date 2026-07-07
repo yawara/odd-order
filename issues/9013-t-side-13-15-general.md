@@ -235,3 +235,19 @@ C が `tSide_caseB_v_gated_inputs` を即 discharge (v-value close)。h11c-dual 
 C 側 coherence machinery (`horth`/count/isometry) は全て proven。9013 の v-value + (別 issue の) S-side βₛ が
 landing 次第、`T_typeIII_ratio_le` は薄い cite で閉じる。sorry 目安は当初裁定の 8→5 から、horth 完了で
 **coherence carrier 分を先取り済**。
+
+## 🧭 HUB RULING (2026-07-07, issue 0098 レーン再点検): de-scope 2 件
+
+hub 裁定 (詳細 = issues/0098-lane-rebalance-c-reactivation.md、調査 = wf_d4994964):
+
+1. **item (i) T-side mᵀ 定義 + 7/10<mᵀ 算術 bound → lane c に de-scope**。c 検証済みの純算術で、
+   plug 先も c 所有 engine (S16_CaseBOrder)。**b のファイル編集ゼロ**。b の案 A deliverable は
+   **(ii) cofactor v∣Singer + (iii) (13.10)-dual analytic ineq + d=1 (V_inf_centralizer_Q_eq_bot)** に縮小。
+   estimate-generalization は従来通り b (instantiation のみ c、案 B 再演の dup 禁止)。
+2. **S-side βₛ bridge (13.18) の ownership gap を解消**: **lane c への decl 領域限定 carve-out**
+   (S15_SAndT.lean:3616 `BetaData := sorry` 周辺; reconciled_typePData_T carve-out の前例に同じ)。
+   c が Γ = τ_S(β_#1) − 1 + η_01 構成 + facts を build、b は cite。上記「9013 の scope 外なら別途 tracking 要」
+   への回答 = 本 carve-out で tracking。
+3. 追記³ の file-topology 分岐 (reconciled downstream 移設 vs ingredients hoist) は **hoist-upstream で解消方向**:
+   c が typeP_pair port (Pf §8, 新 shared leaf, claim-before-build) を build し、自身の carve-out 内
+   W2_le (S15_SAndT_Setup:4520) / centralizer_W1 (:4590) を discharge する (0098 パッケージ item 1)。
