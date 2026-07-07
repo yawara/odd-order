@@ -1261,3 +1261,142 @@ disjointness machine / R(χ) 抽象化 / 4-case は h46-generic 流用。conj-di
    経由、transport 済) — 向きの swap は conj 対称 (Orthogonal の def と inner_conj_symm)。
 2. **特殊化 assembly** (irr-cut Finset 化 + 全 pieces 束ね、named 残 = hDeg + hdegcol)。
 3. hDeg counting (§9、genuine)。
+
+## 🔬 update⁷⁶ (2026-07-08 lane-a /loop) — ★ bundled datum LANDED: composite の構造 supply 完備
+
+### ✅ landed: `S13.irrFamilyMemberOrthoDatum` (commit 066929f0, sorry-free, 一発 green)
+Dmem+hortho_mem+htau1Dmem の per-member subtype package。memberExtensionDecomposition 直接
+構成 (R⊥R の証明項/family 完全一致)、conj-symm swap で向き解決、A₀/A(M) 両 support は
+conjDiff_support の hKsupp 差し替えで。
+
+### (9.11) mixed corner の総括 — 残る真の外部入力は §9 facts のみ
+adjoin composite (`adjoin_muColumnPair_of_irrFamily`) の全入力の供給状況:
+| 入力 | 供給 | |
+|---|---|---|
+| hS₁/hsub/hirr/hconjS | sOf_degreeSubfamily_isCoherent + irrCut_finite/conjClosed | ✅ |
+| Dmem/htau1Dmem/hortho_mem | irrFamilyMemberOrthoDatum | ✅ |
+| Da/hDatau1 | columnBreakDa | ✅ |
+| hμ_S1/hμbar_S1 | columnSum_inner_irr_member_eq_zero (+conj) | ✅ |
+| hμZ | columnSum_mem_ZIrr | ✅ |
+| hgen | 内蔵 (anchorGeneration producer) | ✅ |
+| hdegmem | cut 定義 | ✅ |
+| **hDeg** (2 < \|irr-cut\|) | **§9 counting — genuine 残** | ⏳ |
+| **hdegcol** (columnSum χ₂ 1 = d) | **caseB uniform-qu (§9 fact) — genuine 残** | ⏳ |
+| **hdiffasuppχ** ((μ−χ₁).support ⊆ A₀) | μ ∈ inducedFamily + scaledDiff (hdegcol から) — 組立可 | ⏳ |
+次 = 特殊化 assembly (`caseB_adjoinOneColumnPair`、上表の ✅ を束ね named = hDeg/hdegcol の
+2 つ + hdiffasuppχ in-proof) → その後 chain 化 (§9 counting と合流)。
+
+## 🔬 update⁷⁷ (2026-07-08 lane-a /loop) — ★★ caseB 1-pair adjoin END-TO-END LANDED
+
+### ✅ landed: `S13.caseB_adjoinOneColumnPair` (commit 4d2647ec, sorry-free)
+(9.11) mixed corner の 1-pair step が閉じた: deg-d irr-cut + column pair {μ, μ̄} → coherent
+(A₀)。全構造入力は landed 鎖から discharge。**残る genuine 入力 = hDeg (2 < |cut|) +
+hdegcol (μ deg = d) + hdiffasuppχ の §9/caseB facts のみ**。
+- Lean 教訓 (traps §5 追補、メモリ反映済): Type-valued data は have で束縛すると opaque
+  (with_unfolding_all も不達) — **let 必須**。
+
+### (9.11) caseB 全体の残り
+1. **chain 化**: 1-pair step を全 column pairs (k = 1..(w2−1)/2 の代表) に fold
+   (coherentOfPairChainCover) → family 全体 = cut ∪ all-μ-pairs = sOf(H0Cprime) (caseB) の
+   coherence。pair enumeration (inverse-pair 代表系) + step ごとの hDeg 単調性 (cut は step で
+   増えない — S₁ は成長するが cut-card ベースの bound は同じ… ⚠ chain の各 step の S₁ は
+   前 step の union — xAdjoinStepW_k の hDeg は「S₁ 内の等次数既約 s 部分」で測る — 各 step で
+   同じ irr-cut を s に使えるか [S₁ ⊇ cut は維持、hmemS1 ✓ — irr-cut を s に固定し S₁ だけ
+   成長させる形で composite は既に対応済 (hmemS1 : ∀ i ∈ s, χmem i ∈ S₁)] — **⚠ composite の
+   現 signature は hS₁ : IsCoherent ↑s — s = S₁ 全体を要求! chain では S₁ ⊋ s になる —
+   composite の hS₁/s を分離する軽微な一般化が要る** (S₁ : Set 引数 + s : Finset ⊆ S₁)。
+2. **hDeg/hdegcol の §9 supply** (caseB counting/uniform-qu)。
+3. caseA (non-Galois) は (9.11.1)-(9.11.8) norm-chain — 別フェーズ。
+
+## 🔬 update⁷⁸ (2026-07-08 lane-a /loop) — s/S₁ 分離一般化 landed (chain 化 ready)
+
+### ✅ landed (commit ebb22747, sorry-free ×3 維持)
+adjoin composite / bundled datum / caseB caller を (S₁ : Set) + (s : Finset ⊆ S₁) に分離。
+S₁ は step ごとに成長、s = irr-cut (anchor family) 固定 — chain fold の各 step で同じ s を
+使い回せる形。hdegS₁diff (S₁ 全体の anchor-diff support) が新 named (caseB では全 member
+deg d で scaledDiff から供給、初段 caller で実証済)。
+
+### 次: chain fold (`caseB_coherent_sOf_H0Cprime_of_mixed`)
+- pair enumeration: 非自明 column の inverse-pair 代表系 (Fin ((w2−1)/2) or
+  {χ₂ // χ₂ ≠ 1} / inverse 同一視) — columnSum 全列の被覆と sOf(H0Cprime) = cut ∪ ⋃ pairs
+  (caseB) の family 同定 (all-reducible corner の membership 合成の mixed 版)。
+- fold: coherentOfPairChainCover (S07) — pairUnion 形に合わせる。
+- 各 step の hdegS₁diff: S₁ = cut ∪ 既 pairs — μ 系の deg = d (hdegcol) で保存 ✓。
+- 各 step の hμ_S1 (S₁ 全体): cut 部 = columnSum_inner_irr…、μ 部 = 列違い直交
+  (columnFamily_mu_sum_inner off-diag) ✓ 部品あり。
+- 残る genuine: hDeg (counting) / hdegcol (uniform-qu) / family 同定 (caseB の
+  sOf = cut ⊔ μ-pairs 分割)。
+
+## 🔬 update⁷⁹ (2026-07-08 lane-a /loop) — chain fold 部品: member dichotomy landed
+
+### ✅ landed: `S13.caseB_sOf_member_dichotomy` (commit fa01da1c, sorry-free)
+hcover の核: hunif (caseB uniform-deg、§9 fact named) の下で 𝒮(H₀C′) member は irr-cut ∨
+∃ k ≠ 0, = columnSum (muColumnChar k)。irr 側 = cut 定義、red 側 =
+reducible_mem_…_eq_muGrid_columnSum + world-join。
+
+### chain fold の残り設計 (次 iteration)
+- **pair enumeration**: pair : ℕ → CF × CF で pair j = (columnSum (muColumnChar kⱼ),
+  columnSum (muColumnChar kⱼ)⁻¹-対応)。**inverse-pair 被覆の注意**: dichotomy は「ある k ≠ 0 の
+  columnSum」を返すが pair は代表 k と逆 k⁻ の両方をカバーする必要 —
+  (columnSum χ₂).conj = columnSum χ₂⁻¹ ゆえ pairSet j = {μⱼ, μ̄ⱼ} = {columnSum(χ₂ⱼ),
+  columnSum(χ₂ⱼ⁻¹)}。代表系: Fin w2 の nonzero index を全部 pair に使い (代表系にせず
+  重複 adjoin も chain 上は無害 — pairSet ⊆ X と hcover が満たせれば良い、既 coherent への
+  再 adjoin は…xAdjoinStepW_k は χ ∉ S₁ を要求しない? hχ_S1 : ∀ x ∈ S₁, ⟨μ,x⟩ = 0 —
+  μ ∈ S₁ (既 adjoin 済) だと ⟨μ,μ⟩ = w1 ≠ 0 で hμ_S1 が偽 → **重複 adjoin 不可、真の代表系
+  (k と inv(k) から 1 つ) が必要**)。inv-index: muColumnChar k の逆 = muColumnChar (invk k)
+  の対応 (fCECG と inv の compat) — enumeration 補題群 (~50 行)。
+- **hstep**: caseB_adjoinOneColumnPair の chain 版 (S₁ = pairUnion S₀ pair i、per-step
+  hdegS₁diff/hμ_S1 の帰納的維持 — S₁ の全 member deg d [hunif] + pairwise column 直交)。
+- 残 genuine: hDeg / hdegcol / hunif (全て caseB §9 facts)。
+
+## 🔬 update⁸⁰ (2026-07-08 lane-a /loop) — chain 部品 ×2 landed + 代表系不要の設計確定
+
+### ✅ landed (commit bfc32a52, sorry-free ×2)
+- `columnSum_inner_columnSum_eq_zero` (χ₂ ≠ χ₂' → μ ⊥ μ')
+- `columnSum_muColumnChar_mem_inducedFamily` (k≠0 + hdne1 [d≠1、caseB = u>1] → μ ∈ S)
+
+### ★ chain 設計の簡略化確定 (代表系不要)
+全 nonzero index k = 1..w2−1 を pair 列挙し、hstep 内 by_cases:
+- pairSet i ⊆ pairUnion i → identity step (union_eq_self cast)
+- else → 実 adjoin: 両成分 ∉ (pairUnion は per-pair conj-閉) → χ₂_new ∉ {χ₂_old 系} →
+  相異直交で hμ_S1 の μ-part、cut-part は piece 4。
+
+### chain fold 本体の残入力 (次 iteration で assembly)
+- hdegS₁diff の帰納維持: S₁ = cut ∪ pairs — cut 部 = scaledDiff (landed 路)、μ 部 =
+  columnSum_muColumnChar_mem_inducedFamily + scaledDiff (hunif で deg d)。
+- hμ_S1 の帰納維持: cut 部 (piece 4) + μ 部 (相異直交、本 update)。
+- named 残 (§9/caseB facts): **hunif** (uniform-deg d) / **hDeg** (2 < |cut|) / **hdne1**
+  (d ≠ 1) / **hdegcol 系** (columnSum deg = d — hunif+membership or 直接)。
+- fold = coherentOfPairChainCover (pair j := (columnSum (muColumnChar (j+1 as Fin)), .conj)、
+  N := w2 − 1、hcover = dichotomy [update⁷⁹] + pairSet 第 1/2 成分)。
+
+## 🔬 update⁸¹ (2026-07-08 lane-a /loop) — chain 部品完備 (fold 本体のみ残)
+
+### ✅ landed (commit 1ba4ddde ほか, sorry-free)
+- `columnSum_injective` (S12_Section9Counts): columnSum の dual-単射 — set 相異 → dual 相異。
+- `sOf_anchor_diff_support` (S13): X-統一 hdegS₁diff — hunif 下で全 member の anchor-diff が
+  A₀-supported (S₁ ⊆ X ゆえ全 step 共通供給)。
+- `mem_pairUnion` は S07:4998 に既存確認。
+
+### fold 本体 `caseB_coherent_sOf_H0Cprime_of_mixed` の設計 (次 iteration、一点集中)
+named (§9/caseB facts): hunif (∀ deg d) / hDeg (2 < |cut|) / hdne1 (d ≠ 1) / anchor
+(hχ₁mem/irr/deg)。構成:
+- pair j := (columnSum (muColumnChar kⱼ), conj) where kⱼ = Fin-cast (j+1)、N := w2 − 1
+- hcover: dichotomy → k ≠ 0 → j := k−1 < N、φ = pair.1; conj は sOf closure で X ⊆
+- hpairs: columnSum ∈ sOf? — **⚠ 要確認: μ = columnSum (muColumnChar k) ∈ sOf(H0Cprime) が
+  hpairs (pairSet ⊆ X) に必要** — all-reducible corner では membership は逆向き (member →
+  certainTypeSet) だった。caseB での「columnSum ∈ sOf(H0Cprime)」= μ-column が family に属す
+  (Coq (9.5)/(9.8): μ_j ∈ S_H0C ⊆ S_H0C′) — **S12_Section9Counts の
+  muGrid_column_sum_mem_sOf_H0_and_reducible (:256) が sOf(H0) 版!** sOf(H0) ⊆ sOf(H0Cprime)?
+  向き注意: H0 ≤ H0Cprime → kernel 条件は antitone (sOf_antitone: 大きい Y ⊆ 小さい Y…
+  sOf(H0Cprime) ⊇ sOf(H0C) [update⁴⁶ hyp.sOf_H0C_subset_sOf_H0Cprime] — H0 ≤ H0C′ →
+  sOf(H0Cprime) ⊆ sOf(H0)! 逆向き!) — **μ ∈ sOf(H0Cprime) は sOf(H0) membership からは出ない**
+  (H0Cprime-kernel はより強い条件)。μ の source の kernel が H0C′ ⊇ H0 を含むか = μ の source
+  θ_k は H0C′ を kill するか — Coq: μ_j ∈ S_ H0C (H0C-kernel) ⊆ S_ H0C′ ✓ (H0C′ ≤ H0C、
+  antitone で S_H0C ⊆ S_H0C′) — Lean: sOf(H0C) ⊆ sOf(H0Cprime) (sOf_H0C_subset_sOf_H0Cprime
+  landed ✓) — ∴ **μ ∈ sOf(H0C) を確立** → ⊆ で H0Cprime へ。μ ∈ sOf(H0C):
+  muGrid_column_sum_mem_sOf_H0_and_reducible は sOf(H0) — H0C 版が必要 (source kernel が
+  C も kill: μ の source は HC-linear の induce ゆえ C ⊆ ker ✓ 数学的には真、Lean 補題要 —
+  or named hμmem : ∀ k ≠ 0, columnSum (muColumnChar k) ∈ sOf(H0Cprime) として §9 fact 化)。
+- hstep: by_cases skip / adjoin (supply = update⁸⁰-⁸¹ 部品)。
+まず hμmem を named にして fold を先に閉じ、hμmem の実証明 (source kernel 計算) は後続。
