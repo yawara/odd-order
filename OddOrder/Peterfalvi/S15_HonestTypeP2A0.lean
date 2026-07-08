@@ -199,6 +199,22 @@ theorem escaping_honestTypeP2A0Set_mem_honestTypeP2ASet {M : Subgroup G} (data :
   · exact ⟨hpa, haesc⟩
   · exact absurd (conjClassSetIn_typePV_centralizer_le_M data hva) haesc
 
+/-- **(13.2.e) `normedTI` core for the `A₀`-support: no `A₀(S)`-point escapes.**  Every escaping
+`A₀(S)`-point reduces to an escaping `A(S)`-point (`escaping_honestTypeP2A0Set_mem_honestTypeP2ASet`,
+since `V^S` does not escape), and the honest `A(S)` has no escaping point on a type-`P₂` maximal
+(`escaping_honestTypeP2ASet_eq_empty`, the proven (13.2.e) core via BG Theorem D(4)).  So the full
+`'A0(S)` support is `normedTI`: this is the trivial-stabilizer input `∀ a, dadeHypS0.H a = ⊥` the
+`τ_S = Ind_S^G` Dade=Ind bridge needs (feeding (13.18.c) `⟨Γ, 1_G⟩ = 0` etc., issue 9076). -/
+theorem escaping_honestTypeP2A0Set_eq_empty [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP2 : OddOrder.BG.Ch4.S14.IsTypeP2 M) (data : TypePData M) :
+    OddOrder.GroupTheory.escapingCentralizerSet M (honestTypeP2A0Set M data) = ∅ := by
+  rw [Set.eq_empty_iff_forall_notMem]
+  intro a ha
+  have hAesc := escaping_honestTypeP2A0Set_mem_honestTypeP2ASet data ha
+  rw [escaping_honestTypeP2ASet_eq_empty hG hM hP2] at hAesc
+  exact Set.notMem_empty a hAesc
+
 /-! ### The `A₀(S) ⊆ A0Set M K₀` bridge (issue 9076 piece 4c)
 
 The honest support `honestTypeP2A0Set M data = A(S) ∪ V^S` embeds into BG's Theorem-E set
@@ -574,6 +590,32 @@ theorem Hypothesis.dadeHypS0_hconj [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     (hyp.dadeHypS0 hG).HConjInvariant :=
   (dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.S_maximal hyp.S_typeP2 hyp.Sdata).some.hconj
+
+/-- **`dadeHypS0.H a = ftSupportKernel S (A₀(S)) a`** (A₀ analogue of `dadeHypS_H_eq_ftSupportKernel`).
+The `'A0(S)`-instance Dade stabilizer at a support point `a` is the faithful (8.14) signalizer kernel
+`R(a) = ftSupportKernel S (A₀(S)) a`, read off the `H_eq_ftSupportKernel` field of the underlying
+`DadeSupportHypothesisData` that `dadeHypS0` is projected from. -/
+theorem Hypothesis.dadeHypS0_H_eq_ftSupportKernel [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (a : {a : G // a ∈ honestTypeP2A0Set hyp.S hyp.Sdata}) :
+    (hyp.dadeHypS0 hG).H a =
+      OddOrder.Peterfalvi.S10.ftSupportKernel hyp.S (honestTypeP2A0Set hyp.S hyp.Sdata) a.1 :=
+  (dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.S_maximal hyp.S_typeP2
+    hyp.Sdata).some.H_eq_ftSupportKernel a
+
+/-- **All `'A0(S)`-instance Dade stabilizers vanish** (the (13.2.e) `A₀` `normedTI` conclusion): since
+no `A₀(S)`-point escapes (`escaping_honestTypeP2A0Set_eq_empty`), the faithful kernel
+`ftSupportKernel S (A₀(S)) a` is `⊥` at every support point
+(`ftSupportKernel_eq_bot_of_not_escaping`).  This is the trivial-stabilizer input the `τ_S = Ind_S^G`
+Dade=Ind bridge consumes (for (13.18.c) `⟨Γ,1_G⟩ = 0` and pin C `tauS_mu_row0_vanish_on_V`). -/
+theorem Hypothesis.forall_dadeHypS0_H_eq_bot [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    ∀ a : {a : G // a ∈ honestTypeP2A0Set hyp.S hyp.Sdata}, (hyp.dadeHypS0 hG).H a = ⊥ := by
+  intro a
+  rw [hyp.dadeHypS0_H_eq_ftSupportKernel hG a]
+  have hempty := escaping_honestTypeP2A0Set_eq_empty hG hyp.S_maximal hyp.S_typeP2 hyp.Sdata
+  exact OddOrder.Peterfalvi.S10.ftSupportKernel_eq_bot_of_not_escaping
+    (fun hesc => Set.notMem_empty a.1 (hempty ▸ hesc))
 
 /-! ### Prime-`TI` pins for the (13.18) `S`-side cross-relation (issue 9076 piece 4c-4)
 
