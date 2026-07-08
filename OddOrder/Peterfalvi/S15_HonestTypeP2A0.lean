@@ -224,4 +224,26 @@ theorem dadeSupportHypothesisData_honestTypeP2A0Set [Fintype G] [Finite G]
     intro m x hm
     exact honestTypeP2A0Set_conj_mem data hm
 
+/-- **(13.18) `S`-instance `'A0`-Dade hypothesis**: the `Hypothesis`-level instantiation of
+`dadeSupportHypothesisData_honestTypeP2A0Set` at the type-`P₂` maximal `S` (via `hyp.S_maximal`/
+`hyp.S_typeP2`/`hyp.Sdata`), packaging the honest full support `A₀(S) = A(S) ∪ V^S` as an
+`S04.Hypothesis`.  This is the `S`-side Dade datum for the (13.18) cross-relation
+`τ_S(μ_{0j} − μ_{01}) = η_{0j} − η_{01}` — the `μ`-column differences are `A₀(S)`-supported (the
+`V_S`-part falls outside `A(S) ⊆ S'`), so the `A(S)`-Dade `dadeHypS` cannot see them; `dadeHypS0`
+is the correction.  (Its `.fullDadeIsometryData` inherits the one deep `'A0`-`normedTI` pin
+`not_isConj_honestTypeP2ASet_typePV`.) -/
+noncomputable def Hypothesis.dadeHypS0 [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    OddOrder.Peterfalvi.S04.Hypothesis G (honestTypeP2A0Set hyp.S hyp.Sdata) hyp.S :=
+  (dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.S_maximal hyp.S_typeP2 hyp.Sdata).some.dade
+
+/-- **(13.18) `S`-instance `'A0`-Dade `H`-conjugation invariance**: the `HConjInvariant` of
+`dadeHypS0`, carried by the underlying `DadeSupportHypothesisData` (Peterfalvi (8.14)/(8.15)).  This
+is the `hconj` input for `dadeHypS0.fullDadeIsometryData`, so the `'A0`-Dade isometry
+`τ_S = dadeIntegralCharacterMap (dadeHypS0 hG) …` is well-defined. -/
+theorem Hypothesis.dadeHypS0_hconj [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    (hyp.dadeHypS0 hG).HConjInvariant :=
+  (dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.S_maximal hyp.S_typeP2 hyp.Sdata).some.hconj
+
 end OddOrder.Peterfalvi.S15
