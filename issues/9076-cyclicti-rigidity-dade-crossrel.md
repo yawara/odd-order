@@ -252,3 +252,41 @@ prime-TI μ-grid の cross-column 構造のみ**。精査で判明した **重�
 prime-TI に接続)、or (b) S15↔§12 framework bridge (carrier 構成前提ゆえ bridge lemma 単独では pin 未 discharge)。
 **hub 裁定要**: lane c を (i) lane-b char cascade 支援に再配置 / (ii) S16 W-side の別 gated frontier / (iii) 他。
 lane c は本 flag 後も /loop 継続 (報告≠停止); 次 iteration は S16 W-side 等で ungated piece を再走査。
+
+## ⚠ LANE-B 診断解決 (2026-07-08, /loop 再開): (13.18) μ-carrier の honest source = prime-TI residue (§12 muGrid でない)
+
+上の HUB FLAG (lane c) は「S15.mu の honest source = §12 `Hypothesis.muGrid`、connection = S15 carrier
+構成」とした。lane-b が code-level 精査し、**§12 muGrid route には type obstruction がある**ことを確定
+(訂正):
+
+- **§12.Hypothesis は type-P1 gated**: `type_alt : IsTypeIII ∨ IsTypeIV ∨ IsTypeV` (S12_Core:352)
+  = `IsTypeP1`。Dade support `typePA0` も `dadeSupportHypothesisData_typePA0_of_isTypeP1` (S10:2340) で
+  P1 gated。**S は type-P2** (`S_typeP2`; `not_isTypeII_of_isTypeIII_or_IV`/`not_isTypeII_of_isTypeV`,
+  S16_MainResults:5670/5682 で III/IV/V と disjoint) ⟹ **S に §12.Hypothesis は構成不能**。
+- **真の honest source = prime-TI residue grid** (pins 自身の docstring が既に明示: Coq `prTIres`/
+  `prDade_sub_TIirr_on`/`prTIirr_id`, issue 9014)。`mu2 = (columnFamily χ₂).mu` は §12 muGrid と**同一
+  オブジェクト** (両者 `h.columnFamily.mu`) だが、その構成は **S06 certain-type のみ依存で type-uniform**
+  (`muGrid` は dadeData 非依存、`.toHypothesis = typePData_toS06Hypothesis` のみ使用)。
+- ∴ S (P2) も `typePData_toS06Hypothesis hyp.Sdata` (IsTypeP は `isTypeP_of_isTypeP2 S_typeP2` で供給、
+  **no IsTypeP1**) で S06.Hypothesis を持ち、`PrimeTIResidueData.ofS06Hypothesis` (sorry-free constructor、
+  9014 で完成済) で residue grid を構成できる。
+
+**lane-b 構築 (commit `03e9c01c`、新 leaf `OddOrder/Peterfalvi/S13_PrimeTIResidueBridge.lean`)**:
+- `Hypothesis.s06S hG : S06.Hypothesis ↥S` (type-uniform bridge)。
+- `Hypothesis.residueS hG : PrimeTIResidueData ↥S S' |W₁| |W₂|` (ofS06Hypothesis 経由、全 field discharged)。
+- `PrimeTIResidueData.mu2_ne` (PrimeTIResidue.lean、汎用): entrywise distinctness =
+  **pin 1 `mu_row0_ne` の residue-side content** (i=i'=0, j≠j' の special case)。
+  `(hyp.residueS hG …).mu2_ne` で S-side 取得。
+- full build 3942 green・AxiomsCheck OK・新 axiom/sorry なし。
+
+**残 (full pin discharge に必要、lane-b 継続)**:
+1. **pin 2/3 の residue facts**: μ差 support ⊆ A0(S) (Coq `prDade_sub_TIirr_on`) + V-value = ω
+   (Coq `prTIirr_id`)。residue API に追加 (support は induce structure、V-value は σ-image identity on V)。
+2. **carrier field `hyp.mu = residueS.mu2`** (index 整合込み): S15.mu (free field) を residue grid に
+   同定。これは **FeitThompson.lean (lane-a) の `sectionSixteenHypothesis_of_inputs` 供給** = cross-lane。
+   HUB 調整要 (S15.Hypothesis に field 追加 → FeitThompson で mu := residueS.mu2 供給)。
+3. 上記後に **c-owned S15_HonestTypeP2A0 の 3 pins** を residue API cite で discharge (c 側 or carve-out)。
+
+**⟹ HUB へ**: lane c の「§12 muGrid connection」route は type obstruction で dead。lane-b が
+prime-TI residue route で置換中 (bridge landed)。carrier field (item 2) の FeitThompson 供給が
+cross-lane 調整点。lane c の (13.18) A0-Dade infra (既 landed) はそのまま residue route で再利用可。

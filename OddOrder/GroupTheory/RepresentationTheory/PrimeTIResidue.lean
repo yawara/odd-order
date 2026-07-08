@@ -290,6 +290,21 @@ theorem prTIred_inj (hq : q ≠ 0) : Function.Injective D.primeTIred := by
   rw [hj, D.cfnorm_prTIred j₂] at h0
   exact hq (by exact_mod_cast h0)
 
+/-- **Entrywise distinctness of the prime-TI grid** (Coq `cfdot_prTIirr`, off-diagonal): distinct
+grid positions carry distinct irreducibles, `mu2 i j ≠ mu2 i' j'` whenever `(i, j) ≠ (i', j')`.
+
+Immediate from `mu2_orthonormal`: if the two coincide then their cross inner product is the self
+inner product `1`, but the orthonormality value off the diagonal is `0`.  This is the residue-side
+content of Peterfalvi (13.18)'s **row-`0` distinctness** pin (`S15.Hypothesis.mu_row0_ne`, the
+special case `i = i' = 0`, `j ≠ j'`). -/
+theorem mu2_ne {i i' : Fin q} {j j' : Fin p} (h : ¬ (i = i' ∧ j = j')) :
+    (D.mu2 i j : ClassFunction S ℂ) ≠ (D.mu2 i' j' : ClassFunction S ℂ) := by
+  intro heq
+  have h1 := D.mu2_orthonormal i i' j j'
+  rw [if_neg h] at h1
+  rw [heq, D.mu2_orthonormal i' i' j' j', if_pos ⟨rfl, rfl⟩] at h1
+  exact one_ne_zero h1
+
 /-! ### The residue `chi_ 0` and `μ_0` -/
 
 /-- **`prTIres0`** (Coq `PFsection4.v:608`): the `0`-residue is the trivial character. -/
