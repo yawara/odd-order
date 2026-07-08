@@ -340,6 +340,62 @@ theorem maximalSigmaSubgroupsOfElement_eq_singleton_of_centralizer_le [Finite G]
   rw [← hcconj]
   exact conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer (hCM hcC))
 
+/-- **`¬FittingIsTI M` produces an escaping `σ`-sharp element** (the honest reverse of
+`not_fittingIsTI_of_mem_fittingSharp_of_centralizer_not_le`): if `F(M)` is not a `TI`-subgroup then
+some `z ∈ M_σ#` has `C_G(z) ⊄ M`.  The `TI`-failure gives `g ∉ M` with `F(M) ⊓ F(M)^g ≠ ⊥`
+(`exists_notMem_inf_conj_fitting_ne_bot_of_not_fittingIsTI`); *every* prime dividing that
+intersection lies in `σ(M)` (`mem_sigma_of_prime_dvd_card_inf_conj_fitting`), so any nonidentity `z`
+in it is a `σ(M)`-element, hence `z ∈ M_σ#` (via `M`) and `z ∈ M_σ(M^g)` (via `M^g = conj g • M`,
+`σ` conjugation-invariant).  Were `C_G(z) ≤ M`, the singleton
+`maximalSigmaSubgroupsOfElement_eq_singleton_of_centralizer_le` would force `𝓜_σ(z) = {M}`,
+contradicting `M^g ∈ 𝓜_σ(z)` (which would give `g ∈ N_G(M) = M`, against `g ∉ M`).  The reverse
+reduction toward the all-type-I `FittingIsTI` argument (its remaining gap being the type-`P₂`
+neighbour, BG Cor 15.9 / `escapingCentralizers_control`). -/
+theorem exists_sigmaSharp_escape_of_not_fittingIsTI [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hnotTI : ¬ S15.FittingIsTI M) :
+    ∃ z : G, z ∈ S14.sigmaSharp M ∧ ¬ Subgroup.centralizer ({z} : Set G) ≤ M := by
+  classical
+  obtain ⟨g, hgM, hne⟩ := exists_notMem_inf_conj_fitting_ne_bot_of_not_fittingIsTI hnotTI
+  set H : Subgroup G :=
+    S15.fittingInAmbient M ⊓ MulAut.conj g • S15.fittingInAmbient M with hHdef
+  rw [Subgroup.ne_bot_iff_exists_ne_one] at hne
+  obtain ⟨x, hx1⟩ := hne
+  have hxH : (x : G) ∈ H := SetLike.coe_mem x
+  have hxinf : (x : G) ∈ S15.fittingInAmbient M ∧
+      (x : G) ∈ MulAut.conj g • S15.fittingInAmbient M := Subgroup.mem_inf.mp (hHdef ▸ hxH)
+  have hz1 : (x : G) ≠ 1 := fun h => hx1 (OneMemClass.coe_eq_one.mp h)
+  -- `z = ↑x` is a `σ(M)`-element: every prime of `ord z` divides `|H| = |F(M) ⊓ F(M)^g|`.
+  have hzpi : IsPiElement (OddOrder.BG.Ch3.S10.sigma M) (x : G) := by
+    intro p hp_mem
+    have hpp : p.Prime := Nat.prime_of_mem_primeFactors hp_mem
+    have hord : orderOf (x : G) ∣ Nat.card ↥H := by
+      rw [Subgroup.orderOf_coe]; exact orderOf_dvd_natCard x
+    exact mem_sigma_of_prime_dvd_card_inf_conj_fitting hG hM hgM hpp
+      (hHdef ▸ ((Nat.dvd_of_mem_primeFactors hp_mem).trans hord))
+  -- `z ∈ M_σ#` (via `M`).
+  have hzM : (x : G) ∈ M := OddOrder.BG.Ch2.S08.fittingInG_le M hxinf.1
+  have hzMsigma : (x : G) ∈ OddOrder.BG.Ch3.S10.Msigma M :=
+    S14.mem_Msigma_of_isPiElement_sigma_of_mem hG hM hzM hzpi
+  -- `M^g` maximal, `z ∈ M_σ(M^g)`.
+  have hMg_max : (MulAut.conj g • M) ∈ maximalSubgroups G :=
+    S14.mem_maximalSubgroups_of_isConjugateSubgroup hM ⟨g, rfl⟩
+  have hzMg : (x : G) ∈ (MulAut.conj g • M) :=
+    conj_smul_mono (MulAut.conj g) (OddOrder.BG.Ch2.S08.fittingInG_le M) hxinf.2
+  have hzMsigmaG : (x : G) ∈ OddOrder.BG.Ch3.S10.Msigma (MulAut.conj g • M) :=
+    S14.mem_Msigma_of_isPiElement_sigma_of_mem hG hMg_max hzMg
+      (by rw [S14.sigma_conj_smul_eq]; exact hzpi)
+  refine ⟨(x : G), ⟨hzMsigma, hz1⟩, ?_⟩
+  intro hCzM
+  have hsingle : S14.maximalSigmaSubgroupsOfElement (x : G) = {M} :=
+    maximalSigmaSubgroupsOfElement_eq_singleton_of_centralizer_le hG hM hzMsigma hz1 hCzM
+  have hMg_in : (MulAut.conj g • M) ∈ S14.maximalSigmaSubgroupsOfElement (x : G) :=
+    ⟨hMg_max, hzMsigmaG⟩
+  rw [hsingle, Set.mem_singleton_iff] at hMg_in
+  have hgN : g ∈ Subgroup.normalizer M := mem_normalizer_of_conj_smul_eq_self hMg_in
+  rw [S14.normalizer_eq_self_of_mem_maximalSubgroups hG hM] at hgN
+  exact hgM hgN
+
 /-- **Pointed sharp transitivity upgrades to full sharp transitivity** (regular action): if `R`
 acts on `S` so that every `L ∈ S` is `M₀^r` for a *unique* `r ∈ R`, then `R` is sharply transitive
 on `S` — for `A, B ∈ S` the unique `r ∈ R` with `B = A^r` is `r = b a⁻¹` (where `A = M₀^a`,
