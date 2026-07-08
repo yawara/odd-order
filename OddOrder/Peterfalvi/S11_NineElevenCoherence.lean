@@ -852,6 +852,53 @@ theorem caseA_char_inertia_two_summands {data : TypesIIIIIIVSetup M} {chief : Ch
   ⟨caseA_char_inertia_of_summand (caseA.Hpart_aInvariant i) (caseA.Hpart_order i) hregi g hinv,
     caseA_char_inertia_of_summand (caseA.Hpart_aInvariant j) (caseA.Hpart_order j) hregj g hinv⟩
 
+/-- **(9.11.2) two-summand inertia containment `C_U(H_i) ⊓ C_U(H_j) ⊆ I(θ) ⊓ U`** (the reverse `⊇`).
+For a linear character `χ` of `H̄` supported on the two summands `H_i`, `H_j` (trivial on every other
+summand `H_k`, `hsupp`), a `U`-element `g` centralizing both (`aInvariantRestrictAut … g = 1` on `i`
+and `j`) fixes `χ`: `χ(g·x) = χ(x)` for all `x`.  Proof by the generators argument — `χ∘g` and `χ`
+agree on each summand `H_k` (on `H_i`/`H_j` because `g` acts as the identity; on the others because
+`χ` is trivial there and `g·H_k = H_k` by `U`-invariance), and the summands span `H̄`
+(`Hpart_iSup`), so `χ∘g = χ` (`MonoidHom.eq_of_eqOn_top` on `MonoidHom.eqLocus`).
+
+Together with `caseA_char_inertia_two_summands` (the `⊆` half) this identifies the inertia of a
+two-summand-supported regular `θ`: `I(θ) ⊓ U = C_U(H_i) ⊓ C_U(H_j) = U₁ ∩ U₁ʷ`.  The (9.11.2)
+degree computation then reads off `[U : U₁ ∩ U₁ʷ]` as the inertia index. -/
+theorem caseA_centralizes_two_summands_fixes_char {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
+    (caseA : CliffordCaseAData chars) {i j : Fin data.q}
+    (χ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    (hsupp : ∀ k, k ≠ i → k ≠ j → ∀ x ∈ caseA.Hpart k, χ x = 1)
+    (g : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U)
+    (hgi : aInvariantRestrictAut (caseA.Hpart_aInvariant i) g = 1)
+    (hgj : aInvariantRestrictAut (caseA.Hpart_aInvariant j) g = 1) :
+    ∀ x, χ ((uActionHom data chief) g x) = χ x := by
+  -- `g` acts as the identity on `H_i` and `H_j` (from `aInvariantRestrictAut … g = 1`).
+  have hcent : ∀ k : Fin data.q, (k = i ∨ k = j) → ∀ x ∈ caseA.Hpart k,
+      (uActionHom data chief) g x = x := by
+    rintro k (rfl | rfl) x hx
+    · have h := aInvariantRestrictAut_coe (caseA.Hpart_aInvariant k) g ⟨x, hx⟩
+      rw [hgi] at h; simpa using h.symm
+    · have h := aInvariantRestrictAut_coe (caseA.Hpart_aInvariant k) g ⟨x, hx⟩
+      rw [hgj] at h; simpa using h.symm
+  -- `χ ∘ (uActionHom g)` and `χ` agree on every summand, which span `H̄`.
+  have hle : (⨆ k, caseA.Hpart k) ≤
+      MonoidHom.eqLocus (χ.comp ((uActionHom data chief) g).toMonoidHom) χ := by
+    rw [iSup_le_iff]
+    intro k x hx
+    show (χ.comp ((uActionHom data chief) g).toMonoidHom) x = χ x
+    rw [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom]
+    by_cases hk : k = i ∨ k = j
+    · rw [hcent k hk x hx]
+    · push_neg at hk
+      rw [hsupp k hk.1 hk.2 _ ((caseA.Hpart_aInvariant k).smul_mem g hx),
+        hsupp k hk.1 hk.2 x hx]
+  rw [caseA.Hpart_iSup] at hle
+  have heq : χ.comp ((uActionHom data chief) g).toMonoidHom = χ :=
+    MonoidHom.eq_of_eqOn_top fun x _ => hle (Subgroup.mem_top x)
+  intro x
+  have := DFunLike.congr_fun heq x
+  rwa [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom] at this
+
 end NineElevenTwoInertia
 
 /-- **`[U : K₁ ⊓ K₂] ≤ [U:K₁]·[U:K₂]`** (relative-index form of `Subgroup.index_inf_le`): the
