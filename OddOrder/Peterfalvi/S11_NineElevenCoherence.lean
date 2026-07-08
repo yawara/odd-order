@@ -930,6 +930,32 @@ theorem nineElevenFive_arithmetic_contradiction {q a : ℕ} (hq : 3 ≤ q) (ha :
     exact Nat.le_of_mul_le_mul_right this ha3
   exact absurd hfinal (Nat.not_le.mpr (add_two_lt_two_pow hq))
 
+/-- **Peterfalvi (9.11.3), the `|𝒮₄|` count** (arithmetic core, denominator-cleared).
+
+Book (9.11.3): the sum-of-squares class equation on the quotient `HŪ/(H₀C)` — `n` characters of
+degree `u` and `q(p−1)u/a²` of degree `a`, plus the `u` linear characters of `Ū` — gives
+`p^q·u = u + n·u² + q(p−1)·u` (`hclass`).  Cancelling one `u` yields `n·u + q(p−1) + 1 = p^q`; with
+the conjugate/reducible split `n = q·|𝒮₄| + (p−1)` (`hn`: `(9.8.b)` gives `p−1` of the `n` inducing
+reducibly, the rest falling into `W₁`-orbits of size `q`), this rearranges to the cleared count
+`|𝒮₄|·qu + (p−1)u + (p−1)q + 1 = p^q` — the `hcount` input of `nineElevenFive_refutation` (with
+`p = 2a+1`).  The two group inputs `hclass` (character sum-of-squares) and `hn` (W₁-orbit count) are
+the deep (9.11.3) content, supplied separately. -/
+theorem nineElevenThree_count {p q u n S4 : ℕ} (hu : 1 ≤ u)
+    (hclass : u + n * u ^ 2 + q * (p - 1) * u = p ^ q * u)
+    (hn : n = S4 * q + (p - 1)) :
+    S4 * (q * u) + (p - 1) * u + (p - 1) * q + 1 = p ^ q := by
+  -- Cancel one `u` from the class equation: `n·u + q(p−1) + 1 = p^q`.
+  have key : (n * u + q * (p - 1) + 1) * u = p ^ q * u := by
+    have hexp : (n * u + q * (p - 1) + 1) * u = u + n * u ^ 2 + q * (p - 1) * u := by ring
+    rw [hexp]; exact hclass
+  have hnu : n * u + q * (p - 1) + 1 = p ^ q :=
+    Nat.eq_of_mul_eq_mul_right (by omega) key
+  -- Substitute the `W₁`-orbit split and reassociate.
+  rw [hn] at hnu
+  have hre : (S4 * q + (p - 1)) * u + q * (p - 1) + 1
+      = S4 * (q * u) + (p - 1) * u + (p - 1) * q + 1 := by ring
+  rw [← hre]; exact hnu
+
 /-- **Peterfalvi (9.11.5), the full refutation** (`|𝒮₄| ≤ ‖α‖²` is impossible).
 
 The (9.11.5) argument in denominator-cleared `ℕ` form.  Inputs (all `ℕ`, integrality already used):
