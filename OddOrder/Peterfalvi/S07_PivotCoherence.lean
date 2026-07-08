@@ -757,4 +757,81 @@ theorem exists_pivotPartner {τ : IntegralCharacterMap L G}
 
 end PivotPartner
 
+/-! ### The (5.7) norm-general uniform-degree coherence producer
+
+Assembling `exists_pivotPartner` (the (5.7) partner construction) into the `pivotCoherence`
+engine gives Coq's `uniform_degree_coherence` (`PFsection5.v:1234`): a subcoherent family whose
+members share a degree is coherent, with **no norm-1 restriction** — the reducible certain-type
+columns `μ_j` of norm `q` are admissible.  This is the piece the (9.11) Galois/caseB branch fires
+on the whole family `𝒮(H₀C′)` (`PFsection9.v:1510-1513`, issue 9075). -/
+
+section UniformDegreeCoherence
+
+variable [Fintype L] [Fintype G]
+variable [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+
+/-- **Peterfalvi (5.7): norm-general uniform-degree coherence** (Coq `uniform_degree_coherence`,
+`PFsection5.v:1234`).
+
+Given a subcoherent `S07.Hypothesis` on a finite family `S` whose members share a common nonzero
+degree, `S` is coherent — with **no norm-1 restriction**.  Unlike `coherent_of_constant_degree`
+(which requires every member irreducible, `⟨ζ, ζ⟩ = 1`), the pivot route accepts members of any
+genuine-character norm: the distinguished pivot `η₁` needs only a natural-number self-norm
+(`hN`, the "`⟨χ₁⟩ ∈ Num.nat`" of Coq's clause (a), which the `S07.Hypothesis` transcription omits),
+and the partner `ζ₁` is built by `exists_pivotPartner` from the per-member `R`-data.
+
+The nonzero-norm requirement of every member (needed for the pivot coefficient functional) is
+*derived* from `no_real_characters`: `0` is real, so `0 ∉ S`, whence every member is nonzero and has
+strictly positive self-norm.
+
+This is the (9.11) Galois/caseB engine: applied to the whole `𝒮(H₀C′)` — reducible `μ`-columns of
+norm `q` included — it discharges coherence in one shot, with no auxiliary `2 < |cut|` count. -/
+theorem uniform_degree_coherence_of_subcoherent
+    (hyp : Hypothesis (L := L) (G := G) S A)
+    (hSfin : S.Finite)
+    {η₁ : ClassFunction L ℂ} (hη₁ : η₁ ∈ S)
+    (hN : ∃ n : ℕ, ClassFunction.inner η₁ η₁ = (n : ℂ))
+    (hZdiff : ∀ a ∈ S, ∀ b ∈ S, hyp.tau (a - b) ∈ ZIrr G)
+    (hdeg : ∀ a ∈ S,
+      ((a : ClassFunction L ℂ) : L → ℂ) 1 = ((η₁ : ClassFunction L ℂ) : L → ℂ) 1)
+    (hdeg0 : ((η₁ : ClassFunction L ℂ) : L → ℂ) 1 ≠ 0)
+    (h1A : (1 : L) ∉ A)
+    (hsuppdiff : ∀ a ∈ S, ∀ b ∈ S, ((a - b : ClassFunction L ℂ)).support ⊆ A)
+    {η₂ : ClassFunction L ℂ} (hη₂ : η₂ ∈ S) (hη₂ne : η₂ ≠ η₁) :
+    Nonempty (IsCoherent hyp.tau S A) := by
+  classical
+  -- nonzero self-norm of every member: `0` is real, so `0 ∉ S`
+  have hnormNe : ∀ a ∈ S, ClassFunction.inner a a ≠ 0 := by
+    intro a ha hz
+    have hare : (ClassFunction.inner a a).re = 0 := by rw [hz, Complex.zero_re]
+    exact hyp.no_real_characters ha
+      ((eq_zero_of_inner_self_re_eq_zero hare) ▸ ClassFunction.isReal_zero)
+  -- pairwise orthogonality in applied form
+  have horth : ∀ a ∈ S, ∀ b ∈ S, a ≠ b → ClassFunction.inner a b = 0 :=
+    fun a ha b hb hab => hyp.pairwise_orthogonal ha hb hab
+  -- the per-member orthonormal `R`-families and their (5.2.e) cross-orthogonality
+  have hRorth : ∀ ⦃φ ξ : ClassFunction L ℂ⦄ (hφ : φ ∈ S) (hξ : ξ ∈ S),
+      ClassFunction.inner φ ξ = 0 → ClassFunction.inner φ ξ.conj = 0 →
+      ((hyp.difference_image hφ).toOrthonormalImage).Orthogonal
+        ((hyp.difference_image hξ).toOrthonormalImage) :=
+    fun {φ ξ} hφ hξ h1 h2 =>
+      CharacterDifferenceImage.toOrthonormalImage_orthogonal
+        (hyp.difference_image hφ) (hyp.difference_image hξ)
+        (hyp.difference_images_orthogonal hφ hξ h1 h2)
+  -- build the pivot partner `ζ₁` for `η₁`
+  obtain ⟨ζ₁, hζZ, hnorm, hpivot⟩ :=
+    exists_pivotPartner (τ := hyp.tau) (A := A) hη₁
+      (fun η hη => (hyp.difference_image hη).toOrthonormalImage)
+      horth
+      (fun a ha => hyp.conjugate_mem ha)
+      (fun a ha => hyp.ne_conj ha)
+      hN
+      hyp.tau_isometry_diff
+      hZdiff hsuppdiff hRorth
+  -- fire the pivot coherence engine
+  exact ⟨pivotCoherence hSfin hη₁ hζZ horth hnormNe hnorm hpivot
+    (fun φ ψ hφ hψ => hyp.tau_isometry_diff hφ hψ) hZdiff hdeg hdeg0 h1A hsuppdiff hη₂ hη₂ne⟩
+
+end UniformDegreeCoherence
+
 end OddOrder.Peterfalvi.S07
