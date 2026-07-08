@@ -1448,6 +1448,245 @@ theorem caseA_inertia_eq_hcuInHuPair {data : TypesIIIIIIVSetup M} {chief : Chief
   · rw [sup_le_iff]
     exact ⟨ClassFunction.subgroup_le_inertia θ₀, cuInHuPair_le_inertia caseA χ hsupp⟩
 
+/-! ### (9.11.2) the inertia **index** `[HU : I(θ₀)] = [U : C_U(H_i) ∩ C_U(H_j)]`
+
+Computes the index of the (9.11.2) two-summand inertia `I(θ₀) = H·(C_U(H_i) ∩ C_U(H_j))`
+(`caseA_inertia_eq_hcuInHuPair`) in `HU`.  Mirrors the a-owned single-generator chain
+`index_hcuInHu_eq_relindex_cuInHu` + `index_cuInHu_subgroupOf_uInHu_eq_a` (and the all-summand
+`hc_index_eq_u`), replacing `cuInHu`/`C_U(S₀)` with the pair `cuInHuPair`/`C_U(H_i) ∩ C_U(H_j)`:
+the second-isomorphism step `[HU : H·K] = [U : K]` (`K ◁ U` normal as an intersection of the two
+single-factor centralizer kernels) followed by the realization `[uInHu : cuInHuPair] = [U : K]`.
+This is Peterfalvi (9.11.2)'s inertia index `[U : U₁ ∩ U₁ʷ]` — the degree of the source character
+whose `M`-induction lands in `𝒮(H₀C′)`, feeding the degree dichotomy `[U:U₁∩U₁ʷ] ∈ {u,a}`. -/
+
+omit [Finite G] in
+open Subgroup in
+/-- **`C_U(H_j) ◁ U`** for a general Clifford summand (mirrors `cuSub_subgroupOf_U_normal` for
+`S₀`): the realization `cuSubOf j` is the `G`-image of the kernel `ker(aInvariantRestrictAut H_j)`,
+so its `subgroupOf U` is normal (kernels are normal, transported by the realization iso
+`↥(U.subgroupOf (U ⊔ W₁)) ≃* ↥U`). -/
+theorem cuSubOf_subgroupOf_U_normal {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) (j : Fin data.q) :
+    ((cuSubOf caseA j).subgroupOf data.U).Normal := by
+  set e := subgroupOfEquivOfLe (le_sup_left : data.typeP.U ≤ data.typeP.U ⊔ data.typeP.W1) with he
+  have heq : (cuSubOf caseA j).subgroupOf data.U
+      = (aInvariantRestrictAut (caseA.Hpart_aInvariant j)).ker.map e.toMonoidHom := by
+    ext x
+    simp only [Subgroup.mem_subgroupOf]
+    constructor
+    · intro hx
+      simp only [cuSubOf, Subgroup.mem_map] at hx
+      obtain ⟨z, ⟨y, hy, hyz⟩, hzx⟩ := hx
+      refine ⟨y, hy, ?_⟩
+      apply Subtype.ext
+      rw [MulEquiv.coe_toMonoidHom, he, subgroupOfEquivOfLe_apply_coe, ← hzx, ← hyz]
+      rfl
+    · rintro ⟨y, hy, rfl⟩
+      simp only [cuSubOf, Subgroup.mem_map]
+      refine ⟨_, ⟨y, hy, rfl⟩, ?_⟩
+      rw [MulEquiv.coe_toMonoidHom, he, subgroupOfEquivOfLe_apply_coe]
+      rfl
+  rw [heq]
+  exact (MonoidHom.normal_ker _).map e.toMonoidHom e.surjective
+
+omit [Finite G] in
+/-- **`C_U(H_i) ∩ C_U(H_j) ◁ U`** (the two-summand centralizer is normal in `U`): the intersection
+of the two single-factor normal centralizers (`cuSubOf_subgroupOf_U_normal`), via `subgroupOf`
+distributing over `⊓` (`Subgroup.comap_inf`) and `⊓` of normals being normal. -/
+theorem cuSubOf_pair_subgroupOf_U_normal {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (i j : Fin data.q) :
+    ((cuSubOf caseA i ⊓ cuSubOf caseA j).subgroupOf data.U).Normal := by
+  have hi := cuSubOf_subgroupOf_U_normal caseA i
+  have hj := cuSubOf_subgroupOf_U_normal caseA j
+  have hEq : (cuSubOf caseA i ⊓ cuSubOf caseA j).subgroupOf data.U
+      = (cuSubOf caseA i).subgroupOf data.U ⊓ (cuSubOf caseA j).subgroupOf data.U := by
+    simp only [Subgroup.subgroupOf, Subgroup.comap_inf]
+  rw [hEq]
+  refine ⟨fun n hn g => Subgroup.mem_inf.mpr ⟨?_, ?_⟩⟩
+  · exact hi.conj_mem n (Subgroup.mem_inf.mp hn).1 g
+  · exact hj.conj_mem n (Subgroup.mem_inf.mp hn).2 g
+
+omit [Finite G] in
+/-- `|C_U(H_i) ∩ C_U(H_j)|` realized inside `HU` equals its `G`-cardinality (mirrors
+`card_cuInHu_eq`): the double `subgroupOf` realization is an injective image. -/
+theorem card_cuInHuPair_eq {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (i j : Fin data.q) :
+    Nat.card ↥(cuInHuPair caseA i j) = Nat.card ↥(cuSubOf caseA i ⊓ cuSubOf caseA j) := by
+  have hKleU : cuSubOf caseA i ⊓ cuSubOf caseA j ≤ data.U := inf_le_left.trans (cuSubOf_le_U caseA i)
+  have hCsubM : (cuSubOf caseA i ⊓ cuSubOf caseA j).subgroupOf M ≤ huSub data :=
+    Subgroup.subgroupOf_mono M (hKleU.trans (le_sup_right : data.U ≤ data.H ⊔ data.U))
+  have hCleM : cuSubOf caseA i ⊓ cuSubOf caseA j ≤ M := hKleU.trans (U_le_M data)
+  calc Nat.card ↥(cuInHuPair caseA i j)
+      = Nat.card ↥((cuSubOf caseA i ⊓ cuSubOf caseA j).subgroupOf M) :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hCsubM).toEquiv
+    _ = Nat.card ↥(cuSubOf caseA i ⊓ cuSubOf caseA j) :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hCleM).toEquiv
+
+omit [Finite G] in
+open Subgroup in
+/-- **`C_U(H_i) ∩ C_U(H_j) ◁ U` realized inside `HU`** (mirrors `cuInHu_normal`):
+`cuInHuPair ◁ uInHu`, transported from `(cuSubOf i ⊓ cuSubOf j) ◁ U` along `↥uInHu ≃* ↥U`. -/
+theorem cuInHuPair_normal {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (i j : Fin data.q) :
+    ((cuInHuPair caseA i j).subgroupOf (uInHu data)).Normal := by
+  have hUsubM : data.U.subgroupOf M ≤ huSub data :=
+    Subgroup.subgroupOf_mono M (le_sup_right : data.U ≤ data.H ⊔ data.U)
+  set f : ↥(uInHu data) ≃* ↥data.U :=
+    (subgroupOfEquivOfLe hUsubM).trans (subgroupOfEquivOfLe (U_le_M data)) with hf
+  have hgval : ∀ x : ↥(uInHu data), ((f x : ↥data.U) : G) = (((x : ↥(huSub data)) : ↥M) : G) := by
+    intro x
+    have h1 : (f x : ↥data.U)
+        = subgroupOfEquivOfLe (U_le_M data) (subgroupOfEquivOfLe hUsubM x) := by rw [hf]; rfl
+    rw [h1, subgroupOfEquivOfLe_apply_coe, subgroupOfEquivOfLe_apply_coe]
+  have hcomap : (cuInHuPair caseA i j).subgroupOf (uInHu data)
+      = ((cuSubOf caseA i ⊓ cuSubOf caseA j).subgroupOf data.U).comap f.toMonoidHom := by
+    ext x
+    simp only [cuInHuPair, Subgroup.mem_subgroupOf]
+    rw [Subgroup.mem_comap, Subgroup.mem_subgroupOf, MulEquiv.coe_toMonoidHom, hgval x]
+  rw [hcomap]
+  exact (cuSubOf_pair_subgroupOf_U_normal caseA i j).comap f.toMonoidHom
+
+omit [Finite G] in
+/-- **`H·(C_U(H_i) ∩ C_U(H_j)) ◁ HU`** (mirrors `hcuInHu_normal`): the (9.11.2) inertia subgroup is
+normal.  From `H ◁ HU` (`hInHu_normal`), `C_U(H_i) ∩ C_U(H_j) ◁ U` (`cuInHuPair_normal`), and
+`H ⊔ U = ⊤` (`hInHu_sup_uInHu_eq_top`) via `sup_normal_of_normal_left_of_normal_subgroupOf`. -/
+theorem hcuInHuPair_normal {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (i j : Fin data.q) :
+    (hInHu data ⊔ cuInHuPair caseA i j).Normal :=
+  haveI := hInHu_normal data
+  haveI := cuInHuPair_normal caseA i j
+  OddOrder.GroupTheory.sup_normal_of_normal_left_of_normal_subgroupOf
+    (cuInHuPair_le_uInHu caseA i j) (hInHu_sup_uInHu_eq_top data)
+
+/-- **`C = C_U(H̄) ≤ C_U(H_i) ∩ C_U(H_j)`** realized (`cInHu ≤ cuInHuPair`): centralizing the whole
+chief factor implies centralizing each summand (`cSub_le_cuSubOf`), realized through the double
+`subgroupOf`. -/
+theorem cInHu_le_cuInHuPair {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (i j : Fin data.q) : cInHu data chief ≤ cuInHuPair caseA i j :=
+  Subgroup.subgroupOf_mono _ (Subgroup.subgroupOf_mono _
+    (le_inf (cSub_le_cuSubOf caseA i) (cSub_le_cuSubOf caseA j)))
+
+/-- **`U ⊓ H·(C_U(H_i) ∩ C_U(H_j)) = C_U(H_i) ∩ C_U(H_j)`** realized (mirrors
+`uInHu_inf_hcuInHu_eq_cuInHu`), the second-iso input for `[HU : H·K] = [U : K]`.  The crux
+`hInHu ⊓ uInHu ≤ cuInHuPair` factors through `H ⊓ U ≤ C` (`hInHu_inf_uInHu_le_cInHu`) and
+`C ≤ K` (`cInHu_le_cuInHuPair`). -/
+theorem uInHu_inf_hcuInHuPair_eq_cuInHuPair {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
+    (caseA : CliffordCaseAData chars) (i j : Fin data.q) :
+    uInHu data ⊓ (hInHu data ⊔ cuInHuPair caseA i j) = cuInHuPair caseA i j := by
+  haveI := hInHu_normal data
+  apply le_antisymm
+  · rintro x ⟨hxU, hxHC⟩
+    obtain ⟨hh, hhmem, cc, ccmem, rfl⟩ := Subgroup.mem_sup_of_normal_left.mp hxHC
+    have hcc_u : cc ∈ uInHu data := cuInHuPair_le_uInHu caseA i j ccmem
+    have hh_u : hh ∈ uInHu data := by
+      have h1 : hh * cc * cc⁻¹ ∈ uInHu data :=
+        (uInHu data).mul_mem hxU ((uInHu data).inv_mem hcc_u)
+      rwa [mul_inv_cancel_right] at h1
+    have hh_c : hh ∈ cuInHuPair caseA i j :=
+      cInHu_le_cuInHuPair caseA i j
+        (hInHu_inf_uInHu_le_cInHu data chief (Subgroup.mem_inf.mpr ⟨hhmem, hh_u⟩))
+    exact (cuInHuPair caseA i j).mul_mem hh_c ccmem
+  · exact le_inf (cuInHuPair_le_uInHu caseA i j) le_sup_right
+
+/-- **Second-iso index step: `[HU : H·(C_U(H_i) ∩ C_U(H_j))] = [U : C_U(H_i) ∩ C_U(H_j)]`**
+(realized `(hInHu ⊔ cuInHuPair).index = (cuInHuPair.subgroupOf uInHu).index`).  Mirrors
+`index_hcuInHu_eq_relindex_cuInHu`: the second isomorphism theorem for `H·K ◁ HU` with
+`uInHu ⊔ H·K = ⊤`, and `uInHu ⊓ H·K = K` (`uInHu_inf_hcuInHuPair_eq_cuInHuPair`). -/
+theorem index_hcuInHuPair_eq_relindex_cuInHuPair {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
+    (caseA : CliffordCaseAData chars) (i j : Fin data.q) :
+    (hInHu data ⊔ cuInHuPair caseA i j).index
+      = ((cuInHuPair caseA i j).subgroupOf (uInHu data)).index := by
+  haveI : (hInHu data ⊔ cuInHuPair caseA i j).Normal := hcuInHuPair_normal caseA i j
+  have htop : uInHu data ⊔ (hInHu data ⊔ cuInHuPair caseA i j) = ⊤ := by
+    rw [← sup_assoc, sup_comm (uInHu data) (hInHu data), hInHu_sup_uInHu_eq_top, top_sup_eq]
+  have he := Nat.card_congr (QuotientGroup.quotientInfEquivProdNormalQuotient
+    (uInHu data) (hInHu data ⊔ cuInHuPair caseA i j)).toEquiv
+  have hsub : (hInHu data ⊔ cuInHuPair caseA i j).subgroupOf (uInHu data)
+      = (cuInHuPair caseA i j).subgroupOf (uInHu data) := by
+    ext x
+    simp only [Subgroup.mem_subgroupOf]
+    constructor
+    · intro hx
+      have hxin : (x : ↥(huSub data))
+          ∈ uInHu data ⊓ (hInHu data ⊔ cuInHuPair caseA i j) :=
+        Subgroup.mem_inf.mpr ⟨x.2, hx⟩
+      rw [uInHu_inf_hcuInHuPair_eq_cuInHuPair caseA i j] at hxin
+      exact hxin
+    · intro hx; exact Subgroup.mem_sup_right hx
+  rw [hsub] at he
+  have hsplit := Subgroup.card_eq_card_quotient_mul_card_subgroup
+    ((hInHu data ⊔ cuInHuPair caseA i j).subgroupOf
+      (uInHu data ⊔ (hInHu data ⊔ cuInHuPair caseA i j)))
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right :
+        (hInHu data ⊔ cuInHuPair caseA i j)
+          ≤ uInHu data ⊔ (hInHu data ⊔ cuInHuPair caseA i j))).toEquiv,
+    ← he, ← Subgroup.index_eq_card] at hsplit
+  have htopcard : Nat.card ↥(uInHu data ⊔ (hInHu data ⊔ cuInHuPair caseA i j))
+      = Nat.card ↥(huSub data) := by
+    rw [htop]; exact Nat.card_congr Subgroup.topEquiv.toEquiv
+  rw [htopcard] at hsplit
+  have hmul := Subgroup.card_mul_index (hInHu data ⊔ cuInHuPair caseA i j)
+  rw [hsplit, mul_comm (((cuInHuPair caseA i j).subgroupOf (uInHu data)).index)] at hmul
+  exact Nat.eq_of_mul_eq_mul_left Nat.card_pos hmul
+
+/-- **`[U : C_U(H_i) ∩ C_U(H_j)] = [uInHu : cuInHuPair]`** (realized index equals ambient-`G`
+relative index).  Both sides multiply by `|C_U(H_i) ∩ C_U(H_j)|` to `|U|` (Lagrange in the `uInHu`
+realization and in `U`), cancelling the positive common factor.  Mirrors the `relIndex_cSub_U_eq_u`
+style. -/
+theorem index_cuInHuPair_subgroupOf_uInHu_eq_relIndex {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
+    (caseA : CliffordCaseAData chars) (i j : Fin data.q) :
+    ((cuInHuPair caseA i j).subgroupOf (uInHu data)).index
+      = (cuSubOf caseA i ⊓ cuSubOf caseA j).relIndex data.U := by
+  have hI : Nat.card ↥(cuSubOf caseA i ⊓ cuSubOf caseA j)
+      * ((cuInHuPair caseA i j).subgroupOf (uInHu data)).index = Nat.card ↥data.U := by
+    have h := Subgroup.card_mul_index ((cuInHuPair caseA i j).subgroupOf (uInHu data))
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (cuInHuPair_le_uInHu caseA i j)).toEquiv,
+      card_cuInHuPair_eq caseA i j, card_uInHu_eq data] at h
+    exact h
+  have hII : Nat.card ↥(cuSubOf caseA i ⊓ cuSubOf caseA j)
+      * (cuSubOf caseA i ⊓ cuSubOf caseA j).relIndex data.U = Nat.card ↥data.U := by
+    have h := Subgroup.card_mul_index ((cuSubOf caseA i ⊓ cuSubOf caseA j).subgroupOf data.U)
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+      (inf_le_left.trans (cuSubOf_le_U caseA i))).toEquiv] at h
+  exact Nat.eq_of_mul_eq_mul_left Nat.card_pos (hI.trans hII.symm)
+
+/-- **Peterfalvi (9.11.2), the inertia index `[HU : I(θ₀)] = [U : C_U(H_i) ∩ C_U(H_j)]`.**
+
+For the inflation `θ₀` of the two-summand-supported linear character `linearIrreducibleCharacter χ`
+(regular on `H_i`, `H_j`, `hsupp` off them), the index of its `HU`-inertia group equals the
+relative index of the realized two-summand centralizer `C_U(H_i) ∩ C_U(H_j)` in `U`.  Combines the
+inertia identity `I(θ₀) = H·(C_U(H_i) ∩ C_U(H_j))` (`caseA_inertia_eq_hcuInHuPair`) with the
+second-iso step (`index_hcuInHuPair_eq_relindex_cuInHuPair`) and the realization
+(`index_cuInHuPair_subgroupOf_uInHu_eq_relIndex`).  This is the genuine geometric
+`[U : U₁ ∩ U₁ʷ]` of Peterfalvi (9.11.2): the degree of the source character whose `M`-induction
+lands in `𝒮(H₀C′)`, feeding the degree dichotomy `[U : U₁ ∩ U₁ʷ] ∈ {u, a}`. -/
+theorem caseA_inertia_index_eq {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) {i j : Fin data.q}
+    (χ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    (hsupp : ∀ k, k ≠ i → k ≠ j → ∀ x ∈ caseA.Hpart k, χ x = 1)
+    (hregi : ∃ x ∈ caseA.Hpart i,
+      (linearIrreducibleCharacter χ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+        ≠ (linearIrreducibleCharacter χ : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1)
+    (hregj : ∃ x ∈ caseA.Hpart j,
+      (linearIrreducibleCharacter χ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+        ≠ (linearIrreducibleCharacter χ : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1) :
+    (ClassFunction.inertia (G := ↥(huSub data)) (H := hInHu data)
+        (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (linearIrreducibleCharacter χ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))).index
+      = (cuSubOf caseA i ⊓ cuSubOf caseA j).relIndex data.U := by
+  rw [caseA_inertia_eq_hcuInHuPair caseA χ hsupp hregi hregj,
+    index_hcuInHuPair_eq_relindex_cuInHuPair caseA i j,
+    index_cuInHuPair_subgroupOf_uInHu_eq_relIndex caseA i j]
+
 end NineElevenTwoInertia
 
 /-- **`[U : K₁ ⊓ K₂] ≤ [U:K₁]·[U:K₂]`** (relative-index form of `Subgroup.index_inf_le`): the
