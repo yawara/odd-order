@@ -4147,18 +4147,125 @@ theorem gammaGrid_defGamma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         - (hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩
           - hyp.eta ⟨0, hyp.q_prime.pos⟩ j) by abel, key, sub_self]
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(13.18.a), `'A0(S)`-support form**: `supp(β_j) ⊆ 'A0(S)` for `j ≠ 0`.
+
+The Coq `A0beta` (`PFsection13.v:1870`), obtained from `PVSbeta` (`β_j ∈ 'CF(S, P^# ∪ V_S)`,
+`PFsection13.v:1833`) via `P^# ∪ V_S ⊆ 'A0(S)`.  `PVSbeta` cancels the induced permutation character
+`Ind_{PW₁}^S 1` against `μ_{0j}` off `P^# ∪ V_S`, using the `W₁`-class `normedTI` structure in
+`S̄ = S/P = Ū ⋊ W̄₁` (Coq `gammaW1`) together with the prime-`TI` residue value `prTIirr_id`; both
+bottom out at the shared prime-`TI` residue content (issue 9014) that connects the free `μ`-grid to
+the σ-residue theory.  **This single `'A0`-support obligation is what both `gammaGrid_orthogonal_one`
+and `gammaGrid_Y_norm_bound` reduce to** (the honest `'A0`-Dade=Ind bridge
+`sInstance_dade0_eq_induce`, issue 9076, then discharges the remaining Dade content). -/
+theorem betaGrid_A0_support [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
+    (betaGrid hyp j).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set hyp.S hyp.Sdata) hyp.S := sorry
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.18.c)** `⟨Γ, 1_G⟩ = 0`.
 
-⚠ DEEP §13 RESIDUAL, isolated obligation.  Coq `oGamma1`: `⟨Γ,1⟩ = ⟨τ_S β,1⟩ − 1 + ⟨η_{01},1⟩`;
-`⟨η_{01},1⟩ = 0` (grid orthogonality) and `⟨τ_S β,1⟩ = 1` via the Dade=Ind bridge
-(`hyp.sInstance_dade_eq_induce_of_supported_trivial_H`, gated on the (13.2.e) `A₀(S)` normedTI) +
-Frobenius reciprocity + `⟨μ_{0j},1_S⟩ = 0`.  The Dade=Ind bridge's normedTI hypotheses are the
-missing content. -/
+**De-scaffolded** (issue 9076): the `'A0(S)` `normedTI` content the old docstring flagged as
+"missing" is now supplied by the honest `'A0`-Dade=Ind bridge `sInstance_dade0_eq_induce`.  Reduction
+(Coq `oGamma1`): `⟨Γ,1⟩ = ⟨τ_S β_{#1},1⟩ − ⟨1,1⟩ + ⟨η_{01},1⟩`, and
+* `⟨1,1⟩ = 1` (`constOne_inner_self_eq_one`);
+* `⟨η_{01},1⟩ = 0` — grid orthogonality: `1_G = η_{00}` (`eta_principal_eq_trivial`) and `η_{01} ⊥
+  η_{00}` (`eta_orthonormal`);
+* `⟨τ_S β_{#1},1_G⟩ = 1` — the bridge gives `τ_S β_{#1} = Ind_S^G β_{#1}` (needs `β_{#1}` supported in
+  `'A0(S)`, `betaGrid_A0_support`), so by Frobenius reciprocity (`inner_induce_eq_inner_restrict`)
+  `⟨Ind_S^G β_{#1}, 1_G⟩ = ⟨β_{#1}, 1_S⟩ = ⟨Ind_{PW₁}^S 1, 1_S⟩ − ⟨μ_{01}, 1_S⟩ = 1 − 0`, where
+  `⟨Ind 1, 1_S⟩ = 1` (`inner_induce_trivialChar_constOne_eq_one`) and `⟨μ_{01}, 1_S⟩ = 0` (`μ_{01}`
+  irreducible and `≠ 1_S`, since `⟨Ind 1, μ_{01}⟩ = 0 ≠ 1`, `indPW1_inner_mu`).
+
+The **single** remaining gate is `betaGrid_A0_support` (the (13.18.a) `'A0`-support). -/
+private theorem gammaGrid_orthogonal_one_aux [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    ClassFunction.inner (GammaGrid hG hyp)
+      (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G) = 0 := by
+  classical
+  letI : Fintype ↥hyp.S := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥hyp.S : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Fintype ↥((hyp.P ⊔ hyp.W1).subgroupOf hyp.S) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥((hyp.P ⊔ hyp.W1).subgroupOf hyp.S) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  -- `⟨Ind_{PW₁}^S 1, 1_S⟩ = 1`.
+  have hind : ClassFunction.inner (indPW1 hyp)
+      (OddOrder.Peterfalvi.S09.Hypothesis71.constOne (↥hyp.S)) = 1 := by
+    rw [indPW1, ← OddOrder.RepresentationTheory.IrreducibleCharacter.coe_trivialIrreducibleCharacter]
+    exact OddOrder.Peterfalvi.S09.Cert.inner_induce_trivialChar_constOne_eq_one
+      ((hyp.P ⊔ hyp.W1).subgroupOf hyp.S)
+  -- `⟨μ_{01}, 1_S⟩ = 0`: `μ_{01}` is irreducible and `≠ 1_S` (else `⟨Ind 1, μ_{01}⟩ = 1 ≠ 0`).
+  have hmu : ClassFunction.inner
+      (hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)
+      (OddOrder.Peterfalvi.S09.Hypothesis71.constOne (↥hyp.S)) = 0 := by
+    have hIμ : ClassFunction.inner (indPW1 hyp)
+        (hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩) = 0 :=
+      indPW1_inner_mu hG hyp ⟨1, by have := hyp.three_le_p; omega⟩ (by norm_num)
+    have hne : (⟨hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩,
+          hyp.mu_irreducible ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩⟩ :
+          OddOrder.RepresentationTheory.IrreducibleCharacter ↥hyp.S)
+        ≠ OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥hyp.S := by
+      intro heq
+      apply one_ne_zero (α := ℂ)
+      have hcf : hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩
+          = OddOrder.Peterfalvi.S09.Hypothesis71.constOne (↥hyp.S) :=
+        congrArg (fun χ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥hyp.S =>
+          (χ : ClassFunction ↥hyp.S ℂ)) heq
+      rw [hcf, hind] at hIμ
+      exact hIμ
+    have hite := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite
+      (⟨hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩,
+        hyp.mu_irreducible ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩⟩ :
+        OddOrder.RepresentationTheory.IrreducibleCharacter ↥hyp.S)
+      (OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥hyp.S)
+    rw [if_neg hne] at hite
+    exact hite
+  -- `⟨τ_S(β_{#1}), 1_G⟩ = 1` via the `'A0`-Dade=Ind bridge + Frobenius reciprocity.
+  have htau : ClassFunction.inner (tauSbetaGrid hG hyp)
+      (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G) = 1 := by
+    have hbridge : tauSbetaGrid hG hyp
+        = ClassFunction.induce hyp.S (betaGrid hyp ⟨1, by have := hyp.three_le_p; omega⟩) := by
+      rw [tauSbetaGrid]
+      exact hyp.sInstance_dade0_eq_induce hG
+        (betaGrid_A0_support hG hyp ⟨1, by have := hyp.three_le_p; omega⟩ (by norm_num))
+    rw [hbridge, ClassFunction.inner_induce_eq_inner_restrict]
+    have hres : ClassFunction.restrict hyp.S
+        (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G)
+        = OddOrder.Peterfalvi.S09.Hypothesis71.constOne (↥hyp.S) := by
+      ext x; rw [ClassFunction.restrict_apply]; rfl
+    rw [hres]
+    simp only [betaGrid]
+    rw [ClassFunction.inner_sub_left, hind, hmu, sub_zero]
+  -- `⟨η_{01}, 1_G⟩ = 0`.
+  have heta : ClassFunction.inner
+      (hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)
+      (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G) = 0 := by
+    have h00 : OddOrder.Peterfalvi.S09.Hypothesis71.constOne G
+        = hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨0, hyp.p_prime.pos⟩ := by
+      rw [OddOrder.Peterfalvi.S16.eta_principal_eq_trivial hyp]; rfl
+    rw [h00]
+    have horth := OddOrder.Peterfalvi.S16.eta_orthonormal hyp
+      ⟨0, hyp.q_prime.pos⟩ ⟨0, hyp.q_prime.pos⟩
+      ⟨1, by have := hyp.three_le_p; omega⟩ ⟨0, hyp.p_prime.pos⟩
+    rw [if_neg (by rintro ⟨-, h2⟩; exact absurd (congrArg Fin.val h2) (by norm_num))] at horth
+    exact horth
+  rw [GammaGrid, ClassFunction.inner_add_left, ClassFunction.inner_sub_left,
+    OddOrder.Peterfalvi.S09.Hypothesis71.constOne_inner_self_eq_one, htau, heta]
+  ring
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(13.18.c)** `⟨Γ, 1_G⟩ = 0` (public form).  Thin wrapper over `gammaGrid_orthogonal_one_aux`
+that reconciles the caller's `Fintype G`/`Invertible (Nat.card G : ℂ)` instances with the
+`FiniteInduce`-scoped ones the core proof uses (both are `Subsingleton`). -/
 theorem gammaGrid_orthogonal_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
       ClassFunction.inner (GammaGrid hG hyp)
-        (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G) = 0 := sorry
+        (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G) = 0 := by
+  intro _ _
+  convert gammaGrid_orthogonal_one_aux hG hyp using 2 <;> exact Subsingleton.elim _ _
 
 /-- **(13.18.c)** `Γ` is real: `Γ.conj = Γ`.
 
