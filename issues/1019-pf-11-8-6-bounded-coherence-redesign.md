@@ -1832,3 +1832,27 @@ update¹³ の verdict に基づく honest fix = Coq `bridge_coherent` (generati
 `coherentUnion_of_glued_of_bridge` に置換 (X=sOf H0C, Y=SOf HC orientation)。hgen (caseA-false) 消滅、
 hDτ は単一 bridge `hbridge_τ = hcol` に collapse、hmixed (§14) のみ genuine sorry として残る。structural
 hyps (hsrc_ortho=span_inner_SOf_HC_sOf_H0C、hdeg/hsupp/h1A/hbridge_supp=setup) を discharge。
+
+## 2026-07-08 update¹⁵ (lane-a /loop, subagent) — ★★ caseA-FALSE hgen を bridge engine で ELIMINATE (spine 上から除去)
+
+update¹⁴ の `coherentUnion_of_glued_of_bridge` を capstone `coherent_SOf_H0C_of_column_identities`
+に wire (S13_Orthogonality)。**caseA-FALSE generation hgen は完全消滅** (capstone は hgen/
+`coherent_SOf_H0C_of_glued` を参照しない)。full build green 3944 jobs、AxiomsCheck OK、新 axiom 無。
+
+### 新 helper (全 sorry-free、`inducedKernelFamily` 汎用)
+- `inducedKernelFamily_mem_intDegree` (整数 degree)、`inducedKernelFamily_mem_apply_one_ne_zero`
+  (nonzero degree)、`inducedKernelFamily_zSpan_support_of_apply_one_eq_zero` (degree0→A₀-supported、
+  mixed {qu,qa} degree で uniform — `SHC_zSpan_vanish_support` の fixed-degree 制約を回避)。
+- bridge の structural hyps 8 本 (hsrc_ortho/h1A/hdeg/hsupp/hχX/hdegχ 等) は全 sorry-free discharge。
+
+### 残 sorry: 4 本 (全 TRUE、除去された false hgen とは別物)
+- `hmixed` (§14 (6.7) image-orthogonality、genuine、旧と同一)
+- `hbridge_τ` (μ-column τ-identity `hsofC.extension(∑μ_i1)=∑ω^σ_i1`、旧 hDτ の honest heir、§14/§9)
+- `hφY` (`dζ ∈ ℤ[S(HC)]`) / `hbridge_supp` (`∑μ_i1−dζ` A₀-supported) — **TRUE だが capstone signature が
+  `ζ ∈ S(HC)` + degree-match を carry しないため sorried** (caller は provide 可)。
+
+### 次: ζ data を caller から thread して hφY/hbridge_supp を close → clean end state (hmixed + hbridge_τ のみ)
+capstone に `(hζHC : ζ ∈ hyp.SOf hyp.HC)` + degree-match hyp を追加 (内部 signature のみ、spine-facing の
+`exists_zeta_residual_not_orthogonal_H0C`/`w2_lt_w1_of_hypothesis_H0C` は不変)、caller が discharge
+(ζ=params.zeta は deg-w₁ 既約 ∈ S(HC): `secondDerived_eq_HC`+`SOf_secondDerived_eq`、degree-match:
+`degree_independent`)。⟹ (11.8) route は 2 genuine §14 sorry (hmixed/hbridge_τ) のみ、caseA-false 完全排除。

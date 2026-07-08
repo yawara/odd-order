@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S13_CoreStructure
 import OddOrder.Peterfalvi.S11_NineElevenCaseA
+import OddOrder.Peterfalvi.S07_BridgeCoherent
 
 /-!
 # Peterfalvi Section 13: the (11.8.6) orthogonality endpoint — unconditional `𝒮(H₀C)` coherence
@@ -14,9 +15,10 @@ T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000),
 This leaf sits **downstream of both Clifford branches** of the (9.11) `Ptype_core_coherence`
 induction — caseA (`S11_NineElevenCaseA`) and caseB (`S13_CoreStructure`, issue 9075) are sibling
 leaves, so the case *dispatch* needs this common downstream file.  It assembles the **unconditional**
-`𝒮(H₀C)`-coherence (`coherent_sOf_H0C`) — the `hY` input of the honest (11.8.6) world-bridge union
-glue `coherent_SOf_H0C_of_glued` — which replaces the deprecated wide-`Sset \ SHCSet` uniform-degree
-route (false for non-Galois type III/IV, issue 1019).
+`𝒮(H₀C)`-coherence (`coherent_sOf_H0C`) — the `X`-side input of the honest (11.8.6) world-bridge
+union glue `S07.coherentUnion_of_glued_of_bridge` (Coq `bridge_coherent`, no generation hypothesis)
+— which replaces the deprecated wide-`Sset \ SHCSet` uniform-degree route and the caseA-false
+generation engine (both false for non-Galois type III/IV, issue 1019).
 
 The sole sorried-cite is the caseA **refuter** (the (9.11.2) pair-adjoining non-coherence, lane-b's
 active `S11_NineElevenCoherence` work); everything else — the caseB coherence, the (11.7) `H₀C′ ≤ H₀C`
@@ -30,6 +32,60 @@ open OddOrder.RepresentationTheory
 
 variable {G : Type*} [Group G]
 
+/-- **Every `inducedKernelFamily`-member has integer degree.**  A member `φ = Ind_K^L θ` has degree
+`φ(1) = |L:K|·θ(1)`, a product of natural numbers (`induce_apply_one`,
+`irreducibleCharacter_apply_one_eq_pos_natCast`), hence an integer.  This is the `hdegX`/`hdegY`
+integer-degree (character) datum of the `bridge_coherent` union engine. -/
+theorem inducedKernelFamily_mem_intDegree {M : Subgroup G} [Fintype ↥M]
+    {K : Subgroup ↥M} [Invertible (Nat.card ↥K : ℂ)] {X : Subgroup ↥M} {φ : ClassFunction ↥M ℂ}
+    (hφ : φ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily K X) :
+    ∃ n : ℤ, OddOrder.Peterfalvi.S03.characterDegree φ = (n : ℂ) := by
+  obtain ⟨θ, -, -, rfl⟩ := hφ
+  obtain ⟨d, -, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+  refine ⟨((K.index * d : ℕ) : ℤ), ?_⟩
+  rw [OddOrder.Peterfalvi.S03.characterDegree_def, ClassFunction.induce_apply_one, hd]
+  push_cast; ring
+
+/-- **Every `inducedKernelFamily`-member has nonzero degree.**  `φ(1) = |L:K|·θ(1)` with both
+factors positive naturals.  Supplies the `hdegχ` (nonzero anchor degree) input of `bridge_coherent`
+for the reducible μ-column bridge. -/
+theorem inducedKernelFamily_mem_apply_one_ne_zero {M : Subgroup G} [Fintype ↥M]
+    {K : Subgroup ↥M} [Invertible (Nat.card ↥K : ℂ)] {X : Subgroup ↥M} {φ : ClassFunction ↥M ℂ}
+    (hφ : φ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily K X) :
+    φ 1 ≠ 0 := by
+  obtain ⟨θ, -, -, rfl⟩ := hφ
+  obtain ⟨d, hdpos, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+  rw [ClassFunction.induce_apply_one, hd]
+  exact mul_ne_zero (Nat.cast_ne_zero.mpr Subgroup.index_ne_zero_of_finite)
+    (Nat.cast_ne_zero.mpr (by omega))
+
+/-- **A degree-`0` element of `ℤ[inducedKernelFamily K X]` is `A₀`-supported** whenever `K^# ⊆ A₀`.
+Every member `Ind_K^L θ` vanishes off the normal `K` (`induce_apply_eq_zero_of_not_mem_normal`),
+so the whole integral span does; a span element with `φ(1) = 0` then has its support inside
+`K ∖ {1} ⊆ A₀`.  This is the `hsuppX`/`hsuppY` degree/support dictionary of `bridge_coherent`,
+uniform across the mixed degrees of `𝒮(H₀C)` (unlike `SHC_zSpan_vanish_support`, which anchors on a
+fixed degree). -/
+theorem inducedKernelFamily_zSpan_support_of_apply_one_eq_zero {M : Subgroup G} [Fintype ↥M]
+    {K : Subgroup ↥M} [K.Normal] [Invertible (Nat.card ↥K : ℂ)] {X : Subgroup ↥M} {A0 : Set ↥M}
+    (hKsupp : ∀ x : ↥M, x ∈ K → x ≠ 1 → x ∈ A0) {φ : ClassFunction ↥M ℂ}
+    (hφ : φ ∈ Submodule.span ℤ (OddOrder.Peterfalvi.S08.inducedKernelFamily K X)) (h1 : φ 1 = 0) :
+    φ.support ⊆ A0 := by
+  have hsuppK : ∀ g : ↥M, g ∉ K →
+      ∀ ψ ∈ Submodule.span ℤ (OddOrder.Peterfalvi.S08.inducedKernelFamily K X), ψ g = 0 := by
+    intro g hg ψ hψ
+    induction hψ using Submodule.span_induction with
+    | mem x hx =>
+        obtain ⟨θ, -, -, rfl⟩ := hx
+        exact ClassFunction.induce_apply_eq_zero_of_not_mem_normal K _ hg
+    | zero => rw [ClassFunction.zero_apply]
+    | add x y _ _ hx hy => rw [ClassFunction.add_apply, hx, hy, add_zero]
+    | smul c x _ hx => rw [← Int.cast_smul_eq_zsmul ℂ c x, ClassFunction.smul_apply, hx, mul_zero]
+  intro g hg
+  rw [ClassFunction.mem_support] at hg
+  by_cases hgK : g ∈ K
+  · exact hKsupp g hgK (by rintro rfl; exact hg h1)
+  · exact absurd (hsuppK g hgK φ hφ) hg
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11), unconditional: `𝒮(H₀C)` is coherent on `A₀(M)`** — the Clifford dichotomy
 `clifford_dichotomy` dispatches to caseB (landed `caseB_coherent_sOf_H0C`, issue 9075 via the (11.7)
@@ -39,8 +95,8 @@ induction — is the sole sorried-cite.  The `𝒮(H₀C)`-restriction witness (
 the conjugate difference `μ̄ − μ` of a reducible μ-column (`columnSum_muColumnChar_mem_sOf_H0C`,
 `w₂ ≥ 2`), `A₀`-supported and nonzero (odd-order no-real-characters).
 
-This is the unconditional `hY` (𝒮(H₀C)-coherence) input of the honest (11.8.6) world-bridge union
-glue `coherent_SOf_H0C_of_glued`; contradicting (11.3) `S_H0C_not_coherent` closes (11.8) without the
+This is the unconditional `X`-side (𝒮(H₀C)-coherence) input of the honest (11.8.6) world-bridge union
+glue `S07.coherentUnion_of_glued_of_bridge`; contradicting (11.3) `S_H0C_not_coherent` closes (11.8) without the
 false wide uniform-degree route (issue 1019). -/
 theorem coherent_sOf_H0C [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
@@ -92,7 +148,8 @@ Both `S(HC)` and `𝒮(H₀C)` embed into the pairwise-orthogonal general family
 have nonzero (positive real) norm (`inducedKernelFamily_inner_self_real_pos`) and are finite
 (`inducedKernelFamily_finite`); and `S(HC) ⊥ 𝒮(H₀C)` (`SOf_HC_inner_sOf_H0C_eq_zero`).  So the S07
 non-orthonormal glue `exists_integralCharacterMap_glue_of_orthogonal` applies directly, supplying
-the `ν`/`hagreeX`/`hagreeY` input of the narrow union-glue `coherent_SOf_H0C_of_glued`. -/
+the `ν`/`hagreeX`/`hagreeY` input of the narrow union-glue
+`S07.coherentUnion_of_glued_of_bridge`. -/
 theorem exists_glue_nu_H0C [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
     (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau (hyp.SOf hyp.HC) hyp.base.A0)
     (hY : OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
@@ -137,36 +194,38 @@ theorem exists_glue_nu_H0C [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
     coh.extension hY.extension
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (11.8.6) narrow union-coherence capstone** — the world-bridge analogue of
-`S12.Hypothesis.coherent_Sset_of_column_identities`, targeting the *narrow* family `S(H₀C)` via the
-`𝒮(H₀C)` coherence (contradicting (11.3)), NOT the deprecated wide `Sset \ SHCSet` uniform-degree
-route (false for non-Galois type III/IV, issue 1019).
+/-- **Peterfalvi (11.8.6) narrow union-coherence capstone** — targeting the *narrow* family `S(H₀C)`
+via the `𝒮(H₀C)` coherence (contradicting (11.3)), NOT the deprecated wide `Sset \ SHCSet`
+uniform-degree route (false for non-Galois type III/IV, issue 1019).
 
-From the `S(HC)`-coherence `coh` (Peterfalvi's `τ₁`), the **unconditional** `𝒮(H₀C)`-coherence `hY`
-(`coherent_sOf_H0C`, the `τ₂`), and the column identities
-`(∑ᵢ μ_{ij} − dζ)^τ = ∑ᵢ ω_{ij}^σ − dζ^{τ₁}` (`hcol`, `0 < j`), the glued `τ₃` map
-(`exists_glue_nu_H0C`) assembles a coherent extension of `S(H₀C) = S(HC) ∪ 𝒮(H₀C)`
-(`coherent_SOf_H0C_of_glued`, `SOf_H0C_eq_SOf_HC_union_sOf`).
+From the `S(HC)`-coherence `coh` (Peterfalvi's `τ₁`), the **unconditional** `𝒮(H₀C)`-coherence
+`hsofC` (`coherent_sOf_H0C`, the `τ₂`), and the column identities `hcol`, the glued `τ₃` map
+(`exists_glue_nu_H0C`) assembles a coherent extension of `S(H₀C) = 𝒮(H₀C) ∪ S(HC)` via **Coq's
+`bridge_coherent`** engine `S07.coherentUnion_of_glued_of_bridge` (no generation hypothesis).
 
-Three inputs of the union-glue engine remain as the genuine §14/§9 character content, mirroring the
-S12 wide-route sorries (`coherent_Sset_of_column_identities` at S12:4888/4896/4917):
-- `hmixed` — the (6.7) image-side orthogonality (`⟨coh.extension x, hY.extension y⟩ = 0`, the `b ≡ 0`
-  congruence, §14/Sibley-gated);
-- `hDτ` — the (5.8) column identity on the cross-diagonals `∑ᵢ μ_{ij} − dζ ∈ D` (fed by `hcol`,
-  §14-gated after the `τ`-rewrite);
-- `hgen` — the (6.8.1) generation with the single degree-`qu` diagonal `D = {∑ᵢ μ_{ij} − dζ}`.
-  ⚠ **This `hgen` is TRUE only in Clifford caseB** (uniform degree `q·u`,
-  `forall_mem_sOf_H0C_apply_one_eq_qu`, caseB-gated).  In **caseA it is FALSE**: `𝒮(H₀C)` then
-  contains degree-`qa` irreducibles (`a>1`, `qa = a·w₁ ≠ qu`; Coq `Ptype_core_coherence` non-Galois
-  branch, `PFsection9.v:1537`), and `χ_qa − a·ζ` is A₀-supported (`inducedKernelFamily_scaledDiff_support`)
-  but *not* in `span ℤ (… ∪ D)` (the invariant `π = Σ Y-degree/q (mod u)` is `0` on every RHS
-  generator but `a ≢ 0 (mod u)` on `χ_qa − a·ζ`, since `0 < a < u`).  The capstone *statement* is
-  nonetheless TRUE (Coq proves the same coherence via `bridge_coherent`, `PFsection11.v:954`, which
-  needs **no** generation hypothesis — the mixed `qa` content lives inside `hY` and the single
-  `qu`-bridge suffices via norm-based `Zisometry_of_cfnorm`).  **The generation-based S07 engine is the
-  wrong tool for this mixed-degree family**; the honest fix is a Coq-faithful `bridge_coherent` S07
-  engine (no `hgen`), or a caseA/caseB split (caseB genuine, caseA on the enriched/bridge route).
-  See issue 1019 update¹³. -/
+**Routed through `bridge_coherent`, the caseA-FALSE generation hypothesis `hgen` is gone.**  The old
+generation engine `coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal` needed
+`hgen : ℤ[𝒮(H₀C) ∪ S(HC)]_{A₀} ⊆ ℤ[…∪D]` with a single degree-`qu` diagonal — **FALSE in Clifford
+caseA**, where `𝒮(H₀C)` is mixed degree `{qu, qa}` and `χ_qa − a·ζ` is `A₀`-supported yet outside
+that span (issue 1019 update¹³).  `bridge_coherent` avoids generation entirely: it glues along a
+**single** `A₀`-supported bridge `χ − φ = ∑ᵢ μ_{i1} − dζ` (`χ ∈ 𝒮(H₀C)`, `φ ∈ ℤ[S(HC)]`), the mixed
+`qa` content living inside `hsofC`'s own coherence.  The structural inputs (source/image
+orthogonality, integer degrees, the `A = L^#` degree/support dictionary) are all discharged here.
+
+Remaining genuine §14/§9 character content (NONE of it the removed false `hgen`):
+- `hmixed` — the (6.7) image-side orthogonality `⟨χ^{τ₂}, φ^{τ₁}⟩ = ⟨χ, φ⟩` (the `b ≡ 0` congruence,
+  §14/Sibley-gated) — the SAME genuine content as the old `hmixed`;
+- `hbridge_τ` — the (5.8) bridge `τ`-agreement `ν(∑ᵢ μ_{i1} − dζ) = τ(∑ᵢ μ_{i1} − dζ)`, which via the
+  `ν`-agreements + `hcol` is `hsofC.extension (∑ᵢ μ_{i1}) = ∑ᵢ ω^σ_{i1}` (the `𝒮(H₀C)` coherent
+  extension sends the reducible μ-column to the aligned ω^σ-column).  `coherent_sOf_H0C` carries no
+  such μ-column image pin — this is the honest heir of the old `hDτ` sorry, §14/§9-gated.
+
+Two further bridge inputs (`hφY : dζ ∈ ℤ[S(HC)]`, `hbridge_supp : ∑ᵢ μ_{i1} − dζ` `A₀`-supported)
+are TRUE but currently `sorry`ed because they need `ζ ∈ S(HC)` and the degree match
+`(∑ᵢ μ_{i1})(1) = d·ζ(1)`, which the *signature* does not carry (only `ζ ∈ inducedFamily M ⊋ S(HC)`);
+both are caller-supplied facts (`ζ` irreducible of degree `w₁`; `secondDerived_eq_HC` +
+`SOf_secondDerived_eq`; `degree_independent`).  Threading `ζ ∈ hyp.SOf hyp.HC` (+ degree) into the
+signature closes them, leaving only `hmixed`/`hbridge_τ`.  See issue 1019 update¹³. -/
 theorem coherent_SOf_H0C_of_column_identities [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
@@ -179,29 +238,72 @@ theorem coherent_SOf_H0C_of_column_identities [Finite G]
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := by
   haveI := hyp.base.finiteG
   classical
-  -- `hY` = the unconditional `𝒮(H₀C)`-coherence (this file's `coherent_sOf_H0C`); the `τ₃` glue `ν`
-  -- from the two coherences (issue-9016-style non-orthonormal glue).
-  obtain ⟨hY⟩ := coherent_sOf_H0C hG hyp
-  obtain ⟨ν, hagreeX, hagreeY⟩ := exists_glue_nu_H0C hyp coh hY
-  refine ⟨coherent_SOf_H0C_of_glued hyp coh hY ν hagreeX hagreeY ?_
-    {φ | ∃ j : Fin hyp.base.w2, j ≠ 0 ∧
-      φ = (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i j) - (d : ℂ) • ζ} ?_ ?_⟩
-  · -- **hmixed** → the (6.7) image-side orthogonality (§14/Sibley-gated; mirrors S12:4888).  After
-    -- `hagreeX`/`hagreeY` and the source orthogonality `⟨x,y⟩ = 0`, the residual is
-    -- `⟨coh.extension x, hY.extension y⟩ = 0` (the `b ≡ 0` congruence of the two extensions).
+  -- `hsofC` = the unconditional `𝒮(H₀C)`-coherence (this file's `coherent_sOf_H0C`) = the bridge
+  -- engine's `X`-side coherence; `coh` (`S(HC)`) is the `Y`-side.  `ν` is the `τ₃` glue of the two.
+  obtain ⟨hsofC⟩ := coherent_sOf_H0C hG hyp
+  obtain ⟨ν, hagreeSHC, hagreeSof⟩ := exists_glue_nu_H0C hyp coh hsofC
+  -- The reducible μ-column bridge anchor `χ = ∑ᵢ μ_{i1} ∈ 𝒮(H₀C)`, at the nonzero column `j = 1`.
+  have hw2 : 1 < hyp.base.w2 := hyp.params.w2_prime.one_lt
+  have hk1 : (⟨1, hw2⟩ : Fin hyp.base.w2) ≠ 0 := by
+    intro heq; have := congrArg Fin.val heq; simp at this
+  -- Kernel-family embeddings of both families into the pairwise-orthogonal `S((M')^#)`.
+  have hIKF : ∀ ⦃x : ClassFunction ↥M ℂ⦄,
+      x ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C →
+      x ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) := fun {x} hx =>
+    OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone bot_le
+      (by rw [← hyp.SOf_eq]; exact hyp.sOf_subset_SOf hyp.H0C hx)
+  have hXbridge : ∀ ⦃x : ClassFunction ↥M ℂ⦄, x ∈ hyp.SOf hyp.HC →
+      x ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) (hyp.HC.subgroupOf M) := fun {x} hx => by
+    rw [hyp.SOf_eq] at hx; exact hx
+  have hχmem : (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩)
+      ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C := by
+    rw [hyp.base.muGrid_columnSum_eq_columnSum hG hG.odd ⟨1, hw2⟩]
+    exact columnSum_muColumnChar_mem_sOf_H0C hG hyp ⟨1, hw2⟩ hk1
+  refine ⟨?_⟩
+  rw [hyp.SOf_H0C_eq_SOf_HC_union_sOf, Set.union_comm]
+  -- **`bridge_coherent`** (no generation hypothesis) — engine `X = 𝒮(H₀C)`, `Y = S(HC)`.
+  refine OddOrder.Peterfalvi.S07.coherentUnion_of_glued_of_bridge hsofC coh ν hagreeSof hagreeSHC
+    (fun u hu v hv => by
+      rw [OddOrder.RepresentationTheory.inner_conj_symm,
+        span_inner_SOf_HC_sOf_H0C_eq_zero hyp hv hu, star_zero])
+    ?hmixed hyp.base.one_notMem_A0
+    (fun x hx => inducedKernelFamily_mem_intDegree (hIKF hx))
+    (fun y hy => inducedKernelFamily_mem_intDegree (hXbridge hy))
+    (fun η hη hη0 => ⟨hη, inducedKernelFamily_zSpan_support_of_apply_one_eq_zero
+      hyp.base.mderivSharp_subset_A0 (Submodule.span_mono (fun _ hx => hIKF hx) hη) hη0⟩)
+    (fun η hη hη0 => ⟨hη, inducedKernelFamily_zSpan_support_of_apply_one_eq_zero
+      hyp.base.mderivSharp_subset_A0 (Submodule.span_mono (fun _ hx => hXbridge hx) hη) hη0⟩)
+    (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩) ((d : ℂ) • ζ)
+    hχmem ?hφY (inducedKernelFamily_mem_apply_one_ne_zero (hIKF hχmem)) ?hbridge_supp ?hbridge_τ
+  case hmixed =>
+    -- **(6.7) image-side orthogonality** (§14/Sibley-gated, the `b ≡ 0` congruence — the SAME
+    -- genuine content as the old `hmixed`).  After the `ν`-agreements the goal is
+    -- `⟨χ^{τ₂}, φ^{τ₁}⟩ = ⟨χ, φ⟩` (`χ ∈ 𝒮(H₀C)`, `φ ∈ S(HC)`).
     intro x hx y hy
-    rw [hagreeX x hx, hagreeY y hy, SOf_HC_inner_sOf_H0C_eq_zero hyp hx hy]
+    rw [hagreeSof x hx, hagreeSHC y hy]
     sorry
-  · -- **hDτ** → the (5.8) column identity (§14-gated; mirrors S12:4896).  On the cross-diagonal
-    -- `∑ᵢ μ_{ij} − dζ`, `hcol` rewrites the base map `τ`, leaving
-    -- `ν (∑ᵢ μ_{ij} − dζ) = ∑ᵢ ω^σ_{ij} − d·coh.extension ζ` (the (5.8) identity for `ν`).
-    intro d' hd'
-    obtain ⟨j, hj, rfl⟩ := hd'
-    rw [hcol j hj]
+  case hφY =>
+    -- `(d:ℂ)•ζ ∈ ℤ[S(HC)]`.  TRUE, but needs `ζ ∈ S(HC)` — the capstone carries only
+    -- `hζS : ζ ∈ inducedFamily M ⊋ S(HC)`.  The caller `exists_zeta_residual_not_orthogonal_H0C`
+    -- CAN supply `ζ ∈ S(HC)` (`ζ` irreducible of degree `w₁`; via `secondDerived_eq_HC` +
+    -- `SOf_secondDerived_eq`), so this closes once the signature threads `ζ ∈ hyp.SOf hyp.HC`.
     sorry
-  · -- **hgen** → the (6.8.1) generation.  §9 narrow uniform-degree generation (TRUE, cf.
-    -- `forall_mem_sOf_H0C_apply_one_eq_qu` — the narrow `𝒮(H₀C)` degree `q·u`, NOT the false wide
-    -- `Sset_diff_SHCSet_apply_one_eq_qu`); genuine version deferred.
+  case hbridge_supp =>
+    -- `∑ᵢ μ_{i1} − dζ ∈ ℤ[𝒮(H₀C) ∪ S(HC)]_{A₀}`.  The `ℤ`-span part is `hχmem` + `ζ ∈ S(HC)`; the
+    -- `A₀`-support part is `inducedKernelFamily_scaledDiff_support` from the degree match
+    -- `(∑ᵢ μ_{i1})(1) = d·ζ(1)`.  Both inputs (`ζ ∈ S(HC)`, degree match) are caller-supplied
+    -- (`degree_independent`: `μ_{ij}(1) = d` for `j≠0`; `ζ(1) = w₁`; `∑ᵢ = w₁·d = d·w₁`), not
+    -- available from the current signature — same signature thread as `hφY` closes it.
+    sorry
+  case hbridge_τ =>
+    -- **(5.8) bridge `τ`-agreement `ν(∑ᵢ μ_{i1} − dζ) = τ(∑ᵢ μ_{i1} − dζ)`** (§14/§9 genuine
+    -- content — the honest heir of the old `hDτ` sorry).  Via the `ν`-agreements and `hcol` this
+    -- reduces to `hsofC.extension (∑ᵢ μ_{i1}) = ∑ᵢ ω^σ_{i1}`: the `𝒮(H₀C)` coherent extension sends
+    -- the reducible μ-column to the aligned ω^σ-column.  `coherent_sOf_H0C` carries no such μ-column
+    -- image pin (Peterfalvi (10.6.a) `muColumn_tau1_pin` gives it only for the `Sset`-coherence
+    -- `CoherentHypothesis`, not the narrow `𝒮(H₀C)` one), so this is the residual §14/§9 gate.
     sorry
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
