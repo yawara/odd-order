@@ -37,15 +37,58 @@ not yet in this file" と明記; grep で `eq_signed_sub`/`dirr_small_norm` は 
   (φ=∑c(a)•a, c:→₀ℤ) / `mem_ZIrr_inner_self_eq_sum_sq` (Parseval ‖φ‖²=∑(c a)²) /
   `exists_pair_of_sum_sq_eq_two` (整数 combinatorial core: 全非零・平方和2 ⟹ 相異2元各±1)。
   → 新 leaf 不要、既存 file に assembly のみ追加 (build 3152 jobs green)。
-- [ ] **piece 2 (3.8) cyclicTI NC theory** (deep §3、次の主 frontier): `cyclicTI_NC φ := #|{(i,j) : ⟨φ,η_ij⟩≠0}|`
-  (η-grid 構成数、Coq PFsection3.v:1525) + bounds `cycTI_NC_{opp,sign,iso,irr,dirr,sub,norm}` +
-  **(3.8) `small_cycTI_NC`** (PFsection3.v:1673 近傍、φ が V 上消えて小 norm ⟹ NC 小)。σ-isometry
-  `S05.TICyclicHypothesis.sigmaIntegral` (既存) の η-grid に対して port。repo 不在 (from-scratch)。
-  `eq_signed_sub_cTIiso` が要するのは `NC(φ−ρ) < 2·min(w1,w2)` (via `cycTI_NC_sub` + `cycTI_NC_norm`)。
-- [ ] **piece 3 `eq_signed_sub_cTIiso`**: piece 1 (`exists_signed_pair_...` ✅) + piece 2 の assembly
-  (Coq PFsection3.v:1685-: ψ=φ−ρ の dirr_constt を NC bound で η-grid 内に閉じ込め、V-agreement で符号確定)。
-- [ ] **piece 4 `prDade_sub_TIirr`**: Dade norm (‖μ2_ij−μ2_ik‖²=2) + V-value + piece 3 ⟹ cross-relation。
-  → `tauS_mu_row0_cross` (S15_SAndT.lean, 3003) を discharge。
+- [x] **piece 2 (3.8) cyclicTI NC theory** — ✅ **実装済みと判明 (2026-07-08 精査)**。「repo 不在」は
+  Coq 名 grep による誤診 ([[verify-port-state-by-number-not-coq-name]] の実例):
+  NC 定義 = `sigmaNC`、(3.7) = `sigmaCoeff_add_eq`、(3.8) 弱形 = `sigmaCoeff_eq_zero_of_sigmaNC_lt`、
+  `cycTI_NC_norm` = `ncard_sigmaCoeff_ne_zero_le_of_inner_self_natCast` (全て `S05_SigmaIsometry.lean`)。
+  **(3.8) full trichotomy** = `grid_trichotomy` (`S05_GridTrichotomy.lean`, 抽象版・rank-one 分解法) +
+  `sigmaCoeff_trichotomy` (`S05_SigmaTrichotomy.lean`)。
+- [x] **piece 3 `eq_signed_sub_cTIiso`** — ✅ **実装済みと判明**: `eq_smul_chiFam_diff_of_vanishOnV`
+  (`S05_SigmaTrichotomy.lean:277`)。Coq より一般 (任意 grid index ペア P1≠P2、同一行制約なし)。
+### ⚠ 重要更新 (2026-07-08 精査): rigidity engine は S05 に既存、9076 の残りは "connection"
+
+piece 2/3 が S05 に既にあると判明したので、9076 の当初計画 (§3 from-scratch port) は**不要**。
+残る piece 4 (`tauS_mu_row0_cross` discharge) は**新 leaf を建てる話ではなく**、既存 S05 rigidity を
+consumer (S15 η-grid + τ_S Dade) に**接続する**話。以下は精査で確定した正確な状態。
+
+**correctness 発見 (要 3003 調整)**: 現 (13.18) 実装 (`tauSbetaGrid`/`GammaGrid`/`tauS_mu_row0_cross`,
+S15_SAndT.lean) は **'A(S)-Dade** (`hyp.dadeHypS` = `honestTypeP2ASet`) で組まれているが、Coq §13
+(`A0beta`/`Dtau`/`prDade_sub_TIirr`) は **'A0(S)-Dade** ('A0(S) = 'A(S) ∪ class_support(V_S, S))。
+μ差 `μ_{0j}−μ_{01}` の support は P^#∪V_S (Coq `prDade_sub_TIirr_on` = `∈ 'CF(S,'A0)`) で、V_S-part は
+'A(S) に**入らない** → `dadeIntegralCharacterMap (dadeHypS) …` の arbitrary-extension 領域に落ちる
+→ **現 `tauS_mu_row0_cross` statement は provable でない** (V_S 上で τ_S が未制御)。埋める前に A0 化必須。
+
+**⚠ 既存機構の発見 (2026-07-08)**: `S16_GridExpansion.lean` (lane c 既存) が η-grid の (3.8)
+機構を**大量に実装済み** — `eta_orthonormal`/`eta_mem_ZIrr`/`eta_principal_eq_trivial` (η₀₀=1_G)/
+`inner_eta_grid_relation` ((3.7) separability)/`grid_eq_zero_of_relation_of_card_le_two` (NC≤2 rigidity)/
+`inner_eta_eq_zero_of_vanish_of_inner_self_eq_two` (norm-2 ⊥-grid)/`eta_orthogonal_of_norm_one_pair_vanish`
+((13.19.b))。着手前に grep すべきだった (CLAUDE.md「既存を再構築しない」)。ただし既存は **NC≤2
+(all-zero) case のみ**で、difference rigidity `eq_signed_sub_cTIiso` が要する **NC(ψ)≤4 の full
+trichotomy** (constant-row/column 除外) は欠く → 4a/4b がそれを埋める。
+
+**piece 4 の状態**:
+- [x] **4a. 抽象 rigidity engine** — ✅ **完了 (commit 0d1500cc, sorry-free)**:
+  `OddOrder/Peterfalvi/S05_GridRigidity.lean` の `orthonormalGrid_diff_rigidity`。任意 orthonormal
+  ZIrr grid family に対する norm-2 difference rigidity (full trichotomy 版)。既存 `grid_trichotomy`
+  (S05_GridTrichotomy) を再利用、係数評価のみ抽象 χ に lift。orthonormality は decidable-agnostic
+  `horth_diag`/`horth_off` で受ける (ite mismatch 回避)。**interface guard「module-level generic」準拠**。
+- [x] **4b. η-grid instantiation** — ✅ **完了 (commit 9337f8d1, sorry-free)**:
+  `S16_GridExpansion.eta_diff_rigidity`。4a を cite し、既存 `eta_orthonormal`/`eta_mem_ZIrr`/
+  `inner_eta_grid_relation` から η-grid data + (3.7) separability を供給。行 i₀=0 形で (13.18) の
+  `τ_S(μ_{0j}−μ_{01}) = η_{0j}−η_{01}` の rigidity 部品を提供。(4.8)/(10.5)/(10.10)/(11.8) でも再利用可。
+- [ ] **4c. (13.18) A0-Dade 化 + cross-relation 本体** — ⚠ **correctness fix (残 blocker)**:
+  現 `tauS_mu_row0_cross` (S15_SAndT.lean:4008, sorry) は **'A(S)-Dade** (`hyp.dadeHypS` =
+  `honestTypeP2ASet` = `centralizerSupport(sharp(Msigma S), derivedInG S)` ⊆ S') で組まれているが、
+  μ差 `μ_{0j}−μ_{01}` の support は P^#∪V_S で **V_S (⊄ S'、W₂-成分≠1) は 'A(S) に入らない** →
+  `dadeIntegralCharacterMap` の arbitrary-extension 領域 → **現 statement は provable でない** (確認済:
+  `honestTypeP2ASet` = derivedInG 内、V_S は W₂ 成分ゆえ S' 外)。Coq は **'A0(S) = 'A(S) ∪
+  class_support(V_S)** (`FTtypeP_supp0_def`, `A0beta`) で組む。fix 手順:
+  1. `honestTypeP2A0Set` (= A(S) ∪ V_S-classes) 定義 + A0-Dade `DadeSupportHypothesisData`
+     (既存 `dadeSupportHypothesisData_honestTypeP2ASet` の A0 拡張、or BG `S16.A0Set` 再利用を要調査)。
+  2. tauSbetaGrid/GammaGrid/tauS_mu_row0_cross/gammaGrid_defGamma の τ_S を A0-Dade に差し替え。
+  3. tauS_mu_row0_cross 本体を **4b `eta_diff_rigidity`** で分解。残 isolated pins:
+     μ差 support ⊆ 'A0(S) (Coq `prDade_sub_TIirr_on`) / μ の V-value = ω の V-value (Coq `prTIirr_id`,
+     prime-TI) / Dade-id on V (`sInstance_dade_eq_induce_of_supported_trivial_H` の A0 拡張)。
 
 ## consumers (broad — §4/§10/§11/§13)
 
