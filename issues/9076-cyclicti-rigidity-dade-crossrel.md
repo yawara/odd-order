@@ -84,6 +84,16 @@ trichotomy** (constant-row/column 除外) は欠く → 4a/4b がそれを埋め
     engine で 7 obligation 中 6 discharge。**deep pin 1 本に isolate** = `not_isConj_honestTypeP2ASet_typePV`
     (A(S)∈S' element が V^S∉S' element と G-共役でない; TRUE by normedTI 'A0 だが循環 → type-P2
     FT-support geometry (Coq FTsupp0/BG§16 ThmII) 直接証明を要する; W₂⊆M_σ ゆえ elementary route 不成立)。
+  - [x] **4c-2b′ deep pin を実証明化 (2026-07-08)** — `not_isConj_honestTypeP2ASet_typePV` を
+    **sorry-free に** (旧「genuine deep content」評価を **de-risk**): 循環 normedTI 経路を捨て、
+    **BG §16 Theorem II の tame conjugation** (`BG.Ch4.S16.theoremII_tame_embedding` 第1連言 = repo に
+    既存・obligation discharged) で直接証明。構造 = `a∈A(S)⊆M'` ∧ `b∈V^S⊄M'` ∧ IsConj a b ⟹ tame で
+    **M-共役** `b=m·a·m⁻¹` (m∈M) ⟹ `M'⊴M` ゆえ `b∈M'` (実証明: `(derivedInG M).subgroupOf M` Normal
+    instance + `typePData_typePV_not_mem_derived`) ⟹ `b∉M'` と矛盾。残 deep 部は clean helper
+    `honestTypeP2A0Set_tame_conj` (sorried) に精密 isolate: honest support → BG `A0Set M K` の bridge
+    (`honestTypeP2ASet_subset_hatMsigma` 既存 + `V^M⊆hatMsigma` + order 論法 `V∩𝒞_G(K#)=∅`) +
+    κ-Hall/`(κ∪σ)′`-Hall 供給 (M solvable ⟹ Hall 存在)。∴ **旧「FTsupp0 未形式化」は幻**、残 = mechanical
+    BG-support bridge。full build 3940 green・AxiomsCheck OK・新 axiom なし。**dadeHypS0 の deepest gate 除去**。
   - [x] **4c-2c** `Hypothesis.dadeHypS0`/`dadeHypS0_hconj` (commit 79dd67c1 隣): S-instance 'A0-Dade bridge。
   - [x] **4c-3** tauSbetaGrid/GammaGrid/tauS_mu_row0_cross/gammaGrid_defGamma を dadeHypS0 に rewire
     (commit a6f7a2ed)。**headline correctness fix**: 旧 dadeHypS (A(S)⊆S') では μ差の V_S-part が
