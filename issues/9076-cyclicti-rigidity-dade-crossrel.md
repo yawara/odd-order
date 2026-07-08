@@ -290,3 +290,29 @@ lane c は本 flag 後も /loop 継続 (報告≠停止); 次 iteration は S16 
 **⟹ HUB へ**: lane c の「§12 muGrid connection」route は type obstruction で dead。lane-b が
 prime-TI residue route で置換中 (bridge landed)。carrier field (item 2) の FeitThompson 供給が
 cross-lane 調整点。lane c の (13.18) A0-Dade infra (既 landed) はそのまま residue route で再利用可。
+
+## ⚠ LANE-B pins 2/3 path 特定 (2026-07-08 続): S06 `Hypothesis46` certain-type route
+
+pins 2/3 (`tauS_mu_row0_diff_support` = μ差 support ⊆ A0(S)、`tauS_mu_row0_vanish_on_V` = τ_S(μ差)=η差 on V)
+の content は **S06 `Hypothesis46 A L` certain-type theory に type-uniform に既存** (S06_CertainTypeIsometry.lean):
+
+- **pin 2 (support)** = `certainTypeDiffSupported h hχ₂ hχ₂' i (hdeg i)` (`:793` 近辺): `μ_{ij}−μ_{ik}` を
+  **`A ∪ conjClassSetIn L tic.V = A₀` 上 supported** な `SupportedClassFunctions` として package。i=0,j,k=1 で
+  `μ_{0j}−μ_{01}` の support ⊆ A0(S) = pin 2 そのもの。
+- **pin 3 (V-value/Dade)** = `certainType_diff_dade_eq h hχ hχ₂ hχ₂' i (hdeg i)` (4.8 concl.3):
+  `τ(μ_{ij}−μ_{ik}) = δ_j•(ω_{ij}^σ − ω_{ik}^σ)`。i=0 で `τ_S(μ_{0j}−μ_{01}) = δ•(ω_{0j}^σ−ω_{01}^σ)`。
+  η=τ₃(ω) + V 上 ω^σ=ω-value ⟹ pin 3 (τ_S(μ差)=η差 on V)。
+
+**必要な assembly = `Hypothesis46 (typePA S) ↥S` の構成** (s06S を `toCertainTypeHypothesis` に、tic =
+`typePData_toTICyclicHypothesis Sdata`、`dade0` = **lane-c の A0-Dade `dadeHypS0`**、`tau` =
+`dadeHypS0.fullDadeIsometryData …`)。⚠ 配置: dadeHypS0 は S15_HonestTypeP2A0 (§15) 内ゆえ Hypothesis46-for-S
++ pins discharge は **S15_HonestTypeP2A0 内 (lane-c owned)** が正しい (私の §13 residueS + S06 API は upstream で citable)。
+
+⚠ 要 reconcile: Hypothesis46 の `dade0` support は `A ∪ conjClassSetIn L tic.V`、これが `honestTypeP2A0Set S Sdata`
+(= dadeHypS0 の support) と一致する必要 (`A = typePA S = honestTypeP2ASet S`? / `tic.V = typePV S Sdata`)。
+lane-c は既に honestTypeP2A0Set の Dade を構築済ゆえ整合可能なはず。
+
+**⟹ HUB/lane-c へ**: (13.18) pins 2/3 の honest route = **S06 Hypothesis46 certain-type API** (§12 muGrid でない、
+prime-TI residue と同じ certain-type 土台)。lane-b の `residueS` (grid) + `mu2_ne` (pin1) は landed。残:
+(i) Hypothesis46-for-S 構成 (lane-c file、dadeHypS0 使用) → certainTypeDiffSupported/certainType_diff_dade_eq
+cite で pins 2/3、(ii) carrier field `hyp.mu = residueS.mu2` (FeitThompson = lane-a)。3-lane collaboration。
