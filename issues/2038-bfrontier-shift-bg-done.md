@@ -130,3 +130,22 @@ Theorem-D singleton uniqueness `maximalSubgroupsContaining_centralizer_eq_single
 **次 b 選択肢** (どれも genuine on-path): (i) Fitting-conj-equivariance infra + reverse-escape lemma を confident
 partial として build (allTypeI の半分)、(ii) lane-a と escapingCentralizers_control で coordinate (b の (8.13) ∃!
 が now citable upstream)、(iii) 別 b-frontier piece。lane-b は /loop 継続。
+
+## ✅ (2026-07-08 続³、lane-b /loop) — reverse-escape lemma **landed** (option i)、P₂-crux が唯一残 gate
+
+**landed (commit aac73cfb)**: `exists_sigmaSharp_escape_of_not_fittingIsTI` (S16_MainResults、b-owned) =
+`not_fittingIsTI_of_mem_fittingSharp_of_centralizer_not_le` の honest な逆 (**¬FittingIsTI M ⟹ ∃ z ∈ M_σ#,
+C_G(z) ⊄ M**)。**Fitting-conj-equivariance 不要**と判明: `mem_sigma_of_prime_dvd_card_inf_conj_fitting` が
+「F(M) ⊓ F(M)^g の card を割る素数は全て σ(M)」を与えるゆえ、交わりの任意の非単位元 z は自動 σ-element →
+z ∈ M_σ(M^g) は z ∈ conj g • F(M) ≤ conj g • M = M^g + σ-conj-invariance で直接 (F(M^g) 経由不要)。full build
+3943 green・AxiomsCheck OK。
+
+**allTypeI_fittingIsTI の残 gate = P₂-crux のみ** (確定): reverse-escape で ∃ escaping z を得ても、
+`exists_RData_escape_structure` の neighbour N は all-type-I で type-F に落ちる (前記) → 矛盾出ず。
+**「type-F M で escaping σ# ⟹ N type-P₂」が genuinely 未組立**: Lean `centralizer_escape_final_local` も Coq
+`nonFtype_signalizer_base` (BGsection15:1399) も **¬IsTypeF N (= "nonFtype") を仮説要求** (証明せず)。∴ この
+crux は深い BG Cor 15.9 の逆で、S16 (b-owned) に置ける可能性はあるが Cor-15.9-machinery
+(`typeP2_neighbor_is_typeF_of_mem`/`norm_noncyclic_sigma`/`tau2_transfer_constraint`) の逆向き組立要 →
+Coq/教科書精読 ([[feedback-ask-chatgpt-for-elided-gaps]]) 候補。**次 iteration**: (a) P₂-crux を Coq-assisted で
+attempt、or (b) upstream-priority 再考 (§13 (13.18) residue supply 等)。b の (8.13) ∃! + reverse-escape は
+escapingCentralizers_control (lane-a) の citable upstream として残る。
