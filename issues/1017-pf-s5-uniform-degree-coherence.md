@@ -1008,3 +1008,21 @@ refuter wiring (dichotomy = nineElevenOne_configuration で config 産出 + hle 
     order-p summand は nontrivial char を持つ (has_nonprincipal_irr 類)。**cfDprod 無ゆえ直積 char 構成が infra**。
 (b) inertia index [U:U₁∩U₁ʷ] ∈ {u,a}: I(θ) の induce char が S_H0C' member → degree qu/qa。
 (c) a 排除 → U₁∩U₁ʷ=C (C≤U₁∩U₁ʷ + index u) → nineElevenCaseA_equality_refutation の hCinf 供給。
+
+## 2026-07-08 更新 #33 (lane b, /loop iter 6) — ★(9.11.2) Ū-side inertia identity 完成
+
+**landed (S11_NineElevenCoherence、NineElevenTwoInertia section、全 sorry-free、iter 3-6 で計 6 定理)**:
+`caseA_inertia_iff_centralizes_two_summands` (commit 1d9becc4): 構成 θ に対し g∈U fixes θ ⟺
+g が H_i,H_j 両 summand を centralize。⟹ **I(θ)⊓U = C_U(H_i)⊓C_U(H_j) = U₁∩U₁ʷ (Ū-side 完成)**。
+部品: exists_two_summand_char (構成) + caseA_char_inertia_of_summand/two_summands (⊆) +
+caseA_centralizes_two_summands_fixes_char (⊇)。
+
+**残 tiU1 endgame (deep、multi-iteration — 次 session batch 候補)**:
+(a) **HU-inertia index**: hcPsi bridge (hcPsi_conjBy_eq で HU-conj↔Ū-fixing) + two-summand 版
+    inertia_inf_uInHu_le_cInHu_of_realized → [HU:I(hcPsi θ)]=[U:U₁∩U₁ʷ]。⚠ all-summand 版は
+    inertia=HC (spanning 依存) ゆえ two-summand は plumbing chain (caseB_char_inertia_inflation_of_core
+    等) の adaptation 要。
+(b) **realization**: aInvariantRestrictAut=1 → G-subgroup (cuSub 型 realized centralizer) 橋渡し。
+    K₁=cuSub(=C_U(S₀)) は landed、K₂=C_U(S₀ʷ) の realized 版 新設要。C=cSub=K₁⊓K₂ 形へ。
+(c) **degree dichotomy** [U:U₁∩U₁ʷ]∈{u,a}: Ind(θ)∈S_H0C' → degree qu/qa + a 排除
+    → tiU1 (U₁∩U₁ʷ=C) → nineElevenTwo_u_le_a_sq の hCinf 供給 → equality-branch 発火。

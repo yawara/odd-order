@@ -784,6 +784,46 @@ theorem nineElevenOne_configuration (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 end Configuration
 
+/-- **A character supported on exactly two summands of an internal direct product.**  For the
+internal direct product `Hbar = ∏ S k` of prime-order subgroups and two distinct indices `i ≠ j`,
+there is a linear character `θ` nontrivial on `S i` and `S j` but *trivial on every other summand*
+`S k`.  Combine the per-factor tuple `ψ` — nontrivial characters `A`, `B` at `i`, `j`
+(`exists_ne_one_hom_of_prime_card`), the trivial character elsewhere (`Function.update` of the
+constant `1`) — through `char_eq_on_factors_of_bijective`.  This is the (9.11.2) two-summand `θ`
+whose inertia is `C_U(S i) ⊓ C_U(S j) = U₁ ∩ U₁ʷ` (regular on `S i`, `S j` for the `⊆` half; trivial
+elsewhere for the `⊇` half). -/
+theorem exists_two_summand_char {Hbar : Type*} [CommGroup Hbar] [Finite Hbar]
+    {ι : Type*} [Fintype ι] [DecidableEq ι] (S : ι → Subgroup Hbar)
+    (hindep : iSupIndep S) (hspan : ⨆ i, S i = ⊤)
+    (hp : ∀ i, (Nat.card ↥(S i)).Prime) {i j : ι} (hij : i ≠ j) :
+    ∃ θ : Hbar →* ℂˣ, (∃ x ∈ S i, θ x ≠ 1) ∧ (∃ x ∈ S j, θ x ≠ 1) ∧
+      ∀ k, k ≠ i → k ≠ j → ∀ x ∈ S k, θ x = 1 := by
+  classical
+  have hcomm : Pairwise fun a b : ι => ∀ x y : Hbar, x ∈ S a → y ∈ S b → Commute x y :=
+    fun a b _ x y _ _ => mul_comm x y
+  have hbij : Function.Bijective (Subgroup.noncommPiCoprod hcomm) :=
+    ⟨Subgroup.injective_noncommPiCoprod_of_iSupIndep hindep, by
+      rw [← MonoidHom.range_eq_top, Subgroup.noncommPiCoprod_range]; exact hspan⟩
+  obtain ⟨A, hAne⟩ := exists_ne_one_hom_of_prime_card (hp i)
+  obtain ⟨B, hBne⟩ := exists_ne_one_hom_of_prime_card (hp j)
+  set ψ : ∀ k, ↥(S k) →* ℂˣ := Function.update (Function.update (fun _ => 1) i A) j B with hψdef
+  have hψj : ψ j = B := by rw [hψdef, Function.update_self]
+  have hψi : ψ i = A := by rw [hψdef, Function.update_of_ne hij, Function.update_self]
+  have hψk : ∀ k, k ≠ i → k ≠ j → ψ k = 1 := fun k hki hkj => by
+    rw [hψdef, Function.update_of_ne hkj, Function.update_of_ne hki]
+  obtain ⟨θ, hθ⟩ := char_eq_on_factors_of_bijective hcomm hbij ψ
+  refine ⟨θ, ?_, ?_, ?_⟩
+  · obtain ⟨z, hz⟩ := DFunLike.ne_iff.mp hAne
+    rw [MonoidHom.one_apply] at hz
+    exact ⟨↑z, z.2, by rw [hθ i z, hψi]; exact hz⟩
+  · obtain ⟨z, hz⟩ := DFunLike.ne_iff.mp hBne
+    rw [MonoidHom.one_apply] at hz
+    exact ⟨↑z, z.2, by rw [hθ j z, hψj]; exact hz⟩
+  · intro k hki hkj x hx
+    have h := hθ k ⟨x, hx⟩
+    rw [hψk k hki hkj] at h
+    simpa using h
+
 /-! ### (9.11.2) inertia: the per-summand centralizer containment
 
 Book (9.11.2), first assertion (the deep input `U₁ ∩ U₁ʷ = C`): the `θ`-character regular on the two
@@ -898,6 +938,58 @@ theorem caseA_centralizes_two_summands_fixes_char {data : TypesIIIIIIVSetup M}
   intro x
   have := DFunLike.congr_fun heq x
   rwa [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom] at this
+
+open scoped IsMulCommutative in
+/-- **The (9.11.2) two-summand character exists on the case-(a) chief factor.**  Instantiates
+`exists_two_summand_char` at the internal direct product `caseA.Hpart` of the `q` order-`p` Clifford
+summands (`Hpart_iSupIndep` + `Hpart_iSup` + `Hpart_order`): for two distinct summand indices `i ≠ j`
+there is a linear character `θ` of `H̄` nontrivial on `H_i`, `H_j` and trivial on every other summand.
+Feeding this `θ` to `caseA_char_inertia_two_summands` (`⊆`) and
+`caseA_centralizes_two_summands_fixes_char` (`⊇`) identifies its inertia as `C_U(H_i) ⊓ C_U(H_j)`. -/
+theorem exists_caseA_two_summand_char {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) {i j : Fin data.q}
+    (hij : i ≠ j) :
+    ∃ θ : (↥data.H ⧸ chief.N) →* ℂˣ, (∃ x ∈ caseA.Hpart i, θ x ≠ 1) ∧
+      (∃ x ∈ caseA.Hpart j, θ x ≠ 1) ∧
+      ∀ k, k ≠ i → k ≠ j → ∀ x ∈ caseA.Hpart k, θ x = 1 := by
+  haveI : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
+  exact exists_two_summand_char caseA.Hpart caseA.Hpart_iSupIndep caseA.Hpart_iSup
+    (fun k => by rw [caseA.Hpart_order k]; exact chief.p_prime) hij
+
+/-- **(9.11.2) inertia identity at the chief-factor level.**  Combining the three landed pieces —
+the two-summand character `exists_caseA_two_summand_char`, the `⊆` containment
+`caseA_char_inertia_two_summands`, and the `⊇` containment
+`caseA_centralizes_two_summands_fixes_char` — there is a linear character `θ` of `H̄` whose `U`-inertia
+is *exactly* the two-summand centralizer: for `g ∈ U`, `g` fixes `θ` **iff** `g` centralizes both
+Clifford summands `H_i`, `H_j` (`aInvariantRestrictAut … g = 1`).  This is the `Ū`-side of Peterfalvi
+(9.11.2): the inertia of the two-summand `θ` is `C_U(H_i) ⊓ C_U(H_j) = U₁ ∩ U₁ʷ`.  The `⊆` direction
+casts `θ` to the linear irreducible `linearIrreducibleCharacter θ` (whose `ClassFunction` values are
+`θ`'s, `linearIrreducibleCharacter_apply`) and applies the regular two-summand char-inertia; the `⊇`
+direction is the trivial-off-support fixing lemma directly. -/
+theorem caseA_inertia_iff_centralizes_two_summands {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
+    (caseA : CliffordCaseAData chars) {i j : Fin data.q} (hij : i ≠ j) :
+    ∃ θ : (↥data.H ⧸ chief.N) →* ℂˣ, ∀ g : ↥(typeP_quotientCoprimeAction data.typeP
+        data.nontrivial.1 chief.N_aInvariant).U,
+      (∀ x, θ ((uActionHom data chief) g x) = θ x) ↔
+        (aInvariantRestrictAut (caseA.Hpart_aInvariant i) g = 1 ∧
+          aInvariantRestrictAut (caseA.Hpart_aInvariant j) g = 1) := by
+  obtain ⟨θ, hθi, hθj, hθtriv⟩ := exists_caseA_two_summand_char caseA hij
+  refine ⟨θ, fun g => ⟨fun hfix => ?_, fun hcent =>
+    caseA_centralizes_two_summands_fixes_char caseA θ hθtriv g hcent.1 hcent.2⟩⟩
+  have hinv : ∀ x, (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)
+      ((uActionHom data chief) g x)
+      = (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x := fun x => by
+    rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, hfix x]
+  refine caseA_char_inertia_two_summands caseA ?_ ?_ g hinv
+  · obtain ⟨x, hx, hxne⟩ := hθi
+    refine ⟨x, hx, ?_⟩
+    rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one, Units.val_one]
+    exact fun h => hxne (Units.val_eq_one.mp h)
+  · obtain ⟨x, hx, hxne⟩ := hθj
+    refine ⟨x, hx, ?_⟩
+    rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one, Units.val_one]
+    exact fun h => hxne (Units.val_eq_one.mp h)
 
 end NineElevenTwoInertia
 
