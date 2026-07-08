@@ -147,3 +147,25 @@ trichotomy** (constant-row/column 除外) は欠く → 4a/4b がそれを埋め
 merge 順 (a→c) により a が 9075 を保持、本 issue を **9076 へ renumber** (c の参照ファイル
 3003/s15 notes 内の言及も置換済)。lane c は次回 main sync で本 rename を取り込むこと。
 両 claim は別 ref ((5.7) vs §3 cyclicTI) で重複建設ではない。
+
+## ✅ HUB 裁定: piece 4c-3 の S15_SAndT carve-out 拡張 #2 付与 (2026-07-08 合流 tick)
+
+piece 4c-3 (`tauSbetaGrid`/`tauS_mu_row0_cross`/`gammaGrid_defGamma` の τ_S を `dadeHypS`→`dadeHypS0`
+に rewire) は **b 所有の `S15_SAndT.lean`** への編集。piece 4c carve-out (merge_monitor) は
+S15_HonestTypeP2A0.lean のみを c に付与し、`tauS_mu_row0_cross` statement 変更は
+「**b territory ゆえ b+c 調整要 (b が行うか c が carve-out 追加申請)**」と明記していた。lane c は
+carve-out 申請より先に着手したが、hub は監視 tick で **「軌道修正で保全」ポリシー** (CLAUDE.md /
+merge_monitor 🔧) に従い **retroactive に carve-out 拡張 #2 を付与して成果を保全** (discard/revert せず)。
+
+**裁定根拠 (hub 自律、ユーザー escalation 不要)**:
+1. **genuine correctness fix** — 旧 dadeHypS ('A(S)⊆S') では μ差の V_S-part が arbitrary-extension 領域に
+   落ち statement が unprovable-as-stated。'A0-Dade 化が唯一の sound route。
+2. **下流 blast radius = ゼロ** — `tauS_mu_row0_cross`/`gammaGrid_defGamma`/`tauSbetaGrid` の外部 consumer
+   は repo に存在しない (grep 確認、S15_HonestTypeP2A0 docstring 言及のみ)。signature 変更は self-contained。
+3. **b は S15_SAndT に一切触れていない** (`git diff main...b` 空) → 調整点の懸念 (b+c 同時編集で衝突) は
+   実際には未発生。
+4. **merge-safety 全通過**: build green (3940 jobs) / AxiomsCheck OK / 新 axiom なし / sorry +1 =
+   新 decl `not_isConj_honestTypeP2ASet_typePV` deep-pin scaffold (regression でない)。
+
+⟹ **(13.18) S-side A0-rewire ブロック = lane c 所有** (step 1.5 逸脱でない)。**b は次回 main sync で c の
+rewire を取り込み、`tauS_mu_row0_cross` を再構築しないこと。** 正本 = merge_monitor.md「coordination 点 解決」節。

@@ -226,9 +226,25 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > だが μ差 support は P^#∪V_S ゆえ A0 化必須) infra ゆえ **lane c 所有**として扱う (S05_GridRigidity と
 > 同型 = 内容で割当)。根拠: 新 leaf (b の `S15_SAndT` を編集せず `honestTypeP2ASet` (b の
 > `S15_SAndT_Setup:552`) を cite して拡張)、b は S15 を触っていない (衝突なし)。⟹ step 1.5 で c が
-> S15_HonestTypeP2A0 を編集しても逸脱でない (b が編集したら逸脱)。⚠ **将来 coordination 点**: 既存
-> `tauS_mu_row0_cross` (b の `S15_SAndT`) の A0-Dade 化 statement 変更は b territory ゆえ **b+c 調整要**
-> (statement を A0 化する編集は b が行うか、c が carve-out 追加申請)。詳細 = issues/9076 piece 4c。
+> S15_HonestTypeP2A0 を編集しても逸脱でない (b が編集したら逸脱)。
+>
+> **✅ coordination 点 解決 = carve-out 拡張 #2 付与 (issue 9076 piece 4c-3, hub 裁定 2026-07-08 監視 tick)**:
+> 上記注記の「⚠ 将来 coordination 点 (`tauS_mu_row0_cross` の A0-Dade 化 statement 変更 = b territory、
+> b+c 調整要)」は**解決**。lane c が piece 4c-3 で `S15_SAndT.lean` の **(13.18) S-side A0-rewire ブロック**
+> (`tauSbetaGrid` / `tauS_mu_row0_cross` / `gammaGrid_defGamma` の τ_S を `dadeHypS`→`dadeHypS0` に差し替え)
+> を直接編集。carve-out 申請より先に着手したが、hub 監視 tick で **「軌道修正で保全」ポリシー**に従い
+> **retroactive に carve-out 拡張を付与**して保全: **この (13.18) rewire ブロックは lane c 所有**。
+> 根拠 (自律裁定): (1) genuine correctness fix — 旧 `dadeHypS` ('A(S)-Dade) では μ差 support の V_S-part が
+> arbitrary-extension 領域に落ち statement が provable でなかった; A0 化が唯一の sound route (issue 9076 4c)。
+> (2) **下流 blast radius = ゼロ** — `tauS_mu_row0_cross`/`gammaGrid_defGamma`/`tauSbetaGrid` を cite する
+> consumer は S15_SAndT.lean 外に存在しない (grep 確認、S15_HonestTypeP2A0 docstring 言及のみ)。
+> (3) **b は S15_SAndT に一切触れていない** (`git diff main...b` 確認) → 調整点の懸念 (b+c 同時編集で衝突) は
+> 実際には未発生。(4) merge-safety 全通過: build green (3940 jobs) / AxiomsCheck OK / 新 axiom なし /
+> sorry +1 = 新 decl `not_isConj_honestTypeP2ASet_typePV` deep-pin scaffold (regression でない)。
+> ⟹ step 1.5 で c が S15_SAndT の **(13.18) S-side rewire ブロックのみ**を編集しても逸脱でない
+> (c が S15_SAndT の他領域 = b の char-family/(C')# 系を触ったら従来どおり逸脱; b はこの (13.18) ブロックを
+> 触らない)。**b は次回 main sync で c の rewire を取り込むこと、`tauS_mu_row0_cross` を再構築しない。**
+> 詳細 = issues/9076 piece 4c-3。
 >
 > **⟹ 拡張 #2 (ユーザー裁定 2026-07-05 tick(3) — Hypothesis76 (7.6) 忠実化 field の包括許可)**:
 > 同型逸脱 3 連発 (issue 0091 Hypothesis78 / zeta_induced / zeta_injective、各回ユーザー受理) の
