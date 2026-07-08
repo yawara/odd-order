@@ -231,6 +231,9 @@ theorem coherent_SOf_H0C_of_column_identities [Finite G]
     [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
     (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau (hyp.SOf hyp.HC) hyp.base.A0)
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ OddOrder.Peterfalvi.S12.inducedFamily M) {d : ℕ}
+    (hζHC : ζ ∈ hyp.SOf hyp.HC)
+    (hζdeg : ∀ j : Fin hyp.base.w2, j ≠ 0 →
+      (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i j) 1 = (d : ℂ) * ζ 1)
     (hcol : ∀ j : Fin hyp.base.w2, j ≠ 0 →
       hyp.base.tau ((∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i j) - (d : ℂ) • ζ)
         = (∑ i : Fin hyp.base.w1, hyp.base.alignedOmegaSigmaGrid hG hG.odd i j)
@@ -261,6 +264,12 @@ theorem coherent_SOf_H0C_of_column_identities [Finite G]
       ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C := by
     rw [hyp.base.muGrid_columnSum_eq_columnSum hG hG.odd ⟨1, hw2⟩]
     exact columnSum_muColumnChar_mem_sOf_H0C hG hyp ⟨1, hw2⟩ hk1
+  -- `d·ζ ∈ ℤ[S(HC)]`: `ζ ∈ S(HC)` (`hζHC`) plus `(d:ℂ)•ζ = (d:ℤ)•ζ` (a `zsmul` of a span member).
+  have hdζspan : (d : ℂ) • ζ ∈ Submodule.span ℤ (hyp.SOf hyp.HC) := by
+    have hcast : (d : ℂ) • ζ = (d : ℤ) • ζ := by
+      rw [← Int.cast_smul_eq_zsmul ℂ (d : ℤ) ζ, Int.cast_natCast]
+    rw [hcast]
+    exact Submodule.smul_mem _ (d : ℤ) (Submodule.subset_span hζHC)
   refine ⟨?_⟩
   rw [hyp.SOf_H0C_eq_SOf_HC_union_sOf, Set.union_comm]
   -- **`bridge_coherent`** (no generation hypothesis) — engine `X = 𝒮(H₀C)`, `Y = S(HC)`.
@@ -285,18 +294,18 @@ theorem coherent_SOf_H0C_of_column_identities [Finite G]
     rw [hagreeSof x hx, hagreeSHC y hy]
     sorry
   case hφY =>
-    -- `(d:ℂ)•ζ ∈ ℤ[S(HC)]`.  TRUE, but needs `ζ ∈ S(HC)` — the capstone carries only
-    -- `hζS : ζ ∈ inducedFamily M ⊋ S(HC)`.  The caller `exists_zeta_residual_not_orthogonal_H0C`
-    -- CAN supply `ζ ∈ S(HC)` (`ζ` irreducible of degree `w₁`; via `secondDerived_eq_HC` +
-    -- `SOf_secondDerived_eq`), so this closes once the signature threads `ζ ∈ hyp.SOf hyp.HC`.
-    sorry
+    -- `(d:ℂ)•ζ ∈ ℤ[S(HC)]`: now discharged from `hζHC : ζ ∈ S(HC)` (threaded into the signature).
+    exact hdζspan
   case hbridge_supp =>
-    -- `∑ᵢ μ_{i1} − dζ ∈ ℤ[𝒮(H₀C) ∪ S(HC)]_{A₀}`.  The `ℤ`-span part is `hχmem` + `ζ ∈ S(HC)`; the
-    -- `A₀`-support part is `inducedKernelFamily_scaledDiff_support` from the degree match
-    -- `(∑ᵢ μ_{i1})(1) = d·ζ(1)`.  Both inputs (`ζ ∈ S(HC)`, degree match) are caller-supplied
-    -- (`degree_independent`: `μ_{ij}(1) = d` for `j≠0`; `ζ(1) = w₁`; `∑ᵢ = w₁·d = d·w₁`), not
-    -- available from the current signature — same signature thread as `hφY` closes it.
-    sorry
+    -- `∑ᵢ μ_{i1} − dζ ∈ ℤ[𝒮(H₀C) ∪ S(HC)]_{A₀}`.  The `ℤ`-span part is `hχmem` + `hdζspan`; the
+    -- `A₀`-support part is `inducedKernelFamily_scaledDiff_support` from the degree match `hζdeg`
+    -- (`(∑ᵢ μ_{i1})(1) = d·ζ(1)`).  Both are now threaded through the signature.
+    refine OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mpr ⟨?_, ?_⟩
+    · exact Submodule.sub_mem _ (Submodule.subset_span (Set.mem_union_left _ hχmem))
+        (Submodule.span_mono Set.subset_union_right hdζspan)
+    · have h := OddOrder.Peterfalvi.S08.inducedKernelFamily_scaledDiff_support
+        hyp.base.mderivSharp_subset_A0 (hIKF hχmem) (hXbridge hζHC) (hζdeg ⟨1, hw2⟩ hk1)
+      rwa [← Nat.cast_smul_eq_nsmul ℂ d ζ] at h
   case hbridge_τ =>
     -- **(5.8) bridge `τ`-agreement `ν(∑ᵢ μ_{i1} − dζ) = τ(∑ᵢ μ_{i1} − dζ)`** (§14/§9 genuine
     -- content — the honest heir of the old `hDτ` sorry).  Via the `ν`-agreements and `hcol` this
@@ -378,6 +387,23 @@ theorem exists_zeta_residual_not_orthogonal_H0C [Finite G]
     exact s13hyp.base.tau_muColumnSum_sub_dzeta_eq_of_residualData hG ν hνconj hG.odd hj hzS
       params.zeta_irreducible hz1 params.w2_prime hd hnf hdegall hμ0all hδjj params.two_le_n
       hRn hZ hRorth hRmem hRrev h114
+  -- `ζ ∈ S(HC)`: `ζ` is a degree-`w₁` irreducible in `S`, i.e. a member of `S(M'') = S(HC)`
+  -- (`SOf_secondDerived_eq` characterizes `S(M'')` as the degree-`w₁` irreducible subfamily;
+  -- `secondDerived_eq_HC` (11.5) identifies `M'' = HC`).
+  have hζHC : params.zeta ∈ s13hyp.SOf s13hyp.HC := by
+    rw [← secondDerived_eq_HC hG s13hyp, s13hyp.SOf_secondDerived_eq hG]
+    exact ⟨hzS, params.zeta_irreducible, hz1⟩
+  -- Degree match `(∑ᵢ μ_{ij})(1) = d·ζ(1)`: each `μ_{ij}(1) = d` (`degree_independent`, `j ≠ 0`),
+  -- so the `w₁`-term sum is `w₁·d = d·w₁ = d·ζ(1)` (`hz1 : ζ(1) = w₁`).
+  have hζdeg : ∀ j : Fin s13hyp.base.w2, j ≠ 0 →
+      (∑ i : Fin s13hyp.base.w1, s13hyp.base.muGrid hG hG.odd i j) 1
+        = (params.d : ℂ) * params.zeta 1 := by
+    intro j hj
+    have hall : ∀ i : Fin s13hyp.base.w1, s13hyp.base.muGrid hG hG.odd i j 1 = (params.d : ℂ) :=
+      fun i => hmu ▸ params.degree_independent i j hj
+    rw [ClassFunction.finset_sum_apply]
+    simp only [hall, Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, hz1]
+    ring
   -- (11.8.6) the narrow τ₃ union makes `S(H₀C)` coherent, contradicting (11.3) `S_H0C_not_coherent`.
   -- `coh` = the `ν` (h_orth-derived `S(HC)` coherence) restricted to `S(HC) ⊆ SHCSet`
   -- (`isCoherent_of_subset`, keeping `coh.extension = ν.extension`); the narrow capstone consumes
@@ -386,7 +412,7 @@ theorem exists_zeta_residual_not_orthogonal_H0C [Finite G]
     ⟨by have := (s13hyp.base.toHypothesis46 hG hG.odd).one_lt_card_W1; omega⟩
   exact S_H0C_not_coherent hG s13hyp (coherent_SOf_H0C_of_column_identities hG s13hyp
     (isCoherent_of_subset ν (SOf_HC_subset_SHCSet hG s13hyp)
-      (coherent_SOf_HC hG s13hyp).some.nonzero) hzS hcol)
+      (coherent_SOf_HC hG s13hyp).some.nonzero) hzS hζHC hζdeg hcol)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (11.9.b), narrow `𝒮(H₀C)` route** — `w₂ < w₁` (`q > p`) for the §10 hypothesis on a

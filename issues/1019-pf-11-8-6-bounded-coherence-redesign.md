@@ -1856,3 +1856,22 @@ capstone に `(hζHC : ζ ∈ hyp.SOf hyp.HC)` + degree-match hyp を追加 (内
 `exists_zeta_residual_not_orthogonal_H0C`/`w2_lt_w1_of_hypothesis_H0C` は不変)、caller が discharge
 (ζ=params.zeta は deg-w₁ 既約 ∈ S(HC): `secondDerived_eq_HC`+`SOf_secondDerived_eq`、degree-match:
 `degree_independent`)。⟹ (11.8) route は 2 genuine §14 sorry (hmixed/hbridge_τ) のみ、caseA-false 完全排除。
+
+## 2026-07-08 update¹⁶ (lane-a /loop, subagent) — ★ clean end state: (11.8) capstone は genuine §14 sorry 2 本のみ
+
+update¹⁵ の 2 threadable sorry (hφY/hbridge_supp) を caller から ζ data thread で close。
+capstone signature に `hζHC : ζ ∈ SOf HC` + `hζdeg` (degree-match) 追加 (内部のみ、spine-facing 不変)、
+caller `exists_zeta_residual_not_orthogonal_H0C` が discharge (hζHC = `secondDerived_eq_HC` +
+`SOf_secondDerived_eq` + char params で clean、hζdeg = `degree_independent`)。full build green 3944 jobs。
+
+### ★ (11.8) route の clean end state 到達
+`coherent_SOf_H0C_of_column_identities` の残 sorry = **`hmixed` (6.7 image-orthogonality、§14 Sibley) +
+`hbridge_τ` (5.8 μ-column τ-identity、§14/§9、旧 hDτ heir) の 2 本のみ、全て genuine**。
+`exists_zeta_residual_not_orthogonal_H0C` / `w2_lt_w1_of_hypothesis_H0C` (spine-facing) は sorry-free。
+
+### ⟹ lane-a の (11.8) ungated work は COMPLETE
+(11.8) route は caseA-false obstruction 完全排除 + honest。残 spine sorry は全て genuine cross-lane/deep gate:
+- `hmixed` / `hbridge_τ` (§14 Sibley coherence、lane-c territory)
+- caseA refuter (S13_Orthogonality:101、lane-b (9.11.2) active)
+- `S_not_coherent` (10.8、deep TI-counting gate)
+lane-a-ownable な ungated (11.8) piece は尽きた (bridge engine + threading で honest 化完遂)。
