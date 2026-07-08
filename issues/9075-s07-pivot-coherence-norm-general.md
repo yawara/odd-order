@@ -51,6 +51,36 @@ created: 2026-07-08
 caseB (9.11) `caseB_coherent_sOf_H0Cprime` が hDeg 無しで閉じ、fold 版は下流互換のため
 残置 or 撤去 (assembly 差し替え)。#print axioms で §13 core gate 以外 sorry-free。
 
+## ✅ ENGINE 完成 (2026-07-08、S07_PivotCoherence、全 sorry-free)
+
+part 1–2 (= issue step 1–2) 完了。norm-general (5.7) engine が丸ごと landed:
+
+- **`pivotCoherence`** (part 1, prior commit): pivot η₁ + partner ζ₁ → IsCoherent。
+- **`exists_pivotPartner_spec`** (part 2a): 単一 ξ の haveX step (norm squeeze
+  ‖Y₁‖²≤⟨ξ⟩≤‖X₂‖²≤‖Y₁‖² → Y₁=X₂ + (5.4.b) subset-sum)。
+- **`exists_pivotPartner`** (part 2b): common-X 完成 (anchor ξ₁ 固定、member 4 場合分け
+  χ̄₁/ξ₁/ξ̄₁/generic、‖X−X'‖²=0 で X 一意)。raw per-member R-family を取る。
+- **`uniform_degree_coherence_of_families`** (part 2c 主): raw family データ →
+  Nonempty (IsCoherent)。**任意長 R(η) を受理** (既約=2, 可約 μ=2q)。nonzero ノルムは
+  hnr から導出。← **caseB entry point**。
+- `uniform_degree_coherence_of_subcoherent`: 全既約 S07.Hypothesis 用の薄ラッパー
+  (2元 difference_image → norm 1 強制ゆえ caseB には不使用)。
+
+全て #print axioms = [propext, Classical.choice, Quot.sound]。
+
+## 🔧 残 = step 3 caseB rewire (in progress)
+
+`caseB_coherent_sOf_H0Cprime` (S13_CoreStructure:1467、lane-a 所有、consumer 0 の gated
+endpoint、hDeg 未供給) を `uniform_degree_coherence_of_families` 一発適用に置換して hDeg 撤去。
+要 assemble (𝒮(H₀C′) on hyp.base.tau):
+- R-family dispatcher: member dichotomy (caseB_sOf_member_dichotomy: 既約 d or μ-column k)
+  → 既約=Dade decomposition / μ-column=certainTypeR-on-tau (columnImageFamilyCohFree 系)。
+- cross-ortho 3 combo: μμ (certainTypeR_imageSet_orthogonal_certainTypeR) /
+  μ-irr (certainTypeR_imageSet_orthogonal_dadeOfDiff) / irr-irr
+  (memberExtensionDecomposition/inducedKernelFamily 系)。
+- isometry = hyp.base.tau on A₀-supported / ZIrr diffs / supported diffs / hunif (degree) /
+  pivot = 既約 member (norm 1 ⟹ hN 自明) / second member (card ≥ 2)。
+
 ## 参照
 
 - issues/1019 update⁸⁵ / Coq PFsection5.v:588 (pivot), :1234 (5.7), :863/:881 ((5.4))
