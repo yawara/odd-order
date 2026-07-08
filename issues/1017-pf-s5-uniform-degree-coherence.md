@@ -903,3 +903,27 @@ reducible ν_r + irreducible λ を与え、**(5.7) で 4元 T2族 {λ,λ̄,ν_r
 直交で矛盾。⟹ **(10.7) は本 issue の (9.11) 非Galois pair-adjoining coherence の consumer**
 (uniform-degree 基底 = coherent_of_constant_degree は landed、pair-adjoining 帰納が残)。
 sibling = `exceptional_case_frobenius_realization` (S11:14165、同 content)。
+
+## 2026-07-08 更新 #28 (lane b) — caseA 構造確立: entry point + char sum-of-squares 完結
+
+**landed (2 commit、sorry-free/axiom-clean)**:
+- `sum_xiOf_H0C_degreeSq` 完結 (2ea09eaa): `index_realizedH0supC_eq` (|HU/(H₀C)|=p^q·u、
+  realized-subgroup index tower、subagent 委譲) → **Σ_{𝒳(H₀C)} χ(1)² = p^q·u − u** (config-independent、
+  (9.11.3) hclass char-side 完結)。
+- **caseA entry point** (00943a2c): `caseA_coherent_sOf_H0Cprime_of_refuter` (新 leaf
+  S11_NineElevenCaseA.lean、b carve-out) = caseA coherence → refuter 節 reduction。base case (a) +
+  skeleton (b) + witness genuine 導出。
+
+**⟹ caseA 構造完成**: a の world-bridge (base case sOf_degreeSubfamily_isCoherent + R-data
+caseB_sOf_memberRFamily) + b の scaffold (skeleton + config 抽出 nineElevenOne_configuration +
+(9.11.5) refutation nineElevenFive_refutation + char sum-of-squares) が **entry point で結線**。
+
+**残 = refuter 節の実証明** (S11_NineElevenCaseA.lean の hrefute 引数を実証明で除去):
+1. **adjoin 枝** (lb0 < sumnS 𝒮₂ → xAdjoinStepW 発火 → maximality 矛盾): a の R-data
+   caseB_sOf_memberRFamily (OrthonormalCharacterImageFamily) → xAdjoinStepW inputs
+   (CharacterPsiDecomposition) の impedance 確認 + per-step wiring。**要 engine-internals 調査**。
+2. **equality 枝** (config → (9.11.2)-(9.11.8) 反証): config 抽出 nineElevenOne_configuration
+   (landed) → nineElevenFive_refutation (landed) に hcount/hnorm/hua2 を供給。
+   残 deep 入力 = (9.11.3) degree split (n·u²、config 下) / (9.11.4) Mackey norm ‖Ind_{HU₁}^M 1‖²
+   (double-coset、heavy) / (9.11.2) inertia C=U₁⊓U₁ʷ (two-summand char)。
+これらは相互依存の large 作業ゆえ fresh focused session が適切 (extreme session length ゆえ handoff)。
