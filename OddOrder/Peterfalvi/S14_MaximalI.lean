@@ -5269,6 +5269,68 @@ theorem witness_L_isTypeI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [hLtype] at hLt
     exact absurd ⟨data.L, data.L_maximal, hLt⟩ (OddOrder.Peterfalvi.S12.no_typeV_maximal hG)
 
+/-- **Peterfalvi (12.9)/(12.10): the witness type is exactly `I`.**  The recorded type `data.L_type`
+of the witness `L` is forced to be `I`: every other type contradicts the escape condition
+`C_G(x) ⊄ L` (`data.centralizer_x_not_le_L`) via the type-II/III/IV centralizer-containment lemmas
+(and type `V` is excluded outright).  Same case-split as `witness_L_isTypeI`, but concluding the
+identity `data.L_type = I` needed to compute `L_s = L_F`. -/
+theorem witness_L_type_eq_typeI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
+    data.L_type = PeterfalviType.I := by
+  have hx_mem : data.x ∈ mainSubgroup data.L data.L_type := data.P0_le_Ls data.x_mem_P0
+  have hEsc : ¬ (Subgroup.centralizer ({data.x} : Set G) ≤ data.L) := data.centralizer_x_not_le_L
+  have hLt := data.L_hasType
+  cases hLtype : data.L_type with
+  | I => rfl
+  | II =>
+    rw [hLtype] at hLt hx_mem
+    exact absurd (typeII_centralizer_le_of_mem_mainSubgroup hG data.L_maximal hLt hx_mem
+      data.x_ne_one) hEsc
+  | III =>
+    rw [hLtype] at hLt
+    exact absurd (typeIIIorIV_centralizer_le_of_mem_noncyclic_mainSubgroup hG data.L_maximal
+      (Or.inl hLt) ctr.P0_noncyclic data.L_hasType data.P0_le_Ls data.x_mem_P0 data.x_ne_one) hEsc
+  | IV =>
+    rw [hLtype] at hLt
+    exact absurd (typeIIIorIV_centralizer_le_of_mem_noncyclic_mainSubgroup hG data.L_maximal
+      (Or.inr hLt) ctr.P0_noncyclic data.L_hasType data.P0_le_Ls data.x_mem_P0 data.x_ne_one) hEsc
+  | V =>
+    rw [hLtype] at hLt
+    exact absurd ⟨data.L, data.L_maximal, hLt⟩ (OddOrder.Peterfalvi.S12.no_typeV_maximal hG)
+
+/-- **Peterfalvi (12.10): `P₀ ⊆ L_F`.**  Since the witness type is `I` (`witness_L_type_eq_typeI`),
+`L_s = mainSubgroup L I = L_F`, so `data.P0_le_Ls` (`P₀ ⊆ L_s`) gives `P₀ ⊆ L_F`. -/
+theorem witness_P0_le_kernel [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
+    ctr.P0 ≤ maxNilpotentNormalHall data.L := by
+  have hI := witness_L_type_eq_typeI hG data
+  have hP0 := data.P0_le_Ls
+  rw [hI] at hP0
+  simpa [mainSubgroup] using hP0
+
+/-- **A `q`-subgroup of a nilpotent subgroup `K` lies in `O_q(K) = opiCoreInG {q} K`** (the unique
+Sylow `q`-subgroup of the nilpotent `K`).  Generalisation of `pGroup_le_opiCoreInG_fittingInG` from
+`F(E)` to any nilpotent `K`; the proof uses only `IsNilpotent ↥K`. -/
+theorem pGroup_le_opiCoreInG_of_le_of_isNilpotent [Finite G]
+    {K : Subgroup G} [Group.IsNilpotent ↥K] {q : ℕ} [Fact q.Prime]
+    {T : Subgroup G} (hT : IsPGroup q ↥T) (hTK : T ≤ K) :
+    T ≤ opiCoreInG ({q} : Set ℕ) K := by
+  classical
+  have hHall := OddOrder.BG.Ch3.S10.oPiCore_isHall_of_isNilpotent (K := ↥K) ({q} : Set ℕ)
+  have hTpi : Ch03.Subgroup.IsPiGroup ({q} : Set ℕ) (T.subgroupOf K) := by
+    intro r hr
+    obtain ⟨k, hk⟩ := hT.exists_card_eq
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hTK).toEquiv, hk] at hr
+    have h2 := Nat.prime_of_mem_primeFactors hr
+    have h3 := Nat.dvd_of_mem_primeFactors hr
+    have hrq : r = q := (Nat.prime_dvd_prime_iff_eq h2 Fact.out).mp (h2.dvd_of_dvd_pow h3)
+    simpa using hrq
+  have h1 : T.subgroupOf K ≤ Ch03.oPiCore ({q} : Set ℕ) ↥K :=
+    OddOrder.BG.Ch3.S10.isPiGroup_le_of_normal_isHallSubgroup hHall hTpi
+  calc T = (T.subgroupOf K).map K.subtype := (Subgroup.map_subgroupOf_eq_of_le hTK).symm
+    _ ≤ (Ch03.oPiCore ({q} : Set ℕ) ↥K).map K.subtype := Subgroup.map_mono h1
+    _ = opiCoreInG ({q} : Set ℕ) K := rfl
+
 /-- **Peterfalvi (12.10) obligation B, minimality core** (pinned sorried §8/(12.8) obligation, hub
 9003 Cluster A): for the type-I witness `L` of (12.9), every Sylow `q`-subgroup of `L` at a prime
 `q` dividing `|U|` (`U =` the complement of `H = L_F`) is **cyclic**.
