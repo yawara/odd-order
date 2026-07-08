@@ -65,6 +65,55 @@ theorem typePV_subset_M {M : Subgroup G} (data : TypePData M) :
     typePV M data ⊆ (M : Set G) := fun _ hv =>
   typePData_W_le_M data (((Set.mem_diff _).mp hv).1)
 
+/-- **`V^M`-points lie in BG's `σ`-saturation `hatMsigma M`** (issue 9076 piece 4c-2b″, step 2a of
+the `honestTypeP2A0Set ⊆ A0Set` bridge).  A `V = typePV`-point `v = a·b` (`a ∈ W₁`, `b ∈ W₂`, the
+`W = W₁ ⊔ W₂` factorization) has a **nontrivial** `W₂`-component `b ≠ 1` (else `v = a ∈ W₁`), and
+`W₂ ≤ H = M_F ≤ M_σ` (`maxNilpotentNormalHall_le_Msigma`); since `W` is cyclic (abelian) `v` commutes
+with `b`, so `b ∈ M_σ ⊓ C_G(v)` witnesses `M_σ ⊓ C_G(v) ≠ ⊥`.  This is the `V`-side half of showing
+`A₀(S) ⊆ hatMsigma M`, feeding the BG §16 Theorem-II tame conjugation. -/
+theorem typePV_subset_hatMsigma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (data : TypePData M) :
+    typePV M data ⊆ OddOrder.BG.Ch4.S16.hatMsigma M := by
+  intro v hv
+  simp only [typePV, Set.mem_diff, Set.mem_union, SetLike.mem_coe, not_or] at hv
+  obtain ⟨hvW, hvnW1, _hvnW2⟩ := hv
+  haveI hcyc : IsCyclic ↥data.W := data.W_cyclic
+  letI : CommGroup ↥data.W := hcyc.commGroup
+  have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
+  have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
+  have hWM : (data.W : Subgroup G) ≤ M := by
+    rw [data.W_eq]
+    exact sup_le data.W1_le
+      (data.W2_le.trans (inf_le_left.trans (data.H_le.trans (Subgroup.map_subtype_le _))))
+  -- `v = a·b` with `a ∈ W₁`, `b ∈ W₂` (cyclic `W = W₁ ⊔ W₂`).
+  have hsup : data.W1.subgroupOf data.W ⊔ data.W2.subgroupOf data.W = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hW1le hW2le, ← data.W_eq, Subgroup.subgroupOf_self]
+  have hvmem : (⟨v, hvW⟩ : ↥data.W) ∈
+      data.W1.subgroupOf data.W ⊔ data.W2.subgroupOf data.W := by
+    rw [hsup]; exact Subgroup.mem_top _
+  rw [Subgroup.mem_sup] at hvmem
+  obtain ⟨a, ha, b, hb, hab⟩ := hvmem
+  have haW1 : ((a : ↥data.W) : G) ∈ data.W1 := Subgroup.mem_subgroupOf.mp ha
+  have hbW2 : ((b : ↥data.W) : G) ∈ data.W2 := Subgroup.mem_subgroupOf.mp hb
+  have habG : ((a : ↥data.W) : G) * ((b : ↥data.W) : G) = v := by
+    have := congrArg (Subtype.val) hab; simpa using this
+  -- `b ≠ 1` (else `v = a ∈ W₁`).
+  have hb1 : ((b : ↥data.W) : G) ≠ 1 := by
+    intro h; exact hvnW1 (by rw [← habG, h, mul_one]; exact haW1)
+  -- `b ∈ M_σ` (`W₂ ≤ H = M_F ≤ M_σ`).
+  have hbMσ : ((b : ↥data.W) : G) ∈ OddOrder.BG.Ch3.S10.Msigma M := by
+    refine (data.W2_le.trans (inf_le_left.trans ?_)) hbW2
+    rw [data.H_eq]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hM
+  -- `v` commutes with `b` (both in the abelian `W`).
+  have hcomm : v * ((b : ↥data.W) : G) = ((b : ↥data.W) : G) * v := by
+    have h := congrArg Subtype.val (mul_comm (⟨v, hvW⟩ : ↥data.W) b)
+    simpa using h
+  refine ⟨hWM hvW, fun hbot => hb1 ?_⟩
+  have hbInf : ((b : ↥data.W) : G) ∈
+      OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({v} : Set G) :=
+    ⟨hbMσ, Subgroup.mem_centralizer_singleton_iff.mpr hcomm.symm⟩
+  rw [hbot, Subgroup.mem_bot] at hbInf; exact hbInf
+
 /-- `A₀(S) ⊆ M`: both the `A(S)`-part (`honestTypeP2ASet_subset`) and the `V^S`-part
 (`conjClassSetIn` of the `⊆ M` regular set) land in `M`. -/
 theorem honestTypeP2A0Set_subset {M : Subgroup G} (data : TypePData M) :

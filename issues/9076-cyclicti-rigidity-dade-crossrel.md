@@ -94,6 +94,21 @@ trichotomy** (constant-row/column 除外) は欠く → 4a/4b がそれを埋め
     (`honestTypeP2ASet_subset_hatMsigma` 既存 + `V^M⊆hatMsigma` + order 論法 `V∩𝒞_G(K#)=∅`) +
     κ-Hall/`(κ∪σ)′`-Hall 供給 (M solvable ⟹ Hall 存在)。∴ **旧「FTsupp0 未形式化」は幻**、残 = mechanical
     BG-support bridge。full build 3940 green・AxiomsCheck OK・新 axiom なし。**dadeHypS0 の deepest gate 除去**。
+  - [ ] **4c-2b″ tame helper 完成 route を全 de-risk (2026-07-08 精査、次 iteration 実行)**:
+    `honestTypeP2A0Set_tame_conj` を **circularity 回避のため BG Thm II で uniform に** 証明する
+    (case-dispatch は mixed case = pin ゆえ循環; 実際 `dadeSupportHypothesisData_honestTypeP2A0Set` の
+    dispatch (S15_HonestTypeP2A0:236-244) は mixed に pin を cite = 逆向き依存)。既存 infra 発見:
+    **V-part tame `conjClassSetIn_typePV_isConj_conj_in_M` (S10:1783) は native** (`typePData_V_ti`、
+    Hall/BG Thm II 不要); **A-part `honestTypeP2ASet_isConj_conj_in_M` (S15_Setup:727) は既存**
+    (ASet 経由 BG Thm II)。crux = 単一 inclusion **`honestTypeP2A0Set M data ⊆ A0Set M K`** (BG A0Set):
+    (1) **A-part** `A(S)⊆ASet⊆A0Set` — `honestTypeP2ASet_subset_ASet` 既存 + `ASet⊆A0Set` は order 論法
+        (`U⊔M_σ`-elt は κ′-order, `K#` は κ-order ⟹ `(U⊔M_σ)∩𝒞_G(K#)=∅`, ∴ `hatMsigma∩(U⊔M_σ)⊆hatMsigma∖𝒞_G(K#)`);
+    (2) **V-part** `V^M⊆hatMsigma` (v の W₂-成分 ∈ M_σ# を centralize, W abelian + `data.W₂≤data.H≤M_σ`)
+        ∧ `V^M∩𝒞_G(K#)=∅` (V-elt は σ-prime を order に持つ, K# pure κ);
+    (3) **Halls** `typeP2_exists_matched_kappa_hall_pair hG hM hP2` (S16:1454) — **`IsTypeP2 M` 要**
+        ⟹ pin/helper signature に `hP2` 追加要 (pin 使用箇所 = dadeSupportHypothesisData:241/243 は hP2 保持ゆえ pass 可);
+    (4) helper 本体 = `theoremII_tame_embedding hG hM hKM hUM hK hU (X:=A0Set M K) (Or.inr rfl)` の第1連言 +
+        (1)(2) の inclusion で a,b を A0Set に lift。**全 step tractable、mechanical support-geometry のみ残**。
   - [x] **4c-2c** `Hypothesis.dadeHypS0`/`dadeHypS0_hconj` (commit 79dd67c1 隣): S-instance 'A0-Dade bridge。
   - [x] **4c-3** tauSbetaGrid/GammaGrid/tauS_mu_row0_cross/gammaGrid_defGamma を dadeHypS0 に rewire
     (commit a6f7a2ed)。**headline correctness fix**: 旧 dadeHypS (A(S)⊆S') では μ差の V_S-part が
