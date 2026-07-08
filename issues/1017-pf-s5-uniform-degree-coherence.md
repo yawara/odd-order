@@ -859,3 +859,36 @@ hs1' 供給 + (9.11.5) 全 refutation** まで leaf 完成。残る (9.11) caseA
 (循環回避) を維持。refuter の Dade bundle は S-instance Dade world 依存で、これは 0101 で flag 済の
 world-bridge。**hub 調整事項** (b の chars-level squeeze machinery は完備供給、consumer 側 assembly の
 world 選択が cross-lane 設計判断)。leaf 側で更に進められる genuine piece = (9.11.3) count (次 iteration 検討)。
+
+## 2026-07-08 更新 #27 (lane b, /loop) — ★caseA UNBLOCKED: a の world-bridge landing + char sum-of-squares infra
+
+**a の caseB rewire 3/3 完成 (`e9e16cd9`) + 9075 CLOSE が caseA を構造的に unblock**。caseA が必要とする
+部品が全て reusable に判明:
+- **base case**: `sOf_degreeSubfamily_isCoherent` (S13:1967) = 任意 degree d の sOf 部分族 coherence。
+  caseA の 𝒮₁ (degree qa) coherence はこれで一発 (witness = (9.8.d) count>0 + sOf_antitone、
+  sOf(H₀U')⊆sOf(H₀C') via H₀C'≤H₀U')。
+- **per-member Dade R-data**: `caseB_sOf_memberRFamily` (S13:3012、既約→signed Dade /
+  column→certainTypeR、degree 非依存 = caseA でも可)。maximality induction の adjoin が要する subcoherent 構造。
+- **input 群** (全 sOf reusable): `caseB_sOf_memberRFamily_orthogonal` / `sOf_closedUnderConjugate` /
+  `tau_inner_eq_of_supported` (iso) / `dadeIntegralCharacterMap_mem_ZIrr_of_supported` /
+  `inducedKernelFamily_hasNoRealCharacters`。engine = `uniform_degree_coherence_of_families`
+  (S07_PivotCoherence:793、norm-general、hDeg 撤去)。
+
+**b の landed 部品** (全 sorry-free、caseA arithmetic scaffold + char infra):
+- (9.11.1)-(9.11.5) arithmetic 核 (更新#26): squeeze 同定 / 群世界 config (C=U', a=(p−1)/2) /
+  u≤a² / (9.11.5) 全 refutation / (9.11.3) count 核。
+- **char sum-of-squares infra** (新): `sumDegreeSq_kernelInterval` (一般
+  Σ_{N≤ker,K⊄ker} χ(1)²=|G/N|−|G/(K⊔N)|、`NonInflatedDegreeSqInterval.lean`、config-independent
+  reusable) + `sum_xiOf_H0C_degreeSq` (§9 application: Σ_{𝒳(H₀C)} χ(1)² = |HU/(H₀C)|−u)。
+
+**残 caseA assembly (次 session、multi-step)**:
+1. **caseA entry point** = `coherent_of_maximal_coherent_pair_refuted` (私の skeleton) を具体 caseA
+   (τ=hyp.base.tau, S=sOf H0Cprime, S₁=degree-qa cut=a の base case) に instantiate → refuter への reduction。
+   **要 = 新 b-owned Hypothesis-level file** (S13 import; my leaf は循環回避で S13 非 import)。
+   S11_NineElevenCoherence carve-out (0101) と同様 hub carve-out 要 (a-namespace 検出摩擦回避)。
+2. **refuter deep 入力**: (9.11.3) hclass の残 = |HU/(H₀C)|=p^q·u index arith (|H|/|H₀|=p^q × [U:C]=u、
+   realized-subgroup card tower) / (9.11.4) Mackey norm ‖Ind_{HU₁}^M 1‖² (double-coset、非正規 HU₁ ゆえ
+   general Mackey 要 scratch build) / (9.11.2) inertia 恒等式 C=U₁⊓U₁ʷ (two-summand char inertia)。
+3. **adjoin per-step wiring**: maximality induction の (5.6) engine (xAdjoinStepW) を a の R-data
+   (caseB_sOf_memberRFamily) で発火。OrthonormalCharacterImageFamily → xAdjoinStepW inputs
+   (CharacterPsiDecomposition) の impedance 確認要。
