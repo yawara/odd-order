@@ -107,6 +107,21 @@ trichotomy** (constant-row/column 除外) は欠く → 4a/4b がそれを埋め
     pin 結論 `:False` 不変 (仮説追加のみ) / full build 3941 green / AxiomsCheck OK。
     **残 S15_HonestTypeP2A0 sorry = prime-TI pin 3 本のみ** (mu_row0_ne / tauS_mu_row0_diff_support /
     tauS_mu_row0_vanish_on_V = 9014, tame とは無関係)。
+  - [x] **4c-2d A0-Dade=Ind bridge 完成 (2026-07-08)** ✅ — (13.18) A0-Dade infra を **完全 honest 化**:
+    `escaping_honestTypeP2A0Set_eq_empty` ((13.2.e) A0 normedTI, 既存の proven A(S)版から) →
+    `dadeHypS0_H_eq_ftSupportKernel` → `forall_dadeHypS0_H_eq_bot` (全 A0-stabilizer =⊥) →
+    `sInstance_dade0_eq_induce` (**τ_S = Ind_S^G on A0-support**, dadeMap_eq_induce + restrict_H 経由)。
+    ⟹ gammaGrid_orthogonal_one / pin C の **τ_S=Ind 半分は解決**、残 gate は uniform に prime-TI のみ。
+    full build 3941 green・AxiomsCheck OK・新 axiom/sorry 無。
+  - **⚠ prime-TI frontier 精密特定 (2026-07-08 精査)**: (13.18) 全 endpoint の残 gate = prime-TI **のみ**。
+    重要発見: **μ V-value は §12 で既に形式化** (`Hypothesis.muGrid_apply_eq_columnSign_smul_alignedOmegaSigma_of_mem_typePV`,
+    S12_Core:2584: `muGrid i j v = columnSign j • alignedOmegaSigmaGrid i j v` on typePV)、
+    `muColumnSign`/`alignedOmegaSigmaGrid`/`muGrid_apply` 一式 (S12_Core) 完備。**ただし §10/§12
+    `Hypothesis M` framework の `muGrid`** であって **S15 `Hypothesis` の `hyp.mu` (free field)** ではない。
+    ∴ pin discharge の道 = (a) **S15.mu ↔ §12.muGrid (M=hyp.S) framework bridge** を建てて §12 の
+    V-value/distinctness を transport、or (b) S15 Hypothesis carrier に prime-TI field を追加 (constructor 供給)、
+    or (c) 9014 general residue API port。いずれも substantial (次 session 級)。**mu_row0_ne** (cross-column
+    distinctness) は §12 の grid injectivity 側、**vanish_on_V** は上記 V-value + 新 A0-Dade=Ind bridge の合成。
   - **route (実装済、参考)**:
     `honestTypeP2A0Set_tame_conj` を **circularity 回避のため BG Thm II で uniform に** 証明する
     (case-dispatch は mixed case = pin ゆえ循環; 実際 `dadeSupportHypothesisData_honestTypeP2A0Set` の
@@ -215,3 +230,25 @@ merge_monitor 🔧) に従い **retroactive に carve-out 拡張 #2 を付与し
 
 ⟹ **(13.18) S-side A0-rewire ブロック = lane c 所有** (step 1.5 逸脱でない)。**b は次回 main sync で c の
 rewire を取り込み、`tauS_mu_row0_cross` を再構築しないこと。** 正本 = merge_monitor.md「coordination 点 解決」節。
+
+## ⚠ HUB FLAG (2026-07-08, lane c /loop): (13.18) A0-Dade 完了 → 残 pin は lane-b 依存 (reallocation 要検討)
+
+lane c は本 session で **(13.18) A0-Dade infra を包括的に完成** (8 commit): cross-relation assembly
+(`tauS_mu_row0_cross`) / deep A0-normedTI pin **完全 discharge** (`not_isConj_honestTypeP2ASet_typePV`
+= BG Thm II tame conjugation, `honestTypeP2A0Set_tame_conj` 完成) / A0-Dade=Ind bridge 完成
+(`escaping_honestTypeP2A0Set_eq_empty` → `forall_dadeHypS0_H_eq_bot` → `sInstance_dade0_eq_induce`)。
+**A0-Dade 側は完全 honest** (新 axiom 無、build 3941 green)。
+
+**残 (13.18) endpoint (3 pin + gammaGrid_orthogonal_one/real/Y_norm_bound) の gate は uniform に
+prime-TI μ-grid の cross-column 構造のみ**。精査で判明した **重要 blocker**:
+- S15 `Hypothesis` は **posited carrier** (`S16_NonExistenceGCore:43 base : S15.Hypothesis`)、`mu` は free field。
+- 3 pin (mu_row0_ne=cross-column distinctness / diff_support=off-A0 一致 / vanish_on_V=V-value) は
+  **全て cross-column μ 構造**を要する。`mu_definition` (13.1.e) は **within-column のみ**ゆえ不足。
+- cross-column μ 構造 = **§12 で既に形式化** (`muGrid_apply_eq_columnSign_smul_alignedOmegaSigma_of_mem_typePV`
+  等, S12_Core) だが **§10/§12 `Hypothesis M` framework の `muGrid`**。S15 `hyp.mu` (free field) との
+  **connection = S15 Hypothesis carrier の honest 構成** (mu = §12 muGrid) が必要 = **lane-b S15 char cascade** territory。
+
+⟹ **lane c の ungated・非 lane-b な (13.18) 仕事は完了**。残は (a) lane-b の S15 carrier 構成 (mu を §12
+prime-TI に接続)、or (b) S15↔§12 framework bridge (carrier 構成前提ゆえ bridge lemma 単独では pin 未 discharge)。
+**hub 裁定要**: lane c を (i) lane-b char cascade 支援に再配置 / (ii) S16 W-side の別 gated frontier / (iii) 他。
+lane c は本 flag 後も /loop 継続 (報告≠停止); 次 iteration は S16 W-side 等で ungated piece を再走査。
