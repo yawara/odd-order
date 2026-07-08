@@ -1094,4 +1094,42 @@ theorem sum_xiOf_H0C_degreeSq (data : TypesIIIIIIVSetup M) (chief : ChiefFactorD
 
 end CharacterSumOfSquares
 
+/-! ### (9.11.4): the norm reduction `‖α‖² = ‖γ‖² + 1`
+
+Book (9.11.4): `α = γ − ψ₁` with `γ = Ind_{HU₁}^M 1` and `ψ₁ ∈ 𝒮₁` a norm-one irreducible.  Since
+every constituent of the trivial-induced `γ` has `H ⊆ ker` while `ψ₁` does not, `⟨γ, ψ₁⟩ = 0`, and
+the virtual-character norm splits `‖α‖² = ‖γ‖² + 1` (Coq `'[alpha] = '[gamma] + 1`,
+`PFsection9.v:1905`).  The remaining `‖γ‖²` is the Mackey double-coset count
+`(1/q)·Σ_{w∈W₁} |U₁ ∩ U₁ʷ| / |C| = a + (q−1)a²/u`, resolved through the (9.11.2) inertia identity
+`U₁ ∩ U₁ʷ = C`; **this subsection isolates the character-side reduction, which is independent of
+(9.11.2)**. -/
+
+section NineElevenFour
+
+/-- **Peterfalvi (9.11.4), the norm reduction `‖γ − ψ‖² = ‖γ‖² + 1`** (`cfnormBd`).
+
+For a norm-one irreducible character `ψ` orthogonal to a class function `γ` (`⟨γ, ψ⟩ = 0`), the
+difference `α = γ − ψ` has `⟨α, α⟩ = ⟨γ, γ⟩ + 1`: sesquilinearity expands
+`⟨γ−ψ, γ−ψ⟩ = ⟨γ,γ⟩ − ⟨γ,ψ⟩ − ⟨ψ,γ⟩ + ⟨ψ,ψ⟩`, with `⟨γ,ψ⟩ = 0` (hypothesis),
+`⟨ψ,γ⟩ = conj⟨γ,ψ⟩ = 0` (`inner_conj_symm`), and `⟨ψ,ψ⟩ = 1`
+(`IsIrreducibleCharacter.inner_self_eq_one`).  This is the character-side step of (9.11.4): with
+`γ = Ind_{HU₁}^M 1` and `ψ = ψ₁ ∈ 𝒮₁` (orthogonal because `H ⊆ ker` of every constituent of `γ`
+but not of `ψ₁`), it gives `‖α‖² = ‖γ‖² + 1`; the remaining `‖γ‖²` is the (9.11.2)-gated Mackey
+count.  Stated for an arbitrary character `γ` (no coherence/induction hypothesis), so it is reusable
+wherever a norm-one irreducible is subtracted off orthogonally. -/
+theorem cfnorm_sub_irreducible_orthogonal {Γ : Type*} [Group Γ] [Fintype Γ]
+    [Invertible (Nat.card Γ : ℂ)] {γ ψ : ClassFunction Γ ℂ}
+    (hψ : IsIrreducibleCharacter ψ) (hortho : ClassFunction.inner γ ψ = 0) :
+    ClassFunction.inner (γ - ψ) (γ - ψ) = ClassFunction.inner γ γ + 1 := by
+  have hψγ : ClassFunction.inner ψ γ = 0 := by
+    rw [inner_conj_symm γ ψ, hortho, star_zero]
+  have hψψ : ClassFunction.inner ψ ψ = 1 := by
+    simpa using irreducibleCharacter_inner_eq_ite
+      (⟨ψ, hψ⟩ : IrreducibleCharacter Γ) ⟨ψ, hψ⟩
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
+    hortho, hψγ, hψψ]
+  ring
+
+end NineElevenFour
+
 end OddOrder.Peterfalvi.S11
