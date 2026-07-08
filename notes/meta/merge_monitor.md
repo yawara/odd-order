@@ -209,6 +209,17 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > 一様 route = a (S13 landed 済、b は再構築禁止) / full assembly = a (S12/S13 側で S11 leaf を import)**。
 > 詳細 = issues/0101。
 >
+> **carve-out (issue 9076, hub 裁定 2026-07-08 監視 tick)**: `OddOrder/Peterfalvi/S05_GridRigidity.lean`
+> (lane c が新規作成、Pf (3.8) abstract norm-2 rigidity engine `orthonormalGrid_diff_rigidity` = S05 σ-image
+> と S15 η-grid を de-dup する module-generic 核) は名目上 lane a の S05 regex に掛かるが、issue 9076
+> (lane c shared-infra claim、§3 cyclicTI rigidity、claim-before-build 準拠) の abstract engine ゆえ
+> **lane c 所有**として扱う (carve-out 0090/0096/0101 と同型 = 名目 regex でなく内容で割当)。根拠: lane a は
+> S05 系を一切編集していない (active 衝突なし)、依存 `S05_GridTrichotomy` は既存 grid-rigidity infra、
+> 9076 の「§10-13 と重なる可能性」は a が rigidity を **cite** する consumer 関係 (signature contract) で
+> 所有衝突でない。⟹ step 1.5 で c が S05_GridRigidity (+ grid-rigidity S05_Grid* 系・S16_GridExpansion)
+> を編集しても逸脱でない (lane a が S05_Grid* を編集したら逸脱; c が S05 の char-核 file = S05_TICyclic 等を
+> 編集したら従来どおり逸脱)。詳細 = issues/9076。
+>
 > **⟹ 拡張 #2 (ユーザー裁定 2026-07-05 tick(3) — Hypothesis76 (7.6) 忠実化 field の包括許可)**:
 > 同型逸脱 3 連発 (issue 0091 Hypothesis78 / zeta_induced / zeta_injective、各回ユーザー受理) の
 > 反復解消として、**issue 2034/3002 の (13.5) 供給作業中に限り、b による `S09_NonexistenceCertain`
