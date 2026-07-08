@@ -1378,8 +1378,9 @@ theorem not_orthogonal_mu0_sub_zeta [Finite G]
   sorry
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (9.5)/(9.9.b): the nontrivial column sums `μ_k` are `𝒮(H₀C′)`-members** — the
-`hμmem` input of the (9.11) caseB chain fold (`caseB_coherent_sOf_H0Cprime_of_mixed`).
+/-- **Peterfalvi (9.5)/(9.9.b): the nontrivial column sums `μ_k` are `𝒮(H₀C)`-members** — the
+`𝒮(H₀C)`-level form (kernel `H₀ ⊔ C`), from which the `𝒮(H₀C′)` version and the caseB
+`𝒮(H₀C)`-coherence witness follow.
 
 The chain: `μ_k ∈ 𝒮(H₀^prod)` and is reducible by the (11.8.1) count
 (`muGrid_column_sum_mem_sOf_H0_and_reducible`, at a producer chief over `toTypesIIIIIIVSetup`);
@@ -1387,15 +1388,14 @@ the family relaxes to `𝒮(⊥)` (kernel antitone) where it is setup-independen
 agrees with the producer (`TypesIIIIIIVSetup.eq_of_typeP_eq`, `setup_typeP_eq`); `H₀ = ⊥` in
 types III/IV (`chief_H0_eq_bot`), so this is `𝒮(H₀)`-membership over `hyp.s11Setup`; a reducible
 `𝒮(H₀)`-member lies in `𝒮(H₀ ⊔ cSub)` by the (9.9.b) count (`reducible_mem_sOf_H0C`); `cSub = C`
-(`C_eq_cSub`) identifies that family with `𝒮(H₀C)`, and `𝒮(H₀C) ⊆ 𝒮(H₀C′)` (kernel antitone,
-`C′ ≤ C`). -/
-theorem columnSum_muColumnChar_mem_sOf_H0Cprime [Finite G]
+(`C_eq_cSub`) identifies that family with `𝒮(H₀C)`. -/
+theorem columnSum_muColumnChar_mem_sOf_H0C [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
     (k : Fin hyp.base.w2) (hk : k ≠ 0) :
     OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
         (hyp.base.muColumnChar hG hG.odd k)
-      ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime := by
+      ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C := by
   haveI := hyp.base.finiteG
   classical
   have hnt : OddOrder.GroupTheory.TypePNontrivialCore M hyp.base.typeP :=
@@ -1418,11 +1418,23 @@ theorem columnSum_muColumnChar_mem_sOf_H0Cprime [Finite G]
   -- (9.9.b): a reducible `𝒮(H₀)`-member lies in `𝒮(H₀ ⊔ cSub)`
   have hH0C := OddOrder.Peterfalvi.S11.reducible_mem_sOf_H0C hG
     (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief) _ hmemH0 hgrid.2
-  -- `H₀ ⊔ cSub = H₀C` (`C = cSub`), and `𝒮(H₀C) ⊆ 𝒮(H₀C′)` (kernel antitone)
-  apply hyp.sOf_H0C_subset_sOf_H0Cprime
+  -- `H₀ ⊔ cSub = H₀C` (`C = cSub`)
   change _ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup (hyp.chief.H0 ⊔ hyp.C)
   rw [C_eq_cSub hG hyp]
   exact hH0C
+
+/-- **Peterfalvi (9.5)/(9.9.b): the nontrivial column sums `μ_k` are `𝒮(H₀C′)`-members** — the
+`hμmem` input of the (9.11) caseB chain fold (`caseB_coherent_sOf_H0Cprime_of_mixed`).  Follows
+from the `𝒮(H₀C)` form (`columnSum_muColumnChar_mem_sOf_H0C`) by the kernel-antitone subset
+`𝒮(H₀C) ⊆ 𝒮(H₀C′)` (`C′ ≤ C`, `sOf_H0C_subset_sOf_H0Cprime`). -/
+theorem columnSum_muColumnChar_mem_sOf_H0Cprime [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
+    (k : Fin hyp.base.w2) (hk : k ≠ 0) :
+    OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
+        (hyp.base.muColumnChar hG hG.odd k)
+      ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime :=
+  hyp.sOf_H0C_subset_sOf_H0Cprime (columnSum_muColumnChar_mem_sOf_H0C hG hyp k hk)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.9.a), caseB uniform degree on `𝒮(H₀C′)`** — the `hunif` input of the (9.11)
@@ -1540,6 +1552,58 @@ theorem caseB_coherent_sOf_H0Cprime [Finite G]
     hyp.base.one_notMem_A0
     (Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0Cprime hμ₁mem)
     (OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters hModd _ (hIKF hμ₁mem))
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.11)→(11.7), caseB: `𝒮(H₀C)` is coherent on `A₀(M)`** — chains the landed caseB
+`𝒮(H₀C′)`-coherence (`caseB_coherent_sOf_H0Cprime`, issue 9075, the norm-general (5.7) engine)
+forward to `𝒮(H₀C)` via the kernel-antitone restriction `coherent_sOf_H0C_of_coherent_sOf_H0Cprime`
+(Peterfalvi (11.7): `H₀C′ ≤ H₀C` since `C′ = [C,C] ≤ C`), supplying the nonzero `A₀`-supported
+restriction witness `μ̄_k − μ_k` from a reducible μ-column (`columnSum_muColumnChar_mem_sOf_H0C`,
+`w₂ ≥ 2`; the conjugate difference is `A₀`-supported by `inducedKernelFamily_conjDiff_support` and
+nonzero by odd-order no-real-characters).
+
+This is the caseB `hY` (𝒮(H₀C)-coherence) input of the (11.8.6) world-bridge union-glue
+`coherent_SOf_H0C_of_glued`, making the issue-9075 caseB coherence load-bearing toward the honest
+(11.8.6) narrow-`𝒮₂` route (contradicting (11.3) `S_H0C_not_coherent`) that replaces the
+`Sset \ SHCSet` uniform-degree route (false for non-Galois type III/IV, issue 1019). -/
+noncomputable def caseB_coherent_sOf_H0C [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
+    (caseB : OddOrder.Peterfalvi.S11.CliffordCaseBData
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief)) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+      (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C) hyp.base.A0 := by
+  haveI := hyp.base.finiteG
+  classical
+  -- the pivot μ-column `μ_k ∈ 𝒮(H₀C)` (nonzero column `k = 1`, `w₂ ≥ 2`)
+  have hw2 : 1 < hyp.base.w2 := hyp.params.w2_prime.one_lt
+  have hk1 : (⟨1, hw2⟩ : Fin hyp.base.w2) ≠ 0 := by
+    intro heq; have := congrArg Fin.val heq; simp at this
+  set μ : ClassFunction ↥M ℂ := OddOrder.Peterfalvi.S06.columnSum
+    (hyp.base.toHypothesis46 hG hG.odd) (hyp.base.muColumnChar hG hG.odd ⟨1, hw2⟩) with hμdef
+  have hμmem : μ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
+    columnSum_muColumnChar_mem_sOf_H0C hG hyp ⟨1, hw2⟩ hk1
+  -- the `𝒮(H₀C) → inducedKernelFamily(⊥)` world-bridge (for the support / no-real facts)
+  have hIKF : ∀ ⦃x : ClassFunction ↥M ℂ⦄,
+      x ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C →
+      x ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) := fun {x} hx =>
+    OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone bot_le
+      (by rw [← hyp.SOf_eq]; exact hyp.sOf_subset_SOf hyp.H0C hx)
+  -- the conjugate `μ̄ ∈ 𝒮(H₀C)` (closed under conjugation)
+  have hμc : μ.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
+    Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hμmem
+  refine coherent_sOf_H0C_of_coherent_sOf_H0Cprime hyp
+    (caseB_coherent_sOf_H0Cprime hG hyp caseB).some ⟨μ.conj - μ, ⟨?_, ?_⟩, ?_⟩
+  · -- `μ̄ − μ ∈ ℤ[𝒮(H₀C)]`
+    exact Submodule.sub_mem _ (Submodule.subset_span hμc) (Submodule.subset_span hμmem)
+  · -- `μ̄ − μ` is `A₀`-supported
+    exact OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support
+      hyp.base.mderivSharp_subset_A0 (hIKF hμmem)
+  · -- `μ̄ − μ ≠ 0` (odd order ⇒ no real characters)
+    intro h
+    exact OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters
+      (hyp.base.card_odd_of_isMinimalSimpleOdd hG) _ (hIKF hμmem) (sub_eq_zero.mp h)
 
 /-! ## (11.9): final Type III conclusion -/
 
