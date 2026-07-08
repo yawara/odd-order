@@ -128,3 +128,12 @@ gate-2 `coherent_Sset_of_column_identities` の sorry が `coherent_Sset_of_glue
   (2) non-orthonormal glue-map constructor (**lane-b の S07 coherence carve-out**)。lane-a の on-path
   frontier (群論 + gluing wrapper + obligation 分離) は**完遂**。次は lane-b/§14 の 2 obligation build 待ち、
   または hub が (2) の non-orthonormal glue constructor を lane-b にアサイン。
+
+
+## ✅ HUB CLOSE (2026-07-08 監視 tick): 裁定実行済 → 後継 tracker へ移譲
+
+9016 HUB RULING の両 obligation は実行完了:
+- **obligation-2** (non-orthonormal τ₃/ν glue-map constructor, lane-a S07 carve-out) = commit `a39e2934` で sorry-free landing (merge `77c410b8`)、merge_monitor.md 記録。
+- **obligation-1** (hY producer = lane-b / S07_Subcoherent) = 専用 carve-out issue **0101** (2026-07-08) に fork・実施。
+
+残る FT math (hY = `coherent_Sset_diff_SHCSet` / (6.8.1) capstone / `feitThompson` bare sorry) は生きているが、**9016 は既にその live tracker でない**: 本 issue の uniform-degree roadmap は issue **1019** (2026-07-07) が「非 Galois で偽」と反証し、(11.8.6) redesign を 1019、(9.11) 実行を 0101、§14 gate を 7001 が所有。⟹ 9016 は redundant historical ruling record。**後継 tracker = 1019 / 0101 / 7001**。close。
