@@ -708,9 +708,9 @@ numeric equalities `u = [U:U']`, `2a = p−1`, `χdeg = u` into the group facts 
 and the `𝒮₃`-member source degree `= u`.
 
 The load-bearing translation is `[U:C] = [U:U'] ⟹ C = U'`: with `U' ≤ C ≤ U`, the relative index is
-*strictly* monotone off equality (`relIndex_lt_relIndex_of_le_of_ne`, landed), so equal indices force
-`C = U'`.  The remaining inputs `hs1'`/`hpair` are the world-specific member bundle: `hs1'` is the
-uniform sub-family value `|𝒮₁'|·(qa)² ≤ sumnS 𝒮₂` ((9.11.5)-(9.11.6)) and `hpair` is the (5.6)
+*strictly* monotone off equality (`relIndex_lt_relIndex_of_le_of_ne`, landed), so equal indices
+force `C = U'`.  The remaining inputs `hs1'`/`hpair` are the world-specific member bundle: `hs1'` is
+the uniform sub-family value `|𝒮₁'|·(qa)² ≤ sumnS 𝒮₂` ((9.11.5)-(9.11.6)) and `hpair` is the (5.6)
 contrapositive `sumnS 𝒮₂ ≤ 2q²a·χ(1)` (the pair-refuted clause through the weighted adjoin engine
 `coherentDegreeSqNormBound_of_not_coherentW`); both are supplied by the refuter assembly. -/
 
@@ -720,8 +720,8 @@ variable [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
   {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
 
 /-- **`Even (p − 1)`** for the chief-factor prime `p` of a minimal simple group of odd order.  `p`
-divides `|H̄| = p^q ∣ |H| ∣ |G|` (odd), so `p` is odd (`≠ 2`) and `p − 1` is even.  The `lb12` parity
-input `2a ∣ (p−1)`. -/
+divides `|H̄| = p^q ∣ |H| ∣ |G|` (odd), so `p` is odd (`≠ 2`) and `p − 1` is even.  The `lb12`
+parity input `2a ∣ (p−1)`. -/
 theorem chiefFactor_p_sub_one_even (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     Even (chief.p - 1) := by
   have hq : 0 < data.q := data.nontrivial.2.1.pos
@@ -737,9 +737,9 @@ theorem chiefFactor_p_sub_one_even (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
 /-- **Peterfalvi (9.11.1), the group-world equality configuration.**
 
 The translation of `nineElevenOne_squeeze_arithmetic`'s numeric equalities into the group facts of
-(9.11.1): given the squeeze inputs — the landed §9 identifications (`hχu`, `u_le_relIndex_uprimeSub_U`,
-`caseA_character_count_exact`) plus the world bundle (`hs1'` uniform sub-family value, `hpair` (5.6)
-contrapositive) — the squeeze circle closes to force
+(9.11.1): given the squeeze inputs — the landed §9 identifications (`hχu`,
+`u_le_relIndex_uprimeSub_U`, `caseA_character_count_exact`) plus the world bundle (`hs1'` uniform
+sub-family value, `hpair` (5.6) contrapositive) — the squeeze circle closes to force
 
 * `2·a = p − 1` (hence `a = (p−1)/2`);
 * `C = U'` (from `[U:C] = [U:U']`, strict-index monotonicity off equality);
@@ -747,8 +747,8 @@ contrapositive) — the squeeze circle closes to force
 * the count equality `n₁·a² = (p−1)·[U:U']` (`|𝒮₁| = (p−1)u/a²`).
 
 Here `χdeg` is the abstract source degree of the chosen `𝒮₃`-member (`χ(1) ≤ u`) and `n₁` the number
-of degree-`qa` irreducibles in `𝒮(H₀U')` (the landed count `caseA_character_counts` (d)); `s₂` is the
-real `sumnS 𝒮₂`.  This is what the (9.11.2)–(9.11.8) refutation consumes. -/
+of degree-`qa` irreducibles in `𝒮(H₀U')` (the landed count `caseA_character_counts` (d)); `s₂` is
+the real `sumnS 𝒮₂`.  This is what the (9.11.2)–(9.11.8) refutation consumes. -/
 theorem nineElevenOne_configuration (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (caseA : CliffordCaseAData chars) {χdeg : ℕ} {s₂ : ℝ}
     (hq : 0 < data.q) (hu : 0 < chars.u)
@@ -782,5 +782,128 @@ theorem nineElevenOne_configuration (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (uprimeSub_le_cSub data chief) (cSub_le_U data chief) hne'))
 
 end Configuration
+
+/-! ### (9.11.5) preamble: the uniform sub-family `sumnS` value
+
+Book (9.11.5) / Coq `lb3S1'` left endpoint: on `𝒮₁'` (the degree-`qa` irreducibles) every member is
+norm-one of degree `qa`, so `Snorm ≡ (qa)²` and `sumnS 𝒮₁' = |𝒮₁'|·(qa)²`.  This is the `hs1'`
+supplier of `nineElevenOne_configuration` combined with `sumnS_le_of_subset` (`𝒮₁' ⊆ 𝒮₂`). -/
+
+section UniformSubfamily
+
+variable [Finite G] {M : Subgroup G}
+
+/-- **The uniform sub-family `sumnS` value.**  For a finite family `Si` of irreducible characters of
+common degree `d`, `sumnS Si = |Si|·d²`: each member is norm-one (`inner_self_eq_one`, so `Snorm =
+degree²`) of degree `d`.  The (9.11.5) left endpoint (`sumnS_of_norm_one_constant_degree` fed the
+two pointwise facts from irreducibility + the degree). -/
+theorem sumnS_irreducible_constant_degree [Fintype ↥M] [Invertible (Nat.card ↥M : ℂ)]
+    (Si : Finset (ClassFunction ↥M ℂ)) {d : ℕ}
+    (hirr : ∀ ψ ∈ Si, IsIrreducibleCharacter ψ) (hdeg : ∀ ψ ∈ Si, ψ 1 = (d : ℂ)) :
+    OddOrder.Peterfalvi.S07.sumnS Si = (Si.card : ℝ) * (d : ℝ) ^ 2 := by
+  refine OddOrder.Peterfalvi.S07.sumnS_of_norm_one_constant_degree
+    (fun ψ hψ => ?_) (fun ψ hψ => ?_)
+  · have h : ClassFunction.inner ψ ψ = 1 := by
+      simpa using OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite
+        (⟨ψ, hirr ψ hψ⟩ : IrreducibleCharacter ↥M) ⟨ψ, hirr ψ hψ⟩
+    rw [h, Complex.one_re]
+  · rw [hdeg ψ hψ, Complex.natCast_re]
+
+end UniformSubfamily
+
+/-! ### (9.11.5): the exponential-beats-polynomial arithmetic contradiction
+
+Book (9.11.5), final step: assuming `|𝒮₄| ≤ ‖α‖²`, the (9.11.3)/(9.11.4) norm identities and
+(9.11.2) give `p^q − 1 ≤ (q+2)a³ + q²a² + 2qa`; with `p = 2a+1` this forces `2^q ≤ q+2`,
+contradicting the induction `2^x > x+2` for `x ≥ 3`.  This subsection isolates the pure
+`ℕ`-arithmetic core: the binomial lower bound `(2a+1)^q ≥ 2^q a^q + 2q(q−1)a² + 2qa + 1`
+(extracting the `k ∈ {0,1,2,q}` terms) composed with the polynomial upper bound is impossible for
+`q ≥ 3`, `a ≥ 1`. -/
+
+section FiveArithmetic
+
+/-- **`q + 2 < 2^q` for `q ≥ 3`** (the (9.11.5) endgame `2^x > x+2`, `x ≥ 3`), by induction:
+base `3 + 2 = 5 < 8`, step `2·2^q ≥ 2(q+3) ≥ (q+1)+3`. -/
+theorem add_two_lt_two_pow {q : ℕ} (hq : 3 ≤ q) : q + 2 < 2 ^ q := by
+  induction q with
+  | zero => omega
+  | succ n ih =>
+    rcases Nat.lt_or_ge n 3 with hn | hn
+    · interval_cases n <;> simp_all <;> omega
+    · have := ih hn
+      rw [pow_succ]
+      omega
+
+/-- **`2·(q.choose 2) = q·(q−1)`** (the `k = 2` binomial coefficient in exact form): `q.choose 2 =
+q(q−1)/2` and `q(q−1)` is even (consecutive product). -/
+theorem two_mul_choose_two (q : ℕ) : 2 * q.choose 2 = q * (q - 1) := by
+  rw [Nat.choose_two_right]
+  rcases Nat.eq_zero_or_pos q with hq | hq
+  · simp [hq]
+  · have heven : 2 ∣ q * (q - 1) := by
+      rcases Nat.even_or_odd q with h | h
+      · exact Dvd.dvd.mul_right (even_iff_two_dvd.mp h) _
+      · exact Dvd.dvd.mul_left (even_iff_two_dvd.mp (Nat.Odd.sub_odd h odd_one)) _
+    exact Nat.mul_div_cancel' heven
+
+/-- **The (9.11.5) binomial lower bound** `2^q·a^q + 2q(q−1)·a² + 2q·a + 1 ≤ (2a+1)^q` (`q ≥ 3`):
+the sum of the `k ∈ {0,1,2,q}` terms of `(2a+1)^q = ∑ (2a)^k·C(q,k)`, all others being
+nonnegative. -/
+theorem binomial_lower_bound {q a : ℕ} (hq : 3 ≤ q) :
+    2 ^ q * a ^ q + 2 * q * (q - 1) * a ^ 2 + 2 * q * a + 1 ≤ (2 * a + 1) ^ q := by
+  have hexp : (2 * a + 1) ^ q = ∑ k ∈ Finset.range (q + 1), (2 * a) ^ k * q.choose k := by
+    rw [add_pow]
+    exact Finset.sum_congr rfl fun k _ => by rw [one_pow, mul_one, Nat.cast_id]
+  rw [hexp]
+  have hsub : ({0, 1, 2, q} : Finset ℕ) ⊆ Finset.range (q + 1) := by
+    intro x hx
+    simp only [Finset.mem_insert, Finset.mem_singleton] at hx
+    rw [Finset.mem_range]; omega
+  refine le_trans ?_ (Finset.sum_le_sum_of_subset hsub)
+  -- The subset sum over `{0,1,2,q}` equals the four extracted terms.
+  have h01 : (0 : ℕ) ∉ ({1, 2, q} : Finset ℕ) := by simp; omega
+  have h12 : (1 : ℕ) ∉ ({2, q} : Finset ℕ) := by simp; omega
+  have h2q : (2 : ℕ) ∉ ({q} : Finset ℕ) := by simp; omega
+  rw [show ({0, 1, 2, q} : Finset ℕ) = insert 0 (insert 1 (insert 2 {q})) from rfl,
+    Finset.sum_insert h01, Finset.sum_insert h12, Finset.sum_insert h2q, Finset.sum_singleton]
+  -- Evaluate each term.
+  have e0 : (2 * a) ^ 0 * q.choose 0 = 1 := by simp
+  have e1 : (2 * a) ^ 1 * q.choose 1 = 2 * q * a := by
+    rw [pow_one, Nat.choose_one_right]; ring
+  have e2 : (2 * a) ^ 2 * q.choose 2 = 2 * q * (q - 1) * a ^ 2 := by
+    rw [mul_pow, show (2 : ℕ) ^ 2 = 4 from rfl, mul_comm ((4 : ℕ) * a ^ 2) (q.choose 2),
+      ← mul_assoc, show (q.choose 2) * 4 = 2 * (2 * q.choose 2) by ring, two_mul_choose_two]
+    ring
+  have eq : (2 * a) ^ q * q.choose q = 2 ^ q * a ^ q := by
+    rw [Nat.choose_self, mul_one, mul_pow]
+  rw [e0, e1, e2, eq]; omega
+
+/-- **Peterfalvi (9.11.5), the arithmetic contradiction.**  For `q ≥ 3` and `a ≥ 1`, the polynomial
+bound `(2a+1)^q − 1 ≤ (q+2)a³ + q²a² + 2qa` (from `|𝒮₄| ≤ ‖α‖²` via (9.11.2)-(9.11.4), with
+`p = 2a+1`) is impossible: the binomial lower bound forces `2^q·a^q ≤ (q+2)·a³` (the `a²` terms
+cancel since `2q(q−1) ≥ q²` for `q ≥ 2`), hence `2^q ≤ q+2` (as `a^q ≥ a³`), contradicting
+`add_two_lt_two_pow`. -/
+theorem nineElevenFive_arithmetic_contradiction {q a : ℕ} (hq : 3 ≤ q) (ha : 1 ≤ a)
+    (hbound : (2 * a + 1) ^ q - 1 ≤ (q + 2) * a ^ 3 + q ^ 2 * a ^ 2 + 2 * q * a) : False := by
+  have hlb := binomial_lower_bound (a := a) hq
+  -- `2^q a^q + 2q(q−1)a² + 2qa ≤ (2a+1)^q − 1 ≤ (q+2)a³ + q²a² + 2qa`, cancel `2qa`.
+  have hchain : 2 ^ q * a ^ q + 2 * q * (q - 1) * a ^ 2
+      ≤ (q + 2) * a ^ 3 + q ^ 2 * a ^ 2 := by
+    have h1 : 2 ^ q * a ^ q + 2 * q * (q - 1) * a ^ 2 + 2 * q * a
+        ≤ (2 * a + 1) ^ q - 1 := by omega
+    omega
+  -- `q²a² ≤ 2q(q−1)a²` (since `2q(q−1) ≥ q²` for `q ≥ 2`), so `2^q a^q ≤ (q+2)a³`.
+  have hq2 : q ^ 2 ≤ 2 * q * (q - 1) := by nlinarith [Nat.sub_add_cancel (by omega : 1 ≤ q)]
+  have hqaq : 2 ^ q * a ^ q ≤ (q + 2) * a ^ 3 := by nlinarith [Nat.mul_le_mul_right (a ^ 2) hq2]
+  -- `a^q ≥ a^3` (as `q ≥ 3`, `a ≥ 1`), so `2^q a³ ≤ (q+2)a³`, giving `2^q ≤ q+2`.
+  have haq : a ^ 3 ≤ a ^ q := Nat.pow_le_pow_right ha hq
+  have hfinal : 2 ^ q ≤ q + 2 := by
+    have ha3 : 0 < a ^ 3 := pow_pos (by omega : (0 : ℕ) < a) 3
+    have : 2 ^ q * a ^ 3 ≤ (q + 2) * a ^ 3 :=
+      le_trans (Nat.mul_le_mul_left (2 ^ q) haq) hqaq
+    exact Nat.le_of_mul_le_mul_right this ha3
+  exact absurd hfinal (Nat.not_le.mpr (add_two_lt_two_pow hq))
+
+end FiveArithmetic
 
 end OddOrder.Peterfalvi.S11
