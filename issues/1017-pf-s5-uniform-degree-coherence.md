@@ -952,3 +952,27 @@ prime-order argument で排除 → =u ⟹ U₁∩U₁ʷ=C。**multi-iteration �
 
 **残 caseA refuter deep 入力 (優先順)**: (9.11.2) tiU1 [最上流、次] → (9.11.4) ‖γ‖² [tiU1-gated] →
 (9.11.3) hclass/hn degree-split [sum_xiOf_H0C_degreeSq landed、degree 構造が残] → adjoin 枝 wiring。
+
+## 2026-07-08 更新 #30 (lane b, /loop iter 2) — equality-branch assembly landing (9.11.2-5 連鎖)
+
+**landed (S11_NineElevenCoherence、sorry-free、commit 1d335aef)**:
+- `nineElevenCaseA_equality_refutation`: (9.11.1) config `p=2a+1` の下で 3 deep 入力
+  ((9.11.2) inertia identity C=K₁⊓K₂ / (9.11.3) hclass+hn / (9.11.4) hnorm) + coherence bound
+  hle → False。(9.11.2)→(9.11.5) の 4 landed 定理を連鎖、p=2a+1 substitution で整合。
+
+**⟹ equality 枝は arithmetic 全 discharge**。残 honest content = **3 named deep 入力のみ** +
+refuter wiring (dichotomy = nineElevenOne_configuration で config 産出 + hle = pair-refuted→(5.6) bound)。
+
+**deep 入力の tractability 調査 (S11 machinery 精読)**:
+- (9.11.2) は `hcPsi_inertia_index_eq_u` (S11:10084、all-summands θ ⟹ inertia index=u) を
+  **two-summand θ (regular on {S₀, S₀ʷ}) に一般化** して inertia index = #|U:U₁∩U₁ʷ| を得る route。
+  machinery = inertia_eq_hcInHu_caseA + hcConjDescend (HU-conj ↔ Ū-precomp equivariance)。
+  **repo に cfDprod 無** ゆえ Coq の θ=cfBigdprod route でなく、この一般化 route が Lean-native。
+  multi-session。**⚠ `CliffordCaseAData.Ubar_embeds_product` は vacuous free field (:=True, S11:6678)**
+  — (9.11.2) injectivity は honest 証明要 (この field は使えない)。
+- landed 部品: `index_cuInHu_subgroupOf_uInHu_eq_a` (S11:4527, [U:C_U(S₀)]=a) /
+  `relIndex_cuSub_U_eq_a` (K₁=cuSub の relIndex=a) → nineElevenTwo の hK₁ は供給済、
+  残 = hK₂ (K₂=C_U(S₀ʷ) の index=a、W₁-conj-invariance) + hCinf (deep two-summand inertia)。
+
+**次 (優先順)**: (9.11.2) two-summand inertia 一般化 [upstream 最深] → refuter dichotomy wiring →
+(9.11.3) degree-split。
