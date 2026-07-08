@@ -1875,3 +1875,22 @@ caller `exists_zeta_residual_not_orthogonal_H0C` が discharge (hζHC = `secondD
 - caseA refuter (S13_Orthogonality:101、lane-b (9.11.2) active)
 - `S_not_coherent` (10.8、deep TI-counting gate)
 lane-a-ownable な ungated (11.8) piece は尽きた (bridge engine + threading で honest 化完遂)。
+
+## 2026-07-08 update¹⁷ (lane-a /loop) — broader Section16Inputs menu take-stock: lane-a producer 完遂、残は cross-lane
+
+`feitThompson` → `sectionSixteenHypothesis_of_isMinimalSimpleOdd` (`Section16Inputs` menu、3 producer 分割)
+の take-stock:
+- **lane-a producer = (11.8) char route** (`card_kappaHall_lt_of_isTypeIIIorIV`/`w2_lt_w1_of_hypothesis_H0C`) —
+  **honest 化完遂** (bridge engine で caseA-false hgen 排除、残 §14 sorry 2 本 hmixed/hbridge_τ は cross-lane)。
+- 他 producer = **BG §14 type-P duality (FeitThompson:936、旧 "lane-f") + BG §16 maximal-pair (:708、旧 "lane-g")**
+  = BG §14/§16 territory (現 lane-b/c、2026-07-06 reshape で b=BG§15/§16 追認)。type-P 構造 engine (:757/843/863)
+  は sorry-free skeleton。
+⟹ **lane-a の ungated FT-spine producer work は完遂**。残 spine work は cross-lane (lane-b/c BG §14/§16 +
+(11.8) route の §14/lane-b/(10.8) gate)。
+
+### lane-a descent 候補 (次 iteration、cluster-exhaustion 手順: hub defer + 次 ungated 上流に着手)
+最有力 = **narrow 𝒮(H₀C) coherence の μ-column pin** (hbridge_τ = `hsofC.extension(∑μ_i1)=∑ω^σ_i1`)。
+現 `coherent_sOf_H0C` は arbitrary coherent extension ゆえ pin 無 (`muColumn_tau1_pin` は Sset-coherence
+`CoherentHypothesis` 限定)。narrow 版 pin 構築 = §9/§14 genuine work、lane-a-ownable の可能性 (§9 は lane-a)。
+要調査: coherent_sOf_H0C を pin 付きで再構成できるか (caseB は forall_mem uniform、caseA は refuter 経由)。
+次点: hmixed (§14 Sibley、lane-c) / (10.8) (deep) は cross-lane、claim-before-build 要。
