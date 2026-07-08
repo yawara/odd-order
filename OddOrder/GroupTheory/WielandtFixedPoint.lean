@@ -289,6 +289,35 @@ theorem frobenius_kernel_centralizes_of_complement_fpf {G : Type*} [Group G] [Fi
   rw [hfix] at hco
   exact (mul_inv_eq_iff_eq_mul.mp hco.symm).symm
 
+/-- **Peterfalvi (9.1), the complement-fixed-point corollary via a sub-Frobenius group.**  Let
+`Lsub ≤ G` be a finite Frobenius group with kernel `H`, let `P ≤ H` be a nontrivial subgroup
+normalized by a nontrivial `A ≤ Lsub` meeting the kernel trivially (`A ⊓ H = ⊥`).  Suppose the
+sub-Frobenius group `P ⊔ A` (kernel `P`, complement `A`) acts coprimely on a finite solvable
+subgroup `K` (`P ⊔ A ≤ N_G(K)`) and the kernel `P` does **not** centralize `K`.  Then the complement
+`A` has a nontrivial fixed point on `K`: some `1 ≠ n ∈ K` is centralized by all of `A`.
+
+This is the `C_K(A) ≠ 1` step of Peterfalvi (12.11): the sub-Frobenius group `P ⊔ A` is built by
+`frobeniusGroup_sup_of_invariant_le_kernel_ambient`, and the conclusion is the contrapositive of
+`frobenius_kernel_centralizes_of_complement_fpf` (`C_K(A) = 1 ⟹ P` centralizes `K`). -/
+theorem exists_ne_one_centralized_by_complement_of_kernel_not_centralizes
+    {G : Type*} [Group G] [Finite G] {Lsub H P A K : Subgroup G} (hHL : H ≤ Lsub)
+    (hFrobL : ∃ C : Subgroup ↥Lsub, Ch06.IsFrobeniusGroup ↥Lsub (H.subgroupOf Lsub) C)
+    (hPH : P ≤ H) (hPne : P ≠ ⊥) (hAL : A ≤ Lsub) (hAH : A ⊓ H = ⊥) (hAne : A ≠ ⊥)
+    (hAP : A ≤ Subgroup.normalizer (P : Set G))
+    (hPAK : P ⊔ A ≤ Subgroup.normalizer (K : Set G))
+    (hKsolv : IsSolvable ↥K)
+    (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥(P ⊔ A)))
+    (hPnc : ¬ P ≤ Subgroup.centralizer (K : Set G)) :
+    ∃ n ∈ K, n ≠ 1 ∧ ∀ a ∈ A, a * n * a⁻¹ = n := by
+  classical
+  have hFrob := IsFrobeniusGroup.frobeniusGroup_sup_of_invariant_le_kernel_ambient
+    hHL hFrobL hPH hPne hAL hAH hAne hAP
+  by_contra hcon
+  refine hPnc (frobenius_kernel_centralizes_of_complement_fpf hPAK hFrob hKsolv hcop ?_)
+  intro n hnK hfix
+  by_contra hn1
+  exact hcon ⟨n, hnK, hn1, hfix⟩
+
 end FrobeniusCentralizer
 
 end OddOrder.GroupTheory

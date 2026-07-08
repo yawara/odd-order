@@ -1890,3 +1890,59 @@ commit f8ecb4a5。詳細 = issue 9003「lane b 進捗 loop¹⁰⁰」節が正�
   `nonconjugate_typeI_R_orthogonal` のみ、`_hG` を活性化)。
 - (12.3) の残 transitive sorryAx = S10_MinimalSimpleStructure の §8 pins 6 本 + (8.2.c)。
   **次 = loop¹⁰¹: §8/§16 pins 正面 build** (0096 carve-out、文書順 (8.12.b)→(8.13)→(8.14))。
+
+## (2026-07-09, lane-b): (12.11) 第2主張 `intersection_le_kernel` — 10-step 分解 + steps 3-5 の reusable infra landed
+
+Pf (12.11) 第2主張 `M ∩ L ≤ L_F` (S14:5245、b-owned、on-path 12.11→12.17) の deep proof に着手。
+原文の議論を **10 step に分解**し、うち **Frobenius sub-structure + Wielandt (9.1) 部分 (steps 3-5) を
+reusable infra として landed** (green)。
+
+### 原文 (Pf 12.11 2nd, 04.14) の議論
+A ≤ M∩L で |A| prime to |H|=|L_F| を取る。H nilpotent ゆえ P₀ ⊆ O_p(H)、A normalizes P₀=O_p(H)∩M。
+(8.1.c) で P₀ は K=M_F を非中心化、(12.10) で A≠1 なら P₀A Frobenius kernel P₀。(9.1) を P₀A ↷ K に
+適用 → C_K(A)≠1。(12.9) で C_K(x)≠1。(8.1.b) で A,x は M∩L の可換部分群に入る → A centralizes x →
+A=1 → M∩L ⊆ H。
+
+### 10-step 分解 (formalization)
+1. A ≤ M∩L, |A| coprime to |H| (仮説として per-A に取る)。
+2. P₀=O_p(H)∩M ⊴ L (O_p(H) char in H ⊴ L)、A ≤ M normalizes P₀。P₀ ≤ H。
+3. **P₀A Frobenius kernel P₀** ← step 1 infra ✅
+4. **P₀ が K を非中心化** ← C_M(K)⊆K (self-centralizing kernel) + p∤|K| (P₀ p-group nontrivial)。要 build。
+5. **Wielandt (9.1) 対偶: C_K(A)≠1** ← engine infra ✅
+6. C_K(x)≠1 ← (12.9) `CKx_not_le_Kprime` (C_K(x)⊄K' ⟹ ≠1)。容易。
+7. (8.1.b): A ≤ U1 (C_K(A)≠1 経由) ∧ x ∈ U1 (C_K(x)≠1 経由)、U1=`TypeFData.U1` 可換。**要: A,x を complement U に conjugate で入れる** (Hall 論法、subtle)。
+8. A,x ∈ U1 可換 ⟹ A centralizes x。
+9. A ⊆ C_L(x) ⊆ H (L Frobenius 条件(4) `centralizer_kernel_le`) ∧ A⊓H=1 (coprime) ⟹ A=1。
+10. **Reduction**: 全 π(H)'-A trivial ⟹ M∩L は π(H)-group ⟹ M∩L ⊆ H (H = Frobenius L の normal Hall)。要 build。
+
+**coprimality gcd(|P₀A|,|K|)=1** (step 5 の Wielandt に必須): gcd(|P₀|,|K|)=1 は p∤|K| (ctr `p_dvd_index`+Hall、
+S14:4749 で proven)。gcd(|A|,|K|)=1 は **first assertion `intersection_complements_K` (M∩L complements K) +
+M_F Hall 性** から (∴ 第2主張は第1主張に transitively 依存; 第1は 8.13.c1/lane-a gated だが signature 正で cite 可)。
+
+### landed (reusable infra、green)
+- `IsFrobeniusGroup.frobeniusGroup_sup_of_invariant_le_kernel` (CoprimeAction.lean): internal 形。
+  Frobenius L kernel N、P≤N nontrivial、Q⊓N=⊥ nontrivial が P を normalize ⟹ `IsFrobeniusGroup ↥(P⊔Q)
+  (P.subgroupOf) (Q.subgroupOf)`。`centralizer_inf_kernel_eq_bot_of_not_mem` で conj_frobenius。
+- `..._ambient` (CoprimeAction.lean): ambient-G 形 (P,A:Subgroup G、L の Frobenius は `↥Lsub`)。engine が
+  subgroupOf transfer 無しで consume 可能。engine の lifting パターンを mirror。
+- `exists_ne_one_centralized_by_complement_of_kernel_not_centralizes` (WielandtFixedPoint.lean): **steps 3-5
+  を統合**。ambient step1 で P⊔A Frobenius 構成 → `frobenius_kernel_centralizes_of_complement_fpf` (既存 9.1
+  第1特殊ケース ambient 版) の対偶で「P が K 非中心化 ⟹ ∃1≠n∈K, A が n を中心化」(= C_K(A)≠1)。ungated
+  (coprimality・non-central は仮説供給)。
+
+### step 4 landed (2026-07-09、green)
+- `P0_not_le_centralizer_K` (S14): ¬ P₀ ≤ C_G(K)。route = BG Prop 10.11(b)
+  `rank_centralizer_Msigma_inf_le_one` (P₀ σ(M)ᶜ-subgroup ゆえ rank(C(M_σ)⊓P₀)≤1) vs
+  `two_le_rank_of_noncyclic_pSubgroup` (P₀ noncyclic ゆえ rank≥2) の矛盾。当初想定の
+  self-centralizing (C_M(M_F)≤M_F) は不要 (rank 論法が clean)。
+- helper (additive、reusable counterexample facts): `MF_eq_Msigma` (K=M_F=M_σ, Prop 16.1 f) /
+  `p_not_mem_sigma` (p∉σ(M))。
+
+### 残 (次 iteration、S14 assembly)
+- **step 7** (8.1.b + A,x conjugate into U): 最も subtle。`TypeIData M` (ctr.M_typeI) の `typeF.U1`/
+  `centralizer_le_U1` + A,x を complement に入れる Hall conjugacy。
+- **step 9,10**: L Frobenius 条件(4) `centralizer_kernel_le` (既存) + normal-Hall-in-Frobenius reduction。
+- **coprimality gcd(|A|,|K|)=1**: `intersection_complements_K` (sorried-cite) + M_F Hall。
+- **assembly**: 上記 + step1-5 infra + step4 で per-A の「C_K(A)≠1」を S14 で組む → C_K(x)≠1 (12.9) →
+  A centralizes x → A=1 → M∩L⊆H。`exists_ne_one_centralized_by_complement_of_kernel_not_centralizes` が
+  C_K(A)≠1 の consumer-ready form (φ・coprimality・non-central=step4 を供給)。
