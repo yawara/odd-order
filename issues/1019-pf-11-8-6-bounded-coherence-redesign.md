@@ -1524,3 +1524,23 @@ caseB 適用には pivot 条件 `⟨τ(η−η₁), ζ₁⟩ = −N` ∀η の �
     X-側半分和 — §6 の既存 Dade 展開 (dadeICM_columnDiff_eq_sum 系) から直接計算できる
     可能性 (irr member への cross 内積は §12/§13 の columnBreak/orthoDatum 資産)。
 まず (b) の在庫確認 (certainTypeR の X-半分と ⟨τ(χ−μ₁), X⟩ 計算素材) → 足りなければ (a)。
+
+## 🔬 update⁸⁷ (2026-07-08 lane-a /loop) — ★ 9075 CLOSED (norm-general (5.7) engine + caseB rewire 全 landed)
+
+9075 完遂: `uniform_degree_coherence_of_families` (S07_PivotCoherence) +
+`caseB_coherent_sOf_H0Cprime` を **hDeg 無しの全族一発適用に置換** (S13)。新 6 部品
+axiom-clean、full build green 3937 jobs。**11.8.6 coherence 依存 (9075) は解消**。
+
+### 次 lane-a frontier 決定 (2026-07-08、上流優先+文書順+FT経路+cross-lane 除外)
+- **(9.11) capstone `coherent_H0Cprime_S` / sibleyTarget_H0C (S11:8314) 置換 = lane b の (13.3) 仕事**
+  (S11_NineElevenCoherence:42 「Consumers: lane b's (13.3)」)。私の caseB は landed 共有 infra として供給済。
+- **S10:384/507/3329 = BG §16 consequence の cross-lane cite** (「BG Section 16 consequence, not a local
+  Peterfalvi argument」) — lane-a head-on 対象外。
+- **S07_Subcoherent = 実 sorry ゼロ** (全 docstring)。
+- ⟹ **genuine lane-a frontier = §11.8 orthogonality 計算** (S13_CoreStructure):
+  - `orthogonality_setup` (:1359、11.8.1–11.8.4) = `OrthogonalityData` の構成。現状 scaffold:
+    frobenius_setup / omega_support_reduction / average_formula / coefficient_formula が
+    **opaque Prop field**、coefficient_zero が proof field に hard content を hoist ([[scaffold-sorry-free-not-done]])。
+    honest 化 = Prop field de-opacify + Frobenius reciprocity 係数計算で **coefficientA a = 0** 実証明。
+  - `not_orthogonal_mu0_sub_zeta` (:1378、11.8 結論) = orthogonality_setup を消費。
+  → 次 iteration: mmd/Coq (PFsection11 の 11.8.1–11.8.5) 精読 → OrthogonalityData de-opacify + 係数計算 port。
