@@ -30,6 +30,30 @@ open scoped commutatorElement
 
 variable {G : Type*} [Group G]
 
+/-- **Block scalars all equal ⟹ the representation acts by that single scalar.**  If `u` acts by the
+same scalar `μ ∈ 𝔽_p^×` on every line `B i` of a family of subrepresentations whose submodules span
+the whole space, then `ρ u = μ • id`.  (Two linear maps agreeing on a spanning family are equal;
+`lineScalarChar_smul` gives the per-block agreement `ρ u x = μ • x`.)  The additive core of the
+imprimitive `psi` injectivity: "no common scalar except the trivial one" then reduces to `μ = 1`. -/
+theorem representation_eq_smul_id_of_block_scalars_const {p : ℕ} [Fact p.Prime] {U V : Type*}
+    [Group U] [AddCommGroup V] [Module (ZMod p) V] (ρ : Representation (ZMod p) U V)
+    {ι : Type*} (B : ι → Subrepresentation ρ)
+    (hBline : ∀ i, Module.finrank (ZMod p) (B i).toSubmodule = 1)
+    (hspan : ⨆ i, (B i).toSubmodule = ⊤) (u : U) (μ : (ZMod p)ˣ)
+    (hconst : ∀ i, lineScalarChar (B i).toRepresentation (hBline i) u = μ) :
+    ρ u = (μ : ZMod p) • LinearMap.id := by
+  have hblock : ∀ i, ∀ x ∈ (B i).toSubmodule, ρ u x = (μ : ZMod p) • x := by
+    intro i x hx
+    have hs := lineScalarChar_smul (B i).toRepresentation (hBline i) u ⟨x, hx⟩
+    rw [hconst i] at hs
+    have hv := congrArg Subtype.val hs
+    simpa [Subrepresentation.toRepresentation] using hv
+  refine LinearMap.ext_on (s := ⋃ i, ((B i).toSubmodule : Set V)) ?_ ?_
+  · rw [← Submodule.iSup_eq_span, hspan]
+  · intro x hx
+    obtain ⟨i, hi⟩ := Set.mem_iUnion.mp hx
+    rw [hblock i x hi, LinearMap.smul_apply, LinearMap.id_apply]
+
 /-- Invariance under a hom `φ` transfers to invariance under the range inclusion `φ.range.subtype`:
 `Ū = φ.range` acts by the same automorphisms as the image of `φ`, so a `φ`-invariant subgroup is
 `Ū`-invariant. -/
