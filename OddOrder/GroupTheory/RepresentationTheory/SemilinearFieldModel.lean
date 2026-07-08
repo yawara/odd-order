@@ -154,6 +154,56 @@ built by the caller from the `(9.7.b)` `C`-equivariance of the field iso) and th
 `E ⊓ C = ⊥`, the embedding `σ` is injective and carries the additive kernel onto `E` and the
 complement onto `C`.  Generic version of the `fieldNormalizerData_of_repr` assembly. -/
 
+/-- **Lift compatibility from textbook equivariance.**  The `SemidirectProduct.lift` compatibility
+`hcompatLift` demanded by `fieldModelEmbedding`, derived from the textbook `C`-conjugation
+equivariance of the field iso — `e (ofMul (v x v⁻¹)) = μ v • e (ofMul x)` for `v ∈ C`, `x ∈ E`
+(Peterfalvi `(14.2)(a)`).  Both sides (`S` = `P`/`U`, `T` = `Q`/`V`) route their `hcompatLift`
+through this generic bridge; it transports the conjugation identity across the field iso `e` and
+the `μ`-inversion inside `complementTransport`. -/
+theorem hcompatLift_of_equivariant {r s : ℕ} [Fact r.Prime] {E C : Subgroup G}
+    (e : Additive ↥E ≃+ GaloisField r s)
+    (μ : ↥C →* (GaloisField r s)ˣ) (hμ_inj : Function.Injective μ)
+    (hμ_range : μ.range = normOneUnits r s)
+    (hCE : ∀ (v : ↥C) (x : ↥E), (v : G) * (x : G) * (v : G)⁻¹ ∈ E)
+    (hcompat : ∀ (v : ↥C) (x : ↥E),
+      e (Additive.ofMul (⟨(v : G) * (x : G) * (v : G)⁻¹, hCE v x⟩ : ↥E))
+        = ((μ v : (GaloisField r s)ˣ) : GaloisField r s) * e (Additive.ofMul x)) :
+    ∀ u : ↥(normOneUnits r s),
+      (kernelTransport e).comp ((normOneMulAction r s u).toMonoidHom)
+        = (MulAut.conj (complementTransport μ hμ_inj hμ_range u)).toMonoidHom.comp
+            (kernelTransport e) := by
+  intro u
+  ext s'
+  obtain ⟨v, hμv, hfUv⟩ := complementTransport_exists μ hμ_inj hμ_range u
+  change kernelTransport e ((normOneMulAction r s u) s') =
+    complementTransport μ hμ_inj hμ_range u * kernelTransport e s' *
+      (complementTransport μ hμ_inj hμ_range u)⁻¹
+  rw [hfUv]
+  have hact : (normOneMulAction r s u) s' =
+      Multiplicative.ofAdd (((u : (GaloisField r s)ˣ) : GaloisField r s) *
+          (Multiplicative.toAdd s' : GaloisField r s)) := by
+    apply Multiplicative.toAdd.injective
+    rw [toAdd_ofAdd]
+    conv_lhs => rw [← ofAdd_toAdd s']
+    exact normOneMulAction_apply r s u (Multiplicative.toAdd s')
+  rw [hact, kernelTransport_apply, kernelTransport_apply, toAdd_ofAdd]
+  set t : GaloisField r s := Multiplicative.toAdd s' with htdef
+  set x : ↥E := Additive.toMul (e.symm t) with hxdef
+  have hex : e (Additive.ofMul x) = t := by
+    rw [hxdef, ofMul_toMul, e.apply_symm_apply]
+  have hkey : Additive.toMul (e.symm (((u : (GaloisField r s)ˣ) : GaloisField r s) * t)) =
+      (⟨(v : G) * (x : G) * (v : G)⁻¹, hCE v x⟩ : ↥E) := by
+    have h1 := hcompat v x
+    rw [hex] at h1
+    have hμvF : ((μ v : (GaloisField r s)ˣ) : GaloisField r s) =
+        ((u : (GaloisField r s)ˣ) : GaloisField r s) := by rw [hμv]
+    rw [hμvF] at h1
+    have h2 : Additive.ofMul (⟨(v : G) * (x : G) * (v : G)⁻¹, hCE v x⟩ : ↥E) =
+        e.symm (((u : (GaloisField r s)ˣ) : GaloisField r s) * t) := by
+      rw [← h1, e.symm_apply_apply]
+    rw [← h2, toMul_ofMul]
+  rw [hkey]
+
 /-- **Generic field-model embedding.**  From a field iso `e`, a norm-one character `μ` of the
 complement, the lift compatibility, and disjointness `E ⊓ C = ⊥`, produce an injective
 `σ : normOneFrobeniusGroup r s →* G` with additive kernel `↦ E` and complement `↦ C`. -/

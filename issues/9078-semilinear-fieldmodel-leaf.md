@@ -37,12 +37,19 @@ realization** = 新 shared leaf `OddOrder/GroupTheory/RepresentationTheory/Semil
       S-side `fieldNormalizerData_of_repr` chain の (E,C,r,s) 汎用化。両 side が instantiate 可能。
       ⚠ 知見: E/C は free var で e/μ の型が依存 → backward `rw [← range]` は motive 破綻、forward `rwa` 必須;
       map は `hlift_apply` elementwise (semidirect 型の range_eq_map motive 回避)。
-- [ ] **T-side producer** = `TFieldModelData hyp` の構成 (**次フェーズ**、S16 C-owned)。`fieldModelEmbedding` を
-      (E=Q, C=V, r=q, s=p) で instantiate。要: (a) 体 iso `e_Q : Additive ↥Q ≃+ 𝔽_{q^p}` を App.B
-      `exists_field_semilinear` (Q elementary-abelian + V-action irreducible) から、(b) `μ_V : ↥V →* 𝔽ˣ`
-      (range = normOneUnits) を a の Singer から、(c) `hcompatLift` を V-equivariance から、(d) `Q⊓V=⊥`
-      (`hyp.Q_inf_V_eq_bot`)。gated input (V-abelian = (9.7.b)) は hypothesis で受ける (skeleton pattern)。
-- [ ] `t_side_frobenius_kernel` (S16:4528) を新 producer で discharge (V-abelian input modulo)。
+- [x] **T-side producer** = `tFieldModelData_of_repr` **完成 (2026-07-09、sorry-free、S16_G0Coprime C-owned)**。
+      `fieldModelEmbedding` を (E=Q, C=V, r=q, s=p) で instantiate。inputs `(e, μ, hμ_inj, hμ_range, hVQ,
+      hcompat)` → `Nonempty (TFieldModelData hyp)`。`hcompatLift` 導出は generic leaf に **`hcompatLift_of_equivariant`**
+      として factor (textbook 共役同変性 `e(ofMul(v x v⁻¹)) = μ v • e(ofMul x)` → generic `hcompatLift`、
+      S-side 2446-2493 の generic 化、両 side 再利用可)。`Q⊓V=⊥` は ungated `hyp.Q_inf_V_eq_bot` field。
+- [x] **`t_side_frobenius_kernel` (S16:4557) = sorry-free 化 (2026-07-09)**。gated-endpoint skeleton:
+      新 `t_side_caseB_fieldModel : Nonempty (TFieldModelData hyp.base)` を導入 (S16_NonExistenceG)、
+      `hVQ` (V normalizes Q = `V≤T=N_G(Q)`、`normalizer_Q_eq_T`) を **実証**、producer 経由で組む。
+      `t_side_frobenius_kernel` は `data.derived_inf_centralizer_le_Q hx` で discharge (**sorry-free**)。
+      **唯一の残 sorry** = `t_side_caseB_fieldModel` の field-data 存在 (`∃ e μ …, equivariance`) = 精密化された
+      (9.7.b) T-side gate (`exists_field_semilinear` + Singer、a の char body landing で close)。engine chain
+      (leaf `fieldModelEmbedding` → `tFieldModelData_of_repr` → `derived_inf_centralizer_le_Q` → kernel bound)
+      は end-to-end 型検査済。net sorry 不変 (bare sorry → 精密 gate に relocate + reduction 実証)。
 
 ## 分担境界 (dup 回避、hub RULING 9077)
 
