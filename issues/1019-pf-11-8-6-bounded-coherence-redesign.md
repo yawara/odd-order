@@ -1574,3 +1574,34 @@ lane-a 次 frontier。redesign の upstream ブロック = **forward `bounded_se
 
 ⚠ shared-infra 判定: `extend_coherent`/`bounded_seqIndD_coherence` は §6 coherence 汎用 → 他レーン consumer
 可能性あり。着手前に open 9000 scan (現状 9000/9014/9076 は σ-theory/prime-TI で別物、重複無し) + 必要なら 9000 claim。
+
+## ⚠ 訂正 (lane-a /loop, 2026-07-08) — forward (6.3) は既に PORTED。真の gap は G2 (S12 capstone re-route)
+
+**前 iteration の「forward (6.3) 未 port」= 誤り** ([[verify-port-state-by-number-not-coq-name]] の実例)。
+`S08_Theorem62_63_Standalone.lean` を grep 対象から漏らしていた。実状 (Explore map + 検証):
+
+- **forward `bounded_seqIndD_coherence` = `six_three_of_six_two_oracle`** (`S08_Theorem62_63_Standalone.lean:382`、
+  sorry-free、`AxiomsCheck:2296` axiom-clean)。maxnormal 帰納 + nilpotency 中心化 + 解析 `(x−x⁻¹)²` bound +
+  θ-degree √-geom + `sum_seqIndD_square` は**全て landed**。`extend_coherent` 相当は `xAdjoinStepW`
+  (`S08_CoherenceWeighted:287`、reducible-tolerant) で、`exists_source_index_le_two_psi_of_break`
+  (`S08_SixTwoGeneral:986`) に組み上げ済み。**Xset adjoin-steps 版は irr 限定で別物、port 不要。**
+- **§13 consumer 済**: `coherent_S_of_coherent_SH0C` (`S13_MaximalIII_IV:1415`、**sorry-free**) =
+  `coherent(S_H0C) → coherent(inducedFamily M)`、(K,H,M,H₁)=(M',HC,⊥,H₀C) で oracle を instantiate。
+  `S_H0C_not_coherent` (`S13:1523`) → (10.8) 矛盾も配線済 (S13 全体 sorry-free)。
+- **h56 grid datum** (`sixTwoDecompositionData`, issue 2022, owner=lane b) は §13 use では既に discharge 済
+  (S13 sorry-free)。新 9000 claim 不要 (2022 で被覆)。
+
+### 真の残 = G2 (lane-a-local): S12 capstone の false-sorry route を (6.3) route に置換
+- `Hypothesis.coherent_Sset_of_column_identities` (`S12:4857`) は **deprecated uniform-degree route**、
+  false sorry `Sset_diff_SHCSet_apply_one_eq_qu` (`S12:4480`, irr-side sorry `:4492`、非Galois III/IV で偽) を carry。
+- **live 確証**: `coherent_Sset_of_column_identities` → `exists_zeta_residual_not_orthogonal` (`S12:5011`) →
+  `w2_lt_w1_of_hypothesis` (`S12:5018`) → `card_kappaHall_lt_of_isTypeIIIorIV` (`FeitThompson:615`) → feitThompson。
+  `#print axioms w2_lt_w1_of_hypothesis` = `[propext, sorryAx, Classical.choice, Quot.sound]` (sorryAx 混入確認)。
+  ∴ この false sorry は feitThompson spine 上に live。
+- **entanglement**: S12 は S13 の `coherent_S_of_coherent_SH0C` を cite 不可 (S13 は S12 の下流)。
+  ∴ S12 capstone は **S08 `six_three_of_six_two_oracle` を直 cite** (map 曰く import 制約はこれで解消) して
+  自前で (K,H,M,H₁)=(M',HC,⊥,H₀C) + h56 + `coherent(S_H0C)` を組む必要。
+- **次 iteration の要調査点**: (a) column-identity 入力 (11.8.5) から `coherent(S_H0C = SOf H0C)` が S12 レベルで
+  導けるか (H0C/HC/SOf は S13-Hypothesis field、S12-Hypothesis に無い可能性)。(b) 無ければ
+  `exists_zeta_residual_not_orthogonal`/`w2_lt_w1` の **S13 relocation** (issue の endgame relocation 案)。
+  (c) いずれにせよ false uniform-degree sorry (`:4492`) を除去し、honest な (6.3) route に。
