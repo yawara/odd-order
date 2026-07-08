@@ -319,4 +319,156 @@ noncomputable def pivotCoherence
 
 end PivotCoherence
 
+/-! ### The (5.7) pivot partner: `haveX` (Coq `PFsection5.v:1265-1330`)
+
+Construction of the pivot partner `ζ₁` for `pivotCoherence` from the per-member `R`-data.
+This is the norm-general (5.4)² argument: for each non-conjugate member `ξ`, the projection
+decompositions of `τ(η₁ − ξ)` against `R(η₁)` and of `τ(ξ − η₁)` against `R(ξ)` squeeze the
+norms (`⟨ξ⟩ ≥ ‖Y₁‖² ≥ ‖X₂‖² ≥ ⟨ξ⟩`), forcing `Y₁ = X₂` and the (5.4.b) subset-sum shape of
+`X`. -/
+
+section PivotPartner
+
+variable [Fintype L] [Fintype G]
+variable [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+
+/-- Bilinear extension of pointwise orthogonality to `ℤ`-spans (both slots). -/
+theorem inner_zSpan_zSpan_eq_zero {H : Type*} [Group H] [Fintype H]
+    [Invertible (Nat.card H : ℂ)] {T T' : Set (ClassFunction H ℂ)}
+    (h : ∀ x ∈ T, ∀ y ∈ T', ClassFunction.inner x y = 0)
+    {φ ψ : ClassFunction H ℂ} (hφ : φ ∈ zSpan (L := H) T) (hψ : ψ ∈ zSpan (L := H) T') :
+    ClassFunction.inner φ ψ = 0 := by
+  induction hφ using Submodule.span_induction with
+  | mem x hx =>
+      induction hψ using Submodule.span_induction with
+      | mem y hy => exact h x hx y hy
+      | zero => exact ClassFunction.inner_zero_right x
+      | add y z _ _ ihy ihz => rw [ClassFunction.inner_add_right, ihy, ihz, add_zero]
+      | smul c y _ ih =>
+          rw [← Int.cast_smul_eq_zsmul ℂ c y, ClassFunction.inner_smul_right, ih, mul_zero]
+  | zero => exact ClassFunction.inner_zero_left ψ
+  | add x y _ _ ihx ihy => rw [ClassFunction.inner_add_left, ihx, ihy, add_zero]
+  | smul c x _ ih =>
+      rw [← Int.cast_smul_eq_zsmul ℂ c x, ClassFunction.inner_smul_left, ih, mul_zero]
+
+/-- The `X`-side of a `CharacterPsiDecomposition` lies in the `ℤ`-span of `R(χ)`. -/
+theorem CharacterPsiDecomposition.X_mem_zSpan {τ : IntegralCharacterMap L G}
+    {χ ψ : ClassFunction L ℂ} (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ) :
+    D.X ∈ zSpan (L := G) (↑D.imageFamily.imageSet : Set (ClassFunction G ℂ)) := by
+  rw [D.X_eq]
+  exact Submodule.sum_mem _ fun α hα => by
+    rw [Int.cast_smul_eq_zsmul]
+    exact Submodule.smul_mem _ _ (Submodule.subset_span (Finset.mem_coe.mpr hα))
+
+/-- Self inner products are (complex casts of) their real parts. -/
+theorem inner_self_eq_re_cast {H : Type*} [Group H] [Fintype H]
+    [Invertible (Nat.card H : ℂ)] (φ : ClassFunction H ℂ) :
+    ((ClassFunction.inner φ φ).re : ℂ) = ClassFunction.inner φ φ := by
+  rw [inner_self_eq_realCast, Complex.ofReal_re]
+
+/-- **Peterfalvi (5.7), the `haveX` step** (Coq `PFsection5.v:1268-1297`): for a member `ξ`
+distinct from the pivot `η₁` and its conjugate, there is `X` with
+
+* the (5.4.b) shape: `X = ∑_{α ∈ E} α` for some `E ⊆ R(η₁)` with `|E| = ⟨η₁, η₁⟩`;
+* the residual containment `X − τ(η₁ − ξ) ∈ ℤ[R(ξ)]`;
+* the pivot inner product `⟨X, τ(η₁ − ξ)⟩ = ⟨η₁, η₁⟩`.
+
+The proof runs the two projection decompositions `D₁ = (η₁, ξ)` against `R(η₁)` and
+`D₂ = (ξ, η₁)` against `R(ξ)` and squeezes: `⟨ξ⟩ ≥ ‖Y₁‖²` ((5.6.2) opening on `D₁`),
+`‖Y₁‖² ≥ ‖X₂‖²` (`Y₁ − X₂ ⊥ X₂` from the cross-orthogonality `R(η₁) ⊥ R(ξ)`), and
+`‖X₂‖² ≥ ⟨ξ⟩` ((5.4.a) on `D₂`) — so all are equal, `Y₁ = X₂` lands in `ℤ[R(ξ)]`, and
+(5.4.b) on `D₁` delivers the subset-sum shape. -/
+theorem exists_pivotPartner_spec {τ : IntegralCharacterMap L G}
+    {η₁ ξ : ClassFunction L ℂ}
+    (R₁ : OrthonormalCharacterImageFamily (L := L) (G := G) τ η₁)
+    (Rξ : OrthonormalCharacterImageFamily (L := L) (G := G) τ ξ)
+    (hcross : R₁.Orthogonal Rξ)
+    (hiso1 : ∀ φ ζ : ClassFunction L ℂ,
+      φ ∈ zSpan (L := L) {η₁ - η₁.conj, η₁ - ξ} → ζ ∈ zSpan (L := L) {η₁ - η₁.conj, η₁ - ξ} →
+      ClassFunction.inner (τ φ) (τ ζ) = ClassFunction.inner φ ζ)
+    (hiso2 : ∀ φ ζ : ClassFunction L ℂ,
+      φ ∈ zSpan (L := L) {ξ - ξ.conj, ξ - η₁} → ζ ∈ zSpan (L := L) {ξ - ξ.conj, ξ - η₁} →
+      ClassFunction.inner (τ φ) (τ ζ) = ClassFunction.inner φ ζ)
+    (hZ1 : τ (η₁ - ξ) ∈ ZIrr G) (hZ2 : τ (ξ - η₁) ∈ ZIrr G)
+    (h12 : ClassFunction.inner η₁ ξ = 0) (h1c2 : ClassFunction.inner η₁.conj ξ = 0)
+    (h11c : ClassFunction.inner η₁ η₁.conj = 0)
+    (h21 : ClassFunction.inner ξ η₁ = 0) (h2c1 : ClassFunction.inner ξ.conj η₁ = 0)
+    (h22c : ClassFunction.inner ξ ξ.conj = 0) :
+    ∃ X : ClassFunction G ℂ,
+      (∃ E ⊆ R₁.imageSet, X = ∑ α ∈ E, α ∧ (E.card : ℂ) = ClassFunction.inner η₁ η₁) ∧
+      X - τ (η₁ - ξ) ∈ zSpan (L := G) (↑Rξ.imageSet : Set (ClassFunction G ℂ)) ∧
+      ClassFunction.inner X (τ (η₁ - ξ)) = ClassFunction.inner η₁ η₁ := by
+  classical
+  -- the two projection decompositions
+  let D₁ : CharacterPsiDecomposition (L := L) (G := G) τ η₁ ξ :=
+    CharacterPsiDecomposition.ofProjection R₁ τ hiso1 rfl hZ1 h12 h1c2 h11c
+  let D₂ : CharacterPsiDecomposition (L := L) (G := G) τ ξ η₁ :=
+    CharacterPsiDecomposition.ofProjection Rξ τ hiso2 rfl hZ2 h21 h2c1 h22c
+  have h1 : τ (η₁ - ξ) = D₁.X - D₁.Y := D₁.tau1_image
+  have h2 : τ (ξ - η₁) = D₂.X - D₂.Y := D₂.tau1_image
+  -- the shared image relation `Y₁ = X₂ − Y₂ + X₁` (from `τ(ξ − η₁) = −τ(η₁ − ξ)`)
+  have hY₁eq : D₁.Y = D₂.X - D₂.Y + D₁.X := by
+    have hneg : D₂.X - D₂.Y = -(D₁.X - D₁.Y) := by
+      rw [← h1, ← h2, ← map_neg, neg_sub]
+    rw [hneg]
+    abel
+  -- span memberships and the orthogonality bookkeeping
+  have hX₁span : D₁.X ∈ zSpan (L := G) (↑R₁.imageSet : Set (ClassFunction G ℂ)) :=
+    D₁.X_mem_zSpan
+  have hX₂span : D₂.X ∈ zSpan (L := G) (↑Rξ.imageSet : Set (ClassFunction G ℂ)) :=
+    D₂.X_mem_zSpan
+  have hX₁X₂ : ClassFunction.inner D₁.X D₂.X = 0 :=
+    inner_zSpan_zSpan_eq_zero
+      (fun α hα β hβ => hcross α (Finset.mem_coe.mp hα) β (Finset.mem_coe.mp hβ))
+      hX₁span hX₂span
+  have hY₂X₂ : ClassFunction.inner D₂.Y D₂.X = 0 := by
+    rw [inner_conj_symm D₂.X D₂.Y, D₂.inner_X_Y, star_zero]
+  -- `⟨Y₁, X₂⟩ = ⟨X₂ − Y₂ + X₁, X₂⟩ = ⟨X₂, X₂⟩ − ⟨Y₂, X₂⟩ + ⟨X₁, X₂⟩ = ⟨X₂, X₂⟩ = ⟨X₂, Y₁⟩`
+  have hY₁X₂ : ClassFunction.inner D₁.Y D₂.X = ClassFunction.inner D₂.X D₂.X := by
+    rw [hY₁eq, ClassFunction.inner_add_left, ClassFunction.inner_sub_left, hY₂X₂, hX₁X₂,
+      sub_zero, add_zero]
+  have hX₂Y₁ : ClassFunction.inner D₂.X D₁.Y = ClassFunction.inner D₂.X D₂.X := by
+    rw [inner_conj_symm D₁.Y D₂.X, hY₁X₂]
+    exact (inner_conj_symm D₂.X D₂.X).symm
+  -- hence `‖Y₁ − X₂‖² = ‖Y₁‖² − ‖X₂‖²`
+  have hdiff_re : (ClassFunction.inner (D₁.Y - D₂.X) (D₁.Y - D₂.X)).re
+      = (ClassFunction.inner D₁.Y D₁.Y).re - (ClassFunction.inner D₂.X D₂.X).re := by
+    have hdiff : ClassFunction.inner (D₁.Y - D₂.X) (D₁.Y - D₂.X)
+        = ClassFunction.inner D₁.Y D₁.Y - ClassFunction.inner D₂.X D₂.X := by
+      rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+        ClassFunction.inner_sub_right, hY₁X₂, hX₂Y₁]
+      ring
+    rw [hdiff, Complex.sub_re]
+  -- the norm squeeze `‖Y₁‖² ≤ ‖ξ‖² ≤ ‖X₂‖² ≤ ‖Y₁‖²`
+  have hchain1 : (ClassFunction.inner D₁.Y D₁.Y).re ≤ (ClassFunction.inner ξ ξ).re :=
+    D₁.inner_self_Y_re_le_inner_self_psi
+  have hchain2 : (ClassFunction.inner ξ ξ).re ≤ (ClassFunction.inner D₂.X D₂.X).re :=
+    D₂.inner_self_chi_re_le_inner_self_X
+  have hchain3 : (ClassFunction.inner D₂.X D₂.X).re
+      ≤ (ClassFunction.inner D₁.Y D₁.Y).re := by
+    have hnn := inner_self_re_nonneg (D₁.Y - D₂.X)
+    linarith
+  -- equality throughout, so the residual `Y₁` *is* `X₂ ∈ ℤ[R(ξ)]`
+  have hY₁X₂eq : D₁.Y = D₂.X := by
+    have h0 : D₁.Y - D₂.X = 0 := by
+      apply eq_zero_of_inner_self_re_eq_zero
+      linarith
+    exact sub_eq_zero.mp h0
+  -- (5.4.b) on `D₁` delivers the subset-sum shape and the norm equality
+  obtain ⟨hηX, -, E, hEsub, hXsum, hEcard⟩ :=
+    D₁.norm_eq_and_X_eq_sum_of_norm_Y_ge (by linarith)
+  have hX₁norm : ClassFunction.inner D₁.X D₁.X = ClassFunction.inner η₁ η₁ := by
+    rw [← inner_self_eq_re_cast D₁.X, ← inner_self_eq_re_cast η₁, hηX]
+  refine ⟨D₁.X, ⟨E, hEsub, hXsum, hEcard⟩, ?_, ?_⟩
+  · -- `X − τ(η₁ − ξ) = Y₁ = X₂ ∈ ℤ[R(ξ)]`
+    have hXd : D₁.X - τ (η₁ - ξ) = D₂.X := by
+      rw [h1, hY₁X₂eq]
+      abel
+    rw [hXd]
+    exact hX₂span
+  · -- `⟨X, τ(η₁ − ξ)⟩ = ⟨X, X⟩ − ⟨X, Y₁⟩ = ‖X‖² = ⟨η₁, η₁⟩`
+    rw [h1, ClassFunction.inner_sub_right, D₁.inner_X_Y, sub_zero, hX₁norm]
+
+end PivotPartner
+
 end OddOrder.Peterfalvi.S07
