@@ -1,5 +1,31 @@
 # Pf §16 — non-existence (`S16_NonExistenceG.lean`) gate map — lane-c (2026-06-22)
 
+## ⭐ 2026-07-08 CURRENT — definitive gate map (lane-c /loop, 全数検証)
+
+**C cluster の全 13 live sorry (S16_NonExistenceG 10 + S15_HonestTypeP2A0 pin 3) は 2 つの
+cross-lane gate に完全帰着。C の ungated deep math は完了 (prime-TI infra + `hyp46S` = sorry-free)。**
+
+| sorry | 場所 | gate class | issue |
+|---|---|---|---|
+| `T_typeIII_ratio_le` (S-side βₛ) | S16:1750 | **lane-b** βₛ bridge (S15_SAndT) | 0098/3003 |
+| `hVcomm` (V abelian) | S16:1896 | **lane-a** typeP_Galois σ-theory | 9000 |
+| `T_isTypeP2` (key_ineq fwd) | S16:1963 | **lane-a** v-value (rests on) | 9013 |
+| `tSide_caseB_v_gated_inputs` | S16:2063 | **lane-a** v-value σ-theory | 9013/9000 |
+| `s/t_side_frobenius_kernel` | S16:4515/4528 | **lane-a** FieldNormalizer/TFieldModel σ | 9000 |
+| `lSideGridCoeffData` m_row/m_col/grid_mem | S16:7215/7218/7236 | **lane-b** η-grid parity (β_S) | 3002 |
+| `exists_MHypothesis` betaGrid | S16:8238 | **lane-b** η-grid (13.1.d) expansion | 3002 |
+| pin `mu_row0_ne`/`diff_support`/`vanish_on_V` | S15_HonestTypeP2A0 | **lane-b** μ-grounding (`hyp.mu=residueS.mu2`) | 9076 |
+
+- **lane-a σ-theory (9000/9013)**: 5 sorry。**lane-b η-grid/grounding/βₛ (3002/9076)**: 8 sorry。
+- **C ungated 完了**: prime-TI (`PrimeTIResidue`/`residueS` sorry-free) + `hyp46S` (type-P2 Hyp46-for-S,
+  commit 6945ba5f) + pin scoping (mu_row0_ne isolation, pin-2 j=0 over-claim 発見)。
+- **⚠ pin 2 over-claim (要 b 協調)**: `tauS_mu_row0_diff_support` は `∀ j` だが j=0 で偽、`j≠0` 追加要
+  (consumer は `_hj` 保持、cross-lane 2-step、issue 9076)。
+- **結論**: C の独立 frontier は枯渇。残 close は全て lane-a σ-theory or lane-b η-grid/grounding 待ち。
+  reactivation = a の typeP_Galois or b の grid/grounding landing。
+
+---
+
 > ⚠ **HISTORICAL (2026-06-22 レーン構造; 2026-07-02 追記)**: 現行は 3 レーン再編
 > ([`ft_lane_reallocation_2026_06_28.md`](../meta/ft_lane_reallocation_2026_06_28.md))。
 > `S15_SAndT*` は **lane c 所有** (下記の「S15_SAndT.lean is lane-h (cite only)」記述は無効)。
