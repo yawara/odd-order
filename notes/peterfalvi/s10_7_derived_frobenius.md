@@ -164,3 +164,46 @@ and obtain a matching-instance `h83`, extracting g1g from `h83`'s RHS (avoids ha
 line-83 / `toFamilyHypothesis71`. Study how the (11.8) capstones (S12:4165+) call scoped-FiniteInduce lemmas
 from explicit-Fintype contexts — that pattern is the template. **This instance-alignment is the concrete next
 task; once solved the de-scaffold + hA(→h78) + hB follow from the skeleton above.**
+
+## 2026-07-08 update³ — (10.8) estimate DE-SCAFFOLDED (build-green) + Invertible discipline unified (lane-a /loop)
+
+The `typeII_coherence_contradiction_estimate` (S12) bare `sorry` is **replaced by the full honest
+de-scaffold** (arithmetic spine proven sorry-free); two named genuine gates remain:
+
+- **`h78` = `Hypothesis.chiRhoNormSq_zeta_ge_line78`** (S12, new named lemma, body `sorry`): the (7.8.b)
+  ρ-norm **lower** bound `‖ζ^{τ₁,ρ}‖² ≥ 1 − ŵ₁/|M'|`.  **Ungated lane-a**, C-collision-free.
+- **`hB`** (inline in the estimate, `sorry`): the TI-counting `|G₁|/|G| ≤ (|S_F|−1)/|S| + …`, cites (10.7)
+  ⟹ cross-lane-gated (partner Frobenius structure).
+
+Everything else is PROVEN: params reconstruction (`exists_charParameters_full`), partner `S`+`|U|≥7`
+(`exists_typeII_partner_card_U_ge_seven`), `hS` (`typePData_card_eq_H_mul_U_mul_W1`), `hA` = line-83
+(`chiRhoNormSq_zeta_le_line83`) + `h78` + `card_typePA_div_card_lt_inv_w1` with the ℝ→ℚ cast bridge
+(`Rat.cast_lt` + `push_cast` + `linarith`), and the chain (`typeII_coherence_estimate_chain`).
+
+### ⚠ Invertible-instance discipline (the analogue of the Fintype trap, now RESOLVED)
+line-83/`sum_zeta_tau1_normSq_ge_card` are **rigid `FiniteInduce`-scoped** lemmas (no explicit
+`[Invertible …]` binders ⟹ their `CoherentHypothesis` bakes the scoped `natCardInvC`/`natCardInvCG`).
+The estimate + `S_not_coherent` formerly had **explicit `[Invertible …]` binders** ⟹ their `coh` carried
+abstract binder instances, not defeq to the scoped ones, and `IsCoherent`'s **every** field depends on
+both `Invertible` args (so neither `⟨coh.coherent⟩`+`letI`, `convert`, nor field-by-field re-wrap works —
+all fail "synthesized instance not defeq").  **Fix = drop the explicit `[Invertible …]` binders from
+`typeII_coherence_contradiction_estimate` and `S_not_coherent`** so their `coh` synthesizes the scoped
+instances directly (matching line-83/h78).  All callers (`S_H0C_not_coherent` S13:1528, `no_typeV_maximal`
+S12, `S12:coherent_Sset` path) are already binder-free under `FiniteInduce` scope ⟹ unaffected; S12+S13
+build green.  **Lesson: never mix explicit `[Invertible …]` binders with scoped-FiniteInduce consumers on
+the same `CoherentHypothesis` value — pick scoped.** ([[lean-instance-defeq-traps]])
+
+### h78 build recipe (map-verified, no new deep sorry)
+Construct `h78P : S09.Hypothesis78 G (typePA M hyp.typeP) M` with `H = derivedInG M`, then call
+`zetaNuRhoNormSqGeOfDade` (S09_CertificateDischarge:2406) + bridge `chiRhoNormSq = zetaNuRhoNormSq` via
+`chiRhoCF_congr_hyp` (S16:4738).  Port of `exists_M_hypothesis78` (S16:7988) to **type-P** producers.
+Inputs (all proven/generic except one): `hAH`=`typePA_eq_sharpSubgroup_derivedInG`; H71/`hτ`=`toHypothesis71`
+(S12_Core:555/580); placed family θ/ind1H/Ind(θ₀)=`params.zeta`=`exists_placed_induced_family` (S09:607,
+K=`(derivedInG M).subgroupOf M`); `hnu_isometry`=`coherence_extension_inner_eq_on_family` (S09:2645);
+`hzeta0nu`=`coherence_extension_orthogonal_constOne` (S09:2719) + `inducedFamily_closedUnderConjugate` +
+`inducedFamily_degree_w1_conj_ne`/`inducedFamily_hasNoRealCharacters` + `inner_induce_constOne_eq_zero` +
+Dade ⊥1_G transport (pattern `witness_L_hzeta0nu` S14:6818); `a,ha`=`exists_betaDecomp_a` (S09:1727);
+`hsmall`=`card_derived_ge`.  **The ONE new shallow lemma**: `hagree` **Dade support-restriction bridge** —
+`toHypothesis71.τ` (restricted to `typePA`=A(M)) agrees with `coh.coherent`'s extension of `hyp.tau` (full,
+over `typePA0`=A₀(M)) on `typePA`-supported differences; analogous to `dadeSupport_restrict_subset`
+(S12:367).  S16 never needs it (type-I has A(M)=Dade support, `h78_hyp_eq := rfl`).

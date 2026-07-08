@@ -560,6 +560,35 @@ theorem typePData_card_eq_H_mul_U_mul_W1 [Finite G] {M : Subgroup G} (data : Typ
     _ = Nat.card ↥data.H * Nat.card ↥data.U * Nat.card ↥data.W1 := by rw [← h2]
 
 open scoped Classical FiniteInduce in
+/-- **Peterfalvi (10.8), line 87 lower bound — the (7.8.b) ρ-norm bound for `ζ^{τ₁}`**:
+`‖ζ^{τ₁,ρ}‖² ≥ 1 − ŵ₁/|M'|`.
+
+This is Peterfalvi (7.8.b) specialised to the coherent extension `τ₁` of `ζ ∈ 𝒮` in the present
+type-`P` `Hypothesis M`.  It is the M-side analogue of the §14 pattern
+`MHypothesis.rhoNormSq_ge_lower` (`S16_NonExistenceG.lean`), which couples the `ρ`-norm to the
+(7.8.b) Dade-integral engine `zetaNuRhoNormSqGeOfDade` (`S09_CertificateDischarge.lean`) via a
+`Hypothesis78`-for-`M` certificate (`H = M'`, `ν = coh.tau1`).  Together with the proven line-83
+**upper** bound (`chiRhoNormSq_zeta_le_line83`) and the strict `|A(M)|/|M| < 1/w₁`
+(`card_typePA_div_card_lt_inv_w1`) this closes the (10.8) estimate's `hA` (line 87).
+
+**Genuine, ungated lane-a gate** (the last §7 char-theoretic input to `hA`): the honest route is the
+S16 `chiRhoNormSq_eq_zetaNuRhoNormSq` coupling ported to type-`P` `M`; it does **not** depend on the
+(10.7) partner Frobenius structure (that gates only `hB`).  See
+`notes/peterfalvi/s10_7_derived_frobenius.md` (2026-07-08 update²). -/
+theorem Hypothesis.chiRhoNormSq_zeta_ge_line78 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    {hyp : Hypothesis M} {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hos : params.omegaSigma = hyp.alignedOmegaSigmaGrid hG hG.odd)
+    (hzS : params.zeta ∈ inducedFamily M) (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (hzconj : params.zeta.conj ≠ params.zeta)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta) :
+    (1 : ℝ) - (hyp.w1 : ℝ) / (Nat.card ↥(derivedInG M) : ℝ)
+      ≤ (hyp.toFamilyHypothesis71).chiRhoNormSq (coh.tau1 params.zeta) 0 := by
+  sorry
+
+open scoped Classical FiniteInduce in
 /-- **Peterfalvi (10.8), norm-counting estimate** (the §7 analytic heart, the `hbound` input to
 `typeII_noncoherence_arithmetic`).
 
@@ -577,13 +606,60 @@ is the partner's `|U|`; bundled existentially because (10.8) only consumes `∃ 
 See `notes/peterfalvi/s12_10_8_noncoherence.md`. -/
 theorem typeII_coherence_contradiction_estimate [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
     {hyp : Hypothesis M} {params : CharacterParameters hyp}
     (coh : CoherentHypothesis hyp params) :
     ∃ u : ℕ, 7 ≤ u ∧
       (1 : ℚ) - 1 / (hyp.w1 : ℚ) - 1 / (u : ℚ)
         < (hyp.w1 : ℚ) * (hyp.w2 : ℚ) / (Nat.card ↥(derivedInG M) : ℚ) := by
-  sorry
+  classical
+  -- Reconstruct the (10.3) character parameters `params'` supplying the 7 grid/`ζ` properties that
+  -- the line-83/(7.8.b) bounds consume; the coherence datum `coh.coherent` is params-independent.
+  -- The estimate carries no explicit `[Invertible …]` binders, so `coh` (and hence `coh'`) uses the
+  -- `FiniteInduce`-scoped instances that the line-83/(7.8.b) lemmas expect.
+  obtain ⟨params', hmu, hos, hzS, hz1, hzconj, hδpm, hδj⟩ := hyp.exists_charParameters_full hG
+  let coh' : CoherentHypothesis hyp params' := ⟨coh.coherent⟩
+  -- The Type-II partner `S` (Theorem (8.8)) with `|U| ≥ 7` and `|S : [S,S]| = w₂`.
+  obtain ⟨S, dII, hSmax, hSidx, hU7⟩ := hyp.exists_typeII_partner_card_U_ge_seven hG
+  refine ⟨Nat.card ↥dII.typeP.U, hU7, ?_⟩
+  -- `|W₁(S)| = w₂` and the partner order factorization `|S| = |S_F|·|U|·w₂` (input `hS`).
+  have hW1card : Nat.card ↥dII.typeP.W1 = hyp.w2 := by
+    rw [dII.typeP.card_W1_eq_derived_index]; exact hSidx
+  have hS_struct : Nat.card ↥S = Nat.card ↥dII.typeP.H * Nat.card ↥dII.typeP.U * hyp.w2 := by
+    rw [typePData_card_eq_H_mul_U_mul_W1 dII.typeP, hW1card]
+  -- the proven line-83 **upper** bound and the (7.8.b) **lower** bound for `‖ζ^{τ₁,ρ}‖²`.
+  have h83 := hyp.chiRhoNormSq_zeta_le_line83 hG coh' hmu hos hzS hz1 hzconj hδpm hδj
+  have h78 := hyp.chiRhoNormSq_zeta_ge_line78 hG coh' hmu hos hzS hz1 hzconj hδpm hδj
+  -- the concrete `|G₁|/|G|` term (the line-83 middle term), over `ℚ`.
+  set g1g : ℚ := ((Nat.card (hyp.toFamilyHypothesis71).G0 : ℚ)
+      - ((Finset.univ.filter (fun g : G => g ∉ hyp.dadeData.dade.dadeSupport
+          ∧ (orderOf g).Coprime hyp.w1)).card : ℚ)) / (Nat.card G : ℚ) with hg1g_def
+  -- `hA` (line 87): line-83 (upper) + (7.8.b) (lower) + `|A(M)|/|M| < 1/w₁` (proven), over `ℝ`,
+  -- reflected to `ℚ`.
+  have hA : (1 : ℚ) - g1g - 1 / (hyp.w1 : ℚ) < (hyp.w1 : ℚ) / (Nat.card ↥(derivedInG M) : ℚ) := by
+    have hpaR : (Nat.card ↥(typePA M hyp.typeP) : ℝ) / (Nat.card ↥M : ℝ) < 1 / (hyp.w1 : ℝ) := by
+      have h := (Rat.cast_lt (K := ℝ)).mpr hyp.card_typePA_div_card_lt_inv_w1
+      push_cast at h; exact h
+    have hg1gR : (g1g : ℝ) = (Nat.card G : ℝ)⁻¹ * ((Nat.card (hyp.toFamilyHypothesis71).G0 : ℝ)
+        - ((Finset.univ.filter (fun g : G => g ∉ hyp.dadeData.dade.dadeSupport
+            ∧ (orderOf g).Coprime hyp.w1)).card : ℝ)) := by
+      rw [hg1g_def]; push_cast; rw [div_eq_inv_mul]
+    rw [← Rat.cast_lt (K := ℝ)]
+    push_cast
+    linarith [h78, h83, hpaR, hg1gR]
+  -- `hB` (TI-counting): `|G₁|/|G| ≤ (|S_F|−1)/|S| + (w₁w₂−w₁−w₂+1)/(w₁w₂)`.
+  -- The remaining genuine gate — the inclusion `G₁ ⊆ (S_F#)^G ∪ V^G` and its orbit cardinalities
+  -- (Peterfalvi (10.8) lines 89--91), which use the Type-II partner Frobenius structure (10.7)
+  -- (`typeII_derived_frobenius`) + (8.6.a)/(8.11).  See `notes/peterfalvi/s10_7_derived_frobenius.md`.
+  have hB : g1g ≤ ((Nat.card ↥dII.typeP.H : ℚ) - 1) / (Nat.card ↥S : ℚ)
+      + ((hyp.w1 : ℚ) * hyp.w2 - hyp.w1 - hyp.w2 + 1) / ((hyp.w1 : ℚ) * hyp.w2) := by
+    sorry
+  -- assemble via the proven pure-`ℚ` analytic chain (lines 87--99).
+  have hw1 : 1 ≤ hyp.w1 := Nat.card_pos
+  have hw2 : 1 ≤ hyp.w2 := Nat.card_pos
+  have hu : 1 ≤ Nat.card ↥dII.typeP.U := by omega
+  have hH : 1 ≤ Nat.card ↥dII.typeP.H := Nat.card_pos
+  have hMp : 1 ≤ Nat.card ↥(derivedInG M) := Nat.card_pos
+  exact typeII_coherence_estimate_chain hw1 hw2 hu hH hMp hS_struct hA hB
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (10.8)**: under Hypothesis (10.1), the character family `S` is
@@ -597,7 +673,6 @@ parameters from `w2_prime_and_parameter_independence`); the structural bound
 pure-`ℚ` arithmetic contradiction (`typeII_noncoherence_arithmetic`) together give `False`. -/
 theorem S_not_coherent [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
     (hyp : Hypothesis M) :
     ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A0) := by
   rintro ⟨hcoh⟩
