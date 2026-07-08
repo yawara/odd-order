@@ -1954,8 +1954,11 @@ landed 済 reusable infra: step1-5 (C_K(A)≠1 engine) / step4 (P₀ 非中心�
 step10 (Hall reduction)。残るは **wiring + M-specific 依存**:
 - **P₀ ⊆ L_F**: `data.P0_le_Ls` (P₀⊆mainSubgroup L data.L_type) + `data.L_type = .I` (type 一意性、要確認) で
   mainSubgroup=M_F → P₀⊆L_F。**要**: L_type=I lemma or type uniqueness。
-- **P₀' = O_p(L_F)∩M 機構**: Pf は P₀=O_p(H)∩M と再定義 (A-invariant: O_p(H) char in H⊴L)。ctr.P0⊆P₀' で
-  step4 (非中心化) は継承。A normalizes P₀' (A≤M normalizes M ∧ A≤L normalizes O_p(H))。P₀'⊆H。
+- **P₀' = O_p(L_F)∩M 機構** (infra=`opiCoreInG {p} (maxNilpotentNormalHall L)`, SubgroupInAmbient.lean):
+  Pf は P₀=O_p(H)∩M と再定義 (A-invariant)。`le_normalizer_opiCoreInG_of_le_normalizer` で
+  A≤normalizer(L_F)→A≤normalizer(O_p(L_F))、`opiCoreInG_le` で O_p(L_F)⊆L_F。`isPGroup_opiCoreInG_singleton`
+  で p-group。**要 sub-lemma**: ctr.P0⊆O_p(L_F) (nilpotent L_F の Sylow-p 一意性; mathlib `IsNilpotent`
+  Sylow normal) → ctr.P0⊆P₀'=O_p(L_F)∩M ゆえ P₀'≠⊥ ∧ step4 非中心化継承。
 - **coprimality gcd(|P₀'A|,|K|)=1**: P₀'A≤M∩L complements K (第1主張) → |M∩L| coprime |K| (M_F Hall) → 継承。
 - **per-A core** (A≤M∩L, A⊓L_F=⊥, A≠⊥ → False): `exists_ne_one_centralized_by_complement_of_kernel_not_centralizes`
   (P₀',A,K,L_F,L で C_K(A)≠1) → C_K(x)≠1 (12.9 `CKx_not_le_Kprime`) → step7 (V=M∩L で A,x∈W abelian ⟹
