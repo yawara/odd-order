@@ -4815,6 +4815,81 @@ theorem counterexample_P0_K_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimp
   exact ⟨habelian, le_antisymm hrank_le
     (OddOrder.BG.Ch2.S09.two_le_rank_of_noncyclic_pSubgroup hG ctr.P0_pGroup ctr.P0_noncyclic)⟩
 
+/-- **Counterexample fact: `K = M_F = M_σ`.**  For the type-`I` minimal counterexample `M`, its
+Fitting kernel `K = M_F` equals the `σ`-core `M_σ` (Proposition 16.1 clause (f), via
+`proposition_type_classification`). -/
+theorem MF_eq_Msigma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (ctr : CounterexampleHypothesis (G := G)) :
+    ctr.K = OddOrder.BG.Ch3.S10.Msigma ctr.M := by
+  rw [ctr.K_eq_MF]
+  exact (OddOrder.BG.Ch4.S16.proposition_type_classification hG ctr.M_maximal).2.2.2.2.2.mpr
+    (Or.inl ctr.M_typeI)
+
+/-- **Counterexample fact: `p ∉ σ(M)`.**  The minimal prime `p` of Hypothesis (12.8) does not lie
+in `σ(M)`: `M_σ` is `σ(M)`-Hall in `G` and `p ∤ |M_σ| = |M_F|` (as `M_F` is Hall in `M` and
+`p ∣ [M : M_F]`), while `p ∣ |G| = |M_σ| · [G : M_σ]`, so `p` divides `[G : M_σ]`, forcing
+`p ∉ σ(M)`. -/
+theorem p_not_mem_sigma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (ctr : CounterexampleHypothesis (G := G)) :
+    ctr.p ∉ OddOrder.BG.Ch3.S10.sigma ctr.M := by
+  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  have hMFσ : maxNilpotentNormalHall ctr.M = OddOrder.BG.Ch3.S10.Msigma ctr.M :=
+    (OddOrder.BG.Ch4.S16.proposition_type_classification hG ctr.M_maximal).2.2.2.2.2.mpr
+      (Or.inl ctr.M_typeI)
+  have hpidx : ctr.p ∣ ((maxNilpotentNormalHall ctr.M).subgroupOf ctr.M).index := by
+    have h := ctr.p_dvd_index
+    rwa [ctr.K_eq_MF, Subgroup.relIndex] at h
+  have hMFhall := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall ctr.M
+  have hp_not_dvd_MF : ¬ ctr.p ∣ Nat.card ↥(maxNilpotentNormalHall ctr.M) := fun hdvd =>
+    hMFhall.index_no_pi ctr.p
+      (Nat.mem_primeFactors.mpr ⟨ctr.p_prime, hpidx, Subgroup.index_ne_zero_of_finite⟩)
+      (Nat.mem_primeFactors.mpr ⟨ctr.p_prime, hdvd, Nat.card_pos.ne'⟩)
+  have hp_not_dvd_Mσ : ¬ ctr.p ∣ Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma ctr.M) :=
+    hMFσ ▸ hp_not_dvd_MF
+  have hp_dvd_G : ctr.p ∣ Nat.card G :=
+    (hpidx.trans (Subgroup.index_dvd_card _)).trans (Subgroup.card_subgroup_dvd_card ctr.M)
+  have hσHall := (OddOrder.BG.Ch3.S10.isHall_Msigma_Malpha hG ctr.M_maximal).1
+  intro hpσ
+  refine hp_not_dvd_Mσ ?_
+  have hpmul : ctr.p ∣ Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma ctr.M)
+      * (OddOrder.BG.Ch3.S10.Msigma ctr.M).index := by
+    rw [Subgroup.card_mul_index]; exact hp_dvd_G
+  rcases (Nat.Prime.dvd_mul ctr.p_prime).mp hpmul with h | h
+  · exact h
+  · exact absurd hpσ (hσHall.index_no_pi ctr.p
+      (Nat.mem_primeFactors.mpr ⟨ctr.p_prime, h, Subgroup.index_ne_zero_of_finite⟩))
+
+/-- **Peterfalvi (12.11), step (8.1.c): `P₀` does not centralize `K = M_F`.**  If `P₀ ≤ C_G(K)`,
+then (as `K = M_σ`) `P₀ ≤ C_G(M_σ)`, so `C_G(M_σ) ⊓ P₀ = P₀` has `rank ≤ 1` by BG Proposition
+10.11(b) (`rank_centralizer_Msigma_inf_le_one`, applicable since `P₀` is a `p`-group with
+`p ∉ σ(M)`, hence a `σ(M)ᶜ`-subgroup of `M`).  But `P₀` is noncyclic (Hypothesis (12.8)), so
+`2 ≤ rank P₀` — a contradiction.  This is the honest content of the "(8.1.c) ⟹ `P₀` does not
+centralize `K`" step of Peterfalvi (12.11). -/
+theorem P0_not_le_centralizer_K [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (ctr : CounterexampleHypothesis (G := G)) :
+    ¬ ctr.P0 ≤ Subgroup.centralizer (ctr.K : Set G) := by
+  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  intro hP0C
+  -- `P₀` is a `σ(M)ᶜ`-subgroup (a `p`-group with `p ∉ σ(M)`).
+  have hpσ : ctr.p ∉ OddOrder.BG.Ch3.S10.sigma ctr.M := p_not_mem_sigma hG ctr
+  have hP0pi : ctr.P0.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma ctr.M)ᶜ := by
+    intro q hq
+    obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp ctr.P0_pGroup
+    rw [hn] at hq
+    obtain ⟨hqp, hqdvd, _⟩ := Nat.mem_primeFactors.mp hq
+    rw [(Nat.prime_dvd_prime_iff_eq hqp ctr.p_prime).mp (hqp.dvd_of_dvd_pow hqdvd)]
+    exact hpσ
+  -- `rank (C_G(M_σ) ⊓ P₀) ≤ 1` (BG Prop 10.11(b)).
+  have hrank := OddOrder.BG.Ch3.S10.rank_centralizer_Msigma_inf_le_one hG ctr.M_maximal
+    ctr.P0_le_M hP0pi
+  -- `P₀ ≤ C_G(M_σ)` (from `hP0C` and `K = M_σ`), so `C_G(M_σ) ⊓ P₀ = P₀`.
+  have hP0Cσ : ctr.P0 ≤ Subgroup.centralizer (OddOrder.BG.Ch3.S10.Msigma ctr.M : Set G) := by
+    rwa [MF_eq_Msigma hG ctr] at hP0C
+  rw [inf_eq_right.mpr hP0Cσ] at hrank
+  have h2 := OddOrder.BG.Ch2.S09.two_le_rank_of_noncyclic_pSubgroup hG ctr.P0_pGroup
+    ctr.P0_noncyclic
+  omega
+
 /-- A `p`-Hall subgroup `H` (its order having only `p`-primary divisors among `π = π(|H|)`) with
 `p ∣ |H|` contains a Sylow `p`-subgroup of the ambient group `G`.
 
