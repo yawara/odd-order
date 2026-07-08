@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S15_SAndT_Setup
 import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
+import OddOrder.Peterfalvi.S13_PrimeTIResidueBridge
 
 /-!
 # Peterfalvi (8.10)/(8.15): the honest type-`P₂` `A₀`-support `A₀(S) = A(S) ∪ V^S`
@@ -645,6 +646,58 @@ theorem Hypothesis.sInstance_dade0_eq_induce [Fintype G] [Finite G]
       exact hyp.forall_dadeHypS0_H_eq_bot hG ⟨a.1, a.2⟩)
     ⟨f, (ClassFunction.mem_supportedSubmodule).mpr hf⟩
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The type-`P₂` `Hypothesis46`-for-`S`** (issue 9076 piece 4c-4; the (13.18) pin-2/3 route).
+Assembles the §6 certain-type `Hypothesis46 (honestTypeP2ASet S) ↥S` from the type-uniform
+constructor `hypothesis46OfTypePData` (`S13_PrimeTIResidueBridge`): the type-`P₂` datum `hyp.Sdata`
+(with `IsTypeP S` from `S_typeP2`), the honest `A(S)`-support with its `'A0(S)`-Dade `dadeHypS0`, and
+the kernel-family subgroup `subH = M_σ` — for which the covering `A(S) = ⋃_{z∈M_σ#} C_{S'}(z)#` holds
+(`mem_honestTypeP2ASet`).  This supplies the `certainTypeDiffSupported` /
+`certainType_diff_dade_apply_eq_of_mem_V` residue facts behind the `(13.18)` support/`V`-value pins
+(`tauS_mu_row0_diff_support` / `tauS_mu_row0_vanish_on_V`), which then discharge once `hyp.mu` is
+grounded to `residueS.mu2` (b-side grid field, cf. `mu_row0_ne`).  **Ungated** — pure structural
+assembly (no grounding needed to *build* the `Hypothesis46`). -/
+noncomputable def Hypothesis.hyp46S [Finite G] (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
+    OddOrder.Peterfalvi.S06.Hypothesis46 (honestTypeP2ASet hyp.S) hyp.S :=
+  hypothesis46OfTypePData hG hyp.S_maximal
+    (OddOrder.BG.Ch4.S14.isTypeP_of_isTypeP2 hyp.S_typeP2) hyp.Sdata hG.odd
+    (honestTypeP2ASet hyp.S) (hyp.dadeHypS0 hG) (hyp.dadeHypS0_hconj hG)
+    (fun l _ ha => honestTypeP2ASet_conj_mem l.2 ha)
+    ((OddOrder.BG.Ch3.S10.Msigma hyp.S).subgroupOf hyp.S)
+    (by rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance)
+    (by
+      -- `W₂ ≤ H = maxNilpotentNormalHall S ≤ M_σ` (`W2_le`/`H_eq` + `maxNilpotentNormalHall_le_Msigma`).
+      refine Subgroup.subgroupOf_mono hyp.S ?_
+      have hW2H : hyp.Sdata.W2 ≤ hyp.Sdata.H := le_trans hyp.Sdata.W2_le inf_le_left
+      rw [hyp.Sdata.H_eq] at hW2H
+      exact le_trans hW2H
+        (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hyp.S_maximal))
+    (by
+      -- `M_σ ≤ S'` (`Msigma_le_derived`).
+      exact Subgroup.subgroupOf_mono hyp.S
+        (OddOrder.BG.Ch3.S10.Msigma_le_derived hG hyp.S_maximal))
+    (by
+      -- **`A_covers`**: for `hh ∈ M_σ#` and `x ∈ C_S(hh) ⊓ S'` with `x ≠ 1`, the point `↑x` lies in
+      -- `A(S) = ⋃_{z∈M_σ#} C_{S'}(z)#` — witnessed by `z = ↑hh` (the covering `mem_honestTypeP2ASet`).
+      intro hh hhσ hh1 x hx hx1
+      rw [Subgroup.mem_inf] at hx
+      obtain ⟨hxC, hxD⟩ := hx
+      rw [Subgroup.mem_subgroupOf] at hxD hhσ
+      rw [Subgroup.mem_centralizer_iff] at hxC
+      rw [mem_honestTypeP2ASet]
+      refine ⟨hxD, ?_, (hh : G), ⟨hhσ, ?_⟩, ?_⟩
+      · -- `↑x ≠ 1`
+        simpa using hx1
+      · -- `↑hh ≠ 1`
+        simpa using hh1
+      · -- `↑x ∈ C_G(↑hh)` from `x ∈ C_S(hh)`
+        rw [Subgroup.mem_centralizer_iff]
+        rintro g rfl
+        have hcomm := hxC (hh : ↥hyp.S) rfl
+        have := congrArg (hyp.S.subtype) hcomm
+        simpa using this)
+
 /-! ### Prime-`TI` pins for the (13.18) `S`-side cross-relation (issue 9076 piece 4c-4)
 
 The three isolated prime-`TI` obligations behind `tauS_mu_row0_cross`
@@ -663,13 +716,45 @@ row-direction distinctness is the missing prime-`TI` fact.  Prime-`TI` theory, c
 theorem Hypothesis.mu_row0_ne [Finite G] (hyp : Hypothesis (G := G)) {j : Fin hyp.p}
     (hj : j ≠ ⟨1, by have := hyp.three_le_p; omega⟩) :
     hyp.mu ⟨0, hyp.q_prime.pos⟩ j
-      ≠ hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩ := sorry
+      ≠ hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩ := by
+  classical
+  haveI : Fintype ↥hyp.S := Fintype.ofFinite _
+  haveI : Invertible (Nat.card ↥hyp.S : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  intro heq
+  -- The diagonal value `⟨μ_{0,#1}, μ_{0,#1}⟩ = 1` (irreducibility, `mu_irreducible`).
+  have hdiag : OddOrder.RepresentationTheory.ClassFunction.inner
+      (hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)
+      (hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩) = 1 :=
+    (hyp.mu_irreducible ⟨0, hyp.q_prime.pos⟩
+      ⟨1, by have := hyp.three_le_p; omega⟩).inner_self_eq_one
+  -- The off-diagonal (row-`0` cross-column) value `⟨μ_{0j}, μ_{0,#1}⟩ = 0` (`j ≠ #1`) is the **sole
+  -- genuine content** — the prime-`TI` grounding, transported from the `sorry`-free
+  -- `PrimeTIResidueData.mu2_orthonormal` once `hyp.mu` is grounded to the residue grid `residueS.mu2`
+  -- (a grid-property field on `S15.Hypothesis`, b-side; discharged in the spine where
+  -- `Section16CharacterData.muS = columnFamily.mu = residueS.mu2`, cf. `S13_PrimeTIResidueBridge`).
+  -- Under-determined by the abstract `Hypothesis` axioms (`mu_col_injective` is within-column only;
+  -- the induced `mu_definition` fixes only column differences).  Issues 9076/3002/9014.
+  have hoff : OddOrder.RepresentationTheory.ClassFunction.inner (hyp.mu ⟨0, hyp.q_prime.pos⟩ j)
+      (hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩) = 0 := sorry
+  rw [heq, hdiag] at hoff
+  exact one_ne_zero hoff
 
 /-- **Prime-`TI` support pin** (Coq `prDade_sub_TIirr_on`, `PFsection4.v`): the `μ`-column
 difference `μ_{0j} − μ_{0,#1}` is supported inside `A₀(S) = A(S) ∪ V^S` — its support meets `S`
 only in `P^# ∪ V_S`, because the two prime-`TI` residues share the same `1_S`-part off `A₀(S)` and
 it cancels in the difference.  This is the `S`-side instance of Coq `prDade_sub_TIirr_on`
-(`μ2_{ij} − μ2_{ik} ∈ 'CF(S, 'A0)`).  Prime-`TI` theory, cf. issue 9014. -/
+(`μ2_{ij} − μ2_{ik} ∈ 'CF(S, 'A0)`).  Prime-`TI` theory, cf. issue 9014.
+
+**⚠ over-claim (2026-07-08 lane-c 精査; issue 9076)**: 本 pin は `∀ j` だが **`j = 0` で偽**、`j ≠ 0`
+が要る。consumer `tauS_mu_row0_cross` (S15_SAndT:4020) は `(_hj : (j:ℕ) ≠ 0)` を持ち **j≠0 でのみ**
+呼ぶ。j=0 は trivial column: `chi_zero`+`chi_res` ⟹ `mu2 0 0 (1) = 1` (Res_PU = trivial) だが
+`mu2 0 j (j≠0)` は residue degree ⟹ `(μ_{00}−μ_{0,#1})(1) ≠ 0`、`1 ∉ A₀` ゆえ support ⊄ A₀
+(`certainType_diff_supp_subset_A0` の `z=1` 分岐が `hdeg` を要求、S06_CertainTypeIsometry:287)。
+**honest fix** = signature に `(hj0 : (j:ℕ) ≠ 0)` を追加 (b が consumer で `_hj` を pass、cross-lane
+2-step)。**honest close (j≠0)** = `hyp46S` の `certainTypeDiffSupported` (`hdeg` は
+`forall_columnFamily_mu_apply_one_eq_of_sum_eq` 経由 — 両 residue column の sum-degree 一致) +
+grounding `hyp.mu = residueS.mu2`. -/
 theorem Hypothesis.tauS_mu_row0_diff_support [Finite G] (hyp : Hypothesis (G := G))
     (j : Fin hyp.p) :
     (hyp.mu ⟨0, hyp.q_prime.pos⟩ j

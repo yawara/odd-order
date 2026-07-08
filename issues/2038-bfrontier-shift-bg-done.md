@@ -100,3 +100,110 @@ S14/S10 が cite (S10 は territorial ゆえ新 lemma を S14/§16 側に)。**�
 
 ⟹ **reallocation は不要かも** (lane-b に genuine buildable on-path work = (8.13) assembly + S14 branch が残存)。
 hub は本 finding を勘案。lane-b は build 継続。
+
+## ✅ (2026-07-08 続²、lane-b /loop) — (8.13) per-element ∃! **landed**、allTypeI_fittingIsTI 到達性を精査
+
+**landed (commit 3e88b161)**: `existsUnique_maximal_centralizer_le_typeI_or_typeII` (S16_MainResults、b-owned)
+= (8.13) の per-element `∃!` 結論 (existence 半分 `exists_maximal_centralizer_le_typeI_or_typeII` +
+Theorem-D singleton uniqueness `maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape` を
+合成)。escapingCentralizers_control (S10、lane-a) 第2連言の literal shape そのもの (`theoremII_tame_embedding`
+の BG-set-bound per-x clause の Peterfalvi-set 版 clean core)。full build 3943 green・AxiomsCheck OK。
+
+**allTypeI_fittingIsTI (S14:7089、次 consumer) 到達性 — 精査結果 (docstring は STALE でなく正確)**:
+- consumer chain は明瞭: `exists_typeICovering` (S14:7168) は `allTypeI_fittingIsTI` → 既存
+  `maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI` (S16) のみ。∴ `allTypeI_fittingIsTI` が唯一 gate。
+- clean route (contrapositive): type-I M は type-F (`isTypeF_of_isTypeI`)。¬FittingIsTI と仮定 → 矛盾を出す。
+  だが `exists_RData_escape_structure` (S16:6095) は escaping σ# x に対し neighbour N (typeF∨typeP2) を出すのみで、
+  **all-type-I では N は maximal ⟹ type I ⟹ type F** ゆえ disjunction が typeF に落ち、`IsTypeP2 N → ¬FittingIsTI`
+  は空虚 → 矛盾出ず。
+- **真の crux (未組立)**: 「type-F M で escaping σ# ⟹ neighbour N が type-P₂」= **Cor 15.9 の逆**。
+  Lean の `centralizer_escape_final_local` (S16:5916) は `¬IsTypeF N` を**仮説**に要求 (all-type-I では偽) ゆえ
+  そのままでは使えない。∴ docstring の「escapingCentralizers_control (S10, lane-a) に gated」は**正確**
+  (私の (8.13) ∃! はまさに escapingCentralizers_control の upstream ingredient — lane-a が S10 で cite → 下って
+  allTypeI_fittingIsTI へ)。
+- 「¬FittingIsTI ⟹ ∃ escaping σ#-element」の confident reverse 還元 (pieces:
+  `exists_notMem_inf_conj_fitting_ne_bot_of_not_fittingIsTI` + `mem_sigma_of_prime_dvd_card_inf_conj_fitting` +
+  `mem_Msigma_of_isPiElement_sigma_of_mem` + `maximalSigmaSubgroupsOfElement_eq_singleton_of_centralizer_le`) も
+  **Fitting conj-equivariance (`conj g • fittingInAmbient M = fittingInAmbient (conj g • M)`) が現状 absent** ゆえ
+  infra 追加要 (step: z ∈ F(M)^g ⟹ z ∈ M_σ(M^g))。かつ consumer は P₂-crux で依然 blocked。
+
+**次 b 選択肢** (どれも genuine on-path): (i) Fitting-conj-equivariance infra + reverse-escape lemma を confident
+partial として build (allTypeI の半分)、(ii) lane-a と escapingCentralizers_control で coordinate (b の (8.13) ∃!
+が now citable upstream)、(iii) 別 b-frontier piece。lane-b は /loop 継続。
+
+## ✅ (2026-07-08 続³、lane-b /loop) — reverse-escape lemma **landed** (option i)、P₂-crux が唯一残 gate
+
+**landed (commit aac73cfb)**: `exists_sigmaSharp_escape_of_not_fittingIsTI` (S16_MainResults、b-owned) =
+`not_fittingIsTI_of_mem_fittingSharp_of_centralizer_not_le` の honest な逆 (**¬FittingIsTI M ⟹ ∃ z ∈ M_σ#,
+C_G(z) ⊄ M**)。**Fitting-conj-equivariance 不要**と判明: `mem_sigma_of_prime_dvd_card_inf_conj_fitting` が
+「F(M) ⊓ F(M)^g の card を割る素数は全て σ(M)」を与えるゆえ、交わりの任意の非単位元 z は自動 σ-element →
+z ∈ M_σ(M^g) は z ∈ conj g • F(M) ≤ conj g • M = M^g + σ-conj-invariance で直接 (F(M^g) 経由不要)。full build
+3943 green・AxiomsCheck OK。
+
+**allTypeI_fittingIsTI の残 gate = P₂-crux のみ** (確定): reverse-escape で ∃ escaping z を得ても、
+`exists_RData_escape_structure` の neighbour N は all-type-I で type-F に落ちる (前記) → 矛盾出ず。
+**「type-F M で escaping σ# ⟹ N type-P₂」が genuinely 未組立**: Lean `centralizer_escape_final_local` も Coq
+`nonFtype_signalizer_base` (BGsection15:1399) も **¬IsTypeF N (= "nonFtype") を仮説要求** (証明せず)。∴ この
+crux は深い BG Cor 15.9 の逆で、S16 (b-owned) に置ける可能性はあるが Cor-15.9-machinery
+(`typeP2_neighbor_is_typeF_of_mem`/`norm_noncyclic_sigma`/`tau2_transfer_constraint`) の逆向き組立要 →
+Coq/教科書精読 ([[feedback-ask-chatgpt-for-elided-gaps]]) 候補。**次 iteration**: (a) P₂-crux を Coq-assisted で
+attempt、or (b) upstream-priority 再考 (§13 (13.18) residue supply 等)。b の (8.13) ∃! + reverse-escape は
+escapingCentralizers_control (lane-a) の citable upstream として残る。
+
+## 🧭 (2026-07-08 続⁴、lane-b /loop) — b の (8.13)/escaping クラスタ寄与は **完了**、残は lane-a-coupled 深部 (hub 裁定要)
+
+3 iteration の frontier 精査の**確定診断** (hub 向け):
+- **b の clean 寄与は landed で完了**: `existsUnique_maximal_centralizer_le_typeI_or_typeII` (∃!) +
+  `exists_sigmaSharp_escape_of_not_fittingIsTI` (reverse-escape)。両者 sigmaSharp-based で **b/lane-a 境界の正しい
+  b 側**。escaping-set 形 (A1 M tau → sigmaSharp bridge) は Peterfalvi `A1` (S10、lane-a) を要すゆえ lane-a 側。
+- **P₂-crux = BG §14 type-duality の逆**: repo は `typeP2_neighbor_is_typeF`/`_of_mem` (S14:11396/12030 = Cor 14.12
+  = Coq `P2type_signalizer`) で **M-type-P₂ ⟹ neighbour-type-F** を持つが、逆の **M-type-F + escaping ⟹
+  neighbour-type-P₂** は未組立 (Cor 14.12 machinery の逆向き; Cor 15.9 も Coq もこれを仮説に取る)。深い multi-lemma port。
+- **b の S14 残 sorry (11) は一律 gated**: allTypeI/(8.8.a)/(12.11 = 8.13.c1+8.1.b/c+9.1+12.10)/hub 9003 = 全て §8/§16
+  escaping-centralizer 深部 = escapingCentralizers_control (lane-a S10) 系。b-owned で clean ungated な残は無し。
+- **∴ hub 裁定事項**: (1) lane-a が b の ∃!+reverse-escape を input に escapingCentralizers_control を組む、
+  (2) P₂-crux (type-duality 逆) を b or shared に deep-port 割当 (Coq-assisted, multi-session)、
+  (3) b を別クラスタへ reallocate。lane-b は再評価トリガー (ungated on-path work ゼロ) に**近い**が、本 session で
+  genuine 2 lemma landed ゆえ churn drift ではない。次 /loop iteration は (2) を Coq-assisted で begin する
+  (deep frontier を engage; policy「難所を回避しない」)、hub が別途 (1)/(3) を裁定可。
+
+## ✅ (2026-07-08 続⁵、lane-b /loop) — 訂正: b frontier は**枯渇していない** — intersection_le_kernel が assemblable
+
+前 (続⁴) の「b clean frontier 枯渇 → hub reallocate 検討」は**部分的に誤り** (再: [[verify-port-state-by-number-not-coq-name]])。
+comprehensive survey で **`intersection_le_kernel` (S14:5245、Pf 12.11 第2主張、b-owned、on-path 12.11→12.17) が
+genuinely ASSEMBLABLE** と判明 — docstring「Genuinely still-missing」は **STALE**。全 prereq 実在:
+- (12.10) `witness_L_frobenius` = **PROVEN** (docstring は「pinned」と誤記)
+- (8.1.b) = `TypeFData.{centralizer_le_U1, U1_commutative, U1_normal}` (field!)
+- (8.1.c) = `TypeFData.{exponent_eq, frobenius_HU0}` (field)
+- (9.1) Wielandt = `GroupTheory/CoprimeFixedPoints`+`WielandtFixedPoint` (実在)
+- (12.9) = `RankTwoWitnessData.CKx_not_le_Kprime`
+
+深い multi-step proof (A≤M∩L の p'-part 自明性: P₀=O_p(H)∩M / P₀A Frobenius / Wielandt C_K(A)≠1 /
+(8.1.b) abelian ⟹ A centralizes x ⟹ A=1) だが gated でない。**次 /loop iteration で build** (issue 4/task)。
+∴ **hub は b を reallocate しない** — b に genuine ungated on-path deep work あり。同種の rank-two witness cluster
+(S14: sharpImage/centralizer_le/witness_psi_degree/witness_value_norm_package 等) も stale-docstring 疑い、要精査。
+
+## ⚠ (2026-07-08 続⁶、lane-b /loop) — 続⁵「assemblable」を**訂正**: intersection_le_kernel は multi-lemma deep
+
+続⁵ の「intersection_le_kernel assemblable」は **over-optimistic** ([[verify-port-state-by-number-not-coq-name]]
+の自戒: TypeFData field は確認したが (9.1)/Frobenius machinery を未確認で「assemblable」と label した)。
+検証で判明:
+- **(9.1) = Wielandt order formula** (Pf mmd 04.11: U⋊E Frobenius coprime action on solvable H)。`CoprimeFrobeniusAction`
+  + `wielandt_formula_of_perfactor` (WielandtAssembly) の machinery は在るが、**C_K(A)≠1 を出すには `CoprimeFrobeniusAction`
+  instance (P₀⋊A ↷ K) の構築が要** — これに Frobenius sub-structure が要る。
+- **Frobenius sub-structure (P₀⋊A Frobenius, kernel P₀)**: L=H⋊U Frobenius・P₀≤H・A≤L (A∩H=1) から。
+  `IsFrobeniusGroup` = {isNormal, isComplement, ne_bot×2, conj_frobenius (FPF)}。conj_frobenius は
+  「a∈A\{1} ⟹ C_{P₀}(a)=1」= 「a∉kernel H ⟹ FPF on H」を要すが、これは complement-conjugacy 経由
+  (conj_frobenius は特定 complement U のみ) + subgroup-of setup。**clean な既存 lemma 無し** (prime-complement 版
+  `isFrobeniusGroup_of_prime_complement_fixedFree` のみ)。
+
+**⟹ intersection_le_kernel = genuine multi-lemma deep proof** (gated でないが deep)。**decomposition** (次 build 順):
+1. **Frobenius sub-structure lemma** (Isaacs Ch06 infra、reusable): Frobenius L=N⋊U で a∉N ⟹ C_N(a)=1
+   (element-outside-kernel FPF)、hence P₀ A-invariant ⟹ P₀⋊A Frobenius kernel P₀。
+2. **CoprimeFrobeniusAction 構築** + Wielandt formula → C_K(A)≠1。
+3. **(8.1.b) abelian argument** (TypeFData.centralizer_le_U1) → A centralizes x → A=1 → M∩L⊆H。
+
+これは deep char/group-theory work (multi-iteration)。b は継続 engage (policy「難所回避しない」)。downstream (12.11 combiner)
+は intersection_complements_K (8.13.c1、lane-a) に依然 gated だが、doneness policy 上 intersection_le_kernel 自体が
+genuine assertion ゆえ build 価値あり。**5 iteration の char-endgame 精査で判明した構造的事実**: b の char frontier は
+一律 deep multi-lemma (survey では「stale/assemblable」に見えても body は深い) — 今後は body 検証を先に。

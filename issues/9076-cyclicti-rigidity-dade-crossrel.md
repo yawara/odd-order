@@ -122,6 +122,46 @@ trichotomy** (constant-row/column 除外) は欠く → 4a/4b がそれを埋め
     V-value/distinctness を transport、or (b) S15 Hypothesis carrier に prime-TI field を追加 (constructor 供給)、
     or (c) 9014 general residue API port。いずれも substantial (次 session 級)。**mu_row0_ne** (cross-column
     distinctness) は §12 の grid injectivity 側、**vanish_on_V** は上記 V-value + 新 A0-Dade=Ind bridge の合成。
+  - **✅ 決着: 残 gate = 単一の b-side grounding field (2026-07-08 lane-c /loop 精査)**。上記 (a)/(b)/(c)
+    より precise。`S13_PrimeTIResidueBridge.lean` (main 合流済) が **`Hypothesis.residueS` = S-side
+    prime-TI residue grid `PrimeTIResidueData ↥S`** を **`PrimeTIResidueData.ofS06Hypothesis` で sorry-free
+    構成済** (type-uniform, `IsTypeP2` から `IsTypeP` 経由、`IsTypeP1` 不要)。`PrimeTIResidue.lean` も
+    **100% sorry-free** (`mu2_orthonormal`/`chi_res`/`ind_chi`/`cfker_prTIres`/`prTIres_irr_cases` 全 posited
+    field を実 discharge、`prTIres_irr_dichotomy` 経由)。⟹ **prime-TI 基盤は完成**。3 pin の残 gate は
+    **ただ 1 つ: grounding `hyp.mu i j = hyp.residueS.mu2 (cast i)(cast j)`**。両者とも
+    `columnFamily.mu` — spine の `Section16CharacterData.muS` (FeitThompson:1459) は **文字通り
+    `(certainTypeS.columnFamily …).mu`**、residueS.mu2 も `(columnFamily χ₂).mu`。∴ a の spine discharge は
+    **near-definitional** (certainTypeS vs s06S の identification のみ)。
+    - **3-lane spec (near-mechanical)**: **(b)** `S15.Hypothesis` に grid-property field
+      `mu_grounded : ∀ i j, mu i j = residue grid` (or 弱形 `mu_grid_orthonormal`) を additive 追加
+      (S15_SAndT_Setup、grid-property field ゆえ 9009 で lane-b)。**(a)** spine (FeitThompson:2665) で
+      `muS = columnFamily.mu = residueS.mu2` から discharge。**(c=lane-c)** 3 pin を residueS から close:
+      `mu_row0_ne` ← `mu2_ne`(=`mu2_orthonormal` off-diag); `tauS_mu_row0_diff_support` ←
+      `certainTypeDiffSupported` (+`hypothesis46OfTypePData`, A=honestTypeP2ASet, dade0=dadeHypS0);
+      `tauS_mu_row0_vanish_on_V` ← certain-type Dade-id + V-value。
+    - **なぜ arbitrary hyp で pin が unprovable**: `hyp.mu`/`hyp.omega` は S15.Hypothesis の抽象 axiom
+      (orthonormal grid + `mu_definition` induced-diff + `mu_col_injective` within-col) を満たす **free
+      field**、cross-column distinctness/support/V-value を fix しない (別 valid grid が反例)。∴ grounding
+      無しに pin は theorem でない (scaffold でなく genuine な carrier grounding 不足)。
+    - **lane-c 実施済 (2026-07-08)**: `mu_row0_ne` の proof を refine — diagonal `⟨μ_{0,#1},μ_{0,#1}⟩=1`
+      (`mu_irreducible.inner_self_eq_one`) + 矛盾 logic を実証明、残 sorry を **単一 crisp obligation**
+      `hoff : ⟨μ_{0j},μ_{0,#1}⟩=0` (= row-0 cross-column orthogonality = grounding) に isolate。build green。
+    - **lane-c 実施² (2026-07-08): `hyp46S` = type-P2 Hypothesis46-for-S を sorry-free 構成** (commit
+      6945ba5f)。pin-2/3 が route する §6 certain-type `Hypothesis46 (honestTypeP2ASet S) ↥S` を
+      `hypothesis46OfTypePData` から組立 (dade0=dadeHypS0、subH=M_σ、4 obligation 実証明: normal /
+      `W2≤M_σ` / `M_σ≤S'` / A_covers)。**ungated** (grounding 不要で build 可)。⟹ pin-2/3 の infra
+      (`residueS` + `certainTypeDiffSupported` + `hyp46S`) が全て揃い、残 gate は 3 pin 共通 grounding のみ。
+    - **⚠ correctness 発見 (2026-07-08 lane-c): `tauS_mu_row0_diff_support` (pin 2) は `∀ j` だが
+      `j=0` で偽**。consumer `tauS_mu_row0_cross` (S15_SAndT:4020) は `(_hj : (j:ℕ)≠0)` を持ち **j≠0 で
+      のみ**呼ぶが、pin 2 signature に j≠0 が無い。j=0 = trivial column: `chi_zero`+`chi_res` ⟹
+      `mu2 0 0 (1)=1` (Res_PU=trivial)、`mu2 0 j (j≠0)` は residue degree ⟹ `(μ_{00}−μ_{0,#1})(1)≠0`、
+      `1∉A₀` ゆえ support⊄A₀ (`certainType_diff_supp_subset_A0` の z=1 分岐が hdeg 要求)。**honest fix
+      = pin 2 に `(hj0:(j:ℕ)≠0)` 追加** + b が consumer で `_hj` を pass (cross-lane 2-step; C 単独では
+      signature 変更が b の build を壊す = merge-safety ゆえ coordination 要)。**b への依頼**: grounding
+      field 追加時に併せて `tauS_mu_row0_diff_support` の call を `… j _hj` へ更新。honest close route
+      (j≠0): `hyp46S.certainTypeDiffSupported` (hdeg via `forall_columnFamily_mu_apply_one_eq_of_sum_eq`,
+      両 residue column の sum-degree 一致) + grounding。**pin 3 (vanish_on_V) も同様に j≠0 前提**
+      (V-value は residue column にのみ意味)。
   - **route (実装済、参考)**:
     `honestTypeP2A0Set_tame_conj` を **circularity 回避のため BG Thm II で uniform に** 証明する
     (case-dispatch は mixed case = pin ゆえ循環; 実際 `dadeSupportHypothesisData_honestTypeP2A0Set` の
