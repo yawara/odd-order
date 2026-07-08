@@ -334,3 +334,25 @@ S06 `certainTypeDiffSupported` は support ⊆ **A ∪ V = typePA0** (A=typePA �
 
 ⟹ pin 2 の Hypothesis46 route は「support-set 一致 (typePA0=honestTypeP2A0Set) の確認」or「pin/dade を
 typePA0 に統一」が前提。lane-c A0-Dade 領域。lane-b の residueS/mu2_ne (pin 1) は independent に valid。
+
+### ✅ support-set subtlety 解決 (2026-07-08 続、上の「support-set subtlety」節を訂正)
+
+上節「support-set subtlety」は **誤診 (逆)** だった。code-level 精査で解決:
+
+- **issue 9008 で既決**: `typePA = (S')^#` こそ **over-claim (phantom、mmd OCR 由来)** で、Frobenius
+  補元 `U^#` (C_{S_σ}=1) を誤って含む。`honestTypeP2ASet = centralizerSupport(M_σ^#, S')`
+  (M_σ# 添字) が **honest な (8.10)/(13.2.e) 訂正 support** (strictly smaller、正しい)。
+  ∴ pin 2 の target `honestTypeP2A0Set` は**正しい** (typePA0 でなく)。
+- **certainTypeDiffSupported の support `A ∪ V` は Hypothesis46 の `A` に parametric (free)**
+  (S06_CertainTypeIsometry:357 の signature 確認)。∴ `Hypothesis46 (honestTypeP2ASet S) ↥S` を
+  `dadeHypS0` (support = honestTypeP2A0Set) で組めば certain-type bound が pin の honest support を
+  **直接 deliver**。over-claim 問題は発生しない。
+
+**⟹ 結論: pin 2/3 の route は clean・unblocked**。残 = **Hypothesis46-for-S 組立**
+(`A = honestTypeP2ASet`, `toHypothesis = s06S`, `tic = typePData_toTICyclicHypothesis Sdata`,
+`dade0 = dadeHypS0`, `tau = dadeHypS0.fullDadeIsometryData`) → `certainTypeDiffSupported` (pin 2) +
+`certainType_diff_dade_eq` (pin 3、i=0 で `τ_S(μ_{0j}−μ_{01})=δ(ω^σ_{0j}−ω^σ_{01})`)。
+**配置 = lane-c `S15_HonestTypeP2A0`** (dadeHypS0 消費、backward import 回避)。lane-b の
+`residueS`/`mu2_ne`/`honestTypeP2ASet_subset_typePA` は upstream で citable。
+
+lane-b landed (commit 01e798c6): `honestTypeP2ASet_subset_typePA` + 本 route 確定。
