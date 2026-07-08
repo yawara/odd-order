@@ -1930,9 +1930,19 @@ M_F Hall 性** から (∴ 第2主張は第1主張に transitively 依存; 第1�
   第1特殊ケース ambient 版) の対偶で「P が K 非中心化 ⟹ ∃1≠n∈K, A が n を中心化」(= C_K(A)≠1)。ungated
   (coprimality・non-central は仮説供給)。
 
+### step 4 landed (2026-07-09、green)
+- `P0_not_le_centralizer_K` (S14): ¬ P₀ ≤ C_G(K)。route = BG Prop 10.11(b)
+  `rank_centralizer_Msigma_inf_le_one` (P₀ σ(M)ᶜ-subgroup ゆえ rank(C(M_σ)⊓P₀)≤1) vs
+  `two_le_rank_of_noncyclic_pSubgroup` (P₀ noncyclic ゆえ rank≥2) の矛盾。当初想定の
+  self-centralizing (C_M(M_F)≤M_F) は不要 (rank 論法が clean)。
+- helper (additive、reusable counterexample facts): `MF_eq_Msigma` (K=M_F=M_σ, Prop 16.1 f) /
+  `p_not_mem_sigma` (p∉σ(M))。
+
 ### 残 (次 iteration、S14 assembly)
-- **step 4** (P₀ 非中心化 K): C_M(maxNilpotentNormalHall M) ≤ maxNilpotentNormalHall M の所在確認 or build。
 - **step 7** (8.1.b + A,x conjugate into U): 最も subtle。`TypeIData M` (ctr.M_typeI) の `typeF.U1`/
   `centralizer_le_U1` + A,x を complement に入れる Hall conjugacy。
 - **step 9,10**: L Frobenius 条件(4) `centralizer_kernel_le` (既存) + normal-Hall-in-Frobenius reduction。
 - **coprimality gcd(|A|,|K|)=1**: `intersection_complements_K` (sorried-cite) + M_F Hall。
+- **assembly**: 上記 + step1-5 infra + step4 で per-A の「C_K(A)≠1」を S14 で組む → C_K(x)≠1 (12.9) →
+  A centralizes x → A=1 → M∩L⊆H。`exists_ne_one_centralized_by_complement_of_kernel_not_centralizes` が
+  C_K(A)≠1 の consumer-ready form (φ・coprimality・non-central=step4 を供給)。
