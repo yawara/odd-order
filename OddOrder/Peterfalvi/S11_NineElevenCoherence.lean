@@ -784,6 +784,76 @@ theorem nineElevenOne_configuration (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 end Configuration
 
+/-! ### (9.11.2) inertia: the per-summand centralizer containment
+
+Book (9.11.2), first assertion (the deep input `U₁ ∩ U₁ʷ = C`): the `θ`-character regular on the two
+summands `S₀`, `S₀ʷ` has inertia `I_{HU}(θ) ⊓ U = C_U(S₀) ⊓ C_U(S₀ʷ) = U₁ ∩ U₁ʷ`, whose index
+`[U : U₁ ∩ U₁ʷ]` is then forced into `{u, a}`.  The `⊆`-half of that inertia computation — *a fixing
+element centralizes each regular summand* — is the per-summand lemma below, applied once per summand.
+
+The a-owned `chiefFactor_caseA_char_inertia_single` (`S11_MaximalII_III_IV`) proves this for the
+distinguished generator `S₀ = caseA.S0`; the two-summand argument needs it for the `W₁`-conjugate
+`S₀ʷ` as well, i.e. for an *arbitrary* order-`p` `U`-invariant summand.  We lift the same pure-algebra
+core (`mulAut_eq_id_on_of_fixes_ne_one_on_prime`) to a generic summand `S`. -/
+
+section NineElevenTwoInertia
+
+open OddOrder.Isaacs.Ch03 (IsAInvariant isAInvariant_iff_smul_mem)
+
+variable [Finite G] {M : Subgroup G}
+
+/-- **Per-summand char-inertia (generic summand).**  For *any* order-`p` `U`-invariant summand `S` of
+the chief factor `H̄` and an irreducible `θ` nontrivial on `S`, a `U`-element `g` fixing `θ` acts
+trivially on `S` (`aInvariantRestrictAut hSinv g = 1`, i.e. `g ∈ C_U(S)`).  This generalises the
+a-owned `chiefFactor_caseA_char_inertia_single` from the distinguished generator `S₀ = caseA.S0` to an
+arbitrary summand — needed for the (9.11.2) two-summand inertia `I(θ) ⊓ U ⊆ C_U(S₀) ⊓ C_U(S₀ʷ)`,
+obtained by applying this once to `S = S₀` and once to `S = S₀ʷ` (both order-`p`, `U`-invariant, with
+`θ` regular on each).  Same pure-algebra heart (`mulAut_eq_id_on_of_fixes_ne_one_on_prime`: `θ`
+faithful on the prime-order `S`), lifted through `aInvariantRestrictAut_coe`. -/
+theorem caseA_char_inertia_of_summand {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {S : Subgroup (↥data.H ⧸ chief.N)} (hSinv : IsAInvariant (uActionHom data chief) S)
+    (hScard : Nat.card ↥S = chief.p)
+    {θ : IrreducibleCharacter (↥data.H ⧸ chief.N)}
+    (hreg : ∃ x ∈ S, (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+      ≠ (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1)
+    (g : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U)
+    (hinv : ∀ x, (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) ((uActionHom data chief) g x)
+        = (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x) :
+    aInvariantRestrictAut hSinv g = 1 := by
+  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+    IsMulCommutative.of_comm chief.quotient_elementaryAbelian.comm
+  have hid : ∀ x ∈ S, (uActionHom data chief) g x = x :=
+    mulAut_eq_id_on_of_fixes_ne_one_on_prime ((uActionHom data chief) g) S
+      (by rw [hScard]; exact chief.p_prime)
+      (fun x hx => hSinv.smul_mem g hx) θ hreg hinv
+  ext x
+  rw [MulAut.one_apply, aInvariantRestrictAut_coe, hid x x.2]
+
+/-- **(9.11.2) two-summand inertia containment `I(θ) ⊓ U ⊆ C_U(H_i) ⊓ C_U(H_j)`.**  For a character
+`θ` regular on two Clifford summands `Hpart i`, `Hpart j`, a `U`-element `g` in the inertia (fixing
+`θ`) acts trivially on *both* summands: `aInvariantRestrictAut (Hpart_aInvariant i) g = 1` and
+`aInvariantRestrictAut (Hpart_aInvariant j) g = 1`, i.e. `g ∈ C_U(H_i) ∩ C_U(H_j)`.  Applying
+`caseA_char_inertia_of_summand` once per summand (both order-`p` and `U`-invariant by
+`Hpart_order`/`Hpart_aInvariant`).  This is the `⊆`-half of the (9.11.2) inertia identity
+`I(θ) ⊓ U = U₁ ∩ U₁ʷ` (take `i = 0`, `j` = the `W₁`-translate index of `S₀ʷ`); the reverse `⊇` is
+"fixing both summands ⟹ fixing `θ`", and the index of the intersection is then forced into `{u, a}`. -/
+theorem caseA_char_inertia_two_summands {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) {i j : Fin data.q}
+    {θ : IrreducibleCharacter (↥data.H ⧸ chief.N)}
+    (hregi : ∃ x ∈ caseA.Hpart i, (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+      ≠ (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1)
+    (hregj : ∃ x ∈ caseA.Hpart j, (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+      ≠ (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1)
+    (g : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U)
+    (hinv : ∀ x, (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) ((uActionHom data chief) g x)
+        = (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x) :
+    aInvariantRestrictAut (caseA.Hpart_aInvariant i) g = 1 ∧
+      aInvariantRestrictAut (caseA.Hpart_aInvariant j) g = 1 :=
+  ⟨caseA_char_inertia_of_summand (caseA.Hpart_aInvariant i) (caseA.Hpart_order i) hregi g hinv,
+    caseA_char_inertia_of_summand (caseA.Hpart_aInvariant j) (caseA.Hpart_order j) hregj g hinv⟩
+
+end NineElevenTwoInertia
+
 /-- **`[U : K₁ ⊓ K₂] ≤ [U:K₁]·[U:K₂]`** (relative-index form of `Subgroup.index_inf_le`): the
 relative index `H.relIndex U = (H.subgroupOf U).index`, and `subgroupOf = comap` distributes over
 `⊓` (`Subgroup.comap_inf`), so the ambient `index_inf_le` in `↥U` applies.  The (9.11.2) injectivity
