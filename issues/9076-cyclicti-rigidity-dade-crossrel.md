@@ -316,3 +316,21 @@ lane-c は既に honestTypeP2A0Set の Dade を構築済ゆえ整合可能なは
 prime-TI residue と同じ certain-type 土台)。lane-b の `residueS` (grid) + `mu2_ne` (pin1) は landed。残:
 (i) Hypothesis46-for-S 構成 (lane-c file、dadeHypS0 使用) → certainTypeDiffSupported/certainType_diff_dade_eq
 cite で pins 2/3、(ii) carrier field `hyp.mu = residueS.mu2` (FeitThompson = lane-a)。3-lane collaboration。
+
+### ⚠ support-set subtlety (pin 2 の Hypothesis46 route 非自明): typePA0 vs honestTypeP2A0Set
+
+`honestTypeP2ASet M = centralizerSupport(sharp(Msigma M), derivedInG M)` (Msigma# を centralize する M' 元) ⊊
+`typePA M = (M')# = sharpSubgroup(derivedInG M)` (M' 全 nonidentity)。∴ `honestTypeP2A0Set ⊆ typePA0`。
+
+S06 `certainTypeDiffSupported` は support ⊆ **A ∪ V = typePA0** (A=typePA 時) を出すが、pin 2 は
+`⊆ honestTypeP2A0Set` (**より狭い**) を要求 → **方向が逆で drop-in 不可**。
+
+含意 (lane-c/hub 要判断):
+- (a) type-P2 で `honestTypeP2ASet S = typePA S` が実は一致 (M'# の各元が Msigma# を centralize) なら問題なし。
+  要確認 (群構造依存、M_σ ⊆ Z(M') 等)。
+- (b) 真に ⊊ なら、μ差は typePA0 上 supported だが honestTypeP2A0Set 上とは限らず、**pin 2 statement が
+  honestTypeP2A0Set より typePA0 で述べるべき** possibility (dadeHypS0 の support も typePA0 に合わせる必要)。
+  = lane-c の A0-Dade support 設計の再確認点。
+
+⟹ pin 2 の Hypothesis46 route は「support-set 一致 (typePA0=honestTypeP2A0Set) の確認」or「pin/dade を
+typePA0 に統一」が前提。lane-c A0-Dade 領域。lane-b の residueS/mu2_ne (pin 1) は independent に valid。
