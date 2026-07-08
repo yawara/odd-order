@@ -1058,3 +1058,25 @@ K₂=C_U(S₀ʷ) relIndex a、C=cSub) を供給 → equality-branch (nineElevenC
 6. **tiU1**: C≤U₁∩U₁ʷ (centralizes_all_imp_centralizes_summand realize) + [U:U₁∩U₁ʷ]=u=[U:C]
    → U₁∩U₁ʷ=C → hCinf。
 ⚠ **key infra 依存**: hcConjDescend_eq_uActionHom (S11:10237, A_g=uActionHom g realized bridge)。
+
+## 2026-07-08 更新 #35 (lane b, /loop iter 10-12) — (9.11.2) tiU1 machinery ほぼ完成、残 = degree dichotomy + a 排除
+
+**landed (iter 10-12、subagent 3 委譲、全 sorry-free/axiom-clean)**:
+- iter 10: `cuSubOf` + `relIndex_cuSubOf_U_eq_a` (realized C_U(H_j)、orbit-symmetry crux)。
+- iter 11: `caseA_inertia_eq_hcuInHuPair` (I(θ₀)=hInHu⊔cuInHuPair、HU-inertia 同定) + 6 lemma。
+- iter 12: `caseA_inertia_index_eq` ([I(θ₀)].index = (cuSubOf i⊓cuSubOf j).relIndex U) + 9 lemma。
+⟹ **HU-inertia machinery + index 完成**。char-degree = index bridge も landed
+  (`apply_one_eq_index_of_liesOver_linear_inertia`, CliffordSingleOrbit:585)。
+
+**残 tiU1 = 2 piece (最深、次 focused)**:
+1. **degree dichotomy [U:cuSubOf i⊓cuSubOf j] ∈ {u,a}**: source char (H₀C'⊆ker) を θ₀ inertia から構成
+   (Clifford: linear over inertia induces irreducibly、apply_one_eq_index_of_liesOver_linear_inertia)、
+   M-induce で S_H0C' member。**⚠ S_H0C' member degree 分割 (=qu∨=qa) は未 landed** (caseB は
+   caseB_degree_qu 条件付き、caseA は existence caseA_exists_irreducible_source_degree_qa:6455 のみ)。
+   分割構築 = §9 (9.9)/(9.10) analysis、substantial (b carve-out で建てる、a §9 piece cite)。
+2. **a 排除 (Coq PFsection9.v:1785-1795)**: pred2 case-split。u-branch 即 (|U₁∩U₁ʷ|=|C|)。
+   a-branch: U₁∩U₁ʷ⊆C を prime_meetG (q=|W₁| 素) で直接証明 (bigdprod H̄=∏H₁^w1、各 factor centralize)。
+   C≤cuSubOf i⊓cuSubOf j は landed (cInHu_le_cuInHuPair 経由) ⟹ 両 branch で =C = tiU1。
+⟹ tiU1 → nineElevenTwo_u_le_a_sq(:1468) hCinf → equality-branch。
+**次 route 検討**: (B) a-branch の prime 論法を直接 (U₁∩U₁ʷ⊆C を degree 経由せず) 引けるか精査
+  (引ければ degree partition 構築を回避可能、大幅短縮)。
