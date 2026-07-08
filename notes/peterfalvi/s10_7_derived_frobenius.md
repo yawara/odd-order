@@ -207,3 +207,30 @@ Dade ⊥1_G transport (pattern `witness_L_hzeta0nu` S14:6818); `a,ha`=`exists_be
 `toHypothesis71.τ` (restricted to `typePA`=A(M)) agrees with `coh.coherent`'s extension of `hyp.tau` (full,
 over `typePA0`=A₀(M)) on `typePA`-supported differences; analogous to `dadeSupport_restrict_subset`
 (S12:367).  S16 never needs it (type-I has A(M)=Dade support, `h78_hyp_eq := rfl`).
+
+## 2026-07-08 update⁴ — h78 (7.8.b) M-side bridge PROVEN (sorry-free, axiom-clean) (lane-a /loop)
+
+`Hypothesis.chiRhoNormSq_zeta_ge_line78` (S12) is **closed** — the (7.8.b) ρ-norm lower bound
+`‖ζ^{τ₁,ρ}‖² ≥ 1 − ŵ₁/|M'|` is now a real theorem. `#print axioms` = `[propext, Classical.choice,
+Quot.sound]` (no `sorryAx`); full build 3941 green.
+
+Faithful type-P port of `exists_M_hypothesis78` (S16:7988): assemble `S09.Hypothesis78 G (typePA M) M`
+(`H = M' = derivedInG M`, `K = M'.subgroupOf M`, `ζ_0 = Ind_K θ_0 = params.zeta` via
+`exists_placed_induced_family`, `ν = coh.tau1`) and feed `zetaNuRhoNormSqGeOfDade`.  Resolved pieces:
+- **`hagree`**: the anticipated "new bridge" was NOT needed as a standalone lemma —
+  `S04.FullDadeIsometryData.restrict_apply` already gives `(τ.restrict …).toDadeMap α =
+  τ.toDadeMap (inclusion α)`, inlined (`rw [restrict_apply]; exact congrArg _ (Subtype.ext rfl)`) and
+  composed with `coherence_hagree_dadeMap` (full-map agreement).  No thin wrapper added (repo convention).
+- **`hzeta0nu`** (`ζ_0^ν ⊥ 1_G`): `coherence_extension_orthogonal_constOne` using the conjugate member
+  `ζ̄_0 = Ind_K θ̄_0 ∈ S`; the key `⟨ζ_0, ζ̄_0⟩ = 0` uses **`hzconj`** (`params.zeta.conj ≠ params.zeta`)
+  via `irreducibleCharacter_inner_eq_ite` + `if_neg`.  `htau1` (Dade ⊥ 1_G on `A_0`-supported) built from an
+  inline full `Hypothesis71 G (typePA0 M) M` + `inner_tau_supported_constOne`.
+- **`hsmall`** (`2e+1 ≤ h`): `card_derived_ge` (`(2w₁+1)w₂ ≤ |M'|`, `w₂ ≥ 1`); `e = complementIndex = w₁`
+  (`hcardM : |M| = w₁·|M'|`, `complementIndex = |M|/|H|`), `h = kernelOrder = |M'|` (both `rfl`).
+- **norm bridge** `chiRhoNormSq = zetaNuRhoNormSq`: `H78.hyp76.hyp71 = hyp.toHypothesis71 := rfl` +
+  `hpsi : coh.tau1 params.zeta = ν(zeta zetaDistinct)` + `simp [chiRhoNormSq, zetaNuRhoNormSq]; congr 1`
+  (avoids `chiRhoCF_congr_hyp`, which is downstream in S16).
+- **import added**: `OddOrder.Peterfalvi.S09_CertificateDischarge` (§7 engine; DAG-upstream of §10, no cycle).
+
+⟹ the (10.8) estimate's `hA` is now **fully proven** (line-83 upper + h78 lower + card_typePA).  The estimate's
+sole remaining gate is **`hB`** (TI-counting `G₁ ⊆ (S_F#)^G ∪ V^G`, cites (10.7) — cross-lane-gated).
