@@ -93,13 +93,21 @@ trichotomy** (constant-row/column 除外) は欠く → 4a/4b がそれを埋め
     Coq normedTI-Dade (H=1) と P^#-image で異なりうるが sound: `eta_diff_rigidity` は X を
     (ZIrr, ‖·‖²=2, **V-agreement**) から一意決定し、V_S 上は H=⊥ (V-elem escape せず) ゆえ V-agreement は
     Dade_id で P^#-behavior 非依存。∴ rewire 正しい。
-  - [ ] **4c-4 assembly (buildable、API 全確認済)**: `tauS_mu_row0_cross` 本体を `eta_diff_rigidity` で分解。
-    lane-c assembly (ZIrr=`dadeIntegralCharacterMap_mem_ZIrr_of_supported` / ‖X‖²=2=
-    `dadeIntegralCharacterMap_inner_eq_of_supported` / rigidity cite / j=#1 trivial case) + **3 isolated pin**:
-    (i) μ差 ⊆ supportInSubgroup('A0(S)) (Coq prDade_sub_TIirr_on)、(ii) (τ_S(μ差)−η差) vanishes on
-    conjClassSet(regular) = prime-TI μ V-value (Coq prTIirr_id + Dade_id on V)、(iii) ‖μ差‖²=2
-    (μ_{0j}≠μ_{01})。(i)(ii)=prime-TI theory (未ポート、cf 9014/lane-a)。**lane-c structural work 完了;
-    残 = prime-TI pin (cross-lane) + mechanical assembly**。
+  - [x] **4c-4 assembly** — ✅ **完了 (2026-07-08)**: `tauS_mu_row0_cross` の opaque `sorry` を
+    **実 assembly (S15_SAndT.lean:4019-4117、~98 行、sorry-free)** に置換。lane-c 自身の `eta_diff_rigidity`
+    (4b) + Dade isometry API を genuine に呼ぶ本体を構築:
+    - j=#1 trivial case (`simp [hj1, sub_self, map_zero]`, μ差=η差=0)。
+    - `X := τ_S(μ差) ∈ ZIrr G` = `dadeIntegralCharacterMap_mem_ZIrr_of_supported` (Dade (2.6.b))。
+    - `‖μ差‖²=2` = 2 相異既約の inner (`mu_irreducible` + `mu_row0_ne` + `irreducibleCharacter_inner`
+      + `inner_self_eq_one`) → `‖X‖²=2` = `dadeIntegralCharacterMap_inner_eq_of_supported` (Dade 等長)。
+    - V 上一致 → `S16.eta_diff_rigidity` (s=1) で `X = η_{0j}−η_{01}` を pin。
+    残 = **3 isolated prime-TI pin** (c-owned `S15_HonestTypeP2A0.lean` に isolate、各 Coq provenance 付き):
+    `Hypothesis.mu_row0_ne` (μ_{0j}≠μ_{01}, cross-column 相異)、`Hypothesis.tauS_mu_row0_diff_support`
+    (μ差 ⊆ supportInSubgroup('A0(S))、Coq `prDade_sub_TIirr_on`)、`Hypothesis.tauS_mu_row0_vanish_on_V`
+    ((τ_S(μ差)−η差) vanishes on conjClassSet(regular)、Coq `prTIirr_id`+Dade_id on V)。
+    **(i)(ii)(iii)=prime-TI theory (未ポート、cf 9014/lane-a)**。full build 3940 green・AxiomsCheck OK・
+    新 axiom なし。**architecture**: S15_SAndT が S16_GridExpansion を import (S16 は S15_SAndT_Setup のみ
+    import ゆえ非循環、intended design)。**lane-c structural work 完了; 残 = prime-TI pin (9014 cross-lane)**。
   - **旧記述 (参考)** ⚠ **correctness fix**:
   現 `tauS_mu_row0_cross` (S15_SAndT.lean:4008, sorry) は **'A(S)-Dade** (`hyp.dadeHypS` =
   `honestTypeP2ASet` = `centralizerSupport(sharp(Msigma S), derivedInG S)` ⊆ S') で組まれているが、
