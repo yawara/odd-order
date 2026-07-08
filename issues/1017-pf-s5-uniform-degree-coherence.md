@@ -927,3 +927,28 @@ caseB_sOf_memberRFamily) + b の scaffold (skeleton + config 抽出 nineElevenOn
    残 deep 入力 = (9.11.3) degree split (n·u²、config 下) / (9.11.4) Mackey norm ‖Ind_{HU₁}^M 1‖²
    (double-coset、heavy) / (9.11.2) inertia C=U₁⊓U₁ʷ (two-summand char)。
 これらは相互依存の large 作業ゆえ fresh focused session が適切 (extreme session length ゆえ handoff)。
+
+## 2026-07-08 更新 #29 (lane b, /loop 新 session iter 1) — (9.11.4) char-side reduction landing + (9.11.2) が upstream blocker と確定
+
+**landed (S11_NineElevenCoherence、section NineElevenFour、sorry-free/axiom-clean、commit d005d10b)**:
+- `cfnorm_sub_irreducible_orthogonal`: norm-one 既約 ψ ⊥ γ (⟨γ,ψ⟩=0) ⟹ ⟨γ−ψ,γ−ψ⟩=⟨γ,γ⟩+1。
+  (9.11.4) の `α=γ−ψ₁` norm 分解 (Coq `'[alpha]='[gamma]+1`, PFsection9.v:1905)。
+  reusable (任意 character γ、coherence/induction 非依存)。
+
+**依存構造の確定調査 (Coq PFsection9.v:1680-1949 精読)**:
+- (9.11.4) `‖γ‖²` (γ = Ind_{H<*>U₁}^M 1) は **(9.11.2) inertia identity `tiU1` (∀w∈W₁#, U₁∩U₁ʷ=C)
+  に依存** — Coq 1930-1949 の triple-sum は tiU1 で評価 (w=1 項→|U₁|、残 q−1 項→|C|)。
+- repo の induce-trivial-norm (`induce_trivial_inner_self`, InducedCharacter:736) は **Normal H 専用**
+  (‖Ind_H^G 1‖²=[G:H])。(9.11.4) の HU₁ は **non-normal** ⟹ 直接不適、general Mackey double-coset
+  count が必要 (note の「general Mackey leaf 未到達」を裏取り)。
+- **⟹ (9.11.2) tiU1 が (9.11.4) の upstream blocker**。(9.11.5) は (9.11.2)+(9.11.3)+(9.11.4) 全部を
+  消費するので、critical path 上の最上流 deep input = **(9.11.2)**。
+
+**(9.11.2) tiU1 の本体 (Coq 1680-1806、次の deep push の対象)**: theta-character inertia 論法 —
+θ=cfDprodl(cfBigdprod 'chi) の linear character 構成 → 商 HU/K の inertia group `I_{HU/K}[χ_t2]` →
+`cfInd_Hall_central_Inertia` で誘導次数 `#|U:U₁∩U₁ʷ|` を計算 → pred2 (u or a) の二分 → a を
+prime-order argument で排除 → =u ⟹ U₁∩U₁ʷ=C。**multi-iteration の genuine char theory**
+(inertia group + Clifford Dprod + Hall)。leaf の setup (U₁=cuSub=C_U(S₀)、W₁-conjugation、θ 構成) から。
+
+**残 caseA refuter deep 入力 (優先順)**: (9.11.2) tiU1 [最上流、次] → (9.11.4) ‖γ‖² [tiU1-gated] →
+(9.11.3) hclass/hn degree-split [sum_xiOf_H0C_degreeSq landed、degree 構造が残] → adjoin 枝 wiring。
