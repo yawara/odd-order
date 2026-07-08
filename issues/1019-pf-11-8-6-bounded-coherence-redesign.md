@@ -1754,3 +1754,28 @@ genuine 化 deferred)、caseA refuter (lane-b (9.11.2))、(10.8) `S_not_coherent
 wide chain (`Sset_diff_SHCSet_apply_one_eq_qu`/`coherent_Sset_of_column_identities`/`hgen_of_S2_uniform_degree`/
 S12 `exists_zeta_residual_not_orthogonal`/`w2_lt_w1_of_hypothesis`) は今 **off-spine で unused** (docstring 参照のみ、
 AxiomsCheck #assert 無)。削除で landmine 完全除去可 (共有 helper 有無を要確認ゆえ fresh context 推奨)。
+
+## 2026-07-08 update¹² (lane-a /loop) — ⚠ 自己訂正: narrow hgen の caseA 健全性は UNCERTAIN (over-claim 修正)
+
+update¹¹ の「spine 残 sorry は全て TRUE」は **over-confident**。narrow capstone
+`coherent_SOf_H0C_of_column_identities` の **hgen** (D = {qu-column diagonal `∑μ_ij − dζ`}) は
+**caseB では TRUE** (uniform degree qu、`forall_mem_sOf_H0C_apply_one_eq_qu`) だが、**caseA では健全性 UNCERTAIN**:
+- **Clifford caseA で `sOf(H0C)` は非uniform** — `caseA_exists_irreducible_sOf_H0C` (S11:13170) /
+  `caseA_exists_irreducible_source_degree_qa` (S11:6455) が degree-`qa` (a>1, ≠qu) 既約を与える。
+- (6.8.1) 生成の decompose `φ = (φ_X + k·d·ζ) + (φ_Y − k·ψ₀) + k·(ψ₀−dζ)` は `k = −s_X/d ∈ ℤ` を要す。
+  caseB は uniform relation `s_X = −s_Y·d` で `d|s_X` 自動成立。caseA は `s_X = −(d·n_qu + a·n_qa)` ゆえ
+  `d|s_X ⟺ d|a·n_qa` で一般に不成立 → 単一 qu-diagonal D では **caseA の qa-mixed supported 元を生成できない疑い**
+  (反例候補 `a·ζ − χ_qa` が A₀-supported なら hgen は caseA で FALSE)。⚠ A₀-support 制約が救う可能性は未確認。
+
+### ⟹ milestone の honest 再評価
+- **成立**: spine を Peterfalvi の**正しい族** 𝒮₂ = 𝒮(C) (= sOf H0C) + clean architecture に移行し、
+  **wrong-family な wide false lemma `Sset_diff_SHCSet_apply_one_eq_qu` を repo から除去**。これは genuine な構造改善。
+- **未成立 (over-claim)**: 「all-TRUE sorries」ではない。**hgen sorry は caseA で不十分/FALSE の疑い**があり、
+  fix = **D を qa-diagonal で enrich** (qa-column witness + その (5.8) hDτ 恒等式) — Peterfalvi (11.8.6) caseA の
+  qa-column identity を要す (intricate、caseB uniform より深い)。wide の fundamental falseness より修正可能だが未完。
+
+### 次 iteration (fresh context 推奨)
+1. **caseA hgen 健全性を確定**: `a·ζ − χ_qa` 型の A₀-supported 反例が存在するか (存在 ⟹ 現 D で hgen FALSE-caseA)。
+2. FALSE なら D を qa-diagonal enrich (capstone を caseA/caseB split、caseA は qa-column witness
+   `caseA_exists_irreducible_sOf_H0C` + qa-column (5.8) identity)。caseB hgen は uniform-degree で genuine 化。
+3. Coq PFsection11 (11.8.6) の caseA generation 精読 (単一 diagonal か mixed か)。
