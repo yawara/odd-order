@@ -699,4 +699,88 @@ theorem nineElevenOne_squeeze_arithmetic
 
 end SqueezeArithmetic
 
+/-! ### The (9.11.1) squeeze: the group-world equality configuration
+
+Book (9.11.1) reads its numeric squeeze conclusions back into the group world: *"It follows that
+`C = U′` and `a = (p−1)/2`. … `𝒮₂ = 𝒮₁ ⊂ 𝒮(H₀C) ∩ Irr(M)`, `|𝒮₁| = (p−1)u/a² = 2u/a` and
+`χ(1) = u`."*  This subsection performs the translation of `nineElevenOne_squeeze_arithmetic`'s
+numeric equalities `u = [U:U']`, `2a = p−1`, `χdeg = u` into the group facts `C = U'`, `a = (p−1)/2`
+and the `𝒮₃`-member source degree `= u`.
+
+The load-bearing translation is `[U:C] = [U:U'] ⟹ C = U'`: with `U' ≤ C ≤ U`, the relative index is
+*strictly* monotone off equality (`relIndex_lt_relIndex_of_le_of_ne`, landed), so equal indices force
+`C = U'`.  The remaining inputs `hs1'`/`hpair` are the world-specific member bundle: `hs1'` is the
+uniform sub-family value `|𝒮₁'|·(qa)² ≤ sumnS 𝒮₂` ((9.11.5)-(9.11.6)) and `hpair` is the (5.6)
+contrapositive `sumnS 𝒮₂ ≤ 2q²a·χ(1)` (the pair-refuted clause through the weighted adjoin engine
+`coherentDegreeSqNormBound_of_not_coherentW`); both are supplied by the refuter assembly. -/
+
+section Configuration
+
+variable [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+  {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
+
+/-- **`Even (p − 1)`** for the chief-factor prime `p` of a minimal simple group of odd order.  `p`
+divides `|H̄| = p^q ∣ |H| ∣ |G|` (odd), so `p` is odd (`≠ 2`) and `p − 1` is even.  The `lb12` parity
+input `2a ∣ (p−1)`. -/
+theorem chiefFactor_p_sub_one_even (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
+    Even (chief.p - 1) := by
+  have hq : 0 < data.q := data.nontrivial.2.1.pos
+  have hpq : chief.p ^ data.q ∣ Nat.card ↥data.H :=
+    ⟨Nat.card ↥chief.H0, chief.quotient_order⟩
+  have hp_dvd : chief.p ∣ Nat.card G :=
+    (dvd_pow_self chief.p hq.ne').trans (hpq.trans (Subgroup.card_subgroup_dvd_card data.H))
+  have hp_ne2 : chief.p ≠ 2 := fun h =>
+    (Nat.not_even_iff_odd.mpr hG.odd) (even_iff_two_dvd.mpr (h ▸ hp_dvd))
+  obtain ⟨k, hk⟩ := chief.p_prime.odd_of_ne_two hp_ne2
+  exact ⟨k, by omega⟩
+
+/-- **Peterfalvi (9.11.1), the group-world equality configuration.**
+
+The translation of `nineElevenOne_squeeze_arithmetic`'s numeric equalities into the group facts of
+(9.11.1): given the squeeze inputs — the landed §9 identifications (`hχu`, `u_le_relIndex_uprimeSub_U`,
+`caseA_character_count_exact`) plus the world bundle (`hs1'` uniform sub-family value, `hpair` (5.6)
+contrapositive) — the squeeze circle closes to force
+
+* `2·a = p − 1` (hence `a = (p−1)/2`);
+* `C = U'` (from `[U:C] = [U:U']`, strict-index monotonicity off equality);
+* the `𝒮₃`-member source degree `χdeg = u`;
+* the count equality `n₁·a² = (p−1)·[U:U']` (`|𝒮₁| = (p−1)u/a²`).
+
+Here `χdeg` is the abstract source degree of the chosen `𝒮₃`-member (`χ(1) ≤ u`) and `n₁` the number
+of degree-`qa` irreducibles in `𝒮(H₀U')` (the landed count `caseA_character_counts` (d)); `s₂` is the
+real `sumnS 𝒮₂`.  This is what the (9.11.2)–(9.11.8) refutation consumes. -/
+theorem nineElevenOne_configuration (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (caseA : CliffordCaseAData chars) {χdeg : ℕ} {s₂ : ℝ}
+    (hq : 0 < data.q) (hu : 0 < chars.u)
+    (hp1 : 0 < chief.p - 1) (hχu : χdeg ≤ chars.u)
+    (hs1' : ({χ ∈ sOf data (chief.H0 ⊔ uprimeSub data) |
+          IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}.ncard : ℝ)
+        * ((data.q * caseA.a : ℕ) : ℝ) ^ 2 ≤ s₂)
+    (hpair : s₂ ≤ 2 * (data.q : ℝ) ^ 2 * caseA.a * χdeg) :
+    2 * caseA.a = chief.p - 1 ∧ chars.C = chars.Uprime ∧ χdeg = chars.u ∧
+      {χ ∈ sOf data (chief.H0 ⊔ uprimeSub data) |
+          IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}.ncard
+        * (caseA.a * caseA.a) = (chief.p - 1) * ((uprimeSub data).relIndex data.U) := by
+  obtain ⟨hE1, hE2, _hE3, hE4, _⟩ :=
+    nineElevenOne_squeeze_arithmetic (p1 := chief.p - 1) (q := data.q) (a := caseA.a)
+      (u := chars.u) (iUU' := (uprimeSub data).relIndex data.U) (χdeg := χdeg)
+      (n₁ := {χ ∈ sOf data (chief.H0 ⊔ uprimeSub data) |
+          IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}.ncard)
+      (s₂ := s₂) hq caseA.a_pos hu hp1 caseA.a_dvd_p_sub_one (caseA_a_odd hG caseA)
+      (chiefFactor_p_sub_one_even hG) hχu (u_le_relIndex_uprimeSub_U chars)
+      (caseA_character_count_exact hG caseA) hs1' hpair
+  -- `hE3 : u = [U:U']` translates to `C = U'` via strict index monotonicity off equality.
+  refine ⟨hE2, ?_, hE1, hE4⟩
+  -- `[U:C] = u = [U:U']`, and `U' ≤ C ≤ U`, so `C = U'`.
+  have hCU' : (cSub data chief).relIndex data.U = (uprimeSub data).relIndex data.U := by
+    rw [relIndex_cSub_U_eq_u chars]; exact _hE3
+  by_contra hne
+  have hne' : cSub data chief ≠ uprimeSub data := fun h => hne (by
+    show chars.C = chars.Uprime
+    simp only [Section11CharacterData.C, Section11CharacterData.Uprime]; exact h)
+  exact absurd hCU' (ne_of_lt (OddOrder.Peterfalvi.S07.relIndex_lt_relIndex_of_le_of_ne
+    (uprimeSub_le_cSub data chief) (cSub_le_U data chief) hne'))
+
+end Configuration
+
 end OddOrder.Peterfalvi.S11
