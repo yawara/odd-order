@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S15_SAndT_Setup
 import OddOrder.Peterfalvi.S15_HonestTypeP2A0
+import OddOrder.Peterfalvi.S16_GridExpansion
 import OddOrder.GroupTheory.RepresentationTheory.InflationInduction
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
 
@@ -4022,7 +4023,83 @@ theorem tauS_mu_row0_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         (hyp.mu ⟨0, hyp.q_prime.pos⟩ j
           - hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)
       = hyp.eta ⟨0, hyp.q_prime.pos⟩ j
-          - hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩ := sorry
+          - hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩ := by
+  classical
+  set D := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
+      ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) with hD
+  by_cases hj1 : j = ⟨1, by have := hyp.three_le_p; omega⟩
+  · -- Trivial column `j = #1`: both `μ`- and `η`-differences vanish, and `τ_S 0 = 0`.
+    simp only [hj1, sub_self, map_zero]
+  · -- `j ≠ #1`: `X := τ_S(μ_{0j} − μ_{0,#1})` is a norm-`2` `ZIrr` character agreeing with
+    -- `η_{0j} − η_{0,#1}` on the regular set `V`, so `S16.eta_diff_rigidity` (3.8) pins it.
+    have hμaIrr : IsIrreducibleCharacter (hyp.mu ⟨0, hyp.q_prime.pos⟩ j) :=
+      hyp.mu_irreducible _ _
+    have hμbIrr : IsIrreducibleCharacter
+        (hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩) :=
+      hyp.mu_irreducible _ _
+    have hμne : hyp.mu ⟨0, hyp.q_prime.pos⟩ j
+        ≠ hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩ :=
+      hyp.mu_row0_ne hj1
+    have hsupp := hyp.tauS_mu_row0_diff_support j
+    have hZIrrS : (hyp.mu ⟨0, hyp.q_prime.pos⟩ j
+          - hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)
+        ∈ ZIrr (↥hyp.S) :=
+      (ZIrr (↥hyp.S)).sub_mem hμaIrr.mem_ZIrr hμbIrr.mem_ZIrr
+    -- (a) `X ∈ ZIrr G` (Dade sends supported virtual characters to virtual characters, `(2.6.b)`).
+    have hXZ : D (hyp.mu ⟨0, hyp.q_prime.pos⟩ j
+          - hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩) ∈ ZIrr G :=
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+        (hyp.dadeHypS0 hG) (hyp.dadeHypS0_hconj hG) hsupp hZIrrS
+    -- (b) `‖μ_{0j} − μ_{0,#1}‖² = 2` (two distinct irreducibles).
+    have hinner : ∀ φ ψ : ClassFunction ↥hyp.S ℂ, IsIrreducibleCharacter φ →
+        IsIrreducibleCharacter ψ → ClassFunction.inner φ ψ = if φ = ψ then (1 : ℂ) else 0 := by
+      intro φ ψ hφ hψ
+      have h := irreducibleCharacter_inner (⟨φ, hφ⟩ : IrreducibleCharacter ↥hyp.S)
+        (⟨ψ, hψ⟩ : IrreducibleCharacter ↥hyp.S)
+      simp only [IrreducibleCharacter.coe_mk] at h
+      rw [h]
+      by_cases hpq : φ = ψ
+      · rw [if_pos (Subtype.ext hpq), if_pos hpq]
+      · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+    have h_ab : ClassFunction.inner (hyp.mu ⟨0, hyp.q_prime.pos⟩ j)
+        (hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩) = 0 := by
+      rw [hinner _ _ hμaIrr hμbIrr, if_neg hμne]
+    have h_ba : ClassFunction.inner
+        (hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)
+        (hyp.mu ⟨0, hyp.q_prime.pos⟩ j) = 0 := by
+      rw [hinner _ _ hμbIrr hμaIrr, if_neg (Ne.symm hμne)]
+    have hnorm2 : ClassFunction.inner
+        (hyp.mu ⟨0, hyp.q_prime.pos⟩ j
+          - hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)
+        (hyp.mu ⟨0, hyp.q_prime.pos⟩ j
+          - hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩) = 2 := by
+      rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+        ClassFunction.inner_sub_right, h_ab, h_ba,
+        hμaIrr.inner_self_eq_one, hμbIrr.inner_self_eq_one]
+      ring
+    have hX2 : ClassFunction.inner
+        (D (hyp.mu ⟨0, hyp.q_prime.pos⟩ j
+          - hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩))
+        (D (hyp.mu ⟨0, hyp.q_prime.pos⟩ j
+          - hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)) = 2 := by
+      rw [hD, OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
+        (hyp.dadeHypS0 hG) (hyp.dadeHypS0_hconj hG) hsupp hsupp]
+      exact hnorm2
+    -- (c) `X − (η_{0j} − η_{0,#1})` vanishes on the regular set `V` (prime-`TI` `V`-value pin).
+    have hvanish : ∀ x ∈ conjClassSet
+          ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))),
+        (D (hyp.mu ⟨0, hyp.q_prime.pos⟩ j
+              - hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)
+          - ((1 : ℤ) : ℂ) • (hyp.eta ⟨0, hyp.q_prime.pos⟩ j
+              - hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)) x = 0 := by
+      intro x hx
+      have hv := hyp.tauS_mu_row0_vanish_on_V hG j x hx
+      simpa [hD] using hv
+    -- (3.8) rigidity: a norm-`2` `ZIrr` character agreeing with `η_{0j} − η_{0,#1}` on `V` is it.
+    have hrig := OddOrder.Peterfalvi.S16.eta_diff_rigidity hyp hXZ hX2
+      ⟨0, hyp.q_prime.pos⟩ hj1 (s := (1 : ℤ)) (Or.inl rfl) hvanish
+    rw [Int.cast_one, one_smul] at hrig
+    exact hrig
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.18.c), `j`-independence** (`defGamma`): for every column `j ≠ 0`, the bridge residual

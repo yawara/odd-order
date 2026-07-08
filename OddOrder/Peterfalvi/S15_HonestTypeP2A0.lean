@@ -246,4 +246,53 @@ theorem Hypothesis.dadeHypS0_hconj [Fintype G] [Finite G]
     (hyp.dadeHypS0 hG).HConjInvariant :=
   (dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.S_maximal hyp.S_typeP2 hyp.Sdata).some.hconj
 
+/-! ### Prime-`TI` pins for the (13.18) `S`-side cross-relation (issue 9076 piece 4c-4)
+
+The three isolated prime-`TI` obligations behind `tauS_mu_row0_cross`
+(`τ_S(μ_{0j} − μ_{0,#1}) = η_{0j} − η_{0,#1}`, `S15_SAndT.lean`).  Once these are discharged the
+cross-relation is a pure assembly around the (3.8) rigidity engine `S16.eta_diff_rigidity` (issue
+9076 piece 4b) + the `'A0(S)`-Dade isometry.  They are the `S`-side instances of the Coq prime-`TI`
+lemmas (`prTIres`/`prDade_sub_TIirr_on`/`prTIirr_id`, `PFsection4.v`), the shared prime-`TI` residue
+foundation tracked in issue 9014. -/
+
+/-- **Prime-`TI` row-`0` cross-column distinctness** (issue 9076 piece 4c-4): distinct columns of
+row `0` carry distinct `μ`-entries, `μ_{0j} ≠ μ_{0,#1}` for `j ≠ #1`.  This is the cross-column
+injectivity of the prime-`TI` residue grid: the `μ_{ij}` are pairwise-distinct irreducibles across
+the *whole* grid (Coq: the residues `prTIres i j` are distinct for distinct `(i, j)`).  The
+`Hypothesis` structure records only the *within-column* distinctness `mu_col_injective`; this
+row-direction distinctness is the missing prime-`TI` fact.  Prime-`TI` theory, cf. issue 9014. -/
+theorem Hypothesis.mu_row0_ne [Finite G] (hyp : Hypothesis (G := G)) {j : Fin hyp.p}
+    (hj : j ≠ ⟨1, by have := hyp.three_le_p; omega⟩) :
+    hyp.mu ⟨0, hyp.q_prime.pos⟩ j
+      ≠ hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩ := sorry
+
+/-- **Prime-`TI` support pin** (Coq `prDade_sub_TIirr_on`, `PFsection4.v`): the `μ`-column
+difference `μ_{0j} − μ_{0,#1}` is supported inside `A₀(S) = A(S) ∪ V^S` — its support meets `S`
+only in `P^# ∪ V_S`, because the two prime-`TI` residues share the same `1_S`-part off `A₀(S)` and
+it cancels in the difference.  This is the `S`-side instance of Coq `prDade_sub_TIirr_on`
+(`μ2_{ij} − μ2_{ik} ∈ 'CF(S, 'A0)`).  Prime-`TI` theory, cf. issue 9014. -/
+theorem Hypothesis.tauS_mu_row0_diff_support [Finite G] (hyp : Hypothesis (G := G))
+    (j : Fin hyp.p) :
+    (hyp.mu ⟨0, hyp.q_prime.pos⟩ j
+        - hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩).support
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set hyp.S hyp.Sdata) hyp.S := sorry
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Prime-`TI` `V`-value pin** (Coq `prTIirr_id` + Dade `Dade_id` on the regular set): on the
+regular classes `conjClassSet(W \ (W₁ ∪ W₂)) = V^S`, the `'A0(S)`-Dade lift
+`τ_S(μ_{0j} − μ_{0,#1})` agrees with the grid difference `η_{0j} − η_{0,#1}`.  Both reduce to the
+same `ω`-value there: `τ_S = Ind_S^G` on `A₀(S)`-support (`normedTI 'A0`, `H = ⊥`) followed by the
+prime-`TI` restriction identity `μ_{0j}|_V = ω`-value (Coq `prTIirr_id`), matching
+`η_{0j}|_V = ω_{0j}|_V` (the (3.3) `τ₃ = Dade` identity on `V`).  Prime-`TI` theory, cf. issue
+9014. -/
+theorem Hypothesis.tauS_mu_row0_vanish_on_V [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) (j : Fin hyp.p) :
+    ∀ x ∈ conjClassSet ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))),
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
+          ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG))
+          (hyp.mu ⟨0, hyp.q_prime.pos⟩ j
+            - hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)
+        - (hyp.eta ⟨0, hyp.q_prime.pos⟩ j
+            - hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)) x = 0 := sorry
+
 end OddOrder.Peterfalvi.S15
