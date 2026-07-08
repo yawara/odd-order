@@ -81,6 +81,30 @@ endpoint、hDeg 未供給) を `uniform_degree_coherence_of_families` 一発適�
 - isometry = hyp.base.tau on A₀-supported / ZIrr diffs / supported diffs / hunif (degree) /
   pivot = 既約 member (norm 1 ⟹ hN 自明) / second member (card ≥ 2)。
 
+### 🔬 feasibility 調査 (2026-07-08、直接確認) — GO、ただし multi-lemma assembly
+
+rewire は **mixed corner のみ**が対象 (all-reducible corner は既に `coherent_sOf_H0Cprime_of_allReducible`
+で hDeg 不要、S13_CoreStructure:1500)。mixed corner の既約 pivot χ₁ (norm 1、
+`IsIrreducibleCharacter.inner_self_eq_one` CharacterProduct:195 で hN 自明)、η₂ = χ₁.conj。
+
+**crux = μ-column R-family の CharacterParameters threading (既存 chain-fold とは別データ)**:
+- 既存 `caseB_coherent_sOf_H0Cprime_of_mixed` は `sixTwoDecompositionData` の **pair-adjoining**
+  データ (Da for break + per-member D) を使い、CharacterParameters を**回避**して chain 折込。
+- norm-general engine は **flat per-member R-family** を要求 → μ-column には
+  `Hypothesis.columnImageFamilyCohFree` (S12_MaximalIII_IV_V_Core:5661、on hyp.tau、sorry-free) が
+  必要で、これは `params : CharacterParameters` + 具体 column index j,j' + conjugate pairing
+  `hconj : (∑ᵢ μ_ij).conj = ∑ᵢ μ_ij'` + hδpm/hδj/hzS/hz1/hzconj を要求。
+- **CharacterParameters は `Hypothesis.exists_charParameters` (S12:3057) で hG+hyp から構成可能**
+  (params.mu = muGrid、params.zeta = (10.2) degree-w₁ irr)。← go/no-go = GO。
+- 既約 R-family + isometry + ZIrr + supported は `sOf_degreeSubfamily_isCoherent`
+  (S13_MaximalIII_IV:1967) 内で既に hyp.base.tau 上で使用済 (landed)。
+
+**残 impedance**: (i) 抽象 `columnSum (muColumnChar k)` ↔ 具体 `∑ᵢ muGrid i j` 形の同定 +
+conjugate column j' の取得 (caseBPair は μ̄_k = μ_{k⁻¹} を使用、exists_conj_column 系)。
+(ii) params.delta ↔ muColumnSign の接続 (hδj)。(iii) params.zeta ∈ Sset ↔ inducedFamily 橋 (hzS)。
+(iv) cross-ortho 3-combo の hyp.base.tau 版 (μμ/μ-irr は S06 に σ 版、transport 要確認;
+irr-irr は inducedKernelFamily 系)。→ several 中間補題として段階 land 予定。
+
 ## 参照
 
 - issues/1019 update⁸⁵ / Coq PFsection5.v:588 (pivot), :1234 (5.7), :863/:881 ((5.4))
