@@ -1605,3 +1605,28 @@ lane-a 次 frontier。redesign の upstream ブロック = **forward `bounded_se
   導けるか (H0C/HC/SOf は S13-Hypothesis field、S12-Hypothesis に無い可能性)。(b) 無ければ
   `exists_zeta_residual_not_orthogonal`/`w2_lt_w1` の **S13 relocation** (issue の endgame relocation 案)。
   (c) いずれにせよ false uniform-degree sorry (`:4492`) を除去し、honest な (6.3) route に。
+
+## ⚠⚠ 再訂正 (lane-a /loop, 2026-07-08) — ground-truth axiom-trace で verify (前訂正の sorry-free 判定は誤り)
+
+**前訂正 (update「forward (6.3) 既 PORTED」) の「`coherent_S_of_coherent_SH0C` sorry-free」= 誤り。**
+docstring の "sorry-free" を信用したのが原因 ([[verify-port-state-by-number-not-coq-name]] — docstring でなく
+`#print axioms` が ground-truth)。直接 verify:
+- **`coherent_S_of_coherent_SH0C` (S13:1415)** = `[propext, sorryAx, Classical.choice, Quot.sound]` (**sorryAx あり**)。
+  ∴ (6.3) の §13 consumer は **not sorry-free** (oracle `six_three_of_six_two_oracle` 自体は clean だが consumer は gated)。
+- **`H0C_relIndex_HC` (S13:853) は sorry-free** (完全証明 :853-883、`Nat.eq_of_mul_eq_mul_left`)。
+  ⟹ G2 subagent の「sorryAx は H0C_relIndex_HC 経由」は**誤り** (attribution ミス、subagent 診断は部分的に不正確)。
+- **`S_not_coherent` (10.8, S12) も sorryAx** (自身の hB TI-counting gate、10.7 cite 経由)。
+
+### G2 (11.8.6 capstone re-route) は S12-local 不可能 — cross-lane 多部品 gate 確定 (verify 済結論)
+honest な (6.3) route は `coherent(S_H0C)` を要すが、それは union-glue `S(HC) [uniform-deg] ∪ 𝒮(H0C) [(9.11)
+core-coherence, non-uniform]` で作る。crux = **coherent(𝒮(H0C)) が repo のどこでも sorry-free 未証明**:
+- `coherent_SOf_H0C_of_glued` (S13:2181) = glue capstone、axiom-clean **だが caller 無** (gate 未供給)。
+- `caseB_coherent_sOf_H0Cprime` (S13_CoreStructure:1469) = **sorryAx**。
+- `caseA_coherent_sOf_H0Cprime_of_refuter` (S11_NineElevenCaseA:65) = refuter 条件付き未供給 (caseA=lane b, 0101)。
+- τ₃ glue `hmixed`(6.7)/`hDτ`(5.8) = §14/BG§15-gated; shortcut `sibleyTarget_H0C` は UNSOUND (issue 7001)。
+- import: S13 は S12 を import ⟹ S12 は S13 の honest 機構を cite 不可 (循環)。H0C/HC/SOf は S13-field。
+
+**⟹ honest fix = issue 1019 の multi-part cross-lane 継続作業** (relocate exists_zeta_residual/w2_lt_w1 を S13 へ +
+coherent(𝒮(H0C)) via (9.11) [caseA=b/caseB sorryAx 掃除] + τ₃ glue §14/BG§15)。**lane-a-local な quick fix は無い。**
+false `:4492` sorry は既存 ⚠ 付きで**現状維持が正しい** (今 replace すると true-but-unproven な hY/glue/(10.8) sorry へ
+shuffle するだけ = 禁止)。∴ lane-a の §10-§11.8 cluster ungated work は hA/h78 完了で**枯渇**、残りは cross-lane gate。
