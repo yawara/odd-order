@@ -100,3 +100,33 @@ S14/S10 が cite (S10 は territorial ゆえ新 lemma を S14/§16 側に)。**�
 
 ⟹ **reallocation は不要かも** (lane-b に genuine buildable on-path work = (8.13) assembly + S14 branch が残存)。
 hub は本 finding を勘案。lane-b は build 継続。
+
+## ✅ (2026-07-08 続²、lane-b /loop) — (8.13) per-element ∃! **landed**、allTypeI_fittingIsTI 到達性を精査
+
+**landed (commit 3e88b161)**: `existsUnique_maximal_centralizer_le_typeI_or_typeII` (S16_MainResults、b-owned)
+= (8.13) の per-element `∃!` 結論 (existence 半分 `exists_maximal_centralizer_le_typeI_or_typeII` +
+Theorem-D singleton uniqueness `maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape` を
+合成)。escapingCentralizers_control (S10、lane-a) 第2連言の literal shape そのもの (`theoremII_tame_embedding`
+の BG-set-bound per-x clause の Peterfalvi-set 版 clean core)。full build 3943 green・AxiomsCheck OK。
+
+**allTypeI_fittingIsTI (S14:7089、次 consumer) 到達性 — 精査結果 (docstring は STALE でなく正確)**:
+- consumer chain は明瞭: `exists_typeICovering` (S14:7168) は `allTypeI_fittingIsTI` → 既存
+  `maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI` (S16) のみ。∴ `allTypeI_fittingIsTI` が唯一 gate。
+- clean route (contrapositive): type-I M は type-F (`isTypeF_of_isTypeI`)。¬FittingIsTI と仮定 → 矛盾を出す。
+  だが `exists_RData_escape_structure` (S16:6095) は escaping σ# x に対し neighbour N (typeF∨typeP2) を出すのみで、
+  **all-type-I では N は maximal ⟹ type I ⟹ type F** ゆえ disjunction が typeF に落ち、`IsTypeP2 N → ¬FittingIsTI`
+  は空虚 → 矛盾出ず。
+- **真の crux (未組立)**: 「type-F M で escaping σ# ⟹ neighbour N が type-P₂」= **Cor 15.9 の逆**。
+  Lean の `centralizer_escape_final_local` (S16:5916) は `¬IsTypeF N` を**仮説**に要求 (all-type-I では偽) ゆえ
+  そのままでは使えない。∴ docstring の「escapingCentralizers_control (S10, lane-a) に gated」は**正確**
+  (私の (8.13) ∃! はまさに escapingCentralizers_control の upstream ingredient — lane-a が S10 で cite → 下って
+  allTypeI_fittingIsTI へ)。
+- 「¬FittingIsTI ⟹ ∃ escaping σ#-element」の confident reverse 還元 (pieces:
+  `exists_notMem_inf_conj_fitting_ne_bot_of_not_fittingIsTI` + `mem_sigma_of_prime_dvd_card_inf_conj_fitting` +
+  `mem_Msigma_of_isPiElement_sigma_of_mem` + `maximalSigmaSubgroupsOfElement_eq_singleton_of_centralizer_le`) も
+  **Fitting conj-equivariance (`conj g • fittingInAmbient M = fittingInAmbient (conj g • M)`) が現状 absent** ゆえ
+  infra 追加要 (step: z ∈ F(M)^g ⟹ z ∈ M_σ(M^g))。かつ consumer は P₂-crux で依然 blocked。
+
+**次 b 選択肢** (どれも genuine on-path): (i) Fitting-conj-equivariance infra + reverse-escape lemma を confident
+partial として build (allTypeI の半分)、(ii) lane-a と escapingCentralizers_control で coordinate (b の (8.13) ∃!
+が now citable upstream)、(iii) 別 b-frontier piece。lane-b は /loop 継続。
