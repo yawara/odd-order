@@ -81,3 +81,22 @@ off-path 凍結 23)。memory [[ft-four-fronts-w1-w4]] は既に 2026-07-08 訂�
 
 **再評価トリガー**: b が複数 tick 連続で ungated on-path work ゼロ + dup relocation churn に drift した場合のみ
 reallocation を再検討 (lane-d 基準)。現時点は非該当。本 issue は ruling 記録後 closed 相当 (b は継続)。
+
+## ✅ 訂正 (2026-07-08 続): signalizer uniqueness は PROVEN、(8.13) は assemble 可能 (deep-port 悲観は stale comment 由来)
+
+前記「残 = BG Theorem D signalizer uniqueness の major port」は **誤り** ([[verify-port-state-by-number-not-coq-name]]
+の再実例)。code-level 精査で判明:
+- `signalizer_structure_of_mem_sigmaSharp` (S16_MainResults:271) は **PROVEN (sorry-free)** —
+  `S14.sigmaLength_one_centralizer_structure` (proven) 経由で σ-sharp element の **unique maximal ∃! N[x]**
+  over C_G(x) + Hall(R) + sharp transitivity + type-F/P2 dichotomy + complement を供給。
+- S16_MainResults:156 の「FT_signalizer_context uniqueness is remaining content」comment は **STALE**。
+- BG Cor 12.14 (`maximalContaining_centralizer_and_someSylow_eq_singleton`, S12_Corollary1214) も proven。
+
+**⟹ (8.13) `escapingCentralizers_control` (S10、lane-a) は今 assemble 可能** = genuine buildable b-work:
+escaping x (∈A0(M), C_G(x)⊄M) → x∈M_σ^# σ-sharp ∧ >1 σ-maximal → `signalizer_structure_of_mem_sigmaSharp`
+で ∃! N + (typeF∨typeP2 N) → typeI/II 変換 (`isTypeI_of_isTypeF`/`isTypeII_of_isTypeP2`)。→ S14 all-type-I
+分岐 (`allTypeI_fittingIsTI`/`not_nonTypeICovering`) を unblock。配置: assembly を BG §16 (b-owned) に置き
+S14/S10 が cite (S10 は territorial ゆえ新 lemma を S14/§16 側に)。**次 iteration で build**。
+
+⟹ **reallocation は不要かも** (lane-b に genuine buildable on-path work = (8.13) assembly + S14 branch が残存)。
+hub は本 finding を勘案。lane-b は build 継続。
