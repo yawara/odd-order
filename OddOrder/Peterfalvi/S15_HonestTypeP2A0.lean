@@ -150,22 +150,61 @@ theorem escaping_honestTypeP2A0Set_mem_honestTypeP2ASet {M : Subgroup G} (data :
   · exact ⟨hpa, haesc⟩
   · exact absurd (conjClassSetIn_typePV_centralizer_le_M data hva) haesc
 
+/-- **Tame conjugation for the honest type-`P₂` `A₀`-support** (BG §16 Theorem II): two `G`-conjugate
+elements of `A₀(M) = A(M) ∪ V^M` are already `M`-conjugate.  This is the first conjunct of BG Theorem
+II (`OddOrder.BG.Ch4.S16.theoremII_tame_embedding` with `X = A0Set M K`): for the tame embedding, a
+`G`-fusion of support points is controlled by `N_G(M) = M`.
+
+Discharge route (issue 9076 piece 4c): bridge the honest support `honestTypeP2A0Set M data` into BG's
+`A0Set M K = hatMsigma M ∖ 𝒞_G(K#)` — the `A(M)`-part via `honestTypeP2ASet_subset_hatMsigma`, the
+`V^M`-part via `typePV ⊆ hatMsigma` plus the order argument `V^M ∩ 𝒞_G(K#) = ∅` (a `V`-point has
+order divisible by `pq`, a `K#`-point only by `q`) — and produce the `κ`-Hall `K` / `(κ∪σ)′`-Hall `U`
+of the type-`P` maximal `M`.  With `a, b ∈ A0Set M K`, `theoremII_tame_embedding`'s first conjunct
+supplies the `M`-conjugator.  (Reduces the earlier "genuine deep FT-support geometry" pin to this
+concrete BG-support bridge.) -/
+theorem honestTypeP2A0Set_tame_conj [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (data : TypePData M) {a b : G}
+    (ha : a ∈ honestTypeP2A0Set M data) (hb : b ∈ honestTypeP2A0Set M data)
+    (hab : IsConj a b) : ∃ m ∈ M, b = m * a * m⁻¹ := sorry
+
 /-- **(8.13.a), the mixed `A(S)`–`V^S` case is vacuous**: an `A(S)`-point is never `G`-conjugate to a
-`V^S`-point.  ⚠ DEEP `'A0(S)`-`normedTI` residual (issue 9076 piece 4c).  An `A(S) = honestTypeP2ASet`
-element lies in `S' = derivedInG S`, while a `V^S`-point lies **outside** `S'`
-(`typePData_typePV_not_mem_derived`, the nontrivial `W₁`-component).  If they were `G`-conjugate, the
-`'A0(S)`-`normedTI` property would force the conjugator into `S` (`= N_G('A0(S))`), hence into
-`N_M(S') = M`, so it would preserve `S'` — contradicting `a ∈ S'`, `b ∉ S'`.  But that argument
-**uses** `normedTI 'A0(S)`, which is exactly what this datum is being built to establish, so the
-vacuity must be shown directly from the type-`P₂` FT-support geometry (Coq `FTsupp0` / BG §16
-Theorem II).  The `elementary` coprimality route fails here because `W₂ ⊆ M_σ` (`data.H ≤ M_σ`,
-`data.W₂ ≤ data.H`), so `W` genuinely contains `σ`-elements — the pin is genuine deep content, not a
-missing arithmetic step. -/
+`V^S`-point.  An `A(S) = honestTypeP2ASet` element lies in `S' = derivedInG S`, while a `V^S`-point
+lies **outside** `S'` (`typePData_typePV_not_mem_derived`, the nontrivial `W₁`-component).
+
+Proved (issue 9076 piece 4c) via the honest-support tame conjugation `honestTypeP2A0Set_tame_conj`
+(BG §16 Theorem II): if `a` and `b` were `G`-conjugate, they would be **`M`-conjugate**
+(`b = m·a·m⁻¹`, `m ∈ M`); but `M' = derivedInG M` is normal in `M`, so `M`-conjugation preserves
+`M'`-membership, forcing `b ∈ M'` from `a ∈ M'` — contradicting `b ∉ M'`.  This replaces the earlier
+circular `normedTI`-based argument with the direct FT-support-geometry route (Coq `FTsupp0`). -/
 theorem not_isConj_honestTypeP2ASet_typePV [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (data : TypePData M) {a b : G}
     (ha : a ∈ honestTypeP2ASet M) (hb : b ∈ conjClassSetIn M (typePV M data))
-    (hab : IsConj a b) : False := sorry
+    (hab : IsConj a b) : False := by
+  -- `M`-conjugation preserves `M' = derivedInG M`-membership (`M' ⊴ M`).
+  have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  have hconj_derived : ∀ x w : G, x ∈ M → w ∈ derivedInG M → x * w * x⁻¹ ∈ derivedInG M := by
+    intro x w hxM hwD
+    have hconj := (inferInstance : ((derivedInG M).subgroupOf M).Normal).conj_mem
+      ⟨w, hM'le hwD⟩ (Subgroup.mem_subgroupOf.mpr hwD) ⟨x, hxM⟩
+    rw [Subgroup.mem_subgroupOf] at hconj
+    simpa using hconj
+  -- `a ∈ M'`, and (BG tame) `b ∈ A₀(M)` is `M`-conjugate to `a ∈ A(M) ⊆ A₀(M)`.
+  have haD : a ∈ derivedInG M := (mem_honestTypeP2ASet.mp ha).1
+  have hbA0 : b ∈ honestTypeP2A0Set M data := Set.mem_union_right _ hb
+  obtain ⟨v, hv, h, hhM, hhvb⟩ := hb
+  -- `b ∉ M'`: `b = h·v·h⁻¹`, `v ∈ V ⊄ M'`, `h ∈ M`, and `M' ⊴ M`.
+  have hbnD : b ∉ derivedInG M := by
+    intro hbD
+    refine OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived data hv ?_
+    have hvconj : h⁻¹ * b * (h⁻¹)⁻¹ ∈ derivedInG M :=
+      hconj_derived h⁻¹ b (M.inv_mem hhM) hbD
+    rwa [show h⁻¹ * b * (h⁻¹)⁻¹ = v from by rw [← hhvb]; group] at hvconj
+  -- BG §16 Theorem II tame conjugation ⟹ `b = m·a·m⁻¹ ∈ M'`, contradiction.
+  obtain ⟨m, hmM, hmc⟩ :=
+    honestTypeP2A0Set_tame_conj hG hM data (honestTypeP2ASet_subset_A0Set data ha) hbA0 hab
+  exact hbnD (hmc ▸ hconj_derived m a hmM haD)
 
 /-- **Peterfalvi (8.15) for the honest type-`P₂` `A₀`-support**: the Dade (2.2) support hypotheses
 hold for `A₀(S) = A(S) ∪ V^S`.  Assembled through the `σ`-decomposition engine
