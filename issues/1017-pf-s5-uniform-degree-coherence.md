@@ -994,3 +994,17 @@ refuter wiring (dichotomy = nineElevenOne_configuration で config 産出 + hle 
 2. **index dichotomy** [U:U₁∩U₁ʷ] ∈ {u,a}: I(θ) の induced char が S_H0C' member ⟹ degree qu or qa。
 3. **a 排除** → U₁∩U₁ʷ=C (C≤U₁∩U₁ʷ + index u)。
 ⟹ tiU1 完成で nineElevenCaseA_equality_refutation の hCinf 供給。
+
+## 2026-07-08 更新 #32 (lane b, /loop iter 4) — (9.11.2) inertia identity 両方向完成
+
+**landed (S11_NineElevenCoherence、NineElevenTwoInertia、sorry-free、commit 7d34a60a)**:
+- `caseA_centralizes_two_summands_fixes_char` (⊇): χ が 2 summand supported + g が両 summand centralize
+  ⟹ g fixes χ。generators 論法 (MonoidHom.eqLocus + Hpart_iSup span + eq_of_eqOn_top)。
+- ⟹ ⊆ (iter 3) と合わせ **I(θ)⊓U = C_U(H_i)⊓C_U(H_j) = U₁∩U₁ʷ** 確定 (two-summand supported θ)。
+
+**(9.11.2) tiU1 残 (次〜)**:
+(a) **two-summand regular char θ 構成**: χ:(H̄)→*ℂˣ nontrivial on H_i,H_j / trivial 他。H̄=∏Hpart
+    (Hpart_iSupIndep + Hpart_iSup → noncommPiCoprod bijective) の直積から per-factor char を組む。
+    order-p summand は nontrivial char を持つ (has_nonprincipal_irr 類)。**cfDprod 無ゆえ直積 char 構成が infra**。
+(b) inertia index [U:U₁∩U₁ʷ] ∈ {u,a}: I(θ) の induce char が S_H0C' member → degree qu/qa。
+(c) a 排除 → U₁∩U₁ʷ=C (C≤U₁∩U₁ʷ + index u) → nineElevenCaseA_equality_refutation の hCinf 供給。
