@@ -991,6 +991,22 @@ theorem caseA_inertia_iff_centralizes_two_summands {data : TypesIIIIIIVSetup M}
     rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one, Units.val_one]
     exact fun h => hxne (Units.val_eq_one.mp h)
 
+/-- **`C ⊆ C_U(H_k)` (action level): centralizing all of `H̄` centralizes each summand.**  A
+`U`-element `g` acting trivially on the whole chief factor (`uActionHom g = 1`, i.e. `g` realizing an
+element of `C = C_U(H̄)`) acts trivially on every Clifford summand `H_k`
+(`aInvariantRestrictAut (Hpart_aInvariant k) g = 1`), because the restricted action is a restriction
+of `uActionHom g = 1`.  This is the easy `⊆`-direction of the (9.11.2) final identity `C = U₁ ∩ U₁ʷ`:
+`C ⊆ C_U(H_i) ⊓ C_U(H_j)` (the reverse `⊇` is the deep degree argument).  Realized to `G`-subgroups it
+gives `cSub ≤ C_U(H_i) ⊓ C_U(H_j)` (cf. the landed `cSub_le_cuSub` for the generator `S₀`). -/
+theorem centralizes_all_imp_centralizes_summand {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
+    (caseA : CliffordCaseAData chars) (k : Fin data.q)
+    (g : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U)
+    (hg : (uActionHom data chief) g = 1) :
+    aInvariantRestrictAut (caseA.Hpart_aInvariant k) g = 1 := by
+  ext x
+  rw [MulAut.one_apply, aInvariantRestrictAut_coe, hg, MulAut.one_apply]
+
 end NineElevenTwoInertia
 
 /-- **`[U : K₁ ⊓ K₂] ≤ [U:K₁]·[U:K₂]`** (relative-index form of `Subgroup.index_inf_le`): the
