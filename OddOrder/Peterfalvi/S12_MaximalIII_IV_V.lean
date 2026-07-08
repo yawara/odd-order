@@ -487,6 +487,57 @@ theorem typeII_coherence_estimate_chain
   rw [mul_sub, mul_sub, e1, e2, e3, e4] at hmul
   linarith [hmul]
 
+/-- **Peterfalvi (8.8) enriched: the Type-II partner's Frobenius factor `U` satisfies `|U| ≥ 7`.**
+
+The (8.8) partner `S` — a Type-II maximal subgroup with `|S : [S,S]| = w₂`
+(`exists_typeII_maximal_with_w2`) — has `[S,S] = S_F ⋊ U`, and `U ⋊ W₁(S)` is a Frobenius group
+with kernel `U` (Peterfalvi (8.4), `S11.typeP_uW1_frobenius`).  Its kernel therefore satisfies
+`|U| ≡ 1 (mod |W₁(S)|)` (`card_kernel_modEq_one`), and `|W₁(S)| = |S : [S,S]| = w₂`
+(`TypePData.card_W1_eq_derived_index`).  As `|U|` and `w₂` both divide the odd `|G|` and `U ≠ 1`
+(the Type-II nontrivial core), the odd-order forcing `two_mul_add_one_le_of_odd_dvd` gives
+`|U| ≥ 2w₂+1`; since `w₂` is an odd prime (`w2_prime`), `w₂ ≥ 3` and hence `|U| ≥ 7`.
+
+This is the `∃ u ≥ 7` witness — with its Type-II datum exposed for the `|S| = |S_F|·|U|·w₂` and
+TI-counting inputs — that Peterfalvi (10.8)'s coherence estimate
+(`typeII_coherence_contradiction_estimate`) consumes; cf. issue 1017 "(8.8) enrich". -/
+theorem Hypothesis.exists_typeII_partner_card_U_ge_seven [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
+    ∃ (S : Subgroup G) (dII : TypeIIData S), S ∈ maximalSubgroups G ∧
+      ((derivedInG S).subgroupOf S).index = hyp.w2 ∧
+      7 ≤ Nat.card ↥dII.typeP.U := by
+  obtain ⟨S, hSmax, hSII, hSidx⟩ := hyp.exists_typeII_maximal_with_w2 hG
+  obtain ⟨dII⟩ := hSII
+  refine ⟨S, dII, hSmax, hSidx, ?_⟩
+  -- `|W₁(S)| = |S : [S,S]| = w₂`.
+  have hW1card : Nat.card ↥dII.typeP.W1 = hyp.w2 := by
+    rw [dII.typeP.card_W1_eq_derived_index]; exact hSidx
+  -- `U ≠ 1` (the Type-II nontrivial core), hence `1 < |U|`.
+  have hUne : dII.typeP.U ≠ ⊥ := dII.common.1
+  have hUlt : 1 < Nat.card ↥dII.typeP.U := (Subgroup.one_lt_card_iff_ne_bot _).mpr hUne
+  -- `U ⋊ W₁(S)` is Frobenius; its kernel obeys `|U| ≡ 1 (mod |W₁|)`.
+  have hfrob := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius dII.typeP hUne
+  have hmod := hfrob.card_kernel_modEq_one
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_left).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv] at hmod
+  -- `|W₁| ∣ |U| − 1`.
+  have hdvd : Nat.card ↥dII.typeP.W1 ∣ Nat.card ↥dII.typeP.U - 1 :=
+    (Nat.modEq_iff_dvd' hUlt.le).mp hmod.symm
+  -- `|U|`, `|W₁|` odd (dividing the odd `|G|`).
+  have hUodd : Odd (Nat.card ↥dII.typeP.U) :=
+    hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card dII.typeP.U)
+  have hW1odd : Odd (Nat.card ↥dII.typeP.W1) :=
+    hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card dII.typeP.W1)
+  -- odd-order forcing: `|U| ≥ 2|W₁|+1 = 2w₂+1`.
+  have hge := OddOrder.Peterfalvi.S08.two_mul_add_one_le_of_odd_dvd hW1odd hUodd hdvd hUlt
+  rw [hW1card] at hge
+  -- `w₂ ≥ 3` (an odd prime), so `|U| ≥ 2·3+1 = 7`.
+  have hw2prime : (hyp.w2).Prime := hyp.w2_prime hG
+  have hw2odd : Odd hyp.w2 := hW1card ▸ hW1odd
+  have hw2ge : 3 ≤ hyp.w2 := by
+    have h2 := hw2prime.two_le
+    obtain ⟨k, hk⟩ := hw2odd; omega
+  omega
+
 open scoped FiniteInduce in
 /-- **Peterfalvi (10.8), norm-counting estimate** (the §7 analytic heart, the `hbound` input to
 `typeII_noncoherence_arithmetic`).
