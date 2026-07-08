@@ -956,6 +956,41 @@ theorem exists_caseA_two_summand_char {data : TypesIIIIIIVSetup M} {chief : Chie
   exact exists_two_summand_char caseA.Hpart caseA.Hpart_iSupIndep caseA.Hpart_iSup
     (fun k => by rw [caseA.Hpart_order k]; exact chief.p_prime) hij
 
+/-- **(9.11.2) inertia identity at the chief-factor level.**  Combining the three landed pieces —
+the two-summand character `exists_caseA_two_summand_char`, the `⊆` containment
+`caseA_char_inertia_two_summands`, and the `⊇` containment
+`caseA_centralizes_two_summands_fixes_char` — there is a linear character `θ` of `H̄` whose `U`-inertia
+is *exactly* the two-summand centralizer: for `g ∈ U`, `g` fixes `θ` **iff** `g` centralizes both
+Clifford summands `H_i`, `H_j` (`aInvariantRestrictAut … g = 1`).  This is the `Ū`-side of Peterfalvi
+(9.11.2): the inertia of the two-summand `θ` is `C_U(H_i) ⊓ C_U(H_j) = U₁ ∩ U₁ʷ`.  The `⊆` direction
+casts `θ` to the linear irreducible `linearIrreducibleCharacter θ` (whose `ClassFunction` values are
+`θ`'s, `linearIrreducibleCharacter_apply`) and applies the regular two-summand char-inertia; the `⊇`
+direction is the trivial-off-support fixing lemma directly. -/
+theorem caseA_inertia_iff_centralizes_two_summands {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
+    (caseA : CliffordCaseAData chars) {i j : Fin data.q} (hij : i ≠ j) :
+    ∃ θ : (↥data.H ⧸ chief.N) →* ℂˣ, ∀ g : ↥(typeP_quotientCoprimeAction data.typeP
+        data.nontrivial.1 chief.N_aInvariant).U,
+      (∀ x, θ ((uActionHom data chief) g x) = θ x) ↔
+        (aInvariantRestrictAut (caseA.Hpart_aInvariant i) g = 1 ∧
+          aInvariantRestrictAut (caseA.Hpart_aInvariant j) g = 1) := by
+  obtain ⟨θ, hθi, hθj, hθtriv⟩ := exists_caseA_two_summand_char caseA hij
+  refine ⟨θ, fun g => ⟨fun hfix => ?_, fun hcent =>
+    caseA_centralizes_two_summands_fixes_char caseA θ hθtriv g hcent.1 hcent.2⟩⟩
+  have hinv : ∀ x, (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)
+      ((uActionHom data chief) g x)
+      = (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x := fun x => by
+    rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, hfix x]
+  refine caseA_char_inertia_two_summands caseA ?_ ?_ g hinv
+  · obtain ⟨x, hx, hxne⟩ := hθi
+    refine ⟨x, hx, ?_⟩
+    rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one, Units.val_one]
+    exact fun h => hxne (Units.val_eq_one.mp h)
+  · obtain ⟨x, hx, hxne⟩ := hθj
+    refine ⟨x, hx, ?_⟩
+    rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one, Units.val_one]
+    exact fun h => hxne (Units.val_eq_one.mp h)
+
 end NineElevenTwoInertia
 
 /-- **`[U : K₁ ⊓ K₂] ≤ [U:K₁]·[U:K₂]`** (relative-index form of `Subgroup.index_inf_le`): the
