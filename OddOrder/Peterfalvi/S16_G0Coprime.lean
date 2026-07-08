@@ -1,6 +1,7 @@
 import OddOrder.Peterfalvi.S15_SAndT
 import OddOrder.Peterfalvi.S16_NonExistenceGCore
 import OddOrder.GroupTheory.ConjClassSet
+import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldModel
 
 /-!
 # Peterfalvi (14.11.3), support half: generic elements have order prime to `pq`
@@ -843,5 +844,44 @@ theorem TFieldModelData.derived_inf_centralizer_le_Q [Finite G]
   obtain ⟨mw, hmw⟩ := commute_inl_mem_range_inl hmne hcomm
   rw [← data.sigma_Q_eq_Q]
   exact ⟨w, ⟨mw, hmw⟩, rfl⟩
+
+/-- **T-side field-model producer** (`(14.4)`-dual of `fieldNormalizerData_of_repr`): from the
+`(9.7.b)` T-side field-algebra package — an additive field iso `e : Additive ↥Q ≃+ 𝔽_{q^p}`, a
+norm-one Singer character `μ : ↥V →* 𝔽_{q^p}ˣ`, the `V`-conjugation closure `hVQ` on `Q`, and the
+`(14.2)(a)`-dual equivariance `hcompat` (`e (ofMul (v x v⁻¹)) = μ v • e (ofMul x)`) — assemble the
+injective realization `σ : F_{q^p} ⋊ V* →* G` with kernel `Q` and complement `V`, i.e. a
+`TFieldModelData hyp`.  The `Q ⊓ V = ⊥` disjointness is the ungated `hyp.Q_inf_V_eq_bot` field.
+
+This is the ungated heart of the T-side `(14.4)` reduction: it invokes the generic
+`SemilinearFieldModel.fieldModelEmbedding` (`E = Q`, `C = V`, `r = q`, `s = p`), routing the lift
+compatibility through the generic `hcompatLift_of_equivariant`.  Carries no `sorry`; its only
+external inputs are the field-algebra data `(e, μ, hcompat)`, which the `(9.7.b)` resolution for
+`T` (`exists_field_semilinear` + Singer, issue-9000 sphere) supplies. -/
+theorem tFieldModelData_of_repr (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    (e : letI : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
+         Additive ↥hyp.Q ≃+ GaloisField hyp.q hyp.p)
+    (μ : letI : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
+         ↥hyp.V →* (GaloisField hyp.q hyp.p)ˣ)
+    (hμ_inj : Function.Injective μ)
+    (hμ_range : letI : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
+         μ.range = OddOrder.BG.AppC.NormSet.normOneUnits hyp.q hyp.p)
+    (hVQ : ∀ (v : ↥hyp.V) (x : ↥hyp.Q), (v : G) * (x : G) * (v : G)⁻¹ ∈ hyp.Q)
+    (hcompat : letI : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
+         ∀ (v : ↥hyp.V) (x : ↥hyp.Q),
+           e (Additive.ofMul (⟨(v : G) * (x : G) * (v : G)⁻¹, hVQ v x⟩ : ↥hyp.Q))
+             = ((μ v : (GaloisField hyp.q hyp.p)ˣ) : GaloisField hyp.q hyp.p) *
+                 e (Additive.ofMul x)) :
+    Nonempty (TFieldModelData hyp) := by
+  letI : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
+  have hcompatLift :=
+    OddOrder.RepresentationTheory.SemilinearFieldModel.hcompatLift_of_equivariant
+      e μ hμ_inj hμ_range hVQ hcompat
+  obtain ⟨sigma, hinj, hker, hcomp⟩ :=
+    OddOrder.RepresentationTheory.SemilinearFieldModel.fieldModelEmbedding
+      e μ hμ_inj hμ_range hcompatLift hyp.Q_inf_V_eq_bot
+  exact ⟨{ sigma := sigma
+           sigma_injective := hinj
+           sigma_Q_eq_Q := hker
+           sigma_V_eq_V := hcomp }⟩
 
 end OddOrder.Peterfalvi.S16
