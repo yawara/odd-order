@@ -59,3 +59,34 @@
 新 leaf `OddOrder/Peterfalvi/S11_ImprimitiveUBound.lean` (S11 import、fast iterate)。
 producer を hconst 補題に還元して先に packaging を build-green 化 → hconst を Frobenius で埋める。
 完成後 `CliffordCaseAData.Ubar_embeds_product` を本 bound に置換 (or S15 が直接 cite)。
+
+## ✅ packaging landed (2026-07-09, commit 337c9dbe) — 残 = hconst 1 本のみ
+
+`S11_ImprimitiveUBound.lean` build-green (real sorry = 1 = hconst)。sorry-free で landed:
+- `isAInvariant_range_subtype` (φ-invariant → range.subtype-invariant)
+- `uActionHom_range_comm` (Ū abelian、`typeP_commutator_U_centralizes_H` 経由)
+- `caseA_u_le_cyclotomicQuotient` の全 packaging (aInvariantSubrep で block→Subrep、
+  `card_le_cyclotomicQuotient_of_blocks` 適用、`chars.u_eq_card_quotient` で |Ū|=u、
+  finCongr で Fin q↔Fin((q-1)+1)、instance diamond は H̄/Ū の CommGroup を canonical Group
+  明示 base で構成し解消)。
+
+**⟹ bound 全体が唯一の hconst (block engine の 4th 引数、line ~118 inline sorry) に還元。**
+
+## hconst の precise 分解 (次 iteration)
+
+`hconst : ∀ ū : Ū, (∀ i, lineScalarChar (block i) ū = lineScalarChar (block 0) ū) → ū = 1`
+
+1. **共通 scalar → global scalar**: 各 block で `lineScalarChar (block i) ū = λ` (共通) ⟹
+   `ū` は各 Hpart i 上で power map `x ↦ x^λ` ⟹ blocks span (`Hpart_iSup=⊤`) ゆえ H̄ 全体で。
+   infra: **`mulAut_eq_one_of_eq_id_on_iSup` (S11:2186)** を `ū · (powermap λ)⁻¹` (= id on blocks)
+   に適用。加法 `lineScalarChar_smul` ↔ 乗法 power map の橋渡しが要 (Additive.ofMul 経由)。
+2. **λ·id は MulAut(H̄)=GL(H̄) で中心的** (scalar は全 automorphism と可換)。
+3. **中心的 ū は W̄₁-conjugation 不変** ⟹ `ū ∈ C_Ū(W̄₁)`。
+4. **Frobenius fpf**: `C_Ū(W̄₁) = 1`。⚠ **最深部・infra gap**: `typeP_uW1_frobenius` は
+   `IsFrobeniusGroup (U⊔W₁) (U.subgroupOf) (W₁.subgroupOf)` を与えるが、**quotient Frobenius
+   `(U⊔W₁)/C = Ū⋊W̄₁`** (Coq `frobUW1c` = `Frobenius_quotient frobUW1`) への降下 + その
+   `Frobenius_trivg_cent` が Lean に無い → 新 infra 要 (or 直接: 「u∈U, [u,W₁]⊆C ⟹ u∈C」を
+   U⊔W₁ Frobenius fpf `fixedPointFree_toMulAut` FrobeniusActionTI:394 から導く)。
+   Coq 実装 = `quotient_cents2r` で `[ker(psi),W₁]⊆C` + `Frobenius_trivg_cent frobUW1c`。
+
+step 1-3 は tractable、**step 4 (quotient-Frobenius fpf) が genuine infra 投資**。
