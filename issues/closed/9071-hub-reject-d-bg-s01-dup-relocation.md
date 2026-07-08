@@ -78,3 +78,8 @@ BG S01 の coprime-action ブロックを Isaacs Ch04 へ移す layering 改善�
 - build error: `OddOrder/BG/Ch1_Preliminary/S04e_GorThm37.lean:183` Ambiguous term
 - d claim issues: `issues/closed/9068-*`, `9069-*`, `9070-*` (d branch)
 - [[verify-port-state-by-number-not-coq-name]] [[hub-arbitrates-cross-lane-autonomously]]
+
+
+## ✅ HUB CLOSE (2026-07-08 監視 tick): lane d 退役で moot
+
+9071 は lane d の 9068-9070 (BG S01 既存補題 5 件の verbatim 重複 relocation、net Lean diff = 0) を REJECT した pure coordination record。genuine FT math は含まない (重複ゆえ)。rejected work は main に未マージ、lane d は 2026-07-07 退役 (branch/worktree 削除済) ゆえ本 issue は moot (merge_monitor.md 記録)。process guardrail は merge_monitor.md に保全済。pending action 0。close。

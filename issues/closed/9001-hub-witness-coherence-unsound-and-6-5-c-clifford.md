@@ -254,3 +254,14 @@ scope は §12 向け ((6.5.c) + S07 generic) のみ」というスコープず�
   課題 (2026-06-22「真の long pole = S15 η-grid carrier の honest 化」) の後継 owner = **c**。
 - 詳細・c_eq_one route 制約・S-side 処分は `notes/peterfalvi/s16_w4_char_cascade.md` の
   「✅ HUB 裁定 (2026-07-02 全体レビュー)」節 (lane c の live 正本) に転記済。
+
+
+## ✅ HUB CLOSE (2026-07-08 監視 tick): 全裁定実行済
+
+9001 HUB 裁定の全事項が実行完了:
+- **事項1** ((12.6) `frobenius_typeI_coherent` の 3-case split soundness fix) = commit `ed34cdc8` で landing、case-b (abelianKernel)/case-c (cyclicQuotient) branch とも sorry-free。
+- **事項2 (A/A')** coherence infra = lane b が S07 refactor + (6.5.c) producer で build、carve-out は merge_monitor 記録。
+- **事項2 (B)** 構成的 Clifford = lane c へ再割当、専用 issue **9002** で完遂・closed。
+- 誤 σ-theory-dual guidance = doc correction で撤回済。
+
+近傍の唯一の残 sorry = case-(a) `sibleyTarget_frobI` ((6.8) target, S14_MaximalI:2770) は 9001 の deliverable でなく issue **2032** (closed) が tracked していた別 frontier。⟹ 9001 は pending action 無し。close。

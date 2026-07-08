@@ -149,3 +149,12 @@ item 1 着手前検証。`W2_le` (S15_SAndT_Setup:4520) / `centralizer_W1` (:459
 (`typeP_pair`/`typeP_pairW`/`FTtypeP_pair_cases`/`FTtypeP_pair_witness`/`of_typeP_pair`/`typeP_cent_compl`
 /`of_typeP_compl_conj`) を `OddOrder/GroupTheory/**` へ port し、hyp.S/hyp.T の pair 構造から
 W2_le/centralizer_W1 を discharge。substantial (multi-session)。**次 loop iteration で 9000 番台 claim 起票 → leaf 構築**。
+
+
+## ✅ HUB CLOSE (2026-07-08 監視 tick): rebalance 裁定実行済 → package を後継 tracker へ移譲
+
+0098 (レーン役割再点検: c REACTIVATE 5件パッケージ + b de-scope) の coordination ruling は実行完了 (merge_monitor lane table + 9013 de-scope + carve-out grant 記録)。package の残 math item は各々専用 live tracker が所有:
+- item 3B (deep Γ-facts / (5.3) cross-relation) = **3003 + 9076**
+- item 4 / 2 (§14 Γ-bridge assembly / semilinear (9.7.b) field-model leaf) = **4001** (+ 3003/9076)
+
+⟹ 0098 は live frontier tracker でなく redundant historical ruling record。close。
