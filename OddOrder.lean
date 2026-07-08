@@ -245,6 +245,7 @@ import OddOrder.Peterfalvi.S13_SixTwoBridge
 import OddOrder.Peterfalvi.S13_MaximalIII_IV
 import OddOrder.Peterfalvi.S13_ElementaryAbelianKernel
 import OddOrder.Peterfalvi.S13_CoreStructure
+import OddOrder.Peterfalvi.S13_PrimeTIResidueBridge
 import OddOrder.Peterfalvi.S11_NineElevenCaseA
 import OddOrder.Peterfalvi.S13_Orthogonality
 import OddOrder.Peterfalvi.S14_MaximalI

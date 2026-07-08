@@ -252,3 +252,85 @@ prime-TI μ-grid の cross-column 構造のみ**。精査で判明した **重�
 prime-TI に接続)、or (b) S15↔§12 framework bridge (carrier 構成前提ゆえ bridge lemma 単独では pin 未 discharge)。
 **hub 裁定要**: lane c を (i) lane-b char cascade 支援に再配置 / (ii) S16 W-side の別 gated frontier / (iii) 他。
 lane c は本 flag 後も /loop 継続 (報告≠停止); 次 iteration は S16 W-side 等で ungated piece を再走査。
+
+## ⚠ LANE-B 診断解決 (2026-07-08, /loop 再開): (13.18) μ-carrier の honest source = prime-TI residue (§12 muGrid でない)
+
+上の HUB FLAG (lane c) は「S15.mu の honest source = §12 `Hypothesis.muGrid`、connection = S15 carrier
+構成」とした。lane-b が code-level 精査し、**§12 muGrid route には type obstruction がある**ことを確定
+(訂正):
+
+- **§12.Hypothesis は type-P1 gated**: `type_alt : IsTypeIII ∨ IsTypeIV ∨ IsTypeV` (S12_Core:352)
+  = `IsTypeP1`。Dade support `typePA0` も `dadeSupportHypothesisData_typePA0_of_isTypeP1` (S10:2340) で
+  P1 gated。**S は type-P2** (`S_typeP2`; `not_isTypeII_of_isTypeIII_or_IV`/`not_isTypeII_of_isTypeV`,
+  S16_MainResults:5670/5682 で III/IV/V と disjoint) ⟹ **S に §12.Hypothesis は構成不能**。
+- **真の honest source = prime-TI residue grid** (pins 自身の docstring が既に明示: Coq `prTIres`/
+  `prDade_sub_TIirr_on`/`prTIirr_id`, issue 9014)。`mu2 = (columnFamily χ₂).mu` は §12 muGrid と**同一
+  オブジェクト** (両者 `h.columnFamily.mu`) だが、その構成は **S06 certain-type のみ依存で type-uniform**
+  (`muGrid` は dadeData 非依存、`.toHypothesis = typePData_toS06Hypothesis` のみ使用)。
+- ∴ S (P2) も `typePData_toS06Hypothesis hyp.Sdata` (IsTypeP は `isTypeP_of_isTypeP2 S_typeP2` で供給、
+  **no IsTypeP1**) で S06.Hypothesis を持ち、`PrimeTIResidueData.ofS06Hypothesis` (sorry-free constructor、
+  9014 で完成済) で residue grid を構成できる。
+
+**lane-b 構築 (commit `03e9c01c`、新 leaf `OddOrder/Peterfalvi/S13_PrimeTIResidueBridge.lean`)**:
+- `Hypothesis.s06S hG : S06.Hypothesis ↥S` (type-uniform bridge)。
+- `Hypothesis.residueS hG : PrimeTIResidueData ↥S S' |W₁| |W₂|` (ofS06Hypothesis 経由、全 field discharged)。
+- `PrimeTIResidueData.mu2_ne` (PrimeTIResidue.lean、汎用): entrywise distinctness =
+  **pin 1 `mu_row0_ne` の residue-side content** (i=i'=0, j≠j' の special case)。
+  `(hyp.residueS hG …).mu2_ne` で S-side 取得。
+- full build 3942 green・AxiomsCheck OK・新 axiom/sorry なし。
+
+**残 (full pin discharge に必要、lane-b 継続)**:
+1. **pin 2/3 の residue facts**: μ差 support ⊆ A0(S) (Coq `prDade_sub_TIirr_on`) + V-value = ω
+   (Coq `prTIirr_id`)。residue API に追加 (support は induce structure、V-value は σ-image identity on V)。
+2. **carrier field `hyp.mu = residueS.mu2`** (index 整合込み): S15.mu (free field) を residue grid に
+   同定。これは **FeitThompson.lean (lane-a) の `sectionSixteenHypothesis_of_inputs` 供給** = cross-lane。
+   HUB 調整要 (S15.Hypothesis に field 追加 → FeitThompson で mu := residueS.mu2 供給)。
+3. 上記後に **c-owned S15_HonestTypeP2A0 の 3 pins** を residue API cite で discharge (c 側 or carve-out)。
+
+**⟹ HUB へ**: lane c の「§12 muGrid connection」route は type obstruction で dead。lane-b が
+prime-TI residue route で置換中 (bridge landed)。carrier field (item 2) の FeitThompson 供給が
+cross-lane 調整点。lane c の (13.18) A0-Dade infra (既 landed) はそのまま residue route で再利用可。
+
+## ⚠ LANE-B pins 2/3 path 特定 (2026-07-08 続): S06 `Hypothesis46` certain-type route
+
+pins 2/3 (`tauS_mu_row0_diff_support` = μ差 support ⊆ A0(S)、`tauS_mu_row0_vanish_on_V` = τ_S(μ差)=η差 on V)
+の content は **S06 `Hypothesis46 A L` certain-type theory に type-uniform に既存** (S06_CertainTypeIsometry.lean):
+
+- **pin 2 (support)** = `certainTypeDiffSupported h hχ₂ hχ₂' i (hdeg i)` (`:793` 近辺): `μ_{ij}−μ_{ik}` を
+  **`A ∪ conjClassSetIn L tic.V = A₀` 上 supported** な `SupportedClassFunctions` として package。i=0,j,k=1 で
+  `μ_{0j}−μ_{01}` の support ⊆ A0(S) = pin 2 そのもの。
+- **pin 3 (V-value/Dade)** = `certainType_diff_dade_eq h hχ hχ₂ hχ₂' i (hdeg i)` (4.8 concl.3):
+  `τ(μ_{ij}−μ_{ik}) = δ_j•(ω_{ij}^σ − ω_{ik}^σ)`。i=0 で `τ_S(μ_{0j}−μ_{01}) = δ•(ω_{0j}^σ−ω_{01}^σ)`。
+  η=τ₃(ω) + V 上 ω^σ=ω-value ⟹ pin 3 (τ_S(μ差)=η差 on V)。
+
+**必要な assembly = `Hypothesis46 (typePA S) ↥S` の構成** (s06S を `toCertainTypeHypothesis` に、tic =
+`typePData_toTICyclicHypothesis Sdata`、`dade0` = **lane-c の A0-Dade `dadeHypS0`**、`tau` =
+`dadeHypS0.fullDadeIsometryData …`)。⚠ 配置: dadeHypS0 は S15_HonestTypeP2A0 (§15) 内ゆえ Hypothesis46-for-S
++ pins discharge は **S15_HonestTypeP2A0 内 (lane-c owned)** が正しい (私の §13 residueS + S06 API は upstream で citable)。
+
+⚠ 要 reconcile: Hypothesis46 の `dade0` support は `A ∪ conjClassSetIn L tic.V`、これが `honestTypeP2A0Set S Sdata`
+(= dadeHypS0 の support) と一致する必要 (`A = typePA S = honestTypeP2ASet S`? / `tic.V = typePV S Sdata`)。
+lane-c は既に honestTypeP2A0Set の Dade を構築済ゆえ整合可能なはず。
+
+**⟹ HUB/lane-c へ**: (13.18) pins 2/3 の honest route = **S06 Hypothesis46 certain-type API** (§12 muGrid でない、
+prime-TI residue と同じ certain-type 土台)。lane-b の `residueS` (grid) + `mu2_ne` (pin1) は landed。残:
+(i) Hypothesis46-for-S 構成 (lane-c file、dadeHypS0 使用) → certainTypeDiffSupported/certainType_diff_dade_eq
+cite で pins 2/3、(ii) carrier field `hyp.mu = residueS.mu2` (FeitThompson = lane-a)。3-lane collaboration。
+
+### ⚠ support-set subtlety (pin 2 の Hypothesis46 route 非自明): typePA0 vs honestTypeP2A0Set
+
+`honestTypeP2ASet M = centralizerSupport(sharp(Msigma M), derivedInG M)` (Msigma# を centralize する M' 元) ⊊
+`typePA M = (M')# = sharpSubgroup(derivedInG M)` (M' 全 nonidentity)。∴ `honestTypeP2A0Set ⊆ typePA0`。
+
+S06 `certainTypeDiffSupported` は support ⊆ **A ∪ V = typePA0** (A=typePA 時) を出すが、pin 2 は
+`⊆ honestTypeP2A0Set` (**より狭い**) を要求 → **方向が逆で drop-in 不可**。
+
+含意 (lane-c/hub 要判断):
+- (a) type-P2 で `honestTypeP2ASet S = typePA S` が実は一致 (M'# の各元が Msigma# を centralize) なら問題なし。
+  要確認 (群構造依存、M_σ ⊆ Z(M') 等)。
+- (b) 真に ⊊ なら、μ差は typePA0 上 supported だが honestTypeP2A0Set 上とは限らず、**pin 2 statement が
+  honestTypeP2A0Set より typePA0 で述べるべき** possibility (dadeHypS0 の support も typePA0 に合わせる必要)。
+  = lane-c の A0-Dade support 設計の再確認点。
+
+⟹ pin 2 の Hypothesis46 route は「support-set 一致 (typePA0=honestTypeP2A0Set) の確認」or「pin/dade を
+typePA0 に統一」が前提。lane-c A0-Dade 領域。lane-b の residueS/mu2_ne (pin 1) は independent に valid。
