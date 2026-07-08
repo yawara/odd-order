@@ -610,9 +610,11 @@ The proof is now **fully assembled** from three pieces: (i) the carrier translat
 `K` and `W₁` complement `M'`, so both equal the derived index — `card_kappaHall_eq_derived_index`,
 `TypePData.card_W1_eq_derived_index`); (ii) the carrier translation `|K*| = w₂`
 (`card_Msigma_inf_centralizer_eq_card_W2`, axiom-clean BG §14 group theory); and (iii) the §11
-character reduction `w₂ < w₁` (`S12.w2_lt_w1_of_hypothesis`).  All of (i)/(ii) and the reduction
-spine of (iii) are proven; the *sole* residual is the genuine Peterfalvi (11.8) non-orthogonality
-(`S12.exists_zeta_residual_not_orthogonal`, lane-a (11.8) char obligation). -/
+character reduction `w₂ < w₁` (`S13.w2_lt_w1_of_hypothesis_H0C` — the honest narrow-`𝒮(H₀C)` route,
+issue 1019; the deprecated wide `S12.w2_lt_w1_of_hypothesis` and its false uniform-degree lemma have
+been retired).  All of (i)/(ii) and the reduction spine of (iii) are proven; the residual is the
+genuine Peterfalvi (11.8) non-orthogonality (`S13.exists_zeta_residual_not_orthogonal_H0C`), whose
+remaining `sorry`s are the §14 Sibley glue `(6.7)`/`(5.8)`, the `(9.11)` caseA refuter, and `(10.8)`. -/
 theorem card_kappaHall_lt_of_isTypeIIIorIV {G : Type*} [Group G] [Finite G]
     (hG : IsMinimalSimpleOdd G) {S K Kstar : Subgroup G}
     (hS : S ∈ maximalSubgroups G) (hSP : BG.Ch4.S14.IsTypeP S) (hKS : K ≤ S)
