@@ -85,9 +85,21 @@ trichotomy** (constant-row/column 除外) は欠く → 4a/4b がそれを埋め
     (A(S)∈S' element が V^S∉S' element と G-共役でない; TRUE by normedTI 'A0 だが循環 → type-P2
     FT-support geometry (Coq FTsupp0/BG§16 ThmII) 直接証明を要する; W₂⊆M_σ ゆえ elementary route 不成立)。
   - [x] **4c-2c** `Hypothesis.dadeHypS0`/`dadeHypS0_hconj` (commit 79dd67c1 隣): S-instance 'A0-Dade bridge。
-  - [ ] **4c-3** tauSbetaGrid/GammaGrid/tauS_mu_row0_cross を dadeHypS0 に rewire + tauS_mu_row0_cross 本体を
-    `eta_diff_rigidity` (4b) で分解。要: μ差 ∈ 'A0(S) (Coq prDade_sub_TIirr_on) / τ_S=Ind on 'A0 (H=⊥,
-    normedTI) / μ V-value=ω V-value (Coq prTIirr_id, **prime-TI theory — 9014/lane-a と要調整の可能性**)。
+  - [x] **4c-3** tauSbetaGrid/GammaGrid/tauS_mu_row0_cross/gammaGrid_defGamma を dadeHypS0 に rewire
+    (commit a6f7a2ed)。**headline correctness fix**: 旧 dadeHypS (A(S)⊆S') では μ差の V_S-part が
+    arbitrary-extension 領域ゆえ statement が unprovable-as-stated → 'A0-Dade で provable-in-principle 化。
+    downstream consumer 無し・full build 3940 green・新 sorry 無し。
+  - **rewire soundness 検証済**: dadeHypS0 は faithful-Dade (H=ftSupportKernel、escaping P^# 点で≠⊥) で
+    Coq normedTI-Dade (H=1) と P^#-image で異なりうるが sound: `eta_diff_rigidity` は X を
+    (ZIrr, ‖·‖²=2, **V-agreement**) から一意決定し、V_S 上は H=⊥ (V-elem escape せず) ゆえ V-agreement は
+    Dade_id で P^#-behavior 非依存。∴ rewire 正しい。
+  - [ ] **4c-4 assembly (buildable、API 全確認済)**: `tauS_mu_row0_cross` 本体を `eta_diff_rigidity` で分解。
+    lane-c assembly (ZIrr=`dadeIntegralCharacterMap_mem_ZIrr_of_supported` / ‖X‖²=2=
+    `dadeIntegralCharacterMap_inner_eq_of_supported` / rigidity cite / j=#1 trivial case) + **3 isolated pin**:
+    (i) μ差 ⊆ supportInSubgroup('A0(S)) (Coq prDade_sub_TIirr_on)、(ii) (τ_S(μ差)−η差) vanishes on
+    conjClassSet(regular) = prime-TI μ V-value (Coq prTIirr_id + Dade_id on V)、(iii) ‖μ差‖²=2
+    (μ_{0j}≠μ_{01})。(i)(ii)=prime-TI theory (未ポート、cf 9014/lane-a)。**lane-c structural work 完了;
+    残 = prime-TI pin (cross-lane) + mechanical assembly**。
   - **旧記述 (参考)** ⚠ **correctness fix**:
   現 `tauS_mu_row0_cross` (S15_SAndT.lean:4008, sorry) は **'A(S)-Dade** (`hyp.dadeHypS` =
   `honestTypeP2ASet` = `centralizerSupport(sharp(Msigma S), derivedInG S)` ⊆ S') で組まれているが、
