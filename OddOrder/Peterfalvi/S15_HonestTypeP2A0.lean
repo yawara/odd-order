@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S15_SAndT_Setup
 import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
+import OddOrder.Peterfalvi.S13_PrimeTIResidueBridge
 
 /-!
 # Peterfalvi (8.10)/(8.15): the honest type-`P₂` `A₀`-support `A₀(S) = A(S) ∪ V^S`
@@ -644,6 +645,58 @@ theorem Hypothesis.sInstance_dade0_eq_induce [Fintype G] [Finite G]
       rw [OddOrder.Peterfalvi.S04.Hypothesis.restrict_H]
       exact hyp.forall_dadeHypS0_H_eq_bot hG ⟨a.1, a.2⟩)
     ⟨f, (ClassFunction.mem_supportedSubmodule).mpr hf⟩
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The type-`P₂` `Hypothesis46`-for-`S`** (issue 9076 piece 4c-4; the (13.18) pin-2/3 route).
+Assembles the §6 certain-type `Hypothesis46 (honestTypeP2ASet S) ↥S` from the type-uniform
+constructor `hypothesis46OfTypePData` (`S13_PrimeTIResidueBridge`): the type-`P₂` datum `hyp.Sdata`
+(with `IsTypeP S` from `S_typeP2`), the honest `A(S)`-support with its `'A0(S)`-Dade `dadeHypS0`, and
+the kernel-family subgroup `subH = M_σ` — for which the covering `A(S) = ⋃_{z∈M_σ#} C_{S'}(z)#` holds
+(`mem_honestTypeP2ASet`).  This supplies the `certainTypeDiffSupported` /
+`certainType_diff_dade_apply_eq_of_mem_V` residue facts behind the `(13.18)` support/`V`-value pins
+(`tauS_mu_row0_diff_support` / `tauS_mu_row0_vanish_on_V`), which then discharge once `hyp.mu` is
+grounded to `residueS.mu2` (b-side grid field, cf. `mu_row0_ne`).  **Ungated** — pure structural
+assembly (no grounding needed to *build* the `Hypothesis46`). -/
+noncomputable def Hypothesis.hyp46S [Finite G] (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
+    OddOrder.Peterfalvi.S06.Hypothesis46 (honestTypeP2ASet hyp.S) hyp.S :=
+  hypothesis46OfTypePData hG hyp.S_maximal
+    (OddOrder.BG.Ch4.S14.isTypeP_of_isTypeP2 hyp.S_typeP2) hyp.Sdata hG.odd
+    (honestTypeP2ASet hyp.S) (hyp.dadeHypS0 hG) (hyp.dadeHypS0_hconj hG)
+    (fun l _ ha => honestTypeP2ASet_conj_mem l.2 ha)
+    ((OddOrder.BG.Ch3.S10.Msigma hyp.S).subgroupOf hyp.S)
+    (by rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance)
+    (by
+      -- `W₂ ≤ H = maxNilpotentNormalHall S ≤ M_σ` (`W2_le`/`H_eq` + `maxNilpotentNormalHall_le_Msigma`).
+      refine Subgroup.subgroupOf_mono hyp.S ?_
+      have hW2H : hyp.Sdata.W2 ≤ hyp.Sdata.H := le_trans hyp.Sdata.W2_le inf_le_left
+      rw [hyp.Sdata.H_eq] at hW2H
+      exact le_trans hW2H
+        (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hyp.S_maximal))
+    (by
+      -- `M_σ ≤ S'` (`Msigma_le_derived`).
+      exact Subgroup.subgroupOf_mono hyp.S
+        (OddOrder.BG.Ch3.S10.Msigma_le_derived hG hyp.S_maximal))
+    (by
+      -- **`A_covers`**: for `hh ∈ M_σ#` and `x ∈ C_S(hh) ⊓ S'` with `x ≠ 1`, the point `↑x` lies in
+      -- `A(S) = ⋃_{z∈M_σ#} C_{S'}(z)#` — witnessed by `z = ↑hh` (the covering `mem_honestTypeP2ASet`).
+      intro hh hhσ hh1 x hx hx1
+      rw [Subgroup.mem_inf] at hx
+      obtain ⟨hxC, hxD⟩ := hx
+      rw [Subgroup.mem_subgroupOf] at hxD hhσ
+      rw [Subgroup.mem_centralizer_iff] at hxC
+      rw [mem_honestTypeP2ASet]
+      refine ⟨hxD, ?_, (hh : G), ⟨hhσ, ?_⟩, ?_⟩
+      · -- `↑x ≠ 1`
+        simpa using hx1
+      · -- `↑hh ≠ 1`
+        simpa using hh1
+      · -- `↑x ∈ C_G(↑hh)` from `x ∈ C_S(hh)`
+        rw [Subgroup.mem_centralizer_iff]
+        rintro g rfl
+        have hcomm := hxC (hh : ↥hyp.S) rfl
+        have := congrArg (hyp.S.subtype) hcomm
+        simpa using this)
 
 /-! ### Prime-`TI` pins for the (13.18) `S`-side cross-relation (issue 9076 piece 4c-4)
 
