@@ -1276,6 +1276,178 @@ theorem relIndex_cuSubOf_U_eq_a {data : TypesIIIIIIVSetup M} {chief : ChiefFacto
   exact Nat.eq_of_mul_eq_mul_right Nat.card_pos
     (h1.trans (card_U_eq_a_mul_card_cuSubOf caseA j))
 
+/-! ### The realized two-summand centralizer `C_U(H_i) ∩ C_U(H_j)` inside `HU` and the (9.11.2)
+inertia identity `I(θ₀) = H·(C_U(H_i) ∩ C_U(H_j))`
+
+Lifts the chief-factor-level two-summand inertia (`caseA_inertia_iff_centralizes_two_summands`) to
+the `HU`-inertia subgroup of the inflated character `θ₀`.  Mirrors the a-owned
+`cuInHu`/`inertia_eq_hcuInHu_of_easy_le` chain for the single generator `S₀`, but the centralizer is
+the *pair* intersection `C_U(H_i) ⊓ C_U(H_j)` (realized as `cuSubOf i ⊓ cuSubOf j`), and the
+character-side uses the two-summand lemmas `caseA_hu_char_inertia_two_summands` (`⊆`) and
+`caseA_centralizes_two_summands_compHom_eq` (`⊇`). -/
+
+/-- **The realized two-summand centralizer `C_U(H_i) ∩ C_U(H_j)` inside `HU`**, as a subgroup of
+`↥(huSub data)` (mirrors `cuInHu` for the single generator `S₀`, but with the *pair* intersection
+`cuSubOf i ⊓ cuSubOf j` of the two single-factor centralizers). -/
+noncomputable def cuInHuPair {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (i j : Fin data.q) : Subgroup ↥(huSub data) :=
+  ((cuSubOf caseA i ⊓ cuSubOf caseA j).subgroupOf M).subgroupOf (huSub data)
+
+omit [Finite G] in
+/-- `C_U(H_i) ∩ C_U(H_j) ≤ U` realized inside `HU` (mirrors `cuInHu_le_uInHu`). -/
+theorem cuInHuPair_le_uInHu {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (i j : Fin data.q) : cuInHuPair caseA i j ≤ uInHu data :=
+  Subgroup.subgroupOf_mono _ (Subgroup.subgroupOf_mono _
+    (inf_le_left.trans (cuSubOf_le_U caseA i)))
+
+/-- **Realization bridge**: a `U`-element `a` whose realized `G`-image lies in `cuSubOf caseA k`
+acts trivially on the summand `H_k` (`a ∈ ker(aInvariantRestrictAut (Hpart_aInvariant k))`).  The
+reverse of the membership-building in `inertia_inf_uInHu_le_cuInHu`: `cuSubOf` is the double
+`subtype`-image of the kernel, and the double `subtype` is injective, so the extracted kernel
+witness equals `a`. -/
+theorem mem_ker_of_realized_mem_cuSubOf {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) (k : Fin data.q)
+    (a : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U)
+    (h : (((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype a : ↥(data.typeP.U ⊔ data.typeP.W1)) : G)
+        ∈ cuSubOf caseA k) :
+    a ∈ (aInvariantRestrictAut (caseA.Hpart_aInvariant k)).ker := by
+  simp only [cuSubOf, Subgroup.mem_map] at h
+  obtain ⟨w, ⟨b, hb_ker, hb_w⟩, hw⟩ := h
+  have hba : b = a := by
+    apply Subgroup.subtype_injective (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))
+    apply Subgroup.subtype_injective (data.typeP.U ⊔ data.typeP.W1)
+    rw [hb_w]; exact hw
+  rwa [hba] at hb_ker
+
+/-- **(9.11.2) `⊆` half at the `HU`-inertia level: `I(θ₀) ⊓ U ≤ C_U(H_i) ∩ C_U(H_j)`.**  For the
+inflation `θ₀` of a chief-factor character `θbar` regular on the two Clifford summands `H_i`, `H_j`,
+a realized `U`-element `g` in the `HU`-inertia of `θ₀` lies in the realized two-summand centralizer
+`cuInHuPair`.  Realizes `g` as an abstract `U`-element `a`, unwraps the `conjBy`-fixing to the
+`compHom (typeP_conjAction)` form (`conjBy_compHom_hInHuEquivH` + the injective inflation iso),
+feeds it to the two-summand char-inertia core `caseA_hu_char_inertia_two_summands` (giving
+`aInvariantRestrictAut … a = 1` on both summands), and builds the intersection membership from the
+two kernel witnesses.  Mirrors the single-factor `inertia_inf_uInHu_le_cuInHu`. -/
+theorem inertia_inf_uInHu_le_cuInHuPair {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) {i j : Fin data.q}
+    {θbar : IrreducibleCharacter (↥data.H ⧸ chief.N)}
+    (hregi : ∃ x ∈ caseA.Hpart i, (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+      ≠ (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1)
+    (hregj : ∃ x ∈ caseA.Hpart j, (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+      ≠ (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1) :
+    ClassFunction.inertia (G := ↥(huSub data)) (H := hInHu data)
+        (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ))) ⊓ uInHu data
+      ≤ cuInHuPair caseA i j := by
+  rintro g ⟨hgin, hgu⟩
+  have hgU : ((g : ↥M) : G) ∈ data.typeP.U := by
+    simp only [uInHu] at hgu; exact hgu
+  have hgUW1 : ((g : ↥M) : G) ∈ data.typeP.U ⊔ data.typeP.W1 := Subgroup.mem_sup_left hgU
+  set a : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U :=
+    ⟨⟨((g : ↥M) : G), hgUW1⟩, Subgroup.mem_subgroupOf.mpr hgU⟩ with ha_def
+  have hag : ((g : ↥M) : G)
+      = (((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype a : ↥(data.typeP.U ⊔ data.typeP.W1)) : G) := rfl
+  have hfix := ClassFunction.mem_inertia.mp hgin
+  rw [conjBy_compHom_hInHuEquivH data
+    ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U.subtype a)
+    g hag] at hfix
+  have hfix1 := ClassFunction.compHom_injective_of_surjective (hInHuEquivH data).surjective hfix
+  obtain ⟨hi, hj⟩ := caseA_hu_char_inertia_two_summands caseA hregi hregj a hfix1
+  have hkeri : a ∈ (aInvariantRestrictAut (caseA.Hpart_aInvariant i)).ker :=
+    MonoidHom.mem_ker.mpr hi
+  have hkerj : a ∈ (aInvariantRestrictAut (caseA.Hpart_aInvariant j)).ker :=
+    MonoidHom.mem_ker.mpr hj
+  simp only [cuInHuPair, Subgroup.mem_subgroupOf, Subgroup.mem_inf, cuSubOf, Subgroup.mem_map]
+  exact ⟨⟨_, ⟨a, hkeri, rfl⟩, rfl⟩, ⟨_, ⟨a, hkerj, rfl⟩, rfl⟩⟩
+
+/-- **(9.11.2) `⊇` half at the `HU`-inertia level: `C_U(H_i) ∩ C_U(H_j) ≤ I(θ₀)`.**  For the
+inflation `θ₀` of `θbar = linearIrreducibleCharacter χ` with `χ` a two-summand-supported
+linear character (trivial off `i`, `j`, `hsupp`), the realized two-summand centralizer
+`cuInHuPair` fixes `θ₀`.  A `cuInHuPair`-element `c` realizes an abstract `U`-element `a`
+centralizing both summands (`aInvariantRestrictAut … a = 1` on `i` and `j`, via
+`mem_ker_of_realized_mem_cuSubOf`), so `caseA_centralizes_two_summands_compHom_eq` gives
+`compHom (uActionHom a) θbar = θbar`; inflating (`conjBy_compHom_hInHuEquivH` +
+`compHom_typeP_conjAction_inflation`) then fixes `θ₀`.  Mirrors `cInHu_le_inertia`, replacing
+`quotientMulAutHom w = 1` with the two-summand char-fixing. -/
+theorem cuInHuPair_le_inertia {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) {i j : Fin data.q}
+    (χ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    (hsupp : ∀ k, k ≠ i → k ≠ j → ∀ x ∈ caseA.Hpart k, χ x = 1) :
+    cuInHuPair caseA i j ≤ ClassFunction.inertia (G := ↥(huSub data)) (H := hInHu data)
+        (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (linearIrreducibleCharacter χ : ClassFunction (↥data.H ⧸ chief.N) ℂ))) := by
+  intro c hc
+  rw [ClassFunction.mem_inertia]
+  have hcinf : ((c : ↥M) : G) ∈ cuSubOf caseA i ⊓ cuSubOf caseA j := by
+    simpa only [cuInHuPair, Subgroup.mem_subgroupOf] using hc
+  have hgU : ((c : ↥M) : G) ∈ data.typeP.U := cuSubOf_le_U caseA i hcinf.1
+  have hgUW1 : ((c : ↥M) : G) ∈ data.typeP.U ⊔ data.typeP.W1 := Subgroup.mem_sup_left hgU
+  set a : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U :=
+    ⟨⟨((c : ↥M) : G), hgUW1⟩, Subgroup.mem_subgroupOf.mpr hgU⟩ with ha_def
+  have hag : ((c : ↥M) : G)
+      = (((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype a : ↥(data.typeP.U ⊔ data.typeP.W1)) : G) := rfl
+  have hgi : aInvariantRestrictAut (caseA.Hpart_aInvariant i) a = 1 :=
+    MonoidHom.mem_ker.mp (mem_ker_of_realized_mem_cuSubOf caseA i a (hag ▸ hcinf.1))
+  have hgj : aInvariantRestrictAut (caseA.Hpart_aInvariant j) a = 1 :=
+    MonoidHom.mem_ker.mp (mem_ker_of_realized_mem_cuSubOf caseA j a (hag ▸ hcinf.2))
+  have hchar : ClassFunction.compHom (quotientMulAutHom chief.N_aInvariant
+        ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype a)).toMonoidHom
+        (linearIrreducibleCharacter χ : ClassFunction (↥data.H ⧸ chief.N) ℂ)
+      = (linearIrreducibleCharacter χ : ClassFunction (↥data.H ⧸ chief.N) ℂ) :=
+    caseA_centralizes_two_summands_compHom_eq caseA χ hsupp a hgi hgj
+  rw [conjBy_compHom_hInHuEquivH data
+      ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U.subtype a)
+      c hag, compHom_typeP_conjAction_inflation, hchar]
+
+/-- **(9.11.2) the `HU`-inertia identity `I(θ₀) = H·(C_U(H_i) ∩ C_U(H_j))`.**  Combining the two
+containments (`inertia_inf_uInHu_le_cuInHuPair` for `⊆`, `cuInHuPair_le_inertia` for `⊇`) with
+`H ≤ I(θ₀)` (`subgroup_le_inertia`) identifies the `HU`-inertia of the inflated two-summand
+character `θ₀` as `hInHu ⊔ cuInHuPair`.  This is the realized `HU`-level lift of Peterfalvi
+(9.11.2)'s inertia `I(θ₀) = H·(U₁ ∩ U₁ʷ)`; its index in `HU` is `[U : U₁ ∩ U₁ʷ]` (the
+two-summand inertia index).  Mirrors `inertia_eq_hcInHu_of_inf_le` /
+`inertia_eq_hcuInHu_of_easy_le`. -/
+theorem caseA_inertia_eq_hcuInHuPair {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) {i j : Fin data.q}
+    (χ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    (hsupp : ∀ k, k ≠ i → k ≠ j → ∀ x ∈ caseA.Hpart k, χ x = 1)
+    (hregi : ∃ x ∈ caseA.Hpart i,
+      (linearIrreducibleCharacter χ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+        ≠ (linearIrreducibleCharacter χ : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1)
+    (hregj : ∃ x ∈ caseA.Hpart j,
+      (linearIrreducibleCharacter χ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+        ≠ (linearIrreducibleCharacter χ : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1) :
+    ClassFunction.inertia (G := ↥(huSub data)) (H := hInHu data)
+        (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (linearIrreducibleCharacter χ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+      = hInHu data ⊔ cuInHuPair caseA i j := by
+  set θ₀ := ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+    (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+      (linearIrreducibleCharacter χ : ClassFunction (↥data.H ⧸ chief.N) ℂ)) with hθ₀
+  apply le_antisymm
+  · intro g hg
+    have hgtop : g ∈ hInHu data ⊔ uInHu data :=
+      hInHu_sup_uInHu_eq_top data ▸ Subgroup.mem_top g
+    rw [Subgroup.mem_sup_of_normal_left] at hgtop
+    obtain ⟨h, hh, u, hu, rfl⟩ := hgtop
+    have hh_in : h ∈ ClassFunction.inertia (H := hInHu data) θ₀ :=
+      ClassFunction.subgroup_le_inertia θ₀ hh
+    have hu_in : u ∈ ClassFunction.inertia (H := hInHu data) θ₀ := by
+      have hmem : h⁻¹ * (h * u) ∈ ClassFunction.inertia (H := hInHu data) θ₀ :=
+        mul_mem (inv_mem hh_in) hg
+      rwa [inv_mul_cancel_left] at hmem
+    exact mul_mem (Subgroup.mem_sup_left hh)
+      (Subgroup.mem_sup_right (inertia_inf_uInHu_le_cuInHuPair caseA hregi hregj ⟨hu_in, hu⟩))
+  · rw [sup_le_iff]
+    exact ⟨ClassFunction.subgroup_le_inertia θ₀, cuInHuPair_le_inertia caseA χ hsupp⟩
+
 end NineElevenTwoInertia
 
 /-- **`[U : K₁ ⊓ K₂] ≤ [U:K₁]·[U:K₂]`** (relative-index form of `Subgroup.index_inf_le`): the
