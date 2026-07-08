@@ -76,7 +76,19 @@ trichotomy** (constant-row/column 除外) は欠く → 4a/4b がそれを埋め
   `S16_GridExpansion.eta_diff_rigidity`。4a を cite し、既存 `eta_orthonormal`/`eta_mem_ZIrr`/
   `inner_eta_grid_relation` から η-grid data + (3.7) separability を供給。行 i₀=0 形で (13.18) の
   `τ_S(μ_{0j}−μ_{01}) = η_{0j}−η_{01}` の rigidity 部品を提供。(4.8)/(10.5)/(10.10)/(11.8) でも再利用可。
-- [ ] **4c. (13.18) A0-Dade 化 + cross-relation 本体** — ⚠ **correctness fix (残 blocker)**:
+- [~] **4c. (13.18) A0-Dade 化 + cross-relation 本体** — **'A0-Dade infra 完成 (2026-07-08)**、残 = rewire + prime-TI:
+  - [x] **4c-1** `honestTypeP2A0Set` 定義 + set-facts (commit 144df308, sorry-free)。
+  - [x] **4c-2a** V-part Dade obligation 部品 (commit 6c20b771, sorry-free): V^S は escape せず →
+    escaping は A-part へ帰着。
+  - [x] **4c-2b** `dadeSupportHypothesisData_honestTypeP2A0Set` (commit 79dd67c1): σ-decomposition
+    engine で 7 obligation 中 6 discharge。**deep pin 1 本に isolate** = `not_isConj_honestTypeP2ASet_typePV`
+    (A(S)∈S' element が V^S∉S' element と G-共役でない; TRUE by normedTI 'A0 だが循環 → type-P2
+    FT-support geometry (Coq FTsupp0/BG§16 ThmII) 直接証明を要する; W₂⊆M_σ ゆえ elementary route 不成立)。
+  - [x] **4c-2c** `Hypothesis.dadeHypS0`/`dadeHypS0_hconj` (commit 79dd67c1 隣): S-instance 'A0-Dade bridge。
+  - [ ] **4c-3** tauSbetaGrid/GammaGrid/tauS_mu_row0_cross を dadeHypS0 に rewire + tauS_mu_row0_cross 本体を
+    `eta_diff_rigidity` (4b) で分解。要: μ差 ∈ 'A0(S) (Coq prDade_sub_TIirr_on) / τ_S=Ind on 'A0 (H=⊥,
+    normedTI) / μ V-value=ω V-value (Coq prTIirr_id, **prime-TI theory — 9014/lane-a と要調整の可能性**)。
+  - **旧記述 (参考)** ⚠ **correctness fix**:
   現 `tauS_mu_row0_cross` (S15_SAndT.lean:4008, sorry) は **'A(S)-Dade** (`hyp.dadeHypS` =
   `honestTypeP2ASet` = `centralizerSupport(sharp(Msigma S), derivedInG S)` ⊆ S') で組まれているが、
   μ差 `μ_{0j}−μ_{01}` の support は P^#∪V_S で **V_S (⊄ S'、W₂-成分≠1) は 'A(S) に入らない** →
