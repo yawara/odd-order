@@ -96,8 +96,29 @@ Cites (10.7)'s *conclusion* (existing sorried theorem), NOT the Dade base ⟹ no
 (S12:503) = the `∃u≥7` witness (`|U|≥7` via `typeP_uW1_frobenius` + `card_kernel_modEq_one` + odd-forcing
 `two_mul_add_one_le_of_odd_dvd` + `w2_prime`), partner TypeIIData exposed for `hS`/`hB`.
 
-**Next lane-a steps (estimate build, multi-iteration)**: (1) `hS` = |S|=|S_F|·|U|·w₂ (partner complement cards,
-`M_complement`/`derived_complement` + card_mul); (2) de-scaffold the estimate via the chain, isolating `hA`
-(thread (7.8.b) through `coh`) and `hB` (TI-counting) as named sorried sub-lemmas; (3) `hA` assembly (line-83
-proven + (7.8.b) exists); (4) `hB` TI-counting (genuine §8/§9, cites (10.7)). ⚠ g1g needs the M-famG0 ↔
-partner-G₁ identification — locate/build before final wiring.
+### 2026-07-08 update² — both partner inputs LANDED + hA REDUCED to a single (7.8.b) gate
+
+**LANDED (2 commits, sorry-free, axiom-clean)**: `exists_typeII_partner_card_U_ge_seven` (S12:503, `|U|≥7`,
+a4217ba2) + `typePData_card_eq_H_mul_U_mul_W1` (S12, `|M|=|H|·|U|·|W₁|`, a9a6471c). ⟹ the chain's `hS`
+(|S|=|H|·|U|·w₂, via card lemma + |W₁(S)|=w₂) and `∃u≥7` inputs are both established.
+
+**★ hA REDUCED to ONE gate.** The estimate `hA` = `1 − g1g − 1/w₁ < w₁/|M'|` needs only the **(7.8.b) lower
+bound** `chiRhoNormSq(ζ^{τ₁}) 0 ≥ 1 − w₁/|M'|`; everything else is PROVEN:
+- line-83 upper bound `chiRhoNormSq ≤ |A(M)|/|M| + g1g` = `Hypothesis.chiRhoNormSq_zeta_le_line83` (S12:390);
+- strict `|A(M)|/|M| < 1/w₁` = `Hypothesis.card_typePA_div_card_lt_inv_w1` (S12:265);
+- norm-one `‖ζ^{τ₁}‖²=1` = `inner_tau1_zeta_self_eq_one`.
+Combine: `1−w₁/|M'| ≤ chiRhoNormSq ≤ |A(M)|/|M|+g1g`, rearrange + strict ⟹ hA (a `linarith`).
+**g1g is concrete M-side** = `(|famG0| − |{g∉dadeSupport ∧ coprime w₁}|)/|G|` (the line-83 middle term,
+`famG0 = (hyp.toFamilyHypothesis71).G0`) — no M↔partner identification needed for hA; `hB` bounds this same g1g.
+⚠ line-83 is ℝ-valued, chain is ℚ — g1g:ℚ from ℕ cards + cast bridge.
+
+**(7.8.b) bridge machinery**: `exists_chiRhoNormSq_ge` (S09_FrobeniusEstimate:415),
+`chiRhoNormSq_ge_ratio_of_inner_beta_ne_zero` (S09_FrobeniusEstimate:51); S16 has the analogous M-side bridge
+`MHypothesis.chiRhoNormSq_eq_zetaNuRhoNormSq` (S16:4755) + `chiRhoNormSq_psi_le_line83` (S16:4690) as the
+pattern (couples chiRhoNormSq to the (7.8.b) `zetaNuRhoNormSqGeOfDade` S09:2406). Build the lane-a Hypothesis-M
+analogue: `chiRhoNormSq(ζ^{τ₁}) ≥ 1 − w₁/|M'|` for the coherent ζ.
+
+**Next lane-a steps**: (A) build the M-side (7.8.b) bridge `chiRhoNormSq(ζ^{τ₁}) 0 ≥ 1 − w₁/|M'|` (couple to
+`zetaNuRhoNormSqGeOfDade` via the S16 `chiRhoNormSq_eq_zetaNuRhoNormSq` pattern); (B) then hA = pure arithmetic
+(line-83 + strict, proven); (C) de-scaffold the estimate: chain + hS(done) + hA + hB, isolating **hB
+(TI-counting `G₁⊆(H#)^G∪V^G`, cites (10.7))** as the last genuine gate; (D) build hB (§8/§9 orbit counting).

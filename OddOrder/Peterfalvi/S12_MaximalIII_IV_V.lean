@@ -538,6 +538,27 @@ theorem Hypothesis.exists_typeII_partner_card_U_ge_seven [Finite G]
     obtain ⟨k, hk⟩ := hw2odd; omega
   omega
 
+/-- **Type-`P` order factorization** `|M| = |M_F|·|U|·|W₁|`.  The type-`P` decomposition is a double
+semidirect product `M = (H ⋊ U) ⋊ W₁`: `W₁` complements the derived subgroup `M' = [M,M]` in `M`
+(`M_complement`, `|M| = |M'|·|W₁|`), and `U` complements the Fitting kernel `H = M_F` in `M'`
+(`derived_complement`, `|M'| = |H|·|U|`).  For the Type-II partner `S` with `|W₁(S)| = w₂` this is
+the `|S| = |S_F|·|U|·w₂` input (`hS`) to Peterfalvi (10.8)'s coherence estimate. -/
+theorem typePData_card_eq_H_mul_U_mul_W1 [Finite G] {M : Subgroup G} (data : TypePData M) :
+    Nat.card ↥M = Nat.card ↥data.H * Nat.card ↥data.U * Nat.card ↥data.W1 := by
+  have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  -- `|M'|·|W₁| = |M|` (the `M = M' ⋊ W₁` complement).
+  have h1 : Nat.card ↥(derivedInG M) * Nat.card ↥data.W1 = Nat.card ↥M := by
+    rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'le).toEquiv,
+      ← Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.W1_le).toEquiv]
+    exact data.M_complement.card_mul
+  -- `|H|·|U| = |M'|` (the `M' = H ⋊ U` complement).
+  have h2 : Nat.card ↥data.H * Nat.card ↥data.U = Nat.card ↥(derivedInG M) := by
+    rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.H_le).toEquiv,
+      ← Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.U_le).toEquiv]
+    exact data.derived_complement.card_mul
+  calc Nat.card ↥M = Nat.card ↥(derivedInG M) * Nat.card ↥data.W1 := h1.symm
+    _ = Nat.card ↥data.H * Nat.card ↥data.U * Nat.card ↥data.W1 := by rw [← h2]
+
 open scoped FiniteInduce in
 /-- **Peterfalvi (10.8), norm-counting estimate** (the §7 analytic heart, the `hbound` input to
 `typeII_noncoherence_arithmetic`).
