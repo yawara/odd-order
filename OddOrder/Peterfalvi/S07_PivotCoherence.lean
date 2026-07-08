@@ -770,22 +770,74 @@ section UniformDegreeCoherence
 variable [Fintype L] [Fintype G]
 variable [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
 
-/-- **Peterfalvi (5.7): norm-general uniform-degree coherence** (Coq `uniform_degree_coherence`,
-`PFsection5.v:1234`).
+/-- **Peterfalvi (5.7): norm-general uniform-degree coherence, raw-family form** (Coq
+`uniform_degree_coherence`, `PFsection5.v:1234`).
 
-Given a subcoherent `S07.Hypothesis` on a finite family `S` whose members share a common nonzero
-degree, `S` is coherent — with **no norm-1 restriction**.  Unlike `coherent_of_constant_degree`
-(which requires every member irreducible, `⟨ζ, ζ⟩ = 1`), the pivot route accepts members of any
-genuine-character norm: the distinguished pivot `η₁` needs only a natural-number self-norm
-(`hN`, the "`⟨χ₁⟩ ∈ Num.nat`" of Coq's clause (a), which the `S07.Hypothesis` transcription omits),
-and the partner `ζ₁` is built by `exists_pivotPartner` from the per-member `R`-data.
+Given a finite pairwise-orthogonal, conjugate-closed, no-real family `S` with per-member
+**general orthonormal `R`-families** `R(η)` (any length — `2` for irreducibles, `2q` for the
+reducible certain-type columns `μ_j` of norm `q`), their (5.2.e) cross-orthogonality, the
+`A`-supported lattice isometry, and a common nonzero degree, `S` is coherent — with **no norm-1
+restriction**.
+
+Unlike `coherent_of_constant_degree` (which requires every member irreducible via a 2-element
+`CharacterDifferenceImage`, forcing `⟨ζ, ζ⟩ = 1`), this takes the raw per-member
+`OrthonormalCharacterImageFamily`, so it accepts members of any genuine-character norm.  The pivot
+`η₁` needs only a natural-number self-norm (`hN`, the "`⟨χ₁⟩ ∈ Num.nat`" of Coq's subcoherent
+clause (a)); the partner `ζ₁` is built by `exists_pivotPartner`.
 
 The nonzero-norm requirement of every member (needed for the pivot coefficient functional) is
-*derived* from `no_real_characters`: `0` is real, so `0 ∉ S`, whence every member is nonzero and has
-strictly positive self-norm.
+*derived* from `hnr`: `a ≠ ā` forces `a ≠ 0` (since `0̄ = 0`), whence `⟨a, a⟩ ≠ 0`.
 
-This is the (9.11) Galois/caseB engine: applied to the whole `𝒮(H₀C′)` — reducible `μ`-columns of
-norm `q` included — it discharges coherence in one shot, with no auxiliary `2 < |cut|` count. -/
+This is the (9.11) Galois/caseB engine: applied to the whole `𝒮(H₀C′)` — reducible `μ`-columns
+included — it discharges coherence in one shot, with no auxiliary `2 < |cut|` count. -/
+theorem uniform_degree_coherence_of_families
+    {τ : IntegralCharacterMap L G} {S : Set (ClassFunction L ℂ)} {A : Set L}
+    (hSfin : S.Finite)
+    {η₁ : ClassFunction L ℂ} (hη₁ : η₁ ∈ S)
+    (R : ∀ η ∈ S, OrthonormalCharacterImageFamily (L := L) (G := G) τ η)
+    (horth : ∀ a ∈ S, ∀ b ∈ S, a ≠ b → ClassFunction.inner a b = 0)
+    (hconj : ∀ a ∈ S, a.conj ∈ S)
+    (hnr : ∀ a ∈ S, a ≠ a.conj)
+    (hN : ∃ n : ℕ, ClassFunction.inner η₁ η₁ = (n : ℂ))
+    (hiso : ∀ ⦃φ ψ : ClassFunction L ℂ⦄, φ ∈ zSupportedSpan (L := L) S A →
+      ψ ∈ zSupportedSpan (L := L) S A →
+      ClassFunction.inner (τ φ) (τ ψ) = ClassFunction.inner φ ψ)
+    (hZdiff : ∀ a ∈ S, ∀ b ∈ S, τ (a - b) ∈ ZIrr G)
+    (hsuppdiff : ∀ a ∈ S, ∀ b ∈ S, ((a - b : ClassFunction L ℂ)).support ⊆ A)
+    (hRorth : ∀ ⦃φ ξ : ClassFunction L ℂ⦄ (hφ : φ ∈ S) (hξ : ξ ∈ S),
+      ClassFunction.inner φ ξ = 0 → ClassFunction.inner φ ξ.conj = 0 →
+      (R φ hφ).Orthogonal (R ξ hξ))
+    (hdeg : ∀ a ∈ S,
+      ((a : ClassFunction L ℂ) : L → ℂ) 1 = ((η₁ : ClassFunction L ℂ) : L → ℂ) 1)
+    (hdeg0 : ((η₁ : ClassFunction L ℂ) : L → ℂ) 1 ≠ 0)
+    (h1A : (1 : L) ∉ A)
+    {η₂ : ClassFunction L ℂ} (hη₂ : η₂ ∈ S) (hη₂ne : η₂ ≠ η₁) :
+    Nonempty (IsCoherent τ S A) := by
+  classical
+  -- nonzero self-norm of every member: `a ≠ ā` forces `a ≠ 0`
+  have hnormNe : ∀ a ∈ S, ClassFunction.inner a a ≠ 0 := by
+    intro a ha hz
+    have ha0 : a ≠ 0 := fun h => hnr a ha (by rw [h, ClassFunction.conj_zero])
+    have hare : (ClassFunction.inner a a).re = 0 := by rw [hz, Complex.zero_re]
+    exact ha0 (eq_zero_of_inner_self_re_eq_zero hare)
+  -- build the pivot partner `ζ₁` for `η₁`
+  obtain ⟨ζ₁, hζZ, hnorm, hpivot⟩ :=
+    exists_pivotPartner (τ := τ) (A := A) hη₁ R horth hconj hnr hN hiso hZdiff hsuppdiff hRorth
+  -- fire the pivot coherence engine
+  exact ⟨pivotCoherence hSfin hη₁ hζZ horth hnormNe hnorm hpivot
+    (fun φ ψ hφ hψ => hiso hφ hψ) hZdiff hdeg hdeg0 h1A hsuppdiff hη₂ hη₂ne⟩
+
+/-- **Peterfalvi (5.7) for an all-irreducible subcoherent family** (`S07.Hypothesis` form).
+
+A convenience wrapper of `uniform_degree_coherence_of_families` for the case where every member's
+`R`-datum is the 2-element `CharacterDifferenceImage` carried by an `S07.Hypothesis` (which forces
+`⟨η, η⟩ = 1`, so `hN` is `⟨1⟩`).  The per-member families are `difference_image.toOrthonormalImage`
+and the (5.2.e) cross-orthogonality is `toOrthonormalImage_orthogonal` after
+`difference_images_orthogonal`.
+
+For the genuinely norm-general families (reducible `μ`-columns, whose `R`-datum is *not* a 2-element
+`CharacterDifferenceImage`), the caseB assembly calls `uniform_degree_coherence_of_families`
+directly with the `S06.certainTypeR` / Dade `R`-data. -/
 theorem uniform_degree_coherence_of_subcoherent
     (hyp : Hypothesis (L := L) (G := G) S A)
     (hSfin : S.Finite)
@@ -798,39 +850,20 @@ theorem uniform_degree_coherence_of_subcoherent
     (h1A : (1 : L) ∉ A)
     (hsuppdiff : ∀ a ∈ S, ∀ b ∈ S, ((a - b : ClassFunction L ℂ)).support ⊆ A)
     {η₂ : ClassFunction L ℂ} (hη₂ : η₂ ∈ S) (hη₂ne : η₂ ≠ η₁) :
-    Nonempty (IsCoherent hyp.tau S A) := by
-  classical
-  -- nonzero self-norm of every member: `0` is real, so `0 ∉ S`
-  have hnormNe : ∀ a ∈ S, ClassFunction.inner a a ≠ 0 := by
-    intro a ha hz
-    have hare : (ClassFunction.inner a a).re = 0 := by rw [hz, Complex.zero_re]
-    exact hyp.no_real_characters ha
-      ((eq_zero_of_inner_self_re_eq_zero hare) ▸ ClassFunction.isReal_zero)
-  -- pairwise orthogonality in applied form
-  have horth : ∀ a ∈ S, ∀ b ∈ S, a ≠ b → ClassFunction.inner a b = 0 :=
-    fun a ha b hb hab => hyp.pairwise_orthogonal ha hb hab
-  -- the per-member orthonormal `R`-families and their (5.2.e) cross-orthogonality
-  have hRorth : ∀ ⦃φ ξ : ClassFunction L ℂ⦄ (hφ : φ ∈ S) (hξ : ξ ∈ S),
-      ClassFunction.inner φ ξ = 0 → ClassFunction.inner φ ξ.conj = 0 →
-      ((hyp.difference_image hφ).toOrthonormalImage).Orthogonal
-        ((hyp.difference_image hξ).toOrthonormalImage) :=
-    fun {φ ξ} hφ hξ h1 h2 =>
+    Nonempty (IsCoherent hyp.tau S A) :=
+  uniform_degree_coherence_of_families hSfin hη₁
+    (fun _ hη => (hyp.difference_image hη).toOrthonormalImage)
+    (fun _ ha _ hb hab => hyp.pairwise_orthogonal ha hb hab)
+    (fun _ ha => hyp.conjugate_mem ha)
+    (fun _ ha => hyp.ne_conj ha)
+    hN
+    hyp.tau_isometry_diff
+    hZdiff hsuppdiff
+    (fun {_φ _ξ} hφ hξ h1 h2 =>
       CharacterDifferenceImage.toOrthonormalImage_orthogonal
         (hyp.difference_image hφ) (hyp.difference_image hξ)
-        (hyp.difference_images_orthogonal hφ hξ h1 h2)
-  -- build the pivot partner `ζ₁` for `η₁`
-  obtain ⟨ζ₁, hζZ, hnorm, hpivot⟩ :=
-    exists_pivotPartner (τ := hyp.tau) (A := A) hη₁
-      (fun η hη => (hyp.difference_image hη).toOrthonormalImage)
-      horth
-      (fun a ha => hyp.conjugate_mem ha)
-      (fun a ha => hyp.ne_conj ha)
-      hN
-      hyp.tau_isometry_diff
-      hZdiff hsuppdiff hRorth
-  -- fire the pivot coherence engine
-  exact ⟨pivotCoherence hSfin hη₁ hζZ horth hnormNe hnorm hpivot
-    (fun φ ψ hφ hψ => hyp.tau_isometry_diff hφ hψ) hZdiff hdeg hdeg0 h1A hsuppdiff hη₂ hη₂ne⟩
+        (hyp.difference_images_orthogonal hφ hξ h1 h2))
+    hdeg hdeg0 h1A hη₂ hη₂ne
 
 end UniformDegreeCoherence
 
