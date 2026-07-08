@@ -698,4 +698,22 @@ theorem inf_sup_eq_of_le_normalizer_of_inf_eq_bot
     rw [hxeq, ha_one, mul_one]; exact hw
   · exact le_inf le_sup_left hW_le
 
+/-- **A subgroup coprime to the index of a normal subgroup lies inside it.**  If `H ⊴ G` and the
+order of `S ≤ G` is coprime to `[G : H]`, then `S ≤ H`.  (Applied to a normal Hall `H`: any
+subgroup of order coprime to `[G : H]` — e.g. any `π(H)`-subgroup — is contained in `H`.)
+
+The image `S ↦ SH/H ≤ G/H` has order dividing both `|S|` and `[G : H] = |G/H|`, hence trivial by
+coprimality, so `S ≤ ker(G → G/H) = H`. -/
+theorem le_of_coprime_card_index_of_normal {G : Type*} [Group G] [Finite G]
+    {H S : Subgroup G} [H.Normal] (hcop : Nat.Coprime (Nat.card S) H.index) :
+    S ≤ H := by
+  have h1 : Nat.card (S.map (QuotientGroup.mk' H)) ∣ Nat.card S :=
+    S.card_map_dvd (QuotientGroup.mk' H)
+  have h2 : Nat.card (S.map (QuotientGroup.mk' H)) ∣ H.index := by
+    rw [Subgroup.index_eq_card]
+    exact Subgroup.card_subgroup_dvd_card _
+  have hbot : S.map (QuotientGroup.mk' H) = ⊥ :=
+    Subgroup.card_eq_one.mp (Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd h1 h2))
+  rwa [Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk'] at hbot
+
 end Subgroup
