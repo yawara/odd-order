@@ -34,6 +34,15 @@
 
 > **⚰ 2026-07-07 — lane d (codex) 退役 (ユーザー裁定)**: 徹底調査で **FT frontier (Peterfalvi 72 + BG 15 実 sorry) に codex 単独で閉じられる genuine・on-path・非衝突・非gated な実 sorry は存在しない**と確定 (Peterfalvi=全て gated/深いchar/a-b-c衝突/偽/off-path; BG 非b分=AppD/AppE 全て consumer 0・unimported の off-path scaffold)。構造的理由: FT 残 frontier は深く密結合な char/local-analysis で「切り出せる mechanical leaf」がほぼ無く、codex に軽タスクを与えると dup relocation の churn に流れる (直近 2 tick = 計 14 補題が全て既存 S01 補題の複製、net-genuine 0)。⟹ 3 レーン (a/b/c) に集約。worktree `/home/ywr/odd-order-d` + branch `d` 削除 (churn は net-zero、reflog 復元可)。**♻ 再活性化トリガー (将来)**: (i) proven S-side の **T-side dual** (`V_inf_centralizer_Q_eq_bot` 等) の gate ((14.9) T-typeII 構造) が a/b で landing → codex が template を mirror; (ii) a/b/c が特定 group-theory helper を明示 pull-request。いずれか発生時に `git worktree add /home/ywr/odd-order-d -b d` で再作成 (issue base 4000)。**⚠ ユーザーは codex の /loop セッションを停止すること** (worktree 消失後は codex が git エラーで空転)。
 
+> **⏸ SUPERSEDED→temporary-hold (2026-07-09, issue 9077 HUB RULING #2)**: 下記 (B) の 9078 は **完遂**
+> (`SemilinearFieldModel.lean` leaf + T-side `tFieldModelData_of_repr` producer、全 sorry-free、`t_side_frobenius_kernel`
+> 構造 discharge)。c は独立 frontier 再枯渇を surface → hub が **3-probe workflow (wf_52474eb0、high-conf)** で裁定 =
+> **(A-mod) temporary-hold**。全 probe が「c-buildable ungated non-dup target 無し」を確認: 残 gate (V_inf/13.15 =
+> b の active (13.4) `lambda_forces_T_caseB` / t_side field-data = a の active 9000 char body) は全て他レーンの
+> **ACTIVE work で降りると policy-8 dup** (9013 案 B は却下済)、GroupTheory/Mathlib shared-infra は real sorry 0。
+> c は全 non-dup slice を sorried-cite endpoint 化済 ⟹ **gated-endpoint pattern で self-resume 待機** (lazy idle でない、
+> 2026-07-06 DORMANT とは別)。**hub フォロー: a の 9000 / b の (13.4) landing 監視 → landing tick で 9077 に「c 再 engage 可」flag**。詳細 = 9077 RULING #2。
+>
 > **♻♻ RE-CONFIRMED (2026-07-08, issue 9077 HUB RULING (B))**: lane c が「S16 全 13 sorry は a/b gated、
 > 独立 frontier 枯渇」を全数検証で surface (ユーザー「ハブに聞くべき」)。hub が subagent 調査+自己検証で裁定 =
 > **c は DORMANT でなく `SemilinearFieldModel.lean` shared leaf + T-side `TFieldModelData` producer を build**
