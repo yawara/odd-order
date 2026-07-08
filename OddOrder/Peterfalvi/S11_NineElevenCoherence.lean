@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.S11_MaximalII_III_IV
 import OddOrder.Peterfalvi.S07_Subcoherent
 import OddOrder.Peterfalvi.S08_CoherenceWeighted
+import OddOrder.GroupTheory.RepresentationTheory.NonInflatedDegreeSqInterval
 
 /-!
 # Peterfalvi (9.11): coherence of `𝒮(H₀C′)` — the maximality induction
@@ -993,5 +994,57 @@ theorem nineElevenFive_refutation {q a u S4 N : ℕ} (hq : 3 ≤ q) (ha : 1 ≤ 
   nlinarith [key1, key2, ha, hu, sq_nonneg a, Nat.zero_le q']
 
 end FiveArithmetic
+
+/-! ### (9.11.3) preamble: the `𝒳(H₀C)` character sum-of-squares
+
+Book (9.11.3): the class equation `p^q·u = |Ū| + ∑_{χ ∈ 𝒳(H₀C)} χ(1)²` on the quotient `HŪ/(H₀C)`.
+Its character-theoretic core — the sum `∑_{χ ∈ 𝒳(H₀C)} χ(1)²` — is the kernel-interval
+degree-square sum (`sumDegreeSq_kernelInterval`, `NonInflatedDegreeSqInterval.lean`) at `N = H₀C`,
+`K = H`: `𝒳(H₀C)` is exactly `{χ ∈ Irr(HU) | H₀C ⊆ ker χ, H ⊄ ker χ}` (the `xiOf` conditions), so
+the sum equals `|HU/(H₀C)| − |HU/(H ⊔ H₀C)| = |HU/(H₀C)| − |HU/HC|`.  The second term
+`|HU/HC| = [HU:HC] = u` is resolved here (`index_hcInHu`); the first term `|HU/(H₀C)| = p^q·u` is
+the remaining index arithmetic (`|H|/|H₀| = p^q` × `[U:C] = u`), threaded by the (9.11.3)
+`nineElevenThree_count`'s `hclass`. -/
+
+section CharacterSumOfSquares
+
+variable [Finite G] {M : Subgroup G}
+
+open scoped Classical in
+/-- **Peterfalvi (9.11.3), the `𝒳(H₀C)` character sum-of-squares (with `|HU/HC| = u` resolved).**
+
+The kernel-interval degree-square sum (`sumDegreeSq_kernelInterval`) instantiated at the realized
+`N = H₀C`, `K = H` inside `HU`: over `𝒳(H₀C) = {χ ∈ Irr(HU) | H₀C ⊆ ker, H ⊄ ker}`,
+`∑ χ(1)² = |HU/(H₀C)| − |HU/(H ⊔ H₀C)|`, and `H ⊔ H₀C = HC` (`hInHu_sup_realizedH0supC`) with
+`|HU/HC| = [HU:HC] = u` (`index_hcInHu`).  The remaining `|HU/(H₀C)| = p^q·u` is the (9.11.3) class
+equation's quotient order, supplied to `nineElevenThree_count`'s `hclass`. -/
+theorem sum_xiOf_H0C_degreeSq (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data)
+    (chars : Section11CharacterData data chief) :
+    ∑ χ ∈ Finset.univ.filter (fun χ : IrreducibleCharacter ↥(huSub data) =>
+        (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data) :
+            Set ↥(huSub data)) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction ↥(huSub data) ℂ) ∧
+        ¬ ((hInHu data : Set ↥(huSub data)) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction ↥(huSub data) ℂ))),
+        ((χ : ClassFunction ↥(huSub data) ℂ) 1) ^ 2
+      = (Nat.card (↥(huSub data) ⧸
+          ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) : ℂ)
+        - (chars.u : ℂ) := by
+  haveI : (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal :=
+    (chiefFactor_H0supC_subgroupOf_normal chief).subgroupOf (huSub data)
+  haveI : (hInHu data).Normal := hInHu_normal data
+  rw [OddOrder.RepresentationTheory.sumDegreeSq_kernelInterval
+    (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) (hInHu data)]
+  congr 1
+  -- `|HU/(H ⊔ H₀C)| = |HU/HC| = [HU:HC] = u`.
+  have hHC : hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)
+      = hInHu data ⊔ cInHu data chief := hInHu_sup_realizedH0supC chief
+  rw [hHC]
+  have hu : (hInHu data ⊔ cInHu data chief).index = chars.u :=
+    (index_hcInHu_eq_relindex_cInHu data chief).trans
+      (index_cInHu_subgroupOf_uInHu_eq_u data chief chars)
+  exact_mod_cast hu
+
+end CharacterSumOfSquares
 
 end OddOrder.Peterfalvi.S11
