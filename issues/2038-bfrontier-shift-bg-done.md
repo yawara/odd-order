@@ -166,3 +166,19 @@ escapingCentralizers_control (lane-a) の citable upstream として残る。
   (3) b を別クラスタへ reallocate。lane-b は再評価トリガー (ungated on-path work ゼロ) に**近い**が、本 session で
   genuine 2 lemma landed ゆえ churn drift ではない。次 /loop iteration は (2) を Coq-assisted で begin する
   (deep frontier を engage; policy「難所を回避しない」)、hub が別途 (1)/(3) を裁定可。
+
+## ✅ (2026-07-08 続⁵、lane-b /loop) — 訂正: b frontier は**枯渇していない** — intersection_le_kernel が assemblable
+
+前 (続⁴) の「b clean frontier 枯渇 → hub reallocate 検討」は**部分的に誤り** (再: [[verify-port-state-by-number-not-coq-name]])。
+comprehensive survey で **`intersection_le_kernel` (S14:5245、Pf 12.11 第2主張、b-owned、on-path 12.11→12.17) が
+genuinely ASSEMBLABLE** と判明 — docstring「Genuinely still-missing」は **STALE**。全 prereq 実在:
+- (12.10) `witness_L_frobenius` = **PROVEN** (docstring は「pinned」と誤記)
+- (8.1.b) = `TypeFData.{centralizer_le_U1, U1_commutative, U1_normal}` (field!)
+- (8.1.c) = `TypeFData.{exponent_eq, frobenius_HU0}` (field)
+- (9.1) Wielandt = `GroupTheory/CoprimeFixedPoints`+`WielandtFixedPoint` (実在)
+- (12.9) = `RankTwoWitnessData.CKx_not_le_Kprime`
+
+深い multi-step proof (A≤M∩L の p'-part 自明性: P₀=O_p(H)∩M / P₀A Frobenius / Wielandt C_K(A)≠1 /
+(8.1.b) abelian ⟹ A centralizes x ⟹ A=1) だが gated でない。**次 /loop iteration で build** (issue 4/task)。
+∴ **hub は b を reallocate しない** — b に genuine ungated on-path deep work あり。同種の rank-two witness cluster
+(S14: sharpImage/centralizer_le/witness_psi_degree/witness_value_norm_package 等) も stale-docstring 疑い、要精査。
