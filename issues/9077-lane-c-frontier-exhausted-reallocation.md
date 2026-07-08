@@ -66,9 +66,49 @@ C の cluster は a/b に完全 gated、ungated upstream は a/d claim 済。こ
 
 hub が (A)-(D) を裁定し merge_monitor + 本 issue に記録。(B) 採択時は 9000 dedup ruling 込み。
 
+## ✅ HUB RULING (2026-07-08 合流 tick、自律裁定 🧭 + subagent 調査) — (B) c は field-model leaf を build (DORMANT でない)
+
+**裁定: 選択肢 (B)。lane c は DORMANT にせず、σ-theory semilinear field-model package
+(`SemilinearFieldModel.lean` shared leaf + T-side `TFieldModelData` producer) を build する。
+これは新規判断でなく、hub が 2026-07-07 に既に carve-out 済の作業の再確認** (issue [9000] scope note
+item 2 / closed [0098] item 2 = 未着手)。着手 claim = [9078](9078-semilinear-fieldmodel-leaf.md) 起票済。
+
+**調査 (hub subagent + 自己検証、code-level)**:
+- **field model は genuine 未構築 gap**: 構造体 `FieldNormalizerData`(S16Core:620)/`TFieldModelData`(G0Coprime:800)
+  + 両 transport (`derived_inf_centralizer_le_P/_le_Q`) は proven sorry-free。だが **T-side producer
+  (`Nonempty (TFieldModelData hyp)` を作る項) は repo に存在せず**、`SemilinearFieldModel.lean` も未存在。
+- **cleanly-separable (dup でない)**: field-model realization は a の Singer を **cite** (`S15.basic_structure`
+  → SingerField 経由) して distinct object (`SemidirectProduct.lift` の σ-embedding) を build。`|U|∣p^q−1`
+  Singer bound を再導出しない (frozen sorry-free で既存)。∴ 2026-07-02 の a-vs-d Singer dup を再演しない。
+- **a は未着手**: `git rev-list --count main..a` = 0 (a は 0 ahead)、直近 15 commit は全て (11.8) fix で
+  σ-theory 活動ゼロ。9000 の live claim は実質空き (d は 2026-07-07 退役)。
+
+**根拠 (policy)**:
+1. CLAUDE.md — gated / frontier 枯渇 / cost・規模・payoff の遠さ は着手/継続/reallocation 基準でない
+   ([[feedback-cost-scope-not-a-criterion]])。gated lane は ungated upstream に降りる。field model は c の
+   S16 sorry 5 本 (#3/#4/#5) の直接 gate ゆえ、build は c 自身の cluster を unblock する on-path 最上流。
+2. DORMANT idle (選択肢 A) は最も policy 非整合 (lane を busywork 回避名目で遊ばせる)。genuine 未着手の
+   hub-sanctioned leaf が在る以上、idle は不要。
+3. **gated-endpoint skeleton** ([[feedback-gated-endpoint-skeleton-pattern]]): realization は (9.7.b) char body
+   下流 (σ 構成に V-abelian = a の typeP_Galois output を input 要)。∴ c は V-abelian を **hypothesis 化**した
+   engine+skeleton を今 build、a の char body landing で完全 close。「今すぐ full close しない」は非着手理由でない。
+
+**c への directive** (9078 に詳細):
+- claim [9078] 起票済 → 他レーン scan 対象。c は `OddOrder/GroupTheory/RepresentationTheory/SemilinearFieldModel.lean`
+  (module-level generic `F_{q^p}⋊V*` 実現、両 side instantiate) + T-side `TFieldModelData` producer を build。
+- **分担境界**: c=field-model realization (cite a の Singer) / a=§9 block-decomposition + (11.9) char body。
+  c は Singer bound を再構築しない。interface guard = module generic only + singerAdapter パターン再利用。
+- **併記依頼 1 (pin-2 j≠0)**: issue [9076] に記録済 (cross-lane 2-step、b の grounding-field 作業に束ねる)。
+  hub は b/c の 9076 tick で調整継続。
+
+**2026-07-06 DORMANT 裁定は本 RULING で superseded** (当時「ungated 行き先無し」は field-model leaf が
+未 carve だった時点の判断; 0098 item 2 再活性で ungated 行き先が確定)。C 既存成果は全 in-place 保全。
+
 ## 参照
 
 - gate map: `notes/peterfalvi/s16_nonexistence_gate_map.md` (2026-07-08 CURRENT 表)。
 - gate 詳細: issue 9076 (μ-grounding + pin-2 over-claim + hyp46S)・3002 (η-grid)・9000/9013 (σ-theory)。
-- 2026-07-06 DORMANT 裁定: `notes/meta/merge_monitor.md` 🧭 + `ft_lane_reallocation_2026_06_28.md`。
+- 着手 claim: [9078](9078-semilinear-fieldmodel-leaf.md) (SemilinearFieldModel leaf、本 RULING で起票)。
+- scope 元: [9000] HUB scope note 2026-07-07 item 2 / closed [0098] item 2。
+- 2026-07-06 DORMANT 裁定 (superseded): `notes/meta/merge_monitor.md` 🧭 + `ft_lane_reallocation_2026_06_28.md`。
 - commits: 8a8ad379 / 6945ba5f / 4cc9ad28 / 85457d49。
