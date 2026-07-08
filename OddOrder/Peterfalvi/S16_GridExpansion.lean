@@ -1,4 +1,5 @@
 import OddOrder.Peterfalvi.S15_SAndT_Setup
+import OddOrder.Peterfalvi.S05_GridRigidity
 
 /-!
 # Peterfalvi (3.6)–(3.8): the grid-coefficient theory of the `W`-grid
@@ -366,6 +367,70 @@ theorem inner_eta_eq_zero_of_vanish_of_inner_self_eq_two [Finite G]
     ⟨0, hyp.q_prime.pos⟩ ⟨0, hyp.p_prime.pos⟩ hrel hNC
   intro i j
   rw [hm i j, hzero i j]
+
+/-! ## (3.8) difference rigidity: a norm-`2` `V`-agreement determines the signed `η`-difference -/
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (3.8) difference rigidity for the `η`-grid** (`eq_signed_sub_cTIiso`, Coq
+`PFsection3.v`).  A virtual character `X ∈ ℤ[Irr G]` with `‖X‖² = 2` that agrees with a signed
+row-difference `s·(η_{i₀j₁} − η_{i₀j₂})` (`s = ±1`, `j₁ ≠ j₂`) on the conjugacy saturation of the
+regular set `Ŵ = W ∖ (W₁ ∪ W₂)` equals it: `X = s·(η_{i₀j₁} − η_{i₀j₂})`.
+
+Where `inner_eta_eq_zero_of_vanish_of_inner_self_eq_two` handles the `NC ≤ 2` *all-zero* case, this
+is the `NC(ψ) ≤ 4` *difference* case: it feeds the abstract engine
+`S05.orthonormalGrid_diff_rigidity` (full (3.8) trichotomy, constant-row/column excluded) with the
+`η`-grid data — orthonormality (`eta_orthonormal`), virtual-character membership (`eta_mem_ZIrr`),
+the coprime-odd axis sizes `q, p ≥ 3`, and the (3.7) separability of
+`ψ = X − s·(η_{i₀j₁} − η_{i₀j₂})` (assembled from four instances of `inner_eta_grid_relation`,
+valid because `ψ` vanishes on `Ŵ^G`).
+
+This is the row-`0` shape (`i₀ = 0`) behind the (13.18) `S`-side cross-relation
+`τ_S(μ_{0j} − μ_{01}) = η_{0j} − η_{01}`, and the general row/column shape used by Peterfalvi
+(4.8)/(10.5)/(10.10)/(11.8). -/
+theorem eta_diff_rigidity [Finite G]
+    (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    {X : ClassFunction G ℂ} (hXZ : X ∈ ZIrr G) (hX2 : ClassFunction.inner X X = 2)
+    (i0 : Fin hyp.q) {j1 j2 : Fin hyp.p} (hj : j1 ≠ j2) {s : ℤ} (hs : s = 1 ∨ s = -1)
+    (hvanish : ∀ x ∈ conjClassSet
+        ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))),
+      (X - (s : ℂ) • (hyp.eta i0 j1 - hyp.eta i0 j2)) x = 0) :
+    X = (s : ℂ) • (hyp.eta i0 j1 - hyp.eta i0 j2) := by
+  classical
+  have hcardq : Nat.card (Fin hyp.q) = hyp.q :=
+    Nat.card_eq_fintype_card.trans (Fintype.card_fin _)
+  have hcardp : Nat.card (Fin hyp.p) = hyp.p :=
+    Nat.card_eq_fintype_card.trans (Fintype.card_fin _)
+  -- (3.7) separability of the `ψ`-coefficient grid, from four `inner_eta_grid_relation` instances.
+  have hsep : ∀ (i i' : Fin hyp.q) (j j' : Fin hyp.p),
+      ClassFunction.inner (X - (s : ℂ) • (hyp.eta i0 j1 - hyp.eta i0 j2))
+          ((fun pq : Fin hyp.q × Fin hyp.p => hyp.eta pq.1 pq.2) (i, j))
+        + ClassFunction.inner (X - (s : ℂ) • (hyp.eta i0 j1 - hyp.eta i0 j2))
+            ((fun pq : Fin hyp.q × Fin hyp.p => hyp.eta pq.1 pq.2) (i', j'))
+      = ClassFunction.inner (X - (s : ℂ) • (hyp.eta i0 j1 - hyp.eta i0 j2))
+            ((fun pq : Fin hyp.q × Fin hyp.p => hyp.eta pq.1 pq.2) (i, j'))
+        + ClassFunction.inner (X - (s : ℂ) • (hyp.eta i0 j1 - hyp.eta i0 j2))
+            ((fun pq : Fin hyp.q × Fin hyp.p => hyp.eta pq.1 pq.2) (i', j)) := by
+    intro i i' j j'
+    have h1 := inner_eta_grid_relation hyp hvanish i j
+    have h2 := inner_eta_grid_relation hyp hvanish i' j'
+    have h3 := inner_eta_grid_relation hyp hvanish i j'
+    have h4 := inner_eta_grid_relation hyp hvanish i' j
+    simp only
+    linear_combination h1 + h2 - h3 - h4
+  have hmain := OddOrder.Peterfalvi.S05.orthonormalGrid_diff_rigidity
+    (fun pq : Fin hyp.q × Fin hyp.p => hyp.eta pq.1 pq.2)
+    (fun pq => eta_mem_ZIrr hyp pq.1 pq.2)
+    (fun a => by simpa using eta_orthonormal hyp a.1 a.1 a.2 a.2)
+    (fun a b hab => by
+      rw [eta_orthonormal hyp a.1 b.1 a.2 b.2, if_neg ?_]
+      rintro ⟨h1, h2⟩; exact hab (Prod.ext h1 h2))
+    (by rw [hcardq]; exact hyp.three_le_q) (by rw [hcardp]; exact hyp.three_le_p)
+    (by rw [hcardq]; exact hyp.q_odd) (by rw [hcardp]; exact hyp.p_odd)
+    (by rw [hcardq, hcardp]
+        exact (Nat.coprime_primes hyp.q_prime hyp.p_prime).mpr (Ne.symm hyp.p_ne_q))
+    hXZ hX2 (P1 := (i0, j1)) (P2 := (i0, j2))
+    (by intro h; exact hj (Prod.ext_iff.mp h).2) hs hsep
+  simpa using hmain
 
 /-! ## The `dirr` finish: from `Ψ ⊥ grid` to `ψ^{τ₁} ⊥ grid` -/
 

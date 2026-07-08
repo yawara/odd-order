@@ -37,3 +37,11 @@ created: 2026-07-08
 - [ ] 1019 capstone landing 確認 (trigger)
 - [ ] 凍結境界の特定 (先頭側 sorry-free クラスタ)
 - [ ] prefix-split 実施 + build green + 下流 import 不変
+
+## 更新 (2026-07-08 監視 tick)
+
+- caseB rewire (9.11) 進行に伴い **3,024 → 3,524 行** に成長 (+500)。lane a の active frontier
+  (`caseB_sOf_memberRFamily` per-member R-family dispatcher + reduction 補題群) がこの file 内。
+- **⚠ 分割は a の caseB rewire (9075 step 3、hRorth 3-way dispatch 残) が landing してから** —
+  今は全域が active frontier ゆえ凍結境界が取れず prefix-split が frontier と衝突する。
+  rewire 完遂後に hub が凍結クラスタ (§13.1-13.x の landed 部) を上流 leaf へ push する。
