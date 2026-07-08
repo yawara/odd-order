@@ -976,3 +976,21 @@ refuter wiring (dichotomy = nineElevenOne_configuration で config 産出 + hle 
 
 **次 (優先順)**: (9.11.2) two-summand inertia 一般化 [upstream 最深] → refuter dichotomy wiring →
 (9.11.3) degree-split。
+
+## 2026-07-08 更新 #31 (lane b, /loop iter 3) — (9.11.2) two-summand inertia の ⊆ 方向 landing
+
+**landed (S11_NineElevenCoherence、section NineElevenTwoInertia、sorry-free、commit dbceccab)**:
+- `caseA_char_inertia_of_summand`: 任意 order-p U-invariant summand S、θ regular on S、g fixes θ
+  ⟹ aInvariantRestrictAut hSinv g = 1 (g ∈ C_U(S))。**a 所有 chiefFactor_caseA_char_inertia_single
+  (S₀ 固定) を任意 summand に一般化** (pure-algebra 核 mulAut_eq_id_on_of_fixes_ne_one_on_prime 再利用)。
+  ⚠ IsAInvariant は `open OddOrder.Isaacs.Ch03 (IsAInvariant isAInvariant_iff_smul_mem)` 要 (S11_Maximal と別 open)。
+- `caseA_char_inertia_two_summands`: 2 summand 適用 → I(θ)⊓U ⊆ C_U(H_i)⊓C_U(H_j) = U₁∩U₁ʷ の ⊆ 半分。
+
+**(9.11.2) tiU1 の残 (次 iteration〜)**:
+1. **⊇ 方向** (fixing both summands ⟹ fixing θ): θ = two-summand regular char (S₀,S₀ʷ で nontrivial、
+   他 summand で trivial)。g ∈ C_U(S₀)∩C_U(S₀ʷ) は S₀,S₀ʷ を pointwise fix、他 summand は θ trivial
+   ゆえ θ(g·x)=θ(x)。⟹ I(θ)⊓U = U₁∩U₁ʷ 確定。**要 = two-summand θ (Dprod) の構成** — repo に cfDprod 無、
+   linearIrreducibleCharacter の product 構成 or hcPsi 経由で。
+2. **index dichotomy** [U:U₁∩U₁ʷ] ∈ {u,a}: I(θ) の induced char が S_H0C' member ⟹ degree qu or qa。
+3. **a 排除** → U₁∩U₁ʷ=C (C≤U₁∩U₁ʷ + index u)。
+⟹ tiU1 完成で nineElevenCaseA_equality_refutation の hCinf 供給。
