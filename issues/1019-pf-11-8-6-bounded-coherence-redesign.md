@@ -1812,3 +1812,23 @@ Coq (11.8) は `bridge_coherent` (`PFsection11.v:954`, stmt in PFsection5) で g
   caseA は (A)/(B) gated。中間策。
 
 docstring (S13:157-161) は caseB-only + FALSE-caseA + bridge_coherent fix に訂正済 (本 commit)。
+
+## 2026-07-08 update¹⁴ (lane-a /loop, subagent) — ★ bridge_coherent engine LANDED (sorry-free, axiom-clean) — caseA fix の土台
+
+update¹³ の verdict に基づく honest fix = Coq `bridge_coherent` (generation 不要) を port。
+**`OddOrder/Peterfalvi/S07_BridgeCoherent.lean`** 新設 (additive、234 行):
+- **`coherentUnion_of_glued_of_bridge`** (`Nonempty` でなく `IsCoherent` data を返す): 両族 coherent +
+  span-orthogonality (`hsrc_ortho`) + image-orthogonality (`hmixed`) + 整数 degree + degree0→supported
+  dictionary + **単一 bridge `χ−φ` (A₀-supported) の τ-identity** から `IsCoherent τ (X∪Y) A`。
+  **generation 仮説なし** ⟹ caseA の qa-mixed でも成立。
+- **sorry-free、axiom-clean** (`#print axioms` = `[propext, Classical.choice, Quot.sound]`)、full build green 3944 jobs。
+- ★ key finding: norm-based `Zisometry_of_cfnorm` primitive は**不要**だった — isometry は bilinearity +
+  orthogonality から従い、唯一の新規内容 `extends_on_supported` は Coq descaling identity
+  (PFsection5.v:1044-1051、χ(1) 倍して anchor-bracket 分解して χ(1) で割る、elementary ℤ-lattice)。
+- Coq 忠実 (hypotheses 弱化なし)。
+
+### 次: capstone を bridge engine に rewire (caseA-false hgen を除去)
+`coherent_SOf_H0C_of_column_identities` の `coherent_SOf_H0C_of_glued … hgen` を
+`coherentUnion_of_glued_of_bridge` に置換 (X=sOf H0C, Y=SOf HC orientation)。hgen (caseA-false) 消滅、
+hDτ は単一 bridge `hbridge_τ = hcol` に collapse、hmixed (§14) のみ genuine sorry として残る。structural
+hyps (hsrc_ortho=span_inner_SOf_HC_sOf_H0C、hdeg/hsupp/h1A/hbridge_supp=setup) を discharge。
