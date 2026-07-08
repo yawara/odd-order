@@ -209,6 +209,19 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > 一様 route = a (S13 landed 済、b は再構築禁止) / full assembly = a (S12/S13 側で S11 leaf を import)**。
 > 詳細 = issues/0101。
 >
+> **carve-out 拡張 (issue 0101, hub 裁定 2026-07-08 監視 tick #4)**: `OddOrder/Peterfalvi/S11_NineElevenCaseA.lean`
+> (lane b が新規作成、caseA (9.7.a) entry point `caseA_coherent_sOf_H0Cprime_of_refuter` = caseA coherence を
+> maximality-refuter 節へ reduction、namespace は `OddOrder.Peterfalvi.S13`・S13_MaximalIII_IV import) も
+> **lane b 所有** carve-out として扱う (S11_NineElevenCoherence と同型 = 内容で割当)。根拠 (hub 自律裁定):
+> (1) genuine caseA work = 0101 が b に割当てた caseA territory そのもの、**sorry-free・新 axiom なし**;
+> (2) a の base case `sOf_degreeSubfamily_isCoherent` (S13) + b の skeleton `coherent_of_maximal_coherent_pair_refuted`
+> (S07_Subcoherent) を signature contract で cite (所有衝突でなく consumer 関係); (3) **lane a は S11/S13 の
+> 当該 file を一切編集していない** (`git diff main...a -- 'S11*'` 空、a の active S13 = S13_MaximalIII_IV/
+> S13_CoreStructure とは別 file 隔離); (4) merge-safety 全通過 (build green 3941 jobs / AxiomsCheck OK /
+> sorry 不変 87 / 新 axiom なし)。⟹ step 1.5 で b が S11_NineElevenCaseA を編集しても逸脱でない
+> (a が編集したら逸脱; b は a の S13_MaximalIII_IV/S13_CoreStructure 等 active S13 file には従来どおり
+> 触れない = import cite のみ)。詳細 = issues/0101「2026-07-08 追加 carve-out」節。
+>
 > **carve-out (issue 9076, hub 裁定 2026-07-08 監視 tick)**: `OddOrder/Peterfalvi/S05_GridRigidity.lean`
 > (lane c が新規作成、Pf (3.8) abstract norm-2 rigidity engine `orthonormalGrid_diff_rigidity` = S05 σ-image
 > と S15 η-grid を de-dup する module-generic 核) は名目上 lane a の S05 regex に掛かるが、issue 9076
