@@ -1092,6 +1092,190 @@ theorem caseA_centralizes_two_summands_compHom_eq {data : TypesIIIIIIVSetup M}
     linearIrreducibleCharacter_apply,
     caseA_centralizes_two_summands_fixes_char caseA χ hsupp g hgi hgj y]
 
+/-! ### The generic single-factor centralizer `C_U(H_j)` and its index `a`
+
+Mirrors the a-owned `cuSub`/`card_U_eq_a_mul_card_cuSub` chain for the distinguished generator
+`S₀`, but for an *arbitrary* Clifford summand `H_j = caseA.Hpart j`.  The crux is orbit symmetry:
+`a` is pinned to `|Ū₁| = |range(aInvariantRestrictAut S₀)|`, and since `H_j = φ(orbitRep j) • S₀`
+is the automorphic image of `S₀`, conjugation by `w = φ(orbitRep j)` (well-defined on the acting
+`U`-group because `U ◁ U W₁` is the Frobenius kernel) carries `ker(restrict on S₀)` to
+`ker(restrict on H_j)`, so the two `U`-action images have equal order `a`.  This gives
+`[U : C_U(H_j)] = a` for every `j`. -/
+
+/-- **The generic single-factor centralizer `C_U(H_j)`** for an arbitrary Clifford summand
+`H_j = caseA.Hpart j`, realized as a subgroup of `G` with `C_U(H_j) ≤ U`.  Mirror of `cuSub`
+(which is `C_U(S₀)` for the distinguished generator): the kernel of the restricted `U`-action
+`aInvariantRestrictAut (caseA.Hpart_aInvariant j)` on the order-`p` factor `H_j`, pushed into `G`
+along `↥(U.subgroupOf (U ⊔ W₁)) ↪ ↥(U ⊔ W₁) ↪ G`.  By orbit symmetry `[U : C_U(H_j)] = a`
+(`relIndex_cuSubOf_U_eq_a`), the same index as `C_U(S₀)`. -/
+noncomputable def cuSubOf {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (j : Fin data.q) : Subgroup G :=
+  ((aInvariantRestrictAut (caseA.Hpart_aInvariant j)).ker.map
+      (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype).map
+    (data.typeP.U ⊔ data.typeP.W1).subtype
+
+omit [Finite G] in
+theorem cuSubOf_le_U {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (j : Fin data.q) : cuSubOf caseA j ≤ data.U :=
+  (Subgroup.map_mono (Subgroup.map_subtype_le _)).trans <| by
+    rw [Subgroup.subgroupOf_map_subtype]; exact inf_le_left
+
+omit [Finite G] in
+/-- `|C_U(H_j)| = |ker(aInvariantRestrictAut H_j)|` (mirrors `card_cuSub_eq_card_ker`). -/
+theorem card_cuSubOf_eq_card_ker {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (j : Fin data.q) :
+    Nat.card ↥(cuSubOf caseA j)
+      = Nat.card ↥(aInvariantRestrictAut (caseA.Hpart_aInvariant j)).ker := by
+  change Nat.card ↥(((aInvariantRestrictAut (caseA.Hpart_aInvariant j)).ker.map
+      (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype).map
+        (data.typeP.U ⊔ data.typeP.W1).subtype)
+      = Nat.card ↥(aInvariantRestrictAut (caseA.Hpart_aInvariant j)).ker
+  rw [← Nat.card_congr (Subgroup.equivMapOfInjective _ _ (Subgroup.subtype_injective _)).toEquiv,
+    ← Nat.card_congr (Subgroup.equivMapOfInjective _ _ (Subgroup.subtype_injective _)).toEquiv]
+
+/-- **`ker(uActionHom) ≤ ker(aInvariantRestrictAut H_j)`**: an element acting trivially on the
+whole chief factor acts trivially on the summand `H_j` (mirrors
+`ker_uActionHom_le_ker_aInvariantRestrictAut` for `S₀`, via
+`centralizes_all_imp_centralizes_summand`). -/
+theorem ker_uActionHom_le_ker_Hpart {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (j : Fin data.q) :
+    (uActionHom data chief).ker ≤ (aInvariantRestrictAut (caseA.Hpart_aInvariant j)).ker := by
+  intro g hg
+  rw [MonoidHom.mem_ker] at hg ⊢
+  exact centralizes_all_imp_centralizes_summand caseA j g hg
+
+/-- **`C = C_U(H̄) ≤ C_U(H_j)`** (`cSub ≤ cuSubOf`, mirrors `cSub_le_cuSub`). -/
+theorem cSub_le_cuSubOf {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (j : Fin data.q) : cSub data chief ≤ cuSubOf caseA j :=
+  Subgroup.map_mono (Subgroup.map_mono (ker_uActionHom_le_ker_Hpart caseA j))
+
+/-- **Orbit symmetry of the Clifford index `a`.**  For *any* summand `H_j = caseA.Hpart j` the
+order of the `U`-action image on `H_j` equals `caseA.a` (`= |Ū₁|`, the image on the distinguished
+generator `S₀`).  Since `H_j = φ(orbitRep j) • S₀` is the automorphic image of `S₀` under
+`w = φ(orbitRep j)`, conjugation `σ = conjNormal w⁻¹` (well-defined on the acting group because
+`U ◁ U W₁` is the Frobenius kernel, `W1_normalizes_U`) is an automorphism of the acting `U`-group
+carrying `ker(restrict on S₀)` to `ker(restrict on H_j)`; equal kernels force equal ranges (first
+isomorphism `|U| = |range|·|ker|` on both).  This is the crux behind `[U : C_U(H_j)] = a` for a
+general summand (`relIndex_cuSubOf_U_eq_a`). -/
+theorem caseA_a_eq_card_Hpart_restrictAut_range {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
+    (caseA : CliffordCaseAData chars) (j : Fin data.q) :
+    caseA.a = Nat.card ↥(aInvariantRestrictAut (caseA.Hpart_aInvariant j)).range := by
+  classical
+  set L := data.typeP.U ⊔ data.typeP.W1 with hL
+  -- `U ◁ L` (Frobenius kernel), so conjugation by `L`-elements permutes the acting group `U`.
+  haveI hAnorm : (data.typeP.U.subgroupOf L).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer le_sup_left).mpr
+      (sup_le Subgroup.le_normalizer data.typeP.W1_normalizes_U)
+  set wt : ↥L := caseA.orbitRep j with hwt
+  set w : MulAut (↥data.H ⧸ chief.N) := quotientMulAutHom chief.N_aInvariant wt with hw
+  set σ : MulAut ↥(data.typeP.U.subgroupOf L) := MulAut.conjNormal (wt⁻¹) with hσ
+  have hHj : caseA.Hpart j = w • caseA.S0 := caseA.Hpart_orbit j
+  -- Pointwise-fix characterisation of `restrict … = 1`.
+  have hchar : ∀ (S : Subgroup (↥data.H ⧸ chief.N))
+      (hS : IsAInvariant (uActionHom data chief) S)
+      (a : ↥(data.typeP.U.subgroupOf L)),
+      aInvariantRestrictAut hS a = 1 ↔ ∀ y ∈ S, (uActionHom data chief) a y = y := by
+    intro S hS a
+    constructor
+    · intro h y hy
+      have hcoe := aInvariantRestrictAut_coe hS a ⟨y, hy⟩
+      rw [h] at hcoe
+      simpa [MulAut.one_apply] using hcoe.symm
+    · intro h
+      ext z
+      rw [MulAut.one_apply, aInvariantRestrictAut_coe]
+      exact h _ z.2
+  -- `σ`-conjugation of the action: `φ(σ a) x = w⁻¹ (φ a (w x))`.
+  have hσφ : ∀ (a : ↥(data.typeP.U.subgroupOf L)) (x : ↥data.H ⧸ chief.N),
+      (uActionHom data chief) (σ a) x = w⁻¹ ((uActionHom data chief) a (w x)) := by
+    intro a x
+    have hval : ((σ a : ↥(data.typeP.U.subgroupOf L)) : ↥L) = wt⁻¹ * (a : ↥L) * wt := by
+      rw [hσ, MulAut.conjNormal_apply, inv_inv]
+    have h1 : (uActionHom data chief) (σ a)
+        = quotientMulAutHom chief.N_aInvariant
+            ((σ a : ↥(data.typeP.U.subgroupOf L)) : ↥L) := rfl
+    rw [h1, hval, map_mul, map_mul, map_inv, MulAut.mul_apply, MulAut.mul_apply]
+    rfl
+  -- Kernel correspondence `ker(H_j) = ker(S₀).comap σ`.
+  have hker : (aInvariantRestrictAut (caseA.Hpart_aInvariant j)).ker
+      = (aInvariantRestrictAut caseA.S0_aInvariant).ker.comap σ.toMonoidHom := by
+    ext a
+    rw [MonoidHom.mem_ker, Subgroup.mem_comap, MonoidHom.mem_ker, MulEquiv.coe_toMonoidHom,
+      hchar (caseA.Hpart j) (caseA.Hpart_aInvariant j) a,
+      hchar caseA.S0 caseA.S0_aInvariant (σ a)]
+    constructor
+    · intro h x hx
+      rw [hσφ a x]
+      have hxHj : w x ∈ caseA.Hpart j := by
+        rw [hHj, ← MulAut.smul_def]
+        exact Subgroup.smul_mem_pointwise_smul_iff.mpr hx
+      rw [h (w x) hxHj, ← MulAut.mul_apply, inv_mul_cancel, MulAut.one_apply]
+    · intro h y hy
+      rw [hHj] at hy
+      have hx : w⁻¹ • y ∈ caseA.S0 := Subgroup.mem_pointwise_smul_iff_inv_smul_mem.mp hy
+      have hfix := h (w⁻¹ • y) hx
+      rw [hσφ a (w⁻¹ • y), MulAut.smul_def] at hfix
+      have hww : w (w⁻¹ y) = y := by rw [← MulAut.mul_apply, mul_inv_cancel, MulAut.one_apply]
+      rw [hww] at hfix
+      exact w⁻¹.injective hfix
+  -- Equal kernel cardinalities (conjugation `σ` is a bijection).
+  have hkercard : Nat.card ↥(aInvariantRestrictAut (caseA.Hpart_aInvariant j)).ker
+      = Nat.card ↥(aInvariantRestrictAut caseA.S0_aInvariant).ker := by
+    rw [hker, Subgroup.comap_equiv_eq_map_symm']
+    exact (Nat.card_congr (Subgroup.equivMapOfInjective _ σ.symm.toMonoidHom
+      σ.symm.injective).toEquiv).symm
+  -- Equal range cardinalities via the first isomorphism `|U| = |range|·|ker|`.
+  have h0 := Subgroup.card_eq_card_quotient_mul_card_subgroup
+    (aInvariantRestrictAut caseA.S0_aInvariant).ker
+  have hj := Subgroup.card_eq_card_quotient_mul_card_subgroup
+    (aInvariantRestrictAut (caseA.Hpart_aInvariant j)).ker
+  rw [Nat.card_congr (QuotientGroup.quotientKerEquivRange
+    (aInvariantRestrictAut caseA.S0_aInvariant)).toEquiv] at h0
+  rw [Nat.card_congr (QuotientGroup.quotientKerEquivRange
+    (aInvariantRestrictAut (caseA.Hpart_aInvariant j))).toEquiv] at hj
+  rw [caseA.a_eq_card_restrictAut_range]
+  have hcancel := h0.symm.trans hj
+  rw [hkercard] at hcancel
+  exact Nat.eq_of_mul_eq_mul_right Nat.card_pos hcancel
+
+/-- **`|U| = a · |C_U(H_j)|`** for an arbitrary summand (mirrors `card_U_eq_a_mul_card_cuSub`), via
+orbit symmetry `a = |range(aInvariantRestrictAut H_j)|` (`caseA_a_eq_card_Hpart_restrictAut_range`)
+and the first isomorphism theorem. -/
+theorem card_U_eq_a_mul_card_cuSubOf {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (j : Fin data.q) :
+    Nat.card ↥data.U = caseA.a * Nat.card ↥(cuSubOf caseA j) := by
+  rw [caseA_a_eq_card_Hpart_restrictAut_range caseA j]
+  have h := Subgroup.card_eq_card_quotient_mul_card_subgroup
+    (aInvariantRestrictAut (caseA.Hpart_aInvariant j)).ker
+  rw [Nat.card_congr (QuotientGroup.quotientKerEquivRange
+      (aInvariantRestrictAut (caseA.Hpart_aInvariant j))).toEquiv,
+    ← card_cuSubOf_eq_card_ker caseA j,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+      (le_sup_left : data.typeP.U ≤ data.typeP.U ⊔ data.typeP.W1)).toEquiv] at h
+  exact h
+
+/-- **`[U : C_U(H_j)] = a`** for an arbitrary Clifford summand `H_j` (mirrors
+`relIndex_cuSub_U_eq_a` for `S₀`): Lagrange `[U:C_U(H_j)]·|C_U(H_j)| = |U| = a·|C_U(H_j)|`
+(`card_U_eq_a_mul_card_cuSubOf`), cancelling `|C_U(H_j)| > 0`.  The orbit-symmetric per-summand
+inertia index behind Peterfalvi (9.11.2). -/
+theorem relIndex_cuSubOf_U_eq_a {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (j : Fin data.q) :
+    (cuSubOf caseA j).relIndex data.U = caseA.a := by
+  have h1 : (cuSubOf caseA j).relIndex data.U * Nat.card ↥(cuSubOf caseA j)
+      = Nat.card ↥data.U := by
+    have h := Subgroup.index_mul_card ((cuSubOf caseA j).subgroupOf data.U)
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (cuSubOf_le_U caseA j)).toEquiv] at h
+  exact Nat.eq_of_mul_eq_mul_right Nat.card_pos
+    (h1.trans (card_U_eq_a_mul_card_cuSubOf caseA j))
+
 end NineElevenTwoInertia
 
 /-- **`[U : K₁ ⊓ K₂] ≤ [U:K₁]·[U:K₂]`** (relative-index form of `Subgroup.index_inf_le`): the
