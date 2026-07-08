@@ -784,6 +784,76 @@ theorem nineElevenOne_configuration (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 end Configuration
 
+/-! ### (9.11.2) inertia: the per-summand centralizer containment
+
+Book (9.11.2), first assertion (the deep input `U₁ ∩ U₁ʷ = C`): the `θ`-character regular on the two
+summands `S₀`, `S₀ʷ` has inertia `I_{HU}(θ) ⊓ U = C_U(S₀) ⊓ C_U(S₀ʷ) = U₁ ∩ U₁ʷ`, whose index
+`[U : U₁ ∩ U₁ʷ]` is then forced into `{u, a}`.  The `⊆`-half of that inertia computation — *a fixing
+element centralizes each regular summand* — is the per-summand lemma below, applied once per summand.
+
+The a-owned `chiefFactor_caseA_char_inertia_single` (`S11_MaximalII_III_IV`) proves this for the
+distinguished generator `S₀ = caseA.S0`; the two-summand argument needs it for the `W₁`-conjugate
+`S₀ʷ` as well, i.e. for an *arbitrary* order-`p` `U`-invariant summand.  We lift the same pure-algebra
+core (`mulAut_eq_id_on_of_fixes_ne_one_on_prime`) to a generic summand `S`. -/
+
+section NineElevenTwoInertia
+
+open OddOrder.Isaacs.Ch03 (IsAInvariant isAInvariant_iff_smul_mem)
+
+variable [Finite G] {M : Subgroup G}
+
+/-- **Per-summand char-inertia (generic summand).**  For *any* order-`p` `U`-invariant summand `S` of
+the chief factor `H̄` and an irreducible `θ` nontrivial on `S`, a `U`-element `g` fixing `θ` acts
+trivially on `S` (`aInvariantRestrictAut hSinv g = 1`, i.e. `g ∈ C_U(S)`).  This generalises the
+a-owned `chiefFactor_caseA_char_inertia_single` from the distinguished generator `S₀ = caseA.S0` to an
+arbitrary summand — needed for the (9.11.2) two-summand inertia `I(θ) ⊓ U ⊆ C_U(S₀) ⊓ C_U(S₀ʷ)`,
+obtained by applying this once to `S = S₀` and once to `S = S₀ʷ` (both order-`p`, `U`-invariant, with
+`θ` regular on each).  Same pure-algebra heart (`mulAut_eq_id_on_of_fixes_ne_one_on_prime`: `θ`
+faithful on the prime-order `S`), lifted through `aInvariantRestrictAut_coe`. -/
+theorem caseA_char_inertia_of_summand {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {S : Subgroup (↥data.H ⧸ chief.N)} (hSinv : IsAInvariant (uActionHom data chief) S)
+    (hScard : Nat.card ↥S = chief.p)
+    {θ : IrreducibleCharacter (↥data.H ⧸ chief.N)}
+    (hreg : ∃ x ∈ S, (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+      ≠ (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1)
+    (g : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U)
+    (hinv : ∀ x, (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) ((uActionHom data chief) g x)
+        = (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x) :
+    aInvariantRestrictAut hSinv g = 1 := by
+  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+    IsMulCommutative.of_comm chief.quotient_elementaryAbelian.comm
+  have hid : ∀ x ∈ S, (uActionHom data chief) g x = x :=
+    mulAut_eq_id_on_of_fixes_ne_one_on_prime ((uActionHom data chief) g) S
+      (by rw [hScard]; exact chief.p_prime)
+      (fun x hx => hSinv.smul_mem g hx) θ hreg hinv
+  ext x
+  rw [MulAut.one_apply, aInvariantRestrictAut_coe, hid x x.2]
+
+/-- **(9.11.2) two-summand inertia containment `I(θ) ⊓ U ⊆ C_U(H_i) ⊓ C_U(H_j)`.**  For a character
+`θ` regular on two Clifford summands `Hpart i`, `Hpart j`, a `U`-element `g` in the inertia (fixing
+`θ`) acts trivially on *both* summands: `aInvariantRestrictAut (Hpart_aInvariant i) g = 1` and
+`aInvariantRestrictAut (Hpart_aInvariant j) g = 1`, i.e. `g ∈ C_U(H_i) ∩ C_U(H_j)`.  Applying
+`caseA_char_inertia_of_summand` once per summand (both order-`p` and `U`-invariant by
+`Hpart_order`/`Hpart_aInvariant`).  This is the `⊆`-half of the (9.11.2) inertia identity
+`I(θ) ⊓ U = U₁ ∩ U₁ʷ` (take `i = 0`, `j` = the `W₁`-translate index of `S₀ʷ`); the reverse `⊇` is
+"fixing both summands ⟹ fixing `θ`", and the index of the intersection is then forced into `{u, a}`. -/
+theorem caseA_char_inertia_two_summands {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) {i j : Fin data.q}
+    {θ : IrreducibleCharacter (↥data.H ⧸ chief.N)}
+    (hregi : ∃ x ∈ caseA.Hpart i, (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+      ≠ (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1)
+    (hregj : ∃ x ∈ caseA.Hpart j, (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+      ≠ (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1)
+    (g : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U)
+    (hinv : ∀ x, (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) ((uActionHom data chief) g x)
+        = (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x) :
+    aInvariantRestrictAut (caseA.Hpart_aInvariant i) g = 1 ∧
+      aInvariantRestrictAut (caseA.Hpart_aInvariant j) g = 1 :=
+  ⟨caseA_char_inertia_of_summand (caseA.Hpart_aInvariant i) (caseA.Hpart_order i) hregi g hinv,
+    caseA_char_inertia_of_summand (caseA.Hpart_aInvariant j) (caseA.Hpart_order j) hregj g hinv⟩
+
+end NineElevenTwoInertia
+
 /-- **`[U : K₁ ⊓ K₂] ≤ [U:K₁]·[U:K₂]`** (relative-index form of `Subgroup.index_inf_le`): the
 relative index `H.relIndex U = (H.subgroupOf U).index`, and `subgroupOf = comap` distributes over
 `⊓` (`Subgroup.comap_inf`), so the ambient `index_inf_le` in `↥U` applies.  The (9.11.2) injectivity
@@ -1131,5 +1201,59 @@ theorem cfnorm_sub_irreducible_orthogonal {Γ : Type*} [Group Γ] [Fintype Γ]
   ring
 
 end NineElevenFour
+
+/-! ### (9.11.2)–(9.11.5): the equality-branch refutation (assembly)
+
+Book (9.11.2)–(9.11.8): under the (9.11.1) equality configuration (`p = 2a+1`, forced by
+`nineElevenOne_configuration`'s `2a = p−1`), the coherence bound `|𝒮₄| ≤ ‖α‖²` — the negation of
+"some conjugate pair from `𝒮₃` can be adjoined" — is impossible.  This subsection assembles the four
+landed steps into one refutation, isolating the three remaining deep group/character inputs as named
+hypotheses:
+
+* **(9.11.2)** the inertia identity `C = K₁ ⊓ K₂` with `[U:K₁] = [U:K₂] = a` (`K₁ = C_U(S₀)`,
+  `K₂ = C_U(S₀ʷ)`), giving `u ≤ a²` (`nineElevenTwo_u_le_a_sq`).  Gated on the two-summand `θ`-character
+  inertia computation (generalising `hcPsi_inertia_index_eq_u` from all summands to two).
+* **(9.11.3)** the `HŪ/(H₀C)` class equation `hclass` (`|Ū| + Σχ(1)² = p^q·u`, its character side
+  `sum_xiOf_H0C_degreeSq` landed) and the `W₁`-orbit split `hn` (`n = q·|𝒮₄| + (p−1)`), giving the
+  cleared count (`nineElevenThree_count`).
+* **(9.11.4)** the Mackey norm `hnorm` (`‖α‖²·u = (a+1)u + (q−1)a²`), whose `‖α‖² = ‖γ‖²+1` reduction
+  is `cfnorm_sub_irreducible_orthogonal` and whose `‖γ‖²` is the non-normal-`HU₁` double-coset count.
+
+The (9.11.5) exponential-beats-polynomial contradiction (`nineElevenFive_refutation`) closes it. -/
+
+/-- **Peterfalvi (9.11.2)–(9.11.5), the equality-branch refutation.**
+
+In the (9.11.1) equality configuration `p = 2a+1` (`hpeq`), the three deep inputs — the (9.11.2)
+inertia identity (`hK₁`/`hK₂`/`hCinf`), the (9.11.3) class equation and `W₁`-orbit split
+(`hclass`/`hn`), and the (9.11.4) Mackey norm (`hnorm`) — combine with the coherence bound
+`|𝒮₄| ≤ ‖α‖²` (`hle`) to a contradiction.  This is the equality branch of the (9.11) caseA refuter:
+`nineElevenOne_configuration` produces `hpeq` (and `C = U′`, `χdeg = u`) from the (9.11.1) squeeze,
+and here (9.11.2)/(9.11.3)/(9.11.4) are chained through to `nineElevenFive_refutation`.  Only the
+three named group/character inputs remain honest content; the arithmetic is fully discharged. -/
+theorem nineElevenCaseA_equality_refutation [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (hq3 : 3 ≤ data.q) (hu : 1 ≤ chars.u) (hpeq : chief.p = 2 * caseA.a + 1)
+    {K₁ K₂ : Subgroup G} (hK₁ : K₁.relIndex data.U = caseA.a)
+    (hK₂ : K₂.relIndex data.U = caseA.a) (hCinf : chars.C = K₁ ⊓ K₂)
+    {n S4 : ℕ}
+    (hclass : chars.u + n * chars.u ^ 2 + data.q * (chief.p - 1) * chars.u
+      = chief.p ^ data.q * chars.u)
+    (hn : n = S4 * data.q + (chief.p - 1))
+    {N : ℕ} (hnorm : N * chars.u = (caseA.a + 1) * chars.u + (data.q - 1) * caseA.a ^ 2)
+    (hle : S4 ≤ N) : False := by
+  have ha : 1 ≤ caseA.a := caseA.a_pos
+  -- (9.11.2): `u ≤ a²` from the inertia identity `C = K₁ ⊓ K₂`.
+  have hua2 : chars.u ≤ caseA.a * caseA.a := nineElevenTwo_u_le_a_sq caseA hK₁ hK₂ hCinf
+  -- (9.11.3): the cleared count `|𝒮₄|·qu + (p−1)u + (p−1)q + 1 = p^q`.
+  have hcount0 : S4 * (data.q * chars.u) + (chief.p - 1) * chars.u
+      + (chief.p - 1) * data.q + 1 = chief.p ^ data.q := nineElevenThree_count hu hclass hn
+  -- Substitute `p = 2a+1` to match `nineElevenFive_refutation`'s `(2a+1)^q` form.
+  have hp1 : chief.p - 1 = 2 * caseA.a := by omega
+  have hcount : S4 * (data.q * chars.u) + 2 * caseA.a * data.q + 2 * caseA.a * chars.u + 1
+      = (2 * caseA.a + 1) ^ data.q := by
+    rw [hp1, hpeq] at hcount0; omega
+  -- (9.11.5): the exponential-beats-polynomial contradiction.
+  exact nineElevenFive_refutation hq3 ha hu hua2 hcount hnorm hle
 
 end OddOrder.Peterfalvi.S11
