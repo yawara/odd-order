@@ -94,7 +94,20 @@ trichotomy** (constant-row/column 除外) は欠く → 4a/4b がそれを埋め
     (`honestTypeP2ASet_subset_hatMsigma` 既存 + `V^M⊆hatMsigma` + order 論法 `V∩𝒞_G(K#)=∅`) +
     κ-Hall/`(κ∪σ)′`-Hall 供給 (M solvable ⟹ Hall 存在)。∴ **旧「FTsupp0 未形式化」は幻**、残 = mechanical
     BG-support bridge。full build 3940 green・AxiomsCheck OK・新 axiom なし。**dadeHypS0 の deepest gate 除去**。
-  - [ ] **4c-2b″ tame helper 完成 route を全 de-risk (2026-07-08 精査、次 iteration 実行)**:
+  - [x] **4c-2b″ tame helper 完成 → deep pin 完全 discharge (2026-07-08)** ✅:
+    `honestTypeP2A0Set_tame_conj` を **sorry-free 化** ⟹ `not_isConj_honestTypeP2ASet_typePV` は
+    **完全に proven** (helper 依存も解消) ⟹ **dadeHypS0 の A0-normedTI gate 完全消滅** (4c-4 cross-relation が
+    honest な A0-Dade に乗る)。route (下記) を uniform BG Thm II で実装、subagent 実行 + hub 検証:
+    新 lemma = `honestTypeP2A0Set_subset_A0Set` (A-part `aSet_subset_A0Set` κ′/κ order + V-part
+    `conjClassSetIn_typePV_subset_A0Set` σ⊆κ′ order + hatMsigma M-conj 不変) / `exists_sigma_prime_dvd_orderOf_typePV`
+    (V-elt に σ-prime) / `kappaHall_conjClassSet_isPiElement` (K# = κ-elt) / `typePData_W1_inf_W2_eq_bot`。
+    signature: pin+helper に κ-Hall/`(κ∪σ)′`-Hall 仮説を追加 (IsTypeP2 不要, `honestTypeP2ASet_isConj_conj_in_M`
+    mirror)、唯一の caller `dadeSupportHypothesisData_honestTypeP2A0Set` (既に Halls を produce) が pass。
+    **検証済 (hub)**: 変更は S15_HonestTypeP2A0.lean のみ / 新 axiom 無 / 新 sorry 無 (helper sorry 除去のみ, 4→3) /
+    pin 結論 `:False` 不変 (仮説追加のみ) / full build 3941 green / AxiomsCheck OK。
+    **残 S15_HonestTypeP2A0 sorry = prime-TI pin 3 本のみ** (mu_row0_ne / tauS_mu_row0_diff_support /
+    tauS_mu_row0_vanish_on_V = 9014, tame とは無関係)。
+  - **route (実装済、参考)**:
     `honestTypeP2A0Set_tame_conj` を **circularity 回避のため BG Thm II で uniform に** 証明する
     (case-dispatch は mixed case = pin ゆえ循環; 実際 `dadeSupportHypothesisData_honestTypeP2A0Set` の
     dispatch (S15_HonestTypeP2A0:236-244) は mixed に pin を cite = 逆向き依存)。既存 infra 発見:

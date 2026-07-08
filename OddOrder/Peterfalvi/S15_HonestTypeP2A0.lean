@@ -199,6 +199,231 @@ theorem escaping_honestTypeP2A0Set_mem_honestTypeP2ASet {M : Subgroup G} (data :
   · exact ⟨hpa, haesc⟩
   · exact absurd (conjClassSetIn_typePV_centralizer_le_M data hva) haesc
 
+/-! ### The `A₀(S) ⊆ A0Set M K₀` bridge (issue 9076 piece 4c)
+
+The honest support `honestTypeP2A0Set M data = A(S) ∪ V^S` embeds into BG's Theorem-E set
+`A0Set M K₀ = hatMsigma M ∖ 𝒞_G(K₀#)`.  The `A(S)`-part uses `honestTypeP2ASet_subset_ASet`
+composed with `ASet ⊆ A0Set`; the `V^S`-part uses `typePV_subset_hatMsigma` (conjugacy-closed) plus
+the order argument that a `V`-point carries a `σ`-prime while `K₀#` is pure `κ`.  The order pieces
+all reduce to: `𝒞_G(K₀#)`-points are nonidentity `κ`-elements
+(`kappaHall_conjClassSet_isPiElement`), while `A(S)`-points are `κ′`-elements and `V^S`-points have
+a `σ ⊆ κ′`-prime. -/
+
+/-- **`W₁ ⊓ W₂ = ⊥`** for a `TypePData`: the two cyclic factors intersect trivially.  `W₂ ≤ M'`
+(`W2_le`/`H_le`) while `W₁` complements `M' = derivedInG M` in `M` (`M_complement`), so
+`W₁ ⊓ W₂ ≤ W₁ ⊓ M' = ⊥`.  (Ambient-subgroup form of the disjoint half of `M_complement`, mirroring
+`TypePData.fitting_inf_U_eq_bot`.) -/
+theorem typePData_W1_inf_W2_eq_bot {M : Subgroup G} (data : TypePData M) :
+    data.W1 ⊓ data.W2 = ⊥ := by
+  rw [eq_bot_iff]
+  intro x hx
+  rw [Subgroup.mem_inf] at hx
+  obtain ⟨hxW1, hxW2⟩ := hx
+  have hxM : x ∈ M := data.W1_le hxW1
+  have hxD : x ∈ derivedInG M := data.H_le (Subgroup.mem_inf.mp (data.W2_le hxW2)).1
+  have hmem : (⟨x, hxM⟩ : ↥M) ∈
+      ((derivedInG M).subgroupOf M) ⊓ (data.W1.subgroupOf M) :=
+    Subgroup.mem_inf.mpr ⟨Subgroup.mem_subgroupOf.mpr hxD, Subgroup.mem_subgroupOf.mpr hxW1⟩
+  have hd := data.M_complement.disjoint
+  rw [disjoint_iff] at hd
+  rw [hd, Subgroup.mem_bot] at hmem
+  rw [Subgroup.mem_bot]
+  exact Subtype.ext_iff.mp hmem
+
+/-- **A `V^S`-point's order is divisible by a `σ`-prime** (issue 9076 piece 4c): a
+`V = typePV`-point `v = a·b` (`a ∈ W₁`, `b ∈ W₂`, cyclic `W = W₁ ⊔ W₂`) has a nontrivial
+`W₂`-component `b ≠ 1` (else
+`v = a ∈ W₁`).  Since `W₁ ⊓ W₂ = ⊥` (`typePData_W1_inf_W2_eq_bot`) and `a, b` commute (abelian `W`),
+`orderOf b ∣ orderOf v`; and `b ∈ W₂ ≤ M_σ` is a `σ`-element (`isPiElement_sigma_of_mem_Msigma`),
+so some `σ`-prime divides `orderOf b ∣ orderOf v`.  This is the `V`-side "order carries a `σ`-prime"
+input that excludes `V^S` from the pure-`κ` set `𝒞_G(K₀#)`. -/
+theorem exists_sigma_prime_dvd_orderOf_typePV [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (data : TypePData M) {v : G} (hv : v ∈ typePV M data) :
+    ∃ p ∈ (orderOf v).primeFactors, p ∈ OddOrder.BG.Ch3.S10.sigma M := by
+  simp only [typePV, Set.mem_diff, Set.mem_union, SetLike.mem_coe, not_or] at hv
+  obtain ⟨hvW, hvnW1, _hvnW2⟩ := hv
+  haveI hcyc : IsCyclic ↥data.W := data.W_cyclic
+  letI : CommGroup ↥data.W := hcyc.commGroup
+  have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
+  have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
+  have hsup : data.W1.subgroupOf data.W ⊔ data.W2.subgroupOf data.W = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hW1le hW2le, ← data.W_eq, Subgroup.subgroupOf_self]
+  have hvmem : (⟨v, hvW⟩ : ↥data.W) ∈
+      data.W1.subgroupOf data.W ⊔ data.W2.subgroupOf data.W := by
+    rw [hsup]; exact Subgroup.mem_top _
+  rw [Subgroup.mem_sup] at hvmem
+  obtain ⟨a, ha, b, hb, hab⟩ := hvmem
+  have haW1 : ((a : ↥data.W) : G) ∈ data.W1 := Subgroup.mem_subgroupOf.mp ha
+  have hbW2 : ((b : ↥data.W) : G) ∈ data.W2 := Subgroup.mem_subgroupOf.mp hb
+  have habG : ((a : ↥data.W) : G) * ((b : ↥data.W) : G) = v := by
+    have := congrArg (Subtype.val) hab; simpa using this
+  have hb1 : ((b : ↥data.W) : G) ≠ 1 := by
+    intro h; exact hvnW1 (by rw [← habG, h, mul_one]; exact haW1)
+  have hcomm : Commute ((a : ↥data.W) : G) ((b : ↥data.W) : G) := by
+    have h : ((a : ↥data.W) : G) * ((b : ↥data.W) : G)
+        = ((b : ↥data.W) : G) * ((a : ↥data.W) : G) := by
+      have h0 := congrArg Subtype.val (mul_comm a b); simpa using h0
+    exact h
+  -- `orderOf b ∣ orderOf v` (commuting factors of a cyclic `W = W₁ × W₂`).
+  have hbdvd : orderOf ((b : ↥data.W) : G) ∣ orderOf v := by
+    have hab_n : ((a : ↥data.W) : G) ^ orderOf v * ((b : ↥data.W) : G) ^ orderOf v = 1 := by
+      rw [← hcomm.mul_pow, habG]; exact pow_orderOf_eq_one v
+    have hanW1 : ((a : ↥data.W) : G) ^ orderOf v ∈ data.W1 := pow_mem haW1 _
+    have hbnW2 : ((b : ↥data.W) : G) ^ orderOf v ∈ data.W2 := pow_mem hbW2 _
+    have han_eq : ((a : ↥data.W) : G) ^ orderOf v
+        = (((b : ↥data.W) : G) ^ orderOf v)⁻¹ := mul_eq_one_iff_eq_inv.mp hab_n
+    have han_in_W2 : ((a : ↥data.W) : G) ^ orderOf v ∈ data.W2 := by
+      rw [han_eq]; exact inv_mem hbnW2
+    have han_bot : ((a : ↥data.W) : G) ^ orderOf v ∈ data.W1 ⊓ data.W2 :=
+      Subgroup.mem_inf.mpr ⟨hanW1, han_in_W2⟩
+    rw [typePData_W1_inf_W2_eq_bot data, Subgroup.mem_bot] at han_bot
+    have hbn1 : ((b : ↥data.W) : G) ^ orderOf v = 1 := by
+      rw [han_bot, one_mul] at hab_n; exact hab_n
+    exact orderOf_dvd_of_pow_eq_one hbn1
+  -- `b ∈ M_σ` (`W₂ ≤ H = M_F ≤ M_σ`), so a `σ`-prime divides `orderOf b`.
+  have hbMσ : ((b : ↥data.W) : G) ∈ OddOrder.BG.Ch3.S10.Msigma M := by
+    refine (data.W2_le.trans (inf_le_left.trans ?_)) hbW2
+    rw [data.H_eq]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hM
+  have hbσ : IsPiElement (OddOrder.BG.Ch3.S10.sigma M) ((b : ↥data.W) : G) :=
+    OddOrder.BG.Ch4.S14.isPiElement_sigma_of_mem_Msigma hbMσ
+  have hbord1 : orderOf ((b : ↥data.W) : G) ≠ 1 := fun h => hb1 (orderOf_eq_one_iff.mp h)
+  obtain ⟨p, hpp, hpdvdb⟩ := (orderOf ((b : ↥data.W) : G)).exists_prime_and_dvd hbord1
+  refine ⟨p, Nat.mem_primeFactors.mpr ⟨hpp, hpdvdb.trans hbdvd, (orderOf_pos v).ne'⟩, ?_⟩
+  exact hbσ p (Nat.mem_primeFactors.mpr ⟨hpp, hpdvdb, (orderOf_pos _).ne'⟩)
+
+/-- **`𝒞_G(K₀#)`-points are nonidentity `κ`-elements** (issue 9076 piece 4c): every `G`-conjugate of
+a nontrivial element of the `κ(M)`-Hall `K₀` is a nonidentity `κ(M)`-element.  A `k ∈ K₀#` has
+`orderOf k ∣ |K₀|`, a `κ`-number (`hK`), so `k` is a `κ`-element; conjugation preserves this
+(`isPiElement_conj`) and non-triviality.  This is the exclusion input for both `A(S)` (`κ′`-elements)
+and `V^S` (`σ`-prime carriers) against `A0Set M K₀ = hatMsigma M ∖ 𝒞_G(K₀#)`. -/
+theorem kappaHall_conjClassSet_isPiElement [Finite G] {M K₀ : Subgroup G} (hKM : K₀ ≤ M)
+    (hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M) (K₀.subgroupOf M))
+    {w : G} (hw : w ∈ conjClassSet (OddOrder.GroupTheory.sharpSubgroup K₀)) :
+    IsPiElement (OddOrder.BG.Ch4.S14.kappa M) w ∧ w ≠ 1 := by
+  obtain ⟨k, hk, g, hgw⟩ := hw
+  rw [OddOrder.GroupTheory.sharpSubgroup, Set.mem_diff, SetLike.mem_coe,
+    Set.mem_singleton_iff] at hk
+  obtain ⟨hkK, hk1⟩ := hk
+  subst hgw
+  have hkord : orderOf k ∣ Nat.card ↥K₀ := by
+    have horx : orderOf k = orderOf (⟨k, hkK⟩ : ↥K₀) :=
+      orderOf_injective K₀.subtype K₀.subtype_injective ⟨k, hkK⟩
+    rw [horx]; exact orderOf_dvd_natCard _
+  have hkκ : IsPiElement (OddOrder.BG.Ch4.S14.kappa M) k := by
+    intro p hp
+    have hpp : p.Prime := Nat.prime_of_mem_primeFactors hp
+    have hpdvd : p ∣ orderOf k := Nat.dvd_of_mem_primeFactors hp
+    have hcardeq : Nat.card ↥(K₀.subgroupOf M) = Nat.card ↥K₀ :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv
+    refine hK.1 p ?_
+    rw [hcardeq]
+    exact Nat.mem_primeFactors.mpr ⟨hpp, hpdvd.trans hkord, Nat.card_pos.ne'⟩
+  refine ⟨OddOrder.BG.Ch4.S14.isPiElement_conj g hkκ, fun hcontra => hk1 ?_⟩
+  have hkk : k = g⁻¹ * (g * k * g⁻¹) * g := by group
+  rw [hkk, hcontra]; group
+
+/-- **`ASet M U₀ ⊆ A0Set M K₀`** (issue 9076 piece 4c): the BG Theorem-E `A(M)`-set embeds into the
+`A_0(M)`-set.  Both are `⊆ hatMsigma M`; and an `ASet`-point `x ∈ U₀ ⊔ M_σ` is a `κ′`-element
+(`mem_U_sup_Msigma_iff_isPiElement_kappa_compl`), while a `𝒞_G(K₀#)`-point is a nonidentity
+`κ`-element (`kappaHall_conjClassSet_isPiElement`) — no element is both, so `x ∉ 𝒞_G(K₀#)`. -/
+theorem aSet_subset_A0Set [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K₀ U₀ : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hKM : K₀ ≤ M) (hUM : U₀ ≤ M)
+    (hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M) (K₀.subgroupOf M))
+    (hU : OddOrder.Isaacs.Ch03.IsHallSubgroup
+      ((OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U₀.subgroupOf M)) :
+    OddOrder.BG.Ch4.S16.ASet M U₀ ⊆ OddOrder.BG.Ch4.S16.A0Set M K₀ := by
+  have hMσM : OddOrder.BG.Ch3.S10.Msigma M ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
+  have hnorm : ((U₀ ⊔ OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer (sup_le hUM hMσM)).mpr
+      (OddOrder.BG.Ch4.S16.theoremA_ungated_conjuncts hG hM hKM hUM hK rfl hU).2.2.1
+  intro x hx
+  simp only [OddOrder.BG.Ch4.S16.ASet, Set.mem_inter_iff, SetLike.mem_coe] at hx
+  obtain ⟨hxhat, hxsup⟩ := hx
+  simp only [OddOrder.BG.Ch4.S16.A0Set, Set.mem_diff]
+  refine ⟨hxhat, fun hxconj => ?_⟩
+  obtain ⟨hxκ, hx1⟩ := kappaHall_conjClassSet_isPiElement hKM hK hxconj
+  have hxκ' : IsPiElement (OddOrder.BG.Ch4.S14.kappa M)ᶜ x :=
+    (OddOrder.BG.Ch4.S14.mem_U_sup_Msigma_iff_isPiElement_kappa_compl hG hM hUM hU hnorm
+      hxhat.1).mp hxsup
+  have hne1 : orderOf x ≠ 1 := fun h => hx1 (orderOf_eq_one_iff.mp h)
+  obtain ⟨p, hpp, hpdvd⟩ := (orderOf x).exists_prime_and_dvd hne1
+  have hpf : p ∈ (orderOf x).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨hpp, hpdvd, (orderOf_pos x).ne'⟩
+  exact (hxκ' p hpf) (hxκ p hpf)
+
+/-- **`V^S ⊆ A0Set M K₀`** (issue 9076 piece 4c): the `M`-conjugacy closure of the exceptional
+regular set `V = typePV` embeds into the `A_0(M)`-set.  `V ⊆ hatMsigma M` (`typePV_subset_hatMsigma`)
+extends to the closure because `hatMsigma M` is `M`-conjugation invariant (`M_σ ◁ M`); and a
+`V`-point carries a `σ`-prime (`exists_sigma_prime_dvd_orderOf_typePV`), `σ ⊆ κ′`
+(`kappa_subset_sigmaCompl`), so it is not a `κ`-element, hence off the pure-`κ` set `𝒞_G(K₀#)`
+(conjugation-invariant, `mem_conjClassSet_conj_iff`). -/
+theorem conjClassSetIn_typePV_subset_A0Set [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K₀ : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hKM : K₀ ≤ M)
+    (hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M) (K₀.subgroupOf M))
+    (data : TypePData M) :
+    conjClassSetIn M (typePV M data) ⊆ OddOrder.BG.Ch4.S16.A0Set M K₀ := by
+  have hM_le_NMσ : M ≤ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma M : Set G) := by
+    rw [OddOrder.BG.Ch3.S10.Msigma]
+    exact le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M
+  haveI hMσ_norm : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer
+      (OddOrder.BG.Ch3.S10.Msigma_le M)).mpr hM_le_NMσ
+  rintro _ ⟨v, hv, m, hmM, rfl⟩
+  have hvhat : v ∈ OddOrder.BG.Ch4.S16.hatMsigma M := typePV_subset_hatMsigma hG hM data hv
+  simp only [OddOrder.BG.Ch4.S16.A0Set, Set.mem_diff, OddOrder.BG.Ch4.S16.hatMsigma,
+    Set.mem_setOf_eq]
+  refine ⟨⟨M.mul_mem (M.mul_mem hmM hvhat.1) (M.inv_mem hmM), ?_⟩, ?_⟩
+  · -- `M_σ ⊓ C_G(m·v·m⁻¹) ≠ ⊥`: conjugate the `M_σ`-centralizing witness of `v`.
+    obtain ⟨w, hw1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hvhat.2
+    obtain ⟨hwMσ, hwC⟩ := Subgroup.mem_inf.mp w.2
+    have hw0C : (w : G) * v = v * (w : G) := Subgroup.mem_centralizer_singleton_iff.mp hwC
+    have hwne : (w : G) ≠ 1 := fun h => hw1 (Subtype.ext h)
+    have hconjMσ : m * (w : G) * m⁻¹ ∈ OddOrder.BG.Ch3.S10.Msigma M := by
+      have h := hMσ_norm.conj_mem ⟨(w : G), OddOrder.BG.Ch3.S10.Msigma_le M hwMσ⟩
+        (Subgroup.mem_subgroupOf.mpr hwMσ) ⟨m, hmM⟩
+      rw [Subgroup.mem_subgroupOf] at h
+      simpa using h
+    have hconjC : m * (w : G) * m⁻¹ ∈ Subgroup.centralizer ({m * v * m⁻¹} : Set G) := by
+      rw [Subgroup.mem_centralizer_singleton_iff]
+      calc (m * (w : G) * m⁻¹) * (m * v * m⁻¹)
+          = m * ((w : G) * v) * m⁻¹ := by group
+        _ = m * (v * (w : G)) * m⁻¹ := by rw [hw0C]
+        _ = (m * v * m⁻¹) * (m * (w : G) * m⁻¹) := by group
+    have hconjne : m * (w : G) * m⁻¹ ≠ 1 := by
+      intro h
+      refine hwne ?_
+      have hww : (w : G) = m⁻¹ * (m * (w : G) * m⁻¹) * m := by group
+      rw [hww, h]; group
+    rw [Subgroup.ne_bot_iff_exists_ne_one]
+    exact ⟨⟨m * (w : G) * m⁻¹, Subgroup.mem_inf.mpr ⟨hconjMσ, hconjC⟩⟩,
+      fun h => hconjne (Subtype.ext_iff.mp h)⟩
+  · -- `m·v·m⁻¹ ∉ 𝒞_G(K₀#)`: reduce to `v` (conj-invariant), which carries a `σ ⊆ κ′`-prime.
+    intro hconj
+    rw [mem_conjClassSet_conj_iff] at hconj
+    obtain ⟨hvκ, -⟩ := kappaHall_conjClassSet_isPiElement hKM hK hconj
+    obtain ⟨p, hpf, hpσ⟩ := exists_sigma_prime_dvd_orderOf_typePV hG hM data hv
+    exact OddOrder.BG.Ch4.S14.kappa_subset_sigmaCompl (hvκ p hpf) hpσ
+
+/-- **`A₀(S) ⊆ A0Set M K₀`** (issue 9076 piece 4c): the honest type-`P₂` support embeds into BG's
+Theorem-E set.  `A(S)`-part via `honestTypeP2ASet_subset_ASet` + `aSet_subset_A0Set`; `V^S`-part via
+`conjClassSetIn_typePV_subset_A0Set`.  This is the bridge feeding `theoremII_tame_embedding` for
+`honestTypeP2A0Set_tame_conj`. -/
+theorem honestTypeP2A0Set_subset_A0Set [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K₀ U₀ : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hKM : K₀ ≤ M) (hUM : U₀ ≤ M) (hKne : K₀ ≠ ⊥)
+    (hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M) (K₀.subgroupOf M))
+    (hU : OddOrder.Isaacs.Ch03.IsHallSubgroup
+      ((OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U₀.subgroupOf M))
+    (data : TypePData M) :
+    honestTypeP2A0Set M data ⊆ OddOrder.BG.Ch4.S16.A0Set M K₀ := by
+  apply Set.union_subset
+  · exact (honestTypeP2ASet_subset_ASet hG hM hKM hUM hKne hK hU).trans
+      (aSet_subset_A0Set hG hM hKM hUM hK hU)
+  · exact conjClassSetIn_typePV_subset_A0Set hG hM hKM hK data
+
 /-- **Tame conjugation for the honest type-`P₂` `A₀`-support** (BG §16 Theorem II): two `G`-conjugate
 elements of `A₀(M) = A(M) ∪ V^M` are already `M`-conjugate.  This is the first conjunct of BG Theorem
 II (`OddOrder.BG.Ch4.S16.theoremII_tame_embedding` with `X = A0Set M K`): for the tame embedding, a
@@ -213,9 +438,19 @@ supplies the `M`-conjugator.  (Reduces the earlier "genuine deep FT-support geom
 concrete BG-support bridge.) -/
 theorem honestTypeP2A0Set_tame_conj [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
-    (data : TypePData M) {a b : G}
+    (data : TypePData M) {K₀ U₀ : Subgroup G} (hKM : K₀ ≤ M) (hUM : U₀ ≤ M) (hKne : K₀ ≠ ⊥)
+    (hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M) (K₀.subgroupOf M))
+    (hU : OddOrder.Isaacs.Ch03.IsHallSubgroup
+      ((OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U₀.subgroupOf M))
+    {a b : G}
     (ha : a ∈ honestTypeP2A0Set M data) (hb : b ∈ honestTypeP2A0Set M data)
-    (hab : IsConj a b) : ∃ m ∈ M, b = m * a * m⁻¹ := sorry
+    (hab : IsConj a b) : ∃ m ∈ M, b = m * a * m⁻¹ := by
+  have hsub := honestTypeP2A0Set_subset_A0Set hG hM hKM hUM hKne hK hU data
+  have hII := OddOrder.BG.Ch4.S16.theoremII_tame_embedding hG hM hKM hUM hK hU
+    (X := OddOrder.BG.Ch4.S16.A0Set M K₀) (Or.inr rfl)
+  obtain ⟨g, hg⟩ := isConj_iff.mp hab
+  obtain ⟨m, hmM, hmb⟩ := hII.1 a (hsub ha) b (hsub hb) ⟨g, hg.symm⟩
+  exact ⟨m, hmM, hmb⟩
 
 /-- **(8.13.a), the mixed `A(S)`–`V^S` case is vacuous**: an `A(S)`-point is never `G`-conjugate to a
 `V^S`-point.  An `A(S) = honestTypeP2ASet` element lies in `S' = derivedInG S`, while a `V^S`-point
@@ -228,7 +463,11 @@ Proved (issue 9076 piece 4c) via the honest-support tame conjugation `honestType
 circular `normedTI`-based argument with the direct FT-support-geometry route (Coq `FTsupp0`). -/
 theorem not_isConj_honestTypeP2ASet_typePV [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
-    (data : TypePData M) {a b : G}
+    (data : TypePData M) {K₀ U₀ : Subgroup G} (hKM : K₀ ≤ M) (hUM : U₀ ≤ M) (hKne : K₀ ≠ ⊥)
+    (hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M) (K₀.subgroupOf M))
+    (hU : OddOrder.Isaacs.Ch03.IsHallSubgroup
+      ((OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U₀.subgroupOf M))
+    {a b : G}
     (ha : a ∈ honestTypeP2ASet M) (hb : b ∈ conjClassSetIn M (typePV M data))
     (hab : IsConj a b) : False := by
   -- `M`-conjugation preserves `M' = derivedInG M`-membership (`M' ⊴ M`).
@@ -252,7 +491,8 @@ theorem not_isConj_honestTypeP2ASet_typePV [Finite G]
     rwa [show h⁻¹ * b * (h⁻¹)⁻¹ = v from by rw [← hhvb]; group] at hvconj
   -- BG §16 Theorem II tame conjugation ⟹ `b = m·a·m⁻¹ ∈ M'`, contradiction.
   obtain ⟨m, hmM, hmc⟩ :=
-    honestTypeP2A0Set_tame_conj hG hM data (honestTypeP2ASet_subset_A0Set data ha) hbA0 hab
+    honestTypeP2A0Set_tame_conj hG hM data hKM hUM hKne hK hU
+      (honestTypeP2ASet_subset_A0Set data ha) hbA0 hab
   exact hbnD (hmc ▸ hconj_derived m a hmM haD)
 
 /-- **Peterfalvi (8.15) for the honest type-`P₂` `A₀`-support**: the Dade (2.2) support hypotheses
@@ -287,9 +527,10 @@ theorem dadeSupportHypothesisData_honestTypeP2A0Set [Fintype G] [Finite G]
     rcases ha with hpa | hva
     · rcases hb with hpb | hvb
       · exact honestTypeP2ASet_isConj_conj_in_M hG hM hKM hUM hKne hK hU hpa hpb hab
-      · exact (not_isConj_honestTypeP2ASet_typePV hG hM data hpa hvb hab).elim
+      · exact (not_isConj_honestTypeP2ASet_typePV hG hM data hKM hUM hKne hK hU hpa hvb hab).elim
     · rcases hb with hpb | hvb
-      · exact (not_isConj_honestTypeP2ASet_typePV hG hM data hpb hva hab.symm).elim
+      · exact (not_isConj_honestTypeP2ASet_typePV hG hM data hKM hUM hKne hK hU hpb hva
+          hab.symm).elim
       · exact OddOrder.Peterfalvi.S10.conjClassSetIn_typePV_isConj_conj_in_M data hva hvb hab
   · -- coprimality: the escaping point is in `A(S)`; `b` is in `A(S)` or `V^S`.
     intro a ha b hb
