@@ -389,3 +389,28 @@ bottom-out (前 flag の linchpin と同一)。`gammaGrid_real` は grid conjuga
 
 full build 3941 green・AxiomsCheck OK・新 axiom 無・S15_SAndT real sorry 9 で不変
 (opaque 1 → proven + precise gate 1)。
+
+## 🎯 char-endgame bottleneck synthesis (2026-07-08 lane-b /loop): type-P2 Hypothesis46 が収束点
+
+複数 iteration の精査で、type-P2 char endgame (pins 2/3 + coherence upgrade + (10.7)) が**単一の
+type-P2 `Hypothesis46` に collapse** すると確定:
+
+1. **pins 2/3** = `certainTypeDiffSupported` (support) + `certainType_diff_dade_eq` (V-value)、両者
+   `Hypothesis46 A L` level (S06)。A=honestTypeP2ASet で組めば pin の honest support を直接 deliver (既述)。
+2. **coherence upgrade** (9014 `uniform_prTIred_coherent` = Pf (4.9)) は **§13 に partial ported と判明**
+   ([[verify-port-state-by-number-not-coq-name]]): `adjoin_muColumnPair_of_irrFamily`
+   (S13_MaximalIII_IV:2336、lane-a) が「coherent 既約族が reducible column pair {μ,μ̄} を absorb」を
+   **型-P1 (§12.Hypothesis) で実装** (deep inputs は parametric)。∴「9014 = repo 0」は Coq 名基準の誤り。
+   型-P2 版は同機構を **型-P2 Hypothesis46 で instantiate** すれば得られる。
+3. **(10.7) `Frob_der1_type2`** (型-P2) も同 Hypothesis46 + coherence に gated (lane-a frontier)。
+
+**✅ type-P2 Hypothesis46 は feasible (A_covers 解決)**: `Hypothesis46` の `subH` は field (`subH ≤ K`,
+`W2 ≤ subH`) ゆえ、K=S' 全体でなく **subH = M_σ** を選べば `A_covers` (subH# ⊆ A) が成立
+(M_σ# の各元は自身を centralize ⟹ M_σ# ⊆ honestTypeP2ASet)。∴ **honestTypeP2ASet-Dade (dadeHypS0) +
+subH=M_σ で `Hypothesis46 (honestTypeP2ASet S) ↥S` が組める**。
+
+**⟹ 次アクション (lane-b、次 iteration)**: parameterized `hypothesis46OfTypePData` を build —
+structural 部 (tic = typePData_toTICyclicHypothesis, tic_W1/W2/V reconciliation, toHypothesis = s06S)
+は type-uniform に自動構成、type-P2 固有部 (A=honestTypeP2ASet, dade/dade0=lane-c Dades, subH=M_σ,
+A_covers) は param。lane-c が dadeHypS0 で instantiate → pins 2/3 + 型-P2 coherence を unblock。
+これが char-endgame の最高 leverage。§12 `toHypothesis46` (:1088) が type-P1 template。
