@@ -112,3 +112,28 @@ item 2 / closed [0098] item 2 = 未着手)。着手 claim = [9078](9078-semiline
 - scope 元: [9000] HUB scope note 2026-07-07 item 2 / closed [0098] item 2。
 - 2026-07-06 DORMANT 裁定 (superseded): `notes/meta/merge_monitor.md` 🧭 + `ft_lane_reallocation_2026_06_28.md`。
 - commits: 8a8ad379 / 6945ba5f / 4cc9ad28 / 85457d49。
+
+## 🔁 2026-07-09 status: HUB RULING (B) = 9078 **完遂** → C 再枯渇、次 direction 要請
+
+**RULING (B) の 9078 は完了** (lane-c /loop 2026-07-09, commit `8e6d3e61` 他, full build green・
+AxiomsCheck OK・新 axiom 無):
+- `SemilinearFieldModel.lean` leaf = `hcompatLift_of_equivariant` 追加で完成 (textbook 共役同変性 →
+  generic `hcompatLift` 橋渡し、両 side 再利用)。
+- **T-side producer `tFieldModelData_of_repr` = sorry-free 構成** (`fieldModelEmbedding` を E=Q,C=V,r=q,s=p
+  で instantiate、`Nonempty (TFieldModelData hyp)`)。
+- **`t_side_frobenius_kernel` = sorry-free 化** (gated-endpoint skeleton `t_side_caseB_fieldModel` 経由、
+  `hVQ` 実証明、残 sorry = (9.7.b) field-data 存在 = lane-a gated)。
+- AxiomsCheck に T-side sorry-free core 4 件登録 (fieldModelEmbedding/hcompatLift_of_equivariant/
+  tFieldModelData_of_repr/derived_inf_centralizer_le_Q、各 3 axiom)。
+
+**⟹ C 独立 frontier は再び枯渇** (9000 scope items 尽き: item1=9073 closed / item2=9078 done)。
+2026-07-09 /loop で **代替 ungated target を全数再探索し、全て gated と code-level 再確認**:
+- (14.9) `T_typeIII_ratio_le` hcount de-bundle を調査 → **blocked** (edit 前検証): `v=|V|` は
+  `V_inf_centralizer_Q_eq_bot` (S15_SAndT:1891=**sorry**、T-side d=1) を cite、その proof は T-side
+  `d_eq_one` dual を要し = **T-side v-value (13.15) = lane-a gated (9013)**。S-side c=1 が proven なのは
+  S-side u-value が available だから (非対称)。∴ `V_inf_centralizer_Q_eq_bot` は C 単独 tractable でない
+  (初回 iteration の「dual で tractable」判断を訂正)。gate map 「C 枯渇」結論を追認・精度向上。
+
+**hub への要請**: RULING (B) 完了ゆえ次の cross-lane direction を再裁定 (A/B/C/D、正本 = 上記選択肢)。
+9000 scope items は尽きたので (B) 継続は新 carve-out 要。当面 C は gate landing (a typeP_Galois 9000 /
+b μ-grounding 3002・9076) 待ちで、landing 検知で pin/betaGrid/field-data を一気に close 可 (infra 完備)。
