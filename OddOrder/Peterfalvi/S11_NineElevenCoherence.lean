@@ -1132,4 +1132,58 @@ theorem cfnorm_sub_irreducible_orthogonal {Γ : Type*} [Group Γ] [Fintype Γ]
 
 end NineElevenFour
 
+/-! ### (9.11.2)–(9.11.5): the equality-branch refutation (assembly)
+
+Book (9.11.2)–(9.11.8): under the (9.11.1) equality configuration (`p = 2a+1`, forced by
+`nineElevenOne_configuration`'s `2a = p−1`), the coherence bound `|𝒮₄| ≤ ‖α‖²` — the negation of
+"some conjugate pair from `𝒮₃` can be adjoined" — is impossible.  This subsection assembles the four
+landed steps into one refutation, isolating the three remaining deep group/character inputs as named
+hypotheses:
+
+* **(9.11.2)** the inertia identity `C = K₁ ⊓ K₂` with `[U:K₁] = [U:K₂] = a` (`K₁ = C_U(S₀)`,
+  `K₂ = C_U(S₀ʷ)`), giving `u ≤ a²` (`nineElevenTwo_u_le_a_sq`).  Gated on the two-summand `θ`-character
+  inertia computation (generalising `hcPsi_inertia_index_eq_u` from all summands to two).
+* **(9.11.3)** the `HŪ/(H₀C)` class equation `hclass` (`|Ū| + Σχ(1)² = p^q·u`, its character side
+  `sum_xiOf_H0C_degreeSq` landed) and the `W₁`-orbit split `hn` (`n = q·|𝒮₄| + (p−1)`), giving the
+  cleared count (`nineElevenThree_count`).
+* **(9.11.4)** the Mackey norm `hnorm` (`‖α‖²·u = (a+1)u + (q−1)a²`), whose `‖α‖² = ‖γ‖²+1` reduction
+  is `cfnorm_sub_irreducible_orthogonal` and whose `‖γ‖²` is the non-normal-`HU₁` double-coset count.
+
+The (9.11.5) exponential-beats-polynomial contradiction (`nineElevenFive_refutation`) closes it. -/
+
+/-- **Peterfalvi (9.11.2)–(9.11.5), the equality-branch refutation.**
+
+In the (9.11.1) equality configuration `p = 2a+1` (`hpeq`), the three deep inputs — the (9.11.2)
+inertia identity (`hK₁`/`hK₂`/`hCinf`), the (9.11.3) class equation and `W₁`-orbit split
+(`hclass`/`hn`), and the (9.11.4) Mackey norm (`hnorm`) — combine with the coherence bound
+`|𝒮₄| ≤ ‖α‖²` (`hle`) to a contradiction.  This is the equality branch of the (9.11) caseA refuter:
+`nineElevenOne_configuration` produces `hpeq` (and `C = U′`, `χdeg = u`) from the (9.11.1) squeeze,
+and here (9.11.2)/(9.11.3)/(9.11.4) are chained through to `nineElevenFive_refutation`.  Only the
+three named group/character inputs remain honest content; the arithmetic is fully discharged. -/
+theorem nineElevenCaseA_equality_refutation [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (hq3 : 3 ≤ data.q) (hu : 1 ≤ chars.u) (hpeq : chief.p = 2 * caseA.a + 1)
+    {K₁ K₂ : Subgroup G} (hK₁ : K₁.relIndex data.U = caseA.a)
+    (hK₂ : K₂.relIndex data.U = caseA.a) (hCinf : chars.C = K₁ ⊓ K₂)
+    {n S4 : ℕ}
+    (hclass : chars.u + n * chars.u ^ 2 + data.q * (chief.p - 1) * chars.u
+      = chief.p ^ data.q * chars.u)
+    (hn : n = S4 * data.q + (chief.p - 1))
+    {N : ℕ} (hnorm : N * chars.u = (caseA.a + 1) * chars.u + (data.q - 1) * caseA.a ^ 2)
+    (hle : S4 ≤ N) : False := by
+  have ha : 1 ≤ caseA.a := caseA.a_pos
+  -- (9.11.2): `u ≤ a²` from the inertia identity `C = K₁ ⊓ K₂`.
+  have hua2 : chars.u ≤ caseA.a * caseA.a := nineElevenTwo_u_le_a_sq caseA hK₁ hK₂ hCinf
+  -- (9.11.3): the cleared count `|𝒮₄|·qu + (p−1)u + (p−1)q + 1 = p^q`.
+  have hcount0 : S4 * (data.q * chars.u) + (chief.p - 1) * chars.u
+      + (chief.p - 1) * data.q + 1 = chief.p ^ data.q := nineElevenThree_count hu hclass hn
+  -- Substitute `p = 2a+1` to match `nineElevenFive_refutation`'s `(2a+1)^q` form.
+  have hp1 : chief.p - 1 = 2 * caseA.a := by omega
+  have hcount : S4 * (data.q * chars.u) + 2 * caseA.a * data.q + 2 * caseA.a * chars.u + 1
+      = (2 * caseA.a + 1) ^ data.q := by
+    rw [hp1, hpeq] at hcount0; omega
+  -- (9.11.5): the exponential-beats-polynomial contradiction.
+  exact nineElevenFive_refutation hq3 ha hu hua2 hcount hnorm hle
+
 end OddOrder.Peterfalvi.S11
