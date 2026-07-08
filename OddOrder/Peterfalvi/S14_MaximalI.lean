@@ -5445,23 +5445,215 @@ theorem intersection_complements_K [Finite G]
     Subgroup.IsComplement' (ctr.K.subgroupOf ctr.M) ((ctr.M ⊓ data.L).subgroupOf ctr.M) := by
   sorry
 
-/-- **Peterfalvi (12.11), second assertion** (pinned sorried §8/§9 obligation, hub 9003 Cluster A):
-`M ∩ L ⊆ H = L_F`.  This is the second paragraph of (12.11): a subgroup `A ≤ M ∩ L` of order prime
-to `|H|` normalizes `P₀ = O_p(H) ∩ M` (nilpotency of `H`); by (8.1.c) `P₀` does not centralize `K`
-and, by (12.10) (`L` Frobenius, kernel `H`), `P₀A` is Frobenius with kernel `P₀` when `A ≠ 1`; by
-(9.1) (Wielandt) applied to `P₀A ↷ K`, `C_K(A) ≠ 1`, hence (via (12.9)) `C_K(x) ≠ 1`; by (8.1.b)
-`A` and `x` lie in an abelian subgroup of `M ∩ L`, so `A` centralizes `x`, forcing `A = 1`.  Thus
-`M ∩ L` has no nontrivial `p'`-part, i.e. `M ∩ L ⊆ O_p(H) ⊆ H`.
+/-- **`|M ∩ L|` is coprime to `|K|`** (from the first assertion (12.11) + `M_F` Hall).  `M ∩ L`
+complements `K = M_F` in `M` (`intersection_complements_K`), so `|M ∩ L| = [M : K]`, which is
+coprime to `|K|` because `K = M_F` is a Hall subgroup of `M`. -/
+theorem card_MinfL_coprime_card_K [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
+    Nat.Coprime (Nat.card ↥(ctr.M ⊓ data.L)) (Nat.card ↥ctr.K) := by
+  have hKM : ctr.K ≤ ctr.M := ctr.K_eq_MF ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le ctr.M
+  have hcompl := intersection_complements_K hG data
+  have hHall := (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall ctr.M).coprime_index
+  rw [← ctr.K_eq_MF] at hHall
+  -- `hHall : Coprime |K| [M : K]`;  `[M : K] = |M ∩ L|` by the complement.
+  have hidx : (ctr.K.subgroupOf ctr.M).index = Nat.card ↥((ctr.M ⊓ data.L).subgroupOf ctr.M) :=
+    hcompl.symm.index_eq_card
+  rw [hidx, Nat.card_congr (Subgroup.subgroupOfEquivOfLe inf_le_left).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv] at hHall
+  exact hHall.symm
 
-**Genuinely still-missing** as a usable containment: this argument chains (8.1.b), (8.1.c), (9.1),
-(12.10); the §8 facts (8.1.b/c) are not assembled in reach of S14 and the (12.10) Frobenius input is
-itself pinned.  The statement is **sound**: it is Peterfalvi's (12.11) second assertion for the
-genuine witness `L` (tied to `ctr` via `data`). -/
+/-- **Peterfalvi (12.11), core of the second assertion**: a subgroup `A ≤ M ∩ L` meeting the
+witness kernel `H = L_F` trivially (`A ⊓ H = ⊥`, i.e. of order prime to `|H|`) is trivial.
+
+The genuine (12.11) argument, now fully assembled from the landed infrastructure.  Put
+`P = O_p(H) ∩ M` (an `A`-invariant `p`-subgroup of `H` containing `P₀`, via the nilpotent core
+`opiCoreInG`); then:
+* `P` does not centralize `K` (`P₀_not_le_centralizer_K`, `P₀ ≤ P`);
+* `P ⊔ A` is Frobenius with kernel `P` (from `L`'s Frobenius structure), acts coprimely on `K`
+  (`P ⊔ A ≤ M ∩ L`, coprime to `|K|`), so by Wielandt (9.1)
+  `exists_ne_one_centralized_by_complement_of_kernel_not_centralizes` gives `C_K(A) ≠ 1`;
+* `C_K(x) ≠ 1` by (12.9) (`ctr.CKx_not_le_Kprime`);
+* since `M ∩ L` complements `K` in `M` (first assertion), `A` and `x` land in a common abelian
+  subgroup `W` (`exists_abelian_centralizer_le_of_isComplement` with `V = M ∩ L`), so `A`
+  centralizes `x`;
+* by `L`'s Frobenius condition (4) (`centralizer_kernel_le`, `x ∈ H^#`), `A ≤ C_L(x) ⊆ H`, so
+  `A ⊆ H`, forcing `A = A ⊓ H = ⊥`. -/
+theorem witness_MinfL_pprime_subgroup_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) {A : Subgroup G}
+    (hAML : A ≤ ctr.M ⊓ data.L) (hAH : A ⊓ maxNilpotentNormalHall data.L = ⊥) (hAne : A ≠ ⊥) :
+    False := by
+  classical
+  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  set H : Subgroup G := maxNilpotentNormalHall data.L with hHdef
+  have hAM : A ≤ ctr.M := hAML.trans inf_le_left
+  have hAL : A ≤ data.L := hAML.trans inf_le_right
+  haveI hHnilp : Group.IsNilpotent ↥H := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent data.L
+  have hHL : H ≤ data.L := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le data.L
+  have hHnorm : data.L ≤ Subgroup.normalizer (H : Set G) :=
+    OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer data.L
+  -- Frobenius structure of `L` with kernel `H` (upstream of this theorem).
+  obtain ⟨frob, _⟩ := witness_L_frobenius hG data
+  have hHfrob : frob.typeI.typeF.H = H := frob.typeI.typeF.H_eq
+  have hFrobL : ∃ C : Subgroup ↥data.L,
+      OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥data.L (H.subgroupOf data.L) C :=
+    ⟨frob.complement, hHfrob ▸ frob.frobenius⟩
+  -- `x ∈ H^#` and `x ∈ M ∩ L`.
+  have hxH : data.x ∈ H := witness_P0_le_kernel hG data data.x_mem_P0
+  have hxML : data.x ∈ ctr.M ⊓ data.L := ⟨ctr.P0_le_M data.x_mem_P0, hHL hxH⟩
+  -- `P = O_p(H) ∩ M` contains `P₀`, sits inside `H` and `M`.
+  set P : Subgroup G := opiCoreInG ({ctr.p} : Set ℕ) H ⊓ ctr.M with hPdef
+  have hP0_le_P : ctr.P0 ≤ P :=
+    le_inf (pGroup_le_opiCoreInG_of_le_of_isNilpotent ctr.P0_pGroup (witness_P0_le_kernel hG data))
+      ctr.P0_le_M
+  have hP_le_H : P ≤ H := inf_le_left.trans (opiCoreInG_le _ _)
+  have hP_le_M : P ≤ ctr.M := inf_le_right
+  have hP0ne : ctr.P0 ≠ ⊥ := fun hb => ctr.P0_noncyclic (hb ▸ isCyclic_of_subsingleton)
+  have hPne : P ≠ ⊥ := fun hb => hP0ne (le_bot_iff.mp (hb ▸ hP0_le_P))
+  -- `A` normalises `P` (normalises `O_p(H)` and `M`).
+  have hAnorm_opi : A ≤ Subgroup.normalizer (opiCoreInG ({ctr.p} : Set ℕ) H) :=
+    le_normalizer_opiCoreInG_of_le_normalizer _ (hAL.trans hHnorm)
+  have hAnorm_M : A ≤ Subgroup.normalizer (ctr.M : Set G) := hAM.trans Subgroup.le_normalizer
+  have hAP : A ≤ Subgroup.normalizer (P : Set G) := by
+    intro a ha
+    rw [Subgroup.mem_normalizer_iff]
+    intro y
+    have hOpi := (Subgroup.mem_normalizer_iff.mp (hAnorm_opi ha)) y
+    have hM := (Subgroup.mem_normalizer_iff.mp (hAnorm_M ha)) y
+    simp only [hPdef, Subgroup.mem_inf]
+    rw [hOpi, hM]
+  -- `P ⊔ A ≤ N_G(K)` and `≤ M ∩ L`.
+  have hMnorm_K : ctr.M ≤ Subgroup.normalizer (ctr.K : Set G) :=
+    ctr.K_eq_MF ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer ctr.M
+  have hPAK : P ⊔ A ≤ Subgroup.normalizer (ctr.K : Set G) :=
+    sup_le (hP_le_M.trans hMnorm_K) (hAM.trans hMnorm_K)
+  have hPA_ML : P ⊔ A ≤ ctr.M ⊓ data.L :=
+    sup_le (le_inf hP_le_M (hP_le_H.trans hHL)) hAML
+  -- `K` is solvable (subgroup of the solvable maximal `M`).
+  have hKM : ctr.K ≤ ctr.M := ctr.K_eq_MF ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le ctr.M
+  haveI hMsolv : IsSolvable ↥ctr.M := hG.solvable_of_mem_maximalSubgroups ctr.M_maximal
+  haveI hKsolv : IsSolvable ↥ctr.K :=
+    solvable_of_solvable_injective (Subgroup.inclusion_injective hKM)
+  -- Coprimality of the `P ⊔ A`-action on `K`.
+  have hcop : Nat.Coprime (Nat.card ↥ctr.K) (Nat.card ↥(P ⊔ A)) :=
+    (card_MinfL_coprime_card_K hG data).symm.coprime_dvd_right (Subgroup.card_dvd_of_le hPA_ML)
+  -- `P` does not centralize `K`.
+  have hPnc : ¬ P ≤ Subgroup.centralizer (ctr.K : Set G) := fun hPc =>
+    P0_not_le_centralizer_K hG ctr (hP0_le_P.trans hPc)
+  -- **`C_K(A) ≠ 1`** (Wielandt (9.1) via the sub-Frobenius engine).
+  obtain ⟨n, hnK, hn1, hnA⟩ := exists_ne_one_centralized_by_complement_of_kernel_not_centralizes
+    hHL hFrobL hP_le_H hPne hAL hAH hAne hAP hPAK hKsolv hcop hPnc
+  -- **`C_K(x) ≠ 1`** (Peterfalvi (12.9)).
+  obtain ⟨n', hn'mem, hn'K'⟩ := SetLike.not_le_iff_exists.mp data.CKx_not_le_Kprime
+  obtain ⟨hn'C, hn'K⟩ := Subgroup.mem_inf.mp hn'mem
+  have hn'1 : n' ≠ 1 := fun h => hn'K' (by rw [h]; exact Subgroup.one_mem _)
+  -- **`A` and `x` in a common abelian `W ≤ M ∩ L`** (step (8.1.b), `V = M ∩ L`).
+  obtain ⟨typeIM⟩ := ctr.M_typeI
+  have htypeFH : typeIM.typeF.H = ctr.K := ctr.K_eq_MF ▸ typeIM.typeF.H_eq
+  obtain ⟨W, hWab, hWle⟩ := exists_abelian_centralizer_le_of_isComplement hMsolv typeIM.typeF
+    (V := ctr.M ⊓ data.L) inf_le_left (htypeFH ▸ intersection_complements_K hG data)
+  have hnFH : n ∈ typeIM.typeF.H := by rw [htypeFH]; exact hnK
+  have hn'FH : n' ∈ typeIM.typeF.H := by rw [htypeFH]; exact hn'K
+  have hA_W : A ≤ W := by
+    intro a haA
+    have haC : (a : G) ∈ Subgroup.centralizer ({n} : Set G) :=
+      Subgroup.mem_centralizer_singleton_iff.mpr (mul_inv_eq_iff_eq_mul.mp (hnA a haA))
+    exact hWle n hnFH hn1 ⟨hAML haA, haC⟩
+  have hx_W : data.x ∈ W := by
+    have hxC : data.x ∈ Subgroup.centralizer ({n'} : Set G) :=
+      Subgroup.mem_centralizer_singleton_iff.mpr
+        (Subgroup.mem_centralizer_singleton_iff.mp hn'C).symm
+    exact hWle n' hn'FH hn'1 ⟨hxML, hxC⟩
+  -- **`A` centralizes `x`** (both in abelian `W`), then **`A ⊆ H`** by Frobenius condition (4).
+  have hA_H : A ≤ H := by
+    intro a haA
+    have hax : (a : G) * data.x = data.x * a :=
+      congrArg Subtype.val (hWab.is_comm.comm ⟨a, hA_W haA⟩ ⟨data.x, hx_W⟩)
+    have hxHfrob : (⟨data.x, hHL hxH⟩ : ↥data.L) ∈ frob.typeI.typeF.H.subgroupOf data.L := by
+      rw [Subgroup.mem_subgroupOf, hHfrob]; exact hxH
+    have hx1 : (⟨data.x, hHL hxH⟩ : ↥data.L) ≠ 1 :=
+      fun h => data.x_ne_one (by simpa using congrArg Subtype.val h)
+    have hcent := frob.frobenius.centralizer_kernel_le _ hxHfrob hx1
+    have haC : (⟨a, hAL haA⟩ : ↥data.L) ∈
+        Subgroup.centralizer ({(⟨data.x, hHL hxH⟩ : ↥data.L)} : Set ↥data.L) := by
+      rw [Subgroup.mem_centralizer_singleton_iff]
+      exact Subtype.ext (by simpa using hax)
+    have haH := hcent haC
+    rw [Subgroup.mem_subgroupOf, hHfrob] at haH
+    exact haH
+  exact hAne (le_bot_iff.mp (hAH ▸ le_inf le_rfl hA_H))
+
+/-- **Peterfalvi (12.11), second assertion**: `M ∩ L ⊆ H = L_F`.  `M ∩ L` has no nontrivial
+subgroup meeting `H` trivially (`witness_MinfL_pprime_subgroup_eq_bot`), so its order is coprime to
+`[L : H]` (any common prime would give a nontrivial Sylow subgroup meeting `H` trivially), and the
+normal-Hall reduction `le_of_coprime_card_index_of_normal` places `M ∩ L` inside `H`. -/
 theorem intersection_le_kernel [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
     ctr.M ⊓ data.L ≤ maxNilpotentNormalHall data.L := by
-  sorry
+  classical
+  set H : Subgroup G := maxNilpotentNormalHall data.L with hHdef
+  have hHL : H ≤ data.L := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le data.L
+  have hMLL : ctr.M ⊓ data.L ≤ data.L := inf_le_right
+  haveI hHnorm : (H.subgroupOf data.L).Normal :=
+    OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal data.L
+  -- `|M ∩ L|` is coprime to `[L : H]`.
+  have hcop : Nat.Coprime (Nat.card ↥((ctr.M ⊓ data.L).subgroupOf data.L))
+      (H.subgroupOf data.L).index := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMLL).toEquiv, Nat.coprime_iff_gcd_eq_one]
+    by_contra hgcd
+    obtain ⟨q, hq, hqdvd⟩ := Nat.exists_prime_and_dvd hgcd
+    haveI : Fact q.Prime := ⟨hq⟩
+    rw [Nat.dvd_gcd_iff] at hqdvd
+    obtain ⟨hqML, hqidx⟩ := hqdvd
+    -- A Sylow `q`-subgroup `Q` of `M ∩ L` is nontrivial, meets `H` trivially, contradicts the core.
+    obtain ⟨Q⟩ := (Sylow.nonempty : Nonempty (Sylow q ↥(ctr.M ⊓ data.L)))
+    set A : Subgroup G := (Q : Subgroup ↥(ctr.M ⊓ data.L)).map (ctr.M ⊓ data.L).subtype with hAdef
+    have hApg : IsPGroup q ↥A := Q.2.map _
+    have hAML : A ≤ ctr.M ⊓ data.L := Subgroup.map_subtype_le _
+    -- `q ∉ π(H)` (as `q ∣ [L : H]` and `H` is Hall in `L`), so `A ⊓ H = ⊥`.
+    have hqH : ¬ q ∣ Nat.card ↥H := by
+      have hHallL := (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall data.L).coprime_index
+      intro hdvd
+      have hdvd' : q ∣ Nat.card ↥(H.subgroupOf data.L) := by
+        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHL).toEquiv]; exact hdvd
+      have hg : q ∣ Nat.gcd (Nat.card ↥(H.subgroupOf data.L)) (H.subgroupOf data.L).index :=
+        Nat.dvd_gcd hdvd' hqidx
+      rw [hHallL] at hg
+      exact hq.one_lt.ne' (Nat.dvd_one.mp hg)
+    have hAH : A ⊓ H = ⊥ := by
+      rw [eq_bot_iff]
+      intro z hz
+      obtain ⟨hzA, hzH⟩ := Subgroup.mem_inf.mp hz
+      rw [Subgroup.mem_bot]
+      by_contra hzne
+      apply hqH
+      obtain ⟨k, hk⟩ := (IsPGroup.iff_orderOf.mp hApg) ⟨z, hzA⟩
+      have hoz : orderOf z = q ^ k := by
+        rw [← hk]; exact orderOf_injective A.subtype A.subtype_injective ⟨z, hzA⟩
+      have hk0 : k ≠ 0 := fun h => hzne (orderOf_eq_one_iff.mp (by rw [hoz, h, pow_zero]))
+      have hqoz : q ∣ Nat.card ↥(Subgroup.zpowers z) := by
+        rw [Nat.card_zpowers, hoz]; exact dvd_pow_self q hk0
+      exact hqoz.trans (Subgroup.card_dvd_of_le ((Subgroup.zpowers_le).mpr hzH))
+    have hAne : A ≠ ⊥ := by
+      have hqQ : q ∣ Nat.card ↥(Q : Subgroup ↥(ctr.M ⊓ data.L)) := by
+        have hmul := Subgroup.card_mul_index (Q : Subgroup ↥(ctr.M ⊓ data.L))
+        rcases (Nat.Prime.dvd_mul hq).mp (hmul ▸ hqML) with h | h
+        · exact h
+        · exact absurd h Q.not_dvd_index
+      intro hb
+      have hA1 : Nat.card ↥A = Nat.card ↥(Q : Subgroup ↥(ctr.M ⊓ data.L)) :=
+        (Nat.card_congr (Subgroup.equivMapOfInjective _ _
+          (ctr.M ⊓ data.L).subtype_injective).toEquiv).symm
+      rw [hb, Subgroup.card_bot] at hA1
+      rw [← hA1] at hqQ
+      exact hq.one_lt.ne' (Nat.dvd_one.mp hqQ)
+    exact witness_MinfL_pprime_subgroup_eq_bot hG data hAML hAH hAne
+  -- Apply the normal-Hall reduction.
+  have hle := Subgroup.le_of_coprime_card_index_of_normal hcop
+  intro z hz
+  have : (⟨z, hMLL hz⟩ : ↥data.L) ∈ H.subgroupOf data.L :=
+    hle (Subgroup.mem_subgroupOf.mpr hz)
+  exact Subgroup.mem_subgroupOf.mp this
 
 /-- **Peterfalvi (12.11)**: `M ∩ L` complements `K` in `M` and lies in the Fitting kernel
 `H = L_F` of the witness subgroup `L`.

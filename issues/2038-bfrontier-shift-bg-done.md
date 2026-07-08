@@ -230,3 +230,19 @@ genuine assertion ゆえ build 価値あり。**5 iteration の char-endgame 精
 **残 (次 iteration)**: step7 (8.1.b + A,x を complement へ Hall conjugate — 最も subtle、textbook elision)、
 step6/8/9 wiring、coprimality (first assertion `intersection_complements_K` sorried-cite + M_F Hall)、
 最終 assembly。infra は全て揃った (per-A の C_K(A)≠1 は consumer-ready)。lane-b は継続。
+
+## ✅✅ COMPLETE (2026-07-09, lane-b) — `intersection_le_kernel` (Pf 12.11 第2主張) 完全 proven
+
+続⁶ で「multi-lemma deep proof」と診断した `intersection_le_kernel` (M∩L⊆L_F、S14) を **完全に実証明**
+(own proof sorry-free、full build 3945 jobs green、AxiomsCheck OK)。本 session で 10-step 全 assembly を landing:
+
+**commit 履歴** (b): 57c4394a (steps3-5 Frobenius+Wielandt engine) → 96a3f820 (step4 P₀非中心化K) →
+5bd0e4e0 (step10 Hall reduction) → f5642384 (step7 keystone 共通 abelian W) → 2a9d2546 (assembly-prep:
+P₀⊆L_F, nilpotent p-core) → **0f61c1ea (per-A core + reduction = intersection_le_kernel 完成)**。
+
+**transitive に残る sorried-cite のみ**: 第1主張 `intersection_complements_K` (8.13.c1 = BG §16 Theorem II、
+**lane-a gated**、signature 正で cite) + (12.10) `witness_L_sylow_cyclic_of_dvd_complement` (minimality obligation)。
+
+**次の b-frontier**: (12.11) 全体を閉じるには第1主張 `intersection_complements_K` が要 (lane-a の 8.13.c1)。
+それが埋まれば下流 (12.12 complement E cyclic → 12.14 → 12.16 Dade → 12.17 矛盾) へ。lane-b は本 issue の
+reallocation 議論に該当せず — genuine on-path major result を landing 済。継続。
