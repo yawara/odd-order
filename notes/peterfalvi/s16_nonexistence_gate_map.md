@@ -196,3 +196,29 @@ export してくれれば lane-c が cite で §16 を実証明で積める (sig
 - (14.11.2)/(14.11.3) の β_M η-expansion + generic bound、(14.11.4) norm 不等式 (Frobenius (7.5))
 - (14.14) 直交 dichotomy、(14.16) β_L^τ η-expansion contradiction
 - `T_typeII` (14.9)
+
+## 2026-07-09 lane-c 精査: (14.9) `T_typeIII_ratio_le` hcount de-bundle は **BLOCKED** (v=|V| が gated)
+
+`T_typeIII_ratio_le` (S16_NonExistenceG:1647) の唯一 sorry (:1750) は **bundle**:
+`∃ Γ x, hcount ∧ hxcoe ∧ hx ∧ hnorm` (`T_typeIII_ratio_le_of_sSide_gap` :1519 の 4 入力)。
+`hcount : (calT1.card:ℚ) = (v−1)/p` の close を試みたが **2 重に blocked、de-bundle しても sorry は減らない**:
+
+- ⚠ **`v = |V|` は ungated でない**: `hVcard` (:4080-4085) は `V_inf_centralizer_Q_eq_bot`
+  (**S15_SAndT:1891 = bare sorry**、T-side d=1、docstring「(14.9) T_typeII structure に gated」) を **cite**。
+  ∴ v=|V| は T-side d=1 sorry に gated (私の初回「ungated」判断は誤り、`grep -c sorry` の 1 hit を見落とし)。
+- ⚠ **forward-ref**: v=|V| は `IsTypeII hyp.base.T` を要すが `T_typeII` (:1973) は `T_typeIII_ratio_le`
+  (:1647) より**後方**。`hIII : IsTypeIII` からは IsTypeII を得られない (II/III 排他)。
+- ∴ hcount を close するには sorried v=|V| を cite する forward-ref-broken path しか無く、**bundle は honest as-is**。
+
+**再利用可の発見 (別 endpoint 用)**: (a) exact 乗法カウント `card_image_induce_mul_index_eq`
+(`OrbitOnIrr.lean:56`, `(𝒯.image Ind).card * H.index = 𝒯.card`) — floor 版 `calT1_image_induce_card_eq`
+より強く、`p ∣ (|V|−1)` を要する任意の exact ℚ cast に使える。(b) `T_typeIII_calT1_family` (:677) の
+5th conjunct (count) 内に `hinertia`(:811)/`hconj`(G-conj, :821)/`hcard`(:845) が local に proven。
+⟹ v=|V| が ungate される (= `V_inf_centralizer_Q_eq_bot` が実証明化 = 別レーン/9072 T-side d=1) まで 14.9 は保留。
+
+**次の genuine 上流 target (lane-c、2026-07-09)**: `V_inf_centralizer_Q_eq_bot` (S15_SAndT:1891, T-side d=1,
+= `V ⊓ C(Q) = ⊥`) の実証明化。**S-side dual は proven** (`C_eq_bot` S15_SAndT:200 → `U_inf_centralizer_P_eq_bot`
+:209; `c_eq_one` S15_SAndT_Setup:9191 = `c_eq_one_forces_params`(:9002)+`c_eq_one_final_case`(:9140))
+⟹ T-side は S-side 論法の dual で tractable (P↔Q, U↔V, c↔d, W2↔W1 mirror)。これを close すると 14.9 hcount
+(+ `Q_elementaryAbelian_T`/(13.16) `normalizer_V_inf_W1` 系) が unblock。b-owned file ゆえ additive proof
+置換 (signature 不変) で merge-safe、着手前 9000 claim 推奨 (dup 回避)。
