@@ -252,3 +252,26 @@ prime-TI μ-grid の cross-column 構造のみ**。精査で判明した **重�
 prime-TI に接続)、or (b) S15↔§12 framework bridge (carrier 構成前提ゆえ bridge lemma 単独では pin 未 discharge)。
 **hub 裁定要**: lane c を (i) lane-b char cascade 支援に再配置 / (ii) S16 W-side の別 gated frontier / (iii) 他。
 lane c は本 flag 後も /loop 継続 (報告≠停止); 次 iteration は S16 W-side 等で ungated piece を再走査。
+
+## ✅ 進捗 (2026-07-08 lane c /loop, commit 4d18f60a) — gammaGrid_orthogonal_one 実証明化 → (13.18) gate 単一化
+
+前 session の HUB FLAG (13.18 A0-Dade infra 完成、残 = prime-TI pins) を受け、**A0-Dade=Ind bridge
+`sInstance_dade0_eq_induce` を consumer 側で genuine に消費**して (13.18.c) `⟨Γ,1_G⟩=0`
+(`gammaGrid_orthogonal_one`) を **opaque sorry → sorry-free 実証明化**:
+
+- `⟨Γ,1⟩ = ⟨τ_S β_{#1},1⟩ − 1 + ⟨η_{01},1⟩` に分解。η-orthogonality (`eta_principal_eq_trivial` +
+  `eta_orthonormal`, S16_GridExpansion grid field) と Frobenius reciprocity + bridge で
+  `⟨τ_S β,1⟩ = ⟨β,1_S⟩ = ⟨Ind_{PW₁}^S 1,1_S⟩ − ⟨μ_{01},1_S⟩ = 1 − 0`。
+- `⟨μ_{01},1_S⟩=0` は μ_{01} 既約 ∧ ≠1_S (`indPW1_inner_mu` 矛盾) から導出 = **新 gate 不要**。
+- FiniteInduce-scoped vs binder instance 衝突は `indPW1_inner_mu` パターン (FiniteInduce aux +
+  `convert…using 2 <;> Subsingleton.elim`) で解消。
+
+**帰結**: 残 (13.18) gammaGrid facts の gate を**単一 `betaGrid_A0_support`** ((13.18.a)
+`β_j ∈ CF(S,'A0(S))`, Coq A0beta/PVSbeta) に consolidation — `gammaGrid_orthogonal_one` と
+`gammaGrid_Y_norm_bound` の両方がこれに還元。`betaGrid_A0_support` の中身 (PVSbeta) は W₁-class
+normedTI (Coq gammaW1) + prime-TI residue 値 `prTIirr_id` で、**prime-TI residue = S15 `hyp.mu` free
+field ↔ ported S06/S12 residue theory の carrier connection (3002/9014, lane-b territory)** に
+bottom-out (前 flag の linchpin と同一)。`gammaGrid_real` は grid conjugation (別の prime-TI gate)。
+
+full build 3941 green・AxiomsCheck OK・新 axiom 無・S15_SAndT real sorry 9 で不変
+(opaque 1 → proven + precise gate 1)。
