@@ -105,6 +105,35 @@ conjugate column j' の取得 (caseBPair は μ̄_k = μ_{k⁻¹} を使用、ex
 (iv) cross-ortho 3-combo の hyp.base.tau 版 (μμ/μ-irr は S06 に σ 版、transport 要確認;
 irr-irr は inducedKernelFamily 系)。→ several 中間補題として段階 land 予定。
 
+### 🎯 EXACT WIRING MAP (subagent survey 2026-07-08 — 全部品確定、`columnImageFamilyCohFree` 不要)
+
+**決定的**: `hyp.base.tau` = `dadeIntegralCharacterMap h.dade0 h.tau` が**定義的一致**
+(toHypothesis46 の dade0/tau field 展開、S12:1109-1110)。→ `certainTypeR` も
+`dadeOrthonormalCharacterImageFamilyOfDiff` も **seam なしで hyp.base.tau に直接 land**。
+`.Orthogonal` = `∀α∈R,∀β∈R', inner=0` (定義的) ゆえ imageSet_orthogonal 系が直接 hRorth。
+**pivot = μ₁ = columnSum(muColumnChar ⟨1,_⟩) を採用すれば corner 分割不要・全族一発**
+(μ₁ 常在、self-norm w₁ ∈ ℕ ⟹ hN)。
+
+| engine 入力 | 部品 (file:line) | 備考 |
+|---|---|---|
+| R(μ-col) | `S06.certainTypeR` (S06_CertainTypeCoherence:639) | χ₂:=muColumnChar k。hχ₂=muColumnChar_ne_one、hdeg=columnSum_inv_apply_one.symm |
+| R(irr) | `S07.dadeOrthonormalCharacterImageFamilyOfDiff` (S07_Coherence:5837) | hyp:=base.dadeData.dade、hconj:=base.hconj。template=`irrFamilyMemberOrthoDatum` (S13:2761) |
+| pairwise | `S08.inducedKernelFamily_pairwise_orthogonal` (S08_SixTwoGeneral:166) | sOf→SOf 橋 (sOf_subset_SOf S13:361 + SOf_eq) |
+| conj-closed | `S13.sOf_closedUnderConjugate` (S13_MaximalIII_IV:378) | ✓ |
+| no-real | `S08.inducedKernelFamily_hasNoRealCharacters` (S08_SixTwoGeneral:207) | Odd M |
+| isometry | `S12.Hypothesis.tau_inner_eq_of_supported` (S12_Core:3628) | support_subset_of_mem_zSupportedSpan (S07:59) |
+| τ(a−b)∈ZIrr | `dadeIntegralCharacterMap_mem_ZIrr_of_supported` (S07_Coherence:5633) + `inducedKernelFamily_mem_ZIrr` (S08:238) / `columnSum_mem_ZIrr` (S12_Counts:1945) | compose |
+| supp diff | `S13.sOf_anchor_diff_support` (S13_MaximalIII_IV:3001) | (a−χ₁)=(a−μ₁)−(b−μ₁) |
+| μ×μ ⊥ | `S06.certainTypeR_imageSet_orthogonal_certainTypeR` (S06:685) | χ₂≠χ₂', χ₂≠χ₂'⁻¹ glue |
+| μ×irr ⊥ | `S13.certainTypeR_imageSet_orthogonal_dadeOfDiff_typeP` (S13_MaximalIII_IV:2622) | conj-swap for irr×μ |
+| irr×irr ⊥ | `S08.dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal` (S08_CoherenceCorePart1:1650) | 4 inner=0 from pairwise |
+| degree | `S13.caseB_forall_mem_sOf_H0Cprime_apply_one_eq_qu` (S13_CoreStructure:1432) | **d=q·u** |
+| h1A | `S12.one_notMem_A0 hyp.base` (S13_SixTwoBridge:63) | ✓ |
+| pivot/2nd | `S13.columnSum_muColumnChar_mem_sOf_H0Cprime` (S13_CoreStructure:1391) + μ₁.conj | ~3 line glue |
+
+唯一の新規 = **hRorth の 3-way dispatch** (μ×μ/μ×irr/irr×irr、member の ⟨·,·⟩=0 で branch 選択)
++ R-family dispatcher (dichotomy で irr/μ-col 判定、μ-col は φ=columnSum(k) transport)。
+
 ## 参照
 
 - issues/1019 update⁸⁵ / Coq PFsection5.v:588 (pivot), :1234 (5.7), :863/:881 ((5.4))
