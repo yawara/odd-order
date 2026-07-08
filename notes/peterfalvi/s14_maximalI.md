@@ -1966,3 +1966,16 @@ step10 (Hall reduction)。残るは **wiring + M-specific 依存**:
 - **reduction** (step10): core → `Coprime (card(M∩L)) [L:L_F]` (q|both なら Sylow-q=nontrivial π(H)'-A で矛盾) →
   `le_of_coprime_card_index_of_normal` (↥L, (L_F).subgroupOf L 正規, (M∩L).subgroupOf L) → M∩L⊆L_F。
 - Frobenius L = `witness_L_frobenius` (available、TypeIFrobeniusData)。
+
+## ✅✅ COMPLETE (2026-07-09): `intersection_le_kernel` (Pf 12.11 第2主張) 完全 proven
+
+**S14 green (0 error)。intersection_le_kernel の proof は sorry-free** (comment-strip 実測 0)。全 10-step assembly が
+landed infra から組み上がった。transitive に残るのは第1主張 `intersection_complements_K` (8.13.c1/lane-a gated、
+signature 正で cite) と (12.10) minimality obligation (`witness_L_sylow_cyclic_of_dvd_complement`) の sorried-cite のみ。
+
+**landed (この session、全 green)**:
+- reusable infra: `frobeniusGroup_sup_of_invariant_le_kernel`(+`_ambient`) / `exists_ne_one_centralized_by_complement_of_kernel_not_centralizes` (CoprimeAction+WielandtFixedPoint) / `le_of_coprime_card_index_of_normal` (Mathlib/Subgroup)。
+- S14: `P0_not_le_centralizer_K` (+helper `MF_eq_Msigma`/`p_not_mem_sigma`) / `exists_abelian_centralizer_le_of_isComplement` (step7 keystone) / `witness_L_type_eq_typeI`/`witness_P0_le_kernel`/`pGroup_le_opiCoreInG_of_le_of_isNilpotent` (assembly-prep) / `card_MinfL_coprime_card_K` / `witness_MinfL_pprime_subgroup_eq_bot` (per-A core) / `intersection_le_kernel` (reduction)。
+
+**次**: intersection_le_kernel の残 gate は第1主張 `intersection_complements_K` (8.13.c1 = BG §16 Theorem II、lane-a)。
+これが埋まれば (12.11) 全体が閉じ、下流 (12.12→12.17 の |M|=|K||M∩L|≤|K||H| 評価) へ。
