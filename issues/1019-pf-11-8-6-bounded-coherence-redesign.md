@@ -1832,3 +1832,65 @@ update¹³ の verdict に基づく honest fix = Coq `bridge_coherent` (generati
 `coherentUnion_of_glued_of_bridge` に置換 (X=sOf H0C, Y=SOf HC orientation)。hgen (caseA-false) 消滅、
 hDτ は単一 bridge `hbridge_τ = hcol` に collapse、hmixed (§14) のみ genuine sorry として残る。structural
 hyps (hsrc_ortho=span_inner_SOf_HC_sOf_H0C、hdeg/hsupp/h1A/hbridge_supp=setup) を discharge。
+
+## 2026-07-08 update¹⁵ (lane-a /loop, subagent) — ★★ caseA-FALSE hgen を bridge engine で ELIMINATE (spine 上から除去)
+
+update¹⁴ の `coherentUnion_of_glued_of_bridge` を capstone `coherent_SOf_H0C_of_column_identities`
+に wire (S13_Orthogonality)。**caseA-FALSE generation hgen は完全消滅** (capstone は hgen/
+`coherent_SOf_H0C_of_glued` を参照しない)。full build green 3944 jobs、AxiomsCheck OK、新 axiom 無。
+
+### 新 helper (全 sorry-free、`inducedKernelFamily` 汎用)
+- `inducedKernelFamily_mem_intDegree` (整数 degree)、`inducedKernelFamily_mem_apply_one_ne_zero`
+  (nonzero degree)、`inducedKernelFamily_zSpan_support_of_apply_one_eq_zero` (degree0→A₀-supported、
+  mixed {qu,qa} degree で uniform — `SHC_zSpan_vanish_support` の fixed-degree 制約を回避)。
+- bridge の structural hyps 8 本 (hsrc_ortho/h1A/hdeg/hsupp/hχX/hdegχ 等) は全 sorry-free discharge。
+
+### 残 sorry: 4 本 (全 TRUE、除去された false hgen とは別物)
+- `hmixed` (§14 (6.7) image-orthogonality、genuine、旧と同一)
+- `hbridge_τ` (μ-column τ-identity `hsofC.extension(∑μ_i1)=∑ω^σ_i1`、旧 hDτ の honest heir、§14/§9)
+- `hφY` (`dζ ∈ ℤ[S(HC)]`) / `hbridge_supp` (`∑μ_i1−dζ` A₀-supported) — **TRUE だが capstone signature が
+  `ζ ∈ S(HC)` + degree-match を carry しないため sorried** (caller は provide 可)。
+
+### 次: ζ data を caller から thread して hφY/hbridge_supp を close → clean end state (hmixed + hbridge_τ のみ)
+capstone に `(hζHC : ζ ∈ hyp.SOf hyp.HC)` + degree-match hyp を追加 (内部 signature のみ、spine-facing の
+`exists_zeta_residual_not_orthogonal_H0C`/`w2_lt_w1_of_hypothesis_H0C` は不変)、caller が discharge
+(ζ=params.zeta は deg-w₁ 既約 ∈ S(HC): `secondDerived_eq_HC`+`SOf_secondDerived_eq`、degree-match:
+`degree_independent`)。⟹ (11.8) route は 2 genuine §14 sorry (hmixed/hbridge_τ) のみ、caseA-false 完全排除。
+
+## 2026-07-08 update¹⁶ (lane-a /loop, subagent) — ★ clean end state: (11.8) capstone は genuine §14 sorry 2 本のみ
+
+update¹⁵ の 2 threadable sorry (hφY/hbridge_supp) を caller から ζ data thread で close。
+capstone signature に `hζHC : ζ ∈ SOf HC` + `hζdeg` (degree-match) 追加 (内部のみ、spine-facing 不変)、
+caller `exists_zeta_residual_not_orthogonal_H0C` が discharge (hζHC = `secondDerived_eq_HC` +
+`SOf_secondDerived_eq` + char params で clean、hζdeg = `degree_independent`)。full build green 3944 jobs。
+
+### ★ (11.8) route の clean end state 到達
+`coherent_SOf_H0C_of_column_identities` の残 sorry = **`hmixed` (6.7 image-orthogonality、§14 Sibley) +
+`hbridge_τ` (5.8 μ-column τ-identity、§14/§9、旧 hDτ heir) の 2 本のみ、全て genuine**。
+`exists_zeta_residual_not_orthogonal_H0C` / `w2_lt_w1_of_hypothesis_H0C` (spine-facing) は sorry-free。
+
+### ⟹ lane-a の (11.8) ungated work は COMPLETE
+(11.8) route は caseA-false obstruction 完全排除 + honest。残 spine sorry は全て genuine cross-lane/deep gate:
+- `hmixed` / `hbridge_τ` (§14 Sibley coherence、lane-c territory)
+- caseA refuter (S13_Orthogonality:101、lane-b (9.11.2) active)
+- `S_not_coherent` (10.8、deep TI-counting gate)
+lane-a-ownable な ungated (11.8) piece は尽きた (bridge engine + threading で honest 化完遂)。
+
+## 2026-07-08 update¹⁷ (lane-a /loop) — broader Section16Inputs menu take-stock: lane-a producer 完遂、残は cross-lane
+
+`feitThompson` → `sectionSixteenHypothesis_of_isMinimalSimpleOdd` (`Section16Inputs` menu、3 producer 分割)
+の take-stock:
+- **lane-a producer = (11.8) char route** (`card_kappaHall_lt_of_isTypeIIIorIV`/`w2_lt_w1_of_hypothesis_H0C`) —
+  **honest 化完遂** (bridge engine で caseA-false hgen 排除、残 §14 sorry 2 本 hmixed/hbridge_τ は cross-lane)。
+- 他 producer = **BG §14 type-P duality (FeitThompson:936、旧 "lane-f") + BG §16 maximal-pair (:708、旧 "lane-g")**
+  = BG §14/§16 territory (現 lane-b/c、2026-07-06 reshape で b=BG§15/§16 追認)。type-P 構造 engine (:757/843/863)
+  は sorry-free skeleton。
+⟹ **lane-a の ungated FT-spine producer work は完遂**。残 spine work は cross-lane (lane-b/c BG §14/§16 +
+(11.8) route の §14/lane-b/(10.8) gate)。
+
+### lane-a descent 候補 (次 iteration、cluster-exhaustion 手順: hub defer + 次 ungated 上流に着手)
+最有力 = **narrow 𝒮(H₀C) coherence の μ-column pin** (hbridge_τ = `hsofC.extension(∑μ_i1)=∑ω^σ_i1`)。
+現 `coherent_sOf_H0C` は arbitrary coherent extension ゆえ pin 無 (`muColumn_tau1_pin` は Sset-coherence
+`CoherentHypothesis` 限定)。narrow 版 pin 構築 = §9/§14 genuine work、lane-a-ownable の可能性 (§9 は lane-a)。
+要調査: coherent_sOf_H0C を pin 付きで再構成できるか (caseB は forall_mem uniform、caseA は refuter 経由)。
+次点: hmixed (§14 Sibley、lane-c) / (10.8) (deep) は cross-lane、claim-before-build 要。
