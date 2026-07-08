@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S12_Section9Counts
+import OddOrder.Peterfalvi.S09_CertificateDischarge
 
 /-!
 # Peterfalvi Section 12: Maximal Subgroups of Types III, IV, and V
@@ -560,6 +561,8 @@ theorem typePData_card_eq_H_mul_U_mul_W1 [Finite G] {M : Subgroup G} (data : Typ
     _ = Nat.card ↥data.H * Nat.card ↥data.U * Nat.card ↥data.W1 := by rw [← h2]
 
 open scoped Classical FiniteInduce in
+open OddOrder.Peterfalvi.S09 in
+open OddOrder.Peterfalvi.S09.Cert in
 /-- **Peterfalvi (10.8), line 87 lower bound — the (7.8.b) ρ-norm bound for `ζ^{τ₁}`**:
 `‖ζ^{τ₁,ρ}‖² ≥ 1 − ŵ₁/|M'|`.
 
@@ -574,7 +577,18 @@ type-`P` `Hypothesis M`.  It is the M-side analogue of the §14 pattern
 **Genuine, ungated lane-a gate** (the last §7 char-theoretic input to `hA`): the honest route is the
 S16 `chiRhoNormSq_eq_zetaNuRhoNormSq` coupling ported to type-`P` `M`; it does **not** depend on the
 (10.7) partner Frobenius structure (that gates only `hB`).  See
-`notes/peterfalvi/s10_7_derived_frobenius.md` (2026-07-08 update²). -/
+`notes/peterfalvi/s10_7_derived_frobenius.md` (2026-07-08 update²).
+
+**Proof (type-`P` port of S16 `exists_M_hypothesis78`)**: assemble a §7 Dade certificate
+`S09.Hypothesis78 G (typePA M) M` with `H = M' = derivedInG M`, `K = M'.subgroupOf M`, distinguished
+`ζ_0 = Ind_K θ_0 = params.zeta` (placed by `exists_placed_induced_family`), and `ν = coh.tau1`, then
+feed the (7.8.b) Dade-integral engine `zetaNuRhoNormSqGeOfDade`.  The `(7.8.a)` agreement `hagree`
+bridges the *restricted* Dade map `toHypothesis71.τ` (over `A(M)`) to the *full* map
+(`coherence_hagree_dadeMap`, over `A_0(M)`) via `S04.FullDadeIsometryData.restrict_apply`; the
+`ζ_0^ν ⊥ 1_G` fact is `coherence_extension_orthogonal_constOne` (using the conjugate member `ζ̄_0`);
+`2e+1 ≤ h` is `card_derived_ge`.  The engine bound `1 − e/h ≤ ‖ζ_0^{νρ}‖²` is then rewritten to the
+goal via `e = w₁`, `h = |M'|`, and the `chiRhoNormSq = zetaNuRhoNormSq` bridge (mirroring
+S16 `chiRhoNormSq_eq_zetaNuRhoNormSq`). -/
 theorem Hypothesis.chiRhoNormSq_zeta_ge_line78 [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     {hyp : Hypothesis M} {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
@@ -586,7 +600,253 @@ theorem Hypothesis.chiRhoNormSq_zeta_ge_line78 [Finite G]
     (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta) :
     (1 : ℝ) - (hyp.w1 : ℝ) / (Nat.card ↥(derivedInG M) : ℝ)
       ≤ (hyp.toFamilyHypothesis71).chiRhoNormSq (coh.tau1 params.zeta) 0 := by
-  sorry
+  haveI := hyp.finiteG
+  classical
+  -- **Setup**: `H = M' = derivedInG M`, `K = M'.subgroupOf M ⊴ M`.
+  have hHL : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  have hKnormal0 : ((derivedInG M).subgroupOf M).Normal := by
+    rw [derivedInG, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+    infer_instance
+  set K : Subgroup ↥M := (derivedInG M).subgroupOf M with hKdef
+  haveI : K.Normal := hKnormal0
+  have hHnorm : ∀ (l : ↥M) ⦃h : G⦄, h ∈ derivedInG M →
+      (↑l : G) * h * (↑l : G)⁻¹ ∈ derivedInG M := by
+    intro l h hh
+    have hhM : h ∈ M := hHL hh
+    have hmem : (⟨h, hhM⟩ : ↥M) ∈ K := (Subgroup.mem_subgroupOf).mpr hh
+    have hconj := hKnormal0.conj_mem ⟨h, hhM⟩ hmem l
+    rw [Subgroup.mem_subgroupOf] at hconj
+    simpa using hconj
+  have hAH : typePA M hyp.typeP = (derivedInG M : Set G) \ {1} :=
+    typePA_eq_sharpSubgroup_derivedInG M hyp.typeP
+  -- `M`-stability of `A(M) = typePA` (the input to `toHypothesis71`).
+  have hnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ typePA M hyp.typeP →
+      (↑l : G) * a * (↑l : G)⁻¹ ∈ typePA M hyp.typeP := fun l a ha =>
+    ((Subgroup.mem_set_normalizer_iff).mp (hyp.le_normalizer_typePA l.2) a).mp ha
+  -- **Placed induced family** with the distinguished `ζ_0 = Ind_K θ_0 = params.zeta`.
+  obtain ⟨θz, hθz_ne, hθz_eq⟩ := hzS
+  have hχ_range : params.zeta ∈ Set.range
+      (fun φ : IrreducibleCharacter ↥K =>
+        ClassFunction.induce K (φ : ClassFunction ↥K ℂ)) :=
+    ⟨θz, hθz_eq.symm⟩
+  have hχ_ne : params.zeta ≠ ClassFunction.induce K
+      (trivialIrreducibleCharacter ↥K : ClassFunction ↥K ℂ) := by
+    rw [hθz_eq]; exact induce_ne_trivialChar_induce K θz hθz_ne
+  obtain ⟨n, θ, ind1H, hind1H, hθ0eq, htriv, hinj, hcover⟩ :=
+    exists_placed_induced_family K params.zeta hχ_range hχ_ne
+  have hne_triv : ∀ i : Fin (n + 1), i ≠ ind1H →
+      θ i ≠ trivialIrreducibleCharacter ↥K := by
+    intro i hi hcontra
+    apply hi; apply hinj
+    show ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+      = ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ)
+    rw [hcontra, htriv]
+  have hSmem : ∀ i : Fin (n + 1), i ≠ ind1H →
+      ClassFunction.induce K (θ i : ClassFunction ↥K ℂ) ∈ hyp.Sset :=
+    fun i hi => ⟨θ i, hne_triv i hi, rfl⟩
+  -- **Degrees**: `d i = θ_i(1)`, `Ind(θ_0)(1) = [M:K] = w₁`, and `|M| = w₁·|M'|`.
+  have hKindex : K.index = hyp.w1 := by
+    rw [hKdef, Hypothesis.w1, Hypothesis.W1]; exact hyp.typeP.card_W1_eq_derived_index.symm
+  have hcardM : Nat.card ↥M = hyp.w1 * Nat.card ↥(derivedInG M) := by
+    have hsub : Nat.card ↥K = Nat.card ↥(derivedInG M) := by
+      rw [hKdef]; exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHL).toEquiv
+    rw [← Subgroup.index_mul_card K, hKindex, hsub]
+  let d : Fin (n + 1) → ℂ := fun i => (θ i : ClassFunction ↥K ℂ) (1 : ↥K)
+  have hd : ∀ i, d i = (θ i : ClassFunction ↥K ℂ) (1 : ↥K) := fun _ => rfl
+  have hz0eq : ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) (1 : ↥M)
+      = params.zeta 1 := by rw [hθ0eq]
+  have hdeg0 : ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) (1 : ↥M)
+      = (K.index : ℂ) := by
+    rw [hz0eq, hz1, hKindex]
+  have hdeg : ∀ i, ClassFunction.induce K (θ i : ClassFunction ↥K ℂ) (1 : ↥M)
+      = d i * ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) (1 : ↥M) := by
+    intro i
+    rw [ClassFunction.induce_apply_one K (θ i : ClassFunction ↥K ℂ), hdeg0, hd i]; ring
+  have hdeg_match : ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) (1 : ↥M)
+      = ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ) (1 : ↥M) := by
+    rw [hdeg0, htriv]
+    exact (induce_trivialChar_apply_eq_index K (Subgroup.one_mem _)).symm
+  -- **Support** of the difference vectors in `A(M) = (M')#` and in `A_0(M)`.
+  have psi_support : ∀ i, (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+        - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)).support
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (typePA M hyp.typeP) M := by
+    intro i
+    refine (induce_diff_support (θ i) (θ 0) (d i) (hdeg i)).trans ?_
+    intro x hx
+    rw [Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff] at hx
+    exact (mem_supportInSubgroup_sharp_subgroupOf_iff (derivedInG M) hAH x).mpr ⟨hx.1, hx.2⟩
+  have hsupp_full : ∀ i, (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+        - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)).support
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (typePA0 M hyp.typeP) M := by
+    intro i
+    refine (psi_support i).trans ?_
+    intro x hx
+    rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at hx ⊢
+    exact Set.mem_union_left _ hx
+  have hzeta_ind1H : θ ind1H = trivialIrreducibleCharacter ↥K := htriv
+  -- The restricted Dade isometry certificate for `H71.τ = toHypothesis71.τ`.
+  have hτ : OddOrder.Peterfalvi.S04.IsDadeIsometry (G := G) (k := ℂ) (L := M)
+      hyp.toHypothesis71.τ :=
+    ((hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).restrict Set.subset_union_left
+      hnorm).toDadeIsometryData.isDadeIsometry
+  -- **`ν`-isometry** on the family (`ν = coh.tau1 = coherent extension`).
+  have hnu_isometry : ∀ i j : Fin (n + 1), i ≠ ind1H → j ≠ ind1H →
+      ClassFunction.inner (coh.tau1 (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+          (coh.tau1 (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ)))
+        = ClassFunction.inner (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+          (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ)) :=
+    fun i j hi hj => coherence_extension_inner_eq_on_family coh.coherent (hSmem i hi) (hSmem j hj)
+  -- **(7.8.a) agreement** — the restricted-vs-full Dade-map bridge.
+  have hagree : ∀ i : Fin (n + 1), i ≠ 0 → i ≠ ind1H →
+      hyp.toHypothesis71.τ ⟨ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+          - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), psi_support i⟩
+        = coh.tau1 (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+          - d i • coh.tau1 (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) := by
+    intro i hi0 hi_ind
+    obtain ⟨deg_i, -, hdeg_i_eq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast (θ i)
+    have hcohag := coherence_hagree_dadeMap hyp.dadeData.dade hyp.hconj coh.coherent
+      (hSmem i hi_ind) (hSmem 0 (Ne.symm hind1H)) (m0 := 1) (mi := deg_i) (by norm_num)
+      (by rw [hd i, hdeg_i_eq, Nat.cast_one, div_one]) (hsupp_full i)
+    have hbridge : hyp.toHypothesis71.τ ⟨ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+          - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), psi_support i⟩
+        = (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).toDadeMap
+          ⟨ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+            - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ),
+            (ClassFunction.mem_supportedSubmodule).mpr (hsupp_full i)⟩ := by
+      show ((hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).restrict Set.subset_union_left
+          hnorm).toDadeMap ⟨_, psi_support i⟩ = _
+      rw [OddOrder.Peterfalvi.S04.FullDadeIsometryData.restrict_apply]
+      exact congrArg _ (Subtype.ext rfl)
+    rw [hbridge]; exact hcohag
+  -- **Assemble** the (7.8) Dade certificate.
+  set H78 := hypothesis78OfDade hyp.toHypothesis71 hτ (derivedInG M) hHL hHnorm hAH θ hinj hcover
+    d psi_support hdeg ind1H hind1H hzeta_ind1H hdeg_match coh.tau1 hnu_isometry hagree
+    with hH78def
+  -- `e = [M:M'] = w₁`, `h = |M'|`.
+  have hci : H78.complementIndex = hyp.w1 := by
+    have hcieq : H78.complementIndex = Nat.card ↥M / Nat.card ↥(derivedInG M) := rfl
+    rw [hcieq, hcardM, Nat.mul_div_cancel _ Nat.card_pos]
+  have hko : H78.kernelOrder = Nat.card ↥(derivedInG M) := rfl
+  have hsmall : H78.smallIndex := by
+    show 2 * H78.complementIndex + 1 ≤ H78.kernelOrder
+    rw [hci, hko]
+    have hMp := hyp.card_derived_ge hG
+    have hw2 : 0 < hyp.w2 := Nat.card_pos
+    calc 2 * hyp.w1 + 1 = (2 * hyp.w1 + 1) * 1 := (mul_one _).symm
+      _ ≤ (2 * hyp.w1 + 1) * hyp.w2 := Nat.mul_le_mul_left _ hw2
+      _ ≤ Nat.card ↥(derivedInG M) := hMp
+  -- **(7.8.a) coefficient** `a`.
+  obtain ⟨a, ha⟩ := exists_betaDecomp_a H78
+    (Submodule.sub_mem _
+      (ClassFunction.induce_mem_ZIrr K (θ ind1H).property.mem_ZIrr)
+      (ClassFunction.induce_mem_ZIrr K (θ 0).property.mem_ZIrr))
+    (coh.coherent.extension_mem_ZIrr _ (Submodule.subset_span (hSmem 0 (Ne.symm hind1H))))
+  -- **`ζ_0^ν ⊥ 1_G`** via the conjugate member `ζ̄_0 = Ind_K θ̄_0 ∈ S`.
+  obtain ⟨θ0', hθ0'coe⟩ : ∃ t : IrreducibleCharacter ↥K,
+      (t : ClassFunction ↥K ℂ) = (θ 0 : ClassFunction ↥K ℂ).conj :=
+    ⟨⟨(θ 0 : ClassFunction ↥K ℂ).conj, (θ 0).isIrreducible.conj⟩, rfl⟩
+  have hθ0_ne : θ 0 ≠ trivialIrreducibleCharacter ↥K := hne_triv 0 (Ne.symm hind1H)
+  have hθ0'_ne : θ0' ≠ trivialIrreducibleCharacter ↥K := by
+    intro h
+    apply hθ0_ne
+    have hcoe : (θ 0 : ClassFunction ↥K ℂ).conj = trivialClassFunction ↥K := by
+      rw [← hθ0'coe]
+      simpa using congrArg (fun c : IrreducibleCharacter ↥K => (c : ClassFunction ↥K ℂ)) h
+    apply Subtype.ext
+    show (θ 0 : ClassFunction ↥K ℂ) = trivialClassFunction ↥K
+    rw [← ClassFunction.conj_conj (θ 0 : ClassFunction ↥K ℂ), hcoe]
+    exact trivialClassFunction_isReal
+  have hnorm0 : ClassFunction.inner (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
+      (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) = 1 := by
+    rw [hθ0eq]
+    simpa using irreducibleCharacter_inner_eq_ite
+      (⟨params.zeta, params.zeta_irreducible⟩ : IrreducibleCharacter ↥M)
+      (⟨params.zeta, params.zeta_irreducible⟩ : IrreducibleCharacter ↥M)
+  have hnorm0' : ClassFunction.inner (ClassFunction.induce K (θ0' : ClassFunction ↥K ℂ))
+      (ClassFunction.induce K (θ0' : ClassFunction ↥K ℂ)) = 1 := by
+    rw [hθ0'coe, ← ClassFunction.induce_conj, inner_conj_conj, hnorm0, star_one]
+  have hne_zeta : (⟨params.zeta, params.zeta_irreducible⟩ : IrreducibleCharacter ↥M)
+      ≠ ⟨params.zeta.conj, params.zeta_irreducible.conj⟩ := by
+    intro h
+    exact hzconj
+      (congrArg (fun c : IrreducibleCharacter ↥M => (c : ClassFunction ↥M ℂ)) h).symm
+  have horth : ClassFunction.inner (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
+      (ClassFunction.induce K (θ0' : ClassFunction ↥K ℂ)) = 0 := by
+    rw [hθ0'coe, ← ClassFunction.induce_conj, hθ0eq]
+    have hite := irreducibleCharacter_inner_eq_ite
+      (⟨params.zeta, params.zeta_irreducible⟩ : IrreducibleCharacter ↥M)
+      (⟨params.zeta.conj, params.zeta_irreducible.conj⟩ : IrreducibleCharacter ↥M)
+    rw [if_neg hne_zeta] at hite
+    simpa using hite
+  have hdeg' : ClassFunction.induce K (θ0' : ClassFunction ↥K ℂ) (1 : ↥M)
+      = 1 * ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) (1 : ↥M) := by
+    rw [one_mul, ClassFunction.induce_apply_one, ClassFunction.induce_apply_one]
+    congr 1
+    rw [hθ0'coe, ClassFunction.conj_apply]
+    obtain ⟨m, -, hm⟩ := irreducibleCharacter_apply_one_eq_pos_natCast (θ 0)
+    rw [hm, star_natCast]
+  have hsupp : (ClassFunction.induce K (θ0' : ClassFunction ↥K ℂ)
+        - ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)).support ⊆ hyp.A0 := by
+    have hds := induce_diff_support θ0' (θ 0) 1 hdeg'
+    rw [one_smul] at hds
+    intro x hx
+    have hxd := hds hx
+    rw [Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff] at hxd
+    have hmem := (mem_supportInSubgroup_sharp_subgroupOf_iff (derivedInG M) hAH x).mpr
+      ⟨hxd.1, hxd.2⟩
+    show x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup (typePA0 M hyp.typeP) M
+    rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at hmem ⊢
+    exact Set.mem_union_left _ hmem
+  have hζ0_1 : ClassFunction.inner (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
+      (Hypothesis71.constOne ↥M) = 0 := inner_induce_constOne_eq_zero K (θ 0) hθ0_ne
+  have hζ0'_1 : ClassFunction.inner (ClassFunction.induce K (θ0' : ClassFunction ↥K ℂ))
+      (Hypothesis71.constOne ↥M) = 0 := inner_induce_constOne_eq_zero K θ0' hθ0'_ne
+  have hτ_smul : ∀ (c : ℂ) (x : ClassFunction ↥M ℂ), hyp.tau (c • x) = c • hyp.tau x :=
+    dadeIntegralCharacterMap_smul_complex hyp.dadeData.dade
+      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)
+  have htau1 : ∀ φ : ClassFunction ↥M ℂ, φ.support ⊆ hyp.A0 →
+      ClassFunction.inner (hyp.tau φ) (Hypothesis71.constOne G)
+        = ClassFunction.inner φ (Hypothesis71.constOne ↥M) := by
+    intro φ hφ
+    rw [show hyp.tau φ = hyp.dadeData.dade.dadeMap (k := ℂ)
+        ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφ⟩ from
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) hφ]
+    exact inner_tau_supported_constOne
+      ({ hyp := hyp.dadeData.dade
+         τ := hyp.dadeData.dade.dadeMap (k := ℂ)
+         isDadeMap := hyp.dadeData.dade.isDadeMap_dadeMap
+         hConjInvariant := hyp.hconj } : Hypothesis71 G (typePA0 M hyp.typeP) M)
+      ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφ⟩
+  have hζ0'mem : ClassFunction.induce K (θ0' : ClassFunction ↥K ℂ) ∈ hyp.Sset :=
+    ⟨θ0', hθ0'_ne, rfl⟩
+  have hzeta0nu : ClassFunction.inner
+      (coh.tau1 (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)))
+      (Hypothesis71.constOne G) = 0 :=
+    coherence_extension_orthogonal_constOne coh.coherent hτ_smul htau1
+      (hSmem 0 (Ne.symm hind1H)) hζ0'mem hnorm0 hnorm0' horth hsupp hζ0_1 hζ0'_1
+  -- **The (7.8.b) engine bound** `1 − e/h ≤ ‖ζ_0^{νρ}‖²`.
+  have hbound : (1 : ℝ) - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ)
+      ≤ H78.zetaNuRhoNormSq :=
+    zetaNuRhoNormSqGeOfDade hyp.toHypothesis71 hτ (derivedInG M) hHL hHnorm hAH θ hinj hcover d
+      psi_support hdeg ind1H hind1H hzeta_ind1H hdeg_match coh.tau1 hnu_isometry hagree hzeta0nu
+      hnorm0 a ha hsmall
+  -- **Norm bridge** `chiRhoNormSq = zetaNuRhoNormSq` (mirrors S16's norm-bridge lemma).
+  have hpsi : coh.tau1 params.zeta = H78.nu (H78.hyp76.zeta H78.zetaDistinct) := by
+    show coh.tau1 params.zeta = coh.tau1 (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
+    rw [hθ0eq]
+  have hnorm_eq : (hyp.toFamilyHypothesis71).chiRhoNormSq (coh.tau1 params.zeta) 0
+      = H78.zetaNuRhoNormSq := by
+    have hH71 : H78.hyp76.hyp71 = hyp.toHypothesis71 := rfl
+    have hcf : ((hyp.toFamilyHypothesis71).hyp71 0).chiRhoCF (coh.tau1 params.zeta)
+        = H78.zetaNuRho := by
+      show hyp.toHypothesis71.chiRhoCF (coh.tau1 params.zeta) = H78.zetaNuRho
+      rw [Hypothesis78.zetaNuRho, hH71, ← hpsi]
+    simp only [FamilyHypothesis71.chiRhoNormSq, Hypothesis78.zetaNuRhoNormSq, hcf]
+    congr 1
+  rw [hnorm_eq, ← hci, ← hko]
+  exact hbound
 
 open scoped Classical FiniteInduce in
 /-- **Peterfalvi (10.8), norm-counting estimate** (the §7 analytic heart, the `hbound` input to
