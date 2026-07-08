@@ -7,6 +7,26 @@ created: 2026-07-07
 
 # Pf (11.8.6): uniform-degree 設計 over-strong (非Galoisで偽) → bounded_seqIndD_coherence redesign
 
+> ## ⚠⚠ CURRENT STATE (2026-07-09 lane-a 再開時 code-level 検証) — 本 issue 後半 (update⁴⁶〜⁵⁴) は STALE
+> **redesign は実質完遂**。実コード検証で判明した正確な現状 (update⁴⁶〜⁵⁴ の「Ptype_core_* scaffold landed」
+> 主張は git log -S で **一度もコミットされておらず実体ゼロ** — 診断 doc のみで、その後 caseB uniform-degree
+> route が supersede した):
+> - **caseB (9.7.b) coherence = sorry-free 完成**: `S13.caseB_coherent_sOf_H0Cprime` /
+>   `caseB_coherent_sOf_H0C` (S13_CoreStructure、`uniform_degree_coherence_of_families` engine 経由)。
+> - **caseA (9.7.a) = lane-b へ handoff 済** (HUB RULING 0101): `caseA_coherent_sOf_H0Cprime_of_refuter`
+>   (S11_NineElevenCaseA, lane-b 所有) が maximality **refuter** 節に還元済 (sorry-free)。
+> - **world-bridge + capstone = 完成**: `coherent_sOf_H0C` (unconditional, S13_Orthogonality) +
+>   `coherent_SOf_H0C_of_column_identities` + `exists_zeta_residual_not_orthogonal_H0C` +
+>   `w2_lt_w1_of_hypothesis_H0C`。spine は `OddOrder/FeitThompson.lean` で S13 route に再配線済 (0 bare)。
+> - **残 spine sorry = 3 本 (全て cross-lane、S13_Orthogonality)**: (1) caseA refuter `(by sorry)` (:130,
+>   lane-b S11) / (2) `hmixed` (6.7) image-side 直交 (:295, §14 Sibley) / (3) `hbridge_τ` (5.8) μ-column
+>   image pin (:316, §14/§9)。
+> - **vestigial (証明しない、consumer 0)**: S13_CoreStructure の `OrthogonalityData`-based 3 sorry
+>   (`orthogonality_setup`:1359 / `not_orthogonal_mu0_sub_zeta`:1378 / `final_typeIII_conclusions`:1618)。
+>
+> ⟹ **lane-a の (11.8.6) producer work は完遂**。次目標 = **W2 (9000 typeP_Galois instance tail)** へ pivot
+> (HUB RULING 0101 点5 + `notes/meta/ft_endgame_plan_2026_07_07.md` R1)。本 issue 後半は歴史記録として残置。
+
 ## 背景 (lane-a, 2026-07-07 code-level 確証)
 
 (11.8.6) capstone `Hypothesis.coherent_Sset_of_column_identities` (S12_MaximalIII_IV_V.lean) の

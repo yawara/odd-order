@@ -21,6 +21,7 @@ import OddOrder.GroupTheory.OmegaSubgroup
 import OddOrder.GroupTheory.OpResidual
 import OddOrder.GroupTheory.PRank
 import OddOrder.GroupTheory.PiElementDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.AInvariantSubrep
 import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
