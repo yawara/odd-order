@@ -199,6 +199,22 @@ theorem escaping_honestTypeP2A0Set_mem_honestTypeP2ASet {M : Subgroup G} (data :
   · exact ⟨hpa, haesc⟩
   · exact absurd (conjClassSetIn_typePV_centralizer_le_M data hva) haesc
 
+/-- **(13.2.e) `normedTI` core for the `A₀`-support: no `A₀(S)`-point escapes.**  Every escaping
+`A₀(S)`-point reduces to an escaping `A(S)`-point (`escaping_honestTypeP2A0Set_mem_honestTypeP2ASet`,
+since `V^S` does not escape), and the honest `A(S)` has no escaping point on a type-`P₂` maximal
+(`escaping_honestTypeP2ASet_eq_empty`, the proven (13.2.e) core via BG Theorem D(4)).  So the full
+`'A0(S)` support is `normedTI`: this is the trivial-stabilizer input `∀ a, dadeHypS0.H a = ⊥` the
+`τ_S = Ind_S^G` Dade=Ind bridge needs (feeding (13.18.c) `⟨Γ, 1_G⟩ = 0` etc., issue 9076). -/
+theorem escaping_honestTypeP2A0Set_eq_empty [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP2 : OddOrder.BG.Ch4.S14.IsTypeP2 M) (data : TypePData M) :
+    OddOrder.GroupTheory.escapingCentralizerSet M (honestTypeP2A0Set M data) = ∅ := by
+  rw [Set.eq_empty_iff_forall_notMem]
+  intro a ha
+  have hAesc := escaping_honestTypeP2A0Set_mem_honestTypeP2ASet data ha
+  rw [escaping_honestTypeP2ASet_eq_empty hG hM hP2] at hAesc
+  exact Set.notMem_empty a hAesc
+
 /-! ### The `A₀(S) ⊆ A0Set M K₀` bridge (issue 9076 piece 4c)
 
 The honest support `honestTypeP2A0Set M data = A(S) ∪ V^S` embeds into BG's Theorem-E set
