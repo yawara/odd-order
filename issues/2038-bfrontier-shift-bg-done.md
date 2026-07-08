@@ -149,3 +149,20 @@ crux は深い BG Cor 15.9 の逆で、S16 (b-owned) に置ける可能性はあ
 Coq/教科書精読 ([[feedback-ask-chatgpt-for-elided-gaps]]) 候補。**次 iteration**: (a) P₂-crux を Coq-assisted で
 attempt、or (b) upstream-priority 再考 (§13 (13.18) residue supply 等)。b の (8.13) ∃! + reverse-escape は
 escapingCentralizers_control (lane-a) の citable upstream として残る。
+
+## 🧭 (2026-07-08 続⁴、lane-b /loop) — b の (8.13)/escaping クラスタ寄与は **完了**、残は lane-a-coupled 深部 (hub 裁定要)
+
+3 iteration の frontier 精査の**確定診断** (hub 向け):
+- **b の clean 寄与は landed で完了**: `existsUnique_maximal_centralizer_le_typeI_or_typeII` (∃!) +
+  `exists_sigmaSharp_escape_of_not_fittingIsTI` (reverse-escape)。両者 sigmaSharp-based で **b/lane-a 境界の正しい
+  b 側**。escaping-set 形 (A1 M tau → sigmaSharp bridge) は Peterfalvi `A1` (S10、lane-a) を要すゆえ lane-a 側。
+- **P₂-crux = BG §14 type-duality の逆**: repo は `typeP2_neighbor_is_typeF`/`_of_mem` (S14:11396/12030 = Cor 14.12
+  = Coq `P2type_signalizer`) で **M-type-P₂ ⟹ neighbour-type-F** を持つが、逆の **M-type-F + escaping ⟹
+  neighbour-type-P₂** は未組立 (Cor 14.12 machinery の逆向き; Cor 15.9 も Coq もこれを仮説に取る)。深い multi-lemma port。
+- **b の S14 残 sorry (11) は一律 gated**: allTypeI/(8.8.a)/(12.11 = 8.13.c1+8.1.b/c+9.1+12.10)/hub 9003 = 全て §8/§16
+  escaping-centralizer 深部 = escapingCentralizers_control (lane-a S10) 系。b-owned で clean ungated な残は無し。
+- **∴ hub 裁定事項**: (1) lane-a が b の ∃!+reverse-escape を input に escapingCentralizers_control を組む、
+  (2) P₂-crux (type-duality 逆) を b or shared に deep-port 割当 (Coq-assisted, multi-session)、
+  (3) b を別クラスタへ reallocate。lane-b は再評価トリガー (ungated on-path work ゼロ) に**近い**が、本 session で
+  genuine 2 lemma landed ゆえ churn drift ではない。次 /loop iteration は (2) を Coq-assisted で begin する
+  (deep frontier を engage; policy「難所を回避しない」)、hub が別途 (1)/(3) を裁定可。
