@@ -83,4 +83,36 @@ noncomputable def Hypothesis.residueS [Finite G] (hyp : Hypothesis (G := G))
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   exact PrimeTIResidueData.ofS06Hypothesis (hyp.s06S hG) ⊤ le_top
 
+/-! ## Support-set relation: honest `A(S)` `⊆` the deprecated `typePA` over-claim (issue 9008)
+
+The `(13.18)` support pin `S15.Hypothesis.tauS_mu_row0_diff_support` places the `μ`-column difference
+support inside `honestTypeP2A0Set = honestTypeP2ASet ∪ V^S`, whose `A`-part
+`honestTypeP2ASet = centralizerSupport (M_σ^#) S'` is the **honest** Peterfalvi (8.10)/(13.2.e)
+type-`P₂` support (indexed over the *core* `M_σ^#`; issue 9008 Option A).  The old
+`typePA = centralizerSupport S^# S' = (S')^#` is the **over-claim** (issue 9008 phantom): it wrongly
+includes the Frobenius-complement points `U^#` (where `C_{S_σ} = 1`).
+
+**The pin's support target is therefore correct, and the `(13.18)` route is clean**: the S06
+certain-type bound `certainTypeDiffSupported : SupportedClassFunctions (A ∪ V^S) L` is **parametric
+in the Hypothesis46 support `A`** — so a `Hypothesis46 (honestTypeP2ASet S) ↥S` (built with lane-c's
+`dadeHypS0`, whose support is exactly `honestTypeP2A0Set`) delivers the pin's honest support
+`honestTypeP2A0Set` *directly*, with no `typePA0` over-claim in the way.  The remaining pin-2/3
+assembly is thus the type-`P₂` `Hypothesis46`-for-`S` (`A = honestTypeP2ASet`, `dade0 = dadeHypS0`),
+which lives in lane-c's `S15_HonestTypeP2A0` (it consumes `dadeHypS0`); cf. issue 9076.
+
+The lemma below just records the containment `honest ⊆ over-claim` (immediate from `M_σ ≤ S` and
+`centralizerSupport` monotonicity in its source), a sanity check on the two support notions. -/
+theorem honestTypeP2ASet_subset_typePA {M : Subgroup G}
+    (data : OddOrder.GroupTheory.TypePData M) :
+    honestTypeP2ASet M ⊆ OddOrder.GroupTheory.typePA M data := by
+  intro y hy
+  rw [mem_honestTypeP2ASet] at hy
+  obtain ⟨hyM', hy1, x, hx, hxcent⟩ := hy
+  simp only [OddOrder.GroupTheory.typePA, OddOrder.GroupTheory.centralizerSupport,
+    Set.mem_setOf_eq]
+  rw [OddOrder.GroupTheory.sharpSubgroup, Set.mem_diff_singleton] at hx
+  exact ⟨hyM', hy1, x, by
+    rw [OddOrder.GroupTheory.sharpSubgroup, Set.mem_diff_singleton]
+    exact ⟨OddOrder.BG.Ch3.S10.Msigma_le M hx.1, hx.2⟩, hxcent⟩
+
 end OddOrder.Peterfalvi.S15

@@ -356,3 +356,36 @@ bottom-out (前 flag の linchpin と同一)。`gammaGrid_real` は grid conjuga
 
 full build 3941 green・AxiomsCheck OK・新 axiom 無・S15_SAndT real sorry 9 で不変
 (opaque 1 → proven + precise gate 1)。
+
+### ✅ support-set subtlety 解決 (2026-07-08 続、上の「support-set subtlety」節を訂正)
+
+上節「support-set subtlety」は **誤診 (逆)** だった。code-level 精査で解決:
+
+- **issue 9008 で既決**: `typePA = (S')^#` こそ **over-claim (phantom、mmd OCR 由来)** で、Frobenius
+  補元 `U^#` (C_{S_σ}=1) を誤って含む。`honestTypeP2ASet = centralizerSupport(M_σ^#, S')`
+  (M_σ# 添字) が **honest な (8.10)/(13.2.e) 訂正 support** (strictly smaller、正しい)。
+  ∴ pin 2 の target `honestTypeP2A0Set` は**正しい** (typePA0 でなく)。
+- **certainTypeDiffSupported の support `A ∪ V` は Hypothesis46 の `A` に parametric (free)**
+  (S06_CertainTypeIsometry:357 の signature 確認)。∴ `Hypothesis46 (honestTypeP2ASet S) ↥S` を
+  `dadeHypS0` (support = honestTypeP2A0Set) で組めば certain-type bound が pin の honest support を
+  **直接 deliver**。over-claim 問題は発生しない。
+
+**⟹ 結論: pin 2/3 の route は clean・unblocked**。残 = **Hypothesis46-for-S 組立**
+(`A = honestTypeP2ASet`, `toHypothesis = s06S`, `tic = typePData_toTICyclicHypothesis Sdata`,
+`dade0 = dadeHypS0`, `tau = dadeHypS0.fullDadeIsometryData`) → `certainTypeDiffSupported` (pin 2) +
+`certainType_diff_dade_eq` (pin 3、i=0 で `τ_S(μ_{0j}−μ_{01})=δ(ω^σ_{0j}−ω^σ_{01})`)。
+**配置 = lane-c `S15_HonestTypeP2A0`** (dadeHypS0 消費、backward import 回避)。lane-b の
+`residueS`/`mu2_ne`/`honestTypeP2ASet_subset_typePA` は upstream で citable。
+
+lane-b landed (commit 01e798c6): `honestTypeP2ASet_subset_typePA` + 本 route 確定。
+
+### ⚠ A_covers 追加 subtlety (Hypothesis46-for-S 組立時、lane-c 向け)
+
+`certainTypeDiffSupported` は A parametric だが、`Hypothesis46 A L` の **`A_covers` field** (`∀ hh ∈ subH,
+hh≠1 → hh は A で cover`) が要る。subH = K = S' ゆえ A_covers は「S'# が A で cover」を要求。
+`A = honestTypeP2ASet` (⊊ S'#) では **S'# ∖ honestTypeP2ASet (= M_σ# を centralize しない S'-元) が
+cover されず A_covers が直接には成立しない**可能性。∴ Hypothesis46-for-S を A=honestTypeP2ASet で組むには
+(a) A_covers を honest support 向けに再証明 (S'# の非-M_σ-centralizing 元が実は別経路で cover される、or
+subH を狭める)、or (b) A=typePA で組んで certainTypeDiffSupported ⊆ typePA0 を得た後、μ差が
+typePA0 ∖ honestTypeP2A0Set 上 vanish を別途示す (residue値 chi_j=chi_1 on U^# の議論)。
+lane-c の A0-Dade (honestTypeP2A0Set の covering 構造) 知見が要る点。
