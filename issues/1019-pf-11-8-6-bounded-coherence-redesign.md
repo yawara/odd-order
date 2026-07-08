@@ -1700,3 +1700,28 @@ repo artifact 注記: repo の caseB (9.11) 証明は (11.7) H₀=1 で特化 (�
 (lane-b (9.11) territory、shallow でない)。⟹ **lane-a char cluster は (10.8)+§14+lane-b caseA で comprehensively
 gated が再確認**。my `caseB_coherent_sOf_H0C` は principle-1 な gated-endpoint building block として landed 済
 (9075 を honest (11.8.6) hY に前進、新 sorry 無し)。
+
+## 2026-07-08 update¹⁰ (lane-a /loop) — ★ unconditional `𝒮(H₀C)` coherence LANDED (honest (11.8.6) `hY`)
+
+新 leaf **`OddOrder/Peterfalvi/S13_Orthogonality.lean`** を作成 (caseA=`S11_NineElevenCaseA` と
+caseB=`S13_CoreStructure` は sibling leaf ゆえ dispatch は両者 downstream の共通 file が必要; これが
+honest (11.8.6) endpoint の自然な home、将来 FeitThompson が import)。
+
+**`coherent_sOf_H0C`** (`Nonempty (IsCoherent τ (sOf hyp.s11Setup hyp.H0C) A0)`): (9.11) の
+`clifford_dichotomy` で dispatch —
+- **caseB** = 私の `caseB_coherent_sOf_H0C` (9075→11.7 transfer、landed、新 sorry 無し)、
+- **caseA** = `caseA_coherent_sOf_H0Cprime_of_refuter` + 同 transfer + μ-column witness、
+  **refuter のみ sorried** (= (9.11.2) pair-adjoining non-coherence、lane-b の `S11_NineElevenCoherence`
+  active work、principle-1 sorried-cite)。
+
+これで honest (11.8.6) の **unconditional `hY` (𝒮(H₀C)-coherence) 入力が揃った**
+(`#print axioms` = 1 sorryAx = caseA refuter + caseB chain の (10.8) gate)。full build に組込済
+(OddOrder.lean import 追加)。
+
+### 次 iteration (honest (11.8.6) caller、同 file S13_Orthogonality)
+`coherent_SOf_H0C_of_glued` を `coherent_sOf_H0C` (hY) で instantiate:
+- coh = `coherent_SOf_HC` (landed)、ν = glue map 構成、hgen = narrow uniform-degree (caseB TRUE)、
+  hmixed/hDτ = §14 Sibley sorried-cite。
+→ `𝒮(H₀C)` coherent (union-glue) → **`S_H0C_not_coherent` (11.3/10.8) と矛盾で honest (11.8)**。
+→ `exists_zeta_residual_not_orthogonal`/`w2_lt_w1` を本 file に relocate + FeitThompson rewire →
+  **false `Sset_diff_SHCSet_apply_one_eq_qu` を spine から除去**。
