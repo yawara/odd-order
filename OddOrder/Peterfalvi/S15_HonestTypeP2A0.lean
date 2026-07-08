@@ -744,7 +744,17 @@ theorem Hypothesis.mu_row0_ne [Finite G] (hyp : Hypothesis (G := G)) {j : Fin hy
 difference `μ_{0j} − μ_{0,#1}` is supported inside `A₀(S) = A(S) ∪ V^S` — its support meets `S`
 only in `P^# ∪ V_S`, because the two prime-`TI` residues share the same `1_S`-part off `A₀(S)` and
 it cancels in the difference.  This is the `S`-side instance of Coq `prDade_sub_TIirr_on`
-(`μ2_{ij} − μ2_{ik} ∈ 'CF(S, 'A0)`).  Prime-`TI` theory, cf. issue 9014. -/
+(`μ2_{ij} − μ2_{ik} ∈ 'CF(S, 'A0)`).  Prime-`TI` theory, cf. issue 9014.
+
+**⚠ over-claim (2026-07-08 lane-c 精査; issue 9076)**: 本 pin は `∀ j` だが **`j = 0` で偽**、`j ≠ 0`
+が要る。consumer `tauS_mu_row0_cross` (S15_SAndT:4020) は `(_hj : (j:ℕ) ≠ 0)` を持ち **j≠0 でのみ**
+呼ぶ。j=0 は trivial column: `chi_zero`+`chi_res` ⟹ `mu2 0 0 (1) = 1` (Res_PU = trivial) だが
+`mu2 0 j (j≠0)` は residue degree ⟹ `(μ_{00}−μ_{0,#1})(1) ≠ 0`、`1 ∉ A₀` ゆえ support ⊄ A₀
+(`certainType_diff_supp_subset_A0` の `z=1` 分岐が `hdeg` を要求、S06_CertainTypeIsometry:287)。
+**honest fix** = signature に `(hj0 : (j:ℕ) ≠ 0)` を追加 (b が consumer で `_hj` を pass、cross-lane
+2-step)。**honest close (j≠0)** = `hyp46S` の `certainTypeDiffSupported` (`hdeg` は
+`forall_columnFamily_mu_apply_one_eq_of_sum_eq` 経由 — 両 residue column の sum-degree 一致) +
+grounding `hyp.mu = residueS.mu2`. -/
 theorem Hypothesis.tauS_mu_row0_diff_support [Finite G] (hyp : Hypothesis (G := G))
     (j : Fin hyp.p) :
     (hyp.mu ⟨0, hyp.q_prime.pos⟩ j

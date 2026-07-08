@@ -146,6 +146,22 @@ trichotomy** (constant-row/column 除外) は欠く → 4a/4b がそれを埋め
     - **lane-c 実施済 (2026-07-08)**: `mu_row0_ne` の proof を refine — diagonal `⟨μ_{0,#1},μ_{0,#1}⟩=1`
       (`mu_irreducible.inner_self_eq_one`) + 矛盾 logic を実証明、残 sorry を **単一 crisp obligation**
       `hoff : ⟨μ_{0j},μ_{0,#1}⟩=0` (= row-0 cross-column orthogonality = grounding) に isolate。build green。
+    - **lane-c 実施² (2026-07-08): `hyp46S` = type-P2 Hypothesis46-for-S を sorry-free 構成** (commit
+      6945ba5f)。pin-2/3 が route する §6 certain-type `Hypothesis46 (honestTypeP2ASet S) ↥S` を
+      `hypothesis46OfTypePData` から組立 (dade0=dadeHypS0、subH=M_σ、4 obligation 実証明: normal /
+      `W2≤M_σ` / `M_σ≤S'` / A_covers)。**ungated** (grounding 不要で build 可)。⟹ pin-2/3 の infra
+      (`residueS` + `certainTypeDiffSupported` + `hyp46S`) が全て揃い、残 gate は 3 pin 共通 grounding のみ。
+    - **⚠ correctness 発見 (2026-07-08 lane-c): `tauS_mu_row0_diff_support` (pin 2) は `∀ j` だが
+      `j=0` で偽**。consumer `tauS_mu_row0_cross` (S15_SAndT:4020) は `(_hj : (j:ℕ)≠0)` を持ち **j≠0 で
+      のみ**呼ぶが、pin 2 signature に j≠0 が無い。j=0 = trivial column: `chi_zero`+`chi_res` ⟹
+      `mu2 0 0 (1)=1` (Res_PU=trivial)、`mu2 0 j (j≠0)` は residue degree ⟹ `(μ_{00}−μ_{0,#1})(1)≠0`、
+      `1∉A₀` ゆえ support⊄A₀ (`certainType_diff_supp_subset_A0` の z=1 分岐が hdeg 要求)。**honest fix
+      = pin 2 に `(hj0:(j:ℕ)≠0)` 追加** + b が consumer で `_hj` を pass (cross-lane 2-step; C 単独では
+      signature 変更が b の build を壊す = merge-safety ゆえ coordination 要)。**b への依頼**: grounding
+      field 追加時に併せて `tauS_mu_row0_diff_support` の call を `… j _hj` へ更新。honest close route
+      (j≠0): `hyp46S.certainTypeDiffSupported` (hdeg via `forall_columnFamily_mu_apply_one_eq_of_sum_eq`,
+      両 residue column の sum-degree 一致) + grounding。**pin 3 (vanish_on_V) も同様に j≠0 前提**
+      (V-value は residue column にのみ意味)。
   - **route (実装済、参考)**:
     `honestTypeP2A0Set_tame_conj` を **circularity 回避のため BG Thm II で uniform に** 証明する
     (case-dispatch は mixed case = pin ゆえ循環; 実際 `dadeSupportHypothesisData_honestTypeP2A0Set` の
