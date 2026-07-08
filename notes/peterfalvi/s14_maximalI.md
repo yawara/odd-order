@@ -1938,11 +1938,22 @@ M_F Hall 性** から (∴ 第2主張は第1主張に transitively 依存; 第1�
 - helper (additive、reusable counterexample facts): `MF_eq_Msigma` (K=M_F=M_σ, Prop 16.1 f) /
   `p_not_mem_sigma` (p∉σ(M))。
 
+### step 10 core landed (2026-07-09、green)
+- `le_of_coprime_card_index_of_normal` (Mathlib/Subgroup.lean): H⊴G + gcd(|S|,[G:H])=1 ⟹ S≤H
+  (general reusable、SH/H↪G/H の order が |S| と [G:H] を割る→coprime で自明)。step10 の reduction core。
+
 ### 残 (次 iteration、S14 assembly)
-- **step 7** (8.1.b + A,x conjugate into U): 最も subtle。`TypeIData M` (ctr.M_typeI) の `typeF.U1`/
-  `centralizer_le_U1` + A,x を complement に入れる Hall conjugacy。
-- **step 9,10**: L Frobenius 条件(4) `centralizer_kernel_le` (既存) + normal-Hall-in-Frobenius reduction。
-- **coprimality gcd(|A|,|K|)=1**: `intersection_complements_K` (sorried-cite) + M_F Hall。
-- **assembly**: 上記 + step1-5 infra + step4 で per-A の「C_K(A)≠1」を S14 で組む → C_K(x)≠1 (12.9) →
-  A centralizes x → A=1 → M∩L⊆H。`exists_ne_one_centralized_by_complement_of_kernel_not_centralizes` が
-  C_K(A)≠1 の consumer-ready form (φ・coprimality・non-central=step4 を供給)。
+- **step 7 の難所は解消 (2026-07-09 洞察)**: 「A,x を complement へ Hall conjugate」は**不要**。
+  **M∩L 自体が K の complement in M** (第1主張 `intersection_complements_K`) ゆえ、(8.1.b) の complement
+  U を **U=M∩L に取る** → A も x(∈P₀⊆M∩L) も M∩L=U に居り、(8.1.b) `centralizer_le_U1` で共通 U1 (abelian)
+  に入る (「(b)/(c) はどの complement でも成立」Pf 04.10 line17)。⟹ A centralizes x。**要**: complement=M∩L
+  の `TypeFData` 構成 or 「任意 complement に U1 存在」lemma (ctr.M_typeI の固定 U から M∩L complement へ
+  U1 性を transfer、or 直接構成)。ここが次の主タスク。
+- **step 9**: L Frobenius 条件(4) `centralizer_kernel_le` (既存) で A≤C_L(x)⊆H、A⊓H=⊥ → A=1。
+- **step 10**: `le_of_coprime_card_index_of_normal` (landed) を M∩L (π(H)-group) と H=L_F に適用。
+  M∩L が π(H)-group = core (全 π(H)'-A trivial) から。
+- **coprimality gcd(|P₀A|,|K|)=1**: P₀A≤M∩L complements K (第1主張) → |M∩L| coprime |K| (M_F Hall) →
+  |P₀A| coprime |K|。第1主張 sorried-cite。
+- **assembly**: step1-5 infra + step4 で per-A「C_K(A)≠1」→ C_K(x)≠1 (12.9 `CKx_not_le_Kprime`) →
+  step7 (A centralizes x) → step9 (A=1) → step10 (M∩L⊆H)。
+  `exists_ne_one_centralized_by_complement_of_kernel_not_centralizes` が C_K(A)≠1 の consumer-ready form。
