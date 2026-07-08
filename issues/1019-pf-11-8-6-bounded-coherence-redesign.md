@@ -1630,3 +1630,41 @@ core-coherence, non-uniform]` で作る。crux = **coherent(𝒮(H0C)) が repo 
 coherent(𝒮(H0C)) via (9.11) [caseA=b/caseB sorryAx 掃除] + τ₃ glue §14/BG§15)。**lane-a-local な quick fix は無い。**
 false `:4492` sorry は既存 ⚠ 付きで**現状維持が正しい** (今 replace すると true-but-unproven な hY/glue/(10.8) sorry へ
 shuffle するだけ = 禁止)。∴ lane-a の §10-§11.8 cluster ungated work は hA/h78 完了で**枯渇**、残りは cross-lane gate。
+
+## 2026-07-08 update⁹ (lane-a /loop) — ★ honest route FULLY MAPPED + caseB `hY` LANDED (`caseB_coherent_sOf_H0C`)
+
+独立再検証 (textbook Pf (11.8.6) 原文 `04.13` L61-71 精読 + code trace) で honest 経路の**完全 piece graph**
+を確定。last iteration の「cross-lane multi-part gated」診断は**構造的に正しい**が、以下 2 点を訂正/前進:
+
+### ① honest (11.8.6) 完全 piece graph (全 signature 確認済、S13 に全在)
+`exists_zeta_residual_not_orthogonal` を S13 に relocate し、**narrow-`𝒮₂` route** で組む
+(現 S12 `coherent_Sset_of_column_identities` の wide `Sset\SHCSet` uniform-degree = **偽**を排除):
+- `coh` = `coherent_SOf_HC` (S13:1847, landed)
+- `hY` = **`caseB_coherent_sOf_H0C`** (本 update で LANDED) = caseB `𝒮(H₀C)` coherence
+  = `caseB_coherent_sOf_H0Cprime` (9075) →[`coherent_sOf_H0C_of_coherent_sOf_H0Cprime` (11.7 C′→C)]→ `𝒮(H₀C)`。
+  **caseA 版** = `caseA_coherent_sOf_H0Cprime_of_refuter` (S11_NineElevenCaseA:65) + 同 transfer = **lane-b refuter gated** (sorried-cite)。
+- union-glue `coherent_SOf_H0C_of_glued` (S13:2181, axiom-clean skeleton): ν/hgen/hmixed/hDτ。
+  **hgen** = narrow uniform-degree (caseB TRUE, `forall_mem_sOf_H0C_apply_one_eq_qu`) で genuine 化可。
+  **hmixed/hDτ** = §14 Sibley (6.7)/(5.8) = lane-c gated (sorried-cite)。
+- (6.3) lift `coherent_S_of_coherent_SH0C` (S13:1415) or 直接 `S_H0C_not_coherent` (S13:1523) と矛盾 = (10.8) gated。
+⟹ honest fix は caseA(lane-b refuter) + hmixed/hDτ(§14 lane-c) + (10.8) の 3 cross-lane sorried-cite で組める
+(false lemma を除去、hgen は genuine)。**前倒し gated-endpoint skeleton として build 可能** ([[feedback-gated-endpoint-skeleton-pattern]])。
+
+### ② ★ LANDED (本 update、full build green 3941 jobs): `caseB_coherent_sOf_H0C` (S13_CoreStructure)
+- **`columnSum_muColumnChar_mem_sOf_H0C`**: `columnSum_muColumnChar_mem_sOf_H0Cprime` を `𝒮(H₀C)` 中間で
+  factor (H0Cprime 版 = subset で導出、下流不変)。
+- **`caseB_coherent_sOf_H0C`**: 9075 の caseB `𝒮(H₀C′)` coherence を **(11.7) transfer で `𝒮(H₀C)` に前進**
+  (witness = reducible μ-column の conj-diff, `A₀`-supported + nonzero)。= honest (11.8.6) の **caseB `hY` 入力**。
+  → **これまで consumer 0 だった 9075 を load-bearing 化**。
+
+### ③ ★ ground-truth 訂正 (`#print axioms`): 9075 は axiom-clean で**ない**
+`caseB_coherent_sOf_H0Cprime` (9075) = `[propext, sorryAx, Classical.choice, Quot.sound]` — **sorryAx あり**。
+notes/update⁸⁷ の「9075 axiom-clean」= 誤り (docstring 過信、[[verify-port-state-by-number-not-coq-name]])。
+sorryAx 源 = §9 count chain (`muGrid_column_sum_mem_sOf_H0_and_reducible` → `reducible_count_sOf_H0`/`muGrid`、
+S12_Section9Counts は直接 sorry-free ゆえ**推移的**、TRUE な §9 count) 経由 (`caseB_coherent_sOf_H0Cprime` の
+μ-column pivot が引き込む)。→ caseB 分岐の真の残 gate = この §9 count chain の sorry leaf (次 iteration で pinpoint)。
+
+### 次 iteration (上流優先)
+1. §9 count chain の sorry leaf を pinpoint (`reducible_count_sOf_H0`/`muGrid`/Dade 系のどれか) → lane-a ownable か判定。
+2. honest (11.8.6) caller を build: `coherent_SOf_H0C_of_glued` を `caseB_coherent_sOf_H0C` (caseB hY) で instantiate
+   + ν 構成 + hgen (narrow uniform-deg) + hmixed/hDτ/caseA/(10.8) sorried-cite → false `Sset_diff_SHCSet_apply_one_eq_qu` 除去。
