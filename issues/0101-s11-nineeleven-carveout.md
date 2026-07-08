@@ -58,3 +58,16 @@ created: 2026-07-08
 - [ ] a が 1019 で本裁定を確認 (caseA 手放し + b leaf cite 化)
 - [ ] b が caseB 非再構築を 1017 で確認
 - [ ] full assembly landing 時に本 issue close
+
+## 2026-07-08 追加 carve-out: S11_NineElevenCaseA.lean = b 所有 (entry point)
+
+commit 00943a2c で新 leaf `OddOrder/Peterfalvi/S11_NineElevenCaseA.lean` を b が作成
+(Hypothesis-level、namespace `OddOrder.Peterfalvi.S13`、S13_MaximalIII_IV import)。
+`caseA_coherent_sOf_H0Cprime_of_refuter` = caseA (9.7.a) coherence を maximality refuter 節への
+reduction (a の base case sOf_degreeSubfamily_isCoherent + b の skeleton
+coherent_of_maximal_coherent_pair_refuted、witness は (9.8.d) count から genuine 導出)。
+
+**S11_NineElevenCoherence (本 issue の carve-out) と同様、b 所有 carve-out として扱う**
+(S13 namespace だが別 file 隔離、a の S13_MaximalIII_IV/S13_CoreStructure とは非衝突)。
+a がこの file を編集したら逸脱。b は他の S13 file には従来どおり触れない (import cite のみ)。
+merge_monitor 🔒 所有マップに転記要。
