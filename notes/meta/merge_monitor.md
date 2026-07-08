@@ -220,6 +220,16 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > を編集しても逸脱でない (lane a が S05_Grid* を編集したら逸脱; c が S05 の char-核 file = S05_TICyclic 等を
 > 編集したら従来どおり逸脱)。詳細 = issues/9076。
 >
+> **carve-out 拡張 (issue 9076 piece 4c, hub 裁定 2026-07-08 監視 tick)**: `OddOrder/Peterfalvi/S15_HonestTypeP2A0.lean`
+> (lane c が新規作成、Pf (8.10)/(8.15) honest `'A0(S) = 'A(S) ∪ V^S` 定義 + set-level facts) は名目上
+> S15 = **lane b 領域**だが、issue 9076 の piece 4c (A0-Dade correctness fix — 現 (13.18) は 'A(S)-Dade
+> だが μ差 support は P^#∪V_S ゆえ A0 化必須) infra ゆえ **lane c 所有**として扱う (S05_GridRigidity と
+> 同型 = 内容で割当)。根拠: 新 leaf (b の `S15_SAndT` を編集せず `honestTypeP2ASet` (b の
+> `S15_SAndT_Setup:552`) を cite して拡張)、b は S15 を触っていない (衝突なし)。⟹ step 1.5 で c が
+> S15_HonestTypeP2A0 を編集しても逸脱でない (b が編集したら逸脱)。⚠ **将来 coordination 点**: 既存
+> `tauS_mu_row0_cross` (b の `S15_SAndT`) の A0-Dade 化 statement 変更は b territory ゆえ **b+c 調整要**
+> (statement を A0 化する編集は b が行うか、c が carve-out 追加申請)。詳細 = issues/9076 piece 4c。
+>
 > **⟹ 拡張 #2 (ユーザー裁定 2026-07-05 tick(3) — Hypothesis76 (7.6) 忠実化 field の包括許可)**:
 > 同型逸脱 3 連発 (issue 0091 Hypothesis78 / zeta_induced / zeta_injective、各回ユーザー受理) の
 > 反復解消として、**issue 2034/3002 の (13.5) 供給作業中に限り、b による `S09_NonexistenceCertain`
