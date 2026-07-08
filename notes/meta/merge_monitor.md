@@ -259,6 +259,21 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > 触らない)。**b は次回 main sync で c の rewire を取り込むこと、`tauS_mu_row0_cross` を再構築しない。**
 > 詳細 = issues/9076 piece 4c-3。
 >
+> **carve-out (issue 9014/9076, hub 裁定 2026-07-08 監視 tick — merge 216b605d)**:
+> `OddOrder/Peterfalvi/S13_PrimeTIResidueBridge.lean` (lane b が新規作成、86 行、**namespace は
+> `OddOrder.Peterfalvi.S15`** = ファイル名 S13_* だが宣言は S15 領域) は名目上 lane a の S1[0-6] regex に
+> 掛かるが **lane b 所有**として扱う (carve-out 0090/0101/9076 と同型 = 名目 regex でなく内容で割当)。
+> 内容 = (13.18) μ-carrier の honest source (`Hypothesis.s06S`/`residueS` = prime-TI residue grid を
+> type-uniform な S06.Hypothesis + sorry-free `PrimeTIResidueData.ofS06Hypothesis` で構成、IsTypeP1 不要;
+> §12 muGrid は type-P2 obstruction で dead)。根拠 (自律裁定): (1) genuine b content — (13.18) = §13 char
+> cascade = b の S15_SAndT territory; (2) **lane a は S13/S15 活動ゼロ** (0 unmerged、`git diff main...a --
+> 'S13_PrimeTIResidueBridge*'` 空) で active 衝突なし; (3) a の S12/S14/shared `PrimeTIResidue` を **cite する
+> だけ** (編集せず); (4) merge-safety 全通過 (build green 3942 jobs / AxiomsCheck OK / sorry 86→86 / 新 axiom
+> なし / 衝突なし)。⟹ step 1.5 で b が S13_PrimeTIResidueBridge を編集しても逸脱でない (a が編集したら逸脱;
+> b が a の active S13 = S13_MaximalIII_IV/S13_CoreStructure 等を触ったら従来どおり逸脱)。⚠ **minor**:
+> ファイル名 (S13_*) と namespace (S15) の不一致 — 内容が S15 ゆえ将来 `S15_PrimeTIResidueBridge.lean` への
+> rename が自然 (b の裁量、非緊急・非 blocking)。詳細 = issues/9014・9076。
+>
 > **⟹ 拡張 #2 (ユーザー裁定 2026-07-05 tick(3) — Hypothesis76 (7.6) 忠実化 field の包括許可)**:
 > 同型逸脱 3 連発 (issue 0091 Hypothesis78 / zeta_induced / zeta_injective、各回ユーザー受理) の
 > 反復解消として、**issue 2034/3002 の (13.5) 供給作業中に限り、b による `S09_NonexistenceCertain`
