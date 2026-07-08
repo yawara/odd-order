@@ -7,6 +7,18 @@ created: 2026-07-08
 
 # S07 (5.7) norm-general uniform coherence: pivot_coherence port (lane-a claim)
 
+## ✅ CLOSED 2026-07-08 (全 3 step landed、full build green 3937 jobs / AxiomsCheck OK)
+
+norm-general (5.7) engine + caseB rewire 完遂:
+- **step 1–2** (S07_PivotCoherence): pivotCoherence → exists_pivotPartner_spec/exists_pivotPartner →
+  uniform_degree_coherence_of_families (raw per-member R-family 版、任意長 R(η) 受理)。全 sorry-free。
+- **step 3** (S13): caseB_sOf_memberRFamily (dispatcher) + reduction 補題 (irr/col) +
+  caseB_sOf_memberRFamily_orthogonal (hRorth 3-way) + dadeOfDiff_orthogonal_dadeOfDiff_typeP
+  (irr×irr typeP wrapper) → **caseB_coherent_sOf_H0Cprime を全族一発化、hDeg 撤去**。
+新 6 部品は #print axioms = [propext, Classical.choice, Quot.sound]。caseB_coherent_sOf_H0Cprime の
+残 sorryAx は既存 §13 core gate (caseB_forall_..._qu / columnSum_..._mem) 由来で本 issue 導入分ゼロ
+(完了条件「§13 core gate 以外 sorry-free」達成)。旧 chain-fold (of_mixed/caseBPair) は landed 資産残置。
+
 ## claim (lane-a, 2026-07-08)
 
 **lane a が build する** (caseB (9.11) の唯一の残 gap を閉じる shared S07 infra)。
