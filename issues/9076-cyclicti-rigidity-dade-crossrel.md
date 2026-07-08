@@ -356,3 +356,14 @@ typePA0 に統一」が前提。lane-c A0-Dade 領域。lane-b の residueS/mu2_
 `residueS`/`mu2_ne`/`honestTypeP2ASet_subset_typePA` は upstream で citable。
 
 lane-b landed (commit 01e798c6): `honestTypeP2ASet_subset_typePA` + 本 route 確定。
+
+### ⚠ A_covers 追加 subtlety (Hypothesis46-for-S 組立時、lane-c 向け)
+
+`certainTypeDiffSupported` は A parametric だが、`Hypothesis46 A L` の **`A_covers` field** (`∀ hh ∈ subH,
+hh≠1 → hh は A で cover`) が要る。subH = K = S' ゆえ A_covers は「S'# が A で cover」を要求。
+`A = honestTypeP2ASet` (⊊ S'#) では **S'# ∖ honestTypeP2ASet (= M_σ# を centralize しない S'-元) が
+cover されず A_covers が直接には成立しない**可能性。∴ Hypothesis46-for-S を A=honestTypeP2ASet で組むには
+(a) A_covers を honest support 向けに再証明 (S'# の非-M_σ-centralizing 元が実は別経路で cover される、or
+subH を狭める)、or (b) A=typePA で組んで certainTypeDiffSupported ⊆ typePA0 を得た後、μ差が
+typePA0 ∖ honestTypeP2A0Set 上 vanish を別途示す (residue値 chi_j=chi_1 on U^# の議論)。
+lane-c の A0-Dade (honestTypeP2A0Set の covering 構造) 知見が要る点。
