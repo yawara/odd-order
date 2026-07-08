@@ -7205,3 +7205,16 @@ commuting with a nontrivial additive point lies in the kernel) and its `σ`-tran
 reconciliation closes.) -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.commute_inl_mem_range_inl
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.derived_inf_centralizer_le_P
+
+/-! **Peterfalvi (14.4)/(9.7.b) T-side field model, axiom-clean core** (issue 9078, lane c).
+The side-agnostic embedding `SemilinearFieldModel.fieldModelEmbedding` (injective
+`σ : F_{r^s} ⋊ V* →* G` with kernel `↦ E`, complement `↦ C`) and its lift-compatibility bridge
+`hcompatLift_of_equivariant`, together with the T-side producer `tFieldModelData_of_repr`
+(instantiating `E = Q`, `C = V`, `r = q`, `s = p`) and its `σ`-transport
+`TFieldModelData.derived_inf_centralizer_le_Q` (`C_{T'}(x) ≤ Q` for `x ∈ Q#`) — the T-side mirror
+of the `P`-side engine above.  All `sorry`-free; the sole T-side gate (`t_side_caseB_fieldModel`'s
+field-data existence) is not on this list. -/
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.SemilinearFieldModel.fieldModelEmbedding
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.SemilinearFieldModel.hcompatLift_of_equivariant
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.tFieldModelData_of_repr
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.TFieldModelData.derived_inf_centralizer_le_Q

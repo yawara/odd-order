@@ -4514,18 +4514,56 @@ theorem s_side_frobenius_kernel [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
       derivedInG hyp.base.S ⊓ Subgroup.centralizer ({x} : Set G) ≤ hyp.base.P := by
   sorry
 
+/-- **Gated `(9.7.b)` T-side field model** (issue 9078 / 9000 sphere): the T-side field-algebra
+package assembled into a `TFieldModelData hyp.base` via the proven producer `tFieldModelData_of_repr`
+(`SemilinearFieldModel.fieldModelEmbedding`, `E = Q`, `C = V`).  The `V`-conjugation closure `hVQ`
+on `Q` is *proven* here (`V ≤ T = N_G(Q)`, `normalizer_Q_eq_T`), and the `Q ⊓ V = ⊥` disjointness
+is the ungated `Q_inf_V_eq_bot` field; the σ-assembly, injectivity, kernel/complement identification
+are all discharged by the engine.  The **single remaining `sorry`** is *exactly* the field-data
+existence — an additive iso `Additive ↥Q ≃+ 𝔽_{q^p}` (from `exists_field_semilinear`, `Q`
+elementary-abelian + `V`-irreducible) with a norm-one Singer character `μ : ↥V →* 𝔽_{q^p}ˣ`
+(`μ.range = V*`) satisfying the `(14.2)(a)`-dual equivariance — supplied by the `(9.7.b)` resolution
+for `T` (the case-B/issue-9000 obligation, dual to the S-side
+`field_normalizer_of_U_characteristic_of_inputs`). -/
+theorem t_side_caseB_fieldModel [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) : Nonempty (TFieldModelData hyp.base) := by
+  letI : Fact hyp.base.q.Prime := ⟨hyp.base.q_prime⟩
+  -- `V` normalizes `Q`: `V ≤ T' ≤ T = N_G(Q)` (`normalizer_Q_eq_T`).
+  have hVQ : ∀ (v : ↥hyp.base.V) (x : ↥hyp.base.Q),
+      (v : G) * (x : G) * (v : G)⁻¹ ∈ hyp.base.Q := by
+    intro v x
+    have hVT : hyp.base.V ≤ hyp.base.T :=
+      (show hyp.base.V ≤ derivedInG hyp.base.T by
+        rw [hyp.base.T_deriv_eq_QV]; exact le_sup_right).trans (Subgroup.map_subtype_le _)
+    have hvN : (v : G) ∈ Subgroup.normalizer (hyp.base.Q : Set G) := by
+      rw [OddOrder.Peterfalvi.S15.normalizer_Q_eq_T hG hyp.base]; exact hVT v.2
+    exact (Subgroup.mem_set_normalizer_iff.mp hvN (x : G)).mp x.2
+  -- gated `(9.7.b)` field-algebra package `(e, μ, hcompat)` for `T`
+  obtain ⟨e, μ, hμ_inj, hμ_range, hcompat⟩ :
+      ∃ (e : Additive ↥hyp.base.Q ≃+ GaloisField hyp.base.q hyp.base.p)
+        (μ : ↥hyp.base.V →* (GaloisField hyp.base.q hyp.base.p)ˣ)
+        (_ : Function.Injective μ)
+        (_ : μ.range = OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.q hyp.base.p),
+        ∀ (v : ↥hyp.base.V) (x : ↥hyp.base.Q),
+          e (Additive.ofMul (⟨(v : G) * (x : G) * (v : G)⁻¹, hVQ v x⟩ : ↥hyp.base.Q))
+            = ((μ v : (GaloisField hyp.base.q hyp.base.p)ˣ) : GaloisField hyp.base.q hyp.base.p) *
+                e (Additive.ofMul x) := by
+    sorry
+  exact tFieldModelData_of_repr hyp.base e μ hμ_inj hμ_range hVQ hcompat
+
 /-- **Peterfalvi (14.4)+(13.12), the T-side Frobenius kernel** — `C_{T'}(x) ≤ Q` for
 `x ∈ Q#` (dual of `s_side_frobenius_kernel`: (14.4) puts `T` in case (9.7.b), and the
-T-side field model has Frobenius kernel `Q`).  Discharge path (engine proven,
-`S16_G0Coprime`): supply the minimal (14.4) carrier `TFieldModelData` (injective
-`σ : F_{q^p} ⋊ V* →* G` with kernel `Q`, complement `V` — the
-`T_side_caseB_facts`/issue-9000 sphere) and apply
+T-side field model has Frobenius kernel `Q`).  Discharged (engine proven, `S16_G0Coprime`) by the
+minimal (14.4) carrier `TFieldModelData` from `t_side_caseB_fieldModel` (injective
+`σ : F_{q^p} ⋊ V* →* G` with kernel `Q`, complement `V`) through the proven transport
 `TFieldModelData.derived_inf_centralizer_le_Q`. -/
 theorem t_side_frobenius_kernel [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     ∀ x ∈ sharpSubgroup hyp.base.Q,
       derivedInG hyp.base.T ⊓ Subgroup.centralizer ({x} : Set G) ≤ hyp.base.Q := by
-  sorry
+  intro x hx
+  obtain ⟨data⟩ := t_side_caseB_fieldModel hG hyp
+  exact data.derived_inf_centralizer_le_Q hx
 
 /-- **Peterfalvi (14.11.3), support half**: every element of the generic set `G₀` has order
 prime to `pq`.  The avoidance fields of `MHypothesis` (`G0_avoid`) feed the proven
