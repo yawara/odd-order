@@ -892,3 +892,14 @@ world 選択が cross-lane 設計判断)。leaf 側で更に進められる genu
 3. **adjoin per-step wiring**: maximality induction の (5.6) engine (xAdjoinStepW) を a の R-data
    (caseB_sOf_memberRFamily) で発火。OrthonormalCharacterImageFamily → xAdjoinStepW inputs
    (CharacterPsiDecomposition) の impedance 確認要。
+
+## 2026-07-08 追記 (lane-a): (10.7) typeII_derived_frobenius が 1017 の consumer に
+
+Pf (10.7) `typeII_derived_frobenius` (S12_MaximalIII_IV_V:66) を bare sorry → genuine 構成に
+de-scaffold (commit 3907291e、5/6 IsFrobeniusGroup field + kernel_is_SF 実証明)。残 1 sorry =
+`conj_frobenius` (全 complement U の S_F 上 fixed-point-free 作用)。これは Peterfalvi の
+char-theoretic contradiction に還元: HU 非 Frobenius なら (9.10)/(9.8.b)/(9.9.b) が等次数
+reducible ν_r + irreducible λ を与え、**(5.7) で 4元 T2族 {λ,λ̄,ν_r,ν̄_r} coherent** → (5.8)+Dade
+直交で矛盾。⟹ **(10.7) は本 issue の (9.11) 非Galois pair-adjoining coherence の consumer**
+(uniform-degree 基底 = coherent_of_constant_degree は landed、pair-adjoining 帰納が残)。
+sibling = `exceptional_case_frobenius_realization` (S11:14165、同 content)。
