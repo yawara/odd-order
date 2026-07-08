@@ -242,6 +242,7 @@ import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
 import OddOrder.Peterfalvi.S10_BGInterface
 import OddOrder.Peterfalvi.S11_MaximalII_III_IV
+import OddOrder.Peterfalvi.S11_ImprimitiveUBound
 import OddOrder.Peterfalvi.S11_NineElevenCoherence
 import OddOrder.Peterfalvi.S12_MaximalIII_IV_V
 import OddOrder.Peterfalvi.S13_SixTwoBridge
