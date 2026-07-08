@@ -783,6 +783,32 @@ theorem nineElevenOne_configuration (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 end Configuration
 
+/-- **`[U : K₁ ⊓ K₂] ≤ [U:K₁]·[U:K₂]`** (relative-index form of `Subgroup.index_inf_le`): the
+relative index `H.relIndex U = (H.subgroupOf U).index`, and `subgroupOf = comap` distributes over
+`⊓` (`Subgroup.comap_inf`), so the ambient `index_inf_le` in `↥U` applies.  The (9.11.2) injectivity
+`Ū ↪ (U/U₁)×(U/U₁ʷ)` in relative-index form. -/
+theorem relIndex_inf_le {G : Type*} [Group G] {K₁ K₂ U : Subgroup G} :
+    (K₁ ⊓ K₂).relIndex U ≤ K₁.relIndex U * K₂.relIndex U := by
+  simp only [Subgroup.relIndex, Subgroup.subgroupOf, Subgroup.comap_inf]
+  exact Subgroup.index_inf_le
+
+/-- **Peterfalvi (9.11.2), the bound `u ≤ a²`.**  Book (9.11.2): *"The canonical mapping from `Ū` to
+`(U/U₁)×(U/U₁ʷ)` is injective, and so `u ≤ a²`."*  Given the inertia identity `C = U₁ ⊓ U₁ʷ` (the
+*first* assertion of (9.11.2), the deep character-theoretic input: `U₁ = C_U(H₁)`, `U₁ʷ = C_U(H₂)`,
+their intersection is `C = C_U(H̄)`) and the per-summand index `[U:U₁] = [U:U₁ʷ] = a`, the relative
+index `u = [U:C]` is bounded by `[U:U₁]·[U:U₁ʷ] = a²` (`relIndex_inf_le`).  Consumed by the (9.11.5)
+polynomial bound (`nineElevenFive_refutation`'s `hua2`). -/
+theorem nineElevenTwo_u_le_a_sq [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
+    (caseA : CliffordCaseAData chars) {K₁ K₂ : Subgroup G}
+    (hK₁ : K₁.relIndex data.U = caseA.a) (hK₂ : K₂.relIndex data.U = caseA.a)
+    (hCinf : chars.C = K₁ ⊓ K₂) : chars.u ≤ caseA.a * caseA.a := by
+  have hu : (K₁ ⊓ K₂).relIndex data.U = chars.u := by
+    rw [← hCinf]; exact relIndex_cSub_U_eq_u chars
+  rw [← hu]
+  calc (K₁ ⊓ K₂).relIndex data.U ≤ K₁.relIndex data.U * K₂.relIndex data.U := relIndex_inf_le
+    _ = caseA.a * caseA.a := by rw [hK₁, hK₂]
+
 /-! ### (9.11.5) preamble: the uniform sub-family `sumnS` value
 
 Book (9.11.5) / Coq `lb3S1'` left endpoint: on `𝒮₁'` (the degree-`qa` irreducibles) every member is
@@ -903,6 +929,42 @@ theorem nineElevenFive_arithmetic_contradiction {q a : ℕ} (hq : 3 ≤ q) (ha :
       le_trans (Nat.mul_le_mul_left (2 ^ q) haq) hqaq
     exact Nat.le_of_mul_le_mul_right this ha3
   exact absurd hfinal (Nat.not_le.mpr (add_two_lt_two_pow hq))
+
+/-- **Peterfalvi (9.11.5), the full refutation** (`|𝒮₄| ≤ ‖α‖²` is impossible).
+
+The (9.11.5) argument in denominator-cleared `ℕ` form.  Inputs (all `ℕ`, integrality already used):
+
+* `hcount` — (9.11.3) cleared: `|𝒮₄|·qu + (p−1)q + (p−1)u + 1 = p^q`, i.e. with `p = 2a+1`,
+  `S₄·qu + 2aq + 2au + 1 = (2a+1)^q`.  (Book: `|𝒮₄| = (p^q−1)/(qu) − (p−1)/u − (p−1)/q`.)
+* `hnorm` — (9.11.4) cleared: `‖α‖²·u = (a+1)u + (q−1)a²`.  (Book: `‖α‖² = a+1+(q−1)a²/u`;
+  `‖α‖² ∈ ℤ` as a virtual-character norm.)
+* `hua2` — (9.11.2): `u ≤ a²`.
+* `hle` — the contradiction hypothesis `|𝒮₄| ≤ ‖α‖²`.
+
+From `hle`: `S₄·qu ≤ q·(‖α‖²·u) = (a+1)qu + q(q−1)a²`; substituting into `hcount` and using `u ≤ a²`
+to bound the `u`-linear part `(aq+q+2a)u ≤ (aq+q+2a)a²` gives `(2a+1)^q − 1 ≤ (q+2)a³ + q²a² + 2qa`,
+refuted by `nineElevenFive_arithmetic_contradiction`.  This is what the (9.11.6)–(9.11.8) coherence
+contradiction (or directly the maximality refutation) feeds. -/
+theorem nineElevenFive_refutation {q a u S4 N : ℕ} (hq : 3 ≤ q) (ha : 1 ≤ a) (hu : 1 ≤ u)
+    (hua2 : u ≤ a * a)
+    (hcount : S4 * (q * u) + 2 * a * q + 2 * a * u + 1 = (2 * a + 1) ^ q)
+    (hnorm : N * u = (a + 1) * u + (q - 1) * a ^ 2)
+    (hle : S4 ≤ N) : False := by
+  refine nineElevenFive_arithmetic_contradiction hq ha ?_
+  rw [← hcount, Nat.add_sub_cancel]
+  -- `S₄·(q·u) ≤ (a+1)·q·u + q·(q−1)·a²`.
+  have key1 : S4 * (q * u) ≤ (a + 1) * (q * u) + q * ((q - 1) * a ^ 2) := by
+    calc S4 * (q * u) ≤ N * (q * u) := Nat.mul_le_mul_right _ hle
+      _ = q * (N * u) := by ring
+      _ = q * ((a + 1) * u + (q - 1) * a ^ 2) := by rw [hnorm]
+      _ = (a + 1) * (q * u) + q * ((q - 1) * a ^ 2) := by ring
+  -- `(a·q + q + 2·a)·u ≤ (a·q + q + 2·a)·a²` from `u ≤ a²`.
+  have key2 : (a * q + q + 2 * a) * u ≤ (a * q + q + 2 * a) * (a * a) :=
+    Nat.mul_le_mul_left _ hua2
+  -- Clear the `q − 1` subtraction (`q ≥ 3`), then combine as a polynomial inequality.
+  obtain ⟨q', rfl⟩ : ∃ q', q = q' + 1 := ⟨q - 1, by omega⟩
+  simp only [Nat.add_sub_cancel] at key1 ⊢
+  nlinarith [key1, key2, ha, hu, sq_nonneg a, Nat.zero_le q']
 
 end FiveArithmetic
 
