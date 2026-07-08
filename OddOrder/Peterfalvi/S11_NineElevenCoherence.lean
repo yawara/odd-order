@@ -1069,6 +1069,29 @@ theorem caseA_hu_char_inertia_two_summands {data : TypesIIIIIIVSetup M}
       aInvariantRestrictAut (caseA.Hpart_aInvariant j) g = 1 :=
   caseA_char_inertia_two_summands caseA hregi hregj g (inflation_fixing_imp_action_fixing g hfix)
 
+/-- **(9.11.2) HU-inertia bridge (`⊇` half, `compHom` form): centralizing both summands fixes the
+inflated `θ₀`.**  The Ū-side `⊇` lemma `caseA_centralizes_two_summands_fixes_char` in the `compHom`
+shape the `HU`-inertia consumer needs: for a `U`-element `g` centralizing both summands `H_i`, `H_j`
+and a two-summand-supported linear `χ`, the pullback of `θbar = linearIrreducibleCharacter χ` along
+`φ_U(g)` equals `θbar` as a class function (`compHom (uActionHom g) θbar = θbar`).  Combined with
+`conjBy_compHom_hInHuEquivH` + `compHom_typeP_conjAction_inflation` (as in `cInHu_le_inertia`) this
+gives `C_U(H_i) ⊓ C_U(H_j) ⊆ I(θ₀)` — the reverse containment completing `I(θ₀) ⊓ U = U₁ ∩ U₁ʷ`. -/
+theorem caseA_centralizes_two_summands_compHom_eq {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
+    (caseA : CliffordCaseAData chars) {i j : Fin data.q}
+    (χ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    (hsupp : ∀ k, k ≠ i → k ≠ j → ∀ x ∈ caseA.Hpart k, χ x = 1)
+    (g : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U)
+    (hgi : aInvariantRestrictAut (caseA.Hpart_aInvariant i) g = 1)
+    (hgj : aInvariantRestrictAut (caseA.Hpart_aInvariant j) g = 1) :
+    ClassFunction.compHom ((uActionHom data chief) g).toMonoidHom
+        (linearIrreducibleCharacter χ : ClassFunction (↥data.H ⧸ chief.N) ℂ)
+      = (linearIrreducibleCharacter χ : ClassFunction (↥data.H ⧸ chief.N) ℂ) := by
+  ext y
+  rw [ClassFunction.compHom_apply, MulEquiv.coe_toMonoidHom, linearIrreducibleCharacter_apply,
+    linearIrreducibleCharacter_apply,
+    caseA_centralizes_two_summands_fixes_char caseA χ hsupp g hgi hgj y]
+
 end NineElevenTwoInertia
 
 /-- **`[U : K₁ ⊓ K₂] ≤ [U:K₁]·[U:K₂]`** (relative-index form of `Subgroup.index_inf_le`): the
