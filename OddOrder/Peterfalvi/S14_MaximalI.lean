@@ -4890,6 +4890,84 @@ theorem P0_not_le_centralizer_K [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
     ctr.P0_noncyclic
   omega
 
+open scoped Pointwise in
+/-- **Peterfalvi (8.1.b) for an arbitrary complement of `M_F`.**  For a type-`F` group `M` with
+kernel `K = M_F`, if `V` is *any* complement of `K` in `M`, then the `V`-centralizers of nontrivial
+kernel elements all lie in a single abelian subgroup `W ≤ V` — the conjugate of the type-`F` datum's
+`U₁` by the Schur–Zassenhaus element carrying the datum's complement `U` to `V`.  (Peterfalvi (8.1)
+remark: "(b) holds whatever complement `U` is chosen".)
+
+Used in (12.11): with `V = M ∩ L` (a complement of `K` by the first assertion `(12.11)`), both a
+`p'`-subgroup `A ≤ M ∩ L` and the witness `x ∈ P₀ ⊆ M ∩ L` land in this abelian `W` (via
+`C_K(A) ≠ 1` and `C_K(x) ≠ 1`), so `A` centralizes `x`. -/
+theorem exists_abelian_centralizer_le_of_isComplement [Finite G] {M : Subgroup G}
+    (hMsolv : IsSolvable ↥M) (typeF : TypeFData M) {V : Subgroup G} (hV_le : V ≤ M)
+    (hVcompl : Subgroup.IsComplement' (typeF.H.subgroupOf M) (V.subgroupOf M)) :
+    ∃ W : Subgroup G, IsMulCommutative ↥W ∧
+      ∀ y ∈ typeF.H, y ≠ 1 → V ⊓ Subgroup.centralizer ({y} : Set G) ≤ W := by
+  classical
+  haveI hHnormal : (typeF.H.subgroupOf M).Normal := by
+    rw [typeF.H_eq]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal M
+  have hcop : Nat.Coprime (Nat.card ↥(typeF.H.subgroupOf M)) (typeF.H.subgroupOf M).index := by
+    rw [typeF.H_eq]; exact (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall M).coprime_index
+  -- Schur–Zassenhaus: `U` and `V` are conjugate in `↥M` by `n ∈ H = M_F`.
+  haveI : IsSolvable ↥M := hMsolv
+  obtain ⟨n, hn_mem, hn_conj⟩ :=
+    Subgroup.IsComplement'.exists_conj_of_coprime hcop (Or.inl inferInstance) typeF.complement
+      hVcompl
+  set m : G := (n : G) with hm
+  have hmH : m ∈ typeF.H := Subgroup.mem_subgroupOf.mp hn_mem
+  have hmM : m ∈ M := n.2
+  -- Bridge `↥M`-conjugation to ambient `G`: `U.map (conj m) = V`.
+  have hbridge : M.subtype.comp (MulAut.conj n).toMonoidHom
+      = (MulAut.conj m).toMonoidHom.comp M.subtype := by
+    ext a; simp [MulAut.conj_apply, hm, mul_assoc]
+  have hUmV : typeF.U.map (MulAut.conj m).toMonoidHom = V := by
+    have h1 := congrArg (Subgroup.map M.subtype) hn_conj
+    rw [Subgroup.map_map, hbridge, ← Subgroup.map_map,
+      Subgroup.map_subgroupOf_eq_of_le typeF.U_le,
+      Subgroup.map_subgroupOf_eq_of_le hV_le] at h1
+    exact h1
+  refine ⟨typeF.U1.map (MulAut.conj m).toMonoidHom, ⟨⟨?_⟩⟩, ?_⟩
+  · -- `W = U₁ᵐ` is abelian (conjugate of abelian `U₁`).
+    rintro ⟨a, ha⟩ ⟨b, hb⟩
+    obtain ⟨u, hu, hua⟩ := Subgroup.mem_map.mp ha
+    obtain ⟨u', hu', hub⟩ := Subgroup.mem_map.mp hb
+    have huu' : u * u' = u' * u := by
+      have h := typeF.U1_commutative.is_comm.comm (⟨u, hu⟩ : ↥typeF.U1) ⟨u', hu'⟩
+      simpa using congrArg Subtype.val h
+    apply Subtype.ext
+    simp only [Subgroup.coe_mul]
+    rw [← hua, ← hub, ← map_mul, ← map_mul, huu']
+  · -- `V ⊓ C(y) ≤ W`: `v ∈ V = Uᵐ`, `v` centralizes `y`, so `u = vᵐ⁻¹ ∈ U ⊓ C(yᵐ⁻¹) ≤ U₁`.
+    intro y hyH hy1 v hv
+    obtain ⟨hvV, hvC⟩ := Subgroup.mem_inf.mp hv
+    rw [← hUmV] at hvV
+    obtain ⟨u, hu, rfl⟩ := Subgroup.mem_map.mp hvV
+    apply Subgroup.mem_map_of_mem
+    -- `y' = m⁻¹ y m ∈ H^#`.
+    have hy'H : m⁻¹ * y * m ∈ typeF.H := by
+      have hyM : y ∈ M := typeF.H_le hyH
+      have hconj := hHnormal.conj_mem ⟨y, hyM⟩ (Subgroup.mem_subgroupOf.mpr hyH)
+        ⟨m⁻¹, M.inv_mem hmM⟩
+      have := Subgroup.mem_subgroupOf.mp hconj
+      simpa [mul_assoc] using this
+    have hy'1 : m⁻¹ * y * m ≠ 1 := by
+      intro h; apply hy1
+      have hyeq : y = m * (m⁻¹ * y * m) * m⁻¹ := by group
+      rw [hyeq, h]; group
+    -- `u` centralizes `m⁻¹ y m` because `mᵘ = (conj m) u` centralizes `y`.
+    have hcvy : (m * u * m⁻¹) * y = y * (m * u * m⁻¹) := by
+      have h := Subgroup.mem_centralizer_singleton_iff.mp hvC
+      simpa [MulAut.conj_apply] using h
+    have hthis : m * (u * (m⁻¹ * y * m)) * m⁻¹ = m * ((m⁻¹ * y * m) * u) * m⁻¹ := by
+      have hE : m * (u * (m⁻¹ * y * m)) * m⁻¹ = (m * u * m⁻¹) * y := by group
+      have hE' : m * ((m⁻¹ * y * m) * u) * m⁻¹ = y * (m * u * m⁻¹) := by group
+      rw [hE, hE', hcvy]
+    have hu_cent : u ∈ Subgroup.centralizer ({m⁻¹ * y * m} : Set G) :=
+      Subgroup.mem_centralizer_singleton_iff.mpr (mul_left_cancel (mul_right_cancel hthis))
+    exact typeF.centralizer_le_U1 (m⁻¹ * y * m) hy'H hy'1 (Subgroup.mem_inf.mpr ⟨hu, hu_cent⟩)
+
 /-- A `p`-Hall subgroup `H` (its order having only `p`-primary divisors among `π = π(|H|)`) with
 `p ∣ |H|` contains a Sylow `p`-subgroup of the ambient group `G`.
 

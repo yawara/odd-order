@@ -207,3 +207,26 @@ genuinely ASSEMBLABLE** と判明 — docstring「Genuinely still-missing」は 
 は intersection_complements_K (8.13.c1、lane-a) に依然 gated だが、doneness policy 上 intersection_le_kernel 自体が
 genuine assertion ゆえ build 価値あり。**5 iteration の char-endgame 精査で判明した構造的事実**: b の char frontier は
 一律 deep multi-lemma (survey では「stale/assemblable」に見えても body は深い) — 今後は body 検証を先に。
+
+## ✅ (2026-07-09, lane-b) — (12.11) 第2主張 `intersection_le_kernel` 攻略開始、steps 3-5 + step4 + step10-core landed
+
+続⁶ の「intersection_le_kernel = multi-lemma deep proof」を実際に engage。原文を **10-step 分解**し
+(正本 notes/peterfalvi/s14_maximalI.md)、**5 lemma を green で landing** (full build 3944 jobs, AxiomsCheck OK):
+
+**commit 57c4394a (steps 3-5, reusable Frobenius+Wielandt infra)**:
+- `IsFrobeniusGroup.frobeniusGroup_sup_of_invariant_le_kernel` (CoprimeAction): Frobenius L kernel N で
+  P≤N・Q⊓N=⊥ が P を normalize ⟹ P⊔Q Frobenius kernel P (internal 形)。
+- `..._ambient`: ambient-G 形 (engine が subgroupOf transfer 無しで consume)。
+- `exists_ne_one_centralized_by_complement_of_kernel_not_centralizes` (WielandtFixedPoint): steps 3-5 統合、
+  「P が K 非中心化 ⟹ C_K(A)≠1」(既存 `frobenius_kernel_centralizes_of_complement_fpf` の対偶)。
+
+**commit 96a3f820 (step 4)**:
+- `P0_not_le_centralizer_K` (S14): P₀ は K=M_F を非中心化。BG Prop 10.11(b) rank≤1 vs P₀ rank2 の矛盾
+  (当初想定の self-centralizing は不要)。helper `MF_eq_Msigma`/`p_not_mem_sigma` (additive)。
+
+**step10-core (Mathlib/Subgroup.lean, uncommitted→commit予定)**:
+- `le_of_coprime_card_index_of_normal`: H⊴G + gcd(|S|,[G:H])=1 ⟹ S≤H (normal Hall reduction、general reusable)。
+
+**残 (次 iteration)**: step7 (8.1.b + A,x を complement へ Hall conjugate — 最も subtle、textbook elision)、
+step6/8/9 wiring、coprimality (first assertion `intersection_complements_K` sorried-cite + M_F Hall)、
+最終 assembly。infra は全て揃った (per-A の C_K(A)≠1 は consumer-ready)。lane-b は継続。

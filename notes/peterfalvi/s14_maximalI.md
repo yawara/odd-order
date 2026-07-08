@@ -1938,11 +1938,31 @@ M_F Hall 性** から (∴ 第2主張は第1主張に transitively 依存; 第1�
 - helper (additive、reusable counterexample facts): `MF_eq_Msigma` (K=M_F=M_σ, Prop 16.1 f) /
   `p_not_mem_sigma` (p∉σ(M))。
 
-### 残 (次 iteration、S14 assembly)
-- **step 7** (8.1.b + A,x conjugate into U): 最も subtle。`TypeIData M` (ctr.M_typeI) の `typeF.U1`/
-  `centralizer_le_U1` + A,x を complement に入れる Hall conjugacy。
-- **step 9,10**: L Frobenius 条件(4) `centralizer_kernel_le` (既存) + normal-Hall-in-Frobenius reduction。
-- **coprimality gcd(|A|,|K|)=1**: `intersection_complements_K` (sorried-cite) + M_F Hall。
-- **assembly**: 上記 + step1-5 infra + step4 で per-A の「C_K(A)≠1」を S14 で組む → C_K(x)≠1 (12.9) →
-  A centralizes x → A=1 → M∩L⊆H。`exists_ne_one_centralized_by_complement_of_kernel_not_centralizes` が
-  C_K(A)≠1 の consumer-ready form (φ・coprimality・non-central=step4 を供給)。
+### step 10 core landed (2026-07-09、green)
+- `le_of_coprime_card_index_of_normal` (Mathlib/Subgroup.lean): H⊴G + gcd(|S|,[G:H])=1 ⟹ S≤H
+  (general reusable、SH/H↪G/H の order が |S| と [G:H] を割る→coprime で自明)。step10 の reduction core。
+
+### step 7 transfer landed (2026-07-09、green)
+- `exists_abelian_centralizer_le_of_isComplement` (S14): typeF:TypeFData M + V が K=M_F の complement in M
+  ⟹ ∃W abelian ≤ V, ∀y∈K#, V⊓C(y)≤W。**最も難しかった keystone** (共役 heavy ~55 行、3 iteration で landing)。
+  proof: `IsComplement'.exists_conj_of_coprime` で U→V の SZ 元 m∈K を取り、W=U1.map(conj m)、
+  bridge (map M.subtype + `map_subgroupOf_eq_of_le` + hom-eq)、containment (v=conj m u, u∈U⊓C(m⁻¹ym)≤U1)。
+  **洞察**: M∩L 自体が K の complement (第1主張) ゆえ A も x(∈P₀⊆M∩L) も M∩L=V に居り共通 W に入る。
+
+### 残 (次 iteration、最終 assembly = M-specific gluing のみ、hard math は全て landed)
+landed 済 reusable infra: step1-5 (C_K(A)≠1 engine) / step4 (P₀ 非中心化 K) / step7 (共通 abelian W) /
+step10 (Hall reduction)。残るは **wiring + M-specific 依存**:
+- **P₀ ⊆ L_F**: `data.P0_le_Ls` (P₀⊆mainSubgroup L data.L_type) + `data.L_type = .I` (type 一意性、要確認) で
+  mainSubgroup=M_F → P₀⊆L_F。**要**: L_type=I lemma or type uniqueness。
+- **P₀' = O_p(L_F)∩M 機構** (infra=`opiCoreInG {p} (maxNilpotentNormalHall L)`, SubgroupInAmbient.lean):
+  Pf は P₀=O_p(H)∩M と再定義 (A-invariant)。`le_normalizer_opiCoreInG_of_le_normalizer` で
+  A≤normalizer(L_F)→A≤normalizer(O_p(L_F))、`opiCoreInG_le` で O_p(L_F)⊆L_F。`isPGroup_opiCoreInG_singleton`
+  で p-group。**要 sub-lemma**: ctr.P0⊆O_p(L_F) (nilpotent L_F の Sylow-p 一意性; mathlib `IsNilpotent`
+  Sylow normal) → ctr.P0⊆P₀'=O_p(L_F)∩M ゆえ P₀'≠⊥ ∧ step4 非中心化継承。
+- **coprimality gcd(|P₀'A|,|K|)=1**: P₀'A≤M∩L complements K (第1主張) → |M∩L| coprime |K| (M_F Hall) → 継承。
+- **per-A core** (A≤M∩L, A⊓L_F=⊥, A≠⊥ → False): `exists_ne_one_centralized_by_complement_of_kernel_not_centralizes`
+  (P₀',A,K,L_F,L で C_K(A)≠1) → C_K(x)≠1 (12.9 `CKx_not_le_Kprime`) → step7 (V=M∩L で A,x∈W abelian ⟹
+  A centralizes x) → step9 (`centralizer_kernel_le` で A≤C_L(x)⊆L_F、A⊓L_F=⊥ → A=1) 矛盾。
+- **reduction** (step10): core → `Coprime (card(M∩L)) [L:L_F]` (q|both なら Sylow-q=nontrivial π(H)'-A で矛盾) →
+  `le_of_coprime_card_index_of_normal` (↥L, (L_F).subgroupOf L 正規, (M∩L).subgroupOf L) → M∩L⊆L_F。
+- Frobenius L = `witness_L_frobenius` (available、TypeIFrobeniusData)。
