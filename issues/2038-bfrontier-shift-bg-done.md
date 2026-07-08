@@ -182,3 +182,28 @@ genuinely ASSEMBLABLE** と判明 — docstring「Genuinely still-missing」は 
 (8.1.b) abelian ⟹ A centralizes x ⟹ A=1) だが gated でない。**次 /loop iteration で build** (issue 4/task)。
 ∴ **hub は b を reallocate しない** — b に genuine ungated on-path deep work あり。同種の rank-two witness cluster
 (S14: sharpImage/centralizer_le/witness_psi_degree/witness_value_norm_package 等) も stale-docstring 疑い、要精査。
+
+## ⚠ (2026-07-08 続⁶、lane-b /loop) — 続⁵「assemblable」を**訂正**: intersection_le_kernel は multi-lemma deep
+
+続⁵ の「intersection_le_kernel assemblable」は **over-optimistic** ([[verify-port-state-by-number-not-coq-name]]
+の自戒: TypeFData field は確認したが (9.1)/Frobenius machinery を未確認で「assemblable」と label した)。
+検証で判明:
+- **(9.1) = Wielandt order formula** (Pf mmd 04.11: U⋊E Frobenius coprime action on solvable H)。`CoprimeFrobeniusAction`
+  + `wielandt_formula_of_perfactor` (WielandtAssembly) の machinery は在るが、**C_K(A)≠1 を出すには `CoprimeFrobeniusAction`
+  instance (P₀⋊A ↷ K) の構築が要** — これに Frobenius sub-structure が要る。
+- **Frobenius sub-structure (P₀⋊A Frobenius, kernel P₀)**: L=H⋊U Frobenius・P₀≤H・A≤L (A∩H=1) から。
+  `IsFrobeniusGroup` = {isNormal, isComplement, ne_bot×2, conj_frobenius (FPF)}。conj_frobenius は
+  「a∈A\{1} ⟹ C_{P₀}(a)=1」= 「a∉kernel H ⟹ FPF on H」を要すが、これは complement-conjugacy 経由
+  (conj_frobenius は特定 complement U のみ) + subgroup-of setup。**clean な既存 lemma 無し** (prime-complement 版
+  `isFrobeniusGroup_of_prime_complement_fixedFree` のみ)。
+
+**⟹ intersection_le_kernel = genuine multi-lemma deep proof** (gated でないが deep)。**decomposition** (次 build 順):
+1. **Frobenius sub-structure lemma** (Isaacs Ch06 infra、reusable): Frobenius L=N⋊U で a∉N ⟹ C_N(a)=1
+   (element-outside-kernel FPF)、hence P₀ A-invariant ⟹ P₀⋊A Frobenius kernel P₀。
+2. **CoprimeFrobeniusAction 構築** + Wielandt formula → C_K(A)≠1。
+3. **(8.1.b) abelian argument** (TypeFData.centralizer_le_U1) → A centralizes x → A=1 → M∩L⊆H。
+
+これは deep char/group-theory work (multi-iteration)。b は継続 engage (policy「難所回避しない」)。downstream (12.11 combiner)
+は intersection_complements_K (8.13.c1、lane-a) に依然 gated だが、doneness policy 上 intersection_le_kernel 自体が
+genuine assertion ゆえ build 価値あり。**5 iteration の char-endgame 精査で判明した構造的事実**: b の char frontier は
+一律 deep multi-lemma (survey では「stale/assemblable」に見えても body は深い) — 今後は body 検証を先に。
