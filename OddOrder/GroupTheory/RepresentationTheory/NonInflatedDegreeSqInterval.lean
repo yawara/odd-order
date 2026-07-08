@@ -61,19 +61,22 @@ theorem subset_characterKernel_inflate_iff (N : Subgroup G) [N.Normal]
 
 variable [Finite G]
 
-/-- **The kernel-interval degree-square sum** `∑_{N ≤ ker χ, K ⊄ ker χ} χ(1)² = |G/N| − |G/K|`.
+/-- **The kernel-interval degree-square sum** `∑_{N ≤ ker, K ⊄ ker} χ(1)² = |G/N| − |G/(K ⊔ N)|`.
 
-For nested normal subgroups `N ≤ K` of a finite group, the irreducibles of `G` with `N` in their
-kernel but not `K`.  Via the inflation bijection `Irr(G/N) ≃ {χ ∈ Irr G | N ≤ ker χ}` (degree
-preserving), the `K ⊄ ker` condition transfers to `K̄ = K/N ⊄ ker` in `G/N`, so the sum equals
-`∑_{K̄ ⊄ ker χ̄} χ̄(1)² = |G/N| − |(G/N)/K̄| = |G/N| − |G/K|` (`sumNonInflatedDegreeSq` in `G/N`,
-plus the third isomorphism theorem `(G/N)/(K/N) ≅ G/K`). -/
-theorem sumDegreeSq_kernelInterval (N K : Subgroup G) [N.Normal] [K.Normal] (hNK : N ≤ K) :
+For normal subgroups `N`, `K` of a finite group, the irreducibles of `G` with `N` in their kernel
+but not `K`.  Via the inflation bijection `Irr(G/N) ≃ {χ ∈ Irr G | N ≤ ker χ}` (degree preserving),
+the `K ⊄ ker` condition transfers to `K̄ = K.map(mk' N) ⊄ ker` in `G/N`, so the sum equals
+`∑_{K̄ ⊄ ker χ̄} χ̄(1)² = |G/N| − |(G/N)/K̄| = |G/N| − |G/(K ⊔ N)|` (`sumNonInflatedDegreeSq` in
+`G/N`, plus the third isomorphism theorem `(G/N)/((K ⊔ N)/N) ≅ G/(K ⊔ N)`, using
+`K.map(mk' N) = (K ⊔ N).map(mk' N)` as `N` maps to `⊥`).  No `N ≤ K` hypothesis — when `N ≤ K` this
+specializes to `|G/N| − |G/K|`; the `N ⊄ K` case (Peterfalvi (9.11.3): `N = H₀C`, `K = H`,
+`K ⊔ N = HC`) gives `|G/N| − |G/HC|`. -/
+theorem sumDegreeSq_kernelInterval (N K : Subgroup G) [N.Normal] [K.Normal] :
     ∑ χ ∈ Finset.univ.filter (fun χ : IrreducibleCharacter G =>
         (N : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction G ℂ) ∧
         ¬ (K : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction G ℂ)),
         ((χ : ClassFunction G ℂ) 1) ^ 2
-      = (Nat.card (G ⧸ N) : ℂ) - (Nat.card (G ⧸ K) : ℂ) := by
+      = (Nat.card (G ⧸ N) : ℂ) - (Nat.card (G ⧸ (K ⊔ N)) : ℂ) := by
   classical
   set Kbar : Subgroup (G ⧸ N) := K.map (QuotientGroup.mk' N) with hKbar
   -- Transfer the sum to `G ⧸ N` via the inflation bijection, carrying the `K ⊄ ker` condition.
@@ -119,9 +122,12 @@ theorem sumDegreeSq_kernelInterval (N K : Subgroup G) [N.Normal] [K.Normal] (hNK
   haveI : Kbar.Normal := hKbar ▸ Subgroup.Normal.map inferInstance (QuotientGroup.mk' N)
     (QuotientGroup.mk'_surjective N)
   rw [sumNonInflatedDegreeSq (G := G ⧸ N) (N := Kbar)]
-  -- `|(G ⧸ N) ⧸ Kbar| = |G ⧸ K|` by the third isomorphism theorem.
+  -- `|(G ⧸ N) ⧸ Kbar| = |G ⧸ (K ⊔ N)|` by the third isomorphism theorem (`Kbar = (K ⊔ N).map`).
   congr 1
-  rw [hKbar]
-  exact_mod_cast Nat.card_congr (QuotientGroup.quotientQuotientEquivQuotient N K hNK).toEquiv
+  have hKbar_eq : Kbar = (K ⊔ N).map (QuotientGroup.mk' N) := by
+    rw [hKbar, Subgroup.map_sup, QuotientGroup.map_mk'_self, sup_bot_eq]
+  rw [hKbar_eq]
+  exact_mod_cast Nat.card_congr
+    (QuotientGroup.quotientQuotientEquivQuotient N (K ⊔ N) le_sup_right).toEquiv
 
 end OddOrder.RepresentationTheory
