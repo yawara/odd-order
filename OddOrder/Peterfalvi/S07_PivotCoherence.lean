@@ -469,6 +469,292 @@ theorem exists_pivotPartner_spec {τ : IntegralCharacterMap L G}
   · -- `⟨X, τ(η₁ − ξ)⟩ = ⟨X, X⟩ − ⟨X, Y₁⟩ = ‖X‖² = ⟨η₁, η₁⟩`
     rw [h1, ClassFunction.inner_sub_right, D₁.inner_X_Y, sub_zero, hX₁norm]
 
+/-- `ℤ`-spans of subsets of the supported lattice stay in the supported lattice: the
+membership predicate of `zSupportedSpan` (span membership + `A`-support) is closed under the
+`ℤ`-module operations. -/
+theorem mem_zSupportedSpan_of_mem_zSpan {H : Type*} [Group H]
+    {S T : Set (ClassFunction H ℂ)} {A : Set H}
+    (hT : T ⊆ zSupportedSpan (L := H) S A)
+    {φ : ClassFunction H ℂ} (hφ : φ ∈ zSpan (L := H) T) :
+    φ ∈ zSupportedSpan (L := H) S A := by
+  induction hφ using Submodule.span_induction with
+  | mem x hx => exact hT hx
+  | zero =>
+      exact ⟨Submodule.zero_mem _, by rw [ClassFunction.support_zero]; exact Set.empty_subset A⟩
+  | add x y _ _ ihx ihy =>
+      exact ⟨Submodule.add_mem _ ihx.1 ihy.1,
+        (ClassFunction.support_add_subset _ _).trans (Set.union_subset ihx.2 ihy.2)⟩
+  | smul c x _ ih =>
+      refine ⟨Submodule.smul_mem _ c ih.1, ?_⟩
+      rw [← Int.cast_smul_eq_zsmul ℂ c]
+      exact (ClassFunction.support_smul_subset _ _).trans ih.2
+
+open scoped Classical in
+/-- Plain-sum inner products over subsets of an orthonormal family count the overlap:
+`⟨∑_{α ∈ E} α, ∑_{β ∈ F} β⟩ = |E ∩ F|` for `E, F ⊆ R` orthonormal. -/
+theorem inner_sum_sum_of_orthonormal {H : Type*} [Group H] [Fintype H]
+    [Invertible (Nat.card H : ℂ)] {R : Finset (ClassFunction H ℂ)}
+    (horth : ∀ α ∈ R, ∀ β ∈ R, ClassFunction.inner α β = if α = β then (1 : ℂ) else 0)
+    {E F : Finset (ClassFunction H ℂ)} (hE : E ⊆ R) (hF : F ⊆ R) :
+    ClassFunction.inner (∑ α ∈ E, α) (∑ β ∈ F, β) = ((E ∩ F).card : ℂ) := by
+  classical
+  rw [inner_sum_left]
+  have hterm : ∀ α ∈ E, ClassFunction.inner α (∑ β ∈ F, β)
+      = if α ∈ F then (1 : ℂ) else 0 := by
+    intro α hα
+    rw [inner_sum_right, Finset.sum_congr rfl fun β hβ => horth α (hE hα) β (hF hβ),
+      Finset.sum_ite_eq F α fun _ => (1 : ℂ)]
+  rw [Finset.sum_congr rfl hterm, Finset.sum_ite_mem, Finset.sum_const, nsmul_eq_mul, mul_one]
+
+/-- **Peterfalvi (5.7), the pivot-partner construction** (Coq `uniform_degree_coherence`,
+`PFsection5.v:1265-1330`): under the norm-general subcoherence data — per-member orthonormal
+`R`-families (5.2.d), their cross-orthogonality (5.2.e), the `A`-supported lattice isometry
+(5.2.b), pairwise orthogonality, conjugate closure, no real members — every member `χ₁ ∈ S`
+with genuine-character norm (`⟨χ₁, χ₁⟩ ∈ ℕ`) has a **pivot partner** `ζ₁ ∈ ℤ[Irr G]` with
+
+* `⟨ζ₁, ζ₁⟩ = ⟨χ₁, χ₁⟩`, and
+* `⟨τ(η − χ₁), ζ₁⟩ = −⟨χ₁, χ₁⟩` for every other member `η ∈ S`
+
+— exactly the inputs `hζZ`/`hnorm`/`hpivot` of `pivotCoherence`.
+
+The partner is the common `X` of the `haveX` runs (`exists_pivotPartner_spec`): fixing an
+anchor `ξ₁ ∈ S ∖ {χ₁, χ̄₁}` (if none exists, `S ⊆ {χ₁, χ̄₁}` is the degenerate case and any
+`⟨χ₁,χ₁⟩`-element subset of `R(χ₁)` works, since `|R(χ₁)| = 2⟨χ₁,χ₁⟩`), the member cases are
+
+* `η = χ̄₁`: automatic for any `R(χ₁)`-subset-sum, from `(χ₁ − χ̄₁)^τ = ∑_{R(χ₁)} α`;
+* `η = ξ₁`: the `haveX` inner product, conjugated;
+* `η = ξ̄₁`: split `τ(χ₁ − ξ̄₁) = τ(χ₁ − ξ₁) + ∑_{R(ξ₁)} β` by (5.2.d) at `ξ₁` and use
+  `X ⊥ R(ξ₁)`;
+* otherwise: `X = X_η` (`haveX` at `η` gives the same `X`: `⟨X, X_η⟩ = ⟨χ₁,χ₁⟩` by the residual
+  containments and cross-orthogonalities, so `‖X − X_η‖² = 0`). -/
+theorem exists_pivotPartner {τ : IntegralCharacterMap L G}
+    {S : Set (ClassFunction L ℂ)} {A : Set L}
+    {χ₁ : ClassFunction L ℂ} (hχ₁ : χ₁ ∈ S)
+    (R : ∀ η ∈ S, OrthonormalCharacterImageFamily (L := L) (G := G) τ η)
+    (horth : ∀ a ∈ S, ∀ b ∈ S, a ≠ b → ClassFunction.inner a b = 0)
+    (hconj : ∀ a ∈ S, a.conj ∈ S)
+    (hnr : ∀ a ∈ S, a ≠ a.conj)
+    (hN : ∃ n : ℕ, ClassFunction.inner χ₁ χ₁ = n)
+    (hiso : ∀ ⦃φ ψ : ClassFunction L ℂ⦄, φ ∈ zSupportedSpan (L := L) S A →
+      ψ ∈ zSupportedSpan (L := L) S A →
+      ClassFunction.inner (τ φ) (τ ψ) = ClassFunction.inner φ ψ)
+    (hZdiff : ∀ a ∈ S, ∀ b ∈ S, τ (a - b) ∈ ZIrr G)
+    (hsuppdiff : ∀ a ∈ S, ∀ b ∈ S, ((a - b : ClassFunction L ℂ)).support ⊆ A)
+    (hRorth : ∀ ⦃φ ξ : ClassFunction L ℂ⦄ (hφ : φ ∈ S) (hξ : ξ ∈ S),
+      ClassFunction.inner φ ξ = 0 → ClassFunction.inner φ ξ.conj = 0 →
+      (R φ hφ).Orthogonal (R ξ hξ)) :
+    ∃ ζ₁ ∈ ZIrr G,
+      ClassFunction.inner ζ₁ ζ₁ = ClassFunction.inner χ₁ χ₁ ∧
+      ∀ η ∈ S, η ≠ χ₁ →
+        ClassFunction.inner (τ (η - χ₁)) ζ₁ = -ClassFunction.inner χ₁ χ₁ := by
+  classical
+  obtain ⟨N, hNval⟩ := hN
+  let R₁ := R χ₁ hχ₁
+  have hχ₂ : χ₁.conj ∈ S := hconj χ₁ hχ₁
+  have hne12 : χ₁ ≠ χ₁.conj := hnr χ₁ hχ₁
+  have h11c : ClassFunction.inner χ₁ χ₁.conj = 0 := horth _ hχ₁ _ hχ₂ hne12
+  have h1c1 : ClassFunction.inner χ₁.conj χ₁ = 0 := horth _ hχ₂ _ hχ₁ (Ne.symm hne12)
+  -- member differences live in the supported lattice
+  have hdmem : ∀ a ∈ S, ∀ b ∈ S,
+      (a - b : ClassFunction L ℂ) ∈ zSupportedSpan (L := L) S A := fun a ha b hb =>
+    ⟨Submodule.sub_mem _ (Submodule.subset_span ha) (Submodule.subset_span hb),
+      hsuppdiff a ha b hb⟩
+  -- the lattice isometry restricted to member-difference pair spans
+  have hisopair : ∀ ⦃a b c : ClassFunction L ℂ⦄, a ∈ S → b ∈ S → c ∈ S →
+      ∀ φ ζ : ClassFunction L ℂ,
+        φ ∈ zSpan (L := L) {a - b, a - c} → ζ ∈ zSpan (L := L) {a - b, a - c} →
+        ClassFunction.inner (τ φ) (τ ζ) = ClassFunction.inner φ ζ := by
+    intro a b c ha hb hc φ ζ hφ hζ
+    have hsub : ({a - b, a - c} : Set (ClassFunction L ℂ)) ⊆
+        zSupportedSpan (L := L) S A := by
+      intro x hx
+      simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx
+      rcases hx with rfl | rfl
+      · exact hdmem a ha b hb
+      · exact hdmem a ha c hc
+    exact hiso (mem_zSupportedSpan_of_mem_zSpan hsub hφ)
+      (mem_zSupportedSpan_of_mem_zSpan hsub hζ)
+  -- the `haveX` applicator for a member `ξ ∉ {χ₁, χ̄₁}`
+  have haveX : ∀ ⦃ξ : ClassFunction L ℂ⦄ (hξ : ξ ∈ S), ξ ≠ χ₁ → ξ ≠ χ₁.conj →
+      ∃ X : ClassFunction G ℂ,
+        (∃ E ⊆ R₁.imageSet, X = ∑ α ∈ E, α ∧
+          (E.card : ℂ) = ClassFunction.inner χ₁ χ₁) ∧
+        X - τ (χ₁ - ξ) ∈ zSpan (L := G) (↑(R ξ hξ).imageSet : Set (ClassFunction G ℂ)) ∧
+        ClassFunction.inner X (τ (χ₁ - ξ)) = ClassFunction.inner χ₁ χ₁ := by
+    intro ξ hξ hξ1 hξ2
+    have hξc : ξ.conj ∈ S := hconj ξ hξ
+    have hξcne1 : ξ.conj ≠ χ₁ := fun h => hξ2 (by rw [← h, ClassFunction.conj_conj])
+    exact exists_pivotPartner_spec R₁ (R ξ hξ)
+      (hRorth hχ₁ hξ (horth _ hχ₁ _ hξ (Ne.symm hξ1)) (horth _ hχ₁ _ hξc (Ne.symm hξcne1)))
+      (hisopair hχ₁ hχ₂ hξ) (hisopair hξ hξc hχ₁)
+      (hZdiff _ hχ₁ _ hξ) (hZdiff _ hξ _ hχ₁)
+      (horth _ hχ₁ _ hξ (Ne.symm hξ1)) (horth _ hχ₂ _ hξ (fun h => hξ2 h.symm))
+      h11c
+      (horth _ hξ _ hχ₁ hξ1) (horth _ hξc _ hχ₁ hξcne1)
+      (horth _ hξ _ hξc (hnr ξ hξ))
+  by_cases hdegen : ∃ ξ ∈ S, ξ ≠ χ₁ ∧ ξ ≠ χ₁.conj
+  case neg =>
+    -- degenerate case `S ⊆ {χ₁, χ̄₁}`: any `N`-element subset of `R(χ₁)` works
+    -- `‖χ̄₁‖² = ‖χ₁‖²`
+    have hconjnorm : ClassFunction.inner χ₁.conj χ₁.conj = ClassFunction.inner χ₁ χ₁ := by
+      rw [inner_conj_conj, hNval, star_natCast]
+    -- `|R(χ₁)| = 2N`, via the isometry on `χ₁ − χ̄₁` and (5.2.d)
+    have hcard : R₁.imageSet.card = 2 * N := by
+      have h1 : ClassFunction.inner (τ (χ₁ - χ₁.conj)) (τ (χ₁ - χ₁.conj))
+          = ClassFunction.inner (χ₁ - χ₁.conj) (χ₁ - χ₁.conj) :=
+        hiso (hdmem _ hχ₁ _ hχ₂) (hdmem _ hχ₁ _ hχ₂)
+      rw [R₁.image_eq,
+        inner_sum_sum_of_orthonormal R₁.orthonormal (Finset.Subset.refl _)
+          (Finset.Subset.refl _), Finset.inter_self,
+        ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+        ClassFunction.inner_sub_right, h11c, h1c1, hconjnorm, hNval] at h1
+      have h2 : ((R₁.imageSet.card : ℕ) : ℂ) = ((2 * N : ℕ) : ℂ) := by
+        rw [h1]; push_cast; ring
+      exact_mod_cast h2
+    obtain ⟨E, hEsub, hEcard⟩ :=
+      Finset.exists_subset_card_eq (s := R₁.imageSet) (n := N) (by rw [hcard]; omega)
+    refine ⟨∑ α ∈ E, α, ?_, ?_, ?_⟩
+    · exact Submodule.sum_mem _ fun α hα => R₁.mem_ZIrr α (hEsub hα)
+    · rw [inner_sum_sum_of_orthonormal R₁.orthonormal hEsub hEsub, Finset.inter_self,
+        hEcard, hNval]
+    · intro η hη hηne
+      have hηc : η = χ₁.conj := by
+        by_contra h
+        exact hdegen ⟨η, hη, hηne, h⟩
+      subst hηc
+      have himg2 : τ (χ₁.conj - χ₁) = -∑ α ∈ R₁.imageSet, α := by
+        rw [← R₁.image_eq, ← map_neg, neg_sub]
+      rw [himg2, ClassFunction.inner_neg_left,
+        inner_sum_sum_of_orthonormal R₁.orthonormal (Finset.Subset.refl _) hEsub,
+        Finset.inter_eq_right.mpr hEsub, hEcard, hNval]
+  case pos =>
+    -- an anchor `ξ₁ ∈ S ∖ {χ₁, χ̄₁}` exists; its `haveX` output is the partner
+    obtain ⟨ξ₁, hξ₁S, hξ₁ne1, hξ₁ne2⟩ := hdegen
+    obtain ⟨X, ⟨E, hEsub, hXsum, hEcard⟩, hXres, hXD⟩ := haveX hξ₁S hξ₁ne1 hξ₁ne2
+    have hXnorm : ClassFunction.inner X X = ClassFunction.inner χ₁ χ₁ := by
+      rw [hXsum, inner_sum_sum_of_orthonormal R₁.orthonormal hEsub hEsub,
+        Finset.inter_self, hEcard]
+    have hXZ : X ∈ ZIrr G := by
+      rw [hXsum]
+      exact Submodule.sum_mem _ fun α hα => R₁.mem_ZIrr α (hEsub hα)
+    have hXspan : X ∈ zSpan (L := G) (↑R₁.imageSet : Set (ClassFunction G ℂ)) := by
+      rw [hXsum]
+      exact Submodule.sum_mem _ fun α hα =>
+        Submodule.subset_span (Finset.mem_coe.mpr (hEsub hα))
+    -- (5.2.e) instances at the anchor
+    have horthξ₁χ₁ : (R ξ₁ hξ₁S).Orthogonal R₁ :=
+      hRorth hξ₁S hχ₁ (horth _ hξ₁S _ hχ₁ hξ₁ne1) (horth _ hξ₁S _ hχ₂ hξ₁ne2)
+    refine ⟨X, hXZ, hXnorm, ?_⟩
+    intro η hη hηne
+    by_cases hηc : η = χ₁.conj
+    · -- `η = χ̄₁`: `⟨τ(χ̄₁ − χ₁), X⟩ = −⟨∑_{R(χ₁)} α, ∑_E α⟩ = −|E| = −⟨χ₁,χ₁⟩`
+      subst hηc
+      have himg2 : τ (χ₁.conj - χ₁) = -∑ α ∈ R₁.imageSet, α := by
+        rw [← R₁.image_eq, ← map_neg, neg_sub]
+      rw [himg2, ClassFunction.inner_neg_left, hXsum,
+        inner_sum_sum_of_orthonormal R₁.orthonormal (Finset.Subset.refl _) hEsub,
+        Finset.inter_eq_right.mpr hEsub, hEcard]
+    · by_cases hηξ : η = ξ₁
+      · -- `η = ξ₁`: conjugate the `haveX` inner product
+        subst hηξ
+        have hneg : τ (η - χ₁) = -τ (χ₁ - η) := by rw [← map_neg, neg_sub]
+        rw [hneg, ClassFunction.inner_neg_left, inner_conj_symm X (τ (χ₁ - η)), hXD,
+          hNval, star_natCast]
+      · by_cases hηξc : η = ξ₁.conj
+        · -- `η = ξ̄₁`: split `τ(χ₁ − ξ̄₁) = τ(χ₁ − ξ₁) + ∑_{R(ξ₁)} β`, use `X ⊥ R(ξ₁)`
+          subst hηξc
+          have himgsplit : τ (χ₁ - ξ₁.conj)
+              = τ (χ₁ - ξ₁) + ∑ β ∈ (R ξ₁ hξ₁S).imageSet, β := by
+            rw [← (R ξ₁ hξ₁S).image_eq, ← map_add]
+            congr 1
+            abel
+          have h0 : ClassFunction.inner (∑ β ∈ (R ξ₁ hξ₁S).imageSet, β) X = 0 := by
+            rw [hXsum, inner_sum_left]
+            refine Finset.sum_eq_zero fun β hβ => ?_
+            rw [inner_sum_right]
+            exact Finset.sum_eq_zero fun α hα => horthξ₁χ₁ β hβ α (hEsub hα)
+          have hneg : τ (ξ₁.conj - χ₁) = -τ (χ₁ - ξ₁.conj) := by rw [← map_neg, neg_sub]
+          rw [hneg, ClassFunction.inner_neg_left, himgsplit, ClassFunction.inner_add_left,
+            h0, add_zero, inner_conj_symm X (τ (χ₁ - ξ₁)), hXD, hNval, star_natCast]
+        · -- generic `η`: the common-`X` argument — `haveX` at `η` returns the same `X`
+          obtain ⟨X', ⟨E', hE'sub, hX'sum, hE'card⟩, hX'res, hX'D⟩ := haveX hη hηne hηc
+          have hX'norm : ClassFunction.inner X' X' = ClassFunction.inner χ₁ χ₁ := by
+            rw [hX'sum, inner_sum_sum_of_orthonormal R₁.orthonormal hE'sub hE'sub,
+              Finset.inter_self, hE'card]
+          have hX'span : X' ∈ zSpan (L := G) (↑R₁.imageSet : Set (ClassFunction G ℂ)) := by
+            rw [hX'sum]
+            exact Submodule.sum_mem _ fun α hα =>
+              Submodule.subset_span (Finset.mem_coe.mpr (hE'sub hα))
+          -- (5.2.e) instances at `η`
+          have hηconjS : η.conj ∈ S := hconj η hη
+          have horthR₁η : R₁.Orthogonal (R η hη) :=
+            hRorth hχ₁ hη (horth _ hχ₁ _ hη (Ne.symm hηne))
+              (horth _ hχ₁ _ hηconjS
+                (fun h => hηc (by rw [h, ClassFunction.conj_conj])))
+          have horthξ₁η : (R ξ₁ hξ₁S).Orthogonal (R η hη) :=
+            hRorth hξ₁S hη (horth _ hξ₁S _ hη (fun h => hηξ h.symm))
+              (horth _ hξ₁S _ hηconjS
+                (fun h => hηξc (by rw [h, ClassFunction.conj_conj])))
+          -- orthogonality bookkeeping between the two residuals and the two `X`s
+          have z1 : ClassFunction.inner (X - τ (χ₁ - ξ₁)) X' = 0 :=
+            inner_zSpan_zSpan_eq_zero
+              (fun a ha b hb =>
+                horthξ₁χ₁ a (Finset.mem_coe.mp ha) b (Finset.mem_coe.mp hb))
+              hXres hX'span
+          have z2 : ClassFunction.inner (X - τ (χ₁ - ξ₁)) (X' - τ (χ₁ - η)) = 0 :=
+            inner_zSpan_zSpan_eq_zero
+              (fun a ha b hb =>
+                horthξ₁η a (Finset.mem_coe.mp ha) b (Finset.mem_coe.mp hb))
+              hXres hX'res
+          have z3 : ClassFunction.inner X (X' - τ (χ₁ - η)) = 0 :=
+            inner_zSpan_zSpan_eq_zero
+              (fun a ha b hb =>
+                horthR₁η a (Finset.mem_coe.mp ha) b (Finset.mem_coe.mp hb))
+              hXspan hX'res
+          -- the isometry value `⟨τ(χ₁ − ξ₁), τ(χ₁ − η)⟩ = ⟨χ₁, χ₁⟩`
+          have hDD : ClassFunction.inner (τ (χ₁ - ξ₁)) (τ (χ₁ - η))
+              = ClassFunction.inner χ₁ χ₁ := by
+            rw [hiso (hdmem _ hχ₁ _ hξ₁S) (hdmem _ hχ₁ _ hη),
+              ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+              ClassFunction.inner_sub_right, horth _ hχ₁ _ hη (Ne.symm hηne),
+              horth _ hξ₁S _ hχ₁ hξ₁ne1, horth _ hξ₁S _ hη (fun h => hηξ h.symm)]
+            ring
+          -- `⟨X, X′⟩ = ⟨χ₁, χ₁⟩`
+          have hZ₁D : ClassFunction.inner (X - τ (χ₁ - ξ₁)) (τ (χ₁ - η)) = 0 := by
+            have hτη : τ (χ₁ - η) = X' - (X' - τ (χ₁ - η)) := by abel
+            rw [hτη, ClassFunction.inner_sub_right, z1, z2, sub_zero]
+          have hXX' : ClassFunction.inner X X' = ClassFunction.inner χ₁ χ₁ := by
+            have hX'd : X' = (X' - τ (χ₁ - η)) + τ (χ₁ - η) := by abel
+            have hXd : X = (X - τ (χ₁ - ξ₁)) + τ (χ₁ - ξ₁) := by abel
+            calc ClassFunction.inner X X'
+                = ClassFunction.inner X ((X' - τ (χ₁ - η)) + τ (χ₁ - η)) := by rw [← hX'd]
+              _ = ClassFunction.inner X (X' - τ (χ₁ - η))
+                  + ClassFunction.inner X (τ (χ₁ - η)) := by
+                  rw [ClassFunction.inner_add_right]
+              _ = ClassFunction.inner X (τ (χ₁ - η)) := by rw [z3, zero_add]
+              _ = ClassFunction.inner ((X - τ (χ₁ - ξ₁)) + τ (χ₁ - ξ₁)) (τ (χ₁ - η)) := by
+                  rw [← hXd]
+              _ = ClassFunction.inner (X - τ (χ₁ - ξ₁)) (τ (χ₁ - η))
+                  + ClassFunction.inner (τ (χ₁ - ξ₁)) (τ (χ₁ - η)) := by
+                  rw [ClassFunction.inner_add_left]
+              _ = ClassFunction.inner χ₁ χ₁ := by rw [hZ₁D, zero_add, hDD]
+          have hX'X : ClassFunction.inner X' X = ClassFunction.inner χ₁ χ₁ := by
+            rw [inner_conj_symm X X', hXX', hNval, star_natCast]
+          -- `‖X − X′‖² = 0`, so `X = X′`
+          have hXeq : X = X' := by
+            have h0 : (ClassFunction.inner (X - X') (X - X')).re = 0 := by
+              have hexp : ClassFunction.inner (X - X') (X - X')
+                  = ClassFunction.inner X X - ClassFunction.inner X X'
+                    - (ClassFunction.inner X' X - ClassFunction.inner X' X') := by
+                rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+                  ClassFunction.inner_sub_right]
+              rw [hexp, hXnorm, hXX', hX'X, hX'norm]
+              simp
+            exact sub_eq_zero.mp (eq_zero_of_inner_self_re_eq_zero h0)
+          have hneg : τ (η - χ₁) = -τ (χ₁ - η) := by rw [← map_neg, neg_sub]
+          rw [hneg, ClassFunction.inner_neg_left, hXeq,
+            inner_conj_symm X' (τ (χ₁ - η)), hX'D, hNval, star_natCast]
+
 end PivotPartner
 
 end OddOrder.Peterfalvi.S07
