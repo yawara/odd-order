@@ -2992,6 +2992,77 @@ theorem caseB_sOf_member_dichotomy [Finite G]
     exact ⟨k, hk0, hkeq.trans (hyp.base.muGrid_columnSum_eq_columnSum hG hG.odd k)⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Per-member orthonormal `R`-family over `𝒮(H₀C′)`** (the raw (5.2.d) datum for the
+norm-general (5.7) engine `uniform_degree_coherence_of_families`).  The caseB member dichotomy
+(`caseB_sOf_member_dichotomy`) splits every member into an irreducible (degree `d`) or a certain-type
+column sum `μ_k`; the `R`-family is dispatched accordingly:
+
+* **irreducible `η`** — the 2-element signed Dade family `dadeOrthonormalCharacterImageFamilyOfDiff`
+  (`hyp.base.tau (η − η̄) = ε·(μ − ν)`);
+* **column `η = μ_k`** — the `2q`-element certain-type family `S06.certainTypeR` at
+  `χ₂ = muColumnChar k` (`hyp.base.tau (μ_k − μ̄_k) = ∑ R(μ_k)`).
+
+Both land *definitionally* on `hyp.base.tau = dadeIntegralCharacterMap h.dade0 h.tau` (the
+`toHypothesis46` unfolding), so no `congrMap` seam.  The column case rebuilds the family at the
+abstract member `η` (rather than `▸`-transporting) by reusing the `η`-independent
+`imageSet`/`orthonormal`/`mem_ZIrr` fields of `certainTypeR` and re-proving `image_eq` through the
+dichotomy equality `η = columnSum h χ₂` — so `(caseB_sOf_memberRFamily …).imageSet` is
+*definitionally* `certainTypeR.imageSet`, the form the (5.2.e) cross-orthogonality lemmas consume. -/
+noncomputable def caseB_sOf_memberRFamily [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
+    (d : ℕ)
+    (hunif : ∀ φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
+      (φ : ClassFunction ↥M ℂ) 1 = (d : ℂ))
+    {η : ClassFunction ↥M ℂ}
+    (hη : η ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) :
+    OddOrder.Peterfalvi.S07.OrthonormalCharacterImageFamily hyp.base.tau η := by
+  haveI := hyp.base.finiteG
+  classical
+  have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+  -- bridge to the `⊥`-kernel induced family (for support / no-real facts)
+  have hηIKF0 : η ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+      ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) := by
+    have h := hyp.sOf_subset_SOf hyp.H0Cprime hη
+    rw [hyp.SOf_eq] at h
+    exact OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone bot_le h
+  by_cases hirr : IsIrreducibleCharacter η
+  · -- irreducible: the signed Dade family
+    have hreal : ¬ ClassFunction.IsReal (η : ClassFunction ↥M ℂ) :=
+      OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters hModd
+        (⊥ : Subgroup ↥M) hηIKF0
+    have hdiffsupp := OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support
+      hyp.base.mderivSharp_subset_A0 hηIKF0
+    exact OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
+      hyp.base.dadeData.dade hyp.base.hconj ⟨η, hirr⟩ hreal hdiffsupp
+  · -- column: rebuild `certainTypeR` at the abstract member `η` (data extracted by choice)
+    have hex := (caseB_sOf_member_dichotomy hG hyp d hunif hη).resolve_left
+      (fun h => hirr h.2.1)
+    let k := hex.choose
+    have hk0 : k ≠ 0 := hex.choose_spec.1
+    have hkeq : η = OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
+        (hyp.base.muColumnChar hG hG.odd k) := hex.choose_spec.2
+    exact
+      { imageSet := (OddOrder.Peterfalvi.S06.certainTypeR (hyp.base.toHypothesis46 hG hG.odd)
+          (hyp.base.muColumnChar_ne_one hG hG.odd hk0)
+          (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one (hyp.base.toHypothesis46 hG hG.odd)
+            (hyp.base.muColumnChar hG hG.odd k)).symm).imageSet
+        mem_ZIrr := (OddOrder.Peterfalvi.S06.certainTypeR (hyp.base.toHypothesis46 hG hG.odd)
+          (hyp.base.muColumnChar_ne_one hG hG.odd hk0)
+          (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one (hyp.base.toHypothesis46 hG hG.odd)
+            (hyp.base.muColumnChar hG hG.odd k)).symm).mem_ZIrr
+        orthonormal := (OddOrder.Peterfalvi.S06.certainTypeR (hyp.base.toHypothesis46 hG hG.odd)
+          (hyp.base.muColumnChar_ne_one hG hG.odd hk0)
+          (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one (hyp.base.toHypothesis46 hG hG.odd)
+            (hyp.base.muColumnChar hG hG.odd k)).symm).orthonormal
+        image_eq := by
+          rw [hkeq]
+          exact (OddOrder.Peterfalvi.S06.certainTypeR (hyp.base.toHypothesis46 hG hG.odd)
+            (hyp.base.muColumnChar_ne_one hG hG.odd hk0)
+            (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one (hyp.base.toHypothesis46 hG hG.odd)
+              (hyp.base.muColumnChar hG hG.odd k)).symm).image_eq }
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Uniform anchor-difference support over `𝒮(H₀C′)`** (the `hdegS₁diff` supply of every (9.11)
 chain step, uniform over the whole family): under the caseB uniform degree (`hunif`), the
 difference of any member against the anchor `χ₁ ∈ 𝒮(H₀C′)` is `A₀`-supported — both are
