@@ -3594,6 +3594,27 @@ theorem isTypeII_of_isTypeP2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     isTypeF_derivedInG_of_isTypeP2 hG hM hP2 hKM hUM hKne hK hU hUne
   exact isTypeII_of_isTypeP2_of_derived_typeF hG hM hP2 hderF hderfit
 
+/-- **Existence of the signalizer maximal with Peterfalvi type `I`/`II`** (existence half of
+Peterfalvi (8.13)): for an escaping `σ`-sharp element `x` (`x ∈ M_σ^#` with more than one
+`σ`-maximal), the proven signalizer structure `signalizer_structure_of_mem_sigmaSharp` supplies a
+maximal subgroup `N` over `C_G(x)` whose BG type-`F`/`P₂` dichotomy converts
+(`isTypeI_of_isTypeF`/`isTypeII_of_isTypeP2`) to the Peterfalvi type `I`/`II`.  This is the existence
+half of (8.13)'s `∃! L, C_G(x) ≤ L ∧ (IsTypeI ∨ IsTypeII)` conclusion; the uniqueness half is the
+containing-maximal uniqueness `ℳ(C_G(x)) = {N[x]}` (Theorem D). -/
+theorem exists_maximal_centralizer_le_typeI_or_typeII [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {x : G} (hxM : x ∈ S14.sigmaSharp M)
+    (hgt : 1 < (S14.maximalSigmaSubgroupsOfElement x).ncard) :
+    ∃ N : Subgroup G, N ∈ maximalSubgroups G ∧
+      Subgroup.centralizer ({x} : Set G) ≤ N ∧
+      (OddOrder.GroupTheory.IsTypeI N ∨ OddOrder.GroupTheory.IsTypeII N) := by
+  obtain ⟨N, ⟨hNmax, hCN, _, _, _, hFP2, _⟩, _⟩ :=
+    signalizer_structure_of_mem_sigmaSharp hG hM hxM hgt
+  refine ⟨N, hNmax, hCN, ?_⟩
+  rcases hFP2 with hF | hP2
+  · exact Or.inl (isTypeI_of_isTypeF hG hNmax hF)
+  · exact Or.inr (isTypeII_of_isTypeP2 hG hNmax hP2)
+
 /-- **Prop 16.1 forward bridge, type V last mile** (Peterfalvi (8.8)): a type-`P` datum with
 `U = ⊥` and the Peterfalvi (8.8) trichotomy on `H = M_F` is of type V.  The `alternative`
 disjunction is the deep named residual (BG §15.7(c) / Peterfalvi (8.8)). -/
