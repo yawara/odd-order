@@ -991,6 +991,84 @@ theorem caseA_inertia_iff_centralizes_two_summands {data : TypesIIIIIIVSetup M}
     rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one, Units.val_one]
     exact fun h => hxne (Units.val_eq_one.mp h)
 
+/-- **`C ⊆ C_U(H_k)` (action level): centralizing all of `H̄` centralizes each summand.**  A
+`U`-element `g` acting trivially on the whole chief factor (`uActionHom g = 1`, i.e. `g` realizing an
+element of `C = C_U(H̄)`) acts trivially on every Clifford summand `H_k`
+(`aInvariantRestrictAut (Hpart_aInvariant k) g = 1`), because the restricted action is a restriction
+of `uActionHom g = 1`.  This is the easy `⊆`-direction of the (9.11.2) final identity `C = U₁ ∩ U₁ʷ`:
+`C ⊆ C_U(H_i) ⊓ C_U(H_j)` (the reverse `⊇` is the deep degree argument).  Realized to `G`-subgroups it
+gives `cSub ≤ C_U(H_i) ⊓ C_U(H_j)` (cf. the landed `cSub_le_cuSub` for the generator `S₀`). -/
+theorem centralizes_all_imp_centralizes_summand {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
+    (caseA : CliffordCaseAData chars) (k : Fin data.q)
+    (g : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U)
+    (hg : (uActionHom data chief) g = 1) :
+    aInvariantRestrictAut (caseA.Hpart_aInvariant k) g = 1 := by
+  ext x
+  rw [MulAut.one_apply, aInvariantRestrictAut_coe, hg, MulAut.one_apply]
+
+/-- **Inflation-fixing ⟹ action-fixing (conclusion-agnostic).**  If a realized `U`-element `g` fixes
+the *inflated* chief-factor character `θ₀ = θbar` inflated to `H` (the `compHom (mk' N)`-fixing under
+`typeP_conjAction`), then `g`'s `U`-action fixes `θbar` on `H̄`: `θbar(φ_U(g)·x) = θbar(x)` for all
+`x`.  Strips the inflation (`compHom_typeP_conjAction_inflation`, then `mk' N` injective) exactly as
+`caseB_char_inertia_inflation_of_core` does, but *without* committing to a downstream conclusion — so
+it composes with **any** char-inertia core (all-summand `uActionHom g = 1`, or the two-summand
+centralizer).  This is the HU→Ū half of the (9.11.2) inertia bridge. -/
+theorem inflation_fixing_imp_action_fixing {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} {θbar : IrreducibleCharacter (↥data.H ⧸ chief.N)}
+    (g : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U)
+    (hfix : ClassFunction.compHom (typeP_conjAction data.typeP
+              ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+                chief.N_aInvariant).U.subtype g)).toMonoidHom
+              (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+                (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ))
+            = ClassFunction.compHom (QuotientGroup.mk' chief.N)
+                (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)) :
+    ∀ x, (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)
+        (((typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).φ.comp
+          (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+            chief.N_aInvariant).U.subtype) g x)
+          = (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) x := by
+  rw [compHom_typeP_conjAction_inflation] at hfix
+  have hfix2 := ClassFunction.compHom_injective_of_surjective
+    (QuotientGroup.mk'_surjective chief.N) hfix
+  intro x
+  rw [show ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+        chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+        chief.N_aInvariant).U.subtype) g
+      = quotientMulAutHom chief.N_aInvariant
+          ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+            chief.N_aInvariant).U.subtype g) from rfl]
+  exact congrFun (congrArg (fun f : ClassFunction (↥data.H ⧸ chief.N) ℂ =>
+    (f : (↥data.H ⧸ chief.N) → ℂ)) hfix2) x
+
+/-- **(9.11.2) HU-inertia bridge (`⊆` half): fixing the inflated two-summand `θ₀` in `HU` centralizes
+both summands.**  For a chief-factor character `θbar` regular on the two Clifford summands `H_i`,
+`H_j`, a realized `U`-element `g` in the `HU`-inertia of the inflation `θ₀` (`hfix`) centralizes both
+summands: `aInvariantRestrictAut … g = 1` on `i` and `j`.  Composes the inflation-stripping
+`inflation_fixing_imp_action_fixing` (HU-fixing → Ū-fixing) with the Ū-level two-summand char-inertia
+`caseA_char_inertia_two_summands`.  This is the `HU`-side of `I(θ₀) ⊓ U ⊆ C_U(H_i) ⊓ C_U(H_j)`; with
+the realized subgroups it feeds the index computation `[HU : I(θ₀)] = [U : U₁ ∩ U₁ʷ]`. -/
+theorem caseA_hu_char_inertia_two_summands {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
+    (caseA : CliffordCaseAData chars) {i j : Fin data.q}
+    {θbar : IrreducibleCharacter (↥data.H ⧸ chief.N)}
+    (hregi : ∃ x ∈ caseA.Hpart i, (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+      ≠ (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1)
+    (hregj : ∃ x ∈ caseA.Hpart j, (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+      ≠ (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1)
+    (g : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U)
+    (hfix : ClassFunction.compHom (typeP_conjAction data.typeP
+              ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+                chief.N_aInvariant).U.subtype g)).toMonoidHom
+              (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+                (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ))
+            = ClassFunction.compHom (QuotientGroup.mk' chief.N)
+                (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)) :
+    aInvariantRestrictAut (caseA.Hpart_aInvariant i) g = 1 ∧
+      aInvariantRestrictAut (caseA.Hpart_aInvariant j) g = 1 :=
+  caseA_char_inertia_two_summands caseA hregi hregj g (inflation_fixing_imp_action_fixing g hfix)
+
 end NineElevenTwoInertia
 
 /-- **`[U : K₁ ⊓ K₂] ≤ [U:K₁]·[U:K₂]`** (relative-index form of `Subgroup.index_inf_le`): the
