@@ -2386,3 +2386,32 @@ target (coherent inducedFamily=S_1、(10.8) と矛盾) は正しいが、到達 
 
 **次 iteration = bounded_seqIndD_coherence (Pf 6.x) の repo 状態確認 → S08 (6.7)/(6.8) degree-bound を
 土台に port → capstone を bounded-coherence route に redesign。** issue 1018 で追跡。
+
+## 2026-07-08 update³⁸ (lane-a /loop) — ★ 9075 CLOSED → (11.8) chain は post-9075 で lane-b-gated、次 lane-a 深 frontier マップ
+
+### 9075 完遂 (別 session、norm-general (5.7) engine + caseB rewire)
+`uniform_degree_coherence_of_families` (S07_PivotCoherence) + `caseB_coherent_sOf_H0Cprime`
+を hDeg 無し全族一発化 (S13)。**これが (9.11) `Ptype_core_coherence` の caseB 枝** = lane-a の
+(11.8)/(9.11) chain への genuine 寄与。axiom-clean、full build green。
+
+### post-9075 の (11.8) chain 帰属診断 (honest)
+`card_kappaHall_lt_of_isTypeIIIorIV` (唯一の bare feitThompson sorry, FeitThompson:426)
+ ← `exists_zeta_residual_not_orthogonal` (S12:4473、**構造完成 sorry なし**)
+ ← `coherent_Sset_diff_SHCSet` (S12:4159 sorry、§14 S₂-coherence) + `coherent_Sset_of_glued`
+    の (6.7)/(5.8) sorry (S12:4419/4427、§14 hY-image gated)
+ ← (9.11) `coherent_H0C_commutator` ← `sibleyTarget_H0C` (S11:8314 unsound sorry)
+ ← honest = (9.11) `Ptype_core_coherence` = **caseA (lane b, sorry-free) + caseB (私の 9075, done)**
+    + capstone assembly (`coherent_H0Cprime_S` re-grounding = **lane b の (13.3)**、
+    S11_NineElevenCoherence:42「Consumers: lane b's (13.3)」)。
+
+⟹ **lane-a の (11.8) ungated 寄与は 9075 で尽きた**。残 chain 完成 = lane-b capstone (私の caseB を consume)
+ + §14/world-bridge (cross-lane)。lane-a が正面から埋める(11.8)経路 ungated math は無し。
+
+### 次 lane-a 深 frontier 候補 (いずれも深い独立ピース、quick win 無し = policy 上 OK)
+1. **(10.7) `typeII_derived_frobenius`** (S12:54): hard = `IsFrobeniusGroup [S,S] S_F complement`。
+   coherence でなく型 II 導来部分群の Frobenius 構造 (Isaacs Ch06 machinery + 型 II 構造解析)。深い群論。
+2. **(10.8) `typeII_coherence_contradiction_estimate`** (S12:453): ∃u≥7, coherence 矛盾 estimate。
+   Sibley-type bound (coh gated)。
+3. **type V** (S12:4618 `typeV_forces_coherence`): (10.10.1)-(10.10.4)、§6/§8 coherence gated。
+→ 次 iteration (fresh context): (10.7) Frobenius 構成を Isaacs Ch06 `IsFrobeniusGroup` producer の
+  在庫確認から着手 (型 II の [S,S] = S_F ⋊ complement の Frobenius 性は §10 local analysis + BG)。
