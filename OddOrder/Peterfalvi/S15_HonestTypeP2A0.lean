@@ -150,4 +150,100 @@ theorem escaping_honestTypeP2A0Set_mem_honestTypeP2ASet {M : Subgroup G} (data :
   · exact ⟨hpa, haesc⟩
   · exact absurd (conjClassSetIn_typePV_centralizer_le_M data hva) haesc
 
+/-- **(8.13.a), the mixed `A(S)`–`V^S` case is vacuous**: an `A(S)`-point is never `G`-conjugate to a
+`V^S`-point.  ⚠ DEEP `'A0(S)`-`normedTI` residual (issue 9076 piece 4c).  An `A(S) = honestTypeP2ASet`
+element lies in `S' = derivedInG S`, while a `V^S`-point lies **outside** `S'`
+(`typePData_typePV_not_mem_derived`, the nontrivial `W₁`-component).  If they were `G`-conjugate, the
+`'A0(S)`-`normedTI` property would force the conjugator into `S` (`= N_G('A0(S))`), hence into
+`N_M(S') = M`, so it would preserve `S'` — contradicting `a ∈ S'`, `b ∉ S'`.  But that argument
+**uses** `normedTI 'A0(S)`, which is exactly what this datum is being built to establish, so the
+vacuity must be shown directly from the type-`P₂` FT-support geometry (Coq `FTsupp0` / BG §16
+Theorem II).  The `elementary` coprimality route fails here because `W₂ ⊆ M_σ` (`data.H ≤ M_σ`,
+`data.W₂ ≤ data.H`), so `W` genuinely contains `σ`-elements — the pin is genuine deep content, not a
+missing arithmetic step. -/
+theorem not_isConj_honestTypeP2ASet_typePV [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (data : TypePData M) {a b : G}
+    (ha : a ∈ honestTypeP2ASet M) (hb : b ∈ conjClassSetIn M (typePV M data))
+    (hab : IsConj a b) : False := sorry
+
+/-- **Peterfalvi (8.15) for the honest type-`P₂` `A₀`-support**: the Dade (2.2) support hypotheses
+hold for `A₀(S) = A(S) ∪ V^S`.  Assembled through the `σ`-decomposition engine
+`dadeSupportHypothesisData_of_subset_escaping_sigmaSharp`:
+
+* set-facts (`⊆ M`, `≠ 1`, `M`-conjugation-invariant, nonempty) — the `honestTypeP2A0Set_*` facts;
+* escaping-`σ`-sharp and coprimality — reduced to the `A(S)`-part
+  (`escaping_honestTypeP2A0Set_mem_honestTypeP2ASet`, since `V^S` does not escape) plus the generic
+  `V`-part coprimality (`coprime_FT_signalizer_centralizerIn_typePV`);
+* the `isConj → M`-conjugate obligation — the `A`–`A` and `V`–`V` cases are
+  `honestTypeP2ASet_isConj_conj_in_M` / `conjClassSetIn_typePV_isConj_conj_in_M`, and the mixed case
+  is the vacuity `not_isConj_honestTypeP2ASet_typePV` (the one deep `'A0`-`normedTI` pin).
+
+This is the `S`-side Dade datum the (13.18) row-`0` cross-relation `τ_S(μ_{0j} − μ_{01}) =
+η_{0j} − η_{01}` actually needs (the `μ`-differences are `A₀(S)`-supported, not `A(S)`-supported). -/
+theorem dadeSupportHypothesisData_honestTypeP2A0Set [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP2 : OddOrder.BG.Ch4.S14.IsTypeP2 M) (data : TypePData M) :
+    Nonempty (OddOrder.Peterfalvi.S10.DadeSupportHypothesisData M (honestTypeP2A0Set M data)) := by
+  classical
+  obtain ⟨K₀, U₀, hKM, hUM, hUne, hK, hU, -, -⟩ :=
+    OddOrder.BG.Ch4.S16.typeP2_exists_matched_kappa_hall_pair hG hM hP2
+  have hKne : K₀ ≠ ⊥ := kappaHall_ne_bot_of_isTypeP2 hP2 hK
+  refine OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_of_subset_escaping_sigmaSharp hG hM
+    (honestTypeP2A0Set_subset data) (honestTypeP2A0Set_ne_one data)
+    (fun a ha => escaping_honestTypeP2ASet_mem_sigmaSharp hG hM hKM hUM hKne hK hU
+      (escaping_honestTypeP2A0Set_mem_honestTypeP2ASet data ha))
+    ?_ ?_ ?_ ?_
+  · -- `isConj → M`-conjugate: A–A / A–V (vacuous) / V–A (vacuous) / V–V.
+    intro a ha b hb hab
+    rcases ha with hpa | hva
+    · rcases hb with hpb | hvb
+      · exact honestTypeP2ASet_isConj_conj_in_M hG hM hKM hUM hKne hK hU hpa hpb hab
+      · exact (not_isConj_honestTypeP2ASet_typePV hG hM data hpa hvb hab).elim
+    · rcases hb with hpb | hvb
+      · exact (not_isConj_honestTypeP2ASet_typePV hG hM data hpb hva hab.symm).elim
+      · exact OddOrder.Peterfalvi.S10.conjClassSetIn_typePV_isConj_conj_in_M data hva hvb hab
+  · -- coprimality: the escaping point is in `A(S)`; `b` is in `A(S)` or `V^S`.
+    intro a ha b hb
+    have haA := escaping_honestTypeP2A0Set_mem_honestTypeP2ASet data ha
+    have haσ := escaping_honestTypeP2ASet_mem_sigmaSharp hG hM hKM hUM hKne hK hU haA
+    rcases hb with hpb | hvb
+    · exact coprime_FT_signalizer_centralizerIn_honestTypeP2ASet hG hM haσ ha.2 hpb
+    · exact OddOrder.Peterfalvi.S10.coprime_FT_signalizer_centralizerIn_typePV hG hM data haσ
+        ha.2 hvb
+  · -- nonempty: `M_σ^# ⊆ A(S) ⊆ A₀(S)`.
+    obtain ⟨a, ha1⟩ :=
+      Subgroup.ne_bot_iff_exists_ne_one.mp (OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM)
+    have ha1' : (a : G) ≠ 1 := fun h => ha1 (Subtype.ext h)
+    have haMσ : (a : G) ∈ OddOrder.BG.Ch3.S10.Msigma M := a.2
+    have haM' : (a : G) ∈ derivedInG M := OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM haMσ
+    exact ⟨a.1, Or.inl ⟨haM', ha1', a.1,
+      (Set.mem_diff _).mpr ⟨SetLike.mem_coe.mpr haMσ, fun h => ha1' (Set.mem_singleton_iff.mp h)⟩,
+      Subgroup.mem_centralizer_singleton_iff.mpr rfl⟩⟩
+  · -- `M`-conjugation invariance.
+    intro m x hm
+    exact honestTypeP2A0Set_conj_mem data hm
+
+/-- **(13.18) `S`-instance `'A0`-Dade hypothesis**: the `Hypothesis`-level instantiation of
+`dadeSupportHypothesisData_honestTypeP2A0Set` at the type-`P₂` maximal `S` (via `hyp.S_maximal`/
+`hyp.S_typeP2`/`hyp.Sdata`), packaging the honest full support `A₀(S) = A(S) ∪ V^S` as an
+`S04.Hypothesis`.  This is the `S`-side Dade datum for the (13.18) cross-relation
+`τ_S(μ_{0j} − μ_{01}) = η_{0j} − η_{01}` — the `μ`-column differences are `A₀(S)`-supported (the
+`V_S`-part falls outside `A(S) ⊆ S'`), so the `A(S)`-Dade `dadeHypS` cannot see them; `dadeHypS0`
+is the correction.  (Its `.fullDadeIsometryData` inherits the one deep `'A0`-`normedTI` pin
+`not_isConj_honestTypeP2ASet_typePV`.) -/
+noncomputable def Hypothesis.dadeHypS0 [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    OddOrder.Peterfalvi.S04.Hypothesis G (honestTypeP2A0Set hyp.S hyp.Sdata) hyp.S :=
+  (dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.S_maximal hyp.S_typeP2 hyp.Sdata).some.dade
+
+/-- **(13.18) `S`-instance `'A0`-Dade `H`-conjugation invariance**: the `HConjInvariant` of
+`dadeHypS0`, carried by the underlying `DadeSupportHypothesisData` (Peterfalvi (8.14)/(8.15)).  This
+is the `hconj` input for `dadeHypS0.fullDadeIsometryData`, so the `'A0`-Dade isometry
+`τ_S = dadeIntegralCharacterMap (dadeHypS0 hG) …` is well-defined. -/
+theorem Hypothesis.dadeHypS0_hconj [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    (hyp.dadeHypS0 hG).HConjInvariant :=
+  (dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.S_maximal hyp.S_typeP2 hyp.Sdata).some.hconj
+
 end OddOrder.Peterfalvi.S15

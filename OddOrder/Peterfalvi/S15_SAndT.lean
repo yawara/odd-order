@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S15_SAndT_Setup
+import OddOrder.Peterfalvi.S15_HonestTypeP2A0
 import OddOrder.GroupTheory.RepresentationTheory.InflationInduction
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
 
@@ -3702,13 +3703,13 @@ noncomputable def betaGrid [Finite G] (hyp : Hypothesis (G := G)) (j : Fin hyp.p
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **The genuine `S`-side Dade image** `τ_S(β_{#1})` of the (13.18) bridge character at column
-`#1`.  Uses the honest (13.2.e) Dade isometry `τ_S = dadeIntegralCharacterMap (hyp.dadeHypS hG) …`
+`#1`.  Uses the honest (13.2.e) Dade isometry `τ_S = dadeIntegralCharacterMap (hyp.dadeHypS0 hG) …`
 — the `S`-instance of the (5.3) Dade map — **NOT** the off-path `= 0` placeholder `hyp.tauS`. -/
 noncomputable def tauSbetaGrid [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     ClassFunction G ℂ :=
-  OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
-      ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG))
+  OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
+      ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG))
     (betaGrid hyp ⟨1, by have := hyp.three_le_p; omega⟩)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -3997,18 +3998,27 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(4.8)/(5.3) prime-`TI` Dade cross-relation, `S`-side row-`0` form**:
 `τ_S(μ_{0j} − μ_{01}) = η_{0j} − η_{01}` for `j ≠ 0`.
 
-⚠ DEEP §4/§5 RESIDUAL, isolated obligation (issue 3003).  This is Coq `prDade_sub_TIirr`
-(`PFsection4.v:870`) `τ(μ2_{ij} − μ2_{ik}) = δ_j·(η_{ij} − η_{ik})` specialized to row `i = 0`,
-columns `j` and `#1`, with the `FT`-context sign `δ_j = 1` (Coq `FTprTIsign`).  Mathematically it is
-the compatibility of the `S`-side Dade isometry `τ_S` with the (3.2) `σ`-transfer `τ₃` on the
-`ω`-grid: `τ_S ∘ Ind_W^S = τ₃` on `ω`-differences.  No repo field supplies this cross-**column**
-relation — `mu_definition` is the cross-**row** axis, and the prime-`TI` Dade machinery
-`prDade_sub_TIirr` is not yet ported (`PrimeTIResidue.lean` has only the residue two-way split).
-It is the single deep input behind (13.18.c)'s `j`-independence `gammaGrid_defGamma`. -/
+This is Coq `prDade_sub_TIirr` (`PFsection4.v:870`) `τ(μ2_{ij} − μ2_{ik}) = δ_j·(η_{ij} − η_{ik})`
+specialized to row `i = 0`, columns `j` and `#1`, with the `FT`-context sign `δ_j = 1`.  It is the
+single deep input behind (13.18.c)'s `j`-independence `gammaGrid_defGamma`.
+
+✅ **Now on the correct Dade map** (issue 9076, 2026-07-08): `τ_S` is `dadeIntegralCharacterMap`
+of the honest **`'A0(S)`-Dade** `dadeHypS0` (support `A₀(S) = A(S) ∪ V^S`), **not** the smaller
+`'A(S)`-Dade `dadeHypS`.  The `μ`-column difference `μ_{0j} − μ_{01}` is supported on `P^# ∪ V_S`
+(Coq `prDade_sub_TIirr_on`), and `V_S ⊄ S' ⊇ A(S)`, so with the old `dadeHypS` map the `V_S`-part
+fell in the arbitrary linear-extension region and the statement was **unprovable as stated**; the
+`'A0`-Dade correction fixes that (`dadeHypS0` inherits one deep FT-support pin,
+`not_isConj_honestTypeP2ASet_typePV`).
+
+Remaining to discharge the `sorry` (rigidity engine now available): `X := τ_S(μ-diff)` has
+`‖X‖² = 2` (Dade isometry) and `X ∈ ZIrr`; it agrees with `η_{0j} − η_{01}` on the regular set via
+`τ_S = Ind_S^G` on `A₀`-supported (`normedTI 'A0`, `H = ⊥`) + the prime-`TI` `μ`-value
+`μ_{0j}|_V = ω`-value (Coq `prTIirr_id`, prime-`TI` theory — not yet ported, cf. 9014); then
+`X = η_{0j} − η_{01}` by `S16.eta_diff_rigidity` (Peterfalvi (3.8), issue 9076 piece 4b). -/
 theorem tauS_mu_row0_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (_hj : (j : ℕ) ≠ 0) :
-    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
-        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG))
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
+        ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG))
         (hyp.mu ⟨0, hyp.q_prime.pos⟩ j
           - hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)
       = hyp.eta ⟨0, hyp.q_prime.pos⟩ j
@@ -4030,8 +4040,8 @@ Proof (sorry-free glue, one isolated obligation): `τ_S(β_j) − τ_S(β_{#1}) 
 `abel` closes the goal. -/
 theorem gammaGrid_defGamma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
-    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
-        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) (betaGrid hyp j)
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
+        ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) (betaGrid hyp j)
         - OddOrder.Peterfalvi.S09.Hypothesis71.constOne G + hyp.eta ⟨0, hyp.q_prime.pos⟩ j
       = GammaGrid hG hyp := by
   have hcross := tauS_mu_row0_cross hG hyp j hj
@@ -4039,17 +4049,17 @@ theorem gammaGrid_defGamma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       = -(hyp.mu ⟨0, hyp.q_prime.pos⟩ j
           - hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩) := by
     simp only [betaGrid]; abel
-  have key : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
-        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) (betaGrid hyp j)
-      - OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
-          ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG))
+  have key : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
+        ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) (betaGrid hyp j)
+      - OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
+          ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG))
           (betaGrid hyp ⟨1, by have := hyp.three_le_p; omega⟩)
       = hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩
         - hyp.eta ⟨0, hyp.q_prime.pos⟩ j := by
     rw [← map_sub, hbeta, map_neg, hcross]; abel
   simp only [GammaGrid, tauSbetaGrid]
-  set D := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
-    ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) with hD
+  set D := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
+    ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) with hD
   rw [← sub_eq_zero, show
       (D (betaGrid hyp j) - OddOrder.Peterfalvi.S09.Hypothesis71.constOne G
           + hyp.eta ⟨0, hyp.q_prime.pos⟩ j)
@@ -4107,7 +4117,7 @@ theorem gammaGrid_Y_norm_bound [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
 and their genuine properties (support (13.18.a), the (13.18.b) norm `‖β_j‖² = (u−1)/q + 2`,
 orthogonality of `Γ` to `1_G`, reality, and the (13.18.d) `‖Y‖²` residual bound) are supplied here.
 The concrete `β_j = betaGrid hyp j` and `Γ = GammaGrid hG hyp` are built from the honest `S`-side
-Dade isometry `τ_S` (`hyp.dadeHypS`, **not** the `= 0` placeholder `hyp.tauS`) and the induced
+Dade isometry `τ_S` (`hyp.dadeHypS0`, **not** the `= 0` placeholder `hyp.tauS`) and the induced
 trivial character `Ind_{PW₁}^S 1`.  The bundled properties are the precisely-isolated §13 obligations
 `betaGrid_support` / `betaGrid_norm` / `gammaGrid_orthogonal_one` / `gammaGrid_real` /
 `gammaGrid_Y_norm_bound`; the (13.18.c) `j`-independence is the standalone `gammaGrid_defGamma`
