@@ -215,10 +215,3 @@ export してくれれば lane-c が cite で §16 を実証明で積める (sig
 より強く、`p ∣ (|V|−1)` を要する任意の exact ℚ cast に使える。(b) `T_typeIII_calT1_family` (:677) の
 5th conjunct (count) 内に `hinertia`(:811)/`hconj`(G-conj, :821)/`hcard`(:845) が local に proven。
 ⟹ v=|V| が ungate される (= `V_inf_centralizer_Q_eq_bot` が実証明化 = 別レーン/9072 T-side d=1) まで 14.9 は保留。
-
-**次の genuine 上流 target (lane-c、2026-07-09)**: `V_inf_centralizer_Q_eq_bot` (S15_SAndT:1891, T-side d=1,
-= `V ⊓ C(Q) = ⊥`) の実証明化。**S-side dual は proven** (`C_eq_bot` S15_SAndT:200 → `U_inf_centralizer_P_eq_bot`
-:209; `c_eq_one` S15_SAndT_Setup:9191 = `c_eq_one_forces_params`(:9002)+`c_eq_one_final_case`(:9140))
-⟹ T-side は S-side 論法の dual で tractable (P↔Q, U↔V, c↔d, W2↔W1 mirror)。これを close すると 14.9 hcount
-(+ `Q_elementaryAbelian_T`/(13.16) `normalizer_V_inf_W1` 系) が unblock。b-owned file ゆえ additive proof
-置換 (signature 不変) で merge-safe、着手前 9000 claim 推奨 (dup 回避)。
