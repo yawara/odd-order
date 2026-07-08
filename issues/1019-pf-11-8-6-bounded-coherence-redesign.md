@@ -1544,3 +1544,33 @@ axiom-clean、full build green 3937 jobs。**11.8.6 coherence 依存 (9075) は�
     honest 化 = Prop field de-opacify + Frobenius reciprocity 係数計算で **coefficientA a = 0** 実証明。
   - `not_orthogonal_mu0_sub_zeta` (:1378、11.8 結論) = orthogonality_setup を消費。
   → 次 iteration: mmd/Coq (PFsection11 の 11.8.1–11.8.5) 精読 → OrthogonalityData de-opacify + 係数計算 port。
+
+## 進捗 (lane-a /loop, 2026-07-08) — SCOPING: forward (6.3) port gap 確定
+
+(10.8) 側は完了 (h78 = (7.8.b) 実証明済、estimate `hA` proven、commit a559bd0a)。∴ (11.8.6) redesign が
+lane-a 次 frontier。redesign の upstream ブロック = **forward `bounded_seqIndD_coherence` (Pf (6.3)) の port**。
+
+### repo 状態 (grep 確定)
+- **在る (analytic/contrapositive 側)**: `S08_Theorem63.lean` (`sSubFiltration_sum_le_two_psi_caseB` 等 =
+  coherence-break degree bound `∑ ≤ 2ψ`)、`S08_SixTwoGeneral.lean` の `inducedKernelFamily` 一式 +
+  `inducedKernelFamily_degreeSqNormReBound_of_break_k` (:468、= `coherent_seqIndD_bound` の解析核 `∑χ(1)²/‖·‖²`)。
+- **無い (forward 側、port 要)**:
+  1. **`extend_coherent` (Pf (6.2) forward)** = coherent 族を break pair で拡張する primitive。repo に decl 無
+     (S08_Theorem63:102 は comment 言及のみ)。⚠ これが core。`IsCoherent.extension` (S07、coherent 拡張 MAP) とは別物
+     (こちらは coherent SET を新 pair で拡張する定理)。
+  2. **forward `bounded_seqIndD_coherence` (Pf (6.3))** = `[M,H,H1 <| L] + M⊆H1⊆H⊆K + nilpotent(H/M) +
+     coherent(S H1) + |H:H1|>4|L:K|²+1 → coherent(S M)`。Coq PFsection6.v:114-167 = maxnormal 帰納
+     (A=H1 を M へ縮小、各 step で A/B ⊆ Z(H/B) via nilpotency + 解析 bound `(x−x⁻¹)²≤(2|L:K|)²`)。
+     deps: `extend_coherent`(上)、`coherent_seqIndD_bound`(:158、= 解析核 wrapper)、`sum_seqIndD_square`、
+     `irr1_bound_quo`。
+
+### 次 iteration の建設順 (upstream-first)
+1. `extend_coherent` (Pf 6.2 forward) を port (S07/S08 coherence 機構の上に)。← 最大 piece、要 deep scope
+   (Coq PFsection5/6 の `extend_coherent` 定義精読)。
+2. `coherent_seqIndD_bound` wrapper を `inducedKernelFamily_degreeSqNormReBound_of_break_k` から組む。
+3. forward `bounded_seqIndD_coherence` = maxnormal 帰納で assemble。
+4. 然る後 capstone redesign (やること §2-3): `coherent_Sset_diff_SHCSet` を S_H0C に narrow + capstone を
+   bounded-coherence route に。⟹ (11.8.6) sorry-free、(10.8) `S_not_coherent` へ接続。
+
+⚠ shared-infra 判定: `extend_coherent`/`bounded_seqIndD_coherence` は §6 coherence 汎用 → 他レーン consumer
+可能性あり。着手前に open 9000 scan (現状 9000/9014/9076 は σ-theory/prime-TI で別物、重複無し) + 必要なら 9000 claim。
