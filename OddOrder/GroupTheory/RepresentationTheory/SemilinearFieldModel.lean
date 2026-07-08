@@ -83,4 +83,68 @@ theorem kernelTransport_range {r s : ℕ} [Fact r.Prime] {E : Subgroup G}
     rw [kernelTransport_apply]
     simp
 
+/-! ## The complement transport `V* → G`
+
+The multiplicative `(inr)` factor: transport a norm-one unit `u* ∈ normOneUnits r s` through the
+inverse of `μ` into the complement `C ≤ G`.  Injective with image exactly `C`.  Generic version of
+`fieldNormalizerComplementTransport` (`S16_NonExistenceG`, `C = U`). -/
+
+/-- The `C ≃* normOneUnits r s` equivalence packaged from an injective `μ : ↥C →* 𝔽_{r^s}ˣ` with
+`μ.range = normOneUnits r s`.  Its inverse, post-composed with `C ↪ G`, is `complementTransport`. -/
+noncomputable def complementEquiv {r s : ℕ} [Fact r.Prime] {C : Subgroup G}
+    (μ : ↥C →* (GaloisField r s)ˣ) (hμ_inj : Function.Injective μ)
+    (hμ_range : μ.range = normOneUnits r s) :
+    ↥C ≃* ↥(normOneUnits r s) :=
+  MulEquiv.ofBijective
+    ({ toFun := fun c => ⟨μ c, hμ_range ▸ MonoidHom.mem_range.mpr ⟨c, rfl⟩⟩
+       map_one' := by ext; simp
+       map_mul' := fun a b => by ext; simp } : ↥C →* ↥(normOneUnits r s))
+    ⟨fun a b h => hμ_inj (congrArg Subtype.val h),
+     fun u => by
+       obtain ⟨v, hv⟩ := MonoidHom.mem_range.mp (by rw [hμ_range]; exact u.2)
+       exact ⟨v, Subtype.ext hv⟩⟩
+
+/-- **Complement transport** `normOneUnits r s →* G` inverting `μ` and including back into `G`. -/
+noncomputable def complementTransport {r s : ℕ} [Fact r.Prime] {C : Subgroup G}
+    (μ : ↥C →* (GaloisField r s)ˣ) (hμ_inj : Function.Injective μ)
+    (hμ_range : μ.range = normOneUnits r s) :
+    ↥(normOneUnits r s) →* G :=
+  C.subtype.comp (complementEquiv μ hμ_inj hμ_range).symm.toMonoidHom
+
+/-- Defining property: each `u* ∈ normOneUnits r s` has a preimage `v ∈ C` with `μ v = u*` and
+`complementTransport … u* = ↑v`. -/
+theorem complementTransport_exists {r s : ℕ} [Fact r.Prime] {C : Subgroup G}
+    (μ : ↥C →* (GaloisField r s)ˣ) (hμ_inj : Function.Injective μ)
+    (hμ_range : μ.range = normOneUnits r s) (u : ↥(normOneUnits r s)) :
+    ∃ v : ↥C, (μ v : (GaloisField r s)ˣ) = (u : (GaloisField r s)ˣ) ∧
+        complementTransport μ hμ_inj hμ_range u = (v : G) := by
+  refine ⟨(complementEquiv μ hμ_inj hμ_range).symm u, ?_, rfl⟩
+  have hval : ((complementEquiv μ hμ_inj hμ_range) ((complementEquiv μ hμ_inj hμ_range).symm u) :
+      ↥(normOneUnits r s)) = u := (complementEquiv μ hμ_inj hμ_range).apply_symm_apply u
+  exact congrArg Subtype.val hval
+
+theorem complementTransport_injective {r s : ℕ} [Fact r.Prime] {C : Subgroup G}
+    (μ : ↥C →* (GaloisField r s)ˣ) (hμ_inj : Function.Injective μ)
+    (hμ_range : μ.range = normOneUnits r s) :
+    Function.Injective (complementTransport μ hμ_inj hμ_range) := by
+  intro a b hab
+  obtain ⟨va, hva_mu, hva⟩ := complementTransport_exists μ hμ_inj hμ_range a
+  obtain ⟨vb, hvb_mu, hvb⟩ := complementTransport_exists μ hμ_inj hμ_range b
+  rw [hva, hvb] at hab
+  have hvab : va = vb := Subtype.ext hab
+  exact Subtype.ext (by rw [← hva_mu, ← hvb_mu, hvab])
+
+theorem complementTransport_range {r s : ℕ} [Fact r.Prime] {C : Subgroup G}
+    (μ : ↥C →* (GaloisField r s)ˣ) (hμ_inj : Function.Injective μ)
+    (hμ_range : μ.range = normOneUnits r s) :
+    (complementTransport μ hμ_inj hμ_range).range = C := by
+  apply le_antisymm
+  · rintro _ ⟨u, rfl⟩
+    obtain ⟨v, _, hv⟩ := complementTransport_exists μ hμ_inj hμ_range u
+    rw [hv]; exact v.2
+  · intro g hg
+    refine ⟨(complementEquiv μ hμ_inj hμ_range) ⟨g, hg⟩, ?_⟩
+    simp only [complementTransport, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom,
+      MulEquiv.symm_apply_apply, Subgroup.coe_subtype]
+
 end OddOrder.RepresentationTheory.SemilinearFieldModel
