@@ -1026,3 +1026,35 @@ caseA_centralizes_two_summands_fixes_char (⊇)。
     K₁=cuSub(=C_U(S₀)) は landed、K₂=C_U(S₀ʷ) の realized 版 新設要。C=cSub=K₁⊓K₂ 形へ。
 (c) **degree dichotomy** [U:U₁∩U₁ʷ]∈{u,a}: Ind(θ)∈S_H0C' → degree qu/qa + a 排除
     → tiU1 (U₁∩U₁ʷ=C) → nineElevenTwo_u_le_a_sq の hCinf 供給 → equality-branch 発火。
+
+## 2026-07-08 更新 #34 (lane b, /loop iter 9) — ★(9.11.2) tiU1 endgame 完全マップ (landed 部品 + 残手順)
+
+**目標**: `nineElevenTwo_u_le_a_sq` の `hCinf : chars.C = K₁ ⊓ K₂` (K₁=C_U(S₀)=cuSub relIndex a landed、
+K₂=C_U(S₀ʷ) relIndex a、C=cSub) を供給 → equality-branch (nineElevenCaseA_equality_refutation) 発火。
+
+**landed 部品 (iter 3-9、全 S11_NineElevenCoherence の `NineElevenTwoInertia` section、sorry-free)**:
+| 定理 | 役割 |
+|---|---|
+| `exists_two_summand_char` / `exists_caseA_two_summand_char` | 2-summand supported char θ 構成 (nontrivial H_i,H_j / trivial 他) |
+| `caseA_char_inertia_of_summand` / `_two_summands` | Ū-side ⊆: g fixes θ ⟹ centralize 両 summand |
+| `caseA_centralizes_two_summands_fixes_char` | Ū-side ⊇: centralize 両 + supported ⟹ fixes θ |
+| `caseA_inertia_iff_centralizes_two_summands` | Ū-side identity: I(θ)⊓U = U₁∩U₁ʷ |
+| `centralizes_all_imp_centralizes_summand` | C⊆C_U(H_k) (easy 方向) |
+| `inflation_fixing_imp_action_fixing` / `caseA_hu_char_inertia_two_summands` | HU-bridge ⊆: HU-inertia の realized g ⟹ centralize 両 |
+| `caseA_centralizes_two_summands_compHom_eq` | HU-bridge ⊇ (compHom 形): centralize 両 ⟹ compHom(uActionHom g)θbar=θbar |
+
+**残手順 (次 focused session、順に)**:
+1. **realized subgroup**: `cuSubOfPair`/`cuSubOf j` = realized(ker(aInvariantRestrictAut (Hpart_aInvariant j)))
+   を cuSub (S11:4178) mirror で新設 (b file)。K₂=cuSubOf j。[U:cuSubOf j]=a は **orbit-symmetry 要**
+   (Hpart j = W₁-translate of S₀ ⟹ 作用共役 ⟹ |range|=a、card_U_eq_a_mul_card_cuSub の一般化)。
+2. **HU ⊇ 完成**: caseA_centralizes_two_summands_compHom_eq + conjBy_compHom_hInHuEquivH +
+   compHom_typeP_conjAction_inflation (cInHu_le_inertia S11:5420 pattern) → realized(U₁∩U₁ʷ)⊆I(θ₀)。
+3. **I(θ₀)=H·realized(U₁∩U₁ʷ)**: inertia_eq_hcInHu_of_inf_le (S11:6488) を two-summand target で
+   adapt (⊆=caseA_hu_char_inertia_two_summands realize、⊇=step 2)。
+4. **index**: [HU:I(θ₀)]=[U:U₁∩U₁ʷ] (H-part cancel、hc_index_eq_u / hcPsi_inertia_index_eq_u 型)。
+5. **degree dichotomy**: Ind_M(mod θ₀) ∈ S_H0C' → degree qu/qa → [U:U₁∩U₁ʷ]∈{u,a}
+   (Coq cfInd_Hall_central_Inertia; landed: caseA_exists_irreducible_source_degree_qa S11:6455、
+   sOf_H0Cprime_apply_one_le_qu)。a 排除 (Coq prime arg) → =u。
+6. **tiU1**: C≤U₁∩U₁ʷ (centralizes_all_imp_centralizes_summand realize) + [U:U₁∩U₁ʷ]=u=[U:C]
+   → U₁∩U₁ʷ=C → hCinf。
+⚠ **key infra 依存**: hcConjDescend_eq_uActionHom (S11:10237, A_g=uActionHom g realized bridge)。
