@@ -122,3 +122,45 @@ analogue: `chiRhoNormSq(ζ^{τ₁}) ≥ 1 − w₁/|M'|` for the coherent ζ.
 `zetaNuRhoNormSqGeOfDade` via the S16 `chiRhoNormSq_eq_zetaNuRhoNormSq` pattern); (B) then hA = pure arithmetic
 (line-83 + strict, proven); (C) de-scaffold the estimate: chain + hS(done) + hA + hB, isolating **hB
 (TI-counting `G₁⊆(H#)^G∪V^G`, cites (10.7))** as the last genuine gate; (D) build hB (§8/§9 orbit counting).
+
+### ★ params-provenance RESOLVED — de-scaffold fully specified (no more investigation needed)
+The line-83 lemma needs `hmu/hos/hzS/hz1/hzconj/hδpm/hδj` (grid/zeta props). `CharacterParameters` carries `mu`/
+`omegaSigma` as FREE fields, so the estimate's generic `params` does NOT supply them — **but**
+`CoherentHypothesis.coherent : IsCoherent hyp.tau hyp.Sset hyp.A0` is **params-INDEPENDENT**, and
+`Hypothesis.exists_charParameters_full` (S12_Core:3156) delivers a `params'` satisfying **exactly** those 7
+props. ⟹ estimate reconstructs internally. **Concrete de-scaffold skeleton** (build this directly):
+```
+obtain ⟨params', hmu, hos, hzS, hz1, hzconj, hδpm, hδj⟩ := hyp.exists_charParameters_full hG
+let coh' : CoherentHypothesis hyp params' := ⟨coh.coherent⟩
+obtain ⟨S, dII, hSmax, hSidx, hU7⟩ := hyp.exists_typeII_partner_card_U_ge_seven hG
+refine ⟨Nat.card dII.typeP.U, hU7, ?_⟩
+have hW1card : Nat.card dII.typeP.W1 = hyp.w2 := by rw [dII.typeP.card_W1_eq_derived_index]; exact hSidx
+have hS_struct : Nat.card S = Nat.card dII.typeP.H * Nat.card dII.typeP.U * hyp.w2 := by
+  rw [typePData_card_eq_H_mul_U_mul_W1 dII.typeP, hW1card]
+have h83 := hyp.chiRhoNormSq_zeta_le_line83 hG coh' hmu hos hzS hz1 hzconj hδpm hδj  -- PROVEN
+set g1g : ℚ := ((Nat.card (hyp.toFamilyHypothesis71).G0 : ℚ)
+  - ((Finset.univ.filter (fun g:G => g ∉ hyp.dadeData.dade.dadeSupport ∧ (orderOf g).Coprime hyp.w1)).card : ℚ))
+  / (Nat.card G : ℚ)   -- concrete, matches line-83 middle term
+have hA : (1:ℚ) - g1g - 1/hyp.w1 < hyp.w1 / Nat.card ↥(derivedInG M) := ... -- h83 + h78(GATE) + card_typePA_div_card_lt_inv_w1(PROVEN); ⚠ ℝ→ℚ cast
+have hB : g1g ≤ (Nat.card dII.typeP.H - 1)/Nat.card S + (w₁w₂-w₁-w₂+1)/(w₁w₂) := ... -- GATE (TI-counting)
+exact typeII_coherence_estimate_chain (Nat.card_pos) ... hS_struct hA hB
+```
+Remaining GENUINE gates: `h78` (7.8.b `chiRhoNormSq ≥ 1−w₁/|M'|`) inside hA, and `hB` (TI-counting). Everything
+else is proven.
+
+### ⚠⚠ Fintype-instance TRAP — the real de-scaffold blocker (attempt reverted, build kept green)
+The minimal de-scaffold (partner + hS + chain + concrete g1g, hA/hB sorried) BUILD-FAILED on the
+[[lean-instance-defeq-traps]] scoped-vs-explicit `Fintype G` clash:
+- `chiRhoNormSq_zeta_le_line83` (S12:390) + `toFamilyHypothesis71` live under **`open scoped FiniteInduce in`**
+  → their `Fintype G` is the FiniteInduce-scoped instance (derived from `Finite G`).
+- The estimate `typeII_coherence_contradiction_estimate` has an **explicit `[Fintype G]`** binder (REQUIRED —
+  `CoherentHypothesis` needs `[Fintype G]` in its signature, S12_Core:2852).
+- ⟹ hand-writing g1g's `Finset.univ.filter` (or calling line-83) inside the estimate synthesizes the explicit
+  `Fintype G`, which is not defeq to line-83's scoped one ("synthesized instance not defeq" at the `let g1g`).
+**Fix direction (next iteration, focused)**: align the `Fintype G` provenance across the call chain
+`S_not_coherent → estimate → line-83`. Options: (i) put the estimate body under `open scoped FiniteInduce in`
+and obtain a matching-instance `h83`, extracting g1g from `h83`'s RHS (avoids hand-writing the filter); (ii)
+`letI` the FiniteInduce Fintype locally before the line-83 call; (iii) provide an explicit-`Fintype` variant of
+line-83 / `toFamilyHypothesis71`. Study how the (11.8) capstones (S12:4165+) call scoped-FiniteInduce lemmas
+from explicit-Fintype contexts — that pattern is the template. **This instance-alignment is the concrete next
+task; once solved the de-scaffold + hA(→h78) + hB follow from the skeleton above.**
