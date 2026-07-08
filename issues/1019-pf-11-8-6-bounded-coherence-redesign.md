@@ -1779,3 +1779,36 @@ update¹¹ の「spine 残 sorry は全て TRUE」は **over-confident**。narro
 2. FALSE なら D を qa-diagonal enrich (capstone を caseA/caseB split、caseA は qa-column witness
    `caseA_exists_irreducible_sOf_H0C` + qa-column (5.8) identity)。caseB hgen は uniform-degree で genuine 化。
 3. Coq PFsection11 (11.8.6) の caseA generation 精読 (単一 diagonal か mixed か)。
+
+## 2026-07-08 update¹³ (lane-a /loop, subagent 精査) — ★ VERDICT: narrow hgen は caseA で FALSE (wrong engine)、fix = bridge_coherent
+
+update¹² の caseA 懸念を Coq PFsection11/9 精読 + Lean 不変量で**確定** (high confidence):
+
+### narrow hgen は **caseA で FALSE** (単一 qu-diagonal では不十分) — 但し soundness 違反ではない
+- **caseA で `sOf(H0C)` は mixed-degree {qu, qa}**: Coq `Ptype_core_coherence` (`PFsection9.v:1484`) 非Galois
+  branch (`:1537`) が **degree-`qa` subfamily を明示 filter** (`a_gt1`/`a_dv_u` で `1<a<u`)。Lean `caseB_degree_qu`
+  (S11:8106) / `forall_mem_sOf_H0C_apply_one_eq_qu` (S11:8223) は**両方 `CliffordCaseBData` 引数必須** = uniform-qu は caseB 限定。
+- **反例 `χ_qa − a·ζ`**: A₀-supported (`inducedKernelFamily_scaledDiff_support` S08:251、`qa = a·q` ゆえ) だが
+  **RHS span に無い**: 不変量 `π(∑cᵢξᵢ + ∑dⱼχⱼ) = ∑dⱼ·(χⱼ(1)/q)` は全 RHS generator で `≡0 (mod u)`
+  (D の各 `μ_j − u·ζ` は `π=u`) だが `π(χ_qa − a·ζ) = a`、`0<a<u` ゆえ `a ∉ u·ℤ`。∴ hgen FALSE-caseA。
+- **capstone statement 自体は TRUE** (Coq が同じ coherence を証明) ゆえ `False` は導出不可 = soundness 違反でない。
+  問題は「caseA で閉じられない proof route」= 現状 spine の caseA route は broken (前 wide route と同様に false-in-caseA)。
+
+### ⟹ milestone の再々評価 (honest)
+update¹¹ の「false lemma を spine から除去」は不正確。実態: **正しい族 𝒮(C) + 正しい capstone statement に移行**
+したが、**generation-based S07 engine (`coherentUnion_of_glued_...`, S07:4830) が mixed-degree family に不適**で
+hgen が caseA で FALSE。wide の「wrong statement (false lemma)」より good (correct statement + 明確な fix) だが
+「soundness 改善」ではない (caseA falseness は engine 差の placeholder として残存)。
+
+### 正しい fix = Coq-faithful **`bridge_coherent`** S07 engine (generation 不要)
+Coq (11.8) は `bridge_coherent` (`PFsection11.v:954`, stmt in PFsection5) で glue: **generation 仮説なし**、
+両族 coherent + disjoint + **単一 bridge `χ−φ`** (A₀-supported) + その τ-identity のみ。mixed qa は `hY` 内に吸収、
+`Zisometry_of_cfnorm` の norm-based 拡張が `ν` を `χ_qa−a·ζ` 上で `u·(χ_qa−a·ζ) = (u·χ_qa − a·μ_j) + a·(μ_j−u·ζ)`
+(1/u 演算、ℤ-generation には不可視) 経由で決定。fix options:
+- **(B) bridge_coherent S07 engine を port** (lane-a S07 territory、substantial だが self-contained、honest route)。★推奨
+- (A) D を qa-diagonal enrich: qa-witness in smallest `sOf H0C` (現状 `sOf H0U'`/`H0C'` witness のみ) +
+  qa-column (5.8) τ-identity (未形式化、lane-b `S11_NineElevenCaseA` と overlap) で **blocked**。
+- (C) capstone を caseA/caseB split: caseB は uniform-qu で hgen genuine (narrow uniform-qu machinery 要、lane-a-tractable)、
+  caseA は (A)/(B) gated。中間策。
+
+docstring (S13:157-161) は caseB-only + FALSE-caseA + bridge_coherent fix に訂正済 (本 commit)。

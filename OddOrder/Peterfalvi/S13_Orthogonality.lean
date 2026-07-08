@@ -154,11 +154,19 @@ S12 wide-route sorries (`coherent_Sset_of_column_identities` at S12:4888/4896/49
   congruence, §14/Sibley-gated);
 - `hDτ` — the (5.8) column identity on the cross-diagonals `∑ᵢ μ_{ij} − dζ ∈ D` (fed by `hcol`,
   §14-gated after the `τ`-rewrite);
-- `hgen` — the (6.8.1) generation; unlike the S12 wide route (which cited the FALSE uniform-degree
-  `Sset_diff_SHCSet_apply_one_eq_qu`), the narrow `𝒮(H₀C)` members have the **genuine** uniform
-  degree `q·u` (`forall_mem_sOf_H0C_apply_one_eq_qu`), so this generation is TRUE; the genuine
-  version (needing narrow analogues of `Sset_diff_zSpan_vanish_support` / `SHC_zSpan_vanish_support`)
-  is deferred. -/
+- `hgen` — the (6.8.1) generation with the single degree-`qu` diagonal `D = {∑ᵢ μ_{ij} − dζ}`.
+  ⚠ **This `hgen` is TRUE only in Clifford caseB** (uniform degree `q·u`,
+  `forall_mem_sOf_H0C_apply_one_eq_qu`, caseB-gated).  In **caseA it is FALSE**: `𝒮(H₀C)` then
+  contains degree-`qa` irreducibles (`a>1`, `qa = a·w₁ ≠ qu`; Coq `Ptype_core_coherence` non-Galois
+  branch, `PFsection9.v:1537`), and `χ_qa − a·ζ` is A₀-supported (`inducedKernelFamily_scaledDiff_support`)
+  but *not* in `span ℤ (… ∪ D)` (the invariant `π = Σ Y-degree/q (mod u)` is `0` on every RHS
+  generator but `a ≢ 0 (mod u)` on `χ_qa − a·ζ`, since `0 < a < u`).  The capstone *statement* is
+  nonetheless TRUE (Coq proves the same coherence via `bridge_coherent`, `PFsection11.v:954`, which
+  needs **no** generation hypothesis — the mixed `qa` content lives inside `hY` and the single
+  `qu`-bridge suffices via norm-based `Zisometry_of_cfnorm`).  **The generation-based S07 engine is the
+  wrong tool for this mixed-degree family**; the honest fix is a Coq-faithful `bridge_coherent` S07
+  engine (no `hgen`), or a caseA/caseB split (caseB genuine, caseA on the enriched/bridge route).
+  See issue 1019 update¹³. -/
 theorem coherent_SOf_H0C_of_column_identities [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
