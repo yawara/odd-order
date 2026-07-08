@@ -663,7 +663,29 @@ row-direction distinctness is the missing prime-`TI` fact.  Prime-`TI` theory, c
 theorem Hypothesis.mu_row0_ne [Finite G] (hyp : Hypothesis (G := G)) {j : Fin hyp.p}
     (hj : j ≠ ⟨1, by have := hyp.three_le_p; omega⟩) :
     hyp.mu ⟨0, hyp.q_prime.pos⟩ j
-      ≠ hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩ := sorry
+      ≠ hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩ := by
+  classical
+  haveI : Fintype ↥hyp.S := Fintype.ofFinite _
+  haveI : Invertible (Nat.card ↥hyp.S : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  intro heq
+  -- The diagonal value `⟨μ_{0,#1}, μ_{0,#1}⟩ = 1` (irreducibility, `mu_irreducible`).
+  have hdiag : OddOrder.RepresentationTheory.ClassFunction.inner
+      (hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)
+      (hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩) = 1 :=
+    (hyp.mu_irreducible ⟨0, hyp.q_prime.pos⟩
+      ⟨1, by have := hyp.three_le_p; omega⟩).inner_self_eq_one
+  -- The off-diagonal (row-`0` cross-column) value `⟨μ_{0j}, μ_{0,#1}⟩ = 0` (`j ≠ #1`) is the **sole
+  -- genuine content** — the prime-`TI` grounding, transported from the `sorry`-free
+  -- `PrimeTIResidueData.mu2_orthonormal` once `hyp.mu` is grounded to the residue grid `residueS.mu2`
+  -- (a grid-property field on `S15.Hypothesis`, b-side; discharged in the spine where
+  -- `Section16CharacterData.muS = columnFamily.mu = residueS.mu2`, cf. `S13_PrimeTIResidueBridge`).
+  -- Under-determined by the abstract `Hypothesis` axioms (`mu_col_injective` is within-column only;
+  -- the induced `mu_definition` fixes only column differences).  Issues 9076/3002/9014.
+  have hoff : OddOrder.RepresentationTheory.ClassFunction.inner (hyp.mu ⟨0, hyp.q_prime.pos⟩ j)
+      (hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩) = 0 := sorry
+  rw [heq, hdiag] at hoff
+  exact one_ne_zero hoff
 
 /-- **Prime-`TI` support pin** (Coq `prDade_sub_TIirr_on`, `PFsection4.v`): the `μ`-column
 difference `μ_{0j} − μ_{0,#1}` is supported inside `A₀(S) = A(S) ∪ V^S` — its support meets `S`
