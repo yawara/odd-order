@@ -1668,3 +1668,35 @@ S12_Section9Counts は直接 sorry-free ゆえ**推移的**、TRUE な §9 count
 1. §9 count chain の sorry leaf を pinpoint (`reducible_count_sOf_H0`/`muGrid`/Dade 系のどれか) → lane-a ownable か判定。
 2. honest (11.8.6) caller を build: `coherent_SOf_H0C_of_glued` を `caseB_coherent_sOf_H0C` (caseB hY) で instantiate
    + ν 構成 + hgen (narrow uniform-deg) + hmixed/hDτ/caseA/(10.8) sorried-cite → false `Sset_diff_SHCSet_apply_one_eq_qu` 除去。
+
+### ④ ★ caseB chain の sorry-leaf trace (本 update、`#print axioms` scratch で確定)
+`caseB_coherent_sOf_H0C`/`caseB_coherent_sOf_H0Cprime`(9075) の sorryAx は **§9 count でなく (11.5)-(11.7)
+structural chain** 経由と判明 (μ-column pivot が `columnSum_..._mem_sOf_H0C` → `chief_H0_eq_bot` を引く):
+- **CLEAN (axiom-clean 確認済)**: `reducible_count_sOf_H0`, `muGrid`, `muGrid_column_sum_mem_sOf_H0_and_reducible`,
+  `reducible_mem_sOf_H0C`, `sOf_H0C_subset_sOf_H0Cprime`, **`caseA_commutator_chain`** (11.7 case-a 非Galois
+  D-antisymmetry, docstring の "remaining sorry" は stale — 実は clean), `chiefKernel_caseB_false` (case-b parity),
+  `caseA_fixes_of_action_chain`, `caseA_fixed_contradiction`, `chiefFactor_clifford_U_dichotomy`,
+  `secondDerived_coherent` (5.7) — **(11.7) の genuine 群論は完成**。
+- **SORRYAX**: `chief_H0_eq_bot`/`chief_N_eq_bot`/`C_eq_cSub` (11.7) ← `H0_eq_Hprime`(11.6)/`H_isPGroup` ←
+  **`HC_le_secondDerived`(11.5)** ← **`coherent_quotient_bound`(11.4)** ← (6.2)/(10.8)。`S_not_coherent`(10.8) = SORRYAX。
+⟹ caseB (9.11) chain は **(11.4)/(11.5) char-gate 経由で (6.2)/(10.8) 底**。**shallow な ungated lane-a 勝ち筋は無い**
+(case-helper は既に clean、gate は §6/§10 coherence)。
+
+### 次 iteration の要検証 (ungated 勝ち筋の唯一候補)
+**`coherent_quotient_bound` (11.4) の gate が (6.2) か (10.8) か**を pinpoint。Peterfalvi (11.5) 原文 (mmd `04.13`
+L23-31) は **(11.4)+(5.7) で M''=HC を導き (10.8) を使わない** (repo docstring の「(11.3)/(11.4) 経由 (10.8)」は
+repo 実装の routing、Pf 原証明でない可能性)。(11.4) が (6.2)-only gate (= §6 coherence quotient bound、
+port 可能性) なら **(11.5)→(11.6)→(11.7)→caseB chain を (10.8) 非依存で un-gate** できる → caseB (9.11) を
+honest 化する唯一の ungated 経路。(11.4) が (10.8) 底なら caseB chain は deep char-gate 確定 (再攻略せず sorried-cite)。
+
+### ④′ 訂正 (同 iteration、(11.4) 直読で確定): caseB chain は **(10.8)-deep-gated、ungated 勝ち筋なし**
+`coherent_quotient_bound` (11.4, S13_MaximalIII_IV:1534) の proof は `hBncoh` (:1562-1569) で
+**`S_H0C_not_coherent` (11.3→10.8) を直接使用** — Pf (11.4)=(6.2) dichotomy が "S(H₀C) not coherent"
+を break 入力に要するため (原文どおり)。∴ (11.5) を (10.8) 非依存で再導出する路は**無い** (Pf の (11.4)
+自体が非coherence を使う)。⟹ **caseB (9.11) chain (my `caseB_coherent_sOf_H0C` 含む) は (10.8) deep-gate 確定**
+(§9 columnSum が (11.7) H₀=1 = chief_H0_eq_bot で type III/IV 特化 → (11.5)→(11.4)→(10.8))。
+repo artifact 注記: repo の caseB (9.11) 証明は (11.7) H₀=1 で特化 (§9 を §11 結果で証明する logical inversion)
+ゆえ (10.8) を引く。H₀ 一般のまま (9.11) を証明すれば (10.8) 非依存化しうるが = §9 一般機構の re-architecture
+(lane-b (9.11) territory、shallow でない)。⟹ **lane-a char cluster は (10.8)+§14+lane-b caseA で comprehensively
+gated が再確認**。my `caseB_coherent_sOf_H0C` は principle-1 な gated-endpoint building block として landed 済
+(9075 を honest (11.8.6) hY に前進、新 sorry 無し)。
