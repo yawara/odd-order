@@ -3007,7 +3007,8 @@ Both land *definitionally* on `hyp.base.tau = dadeIntegralCharacterMap h.dade0 h
 abstract member `η` (rather than `▸`-transporting) by reusing the `η`-independent
 `imageSet`/`orthonormal`/`mem_ZIrr` fields of `certainTypeR` and re-proving `image_eq` through the
 dichotomy equality `η = columnSum h χ₂` — so `(caseB_sOf_memberRFamily …).imageSet` is
-*definitionally* `certainTypeR.imageSet`, the form the (5.2.e) cross-orthogonality lemmas consume. -/
+*definitionally* `certainTypeR.imageSet`, the form the (5.2.e) cross-orthogonality lemmas
+consume. -/
 noncomputable def caseB_sOf_memberRFamily [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
@@ -3061,6 +3062,68 @@ noncomputable def caseB_sOf_memberRFamily [Finite G]
             (hyp.base.muColumnChar_ne_one hG hG.odd hk0)
             (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one (hyp.base.toHypothesis46 hG hG.odd)
               (hyp.base.muColumnChar hG hG.odd k)).symm).image_eq }
+
+/-- **`caseB_sOf_memberRFamily` reduction, irreducible case**: for an irreducible member `η`, the
+dispatched `R`-family *is* `dadeOrthonormalCharacterImageFamilyOfDiff` (imageSet form).  The
+realness and support proofs are existential (proof-irrelevant inputs to a proof-independent
+`imageSet`), so the (5.2.e) `dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal` lemma applies to
+`(caseB_sOf_memberRFamily …).imageSet` after rewriting. -/
+theorem caseB_sOf_memberRFamily_imageSet_of_irr [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
+    (d : ℕ)
+    (hunif : ∀ φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
+      (φ : ClassFunction ↥M ℂ) 1 = (d : ℂ))
+    {η : ClassFunction ↥M ℂ}
+    (hη : η ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime)
+    (hirr : IsIrreducibleCharacter η) :
+    ∃ (hr : ¬ ClassFunction.IsReal (η : ClassFunction ↥M ℂ))
+      (hs : ((η : ClassFunction ↥M ℂ).conj - (η : ClassFunction ↥M ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup
+          (OddOrder.GroupTheory.typePA0 M hyp.base.typeP) M),
+      (caseB_sOf_memberRFamily hG hyp d hunif hη).imageSet =
+        (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
+          hyp.base.dadeData.dade hyp.base.hconj ⟨η, hirr⟩ hr hs).imageSet := by
+  haveI := hyp.base.finiteG
+  have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+  have hηIKF0 : η ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+      ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) :=
+    OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone bot_le
+      (by rw [← hyp.SOf_eq]; exact hyp.sOf_subset_SOf hyp.H0Cprime hη)
+  refine ⟨OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters hModd
+      (⊥ : Subgroup ↥M) hηIKF0,
+    OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support
+      hyp.base.mderivSharp_subset_A0 hηIKF0, ?_⟩
+  unfold caseB_sOf_memberRFamily
+  rw [dif_pos hirr]
+
+/-- **`caseB_sOf_memberRFamily` reduction, column case**: for a reducible member `η`, the dispatched
+`R`-family *is* `certainTypeR` at the certain-type column `χ₂ = muColumnChar k` (imageSet form),
+for the internally-chosen column index `k` (exposed existentially together with the membership
+equation `η = columnSum h χ₂`, which supplies the `≠`-side conditions of the μ×μ / μ×irr
+cross-orthogonality). -/
+theorem caseB_sOf_memberRFamily_imageSet_of_col [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
+    (d : ℕ)
+    (hunif : ∀ φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
+      (φ : ClassFunction ↥M ℂ) 1 = (d : ℂ))
+    {η : ClassFunction ↥M ℂ}
+    (hη : η ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime)
+    (hcol : ¬ IsIrreducibleCharacter η) :
+    ∃ (k : Fin hyp.base.w2) (hk0 : k ≠ 0),
+      η = OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
+          (hyp.base.muColumnChar hG hG.odd k) ∧
+      (caseB_sOf_memberRFamily hG hyp d hunif hη).imageSet =
+        (OddOrder.Peterfalvi.S06.certainTypeR (hyp.base.toHypothesis46 hG hG.odd)
+          (hyp.base.muColumnChar_ne_one hG hG.odd hk0)
+          (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one (hyp.base.toHypothesis46 hG hG.odd)
+            (hyp.base.muColumnChar hG hG.odd k)).symm).imageSet := by
+  haveI := hyp.base.finiteG
+  have hex := (caseB_sOf_member_dichotomy hG hyp d hunif hη).resolve_left (fun h => hcol h.2.1)
+  refine ⟨hex.choose, hex.choose_spec.1, hex.choose_spec.2, ?_⟩
+  unfold caseB_sOf_memberRFamily
+  rw [dif_neg hcol]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Uniform anchor-difference support over `𝒮(H₀C′)`** (the `hdegS₁diff` supply of every (9.11)
