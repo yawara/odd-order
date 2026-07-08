@@ -824,3 +824,38 @@ S07_Subcoherent 済部品 + §9 counting 接続)、(iii) strict 枝の member-da
 generic (data : TypesIIIIIIVSetup M) だが S15 在住 (FiniteInduce scope 依存)。(9.11) assembly が
 sOf 版を要するときは S15 から leaf への移設 or sOf 直証明を検討 (S15 は b 所有ゆえ移設可、
 ただし S12.FiniteInduce scope import の循環チェック要)。
+
+## 2026-07-08 更新 #26 (lane b, /loop iter 5-9) — (9.11.1) squeeze machinery + (9.11.2)/(9.11.5) 完組
+
+**landed (全 S11_NineElevenCoherence、sorry-free/axiom-clean、5 commit)**:
+- **981ffee2 (brick A)**: squeeze 円環ノードの §9 同定 — `relIndex_cuSub_U_eq_a` / `relIndex_cSub_U_eq_u`
+  (実現 index の ambient-G relIndex 転送) / `relIndex_uprimeSub_U_eq` ([U:U']=a·[C_U(S0):U']) /
+  `u_le_relIndex_uprimeSub_U` (lb23 入力) / `caseA_character_count_exact` ((p−1)[U:U']≤n₁a²、
+  landed count の dv_lb exact 化)。
+- **5d3a9e61 (B2a)**: `chiefFactor_p_sub_one_even` + `nineElevenOne_configuration` — 算術核
+  (`nineElevenOne_squeeze_arithmetic`) に landed 同定 + world bundle (hs1'/hpair) を通し群世界
+  equality 配置抽出: 2a=p−1 / **C=U'** ([U:C]=[U:U']⟹C=U' via relIndex_lt_lt 対偶) / χdeg=u /
+  n₁a²=(p−1)[U:U']。
+- **6f1e6ec4 (9.11.5 arith + 一様値)**: `sumnS_irreducible_constant_degree` (hs1' 供給) +
+  `add_two_lt_two_pow` (q+2<2^q) + `two_mul_choose_two` + `binomial_lower_bound`
+  ((2a+1)^q の k∈{0,1,2,q} 項抽出) + `nineElevenFive_arithmetic_contradiction`
+  (指数 vs 多項式、2^q≤q+2 矛盾)。
+- **881af4e8 (9.11.2 + 9.11.5 refutation)**: `relIndex_inf_le` (relative index-inf) +
+  `nineElevenTwo_u_le_a_sq` (u≤a²、C=U₁⊓U₁ʷ 入力) + `nineElevenFive_refutation`
+  (cleared ℕ 形の全 refutation: hcount/hnorm/hua2/hle → False)。
+
+**⟹ frontier の実質変化**: (9.11.1) squeeze は arithmetic core → **core + §9 同定 + 群世界配置抽出 +
+hs1' 供給 + (9.11.5) 全 refutation** まで leaf 完成。残る (9.11) caseA は **深い入力 3 種**に集約:
+1. **(9.11.3) |𝒮₄| count** — X(H₀C) の次数別既約数え (sum-of-squares 類、char-theory)。leaf 可能性中。
+2. **(9.11.4) ‖α‖² Mackey norm** — γ=Ind_{HU₁}^M 1 の double-coset ノルム。**HU₁ 非正規ゆえ
+   `induce_inner_induce_trivial` (正規版) 不適** — general Mackey double-coset 数え infra が leaf 未到達。
+3. **refuter hpair (= (5.6) 対偶)** — `coherentDegreeSqNormBound_of_not_coherentW` が要求する
+   §9 S-family の per-member Dade bundle (Dmem/hortho_mem/htau1Dmem)。**coherence world (S07.Hypothesis/
+   IsCoherent、Hypothesis-level)** ゆえ leaf の chars-level から届かない = **world-bridge**。
+   caseB 先例 `caseB_coherent_sOf_H0Cprime_of_mixed` は S13 (a 所有、Hypothesis-level) 在住。
+
+**次判断 (world-bridge)**: caseA の最終 assembly (`IsCoherent hyp.base.tau (sOf ...) hyp.base.A0` 産出)
+は caseB と同じ Hypothesis-level ゆえ **S13 (a) or b 新 file (S13 import)** が居場所。leaf は S13 非 import
+(循環回避) を維持。refuter の Dade bundle は S-instance Dade world 依存で、これは 0101 で flag 済の
+world-bridge。**hub 調整事項** (b の chars-level squeeze machinery は完備供給、consumer 側 assembly の
+world 選択が cross-lane 設計判断)。leaf 側で更に進められる genuine piece = (9.11.3) count (次 iteration 検討)。
