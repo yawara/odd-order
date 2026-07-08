@@ -480,6 +480,91 @@ theorem caseA_sq_mul_card_uprime_dvd [Finite G] {M : Subgroup G}
 
 end CaseADivisibility
 
+/-! ### The (9.11.1) squeeze: §9 identification of the circle nodes
+
+The arithmetic core below abstracts the squeeze quantities as bare naturals; this subsection
+supplies the §9 identifications tying them to the group world (Coq `PFsection9.v:1560-1607`):
+the ambient relative-index realizations `[U:C_U(S₀)] = a` / `[U:C] = u` (Lagrange transports of
+the `uInHu`-realized indices), the factorization `[U:U'] = a·[C_U(S₀):U']` behind Coq's
+`szS1' = (p−1)·[U:U']/a²`, the `lb23` bound `u ≤ [U:U']`, and the **exact** (9.8.d) count
+`(p−1)·[U:U'] ≤ n₁·a²` (the landed `caseA_character_counts` (d) with its iterated ℕ-division
+resolved by the `dv_lb` divisibilities above). -/
+
+section SqueezeIdentifications
+
+variable [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+  {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
+
+/-- **`[U : C_U(S₀)] = a`** (ambient-`G` relative-index form of
+`index_cuInHu_subgroupOf_uInHu_eq_a`): Lagrange `[U:C_U(S₀)]·|C_U(S₀)| = |U| = a·|C_U(S₀)|`
+(`card_U_eq_a_mul_card_cuSub`), cancelling `|C_U(S₀)| > 0`. -/
+theorem relIndex_cuSub_U_eq_a (caseA : CliffordCaseAData chars) :
+    (cuSub caseA).relIndex data.U = caseA.a := by
+  have h1 : (cuSub caseA).relIndex data.U * Nat.card ↥(cuSub caseA) = Nat.card ↥data.U := by
+    have h := Subgroup.index_mul_card ((cuSub caseA).subgroupOf data.U)
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (cuSub_le_U caseA)).toEquiv] at h
+  exact Nat.eq_of_mul_eq_mul_right Nat.card_pos
+    (h1.trans (card_U_eq_a_mul_card_cuSub caseA))
+
+/-- **`[U:U'] = a·[C_U(S₀):U']`** (the Coq `szS1'` denominator factorization): relative-index
+multiplicativity along `U' ≤ C_U(S₀) ≤ U` with `[U:C_U(S₀)] = a`. -/
+theorem relIndex_uprimeSub_U_eq (caseA : CliffordCaseAData chars) :
+    (uprimeSub data).relIndex data.U
+      = caseA.a * (uprimeSub data).relIndex (cuSub caseA) := by
+  rw [← Subgroup.relIndex_mul_relIndex (uprimeSub data) (cuSub caseA) data.U
+      (uprimeSub_le_cuSub caseA) (cuSub_le_U caseA),
+    relIndex_cuSub_U_eq_a caseA, mul_comm]
+
+/-- **`[U : C] = u`** (ambient-`G` relative-index form of `index_cInHu_subgroupOf_uInHu_eq_u`):
+both sides multiply by `|C|` to `|U|` (Lagrange in `U` and in the `uInHu` realization). -/
+theorem relIndex_cSub_U_eq_u (chars : Section11CharacterData data chief) :
+    (cSub data chief).relIndex data.U = chars.u := by
+  have h1 : (cSub data chief).relIndex data.U * Nat.card ↥(cSub data chief)
+      = Nat.card ↥data.U := by
+    have h := Subgroup.index_mul_card ((cSub data chief).subgroupOf data.U)
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (cSub_le_U data chief)).toEquiv] at h
+  have h2 : chars.u * Nat.card ↥(cSub data chief) = Nat.card ↥data.U := by
+    have h := Subgroup.index_mul_card ((cInHu data chief).subgroupOf (uInHu data))
+    rwa [index_cInHu_subgroupOf_uInHu_eq_u data chief chars,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe (cInHu_le_uInHu data chief)).toEquiv,
+      card_cInHu_eq data chief, card_uInHu_eq data] at h
+  exact Nat.eq_of_mul_eq_mul_right Nat.card_pos (h1.trans h2.symm)
+
+/-- **The `lb23` bound `u ≤ [U:U']`** — `u = [U:C]` and Lagrange monotonicity `[U:C] ≤ [U:U']`
+along `U' ≤ C ≤ U` (`relIndex_le_relIndex_of_le`).  The `hule` input of the (9.11.1) squeeze. -/
+theorem u_le_relIndex_uprimeSub_U (chars : Section11CharacterData data chief) :
+    chars.u ≤ (uprimeSub data).relIndex data.U := by
+  rw [← relIndex_cSub_U_eq_u chars]
+  exact OddOrder.Peterfalvi.S07.relIndex_le_relIndex_of_le
+    (uprimeSub_le_cSub data chief) (cSub_le_U data chief)
+
+/-- **The exact (9.8.d) count `(p−1)·[U:U'] ≤ n₁·a²`** (Coq `lb_Sqa` with the `dv_lb`
+exactness), `n₁` the number of degree-`qa` irreducibles in `𝒮(H₀U')`.  The landed count
+(`caseA_character_counts` (d)) bounds `n₁` below by the iterated ℕ-division
+`((p−1)/a)·(|U|/(a·|U'|))`; the divisibilities `a ∣ p−1` and `a·|U'| ∣ |U|` make both divisions
+exact, and multiplying through by `a²` gives the multiplicative form consumed by the (9.11.1)
+squeeze (`nineElevenOne_squeeze_arithmetic`'s `hcount`). -/
+theorem caseA_character_count_exact (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (caseA : CliffordCaseAData chars) :
+    (chief.p - 1) * ((uprimeSub data).relIndex data.U)
+      ≤ {χ ∈ sOf data (chief.H0 ⊔ uprimeSub data) |
+          IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}.ncard
+        * (caseA.a * caseA.a) := by
+  have hcount := (caseA_character_counts hG chars caseA).2.2.2
+  rw [show chars.Uprime = uprimeSub data from rfl,
+    Section11CharacterData.SOf_eq,
+    card_U_div_a_mul_card_Uprime_eq_relIndex caseA] at hcount
+  rw [relIndex_uprimeSub_U_eq caseA, ← Nat.mul_div_cancel' caseA.a_dvd_p_sub_one]
+  calc caseA.a * ((chief.p - 1) / caseA.a)
+        * (caseA.a * (uprimeSub data).relIndex (cuSub caseA))
+      = (chief.p - 1) / caseA.a * ((uprimeSub data).relIndex (cuSub caseA))
+          * (caseA.a * caseA.a) := by ring
+    _ ≤ {χ ∈ sOf data (chief.H0 ⊔ uprimeSub data) |
+          IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}.ncard
+        * (caseA.a * caseA.a) := Nat.mul_le_mul_right _ hcount
+
+end SqueezeIdentifications
+
 /-! ### The (9.11.1) squeeze: arithmetic core
 
 Book (9.11.1): with `𝒮₂` maximal and `χ ∈ 𝒮₃`, *"By Theorem (5.6) and by (9.8.a, d),
