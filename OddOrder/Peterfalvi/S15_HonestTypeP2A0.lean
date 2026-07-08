@@ -109,4 +109,45 @@ theorem honestTypeP2A0Set_conj_mem [Finite G] {M : Subgroup G} (data : TypePData
     · exact Or.inl (honestTypeP2ASet_conj_mem hm h)
     · exact Or.inr ((mem_conjClassSetIn_conj_iff hm x).mpr h)
 
+/-- `∀ x ∈ A₀(S), x ≠ 1` — the `≠ 1` form of `honestTypeP2A0Set_one_not_mem` (the shape the
+`σ`-decomposition Dade engine's `hXsharp` obligation takes). -/
+theorem honestTypeP2A0Set_ne_one {M : Subgroup G} (data : TypePData M) :
+    ∀ x ∈ honestTypeP2A0Set M data, x ≠ (1 : G) :=
+  fun _ hx h => honestTypeP2A0Set_one_not_mem data (h ▸ hx)
+
+/-- **A `V^S`-point does not escape `M`**: its centralizer lies in `M`.  For `b = h·v·h⁻¹`
+(`v ∈ V_S`, `h ∈ M`), `C_G(b) = h·C_G(v)·h⁻¹ ≤ h·M·h⁻¹ = M` (`centralizer_typePV_le_M`, `h ∈ M`).
+This is what makes the `V`-part of the Dade engine's escaping-`σ`-sharp obligation **vacuous**. -/
+theorem conjClassSetIn_typePV_centralizer_le_M {M : Subgroup G} (data : TypePData M)
+    {b : G} (hb : b ∈ conjClassSetIn M (typePV M data)) :
+    Subgroup.centralizer ({b} : Set G) ≤ M := by
+  obtain ⟨v, hv, h, hhM, rfl⟩ := hb
+  intro x hx
+  have hcomm : x * (h * v * h⁻¹) = (h * v * h⁻¹) * x :=
+    Subgroup.mem_centralizer_singleton_iff.mp hx
+  -- `h⁻¹ x h` commutes with `v`, hence lies in `C_G(v) ≤ M`.
+  have hcv : (h⁻¹ * x * h) ∈ Subgroup.centralizer ({v} : Set G) := by
+    rw [Subgroup.mem_centralizer_singleton_iff]
+    calc (h⁻¹ * x * h) * v
+        = h⁻¹ * (x * (h * v * h⁻¹)) * h := by group
+      _ = h⁻¹ * ((h * v * h⁻¹) * x) * h := by rw [hcomm]
+      _ = v * (h⁻¹ * x * h) := by group
+  have hxM : (h⁻¹ * x * h) ∈ M :=
+    OddOrder.Peterfalvi.S10.centralizer_typePV_le_M data hv hcv
+  have hxeq : x = h * (h⁻¹ * x * h) * h⁻¹ := by group
+  rw [hxeq]
+  exact M.mul_mem (M.mul_mem hhM hxM) (M.inv_mem hhM)
+
+/-- **Escaping `A₀(S)`-points come from the `A(S)`-part**: since `V^S`-points do not escape
+(`conjClassSetIn_typePV_centralizer_le_M`), any escaping point of `A₀(S)` lies in `A(S)` and escapes
+there too.  This reduces the Dade engine's escaping-`σ`-sharp and coprimality obligations for `A₀(S)`
+to the already-established `honestTypeP2ASet` ones. -/
+theorem escaping_honestTypeP2A0Set_mem_honestTypeP2ASet {M : Subgroup G} (data : TypePData M)
+    {a : G} (ha : a ∈ escapingCentralizerSet M (honestTypeP2A0Set M data)) :
+    a ∈ escapingCentralizerSet M (honestTypeP2ASet M) := by
+  obtain ⟨haA0, haesc⟩ := ha
+  rcases haA0 with hpa | hva
+  · exact ⟨hpa, haesc⟩
+  · exact absurd (conjClassSetIn_typePV_centralizer_le_M data hva) haesc
+
 end OddOrder.Peterfalvi.S15
