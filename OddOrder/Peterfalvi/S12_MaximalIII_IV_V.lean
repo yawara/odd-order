@@ -559,7 +559,7 @@ theorem typePData_card_eq_H_mul_U_mul_W1 [Finite G] {M : Subgroup G} (data : Typ
   calc Nat.card ↥M = Nat.card ↥(derivedInG M) * Nat.card ↥data.W1 := h1.symm
     _ = Nat.card ↥data.H * Nat.card ↥data.U * Nat.card ↥data.W1 := by rw [← h2]
 
-open scoped FiniteInduce in
+open scoped Classical FiniteInduce in
 /-- **Peterfalvi (10.8), norm-counting estimate** (the §7 analytic heart, the `hbound` input to
 `typeII_noncoherence_arithmetic`).
 
@@ -575,8 +575,8 @@ Isolated here as the single remaining genuine character-theoretic gate of (10.8)
 arithmetic closer and the structural bound `|M'| ≥ (2w₁+1)w₂` are discharged separately.  The `u`
 is the partner's `|U|`; bundled existentially because (10.8) only consumes `∃ u ≥ 7` with the bound.
 See `notes/peterfalvi/s12_10_8_noncoherence.md`. -/
-theorem typeII_coherence_contradiction_estimate [Finite G] [Fintype G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Fintype ↥M]
+theorem typeII_coherence_contradiction_estimate [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
     {hyp : Hypothesis M} {params : CharacterParameters hyp}
     (coh : CoherentHypothesis hyp params) :
@@ -585,6 +585,7 @@ theorem typeII_coherence_contradiction_estimate [Finite G] [Fintype G]
         < (hyp.w1 : ℚ) * (hyp.w2 : ℚ) / (Nat.card ↥(derivedInG M) : ℚ) := by
   sorry
 
+open scoped FiniteInduce in
 /-- **Peterfalvi (10.8)**: under Hypothesis (10.1), the character family `S` is
 not coherent.
 
@@ -594,8 +595,8 @@ parameters from `w2_prime_and_parameter_independence`); the structural bound
 `|M'| ≥ (2w₁+1)w₂` (`card_derived_ge`), the norm-counting estimate
 `1 − 1/w₁ − 1/|U| < w₁w₂/|M'|` with `|U| ≥ 7` (`typeII_coherence_contradiction_estimate`), and the
 pure-`ℚ` arithmetic contradiction (`typeII_noncoherence_arithmetic`) together give `False`. -/
-theorem S_not_coherent [Finite G] [Fintype G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Fintype ↥M]
+theorem S_not_coherent [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
     (hyp : Hypothesis M) :
     ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A0) := by
