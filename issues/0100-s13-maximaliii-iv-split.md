@@ -45,3 +45,11 @@ created: 2026-07-08
 - **⚠ 分割は a の caseB rewire (9075 step 3、hRorth 3-way dispatch 残) が landing してから** —
   今は全域が active frontier ゆえ凍結境界が取れず prefix-split が frontier と衝突する。
   rewire 完遂後に hub が凍結クラスタ (§13.1-13.x の landed 部) を上流 leaf へ push する。
+
+## 更新 (2026-07-08 監視 tick #2)
+
+- caseB rewire 3/3 完成 (hDeg 撤去) landing で **S13_MaximalIII_IV 3,524 → 3,672 行**。
+- **⚠ 新規: S13_CoreStructure.lean が 1,556 行で 1,500 を超過** (このクラスタで 2 つ目の large file)。
+  両 S13 file とも a の active frontier (S13 char-核) ゆえ分割は依然保留。
+- 9075 (norm-general engine + caseB rewire) は CLOSE 済。次の S13 frontier が落ち着いた段階で
+  hub が両 file の凍結クラスタ (§13.1-13.x landed 部) を上流 leaf へ prefix-split する。
