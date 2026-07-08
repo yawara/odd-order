@@ -617,6 +617,34 @@ theorem Hypothesis.forall_dadeHypS0_H_eq_bot [Fintype G] [Finite G]
   exact OddOrder.Peterfalvi.S10.ftSupportKernel_eq_bot_of_not_escaping
     (fun hesc => Set.notMem_empty a.1 (hempty ▸ hesc))
 
+open OddOrder.RepresentationTheory in
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **`τ_S = Ind_S^G` on `A₀(S)`-supported functions** (the honest `'A0`-Dade=Ind bridge): for `f`
+supported in `A₀(S)`, the `'A0(S)`-Dade lift `dadeIntegralCharacterMap (dadeHypS0 …) f` equals plain
+induction `Ind_S^G f`.  All `'A0(S)`-instance Dade stabilizers vanish
+(`forall_dadeHypS0_H_eq_bot`, the (13.2.e) `A₀` `normedTI`), so on the `A₀(S)`-supported span the
+Dade map coincides with the induction map (`dadeMap_eq_induce_of_supported_on_trivial_H` at the full
+support `A₁ = A₀(S)`).  This is the `'A0` analogue of `sInstance_dade_eq_induce`; it is the
+`τ_S = Ind` half of (13.18.c) `⟨Γ,1_G⟩ = 0` (`gammaGrid_orthogonal_one`) and of pin C
+`tauS_mu_row0_vanish_on_V` (both additionally need prime-`TI` `μ`-value content, issue 9014). -/
+theorem Hypothesis.sInstance_dade0_eq_induce [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {f : ClassFunction ↥hyp.S ℂ}
+    (hf : f.support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set hyp.S hyp.Sdata) hyp.S) :
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
+        ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) f
+      = ClassFunction.induce hyp.S f := by
+  rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support (hyp.dadeHypS0 hG)
+    ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) hf]
+  exact OddOrder.Peterfalvi.S14.dadeMap_eq_induce_of_supported_on_trivial_H (hyp.dadeHypS0 hG)
+    (subset_refl _)
+    (fun l _ ha => (honestTypeP2A0Set_conj_mem hyp.Sdata l.2).mpr ha)
+    (fun a => by
+      rw [OddOrder.Peterfalvi.S04.Hypothesis.restrict_H]
+      exact hyp.forall_dadeHypS0_H_eq_bot hG ⟨a.1, a.2⟩)
+    ⟨f, (ClassFunction.mem_supportedSubmodule).mpr hf⟩
+
 /-! ### Prime-`TI` pins for the (13.18) `S`-side cross-relation (issue 9076 piece 4c-4)
 
 The three isolated prime-`TI` obligations behind `tauS_mu_row0_cross`
