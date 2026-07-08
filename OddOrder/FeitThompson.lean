@@ -2,6 +2,7 @@ import OddOrder.BG.AppC_FinalContradiction
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePComplement
 import OddOrder.Peterfalvi.S06_MuColumnBridge
 import OddOrder.Peterfalvi.S13_CoreStructure
+import OddOrder.Peterfalvi.S13_Orthogonality
 
 /-!
 # Feit-Thompson Theorem
@@ -644,9 +645,11 @@ theorem card_kappaHall_lt_of_isTypeIIIorIV {G : Type*} [Group G] [Finite G]
     OddOrder.Peterfalvi.S13.secondDerived_eq_fitting_of_base hG hyp hIIIorIV
   have hHcard : Nat.card ↥hyp.typeP.H = hyp.w2 ^ hyp.w1 :=
     OddOrder.Peterfalvi.S13.card_H_eq_of_base hG hyp hIIIorIV
-  -- `w₂ < w₁` (Peterfalvi (11.9.b), from the genuine (11.8)).
+  -- `w₂ < w₁` (Peterfalvi (11.9.b), from the genuine (11.8) via the honest narrow `𝒮(H₀C)` route —
+  -- `S13.w2_lt_w1_of_hypothesis_H0C`, replacing the deprecated wide `S12.w2_lt_w1_of_hypothesis`
+  -- whose uniform-degree lemma is false for non-Galois type III/IV, issue 1019).
   rw [hKstarw2, hKw1]
-  exact OddOrder.Peterfalvi.S12.w2_lt_w1_of_hypothesis hG hyp hIIIorIV hM2 hHcard
+  exact OddOrder.Peterfalvi.S13.w2_lt_w1_of_hypothesis_H0C hG hyp hIIIorIV hM2 hHcard
 
 /-- **Peterfalvi (13.2.a), character core** (mmd §13, `references/peterfalvi/04.15_*`).
 

@@ -1725,3 +1725,32 @@ honest (11.8.6) endpoint の自然な home、将来 FeitThompson が import)。
 → `𝒮(H₀C)` coherent (union-glue) → **`S_H0C_not_coherent` (11.3/10.8) と矛盾で honest (11.8)**。
 → `exists_zeta_residual_not_orthogonal`/`w2_lt_w1` を本 file に relocate + FeitThompson rewire →
   **false `Sset_diff_SHCSet_apply_one_eq_qu` を spine から除去**。
+
+## 2026-07-08 update¹¹ (lane-a /loop) — ★★ honest narrow (11.8) route LANDED + WIRED INTO SPINE (false lemma OFF-SPINE)
+
+honest (11.8.6) narrow-`𝒮(H₀C)` caller を `S13_Orthogonality.lean` に完成し、**feitThompson spine を
+それに rewire**。full build green 3943 jobs、AxiomsCheck OK。
+
+### landed (S13_Orthogonality、S12 wide template を narrow に mirror)
+- **`exists_glue_nu_H0C`** (sorry-free): SOf(HC)/sOf(H0C) glue-map constructor
+  (`exists_integralCharacterMap_glue_of_orthogonal` + inducedKernelFamily 直交/norm + `SOf_HC_inner_sOf_H0C_eq_zero`)。
+- **`coherent_SOf_H0C_of_column_identities`** (3 sorry のみ): narrow capstone。`coherent_sOf_H0C` (hY) を消費、
+  `coherent_SOf_H0C_of_glued` を feed。3 sorry = **hmixed** (6.7、§14、S12:4888 と同型) / **hDτ** (5.8、§14、
+  S12:4896 と同型) / **hgen** (6.8.1 生成、**§9 narrow uniform-degree で TRUE** ← S12 の FALSE
+  `Sset_diff_SHCSet_apply_one_eq_qu` を置換)。
+- **`exists_zeta_residual_not_orthogonal_H0C`** (sorry-free、S12 版と同一 statement): `intro h_orth` →
+  S12 residual machinery で ν/hcol 構成 → narrow capstone → **`S_H0C_not_coherent` (11.3) と矛盾**。
+  soundness = h_orth-gated (S12 と同型、unconditional False 無し、`#print axioms` = sorryAx のみ・新 axiom 無)。
+- **`w2_lt_w1_of_hypothesis_H0C`**: narrow caller + `w2_lt_w1_of_residual_not_orthogonal` → w₂<w₁。
+
+### spine rewire (FeitThompson)
+`card_kappaHall_lt_of_isTypeIIIorIV` (:649) を `S12.w2_lt_w1_of_hypothesis` → **`S13.w2_lt_w1_of_hypothesis_H0C`**
+に変更 (+ S13_Orthogonality import)。⟹ **feitThompson は FALSE `Sset_diff_SHCSet_apply_one_eq_qu` を
+経由しなくなった**。spine 残 sorry は全て TRUE: hmixed/hDτ (§14 Sibley、lane-c)、hgen (§9 narrow、TRUE、
+genuine 化 deferred)、caseA refuter (lane-b (9.11.2))、(10.8) `S_not_coherent`。
+[[scaffold-sorry-free-not-done]]: FALSE-lemma-route → all-TRUE-sorry-route = genuine soundness 前進。
+
+### 残 (deletable follow-up、churn 回避で defer)
+wide chain (`Sset_diff_SHCSet_apply_one_eq_qu`/`coherent_Sset_of_column_identities`/`hgen_of_S2_uniform_degree`/
+S12 `exists_zeta_residual_not_orthogonal`/`w2_lt_w1_of_hypothesis`) は今 **off-spine で unused** (docstring 参照のみ、
+AxiomsCheck #assert 無)。削除で landmine 完全除去可 (共有 helper 有無を要確認ゆえ fresh context 推奨)。
