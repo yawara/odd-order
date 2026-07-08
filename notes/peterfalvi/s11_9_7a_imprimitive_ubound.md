@@ -90,3 +90,28 @@ producer を hconst 補題に還元して先に packaging を build-green 化 �
    Coq 実装 = `quotient_cents2r` で `[ker(psi),W₁]⊆C` + `Frobenius_trivg_cent frobUW1c`。
 
 step 1-3 は tractable、**step 4 (quotient-Frobenius fpf) が genuine infra 投資**。
+
+## ✅ scalar 半 landed (2026-07-09, commit 3778d6d4)
+
+`representation_eq_smul_id_of_block_scalars_const` (generic, sorry-free): block scalar 全一致
+⟹ `ρ u = μ • id`。lineScalarChar_smul で per-block、⨆block=⊤ の span で LinearMap.ext_on。
+⟹ **hconst は「ρ u = μ•id ⟹ u = 1」(Frobenius 半) のみに還元**。
+
+## Frobenius 半の精緻 plan (次 iteration、multiplicative route)
+
+`u ∈ Ū = range(uActionHom)`, `ρ u = μ•id` ⟹ `u = 1`:
+1. **ρ u = μ•id ⟹ u.val x = x^k on H̄** (k = (μ:ZMod p).val): `ρ u (ofMul x)=ofMul(u.val x)`
+   (elabRepresentation_apply) と `μ•(ofMul x)=ofMul(x^k)` (zmodModule smul、要 unfold
+   `ElementaryAbelian.zmodModule`) を equate。
+2. **u.val central**: `u.val = k-power map`、abelian H̄ で `φ(x^k)=φ(x)^k` ゆえ全 MulAut と可換。
+3. **W̄₁-conjugation fixes u**: `u = quotientMulAutHom(ĝ)` (ĝ=g∈U の U⊔W₁ 像)、w∈W₁ に対し
+   `quotientMulAutHom(ŵ)·u.val·quotientMulAutHom(ŵ)⁻¹ = quotientMulAutHom(ŵĝŵ⁻¹)` (hom)
+   `= u.val` (central) ⟹ `quotientMulAutHom(ŵĝŵ⁻¹ ĝ⁻¹)=1` ⟹ `[ŵ,ĝ]∈ker=C`。
+4. **coprime 降下**: C=C_U(H̄) は W₁-invariant・normal、|W₁| coprime |U| (Frobenius
+   `coprime_card_kernel_complement`)。C_U(W₁)=1 (Frobenius `centralizer_complement_le`:
+   w≠1 で C_{U⊔W₁}(w)≤W₁、∩U=⊥)。`CoprimeFixedPoints.map_fixedSubgroup_eq_fixedSubgroup_quotient`
+   で C_{U/C}(W₁)=image(C_U(W₁))=1。ḡ (g の U/C 像) は W₁-fixed (step3) ⟹ ḡ=1 ⟹ g∈C ⟹ u=1。
+   - first-iso `range(uActionHom) ≅ U/C` で u ↔ ḡ を橋渡し。
+
+**最深部 = step 4 の coprime 降下 setup** (W₁↷U/C の action・fixedSubgroup 形を CoprimeFixedPoints
+の API に合わせる)。step 1-2 は zmodModule smul unfold + power-map centrality で機械的。
