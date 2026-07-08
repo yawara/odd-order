@@ -1010,14 +1010,63 @@ section CharacterSumOfSquares
 
 variable [Finite G] {M : Subgroup G}
 
+/-- **Peterfalvi (9.11.3) quotient order**: the realized `H₀C` in `HU` has index `p^q·u`.
+
+`[HU : H₀C] = [HU : HC]·[HC : H₀C] = u·p^q`, where `HC = H·C = hInHu ⊔ cInHu`:
+* `[HU : HC] = u` (`index_hcInHu_eq_relindex_cInHu` ∘ `index_cInHu_subgroupOf_uInHu_eq_u`);
+* `[HC : H₀C] = p^q` by the second isomorphism `HC/H₀C ≅ H/(H ⊓ H₀C) = H/H₀ = H̄`
+  (`relIndex_sup_right` with `HC = H ⊔ H₀C`, and `H ⊓ H₀C = H₀` via
+  `hInHu_inf_realizedH0supC_eq_realizedH0`), so `[HC : H₀C] = [H : H₀] = |H|/|H₀| = p^q`
+  (`chief.quotient_order`).
+This is the first term of the (9.11.3) class equation, folded into `sum_xiOf_H0C_degreeSq`. -/
+theorem index_realizedH0supC_eq (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data)
+    (chars : Section11CharacterData data chief) :
+    Nat.card (↥(huSub data) ⧸
+      ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+      = chief.p ^ data.q * chars.u := by
+  haveI : (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal :=
+    (chiefFactor_H0supC_subgroupOf_normal chief).subgroupOf (huSub data)
+  rw [← Subgroup.index_eq_card]
+  have hHC : hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)
+      = hInHu data ⊔ cInHu data chief := hInHu_sup_realizedH0supC chief
+  have hle : ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)
+      ≤ hInHu data ⊔ cInHu data chief := by rw [← hHC]; exact le_sup_right
+  have hu : (hInHu data ⊔ cInHu data chief).index = chars.u :=
+    (index_hcInHu_eq_relindex_cInHu data chief).trans
+      (index_cInHu_subgroupOf_uInHu_eq_u data chief chars)
+  -- `[HC : H₀C] = [H : H₀] = p^q` via the second isomorphism theorem.
+  have hrel : (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).relIndex
+      (hInHu data ⊔ cInHu data chief) = chief.p ^ data.q := by
+    rw [← hHC, Subgroup.relIndex_sup_right, ← Subgroup.inf_relIndex_left,
+      hInHu_inf_realizedH0supC_eq_realizedH0 chief]
+    -- `[H : H₀] = |H|/|H₀| = p^q`.
+    have hH0le : (chief.H0.subgroupOf M).subgroupOf (huSub data) ≤ hInHu data :=
+      Subgroup.subgroupOf_mono (huSub data) (Subgroup.subgroupOf_mono M chief.H0_lt_H.le)
+    have hcard_H0r : Nat.card ↥((chief.H0.subgroupOf M).subgroupOf (huSub data))
+        = Nat.card ↥chief.H0 := by
+      have hH0M : chief.H0 ≤ M := chief.H0_lt_H.le.trans (H_le_M data)
+      have hH0subM : chief.H0.subgroupOf M ≤ huSub data :=
+        Subgroup.subgroupOf_mono M (chief.H0_lt_H.le.trans le_sup_left)
+      calc Nat.card ↥((chief.H0.subgroupOf M).subgroupOf (huSub data))
+          = Nat.card ↥(chief.H0.subgroupOf M) :=
+            Nat.card_congr (Subgroup.subgroupOfEquivOfLe hH0subM).toEquiv
+        _ = Nat.card ↥chief.H0 := Nat.card_congr (Subgroup.subgroupOfEquivOfLe hH0M).toEquiv
+    have hlag := Subgroup.index_mul_card
+      (((chief.H0.subgroupOf M).subgroupOf (huSub data)).subgroupOf (hInHu data))
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hH0le).toEquiv, hcard_H0r,
+      Nat.card_congr (hInHuEquivH data).toEquiv, chief.quotient_order] at hlag
+    exact Nat.eq_of_mul_eq_mul_right Nat.card_pos hlag
+  rw [← Subgroup.relIndex_mul_index hle, hrel, hu]
+
 open scoped Classical in
-/-- **Peterfalvi (9.11.3), the `𝒳(H₀C)` character sum-of-squares (with `|HU/HC| = u` resolved).**
+/-- **Peterfalvi (9.11.3), the `𝒳(H₀C)` character sum-of-squares (fully resolved: `p^q·u − u`).**
 
 The kernel-interval degree-square sum (`sumDegreeSq_kernelInterval`) instantiated at the realized
 `N = H₀C`, `K = H` inside `HU`: over `𝒳(H₀C) = {χ ∈ Irr(HU) | H₀C ⊆ ker, H ⊄ ker}`,
 `∑ χ(1)² = |HU/(H₀C)| − |HU/(H ⊔ H₀C)|`, and `H ⊔ H₀C = HC` (`hInHu_sup_realizedH0supC`) with
-`|HU/HC| = [HU:HC] = u` (`index_hcInHu`).  The remaining `|HU/(H₀C)| = p^q·u` is the (9.11.3) class
-equation's quotient order, supplied to `nineElevenThree_count`'s `hclass`. -/
+`|HU/HC| = [HU:HC] = u` (`index_hcInHu`) and `|HU/(H₀C)| = p^q·u` (`index_realizedH0supC_eq`).
+So `∑ χ(1)² = p^q·u − u`, the (9.11.3) class equation `|Ū| = |HU/H₀C| − ∑ χ(1)²` value fed to
+`nineElevenThree_count`'s `hclass`. -/
 theorem sum_xiOf_H0C_degreeSq (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data)
     (chars : Section11CharacterData data chief) :
     ∑ χ ∈ Finset.univ.filter (fun χ : IrreducibleCharacter ↥(huSub data) =>
@@ -1027,23 +1076,21 @@ theorem sum_xiOf_H0C_degreeSq (data : TypesIIIIIIVSetup M) (chief : ChiefFactorD
         ¬ ((hInHu data : Set ↥(huSub data)) ⊆
           OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction ↥(huSub data) ℂ))),
         ((χ : ClassFunction ↥(huSub data) ℂ) 1) ^ 2
-      = (Nat.card (↥(huSub data) ⧸
-          ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) : ℂ)
-        - (chars.u : ℂ) := by
+      = (chief.p ^ data.q * chars.u : ℂ) - (chars.u : ℂ) := by
   haveI : (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal :=
     (chiefFactor_H0supC_subgroupOf_normal chief).subgroupOf (huSub data)
   haveI : (hInHu data).Normal := hInHu_normal data
   rw [OddOrder.RepresentationTheory.sumDegreeSq_kernelInterval
     (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) (hInHu data)]
-  congr 1
-  -- `|HU/(H ⊔ H₀C)| = |HU/HC| = [HU:HC] = u`.
   have hHC : hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)
       = hInHu data ⊔ cInHu data chief := hInHu_sup_realizedH0supC chief
-  rw [hHC]
   have hu : (hInHu data ⊔ cInHu data chief).index = chars.u :=
     (index_hcInHu_eq_relindex_cInHu data chief).trans
       (index_cInHu_subgroupOf_uInHu_eq_u data chief chars)
-  exact_mod_cast hu
+  -- First term `|HU/(H₀C)| = p^q·u` (`index_realizedH0supC_eq`); second `|HU/HC| = u`.
+  congr 1
+  · exact_mod_cast index_realizedH0supC_eq data chief chars
+  · rw [hHC]; exact_mod_cast hu
 
 end CharacterSumOfSquares
 
