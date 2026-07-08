@@ -3125,6 +3125,154 @@ theorem caseB_sOf_memberRFamily_imageSet_of_col [Finite G]
   unfold caseB_sOf_memberRFamily
   rw [dif_neg hcol]
 
+set_option maxHeartbeats 1600000 in
+-- the `dadeData.dade`-support defeq (`supportInSubgroup A L =?= typePA0`) is feasible but
+-- expensive; discharging it once here keeps it out of the larger `hRorth` proof
+/-- **irr × irr `R`-family orthogonality, typeP form**: the §12/§13 specialization of the generic
+`dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal` to `hyp.dadeData.dade` with the typePA0
+supports, isolating the (feasible-but-expensive) `dadeData.dade`-support defeq in one focused lemma
+(so the (5.2.e) `hRorth` case split does not re-pay it under its large local context). -/
+theorem dadeOfDiff_orthogonal_dadeOfDiff_typeP [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)
+    [NeZero (Nat.card (hyp.toHypothesis46 hG hG.odd).W1)]
+    (x χ : IrreducibleCharacter ↥M)
+    (hxreal : ¬ ClassFunction.IsReal (x : ClassFunction ↥M ℂ))
+    (hxdiffsupp : ((x : ClassFunction ↥M ℂ).conj - (x : ClassFunction ↥M ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.GroupTheory.typePA0 M hyp.typeP) M)
+    (hχreal : ¬ ClassFunction.IsReal (χ : ClassFunction ↥M ℂ))
+    (hχdiffsupp : ((χ : ClassFunction ↥M ℂ).conj - (χ : ClassFunction ↥M ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.GroupTheory.typePA0 M hyp.typeP) M)
+    (hxχ : ClassFunction.inner (x : ClassFunction ↥M ℂ) (χ : ClassFunction ↥M ℂ) = 0)
+    (hxχbar : ClassFunction.inner (x : ClassFunction ↥M ℂ) (χ : ClassFunction ↥M ℂ).conj = 0)
+    (hxbarχ : ClassFunction.inner (x : ClassFunction ↥M ℂ).conj (χ : ClassFunction ↥M ℂ) = 0)
+    (hxbarχbar :
+      ClassFunction.inner (x : ClassFunction ↥M ℂ).conj (χ : ClassFunction ↥M ℂ).conj = 0) :
+    (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp.dadeData.dade
+        hyp.hconj x hxreal hxdiffsupp).Orthogonal
+      (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp.dadeData.dade
+        hyp.hconj χ hχreal hχdiffsupp) :=
+  OddOrder.Peterfalvi.S08.dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal
+    hyp.dadeData.dade hyp.hconj hxreal hxdiffsupp hχreal hχdiffsupp
+    hxχ hxχbar hxbarχ hxbarχbar
+
+set_option maxHeartbeats 1600000 in
+-- the `2×2` dichotomy case split repeatedly matches the reduced dispatched families against the
+-- (5.2.e) lemmas through the `hyp.base.tau = dadeIntegralCharacterMap` defeq
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(5.2.e) cross-orthogonality of the dispatched `R`-families over `𝒮(H₀C′)`** (the `hRorth`
+input of the norm-general (5.7) engine).  For members `φ, ξ` with `⟨φ, ξ⟩ = ⟨φ, ξ̄⟩ = 0`, the
+`R`-families `R(φ) ⊥ R(ξ)` — a `2×2` case split on the member dichotomy (irreducible / column):
+
+* **irr × irr** — `dadeOfDiff_orthogonal_dadeOfDiff_typeP`; the two extra scalars
+  `⟨φ̄, ξ⟩`, `⟨φ̄, ξ̄⟩` are `star`-conjugates of `⟨φ, ξ̄⟩`, `⟨φ, ξ⟩` (`inner_conj_conj`), so `0`;
+* **irr × column** / **column × irr** — `certainTypeR_imageSet_orthogonal_dadeOfDiff_typeP`
+  (the irr-on-left order via an `inner_conj_symm` swap);
+* **column × column** — `certainTypeR_imageSet_orthogonal_certainTypeR`, whose `χ₂ ≠ χ₂'` and
+  `χ₂ ≠ χ₂'⁻¹` side conditions come from `⟨φ, ξ⟩ = 0` and `⟨φ, ξ̄⟩ = 0`: if `χ₂ = χ₂'` then `φ = ξ`
+  and `⟨φ, φ⟩ = w₁ ≠ 0`; if `χ₂ = χ₂'⁻¹` then `φ = ξ̄` (`columnSum_conj_eq`) and `⟨φ, ξ̄⟩ = w₁`. -/
+theorem caseB_sOf_memberRFamily_orthogonal [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
+    (d : ℕ)
+    (hunif : ∀ φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
+      (φ : ClassFunction ↥M ℂ) 1 = (d : ℂ))
+    {φ ξ : ClassFunction ↥M ℂ}
+    (hφ : φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime)
+    (hξ : ξ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime)
+    (h1 : ClassFunction.inner φ ξ = 0) (h2 : ClassFunction.inner φ ξ.conj = 0) :
+    (caseB_sOf_memberRFamily hG hyp d hunif hφ).Orthogonal
+      (caseB_sOf_memberRFamily hG hyp d hunif hξ) := by
+  haveI := hyp.base.finiteG
+  classical
+  have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+  -- typePA support for an irreducible member (needed by the μ×irr cross-orthogonality)
+  have hIrrPA : ∀ {ζ : ClassFunction ↥M ℂ},
+      ζ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime →
+      ((ζ.conj - ζ).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.GroupTheory.typePA M hyp.base.typeP) M) := by
+    intro ζ hζ
+    have hζIKF0 : ζ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) :=
+      OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone bot_le
+        (by rw [← hyp.SOf_eq]; exact hyp.sOf_subset_SOf hyp.H0Cprime hζ)
+    refine OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support ?_ hζIKF0
+    intro y hyK hy1
+    rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup,
+      OddOrder.GroupTheory.typePA_eq_sharpSubgroup_derivedInG]
+    exact ⟨Subgroup.mem_subgroupOf.mp hyK,
+      fun h => hy1 (OneMemClass.coe_eq_one.mp (Set.mem_singleton_iff.mp h))⟩
+  -- self-norm `w₁ ≠ 0` of a column sum (for the μ×μ `≠`-conditions)
+  have hw1ne : (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1 : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr (NeZero.ne _)
+  intro α hα β hβ
+  by_cases hφirr : IsIrreducibleCharacter φ <;> by_cases hξirr : IsIrreducibleCharacter ξ
+  · -- irr × irr
+    obtain ⟨hrφ, hsφ, hφeq⟩ := caseB_sOf_memberRFamily_imageSet_of_irr hG hyp d hunif hφ hφirr
+    obtain ⟨hrξ, hsξ, hξeq⟩ := caseB_sOf_memberRFamily_imageSet_of_irr hG hyp d hunif hξ hξirr
+    rw [hφeq] at hα
+    rw [hξeq] at hβ
+    have hbarχ : ClassFunction.inner φ.conj ξ = 0 := by
+      rw [← ClassFunction.conj_conj ξ, inner_conj_conj, h2, star_zero]
+    have hbarχbar : ClassFunction.inner φ.conj ξ.conj = 0 := by
+      rw [inner_conj_conj, h1, star_zero]
+    exact dadeOfDiff_orthogonal_dadeOfDiff_typeP hG hyp.base ⟨φ, hφirr⟩ ⟨ξ, hξirr⟩
+      hrφ hsφ hrξ hsξ h1 h2 hbarχ hbarχbar α hα β hβ
+  · -- irr × column
+    obtain ⟨hrφ, hsφ, hφeq⟩ := caseB_sOf_memberRFamily_imageSet_of_irr hG hyp d hunif hφ hφirr
+    obtain ⟨k, hk0, hkeq, hξeq⟩ := caseB_sOf_memberRFamily_imageSet_of_col hG hyp d hunif hξ hξirr
+    rw [hφeq] at hα
+    rw [hξeq] at hβ
+    rw [inner_conj_symm β α]
+    rw [certainTypeR_imageSet_orthogonal_dadeOfDiff_typeP hG hyp.base
+      (hyp.base.muColumnChar_ne_one hG hG.odd hk0)
+      (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one (hyp.base.toHypothesis46 hG hG.odd)
+        (hyp.base.muColumnChar hG hG.odd k)).symm
+      ⟨φ, hφirr⟩ hrφ (hIrrPA hφ) hsφ β hβ α hα, star_zero]
+  · -- column × irr
+    obtain ⟨k, hk0, hkeq, hφeq⟩ := caseB_sOf_memberRFamily_imageSet_of_col hG hyp d hunif hφ hφirr
+    obtain ⟨hrξ, hsξ, hξeq⟩ := caseB_sOf_memberRFamily_imageSet_of_irr hG hyp d hunif hξ hξirr
+    rw [hφeq] at hα
+    rw [hξeq] at hβ
+    exact certainTypeR_imageSet_orthogonal_dadeOfDiff_typeP hG hyp.base
+      (hyp.base.muColumnChar_ne_one hG hG.odd hk0)
+      (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one (hyp.base.toHypothesis46 hG hG.odd)
+        (hyp.base.muColumnChar hG hG.odd k)).symm
+      ⟨ξ, hξirr⟩ hrξ (hIrrPA hξ) hsξ α hα β hβ
+  · -- column × column
+    obtain ⟨kφ, hkφ0, hkφeq, hφeq⟩ :=
+      caseB_sOf_memberRFamily_imageSet_of_col hG hyp d hunif hφ hφirr
+    obtain ⟨kξ, hkξ0, hkξeq, hξeq⟩ :=
+      caseB_sOf_memberRFamily_imageSet_of_col hG hyp d hunif hξ hξirr
+    rw [hφeq] at hα
+    rw [hξeq] at hβ
+    set h46 := hyp.base.toHypothesis46 hG hG.odd with hh46
+    -- `χ₂ ≠ χ₂'`: else `φ = ξ` and `⟨φ, φ⟩ = w₁ ≠ 0` contradicts `h1`
+    have hne1 : hyp.base.muColumnChar hG hG.odd kφ ≠ hyp.base.muColumnChar hG hG.odd kξ := by
+      intro heq
+      have hφξ : φ = ξ := by rw [hkφeq, hkξeq, heq]
+      rw [hφξ, hkξeq, OddOrder.Peterfalvi.S06.columnSum_def,
+        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl] at h1
+      exact hw1ne h1
+    -- `χ₂ ≠ χ₂'⁻¹`: else `φ = ξ̄` and `⟨φ, ξ̄⟩ = w₁ ≠ 0` contradicts `h2`
+    have hne2 : hyp.base.muColumnChar hG hG.odd kφ ≠ (hyp.base.muColumnChar hG hG.odd kξ)⁻¹ := by
+      intro heq
+      have hφξc : φ = ξ.conj := by
+        rw [hkφeq, heq, ← OddOrder.Peterfalvi.S06.columnSum_conj_eq, hkξeq]
+      rw [hφξc, hkξeq, OddOrder.Peterfalvi.S06.columnSum_conj_eq,
+        OddOrder.Peterfalvi.S06.columnSum_def,
+        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl] at h2
+      exact hw1ne h2
+    exact OddOrder.Peterfalvi.S06.certainTypeR_imageSet_orthogonal_certainTypeR h46
+      (hyp.base.muColumnChar_ne_one hG hG.odd hkφ0) (hyp.base.muColumnChar_ne_one hG hG.odd hkξ0)
+      (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46
+        (hyp.base.muColumnChar hG hG.odd kφ)).symm
+      (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46
+        (hyp.base.muColumnChar hG hG.odd kξ)).symm
+      hne1 hne2 α hα β hβ
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Uniform anchor-difference support over `𝒮(H₀C′)`** (the `hdegS₁diff` supply of every (9.11)
 chain step, uniform over the whole family): under the caseB uniform degree (`hunif`), the
