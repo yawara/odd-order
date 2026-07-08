@@ -3594,6 +3594,27 @@ theorem isTypeII_of_isTypeP2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     isTypeF_derivedInG_of_isTypeP2 hG hM hP2 hKM hUM hKne hK hU hUne
   exact isTypeII_of_isTypeP2_of_derived_typeF hG hM hP2 hderF hderfit
 
+/-- **Existence of the signalizer maximal with Peterfalvi type `I`/`II`** (existence half of
+Peterfalvi (8.13)): for an escaping `σ`-sharp element `x` (`x ∈ M_σ^#` with more than one
+`σ`-maximal), the proven signalizer structure `signalizer_structure_of_mem_sigmaSharp` supplies a
+maximal subgroup `N` over `C_G(x)` whose BG type-`F`/`P₂` dichotomy converts
+(`isTypeI_of_isTypeF`/`isTypeII_of_isTypeP2`) to the Peterfalvi type `I`/`II`.  This is the existence
+half of (8.13)'s `∃! L, C_G(x) ≤ L ∧ (IsTypeI ∨ IsTypeII)` conclusion; the uniqueness half is the
+containing-maximal uniqueness `ℳ(C_G(x)) = {N[x]}` (Theorem D). -/
+theorem exists_maximal_centralizer_le_typeI_or_typeII [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {x : G} (hxM : x ∈ S14.sigmaSharp M)
+    (hgt : 1 < (S14.maximalSigmaSubgroupsOfElement x).ncard) :
+    ∃ N : Subgroup G, N ∈ maximalSubgroups G ∧
+      Subgroup.centralizer ({x} : Set G) ≤ N ∧
+      (OddOrder.GroupTheory.IsTypeI N ∨ OddOrder.GroupTheory.IsTypeII N) := by
+  obtain ⟨N, ⟨hNmax, hCN, _, _, _, hFP2, _⟩, _⟩ :=
+    signalizer_structure_of_mem_sigmaSharp hG hM hxM hgt
+  refine ⟨N, hNmax, hCN, ?_⟩
+  rcases hFP2 with hF | hP2
+  · exact Or.inl (isTypeI_of_isTypeF hG hNmax hF)
+  · exact Or.inr (isTypeII_of_isTypeP2 hG hNmax hP2)
+
 /-- **Prop 16.1 forward bridge, type V last mile** (Peterfalvi (8.8)): a type-`P` datum with
 `U = ⊥` and the Peterfalvi (8.8) trichotomy on `H = M_F` is of type V.  The `alternative`
 disjunction is the deep named residual (BG §15.7(c) / Peterfalvi (8.8)). -/
@@ -6608,6 +6629,42 @@ theorem maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape
   have hxN : x ∈ N := hCN (Subgroup.mem_centralizer_iff.mpr
     (fun y hy => by rw [Set.mem_singleton_iff.mp hy]))
   exact ⟨N, maximalContaining_centralizer_eq_singleton_of_tau2_element hG hNmax hxN hx1 hxtau2 hRne⟩
+
+/-- **The signalizer maximal is the unique type-`I`/`II` overgroup of `C_G(x)`** (full per-element
+half of Peterfalvi (8.13)): for an escaping `σ`-sharp element `x` (`x ∈ M_σ#`, `C_G(x) ⊄ M`) there is
+a *unique* maximal subgroup `L` over `C_G(x)` of Peterfalvi type `I`/`II`.  Existence is the previous
+`exists_maximal_centralizer_le_typeI_or_typeII` (the type-`F`/`P₂` neighbour of
+`signalizer_structure_of_mem_sigmaSharp`, converted to type `I`/`II`); uniqueness is the Theorem-D
+singleton `ℳ(C_G(x)) = {N[x]}`
+(`maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape`), which collapses *every*
+maximal over `C_G(x)` — not merely the type-`I`/`II` ones — to `N[x]`.  This is exactly the `∃!`
+clause of (8.13)'s conclusion; the escape hypothesis `C_G(x) ⊄ M` supplies the `1 < |𝓜_σ(x)|` the
+existence half needs (`centralizer_le_of_maximalSigma_le_one`). -/
+theorem existsUnique_maximal_centralizer_le_typeI_or_typeII [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {x : G} (hxM : x ∈ S14.sigmaSharp M)
+    (hesc : ¬ Subgroup.centralizer ({x} : Set G) ≤ M) :
+    ∃! L : Subgroup G, L ∈ maximalSubgroups G ∧
+      Subgroup.centralizer ({x} : Set G) ≤ L ∧
+      (OddOrder.GroupTheory.IsTypeI L ∨ OddOrder.GroupTheory.IsTypeII L) := by
+  -- Theorem-D singleton `ℳ(C_G(x)) = {N}` collapses every maximal over `C_G(x)`.
+  obtain ⟨N, hMC⟩ := maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape
+    hG hM hxM hesc
+  have key : ∀ L : Subgroup G, L ∈ maximalSubgroups G →
+      Subgroup.centralizer ({x} : Set G) ≤ L → L = N := fun L hLmax hLC => by
+    have hmem : L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) :=
+      mem_maximalSubgroupsContaining.mpr ⟨hLmax, hLC⟩
+    rw [hMC, Set.mem_singleton_iff] at hmem; exact hmem
+  -- `1 < |𝓜_σ(x)|` from escape, feeding the existence half.
+  have hx1 : x ≠ 1 := hxM.2
+  have hgt : 1 < (S14.maximalSigmaSubgroupsOfElement x).ncard := by
+    by_contra h
+    push_neg at h
+    exact hesc (centralizer_le_of_maximalSigma_le_one hG hM hxM.1 hx1 h)
+  obtain ⟨L₀, hL₀max, hL₀C, hL₀type⟩ :=
+    exists_maximal_centralizer_le_typeI_or_typeII hG hM hxM hgt
+  have hL₀eq : L₀ = N := key L₀ hL₀max hL₀C
+  exact ⟨N, ⟨hL₀eq ▸ hL₀max, hL₀eq ▸ hL₀C, hL₀eq ▸ hL₀type⟩, fun L hL => key L hL.1 hL.2.1⟩
 
 /-- **BG Theorem II** (mmd L4548): `A(M)` and `A_0(M)` are tamely embedded.  The BG form of the
 centralizer-control input used by Peterfalvi (8.12)--(8.13).  Cites the gated-endpoint skeleton
