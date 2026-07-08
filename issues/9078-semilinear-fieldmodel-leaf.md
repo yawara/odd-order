@@ -30,12 +30,19 @@ realization** = 新 shared leaf `OddOrder/GroupTheory/RepresentationTheory/Semil
 
 ## やること
 
-- [ ] 新 leaf `OddOrder/GroupTheory/RepresentationTheory/SemilinearFieldModel.lean` — module-level generic な
-      `F_{q^p} ⋊ V*` 実現 interface (App.B `exists_field_semilinear` + a の SingerField structure を **cite**、
-      `SemidirectProduct.lift` で σ-embedding を組む)。S-side (a の S12/S13) と T-side (c の S16) の両方が instantiate。
-- [ ] T-side producer = `TFieldModelData hyp` の構成 (S-side `exists_pu_field_repr`→`fieldNormalizerData_of_repr`
-      chain の dual、~550 行相当)。gated input (V-abelian/cyclic = (9.7.b) char body) は **parameter/hypothesis** で受ける。
-- [ ] `t_side_frobenius_kernel` (S16:4528) を新 producer で discharge (V-abelian input modulo)、S-side を symmetrize。
+- [x] **新 leaf `SemilinearFieldModel.lean` = 完成 (2026-07-09、commit 3555d0ea/2715290b/648f1c36、sorry-free)**。
+      module-level generic (App.C `additiveFieldGroup`/`normOneFrobeniusGroup` = Mathlib-only ゆえ GroupTheory
+      層違反なし)。内容: `kernelTransport` (F_{r^s}→G) + `complementTransport` (V*→G) + `complementEquiv` +
+      `fieldModelEmbedding` (σ = `SemidirectProduct.lift`、injective via `E⊓C=⊥`、kernel↦E/complement↦C)。
+      S-side `fieldNormalizerData_of_repr` chain の (E,C,r,s) 汎用化。両 side が instantiate 可能。
+      ⚠ 知見: E/C は free var で e/μ の型が依存 → backward `rw [← range]` は motive 破綻、forward `rwa` 必須;
+      map は `hlift_apply` elementwise (semidirect 型の range_eq_map motive 回避)。
+- [ ] **T-side producer** = `TFieldModelData hyp` の構成 (**次フェーズ**、S16 C-owned)。`fieldModelEmbedding` を
+      (E=Q, C=V, r=q, s=p) で instantiate。要: (a) 体 iso `e_Q : Additive ↥Q ≃+ 𝔽_{q^p}` を App.B
+      `exists_field_semilinear` (Q elementary-abelian + V-action irreducible) から、(b) `μ_V : ↥V →* 𝔽ˣ`
+      (range = normOneUnits) を a の Singer から、(c) `hcompatLift` を V-equivariance から、(d) `Q⊓V=⊥`
+      (`hyp.Q_inf_V_eq_bot`)。gated input (V-abelian = (9.7.b)) は hypothesis で受ける (skeleton pattern)。
+- [ ] `t_side_frobenius_kernel` (S16:4528) を新 producer で discharge (V-abelian input modulo)。
 
 ## 分担境界 (dup 回避、hub RULING 9077)
 
