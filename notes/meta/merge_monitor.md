@@ -34,6 +34,13 @@
 
 > **⚰ 2026-07-07 — lane d (codex) 退役 (ユーザー裁定)**: 徹底調査で **FT frontier (Peterfalvi 72 + BG 15 実 sorry) に codex 単独で閉じられる genuine・on-path・非衝突・非gated な実 sorry は存在しない**と確定 (Peterfalvi=全て gated/深いchar/a-b-c衝突/偽/off-path; BG 非b分=AppD/AppE 全て consumer 0・unimported の off-path scaffold)。構造的理由: FT 残 frontier は深く密結合な char/local-analysis で「切り出せる mechanical leaf」がほぼ無く、codex に軽タスクを与えると dup relocation の churn に流れる (直近 2 tick = 計 14 補題が全て既存 S01 補題の複製、net-genuine 0)。⟹ 3 レーン (a/b/c) に集約。worktree `/home/ywr/odd-order-d` + branch `d` 削除 (churn は net-zero、reflog 復元可)。**♻ 再活性化トリガー (将来)**: (i) proven S-side の **T-side dual** (`V_inf_centralizer_Q_eq_bot` 等) の gate ((14.9) T-typeII 構造) が a/b で landing → codex が template を mirror; (ii) a/b/c が特定 group-theory helper を明示 pull-request。いずれか発生時に `git worktree add /home/ywr/odd-order-d -b d` で再作成 (issue base 4000)。**⚠ ユーザーは codex の /loop セッションを停止すること** (worktree 消失後は codex が git エラーで空転)。
 
+> **♻♻ RE-CONFIRMED (2026-07-08, issue 9077 HUB RULING (B))**: lane c が「S16 全 13 sorry は a/b gated、
+> 独立 frontier 枯渇」を全数検証で surface (ユーザー「ハブに聞くべき」)。hub が subagent 調査+自己検証で裁定 =
+> **c は DORMANT でなく `SemilinearFieldModel.lean` shared leaf + T-side `TFieldModelData` producer を build**
+> (= 0098 item 2 の再活性、genuine 未着手 gap、a の Singer と cleanly-separable = dup でない、a は未着手で
+> `main..a`=0)。着手 claim = **issue 9078** 起票済。gated-endpoint skeleton パターン (V-abelian を hypothesis 化)。
+> 分担境界: c=field-model realization (a の Singer cite) / a=§9 block-decomp + (11.9) char body。詳細 = 9077/9078。
+>
 > **♻ SUPERSEDED (2026-07-07, issue 0098)**: 下記 DORMANT 化は解除 — 4-agent 再調査 (wf_d4994964) で
 > ungated genuine work 5 件 (typeP_pair port / semilinear field-model leaf / βₛ bridge carve-out / §14 Γ-assembly /
 > hcard2 verify) を確定し c を REACTIVATE。9013 item (i) mᵀ は c へ de-scope。9000 claim は a 保持 (scope 注記済)。
