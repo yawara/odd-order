@@ -166,3 +166,44 @@ escapingCentralizers_control (lane-a) の citable upstream として残る。
   (3) b を別クラスタへ reallocate。lane-b は再評価トリガー (ungated on-path work ゼロ) に**近い**が、本 session で
   genuine 2 lemma landed ゆえ churn drift ではない。次 /loop iteration は (2) を Coq-assisted で begin する
   (deep frontier を engage; policy「難所を回避しない」)、hub が別途 (1)/(3) を裁定可。
+
+## ✅ (2026-07-08 続⁵、lane-b /loop) — 訂正: b frontier は**枯渇していない** — intersection_le_kernel が assemblable
+
+前 (続⁴) の「b clean frontier 枯渇 → hub reallocate 検討」は**部分的に誤り** (再: [[verify-port-state-by-number-not-coq-name]])。
+comprehensive survey で **`intersection_le_kernel` (S14:5245、Pf 12.11 第2主張、b-owned、on-path 12.11→12.17) が
+genuinely ASSEMBLABLE** と判明 — docstring「Genuinely still-missing」は **STALE**。全 prereq 実在:
+- (12.10) `witness_L_frobenius` = **PROVEN** (docstring は「pinned」と誤記)
+- (8.1.b) = `TypeFData.{centralizer_le_U1, U1_commutative, U1_normal}` (field!)
+- (8.1.c) = `TypeFData.{exponent_eq, frobenius_HU0}` (field)
+- (9.1) Wielandt = `GroupTheory/CoprimeFixedPoints`+`WielandtFixedPoint` (実在)
+- (12.9) = `RankTwoWitnessData.CKx_not_le_Kprime`
+
+深い multi-step proof (A≤M∩L の p'-part 自明性: P₀=O_p(H)∩M / P₀A Frobenius / Wielandt C_K(A)≠1 /
+(8.1.b) abelian ⟹ A centralizes x ⟹ A=1) だが gated でない。**次 /loop iteration で build** (issue 4/task)。
+∴ **hub は b を reallocate しない** — b に genuine ungated on-path deep work あり。同種の rank-two witness cluster
+(S14: sharpImage/centralizer_le/witness_psi_degree/witness_value_norm_package 等) も stale-docstring 疑い、要精査。
+
+## ⚠ (2026-07-08 続⁶、lane-b /loop) — 続⁵「assemblable」を**訂正**: intersection_le_kernel は multi-lemma deep
+
+続⁵ の「intersection_le_kernel assemblable」は **over-optimistic** ([[verify-port-state-by-number-not-coq-name]]
+の自戒: TypeFData field は確認したが (9.1)/Frobenius machinery を未確認で「assemblable」と label した)。
+検証で判明:
+- **(9.1) = Wielandt order formula** (Pf mmd 04.11: U⋊E Frobenius coprime action on solvable H)。`CoprimeFrobeniusAction`
+  + `wielandt_formula_of_perfactor` (WielandtAssembly) の machinery は在るが、**C_K(A)≠1 を出すには `CoprimeFrobeniusAction`
+  instance (P₀⋊A ↷ K) の構築が要** — これに Frobenius sub-structure が要る。
+- **Frobenius sub-structure (P₀⋊A Frobenius, kernel P₀)**: L=H⋊U Frobenius・P₀≤H・A≤L (A∩H=1) から。
+  `IsFrobeniusGroup` = {isNormal, isComplement, ne_bot×2, conj_frobenius (FPF)}。conj_frobenius は
+  「a∈A\{1} ⟹ C_{P₀}(a)=1」= 「a∉kernel H ⟹ FPF on H」を要すが、これは complement-conjugacy 経由
+  (conj_frobenius は特定 complement U のみ) + subgroup-of setup。**clean な既存 lemma 無し** (prime-complement 版
+  `isFrobeniusGroup_of_prime_complement_fixedFree` のみ)。
+
+**⟹ intersection_le_kernel = genuine multi-lemma deep proof** (gated でないが deep)。**decomposition** (次 build 順):
+1. **Frobenius sub-structure lemma** (Isaacs Ch06 infra、reusable): Frobenius L=N⋊U で a∉N ⟹ C_N(a)=1
+   (element-outside-kernel FPF)、hence P₀ A-invariant ⟹ P₀⋊A Frobenius kernel P₀。
+2. **CoprimeFrobeniusAction 構築** + Wielandt formula → C_K(A)≠1。
+3. **(8.1.b) abelian argument** (TypeFData.centralizer_le_U1) → A centralizes x → A=1 → M∩L⊆H。
+
+これは deep char/group-theory work (multi-iteration)。b は継続 engage (policy「難所回避しない」)。downstream (12.11 combiner)
+は intersection_complements_K (8.13.c1、lane-a) に依然 gated だが、doneness policy 上 intersection_le_kernel 自体が
+genuine assertion ゆえ build 価値あり。**5 iteration の char-endgame 精査で判明した構造的事実**: b の char frontier は
+一律 deep multi-lemma (survey では「stale/assemblable」に見えても body は深い) — 今後は body 検証を先に。
