@@ -1366,5 +1366,56 @@ theorem complement_cyclic_order_dvd [Finite G]
   · exact Or.inl h
   · exact hrefine h
 
+/-- **Peterfalvi (12.12) → (12.16) numeric input: `2e ≤ p + 1`** ("Also `2e ≤ p+1` by (12.12)").
+The witness complement order `e = |E|` is odd (a subgroup of the odd-order `G`) and divides
+`p − 1` or `p + 1` by (12.12); an odd divisor of the even number `p ∓ 1` divides its half, so
+`2e ≤ p ∓ 1 ≤ p + 1`.  This is the `h2e` field of `CounterexampleDadeData`, in `ℕ` form. -/
+theorem two_mul_card_complement_le [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
+    (frob : TypeIFrobeniusData data.L) :
+    2 * Nat.card ↥frob.complement ≤ ctr.p + 1 := by
+  classical
+  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  obtain ⟨-, hdvd⟩ := complement_cyclic_order_dvd hG data frob
+  -- `e = |E|` is odd.
+  have hodd : Odd (Nat.card ↥frob.complement) :=
+    hG.odd.of_dvd_nat ((Subgroup.card_subgroup_dvd_card frob.complement).trans
+      (Subgroup.card_subgroup_dvd_card data.L))
+  -- `p` is odd and `≥ 3` (`p ∣ |G|` odd).
+  have hpG : ctr.p ∣ Nat.card G := by
+    have h1 : ctr.p ∣ (ctr.K.subgroupOf ctr.M).index := by
+      have := ctr.p_dvd_index
+      rwa [Subgroup.relIndex] at this
+    exact (h1.trans (Subgroup.index_dvd_card _)).trans
+      (Subgroup.card_subgroup_dvd_card ctr.M)
+  have hpodd : Odd ctr.p := hG.odd.of_dvd_nat hpG
+  have hp3 : 3 ≤ ctr.p := by
+    have h2 := ctr.p_prime.two_le
+    have hne : ctr.p ≠ 2 := fun h => by
+      rw [h] at hpodd
+      exact (by decide : ¬ Odd 2) hpodd
+    omega
+  -- An odd divisor of an even number divides its half.
+  have he_mod : Nat.card ↥frob.complement % 2 = 1 := Nat.odd_iff.mp hodd
+  have key : ∀ m : ℕ, 0 < m → Even m → Nat.card ↥frob.complement ∣ m →
+      2 * Nat.card ↥frob.complement ≤ m := by
+    intro m hm hme hdvd'
+    obtain ⟨k, hk⟩ := hme
+    have hm2k : m = 2 * k := by omega
+    have hcop : Nat.Coprime (Nat.card ↥frob.complement) 2 :=
+      (Nat.prime_two.coprime_iff_not_dvd.mpr (fun h => by omega)).symm
+    have hdvd_k : Nat.card ↥frob.complement ∣ k :=
+      Nat.Coprime.dvd_of_dvd_mul_left hcop (hm2k ▸ hdvd')
+    have hkpos : 0 < k := by omega
+    have := Nat.le_of_dvd hkpos hdvd_k
+    omega
+  rcases hdvd with h | h
+  · -- `e ∣ p − 1`: `2e ≤ p − 1 ≤ p + 1`.
+    have := key (ctr.p - 1) (by omega) (Nat.Odd.sub_odd hpodd odd_one) h
+    omega
+  · -- `e ∣ p + 1`: `2e ≤ p + 1`.
+    exact key (ctr.p + 1) (by omega) (Odd.add_one hpodd) h
+
 end OddOrder.Peterfalvi.S14
 
