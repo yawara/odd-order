@@ -194,3 +194,19 @@ RULING #2 が「landing 発火で一気に close (infra 完備)」とした前�
 **close 態勢 (b の grounding field landing 時)**: pin 1 = `mu2_orthonormal` transport 一行 /
 pin 2 = Engine A cite (度数は §13 具体値で discharge) / pin 3 = Engine C + η-grounding。
 full build green 4128 jobs、AxiomsCheck OK、新 axiom 無し。
+
+## 🎯 2026-07-10 lane-c (wakeup iteration): frobPU 実証明 — s_side gate は u-value 1 本へ
+
+- `c3ccd231` — **`frobenius_PU_of_u_full` (sorry-free)**: Coq PFsection14.v:111-124 の frobPU
+  (typeP_Galois_P → Frobenius_semiregularP) を完全実現。field model (`exists_pu_field_repr`)
+  の μ-線形化で semiregularity、carrier + subgroupOf 搬送で complement 構造。
+  `s_side_frobenius_kernel` の残 sorry = **hu_full = (13.15) u-value 1 本** (b の caseB_order_u
+  / basic_structure sphere)。Coq galS chain と 1:1。
+- 併せて SubgroupM 2074 行 → SubgroupMCore (985, sorry 0) + SubgroupM (1116, sorry 2) に
+  prefix-split (2000 上限)。
+- b の新 leaf `S12_TypeIIFrobenius` (typeII_HU_frobenius_of_coherent) は **(10.8) 帰謬法内部**
+  (coherence 仮定下) の中間結果ゆえ §14 の無条件 frobPU には不適合と code/Coq-level で確認 —
+  u-value 経由が正道 (dup せず独立に整合)。
+- gate 残: pins ×3 (μ-grounding, b) / lSideGridCoeffData ×3 + betaGrid (β_S parity, b) /
+  hu_full (u-value, b) / t_side field-data + hVcomm + v-value (9000, a) / V_inf ((13.4), b)。
+  次 engine-prep 候補 = M-side betaGrid mirror (gate map 2026-07-09 追記節)。
