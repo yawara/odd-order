@@ -229,6 +229,24 @@ theorem omega1OfAbelian_isElementaryAbelian {H : Subgroup G} {p : ℕ}
   · exact hH (x : G) (omega1OfAbelian_le x.2) (y : G) (omega1OfAbelian_le y.2)
   · exact pow_eq_one_of_mem_omega1OfAbelian x.2
 
+/-- An element normalizing `H` normalizes `Ω₁(H)` (abelian form): conjugation by `g` preserves
+both membership in `H` and the equation `x ^ p = 1`. -/
+theorem mem_normalizer_omega1OfAbelian {H : Subgroup G} {p : ℕ}
+    {hH : ∀ x ∈ H, ∀ y ∈ H, x * y = y * x} {g : G}
+    (hg : g ∈ Subgroup.normalizer (H : Set G)) :
+    g ∈ Subgroup.normalizer ((omega1OfAbelian G H p hH : Subgroup G) : Set G) := by
+  rw [Subgroup.mem_set_normalizer_iff] at hg ⊢
+  intro h
+  constructor
+  · rintro ⟨hhH, hhp⟩
+    refine ⟨(hg h).mp hhH, ?_⟩
+    rw [conj_pow, hhp, mul_one, mul_inv_cancel]
+  · rintro ⟨hhH, hhp⟩
+    refine ⟨(hg h).mpr hhH, ?_⟩
+    rw [conj_pow] at hhp
+    have := congrArg (fun z => g⁻¹ * z * g) hhp
+    simpa [mul_assoc] using this
+
 /-- If an abelian subgroup `H` has `p`-rank at least `n > 0`, then
 `p^n` divides the order of its ambient `Ω₁(H)`.
 

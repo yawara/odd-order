@@ -5331,6 +5331,223 @@ theorem pGroup_le_opiCoreInG_of_le_of_isNilpotent [Finite G]
     _ ≤ (Ch03.oPiCore ({q} : Set ℕ) ↥K).map K.subtype := Subgroup.map_mono h1
     _ = opiCoreInG ({q} : Set ℕ) K := rfl
 
+/-- **`N_G(L_F) = L` for the witness subgroup** (`TypeIData` form, Frobenius-free): `L` is maximal
+(a coatom) and normalizes its Fitting kernel `H = L_F ≠ ⊥`; a strictly larger normalizer would be
+`⊤` by maximality, making `H ≠ ⊥` normal in the simple `G` — impossible.  Shared by the (12.10)
+TI-case exclusion (`witness_H_sharp_not_isTISubset_of_typeI`) and its Frobenius specialization. -/
+theorem witness_normalizer_kernel_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
+    (typeI : TypeIData data.L) :
+    Subgroup.normalizer ((typeI.typeF.H : Subgroup G) : Set G) = data.L := by
+  have hne : maxNilpotentNormalHall data.L ≠ ⊥ := by
+    rw [← typeI.typeF.H_eq]; exact typeI.typeF.H_nontrivial
+  rw [typeI.typeF.H_eq]
+  have hco : IsCoatom data.L := data.L_maximal
+  have hLleN : data.L ≤ Subgroup.normalizer (maxNilpotentNormalHall data.L : Set G) :=
+    OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer data.L
+  refine (le_antisymm hLleN ?_).symm
+  rcases hLleN.lt_or_eq with hlt | heq
+  · exfalso
+    have hNtop := hco.2 _ hlt
+    haveI hHnormal : (maxNilpotentNormalHall data.L).Normal :=
+      Subgroup.normalizer_eq_top_iff.mp hNtop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (maxNilpotentNormalHall data.L) hHnormal with
+      hb | ht
+    · exact hne hb
+    · have hle := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le data.L
+      rw [ht] at hle; exact hco.1 (top_le_iff.mp hle)
+  · exact heq.ge
+
+/-- **(12.10), TI-case exclusion for the witness** (`TypeIData` form, Frobenius-free): the
+kernel-sharp set `H^#` of the witness `L` is **not** a TI-subset of `G`.  The rank-two witness
+`x ∈ Ω₁(P₀)^# ⊆ H^#` (`witness_P0_le_kernel`) has `C_G(x) ⊄ L` (`data.centralizer_x_not_le_L`)
+while `N_G(H) = L` (`witness_normalizer_kernel_eq`); picking `g ∈ C_G(x) ∖ L` gives
+`g x g⁻¹ = x ∈ H^# ∩ (H^#)^g` with `g ∉ N_G(H)` — the TI failure.  Dispatches case (a) of the
+(8.3) alternative in the (12.10) minimality argument. -/
+theorem witness_H_sharp_not_isTISubset_of_typeI [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
+    (typeI : TypeIData data.L) :
+    ¬ OddOrder.GroupTheory.IsTISubset
+        (OddOrder.GroupTheory.sharpSubgroup typeI.typeF.H)
+        (Subgroup.normalizer (typeI.typeF.H : Set G)) := by
+  intro hTI
+  have hNL := witness_normalizer_kernel_eq hG data typeI
+  have hxH : data.x ∈ typeI.typeF.H := by
+    rw [typeI.typeF.H_eq]
+    exact witness_P0_le_kernel hG data data.x_mem_P0
+  have hxsharp : data.x ∈ OddOrder.GroupTheory.sharpSubgroup typeI.typeF.H :=
+    ⟨hxH, by simpa using data.x_ne_one⟩
+  obtain ⟨g, hgC, hgL⟩ := SetLike.not_le_iff_exists.mp data.centralizer_x_not_le_L
+  have hgc : g * data.x * g⁻¹ = data.x := by
+    rw [mul_inv_eq_iff_eq_mul]
+    exact Subgroup.mem_centralizer_singleton_iff.mp hgC
+  exact hgL (hNL ▸ hTI g ⟨data.x, hxsharp, by rw [hgc]; exact hxsharp⟩)
+
+/-- An **odd** prime `q` dividing `p² − 1` for an **odd** prime `p` satisfies `q < p`:
+`q ∣ (p+1)(p−1)` splits as `q ∣ p−1` (so `q ≤ p−1 < p`) or `q ∣ p+1`; in the latter case
+`q ≠ p+1` (`p+1` is even, `q` odd), so `q` is a proper divisor: `2q ≤ p+1 < 2p`.  The `q < p`
+conclusion of the (8.3.b)/(8.3.c) prime comparison in Peterfalvi (12.10). -/
+theorem prime_lt_of_odd_dvd_sq_sub_one {p q : ℕ} (hp : p.Prime) (hq : q.Prime)
+    (hp_odd : Odd p) (hq_odd : Odd q) (hdvd : q ∣ p ^ 2 - 1) : q < p := by
+  have hp3 : 3 ≤ p := by
+    have h2 := hp.two_le
+    rcases Nat.lt_or_ge p 3 with h | h
+    · interval_cases p
+      · exact absurd hp_odd (by decide)
+    · exact h
+  have hfac : p ^ 2 - 1 = (p + 1) * (p - 1) := by
+    rw [sq]; exact mul_self_tsub_one p
+  rcases (Nat.Prime.dvd_mul hq).mp (hfac ▸ hdvd) with h | h
+  · -- `q ∣ p + 1`: a proper (odd) divisor of the even `p + 1`, so `2q ≤ p + 1 < 2p`.
+    have hne : q ≠ p + 1 := by
+      intro heq
+      obtain ⟨m, hm⟩ := hq_odd
+      obtain ⟨l, hl⟩ := hp_odd
+      omega
+    obtain ⟨c, hc⟩ := h
+    have hc2 : 2 ≤ c := by
+      rcases Nat.lt_or_ge c 2 with h' | h'
+      · interval_cases c
+        · omega
+        · exact absurd (by omega : q = p + 1) hne
+      · exact h'
+    have h2q : 2 * q ≤ p + 1 := by
+      calc 2 * q ≤ c * q := Nat.mul_le_mul_right q hc2
+        _ = q * c := mul_comm c q
+        _ = p + 1 := hc.symm
+    omega
+  · -- `q ∣ p − 1 < p`.
+    have := Nat.le_of_dvd (by omega) h
+    omega
+
+/-- **(12.10), case (8.3.b) counting core** (type-`F` general form): if the kernel `H` of a
+type-`F` subgroup is **abelian of rank ≤ 2** with `p ∣ |H|`, then every prime `q` dividing `|U|`
+divides `p² − 1`.
+
+Peterfalvi's argument: `q ∣ |U|` gives an order-`q` element of `U` (Cauchy), so
+`q ∣ exp U = exp U₀ ∣ |U₀|` (the `(8.1.c)`/`(8.2.a)` fields) and `U₀` has an element `u` of
+order `q`.  `H U₀` is Frobenius with kernel `H` (`frobenius_HU0`), so the nontrivial cyclic
+`⟨u⟩` (meeting `H` trivially) acts fixed-point-freely on the `⟨u⟩`-invariant subgroup
+`Ω₁(H) ≠ ⊥`, whence `|Ω₁(H)| ≡ 1 (mod q)`
+(`IsFrobeniusGroup.card_modEq_one_of_invariant_le_kernel_ambient`).  As `H` is abelian of rank
+≤ 2, `|Ω₁(H)| = p^k` with `1 ≤ k ≤ 2`, so `q ∣ p^k − 1 ∣ p² − 1`. -/
+theorem _root_.OddOrder.GroupTheory.TypeFData.prime_dvd_sq_sub_one_of_abelian_kernel
+    [Finite G] {M : Subgroup G} (typeF : OddOrder.GroupTheory.TypeFData M)
+    (hab : IsMulCommutative ↥typeF.H) (hrank : OddOrder.GroupTheory.rank ↥typeF.H ≤ 2)
+    {p q : ℕ} [Fact p.Prime] (hq : q.Prime) (hpH : p ∣ Nat.card ↥typeF.H)
+    (hqU : q ∣ Nat.card ↥typeF.U) :
+    q ∣ p ^ 2 - 1 := by
+  classical
+  haveI : Fact q.Prime := ⟨hq⟩
+  haveI : Fintype ↥typeF.U := Fintype.ofFinite _
+  haveI : Fintype ↥typeF.U0 := Fintype.ofFinite _
+  haveI : Fintype ↥typeF.H := Fintype.ofFinite _
+  -- Abelian commutation witness for `Ω₁(H)`.
+  have hcomm : ∀ x ∈ typeF.H, ∀ y ∈ typeF.H, x * y = y * x := fun x hx y hy =>
+    congrArg Subtype.val (hab.is_comm.comm (⟨x, hx⟩ : ↥typeF.H) (⟨y, hy⟩ : ↥typeF.H))
+  set Ω : Subgroup G := OddOrder.GroupTheory.omega1OfAbelian G typeF.H p hcomm with hΩdef
+  -- An order-`q` element `u ∈ U₀` via `q ∣ exp U = exp U₀ ∣ |U₀|`.
+  obtain ⟨u₁, hu₁⟩ := exists_prime_orderOf_dvd_card (G := ↥typeF.U) q
+    (by rwa [← Nat.card_eq_fintype_card])
+  have hqU0 : q ∣ Nat.card ↥typeF.U0 :=
+    ((hu₁ ▸ Monoid.order_dvd_exponent u₁ : q ∣ Monoid.exponent ↥typeF.U).trans
+      (typeF.exponent_eq ▸ dvd_refl _ : Monoid.exponent ↥typeF.U ∣ Monoid.exponent ↥typeF.U0)).trans
+      Group.exponent_dvd_nat_card
+  obtain ⟨u, hu⟩ := exists_prime_orderOf_dvd_card (G := ↥typeF.U0) q
+    (by rwa [← Nat.card_eq_fintype_card])
+  have hu_ord : orderOf ((u : G)) = q := by
+    rw [← hu]
+    exact orderOf_injective typeF.U0.subtype typeF.U0.subtype_injective u
+  have hu_ne : (u : G) ≠ 1 := by
+    intro h1
+    rw [h1, orderOf_one] at hu_ord
+    exact hq.one_lt.ne' hu_ord.symm
+  set A : Subgroup G := Subgroup.zpowers (u : G) with hAdef
+  have hAcard : Nat.card ↥A = q := by rw [hAdef, Nat.card_zpowers, hu_ord]
+  -- `Ω₁(H) ≠ ⊥`: an order-`p` element of `H` (Cauchy at `p ∣ |H|`) lies in it.
+  have hΩne : Ω ≠ ⊥ := by
+    obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card (G := ↥typeF.H) p
+      (by rwa [← Nat.card_eq_fintype_card])
+    have hg_ord : orderOf (g : G) = p := by
+      rw [← hg]
+      exact orderOf_injective typeF.H.subtype typeF.H.subtype_injective g
+    have hgΩ : (g : G) ∈ Ω := ⟨g.2, by rw [← hg_ord]; exact pow_orderOf_eq_one _⟩
+    intro hbot
+    rw [hbot, Subgroup.mem_bot] at hgΩ
+    rw [hgΩ, orderOf_one] at hg_ord
+    exact (Fact.out : p.Prime).one_lt.ne' hg_ord.symm
+  -- `u ∉ H` (complement disjointness), so the prime-order `A = ⟨u⟩` meets `H` trivially.
+  have huH : (u : G) ∉ typeF.H := by
+    intro huH
+    have huU : (u : G) ∈ typeF.U := typeF.U0_le u.2
+    have huM : (u : G) ∈ M := typeF.U_le huU
+    have hmem : (⟨(u : G), huM⟩ : ↥M) ∈ typeF.H.subgroupOf M ⊓ typeF.U.subgroupOf M :=
+      ⟨Subgroup.mem_subgroupOf.mpr huH, Subgroup.mem_subgroupOf.mpr huU⟩
+    rw [typeF.complement.disjoint.eq_bot, Subgroup.mem_bot] at hmem
+    exact hu_ne (congrArg Subtype.val hmem)
+  have hAH : A ⊓ typeF.H = ⊥ := by
+    have hdvd : Nat.card ↥(A ⊓ typeF.H) ∣ q := by
+      rw [← hAcard]
+      exact Subgroup.card_dvd_of_le inf_le_left
+    rcases hq.eq_one_or_self_of_dvd _ hdvd with h1 | hqq
+    · exact Subgroup.card_eq_one.mp h1
+    · exfalso
+      have heq : A ⊓ typeF.H = A :=
+        Subgroup.eq_of_le_of_card_ge inf_le_left (by rw [hAcard, hqq])
+      exact huH ((heq.symm ▸ Subgroup.mem_zpowers (u : G) : (u : G) ∈ A ⊓ typeF.H)).2
+  -- `⟨u⟩` normalizes `Ω₁(H)` (it normalizes `H = M_F ◁ M`).
+  have hAnorm : A ≤ Subgroup.normalizer ((Ω : Subgroup G) : Set G) := by
+    rw [hAdef, Subgroup.zpowers_le]
+    refine OddOrder.GroupTheory.mem_normalizer_omega1OfAbelian ?_
+    have huM : (u : G) ∈ M := typeF.U_le (typeF.U0_le u.2)
+    have hMN : M ≤ Subgroup.normalizer ((typeF.H : Subgroup G) : Set G) := by
+      rw [typeF.H_eq]
+      exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer M
+    exact hMN huM
+  -- Frobenius counting: `|Ω₁(H)| ≡ 1 (mod q)`.
+  have hmod :=
+    OddOrder.GroupTheory.IsFrobeniusGroup.card_modEq_one_of_invariant_le_kernel_ambient
+      (le_sup_left : typeF.H ≤ typeF.H ⊔ typeF.U0) ⟨_, typeF.frobenius_HU0⟩
+      (OddOrder.GroupTheory.omega1OfAbelian_le) hΩne
+      (by rw [hAdef, Subgroup.zpowers_le]; exact Subgroup.mem_sup_right u.2) hAH
+      (by
+        rw [hAdef]
+        intro hbot
+        exact hu_ne (by
+          have := Subgroup.mem_zpowers (u : G)
+          rwa [hbot, Subgroup.mem_bot] at this))
+      hAnorm
+  rw [hAcard] at hmod
+  have hq_dvd : q ∣ Nat.card ↥Ω - 1 :=
+    (Nat.modEq_iff_dvd' Nat.card_pos).mp hmod.symm
+  -- `|Ω₁(H)| = p^k` with `1 ≤ k ≤ 2` (elementary abelian; rank bound).
+  have hΩelem : OddOrder.GroupTheory.IsElementaryAbelian p ↥Ω :=
+    OddOrder.GroupTheory.omega1OfAbelian_isElementaryAbelian
+  obtain ⟨k, hΩcard⟩ : ∃ k, Nat.card ↥Ω = p ^ k := ⟨_, hΩelem.card_eq_pow_finrank⟩
+  have hk1 : 1 ≤ k := by
+    by_contra h0
+    have hk0 : k = 0 := by omega
+    exact hΩne (Subgroup.card_eq_one.mp (by rw [hΩcard, hk0, pow_zero]))
+  have hk2 : k ≤ 2 := by
+    have hsub_elem : (Ω.subgroupOf typeF.H).IsElementaryAbelian p :=
+      OddOrder.GroupTheory.IsElementaryAbelian.of_mulEquiv
+        (Subgroup.subgroupOfEquivOfLe OddOrder.GroupTheory.omega1OfAbelian_le).symm hΩelem
+    have hle := OddOrder.GroupTheory.le_pRank (Ω.subgroupOf typeF.H) hsub_elem
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+        OddOrder.GroupTheory.omega1OfAbelian_le).toEquiv,
+      hΩcard, Nat.log_pow (Fact.out : p.Prime).one_lt] at hle
+    calc k ≤ OddOrder.GroupTheory.pRank ↥typeF.H p := hle
+      _ ≤ OddOrder.GroupTheory.rank ↥typeF.H := OddOrder.GroupTheory.pRank_le_rank p
+      _ ≤ 2 := hrank
+  -- `q ∣ p^k − 1 ∣ p² − 1`.
+  have hdvd_pk : q ∣ p ^ k - 1 := by rw [← hΩcard]; exact hq_dvd
+  have hfac : p ^ 2 - 1 = (p + 1) * (p - 1) := by
+    rw [sq]; exact mul_self_tsub_one p
+  interval_cases k
+  · exact hdvd_pk.trans (by rw [hfac, pow_one]; exact dvd_mul_left _ _)
+  · exact hdvd_pk
+
 /-- **Peterfalvi (12.10) obligation B, minimality core** (pinned sorried §8/(12.8) obligation, hub
 9003 Cluster A): for the type-I witness `L` of (12.9), every Sylow `q`-subgroup of `L` at a prime
 `q` dividing `|U|` (`U =` the complement of `H = L_F`) is **cyclic**.
@@ -5341,19 +5558,74 @@ Peterfalvi's argument: a prime `q ∣ |L/H|` has `q < p` — in case (8.3.c) `q 
 `q < p`.  By the minimality of `p` in (12.8) (no type-I maximal has a noncyclic Sylow `q`-subgroup
 of its `M/M_F` for `q < p`), a Sylow `q`-subgroup of `L` is cyclic.
 
-**Genuinely still-missing**: the (8.3.b/c)/(8.1.c) fixed-point-free-order-`q` facts and the
-(12.8)-minimality transfer to `L`'s Sylow `q`-subgroups are not assembled in reach of S14.  The
-statement is **sound**: it is Peterfalvi's genuine minimality conclusion for the witness `L` (tied
-to `ctr` via `data`), true because every `q ∣ |U|` is `< p` and `p` is minimal.  Constrained to
-primes `q ∣ |U|` (for `q ∤ |U|` the claim is not needed and the witness complement is a `p'`-group,
-so the (8.3)/(12.8) route only speaks about such `q`). -/
+**Assembly** (proven): case (a) of the (8.3) alternative is excluded by
+`witness_H_sharp_not_isTISubset_of_typeI`; case (b) is the counting core
+`TypeFData.prime_dvd_sq_sub_one_of_abelian_kernel` (`q ∣ p² − 1`) followed by
+`prime_lt_of_odd_dvd_sq_sub_one` (`q < p`, using that `p`, `q` are odd); case (c) pairs the
+exponent bound `exp U ∣ p − 1` at the prime `p ∣ |H|` with a Cauchy order-`q` element of `U`.
+With `q < p`, a noncyclic Sylow `q`-subgroup `Q` of `L` would witness `InPi q` (its `L`-image has
+full `q`-order, and `q ∣ [L : L_F] = |U|`), contradicting the (12.8) minimality `minimal_p`. -/
 theorem witness_L_sylow_cyclic_of_dvd_complement [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
     (typeI : TypeIData data.L) {q : ℕ} (hq : q.Prime)
     (hqU : q ∣ Nat.card ↥typeI.typeF.U) (Q : Sylow q ↥data.L) :
     IsCyclic ↥(Q : Subgroup ↥data.L) := by
-  sorry
+  classical
+  haveI : Fact q.Prime := ⟨hq⟩
+  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  -- `P₀ ≤ H`, so `p ∣ |H|`.
+  have hP0H : ctr.P0 ≤ typeI.typeF.H := by
+    rw [typeI.typeF.H_eq]; exact witness_P0_le_kernel hG data
+  have hP0ne : ctr.P0 ≠ ⊥ := fun h => ctr.P0_noncyclic (h ▸ inferInstance)
+  have hpH : ctr.p ∣ Nat.card ↥typeI.typeF.H := by
+    obtain ⟨k, hk⟩ := ctr.P0_pGroup.exists_card_eq
+    have hk0 : k ≠ 0 := by
+      rintro rfl
+      exact hP0ne (Subgroup.card_eq_one.mp (by rw [hk, pow_zero]))
+    exact (dvd_pow_self ctr.p hk0).trans (hk ▸ Subgroup.card_dvd_of_le hP0H)
+  -- `p` and `q` are odd (divisors of the odd `|G|`).
+  have hq_odd : Odd q :=
+    hG.odd.of_dvd_nat (hqU.trans (Subgroup.card_subgroup_dvd_card _))
+  have hp_odd : Odd ctr.p :=
+    hG.odd.of_dvd_nat (hpH.trans (Subgroup.card_subgroup_dvd_card _))
+  -- Step A: `q < p`, by the (8.3) alternative for the type-I witness `L`.
+  have hqp : q < ctr.p := by
+    rcases typeI.alternative with hTI | ⟨hab, hrank⟩ | ⟨hexp, _⟩
+    · exact absurd hTI (witness_H_sharp_not_isTISubset_of_typeI hG data typeI)
+    · exact prime_lt_of_odd_dvd_sq_sub_one ctr.p_prime hq hp_odd hq_odd
+        (typeI.typeF.prime_dvd_sq_sub_one_of_abelian_kernel hab hrank.le hq hpH hqU)
+    · have hpmem : ctr.p ∈ (Nat.card ↥typeI.typeF.H).primeFactors :=
+        Nat.mem_primeFactors.mpr ⟨ctr.p_prime, hpH, Nat.card_pos.ne'⟩
+      haveI : Fintype ↥typeI.typeF.U := Fintype.ofFinite _
+      obtain ⟨u, hu⟩ := exists_prime_orderOf_dvd_card (G := ↥typeI.typeF.U) q
+        (by rwa [← Nat.card_eq_fintype_card])
+      have hqp1 : q ∣ ctr.p - 1 :=
+        (hu ▸ Monoid.order_dvd_exponent u).trans (hexp ctr.p ctr.p_prime hpmem)
+      have hp2 := ctr.p_prime.two_le
+      have := Nat.le_of_dvd (by omega) hqp1
+      omega
+  -- Step B: minimality of `p` (12.8) — a noncyclic Sylow `q` of `L` would put `q ∈ π`.
+  by_contra hnc
+  refine absurd (ctr.minimal_p q hq ⟨data.L, data.L_maximal, ⟨typeI⟩,
+    (Q : Subgroup ↥data.L).map data.L.subtype, Subgroup.map_subtype_le _,
+    Q.2.map data.L.subtype, ?_, ?_, ?_⟩) (not_le.mpr hqp)
+  · -- The image has full `q`-order in `L`: `¬ q ∣ [L : Q]`.
+    rw [Subgroup.relIndex, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective data.L.subtype_injective]
+    exact Q.not_dvd_index
+  · -- Noncyclicity transfers along `Q ≅ Q.map L.subtype`.
+    intro hc
+    haveI := hc
+    exact hnc (isCyclic_of_surjective
+      (Subgroup.equivMapOfInjective (Q : Subgroup ↥data.L) data.L.subtype
+        data.L.subtype_injective).symm.toMonoidHom
+      (Subgroup.equivMapOfInjective (Q : Subgroup ↥data.L) data.L.subtype
+        data.L.subtype_injective).symm.surjective)
+  · -- `q ∣ [L : L_F] = |U|`.
+    rw [← typeI.typeF.H_eq, Subgroup.relIndex, typeI.typeF.complement.symm.index_eq_card,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe typeI.typeF.U_le).toEquiv]
+    exact hqU
 
 /-- **Peterfalvi (12.10) obligation B**: the type-I witness `L`'s complement `U` is a Z-group.
 
@@ -5677,49 +5949,17 @@ yet `g x g⁻¹ = x ∈ H^#`, witnessing the TI failure (`x ∈ H^# ∩ (H^#)^g`
 This is the honest (12.9)/(12.10) prerequisite of the *witness* coherence route: with it,
 `witness_L_coherent` dispatches only through the (b)/(c) cases of (12.6) (which are `sorry`-free),
 never the TI-only case (a) — so the witness coherence depends on this genuine (12.9) fact rather
-than on the (8.18.c) geometry that case (a) (`sibleyTarget_frobI`) transitively needs. -/
+than on the (8.18.c) geometry that case (a) (`sibleyTarget_frobI`) transitively needs.
+
+Specialization of the `TypeIData`-form `witness_H_sharp_not_isTISubset_of_typeI` to the
+Frobenius witness (whose `x ∈ H` route is the upstream `witness_P0_le_kernel`, not (12.11)). -/
 theorem witness_H_sharp_not_isTISubset [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
-    (frob : TypeIFrobeniusData data.L) (hker : frob.kernel_eq_MF) :
+    (frob : TypeIFrobeniusData data.L) :
     ¬ OddOrder.GroupTheory.IsTISubset
         (OddOrder.GroupTheory.sharpSubgroup frob.typeI.typeF.H)
-        (Subgroup.normalizer (frob.typeI.typeF.H : Set G)) := by
-  intro hTI
-  -- `N_G(H) = L` (`H = L_F` self-normalizing at the maximal coatom `L`; simplicity kills `N = ⊤`).
-  have hne : maxNilpotentNormalHall data.L ≠ ⊥ := by
-    rw [← frob.typeI.typeF.H_eq]; exact frob.typeI.typeF.H_nontrivial
-  have hNL : Subgroup.normalizer (frob.typeI.typeF.H : Set G) = data.L := by
-    rw [frob.typeI.typeF.H_eq]
-    have hco : IsCoatom data.L := data.L_maximal
-    have hLleN : data.L ≤ Subgroup.normalizer (maxNilpotentNormalHall data.L : Set G) :=
-      OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer data.L
-    refine (le_antisymm hLleN ?_).symm
-    rcases hLleN.lt_or_eq with hlt | heq
-    · exfalso
-      have hNtop := hco.2 _ hlt
-      haveI hHnormal : (maxNilpotentNormalHall data.L).Normal :=
-        Subgroup.normalizer_eq_top_iff.mp hNtop
-      rcases hG.simple.eq_bot_or_eq_top_of_normal (maxNilpotentNormalHall data.L) hHnormal with
-        hb | ht
-      · exact hne hb
-      · have hle := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le data.L
-        rw [ht] at hle; exact hco.1 (top_le_iff.mp hle)
-    · exact heq.ge
-  -- The rank-two witness `x ∈ H^#` with `C_G(x) ⊄ L`: `x ∈ H = L_F` is `x ∈ M ⊓ L ≤ L_F` by (12.11)
-  -- (`intersection_complement_structure`), with `x ∈ P₀ ≤ M` and `x ∈ P₀ ≤ L_s ≤ L`.
-  have hxH : data.x ∈ frob.typeI.typeF.H := by
-    rw [frob.typeI.typeF.H_eq]
-    exact (intersection_complement_structure hG data).2
-      ⟨ctr.P0_le_M data.x_mem_P0,
-        mainSubgroup_le data.L data.L_type (data.P0_le_Ls data.x_mem_P0)⟩
-  have hxsharp : data.x ∈ OddOrder.GroupTheory.sharpSubgroup frob.typeI.typeF.H :=
-    ⟨hxH, by simpa using data.x_ne_one⟩
-  -- Pick `g ∈ C_G(x) ∖ L`; it centralizes `x`, so `g x g⁻¹ = x ∈ H^#`, yet `g ∉ L = N_G(H)`.
-  obtain ⟨g, hgC, hgL⟩ := SetLike.not_le_iff_exists.mp data.centralizer_x_not_le_L
-  have hgc : g * data.x * g⁻¹ = data.x := by
-    rw [mul_inv_eq_iff_eq_mul]
-    exact Subgroup.mem_centralizer_singleton_iff.mp hgC
-  exact hgL (hNL ▸ hTI g ⟨data.x, hxsharp, by rw [hgc]; exact hxsharp⟩)
+        (Subgroup.normalizer (frob.typeI.typeF.H : Set G)) :=
+  witness_H_sharp_not_isTISubset_of_typeI hG data frob.typeI
 
 /-- **Peterfalvi (12.1) for the witness subgroup `L`, with its Frobenius witness**: the second
 maximal subgroup `L` of (12.9) carries the (12.1) Hypothesis together with an explicit Frobenius
@@ -5741,7 +5981,7 @@ theorem witness_L_hypothesis_frobenius [Finite G] (hG : OddOrder.BG.IsMinimalSim
   · rw [show hyp.H = hyp.typeI.typeF.H from rfl, hH]
     exact frob.frobenius
   · rw [hH]
-    exact witness_H_sharp_not_isTISubset hG data frob hker
+    exact witness_H_sharp_not_isTISubset hG data frob
 
 /-- **Peterfalvi (12.1) Hypothesis for the witness subgroup `L`** (forgetful form of
 `witness_L_hypothesis_frobenius`). -/

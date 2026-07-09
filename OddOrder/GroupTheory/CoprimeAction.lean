@@ -352,6 +352,25 @@ theorem IsFrobeniusGroup.frobeniusGroup_sup_of_invariant_le_kernel_ambient
       ⟨hn_cent, Subgroup.mem_subgroupOf.mpr hnH⟩
     exact hnL_ne (congrArg Subtype.val (Subgroup.mem_bot.mp (hcb.le hn_in)))
 
+/-- **Isaacs Lemma 6.1 for an invariant subgroup of a Frobenius kernel (ambient form)**: in the
+setting of `frobeniusGroup_sup_of_invariant_le_kernel_ambient` — a finite Frobenius group
+`Lsub ≤ G` with kernel `H`, a nontrivial `P ≤ H` normalized by a nontrivial `A ≤ Lsub` meeting the
+kernel trivially — the sub-Frobenius group `P ⋊ A` yields the congruence `|P| ≡ 1 (mod |A|)`.
+
+Reusable counting engine for Peterfalvi's "an order-`q` element acts fixed-point-freely on
+`Ω₁(P)`, hence `q ∣ p^k - 1`" steps ((12.10) case (8.3.b), (12.12)). -/
+theorem IsFrobeniusGroup.card_modEq_one_of_invariant_le_kernel_ambient
+    {G : Type*} [Group G] [Finite G] {Lsub H P A : Subgroup G} (hHL : H ≤ Lsub)
+    (hFrobL : ∃ C : Subgroup ↥Lsub, Ch06.IsFrobeniusGroup ↥Lsub (H.subgroupOf Lsub) C)
+    (hPH : P ≤ H) (hPne : P ≠ ⊥) (hAL : A ≤ Lsub) (hAH : A ⊓ H = ⊥) (hAne : A ≠ ⊥)
+    (hAP : A ≤ Subgroup.normalizer (P : Set G)) :
+    Nat.card ↥P ≡ 1 [MOD Nat.card ↥A] := by
+  have hFrob := IsFrobeniusGroup.frobeniusGroup_sup_of_invariant_le_kernel_ambient
+    hHL hFrobL hPH hPne hAL hAH hAne hAP
+  have h1 := hFrob.card_kernel_modEq_one
+  rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left : P ≤ P ⊔ A)).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right : A ≤ P ⊔ A)).toEquiv] at h1
+
 /-! The fixed-point-free engine `isFrobenius_kernel_eq_bot_of_frobenius_subgroup` (Peterfalvi
 (13.17.b)), which combines `centralizer_inf_kernel_eq_bot_of_not_mem` with Wielandt's formula
 `coprimeFrobeniusAction_card_eq_one`, lives in `OddOrder.GroupTheory.WielandtFixedPoint`
