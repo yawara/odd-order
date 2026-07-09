@@ -315,4 +315,32 @@ theorem caseA_u_le_cyclotomicQuotient [Finite G] {M : Subgroup G} {data : TypesI
   rw [chars.u_eq_card_quotient]
   exact hbound
 
+/-- **Peterfalvi (9.7): the `u`-bound `u ≤ (p^q − 1)/(p − 1)`, unconditionally.**  The Clifford
+dichotomy (`chiefFactor_clifford_U_dichotomy`) splits the `U`-action on the chief factor `H̄`:
+
+* **irreducible** (Galois, case (b)): the Singer-field cyclic bound gives the divisibility
+  `u ∣ (p^q − 1)/(p − 1)` (`chiefFactor_caseB_image_dvd_norm`);
+* **imprimitive** (case (a)): the block-scalar ratio embedding `Ū ↪ ℤ_{p-1}^{q-1}` gives
+  `u ≤ (p−1)^{q−1} ≤ (p^q − 1)/(p − 1)` (`caseA_u_le_cyclotomicQuotient`, via the case-(a)
+  carrier `clifford_caseA_data`).
+
+This is the upstream fact behind Peterfalvi (13.2.c) `basic_structure.u_bound` (issue 9000):
+the §13/§15 consumer instantiates `chars` for the type-P₂ member `S` and cites this bound. -/
+theorem u_le_cyclotomicQuotient [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} (chars : Section11CharacterData data chief) :
+    chars.u ≤ (chief.p ^ data.q - 1) / (chief.p - 1) := by
+  rcases chiefFactor_clifford_U_dichotomy chief with hcaseB | ⟨S₀, hS₀ne, hS₀inv, hS₀card, hirr₀⟩
+  · -- Galois / irreducible (case (b)): the Singer divisibility bound, weakened to `≤`.
+    have hdvd := chiefFactor_caseB_image_dvd_norm chief hcaseB
+    have hpos : 0 < (chief.p ^ data.q - 1) / (chief.p - 1) := by
+      have hp2 := chief.p_prime.two_le
+      have hq1 : 1 ≤ data.q := data.nontrivial.2.1.pos
+      have hle : chief.p ≤ chief.p ^ data.q := Nat.le_self_pow (by omega) _
+      exact Nat.div_pos (by omega) (by omega)
+    rw [chars.u_eq_card_quotient]
+    exact Nat.le_of_dvd hpos hdvd
+  · -- imprimitive (case (a)): the block-scalar bound through the case-(a) carrier.
+    exact caseA_u_le_cyclotomicQuotient chars
+      (clifford_caseA_data chars hS₀ne hS₀inv hS₀card hirr₀)
+
 end OddOrder.Peterfalvi.S11
