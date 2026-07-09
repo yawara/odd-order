@@ -41,3 +41,14 @@ S11_MaximalII_III_IV.lean が ~1500 行以下 (または topic-coherent な複�
 - **sequencing**: 分割は **issue 9000 の dedup (S11 dup 3 定理 retire → generic σ-theory
   leaf cite) の後**に実施する。dedup が S11 内の宣言を削る/差し替えるため、先に split
   すると境界が二度動く。
+
+## 完了 (2026-07-09)
+
+dir 化分割を実施 (issue 0103 方式、lean_split.py による機械分割 + 宣言/namespace 文脈/sorry 保存検証 + full build green):
+  - CharacterCounts.lean (1148 行)
+  - CliffordData.lean (2695 行)
+  - Coherence911.lean (970 行)
+  - CuS0.lean (3011 行)
+  - SummandComplementKernel.lean (4011 行)
+  - ThetaCountAssembly.lean (1097 行)
+  - WielandtSetup.lean (1474 行)
