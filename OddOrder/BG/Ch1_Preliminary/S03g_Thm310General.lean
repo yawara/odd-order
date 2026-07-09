@@ -64,12 +64,10 @@ theorem invariants_normal_eq_bot_or_top_of_isIrreducible
         rw [hgg, map_mul, Module.End.mul_apply, hfix] } with hS
   -- An irreducible representation has only `⊥` and `⊤` as subrepresentations.
   rcases IsSimpleOrder.eq_bot_or_eq_top S with hb | ht
-  · left
-    have h := congrArg Subrepresentation.toSubmodule hb
-    simpa using h
-  · right
-    have h := congrArg Subrepresentation.toSubmodule ht
-    simpa using h
+  · -- `S.toSubmodule` is defeq to the invariants and `(⊥ : Subrepresentation ρ).toSubmodule` to
+    -- `⊥`, so the projected equation is exactly the goal.
+    exact Or.inl (congrArg Subrepresentation.toSubmodule hb)
+  · exact Or.inr (congrArg Subrepresentation.toSubmodule ht)
 
 /-- **BG Theorem 3.10(a)+(b), the induction base case** (mmd L1346 "we can assume that `K` is a
 minimal normal subgroup of `KR`; since `KR` is solvable, this implies that `K` is an elementary
@@ -118,7 +116,7 @@ theorem invariants_lift_map_eq_of_trivial (ρ : Representation F G V) {K₀ : Su
     have hmem : (QuotientGroup.mk' K₀) (s : G) ∈ S.map (QuotientGroup.mk' K₀) :=
       Subgroup.mem_map_of_mem _ s.2
     have hs := h ⟨(QuotientGroup.mk' K₀) (s : G), hmem⟩
-    simp only [MonoidHom.comp_apply, Subgroup.coe_subtype, QuotientGroup.lift_mk'] at hs ⊢
+    simp only [MonoidHom.comp_apply, Subgroup.coe_subtype] at hs ⊢
     exact hs
   · intro h s'
     obtain ⟨g, hgS, hgeq⟩ := s'.2

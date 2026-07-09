@@ -245,7 +245,7 @@ theorem fittingInG_isNilpotent [Finite G] (M : Subgroup G) :
     Group.IsNilpotent ↥(fittingInG M) := by
   rw [fittingInG]
   haveI : Group.IsNilpotent ↥(Ch01.fitting ↥M) := Ch01.fitting.isNilpotent
-  exact nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective (Ch01.fitting ↥M)
+  exact Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective (Ch01.fitting ↥M)
     M.subtype M.subtype_injective)
 
 /-- An element normalizing `N` also normalizes the ambient realization of `F(N)`. -/
@@ -293,7 +293,7 @@ theorem fittingInG_le_fittingInG_of_le_normalizer [Finite G] {N H : Subgroup G}
     exact mem_normalizer_fittingInG_of_mem_normalizer (hHN hx)
   have hFN_nilp_H : Group.IsNilpotent ↥((fittingInG N).subgroupOf H) := by
     haveI : Group.IsNilpotent ↥(fittingInG N) := fittingInG_isNilpotent N
-    exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hFN_H).symm
+    exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hFN_H).symm
   have hSub_le_fitH : (fittingInG N).subgroupOf H ≤ Ch01.fitting ↥H := by
     haveI : ((fittingInG N).subgroupOf H).Normal := hFN_norm_H
     haveI : Group.IsNilpotent ↥((fittingInG N).subgroupOf H) := hFN_nilp_H
@@ -1876,13 +1876,13 @@ theorem opiCoreInG_cFittingInG_singleton_compl_le_opiCoreInG_singleton_compl
     exact inf_le_right
   have hA_nilp : Group.IsNilpotent ↥A := by
     haveI : Group.IsNilpotent ↥(fittingInG M) := fittingInG_isNilpotent M
-    exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hA_le_F)
+    exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hA_le_F)
   have hK_nilp : Group.IsNilpotent ↥K := by
     have hK_A : K ≤ A := by
       dsimp [K]
       exact opiCoreInG_le ({q} : Set ℕ)ᶜ A
     haveI : Group.IsNilpotent ↥A := hA_nilp
-    exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hK_A)
+    exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hK_A)
   refine le_of_sylow_le_of_nilpotent hK_nilp ?_
   intro r
   haveI : Fact (r : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors r.2⟩
@@ -1930,7 +1930,7 @@ theorem opiCoreInG_singleton_cFittingInG_le_centralizer_opiCoreInG_singleton_com
       exact opiCoreInG_le ({p} : Set ℕ)ᶜ (fittingInG H)
     have hK_nilp : Group.IsNilpotent ↥K := by
       haveI : Group.IsNilpotent ↥(fittingInG H) := fittingInG_isNilpotent H
-      exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hK_le_FH)
+      exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hK_le_FH)
     refine le_of_sylow_le_of_nilpotent hK_nilp ?_
     intro r
     haveI : Fact (r : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors r.2⟩
@@ -3136,7 +3136,8 @@ theorem oPiPrimePiCore_singleton_eq_oPiCore_singleton_of_compl_bot
     rw [Subgroup.comap_equiv_eq_map_symm']
     simp only [MulEquiv.symm_symm]
     exact Ch03.oPiCore.map_eq_of_mulEquiv ({p} : Set ℕ) (QuotientGroup.quotientBot (G := X))
-  simpa [Set.compl_setOf] using key _ h
+  -- `oPiPrimePiCore {p} X` unfolds definitionally to the `comap` at `{q | q ∉ {p}} = {p}ᶜ`.
+  exact key _ h
 
 /-- BG 8.1(b), third p-group bridge: when `F(M)` is a `p`-group, `O_{p',p}(M)`,
 viewed in `G`, lies in `F(M)`. -/
@@ -3230,7 +3231,7 @@ theorem sylow_map_mem_range_of_normalizer_le_normalizer [Finite G]
     exact hPH_not_le (le_of_eq h.symm))
   haveI : Group.IsNilpotent ↥(PH : Subgroup G) := PH.isPGroup'.isNilpotent
   have hNC : NormalizerCondition ↥(PH : Subgroup G) :=
-    normalizerCondition_of_isNilpotent (G := ↥(PH : Subgroup G))
+    Group.normalizerCondition_of_isNilpotent (G := ↥(PH : Subgroup G))
   have hSH_subOf_lt_top : SH.subgroupOf (PH : Subgroup G) < ⊤ := by
     rw [lt_top_iff_ne_top]
     intro htop
@@ -3614,8 +3615,8 @@ theorem sylow_map_mem_range_of_fittingInG_isPGroup [Finite G]
   have hcore_bot_compl : Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥M = ⊥ :=
     (Subgroup.map_eq_bot_iff_of_injective
       (Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥M) M.subtype_injective).mp hmap_bot
-  have hcore_bot : Ch03.oPiCore {q | q ≠ p} ↥M = ⊥ := by
-    simpa [Set.compl_setOf] using hcore_bot_compl
+  -- `{q | q ≠ p}` is definitionally `({p} : Set ℕ)ᶜ`.
+  have hcore_bot : Ch03.oPiCore {q | q ≠ p} ↥M = ⊥ := hcore_bot_compl
   have hZ_norm_M : (OddOrder.BG.AppB.zCenterLOdd (P : Subgroup ↥M)).Normal := by
     have h := OddOrder.BG.AppB.zCenter_lOdd_sup_oPiCore_normal hp_odd hsolvM hoddM P
     rwa [hcore_bot, sup_bot_eq] at h
@@ -3998,8 +3999,8 @@ theorem zCenterLOdd_sylow_map_subgroupOf_normal_of_opiCoreInG_singleton_compl_eq
   have hcore_bot_compl : Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥H = ⊥ :=
     (Subgroup.map_eq_bot_iff_of_injective
       (Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥H) H.subtype_injective).mp hmap_bot
-  have hcore_bot : Ch03.oPiCore {q | q ≠ p} ↥H = ⊥ := by
-    simpa [Set.compl_setOf] using hcore_bot_compl
+  -- `{q | q ≠ p}` is definitionally `({p} : Set ℕ)ᶜ`.
+  have hcore_bot : Ch03.oPiCore {q | q ≠ p} ↥H = ⊥ := hcore_bot_compl
   have hZ_norm_H : (OddOrder.BG.AppB.zCenterLOdd (R : Subgroup ↥H)).Normal := by
     have h := OddOrder.BG.AppB.zCenter_lOdd_sup_oPiCore_normal hp_odd hH_solvable hoddH R
     rwa [hcore_bot, sup_bot_eq] at h
@@ -4199,7 +4200,7 @@ theorem lt_inf_normalizer_of_isPGroup_lt [Finite G]
     (hL : IsPGroup p L) (hKL : K < L) :
     K < L ⊓ Subgroup.normalizer (K : Set G) := by
   haveI : Group.IsNilpotent ↥L := hL.isNilpotent
-  have hNC : NormalizerCondition ↥L := normalizerCondition_of_isNilpotent (G := ↥L)
+  have hNC : NormalizerCondition ↥L := Group.normalizerCondition_of_isNilpotent (G := ↥L)
   have hK_le : K ≤ L := le_of_lt hKL
   have hsub_lt_top : K.subgroupOf L < ⊤ := by
     rw [lt_top_iff_ne_top]
