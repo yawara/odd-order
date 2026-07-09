@@ -328,17 +328,31 @@ c は temporary-hold 中 — 必要になった時点で 9000 claim を検討)�
   「全 R(a)=1 + (2.3)」、(8.15) = Hypothesis (2.2)/(4.6)/(5.2) 供給、(8.17) = Thm E citation)。
 
 ### 次 iteration (obligation 1 続き) — τ_S packaging → (4.7) support → T2 家族
-1. **τ_S packaging**: `typeIIDadeHypothesis` → Dade map → `S07.IntegralCharacterMap ↥S G` +
-   zSupportedSpan isometry (engine `uniform_degree_coherence_of_families` の hiso 形)。既存
-   plumbing を探す: S13 caseB template が S04.Hypothesis からどう IntegralCharacterMap を
-   作ったか (dadeIntegralCharacterMap 系、[[lean-dade-map-wrapper-bridging]])。
-2. **(4.7) support lemma (S11 語彙)**: `sOf data chief.H0` 差分の support ⊆ A(S)。lane-b の
-   `sSet_member_support_subset_A` (S15:1142) の証明を S12 語彙で mirror ((1.2) 核 =
-   `S03.irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot` 反対偶 +
-   `support_induce_subset_conjugatesIntoSet` + 上の conj_mem — 全て upstream citable)。
-   H = P = S_σ 同定は `maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II` (landed 済引用)。
-3. T2 = {λ,λ̄,ν,ν̄} 家族の R-data (`certainTypeRImage` / `dadeCharacterDifferenceImageOfDiff`) +
-   hRorth (S13.caseB dispatch の S-再instantiation) → engine 適用。
+1. ~~**τ_S packaging**~~ **DONE (31f31a56)**: `typeIITau` = `S07.dadeIntegralCharacterMap`
+   (typeIIDadeHypothesis + generic (2.6) `fullDadeIsometryData`、hconj = H≡⊥ 自明)。
+   isometry/ZIrr/1-vanish は S07 generic
+   (`dadeIntegralCharacterMap_inner_eq_on_supported_span` / `_mem_ZIrr_of_supported` /
+   `_apply_one_eq_zero`) がこの hyp+hconj で直接効く — wrapper 不要。axiom-clean。
+2. ~~**(4.7) support lemma**~~ **DONE (31f31a56)**: `typeII_sSet_member_support_subset`
+   (member ⊆ A(S)∪{1}、TypesIIIIIIVSetup-generic) + `typeII_sSet_diff_support_subset`
+   (等次数差、engine hsuppdiff 形) + `typeII_sSet_member_diffsupp` ((5.3.a) 共役差、
+   irreducible R-datum 用)。
+3. **T2 = {λ,λ̄,ν,ν̄} 家族の R-data + engine 適用 (次 iteration)**:
+   - **irreducible 側 (λ,λ̄)**: `S07.dadeOrthonormalCharacterImageFamily` (generic、
+     hyp+hconj+irr+non-real+supported) or `dadeCharacterDifferenceImageOfDiff` — 入力は
+     landed (diffsupp ✓)。non-real は `inducedKernelFamily_hasNoRealCharacters`-analog
+     (S11 に sOf 版があるか要確認; M-odd から)。
+   - **reducible 側 (ν,ν̄) が本丸**: R(ν) = `S06.certainTypeR`/`certainTypeRImage` は
+     **S-side Hypothesis46 instance** (S の (4.5) W-pair grid) を要する。M-side は
+     `hyp.base.toHypothesis46 hG hG.odd` が持つが S 版は未構築 — S13 caseB dispatch
+     (`caseB_sOf_memberRFamily(_orthogonal)`) の S-再instantiation とセット。
+     「reducible sOf member = column μ_j」の同定 ((9.8.b)/(9.9.c) 分類) も同所。
+     ⚠ maxHeartbeats 1600000 級の重 elaboration 注意 (S13:1466 前例)。
+   - hRorth: S13 `caseB_sOf_memberRFamily_orthogonal` template の S-mirror。
+   - 代替検討: T2 は 4 元のみゆえ、家族全体 dispatch でなく **per-member 直接構築**
+     (λ: Dade R-datum ✓ / ν: column 同定 → certainTypeR) が軽い可能性。まず
+     「ν が column である」ことの S11-level 供給源 (`caseA/caseB_character_counts` の
+     hbred が ν の deg=qu しか言わない — column 性は §6 経由) を精査してから設計。
 
 ### update⁵ 補遺² — S-side Dade の support-set 選定 (次 iteration の最初の判断)
 - **A₁(S) = S_F^# の TI は即座に取れる**: `TypePNontrivialCore` が kernel-sharp TI を
