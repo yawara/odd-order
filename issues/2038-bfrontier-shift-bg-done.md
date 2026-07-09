@@ -246,3 +246,29 @@ P₀⊆L_F, nilpotent p-core) → **0f61c1ea (per-A core + reduction = intersect
 **次の b-frontier**: (12.11) 全体を閉じるには第1主張 `intersection_complements_K` が要 (lane-a の 8.13.c1)。
 それが埋まれば下流 (12.12 complement E cyclic → 12.14 → 12.16 Dade → 12.17 矛盾) へ。lane-b は本 issue の
 reallocation 議論に該当せず — genuine on-path major result を landing 済。継続。
+
+## ✅✅ (2026-07-09 続、lane-b) — (12.10) minimality core + (8.16) pin + (12.11) 第1主張、3 連 landed
+
+前回の「(12.11) 全体を閉じるには第1主張 (lane-a gated) が要る」を**再診断で覆して完遂**。
+S14 実 sorry 10 → 7 (comment-strip)。3 commits (b47a1c66 / 51a7cbba / 59780cc9):
+
+1. **`witness_L_sylow_cyclic_of_dvd_complement` ((12.10) minimality core) 完全 proven**:
+   (8.3) 3-case → q < p (case a = TI 排除 typeI 形 / case b = Ω₁ FPF counting q|p²−1 /
+   case c = exp(U)|p−1) + (12.8) minimal_p 対偶。reusable infra:
+   `IsFrobeniusGroup.card_modEq_one_of_invariant_le_kernel_ambient` (CoprimeAction) /
+   `mem_normalizer_omega1OfAbelian` (OmegaSubgroup) /
+   `TypeFData.prime_dvd_sq_sub_one_of_abelian_kernel` / `prime_lt_of_odd_dvd_sq_sub_one` (S14)。
+2. **`typeII_centralizer_le_of_mem_mainSubgroup` ((8.16) pin) 完全 proven**: Pf p.48 が
+   Nougat MISSING と判明 → PDF 画像読みで復元 — (8.16) 証明 = 「A₁ 上 (8.6.a) で R(a)=1」。
+   (8.6.a) = TypePNontrivialCore の TI field (既 encode 済) + N_G(L_F)=L で直接。共通 core
+   `typeP_core_centralizer_le_of_mem_fitting` 新設。typeIIIorIV pin は
+   `typeIIIorIV_noncyclic_le_fitting` (P₀⊆L_F reduction、(11.9.c)/(9.7.b) = S13 char gated) に narrow 化。
+3. **`intersection_complements_K` ((12.11) 第1主張 8.13.c1) 完全 proven**: 「lane-a gated」は
+   stale — D(4) tail「N = N_F ⋊ (M∩N)」は proven `signalizer_structure_of_mem_sigmaSharp` の
+   IsComplement' conjunct に既在。singleton 𝓜(C_G(x)) で N=M を pin、M':=L で instantiate。
+   **⟹ (12.11) 全体が own-proof sorry-free**。
+
+**残 S14 sorry 7**: sibleyTarget_frobI (12.3 case a) / typeIIIorIV_noncyclic_le_fitting
+(S13 char gated) / exists_center_omega1_elemAbelian_fpf_of_witness (12.12 — 今回の Ω₁ infra
+で attack 可能見込み) / witness_psi_degree + witness_value_norm_package (12.13-15 char) /
+allTypeI_fittingIsTI + not_nonTypeICovering (P₂-crux gated)。次 = 文書順で (12.12) T-package。
