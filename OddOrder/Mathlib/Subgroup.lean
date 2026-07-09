@@ -10,7 +10,7 @@ import Mathlib.GroupTheory.Coset.Card
 import Mathlib.GroupTheory.Complement
 import Mathlib.GroupTheory.Index
 import Mathlib.GroupTheory.Nilpotent
-import Mathlib.Data.Finite.Card
+import Mathlib.SetTheory.Cardinal.NatCard
 import Mathlib.Data.Setoid.Basic
 import Mathlib.Tactic.Group
 
@@ -163,7 +163,7 @@ theorem centralizer_subgroupOf {S : Subgroup G} (T : Set S) :
   rw [mem_centralizer_iff, mem_subgroupOf, mem_centralizer_iff]
   constructor
   · rintro hs g ⟨t, ht, rfl⟩
-    simpa only [map_mul] using congrArg S.subtype (hs t ht)
+    simpa only [map_mul, subtype_apply] using congrArg S.subtype (hs t ht)
   · intro hs t ht
     apply Subtype.ext
     rw [Subgroup.coe_mul, Subgroup.coe_mul]
@@ -433,7 +433,7 @@ theorem isNilpotent_map {H : Type*} [Group H] (K : Subgroup G) [Group.IsNilpoten
     { toFun := fun k => ⟨f k.1, ⟨k.1, k.2, rfl⟩⟩
       map_one' := Subtype.ext (map_one f)
       map_mul' := fun x y => Subtype.ext (map_mul f x.1 y.1) }
-  exact nilpotent_of_surjective φ (by
+  exact Group.nilpotent_of_surjective φ (by
     rintro ⟨_, x, hx, rfl⟩
     exact ⟨⟨x, hx⟩, rfl⟩)
 

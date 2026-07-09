@@ -231,7 +231,7 @@ lemma exists_mem_normSetE_ne_one [Fact p.Prime]
     (hcard : 2 ≤ (normSetE p q).ncard) :
     ∃ a ∈ normSetE p q, a ≠ 1 := by
   by_contra h
-  push_neg at h
+  push Not at h
   have hsub : normSetE p q ⊆ {1} := fun a ha => h a ha
   have hle : (normSetE p q).ncard ≤ ({1} : Set (GaloisField p q)).ncard :=
     Set.ncard_le_ncard hsub (Set.finite_singleton 1)
@@ -658,7 +658,8 @@ abbrev additiveFieldGroup [Fact p.Prime] := Multiplicative (GaloisField p q)
 noncomputable def normOneMulAction [Fact p.Prime] :
     normOneUnits p q →* MulAut (additiveFieldGroup p q) :=
   (MulAutMultiplicative (GaloisField p q)).symm.toMonoidHom.comp
-    ((AddAut.mulLeft : (GaloisField p q)ˣ →* AddAut (GaloisField p q)).comp
+    ((AddAut.mulLeft :
+        (GaloisField p q)ˣ →* Multiplicative (AddAut (GaloisField p q))).comp
       (normOneUnits p q).subtype)
 
 /-- The concrete Frobenius group `H = P ⋊ U` from BG Appendix C, Lemma C.2, with
@@ -1547,7 +1548,7 @@ lemma exists_rootFree_cubic [Fact p.Prime] (hpodd : Odd p) :
     have := Nat.le_of_dvd (by norm_num) h2cast
     omega
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   choose g hg using hcon
   -- `g c ≠ 0` and `g c ≠ 2`, since `f_c(0) = -1`, `f_c(2) = 1`.
   have hg0 : ∀ c, g c ≠ 0 := by
@@ -1624,7 +1625,7 @@ lemma exists_root_fCubic [Fact p.Prime] (c : ZMod p) (hirr : Irreducible (fCubic
   haveI : NeZero p := ⟨(Fact.out : p.Prime).pos.ne'⟩
   have hne : fCubic p c ≠ 0 := hirr.ne_zero
   haveI : FiniteDimensional (ZMod p) (AdjoinRoot (fCubic p c)) :=
-    FiniteDimensional.of_fintype_basis (AdjoinRoot.powerBasis hne).basis
+    (AdjoinRoot.powerBasis hne).basis.finiteDimensional_of_finite
   haveI : Finite (AdjoinRoot (fCubic p c)) := Module.finite_of_finite (ZMod p)
   haveI : Fintype (AdjoinRoot (fCubic p c)) := Fintype.ofFinite _
   have hfr : Module.finrank (ZMod p) (AdjoinRoot (fCubic p c)) = 3 := by
