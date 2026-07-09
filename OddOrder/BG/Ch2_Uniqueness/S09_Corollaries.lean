@@ -311,7 +311,7 @@ private theorem two_le_rank_inf_centralizer_of_normal_in_overgroup_card_prime_sq
     obtain ⟨y, hy, rfl⟩ := hx
     refine ⟨?_, ?_⟩
     · change (y : G) ∈ Bstar
-      simpa [BP] using hy.1
+      simpa [BP, Subgroup.mem_subgroupOf] using hy.1
     · change (y : G) ∈ Subgroup.centralizer (D : Set G)
       rw [Subgroup.mem_centralizer_iff]
       intro d hd

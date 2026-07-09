@@ -120,10 +120,10 @@ theorem maxNilpotentNormalHall_isNilpotent [Finite G] (M : Subgroup G) :
   haveI : Group.IsNilpotent ↥(OddOrder.Isaacs.Ch01.fitting (↥M)) :=
     OddOrder.Isaacs.Ch01.fitting.isNilpotent
   haveI : Group.IsNilpotent ↥(OddOrder.BG.Ch2.S08.fittingInG M) :=
-    nilpotent_of_mulEquiv
+    Group.nilpotent_of_mulEquiv
       (Subgroup.equivMapOfInjective (OddOrder.Isaacs.Ch01.fitting (↥M)) M.subtype
         M.subtype_injective)
-  exact nilpotent_of_mulEquiv
+  exact Group.nilpotent_of_mulEquiv
     (Subgroup.subgroupOfEquivOfLe (maxNilpotentNormalHall_le_fittingInG M))
 
 /-- **`M_F` absorbs every nilpotent normal Hall subgroup** (`§14`-independent): a subgroup `N ≤ M`
@@ -155,7 +155,7 @@ theorem Msigma_le_maxNilpotentNormalHall_of_nilpotent [Finite G]
   apply le_sSup
   refine ⟨hle, ?_, ?_, ?_⟩
   · rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
-  · exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hle).symm
+  · exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hle).symm
   · obtain ⟨hHcard, hHidx⟩ := OddOrder.BG.Ch3.S10.Msigma_isHall hG hM
     refine ⟨fun q hq => by rwa [hcard] at hq, fun q hq hqπ => ?_⟩
     obtain ⟨hqp, hqd, -⟩ := Nat.mem_primeFactors.mp hq
@@ -363,7 +363,7 @@ nilpotent so `F(M_σ) = M_σ = M_F`) and the `M_F` cyclic ⟹ `F(M)` cyclic step
 theorem fittingInAmbient_eq_self_of_isNilpotent [Finite G] {H : Subgroup G}
     [Group.IsNilpotent ↥H] : fittingInAmbient H = H := by
   haveI : Group.IsNilpotent ↥(⊤ : Subgroup ↥H) :=
-    nilpotent_of_mulEquiv Subgroup.topEquiv.symm
+    Group.nilpotent_of_mulEquiv Subgroup.topEquiv.symm
   have htop : OddOrder.Isaacs.Ch01.fitting ↥H = ⊤ :=
     top_le_iff.mp OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
   show (OddOrder.Isaacs.Ch01.fitting ↥H).map H.subtype = H
@@ -385,7 +385,7 @@ theorem isNilpotent_of_fittingInAmbient_eq_self [Finite G] {H : Subgroup G}
     OddOrder.Isaacs.Ch01.fitting.isNilpotent
   rw [htop] at hnil
   haveI := hnil
-  exact nilpotent_of_mulEquiv Subgroup.topEquiv
+  exact Group.nilpotent_of_mulEquiv Subgroup.topEquiv
 
 /-! ### The Aut-abelian core (`§14`-independent, reusable)
 
@@ -1321,7 +1321,7 @@ theorem typeP_hall_regular_component_at_prime [Finite G]
       have hAmax : IsMaximalElementaryAbelian p A :=
         (isMaximalElementaryAbelian_of_mem_tau2 hG hM Fact.out hpτ2 hAM hA).1
       -- nonabelian Sylow `S' ⊇ SUG`.
-      push_neg at habel
+      push Not at habel
       obtain ⟨S', hSUGS'⟩ := hSUGpg.exists_le_sylow
       have hAS' : A ≤ (S' : Subgroup G) := hASUG.trans hSUGS'
       have hS'nonab : ¬ IsMulCommutative ↥(S' : Subgroup G) := by
@@ -1436,7 +1436,7 @@ theorem typeP_hall_regular_component_at_prime [Finite G]
           (hcardSUG ▸ Group.exponent_dvd_nat_card)
         have hmk : m ≤ k := by
           by_contra hc
-          push_neg at hc
+          push Not at hc
           exact hexpSUGne (by rw [hm, show m = k + 1 by omega, hcardSUG])
         have hfp : ∀ n, (p ^ n).factorization p = n := fun n => by
           rw [Nat.factorization_pow, Finsupp.smul_apply,
@@ -1858,7 +1858,7 @@ theorem centralizer_kappa_inf_fittingInAmbient_ne_bot_of_inputs [Finite G]
     intro hnil
     haveI := hnil
     exact hMσ_not_nil
-      (nilpotent_of_mulEquiv
+      (Group.nilpotent_of_mulEquiv
         (Subgroup.subgroupOfEquivOfLe (OddOrder.BG.Ch3.S10.Msigma_le M)))
   -- normality of `M_σ.subgroupOf M`.
   have hM_le_NMσ :
@@ -2395,7 +2395,6 @@ theorem frattini_factorization [Finite G] {M Q H : Subgroup G}
     rw [Subgroup.subgroupOf, Subgroup.map_comap_eq, Subgroup.range_subtype, inf_of_le_right hH'L]
   have hlift : MulAut.conj q • H = MulAut.conj m⁻¹ • H := by
     have hlifted := congrArg (·.map (Q ⊔ H).subtype) hq'eq
-    simp only at hlifted
     rw [Subgroup.map_map, hintertwine, ← Subgroup.map_map, hmapH, hmapH'] at hlifted
     rw [Subgroup.pointwise_smul_def]
     exact hlifted
@@ -2750,7 +2749,7 @@ theorem mf_centralizer_msigma_decomp [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
   have hX_pi : ∀ p ∈ (Nat.card ↥X).primeFactors, p ∈ (S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ := by
     intro p hp
     rw [Set.mem_compl_iff, Set.mem_union]
-    push_neg
+    push Not
     refine ⟨?_, ?_⟩
     · -- `p ∉ κ(M)`: `X ≤ C`, and `C` is a `κ'`-group.
       have hpC : p ∈ (Nat.card ↥C).primeFactors :=
@@ -2872,7 +2871,7 @@ theorem mf_centralizer_hall_decomp_of_kappaCompl [Finite G]
       p ∈ (S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ := by
     intro p hp
     rw [Set.mem_compl_iff, Set.mem_union]
-    push_neg
+    push Not
     refine ⟨?_, ?_⟩
     · have hpC : p ∈ (Nat.card ↥C).primeFactors :=
         Nat.primeFactors_mono (Subgroup.card_dvd_of_le hX_le_C) Nat.card_pos.ne' hp
@@ -3431,7 +3430,7 @@ theorem isNilpotent_sup_of_commutator_eq_bot {A B : Subgroup G}
   have hrange : f.range = A ⊔ B := by
     rw [hf, MonoidHom.noncommCoprod_range, Subgroup.range_subtype, Subgroup.range_subtype]
   haveI : Group.IsNilpotent ↥(f.range) :=
-    nilpotent_of_surjective f.rangeRestrict f.rangeRestrict_surjective
+    Group.nilpotent_of_surjective f.rangeRestrict f.rangeRestrict_surjective
   exact hrange ▸ this
 
 /-- **`C_Q(D) ⊊ Q` for a non-nilpotent would-be-commuting join** (`§14`-independent, reusable): if
@@ -3706,7 +3705,7 @@ theorem commutator_eq_bot_of_isNilpotent_of_normal_isPGroup
     (hB : q ∉ (Nat.card ↥B).primeFactors) :
     ⁅A, B⁆ = ⊥ := by
   haveI : Group.IsNilpotent ↥(⊤ : Subgroup 𝓗) :=
-    nilpotent_of_mulEquiv Subgroup.topEquiv.symm
+    Group.nilpotent_of_mulEquiv Subgroup.topEquiv.symm
   haveI hOnorm : (opiCoreInG ({q}ᶜ : Set ℕ) (⊤ : Subgroup 𝓗)).Normal :=
     opiCoreInG_normal ({q}ᶜ : Set ℕ)
   -- `B ≤ O_{q′}` (a `q′`-subgroup of a nilpotent group).
@@ -3778,7 +3777,7 @@ theorem isNilpotent_quotient_subgroupOf_of_isNilpotent_map {G : Type*} [Group G]
   haveI : Group.IsNilpotent ↥φ.range := by rw [hrange]; exact hNilp
   have e : ↥H ⧸ N.subgroupOf H ≃* ↥φ.range :=
     (QuotientGroup.quotientMulEquivOfEq hker.symm).trans (QuotientGroup.quotientKerEquivRange φ)
-  exact nilpotent_of_mulEquiv e.symm
+  exact Group.nilpotent_of_mulEquiv e.symm
 
 /-- **Brick B2 core of Theorem 15.2 step 3(ii)** (mmd L4194, regular-action ⟹ nilpotent step):
 if `K₁` (prime order) acts regularly on `DQ₁/Q₀` — the preimage fixed-point-free condition `hFPF`
@@ -3895,7 +3894,7 @@ theorem isNilpotent_DQ1_quotient_of_regular [Finite G]
         inv_inv, mul_assoc] using hmem
   have e : (↥(D ⊔ Q1) ⧸ Q0.subgroupOf (D ⊔ Q1)) ≃* ↥(ψ.range) :=
     (QuotientGroup.quotientMulEquivOfEq hkerψ.symm).trans (QuotientGroup.quotientKerEquivRange ψ)
-  exact nilpotent_of_mulEquiv e.symm
+  exact Group.nilpotent_of_mulEquiv e.symm
 
 /-- **Regular-action ⟹ quotient nilpotent, single-subgroup form** (`§14`-independent, reusable;
 generalises `isNilpotent_DQ1_quotient_of_regular` from `N = D ⊔ Q₁` to an arbitrary `N`).  If a
@@ -4005,7 +4004,7 @@ theorem isNilpotent_quotient_of_regular_general [Finite G]
         inv_inv, mul_assoc] using hmem
   have e : (↥N ⧸ Q0.subgroupOf N) ≃* ↥(ψ.range) :=
     (QuotientGroup.quotientMulEquivOfEq hkerψ.symm).trans (QuotientGroup.quotientKerEquivRange ψ)
-  exact nilpotent_of_mulEquiv e.symm
+  exact Group.nilpotent_of_mulEquiv e.symm
 
 /-- **Brick A "core" of Theorem 15.2 step 3(ii)** (mmd L4194): under the `K*`-condition, the fixed
 points of `k` (with prime-manner action `C_{M_σ}(k) = K*`) inside `D ⊔ Q₁` land in `Q₀`.
@@ -4864,14 +4863,14 @@ theorem msigma_quotient_isNilpotent_of_inputs [Finite G]
 
 /-- **A nilpotent group with trivial `q`-core is a `q'`-group** (`§14`-independent, reusable):
 if `O_q(H) = ⊥` for a finite nilpotent `H`, then `q ∤ |H|`.  The Sylow `q`-subgroup of a nilpotent
-group is normal (`normalizerCondition_of_isNilpotent`), hence equals `O_q(H)`
+group is normal (`Group.normalizerCondition_of_isNilpotent`), hence equals `O_q(H)`
 (`Sylow.eq_opCore_of_normal`); if that is `⊥` then `q ∤ |H|`. -/
 theorem not_dvd_card_of_opCore_eq_bot {H : Type*} [Group H] [Finite H] {q : ℕ} [Fact q.Prime]
     [Group.IsNilpotent H] (hbot : OddOrder.Isaacs.Ch01.opCore q H = ⊥) : ¬ q ∣ Nat.card H := by
   intro hdvd
   obtain ⟨P⟩ := Sylow.nonempty (p := q) (G := H)
   have hPnorm : (P : Subgroup H).Normal :=
-    Sylow.normal_of_normalizerCondition normalizerCondition_of_isNilpotent P
+    Sylow.normal_of_normalizerCondition Group.normalizerCondition_of_isNilpotent P
   have hPcore : (P : Subgroup H) = OddOrder.Isaacs.Ch01.opCore q H :=
     OddOrder.Isaacs.Ch01.Sylow.eq_opCore_of_normal P hPnorm
   exact (OddOrder.Isaacs.Ch07.Sylow.ne_bot_of_dvd_card hdvd P) (hPcore.trans hbot)
@@ -5383,7 +5382,7 @@ theorem centralizer_msigma_quotient_le_fittingInAmbient [Finite G]
   haveI : Group.IsNilpotent ↥Q := hQpg.isNilpotent
   haveI hDSnil : Group.IsNilpotent ↥((D ⊓ S : Subgroup G).subgroupOf D) := inferInstance
   haveI : Group.IsNilpotent ↥(D ⊓ S : Subgroup G) :=
-    nilpotent_of_mulEquiv
+    Group.nilpotent_of_mulEquiv
       (Subgroup.subgroupOfEquivOfLe (inf_le_left : (D ⊓ S : Subgroup G) ≤ D))
   have hcommbot : ⁅Q, (D ⊓ S : Subgroup G)⁆ = ⊥ := by
     rw [Subgroup.commutator_comm]
@@ -5418,7 +5417,7 @@ theorem centralizer_msigma_quotient_le_fittingInAmbient [Finite G]
   haveI hSnormM : (S.subgroupOf M).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer (hSMσ.trans hMσM)).mpr hMnormS
   haveI : Group.IsNilpotent ↥(S.subgroupOf M) :=
-    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe (hSMσ.trans hMσM)).symm
+    Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe (hSMσ.trans hMσM)).symm
   have hSF : S ≤ fittingInAmbient M := by
     calc S = (S.subgroupOf M).map M.subtype := (Subgroup.map_subgroupOf_eq_of_le (hSMσ.trans hMσM)).symm
       _ ≤ (OddOrder.Isaacs.Ch01.fitting ↥M).map M.subtype :=
@@ -5463,8 +5462,12 @@ theorem card_invariants_eq_card_of_fixedPoints {q : ℕ} {H : Type*} [Group H]
   refine forall_congr' (fun r => ?_)
   show ((r : H) • v = v) ↔ ((r : H) • Additive.toMul v = Additive.toMul v)
   constructor
-  · intro h; have := congrArg Additive.toMul h; simpa using this
-  · intro h; apply Additive.toMul.injective; simpa using h
+  · intro h
+    have := congrArg Additive.toMul h
+    rwa [show Additive.toMul ((r : H) • v) = (r : H) • Additive.toMul v from rfl] at this
+  · intro h
+    apply Additive.toMul.injective
+    rwa [show Additive.toMul ((r : H) • v) = (r : H) • Additive.toMul v from rfl]
 
 open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom quotientMulAutHom_apply_mk') in
@@ -5986,7 +5989,7 @@ theorem fittingInAmbient_eq_sup_centralizer_inf_of_inputs [Finite G] {M Q : Subg
 centralizes a normal subgroup `Q ◁ K` is nilpotent whenever the quotient `K/Q` is nilpotent.
 `H ∩ Q` lies in the centre of `H` (since `H` centralizes `Q`), and `H/(H ∩ Q)` embeds in the
 nilpotent `K/Q`, so `H` is a central extension of a nilpotent group, hence nilpotent
-(`isNilpotent_of_ker_le_center` applied to `H → K/Q`).
+(`Subgroup.isNilpotent_of_ker_le_center` applied to `H → K/Q`).
 
 This is the crux of Theorem 15.2(g)'s reverse inclusion: with `K = M_σ`, `Q = O_q(M)`, and
 `H = C_M(Q) ⊆ M_σ`, it shows `C_M(Q)` is nilpotent, hence (being normal in `M`) lands in `F(M)`. -/
@@ -5994,7 +5997,7 @@ theorem isNilpotent_of_centralizes_normal_of_quotient_isNilpotent {Q K H : Subgr
     [(Q.subgroupOf K).Normal] [Group.IsNilpotent (↥K ⧸ Q.subgroupOf K)]
     (hHK : H ≤ K) (hHQ : H ≤ Subgroup.centralizer (Q : Set G)) :
     Group.IsNilpotent ↥H := by
-  refine isNilpotent_of_ker_le_center
+  refine Subgroup.isNilpotent_of_ker_le_center
     ((QuotientGroup.mk' (Q.subgroupOf K)).comp (Subgroup.inclusion hHK)) ?_
   intro x hx
   simp only [MonoidHom.mem_ker, MonoidHom.comp_apply, QuotientGroup.mk'_apply,
@@ -6342,7 +6345,7 @@ theorem centralizer_inf_le_fittingInAmbient_of_le_Msigma [Finite G]
   haveI : ((Subgroup.centralizer (Q : Set G) ⊓ M).subgroupOf M).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer inf_le_right).mpr hMnormC
   haveI : Group.IsNilpotent ↥((Subgroup.centralizer (Q : Set G) ⊓ M).subgroupOf M) :=
-    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe (inf_le_right :
+    Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe (inf_le_right :
       Subgroup.centralizer (Q : Set G) ⊓ M ≤ M)).symm
   -- Nilpotent normal subgroup of `M` lands in `F(M)`.
   calc Subgroup.centralizer (Q : Set G) ⊓ M
@@ -6706,11 +6709,11 @@ theorem opiCoreInG_sigma_fittingInAmbient_eq_fittingInAmbient_Msigma [Finite G]
     -- `N` is nilpotent (subgroup of the nilpotent `F(M)`).
     haveI : Group.IsNilpotent ↥N := by
       haveI : Group.IsNilpotent ↥(fittingInAmbient M) := OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M
-      exact nilpotent_of_mulEquiv
+      exact Group.nilpotent_of_mulEquiv
         (Subgroup.subgroupOfEquivOfLe (OddOrder.GroupTheory.opiCoreInG_le σ (fittingInAmbient M)))
     -- Nilpotent normal subgroup of `M_σ` lands in `F(M_σ)`.
     haveI : Group.IsNilpotent ↥(N.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)) :=
-      nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hN_Mσ).symm
+      Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hN_Mσ).symm
     haveI := hNnorm_Mσ
     calc N = (N.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)).map
               (OddOrder.BG.Ch3.S10.Msigma M).subtype :=
@@ -6757,7 +6760,7 @@ theorem le_fittingInAmbient_of_subgroupOf_normal_of_isNilpotent [Finite G] {M N 
     N ≤ fittingInAmbient M := by
   haveI := hNnorm
   haveI : Group.IsNilpotent ↥(N.subgroupOf M) :=
-    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hNM).symm
+    Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hNM).symm
   calc N = (N.subgroupOf M).map M.subtype := (Subgroup.map_subgroupOf_eq_of_le hNM).symm
     _ ≤ (OddOrder.Isaacs.Ch01.fitting ↥M).map M.subtype :=
         Subgroup.map_mono OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
@@ -7971,9 +7974,9 @@ theorem exists_notMem_inf_conj_fitting_ne_bot_of_not_fittingIsTI {M : Subgroup G
       (fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M : Subgroup G) ≠ ⊥ := by
   rw [FittingIsTI] at hnotTI
   simp only [OddOrder.GroupTheory.IsTISubset] at hnotTI
-  push_neg at hnotTI
+  push Not at hnotTI
   obtain ⟨g, ⟨a, haA, hgaA⟩, hgN⟩ := hnotTI
-  simp only [fittingSharp, sharpSubgroup, Set.mem_diff, SetLike.mem_coe,
+  simp only [fittingSharp, sharpSubgroup, Set.mem_sdiff, SetLike.mem_coe,
     Set.mem_singleton_iff] at haA hgaA
   obtain ⟨haF, _ha1⟩ := haA
   obtain ⟨hgaF, hga1⟩ := hgaA
@@ -8311,7 +8314,7 @@ theorem two_le_pRank_of_comm_isPGroup_not_isCyclic {R : Type*} [Group R] [Finite
   obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hΩpg
   have hk2 : 2 ≤ k := by
     by_contra h
-    push_neg at h
+    push Not at h
     interval_cases k
     · simp only [pow_zero] at hk; rw [hk] at hlt; omega
     · simp only [pow_one] at hk; rw [hk] at hlt; omega
@@ -8402,7 +8405,7 @@ theorem isMulCommutative_mf_inf_centralizer_of_not_le [Finite G]
   haveI hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
   haveI : Group.IsNilpotent ↥(C1.subgroupOf (MF M)) := Subgroup.isNilpotent (C1.subgroupOf (MF M))
   haveI hC1nil : Group.IsNilpotent ↥C1 :=
-    nilpotent_of_surjective (Subgroup.subgroupOfEquivOfLe hC1MF).toMonoidHom
+    Group.nilpotent_of_surjective (Subgroup.subgroupOfEquivOfLe hC1MF).toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hC1MF).surjective
   -- `C1 < ⊤` and `C1` is not uniquely maximal.
   have hC1notU : ¬ OddOrder.GroupTheory.IsUniquelyMaximal C1 :=
@@ -9060,7 +9063,7 @@ theorem derivedInG_le_fittingInAmbient_of_not_fittingIsTI [Finite G]
     rw [heq]; infer_instance
   haveI := OddOrder.BG.Ch3.S10.derivedQuotientMbeta_isNilpotent hG hM
   haveI hM'nil : Group.IsNilpotent ↥(derivedInG M) :=
-    nilpotent_of_mulEquiv ((QuotientGroup.quotientMulEquivOfEq heq).trans QuotientGroup.quotientBot)
+    Group.nilpotent_of_mulEquiv ((QuotientGroup.quotientMulEquivOfEq heq).trans QuotientGroup.quotientBot)
   -- `M'` normal in `M` + nilpotent ⟹ `M' ≤ F(M)`.
   have hid : (derivedInG M).subgroupOf M = commutator ↥M :=
     Subgroup.comap_map_eq_self_of_injective M.subtype_injective (commutator ↥M)
@@ -9362,7 +9365,7 @@ theorem maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2_of_tau2_empty [F
     refine le_maxNilpotentNormalHall hMσM' ?_ ?_ ?_
     · rw [Subgroup.normal_subgroupOf_iff_le_normalizer hMσM']
       exact hM'M.trans ((Subgroup.normal_subgroupOf_iff_le_normalizer hMσM).mp hMσnormM)
-    · exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hMσM').symm
+    · exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hMσM').symm
     · -- `M_σ` Hall in `M'`.
       have hHallM : Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M)
           ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) :=
@@ -9491,7 +9494,7 @@ theorem maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2 [Finite G]
     have hLnorm : ((maxNilpotentNormalHall (derivedInG M)).subgroupOf M).Normal :=
       maxNilpotentNormalHall_subgroupOf_normal_of_le_of_normal hM'M hM'normM
     have hLnil : Group.IsNilpotent ↥((maxNilpotentNormalHall (derivedInG M)).subgroupOf M) :=
-      nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hLM).symm
+      Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hLM).symm
     have hLhall := isHallSubgroup_primeFactors_of_coprime_index hLM hLcopM
     calc maxNilpotentNormalHall (derivedInG M)
         ≤ maxNilpotentNormalHall M := le_maxNilpotentNormalHall hLM hLnorm hLnil hLhall
@@ -9500,7 +9503,7 @@ theorem maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2 [Finite G]
     refine le_maxNilpotentNormalHall hMσM' ?_ ?_ ?_
     · rw [Subgroup.normal_subgroupOf_iff_le_normalizer hMσM']
       exact hM'M.trans ((Subgroup.normal_subgroupOf_iff_le_normalizer hMσM).mp hMσnormM)
-    · exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hMσM').symm
+    · exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hMσM').symm
     · -- `M_σ` Hall in `M'`.
       have hHallM : Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M)
           ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) :=
@@ -11160,7 +11163,7 @@ theorem normalizer_fittingInG_le_self [Finite G]
         show Group.IsNilpotent ↥(OddOrder.BG.Ch2.S08.fittingInG M)
         exact OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M
       haveI : Group.IsNilpotent (↥(⊤ : Subgroup G)) := htop ▸ this
-      haveI : Group.IsNilpotent G := nilpotent_of_mulEquiv Subgroup.topEquiv
+      haveI : Group.IsNilpotent G := Group.nilpotent_of_mulEquiv Subgroup.topEquiv
       exact hG.notSolvable IsNilpotent.to_isSolvable
 
 /-- **`F(M)` fails to be TI once a centralizer of one of its nonidentity elements escapes `M`**

@@ -235,7 +235,7 @@ theorem centralizer_isUniquelyMaximal_of_two_le_rank [Finite G] (hG : IsMinimalS
     le_trans (le_trans hBlog hBea.log_card_le_pRank) (pRank_le_rank p)
   have hCPB_rank : rank ↥(Subgroup.centralizer (B : Set G) ⊓ P) ≤ 2 := by
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     have hCPB_lt : Subgroup.centralizer (B : Set G) ⊓ P < ⊤ :=
       lt_of_le_of_lt (inf_le_right.trans (hP_le_Ma.trans (Malpha_le M))) hMlt
     have hCPB_U : IsUniquelyMaximal (Subgroup.centralizer (B : Set G) ⊓ P) :=

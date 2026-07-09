@@ -95,7 +95,7 @@ theorem lt_normalizer_inf_sylow_of_lt
   classical
   haveI : Group.IsNilpotent ↥(S : Subgroup H) := S.isPGroup'.isNilpotent
   have hNC : NormalizerCondition ↥(S : Subgroup H) :=
-    normalizerCondition_of_isNilpotent (G := ↥(S : Subgroup H))
+    Group.normalizerCondition_of_isNilpotent (G := ↥(S : Subgroup H))
   -- D.subgroupOf S < ⊤.
   have hD_le : D ≤ (S : Subgroup H) := le_of_lt hD_lt
   have hsub_lt_top : D.subgroupOf (S : Subgroup H) < ⊤ := by
@@ -283,10 +283,10 @@ theorem step3_main
       Subgroup.centralizer_closure, Subgroup.sup_eq_closure, Subgroup.closure_le]
     rintro g (hg | hg) <;> rw [SetLike.mem_coe, Subgroup.mem_centralizer_iff] <;>
       rintro h (hh | hh)
-    · exact Subgroup.mul_comm_of_mem_isMulCommutative (H := ZpH) hh hg
+    · exact setLike_mul_comm (s := ZpH) hh hg
     · exact (hcross g hg h hh).symm
     · exact hcross h hh g hg
-    · exact Subgroup.mul_comm_of_mem_isMulCommutative (H := ZqH) hh hg
+    · exact setLike_mul_comm (s := ZqH) hh hg
   haveI hZ_comm : IsMulCommutative Z :=
     Subgroup.le_centralizer_iff_isMulCommutative.mp hZ_le_cent
   haveI hZ_nilp : Group.IsNilpotent ↥Z := inferInstance
@@ -493,7 +493,7 @@ theorem step3_main
   have hA_faithful : Function.Injective φ := by
     by_contra hni
     rw [injective_iff_map_eq_one] at hni
-    push_neg at hni
+    push Not at hni
     obtain ⟨c, hc1, hc_ne⟩ := hni
     refine hZqH_le_Mg_imp_False (hclosure_imp ?_)
     have hfix_top : actionFixedBy φ c = ⊤ := by
@@ -546,7 +546,7 @@ has exactly one type*.
 Combining the partition (`maximal_isPType_or_isQType`, proven) with Step 3
 (`step3_not_both_opCore_ne_bot`, axiom: not both cores nontrivial): a maximal
 subgroup `M ≠ ⊥` of a simple group of order `p^a q^b` is `p`-type **xor**
-`q`-type — exactly one of `IsPType p M`, `IsQType q M` holds.  This `Xor'` form
+`q`-type — exactly one of `IsPType p M`, `IsQType q M` holds.  This `Xor` form
 is the precise statement used throughout Steps 5-9. -/
 theorem maximal_isPType_xor_isQType
     {H : Type*} [Group H] [Finite H] [IsSimpleGroup H] {p q : ℕ}
@@ -554,7 +554,7 @@ theorem maximal_isPType_xor_isQType
     {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
     (hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → IsSolvable K)
     {M : Subgroup H} (hM_max : IsCoatom M) (hM_ne_bot : M ≠ ⊥) :
-    Xor' (IsPType p M) (IsQType q M) := by
+    Xor (IsPType p M) (IsQType q M) := by
   -- At least one type (partition).
   have h_or : IsPType p M ∨ IsQType q M :=
     maximal_isPType_or_isQType hpq hH_card hM_max hM_ne_bot (hSubgroupsSolvable M hM_max.1)
@@ -709,6 +709,7 @@ theorem step4_qCentral_normalizes_no_pCentral
     {x : H} (hx_pcentral : IsPCentral p x) (hx_mem : x ∈ V) :
     False := by
   classical
+  letI : Fintype (Subgroup H) := Fintype.ofFinite _
   have hp_prime : p.Prime := Fact.out
   have hq_prime : q.Prime := Fact.out
   obtain ⟨hp_dvd, hq_dvd⟩ :=
@@ -1721,7 +1722,7 @@ theorem step8_sylow_full
   -- Work inside `↥PH`: `SH.subgroupOf PH < ⊤`.
   haveI : Group.IsNilpotent ↥(PH : Subgroup H) := PH.isPGroup'.isNilpotent
   have hNC : NormalizerCondition ↥(PH : Subgroup H) :=
-    normalizerCondition_of_isNilpotent (G := ↥(PH : Subgroup H))
+    Group.normalizerCondition_of_isNilpotent (G := ↥(PH : Subgroup H))
   have hSH_subOf_lt_top : SH.subgroupOf (PH : Subgroup H) < ⊤ := by
     rw [lt_top_iff_ne_top]
     intro htop
@@ -1983,6 +1984,7 @@ theorem step9_core
       (Subgroup.thompsonJ (S : Subgroup ↥M) p).Normal) :
     False := by
   classical
+  letI : Fintype (Sylow p H) := Fintype.ofFinite _
   have hp_prime : p.Prime := Fact.out
   have hq_prime : q.Prime := Fact.out
   obtain ⟨hp_dvd, hq_dvd⟩ :=

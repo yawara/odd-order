@@ -110,7 +110,9 @@ theorem IsIrreducible.comp_mulEquiv
       congrArg Subrepresentation.toSubmodule hbot
     have hρbot : (⊥ : Subrepresentation ρ) = ⊤ := by
       apply Subrepresentation.toSubmodule_injective
-      simpa using hsub
+      -- `(⊥/⊤ : Subrepresentation _).toSubmodule` is `⊥/⊤ : Submodule k V` by `rfl` for
+      -- both `ρ` and `ρ.comp e.toMonoidHom`, so `hsub` closes the goal definitionally.
+      exact hsub
     exact IsSimpleOrder.bot_ne_top hρbot
   · intro W
     let Wρ : Subrepresentation ρ := {
@@ -121,10 +123,12 @@ theorem IsIrreducible.comp_mulEquiv
     rcases IsSimpleOrder.eq_bot_or_eq_top Wρ with hbot | htop
     · left
       apply Subrepresentation.toSubmodule_injective
-      simpa [Wρ] using congrArg (fun X : Subrepresentation ρ => X.toSubmodule) hbot
+      -- `Wρ.toSubmodule = W.toSubmodule` and `(⊥ : Subrepresentation _).toSubmodule = ⊥`
+      -- both hold by `rfl`, so the `congrArg` proof closes the goal definitionally.
+      exact congrArg (fun X : Subrepresentation ρ => X.toSubmodule) hbot
     · right
       apply Subrepresentation.toSubmodule_injective
-      simpa [Wρ] using congrArg (fun X : Subrepresentation ρ => X.toSubmodule) htop
+      exact congrArg (fun X : Subrepresentation ρ => X.toSubmodule) htop
 
 end Representation
 

@@ -2514,7 +2514,7 @@ private theorem commutatorElement_mul_left_eq_of_commute_right_of_central
     ⁅t * x, y⁆ = ⁅x, y⁆ := by
   rw [commutatorElement_def, commutatorElement_def]
   have ht_comm : Commute t (x * y * x⁻¹ * y⁻¹) := by
-    simpa [commutatorElement_def] using Subgroup.mem_center_iff.mp hcen t
+    simpa [commute_iff_eq, commutatorElement_def] using Subgroup.mem_center_iff.mp hcen t
   calc
     (t * x) * y * (t * x)⁻¹ * y⁻¹
         = t * x * y * (x⁻¹ * t⁻¹) * y⁻¹ := by
@@ -2940,7 +2940,9 @@ theorem blackburnRankTwoClassification
       isAInvariant_subgroupOf_restrict hS_inv hT_inv
     let φST : A →* MulAut (S ⧸ Tsub) := quotientMulAutHom hTsub_inv
     have hφST_qy : (φST a) qy = qy ^ jℤ := by
-      simpa [φST, qy, φyS, IsAInvariant.restrict_apply_val] using hφy_quot_eq
+      have hres : (hS_inv.restrict a) yS = φyS :=
+        Subtype.ext (IsAInvariant.restrict_apply_val hS_inv a yS)
+      simpa [φST, qy, hres] using hφy_quot_eq
     have hφST_ne_one : φST a ≠ 1 := by
       intro htriv
       let s0S : S := ⟨s0, hs0S⟩
@@ -2950,7 +2952,9 @@ theorem blackburnRankTwoClassification
             QuotientGroup.mk' Tsub s0S := by
         have happ := congrArg
           (fun σ : MulAut (S ⧸ Tsub) => σ (QuotientGroup.mk' Tsub s0S)) htriv
-        simpa [φST, s0S, φs0S, IsAInvariant.restrict_apply_val] using happ
+        have hres : (hS_inv.restrict a) s0S = φs0S :=
+          Subtype.ext (IsAInvariant.restrict_apply_val hS_inv a s0S)
+        simpa [φST, hres] using happ
       have hdiv : φs0S / s0S ∈ Tsub := QuotientGroup.eq_iff_div_mem.mp hquot_s0
       exact hs0T (by
         simpa [div_eq_mul_inv, s0S, φs0S] using Subgroup.mem_subgroupOf.mp hdiv)

@@ -79,7 +79,7 @@ theorem E3_not_regular_consequences [Finite G] (hG : IsMinimalSimpleOdd G)
   -- From `¬reg` and `E₃` prime on `M_σ`: some `x ∈ E₃#` has `C_{M_σ}(x) ≠ 1`.
   have hxex : ∃ x ∈ E₃, x ≠ 1 ∧ S10.Msigma M ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ := by
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     exact hreg (fun x hxE3 hx1 => by rw [fixedByElement_def]; exact hcon x hxE3 hx1)
   obtain ⟨x, hxE3, hxne, hxC⟩ := hxex
   -- `τ₂(M)` empty (`E₂ = ⊥`): an `A ∈ ℰ_p²(E)` with `p ∈ τ₂` would force `C_{M_σ}(x) = 1`.
@@ -122,7 +122,7 @@ theorem E3_not_regular_consequences [Finite G] (hG : IsMinimalSimpleOdd G)
       intro e he; rw [Subgroup.mem_centralizer_iff]; intro u hu
       rw [Set.mem_singleton_iff.mp hu]
       exact (Subgroup.mem_centralizer_iff.mp hgCE3 e he).symm
-    rw [ActsRegularlyOn]; push_neg
+    rw [ActsRegularlyOn]; push Not
     refine ⟨(g : G), g.2, hg1, ?_⟩
     rw [fixedByElement_def]
     intro hbot

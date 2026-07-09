@@ -231,10 +231,10 @@ theorem prime_card_and_finrank_of_elemAbelian {p : ℕ} [Fact p.Prime]
     constructor
     · intro h
       have := congrArg Additive.toMul h
-      simpa using this
+      rwa [show Additive.toMul ((g : H) • v) = (g : H) • Additive.toMul v from rfl] at this
     · intro h
       apply Additive.toMul.injective
-      simpa using h
+      rwa [show Additive.toMul ((g : H) • v) = (g : H) • Additive.toMul v from rfl]
   -- (hCK0) `C_V(K) = 0` over `ZMod p`.
   have hCK0 : Representation.invariants (ρ.comp K.subtype) = ⊥ := by
     ext v

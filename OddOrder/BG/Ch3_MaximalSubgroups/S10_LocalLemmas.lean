@@ -1085,7 +1085,7 @@ theorem nonabelian_pSubgroup_rankTwo_elemAbelian_structure [Finite G]
       Subgroup.subgroupOf_eq_top.mp htop
     exact hPnonab ⟨⟨fun a b => Subtype.ext (hCPab _ (hPle a.2) _ (hPle b.2))⟩⟩
   haveI : Group.IsNilpotent ↥P := hPp.isNilpotent
-  have hgrow := normalizerCondition_of_isNilpotent (G := ↥P)
+  have hgrow := Group.normalizerCondition_of_isNilpotent (G := ↥P)
     ((Subgroup.centralizer (A : Set G) ⊓ P).subgroupOf P) hCPlt
   obtain ⟨w, hwN, hwC⟩ := SetLike.exists_of_lt hgrow
   -- `A` is exactly the set of exponent-`p` elements of `C_P(A)`

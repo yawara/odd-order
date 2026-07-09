@@ -525,7 +525,7 @@ theorem E_le_normalizer_sylow_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOd
   haveI : Group.IsNilpotent ↥(Ch2.S08.fittingInG E) := Ch2.S08.fittingInG_isNilpotent E
   set SF : Sylow p ↥(Ch2.S08.fittingInG E) := S.subtype hSFE with hSFdef
   have hSF_norm : (SF : Subgroup ↥(Ch2.S08.fittingInG E)).Normal := by
-    have htfae := (isNilpotent_of_finite_tfae (G := ↥(Ch2.S08.fittingInG E))).out 0 3
+    have htfae := (Group.isNilpotent_of_finite_tfae (G := ↥(Ch2.S08.fittingInG E))).out 0 3
     exact htfae.mp inferInstance p ⟨Fact.out⟩ SF
   haveI : (SF : Subgroup ↥(Ch2.S08.fittingInG E)).Characteristic :=
     Sylow.characteristic_of_normal SF hSF_norm
@@ -964,7 +964,7 @@ theorem exists_partial_centralizer_of_abelianSylow [Finite G] (hG : IsMinimalSim
   have hEQ : E ⊓ Q = Q₁ :=
     hQ₁maxE (E ⊓ Q) (le_inf hQ₁E hQ₁Q) inf_le_left (hQpg.to_le inf_le_right)
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   -- regularity of `Q` on `S` modulo `C_G(S)`.
   have hreg' : ∀ x ∈ Q, x ∉ Subgroup.centralizer ((S : Subgroup G) : Set G) →
       (S : Subgroup G) ⊓ Subgroup.centralizer ({x} : Set G) = ⊥ := by

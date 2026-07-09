@@ -204,7 +204,8 @@ theorem caseB_column_mapagree
           - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj) := by
   rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq]
   exact (hyp.dade0_map_eq_tau_of_support h46
-    (OddOrder.Peterfalvi.S06.columnDiff_support_subset h46 hχ₂ (inv_ne_one.mpr hχ₂)
+    (OddOrder.Peterfalvi.S06.columnDiff_support_subset h46 hχ₂
+      ((inv_ne_one (a := χ₂)).mpr hχ₂)
       (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm)).symm
 
 /-- **(6.8.2.3) raw `X ⊥ Y`, per certain-type constituent** — Peterfalvi (4.1), source level.
@@ -328,7 +329,8 @@ theorem caseB_column_hSdiff
   simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
   rcases hs with rfl | rfl
   · rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq]
-    exact OddOrder.Peterfalvi.S06.columnDiff_support_subset h46 hχ₂ (inv_ne_one.mpr hχ₂)
+    exact OddOrder.Peterfalvi.S06.columnDiff_support_subset h46 hχ₂
+      ((inv_ne_one (a := χ₂)).mpr hχ₂)
       (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm
   · exact caseB_column_sub_smul_support hyp h46 hHK hη₁ χ₂ a h1
 
@@ -600,6 +602,7 @@ theorem caseB_irr_conj_inner
     intro heq
     apply hnonreal
     have h2 := congrArg (fun c : IrreducibleCharacter ↥L => (c : ClassFunction ↥L ℂ)) heq
+    show Φ.conj = Φ
     simpa using h2.symm
   have hkron := irreducibleCharacter_inner_eq_ite (⟨Φ, hirr1⟩ : IrreducibleCharacter ↥L)
     (⟨Φ.conj, hirr1.conj⟩ : IrreducibleCharacter ↥L)
@@ -1749,6 +1752,7 @@ noncomputable def adjoin_irr_nonreal_of_supportedDecomposition
     intro heq
     apply hχnonreal
     have h2 := congrArg (fun c : IrreducibleCharacter ↥L => (c : ClassFunction ↥L ℂ)) heq
+    show χ.conj = χ
     simpa using h2.symm
   have hχχbar : ClassFunction.inner χ χ.conj = 0 := by
     have h := irreducibleCharacter_inner_eq_ite (⟨χ, hχirr⟩ : IrreducibleCharacter ↥L)

@@ -716,7 +716,7 @@ theorem coherent_of_maximal_coherent_pair_refuted
     rcases Set.eq_empty_or_nonempty (S \ S₂) with he | hne
     · exact absurd (Set.Subset.antisymm hS₂S (fun ψ hψ => by
         by_contra hψ₂
-        exact Set.notMem_empty ψ (he ▸ Set.mem_diff_of_mem hψ hψ₂))) hS₂ne
+        exact Set.notMem_empty ψ (he ▸ Set.mem_sdiff_of_mem hψ hψ₂))) hS₂ne
     · exact hne
   refine hrefute S₂ hS₁S₂ hS₂S hS₂conj hS₂coh hS₃ne ?_
   rintro χ ⟨hχS, hχS₂⟩ ⟨hcoh'⟩

@@ -146,17 +146,18 @@ elementary abelian `p`-群 `E` の自己同型群が `F_p`-ベクトル空間 `A
 `GL(Fin n, ZMod p)` へ移る. -/
 
 /-- The automorphism group of a `ZMod p`-module `M` (as an additive group) is multiplicatively
-equivalent to the group of `ZMod p`-linear automorphisms of `M`.
+equivalent to the group of `ZMod p`-linear automorphisms of `M`. (`AddAut M` is an *additive*
+group in mathlib, so its multiplicative incarnation is `Multiplicative (AddAut M)`.)
 
 Every additive automorphism of `M` is automatically `ZMod p`-linear, because an additive map
 preserves the `ZMod p`-scalar action (`ZMod.map_smul`): the action `c • x` is determined by the
 group structure (`c • x = (c.val) • x` as an iterated sum), which any `AddMonoidHom` respects. -/
 noncomputable def AddAut.toZModLinearEquiv {p : ℕ} {M : Type*}
     [AddCommGroup M] [Module (ZMod p) M] :
-    AddAut M ≃* (M ≃ₗ[ZMod p] M) where
-  toFun e := { e with map_smul' := ZMod.map_smul e.toAddMonoidHom }
-  invFun e := { e.toAddEquiv with }
-  left_inv _ := by ext; rfl
+    Multiplicative (AddAut M) ≃* (M ≃ₗ[ZMod p] M) where
+  toFun e := { e.toAdd with map_smul' := ZMod.map_smul e.toAdd.toAddMonoidHom }
+  invFun e := Multiplicative.ofAdd { e.toAddEquiv with }
+  left_inv _ := rfl
   right_inv _ := by ext; rfl
   map_mul' _ _ := by ext; rfl
 
@@ -171,7 +172,7 @@ shared module argument. The `Additive E`-specific form is obtained in
 `IsElementaryAbelian.mulAutEquivGeneralLinearGroup` by composing with `AddAutAdditive`. -/
 noncomputable def IsElementaryAbelian.addAutEquivGL {p : ℕ} [Fact p.Prime] {M : Type*}
     [AddCommGroup M] [Module (ZMod p) M] [Finite M] :
-    AddAut M ≃* GL (Fin (Module.finrank (ZMod p) M)) (ZMod p) := by
+    Multiplicative (AddAut M) ≃* GL (Fin (Module.finrank (ZMod p) M)) (ZMod p) := by
   haveI : Module.Finite (ZMod p) M := Module.Finite.of_finite
   let b : Module.Basis (Fin (Module.finrank (ZMod p) M)) (ZMod p) M :=
     Module.finBasisOfFinrankEq (ZMod p) M rfl
@@ -185,7 +186,8 @@ noncomputable def IsElementaryAbelian.addAutEquivGL {p : ℕ} [Fact p.Prime] {M 
 This is the standard bridge underlying BG Lem 4.13 and Thm 4.16: viewing `E` additively as an
 `F_p`-vector space, `MulAut E` is multiplicatively equivalent to the general linear group of
 dimension `m(E)` over `F_p`. The multiplicativity is honest (no anti-homomorphism flip): the
-`AddAutAdditive` leg is a genuine `≃*` in the direction `AddAut (Additive E) → MulAut E`. -/
+`AddAutAdditive` leg is a genuine `≃+` in the direction `AddAut (Additive E) → Additive (MulAut E)`,
+transported to a `≃*` by `AddEquiv.toMultiplicativeLeft`. -/
 noncomputable def IsElementaryAbelian.mulAutEquivGeneralLinearGroup
     {p : ℕ} {E : Type*} [Group E] [Finite E] [Fact p.Prime]
     (hE : IsElementaryAbelian p E) :
@@ -196,7 +198,10 @@ noncomputable def IsElementaryAbelian.mulAutEquivGeneralLinearGroup
   letI : IsMulCommutative E := IsMulCommutative.of_comm hE.comm
   letI := hE.zmodModule
   haveI : Finite (Additive E) := inferInstanceAs (Finite E)
-  exact (AddAutAdditive (G := E)).symm.trans IsElementaryAbelian.addAutEquivGL
+  -- `AddAutAdditive : AddAut (Additive E) ≃+ Additive (MulAut E)`;
+  -- `AddEquiv.toMultiplicativeLeft` turns it into `Multiplicative (AddAut (Additive E)) ≃* MulAut E`.
+  exact (AddEquiv.toMultiplicativeLeft (AddAutAdditive (G := E))).symm.trans
+    IsElementaryAbelian.addAutEquivGL
 
 /-- **`|Aut(E)| = ∏ (pⁿ - pⁱ)`** for an elementary abelian `p`-group `E` (`p` prime), where
 `n = m(E) = finrank (ZMod p) (Additive E)`.
@@ -227,10 +232,10 @@ theorem card_le_prime_of_isPGroup_of_not_sq_dvd {G : Type*} [Group G] [Finite G]
   obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hK
   rw [hk]
   by_contra hlt
-  push_neg at hlt
+  push Not at hlt
   have hk2 : 2 ≤ k := by
     by_contra h
-    push_neg at h
+    push Not at h
     have hle : p ^ k ≤ p := by
       calc p ^ k ≤ p ^ 1 := Nat.pow_le_pow_right (Fact.out : p.Prime).one_lt.le (by omega)
         _ = p := pow_one p

@@ -229,9 +229,9 @@ theorem centralizer_fitting_le_fitting
   have hquot_mul_comm : ∀ x y : K ⧸ N, x * y = y * x :=
     (Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr hcomm_K_le_N).is_comm.comm
   haveI hquot_nilpotent : Group.IsNilpotent (K ⧸ N) := by
-    rw [nilpotent_iff_lowerCentralSeries]
+    rw [Subgroup.nilpotent_iff_lowerCentralSeries]
     refine ⟨1, ?_⟩
-    rw [lowerCentralSeries_one, commutator_eq_bot_iff_center_eq_top, eq_top_iff]
+    rw [Subgroup.top_lowerCentralSeries_one, commutator_eq_bot_iff_center_eq_top, eq_top_iff]
     intro q _
     rw [Subgroup.mem_center_iff]
     intro r
@@ -240,7 +240,7 @@ theorem centralizer_fitting_le_fitting
     rw [QuotientGroup.ker_mk']
     exact hN_le_center
   haveI hK_nilpotent : Group.IsNilpotent K :=
-    isNilpotent_of_ker_le_center (QuotientGroup.mk' N) hker_le_center
+    Subgroup.isNilpotent_of_ker_le_center (QuotientGroup.mk' N) hker_le_center
   have hK_le_fitting : K ≤ OddOrder.Isaacs.Ch01.fitting G :=
     OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
   apply hK_not_le_F
@@ -308,7 +308,7 @@ private theorem isNilpotent_subgroup_map
     { toFun := fun k => ⟨f k.1, ⟨k.1, k.2, rfl⟩⟩
       map_one' := Subtype.ext (map_one f)
       map_mul' := fun x y => Subtype.ext (map_mul f x.1 y.1) }
-  exact nilpotent_of_surjective φ (by
+  exact Group.nilpotent_of_surjective φ (by
     rintro ⟨_, x, hx, rfl⟩
     exact ⟨⟨x, hx⟩, rfl⟩)
 
@@ -496,7 +496,7 @@ theorem chiefFactorCentralizer_subset_le_fitting_of_isSolvable
       OddOrder.GroupTheory.isNilpotent_of_chief_factor_centralization h_central
     -- `K.subgroupOf G* ⊴ G*` is nilpotent (via `subgroupOfEquivOfLe`), so it is `≤ F(G*)`.
     have hK_subg_nilp : Group.IsNilpotent ↥(K.subgroupOf Gstar) :=
-      nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hK_le_Gstar).symm
+      Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hK_le_Gstar).symm
     have hK_subg_le_fitting :
         K.subgroupOf Gstar ≤ OddOrder.Isaacs.Ch01.fitting Gstar :=
       OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
@@ -1988,7 +1988,7 @@ theorem coprime_nilpotent_acts_trivially_of_centralizer_self
   have hNCeqC : Subgroup.normalizer (C : Set G) = C := le_antisymm hNC_le_C hC_le_NC
   have hC_top : C = ⊤ :=
     (normalizerCondition_iff_only_full_group_self_normalizing.mp
-      normalizerCondition_of_isNilpotent) C hNCeqC
+      Group.normalizerCondition_of_isNilpotent) C hNCeqC
   intro a g
   have hmem : g ∈ C := hC_top ▸ Subgroup.mem_top g
   rw [hC, Subgroup.mem_fixedPointsOfMulAut] at hmem

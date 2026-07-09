@@ -187,7 +187,7 @@ theorem six_three_index_bound_c2 (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     Nat.le_of_dvd Nat.card_pos (Subgroup.index_dvd_of_le (Subgroup.subgroupOf_mono H hAH₁))
   refine six_three_HH1_le (LK := H.index) (KH := 1) (HA := Nat.card (↥H ⧸ A.subgroupOf H))
     (HH1 := Nat.card (↥H ⧸ H₁.subgroupOf H)) (by norm_num) hHH1le ?_
-  simpa using hsixtwo
+  simpa [Subgroup.index_eq_card] using hsixtwo
 
 /-- **Peterfalvi (6.3), case (c2)** (`six_three` analogue, `hW2B`-free).  The minimal-`A` induction:
 for `M ≤ H₁ ≤ ⁅H,H⁆` with `S(H₁)` coherent and `4|L:K|²+1 < |H:H₁|`, `S(M)` is coherent.  Mirror of

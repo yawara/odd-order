@@ -278,7 +278,7 @@ theorem exists_maxElemAbelianIn_not_le_of_thompsonJ_not_le
     (h : ¬ Subgroup.thompsonJ P p ≤ X) :
     ∃ E ∈ Subgroup.maxElemAbelianIn P p, ¬ E ≤ X := by
   by_contra h_all
-  push_neg at h_all
+  push Not at h_all
   exact h ((thompsonJ_le_iff P X p).mpr h_all)
 
 /-- The image of an elementary abelian subgroup under a group hom is

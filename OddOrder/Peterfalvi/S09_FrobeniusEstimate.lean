@@ -171,7 +171,7 @@ theorem hzeta0nu [Fintype G] [Invertible (Nat.card G : ℂ)]
     rw [one_smul] at hds
     intro x hx
     have hxd := hds hx
-    rw [Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff] at hxd
+    rw [Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff] at hxd
     exact (mem_supportInSubgroup_sharp_subgroupOf_iff (F.H i) hAH x).mpr ⟨hxd.1, hxd.2⟩
   -- The Dade `⊥ 1_G` transport and `ℂ`-linearity of `τ = sib.tau`.
   have htau1 : ∀ φ : ClassFunction ↥(F.L i) ℂ,
@@ -309,7 +309,7 @@ theorem zetaNuRhoNormSq_ge [Fintype G] [Invertible (Nat.card G : ℂ)]
     intro j
     refine (induce_diff_support (θ j) (θ 0) (d j) (hdeg j)).trans ?_
     intro x hx
-    rw [Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff] at hx
+    rw [Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff] at hx
     exact (mem_supportInSubgroup_sharp_subgroupOf_iff (F.H i) hAH x).mpr ⟨hx.1, hx.2⟩
   have hnu_isometry : ∀ a b : Fin (n + 1), a ≠ ind1H → b ≠ ind1H →
       ClassFunction.inner (coh.extension

@@ -133,14 +133,14 @@ theorem fixes_components_of_permutes_indep
     exact eq_mul_inv_iff_mul_eq.mpr
       ((mul_comm ((φ x) b) ((φ x) a)).trans (hprod.trans (mul_comm a b)))
   have hσi_cases : σi = i ∨ σi = j := by
-    by_contra hc; push_neg at hc
+    by_contra hc; push Not at hc
     refine hxa1 (hkill _ σi i j σj hxa_mem ?_ hc.1 hc.2 hσ_ne)
     rw [hxa_eq]
     exact mul_mem (mul_mem (Subgroup.mem_sup_left (Subgroup.mem_sup_left ha))
       (Subgroup.mem_sup_left (Subgroup.mem_sup_right hb)))
       (Subgroup.mem_sup_right (inv_mem hxb_mem))
   have hσj_cases : σj = i ∨ σj = j := by
-    by_contra hc; push_neg at hc
+    by_contra hc; push Not at hc
     refine hxb1 (hkill _ σj i j σi hxb_mem ?_ hc.1 hc.2 (Ne.symm hσ_ne))
     rw [hxb_eq]
     exact mul_mem (mul_mem (Subgroup.mem_sup_left (Subgroup.mem_sup_left ha))
@@ -461,12 +461,9 @@ theorem exists_aInvariant_complement_of_elementaryAbelian
     rw [ρ.mem_invtSubmodule]; intro a
     rw [Module.End.mem_invtSubmodule_iff_forall_mem_of_mem]
     exact fun v hv => qcSub.apply_mem_toSubmodule a hv
-  have hinf : pU ⊓ qc = ⊥ := by
-    have h := congrArg Subrepresentation.toSubmodule hcompl.inf_eq_bot
-    simpa [Subrepresentation.toSubmodule_inf] using h
-  have hsup : pU ⊔ qc = ⊤ := by
-    have h := congrArg Subrepresentation.toSubmodule hcompl.sup_eq_top
-    simpa [Subrepresentation.toSubmodule_sup] using h
+  -- `(⊓/⊔).toSubmodule` and `⊥/⊤.toSubmodule` are defeq projections (wave6 OperatorMaschke パターン).
+  have hinf : pU ⊓ qc = ⊥ := congrArg Subrepresentation.toSubmodule hcompl.inf_eq_bot
+  have hsup : pU ⊔ qc = ⊤ := congrArg Subrepresentation.toSubmodule hcompl.sup_eq_top
   let Φ : Submodule (ZMod q) (Additive E) ≃o Subgroup E :=
     (AddSubgroup.toZModSubmodule (n := q)).symm.trans AddSubgroup.toSubgroup'
   set W : Subgroup E := Φ qc with hW_def
@@ -576,7 +573,7 @@ theorem pGroup_cyclic_fixedPointFree
         -- deferred in `BG/Ch1_Preliminary/S04_PGroupsSmallRank.lean` (≈ line 911).  See
         -- issue 2004.  Off-FT-critical-path (Appendix B = Peterfalvi Part II).
         sorry
-    · push_neg at hirr
+    · push Not at hirr
       obtain ⟨U, hUinv, hUbot, hUtop⟩ := hirr
       exact fpf_of_reducible hqE hcop hE φ hfaithful hPodd hconst hUinv hUbot hUtop
   exact ⟨isCyclic_of_faithful_fpf_pgroup_on_elementaryAbelian hq hP hp_odd hE φ hfpf, hfpf⟩

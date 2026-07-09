@@ -403,7 +403,7 @@ theorem typeI_or_typeII_centralizer_unique_hall [Finite G]
   classical
   -- `Y = ⟨X⟩ ≤ U` is a nontrivial `(κ ∪ σ)ᶜ`-subgroup.
   set Y : Subgroup G := Subgroup.closure X with hYdef
-  have hXsubU : X ⊆ (U : Set G) := hXU.trans (by rw [sharpSubgroup]; exact Set.diff_subset)
+  have hXsubU : X ⊆ (U : Set G) := hXU.trans (by rw [sharpSubgroup]; exact Set.sdiff_subset)
   have hYU : Y ≤ U := (Subgroup.closure_le U).mpr hXsubU
   obtain ⟨x0, hx0X⟩ := hXne
   have hx0mem : x0 ∈ (U : Set G) ∧ x0 ∉ ({1} : Set G) := hXU hx0X
@@ -680,13 +680,13 @@ private theorem conj_ne_one {m a : G} (ha : a ≠ 1) : m * a * m⁻¹ ≠ 1 := f
 theorem typeIA_conj_mem (M : Subgroup G) (data : TypeIData M) {m : G} (hm : m ∈ M) {a : G}
     (ha : a ∈ typeIA M data) : m * a * m⁻¹ ∈ typeIA M data := by
   obtain ⟨haM, ha1, x, hx, hax⟩ := ha
-  obtain ⟨hxH, hx1⟩ := (Set.mem_diff x).mp hx
+  obtain ⟨hxH, hx1⟩ := (Set.mem_sdiff x).mp hx
   have hmxH : m * x * m⁻¹ ∈ maxNilpotentNormalHall M := by
     have hnorm := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer M hm
     rw [Subgroup.mem_normalizer_iff] at hnorm
     exact (hnorm x).mp (data.typeF.H_eq ▸ (SetLike.mem_coe.mp hxH))
   refine ⟨mul_mem (mul_mem hm haM) (inv_mem hm), conj_ne_one ha1, m * x * m⁻¹, ?_, ?_⟩
-  · exact (Set.mem_diff _).mpr ⟨data.typeF.H_eq ▸ (SetLike.mem_coe.mpr hmxH),
+  · exact (Set.mem_sdiff _).mpr ⟨data.typeF.H_eq ▸ (SetLike.mem_coe.mpr hmxH),
       conj_ne_one (fun h => hx1 (Set.mem_singleton_iff.mpr h))⟩
   · rw [Subgroup.mem_centralizer_singleton_iff] at hax ⊢
     calc m * a * m⁻¹ * (m * x * m⁻¹) = m * (a * x) * m⁻¹ := by group
@@ -699,7 +699,7 @@ theorem typeIA_nonempty (M : Subgroup G) (data : TypeIData M) :
   obtain ⟨a, ha1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp data.typeF.H_nontrivial
   have ha1' : (a : G) ≠ 1 := fun h => ha1 (Subtype.ext h)
   exact ⟨a.1, data.typeF.H_le a.2, ha1',
-    a.1, (Set.mem_diff _).mpr ⟨SetLike.mem_coe.mpr a.2, fun h => ha1' (Set.mem_singleton_iff.mp h)⟩,
+    a.1, (Set.mem_sdiff _).mpr ⟨SetLike.mem_coe.mpr a.2, fun h => ha1' (Set.mem_singleton_iff.mp h)⟩,
     Subgroup.mem_centralizer_singleton_iff.mpr rfl⟩
 
 /-- **The type-`F` complement `U` is a `(κ ∪ σ)′`-Hall subgroup of `M`.**  For type I,
@@ -762,7 +762,7 @@ theorem typeIA_subset_ASet [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II
       hG hM (Or.inl ⟨data⟩)
   rintro y ⟨hyM, _hy1, x, hxH, hyC⟩
-  obtain ⟨hxHmem, hx1⟩ := (Set.mem_diff _).mp hxH
+  obtain ⟨hxHmem, hx1⟩ := (Set.mem_sdiff _).mp hxH
   refine ⟨⟨hyM, ?_⟩, ?_⟩
   · -- `x ∈ M_σ ⊓ C_G(y)` is a nonidentity witness.
     intro hbot
@@ -1005,7 +1005,7 @@ theorem escaping_sigma_disjoint_centralizer [Finite G]
     OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II
       hG hS (Or.inl ⟨dS⟩)
   obtain ⟨hwS, hw1, h, hh, hwC⟩ := hw
-  obtain ⟨hhH, hh1⟩ := (Set.mem_diff _).mp hh
+  obtain ⟨hhH, hh1⟩ := (Set.mem_sdiff _).mp hh
   have hh1' : h ≠ 1 := fun he => hh1 (Set.mem_singleton_iff.mpr he)
   have hhMσ : h ∈ OddOrder.BG.Ch3.S10.Msigma S := by
     rw [← hMFMσ, ← dS.typeF.H_eq]
@@ -1342,11 +1342,11 @@ theorem FT_signalizer_conj_smul_of_escaping [Finite G]
   -- branch conditions for the concrete `FT_signalizerBase`
   have hgt : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement a).ncard := by
     by_contra h
-    push_neg at h
+    push Not at h
     exact hesc (OddOrder.BG.Ch4.S16.centralizer_le_of_maximalSigma_le_one hG hM hσ.1 haA.2.1 h)
   have hgt' : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement (m * a * m⁻¹)).ncard := by
     by_contra h
-    push_neg at h
+    push Not at h
     exact hesc'
       (OddOrder.BG.Ch4.S16.centralizer_le_of_maximalSigma_le_one hG hM hσ'.1 ha'A.2.1 h)
   have hbr : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement a).ncard ∧
@@ -1524,11 +1524,11 @@ theorem dadeSupportHypothesisData_of_subset [Fintype G]
 theorem A1_subset_typeIA (M : Subgroup G) (data : TypeIData M) :
     A1 M PeterfalviType.I ⊆ typeIA M data := by
   intro x hx
-  obtain ⟨hxH, hx1⟩ := (Set.mem_diff x).mp hx
+  obtain ⟨hxH, hx1⟩ := (Set.mem_sdiff x).mp hx
   have hx1' : x ≠ 1 := fun h => hx1 (Set.mem_singleton_iff.mpr h)
   have hxH' : x ∈ data.typeF.H := data.typeF.H_eq ▸ SetLike.mem_coe.mp hxH
   exact ⟨data.typeF.H_le hxH', hx1',
-    x, (Set.mem_diff _).mpr ⟨SetLike.mem_coe.mpr hxH', hx1⟩,
+    x, (Set.mem_sdiff _).mpr ⟨SetLike.mem_coe.mpr hxH', hx1⟩,
     Subgroup.mem_centralizer_singleton_iff.mpr rfl⟩
 
 
@@ -1539,9 +1539,9 @@ theorem sharpSubgroup_conj_mem {H : Subgroup G} {m : G}
     (hn : m ∈ Subgroup.normalizer (H : Set G)) {a : G}
     (ha : a ∈ OddOrder.GroupTheory.sharpSubgroup H) :
     m * a * m⁻¹ ∈ OddOrder.GroupTheory.sharpSubgroup H := by
-  obtain ⟨haH, ha1⟩ := (Set.mem_diff a).mp ha
+  obtain ⟨haH, ha1⟩ := (Set.mem_sdiff a).mp ha
   rw [Subgroup.mem_normalizer_iff] at hn
-  refine (Set.mem_diff _).mpr ⟨SetLike.mem_coe.mpr ((hn a).mp (SetLike.mem_coe.mp haH)), ?_⟩
+  refine (Set.mem_sdiff _).mpr ⟨SetLike.mem_coe.mpr ((hn a).mp (SetLike.mem_coe.mp haH)), ?_⟩
   exact fun h => (conj_ne_one (fun h1 => ha1 (Set.mem_singleton_iff.mpr h1)))
     (Set.mem_singleton_iff.mp h)
 
@@ -1677,7 +1677,7 @@ theorem typePData_V_ti [Finite G] {M : Subgroup G} (data : TypePData M) :
   rw [← data.normalizer_V (typePV M data) ⟨a, haV⟩ Set.Subset.rfl,
     Subgroup.mem_set_normalizer_iff]
   intro h
-  simp only [typePV, Set.mem_diff, Set.mem_union, SetLike.mem_coe]
+  simp only [typePV, Set.mem_sdiff, Set.mem_union, SetLike.mem_coe]
   rw [hgW h, hstab data.W1 hW1le h, hstab data.W2 hW2le h]
 
 /-- An element of the exceptional set `V = W − (W₁ ∪ W₂)` of a type-`P` maximal subgroup lies
@@ -1687,7 +1687,7 @@ outside the derived subgroup `M' = [M,M]`.  Decompose `v ∈ W = W₁ ⊔ W₂` 
 type-`P` `A_0(M)` support geometry; also used in S12's §10 Dade-image analysis.) -/
 theorem typePData_typePV_not_mem_derived {M : Subgroup G} (data : TypePData M)
     {v : G} (hv : v ∈ typePV M data) : v ∉ derivedInG M := by
-  simp only [typePV, Set.mem_diff, Set.mem_union, SetLike.mem_coe, not_or] at hv
+  simp only [typePV, Set.mem_sdiff, Set.mem_union, SetLike.mem_coe, not_or] at hv
   obtain ⟨hvW, _hvnW1, hvnW2⟩ := hv
   intro hvM'
   haveI hcyc : IsCyclic ↥data.W := data.W_cyclic
@@ -1882,7 +1882,7 @@ theorem not_isConj_typePA_typePV_of_isTypeP1 [Finite G]
     rwa [show m⁻¹ * y * m⁻¹⁻¹ = v from by rw [← hmv]; group] at h1
   have hvW : v ∈ data.W := by
     have hv' := hv
-    simp only [typePV, Set.mem_diff] at hv'
+    simp only [typePV, Set.mem_sdiff] at hv'
     exact hv'.1
   have hvM : v ∈ M := by
     have hWM : (data.W : Subgroup G) ≤ M := by
@@ -1941,7 +1941,7 @@ theorem coprime_FT_signalizer_centralizerIn_typePV [Fintype G]
   classical
   obtain ⟨v, hv, m, hmM, hmv⟩ := hb
   have hvW : v ∈ data.W := by
-    have hv' := hv; simp only [typePV, Set.mem_diff] at hv'; exact hv'.1
+    have hv' := hv; simp only [typePV, Set.mem_sdiff] at hv'; exact hv'.1
   have hWM : (data.W : Subgroup G) ≤ M := by
     rw [data.W_eq]
     exact sup_le data.W1_le (data.W2_le.trans (inf_le_left.trans
@@ -2033,7 +2033,7 @@ theorem dadeSupportHypotheses_typeI [Fintype G] [Finite G]
       show a.1 ∈ maxNilpotentNormalHall M
       rw [← data.typeF.H_eq]
       exact a.2
-    exact ⟨a.1, (Set.mem_diff _).mpr
+    exact ⟨a.1, (Set.mem_sdiff _).mpr
       ⟨SetLike.mem_coe.mpr haH, fun h => ha1' (Set.mem_singleton_iff.mp h)⟩⟩
 
 /-- **(8.14) kernel equivariance at a `σ`-sharp escaping point** (`σ`-generic form of
@@ -2062,11 +2062,11 @@ theorem FT_signalizer_conj_smul_of_escaping_sigmaSharp [Finite G]
   obtain ⟨hNmax, hCN⟩ := mem_maximalSubgroupsContaining.mp hNmem
   have hgt : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement a).ncard := by
     by_contra h
-    push_neg at h
+    push Not at h
     exact hesc (OddOrder.BG.Ch4.S16.centralizer_le_of_maximalSigma_le_one hG hM hσ.1 hσ.2 h)
   have hgt' : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement (m * a * m⁻¹)).ncard := by
     by_contra h
-    push_neg at h
+    push Not at h
     exact hesc'
       (OddOrder.BG.Ch4.S16.centralizer_le_of_maximalSigma_le_one hG hM hσ'.1 hσ'.2 h)
   have hbr : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement a).ncard ∧
@@ -2352,7 +2352,7 @@ theorem dadeSupportHypothesisData_typePA0_of_isTypeP1 [Fintype G] [Finite G]
   classical
   have hVM : typePV M data ⊆ (M : Set G) := by
     intro v hv
-    have hvW : v ∈ data.W := by simp only [typePV, Set.mem_diff] at hv; exact hv.1
+    have hvW : v ∈ data.W := by simp only [typePV, Set.mem_sdiff] at hv; exact hv.1
     exact (show (data.W : Subgroup G) ≤ M by
       rw [data.W_eq]; exact sup_le data.W1_le (data.W2_le.trans (inf_le_left.trans
         (data.H_le.trans (Subgroup.map_subtype_le _))))) hvW
@@ -2366,18 +2366,18 @@ theorem dadeSupportHypothesisData_typePA0_of_isTypeP1 [Fintype G] [Finite G]
     intro x hx
     rcases hx with hpa | hva
     · rw [typePA_eq_sharpSubgroup_derivedInG] at hpa
-      exact (Subgroup.map_subtype_le _) ((Set.mem_diff _).mp hpa).1
+      exact (Subgroup.map_subtype_le _) ((Set.mem_sdiff _).mp hpa).1
     · exact conjClassSetIn_subset hVM hva
   · -- `x ≠ 1`
     intro x hx
     rcases hx with hpa | hva
     · rw [typePA_eq_sharpSubgroup_derivedInG] at hpa
-      exact fun h => ((Set.mem_diff _).mp hpa).2 (Set.mem_singleton_iff.mpr h)
+      exact fun h => ((Set.mem_sdiff _).mp hpa).2 (Set.mem_singleton_iff.mpr h)
     · obtain ⟨v, hv, m, hmM, hmv⟩ := hva
       have hv1 : v ≠ 1 := by
         rintro rfl
         have h1 := hv
-        simp only [typePV, Set.mem_diff, Set.mem_union] at h1
+        simp only [typePV, Set.mem_sdiff, Set.mem_union] at h1
         exact h1.2 (Or.inl (Subgroup.one_mem data.W1))
       intro hx1
       apply hv1
@@ -2391,7 +2391,7 @@ theorem dadeSupportHypothesisData_typePA0_of_isTypeP1 [Fintype G] [Finite G]
     have ha1' : (a : G) ≠ 1 := fun h => ha1 (Subtype.ext h)
     refine ⟨a.1, Or.inl ?_⟩
     rw [typePA_eq_sigmaSharp_of_isTypeP1 hG hM data hP1]
-    exact (Set.mem_diff _).mpr
+    exact (Set.mem_sdiff _).mpr
       ⟨SetLike.mem_coe.mpr a.2, fun h => ha1' (Set.mem_singleton_iff.mp h)⟩
   · -- `M`-conjugation invariance
     intro m x hm
@@ -2440,7 +2440,7 @@ theorem dadeSupportHypotheses_typeP [Fintype G] [Finite G]
           rw [OddOrder.BG.Ch4.S16.mainSubgroup_eq_Msigma hG hM hType]
           exact OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM)
       have ha1' : (a : G) ≠ 1 := fun h => ha1 (Subtype.ext h)
-      exact ⟨a.1, (Set.mem_diff _).mpr
+      exact ⟨a.1, (Set.mem_sdiff _).mpr
         ⟨SetLike.mem_coe.mpr a.2, fun h => ha1' (Set.mem_singleton_iff.mp h)⟩⟩
     · intro m x hm
       refine ⟨fun h => ?_, A1_conj_mem M tau hm⟩
@@ -2846,7 +2846,7 @@ theorem escaping_supported_of_A1_conj_mem_typeIA [Finite G]
     {x g : G} (hxA1 : x ∈ A1 S PeterfalviType.I) (hgx : g * x * g⁻¹ ∈ typeIA T dT) :
     x ∈ OddOrder.GroupTheory.escapingCentralizerSet S (typeIA S dS) ∧
       Subgroup.centralizer ({x} : Set G) ≤ MulAut.conj g⁻¹ • T := by
-  obtain ⟨hxMF, hx1s⟩ := (Set.mem_diff x).mp hxA1
+  obtain ⟨hxMF, hx1s⟩ := (Set.mem_sdiff x).mp hxA1
   have hx1 : x ≠ 1 := fun h => hx1s (Set.mem_singleton_iff.mpr h)
   set y := g * x * g⁻¹ with hydef
   have hy1 : y ≠ 1 := conj_ne_one hx1
@@ -2878,7 +2878,7 @@ theorem escaping_supported_of_A1_conj_mem_typeIA [Finite G]
   -- the (8.12.b) pin at `y`
   obtain ⟨hyT, -, h, hh, hyh⟩ := hgx
   have hwit : ∃ h' ∈ maxNilpotentNormalHall T, h' ≠ 1 ∧ Commute y h' := by
-    obtain ⟨hhH, hh1⟩ := (Set.mem_diff h).mp hh
+    obtain ⟨hhH, hh1⟩ := (Set.mem_sdiff h).mp hh
     refine ⟨h, ?_, fun he => hh1 (Set.mem_singleton_iff.mpr he), ?_⟩
     · rw [← dT.typeF.H_eq]; exact SetLike.mem_coe.mp hhH
     · exact (Subgroup.mem_centralizer_singleton_iff.mp hyh)
@@ -2947,7 +2947,7 @@ theorem exists_A1_conj_mem_typeIA_of_not_disjoint [Finite G]
     -- `S`-side: `y = v·(b·k)·v⁻¹`.
     obtain ⟨t', ⟨k, hk, rfl⟩, v, hv⟩ := hyb
     have hb1 : b ≠ 1 := fun h =>
-      ((Set.mem_diff b).mp hbA1).2 (Set.mem_singleton_iff.mpr h)
+      ((Set.mem_sdiff b).mp hbA1).2 (Set.mem_singleton_iff.mpr h)
     obtain ⟨haT, ha1, hwitA⟩ := haA
     by_cases hbesc : b ∈ OddOrder.GroupTheory.escapingCentralizerSet S (A1 S PeterfalviType.I)
     · -- thick `S`-side: extract `b` as a power of `b·k`.
@@ -3037,11 +3037,11 @@ theorem ftThickenedSupport_mixed_disjoint_of_nonconjugate [Finite G]
   -- `orderOf x'` divides the coprime pair `|T_σ|`, `|C_S(u·x'·u⁻¹)|`.
   set w := u * x' * u⁻¹ with hwdef
   have hx'1 : x' ≠ 1 := fun h =>
-    ((Set.mem_diff x').mp hx'A1T).2 (Set.mem_singleton_iff.mpr h)
+    ((Set.mem_sdiff x').mp hx'A1T).2 (Set.mem_singleton_iff.mpr h)
   have h1 : orderOf x' ∣ Nat.card (OddOrder.BG.Ch3.S10.Msigma T) := by
     have hx'Mσ : x' ∈ OddOrder.BG.Ch3.S10.Msigma T := by
       have : x' ∈ maxNilpotentNormalHall T :=
-        SetLike.mem_coe.mp ((Set.mem_diff x').mp hx'A1T).1
+        SetLike.mem_coe.mp ((Set.mem_sdiff x').mp hx'A1T).1
       rwa [OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II hG hT
         (Or.inl ⟨dT⟩)] at this
     exact Subgroup.orderOf_dvd_natCard _ hx'Mσ
@@ -3181,7 +3181,7 @@ noncomputable def nonTypeICovering_of_isTypeP [Finite G] (hG : OddOrder.BG.IsMin
   -- conjugacy-saturation of a `1`-free set avoids `1`, hence lands in `(⊤)#`.
   have hsub : ∀ S : Set G, (1 : G) ∉ S → conjClassSet S ⊆ sharpSubgroup (⊤ : Subgroup G) := by
     rintro S hS y ⟨t, ht, g, rfl⟩
-    rw [sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff]
+    rw [sharpSubgroup, Set.mem_sdiff, Set.mem_singleton_iff]
     refine ⟨Subgroup.mem_top _, fun h1 => hS ?_⟩
     have ht1 : t = 1 := mul_left_cancel ((mul_inv_eq_one.mp h1).trans (mul_one g).symm)
     exact ht1 ▸ ht
@@ -3190,7 +3190,7 @@ noncomputable def nonTypeICovering_of_isTypeP [Finite G] (hG : OddOrder.BG.IsMin
     apply Set.Subset.antisymm
     · intro x hx
       have hx1 : x ≠ 1 := by
-        rw [sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff] at hx; exact hx.2
+        rw [sharpSubgroup, Set.mem_sdiff, Set.mem_singleton_iff] at hx; exact hx.2
       rcases OddOrder.BG.Ch4.S14.exists_mem_conjClassSet_Mtilde_or_fixed_zTilde hG hMref hMPref
         hKMref hKref hKstarref hUref hx1 with ⟨M, hMmax, hxM⟩ | hxZ
       · obtain ⟨j, g, hgconj⟩ := data.representatives M hMmax

@@ -27,7 +27,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 2
 
 mathlib `Subgroup.IsSubnormal` (inductive predicate + `isSubnormal_iff` chain 表現 +
 `subgroupOf` / `inf` / `trans` / `map` / `comap` ら) を全面利用。Ch.1 の `Subgroup.fitting`
-(= F(G)) と Thm 1.26 (`isNilpotent_of_finite_tfae` 経由の NormalizerCondition) を
+(= F(G)) と Thm 1.26 (`Group.isNilpotent_of_finite_tfae` 経由の NormalizerCondition) を
 橋渡しに使う。
 
 新規定義は `IsMinimalNormal` (mathlib 未収載). Thm 2.6 や 2.18 で必須。
@@ -74,7 +74,7 @@ def IsMinimalNormal (M : Subgroup G) : Prop :=
 ならば `H < K` で `H ⊴ K` となる `K` が存在する。すると `K ≤ N_G(H)` で `H < N_G(H)`。 -/
 theorem isNilpotent_of_all_isSubnormal [Finite G]
     (h : ∀ H : Subgroup G, H.IsSubnormal) : Group.IsNilpotent G := by
-  refine ((isNilpotent_of_finite_tfae (G := G)).out 1 0).mp ?_
+  refine ((Group.isNilpotent_of_finite_tfae (G := G)).out 1 0).mp ?_
   intro H hHlt
   rcases Subgroup.IsSubnormal.iff_eq_top_or_exists.mp (h H) with hHtop | ⟨K, hHK, _, hKnorm⟩
   · exact absurd hHtop hHlt.ne
@@ -101,7 +101,7 @@ theorem isSubnormal_of_isNilpotent_finite [Finite G] [Group.IsNilpotent G]
     · rw [hHt]; exact Subgroup.IsSubnormal.top
     · -- H < ⊤ via hHt; NormalizerCondition gives H < N_G(H).
       have hNC : NormalizerCondition G :=
-        ((isNilpotent_of_finite_tfae (G := G)).out 0 1).mp ‹_›
+        ((Group.isNilpotent_of_finite_tfae (G := G)).out 0 1).mp ‹_›
       have hHlt : H < ⊤ := lt_top_iff_ne_top.mpr hHt
       have hH_lt_N : H < Subgroup.normalizer (H : Set G) := hNC H hHlt
       -- (normalizer H).index < H.index
@@ -315,7 +315,7 @@ private theorem le_fitting_aux :
       -- IH の入力: subnormality と nilpotency を `H.subgroupOf K` (K の部分群) に転送.
       have hH_sn_in_K : (H.subgroupOf K).IsSubnormal := hSn.subgroupOf
       have hH_nilp_in_K : Group.IsNilpotent (H.subgroupOf K) :=
-        nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hHK).symm
+        Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hHK).symm
       have hH_le_fitK : H.subgroupOf K ≤ fitting K :=
         ih K hKcard_le hH_nilp_in_K hH_sn_in_K
       -- `H = (H.subgroupOf K).map K.subtype ≤ (fitting K).map K.subtype`.
@@ -326,7 +326,7 @@ private theorem le_fitting_aux :
       -- `(fitting K).map K.subtype` は normal (characteristic in K + K ⊴ G) かつ nilpotent.
       haveI : ((fitting K).map K.subtype).Normal := inferInstance
       haveI : Group.IsNilpotent ((fitting K).map K.subtype) :=
-        nilpotent_of_mulEquiv ((fitting K).equivMapOfInjective K.subtype K.subtype_injective)
+        Group.nilpotent_of_mulEquiv ((fitting K).equivMapOfInjective K.subtype K.subtype_injective)
       exact hpush.trans nilpotent_normal_le_fitting
 
 /-- **Isaacs Thm 2.2**: 有限群 `G` の部分群 `H` について,
@@ -348,7 +348,7 @@ theorem le_fitting_iff_isNilpotent_and_isSubnormal [Finite G] (H : Subgroup G) :
   refine ⟨fun hH => ⟨?_, ?_⟩,
     fun ⟨hNilp, hSn⟩ => le_fitting_aux (Nat.card G) G le_rfl hNilp hSn⟩
   · -- H ≤ F(G) ⇒ H 冪零 (`H.subgroupOf F(G) ≃* H`, F(G) 冪零, subgroup 継承)
-    exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hH)
+    exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hH)
   · -- H ≤ F(G) ⇒ H subnormal (F(G) subnormal in G + H.subgroupOf F(G) subnormal in F(G))
     have hFsn : (fitting G).IsSubnormal := Subgroup.Normal.isSubnormal inferInstance
     have hHsn_in_F : (H.subgroupOf (fitting G)).IsSubnormal :=
@@ -455,7 +455,7 @@ private theorem isMinimalNormal_le_normalizer_aux :
               rw [Subgroup.mem_subgroupOf] at h2
               -- h2 : ((⟨g', _⟩ * ⟨s, _⟩ * ⟨g', _⟩⁻¹ : N) : G) ∈ S
               -- coerce: (⟨a, _⟩ * ⟨b, _⟩ : N : G) = a * b in G.
-              convert h2 using 1
+              simpa using h2
             · intro hgsg
               have hgsg_N : g' * s * g'⁻¹ ∈ N := hNnorm.conj_mem s hsN g'
               have h1 : (⟨g' * s * g'⁻¹, hgsg_N⟩ : N) ∈ S.subgroupOf N := by
@@ -1362,7 +1362,7 @@ private theorem subset_fitting_aux : ∀ n : ℕ,
       intro ⟨g, hg⟩
       exact Subtype.ext (hAab g hg x hx)
     haveI hA_nilp : Group.IsNilpotent ↥A := ⟨1, by
-      rw [upperCentralSeries_one]; exact hA_center_top⟩
+      rw [Subgroup.upperCentralSeries_one]; exact hA_center_top⟩
     -- Case split: A subnormal in G.
     by_cases hA_sn : A.IsSubnormal
     · exact (le_fitting_iff_isNilpotent_and_isSubnormal A).mpr ⟨hA_nilp, hA_sn⟩
@@ -1504,7 +1504,6 @@ private theorem subset_fitting_aux : ∀ n : ℕ,
       rw [hs1, hs2] at habelian
       -- conjugate both sides by g to cancel.
       have := congrArg (fun z => g * z * g⁻¹) habelian
-      simp only at this
       calc b₁ * b₂ = g * (g⁻¹ * (b₁ * b₂) * g) * g⁻¹ := by group
         _ = g * (g⁻¹ * (b₂ * b₁) * g) * g⁻¹ := this
         _ = b₂ * b₁ := by group
@@ -1716,7 +1715,7 @@ theorem baer_sup_conj_isNilpotent_of_le_fitting [Finite G] {H : Subgroup G}
   -- H ⊔ H^x ≤ F(G).
   have hSup_le : (H ⊔ ((MulAut.conj x) • H : Subgroup G)) ≤ fitting G := sup_le hH hHx_le
   -- Subgroup of nilpotent F(G) is nilpotent.
-  exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hSup_le)
+  exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hSup_le)
 
 open scoped Pointwise in
 /-- **Isaacs Thm 2.12 (Baer)** 逆方向の `|G|`-induction の generalized core.
@@ -1775,7 +1774,7 @@ private theorem le_fitting_of_baer_aux :
             ↥(H ⊔ ((MulAut.conj (y : G)) • H) : Subgroup G) := hN (y : G)
         have hsup_le_K : (H ⊔ ((MulAut.conj (y : G)) • H) : Subgroup G) ≤ K :=
           sup_le hHK hHy_le_K
-        exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hsup_le_K).symm
+        exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hsup_le_K).symm
       exact ((le_fitting_iff_isNilpotent_and_isSubnormal _).mp hIH_K).2
     -- Zipper Lemma で `H` を含む極大部分群 `M` の一意性.
     obtain ⟨M, hMcoatom, _, hMuniq⟩ := zipper_lemma hIH hSnneg
@@ -1790,7 +1789,7 @@ private theorem le_fitting_of_baer_aux :
         rw [h_top] at hNx
         haveI := hNx
         haveI hG_nilp : Group.IsNilpotent G :=
-          nilpotent_of_mulEquiv (Subgroup.topEquiv : (⊤ : Subgroup G) ≃* G)
+          Group.nilpotent_of_mulEquiv (Subgroup.topEquiv : (⊤ : Subgroup G) ≃* G)
         exact isSubnormal_of_isNilpotent_finite H
       -- ⟨H, H^x⟩ ≤ M (M は H を含む唯一の極大).
       obtain ⟨K, hKcoatom, hKle⟩ :=
@@ -3399,7 +3398,6 @@ private lemma conj_smul_abelian {G : Type*} [Group G] {B : Subgroup G}
   have hs2 : (g⁻¹ * b₂ * g) * (g⁻¹ * b₁ * g) = g⁻¹ * (b₂ * b₁) * g := by group
   rw [hs1, hs2] at habelian
   have hconj := congrArg (fun z => g * z * g⁻¹) habelian
-  simp only at hconj
   calc b₁ * b₂ = g * (g⁻¹ * (b₁ * b₂) * g) * g⁻¹ := by group
     _ = g * (g⁻¹ * (b₂ * b₁) * g) * g⁻¹ := hconj
     _ = b₂ * b₁ := by group
@@ -3770,10 +3768,10 @@ theorem inf_fitting_ne_bot_of_abelian_card_ge_index [Finite G] [Nontrivial G] {A
       exact hG_commute g x
     -- G is nilpotent.
     haveI hGnilp : Group.IsNilpotent G := ⟨1, by
-      rw [upperCentralSeries_one]; exact hcenter⟩
+      rw [Subgroup.upperCentralSeries_one]; exact hcenter⟩
     -- ↥⊤ is also nilpotent.
     haveI : Group.IsNilpotent ↥(⊤ : Subgroup G) :=
-      nilpotent_of_mulEquiv Subgroup.topEquiv.symm
+      Group.nilpotent_of_mulEquiv Subgroup.topEquiv.symm
     -- F(G) = ⊤.
     have hFtop : fitting G = ⊤ := top_le_iff.mp (nilpotent_normal_le_fitting (N := ⊤))
     rw [hFtop]

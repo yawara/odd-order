@@ -7,7 +7,7 @@ import Mathlib.GroupTheory.IndexNormal
 import Mathlib.GroupTheory.GroupAction.ConjAct
 import Mathlib.GroupTheory.GroupAction.Quotient
 import Mathlib.GroupTheory.Index
-import Mathlib.Data.Finite.Card
+import Mathlib.SetTheory.Cardinal.NatCard
 import Mathlib.Data.Nat.Choose.Dvd
 import Mathlib.Data.Nat.Factorization.Basic
 import Mathlib.Algebra.Module.ZMod
@@ -750,7 +750,8 @@ theorem omega1_pow_eq_one (hR : IsPGroup p R) (hp_odd : Odd p)
     have hle : Omega R p 1 ≤ omega1 := by
       rw [Omega, Subgroup.closure_le]
       intro x hx
-      simpa using (pow_one p ▸ hx : x ^ p = 1)
+      show x ^ p = 1
+      exact pow_one p ▸ hx
     simpa [omega1] using hle hg
   clear hg g
   -- Strong induction on `Nat.card R`.
@@ -802,7 +803,8 @@ theorem omega1_pow_eq_one (hR : IsPGroup p R) (hp_odd : Odd p)
       have hΩle : Omega ↥S p 1 ≤ omega1S := by
         rw [Omega, Subgroup.closure_le]
         intro a ha
-        simpa using (pow_one p ▸ ha : a ^ p = 1)
+        show a ^ p = 1
+        exact pow_one p ▸ ha
       intro z hz
       rw [hH_def, Subgroup.mem_map] at hz
       obtain ⟨a, ha, rfl⟩ := hz
@@ -933,7 +935,7 @@ theorem exists_distinct_subgroups_card_prime_of_not_isCyclic (hR : IsPGroup p R)
       IsCyclic R :=
     fun h => OddOrder.Isaacs.Ch06.isCyclic_of_subgroups_card_prime_unique_of_odd hR hp_odd h
   by_contra h
-  -- `push_neg` is deprecated in this toolchain; unfold the negated existential by hand.
+  -- `push Not` is deprecated in this toolchain; unfold the negated existential by hand.
   simp only [not_exists, not_and, ne_eq, not_not] at h
   exact hnc (huniq fun K L hK hL => h K L hK hL)
 
@@ -2351,7 +2353,7 @@ theorem nilpotencyClass_le_of_card_le_pow {p : ℕ} [Fact p.Prime]
   haveI : Group.IsNilpotent R' := hR'.isNilpotent
   rcases subsingleton_or_nontrivial R' with hsub | hnt
   · -- `Subsingleton R'`: class `= 0 ≤ j`.
-    exact le_trans (le_of_eq (nilpotencyClass_zero_iff_subsingleton.mpr hsub)) (Nat.zero_le j)
+    exact le_trans (le_of_eq (Group.nilpotencyClass_zero_iff_subsingleton.mpr hsub)) (Nat.zero_le j)
   · -- `Nontrivial R'`.
     obtain ⟨m, hm⟩ := IsPGroup.iff_card.mp hR'
     -- `m ≥ 1` since `R'` is nontrivial.
@@ -2381,7 +2383,7 @@ theorem nilpotencyClass_le_of_card_le_pow {p : ℕ} [Fact p.Prime]
         · -- `|R'| = p²`: commutative.
           exact IsPGroup.commutative_of_card_eq_prime_sq hm
       -- `Z(R') = ⊤`, so `upperCentralSeries R' 1 = ⊤`, giving `cl(R') ≤ 1`.
-      rw [← upperCentralSeries_eq_top_iff_nilpotencyClass_le, upperCentralSeries_one, eq_top_iff]
+      rw [← Subgroup.upperCentralSeries_eq_top_iff_nilpotencyClass_le, Subgroup.upperCentralSeries_one, eq_top_iff]
       intro z _
       rw [Subgroup.mem_center_iff]
       intro g
@@ -2421,7 +2423,7 @@ theorem nilpotencyClass_le_of_card_le_pow {p : ℕ} [Fact p.Prime]
       have hQclass : Group.nilpotencyClass (R' ⧸ Subgroup.center R') ≤ j - 1 :=
         ih (Nat.card (R' ⧸ Subgroup.center R')) hquot_lt (j - 1) (by omega) hQpg rfl hquot_le
       -- `cl(R') = cl(R'/Z) + 1 ≤ (j-1) + 1 = j`.
-      rw [nilpotencyClass_eq_quotient_center_plus_one]
+      rw [Group.nilpotencyClass_eq_quotient_center_plus_one]
       omega
 
 /-- From `cl(G) ≤ 3` one gets that every weight-`3` commutator `⁅⁅a, b⁆, c⁆` is central.
@@ -2434,22 +2436,23 @@ the packaged-commutator hypothesis required by `omega1_pow_eq_one`.
 theorem pointwise_central_of_nilpotencyClass_le_three {G : Type*} [Group G]
     [Group.IsNilpotent G] (h : Group.nilpotencyClass G ≤ 3) :
     ∀ a b c : G, ⁅⁅a, b⁆, c⁆ ∈ Subgroup.center G := by
-  -- `γ₄ = lowerCentralSeries G 3 = ⊥`.
-  have hbot : lowerCentralSeries G 3 = ⊥ := lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mpr h
+  -- `γ₄ = (⊤ : Subgroup G).lowerCentralSeries 3 = ⊥`.
+  have hbot : (⊤ : Subgroup G).lowerCentralSeries 3 = ⊥ :=
+    Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mpr h
   intro a b c
-  -- `⁅a, b⁆ ∈ lowerCentralSeries G 1 = commutator G = ⁅⊤, ⊤⁆`.
-  have h1 : ⁅a, b⁆ ∈ lowerCentralSeries G 1 := by
-    rw [lowerCentralSeries_one]
+  -- `⁅a, b⁆ ∈ (⊤ : Subgroup G).lowerCentralSeries 1 = commutator G = ⁅⊤, ⊤⁆`.
+  have h1 : ⁅a, b⁆ ∈ (⊤ : Subgroup G).lowerCentralSeries 1 := by
+    rw [Subgroup.top_lowerCentralSeries_one]
     exact Subgroup.commutator_mem_commutator (Subgroup.mem_top a) (Subgroup.mem_top b)
-  -- `⁅⁅a, b⁆, c⁆ ∈ lowerCentralSeries G 2 = ⁅lcs 1, ⊤⁆`.
-  have h2 : ⁅⁅a, b⁆, c⁆ ∈ lowerCentralSeries G 2 := by
-    rw [lowerCentralSeries_succ]
+  -- `⁅⁅a, b⁆, c⁆ ∈ (⊤ : Subgroup G).lowerCentralSeries 2 = ⁅lcs 1, ⊤⁆`.
+  have h2 : ⁅⁅a, b⁆, c⁆ ∈ (⊤ : Subgroup G).lowerCentralSeries 2 := by
+    rw [Subgroup.lowerCentralSeries_succ]
     exact Subgroup.commutator_mem_commutator h1 (Subgroup.mem_top c)
   -- For every `d`, `⁅⁅⁅a, b⁆, c⁆, d⁆ ∈ lcs 3 = ⊥`, so the commutator is `1`.
   rw [Subgroup.mem_center_iff]
   intro d
-  have h3 : ⁅⁅⁅a, b⁆, c⁆, d⁆ ∈ lowerCentralSeries G 3 := by
-    rw [lowerCentralSeries_succ]
+  have h3 : ⁅⁅⁅a, b⁆, c⁆, d⁆ ∈ (⊤ : Subgroup G).lowerCentralSeries 3 := by
+    rw [Subgroup.lowerCentralSeries_succ]
     exact Subgroup.commutator_mem_commutator h2 (Subgroup.mem_top d)
   rw [hbot, Subgroup.mem_bot] at h3
   exact (commutatorElement_eq_one_iff_commute.mp h3).symm
@@ -2485,7 +2488,8 @@ theorem omega1_pow_eq_one_of_pRank_le_two_of_three_lt
     have hle : Omega R p 1 ≤ omega1 := by
       rw [Omega, Subgroup.closure_le]
       intro x hx
-      simpa using (pow_one p ▸ hx : x ^ p = 1)
+      show x ^ p = 1
+      exact pow_one p ▸ hx
     simpa [omega1] using hle hg
   clear hg g
   -- Strong induction on `Nat.card R`, with `R` and `pRank ≤ 2` in the motive.
@@ -2535,7 +2539,8 @@ theorem omega1_pow_eq_one_of_pRank_le_two_of_three_lt
         have hΩle : Omega ↥S p 1 ≤ omega1S := by
           rw [Omega, Subgroup.closure_le]
           intro a ha
-          simpa using (pow_one p ▸ ha : a ^ p = 1)
+          show a ^ p = 1
+          exact pow_one p ▸ ha
         intro a ha
         simpa [omega1S] using hΩle ha
       -- `Ω₁(↥S)` (as an `R'`-subgroup) is normal in `R'` and has exponent `p`.
@@ -3344,7 +3349,7 @@ theorem isPGroup_commutator_of_mulAut_odd_of_pRank_le_two
         have hmk : (QuotientGroup.mk' C) ⁅g₁, g₂⁆ = 1 := by
           rw [map_commutatorElement]
           exact commutatorElement_eq_one_iff_commute.mpr (hcomm _ _)
-        exact (QuotientGroup.eq_one_iff _).mp (by simpa using hmk)
+        exact (QuotientGroup.eq_one_iff _).mp hmk
       exact hC_pg.to_le hA'_le
   -- (ii) `|V| = p³` is impossible: `Φ(H) = 1` makes `H` elementary abelian of rank 3.
   · exfalso

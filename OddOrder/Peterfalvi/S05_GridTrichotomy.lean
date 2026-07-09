@@ -114,12 +114,12 @@ theorem card_support_ge_of_not_const {ι κ : Type*} [Fintype ι] [Fintype κ]
   have hrow1 : ∀ i, 1 ≤ (Finset.univ.filter (fun j : κ => f i + g j ≠ 0)).card := by
     intro i
     obtain ⟨j, hj⟩ : ∃ j, f i + g j ≠ 0 := by
-      by_contra hc; push_neg at hc
+      by_contra hc; push Not at hc
       exact hg (fun j j' => by linear_combination hc j - hc j')
     exact Finset.card_pos.mpr ⟨j, Finset.mem_filter.mpr ⟨Finset.mem_univ j, hj⟩⟩
   -- two distinguished rows together cover all columns
   obtain ⟨i₁, i₂, hi⟩ : ∃ i₁ i₂, f i₁ ≠ f i₂ := by
-    by_contra hc; push_neg at hc; exact hf hc
+    by_contra hc; push Not at hc; exact hf hc
   have hi12 : i₁ ≠ i₂ := fun h => hi (by rw [h])
   have hpair : Fintype.card κ
       ≤ (Finset.univ.filter (fun j : κ => f i₁ + g j ≠ 0)).card
@@ -220,7 +220,7 @@ theorem grid_trichotomy {ι κ : Type*} [Finite ι] [Finite κ] [Nonempty ι] [N
       rw [hceq, card_support_const_fst (fun i => f i + g j₀)] at hlt
       have hNι : (Finset.univ.filter (fun i => f i + g j₀ ≠ 0)).card ≤ 1 := by
         by_contra hge
-        push_neg at hge
+        push Not at hge
         have h2 : 2 * Fintype.card κ
             ≤ (Finset.univ.filter (fun i => f i + g j₀ ≠ 0)).card * Fintype.card κ := by
           gcongr

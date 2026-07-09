@@ -268,7 +268,7 @@ theorem isFrobeniusGroup_of_prime_complement_fixedFree
     refine hFix n hnN (fun b hbA => ?_)
     have hcomm : Commute a n := by
       have h := congrArg (· * a) hconj
-      simpa [mul_assoc] using h
+      simpa [commute_iff_eq, mul_assoc] using h
     have hgen : Subgroup.zpowers a = A := Subgroup.zpowers_eq_of_prime_card hp haA ha
     rw [← hgen, Subgroup.mem_zpowers_iff] at hbA
     obtain ⟨j, rfl⟩ := hbA
@@ -777,7 +777,7 @@ noncomputable def frobeniusGroup [Finite G] {N A : Subgroup G}
       · obtain ⟨k, rfl⟩ := mem_conjugatesFinset.mp hY
         have hTI : ∀ g : G, g ∉ A → A ⊓ (MulAut.conj g • A) = ⊥ := by
           intro g hg
-          simpa [Subgroup.pointwise_smul_def] using h.trivialIntersection g hg
+          exact h.trivialIntersection g hg
         exact TI_conjugate hTI g k hXY
 
 /-- The Frobenius-group partition has cardinality `1 + |N|`, where `N` is the kernel. -/
@@ -787,7 +787,7 @@ theorem frobeniusGroup_parts_card [Finite G] {N A : Subgroup G}
   classical
   have hTI : ∀ g : G, g ∉ A → A ⊓ (MulAut.conj g • A) = ⊥ := by
     intro g hg
-    simpa [Subgroup.pointwise_smul_def] using h.trivialIntersection g hg
+    exact h.trivialIntersection g hg
   have hN_not_mem : N ∉ conjugatesFinset A := by
     intro hNmem
     obtain ⟨g, hNg⟩ := mem_conjugatesFinset.mp hNmem
@@ -877,7 +877,7 @@ theorem exists_actorSubgroup_invariant_nontrivial_abelian_subgroup_of_solvable
   · dsimp [M]
     infer_instance
   · intro b m hm
-    simpa [φ] using hM_inv.smul_mem b hm
+    simpa [φ, Subgroup.smul_def] using hM_inv.smul_mem b hm
 
 /-- **Isaacs Thm 6.9** reduction hook: if a subgroup `B` of the Frobenius actor is itself a
 Frobenius group and the target contains a nontrivial `B`-invariant abelian subgroup, then the

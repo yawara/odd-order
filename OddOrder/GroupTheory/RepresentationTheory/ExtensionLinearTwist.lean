@@ -141,7 +141,8 @@ theorem exists_linearClassFunction_mul_of_restrict_eq_restrict [Finite K]
     intro y
     refine exists_smul_id_of_forall_mul_comm res₁ _ (fun h => ?_)
     have h12 := congrArg Units.val (hScomm y h)
-    simpa only [Units.val_mul, Representation.asGroupHom_apply] using h12
+    simpa only [hres₁def, MonoidHom.comp_apply, Subgroup.subtype_apply, Units.val_mul,
+      Representation.asGroupHom_apply] using h12
   choose c hc using hSchur
   -- scalar bookkeeping: uniqueness, nonvanishing, multiplicativity, triviality on `H`
   haveI : Nontrivial V₁ := by

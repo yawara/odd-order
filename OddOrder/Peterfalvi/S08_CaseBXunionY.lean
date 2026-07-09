@@ -137,7 +137,7 @@ theorem hgen_withDiagonal_certainTypeSet
     by_contra h
     have hmem := hφsupp (ClassFunction.mem_support.mpr h)
     rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at hmem
-    simp only [sharpImage, Set.mem_diff, Set.mem_singleton_iff] at hmem
+    simp only [sharpImage, Set.mem_sdiff, Set.mem_singleton_iff] at hmem
     exact hmem.2 (by simp)
   -- split `φ = φ_X + φ_Y`.
   rw [OddOrder.Peterfalvi.S07.zSpan, Submodule.span_union] at hφspan

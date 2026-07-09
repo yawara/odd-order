@@ -897,7 +897,7 @@ theorem Sset_diff_support_subset_A1 {L : Subgroup G} [Finite G] (hyp : Hypothesi
   · -- inside `H` but not in `A₁ = H^#`: forced `x = 1`, where the difference cancels.
     have hx1 : x = 1 := by
       by_contra hx1
-      refine hxA1 ((Set.mem_diff _).mpr ⟨SetLike.mem_coe.mpr ?_, fun h => ?_⟩)
+      refine hxA1 ((Set.mem_sdiff _).mpr ⟨SetLike.mem_coe.mpr ?_, fun h => ?_⟩)
       · show (x : G) ∈ maxNilpotentNormalHall L
         rw [← hyp.typeI.typeF.H_eq]
         exact hxH
@@ -1942,7 +1942,7 @@ theorem Sset_diff_support_subset_ambientA {L : Subgroup G} (hyp : Hypothesis L)
   rw [ClassFunction.mem_support] at hx
   have hnot : ¬((x : G) ∉ hyp.H ∨ x = 1) := fun h =>
     hx (Sset_diff_vanishes_off_H_sharp hyp hχ₁ hχ₂ hdeg h)
-  push_neg at hnot
+  push Not at hnot
   exact (OddOrder.Peterfalvi.S09.Cert.mem_supportInSubgroup_sharp_subgroupOf_iff
     hyp.typeI.typeF.H hAH x).mpr ⟨Subgroup.mem_subgroupOf.mpr hnot.1, hnot.2⟩
 
@@ -2244,7 +2244,7 @@ theorem constituent_diff_support_subset_nonescaping [Finite G] {L : Subgroup G}
   have hres := restrict_eq_of_mem_constituents hyp dχ h₁ h₂
   intro x hx
   rw [ClassFunction.mem_support] at hx
-  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup, Set.mem_diff]
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup, Set.mem_sdiff]
   -- `x` lies in the support of `φ₁` or `φ₂`, hence in `A(L) ∪ {1}`.
   have hxsupp : x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L ∪ ({1} : Set ↥L) := by
     rcases ne_or_eq ((φ₁ : ClassFunction ↥L ℂ) x) 0 with h | h
@@ -2267,7 +2267,7 @@ theorem constituent_diff_support_subset_nonescaping [Finite G] {L : Subgroup G}
   have hxH : (x : G) ∈ hyp.typeI.typeF.H := by
     rw [hyp.typeI.typeF.H_eq]
     have hmem : (x : G) ∈ OddOrder.GroupTheory.sharpSubgroup (maxNilpotentNormalHall L) := hxA1
-    exact ((Set.mem_diff _).mp hmem).1
+    exact ((Set.mem_sdiff _).mp hmem).1
   have hxK : x ∈ (hyp.typeI.typeF.H).subgroupOf L := Subgroup.mem_subgroupOf.mpr hxH
   refine hx ?_
   have hev : ClassFunction.restrict ((hyp.typeI.typeF.H).subgroupOf L)
@@ -2297,8 +2297,9 @@ theorem constituent_diff_tau_eq_induce {L : Subgroup G} [Finite G]
     intro l a
     refine ⟨fun h => ?_, fun h => hyp.dadeData.dade.L_normalizes_A l h⟩
     have h2 := hyp.dadeData.dade.L_normalizes_A l⁻¹ h
-    simpa [Subgroup.coe_inv, mul_assoc] using h2
-  have hA₁A : hyp.ambientA \ escapingCentralizerSet L hyp.ambientA ⊆ hyp.ambientA := Set.diff_subset
+    have h3 : a ∈ typeIA L hyp.typeI := by simpa [Subgroup.coe_inv, mul_assoc] using h2
+    exact h3
+  have hA₁A : hyp.ambientA \ escapingCentralizerSet L hyp.ambientA ⊆ hyp.ambientA := Set.sdiff_subset
   have hA₁norm : ∀ (l : L) ⦃a : G⦄,
       a ∈ hyp.ambientA \ escapingCentralizerSet L hyp.ambientA →
       (l : G) * a * (l : G)⁻¹ ∈ hyp.ambientA \ escapingCentralizerSet L hyp.ambientA := by
@@ -2717,7 +2718,7 @@ theorem centralizerSupport_sharp_eq_of_frobenius [Finite G] {M N : Subgroup G} {
       = OddOrder.GroupTheory.sharpSubgroup N := by
   ext y
   simp only [OddOrder.GroupTheory.centralizerSupport, OddOrder.GroupTheory.sharpSubgroup,
-    Set.mem_setOf_eq, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+    Set.mem_setOf_eq, Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff]
   constructor
   · rintro ⟨hyM, hy1, x, ⟨hxN, hx1⟩, hyx⟩
     have hxM : x ∈ M := hNM hxN
@@ -2822,7 +2823,7 @@ theorem Hypothesis.typeIA_eq_sharp_of_frobenius [Finite G] {L : Subgroup G} (hyp
     = OddOrder.GroupTheory.sharpSubgroup hyp.typeI.typeF.H
   ext y
   simp only [OddOrder.GroupTheory.centralizerSupport, OddOrder.GroupTheory.sharpSubgroup,
-    Set.mem_setOf_eq, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+    Set.mem_setOf_eq, Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff]
   constructor
   · rintro ⟨hyL, hy1, x, ⟨hxN, hx1⟩, hyx⟩
     have hxL : x ∈ L := hyp.typeI.typeF.H_le hxN
@@ -4168,7 +4169,7 @@ theorem typeF_H_subgroupOf_isNilpotent [Finite G] {L : Subgroup G} (hyp : Hypoth
   haveI : Group.IsNilpotent ↥(hyp.typeI.typeF.H) := by
     rw [hyp.typeI.typeF.H_eq]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent L
-  exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hyp.typeI.typeF.H_le).symm
+  exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hyp.typeI.typeF.H_le).symm
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.6) case (c): cyclic-quotient kernel → (6.5.c) coherence.** `sorry`-free.
@@ -4278,7 +4279,7 @@ theorem frobenius_typeI_coherent_of_cyclicQuotient [Finite G]
         Subgroup.nontrivial_quotient_of_ne_top hAne
       exact (IsSolvable.commutator_lt_top_of_nontrivial _).ne
   · -- **Abelian branch:** `⁅K,K⁆ = ⊥`, so `S(⁅K,K⁆) = S(⊥) = Sset` is coherent by `hcoh`.
-    push_neg at hnonab
+    push Not at hnonab
     have hcomm_bot : (⁅(hyp.typeI.typeF.H).subgroupOf L,
         (hyp.typeI.typeF.H).subgroupOf L⁆ : Subgroup ↥L) = ⊥ := by
       rw [eq_bot_iff, Subgroup.commutator_le]
@@ -4286,7 +4287,7 @@ theorem frobenius_typeI_coherent_of_cyclicQuotient [Finite G]
       rw [Subgroup.mem_bot, commutatorElement_eq_one_iff_commute]
       have h := hnonab ⟨p, hp⟩ ⟨q, hq⟩
       have h3 := Subtype.ext_iff.mp h
-      simpa using h3
+      simpa [commute_iff_eq] using h3
     rw [← hyp.SsubFiltration_bot, ← hcomm_bot]
     exact hcoh
 
@@ -4554,7 +4555,7 @@ theorem exists_ne_one_actionFixedBy_not_le_commutator
   have htop : Ch06.nontrivialActionFixedByClosure ψ = ⊤ :=
     OddOrder.BG.Ch1.S01.nontrivialActionFixedByClosure_eq_top_of_not_isCyclic' ψ hCopQ hNC
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   -- `hcon : ∀ a, a ≠ 1 → C_K(a) ≤ [K, K]`.  Show the quotient closure is `⊥`.
   have hquot_bot : Ch06.nontrivialActionFixedByClosure ψ ≤ ⊥ := by
     rw [Ch06.nontrivialActionFixedByClosure_le_iff]
@@ -5804,7 +5805,7 @@ theorem intersection_complements_K [Finite G]
   -- The signalizer structure at the escaping `σ`-sharp `x`; its unique `N` is `M`.
   have hgt : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement data.x).ncard := by
     by_contra h
-    push_neg at h
+    push Not at h
     exact data.centralizer_x_not_le_L
       (OddOrder.BG.Ch4.S16.centralizer_le_of_maximalSigma_le_one hG data.L_maximal hxLσ
         data.x_ne_one h)
@@ -6315,7 +6316,7 @@ theorem isCyclic_and_card_dvd_dichotomy_of_fpf_dim_le_two
       haveI : Nontrivial (Subrepresentation ρ) := ⟨⊥, ⊤, hbnt⟩
       have hnotall : ¬ ∀ W : Subrepresentation ρ, W = ⊥ ∨ W = ⊤ := fun H =>
         hirr { eq_bot_or_eq_top := H }
-      push_neg at hnotall
+      push Not at hnotall
       obtain ⟨W, hWbot, hWtop⟩ := hnotall
       -- `W` is a proper nonzero subrepresentation; its submodule has `finrank = 1`.
       have hWsub_bot : W.toSubmodule ≠ ⊥ := fun h =>
@@ -6346,7 +6347,7 @@ theorem isCyclic_and_card_dvd_dichotomy_of_fpf_dim_le_two
             inv_mul_cancel, map_one, Module.End.one_apply]
         have hfixV : ρ (b⁻¹ * a) w = w := by
           have := congrArg Subtype.val hfix
-          simpa [Subrepresentation.toRepresentation, LinearMap.restrict_coe_apply] using this
+          simpa [Subrepresentation.toRepresentation, LinearMap.coe_restrict_apply] using this
         exact hfpf (b⁻¹ * a) hba w hfixV
       -- Case A on `W.toRepresentation` gives `IsCyclic E ∧ |E| ∣ p - 1`.
       obtain ⟨hcyc, hdvd⟩ :=
@@ -6531,6 +6532,7 @@ theorem isCyclic_and_card_dvd_sub_or_add_one_of_fpf_mulDistribMulAction
       have h1 := hn (Additive.ofMul m)
       rw [Representation.ofDistribMulAction_apply_apply] at h1
       have := congrArg Additive.toMul h1
+      rw [show Additive.toMul (e • Additive.ofMul m) = e • m from rfl] at this
       simpa using this
     obtain ⟨-, hp1⟩ :=
       isCyclic_and_card_dvd_add_one_of_two_dim_irreducible_nonscalar hodd
@@ -7640,7 +7642,7 @@ minimal counterexample, contradicting (12.16) (`counterexample_contradiction`). 
 theorem pi_empty [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     ∀ q : ℕ, q.Prime → ¬ InPi (G := G) q := by
   by_contra h
-  push_neg at h
+  push Not at h
   obtain ⟨ctr⟩ := exists_counterexampleHypothesis hG h
   exact counterexample_contradiction hG ctr
 
@@ -7768,7 +7770,7 @@ theorem witness_L_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     intro i
     refine (induce_diff_support (θ i) (θ 0) (d i) (hdeg i)).trans ?_
     intro x hx
-    rw [Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff] at hx
+    rw [Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff] at hx
     exact (mem_supportInSubgroup_sharp_subgroupOf_iff hyp.typeI.typeF.H hAH x).mpr ⟨hx.1, hx.2⟩
   -- Assemble the `Hypothesis78` via `hypothesis78OfDade`.
   refine ⟨hypothesis78OfDade hyp.toHypothesis71
@@ -7867,7 +7869,7 @@ theorem witness_L_hzeta0nu [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [one_smul] at hds
     intro x hx
     have hxd := hds hx
-    rw [Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff] at hxd
+    rw [Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff] at hxd
     exact (mem_supportInSubgroup_sharp_subgroupOf_iff hyp.typeI.typeF.H hAH x).mpr ⟨hxd.1, hxd.2⟩
   -- The Dade `⊥ 1_G` transport and `ℂ`-linearity of `τ = hyp.tau`.
   have htau1 : ∀ φ : ClassFunction ↥L ℂ, φ.support ⊆ hyp.A →
@@ -8007,7 +8009,7 @@ theorem witness_L_zeta_bound [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     intro i
     refine (induce_diff_support (θ i) (θ 0) (d i) (hdeg i)).trans ?_
     intro x hx
-    rw [Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff] at hx
+    rw [Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff] at hx
     exact (mem_supportInSubgroup_sharp_subgroupOf_iff hyp.typeI.typeF.H hAH x).mpr ⟨hx.1, hx.2⟩
   have hnu_isometry : ∀ i j : Fin (n + 1), i ≠ ind1H → j ≠ ind1H →
       ClassFunction.inner (coh.extension
@@ -8253,7 +8255,7 @@ theorem exists_typeICovering (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         rw [← hTypeI.cover_nonidentity] at hempty
         obtain ⟨b, hb⟩ := exists_ne (1 : G)
         have hbmem : b ∈ sharpSubgroup (⊤ : Subgroup G) := by
-          simp only [sharpSubgroup, Subgroup.coe_top, Set.mem_diff, Set.mem_univ, true_and,
+          simp only [sharpSubgroup, Subgroup.coe_top, Set.mem_sdiff, Set.mem_univ, true_and,
             Set.mem_singleton_iff]
           exact hb
         rw [hempty] at hbmem
@@ -8337,7 +8339,7 @@ theorem exists_typeICovering (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       -- cover `cover_nonidentity`, every nonidentity `x` is conjugate into some `(M_i)_F#`.
       intro x hx1
       have hxsharp : x ∈ sharpSubgroup (⊤ : Subgroup G) := by
-        simp only [sharpSubgroup, Subgroup.coe_top, Set.mem_diff, Set.mem_univ, true_and,
+        simp only [sharpSubgroup, Subgroup.coe_top, Set.mem_sdiff, Set.mem_univ, true_and,
           Set.mem_singleton_iff]
         exact hx1
       rw [hTypeI.cover_nonidentity] at hxsharp
@@ -8436,7 +8438,7 @@ theorem theorem88_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
   by_cases hall : ∀ M : Subgroup G, M ∈ maximalSubgroups G → IsTypeI M
   · exact Or.inl hall
   · refine Or.inr ?_
-    push_neg at hall
+    push Not at hall
     obtain ⟨S, hS, hSnotI⟩ := hall
     haveI : IsSolvable ↥S := hG.solvable_of_mem_maximalSubgroups hS
     -- `S` not type I ⟹ `S` type `P` (Prop 16.1(a): `TypeI ⟺ TypeF`, `TypeF ⟺ κ(S) = ∅`).

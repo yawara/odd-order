@@ -423,7 +423,7 @@ theorem fieldNormalizerNormOneUnits_card_gt_one (hyp : Hypothesis (G := G)) :
       (∑ k ∈ Finset.range 2, hyp.base.p ^ k) ≤
         ∑ k ∈ Finset.range hyp.base.q, hyp.base.p ^ k :=
     Finset.sum_le_sum_of_subset_of_nonneg hrange
-      (fun _ _ _ => zero_le _)
+      (fun _ _ _ => Nat.zero_le _)
   have htwo : 1 < (∑ k ∈ Finset.range 2, hyp.base.p ^ k) := by
     simp
     omega

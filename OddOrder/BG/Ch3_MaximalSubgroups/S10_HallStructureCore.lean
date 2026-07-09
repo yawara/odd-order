@@ -517,7 +517,7 @@ private theorem lt_inf_normalizer_of_lt_of_isPGroup [Finite G] {p : ℕ} [Fact p
     {X S : Subgroup G} (hXS : X < S) (hS : IsPGroup p ↥S) :
     X < Subgroup.normalizer X ⊓ S := by
   haveI : Group.IsNilpotent ↥S := hS.isNilpotent
-  have hNC : NormalizerCondition ↥S := normalizerCondition_of_isNilpotent (G := ↥S)
+  have hNC : NormalizerCondition ↥S := Group.normalizerCondition_of_isNilpotent (G := ↥S)
   have hsub_lt : X.subgroupOf S < ⊤ := by
     rw [lt_top_iff_ne_top]
     intro htop
@@ -674,7 +674,7 @@ private theorem fusion_b [Finite G] (hG : IsMinimalSimpleOdd G)
   | _ n IH =>
     intro X hmeas hXne hXp g₁ g₂ h1 h2
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     set M₁ := MulAut.conj g₁ • M with hM₁def
     set M₂ := MulAut.conj g₂ • M with hM₂def
     set L := Subgroup.normalizer (X : Set G) with hLdef

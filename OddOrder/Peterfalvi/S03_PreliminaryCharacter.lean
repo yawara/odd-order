@@ -871,7 +871,9 @@ theorem mem_characterKernel_of_mem_characterKernel_induce
     intro ψ hψ
     rw [hfamcoe ψ hψ]
     obtain ⟨g, -, rfl⟩ := Finset.mem_image.mp hψ
-    simpa [ClassFunction.conjBy_apply] using hdeg
+    rw [ClassFunction.conjBy_apply]
+    refine (congrArg θ (Subtype.ext ?_)).trans hdeg
+    simp
   have hval : ∑ ψ ∈ S, ((1 : ℕ) : ℂ) * (fam ψ : ClassFunction ↥H ℂ) (⟨x, hxH⟩ : ↥H)
       = ∑ ψ ∈ S, ((1 : ℕ) : ℂ) * (fam ψ : ClassFunction ↥H ℂ) 1 := by
     have e1 : ∀ pt : ↥H, ∑ ψ ∈ S, ((1 : ℕ) : ℂ) * (fam ψ : ClassFunction ↥H ℂ) pt

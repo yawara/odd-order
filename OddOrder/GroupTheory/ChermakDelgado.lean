@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Group.Subgroup.Finite
-import Mathlib.Data.Finite.Card
+import Mathlib.SetTheory.Cardinal.NatCard
 import Mathlib.Data.Fintype.Lattice
 import Mathlib.GroupTheory.Index
 import Mathlib.GroupTheory.Subgroup.Simple

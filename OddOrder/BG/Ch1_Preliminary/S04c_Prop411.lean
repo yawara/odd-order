@@ -159,7 +159,7 @@ theorem exists_generators_le_two_of_isPGroup_of_card_le_prime_sq {Q : Type*} [Gr
       · have hcardeq : Nat.card (Subgroup.zpowers g₁) = Nat.card Q := by rw [hcardz, hje, hk]
         exact absurd (Subgroup.eq_top_of_card_eq (H := Subgroup.zpowers g₁) hcardeq) hz_ne_top
     obtain ⟨g₂, hg₂⟩ : ∃ x, x ∉ Subgroup.zpowers g₁ := by
-      by_contra h; push_neg at h
+      by_contra h; push Not at h
       exact hz_ne_top (top_unique fun x _ => h x)
     refine ⟨{g₁, g₂}, le_trans (Finset.card_insert_le _ _) (by simp), ?_⟩
     -- `K := ⟨g₁,g₂⟩` contains `⟨g₁⟩` (order `p`) and `g₂ ∉ ⟨g₁⟩`, so `|K| ≠ p`; `|K| ∣ p²` and

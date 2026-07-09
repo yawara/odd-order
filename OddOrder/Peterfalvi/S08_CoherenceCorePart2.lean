@@ -1204,7 +1204,7 @@ theorem SsubFiltration_nonempty_of_subgroupOf_ne_top
   haveI : Fintype ↥H := Fintype.ofFinite _
   letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
   haveI : Group.IsNilpotent (↥H ⧸ A.subgroupOf H) :=
-    nilpotent_of_surjective (QuotientGroup.mk' (A.subgroupOf H))
+    Group.nilpotent_of_surjective (QuotientGroup.mk' (A.subgroupOf H))
       (QuotientGroup.mk'_surjective (A.subgroupOf H))
   haveI : IsSolvable (↥H ⧸ A.subgroupOf H) := IsNilpotent.to_isSolvable
   haveI : Nontrivial (↥H ⧸ A.subgroupOf H) :=
@@ -1922,7 +1922,7 @@ theorem sMember_diffSupport (hyp : SibleyDadeHypothesis G L H)
       exact ClassFunction.support_induce_subset_of_normal H (θ : ClassFunction ↥H ℂ)
     exact hsupp (ClassFunction.mem_support.mpr hχg)
   rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
-  simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+  simp only [sharpImage, Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff]
   exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h1 => hg1 (OneMemClass.coe_eq_one.mp h1)⟩
 
 /-- **(6.8.1), Frobenius case:** source-side orthogonality for the final
@@ -2254,7 +2254,7 @@ theorem xMember_diffSupport_of_irreducible_X (hyp : SibleyDadeHypothesis G L H)
       exact ClassFunction.support_induce_subset_of_normal H (θ : ClassFunction ↥H ℂ)
     exact hsupp (ClassFunction.mem_support.mpr hχg)
   rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
-  simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+  simp only [sharpImage, Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff]
   exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h1 => hg1 (OneMemClass.coe_eq_one.mp h1)⟩
 
 /-- **(T8 leaf 2) `X`-member difference support** (Frobenius case). -/
@@ -2445,7 +2445,7 @@ theorem sMember_diffSupport_of_charValue_eq (hyp : SibleyDadeHypothesis G L H)
       exact hyp.sMember_support_subset_H hχ'S (ClassFunction.mem_support.mpr hχ'g)
     · exact hyp.sMember_support_subset_H hχS (ClassFunction.mem_support.mpr hχg)
   rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
-  simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+  simp only [sharpImage, Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff]
   exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h1 => hg1 (OneMemClass.coe_eq_one.mp h1)⟩
 
 /-- **(T8.11d) scaled degree-matched support.**
@@ -2473,7 +2473,7 @@ theorem sMember_scaledDiffSupport_of_charValue_eq (hyp : SibleyDadeHypothesis G 
       exact hyp.sMember_support_subset_H hχ'S (ClassFunction.mem_support.mpr hχ'g)
     · exact hyp.sMember_support_subset_H hχS (ClassFunction.mem_support.mpr hχg)
   rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
-  simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+  simp only [sharpImage, Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff]
   exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h1 => hg1 (OneMemClass.coe_eq_one.mp h1)⟩
 
 /-- **Two-coefficient degree-matched difference support.**  For two `S`-members `χ, χ'` and naturals
@@ -2505,7 +2505,7 @@ theorem sMember_smulDiffSupport_of_charValue_eq (hyp : SibleyDadeHypothesis G L 
       exact hgnH (hyp.sMember_support_subset_H hχ'S (ClassFunction.mem_support.mpr h))
     exact hg (by rw [hval, hχg, hχ'g, mul_zero, mul_zero, sub_zero])
   rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
-  simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+  simp only [sharpImage, Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff]
   exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h1 => hg1 (OneMemClass.coe_eq_one.mp h1)⟩
 
 /-- **General `S`-combination support from degree 0.**  Any integer combination of `S`-members
@@ -2540,7 +2540,7 @@ theorem zSpan_S_support_subset_of_apply_one_eq_zero (hyp : SibleyDadeHypothesis 
   have hg1 : g ≠ 1 := by
     rintro rfl; exact (ClassFunction.mem_support.mp hg) h1
   rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
-  simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+  simp only [sharpImage, Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff]
   exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h => hg1 (OneMemClass.coe_eq_one.mp h)⟩
 
 /-- **`S`-member degree ratio against a degree-`|W₁|` anchor.**
@@ -3272,7 +3272,7 @@ theorem false_of_centralCommutator_break_arith {w1 d hZ cZ : ℕ}
   set m := cZ - 1 with hm
   have hge : 2 * w1 ^ 2 * hZ ≤ w1 * hZ * m := by
     calc 2 * w1 ^ 2 * hZ = w1 * hZ * (2 * w1) := by ring
-      _ ≤ w1 * hZ * m := mul_le_mul_left' hfpf (w1 * hZ)
+      _ ≤ w1 * hZ * m := mul_le_mul_right hfpf (w1 * hZ)
   have hle : 2 * w1 ^ 2 * hZ ≤ 2 * w1 ^ 2 * d := le_trans hge hbreak
   have hZd : hZ ≤ d := Nat.le_of_mul_le_mul_left hle (by positivity)
   have h2d : 2 ≤ d := le_trans hZ2 hZd
@@ -3888,7 +3888,7 @@ theorem six_three_index_bound (hyp : SibleyDadeHypothesis G L H)
     Nat.le_of_dvd Nat.card_pos (Subgroup.index_dvd_of_le (Subgroup.subgroupOf_mono H hAH₁))
   refine six_three_HH1_le (LK := H.index) (KH := 1) (HA := Nat.card (↥H ⧸ A.subgroupOf H))
     (HH1 := Nat.card (↥H ⧸ H₁.subgroupOf H)) (by norm_num) hHH1le ?_
-  simpa using hsixtwo
+  simpa [Subgroup.index_eq_card] using hsixtwo
 
 /-- **`hAcomm` from nilpotency of `H`.**
 

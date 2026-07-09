@@ -556,7 +556,7 @@ theorem fitting_map_eq_of_normal_of_fitting_le
   haveI : Group.IsNilpotent ↥(OddOrder.Isaacs.Ch01.fitting H) :=
     OddOrder.Isaacs.Ch01.fitting.isNilpotent
   haveI : Group.IsNilpotent ↥((OddOrder.Isaacs.Ch01.fitting H).subgroupOf P) :=
-    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hFP).symm
+    Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hFP).symm
   have hle : (OddOrder.Isaacs.Ch01.fitting H).subgroupOf P ≤ OddOrder.Isaacs.Ch01.fitting ↥P :=
     OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
   calc OddOrder.Isaacs.Ch01.fitting H
@@ -597,7 +597,7 @@ theorem exists_opCore_not_le_of_fitting_not_le
     {Q : Type*} [Group Q] {S : Subgroup Q} (hS : ¬ OddOrder.Isaacs.Ch01.fitting Q ≤ S) :
     ∃ p : Nat.Primes, ¬ OddOrder.Isaacs.Ch01.opCore (p : ℕ) Q ≤ S := by
   by_contra h
-  push_neg at h
+  push Not at h
   exact hS (iSup_le h)
 
 /-- The image of `F(A)` under an isomorphism `e : A ≃* B` is contained in `F(B)` (one direction of
@@ -608,7 +608,7 @@ theorem fitting_map_mulEquiv_le {A B : Type*} [Group A] [Group B] [Finite A] [Fi
   haveI : Group.IsNilpotent (OddOrder.Isaacs.Ch01.fitting A) :=
     OddOrder.Isaacs.Ch01.fitting.isNilpotent
   haveI : Group.IsNilpotent ↥((OddOrder.Isaacs.Ch01.fitting A).map e.toMonoidHom) :=
-    nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ e.toMonoidHom e.injective)
+    Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ e.toMonoidHom e.injective)
   haveI : ((OddOrder.Isaacs.Ch01.fitting A).map e.toMonoidHom).Normal :=
     (OddOrder.Isaacs.Ch01.fitting.normal A).map e.toMonoidHom e.surjective
   exact OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
@@ -686,7 +686,7 @@ theorem centralizer_subgroupOf {G : Type*} [Group G] {S : Subgroup G} (T : Set �
   rw [Subgroup.mem_centralizer_iff, Subgroup.mem_subgroupOf, Subgroup.mem_centralizer_iff]
   constructor
   · rintro hs g ⟨t, ht, rfl⟩
-    simpa only [map_mul] using congrArg (S.subtype) (hs t ht)
+    simpa only [map_mul, Subgroup.subtype_apply] using congrArg (S.subtype) (hs t ht)
   · intro hs t ht
     apply Subtype.ext
     rw [Subgroup.coe_mul, Subgroup.coe_mul]

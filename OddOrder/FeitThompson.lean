@@ -554,7 +554,7 @@ theorem exists_section16MaximalPair_data {G : Type*} [Group G] [Finite G]
   · obtain ⟨cb⟩ := Peterfalvi.S14.theorem88_caseB_holds hG
     exact absurd (hall cb.S cb.S_maximal)
       (BG.Ch4.S16.not_isTypeI_of_isTypeNonI hG cb.S_maximal cb.S_nonI)
-  · push_neg at hall
+  · push Not at hall
     obtain ⟨S, hS, hSnotI⟩ := hall
     have hSP : BG.Ch4.S14.IsTypeP S := notTypeI_imp_typeP S hS hSnotI
     haveI : IsSolvable ↥S := hG.solvable_of_mem_maximalSubgroups hS
@@ -1818,14 +1818,14 @@ noncomputable def tiCyclicW : OddOrder.Peterfalvi.S05.TICyclicHypothesis G :=
     V := (tp.W : Set G) \ ((tp.W1 : Set G) ∪ (tp.W2 : Set G))
     V_subset_sharp := by
       rintro x hx
-      rw [Set.mem_diff] at hx
+      rw [Set.mem_sdiff] at hx
       obtain ⟨_, hxni⟩ := hx
       simp only [Set.mem_union, SetLike.mem_coe, not_or] at hxni
       change x ∈ Set.univ \ ({1} : Set G)
       refine ⟨Set.mem_univ x, ?_⟩
       simp only [Set.mem_singleton_iff]
       exact fun h => hxni.1 (h ▸ one_mem tp.W1)
-    V_subset_W := Set.diff_subset
+    V_subset_W := Set.sdiff_subset
     W_normalizes_V := by
       intro w v hv
       have hvW : v ∈ tp.W := hv.1
@@ -2478,7 +2478,6 @@ theorem tau3W_omegaS_fourcorner_vanish (i : Fin tp.q) (j : Fin tp.p)
   have htriv := ((tiCyclicW hG mp tp).chiFam_spec rfl (tiCyclicWDadeApp hG mp tp)).1
   -- evaluate at `x` and rearrange
   have hev := congrArg (fun f : ClassFunction G ℂ => f x) hrel
-  simp only at hev
   rw [hvanish] at hev
   have hev' : (0 : ℂ) = 1 - tau3W hG mp tp (omegaS hG mp tp i ⟨0, tp.p_prime.pos⟩) x
       - tau3W hG mp tp (omegaS hG mp tp ⟨0, tp.q_prime.pos⟩ j) x
@@ -2579,7 +2578,8 @@ theorem tau3W_omegaS_row_vanish_of_one_zero {x : G}
   have hk0 : k ≠ 0 := by
     intro h0'
     refine hξᵢne ?_
-    rw [hkhom, h0', pow_zero]
+    rw [hkhom, h0']
+    exact pow_zero ξ₁
   have hkcop : k.Coprime (orderOf ξ₁) := by
     rw [hord₁]
     exact Nat.coprime_comm.mp (tp.q_prime.coprime_iff_not_dvd.mpr
@@ -2596,11 +2596,9 @@ theorem tau3W_omegaS_row_vanish_of_one_zero {x : G}
     show (tiCyclicW hG mp tp).sigmaIntegral rfl (tiCyclicWDadeApp hG mp tp) _ = _
     rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_apply]
   have hgoal := congrArg (fun f : ClassFunction G ℂ => f x) (hid i)
-  simp only at hgoal
   have huv := congrArg (fun f : ClassFunction G ℂ => f x) hu
   simp only [OddOrder.RepresentationTheory.ClassFunction.mapRingEquiv_apply] at huv
   have h1v := congrArg (fun f : ClassFunction G ℂ => f x) (hid ⟨1, tp.q_prime.one_lt⟩)
-  simp only at h1v
   calc tau3W hG mp tp (omegaS hG mp tp i ⟨0, tp.p_prime.pos⟩) x
       = (tiCyclicW hG mp tp).sigma rfl (tiCyclicWDadeApp hG mp tp)
           ((tiCyclicW hG mp tp).omega ξᵢ :

@@ -1526,6 +1526,7 @@ noncomputable def conjClassQuotient (hyp : Hypothesis G A L) : Type _ :=
   MulAction.orbitRel.Quotient L (Finset {a : G // a ∈ A})
 
 instance (hyp : Hypothesis G A L) : Finite hyp.conjClassQuotient := by
+  classical
   unfold Hypothesis.conjClassQuotient
   letI := hyp.conjFinsetAction
   letI : Finite (Finset {a : G // a ∈ A}) := Finite.of_fintype _

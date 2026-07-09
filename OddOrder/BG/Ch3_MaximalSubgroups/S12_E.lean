@@ -160,8 +160,8 @@ private theorem exists_hall_subgroupOf_of_full_factorization [Finite G] {Nsub C 
         rw [← hmul, Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
           Finsupp.add_apply]
       omega
-    · rw [Nat.factorization_eq_zero_of_non_prime _ hp_prime,
-        Nat.factorization_eq_zero_of_non_prime _ hp_prime]
+    · rw [Nat.factorization_eq_zero_of_not_prime _ hp_prime,
+        Nat.factorization_eq_zero_of_not_prime _ hp_prime]
   refine ⟨W, hWC, ?_, ?_⟩
   · intro p hp
     rw [hcardWN, hcardW] at hp

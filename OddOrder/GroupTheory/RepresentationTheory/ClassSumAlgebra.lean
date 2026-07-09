@@ -935,7 +935,7 @@ theorem centralCharacterOfRep_classSum_mul (ρ : Representation ℂ G V) [IsIrre
           ((classSum Ci * classSum Cj) Cs.out) •
             (⟨classSum Cs, classSum_mem_center Cs⟩ : Subalgebra.center ℂ (ℂ[G])) := by
     apply Subtype.ext
-    rw [Subalgebra.coe_mul, AddSubmonoidClass.coe_finset_sum]
+    rw [Subalgebra.coe_mul, AddSubmonoidClass.coe_finsetSum]
     simp only [SetLike.val_smul]
     exact classSum_mul Ci Cj
   calc (ω ρ Ci) * (ω ρ Cj)
@@ -2069,7 +2069,6 @@ theorem sum_centralCharacter_mul_character_inv_mul_character_one (ρ : Represent
       (F := fun g => ρ.character g * ρ.character g⁻¹) ?_]
   · exact hsumG
   · intro g h
-    simp only
     rw [ρ.char_conj, show (h * g * h⁻¹)⁻¹ = h * g⁻¹ * h⁻¹ by group, ρ.char_conj]
 
 end CharacterDegreeDvd

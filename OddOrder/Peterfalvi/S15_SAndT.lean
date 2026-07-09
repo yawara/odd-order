@@ -1014,7 +1014,7 @@ theorem W_sdiff_nonempty [Finite G] (hyp : Hypothesis (G := G)) :
   have hq3 : 3 ≤ hyp.q := hyp.three_le_q
   have hkey : hyp.p * hyp.q ≤ hyp.q + hyp.p := le_trans hle hunion
   have h3q : 3 * hyp.q ≤ hyp.p * hyp.q := mul_le_mul_right' hp3 hyp.q
-  have h3p : hyp.p * 3 ≤ hyp.p * hyp.q := mul_le_mul_left' hq3 hyp.p
+  have h3p : hyp.p * 3 ≤ hyp.p * hyp.q := mul_le_mul_right hq3 hyp.p
   omega
 
 /-- **Coprimality of the configuration complement from disjointness** (the Hall mechanism of

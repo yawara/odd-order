@@ -349,7 +349,7 @@ theorem derivedInG_normalizer_elemAb_le_fittingInG [Finite G] (hG : IsMinimalSim
       intro e he
       exact Ch2.S08.mem_normalizer_fittingInG_of_mem (hE_le_N he)
     haveI h3 : Group.IsNilpotent ↥(FN.subgroupOf E) :=
-      nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hFN_le_E).symm
+      Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hFN_le_E).symm
     calc FN = (FN.subgroupOf E).map E.subtype :=
           (Subgroup.map_subgroupOf_eq_of_le hFN_le_E).symm
       _ ≤ (Ch01.fitting ↥E).map E.subtype :=
@@ -674,7 +674,7 @@ theorem E2_abelian_normal_hall_of_abelianSylow [Finite G] (hG : IsMinimalSimpleO
   -- centralizes.
   have hE₂_le_FE : E₂ ≤ FE := hE₂_eq_W ▸ hW_le_FE
   haveI hE₂nilp : Group.IsNilpotent ↥E₂ :=
-    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hE₂_le_FE)
+    Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hE₂_le_FE)
   have hE₂_le_C : E₂ ≤ Subgroup.centralizer ((E₂ : Subgroup G) : Set G) := by
     refine Ch2.S08.le_of_sylow_le_of_nilpotent hE₂nilp ?_
     intro r

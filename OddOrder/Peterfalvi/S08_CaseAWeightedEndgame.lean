@@ -209,7 +209,7 @@ theorem nonempty_coherent_S_caseA_of_c2
           · exact hχ₂X
         have hdc : (hyp.Xset hyp.centralCommutator \ {χ₁, χ₂}).ncard
             = (hyp.Xset hyp.centralCommutator).ncard - 2 := by
-          rw [Set.ncard_diff hpair, Set.ncard_pair (Ne.symm hne)]
+          rw [Set.ncard_sdiff hpair, Set.ncard_pair (Ne.symm hne)]
         have hcne : (hyp.Xset hyp.centralCommutator \ {χ₁, χ₂}).Nonempty := by
           rw [Set.nonempty_iff_ne_empty]; intro he; rw [he, Set.ncard_empty] at hdc; omega
         obtain ⟨c, hcs, hcnp⟩ := hcne

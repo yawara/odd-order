@@ -392,7 +392,6 @@ theorem commutator_decomp_of_tau1_action [Finite G] (hG : IsMinimalSimpleOdd G)
       rw [hbot] at hconj_comm
       have hAQ_bot : (⁅A, Q⁆ : Subgroup G) = ⊥ := by
         have h2 := congrArg (fun K => MulAut.conj w⁻¹ • K) hconj_comm
-        simp only at h2
         rwa [map_inv, inv_smul_smul, mulAut_smul_eq_map, Subgroup.map_bot] at h2
       exact hAQ hAQ_bot
   exact ⟨⟨hA₀_mem, hA₀_le_A, ha3, hM_norm_A₀⟩, hb, hA₁_mem, inf_le_left, hc3⟩

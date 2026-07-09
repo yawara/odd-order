@@ -316,7 +316,7 @@ theorem Hypothesis.muGrid_column_sum_mem_sOf_H0_and_reducible [Finite G]
       {j : Fin hyp.w2 | j ≠ 0}).ncard = hyp.w2 - 1 := by
     rw [Set.ncard_image_of_injective _ hFinj,
       show {j : Fin hyp.w2 | j ≠ 0} = (Set.univ \ {0} : Set (Fin hyp.w2)) by ext j; simp,
-      Set.ncard_diff (Set.subset_univ _), Set.ncard_univ, Set.ncard_singleton]
+      Set.ncard_sdiff (Set.subset_univ _), Set.ncard_univ, Set.ncard_singleton]
     simp [Nat.card_eq_fintype_card]
   -- `A ⊆ B`: a reducible `𝒮(H₀)`-member is a nonzero column sum
   have hAB : {φ ∈ sOf (hyp.toTypesIIIIIIVSetup htype hnt) chief.H0 |
@@ -671,7 +671,7 @@ theorem Hypothesis.charParam_d_eq_u [Finite G] (hG : OddOrder.BG.IsMinimalSimple
         = ∑ i : Fin hyp.w1, (hyp.muGrid hG hG.odd i k) (1 : ↥M) := by
       rw [show ((∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i k : ClassFunction ↥M ℂ) : ↥M → ℂ)
           = ∑ i : Fin hyp.w1, ((hyp.muGrid hG hG.odd i k : ClassFunction ↥M ℂ) : ↥M → ℂ) from
-        AddSubmonoidClass.coe_finset_sum _ _]
+        AddSubmonoidClass.coe_finsetSum _ _]
       rw [Finset.sum_apply]
     have hterm : ∀ i : Fin hyp.w1, (hyp.muGrid hG hG.odd i k) (1 : ↥M) = (params.d : ℂ) := by
       intro i

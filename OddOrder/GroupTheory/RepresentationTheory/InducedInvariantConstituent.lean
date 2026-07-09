@@ -407,7 +407,7 @@ theorem constant_off_normal_of_inner_block_const {G : Type*} [Group G] [Finite G
           ClassFunction.induce_apply_eq_zero_of_not_mem_normal H _ hy, sub_zero]
       rw [hI0, mul_zero]
     exact (mul_eq_zero.mp hkey).resolve_left he_ne
-  · push_neg at hnt
+  · push Not at hnt
     refine Finset.sum_eq_zero fun θ hθA => ?_
     rw [hnt θ hθA]; simp
 

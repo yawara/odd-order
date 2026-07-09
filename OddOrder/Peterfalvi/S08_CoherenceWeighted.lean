@@ -692,7 +692,7 @@ theorem coherentDegreeSqNormBound_of_not_coherentW
       (OddOrder.Peterfalvi.S04.supportInSubgroup A L))) :
     ∑ i ∈ s, ((deg i : ℝ)) ^ 2 / mc i ≤ 2 * (a : ℝ) := by
   by_contra hlt
-  push_neg at hlt
+  push Not at hlt
   exact hnc ⟨xAdjoinStepW hyp hconj hS₁ χ hrealχ hdiffsuppχ hχχ hχbarχbar hχχbar hχbarχ
     hχ_S1 hχbar_S1 s χmem deg i₁ hi₁ hmemdegdiffsupp hmemS1 mc hmempos hmemortho hanchorNorm
     Dmem hortho_mem htau1Dmem hdiffasuppχ htau1_memaχ ha1 hlt hSgen hgen⟩
@@ -762,7 +762,7 @@ theorem coherentDegreeSqNormBound_of_not_coherentW_k
       (OddOrder.Peterfalvi.S04.supportInSubgroup A L))) :
     ∑ i ∈ s, ((deg i : ℝ)) ^ 2 / mc i ≤ 2 * (a : ℝ) := by
   by_contra hlt
-  push_neg at hlt
+  push Not at hlt
   exact hnc ⟨xAdjoinStepW_k hyp hconj hS₁ χ hdiffsuppχ hχχne hχbarχbarne hχχbar hχbarχ
     hχ_S1 hχbar_S1 s χmem deg i₁ hi₁ hmemdegdiffsupp hmemS1 mc hmempos hmemortho hanchorNorm
     Dmem Da hDatau1 hortho_mem htau1Dmem hdiffasuppχ htau1_memaχ ha1 hlt hSgen hgen⟩

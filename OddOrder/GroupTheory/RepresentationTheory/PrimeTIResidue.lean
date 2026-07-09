@@ -581,7 +581,7 @@ theorem prTIres_irr_dichotomy (χ : IrreducibleCharacter ↥h.K) :
             ≠ ((h.columnFamily χ₂).mu i : ClassFunction L ℂ)) := by
   by_cases hcase : ∃ χ₂, h.chiRestrict χ₂ = χ
   · exact Or.inl hcase
-  · push_neg at hcase
+  · push Not at hcase
     exact Or.inr ⟨h.induce_isIrreducible_of_forall_chiRestrict_ne hcase,
       fun χ₂ i => h.induce_ne_certainType_of_forall_chiRestrict_ne hcase χ₂ i⟩
 

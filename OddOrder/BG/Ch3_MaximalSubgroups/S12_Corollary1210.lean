@@ -49,7 +49,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
   `SubgroupESetup.derived_isNilpotent` (E' nilpotent)。
 - Theorem 10.1(c) = `S10.fusion_control_of_mem_sigma` 第 3 連言。
 - Proposition 12.4(a) = `centralizer_le_of_elemAb_rank_two`。
-- `Sylow.directProductOfNormal` + `isNilpotent_of_finite_tfae` (nilpotent = Sylow 直積)。
+- `Sylow.directProductOfNormal` + `Group.isNilpotent_of_finite_tfae` (nilpotent = Sylow 直積)。
 -/
 
 namespace OddOrder.BG.Ch3.S12
@@ -69,7 +69,7 @@ theorem isMulCommutative_of_isNilpotent_of_forall_sylow {H : Type*} [Group H] [F
     (hab : ∀ (q : ℕ), q.Prime → ∀ S : Sylow q H, IsMulCommutative ↥(S : Subgroup H)) :
     IsMulCommutative H := by
   classical
-  obtain ⟨e⟩ := ((isNilpotent_of_finite_tfae (G := H)).out 0 4).mp hnil
+  obtain ⟨e⟩ := ((Group.isNilpotent_of_finite_tfae (G := H)).out 0 4).mp hnil
   refine S11.isMulCommutative_of_mulEquiv e ⟨⟨fun x y => ?_⟩⟩
   funext q P
   exact (hab q (Nat.prime_of_mem_primeFactors q.2) P).is_comm.comm (x q P) (y q P)
@@ -531,7 +531,6 @@ theorem nilpotent_sigmaComplement_abelian [Finite G] (hG : IsMinimalSimpleOdd G)
       have hMfix : MulAut.conj w⁻¹ • M = M :=
         conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer (inv_mem hwM))
       have h3 := congrArg (fun K => MulAut.conj w⁻¹ • K) h2
-      simp only at h3
       rwa [smul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul, hMfix] at h3
     · intro hMs
       rw [hMs]

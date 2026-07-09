@@ -370,7 +370,7 @@ theorem Msigma_inf_centralizer_E_ne_bot_of_actsPrime_nonregular {M E E₃ : Subg
   have hxex : ∃ x ∈ E₃, x ≠ 1 ∧
       fixedByElement (OddOrder.BG.Ch3.S10.Msigma M) x ≠ ⊥ := by
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     exact hreg fun x hx hx1 => hcon x hx hx1
   obtain ⟨x, hxE3, hx1, hxfix⟩ := hxex
   -- Prime action collapses the `x`-fixed points to the `E`-fixed points.
@@ -1122,7 +1122,7 @@ theorem maximalTypeP1Family_disjoint_typeP2Family :
 theorem maximalTypeFFamily_eq_diff :
     maximalTypeFFamily G = maximalSubgroups G \ maximalTypePFamily G := by
   ext M
-  simp only [maximalTypeFFamily, maximalTypePFamily, Set.mem_setOf_eq, Set.mem_diff, not_and]
+  simp only [maximalTypeFFamily, maximalTypePFamily, Set.mem_setOf_eq, Set.mem_sdiff, not_and]
   constructor
   · rintro ⟨hM, hF⟩
     exact ⟨hM, fun _ => isTypeF_iff_not_isTypeP.mp hF⟩
@@ -1346,7 +1346,7 @@ theorem sigmaLength_conj [Finite G] (h x : G) :
   have hconjset : sigmaDecomposition (h * x * h⁻¹)
       = (fun z => h * z * h⁻¹) '' sigmaDecomposition x := by
     unfold sigmaDecomposition
-    rw [Set.image_diff hinj]
+    rw [Set.image_sdiff hinj]
     congr 1
     · ext y
       simp only [Set.mem_setOf_eq, Set.mem_image]
@@ -1570,7 +1570,7 @@ theorem sigma_cover_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
   have hpart : ∀ L : Subgroup G, sigmaPart L (x * x') = sigmaPart L x * sigmaPart L x' := fun L => by
     simp only [sigmaPart]; exact piPart_mul_of_commute hcomm
   ext y
-  simp only [sigmaDecomposition, Set.mem_diff, Set.mem_setOf_eq, Set.mem_singleton_iff,
+  simp only [sigmaDecomposition, Set.mem_sdiff, Set.mem_setOf_eq, Set.mem_singleton_iff,
     Set.mem_insert_iff]
   constructor
   · rintro ⟨⟨L, hL, rfl⟩, hne⟩
@@ -1659,7 +1659,7 @@ theorem sigmaLength_cover_le_two_signalizer [Finite G] (hG : OddOrder.BG.IsMinim
     sigmaLength (x * x') ≤ 2 := by
   rw [sigmaLength, sigma_cover_decomposition_signalizer hG hM hN hxM hx1 hxτ2 hx'N hcomm]
   have h1 : ({x'} \ {1} : Set G).ncard ≤ 1 :=
-    (Set.ncard_le_ncard Set.diff_subset (Set.finite_singleton x')).trans
+    (Set.ncard_le_ncard Set.sdiff_subset (Set.finite_singleton x')).trans
       (le_of_eq (Set.ncard_singleton x'))
   calc (insert x ({x'} \ {1} : Set G)).ncard
       ≤ ({x'} \ {1} : Set G).ncard + 1 := Set.ncard_insert_le x _
@@ -1979,7 +1979,7 @@ theorem isTISubset_sigmaSharp_of_sigma_eq_beta [Finite G]
       (Subgroup.normalizer ((OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G)) := by
   intro g hov
   obtain ⟨a, haS, hgaS⟩ := hov
-  simp only [sigmaSharp, sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff,
+  simp only [sigmaSharp, sharpSubgroup, Set.mem_sdiff, Set.mem_singleton_iff,
     SetLike.mem_coe] at haS hgaS
   obtain ⟨haMσ, _ha1⟩ := haS
   obtain ⟨hgaMσ, hga1⟩ := hgaS
@@ -2369,7 +2369,7 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     obtain ⟨x, hxE3, hxne, hxC⟩ : ∃ x ∈ E₃, x ≠ 1 ∧
         OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ := by
       by_contra hcon
-      push_neg at hcon
+      push Not at hcon
       exact hreg fun y hy hy1 => hcon y hy hy1
     -- `π(E) ⊆ κ(M)`, so `E` is a `κ(M)`-subgroup; the Hall `κ(M)`-subgroup `K ≤ E` forces `K = E`.
     have hEpi : Ch03.Subgroup.IsPiGroup (kappa M) (E.subgroupOf M) := by
@@ -2980,7 +2980,7 @@ theorem exists_typePESetup_kappaHall [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
     obtain ⟨x, hxE3, hxne, hxC⟩ : ∃ x ∈ E₃, x ≠ 1 ∧
         OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ := by
       by_contra hcon
-      push_neg at hcon
+      push Not at hcon
       exact hreg fun y hy hy1 => hcon y hy hy1
     have hEpi : Ch03.Subgroup.IsPiGroup (kappa M) (E.subgroupOf M) := by
       intro q hq
@@ -3478,7 +3478,7 @@ theorem sigma_diagnostic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         maximalSubgroupsContaining (Subgroup.centralizer ({x'} : Set G)) = {M}) := by
   classical
   -- `x ∈ M_σ`, `x ≠ 1`.
-  rw [sigmaSharp, sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe] at hx
+  rw [sigmaSharp, sharpSubgroup, Set.mem_sdiff, Set.mem_singleton_iff, SetLike.mem_coe] at hx
   obtain ⟨hxMσ, hx1⟩ := hx
   have hclos : Subgroup.closure ({x'} : Set G) = Subgroup.zpowers x' :=
     (Subgroup.zpowers_eq_closure x').symm
@@ -3552,7 +3552,7 @@ theorem sigma_diagnostic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     simpa using hconj
   · -- **Branch 1**: some prime `p₀ ∈ π(⟨x'⟩)` lies in `τ₁(M) ∪ τ₃(M)`.
     left
-    push_neg at hτ2
+    push Not at hτ2
     obtain ⟨p₀, hp₀mem, hp₀τ2⟩ := hτ2
     have hp₀prime : p₀.Prime := Nat.prime_of_mem_primeFactors hp₀mem
     haveI : Fact p₀.Prime := ⟨hp₀prime⟩
@@ -3821,7 +3821,7 @@ theorem typeP_neighbor_kappa [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hxne : (xsub : G) ≠ 1 := fun h => hxsub (OneMemClass.coe_eq_one.mp h)
   have hxK : (xsub : G) ∈ K := hXK hxX
   have hxsharp : (xsub : G) ∈ sigmaSharp Mi := by
-    rw [sigmaSharp, sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe]
+    rw [sigmaSharp, sharpSubgroup, Set.mem_sdiff, Set.mem_singleton_iff, SetLike.mem_coe]
     exact ⟨hXMiσ hxX, hxne⟩
   intro q hq
   haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hq⟩
@@ -4129,7 +4129,7 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
     have hwne : (wsub : G) ≠ 1 := fun h => hwsub (OneMemClass.coe_eq_one.mp h)
     obtain ⟨hwMσ, hwCx⟩ := Subgroup.mem_inf.mp hwmem
     have hwsharp : (wsub : G) ∈ sigmaSharp N := by
-      rw [sigmaSharp, sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe]
+      rw [sigmaSharp, sharpSubgroup, Set.mem_sdiff, Set.mem_singleton_iff, SetLike.mem_coe]
       exact ⟨hwMσ, hwne⟩
     have hxCw : x ∈ Subgroup.centralizer ({(wsub : G)} : Set G) := by
       rw [Subgroup.mem_centralizer_iff]; intro y hy; rw [Set.mem_singleton_iff.mp hy]
@@ -5094,7 +5094,7 @@ theorem Mtilde_disjoint [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   classical
   rw [Set.disjoint_left]
   rintro g ⟨x, hxsharp, x', hx'R, rfl⟩ ⟨w, hwsharp, w', hw'R, hgw⟩
-  rw [sigmaSharp, sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe]
+  rw [sigmaSharp, sharpSubgroup, Set.mem_sdiff, Set.mem_singleton_iff, SetLike.mem_coe]
     at hxsharp hwsharp
   obtain ⟨hxM₁, hx1⟩ := hxsharp
   obtain ⟨hwM₂, hw1⟩ := hwsharp
@@ -5316,7 +5316,7 @@ theorem signalizer_coset_or_kappa_of_sigmaSharp [Finite G]
         x' ∈ sharpSubgroup (M ⊓ Subgroup.centralizer ({x} : Set G)) ∧
         OddOrder.GroupTheory.IsPiElement (kappa M) x') := by
   classical
-  rw [sigmaSharp, sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe] at hx
+  rw [sigmaSharp, sharpSubgroup, Set.mem_sdiff, Set.mem_singleton_iff, SetLike.mem_coe] at hx
   obtain ⟨hxMσ, hx1⟩ := hx
   -- `x` and `x'` commute.
   have hcomm : x * x' = x' * x := (Subgroup.mem_centralizer_iff.mp hx'cent) x (Set.mem_singleton x)
@@ -5325,7 +5325,7 @@ theorem signalizer_coset_or_kappa_of_sigmaSharp [Finite G]
   · -- **κ branch**.
     refine Or.inr ⟨?_, ⟨hM, hxMσ⟩, ?_, ?_⟩
     · exact length_one_of_isPiElement_sigma hG D hM hx1 (isPiElement_sigma_of_mem_Msigma hxMσ)
-    · exact Set.mem_diff_singleton.mpr ⟨Subgroup.mem_inf.mpr ⟨hx'M, hx'cent⟩, hx'1⟩
+    · exact Set.mem_sdiff_singleton.mpr ⟨Subgroup.mem_inf.mpr ⟨hx'M, hx'cent⟩, hx'1⟩
     · intro p hp
       refine hκ p ?_
       change p ∈ (Nat.card ↥(Subgroup.closure ({x'} : Set G))).primeFactors
@@ -5397,7 +5397,7 @@ theorem branchA_or_branchB_of_mem_maximal [Finite G]
   have hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma M :=
     mem_Msigma_of_isPiElement_sigma_of_mem hG hM hxM hxπ
   have hxsharp : x ∈ sigmaSharp M := by
-    rw [sigmaSharp, sharpSubgroup]; exact Set.mem_diff_singleton.mpr ⟨hxMσ, hx1⟩
+    rw [sigmaSharp, sharpSubgroup]; exact Set.mem_sdiff_singleton.mpr ⟨hxMσ, hx1⟩
   have hxg : x⁻¹ * g = b := by rw [← hbmul, ← mul_assoc, inv_mul_cancel, one_mul]
   have hlen : D.length x = 1 := length_one_of_isPiElement_sigma hG D hM hx1 hxπ
   by_cases hb1 : b = 1
@@ -5453,7 +5453,7 @@ theorem sigma_decomposition_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimp
   have hlen0 : sigmaLength g ≠ 0 := fun h => hg ((sigmaLength_eq_zero_iff hG g).mp h)
   obtain ⟨x, hxmem⟩ : (sigmaDecomposition g).Nonempty := by
     rw [sigmaLength] at hlen0; exact Set.nonempty_of_ncard_ne_zero hlen0
-  rw [sigmaDecomposition, Set.mem_diff, Set.mem_singleton_iff] at hxmem
+  rw [sigmaDecomposition, Set.mem_sdiff, Set.mem_singleton_iff] at hxmem
   obtain ⟨⟨M₀, hM₀, hxeq⟩, hx1⟩ := hxmem
   have hxπ₀ : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M₀) x :=
     hxeq ▸ isPiElement_piPart (OddOrder.BG.Ch3.S10.sigma M₀) g
@@ -5495,7 +5495,7 @@ theorem sigma_decomposition_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimp
   -- `|𝓜_σ(x)| > 1` (else `C_G(x) ≤ M`, so `g ∈ M`).
   have hgt : 1 < (maximalSigmaSubgroupsOfElement x).ncard := by
     by_contra hle
-    push_neg at hle
+    push Not at hle
     have hcard1 : (maximalSigmaSubgroupsOfElement x).ncard = 1 :=
       le_antisymm hle ((Set.ncard_pos (Set.toFinite _)).mpr ⟨M, hMmemx⟩)
     exact hnotMg ((centralizer_le_of_maximalSigma_ncard_eq_one hG hcard1 hMmemx) hcxg)
@@ -5561,10 +5561,10 @@ theorem exists_mem_conjClassSet_Mtilde_of_ne_one [Finite G]
   · -- **Signalizer branch**: `y⁻¹g ∈ R(y)` puts `g` in `M̃(M)` for the maximal `M ∋ y` in `M_σ`.
     obtain ⟨hy1, M, hMmax, hyMσ⟩ := (D.length_one_iff y).mp hyl
     exact ⟨M, hMmax, subset_conjClassSet
-      (mem_Mtilde_of_mem_coset hG D (Set.mem_diff_singleton.mpr ⟨hyMσ, hy1⟩) hyr)⟩
+      (mem_Mtilde_of_mem_coset hG D (Set.mem_sdiff_singleton.mpr ⟨hyMσ, hy1⟩) hyr)⟩
   · -- **κ branch**: impossible under all-type-`F` (`κ(N) = ∅`).
     exfalso
-    have hN1 : y⁻¹ * g ≠ 1 := (Set.mem_diff_singleton.mp hsharp).2
+    have hN1 : y⁻¹ * g ≠ 1 := (Set.mem_sdiff_singleton.mp hsharp).2
     obtain ⟨p, hp⟩ : (orderOf (y⁻¹ * g)).primeFactors.Nonempty :=
       Nat.nonempty_primeFactors.mpr (by
         have h1 : orderOf (y⁻¹ * g) ≠ 1 := by rwa [Ne, orderOf_eq_one_iff]
@@ -5583,7 +5583,7 @@ theorem sharpSubgroup_Msigma_ncard_of_isConjugate [Finite G] {M L : Subgroup G}
   have key : ∀ H : Subgroup G, (sharpSubgroup H).ncard = Nat.card ↥H - 1 := fun H => by
     have hc : Nat.card ↥H = (H : Set G).ncard := by
       rw [← Nat.card_coe_set_eq]; exact Nat.card_congr (Equiv.refl _)
-    rw [sharpSubgroup, Set.ncard_diff (Set.singleton_subset_iff.mpr H.one_mem),
+    rw [sharpSubgroup, Set.ncard_sdiff (Set.singleton_subset_iff.mpr H.one_mem),
       Set.ncard_singleton, hc]
   rw [key, key]
   congr 1
@@ -5688,7 +5688,7 @@ theorem ne_one_of_mem_sigmaConjugacySaturation {M : Subgroup G} {x : G}
     (hx : x ∈ sigmaConjugacySaturation M) : x ≠ 1 := by
   rw [sigmaConjugacySaturation, sigmaSharp, mem_conjClassSet] at hx
   obtain ⟨t, ht, g, hgt⟩ := hx
-  rw [sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe] at ht
+  rw [sharpSubgroup, Set.mem_sdiff, Set.mem_singleton_iff, SetLike.mem_coe] at ht
   rw [← hgt]; intro h
   have e : g * t * g⁻¹ = g * 1 * g⁻¹ := by rw [h]; group
   exact ht.2 (mul_left_cancel (mul_right_cancel e))
@@ -5704,7 +5704,7 @@ theorem length_one_of_mem_sigmaConjugacySaturation [Finite G]
   classical
   rw [sigmaConjugacySaturation, sigmaSharp, mem_conjClassSet] at hx
   obtain ⟨t, ht, g, hgt⟩ := hx
-  rw [sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe] at ht
+  rw [sharpSubgroup, Set.mem_sdiff, Set.mem_singleton_iff, SetLike.mem_coe] at ht
   obtain ⟨htM, ht1⟩ := ht
   have hx1 : x ≠ 1 := by
     rw [← hgt]; intro h
@@ -5740,7 +5740,7 @@ theorem saturation_inter_Msigma_eq_sharp [Finite G] {M L : Subgroup G}
     {x | x ∈ sigmaConjugacySaturation M ∧ x ∈ OddOrder.BG.Ch3.S10.Msigma L}
       = sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma L) := by
   ext x
-  rw [sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe, Set.mem_setOf_eq]
+  rw [sharpSubgroup, Set.mem_sdiff, Set.mem_singleton_iff, SetLike.mem_coe, Set.mem_setOf_eq]
   refine ⟨fun hx => ⟨hx.2, ne_one_of_mem_sigmaConjugacySaturation hx.1⟩, fun hx => ⟨?_, hx.1⟩⟩
   obtain ⟨a, rfl⟩ := hconj
   rw [sigmaConjugacySaturation, sigmaSharp, mem_conjClassSet]
@@ -5749,7 +5749,7 @@ theorem saturation_inter_Msigma_eq_sharp [Finite G] {M L : Subgroup G}
   have hax : a * t * a⁻¹ = x := by
     rw [htdef, ← map_inv (MulAut.conj) a, MulAut.smul_def, MulAut.conj_apply, inv_inv]; group
   refine ⟨t, ?_, a, hax⟩
-  rw [sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe]
+  rw [sharpSubgroup, Set.mem_sdiff, Set.mem_singleton_iff, SetLike.mem_coe]
   exact ⟨hx.1, fun ht1 => hx.2 (by rw [← hax, ht1]; group)⟩
 
 /-- **BG Lemma 14.5(c), the double count** (mmd L3933-3940): summing `|R(x)|` over the conjugacy
@@ -5972,7 +5972,7 @@ theorem sigmaConjugacySaturation_Mtilde_ncard [Finite G]
     have hc : Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M)
         = (OddOrder.BG.Ch3.S10.Msigma M : Set G).ncard := by
       rw [← Nat.card_coe_set_eq]; exact Nat.card_congr (Equiv.refl _)
-    rw [sharpSubgroup, Set.ncard_diff
+    rw [sharpSubgroup, Set.ncard_sdiff
         (Set.singleton_subset_iff.mpr (OddOrder.BG.Ch3.S10.Msigma M).one_mem),
       Set.ncard_singleton, hc]
   rw [conjClassSet_Mtilde_eq_biUnion hG D, key, sigmaSaturation_Rsub_count hG D hM, hsharp]
@@ -6016,7 +6016,7 @@ theorem sigmaConjugacy_disjoint_of_nonconjugate [Finite G]
   rw [Set.disjoint_left]
   rintro g hgM hgN
   simp only [sigmaConjugacySaturation, sigmaSharp, sharpSubgroup, mem_conjClassSet,
-    Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe] at hgM hgN
+    Set.mem_sdiff, Set.mem_singleton_iff, SetLike.mem_coe] at hgM hgN
   obtain ⟨t, ⟨htM, ht1⟩, a, hat⟩ := hgM
   obtain ⟨s, ⟨hsN, _hs1⟩, b, hbs⟩ := hgN
   -- `t` is conjugate to `s` (both conjugate to `g`), hence has the same order.
@@ -6045,7 +6045,7 @@ theorem not_type1_of_type2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   classical
   rintro ⟨x, x', hgxx', hlx, hx'R⟩
   have hx1 : x ≠ 1 := ((D.length_one_iff x).mp hlx).1
-  rw [sigmaSharp, sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe] at hy
+  rw [sigmaSharp, sharpSubgroup, Set.mem_sdiff, Set.mem_singleton_iff, SetLike.mem_coe] at hy
   obtain ⟨hyMσ, hy1⟩ := hy
   have hgeq : x * x' = y * y' := hgxx'.symm.trans hgyy'
   have hpiSet : ∀ z : G, ∀ {q : ℕ}, q ∈ (orderOf z).primeFactors →
@@ -6105,7 +6105,7 @@ theorem not_type1_of_type2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     -- Corollary 14.3 for `(y, y')`: branch 2 (`τ₂`) is impossible, so `C_G(y) ⊆ M`.
     have hCyM : Subgroup.centralizer ({y} : Set G) ≤ M := by
       have hyσsharp : y ∈ sigmaSharp M := by
-        rw [sigmaSharp, sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe]
+        rw [sigmaSharp, sharpSubgroup, Set.mem_sdiff, Set.mem_singleton_iff, SetLike.mem_coe]
         exact ⟨hyMσ, hy1⟩
       rcases sigma_diagnostic hG D hM hyσsharp hy'M hy'1 hy'C
         (fun p hp => hy'Pi p (by
@@ -7803,7 +7803,7 @@ theorem typeP_family_exists_sigmaPart [Finite G] (hG : OddOrder.BG.IsMinimalSimp
     ∃ N : Subgroup G, IsZFamilyMember M K N ∧
       ¬ IsPiElement (OddOrder.BG.Ch3.S10.sigma N)ᶜ t := by
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   -- `ord(t) ≠ 1` has a prime factor `p`, and `p ∣ |Z|`.
   have hordne : orderOf t ≠ 1 := by rw [Ne, orderOf_eq_one_iff]; exact ht1
   obtain ⟨p, hp, hpord⟩ := Nat.exists_prime_and_dvd hordne
@@ -8069,7 +8069,7 @@ theorem mem_Mtilde_imp_form [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hg : g ∈ Mtilde hG D M) :
     ∃ x x' : G, g = x * x' ∧ D.length x = 1 ∧ x' ∈ Rsub hG D x := by
   obtain ⟨x, hx, x', hx', rfl⟩ := hg
-  rw [sigmaSharp, sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe] at hx
+  rw [sigmaSharp, sharpSubgroup, Set.mem_sdiff, Set.mem_singleton_iff, SetLike.mem_coe] at hx
   exact ⟨x, x', rfl, (D.length_one_iff x).mpr ⟨hx.2, ⟨M, hM, hx.1⟩⟩, hx'⟩
 
 /-- **Elements of `M̃` have `σ`-length at most two** (the per-element core of BG Cor 14.10): every
@@ -8148,7 +8148,7 @@ theorem typeP_family_T_form [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       rw [show t = y from by rw [← hyy', h, mul_one]]; exact hyKstar))
   obtain ⟨hNmax, -, -, -⟩ := typeP_family_member_data hG hM hP hKM hK hKstar hU hN
   refine ⟨N, hNmax, y, y', hyy'.symm, hcomm, ?_, hy'1, hKNN hy'KN, ?_, ?_⟩
-  · rw [sigmaSharp, sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe]
+  · rw [sigmaSharp, sharpSubgroup, Set.mem_sdiff, Set.mem_singleton_iff, SetLike.mem_coe]
     exact ⟨(inf_le_right :
       (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N ≤ _) hyKstar, hy1⟩
   · rw [Subgroup.mem_centralizer_iff]
@@ -8266,7 +8266,7 @@ theorem one_not_mem_Mtilde [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (D : SigmaDecompositionData G) {N : Subgroup G} (hN : N ∈ maximalSubgroups G) :
     (1 : G) ∉ Mtilde hG D N := by
   rintro ⟨x, hxsharp, x', hx'R, hxx'⟩
-  rw [sigmaSharp, sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe] at hxsharp
+  rw [sigmaSharp, sharpSubgroup, Set.mem_sdiff, Set.mem_singleton_iff, SetLike.mem_coe] at hxsharp
   obtain ⟨hxN, hx1⟩ := hxsharp
   have hx'eq : x' = x⁻¹ := (mul_eq_one_iff_inv_eq.mp hxx'.symm).symm
   have hlen : D.length x = 1 := (D.length_one_iff x).mpr ⟨hx1, ⟨N, hN, hxN⟩⟩
@@ -8297,7 +8297,7 @@ theorem sharpSubgroup_top_eq_iUnion_conjClassSet_Mtilde_of_typeF [Finite G]
           conjClassSet (Mtilde hG (genuineSigmaDecomposition hG) M) := by
   set D := genuineSigmaDecomposition hG with hD
   ext g
-  simp only [sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe,
+  simp only [sharpSubgroup, Set.mem_sdiff, Set.mem_singleton_iff, SetLike.mem_coe,
     Subgroup.mem_top, true_and, Set.mem_iUnion₂]
   constructor
   · intro hg1
@@ -8455,7 +8455,7 @@ theorem density_pieces_ncard_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
       (fun N _ => Set.toFinite _) hpair, finsum_mem_coe_finset]
   -- all pieces avoid `1`
   have h1T : (1 : G) ∉ Tset := fun h =>
-    (Set.mem_diff _ |>.mp h).2 (Set.mem_iUnion₂.mpr ⟨M, mem_ZFamilyFinset.mpr (Or.inl rfl),
+    (Set.mem_sdiff _ |>.mp h).2 (Set.mem_iUnion₂.mpr ⟨M, mem_ZFamilyFinset.mpr (Or.inl rfl),
       SetLike.mem_coe.mpr (Subgroup.one_mem _)⟩)
   have h1A : (1 : G) ∉ A := one_not_mem_conjClassSet h1T
   have h1U : (1 : G) ∉ U := by
@@ -8477,8 +8477,8 @@ theorem density_pieces_ncard_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
     · exact fun h => h1U (h ▸ hz)
   have hWcard : ({g : G | g ≠ 1} : Set G).ncard = Nat.card G - 1 := by
     have hWeq : {g : G | g ≠ 1} = (Set.univ : Set G) \ {1} := by
-      ext g; simp [Set.mem_diff]
-    rw [hWeq, Set.ncard_diff (Set.singleton_subset_iff.mpr (Set.mem_univ 1)), Set.ncard_univ,
+      ext g; simp [Set.mem_sdiff]
+    rw [hWeq, Set.ncard_sdiff (Set.singleton_subset_iff.mpr (Set.mem_univ 1)), Set.ncard_univ,
       Set.ncard_singleton]
   calc A.ncard + ∑ N ∈ ZFamilyFinset M K, (conjClassSet (Mtilde hG D N)).ncard
       = A.ncard + U.ncard := by rw [hUcard]
@@ -8501,7 +8501,7 @@ theorem exists_typeP2_member [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     ∃ N ∈ ZFamilyFinset M K, IsTypeP2 N := by
   classical
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   have hallP1 : ∀ N ∈ ZFamilyFinset M K, IsTypeP1 N := fun N hN =>
     (isTypeP_iff_isTypeP1_or_isTypeP2.mp
       (typeP_family_member_data hG hM hP hKM hK hKstar hU (mem_ZFamilyFinset.mp hN)).2.1).resolve_right
@@ -8895,7 +8895,7 @@ private theorem nat_mul_sub_kl_identity {k l : ℕ} (hk : 1 ≤ k) (hl : 1 ≤ l
 /-- `1 ∉ Ẑ`: the identity lies in `K ≤ K ⊔ K*`, hence in the removed set `K ∪ K*`.  So
 `sharpSubgroup Ẑ = Ẑ` and `𝒞_G(Ẑ^#) ⊆ G^#` — a prerequisite for the NonType-I `G^#` cover. -/
 theorem one_not_mem_zTilde (K Kstar : Subgroup G) : (1 : G) ∉ zTilde K Kstar := by
-  rw [zTilde, Set.mem_diff, not_and_or, not_not]
+  rw [zTilde, Set.mem_sdiff, not_and_or, not_not]
   exact Or.inr (Set.mem_union_left _ (SetLike.mem_coe.mpr K.one_mem))
 
 /-- **`Ẑ` is symmetric in its two factors**: `zTilde K K* = zTilde K* K` (both `K ⊔ K*` and
@@ -8947,7 +8947,7 @@ part of κ→Ẑ (placing the σ-part `y` in `K* = C_{M_σ}(K)` via `Z = K ⊔ K
 theorem mem_zTilde_of_mul {K Kstar : Subgroup G} (htri : K ⊓ Kstar = ⊥)
     {y y' : G} (hy : y ∈ Kstar) (hy1 : y ≠ 1) (hy' : y' ∈ K) (hy'1 : y' ≠ 1) :
     y * y' ∈ zTilde K Kstar := by
-  rw [zTilde, Set.mem_diff]
+  rw [zTilde, Set.mem_sdiff]
   refine ⟨(K ⊔ Kstar).mul_mem (Subgroup.mem_sup_right hy) (Subgroup.mem_sup_left hy'), ?_⟩
   rw [Set.mem_union, not_or]
   refine ⟨fun hmem => hy1 ?_, fun hmem => hy'1 ?_⟩
@@ -9002,7 +9002,7 @@ theorem zTilde_ncard_eq [Finite G] {M K Kstar : Subgroup G} (hKM : K ≤ M)
     have h := Set.ncard_union_add_ncard_inter (K : Set G) (Kstar : Set G)
     rw [hinter, Set.ncard_singleton, hKc, hKstarc] at h
     omega
-  rw [zTilde, Set.ncard_diff hsub, hZc, hunion]
+  rw [zTilde, Set.ncard_sdiff hsub, hZc, hunion]
   exact nat_mul_sub_kl_identity Nat.card_pos Nat.card_pos
 
 /-- Pure `ℕ` arithmetic for the `8/15 > 1/2` density step: for coprime odd `k, l > 1` one has
@@ -9202,7 +9202,7 @@ theorem exists_inf_ne_bot_of_mem_zTilde_inter [Finite G] {K Kstar L Lstar : Subg
   have hbLstar : b ∈ Lstar := (Subgroup.zpowers_le.mpr hwLstar) hbz
   -- `w = a * b ≠ 1`, so one factor is nontrivial.
   have hor : a ≠ 1 ∨ b ≠ 1 := by
-    by_contra h; push_neg at h
+    by_contra h; push Not at h
     exact hw1 (by rw [← hab, h.1, h.2, mul_one])
   rcases hor with ha1 | hb1
   · exact Or.inr fun hbot => ha1 (by
@@ -9372,7 +9372,7 @@ theorem typeP_covering [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   obtain ⟨u, huM, huH⟩ := ncard_inter_nonempty_of_two_mul_gt hMbound hHbound
   obtain ⟨t, htM, a, hat⟩ := huM
   obtain ⟨s, hsH, b, hbs⟩ := huH
-  simp only [zTilde, Set.mem_diff, Set.mem_union, SetLike.mem_coe, not_or] at htM hsH
+  simp only [zTilde, Set.mem_sdiff, Set.mem_union, SetLike.mem_coe, not_or] at htM hsH
   obtain ⟨htZ, htK, htKstar⟩ := htM
   obtain ⟨hsZ, hsL, hsLstar⟩ := hsH
   set c := a⁻¹ * b with hc_def
@@ -9484,7 +9484,7 @@ theorem isCyclic_kappaHall_of_le_nilpotent [Finite G] (hG : OddOrder.BG.IsMinima
     (hK'_hall : Ch03.IsHallSubgroup (kappa N) (K'.subgroupOf N))
     (hK'W : K' ≤ W) [Group.IsNilpotent ↥W] : IsCyclic ↥K' := by
   haveI : Group.IsNilpotent ↥K' :=
-    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hK'W)
+    Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hK'W)
   have hodd : Odd (Nat.card ↥K') :=
     hG.odd.of_dvd_nat ((Subgroup.card_dvd_of_le hK'N).trans (Subgroup.card_subgroup_dvd_card N))
   refine isCyclic_of_odd_of_isNilpotent_of_forall_pRank_le_one hodd fun p hp => ?_
@@ -9773,7 +9773,7 @@ theorem typeP_derivedInG_isComplement_kappaHall [Finite G]
     obtain ⟨x, hxE3, hxne, hxC⟩ : ∃ x ∈ E₃, x ≠ 1 ∧
         OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ := by
       by_contra hcon
-      push_neg at hcon
+      push Not at hcon
       exact hreg fun y hy hy1 => hcon y hy hy1
     have hEpi : Ch03.Subgroup.IsPiGroup (kappa M) (E.subgroupOf M) := by
       intro q hq
@@ -10271,7 +10271,7 @@ theorem sigmaLength_le_two_of_mem_zTilde_of_isTypeP [Finite G]
   have hKMsig : Kref ≤ OddOrder.BG.Ch3.S10.Msigma Mstar := hK_eq.trans_le inf_le_left
   have hKstarMsig : Kstarref ≤ OddOrder.BG.Ch3.S10.Msigma Mref := hKstarref.trans_le inf_le_left
   -- Unpack `z ∈ Ẑ = (K ⊔ K*) ∖ (K ∪ K*)`.
-  rw [zTilde, Set.mem_diff, Set.mem_union] at hz
+  rw [zTilde, Set.mem_sdiff, Set.mem_union] at hz
   obtain ⟨hzW, hznot⟩ := hz
   have hzW' : z ∈ Kref ⊔ Kstarref := SetLike.mem_coe.mp hzW
   -- `K ◁ (K ⊔ K*)` (`K*` centralises `K`), so the split `z = k·k*` exists (no `CommGroup` needed).
@@ -10307,7 +10307,7 @@ theorem sigmaLength_le_two_of_mem_zTilde_of_isTypeP [Finite G]
     (hKstarMsig hksK) hcomm
   rw [sigmaLength, hzkk, hdecomp]
   have h1 : (({(b : G)} : Set G) \ {1}).ncard ≤ 1 :=
-    (Set.ncard_le_ncard Set.diff_subset (Set.finite_singleton _)).trans
+    (Set.ncard_le_ncard Set.sdiff_subset (Set.finite_singleton _)).trans
       (le_of_eq (Set.ncard_singleton _))
   calc (insert (a : G) (({(b : G)} : Set G) \ {1})).ncard
       ≤ (({(b : G)} : Set G) \ {1}).ncard + 1 := Set.ncard_insert_le _ _
@@ -10473,7 +10473,7 @@ private theorem Q_le_fittingInG_of_commutator_centralizesQ [Finite G]
   haveI : IsMulCommutative ↥(Q ⊔ R : Subgroup G) := hNab
   haveI : Group.IsNilpotent ↥(Q ⊔ R : Subgroup G) := inferInstance
   haveI : Group.IsNilpotent ↥((Q ⊔ R).subgroupOf E) :=
-    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hNE).symm
+    Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hNE).symm
   have hfit : (Q ⊔ R).subgroupOf E ≤ OddOrder.Isaacs.Ch01.fitting ↥E :=
     Ch01.nilpotent_normal_le_fitting
   have hNfitG : (Q ⊔ R : Subgroup G) ≤ OddOrder.BG.Ch2.S08.fittingInG E := by
@@ -11013,7 +11013,7 @@ theorem kappa_branch_dichotomy_mem_conjClassSet_zTilde [Finite G]
     ∃ K Kstar : Subgroup G, g ∈ conjClassSet (zTilde K Kstar) := by
   obtain ⟨hNmax, hyNsigma⟩ := hNmem
   have hy1 : y ≠ 1 := ((D.length_one_iff y).mp hyl).1
-  rw [sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe,
+  rw [sharpSubgroup, Set.mem_sdiff, Set.mem_singleton_iff, SetLike.mem_coe,
     Subgroup.mem_inf] at hsharp
   obtain ⟨⟨hy'N, hy'cent⟩, hy'1⟩ := hsharp
   have hycent : y ∈ Subgroup.centralizer ({y⁻¹ * g} : Set G) := by
@@ -11053,7 +11053,7 @@ theorem kappa_branch_dichotomy_mem_fixed_conjClassSet_zTilde [Finite G]
     g ∈ conjClassSet (zTilde Kref Kstarref) := by
   obtain ⟨hNmax, hyNsigma⟩ := hNmem
   have hy1 : y ≠ 1 := ((D.length_one_iff y).mp hyl).1
-  rw [sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe,
+  rw [sharpSubgroup, Set.mem_sdiff, Set.mem_singleton_iff, SetLike.mem_coe,
     Subgroup.mem_inf] at hsharp
   obtain ⟨⟨hy'N, hy'cent⟩, hy'1⟩ := hsharp
   have hycent : y ∈ Subgroup.centralizer ({y⁻¹ * g} : Set G) := by
@@ -11092,7 +11092,7 @@ theorem exists_mem_conjClassSet_Mtilde_or_zTilde_of_ne_one [Finite G]
     ⟨y, hyl, hyr⟩ | ⟨y, hyl, N, hNmem, hsharp, hκ⟩
   · obtain ⟨hy1, M, hMmax, hyMσ⟩ := (D.length_one_iff y).mp hyl
     exact Or.inl ⟨M, hMmax, subset_conjClassSet
-      (mem_Mtilde_of_mem_coset hG D (Set.mem_diff_singleton.mpr ⟨hyMσ, hy1⟩) hyr)⟩
+      (mem_Mtilde_of_mem_coset hG D (Set.mem_sdiff_singleton.mpr ⟨hyMσ, hy1⟩) hyr)⟩
   · exact Or.inr (kappa_branch_dichotomy_mem_conjClassSet_zTilde hG D hyl hNmem hsharp hκ)
 
 /-- **Fixed-`W` `G^#` cover** (the form BG Corollary 14.9 / the NonTypeICovering struct needs):
@@ -11117,7 +11117,7 @@ theorem exists_mem_conjClassSet_Mtilde_or_fixed_zTilde [Finite G]
     ⟨y, hyl, hyr⟩ | ⟨y, hyl, N, hNmem, hsharp, hκ⟩
   · obtain ⟨hy1, M, hMmax, hyMσ⟩ := (D.length_one_iff y).mp hyl
     exact Or.inl ⟨M, hMmax, subset_conjClassSet
-      (mem_Mtilde_of_mem_coset hG D (Set.mem_diff_singleton.mpr ⟨hyMσ, hy1⟩) hyr)⟩
+      (mem_Mtilde_of_mem_coset hG D (Set.mem_sdiff_singleton.mpr ⟨hyMσ, hy1⟩) hyr)⟩
   · exact Or.inr (kappa_branch_dichotomy_mem_fixed_conjClassSet_zTilde hG D hMref hMPref hKMref
       hKref hKstarref hUref hyl hNmem hsharp hκ)
 
@@ -11367,7 +11367,7 @@ private theorem eq_of_isNilpotent_normalizer_inf_le [Finite G] {N P : Subgroup G
     (hN : Group.IsNilpotent ↥N) (hPN : P ≤ N)
     (hle : Subgroup.normalizer (P : Set G) ⊓ N ≤ P) : N = P := by
   haveI : Group.IsNilpotent ↥N := hN
-  have hnc : NormalizerCondition ↥N := normalizerCondition_of_isNilpotent
+  have hnc : NormalizerCondition ↥N := Group.normalizerCondition_of_isNilpotent
   have hself : Subgroup.normalizer (P.subgroupOf N) = P.subgroupOf N := by
     rw [← Subgroup.subgroupOf_normalizer_eq hPN]
     refine le_antisymm (fun x hx => ?_) (fun x hx => ?_) <;>
@@ -11459,7 +11459,7 @@ theorem typeP2_neighbor_is_typeF_of_mem [Finite G] (hG : OddOrder.BG.IsMinimalSi
           have hmem : q ∈ (Nat.card ↥(R.subgroupOf U)).primeFactors :=
             Nat.mem_primeFactors.mpr ⟨hqp, hdvd, Nat.card_pos.ne'⟩
           exact (Set.mem_singleton_iff.mp (hR.1 q hmem)).symm
-        · exact Nat.factorization_eq_zero_of_non_prime _ hqp
+        · exact Nat.factorization_eq_zero_of_not_prime _ hqp
     have hfact : (Nat.card ↥U).factorization r
         = (Nat.card ↥(R.subgroupOf U)).factorization r := by
       have hidx : (R.subgroupOf U).index.factorization r = 0 :=
@@ -11508,7 +11508,7 @@ theorem typeP2_neighbor_is_typeF_of_mem [Finite G] (hG : OddOrder.BG.IsMinimalSi
           have hmem : q ∈ (Nat.card ↥(R.subgroupOf U)).primeFactors :=
             Nat.mem_primeFactors.mpr ⟨hqp, hSU ▸ hdvd, Nat.card_pos.ne'⟩
           exact (Set.mem_singleton_iff.mp (hR.1 q hmem)).symm
-        · exact Nat.factorization_eq_zero_of_non_prime _ hqp
+        · exact Nat.factorization_eq_zero_of_not_prime _ hqp
     -- `(|U|).factorization r = (|R|).factorization r` (`r ∤ [U : R]`).
     have hfUR : (Nat.card ↥U).factorization r = (Nat.card ↥R).factorization r := by
       have hidxU : (R.subgroupOf U).index.factorization r = 0 :=
@@ -11787,7 +11787,7 @@ theorem typeP2_neighbor_is_typeF_of_mem [Finite G] (hG : OddOrder.BG.IsMinimalSi
     haveI h2 : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma H) :=
       (msigma_structure_of_notMem_sigma_kappa hG hHmax hqπH hqσ'H hqκH hAmem hAH).2.2
     haveI h3 : Group.IsNilpotent ↥((OddOrder.BG.Ch3.S10.Msigma H).subgroupOf H) :=
-      nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe (OddOrder.BG.Ch3.S10.Msigma_le H)).symm
+      Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe (OddOrder.BG.Ch3.S10.Msigma_le H)).symm
     have h4 : (OddOrder.BG.Ch3.S10.Msigma H).subgroupOf H ≤ OddOrder.Isaacs.Ch01.fitting ↥H :=
       OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
     calc OddOrder.BG.Ch3.S10.Msigma H
@@ -12008,7 +12008,7 @@ theorem typeP2_neighbor_is_typeF_of_mem [Finite G] (hG : OddOrder.BG.IsMinimalSi
       calc Subgroup.normalizer (U : Set G) ⊓ Fu ≤ M ⊓ Fu := le_inf h1 inf_le_right
         _ = U := hdefU
     haveI hFunil : Group.IsNilpotent ↥Fu :=
-      nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe
+      Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe
         (opiCoreInG_le π (OddOrder.BG.Ch2.S08.fittingInG H)))
     have hFuU : Fu = U := eq_of_isNilpotent_normalizer_inf_le hFunil hUFu hNFuU
     have hHnU : H ≤ Subgroup.normalizer (U : Set G) := hFuU ▸ hHnFu
@@ -12132,7 +12132,7 @@ theorem exists_sigmaDecomposition_length_le_two [Finite G]
         rw [isTypeF_iff_not_isTypeP]
         exact fun hMP => hP ⟨M, hM, hMP⟩
       have hgsharp : g ∈ sharpSubgroup (⊤ : Subgroup G) :=
-        Set.mem_diff_singleton.mpr ⟨Subgroup.mem_top g, hg1⟩
+        Set.mem_sdiff_singleton.mpr ⟨Subgroup.mem_top g, hg1⟩
       rw [sharpSubgroup_top_eq_iUnion_conjClassSet_Mtilde_of_typeF hG htypeF,
         Set.mem_iUnion₂] at hgsharp
       obtain ⟨M, hMmax, hgM⟩ := hgsharp
@@ -12229,12 +12229,12 @@ decomposition below (Coq `nilpotent_subnormal (Fitting_nil D) sK_FD`).  Not `S14
 
 /-- **Every subgroup of a finite nilpotent group is subnormal** (mathcomp `nilpotent_subnormal`).
 Strong induction on the index: for `H ≠ ⊤` the normalizer condition
-(`normalizerCondition_of_isNilpotent`) gives `H < N(H)`, `H ⊴ N(H)` (`normal_in_normalizer`), and
+(`Group.normalizerCondition_of_isNilpotent`) gives `H < N(H)`, `H ⊴ N(H)` (`normal_in_normalizer`), and
 `[Γ : N(H)] < [Γ : H]` (`index_strictAnti`), so the IH makes `N(H)` subnormal;
 then `IsSubnormal.step`. -/
 theorem isSubnormal_of_isNilpotent {Γ : Type*} [Group Γ] [Finite Γ] [Group.IsNilpotent Γ]
     (H : Subgroup Γ) : H.IsSubnormal := by
-  have hnc : NormalizerCondition Γ := normalizerCondition_of_isNilpotent
+  have hnc : NormalizerCondition Γ := Group.normalizerCondition_of_isNilpotent
   induction hidx : H.index using Nat.strong_induction_on generalizing H with
   | _ n ih =>
     by_cases hHtop : H = ⊤
@@ -12335,7 +12335,7 @@ theorem signalizer_msigma_sup_inf_partner_eq [Finite G]
     refine isSubnormal_of_le_normal_nilpotent
       (N := (OddOrder.BG.Ch2.S08.fittingInG E).subgroupOf E) ?_
       (OddOrder.BG.Ch2.S08.fittingInG_subgroupOf_normal E)
-      (nilpotent_of_mulEquiv
+      (Group.nilpotent_of_mulEquiv
         (Subgroup.subgroupOfEquivOfLe (OddOrder.BG.Ch2.S08.fittingInG_le E)).symm)
     exact Subgroup.comap_mono hKFE
   have hEMst : E ≤ Mst := le_partner_of_subnormal_of_uniq hsKuniq hKMst E hKE hKsubnormal

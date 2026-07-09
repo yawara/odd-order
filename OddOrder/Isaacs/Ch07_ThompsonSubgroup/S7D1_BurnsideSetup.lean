@@ -534,7 +534,7 @@ theorem card_eq_pow_mul_pow_of_dvd {n p q : ℕ}
       by_cases hr_prime : r.Prime
       · exact Nat.factorization_eq_zero_of_not_dvd (fun hdvd_pr => by
           rcases hpf r hr_prime hdvd_pr with h | h; exacts [hrp h, hrq h])
-      · exact Nat.factorization_eq_zero_of_non_prime _ hr_prime
+      · exact Nat.factorization_eq_zero_of_not_prime _ hr_prime
 
 /-- **§7D Step 2 — complementary Sylow product** (Isaacs L3973).
 
@@ -1172,7 +1172,7 @@ theorem step1_unique_maximal_containing_nilpotent
       rw [hL_def, hLp_def, hLq_def, ← Subgroup.map_sup]
     haveI hL_nilp : Group.IsNilpotent ↥L := by
       rw [hL_eq_map]
-      exact nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective (OpX ⊔ OqX) X.subtype
+      exact Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective (OpX ⊔ OqX) X.subtype
         X.subtype_injective)
     -- `p, q ∣ |L|` (`Kp ≤ Lp ≤ L` with `p ∣ |Kp|`, etc.).
     have hKp_card_eq : Nat.card ↥Kp = Nat.card ↥(OddOrder.Isaacs.Ch01.opCore p ↥K) := by

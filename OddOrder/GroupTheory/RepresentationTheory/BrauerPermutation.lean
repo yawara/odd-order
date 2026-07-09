@@ -301,7 +301,6 @@ theorem ncard_fixedPoints_eq_of_permMatrix_conj {n : Type*} [Fintype n] [Decidab
     (Function.fixedPoints σ).ncard = (Function.fixedPoints τ).ncard := by
   have hσ_conj : σ.permMatrix ℂ = A * τ.permMatrix ℂ * A⁻¹ := by
     have h := congrArg (fun M => M * A⁻¹) hmat
-    simp only at h
     rwa [Matrix.mul_assoc (σ.permMatrix ℂ), Matrix.mul_inv_of_invertible, Matrix.mul_one] at h
   have htrace : Matrix.trace (σ.permMatrix ℂ) = Matrix.trace (τ.permMatrix ℂ) := by
     rw [hσ_conj, Matrix.trace_mul_cycle, Matrix.inv_mul_of_invertible, Matrix.one_mul]

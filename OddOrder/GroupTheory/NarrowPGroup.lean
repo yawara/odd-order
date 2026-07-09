@@ -177,11 +177,11 @@ by the order-`p` elements of the second centre `Z₂(R) = upperCentralSeries R 2
 realised as the image of `Ω₁(↥Z₂(R))` under `Z₂(R).subtype` (the `omega1Map`
 template, since `Z₂(R)` is generally non-abelian). -/
 def omega1UpperCentralTwo (R : Type*) [Group R] (p : ℕ) : Subgroup R :=
-  (Omega ↥(upperCentralSeries R 2) p 1).map (upperCentralSeries R 2).subtype
+  (Omega ↥(Subgroup.upperCentralSeries R 2) p 1).map (Subgroup.upperCentralSeries R 2).subtype
 
 /-- `W = Ω₁(Z₂(R)) ≤ Z₂(R)`. -/
 theorem omega1UpperCentralTwo_le (R : Type*) [Group R] (p : ℕ) :
-    omega1UpperCentralTwo R p ≤ upperCentralSeries R 2 :=
+    omega1UpperCentralTwo R p ≤ Subgroup.upperCentralSeries R 2 :=
   Subgroup.map_subtype_le _
 
 /-- `W = Ω₁(Z₂(R))` is characteristic in `R` (char-in-char: `Ω₁` is characteristic
@@ -197,17 +197,17 @@ For `x, y ∈ Z₂(R) = upperCentralSeries R 2`, `mem_upperCentralSeries_succ_if
 `⁅x, y⁆` commutes with all of `R`, in particular centralises `Z₂(R)`. Translating
 along `Z₂(R).subtype` yields the claim. -/
 theorem commutator_upperCentralSeries_two_le_center {R : Type*} [Group R] :
-    _root_.commutator ↥(upperCentralSeries R 2) ≤
-      Subgroup.center ↥(upperCentralSeries R 2) := by
-  set Z := upperCentralSeries R 2 with hZ
+    _root_.commutator ↥(Subgroup.upperCentralSeries R 2) ≤
+      Subgroup.center ↥(Subgroup.upperCentralSeries R 2) := by
+  set Z := Subgroup.upperCentralSeries R 2 with hZ
   -- `⁅Z, Z⁆ ≤ Z(R)`: for `x, y ∈ Z = upperCentralSeries R 2`, `⁅x, y⁆ ∈ Z(R)`.
   have hZZ_le_center : ⁅Z, Z⁆ ≤ Subgroup.center R := by
     rw [Subgroup.commutator_le]
     intro x hx y _
-    -- `x ∈ upperCentralSeries R (1 + 1)` ⇒ `x * y * x⁻¹ * y⁻¹ ∈ upperCentralSeries R 1`.
-    have hmem : x * y * x⁻¹ * y⁻¹ ∈ upperCentralSeries R 1 :=
-      mem_upperCentralSeries_succ_iff.mp hx y
-    rwa [upperCentralSeries_one, ← commutatorElement_def] at hmem
+    -- `x ∈ upperCentralSeries R (1 + 1)` ⇒ `⁅x, y⁆ ∈ upperCentralSeries R 1`.
+    have hmem : ⁅x, y⁆ ∈ Subgroup.upperCentralSeries R 1 :=
+      Subgroup.mem_upperCentralSeries_succ_iff.mp hx y
+    rwa [Subgroup.upperCentralSeries_one] at hmem
   -- `Z(R)` centralises everything, so `⁅Z, Z⁆ ≤ centralizer (Z : Set R)`.
   have hZZ_cent : ⁅Z, Z⁆ ≤ Subgroup.centralizer (Z : Set R) := by
     intro x hx
@@ -272,10 +272,10 @@ theorem commutator_le_centralizer_omega1UpperCentralTwo
   have hW_top_center : ⁅W, (⊤ : Subgroup R)⁆ ≤ Subgroup.center R := by
     rw [Subgroup.commutator_le]
     intro x hx y _
-    have hxZ2 : x ∈ upperCentralSeries R 2 := omega1UpperCentralTwo_le R p hx
-    have hmem : x * y * x⁻¹ * y⁻¹ ∈ upperCentralSeries R 1 :=
-      mem_upperCentralSeries_succ_iff.mp hxZ2 y
-    rwa [upperCentralSeries_one, ← commutatorElement_def] at hmem
+    have hxZ2 : x ∈ Subgroup.upperCentralSeries R 2 := omega1UpperCentralTwo_le R p hx
+    have hmem : ⁅x, y⁆ ∈ Subgroup.upperCentralSeries R 1 :=
+      Subgroup.mem_upperCentralSeries_succ_iff.mp hxZ2 y
+    rwa [Subgroup.upperCentralSeries_one] at hmem
   have htop_W_center : ⁅(⊤ : Subgroup R), W⁆ ≤ Subgroup.center R := by
     rw [Subgroup.commutator_comm]
     exact hW_top_center

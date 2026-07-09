@@ -273,7 +273,7 @@ theorem Hypothesis.card_typePA_div_card_lt_inv_w1 [Finite G]
     rw [typePA_eq_sharpSubgroup_derivedInG, Nat.card_coe_set_eq]
     have hc : Nat.card ↥(derivedInG M) = ((derivedInG M : Set G)).ncard := by
       rw [← Nat.card_coe_set_eq]; exact Nat.card_congr (Equiv.refl _)
-    rw [sharpSubgroup, Set.ncard_diff (Set.singleton_subset_iff.mpr (derivedInG M).one_mem),
+    rw [sharpSubgroup, Set.ncard_sdiff (Set.singleton_subset_iff.mpr (derivedInG M).one_mem),
       Set.ncard_singleton, hc]
   -- `|M| = w₁·|M'|` since `[M : M'] = w₁`.
   have hcardM : Nat.card ↥M = hyp.w1 * Nat.card ↥(derivedInG M) := by
@@ -674,7 +674,7 @@ theorem Hypothesis.chiRhoNormSq_zeta_ge_line78 [Finite G]
     intro i
     refine (induce_diff_support (θ i) (θ 0) (d i) (hdeg i)).trans ?_
     intro x hx
-    rw [Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff] at hx
+    rw [Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff] at hx
     exact (mem_supportInSubgroup_sharp_subgroupOf_iff (derivedInG M) hAH x).mpr ⟨hx.1, hx.2⟩
   have hsupp_full : ∀ i, (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
         - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)).support
@@ -792,7 +792,7 @@ theorem Hypothesis.chiRhoNormSq_zeta_ge_line78 [Finite G]
     rw [one_smul] at hds
     intro x hx
     have hxd := hds hx
-    rw [Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff] at hxd
+    rw [Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff] at hxd
     have hmem := (mem_supportInSubgroup_sharp_subgroupOf_iff (derivedInG M) hAH x).mpr
       ⟨hxd.1, hxd.2⟩
     show x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup (typePA0 M hyp.typeP) M
@@ -2716,7 +2716,7 @@ theorem charParam_a_mem_of_norm_ineq {a : ℤ} {n : ℕ} (hn : 2 ≤ n)
     (h : (n : ℤ) * (a ^ 2 - 2 * a) ≤ 2) : a = 0 ∨ a = 1 ∨ a = 2 := by
   have hn2 : (2 : ℤ) ≤ (n : ℤ) := by exact_mod_cast hn
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   obtain ⟨ha0, ha1, ha2⟩ := hcon
   have ha : a ≤ -1 ∨ 3 ≤ a := by omega
   have hge : 3 ≤ a ^ 2 - 2 * a := by rcases ha with h | h <;> nlinarith

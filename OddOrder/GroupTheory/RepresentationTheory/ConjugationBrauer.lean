@@ -142,7 +142,7 @@ theorem card_fixedPoints_conjClassPerm_eq_one_of_commute_of_centralizer_inf_eq_b
     rcases ConjClasses.exists_rep E with ⟨h, rfl⟩
     have hmk :
         ConjClasses.mk (ClassFunction.conjByMulEquiv (G := G) (H := H) g h) = ConjClasses.mk h := by
-      simpa [ConjClasses.conjByPerm_mk] using hE
+      simpa [ConjClasses.conjByPerm_mk] using hE.eq
     have hisConj :
         IsConj (ClassFunction.conjByMulEquiv (G := G) (H := H) g h) h :=
       ConjClasses.mk_eq_mk_iff_isConj.mp hmk

@@ -100,7 +100,7 @@ no induction term vanishes (`induceTerm_of_mem_normal`), and `θ(x⁻¹ h x)` is
 theorem card_smul_restrict_induce (θ : ClassFunction ↥H k) :
     (Nat.card H : k) • restrict H (induce H θ) = ∑ x : G, conjBy x⁻¹ θ := by
   ext h
-  rw [smul_apply, restrict_apply, induce_apply, ClassFunction.finset_sum_apply,
+  rw [ClassFunction.smul_apply, restrict_apply, induce_apply, ClassFunction.finset_sum_apply,
     ← mul_assoc, mul_invOf_self, one_mul]
   refine Finset.sum_congr rfl fun x _ => ?_
   rw [induceTerm_of_mem_normal (le_refl H) θ h.property x, conjBy_apply]
@@ -323,7 +323,7 @@ theorem induce_eq_induce_iff_conj (θ ψ : IrreducibleCharacter H) :
   constructor
   · intro heq
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     have h0 := inner_induce_eq_zero_of_not_conj θ ψ hcon
     rw [heq] at h0
     have hpos : ClassFunction.inner (induce H (ψ : ClassFunction ↥H ℂ))

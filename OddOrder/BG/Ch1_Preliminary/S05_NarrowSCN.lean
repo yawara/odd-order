@@ -80,10 +80,10 @@ theorem omega1Center_le_omega1UpperCentralTwo {p : ℕ} :
   intro z hz
   rw [omega1UpperCentralTwo, Subgroup.mem_map]
   have hz_pow : z ^ p = 1 := (mem_omega1Center.mp hz).2
-  have hzZ2 : z ∈ upperCentralSeries R 2 := by
-    exact (upperCentralSeries_mono R (by norm_num : (1 : ℕ) ≤ 2))
+  have hzZ2 : z ∈ Subgroup.upperCentralSeries R 2 := by
+    exact (Subgroup.upperCentralSeries_mono R (by norm_num : (1 : ℕ) ≤ 2))
       (by
-        rw [upperCentralSeries_one]
+        rw [Subgroup.upperCentralSeries_one]
         exact (mem_omega1Center.mp hz).1)
   refine ⟨⟨z, hzZ2⟩, ?_, rfl⟩
   refine Omega.mem_of_pow_eq_one ?_
@@ -115,11 +115,11 @@ theorem commutator_omega1UpperCentralTwo_le_omega1Center {p : ℕ} (hp : Odd p) 
     ⁅omega1UpperCentralTwo R p, (⊤ : Subgroup R)⁆ ≤ omega1Center R p := by
   rw [Subgroup.commutator_le]
   intro w hw r _
-  have hwZ2 : w ∈ upperCentralSeries R 2 := omega1UpperCentralTwo_le R p hw
+  have hwZ2 : w ∈ Subgroup.upperCentralSeries R 2 := omega1UpperCentralTwo_le R p hw
   have hcomm_center : ⁅w, r⁆ ∈ Subgroup.center R := by
-    have hmem : w * r * w⁻¹ * r⁻¹ ∈ upperCentralSeries R 1 :=
-      mem_upperCentralSeries_succ_iff.mp hwZ2 r
-    rwa [upperCentralSeries_one, ← commutatorElement_def] at hmem
+    have hmem : w * r * w⁻¹ * r⁻¹ ∈ Subgroup.upperCentralSeries R 1 :=
+      Subgroup.mem_upperCentralSeries_succ_iff.mp hwZ2 r
+    rwa [Subgroup.upperCentralSeries_one, ← commutatorElement_def] at hmem
   refine (mem_omega1Center).mpr ⟨hcomm_center, ?_⟩
   have hwpow : w ^ p = 1 := pow_eq_one_of_mem_omega1UpperCentralTwo hp hw
   have hpow := S04.commutatorElement_pow_left_of_central hcomm_center p
@@ -489,15 +489,15 @@ theorem omega1UpperCentralTwo_not_isCyclic_of_three_le_pRank
       have hj_eq_one : j = 1 := by omega
       have hHcard : Nat.card H = p := by simpa [hj_eq_one] using hj_eq
       exact S04.le_center_of_card_eq_prime_of_normal hpg hHcard
-  have hS_le_Z2 : S ≤ upperCentralSeries R 2 := by
+  have hS_le_Z2 : S ≤ Subgroup.upperCentralSeries R 2 := by
     intro s hs
-    rw [mem_upperCentralSeries_succ_iff]
+    rw [Subgroup.mem_upperCentralSeries_succ_iff]
     intro r
     have hcomm_center : ⁅s, r⁆ ∈ Subgroup.center R := by
       exact hH_le_center (by
         dsimp [H]
         exact Subgroup.commutator_mem_commutator hs trivial)
-    simpa [upperCentralSeries_one, commutatorElement_def] using hcomm_center
+    simpa [Subgroup.upperCentralSeries_one, commutatorElement_def] using hcomm_center
   let W : Subgroup R := omega1UpperCentralTwo R p
   have hS_le_W : S ≤ W := by
     intro s hs
@@ -1038,7 +1038,7 @@ theorem omega1UpperCentralTwo_isElementaryAbelian_of_maximalElementaryAbelian_ca
         hp hpg h3 hEcard hEstar
   refine ⟨?_, ?_⟩
   · intro x y
-    exact IsPGroup.commutative_of_card_eq_prime_sq (p := p) (G := W) hWcard x y
+    exact (IsPGroup.isMulCommutative_of_card_eq_prime_sq (p := p) (G := W) hWcard).is_comm.comm x y
   · intro x
     apply Subtype.ext
     exact pow_eq_one_of_mem_omega1UpperCentralTwo hp x.2

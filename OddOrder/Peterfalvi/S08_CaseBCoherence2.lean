@@ -608,7 +608,7 @@ theorem inner_Y_coeff_le_of_psi_nsmul {L : Subgroup G} [Fintype ↥L] [Invertibl
   have hb2z : b ^ 2 ≤ (a : ℤ) ^ 2 := by exact_mod_cast le_trans hsq hYle
   -- Integer tail: `b² ≤ a² ∧ 0 ≤ a ⟹ b ≤ a`.
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   have ha : (0 : ℤ) ≤ (a : ℤ) := Int.natCast_nonneg a
   nlinarith [mul_nonneg ha (le_of_lt (sub_pos.mpr hcon)),
     mul_pos (lt_of_le_of_lt ha hcon) (sub_pos.mpr hcon), hb2z]
@@ -1056,7 +1056,7 @@ theorem tau_apply_eq_zero_of_mem_ticVdiffV
     hyp.dade.isDadeMap_dadeMap hyp.dade_H_eq_bot _ ?_
   intro hvconj
   have hbridge : sharpImage H ⊆ ((h46.K.map L.subtype : Subgroup G) : Set G) := by
-    rw [hHK]; exact Set.diff_subset
+    rw [hHK]; exact Set.sdiff_subset
   exact ticVdiffV_not_mem_conjugatesOfSet_K h46 hv (Group.conjugatesOfSet_mono hbridge hvconj)
 
 /-- **(6.8.2.3) anchor, generic coherent-extension form: a difference of coherent images of two
@@ -1133,7 +1133,7 @@ theorem inner_smul_chiFam_eq_zero_of_diff_vanishOnV
   have hNC : hyp.sigmaNC hVeq app (c • ξ - c' • ξ') ≤ 2 := by
     refine sigmaNC_le_two_of_inner_chiFam hyp hVeq app hξZ hξ1 hξ'Z hξ'1 (fun pq' hpq' => ?_)
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     refine hpq' ?_
     change ClassFunction.inner (c • ξ - c' • ξ') (hyp.chiFam hVeq app pq') = 0
     rw [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, ClassFunction.inner_smul_left,

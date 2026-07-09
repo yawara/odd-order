@@ -547,7 +547,7 @@ theorem aInvariant_sylow_conj
    よって `R ≤ Q`. Sylow の極大性で `Q.subgroupOf N = R_in_N`, つまり `Q = R` が
    `N` 内で Sylow.
 4. **Normalizer grow**: 任意の p-部分群 `T ⊇ Q` に対し, `T` が p-群 ⇒
-   `NormalizerCondition T` (`IsPGroup.isNilpotent` + `normalizerCondition_of_isNilpotent`).
+   `NormalizerCondition T` (`IsPGroup.isNilpotent` + `Group.normalizerCondition_of_isNilpotent`).
    `Q.subgroupOf T < ⊤` ⇒ `Q.subgroupOf T < normalizer = N.subgroupOf T`, 翻訳して
    `Q < N ⊓ T`. `N ⊓ T ≤ N` は p-部分群で `Q` Sylow に矛盾. よって `T = Q`,
    つまり `Q` は `G` の Sylow. -/
@@ -635,7 +635,7 @@ theorem aInvariant_pSubgroup_le_aInvariant_sylow
       have hQT_lt : Q < T := lt_of_le_of_ne hQT (Ne.symm hT_ne_Q)
       haveI hT_finite : Finite ↥T := Subtype.finite
       haveI hT_nilp : Group.IsNilpotent ↥T := hT_pgrp.isNilpotent
-      have hT_nc : NormalizerCondition ↥T := normalizerCondition_of_isNilpotent
+      have hT_nc : NormalizerCondition ↥T := Group.normalizerCondition_of_isNilpotent
       -- Q.subgroupOf T < ⊤ in T.
       have hQT_subOf_lt : Q.subgroupOf T < (⊤ : Subgroup ↥T) := by
         rw [lt_top_iff_ne_top]

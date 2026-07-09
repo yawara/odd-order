@@ -29,7 +29,7 @@ variable {G : Type*} [Group G]
 
 /-- **有限 `q`-群の normalizer-growth**: `T` が有限 `q`-群で `Q < T` なら、`Q` はその
 `T` 内 normalizer `T ⊓ N_G(Q)` に真に含まれる。冪零群の normalizer condition の帰結
-(`normalizerCondition_of_isNilpotent`)。
+(`Group.normalizerCondition_of_isNilpotent`)。
 
 Lemma 13.8 GAP 1.3 の核 — 「`M ∩ M*` の極大 `q`-部分群 `Q` で `N_G(Q) ⊆ M*` なら `Q` は
 `M` の極大 `q`-部分群」を示すのに使う: `Q < T ≤ M` を仮定すると `T ⊓ N_G(Q) ⊆ M ⊓ M*` の
@@ -41,7 +41,7 @@ theorem lt_inf_normalizer_of_lt_of_pgroup [Finite G] {q : ℕ} [Fact q.Prime]
   have hne_top : Q.subgroupOf T ≠ ⊤ := fun htop =>
     hQT.ne (le_antisymm hQTle (Subgroup.subgroupOf_eq_top.mp htop))
   haveI : Group.IsNilpotent ↥T := IsPGroup.isNilpotent hTq
-  have hNC : NormalizerCondition ↥T := normalizerCondition_of_isNilpotent
+  have hNC : NormalizerCondition ↥T := Group.normalizerCondition_of_isNilpotent
   have hgrow := hNC (Q.subgroupOf T) (lt_top_iff_ne_top.mpr hne_top)
   rw [← Subgroup.subgroupOf_normalizer_eq hQTle] at hgrow
   refine lt_of_le_of_ne (le_inf hQTle Subgroup.le_normalizer) (fun heq => hgrow.ne ?_)

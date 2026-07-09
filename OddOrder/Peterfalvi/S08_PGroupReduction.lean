@@ -319,7 +319,7 @@ theorem commutator_ne_bot_of_Xset_commutator_nonempty (hyp : SibleyDadeHypothesi
     (Subgroup.subgroupOf_eq_bot.mp hbot).eq_bot_of_le (Subgroup.commutator_le_left H H)
   have hXempty : hyp.Xset ⁅H, H⁆ = ∅ := by
     show hyp.S \ hyp.SsubFiltration ⁅H, H⁆ = ∅
-    rw [hcommbot, hyp.SsubFiltration_bot, Set.diff_self]
+    rw [hcommbot, hyp.SsubFiltration_bot, Set.sdiff_self]
   rw [hXempty] at hXne
   exact Set.not_nonempty_empty hXne
 

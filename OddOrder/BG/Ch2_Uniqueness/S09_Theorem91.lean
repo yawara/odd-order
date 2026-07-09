@@ -206,8 +206,8 @@ private theorem le_oPiCore_compl_of_sylow_normalizes
   haveI : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) (G' ⧸ N) := inferInstance
   have hHH : Subgroup.centralizer (Ch03.oPiCore ({p} : Set ℕ) (G' ⧸ N) : Set (G' ⧸ N))
       ≤ Ch03.oPiCore ({p} : Set ℕ) (G' ⧸ N) :=
-    OddOrder.Isaacs.Ch03.hall_higman_1_2_3 (G := G' ⧸ N) ({p} : Set ℕ)
-      (by simpa using hbot)
+    -- `({p} : Set ℕ)ᶜ` and `{q | ¬q = p}` are definitionally equal, so `hbot` applies directly.
+    OddOrder.Isaacs.Ch03.hall_higman_1_2_3 (G := G' ⧸ N) ({p} : Set ℕ) hbot
   have hYbar_le_Q : Ybar ≤ Q := hYbar_cent_Q.trans hHH
   -- `Ȳ ≤ O_p(X̄)` is both `p'` and `p`, hence trivial; so `Y ≤ ker mk = O_{p'}(G')`.
   have hYbar_bot : Ybar = ⊥ := by

@@ -290,7 +290,8 @@ theorem pow_index_center_eq_one_of_mem_commutator
     [Subgroup.FiniteIndex (Subgroup.center G)] {g : G} (hg : g ∈ commutator G) :
     g ^ (Subgroup.center G).index = 1 := by
   have h := Abelianization.commutator_subset_ker (MonoidHom.transferCenterPow G) hg
-  simpa only [MonoidHom.mem_ker, Subtype.ext_iff] using h
+  simpa only [MonoidHom.mem_ker, Subtype.ext_iff, MonoidHom.transferCenterPow_apply,
+    OneMemClass.coe_one] using h
 
 /-- **Isaacs Cor 5.9**: if `Z(G)` has finite index, every commutator has
 `|G : Z(G)|`-th power equal to `1`. -/
@@ -497,14 +498,14 @@ theorem cyclic_pgroup_inf_eq_bot_iff
   refine ⟨fun h_inf => ?_, fun h => h.elim
     (fun he => by rw [he, bot_inf_eq]) (fun he => by rw [he, inf_bot_eq])⟩
   by_contra h_not
-  push_neg at h_not
+  push Not at h_not
   obtain ⟨hH_ne, hK_ne⟩ := h_not
   -- Cauchy in H: ∃ h ∈ H with orderOf h = p
   have hH_pgroup : IsPGroup p ↥H := hP_pgroup.to_le hH_le_P
   obtain ⟨nH, hnH⟩ := IsPGroup.iff_card.mp hH_pgroup
   have hnH_pos : 1 ≤ nH := by
     by_contra h
-    push_neg at h
+    push Not at h
     interval_cases nH
     rw [pow_zero] at hnH
     exact hH_ne (Subgroup.eq_bot_of_card_eq H hnH)
@@ -519,7 +520,7 @@ theorem cyclic_pgroup_inf_eq_bot_iff
   obtain ⟨nK, hnK⟩ := IsPGroup.iff_card.mp hK_pgroup
   have hnK_pos : 1 ≤ nK := by
     by_contra h
-    push_neg at h
+    push Not at h
     interval_cases nK
     rw [pow_zero] at hnK
     exact hK_ne (Subgroup.eq_bot_of_card_eq K hnK)
@@ -999,7 +1000,7 @@ theorem not_isSimpleGroup_of_isCyclic_sylow_two
   obtain ⟨a, hP_card⟩ := IsPGroup.iff_card.mp P.isPGroup'
   have ha_pos : 1 ≤ a := by
     by_contra h
-    push_neg at h
+    push Not at h
     interval_cases a
     rw [pow_zero] at hP_card
     exact hP_nontrivial (Subgroup.eq_bot_of_card_eq _ hP_card)
@@ -1156,7 +1157,7 @@ instance OPrime_index_subtype_normal {p : ℕ} {G : Type*} [Group G]
 
 **証明**: `OPrime = ⨅ N : ι, N.val` over the finite indexing set `ι` of normal subgroups
 with p-power index. Build the diagonal `MonoidHom G →* ∏ N : ι, G/N.val` (via
-`Pi.monoidHom`); its kernel is exactly `⨅ N : ι, N.val = OPrime p G` (since `g ∈ ker`
+`MonoidHom.pi`); its kernel is exactly `⨅ N : ι, N.val = OPrime p G` (since `g ∈ ker`
 iff `g ∈ N` for every member of the family). By the first iso theorem,
 `G/OPrime ≃* range`, with range a subgroup of `∏ G/N.val`. Lagrange gives
 `|range| ∣ |∏ G/N.val| = ∏ N.val.index`. Each `N.val.index = p^{k_N}` so the product
@@ -1169,7 +1170,7 @@ lemma OPrime_index_isPGroup (p : ℕ) (G : Type*) [Group G] [Finite G] [Fact p.P
   haveI : Fintype ι := Fintype.ofFinite ι
   -- Diagonal hom φ : G →* ∀ i : ι, G ⧸ i.val (instance found via OPrime_index_subtype_normal)
   let φ : G →* (∀ i : ι, G ⧸ (i.val : Subgroup G)) :=
-    Pi.monoidHom fun i : ι => QuotientGroup.mk' i.val
+    MonoidHom.pi fun i : ι => QuotientGroup.mk' i.val
   -- ker φ = OPrime p G
   have h_ker : φ.ker = OPrime p G := by
     ext g
@@ -1178,11 +1179,11 @@ lemma OPrime_index_isPGroup (p : ℕ) (G : Type*) [Group G] [Finite G] [Fact p.P
       intro i
       have hg_i : φ g i = (1 : G ⧸ (i.val : Subgroup G)) := by
         rw [MonoidHom.mem_ker] at h; exact congrFun h i
-      simpa [φ, Pi.monoidHom_apply, QuotientGroup.mk'_apply,
+      simpa [φ, MonoidHom.pi_apply, QuotientGroup.mk'_apply,
         QuotientGroup.eq_one_iff] using hg_i
     · rw [MonoidHom.mem_ker]
       ext i
-      simp only [φ, Pi.monoidHom_apply, QuotientGroup.mk'_apply, Pi.one_apply,
+      simp only [φ, MonoidHom.pi_apply, QuotientGroup.mk'_apply, Pi.one_apply,
         QuotientGroup.eq_one_iff]
       rw [OPrime, Subgroup.mem_iInf] at h
       exact h i
@@ -1256,7 +1257,7 @@ lemma APrime_index_isPGroup (p : ℕ) (G : Type*) [Group G] [Finite G] [Fact p.P
   haveI : Finite ι := Subtype.finite
   haveI : Fintype ι := Fintype.ofFinite ι
   let φ : G →* (∀ i : ι, G ⧸ (i.val : Subgroup G)) :=
-    Pi.monoidHom fun i : ι => QuotientGroup.mk' i.val
+    MonoidHom.pi fun i : ι => QuotientGroup.mk' i.val
   have h_ker : φ.ker = APrime p G := by
     ext g
     refine ⟨fun h => ?_, fun h => ?_⟩
@@ -1264,11 +1265,11 @@ lemma APrime_index_isPGroup (p : ℕ) (G : Type*) [Group G] [Finite G] [Fact p.P
       intro i
       have hg_i : φ g i = (1 : G ⧸ (i.val : Subgroup G)) := by
         rw [MonoidHom.mem_ker] at h; exact congrFun h i
-      simpa [φ, Pi.monoidHom_apply, QuotientGroup.mk'_apply,
+      simpa [φ, MonoidHom.pi_apply, QuotientGroup.mk'_apply,
         QuotientGroup.eq_one_iff] using hg_i
     · rw [MonoidHom.mem_ker]
       ext i
-      simp only [φ, Pi.monoidHom_apply, QuotientGroup.mk'_apply, Pi.one_apply,
+      simp only [φ, MonoidHom.pi_apply, QuotientGroup.mk'_apply, Pi.one_apply,
         QuotientGroup.eq_one_iff]
       rw [APrime, Subgroup.mem_iInf] at h
       exact h i
@@ -1746,7 +1747,7 @@ assembly on top of this.
   (Base: `Q.map subtype ≤ P` since `Q ⊆ P`. Step: `Q.map subtype ≤ ⁅Q.map subtype, P⁆ ≤
   ⁅lowerCentralSeries P n, ⊤⁆ = lowerCentralSeries P (n+1)`.)
 * **Termination**: `P` is a finite p-group ⇒ `IsNilpotent P` (`IsPGroup.isNilpotent`) ⇒
-  `∃ n, lowerCentralSeries P n = ⊥` (`nilpotent_iff_lowerCentralSeries`). Hence
+  `∃ n, lowerCentralSeries P n = ⊥` (`Subgroup.nilpotent_iff_lowerCentralSeries`). Hence
   `Q.map subtype = ⊥` in `G`, so `(P : Subgroup G) ⊓ N = ⊥`.
 
 The proof below implements these steps directly. -/
@@ -1852,11 +1853,11 @@ lemma OPrime_meet_sylow_eq_bot_of_controlsOwnFusion [Finite G] {p : ℕ} [Fact p
   have h_top_map : ((⊤ : Subgroup ↥(P : Subgroup G))).map (P : Subgroup G).subtype =
       (P : Subgroup G) := by
     rw [← MonoidHom.range_eq_map, Subgroup.range_subtype]
-  -- **Step 5 (iteration)**: `∀ n, R ≤ (lowerCentralSeries ↥P n).map P.subtype`.
+  -- **Step 5 (iteration)**: `∀ n, R ≤ ((⊤ : Subgroup ↥P).lowerCentralSeries n).map P.subtype`.
   -- Base: R ⊆ P = ⊤.map subtype. Step: R ≤ ⁅R, P⁆ = ⁅R, ⊤.map subtype⁆ ≤ ⁅(lcs n).map, ⊤.map⁆
   --       = (⁅lcs n, ⊤⁆).map = (lcs (n+1)).map.
   have h_R_le_lcs : ∀ n : ℕ, R ≤ Subgroup.map (P : Subgroup G).subtype
-      (lowerCentralSeries ↥(P : Subgroup G) n) := by
+      ((⊤ : Subgroup ↥(P : Subgroup G)).lowerCentralSeries n) := by
     intro n
     induction n with
     | zero =>
@@ -1865,13 +1866,14 @@ lemma OPrime_meet_sylow_eq_bot_of_controlsOwnFusion [Finite G] {p : ℕ} [Fact p
       exact inf_le_left
     | succ n ih =>
       change R ≤ Subgroup.map (P : Subgroup G).subtype
-        ⁅lowerCentralSeries ↥(P : Subgroup G) n, (⊤ : Subgroup ↥(P : Subgroup G))⁆
+        ⁅(⊤ : Subgroup ↥(P : Subgroup G)).lowerCentralSeries n,
+          (⊤ : Subgroup ↥(P : Subgroup G))⁆
       rw [Subgroup.map_commutator, h_top_map]
       exact h_R_le_comm.trans (Subgroup.commutator_mono ih le_rfl)
   -- **Step 6 (termination)**: `P` is a finite p-group ⇒ nilpotent ⇒ `∃ n, lcs ↥P n = ⊥`.
   haveI hP_pgroup : IsPGroup p ↥(P : Subgroup G) := P.isPGroup'
   haveI hP_nilp : Group.IsNilpotent ↥(P : Subgroup G) := hP_pgroup.isNilpotent
-  obtain ⟨n, hn⟩ := nilpotent_iff_lowerCentralSeries.mp hP_nilp
+  obtain ⟨n, hn⟩ := Subgroup.nilpotent_iff_lowerCentralSeries.mp hP_nilp
   have : R ≤ ⊥ := by
     have := h_R_le_lcs n
     rw [hn, Subgroup.map_bot] at this
@@ -2117,7 +2119,7 @@ theorem isPGroup_normalizerQuotientCentralizer_of_forall_hasNormalPComplement
       exact IsPGroup.of_card (h_card_eq.trans hk)
     -- K' ⊓ X_n = ⊥ (coprime cards)
     have h_inf_bot : K' ⊓ X_n = ⊥ := by
-      apply Subgroup.inf_eq_bot_of_coprime
+      refine (Subgroup.disjoint_of_coprime_natCard ?_).eq_bot
       obtain ⟨k, hX_n_card⟩ := IsPGroup.iff_card.mp h_X_n_pg
       rw [hX_n_card]
       exact (((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr h_p_ndvd_K').symm).pow_right k
@@ -2429,6 +2431,9 @@ theorem isaacs_lem_5_28 [Finite G] {p : ℕ} [Fact p.Prime]
         -- Goal: (MulAut.conj (yC : G))⁻¹ q ∈ (R : Subgroup G)
         -- Both sides equal (yC : G)⁻¹ * q * (yC : G); ((MulAut.conj yC)⁻¹ q_N).val computes same
         convert hs_in_R using 1
+        simp only [MulAut.smul_def, MulAut.conj_inv_apply, Subgroup.coe_mul,
+          InvMemClass.coe_inv]
+        rfl
       -- **Step 10**: index strict inequalities for IH (P, R) and (yR, Q)
       have hQyR_gt_D : D < (Q : Subgroup G) ⊓ yR :=
         lt_of_lt_of_le hQN_gt_D (le_inf inf_le_left hQN_le_yR)

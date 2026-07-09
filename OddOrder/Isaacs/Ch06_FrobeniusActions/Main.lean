@@ -867,8 +867,10 @@ private lemma square_root_two_adic_cases_false
         have h4 : (4 : ℤ) ∣ (2 : ℤ) ^ (e - 1) := by
           simpa [show (4 : ℤ) = (2 : ℤ) ^ 2 by norm_num] using
             pow_dvd_pow (2 : ℤ) hle
-        convert dvd_neg.mpr h4 using 1
-        ring
+        have hrw : (-1 : ℤ) - ((2 : ℤ) ^ (e - 1) - 1) = -((2 : ℤ) ^ (e - 1)) := by
+          ring
+        rw [hrw]
+        exact dvd_neg.mpr h4
       exact (hi.of_dvd h4_dvd).trans hsemi
   have hsq : (j ^ 2 : ℤ) ≡ (-1 : ℤ) [ZMOD (4 : ℤ)] :=
     hij4.symm.trans hi4
@@ -977,7 +979,6 @@ theorem dihedralOrQuaternionOrSemiDihedral_of_cyclic_quotient_two_adic_conj_case
       exact Subgroup.pow_mem _ (Subgroup.mem_zpowers c) _
     have h_z_sq : z ^ 2 = 1 := by
       dsimp [z]
-      change (c ^ (2 ^ (e - 1))) ^ (2 : ℕ) = 1
       rw [← pow_mul]
       have hmul : 2 ^ (e - 1) * 2 = 2 ^ e := by
         rw [← pow_succ]

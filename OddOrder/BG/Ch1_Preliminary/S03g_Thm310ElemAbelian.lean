@@ -47,14 +47,14 @@ theorem invariants_toRepresentation_map_eq (ρ : Representation F G V) (W : Subr
     refine Submodule.mem_inf.mpr
       ⟨(Representation.mem_invariants (ρ.comp H.subtype) w).mpr fun g => ?_, hw⟩
     have hg := congrArg Subtype.val (hinv' g)
-    simpa [Subrepresentation.toRepresentation, LinearMap.restrict_coe_apply] using hg
+    simpa [Subrepresentation.toRepresentation, LinearMap.coe_restrict_apply] using hg
   · intro hv
     obtain ⟨hfix, hw⟩ := Submodule.mem_inf.mp hv
     have hfix' := (Representation.mem_invariants (ρ.comp H.subtype) v).mp hfix
     refine ⟨⟨v, hw⟩, (Representation.mem_invariants (W.toRepresentation.comp H.subtype)
       ⟨v, hw⟩).mpr fun g => ?_, rfl⟩
     apply Subtype.ext
-    simpa [Subrepresentation.toRepresentation, LinearMap.restrict_coe_apply] using hfix' g
+    simpa [Subrepresentation.toRepresentation, LinearMap.coe_restrict_apply] using hfix' g
 
 theorem finrank_invariants_toRepresentation_inf (ρ : Representation F G V)
     (W : Subrepresentation ρ) (H : Subgroup G) :
@@ -150,7 +150,7 @@ theorem exists_maschke_split [Finite G] [NeZero (Nat.card G : F)] (ρ : Represen
     ⟨⊥, ⊤, fun h => absurd (congrArg Subrepresentation.toSubmodule h) bot_ne_top⟩
   obtain ⟨U, hUbot, hUtop⟩ : ∃ U : Subrepresentation ρ, U ≠ ⊥ ∧ U ≠ ⊤ := by
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     exact hirr { eq_bot_or_eq_top := fun U => (em (U = ⊥)).imp id (hcon U) }
   obtain ⟨U', hUU'⟩ := exists_isCompl U
   have hsup : U.toSubmodule ⊔ U'.toSubmodule = ⊤ := by
@@ -320,12 +320,12 @@ private theorem frobenius_elemAbelian_c_aux
       have hgU : ∀ u ∈ U.toSubmodule, ρ g u = u := by
         intro u hu
         have h := congrArg Subtype.val (DFunLike.congr_fun (hIHU g hg) ⟨u, hu⟩)
-        simpa [Subrepresentation.toRepresentation, LinearMap.restrict_coe_apply,
+        simpa [Subrepresentation.toRepresentation, LinearMap.coe_restrict_apply,
           Module.End.one_apply] using h
       have hgU' : ∀ u ∈ U'.toSubmodule, ρ g u = u := by
         intro u hu
         have h := congrArg Subtype.val (DFunLike.congr_fun (hIHU' g hg) ⟨u, hu⟩)
-        simpa [Subrepresentation.toRepresentation, LinearMap.restrict_coe_apply,
+        simpa [Subrepresentation.toRepresentation, LinearMap.coe_restrict_apply,
           Module.End.one_apply] using h
       refine LinearMap.ext fun v => ?_
       obtain ⟨u, hu, u', hu', rfl⟩ := Submodule.mem_sup.mp
@@ -422,8 +422,12 @@ theorem prime_card_and_finrank_of_elemAbelian_general {p : ℕ} [Fact p.Prime]
     intro g v
     rw [hρ, Representation.ofDistribMulAction_apply_apply]
     constructor
-    · intro h; have := congrArg Additive.toMul h; simpa using this
-    · intro h; apply Additive.toMul.injective; simpa using h
+    · intro h
+      have := congrArg Additive.toMul h
+      rwa [show Additive.toMul ((g : H) • v) = (g : H) • Additive.toMul v from rfl] at this
+    · intro h
+      apply Additive.toMul.injective
+      rwa [show Additive.toMul ((g : H) • v) = (g : H) • Additive.toMul v from rfl]
   -- `C_V(K) = 0` over `ZMod p`.
   have hCK0 : Representation.invariants (ρ.comp K.subtype) = ⊥ := by
     ext v
@@ -552,8 +556,12 @@ theorem commutator_acts_trivially_of_elemAbelian_general {p : ℕ} [Fact p.Prime
     intro g v
     rw [hρ, Representation.ofDistribMulAction_apply_apply]
     constructor
-    · intro h; have := congrArg Additive.toMul h; simpa using this
-    · intro h; apply Additive.toMul.injective; simpa using h
+    · intro h
+      have := congrArg Additive.toMul h
+      rwa [show Additive.toMul ((g : H) • v) = (g : H) • Additive.toMul v from rfl] at this
+    · intro h
+      apply Additive.toMul.injective
+      rwa [show Additive.toMul ((g : H) • v) = (g : H) • Additive.toMul v from rfl]
   have hCK0 : Representation.invariants (ρ.comp K.subtype) = ⊥ := by
     ext v
     rw [Representation.mem_invariants, Submodule.mem_bot]

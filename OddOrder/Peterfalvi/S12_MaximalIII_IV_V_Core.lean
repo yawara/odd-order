@@ -498,7 +498,7 @@ theorem normalizer_typePA_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         simp
       · have hg' := hg h
         rw [typePA_eq_sharpSubgroup_derivedInG] at hg'
-        simp only [sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe] at hg' ⊢
+        simp only [sharpSubgroup, Set.mem_sdiff, Set.mem_singleton_iff, SetLike.mem_coe] at hg' ⊢
         constructor
         · intro hh
           exact (hg'.mp ⟨hh, h1⟩).1
@@ -695,7 +695,7 @@ theorem typePData_typePV_nonempty {M : Subgroup G} (data : TypePData M) :
   have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
   have hdisj := disjoint_iff.mp (typePData_disjoint_W1_W2 data)
   refine ⟨x * y, ?_⟩
-  simp only [typePV, Set.mem_diff, Set.mem_union, SetLike.mem_coe, not_or]
+  simp only [typePV, Set.mem_sdiff, Set.mem_union, SetLike.mem_coe, not_or]
   refine ⟨mul_mem (hW1le hxW1) (hW2le hyW2), ?_, ?_⟩
   · intro hxy
     have hy1 : y ∈ data.W1 := by
@@ -761,7 +761,7 @@ theorem typePData_typePV_ncard [Finite G] {M : Subgroup G} (data : TypePData M) 
   -- `W₂ \ W₁ = W₂ \ {1}`: for `x ∈ W₂`, `x ∈ W₁ ↔ x = 1` (disjointness).
   have hW2diff : (data.W2 : Set G) \ (data.W1 : Set G) = (data.W2 : Set G) \ {1} := by
     ext x
-    simp only [Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe]
+    simp only [Set.mem_sdiff, Set.mem_singleton_iff, SetLike.mem_coe]
     refine ⟨fun ⟨hx2, hx1⟩ => ⟨hx2, fun h => hx1 (h ▸ data.W1.one_mem)⟩,
       fun ⟨hx2, hxne⟩ => ⟨hx2, fun hx1 => hxne ?_⟩⟩
     have hmem : x ∈ data.W1 ⊓ data.W2 := ⟨hx1, hx2⟩
@@ -773,13 +773,13 @@ theorem typePData_typePV_ncard [Finite G] {M : Subgroup G} (data : TypePData M) 
     have h2pos : 1 ≤ Nat.card ↥data.W2 := Nat.card_pos
     rw [← Set.union_diff_self (s := (data.W1 : Set G)) (t := (data.W2 : Set G)),
       Set.ncard_union_eq disjoint_sdiff_self_right (Set.toFinite _) (Set.toFinite _), hW2diff,
-      Set.ncard_diff (Set.singleton_subset_iff.mpr data.W2.one_mem), Set.ncard_singleton,
+      Set.ncard_sdiff (Set.singleton_subset_iff.mpr data.W2.one_mem), Set.ncard_singleton,
       hcW1, hcW2]
     omega
   -- `V = W \ (W₁ ∪ W₂)` has `|V| = |W| − |W₁ ∪ W₂|`
   have hdiff : (typePV M data).ncard = ((data.W : Set G)).ncard
       - ((data.W1 : Set G) ∪ (data.W2 : Set G)).ncard := by
-    rw [typePV, Set.ncard_diff hsub]
+    rw [typePV, Set.ncard_sdiff hsub]
   rw [hdiff, hunion, hcW, typePData_card_W]
   have hw1ge : 1 < Nat.card ↥data.W1 := (Subgroup.one_lt_card_iff_ne_bot _).mpr data.W1_nontrivial
   have hw2ge : 1 < Nat.card ↥data.W2 := (Subgroup.one_lt_card_iff_ne_bot _).mpr data.W2_nontrivial
@@ -1122,7 +1122,7 @@ theorem exists_nontrivial_linearIrreducibleCharacter {K : Type*} [Group K] [Fini
   classical
   obtain ⟨a, ha⟩ : ∃ a : K, a ∉ commutator K := by
     by_contra h
-    push_neg at h
+    push Not at h
     exact hK (top_le_iff.mp fun x _ => h x)
   haveI : Finite (Abelianization K) := Quotient.finite _
   have hā : (Abelianization.of a) ≠ 1 := by
@@ -1766,7 +1766,6 @@ theorem columnFamily_mu_zero_apply_one_pow {L : Type*} [Group L] [Fintype L]
   rw [e43 (χ₂ ^ k), e43 χ₂] at hu
   -- `hu : δ' • μ'_0 = (δ • μ_0)^u`; evaluate at `1`
   have h1 := congrArg (fun f : ClassFunction L ℂ => (f : L → ℂ) (1 : L)) hu
-  simp only at h1
   obtain ⟨d, hd_pos, hd⟩ :=
     irreducibleCharacter_apply_one_eq_pos_natCast ((h.columnFamily χ₂).mu 0)
   obtain ⟨d', hd'_pos, hd'⟩ :=
@@ -1819,7 +1818,6 @@ theorem columnFamily_mu_zero_sign_pow {L : Type*} [Group L] [Fintype L]
     exact hψ
   rw [e43 (χ₂ ^ k), e43 χ₂] at hu
   have h1 := congrArg (fun f : ClassFunction L ℂ => (f : L → ℂ) (1 : L)) hu
-  simp only at h1
   obtain ⟨d, hd_pos, hd⟩ :=
     irreducibleCharacter_apply_one_eq_pos_natCast ((h.columnFamily χ₂).mu 0)
   obtain ⟨d', hd'_pos, hd'⟩ :=
@@ -2771,7 +2769,7 @@ theorem Hypothesis.muGrid_alpha_support [Finite G] (hG : OddOrder.BG.IsMinimalSi
     · -- `(x:G)·(y:G) ∈ typePV`
       have hxyW : (x : G) * (y : G) ∈ hyp.typeP.W := by
         rw [hyp.typeP.W_eq]; exact mul_mem (Subgroup.mem_sup_left hxG) (Subgroup.mem_sup_right hyG)
-      simp only [typePV, Set.mem_diff, Set.mem_union, SetLike.mem_coe, not_or]
+      simp only [typePV, Set.mem_sdiff, Set.mem_union, SetLike.mem_coe, not_or]
       refine ⟨hxyW, ?_, ?_⟩
       · intro hmem
         apply hy1
@@ -3002,7 +3000,7 @@ theorem Hypothesis.exists_charParamArith [Finite G]
     rcases (h.columnFamily χ₂).sign_eq with hs | hs <;> rw [hs] <;> omega
   have hapos : 0 ≤ a := by
     by_contra hlt
-    push_neg at hlt
+    push Not at hlt
     have hwa : (hyp.w1 : ℤ) * a < 0 := mul_neg_of_pos_of_neg hw1pos hlt
     linarith [hZ, hdsign, hwa]
   -- (10.3): `n = a` is even (hence `≥ 2`).  `d = μ_{0 j₀}(1)` divides the odd `|M|` (a character

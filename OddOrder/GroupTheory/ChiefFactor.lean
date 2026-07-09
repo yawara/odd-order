@@ -375,7 +375,7 @@ theorem isChiefFactor_chiefSeriesInside {K : Subgroup G} [K.Normal] {n : ℕ}
 theorem chiefSeriesInside_exists_eq_bot (K : Subgroup G) [K.Normal] :
     ∃ N : ℕ, chiefSeriesInside K N = ⊥ := by
   by_contra h
-  push_neg at h
+  push Not at h
   have h_strict_anti : StrictAnti (chiefSeriesInside K) :=
     strictAnti_nat_of_succ_lt (fun n => chiefSeriesInside_lt_of_ne_bot (h n))
   -- `Finite (Subgroup G)` comes from `Finite G` via `SetLike` (Mathlib.Data.SetLike.Fintype).
@@ -510,7 +510,7 @@ theorem isNilpotent_of_chief_factor_centralization
     (h_cent : ∀ i : ℕ, ⁅K, chiefSeriesInside K i⁆ ≤ chiefSeriesInside K (i + 1)) :
     Group.IsNilpotent ↥K := by
   obtain ⟨N, hN_bot⟩ := chiefSeriesInside_exists_eq_bot K
-  rw [nilpotent_iff_finite_descending_central_series]
+  rw [Subgroup.nilpotent_iff_finite_descending_central_series]
   refine ⟨N, chiefSeriesSubgroupOf K, ⟨?_, ?_⟩, ?_⟩
   · exact chiefSeriesSubgroupOf_zero K
   · intro x n hx g

@@ -398,7 +398,7 @@ theorem character_mem_ZIrr {V : Type*} [AddCommGroup V] [Module ℂ V] [FiniteDi
     -- From `¬ IsIrreducible` extract `U` with `U ≠ ⊥` and `U ≠ ⊤`.
     obtain ⟨U, hUbot, hUtop⟩ : ∃ U : Subrepresentation ρ, U ≠ ⊥ ∧ U ≠ ⊤ := by
       by_contra hcon
-      push_neg at hcon
+      push Not at hcon
       exact hirr ⟨fun U => or_iff_not_imp_left.mpr (hcon U)⟩
     -- Maschke gives a complement.
     obtain ⟨U', hUU'⟩ := ComplementedLattice.exists_isCompl U
@@ -527,7 +527,7 @@ theorem classFunctionOperator_ofSubmodulePrime_coe (f : ClassFunction G ℂ) {W 
     ((classFunctionOperator f (Subrepresentation.ofSubmodule' N).toRepresentation w).1 : W)
     = classFunctionOperator f ρ (show W from w.1) := by
   rw [classFunctionOperator, classFunctionOperator, LinearMap.sum_apply, LinearMap.sum_apply,
-    AddSubmonoid.coe_finset_sum]
+    AddSubmonoid.coe_finsetSum]
   refine Finset.sum_congr rfl fun g _ => ?_
   rw [LinearMap.smul_apply, LinearMap.smul_apply]
   rfl
@@ -555,6 +555,14 @@ theorem classFunction_eq_zero_of_orthogonal (f : ClassFunction G ℂ)
   set Ti : reg.asModule →ₗ[ℂ[G]] reg.asModule :=
     Representation.IntertwiningMap.equivLinearMapAsModule reg reg
       (classFunctionIntertwiner (classFunctionInv f) reg) with hTi
+  -- Register the canonical `AddCommGroup` instances on `G →₀ ℂ` and `reg.asModule` as
+  -- zeta-transparent local instances: since the mathlib bump (module system), the nested
+  -- unifications `Representation.instAddCommMonoidAsModule ≟ AddCommGroup.toAddCommMonoid ?_`
+  -- (inside `Submodule.addCommGroup`) and the `Zero ℂ` argument of `Finsupp.instAddCommGroup`
+  -- exceed the synthesis nesting limit when `V = G →₀ ℂ` is concrete, so `AddCommGroup ↥N`
+  -- and `Representation.IsIrreducible σN` below would otherwise fail to elaborate.
+  letI : AddCommGroup (G →₀ ℂ) := inferInstance
+  letI : AddCommGroup reg.asModule := inferInstance
   -- Each simple `ℂ[G]`-submodule lies in `ker Ti`.
   have hsimple_le : ∀ N : Submodule ℂ[G] reg.asModule, IsSimpleModule ℂ[G] (↥N) →
       N ≤ LinearMap.ker Ti := by
@@ -747,8 +755,10 @@ noncomputable def CharacterTableIndexing.ofFinite' (G : Type*) [Group G] [Finite
   rw [← Nat.card_eq_fintype_card (α := IrreducibleCharacter G),
     ← Nat.card_eq_fintype_card (α := ConjClasses G), card_irreducibleCharacter_eq]
 
-/-- A finite group canonically carries character-table indexing data. -/
-noncomputable instance instCharacterTableIndexingOfFinite {G : Type*} [Group G] [Finite G] :
+/-- A finite group canonically carries character-table indexing data. Not an `instance`
+(`CharacterTableIndexing` is a structure, not a class); consumers bind it explicitly or
+via `letI`. -/
+noncomputable def instCharacterTableIndexingOfFinite {G : Type*} [Group G] [Finite G] :
     CharacterTableIndexing G :=
   CharacterTableIndexing.ofFinite' G
 

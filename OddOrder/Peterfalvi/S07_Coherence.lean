@@ -332,7 +332,8 @@ theorem mapRingEquiv_symm_mem_zSpan_of_mem_image (σ : ℂ ≃+* ℂ)
   induction hφ using Submodule.span_induction with
   | mem x hx =>
       rcases hx with ⟨y, hy, rfl⟩
-      simpa using (Submodule.subset_span hy : y ∈ zSpan (L := L) S)
+      rw [mapRingEquiv_symm_mapRingEquiv]
+      exact Submodule.subset_span hy
   | zero =>
       rw [mapRingEquiv_zero]
       exact Submodule.zero_mem _
@@ -5524,8 +5525,8 @@ theorem support_subset_of_mem_zSpan_of_supported
       (ClassFunction.supportedSubmodule (G := ↥L) (k := ℂ)
         (supportInSubgroup A L)).restrictScalars ℤ :=
     Submodule.span_le.mpr (fun s hs => by
-      simpa only [Submodule.restrictScalars_mem, ClassFunction.mem_supportedSubmodule]
-        using hS s hs)
+      simpa only [SetLike.mem_coe, Submodule.restrictScalars_mem,
+        ClassFunction.mem_supportedSubmodule] using hS s hs)
   exact (ClassFunction.mem_supportedSubmodule).mp (hle hφ)
 
 /-- **Peterfalvi (5.1)/(5.4): the Dade base map supplies the lattice-relative isometry.**

@@ -122,7 +122,7 @@ theorem repr_sum_fourier_orbit_zero
     b.repr (∑ k : ZMod h, ((ε ^ m)⁻¹ ^ k.val) • (T ^ k.val) (b c)) c' = 0 := by
   classical
   rw [map_sum]
-  simp only [Finsupp.coe_finset_sum, Finset.sum_apply]
+  simp only [Finsupp.coe_finsetSum, Finset.sum_apply]
   refine Finset.sum_eq_zero fun k _ => ?_
   obtain ⟨a, ha⟩ := hmon k.val c
   rw [ha]
@@ -139,7 +139,7 @@ theorem repr_sum_fourier_self_free
     b.repr (∑ k : ZMod h, ((ε ^ m)⁻¹ ^ k.val) • (T ^ k.val) (b c)) c = 1 := by
   classical
   rw [map_sum]
-  simp only [Finsupp.coe_finset_sum, Finset.sum_apply]
+  simp only [Finsupp.coe_finsetSum, Finset.sum_apply]
   rw [Finset.sum_eq_single (0 : ZMod h)]
   · simp only [ZMod.val_zero, pow_zero, one_smul, Module.End.one_apply,
       Basis.repr_self, Finsupp.single_eq_same]

@@ -97,7 +97,7 @@ theorem toModuleEnd_surjective_of_isAlgClosed :
   refine ⟨a, ?_⟩
   ext m
   have hm := LinearMap.congr_fun ha m
-  simpa using hm
+  simpa [g'] using hm
 
 end Burnside
 

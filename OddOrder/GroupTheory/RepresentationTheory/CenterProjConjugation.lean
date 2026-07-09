@@ -60,7 +60,7 @@ theorem domCongrAut_centerIdem (c : MulAut U) (i : Fin N) :
   rw [centerRep_eq_centerCongr] at h
   have hcoe := congrArg
     (fun z : Subalgebra.center k (MonoidAlgebra k U) => (z : MonoidAlgebra k U)) h
-  simpa only [CenterSplitting.centerCongr_apply] using hcoe
+  simpa only [CenterSplitting.centerCongr_apply, Subalgebra.coe_val] using hcoe
 
 /-- **(item 0, ingredient a)**: the algebra-level intertwining.  A linear automorphism `τ` of `W`
 intertwining `ρ` with its `c`-twist (`τ ρ u = ρ (c u) τ`) conjugates the whole group-algebra action:

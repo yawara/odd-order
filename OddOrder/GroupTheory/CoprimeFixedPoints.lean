@@ -85,7 +85,7 @@ theorem map_fixedSubgroup_eq_fixedSubgroup_quotient [N.Normal] [Finite ↥X] [Fi
       OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient (φ := φ.comp X.subtype)
         hCop hSolv (isAInvariant_comp_subtype hN) hfix
     refine ⟨c, fun l hl => ?_, ?_⟩
-    · simpa only [MonoidHom.comp_apply] using hc_fix ⟨l, hl⟩
+    · simpa only [MonoidHom.comp_apply, Subgroup.subtype_apply] using hc_fix ⟨l, hl⟩
     · have hn1 : (QuotientGroup.mk' N) n = 1 := (QuotientGroup.eq_one_iff n).mpr hn
       rw [hc_eq, map_mul, hn1, mul_one]
 

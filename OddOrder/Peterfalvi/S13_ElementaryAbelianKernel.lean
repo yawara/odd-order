@@ -56,19 +56,20 @@ theorem commutator_top_lt_of_normal_of_ne_bot [Group.IsNilpotent K]
   refine lt_of_le_of_ne (Subgroup.commutator_le_right ⊤ N) ?_
   intro heq
   apply hNne
-  obtain ⟨n, hn⟩ := nilpotent_iff_lowerCentralSeries.mp ‹Group.IsNilpotent K›
-  have hle : ∀ m, N ≤ lowerCentralSeries K m := by
+  obtain ⟨n, hn⟩ := Subgroup.nilpotent_iff_lowerCentralSeries.mp ‹Group.IsNilpotent K›
+  have hle : ∀ m, N ≤ (⊤ : Subgroup K).lowerCentralSeries m := by
     intro m
     induction m with
     | zero => exact le_top
     | succ m ih =>
-        have hsucc : lowerCentralSeries K (m + 1) = ⁅lowerCentralSeries K m, ⊤⁆ := by
-          rw [Subgroup.commutator_def, lowerCentralSeries_succ]
+        have hsucc : (⊤ : Subgroup K).lowerCentralSeries (m + 1)
+            = ⁅(⊤ : Subgroup K).lowerCentralSeries m, ⊤⁆ := by
+          rw [Subgroup.commutator_def, Subgroup.lowerCentralSeries_succ]
           rfl
         rw [hsucc]
         calc N = ⁅⊤, N⁆ := heq.symm
           _ = ⁅N, ⊤⁆ := Subgroup.commutator_comm _ _
-          _ ≤ ⁅lowerCentralSeries K m, ⊤⁆ := Subgroup.commutator_mono ih le_rfl
+          _ ≤ ⁅(⊤ : Subgroup K).lowerCentralSeries m, ⊤⁆ := Subgroup.commutator_mono ih le_rfl
   exact le_bot_iff.mp (hn ▸ hle n)
 
 /-- **The index-`p` normal subgroup below a nontrivial normal subgroup of a `p`-group**
@@ -1112,7 +1113,7 @@ theorem caseA_commutator_chain [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   -- `ntrivD`: some `⁅hat (xC a₀), hat (xC b₀)⁆ ≠ 1` (else `(H/Q)' = ⊥`, contradicting `|N̂| = p`).
   have hntrivD : ∃ a₀ b₀ : ↥L, ⁅hat (xC b₀), hat (xC a₀)⁆ ≠ 1 := by
     by_contra hall
-    push_neg at hall
+    push Not at hall
     -- All `⁅hat (xC b), hat (xC a)⁆ = 1`, so `H/Q` is abelian.
     have hcommbot : commutator (↥data.typeP.H ⧸ Q) = ⊥ := by
       rw [commutator_eq_bot_iff_center_eq_top, eq_top_iff]

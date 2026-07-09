@@ -110,9 +110,9 @@ theorem honestTypeP2ASet_subset_typePA {M : Subgroup G}
   obtain ⟨hyM', hy1, x, hx, hxcent⟩ := hy
   simp only [OddOrder.GroupTheory.typePA, OddOrder.GroupTheory.centralizerSupport,
     Set.mem_setOf_eq]
-  rw [OddOrder.GroupTheory.sharpSubgroup, Set.mem_diff_singleton] at hx
+  rw [OddOrder.GroupTheory.sharpSubgroup, Set.mem_sdiff_singleton] at hx
   exact ⟨hyM', hy1, x, by
-    rw [OddOrder.GroupTheory.sharpSubgroup, Set.mem_diff_singleton]
+    rw [OddOrder.GroupTheory.sharpSubgroup, Set.mem_sdiff_singleton]
     exact ⟨OddOrder.BG.Ch3.S10.Msigma_le M hx.1, hx.2⟩, hxcent⟩
 
 /-! ## A type-`P₂`-usable `Hypothesis46` constructor (issue 9076, char-endgame shared infra)

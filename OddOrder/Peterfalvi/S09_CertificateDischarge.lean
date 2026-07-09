@@ -724,7 +724,7 @@ theorem mem_supportInSubgroup_sharp_iff (H : Subgroup G) {A : Set G}
     (hAH : A = (H : Set G) \ {1}) (x : ↥L) :
     x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L ↔ ((x : G) ∈ H ∧ (x : G) ≠ 1) := by
   rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup, hAH]
-  simp only [Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+  simp only [Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff]
 
 /-- Membership in the sharp support, phrased on the subgroup side `K = H.subgroupOf L`:
 `x ∈ supportInSubgroup (H \ {1}) L` iff `x ∈ H.subgroupOf L` and `x ≠ 1`. -/
@@ -822,9 +822,9 @@ noncomputable def hypothesis76OfFamily
         field_simp
       refine (induce_diff_support (θ i) (θ 0) _ hdeg).trans ?_
       intro x hx
-      rw [Set.mem_diff, SetLike.mem_coe, Subgroup.mem_subgroupOf, Set.mem_singleton_iff] at hx
+      rw [Set.mem_sdiff, SetLike.mem_coe, Subgroup.mem_subgroupOf, Set.mem_singleton_iff] at hx
       rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup, hAH]
-      simp only [Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+      simp only [Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff]
       refine ⟨hx.1, fun h1 => hx.2 (Subtype.ext h1)⟩
     zeta_injective := hinj
     zeta_induced := fun i => ⟨θ i, by congr! <;> exact Subsingleton.elim _ _⟩
@@ -849,9 +849,9 @@ noncomputable def hypothesis76OfFamily
         intro i
         refine (induce_diff_support (θ i) (θ 0) _ (hdeg i)).trans ?_
         intro y hy
-        rw [Set.mem_diff, SetLike.mem_coe, Subgroup.mem_subgroupOf, Set.mem_singleton_iff] at hy
+        rw [Set.mem_sdiff, SetLike.mem_coe, Subgroup.mem_subgroupOf, Set.mem_singleton_iff] at hy
         rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup, hAH]
-        simp only [Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+        simp only [Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff]
         refine ⟨hy.1, fun h1 => hy.2 (Subtype.ext h1)⟩
       exact chiRho_decomp_induced H71 (H.subgroupOf L) θ _ hpsupp hinj hcover hdeg
         (fun g h => supportInSubgroup_sharp_conj_mem_iff H hAH hHnorm g h)
@@ -1691,7 +1691,7 @@ noncomputable def hypothesis78OfDade
     rw [one_smul] at h
     refine h.trans ?_
     intro x hx
-    rw [Set.mem_diff, SetLike.mem_coe, Subgroup.mem_subgroupOf, Set.mem_singleton_iff] at hx
+    rw [Set.mem_sdiff, SetLike.mem_coe, Subgroup.mem_subgroupOf, Set.mem_singleton_iff] at hx
     exact (mem_supportInSubgroup_sharp_iff H hAH x).mpr
       ⟨hx.1, fun h1 => hx.2 (OneMemClass.coe_eq_one.mp h1)⟩
   refine

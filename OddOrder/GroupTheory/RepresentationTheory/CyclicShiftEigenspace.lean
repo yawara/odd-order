@@ -56,7 +56,7 @@ theorem linearIndependent_of_triangular {ι κ : Type*} [Finite κ] (b : Basis �
   intro c hc a₀
   have hb : (b.repr (∑ a, c a • g a)) (coord a₀) = 0 := by rw [hc]; simp
   rw [map_sum] at hb
-  simp only [map_smul, Finsupp.coe_finset_sum, Finset.sum_apply, Finsupp.coe_smul,
+  simp only [map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.coe_smul,
     Pi.smul_apply, smul_eq_mul] at hb
   rw [Finset.sum_eq_single a₀] at hb
   · exact (mul_eq_zero.mp hb).resolve_right (hdiag a₀)
@@ -206,7 +206,7 @@ theorem finrank_cyclicEigenspaceFin_cyclicShift (T : Module.End F W) (b : Basis 
       intro hzero
       have hcoord : (b.repr (∑ l : ZMod h, ((ε ^ j.1)⁻¹ ^ l.val) • b l)) 0 = 1 := by
         rw [map_sum]
-        simp only [map_smul, Basis.repr_self, Finsupp.coe_finset_sum, Finset.sum_apply,
+        simp only [map_smul, Basis.repr_self, Finsupp.coe_finsetSum, Finset.sum_apply,
           Finsupp.smul_single, smul_eq_mul, mul_one, Finsupp.single_apply]
         rw [Finset.sum_eq_single (0 : ZMod h)]
         · simp

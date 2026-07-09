@@ -245,7 +245,7 @@ theorem exists_liesOver_of_subgroup [Finite G] [Fintype G] [Invertible (Nat.card
     have hidx : (H.index : ℂ) ≠ 0 := by exact_mod_cast Subgroup.index_ne_zero_of_finite
     exact mul_ne_zero hidx (by exact_mod_cast hd.ne') h1
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   apply hne
   apply classFunction_eq_zero_of_orthogonal
   intro ψ

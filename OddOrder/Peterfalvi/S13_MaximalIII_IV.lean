@@ -959,15 +959,15 @@ theorem HC_isNilpotent [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
   haveI hUnil : Group.IsNilpotent ↥hyp.base.typeP.U := hyp.base.typeP.U_nilpotent
   haveI hCnil : Group.IsNilpotent ↥hyp.C := by
     haveI : Group.IsNilpotent ↥(hyp.C.subgroupOf hyp.base.typeP.U) := Subgroup.isNilpotent _
-    exact nilpotent_of_surjective
+    exact Group.nilpotent_of_surjective
       (Subgroup.subgroupOfEquivOfLe hyp.C_le_U).toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hyp.C_le_U).surjective
   haveI hHtr : Group.IsNilpotent ↥(hyp.base.typeP.H.subgroupOf hyp.HC) :=
-    nilpotent_of_surjective
+    Group.nilpotent_of_surjective
       (Subgroup.subgroupOfEquivOfLe hHle).symm.toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hHle).symm.surjective
   haveI hCtr : Group.IsNilpotent ↥(hyp.C.subgroupOf hyp.HC) :=
-    nilpotent_of_surjective
+    Group.nilpotent_of_surjective
       (Subgroup.subgroupOfEquivOfLe hCle).symm.toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hCle).symm.surjective
   -- Fitting: both ≤ F(↥HC), and they join to ⊤
@@ -984,7 +984,7 @@ theorem HC_isNilpotent [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
   have : Group.IsNilpotent ↥(⊤ : Subgroup ↥hyp.HC) := by
     rw [← hfit_top]
     infer_instance
-  exact nilpotent_of_surjective
+  exact Group.nilpotent_of_surjective
     (Subgroup.topEquiv (G := ↥hyp.HC)).toMonoidHom
     (Subgroup.topEquiv (G := ↥hyp.HC)).surjective
 
@@ -1259,7 +1259,6 @@ theorem q_dvd_secondDerived_relIndex_HC_sub_one [Finite G]
       have h1 := hsmul a x
       rw [hax] at h1
       have h2 := congrArg (fun m : ↥M => (m : G)) h1
-      simp only at h2
       have h3 : ((x : ↥M) : G) = ((a : ↥M) : G) * ((x : ↥M) : G) * ((a : ↥M) : G)⁻¹ := h2
       calc ((a : ↥M) : G) * ((x : ↥M) : G)
           = (((a : ↥M) : G) * ((x : ↥M) : G) * ((a : ↥M) : G)⁻¹) * ((a : ↥M) : G) := by group
@@ -1430,7 +1429,7 @@ theorem coherent_S_of_coherent_SH0C [Finite G]
   haveI : IsSolvable ↥((derivedInG M).subgroupOf M) := inferInstance
   haveI hHCnil : Group.IsNilpotent ↥(hyp.HC.subgroupOf M) := by
     haveI := hyp.HC_isNilpotent
-    exact nilpotent_of_surjective
+    exact Group.nilpotent_of_surjective
       (Subgroup.subgroupOfEquivOfLe hHCleM).symm.toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hHCleM).symm.surjective
   haveI hH₁n : (hyp.H0C.subgroupOf M).Normal := hyp.H0C_subgroupOf_normal
@@ -1757,7 +1756,8 @@ noncomputable def certainTypeSet_isCoherent_A0 [Finite G]
               (OddOrder.GroupTheory.typePA M hyp.typeP) M ∪ {1})).restrictScalars ℤ := by
         refine Submodule.span_le.mpr (fun s hs => ?_)
         obtain ⟨χ₂, hχ₂, -, rfl⟩ := hs
-        simpa only [Submodule.restrictScalars_mem, ClassFunction.mem_supportedSubmodule]
+        simpa only [SetLike.mem_coe, Submodule.restrictScalars_mem,
+            ClassFunction.mem_supportedSubmodule]
           using OddOrder.Peterfalvi.S06.columnSum_support_subset
             (hyp.toHypothesis46 hG hodd) hχ₂
       exact (ClassFunction.mem_supportedSubmodule).mp (hle hφspan)

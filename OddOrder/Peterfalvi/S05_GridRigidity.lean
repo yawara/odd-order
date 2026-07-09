@@ -132,7 +132,7 @@ theorem ncard_inner_grid_ne_zero_le_two {Idx : Type*} [Finite Idx]
     simp only [Set.mem_setOf_eq] at hi
     rw [Set.mem_union, Set.mem_setOf_eq, Set.mem_setOf_eq]
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     exact hi (by rw [hXαβ, ClassFunction.inner_add_left, ClassFunction.inner_smul_left,
       ClassFunction.inner_smul_left, hcon.1, hcon.2, mul_zero, mul_zero, add_zero])
   · exact add_le_add

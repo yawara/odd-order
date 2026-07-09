@@ -624,7 +624,7 @@ private theorem frobeniusKernelIsNilpotent_aux : ∀ (n : ℕ) {G : Type*} [Grou
               rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv]; exact hpc⟩
           haveI : Group.IsNilpotent ↥(L.subgroupOf (L ⊔ R)) :=
             IH _ hcardlt (L.subgroupOf (L ⊔ R)) (R.subgroupOf (L ⊔ R)) hLR hRprime' rfl
-          exact nilpotent_of_surjective
+          exact Group.nilpotent_of_surjective
             (Subgroup.subgroupOfEquivOfLe (le_sup_left : L ≤ L ⊔ R)).toMonoidHom
             (Subgroup.subgroupOfEquivOfLe (le_sup_left : L ≤ L ⊔ R)).surjective
       have hLfit : L ≤ OddOrder.Isaacs.Ch01.fitting G := by
@@ -724,7 +724,7 @@ theorem isNilpotent_of_normalizing_primeOrder_fixedPointFree {G : Type*} [Group 
     exact ⟨p, hp, by
       rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hRleH).toEquiv]; exact hpc⟩
   haveI : Group.IsNilpotent ↥(N.subgroupOf (N ⊔ R)) := frobeniusKernelIsNilpotent hfrob hRprime'
-  exact nilpotent_of_surjective (Subgroup.subgroupOfEquivOfLe hNleH).toMonoidHom
+  exact Group.nilpotent_of_surjective (Subgroup.subgroupOfEquivOfLe hNleH).toMonoidHom
     (Subgroup.subgroupOfEquivOfLe hNleH).surjective
 
 end OddOrder.BG.Ch1.S03c

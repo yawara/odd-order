@@ -676,7 +676,7 @@ theorem exists_constituent_not_subset_characterKernel
         OddOrder.Peterfalvi.S03.characterKernel (ψ : ClassFunction ↥B ℂ)) := by
   classical
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   apply hAχ
   intro x hx
   rw [OddOrder.Peterfalvi.S03.mem_characterKernel, OddOrder.Peterfalvi.S03.characterDegree_def]

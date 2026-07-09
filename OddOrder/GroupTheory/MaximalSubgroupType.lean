@@ -417,7 +417,7 @@ which is all any consumer uses (`dadeSupportHypotheses_typeP` carries an `IsType
 theorem typePA_eq_sharpSubgroup_derivedInG (M : Subgroup G) (data : TypePData M) :
     typePA M data = sharpSubgroup (derivedInG M) := by
   ext y
-  simp only [typePA, centralizerSupport, sharpSubgroup, Set.mem_setOf_eq, Set.mem_diff_singleton]
+  simp only [typePA, centralizerSupport, sharpSubgroup, Set.mem_setOf_eq, Set.mem_sdiff_singleton]
   constructor
   · rintro ⟨h1, h2, -⟩
     exact ⟨h1, h2⟩

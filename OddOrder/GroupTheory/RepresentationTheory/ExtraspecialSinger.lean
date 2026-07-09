@@ -212,7 +212,6 @@ noncomputable def commPairing : V[P] →+ V[P] →+ ZMod p :=
     (fun v => AddMonoidHom.mk'
       (fun w => Multiplicative.toAdd (commBihom2 hP (Additive.toMul v) (Additive.toMul w)))
       (fun w w' => by
-        dsimp only
         rw [show Additive.toMul (w + w') = Additive.toMul w * Additive.toMul w' from rfl,
           map_mul, toAdd_mul]))
     (fun v v' => by
@@ -252,7 +251,7 @@ theorem commPairing_ne (hnonab : ¬ ∀ a b : P, a * b = b * a) :
     ∃ v w, commPairing hP v w ≠ 0 := by
   obtain ⟨x, y, hxy⟩ : ∃ x y : P, ⁅x, y⁆ ≠ 1 := by
     by_contra h
-    push_neg at h
+    push Not at h
     exact hnonab fun a b => commutatorElement_eq_one_iff_mul_comm.mp (h a b)
   refine ⟨Additive.ofMul (QuotientGroup.mk x), Additive.ofMul (QuotientGroup.mk y), ?_⟩
   rw [commPairing_ofMul]
@@ -339,7 +338,7 @@ theorem card_dvd_succ_of_primeAction_extraspecial (hodd : Odd p)
       have hp1 : 0 < p := Fact.out (p := p.Prime).pos
       have : Nat.card (P ⧸ commutator P) * p = p ^ 2 * p := by rw [← hq]; ring
       exact Nat.eq_of_mul_eq_mul_right hp1 this
-    simpa using this
+    exact (Nat.card_congr Additive.toMul).trans this
   have hdim : Module.finrank (ZMod p) (Additive (P ⧸ commutator P)) = 2 := by
     have := Module.natCard_eq_pow_finrank (K := ZMod p) (V := Additive (P ⧸ commutator P))
     rw [hVcard, Nat.card_eq_fintype_card (α := ZMod p), ZMod.card] at this
@@ -458,7 +457,7 @@ theorem card_dvd_succ_of_primeAction_extraspecial (hodd : Odd p)
     haveI : Nontrivial (Subrepresentation ρ) := ⟨⊥, ⊤, hbnt⟩
     refine ⟨fun W => ?_⟩
     by_contra hW
-    push_neg at hW
+    push Not at hW
     obtain ⟨hWbot, hWtop⟩ := hW
     have hWsub_bot : W.toSubmodule ≠ ⊥ := fun h =>
       hWbot (Subrepresentation.toSubmodule_injective (by rw [h]; rfl))
@@ -484,7 +483,7 @@ theorem card_dvd_succ_of_primeAction_extraspecial (hodd : Odd p)
           inv_mul_cancel, map_one, Module.End.one_apply]
       have hfixV : ρ (b⁻¹ * a) w = w := by
         have := congrArg Subtype.val hfix
-        simpa [Subrepresentation.toRepresentation, LinearMap.restrict_coe_apply] using this
+        simpa [Subrepresentation.toRepresentation, LinearMap.coe_restrict_apply] using this
       exact hfpfρ (b⁻¹ * a) hba w hfixV
     exact hndvd (OddOrder.RepresentationTheory.card_dvd_sub_one_of_faithful_line
       W.toRepresentation hWdim hfaithW)

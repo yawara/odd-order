@@ -944,7 +944,7 @@ theorem characterDegree_re_le_of_not_mem_pairUnion (hyp : SibleyDadeHypothesis G
   · exact absurd (OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl hbase)) hφnot
   · have hij : i ≤ j := by
       by_contra hlt
-      push_neg at hlt  -- j < i
+      push Not at hlt  -- j < i
       exact hφnot (OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inr ⟨j, hlt, hjpair⟩))
     have hdeg_ij : (OddOrder.Peterfalvi.S03.characterDegree (pair i).1).re ≤
         (OddOrder.Peterfalvi.S03.characterDegree (pair j).1).re := by
@@ -3330,7 +3330,7 @@ theorem two_le_degreeRatio_of_mem_Xset_of_frobenius
   obtain ⟨d, hd_pos, hd_eq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
   have had : a = d := by have := haθ.trans hd_eq; exact_mod_cast this
   by_contra hlt
-  push_neg at hlt
+  push Not at hlt
   -- `a ≤ 1` with `a = d ≥ 1` ⟹ `a = 1` ⟹ `θ(1) = 1`.
   have ha1 : a = 1 := by omega
   have hθ1 : (θ : ClassFunction ↥H ℂ) 1 = 1 := by rw [← haθ, ha1]; norm_num
@@ -4703,7 +4703,7 @@ theorem hgen_withDiagonal_of_frobenius
     by_contra h
     have hmem := hφsupp (ClassFunction.mem_support.mpr h)
     rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at hmem
-    simp only [sharpImage, Set.mem_diff, Set.mem_singleton_iff] at hmem
+    simp only [sharpImage, Set.mem_sdiff, Set.mem_singleton_iff] at hmem
     exact hmem.2 (by simp)
   -- split `φ = φ_X + φ_Y`.
   rw [OddOrder.Peterfalvi.S07.zSpan, Submodule.span_union] at hφspan
@@ -4798,7 +4798,7 @@ theorem hgen_withDiagonal_c2_caseA
     by_contra h
     have hmem := hφsupp (ClassFunction.mem_support.mpr h)
     rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at hmem
-    simp only [sharpImage, Set.mem_diff, Set.mem_singleton_iff] at hmem
+    simp only [sharpImage, Set.mem_sdiff, Set.mem_singleton_iff] at hmem
     exact hmem.2 (by simp)
   -- split `φ = φ_X + φ_Y`.
   rw [OddOrder.Peterfalvi.S07.zSpan, Submodule.span_union] at hφspan
@@ -5708,7 +5708,7 @@ theorem nonempty_coherent_S_caseA_of_card_of_frobenius
       · exact hb
     have hdc : (hyp.xBaseBlock hyp.centralCommutator \ {a, b}).ncard
         = (hyp.xBaseBlock hyp.centralCommutator).ncard - 2 := by
-      rw [Set.ncard_diff hpair, Set.ncard_pair (Ne.symm hba)]
+      rw [Set.ncard_sdiff hpair, Set.ncard_pair (Ne.symm hba)]
     have hcne : (hyp.xBaseBlock hyp.centralCommutator \ {a, b}).Nonempty := by
       rw [Set.nonempty_iff_ne_empty]; intro he; rw [he, Set.ncard_empty] at hdc; omega
     obtain ⟨c, hcs, hcnp⟩ := hcne
@@ -5810,7 +5810,7 @@ theorem nonempty_coherent_S_caseA_of_frobenius
           · exact hχ₂X
         have hdc : (hyp.Xset hyp.centralCommutator \ {χ₁, χ₂}).ncard
             = (hyp.Xset hyp.centralCommutator).ncard - 2 := by
-          rw [Set.ncard_diff hpair, Set.ncard_pair (Ne.symm hne)]
+          rw [Set.ncard_sdiff hpair, Set.ncard_pair (Ne.symm hne)]
         have hcne : (hyp.Xset hyp.centralCommutator \ {χ₁, χ₂}).Nonempty := by
           rw [Set.nonempty_iff_ne_empty]; intro he; rw [he, Set.ncard_empty] at hdc; omega
         obtain ⟨c, hcs, hcnp⟩ := hcne

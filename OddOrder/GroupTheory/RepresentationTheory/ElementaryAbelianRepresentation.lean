@@ -57,9 +57,7 @@ automatically `ZMod n`-linear (`ZMod.map_smul`). This is the `SMulCommClass` tha
 instance instSMulCommClassZModOfDistribMulAction {n : ℕ} {G A : Type*} [Monoid G]
     [AddCommGroup A] [Module (ZMod n) A] [DistribMulAction G A] :
     SMulCommClass G (ZMod n) A where
-  smul_comm g c a := by
-    have h := ZMod.map_smul (DistribMulAction.toAddMonoidEnd G A g) c a
-    simpa using h
+  smul_comm g c a := ZMod.map_smul (DistribSMul.toAddMonoidHom A g) c a
 
 /-- Descend a `MulDistribMulAction G M` to the quotient `G ⧸ L` when the normal subgroup `L` acts
 trivially on `M`. (Used in BG Theorem 3.7's coprime chief-factor case: the conjugation action of

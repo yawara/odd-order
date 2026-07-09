@@ -797,7 +797,7 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
       obtain ⟨r, hr_prime, hr_dvd, hr_ne_p⟩ :
           ∃ r : ℕ, r.Prime ∧ r ∣ Nat.card ↥H ∧ r ≠ p := by
         by_contra h_no
-        push_neg at h_no
+        push Not at h_no
         apply h_not_pow
         have hall : ∀ q ∈ (Nat.card ↥H).primeFactorsList, q = p := by
           intro q hq
@@ -1187,7 +1187,7 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
           have h_at_val :
               ρ_H z_subt (ρ_H z_subt w.val - w.val) - (ρ_H z_subt w.val - w.val) = 0 := by
             have h := congr_arg (· w.val) hzsq
-            simp only [Pi.zero_apply] at h
+            simp only [LinearMap.zero_apply] at h
             rw [pow_two, Module.End.mul_apply,
               LinearMap.sub_apply, LinearMap.sub_apply,
               Module.End.one_apply, Module.End.one_apply] at h

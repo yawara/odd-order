@@ -155,7 +155,7 @@ theorem finrank_le_one_of_aut_fixedScalar
     (hfix : ∀ f : End k W₀, θ f = f → ∃ c : k, algebraMap k (End k W₀) c = f) :
     Module.finrank k W₀ ≤ 1 := by
   rcases subsingleton_or_nontrivial W₀ with _ | hnt
-  · simp
+  · exact Module.finrank_zero_of_subsingleton.trans_le (Nat.zero_le 1)
   · -- `End k W₀` is simple Artinian (transport to a matrix ring over the field `k`).
     haveI : NeZero (Module.finrank k W₀) := ⟨Module.finrank_pos.ne'⟩
     haveI : Nonempty (Fin (Module.finrank k W₀)) := ⟨⟨0, Module.finrank_pos⟩⟩
@@ -169,10 +169,13 @@ theorem finrank_le_one_of_aut_fixedScalar
     obtain ⟨e⟩ := nonempty_linearEquiv_of_isSimpleModule
       (E := End k W₀) (A := W₀) (B := EndTwist θ)
     -- `e` intertwines the standard and twisted actions: `e (f w) = θ f (e w)`.
-    have key : ∀ (f : End k W₀) (w : W₀), (e (f • w) : W₀) = (θ f) (e w : W₀) := by
+    -- (`@Eq W₀` is explicit: a mere ascription would leave the `Eq` at `EndTwist θ`,
+    -- which downstream `simpa` calls no longer unfold.)
+    have key : ∀ (f : End k W₀) (w : W₀), @Eq W₀ (e (f • w)) ((θ f) (e w : W₀)) := by
       intro f w
       have h := e.map_smul f w
-      rwa [EndTwist.smul_def] at h
+      rw [EndTwist.smul_def] at h
+      exact h
     -- package `e` as a `k`-linear automorphism `u` of `W₀`.
     set uMap : W₀ →ₗ[k] W₀ :=
       { toFun := fun w => (e w : W₀)

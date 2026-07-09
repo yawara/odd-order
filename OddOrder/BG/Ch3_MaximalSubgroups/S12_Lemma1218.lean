@@ -57,16 +57,16 @@ theorem isNilpotent_derived_of_Malpha_eq_bot [Finite G] (hG : IsMinimalSimpleOdd
     (QuotientGroup.quotientMulEquivOfEq hbot).trans QuotientGroup.quotientBot
   -- the commutator of the quotient is nilpotent: subgroup of the nilpotent Fitting subgroup.
   haveI hnil1 : Group.IsNilpotent ↥(commutator (↥M ⧸ (S10.Malpha M).subgroupOf M)) :=
-    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe h102)
+    Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe h102)
   have hcomm_eq :
       (commutator (↥M ⧸ (S10.Malpha M).subgroupOf M)).map e2.toMonoidHom = commutator ↥M := by
     rw [_root_.commutator_def, Subgroup.map_commutator,
       Subgroup.map_top_of_surjective _ e2.surjective, ← _root_.commutator_def]
   haveI hnil2 : Group.IsNilpotent ↥(commutator ↥M) := by
     rw [← hcomm_eq]
-    exact nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ _ e2.injective)
+    exact Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ _ e2.injective)
   -- `derivedInG M = (commutator ↥M).map M.subtype`.
-  exact nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ _ M.subtype_injective)
+  exact Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ _ M.subtype_injective)
 
 section Helpers
 
@@ -969,7 +969,7 @@ theorem tau1_Malpha_centralizer_PQ_eq_bot [Finite G] (hG : IsMinimalSimpleOdd G)
       haveI := hnil
       have hcomm := S10.commute_of_coprime_orderOf_of_isNilpotent hcop
       have hxy := congrArg Subtype.val hcomm
-      simpa using hxy
+      simpa [commute_iff_eq] using hxy
     have h1 : π (⟨(u : G), huH⟩ * ⟨n₀, hn₀H⟩ * ⟨(u : G), huH⟩⁻¹ * ⟨n₀, hn₀H⟩⁻¹) = 1 := by
       rw [map_mul, map_mul, map_mul, map_inv, map_inv]
       have hc : π ⟨(u : G), huH⟩ * π ⟨n₀, hn₀H⟩ = π ⟨n₀, hn₀H⟩ * π ⟨(u : G), huH⟩ :=
@@ -1126,7 +1126,7 @@ theorem tau1_Malpha_interaction [Finite G] (hG : IsMinimalSimpleOdd G)
       apply Subgroup.map_injective (derivedInG M).subtype_injective
       rw [Subgroup.map_subgroupOf_eq_of_le hQM', ← hTeq]
     let S : Sylow q ↥(derivedInG M) := ⟨Q.subgroupOf (derivedInG M), hQ₀pgrp, hmax⟩
-    have htfae := (isNilpotent_of_finite_tfae (G := ↥(derivedInG M))).out 0 3
+    have htfae := (Group.isNilpotent_of_finite_tfae (G := ↥(derivedInG M))).out 0 3
     have hnormal : (Q.subgroupOf (derivedInG M)).Normal := htfae.mp hnil q ⟨Fact.out⟩ S
     haveI hchar : (Q.subgroupOf (derivedInG M)).Characteristic :=
       Sylow.characteristic_of_normal S hnormal

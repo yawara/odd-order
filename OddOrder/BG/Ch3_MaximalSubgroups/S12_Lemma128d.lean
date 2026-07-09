@@ -119,7 +119,7 @@ theorem E3_le_fittingInG [Finite G] (hG : IsMinimalSimpleOdd G)
   haveI h1 : (E₃.subgroupOf E).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer h.E₃_le).mpr (h.E3_normal hG)
   haveI h3 : Group.IsNilpotent ↥(E₃.subgroupOf E) :=
-    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe h.E₃_le).symm
+    Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe h.E₃_le).symm
   calc E₃ = (E₃.subgroupOf E).map E.subtype :=
         (Subgroup.map_subgroupOf_eq_of_le h.E₃_le).symm
     _ ≤ (Ch01.fitting ↥E).map E.subtype :=
@@ -164,7 +164,7 @@ theorem normalizer_chain_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
     exact Subgroup.map_subtype_le _
   have hE₃_le_FE : E₃ ≤ FE := E3_le_fittingInG hG h
   haveI hE₂nilp : Group.IsNilpotent ↥E₂ :=
-    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hE₂_le_FE)
+    Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hE₂_le_FE)
   -- prime-part bookkeeping for `K := E₂ ⊔ E₃`.
   set K : Subgroup G := E₂ ⊔ E₃ with hKdef
   have hE₂pi : ∀ r ∈ (Nat.card ↥E₂).primeFactors, r ∈ tau2 M := fun r hr =>
@@ -188,7 +188,7 @@ theorem normalizer_chain_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
       (h.E₂_le.trans (h.E3_normal hG)) hE₂E₃_bot
   have hK_le_FE : K ≤ FE := sup_le hE₂_le_FE hE₃_le_FE
   haveI hKnilp : Group.IsNilpotent ↥K :=
-    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hK_le_FE)
+    Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hK_le_FE)
   -- `ν_r(E) = ν_r(E₂)` for `r ∈ τ₂` and `= ν_r(E₃)` for `r ∈ τ₃`.
   have hfacE₂ : ∀ r : ℕ, r.Prime → r ∈ tau2 M →
       (Nat.card ↥E).factorization r = (Nat.card ↥E₂).factorization r := by
@@ -359,7 +359,7 @@ theorem normalizer_chain_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
         intro c hc
         exact Ch2.S08.mem_normalizer_fittingInG_of_mem (hC_le_E hc)
       haveI h3 : Group.IsNilpotent ↥(FE.subgroupOf C) :=
-        nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hFE_le_C).symm
+        Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hFE_le_C).symm
       calc FE = (FE.subgroupOf C).map C.subtype :=
             (Subgroup.map_subgroupOf_eq_of_le hFE_le_C).symm
         _ ≤ (Ch01.fitting ↥C).map C.subtype :=
@@ -376,7 +376,7 @@ theorem normalizer_chain_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
           (K := C) (W := Ch01.fitting ↥C)
       haveI : Group.IsNilpotent ↥(Ch2.S08.fittingInG C) := Ch2.S08.fittingInG_isNilpotent C
       haveI h3 : Group.IsNilpotent ↥((Ch2.S08.fittingInG C).subgroupOf N) :=
-        nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hFC_le_N).symm
+        Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hFC_le_N).symm
       calc Ch2.S08.fittingInG C
           = ((Ch2.S08.fittingInG C).subgroupOf N).map N.subtype :=
             (Subgroup.map_subgroupOf_eq_of_le hFC_le_N).symm
@@ -633,7 +633,7 @@ theorem central_line_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
             (h.E3_normal hG (h.E₂_le ha)) b).mp hb
           exact h3
         have h4 : ⁅a, b⁆ = (a * b * a⁻¹) * b⁻¹ := by
-          rw [commutatorElement_def]; group
+          rw [commutatorElement_def]
         rw [h4]
         exact E₃.mul_mem h2 (E₃.inv_mem hb)
     refine h1.trans (le_of_eq ?_)

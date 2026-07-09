@@ -295,7 +295,7 @@ theorem exists_summand_witness_of_ne_one (caseA : CliffordCaseAData chars)
     {θbar : (↥data.H ⧸ chief.N) →* ℂˣ} (hne : θbar ≠ 1) :
     ∃ w : Fin data.q, ∃ x ∈ caseA.Hpart w, θbar x ≠ 1 := by
   by_contra hall
-  push_neg at hall
+  push Not at hall
   apply hne
   refine MonoidHom.ext fun y => ?_
   rw [MonoidHom.one_apply]
@@ -929,7 +929,7 @@ theorem caseA_centralizes_two_summands_fixes_char {data : TypesIIIIIIVSetup M}
     rw [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom]
     by_cases hk : k = i ∨ k = j
     · rw [hcent k hk x hx]
-    · push_neg at hk
+    · push Not at hk
       rw [hsupp k hk.1 hk.2 _ ((caseA.Hpart_aInvariant k).smul_mem g hx),
         hsupp k hk.1 hk.2 x hx]
   rw [caseA.Hpart_iSup] at hle

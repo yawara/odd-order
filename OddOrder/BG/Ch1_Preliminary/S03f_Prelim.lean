@@ -278,7 +278,7 @@ theorem fitting_map_le_of_mulEquiv {G G' : Type*} [Group G] [Finite G] [Group G'
   haveI : Group.IsNilpotent ↥((OddOrder.Isaacs.Ch01.fitting G).map f.toMonoidHom) := by
     have e' := Subgroup.equivMapOfInjective (OddOrder.Isaacs.Ch01.fitting G) f.toMonoidHom
       f.injective
-    exact nilpotent_of_surjective e'.toMonoidHom e'.surjective
+    exact Group.nilpotent_of_surjective e'.toMonoidHom e'.surjective
   exact OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
 
 /-- **The Fitting subgroup transports along group isomorphisms**: `F(G).map e = F(G')` for
@@ -738,13 +738,13 @@ theorem disjoint_biSup_biSup_of_proj {M : Type*} [Group M] [IsMulCommutative M] 
     have hle : (⨆ i ∈ t, V i : Subgroup M) ≤ MonoidHom.eqLocus E (powMonoidHom m) := by
       refine iSup₂_le fun j hj => fun v hv => ?_
       show E v = powMonoidHom m v
-      rw [powMonoidHom_apply, hE, MonoidHom.finset_prod_apply]
+      rw [powMonoidHom_apply, hE, MonoidHom.finsetProd_apply]
       rw [Finset.prod_eq_single j (fun b _ hbj => hkill b j hbj v hv)
         (fun hj' => absurd hj hj')]
       exact hfix j v hv
     exact hle hzt
   have hEs : E z = 1 := by
-    rw [hE, MonoidHom.finset_prod_apply]
+    rw [hE, MonoidHom.finsetProd_apply]
     refine Finset.prod_eq_one fun l hl => ?_
     have hker : (⨆ i ∈ s, V i : Subgroup M) ≤ (e l).ker := by
       refine iSup₂_le fun k hk => fun v hv => ?_
@@ -825,8 +825,6 @@ theorem centralizer_map_conj (g : G) (K : Subgroup G) :
   · intro hx
     refine ⟨g⁻¹ * x * g, fun k hk => ?_, by group⟩
     have h1 := hx (g * k * g⁻¹) ⟨k, hk, rfl⟩
-    have h2 := congrArg (fun z => g⁻¹ * z * g) h1
-    simp only at h2
     calc k * (g⁻¹ * x * g) = g⁻¹ * (g * k * g⁻¹ * x) * g := by group
       _ = g⁻¹ * (x * (g * k * g⁻¹)) * g := by rw [h1]
       _ = g⁻¹ * x * g * k := by group
