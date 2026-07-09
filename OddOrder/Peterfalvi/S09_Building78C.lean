@@ -350,6 +350,88 @@ theorem chiRho_decomp_proof {G : Type*} [Group G] [Fintype G] {A : Set G} {L : S
   rw [hval, hcand, ClassFunction.finset_sum_apply]
   exact Finset.sum_congr rfl fun i _ => by rw [ClassFunction.smul_apply]
 
+/-- **Peterfalvi (12.14), the source-side (7.7.a) evaluation.**  For a pairwise-orthogonal family
+`ζ` with `A`-supported difference vectors `ψ_i = ζ_i − d_i ζ_0` spanning `CF(L,A)`, the
+distinguished `ζ_0` itself satisfies the (7.7.a) decomposition formula at every `x ∈ A`:
+`ζ_0(x) = Σ_{i≥1} star(⟨ψ_i, ζ_0⟩)/‖ζ_i‖² · ζ_i(x)`.
+
+Same skeleton as `chiRho_decomp_proof` with `χ^ρ` replaced by `ζ_0`: the difference
+`ζ_0 − candidate` has zero inner product against every spanning `ψ_j`
+(`inner_psi_candidate_eq` matches the candidate's coefficients with `⟨ψ_j, ζ_0⟩`), so it
+vanishes on `A` by `eq_zero_on_A_of_inner_zero` — the vanishing target need not itself be
+supported, since the conclusion factors through `supportedProj`.  Paired with
+`chiRho_decomp_proof` at `χ = ν ζ_0` and the (12.14) coefficient identification (`a = 0`), this
+gives Peterfalvi's `ψ^ρ(x) = χ(x)`. -/
+theorem zeta0_decomp_on_A [Invertible (Nat.card L : ℂ)] (A : Set L)
+    (hAconj : ∀ g h : L, h * g * h⁻¹ ∈ A ↔ g ∈ A) {n : ℕ}
+    (ζ : Fin (n + 1) → ClassFunction L ℂ) (d : Fin (n + 1) → ℂ)
+    (psi_support : ∀ i, (ζ i - d i • ζ 0).support ⊆ A)
+    (horth : ∀ a b : Fin (n + 1), a ≠ b → ClassFunction.inner (ζ a) (ζ b) = 0)
+    (hnorm : ∀ i : Fin (n + 1), ClassFunction.inner (ζ i) (ζ i) ≠ 0)
+    (hspan : ClassFunction.supportedSubmodule A ≤
+      Submodule.span ℂ ((fun j => ζ j - d j • ζ 0) '' {j : Fin (n + 1) | j ≠ 0}))
+    {x : L} (hx : x ∈ A) :
+    ζ 0 x = ∑ i ∈ Finset.Ioi (0 : Fin (n + 1)),
+      (star (ClassFunction.inner (ζ i - d i • ζ 0) (ζ 0)) /
+        ClassFunction.inner (ζ i) (ζ i)) * ζ i x := by
+  classical
+  set c : Fin (n + 1) → ℂ := fun i => ClassFunction.inner (ζ i - d i • ζ 0) (ζ 0) with hc
+  set cand : ClassFunction L ℂ :=
+    ∑ i ∈ Finset.Ioi (0 : Fin (n + 1)),
+      (star (c i) / ClassFunction.inner (ζ i) (ζ i)) • ζ i with hcand
+  have hηA : (ζ 0 - cand) x = 0 := by
+    apply eq_zero_on_A_of_inner_zero A hAconj hspan
+    · rintro v ⟨j, _, rfl⟩
+      rw [ClassFunction.mem_supportedSubmodule]
+      exact psi_support j
+    · rintro v ⟨j, hj, rfl⟩
+      rw [ClassFunction.inner_sub_right,
+        show ClassFunction.inner (ζ j - d j • ζ 0) (ζ 0) = c j from rfl,
+        inner_psi_candidate_eq ζ d horth c hnorm hj, sub_self]
+    · exact hx
+  have hval : ζ 0 x = cand x := by
+    have h := hηA
+    rw [ClassFunction.sub_apply] at h
+    exact sub_eq_zero.mp h
+  rw [hval, hcand, ClassFunction.finset_sum_apply]
+  exact Finset.sum_congr rfl fun i _ => by rw [ClassFunction.smul_apply]
+
+open OddOrder.Peterfalvi.S09 in
+/-- **Peterfalvi (12.14), `ψ^ρ(x) = χ(x)`** (the two-sided (7.7.a) evaluation).  If the (7.7.a)
+coefficients of `χ` (typically `χ = ν ζ_0`, after the (12.14) `a = 0` counting collapses
+`c_{ind1H} = a − 1 = −1 = −d_{ind1H}`) are the **uniform** `c_i = ⟨ψ_i^τ, χ⟩ = −d_i` for all
+`i ≥ 1`, then `χ^ρ` agrees with `ζ_0` on `A`: `χ^ρ` decomposes by `chiRho_decomp_proof`, `ζ_0`
+by `zeta0_decomp_on_A`, and the source-side coefficients `⟨ψ_i, ζ_0⟩ = 0 − d_i·‖ζ_0‖² = −d_i`
+match term by term. -/
+theorem chiRho_apply_eq_zeta0_of_inner_tau_uniform {G : Type*} [Group G] [Fintype G] {A : Set G}
+    {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L) {n : ℕ}
+    (ζ : Fin (n + 1) → ClassFunction L ℂ) (d : Fin (n + 1) → ℂ)
+    (psi_support : ∀ i, (ζ i - d i • ζ 0).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (horth : ∀ a b : Fin (n + 1), a ≠ b → ClassFunction.inner (ζ a) (ζ b) = 0)
+    (hnorm : ∀ i : Fin (n + 1), ClassFunction.inner (ζ i) (ζ i) ≠ 0)
+    (hζ0norm : ClassFunction.inner (ζ 0) (ζ 0) = 1)
+    (hAconj : ∀ g h : L, h * g * h⁻¹ ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L ↔
+      g ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hspan : ClassFunction.supportedSubmodule (OddOrder.Peterfalvi.S04.supportInSubgroup A L) ≤
+      Submodule.span ℂ ((fun j => ζ j - d j • ζ 0) '' {j : Fin (n + 1) | j ≠ 0}))
+    (χ : ClassFunction G ℂ)
+    (hc : ∀ i : Fin (n + 1), i ≠ 0 →
+      ClassFunction.inner (H71.τ ⟨ζ i - d i • ζ 0, psi_support i⟩) χ = -(d i))
+    {x : L} (hx : (x : G) ∈ A) :
+    H71.chiRho χ x = ζ 0 x := by
+  rw [chiRho_decomp_proof H71 ζ d psi_support horth hnorm hAconj hspan χ hx,
+    zeta0_decomp_on_A (OddOrder.Peterfalvi.S04.supportInSubgroup A L) hAconj ζ d psi_support
+      horth hnorm hspan
+      (by rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]; exact hx)]
+  refine Finset.sum_congr rfl fun i hi => ?_
+  have hi0 : i ≠ 0 := (Finset.mem_Ioi.mp hi).ne'
+  have hL : ClassFunction.inner (ζ i - d i • ζ 0) (ζ 0) = -(d i) := by
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, horth i 0 hi0, hζ0norm,
+      mul_one, zero_sub]
+  rw [hc i hi0, hL]
+
 /-- **Induced irreducible characters have nonzero norm.**  `‖Ind_K^L θ‖² ≠ 0`, since
 `|K|·‖Ind θ‖² = |I_L(θ)| > 0` (`card_mul_inner_self_induce_eq_card_inertia`).  Supplies the
 `hnorm` hypothesis of `chiRho_decomp_proof` for the family `ζ_i = Ind θ_i` of (7.6)/(7.7.a). -/
