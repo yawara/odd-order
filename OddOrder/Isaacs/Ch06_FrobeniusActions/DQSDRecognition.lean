@@ -591,8 +591,7 @@ theorem card_ne_eight_of_relIndex_prime_of_card_ne_four
     Nat.card T ≠ 8 := by
   intro hT_card
   let Csub : Subgroup T := C.subgroupOf T
-  have hCsub_index : Csub.index = p := by
-    simpa [Csub] using hC_rel
+  have hCsub_index : Csub.index = p := hC_rel
   have hquot_card : Nat.card (T ⧸ Csub) = p := by
     rw [← Subgroup.index_eq_card]
     exact hCsub_index

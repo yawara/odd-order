@@ -1187,7 +1187,7 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
           have h_at_val :
               ρ_H z_subt (ρ_H z_subt w.val - w.val) - (ρ_H z_subt w.val - w.val) = 0 := by
             have h := congr_arg (· w.val) hzsq
-            simp only [Pi.zero_apply] at h
+            simp only [LinearMap.zero_apply] at h
             rw [pow_two, Module.End.mul_apply,
               LinearMap.sub_apply, LinearMap.sub_apply,
               Module.End.one_apply, Module.End.one_apply] at h
