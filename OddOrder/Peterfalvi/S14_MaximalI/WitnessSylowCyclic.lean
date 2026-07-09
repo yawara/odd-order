@@ -1292,4 +1292,193 @@ theorem _root_.OddOrder.GroupTheory.TypeFData.prime_dvd_sq_sub_one_of_abelian_ke
   · exact hdvd_pk.trans (by rw [hfac, pow_one]; exact dvd_mul_left _ _)
   · exact hdvd_pk
 
+/-- **Counterexample fact: `p ∤ |K|`.**  `K = M_F` is Hall in `M` while `p ∣ [M : M_F]`
+(Hypothesis (12.8)), so `p` cannot also divide `|K|`. -/
+theorem p_not_dvd_card_K [Finite G] (ctr : CounterexampleHypothesis (G := G)) :
+    ¬ ctr.p ∣ Nat.card ↥ctr.K := by
+  intro hdvd
+  have hKleM : ctr.K ≤ ctr.M :=
+    ctr.K_eq_MF ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le ctr.M
+  have hcard : Nat.card ↥(ctr.K.subgroupOf ctr.M) = Nat.card ↥ctr.K :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKleM).toEquiv
+  have hcop : Nat.Coprime (Nat.card ↥ctr.K) (ctr.K.relIndex ctr.M) := by
+    have h := (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall ctr.M).coprime_index
+    rw [← ctr.K_eq_MF, hcard] at h
+    rwa [Subgroup.relIndex]
+  exact Nat.Prime.not_dvd_one ctr.p_prime (hcop ▸ Nat.dvd_gcd hdvd ctr.p_dvd_index)
+
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+  (quotientMulAutHom quotientMulAutHom_apply_mk') in
+/-- **Peterfalvi (8.1.c) → (12.16) numeric input: `4·|K'| ≤ |K|`** (the `hidx` field of
+`CounterexampleDadeData`).
+
+The type-I structure of `M` supplies, via the (8.1.c) Frobenius group `H ⋊ U₀`
+(`typeF.frobenius_HU0`) and `p ∣ [M : M_F] = |U|` with `exp U₀ = exp U`, an element `u ∈ U₀`
+of order `p` acting fixed-point-freely on `K = M_F` by conjugation.  The FPF property descends
+along the coprime quotient `K/K'` (Isaacs Cor 3.28, `coprime_fixedPoints_quotient`), so the
+`p`-group `⟨u⟩` acts on `K/K'` with `1` as its only fixed point; orbit counting
+(`IsPGroup.card_modEq_card_fixedPoints`) gives `|K/K'| ≡ 1 (mod p)`.  `K` is nilpotent and
+nontrivial, hence not perfect, so `|K/K'| ≠ 1`, whence `|K/K'| ≥ p + 1 ≥ 4` (`p ≥ 3` odd) and
+`|K| = |K/K'|·|K'| ≥ 4·|K'|`. -/
+theorem four_mul_card_Kprime_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (ctr : CounterexampleHypothesis (G := G)) :
+    4 * Nat.card ↥ctr.Kprime ≤ Nat.card ↥ctr.K := by
+  classical
+  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  obtain ⟨tI⟩ := ctr.M_typeI
+  have hHK : tI.typeF.H = ctr.K := tI.typeF.H_eq.trans ctr.K_eq_MF.symm
+  -- `p ∣ |U|` (the type-I complement realizes `[M : M_F]`).
+  have hpU : ctr.p ∣ Nat.card ↥tI.typeF.U := by
+    have h1 : ctr.p ∣ (ctr.K.subgroupOf ctr.M).index := by
+      have h := ctr.p_dvd_index
+      rwa [Subgroup.relIndex] at h
+    rw [← hHK, tI.typeF.complement.symm.index_eq_card] at h1
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe tI.typeF.U_le).toEquiv] at h1
+  -- An order-`p` element `u ∈ U₀` (Cauchy through `exp U₀ = exp U`).
+  haveI : Fintype ↥tI.typeF.U := Fintype.ofFinite _
+  obtain ⟨xU, hxU⟩ := exists_prime_orderOf_dvd_card (G := ↥tI.typeF.U) ctr.p
+    (by rwa [Nat.card_eq_fintype_card] at hpU)
+  have hpU0 : ctr.p ∣ Nat.card ↥tI.typeF.U0 := by
+    haveI : Fintype ↥tI.typeF.U0 := Fintype.ofFinite _
+    have hexp : Monoid.exponent ↥tI.typeF.U0 ∣ Nat.card ↥tI.typeF.U0 := by
+      rw [Nat.card_eq_fintype_card]
+      exact Group.exponent_dvd_card
+    refine Dvd.dvd.trans ?_ hexp
+    rw [tI.typeF.exponent_eq]
+    exact hxU ▸ Monoid.order_dvd_exponent xU
+  haveI : Fintype ↥tI.typeF.U0 := Fintype.ofFinite _
+  obtain ⟨u0, hu0⟩ := exists_prime_orderOf_dvd_card (G := ↥tI.typeF.U0) ctr.p
+    (by rwa [Nat.card_eq_fintype_card] at hpU0)
+  set u : G := (u0 : G) with hu_def
+  have huU0 : u ∈ tI.typeF.U0 := u0.2
+  have hu_ord : orderOf u = ctr.p := by
+    rw [← hu0]
+    exact orderOf_injective tI.typeF.U0.subtype tI.typeF.U0.subtype_injective u0
+  have hu_ne : u ≠ 1 := fun h =>
+    ctr.p_prime.one_lt.ne' (by rw [← hu_ord, h, orderOf_one])
+  -- `u` acts fixed-point-freely on `K` (ambient form of `frobenius_HU0.conj_frobenius`).
+  have hfpf : ∀ n ∈ ctr.K, u * n * u⁻¹ = n → n = 1 := by
+    intro n hnK hconj
+    by_contra hn_ne
+    have hnH : n ∈ tI.typeF.H := hHK ▸ hnK
+    have huS : u ∈ tI.typeF.H ⊔ tI.typeF.U0 := Subgroup.mem_sup_right huU0
+    have hnS : n ∈ tI.typeF.H ⊔ tI.typeF.U0 := Subgroup.mem_sup_left hnH
+    exact tI.typeF.frobenius_HU0.conj_frobenius ⟨u, huS⟩
+      (Subgroup.mem_subgroupOf.mpr huU0)
+      (fun h => hu_ne (congrArg Subtype.val h)) ⟨n, hnS⟩
+      (Subgroup.mem_subgroupOf.mpr hnH)
+      (fun h => hn_ne (congrArg Subtype.val h)) (Subtype.ext hconj)
+  -- The conjugation action of `⟨u⟩` on `K` and its descent to `K/K'`.
+  have huM : u ∈ ctr.M := tI.typeF.U_le (tI.typeF.U0_le huU0)
+  have hu_norm : u ∈ Subgroup.normalizer ctr.K := by
+    have h := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer ctr.M
+    exact ctr.K_eq_MF ▸ h huM
+  have hAnorm : Subgroup.zpowers u ≤ Subgroup.normalizer ctr.K :=
+    Subgroup.zpowers_le.mpr hu_norm
+  set φ : ↥(Subgroup.zpowers u) →* MulAut ↥ctr.K :=
+    (Subgroup.normalizerMonoidHom ctr.K).comp (Subgroup.inclusion hAnorm) with hφ
+  have hN_inv : Ch03.IsAInvariant φ (commutator ↥ctr.K) :=
+    Ch03.IsAInvariant.of_characteristic φ
+  set ψ := quotientMulAutHom hN_inv with hψ
+  letI : MulAction ↥(Subgroup.zpowers u) (↥ctr.K ⧸ commutator ↥ctr.K) :=
+    MulAction.compHom _ ψ
+  -- `p ∤ |K|`, so Isaacs 3.28 lifts quotient fixed points; FPF then leaves only `1`.
+  have hCop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers u)) (Nat.card ↥ctr.K) := by
+    rw [Nat.card_zpowers, hu_ord]
+    exact ctr.p_prime.coprime_iff_not_dvd.mpr (p_not_dvd_card_K ctr)
+  have hfix_eq : MulAction.fixedPoints ↥(Subgroup.zpowers u) (↥ctr.K ⧸ commutator ↥ctr.K)
+      = {1} := by
+    ext q
+    simp only [Set.mem_singleton_iff, MulAction.mem_fixedPoints]
+    constructor
+    · intro hq
+      obtain ⟨g, rfl⟩ := QuotientGroup.mk'_surjective (commutator ↥ctr.K) q
+      have hg_fix : ∀ a : ↥(Subgroup.zpowers u), ∃ n ∈ commutator ↥ctr.K, φ a g = g * n := by
+        intro a
+        have hb : ψ a (QuotientGroup.mk' (commutator ↥ctr.K) g)
+            = QuotientGroup.mk' (commutator ↥ctr.K) g := hq a
+        rw [hψ, quotientMulAutHom_apply_mk', QuotientGroup.mk'_apply,
+          QuotientGroup.mk'_apply, QuotientGroup.eq] at hb
+        exact ⟨g⁻¹ * φ a g, by simpa using (commutator ↥ctr.K).inv_mem hb, by group⟩
+      obtain ⟨c, hc_fix, n, hn, hcn⟩ :=
+        Ch04.coprime_fixedPoints_quotient hCop (Or.inl inferInstance) hN_inv hg_fix
+      have hca : φ ⟨u, Subgroup.mem_zpowers u⟩ c = c := hc_fix ⟨u, Subgroup.mem_zpowers u⟩
+      have hc1 : (c : G) = 1 := hfpf (c : G) c.2 (congrArg Subtype.val hca)
+      have hg_mem : g ∈ commutator ↥ctr.K := by
+        have hgc : g = c * n⁻¹ := by rw [hcn]; group
+        rw [hgc, show c = (1 : ↥ctr.K) from Subtype.ext hc1, one_mul]
+        exact (commutator ↥ctr.K).inv_mem hn
+      rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+      exact hg_mem
+    · rintro rfl
+      intro a
+      show ψ a 1 = 1
+      exact map_one (ψ a)
+  -- Orbit counting: `|K/K'| ≡ 1 (mod p)`.
+  haveI : Fintype (↥ctr.K ⧸ commutator ↥ctr.K) := Fintype.ofFinite _
+  haveI : Fintype (MulAction.fixedPoints ↥(Subgroup.zpowers u)
+    (↥ctr.K ⧸ commutator ↥ctr.K)) := Fintype.ofFinite _
+  have hApG : IsPGroup ctr.p ↥(Subgroup.zpowers u) :=
+    IsPGroup.of_card (n := 1) (by rw [Nat.card_zpowers, hu_ord, pow_one])
+  have hmod := hApG.card_modEq_card_fixedPoints (↥ctr.K ⧸ commutator ↥ctr.K)
+  have hfixcard : Nat.card (MulAction.fixedPoints ↥(Subgroup.zpowers u)
+      (↥ctr.K ⧸ commutator ↥ctr.K)) = 1 := by
+    rw [Nat.card_congr (Equiv.setCongr hfix_eq)]
+    exact Nat.card_unique
+  have hQmod : Nat.card (↥ctr.K ⧸ commutator ↥ctr.K) % ctr.p = 1 % ctr.p := by
+    have h2 := hmod
+    rw [hfixcard] at h2
+    exact h2
+  -- `|K/K'| ≠ 1` (`K` is nilpotent and nontrivial, hence not perfect).
+  have hQne1 : Nat.card (↥ctr.K ⧸ commutator ↥ctr.K) ≠ 1 := by
+    intro h1
+    haveI : Nontrivial ↥ctr.K :=
+      (Subgroup.nontrivial_iff_ne_bot ctr.K).mpr (hHK ▸ tI.typeF.H_nontrivial)
+    haveI : Group.IsNilpotent ↥ctr.K :=
+      ctr.K_eq_MF ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent ctr.M
+    have hcomm_ne : commutator ↥ctr.K ≠ ⊤ :=
+      (IsSolvable.commutator_lt_top_of_nontrivial ↥ctr.K).ne
+    exact hcomm_ne (Subgroup.index_eq_one.mp h1)
+  -- `p ≥ 3` (odd), so `|K/K'| ≥ p + 1 ≥ 4`.
+  have hpG : ctr.p ∣ Nat.card G := by
+    have h1 : ctr.p ∣ (ctr.K.subgroupOf ctr.M).index := by
+      have := ctr.p_dvd_index
+      rwa [Subgroup.relIndex] at this
+    exact (h1.trans (Subgroup.index_dvd_card _)).trans
+      (Subgroup.card_subgroup_dvd_card ctr.M)
+  have hpodd : Odd ctr.p := hG.odd.of_dvd_nat hpG
+  have hp3 : 3 ≤ ctr.p := by
+    have h2 := ctr.p_prime.two_le
+    have hne : ctr.p ≠ 2 := fun h => by
+      rw [h] at hpodd
+      exact (by decide : ¬ Odd 2) hpodd
+    omega
+  have hQ4 : 4 ≤ Nat.card (↥ctr.K ⧸ commutator ↥ctr.K) := by
+    set c := Nat.card (↥ctr.K ⧸ commutator ↥ctr.K) with hc
+    have h1p : (1 : ℕ) % ctr.p = 1 := Nat.mod_eq_of_lt (by omega)
+    have hdm := Nat.div_add_mod c ctr.p
+    rw [hQmod, h1p] at hdm
+    have hq1 : 1 ≤ c / ctr.p := by
+      rcases Nat.eq_zero_or_pos (c / ctr.p) with h0 | hpos
+      · rw [h0, mul_zero, zero_add] at hdm
+        exact absurd hdm.symm hQne1
+      · exact hpos
+    have hple : ctr.p ≤ ctr.p * (c / ctr.p) := Nat.le_mul_of_pos_right _ hq1
+    obtain ⟨X, hX⟩ : ∃ X, ctr.p * (c / ctr.p) = X := ⟨_, rfl⟩
+    rw [hX] at hdm hple
+    omega
+  -- `|K| = |K/K'|·|K'|`.
+  have hKfact : Nat.card ↥ctr.K
+      = Nat.card (↥ctr.K ⧸ commutator ↥ctr.K) * Nat.card ↥(commutator ↥ctr.K) :=
+    Subgroup.card_eq_card_quotient_mul_card_subgroup _
+  have hK'card : Nat.card ↥ctr.Kprime = Nat.card ↥(commutator ↥ctr.K) := by
+    rw [ctr.Kprime_eq]
+    exact (Nat.card_congr (Subgroup.equivMapOfInjective (commutator ↥ctr.K) ctr.K.subtype
+      ctr.K.subtype_injective).toEquiv).symm
+  calc 4 * Nat.card ↥ctr.Kprime
+      = 4 * Nat.card ↥(commutator ↥ctr.K) := by rw [hK'card]
+    _ ≤ Nat.card (↥ctr.K ⧸ commutator ↥ctr.K) * Nat.card ↥(commutator ↥ctr.K) :=
+        Nat.mul_le_mul_right _ hQ4
+    _ = Nat.card ↥ctr.K := hKfact.symm
+
 end OddOrder.Peterfalvi.S14
