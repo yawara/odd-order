@@ -158,7 +158,6 @@ theorem sumNontrivialIrreducibleDegreeSq :
     Finset.add_sum_erase (Finset.univ : Finset (IrreducibleCharacter G))
       (fun χ => ((χ : ClassFunction G ℂ) 1) ^ 2)
       (a := trivialIrreducibleCharacter G) (Finset.mem_univ _)
-  dsimp only at hsplit
   rw [htriv] at hsplit
   rw [eq_sub_iff_add_eq, add_comm, hsplit, sumIrreducibleDegreeSq]
 

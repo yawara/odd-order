@@ -75,42 +75,43 @@ theorem iterCommutator_succ (E F : Subgroup G) (n : ℕ) :
     iterCommutator E F (n + 1) = ⁅iterCommutator E F n, F⁆ := rfl
 
 /-- **iterCommutator は F の lcs 経由で押し込められる**: `E ≤ F` ⇒
-`iterCommutator E F n ≤ (lowerCentralSeries (↥F) n).map F.subtype`.
+`iterCommutator E F n ≤ ((⊤ : Subgroup ↥F).lowerCentralSeries n).map F.subtype`.
 
 特に `F` が冪零 (Group.IsNilpotent ↥F) なら, 十分大きな `n` で `lcs ↥F n = ⊥`,
 よって `iterCommutator E F n = ⊥`. これが Lucchini K = ⊥ case の核心 (Z(F(G))
 absorbs G-minimal). -/
 theorem iterCommutator_le_lowerCentralSeries_map
     {E F : Subgroup G} (hE : E ≤ F) (n : ℕ) :
-    iterCommutator E F n ≤ (lowerCentralSeries (↥F) n).map F.subtype := by
+    iterCommutator E F n ≤ ((⊤ : Subgroup ↥F).lowerCentralSeries n).map F.subtype := by
   induction n with
   | zero =>
-    simp only [iterCommutator_zero, lowerCentralSeries_zero]
+    simp only [iterCommutator_zero, Subgroup.lowerCentralSeries_zero]
     rw [← MonoidHom.range_eq_map, F.range_subtype]
     exact hE
   | succ n ih =>
     rw [iterCommutator_succ]
     have hRange : (⊤ : Subgroup ↥F).map F.subtype = F := by
       rw [← MonoidHom.range_eq_map]; exact F.range_subtype
-    have hMapLcs : (lowerCentralSeries (↥F) (n + 1)).map F.subtype =
-        ⁅((lowerCentralSeries (↥F) n).map F.subtype), F⁆ := by
-      change ⁅lowerCentralSeries (↥F) n, (⊤ : Subgroup ↥F)⁆.map F.subtype = _
+    have hMapLcs : ((⊤ : Subgroup ↥F).lowerCentralSeries (n + 1)).map F.subtype =
+        ⁅(((⊤ : Subgroup ↥F).lowerCentralSeries n).map F.subtype), F⁆ := by
+      change ⁅(⊤ : Subgroup ↥F).lowerCentralSeries n, (⊤ : Subgroup ↥F)⁆.map F.subtype = _
       rw [Subgroup.map_commutator, hRange]
     rw [hMapLcs]
     exact Subgroup.commutator_mono ih le_rfl
 
 /-- **iterCommutator は ambient G の lcs に押し込められる**: 任意 `E, F ⊆ G` で
-`iterCommutator E F n ≤ lowerCentralSeries G n`. `E ≤ F` 不要 (E, F は ⊤ ≤ G で挟まれる).
+`iterCommutator E F n ≤ (⊤ : Subgroup G).lowerCentralSeries n`. `E ≤ F` 不要
+(E, F は ⊤ ≤ G で挟まれる).
 
 `E ≤ ⊤` と `F ≤ ⊤` 経由で `iterCommutator E F n ≤ iterCommutator ⊤ ⊤ n = lcs G n`. -/
 theorem iterCommutator_le_lowerCentralSeries (E F : Subgroup G) (n : ℕ) :
-    iterCommutator E F n ≤ lowerCentralSeries G n := by
+    iterCommutator E F n ≤ (⊤ : Subgroup G).lowerCentralSeries n := by
   induction n with
   | zero =>
-    simp only [iterCommutator_zero, lowerCentralSeries_zero]
+    simp only [iterCommutator_zero, Subgroup.lowerCentralSeries_zero]
     exact le_top
   | succ n ih =>
-    rw [iterCommutator_succ, lowerCentralSeries_succ]
+    rw [iterCommutator_succ, Subgroup.lowerCentralSeries_succ]
     exact Subgroup.commutator_mono ih le_top
 
 /-- **ambient G 冪零 ⇒ iterCommutator は最終的に ⊥** (任意 E, F).
@@ -118,7 +119,7 @@ theorem iterCommutator_le_lowerCentralSeries (E F : Subgroup G) (n : ℕ) :
 theorem iterCommutator_eq_bot_of_isNilpotent_ambient
     [Group.IsNilpotent G] (E F : Subgroup G) :
     ∃ n, iterCommutator E F n = ⊥ := by
-  obtain ⟨n, hn⟩ := nilpotent_iff_lowerCentralSeries.mp ‹_›
+  obtain ⟨n, hn⟩ := Subgroup.nilpotent_iff_lowerCentralSeries.mp ‹_›
   refine ⟨n, le_antisymm ?_ bot_le⟩
   exact (iterCommutator_le_lowerCentralSeries E F n).trans (le_of_eq hn)
 
@@ -168,10 +169,10 @@ theorem iterCommutator_succ_le_self {E F : Subgroup G} [E.Normal] [F.Normal] (n 
 theorem iterCommutator_eq_bot_of_isNilpotent
     {E F : Subgroup G} (hE : E ≤ F) [hF : Group.IsNilpotent ↥F] :
     ∃ n, iterCommutator E F n = ⊥ := by
-  obtain ⟨n, hn⟩ := nilpotent_iff_lowerCentralSeries.mp hF
+  obtain ⟨n, hn⟩ := Subgroup.nilpotent_iff_lowerCentralSeries.mp hF
   refine ⟨n, le_antisymm ?_ bot_le⟩
   calc iterCommutator E F n
-      ≤ (lowerCentralSeries (↥F) n).map F.subtype :=
+      ≤ ((⊤ : Subgroup ↥F).lowerCentralSeries n).map F.subtype :=
         iterCommutator_le_lowerCentralSeries_map hE n
     _ ≤ ⊥ := by rw [hn]; exact (Subgroup.map_bot F.subtype).le
 
@@ -378,7 +379,7 @@ theorem exists_isMinimalNormal_le_fitting_le_centralizer_fitting
   haveI hFNilp : Group.IsNilpotent ↥(OddOrder.Isaacs.Ch01.fitting G) :=
     OddOrder.Isaacs.Ch01.fitting.isNilpotent
   haveI hENilp : Group.IsNilpotent ↥E :=
-    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hEle)
+    Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hEle)
   -- E elem abelian p-group.
   obtain ⟨p, hp_prime, hElem⟩ :=
     isElementaryAbelian_of_isMinimalNormal_of_isNilpotent_subtype hMin
@@ -672,9 +673,10 @@ private theorem lucchini_aux : ∀ n : ℕ,
       have hM_comm_of_E_central
           (hE_cent : E.subgroupOf M ≤ Subgroup.center M) :
           ∀ x y : M, x * y = y * x := by
-        exact commutative_of_cyclic_center_quotient qM (by
+        have hcomm := qM.isMulCommutative_of_isCyclic_of_ker_le_center (by
           rw [QuotientGroup.ker_mk']
           exact hE_cent)
+        exact fun x y => hcomm.is_comm.comm x y
       -- E ≤ M but A ⊓ E ⊆ A.normalCore (need E ⊓ A normal in A? actually we use E.Normal).
       -- Translation: Ā.index = (A ⊔ E).index.
       have hĀ_index_eq : Ā.index = (A ⊔ E).index := by
