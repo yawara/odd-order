@@ -38,3 +38,11 @@ tail が 1,500 行以下、chain importer 透過、`lake build OddOrder` 緑。
 - 行数 refresh: `S16_NonExistenceG.lean` = **4548 行** (2026-07-02)。凍結 Core =
   `S16_NonExistenceGCore.lean` 4919 行。
 - 分割実施は従来通り prefix-split (lane c の frontier と衝突しない凍結境界で)。
+
+## 完了 (2026-07-09)
+
+dir 化分割を実施 (issue 0103 方式、lean_split.py による機械分割 + 宣言/namespace 文脈/sorry 保存検証 + full build green):
+  - ComparingLM.lean (3007 行)
+  - KeyInequality.lean (598 行)
+  - SubgroupL.lean (2945 行)
+  - SubgroupM.lean (1897 行)
