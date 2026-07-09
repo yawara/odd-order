@@ -246,3 +246,18 @@ field_normalizer_structure)。honest 分解 = (14.6)-時点の §13 供給 (u-va
 直接呼ぶ形 — 構造 inputs (`W2_le_P`/`Q_elemAb`) は `S_field_model_structural_inputs` で
 **既に proven**。t_side 型の精密 existential 化は次 iteration 候補 (hcyc/(14.5)-y の
 (14.6)-context 供給可否の原文照合が要る)。
+
+### 追記 (同日): s_side_frobenius_kernel 分解完了 (`aa9695f2`) + 次 iteration 候補
+
+- **s_side_frobenius_kernel = crisp frobPU gate 化済**: 残 sorry は Coq `frobPU`
+  (`IsFrobeniusGroup ↥S' (P.subgroupOf S') (U.subgroupOf S')`) そのもの。真の gate =
+  typeP_Galois S (9000/lane-a、Coq `typeP_Galois_P` 経由) と code-level 確定。transport
+  (Isaacs 6.4 `centralizer_kernel_le` の座標搬送) は実証明済。field-model 経由の旧 framing は
+  真の循環 (field_normalizer_structure ← exists_MHypothesis ← (14.11.3) ← 本 lemma) で不可。
+- **次 iteration 候補 (engine-prep 系の残り)**: `exists_MHypothesis` betaGrid (ComparingLM:~1368)
+  の M-side grid-coefficient carrier mirror。L-side 機構 (`lSideGridCoeffData` +
+  `lSide_delta_grid_expansion`、±1 rigidity assembly) の `hq3/hp5` binder は **body 未使用の
+  vestigial** ゆえ一般 q,p で M に mirror 可能。ただし M-side は `TypeICoherent78Data` package
+  でなく `exists_M_hypothesis78` の直接 h78 を持つ → **L-machinery の dataL → h78 一般化 or
+  M-data の TypeICoherent78Data 再 packaging** の設計判断が要る (中規模)。gated 3-field
+  (parity ×2 + Y=0 membership) は L-side と同一の b-layer。
