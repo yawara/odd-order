@@ -39,10 +39,10 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 4
 | `⁅H,K⁆ = ⊥ ↔ H ⊆ Z_G(K)` | `Subgroup.commutator_eq_bot_iff_le_centralizer` |
 | `⁅H₁, H₂⁆ ≤ H₂` (H₂ normal 仮定) | `Subgroup.commutator_le_right` |
 | **Lemma 4.9 Three-subgroups** | `Subgroup.commutator_commutator_eq_bot_of_rotate` |
-| 下降中心列 `G^k` | `lowerCentralSeries`, `lowerCentralSeries_succ` |
+| 下降中心列 `G^k` | `Subgroup.lowerCentralSeries` (`(⊤ : Subgroup G).lowerCentralSeries`), `Subgroup.lowerCentralSeries_succ` |
 
-注: mathlib `lowerCentralSeries` の index 規約は Isaacs `G^k` と **オフセット 1 ずれ** —
-mathlib `lcs 0 = ⊤ = G^1`, `lcs 1 = G' = G^2`, `lcs n = G^{n+1}`.
+注: mathlib `(⊤ : Subgroup G).lowerCentralSeries` の index 規約は Isaacs `G^k` と
+**オフセット 1 ずれ** — mathlib `lcs 0 = ⊤ = G^1`, `lcs 1 = G' = G^2`, `lcs n = G^{n+1}`.
 
 ノート: [`notes/isaacs/ch04_commutators.md`](../../../notes/isaacs/ch04_commutators.md)
 -/
@@ -311,7 +311,7 @@ private lemma index_eq_prime_of_isCoatom_of_pgroup
   haveI : Group.IsNilpotent P := hP.isNilpotent
   have hMnormal : M.Normal :=
     Subgroup.NormalizerCondition.normal_of_coatom M
-      (normalizerCondition_of_isNilpotent (G := P)) hMax
+      (Group.normalizerCondition_of_isNilpotent (G := P)) hMax
   haveI := hMnormal
   have hPQuot : IsPGroup p (P ⧸ M) := hP.to_quotient M
   obtain ⟨k, hk⟩ := hPQuot.exists_card_eq
@@ -397,7 +397,7 @@ private lemma commutator_le_of_isCoatom_of_pgroup
   haveI : Group.IsNilpotent P := hP.isNilpotent
   have hMnormal : M.Normal :=
     Subgroup.NormalizerCondition.normal_of_coatom M
-      (normalizerCondition_of_isNilpotent (G := P)) hMax
+      (Group.normalizerCondition_of_isNilpotent (G := P)) hMax
   haveI := hMnormal
   have h_idx : M.index = p := index_eq_prime_of_isCoatom_of_pgroup hP hMax
   have h_card_quot : Nat.card (P ⧸ M) = p := by
@@ -417,7 +417,7 @@ private lemma pow_p_mem_of_isCoatom_of_pgroup
   haveI : Group.IsNilpotent P := hP.isNilpotent
   have hMnormal : M.Normal :=
     Subgroup.NormalizerCondition.normal_of_coatom M
-      (normalizerCondition_of_isNilpotent (G := P)) hMax
+      (Group.normalizerCondition_of_isNilpotent (G := P)) hMax
   haveI := hMnormal
   have h_idx : M.index = p := index_eq_prime_of_isCoatom_of_pgroup hP hMax
   have h_card_quot : Nat.card (P ⧸ M) = p := by
@@ -704,7 +704,7 @@ theorem commutator_eq_commutator_of_normal_abelian_cyclic_quotient
     exact Subgroup.commutator_mem_commutator (Subgroup.mem_top g) hyA
   -- Step 4: G/H is abelian.
   have habelian : ∀ a b : G ⧸ H, a * b = b * a :=
-    commutative_of_cyclic_center_quotient f hker_central
+    (f.isMulCommutative_of_isCyclic_of_ker_le_center hker_central).is_comm.comm
   -- Step 5: commutator G ⊆ H.
   rw [_root_.commutator_def, Subgroup.commutator_def, Subgroup.closure_le]
   rintro _ ⟨a, _, b, _, rfl⟩
@@ -1043,20 +1043,11 @@ theorem card_commutator_mul_card_inf_center_eq_card_of_normal_abelian_cyclic_quo
   rw [mul_comm]
   exact h_lag
 
-/-! ### Thm 4.7: maximal class p-群 (helpers + base case m = 1) -/
+/-! ### Thm 4.7: maximal class p-群 (helpers + base case m = 1)
 
-/-- Helper: For surjective hom `f : G →* H`, `(lcs G n).map f = lcs H n`. -/
-theorem lowerCentralSeries_map_eq_of_surjective {G H : Type*} [Group G] [Group H]
-    (f : G →* H) (hf : Function.Surjective f) (n : ℕ) :
-    Subgroup.map f (lowerCentralSeries G n) = lowerCentralSeries H n := by
-  induction n with
-  | zero =>
-    show Subgroup.map f (⊤ : Subgroup G) = ⊤
-    exact Subgroup.map_top_of_surjective f hf
-  | succ n ih =>
-    show Subgroup.map f ⁅lowerCentralSeries G n, (⊤ : Subgroup G)⁆
-        = ⁅lowerCentralSeries H n, (⊤ : Subgroup H)⁆
-    rw [Subgroup.map_commutator, ih, Subgroup.map_top_of_surjective f hf]
+surjective `f` での `(lcs G n).map f = lcs H n` (旧自前 helper
+`lowerCentralSeries_map_eq_of_surjective`) は mathlib `Subgroup.map_lowerCentralSeries`
+(一般 `f` で等号) + `Subgroup.map_top_of_surjective` の合成で直接得る (wrapper 方針). -/
 
 /-- **Thm 4.7, m = 1 case**: `A ⊴ P` abelian, `P` p-群, `|A| = p`, `P/A` cyclic,
 `|A ⊓ Z(P)| = p` ⇒ `Group.nilpotencyClass P = 1` (i.e., P abelian, nontrivial).
@@ -1081,7 +1072,8 @@ theorem nilpotencyClass_eq_one_of_normal_abelian_cyclic_quotient_inf_center_prim
   have hP_abelian : ∀ x y : P, x * y = y * x := by
     have hker_le : (QuotientGroup.mk' A).ker ≤ Subgroup.center P := by
       rw [QuotientGroup.ker_mk']; exact hA_le_Z
-    exact commutative_of_cyclic_center_quotient (QuotientGroup.mk' A) hker_le
+    exact ((QuotientGroup.mk' A).isMulCommutative_of_isCyclic_of_ker_le_center
+      hker_le).is_comm.comm
   -- commutator P = ⊥ via center P = ⊤
   have hcomm_bot : _root_.commutator P = ⊥ := by
     rw [commutator_eq_bot_iff_center_eq_top, Subgroup.eq_top_iff']
@@ -1091,7 +1083,8 @@ theorem nilpotencyClass_eq_one_of_normal_abelian_cyclic_quotient_inf_center_prim
     exact hP_abelian y x
   -- nilpotencyClass ≤ 1
   have h_class_le : Group.nilpotencyClass P ≤ 1 := by
-    rw [← lowerCentralSeries_eq_bot_iff_nilpotencyClass_le, lowerCentralSeries_one]
+    rw [← Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le,
+      Subgroup.top_lowerCentralSeries_one]
     exact hcomm_bot
   -- P nontrivial (|A| = p ≥ 2)
   have hA_ne_bot : A ≠ ⊥ := by
@@ -1110,7 +1103,7 @@ theorem nilpotencyClass_eq_one_of_normal_abelian_cyclic_quotient_inf_center_prim
   -- nilpotencyClass ≠ 0
   have h_class_ne_zero : Group.nilpotencyClass P ≠ 0 := by
     intro h
-    rw [nilpotencyClass_zero_iff_subsingleton] at h
+    rw [Group.nilpotencyClass_zero_iff_subsingleton] at h
     exact not_subsingleton P h
   omega
 
@@ -1156,7 +1149,7 @@ private lemma card_map_mk_mul_card_inf_eq_card {G : Type*} [Group G] [Finite G]
   `commutator P ⊓ Z(P) > ⊥`. Combined with `commutator P ⊓ Z(P) ⊆ A ⊓ Z(P) = Z`
   and `|Z| = p` prime, get `commutator P ⊓ Z(P) = Z`, so `Z ⊆ commutator P`.
   Apply IH to `P̄ = P/Z` and `Ā = A.map mk'`: class `P̄ = m-1`. Lift back via
-  `lowerCentralSeries_map_eq_of_surjective`. -/
+  `Subgroup.map_lowerCentralSeries` (+ `Subgroup.map_top_of_surjective`). -/
 theorem nilpotencyClass_eq_of_normal_abelian_cyclic_quotient_inf_center_prime_card_p_pow
     (m : ℕ) {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime]
     (hP : IsPGroup p P) {A : Subgroup P} [A.Normal]
@@ -1272,8 +1265,9 @@ theorem nilpotencyClass_eq_of_normal_abelian_cyclic_quotient_inf_center_prime_ca
     have hG'Z_inter_eq : ((_root_.commutator P) ⊓ Z : Subgroup P) = Z := inf_of_le_right hZ_le_G'
     -- commutator P̄ = (commutator P).map φ (by lcs_map at n=1)
     have h_lcs1 : Subgroup.map φ (_root_.commutator P) = _root_.commutator (P ⧸ Z) := by
-      have := lowerCentralSeries_map_eq_of_surjective φ hφ_surj 1
-      simpa [lowerCentralSeries_one] using this
+      have := Subgroup.map_lowerCentralSeries (S := (⊤ : Subgroup P)) φ 1
+      rwa [Subgroup.map_top_of_surjective φ hφ_surj, Subgroup.top_lowerCentralSeries_one,
+        Subgroup.top_lowerCentralSeries_one] at this
     -- |commutator P̄| = p^(k-1)
     have hGbar'_card : Nat.card (_root_.commutator (P ⧸ Z)) = p^(k-1) := by
       have h := card_map_mk_mul_card_inf_eq_card (N := Z) (_root_.commutator P)
@@ -1297,33 +1291,34 @@ theorem nilpotencyClass_eq_of_normal_abelian_cyclic_quotient_inf_center_prime_ca
     have h_class_Pbar : Group.nilpotencyClass (P ⧸ Z) = k :=
       ih hPbar hAbar_Ab hAbar_quot_cyclic hAbar_card hAbarZbar_card
     -- Translate to lcs: lcs P̄ k = ⊥ and lcs P̄ (k-1) ≠ ⊥
-    have h_lcs_Pbar_k : lowerCentralSeries (P ⧸ Z) k = ⊥ :=
-      lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mpr h_class_Pbar.le
-    have h_lcs_Pbar_km1_ne : lowerCentralSeries (P ⧸ Z) (k - 1) ≠ ⊥ := by
+    have h_lcs_Pbar_k : (⊤ : Subgroup (P ⧸ Z)).lowerCentralSeries k = ⊥ :=
+      Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mpr h_class_Pbar.le
+    have h_lcs_Pbar_km1_ne : (⊤ : Subgroup (P ⧸ Z)).lowerCentralSeries (k - 1) ≠ ⊥ := by
       intro h_eq
-      have := lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mp h_eq
+      have := Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mp h_eq
       rw [h_class_Pbar] at this
       omega
     -- lcs P k ≤ Z (lift lcs P̄ k = ⊥ back)
-    have h_lcs_P_k_le_Z : lowerCentralSeries P k ≤ Z := by
-      have h_map : Subgroup.map φ (lowerCentralSeries P k) = lowerCentralSeries (P ⧸ Z) k :=
-        lowerCentralSeries_map_eq_of_surjective φ hφ_surj k
+    have h_lcs_P_k_le_Z : (⊤ : Subgroup P).lowerCentralSeries k ≤ Z := by
+      have h_map : Subgroup.map φ ((⊤ : Subgroup P).lowerCentralSeries k)
+          = (⊤ : Subgroup (P ⧸ Z)).lowerCentralSeries k := by
+        rw [Subgroup.map_lowerCentralSeries, Subgroup.map_top_of_surjective φ hφ_surj]
       rw [h_lcs_Pbar_k] at h_map
-      have h_le_ker : lowerCentralSeries P k ≤ φ.ker :=
+      have h_le_ker : (⊤ : Subgroup P).lowerCentralSeries k ≤ φ.ker :=
         (Subgroup.map_eq_bot_iff _).mp h_map
       rw [hφ_ker] at h_le_ker
       exact h_le_ker
     -- lcs P (k+1) = ⊥ (lcs P k ≤ Z ≤ Z(P))
-    have h_lcs_P_kp1 : lowerCentralSeries P (k + 1) = ⊥ :=
-      lowerCentralSeries_succ_eq_bot (h_lcs_P_k_le_Z.trans hZ_le_center)
+    have h_lcs_P_kp1 : (⊤ : Subgroup P).lowerCentralSeries (k + 1) = ⊥ :=
+      Subgroup.lowerCentralSeries_succ_eq_bot ⊤ (h_lcs_P_k_le_Z.trans hZ_le_center)
     -- lcs P k ≠ ⊥
-    have h_lcs_P_k_ne : lowerCentralSeries P k ≠ ⊥ := by
+    have h_lcs_P_k_ne : (⊤ : Subgroup P).lowerCentralSeries k ≠ ⊥ := by
       -- Case k = 1: lcs P 1 = commutator P ≠ ⊥
       -- Case k ≥ 2: lcs P (k-1) ⊆ commutator P ⊆ A, lcs P (k-1) ⊄ Z ⇒ ...
       by_cases hk1 : k = 1
       · -- k = 1
         subst hk1
-        rw [lowerCentralSeries_one]
+        rw [Subgroup.top_lowerCentralSeries_one]
         intro h_bot
         rw [h_bot, Subgroup.card_bot] at hG'_card
         -- p^1 = 1 ⇒ p = 1, contradiction
@@ -1333,24 +1328,26 @@ theorem nilpotencyClass_eq_of_normal_abelian_cyclic_quotient_inf_center_prime_ca
         -- lcs P (k-1) ⊄ Z ⇒ lcs P (k-1) ⊄ Z(P) ⇒ lcs P k ≠ ⊥
         intro h_lcs_k_bot
         -- lcs P (k-1) maps to lcs P̄ (k-1) ≠ ⊥
-        have h_map_km1 : Subgroup.map φ (lowerCentralSeries P (k - 1))
-            = lowerCentralSeries (P ⧸ Z) (k - 1) :=
-          lowerCentralSeries_map_eq_of_surjective φ hφ_surj (k - 1)
+        have h_map_km1 : Subgroup.map φ ((⊤ : Subgroup P).lowerCentralSeries (k - 1))
+            = (⊤ : Subgroup (P ⧸ Z)).lowerCentralSeries (k - 1) := by
+          rw [Subgroup.map_lowerCentralSeries, Subgroup.map_top_of_surjective φ hφ_surj]
         -- lcs P (k-1) ⊄ Z (= φ.ker)
-        have h_lcs_km1_nle_Z : ¬ lowerCentralSeries P (k - 1) ≤ Z := by
+        have h_lcs_km1_nle_Z : ¬ (⊤ : Subgroup P).lowerCentralSeries (k - 1) ≤ Z := by
           intro h_le
-          have h_le_ker : lowerCentralSeries P (k - 1) ≤ φ.ker := by
+          have h_le_ker : (⊤ : Subgroup P).lowerCentralSeries (k - 1) ≤ φ.ker := by
             rw [hφ_ker]; exact h_le
-          have : Subgroup.map φ (lowerCentralSeries P (k - 1)) = ⊥ :=
+          have : Subgroup.map φ ((⊤ : Subgroup P).lowerCentralSeries (k - 1)) = ⊥ :=
             (Subgroup.map_eq_bot_iff _).mpr h_le_ker
           rw [h_map_km1] at this
           exact h_lcs_Pbar_km1_ne this
         -- lcs P (k-1) ⊆ commutator P ⊆ A (using k - 1 ≥ 1, lcs decreasing)
         have hk_one_le : 1 ≤ k - 1 := by omega
-        have h_lcs_km1_le_G' : lowerCentralSeries P (k - 1) ≤ _root_.commutator P := by
-          rw [← lowerCentralSeries_one]
-          exact lowerCentralSeries_antitone hk_one_le
-        have h_lcs_km1_le_A : lowerCentralSeries P (k - 1) ≤ A := h_lcs_km1_le_G'.trans hG'_le_A
+        have h_lcs_km1_le_G' :
+            (⊤ : Subgroup P).lowerCentralSeries (k - 1) ≤ _root_.commutator P := by
+          rw [← Subgroup.top_lowerCentralSeries_one]
+          exact (⊤ : Subgroup P).lowerCentralSeries_antitone hk_one_le
+        have h_lcs_km1_le_A : (⊤ : Subgroup P).lowerCentralSeries (k - 1) ≤ A :=
+          h_lcs_km1_le_G'.trans hG'_le_A
         -- ∃ x ∈ lcs P (k-1), x ∉ Z
         rw [SetLike.not_le_iff_exists] at h_lcs_km1_nle_Z
         obtain ⟨x, hx_in, hx_notZ⟩ := h_lcs_km1_nle_Z
@@ -1364,8 +1361,8 @@ theorem nilpotencyClass_eq_of_normal_abelian_cyclic_quotient_inf_center_prime_ca
         push Not at hx_notZP
         obtain ⟨y, hxy⟩ := hx_notZP
         -- [x, y] ∈ ⁅lcs P (k-1), ⊤⁆ = lcs P k via lcs definition
-        have h_xy_in_kp : ⁅x, y⁆ ∈ lowerCentralSeries P ((k - 1) + 1) := by
-          show ⁅x, y⁆ ∈ ⁅lowerCentralSeries P (k - 1), (⊤ : Subgroup P)⁆
+        have h_xy_in_kp : ⁅x, y⁆ ∈ (⊤ : Subgroup P).lowerCentralSeries ((k - 1) + 1) := by
+          show ⁅x, y⁆ ∈ ⁅(⊤ : Subgroup P).lowerCentralSeries (k - 1), (⊤ : Subgroup P)⁆
           exact Subgroup.commutator_mem_commutator hx_in (Subgroup.mem_top y)
         have hk_succ : (k - 1) + 1 = k := Nat.sub_add_cancel hk_pos
         rw [hk_succ] at h_xy_in_kp
@@ -1376,12 +1373,12 @@ theorem nilpotencyClass_eq_of_normal_abelian_cyclic_quotient_inf_center_prime_ca
     -- Conclude: Group.nilpotencyClass P = k + 1
     refine Nat.le_antisymm ?_ ?_
     · -- ≤ : lcs P (k+1) = ⊥
-      exact lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mp h_lcs_P_kp1
+      exact Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mp h_lcs_P_kp1
     · -- ≥ : NOT (nilpotencyClass ≤ k)
       by_contra h
       push Not at h
-      have : lowerCentralSeries P k = ⊥ :=
-        lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mpr (Nat.lt_succ_iff.mp h)
+      have : (⊤ : Subgroup P).lowerCentralSeries k = ⊥ :=
+        Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mpr (Nat.lt_succ_iff.mp h)
       exact h_lcs_P_k_ne this
 
 /-! ### Commutator collection in class ≤ 2 (Thm 4.8 の前段) -/
@@ -1608,22 +1605,24 @@ mathlib indexing (`lcs 0 = ⊤ = G^1`, `lcs n = G^{n+1}`) では Isaacs `⁅G^i,
 **下流**: Cor 4.12 (weight n commutator ⊆ G^n), Cor 4.13 (derived ⊆ lcs),
 Ch.2 §2D Lucchini K = ⊥ aux の解消経路. -/
 theorem commutator_lowerCentralSeries_le (i j : ℕ) :
-    ⁅lowerCentralSeries G i, lowerCentralSeries G j⁆ ≤
-      lowerCentralSeries G (i + j + 1) := by
+    ⁅(⊤ : Subgroup G).lowerCentralSeries i, (⊤ : Subgroup G).lowerCentralSeries j⁆ ≤
+      (⊤ : Subgroup G).lowerCentralSeries (i + j + 1) := by
   induction j generalizing i with
   | zero =>
     -- ⁅lcs i, lcs 0⁆ = ⁅lcs i, ⊤⁆ = lcs (i+1) by `lowerCentralSeries` def.
-    change ⁅lowerCentralSeries G i, (⊤ : Subgroup G)⁆ ≤ lowerCentralSeries G (i + 1)
+    change ⁅(⊤ : Subgroup G).lowerCentralSeries i, (⊤ : Subgroup G)⁆ ≤
+      (⊤ : Subgroup G).lowerCentralSeries (i + 1)
     exact le_refl _
   | succ j ih =>
     -- Goal: ⁅lcs i, lcs (j+1)⁆ ≤ lcs (i + (j+1) + 1) = lcs (i + j + 2).
     -- Step A: prove the rotated form via Cor 4.10.
-    have key : ⁅⁅lowerCentralSeries G j, (⊤ : Subgroup G)⁆, lowerCentralSeries G i⁆ ≤
-        lowerCentralSeries G (i + j + 2) := by
+    have key : ⁅⁅(⊤ : Subgroup G).lowerCentralSeries j, (⊤ : Subgroup G)⁆,
+        (⊤ : Subgroup G).lowerCentralSeries i⁆ ≤
+        (⊤ : Subgroup G).lowerCentralSeries (i + j + 2) := by
       refine commutator_commutator_le_of_rotate ?_ ?_
       · -- h1: ⁅⁅⊤, lcs i⁆, lcs j⁆ ≤ lcs (i + j + 2).
-        have h_top : (⁅(⊤ : Subgroup G), lowerCentralSeries G i⁆ : Subgroup G) =
-            lowerCentralSeries G (i + 1) := by
+        have h_top : (⁅(⊤ : Subgroup G), (⊤ : Subgroup G).lowerCentralSeries i⁆ : Subgroup G) =
+            (⊤ : Subgroup G).lowerCentralSeries (i + 1) := by
           rw [Subgroup.commutator_comm]; rfl
         rw [h_top]
         have hIH := ih (i + 1)
@@ -1648,15 +1647,15 @@ def iterLeftCommutator (head : G) (tail : List G) : G :=
 /-- **`iterLeftCommutator` 汎用補題**: accumulator が `lcs n` 内なら, 長さ `m` の
 リストでの fold は `lcs (n + m)` に収まる. -/
 theorem iterLeftCommutator_mem_lowerCentralSeries_add (n : ℕ) (acc : G)
-    (hacc : acc ∈ lowerCentralSeries G n) (gs : List G) :
-    iterLeftCommutator acc gs ∈ lowerCentralSeries G (n + gs.length) := by
+    (hacc : acc ∈ (⊤ : Subgroup G).lowerCentralSeries n) (gs : List G) :
+    iterLeftCommutator acc gs ∈ (⊤ : Subgroup G).lowerCentralSeries (n + gs.length) := by
   induction gs generalizing n acc with
   | nil =>
     simpa [iterLeftCommutator] using hacc
   | cons g rest ih =>
     -- iterLeftCommutator acc (g :: rest) = iterLeftCommutator ⁅acc, g⁆ rest.
-    have step : ⁅acc, g⁆ ∈ lowerCentralSeries G (n + 1) := by
-      change ⁅acc, g⁆ ∈ ⁅lowerCentralSeries G n, (⊤ : Subgroup G)⁆
+    have step : ⁅acc, g⁆ ∈ (⊤ : Subgroup G).lowerCentralSeries (n + 1) := by
+      change ⁅acc, g⁆ ∈ ⁅(⊤ : Subgroup G).lowerCentralSeries n, (⊤ : Subgroup G)⁆
       exact Subgroup.commutator_mem_commutator hacc (Subgroup.mem_top g)
     have hRec := ih (n + 1) ⁅acc, g⁆ step
     -- hRec : iterLeftCommutator ⁅acc, g⁆ rest ∈ lcs ((n+1) + rest.length)
@@ -1673,7 +1672,7 @@ theorem iterLeftCommutator_mem_lowerCentralSeries_add (n : ℕ) (acc : G)
 **証明**: 汎用補題 `iterLeftCommutator_mem_lowerCentralSeries_add` を `n = 0`,
 `acc = g ∈ ⊤ = lcs 0` で specialize. -/
 theorem iterLeftCommutator_mem_lowerCentralSeries (g : G) (gs : List G) :
-    iterLeftCommutator g gs ∈ lowerCentralSeries G gs.length := by
+    iterLeftCommutator g gs ∈ (⊤ : Subgroup G).lowerCentralSeries gs.length := by
   simpa using iterLeftCommutator_mem_lowerCentralSeries_add 0 g
     (by simp : g ∈ (⊤ : Subgroup G)) gs
 
@@ -1694,17 +1693,18 @@ mathlib 既存の `derived_le_lower_central` (`derived r ≤ lcs r`) より stri
 **系** (Isaacs Cor 4.13 文): `G` nilpotent class `m` (`lcs m = ⊥`) ⇒ derived length
 `≤ 1 + ⌈log₂ m⌉`. 本リポでは boolean form のみ実装, log₂ 操作は別途. -/
 theorem derivedSeries_le_lowerCentralSeries_two_pow_sub_one (r : ℕ) :
-    derivedSeries G r ≤ lowerCentralSeries G (2 ^ r - 1) := by
+    derivedSeries G r ≤ (⊤ : Subgroup G).lowerCentralSeries (2 ^ r - 1) := by
   induction r with
   | zero => simp
   | succ r ih =>
     rw [derivedSeries_succ]
     calc ⁅derivedSeries G r, derivedSeries G r⁆
-        ≤ ⁅lowerCentralSeries G (2 ^ r - 1), lowerCentralSeries G (2 ^ r - 1)⁆ :=
+        ≤ ⁅(⊤ : Subgroup G).lowerCentralSeries (2 ^ r - 1),
+            (⊤ : Subgroup G).lowerCentralSeries (2 ^ r - 1)⁆ :=
           Subgroup.commutator_mono ih ih
-      _ ≤ lowerCentralSeries G ((2 ^ r - 1) + (2 ^ r - 1) + 1) :=
+      _ ≤ (⊤ : Subgroup G).lowerCentralSeries ((2 ^ r - 1) + (2 ^ r - 1) + 1) :=
           commutator_lowerCentralSeries_le _ _
-      _ = lowerCentralSeries G (2 ^ (r + 1) - 1) := by
+      _ = (⊤ : Subgroup G).lowerCentralSeries (2 ^ (r + 1) - 1) := by
           congr 1
           have h1 : 1 ≤ 2 ^ r := Nat.one_le_two_pow
           rw [pow_succ]
@@ -1721,16 +1721,17 @@ theorem derivedSeries_le_lowerCentralSeries_two_pow_sub_one (r : ℕ) :
 ⇒ lcs antitone で `lcs (2^(...)-1) ≤ lcs m = ⊥`. **Cor 4.13** で `derived (Nat.log 2 m + 1)
 ≤ lcs (2^(Nat.log 2 m + 1) - 1) = ⊥`. -/
 theorem derivedSeries_eq_bot_of_lowerCentralSeries_eq_bot
-    {m : ℕ} (h : lowerCentralSeries G m = ⊥) :
+    {m : ℕ} (h : (⊤ : Subgroup G).lowerCentralSeries m = ⊥) :
     derivedSeries G (Nat.log 2 m + 1) = ⊥ := by
   have h2pow : m < 2 ^ (Nat.log 2 m + 1) :=
     Nat.lt_pow_succ_log_self (by norm_num : (1:ℕ) < 2) m
   have hidx : m ≤ 2 ^ (Nat.log 2 m + 1) - 1 := by omega
   rw [eq_bot_iff]
   calc derivedSeries G (Nat.log 2 m + 1)
-      ≤ lowerCentralSeries G (2 ^ (Nat.log 2 m + 1) - 1) :=
+      ≤ (⊤ : Subgroup G).lowerCentralSeries (2 ^ (Nat.log 2 m + 1) - 1) :=
         derivedSeries_le_lowerCentralSeries_two_pow_sub_one _
-    _ ≤ lowerCentralSeries G m := lowerCentralSeries_antitone (G := G) hidx
+    _ ≤ (⊤ : Subgroup G).lowerCentralSeries m :=
+        (⊤ : Subgroup G).lowerCentralSeries_antitone hidx
     _ = ⊥ := h
 
 /-! ### iterCommutator + Z(F(G)) absorbs G-minimal 補題群
@@ -1861,7 +1862,7 @@ private theorem isPiGroup_compl_top_of_isMulCommutative_opCore_eq_bot
   -- rc2: `CommGroup.ofIsMulCommutative` removed; build CommGroup from the IsMulCommutative.
   letI : CommGroup G :=
     { (inferInstance : Group G) with mul_comm := ‹IsMulCommutative G›.is_comm.comm }
-  haveI : (P : Subgroup G).Normal := Subgroup.normal_of_comm _
+  haveI : (P : Subgroup G).Normal := Subgroup.normal_of_isMulCommutative _
   have hP_le : (P : Subgroup G) ≤ OddOrder.Isaacs.Ch01.opCore p G :=
     OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore P.isPGroup'
   have hP_bot : (P : Subgroup G) = ⊥ := by
@@ -2002,8 +2003,7 @@ theorem commute_of_normal_isPGroup_of_normal_isPiCompl
   have hcop : Nat.Coprime (Nat.card P) (Nat.card Q) :=
     OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
       Nat.card_pos.ne' Nat.card_pos.ne' hPpi hQ
-  have hdis : Disjoint P Q :=
-    disjoint_iff.mpr (Subgroup.inf_eq_bot_of_coprime hcop)
+  have hdis : Disjoint P Q := Subgroup.disjoint_of_coprime_natCard hcop
   intro x y hx hy
   exact Subgroup.commute_of_normal_of_disjoint P Q inferInstance inferInstance hdis x y hx hy
 
@@ -2829,7 +2829,7 @@ theorem derivedSeries_subtype_commutator_eq_bot_of_iter_eq_bot
         congr 1
         rw [show k = (k - 1) + 1 from (Nat.sub_add_cancel hk_le).symm,
             derivedSeries_succ]
-        congr 2 <;> omega
+        congr 2
       show ⁅(derivedSeries ↥X (k + 1 - 1)).map X.subtype, E⁆ = ⊥
       rw [show k + 1 - 1 = k from by omega]
       rw [← h_DD]
@@ -3255,7 +3255,8 @@ theorem prime_dvd_card_of_faithful_iterCommutator_eq_bot
     have hx_ker : x ∈ ψ.ker := hP_le_ker (Subgroup.mem_top x)
     rw [MonoidHom.mem_ker] at hx_ker
     have hφa : φ a = 1 := by
-      simpa [ψ, x] using hx_ker
+      -- `ψ x = φ ((↑P).subtype ⟨a, ha⟩)` is definitionally `φ a`.
+      exact hx_ker
     exact h_inj (by simpa using hφa)
   exact (P.ne_bot_of_dvd_card hpA) hP_bot
 
@@ -3524,7 +3525,7 @@ private theorem actionCommutator_isNilpotent_of_iter_eq_bot_aux :
           simpa [QuotientGroup.ker_mk'] using hle_ker
         have hAC_sub_nilp : Group.IsNilpotent ((actionCommutator φ).subgroupOf F) :=
           inferInstance
-        exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hAC_le_F)
+        exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hAC_le_F)
 
 /-- **Isaacs Theorem 4.27**: if finite `A` acts on finite `G` and
 `[G, A, ..., A] = 1`, then `[G, A]` is nilpotent. -/
@@ -4873,7 +4874,8 @@ theorem oPiCore_compl_normalizer_le_centralizer_opCore
       rw [Subgroup.mem_centralizer_iff]
       intro x hxP
       have hfixed_x :=
-        congr_arg (Subtype.val : U → G) (hu ⟨⟨x, hP_le_H hxP⟩, by simpa [PH] using hxP⟩)
+        congr_arg (Subtype.val : U → G)
+          (hu ⟨⟨x, hP_le_H hxP⟩, by simpa [PH, Subgroup.mem_subgroupOf] using hxP⟩)
       have hxconj : x * (u : G) * x⁻¹ = (u : G) := by
         simpa [φ, ψ, pqMul, MulAut.conjNormal_apply] using hfixed_x
       calc
@@ -4981,9 +4983,8 @@ theorem oPiCore_compl_normalizer_eq_bot_of_oPiCore_compl_eq_bot
   have hcop : Nat.Coprime (Nat.card K) (Nat.card K) :=
     OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
       Nat.card_pos.ne' Nat.card_pos.ne' hK_pi hK_pi'
-  have hK_bot : K = ⊥ := by
-    have hInf : K ⊓ K = ⊥ := Subgroup.inf_eq_bot_of_coprime hcop
-    simpa using hInf
+  have hK_bot : K = ⊥ :=
+    disjoint_self.mp (Subgroup.disjoint_of_coprime_natCard hcop)
   exact (Subgroup.map_eq_bot_iff_of_injective Q H.subtype_injective).mp
     (by simpa [hK_def] using hK_bot)
 
@@ -5278,31 +5279,37 @@ private lemma nat_card_lt_of_subgroup_lt {G : Type*} [Group G] [Finite G]
 /-- 鳩の巣論法: 有限群の lcs は `Nat.card A` step 以内に必ず stabilize する.
     具体的には `lcs A (Nat.card A) = lcs A (Nat.card A + 1)`. -/
 private lemma lowerCentralSeries_card_eq_succ_card [Finite A] :
-    lowerCentralSeries A (Nat.card A) = lowerCentralSeries A (Nat.card A + 1) := by
+    (⊤ : Subgroup A).lowerCentralSeries (Nat.card A)
+      = (⊤ : Subgroup A).lowerCentralSeries (Nat.card A + 1) := by
   -- antitone を使って ≤ は trivial. < は矛盾を導く.
-  refine le_antisymm ?_ (lowerCentralSeries_antitone (Nat.le_succ _))
+  refine le_antisymm ?_ ((⊤ : Subgroup A).lowerCentralSeries_antitone (Nat.le_succ _))
   -- by contradiction: もし lcs (N+1) < lcs N なら、それまで全 step も strict
   -- かもしれない. しかしそうとは限らないので、別ルートで.
   -- Claim: ∃ k ≤ Nat.card A, lcs k = lcs (k+1). これを取れば stability propagation.
-  suffices h : ∃ k ≤ Nat.card A, lowerCentralSeries A k = lowerCentralSeries A (k + 1) by
+  suffices h : ∃ k ≤ Nat.card A, (⊤ : Subgroup A).lowerCentralSeries k
+      = (⊤ : Subgroup A).lowerCentralSeries (k + 1) by
     obtain ⟨k, hk_le, hk_eq⟩ := h
     -- propagate: lcs k = lcs (k+1) ⇒ lcs (k+j) = lcs k for all j
-    have h_prop : ∀ j, lowerCentralSeries A (k + j) = lowerCentralSeries A k := by
+    have h_prop : ∀ j, (⊤ : Subgroup A).lowerCentralSeries (k + j)
+        = (⊤ : Subgroup A).lowerCentralSeries k := by
       intro j
       induction j with
       | zero => rfl
       | succ j ih =>
-          have h1 : lowerCentralSeries A (k + (j + 1)) =
-              ⁅lowerCentralSeries A (k + j), ⊤⁆ := rfl
+          have h1 : (⊤ : Subgroup A).lowerCentralSeries (k + (j + 1)) =
+              ⁅(⊤ : Subgroup A).lowerCentralSeries (k + j), ⊤⁆ := rfl
           rw [h1, ih]
-          have h2 : lowerCentralSeries A (k + 1) = ⁅lowerCentralSeries A k, ⊤⁆ := rfl
+          have h2 : (⊤ : Subgroup A).lowerCentralSeries (k + 1) =
+              ⁅(⊤ : Subgroup A).lowerCentralSeries k, ⊤⁆ := rfl
           rw [← h2, hk_eq]
     -- want: lcs (Nat.card A) ≤ lcs (Nat.card A + 1)
     -- show both = lcs k
-    have h_LHS : lowerCentralSeries A (Nat.card A) = lowerCentralSeries A k := by
+    have h_LHS : (⊤ : Subgroup A).lowerCentralSeries (Nat.card A)
+        = (⊤ : Subgroup A).lowerCentralSeries k := by
       have hN : Nat.card A = k + (Nat.card A - k) := by omega
       rw [hN]; exact h_prop _
-    have h_RHS : lowerCentralSeries A (Nat.card A + 1) = lowerCentralSeries A k := by
+    have h_RHS : (⊤ : Subgroup A).lowerCentralSeries (Nat.card A + 1)
+        = (⊤ : Subgroup A).lowerCentralSeries k := by
       have hN : Nat.card A + 1 = k + (Nat.card A - k + 1) := by omega
       rw [hN]; exact h_prop _
     rw [h_LHS, h_RHS]
@@ -5312,17 +5319,18 @@ private lemma lowerCentralSeries_card_eq_succ_card [Finite A] :
   -- h_no_stable : ∀ k ≤ Nat.card A, lcs k ≠ lcs (k+1)
   -- antitone + ≠ ⇒ strict at every step ≤ Nat.card A
   have h_strict : ∀ k ≤ Nat.card A,
-      lowerCentralSeries A (k + 1) < lowerCentralSeries A k := fun k hk =>
-    lt_of_le_of_ne (lowerCentralSeries_antitone (Nat.le_succ k))
+      (⊤ : Subgroup A).lowerCentralSeries (k + 1)
+        < (⊤ : Subgroup A).lowerCentralSeries k := fun k hk =>
+    lt_of_le_of_ne ((⊤ : Subgroup A).lowerCentralSeries_antitone (Nat.le_succ k))
       (fun heq => h_no_stable k hk heq.symm)
   -- card bound: Nat.card (lcs k) ≤ Nat.card A - k for k ≤ Nat.card A + 1
   have h_card_bound : ∀ k ≤ Nat.card A + 1,
-      Nat.card (lowerCentralSeries A k) + k ≤ Nat.card A + 1 := by
+      Nat.card ((⊤ : Subgroup A).lowerCentralSeries k) + k ≤ Nat.card A + 1 := by
     intro k hk
     induction k with
     | zero =>
         simp only [Nat.add_zero]
-        have h_top : lowerCentralSeries A 0 = ⊤ := lowerCentralSeries_zero
+        have h_top : (⊤ : Subgroup A).lowerCentralSeries 0 = ⊤ := rfl
         rw [h_top]
         have h_top_card : Nat.card (⊤ : Subgroup A) = Nat.card A :=
           Nat.card_congr Subgroup.topEquiv.toEquiv
@@ -5330,13 +5338,14 @@ private lemma lowerCentralSeries_card_eq_succ_card [Finite A] :
     | succ n ih =>
         have hn : n ≤ Nat.card A := by omega
         have hn_le : n ≤ Nat.card A + 1 := Nat.le_succ_of_le hn
-        have ih' : Nat.card (lowerCentralSeries A n) + n ≤ Nat.card A + 1 := ih hn_le
+        have ih' : Nat.card ((⊤ : Subgroup A).lowerCentralSeries n) + n
+            ≤ Nat.card A + 1 := ih hn_le
         have h_strict_n := h_strict n hn
         have h_card_lt := nat_card_lt_of_subgroup_lt h_strict_n
         omega
   -- Apply at k = Nat.card A + 1
   have h_final := h_card_bound (Nat.card A + 1) le_rfl
-  have h_ge_one : 1 ≤ Nat.card (lowerCentralSeries A (Nat.card A + 1)) :=
+  have h_ge_one : 1 ≤ Nat.card ((⊤ : Subgroup A).lowerCentralSeries (Nat.card A + 1)) :=
     Nat.card_pos
   omega
 
@@ -5344,7 +5353,7 @@ private lemma lowerCentralSeries_card_eq_succ_card [Finite A] :
 `A^∞ := lowerCentralSeries A (Nat.card A)`. For a finite group this is the eventual
 stable value of the lower central series. -/
 noncomputable def lowerCentralSeriesInfty (A : Type*) [Group A] [Finite A] : Subgroup A :=
-  lowerCentralSeries A (Nat.card A)
+  (⊤ : Subgroup A).lowerCentralSeries (Nat.card A)
 
 /-- `A^∞ = ⁅A^∞, ⊤⁆` (lcs の stable 性質の右作用形). -/
 lemma lowerCentralSeriesInfty_commutator_top [Finite A] :
@@ -5445,7 +5454,7 @@ private lemma actionCommutatorInfty_isAInvariant
   -- Generator: x = g * (phiInfty φ) ⟨a, ha⟩ g⁻¹ with ⟨a, ha⟩ : A^∞. Equivalently g * (φ a) g⁻¹.
   have h_norm : (lowerCentralSeriesInfty A).Normal := by
     unfold lowerCentralSeriesInfty
-    exact (lowerCentralSeries A (Nat.card A)).normal_of_characteristic
+    exact ((⊤ : Subgroup A).lowerCentralSeries (Nat.card A)).normal_of_characteristic
   have key : ∀ g : G, ∀ a : lowerCentralSeriesInfty A,
       (φ b) (g * (phiInfty φ) a g⁻¹) =
         (φ b) g * (phiInfty φ) ⟨b * a.val * b⁻¹, h_norm.conj_mem _ a.property _⟩
@@ -6278,7 +6287,7 @@ theorem isaacs_thm_4_24
       simpa [MonoidHom.mem_ker] using hAinf_le_ker ha
     have ha_one : a = 1 := hfaithful (by rw [hker, map_one])
     simp [ha_one]
-  rw [nilpotent_iff_lowerCentralSeries]
+  rw [Subgroup.nilpotent_iff_lowerCentralSeries]
   exact ⟨Nat.card A, by simpa [lowerCentralSeriesInfty] using hAinf_bot⟩
 
 end /- §4C (続 II) -/
