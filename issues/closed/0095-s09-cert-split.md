@@ -35,3 +35,12 @@ AxiomsCheck green を維持。
 - merge_monitor.md 手順 4 (サイズ watch)
 - lane b 所有 carve-out: [0090](0090-b-owns-s09-certificate-discharge.md)
 - 同種 deferred split issue: [0075](0075-s15-sandt-split.md), [0079](0079-feitthompson-split.md), [0084](0084-s14-maximali-split.md), [0094](0094-s15-setup-split.md)
+
+## 完了 (2026-07-09)
+
+dir 化分割を実施 (issue 0103 方式、lean_split.py による機械分割 + 宣言/namespace 文脈/sorry 保存検証 + full build green):
+  - CoherenceFormula.lean (2368 行)
+  - FrobeniusFamily.lean (2586 行)
+  - Hypothesis71.lean (1005 行)
+  - NormalCase.lean (456 行)
+  - TwoFamilies.lean (537 行)
