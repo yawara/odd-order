@@ -305,6 +305,41 @@ c は temporary-hold 中 — 必要になった時点で 9000 claim を検討)�
   必要 glue = 「A(S) (= (8.10) の type-II A-set) が TI」を (8.16) core から
   `IsTISubset` 形に整形する補題。
 
+## 2026-07-10 update⁶ — ★ (8.16) type-II S-side Dade base LANDED (c844ccb0、sorry-free/axiom-clean)
+
+補遺²の判断は解決、obligation 1 の τ_S 基盤が **sorried-cite すら無しで** 閉じた
+(S12_TypeIIFrobenius に新 section DadeBase、#print axioms = 3 standard のみ):
+
+- **support 判断**: 差分 ν−λ の support は full A(S) (witness d ∈ S_F^# が w を中心化するだけで
+  w 自身は C_{S'}(d) の U-part に居てよい ⟹ A₁ に絞れない)。よって honest A(S) =
+  `centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)` (= S15 `honestTypeP2ASet` と
+  定義一致、ただし S15 は下流ゆえ本 leaf では raw composite で表記)。
+- **`typeII_centralizerSupport_isTISubset`**: Pf (8.16) TI part。原文の (8.15) signalizer 経由でなく 3-case 分解:
+  A₁×A₁ = kernel-TI (`TypePNontrivialCore.hTI` + N_G(S_F)=S を maximality+simplicity で inline) /
+  (A−A₁)² = **proven** BG Thm B(5) `theoremB_A_minus_Msigma_isTISubset`
+  (A(S) ⊆ ASet S U は `typeP_exists_hall_derived_eq` の S' = U ⊔ S_σ; IsTypeP は
+  `isTypeP_of_isTypeNonI (Or.inl hSII)` — **II→P₂ dictionary 不要**) /
+  cross = σ-element order 不変 (`mem_Msigma_iff_isPiElement_sigma` + `isPiElement_conj`) で不可能。
+  旧 `typeII_A_sets_TI` の false-as-stated 問題 (S10:524 RETIRED) は honest 集合 + type-II 限定で回避。
+- **`typeIIDadeHypothesis`**: `S04.Hypothesis G (A(S)) S` (of_isTISubset、全 signalizer ⊥、
+  scoped FiniteInduce)。**`typeII_centralizer_le_of_mem_centralizerSupport`**: (12.10) 用
+  containment 形。**`centralizerSupport_sharpMsigma_conj_mem`**: S-共役安定性。
+- 教科書 (8.14)-(8.17) ページは mmd MISSING → PDF p.48 直読で復元済 ((8.16) 証明 =
+  「全 R(a)=1 + (2.3)」、(8.15) = Hypothesis (2.2)/(4.6)/(5.2) 供給、(8.17) = Thm E citation)。
+
+### 次 iteration (obligation 1 続き) — τ_S packaging → (4.7) support → T2 家族
+1. **τ_S packaging**: `typeIIDadeHypothesis` → Dade map → `S07.IntegralCharacterMap ↥S G` +
+   zSupportedSpan isometry (engine `uniform_degree_coherence_of_families` の hiso 形)。既存
+   plumbing を探す: S13 caseB template が S04.Hypothesis からどう IntegralCharacterMap を
+   作ったか (dadeIntegralCharacterMap 系、[[lean-dade-map-wrapper-bridging]])。
+2. **(4.7) support lemma (S11 語彙)**: `sOf data chief.H0` 差分の support ⊆ A(S)。lane-b の
+   `sSet_member_support_subset_A` (S15:1142) の証明を S12 語彙で mirror ((1.2) 核 =
+   `S03.irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot` 反対偶 +
+   `support_induce_subset_conjugatesIntoSet` + 上の conj_mem — 全て upstream citable)。
+   H = P = S_σ 同定は `maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II` (landed 済引用)。
+3. T2 = {λ,λ̄,ν,ν̄} 家族の R-data (`certainTypeRImage` / `dadeCharacterDifferenceImageOfDiff`) +
+   hRorth (S13.caseB dispatch の S-再instantiation) → engine 適用。
+
 ### update⁵ 補遺² — S-side Dade の support-set 選定 (次 iteration の最初の判断)
 - **A₁(S) = S_F^# の TI は即座に取れる**: `TypePNontrivialCore` が kernel-sharp TI を
   field で保持 (`typeP_core_centralizer_le_of_mem_fitting` の hTI destructure) +
