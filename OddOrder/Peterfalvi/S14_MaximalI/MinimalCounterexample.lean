@@ -997,9 +997,8 @@ theorem isCyclic_and_card_dvd_sub_or_add_one_of_fpf_conj_elemAbelian
   exact isCyclic_and_card_dvd_sub_or_add_one_of_fpf_mulDistribMulAction hodd hp_ndvd hdim
     hfpfM hnsM
 
-/-- **Peterfalvi (12.12), the `p + 1` refinement** (pinned sorried Singer/(12.11) obligation):
-if the witness Frobenius complement's order `e = |E|` divides `p² − 1`, then it divides `p − 1`
-or `p + 1`.
+/-- **Peterfalvi (12.12), the `p + 1` refinement**: if the witness Frobenius complement's order
+`e = |E|` divides `p² − 1`, then it divides `p − 1` or `p + 1`.
 
 Peterfalvi's argument (the second half of the (12.12) proof): `E` is cyclic acting on
 `T = Ω₁(P₀)` of order `p²`; identifying `T ⋊ E ↪ 𝔽_{p²} ⋊ 𝔽_{p²}^*` (Schur, as in (9.7.b)), the
@@ -1008,12 +1007,14 @@ subgroup of `T` — in particular `⟨x⟩` for the (12.9) witness `x ∈ T`.  T
 by (12.9), so `A ⊆ M ∩ L ⊆ H` by (12.11), while `A ≤ E` meets `H` trivially — `A = 1`.  Hence
 `gcd(e, p−1) = 1` and `e ∣ p + 1`.
 
-**Genuinely still-missing**: the Singer-cyclic identification of the FPF action (the (9.7.b)
-mechanism specialized to the witness) and the `x ∈ T` bookkeeping (`|T| = p²` forces
-`T = Ω₁(P₀) ∋ x`) are not assembled; the (12.11) `A = 1` step is now proven
-(`intersection_complement_structure`).  The statement is **sound**: it is Peterfalvi's genuine
-(12.12) conclusion for the witness of `ctr` (tied via `data`/`frob`), packaged with the `T` data
-the argument runs on (supplied by `exists_center_omega1_elemAbelian_fpf_of_witness`). -/
+**Assembly** (proven): instead of the Singer-cyclic identification, the rep-theory core
+`isCyclic_and_card_dvd_sub_or_add_one_of_fpf_conj_elemAbelian` reduces the dichotomy to the
+**nonscalar** hypothesis — no `e ∈ E` acts as a power map `t ↦ tⁿ` on a `T` of order `p²` —
+which is exactly Peterfalvi's `A = 1` argument, elementwise: a scalar-acting `e` normalizes
+every subgroup of `T`; the bookkeeping `|T| = p²` forces `T = Ω₁(P₀) ∋ x` (both are elementary
+abelian sandwiched in the rank-`2` abelian `P₀`, so `T ⊆ Ω₁(P₀)` with `|Ω₁(P₀)| ≤ p² = |T|`),
+so `e ∈ N_G(⟨x⟩) ⊆ M` by (12.9), hence `e ∈ M ∩ L ⊆ H = L_F` by (12.11)
+(`intersection_le_kernel`), and the Frobenius disjointness `H ∩ E = 1` gives `e = 1`. -/
 theorem witness_complement_dvd_p_sub_or_add_one [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
@@ -1023,7 +1024,117 @@ theorem witness_complement_dvd_p_sub_or_add_one [Finite G]
     (hfpf : ∀ e : G, e ∈ frob.complement.map data.L.subtype → e ≠ 1 →
       ∀ t : G, t ∈ T → e * t * e⁻¹ = t → t = 1) :
     Nat.card ↥frob.complement ∣ ctr.p - 1 ∨ Nat.card ↥frob.complement ∣ ctr.p + 1 := by
-  sorry
+  classical
+  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  have hEcard : Nat.card ↥(frob.complement.map data.L.subtype) = Nat.card ↥frob.complement :=
+    Subgroup.card_map_of_injective (K := frob.complement) data.L.subtype_injective
+  -- `|T| ∈ {p, p²}` from `T ≤ P₀` of rank `2`.
+  have hTcard : Nat.card ↥T = ctr.p ∨ Nat.card ↥T = ctr.p ^ 2 :=
+    OddOrder.GroupTheory.card_eq_prime_or_sq_of_isElementaryAbelian_le hTelem hTP0
+      (counterexample_P0_K_structure hG ctr).2.le hTne
+  -- Odd order of the realized complement `E' = E.map L.subtype`.
+  have hodd : Odd (Nat.card ↥(frob.complement.map data.L.subtype)) :=
+    hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card _)
+  -- `T ≤ H` through `P₀ ≤ L_F` (12.10).
+  have hHeq : frob.typeI.typeF.H = maxNilpotentNormalHall data.L := frob.typeI.typeF.H_eq
+  have hTH : T ≤ frob.typeI.typeF.H := by
+    refine hTP0.trans ?_
+    rw [hHeq]
+    exact witness_P0_le_kernel hG data
+  -- `p ∤ |E'|`: Frobenius kernel/complement coprimality with `p ∣ |T| ∣ |H|`.
+  have hp_ndvd : ¬ ctr.p ∣ Nat.card ↥(frob.complement.map data.L.subtype) := by
+    have hpT : ctr.p ∣ Nat.card ↥T := by
+      rcases hTcard with h | h
+      · rw [h]
+      · rw [h]; exact dvd_pow_self ctr.p two_ne_zero
+    have hcopLL : Nat.Coprime (Nat.card ↥(frob.typeI.typeF.H.subgroupOf data.L))
+        (Nat.card ↥frob.complement) := frob.frobenius.coprime_card_kernel_complement
+    have hpHL : ctr.p ∣ Nat.card ↥(frob.typeI.typeF.H.subgroupOf data.L) := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe frob.typeI.typeF.H_le).toEquiv]
+      exact hpT.trans (Subgroup.card_dvd_of_le hTH)
+    rw [hEcard]
+    intro hpE
+    exact ctr.p_prime.not_dvd_one (hcopLL ▸ Nat.dvd_gcd hpHL hpE)
+  -- The **nonscalar** hypothesis — Peterfalvi's (12.11) `A = 1` argument, elementwise.
+  have hnonscalar : Nat.card ↥T = ctr.p ^ 2 →
+      ∀ e : G, e ∈ frob.complement.map data.L.subtype →
+        (∃ n : ℕ, ∀ t : G, t ∈ T → e * t * e⁻¹ = t ^ n) → e = 1 := by
+    intro hT2 e heE hsc
+    obtain ⟨n, hn⟩ := hsc
+    -- Bookkeeping: `|T| = p²` forces `T = Ω₁(P₀)`, so the (12.9) witness `x` lies in `T`.
+    obtain ⟨hP0ab, hP0rank⟩ := counterexample_P0_K_structure hG ctr
+    have hP0comm : ∀ y ∈ ctr.P0, ∀ z ∈ ctr.P0, y * z = z * y := fun y hy z hz =>
+      congrArg Subtype.val (hP0ab.is_comm.comm (⟨y, hy⟩ : ↥ctr.P0) ⟨z, hz⟩)
+    have hxOm : data.x ∈ OddOrder.GroupTheory.omega1OfAbelian G ctr.P0 ctr.p hP0comm :=
+      ⟨data.x_mem_P0, data.x_mem_omega1⟩
+    have hTOm : T ≤ OddOrder.GroupTheory.omega1OfAbelian G ctr.P0 ctr.p hP0comm := fun t ht =>
+      ⟨hTP0 ht, by simpa using congrArg Subtype.val (hTelem.2 (⟨t, ht⟩ : ↥T))⟩
+    have hOmne : OddOrder.GroupTheory.omega1OfAbelian G ctr.P0 ctr.p hP0comm ≠ ⊥ := fun hbot =>
+      data.x_ne_one (Subgroup.mem_bot.mp (hbot ▸ hxOm))
+    have hOmcard := OddOrder.GroupTheory.card_eq_prime_or_sq_of_isElementaryAbelian_le
+      OddOrder.GroupTheory.omega1OfAbelian_isElementaryAbelian
+      OddOrder.GroupTheory.omega1OfAbelian_le hP0rank.le hOmne
+    have hTeq : T = OddOrder.GroupTheory.omega1OfAbelian G ctr.P0 ctr.p hP0comm := by
+      refine Subgroup.eq_of_le_of_card_ge hTOm ?_
+      rw [hT2]
+      rcases hOmcard with h | h
+      · rw [h]; exact Nat.le_self_pow two_ne_zero ctr.p
+      · rw [h]
+    have hxT : data.x ∈ T := by rw [hTeq]; exact hxOm
+    -- `orderOf x = p`; the scalar exponent `n` is prime to `p` (else conjugation kills `x`).
+    have hordx : orderOf data.x = ctr.p := orderOf_eq_prime data.x_mem_omega1 data.x_ne_one
+    have hexn : e * data.x * e⁻¹ = data.x ^ n := hn data.x hxT
+    have hxnne : data.x ^ n ≠ 1 := fun h1 => by
+      have : e * data.x * e⁻¹ = 1 := by rw [hexn, h1]
+      exact data.x_ne_one (by
+        calc data.x = e⁻¹ * (e * data.x * e⁻¹) * e := by group
+          _ = 1 := by rw [this]; group)
+    have hordxn : orderOf (data.x ^ n) = ctr.p := by
+      have hdvd : orderOf (data.x ^ n) ∣ ctr.p :=
+        orderOf_dvd_iff_pow_eq_one.mpr (by
+          rw [← pow_mul, mul_comm n ctr.p, pow_mul, data.x_mem_omega1, one_pow])
+      rcases (Nat.Prime.eq_one_or_self_of_dvd ctr.p_prime _ hdvd) with h1 | hp
+      · exact absurd (orderOf_eq_one_iff.mp h1) hxnne
+      · exact hp
+    -- `zpowers (xⁿ) = zpowers x` (both have order `p`), so `e` normalizes `⟨x⟩`.
+    have hzp : Subgroup.zpowers (data.x ^ n) = Subgroup.zpowers data.x := by
+      refine Subgroup.eq_of_le_of_card_ge
+        (Subgroup.zpowers_le.mpr (Subgroup.pow_mem _ (Subgroup.mem_zpowers data.x) n)) ?_
+      rw [Nat.card_zpowers, Nat.card_zpowers, hordx, hordxn]
+    have heN : e ∈ Subgroup.normalizer
+        ((Subgroup.closure ({data.x} : Set G) : Subgroup G) : Set G) := by
+      rw [← Subgroup.zpowers_eq_closure, Subgroup.mem_set_normalizer_iff]
+      intro h
+      constructor
+      · intro hh
+        obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp (SetLike.mem_coe.mp hh)
+        refine SetLike.mem_coe.mpr ?_
+        rw [← conj_zpow, hexn]
+        exact hzp ▸ Subgroup.mem_zpowers_iff.mpr ⟨k, rfl⟩
+      · intro hh
+        have hh' : e * h * e⁻¹ ∈ Subgroup.zpowers (data.x ^ n) := by
+          rw [hzp]; exact SetLike.mem_coe.mp hh
+        obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp hh'
+        rw [← hexn, conj_zpow] at hk
+        exact SetLike.mem_coe.mpr (Subgroup.mem_zpowers_iff.mpr
+          ⟨k, mul_left_cancel (mul_right_cancel hk)⟩)
+    -- (12.9): `e ∈ N_G(⟨x⟩) ⊆ M`; with `e ∈ L`, (12.11) places `e ∈ H = L_F`.
+    have heM : e ∈ ctr.M := data.normalizer_closure_x_le_M heN
+    have heL : e ∈ data.L := Subgroup.map_subtype_le _ heE
+    have heH : e ∈ frob.typeI.typeF.H := by
+      rw [hHeq]
+      exact intersection_le_kernel hG data ⟨heM, heL⟩
+    -- Frobenius disjointness: `e ∈ E ∩ H = 1`.
+    obtain ⟨a, haC, rfl⟩ := heE
+    have haH : a ∈ frob.typeI.typeF.H.subgroupOf data.L :=
+      Subgroup.mem_subgroupOf.mpr heH
+    have ha1 : a = 1 :=
+      Subgroup.disjoint_def.mp frob.frobenius.isComplement.disjoint haH haC
+    rw [ha1, map_one]
+  -- The proven rep-theory dichotomy, with the scalar case excluded.
+  obtain ⟨-, hdvd⟩ := isCyclic_and_card_dvd_sub_or_add_one_of_fpf_conj_elemAbelian
+    hTelem hEnorm hodd hp_ndvd hTcard hfpf hnonscalar
+  rwa [hEcard] at hdvd
 
 /-- **Peterfalvi (12.12), structural input from (12.9)/(12.10)/(12.11)** (pinned sorried §8/§9
 obligation, hub 9003 Cluster A).  For the (12.9) witness `L` (type-I Frobenius, kernel `H = L_F`),
