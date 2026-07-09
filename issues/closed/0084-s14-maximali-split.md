@@ -34,3 +34,12 @@ merge-monitor のサイズ watch (粒度規約 1,500 行) で検出 (2026-06-26,
 - 規約: CLAUDE.md「分割の owner と trigger」/ `notes/meta/merge_monitor.md` サイズ watch
 - 同種 deferred split issue: 0085 (S07_Coherence), 0077 (S11), 0094 (S15_SAndT_Setup)
 - lane 配分正本: `notes/meta/ft_lane_reallocation_2026_06_28.md` (2026-07-02, 3 レーン a/b/c)
+
+## 完了 (2026-07-09)
+
+dir 化分割を実施 (issue 0103 方式、lean_split.py による機械分割 + 宣言/namespace 文脈/sorry 保存検証 + full build green):
+  - DadeContradiction.lean (1665 行)
+  - FrobeniusStructure.lean (1690 行)
+  - Hypothesis.lean (753 行)
+  - MinimalCounterexample.lean (2529 行)
+  - RhoConstancy.lean (1916 行)
