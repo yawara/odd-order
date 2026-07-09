@@ -7520,7 +7520,7 @@ theorem exists_caseB_data_eta10 [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd
       have h0 : (((z.natAbs ^ 2 : ℕ) : ℤ) : ℝ) = ((z ^ 2 : ℤ) : ℝ) := by
         exact_mod_cast Int.natAbs_sq z
       push_cast at h0
-      rw [Int.cast_natAbs, Int.cast_abs]
+      rw [Nat.cast_natAbs, Int.cast_abs]
       exact h0
     rw [← hψ1, hz, Complex.norm_intCast, sq_abs, ← h2]
   have hsharp_nonneg : (0 : ℝ) ≤ ∑ x ∈ F, ‖αS x‖ ^ 2 :=
