@@ -1070,17 +1070,17 @@ theorem isNilpotent_normal_inf_center_ne_bot {Γ : Type*} [Group Γ] [Finite Γ]
     [Group.IsNilpotent Γ] {N : Subgroup Γ} (hN : N.Normal) (hNne : N ≠ ⊥) :
     N ⊓ Subgroup.center Γ ≠ ⊥ := by
   classical
-  have hexists : ∃ i, N ⊓ upperCentralSeries Γ i ≠ ⊥ := by
+  have hexists : ∃ i, N ⊓ Subgroup.upperCentralSeries Γ i ≠ ⊥ := by
     refine ⟨Group.nilpotencyClass Γ, ?_⟩
-    rw [upperCentralSeries_eq_top_iff_nilpotencyClass_le.mpr (le_refl _), inf_top_eq]
+    rw [Subgroup.upperCentralSeries_eq_top_iff_nilpotencyClass_le.mpr (le_refl _), inf_top_eq]
     exact hNne
   have hm := Nat.find_spec hexists
   have hm0 : Nat.find hexists ≠ 0 := by
     intro h0
-    rw [h0, upperCentralSeries_zero, inf_bot_eq] at hm
+    rw [h0, Subgroup.upperCentralSeries_zero, inf_bot_eq] at hm
     exact hm rfl
   obtain ⟨k, hk_eq⟩ := Nat.exists_eq_succ_of_ne_zero hm0
-  have hkbot : N ⊓ upperCentralSeries Γ k = ⊥ := by
+  have hkbot : N ⊓ Subgroup.upperCentralSeries Γ k = ⊥ := by
     by_contra h
     exact Nat.find_min hexists (m := k) (by rw [hk_eq]; exact Nat.lt_succ_self k) h
   rw [hk_eq] at hm
@@ -1091,14 +1091,14 @@ theorem isNilpotent_normal_inf_center_ne_bot {Γ : Type*} [Group Γ] [Finite Γ]
   have hxcenter : x ∈ Subgroup.center Γ := by
     rw [Subgroup.mem_center_iff]
     intro y
-    have hcomm_U : x * y * x⁻¹ * y⁻¹ ∈ upperCentralSeries Γ k :=
-      mem_upperCentralSeries_succ_iff.mp hxU y
+    have hcomm_U : x * y * x⁻¹ * y⁻¹ ∈ Subgroup.upperCentralSeries Γ k :=
+      Subgroup.mem_upperCentralSeries_succ_iff.mp hxU y
     have hcomm_N : x * y * x⁻¹ * y⁻¹ ∈ N := by
       have hconj : y * x⁻¹ * y⁻¹ ∈ N := hN.conj_mem x⁻¹ (N.inv_mem hxN) y
       have := N.mul_mem hxN hconj
       rwa [← mul_assoc, ← mul_assoc] at this
     have hbot : x * y * x⁻¹ * y⁻¹ = 1 := by
-      have hin : x * y * x⁻¹ * y⁻¹ ∈ N ⊓ upperCentralSeries Γ k :=
+      have hin : x * y * x⁻¹ * y⁻¹ ∈ N ⊓ Subgroup.upperCentralSeries Γ k :=
         Subgroup.mem_inf.mpr ⟨hcomm_N, hcomm_U⟩
       rw [hkbot, Subgroup.mem_bot] at hin
       exact hin
@@ -3172,7 +3172,7 @@ theorem exists_monoidHom_units_ne_one_of_commutator_ne_top {Γ : Type*} [Group �
     CommGroup.exists_apply_ne_one_of_hasEnoughRootsOfUnity (Abelianization Γ) ℂ ha
   -- Pull `φ` back along the surjection `Abelianization.of`; non-triviality transports.
   refine ⟨φ.comp Abelianization.of, fun hcon => hφ ?_⟩
-  obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective a
+  obtain ⟨g, rfl⟩ : ∃ g : Γ, Abelianization.of g = a := QuotientGroup.mk_surjective a
   simpa using DFunLike.congr_fun hcon g
 
 /-- A finite group with non-trivial abelianization carries a non-trivial **degree-one irreducible

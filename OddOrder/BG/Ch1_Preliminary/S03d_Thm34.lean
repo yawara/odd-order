@@ -333,10 +333,11 @@ theorem exists_irreducible_subrep_apply_ne
         rw [← sSup_eq_iSup', IsSemisimpleModule.sSup_simples_eq_top]; exact Submodule.mem_top
       refine Submodule.iSup_induction (motive := fun z => MonoidAlgebra.single g₀ (1 : F) • z = z)
         _ hv (fun i x hx => hcon i.1 i.2 x hx) (by simp)
-        (fun a b ha hb => by simp only [] at ha hb ⊢; rw [smul_add, ha, hb])
+        (fun a b ha hb => by rw [smul_add, ha, hb])
     ext v
-    have hv := hall (ρ.asModuleEquiv.symm v)
-    rw [Representation.single_smul] at hv
+    have hv := congrArg ρ.asModuleEquiv (hall (ρ.asModuleEquiv.symm v))
+    rw [Representation.asModuleEquiv_map_smul, Representation.asAlgebraHom_single_one,
+      LinearEquiv.apply_symm_apply] at hv
     simpa using hv
   obtain ⟨N, hNs, w, hwN, hwne⟩ := key
   haveI := hNs
@@ -348,8 +349,9 @@ theorem exists_irreducible_subrep_apply_ne
   have key2 : (Subrepresentation.ofSubmodule' N).toRepresentation g₀ ⟨w, hwW⟩ = ⟨w, hwW⟩ := by
     rw [hcontra]; rfl
   have happ : ρ g₀ w = w := congrArg Subtype.val key2
-  rw [Representation.single_smul]
-  simpa using happ
+  refine ρ.asModuleEquiv.injective ?_
+  rw [Representation.asModuleEquiv_map_smul, Representation.asAlgebraHom_single_one]
+  exact happ
 
 /-- **BG Theorem 3.4, step 2-3 (group theory): a normal subgroup meeting the prime-order complement
 trivially lies in the normal Hall kernel.**  `K ◁ G` is a Hall subgroup and `R` a complement of
@@ -527,7 +529,7 @@ lemma isFrobeniusGroup_of_prime_complement_fixedFree
     refine hFix n hnK (fun r hrR => ?_)
     have hcomm : Commute a n := by
       have h := congrArg (· * a) hconj
-      simpa [mul_assoc] using h
+      simpa [commute_iff_eq, mul_assoc] using h
     have hgen : Subgroup.zpowers a = R := zpowers_eq_of_prime_card hp haR ha
     rw [← hgen, Subgroup.mem_zpowers_iff] at hrR
     obtain ⟨j, rfl⟩ := hrR

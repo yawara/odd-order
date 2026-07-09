@@ -255,7 +255,6 @@ theorem commutator_centralizes_of_stabilize {A H : Subgroup P} [A.Normal]
     -- From `g₁⁻¹ a g₁ = s a` we get `a = (g₁ s g₁⁻¹)(g₁ a g₁⁻¹) = s (g₁ a g₁⁻¹)`.
     have h1 : a = s * (g₁ * a * g₁⁻¹) := by
       have h := congrArg (fun z => g₁ * z * g₁⁻¹) hconj₁
-      simp only at h
       rw [show g₁ * (g₁⁻¹ * a * g₁) * g₁⁻¹ = a by group,
         show g₁ * (s * a) * g₁⁻¹ = (g₁ * s * g₁⁻¹) * (g₁ * a * g₁⁻¹) by group,
         fixR g₁ s hg1s] at h
@@ -266,7 +265,6 @@ theorem commutator_centralizes_of_stabilize {A H : Subgroup P} [A.Normal]
   have hconj₂' : g₂ * a * g₂⁻¹ = t⁻¹ * a := by
     have h1 : a = t * (g₂ * a * g₂⁻¹) := by
       have h := congrArg (fun z => g₂ * z * g₂⁻¹) hconj₂
-      simp only at h
       rw [show g₂ * (g₂⁻¹ * a * g₂) * g₂⁻¹ = a by group,
         show g₂ * (t * a) * g₂⁻¹ = (g₂ * t * g₂⁻¹) * (g₂ * a * g₂⁻¹) by group,
         fixR g₂ t hg2t] at h
@@ -780,7 +778,9 @@ private theorem omega1_centralizer_mul_pow (hp_odd : Odd p) (hP : IsPGroup p P)
               rcases hw with rfl | rfl
               · exact Subgroup.subset_closure (by simp)
               · exact Subgroup.subset_closure (by simp)
-            | one => intro _; simpa using one_mem _
+            | one =>
+              intro hz
+              exact (show (⟨1, hz⟩ : ↥K) = 1 from Subtype.ext rfl) ▸ one_mem _
             | mul a b ha hb iha ihb =>
               intro hzK
               have haK : a ∈ K := hK_def ▸ ha
