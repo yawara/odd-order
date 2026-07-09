@@ -26,6 +26,8 @@ as the `sorry` inside the block engine's `hconst` argument (see `notes/peterfalv
 namespace OddOrder.Peterfalvi.S11
 
 open OddOrder.RepresentationTheory OddOrder.GroupTheory OddOrder.Isaacs.Ch03
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+  (quotientMulAutHom quotientMulAutHom_apply_mk')
 open scoped commutatorElement
 
 variable {G : Type*} [Group G]
@@ -53,6 +55,140 @@ theorem representation_eq_smul_id_of_block_scalars_const {p : ℕ} [Fact p.Prime
   · intro x hx
     obtain ⟨i, hi⟩ := Set.mem_iUnion.mp hx
     rw [hblock i x hi, LinearMap.smul_apply, LinearMap.id_apply]
+
+/-- **A global `ZMod p`-scalar is central in `MulAut`.**  If `l` acts on the additive side as the
+scalar `μ` (`ρ l = μ • id` for the descended representation `ρ = elabRepresentation p φ`), then
+`φ l` commutes with every automorphism of `V`: automorphisms are additive maps, and additive maps
+commute with `ZMod p`-scalar multiplication (`ZMod.map_smul`). -/
+theorem commute_mulAut_of_elabRepresentation_eq_smul_id {p : ℕ} {L V : Type*} [Group L]
+    [CommGroup V] [Module (ZMod p) (Additive V)] (φ : L →* MulAut V) (l : L) (μ : ZMod p)
+    (h : elabRepresentation p φ l = μ • LinearMap.id) (σ : MulAut V) :
+    Commute σ (φ l) := by
+  have happly : ∀ x : V, Additive.ofMul ((φ l) x) = μ • Additive.ofMul x := by
+    intro x
+    have hx := LinearMap.congr_fun h (Additive.ofMul x)
+    rwa [LinearMap.smul_apply, LinearMap.id_apply, elabRepresentation_apply] at hx
+  have : σ * (φ l) = (φ l) * σ := by
+    refine MulEquiv.ext fun x => ?_
+    show σ ((φ l) x) = (φ l) (σ x)
+    calc σ ((φ l) x)
+        = Additive.toMul ((MulEquiv.toAdditive σ) (Additive.ofMul ((φ l) x))) := rfl
+      _ = Additive.toMul ((MulEquiv.toAdditive σ) (μ • Additive.ofMul x)) := by rw [happly]
+      _ = Additive.toMul (μ • (MulEquiv.toAdditive σ) (Additive.ofMul x)) := by
+          rw [ZMod.map_smul]
+      _ = Additive.toMul (μ • Additive.ofMul (σ x)) := rfl
+      _ = Additive.toMul (Additive.ofMul ((φ l) (σ x))) := by rw [← happly]
+      _ = (φ l) (σ x) := rfl
+  exact this
+
+/-- Unfolding `uActionHom` along the conjugation action of `L = U ⊔ W₁` on its normal subgroup
+`U`: the action of a conjugate is the conjugate of the actions. -/
+theorem uActionHom_conjNormal [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+    (chief : ChiefFactorData data)
+    [(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).Normal]
+    (l : ↥(data.typeP.U ⊔ data.typeP.W1))
+    (x : ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))) :
+    haveI : chief.N.Normal := chief.N_normal
+    uActionHom data chief (MulAut.conjNormal l x)
+      = quotientMulAutHom (N := chief.N) chief.N_aInvariant l
+        * uActionHom data chief x
+        * (quotientMulAutHom (N := chief.N) chief.N_aInvariant l)⁻¹ := by
+  haveI : chief.N.Normal := chief.N_normal
+  have hval : ((MulAut.conjNormal l x :
+        ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))) :
+        ↥(data.typeP.U ⊔ data.typeP.W1))
+      = l * (x : ↥(data.typeP.U ⊔ data.typeP.W1)) * l⁻¹ := MulAut.conjNormal_apply l x
+  calc uActionHom data chief (MulAut.conjNormal l x)
+      = quotientMulAutHom (N := chief.N) chief.N_aInvariant
+          ((MulAut.conjNormal l x :
+            ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))) :
+            ↥(data.typeP.U ⊔ data.typeP.W1)) := rfl
+    _ = quotientMulAutHom (N := chief.N) chief.N_aInvariant
+          (l * (x : ↥(data.typeP.U ⊔ data.typeP.W1)) * l⁻¹) := by rw [hval]
+    _ = _ := by rw [map_mul, map_mul, map_inv]; rfl
+
+/-- **The Frobenius fixed-point-freeness eliminates global scalars** (the multiplicative half of
+the Coq `psi` injectivity, `PFsection9.v:442-484`).  If `g ∈ U` acts on the chief factor `H̄` by an
+automorphism *central in `Aut(H̄)`* — e.g. a scalar power map — then it acts trivially.
+
+Centrality makes the action of `g` invariant under `W̄₁`-conjugation, so the image `ḡ ∈ Ū = U/C`
+lies in `C_Ū(W̄₁)`; the coprime fixed-point descent (Isaacs Cor 3.28,
+`map_fixedSubgroup_eq_fixedSubgroup_quotient`) identifies `C_Ū(W̄₁)` with the image of `C_U(W₁)`,
+which is trivial by the Frobenius fixed-point-freeness of `(U ⊔ W₁, U, W₁)`
+(`typeP_uW1_frobenius`).  Hence `ḡ = 1`, i.e. `uActionHom g = 1`. -/
+theorem uActionHom_eq_one_of_commute_mulAut [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (g : ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
+    (hcentral : ∀ σ : MulAut (↥data.H ⧸ chief.N), Commute (uActionHom data chief g) σ) :
+    uActionHom data chief g = 1 := by
+  haveI : chief.N.Normal := chief.N_normal
+  have frob := typeP_uW1_frobenius data.typeP data.nontrivial.1
+  haveI hUnorm : (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).Normal := frob.isNormal
+  -- The kernel `C = C_U(H̄)` of the `U`-action is invariant under `L`-conjugation.
+  have hNinv : IsAInvariant
+      (MulAut.conjNormal :
+        ↥(data.typeP.U ⊔ data.typeP.W1)
+          →* MulAut ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
+      (uActionHom data chief).ker := by
+    rw [isAInvariant_iff_smul_mem]
+    intro l x hx
+    rw [MonoidHom.mem_ker] at hx ⊢
+    rw [uActionHom_conjNormal chief l x, hx, mul_one, mul_inv_cancel]
+  -- Coprimality `|W₁| ⟂ |U|` and solvability of the cyclic `W₁`.
+  have hCop : Nat.Coprime
+      (Nat.card ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
+      (Nat.card ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))) :=
+    frob.coprime_card_kernel_complement.symm
+  haveI hXcyc : IsCyclic ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) := by
+    haveI := data.typeP.W1_cyclic
+    exact isCyclic_of_surjective _
+      (Subgroup.subgroupOfEquivOfLe le_sup_right).symm.surjective
+  have hSolv : IsSolvable ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1))
+      ∨ IsSolvable ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) := by
+    left
+    letI := hXcyc.commGroup
+    infer_instance
+  -- `C_U(W₁) = 1`: the Frobenius fixed-point-freeness.
+  have hfixbot : fixedSubgroup
+      (MulAut.conjNormal :
+        ↥(data.typeP.U ⊔ data.typeP.W1)
+          →* MulAut ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
+      (data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) = ⊥ := by
+    rw [eq_bot_iff]
+    intro x hx
+    rw [mem_fixedSubgroup] at hx
+    rw [Subgroup.mem_bot]
+    by_contra hxne
+    obtain ⟨w, hwW1, hwne⟩ :=
+      data.typeP.W1.bot_or_exists_ne_one.resolve_left data.typeP.W1_nontrivial
+    have hŵX : (⟨w, Subgroup.mem_sup_right hwW1⟩ : ↥(data.typeP.U ⊔ data.typeP.W1))
+        ∈ data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1) :=
+      Subgroup.mem_subgroupOf.mpr hwW1
+    have hvaleq : (⟨w, Subgroup.mem_sup_right hwW1⟩ : ↥(data.typeP.U ⊔ data.typeP.W1))
+          * (x : ↥(data.typeP.U ⊔ data.typeP.W1))
+          * (⟨w, Subgroup.mem_sup_right hwW1⟩ : ↥(data.typeP.U ⊔ data.typeP.W1))⁻¹
+        = (x : ↥(data.typeP.U ⊔ data.typeP.W1)) := by
+      have h := congrArg Subtype.val (hx _ hŵX)
+      rwa [MulAut.conjNormal_apply] at h
+    exact frob.conj_frobenius _ hŵX (fun h => hwne (congrArg Subtype.val h))
+      (x : ↥(data.typeP.U ⊔ data.typeP.W1)) x.2
+      (fun h => hxne (OneMemClass.coe_eq_one.mp h)) hvaleq
+  -- Descend: `C_Ū(W̄₁)` is the image of `C_U(W₁) = 1`.
+  have hmap := map_fixedSubgroup_eq_fixedSubgroup_quotient hNinv hCop hSolv
+  rw [hfixbot, Subgroup.map_bot] at hmap
+  -- `ḡ` is `W̄₁`-fixed: centrality makes each `W₁`-conjugate of `g` agree with `g` mod `C`.
+  have hgfix : QuotientGroup.mk' (uActionHom data chief).ker g
+      ∈ fixedSubgroup (quotientMulAutHom hNinv)
+        (data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) := by
+    rw [mem_fixedSubgroup]
+    intro l hl
+    rw [quotientMulAutHom_apply_mk', QuotientGroup.mk'_eq_mk']
+    refine ⟨(MulAut.conjNormal l g)⁻¹ * g, ?_, mul_inv_cancel_left _ _⟩
+    rw [MonoidHom.mem_ker, map_mul, map_inv, uActionHom_conjNormal chief l g,
+      ← (hcentral (quotientMulAutHom (N := chief.N) chief.N_aInvariant l)).eq,
+      mul_inv_cancel_right, inv_mul_cancel]
+  rw [← hmap, Subgroup.mem_bot, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at hgfix
+  exact hgfix
 
 /-- Invariance under a hom `φ` transfers to invariance under the range inclusion `φ.range.subtype`:
 `Ū = φ.range` acts by the same automorphisms as the image of `φ`, so a `φ`-invariant subgroup is
@@ -141,10 +277,40 @@ theorem caseA_u_le_cyclotomicQuotient [Finite G] {M : Subgroup G} {data : TypesI
       (fun i => (card_aInvariantSubrep _).trans (caseA.Hpart_order (finCongr hq1 i)))
       -- **hconst — the genuine §9 crux (Coq `psi` injectivity, `PFsection9.v:442-484`)**: no
       -- nonidentity `ū ∈ Ū` acts by one common scalar on every block.  A common scalar makes
-      -- `ū = λ·(-)` central in `MulAut(H̄)`, hence `W̄₁`-conjugation-invariant, so `ū ∈ C_Ū(W̄₁) = 1`
-      -- by the Frobenius `(U ⊔ W₁)/C = Ū ⋊ W̄₁` (`typeP_uW1_frobenius`).  The whole bound reduces to
-      -- this one fact; see `notes/peterfalvi/s11_9_7a_imprimitive_ubound.md`.
-      (fun u _hscal => by sorry)
+      -- `ū = λ·(-)` central in `MulAut(H̄)` (`commute_mulAut_of_elabRepresentation_eq_smul_id`),
+      -- hence `W̄₁`-conjugation-invariant, so `ū ∈ C_Ū(W̄₁) = 1` by the Frobenius fpf of
+      -- `(U ⊔ W₁, U, W₁)` descended mod `C` (`uActionHom_eq_one_of_commute_mulAut`).
+      (fun u hscal => by
+        -- the blocks span `H̄`, so the common block scalar `μ` is a global scalar: `ρ u = μ • id`
+        have hspan : ⨆ i : Fin ((data.q - 1) + 1),
+            (aInvariantSubrep (p := chief.p) (isAInvariant_range_subtype
+              (caseA.Hpart_aInvariant (finCongr hq1 i)))).toSubmodule = ⊤ := by
+          have hre : ⨆ i : Fin ((data.q - 1) + 1), caseA.Hpart (finCongr hq1 i) = ⊤ := by
+            rw [Equiv.iSup_comp (finCongr hq1) (g := caseA.Hpart)]
+            exact caseA.Hpart_iSup
+          calc ⨆ i : Fin ((data.q - 1) + 1),
+              (aInvariantSubrep (p := chief.p) (isAInvariant_range_subtype
+                (caseA.Hpart_aInvariant (finCongr hq1 i)))).toSubmodule
+              = ⨆ i : Fin ((data.q - 1) + 1), (elabSubmoduleSubgroupEquiv chief.p).symm
+                  (caseA.Hpart (finCongr hq1 i)) := rfl
+            _ = (elabSubmoduleSubgroupEquiv chief.p).symm
+                  (⨆ i : Fin ((data.q - 1) + 1), caseA.Hpart (finCongr hq1 i)) :=
+                ((elabSubmoduleSubgroupEquiv chief.p).symm.map_iSup _).symm
+            _ = ⊤ := by rw [hre, OrderIso.map_top]
+        have hsmul := representation_eq_smul_id_of_block_scalars_const
+          (elabRepresentation chief.p (MonoidHom.range (uActionHom data chief)).subtype)
+          (fun i => aInvariantSubrep (isAInvariant_range_subtype
+            (caseA.Hpart_aInvariant (finCongr hq1 i))))
+          (fun i => finrank_eq_one_of_card_eq_prime
+            ((card_aInvariantSubrep _).trans (caseA.Hpart_order (finCongr hq1 i))))
+          hspan u _ hscal
+        -- a global scalar is central in `MulAut(H̄)`, so the Frobenius fpf forces `u = 1`
+        obtain ⟨g, hg⟩ := MonoidHom.mem_range.mp u.2
+        have hone : uActionHom data chief g = 1 :=
+          uActionHom_eq_one_of_commute_mulAut chief g (fun σ => by
+            rw [hg]
+            exact (commute_mulAut_of_elabRepresentation_eq_smul_id _ u _ hsmul σ).symm)
+        exact Subtype.ext (hg ▸ hone))
   rw [hq1] at hbound
   rw [chars.u_eq_card_quotient]
   exact hbound
