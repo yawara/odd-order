@@ -528,18 +528,18 @@ private theorem isPGroup_commutator_and_orderOf_dvd_of_narrow_witness
     | zero => exact le_of_eq hs0
     | succ i ih => exact (hs_step i).trans ih
   have hanti : Antitone s := antitone_nat_of_succ_le hs_step
-  obtain ⟨n, hn⟩ : ∃ n, lowerCentralSeries R n = ⊥ := by
+  obtain ⟨n, hn⟩ : ∃ n, (⊤ : Subgroup R).lowerCentralSeries n = ⊥ := by
     haveI := hpg.isNilpotent
-    exact nilpotent_iff_lowerCentralSeries.mp inferInstance
+    exact Subgroup.nilpotent_iff_lowerCentralSeries.mp inferInstance
   have hsn : s n = ⊥ := by
-    have hLCS : ∀ i, s i ≤ lowerCentralSeries R i := by
+    have hLCS : ∀ i, s i ≤ (⊤ : Subgroup R).lowerCentralSeries i := by
       intro i
       induction i with
       | zero =>
-        rw [lowerCentralSeries_zero]
+        rw [Subgroup.lowerCentralSeries_zero]
         exact le_top
       | succ i ih =>
-        rw [hs_succ, lowerCentralSeries_succ]
+        rw [hs_succ, Subgroup.lowerCentralSeries_succ]
         exact Subgroup.commutator_mono ih le_rfl
     exact le_bot_iff.mp (hn ▸ hLCS n)
   -- factor bound `|s i| ≤ |s (i+1)| · p`.
