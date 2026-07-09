@@ -291,3 +291,16 @@ named producer `exists_typeIICrossIsometryData` 1 本 (census 81 不変、bare�
 S12_TypeIIFrobenius (a 所有)。その後 2(a) の S-side (5.8) 機構 mirror →
 2(b)/3 は §8/pair 圏で claim-before-build 判断 (0098 item 1 は lane c 名義・未着手;
 c は temporary-hold 中 — 必要になった時点で 9000 claim を検討)。
+
+### update⁵ 補遺 — obligation 1 の S-side Dade は (8.16) TI-route が軽い
+- **II→P2 dictionary は未形式化** (`isTypeII_of_isTypeP2` の逆は TaxonomyOutput の仮説
+  としてのみ存在) ⟹ honest-P₂ Dade (`dadeSupportHypothesisData_honestTypeP2ASet`、
+  要 `IsTypeP2 S`) を type-II S に使うには dictionary が先に要る。
+- **代替 (Coq 準拠・軽い)**: type-II では (8.16) `FTtypeII_ker_TI` = A₀(S)/A(S)/A₁(S)
+  が normedTI (normalizer S)。repo に **`S04.Hypothesis.of_isTISubset`**
+  (S04_DadeIsometryBasic:273、TI subset → Dade Hypothesis、signalizer 自明) が landed、
+  (8.16) core = `typeII_centralizer_le_of_mem_mainSubgroup` (S14_MaximalI/
+  WitnessSylowCyclic:929、commit 51a7cbba で proven)。⟹ **P1 の τ_S は
+  of_isTISubset route で構築するのが正** (II→P2 も escaping-σ-sharp engine も不要)。
+  必要 glue = 「A(S) (= (8.10) の type-II A-set) が TI」を (8.16) core から
+  `IsTISubset` 形に整形する補題。
