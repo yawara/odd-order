@@ -1336,7 +1336,6 @@ private theorem hall_C_strong_aux : ∀ n : ℕ,
           rw [Subgroup.subgroupOf, Subgroup.map_comap_eq, Subgroup.range_subtype,
               inf_of_le_right hK_le_HM]
         have := congrArg (·.map HM.subtype) hn_eq
-        simp only at this
         rw [h_lhs, h_rhs] at this
         exact this
       -- K = H^(m * g) via composition.
@@ -1402,7 +1401,8 @@ theorem exists_conj_le_of_isComplement'_of_coprime [Finite G] {M K : Subgroup G}
   have hU_le_P : U ≤ P := le_sup_left
   have hMnorm : M.Normal := inferInstance
   haveI hMP_normal : (M.subgroupOf P).Normal := Subgroup.normal_subgroupOf
-  have hU_inf_M : (U ⊓ M : Subgroup G) = ⊥ := Subgroup.inf_eq_bot_of_coprime hcop
+  have hU_inf_M : (U ⊓ M : Subgroup G) = ⊥ :=
+    (Subgroup.disjoint_of_coprime_natCard hcop).eq_bot
   have hM_inf_K : (M ⊓ K : Subgroup G) = ⊥ := hK.disjoint.eq_bot
   have h_card_MP : Nat.card ↥(M.subgroupOf P) = Nat.card ↥M :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM_le_P).toEquiv
@@ -1474,7 +1474,6 @@ theorem exists_conj_le_of_isComplement'_of_coprime [Finite G] {M K : Subgroup G}
     rw [Subgroup.subgroupOf, Subgroup.map_comap_eq, Subgroup.range_subtype,
         inf_of_le_right hU_le_P]
   have h_eq_lifted := congrArg (·.map P.subtype) hn_eq
-  simp only at h_eq_lifted
   rw [h_lhs, h_rhs] at h_eq_lifted
   rw [← h_eq_lifted]
   exact Subgroup.map_mono inf_le_right
@@ -2180,7 +2179,7 @@ theorem Subgroup.IsPiGroup.normal_le_hall {G : Type*} [Group G] [Finite G] {π :
 - bot: trivially normal + π-group (primeFactors 1 = ∅).
 - closure: `H₁, H₂ ⊴ G + π-group ⇒ H₁ ⊔ H₂ ⊴ G + π-group` (mathlib + `IsPiGroup.sup_of_normal`).
 - generators: each subtype element has the predicate by construction. -/
-instance oPiCore.isPiGroup [Finite G] (π : Set ℕ) :
+theorem oPiCore.isPiGroup [Finite G] (π : Set ℕ) :
     Subgroup.IsPiGroup π (oPiCore π G) := by
   classical
   haveI hSubF : Fintype {H : Subgroup G // H.Normal ∧ Subgroup.IsPiGroup π H} :=
@@ -2476,12 +2475,13 @@ theorem oPiCore_quotient_self_eq_bot {G : Type*} [Group G] [Finite G] (π : Set 
 /-- **`oPiCore π G ⊓ oPiCore π' G = ⊥`** for finite `G`.
 
 `oPiCore π G` は π-group, `oPiCore π' G` は π'-group なので primeFactors が排他的
-⇒ cardinality が coprime ⇒ inf が ⊥ (`Subgroup.inf_eq_bot_of_coprime` 経由).
+⇒ cardinality が coprime ⇒ inf が ⊥ (`Subgroup.disjoint_of_coprime_natCard` 経由).
 
 Hall-Higman π-separable 一般版の Bezout decomposition 前提として必須. -/
 theorem oPiCore.coprime_inf {G : Type*} [Group G] [Finite G] (π : Set ℕ) :
     oPiCore π G ⊓ oPiCore {p | p ∉ π} G = ⊥ := by
-  apply Subgroup.inf_eq_bot_of_coprime
+  apply Disjoint.eq_bot
+  apply Subgroup.disjoint_of_coprime_natCard
   exact Nat.coprime_of_isPiGroup_of_isPiGroup_compl
     Nat.card_pos.ne' Nat.card_pos.ne'
     (oPiCore.isPiGroup π) (oPiCore.isPiGroup _)
@@ -2872,7 +2872,9 @@ theorem oPiCore_sup_ne_bot_of_isPiSeparable
         oPiCore {p | p ∉ π} (G ⧸ (⊥ : Subgroup G))) = ⊥ := by
       apply Subgroup.comap_injective (QuotientGroup.mk'_surjective (⊥ : Subgroup G))
       rw [MonoidHom.comap_bot, QuotientGroup.ker_mk']
-      simpa [piFittingSeries_succ, piFittingSeries_zero] using hF1
+      -- `piFittingSeries π G 1` は定義 (`piFittingSeries_succ`/`_zero` とも `rfl`) より
+      -- ちょうどこの comap (bump 後は simp 経由だと instance 経路がずれるので defeq で渡す).
+      exact hF1
     have h_all_bot : ∀ n, piFittingSeries π G n = ⊥ := by
       intro n
       induction n with
@@ -2908,7 +2910,9 @@ theorem oPiCore_sup_ne_bot_of_isPiSeparable
     (piFittingSeries_lt_succ_iff π (G := G) 0).mp hF0_lt
   have hQsup : (oPiCore π (G ⧸ (⊥ : Subgroup G)) ⊔
       oPiCore {p | p ∉ π} (G ⧸ (⊥ : Subgroup G))) ≠ ⊥ := by
-    simpa only [piFittingSeries_zero] using hQsup0
+    -- `piFittingSeries π G 0 = ⊥` は `rfl` (bump 後は simp 経由だと instance 経路が
+    -- ずれるので defeq で渡す).
+    exact hQsup0
   intro hsup_bot
   have hπ_bot : oPiCore π G = ⊥ := by
     apply le_antisymm ?_ bot_le
@@ -3633,9 +3637,10 @@ theorem IsAInvariant.derivedSeries {A : Type*} [Group A] (φ : A →* MulAut G) 
     IsAInvariant φ (derivedSeries G n) :=
   IsAInvariant.of_characteristic φ
 
-/-- `lowerCentralSeries G n` は A-不変 (characteristic instance 経由). -/
+/-- `(⊤ : Subgroup G).lowerCentralSeries n` (旧 `lowerCentralSeries G n`) は A-不変
+(characteristic instance 経由). -/
 theorem IsAInvariant.lowerCentralSeries {A : Type*} [Group A] (φ : A →* MulAut G) (n : ℕ) :
-    IsAInvariant φ (lowerCentralSeries G n) :=
+    IsAInvariant φ ((⊤ : Subgroup G).lowerCentralSeries n) :=
   IsAInvariant.of_characteristic φ
 
 /-- `Subgroup.center G` は A-不変 (characteristic instance 経由). -/
