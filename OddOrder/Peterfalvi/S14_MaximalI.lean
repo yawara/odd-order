@@ -5182,45 +5182,123 @@ theorem exists_rankTwoWitness [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
            CKx_not_le_Kprime := hCKx, normalizer_closure_x_le_M := hNx,
            centralizer_x_not_le_L := hCx }⟩
 
-/-- **Peterfalvi (8.16) centralizer-containment, Type II** (pinned sorried §8–§11 obligation,
-hub 9003 Cluster A): for a maximal subgroup `L` of Type II, `C_G(y) ⊆ L` for every nonidentity
-`y ∈ L_s = A_1(L)` (`L_s = L_F` for Type II).
+/-- **Normalizer bridge** (used by (12.10) and (12.17)): a maximal subgroup `L` of a minimal
+simple group of odd order is the normalizer of its maximal nilpotent normal Hall subgroup `L_F`,
+as soon as `L_F ≠ ⊥`.
 
-This is the "By (8.16), `C_G(y) ⊆ L` for all `y ∈ A(L)`" step of (12.10).  Peterfalvi (8.16) states
-that `A_0(L)`, `A(L)`, `A_1(L)` are TI-subsets of `G` with normalizer `L`
-(`S12.typeII_A_sets_normalizer` / `typeII_A_sets_TI`, both sorried), and `A_1(L) = L_s^#`
-(`sharpSubgroup (mainSubgroup L .II)`).  For `y ∈ A_1(L)`, `C_G(y) ≤ N_G(A_1(L)) = L` because `y`'s
-centralizer normalizes the TI-set through `y`.  Stated at the §8–§11 boundary (the honest
-containment consumed by the witness argument) pending relocation of the genuine (8.16)/(2.3)
-tame-embedding facts upstream of §14.  **Genuinely still-missing** as a *usable* containment: the
-repo carries only the (overstated, sorried) `typeII_A_sets_normalizer`; no direct
-`C_G(y) ⊆ L` for `y ∈ L_s^#` exists. -/
+`L ≤ N_G(L_F)` is `maxNilpotentNormalHall_le_normalizer`.  If `N_G(L_F) = ⊤` then `L_F ⊴ G`, so by
+simplicity `L_F = ⊥` or `⊤`; both are excluded (`L_F ≠ ⊥` by hypothesis, `L_F ≤ L < ⊤`).  Hence
+`L ≤ N_G(L_F) < ⊤`, and `L` being a coatom upgrades the containment to equality. -/
+theorem maximalSubgroup_eq_normalizer_maxNilpotentNormalHall [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} (hL : L ∈ maximalSubgroups G)
+    (hne : maxNilpotentNormalHall L ≠ ⊥) :
+    L = Subgroup.normalizer (maxNilpotentNormalHall L : Set G) := by
+  have hco : IsCoatom L := hL
+  have hLleN : L ≤ Subgroup.normalizer (maxNilpotentNormalHall L : Set G) :=
+    OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer L
+  refine le_antisymm hLleN ?_
+  rcases hLleN.lt_or_eq with hlt | heq
+  · -- `L < N_G(L_F)` would force `N_G(L_F) = ⊤`, making `L_F ⊴ G`, which simplicity excludes.
+    exfalso
+    have hNtop : Subgroup.normalizer (maxNilpotentNormalHall L : Set G) = ⊤ := hco.2 _ hlt
+    haveI hHnormal : (maxNilpotentNormalHall L).Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (maxNilpotentNormalHall L) hHnormal with hb | ht
+    · exact hne hb
+    · have hle : maxNilpotentNormalHall L ≤ L := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le L
+      rw [ht] at hle
+      exact hco.1 (top_le_iff.mp hle)
+  · exact heq.ge
+
+/-- **Peterfalvi (8.6.a) centralizer containment for type-`P` kernels**: for a maximal `L` of
+type II–IV — i.e. carrying the `TypePNontrivialCore` of Definition (8.6), whose clause (a) makes
+`L_F^#` a TI-subset with normalizer `N_G(L_F)` — every nonidentity `y ∈ L_F` has `C_G(y) ≤ L`.
+
+An element `c ∈ C_G(y)` fixes `y ∈ L_F^# ∩ (L_F^#)^c`, so the TI property puts
+`c ∈ N_G(L_F) = L` (`maximalSubgroup_eq_normalizer_maxNilpotentNormalHall`).  This is the (8.16)
+proof's "`(8.6.a)` implies `R(a) = 1`" mechanism, exposed as the containment the (12.10) type
+exclusions consume.  (The textbook (8.6.a) states the TI property for the full Fitting subgroup
+`F(L)^# ⊇ L_F^#`; the Lean `TypePNontrivialCore` carries the `L_F`-form, which is what we use.) -/
+theorem typeP_core_centralizer_le_of_mem_fitting [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} (hL : L ∈ maximalSubgroups G)
+    {data : TypePData L} (hcore : TypePNontrivialCore L data)
+    {y : G} (hy : y ∈ maxNilpotentNormalHall L) (hy1 : y ≠ 1) :
+    Subgroup.centralizer ({y} : Set G) ≤ L := by
+  obtain ⟨-, -, hTI⟩ := hcore
+  have hne : maxNilpotentNormalHall L ≠ ⊥ := by
+    intro hb
+    rw [hb] at hy
+    exact hy1 (Subgroup.mem_bot.mp hy)
+  have hNL := maximalSubgroup_eq_normalizer_maxNilpotentNormalHall hG hL hne
+  intro c hc
+  have hcy : c * y * c⁻¹ = y := by
+    rw [mul_inv_eq_iff_eq_mul]
+    exact Subgroup.mem_centralizer_singleton_iff.mp hc
+  have hysharp : y ∈ OddOrder.GroupTheory.sharpSubgroup (maxNilpotentNormalHall L) :=
+    ⟨hy, by simpa using hy1⟩
+  rw [hNL]
+  exact hTI c ⟨y, hysharp, by rw [hcy]; exact hysharp⟩
+
+/-- **Peterfalvi (8.16) centralizer-containment, Type II**: for a maximal subgroup `L` of
+Type II, `C_G(y) ⊆ L` for every nonidentity `y ∈ L_s` (`L_s = L_F` for Type II).
+
+This is the "By (8.16), `C_G(y) ⊆ L` for all `y ∈ A(L)`" step of (12.10), restricted to the
+`A_1(L) = L_s^#` core the witness argument uses.  Peterfalvi's (8.16) proof reduces the `A_1(L)`
+case to exactly clause (a) of Definition (8.6) — the kernel-sharp TI-set — which the Lean
+`TypeIIData` carries in its `TypePNontrivialCore`; the containment is then
+`typeP_core_centralizer_le_of_mem_fitting`. -/
 theorem typeII_centralizer_le_of_mem_mainSubgroup [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} (hL : L ∈ maximalSubgroups G)
     (hII : IsTypeII L) {y : G} (hy : y ∈ mainSubgroup L PeterfalviType.II) (hy1 : y ≠ 1) :
     Subgroup.centralizer ({y} : Set G) ≤ L := by
+  obtain ⟨iiData⟩ := hII
+  exact typeP_core_centralizer_le_of_mem_fitting hG hL iiData.common
+    (by simpa [mainSubgroup] using hy) hy1
+
+/-- **Peterfalvi (10.10)+(11.9.c)+(11.6)+(9.7.b) kernel reduction, Type III/IV** (pinned sorried
+§9–§11 obligation, hub 9003 Cluster A): for a maximal subgroup `L` of Type III or IV, a noncyclic
+`p`-group `P₀ ⊆ L_s` lies in the Fitting kernel `L_F`.
+
+This is the second paragraph of (12.10) up to its final (8.6.a) step: by Theorem (10.10)
+(`S12.no_typeV_maximal`, available — excludes Type V) and (11.9.c)
+(`S13.final_typeIII_conclusions`, sorried) `L` is Type III with case (b) of (9.7); by (11.6)
+(`C_U(H) = 1`) and (9.7.b) the complement `U` of `H = L_F` in `[L,L]` is **cyclic**.  Since
+`L_F` is a normal Hall subgroup of `L_s = [L,L]` with cyclic complement, a noncyclic `p`-group
+`P₀ ≤ L_s` cannot embed in the complement side (`p ∣ |U|` would make `P₀ ↪ L_s/L_F ≅ U` cyclic),
+so `p ∣ |L_F|` and `P₀` lies in the Sylow `p`-subgroup of the normal Hall `L_F`, i.e. `P₀ ⊆ L_F`.
+**Genuinely still-missing**: the (9.7.b)/(11.6) cyclicity of `U` (`S13.final_typeIII_conclusions`
+is sorried) and the Hall-embedding bookkeeping are not assembled in reach of S14. -/
+theorem typeIIIorIV_noncyclic_le_fitting [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L P0 : Subgroup G} (hL : L ∈ maximalSubgroups G)
+    (hIIIIV : IsTypeIII L ∨ IsTypeIV L) (hP0nc : ¬ IsCyclic ↥P0)
+    {Lt : PeterfalviType} (hLhasType : HasPeterfalviType Lt L)
+    (hP0 : P0 ≤ mainSubgroup L Lt) :
+    P0 ≤ maxNilpotentNormalHall L := by
   sorry
 
-/-- **Peterfalvi (10.10)+(11.9.c)+(11.6)+(9.7.b)+(8.6.a), Type III/IV route** (pinned sorried
-§8–§11 obligation, hub 9003 Cluster A): for a maximal subgroup `L` of Type III or IV and a
-noncyclic `p`-group `P₀ ⊆ L_s`, one has `P₀ ⊆ L_F` and `C_G(y) ⊆ L` for every nonidentity
-`y ∈ P₀` (so `y ∈ L_F^#`).
+/-- **Peterfalvi (10.10)+(11.9.c)+(11.6)+(9.7.b)+(8.6.a), Type III/IV route**: for a maximal
+subgroup `L` of Type III or IV and a noncyclic `p`-group `P₀ ⊆ L_s`, `C_G(y) ⊆ L` for every
+nonidentity `y ∈ P₀`.
 
-This is the second paragraph of (12.10): by Theorem (10.10) (`S12.no_typeV_maximal`, available —
-excludes Type V) and (11.9.c) (`S13.final_typeIII_conclusions`, sorried) `L` is Type III with case
-(b) of (9.7); by (11.6) (`S11.typeII_centralizer_U_eq_bot`-analogue, `C_U(H)=1`) and (9.7.b) the
-complement `U` of `H = L_F` in `[L,L]` is cyclic, so the noncyclic `P₀` lands in `H`; by (8.6.a)
-`C_G(y) ⊆ L` for all `y ∈ H^#`.  Stated at the §8–§11 boundary pending relocation of the genuine
-Type III/IV structural facts (9.7.b, 11.6, 8.6.a) upstream of §14.  **Genuinely still-missing** as
-a usable containment: `S13.final_typeIII_conclusions` and the (8.6.a) `L_F^#`-TI covering are
-sorried, and no assembled `P₀ ⊆ L_F ⟹ C_G(y) ⊆ L` exists in the repo. -/
+**Assembly** (`sorry`-free modulo the (11.9.c)/(9.7.b) kernel reduction): the reduction
+`typeIIIorIV_noncyclic_le_fitting` places `P₀ ⊆ L_F`, and the (8.6.a) TI containment
+`typeP_core_centralizer_le_of_mem_fitting` (via the `TypePNontrivialCore` carried by both the
+`TypeIIIData` and `TypeIVData` witnesses) yields `C_G(y) ≤ L` for `y ∈ L_F^#`. -/
 theorem typeIIIorIV_centralizer_le_of_mem_noncyclic_mainSubgroup [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L P0 : Subgroup G} (hL : L ∈ maximalSubgroups G)
     (hIIIIV : IsTypeIII L ∨ IsTypeIV L) (hP0nc : ¬ IsCyclic ↥P0)
     {Lt : PeterfalviType} (hLhasType : HasPeterfalviType Lt L)
     (hP0 : P0 ≤ mainSubgroup L Lt) {y : G} (hy : y ∈ P0) (hy1 : y ≠ 1) :
     Subgroup.centralizer ({y} : Set G) ≤ L := by
-  sorry
+  have hyF : y ∈ maxNilpotentNormalHall L :=
+    typeIIIorIV_noncyclic_le_fitting hG hL hIIIIV hP0nc hLhasType hP0 hy
+  have hcommon : ∃ pdata : TypePData L, TypePNontrivialCore L pdata := by
+    rcases hIIIIV with h3 | h4
+    · obtain ⟨iiiData⟩ := h3
+      exact ⟨iiiData.typeP, iiiData.common⟩
+    · obtain ⟨ivData⟩ := h4
+      exact ⟨ivData.typeP, ivData.common⟩
+  obtain ⟨pdata, hcore⟩ := hcommon
+  exact typeP_core_centralizer_le_of_mem_fitting hG hL hcore hyF hy1
 
 /-- **Peterfalvi (12.10) obligation A**: the (12.9) witness `L` is of Type I.
 
@@ -5342,21 +5420,7 @@ theorem witness_normalizer_kernel_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
   have hne : maxNilpotentNormalHall data.L ≠ ⊥ := by
     rw [← typeI.typeF.H_eq]; exact typeI.typeF.H_nontrivial
   rw [typeI.typeF.H_eq]
-  have hco : IsCoatom data.L := data.L_maximal
-  have hLleN : data.L ≤ Subgroup.normalizer (maxNilpotentNormalHall data.L : Set G) :=
-    OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer data.L
-  refine (le_antisymm hLleN ?_).symm
-  rcases hLleN.lt_or_eq with hlt | heq
-  · exfalso
-    have hNtop := hco.2 _ hlt
-    haveI hHnormal : (maxNilpotentNormalHall data.L).Normal :=
-      Subgroup.normalizer_eq_top_iff.mp hNtop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (maxNilpotentNormalHall data.L) hHnormal with
-      hb | ht
-    · exact hne hb
-    · have hle := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le data.L
-      rw [ht] at hle; exact hco.1 (top_le_iff.mp hle)
-  · exact heq.ge
+  exact (maximalSubgroup_eq_normalizer_maxNilpotentNormalHall hG data.L_maximal hne).symm
 
 /-- **(12.10), TI-case exclusion for the witness** (`TypeIData` form, Frobenius-free): the
 kernel-sharp set `H^#` of the witness `L` is **not** a TI-subset of `G`.  The rank-two witness
@@ -7685,32 +7749,9 @@ section Theorem1217
 
 variable [Finite G]
 
-/-- **Normalizer bridge for Peterfalvi (12.17)**: a maximal subgroup `L` of a minimal simple group
-of odd order is the normalizer of its maximal nilpotent normal Hall subgroup `L_F`, as soon as
-`L_F ≠ ⊥`.
-
-`L ≤ N_G(L_F)` is `maxNilpotentNormalHall_le_normalizer`.  If `N_G(L_F) = ⊤` then `L_F ⊴ G`, so by
-simplicity `L_F = ⊥` or `⊤`; both are excluded (`L_F ≠ ⊥` by hypothesis, `L_F ≤ L < ⊤`).  Hence
-`L ≤ N_G(L_F) < ⊤`, and `L` being a coatom upgrades the containment to equality. -/
-theorem maximalSubgroup_eq_normalizer_maxNilpotentNormalHall
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} (hL : L ∈ maximalSubgroups G)
-    (hne : maxNilpotentNormalHall L ≠ ⊥) :
-    L = Subgroup.normalizer (maxNilpotentNormalHall L : Set G) := by
-  have hco : IsCoatom L := hL
-  have hLleN : L ≤ Subgroup.normalizer (maxNilpotentNormalHall L : Set G) :=
-    OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer L
-  refine le_antisymm hLleN ?_
-  rcases hLleN.lt_or_eq with hlt | heq
-  · -- `L < N_G(L_F)` would force `N_G(L_F) = ⊤`, making `L_F ⊴ G`, which simplicity excludes.
-    exfalso
-    have hNtop : Subgroup.normalizer (maxNilpotentNormalHall L : Set G) = ⊤ := hco.2 _ hlt
-    haveI hHnormal : (maxNilpotentNormalHall L).Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (maxNilpotentNormalHall L) hHnormal with hb | ht
-    · exact hne hb
-    · have hle : maxNilpotentNormalHall L ≤ L := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le L
-      rw [ht] at hle
-      exact hco.1 (top_le_iff.mp hle)
-  · exact heq.ge
+/-! The normalizer bridge `maximalSubgroup_eq_normalizer_maxNilpotentNormalHall` (`L = N_G(L_F)`
+for maximal `L` with `L_F ≠ ⊥`) now lives with the (8.6.a)/(8.16) centralizer-containment block
+before (12.10), where the type-`P` pins consume it. -/
 
 /-- **Peterfalvi (8.13.c1)+(2.3), all-type-I case** — the escaping-centralizer control that makes
 each type-I kernel's Fitting subgroup a `TI`-subgroup, supplying the `FittingIsTI` gate of the
