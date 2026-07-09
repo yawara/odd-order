@@ -304,3 +304,19 @@ c は temporary-hold 中 — 必要になった時点で 9000 claim を検討)�
   of_isTISubset route で構築するのが正** (II→P2 も escaping-σ-sharp engine も不要)。
   必要 glue = 「A(S) (= (8.10) の type-II A-set) が TI」を (8.16) core から
   `IsTISubset` 形に整形する補題。
+
+### update⁵ 補遺² — S-side Dade の support-set 選定 (次 iteration の最初の判断)
+- **A₁(S) = S_F^# の TI は即座に取れる**: `TypePNontrivialCore` が kernel-sharp TI を
+  field で保持 (`typeP_core_centralizer_le_of_mem_fitting` の hTI destructure) +
+  `maximalSubgroup_eq_normalizer_maxNilpotentNormalHall` ⟹ `IsTISubset (S_F^#) S` は
+  数行。`of_isTISubset` (H(a)=⊥) で `S04.Hypothesis G (S_F^#) S` が立つ。
+- **⚠ full A(S)/A₀(S) の TI は旧 `typeII_A_sets_TI` が FALSE-as-stated で撤去済み**
+  (S10_StructureSetup:524 コメント、faithful content = BG
+  `theoremB_A_minus_Msigma_isTISubset`)。A(S)-level が要るなら BG 側 statement 経由。
+- **先に決めるべきこと = T2-差分の support**: Peterfalvi (8.15) は
+  Supp(ℤ[𝒯,S^#]) ⊆ A(S) (full)。差分 λ−ν が A₁(S)=S_F^# に落ちるかは非自明
+  (Ind の U-part 値)。lane-b の §13-S instance は `sSet_member_support_subset_A`
+  (support ⊆ honestTypeP2ASet ∪ {1}) を証明済 — その証明が一般 type-II S に
+  instantiate できるか (S15.Hypothesis 依存部の除去) を最初に確認し、
+  (a) A₁-TI Dade で足りる形に支持集合を絞れるなら最軽、
+  (b) 足りなければ honest A(S) + BG theoremB-TI 経由。
