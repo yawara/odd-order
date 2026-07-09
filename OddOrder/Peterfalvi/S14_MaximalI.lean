@@ -5764,22 +5764,64 @@ theorem mainSubgroup_le (M : Subgroup G) (tau : OddOrder.GroupTheory.PeterfalviT
       | exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le M
       | exact Subgroup.map_subtype_le _
 
-/-- **Peterfalvi (12.11), first assertion** (pinned sorried §8 obligation, hub 9003 Cluster A):
-`M ∩ L` complements `K = M_F` in `M`.  This is the "first assertion follows from (12.9) and
-(8.13.c1)" step: for the (12.9) witness with `x ∈ Ω₁(P₀)^#` escaping (`C_G(x) ⊄ L`,
-`N_G(⟨x⟩) ⊆ M`), (8.13.c1) (BG §16 Theorem II) gives `C_G(x) = R(x) ⋊ C_M(x)` and, transported to
-`M`, `M ∩ L` complements `M_F = K`.
+/-- **Peterfalvi (12.11), first assertion**: `M ∩ L` complements `K = M_F` in `M`.  This is the
+"first assertion follows from (12.9) and (8.13.c1)" step, with the (8.13)/BG roles swapped from
+the (12.11) notation: the witness `x ∈ Ω₁(P₀)^# ⊆ L_F = L_σ` (type I) is a `σ`-sharp element of
+`L` **escaping `L`** (`C_G(x) ⊄ L`), and its supporting maximal is `M` (`C_G(x) ≤ N_G(⟨x⟩) ≤ M`
+pins `M` in the singleton `𝓜(C_G(x))`).
 
-**Genuinely still-missing** as a usable complement: the (8.13.c1) signalizer-complement structure
-(`S10.escaping_typeIA_signalizer_structure`, itself pinned upstream through BG §16 Theorem II) is
-not assembled into the `M ∩ L`-complements-`K` conclusion anywhere in the repo.  The statement is
-**sound**: it is Peterfalvi's genuine (12.11) first assertion for the witness `L` of `ctr` (tied via
-`data`), true by (12.9)+(8.13.c1). -/
+**Assembly** (proven): BG Theorem D(4) tail — "`M ∩ N` is a complement of `N_σ` in `N`" — is the
+`IsComplement'` conjunct of `signalizer_structure_of_mem_sigmaSharp` (its unique `N` is `M` by the
+singleton), applied at `M' := L ∈ 𝓜_σ(x)`; `N_σ = M_σ = M_F = K` is the type-I identification
+`MF_eq_Msigma`. -/
 theorem intersection_complements_K [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
     Subgroup.IsComplement' (ctr.K.subgroupOf ctr.M) ((ctr.M ⊓ data.L).subgroupOf ctr.M) := by
-  sorry
+  classical
+  -- The witness `L` is type I with `L_F = L_σ`, so `x ∈ P₀ ⊆ L_F` is `σ`-sharp in `L`.
+  have hLtypeI : IsTypeI data.L := witness_L_isTypeI hG data
+  have hLF_eq : maxNilpotentNormalHall data.L = OddOrder.BG.Ch3.S10.Msigma data.L :=
+    (OddOrder.BG.Ch4.S16.proposition_type_classification hG data.L_maximal).2.2.2.2.2.mpr
+      (Or.inl hLtypeI)
+  have hxLσ : data.x ∈ OddOrder.BG.Ch3.S10.Msigma data.L :=
+    hLF_eq ▸ witness_P0_le_kernel hG data data.x_mem_P0
+  have hxσ : data.x ∈ OddOrder.BG.Ch4.S14.sigmaSharp data.L :=
+    ⟨hxLσ, by simpa using data.x_ne_one⟩
+  -- `C_G(x) ≤ M` (via `N_G(⟨x⟩) ≤ M`), so `M` is THE maximal subgroup over `C_G(x)`.
+  have hCM : Subgroup.centralizer ({data.x} : Set G) ≤ ctr.M := by
+    refine le_trans ?_ data.normalizer_closure_x_le_M
+    rw [← Subgroup.centralizer_closure]
+    exact Subgroup.centralizer_le_normalizer _
+  obtain ⟨N₀, hN₀⟩ :=
+    OddOrder.BG.Ch4.S16.maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape
+      hG data.L_maximal hxσ data.centralizer_x_not_le_L
+  have hMN₀ : ctr.M = N₀ := by
+    have hMin : ctr.M ∈ maximalSubgroupsContaining
+        (Subgroup.centralizer ({data.x} : Set G)) := ⟨ctr.M_maximal, hCM⟩
+    rw [hN₀] at hMin
+    exact hMin
+  -- The signalizer structure at the escaping `σ`-sharp `x`; its unique `N` is `M`.
+  have hgt : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement data.x).ncard := by
+    by_contra h
+    push_neg at h
+    exact data.centralizer_x_not_le_L
+      (OddOrder.BG.Ch4.S16.centralizer_le_of_maximalSigma_le_one hG data.L_maximal hxLσ
+        data.x_ne_one h)
+  obtain ⟨N, ⟨hNmax, hCN, -, -, -, -, hforall⟩, -⟩ :=
+    OddOrder.BG.Ch4.S16.signalizer_structure_of_mem_sigmaSharp hG data.L_maximal hxσ hgt
+  have hNM : N = ctr.M := by
+    have hNin : N ∈ maximalSubgroupsContaining
+        (Subgroup.centralizer ({data.x} : Set G)) := ⟨hNmax, hCN⟩
+    rw [hN₀] at hNin
+    rw [hNin, ← hMN₀]
+  -- `L ∈ 𝓜_σ(x)`: apply the Theorem D(4) complement conjunct at `M' = L`.
+  have hLin : data.L ∈ OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement data.x :=
+    ⟨data.L_maximal, hxLσ⟩
+  obtain ⟨-, -, hcompl, -⟩ := hforall data.L hLin
+  rw [hNM, ← MF_eq_Msigma hG ctr,
+    show data.L ⊓ ctr.M = ctr.M ⊓ data.L from inf_comm .. ] at hcompl
+  exact hcompl
 
 /-- **`|M ∩ L|` is coprime to `|K|`** (from the first assertion (12.11) + `M_F` Hall).  `M ∩ L`
 complements `K = M_F` in `M` (`intersection_complements_K`), so `|M ∩ L| = [M : K]`, which is
