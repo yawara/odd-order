@@ -2705,8 +2705,6 @@ structure CliffordCaseAData {M : Subgroup G} {data : TypesIIIIIIVSetup M}
   from the character degrees, and the degree-`qa` count (9.8.d) would not be honestly provable. -/
   a_eq_card_restrictAut_range :
     a = Nat.card ↥(aInvariantRestrictAut S0_aInvariant).range
-  quotient_factors_cyclic_order_a : Prop
-  quotient_factors_cyclic_order_a_holds : quotient_factors_cyclic_order_a
 
 open scoped IsMulCommutative in
 /-- **The `(9.8)` regular-character count on the chief factor** (`oXtheta` numerator): the
@@ -6670,9 +6668,7 @@ noncomputable def clifford_caseA_data [Finite G] {M : Subgroup G}
       a := Nat.card ↥(aInvariantRestrictAut hS₀inv).range
       a_pos := Nat.card_pos
       a_dvd_p_sub_one := ?_
-      a_eq_card_restrictAut_range := rfl
-      quotient_factors_cyclic_order_a := True
-      quotient_factors_cyclic_order_a_holds := trivial }
+      a_eq_card_restrictAut_range := rfl }
   -- `a = |U-image on S₀| ∣ |S₀| - 1 = p - 1` (the order-`p` factor is cyclic, `Aut ≅ (ZMod p)ˣ`).
   have hdvd := aInvariantRestrictAut_range_card_dvd hS₀inv (hS₀card ▸ chief.p_prime)
   rwa [hS₀card] at hdvd
