@@ -305,3 +305,18 @@ allTypeI_fittingIsTI + not_nonTypeICovering (P₂-crux gated)。次 = 文書順�
   docstring 言及のみ) — off-path 保留妥当。
 - `typeIIIorIV_noncyclic_le_fitting`: S13 char gated (変化なし)。
 - `allTypeI_fittingIsTI` + `not_nonTypeICovering`: P₂-crux gated (変化なし)。
+
+## ✅ (2026-07-09 続⁴、lane-b) — hidx (4|K'| ≤ |K|、8.1.c) 完全 proven
+
+frontier map の「hidx 組立可能」を実施 (commit f349de80):
+`four_mul_card_Kprime_le` + helper `p_not_dvd_card_K` (WitnessSylowCyclic)。
+frobenius_HU0 ambient FPF → quotientMulAutHom descent → Isaacs Cor 3.28 固定点
+lift → IsPGroup.card_modEq_card_fixedPoints で |K/K'| ≡ 1 (mod p) ≥ p+1 ≥ 4。
+
+**witness_value_norm_package conjunct 供給状況**: h_const ✅ (psi_constant_on_xK proven 済) /
+h2e ✅ (two_mul_card_complement_le) / hidx ✅ (本 commit) / 残 = h_psig_int ((12.15) ℤ-値) +
+hA ((12.15) ρM relation) + hB ((7.8.b) — S09 zetaNuRhoNormSqGeOfDade 接続、witness_L_hypothesis78
+proven 済ゆえ配線距離短い) + hC ((7.3)+(8.17)) + mval 束ね。
+**次 iteration**: (a) hB 接続 (Hypothesis78 → zetaNuRhoNormSqGeOfDade → dade.psi 形へ) or
+(b) (12.14) evaluation 機械 (a=0 counting + (7.7.a)、witness_psi_degree と h_psig_int の共通上流)。
+文書順は (12.14) が先。
