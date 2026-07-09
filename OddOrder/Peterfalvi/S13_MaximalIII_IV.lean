@@ -1756,7 +1756,8 @@ noncomputable def certainTypeSet_isCoherent_A0 [Finite G]
               (OddOrder.GroupTheory.typePA M hyp.typeP) M ∪ {1})).restrictScalars ℤ := by
         refine Submodule.span_le.mpr (fun s hs => ?_)
         obtain ⟨χ₂, hχ₂, -, rfl⟩ := hs
-        simpa only [Submodule.restrictScalars_mem, ClassFunction.mem_supportedSubmodule]
+        simpa only [SetLike.mem_coe, Submodule.restrictScalars_mem,
+            ClassFunction.mem_supportedSubmodule]
           using OddOrder.Peterfalvi.S06.columnSum_support_subset
             (hyp.toHypothesis46 hG hodd) hχ₂
       exact (ClassFunction.mem_supportedSubmodule).mp (hle hφspan)
