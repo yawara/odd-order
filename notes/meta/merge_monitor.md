@@ -297,6 +297,13 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > (13.18) μ-carrier honest source 側 (`Hypothesis.s06S` 等) は従来どおり b 専有。b は main sync で
 > 本 refactor を取り込み、binder 供給へ再変更しない。詳細 = issues/9014 「HUB carve-out 追記 2026-07-09」節。
 >
+> **carve-out (issue 2038 供給編集権, hub 裁定 2026-07-09 監視 tick — merge 03fd8474)**: 3002 供給編集権
+> (上記、失効済) と同型の期限付き編集権を **issue 2038 の (12.14) chiRho 供給 chain** に付与: b は
+> **a 所有 S09 chiRho 機構ファイル** (`S09_Building78C.lean`・`S09_NonexistenceCertain/*` 等) への
+> **純 additive・proven な helper theorem 追加**を行ってよい (条件 = 3002 先例と同一: (i) additive のみ、
+> (ii) proven (sorry 追加なし)、(iii) 用途 = 2038 (12.14) 供給、(iv) issue で self-flag)。既存宣言の
+> statement/proof 改変は従来どおり逸脱。**(12.14) 供給完了で失効**。詳細 = issues/2038 「HUB carve-out」節。
+>
 > **⟹ 拡張 #2 (ユーザー裁定 2026-07-05 tick(3) — Hypothesis76 (7.6) 忠実化 field の包括許可)**:
 > 同型逸脱 3 連発 (issue 0091 Hypothesis78 / zeta_induced / zeta_injective、各回ユーザー受理) の
 > 反復解消として、**issue 2034/3002 の (13.5) 供給作業中に限り、b による `S09_NonexistenceCertain`
