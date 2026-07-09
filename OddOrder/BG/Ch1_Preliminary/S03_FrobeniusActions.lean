@@ -267,7 +267,7 @@ theorem zpowers_quotient_fixed_of_generator_quotient_fixed
     exact hgen
   have hxy_comm : Commute (x : G ⧸ N) (y : G ⧸ N) := by
     have hmul := congrArg (fun z => z * (x : G ⧸ N)) hgenQ
-    simpa only [mul_assoc, inv_mul_cancel, mul_one] using hmul
+    simpa only [commute_iff_eq, mul_assoc, inv_mul_cancel, mul_one] using hmul
   have hxpow_comm : Commute ((x : G ⧸ N) ^ n) (y : G ⧸ N) :=
     hxy_comm.zpow_left n
   have hconj :

@@ -487,7 +487,7 @@ theorem eq_smul_chiFam_column_of_vanishOnV (hyp : TICyclicHypothesis G) [Fintype
       · rw [hsupp pq hq' hq, star_zero]
   -- a third column `q₀ ∉ {jcol, kcol}` exists since `w₂ ≥ 3`.
   obtain ⟨q₀, hq₀j, hq₀k⟩ : ∃ q₀ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ, q₀ ≠ jcol ∧ q₀ ≠ kcol := by
-    by_contra hcon; push_neg at hcon
+    by_contra hcon; push Not at hcon
     have hsub : (Finset.univ : Finset ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)) ⊆ {jcol, kcol} := by
       intro q _
       rcases eq_or_ne q jcol with hq | hq
@@ -508,12 +508,12 @@ theorem eq_smul_chiFam_column_of_vanishOnV (hyp : TICyclicHypothesis G) [Fintype
       fun pq => by rw [hstar pq]; ring
     rw [Finset.sum_congr rfl (fun pq _ => hsq pq), ← hParseval, hXnorm,
       ← Nat.card_eq_fintype_card, hyp.card_charGroup_subgroupOf hyp.W1_le_W]
-  -- apply the abstract two-column core (beta-reduce the grid `fun pq => sigmaCoeff X pq`).
+  -- apply the abstract two-column core (the grid `fun pq => sigmaCoeff X pq` beta-reduces
+  -- automatically in the statement of `hcore`).
   have hcore := grid_eq_const_column_of_two_col (ι := (hyp.W1.subgroupOf hyp.W) →* ℂˣ)
     (κ := (hyp.W2.subgroupOf hyp.W) →* ℂˣ) (fun pq => hyp.sigmaCoeff hVeq app X pq)
     (fun i i' q q' => hyp.sigmaCoeff_add_eq hVeq app hψV i i' q q') hjk hq₀j hq₀k
     (fun i q hqj hqk => hsupp (i, q) hqj hqk) hδ hk hj hmass
-  simp only [] at hcore
   -- reconstruct `X` from its coefficients, then collapse to the surviving column.
   have hXrec : X = ∑ pq, hyp.sigmaCoeff hVeq app X pq • hyp.chiFam hVeq app pq :=
     hyp.eq_sum_sigmaCoeff_smul_chiFam_of_inner_self_eq hVeq app hParseval

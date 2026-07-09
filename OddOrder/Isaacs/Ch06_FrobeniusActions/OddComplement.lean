@@ -357,7 +357,7 @@ theorem normal_of_card_prime_of_isFrobeniusAction_of_odd
       rwa [map_pow, map_one, Subgroup.coe_subtype] at this
     set ν : A := k * r₀⁻¹ with hνdef
     have hνN : ν ∈ commutator A := by
-      have hνe : ν = ⁅g, r₀⁆ := by rw [hνdef, ← hkval, commutatorElement_def]; group
+      have hνe : ν = ⁅g, r₀⁆ := by rw [hνdef, ← hkval, commutatorElement_def]
       rw [hνe]
       exact Subgroup.commutator_mem_commutator (Subgroup.mem_top g) (Subgroup.mem_top r₀)
     have hcomm : Commute ν r₀ := by

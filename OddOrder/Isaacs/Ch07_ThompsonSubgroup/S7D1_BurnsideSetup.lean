@@ -534,7 +534,7 @@ theorem card_eq_pow_mul_pow_of_dvd {n p q : ℕ}
       by_cases hr_prime : r.Prime
       · exact Nat.factorization_eq_zero_of_not_dvd (fun hdvd_pr => by
           rcases hpf r hr_prime hdvd_pr with h | h; exacts [hrp h, hrq h])
-      · exact Nat.factorization_eq_zero_of_non_prime _ hr_prime
+      · exact Nat.factorization_eq_zero_of_not_prime _ hr_prime
 
 /-- **§7D Step 2 — complementary Sylow product** (Isaacs L3973).
 

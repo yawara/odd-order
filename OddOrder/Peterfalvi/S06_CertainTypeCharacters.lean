@@ -1105,7 +1105,6 @@ theorem certainType_zero_column_anchor [NeZero (Nat.card h.W1)] :
       * (if (h.columnFamily 1).mu 0 = oneIrr then (1 : ℂ) else 0) = 1 := by
     have h2 := congrArg
       (fun f : ClassFunction L ℂ => ClassFunction.inner f (oneIrr : ClassFunction L ℂ)) hkey
-    simp only at h2
     rw [(by rfl : (oneIrr : ClassFunction L ℂ) = trivialClassFunction L).symm,
       irreducibleCharacter_inner oneIrr oneIrr, if_pos rfl,
       ← Int.cast_smul_eq_zsmul ℂ, ClassFunction.inner_smul_left, irreducibleCharacter_inner] at h2
