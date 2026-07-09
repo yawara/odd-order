@@ -202,12 +202,11 @@ theorem map_conj_eq_iff_mem_normalizer {K : Subgroup G} {g : G} :
     · intro hh
       have hm : g * h * g⁻¹ ∈ K.map (MulAut.conj g).toMonoidHom := by rw [hmap]; exact hh
       obtain ⟨y, hy, hxy⟩ := hm
-      simp only [MulAut.conj_apply, MonoidHom.coe_coe] at hxy
       have hyh : y = h := mul_left_cancel (mul_right_cancel hxy)
       rwa [← hyh]
   · intro hnorm
     ext x
-    simp only [Subgroup.mem_map, MulAut.conj_apply, MonoidHom.coe_coe]
+    simp only [Subgroup.mem_map]
     constructor
     · rintro ⟨y, hy, rfl⟩
       exact (hnorm y).mp hy
