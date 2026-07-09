@@ -128,7 +128,7 @@ theorem elemAb_le_E2_of_prime_eq [Finite G] (hG : IsMinimalSimpleOdd G)
   have h4 : (⟨a, hAE ha⟩ : ↥E) ∈ E₂.subgroupOf E := by
     have h5 : (⟨a, hAE ha⟩ : ↥E) ∈ (SE₂ : Subgroup ↥E) := by
       rw [← he, Sylow.coe_subgroup_smul, Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
-      simpa using h2
+      simpa [SetLike.mem_coe] using h2
     rwa [hSE₂def, Sylow.coe_ofCard] at h5
   exact Subgroup.mem_subgroupOf.mp h4
 
