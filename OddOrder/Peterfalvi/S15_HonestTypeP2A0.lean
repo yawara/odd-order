@@ -740,6 +740,59 @@ theorem Hypothesis.mu_row0_ne [Finite G] (hyp : Hypothesis (G := G)) {j : Fin hy
   rw [heq, hdiag] at hoff
   exact one_ne_zero hoff
 
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (4.8) conclusion (1) on the `S`-side residue grid** — the `S`-instance of Coq
+`prDade_sub_TIirr_on` (`PFsection4.v:838`), **with Coq's exact hypotheses**: for *nontrivial*
+columns `j, k ≠ 0` of *equal degree* (`mu2_ i j 1%g = mu2_ i k 1%g` is an explicit hypothesis of
+the Coq lemma, discharged by its §13/§14 consumers from the concrete degree values), the
+residue-column difference `μ2_{ij} − μ2_{ik}` is supported in `A₀(S) = A(S) ∪ V^S`.
+
+This is the *engine* of the `(13.18)` support pin `tauS_mu_row0_diff_support` (at `i = 0`): once
+`hyp.mu` is grounded to the residue grid (`hyp.mu = residueS.mu2`, the b-side grid-property field
+of issues 9076/3002) *and* the pin signature carries the honest `(j : ℕ) ≠ 0` (the 9076 over-claim
+fix — the hypothesis shape here matches the consumer's `_hj` verbatim), the pin is this theorem
+after rewriting — with the degree hypothesis supplied, as in Coq, by the concrete §13 degree facts
+of the grounded grid.  Proven by instantiating the §6 certain-type support bound
+`certainType_diff_supp_subset_A0` at the type-`P₂` `Hypothesis46` `hyp46S` (whose support is the
+honest `A(S)`, so the conclusion is `A₀(S)`-membership definitionally). -/
+theorem Hypothesis.residueS_mu2_diff_support [Finite G] (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    [NeZero (Nat.card ↥(hyp.s06S hG).W1)] [NeZero (Nat.card ↥(hyp.s06S hG).W2)]
+    (i : Fin (Nat.card ↥(hyp.s06S hG).W1)) {j k : Fin (Nat.card ↥(hyp.s06S hG).W2)}
+    (hj0 : (j : ℕ) ≠ 0) (hk0 : (k : ℕ) ≠ 0)
+    (hdeg : ((hyp.residueS hG).mu2 i j
+            : OddOrder.RepresentationTheory.ClassFunction ↥hyp.S ℂ) 1
+          = ((hyp.residueS hG).mu2 i k
+            : OddOrder.RepresentationTheory.ClassFunction ↥hyp.S ℂ) 1) :
+    (((hyp.residueS hG).mu2 i j : OddOrder.RepresentationTheory.ClassFunction ↥hyp.S ℂ)
+        - ((hyp.residueS hG).mu2 i k
+            : OddOrder.RepresentationTheory.ClassFunction ↥hyp.S ℂ)).support
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set hyp.S hyp.Sdata) hyp.S := by
+  classical
+  -- `Prop`-side bridge: the §6 lemma searches for the `hyp46S`-form `NeZero` (data instances all
+  -- come from the scoped `FiniteInduce` constants, so they unify without bridging)
+  haveI : NeZero (Nat.card ↥(hyp.hyp46S hG).W1) :=
+    inferInstanceAs (NeZero (Nat.card ↥(hyp.s06S hG).W1))
+  -- nontrivial columns: the enumeration sends only `0` to the trivial character
+  have hχj : (hyp.s06S hG).charGroupW2Equiv j ≠ 1 := by
+    intro hc
+    have h0 : j = 0 := (hyp.s06S hG).charGroupW2Equiv.injective
+      (hc.trans (OddOrder.Peterfalvi.S06.Hypothesis.charGroupW2Equiv_zero
+        (h := hyp.s06S hG)).symm)
+    exact hj0 (by simp [h0])
+  have hχk : (hyp.s06S hG).charGroupW2Equiv k ≠ 1 := by
+    intro hc
+    have h0 : k = 0 := (hyp.s06S hG).charGroupW2Equiv.injective
+      (hc.trans (OddOrder.Peterfalvi.S06.Hypothesis.charGroupW2Equiv_zero
+        (h := hyp.s06S hG)).symm)
+    exact hk0 (by simp [h0])
+  intro z hz
+  rw [OddOrder.RepresentationTheory.ClassFunction.mem_support] at hz
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+  exact OddOrder.Peterfalvi.S06.certainType_diff_supp_subset_A0 (hyp.hyp46S hG)
+    hχj hχk i hdeg hz
+
 /-- **Prime-`TI` support pin** (Coq `prDade_sub_TIirr_on`, `PFsection4.v`): the `μ`-column
 difference `μ_{0j} − μ_{0,#1}` is supported inside `A₀(S) = A(S) ∪ V^S` — its support meets `S`
 only in `P^# ∪ V_S`, because the two prime-`TI` residues share the same `1_S`-part off `A₀(S)` and

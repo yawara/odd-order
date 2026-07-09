@@ -67,21 +67,17 @@ type-`P2` group `S`, with no `IsTypeP1` requirement.  The kernel-family subgroup
 (the whole `S'`); every residue `chi_ j` (`j ≠ 0`) is then non-trivial, which is all the downstream
 `(13.18)` facts (distinctness, difference support, `V`-value) use.
 
-The `↥S`- and `S'`-side `Fintype`/`Invertible`/`NeZero` data are taken as instance binders (the
-standard repo pattern for `↥S`-level character theory, cf. `mkSection11CharacterDataS_honest`);
-every one holds unconditionally for the finite group `↥S` and its subgroups, and callers discharge
-them by `Fintype.ofFinite`/`invertibleOfNonzero`/`Nat.card_pos.ne'`. -/
+The `Fintype`/`Invertible` data instances come uniformly from the scoped `FiniteInduce`
+instances (`finiteSubFintype`/`natCardInvC`) — *not* from binders — so that every consumer sees
+the *same* instance terms and the `mu2`-projection stays cheaply definitionally comparable
+(instance-argument mismatches otherwise break `columnFamily`-level unification).  Only the
+`Prop`-valued `NeZero` side conditions remain binders (proof-irrelevant, so harmless). -/
 noncomputable def Hypothesis.residueS [Finite G] (hyp : Hypothesis (G := G))
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    [Fintype ↥hyp.S] [Invertible (Nat.card ↥hyp.S : ℂ)]
-    [Fintype ↥(hyp.s06S hG).K] [Invertible (Nat.card ↥(hyp.s06S hG).K : ℂ)]
     [NeZero (Nat.card ↥(hyp.s06S hG).W1)] [NeZero (Nat.card ↥(hyp.s06S hG).W2)] :
     PrimeTIResidueData ↥hyp.S (hyp.s06S hG).K
-      (Nat.card ↥(hyp.s06S hG).W1) (Nat.card ↥(hyp.s06S hG).W2) := by
-  haveI : Fintype ↥((hyp.s06S hG).W1 ⊔ (hyp.s06S hG).W2) := Fintype.ofFinite _
-  haveI : Invertible (Nat.card ↥((hyp.s06S hG).W1 ⊔ (hyp.s06S hG).W2) : ℂ) :=
-    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  exact PrimeTIResidueData.ofS06Hypothesis (hyp.s06S hG) ⊤ le_top
+      (Nat.card ↥(hyp.s06S hG).W1) (Nat.card ↥(hyp.s06S hG).W2) :=
+  PrimeTIResidueData.ofS06Hypothesis (hyp.s06S hG) ⊤ le_top
 
 /-! ## Support-set relation: honest `A(S)` `⊆` the deprecated `typePA` over-claim (issue 9008)
 
