@@ -290,6 +290,13 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > ファイル名 (S13_*) と namespace (S15) の不一致 — 内容が S15 ゆえ将来 `S15_PrimeTIResidueBridge.lean` への
 > rename が自然 (b の裁量、非緊急・非 blocking)。詳細 = issues/9014・9076。
 >
+> **carve-out 拡張 (issue 9014, hub 裁定 2026-07-09 監視 tick — merge dd18fdc5)**: 上記 b 所有の
+> `S13_PrimeTIResidueBridge.lean` のうち **`Hypothesis.residueS` 周辺 (c の (13.18) engine が consume する
+> S-side bridge 宣言) は lane c も編集可** (retroactive 保全、9076 4c-3 と同型)。実例 = c の instance-plumbing
+> refactor (binder → scoped FiniteInduce 統一、whnf timeout 解消、consumer 0・数学的内容不変)。b の
+> (13.18) μ-carrier honest source 側 (`Hypothesis.s06S` 等) は従来どおり b 専有。b は main sync で
+> 本 refactor を取り込み、binder 供給へ再変更しない。詳細 = issues/9014 「HUB carve-out 追記 2026-07-09」節。
+>
 > **⟹ 拡張 #2 (ユーザー裁定 2026-07-05 tick(3) — Hypothesis76 (7.6) 忠実化 field の包括許可)**:
 > 同型逸脱 3 連発 (issue 0091 Hypothesis78 / zeta_induced / zeta_injective、各回ユーザー受理) の
 > 反復解消として、**issue 2034/3002 の (13.5) 供給作業中に限り、b による `S09_NonexistenceCertain`
