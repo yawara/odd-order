@@ -37,3 +37,7 @@ full build green + AxiomsCheck OK。
 - 分割 owner = hub (merge_monitor.md step 4)
 - 同型の既存 split issue: 0068-0079, 0084, 0085, 0094, 0095 (Pf/BG frontier 側)
 - 直近追記 commit: 2826cac1 (Merge 'd', 9061-9067)
+
+## 完了 (2026-07-09)
+
+Main.lean を dir 化分割 (commit 57309d7f)。CommutatorBasics/ThreeSubgroupsCoprime/BaerTrick/ChainNilpotent の 4 leaves。
