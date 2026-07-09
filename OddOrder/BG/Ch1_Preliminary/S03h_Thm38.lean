@@ -686,7 +686,7 @@ theorem centralizer_subgroupOf {G : Type*} [Group G] {S : Subgroup G} (T : Set �
   rw [Subgroup.mem_centralizer_iff, Subgroup.mem_subgroupOf, Subgroup.mem_centralizer_iff]
   constructor
   · rintro hs g ⟨t, ht, rfl⟩
-    simpa only [map_mul] using congrArg (S.subtype) (hs t ht)
+    simpa only [map_mul, Subgroup.subtype_apply] using congrArg (S.subtype) (hs t ht)
   · intro hs t ht
     apply Subtype.ext
     rw [Subgroup.coe_mul, Subgroup.coe_mul]

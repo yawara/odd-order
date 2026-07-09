@@ -1929,7 +1929,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
           rw [Subgroup.mem_normalizer_iff] at hxn
           have h2 : x * q * x⁻¹ ∈ OpG := (hxn q).mp (hPG_le_OpG hq)
           have heq : ⁅x, q⁆ = (x * q * x⁻¹) * q⁻¹ := by
-            rw [commutatorElement_def]; group
+            rw [commutatorElement_def]
           rw [heq]
           exact OpG.mul_mem h2 (OpG.inv_mem (hPG_le_OpG hq))
       have hXp' : ¬ p ∣ Nat.card ↥X := by

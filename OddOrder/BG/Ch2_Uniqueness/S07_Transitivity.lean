@@ -2829,7 +2829,6 @@ private theorem le_of_centralizer_inf_le_of_commutator_le {G : Type*} [Group G] 
         = (a : G) * (g : G) * (a : G)⁻¹ * (g : G)⁻¹ := by
       rw [Subgroup.coe_mul, Subgroup.coe_inv, Ch03.IsAInvariant.restrict_apply_val]
       simp only [conjAction, MonoidHom.comp_apply, Subgroup.coe_subtype, MulAut.conj_apply]
-      group
     rw [hgen]
     exact hcomm (Subgroup.commutator_mem_commutator a.2 g.2)
 

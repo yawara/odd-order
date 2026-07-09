@@ -3888,7 +3888,7 @@ theorem six_three_index_bound (hyp : SibleyDadeHypothesis G L H)
     Nat.le_of_dvd Nat.card_pos (Subgroup.index_dvd_of_le (Subgroup.subgroupOf_mono H hAH₁))
   refine six_three_HH1_le (LK := H.index) (KH := 1) (HA := Nat.card (↥H ⧸ A.subgroupOf H))
     (HH1 := Nat.card (↥H ⧸ H₁.subgroupOf H)) (by norm_num) hHH1le ?_
-  simpa using hsixtwo
+  simpa [Subgroup.index_eq_card] using hsixtwo
 
 /-- **`hAcomm` from nilpotency of `H`.**
 
