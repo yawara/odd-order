@@ -351,6 +351,11 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
    - **コンフリクト時**:
      - `AxiomsCheck.lean` / `OddOrder.lean` の**独立追記衝突** = 両ブロック保持で解決して続行
        （A=keystone 系の `#assert_only_allowed_axioms`、B=Peterfalvi 系の同コマンドは別定理ゆえ両方有効）
+     - **`issues/**`・`notes/**` (.md) の独立追記衝突も同様に両ブロック保持で続行** (hub 裁定
+       2026-07-10 tick で明文化: hub の裁定追記と lane の進捗追記が同一 issue 末尾に付く型は
+       AxiomsCheck 独立追記と同じ良性クラス、build 影響なし。実例 = issues/2038 の
+       carve-out 記録 vs whnf-wall 診断、merge 68dd36ca)。**同一行・同一節をどちらも書き換える
+       絡み衝突は従来どおり abort+報告**
      - それ以外・内容が絡む衝突 = `git merge --abort` で**報告**（自動解決しない）
    - **staged が全て `notes/` 配下なら build 省略**(Lean 不変ゆえ結果不変)し直接 commit へ。
    - **`.lean` を含む場合 — sorry 先行チェックで build 短絡**: build は重い (~3800 jobs) ので**先に**
