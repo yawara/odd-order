@@ -174,3 +174,23 @@ landing 検知 → 一気に close)。これは 2026-07-06 の DORMANT とは**�
 
 **hub 側フォロー**: a の 9000 / b の (13.4) landing を合流 tick で監視し、landing した tick で 9077 に「c 再 engage 可」を
 追記 (c の self-resume が検知するが hub も明示 flag)。正本 = merge_monitor 🧭 + 本 RULING #2。
+
+## 🔧 2026-07-09 lane-c (再開 session): RULING #2 の「infra 完備」を実体化 — pin 2/3 close engine 構築
+
+ユーザー再開指示 → gate 全数再検証 (14 sorry 全て a/b gate 継続、RULING #2 hold 前提は有効) の上で、
+RULING #2 が「landing 発火で一気に close (infra 完備)」とした前提を精査 → **pin 2/3 の
+「grounding 仮説 → S06 定理で close」engine が未構築**と判明 (gated-endpoint skeleton の
+最終部品)。c-buildable / non-dup (b の field 供給と直交) ゆえ即構築:
+
+- `426c3ae1` — **Engine A `residueS_mu2_diff_support`**: Coq `prDade_sub_TIirr_on` の S-side
+  instance (仮定形も Coq 忠実: `(j:ℕ)≠0`/`(k:ℕ)≠0`/度数一致)。pin 2 は grounding + j≠0 fix
+  landing 時に one-line cite 化。+ refactor: `residueS` の data instance を scoped FiniteInduce
+  供給に統一 (instance 項不一致による columnFamily-level defeq 破壊 = whnf timeout を根治)。
+- `4cff46ce` — **Engine C `residueS_mu2_diff_dade_apply_of_mem_V`**: regular set 上の
+  `τ_S(μ2-diff)(v) = δ·(ω^σ-diff)(v)` (Coq prTIirr_id 系)。Dade 側は
+  `dadeIntegralCharacterMap_apply_of_support` + Engine A の support で完全 discharge。
+  pin 3 の残 gap = **grid grounding のみ** (`hyp.mu = residueS.mu2` + η/ω^σ 同定) に精密化。
+
+**close 態勢 (b の grounding field landing 時)**: pin 1 = `mu2_orthonormal` transport 一行 /
+pin 2 = Engine A cite (度数は §13 具体値で discharge) / pin 3 = Engine C + η-grounding。
+full build green 4128 jobs、AxiomsCheck OK、新 axiom 無し。
