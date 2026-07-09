@@ -27,3 +27,10 @@ frozen 境界で prefix-split し、各 leaf <1500 行 (or active leaf のみ fr
 - 行数 refresh: `S16_MainResults.lean` = **6007 行** (2026-07-02)。
 - 優先度 = hygiene-only (BG 凍結クラスタの粒度整理)。実施 owner = hub (prefix-split)。
 - (冒頭の空 scaffold template block は本レビューで除去済。)
+
+## 完了 (2026-07-09)
+
+dir 化分割を実施 (issue 0103 方式、lean_split.py による機械分割 + 宣言/namespace 文脈/sorry 保存検証 + full build green):
+  - TaxonomyOutput.lean (1505 行)
+  - TheoremsAE.lean (2209 行)
+  - TypeBridges.lean (3088 行)
