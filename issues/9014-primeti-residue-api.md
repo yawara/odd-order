@@ -632,3 +632,11 @@ this shared foundation claim. Move to `issues/closed/`.
 **§5/§8/§10 downstream coherence upgrade** (`uniform_prTIred_coherent` / `FTtypeP_coherent_TIred`、posited
 `primeTIred` 上に signature-contract で build、(10.7) `typeII_derived_frobenius` feeder = lane-a §10 path)
 が未 build ゆえのみ。**新規レーンを本 issue に張り付けない** (9000 型の a-vs-d 重複衝突を招く)。
+
+## ⚖️ HUB carve-out 追記 (2026-07-09 監視 tick — merge dd18fdc5)
+
+**lane c の `S13_PrimeTIResidueBridge.lean` 編集 (426c3ae1) を retroactive carve-out で保全** (軌道修正保全、9076 piece 4c-3 先例と同型)。本 file は 2026-07-08 carve-out で **b 所有**だが、c の編集を hub 検証のうえ受理:
+
+- **内容**: `Hypothesis.residueS` の data instance binder (`[Fintype ↥hyp.S]` / `[Invertible …]` ×4) を scoped `FiniteInduce` 供給 (`finiteSubFintype`/`natCardInvC`) に統一 + 内部 `haveI` 除去。Prop-valued `NeZero` binder のみ維持。動機 = instance 項不一致が `columnFamily` level の defeq unification を破壊し whnf timeout (200k heartbeats 超) — [[lean-instance-defeq-traps]] の既知イディオム準拠の修正。
+- **hub 検証**: (i) `residueS` の consumer = repo 全体で S13_PrimeTIResidueBridge + S15_HonestTypeP2A0 (c 所有) のみ = **blast radius 0**; (ii) `git diff main...b` に本 file なし = b の並行編集なし; (iii) 数学的内容 (ofS06Hypothesis 構成) 不変の instance plumbing で「signature 無断改変」STOP の対象 (contract 破壊) に非該当; (iv) merge gates 通過 (sorry 増減なし・新 axiom なし)。
+- **⟹ 恒久ルール**: c が本 file の **`Hypothesis.residueS` 周辺 (c の (13.18) engine が consume する S-side bridge 宣言)** を編集しても逸脱でない。b の (13.18) μ-carrier honest source 側 (`Hypothesis.s06S` 等) は従来どおり b。b は次回 main sync で本 refactor を取り込むこと (binder 供給の再変更をしない)。
