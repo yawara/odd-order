@@ -455,7 +455,7 @@ private theorem isMinimalNormal_le_normalizer_aux :
               rw [Subgroup.mem_subgroupOf] at h2
               -- h2 : ((⟨g', _⟩ * ⟨s, _⟩ * ⟨g', _⟩⁻¹ : N) : G) ∈ S
               -- coerce: (⟨a, _⟩ * ⟨b, _⟩ : N : G) = a * b in G.
-              convert h2 using 1
+              simpa using h2
             · intro hgsg
               have hgsg_N : g' * s * g'⁻¹ ∈ N := hNnorm.conj_mem s hsN g'
               have h1 : (⟨g' * s * g'⁻¹, hgsg_N⟩ : N) ∈ S.subgroupOf N := by
@@ -1504,7 +1504,6 @@ private theorem subset_fitting_aux : ∀ n : ℕ,
       rw [hs1, hs2] at habelian
       -- conjugate both sides by g to cancel.
       have := congrArg (fun z => g * z * g⁻¹) habelian
-      simp only at this
       calc b₁ * b₂ = g * (g⁻¹ * (b₁ * b₂) * g) * g⁻¹ := by group
         _ = g * (g⁻¹ * (b₂ * b₁) * g) * g⁻¹ := this
         _ = b₂ * b₁ := by group
@@ -3399,7 +3398,6 @@ private lemma conj_smul_abelian {G : Type*} [Group G] {B : Subgroup G}
   have hs2 : (g⁻¹ * b₂ * g) * (g⁻¹ * b₁ * g) = g⁻¹ * (b₂ * b₁) * g := by group
   rw [hs1, hs2] at habelian
   have hconj := congrArg (fun z => g * z * g⁻¹) habelian
-  simp only at hconj
   calc b₁ * b₂ = g * (g⁻¹ * (b₁ * b₂) * g) * g⁻¹ := by group
     _ = g * (g⁻¹ * (b₂ * b₁) * g) * g⁻¹ := hconj
     _ = b₂ * b₁ := by group

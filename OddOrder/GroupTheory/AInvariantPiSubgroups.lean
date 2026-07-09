@@ -148,7 +148,8 @@ theorem mem_normalizer_of_conj_smul_eq_self {Q : Subgroup G} {a : G}
     rw [← h, Subgroup.pointwise_smul_def, Subgroup.mem_map] at hy
     obtain ⟨z, hz, hz_eq⟩ := hy
     have h1 : a * z * a⁻¹ = a * y * a⁻¹ := by
-      simpa only [MulAut.conj_apply] using hz_eq
+      simpa only [MulDistribMulAction.toMonoidEnd_apply, MulDistribMulAction.toMonoidHom_apply,
+        MulAut.smul_def, MulAut.conj_apply] using hz_eq
     have hzy : z = y := mul_left_cancel (mul_right_cancel h1)
     exact hzy ▸ hz
 

@@ -94,7 +94,8 @@ theorem of_card_prime_sq_of_not_isCyclic
   letI : Fact p.Prime := ⟨hp⟩
   have hExp : Monoid.exponent G = p :=
     (not_isCyclic_iff_exponent_eq_prime hp hCard).mp hNotCyclic
-  refine ⟨IsPGroup.commutative_of_card_eq_prime_sq (p := p) hCard, ?_⟩
+  refine ⟨isMulCommutative_iff.mp
+    (IsPGroup.isMulCommutative_of_card_eq_prime_sq (p := p) hCard), ?_⟩
   intro x
   simpa [hExp] using (Monoid.pow_exponent_eq_one x)
 
@@ -478,12 +479,12 @@ theorem exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_ne
       have hx_mem : (x : G) ∈ (Z : Set G) * (U : Set G) := by
         rw [← hE_set]
         exact x.2
-      simpa only [Set.mem_mul] using hx_mem
+      simpa only [Set.mem_mul, SetLike.mem_coe] using hx_mem
     obtain ⟨zy, hzy, uy, huy, hy_prod⟩ : ∃ zy ∈ Z, ∃ uy ∈ U, zy * uy = (y : G) := by
       have hy_mem : (y : G) ∈ (Z : Set G) * (U : Set G) := by
         rw [← hE_set]
         exact y.2
-      simpa only [Set.mem_mul] using hy_mem
+      simpa only [Set.mem_mul, SetLike.mem_coe] using hy_mem
     apply Subtype.ext
     change (x : G) * (y : G) = (y : G) * (x : G)
     rw [← hx_prod, ← hy_prod]
@@ -502,7 +503,7 @@ theorem exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_ne
       have hx_mem : (x : G) ∈ (Z : Set G) * (U : Set G) := by
         rw [← hE_set]
         exact x.2
-      simpa only [Set.mem_mul] using hx_mem
+      simpa only [Set.mem_mul, SetLike.mem_coe] using hx_mem
     apply Subtype.ext
     change ((x : G) ^ p) = 1
     rw [← hx_prod]

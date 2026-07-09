@@ -62,9 +62,9 @@ theorem exists_central_scalar (ρ : Representation ℂ G V) [IsIrreducible ρ]
       (ρ := ρ)).2 (IntertwiningMap.centralMul ρ g hgc)
   refine ⟨c, ?_⟩
   have hlin := congrArg IntertwiningMap.toLinearMap hc
-  rw [IntertwiningMap.algebraMap_apply] at hlin
-  simpa [IntertwiningMap.centralMul, IntertwiningMap.toLinearMap_smul,
-    IntertwiningMap.toLinearMap_id] using hlin.symm
+  rw [IntertwiningMap.algebraMap_apply, IntertwiningMap.toLinearMap_smul,
+    show (1 : IntertwiningMap ρ ρ).toLinearMap = LinearMap.id from rfl] at hlin
+  exact hlin.symm
 
 /-- For a central element `z`, the product `χ(z)·χ(z⁻¹)` equals `χ(1)² = (finrank ℂ V)²`.
 
