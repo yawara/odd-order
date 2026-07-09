@@ -980,16 +980,51 @@ theorem classFunction_sum_apply {ι : Type*} {k : Type*} [CommRing k]
       rw [Finset.sum_insert ha, ClassFunction.add_apply, ih, Finset.sum_insert ha]
 
 /-- **Peterfalvi (14.6)+(13.12), the S-side Frobenius kernel** — `C_{S'}(x) ≤ P` for
-`x ∈ P#`.  (14.6) puts `S` in case (9.7.b), whose field model (`FieldNormalizerData`) has
-Frobenius kernel `P`; the proven transport `FieldNormalizerData.derived_inf_centralizer_le_P`
-then gives the containment.  Named §14 obligation: what remains is the (9.7.b) resolution
-for `S` — the (14.2.a)-carrier inputs of `field_normalizer_of_U_characteristic_of_inputs`
-(§13 producers `basic_structure`/`c_eq_one`, issue 2035/9000 sphere). -/
+`x ∈ P#`.  Follows Coq `PFsection14.v:111-141` *exactly*: the (9.7.b) resolution for `S`
+(`typeP_Galois S`, via `typeP_Galois_P` and the §13 (13.12) structure) makes
+`S' = P ⋊ U` a **Frobenius group with kernel `P`** (Coq `frobPU`), and the containment is
+the standard Frobenius kernel-centralizer property `Frobenius_cent1_ker` — here the proven
+Isaacs Thm 6.4 transport `IsFrobeniusGroup.centralizer_kernel_le`.
+
+The **single remaining `sorry` is exactly Coq's `frobPU`** — gated on the `typeP_Galois S`
+char body (the (9.7.b) resolution, issue 9000 / lane a, threading through the §13 producers
+of issue 2035); everything else (the `↥S'`-coordinate transport) is proven below.  (The
+alternative route through the (14.2) field model `FieldNormalizerData` is *not* available
+here: `field_normalizer_structure` sits downstream of `exists_MHypothesis`, which consumes
+(14.11.3) and hence this very lemma — a genuine circularity, so the (13.12)-Frobenius gate
+is the honest isolation.) -/
 theorem s_side_frobenius_kernel [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     ∀ x ∈ sharpSubgroup hyp.base.P,
       derivedInG hyp.base.S ⊓ Subgroup.centralizer ({x} : Set G) ≤ hyp.base.P := by
-  sorry
+  intro x hx
+  rw [sharpSubgroup, Set.mem_sdiff_singleton] at hx
+  obtain ⟨hxP, hx1⟩ := hx
+  -- ⚠ the crisp gate (Coq `frobPU`): `S' = P ⋊ U` is Frobenius with kernel `P`, from
+  -- `typeP_Galois S` (`typeP_Galois_P`; PFsection14.v:111-124).  Issue 9000 / lane a.
+  have frobPU : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(derivedInG hyp.base.S)
+      (hyp.base.P.subgroupOf (derivedInG hyp.base.S))
+      (hyp.base.U.subgroupOf (derivedInG hyp.base.S)) := sorry
+  -- `P ≤ S'` (carrier: `S' = P ⊔ U`)
+  have hP_le : hyp.base.P ≤ derivedInG hyp.base.S := by
+    rw [hyp.base.S_deriv_eq_PU]; exact le_sup_left
+  -- transport the Isaacs 6.4 kernel-centralizer containment from `↥S'`-coordinates
+  intro g hg
+  rw [Subgroup.mem_inf] at hg
+  obtain ⟨hgS', hgC⟩ := hg
+  have hkey := frobPU.centralizer_kernel_le
+    (⟨x, hP_le hxP⟩ : ↥(derivedInG hyp.base.S)) (Subgroup.mem_subgroupOf.mpr hxP)
+    (fun hc => hx1 (by simpa using congrArg Subtype.val hc))
+  have hgP : (⟨g, hgS'⟩ : ↥(derivedInG hyp.base.S))
+      ∈ hyp.base.P.subgroupOf (derivedInG hyp.base.S) := by
+    apply hkey
+    rw [Subgroup.mem_centralizer_singleton_iff]
+    have hcomm : g * x = x * g := by
+      have := Subgroup.mem_centralizer_iff.mp hgC x rfl
+      -- `mem_centralizer_iff` gives `∀ h ∈ {x}, h * g = g * h`; normalize orientation
+      exact this.symm
+    exact Subtype.ext (by simpa using hcomm)
+  exact Subgroup.mem_subgroupOf.mp hgP
 
 /-- **Gated `(9.7.b)` T-side field model** (issue 9078 / 9000 sphere): the T-side field-algebra
 package assembled into a `TFieldModelData hyp.base` via the proven producer `tFieldModelData_of_repr`

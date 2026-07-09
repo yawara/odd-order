@@ -454,3 +454,18 @@ structural 部 (tic = typePData_toTICyclicHypothesis, tic_W1/W2/V reconciliation
 は type-uniform に自動構成、type-P2 固有部 (A=honestTypeP2ASet, dade/dade0=lane-c Dades, subH=M_σ,
 A_covers) は param。lane-c が dadeHypS0 で instantiate → pins 2/3 + 型-P2 coherence を unblock。
 これが char-endgame の最高 leverage。§12 `toHypothesis46` (:1088) が type-P1 template。
+
+## ✅ 2026-07-09 lane-c: pin 2/3 close engine 構築 (426c3ae1 / 4cff46ce)
+
+pin 2 (`tauS_mu_row0_diff_support`) と pin 3 (`tauS_mu_row0_vanish_on_V`) の close engine を
+S15_HonestTypeP2A0 に実証明で追加 — **b の grounding field (`hyp.mu = residueS.mu2`) landing 時、
+pins は one-line cite で閉じる態勢が完成**:
+
+- **Engine A `residueS_mu2_diff_support`**: Coq `prDade_sub_TIirr_on` S-instance。仮定形は
+  consumer `tauS_mu_row0_cross` の `_hj : (j:ℕ)≠0` と verbatim 一致 (pin-2 j≠0 fix と噛み合う)。
+  度数一致仮定は Coq 忠実 (close 時に §13 具体度数で discharge)。
+- **Engine C `residueS_mu2_diff_dade_apply_of_mem_V`**: regular set 上 τ_S(μ2-diff) = δ·(ω^σ-diff)。
+  pin 3 の残 gap = grounding + η/ω^σ-grid 同定 ((3.5)/(13.1.d) spine 対応) のみに精密化。
+- 副産物 refactor: `residueS` の data instance を scoped FiniteInduce に統一 (cross-form defeq
+  の whnf timeout 根治)。**b への注意**: grounding field を S15.Hypothesis に足す際、residue 側
+  instance は scoped FiniteInduce 形が canonical (letI 独自導出だと defeq が重くなる)。

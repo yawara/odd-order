@@ -215,3 +215,49 @@ export してくれれば lane-c が cite で §16 を実証明で積める (sig
 より強く、`p ∣ (|V|−1)` を要する任意の exact ℚ cast に使える。(b) `T_typeIII_calT1_family` (:677) の
 5th conjunct (count) 内に `hinertia`(:811)/`hconj`(G-conj, :821)/`hcard`(:845) が local に proven。
 ⟹ v=|V| が ungate される (= `V_inf_centralizer_Q_eq_bot` が実証明化 = 別レーン/9072 T-side d=1) まで 14.9 は保留。
+
+
+## 2026-07-09 lane-c (再開): pin 2/3 の close engine 構築完了 — pins は「grounding のみ待ち」に精密化
+
+RULING #2 (9077) の「landing 発火で一気に close (infra 完備)」の前提を実査 → **pin 2/3 の
+「grounding 仮説 → S06 定理で close」engine が未構築**だったため構築 (c-buildable / non-dup):
+
+- `426c3ae1` **Engine A `Hypothesis.residueS_mu2_diff_support`** (S15_HonestTypeP2A0): Coq
+  `prDade_sub_TIirr_on` (PFsection4.v:838) の S-side instance。**Coq 原典と同一の仮定形**
+  (`(j:ℕ)≠0` / `(k:ℕ)≠0` / 度数一致 — Coq 自身が度数一致を明示仮定に取る) で、
+  `μ2_{ij} − μ2_{ik}` の support ⊆ `A₀(S)` を `certainType_diff_supp_subset_A0` の hyp46S
+  instantiation で実証明。付随 refactor: `residueS` (S13_PrimeTIResidueBridge) の data instance
+  を scoped `FiniteInduce` 供給に統一 (instance 項不一致 → columnFamily-level defeq 破壊
+  → whnf timeout、の根治。教訓: instance-dependent な def の cross-form cite は
+  **両側を同一 scoped 定数に統一**するのが正解、letI 再現より強い)。
+- `4cff46ce` **Engine C `Hypothesis.residueS_mu2_diff_dade_apply_of_mem_V`**: regular set
+  `V_S = W∖(W₁∪W₂)` 上の `τ_S(μ2-diff)(v) = δ·(ω^σ-diff)(v)` (Coq prTIirr_id 系)。Dade 側は
+  `dadeIntegralCharacterMap_apply_of_support` + Engine A の support で完全 discharge。
+
+**pins の close 残 (b-side grounding landing 時)**: pin 1 = `mu2_orthonormal` transport 1 行 /
+pin 2 = Engine A cite (+9076 の j≠0 signature fix、度数は §13 具体値) / pin 3 = Engine C +
+**η/ω^σ-grid 同定** (`η_{ij} = δ·ω^σ_{ij}` on regular、(3.5)/(13.1.d) spine 対応 — grounding
+package の一部として b/spine 側)。
+
+**s_side_frobenius_kernel (SubgroupM:992) の追加調査**: `field_normalizer_structure` (14.2、
+proven dispatch) の cite は**真の循環で不可** (s_side → (14.11.3) → exists_MHypothesis →
+field_normalizer_structure)。honest 分解 = (14.6)-時点の §13 供給 (u-value = b の
+`caseB_order_u` 等) で `field_normalizer_of_U_characteristic_of_inputs` (proven engine) を
+直接呼ぶ形 — 構造 inputs (`W2_le_P`/`Q_elemAb`) は `S_field_model_structural_inputs` で
+**既に proven**。t_side 型の精密 existential 化は次 iteration 候補 (hcyc/(14.5)-y の
+(14.6)-context 供給可否の原文照合が要る)。
+
+### 追記 (同日): s_side_frobenius_kernel 分解完了 (`aa9695f2`) + 次 iteration 候補
+
+- **s_side_frobenius_kernel = crisp frobPU gate 化済**: 残 sorry は Coq `frobPU`
+  (`IsFrobeniusGroup ↥S' (P.subgroupOf S') (U.subgroupOf S')`) そのもの。真の gate =
+  typeP_Galois S (9000/lane-a、Coq `typeP_Galois_P` 経由) と code-level 確定。transport
+  (Isaacs 6.4 `centralizer_kernel_le` の座標搬送) は実証明済。field-model 経由の旧 framing は
+  真の循環 (field_normalizer_structure ← exists_MHypothesis ← (14.11.3) ← 本 lemma) で不可。
+- **次 iteration 候補 (engine-prep 系の残り)**: `exists_MHypothesis` betaGrid (ComparingLM:~1368)
+  の M-side grid-coefficient carrier mirror。L-side 機構 (`lSideGridCoeffData` +
+  `lSide_delta_grid_expansion`、±1 rigidity assembly) の `hq3/hp5` binder は **body 未使用の
+  vestigial** ゆえ一般 q,p で M に mirror 可能。ただし M-side は `TypeICoherent78Data` package
+  でなく `exists_M_hypothesis78` の直接 h78 を持つ → **L-machinery の dataL → h78 一般化 or
+  M-data の TypeICoherent78Data 再 packaging** の設計判断が要る (中規模)。gated 3-field
+  (parity ×2 + Y=0 membership) は L-side と同一の b-layer。
