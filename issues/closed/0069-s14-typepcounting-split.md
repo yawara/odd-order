@@ -55,3 +55,12 @@ created: 2026-06-15
 - 行数 refresh: `S14_TypePCounting.lean` = **12098 行** (2026-07-02)。
 - 優先度 = **hygiene-only** (BG 凍結クラスタの粒度整理であり FT 経路の実質的証明では
   ない)。hub batch の余力枠で実施。
+
+## 完了 (2026-07-09)
+
+dir 化分割を実施 (issue 0103 方式、lean_split.py による機械分割 + 宣言/namespace 文脈/sorry 保存検証 + full build green):
+  - Basics.lean (1657 行)
+  - GlobalCounting.lean (2052 行)
+  - LocalStructure.lean (2197 行)
+  - SigmaLengthOne.lean (2403 行)
+  - TypePDuality.lean (4073 行)
