@@ -576,14 +576,14 @@ theorem pComplementCore_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
         = _root_.commutator ↥hyp.pComplementCore :=
       OddOrder.Peterfalvi.S08.commutator_subgroupOf_self hyp.pComplementCore
     rw [← h1, ← hCCeq, Subgroup.subgroupOf_self]
-  have hlcs : ∀ n, lowerCentralSeries ↥hyp.pComplementCore n = ⊤ := by
+  have hlcs : ∀ n, (⊤ : Subgroup ↥hyp.pComplementCore).lowerCentralSeries n = ⊤ := by
     intro n
     induction n with
     | zero => rfl
     | succ n ih =>
-        rw [lowerCentralSeries_succ, ih]
+        rw [Subgroup.lowerCentralSeries_succ, ih]
         exact hcommtop
-  obtain ⟨n, hn⟩ := nilpotent_iff_lowerCentralSeries.mp hAnil
+  obtain ⟨n, hn⟩ := Subgroup.nilpotent_iff_lowerCentralSeries.mp hAnil
   have hbot_top : (⊥ : Subgroup ↥hyp.pComplementCore) = ⊤ := by rw [← hn, hlcs n]
   rw [eq_bot_iff]
   intro x hx

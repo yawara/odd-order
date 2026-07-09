@@ -1259,7 +1259,6 @@ theorem q_dvd_secondDerived_relIndex_HC_sub_one [Finite G]
       have h1 := hsmul a x
       rw [hax] at h1
       have h2 := congrArg (fun m : ↥M => (m : G)) h1
-      simp only at h2
       have h3 : ((x : ↥M) : G) = ((a : ↥M) : G) * ((x : ↥M) : G) * ((a : ↥M) : G)⁻¹ := h2
       calc ((a : ↥M) : G) * ((x : ↥M) : G)
           = (((a : ↥M) : G) * ((x : ↥M) : G) * ((a : ↥M) : G)⁻¹) * ((a : ↥M) : G) := by group

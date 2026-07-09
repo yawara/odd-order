@@ -1766,7 +1766,6 @@ theorem columnFamily_mu_zero_apply_one_pow {L : Type*} [Group L] [Fintype L]
   rw [e43 (χ₂ ^ k), e43 χ₂] at hu
   -- `hu : δ' • μ'_0 = (δ • μ_0)^u`; evaluate at `1`
   have h1 := congrArg (fun f : ClassFunction L ℂ => (f : L → ℂ) (1 : L)) hu
-  simp only at h1
   obtain ⟨d, hd_pos, hd⟩ :=
     irreducibleCharacter_apply_one_eq_pos_natCast ((h.columnFamily χ₂).mu 0)
   obtain ⟨d', hd'_pos, hd'⟩ :=
@@ -1819,7 +1818,6 @@ theorem columnFamily_mu_zero_sign_pow {L : Type*} [Group L] [Fintype L]
     exact hψ
   rw [e43 (χ₂ ^ k), e43 χ₂] at hu
   have h1 := congrArg (fun f : ClassFunction L ℂ => (f : L → ℂ) (1 : L)) hu
-  simp only at h1
   obtain ⟨d, hd_pos, hd⟩ :=
     irreducibleCharacter_apply_one_eq_pos_natCast ((h.columnFamily χ₂).mu 0)
   obtain ⟨d', hd'_pos, hd'⟩ :=

@@ -3669,6 +3669,7 @@ theorem exists_supIndep_aInvariant_family_of_iSup {K : Type*} [Group K] [Finite 
     ∃ t : Finset ι, t.SupIndep S ∧ (∀ i ∈ t, S i ≠ ⊥) ∧ (⨆ i ∈ t, S i = ⊤) ∧
       Nat.card K = n ^ t.card := by
   classical
+  letI : Fintype ι := Fintype.ofFinite ι
   -- `K` is abelian, so its subgroup lattice is modular (used to enlarge `SupIndep` families).
   letI : CommGroup K := { (inferInstance : Group K) with mul_comm := fun a b => (hcomm a b).eq }
   -- Candidate finsets: `SupIndep` subfamilies of nonzero pieces.
@@ -4067,7 +4068,8 @@ theorem exists_addEquiv_asModule_fpf
     have h2 := asModuleEquiv_map_smul (ρ := elabRepresentation p φ)
       (MonoidAlgebra.of (ZMod p) A a) z
     rw [asAlgebraHom_of] at h2
-    simpa [Representation.asModuleEquiv] using h2
+    -- `asModuleEquiv` is `LinearEquiv.refl`, so both sides are definitionally unchanged.
+    exact h2
   -- Fixed-point-freeness in `𝔽ₚ[A]`-module terms.
   intro a ha
   apply hfpf a
@@ -13438,7 +13440,6 @@ theorem hcuPsiPair_injective_pair [Finite G] {M : Subgroup G}
     have := congrFun (congrArg (fun η : ClassFunction ↥(hInHu data ⊔ cuInHu caseA) ℂ =>
       (η : ↥(hInHu data ⊔ cuInHu caseA) → ℂ)) hcoe)
       (Subgroup.inclusion (le_sup_left : hInHu data ≤ hInHu data ⊔ cuInHu caseA) h)
-    simp only [] at this
     rw [h1, h2] at this
     simp only [ClassFunction.compHom_linearIrreducibleCharacter,
       linearIrreducibleCharacter_apply] at this
@@ -13452,7 +13453,6 @@ theorem hcuPsiPair_injective_pair [Finite G] {M : Subgroup G}
     have := congrFun (congrArg (fun η : ClassFunction ↥(hInHu data ⊔ cuInHu caseA) ℂ =>
       (η : ↥(hInHu data ⊔ cuInHu caseA) → ℂ)) hcoe)
       (Subgroup.inclusion (le_sup_right : cuInHu caseA ≤ hInHu data ⊔ cuInHu caseA) c)
-    simp only [] at this
     rw [h1, h2] at this
     exact Units.val_injective this
 

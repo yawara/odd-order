@@ -5731,7 +5731,6 @@ theorem Hypothesis.mu_apply_one_column_const [Finite G] (hyp : Hypothesis (G := 
   haveI := hyp.finiteG
   have hdef := hyp.mu_definition i j
   have h1 := congrArg (fun f : ClassFunction ↥hyp.S ℂ => f (1 : ↥hyp.S)) hdef
-  simp only at h1
   -- LHS(1) = 0
   rw [ClassFunction.induce_apply_one] at h1
   have homega0 : (ClassFunction.compHom
