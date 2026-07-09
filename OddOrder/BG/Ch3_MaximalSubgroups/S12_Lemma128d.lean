@@ -633,7 +633,7 @@ theorem central_line_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
             (h.E3_normal hG (h.E₂_le ha)) b).mp hb
           exact h3
         have h4 : ⁅a, b⁆ = (a * b * a⁻¹) * b⁻¹ := by
-          rw [commutatorElement_def]; group
+          rw [commutatorElement_def]
         rw [h4]
         exact E₃.mul_mem h2 (E₃.inv_mem hb)
     refine h1.trans (le_of_eq ?_)
