@@ -1209,7 +1209,7 @@ theorem eq_top_of_forall_sylow_le {Γ : Type*} [Group Γ] [Finite Γ] {K : Subgr
       have := Subgroup.card_dvd_of_le (h p (default : Sylow p Γ))
       rwa [Sylow.card_eq_multiplicity] at this
     exact (hp.pow_dvd_iff_le_factorization Nat.card_pos.ne').mp hdvd
-  · simp [Nat.factorization_eq_zero_of_non_prime _ hp]
+  · simp [Nat.factorization_eq_zero_of_not_prime _ hp]
 
 /-- In a finite **nilpotent** group `H`, a Sylow `p`-subgroup `P` (for a prime `p ∣ |H|`) has a
 **characteristic complement** `Q` — the `p`-complement `⨆_{q ≠ p} O_q(H)`.  Each `O_q = opCore q H`

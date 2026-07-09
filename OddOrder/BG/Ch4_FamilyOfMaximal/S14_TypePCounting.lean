@@ -11459,7 +11459,7 @@ theorem typeP2_neighbor_is_typeF_of_mem [Finite G] (hG : OddOrder.BG.IsMinimalSi
           have hmem : q ∈ (Nat.card ↥(R.subgroupOf U)).primeFactors :=
             Nat.mem_primeFactors.mpr ⟨hqp, hdvd, Nat.card_pos.ne'⟩
           exact (Set.mem_singleton_iff.mp (hR.1 q hmem)).symm
-        · exact Nat.factorization_eq_zero_of_non_prime _ hqp
+        · exact Nat.factorization_eq_zero_of_not_prime _ hqp
     have hfact : (Nat.card ↥U).factorization r
         = (Nat.card ↥(R.subgroupOf U)).factorization r := by
       have hidx : (R.subgroupOf U).index.factorization r = 0 :=
@@ -11508,7 +11508,7 @@ theorem typeP2_neighbor_is_typeF_of_mem [Finite G] (hG : OddOrder.BG.IsMinimalSi
           have hmem : q ∈ (Nat.card ↥(R.subgroupOf U)).primeFactors :=
             Nat.mem_primeFactors.mpr ⟨hqp, hSU ▸ hdvd, Nat.card_pos.ne'⟩
           exact (Set.mem_singleton_iff.mp (hR.1 q hmem)).symm
-        · exact Nat.factorization_eq_zero_of_non_prime _ hqp
+        · exact Nat.factorization_eq_zero_of_not_prime _ hqp
     -- `(|U|).factorization r = (|R|).factorization r` (`r ∤ [U : R]`).
     have hfUR : (Nat.card ↥U).factorization r = (Nat.card ↥R).factorization r := by
       have hidxU : (R.subgroupOf U).index.factorization r = 0 :=

@@ -133,7 +133,7 @@ theorem eq_of_le_of_forall_full_prime_pow [Finite G] {H C : Subgroup G} (hCH : C
       have hpow : q ^ (Nat.card ↥H).factorization q ∣ Nat.card ↥C :=
         hScard ▸ Subgroup.card_dvd_of_le hSC
       exact (Nat.Prime.pow_dvd_iff_le_factorization hq Nat.card_pos.ne').mp hpow
-    · rw [Nat.factorization_eq_zero_of_non_prime _ hq]; exact Nat.zero_le _
+    · rw [Nat.factorization_eq_zero_of_not_prime _ hq]; exact Nat.zero_le _
   have heq : Nat.card ↥C = Nat.card ↥H :=
     Nat.dvd_antisymm (Subgroup.card_dvd_of_le hCH) hdvd
   have hsub : C.subgroupOf H = ⊤ :=
