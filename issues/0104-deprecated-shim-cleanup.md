@@ -1,0 +1,32 @@
+---
+id: 104
+slug: deprecated-shim-cleanup
+title: "返り値型が変わった deprecated shim 4 種 (~111 sites) の置換"
+created: 2026-07-09
+---
+
+# 返り値型が変わった deprecated shim 4 種 (~111 sites) の置換
+
+## 背景
+
+mathlib v4.32 bump (branch mathlib-v432、notes/meta/mathlib_v432_migration.md) の deprecation
+sweep で、**同 signature リネームは全置換済** (commit 68359993)。返り値型が変わった deprecated
+shim は動作継続中のため据え置いた。次回 bump で削除される可能性があるので、それまでに置換する。
+
+## やること
+
+- [ ] `Subgroup.inf_eq_bot_of_coprime` (~68 sites) → `Subgroup.disjoint_of_coprime_natCard` + `.eq_bot` (H ⊓ K = ⊥ が要る site) / `Disjoint` のまま使える site は直接
+- [ ] `commutative_of_cyclic_center_quotient` (~24 sites) → `MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center` + `.is_comm.comm` (wave 修正済み site のパターン参照: git log -S)
+- [ ] `IsPGroup.commutative_of_card_eq_prime_sq` (~12 sites) → `isMulCommutative_of_card_eq_prime_sq` + `isMulCommutative_iff.mp` (wave2 ElementaryAbelian の置換例参照)
+- [ ] `Subgroup.normal_of_comm` (~7 sites) → `Subgroup.normal_of_isMulCommutative` (wave5 Ch04 の置換例参照)
+- [ ] 置換は形が site ごとに違うため機械置換不可 — file 単位で agent fan-out が適当
+- [ ] 残存 deprecation warning ゼロ化の確認 (full build log から grep)
+
+## 完了条件
+
+full build green + `has been deprecated` warning が repo 由来 0 件。
+
+## 参照
+
+- notes/meta/mathlib_v432_migration.md「deprecation sweep」節
+- 置換パターンの実例: bump waves の commits (git log --oneline main..mathlib-v432 相当領域)
