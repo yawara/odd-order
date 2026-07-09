@@ -779,9 +779,9 @@ private theorem step_caseA
       group
 
 omit [Finite G] in
-/-- Helper: a conjugate of a complement is a complement. The conjugating element lies in `G`,
-not necessarily in `N`. (Generalizes the inline proof in `step_caseA`.) -/
-private theorem isComplement'_conj {N K : Subgroup G} [N.Normal]
+/-- A conjugate of a complement is a complement. The conjugating element lies in `G`,
+not necessarily in `N`. (Also generalizes the inline proof in `step_caseA`.) -/
+theorem isComplement'_conj {N K : Subgroup G} [N.Normal]
     (hK : IsComplement' N K) (g : G) :
     IsComplement' N (K.map (MulAut.conj g).toMonoidHom) := by
   haveI hN_normal : N.Normal := inferInstance
