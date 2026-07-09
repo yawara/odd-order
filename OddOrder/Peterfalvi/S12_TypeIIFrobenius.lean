@@ -233,6 +233,202 @@ theorem typeII_centralizer_le_of_mem_centralizerSupport [Finite G]
     exact Subgroup.mem_centralizer_singleton_iff.mp hc
   rw [hcy]; exact hy
 
+open scoped Classical FiniteInduce in
+/-- The (8.16) Dade hypothesis has every signalizer `H(a) = ⊥` (by construction,
+`of_isTISubset`), so the kernel assignment is trivially `S`-conjugation invariant — the
+`hconj` input of the §4 full Dade isometry (2.6). -/
+theorem typeIIDadeHypothesis_hConjInvariant [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) :
+    (typeIIDadeHypothesis hG hSmax hSII).HConjInvariant :=
+  OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl)
+
+open scoped Classical FiniteInduce in
+/-- **The (10.7) `S`-side Dade base map `τ_S`**: the §4 Dade isometry of the (8.16) hypothesis
+`(A(S), S)`, lifted to a total `IntegralCharacterMap ↥S G`.  On `A(S)`-supported class
+functions it is the honest (2.5) Dade map (`S07.dadeIntegralCharacterMap_apply_of_support`);
+its (2.6.a) isometry and (2.6.b) `ℤ[Irr]`-preservation on the supported sublattice are supplied
+by the generic `S07.dadeIntegralCharacterMap_inner_eq_on_supported_span` /
+`S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported` at the hypothesis
+`typeIIDadeHypothesis hG hSmax hSII` with `hconj = typeIIDadeHypothesis_hConjInvariant …`.
+This is the map the (5.7) engine (`S07.uniform_degree_coherence_of_families`) runs over in the
+(10.7) left branch. -/
+noncomputable def typeIITau [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) :
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥S G :=
+  OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (typeIIDadeHypothesis hG hSmax hSII)
+    ((typeIIDadeHypothesis hG hSmax hSII).fullDadeIsometryData
+      (typeIIDadeHypothesis_hConjInvariant hG hSmax hSII))
+
+open OddOrder.Peterfalvi.S11 in
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (4.7)/(8.15), §9-family induced support, type-II instance**:
+`Supp (Ind_{HU}^S ξ) ⊆ A(S) ∪ {1}` for every `ξ ∈ 𝒳` (the (9.5) family, `H ⊄ Ker ξ`), with
+`A(S) = ⋃_{x∈S_σ^#} C_{S'}(x)^#` the honest (8.10) type-II support.
+
+Generic (`TypesIIIIIIVSetup`-level) mirror of the `S15.Hypothesis`-locked
+`sSet_member_support_subset_A` (whose proof this replays; the S15 instance is downstream of
+this file):
+
+* `support_induce_subset_conjugatesIntoSet`: a nonvanishing point of `Ind_{HU}^S ξ` is
+  `S`-conjugate to a nonvanishing point `w ∈ HU` of `ξ`;
+* the (1.2) core (`irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot`,
+  contrapositive) forces a nontrivial `d ∈ H` centralizing `w`; the chain
+  `H = S_F = S_σ` (`TypePData.H_eq` + `maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II`)
+  makes `d` an `S_σ^#`-witness, so `w ∈ A(S)` (`w ∈ HU = S'` by
+  `huSub_eq_derivedInG_subgroupOf`);
+* `A(S)` is `S`-conjugation invariant (`centralizerSupport_sharpMsigma_conj_mem`), so the
+  original point lies in `A(S) ∪ {1}` too. -/
+theorem typeII_sSet_member_support_subset [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S)
+    (data : TypesIIIIIIVSetup S)
+    {ξ : IrreducibleCharacter ↥(huSub data)} (hξ : ξ ∈ xiSet data) :
+    (induceHU data (ξ : ClassFunction ↥(huSub data) ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)) S ∪ {1} := by
+  classical
+  -- `H = S_F = S_σ` (type II).
+  have hHσ : data.H = Msigma S := by
+    show data.typeP.H = Msigma S
+    rw [data.typeP.H_eq]
+    exact OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II hG
+      hSmax (Or.inr hSII)
+  -- the (1.2) core: a nonvanishing `w ∈ HU` with `(w:S:G) ≠ 1` lies in `A(S)`.
+  have hcore : ∀ w : ↥(huSub data),
+      (ξ : ClassFunction ↥(huSub data) ℂ) w ≠ 0 → ((w : ↥S) : G) ≠ 1 →
+      ((w : ↥S) : G) ∈ centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S) := by
+    intro w hwval hwne
+    haveI := hInHu_normal data
+    have hCne : OddOrder.Peterfalvi.S03.centralizerInSubgroup (hInHu data) w ≠ ⊥ := fun hbot =>
+      hwval
+        (OddOrder.Peterfalvi.S03.irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot
+          ξ hξ hbot)
+    obtain ⟨d, hd_mem, hd_ne⟩ := (Subgroup.bot_or_exists_ne_one _).resolve_left hCne
+    rw [OddOrder.Peterfalvi.S03.mem_centralizerInSubgroup] at hd_mem
+    obtain ⟨hd_H, hd_comm⟩ := hd_mem
+    -- `d`'s ambient image lies in `H = S_σ`, is nontrivial, and commutes with `w`.
+    have hdS_H : (d : ↥S) ∈ data.H.subgroupOf S := (Subgroup.mem_subgroupOf).mp hd_H
+    have hdH_G : ((d : ↥S) : G) ∈ data.H := (Subgroup.mem_subgroupOf).mp hdS_H
+    have hdG_ne : ((d : ↥S) : G) ≠ 1 := fun he => hd_ne (by
+      apply Subtype.ext; apply Subtype.ext; exact he)
+    have hcommG : ((d : ↥S) : G) * ((w : ↥S) : G) = ((w : ↥S) : G) * ((d : ↥S) : G) := by
+      have := congrArg (fun t : ↥S => (t : G)) (Subtype.ext_iff.mp hd_comm)
+      simpa using this
+    -- assemble the `A(S)`-membership with witness `d ∈ S_σ^#`.
+    refine ⟨?_, hwne, ((d : ↥S) : G), ?_, ?_⟩
+    · have hwHU : (w : ↥S) ∈ (derivedInG S).subgroupOf S := by
+        rw [← huSub_eq_derivedInG_subgroupOf]; exact w.2
+      exact (Subgroup.mem_subgroupOf).mp hwHU
+    · refine (Set.mem_sdiff _).mpr ⟨?_, fun he => hdG_ne (Set.mem_singleton_iff.mp he)⟩
+      exact SetLike.mem_coe.mpr (hHσ ▸ hdH_G)
+    · rw [Subgroup.mem_centralizer_singleton_iff]
+      exact hcommG.symm
+  -- assemble via `support_induce_subset_conjugatesIntoSet` + conjugation invariance.
+  intro x hx
+  rw [Set.mem_union, Set.mem_singleton_iff]
+  by_cases hx1 : x = 1
+  · exact Or.inr hx1
+  have hxsupp : (induceHU data (ξ : ClassFunction ↥(huSub data) ℂ)) x ≠ 0 :=
+    ClassFunction.mem_support.mp hx
+  have hx_conj : x ∈ ClassFunction.conjugatesIntoSet (huSub data)
+      ((ξ : ClassFunction ↥(huSub data) ℂ)).support := by
+    have hind : induceHU data (ξ : ClassFunction ↥(huSub data) ℂ)
+        = ClassFunction.induce (huSub data) (ξ : ClassFunction ↥(huSub data) ℂ) := rfl
+    refine ClassFunction.support_induce_subset_conjugatesIntoSet (subset_refl _) ?_
+    rw [← hind]; exact hxsupp
+  rw [ClassFunction.mem_conjugatesIntoSet] at hx_conj
+  obtain ⟨c, hc, hcsupp⟩ := hx_conj
+  set w : ↥(huSub data) := ⟨c⁻¹ * x * c, hc⟩ with hw_def
+  have hw_val : (ξ : ClassFunction ↥(huSub data) ℂ) w ≠ 0 := ClassFunction.mem_support.mp hcsupp
+  have hxeq : (x : G) = (c : G) * ((w : ↥S) : G) * (c : G)⁻¹ := by
+    show (x : G) = (c : G) * ((c : G)⁻¹ * (x : G) * (c : G)) * (c : G)⁻¹
+    group
+  have hwne : ((w : ↥S) : G) ≠ 1 := by
+    intro he
+    apply hx1
+    have hxG : (x : G) = 1 := by rw [hxeq, he]; group
+    exact Subtype.ext hxG
+  have hwA : ((w : ↥S) : G) ∈
+      centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S) := hcore w hw_val hwne
+  refine Or.inl ?_
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup, hxeq]
+  exact centralizerSupport_sharpMsigma_conj_mem c.2 hwA
+
+open OddOrder.Peterfalvi.S11 in
+open scoped Classical FiniteInduce in
+/-- **Equal-degree §9-family differences are `A(S)`-supported** (the (5.7) engine's
+`hsuppdiff` input for the (10.7) `T2`-family): for `ξ, η ∈ 𝒳` whose inductions share a degree,
+`Supp (Ind ξ − Ind η) ⊆ A(S)` as an `↥S`-support.  Each member's support lies in
+`A(S) ∪ {1}` (`typeII_sSet_member_support_subset`) and the equal degrees kill the `1`-point. -/
+theorem typeII_sSet_diff_support_subset [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S)
+    (data : TypesIIIIIIVSetup S)
+    {ξ η : IrreducibleCharacter ↥(huSub data)}
+    (hξ : ξ ∈ xiSet data) (hη : η ∈ xiSet data)
+    (hdeg : induceHU data (ξ : ClassFunction ↥(huSub data) ℂ) 1
+      = induceHU data (η : ClassFunction ↥(huSub data) ℂ) 1) :
+    ((induceHU data (ξ : ClassFunction ↥(huSub data) ℂ)
+        - induceHU data (η : ClassFunction ↥(huSub data) ℂ)).support)
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+        (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)) S := by
+  intro x hx
+  have hx0 : (induceHU data (ξ : ClassFunction ↥(huSub data) ℂ)
+      - induceHU data (η : ClassFunction ↥(huSub data) ℂ)) x ≠ 0 :=
+    ClassFunction.mem_support.mp hx
+  have hx1 : x ≠ 1 := by
+    intro he
+    apply hx0
+    rw [he, ClassFunction.sub_apply, hdeg, sub_self]
+  have hmem : x ∈ (induceHU data (ξ : ClassFunction ↥(huSub data) ℂ)).support ∪
+      (induceHU data (η : ClassFunction ↥(huSub data) ℂ)).support :=
+    ClassFunction.support_sub_subset _ _ hx
+  rcases hmem with h | h
+  · rcases typeII_sSet_member_support_subset hG hSmax hSII data hξ h with h' | h'
+    · exact h'
+    · exact absurd (Set.mem_singleton_iff.mp h') hx1
+  · rcases typeII_sSet_member_support_subset hG hSmax hSII data hη h with h' | h'
+    · exact h'
+    · exact absurd (Set.mem_singleton_iff.mp h') hx1
+
+open OddOrder.Peterfalvi.S11 in
+open scoped Classical FiniteInduce in
+/-- **(5.3.a) conjugate-difference support, type-II instance**: `Supp ((Ind ξ)̄ − Ind ξ) ⊆ A(S)`
+as an `↥S`-support — the `hdiffsupp` input of the irreducible members' `R`-data
+(`S07.dadeCharacterDifferenceImageOfDiff`).  The conjugate has the same support, and the
+difference vanishes at `1` (the degree `q·ξ(1)` is a positive natural, self-conjugate). -/
+theorem typeII_sSet_member_diffsupp [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S)
+    (data : TypesIIIIIIVSetup S)
+    {ξ : IrreducibleCharacter ↥(huSub data)} (hξ : ξ ∈ xiSet data) :
+    ((induceHU data (ξ : ClassFunction ↥(huSub data) ℂ)).conj
+        - induceHU data (ξ : ClassFunction ↥(huSub data) ℂ)).support
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+        (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)) S := by
+  set φ : ClassFunction ↥S ℂ :=
+    induceHU data (ξ : ClassFunction ↥(huSub data) ℂ) with hφ
+  have hsupp_eq : φ.conj.support = φ.support := by
+    ext y
+    simp only [ClassFunction.mem_support, ne_eq, ClassFunction.conj_apply, star_eq_zero]
+  intro x hx
+  have hx0 : (φ.conj - φ) x ≠ 0 := hx
+  have hxsupp : x ∈ φ.support := by
+    have hxU := ClassFunction.support_sub_subset _ _ hx
+    rwa [hsupp_eq, Set.union_self] at hxU
+  rcases typeII_sSet_member_support_subset hG hSmax hSII data hξ (hφ ▸ hxsupp) with h | h
+  · exact h
+  · exfalso
+    rw [Set.mem_singleton_iff] at h
+    subst h
+    obtain ⟨d, _, hd⟩ :=
+      OddOrder.RepresentationTheory.irreducibleCharacter_apply_one_eq_pos_natCast ξ
+    apply hx0
+    rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hφ, induceHU_apply_one_eq_q_mul, hd,
+      star_mul', star_natCast, star_natCast, sub_self]
+
 end DadeBase
 
 /-! ## The (10.7) cross-isometry package -/
