@@ -234,3 +234,89 @@ Faithful type-P port of `exists_M_hypothesis78` (S16:7988): assemble `S09.Hypoth
 
 ⟹ the (10.8) estimate's `hA` is now **fully proven** (line-83 upper + h78 lower + card_typePA).  The estimate's
 sole remaining gate is **`hB`** (TI-counting `G₁ ⊆ (S_F#)^G ∪ V^G`, cites (10.7) — cross-lane-gated).
+
+## 2026-07-09 update⁵ — ★ (10.7) dichotomy assembly LANDED (commit 2a458dbc): exceptional 枝 honest close、左枝 = 単一 named gate
+
+新 leaf `OddOrder/Peterfalvi/S12_TypeIIFrobenius.lean` で **(10.7) の骨格が完成**。
+`typeII_derived_frobenius` の bare `conj_frobenius` sorry は消滅し、残 sorry は
+named producer `exists_typeIICrossIsometryData` 1 本 (census 81 不変、bare→named)。
+
+### 構造 (全て PROVEN、producer のみ sorried)
+- `typeII_HU_frobenius_of_coherent(_aux)`: S に `TypesIIIIIIVSetup` 直接構築
+  (type_alt=Or.inl、`Section11CharacterData` は inert-tau で counts のみ消費) →
+  `clifford_dichotomy`:
+  - **caseA**: (9.8.c) 既約 + (9.8.b) 可約 (deg qu) → 左枝矛盾。
+  - **caseB exceptional**: (9.10) `exceptional_case_frobenius_realization` conjunct 3 →
+    `derivedInG_eq_fitting_sup_U` transport で **sorry-free に HU-Frobenius**。
+  - **caseB 非 exceptional**: 既約 λ ∈ 𝒮(H₀C′) + (9.9.c) 可約 → 左枝矛盾。
+- `TypeIICrossIsometryData.elim`: 左枝矛盾の計算 (proven)。M-side は proven
+  `muColumn_tau1_pin` + `alignedOmegaSigmaGrid_inner`; 双線形展開で共有 grid entry
+  ±1 のみ残す (S15 `eta_cross_expansion_ne_zero` の inline mirror — S15 は下流ゆえ
+  cite 不可; 将来 upstream hoist で dedup 候補)。
+
+### 残 = `exists_typeIICrossIsometryData` の 3 obligations (docstring 精密化済)
+1. **T2 coherence (5.7)** — `S07.uniform_degree_coherence_of_families` (norm-general、
+   sorry-free) を T2={λ,λ̄,ν,ν̄} に適用。R(ν) = `S06.certainTypeR`/`certainTypeRImage`
+   (可約列、landed)、R(λ) = `dadeCharacterDifferenceImageOfDiff` (landed)、
+   τ_S = honest type-P₂ Dade (`dadeSupportHypothesisData_honestTypeP2ASet`、landed、
+   type-II S に直接適用可)。**hRorth (R(λ)⊥R(ν) = (5.3.b) base-ortho) の discharge は
+   `S13.caseB_coherent_sOf_H0Cprime` (a 所有、sorry-free) の
+   `caseB_sOf_memberRFamily(_orthogonal)` dispatch が worked template** —
+   ただし S13 版は S13.Hypothesis (M-instance) locked ゆえ、S の (data,chief,chars_honest)
+   への**再 instantiation** が必要 (§6/§9-generic 部品は再利用可; maxHeartbeats 1600000
+   級の重 elaboration に注意)。chars_honest = tau := honest Dade / H0CprimeSupport :=
+   honest support の manual 構築 (lane-b の `mkSection11CharacterDataS_honest` が
+   S15-instance の template)。T2 (4-elt) 直接 route は caseA/caseB 一様に効く
+   (ν は列ゆえ case 非依存、家族全体の uniform degree 不要)。
+2. **S-side (5.8) + shared grid** — τ₂(ν) = ±Σ_j ω^{M-aligned}_{r'j}。2 段:
+   (a) τ₂(ν) が **S-side** certainType grid の ±列和 (Coq `coherent_prDade_TIred`;
+   subcoherent (5.5) 分解 `mem_coherent_sum_subseq` 相当 + (3.7) 係数 rigidity +
+   (3.2.d) V-vanishing — S12 M-side の `exists_muColumn_tau1_eq_sum_R` →
+   `muColumn_tau1_pin` chain が同型の worked template、S-side へ mirror)。
+   (b) **S-grid = M-grid transpose** ((8.8) pair `S∩M=W` + (3.2) σ-uniqueness) —
+   typeP_pair 圏 (issue 0098 item 1、未 claim・未 build)。⚠ (b) が真の新規 deep。
+   M-side の同型 gate = S13_Orthogonality:316 `hbridge_τ` (narrow coherence の
+   μ-column pin) — (a) の機構が landed すれば両方閉じる公算。
+3. **(8.18.b) support disjointness** — `Disjoint Ã₁(M) Ã(S)` (8.13.c4 経由、
+   M not-Frobenius ← Hyp (10.1))。既存 (8.17.c)/(8.18) lemma 群は type-I pair 限定
+   (`ftThickenedSupport_A1_disjoint_of_nonconjugate` 等) — type-P₁ M × type-II S 版は
+   **新規 statement**。engine は landed: `disjoint_conjugatesIntoSet_of_centralizer`
+   (Machinery135:254、type-agnostic) + `inner_eq_zero_of_disjoint_support` +
+   Dade 側は restrict (`S04.FullDadeIsometryData.restrict_apply`、h78 と同 pattern)。
+   `escapingCentralizers_control` (8.13、S10:519) が sorried であることに注意
+   (c4 の一意性がそこに依存するなら sorried-cite)。
+
+### 次 iteration 開始点
+上流優先: **obligation 1 (T2/caseB-engine の S-instantiation)** から。場所 =
+S12_TypeIIFrobenius (a 所有)。その後 2(a) の S-side (5.8) 機構 mirror →
+2(b)/3 は §8/pair 圏で claim-before-build 判断 (0098 item 1 は lane c 名義・未着手;
+c は temporary-hold 中 — 必要になった時点で 9000 claim を検討)。
+
+### update⁵ 補遺 — obligation 1 の S-side Dade は (8.16) TI-route が軽い
+- **II→P2 dictionary は未形式化** (`isTypeII_of_isTypeP2` の逆は TaxonomyOutput の仮説
+  としてのみ存在) ⟹ honest-P₂ Dade (`dadeSupportHypothesisData_honestTypeP2ASet`、
+  要 `IsTypeP2 S`) を type-II S に使うには dictionary が先に要る。
+- **代替 (Coq 準拠・軽い)**: type-II では (8.16) `FTtypeII_ker_TI` = A₀(S)/A(S)/A₁(S)
+  が normedTI (normalizer S)。repo に **`S04.Hypothesis.of_isTISubset`**
+  (S04_DadeIsometryBasic:273、TI subset → Dade Hypothesis、signalizer 自明) が landed、
+  (8.16) core = `typeII_centralizer_le_of_mem_mainSubgroup` (S14_MaximalI/
+  WitnessSylowCyclic:929、commit 51a7cbba で proven)。⟹ **P1 の τ_S は
+  of_isTISubset route で構築するのが正** (II→P2 も escaping-σ-sharp engine も不要)。
+  必要 glue = 「A(S) (= (8.10) の type-II A-set) が TI」を (8.16) core から
+  `IsTISubset` 形に整形する補題。
+
+### update⁵ 補遺² — S-side Dade の support-set 選定 (次 iteration の最初の判断)
+- **A₁(S) = S_F^# の TI は即座に取れる**: `TypePNontrivialCore` が kernel-sharp TI を
+  field で保持 (`typeP_core_centralizer_le_of_mem_fitting` の hTI destructure) +
+  `maximalSubgroup_eq_normalizer_maxNilpotentNormalHall` ⟹ `IsTISubset (S_F^#) S` は
+  数行。`of_isTISubset` (H(a)=⊥) で `S04.Hypothesis G (S_F^#) S` が立つ。
+- **⚠ full A(S)/A₀(S) の TI は旧 `typeII_A_sets_TI` が FALSE-as-stated で撤去済み**
+  (S10_StructureSetup:524 コメント、faithful content = BG
+  `theoremB_A_minus_Msigma_isTISubset`)。A(S)-level が要るなら BG 側 statement 経由。
+- **先に決めるべきこと = T2-差分の support**: Peterfalvi (8.15) は
+  Supp(ℤ[𝒯,S^#]) ⊆ A(S) (full)。差分 λ−ν が A₁(S)=S_F^# に落ちるかは非自明
+  (Ind の U-part 値)。lane-b の §13-S instance は `sSet_member_support_subset_A`
+  (support ⊆ honestTypeP2ASet ∪ {1}) を証明済 — その証明が一般 type-II S に
+  instantiate できるか (S15.Hypothesis 依存部の除去) を最初に確認し、
+  (a) A₁-TI Dade で足りる形に支持集合を絞れるなら最軽、
+  (b) 足りなければ honest A(S) + BG theoremB-TI 経由。

@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S12_Section9Counts
+import OddOrder.Peterfalvi.S12_TypeIIFrobenius
 import OddOrder.Peterfalvi.S09_CertificateDischarge
 
 /-!
@@ -49,76 +50,30 @@ structure DerivedFrobeniusData (S : Subgroup G) where
   kernel_is_SF : Prop
   frobenius : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(derivedInG S) kernel complement
 
+open scoped Classical FiniteInduce in
 /-- **Peterfalvi (10.7)**: if `S` is a maximal subgroup of type II, then `[S,S] = S^{(1)}` is a
 Frobenius group with kernel `S_F` (Coq `Frob_der1_type2`, `PFsection10.v:549`).
 
-**Status (genuine partial reduction).**  The datum is built with the *genuine* kernel `S_F` and
-complement `U` — the type-`P` decomposition `M' = S_F ⋊ U` (`TypePData.derived_complement`) — and
-**four of the five `IsFrobeniusGroup` fields are honestly proven**: `isNormal` (`S_F ⊴ [S,S]`,
-since `S ≤ N_G(S_F)` and `[S,S] ≤ S`), `isComplement` (verbatim `derived_complement`), and both
-nontriviality clauses; the `kernel_is_SF` identity is likewise proven.  The **sole residual
-`sorry`** is `conj_frobenius`: that the *full* complement `U` acts fixed-point-freely on `S_F`.
-
-This residual is NOT a structural transport.  The type-`F` datum of `[S,S]`
-(`TypeIIData.derived_typeF` / `isTypeF_derivedInG_of_isTypeP2`) yields only the *sub-complement*
-`U₀`-Frobenius `frobenius_HU0`, and `U` is not cyclic in general (`U₀ = U` fails, so
-`typeF_frobenius_of_card_eq_exponent` does not apply).  Peterfalvi's proof (mmd §10) is the
-character-theoretic contradiction: were `HU` not Frobenius, (9.10)/(9.8.b)/(9.9.b) give a reducible
-`ν_r ∈ 𝒯` and an irreducible `λ ∈ 𝒯 ∩ Irr S` of equal degree; by (5.7) the 4-element family
-`{λ,λ̄,ν_r,ν̄_r}` is coherent, and (5.8) plus the Dade orthogonality (from (8.10)/(8.15)/(8.18.b) +
-Hyp (10.1)) force a contradiction.  The coherence of that `T2` family is the (9.11) assembly flagged
-open in `S07_Subcoherent` (only the uniform-degree base case is landed; the non-Galois
-pair-adjoining induction is not).  Tracking: issue 1017.  Sibling sorry for the same content:
-`exceptional_case_frobenius_realization` (S11, case-B/`H₀ = 1`-gated). -/
-theorem typeII_derived_frobenius [Finite G] [Fintype G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Fintype ↥M]
-    [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
+The Frobenius structure is `typeII_HU_frobenius_of_coherent` (`S12_TypeIIFrobenius`): the
+`S`-side §9 Clifford dichotomy either lands in the exceptional case — where Peterfalvi (9.10)
+(`S11.exceptional_case_frobenius_realization`, proven) yields the `HU`-Frobenius directly — or
+supplies an irreducible/reducible pair of equal degree `q·u`, which the (10.7) cross-isometry
+computation refutes (`TypeIICrossIsometryData.elim`, proven, against the named left-branch gate
+`exists_typeIICrossIsometryData`: T2-coherence (5.7) + shared-grid (5.8) + (8.18.b) support
+disjointness).  The `coh`/`hSmax`/`hG` hypotheses (10.4)/(10.1) are what the dichotomy consumes. -/
+theorem typeII_derived_frobenius [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     {hyp : Hypothesis M} {params : CharacterParameters hyp}
     (coh : CoherentHypothesis hyp params) {S : Subgroup G}
     (hSmax : S ∈ maximalSubgroups G) (hSType : IsTypeII S) :
     ∃ data : DerivedFrobeniusData S, data.kernel_is_SF := by
   classical
   obtain ⟨td⟩ := hSType
-  -- `[S,S] = derivedInG S ≤ S`.
-  have hM'le : derivedInG S ≤ S := Subgroup.map_subtype_le _
-  -- `H = S_F` is normal in `[S,S]`: `S ≤ N_G(S_F)` (as `S_F = maxNilpotentNormalHall S`) and
-  -- `[S,S] ≤ S`.
-  have hHn : (td.typeP.H.subgroupOf (derivedInG S)).Normal := by
-    refine (Subgroup.normal_subgroupOf_iff_le_normalizer td.typeP.H_le).mpr ?_
-    have hnS : S ≤ Subgroup.normalizer (td.typeP.H : Set G) := by
-      rw [td.typeP.H_eq]
-      exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer S
-    exact hM'le.trans hnS
-  -- `H = S_F ≠ 1`: read off the type-`F` structure of `[S,S]`, whose Fitting kernel is `S_F`.
-  have hHne : td.typeP.H ≠ ⊥ := by
-    have h := td.derived_typeF.some.H_nontrivial
-    rwa [td.derived_typeF.some.H_eq, td.derived_fitting_eq] at h
-  -- `U ≠ 1`: the (8.6) nontrivial core carried by type II.
-  have hUne : td.typeP.U ≠ ⊥ := td.common.1
-  -- Both factors remain nontrivial as subgroups of `[S,S]` (each is `≤ derivedInG S`).
-  have hkne : td.typeP.H.subgroupOf (derivedInG S) ≠ ⊥ := by
-    rw [Ne, Subgroup.subgroupOf_eq_bot, disjoint_iff, inf_of_le_left td.typeP.H_le]; exact hHne
-  have hcne : td.typeP.U.subgroupOf (derivedInG S) ≠ ⊥ := by
-    rw [Ne, Subgroup.subgroupOf_eq_bot, disjoint_iff, inf_of_le_left td.typeP.U_le]; exact hUne
-  -- Assemble the Frobenius datum.  Four of the five fields are genuine; the fixed-point-free
-  -- `conj_frobenius` is the single honest residual (see the theorem docstring).
-  have hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(derivedInG S)
-      (td.typeP.H.subgroupOf (derivedInG S)) (td.typeP.U.subgroupOf (derivedInG S)) :=
-    { isNormal := hHn
-      isComplement := td.typeP.derived_complement
-      ne_bot_kernel := hkne
-      ne_bot_complement := hcne
-      conj_frobenius := by
-        -- ⚠ **THE SINGLE HONEST GAP OF (10.7)** — fixed-point-free core (Coq `Frob_der1_type2`).
-        -- Goal: no nontrivial `u ∈ U` centralises a nontrivial `h ∈ H = S_F`, i.e. `U` acts
-        -- Frobenius-ly on `S_F`.  Genuine character-theoretic content (see docstring); the
-        -- `coh`/`hSmax`/`_hG` hypotheses (10.4)/(10.1) are what its honest proof consumes.
-        sorry }
   exact ⟨{ kernel := td.typeP.H.subgroupOf (derivedInG S)
            complement := td.typeP.U.subgroupOf (derivedInG S)
            kernel_is_SF := td.typeP.H.subgroupOf (derivedInG S)
              = (maxNilpotentNormalHall S).subgroupOf (derivedInG S)
-           frobenius := hfrob },
+           frobenius := typeII_HU_frobenius_of_coherent hG coh hSmax td },
          congrArg (·.subgroupOf (derivedInG S)) td.typeP.H_eq⟩
 
 /-- **Closing arithmetic contradiction of Peterfalvi (10.8)** — the numerical heart of the
