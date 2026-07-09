@@ -349,6 +349,14 @@ c は temporary-hold 中 — 必要になった時点で 9000 claim を検討)�
      「reducible sOf member = column μ_j」の同定 ((9.8.b)/(9.9.c) 分類) も同所。
      ⚠ maxHeartbeats 1600000 級の重 elaboration 注意 (S13:1466 前例)。
    - hRorth: S13 `caseB_sOf_memberRFamily_orthogonal` template の S-mirror。
+   - **精査済 crumb (2026-07-10 iteration 3 冒頭)**: `S06.Hypothesis46` (S06_CertainHypothesis46:40)
+     の Dade fields は instantiator 供給 — `dade0 : S04.Hypothesis G (A ∪ conjClassSetIn L tic.V) L`
+     (= **A₀ = A ∪ V^L level**) + `tau : FullDadeIsometryData dade0`。⟹ S-side instance には
+     landed の A(S)-level `typeIIDadeHypothesis` を **A₀(S) = A(S) ∪ V^S に拡張**する必要
+     ((8.16) は A₀ も TI と主張 — V-part の cross case は W cyclic TI (3.1) 経由; typePA0 の
+     conjClassSetIn 形 (8.10) と定義整合)。他 fields: CertainTypeHypothesis ((4.2) L-side) +
+     tic (3.1 TICyclicHypothesis) + W₁/W₂ image 同定 + subH (W₂ ≤ H ≤ K, normal) + A_covers。
+     M-side 前例 = `S12_Core.Hypothesis.toHypothesis46` (Hypothesis.lean:1057)。
    - 代替検討: T2 は 4 元のみゆえ、家族全体 dispatch でなく **per-member 直接構築**
      (λ: Dade R-datum ✓ / ν: column 同定 → certainTypeR) が軽い可能性。まず
      「ν が column である」ことの S11-level 供給源 (`caseA/caseB_character_counts` の
