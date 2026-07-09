@@ -44,3 +44,11 @@ S15_MF.lean が 1,500 行以下になり、full build + AxiomsCheck green を維
 - 行数 refresh: `S15_MF.lean` = **9603 行** (2026-07-02)。
 - 優先度 = **hygiene-only** (BG 凍結クラスタの粒度整理であり FT 経路の実質的証明では
   ない)。hub batch の余力枠で実施。
+
+## 完了 (2026-07-09)
+
+dir 化分割を実施 (issue 0103 方式、lean_split.py による機械分割 + 宣言/namespace 文脈/sorry 保存検証 + full build green):
+  - Corollary155.lean (4237 行)
+  - SetupLemma151.lean (1738 行)
+  - Theorem152Helpers.lean (1607 行)
+  - TIFailure.lean (3814 行)
