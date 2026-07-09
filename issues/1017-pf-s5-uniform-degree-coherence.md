@@ -1080,3 +1080,21 @@ K₂=C_U(S₀ʷ) relIndex a、C=cSub) を供給 → equality-branch (nineElevenC
 ⟹ tiU1 → nineElevenTwo_u_le_a_sq(:1468) hCinf → equality-branch。
 **次 route 検討**: (B) a-branch の prime 論法を直接 (U₁∩U₁ʷ⊆C を degree 経由せず) 引けるか精査
   (引ければ degree partition 構築を回避可能、大幅短縮)。
+
+## 2026-07-09 更新 (lane a) — (10.7) の exceptional 枝は S11 で閉じた + §9 全 conjunct proven
+
+lane a が §9 を完遂 (commits 14b67135/a9fb79d1/e33ca028/f66c3921):
+- **(9.7) 無条件 u-bound** `u_le_cyclotomicQuotient` (S11_ImprimitiveUBound、dichotomy 両枝実証明)。
+- **(9.10) type-II HU-Frobenius (exceptional 枝) 完全 proven** —
+  `exceptional_case_frobenius_realization` sorry-free。新 helper
+  `IsFrobeniusGroup.conj_complement` (S11、complement 共役 transport、S12 からも cite 可)。
+
+**⟹ (10.7) `typeII_derived_frobenius` (S12:47) への含意**: Coq `Frob_der1_type2` の入り口
+`typeP_reducible_core_cases` の両枝が Lean で利用可能になった:
+- 右枝 (exceptional): `exceptional_case_frobenius_realization` cite で **即 HU-Frobenius**。
+- 左枝 (λ 存在): caseA/caseB_character_counts (proven) から reducible ν_r + irreducible λ
+  (等 degree qu) を取り、**T2 = {λ,λ̄,ν_r,ν̄_r} は 4-elt uniform-degree** ⟹ 更新 #3 の予想通り
+  `coherent_subset_of_constant_degree` (landed) で (9.11) full induction 回避可の見込み。
+  残る genuine gap = S-side Dade τS + M↔S support disjoint (`oST`) + FTtypeP_coherent_TIred
+  相当の cross-isometry 計算 (Coq PFsection10:568-658 後半)。次の lane-a focused session で
+  この S12 assembly に正面着手する。
