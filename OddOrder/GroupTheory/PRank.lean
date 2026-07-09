@@ -668,6 +668,29 @@ theorem rank_le_of_injective [Finite G] {H : Type*} [Group H] [Finite H]
   haveI : Fact p.Prime := ⟨hp⟩
   exact (pRank_le_of_injective hf).trans (pRank_le_rank (G := G) p)
 
+/-- **A nontrivial elementary abelian subgroup of a rank-≤-2 subgroup has order `p` or `p²`**
+(`[Finite G]`): its order is `p^k` with `1 ≤ k = log_p |A| ≤ pRank B ≤ rank B ≤ 2`. -/
+theorem card_eq_prime_or_sq_of_isElementaryAbelian_le [Finite G] {p : ℕ} [Fact p.Prime]
+    {A B : Subgroup G} (hA : A.IsElementaryAbelian p) (hAB : A ≤ B)
+    (hrank : rank ↥B ≤ 2) (hne : A ≠ ⊥) :
+    Nat.card ↥A = p ∨ Nat.card ↥A = p ^ 2 := by
+  obtain ⟨k, hk⟩ : ∃ k, Nat.card ↥A = p ^ k := ⟨_, hA.card_eq_pow_finrank⟩
+  have hk1 : 1 ≤ k := by
+    by_contra h0
+    have hk0 : k = 0 := by omega
+    exact hne (Subgroup.card_eq_one.mp (by rw [hk, hk0, pow_zero]))
+  have hk2 : k ≤ 2 := by
+    have hsub : (A.subgroupOf B).IsElementaryAbelian p :=
+      Subgroup.IsElementaryAbelian.of_map (f := B.subtype) B.subtype_injective
+        (by rwa [Subgroup.map_subgroupOf_eq_of_le hAB])
+    have hle := le_pRank (A.subgroupOf B) hsub
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAB).toEquiv, hk,
+      Nat.log_pow (Fact.out : p.Prime).one_lt] at hle
+    exact hle.trans ((pRank_le_rank p).trans hrank)
+  interval_cases k
+  · exact Or.inl (by rw [hk, pow_one])
+  · exact Or.inr hk
+
 /-- **Existence side for a positive `rank` lower bound** (`[Finite G]`).
 If `n ≤ rank G` and `n > 0`, then some prime `p` has `pRank G p ≥ n`. -/
 theorem exists_pRank_ge_of_pos_le_rank [Finite G] {n : ℕ} (hnpos : 0 < n)

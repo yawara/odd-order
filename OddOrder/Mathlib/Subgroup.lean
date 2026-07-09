@@ -716,4 +716,42 @@ theorem le_of_coprime_card_index_of_normal {G : Type*} [Group G] [Finite G]
     Subgroup.card_eq_one.mp (Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd h1 h2))
   rwa [Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk'] at hbot
 
+/-- **Membership in the ambient image of a center**: `z ∈ Z(P).map P.subtype` iff `z ∈ P` and `z`
+commutes with every element of `P`. -/
+theorem mem_center_map_subtype_iff {G : Type*} [Group G] {P : Subgroup G} {z : G} :
+    z ∈ (Subgroup.center ↥P).map P.subtype ↔ z ∈ P ∧ ∀ w ∈ P, w * z = z * w := by
+  constructor
+  · rintro ⟨z', hz', rfl⟩
+    exact ⟨z'.2, fun w hw =>
+      congrArg Subtype.val ((Subgroup.mem_center_iff.mp hz') ⟨w, hw⟩)⟩
+  · rintro ⟨hzP, hcomm⟩
+    exact ⟨⟨z, hzP⟩, Subgroup.mem_center_iff.mpr fun w => Subtype.ext (hcomm w w.2), rfl⟩
+
+/-- **An element normalizing `P` normalizes the ambient image of its center**
+`Z(P) = (Subgroup.center ↥P).map P.subtype`: conjugation by `g` preserves both membership in `P`
+and commutation with every element of `P`. -/
+theorem mem_normalizer_center_map_of_mem_normalizer {G : Type*} [Group G] {P : Subgroup G}
+    {g : G} (hg : g ∈ Subgroup.normalizer (P : Set G)) :
+    g ∈ Subgroup.normalizer (((Subgroup.center ↥P).map P.subtype : Subgroup G) : Set G) := by
+  rw [Subgroup.mem_set_normalizer_iff] at hg ⊢
+  intro z
+  simp only [SetLike.mem_coe] at hg ⊢
+  rw [mem_center_map_subtype_iff, mem_center_map_subtype_iff]
+  constructor
+  · rintro ⟨hzP, hcomm⟩
+    refine ⟨(hg z).mp hzP, fun w hw => ?_⟩
+    have hw' : g⁻¹ * w * g ∈ P := by
+      refine (hg (g⁻¹ * w * g)).mpr ?_
+      have heq : g * (g⁻¹ * w * g) * g⁻¹ = w := by group
+      rwa [heq]
+    calc w * (g * z * g⁻¹) = g * ((g⁻¹ * w * g) * z) * g⁻¹ := by group
+      _ = g * (z * (g⁻¹ * w * g)) * g⁻¹ := by rw [hcomm _ hw']
+      _ = g * z * g⁻¹ * w := by group
+  · rintro ⟨hzP', hcomm⟩
+    refine ⟨(hg z).mpr hzP', fun w hw => ?_⟩
+    have hw' : g * w * g⁻¹ ∈ P := (hg w).mp hw
+    calc w * z = g⁻¹ * ((g * w * g⁻¹) * (g * z * g⁻¹)) * g := by group
+      _ = g⁻¹ * ((g * z * g⁻¹) * (g * w * g⁻¹)) * g := by rw [hcomm _ hw']
+      _ = z * w := by group
+
 end Subgroup
