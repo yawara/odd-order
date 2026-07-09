@@ -272,3 +272,36 @@ S14 実 sorry 10 → 7 (comment-strip)。3 commits (b47a1c66 / 51a7cbba / 59780c
 (S13 char gated) / exists_center_omega1_elemAbelian_fpf_of_witness (12.12 — 今回の Ω₁ infra
 で attack 可能見込み) / witness_psi_degree + witness_value_norm_package (12.13-15 char) /
 allTypeI_fittingIsTI + not_nonTypeICovering (P₂-crux gated)。次 = 文書順で (12.12) T-package。
+
+## ✅✅ (2026-07-09 続³、lane-b) — (12.12) p+1 refinement 完全 proven、S14 実 sorry 7 → 6
+
+前回リストの文書順先頭「(12.12) 系」を完遂 (commits c4cf5a54 / ae0babd8):
+
+1. **`witness_complement_dvd_p_sub_or_add_one` 完全 proven** ((12.12) の p+1 refinement、
+   S14 最後の (12.12) sorry)。Singer-cyclic 識別の代わりに proven 済み
+   `isCyclic_and_card_dvd_sub_or_add_one_of_fpf_conj_elemAbelian` の **nonscalar 仮説**へ還元し、
+   Peterfalvi の A=1 議論を elementwise 実装: |T|=p² → T=Ω₁(P₀)∋x (card 挟み撃ち) /
+   scalar e は ⟨x⟩ を normalize (zpowers card 論法 + conj_zpow) / (12.9) N_G(⟨x⟩)≤M +
+   (12.11) intersection_le_kernel で e ∈ M⊓L ≤ H / Frobenius disjointness で e=1。
+   ⟹ **(12.12) 全体 (complement_cyclic_order_dvd) が own-proof sorry-free**。
+2. **`two_mul_card_complement_le`** (2e ≤ p+1、原文 (12.16) の numeric): odd divisor of
+   even p∓1 divides half。witness_value_norm_package の h2e conjunct の ℕ-core。
+
+**残 S14 実 sorry 6 の frontier map (精査済み)**:
+- `witness_psi_degree` (12.13 ψ(1)=e) + `witness_value_norm_package` (12.14/12.15 束):
+  **共通上流 = (12.14) evaluation 機械** (a=0 counting + (7.7.a))。部品状況:
+  - ✅ `psi_constant_on_xK` **proven** ((12.14) constancy 半分、h_const 供給可能)
+  - ✅ (12.3)/(12.4)/(12.5)/(5.5) = RhoConstancy.lean に sorry-free 済
+  - ✅ `witness_L_hypothesis78` proven (witness の Hypothesis78、(7.8.a) agreement 込)
+  - 残 = (7.8.a) 分解 α^τ = 1_G − ψ + aΣdᵢχᵢ^{τ₁} + Γ の a=0 counting +
+    (7.7.a) evaluation ψ^ρ(x) = χ(x) (S09_Building78C の decomposition 消費)。
+  - 注: 原文 (12.16) は ψ(1)=e を直接使わず ψ(x)=χ(x) + χ(x)≡χ(1)=e (L側 1.10.a) 経由。
+    h_psix の供給再配線も選択肢 (どちらも (7.7.a) 機械が本丸)。
+- `hidx` (4|K'|≤|K|、(8.1.c)): **組立可能と診断** — frobenius_HU0 (U₀ FPF on K) +
+  p ∣ exp U₀ (Cauchy) + coprime descent to K/K' (coprime_fixedPoints_quotient) +
+  IsPGroup.card_modEq_card_fixedPoints → |K/K'| ≡ 1 (mod p) ≥ p+1 ≥ 4。ambient 化要
+  (~100-150 行)。**次 iteration 候補 (文書順では (12.14) 機械が先だが hidx は独立部品)**。
+- `sibleyTarget_frobI` (12.3 case a TI): 実 consumer 無し (witness route は (b)/(c) dispatch、
+  docstring 言及のみ) — off-path 保留妥当。
+- `typeIIIorIV_noncyclic_le_fitting`: S13 char gated (変化なし)。
+- `allTypeI_fittingIsTI` + `not_nonTypeICovering`: P₂-crux gated (変化なし)。
