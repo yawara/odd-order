@@ -5,6 +5,11 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S12_Section9Counts
 import OddOrder.Peterfalvi.S11_MaximalII_III_IV
+import OddOrder.Peterfalvi.S04_DadeIsometryBasic
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TaxonomyOutput
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Basics
 
 /-!
 # Peterfalvi (10.7): the Type-II `HU`-Frobenius dichotomy assembly
@@ -47,6 +52,188 @@ open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory
 
 variable {G : Type*} [Group G]
+
+/-! ## Peterfalvi (8.16): the `S`-side Dade base for a Type-II maximal
+
+The (10.7) left branch needs the Dade isometry `τ_S` of the pair `(A(S), S)` for the Type-II
+maximal `S`, where `A(S) = ⋃_{x∈S_σ^#} C_{S'}(x)^#` is the honest (8.10) type-`P` support
+(`centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)`; the §9 family differences are
+`A(S)`-supported by (8.15)/(4.7), and the equal-degree difference `ν − λ` vanishes at `1`).
+
+Peterfalvi proves (8.16) — `A₀(S), A(S), A₁(S)` are TI-subsets of `G` with normalizer `S` — by
+checking that every (8.14) signalizer `R(a)` is trivial and citing (2.3).  We instead assemble
+the TI property of `A(S)` directly from three proven ingredients, avoiding the (8.15) signalizer
+machinery altogether (all signalizers being trivial, Hypothesis (2.2) is `of_isTISubset`):
+
+* on `A₁(S) = S_F^#` the (8.6.a) kernel TI-property (`TypePNontrivialCore`, with
+  `N_G(S_F) = S` by maximality and simplicity);
+* on `A(S) − A₁(S)` the BG Theorem B(5) TI-subset `A(M) − M_σ`
+  (`theoremB_A_minus_Msigma_isTISubset`, transported through `A(S) ⊆ ASet S U` for a
+  `(κ∪σ)'`-Hall `U` with `S' = U ⊔ S_σ`, BG Lemma 15.1(b) via `typeP_exists_hall_derived_eq`);
+* no cross fusion: `S_σ`-membership of an element of `S` is determined by its order
+  (`mem_Msigma_iff_isPiElement_sigma` + `isPiElement_conj`), so a `G`-conjugation cannot move a
+  point between `A₁(S)` and `A(S) − A₁(S)`.
+
+The type-II specialization enters through `S_F = S_σ`
+(`maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II`) and `IsTypeP S` (`isTypeP_of_isTypeNonI`);
+no `II → P₂` taxonomy bridge is needed. -/
+
+section DadeBase
+
+open OddOrder.BG.Ch3.S10
+
+/-- **Peterfalvi (8.16), TI part, for the honest type-II `A(S)`**: for a Type-II maximal
+subgroup `S`, the (8.10) support `A(S) = ⋃_{x∈S_σ^#} C_{S'}(x)^#` is a TI-subset of `G` with
+normalizer bound `S`.
+
+The proof splits a conjugation `g·a·g⁻¹ = b` with `a, b ∈ A(S)` by `S_σ`-membership: both in
+`A₁(S) = S_σ^# = S_F^#` is the (8.6.a) kernel TI-property; both outside is BG Theorem B(5)
+(`A(S) − S_σ ⊆ ASet S U − S_σ`, a TI-subset); and the mixed cases are impossible because
+`S_σ`-membership inside `S` depends only on the element's order. -/
+theorem typeII_centralizerSupport_isTISubset [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) :
+    OddOrder.GroupTheory.IsTISubset
+      (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)) S := by
+  classical
+  obtain ⟨iiData⟩ := id hSII
+  obtain ⟨-, -, hTI⟩ := iiData.common
+  -- `S_F = S_σ` (type II) and `S_F ≠ ⊥`.
+  have hMσF : maxNilpotentNormalHall S = Msigma S :=
+    OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II hG hSmax
+      (Or.inr hSII)
+  have hFne : maxNilpotentNormalHall S ≠ ⊥ := by
+    rw [hMσF]; exact Msigma_ne_bot hG hSmax
+  -- `N_G(S_F) = S`: `S` normalizes its normal Hall core, the normalizer is proper (simplicity),
+  -- and `S` is a coatom.
+  have hNS : Subgroup.normalizer ((maxNilpotentNormalHall S : Subgroup G) : Set G) = S := by
+    have hle : S ≤ Subgroup.normalizer ((maxNilpotentNormalHall S : Subgroup G) : Set G) := by
+      intro s hs
+      rw [hMσF, Msigma]
+      exact OddOrder.GroupTheory.le_normalizer_opiCoreInG (sigma S) S hs
+    by_contra hne
+    have hNtop : Subgroup.normalizer ((maxNilpotentNormalHall S : Subgroup G) : Set G) = ⊤ :=
+      hSmax.2 _ (lt_of_le_of_ne hle fun h => hne h.symm)
+    haveI hHnormal : (maxNilpotentNormalHall S).Normal :=
+      Subgroup.normalizer_eq_top_iff.mp hNtop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (maxNilpotentNormalHall S) hHnormal with hb | ht
+    · exact hFne hb
+    · exact hSmax.1
+        (top_le_iff.mp (ht ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le S))
+  -- `IsTypeP S` and a `(κ∪σ)'`-Hall `U` with `S' = U ⊔ S_σ` (BG Lemma 15.1(b)), plus a
+  -- `κ(S)`-Hall `K` (Hall's theorem in the solvable `S`), feeding Theorem B(5).
+  have hP : OddOrder.BG.Ch4.S14.IsTypeP S :=
+    OddOrder.BG.Ch4.S16.isTypeP_of_isTypeNonI hG hSmax (Or.inl hSII)
+  obtain ⟨U, hU, hder⟩ := OddOrder.BG.Ch4.S16.typeP_exists_hall_derived_eq hG hSmax hP
+  have hUM : U ≤ S :=
+    (le_sup_left.trans hder.ge).trans (Subgroup.map_subtype_le _)
+  haveI : IsSolvable ↥S := hG.solvable_of_mem_maximalSubgroups hSmax
+  obtain ⟨K', hK'⟩ :=
+    OddOrder.Isaacs.Ch03.hall_E_exists (G := ↥S) (OddOrder.BG.Ch4.S14.kappa S)
+  have hKM : K'.map S.subtype ≤ S := Subgroup.map_subtype_le K'
+  have hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa S)
+      ((K'.map S.subtype).subgroupOf S) := by
+    have hKeq : (K'.map S.subtype).subgroupOf S = K' :=
+      Subgroup.comap_map_eq_self_of_injective S.subtype_injective K'
+    rw [hKeq]; exact hK'
+  have hTIB := OddOrder.BG.Ch4.S16.theoremB_A_minus_Msigma_isTISubset hG hSmax hKM hUM hK hU
+  -- the conjugation `g·a·g⁻¹ ∈ A(S)` for `a ∈ A(S)`, split by `S_σ`-membership.
+  rintro g ⟨a, ha, hga⟩
+  obtain ⟨haM', ha1, z, hzσ, hzC⟩ := ha
+  obtain ⟨hgaM', hga1, w, hwσ, hwC⟩ := hga
+  have haS : a ∈ S := Subgroup.map_subtype_le _ haM'
+  have hgaS : g * a * g⁻¹ ∈ S := Subgroup.map_subtype_le _ hgaM'
+  by_cases haσ : a ∈ Msigma S
+  · by_cases hgaσ : g * a * g⁻¹ ∈ Msigma S
+    · -- both in `A₁(S) = S_F^#`: the (8.6.a) kernel TI-property.
+      have hg := hTI g ⟨a,
+        ⟨by rw [hMσF]; exact SetLike.mem_coe.mpr haσ, by simpa using ha1⟩,
+        ⟨by rw [hMσF]; exact SetLike.mem_coe.mpr hgaσ, by simpa using hga1⟩⟩
+      rwa [hNS] at hg
+    · -- `a ∈ S_σ`, `g·a·g⁻¹ ∉ S_σ`: impossible, `S_σ`-membership is order-determined.
+      exact absurd
+        ((OddOrder.BG.Ch4.S14.mem_Msigma_iff_isPiElement_sigma hG hSmax hgaS).mpr
+          (OddOrder.BG.Ch4.S14.isPiElement_conj g
+            ((OddOrder.BG.Ch4.S14.mem_Msigma_iff_isPiElement_sigma hG hSmax haS).mp haσ)))
+        hgaσ
+  · by_cases hgaσ : g * a * g⁻¹ ∈ Msigma S
+    · -- `a ∉ S_σ`, `g·a·g⁻¹ ∈ S_σ`: the same order argument along `g⁻¹`.
+      refine absurd ?_ haσ
+      have hπ := OddOrder.BG.Ch4.S14.isPiElement_conj g⁻¹
+        ((OddOrder.BG.Ch4.S14.mem_Msigma_iff_isPiElement_sigma hG hSmax hgaS).mp hgaσ)
+      rw [show g⁻¹ * (g * a * g⁻¹) * g⁻¹⁻¹ = a by group] at hπ
+      exact (OddOrder.BG.Ch4.S14.mem_Msigma_iff_isPiElement_sigma hG hSmax haS).mpr hπ
+    · -- both in `A(S) − S_σ ⊆ ASet S U − S_σ`: BG Theorem B(5).
+      have hmem : ∀ {y : G}, y ∈ S → y ∈ derivedInG S →
+          ∀ {x : G}, x ∈ sharpSubgroup (Msigma S) → y ∈ Subgroup.centralizer ({x} : Set G) →
+          y ∉ Msigma S →
+          y ∈ OddOrder.BG.Ch4.S16.ASet S U \ ((Msigma S : Subgroup G) : Set G) := by
+        intro y hyS hyM' x hxσ hxC hyσ
+        refine ⟨⟨⟨hyS, fun hbot => ?_⟩, ?_⟩, fun h => hyσ (SetLike.mem_coe.mp h)⟩
+        · have hxmem : x ∈ Msigma S ⊓ Subgroup.centralizer ({y} : Set G) :=
+            Subgroup.mem_inf.mpr ⟨SetLike.mem_coe.mp hxσ.1, by
+              rw [Subgroup.mem_centralizer_singleton_iff]
+              exact (Subgroup.mem_centralizer_singleton_iff.mp hxC).symm⟩
+          rw [hbot, Subgroup.mem_bot] at hxmem
+          exact hxσ.2 (Set.mem_singleton_iff.mpr hxmem)
+        · exact SetLike.mem_coe.mpr (hder ▸ hyM')
+      exact hTIB g ⟨a, hmem haS haM' hzσ hzC haσ, hmem hgaS hgaM' hwσ hwC hgaσ⟩
+
+/-- The honest type-II support `A(S)` is `S`-conjugation stable (both `S' = derivedInG S` and
+`S_σ = Msigma S` are normalized by `S`); the `hL_norm` input of Hypothesis (2.2). -/
+theorem centralizerSupport_sharpMsigma_conj_mem [Finite G] {S : Subgroup G} {m : G}
+    (hm : m ∈ S) {y : G}
+    (hy : y ∈ centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)) :
+    m * y * m⁻¹ ∈ centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S) := by
+  obtain ⟨hyM', hy1, x, hxσ, hyC⟩ := hy
+  have hmM' : m ∈ Subgroup.normalizer ((derivedInG S : Subgroup G) : Set G) :=
+    OddOrder.BG.Ch3.S10.le_normalizer_derivedInG S hm
+  have hmMσ : m ∈ Subgroup.normalizer ((Msigma S : Subgroup G) : Set G) := by
+    rw [Msigma]
+    exact OddOrder.GroupTheory.le_normalizer_opiCoreInG (sigma S) S hm
+  refine ⟨(Subgroup.mem_normalizer_iff.mp hmM' y).mp hyM',
+    fun h => hy1 (by
+      have hyeq : y = m⁻¹ * (m * y * m⁻¹) * m := by group
+      rw [hyeq, h]; group),
+    m * x * m⁻¹, OddOrder.Peterfalvi.S10.sharpSubgroup_conj_mem hmMσ hxσ, ?_⟩
+  rw [Subgroup.mem_centralizer_singleton_iff] at hyC ⊢
+  calc m * y * m⁻¹ * (m * x * m⁻¹) = m * (y * x) * m⁻¹ := by group
+    _ = m * (x * y) * m⁻¹ := by rw [hyC]
+    _ = m * x * m⁻¹ * (m * y * m⁻¹) := by group
+
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (8.16) ⇒ Hypothesis (2.2) for `(A(S), S)`, Type II**: the honest type-II Dade
+base.  All (8.14) signalizers are trivial — `A(S)` is a TI-subset
+(`typeII_centralizerSupport_isTISubset`) — so Hypothesis (2.2) is `of_isTISubset` with
+`H(a) = ⊥`.  This is the `τ_S` foundation of the (10.7) left branch: the coherence engine
+(5.7) runs over the Dade isometry of this hypothesis. -/
+noncomputable def typeIIDadeHypothesis [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) :
+    OddOrder.Peterfalvi.S04.Hypothesis G
+      (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)) S :=
+  OddOrder.Peterfalvi.S04.Hypothesis.of_isTISubset
+    (fun _y hy => OddOrder.Peterfalvi.S04.mem_sharp.mpr ⟨Set.mem_univ _, hy.2.1⟩)
+    (fun _y hy => Subgroup.map_subtype_le _ hy.1)
+    (fun l _a ha => centralizerSupport_sharpMsigma_conj_mem l.2 ha)
+    (typeII_centralizerSupport_isTISubset hG hSmax hSII)
+
+/-- **Peterfalvi (8.16), centralizer containment**: `C_G(y) ≤ S` for every point of the
+type-II support `A(S)` (the "(8.16): `C_G(y) ⊆ S` for all `y ∈ A(S)`" form that (12.10)
+cites).  Immediate from the TI property: any `c ∈ C_G(y)` fixes `y ∈ A(S) ∩ A(S)^c`. -/
+theorem typeII_centralizer_le_of_mem_centralizerSupport [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) {y : G}
+    (hy : y ∈ centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)) :
+    Subgroup.centralizer ({y} : Set G) ≤ S := by
+  intro c hc
+  refine typeII_centralizerSupport_isTISubset hG hSmax hSII c ⟨y, hy, ?_⟩
+  have hcy : c * y * c⁻¹ = y := by
+    rw [mul_inv_eq_iff_eq_mul]
+    exact Subgroup.mem_centralizer_singleton_iff.mp hc
+  rw [hcy]; exact hy
+
+end DadeBase
 
 /-! ## The (10.7) cross-isometry package -/
 
