@@ -308,7 +308,7 @@ private theorem fitting_top_map_subtype_eq :
     haveI : ((Ch01.fitting G).subgroupOf (⊤ : Subgroup G)).Normal :=
       (Ch01.fitting.normal G).subgroupOf _
     haveI : Group.IsNilpotent ↥((Ch01.fitting G).subgroupOf (⊤ : Subgroup G)) :=
-      nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe le_top).symm
+      Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe le_top).symm
     exact Ch01.nilpotent_normal_le_fitting
 
 /-- **`F(G)` 内の `q`-部分群は `O_q(G)` に入る**: `F(G)` は冪零なのでその Sylow `q` は
@@ -851,7 +851,7 @@ theorem hasNormalPComplement_minFac_of_rank_fitting_le_two
     haveI : ((Ch01.fitting G).subgroupOf Hsub).Normal :=
       Subgroup.Normal.subgroupOf inferInstance Hsub
     haveI : Group.IsNilpotent ↥((Ch01.fitting G).subgroupOf Hsub) :=
-      nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hF_le_H).symm
+      Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hF_le_H).symm
     -- `p ∤ [H:F]` because `H/F ≅ O_{p'}(G/F)` is a `p'`-group
     have hidx : ¬ p ∣ ((Ch01.fitting G).subgroupOf Hsub).index := by
       have hker : ((QuotientGroup.mk' (Ch01.fitting G)).comp Hsub.subtype).ker

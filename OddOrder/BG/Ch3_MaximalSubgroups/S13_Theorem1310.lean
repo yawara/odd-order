@@ -658,7 +658,7 @@ theorem not_actsPrime_Msigma_of_malpha_facts [Finite G] (hG : IsMinimalSimpleOdd
     exact hane hmem
   -- `∃ y ∈ Q#` with `a ∉ C_G(y)`.
   rw [Subgroup.mem_centralizer_iff] at haNCQ
-  push_neg at haNCQ
+  push Not at haNCQ
   obtain ⟨y, hyQ, hyne⟩ := haNCQ
   have hy1 : y ≠ 1 := fun hc => hyne (by rw [hc, one_mul, mul_one])
   -- `x ∈ P#`.
@@ -979,7 +979,7 @@ theorem E1_regular_on_E3_of_noncentralize [Finite G] (hG : IsMinimalSimpleOdd G)
       le_derivedInG_E_of_inf_centralizer_eq_bot (hPE1.trans h.E₁_le) hQE hPNQ hcopPQ hCQ
     have hMσMstar_eq : S10.Msigma M ⊓ Mstar = S10.Msigma M ⊓ Subgroup.centralizer (Q : Set G) :=
       inf_Msigma_Mstar_eq_centralizer_Q hG h hqτ3 hQE hQne hQq hMstar_mem
-    rw [ActsRegularlyOn] at hreg; push_neg at hreg
+    rw [ActsRegularlyOn] at hreg; push Not at hreg
     obtain ⟨g, hgE3, hg1, hfix⟩ := hreg
     have hCE3 : S10.Msigma M ⊓ Subgroup.centralizer (E₃ : Set G) ≠ ⊥ := by
       have hpr := hE3prime g hgE3 hg1

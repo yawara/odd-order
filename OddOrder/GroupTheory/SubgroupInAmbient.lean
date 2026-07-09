@@ -282,7 +282,7 @@ theorem sylow_coe_eq_of_normalizer_inf_le [Finite G] {p : ℕ} [Fact p.Prime]
     (hle : Subgroup.normalizer P ⊓ (Q : Subgroup G) ≤ P) :
     (Q : Subgroup G) = P := by
   haveI : Group.IsNilpotent ↥(Q : Subgroup G) := Q.isPGroup'.isNilpotent
-  have hnc : NormalizerCondition ↥(Q : Subgroup G) := normalizerCondition_of_isNilpotent
+  have hnc : NormalizerCondition ↥(Q : Subgroup G) := Group.normalizerCondition_of_isNilpotent
   -- `P.subgroupOf Q` is self-normalizing in `↥Q`.
   have hself : Subgroup.normalizer (P.subgroupOf (Q : Subgroup G)) =
       P.subgroupOf (Q : Subgroup G) := by

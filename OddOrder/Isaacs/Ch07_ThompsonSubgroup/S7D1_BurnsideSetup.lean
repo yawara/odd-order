@@ -1172,7 +1172,7 @@ theorem step1_unique_maximal_containing_nilpotent
       rw [hL_def, hLp_def, hLq_def, ← Subgroup.map_sup]
     haveI hL_nilp : Group.IsNilpotent ↥L := by
       rw [hL_eq_map]
-      exact nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective (OpX ⊔ OqX) X.subtype
+      exact Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective (OpX ⊔ OqX) X.subtype
         X.subtype_injective)
     -- `p, q ∣ |L|` (`Kp ≤ Lp ≤ L` with `p ∣ |Kp|`, etc.).
     have hKp_card_eq : Nat.card ↥Kp = Nat.card ↥(OddOrder.Isaacs.Ch01.opCore p ↥K) := by

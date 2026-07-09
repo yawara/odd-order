@@ -440,21 +440,21 @@ theorem IsPGroup.normal_inf_center_nontrivial {P : Type*} [Group P] [Finite P]
 
 /-! **Isaacs Lemma 1.20** は冪零性のいくつかの特性化を主張するが, (1)-(2) は
 `IsNilpotent` の定義そのもの, (3) 「全 Sylow 正規」は mathlib
-`isNilpotent_of_finite_tfae` 全体に対応する (Thm 1.26 慣用名
+`Group.isNilpotent_of_finite_tfae` 全体に対応する (Thm 1.26 慣用名
 `isNilpotent_iff_forall_sylow_normal` で扱う).
 
-**Thm 1.20** (冪零 ⇔ NormalizerCondition) は `isNilpotent_of_finite_tfae.out 0 1`,
+**Thm 1.20** (冪零 ⇔ NormalizerCondition) は `Group.isNilpotent_of_finite_tfae.out 0 1`,
 **Thm 1.21** (`upperCentralSeries G (nilpotencyClass G) = ⊤`) は
 `upperCentralSeries_nilpotencyClass` を直接呼ぶ. -/
 
 /-- **Isaacs Thm 1.22** (Normalizer Condition).  有限冪零群 `G` で真部分群 `H < G` ならば
 `H < N_G(H)`.
 
-mathlib `normalizerCondition_of_isNilpotent` の再述. -/
+mathlib `Group.normalizerCondition_of_isNilpotent` の再述. -/
 theorem lt_normalizer_of_isNilpotent_of_lt_top [Group.IsNilpotent G]
     {H : Subgroup G} (hH : H < ⊤) :
     H < Subgroup.normalizer H :=
-  normalizerCondition_of_isNilpotent H hH
+  Group.normalizerCondition_of_isNilpotent H hH
 
 /-- **Isaacs Lemma 1.23**.  `P` を有限 `p`-群, `N, M ⊴ P` で `N < M` ならば,
 ある `L ⊴ P` が存在して `N < L`, `L ≤ M`, かつ `N.relIndex L = p`.
@@ -699,13 +699,13 @@ theorem exists_normal_sylow_of_characteristic_card_eq_sylow [Finite G]
 /-- **Isaacs Thm 1.26 (1) ⇔ (4)**.  有限群 `G` について「`G` が冪零」と
 「`G` の任意の Sylow 部分群が正規」は同値.
 
-mathlib `isNilpotent_of_finite_tfae` の (0) ⇔ (3) の抽出ラッパー.  Isaacs 流 5 条件
+mathlib `Group.isNilpotent_of_finite_tfae` の (0) ⇔ (3) の抽出ラッパー.  Isaacs 流 5 条件
 ((1)冪零, (2)`H<G ⇒ N_G(H)>H`, (3) 全極大正規, (4) 全 Sylow 正規, (5) Sylow 内部直積)
-は TFAE 全体 (`isNilpotent_of_finite_tfae`) で確保される. -/
+は TFAE 全体 (`Group.isNilpotent_of_finite_tfae`) で確保される. -/
 theorem isNilpotent_iff_forall_sylow_normal [Finite G] :
     Group.IsNilpotent G ↔
       ∀ (p : ℕ) [Fact p.Prime] (P : Sylow p G), (↑P : Subgroup G).Normal :=
-  isNilpotent_of_finite_tfae.out 0 3
+  Group.isNilpotent_of_finite_tfae.out 0 3
 
 /-! **Isaacs Thm 1.26 (4) ⇒ (1)** (全 Sylow 正規 ⇒ 冪零) は呼出側で
 `isNilpotent_iff_forall_sylow_normal.mpr` を直接呼ぶ. -/
@@ -1096,7 +1096,7 @@ theorem fitting_eq_iSup_primeFactors [Finite G] :
 range は `⨆ p, opCore p G = fitting G` (`fitting_eq_iSup_primeFactors`).
 従って `(∀ p, opCore p G) ≃* fitting G` (`MulEquiv.ofInjective` + `subgroupCongr`).
 各 `opCore p G` は有限 p-群ゆえ冪零 (`IsPGroup.isNilpotent`), 有限積も冪零
-(`isNilpotent_pi`), `MulEquiv` で `fitting G` も冪零.
+(`Group.isNilpotent_pi`), `MulEquiv` で `fitting G` も冪零.
 
 `instance` 指定で `[Group.IsNilpotent (fitting G)]` が下流で自動推論される. -/
 instance fitting.isNilpotent [Finite G] : Group.IsNilpotent (fitting G) := by
@@ -1140,9 +1140,9 @@ instance fitting.isNilpotent [Finite G] : Group.IsNilpotent (fitting G) := by
     exact (opCore_isPGroup p G).isNilpotent
   -- Finite product of nilpotent is nilpotent
   haveI : ∀ p : ps, Group.IsNilpotent (opCore (p : ℕ) G) := hnilp
-  haveI : Group.IsNilpotent (∀ p : ps, opCore (p : ℕ) G) := isNilpotent_pi
+  haveI : Group.IsNilpotent (∀ p : ps, opCore (p : ℕ) G) := Group.isNilpotent_pi
   -- Transport across the MulEquiv
-  exact nilpotent_of_mulEquiv e
+  exact Group.nilpotent_of_mulEquiv e
 
 /-- **Isaacs Cor 1.29** (冪零正規部分群の積も冪零).
 `K, L` が `G` の正規冪零部分群ならば `K ⊔ L` (= `KL`) も冪零.
@@ -1156,7 +1156,7 @@ instance sup_isNilpotent_of_normal_nilpotent [Finite G]
     Group.IsNilpotent (↥(K ⊔ L)) := by
   have hKLfit : K ⊔ L ≤ fitting G :=
     sup_le nilpotent_normal_le_fitting nilpotent_normal_le_fitting
-  exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hKLfit)
+  exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hKLfit)
 
 /-- **Isaacs Lucchini 2.20 prereq**: `M ⊴ G` ⇒ `F(M) ⊆ F(G)` (`F(M)` を `M.subtype`
 で `G` 部分群として見て).
@@ -1167,14 +1167,14 @@ instance sup_isNilpotent_of_normal_nilpotent [Finite G]
 **証明**: `fitting ↥M` は `↥M` で characteristic (`fitting.characteristic`).
 `M ⊴ G` ゆえ mathlib `Subgroup.normal_of_characteristic_of_normal` instance で
 `(fitting ↥M).map M.subtype ⊴ G`. `fitting ↥M` は冪零 (`fitting.isNilpotent`),
-`equivMapOfInjective` + `nilpotent_of_mulEquiv` で image も冪零.
+`equivMapOfInjective` + `Group.nilpotent_of_mulEquiv` で image も冪零.
 `nilpotent_normal_le_fitting` を適用して結論. -/
 theorem fitting_map_subtype_le_fitting [Finite G] {M : Subgroup G} [M.Normal] :
     (fitting ↥M).map M.subtype ≤ fitting G := by
   haveI : Finite ↥M := inferInstance
   haveI : Group.IsNilpotent ↥(fitting (↥M : Type _)) := fitting.isNilpotent
   haveI hNilp : Group.IsNilpotent ↥((fitting ↥M).map M.subtype) :=
-    nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective (fitting ↥M) M.subtype
+    Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective (fitting ↥M) M.subtype
       M.subtype_injective)
   exact nilpotent_normal_le_fitting
 
@@ -1186,7 +1186,7 @@ theorem fitting_map_eq_of_normal_of_fitting_le [Finite G] {M : Subgroup G} [M.No
   refine le_antisymm fitting_map_subtype_le_fitting ?_
   haveI : Group.IsNilpotent ↥(fitting G) := fitting.isNilpotent
   haveI : Group.IsNilpotent ↥((fitting G).subgroupOf M) :=
-    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hFM).symm
+    Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hFM).symm
   have hle : (fitting G).subgroupOf M ≤ fitting ↥M :=
     nilpotent_normal_le_fitting
   calc fitting G
@@ -1202,7 +1202,7 @@ theorem fitting_map_mulEquiv_le {A B : Type*} [Group A] [Group B] [Finite A] [Fi
     (fitting A).map e.toMonoidHom ≤ fitting B := by
   haveI : Group.IsNilpotent (fitting A) := fitting.isNilpotent
   haveI : Group.IsNilpotent ↥((fitting A).map e.toMonoidHom) :=
-    nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ e.toMonoidHom e.injective)
+    Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ e.toMonoidHom e.injective)
   haveI : ((fitting A).map e.toMonoidHom).Normal :=
     (fitting.normal A).map e.toMonoidHom e.surjective
   exact nilpotent_normal_le_fitting

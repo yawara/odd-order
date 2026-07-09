@@ -407,7 +407,7 @@ theorem conjClass_meets_W2 (g : L) (hg : g ∈ h.W1) (hg1 : g ≠ 1) (C : ConjCl
     intro ψ x y hxy
     simpa only [MulEquiv.coe_toMonoidHom] using ψ.toMonoidHom.map_isConj hxy
   by_contra hno
-  push_neg at hno
+  push Not at hno
   set φ : MulAut ↥h.K := MulAut.conjNormal g with hφ
   -- `C` is `g`-stable: `IsConj (φ a) a`
   have hconj_a : IsConj (φ a) a := by
@@ -987,7 +987,7 @@ theorem exists_eq_certainType_or_induce [NeZero (Nat.card h.W1)] (μ : Irreducib
     rw [irreducibleCharacter_inner_eq_ite, if_neg hne] at hi
     exact hi rfl
   · -- `θ ∉ {χ_j}`: `Ind^L_K θ` is irreducible, hence equals `μ`
-    push_neg at hcase
+    push Not at hcase
     right
     refine ⟨θ, hcase, ?_⟩
     have hirr := h.induce_isIrreducible_of_forall_chiRestrict_ne hcase
@@ -1055,7 +1055,7 @@ theorem induce_not_isIrreducible_iff [NeZero (Nat.card h.W1)]
   constructor
   · intro hred
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     exact hred (h.induce_isIrreducible_of_forall_chiRestrict_ne hcon)
   · rintro ⟨χ₂, rfl⟩
     exact h.induce_chiRestrict_not_isIrreducible χ₂

@@ -521,8 +521,8 @@ theorem SubgroupESetup.derived_isNilpotent [Finite G] (hG : IsMinimalSimpleOdd G
     have hderived : commutator ↥E ≤ Ch01.fitting ↥E :=
       Ch1.S05.derived_le_fitting_of_rank_fitting_le_two hodd hrankF
     haveI : Group.IsNilpotent ↥(commutator ↥E) :=
-      nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hderived)
-    exact nilpotent_of_mulEquiv
+      Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hderived)
+    exact Group.nilpotent_of_mulEquiv
       (Subgroup.equivMapOfInjective (commutator ↥E) E.subtype (Subgroup.subtype_injective E))
 
 /-- The normalizer in `↥E` of a Sylow `p`-subgroup `P` (local shorthand for the
@@ -842,7 +842,7 @@ theorem SubgroupESetup.E3_isCyclic [Finite G] (hG : IsMinimalSimpleOdd G)
     IsCyclic ↥E₃ := by
   haveI hnilp : Group.IsNilpotent ↥(derivedInG E) := h.derived_isNilpotent hG
   haveI : Group.IsNilpotent ↥E₃ :=
-    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe (h.E3_le_derived hG))
+    Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe (h.E3_le_derived hG))
   have hodd : Odd (Nat.card ↥E₃) :=
     hG.odd.of_dvd_nat
       ((Subgroup.card_dvd_of_le h.E3_le_M).trans (Subgroup.card_subgroup_dvd_card M))

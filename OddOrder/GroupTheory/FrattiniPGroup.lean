@@ -60,7 +60,7 @@ variable {p : ℕ} [hp : Fact p.Prime] {R : Type*} [Group R] [Finite R]
 lemma _root_.IsCoatom.normal_of_isPGroup
     (hR : IsPGroup p R) {M : Subgroup R} (hM : IsCoatom M) : M.Normal := by
   haveI : Group.IsNilpotent R := hR.isNilpotent
-  exact Subgroup.NormalizerCondition.normal_of_coatom M normalizerCondition_of_isNilpotent hM
+  exact Subgroup.NormalizerCondition.normal_of_coatom M Group.normalizerCondition_of_isNilpotent hM
 
 set_option linter.unusedSectionVars false in
 /-- Coatom correspondence: subgroups of `R ⧸ M` are exactly `⊥` and `⊤` when `M` is a coatom. -/

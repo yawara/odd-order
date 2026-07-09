@@ -128,7 +128,7 @@ theorem grid_eq_zero_of_ncard_support_lt {ι κ : Type*} [Finite ι] [Finite κ]
         _ ≤ S.card := Finset.card_le_card hcol
     omega
   · -- two rows differ in some column ⟹ they differ in *every* column ⟹ `|κ| ≤ #S`
-    push_neg at hrows
+    push Not at hrows
     obtain ⟨i, i', j₀, hjj⟩ := hrows
     have hdiff : ∀ j, a (i, j) ≠ a (i', j) := fun j hj => by
       apply hjj
@@ -1572,7 +1572,7 @@ theorem ncard_sigmaCoeff_ne_zero_le_two (hyp : TICyclicHypothesis G) [Fintype hy
     simp only [sigmaCoeff, Set.mem_setOf_eq] at hpq
     rw [Set.mem_union, Set.mem_setOf_eq, Set.mem_setOf_eq]
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     exact hpq (by rw [hχαβ, ClassFunction.inner_add_left, ClassFunction.inner_smul_left,
       ClassFunction.inner_smul_left, hcon.1, hcon.2, mul_zero, mul_zero, add_zero])
   · exact add_le_add
@@ -1617,7 +1617,7 @@ theorem ncard_sigmaCoeff_ne_zero_le_of_inner_self_natCast (hyp : TICyclicHypothe
         simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hpq
         rw [Finset.mem_biUnion]
         by_contra hcon
-        push_neg at hcon
+        push Not at hcon
         apply hpq
         change ClassFunction.inner χ (hyp.chiFam hVeq app pq) = 0
         rw [hrepr, inner_sum_left]

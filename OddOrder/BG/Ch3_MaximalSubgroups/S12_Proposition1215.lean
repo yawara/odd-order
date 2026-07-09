@@ -68,7 +68,7 @@ private theorem eq_of_isPGroup_of_normalizer_inf_eq [Finite G] {q : ℕ} [Fact q
     rw [Subgroup.inf_subgroupOf_left]
   have htop : S.subgroupOf T' = ⊤ :=
     normalizerCondition_iff_only_full_group_self_normalizing.mp
-      normalizerCondition_of_isNilpotent _ hfix
+      Group.normalizerCondition_of_isNilpotent _ hfix
   rw [Subgroup.subgroupOf_eq_top] at htop
   exact le_antisymm hST' htop
 

@@ -1114,7 +1114,7 @@ theorem tau2_normalSylow_abelianSylow_of_mem_index_card [Finite G]
         exact hpσst
     set PW : Sylow p ↥(S10.Msigma Mstar) := S.subtype hSMσ with hPWdef
     have hPW_norm : (PW : Subgroup ↥(S10.Msigma Mstar)).Normal := by
-      have htfae := (isNilpotent_of_finite_tfae (G := ↥(S10.Msigma Mstar))).out 0 3
+      have htfae := (Group.isNilpotent_of_finite_tfae (G := ↥(S10.Msigma Mstar))).out 0 3
       exact htfae.mp hnilp p ⟨Fact.out⟩ PW
     haveI hPW_char : (PW : Subgroup ↥(S10.Msigma Mstar)).Characteristic :=
       Sylow.characteristic_of_normal PW hPW_norm

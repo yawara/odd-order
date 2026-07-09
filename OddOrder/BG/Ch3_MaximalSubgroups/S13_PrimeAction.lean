@@ -112,7 +112,7 @@ theorem fixedBy_eq_of_le_of_ne_bot {N E₁ : Subgroup G} (hprime : ActsPrimeOn N
     fixedBy N P = fixedBy N E₁ := by
   obtain ⟨g, hgP, hg1⟩ : ∃ g ∈ P, g ≠ 1 := by
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     exact hPne (by rw [eq_bot_iff]; intro x hx; rw [Subgroup.mem_bot]; exact hcon x hx)
   refine le_antisymm ?_ (inf_le_inf_left _ (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hPE1)))
   calc fixedBy N P ≤ fixedByElement N g := fixedBy_le_fixedByElement hgP

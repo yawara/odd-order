@@ -530,7 +530,7 @@ theorem orbit_parity_contradiction
   -- `A` acts transitively on the family ((3.11): two disjoint orbit-sups cannot both be `≠ ⊥`)
   have htrans : ∀ i j : {Ki : Subgroup G // Pfam Ki}, j ∈ MulAction.orbit (↥A) i := by
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     obtain ⟨i₀, j₀, hj₀⟩ := hcon
     set S₁ : Subgroup G := ⨆ j ∈ MulAction.orbit (↥A) i₀, Vfam j with hS₁def
     set S₂ : Subgroup G := ⨆ j ∈ MulAction.orbit (↥A) j₀, Vfam j with hS₂def
@@ -1056,7 +1056,7 @@ theorem orbit_parity_contradiction
       ∃ b : ↥A, (b : G) ∈ R₀ ∧ b • i₁ = j := by
     intro j hj
     by_contra hnotin
-    push_neg at hnotin
+    push Not at hnotin
     rcases (Vfam j).bot_or_exists_ne_one with h1 | ⟨g, hg, hgne⟩
     · exact hVfam_ne j h1
     set vj : ↥VG := ⟨g, hVfam_le j hg⟩ with hvjdef
@@ -1167,7 +1167,7 @@ theorem orbit_parity_contradiction
     exact (Nat.not_odd_iff_even.mpr (Odd.add_one hr_odd)) hn_odd
   · -- **`n = r`**: `p ∤ n`, so the `p`-group `P` fixes some `Vᵢ`; then `K = ⁅K,P⁆`
     -- centralizes that `Vᵢ` — against `C_V(K) = ⊥`
-    push_neg at hexfix
+    push Not at hexfix
     have huniv : MulAction.orbit (↥(R₀.subgroupOf A)) i₁ = Set.univ := by
       rw [Set.eq_univ_iff_forall]
       intro j

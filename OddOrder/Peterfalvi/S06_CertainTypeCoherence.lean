@@ -268,7 +268,7 @@ theorem columnSum_support_subset (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
   by_contra hzn
   refine hz (columnSum_apply_eq_zero_of_not_mem h hχ₂ ?_)
   rw [Set.mem_union] at hzn
-  push_neg at hzn
+  push Not at hzn
   obtain ⟨hzA, hz1⟩ := hzn
   rintro (hA | h1)
   · exact hzA (by rwa [S04.mem_supportInSubgroup])
@@ -355,7 +355,7 @@ theorem certainTypeExtension_columnDiff_eq_dade (h : Hypothesis46 A L) [NeZero (
           (A ∪ OddOrder.GroupTheory.conjClassSetIn L h.tic.V) L) :
         ClassFunction ↥L ℂ)
       = columnSum h χ₂ - columnSum h χ₂' := by
-    rw [AddSubmonoidClass.coe_finset_sum, columnSum_def, columnSum_def, ← Finset.sum_sub_distrib]
+    rw [AddSubmonoidClass.coe_finsetSum, columnSum_def, columnSum_def, ← Finset.sum_sub_distrib]
     rfl
   have hLHS : certainTypeExtension h (columnSum h χ₂ - columnSum h χ₂')
       = (h.columnFamily χ₂).sign •

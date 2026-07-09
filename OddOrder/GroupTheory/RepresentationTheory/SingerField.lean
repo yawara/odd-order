@@ -6,7 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.RingTheory.SimpleModule.Basic
 import Mathlib.RingTheory.Ideal.Quotient.Operations
 import Mathlib.Algebra.MonoidAlgebra.Basic
-import Mathlib.Data.Fintype.Units
+import Mathlib.Algebra.GroupWithZero.Units.Fintype
 import Mathlib.FieldTheory.Finite.GaloisField
 import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.Data.Nat.GCD.Basic

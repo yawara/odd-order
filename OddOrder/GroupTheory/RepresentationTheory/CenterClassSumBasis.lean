@@ -175,7 +175,7 @@ noncomputable def centerBasis :
       have hsum : z = ∑ C : ConjClasses G,
           (z : MonoidAlgebra k G) (C.out) • classSumCenter (k := k) C := by
         apply Subtype.ext
-        rw [AddSubmonoidClass.coe_finset_sum]
+        rw [AddSubmonoidClass.coe_finsetSum]
         simp only [SetLike.val_smul, classSumCenter_coe]
         exact center_eq_sum_classSum z.2
       rw [hsum]

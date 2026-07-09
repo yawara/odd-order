@@ -85,7 +85,7 @@ theorem exists_irreducibleCharacter_apply_ne [Finite P] {z : P} (hz : z ≠ 1) :
       (χ : ClassFunction P ℂ) z ≠ (χ : ClassFunction P ℂ) 1 := by
   classical
   by_contra hall
-  push_neg at hall
+  push Not at hall
   have hnc : ¬ IsConj z 1 := fun hc => hz (isConj_one_left.mp hc)
   have h0 := column_orthogonality_not_conjugate (g := z) (h := 1) hnc
   have hsq : ∀ χ : IrreducibleCharacter P,

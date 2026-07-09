@@ -1747,7 +1747,7 @@ assembly on top of this.
   (Base: `Q.map subtype ≤ P` since `Q ⊆ P`. Step: `Q.map subtype ≤ ⁅Q.map subtype, P⁆ ≤
   ⁅lowerCentralSeries P n, ⊤⁆ = lowerCentralSeries P (n+1)`.)
 * **Termination**: `P` is a finite p-group ⇒ `IsNilpotent P` (`IsPGroup.isNilpotent`) ⇒
-  `∃ n, lowerCentralSeries P n = ⊥` (`nilpotent_iff_lowerCentralSeries`). Hence
+  `∃ n, lowerCentralSeries P n = ⊥` (`Subgroup.nilpotent_iff_lowerCentralSeries`). Hence
   `Q.map subtype = ⊥` in `G`, so `(P : Subgroup G) ⊓ N = ⊥`.
 
 The proof below implements these steps directly. -/

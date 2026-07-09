@@ -449,7 +449,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
         A ⊓ B = ⊥ → A = ⊥ ∨ B = ⊥ := by
       intro A B _ _ hAH hBH hAB
       by_contra hcon
-      push_neg at hcon
+      push Not at hcon
       have hplA := h37 A hcon.1 hAH
       have hplB := h37 B hcon.2 hBH
       have hinf : (A.subgroupOf H) ⊓ (B.subgroupOf H) = ⊥ := by
@@ -1039,7 +1039,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
         haveI : Group.IsNilpotent ↥(K.subgroupOf N) := by
           rw [hKN_fit]
           infer_instance
-        refine nilpotent_of_surjective (e1.toMonoidHom.comp e2.toMonoidHom) ?_
+        refine Group.nilpotent_of_surjective (e1.toMonoidHom.comp e2.toMonoidHom) ?_
         rw [MonoidHom.coe_comp]
         exact e1.surjective.comp e2.surjective
       haveI hKG_cyc : IsCyclic ↥(K.map H.subtype) := inferInstance
@@ -2148,7 +2148,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
       haveI : Group.IsNilpotent ↥(K.subgroupOf N) := by
         rw [hKN_fit]
         infer_instance
-      refine nilpotent_of_surjective (e1.toMonoidHom.comp e2.toMonoidHom) ?_
+      refine Group.nilpotent_of_surjective (e1.toMonoidHom.comp e2.toMonoidHom) ?_
       rw [MonoidHom.coe_comp]
       exact e1.surjective.comp e2.surjective
     obtain ⟨q, hq_prime, hq_ne_p, hq_ne_r, hKGq⟩ :
@@ -2204,7 +2204,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
         have hfit_top : OddOrder.Isaacs.Ch01.fitting ↥KG = ⊤ := by
           refine le_antisymm le_top ?_
           haveI : Group.IsNilpotent ↥(⊤ : Subgroup ↥KG) :=
-            nilpotent_of_surjective (Subgroup.topEquiv (G := ↥KG)).symm.toMonoidHom
+            Group.nilpotent_of_surjective (Subgroup.topEquiv (G := ↥KG)).symm.toMonoidHom
               (Subgroup.topEquiv (G := ↥KG)).symm.surjective
           exact OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
         have hC : ∀ y : ↥KG, y ∈ (⨆ ℓ : (Nat.card ↥KG).primeFactors,
@@ -2280,7 +2280,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
       obtain ⟨ψ₀, hψ₀P, k₀, hk₀K, hψ₀k₀⟩ :
           ∃ ψ₀ ∈ (P.map H.subtype : Subgroup G), ∃ k₀ ∈ KG, ψ₀ * k₀ * ψ₀⁻¹ ≠ k₀ := by
         by_contra hall
-        push_neg at hall
+        push Not at hall
         apply h313G
         rw [eq_bot_iff, Subgroup.commutator_le]
         intro g₁ hg₁ g₂ hg₂
@@ -3111,7 +3111,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
     have h335 : ∃ x ∈ (P.map H.subtype : Subgroup G),
         (⁅KG, R₀⁆ : Subgroup G).map (MulAut.conj x).toMonoidHom ≠ ⁅KG, R₀⁆ := by
       by_contra hcon
-      push_neg at hcon
+      push Not at hcon
       have hPG_le_NKR : (P.map H.subtype : Subgroup G)
           ≤ Subgroup.normalizer ((⁅KG, R₀⁆ : Subgroup G) : Set G) := fun x hx =>
         mem_normalizer_of_map_conj_eq (hcon x hx)
@@ -3547,7 +3547,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
           exact Subgroup.index_dvd_card _)
       refine ⟨j, ?_, hj⟩
       by_contra hgt
-      push_neg at hgt
+      push Not at hgt
       have h1 : q ^ 3 ≤ q ^ j := Nat.pow_le_pow_right hq_prime.pos (by omega)
       have h2 : q * q < q ^ 3 := by
         have h3 : q * q = q ^ 2 := (pow_two q).symm
@@ -3690,7 +3690,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
     -- dim 0: `K = ⊥` contradicts (3.13)) — against (3.21)/(3.13).
     have h337 : q ^ 2 < Nat.card ↥KG := by
       by_contra hle
-      push_neg at hle
+      push Not at hle
       haveI hKGcommM : IsMulCommutative ↥KG := ⟨⟨hKcomm⟩⟩
       have hqsmulK : ∀ v : Additive ↥KG, (q : ℕ) • v = 0 := by
         intro v
@@ -3731,7 +3731,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
         have hcardK' : Nat.card (Additive ↥KG) = Nat.card ↥KG := rfl
         have hfrle : Module.finrank (ZMod q) (Additive ↥KG) ≤ 2 := by
           by_contra hgt
-          push_neg at hgt
+          push Not at hgt
           have h1 : q ^ 3 ≤ q ^ Module.finrank (ZMod q) (Additive ↥KG) :=
             Nat.pow_le_pow_right hq_prime.pos (by omega)
           have h3 : q ^ 2 < q ^ 3 := Nat.pow_lt_pow_right hq_prime.one_lt (by omega)

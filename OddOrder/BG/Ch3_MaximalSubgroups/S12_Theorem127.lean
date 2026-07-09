@@ -842,7 +842,7 @@ theorem fitting_eq_sup_of_canonical_line [Finite G] (hG : IsMinimalSimpleOdd G)
     haveI h2 : Group.IsNilpotent ↥(S10.Msigma M) :=
       (Msigma_nilpotent_of_tau2 hG h.mem_maximal hp hA hAM).1
     haveI h3 : Group.IsNilpotent ↥((S10.Msigma M).subgroupOf M) :=
-      nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe (S10.Msigma_le M)).symm
+      Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe (S10.Msigma_le M)).symm
     have h4 : (S10.Msigma M).subgroupOf M ≤ Ch01.fitting ↥M :=
       Ch01.nilpotent_normal_le_fitting
     calc S10.Msigma M

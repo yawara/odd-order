@@ -757,7 +757,7 @@ theorem isNarrow_sylow_of_not_mem_beta [Finite G] (hG : IsMinimalSimpleOdd G)
     rw [mem_idealPrime_iff, not_and_or] at hnotideal
     rcases hnotideal with h3 | hQex
     · exact absurd h3G h3
-    · push_neg at hQex
+    · push Not at hQex
       obtain ⟨Q, A, hAcard, hAmax⟩ := hQex
       have h3Q : 3 ≤ pRank ↥(Q : Subgroup G) p := by rw [pRank_sylow_eq Q]; exact h3G
       have hQnarrow : IsNarrow p ↥(Q : Subgroup G) :=
@@ -970,11 +970,11 @@ theorem oPiCore_subgroupOf_eq_of_normal {G' : Type*} [Group G'] [Finite G'] (π 
 For each prime `p`, the engine `isHall_oPiCore_of_forall_hasNormalPComplement` (applied with
 `π = {p}`, using the complements at all `q ≠ p`) shows `O_p(H) = oPiCore {p} H` is a Hall
 `{p}`-subgroup, i.e. a normal Sylow `p`-subgroup; so every Sylow is normal and `H` is nilpotent
-(`isNilpotent_of_finite_tfae`). Companion to the Hall engine. -/
+(`Group.isNilpotent_of_finite_tfae`). Companion to the Hall engine. -/
 theorem isNilpotent_of_forall_hasNormalPComplement {H : Type*} [Group H] [Finite H]
     (h : ∀ p : ℕ, p.Prime → p ∈ (Nat.card H).primeFactors → Ch05.HasNormalPComplement p H) :
     Group.IsNilpotent H := by
-  refine ((isNilpotent_of_finite_tfae (G := H)).out 0 3).mpr ?_
+  refine ((Group.isNilpotent_of_finite_tfae (G := H)).out 0 3).mpr ?_
   intro p hp P
   haveI := hp
   have hHall : Ch03.IsHallSubgroup ({p} : Set ℕ) (Ch03.oPiCore ({p} : Set ℕ) H) :=
@@ -1118,7 +1118,7 @@ theorem isHall_Mbeta [Finite G] (hG : IsMinimalSimpleOdd G)
     · rw [Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective A.subtype_injective]
       exact hW₀hall
     · let e := Subgroup.equivMapOfInjective W₀ A.subtype A.subtype_injective
-      exact nilpotent_of_surjective e.toMonoidHom e.surjective
+      exact Group.nilpotent_of_surjective e.toMonoidHom e.surjective
   refine ⟨Mbeta_isHall hG hM, ?_, ?_, h4⟩
   · -- (b) for `M' = derivedInG M`.
     haveI : IsSolvable ↥(derivedInG M) := by

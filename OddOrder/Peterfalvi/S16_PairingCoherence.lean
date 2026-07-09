@@ -191,7 +191,7 @@ theorem psi_support (hG : OddOrder.BG.IsMinimalSimpleOdd G) (i : Fin (data.n + 1
   haveI := data.kernelIn_normal
   refine (induce_diff_support (data.θ i) (data.θ 0) (data.d i) (data.zeta_deg i)).trans ?_
   intro x hx
-  rw [Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff] at hx
+  rw [Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff] at hx
   exact (mem_supportInSubgroup_sharp_subgroupOf_iff data.kernel
     (data.typeIA_eq_sharp hG) x).mpr ⟨hx.1, hx.2⟩
 

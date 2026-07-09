@@ -40,7 +40,7 @@ private theorem lt_inf_normalizer_of_lt_of_isPGroup [Finite G] {p : ℕ} [Fact p
     {X S : Subgroup G} (hXS : X < S) (hS : IsPGroup p ↥S) :
     X < Subgroup.normalizer X ⊓ S := by
   haveI : Group.IsNilpotent ↥S := hS.isNilpotent
-  have hNC : NormalizerCondition ↥S := normalizerCondition_of_isNilpotent (G := ↥S)
+  have hNC : NormalizerCondition ↥S := Group.normalizerCondition_of_isNilpotent (G := ↥S)
   have hsub_lt : X.subgroupOf S < ⊤ := by
     rw [lt_top_iff_ne_top]
     intro htop
@@ -480,7 +480,7 @@ theorem exists_line_maximalContaining_eq_of_Malpha_ne_bot [Finite G] (hG : IsMin
     ∃ A₀ ∈ elemAbelianOfRank G p 1, A₀ ≤ A ∧
       maximalSubgroupsContaining (Subgroup.normalizer (A₀ : Set G)) = {M} := by
   by_contra h
-  push_neg at h
+  push Not at h
   exact hα (mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne hG hM hA hAM h).2.1
 
 /-- **An exp-`p` extraspecial `Q ≤ G` contains `A ∈ ℰ²_p(G)`** (the `A ∈ ℰ²(Q)` of BG 12.13,

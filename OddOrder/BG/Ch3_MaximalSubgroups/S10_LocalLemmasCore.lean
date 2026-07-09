@@ -397,8 +397,8 @@ theorem rank_centralizer_Msigma_inf_le_one [Finite G] (hG : IsMinimalSimpleOdd G
   haveI hM'nil : Group.IsNilpotent ↥(derivedInG M) := by
     haveI : Group.IsNilpotent ↥(Ch01.fitting ↥M) := Ch01.fitting.isNilpotent
     haveI : Group.IsNilpotent ↥(commutator ↥M) :=
-      nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hderM)
-    exact nilpotent_of_mulEquiv
+      Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hderM)
+    exact Group.nilpotent_of_mulEquiv
       (Subgroup.equivMapOfInjective (commutator ↥M) M.subtype M.subtype_injective)
   -- Proposition 10.10: a Sylow `p`-subgroup `P` of `G` with `A ≤ P ≤ N_G(S)' ⊆ M'`.
   have hpq : p ≠ q := fun h => hKpi p hpK (h ▸ hqσ)
@@ -534,7 +534,7 @@ theorem sigma_complement_rank_le_one [Finite G] (hG : IsMinimalSimpleOdd G)
     rwa [inf_eq_right.mpr hZ_le_C] at h
   haveI hFnil : Group.IsNilpotent ↥F := Ch2.S08.fittingInG_isNilpotent M
   haveI hZnil : Group.IsNilpotent ↥Z :=
-    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hZ_le_F)
+    Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hZ_le_F)
   have hZodd : Odd (Nat.card ↥Z) :=
     hG.odd.of_dvd_nat ((Subgroup.card_dvd_of_le hZ_le_M).trans
       (Subgroup.card_subgroup_dvd_card M))

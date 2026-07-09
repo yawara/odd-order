@@ -119,7 +119,7 @@ theorem exists_nilpotent_hall_pq [Finite G] (hG : IsMinimalSimpleOdd G)
         (Subgroup.normal_subgroupOf_iff_le_normalizer (inf_le_left : W ⊓ D ≤ W)).mpr hWnD
       haveI := hWDnil
       have hNnil : Group.IsNilpotent ↥((W ⊓ D).subgroupOf W) :=
-        nilpotent_of_surjective
+        Group.nilpotent_of_surjective
           (Subgroup.subgroupOfEquivOfLe (inf_le_left : W ⊓ D ≤ W)).symm.toMonoidHom
           (Subgroup.subgroupOfEquivOfLe (inf_le_left : W ⊓ D ≤ W)).symm.surjective
       -- `Y/M'` is a `q`-group (it is covered by the `q`-group `X`).
@@ -420,7 +420,7 @@ theorem derivedQuotientMbeta_isNilpotent [Finite G] (hG : IsMinimalSimpleOdd G)
   have hMβD : Mbeta M ≤ derivedInG M :=
     le_trans (Subgroup.map_mono (Ch03.oPiCore_mono hβσ ↥M)) (Msigma_le_derived hG hM)
   haveI hWstar'_nilp : Group.IsNilpotent ↥(Wstar.subgroupOf (derivedInG M)) :=
-    nilpotent_of_surjective (Subgroup.subgroupOfEquivOfLe hWstar_le).symm.toMonoidHom
+    Group.nilpotent_of_surjective (Subgroup.subgroupOfEquivOfLe hWstar_le).symm.toMonoidHom
       (MulEquiv.surjective _)
   have hMβHall : Ch03.IsHallSubgroup (beta M) ((Mbeta M).subgroupOf (derivedInG M)) :=
     isHallSubgroup_subgroupOf_of_le (isHall_Mbeta hG hM).1 hMβD
@@ -449,7 +449,7 @@ theorem derivedQuotientMbeta_isNilpotent [Finite G] (hG : IsMinimalSimpleOdd G)
       (h.trans (Subgroup.comap_top _).symm)
   have hrange : f.range = ⊤ := by
     rw [hf, MonoidHom.range_comp, Subgroup.range_subtype, hmaptop]
-  exact nilpotent_of_surjective f (MonoidHom.range_eq_top.mp hrange)
+  exact Group.nilpotent_of_surjective f (MonoidHom.range_eq_top.mp hrange)
 
 /-- **`N ⊔ Q` is normal when `Γ/N` is nilpotent** (`N` a `q'`-group, `Q` a Sylow `q`-subgroup):
 the image `Q̄ = Q.map (mk' N)` is a Sylow `q`-subgroup of the nilpotent `Γ/N`, hence normal, and
@@ -493,7 +493,7 @@ theorem normal_sup_sylow_of_quotient_nilpotent {Γ : Type*} [Group Γ] [Finite �
     rw [hQbar, Sylow.coe_ofCard]
   have hAllNormal : ∀ (r : ℕ), Fact r.Prime → ∀ (R : Sylow r (Γ ⧸ N)),
       (↑R : Subgroup (Γ ⧸ N)).Normal :=
-    ((isNilpotent_of_finite_tfae (G := Γ ⧸ N)).out 0 3).mp hNil
+    ((Group.isNilpotent_of_finite_tfae (G := Γ ⧸ N)).out 0 3).mp hNil
   haveI hQbar_norm : (Qbar : Subgroup (Γ ⧸ N)).Normal := hAllNormal q ‹Fact q.Prime› Qbar
   rw [show N ⊔ (Q : Subgroup Γ) =
       ((Q : Subgroup Γ).map (QuotientGroup.mk' N)).comap (QuotientGroup.mk' N) from

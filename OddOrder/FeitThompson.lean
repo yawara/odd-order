@@ -554,7 +554,7 @@ theorem exists_section16MaximalPair_data {G : Type*} [Group G] [Finite G]
   · obtain ⟨cb⟩ := Peterfalvi.S14.theorem88_caseB_holds hG
     exact absurd (hall cb.S cb.S_maximal)
       (BG.Ch4.S16.not_isTypeI_of_isTypeNonI hG cb.S_maximal cb.S_nonI)
-  · push_neg at hall
+  · push Not at hall
     obtain ⟨S, hS, hSnotI⟩ := hall
     have hSP : BG.Ch4.S14.IsTypeP S := notTypeI_imp_typeP S hS hSnotI
     haveI : IsSolvable ↥S := hG.solvable_of_mem_maximalSubgroups hS
@@ -1818,14 +1818,14 @@ noncomputable def tiCyclicW : OddOrder.Peterfalvi.S05.TICyclicHypothesis G :=
     V := (tp.W : Set G) \ ((tp.W1 : Set G) ∪ (tp.W2 : Set G))
     V_subset_sharp := by
       rintro x hx
-      rw [Set.mem_diff] at hx
+      rw [Set.mem_sdiff] at hx
       obtain ⟨_, hxni⟩ := hx
       simp only [Set.mem_union, SetLike.mem_coe, not_or] at hxni
       change x ∈ Set.univ \ ({1} : Set G)
       refine ⟨Set.mem_univ x, ?_⟩
       simp only [Set.mem_singleton_iff]
       exact fun h => hxni.1 (h ▸ one_mem tp.W1)
-    V_subset_W := Set.diff_subset
+    V_subset_W := Set.sdiff_subset
     W_normalizes_V := by
       intro w v hv
       have hvW : v ∈ tp.W := hv.1

@@ -111,7 +111,7 @@ theorem chiColumn_fourcorner_mem_supportedSubmodule (h : Hypothesis46 A L)
   -- `toTICyclicHypothesis.V = ↑(W₁ ⊔ W₂) ∖ (↑W₁ ∪ ↑W₂)`
   have hVdef : h.toTICyclicHypothesis.V
       = ((h.W1 ⊔ h.W2 : Subgroup ↥L) : Set ↥L) \ ((h.W1 : Set ↥L) ∪ (h.W2 : Set ↥L)) := rfl
-  rw [hVdef, Set.mem_diff, Set.mem_union, not_or]
+  rw [hVdef, Set.mem_sdiff, Set.mem_union, not_or]
   refine ⟨w.2, fun h1 => hw ?_, fun h2 => hw ?_⟩
   · -- `(w : L) ∈ W₁`: column difference cancels (row-only dependence)
     have hwmem : w ∈ h.sdiffTICyclicHypothesis.W1.subgroupOf h.sdiffTICyclicHypothesis.W :=
@@ -154,10 +154,10 @@ theorem coe_mem_A0_of_mem_conjugatesOfSet_toTICV (h : Hypothesis46 A L)
   obtain ⟨c, hc⟩ := isConj_iff.mp hconj
   have hVdef : h.toTICyclicHypothesis.V
       = ((h.W1 ⊔ h.W2 : Subgroup ↥L) : Set ↥L) \ ((h.W1 : Set ↥L) ∪ (h.W2 : Set ↥L)) := rfl
-  rw [hVdef, Set.mem_diff, Set.mem_union, not_or] at hvV
+  rw [hVdef, Set.mem_sdiff, Set.mem_union, not_or] at hvV
   obtain ⟨hvW, hvnW1, hvnW2⟩ := hvV
   have hvtic : (L.subtype v) ∈ h.tic.V := by
-    rw [h.tic_V, Set.mem_diff]
+    rw [h.tic_V, Set.mem_sdiff]
     refine ⟨?_, ?_⟩
     · rw [tic_W_eq_map h]
       exact Subgroup.mem_map.mpr ⟨v, hvW, rfl⟩
@@ -194,7 +194,7 @@ theorem coe_mem_ticVdiffV_of_mem_toTICV (h : Hypothesis46 A L) {v : ↥L}
     (L.subtype v) ∈ (ticVdiff h).V := by
   have hVdef : h.toTICyclicHypothesis.V
       = ((h.W1 ⊔ h.W2 : Subgroup ↥L) : Set ↥L) \ ((h.W1 : Set ↥L) ∪ (h.W2 : Set ↥L)) := rfl
-  rw [hVdef, Set.mem_diff, Set.mem_union, not_or] at hv
+  rw [hVdef, Set.mem_sdiff, Set.mem_union, not_or] at hv
   obtain ⟨hvW, hvnW1, hvnW2⟩ := hv
   refine ⟨?_, ?_⟩
   · rw [tic_W_eq_map h]

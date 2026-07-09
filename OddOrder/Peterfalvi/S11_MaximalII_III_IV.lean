@@ -405,14 +405,14 @@ theorem typeP_U_not_centralizes_H [Finite G] (data : TypePData M) (hU : data.U �
     OddOrder.Isaacs.Ch01.fitting.isNilpotent
   haveI hM'nil : Group.IsNilpotent ↥(derivedInG M) := by
     rw [← hFit]
-    exact nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective (OddOrder.Isaacs.Ch01.fitting ↥M)
+    exact Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective (OddOrder.Isaacs.Ch01.fitting ↥M)
       M.subtype M.subtype_injective)
   -- `M'.subgroupOf M` is the commutator subgroup of `↥M`: normal and nilpotent.
   have hM'sub : (derivedInG M).subgroupOf M = commutator ↥M :=
     Subgroup.comap_map_eq_self_of_injective M.subtype_injective (commutator ↥M)
   have hM'norm : ((derivedInG M).subgroupOf M).Normal := by rw [hM'sub]; infer_instance
   haveI : Group.IsNilpotent ↥((derivedInG M).subgroupOf M) :=
-    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hM'M).symm
+    Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hM'M).symm
   -- `M'` is a normal Hall subgroup of `M`, so `M' ≤ M_F = H`.
   have hidxM' : ((derivedInG M).subgroupOf M).index = Nat.card ↥data.W1 := by
     rw [data.M_complement.symm.index_eq_card,
@@ -559,7 +559,7 @@ theorem typeII_centralizer_U_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimple
   -- `C_G(U#) = C_G(U)` (the identity is centralized by everyone).
   have hCeq : Subgroup.centralizer (sharpSubgroup data.U)
       = Subgroup.centralizer (data.U : Set G) := by
-    refine le_antisymm ?_ (Subgroup.centralizer_le Set.diff_subset)
+    refine le_antisymm ?_ (Subgroup.centralizer_le Set.sdiff_subset)
     intro g hg
     rw [Subgroup.mem_centralizer_iff] at hg ⊢
     intro h hh
@@ -1300,7 +1300,7 @@ theorem exists_chiefFactor_seed [Finite G] {M : Subgroup G} (data : TypePData M)
       ∃ (p : ℕ) (_ : Fact p.Prime) (P : Sylow p ↥data.H),
         ¬ ((↑P : Subgroup ↥data.H) ≤ CU) := by
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     exact hCUtop (eq_top_of_forall_sylow_le hcon)
   haveI := hpfact
   have hp : p.Prime := hpfact.out
@@ -2346,7 +2346,7 @@ theorem exists_ne_one_hom_comp_ne {K K' : Type*} [CommGroup K] [CommGroup K'] [F
   haveI : Fintype (K' →* ℂˣ) := Fintype.ofFinite _
   set C : K' →* ℂˣ := A.comp α.symm.toMonoidHom with hC
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   have hsub : (Finset.univ : Finset (K' →* ℂˣ)) ⊆ {1, C} := by
     intro B _
     rcases eq_or_ne B 1 with h | h
@@ -5626,7 +5626,7 @@ theorem caseA_exists_index_S0_not_le_biSup_compl [Finite G] {M : Subgroup G}
     rw [congrFun hsymm j₀, Pi.mulSingle_eq_of_ne (Ne.symm hj)]
   -- If `S₀` were `≤` every complement, every `x ∈ S₀` has all-trivial components, so `x = 1`.
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   apply hS0ne
   rw [eq_bot_iff]
   intro x hx
@@ -5901,7 +5901,7 @@ theorem exists_source_char_caseA [Finite G] {M : Subgroup G}
   refine ⟨linearIrreducibleCharacter θ, ?_, ?_⟩
   · -- nontrivial on `S₀`: else `θ = 1` on `S₀ ⊔ W = ⊤`, forcing `χ̄ = 1` (`mk' W` surjective).
     by_contra hall
-    push_neg at hall
+    push Not at hall
     have hθS0 : ∀ s ∈ caseA.S0, θ s = 1 := by
       intro s hs
       have hθs := hall s hs
@@ -6353,7 +6353,7 @@ theorem exists_source_char_hom_caseA [Finite G] {M : Subgroup G}
       map_one]
   refine ⟨θ, W, hWinv, hsup, ?_, ?_⟩
   · by_contra hall
-    push_neg at hall
+    push Not at hall
     have hθS0 : ∀ s ∈ caseA.S0, θ s = 1 := by
       intro s hs
       have hθs := hall s hs
@@ -6418,7 +6418,7 @@ theorem exists_source_char_hom_caseA_nonRegular [Finite G] {M : Subgroup G}
       map_one]
   refine ⟨θ, W, hWinv, hsup, ?_, ?_, j₁, ?_⟩
   · by_contra hall
-    push_neg at hall
+    push Not at hall
     have hθS0 : ∀ s ∈ caseA.S0, θ s = 1 := by
       intro s hs
       have hθs := hall s hs
@@ -7381,7 +7381,7 @@ theorem exists_regular_not_reducible_of_odd {α : Type*} {X Xmu : Set α}
     omega
   have hlt : p - 1 < X.ncard := lt_of_le_of_ne hle (Ne.symm hne)
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   have hXsub : X ⊆ Xmu := fun s hs => hcon s hs
   have hXeq : X = Xmu := Set.Subset.antisymm hXsub hsub
   rw [hXeq, hXmu] at hlt

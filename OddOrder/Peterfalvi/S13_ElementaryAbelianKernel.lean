@@ -1113,7 +1113,7 @@ theorem caseA_commutator_chain [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   -- `ntrivD`: some `⁅hat (xC a₀), hat (xC b₀)⁆ ≠ 1` (else `(H/Q)' = ⊥`, contradicting `|N̂| = p`).
   have hntrivD : ∃ a₀ b₀ : ↥L, ⁅hat (xC b₀), hat (xC a₀)⁆ ≠ 1 := by
     by_contra hall
-    push_neg at hall
+    push Not at hall
     -- All `⁅hat (xC b), hat (xC a)⁆ = 1`, so `H/Q` is abelian.
     have hcommbot : commutator (↥data.typeP.H ⧸ Q) = ⊥ := by
       rw [commutator_eq_bot_iff_center_eq_top, eq_top_iff]

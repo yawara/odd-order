@@ -566,7 +566,7 @@ theorem mem_idealPrime_of_tau1_of_interaction [Finite G] (hG : IsMinimalSimpleOd
 
 /-- `M*'/M*_α` is nilpotent: it is `(M*'/M*_β) ⧸ (M*_α/M*_β)`, a quotient of the nilpotent
 `M*'/M*_β` (`derivedQuotientMbeta_isNilpotent`, `M*_β ≤ M*_α`). Via the third isomorphism
-`quotientQuotientEquivQuotient` + `nilpotent_of_surjective`. -/
+`quotientQuotientEquivQuotient` + `Group.nilpotent_of_surjective`. -/
 theorem derivedQuotientMalpha_isNilpotent [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
     [((S10.Malpha M).subgroupOf (derivedInG M)).Normal] :
@@ -585,8 +585,8 @@ theorem derivedQuotientMalpha_isNilpotent [Finite G] (hG : IsMinimalSimpleOdd G)
       ((↥(derivedInG M) ⧸ (S10.Mbeta M).subgroupOf (derivedInG M)) ⧸
         ((S10.Malpha M).subgroupOf (derivedInG M)).map
           (QuotientGroup.mk' ((S10.Mbeta M).subgroupOf (derivedInG M)))) :=
-    nilpotent_of_surjective (QuotientGroup.mk' _) (QuotientGroup.mk'_surjective _)
-  exact nilpotent_of_surjective
+    Group.nilpotent_of_surjective (QuotientGroup.mk' _) (QuotientGroup.mk'_surjective _)
+  exact Group.nilpotent_of_surjective
     (QuotientGroup.quotientQuotientEquivQuotient _ _ hsub).toMonoidHom
     (QuotientGroup.quotientQuotientEquivQuotient _ _ hsub).surjective
 

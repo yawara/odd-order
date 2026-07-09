@@ -150,7 +150,7 @@ theorem exists_maschke_split [Finite G] [NeZero (Nat.card G : F)] (ρ : Represen
     ⟨⊥, ⊤, fun h => absurd (congrArg Subrepresentation.toSubmodule h) bot_ne_top⟩
   obtain ⟨U, hUbot, hUtop⟩ : ∃ U : Subrepresentation ρ, U ≠ ⊥ ∧ U ≠ ⊤ := by
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     exact hirr { eq_bot_or_eq_top := fun U => (em (U = ⊥)).imp id (hcon U) }
   obtain ⟨U', hUU'⟩ := exists_isCompl U
   have hsup : U.toSubmodule ⊔ U'.toSubmodule = ⊤ := by

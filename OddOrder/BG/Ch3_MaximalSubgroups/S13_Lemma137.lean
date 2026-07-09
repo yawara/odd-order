@@ -244,7 +244,7 @@ theorem exists_elemAbelian_centralizing_of_not_regular [Finite G] {E₁ E₃ : S
   classical
   rw [actsRegularlyOn_iff] at hreg
   simp only [fixedByElement_def] at hreg
-  push_neg at hreg
+  push Not at hreg
   obtain ⟨g, hgE1, hgne, hfix⟩ := hreg
   obtain ⟨⟨he, he_mem⟩, he_ne⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hfix
   obtain ⟨heE3, heC⟩ := Subgroup.mem_inf.mp he_mem

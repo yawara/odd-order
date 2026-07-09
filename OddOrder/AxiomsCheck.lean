@@ -6007,7 +6007,7 @@ coprimely.  Discharges the `hUle`/`hKnorm`/`hDcompl`/`U ≠ ⊥` `TypePData` fie
 `isNilpotent_complement_of_isTypeP1_mf_ne_msigma`): any complement `U` of `M_F` inside `M' = M_σ`
 (`M_F ⊔ U = M'`, `M_F ⊓ U = ⊥`) is nilpotent.  Theorem 15.2 (`mf_ne_msigma_typeP1_structure`)
 supplies `Q ⋊ D = M_σ` with `Q ≤ M_F` and `D` nilpotent, so `M_σ/M_F` is the nilpotent image of `D`
-(`nilpotent_of_surjective`); the restricted quotient map `Ū → M_σ/M_F` is bijective, so `U` is
+(`Group.nilpotent_of_surjective`); the restricted quotient map `Ū → M_σ/M_F` is bijective, so `U` is
 nilpotent.  Discharges the `U` nilpotent residual `TypePData` field deferred by
 `exists_typeP1_mf_complement` (the deferred half of Corollary 15.5(c)) for the `hP1neIIIIV` bridge.
 Axiom-clean. -/
@@ -7147,7 +7147,7 @@ measure `orbit_sharpSubgroup_normSq_term`: `|(P#)^G|/|G| = |P#|/|N_G(P)|` for a 
 /-! **Peterfalvi (14.11.4) `G₀`-drop set reduction** (`S16_NonExistenceG`, lane γ/POLE-2).
 `MHypothesis.famG0_sub_filter_card_le_orbit_ncard`: `|famG₀| − |G₀| ≤ |(W−(W₁∪W₂))^G| + |(P#)^G| +
 |(Q#)^G|` (as `ncard`s), from `G₀ ⊆ famG₀` (`G0_off_dadeSupport`) and `famG₀ ∖ G₀ ⊆ orbits`
-(`G0_orbit_cover` carrier) via `Set.ncard_diff` + `Set.ncard_union_le`.  The set-theoretic core of
+(`G0_orbit_cover` carrier) via `Set.ncard_sdiff` + `Set.ncard_union_le`.  The set-theoretic core of
 the §8 TI-counting of (14.11.4).  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.MHypothesis.famG0_sub_filter_card_le_orbit_ncard
 

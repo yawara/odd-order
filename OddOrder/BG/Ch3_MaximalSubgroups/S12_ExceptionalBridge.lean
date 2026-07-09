@@ -399,7 +399,7 @@ theorem normalizer_Malpha_sup_sylow_of_mem_sigma [Finite G] (hG : IsMinimalSimpl
   -- a Sylow subgroup inside a nilpotent normal subgroup is normal.
   set SbF : Sylow p ↥(Ch01.fitting (↥M ⧸ N)) := Sb.subtype hSb_F with hSbFdef
   have hSbF_norm : (SbF : Subgroup ↥(Ch01.fitting (↥M ⧸ N))).Normal := by
-    have htfae := (isNilpotent_of_finite_tfae (G := ↥(Ch01.fitting (↥M ⧸ N)))).out 0 3
+    have htfae := (Group.isNilpotent_of_finite_tfae (G := ↥(Ch01.fitting (↥M ⧸ N)))).out 0 3
     exact htfae.mp inferInstance p ⟨Fact.out⟩ SbF
   haveI hSbF_char : (SbF : Subgroup ↥(Ch01.fitting (↥M ⧸ N))).Characteristic :=
     Sylow.characteristic_of_normal SbF hSbF_norm
@@ -1127,10 +1127,10 @@ theorem mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne [Finite G]
   haveI hM'nil := isNilpotent_derived_of_Malpha_eq_bot hG hM hMαbot
   have hMσM' : S10.Msigma M ≤ derivedInG M := S10.Msigma_le_derived hG hM
   have hMσnil : Group.IsNilpotent ↥(S10.Msigma M) :=
-    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hMσM')
+    Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hMσM')
   -- (10) `C_G(A) ≤ M`: `Pg ⊴`-by-`M`, `Z` characteristic, `N_G(Z) = M`.
   have hPW_norm : (PW : Subgroup ↥(S10.Msigma M)).Normal := by
-    have htfae := (isNilpotent_of_finite_tfae (G := ↥(S10.Msigma M))).out 0 3
+    have htfae := (Group.isNilpotent_of_finite_tfae (G := ↥(S10.Msigma M))).out 0 3
     exact htfae.mp hMσnil p ⟨Fact.out⟩ PW
   haveI hPW_char : (PW : Subgroup ↥(S10.Msigma M)).Characteristic :=
     Sylow.characteristic_of_normal PW hPW_norm

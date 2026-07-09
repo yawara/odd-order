@@ -931,7 +931,7 @@ theorem tSideDadeSupport_nonempty [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleO
     obtain ⟨a, ha1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp
       (OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hyp.base.T_maximal)
     have ha1' : (a : G) ≠ 1 := fun h => ha1 (Subtype.ext h)
-    exact ⟨a.1, (Set.mem_diff _).mpr
+    exact ⟨a.1, (Set.mem_sdiff _).mpr
       ⟨SetLike.mem_coe.mpr a.2, fun h => ha1' (Set.mem_singleton_iff.mp h)⟩⟩
   · -- `T`-conjugation invariance of `T_σ^# = sharpSubgroup (M_σ T)`.
     intro m x hm
@@ -4854,7 +4854,7 @@ theorem centralizerSupport_sharpSubgroup_eq_of_frobenius [Finite G] {M N : Subgr
       = OddOrder.GroupTheory.sharpSubgroup N := by
   ext y
   simp only [OddOrder.GroupTheory.centralizerSupport, OddOrder.GroupTheory.sharpSubgroup,
-    Set.mem_setOf_eq, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+    Set.mem_setOf_eq, Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff]
   constructor
   · rintro ⟨hyM, hy1, x, ⟨hxN, hx1⟩, hyx⟩
     have hxM : x ∈ M := hNM hxN
@@ -4895,7 +4895,7 @@ theorem MHypothesis.card_typeIA_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
   have hc : Nat.card ↥Mdata.K = ((Mdata.K : Set G)).ncard := by
     rw [← Nat.card_coe_set_eq]; exact Nat.card_congr (Equiv.refl _)
   rw [hTI, hHK, Mdata.k_eq_card_K, Nat.card_coe_set_eq, OddOrder.GroupTheory.sharpSubgroup,
-    Set.ncard_diff (Set.singleton_subset_iff.mpr Mdata.K.one_mem), Set.ncard_singleton, hc]
+    Set.ncard_sdiff (Set.singleton_subset_iff.mpr Mdata.K.one_mem), Set.ncard_singleton, hc]
 
 /-- **Peterfalvi (14.11): `|M| = p q k`** — the order of the type-I maximal `M`, from
 `[M : K] = e = pq` (`e_eq_index`, `complement_card_eq_pq`) and `|K| = k` (`k_eq_card_K`) by Lagrange.
@@ -4992,7 +4992,7 @@ theorem isTISubset_sdiff_sup_of_normalizer_eq [Finite G] {W W1 W2 : Subgroup G}
       simpa only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply] using hmem
   rw [← hnorm vset ⟨a, haV⟩ Set.Subset.rfl, Subgroup.mem_set_normalizer_iff]
   intro h
-  simp only [hvset, Set.mem_diff, Set.mem_union, SetLike.mem_coe]
+  simp only [hvset, Set.mem_sdiff, Set.mem_union, SetLike.mem_coe]
   rw [hgW h, hstab W1 hW1le h, hstab W2 hW2le h]
 
 /-- **`W` stabilises its exceptional set `W − (W₁ ∪ W₂)` under conjugation** — the `hstab` input to
@@ -5058,7 +5058,7 @@ theorem conj_smul_sharpSubgroup_eq_of_mem_normalizer {P : Subgroup G} {l : G}
   rw [Subgroup.mem_set_normalizer_iff] at hl
   ext x
   simp only [Set.mem_smul_set, MulAut.smul_def, MulAut.conj_apply,
-    OddOrder.GroupTheory.sharpSubgroup, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+    OddOrder.GroupTheory.sharpSubgroup, Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff]
   constructor
   · rintro ⟨v, ⟨hvP, hv1⟩, rfl⟩
     refine ⟨(hl v).mp hvP, fun h => hv1 ?_⟩
@@ -5115,7 +5115,7 @@ open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (14.11.4), the `G₀`-drop set reduction** — `|famG₀| − |G₀| ≤ |(W−(W₁∪W₂))^G| +
 |(P#)^G| + |(Q#)^G|` (as `ncard`s).  Since `G₀ ⊆ famG₀` (`G0_off_dadeSupport`) and `famG₀ ∖ G₀` is
 covered by the three orbits (`G0_orbit_cover`, the (14.11.3) `G₀ = G − [Ã(M) ∪ orbits]`), the
-difference is bounded by the orbit cardinalities (`Set.ncard_diff` + `Set.ncard_union_le`).  The
+difference is bounded by the orbit cardinalities (`Set.ncard_sdiff` + `Set.ncard_union_le`).  The
 set-theoretic core of the (14.11.4) §8 TI-counting, feeding `orbit_normSq_term` per orbit. -/
 theorem MHypothesis.famG0_sub_filter_card_le_orbit_ncard [Finite G] {hyp : Hypothesis (G := G)}
     (Mdata : MHypothesis hyp) :
@@ -5148,7 +5148,7 @@ theorem MHypothesis.famG0_sub_filter_card_le_orbit_ncard [Finite G] {hyp : Hypot
   have hdiff : (famG0 \ Mdata.G0).ncard ≤ Worb.ncard + Porb.ncard + Qorb.ncard :=
     le_trans (Set.ncard_le_ncard hcover)
       (le_trans (Set.ncard_union_le _ _) (by gcongr; exact Set.ncard_union_le _ _))
-  have hdeq : (famG0 \ Mdata.G0).ncard = famG0.ncard - Mdata.G0.ncard := Set.ncard_diff hsub
+  have hdeq : (famG0 \ Mdata.G0).ncard = famG0.ncard - Mdata.G0.ncard := Set.ncard_sdiff hsub
   have hG0le : Mdata.G0.ncard ≤ famG0.ncard := Set.ncard_le_ncard hsub
   -- `Nat.card famG₀ = famG₀.ncard`, `|filter| = G₀.ncard`.
   have hfamcard : Nat.card famG0 = famG0.ncard := Nat.card_coe_set_eq famG0
@@ -8119,7 +8119,7 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     intro i
     refine (induce_diff_support (θ i) (θ 0) (d i) (hdeg i)).trans ?_
     intro x hx
-    rw [Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff] at hx
+    rw [Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff] at hx
     exact (mem_supportInSubgroup_sharp_subgroupOf_iff typeIHyp.typeI.typeF.H hAH x).mpr
       ⟨hx.1, hx.2⟩
   have hnu_isometry : ∀ i j : Fin (n + 1), i ≠ ind1H → j ≠ ind1H →

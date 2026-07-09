@@ -57,7 +57,7 @@ theorem averageMap_apply (ρ : Representation k G V) [Fintype G]
     [Invertible (Fintype.card G : k)] (v : V) :
     ρ.averageMap v = ⅟(Fintype.card G : k) • ∑ g : G, ρ g v := by
   simp only [averageMap, GroupAlgebra.average, map_smul, map_sum, MonoidAlgebra.of_apply,
-    asAlgebraHom_single_one, LinearMap.smul_apply, LinearMap.coeFn_sum, Finset.sum_apply]
+    asAlgebraHom_single_one, LinearMap.smul_apply, LinearMap.coe_sum, Finset.sum_apply]
 
 /-- The two summands of the coprime decomposition meet trivially: a `G`-invariant vector lying
 in the augmentation submodule `[V,G] = ker (averageMap ρ)` is zero.  (This is `[V,G]^G = 0`, used

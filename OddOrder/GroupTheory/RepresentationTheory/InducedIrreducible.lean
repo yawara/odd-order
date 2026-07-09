@@ -323,7 +323,7 @@ theorem induce_eq_induce_iff_conj (θ ψ : IrreducibleCharacter H) :
   constructor
   · intro heq
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     have h0 := inner_induce_eq_zero_of_not_conj θ ψ hcon
     rw [heq] at h0
     have hpos : ClassFunction.inner (induce H (ψ : ClassFunction ↥H ℂ))

@@ -251,7 +251,7 @@ theorem commPairing_ne (hnonab : ¬ ∀ a b : P, a * b = b * a) :
     ∃ v w, commPairing hP v w ≠ 0 := by
   obtain ⟨x, y, hxy⟩ : ∃ x y : P, ⁅x, y⁆ ≠ 1 := by
     by_contra h
-    push_neg at h
+    push Not at h
     exact hnonab fun a b => commutatorElement_eq_one_iff_mul_comm.mp (h a b)
   refine ⟨Additive.ofMul (QuotientGroup.mk x), Additive.ofMul (QuotientGroup.mk y), ?_⟩
   rw [commPairing_ofMul]
@@ -457,7 +457,7 @@ theorem card_dvd_succ_of_primeAction_extraspecial (hodd : Odd p)
     haveI : Nontrivial (Subrepresentation ρ) := ⟨⊥, ⊤, hbnt⟩
     refine ⟨fun W => ?_⟩
     by_contra hW
-    push_neg at hW
+    push Not at hW
     obtain ⟨hWbot, hWtop⟩ := hW
     have hWsub_bot : W.toSubmodule ≠ ⊥ := fun h =>
       hWbot (Subrepresentation.toSubmodule_injective (by rw [h]; rfl))
@@ -483,7 +483,7 @@ theorem card_dvd_succ_of_primeAction_extraspecial (hodd : Odd p)
           inv_mul_cancel, map_one, Module.End.one_apply]
       have hfixV : ρ (b⁻¹ * a) w = w := by
         have := congrArg Subtype.val hfix
-        simpa [Subrepresentation.toRepresentation, LinearMap.restrict_coe_apply] using this
+        simpa [Subrepresentation.toRepresentation, LinearMap.coe_restrict_apply] using this
       exact hfpfρ (b⁻¹ * a) hba w hfixV
     exact hndvd (OddOrder.RepresentationTheory.card_dvd_sub_one_of_faithful_line
       W.toRepresentation hWdim hfaithW)

@@ -327,7 +327,7 @@ theorem eq_zero_or_edge_of_dvd_of_normBound {a b m : ℤ}
   -- Hence `x² ≤ 1`: otherwise `x² ≥ 2` gives `2a² ≤ a²x² ≤ 1 + a²`, i.e. `a² ≤ 1`, contradicting `a ≥ 2`.
   have hx2 : x ^ 2 ≤ 1 := by
     by_contra h
-    push_neg at h
+    push Not at h
     have hx2' : 2 ≤ x ^ 2 := h
     nlinarith [hb2, mul_pos ha0 ha0, mul_le_mul_of_nonneg_left hx2' (le_of_lt (mul_pos ha0 ha0))]
   have hxlo : -1 ≤ x := by nlinarith [hx2, sq_nonneg (x + 1)]
@@ -2475,7 +2475,7 @@ theorem coherentDegreeSumBound_of_not_coherent
       (OddOrder.Peterfalvi.S04.supportInSubgroup A L))) :
     ∑ i ∈ s, ((deg i : ℝ)) ^ 2 ≤ 2 * (a : ℝ) := by
   by_contra hlt
-  push_neg at hlt
+  push Not at hlt
   exact hnc ⟨xAdjoinStep hyp hconj hS₁ χ hrealχ hdiffsuppχ hχχ hχbarχbar hχχbar hχbarχ
     hχ_S1 hχbar_S1 s χmem deg i₁ hi₁ hmemreal hmemdiffsupp hmemdegdiffsupp hmemS1 hmembarS1
     hmemconjortho hmemortho hdiffasuppχ htau1_memaχ ha1 hlt hSgen hgen⟩
@@ -2915,7 +2915,7 @@ theorem isPGroup_of_isNilpotent_of_isPGroup_abelianization {p : ℕ} [Fact p.Pri
   classical
   obtain ⟨P⟩ : Nonempty (Sylow p Γ) := inferInstance
   haveI hPnormal : (↑P : Subgroup Γ).Normal := by
-    have htfae := (isNilpotent_of_finite_tfae (G := Γ)).out 0 3
+    have htfae := (Group.isNilpotent_of_finite_tfae (G := Γ)).out 0 3
     exact htfae.mp ‹_› p ‹_› P
   -- `Abelianization Q` is a `p`-group (image of `Abelianization Γ`).
   have hQab_p : IsPGroup p (Abelianization (Γ ⧸ (↑P : Subgroup Γ))) :=

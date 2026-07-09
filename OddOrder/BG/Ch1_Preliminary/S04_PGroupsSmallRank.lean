@@ -7,7 +7,7 @@ import Mathlib.GroupTheory.IndexNormal
 import Mathlib.GroupTheory.GroupAction.ConjAct
 import Mathlib.GroupTheory.GroupAction.Quotient
 import Mathlib.GroupTheory.Index
-import Mathlib.Data.Finite.Card
+import Mathlib.SetTheory.Cardinal.NatCard
 import Mathlib.Data.Nat.Choose.Dvd
 import Mathlib.Data.Nat.Factorization.Basic
 import Mathlib.Algebra.Module.ZMod
@@ -935,7 +935,7 @@ theorem exists_distinct_subgroups_card_prime_of_not_isCyclic (hR : IsPGroup p R)
       IsCyclic R :=
     fun h => OddOrder.Isaacs.Ch06.isCyclic_of_subgroups_card_prime_unique_of_odd hR hp_odd h
   by_contra h
-  -- `push_neg` is deprecated in this toolchain; unfold the negated existential by hand.
+  -- `push Not` is deprecated in this toolchain; unfold the negated existential by hand.
   simp only [not_exists, not_and, ne_eq, not_not] at h
   exact hnc (huniq fun K L hK hL => h K L hK hL)
 
@@ -2353,7 +2353,7 @@ theorem nilpotencyClass_le_of_card_le_pow {p : ℕ} [Fact p.Prime]
   haveI : Group.IsNilpotent R' := hR'.isNilpotent
   rcases subsingleton_or_nontrivial R' with hsub | hnt
   · -- `Subsingleton R'`: class `= 0 ≤ j`.
-    exact le_trans (le_of_eq (nilpotencyClass_zero_iff_subsingleton.mpr hsub)) (Nat.zero_le j)
+    exact le_trans (le_of_eq (Group.nilpotencyClass_zero_iff_subsingleton.mpr hsub)) (Nat.zero_le j)
   · -- `Nontrivial R'`.
     obtain ⟨m, hm⟩ := IsPGroup.iff_card.mp hR'
     -- `m ≥ 1` since `R'` is nontrivial.
@@ -2383,7 +2383,7 @@ theorem nilpotencyClass_le_of_card_le_pow {p : ℕ} [Fact p.Prime]
         · -- `|R'| = p²`: commutative.
           exact IsPGroup.commutative_of_card_eq_prime_sq hm
       -- `Z(R') = ⊤`, so `upperCentralSeries R' 1 = ⊤`, giving `cl(R') ≤ 1`.
-      rw [← upperCentralSeries_eq_top_iff_nilpotencyClass_le, upperCentralSeries_one, eq_top_iff]
+      rw [← Subgroup.upperCentralSeries_eq_top_iff_nilpotencyClass_le, Subgroup.upperCentralSeries_one, eq_top_iff]
       intro z _
       rw [Subgroup.mem_center_iff]
       intro g
@@ -2423,7 +2423,7 @@ theorem nilpotencyClass_le_of_card_le_pow {p : ℕ} [Fact p.Prime]
       have hQclass : Group.nilpotencyClass (R' ⧸ Subgroup.center R') ≤ j - 1 :=
         ih (Nat.card (R' ⧸ Subgroup.center R')) hquot_lt (j - 1) (by omega) hQpg rfl hquot_le
       -- `cl(R') = cl(R'/Z) + 1 ≤ (j-1) + 1 = j`.
-      rw [nilpotencyClass_eq_quotient_center_plus_one]
+      rw [Group.nilpotencyClass_eq_quotient_center_plus_one]
       omega
 
 /-- From `cl(G) ≤ 3` one gets that every weight-`3` commutator `⁅⁅a, b⁆, c⁆` is central.

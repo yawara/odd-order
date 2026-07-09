@@ -2392,7 +2392,7 @@ theorem card_A_eq_kernelOrder_sub_one (H78 : Hypothesis78 G A L) :
     rw [← Nat.card_coe_set_eq]
     rfl
   have h1_mem : (1 : G) ∈ (H78.hyp76.H : Set G) := H78.hyp76.H.one_mem
-  rw [Set.ncard_diff (Set.singleton_subset_iff.mpr h1_mem) (Set.finite_singleton _),
+  rw [Set.ncard_sdiff (Set.singleton_subset_iff.mpr h1_mem) (Set.finite_singleton _),
     Set.ncard_singleton, hHcard]
 
 /-- The local support ratio `|A|/|L|` in the `(h,e)` notation of (7.8.b). -/
@@ -4549,7 +4549,7 @@ lemma ncard_kernel_sharp [Finite G] (F : FrobeniusFamily G k) (i : Fin k) :
     rw [← Nat.card_coe_set_eq]
     rfl
   have h1_mem : (1 : G) ∈ (F.H i : Set G) := (F.H i).one_mem
-  rw [Set.ncard_diff (Set.singleton_subset_iff.mpr h1_mem) (Set.finite_singleton _),
+  rw [Set.ncard_sdiff (Set.singleton_subset_iff.mpr h1_mem) (Set.finite_singleton _),
     Set.ncard_singleton, hHcard]
 
 /-- A conjugate image of `H_i^#` has cardinality `|H_i| - 1`. -/

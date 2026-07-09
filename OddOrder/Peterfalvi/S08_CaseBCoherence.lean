@@ -52,7 +52,7 @@ theorem eq_zero_or_edge_of_dvd_of_normLt {a b m : ℤ}
     nlinarith [sq_nonneg (a * x - a), mul_nonneg (by linarith : (0 : ℤ) ≤ m - 2) (sq_nonneg (a * x))]
   have hx2 : x ^ 2 ≤ 1 := by
     by_contra h
-    push_neg at h
+    push Not at h
     have hx2' : 2 ≤ x ^ 2 := h
     nlinarith [hb2, mul_pos ha0 ha0, mul_le_mul_of_nonneg_left hx2' (le_of_lt (mul_pos ha0 ha0))]
   have hxlo : -1 ≤ x := by nlinarith [hx2, sq_nonneg (x + 1)]

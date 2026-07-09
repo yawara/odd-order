@@ -232,7 +232,7 @@ theorem dichotomy_3_5
   · refine Or.inr (kernel_trivial_on_submodule_of_centralizer_eq_bot hFrob hNK hNinv hNne ρ
       hcharN hBinv (fun b hb hbfix => ?_))
     -- From `¬ (C_A(R) = 0)` get a nonzero `a ∈ A` fixed by `R`; show `C_B(R) = 0`.
-    push_neg at hA0
+    push Not at hA0
     obtain ⟨a, haA, hafix, ha0⟩ := hA0
     -- `a ∈ inv`, `a ≠ 0`, and `inv` is one-dimensional, so `inv = span {a}`.
     have hainv : a ∈ inv := (hmem_inv a).mpr hafix
@@ -831,7 +831,7 @@ theorem exists_conjChar_eq_of_irreducible (ρ : Representation F G W) {H K' : Su
     · exact congrArg Subrepresentation.toSubmodule ht
   -- `χ₂ ∈ O`.
   by_contra hχ₂
-  push_neg at hχ₂
+  push Not at hχ₂
   have hle : weightSpace ρ K' χ₂ ≤ ⨆ j, ⨆ _ : j ≠ χ₂, weightSpace ρ K' j := by
     calc weightSpace ρ K' χ₂ ≤ V := le_top.trans_eq hVtop.symm
       _ = ⨆ χ ∈ O, weightSpace ρ K' χ := hV
@@ -1560,7 +1560,7 @@ private theorem thm35_aux : ∀ (n : ℕ)
           exact hUg (Subsingleton.elim _ _)
         by_cases hKtrivU : ∀ k : ↥K, U.toRepresentation (k : G) = 1
         · exact hKtrivU ⟨g, hKK_le hg⟩
-        · push_neg at hKtrivU
+        · push Not at hKtrivU
           have hCU1 := finrank_invariants_subrep_eq_one ρ hFrob hcharK hCV1 U hKtrivU
           have hCUK' := invariants_commutator_ne_bot_of_irreducible U.toRepresentation hFrob x hxR
             hRp' hgen hchar hcharK hcharKR hcop hK'ne hcomm hCU1

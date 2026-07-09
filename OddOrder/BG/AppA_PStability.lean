@@ -797,7 +797,7 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
       obtain ⟨r, hr_prime, hr_dvd, hr_ne_p⟩ :
           ∃ r : ℕ, r.Prime ∧ r ∣ Nat.card ↥H ∧ r ≠ p := by
         by_contra h_no
-        push_neg at h_no
+        push Not at h_no
         apply h_not_pow
         have hall : ∀ q ∈ (Nat.card ↥H).primeFactorsList, q = p := by
           intro q hq

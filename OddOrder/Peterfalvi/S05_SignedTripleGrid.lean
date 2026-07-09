@@ -1610,7 +1610,7 @@ theorem exists_common [Fintype ι] (hG : IsSignedTripleGrid A) (hι : 4 ≤ Fint
       have hb1 := Finset.card_insert_le i₁ ({i₂, i₃} : Finset ι)
       have hb2 := Finset.card_insert_le i₂ ({i₃} : Finset ι)
       simp only [Finset.card_singleton] at hb1 hb2; omega
-    by_contra hcon; push_neg at hcon
+    by_contra hcon; push Not at hcon
     have hle : (Finset.univ : Finset ι).card ≤ ({i₁, i₂, i₃} : Finset ι).card :=
       Finset.card_le_card (fun x _ => hcon x)
     rw [Finset.card_univ] at hle; omega

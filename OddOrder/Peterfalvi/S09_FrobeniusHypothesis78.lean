@@ -238,7 +238,7 @@ noncomputable def hypothesis78 [Fintype G] [Invertible (Nat.card G : ℂ)]
     intro j
     refine (induce_diff_support (θ j) (θ 0) (d j) (hdeg j)).trans ?_
     intro x hx
-    rw [Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff] at hx
+    rw [Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff] at hx
     exact (mem_supportInSubgroup_sharp_subgroupOf_iff (F.H i) hAH x).mpr ⟨hx.1, hx.2⟩
   -- Assemble the `Hypothesis78` via `hypothesis78OfDade`.  The `hτ` isometry is the coherence
   -- Dade map's own `isDadeIsometry` (matching `sibleyToHypothesis71.τ` definitionally).

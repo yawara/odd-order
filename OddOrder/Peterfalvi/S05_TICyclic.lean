@@ -133,7 +133,7 @@ noncomputable def mapOfInjective {H G : Type*} [Group H] [Group G] [Fintype H] [
       have := hyp.V_subset_sharp hx
       simpa [OddOrder.Peterfalvi.S04.sharp] using this
     change φ x ∈ Set.univ \ ({1} : Set G)
-    simp only [Set.mem_diff, Set.mem_univ, Set.mem_singleton_iff, true_and]
+    simp only [Set.mem_sdiff, Set.mem_univ, Set.mem_singleton_iff, true_and]
     exact fun hc => hxs (hφ (hc.trans (map_one φ).symm))
   V_subset_W := by
     rintro _ ⟨x, hx, rfl⟩
@@ -528,7 +528,7 @@ def Vdiff (hyp : TICyclicHypothesis G) : Set G :=
 
 @[simp] theorem mem_Vdiff (hyp : TICyclicHypothesis G) {g : G} :
     g ∈ hyp.Vdiff ↔ g ∈ hyp.W ∧ g ∉ hyp.W1 ∧ g ∉ hyp.W2 := by
-  simp only [Vdiff, Set.mem_diff, Set.mem_union, SetLike.mem_coe, not_or]
+  simp only [Vdiff, Set.mem_sdiff, Set.mem_union, SetLike.mem_coe, not_or]
 
 section
 open scoped IsMulCommutative

@@ -110,7 +110,7 @@ private lemma exists_not_commute_of_center_index_pow_two
     (h_idx : (Subgroup.center T).index = p ^ 2) :
     ∃ x y : T, x * y ≠ y * x := by
   by_contra h
-  push_neg at h
+  push Not at h
   -- T abelian ⇒ Z(T) = ⊤ ⇒ index = 1.
   have hZ_top : Subgroup.center T = ⊤ := by
     rw [Subgroup.eq_top_iff']
@@ -324,7 +324,7 @@ private lemma card_setOfPowEqOne_ge_pow_two_of_index_pow_two_odd
   -- p² * |Z(T)| ≤ |K| * |Z(T)| (using h_im_card_le and h_lag)
   have hZ_pos : 0 < Nat.card (Subgroup.center T) := Nat.card_pos
   by_contra hKlt
-  push_neg at hKlt
+  push Not at hKlt
   -- |K| < p² ⇒ |K| * |Z(T)| < p² * |Z(T)|. But |K| * |im θ| = |T| = p² * |Z(T)|
   -- and |im θ| ≤ |Z(T)|.
   have h_lt : Nat.card (OddOrder.Isaacs.Ch04.setOfPowEqOne hC hp_odd) * Nat.card θ.range
@@ -598,7 +598,7 @@ private theorem char_elementaryAbelian_4_of_noncyclic_abelian_2group
       exact h_not_cyclic (isCyclic_of_prime_card hA_card)
     have hkD_pos : 1 ≤ kD := by
       by_contra hlt
-      push_neg at hlt
+      push Not at hlt
       interval_cases kD
       rw [pow_zero] at hD_pow
       exact hD_card_ne_one hD_pow
@@ -727,7 +727,7 @@ private theorem char_elementaryAbelian_4_of_noncyclic_abelian_2group
     -- orderOf a < |A| (otherwise A cyclic).
     have ha_order_lt : orderOf a < Nat.card A := by
       by_contra hge
-      push_neg at hge
+      push Not at hge
       have h_le : orderOf a ≤ Nat.card A := orderOf_le_card
       have ha_order_eq : orderOf a = Nat.card A := le_antisymm h_le hge
       apply h_not_cyclic

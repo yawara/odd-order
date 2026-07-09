@@ -317,7 +317,7 @@ private theorem lt_normalizer_inf_of_pgroup_lt [Finite G] {q : ℕ} [Fact q.Prim
     Q < P ⊓ Subgroup.normalizer Q := by
   classical
   haveI : Group.IsNilpotent ↥P := hP.isNilpotent
-  have hNC : NormalizerCondition ↥P := normalizerCondition_of_isNilpotent (G := ↥P)
+  have hNC : NormalizerCondition ↥P := Group.normalizerCondition_of_isNilpotent (G := ↥P)
   have hQ_le : Q ≤ P := le_of_lt hQP
   have hsub_lt_top : Q.subgroupOf P < ⊤ := by
     rw [lt_top_iff_ne_top]
@@ -718,7 +718,7 @@ theorem exists_cocyclic_inf_centralizer_ne_bot_of_not_isCyclic [Finite G]
   have htop := OddOrder.BG.Ch1.S01.cocyclicFixedByClosure_eq_top_of_not_isCyclic
     hQ_inv.restrict hCop hB_nc
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   have hle : OddOrder.BG.Ch1.S01.cocyclicFixedByClosure hQ_inv.restrict ≤ ⊥ := by
     rw [OddOrder.BG.Ch1.S01.cocyclicFixedByClosure, Subgroup.closure_le]
     rintro g ⟨Yb, ⟨b, hb⟩, hYfix⟩
@@ -747,7 +747,7 @@ theorem exists_cocyclic_inf_centralizer_ne_bot_of_not_isCyclic [Finite G]
 private theorem exists_le_pRank_of_le_rank {H : Type*} [Group H] [Finite H] {n : ℕ}
     (hn : 0 < n) (h : n ≤ rank H) : ∃ p : ℕ, n ≤ pRank H p := by
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   have : rank H ≤ n - 1 := by
     rw [rank_le_iff]; intro p; have := hcon p; omega
   omega
@@ -895,7 +895,7 @@ theorem transitive_of_three_le_rank_center [Finite G] (hG : IsMinimalSimpleOdd G
   obtain ⟨p, B, hB_ea, hB_nc, hB_log, hBA, hB_cent⟩ :=
     exists_elementaryAbelian_le_center_of_le_rank (n := 3) (by norm_num) hm
   have hp2 : 2 ≤ p := by
-    by_contra h; push_neg at h
+    by_contra h; push Not at h
     rw [Nat.log_of_left_le_one (by omega)] at hB_log; omega
   intro Q₁ hQ₁ Q₂ hQ₂
   by_cases hQ₁bot : Q₁ = ⊥
@@ -2942,7 +2942,7 @@ private theorem card_le_prime_mul_card_centralizer_inf {p : ℕ} [Fact p.Prime] 
     rw [hj] at hlt ⊢
     have hj1 : j ≤ 1 := by
       by_contra h
-      push_neg at h
+      push Not at h
       exact absurd hlt (not_lt.mpr (Nat.pow_le_pow_right (Fact.out : p.Prime).one_lt.le h))
     calc p ^ j ≤ p ^ 1 := Nat.pow_le_pow_right (Fact.out : p.Prime).one_lt.le hj1
       _ = p := pow_one p

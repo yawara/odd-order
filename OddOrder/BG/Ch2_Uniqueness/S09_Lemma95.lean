@@ -1608,7 +1608,7 @@ private theorem chiefSeriesInside_le_opiCoreInG_sup_of_nilpotent
     simpa [U] using chiefSeriesInside_le K i
   have hU_nilp : Group.IsNilpotent ↥U := by
     haveI : Group.IsNilpotent ↥K := hKnilp
-    exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hU_le_K)
+    exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hU_le_K)
   change U ≤ X
   refine S08.le_of_sylow_le_of_nilpotent hU_nilp ?_
   intro r
@@ -1937,14 +1937,14 @@ private theorem le_centralizer_inf_opiCoreFitting_of_pSubgroup_local_derived
     simpa [H] using hP0_der.trans (derivedInG_le_self (L ⊓ M))
   have hD_nilp : Group.IsNilpotent ↥D := by
     haveI : Group.IsNilpotent ↥(S08.fittingInG M) := S08.fittingInG_isNilpotent M
-    exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hD_le_F)
+    exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hD_le_F)
   have hK_nilp_ambient : Group.IsNilpotent ↥K := by
     haveI : Group.IsNilpotent ↥D := hD_nilp
-    exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe inf_le_left)
+    exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe inf_le_left)
   have hK_nilp :
       Group.IsNilpotent ↥((K.subgroupOf H : Subgroup ↥H)) := by
     haveI : Group.IsNilpotent ↥K := hK_nilp_ambient
-    exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hK_le_H).symm
+    exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hK_le_H).symm
   have hK_rank_ambient : rank ↥K ≤ 2 := by
     simpa [D, K] using
       (rank_inf_opiCoreFitting_le_two_of_distinct_maximals
@@ -2415,7 +2415,7 @@ private theorem pRank_le_pRank_oPiCore_compl_of_nilpotent
   obtain ⟨S⟩ := (inferInstance : Nonempty (Sylow q N))
   have hiff : Group.IsNilpotent N ↔
       ∀ (p' : ℕ) (_hp : Fact p'.Prime) (P : Sylow p' N), (↑P : Subgroup N).Normal :=
-    (isNilpotent_of_finite_tfae (G := N)).out 0 3
+    (Group.isNilpotent_of_finite_tfae (G := N)).out 0 3
   haveI hSnorm : (S : Subgroup N).Normal := hiff.mp inferInstance q inferInstance S
   have hSpi : Ch03.Subgroup.IsPiGroup {r : ℕ | r ≠ p} (S : Subgroup N) := by
     intro r hr
@@ -2725,7 +2725,7 @@ theorem scn3_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd G)
   have hncase := mt (noncyclic_isUniquelyMaximal_of_centralizer_le hG hM.1 hWea hWleM hWnc) hWnot
   rw [not_or] at hncase
   have hfirst := hncase.1
-  push_neg at hfirst
+  push Not at hfirst
   obtain ⟨x, hxW, hx1, hxnotM⟩ := hfirst
   -- `Z(G) = ⊥`, hence `C_G(x) < ⊤`
   have hZbot : Subgroup.center G = ⊥ := by

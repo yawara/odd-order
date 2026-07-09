@@ -321,7 +321,7 @@ theorem exists_irreducible_subrep_apply_ne
       IsSimpleModule (MonoidAlgebra F G) ↥N ∧
       ∃ w : ρ.asModule, w ∈ N ∧ MonoidAlgebra.single g₀ (1 : F) • w ≠ w := by
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     apply hg₀
     -- `single g₀ 1` fixes every `asModule` element (it fixes every simple, which join to `⊤`)
     have hall : ∀ w : ρ.asModule, MonoidAlgebra.single g₀ (1 : F) • w = w := by
@@ -686,7 +686,7 @@ private theorem thm34_aux : ∀ (n : ℕ)
       thm34_isPrimePow_of_minimal ρ hHall.symm wiring_check hRK
     -- **step 2**: pick `g₀ ∈ ⁅R, K⁆` acting nontrivially, and an irreducible `W`
     -- (Maschke selection).
-    push_neg at hRK
+    push Not at hRK
     obtain ⟨g₀, hg₀mem, hg₀ne⟩ := hRK
     obtain ⟨W, hWirr, hWg₀⟩ := exists_irreducible_subrep_apply_ne ρ hg₀ne
     haveI hWnt : Nontrivial ↥W.toSubmodule := by

@@ -611,7 +611,7 @@ theorem honestTypeP2ASet_conj_mem [Finite G] {M : Subgroup G} {m : G} (hm : m �
 theorem honestTypeP2ASet_subset_hatMsigma [Finite G] {M : Subgroup G} :
     honestTypeP2ASet M ⊆ OddOrder.BG.Ch4.S16.hatMsigma M := by
   rintro y ⟨hyM', -, x, hxσ, hyC⟩
-  obtain ⟨hxMσ, hx1⟩ := (Set.mem_diff _).mp hxσ
+  obtain ⟨hxMσ, hx1⟩ := (Set.mem_sdiff _).mp hxσ
   refine ⟨Subgroup.map_subtype_le _ hyM', ?_⟩
   -- `x ∈ M_σ ⊓ C_G(y)` is a nonidentity witness (`y ∈ C_G(x) ↔ x ∈ C_G(y)`).
   intro hbot
@@ -710,7 +710,7 @@ theorem coprime_FT_signalizer_centralizerIn_honestTypeP2ASet [Finite G]
     exact Subgroup.mem_subgroupOf.mp (hcent humem)
   -- `w ∈ M_σ`: `w ∈ A(S)` centralizes a nonidentity `M_σ`-element `x`.
   obtain ⟨hwM', hw1, x, hxσ, hwC⟩ := hw
-  obtain ⟨hxMσ, hx1⟩ := (Set.mem_diff _).mp hxσ
+  obtain ⟨hxMσ, hx1⟩ := (Set.mem_sdiff _).mp hxσ
   have hx1' : x ≠ 1 := fun he => hx1 (Set.mem_singleton_iff.mpr he)
   have hwM : w ∈ M := Subgroup.map_subtype_le _ hwM'
   have hwMσ : w ∈ OddOrder.BG.Ch3.S10.Msigma M := by
@@ -867,7 +867,7 @@ theorem dadeSupportHypothesisData_honestTypeP2ASet [Fintype G] [Finite G]
     have haMσ : (a : G) ∈ OddOrder.BG.Ch3.S10.Msigma M := a.2
     have haM' : (a : G) ∈ derivedInG M := OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM haMσ
     refine ⟨a.1, haM', ha1', a.1, ?_, ?_⟩
-    · exact (Set.mem_diff _).mpr ⟨SetLike.mem_coe.mpr haMσ, fun h => ha1' (Set.mem_singleton_iff.mp h)⟩
+    · exact (Set.mem_sdiff _).mpr ⟨SetLike.mem_coe.mpr haMσ, fun h => ha1' (Set.mem_singleton_iff.mp h)⟩
     · exact Subgroup.mem_centralizer_singleton_iff.mpr rfl
   · -- `M`-conjugation invariance.
     intro m x hm
@@ -1136,7 +1136,7 @@ theorem Hypothesis.cprimeSharpS_subset_supportA [Fintype G] [Finite G]
   have hxC : (x : G) ∈ hyp.C := hCpC hxCp
   rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup, mem_honestTypeP2ASet]
   refine ⟨hCderiv hxC, fun h => hxne (Subtype.ext h), (z : G),
-    (Set.mem_diff _).mpr ⟨SetLike.mem_coe.mpr z.2, fun h => hz1' (Set.mem_singleton_iff.mp h)⟩, ?_⟩
+    (Set.mem_sdiff _).mpr ⟨SetLike.mem_coe.mpr z.2, fun h => hz1' (Set.mem_singleton_iff.mp h)⟩, ?_⟩
   rw [Subgroup.mem_centralizer_singleton_iff]
   have hzP : (z : G) ∈ hyp.P := by rw [hPeq]; exact z.2
   exact (Subgroup.mem_centralizer_iff.mp (hCcentP hxC) (z : G) hzP).symm
@@ -1217,7 +1217,7 @@ theorem Hypothesis.sSet_member_support_subset_A [Fintype G] [Finite G]
         rw [← huSub_eq_derivedInG_subgroupOf]; exact w.2
       exact (Subgroup.mem_subgroupOf).mp hwHU
     · -- `d ∈ S_σ# = (Msigma S)#`.
-      refine (Set.mem_diff _).mpr ⟨?_, fun he => hdG_ne (Set.mem_singleton_iff.mp he)⟩
+      refine (Set.mem_sdiff _).mpr ⟨?_, fun he => hdG_ne (Set.mem_singleton_iff.mp he)⟩
       have hdP : ((d : ↥hyp.S) : G) ∈ hyp.P := hHP ▸ hdH_G
       exact SetLike.mem_coe.mpr (hPeq ▸ hdP)
     · -- `w` centralizes `d`.
@@ -2572,7 +2572,7 @@ theorem exists_nat_inner_self_of_mem_ZIrr {H : Type*} [Group H] [Fintype H]
   have hzreal : (Nat.card H : ℝ) * (z : ℝ) = ∑ g : H, ‖φ g‖ ^ 2 := by exact_mod_cast hzr
   have hz0 : (0 : ℤ) ≤ z := by
     by_contra hneg
-    push_neg at hneg
+    push Not at hneg
     have h1 : (z : ℝ) < 0 := by exact_mod_cast hneg
     have h2 : (Nat.card H : ℝ) * (z : ℝ) < 0 := mul_neg_of_pos_of_neg hcard h1
     have h3 : (0 : ℝ) ≤ ∑ g : H, ‖φ g‖ ^ 2 :=
@@ -2876,7 +2876,7 @@ theorem caseB_quadratic_nonneg {Pm1 u : ℕ} (hu : 2 * u ≤ Pm1) (b : ℤ) :
   have hb : 0 ≤ b * (b - 1) := by
     by_cases h : 1 ≤ b
     · exact mul_nonneg (by linarith) (by linarith)
-    · push_neg at h
+    · push Not at h
       calc 0 ≤ (-b) * (-(b - 1)) := mul_nonneg (by omega) (by omega)
         _ = b * (b - 1) := by ring
   nlinarith [mul_nonneg (by linarith : (0 : ℤ) ≤ (Pm1 : ℤ) - 2 * u) (sq_nonneg b),
@@ -4514,7 +4514,7 @@ theorem conj_smul_sharpSubgroup_eq {K N : Subgroup G}
   have hlnorm : l ∈ Subgroup.normalizer (K : Set G) := hnorm ▸ hl
   rw [Subgroup.mem_set_normalizer_iff] at hlnorm
   ext x
-  simp only [Set.mem_smul_set, MulAut.smul_def, MulAut.conj_apply, sharpSubgroup, Set.mem_diff,
+  simp only [Set.mem_smul_set, MulAut.smul_def, MulAut.conj_apply, sharpSubgroup, Set.mem_sdiff,
     Set.mem_singleton_iff, SetLike.mem_coe]
   constructor
   · rintro ⟨v, ⟨hvK, hv1⟩, rfl⟩
@@ -4612,14 +4612,14 @@ theorem Hypothesis.isNilpotent_V [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
     Subgroup.IsComplement'.exists_conj_of_coprime hcop hsolv hUcompl hVcompl
   haveI : Group.IsNilpotent ↥tpd0.U := tpd0.U_nilpotent
   have h1 : Group.IsNilpotent ↥(tpd0.U.subgroupOf (derivedInG hyp.T)) :=
-    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hU_le).symm
+    Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hU_le).symm
   haveI := h1
   have h2 : Group.IsNilpotent
       ↥((tpd0.U.subgroupOf (derivedInG hyp.T)).map (MulAut.conj n).toMonoidHom) :=
-    nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ _ (MulAut.conj n).injective)
+    Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ _ (MulAut.conj n).injective)
   have h3 : Group.IsNilpotent ↥(hyp.V.subgroupOf (derivedInG hyp.T)) := hn ▸ h2
   haveI := h3
-  exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hV_le)
+  exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hV_le)
 
 /-- **A type-`P` datum on `T` whose complement is the abstract `V` (and whose kernel is `Q`).**
 The §13-level producer `typePData_of_isTypeNonI T_nonI` gives *some* `tpd0 : TypePData T`; its
@@ -5501,7 +5501,7 @@ theorem Hypothesis.mem_G0_iff (hyp : Hypothesis (G := G)) (x : G) :
     x ∈ hyp.G0 ↔ x ≠ 1 ∧ x ∉ conjClassSet (sharpSubgroup hyp.H)
       ∧ x ∉ conjClassSet (sharpSubgroup hyp.Q) := by
   show x ∈ sharpSubgroup (⊤ : Subgroup G) \ _ ↔ _
-  simp only [sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe,
+  simp only [sharpSubgroup, Set.mem_sdiff, Set.mem_singleton_iff, SetLike.mem_coe,
     Subgroup.mem_top, true_and, Set.mem_union, not_or]
 
 open scoped Classical in
@@ -6154,7 +6154,7 @@ theorem card_sharp_toFinset [Fintype G] (K : Subgroup G) :
     ext x
     rw [Set.Finite.mem_toFinset, Finset.mem_erase, Finset.mem_filter]
     show x ∈ (K : Set G) \ {1} ↔ _
-    rw [Set.mem_diff, Set.mem_singleton_iff]
+    rw [Set.mem_sdiff, Set.mem_singleton_iff]
     exact ⟨fun ⟨h1, h2⟩ => ⟨h2, Finset.mem_univ _, h1⟩, fun ⟨h2, _, h1⟩ => ⟨h1, h2⟩⟩
   rw [h, Finset.card_erase_of_mem (Finset.mem_filter.mpr ⟨Finset.mem_univ _, K.one_mem⟩)]
   congr 1
@@ -7564,7 +7564,7 @@ theorem exists_caseB_data_eta10 [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd
     rfl
   · -- `1 ≤ n`: else `ψ = 0` pointwise, contradicting `α(1) ≠ 0`.
     by_contra hn0
-    push_neg at hn0
+    push Not at hn0
     have hn00 : n = 0 := by omega
     subst hn00
     have hzero : ∑ k : ↥K, ‖ψ k‖ ^ 2 = 0 := by
@@ -8309,7 +8309,7 @@ theorem G0_nonvanishing_dichotomy [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleO
     exact one_ne_zero hmul
   · -- doubly-vanishing branch: contradiction via `q·η₀₁(x) = q − 1`
     by_contra hboth
-    push_neg at hboth
+    push Not at hboth
     obtain ⟨hl0, he0⟩ := hboth
     obtain ⟨δ, hδ, hlam⟩ := lambda_tau1_apply_eq_of_not_mem_H_sat _hG chars hxH
     have hδ0 : (δ : ℂ) ≠ 0 := by

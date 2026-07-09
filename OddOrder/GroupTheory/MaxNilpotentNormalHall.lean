@@ -91,7 +91,7 @@ theorem maxNilpotentNormalHall_pointwise_smul [Finite G] (φ : MulAut G) (M : Su
       exact hnorm.map (e : ↥M' →* ↥(M'.map (ψ : G →* G))) e.surjective
     · rw [hψN, hψM, ← map_subgroupMap_subgroupOf]
       haveI := hnilp
-      exact nilpotent_of_mulEquiv (e.subgroupMap (N.subgroupOf M'))
+      exact Group.nilpotent_of_mulEquiv (e.subgroupMap (N.subgroupOf M'))
     · rw [hcardN, hψN, hψM, ← map_subgroupMap_subgroupOf]
       have hidx : ((N.subgroupOf M').map (e : ↥M' →* ↥(M'.map (ψ : G →* G)))).index =
           (N.subgroupOf M').index := by

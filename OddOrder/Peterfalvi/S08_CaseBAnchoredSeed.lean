@@ -223,7 +223,7 @@ theorem caseB_column_W2_nonconstant
         ≠ (ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)) 1 := by
   classical
   by_contra hc
-  push_neg at hc
+  push Not at hc
   refine OddOrder.Peterfalvi.S06.Hypothesis.not_subset_characterKernel_chiRestrict_of_ne_one
     h46.toCertainTypeHypothesis.toHypothesis hχ₂ ?_
   intro g hg
@@ -904,7 +904,7 @@ theorem caseB_Xset_member_anchored
   have hθne : ∃ w : ↥(h46.W2.subgroupOf H),
       (θ : ClassFunction ↥H ℂ) (w : ↥H) ≠ (θ : ClassFunction ↥H ℂ) 1 := by
     by_contra hc
-    push_neg at hc
+    push Not at hc
     exact hχnotsub (hyp.mem_SsubFiltration.mpr ⟨θ, hθne1, fun g hg => by
       rw [OddOrder.Peterfalvi.S03.mem_characterKernel]; exact hc ⟨g, hg⟩, hχeq⟩)
   obtain ⟨X, a, hdeg, hanc, hmix, hXZ⟩ :=
@@ -1214,7 +1214,7 @@ theorem mem_span_scaledDiff_of_mem_zSupportedSpan
     by_contra hne
     have h1mem := hφsupp (ClassFunction.mem_support.mpr hne)
     rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at h1mem
-    simp only [sharpImage, Set.mem_diff, Set.mem_singleton_iff] at h1mem
+    simp only [sharpImage, Set.mem_sdiff, Set.mem_singleton_iff] at h1mem
     exact h1mem.2 (by simp)
   rw [← hyz, map_add, hD_vanish y hy, zero_add, map_zsmul] at hφ1
   have hn : n = 0 := by

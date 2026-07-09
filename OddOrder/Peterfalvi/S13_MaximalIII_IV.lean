@@ -959,15 +959,15 @@ theorem HC_isNilpotent [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
   haveI hUnil : Group.IsNilpotent ↥hyp.base.typeP.U := hyp.base.typeP.U_nilpotent
   haveI hCnil : Group.IsNilpotent ↥hyp.C := by
     haveI : Group.IsNilpotent ↥(hyp.C.subgroupOf hyp.base.typeP.U) := Subgroup.isNilpotent _
-    exact nilpotent_of_surjective
+    exact Group.nilpotent_of_surjective
       (Subgroup.subgroupOfEquivOfLe hyp.C_le_U).toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hyp.C_le_U).surjective
   haveI hHtr : Group.IsNilpotent ↥(hyp.base.typeP.H.subgroupOf hyp.HC) :=
-    nilpotent_of_surjective
+    Group.nilpotent_of_surjective
       (Subgroup.subgroupOfEquivOfLe hHle).symm.toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hHle).symm.surjective
   haveI hCtr : Group.IsNilpotent ↥(hyp.C.subgroupOf hyp.HC) :=
-    nilpotent_of_surjective
+    Group.nilpotent_of_surjective
       (Subgroup.subgroupOfEquivOfLe hCle).symm.toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hCle).symm.surjective
   -- Fitting: both ≤ F(↥HC), and they join to ⊤
@@ -984,7 +984,7 @@ theorem HC_isNilpotent [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
   have : Group.IsNilpotent ↥(⊤ : Subgroup ↥hyp.HC) := by
     rw [← hfit_top]
     infer_instance
-  exact nilpotent_of_surjective
+  exact Group.nilpotent_of_surjective
     (Subgroup.topEquiv (G := ↥hyp.HC)).toMonoidHom
     (Subgroup.topEquiv (G := ↥hyp.HC)).surjective
 
@@ -1429,7 +1429,7 @@ theorem coherent_S_of_coherent_SH0C [Finite G]
   haveI : IsSolvable ↥((derivedInG M).subgroupOf M) := inferInstance
   haveI hHCnil : Group.IsNilpotent ↥(hyp.HC.subgroupOf M) := by
     haveI := hyp.HC_isNilpotent
-    exact nilpotent_of_surjective
+    exact Group.nilpotent_of_surjective
       (Subgroup.subgroupOfEquivOfLe hHCleM).symm.toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hHCleM).symm.surjective
   haveI hH₁n : (hyp.H0C.subgroupOf M).Normal := hyp.H0C_subgroupOf_normal

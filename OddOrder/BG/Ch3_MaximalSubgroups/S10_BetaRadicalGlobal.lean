@@ -265,7 +265,7 @@ theorem beta_global_structure [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [
       have hQlt : Q < (P : Subgroup G) := lt_of_le_of_ne hQP hQne
       haveI : Group.IsNilpotent ↥(P : Subgroup G) := P.2.isNilpotent
       have hNC : NormalizerCondition ↥(P : Subgroup G) :=
-        normalizerCondition_of_isNilpotent (G := ↥(P : Subgroup G))
+        Group.normalizerCondition_of_isNilpotent (G := ↥(P : Subgroup G))
       have hQsub_lt : Q.subgroupOf (P : Subgroup G) < ⊤ := by
         rw [lt_top_iff_ne_top]
         intro htop
@@ -380,7 +380,7 @@ theorem normalizer_le_of_nontrivial_beta_subgroup [Finite G] (hG : IsMinimalSimp
     _ = M := by rw [hCeq, ← hM_eq]
 
 /-- 有限 nilpotent 群では `q`-部分群 `X` が `p`-部分群 `P` を中心化する (`p ≠ q`)。
-nilpotent ⟹ 各 Sylow 正規 (`isNilpotent_of_finite_tfae`)、`X ≤` Sylow `q` `Q`,
+nilpotent ⟹ 各 Sylow 正規 (`Group.isNilpotent_of_finite_tfae`)、`X ≤` Sylow `q` `Q`,
 `P ≤` Sylow `p` `P_W`, 異素数ゆえ `Q ⊓ P_W = ⊥` (`IsPGroup.disjoint_of_ne`)、正規 2 部分群は
 disjoint なら可換 (`commute_of_normal_of_disjoint`)。BG Cor 10.9(a)(1) で「`W` nilpotent ⟹
 `X` が `M_σ` の Sylow `p` を中心化」に使う。 -/
@@ -391,7 +391,7 @@ theorem isPGroup_le_centralizer_of_isNilpotent {W : Type*} [Group W] [Finite W]
   obtain ⟨Q, hXQ⟩ := hX.exists_le_sylow
   obtain ⟨PW, hPPW⟩ := hP.exists_le_sylow
   have hAllNormal : ∀ (r : ℕ), Fact r.Prime → ∀ (R : Sylow r W), (↑R : Subgroup W).Normal :=
-    ((isNilpotent_of_finite_tfae (G := W)).out 0 3).mp hW
+    ((Group.isNilpotent_of_finite_tfae (G := W)).out 0 3).mp hW
   have hQnorm : (Q : Subgroup W).Normal := hAllNormal q ‹Fact q.Prime› Q
   have hPWnorm : (PW : Subgroup W).Normal := hAllNormal p ‹Fact p.Prime› PW
   have hdis : Disjoint (Q : Subgroup W) (PW : Subgroup W) :=
@@ -423,7 +423,7 @@ theorem normal_map_subtype_of_characteristic {W : Type*} [Group W] {N : Subgroup
 `N` nilpotent ⟹ Sylow `p` `PN` が `N` で正規・characteristic (`Sylow.characteristic_of_normal`)、
 `N ⊴ W` で押し出すと `W` で正規 (`normal_map_subtype_of_characteristic`)。`W/N` が `q`-群ゆえ
 `|W|_p = |N|_p` で `PN.map N.subtype` は `W` の Sylow `p`。正規 Sylow `p`/`q` で全 Sylow 正規
-(`Sylow.unique_of_normal`)、よって `W` nilpotent (`isNilpotent_of_finite_tfae` 3→0)。
+(`Sylow.unique_of_normal`)、よって `W` nilpotent (`Group.isNilpotent_of_finite_tfae` 3→0)。
 BG Cor 10.9(a) の `X ⊄ M'` (`p < q`) ケースで `W` の nilpotency に使う。 -/
 theorem isNilpotent_of_normalSylowQ_of_nilpotent_qQuotient {W : Type*} [Group W] [Finite W]
     {p q : ℕ} [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
@@ -444,7 +444,7 @@ theorem isNilpotent_of_normalSylowQ_of_nilpotent_qQuotient {W : Type*} [Group W]
   -- A normal Sylow `p`-subgroup of `W`, built from `N`.
   obtain ⟨PN⟩ := (inferInstance : Nonempty (Sylow p ↥N))
   have hAllNormalN : ∀ (r : ℕ), Fact r.Prime → ∀ (R : Sylow r ↥N), (↑R : Subgroup ↥N).Normal :=
-    ((isNilpotent_of_finite_tfae (G := ↥N)).out 0 3).mp hNnil
+    ((Group.isNilpotent_of_finite_tfae (G := ↥N)).out 0 3).mp hNnil
   have hPNnorm : (PN : Subgroup ↥N).Normal := hAllNormalN p ‹Fact p.Prime› PN
   have hPNchar : (PN : Subgroup ↥N).Characteristic := Sylow.characteristic_of_normal PN hPNnorm
   have hPpcard : Nat.card ↥((PN : Subgroup ↥N).map N.subtype) =
@@ -472,7 +472,7 @@ theorem isNilpotent_of_normalSylowQ_of_nilpotent_qQuotient {W : Type*} [Group W]
       have hPcard : Nat.card ↥(P : Subgroup W) = 1 := by
         rw [Sylow.card_eq_multiplicity P, Nat.factorization_eq_zero_of_not_dvd hr_ndvd, pow_zero]
       rw [Subgroup.card_eq_one.mp hPcard]; infer_instance
-  exact ((isNilpotent_of_finite_tfae (G := W)).out 3 0).mp hAllNormalW
+  exact ((Group.isNilpotent_of_finite_tfae (G := W)).out 3 0).mp hAllNormalW
 
 /-- **Corollary 10.9 核 (W ∩ M' is nilpotent)** (mmd L2860, forward-conditional via Theorem 10.6):
 `M' = derivedInG M` の任意の `β(M)'`-部分群 `V` は nilpotent。
@@ -493,7 +493,7 @@ theorem betacompl_subgroup_derived_isNilpotent [Finite G] (hG : IsMinimalSimpleO
   obtain ⟨Wstar, hWstar_le, hWstar_hall, hWstar_nilp⟩ := (isHall_Mbeta hG hM).2.1
   haveI := hWstar_nilp
   haveI hWstar'_nilp : Group.IsNilpotent ↥(Wstar.subgroupOf (derivedInG M)) :=
-    nilpotent_of_surjective (Subgroup.subgroupOfEquivOfLe hWstar_le).symm.toMonoidHom
+    Group.nilpotent_of_surjective (Subgroup.subgroupOfEquivOfLe hWstar_le).symm.toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hWstar_le).symm.surjective
   -- `V.subgroupOf M'` is a `β(M)'`-subgroup; embed it in a Hall `β(M)'`-subgroup `W'` (Hall-D).
   have hV'β : ∀ r ∈ (Nat.card ↥(V.subgroupOf (derivedInG M))).primeFactors, r ∈ (beta M)ᶜ := by
@@ -505,15 +505,15 @@ theorem betacompl_subgroup_derived_isNilpotent [Finite G] (hG : IsMinimalSimpleO
   obtain ⟨g, hg⟩ := Ch03.hall_C hWstar_hall hW'_hall
   haveI hW'_nilp : Group.IsNilpotent ↥W' := by
     rw [← hg]
-    exact nilpotent_of_surjective
+    exact Group.nilpotent_of_surjective
       (Subgroup.equivMapOfInjective (Wstar.subgroupOf (derivedInG M))
         (MulAut.conj g).toMonoidHom (MulEquiv.injective _)).toMonoidHom (MulEquiv.surjective _)
   -- `V ≤ W'` (in `M'`) and `W'` nilpotent ⟹ `V` nilpotent.
   haveI : Group.IsNilpotent ↥((V.subgroupOf (derivedInG M)).subgroupOf W') := inferInstance
   haveI hV'_nilp : Group.IsNilpotent ↥(V.subgroupOf (derivedInG M)) :=
-    nilpotent_of_surjective (Subgroup.subgroupOfEquivOfLe hV'_le).toMonoidHom
+    Group.nilpotent_of_surjective (Subgroup.subgroupOfEquivOfLe hV'_le).toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hV'_le).surjective
-  exact nilpotent_of_surjective (Subgroup.subgroupOfEquivOfLe hVD).toMonoidHom
+  exact Group.nilpotent_of_surjective (Subgroup.subgroupOfEquivOfLe hVD).toMonoidHom
     (Subgroup.subgroupOfEquivOfLe hVD).surjective
 
 /-- `Ch03.IsHallSubgroup` は位数と指数のみで定義されるので, 群同型 `e : A ≃* B` で

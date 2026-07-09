@@ -357,7 +357,7 @@ theorem rightMulAction_irreducible_of_index_two {F : Type*} [NearField F] [Finit
     (hUinv : OddOrder.Isaacs.Ch03.IsAInvariant (rightMulAction A hcomm) U) :
     U = ⊥ ∨ U = ⊤ := by
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   obtain ⟨hU_ne_bot, hU_ne_top⟩ := hcon
   haveI : Nontrivial (Multiplicative F) := inferInstanceAs (Nontrivial F)
   -- elementary abelian data + coprimality of `|A|` with `|F|`, plus `f ∣ |F|`.

@@ -109,7 +109,7 @@ theorem normalizer_pointwise_smul (H : Subgroup G) :
 theorem image_sharpSubgroup (H : Subgroup G) :
     φ '' sharpSubgroup H = sharpSubgroup (φ • H) := by
   unfold sharpSubgroup
-  rw [Set.image_diff φ.injective, coe_pointwise_smul]
+  rw [Set.image_sdiff φ.injective, coe_pointwise_smul]
   congr 1
   rw [Set.image_singleton, map_one]
 
@@ -336,7 +336,7 @@ theorem secondDerivedInAmbient_pointwise_smul (M : Subgroup G) :
 `↥(φ • K)`, via the iso `conjSubgroupEquiv φ K : ↥K ≃* ↥(φ • K)`. -/
 theorem isNilpotent_pointwise_smul {K : Subgroup G} (h : Group.IsNilpotent ↥K) :
     Group.IsNilpotent ↥(φ • K) :=
-  nilpotent_of_mulEquiv (conjSubgroupEquiv φ K)
+  Group.nilpotent_of_mulEquiv (conjSubgroupEquiv φ K)
 
 /-- **The ambient Fitting subgroup `F(↥M).map M.subtype` is `MulAut`-equivariant**:
 `(F(↥(φ•M))).map (φ•M).subtype = φ • ((F(↥M)).map M.subtype)`.  The Fitting subgroup is functorial
@@ -358,7 +358,7 @@ theorem fitting_map_subtype_pointwise_smul (M : Subgroup G) :
     · haveI : ((OddOrder.Isaacs.Ch01.fitting ↥M).map (e : ↥M →* ↥(φ • M))).Normal :=
         Subgroup.Normal.map inferInstance (e : ↥M →* ↥(φ • M)) e.surjective
       haveI : Group.IsNilpotent ↥((OddOrder.Isaacs.Ch01.fitting ↥M).map (e : ↥M →* ↥(φ • M))) :=
-        nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ (e : ↥M →* ↥(φ • M)) e.injective)
+        Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ (e : ↥M →* ↥(φ • M)) e.injective)
       exact OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
     · -- pull back along `e.symm`
       have h2 : (OddOrder.Isaacs.Ch01.fitting ↥(φ • M)).map (e.symm : ↥(φ • M) →* ↥M) ≤
@@ -367,7 +367,7 @@ theorem fitting_map_subtype_pointwise_smul (M : Subgroup G) :
           Subgroup.Normal.map inferInstance (e.symm : ↥(φ • M) →* ↥M) e.symm.surjective
         haveI : Group.IsNilpotent
             ↥((OddOrder.Isaacs.Ch01.fitting ↥(φ • M)).map (e.symm : ↥(φ • M) →* ↥M)) :=
-          nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ (e.symm : ↥(φ • M) →* ↥M)
+          Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ (e.symm : ↥(φ • M) →* ↥M)
             e.symm.injective)
         exact OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
       have h3 := Subgroup.map_mono (f := (e : ↥M →* ↥(φ • M))) h2
@@ -524,7 +524,7 @@ def TypePData.conj (φ : MulAut G) {M : Subgroup G} (data : TypePData M) :
       rw [coe_pointwise_smul, ← Set.image_comp]; simp [Function.comp]
     have hYsub : Y ⊆ (data.W : Set G) \ ((data.W1 : Set G) ∪ (data.W2 : Set G)) := by
       rw [hback data.W, hback data.W1, hback data.W2, hY, ← Set.image_union,
-        ← Set.image_diff φ.symm.injective]
+        ← Set.image_sdiff φ.symm.injective]
       exact Set.image_mono hXsub
     have hnorm := data.normalizer_V Y hYne hYsub
     -- `X = φ '' Y`, so `normalizer X = φ • normalizer Y = φ • W`.

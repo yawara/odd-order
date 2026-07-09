@@ -64,7 +64,7 @@ theorem typePData_W_le_M {M : Subgroup G} (data : TypePData M) :
 /-- `V_S ⊆ M`: the exceptional regular set lands in `M` (it is `⊆ W ≤ M`). -/
 theorem typePV_subset_M {M : Subgroup G} (data : TypePData M) :
     typePV M data ⊆ (M : Set G) := fun _ hv =>
-  typePData_W_le_M data (((Set.mem_diff _).mp hv).1)
+  typePData_W_le_M data (((Set.mem_sdiff _).mp hv).1)
 
 /-- **`V^M`-points lie in BG's `σ`-saturation `hatMsigma M`** (issue 9076 piece 4c-2b″, step 2a of
 the `honestTypeP2A0Set ⊆ A0Set` bridge).  A `V = typePV`-point `v = a·b` (`a ∈ W₁`, `b ∈ W₂`, the
@@ -76,7 +76,7 @@ theorem typePV_subset_hatMsigma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (data : TypePData M) :
     typePV M data ⊆ OddOrder.BG.Ch4.S16.hatMsigma M := by
   intro v hv
-  simp only [typePV, Set.mem_diff, Set.mem_union, SetLike.mem_coe, not_or] at hv
+  simp only [typePV, Set.mem_sdiff, Set.mem_union, SetLike.mem_coe, not_or] at hv
   obtain ⟨hvW, hvnW1, _hvnW2⟩ := hv
   haveI hcyc : IsCyclic ↥data.W := data.W_cyclic
   letI : CommGroup ↥data.W := hcyc.commGroup
@@ -130,7 +130,7 @@ theorem conjClassSetIn_typePV_one_not_mem {M : Subgroup G} (data : TypePData M) 
   rintro ⟨v, hv, h, -, hconj⟩
   have hv1 : v ≠ 1 := by
     rintro rfl
-    exact ((Set.mem_diff _).mp hv).2 (Or.inl (Subgroup.one_mem data.W1))
+    exact ((Set.mem_sdiff _).mp hv).2 (Or.inl (Subgroup.one_mem data.W1))
   exact hv1 (by
     have : v = h⁻¹ * (h * v * h⁻¹) * h := by group
     rw [this, hconj]; group)
@@ -258,7 +258,7 @@ theorem exists_sigma_prime_dvd_orderOf_typePV [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (data : TypePData M) {v : G} (hv : v ∈ typePV M data) :
     ∃ p ∈ (orderOf v).primeFactors, p ∈ OddOrder.BG.Ch3.S10.sigma M := by
-  simp only [typePV, Set.mem_diff, Set.mem_union, SetLike.mem_coe, not_or] at hv
+  simp only [typePV, Set.mem_sdiff, Set.mem_union, SetLike.mem_coe, not_or] at hv
   obtain ⟨hvW, hvnW1, _hvnW2⟩ := hv
   haveI hcyc : IsCyclic ↥data.W := data.W_cyclic
   letI : CommGroup ↥data.W := hcyc.commGroup
@@ -319,7 +319,7 @@ theorem kappaHall_conjClassSet_isPiElement [Finite G] {M K₀ : Subgroup G} (hKM
     {w : G} (hw : w ∈ conjClassSet (OddOrder.GroupTheory.sharpSubgroup K₀)) :
     IsPiElement (OddOrder.BG.Ch4.S14.kappa M) w ∧ w ≠ 1 := by
   obtain ⟨k, hk, g, hgw⟩ := hw
-  rw [OddOrder.GroupTheory.sharpSubgroup, Set.mem_diff, SetLike.mem_coe,
+  rw [OddOrder.GroupTheory.sharpSubgroup, Set.mem_sdiff, SetLike.mem_coe,
     Set.mem_singleton_iff] at hk
   obtain ⟨hkK, hk1⟩ := hk
   subst hgw
@@ -358,7 +358,7 @@ theorem aSet_subset_A0Set [Finite G]
   intro x hx
   simp only [OddOrder.BG.Ch4.S16.ASet, Set.mem_inter_iff, SetLike.mem_coe] at hx
   obtain ⟨hxhat, hxsup⟩ := hx
-  simp only [OddOrder.BG.Ch4.S16.A0Set, Set.mem_diff]
+  simp only [OddOrder.BG.Ch4.S16.A0Set, Set.mem_sdiff]
   refine ⟨hxhat, fun hxconj => ?_⟩
   obtain ⟨hxκ, hx1⟩ := kappaHall_conjClassSet_isPiElement hKM hK hxconj
   have hxκ' : IsPiElement (OddOrder.BG.Ch4.S14.kappa M)ᶜ x :=
@@ -390,7 +390,7 @@ theorem conjClassSetIn_typePV_subset_A0Set [Finite G]
       (OddOrder.BG.Ch3.S10.Msigma_le M)).mpr hM_le_NMσ
   rintro _ ⟨v, hv, m, hmM, rfl⟩
   have hvhat : v ∈ OddOrder.BG.Ch4.S16.hatMsigma M := typePV_subset_hatMsigma hG hM data hv
-  simp only [OddOrder.BG.Ch4.S16.A0Set, Set.mem_diff, OddOrder.BG.Ch4.S16.hatMsigma,
+  simp only [OddOrder.BG.Ch4.S16.A0Set, Set.mem_sdiff, OddOrder.BG.Ch4.S16.hatMsigma,
     Set.mem_setOf_eq]
   refine ⟨⟨M.mul_mem (M.mul_mem hmM hvhat.1) (M.inv_mem hmM), ?_⟩, ?_⟩
   · -- `M_σ ⊓ C_G(m·v·m⁻¹) ≠ ⊥`: conjugate the `M_σ`-centralizing witness of `v`.
@@ -564,7 +564,7 @@ theorem dadeSupportHypothesisData_honestTypeP2A0Set [Fintype G] [Finite G]
     have haMσ : (a : G) ∈ OddOrder.BG.Ch3.S10.Msigma M := a.2
     have haM' : (a : G) ∈ derivedInG M := OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM haMσ
     exact ⟨a.1, Or.inl ⟨haM', ha1', a.1,
-      (Set.mem_diff _).mpr ⟨SetLike.mem_coe.mpr haMσ, fun h => ha1' (Set.mem_singleton_iff.mp h)⟩,
+      (Set.mem_sdiff _).mpr ⟨SetLike.mem_coe.mpr haMσ, fun h => ha1' (Set.mem_singleton_iff.mp h)⟩,
       Subgroup.mem_centralizer_singleton_iff.mpr rfl⟩⟩
   · -- `M`-conjugation invariance.
     intro m x hm

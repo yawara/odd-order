@@ -49,7 +49,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
   `SubgroupESetup.derived_isNilpotent` (E' nilpotent)。
 - Theorem 10.1(c) = `S10.fusion_control_of_mem_sigma` 第 3 連言。
 - Proposition 12.4(a) = `centralizer_le_of_elemAb_rank_two`。
-- `Sylow.directProductOfNormal` + `isNilpotent_of_finite_tfae` (nilpotent = Sylow 直積)。
+- `Sylow.directProductOfNormal` + `Group.isNilpotent_of_finite_tfae` (nilpotent = Sylow 直積)。
 -/
 
 namespace OddOrder.BG.Ch3.S12
@@ -69,7 +69,7 @@ theorem isMulCommutative_of_isNilpotent_of_forall_sylow {H : Type*} [Group H] [F
     (hab : ∀ (q : ℕ), q.Prime → ∀ S : Sylow q H, IsMulCommutative ↥(S : Subgroup H)) :
     IsMulCommutative H := by
   classical
-  obtain ⟨e⟩ := ((isNilpotent_of_finite_tfae (G := H)).out 0 4).mp hnil
+  obtain ⟨e⟩ := ((Group.isNilpotent_of_finite_tfae (G := H)).out 0 4).mp hnil
   refine S11.isMulCommutative_of_mulEquiv e ⟨⟨fun x y => ?_⟩⟩
   funext q P
   exact (hab q (Nat.prime_of_mem_primeFactors q.2) P).is_comm.comm (x q P) (y q P)

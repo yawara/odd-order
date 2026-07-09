@@ -119,7 +119,7 @@ theorem centralizer_ne_bot_of_nontrivial_kernel [Finite G] {K R : Subgroup G}
   classical
   haveI : Fintype G := Fintype.ofFinite G
   by_contra hCon
-  push_neg at hCon
+  push Not at hCon
   have hCR : ∀ w : V, (∀ r : R, ρ (r : G) w = w) → w = 0 := fun w hw => by
     by_contra hw0; obtain ⟨r, hr⟩ := hCon w hw0; exact hr (hw r)
   -- The nonidentity part of `groupSumMap ρ H w` over a finite subgroup `H`.
@@ -210,7 +210,7 @@ theorem kernel_acts_trivially_of_centralizer_eq_bot [Finite G] {K R : Subgroup G
     (hCR : ∀ v : V, (∀ r : R, ρ (r : G) v = v) → v = 0) :
     ∀ k : K, ρ (k : G) = 1 := by
   by_contra h
-  push_neg at h
+  push Not at h
   obtain ⟨v, hv0, hvfix⟩ := centralizer_ne_bot_of_nontrivial_kernel hFrob ρ hchar h
   exact hv0 (hCR v hvfix)
 
