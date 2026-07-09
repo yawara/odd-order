@@ -305,6 +305,63 @@ c は temporary-hold 中 — 必要になった時点で 9000 claim を検討)�
   必要 glue = 「A(S) (= (8.10) の type-II A-set) が TI」を (8.16) core から
   `IsTISubset` 形に整形する補題。
 
+## 2026-07-10 update⁶ — ★ (8.16) type-II S-side Dade base LANDED (c844ccb0、sorry-free/axiom-clean)
+
+補遺²の判断は解決、obligation 1 の τ_S 基盤が **sorried-cite すら無しで** 閉じた
+(S12_TypeIIFrobenius に新 section DadeBase、#print axioms = 3 standard のみ):
+
+- **support 判断**: 差分 ν−λ の support は full A(S) (witness d ∈ S_F^# が w を中心化するだけで
+  w 自身は C_{S'}(d) の U-part に居てよい ⟹ A₁ に絞れない)。よって honest A(S) =
+  `centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)` (= S15 `honestTypeP2ASet` と
+  定義一致、ただし S15 は下流ゆえ本 leaf では raw composite で表記)。
+- **`typeII_centralizerSupport_isTISubset`**: Pf (8.16) TI part。原文の (8.15) signalizer 経由でなく 3-case 分解:
+  A₁×A₁ = kernel-TI (`TypePNontrivialCore.hTI` + N_G(S_F)=S を maximality+simplicity で inline) /
+  (A−A₁)² = **proven** BG Thm B(5) `theoremB_A_minus_Msigma_isTISubset`
+  (A(S) ⊆ ASet S U は `typeP_exists_hall_derived_eq` の S' = U ⊔ S_σ; IsTypeP は
+  `isTypeP_of_isTypeNonI (Or.inl hSII)` — **II→P₂ dictionary 不要**) /
+  cross = σ-element order 不変 (`mem_Msigma_iff_isPiElement_sigma` + `isPiElement_conj`) で不可能。
+  旧 `typeII_A_sets_TI` の false-as-stated 問題 (S10:524 RETIRED) は honest 集合 + type-II 限定で回避。
+- **`typeIIDadeHypothesis`**: `S04.Hypothesis G (A(S)) S` (of_isTISubset、全 signalizer ⊥、
+  scoped FiniteInduce)。**`typeII_centralizer_le_of_mem_centralizerSupport`**: (12.10) 用
+  containment 形。**`centralizerSupport_sharpMsigma_conj_mem`**: S-共役安定性。
+- 教科書 (8.14)-(8.17) ページは mmd MISSING → PDF p.48 直読で復元済 ((8.16) 証明 =
+  「全 R(a)=1 + (2.3)」、(8.15) = Hypothesis (2.2)/(4.6)/(5.2) 供給、(8.17) = Thm E citation)。
+
+### 次 iteration (obligation 1 続き) — τ_S packaging → (4.7) support → T2 家族
+1. ~~**τ_S packaging**~~ **DONE (31f31a56)**: `typeIITau` = `S07.dadeIntegralCharacterMap`
+   (typeIIDadeHypothesis + generic (2.6) `fullDadeIsometryData`、hconj = H≡⊥ 自明)。
+   isometry/ZIrr/1-vanish は S07 generic
+   (`dadeIntegralCharacterMap_inner_eq_on_supported_span` / `_mem_ZIrr_of_supported` /
+   `_apply_one_eq_zero`) がこの hyp+hconj で直接効く — wrapper 不要。axiom-clean。
+2. ~~**(4.7) support lemma**~~ **DONE (31f31a56)**: `typeII_sSet_member_support_subset`
+   (member ⊆ A(S)∪{1}、TypesIIIIIIVSetup-generic) + `typeII_sSet_diff_support_subset`
+   (等次数差、engine hsuppdiff 形) + `typeII_sSet_member_diffsupp` ((5.3.a) 共役差、
+   irreducible R-datum 用)。
+3. **T2 = {λ,λ̄,ν,ν̄} 家族の R-data + engine 適用 (次 iteration)**:
+   - **irreducible 側 (λ,λ̄)**: `S07.dadeOrthonormalCharacterImageFamily` (generic、
+     hyp+hconj+irr+non-real+supported) or `dadeCharacterDifferenceImageOfDiff` — 入力は
+     landed (diffsupp ✓)。non-real は `inducedKernelFamily_hasNoRealCharacters`-analog
+     (S11 に sOf 版があるか要確認; M-odd から)。
+   - **reducible 側 (ν,ν̄) が本丸**: R(ν) = `S06.certainTypeR`/`certainTypeRImage` は
+     **S-side Hypothesis46 instance** (S の (4.5) W-pair grid) を要する。M-side は
+     `hyp.base.toHypothesis46 hG hG.odd` が持つが S 版は未構築 — S13 caseB dispatch
+     (`caseB_sOf_memberRFamily(_orthogonal)`) の S-再instantiation とセット。
+     「reducible sOf member = column μ_j」の同定 ((9.8.b)/(9.9.c) 分類) も同所。
+     ⚠ maxHeartbeats 1600000 級の重 elaboration 注意 (S13:1466 前例)。
+   - hRorth: S13 `caseB_sOf_memberRFamily_orthogonal` template の S-mirror。
+   - **精査済 crumb (2026-07-10 iteration 3 冒頭)**: `S06.Hypothesis46` (S06_CertainHypothesis46:40)
+     の Dade fields は instantiator 供給 — `dade0 : S04.Hypothesis G (A ∪ conjClassSetIn L tic.V) L`
+     (= **A₀ = A ∪ V^L level**) + `tau : FullDadeIsometryData dade0`。⟹ S-side instance には
+     landed の A(S)-level `typeIIDadeHypothesis` を **A₀(S) = A(S) ∪ V^S に拡張**する必要
+     ((8.16) は A₀ も TI と主張 — V-part の cross case は W cyclic TI (3.1) 経由; typePA0 の
+     conjClassSetIn 形 (8.10) と定義整合)。他 fields: CertainTypeHypothesis ((4.2) L-side) +
+     tic (3.1 TICyclicHypothesis) + W₁/W₂ image 同定 + subH (W₂ ≤ H ≤ K, normal) + A_covers。
+     M-side 前例 = `S12_Core.Hypothesis.toHypothesis46` (Hypothesis.lean:1057)。
+   - 代替検討: T2 は 4 元のみゆえ、家族全体 dispatch でなく **per-member 直接構築**
+     (λ: Dade R-datum ✓ / ν: column 同定 → certainTypeR) が軽い可能性。まず
+     「ν が column である」ことの S11-level 供給源 (`caseA/caseB_character_counts` の
+     hbred が ν の deg=qu しか言わない — column 性は §6 経由) を精査してから設計。
+
 ### update⁵ 補遺² — S-side Dade の support-set 選定 (次 iteration の最初の判断)
 - **A₁(S) = S_F^# の TI は即座に取れる**: `TypePNontrivialCore` が kernel-sharp TI を
   field で保持 (`typeP_core_centralizer_le_of_mem_fitting` の hTI destructure) +
