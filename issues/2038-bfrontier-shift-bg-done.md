@@ -347,3 +347,26 @@ proven 済ゆえ配線距離短い) + hC ((7.3)+(8.17)) + mval 束ね。
 (iii) hconst: witness Dade datum の H(x) = R(x) ⊆ K 構造 + proven `psi_constant_on_xK`;
 (iv) assembly → witness_psi_degree 代替の h_psix 再配線 or (12.14) full statement。
 witness_L_zeta_bound (hB、既 proven) と同じ供給ライン。
+
+## ⚠ WIP (2026-07-10 00:24、lane-b /loop 休止前 snapshot) — ofDade wrapper が whnf-wall、診断ログ
+
+`chiRho_apply_eq_zeta0_induced` (Ind-family 完成形) は **landed** (afa72d2f)。残る最終 wire
+`chiRho_nu_zeta0_apply_eq_zeta0_ofDade` (S09_CertificateDischarge、working tree に WIP) が
+**whnf-wall**: 最終 `refine chiRho_apply_eq_zeta0_induced …` の unification が 3.2M heartbeats
+でも爆発 ([[lean-giant-declaration-debugging]] 系)。
+
+**診断確定事項** (bisect 済):
+- 引数 elaboration + `set H78 := hypothesis78OfDade …` + ha0 (betaDecompOfDade_a_eq_zero 適用)
+  + hdind + hc (uniform 係数、hβ の H78.beta defeq bridge 込み) までは **800k 内で green**
+  (final application を sorry にすると通る)。
+- 犯人 = **最終 refine/exact 単独** (hc hole を sorry にしても爆発 → hc unify でなく他引数
+  or 結論 or context)。`clear_value H78; clear hH78 ha ha0` を直前に挿入しても爆発
+  (let-body 除去では不十分)。
+- 次の試行候補: (a) `set H78` を完全排除しフル適用形で書く (context から
+  hypothesis78OfDade 項を消す)、(b) 最終 application を **別 theorem に分離**
+  (hc/hζ0norm 等を引数に取る thin wrapper — 巨大 context と切り離して unify)、
+  (c) chiRho_apply_eq_zeta0_induced 側の暗黙引数を明示指定 (unify の探索を殺す)。
+  (b) が最有望: hc の型は H78 非依存 (明示形) なので、hc を持ち出せば ofDade context 不要。
+
+working tree: S09_CertificateDischarge.lean に WIP (clear_value 版、build 赤)。
+original snapshot = scratchpad/S09_CertificateDischarge.lean.bak。
