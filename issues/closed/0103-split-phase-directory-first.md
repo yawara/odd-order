@@ -48,3 +48,12 @@ leaves の多く (1.5k-4.2k) がまだ超過。>3k の 4 leaves (S14_TPC/TypePDu
 S15_MF/Corollary155 4.2k、S15_MF/TIFailure 3.8k、S11/SummandComplementKernel 4.0k) を優先に
 再分割するか、上限値 (1500 vs 2000) の裁定待ち。`weak.linter.style.longFile` の lakefile 有効化も
 候補 (mathlib 方式の機械的 enforcement)。
+
+## 第 2 パス完了 (2026-07-09) — issue close
+
+上限 2000 行 (ユーザー裁定) で全 file 適合完了。55 files を flat prefix-split、
+lakefile に weak.linter.style.longFile/longFileDefValue = 2000 を有効化 (mathlib 方式の
+機械的 enforcement)。例外 = S03f_Thm36 (4000、単一巨大宣言) / AxiomsCheck (7400、機械列挙)。
+検証: 宣言 multiset 保存 / sorry 81 / AxiomsCheck clean / full build green。
+tool = scratchpad の lean_split.py (map/auto/split/splitflat/verify)。
+残: S12 本体は 0076 で S12_Props109To1011/S12_HypothesisLayer に分割済 — 0076 も close 可。

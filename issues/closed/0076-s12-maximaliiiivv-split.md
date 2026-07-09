@@ -54,3 +54,7 @@ dir 化分割を実施 (issue 0103 方式、lean_split.py による機械分割 
   - CharacterParameters.lean (1976 行)
   - DadeCalculations.lean (3561 行)
   - Hypothesis.lean (1205 行)
+
+## 完了 (2026-07-09)
+
+Core は dir 化 (第1パス、741ea5bf)、S12 本体は flat prefix-split (第2パス: S12_Props109To1011 / S12_HypothesisLayer)。全て 2000 行以下。
