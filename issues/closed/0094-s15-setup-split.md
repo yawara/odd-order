@@ -45,3 +45,12 @@ AxiomsCheck green を維持。
   `notes/meta/ft_lane_reallocation_2026_06_28.md`)。
 - 行数 refresh: `S15_SAndT_Setup.lean` = **1916 行** (2026-07-02)。
 - **実施は lane c の setup cluster 凍結まで defer** (prefix-split owner = hub は不変)。
+
+## 完了 (2026-07-09)
+
+dir 化分割を実施 (issue 0103 方式、lean_split.py による機械分割 + 宣言/namespace 文脈/sorry 保存検証 + full build green):
+  - CountingLayer.lean (1975 行)
+  - DegreesFirstSplit.lean (2137 行)
+  - HypothesisBasics.lean (2220 行)
+  - NormEstimates.lean (2336 行)
+  - OrderDetermination.lean (800 行)
