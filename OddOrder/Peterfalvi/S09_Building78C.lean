@@ -432,6 +432,7 @@ theorem chiRho_apply_eq_zeta0_of_inner_tau_uniform {G : Type*} [Group G] [Fintyp
       mul_one, zero_sub]
   rw [hc i hi0, hL]
 
+
 /-- **Induced irreducible characters have nonzero norm.**  `‖Ind_K^L θ‖² ≠ 0`, since
 `|K|·‖Ind θ‖² = |I_L(θ)| > 0` (`card_mul_inner_self_induce_eq_card_inertia`).  Supplies the
 `hnorm` hypothesis of `chiRho_decomp_proof` for the family `ζ_i = Ind θ_i` of (7.6)/(7.7.a). -/
@@ -775,6 +776,54 @@ theorem chiRho_decomp_induced {G : Type*} [Group G] [Fintype G] {A : Set G} {L :
   refine chiRho_decomp_proof H71 (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) d
     psi_support (induce_family_orthogonal_of_injective K θ hinj)
     (fun i => induce_norm_ne_zero K (θ i)) hAconj ?_ χ hx
+  intro ψ hψ
+  refine supported_mem_span_psi K (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) d
+    hcover hdeg (induce_apply_one_ne_zero K (θ 0)) ?_ ?_
+  · intro y hyK
+    by_contra hne
+    exact hyK (hAK_off y (hψ (ClassFunction.mem_support.mpr hne)))
+  · by_contra hne
+    exact hA_one (hψ (ClassFunction.mem_support.mpr hne))
+
+open OddOrder.Peterfalvi.S09 in
+/-- **Peterfalvi (12.14), `ψ^ρ(x) = χ(x)` for the induced family** (the two-sided (7.7.a)
+evaluation, `Ind`-family form).  Same family hypotheses as `chiRho_decomp_induced`, plus the
+uniform coefficient identification `⟨ψ_i^τ, χ⟩ = −d_i` (available for `χ = ν ζ_0` after the
+(12.14) `a = 0` counting `betaDecompOfDade_a_eq_zero`) and the norm-one normalization
+`‖Ind θ_0‖² = 1` (Frobenius kernel: `inner_self_induce_eq_one_of_frobeniusGroup`): then
+`χ^ρ(x) = Ind θ_0 (x)` for every `x ∈ A`.  The spanning input of the two-sided evaluation is
+discharged by `supported_mem_span_psi` exactly as in `chiRho_decomp_induced`. -/
+theorem chiRho_apply_eq_zeta0_induced {G : Type*} [Group G] [Fintype G] {A : Set G}
+    {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L) (K : Subgroup ↥L) [K.Normal] [Fintype ↥K]
+    [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
+    (θ : Fin (n + 1) → IrreducibleCharacter ↥K) (d : Fin (n + 1) → ℂ)
+    (psi_support : ∀ i, (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+        - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hinj : Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+    (hcover : ∀ φ : IrreducibleCharacter ↥K,
+      ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈
+        Set.range (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+    (hdeg : ∀ i, ClassFunction.induce K (θ i : ClassFunction ↥K ℂ) (1 : ↥L)
+        = d i * ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) (1 : ↥L))
+    (hAconj : ∀ g h : ↥L, h * g * h⁻¹ ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L ↔
+      g ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hAK_off : ∀ y : ↥L, y ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L → y ∈ K)
+    (hA_one : (1 : ↥L) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hζ0norm : ClassFunction.inner (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
+      (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) = 1)
+    (χ : ClassFunction G ℂ)
+    (hc : ∀ i : Fin (n + 1), i ≠ 0 →
+      ClassFunction.inner (H71.τ ⟨ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+          - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), psi_support i⟩) χ
+        = -(d i))
+    {x : ↥L} (hx : (x : G) ∈ A) :
+    H71.chiRho χ x = ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) x := by
+  refine chiRho_apply_eq_zeta0_of_inner_tau_uniform H71
+    (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) d psi_support
+    (induce_family_orthogonal_of_injective K θ hinj)
+    (fun i => induce_norm_ne_zero K (θ i)) hζ0norm hAconj ?_ χ hc hx
   intro ψ hψ
   refine supported_mem_span_psi K (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) d
     hcover hdeg (induce_apply_one_ne_zero K (θ 0)) ?_ ?_

@@ -355,3 +355,26 @@ witness_L_zeta_bound (hB、既 proven) と同じ供給ライン。
 - **対象実例**: `S09_Building78C.lean` (+82, `zeta0_decomp_on_A` / `chiRho_apply_eq_zeta0_of_inner_tau_uniform`)、`S09_NonexistenceCertain/Hypothesis71.lean` (+19, `chiRho_apply_eq_of_forall_coset`)。いずれも新 theorem のみ・既存宣言改変なし。
 - **hub 検証**: (i) 純 additive、(ii) 全て proven (sorry/axiom 追加なし)、(iii) 用途 = 本 issue (12.14) の chiRho 供給 chain (χ^ρ 機構は S09 に在住、0089 裁定で cite 先)、(iv) a の並行編集ゼロ (`main..a` = 0)。
 - **⟹ 恒久ルール (本 issue の (12.14) 供給完了まで)**: b は **2038 (12.14) 供給 chain に必要な a 所有 S09 chiRho 機構ファイルへの純 additive・proven な helper 追加**を行ってよい (条件は 3002 先例と同一: additive / proven / 用途明示 / self-flag)。既存宣言の statement・proof 改変は従来どおり逸脱。**(12.14) 供給完了で失効**。
+
+## ⚠ WIP (2026-07-10 00:24、lane-b /loop 休止前 snapshot) — ofDade wrapper が whnf-wall、診断ログ
+
+`chiRho_apply_eq_zeta0_induced` (Ind-family 完成形) は **landed** (afa72d2f)。残る最終 wire
+`chiRho_nu_zeta0_apply_eq_zeta0_ofDade` (S09_CertificateDischarge、working tree に WIP) が
+**whnf-wall**: 最終 `refine chiRho_apply_eq_zeta0_induced …` の unification が 3.2M heartbeats
+でも爆発 ([[lean-giant-declaration-debugging]] 系)。
+
+**診断確定事項** (bisect 済):
+- 引数 elaboration + `set H78 := hypothesis78OfDade …` + ha0 (betaDecompOfDade_a_eq_zero 適用)
+  + hdind + hc (uniform 係数、hβ の H78.beta defeq bridge 込み) までは **800k 内で green**
+  (final application を sorry にすると通る)。
+- 犯人 = **最終 refine/exact 単独** (hc hole を sorry にしても爆発 → hc unify でなく他引数
+  or 結論 or context)。`clear_value H78; clear hH78 ha ha0` を直前に挿入しても爆発
+  (let-body 除去では不十分)。
+- 次の試行候補: (a) `set H78` を完全排除しフル適用形で書く (context から
+  hypothesis78OfDade 項を消す)、(b) 最終 application を **別 theorem に分離**
+  (hc/hζ0norm 等を引数に取る thin wrapper — 巨大 context と切り離して unify)、
+  (c) chiRho_apply_eq_zeta0_induced 側の暗黙引数を明示指定 (unify の探索を殺す)。
+  (b) が最有望: hc の型は H78 非依存 (明示形) なので、hc を持ち出せば ofDade context 不要。
+
+working tree: S09_CertificateDischarge.lean に WIP (clear_value 版、build 赤)。
+original snapshot = scratchpad/S09_CertificateDischarge.lean.bak。
