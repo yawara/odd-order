@@ -46,6 +46,11 @@ PDF と Nougat 抽出 Markdown (`.mmd`) は `references/` 配下 (別 private �
 - **1 ファイル = 1 つの数学的トピック** (定義+API、または 1 定理とその支持補題群)。行数や「1 節」単位そのものでなく**主題の結束**で分ける。`§` が複数の独立した定理クラスタを含むなら複数ファイルに割ってよい (むしろ割る)。
 - **Isaacs: 1 章 = 1 ディレクトリ** (入口 `Main.lean`、例 `OddOrder/Isaacs/Ch01_Sylow/Main.lean`)。ディレクトリ内は topic 別ファイル。
 - **BG / Peterfalvi**: 小さい節は 1 節 = 1 ファイルでよいが、大きい節は **topic-coherent な複数ファイル + hub** に分ける。例: `S09_Uniqueness.lean` (4440 行) を `S09_Theorem91` / `S09_Corollaries` / `S09_Lemma95` / hub `S09_Uniqueness` に分割 (下流は hub を import するだけで不変)。**active frontier を小さな leaf に残し、凍結クラスタを上流ファイルへ押し出して hub が束ねる**。
+- **分割の粒度・形式も mathlib 準拠 (2026-07-09 明文化、ユーザー指示)**:
+  - **目安 = mathlib の実態と同じ 1 ファイル ≈ 300–1,500 行・1 トピック**。単一定理の支持補題クラスタでも **~3k 行を超えるなら** helper 層 (汎用補題・カウンティング・集合論的下請け等) を切り出して mathlib 粒度に近づける。
+  - **巨大節の解体はディレクトリ化を第一候補**: `<節名>.lean` を **pure re-export の hub** (mathlib の `Mathlib/Tactic.lean` 型 — import 行のみ) として残し、実体は `<節名>/<Topic>.lean` の topic leaves に置く。module 名が不変なので**下流 import は無変更**。単一主題を 2 分割する程度の小規模ケースのみ flat な兄弟 prefix-split 可。
+  - **leaf 命名は mathlib 互換の記述的英語** (`TypePDuality`, `NormEstimates` 等)。`Part1`/`Part2` 等の無内容な名前は不可。
+  - 機械分割の道具と手順 (preamble 再現・private public 化・sorry/宣言保存検証) は issue 0103 と `notes/meta/merge_monitor.md` を参照。
 - **最小 import (mathlib の衛生)**: 各ファイルは必要な module だけ import する。一般には import DAG を浅くし full build 並列化 + fan-out 縮小に効く。**ただし FT の spine (§1→§16 が直列依存) のように深い base closure を共有するファイル群では推移閉包が不変ゆえ速度改善はほぼ無い** (2026-06-05 実測: S09 4分割を minimal-import 化しても full build 3580 jobs 不変)。よって本リポジトリでの minimal-import の価値は **DAG 衛生 + 可読性 + upstream 適性**が主で、速度ではない。**注意: `lake exe shake` は本リポジトリで誤判定が多い** (実使用中の import を removable と誤報する) ので鵜呑みにせず必ず build/grep で検証する。
 - **`private` をファイル跨ぎで使わない**: 複数ファイルで使う補題は適切な namespace 付き public にする (mathlib は `private` を真に局所な helper に限定)。
 - **計測事実 (2026-06-05)**: `lake build` はファイル単位で全再 elaboration するが、1 ファイルの再 elaboration は **import closure 読み込み固定費 (~5s) が支配的**で行数差は小さい (S09 4440 行 ≈5.5s、分割後 leaf 2544 行 ≈4.7s)。よって**ファイル分割の主目的は速度でなく minimal-import による DAG 衛生 + 可読性 + upstream 適性**。速度の主レバーは「**開発中は leaf build で回し、full build は commit 直前のみ**」。過度な細分化 (<~300 行が乱立) は固定 ~5s/ファイルが効いて逆効果。詳細は [ROADMAP.md#ファイル粒度とトレーサビリティ](ROADMAP.md)。**ただし行数が elaboration を支配し始める例外もある** (2026-06-11 実測: S08 11.8k 行 ≈21s、S03f_Thm36 3.8k 行 ≈50s) — frontier ファイルがこの域に入ると編集ループを直撃する。
