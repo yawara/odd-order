@@ -39,3 +39,12 @@ leaf + hub)、full build + AxiomsCheck green 維持。
 - 規約: CLAUDE.md「分割の owner と trigger」/ `notes/meta/merge_monitor.md` サイズ watch
 - 関連: issue 1015 (解消済 — IsCoherent field 変更懸念の消滅), 0084 (S14_MaximalI split)
 - lane 配分正本: `notes/meta/ft_lane_reallocation_2026_06_28.md` (2026-07-02, 3 レーン a/b/c)
+
+## 完了 (2026-07-09)
+
+dir 化分割を実施 (issue 0103 方式、lean_split.py による機械分割 + 宣言/namespace 文脈/sorry 保存検証 + full build green):
+  - CoherenceUnion.lean (1706 行)
+  - DifferenceImage.lean (1195 行)
+  - FamilyBundleDade.lean (1611 行)
+  - NormInequalities.lean (1070 行)
+  - PsiDecomposition.lean (1249 行)
