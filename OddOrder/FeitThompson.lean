@@ -2478,7 +2478,6 @@ theorem tau3W_omegaS_fourcorner_vanish (i : Fin tp.q) (j : Fin tp.p)
   have htriv := ((tiCyclicW hG mp tp).chiFam_spec rfl (tiCyclicWDadeApp hG mp tp)).1
   -- evaluate at `x` and rearrange
   have hev := congrArg (fun f : ClassFunction G ℂ => f x) hrel
-  simp only at hev
   rw [hvanish] at hev
   have hev' : (0 : ℂ) = 1 - tau3W hG mp tp (omegaS hG mp tp i ⟨0, tp.p_prime.pos⟩) x
       - tau3W hG mp tp (omegaS hG mp tp ⟨0, tp.q_prime.pos⟩ j) x
@@ -2579,7 +2578,8 @@ theorem tau3W_omegaS_row_vanish_of_one_zero {x : G}
   have hk0 : k ≠ 0 := by
     intro h0'
     refine hξᵢne ?_
-    rw [hkhom, h0', pow_zero]
+    rw [hkhom, h0']
+    exact pow_zero ξ₁
   have hkcop : k.Coprime (orderOf ξ₁) := by
     rw [hord₁]
     exact Nat.coprime_comm.mp (tp.q_prime.coprime_iff_not_dvd.mpr
@@ -2596,11 +2596,9 @@ theorem tau3W_omegaS_row_vanish_of_one_zero {x : G}
     show (tiCyclicW hG mp tp).sigmaIntegral rfl (tiCyclicWDadeApp hG mp tp) _ = _
     rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_apply]
   have hgoal := congrArg (fun f : ClassFunction G ℂ => f x) (hid i)
-  simp only at hgoal
   have huv := congrArg (fun f : ClassFunction G ℂ => f x) hu
   simp only [OddOrder.RepresentationTheory.ClassFunction.mapRingEquiv_apply] at huv
   have h1v := congrArg (fun f : ClassFunction G ℂ => f x) (hid ⟨1, tp.q_prime.one_lt⟩)
-  simp only at h1v
   calc tau3W hG mp tp (omegaS hG mp tp i ⟨0, tp.p_prime.pos⟩) x
       = (tiCyclicW hG mp tp).sigma rfl (tiCyclicWDadeApp hG mp tp)
           ((tiCyclicW hG mp tp).omega ξᵢ :

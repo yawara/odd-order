@@ -461,12 +461,9 @@ theorem exists_aInvariant_complement_of_elementaryAbelian
     rw [ρ.mem_invtSubmodule]; intro a
     rw [Module.End.mem_invtSubmodule_iff_forall_mem_of_mem]
     exact fun v hv => qcSub.apply_mem_toSubmodule a hv
-  have hinf : pU ⊓ qc = ⊥ := by
-    have h := congrArg Subrepresentation.toSubmodule hcompl.inf_eq_bot
-    simpa [Subrepresentation.toSubmodule_inf] using h
-  have hsup : pU ⊔ qc = ⊤ := by
-    have h := congrArg Subrepresentation.toSubmodule hcompl.sup_eq_top
-    simpa [Subrepresentation.toSubmodule_sup] using h
+  -- `(⊓/⊔).toSubmodule` and `⊥/⊤.toSubmodule` are defeq projections (wave6 OperatorMaschke パターン).
+  have hinf : pU ⊓ qc = ⊥ := congrArg Subrepresentation.toSubmodule hcompl.inf_eq_bot
+  have hsup : pU ⊔ qc = ⊤ := congrArg Subrepresentation.toSubmodule hcompl.sup_eq_top
   let Φ : Submodule (ZMod q) (Additive E) ≃o Subgroup E :=
     (AddSubgroup.toZModSubmodule (n := q)).symm.trans AddSubgroup.toSubgroup'
   set W : Subgroup E := Φ qc with hW_def
