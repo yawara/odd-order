@@ -6258,20 +6258,25 @@ theorem isCyclic_and_card_dvd_add_one_of_two_dim_irreducible_nonscalar
   rw [← hpq] at hdvd_sq
   exact hcop.dvd_of_dvd_mul_left hdvd_sq
 
-/-- **(12.12) rep-theory core (combined).**  A finite odd-order group `E` (`p ∤ |E|`) acting
-**fixed-point-freely** (no nonzero vector is fixed by a nontrivial element) on an `𝔽_p`-space `V`
-of dimension `1` or `2` is **cyclic**, with `|E| ∣ |V| - 1`.  Dispatches the two (12.12) cores:
-dim 1 (or dim 2 with an `E`-invariant line) ⟹ Case A (`isCyclic_and_card_dvd_of_faithful_one_dim`);
-dim 2 irreducible ⟹ Case B (`isCyclic_and_card_dvd_of_odd_two_dim_irreducible`).  The FPF
-hypothesis makes `E` faithful on every nonzero invariant subspace. -/
-theorem isCyclic_and_card_dvd_of_fpf_dim_le_two
+/-- **(12.12) rep-theory core (dichotomy form).**  A finite odd-order group `E` (`p ∤ |E|`)
+acting **fixed-point-freely** on an `𝔽_p`-space `V` of dimension `1` or `2` is **cyclic**, and
+either `|E| ∣ p − 1`, or the action is `2`-dimensional **irreducible** with `|E| ∣ p² − 1`.
+Dim 1 and the reducible dim-2 case (an `E`-invariant line) go through Case A
+(`isCyclic_and_card_dvd_of_faithful_one_dim`); irreducible dim 2 is Case B
+(`isCyclic_and_card_dvd_of_odd_two_dim_irreducible`).  The FPF hypothesis makes `E` faithful on
+every nonzero invariant subspace.  The dichotomy (rather than the combined `|E| ∣ |V| − 1`)
+retains the irreducibility needed by the (12.12) `p + 1` refinement
+(`isCyclic_and_card_dvd_add_one_of_two_dim_irreducible_nonscalar`). -/
+theorem isCyclic_and_card_dvd_dichotomy_of_fpf_dim_le_two
     {p : ℕ} [Fact p.Prime] {E V : Type*} [Group E] [Finite E] (hodd : Odd (Nat.card E))
     [AddCommGroup V] [Module (ZMod p) V] [Finite V]
     (ρ : Representation (ZMod p) E V)
     (hfpf : ∀ e : E, e ≠ 1 → ∀ v : V, ρ e v = v → v = 0)
     (hdim : Module.finrank (ZMod p) V = 1 ∨ Module.finrank (ZMod p) V = 2)
     (hp_ndvd : ¬ p ∣ Nat.card E) :
-    IsCyclic E ∧ Nat.card E ∣ Nat.card V - 1 := by
+    IsCyclic E ∧ (Nat.card E ∣ p - 1 ∨
+      (Module.finrank (ZMod p) V = 2 ∧ Representation.IsIrreducible ρ ∧
+        Nat.card E ∣ p ^ 2 - 1)) := by
   classical
   haveI : Module.Finite (ZMod p) V := Module.Finite.of_finite
   -- Step 1: the FPF hypothesis makes `ρ` faithful.
@@ -6290,16 +6295,21 @@ theorem isCyclic_and_card_dvd_of_fpf_dim_le_two
     rw [map_mul, Module.End.mul_apply, hab, ← Module.End.mul_apply, ← map_mul, inv_mul_cancel,
       map_one, Module.End.one_apply]
   rcases hdim with hd1 | hd2
-  · -- dim 1: Case A.
-    exact isCyclic_and_card_dvd_of_faithful_one_dim ρ hfaith hd1
+  · -- dim 1: Case A; `|V| = p`.
+    obtain ⟨hcyc, hdvd⟩ := isCyclic_and_card_dvd_of_faithful_one_dim ρ hfaith hd1
+    have hcardV : Nat.card V = p := by
+      rw [Module.natCard_eq_pow_finrank (K := ZMod p), hd1, pow_one, Nat.card_eq_fintype_card,
+        ZMod.card]
+    exact ⟨hcyc, Or.inl (by rwa [hcardV] at hdvd)⟩
   · -- dim 2.
     by_cases hirr : Representation.IsIrreducible ρ
-    · -- irreducible: Case B.
-      exact isCyclic_and_card_dvd_of_odd_two_dim_irreducible hodd ρ hfaith hirr hd2 hp_ndvd
-    · -- reducible: a proper nonzero invariant line `W` exists; apply Case A to `W.toRepresentation`,
-      -- then lift `|E| ∣ p - 1` to `|E| ∣ p² - 1` via `p - 1 ∣ p² - 1`.
-      -- `¬ IsSimpleOrder` plus nontriviality (`⊥ ≠ ⊤` since `V` is nontrivial) yields a proper
-      -- nonzero subrepresentation `W`.
+    · -- irreducible: Case B; `|V| = p²`.
+      obtain ⟨hcyc, hdvd⟩ :=
+        isCyclic_and_card_dvd_of_odd_two_dim_irreducible hodd ρ hfaith hirr hd2 hp_ndvd
+      have hcardV : Nat.card V = p ^ 2 := by
+        rw [Module.natCard_eq_pow_finrank (K := ZMod p), hd2, Nat.card_eq_fintype_card, ZMod.card]
+      exact ⟨hcyc, Or.inr ⟨hd2, hirr, by rwa [hcardV] at hdvd⟩⟩
+    · -- reducible: a proper nonzero invariant line `W` exists; Case A on `W.toRepresentation`.
       have hbnt : (⊥ : Subrepresentation ρ) ≠ ⊤ := fun h =>
         bot_ne_top (congrArg Subrepresentation.toSubmodule h)
       haveI : Nontrivial (Subrepresentation ρ) := ⟨⊥, ⊤, hbnt⟩
@@ -6341,22 +6351,48 @@ theorem isCyclic_and_card_dvd_of_fpf_dim_le_two
       -- Case A on `W.toRepresentation` gives `IsCyclic E ∧ |E| ∣ p - 1`.
       obtain ⟨hcyc, hdvd⟩ :=
         isCyclic_and_card_dvd_of_faithful_one_dim W.toRepresentation hfaithW hWdim
-      refine ⟨hcyc, ?_⟩
-      -- `Nat.card ↥W.toSubmodule = p`, `Nat.card V = p²`.
       have hcardW : Nat.card ↥W.toSubmodule = p := by
         rw [Module.natCard_eq_pow_finrank (K := ZMod p), hWdim, pow_one, Nat.card_eq_fintype_card,
           ZMod.card]
-      have hcardV : Nat.card V = p ^ 2 := by
-        rw [Module.natCard_eq_pow_finrank (K := ZMod p), hd2, Nat.card_eq_fintype_card, ZMod.card]
-      rw [hcardW] at hdvd
-      rw [hcardV]
-      -- `|E| ∣ p - 1 ∣ p² - 1`, via `p² - 1 = (p - 1) * (p + 1)`.
-      refine hdvd.trans ?_
-      have hp1 : 1 ≤ p := (Fact.out (p := p.Prime)).one_le
-      obtain ⟨k, rfl⟩ : ∃ k, p = k + 1 := ⟨p - 1, by omega⟩
-      refine ⟨k + 2, ?_⟩
-      have hsq : (k + 1) ^ 2 = k * (k + 2) + 1 := by ring
-      rw [hsq, Nat.add_sub_cancel, Nat.add_sub_cancel]
+      exact ⟨hcyc, Or.inl (by rwa [hcardW] at hdvd)⟩
+
+/-- **(12.12) rep-theory core (combined).**  A finite odd-order group `E` (`p ∤ |E|`) acting
+**fixed-point-freely** (no nonzero vector is fixed by a nontrivial element) on an `𝔽_p`-space `V`
+of dimension `1` or `2` is **cyclic**, with `|E| ∣ |V| - 1`.  Forgetful form of the dichotomy
+`isCyclic_and_card_dvd_dichotomy_of_fpf_dim_le_two` (`p − 1` divides `|V| − 1` in both dims). -/
+theorem isCyclic_and_card_dvd_of_fpf_dim_le_two
+    {p : ℕ} [Fact p.Prime] {E V : Type*} [Group E] [Finite E] (hodd : Odd (Nat.card E))
+    [AddCommGroup V] [Module (ZMod p) V] [Finite V]
+    (ρ : Representation (ZMod p) E V)
+    (hfpf : ∀ e : E, e ≠ 1 → ∀ v : V, ρ e v = v → v = 0)
+    (hdim : Module.finrank (ZMod p) V = 1 ∨ Module.finrank (ZMod p) V = 2)
+    (hp_ndvd : ¬ p ∣ Nat.card E) :
+    IsCyclic E ∧ Nat.card E ∣ Nat.card V - 1 := by
+  classical
+  haveI : Module.Finite (ZMod p) V := Module.Finite.of_finite
+  obtain ⟨hcyc, hdvd⟩ :=
+    isCyclic_and_card_dvd_dichotomy_of_fpf_dim_le_two hodd ρ hfpf hdim hp_ndvd
+  refine ⟨hcyc, ?_⟩
+  have hsub_dvd : (p - 1 : ℕ) ∣ p ^ 2 - 1 := by
+    have hp1 : 1 ≤ p := (Fact.out (p := p.Prime)).one_le
+    obtain ⟨k, rfl⟩ : ∃ k, p = k + 1 := ⟨p - 1, by omega⟩
+    refine ⟨k + 2, ?_⟩
+    have hsq : (k + 1) ^ 2 = k * (k + 2) + 1 := by ring
+    rw [hsq, Nat.add_sub_cancel, Nat.add_sub_cancel]
+  rcases hdim with hd1 | hd2
+  · have hcardV : Nat.card V = p := by
+      rw [Module.natCard_eq_pow_finrank (K := ZMod p), hd1, pow_one, Nat.card_eq_fintype_card,
+        ZMod.card]
+    rw [hcardV]
+    rcases hdvd with h1 | ⟨hd2, -, -⟩
+    · exact h1
+    · rw [hd1] at hd2; omega
+  · have hcardV : Nat.card V = p ^ 2 := by
+      rw [Module.natCard_eq_pow_finrank (K := ZMod p), hd2, Nat.card_eq_fintype_card, ZMod.card]
+    rw [hcardV]
+    rcases hdvd with h1 | ⟨-, -, hsq⟩
+    · exact h1.trans hsub_dvd
+    · exact hsq
 
 /-- **(12.12) rep-theory bridge (abstract `MulDistribMulAction` form).**  A finite odd-order group
 `E` (`p ∤ |E|`) acting **fixed-point-freely** on an elementary abelian `p`-group `M` — encoded by
@@ -6442,6 +6478,121 @@ theorem isCyclic_and_card_dvd_of_fpf_conj_elemAbelian
   · exact Or.inl (by rwa [h] at hdvd)
   · exact Or.inr (by rwa [h] at hdvd)
 
+/-- **(12.12) rep-theory bridge (abstract `MulDistribMulAction` form), `p ± 1` refinement.**
+As in `isCyclic_and_card_dvd_of_fpf_mulDistribMulAction`, but with the **non-scalar** input in
+the rank-two case — no nontrivial `e : E` acts on `M` as a uniform power `m ↦ m ^ n` — which
+upgrades the rank-two branch to `|E| ∣ p + 1` (Singer,
+`isCyclic_and_card_dvd_add_one_of_two_dim_irreducible_nonscalar`); the rank-one and reducible
+branches give `|E| ∣ p − 1` outright (dichotomy core,
+`isCyclic_and_card_dvd_dichotomy_of_fpf_dim_le_two`). -/
+theorem isCyclic_and_card_dvd_sub_or_add_one_of_fpf_mulDistribMulAction
+    {p : ℕ} [Fact p.Prime] {E M : Type*} [Group E] [Finite E] (hodd : Odd (Nat.card E))
+    [CommGroup M] [Finite M] [Module (ZMod p) (Additive M)] [MulDistribMulAction E M]
+    (hp_ndvd : ¬ p ∣ Nat.card E)
+    (hdim : Module.finrank (ZMod p) (Additive M) = 1 ∨
+      Module.finrank (ZMod p) (Additive M) = 2)
+    (hfpf : ∀ e : E, e ≠ 1 → ∀ m : M, e • m = m → m = 1)
+    (hnonscalar : Module.finrank (ZMod p) (Additive M) = 2 →
+      ∀ e : E, (∃ n : ℕ, ∀ m : M, e • m = m ^ n) → e = 1) :
+    IsCyclic E ∧ (Nat.card E ∣ p - 1 ∨ Nat.card E ∣ p + 1) := by
+  classical
+  haveI : Finite (Additive M) := inferInstanceAs (Finite M)
+  -- The FPF hypothesis, transported to the additive representation `ρ = e ↦ (e • ·)`.
+  have hfpf' : ∀ e : E, e ≠ 1 → ∀ v : Additive M,
+      (Representation.ofDistribMulAction (ZMod p) E (Additive M)) e v = v → v = 0 := by
+    intro e he v hv
+    rw [Representation.ofDistribMulAction_apply_apply] at hv
+    change Additive.ofMul (e • Additive.toMul v) = v at hv
+    have hev : e • Additive.toMul v = Additive.toMul v := by
+      have := congrArg Additive.toMul hv; simpa using this
+    have hm1 : Additive.toMul v = 1 := hfpf e he _ hev
+    exact Additive.toMul.injective (by simp [hm1])
+  obtain ⟨hcyc, hdvd⟩ := isCyclic_and_card_dvd_dichotomy_of_fpf_dim_le_two hodd
+    (Representation.ofDistribMulAction (ZMod p) E (Additive M)) hfpf' hdim hp_ndvd
+  refine ⟨hcyc, ?_⟩
+  rcases hdvd with h1 | ⟨hd2, hirr, -⟩
+  · exact Or.inl h1
+  · -- Irreducible rank-two branch: supply the non-scalar input and apply Singer.
+    have hfaith :
+        Function.Injective (Representation.ofDistribMulAction (ZMod p) E (Additive M)) := by
+      intro a b hab
+      by_contra hne
+      have hba : b⁻¹ * a ≠ 1 := fun h => hne (inv_mul_eq_one.mp h).symm
+      haveI : Nontrivial (Additive M) :=
+        Module.nontrivial_of_finrank_eq_succ (n := 1) (by rw [hd2])
+      obtain ⟨v, hv⟩ := exists_ne (0 : Additive M)
+      refine hv (hfpf' (b⁻¹ * a) hba v ?_)
+      rw [map_mul, Module.End.mul_apply, hab, ← Module.End.mul_apply, ← map_mul,
+        inv_mul_cancel, map_one, Module.End.one_apply]
+    have hns : ∀ e : E, (∃ n : ℕ, ∀ v : Additive M,
+        (Representation.ofDistribMulAction (ZMod p) E (Additive M)) e v = n • v) → e = 1 := by
+      rintro e ⟨n, hn⟩
+      refine hnonscalar hd2 e ⟨n, fun m => ?_⟩
+      have h1 := hn (Additive.ofMul m)
+      rw [Representation.ofDistribMulAction_apply_apply] at h1
+      have := congrArg Additive.toMul h1
+      simpa using this
+    obtain ⟨-, hp1⟩ :=
+      isCyclic_and_card_dvd_add_one_of_two_dim_irreducible_nonscalar hodd
+        (Representation.ofDistribMulAction (ZMod p) E (Additive M)) hfaith hirr hd2 hp_ndvd hns
+    exact Or.inr hp1
+
+/-- **(12.12) rep-theory bridge (conjugation form), `p ± 1` refinement.**  As in
+`isCyclic_and_card_dvd_of_fpf_conj_elemAbelian`, but with the **non-scalar** input — no
+nontrivial `e ∈ E` conjugates every `t ∈ T` to the same power `t^n` — which upgrades the
+`|T| = p²` branch to `|E| ∣ p + 1` (Singer,
+`isCyclic_and_card_dvd_add_one_of_two_dim_irreducible_nonscalar`); the reducible/`|T| = p`
+branches give `|E| ∣ p − 1` outright (dichotomy core). -/
+theorem isCyclic_and_card_dvd_sub_or_add_one_of_fpf_conj_elemAbelian
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    {T E : Subgroup G} (hT : IsElementaryAbelian p ↥T)
+    (hEnorm : E ≤ Subgroup.normalizer (T : Set G))
+    (hodd : Odd (Nat.card ↥E)) (hp_ndvd : ¬ p ∣ Nat.card ↥E)
+    (hT_card : Nat.card ↥T = p ∨ Nat.card ↥T = p ^ 2)
+    (hfpf : ∀ e : G, e ∈ E → e ≠ 1 → ∀ t : G, t ∈ T → e * t * e⁻¹ = t → t = 1)
+    (hnonscalar : Nat.card ↥T = p ^ 2 →
+      ∀ e : G, e ∈ E → (∃ n : ℕ, ∀ t : G, t ∈ T → e * t * e⁻¹ = t ^ n) → e = 1) :
+    IsCyclic ↥E ∧ (Nat.card ↥E ∣ p - 1 ∨ Nat.card ↥E ∣ p + 1) := by
+  classical
+  letI : CommGroup ↥T := hT.subgroupCommGroup
+  letI : Module (ZMod p) (Additive ↥T) := hT.subgroupZmodModule
+  letI act : MulDistribMulAction ↥E ↥T :=
+    MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (T : Set G))) ↥T
+      (Subgroup.inclusion hEnorm)
+  -- The conjugation action's coercion: `(ε • τ : G) = ε * τ * ε⁻¹`.
+  have hsmul_coe : ∀ (ε : ↥E) (τ : ↥T), ((ε • τ : ↥T) : G) = (ε : G) * (τ : G) * (ε : G)⁻¹ :=
+    fun _ _ => rfl
+  -- `dim_{𝔽_p} (Additive T) ∈ {1, 2}` from `|T| ∈ {p, p²}`.
+  have hcard_pow : p ^ Module.finrank (ZMod p) (Additive ↥T) = Nat.card ↥T := by
+    rw [FiniteField.pow_finrank_eq_natCard p (Additive ↥T),
+      Nat.card_congr (Additive.toMul (α := ↥T))]
+  have h2le := (Fact.out (p := p.Prime)).two_le
+  have hdim : Module.finrank (ZMod p) (Additive ↥T) = 1 ∨
+      Module.finrank (ZMod p) (Additive ↥T) = 2 := by
+    rcases hT_card with h | h
+    · have e1 : p ^ Module.finrank (ZMod p) (Additive ↥T) = p ^ 1 := by rw [hcard_pow, h, pow_one]
+      exact Or.inl (Nat.pow_right_injective h2le e1)
+    · have e2 : p ^ Module.finrank (ZMod p) (Additive ↥T) = p ^ 2 := by rw [hcard_pow, h]
+      exact Or.inr (Nat.pow_right_injective h2le e2)
+  -- The conjugation FPF hypothesis, transported to the `MulDistribMulAction` form.
+  have hfpfM : ∀ ε : ↥E, ε ≠ 1 → ∀ τ : ↥T, ε • τ = τ → τ = 1 := by
+    intro ε hεne τ hτ
+    have hc : (ε : G) * (τ : G) * (ε : G)⁻¹ = (τ : G) := by
+      rw [← hsmul_coe]; exact congrArg Subtype.val hτ
+    exact OneMemClass.coe_eq_one.mp
+      (hfpf (ε : G) ε.2 (mt OneMemClass.coe_eq_one.mp hεne) (τ : G) τ.2 hc)
+  -- The conjugation non-scalar hypothesis, transported to the `MulDistribMulAction` form.
+  have hnsM : Module.finrank (ZMod p) (Additive ↥T) = 2 →
+      ∀ ε : ↥E, (∃ n : ℕ, ∀ τ : ↥T, ε • τ = τ ^ n) → ε = 1 := by
+    rintro hd2 ε ⟨n, hn⟩
+    have hcardT : Nat.card ↥T = p ^ 2 := by rw [← hcard_pow, hd2]
+    refine Subtype.ext (hnonscalar hcardT (ε : G) ε.2 ⟨n, fun t ht => ?_⟩)
+    have hcoe := congrArg Subtype.val (hn ⟨t, ht⟩)
+    rw [hsmul_coe] at hcoe
+    simpa using hcoe
+  exact isCyclic_and_card_dvd_sub_or_add_one_of_fpf_mulDistribMulAction hodd hp_ndvd hdim
+    hfpfM hnsM
+
 /-- **Peterfalvi (12.12), the `p + 1` refinement** (pinned sorried Singer/(12.11) obligation):
 if the witness Frobenius complement's order `e = |E|` divides `p² − 1`, then it divides `p − 1`
 or `p + 1`.
@@ -6454,14 +6605,19 @@ by (12.9), so `A ⊆ M ∩ L ⊆ H` by (12.11), while `A ≤ E` meets `H` trivia
 `gcd(e, p−1) = 1` and `e ∣ p + 1`.
 
 **Genuinely still-missing**: the Singer-cyclic identification of the FPF action (the (9.7.b)
-mechanism specialized to the witness) and the `x ∈ T` bookkeeping are not assembled; the (12.11)
-`A = 1` step is now proven (`intersection_complement_structure`).  The statement is **sound**: it
-is Peterfalvi's genuine (12.12) conclusion for the witness of `ctr` (tied via `data`/`frob`). -/
+mechanism specialized to the witness) and the `x ∈ T` bookkeeping (`|T| = p²` forces
+`T = Ω₁(P₀) ∋ x`) are not assembled; the (12.11) `A = 1` step is now proven
+(`intersection_complement_structure`).  The statement is **sound**: it is Peterfalvi's genuine
+(12.12) conclusion for the witness of `ctr` (tied via `data`/`frob`), packaged with the `T` data
+the argument runs on (supplied by `exists_center_omega1_elemAbelian_fpf_of_witness`). -/
 theorem witness_complement_dvd_p_sub_or_add_one [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
     (frob : TypeIFrobeniusData data.L)
-    (hdvd : Nat.card ↥frob.complement ∣ ctr.p ^ 2 - 1) :
+    {T : Subgroup G} (hTelem : T.IsElementaryAbelian ctr.p) (hTP0 : T ≤ ctr.P0) (hTne : T ≠ ⊥)
+    (hEnorm : frob.complement.map data.L.subtype ≤ Subgroup.normalizer (T : Set G))
+    (hfpf : ∀ e : G, e ∈ frob.complement.map data.L.subtype → e ≠ 1 →
+      ∀ t : G, t ∈ T → e * t * e⁻¹ = t → t = 1) :
     Nat.card ↥frob.complement ∣ ctr.p - 1 ∨ Nat.card ↥frob.complement ∣ ctr.p + 1 := by
   sorry
 
@@ -6620,8 +6776,8 @@ theorem exists_center_omega1_elemAbelian_fpf_of_witness [Finite G]
     exact frob.frobenius.conj_frobenius a haC hane ⟨t, htL⟩
       (Subgroup.mem_subgroupOf.mpr htH) (fun h => htne (congrArg Subtype.val h))
       (Subtype.ext hconj)
-  exact ⟨T, hTelem, hEnorm, hTcard, hTH, hfpf,
-    witness_complement_dvd_p_sub_or_add_one hG data frob⟩
+  exact ⟨T, hTelem, hEnorm, hTcard, hTH, hfpf, fun _ =>
+    witness_complement_dvd_p_sub_or_add_one hG data frob hTelem hTP0 hTne hEnorm hfpf⟩
 
 /-- **Peterfalvi (12.12)**: the Frobenius complement `E` in the (12.9) witness subgroup `L` is
 cyclic, with order `e = |E|` dividing `p - 1` or `p + 1`.
