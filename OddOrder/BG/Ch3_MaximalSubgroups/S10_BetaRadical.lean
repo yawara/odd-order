@@ -925,7 +925,7 @@ theorem beta_factorization_of_sylow_normalizer_in_intersection [Finite G]
               · exact hpq' (Set.mem_singleton_iff.mp h)
             rw [Nat.factorization_eq_zero_of_not_dvd hpnd]
             exact Nat.zero_le _
-      · rw [Nat.factorization_eq_zero_of_non_prime _ hp_prime]
+      · rw [Nat.factorization_eq_zero_of_not_prime _ hp_prime]
         exact Nat.zero_le _
     have hKeq : K = Mbeta M ⊔ (S : Subgroup G) := by
       rw [← hMβX_eq]
@@ -1035,7 +1035,7 @@ private theorem conj_smul_mem_hInvariant_top_conj {P Q : Subgroup G} {π : Set �
     apply mem_normalizer_of_conj_smul_eq_self
     have ha : g⁻¹ * b * g ∈ P := by
       rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hb
-      simpa only [map_inv, MulAut.conj_inv_apply] using hb
+      simpa only [map_inv, MulAut.smul_def, MulAut.conj_inv_apply] using hb
     calc MulAut.conj b • MulAut.conj g • Q
         = MulAut.conj (b * g) • Q := by rw [smul_smul, ← map_mul]
       _ = MulAut.conj (g * (g⁻¹ * b * g)) • Q := by group
