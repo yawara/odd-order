@@ -97,7 +97,30 @@ step 1-3 は tractable、**step 4 (quotient-Frobenius fpf) が genuine infra 投
 ⟹ `ρ u = μ • id`。lineScalarChar_smul で per-block、⨆block=⊤ の span で LinearMap.ext_on。
 ⟹ **hconst は「ρ u = μ•id ⟹ u = 1」(Frobenius 半) のみに還元**。
 
-## Frobenius 半の精緻 plan (次 iteration、multiplicative route)
+## ✅✅ W2 完成 (2026-07-09, commits 14b67135 + a9fb79d1) — 目標達成
+
+**hconst Frobenius 半 landed** (`14b67135`): 4-step plan は実装時に大幅短縮 —
+`ZMod.map_smul` (mathlib) が「任意の AddMonoidHom は ZMod smul と自動可換」を与えるため、
+step 1-2 の power-map unfold (zmodModule smul 展開) が**丸ごと不要**になった:
+- `commute_mulAut_of_elabRepresentation_eq_smul_id` (generic): `ρ l = μ•id` ⟹ `φ l` は全
+  MulAut と可換 (σ を `MulEquiv.toAdditive` で AddEquiv 化して `ZMod.map_smul`)。
+- `uActionHom_eq_one_of_commute_mulAut` (Frobenius 半): central ⟹ `[W₁,g] ⊆ ker` ⟹
+  `ḡ ∈ C_Ū(W̄₁) = image C_U(W₁) = 1`。降下 = `MulAut.conjNormal` (W₁↷U) +
+  `map_fixedSubgroup_eq_fixedSubgroup_quotient` (coprime = `frob.coprime_card_kernel_complement`、
+  solvable = W₁ cyclic)、`C_U(W₁)=1` = `frob.conj_frobenius`。
+- ⚠ rw 罠: `← (hcentral _).eq` はメタ変数 σ が goal の外側 `(...)⁻¹ * uAct g` に先マッチ →
+  σ 明示で解決。`le_sup_right hwW1` は抽象 lattice ≤ ゆえ関数適用不可 → `Subgroup.mem_sup_right`。
+
+**無条件版 landed** (`a9fb79d1`): `u_le_cyclotomicQuotient : chars.u ≤ (p^q-1)/(p-1)` —
+`chiefFactor_clifford_U_dichotomy` で分岐、Galois 側 = `chiefFactor_caseB_image_dvd_norm` の
+dvd→le、caseA 側 = `clifford_caseA_data` + `caseA_u_le_cyclotomicQuotient`。
+`CliffordCaseAData.Ubar_embeds_product` (opaque Prop pair, consumer 0) は削除済。
+
+**S15 配線 (lane b 所有)**: `basic_structure_gated.u_bound` (S15:2171 sorry) は
+`hyp.toTypesIIIIIIVSetupS hG` (S15 に既存) + chars instance で `u_le_cyclotomicQuotient` を
+cite すれば閉じる。hyp.u/p/q ↔ chars.u/chief.p/data.q の橋は S15 側の識別で。
+
+## (旧) Frobenius 半の精緻 plan (次 iteration、multiplicative route)
 
 `u ∈ Ū = range(uActionHom)`, `ρ u = μ•id` ⟹ `u = 1`:
 1. **ρ u = μ•id ⟹ u.val x = x^k on H̄** (k = (μ:ZMod p).val): `ρ u (ofMul x)=ofMul(u.val x)`
