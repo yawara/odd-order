@@ -123,6 +123,9 @@ import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 
+-- 機械列挙ファイル (flagship axioms check) のため分割対象外 — CLAUDE.md の明示例外
+set_option linter.style.longFile 7400
+
 /-!
 # Axioms check for chapter flagship theorems
 

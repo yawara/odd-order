@@ -14,6 +14,7 @@ import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
 import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
 import OddOrder.GroupTheory.ZGroup
 
+
 /-!
 # BG §3: Theorem 3.6 (the p-length-one subprogram, mmd L955)
 
@@ -69,6 +70,9 @@ Lemma 3.1/3.3 (`S03`/`S03b`), Gorenstein 5.3.7 (`S04e`), Prop 1.3/1.4/1.5/1.6/1.
 **状態 (2026-06-10)**: ✅ **COMPLETE** — Phase A–F すべて sorry-free.  詳細経緯 =
 `notes/bg/s03_thm36_plan.md`.
 -/
+
+-- 単一の巨大宣言 (thm36_aux, ~3.7k 行) のため分割不能 — CLAUDE.md の明示例外
+set_option linter.style.longFile 4000
 
 namespace OddOrder.BG.Ch1.S03f
 
