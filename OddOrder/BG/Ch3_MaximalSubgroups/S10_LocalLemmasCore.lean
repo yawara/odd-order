@@ -720,7 +720,7 @@ theorem commute_of_coprime_orderOf_of_isNilpotent {L : Type*} [Group L] [Finite 
   -- Assemble componentwise commutation, then transport along the isomorphism `e`.
   have hkey : e.symm x * e.symm y = e.symm y * e.symm x := by
     funext p P
-    simpa [Pi.mul_apply] using hcomp p P
+    simpa [Pi.mul_apply, commute_iff_eq] using hcomp p P
   have hcong := congrArg e hkey
   rwa [map_mul, map_mul, MulEquiv.apply_symm_apply, MulEquiv.apply_symm_apply] at hcong
 
