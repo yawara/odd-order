@@ -2707,8 +2707,6 @@ structure CliffordCaseAData {M : Subgroup G} {data : TypesIIIIIIVSetup M}
     a = Nat.card ↥(aInvariantRestrictAut S0_aInvariant).range
   quotient_factors_cyclic_order_a : Prop
   quotient_factors_cyclic_order_a_holds : quotient_factors_cyclic_order_a
-  Ubar_embeds_product : Prop
-  Ubar_embeds_product_holds : Ubar_embeds_product
 
 open scoped IsMulCommutative in
 /-- **The `(9.8)` regular-character count on the chief factor** (`oXtheta` numerator): the
@@ -6674,9 +6672,7 @@ noncomputable def clifford_caseA_data [Finite G] {M : Subgroup G}
       a_dvd_p_sub_one := ?_
       a_eq_card_restrictAut_range := rfl
       quotient_factors_cyclic_order_a := True
-      quotient_factors_cyclic_order_a_holds := trivial
-      Ubar_embeds_product := True
-      Ubar_embeds_product_holds := trivial }
+      quotient_factors_cyclic_order_a_holds := trivial }
   -- `a = |U-image on S₀| ∣ |S₀| - 1 = p - 1` (the order-`p` factor is cyclic, `Aut ≅ (ZMod p)ˣ`).
   have hdvd := aInvariantRestrictAut_range_card_dvd hS₀inv (hS₀card ▸ chief.p_prime)
   rwa [hS₀card] at hdvd

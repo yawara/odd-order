@@ -303,6 +303,36 @@ C 側は **cite-ready sorried-cite endpoint に整理済** — 9000 の typeP_Ga
 上記は薄い cite で close 可能 (C が assemble)。9000 の owner=lane-a は本項目を dictate されないが、C の
 type-determination 全体が 1・2 に gated である事実を downstream 影響として記録。
 
+## ✅✅ W2 instance tail 完成 (2026-07-09 lane a, commits 14b67135 + a9fb79d1)
+
+**§9 block 分解 + hconst の assembly が完了し、Pf (9.7) の u-bound が無条件に閉じた**:
+
+- `S11.caseA_u_le_cyclotomicQuotient` (sorry-free): CliffordCaseAData → `chars.u ≤ (p^q-1)/(p-1)`。
+  hconst (Coq psi injectivity) は scalar 半 (`representation_eq_smul_id_of_block_scalars_const`)
+  + Frobenius 半 (`uActionHom_eq_one_of_commute_mulAut`: central → C_Ū(W̄₁)=1 coprime 降下) で実証明。
+- **`S11.u_le_cyclotomicQuotient` (sorry-free, 無条件版)**: `chiefFactor_clifford_U_dichotomy` で
+  Galois 分岐 (`chiefFactor_caseB_image_dvd_norm`) と caseA 分岐 (`clifford_caseA_data`) を束ねた。
+  **任意の `Section11CharacterData` に対し `chars.u ≤ (chief.p ^ data.q - 1)/(chief.p - 1)`。**
+- `CliffordCaseAData.Ubar_embeds_product` opaque pair は削除 (consumer 0、bound 実証明で用済み)。
+
+### 📣 lane b 向け cite signature (S15 u_bound 用)
+
+`OddOrder.Peterfalvi.S11.u_le_cyclotomicQuotient` (`S11_ImprimitiveUBound.lean`、import は
+`OddOrder.Peterfalvi.S11_ImprimitiveUBound`):
+```
+theorem u_le_cyclotomicQuotient [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} (chars : Section11CharacterData data chief) :
+    chars.u ≤ (chief.p ^ data.q - 1) / (chief.p - 1)
+```
+`basic_structure_gated.u_bound` (S15_SAndT_Setup:2171 sorry、lane b 所有) は
+`hyp.toTypesIIIIIIVSetupS hG` (S15 に既存の S11 bridge) の setup で `chief`/`chars` を
+instantiate し本 theorem を cite → `hyp.u = chars.u`・`hyp.p = chief.p`・`hyp.q = data.q` の
+識別 (S15 側の Hypothesis 定義に依存) で閉じる。C 側 (14.9) の V-abelian (typeP_Galois char body)
+も caseB 分岐の `chiefFactor_caseB_image_cyclic` (Ū cyclic) が同 leaf 経由で cite 可能。
+
+**9000 の残 (lane a)**: (9.8.d) de-opacify (issue 1012 piece) と §13 (11.9) typeP_Galois char body
+(hub 注記の V-abelian 用) — 文書順で次の自然な区切りに継続。
+
 ## 🧭 HUB scope 注記 (2026-07-07, issue 0098 レーン再点検)
 
 **claim は lane a が保持** (instance tail = S11 §9 block-decomposition + S13 (11.9) char body は a territory
