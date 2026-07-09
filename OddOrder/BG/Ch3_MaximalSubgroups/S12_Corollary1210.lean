@@ -531,7 +531,6 @@ theorem nilpotent_sigmaComplement_abelian [Finite G] (hG : IsMinimalSimpleOdd G)
       have hMfix : MulAut.conj w⁻¹ • M = M :=
         conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer (inv_mem hwM))
       have h3 := congrArg (fun K => MulAut.conj w⁻¹ • K) h2
-      simp only at h3
       rwa [smul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul, hMfix] at h3
     · intro hMs
       rw [hMs]
