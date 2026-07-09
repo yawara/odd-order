@@ -248,7 +248,7 @@ theorem centralizer_eq_self_of_maximal_abelian_normal
   -- `X` is abelian (cyclic quotient by central kernel).
   have hX_comm : ∀ x ∈ X, ∀ y ∈ X, x * y = y * x := by
     intro x hx y hy
-    have := commutative_of_cyclic_center_quotient f hker ⟨x, hx⟩ ⟨y, hy⟩
+    have := (f.isMulCommutative_of_isCyclic_of_ker_le_center hker).is_comm.comm ⟨x, hx⟩ ⟨y, hy⟩
     exact congrArg Subtype.val this
   -- `X = M` by maximality, but `x ∈ X \ M` — contradiction.
   obtain ⟨x, hx_eq⟩ := QuotientGroup.mk'_surjective M xbar
@@ -744,7 +744,8 @@ theorem Omega.pow_eq_one_of_class_le_two (hp_odd : Odd p)
   have hle : Omega K p 1 ≤ omega1OfClassLeTwo K p hp_odd hcl := by
     rw [Omega, Subgroup.closure_le]
     intro x hx
-    simpa using (pow_one p ▸ hx : x ^ p = 1)
+    show x ^ p = 1
+    exact pow_one p ▸ hx
   simpa [omega1OfClassLeTwo] using hle hg
 
 /-- **Gorenstein "Finite Groups" Lemma 5.3.9(i)** (exponent form). For odd `p` and

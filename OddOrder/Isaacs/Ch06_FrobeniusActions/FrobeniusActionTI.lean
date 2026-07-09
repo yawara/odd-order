@@ -96,7 +96,7 @@ theorem actorSubgroup (h : IsFrobeniusAction A N) (B : Subgroup A) :
     IsFrobeniusAction B N := by
   intro b hb n hn hfix
   have hbA : (b : A) ≠ 1 := fun hbA => hb (Subtype.ext hbA)
-  exact h (b : A) hbA n hn (by simpa using hfix)
+  exact h (b : A) hbA n hn ((Subgroup.smul_def b n).symm.trans hfix)
 
 @[reducible] def invariantQuotientMulAut (M : Subgroup N) [M.Normal]
     (hM : ∀ a : A, ∀ m ∈ M, a • m ∈ M) (a : A) : MulAut (N ⧸ M) := by
@@ -234,9 +234,7 @@ theorem quotient [Finite A] [Finite N] (h : IsFrobeniusAction A N) (M : Subgroup
           φ b⁻¹ n = (φ b⁻¹ n * φ b⁻¹ m) * (φ b⁻¹ m)⁻¹ := by group
           _ = n * (φ b⁻¹ m)⁻¹ := by rw [← hb'] }
   have haP : a ∈ P := by
-    have hfix' : ((a • n : N) : N ⧸ M) = (n : N ⧸ M) := by
-      simpa [invariantQuotientMulDistribMulAction, invariantQuotientMulAutHom,
-        invariantQuotientMulAut] using hfix
+    have hfix' : ((a • n : N) : N ⧸ M) = (n : N ⧸ M) := hfix
     have hdiv : (a • n) / n ∈ M := (QuotientGroup.eq_iff_div_mem (N := M)).mp hfix'
     have hMN : M.Normal := inferInstance
     have hm : n⁻¹ * (a • n) ∈ M := by
@@ -263,7 +261,7 @@ theorem quotient [Finite A] [Finite N] (h : IsFrobeniusAction A N) (M : Subgroup
   have hSolvC : IsSolvable C ∨ IsSolvable N := Or.inl inferInstance
   have hg_fix_C : ∀ c : C, ∃ m ∈ M, φC c n = n * m := by
     intro c
-    simpa [φC] using hC_le_P c.2
+    simpa [φC, P] using hC_le_P c.2
   obtain ⟨x, hx_fixed, hx_coset⟩ :=
     OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient
       (A := C) (G := N) (φ := φC) hCopCN hSolvC hM_inv_C hg_fix_C
@@ -338,9 +336,7 @@ theorem quotient_of_fixedPoints_le [Finite A] [Finite N]
           φ b⁻¹ n = (φ b⁻¹ n * φ b⁻¹ m) * (φ b⁻¹ m)⁻¹ := by group
           _ = n * (φ b⁻¹ m)⁻¹ := by rw [← hb'] }
   have haP : a ∈ P := by
-    have hfix' : ((a • n : N) : N ⧸ M) = (n : N ⧸ M) := by
-      simpa [invariantQuotientMulDistribMulAction, invariantQuotientMulAutHom,
-        invariantQuotientMulAut] using hfix_q
+    have hfix' : ((a • n : N) : N ⧸ M) = (n : N ⧸ M) := hfix_q
     have hdiv : (a • n) / n ∈ M := (QuotientGroup.eq_iff_div_mem (N := M)).mp hfix'
     have hMN : M.Normal := inferInstance
     have hm : n⁻¹ * (a • n) ∈ M := by
@@ -364,7 +360,7 @@ theorem quotient_of_fixedPoints_le [Finite A] [Finite N]
   have hSolvC : IsSolvable C ∨ IsSolvable N := Or.inl inferInstance
   have hg_fix_C : ∀ c : C, ∃ m ∈ M, φC c n = n * m := by
     intro c
-    simpa [φC] using hC_le_P c.2
+    simpa [φC, P] using hC_le_P c.2
   obtain ⟨x, hx_fixed, hx_coset⟩ :=
     OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient
       (A := C) (G := N) (φ := φC) hCopCN hSolvC hM_inv_C hg_fix_C
@@ -727,7 +723,7 @@ theorem card_notConjugateSet_eq_index [Finite G]
       -- Now `(B.carrier \ {1}).ncard = |B| - 1`.
       have h1_mem : (1 : G) ∈ ((MulAut.conj g • A : Subgroup G) : Set G) :=
         Subgroup.one_mem _
-      rw [Set.ncard_diff (Set.singleton_subset_iff.mpr h1_mem) (Set.finite_singleton _),
+      rw [Set.ncard_sdiff (Set.singleton_subset_iff.mpr h1_mem) (Set.finite_singleton _),
           Set.ncard_singleton, h_card_B]
     -- (Step e) Cardinality of `conjs` is `A.index`.
     have h_card_conjs : conjs.ncard = A.index := by
@@ -894,7 +890,7 @@ theorem nonidentitySigmaTo_injective :
     congrArg Subtype.val hpq
   have hx_ne : ((x.1 : X.1) : G) ≠ 1 := fun hx => x.2 (Subtype.ext hx)
   have hY_mem_x : ((x.1 : X.1) : G) ∈ Y.1 := by
-    simpa [hxyA] using y.1.2
+    simp [hxyA]
   have hXY : X = Y := by
     apply Subtype.ext
     exact partn.eq_of_mem_ne_one X.2 Y.2 x.1.2 hY_mem_x hx_ne
@@ -1262,10 +1258,7 @@ theorem quotient_isFrobeniusAction_of_fixedBy_le
           φ b⁻¹ n = (φ b⁻¹ n * φ b⁻¹ m) * (φ b⁻¹ m)⁻¹ := by group
           _ = n * (φ b⁻¹ m)⁻¹ := by rw [← hb'] }
   have haP : a ∈ P := by
-    have hfix' : ((a • n : N) : N ⧸ M) = (n : N ⧸ M) := by
-      simpa [IsFrobeniusAction.invariantQuotientMulDistribMulAction,
-        IsFrobeniusAction.invariantQuotientMulAutHom,
-        IsFrobeniusAction.invariantQuotientMulAut] using hfix
+    have hfix' : ((a • n : N) : N ⧸ M) = (n : N ⧸ M) := hfix
     have hdiv : (a • n) / n ∈ M := (QuotientGroup.eq_iff_div_mem (N := M)).mp hfix'
     have hMN : M.Normal := inferInstance
     have hm : n⁻¹ * (a • n) ∈ M := by
@@ -1287,7 +1280,7 @@ theorem quotient_isFrobeniusAction_of_fixedBy_le
   have hSolvC : IsSolvable C ∨ IsSolvable M := Or.inl inferInstance
   have hg_fix_C : ∀ c : C, ∃ m ∈ M, φC c n = n * m := by
     intro c
-    simpa [φC] using hC_le_P c.2
+    simpa [φC, P] using hC_le_P c.2
   obtain ⟨x, hx_fixed, hx_coset⟩ :=
     OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient_of_coprime_normal
       (A := C) (G := N) (φ := φC) hCopCM hSolvC hM_inv_C hg_fix_C

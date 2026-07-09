@@ -52,7 +52,7 @@ nothing; we prove it directly by closure induction using commutativity for the p
 theorem pow_eq_one_of_mem_omega_one_of_comm {Q : Type*} [Group Q]
     (hQ : ∀ x y : Q, x * y = y * x) {g : Q} (hg : g ∈ Omega Q p 1) : g ^ p = 1 := by
   induction hg using Subgroup.closure_induction with
-  | mem x hx => simpa only [pow_one] using hx
+  | mem x hx => simpa only [Set.mem_setOf_eq, pow_one] using hx
   | one => exact one_pow p
   | mul a b _ _ ha hb =>
       have hab : Commute a b := hQ a b
@@ -218,12 +218,12 @@ theorem exists_aInvariant_complement_in_omega1_quotient
     rw [ρ.mem_invtSubmodule]; intro a
     rw [Module.End.mem_invtSubmodule_iff_forall_mem_of_mem]
     exact fun v hv => qcSub.apply_mem_toSubmodule a hv
-  have hinf : pW ⊓ qc = ⊥ := by
-    have h := congrArg Subrepresentation.toSubmodule hcompl.inf_eq_bot
-    simpa [Subrepresentation.toSubmodule_inf] using h
-  have hsup : pW ⊔ qc = ⊤ := by
-    have h := congrArg Subrepresentation.toSubmodule hcompl.sup_eq_top
-    simpa [Subrepresentation.toSubmodule_sup] using h
+  -- `(⊥/⊤ : Subrepresentation _).toSubmodule = ⊥/⊤` and `(· ⊓/⊔ ·).toSubmodule` reduce by
+  -- `rfl`, so the `congrArg` proofs close the goals definitionally.
+  have hinf : pW ⊓ qc = ⊥ :=
+    congrArg Subrepresentation.toSubmodule hcompl.inf_eq_bot
+  have hsup : pW ⊔ qc = ⊤ :=
+    congrArg Subrepresentation.toSubmodule hcompl.sup_eq_top
   -- transport `qc` to a subgroup `Hc` of `↥E` via the order-iso `Φ`.
   let Φ : Submodule (ZMod p) (Additive ↥(Omega (R ⧸ S) p 1)) ≃o Subgroup ↥(Omega (R ⧸ S) p 1) :=
     (AddSubgroup.toZModSubmodule (n := p)).symm.trans AddSubgroup.toSubgroup'
@@ -325,12 +325,11 @@ theorem exists_aInvariant_complement_of_isElementaryAbelian
     rw [ρ.mem_invtSubmodule]; intro a
     rw [Module.End.mem_invtSubmodule_iff_forall_mem_of_mem]
     exact fun v hv => qcSub.apply_mem_toSubmodule a hv
-  have hinf : pU ⊓ qc = ⊥ := by
-    have h := congrArg Subrepresentation.toSubmodule hcompl.inf_eq_bot
-    simpa [Subrepresentation.toSubmodule_inf] using h
-  have hsup : pU ⊔ qc = ⊤ := by
-    have h := congrArg Subrepresentation.toSubmodule hcompl.sup_eq_top
-    simpa [Subrepresentation.toSubmodule_sup] using h
+  -- as above, `Subrepresentation.toSubmodule` commutes with `⊓/⊔/⊥/⊤` definitionally.
+  have hinf : pU ⊓ qc = ⊥ :=
+    congrArg Subrepresentation.toSubmodule hcompl.inf_eq_bot
+  have hsup : pU ⊔ qc = ⊤ :=
+    congrArg Subrepresentation.toSubmodule hcompl.sup_eq_top
   let Φ : Submodule (ZMod p) (Additive E) ≃o Subgroup E :=
     (AddSubgroup.toZModSubmodule (n := p)).symm.trans AddSubgroup.toSubgroup'
   set W : Subgroup E := Φ qc with hW_def
