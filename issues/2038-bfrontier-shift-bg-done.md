@@ -320,3 +320,30 @@ proven 済ゆえ配線距離短い) + hC ((7.3)+(8.17)) + mval 束ね。
 **次 iteration**: (a) hB 接続 (Hypothesis78 → zetaNuRhoNormSqGeOfDade → dade.psi 形へ) or
 (b) (12.14) evaluation 機械 (a=0 counting + (7.7.a)、witness_psi_degree と h_psig_int の共通上流)。
 文書順は (12.14) が先。
+
+## ✅✅ (2026-07-09 続⁴、lane-b) — (12.14) の数学的 engine 完成 (a=0 + two-sided (7.7.a) + ρ-collapse)
+
+(12.14) ψ(xg) = ψ^ρ(x) = χ(x) の 3 部品 + ρ-bridging を全て実証明
+(commits 952f3f77 / 976fdd7c / 131c99a1、全 full build green + AxiomsCheck OK):
+
+1. **a = 0 counting** (S09_CertificateDischarge):
+   - `betaDecomp_a_eq_zero_of_p_bounds` (arithmetic core): ‖β‖²=e+1 + 直交展開
+     (betaNormSq_eq_of_source_orthogonal) + ‖Γ‖²≥0 → ((h−1)/e)a²−2a ≤ e−1、
+     p²≤h + 2e≤p+1 ((12.12)) + p≥3 → a=0 (nlinarith 2 case)。
+   - `betaDecompOfDade_a_eq_zero`: hypothesis78OfDade/betaDecompOfDade 実現形への適用
+     (SourceDiffNormEvaluation / univ.erase degree sum = family_degree_sum を discharge)。
+2. **two-sided (7.7.a) evaluation** (S09_Building78C):
+   - `zeta0_decomp_on_A`: ζ₀ 自身の A 上 (7.7.a) 分解 (eq_zero_on_A_of_inner_zero は
+     対象非 supported でも supportedProj 経由で効く、という構造的発見)。
+   - `chiRho_apply_eq_zeta0_of_inner_tau_uniform`: 係数 uniform c_i = −d_i なら
+     χ^ρ(x) = ζ₀(x)。**a=0 が c_{ind1H} = a−1 = −1 = −d_{ind1H} を uniform 化**
+     (ind1H の場合分けが消える)。
+3. **ρ-collapse** (Hypothesis71): `chiRho_apply_eq_of_forall_coset` — χ constant on
+   a·H(a) → χ^ρ(a) = χ(a)。
+
+**残る (12.14) 完成 wire (次 iteration)**: witness 文脈 discharge —
+(i) hc uniform: 既存 `cCoeff_nu_zeta_zero_eq_neg_d` (i≠ind1H) + a=0 + d_{ind1H}=1;
+(ii) hspan: CF(L,A) spanning (S09_Building78C 74-160 の induced spanning から);
+(iii) hconst: witness Dade datum の H(x) = R(x) ⊆ K 構造 + proven `psi_constant_on_xK`;
+(iv) assembly → witness_psi_degree 代替の h_psix 再配線 or (12.14) full statement。
+witness_L_zeta_bound (hB、既 proven) と同じ供給ライン。

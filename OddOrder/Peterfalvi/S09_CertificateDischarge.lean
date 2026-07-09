@@ -1639,6 +1639,201 @@ theorem zetaNuRhoNormSqGeOfDade
       rw [hz0_compl])
     hN_ind1H hP_ind1H hGsum hsmall
 
+/-- **Peterfalvi (12.14), the `a = 0` step.**  The (7.8.a) coefficient `a` of a `BetaDecomp`
+vanishes under the witness numerics.  From `‖β‖² = e + 1`
+(`betaNormSq_eq_complementIndex_add_one`) and its orthogonal expansion
+`‖β‖² = 2 + ((h−1)/e)·a² − 2a + ‖Γ‖²` (`betaNormSq_eq_of_source_orthogonal`) with `‖Γ‖² ≥ 0`,
+the integer `a` satisfies `((h−1)/e)·a² − 2a ≤ e − 1`; with `p² ≤ h` (the rank-two `P₀ ⊆ H`)
+and `2e ≤ p + 1` (Peterfalvi (12.12)) this gives `2(p−1)·a² − 2a ≤ (p−1)/2`, which for `p ≥ 3`
+forces `a = 0`: `a ≥ 1` makes the left side at least `2p − 4 > (p−1)/2`, and `a ≤ −1` makes it
+at least `2p > (p−1)/2`. -/
+theorem betaDecomp_a_eq_zero_of_p_bounds {G : Type*} [Group G] [Fintype G] {A : Set G}
+    {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : OddOrder.Peterfalvi.S09.Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hbetaNorm : H78.betaNormSq = (H78.complementIndex : ℝ) + 1)
+    (hexpand : H78.betaNormSq =
+      2 + (((H78.kernelOrder : ℝ) - 1) / (H78.complementIndex : ℝ)) * (hBD.a : ℝ) ^ 2
+        - 2 * (hBD.a : ℝ) + H78.gammaNormSq hBD)
+    {p : ℕ} (hp3 : 3 ≤ p)
+    (hph : (p : ℝ) ^ 2 ≤ (H78.kernelOrder : ℝ))
+    (h2e : 2 * (H78.complementIndex : ℝ) ≤ (p : ℝ) + 1) :
+    hBD.a = 0 := by
+  have hgamma_nonneg : 0 ≤ H78.gammaNormSq hBD :=
+    OddOrder.Peterfalvi.S09.Hypothesis71.ClassFunction.inner_self_re_nonneg hBD.Gamma
+  have he_pos : (0 : ℝ) < (H78.complementIndex : ℝ) := by
+    exact_mod_cast H78.complementIndex_pos
+  have hp_real : (3 : ℝ) ≤ (p : ℝ) := by exact_mod_cast hp3
+  -- `((h−1)/e)·a² − 2a ≤ e − 1`.
+  have hkey : (((H78.kernelOrder : ℝ) - 1) / (H78.complementIndex : ℝ)) * (hBD.a : ℝ) ^ 2
+      - 2 * (hBD.a : ℝ) ≤ (H78.complementIndex : ℝ) - 1 := by
+    have h := hexpand.symm.trans hbetaNorm
+    linarith
+  -- `2(p−1) ≤ (h−1)/e`: from `h ≥ p²` and `2e ≤ p + 1`.
+  have hfrac : 2 * ((p : ℝ) - 1) ≤ ((H78.kernelOrder : ℝ) - 1) / (H78.complementIndex : ℝ) := by
+    rw [le_div_iff₀ he_pos]
+    nlinarith
+  have hL : 2 * ((p : ℝ) - 1) * (hBD.a : ℝ) ^ 2 - 2 * (hBD.a : ℝ)
+      ≤ (H78.complementIndex : ℝ) - 1 := by
+    have hmul := mul_le_mul_of_nonneg_right hfrac (sq_nonneg ((hBD.a : ℝ)))
+    linarith
+  have he_ub : (H78.complementIndex : ℝ) - 1 ≤ ((p : ℝ) - 1) / 2 := by linarith
+  rcases lt_trichotomy hBD.a 0 with hneg | hzero | hpos
+  · exfalso
+    have ha1 : (hBD.a : ℝ) ≤ -1 := by
+      have h1 : hBD.a ≤ -1 := by omega
+      exact_mod_cast h1
+    nlinarith [sq_nonneg ((hBD.a : ℝ) + 1)]
+  · exact hzero
+  · exfalso
+    have ha1 : (1 : ℝ) ≤ (hBD.a : ℝ) := by exact_mod_cast hpos
+    nlinarith [sq_nonneg ((hBD.a : ℝ) - 1)]
+
+open OddOrder.Peterfalvi.S09 in
+/-- **Peterfalvi (12.14), `a = 0` for the Dade-realized family.**  In the setting of
+`zetaNuRhoNormSqGeOfDade` (the `hypothesis78OfDade`/`betaDecompOfDade` realization of the (7.8)
+machinery over a Dade isometry), the (7.8.a) coefficient `a = (β, ζ_0^ν) + 1` **vanishes** under
+the (12.14) numerics: `ζ_0` irreducible, `p² ≤ |H|` (the rank-two `P₀ ⊆ H` of (12.9)),
+`2·[L:H] ≤ p + 1` ((12.12)), `p ≥ 3` odd.  Discharges `‖β‖² = e + 1`
+(`SourceDiffNormEvaluation` from the family inner values) and the orthogonal expansion
+(`betaNormSq_eq_of_source_orthogonal`), then applies the arithmetic core
+`betaDecomp_a_eq_zero_of_p_bounds`.  This is the counting step of Peterfalvi (12.14): with it the
+(7.7.a) coefficients of `ψ = ζ_0^ν` collapse to `c_{ind1H} = −1`, `c_i = −d_i`. -/
+theorem betaDecompOfDade_a_eq_zero
+    {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L)
+    (hτ : OddOrder.Peterfalvi.S04.IsDadeIsometry (G := G) (k := ℂ) (L := L) H71.τ)
+    (H : Subgroup G) (hHL : H ≤ L)
+    (hHnorm : ∀ (l : ↥L) {h : G}, h ∈ H → (l : G) * h * (l : G)⁻¹ ∈ H)
+    (hAH : A = (H : Set G) \ {1})
+    [Fintype ↥(H.subgroupOf L)] [Invertible (Nat.card ↥(H.subgroupOf L) : ℂ)] {n : ℕ}
+    (θ : Fin (n + 1) → IrreducibleCharacter ↥(H.subgroupOf L))
+    (hinj : Function.Injective
+      (fun i => ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ)))
+    (hcover : ∀ φ : IrreducibleCharacter ↥(H.subgroupOf L),
+      ClassFunction.induce (H.subgroupOf L) (φ : ClassFunction _ ℂ) ∈
+        Set.range (fun i => ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ)))
+    (d : Fin (n + 1) → ℂ)
+    (psi_support : ∀ i, (ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ)
+        - d i • ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hdeg : ∀ i, ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ) (1 : ↥L)
+        = d i * ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L))
+    (ind1H : Fin (n + 1)) (hind1H : ind1H ≠ 0)
+    (hzeta_ind1H : θ ind1H = trivialIrreducibleCharacter ↥(H.subgroupOf L))
+    (hdeg_match : ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L)
+        = ClassFunction.induce (H.subgroupOf L) (θ ind1H : ClassFunction _ ℂ) (1 : ↥L))
+    (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (hnu_isometry : ∀ i j : Fin (n + 1), i ≠ ind1H → j ≠ ind1H →
+      ClassFunction.inner (ν (ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ)))
+          (ν (ClassFunction.induce (H.subgroupOf L) (θ j : ClassFunction _ ℂ)))
+        = ClassFunction.inner (ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ))
+          (ClassFunction.induce (H.subgroupOf L) (θ j : ClassFunction _ ℂ)))
+    (hagree : ∀ i : Fin (n + 1), i ≠ 0 → i ≠ ind1H →
+      H71.τ ⟨ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ)
+          - d i • ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ), psi_support i⟩
+        = ν (ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ))
+          - d i • ν (ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ)))
+    (hzeta0nu : ClassFunction.inner (ν (ClassFunction.induce (H.subgroupOf L)
+        (θ 0 : ClassFunction _ ℂ))) (Hypothesis71.constOne G) = 0)
+    (hζ0norm : ClassFunction.inner (ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ))
+      (ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ)) = 1)
+    (a : ℤ) (ha : (a : ℂ) = ClassFunction.inner
+      (hypothesis78OfDade H71 hτ H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H
+        hzeta_ind1H hdeg_match ν hnu_isometry hagree).beta
+      (ν (ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ))) + 1)
+    (hzeta_irr : IsIrreducibleCharacter
+      (ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ)))
+    {p : ℕ} (hp3 : 3 ≤ p)
+    (hph : (p : ℝ) ^ 2 ≤ (Nat.card ↥H : ℝ))
+    (h2e : 2 * (((H.subgroupOf L).index : ℝ)) ≤ (p : ℝ) + 1) :
+    a = 0 := by
+  haveI hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
+  set H78 := hypothesis78OfDade H71 hτ H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H
+    hind1H hzeta_ind1H hdeg_match ν hnu_isometry hagree with hH78
+  set hBD := betaDecompOfDade H71 hτ H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H
+    hind1H hzeta_ind1H hdeg_match ν hnu_isometry hagree hzeta0nu hζ0norm a ha with hBDdef
+  have hBDa : hBD.a = a := rfl
+  have hz0 : ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L) ≠ 0 :=
+    induce_apply_one_ne_zero _ (θ 0)
+  have hz_ind : H78.hyp76.zeta H78.ind1H = ClassFunction.induce (H.subgroupOf L)
+      (trivialIrreducibleCharacter ↥(H.subgroupOf L) : ClassFunction _ ℂ) := by
+    show ClassFunction.induce (H.subgroupOf L) (θ ind1H : ClassFunction _ ℂ) = _
+    rw [hzeta_ind1H]
+  have hP_ind1H : H78.hyp76.zeta H78.ind1H (1 : ↥L) = (H78.complementIndex : ℂ) := by
+    rw [complementIndex_eq_subgroupOf_index H78, hz_ind]
+    exact induce_trivialChar_apply_eq_index (H.subgroupOf L) (Subgroup.one_mem _)
+  have hN_ind1H : H78.hyp76.zetaNormSq H78.ind1H = (H78.complementIndex : ℂ) := by
+    rw [complementIndex_eq_subgroupOf_index H78]
+    show ClassFunction.inner (H78.hyp76.zeta H78.ind1H) (H78.hyp76.zeta H78.ind1H)
+      = ((H78.hyp76.H.subgroupOf L).index : ℂ)
+    rw [hz_ind]
+    exact induce_trivialChar_normSq_eq_index (H.subgroupOf L)
+  have hz0_compl : ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L)
+      = (H78.complementIndex : ℂ) := by
+    show H78.hyp76.zeta H78.zetaDistinct (1 : ↥L) = (H78.complementIndex : ℂ)
+    rw [H78.zeta_one_eq_ind1H_one, hP_ind1H]
+  -- Family orthogonality in the `if`-diagonal form.
+  have horth_if : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H),
+        ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta j) =
+          if i = j then ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) else 0 := by
+    intro i _ j _
+    by_cases hij : i = j
+    · rw [if_pos hij, hij]
+    · rw [if_neg hij]
+      exact induce_family_orthogonal_of_injective (H.subgroupOf L) θ hinj i j hij
+  have hnorm_ne : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) ≠ 0 :=
+    fun i _ => induce_norm_ne_zero (H.subgroupOf L) (θ i)
+  -- Degree sum over `univ.erase ind1H`, with `star` collapsed by realness of degrees.
+  have hdeg_sum : (∑ i ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta i (1 : L) * star (H78.hyp76.zeta i (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) =
+      ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ) := by
+    have hstar : ∀ i : Fin (n + 1), star (H78.hyp76.zeta i (1 : L)) = H78.hyp76.zeta i (1 : L) :=
+      fun i => induce_apply_one_star (H.subgroupOf L) (θ i)
+    have hsq : ∀ i : Fin (n + 1),
+        H78.hyp76.zeta i (1 : L) * star (H78.hyp76.zeta i (1 : L)) =
+          H78.hyp76.zeta i (1 : L) ^ 2 := fun i => by rw [hstar i, sq]
+    calc (∑ i ∈ (Finset.univ.erase H78.ind1H),
+          H78.hyp76.zeta i (1 : L) * star (H78.hyp76.zeta i (1 : L)) /
+            ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i))
+        = ∑ i ∈ (Finset.univ.erase H78.ind1H),
+            H78.hyp76.zeta i (1 : L) ^ 2 /
+              ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) :=
+          Finset.sum_congr rfl fun i _ => by rw [hsq i]
+      _ = ((H.subgroupOf L).index : ℂ) * ((Nat.card ↥(H.subgroupOf L) : ℂ) - 1) :=
+          family_degree_sum (H.subgroupOf L) θ hinj hcover ind1H hzeta_ind1H
+      _ = ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ) := by
+          have hke : (H78.kernelOrder : ℂ) = (Nat.card ↥(H.subgroupOf L) : ℂ) := by
+            exact_mod_cast congrArg (Nat.cast (R := ℂ))
+              ((Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHL).toEquiv).symm :
+                H78.kernelOrder = Nat.card ↥(H.subgroupOf L))
+          have hce : (H78.complementIndex : ℂ) = (((H.subgroupOf L)).index : ℂ) := by
+            exact_mod_cast complementIndex_eq_subgroupOf_index H78
+          rw [hke, hce]
+          ring
+  -- `‖β‖² = e + 1` via the source-side norm evaluation.
+  have hsrc : H78.SourceDiffNormEvaluation :=
+    H78.sourceDiffNormEvaluation_of_zeta_ind_orthogonal_of_zeta_irreducible
+      hN_ind1H
+      (induce_family_orthogonal_of_injective (H.subgroupOf L) θ hinj 0 ind1H (Ne.symm hind1H))
+      hzeta_irr
+  -- The orthogonal expansion of `‖β‖²`.
+  have hexpand := H78.betaNormSq_eq_of_source_orthogonal hBD horth_if hnorm_ne hz0_compl
+    hdeg_sum hzeta_irr
+  -- Cast the numeric bounds to the `H78` accessors.
+  have hph' : (p : ℝ) ^ 2 ≤ (H78.kernelOrder : ℝ) := by
+    rwa [show H78.kernelOrder = Nat.card ↥H from rfl]
+  have h2e' : 2 * (H78.complementIndex : ℝ) ≤ (p : ℝ) + 1 := by
+    have hce : H78.complementIndex = (H.subgroupOf L).index := by
+      exact_mod_cast complementIndex_eq_subgroupOf_index H78
+    rwa [hce]
+  have h0 := betaDecomp_a_eq_zero_of_p_bounds H78 hBD
+    (H78.betaNormSq_eq_complementIndex_add_one hsrc) hexpand hp3 hph' h2e'
+  rwa [hBDa] at h0
+
 /-- **The Dade integral character map is ℂ-linear** (the §12→§7 coherence-bridge keystone).
 `dadeIntegralCharacterMap` is `(LinearMap.exists_extend hyp.dadeLinearMap).choose.restrictScalars ℤ`
 — the ℂ-linear extension of the §4 Dade map, read as `ℤ`-linear (`IntegralCharacterMap`).  Its

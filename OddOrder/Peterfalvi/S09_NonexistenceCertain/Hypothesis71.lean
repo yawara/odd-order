@@ -191,6 +191,25 @@ theorem chiRho_dadeImage_eq (H71 : Hypothesis71 G A L)
   rw [Finset.sum_const, Finset.card_univ, ← Nat.card_eq_fintype_card,
       nsmul_eq_mul, ← mul_assoc, inv_mul_cancel₀ hne, one_mul]
 
+open scoped Classical in
+/-- **The `ρ`-average collapses on a coset of constancy** (Peterfalvi (12.14), the
+`ψ^ρ(x) = ψ(x)` step).  If `χ` is constant on the local coset `a·H(a)` — for the (12.14)
+witness this follows from `ψ` being constant on `x·K ⊇ x·R(x)` ((12.3)/(12.4), with
+`R(x) = C_K(x)` per Definition (8.14)) — then the `ρ`-average at `a` is just the value:
+`χ^ρ(a) = χ(a)`. -/
+theorem chiRho_apply_eq_of_forall_coset (H71 : Hypothesis71 G A L)
+    (χ : ClassFunction G ℂ) {a : L} (ha : (a : G) ∈ A)
+    (hconst : ∀ y : G, y ∈ H71.hyp.H ⟨(a : G), ha⟩ → χ ((a : G) * y) = χ (a : G)) :
+    H71.chiRho χ a = χ (a : G) := by
+  rw [H71.chiRho_of_mem _ ha]
+  have hpt : ∀ x : H71.hyp.H ⟨(a : G), ha⟩,
+      χ ((a : G) * (x : G)) = χ (a : G) := fun x => hconst (x : G) x.2
+  simp_rw [hpt]
+  have hne : (Nat.card (H71.hyp.H ⟨(a : G), ha⟩) : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr (Nat.card_pos (α := H71.hyp.H ⟨(a : G), ha⟩)).ne'
+  rw [Finset.sum_const, Finset.card_univ, ← Nat.card_eq_fintype_card,
+      nsmul_eq_mul, ← mul_assoc, inv_mul_cancel₀ hne, one_mul]
+
 /-- **L-conjugation invariance of `chiRho`.** Under `HConjInvariant` (carried by
 `Hypothesis71`), the `ρ`-image of any `χ ∈ CF(G)` is `L`-class-function valued. -/
 theorem chiRho_conj_invariant (H71 : Hypothesis71 G A L) (χ : ClassFunction G ℂ)
