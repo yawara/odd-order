@@ -2266,13 +2266,11 @@ private theorem conj_smul_centralizer_singleton (u x : G) :
   constructor
   · intro h
     have h2 := congrArg (fun t => u * t * u⁻¹) h
-    simp only at h2
     calc u * x * u⁻¹ * g = u * (x * (u⁻¹ * g * u)) * u⁻¹ := by group
       _ = u * (u⁻¹ * g * u * x) * u⁻¹ := h2
       _ = g * (u * x * u⁻¹) := by group
   · intro h
     have h2 := congrArg (fun t => u⁻¹ * t * u) h
-    simp only at h2
     calc x * (u⁻¹ * g * u) = u⁻¹ * (u * x * u⁻¹ * g) * u := by group
       _ = u⁻¹ * (g * (u * x * u⁻¹)) * u := by rw [h]
       _ = u⁻¹ * g * u * x := by group
@@ -5881,7 +5879,7 @@ theorem typeF_frobenius_of_esetup [Finite G]
     have hcomm : Commute (a : G) (n : G) := by
       have hcM : a * n = n * a := mul_inv_eq_iff_eq_mul.mp hfix
       have h2 := congrArg (fun z : ↥M => (z : G)) hcM
-      simpa using h2
+      simpa [commute_iff_eq] using h2
     -- a prime `r ∣ orderOf (a : G)`, with an order-`r` power `c` of `a`.
     have haG1 : (a : G) ≠ 1 := fun h => ha1 (by
       apply Subtype.ext
