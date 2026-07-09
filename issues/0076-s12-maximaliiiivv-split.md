@@ -47,3 +47,10 @@ full build (3881 jobs) green を維持。lane-b の frontier 編集と衝突し�
 - 既存 split 前例: issue 0069 (S14_TypePCounting) / 0071 (S15_MF) / 0075 (S15_SAndT)
 - merge `0256fe25` (3508 行到達時点)
 - [[feedback-record-deferred-hub-tasks-as-issues]]
+
+## 完了 (2026-07-09)
+
+dir 化分割を実施 (issue 0103 方式、lean_split.py による機械分割 + 宣言/namespace 文脈/sorry 保存検証 + full build green):
+  - CharacterParameters.lean (1976 行)
+  - DadeCalculations.lean (3561 行)
+  - Hypothesis.lean (1205 行)
