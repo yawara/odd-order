@@ -2297,7 +2297,8 @@ theorem constituent_diff_tau_eq_induce {L : Subgroup G} [Finite G]
     intro l a
     refine ⟨fun h => ?_, fun h => hyp.dadeData.dade.L_normalizes_A l h⟩
     have h2 := hyp.dadeData.dade.L_normalizes_A l⁻¹ h
-    simpa [Subgroup.coe_inv, mul_assoc] using h2
+    have h3 : a ∈ typeIA L hyp.typeI := by simpa [Subgroup.coe_inv, mul_assoc] using h2
+    exact h3
   have hA₁A : hyp.ambientA \ escapingCentralizerSet L hyp.ambientA ⊆ hyp.ambientA := Set.diff_subset
   have hA₁norm : ∀ (l : L) ⦃a : G⦄,
       a ∈ hyp.ambientA \ escapingCentralizerSet L hyp.ambientA →
@@ -4286,7 +4287,7 @@ theorem frobenius_typeI_coherent_of_cyclicQuotient [Finite G]
       rw [Subgroup.mem_bot, commutatorElement_eq_one_iff_commute]
       have h := hnonab ⟨p, hp⟩ ⟨q, hq⟩
       have h3 := Subtype.ext_iff.mp h
-      simpa using h3
+      simpa [commute_iff_eq] using h3
     rw [← hyp.SsubFiltration_bot, ← hcomm_bot]
     exact hcoh
 
@@ -6531,6 +6532,7 @@ theorem isCyclic_and_card_dvd_sub_or_add_one_of_fpf_mulDistribMulAction
       have h1 := hn (Additive.ofMul m)
       rw [Representation.ofDistribMulAction_apply_apply] at h1
       have := congrArg Additive.toMul h1
+      rw [show Additive.toMul (e • Additive.ofMul m) = e • m from rfl] at this
       simpa using this
     obtain ⟨-, hp1⟩ :=
       isCyclic_and_card_dvd_add_one_of_two_dim_irreducible_nonscalar hodd
