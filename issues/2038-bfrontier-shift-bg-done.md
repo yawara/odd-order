@@ -347,3 +347,11 @@ proven 済ゆえ配線距離短い) + hC ((7.3)+(8.17)) + mval 束ね。
 (iii) hconst: witness Dade datum の H(x) = R(x) ⊆ K 構造 + proven `psi_constant_on_xK`;
 (iv) assembly → witness_psi_degree 代替の h_psix 再配線 or (12.14) full statement。
 witness_L_zeta_bound (hB、既 proven) と同じ供給ライン。
+
+## ⚖️ HUB carve-out (2026-07-09 監視 tick — merge 03fd8474): 2038 供給編集権
+
+**b の a 所有 S09 機構ファイルへの additive 編集を retroactive carve-out で受理** (3002 供給編集権 = ユーザー裁定 2026-07-05 の先例と同型、hub 自律裁定):
+
+- **対象実例**: `S09_Building78C.lean` (+82, `zeta0_decomp_on_A` / `chiRho_apply_eq_zeta0_of_inner_tau_uniform`)、`S09_NonexistenceCertain/Hypothesis71.lean` (+19, `chiRho_apply_eq_of_forall_coset`)。いずれも新 theorem のみ・既存宣言改変なし。
+- **hub 検証**: (i) 純 additive、(ii) 全て proven (sorry/axiom 追加なし)、(iii) 用途 = 本 issue (12.14) の chiRho 供給 chain (χ^ρ 機構は S09 に在住、0089 裁定で cite 先)、(iv) a の並行編集ゼロ (`main..a` = 0)。
+- **⟹ 恒久ルール (本 issue の (12.14) 供給完了まで)**: b は **2038 (12.14) 供給 chain に必要な a 所有 S09 chiRho 機構ファイルへの純 additive・proven な helper 追加**を行ってよい (条件は 3002 先例と同一: additive / proven / 用途明示 / self-flag)。既存宣言の statement・proof 改変は従来どおり逸脱。**(12.14) 供給完了で失効**。
