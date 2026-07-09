@@ -2395,7 +2395,6 @@ theorem frattini_factorization [Finite G] {M Q H : Subgroup G}
     rw [Subgroup.subgroupOf, Subgroup.map_comap_eq, Subgroup.range_subtype, inf_of_le_right hH'L]
   have hlift : MulAut.conj q • H = MulAut.conj m⁻¹ • H := by
     have hlifted := congrArg (·.map (Q ⊔ H).subtype) hq'eq
-    simp only at hlifted
     rw [Subgroup.map_map, hintertwine, ← Subgroup.map_map, hmapH, hmapH'] at hlifted
     rw [Subgroup.pointwise_smul_def]
     exact hlifted
@@ -5463,8 +5462,12 @@ theorem card_invariants_eq_card_of_fixedPoints {q : ℕ} {H : Type*} [Group H]
   refine forall_congr' (fun r => ?_)
   show ((r : H) • v = v) ↔ ((r : H) • Additive.toMul v = Additive.toMul v)
   constructor
-  · intro h; have := congrArg Additive.toMul h; simpa using this
-  · intro h; apply Additive.toMul.injective; simpa using h
+  · intro h
+    have := congrArg Additive.toMul h
+    rwa [show Additive.toMul ((r : H) • v) = (r : H) • Additive.toMul v from rfl] at this
+  · intro h
+    apply Additive.toMul.injective
+    rwa [show Additive.toMul ((r : H) • v) = (r : H) • Additive.toMul v from rfl]
 
 open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom quotientMulAutHom_apply_mk') in
