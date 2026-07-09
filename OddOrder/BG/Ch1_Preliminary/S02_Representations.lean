@@ -498,7 +498,8 @@ private theorem perm_fin_two_eq_one_of_odd_order
     rw [Nat.card_eq_fintype_card]
     decide
   have hdvd : orderOf σ ∣ 2 := by
-    simpa [hcard] using orderOf_dvd_natCard σ
+    have h := orderOf_dvd_natCard σ
+    rwa [hcard] at h
   have hle : orderOf σ ≤ 2 := Nat.le_of_dvd (by decide) hdvd
   have hpos : 0 < orderOf σ := orderOf_pos σ
   have hne2 : orderOf σ ≠ 2 := by
@@ -878,7 +879,7 @@ private theorem finrank_eq_one_of_irreducible_representation_of_commutative_grou
       (Representation.instModuleAsModule σ)
       (Representation.instModuleMonoidAlgebraAsModule σ)
       inferInstance inferInstance hfinite inferInstance inferInstance
-  simpa [Representation.asModule] using hmodule
+  exact σ.asModuleEquiv.symm.finrank_eq.trans hmodule
 
 /-- Characteristic-away bridge for Maschke in the BG Thm 2.6 q≠p branch.
 
@@ -916,8 +917,7 @@ private theorem neZero_nat_card_cast_of_forall_prime_not_char
   · haveI : CharZero F := hzero
     refine ⟨?_⟩
     intro hcast
-    exact (Nat.card_pos (α := K)).ne'
-      (CharZero.cast_injective (by simpa using hcast))
+    exact (Nat.card_pos (α := K)).ne' (Nat.cast_eq_zero.mp hcast)
   · rcases hpos with ⟨p, hp_prime, hp_char⟩
     haveI : CharP F p := hp_char
     refine NeZero.of_not_dvd (R := F) (p := p) (n := Nat.card K) ?_
@@ -1029,7 +1029,8 @@ private theorem finrank_eq_one_of_simple_submodule_of_commutative_group
       @Submodule.finiteDimensional_of_le F σ.asModule
         inferInstance inferInstance (Representation.instModuleAsModule σ)
         NF ⊤ hfiniteTop le_top
-    simpa [NF, Submodule.restrictScalars] using hfiniteNF
+    exact hfiniteNF.equiv
+      ((Submodule.restrictScalarsEquiv F (MonoidAlgebra F K) σ.asModule N).restrictScalars F)
   haveI : IsMulCommutative K := ⟨hKcomm⟩
   haveI : IsMulCommutative (MonoidAlgebra F K) := inferInstance
   have hNdim : Module.finrank F N = 1 :=
@@ -1040,7 +1041,15 @@ private theorem finrank_eq_one_of_simple_submodule_of_commutative_group
       inferInstance inferInstance hfiniteN inferInstance inferInstance
   let W : Subrepresentation σ := Subrepresentation.ofSubmodule' N
   change Module.finrank F W.toSubmodule = 1
-  simpa [W, Subrepresentation.ofSubmodule'] using hNdim
+  let eW : W.toSubmodule ≃ₗ[F] N :=
+    { toFun := fun x => ⟨x.1, x.2⟩
+      invFun := fun x => ⟨x.1, x.2⟩
+      map_add' := fun _ _ => rfl
+      map_smul' := fun _ _ => rfl
+      left_inv := fun _ => rfl
+      right_inv := fun _ => rfl }
+  rw [eW.finrank_eq]
+  exact hNdim
 
 /-- A simple group-algebra submodule for an abelian group gives a rank-one
 subrepresentation over an algebraically closed field.
@@ -1125,15 +1134,16 @@ private theorem exists_rank_one_complement_subrepresentations_of_commutative_of_
   have hWdim :
       Module.finrank F W.toSubmodule = 1 :=
     finrank_eq_one_of_simple_submodule_of_commutative_group hKcomm σ N hNsimple
-  have hsubrep_compl : IsCompl W U := by
-    simpa [W, U] using
-      ((Subrepresentation.subrepresentationSubmoduleOrderIso (ρ := σ)).symm.isCompl hNQ)
+  have hsubrep_compl : IsCompl W U :=
+    (Subrepresentation.subrepresentationSubmoduleOrderIso (ρ := σ)).symm.isCompl hNQ
   have hcompl : IsCompl W.toSubmodule U.toSubmodule := by
     refine IsCompl.of_eq ?_ ?_
     · have h := congrArg Subrepresentation.toSubmodule hsubrep_compl.inf_eq_bot
-      simpa [W, U] using h
+      rw [Subrepresentation.toSubmodule_inf] at h
+      exact h
     · have h := congrArg Subrepresentation.toSubmodule hsubrep_compl.sup_eq_top
-      simpa [W, U] using h
+      rw [Subrepresentation.toSubmodule_sup] at h
+      exact h
   haveI : IsSimpleModule (MonoidAlgebra F K) N := hNsimple
   have hW_ne_bot_sub : W.toSubmodule ≠ ⊥ := by
     have hN_nontrivial : Nontrivial N :=
@@ -1296,8 +1306,10 @@ private theorem finrank_conjugateSubrepresentationOfNormal
     Module.finrank F (conjugateSubrepresentationOfNormal K hKnormal ρ W g).toSubmodule =
       Module.finrank F W.toSubmodule := by
   let e : V ≃ₗ[F] V := LinearEquiv.ofBijective (ρ g) (ρ.apply_bijective g)
-  simpa [conjugateSubrepresentationOfNormal, e] using
-    (LinearEquiv.finrank_map_eq e W.toSubmodule)
+  have hcoe : (e : V →ₗ[F] V) = ρ g := LinearMap.ext fun x => by simp [e]
+  have h := LinearEquiv.finrank_map_eq e W.toSubmodule
+  rw [hcoe] at h
+  exact h
 
 /-- Conjugating complementary `K`-subrepresentations by an ambient element
 preserves complementarity. -/

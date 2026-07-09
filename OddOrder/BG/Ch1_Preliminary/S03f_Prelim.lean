@@ -825,8 +825,6 @@ theorem centralizer_map_conj (g : G) (K : Subgroup G) :
   · intro hx
     refine ⟨g⁻¹ * x * g, fun k hk => ?_, by group⟩
     have h1 := hx (g * k * g⁻¹) ⟨k, hk, rfl⟩
-    have h2 := congrArg (fun z => g⁻¹ * z * g) h1
-    simp only at h2
     calc k * (g⁻¹ * x * g) = g⁻¹ * (g * k * g⁻¹ * x) * g := by group
       _ = g⁻¹ * (x * (g * k * g⁻¹)) * g := by rw [h1]
       _ = g⁻¹ * x * g * k := by group

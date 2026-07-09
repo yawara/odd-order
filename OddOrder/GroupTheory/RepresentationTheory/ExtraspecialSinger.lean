@@ -212,7 +212,6 @@ noncomputable def commPairing : V[P] →+ V[P] →+ ZMod p :=
     (fun v => AddMonoidHom.mk'
       (fun w => Multiplicative.toAdd (commBihom2 hP (Additive.toMul v) (Additive.toMul w)))
       (fun w w' => by
-        dsimp only
         rw [show Additive.toMul (w + w') = Additive.toMul w * Additive.toMul w' from rfl,
           map_mul, toAdd_mul]))
     (fun v v' => by
@@ -339,7 +338,7 @@ theorem card_dvd_succ_of_primeAction_extraspecial (hodd : Odd p)
       have hp1 : 0 < p := Fact.out (p := p.Prime).pos
       have : Nat.card (P ⧸ commutator P) * p = p ^ 2 * p := by rw [← hq]; ring
       exact Nat.eq_of_mul_eq_mul_right hp1 this
-    simpa using this
+    exact (Nat.card_congr Additive.toMul).trans this
   have hdim : Module.finrank (ZMod p) (Additive (P ⧸ commutator P)) = 2 := by
     have := Module.natCard_eq_pow_finrank (K := ZMod p) (V := Additive (P ⧸ commutator P))
     rw [hVcard, Nat.card_eq_fintype_card (α := ZMod p), ZMod.card] at this
