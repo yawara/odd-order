@@ -86,7 +86,7 @@ theorem normOneUnits_card_gt_one [Fact p.Prime] (hq : 1 < q) :
   have hle :
       (∑ k ∈ Finset.range 2, p ^ k) ≤ ∑ k ∈ Finset.range q, p ^ k :=
     Finset.sum_le_sum_of_subset_of_nonneg hrange
-      (fun _ _ _ => zero_le _)
+      (fun _ _ _ => Nat.zero_le _)
   have htwo : 1 < (∑ k ∈ Finset.range 2, p ^ k) := by
     simp
     omega
@@ -98,7 +98,7 @@ theorem pow_sub_one_le_normOneUnits_card [Fact p.Prime] (hq : q ≠ 0) :
     p ^ (q - 1) ≤ Nat.card (normOneUnits p q) := by
   have hp2 : 2 ≤ p := (Fact.out : p.Prime).two_le
   rw [normOneUnits_card p q hq, ← Nat.geomSum_eq hp2 q]
-  exact Finset.single_le_sum (fun k _ => zero_le (p ^ k)) (by simp; omega)
+  exact Finset.single_le_sum (fun k _ => Nat.zero_le (p ^ k)) (by simp; omega)
 
 /-- The two largest terms in the geometric sum for `|U|` give a sharper lower
 bound used in the `q >= 5` numerical separation. -/
@@ -115,7 +115,7 @@ theorem pow_sub_one_add_pow_sub_two_le_normOneUnits_card [Fact p.Prime] (hq : 2 
   have hle :
       (∑ k ∈ ({q - 2, q - 1} : Finset ℕ), p ^ k) ≤ ∑ k ∈ Finset.range q, p ^ k :=
     Finset.sum_le_sum_of_subset_of_nonneg hsubset
-      (fun _ _ _ => zero_le _)
+      (fun _ _ _ => Nat.zero_le _)
   have hsum :
       (∑ k ∈ ({q - 2, q - 1} : Finset ℕ), p ^ k) =
         p ^ (q - 2) + p ^ (q - 1) := by
