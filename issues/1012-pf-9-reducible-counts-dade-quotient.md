@@ -2211,3 +2211,18 @@ multi-session が正体。sorry-free 上流 (orbit count/構造 iso/producer/d=u
 (10.8) coherence cluster に gated。lane-a が spine を前進させる唯一の道 = **(10.8) cluster の根**
 ((10.7) partner Frobenius via §9 + (7.8.b)[b] + TI-counting) を正面から、または carrier de-scaffold を
 9000 claim で。次 iteration はこのどちらかに sustained commit すべき (再調査でなく)。
+
+## ✅✅✅ (9.10) 完全クローズ (2026-07-09 lane a, commit f66c3921) — 本 issue の §9 scope 完遂
+
+`exceptional_case_frobenius_realization` の最終 conjunct (type-II HU-Frobenius) を実証明
+(Coq `typeP_reducible_core_cases` 右枝 mirror): exceptional ⟹ C=⊥ ⟹ U≅Ū cyclic ⟹
+Schur–Zassenhaus 共役で type-F complement へ cyclic 移送 ⟹
+`typeF_frobenius_of_card_eq_exponent` collapse ⟹ 新 helper
+`IsFrobeniusGroup.conj_complement` で type-P の U へ transport。
+
+**⟹ 本 issue の (9.9.b)/(9.8.b)/(9.10) は全て実証明済**。S11 の残 sorry は
+`sibleyTarget_H0C` (§14 cross-lane、do-not-fill 設計) のみ。同日 (9.7.a) 側も完遂
+(issue 9000: caseA_u_le_cyclotomicQuotient + 無条件 u_le_cyclotomicQuotient +
+opaque pair 2 組削除)。残る §9-隣接 work = S12 (10.7) 一般 case (T2 coherence、
+issue 1017 管轄; exceptional 枝は本定理 cite で閉じられる)。→ **CLOSE 推奨**
+(hub merge tick で issues/closed/ へ)。

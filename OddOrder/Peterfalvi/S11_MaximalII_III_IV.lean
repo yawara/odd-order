@@ -19,6 +19,7 @@ import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
 import OddOrder.Peterfalvi.S08_CoherenceCorePart1
 import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
 import OddOrder.GroupTheory.RepresentationTheory.OrbitOnIrr
+import OddOrder.Mathlib.SchurZassenhausConj
 
 /-!
 # Peterfalvi Section 11: Maximal Subgroups of Types II, III, and IV
@@ -14138,6 +14139,38 @@ theorem caseB_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     exact ⟨caseB_no_irreducible_forces_C_bot hG chars caseB hno,
       caseB_no_irreducible_u_formula hG chars caseB hno⟩
 
+/-- **A Frobenius-group structure is independent of the choice of complement**: conjugating the
+complement preserves it (the kernel `N`, being normal, is fixed by conjugation).  Complements of a
+normal Hall subgroup are all conjugate (Schur–Zassenhaus,
+`Subgroup.IsComplement'.exists_conj_of_coprime`), so Frobenius-ness transports between any two of
+them — the bridge from the type-`F` complement witness to the type-`P` complement `U`. -/
+theorem _root_.OddOrder.Isaacs.Ch06.IsFrobeniusGroup.conj_complement {G' : Type*} [Group G']
+    {N A : Subgroup G'} (h : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G' N A) (n : G') :
+    OddOrder.Isaacs.Ch06.IsFrobeniusGroup G' N (A.map (MulAut.conj n).toMonoidHom) := by
+  haveI := h.isNormal
+  refine ⟨h.isNormal, Subgroup.SchurZassenhausConj.isComplement'_conj h.isComplement n,
+    h.ne_bot_kernel, ?_, ?_⟩
+  · intro hbot
+    exact h.ne_bot_complement ((Subgroup.map_eq_bot_iff_of_injective A
+      (MulAut.conj n).injective).mp hbot)
+  · intro a haA' hane m hmN hmne hconj
+    obtain ⟨a₀, ha₀A, rfl⟩ := Subgroup.mem_map.mp haA'
+    have ha₀ne : a₀ ≠ 1 := by
+      rintro rfl; exact hane (by simp)
+    have hm'N : n⁻¹ * m * n ∈ N := by
+      simpa [mul_assoc] using h.isNormal.conj_mem m hmN n⁻¹
+    have hm'ne : n⁻¹ * m * n ≠ 1 := by
+      intro h1
+      exact hmne (by
+        have := congrArg (fun x => n * x * n⁻¹) h1
+        simpa [mul_assoc] using this)
+    refine h.conj_frobenius a₀ ha₀A ha₀ne _ hm'N hm'ne ?_
+    have hc : (MulAut.conj n a₀) * m * (MulAut.conj n a₀)⁻¹ = m := hconj
+    rw [MulAut.conj_apply] at hc
+    -- `(n a₀ n⁻¹) m (n a₀ n⁻¹)⁻¹ = m  ⟹  a₀ (n⁻¹ m n) a₀⁻¹ = n⁻¹ m n`
+    have := congrArg (fun x => n⁻¹ * x * n) hc
+    simpa [mul_assoc] using this
+
 /-- **Peterfalvi (9.10)**: in the exceptional case where `𝒮(H₀C')` contains no irreducible
 character of degree `qu`, the quotient semidirect product is Frobenius; in type II the full `H U`
 subgroup is Frobenius with kernel `H`, and `u = (p^q-1)/(p-1)`.
@@ -14173,6 +14206,89 @@ theorem exceptional_case_frobenius_realization [Finite G]
     exact hno ⟨χ, hmem, hirr, caseB_degree_qu hG chars caseB χ hmem⟩
   refine ⟨fun g hg => chiefFactor_caseB_action_fpf chief caseB.actsIrreducibly g hg,
     caseB_no_irreducible_u_formula hG chars caseB hno', ?_⟩
-  sorry
+  -- **Type-II `HU`-Frobenius** (Coq `typeP_reducible_core_cases`, right branch): the exceptional
+  -- case forces `C = ⊥` (`caseB_no_irreducible_forces_C_bot`), so `U ≅ Ū` is cyclic (Singer);
+  -- a cyclic complement collapses the type-F Frobenius `H ⊔ U₀` to the full `H ⊔ U`
+  -- (`typeF_frobenius_of_card_eq_exponent`), transported to the type-`P` complement `U` by
+  -- Schur–Zassenhaus conjugacy.
+  intro hTypeII
+  classical
+  -- `C = ⊥`, hence `uActionHom` is injective and `U ≅ Ū` is cyclic.
+  have hCbot : cSub data chief = ⊥ := caseB_no_irreducible_forces_C_bot hG chars caseB hno'
+  have hker : (uActionHom data chief).ker = ⊥ := by
+    have h1 : ((uActionHom data chief).ker.map
+        (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype).map
+        (data.typeP.U ⊔ data.typeP.W1).subtype = ⊥ := hCbot
+    rwa [Subgroup.map_eq_bot_iff_of_injective _ (Subgroup.subtype_injective _),
+      Subgroup.map_eq_bot_iff_of_injective _ (Subgroup.subtype_injective _)] at h1
+  haveI hUcyc : IsCyclic ↥data.typeP.U := by
+    haveI hUbar := caseB.Ubar_cyclic
+    have hinj : Function.Injective (uActionHom data chief) :=
+      (uActionHom data chief).ker_eq_bot_iff.mp hker
+    haveI : IsCyclic ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) :=
+      isCyclic_of_surjective (MonoidHom.ofInjective hinj).symm.toMonoidHom
+        (MonoidHom.ofInjective hinj).symm.surjective
+    exact isCyclic_of_surjective
+      (Subgroup.subgroupOfEquivOfLe
+        (le_sup_left : data.typeP.U ≤ data.typeP.U ⊔ data.typeP.W1)).toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe
+        (le_sup_left : data.typeP.U ≤ data.typeP.U ⊔ data.typeP.W1)).surjective
+  -- The type-II type-F structure of `M' = [M,M]`, with `tf.H = H` (both the Fitting kernel).
+  obtain ⟨td⟩ := hTypeII
+  obtain ⟨tf⟩ := td.derived_typeF
+  have htfH : tf.H = data.typeP.H := by
+    rw [tf.H_eq, td.derived_fitting_eq, td.typeP.H_eq, ← data.typeP.H_eq]
+  -- Schur–Zassenhaus: the type-F complement `tf.U` and the type-`P` complement `U` of `H` in `M'`
+  -- are conjugate.
+  haveI hHnormal : ((data.typeP.H).subgroupOf (derivedInG M)).Normal := by
+    refine (Subgroup.normal_subgroupOf_iff_le_normalizer data.typeP.H_le).mpr ?_
+    have hn := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer M
+    rw [← data.typeP.H_eq] at hn
+    exact (derivedInG_le_self M).trans hn
+  have hNcard : Nat.card ↥((data.typeP.H).subgroupOf (derivedInG M))
+      = Nat.card ↥data.typeP.H :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.typeP.H_le).toEquiv
+  have hNidx : ((data.typeP.H).subgroupOf (derivedInG M)).index = Nat.card ↥data.typeP.U := by
+    rw [data.typeP.derived_complement.symm.index_eq_card,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.typeP.U_le).toEquiv]
+  have hCopHU : Nat.Coprime (Nat.card ↥data.typeP.H) (Nat.card ↥data.typeP.U) :=
+    (typeP_coprime_H_uW1 data.typeP data.nontrivial.1).coprime_dvd_right
+      (Subgroup.card_dvd_of_le le_sup_left)
+  have hHsolv : IsSolvable ↥((data.typeP.H).subgroupOf (derivedInG M)) := by
+    haveI : Group.IsNilpotent ↥data.typeP.H := by
+      rw [data.typeP.H_eq]
+      exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent M
+    haveI : IsSolvable ↥data.typeP.H := IsNilpotent.to_isSolvable
+    exact solvable_of_surjective
+      (f := (Subgroup.subgroupOfEquivOfLe data.typeP.H_le).symm.toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe data.typeP.H_le).symm.surjective
+  obtain ⟨nn, _hnnH, hnnconj⟩ := Subgroup.IsComplement'.exists_conj_of_coprime
+    (by rw [hNcard, hNidx]; exact hCopHU) (Or.inl hHsolv)
+    (htfH ▸ tf.complement) data.typeP.derived_complement
+  -- `tf.U` is cyclic (conjugate to the cyclic `U`), so `|tf.U| = exp tf.U`.
+  haveI htfUsubCyc : IsCyclic ↥((tf.U).subgroupOf (derivedInG M)) := by
+    have e := Subgroup.equivMapOfInjective ((tf.U).subgroupOf (derivedInG M))
+      (MulAut.conj nn).toMonoidHom (MulAut.conj nn).injective
+    rw [hnnconj] at e
+    haveI : IsCyclic ↥((data.typeP.U).subgroupOf (derivedInG M)) :=
+      isCyclic_of_surjective (Subgroup.subgroupOfEquivOfLe data.typeP.U_le).symm.toMonoidHom
+        (Subgroup.subgroupOfEquivOfLe data.typeP.U_le).symm.surjective
+    exact isCyclic_of_surjective e.symm.toMonoidHom e.symm.surjective
+  haveI htfUcyc : IsCyclic ↥tf.U :=
+    isCyclic_of_surjective (Subgroup.subgroupOfEquivOfLe tf.U_le).toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe tf.U_le).surjective
+  -- Collapse the type-F Frobenius to the full complement and transport to `U`.
+  have hfrobM' := OddOrder.Peterfalvi.S10.typeF_frobenius_of_card_eq_exponent tf
+    IsCyclic.exponent_eq_card.symm
+  rw [htfH] at hfrobM'
+  have hfrob2 := hfrobM'.conj_complement nn
+  rw [hnnconj] at hfrob2
+  -- Rewrite the ambient `M' = H ⊔ U`.
+  have hM'eq : derivedInG M = data.H ⊔ data.U := by
+    show derivedInG M = data.typeP.H ⊔ data.typeP.U
+    rw [data.typeP.H_eq]
+    exact data.typeP.derivedInG_eq_fitting_sup_U
+  rw [← hM'eq]
+  exact hfrob2
 
 end OddOrder.Peterfalvi.S11
