@@ -969,7 +969,7 @@ theorem tau1_Malpha_centralizer_PQ_eq_bot [Finite G] (hG : IsMinimalSimpleOdd G)
       haveI := hnil
       have hcomm := S10.commute_of_coprime_orderOf_of_isNilpotent hcop
       have hxy := congrArg Subtype.val hcomm
-      simpa using hxy
+      simpa [commute_iff_eq] using hxy
     have h1 : π (⟨(u : G), huH⟩ * ⟨n₀, hn₀H⟩ * ⟨(u : G), huH⟩⁻¹ * ⟨n₀, hn₀H⟩⁻¹) = 1 := by
       rw [map_mul, map_mul, map_mul, map_inv, map_inv]
       have hc : π ⟨(u : G), huH⟩ * π ⟨n₀, hn₀H⟩ = π ⟨n₀, hn₀H⟩ * π ⟨(u : G), huH⟩ :=
