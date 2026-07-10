@@ -482,6 +482,32 @@ S05 `omegaProdEquiv_symm_omegaProdChar` + w1CharEquiv/ticW₂-transport 全射�
 V-値 0 (landed anchor) → λ1·τ₂ν(v) = ν1·τ₂λ(v) = 0 → τ₂ν|_V = 0 (λ1 ≠ 0)。
 (c) S05 endgame 適用 (update¹⁰ の 3-5) → typeII_nu_tau2_dichotomy。
 
+**進捗⁴ (741109f0)**: ~~(a) τ₂λ|_V = 0~~ ~~(b) τ₂ν|_V = 0~~ **step 2 完全 DONE**。
+発見 2 点: (i) `inner_smul_chiFam_...` は既に ∀pq-chiFam 形 → **全射 lemma 不要**
+(156e3906 を chiFam-primary に refactor)。(ii) **λ, ν 等次数ゆえ scaled zeta1 不要** —
+ν − λ が直接 A(S)-supported で anchor が効く。⚠ λ-in-identifier 3 度目 (hλv 等) —
+**識別子には lam/nu を使う** (λ は予約語、ν は可だが混在回避)。
+**残 = step 3 (最終 assembly) のみ**: `typeII_nu_tau2_dichotomy` =
+S05 `eq_smul_chiFam_column_of_vanishOnV` ((ticVdiff h46) rfl (ticVdiffFullDadeApplication…)) を
+X := c.extension (columnSum χ₂) に適用。入力チェックリスト:
+- hψV ✓ (741109f0 の nu-side、typePV↔ticVdiff.V defeq)
+- σ-coeff 2 列支持 + {0,δ}/{0,−δ}: (5.5) E-形 (c6d4b780) から。τ₂ν = Σ_{α∈E}α、
+  E ⊆ certainTypeRImage の像 → sigmaCoeff pq = ⟨Σ E, chiFam pq⟩ = Σ_{α∈E}⟨α, chiFam pq⟩ —
+  各 α = ±δ_j ω_{χ₂/χ₂⁻¹, i} = ±δ_j chiFam P_i (certainTypeOmegaSigma_eq_chiFam) +
+  chiFam 直交性 ((ticVdiff).chiFam_spec .2.2.1) → coeff = ±δ_j·[P ∈ E-index]。
+  2 列条件の jcol/kcol := omegaProdEquiv.symm (omegaProdCharTic h χ₂/χ₂⁻¹ i).2 —
+  **q-成分の i-独立性 lemma がここで必要** (omegaProdCharTic の分解、
+  S05 omegaProdEquiv_symm_omegaProdChar + tic_W₂-transport; sigmaCoeff_psi_eq (S06:515) の
+  pattern 参照)。row-条件 hk/hj: ∀p 形 — p ∉ P-image の行は coeff 0 (支持)。
+- hδ = (columnFamily χ₂).sign (sign_eq) / hXnorm ✓ (extension_inner_eq + mu_sum_inner) /
+- hParseval: ⟨X,X⟩ = w₁ = |E| = Σ_pq |coeff|² (coeff = ±δ on E-indices、0 else;
+  E-index 単射 = certainTypeRImage_injective + omegaProdEquiv_symm_omegaProdCharTic_ne)。
+- 結論整形: chiFam-form → certainTypeOmegaSigma 逆翻訳 (eq_chiFam.symm) で
+  τ₂ν = δ·Σ_i ω_{χ₂,i} ∨ τ₂ν = −δ·Σ_i ω_{χ₂⁻¹,i}。
+その後 = obligation 2(b) (S↔M grid transpose、0098 item 1 → 9000 claim) + obligation 3
+((8.18.b) disjointness) — dichotomy が landed すれば `exists_typeIICrossIsometryData` の
+残 gap はこの 2 つ。
+
 ### 2026-07-10 update⁹ — ★★ typeII_T2_coherent LANDED (408e9650) — obligation 1 完成
 
 **T2 = {λ,λ̄,ν,ν̄} の (5.7) coherence が sorry-free/axiom-clean で閉じた** (τ₂ の存在 =
