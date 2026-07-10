@@ -20,7 +20,7 @@ open scoped Pointwise
 variable {G : Type*} [Group G]
 
 open OddOrder.Isaacs.Ch03 (IsAInvariant isAInvariant_iff_smul_mem)
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
 
 variable {M : Subgroup G}
 
@@ -218,7 +218,7 @@ theorem caseA_realizedComplement_uW_le_normalizer [Finite G] {M : Subgroup G}
           ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
         (Subgroup.mem_comap.mp hm)
     rw [uActionHom, MonoidHom.comp_apply, Subgroup.coe_subtype,
-      OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk'] at huinv
+      OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk'] at huinv
     refine ⟨typeP_conjAction data.typeP ⟨(u : G), huUW1⟩ m,
       Subgroup.mem_comap.mpr ?_, typeP_conjAction_apply data.typeP _ m⟩
     simpa only [Subgroup.subtype_apply, QuotientGroup.mk'_apply] using huinv
@@ -300,7 +300,7 @@ theorem caseA_wOrbit_horbit [Finite G] {M : Subgroup G}
     rw [Subgroup.mem_comap]
     have hmkx : (QuotientGroup.mk' chief.N) x
         = (quotientMulAutHom chief.N_aInvariant a) ((QuotientGroup.mk' chief.N) x_s) := by
-      rw [hx, OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk']
+      rw [hx, OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk']
     rw [hmkx]
     -- `S₀^{w₁} = caseA_wOrbit caseA ⟨w₁⟩ ≤ caseA_wComplement caseA` (`w₁ ≠ 1`).
     have haW1sub : a ∈ data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1) := by
@@ -1043,7 +1043,7 @@ theorem hcConjDescend_eq_uActionHom [Finite G] {M : Subgroup G}
       = QuotientGroup.mk' chief.N (typeP_conjAction data.typeP x₀ (hInHuEquivH data h)) := by
     show (quotientMulAutHom chief.N_aInvariant) x₀
         (QuotientGroup.mk' chief.N (hInHuEquivH data h)) = _
-    rw [OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk']
+    rw [OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk']
   -- left side: `A_u ∘ hcHom` = `hcHom ∘ conjBy u`, and the conjugate lands in `hInHu`
   have hmem' : (u : ↥(huSub data)) * (h : ↥(huSub data)) * (u : ↥(huSub data))⁻¹ ∈ hInHu data :=
     (hInHu_normal data).conj_mem (h : ↥(huSub data)) h.2 (u : ↥(huSub data))

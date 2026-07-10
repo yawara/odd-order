@@ -1449,7 +1449,7 @@ Thm 2.6(a) (`odd_two_dim_abelian`) で `A/C` abelian。いずれも kernel `C` (
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs.Ch03 (IsAInvariant isAInvariant_iff_smul_mem)
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
 open scoped commutatorElement IsMulCommutative
 
 variable {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]

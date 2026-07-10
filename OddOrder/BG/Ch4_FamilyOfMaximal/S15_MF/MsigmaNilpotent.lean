@@ -230,7 +230,7 @@ theorem exists_chiefFactor_over_normalized [Finite G]
     (Subgroup.normal_subgroupOf_iff_le_normalizer (hQ2T.trans hTN)).mp hQ2norm
   exact ⟨Q2, hQ1Q2, hQ2Q, hDN.trans hN_normQ2, hK1N.trans hN_normQ2, hQ2Q1norm⟩
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **Coprime lifting over a normal `D`-invariant subgroup** (`§14`-independent, reusable; the
 practical non-abelian form of `N = ⁅N,D⁆·C_N(D)` instantiated at a *given* normal subgroup `M₀`
 containing `⁅N,D⁆`).  If `D` normalizes `N`, `M₀ ≤ N` is normalized by both `N` and `D`,
@@ -703,7 +703,7 @@ theorem centralizer_inf_DQ1_le_Q0 [Finite G]
           (by rw [hcard]; exact hqq.symm.le)) ▸ inf_le_right) hc
     rw [hbot]; exact bot_le
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+open OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom quotientMulAutHom_apply_mk') in
 /-- **Brick A "lift" of Theorem 15.2 step 3(ii)** (Prop 1.5(d)): from `C(k) ⊓ (D ⊔ Q₁) ≤ Q₀`
 (brick A-core) and the coprime conjugation action of `⟨k⟩` on `D ⊔ Q₁`, `k` acts fixed-point-freely
@@ -782,7 +782,7 @@ theorem fpf_of_centralizer_inf_le [Finite G]
     Subgroup.mem_subgroupOf] at hxbar
   exact hxbar
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+open OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom quotientMulAutHom_apply_mk') in
 /-- **Single-subgroup form of `fpf_of_centralizer_inf_le`** (`§14`-independent, reusable): the
 Prop 1.5(d) fixed-point lift for an arbitrary subgroup `A` (not just `D ⊔ Q₁`).  If `k` normalizes
@@ -1371,7 +1371,7 @@ theorem isElementaryAbelian_chiefFactor_of_minimalNormal [Finite G]
       ((Fact.out : q.Prime).dvd_of_dvd_pow hqdvd)).symm
   exact ⟨hpq ▸ hEAp', hNT⟩
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+open OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom quotientMulAutHom_apply_mk') in
 open scoped commutatorElement in
 /-- **Theorem 15.2 step 4, the fixed-point-free fact `C_{Q̄}(D) = 1`** (Proposition 1.5(d), mmd

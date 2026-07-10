@@ -26,7 +26,7 @@ as the `sorry` inside the block engine's `hconst` argument (see `notes/peterfalv
 namespace OddOrder.Peterfalvi.S11
 
 open OddOrder.RepresentationTheory OddOrder.GroupTheory OddOrder.Isaacs.Ch03
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+open OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom quotientMulAutHom_apply_mk')
 open scoped commutatorElement
 

@@ -368,7 +368,7 @@ theorem commutator_le_fitting_of_reduced
     exact hdich hxRK
   exact fun y hy => hNF (Subgroup.subset_normalClosure hy)
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **BG Theorem 3.8, step 1** (base case of the `|RK|` induction, mmd L1233): if `R` (normalizing
 `K`) centralizes the Fitting subgroup of `K̄ = ↥K / F(K)`, then `R` centralizes `K̄` itself
 (Proposition 1.4), i.e. `⁅K, R⁆ ⊆ F(K)`.
@@ -405,7 +405,7 @@ theorem commutator_le_fitting_of_centralizes_fittingQuotient
         (OddOrder.BG.Ch1.S06.actionCommutator_conj_map_subtype hRK).symm
     _ ≤ (OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype := Subgroup.map_mono hle
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+open OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom quotientMulAutHom_apply_mk') in
 /-- **BG Proposition 1.5(d), subgroup form** (`C_{G/N}(A) = C_G(A)·N / N`): for a coprime action
 `φ : A → MulAut G` and an `A`-invariant normal `N`, the fixed points of the induced action on
@@ -441,7 +441,7 @@ theorem fixedPointsOfMulAut_quotientMulAutHom_eq_map
     intro a
     rw [quotientMulAutHom_apply_mk', hc a]
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **Converse of step 1** (mmd L1243, the `R₀`-centralizes-`K̄` direction): if `⁅K, R⁆ ⊆ F(K)`
 (`R` centralizes `K̄`), then `R` fixes every element of `K̄ = ↥K / F(K)` (the induced action's
 fixed points are `⊤`).  This is the reverse of
@@ -478,7 +478,7 @@ theorem fixedPoints_quotient_eq_top_of_commutator_le_fitting
   intro a
   exact (OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_iff_acts_trivially _).mp hbot a g
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **BG Theorem 3.8, step 3** (mmd L1241-1245, the condition-(2) reduction from `R₀` to `R`): if
 `R₀` (normalizing `K`) already centralizes `K̄ = ↥K / F(K)` (`⁅K, R₀⁆ ⊆ F(K)`) and `R₀` has the
 *same fixed points on `K`* as `R` — i.e. `C_G(R₀) ⊓ K = C_G(R) ⊓ K`, which is exactly condition (2)
@@ -724,7 +724,7 @@ theorem fitting_map_map_subtype {G : Type*} [Group G] [Finite G] {K : Subgroup G
     Subgroup.map_map, hcomp, ← Subgroup.map_map]
 
 open scoped commutatorElement in
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+open OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom quotientMulAutHom_apply_mk') in
 /-- **BG Theorem 3.8** (`|RK|`-induction skeleton, mmd L1221-1259).  `G = KR` solvable of odd order,
 `K ⊴ G`, conditions (1) `(|R|, |K|) = 1`, (2) `C_K(x) = C_K(R)` for all `x ∈ R^#`, (3)

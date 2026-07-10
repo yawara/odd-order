@@ -651,7 +651,7 @@ theorem actionCentralizer_quotient_image_index_eq_of_le
 noncomputable def quotientActionHom {A V : Type*} [Group A] [Group V]
     (φ : A →* MulAut V) {U : Subgroup V} [U.Normal]
     (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U) : A →* MulAut (V ⧸ U) :=
-  OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hU
+  OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hU
 
 @[simp]
 theorem quotientActionHom_apply_mk' {A V : Type*} [Group A] [Group V]
@@ -659,7 +659,7 @@ theorem quotientActionHom_apply_mk' {A V : Type*} [Group A] [Group V]
     (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U) (a : A) (v : V) :
     (quotientActionHom φ hU a) (QuotientGroup.mk' U v) =
       QuotientGroup.mk' U ((φ a) v) :=
-  OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk'
+  OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk'
     hU a v
 
 /-- The image of `C_V(P)` in `V/U` is fixed by `P` for the induced quotient action. -/

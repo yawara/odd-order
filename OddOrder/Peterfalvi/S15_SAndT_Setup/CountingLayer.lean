@@ -1004,7 +1004,7 @@ theorem Hypothesis.toTypesIIIIIIVSetupT_H_eq [Finite G]
   show (reconciled_typePData_T hG hyp).choose.H = hyp.Q
   rw [(reconciled_typePData_T hG hyp).choose.H_eq, hyp.Q_eq_TF]
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **§9 character data on `T`** (the T-mirror of `mkSection11CharacterDataS`, over the
 `toTypesIIIIIIVSetupT` router; issue 9013 gate 3): `u = |V̄|` is rfl-pinned to the `V`-action
 image on the chief factor of `Q`; `tau := hyp.tauT`; `H0CprimeSupport := ∅` and

@@ -57,7 +57,7 @@ Reference note: `issues/1017-pf-s5-uniform-degree-coherence.md` (G1),
 namespace OddOrder.Peterfalvi.S11
 
 open OddOrder.RepresentationTheory
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
 open scoped Pointwise
 
 variable {G : Type*} [Group G]

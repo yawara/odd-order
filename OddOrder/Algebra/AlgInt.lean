@@ -4,6 +4,10 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Data.Complex.Basic
+import Mathlib.RingTheory.Polynomial.RationalRoot
+import Mathlib.Algebra.Order.BigOperators.Group.Multiset
+import Mathlib.Algebra.Polynomial.Monic
+import Mathlib.Analysis.Complex.Norm
 import Mathlib.RingTheory.IntegralClosure.IsIntegral.Basic
 import Mathlib.RingTheory.IntegralClosure.IsIntegralClosure.Basic
 import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
@@ -214,3 +218,107 @@ theorem Cong.of_int (hn : (n : ℂ) ≠ 0) {j k : ℤ} (h : n ∣ j - k) :
   linear_combination hc
 
 end OddOrder.AlgInt
+
+/-!
+## Complex algebraic-integer atoms (relocated)
+
+Extracted from `OddOrder/GroupTheory/RepresentationTheory/ClassSumCongruence.lean` (issue 0106):
+generic material relocated to a light-import leaf so downstream consumers need not pull the
+class-sum congruence machinery (rep theory + complex analysis + integral closure).  Declarations
+keep their original `OddOrder.RepresentationTheory` namespace so existing call sites are unchanged.
+-/
+
+namespace OddOrder.RepresentationTheory
+
+/-- **A root of unity is an algebraic integer.** If `x : ℂ` satisfies `x ^ n = 1` with `n ≠ 0`,
+then `x` is integral over `ℤ` — it is a root of the monic polynomial `X ^ n - 1`. -/
+theorem isIntegral_of_pow_eq_one {x : ℂ} {n : ℕ} (hn : n ≠ 0) (hx : x ^ n = 1) :
+    IsIntegral ℤ x := by
+  refine ⟨Polynomial.X ^ n - Polynomial.C 1, ?_, ?_⟩
+  · exact Polynomial.monic_X_pow_sub_C 1 hn
+  · simp [hx]
+
+
+/-- **A complex number of unit modulus with real part `1` is `1`.** If `‖z‖ = 1` and `z.re = 1`
+then `z = 1`: from `z.re ^ 2 + z.im ^ 2 = ‖z‖ ^ 2 = 1` and `z.re = 1` we get `z.im = 0`. -/
+private theorem eq_one_of_norm_eq_one_of_re_eq_one {z : ℂ} (hz : ‖z‖ = 1) (hre : z.re = 1) :
+    z = 1 := by
+  -- `z.im ^ 2 = ‖z‖ ^ 2 - z.re ^ 2 = 1 - 1 = 0`, so `z.im = 0`; with `z.re = 1` this is `1`.
+  have hns : z.re * z.re + z.im * z.im = 1 := by
+    rw [← Complex.normSq_apply, Complex.normSq_eq_norm_sq, hz]; norm_num
+  have him : z.im = 0 := by nlinarith [sq_nonneg z.im, hns, hre]
+  apply Complex.ext <;> simp [hre, him]
+
+/-- **A complex number of unit modulus has real part at most `1`.** -/
+private theorem re_le_one_of_norm_eq_one {z : ℂ} (hz : ‖z‖ = 1) : z.re ≤ 1 := by
+  have hns : z.re * z.re + z.im * z.im = 1 := by
+    rw [← Complex.normSq_apply, Complex.normSq_eq_norm_sq, hz]; norm_num
+  nlinarith [sq_nonneg z.im, sq_nonneg (z.re - 1), hns]
+
+/-- **Unit complex numbers summing to their count are all `1`** (the equality case of the triangle
+inequality, for the keystone `character g = degree ⟹ ρ g = id`).  If a multiset `s` of complex
+numbers has `‖z‖ = 1` for every `z ∈ s` and `∑_{z ∈ s} z = card s`, then `z = 1` for every
+`z ∈ s`.
+
+Proof (real-part / non-negative-sum argument).  Taking real parts of `∑ z = card s` gives
+`∑ z.re = card s`.  Each `z.re ≤ ‖z‖ = 1`, so the multiset `card s · 1 - ∑ z.re = ∑ (1 - z.re)`
+is a sum of non-negatives equal to `0`; hence every `1 - z.re = 0`, i.e. `z.re = 1`.  A unit-modulus
+complex number with real part `1` is `1` (`eq_one_of_norm_eq_one_of_re_eq_one`). -/
+theorem all_eq_one_of_norm_eq_one_of_sum_eq_card {s : Multiset ℂ}
+    (hnorm : ∀ z ∈ s, ‖z‖ = 1) (hsum : s.sum = (Multiset.card s : ℂ)) :
+    ∀ z ∈ s, z = 1 := by
+  -- Reduce to `z.re = 1` for every `z ∈ s`, then apply the unit-modulus rigidity.
+  suffices hre : ∀ z ∈ s, z.re = 1 by
+    intro z hz; exact eq_one_of_norm_eq_one_of_re_eq_one (hnorm z hz) (hre z hz)
+  -- The deficits `1 - z.re ≥ 0` sum to `card s - ∑ z.re = card s - (∑ z).re = card s - card s = 0`.
+  have hdef_sum : (s.map fun z => 1 - z.re).sum = 0 := by
+    -- `∑ (1 - z.re) = card s · 1 - ∑ z.re`, computed by induction on the multiset.
+    have key : ∀ t : Multiset ℂ,
+        (t.map fun z => 1 - z.re).sum = (Multiset.card t : ℝ) - (t.map fun z => z.re).sum := by
+      intro t
+      induction t using Multiset.induction with
+      | empty => simp
+      | cons a t ih => simp only [Multiset.map_cons, Multiset.sum_cons, Multiset.card_cons,
+          ih, Nat.cast_add, Nat.cast_one]; ring
+    rw [key]
+    -- `(∑ z).re = ∑ z.re` (real part is additive over the multiset).
+    have hre_sum : (s.map fun z => z.re).sum = ((s.sum).re : ℝ) := by
+      have := map_multiset_sum Complex.reAddGroupHom s
+      simpa [Complex.coe_reAddGroupHom] using this.symm
+    rw [hre_sum, hsum]; simp
+  -- Each deficit is non-negative, and their sum is `0`, so each deficit is `0`.
+  have hnn : ∀ x ∈ (s.map fun z => 1 - z.re), (0 : ℝ) ≤ x := by
+    intro x hx
+    rw [Multiset.mem_map] at hx
+    obtain ⟨z, hzs, rfl⟩ := hx
+    linarith [re_le_one_of_norm_eq_one (hnorm z hzs)]
+  have hzero := Multiset.all_zero_of_le_zero_le_of_sum_eq_zero hnn hdef_sum
+  intro z hz
+  have : (1 : ℝ) - z.re = 0 := hzero _ (Multiset.mem_map_of_mem _ hz)
+  linarith
+
+
+/-- **A rational algebraic integer is an integer.** If `q : ℚ` is integral over `ℤ` when viewed
+inside `ℂ`, then `q` is the image of an integer: there is `n : ℤ` with `(q : ℂ) = n`.
+
+`ℤ` is integrally closed (it is a `UniqueFactorizationMonoid`, hence integrally closed in its
+fraction field `ℚ`).  Transferring `IsIntegral ℤ (q : ℂ)` down the injective `ℚ`-algebra map
+`ℚ ↪ ℂ` gives `IsIntegral ℤ q`, and integral closure then yields the integer. -/
+theorem isIntegral_rat_imp_int {q : ℚ} (h : IsIntegral ℤ (q : ℂ)) :
+    ∃ n : ℤ, (q : ℂ) = n := by
+  -- `(q : ℂ) = algebraMap ℚ ℂ q`; transfer integrality down the injection `ℚ ↪ ℂ`.
+  have hqℂ : (q : ℂ) = algebraMap ℚ ℂ q := (eq_ratCast (algebraMap ℚ ℂ) q).symm
+  rw [hqℂ] at h
+  have hQ : IsIntegral ℤ q :=
+    (isIntegral_algebraMap_iff (FaithfulSMul.algebraMap_injective ℚ ℂ)).mp h
+  -- `ℤ` is integrally closed in `ℚ` (it is a UFD), so `q = (n : ℚ)` for some `n : ℤ`.
+  obtain ⟨n, hn⟩ := IsIntegrallyClosed.isIntegral_iff.mp hQ
+  refine ⟨n, ?_⟩
+  -- `hn : algebraMap ℤ ℚ n = q`, i.e. `(n : ℚ) = q`; cast up to `ℂ`.
+  rw [algebraMap_int_eq, Int.coe_castRingHom] at hn
+  rw [← hn]
+  push_cast
+  ring
+
+
+end OddOrder.RepresentationTheory

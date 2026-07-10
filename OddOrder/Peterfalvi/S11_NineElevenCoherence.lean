@@ -12,7 +12,7 @@ Prefix-split from `OddOrder.Peterfalvi.S11_NineElevenCoherence` (2000-line limit
 -/
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.RepresentationTheory
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
 open scoped Pointwise
 
 variable {G : Type*} [Group G]

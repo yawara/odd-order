@@ -414,7 +414,7 @@ private theorem card_le_card_mul_of_commutator_mem_of_card_centralizer_le
   calc Nat.card ↥M = C'.index * Nat.card C' := (C'.index_mul_card).symm
     _ ≤ Nat.card ↥N * m := Nat.mul_le_mul hindex_le hC'_card
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **BG Theorem 5.5, `r(R) ≥ 3` chain machinery** (mmd L1905-1917): for a narrow
 witness `S` and any faithful action `φ : A →* MulAut R`, the descending chain
 `H_0 = H` (Thompson critical), `H_{i+1} = ⁅H_i, R⁆` is characteristic with factors of
@@ -768,7 +768,7 @@ private theorem isPGroup_commutator_and_orderOf_dvd_of_narrow_witness
     exact orderOf_dvd_of_pow_eq_one (hStab_p' _ hα_mem hα_pow_cop)
 
 open scoped Pointwise in
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **BG Theorem 5.5(c)** (`r(R) ≤ 2` assembly, mmd L1919-1941): if `|A| = q` is a
 prime not dividing `p(p-1)`, then `q ∣ (p+1)/2` (Lemma 4.14 under `SCN₃(R) = ∅`);
 if moreover `R = [R,A]` and `R` is nonabelian, then `|R| = p³`: Thm 4.16 (Blackburn)

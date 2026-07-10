@@ -345,7 +345,7 @@ section CaseB
 variable {G : Type*} [Group G]
 
 open OddOrder.Isaacs.Ch03 (IsAInvariant)
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
 
 /-- **Peterfalvi (11.7), Galois case refuted**: if `H` is a `p`-group with `H₀ = N = H'` a
 *nontrivial* chief kernel, `U` centralizes `N`, and `U` acts irreducibly on `H̄ = H/H₀`
@@ -505,7 +505,7 @@ section CaseA
 variable {G : Type*} [Group G]
 
 open OddOrder.Isaacs.Ch03 (IsAInvariant)
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
 open scoped Pointwise
 
 /-- **Case (a) endgame**: if `U` fixes the order-`p` factor `S₀ ≠ ⊥` pointwise, it fixes every

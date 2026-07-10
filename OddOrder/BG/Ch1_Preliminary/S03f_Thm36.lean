@@ -1069,7 +1069,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
         exact isCyclic_of_surjective e3 e3.surjective
       -- the induced `R`-action on `Q = ↥H ⧸ V` has full action commutator ((3.6)).
       set φQ : ↥R →* MulAut (↥H ⧸ V) :=
-        OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hV_inv with hφQ
+        OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hV_inv with hφQ
       have hACH : OddOrder.Isaacs.Ch04.actionCommutator φ = ⊤ := by
         have hb := actionCommutator_conjNormal_map_subtype_eq H R
         rw [h36] at hb
@@ -2535,7 +2535,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
     have hK'_inv : OddOrder.Isaacs.Ch03.IsAInvariant φA (commutator ↥KG) :=
       OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic φA
     set φAQ : ↥A →* MulAut (↥KG ⧸ commutator ↥KG) :=
-      OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hK'_inv
+      OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hK'_inv
       with hφAQ
     have h329 : ∀ a : ↥A,
         (∀ kq : ↥KG ⧸ commutator ↥KG, φAQ a kq = kq) → a = 1 := by

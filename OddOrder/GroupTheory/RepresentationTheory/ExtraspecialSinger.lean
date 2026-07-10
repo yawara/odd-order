@@ -288,7 +288,7 @@ generic `OddOrder.RepresentationTheory.card_dvd_sub_one_of_faithful_line` of `Li
 (every endomorphism of a line is a homothety, so `K ↪ (ℤ/p)ˣ`); it is cited directly below. -/
 
 open OddOrder.BG.Ch1_Preliminary
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom quotientMulAutHom_apply)
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom quotientMulAutHom_apply)
 open scoped IsMulCommutative in
 set_option maxHeartbeats 1600000 in
 /-- **Route B (BG Theorem 15.7(e), disjunct 3): `|K| ∣ p + 1`.**

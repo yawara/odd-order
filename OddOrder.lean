@@ -4,6 +4,7 @@ import OddOrder.GroupTheory.CentralProduct
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.ChiefFactor
 import OddOrder.GroupTheory.ConjClassSet
+import OddOrder.GroupTheory.ConjClassCardinality
 import OddOrder.GroupTheory.CoprimeAction
 import OddOrder.GroupTheory.WielandtFixedPoint
 import OddOrder.GroupTheory.FreeActionOrbitCount
@@ -101,6 +102,7 @@ import OddOrder.GroupTheory.ZGroup
 import OddOrder.Mathlib.SchurZassenhausConj
 import OddOrder.Mathlib.SemidirectProduct
 import OddOrder.Mathlib.Subgroup
+import OddOrder.Mathlib.Sylow
 import OddOrder.Isaacs.Ch01_Sylow.Main
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main

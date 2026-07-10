@@ -150,3 +150,29 @@ Theorem131 / ClassSumCongruence はともに最上流 (Ch01/GroupTheory) で編�
 検査 10 定理 transitive axiom-clean の確認と具体的 findings に感謝。P1 は batch 1 で解消予定、
 P2 はトリガー付き queue (moore57 側 HOLD トリガーと対応)。upstream 候補メモ (card-dvd 系の
 mathlib 配置) は将来の PR 解禁時に利用する。
+
+## batch 1 実施記録 (2026-07-10, hub — commit は git log 参照)
+
+- **P1-1 完了**: ClassSumCongruence 1833→1601 行。抽出先 (全て namespace `OddOrder.RepresentationTheory`
+  を保存 = 既存 call site 無変更、ClassSumCongruence が新 leaf を import する genuine 依存形):
+  - `card_dvd_of_stabilizer_eq_bot`/`card_dvd_of_no_nontrivial_fixed` → `GroupTheory/FreeActionOrbitCount.lean`
+  - `mk_inv_eq_of_mk_eq` → `GroupTheory/ConjClassSet.lean` (import-cycle 注記は撤去)
+  - `card_class_eq_index_centralizer`/`coprime_card_class_card_sylow` → 新 leaf `GroupTheory/ConjClassCardinality.lean`
+  - `mem_sylow_of_mem_normalizer_of_isPGroup` → 新 leaf `Mathlib/Sylow.lean`
+  - `isIntegral_of_pow_eq_one`/`all_eq_one_of_norm_eq_one_of_sum_eq_card` (+private helpers)/
+    `isIntegral_rat_imp_int` → `Algebra/AlgInt.lean`
+  moore57 は各新 leaf を direct import すれば複素解析込みの closure を引かずに済む。
+- **P1-2 完了**: `card_sylow_{p,q}_of_card_eq_sq_mul_prime` de-private (cube 版と visibility 統一)。
+  sharpened 直接形は moore57 の実需が確認されたら追加 (まず de-private で足りるか見る)。
+- **P3-5 完了 (alias なし)**: `quotientMulAutHom` + simp 2 本を `_root_.` head で単一 namespace 化、
+  doubled 参照 38+2 file を機械置換。**deprecated alias は撤去** — doubled-name alias は
+  `open OddOrder.Isaacs.Ch04` を file-wide に持つ file で qualified 参照を ambiguous 化するため
+  (build で実証)。⚠ **moore57 へ**: 旧 doubled 名は次回 bump で解決不能になる。対応 =
+  `OddOrder.Isaacs.Ch04.` prefix を落とすだけ (同一宣言・同一 signature)。
+- **P2-3 dup 疑い 3 件の照合結果 (Explore agent + hub 確認)**: `sum_pow_val_eq_zero` = NEAR
+  (mathlib `IsPrimitiveRoot.geom_sum_eq_zero` は primitive 要求、OddOrder 版は非原始根も許す一般化
+  ゆえ**保持**) / `orbitSetoid` = NEAR (`MulAction.orbitRel` の ZMod-indexed Perm 特化、置換には接着要
+  → **保持**) / `perm_pow_val_add` = NONE (mathlib に不在) 。wrapper 方針上の削除対象なし。
+- **スキップ (低価値と裁定)**: P3-7 `wielandt_card_combine` 沈降 (現配置 = 唯一の consumer と同 file、
+  実害なし)。P3-9 docstring 言語一括書換 (新規は英語収束、既存はそのまま)。
+- 検証: full rebuild green (4136 jobs / 12m25s)、AxiomsCheck OK、sorry 82 不変、新 axiom なし。

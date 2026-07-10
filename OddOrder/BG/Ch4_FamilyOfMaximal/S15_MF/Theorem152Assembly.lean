@@ -108,7 +108,7 @@ theorem not_dvd_card_of_opCore_eq_bot {H : Type*} [Group H] [Finite H] {q : ℕ}
     OddOrder.Isaacs.Ch01.Sylow.eq_opCore_of_normal P hPnorm
   exact (OddOrder.Isaacs.Ch07.Sylow.ne_bot_of_dvd_card hdvd P) (hPcore.trans hbot)
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+open OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom quotientMulAutHom_apply_mk') in
 /-- **Theorem 15.2 step (c) — `Q = O_q(M)` is the Sylow `q`-subgroup of `M_σ`** (mmd L4192, the
 implicit content of "choose a complement `D` of `Q` in `M_σ`"): with `M_σ/Q` nilpotent (step (c)(d),
@@ -702,7 +702,7 @@ theorem card_invariants_eq_card_of_fixedPoints {q : ℕ} {H : Type*} [Group H]
     apply Additive.toMul.injective
     rwa [show Additive.toMul ((r : H) • v) = (r : H) • Additive.toMul v from rfl]
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+open OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom quotientMulAutHom_apply_mk') in
 open scoped commutatorElement in
 open scoped IsMulCommutative in
@@ -916,7 +916,7 @@ theorem chiefFactor_card_and_commutator_of_inputs [Finite G]
     have hg0eq : ((gbar : ↥H) : G) = g0 := hgbareq
     rw [← hg0eq]; exact hbrk
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+open OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom quotientMulAutHom_apply_mk') in
 open scoped commutatorElement in
 /-- **`C_{Q̄}(K)` is the image of `K* ⊔ Q₀`** (BG Proposition 1.5(d), the `hCfix` core of Theorem

@@ -689,7 +689,7 @@ formula gives `|H̄| = |C_{H̄}(W₁)|^q`; as `C_{H̄}(W₁)` is the image of th
 exponent `p`, so `|H̄| = p^q`. -/
 
 open OddOrder.Isaacs.Ch03 (IsAInvariant isAInvariant_iff_smul_mem)
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
 
 /-- The fixed subgroup `C_H(K)` of a *normal* subgroup `K ◁ L` under an action `φ : L →* MulAut H`
 is `φ`-invariant: `φ` permutes the fixed subgroups `C_H(K)` according to its action on the `K`'s,
@@ -724,7 +724,7 @@ noncomputable def typeP_quotientCoprimeAction [Finite G] (data : TypePData M) (h
   H_solvable := by
     haveI := (typeP_coprimeAction data hU).H_solvable
     exact solvable_of_surjective (QuotientGroup.mk'_surjective N)
-  φ := OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN
+  φ := OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN
   coprime_order := Nat.Coprime.coprime_dvd_left (Subgroup.card_quotient_dvd_card N)
     (typeP_coprime_H_uW1 data hU)
 
@@ -1246,7 +1246,7 @@ theorem exists_characteristic_complement_to_sylow_of_nilpotent
     exact Subgroup.isComplement'_of_disjoint_and_mul_eq_univ hdisj
       (by rw [← Subgroup.normal_mul, hsup, Subgroup.coe_top])
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+open OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom quotientMulAutHom_apply_mk') in
 /-- **Peterfalvi (9.4), the elementary-abelian seed** (the remaining group-theoretic input).
 There is a `U W₁`-invariant normal subgroup `N₀ ◁ H = M_F` with `H/N₀` elementary abelian `p`
