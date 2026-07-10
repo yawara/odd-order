@@ -35,3 +35,20 @@ book (10.10) の「type V なら 𝒮 coherent」((10.8) との矛盾用)。
 2. S12_Noncoherence に typeV branch (a)/(b) 実装。
 3. (c)-refutation ((10.10.1)-(10.10.4)、(10.9) 消費)。
 4. no_typeV_maximal_unconditional を新版に配線 → sorryAx-free 化。
+
+## 2026-07-11 tick¹⁶ — 部品 survey 完了 + transfer lemma landed
+
+- `TypeVData.alternative_transfer` landed (MaximalBasic、axiom-clean 見込み) —
+  (8.7)-trichotomy を hyp.typeP へ転送。
+- **case-(a) 設計確定**: SibleyDadeHypothesis は **H#-TI が field** → (a) 専用。
+  組立部品: split = M_complement (U=⊥ で M' = H)、dade = S04.Hypothesis.of_isTISubset
+  (S09_FrobeniusSibley の sibleyDadeHypothesis_of_frobenius が producer template、
+  ただし cases-branch は Frobenius でなく **h46-certain-type** 側 —
+  certainTypeHypothesis_of_typeP_kappaHall (FTS:1160) で構成)。
+  出力の transport: 家族差分は (M')# = H#-supported (type V) なので
+  `isCoherent_of_supportedSpan_le` (S13_Lemmas113To115:318) で A₀ 版へ。
+  tau-agreement は S04.restrict 系。
+- **case (b)**: (6.4)-general の (6.5.c) — SibleyDade (TI) 外。候補 =
+  (11.4)/(11.5) filtration route (S13_Lemmas113To115、type II/III/IV 向けに proven —
+  type V 適用可否の確認が次) or S08_SixTwoGeneral の非-TI 形。
+- **case (c)**: (10.10.1)-(10.10.4) + (10.9) refutation — 最深、最後。
