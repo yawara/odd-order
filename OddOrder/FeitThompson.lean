@@ -322,6 +322,26 @@ theorem omegaS_inner (i k : Fin tp.q) (j l : Fin tp.p) :
         (chi2enum hG mp tp).injective h2⟩
     rw [if_neg hne, if_neg h]
 
+/-- **Peterfalvi (4.3.b), full-grid orthonormality of the S-side `μ`-grid** (issues 9076/9014):
+`⟨μ_{ij}, μ_{kl}⟩ = [(i,j) = (k,l)]`.  Within a column by the (1.4) family injectivity; across
+columns by the certain-type cross-column distinctness `columnFamily_mu_ne`. -/
+theorem muS_orthonormal (i k : Fin tp.q) (j l : Fin tp.p) :
+    ClassFunction.inner (muS hG mp tp i j) (muS hG mp tp k l)
+      = if i = k ∧ j = l then 1 else 0 := by
+  simp only [muS]
+  rw [irreducibleCharacter_inner_eq_ite]
+  by_cases hjl : j = l
+  · subst hjl
+    by_cases hik : i = k
+    · subst hik
+      rw [if_pos rfl, if_pos ⟨rfl, rfl⟩]
+    · rw [if_neg (fun hc => hik ((eqQ hG mp tp).injective
+          ((((mp.certainTypeS hG).columnFamily (chi2enum hG mp tp j)).injective) hc))),
+        if_neg (by simp [hik])]
+  · rw [if_neg ((mp.certainTypeS hG).columnFamily_mu_ne
+        (fun hc => hjl ((chi2enum hG mp tp).injective hc)) _ _),
+      if_neg (by simp [hjl])]
+
 /-- The `omegaS` are linear characters: `ω_{ij}(1) = 1`. -/
 theorem omegaS_apply_one (i : Fin tp.q) (j : Fin tp.p) :
     omegaS hG mp tp i j 1 = 1 := by
@@ -1099,6 +1119,7 @@ noncomputable def section16CharacterData_of_isMinimalSimpleOdd {G : Type*} [Grou
           ((((mp.certainTypeS hG).columnFamily
             (Section16CharacterData.chi2enum hG mp tp j)).injective)
             (OddOrder.RepresentationTheory.IrreducibleCharacter.ext h))
+      mu_orthonormal := Section16CharacterData.muS_orthonormal hG mp tp
       mu_colSum_eq_induce := fun j => by
         refine ⟨ClassFunction.restrict ((derivedInG mp.S).subgroupOf mp.S)
             (((mp.certainTypeS hG).columnFamily
@@ -1228,6 +1249,7 @@ noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [F
     mu_definition := cd.mu_definition
     mu_irreducible := cd.mu_irreducible
     mu_col_injective := cd.mu_col_injective
+    mu_orthonormal := cd.mu_orthonormal
     mu_colSum_eq_induce := cd.mu_colSum_eq_induce
     nu_definition := cd.nu_definition
     q_lt_p := tp.q_lt_p
@@ -1352,6 +1374,7 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       mu_definition := inp.mu_definition
       mu_irreducible := inp.mu_irreducible
       mu_col_injective := inp.mu_col_injective
+      mu_orthonormal := inp.mu_orthonormal
       mu_colSum_eq_induce := inp.mu_colSum_eq_induce
       nu_definition := inp.nu_definition
       m := 1 - 1 / ((inp.q : ℚ) - 1) - ((inp.q : ℚ) - 1) / (inp.q : ℚ) ^ inp.p +
