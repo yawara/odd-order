@@ -323,12 +323,30 @@ change + `congr 1` (compHom↔linearIrred-comp は defeq、congr が閉じる)�
 typePData_W1_hall_coprime の proof mirror + card-transfer) + `not_isTypeP2_of_isTypeIII_or_IV_or_V`
 (P₁/P₂ 排他)。これで下記設計 1 の duality seed (K := hyp.typeP.W1) と、強形 reduction の
 ¬IsTypeII discharge / K_lt_Kstar 導出の材料が揃った。
-**次 = P3/P4**: `exists_section16MaximalPair_data` (FTS:526) の M-seed mirror
-(相違: seed = (M, hyp.typeP.W1)、relabel case-split なし — M 非 P₂ ⟹ partner が
-P₂/smaller 側と強制 (not_isTypeP2 + isTypeP2_of_typeP_kappaHall_lt (FTS:703) 対偶 +
-card_kappaHall_ne_card_Kstar)) → structure 化 (mirror FTS:726)、置き場 = 本 leaf。
-その後 P5: `section16TypePStructure_of_isMinimalSimpleOdd` が mp-generic か確認
-(mp-generic なら tp は無料)。
+**✅ P3/P4 LANDED (5422d724)**: `exists_section16MaximalPair_data_around` +
+`exists_section16MaximalPair_around` — `∃ mp, mp.T = M ∧ mp.Kstar = W1` 形。
+relabel case-split なし (M 非 P₂ ⟹ 強制)。⚠ producer は tactic-def + rfl-projection
+不可 (obtain の casesOn が簡約塞ぐ) → ∃-theorem 形が正。
+⚠ axiom: isTypeP2_of_typeP_kappaHall_lt 経由の既存 sorryAx taint 継承 (canonical
+data lemma と同一、新規 sorry ゼロ、typeP_duality 自体 clean)。
+**✅ P5 確定**: `section16TypePStructure_of_isMinimalSimpleOdd (hG) (mp)` は
+**mp-generic** (FTS:953) — M-seeded pair に直接適用可、tp.Sdata 無料
+(U-side residual menu の既知 local sorry 1 点、sorried-cite 可)。
+
+**次 = gate field threading** (設計 2/3 の実行)。gate 文脈 (hyp : Hypothesis M) での組立:
+```
+hP      := hyp.bgTypeP hG (要確認: 名称)
+hnotP2  := not_isTypeP2_of_isTypeIII_or_IV_or_V hG hyp.maximal hyp.type_alt
+hW1hall := typePData_W1_isHallSubgroup_kappa hG hyp.maximal hP hyp.typeP
+⟨mp, hT, hKstar⟩ := exists_section16MaximalPair_around hG … hyp.typeP.W1_le hW1hall
+tp      := section16TypePStructure_of_isMinimalSimpleOdd hG mp
+dataT   := hyp.typeP / hTW1 := hKstar.symm 形 (hT : mp.T = M を ▸ で調整)
+¬IsTypeII mp.T := hT ▸ (classification .2.1 + hnotP2)
+S-reduction := exists_conj_eq_S_of_isTypeII
+```
+残る本体 = aux (S12_TypeIIFrobenius:1332) の WLOG 再構成 (mp.S 上での S11 data
+instantiate — TypesIIIIIIVSetup 4-field 組立 + 結論 Frobenius の conj 転送) +
+dichotomy→pair transpose→fiber lemma の連結 + c.extension→tau2 packaging + 符号。
 
 ### 残 = gate 組立 (次 iteration)。★設計確定 (2026-07-10 調査、conj-transport 不要 route):
 **発見**: `BG.Ch4.S14.typeP_duality` (TypePDuality.lean:982) は**任意の type-P maximal M**
