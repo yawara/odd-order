@@ -543,6 +543,80 @@ theorem exists_prime_dvd_orderOf_of_mem_typePV [Finite G] {M : Subgroup G}
     rwa [disjoint_iff.mp (typePData_disjoint_W1_W2 data), Subgroup.mem_bot] at hmem
   exact hpd.trans (orderOf_dvd_of_pow_eq_one hkill)
 
+open scoped Classical FiniteInduce in
+/-- **Coprime-order elements of the full Dade support lie in the `A(M)`-restricted support**
+(the (10.8) `G₀`-bookkeeping): the extra support over `A₀(M) ∖ A(M) = V^M` consists of
+conjugates of `a·h` with `a` conjugate into `V` — whose order is divisible by a `w₁`-prime
+(`exists_prime_dvd_orderOf_of_mem_typePV`, carried through the coprime `H(a)`-part) — so an
+element of `w₁`-coprime order must arise from the `A(M)`-part. -/
+theorem Hypothesis.mem_restricted_dadeSupport_of_coprime [Finite G] {M : Subgroup G}
+    (hyp : Hypothesis M) {g : G} (hg : g ∈ hyp.dadeData.dade.dadeSupport)
+    (hcop : (orderOf g).Coprime hyp.w1) :
+    g ∈ hyp.toHypothesis71.hyp.dadeSupport := by
+  classical
+  obtain ⟨a, h, hh, hconj⟩ := hyp.dadeData.dade.mem_dadeSupport_iff.mp hg
+  have ha2 : a.1 ∈ typePA M hyp.typeP ∪ conjClassSetIn M (typePV M hyp.typeP) := a.2
+  rcases ha2 with haA | haV
+  · -- the `A(M)`-part: the same witness lives in the restricted support
+    exact hyp.toHypothesis71.hyp.mem_dadeSupport_iff.mpr ⟨⟨a.1, haA⟩, h, hh, hconj⟩
+  · -- the `V^M`-part: its orders are divisible by a `w₁`-prime — contradiction
+    exfalso
+    obtain ⟨t, htV, m, hmM, hma⟩ := haV
+    obtain ⟨p, hp, hpv, hpw⟩ := exists_prime_dvd_orderOf_of_mem_typePV hyp.typeP htV
+    -- `p ∣ orderOf a` (conjugation-invariance of the order)
+    have hoa : orderOf a.1 = orderOf t := by
+      rw [← hma]
+      have := orderOf_injective (MulAut.conj m).toMonoidHom (MulAut.conj m).injective t
+      simpa [MulAut.conj_apply] using this
+    have hpa : p ∣ orderOf a.1 := hoa ▸ hpv
+    -- `h ∈ H(a)` commutes with `a` and has coprime order ((2.2.b)/(2.2.c))
+    have hhc : h ∈ Subgroup.centralizer ({a.1} : Set G) := by
+      have hsup : h ∈ hyp.dadeData.dade.H a ⊔ OddOrder.Peterfalvi.S04.centralizerIn M a.1 :=
+        (le_sup_left : hyp.dadeData.dade.H a ≤ _) hh
+      rwa [← hyp.dadeData.dade.centralizer_eq_sup a] at hsup
+    have hcomm : Commute a.1 h :=
+      Subgroup.mem_centralizer_iff.mp hhc a.1 rfl
+    have hcopah : Nat.Coprime (orderOf a.1) (orderOf h) := by
+      have h1 : orderOf h ∣ Nat.card (hyp.dadeData.dade.H a) := by
+        have he : orderOf h = orderOf (⟨h, hh⟩ : ↥(hyp.dadeData.dade.H a)) :=
+          orderOf_injective (hyp.dadeData.dade.H a).subtype
+            (hyp.dadeData.dade.H a).subtype_injective ⟨h, hh⟩
+        rw [he]; exact orderOf_dvd_natCard _
+      have h2 : orderOf a.1 ∣ Nat.card (OddOrder.Peterfalvi.S04.centralizerIn M a.1) := by
+        have haC : a.1 ∈ OddOrder.Peterfalvi.S04.centralizerIn M a.1 :=
+          ⟨hyp.dadeData.dade.subset_L a.2, Subgroup.mem_centralizer_iff.mpr
+            (fun z hz => by rw [Set.mem_singleton_iff.mp hz])⟩
+        have he : orderOf a.1 = orderOf (⟨a.1, haC⟩ : ↥(OddOrder.Peterfalvi.S04.centralizerIn M a.1)) :=
+          orderOf_injective (OddOrder.Peterfalvi.S04.centralizerIn M a.1).subtype
+            (OddOrder.Peterfalvi.S04.centralizerIn M a.1).subtype_injective ⟨a.1, haC⟩
+        rw [he]; exact orderOf_dvd_natCard _
+      exact ((hyp.dadeData.dade.centralizer_coprime a a).coprime_dvd_left h1).coprime_dvd_right
+        h2 |>.symm
+    -- `p ∣ orderOf (a·h)`: the killing power lands `a ^ n` in the trivial coprime overlap
+    have hpah : p ∣ orderOf (a.1 * h) := by
+      have hkill : a.1 ^ orderOf (a.1 * h) = 1 := by
+        have h1 : (a.1 * h) ^ orderOf (a.1 * h) = 1 := pow_orderOf_eq_one _
+        rw [hcomm.mul_pow] at h1
+        have hd1 : orderOf (a.1 ^ orderOf (a.1 * h)) ∣ orderOf a.1 := orderOf_pow_dvd _
+        have hd2 : orderOf (a.1 ^ orderOf (a.1 * h)) ∣ orderOf h := by
+          have heq : a.1 ^ orderOf (a.1 * h) = (h ^ orderOf (a.1 * h))⁻¹ :=
+            eq_inv_of_mul_eq_one_left h1
+          rw [heq, orderOf_inv]
+          exact orderOf_pow_dvd _
+        have hone : orderOf (a.1 ^ orderOf (a.1 * h)) = 1 :=
+          Nat.dvd_one.mp (hcopah ▸ Nat.dvd_gcd hd1 hd2)
+        exact orderOf_eq_one_iff.mp hone
+      exact hpa.trans (orderOf_dvd_of_pow_eq_one hkill)
+    -- transport along the conjugacy to `g` and contradict the coprimality
+    have hog : orderOf g = orderOf (a.1 * h) := by
+      obtain ⟨c, hc⟩ := isConj_iff.mp hconj
+      rw [← hc]
+      have := orderOf_injective (MulAut.conj c).toMonoidHom (MulAut.conj c).injective (a.1 * h)
+      simpa [MulAut.conj_apply] using this
+    have hpg : p ∣ orderOf g := hog ▸ hpah
+    have hpw1 : p ∣ hyp.w1 := hpw
+    exact hp.ne_one (Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hpg hpw1))
+
 /-- **The `(S_F#)^G` union bound of the (10.8) TI-counting** (p. 60 line 91, `≤`-form): the
 conjugacy saturation of the kernel sharp-set of a type-`P` maximal `S` has at most
 `(|S_F| − 1)·[G : S]` elements.  `S` stabilises `H# = H ∖ {1}` under conjugation (`H ⊴ S`), so
