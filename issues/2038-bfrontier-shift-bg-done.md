@@ -1228,3 +1228,24 @@ cd-construction) 層でも mp-level の同名 4 部品から**同じ A₀-Dade +
    で使い hdeg-free の row-0 特化 field にする)。
 4. consumer (S15_SAndT:1152 `hsupp := hyp.tauS_mu_row0_diff_support j`) に `_hj` pass (1-line)。
 V-value pin (pin 3) は support field 完了後に同型で (η 同定込み)。
+
+## 📋 (2026-07-11、lane-b /loop iter 31) — hdeg 供給の正体確定、設計完結
+
+- **S06 に次数機構は完備**: `columnFamily_mu_apply_one_eq` (列内次数一定、proven) +
+  `forall_columnFamily_mu_apply_one_eq_of_sum_eq` (列和一致 → 行別一致、proven、
+  S06_CertainTypeIsometry:824)。∴ hdeg (行別) ⟸ **列和次数一致 μ_j(1) = μ_k(1) (j,k≠0)**
+  ⟺ residue 次数一致 χ_j(1) = χ_k(1) (μ_j = Ind_{S'}^S χ_j、mu_colSum_eq_induce)。
+- **residue 次数一致は repo 不在の genuine §13 math** (grep 確認: S13/S15 に mu 次数 fact 無し、
+  S06 は (4.3.d) mod-q のみ)。数学的内容 = Pf (13.3)-region「μ_j(1) = qu (j≠0)」: S' = PU が
+  **Frobenius kernel P** (type-P₂ の (13.2)/(8.4) 構造) ⟹ 非線形 Irr(PU) は全て Ind_P^{PU}(線形)
+  で次数 u ⟹ 全 j≠0 で χ_j(1) = u。P-nonlinear 性は cfker_prTIres field と接続。
+- **∴ 最終実装順 (確定)**:
+  1. **支持 field (hdeg-parametric、math-risk ゼロ)**: `mu_diff_support` を 3 層 +
+     producer discharge (mp-level Hypothesis46 + certainType_diff_supp_subset_A0、hdeg は
+     hypothesis で素通し) + pin へ hj0/hk0/hdeg 追加 + 射影。
+  2. **genuine math unit: residue 次数一致** — PU Frobenius kernel P ⟹ 非自明 residue 次数 = u。
+     置き場 = S06 側 (certainType 層、PU-Frobenius 仮定 parametric) or S13 bridge (S-instance)。
+     Isaacs Ch.6 Frobenius character theory (Ind from kernel) の在庫確認から。
+  3. consumer 配線: field `mu_row0_apply_one_eq`-形 or 直接 (2) を cite して
+     tauS_mu_row0_diff_support / tauS_mu_row0_cross の hdeg discharge。
+  4. V-value pin (pin 3) は 1-3 後に同型 (η/ω^σ 同定込み)。
