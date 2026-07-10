@@ -1204,6 +1204,105 @@ theorem typeII_coherence_contradiction_estimate [Finite G]
   have hMp : 1 ≤ Nat.card ↥(derivedInG M) := Nat.card_pos
   exact typeII_coherence_estimate_chain hw1 hw2 hu hH hMp hS_struct hA hB
 
+open scoped Classical FiniteInduce in
+/-- **The (10.8) coherence-contradiction estimate, partner-supplied form** (issue 1020
+Phase 3): `typeII_coherence_contradiction_estimate` with the Type-II partner and its
+§8/(10.7) supply facts taken as hypotheses, so that `hB` is discharged by
+`g1_div_le_of_partner`.  The unconditional form is assembled downstream, where the pair
+machinery provides the supply; see issue 1020. -/
+theorem typeII_coherence_contradiction_estimate_of_partner [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    {hyp : Hypothesis M} {params : CharacterParameters hyp}
+    (coh : CoherentHypothesis hyp params)
+    {S : Subgroup G} (dII : TypeIIData S)
+    (hSidx : ((derivedInG S).subgroupOf S).index = hyp.w2)
+    (hU7 : 7 ≤ Nat.card ↥dII.typeP.U)
+    (hprime : (Nat.card ↥dII.typeP.W1).Prime)
+    (hcop : Nat.Coprime (Nat.card ↥(derivedInG S)) (Nat.card ↥dII.typeP.W1))
+    (hHall : OddOrder.Isaacs.Ch03.IsHallSubgroup
+      (Nat.card ↥dII.typeP.H).primeFactors dII.typeP.H)
+    (hcent : ∀ b ∈ dII.typeP.H, b ≠ 1 → Subgroup.centralizer ({b} : Set G) ≤ S)
+    (hfrobcap : ∀ b ∈ dII.typeP.H, b ≠ 1 → ∀ y ∈ derivedInG S,
+      y ∈ Subgroup.centralizer ({b} : Set G) → y ∈ dII.typeP.H)
+    (hW2card : Nat.card ↥dII.typeP.W2 = hyp.w1)
+    (hWcard : Nat.card ↥dII.typeP.W = hyp.w1 * hyp.w2) :
+    ∃ u : ℕ, 7 ≤ u ∧
+      (1 : ℚ) - 1 / (hyp.w1 : ℚ) - 1 / (u : ℚ)
+        < (hyp.w1 : ℚ) * (hyp.w2 : ℚ) / (Nat.card ↥(derivedInG M) : ℚ) := by
+  classical
+  obtain ⟨params', hmu, hos, hzS, hz1, hzconj, hδpm, hδj⟩ := hyp.exists_charParameters_full hG
+  let coh' : CoherentHypothesis hyp params' := ⟨coh.coherent⟩
+  refine ⟨Nat.card ↥dII.typeP.U, hU7, ?_⟩
+  have hW1card : Nat.card ↥dII.typeP.W1 = hyp.w2 := by
+    rw [dII.typeP.card_W1_eq_derived_index]; exact hSidx
+  have hS_struct : Nat.card ↥S = Nat.card ↥dII.typeP.H * Nat.card ↥dII.typeP.U * hyp.w2 := by
+    rw [typePData_card_eq_H_mul_U_mul_W1 dII.typeP, hW1card]
+  have h83 := hyp.chiRhoNormSq_zeta_le_line83 hG coh' hmu hos hzS hz1 hzconj hδpm hδj
+  have h78 := hyp.chiRhoNormSq_zeta_ge_line78 hG coh' hmu hos hzS hz1 hzconj hδpm hδj
+  set g1g : ℚ := ((Nat.card (hyp.toFamilyHypothesis71).G0 : ℚ)
+      - ((Finset.univ.filter (fun g : G => g ∉ hyp.dadeData.dade.dadeSupport
+          ∧ (orderOf g).Coprime hyp.w1)).card : ℚ)) / (Nat.card G : ℚ) with hg1g_def
+  have hA : (1 : ℚ) - g1g - 1 / (hyp.w1 : ℚ)
+      < (hyp.w1 : ℚ) / (Nat.card ↥(derivedInG M) : ℚ) := by
+    have hpaR : (Nat.card ↥(typePA M hyp.typeP) : ℝ) / (Nat.card ↥M : ℝ)
+        < 1 / (hyp.w1 : ℝ) := by
+      have h := (Rat.cast_lt (K := ℝ)).mpr hyp.card_typePA_div_card_lt_inv_w1
+      push_cast at h; exact h
+    have hg1gR : (g1g : ℝ) = (Nat.card G : ℝ)⁻¹
+        * ((Nat.card (hyp.toFamilyHypothesis71).G0 : ℝ)
+          - ((Finset.univ.filter (fun g : G => g ∉ hyp.dadeData.dade.dadeSupport
+              ∧ (orderOf g).Coprime hyp.w1)).card : ℝ)) := by
+      rw [hg1g_def]; push_cast; rw [div_eq_inv_mul]
+    rw [← Rat.cast_lt (K := ℝ)]
+    push_cast
+    linarith [h78, h83, hpaR, hg1gR]
+  have hB : g1g ≤ ((Nat.card ↥dII.typeP.H : ℚ) - 1) / (Nat.card ↥S : ℚ)
+      + ((hyp.w1 : ℚ) * hyp.w2 - hyp.w1 - hyp.w2 + 1) / ((hyp.w1 : ℚ) * hyp.w2) := by
+    rw [hg1g_def]
+    exact hyp.g1_div_le_of_partner dII.typeP hprime hcop hHall hcent hfrobcap
+      hW1card hW2card hWcard
+  have hw1 : 1 ≤ hyp.w1 := Nat.card_pos
+  have hw2 : 1 ≤ hyp.w2 := Nat.card_pos
+  have hu : 1 ≤ Nat.card ↥dII.typeP.U := by omega
+  have hH : 1 ≤ Nat.card ↥dII.typeP.H := Nat.card_pos
+  have hMp : 1 ≤ Nat.card ↥(derivedInG M) := Nat.card_pos
+  exact typeII_coherence_estimate_chain hw1 hw2 hu hH hMp hS_struct hA hB
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.8), partner-supplied form**: `S_not_coherent` with the Type-II partner
+and its supply facts as hypotheses (issue 1020 Phase 3) — sorry-free.  The unconditional
+`S_not_coherent` is recovered downstream once the pair machinery discharges the supply. -/
+theorem S_not_coherent_of_partner [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : Hypothesis M)
+    {S : Subgroup G} (dII : TypeIIData S)
+    (hSidx : ((derivedInG S).subgroupOf S).index = hyp.w2)
+    (hU7 : 7 ≤ Nat.card ↥dII.typeP.U)
+    (hprime : (Nat.card ↥dII.typeP.W1).Prime)
+    (hcop : Nat.Coprime (Nat.card ↥(derivedInG S)) (Nat.card ↥dII.typeP.W1))
+    (hHall : OddOrder.Isaacs.Ch03.IsHallSubgroup
+      (Nat.card ↥dII.typeP.H).primeFactors dII.typeP.H)
+    (hcent : ∀ b ∈ dII.typeP.H, b ≠ 1 → Subgroup.centralizer ({b} : Set G) ≤ S)
+    (hfrobcap : ∀ b ∈ dII.typeP.H, b ≠ 1 → ∀ y ∈ derivedInG S,
+      y ∈ Subgroup.centralizer ({b} : Set G) → y ∈ dII.typeP.H)
+    (hW2card : Nat.card ↥dII.typeP.W2 = hyp.w1)
+    (hWcard : Nat.card ↥dII.typeP.W = hyp.w1 * hyp.w2) :
+    ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A0) := by
+  rintro ⟨hcoh⟩
+  obtain ⟨params, -⟩ := w2_prime_and_parameter_independence hG hyp
+  let coh : CoherentHypothesis hyp params := ⟨hcoh⟩
+  have hw1odd : Odd hyp.w1 :=
+    hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card hyp.W1)
+  have hw1gt : 1 < hyp.w1 :=
+    (Subgroup.one_lt_card_iff_ne_bot _).mpr hyp.typeP.W1_nontrivial
+  have hw1 : 3 ≤ hyp.w1 := by
+    obtain ⟨k, hk⟩ := hw1odd; omega
+  have hw2 : 1 ≤ hyp.w2 := Nat.card_pos
+  have hMp : (2 * hyp.w1 + 1) * hyp.w2 ≤ Nat.card ↥(derivedInG M) := hyp.card_derived_ge hG
+  obtain ⟨u, hu7, hbound⟩ := typeII_coherence_contradiction_estimate_of_partner hG coh dII
+    hSidx hU7 hprime hcop hHall hcent hfrobcap hW2card hWcard
+  exact typeII_noncoherence_arithmetic hw1 hu7 hw2 hMp hbound
+
 open scoped FiniteInduce in
 /-- **Peterfalvi (10.8)**: under Hypothesis (10.1), the character family `S` is
 not coherent.
