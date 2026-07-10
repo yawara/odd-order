@@ -182,6 +182,11 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
   mu_irreducible : ∀ (i : Fin q) (j : Fin p),
     OddOrder.RepresentationTheory.IsIrreducibleCharacter (mu i j)
   mu_col_injective : ∀ j : Fin p, Function.Injective (fun i : Fin q => mu i j)
+  /-- **Peterfalvi (4.3.b), full-grid orthonormality** (issues 9076/9014): the `μ_{ij}` are
+  pairwise-distinct irreducibles across the whole grid. -/
+  mu_orthonormal : ∀ (i k : Fin q) (j l : Fin p),
+    OddOrder.RepresentationTheory.ClassFunction.inner (mu i j) (mu k l)
+      = if i = k ∧ j = l then 1 else 0
   mu_colSum_eq_induce : ∀ j : Fin p,
     ∃ ψ : ClassFunction ↥((derivedInG S).subgroupOf S) ℂ,
       OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ ∧
@@ -429,6 +434,11 @@ structure Section16CharacterData {G : Type*} [Group G] [Finite G]
   mu_irreducible : ∀ (i : Fin tp.q) (j : Fin tp.p),
     OddOrder.RepresentationTheory.IsIrreducibleCharacter (mu i j)
   mu_col_injective : ∀ j : Fin tp.p, Function.Injective (fun i : Fin tp.q => mu i j)
+  /-- **Peterfalvi (4.3.b), full-grid orthonormality** (issues 9076/9014): the `μ_{ij}` are
+  pairwise-distinct irreducibles across the whole grid. -/
+  mu_orthonormal : ∀ (i k : Fin tp.q) (j l : Fin tp.p),
+    OddOrder.RepresentationTheory.ClassFunction.inner (mu i j) (mu k l)
+      = if i = k ∧ j = l then 1 else 0
   mu_colSum_eq_induce : ∀ j : Fin tp.p,
     ∃ ψ : ClassFunction ↥((derivedInG mp.S).subgroupOf mp.S) ℂ,
       OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ ∧
