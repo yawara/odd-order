@@ -180,3 +180,48 @@ FTS 閉包は S12_TypeII* leaf を含まない — S13_CoreStructure/S13_Orthogo
   代替。なお S12_TypeIIFrobenius は FeitThompsonSetup を import しない (逆も無い) —
   gate の pair-witness 再構成時は gate 側 (or 新 leaf) が FTS を import する方向で
   cycle なし (確認済)。
+
+## 2026-07-10 part 1.6 LANDED (d5809411): T-side producer — sourcing gap CLOSED
+
+`exists_section16_partner_typePData (hG) (mp) : ∃ dataT : TypePData mp.T,
+dataT.W1 = mp.Kstar ∧ dataT.W2 = mp.K` — sorry-free / axiom-clean (3-standard)。
+**P₂ 不要**。pair 層の仮説対 (dataT, hTW1) はこれで完全 discharge 可能。
+
+### route (a)/(b) の判定根拠
+- **(a) は P₂ 必須と確定**: 供給 lemma 3 本のうち `typeP_hall_derived_eq_and_abelian`
+  (BG 15.1(b)) は実は **P₂-free** (K ≠ ⊥ のみ) だが、
+  `typeP2_mf_internal_fitting_decomposition` (BG Cor 15.5) は冒頭で
+  `M_F = M_σ` (⟸ `msigma_isNilpotent_of_isTypeP2`) を本質使用。非 P₂ の partner T では
+  M_σ が nilpotent でなく M_F < M_σ となりうるため、(κ∪σ)'-Hall U は M_F を T′ 内で
+  補完しない (hDcompl が偽) — U を Hall で選ぶ (a) 型の構成は T-side では成立しない。
+- **(b) を採用**: 任意 witness data₀ (typePData_of_isTypeNonI mp.T_nonI) の
+  **complement U/構造 field を作り直さず丸ごと共役移送**。data₀.W1 と mp.Kstar は
+  どちらも T′ の補群 (data₀.M_complement / `typeP_derivedInG_isComplement_kappaHall`
+  — 後者は IsTypeP のみで ungated) → Schur–Zassenhaus 共役
+  (`IsComplement'.exists_conj_of_coprime`、coprime |T′| [T:T′] は
+  `coprime_card_derived_kappaHall_of_isComplement'`、T′.subgroupOf T normal は
+  = commutator ↥T via comap_map_eq_self_of_injective) → conjugator n ∈ T →
+  G-level lift (subtype-comp 橋 + map_subgroupOf_eq_of_le ×2) →
+  `TypePData.conj` (MaximalSubgroupTypeConj:462、全 20 field 移送済の既存資産!) +
+  `hgT ▸` cast-back (hgT : conj g • T = T、projection は fresh-index subst 補題) 。
+  S15 CountingLayer:340-385 の `exists_typePData_U_eq_V` が同型 pattern の precedent。
+
+### 発見した既存資産 (調査で判明、再構築を回避)
+- `TypePData.conj (φ : MulAut G) : TypePData M → TypePData (φ • M)` — 完全な
+  automorphism-equivariance が **既に formal 化済** (GroupTheory/MaximalSubgroupTypeConj)。
+- S15 の `reconciled_typePData_T` (CountingLayer:757) は S15-Hypothesis 文脈の
+  同型ゴール (data.W1 = hyp.W2 等) を Fact A/B (κ-Hall + Msigma⊓C 同定) 経由で組む —
+  ただし S15 文脈では Fact B (`W1_eq_Msigma_T_inf_centralizer_W2`) が別途 gated。
+  **mp 文脈では Fact A = mp.Kstar_hall / Fact B = mp.K_eq が structure fields** ゆえ
+  本 producer は完全 ungated で閉じた (これが mp-文脈の決定的アドバンテージ)。
+- ⚠ 唯一の実装ハマり: `MulAut G` の `Subgroup` への smul は `open scoped Pointwise` 必須
+  (HSMul synth 失敗で発覚)。
+
+### 残 (part 2 本体、次 iteration)
+1. **grid 指標レベルの σ-同定** ((3.5)-determination or (3.7) 係数 rigidity) —
+   certainTypeOmegaSigma (S-side) ↔ alignedOmegaSigmaGrid (M-side) の per-index 対応。
+   pair 層の CF(W,V)-一致 (完成) が土台。
+2. scope item 3 (type-II L → canonical partner 還元 glue、theorem88_caseB +
+   typeP_duality) + item 4 (行和 pin 変換)。
+3. gate `exists_typeIICrossIsometryData` の pair-witness 再構成時は gate 側が
+   FeitThompsonSetup (or 本 leaf) を import する (cycle なし確認済)。
