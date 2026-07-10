@@ -519,6 +519,28 @@ X := c.extension (columnSum χ₂) に適用。入力チェックリスト:
   `omegaProdEquiv_symm_omegaProdCharTic_ne` (S06:既存、pair-ne) + (L1') fst 一致 → snd 相異 ✓。
 ⚠ ticVdiff h の W₁/W₂ は h.tic の fields (ticVdiff は tic の W-系を再利用) — subgroupOf の
 基準が (ticVdiff h).W = h.tic.W で一致することを確認しつつ書く。
+**進捗⁸ — obligation 2(b) の scoping 確定 + 9079 claim (実装は次 iteration)**:
+Coq (10.7) (`Frob_der1_type2` PFsection10:549) の精読で **route 再構成が判明**:
+(i) 任意 type-II L でなく **M の pair partner S** (`FTtypeP_pair_witness`) に対して
+cross-isometry を証明、(ii) pair の type-2 分類 clause で `L = S^x`、(iii) 共役転送
+(`FrobeniusJker` 相当)。⟹ `exists_typeIICrossIsometryData` の現行 signature (任意 S) は
+partner-witness + 転送に**再構成すべき** (T2/dichotomy 機構は S-generic ゆえ partner 上で
+そのまま効く)。transpose の鍵候補 = **Dade-map 一意性** (両 σ が同じ (G,V)-TI の Dade map
+⟹ 同一; `IsDadeMap.unique`)。repo 資産 = `Section16MaximalPair` (FeitThompsonSetup:292、
+typeP_pair_W_structure + certainTypeS/T 済) — 次 iteration は coverage 精査から。
+claim = **issue 9079** (9076 (c, §3 rigidity) とは非重複を明記)。
+
+**進捗⁷ (b5a20e11) — ★★ obligation 2(a) 完成**: `typeII_nu_tau2_dichotomy` landed
+(sorry-free/axiom-clean、leaf 1273 行)。(5.8) の S-side pin = Coq coherent_prDade_TIred の
+dichotomy 形。T-添字化 → σ-coeff 公式 → 2 列支持 → S05 endgame 一撃。
+**残 obligations = 2(b) S↔M grid transpose (typeP_pair 圏、0098 item 1 → 着手時 9000 claim) +
+3 ((8.18.b) disjointness、update⁵ 参照)** — この 2 つが `exists_typeIICrossIsometryData` の
+最後の gap (dichotomy → TypeIICrossIsometryData fields への整形は 2(b) の transpose とセット)。
+
+**進捗⁶ (df0cc78a)**: ~~L1/L1'/L2~~ **DONE** (+ 橋像帰属 helper 2 本、Hypothesis46-generic)。
+⚠ (ticVdiff h).W ≡ h.tic.W の型 spelling 差 → **erw** 必須。
+**残 = endgame 適用本体 1 本** (`typeII_nu_tau2_dichotomy`): kcol/jcol := 成分 (L1 で
+well-defined)、σ-coeff 計算、S05 endgame 呼び出し、逆翻訳。
 endgame 適用の残り組立は本 note 直上のチェックリスト通り
 (E-Finset → T := 添字 preimage、coeff 計算 = sigmaCoeff_psi_eq (S06:515) の
 chiFam_spec .2.2.1 pattern、hδ = (columnFamily χ₂).sign + sign_eq)。
