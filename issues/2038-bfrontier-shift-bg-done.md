@@ -946,3 +946,17 @@ orthonormal collapse + inner_conj_symm。
 (ii) W₂-vanishing → 行和 0 (f = Σc_χ ω_χ、x∈W₂ で ω_χ(x) = χのW₂成分値 → W₂-char 独立性で
 Σ_{W₁成分} c = 0 per W₂-char)、(iii) 差族 reassembly (行和 0 ⟹ f = Σ_j Σ_i c_ij(ω_ij−ω_0j))。
 wFst/wSnd (W=W₁×W₂ 射影、S05) で char の積分解。
+
+## ✅ (2026-07-11、lane-b /loop iter 17-18) — ω-差族 spanning 完成 (V2basis spanning 半分 landed)
+
+- iter 17 (707c6e62): `S05_OmegaSpanning` 新 leaf — `span_omega_eq_top` (Irr W = ω-range +
+  completeness) + `eq_sum_inner_smul_omega` (ω-Fourier 展開)。
+- iter 18 (本 commit): `sndPart` (W₂-成分 lift、Coq w_ 0 j) + **`supported_le_span_omega_sub_sndPart`**
+  (CF(W,W∖W₂) ⊆ span{ω_χ − ω_{sndPart χ}})。**W₂-char 独立性論法を完全回避**: Fourier split の
+  残余 g は W₂ 上 0 かつ W₂-成分のみ依存 → 恒等 0。
+**次 = cross-level (1.3.b) wrapper**: H ≤ G、A ⊆ H、Φ_j ∈ CF(H,A) spanning、mu_i ∈ CF(G)
+orthonormal、`Ind Φ_j = Σ_i ⟨Φ_j,χ_i⟩•mu_i` → mu_i = χ_i on A。導出 = Res mu_i に (1.3.a) core:
+⟨Φ_j, Res mu_i⟩ = ⟨Ind Φ_j, mu_i⟩ (inner_induce_eq_inner_restrict) = ⟨Φ_j,χ_i⟩ (orthonormal
+collapse) → D := Res mu_i − χ_i ⊥ 全 Φ → D = 0 on A。SupportedSpanOrthogonality に追記 →
+その後 mu2Grid instantiation (Φ := ω-差族 [今回 landed]、mu_ := δ·mu2Grid 族、hypothesis =
+sigma_omega_eq_mu2GridSign_smul_mu2Grid 経由) で prTIirr_id 対応が閉じる。
