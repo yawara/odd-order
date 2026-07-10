@@ -852,3 +852,21 @@ S15 grounding fields → pins/mu_row0_ne discharge → PVSbeta assembly の mult
 部品 D/A は landed 済、B/C は上記経路で継続。次 iter: 9014 の constructor
 (ofS06Hypothesis) の W₁-値 discharge 可能性を精査 (S06 側に W₁-restriction 値があるか) —
 可能なら field+constructor を 1 commit で。
+
+## 📋 (2026-07-10 続¹⁷、lane-b /loop iter 11) — B(iii) への残 gap が 2 点に絞れた
+
+**ofS06Hypothesis constructor 精読**: mu2 i j := (columnFamily (charGroupW2Equiv j)).mu i —
+全 field が S06 定理で discharge 済 (mu2_orthonormal/chi_res/ind_chi/chi_zero/cfker/dichotomy)。
+**同 file に mu2Grid (σ-grounding) が移設済**: `mu2Grid_eq_sign_smul_sigma_omega` = **μ = δ·σ(ω)**
+(sign ±1 = mu2GridSign) + mu2Grid_orthonormal/injective。
+
+**∴ B(iii) (μ_0j(x)=1 on W₁^#) への残 gap は 2 点**:
+1. **σ(ω) の W₁^#-値 API**: TICyclicHypothesis の σ (cyclicTIiso (3.2)) が W 上で ω とどう関係するか
+   (Coq prTIirr_id の中身 = cycTI の W-値 identity)。x∈W₁^# で σ(ω_0j)(x) = ω_0j(x) = 1
+   (ω_0j の W₁-part = trivial)。TICyclicHypothesis の値 API の有無を次 iter で精査。
+2. **columnFamily.mu ↔ mu2Grid の同定**: residueS の mu2 は columnFamily 経由、σ-値は mu2Grid 経由 —
+   両 μ-grid の同定 (どちらも orthonormal + 同 column 構造だが identification が要る;
+   「σ-grounding down-payment」の表現は full 接続が未了を示唆)。
+
+どちらも 9014 の続き (cyclicTIiso port の残り)。gap 1 が閉じれば B(iii) は
+mu2Grid_eq_sign_smul_sigma_omega + σ-値 + δ の (4.4)-normalization (delta_zero_eq_one 系) で組める。
