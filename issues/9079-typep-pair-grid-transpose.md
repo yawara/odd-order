@@ -521,3 +521,14 @@ Coq の base-ortho kernel は support 論法でなく **(3.8) NC-カウント**�
 組立順: (k1) S-side kernel ⟨τ_S(λ−λ̄), chiFam_S P⟩ = 0 (anchor + norm2 + engine) →
 (k2) (5.5) 再演 → (k3) constituent trick → lam_ortho_grid (per-index 還元込み) →
 (k4) M-mirror で zeta_ortho_grid。
+
+### k1 LANDED (44ea7140): (5.3.b) base-ortho kernel — axiom-clean
+`typeII_tau_diff_inner_chiFam_eq_zero` (S12_TypeIICrossIsometryPair)。crumbs: dade0 の
+A は A₀-形 (明示型注釈で monotone 拡張) / mem_ZIrr_of_supported は (hsupp)(hZ) 順 /
+hconj は typeIIHypothesis46_dade0_hConjInvariant。
+**次 = k2**: τ₂λ ∈ ℤ[R(λ)]-form ((5.5) 再演)。lane-b template
+(PairCoherence:400 の ofProjection (ψ:=0) + eq_sum_of_psi_eq_zero) を
+typeII_T2_memberRFamily の R(λ)-block (dadeOrthonormalCharacterImageFamilyOfDiff) で。
+c := typeII_T2_coherent の extension、hsupp/inner 部品は k1 と共通。
+その後 k3 (constituent trick: k1 + orthonormal ±irr 対 + grid=±irr) → lam_ortho_grid
+(per-index 還元込み、pair leaf の sorry 1 本目 discharge) → k4 M-mirror。
