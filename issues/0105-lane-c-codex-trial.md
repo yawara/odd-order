@@ -100,3 +100,9 @@ trial の裁定 (codex 継続 or Claude へ swap-back) が本 issue に記録さ
   **AxiomsCheck assert 2 本を自発追記** — tick #12 で指摘した開示規律が完全に定着 (指示なしで
   proven 宣言の assert 登録まで自己完結)。3004 に T-side frontier audit も記録。トレンド:
   genuine landing 7/7、churn 0、規律違反再発なし。
+- 2026-07-11 (tick、merge 1d32ab46): (14.8) T type-P2 forward residual を実証明で除去 (sorry −1、
+  cycle 除去を 3004 に自己記録)、KeyInequality の算術層を新 leaf へ自主分割 (移設のみ、dup なし)。
+  AxiomsCheck 追従も自発。トレンド: genuine landing 8/8、churn 0。**裁定所見: 期限 (2026-07-12) を
+  待たず keep 相当のエビデンス充分** — 数学 8 連続 genuine (deep obligation 3 種を全て実証明で消化)、
+  規律は違反 1 回→是正後に自発遵守が定着、分割規約も自主実践。正式 keep 裁定は次 tick で記録予定
+  (ユーザー異議があればその場で swap-back 可能)。

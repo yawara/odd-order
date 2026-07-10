@@ -63,3 +63,20 @@ covers field discharge、**lane b 所有**)。TypeICovering.lean は NormPackage
 - commit f4140838 (branch restructure + collapse lemmas) / 6b08f22d ((8.11) 閉鎖)
 - PDF p.47-48 (references/peterfalvi/pdf/04.10、(8.14)-(8.17) は Nougat 欠落 → 視読)
 - BG mmd L4389-4414 (Thm D/E)、04.14 mmd :47/:109-111 ((12.7)/(12.17))
+
+## ⚖️ HUB RULING (2026-07-11 監視 tick)
+
+**裁定 = migration 提案を承認** (a の診断は原文 PDF 視読 + BG mmd + Coq の 3 点照合済みで、
+「restatement が証明に先行」の settled パターンに合致。§8 層に kernel-collapse は存在せず、
+(12.17) 証明内でのみ導出可能という層別も mmd 行番号レベルで確認可能):
+
+1. **S14 側 (owner = b)**: `S14_MaximalI/TypeICovering.lean:292` の covers discharge を
+   (12.17)-faithful route に置換 (本 issue の手順 1、a の collapse lemma 2 本 +
+   `theoremD_msigma_conjugacy_and_centralizers` + (12.7) `typeI_frobenius` を cite)。
+   b のレーン内 scheduling は b の自律判断 (文書順では (12.17) < (13.18) だが、進行中の
+   (13.18) port chain との順序は b が決める)。
+2. **S10 側 (owner = a)**: 手順 1 landing 後、consumer-0 を grep 確認の上
+   `cover_subset_kernels` field を削除 → producer branch を sorry-free 完結。
+   (field 削除 = carrier signature 変更だが、唯一の consumer が手順 1 で先に外れるため
+   無断変更に当たらない — 本 ruling が承認記録)
+3. 順序は 1 → 2 の直列 (逆順は build 破壊)。完了で本 issue close。
