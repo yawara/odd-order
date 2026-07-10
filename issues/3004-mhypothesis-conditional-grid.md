@@ -63,17 +63,51 @@ OddOrder/Peterfalvi/S15_SAndT.lean の TypeIOrthogonalityGridData も原文と�
 
 ## やること
 
-- [ ] hub ruling: unsound/over-strong carrier と確認し、C/B の修正境界を裁定。
-- [ ] MHypothesisを faithfulな (14.10) carrierへ戻し、complement_card_eq_pq,
+- [x] hub ruling: unsound/over-strong carrier と確認し、C/B の修正境界を裁定。
+- [x] MHypothesisを faithfulな (14.10) carrierへ戻し、complement_card_eq_pq,
       betaSigns, betaSigns_pm, betaGridを無条件 fieldsから外す。
-- [ ] main_size_bounds_structuralを K!=V と e<=p*qから (14.11.1) を証明する形へ直す。
+- [x] main_size_bounds_structuralを K!=V と e<=p*qから (14.11.1) を証明する形へ直す。
 - [ ] (14.11.2) conditional producerを作り、K!=V + gaps + faithful (13.19.c) から
       e=pq、axis parity、coefficient rigidity、Y=0、signed expansionを同時に構成する。
-- [ ] betaM_expansionをconditional producerへ再配線する。
+- [x] betaM_expansionをconditional producerへ再配線する。
 - [ ] K_eq_V_index_pqのindex halfは K=Vを得た後、faithful (13.17.c) specializationから導く。
-- [ ] lane b ownerの TypeIOrthogonalityGridDataを原文 (13.19) に restateし、
+- [x] lane b ownerの TypeIOrthogonalityGridDataを原文 (13.19) に restateし、
       zero-axis constancy / (c1)/(c2) と actual Dade imageを正確にcarryする。
 - [ ] L/M grid consumersは修正後の conditional APIだけをciteする。
+
+## 実装進捗 (2026-07-10, lane c)
+
+Hub 裁定を main から取り込み、C-owned の faithfulness repair と b landing への接続を実装した。
+
+- `MHypothesis` から4つの (14.11) 結論 fieldを削除。`e` は constructor で実際の
+  `(K.subgroupOf M).index` を取る。`exists_MHypothesis` の旧 beta-grid `sorry` は消滅し、
+  (14.10) assembly は再び sorry-free。
+- `exists_M_hypothesis78` は b の不忠実な `vdata.complement_card_eq_pq` を読まず、landed
+  `exists_M_structural_dichotomy` から `e=p ∨ e=pq` を構成。`complementIndex_le_pq` は実証明。
+- `main_size_bounds_structural` は `e≤pq` を入力に取り、原文 proof の strict gap
+  `(k−1)/e > (v−1)/p` まで実証明。
+- (13.19.c) は actual `Mdata.betaM` に対する二つの bound-or-parity disjunction
+  `BetaMGridParityAlternatives` として明示。`betaM_axis_odd_of_main_size_bounds` が
+  (14.11.1) の strict gaps で両 bound 枝を排除する部分は sorry-free。
+- landed `TypeIOrthogonalityGridData` の conjunction 二分岐を sorry-free で射影。
+  `exists_betaMGridData` には b producer の chosen Dade image と `Mdata.h78.beta` の同期だけを隔離。
+- `betaM_expansion_data` は `K≠V`, `e≤pq`, strict gaps, 二軸 odd parity を明示引数に
+  取り、`e=pq`, signed expansion, `Y=0`, χ classificationを同時に返す conditional producerへ変更。
+- 無条件 API は `rhoNormSq_ge_lower : 1-e/k ≤ ...` と `card_M_eq : |M|=e*k` に一般化。
+  norm cascadeだけが conditional producerの `e=pq` を使って教科書の形へ特殊化する。
+
+残る named scaffold / upstream producer は原文の依存境界と一致する:
+
+1. **b** `complement_inf_P_structure_dichotomy` — corrected (13.17.c)-dual theorem body。
+2. **b** `typeIOrthogonalityGridData_of_typeISetup` — corrected (13.19) deep producer。
+3. **c/b interface** `exists_betaMGridData` — chosen Dade imageを `Mdata.h78.beta` と同期。
+4. **c** `betaM_expansion_data` — coefficient projection / norm tightness / `Y=0` /
+   `χ` classification の generic support-coherence engine。
+5. **c** `complementIndex_eq_pq_of_K_eq_V` — `K=V` 後に §14 文脈で small branchを排除。
+
+`SubgroupMCore`, `SubgroupM`, `ComparingLM`, final contradiction, Feit--Thompson endpoint,
+`AxiomsCheck` を含む最新 main 上の 4133-job build は green。新規 axiom 宣言なし、追加した
+`betaM_axis_odd_of_main_size_bounds` の axiom-clean assertion も通過。
 
 ## 完了条件
 

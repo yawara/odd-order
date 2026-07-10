@@ -55,12 +55,9 @@ structure MHypothesis (hyp : Hypothesis (G := G)) where
   /-- **Peterfalvi (14.10)**: `e = |M : K|` (the degree of `ψ`).  De-opacified from the former
   opaque `Prop` to the concrete index identity (lane-c §16 char-endpoint, carrier honesty). -/
   e_eq_index : e = (K.subgroupOf M).index
-  /-- **Peterfalvi (14.11)**: `e = |M : K| = p q`.  The V-side dual of
-  `LHypothesis.typeI_complement_card_eq_pq`: `M` is type I over `N_G(V)` with Frobenius complement
-  `W₁ W₂^y` of order `p q` ((13.17.c)/(14.5), dual side).  Carried structurally and supplied by
-  `exists_MHypothesis` (from the T/V-side `typeII_overNormalizer_frobenius`), so that the index
-  half of (14.11) `K_eq_V_index_pq` is a direct consequence rather than a separate obligation. -/
-  complement_card_eq_pq : e = hyp.base.p * hyp.base.q
+  /-- **Peterfalvi (13.17.c), V-side dual**: the faithful complement-index alternatives
+  `e = p` or `e = p q`.  This is upstream input to (14.11), not either of its conclusions. -/
+  complementIndex_cases : e = hyp.base.p ∨ e = hyp.base.p * hyp.base.q
   k_eq_card_K : k = Nat.card ↥K
   psi_mem : psi ∈ Mset
   psi_degree_eq_e : psi 1 = (e : ℂ)
@@ -74,13 +71,6 @@ structure MHypothesis (hyp : Hypothesis (G := G)) where
   betaM_eq : betaM = h78.beta
   /-- **Peterfalvi (14.10)/(7.8)**: `ψ^{τ₁}` is the coherent image `ζ^ν` of the distinguished `ζ`. -/
   psi_tau1_eq : tau1 psi = h78.nu (h78.hyp76.zeta h78.zetaDistinct)
-  /-- **Peterfalvi (13.1.d)/(3.9)**: the `±1` signs of the `η`-grid expansion of `1_G + Δ`. -/
-  betaSigns : Fin hyp.base.q → Fin hyp.base.p → ℤ
-  betaSigns_pm : ∀ i j, betaSigns i j = 1 ∨ betaSigns i j = -1
-  /-- **Peterfalvi (13.1.d)**: `1_G + Δ = Σ ε_ij η_ij` ties the residual `Δ` of `h78`'s (7.8.a)
-  decomposition to the §13 `η`-grid. -/
-  betaGrid : OddOrder.Peterfalvi.S09.Hypothesis71.constOne G + h78.delta =
-    ∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (betaSigns i j : ℂ) • hyp.base.eta i j
   G0 : Set G
   /-- **Peterfalvi (14.10)/(7.5)**: the test character `ψ^{τ₁}` has norm one — it is the
   Dade-isometry `τ₁`-image of the unit-norm coherent `ζ`, hence admissible in the family
@@ -151,13 +141,13 @@ structure MHypothesis (hyp : Hypothesis (G := G)) where
   /-- **Peterfalvi (7.6)/(14.10).**  The normal kernel `H` of the §7 coherence datum `h78` is the
   Fitting kernel `K = M_F`.  (For type-I `M`, `A(M) = K^#` is the Dade support; the coherent family
   `T = {Ind_K^M θ}` has kernel `K`.)  Gives `h78.kernelOrder = |K| = k` and
-  `h78.complementIndex = |M : K| = e = p q` for the (7.8.b) lower bound. -/
+  `h78.complementIndex = |M : K| = e` for the unconditional (7.8.b) lower bound. -/
   h78_H_eq : h78.hyp76.H = K
   /-- **Peterfalvi (7.8.b) for `M`** — the coherence-norm lower bound
   `‖ζ^{νρ}‖² ≥ 1 − e/h = 1 − |M:K|/|K|`.  This is
   `S09.Hypothesis78.NormEstimates.zetaNuRho_norm_sq_ge` for the coherent type-I `M`, with the
-  small-index hypothesis `smallIndex` (`2·|M:K| + 1 ≤ |K|`, i.e. `2 p q + 1 ≤ k`, a consequence of
-  (14.11.1) `k > 2 p v` and `v ≥ q`) discharged.  The genuine §7 Dade content of the (14.11.4)
+  small-index hypothesis `smallIndex` (`2·|M:K| + 1 ≤ |K|`) discharged by the Frobenius
+  structure of `M`.  The genuine §7 Dade content of the (14.11.4)
   lower bound, isolated here as part of the `exists_MHypothesis` obligation. -/
   h78_zetaNuRho_normSq_ge :
     1 - (h78.complementIndex : ℝ) / (h78.kernelOrder : ℝ) ≤ h78.zetaNuRhoNormSq
@@ -402,7 +392,7 @@ theorem norm_cascade_contradiction_of_caseB_data_main_size_bounds
     {hyp : Hypothesis (G := G)}
     (Tdata : CaseBForTData hyp) (Sdata : CaseBForSData hyp) (Mdata : MHypothesis hyp)
     (hsize : Mdata.k > 2 * hyp.base.p * hyp.base.v ∧
-      (((Mdata.k - 1 : ℕ) : ℚ) / (Mdata.e : ℚ) ≥
+      (((Mdata.k - 1 : ℕ) : ℚ) / (Mdata.e : ℚ) >
         ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ)) ∧
       (((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
         ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)))
@@ -418,7 +408,7 @@ theorem norm_cascade_contradiction_of_caseB_outputs_main_size_bounds
       data.caseB_formula ∧ hyp.base.v = (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1))
     (hS : ∃ data : CaseBForSData hyp, data.caseB_formula) (Mdata : MHypothesis hyp)
     (hsize : Mdata.k > 2 * hyp.base.p * hyp.base.v ∧
-      (((Mdata.k - 1 : ℕ) : ℚ) / (Mdata.e : ℚ) ≥
+      (((Mdata.k - 1 : ℕ) : ℚ) / (Mdata.e : ℚ) >
         ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ)) ∧
       (((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
         ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)))
@@ -531,9 +521,9 @@ private theorem two_mul_add_one_le_of_modEq_one_odd {p x : ℕ} (hp : Odd p) (hp
   omega
 
 /-- **Peterfalvi (14.11.1)** structural half: under `K ≠ V`, the Fitting kernel `K = M_F` is large
-(`k > 2 p v`) and the Frobenius quotient `(k − 1) / e` dominates `(v − 1) / p`.  The **quotient
-bound is now a genuine consequence** of `k > 2 p v` (with `e = pq`, `q < p`): `q(v−1) ≤ qv ≤ 2pv ≤
-k−1`, so `(v−1)/p ≤ (k−1)/(pq)` (`div_le_div_iff₀` + `nlinarith`).  The `k > 2 p v` bound is in turn
+(`k > 2 p v`) and `(k − 1) / e > (v − 1) / p`.  The strict quotient bound is a genuine
+consequence of `k > 2 p v`, `e ≤ p q`, and `q < p`: cross multiplication reduces it to
+`e(v−1) ≤ pq(v−1) < p(k−1)`.  The `k > 2 p v` bound is in turn
 the arithmetic consequence (`two_mul_add_one_le_of_modEq_one_odd`) of the §13/§15 structural datum
 `hstruct` of (14.11.1): by (13.17) the kernel order factors as `k = v·x` with `x` an integer, `x ≠ 1`
 (as `K ≠ V`), and `x ≡ 1 (mod p)` (since `W₂` acts fixed-point-freely on `K` and `V`); as `k = |K|`
@@ -542,9 +532,10 @@ is odd, `x` is odd, so `x ≥ 2p+1` and `k = vx > 2pv`.  The third inequality of
 `main_size_bounds`. -/
 theorem main_size_bounds_structural [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp)
-    (hne : Mdata.K ≠ hyp.base.V) :
+    (hne : Mdata.K ≠ hyp.base.V)
+    (he_le : Mdata.e ≤ hyp.base.p * hyp.base.q) :
     Mdata.k > 2 * hyp.base.p * hyp.base.v ∧
-      (((Mdata.k - 1 : ℕ) : ℚ) / (Mdata.e : ℚ) ≥
+      (((Mdata.k - 1 : ℕ) : ℚ) / (Mdata.e : ℚ) >
         ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ)) := by
   have hqp : hyp.base.q < hyp.base.p := hyp.q_lt_p
   -- (14.11.1): `k = v·x`, `x ≡ 1 (mod p)` (`W₂` fixed-point-free on `K`, `V`), `x ≠ 1` (`K ≠ V`) —
@@ -624,28 +615,65 @@ theorem main_size_bounds_structural [Finite G] (_hG : OddOrder.BG.IsMinimalSimpl
         = 2 * hyp.base.p * hyp.base.v + hyp.base.v := by ring
     rw [hkx]; omega
   refine ⟨hk, ?_⟩
-  -- The quotient bound `(k−1)/e ≥ (v−1)/p` is pure arithmetic from `k > 2pv`, `q < p`, `e = pq`:
-  -- `q(v−1) ≤ qv ≤ 2pv ≤ k−1`, so `(v−1)/p ≤ (k−1)/(pq)`.
-  have he : Mdata.e = hyp.base.p * hyp.base.q := Mdata.complement_card_eq_pq
-  have hNat : hyp.base.q * (hyp.base.v - 1) ≤ Mdata.k - 1 := by
+  -- The strict quotient bound `(k−1)/e > (v−1)/p` is pure arithmetic from `k > 2pv`, `q < p`,
+  -- and the faithful (13.17.c)-dual bound `e ≤ pq`:
+  -- `e(v−1) ≤ pq(v−1) = p·q(v−1) ≤ p(k−1)`.
+  have hv_pos : 0 < hyp.base.v := by
+    obtain ⟨x, hkx, _, _⟩ := hstruct
+    have hk_odd : Odd Mdata.k := by
+      rw [Mdata.k_eq_card_K]
+      exact _hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card Mdata.K)
+    have hvx_odd : Odd (hyp.base.v * x) := hkx ▸ hk_odd
+    exact (Nat.odd_mul.mp hvx_odd).1.pos
+  have hNat : hyp.base.q * (hyp.base.v - 1) < Mdata.k - 1 := by
     have hb : 2 * hyp.base.p * hyp.base.v ≤ Mdata.k - 1 := Nat.le_sub_one_of_lt hk
-    have ha : hyp.base.q * (hyp.base.v - 1) ≤ 2 * hyp.base.p * hyp.base.v := by
+    have ha : hyp.base.q * (hyp.base.v - 1) < 2 * hyp.base.p * hyp.base.v := by
       calc hyp.base.q * (hyp.base.v - 1) ≤ hyp.base.q * hyp.base.v := by gcongr; omega
-        _ ≤ 2 * hyp.base.p * hyp.base.v := by gcongr; omega
-    exact le_trans ha hb
-  rw [he, ge_iff_le]
+        _ < 2 * hyp.base.p * hyp.base.v := by
+          exact Nat.mul_lt_mul_of_pos_right (by omega) hv_pos
+    exact lt_of_lt_of_le ha hb
+  rw [gt_iff_lt]
   have hppos : (0 : ℚ) < hyp.base.p := by exact_mod_cast hyp.base.p_prime.pos
-  have hqpos : (0 : ℚ) < hyp.base.q := by exact_mod_cast hyp.base.q_prime.pos
-  have hpqpos : (0 : ℚ) < ((hyp.base.p * hyp.base.q : ℕ) : ℚ) := by
-    exact_mod_cast Nat.mul_pos hyp.base.p_prime.pos hyp.base.q_prime.pos
-  rw [div_le_div_iff₀ hppos hpqpos]
-  have hNatQ : (hyp.base.q : ℚ) * ((hyp.base.v - 1 : ℕ) : ℚ) ≤ ((Mdata.k - 1 : ℕ) : ℚ) := by
-    exact_mod_cast hNat
-  push_cast
-  nlinarith [hNatQ, hppos, hqpos]
+  have heposNat : 0 < Mdata.e := by
+    rw [Mdata.e_eq_index]
+    exact Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite
+  have hepos : (0 : ℚ) < Mdata.e := by exact_mod_cast heposNat
+  rw [div_lt_div_iff₀ hppos hepos]
+  have hcross :
+      (hyp.base.v - 1) * Mdata.e < (Mdata.k - 1) * hyp.base.p := by
+    calc
+      (hyp.base.v - 1) * Mdata.e
+          ≤ (hyp.base.v - 1) * (hyp.base.p * hyp.base.q) := by gcongr
+      _ = hyp.base.p * (hyp.base.q * (hyp.base.v - 1)) := by ring
+      _ < hyp.base.p * (Mdata.k - 1) := by
+        exact Nat.mul_lt_mul_of_pos_left hNat hyp.base.p_prime.pos
+      _ = (Mdata.k - 1) * hyp.base.p := by ring
+  exact_mod_cast hcross
 
-/-- **Peterfalvi (14.11.1)**: if `K != V`, then `k` is large and the quotient
-bound dominates `(v - 1) / p`.
+/-- **Peterfalvi (13.17.c), V-side dual complement alternatives**:
+`e = |M : K| = p` or `e = p q`.
+
+The alternatives are supplied by lane b's corrected `exists_M_structural_dichotomy` and stored
+faithfully on the (14.10) witness. -/
+theorem MHypothesis.complementIndex_eq_p_or_pq [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (Mdata : MHypothesis hyp) :
+    Mdata.e = hyp.base.p ∨ Mdata.e = hyp.base.p * hyp.base.q := by
+  exact Mdata.complementIndex_cases
+
+/-- **Peterfalvi (13.17.c), V-side dual input for (14.11.1)**:
+`e = |M : K| ≤ p q`, without choosing the `p q` branch. -/
+theorem MHypothesis.complementIndex_le_pq [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (Mdata : MHypothesis hyp) :
+    Mdata.e ≤ hyp.base.p * hyp.base.q := by
+  rcases Mdata.complementIndex_eq_p_or_pq _hG with he | he
+  · rw [he]
+    exact Nat.le_mul_of_pos_right _ hyp.base.q_prime.pos
+  · exact he.le
+
+/-- **Peterfalvi (14.11.1)**: if `K != V`, then `k` is large and the first quotient is
+strictly greater than `(v - 1) / p`.
 
 The third conjunct `(v − 1) / p > (u − 1) / q` is now a genuine proof: it is the arithmetic
 ratio comparison `key_ratio_inequality_of_caseB_data` (14.8), fed by the (14.4)/(14.6) case-(9.7.b)
@@ -655,14 +683,15 @@ theorem main_size_bounds [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp)
     (hne : Mdata.K ≠ hyp.base.V) :
     Mdata.k > 2 * hyp.base.p * hyp.base.v ∧
-      (((Mdata.k - 1 : ℕ) : ℚ) / (Mdata.e : ℚ) ≥
+      (((Mdata.k - 1 : ℕ) : ℚ) / (Mdata.e : ℚ) >
         ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ)) ∧
       (((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
         ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)) := by
   obtain ⟨Ldata⟩ := exists_LHypothesis _hG hyp
   obtain ⟨Tdata, _⟩ := caseB_for_T _hG hyp
   obtain ⟨Sdata, _⟩ := caseB_for_S _hG hyp Ldata
-  obtain ⟨hk, hke⟩ := main_size_bounds_structural _hG hyp Mdata hne
+  obtain ⟨hk, hke⟩ :=
+    main_size_bounds_structural _hG hyp Mdata hne (Mdata.complementIndex_le_pq _hG)
   exact ⟨hk, hke, key_ratio_inequality_of_caseB_data Tdata Sdata⟩
 
 /-- **Arithmetic core of Peterfalvi (14.11.2)**: an integer grid of *odd* Dade-isometry
@@ -707,6 +736,105 @@ theorem all_pm_one_and_card_of_odd_sq_sum_le {ι : Type*} [Fintype ι]
   · left; linarith
   · right; linarith
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (13.19.c), M-side bound-or-parity alternatives.**
+
+This is the projection of each textbook (13.19.c) conjunction needed by (14.11.2): either the
+corresponding degree bound holds, or the actual coefficient of `β_M^τ` on the non-principal zero
+axis is an odd integer.  No parity branch is selected inside the carrier. -/
+structure BetaMGridParityAlternatives [Finite G]
+    (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) where
+  row :
+    ((((Mdata.k - 1 : ℕ) : ℚ) / (Mdata.e : ℚ) ≤
+        ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)) ∨
+      ∀ j : Fin hyp.base.p, (j : ℕ) ≠ 0 →
+        OddOrder.Peterfalvi.S15.OddIntegerInner Mdata.betaM
+          (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ j))
+  col :
+    ((((Mdata.k - 1 : ℕ) : ℚ) / (Mdata.e : ℚ) ≤
+        ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ)) ∨
+      ∀ i : Fin hyp.base.q, (i : ℕ) ≠ 0 →
+        OddOrder.Peterfalvi.S15.OddIntegerInner Mdata.betaM
+          (hyp.base.eta i ⟨0, hyp.base.p_prime.pos⟩))
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (13.19), synchronized M-side grid source.**
+
+Lane b's corrected `TypeIOrthogonalityGridData` now carries the faithful conjunction alternatives
+and an actual Dade-image equation.  The remaining interface obligation is to synchronize the
+producer's chosen Dade image with the distinguished `betaM` already chosen by `Mdata.h78`.
+The existential form is essential: lane b's current parameter-free producer does not expose a
+uniqueness theorem that would identify its particular choice with `Mdata.h78`. -/
+theorem exists_betaMGridData [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) :
+    ∃ grid : OddOrder.Peterfalvi.S15.TypeIOrthogonalityGridData hyp.base Mdata.typeIHyp,
+      grid.betaL = Mdata.betaM := by
+  sorry
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (13.19.c), faithful M-side source adapter.**  Projects the corrected conjunction
+alternatives supplied by lane b, after synchronizing its `β_L^τ` with the actual `Mdata.betaM`. -/
+theorem betaMGridParityAlternatives [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) :
+    BetaMGridParityAlternatives hyp Mdata := by
+  obtain ⟨grid, hbeta⟩ := exists_betaMGridData _hG hyp Mdata
+  have heM : Mdata.e = ((maxNilpotentNormalHall Mdata.M).subgroupOf Mdata.M).index := by
+    rw [Mdata.e_eq_index, Mdata.K_eq_MF]
+  have he : grid.e = Mdata.e := grid.e_eq_index.symm.trans heM.symm
+  have hH : Mdata.typeIHyp.H = Mdata.K := by
+    rw [OddOrder.Peterfalvi.S14.Hypothesis.H, Mdata.typeIHyp.typeI.typeF.H_eq,
+      Mdata.K_eq_MF]
+  have hk : Nat.card ↥Mdata.typeIHyp.H = Mdata.k := by
+    rw [hH, ← Mdata.k_eq_card_K]
+  constructor
+  · rcases grid.caseC with hbound | hodd
+    · left
+      have h := hbound.2
+      rw [hk, he] at h
+      exact h
+    · right
+      intro j hj
+      have h := hodd.1 j hj
+      rwa [hbeta] at h
+  · rcases grid.caseC_dual with hbound | hodd
+    · left
+      have h := hbound.2
+      rw [hk, he] at h
+      exact h
+    · right
+      intro i hi
+      have h := hodd.1 i hi
+      rwa [hbeta] at h
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (14.11.1) → (13.19.c)**: the two strict size gaps exclude both degree-bound
+branches of (13.19.c), so the row and column coefficients of the actual `β_M^τ` are odd. -/
+theorem betaM_axis_odd_of_main_size_bounds [Finite G]
+    {hyp : Hypothesis (G := G)} {Mdata : MHypothesis hyp}
+    (hsize : Mdata.k > 2 * hyp.base.p * hyp.base.v ∧
+      (((Mdata.k - 1 : ℕ) : ℚ) / (Mdata.e : ℚ) >
+        ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ)) ∧
+      (((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
+        ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)))
+    (h1319 : BetaMGridParityAlternatives hyp Mdata) :
+    (∀ j : Fin hyp.base.p, (j : ℕ) ≠ 0 →
+      OddOrder.Peterfalvi.S15.OddIntegerInner Mdata.betaM
+        (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ j)) ∧
+    (∀ i : Fin hyp.base.q, (i : ℕ) ≠ 0 →
+      OddOrder.Peterfalvi.S15.OddIntegerInner Mdata.betaM
+        (hyp.base.eta i ⟨0, hyp.base.p_prime.pos⟩)) := by
+  constructor
+  · rcases h1319.row with hbound | hodd
+    · exfalso
+      linarith [hsize.2.1, hsize.2.2]
+    · exact hodd
+  · rcases h1319.col with hbound | hodd
+    · exfalso
+      linarith [hsize.2.1]
+    · exact hodd
+
 /-- **Faithful §7/§3 Dade carrier for the `β_M` expansion of Peterfalvi (14.11.2).**
 
 This is the `M`-instance of the (7.8) Dade-coherence decomposition specialised to the `η`-grid,
@@ -714,8 +842,9 @@ isolating the genuine character-theoretic content of (14.11.2) away from the pur
 
 * `betaM_seven_eight` — **Peterfalvi (7.8.a)** for `M`: `β_M^τ = 1_G − χ + Δ`, the Dade-isometry
   image of `β_M = Ind_K^M 1_K − ψ` decomposed against the principal character `1_G` and the removed
-  unit-norm coherent image `χ` (`= ψ^{τ₁}` or `−ψ̄^{τ₁}`, recorded only through the
-  branch-independent `chi_norm`).  In the `χ = ψ^{τ₁} = ζ^ν` branch this is exactly the `M`-instance
+  unit-norm coherent image `χ` (`= ψ^{τ₁}` or `−ψ̄^{τ₁}`, recorded by `chi_classification`;
+  `chi_norm` is its branch-independent consequence).  In the `χ = ψ^{τ₁} = ζ^ν` branch this is the
+  `M`-instance
   of `S09.Hypothesis78.beta_eq_constOne_sub_zetaImage_add_delta` (`β = 1_G − ζ^ν + Δ`); see the
   bridge lemma `betaMExpansionData_of_hypothesis78` below.
 * `grid_eq` — **Peterfalvi (13.1.d)/(7.8.b)** `η`-grid identification: `1_G + Δ = Σ_{ij} ε_ij η_ij`.
@@ -723,10 +852,12 @@ isolating the genuine character-theoretic content of (14.11.2) away from the pur
   `±1` signs come from the Dade congruence `a_ij ≡ 1 (mod 2)` (13.19.c / 7.8.c) with
   `Σ a_ij² ≤ e − 1` and `e = p q` (`all_pm_one_and_card_of_odd_sq_sum_le`).
 
-All fields are genuine facts about the type-I maximal subgroup `M` (its Dade isometry and coherent
-extension exist by the §3/§4/§5 machinery); their concrete construction is the remaining §3/§4
-Dade-isometry obligation.  Cf. `EtaGenericData` for the dual generic-set carrier. -/
+All fields are the conditional conclusion of the (14.11.2) support-coherence argument: besides
+the §3/§4/§5 Dade machinery it uses coefficient projection, norm tightness, and residual
+vanishing.  Cf. `EtaGenericData` for the dual generic-set carrier. -/
 structure BetaMExpansionData (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) where
+  /-- The equality `e = p q`, obtained in the same norm-collapse as the signed expansion. -/
+  e_eq_pq : Mdata.e = hyp.base.p * hyp.base.q
   /-- The residual `Δ` of the (7.8.a) Dade expansion `β_M = 1_G − χ + Δ`. -/
   delta : ClassFunction G ℂ
   /-- The removed unit-norm character `χ` (`= ψ^{τ₁}` or `−ψ̄^{τ₁}`). -/
@@ -734,6 +865,10 @@ structure BetaMExpansionData (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hy
   /-- `χ` has the same pointwise absolute value as `ψ^{τ₁}` (holds for both branches, since
   `|z| = |z̄|`) — exactly what (14.11.3) consumes. -/
   chi_norm : ∀ g : G, ‖chi g‖ = ‖(Mdata.tau1 Mdata.psi) g‖
+  /-- **Peterfalvi (14.11.2)**: the removed character is the coherent image of `ψ`, or the
+  negative coherent image of its complex conjugate. -/
+  chi_classification :
+    chi = Mdata.tau1 Mdata.psi ∨ chi = -(Mdata.tau1 Mdata.psi.conj)
   /-- **Peterfalvi (7.8.a)** for `M`: `β_M^τ = 1_G − χ + Δ`. -/
   betaM_seven_eight :
     Mdata.betaM = OddOrder.Peterfalvi.S09.Hypothesis71.constOne G - chi + delta
@@ -746,22 +881,27 @@ structure BetaMExpansionData (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hy
       ∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (signs i j : ℂ) • hyp.base.eta i j
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Faithful §3/§7 Dade producer for (14.11.2).**  Under `K ≠ V`, the type-I maximal subgroup `M`
-carries the (7.8) Dade-coherence decomposition `BetaMExpansionData` of `β_M^τ` against the `η`-grid.
-The construction is the §3/§4 Dade-isometry layer (the abstract §16 `τ`/`τ₁`/`betaM` carriers do not
-yet pin it); see the bridge lemma `betaMExpansionData_of_hypothesis78`, which reduces this to a
-concrete `S09.Hypothesis78` for `M` plus the `η`-grid identification (3.9)/(13.1.d). -/
+/-- **Faithful conditional support-coherence producer for (14.11.2).**  Under `K ≠ V`, the
+coefficient projection and norm-tightness argument derives `e = p q`, vanishing of the orthogonal
+residual, the signed `η`-grid expansion, and the classification of `χ`.  The bridge lemma
+`betaMExpansionData_of_hypothesis78` supplies its concrete (7.8.a) branch. -/
 noncomputable def betaM_expansion_data [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) (_hne : Mdata.K ≠ hyp.base.V) :
-    BetaMExpansionData hyp Mdata where
-  delta := Mdata.h78.delta
-  chi := Mdata.tau1 Mdata.psi
-  chi_norm := fun _ => rfl
-  betaM_seven_eight := by
-    rw [Mdata.betaM_eq, Mdata.h78.beta_eq_constOne_sub_zetaImage_add_delta, Mdata.psi_tau1_eq]
-  signs := Mdata.betaSigns
-  signs_pm_one := Mdata.betaSigns_pm
-  grid_eq := Mdata.betaGrid
+    (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp)
+    (_hne : Mdata.K ≠ hyp.base.V)
+    (_he_le : Mdata.e ≤ hyp.base.p * hyp.base.q)
+    (_hsize : Mdata.k > 2 * hyp.base.p * hyp.base.v ∧
+      (((Mdata.k - 1 : ℕ) : ℚ) / (Mdata.e : ℚ) >
+        ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ)) ∧
+      (((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
+        ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)))
+    (_hrow : ∀ j : Fin hyp.base.p, (j : ℕ) ≠ 0 →
+      OddOrder.Peterfalvi.S15.OddIntegerInner Mdata.betaM
+        (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ j))
+    (_hcol : ∀ i : Fin hyp.base.q, (i : ℕ) ≠ 0 →
+      OddOrder.Peterfalvi.S15.OddIntegerInner Mdata.betaM
+        (hyp.base.eta i ⟨0, hyp.base.p_prime.pos⟩)) :
+    BetaMExpansionData hyp Mdata := by
+  sorry
 
 /-- **§16 → §7 bridge for the `β_M` (7.8.a) decomposition.**  Given a concrete `S09.Hypothesis78`
 for `M` whose Dade image `β` and coherent image `ζ^ν` are identified with the abstract §16 carriers
@@ -780,14 +920,17 @@ noncomputable def betaMExpansionData_of_hypothesis78 [Finite G]
     (H78 : OddOrder.Peterfalvi.S09.Hypothesis78 G A Mdata.M)
     (hbeta : Mdata.betaM = H78.beta)
     (hchi : Mdata.tau1 Mdata.psi = H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+    (hepq : Mdata.e = hyp.base.p * hyp.base.q)
     (signs : Fin hyp.base.q → Fin hyp.base.p → ℤ)
     (hsigns : ∀ i j, signs i j = 1 ∨ signs i j = -1)
     (hgrid : OddOrder.Peterfalvi.S09.Hypothesis71.constOne G + H78.delta =
       ∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (signs i j : ℂ) • hyp.base.eta i j) :
     BetaMExpansionData hyp Mdata where
+  e_eq_pq := hepq
   delta := H78.delta
   chi := Mdata.tau1 Mdata.psi
   chi_norm := fun _ => rfl
+  chi_classification := Or.inl rfl
   betaM_seven_eight := by
     rw [hbeta, H78.beta_eq_constOne_sub_zetaImage_add_delta, hchi]
   signs := signs
@@ -798,11 +941,11 @@ noncomputable def betaMExpansionData_of_hypothesis78 [Finite G]
 `η_ij` grid with one unit-norm character `χ` removed:
 `β_M^τ = Σ_{0≤i<q, 0≤j<p} (±η_ij) − χ`, where `χ = ψ^{τ₁}` or `−ψ̄^{τ₁}`.
 
-De-opacified (W4 §16→§7 bridge, lane-h): the `e = p q` half is the structural field
-`MHypothesis.complement_card_eq_pq` (Pf (14.11)), and the `η`-grid expansion is the pure-algebra
-rearrangement of the faithful `BetaMExpansionData` (7.8.a) decomposition `β_M = 1_G − χ + Δ`
-together with the `η`-grid identification `1_G + Δ = Σ ε_ij η_ij`.  The genuine character theory
-(the (7.8) Dade decomposition for `M`) is confined to `betaM_expansion_data`. -/
+The equality `e = p q`, coefficient rigidity, vanishing of the orthogonal residual, and the χ
+classification are derived together inside `betaM_expansion_data` from `K ≠ V`, (14.11.1), the
+faithful (13.17.c)-dual bound, and the explicit (13.19.c) alternatives.  This public projection
+retains only the pointwise norm consequence needed downstream.  No conclusion of (14.11.2) is
+read from `MHypothesis`. -/
 theorem betaM_expansion [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp)
     (hne : Mdata.K ≠ hyp.base.V) :
@@ -814,9 +957,14 @@ theorem betaM_expansion [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
           Mdata.betaM =
             (∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p,
               (ε i j : ℂ) • hyp.base.eta i j) - χ := by
-  refine ⟨Mdata.complement_card_eq_pq, ?_⟩
-  obtain ⟨delta, chi, hchi_norm, hbeta, signs, hsigns, hgrid⟩ :=
-    betaM_expansion_data _hG hyp Mdata hne
+  have he_le := Mdata.complementIndex_le_pq _hG
+  have hsize := main_size_bounds _hG hyp Mdata hne
+  have haxis :=
+    betaM_axis_odd_of_main_size_bounds hsize
+      (betaMGridParityAlternatives _hG hyp Mdata)
+  obtain ⟨hepq, delta, chi, hchi_norm, _hchi_classification, hbeta, signs, hsigns, hgrid⟩ :=
+    betaM_expansion_data _hG hyp Mdata hne he_le hsize haxis.1 haxis.2
+  refine ⟨hepq, ?_⟩
   refine ⟨signs, hsigns, chi, hchi_norm, ?_⟩
   rw [hbeta, ← hgrid]
   abel
@@ -982,4 +1130,3 @@ theorem classFunction_sum_apply {ι : Type*} {k : Type*} [CommRing k]
   | empty => simp
   | @insert a s ha ih =>
       rw [Finset.sum_insert ha, ClassFunction.add_apply, ih, Finset.sum_insert ha]
-

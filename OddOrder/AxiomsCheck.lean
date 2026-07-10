@@ -6838,14 +6838,20 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- AxiomsCheck-registered**: it cites `sum_zeta_tau1_normSq_ge_card`/`tau1_values_and_norm_bound`,
 -- which carry the existing §10 `Hypothesis`-carrier `sorryAx` taint (same as (10.9)); no *new* sorry.
 
+/-! **Peterfalvi (13.19.c) parity branch under the (14.11.1) strict gaps**
+(`S16_NonExistenceG`, lane C).  Once the faithful row/column alternatives are supplied explicitly,
+the two strict quotient inequalities eliminate their size-bound branches and leave the actual
+`β_M` odd-integrality conclusions.  This is pure order arithmetic and is axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.betaM_axis_odd_of_main_size_bounds
+
 -- **W4 §16→§7 bridge (lane-h, βM (14.11.2) de-opacification)** — `betaMExpansionData_of_hypothesis78`
 -- certifies that the (7.8.a) field of `BetaMExpansionData` (`β_M = 1_G − χ + Δ`) is a genuine
 -- consequence of the S09 §7 Dade decomposition
 -- `S09.Hypothesis78.beta_eq_constOne_sub_zetaImage_add_delta` (`β = 1_G − ζ^ν + Δ`), given `M`
 -- instantiating `S09.Hypothesis78` with `β_M = β` and `ψ^{τ₁} = ζ^ν` (the `χ = ζ^ν` branch, so
--- `chi_norm` is `rfl`).  Reduces the faithful `betaM_expansion_data` obligation to the §3/§4 Dade
--- construction + the (13.1.d)/(3.9) η-grid identification.  Axiom-clean (pure `rw` from the S09
--- (7.8.a) cite).
+-- `chi_norm` is `rfl`), together with the conditionally derived `e = p q`.  It isolates the
+-- remaining conditional engine work: coefficient projection, norm tightness, residual vanishing,
+-- and the χ classification.  Axiom-clean (pure `rw` from the S09 (7.8.a) cite).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.betaMExpansionData_of_hypothesis78
 
 -- **W2 §12 (12.17) normalizer bridge (lane-h)** — `maximalSubgroup_eq_normalizer_maxNilpotentNormalHall`:
@@ -7084,12 +7090,13 @@ The linchpin tying the (7.5) family-inequality layer to the (7.8.b) coherence-no
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.chiRhoCF_congr_hyp
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.MHypothesis.chiRhoNormSq_eq_zetaNuRhoNormSq
 
-/-! **Peterfalvi (14.11.4) lower bound** (`S16_NonExistenceG`, lane γ/POLE-2).  The genuine (7.8.b)
-content of (14.11.4): `1 − pq/k ≤ ‖ψ^{τ₁ρ}‖²`.  Combines the coherence-norm lower bound for `M`
+/-! **Peterfalvi (7.8.b)/(14.11.4) lower bound** (`S16_NonExistenceG`, lane γ/POLE-2).
+The unconditional genuine content is `1 − e/k ≤ ‖ψ^{τ₁ρ}‖²`, where `e = |M:K|`.
+Combines the coherence-norm lower bound for `M`
 (`h78_zetaNuRho_normSq_ge`, the (7.8.b) `NormEstimates.zetaNuRho_norm_sq_ge` with `smallIndex`
-discharged) with the index identities `h78.kernelOrder = |K| = k`, `h78.complementIndex = |M:K| = pq`
-(`h78_H_eq`/`e_eq_index`/`complement_card_eq_pq` + Lagrange) and the norm bridge above.  The `lower`
-field of the `normCascadeData` producer; the remaining gate is the upper §8 TI-counting.
+discharged) with the index identities `h78.kernelOrder = |K| = k` and
+`h78.complementIndex = |M:K| = e` (`h78_H_eq`/`e_eq_index` + Lagrange), and the norm bridge
+above.  The conditional `normCascadeData` rewrites `e` to `p q` using (14.11.2).
 Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.MHypothesis.rhoNormSq_ge_lower
 
@@ -7101,9 +7108,10 @@ cardinality input `|A(M)| = k − 1` of (14.11.4) (Coq `PFsection14` `Dade_cover
 `#|A| = k.-1`).  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.centralizerSupport_sharpSubgroup_eq_of_frobenius
 
-/-! **Peterfalvi (14.11) `|M| = p q k`** (`S16_NonExistenceG`, lane γ/POLE-2).  The order of the
-type-I maximal `M`, from `[M : K] = pq` and `|K| = k` by Lagrange (`card_mul_index` +
-`subgroupOfEquivOfLe`).  The denominator of the §8 cardinality input `|A(M)|/|M| = (k−1)/(kpq)`.
+/-! **Peterfalvi (14.10) `|M| = e k`** (`S16_NonExistenceG`, lane γ/POLE-2).  The order of the
+type-I maximal `M`, from `[M : K] = e` and `|K| = k` by Lagrange (`card_mul_index` +
+`subgroupOfEquivOfLe`).  The conditional (14.11.4) upper bound rewrites `e = p q` only after
+(14.11.2), yielding the denominator `|A(M)|/|M| = (k−1)/(kpq)`.
 (`card_typeIA_eq`, the numerator `|A(M)| = k − 1`, cites `typeI_frobenius` (12.7) so is body-honest
 but transitively gated on (12.16)/lane β, hence not registered here.)  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.MHypothesis.card_M_eq
