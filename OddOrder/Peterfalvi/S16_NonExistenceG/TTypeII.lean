@@ -1,4 +1,5 @@
 import OddOrder.Peterfalvi.S16_NonExistenceG.TSideTypeP
+import OddOrder.Peterfalvi.S16_GridExpansion
 
 /-!
 # Peterfalvi (14.9): the T-side Type-II theorem
@@ -14,6 +15,17 @@ open scoped Pointwise
 open scoped BigOperators
 
 variable {G : Type*} [Group G]
+
+/-- Two Peterfalvi (2.2) hypotheses on the same support and subgroup are equal once their
+`H`-fields agree.  The `H`-field is the only data field; all other fields are propositions. -/
+private theorem dadeHypothesis_eq_of_H_eq [Fintype G] {A : Set G} {L : Subgroup G}
+    {h₁ h₂ : OddOrder.Peterfalvi.S04.Hypothesis G A L}
+    (hH : ∀ a, h₁.H a = h₂.H a) : h₁ = h₂ := by
+  obtain ⟨s₁, l₁, n₁, H₁, c₁, ce₁, cd₁, hn₁, cc₁⟩ := h₁
+  obtain ⟨s₂, l₂, n₂, H₂, c₂, ce₂, cd₂, hn₂, cc₂⟩ := h₂
+  have hHeq : H₁ = H₂ := funext hH
+  subst hHeq
+  rfl
 
 
 
@@ -445,6 +457,209 @@ theorem T_typeIII_calT1_isCoherent [Finite G] (hyp : Hypothesis (G := G))
     hdiff_supp hcard2
 
 open scoped Classical in
+/-- T-side calT1 member differences are supported on A₁(T) = (T')#.
+
+This is the source-support input shared by the coherence construction and the (5.3.b)
+eta-orthogonality argument.  Normality of T' makes each induced character vanish off T',
+while the common linear source degree makes a member difference vanish at 1. -/
+theorem T_typeIII_calT1_difference_support [Finite G] (hyp : Hypothesis (G := G))
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    [Fintype ↥hyp.base.T] [Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
+    [Invertible (Nat.card ↥hyp.base.T : ℂ)]
+    [Invertible (Nat.card ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T)
+    (𝒯 : Finset (IrreducibleCharacter ((derivedInG hyp.base.T).subgroupOf hyp.base.T)))
+    (hlinear : ∀ θ ∈ 𝒯, (θ.toClassFunction :
+      ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) → ℂ) 1 = 1)
+    (calT1_set : Set (ClassFunction ↥hyp.base.T ℂ))
+    (hcalT1 : calT1_set = ↑(𝒯.image (fun θ => ClassFunction.induce
+      ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction))) :
+    ∀ a ∈ calT1_set, ∀ b ∈ calT1_set,
+      (a - b).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T := by
+  classical
+  haveI := hyp.base.finiteG
+  have hAK : OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T =
+      (derivedInG hyp.base.T : Set G) \ {1} :=
+    T_typeIII_sigmaSharp_eq hG hyp hIII
+  have hmemA : ∀ x : ↥hyp.base.T,
+      x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T ↔
+        (x ∈ (derivedInG hyp.base.T).subgroupOf hyp.base.T ∧ x ≠ 1) := fun x =>
+    OddOrder.Peterfalvi.S09.Cert.mem_supportInSubgroup_sharp_subgroupOf_iff
+      (derivedInG hyp.base.T) hAK x
+  haveI : ((derivedInG hyp.base.T).subgroupOf hyp.base.T).Normal :=
+    T_derivedSubgroupOf_normal hyp
+  intro a ha b hb
+  rw [hcalT1, Finset.mem_coe, Finset.mem_image] at ha hb
+  obtain ⟨θa, hθa, rfl⟩ := ha
+  obtain ⟨θb, hθb, rfl⟩ := hb
+  intro x hx
+  have hx0 : (ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T)
+        θa.toClassFunction
+      - ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T)
+        θb.toClassFunction) x ≠ 0 := ClassFunction.mem_support.mp hx
+  rw [ClassFunction.sub_apply] at hx0
+  have hxK : x ∈ (derivedInG hyp.base.T).subgroupOf hyp.base.T := by
+    by_contra h
+    apply hx0
+    rw [ClassFunction.induce_eq_zero_of_not_mem_normal θa.toClassFunction h,
+      ClassFunction.induce_eq_zero_of_not_mem_normal θb.toClassFunction h, sub_zero]
+  have hx1 : x ≠ 1 := by
+    rintro rfl
+    apply hx0
+    rw [ClassFunction.induce_apply_one, ClassFunction.induce_apply_one,
+      hlinear θa hθa, hlinear θb hθb, sub_self]
+  rw [hmemA x]
+  exact ⟨hxK, hx1⟩
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (5.3.b), T-side coherent images are orthogonal to the shared `η`-grid.**
+
+This is the subfamily form used in (14.9), Coq `coherent_ortho_cycTIiso`.  The coherent
+conjugate difference agrees with the Dade map on `A₁(T) = T_σ#`.  The latter is the restriction
+of the full type-`P₁` `A₀(T)` Dade map.  For a regular element of the shared cyclic group
+`W = W₁ × W₂`, the reconciled T-side type-`P` datum identifies that element with its
+`typePV`; the full Dade map therefore reads the source difference there, which is zero because
+the source is `A₁(T)`-supported.  Conjugacy invariance gives vanishing on the full regular-set
+saturation, and the (3.7)--(3.8) norm-two engine
+`eta_orthogonal_of_norm_one_pair_vanish` gives the desired individual orthogonality. -/
+theorem T_typeIII_coherent_image_inner_eta_eq_zero [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T)
+    [fintypeG : Fintype G] [invertibleG : Invertible (Nat.card G : ℂ)]
+    [Fintype ↥hyp.base.T] [Invertible (Nat.card ↥hyp.base.T : ℂ)]
+    {S : Set (ClassFunction ↥hyp.base.T ℂ)}
+    (hconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S)
+    (hnoReal : OddOrder.Peterfalvi.S03.HasNoRealCharacters S)
+    (hsupp : ∀ ζ ∈ S, (ζ - ζ.conj).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent (tSideDadeMap hyp hG) S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T))
+    {ζ : ClassFunction ↥hyp.base.T ℂ} (hζ : ζ ∈ S)
+    (hζirr : IsIrreducibleCharacter ζ) :
+    ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
+      ClassFunction.inner (coh.extension ζ) (hyp.base.eta i j) = 0 := by
+  have hfintype : fintypeG =
+      OddOrder.Peterfalvi.S12.FiniteInduce.finiteGFintype := Subsingleton.elim _ _
+  subst fintypeG
+  have hinvertible : invertibleG =
+      OddOrder.Peterfalvi.S12.FiniteInduce.natCardInvCG := Subsingleton.elim _ _
+  subst invertibleG
+  haveI := hyp.base.finiteG
+  classical
+  let side := (tSideDadeSupport_nonempty hG hyp).some
+  let dataT := (OddOrder.Peterfalvi.S15.reconciled_typePData_T hG hyp.base).choose
+  have hdata := (OddOrder.Peterfalvi.S15.reconciled_typePData_T hG hyp.base).choose_spec
+  have hU : dataT.U = hyp.base.V := hdata.1
+  have hW1 : dataT.W1 = hyp.base.W2 := hdata.2.1
+  have hW2 : dataT.W2 = hyp.base.W1 := hdata.2.2
+  have hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T := by
+    have hcls := OddOrder.BG.Ch4.S16.proposition_type_classification hG hyp.base.T_maximal
+    exact (hcls.2.2.1.mp (Or.inl hIII)).1
+  let full := (OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_typePA0_of_isTypeP1
+    hG hyp.base.T_maximal dataT hP1).some
+  have hPA : OddOrder.GroupTheory.typePA hyp.base.T dataT =
+      OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T :=
+    OddOrder.Peterfalvi.S10.typePA_eq_sigmaSharp_of_isTypeP1
+      hG hyp.base.T_maximal dataT hP1
+  have hA1A0 : OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T ⊆
+      OddOrder.GroupTheory.typePA0 hyp.base.T dataT := by
+    rw [← hPA]
+    exact Set.subset_union_left
+  have hA1norm : ∀ (l : ↥hyp.base.T) ⦃a : G⦄,
+      a ∈ OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T →
+        (l : G) * a * (l : G)⁻¹ ∈ OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T :=
+    side.dade.L_normalizes_A
+  let restricted := full.dade.restrict hA1A0 hA1norm
+  have hH : ∀ a, restricted.H a = side.dade.H a := by
+    intro a
+    rw [OddOrder.Peterfalvi.S04.Hypothesis.restrict_H,
+      full.H_eq_ftSupportKernel, side.H_eq_ftSupportKernel]
+    exact (OddOrder.Peterfalvi.S10.ftSupportKernel_restrict hA1A0 a.2).symm
+  have hdade : restricted = side.dade := dadeHypothesis_eq_of_H_eq hH
+  have hζc : ζ.conj ∈ S := hconj hζ
+  have hdiffSpan : ζ - ζ.conj ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.base.T) S :=
+    Submodule.sub_mem _ (Submodule.subset_span hζ) (Submodule.subset_span hζc)
+  have hdiffSupp := hsupp ζ hζ
+  have hdiffSupported : ζ - ζ.conj ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.base.T) S
+        (OddOrder.Peterfalvi.S04.supportInSubgroup
+          (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T) :=
+    ⟨hdiffSpan, hdiffSupp⟩
+  have hfullSupp : (ζ - ζ.conj).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.GroupTheory.typePA0 hyp.base.T dataT) hyp.base.T :=
+    hdiffSupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono hA1A0)
+  have hmaps : tSideDadeMap hyp hG (ζ - ζ.conj) =
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap full.dade
+        (full.dade.fullDadeIsometryData full.hconj) (ζ - ζ.conj) := by
+    rw [tSideDadeMap,
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support side.dade
+        (side.dade.fullDadeIsometryData side.hconj) hdiffSupp,
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support full.dade
+        (full.dade.fullDadeIsometryData full.hconj) hfullSupp]
+    rw [← hdade]
+    exact full.dade.dadeMap_restrict_apply hA1A0 hA1norm
+      ⟨ζ - ζ.conj, (ClassFunction.mem_supportedSubmodule).mpr hdiffSupp⟩
+  have hextDiff : coh.extension ζ - coh.extension ζ.conj =
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap full.dade
+        (full.dade.fullDadeIsometryData full.hconj) (ζ - ζ.conj) := by
+    rw [← hmaps, ← coh.extends_on_supported (ζ - ζ.conj) hdiffSupported, map_sub]
+  have hW : dataT.W = hyp.base.W := by
+    rw [dataT.W_eq, hW1, hW2, hyp.base.W_eq_join, sup_comm]
+  have hV : OddOrder.GroupTheory.typePV hyp.base.T dataT =
+      (hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G)) := by
+    simp only [OddOrder.GroupTheory.typePV, hW, hW1, hW2, Set.union_comm]
+  have hvanish : ∀ x ∈ OddOrder.GroupTheory.conjClassSet
+      ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G))),
+      (coh.extension ζ - coh.extension ζ.conj) x = 0 := by
+    intro x hx
+    obtain ⟨w, hw, g, hg⟩ := hx
+    rw [hextDiff]
+    rw [← (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap full.dade
+      (full.dade.fullDadeIsometryData full.hconj) (ζ - ζ.conj)).of_isConj
+        (isConj_iff.mpr ⟨g, hg⟩)]
+    have hwV : w ∈ OddOrder.GroupTheory.typePV hyp.base.T dataT := hV.symm ▸ hw
+    have hwA0 : w ∈ OddOrder.GroupTheory.typePA0 hyp.base.T dataT :=
+      Set.mem_union_right _ (OddOrder.GroupTheory.subset_conjClassSetIn hwV)
+    rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support full.dade
+      (full.dade.fullDadeIsometryData full.hconj) hfullSupp]
+    let a : {a : G // a ∈ OddOrder.GroupTheory.typePA0 hyp.base.T dataT} := ⟨w, hwA0⟩
+    have hwh : w ∈ full.dade.hCoset a := ⟨1, full.dade.H a |>.one_mem, by simp [a]⟩
+    rw [full.dade.isDadeMap_dadeMap.map_eq_of_mem_hCoset _ a hwh]
+    by_contra hne
+    have hwSupp : (⟨w, full.dade.mem_L hwA0⟩ : ↥hyp.base.T) ∈
+        (ζ - ζ.conj).support := ClassFunction.mem_support.mpr hne
+    have hwSigma : w ∈ OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T := hdiffSupp hwSupp
+    have hwDeriv : w ∈ derivedInG hyp.base.T := by
+      rw [OddOrder.BG.Ch4.S16.isTypeP1_derivedInG_eq_Msigma
+        hG hyp.base.T_maximal hP1]
+      exact hwSigma.1
+    exact (OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived dataT hwV) hwDeriv
+  have hpsiZ : coh.extension ζ ∈ ZIrr G :=
+    coh.extension_mem_ZIrr ζ (Submodule.subset_span hζ)
+  have hconjZ : coh.extension ζ.conj ∈ ZIrr G :=
+    coh.extension_mem_ZIrr ζ.conj (Submodule.subset_span hζc)
+  have hpsi1 : ClassFunction.inner (coh.extension ζ) (coh.extension ζ) = 1 := by
+    rw [coh.extension_inner_eq ζ ζ (Submodule.subset_span hζ) (Submodule.subset_span hζ)]
+    exact hζirr.inner_self_eq_one
+  have hconj1 : ClassFunction.inner (coh.extension ζ.conj) (coh.extension ζ.conj) = 1 := by
+    rw [coh.extension_inner_eq ζ.conj ζ.conj (Submodule.subset_span hζc)
+      (Submodule.subset_span hζc)]
+    exact hζirr.conj.inner_self_eq_one
+  have hcross : ClassFunction.inner (coh.extension ζ) (coh.extension ζ.conj) = 0 := by
+    rw [coh.extension_inner_eq ζ ζ.conj (Submodule.subset_span hζ)
+      (Submodule.subset_span hζc), OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr.conj,
+      if_neg (fun h => hnoReal hζ h.symm)]
+  intro i j
+  have h := eta_orthogonal_of_norm_one_pair_vanish hyp.base hpsiZ hconjZ hpsi1 hconj1
+    hcross hvanish i j
+  rw [OddOrder.RepresentationTheory.inner_conj_symm, h, star_zero]
+
+open scoped Classical in
 /-- **Peterfalvi (14.9), the Γ-Bessel assembly skeleton** — the *proven* structural core of the
 character body, isolating the char-cascade carriers as precisely-named hypotheses.  Coq
 `FTtypeP_min_typeII` (PFsection14.v:764--853): given the coherent `τ₁`-image family `calT1`
@@ -625,95 +840,20 @@ theorem T_side_caseB_facts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 sole deep obligation of (14.9).  Coq `PFsection14` `FTtypeP_min_typeII`, lines 737--853: assuming `T`
 is type III, build `calT1 = seqIndD QV T QV Q` (the degree-`p` induced characters of `T`, from
 `T' = Q ⊔ V` via `T_deriv_eq_QV`), coherent by uniform-degree coherence
-(`S07.coherent_of_constant_degree` / Coq `uniform_degree_coherence`).  Now **reduced to the proven
-Γ-Bessel skeleton** `T_typeIII_ratio_le_of_gamma_bridge` (above), which discharges all the
-orthonormal-family Bessel arithmetic; this theorem supplies the skeleton's four precisely-named
-char-cascade carriers (`hcount`/`horth`/`hdecomp`+`hΓ₁`+`hx`/`hnorm`), kept jointly as its single
-documented residual `sorry`.  Via the `S`-side `βₛ` bridge
-gap `Γ`, `⟨Γ, τ₁ ζ⟩ ≡ 1 (mod 2)` for each `ζ ∈ calT1` (Coq `nzT1_Ga`, using
-`cfdot_real_vchar_even`), so `|⟨Γ, τ₁ ζ⟩|² ≥ 1`; then `orthogonal_split` + Bessel give
-`(v − 1)/p = p · |calT1| ≤ ⟨Γ, Γ⟩ ≤ (u − 1)/q`.
+(`S07.coherent_of_constant_degree` / Coq `uniform_degree_coherence`).
 
-The `|calT1| = (v − 1)/p` step is *structural* (Coq line 836--845: `size calT1 = (v.-1) %/ p` from
-`v = |V/Q|` and the degree-`p` induction), so this bound does **not** re-derive the exact `v`-value;
-it is exactly the type-III Γ-bridge estimate whose `>` counterpart (14.8) `key_inequality` then
-contradicts.  Kept as the single precisely-named character residual of (14.9).
+The T-side inputs are now fully constructed: `T_typeIII_calT1_family` and its orbit count give
+`|calT1| = (|V|−1)/p`; `T_typeIII_calT1_isCoherent` supplies the coherent extension; the direct
+(13.4) producer `T_side_caseB_facts` gives `D = ⊥`, hence `|V| = v`; and
+`T_typeIII_coherent_image_inner_eta_eq_zero` proves every coherent image orthogonal to the shared
+`eta`-grid by restricting the full type-P1 Dade map and applying the norm-two rigidity engine.
 
-**Blocker map (why this stays sorried; lane-c 2026-07-06).**  The Coq spine needs four missing
-pieces, none supplied by the `S16_PairingBessel` M-side template (which inducts from the *full*
-`Irr(M')` via a Frobenius `(T, M', C)` and counts fibers with `card_index_mul_sum_induced_family_
-degree_sq` — *not* the quotient-restricted `Irr(QV/Q)` family with a `W₁`-orbit count):
-
-1. **`v = |V|`** (Peterfalvi (13.12), `d = 1`, i.e. `D = V ⊓ C_G(Q) = ⊥`).  Coq's `v := |V|` is
-   *definitional* (PFsection14.v:66/422) so its `(v−1)/p` bound is literally `(|V|−1)/p`; the Lean
-   `Hypothesis.v` is a **free** ℕ with only `card_V_eq_vd : |V| = v·d`, so `v = |V|` iff `d = 1`.
-   That is `S15.V_inf_centralizer_Q_eq_bot` — currently **sorried and gated on `IsTypeII T`**, hence
-   unavailable in this type-III branch.  Without it, the honest `|calT1| = (|V|−1)/p` cannot be
-   identified with the goal's `(v−1)/p`.  (`T_card_quot_Q_derived_eq_card_V` above supplies the
-   `|QV/Q| = |V|` half; the `|V| = v` half is the missing (13.12).)
-2. **The `calT1` family + its `|calT1| = (v−1)/p` count.**  Needs (a) inflation `Irr(QV/Q) ↪
-   {χ ∈ Irr QV | Q ⊆ ker}` (available: `RepresentationTheory.InflationCharacter`), (b)
-   `Ind_{QV}^T`-irreducibility for nonprincipal inflated sources via `I_T(θ) = QV` — reduced below to
-   two general rep-theory bricks, **both now available as shared infra**, so no longer missing — and
-   (c) the `/p` **orbit count**, landed as reusable shared infra
-   `RepresentationTheory.card_image_induce_eq_div` (`OrbitOnIrr.lean`):
-   `|T.image (Ind_H^G)| = |T| / [G:H]` for a conjugation-invariant `T ⊆ Irr H` with `I_G(θ) = H`
-   throughout — the cardinality analogue of the M-side degree-square `sum_div_normSq_induce_image_eq`,
-   built from `card_filter_induce_eq_index_inertia`.  With (a)+(c) in hand the count reduces to (b).
-
-   The residual (b) — `I_T(inflate θ) = QV` for nonprincipal `θ ∈ Irr(QV/Q)` (Coq
-   `irr_induced_Frobenius_ker` + `injm_Frobenius_ker` through the quotient, PFsection14.v:757--762) —
-   is packaged as the reusable brick `inertia_inflate_eq_of_frobeniusQuotient` (this file):
-   `I_G(inflate θ̄) = H` from a Frobenius quotient `G/N` with kernel `H/N`, via
-   `inertia_eq_of_frobeniusGroup` (⟹ `I_{G/N}(θ̄) = H/N`) + the inertia/inflation bridge
-   `mem_inertia_compHom_iff` (`ConjugationBrauer.lean`) + `comap_map_eq_self` (`N ≤ H`).  Its input,
-   the quotient Frobenius `T/Q = (QV/Q) ⋊ (W₂Q/Q)`, is transported (`isFrobeniusGroup_map_equiv`)
-   from the **intrinsic** `U ⋊ W₁` Frobenius `T_typeIII_UW1_frobenius` through `mk' Q` (injective on
-   `U ⊔ W₁` since `Q ⊓ (U ⊔ W₁) = ⊥`) — **ungated**, replacing the earlier abstract-`V ⋊ W₂`
-   (`S15.isMulCommutative_V`) route that was gated through the sorried `reconciled_typePData_T`.
-   Likewise `U` abelian is the intrinsic `td.U_commutative` (ungated), not the gated abstract-`V`
-   abelianness.  See the (now-`UNGATED`) escape-hatch conclusion below.
-3. **A full `S07.Hypothesis` (5.2) instance for `calT1`** (the (12.1) T-side Dade `tauT` +
-   `difference_image`/`no_real`/`pairwise_orthogonal`/`tau_isometry_diff`), to feed
-   `coherent_of_constant_degree`.  This is the T-side coherence package, itself separately gated.
-4. **The `S`-side βₛ bridge gap `Γ`** and `⟨Γ, τ₁ζ⟩ ≡ 1 (mod 2)` (Coq `nzT1_Ga`, via
-   `S09.cfdot_real_vchar_even`), then `orthogonal_split` + Bessel.  `Γ` needs the full S-side
-   (13.x)/(14.x) βₛ construction (cf. the `S16_NonExistenceG` βₛ-grid sorry at ~line 6377).
-
-Escape-hatch conclusion (**revised 2026-07-06, lane-c** — the count is now known **UNGATED**; this
-corrects an earlier lane-c note that wrongly called items 2/b "gated behind `IsTypeP2 T`").  The
-`IsTypeP2` gate is **bypassed by working with the *intrinsic* type-III datum** `td = hIII.some :
-TypeIIIData T` (NOT the abstract Hypothesis `V`/`W₂`, whose reconciliation to `td` is the sorried
-`S15.reconciled_typePData_T`).  Its factors `td.typeP.U`/`td.typeP.W₁` supply, **all ungated**:
-
-* `td.U_commutative : IsMulCommutative ↥td.typeP.U` (⟹ `QV/Q ≅ U` abelian ⟹ `|Irr(QV/Q)| = |V|`);
-* `T_typeIII_UW1_frobenius` — the `U ⋊ W₁` Frobenius (`S11.typeP_uW1_frobenius td.typeP td.common.1`,
-  Coq `frobVW2`), the ungated source of the quotient Frobenius `T/Q` for the inertia fact;
-* `T_typeIII_card_W1 : |td.typeP.W₁| = p` and `T_typeIII_card_U : |td.typeP.U| = |V|` — canonical
-  (both sides are intrinsic indices `[T:T']`, `[T':M_F]`), so **no** abstract-`V`/`W₂`
-  reconciliation.
-
-Landed ungated + green: the group-theoretic foundation (`T_derived_index_eq_p`,
-`T_Q_isComplement_V_derived`, `T_card_quot_Q_derived_eq_card_V`, `T_derivedSubgroupOf_normal`), the
-orbit-count engine `calT1_image_induce_card_eq` (`|{Ind_{QV}^T θ}| = |𝒯|/p` for conj-invariant
-inertia-`QV` `𝒯`), the reusable inflation-quotient inertia brick
-`inertia_inflate_eq_of_frobeniusQuotient` (`I_G(inflate θ̄) = H` from a Frobenius quotient `G/N`,
-kernel `H/N`), the four intrinsic facts above, and the **no-`sorry` assembly skeleton**
-`T_typeIII_calT1_card_eq` producing `|calT1| = (|V|−1)/p` from the count engine + `|𝒯| = |V|−1`.
-
-The remaining `|calT1| = (|V|−1)/p` work is **pure transcription, ungated** (not a gate): discharging
-the skeleton's `hcard`/`hconj`/`hinertia` by (i) building `𝒯` = non-principal inflated `Irr(QV/Q)`,
-(ii) the `Q`-complement `IsComplement' (Q.subgroupOf T) ((U ⊔ W₁).subgroupOf T)` → iso
-`↥T/Q ≅ U ⊔ W₁` → quotient Frobenius `T/Q` via `isFrobeniusGroup_map_equiv` (feeding
-`inertia_inflate_eq_of_frobeniusQuotient`), (iii) `|𝒯| = |V|−1` via `inflate_injective` +
-`T_typeIII_card_U` + `card_irreducibleCharacter_eq_card_of_commGroup`, (iv) conj-invariance via
-`conjBy_compHom_eq_compHom_conjBy`.  All bricks for (i)-(iv) are landed/verified.
-
-Then the *full* (14.9) `T_typeIII_ratio_le` bound still needs, beyond `|calT1| = (|V|−1)/p`:
-item 1 (`v = |V|`, i.e. (13.12) `d = 1`, separately lane-b-gated — the `(|V|−1)/p → (v−1)/p`
-substitution), item 3 (the T-side coherence package `S07.Hypothesis` feeding
-`coherent_of_constant_degree`), and item 4 (the S-side `Γ` bridge + `nzT1_Ga` + `orthogonal_split`
-Bessel).  Those remain the documented residual of the character body. -/
+Consequently the sole residual is the S-side gap parity statement: integers `x_ζ` with
+`⟨Γ, τ₁ζ⟩ = x_ζ ≠ 0` for every `ζ ∈ calT1` (Coq `nzT1_Ga`, using
+`cfdot_real_vchar_even`).  Once supplied, the proven Γ-Bessel skeleton
+`T_typeIII_ratio_le_of_sSide_gap` combines orthogonality, the exact count, and the concrete
+(13.18.d) bound `betaData.Y_norm_bound` to obtain
+`(v − 1)/p ≤ (u − 1)/q`, contradicting the strict (14.8) inequality. -/
 theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T) :
     ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) ≤
@@ -766,8 +906,9 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [hncard, Nat.le_div_iff_mul_le hyp.base.p_prime.pos]
     omega
   -- The T-side coherence: `τ₁ = hτ.extension`, `IsCoherent (tSideDadeMap) calT1_set A₁(T)`.
-  obtain ⟨hyp07, _htau, ⟨hτ⟩⟩ :=
+  obtain ⟨hyp07, htau, ⟨hτ⟩⟩ :=
     T_typeIII_calT1_isCoherent hyp hG hIII 𝒯 hinertia hlinear hne hconj𝒯 calT1_set hcalT1 hcard2
+  rw [htau] at hτ
   -- `calT1 := τ₁(calT1_set)`, the coherent-image `Finset` in `CF(G)`.
   set calT1 : Finset (ClassFunction G ℂ) :=
     calT1_set.toFinset.image (⇑hτ.extension) with hcalT1img
@@ -844,21 +985,30 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [hcalcard, hsourcecard, hVcard]
     exact Nat.cast_div hpdiv (Nat.cast_ne_zero.mpr hyp.base.p_prime.ne_zero)
   -- **The gated `S`-side `βₛ` bridge content** (one documented residual `sorry`), now reduced
-  -- to the gap coefficients and their η-grid orthogonality:
+  -- to the gap coefficients alone:
   --   • `hxcoe`/`hx` = the `S`-side gap coefficients `⟨Γ, ζ⟩ = x_ζ ∈ ℤ` with parity nonzeroness
   --     `x_ζ ≠ 0` (Coq `nzT1_Ga`, via `S09.cfdot_real_vchar_even`);
-  --   • `heta` = every coherent image is orthogonal to the η-grid.
   -- The gap itself and the genuine (13.18.d) projected norm are the concrete, correctly stated
   -- `betaData_of_grid.Gamma` and `Y_norm_bound`; they are no longer part of this residual.
   let betaData := OddOrder.Peterfalvi.S15.betaData_of_grid hG hyp.base
     ⟨1, hyp.base.p_prime.one_lt⟩ (by simp)
-  obtain ⟨x, hxcoe, hx, heta⟩ :
+  obtain ⟨x, hxcoe, hx⟩ :
       ∃ (x : ClassFunction G ℂ → ℤ),
         (∀ a ∈ calT1, ClassFunction.inner betaData.Gamma a = ((x a : ℝ) : ℂ)) ∧
-        (∀ a ∈ calT1, x a ≠ 0) ∧
-        (∀ a ∈ calT1, ∀ (i : Fin hyp.base.q) (k : Fin hyp.base.p),
-          ClassFunction.inner a (hyp.base.eta i k) = 0) := by
+        (∀ a ∈ calT1, x a ≠ 0) := by
     sorry
+  have hdiff_supp := T_typeIII_calT1_difference_support
+    hyp hG hIII 𝒯 hlinear calT1_set hcalT1
+  have heta : ∀ a ∈ calT1, ∀ (i : Fin hyp.base.q) (k : Fin hyp.base.p),
+      ClassFunction.inner a (hyp.base.eta i k) = 0 := by
+    intro a ha i k
+    rw [hcalT1img, Finset.mem_image] at ha
+    obtain ⟨ζ, hζT, rfl⟩ := ha
+    rw [Set.mem_toFinset] at hζT
+    exact T_typeIII_coherent_image_inner_eta_eq_zero hG hyp hIII
+      hyp07.conjugate_closed hyp07.no_real_characters
+      (fun χ hχ => hdiff_supp χ hχ χ.conj (hyp07.conjugate_closed hχ))
+      hτ hζT (hirr ζ hζT) i k
   exact T_typeIII_ratio_le_of_sSide_gap hyp calT1 horth hcount
     betaData.Gamma x hxcoe hx heta betaData.Y_norm_bound
 
