@@ -104,3 +104,24 @@ card_kappaHall_lt_of_isTypeIIIorIV) は Phase 1 後の残消費を調査の上�
 **着手順の判断**: Phase 2 (hB cover-bound engine、hypothesis-parameterized) は
 taint と独立な純 genuine math で設計リスクなし → **次 tick は Phase 2 から**
 (Phase 1a の refactor は影響全数調査と併せて fresh context で)。
+
+## 2026-07-11 tick⁸ — ★★ Phase 2 完結 (hB の数学が全て landed)
+
+`Hypothesis.g1_div_le_of_partner` (MaximalBasic、axiom-clean) が estimate の
+hB sorry と同形の ℚ 不等式を hypothesis-parameterized で完全証明。積み上げ
+(全て axiom-clean、commits 20d5db9a…d9502c0a + 本 commit):
+V-capture / Hall 共役 / 被覆コア / union-bound 計数 (generic + H#) /
+W-分解 / V-order / 支持制限 (Ã₀∩cop ⊆ Ã) / Nat-count bound / ℚ 除算。
+
+**Phase 3 (次)**: 供給 8 hypothesis の discharge を pair leaf 下流の新 leaf
+(S12_Noncoherence) で:
+- hprime = w₂ prime (dII.common / theorem88_caseB_prime_orders 系)
+- hcop = typePData_W1_hall_coprime
+- hHall = (8.11) hall_maxNilpotentNormalHall_and_mainSubgroup (閉鎖済!)
+- hcent = (8.6.a) — 要 port 確認 (§8 の type-II TI clause)
+- hfrobcap = (10.7)' typeII_HU_frobenius_of_coherent' の kernel-centralizer 帰結
+  (IsFrobeniusGroup.centralizer_kernel_le、subgroupOf 橋)
+- hW1card/hW2card/hWcard = pair の W-block pin (mp.Kstar_eq 系 +
+  card_mul_eq_of_disjoint_sup_le_isCyclic (FTS:1167))
++ estimate/S_not_coherent の hypothesis-parameterized 変種を MaximalBasic に
+  並設 → 無条件版を S12_Noncoherence で (13.2.a)-circle 回避 (Phase 1a) と併せて。
