@@ -180,3 +180,129 @@ FTS 閉包は S12_TypeII* leaf を含まない — S13_CoreStructure/S13_Orthogo
   代替。なお S12_TypeIIFrobenius は FeitThompsonSetup を import しない (逆も無い) —
   gate の pair-witness 再構成時は gate 側 (or 新 leaf) が FTS を import する方向で
   cycle なし (確認済)。
+
+## 2026-07-10 part 1.6 LANDED (d5809411): T-side producer — sourcing gap CLOSED
+
+`exists_section16_partner_typePData (hG) (mp) : ∃ dataT : TypePData mp.T,
+dataT.W1 = mp.Kstar ∧ dataT.W2 = mp.K` — sorry-free / axiom-clean (3-standard)。
+**P₂ 不要**。pair 層の仮説対 (dataT, hTW1) はこれで完全 discharge 可能。
+
+### route (a)/(b) の判定根拠
+- **(a) は P₂ 必須と確定**: 供給 lemma 3 本のうち `typeP_hall_derived_eq_and_abelian`
+  (BG 15.1(b)) は実は **P₂-free** (K ≠ ⊥ のみ) だが、
+  `typeP2_mf_internal_fitting_decomposition` (BG Cor 15.5) は冒頭で
+  `M_F = M_σ` (⟸ `msigma_isNilpotent_of_isTypeP2`) を本質使用。非 P₂ の partner T では
+  M_σ が nilpotent でなく M_F < M_σ となりうるため、(κ∪σ)'-Hall U は M_F を T′ 内で
+  補完しない (hDcompl が偽) — U を Hall で選ぶ (a) 型の構成は T-side では成立しない。
+- **(b) を採用**: 任意 witness data₀ (typePData_of_isTypeNonI mp.T_nonI) の
+  **complement U/構造 field を作り直さず丸ごと共役移送**。data₀.W1 と mp.Kstar は
+  どちらも T′ の補群 (data₀.M_complement / `typeP_derivedInG_isComplement_kappaHall`
+  — 後者は IsTypeP のみで ungated) → Schur–Zassenhaus 共役
+  (`IsComplement'.exists_conj_of_coprime`、coprime |T′| [T:T′] は
+  `coprime_card_derived_kappaHall_of_isComplement'`、T′.subgroupOf T normal は
+  = commutator ↥T via comap_map_eq_self_of_injective) → conjugator n ∈ T →
+  G-level lift (subtype-comp 橋 + map_subgroupOf_eq_of_le ×2) →
+  `TypePData.conj` (MaximalSubgroupTypeConj:462、全 20 field 移送済の既存資産!) +
+  `hgT ▸` cast-back (hgT : conj g • T = T、projection は fresh-index subst 補題) 。
+  S15 CountingLayer:340-385 の `exists_typePData_U_eq_V` が同型 pattern の precedent。
+
+### 発見した既存資産 (調査で判明、再構築を回避)
+- `TypePData.conj (φ : MulAut G) : TypePData M → TypePData (φ • M)` — 完全な
+  automorphism-equivariance が **既に formal 化済** (GroupTheory/MaximalSubgroupTypeConj)。
+- S15 の `reconciled_typePData_T` (CountingLayer:757) は S15-Hypothesis 文脈の
+  同型ゴール (data.W1 = hyp.W2 等) を Fact A/B (κ-Hall + Msigma⊓C 同定) 経由で組む —
+  ただし S15 文脈では Fact B (`W1_eq_Msigma_T_inf_centralizer_W2`) が別途 gated。
+  **mp 文脈では Fact A = mp.Kstar_hall / Fact B = mp.K_eq が structure fields** ゆえ
+  本 producer は完全 ungated で閉じた (これが mp-文脈の決定的アドバンテージ)。
+- ⚠ 唯一の実装ハマり: `MulAut G` の `Subgroup` への smul は `open scoped Pointwise` 必須
+  (HSMul synth 失敗で発覚)。
+
+### 残 (part 2 本体、次 iteration)
+1. **grid 指標レベルの σ-同定** ((3.5)-determination or (3.7) 係数 rigidity) —
+   certainTypeOmegaSigma (S-side) ↔ alignedOmegaSigmaGrid (M-side) の per-index 対応。
+   pair 層の CF(W,V)-一致 (完成) が土台。
+2. scope item 3 (type-II L → canonical partner 還元 glue、theorem88_caseB +
+   typeP_duality) + item 4 (行和 pin 変換)。
+3. gate `exists_typeIICrossIsometryData` の pair-witness 再構成時は gate 側が
+   FeitThompsonSetup (or 本 leaf) を import する (cycle なし確認済)。
+
+## 2026-07-10 part 1.7 LANDED (98fb466d): item 3 還元 glue — disjunction 版
+
+3 宣言 sorry-free / axiom-clean (3-standard):
+- `section16_S_isTypeII` — IsTypeII mp.S (S_typeP2 + `isTypeII_of_isTypeP2` dictionary)
+- `conj_eq_S_or_conj_eq_T_of_isTypeII` — 任意 type-II maximal L について
+  (∃g, conj g • L = mp.S) ∨ ((∃g, conj g • L = mp.T) ∧ **IsTypeII mp.T**)。
+  theorem88_caseB → type-I 枝は `not_isTypeI_of_isTypeNonI` (IsTypeNonI = 4-or の
+  Or.inl) で排除、T-枝は `isTypeII_pointwise_smul` で type-II 証明書付与。
+- `exists_conj_eq_S_of_isTypeII` — 条件付き strong 形 (仮説 ¬IsTypeII mp.T)。
+
+### ★ T-枝の排除可否判定 (調査結果): 無条件 strong 版は成立しない
+- **Peterfalvi (13.2.a) は片方向**: mmd 原文 "S is of Type II or Type III.
+  If q<p, then S is of Type II" — 小さい側の type-II を保証するだけで、大きい側
+  T の type-II を**排除しない** (T が type II の可能性は理論上 open)。
+- **Coq も同様**: PFsection10 `Frob_der1_type2` の M-枝 kill は
+  `rewrite defL FTtypeJ` + **文脈仮説 notMtype2** (§10 の ambient M が type 2 でない
+  という section hypothesis) — 無条件の排除は Coq にも無い。
+- **設計対応**: disjunction + 証明書 + 条件付き strong の 3 段 API。T-枝が発火した
+  場合は IsTypeII mp.T 証明書付きで、pair 機構は S/T 対称
+  (exists_section16_partner_typePData で T-side TypePData も取れる) ゆえ消費側
+  ((10.7) gate の pair-witness 再構成) で対称に処理できる。gate 側が
+  notMtype2-相当の文脈 (M-side は §10 の Hypothesis M で type III/IV/V) を持つ
+  場合は strong 形が直接効く。
+
+### issue scope 総括 (part 1–1.7 で landed 済 / 残)
+- ✅ item 1 (σ-grid pair transpose bridge の CF(W,V) 層): part 1 + 1.5
+- ✅ item 2 (pair 対称化 / V-W 共有): part 1.5 + 1.6 (T-side producer)
+- ✅ item 3 (type-II L → canonical partner 還元): part 1.7 (disjunction 版)
+- ⏳ item 4 (行和 pin 変換) + **part 2 本体** (grid 指標 per-index σ-同定 =
+  (3.5)-determination or (3.7) 係数 rigidity) — 次 iteration。
+
+## 2026-07-10 part 2 第一陣 LANDED (6dfc4e9e): (3.5)-determination core
+
+### route 判定: (a) 採用、(b) は不要と確定
+- **書籍 (3.5) は存在文のみ** (mmd 04.5 確認: "There is an orthonormal family (χ_ij) …" —
+  一意性 clause 無し)。証明の交叉組合せ論 ((3.5.2)/(3.5.4)) が実質 family を pin する。
+- **Coq の形式化が正解形**: `eq_in_cycTIiso` (PFsection3.v:1750) =
+  「φ ∈ dirr G が V 上 ω と一致 ⟹ φ = σω」— **σ-像は V-制限だけで pin される**。
+  pair transpose 同定 `cycTIisoC` (1849) はこれ + V の swap 不変性 (setUC =
+  自分の ticyclic_Vdiff_eq_of_swap!) + (3.2.c) restrict で **2 行**。
+  PFsection10:632 の `etaC i j : sigS (w_ j i) = eta_ i j` が (10.7) での消費形。
+- **(b) との関係**: 本 route が消費する (3.7)/(3.8) は S05_SigmaTrichotomy の自レーン
+  既存 engine (`sigmaCoeff_eq_zero_of_vanishOnV`) のみ — **9076 (lane c、§3 rigidity
+  eq_signed_sub_cTIiso) への依存ゼロ**。境界侵犯なし。
+
+### landed (3 宣言、S05-generic、GenericBridge 節)
+- `inner_intCast_of_mem_ZIrr` — ZIrr×ZIrr 内積整数性 (右 slot span 帰納)。
+  ⚠ upstream hoist 候補 (ZIrrFourier.lean が自然な家)。
+- `ticyclic_V_nonempty` — V ≠ ∅ (supportInVdiffEquiv.symm、W₁/W₂ 非自明)。
+- **`ticyclic_eq_sigma_omega_of_eqOn_V`** (eq_in_cycTIiso の Lean 版) —
+  φ ∈ ZIrr、⟨φ,φ⟩ = 1、φ|_V = ω(ξ)|_V ⟹ φ = σ(ω(ξ))。
+  Coq mirror 証明: c = ⟨φ,σω⟩ ∈ ℤ; ‖σω∓φ‖² = 2∓2c ≥ 0 → c ∈ {-1,0,1};
+  c=1 → 正定値性で φ = σω / c=0 → ‖ψ‖²=2 + ψ|_V=0 → 全 σ-係数 0
+  (sigmaCoeff_eq_zero_of_vanishOnV) が ⟨ψ,σω⟩=1 と矛盾 / c=-1 → ω が非空 V 上
+  0 (linear char の unit 値と矛盾)。
+
+### 残 assembly (part 2 第二陣、fresh agent 向け設計):
+Coq `cycTIisoC` の Lean 版 = **pair 両側 σ の per-index 同定**:
+```
+σ_T (ω_T(ξ')) = σ_S (ω_S(ξ))   (ξ' = ξ の swap-transport)
+```
+手順 (全部品 landed 済):
+1. hyp_S := typePData_toTICyclicHypothesis tp.Sdata hodd / hyp_T := 同 dataT
+   (dataT := exists_section16_partner_typePData で取得)。
+2. ξ' : hyp_T.W →* ℂˣ を ξ : hyp_S.W →* ℂˣ から W-同一性 (section16_pair 系の
+   hW : hyp_S.W = hyp_T.W、derivable) で transport — **MonoidHom.comp
+   (Subgroup.inclusion hW.ge)-流の値レベル transport を推奨** (part-1 の
+   ticyclicSupportedOnVCongr と同型、cast ゼロ)。
+3. apply `ticyclic_eq_sigma_omega_of_eqOn_V` (hyp := hyp_T, ξ := ξ',
+   φ := σ_S(ω_S(ξ))): hφZ = sigma_mem_ZIrr (ω ∈ ZIrr)、hφ1 = sigma_inner +
+   irr norm 1 (or chiFam_spec 対角)、hφV = (3.2.c) sigma_apply_irreducible… on
+   S-side + V-同一 (section16_pair_tic_V_eq) + ω_S/ω_T の V 上一致 (値レベル、
+   transport の rfl-性)。
+4. 帰結: alignedOmegaSigmaGrid (M-side) と certainTypeOmegaSigma (S-side、
+   typeIIHypothesis46 の ticVdiff — こちらの V/W と typePData bridge の V/W の
+   一致 lemma が追加で要る可能性 → 要確認) の per-index 翻訳、そして item 4
+   (行和 pin 変換) へ。
+注意: ω_S(ξ) の IrreducibleCharacter norm: hφ1 は
+`sigma_inner_irreducibleCharacter` + `irreducibleCharacter_inner_eq_ite` (対角) で
+1 行のはず。

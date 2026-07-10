@@ -44,21 +44,36 @@ as the bridge for identifying the `S`-side σ-grid (`certainTypeOmegaSigma`) wit
   whose `W₁` is the dual factor `mp.Kstar` has `W₂ = mp.K` (the (8.4.b) centralizer law) and
   shares `W` and `V` with the reconciled `mp.S`-side `tp.Sdata`, so the two
   `typePData_toTICyclicHypothesis` bridges have equal Dade maps and σ's on `CF(W, V)`.
+* `exists_section16_partner_typePData`: the `T`-side **producer** — a `TypePData mp.T` with
+  `W₁ = mp.Kstar` (hence `W₂ = mp.K`) exists, by Schur–Zassenhaus conjugation of the datum
+  of `typePData_of_isTypeNonI` (no `IsTypeP2 mp.T` needed).  This discharges the hypothesis
+  pair `(dataT, hTW1)` of the packaging lemmas above.
+* `conj_eq_S_or_conj_eq_T_of_isTypeII` / `exists_conj_eq_S_of_isTypeII`: the (10.7)
+  **reduction glue** — every type-II maximal subgroup is conjugate to `mp.S`, or to `mp.T`
+  with the certificate `IsTypeII mp.T` (Peterfalvi (13.2.a) does not exclude a type-II
+  partner; the strong form takes `¬ IsTypeII mp.T` as a hypothesis, mirroring Coq's
+  contextual `notMtype2`).
+
+* `ticyclic_eq_sigma_omega_of_eqOn_V`: the **(3.5)-determination** (Coq `eq_in_cycTIiso`) —
+  a norm-one virtual character agreeing with the linear character `ω` on `V` *is* `ω^σ`.
+  The grid vectors are pinned by their `V`-restrictions, which is what identifies the two
+  σ-grids of a pair per index (Coq `cycTIisoC`; the assembly is the remaining step of
+  issue 9079 part 2).
 
 ## Design note
 
-On non-`V`-supported class functions (e.g. the grid characters `ω_{ij}` themselves) the two
-`σ`'s are *not* identified by this file: `σ` is built from a choice of the (3.5) family
-`chiFam`, and only its restriction to `CF(W, V)` is pinned by the Dade map (via
-`sigma_eq_tau`).  Identifying the full grids requires the (3.5)-determination / coefficient
-rigidity step ((3.7)-style), which is part 2 of the transpose (issue 9079).
+On non-`V`-supported class functions, `σ` is built from a choice of the (3.5) family
+`chiFam`, and its restriction to `CF(W, V)` is pinned by the Dade map (`sigma_eq_tau`);
+the σ-image of a single grid character `ω` is nevertheless pinned by its `V`-restriction
+alone (`ticyclic_eq_sigma_omega_of_eqOn_V`, the (3.7)/(3.8)-counting uniqueness).
 
 For the canonical pair, only the `S`-side `TypePData` is canonically reconciled to the pair
 factors (`tp.Sdata` with `Sdata_W1_eq`; the `W₁`-prescribing producer
 `exists_typePData_W1_eq_of_isTypeP2` is gated on type `P₂`, which `Section16MaximalPair`
-pins only for `S` via `S_typeP2`).  The pair lemmas therefore take the `T`-side datum as a
-hypothesis `(dataT : TypePData mp.T) (hTW1 : dataT.W1 = mp.Kstar)` — the exact shape that
-producer emits — and derive everything else; see issue 9079 for the sourcing gap record.
+pins only for `S` via `S_typeP2`).  The pair lemmas take the `T`-side datum as a hypothesis
+pair `(dataT : TypePData mp.T) (hTW1 : dataT.W1 = mp.Kstar)`, and
+`exists_section16_partner_typePData` supplies it `P₂`-free — by Schur–Zassenhaus conjugacy
+of complements of `T'`, transported through the whole-datum `TypePData.conj`.
 -/
 
 namespace OddOrder.Peterfalvi.S12
@@ -268,6 +283,158 @@ theorem ticyclic_sigma_congr_eq
   ticyclic_sigma_eq_of_V_eq hyp₁ hyp₂ hVeq₁ hVeq₂ hV app₁ app₂ α
     (ticyclicSupportedOnVCongr hyp₁ hyp₂ hV hW α) (fun _ _ _ => rfl)
 
+/- The (3.5)-determination: a ±irreducible agreeing with `ω` on `V` *is* `ω^σ` -/
+
+/-- Integrality of the inner product on `ZIrr` (both slots): `⟨φ, η⟩ ∈ ℤ` for virtual
+characters `φ, η`.  Right-slot span induction over `Irr(G)` on top of the single-irreducible
+case `mem_ZIrr_inner_int`. -/
+theorem inner_intCast_of_mem_ZIrr {φ η : ClassFunction G ℂ}
+    (hφ : φ ∈ ZIrr G) (hη : η ∈ ZIrr G) :
+    ∃ m : ℤ, ClassFunction.inner φ η = (m : ℂ) := by
+  rw [ZIrr_eq_span] at hη
+  induction hη using Submodule.span_induction with
+  | mem x hx => exact mem_ZIrr_inner_int (⟨x, hx⟩ : IrreducibleCharacter G) hφ
+  | zero =>
+      refine ⟨0, ?_⟩
+      rw [show (0 : ClassFunction G ℂ) = (0 : ℂ) • 0 from (zero_smul ℂ _).symm,
+        OddOrder.RepresentationTheory.inner_smul_right]
+      simp
+  | add x y _ _ ihx ihy =>
+      obtain ⟨mx, hmx⟩ := ihx
+      obtain ⟨my, hmy⟩ := ihy
+      refine ⟨mx + my, ?_⟩
+      rw [ClassFunction.inner_add_right, hmx, hmy]
+      push_cast; ring
+  | smul a x _ ih =>
+      obtain ⟨m, hm⟩ := ih
+      refine ⟨a * m, ?_⟩
+      rw [← Int.cast_smul_eq_zsmul ℂ a x, OddOrder.RepresentationTheory.inner_smul_right,
+        hm, star_intCast]
+      push_cast; ring
+
+omit [Invertible (Nat.card G : ℂ)] in
+/-- The TI-set `V = W ∖ (W₁ ∪ W₂)` of a (3.1) setup is nonempty: both cyclic factors are
+nontrivial, so the internal product `W = W₁ × W₂` has an element with both components
+nontrivial (`supportInVdiffEquiv`). -/
+theorem ticyclic_V_nonempty (hyp : OddOrder.Peterfalvi.S05.TICyclicHypothesis G)
+    (hVeq : hyp.V = hyp.Vdiff) : hyp.V.Nonempty := by
+  have hne1 : hyp.W1.subgroupOf hyp.W ≠ ⊥ := by
+    rw [ne_eq, Subgroup.subgroupOf_eq_bot]
+    exact fun hd => hyp.W1_nontrivial (hd.eq_bot_of_le hyp.W1_le_W)
+  have hne2 : hyp.W2.subgroupOf hyp.W ≠ ⊥ := by
+    rw [ne_eq, Subgroup.subgroupOf_eq_bot]
+    exact fun hd => hyp.W2_nontrivial (hd.eq_bot_of_le hyp.W2_le_W)
+  haveI := (Subgroup.nontrivial_iff_ne_bot _).mpr hne1
+  haveI := (Subgroup.nontrivial_iff_ne_bot _).mpr hne2
+  obtain ⟨a, ha⟩ := exists_ne (1 : ↥(hyp.W1.subgroupOf hyp.W))
+  obtain ⟨b, hb⟩ := exists_ne (1 : ↥(hyp.W2.subgroupOf hyp.W))
+  refine ⟨(((hyp.supportInVdiffEquiv.symm (⟨a, ha⟩, ⟨b, hb⟩)).1 : ↥hyp.W) : G), ?_⟩
+  rw [hVeq]
+  exact OddOrder.Peterfalvi.S04.mem_supportInSubgroup.mp
+    (hyp.supportInVdiffEquiv.symm (⟨a, ha⟩, ⟨b, hb⟩)).2
+
+/-- **The (3.5)-determination of the σ-grid** (Coq `eq_in_cycTIiso`, `PFsection3.v:1750`):
+a norm-one virtual character of `G` that agrees on `V` with the linear character
+`ω = ω(ξ)` of `W` **is** `ω^σ`.  This is the uniqueness underlying the per-index
+identification of the two σ-grids of an (8.8) pair (Coq `cycTIisoC`): the grid vectors are
+pinned by their `V`-restrictions alone.
+
+Proof (mirroring Coq): let `η = ω^σ` and `ψ = η − φ`; `ψ` vanishes on `V` (both agree with
+`ω` there — (3.2.c) `sigma_apply_irreducibleCharacter_of_mem_V` for `η`).  The integer
+`c = ⟨φ, η⟩` satisfies `‖η ∓ φ‖² = 2 ∓ 2c ≥ 0`, so `c ∈ {−1, 0, 1}`:
+`c = 1` forces `ψ = 0` (positive definiteness); `c = 0` gives `‖ψ‖² = 2`, so all
+σ-coefficients of the `V`-vanishing `ψ` vanish (`sigmaCoeff_eq_zero_of_vanishOnV`, the
+(3.7)/(3.8) counting) — contradicting `⟨ψ, η⟩ = 1`; `c = −1` forces `φ = −η`, making
+`ω` vanish on the nonempty `V` — impossible for a unit-valued linear character. -/
+theorem ticyclic_eq_sigma_omega_of_eqOn_V
+    (hyp : OddOrder.Peterfalvi.S05.TICyclicHypothesis G)
+    [Fintype hyp.W] [Invertible (Nat.card hyp.W : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff)
+    (app : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication (G := G) hyp)
+    (ξ : hyp.W →* ℂˣ) {φ : ClassFunction G ℂ}
+    (hφZ : φ ∈ ZIrr G) (hφ1 : ClassFunction.inner φ φ = 1)
+    (hφV : ∀ (v : G) (hv : v ∈ hyp.V),
+      φ v = (hyp.omega ξ : ClassFunction hyp.W ℂ) ⟨v, hyp.V_subset_W hv⟩) :
+    φ = hyp.sigma hVeq app (hyp.omega ξ : ClassFunction hyp.W ℂ) := by
+  classical
+  set η := hyp.sigma hVeq app (hyp.omega ξ : ClassFunction hyp.W ℂ) with hηdef
+  -- `η` is the (3.5) family member at the index of `ξ`: `ZIrr`, norm one
+  have hηchi : η = hyp.chiFam hVeq app (hyp.omegaProdEquiv.symm ξ) :=
+    hyp.sigma_omega hVeq app ξ
+  have hηZ : η ∈ ZIrr G := by
+    rw [hηchi]; exact (hyp.chiFam_spec hVeq app).2.1 _
+  have hη1 : ClassFunction.inner η η = 1 := by
+    rw [hηchi, (hyp.chiFam_spec hVeq app).2.2.1, if_pos rfl]
+  -- `η` agrees with `ω` on `V` ((3.2.c)), so `ψ = η − φ` vanishes on `V`
+  have hηV : ∀ (v : G) (hv : v ∈ hyp.V),
+      η v = (hyp.omega ξ : ClassFunction hyp.W ℂ) ⟨v, hyp.V_subset_W hv⟩ := fun v hv =>
+    hyp.sigma_apply_irreducibleCharacter_of_mem_V hVeq app (hyp.omega ξ) hv
+  have hψV : ∀ v ∈ hyp.V, (η - φ) v = 0 := fun v hv => by
+    rw [ClassFunction.sub_apply, hηV v hv, hφV v hv, sub_self]
+  -- the integer inner product `c = ⟨φ, η⟩`
+  obtain ⟨c, hc⟩ := inner_intCast_of_mem_ZIrr hφZ hηZ
+  have hcstar : ClassFunction.inner η φ = (c : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hc, star_intCast]
+  -- `‖η − φ‖² = 2 − 2c` and `‖φ + η‖² = 2 + 2c`
+  have hsub : ClassFunction.inner (η - φ) (η - φ) = ((2 - 2 * c : ℤ) : ℂ) := by
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right, hη1, hφ1, hc, hcstar]
+    push_cast; ring
+  have hadd : ClassFunction.inner (φ + η) (φ + η) = ((2 + 2 * c : ℤ) : ℂ) := by
+    rw [ClassFunction.inner_add_left, ClassFunction.inner_add_right,
+      ClassFunction.inner_add_right, hη1, hφ1, hc, hcstar]
+    push_cast; ring
+  -- positivity bounds: `−1 ≤ c ≤ 1`
+  have hle : c ≤ 1 := by
+    have h0 := inner_self_re_nonneg (η - φ)
+    rw [hsub, Complex.intCast_re] at h0
+    have : (0 : ℤ) ≤ 2 - 2 * c := by exact_mod_cast h0
+    omega
+  have hge : -1 ≤ c := by
+    have h0 := inner_self_re_nonneg (φ + η)
+    rw [hadd, Complex.intCast_re] at h0
+    have : (0 : ℤ) ≤ 2 + 2 * c := by exact_mod_cast h0
+    omega
+  interval_cases c
+  · -- `c = −1`: `φ = −η`, so `ω` vanishes on the nonempty `V` — impossible
+    exfalso
+    have hzero : φ + η = 0 := by
+      refine eq_zero_of_inner_self_re_eq_zero ?_
+      rw [hadd]
+      norm_num
+    obtain ⟨v, hv⟩ := ticyclic_V_nonempty hyp hVeq
+    have hφv : φ v = -(η v) := by
+      have h := congrArg (fun f : ClassFunction G ℂ => f v) hzero
+      simp only [ClassFunction.add_apply, ClassFunction.zero_apply] at h
+      exact eq_neg_of_add_eq_zero_left h
+    have homega : (hyp.omega ξ : ClassFunction hyp.W ℂ) ⟨v, hyp.V_subset_W hv⟩ = 0 := by
+      have h1 := hφV v hv
+      have h2 := hηV v hv
+      rw [hφv, h2] at h1
+      -- `−ω(v) = ω(v)` forces `ω(v) = 0`
+      linear_combination -h1 / 2
+    rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.omega_apply] at homega
+    exact Units.ne_zero _ homega
+  · -- `c = 0`: `‖ψ‖² = 2` and `ψ|_V = 0`, so all σ-coefficients vanish — but `⟨ψ, η⟩ = 1`
+    exfalso
+    have hψZ : η - φ ∈ ZIrr G := Submodule.sub_mem _ hηZ hφZ
+    have hψ2 : ClassFunction.inner (η - φ) (η - φ) = 2 := by rw [hsub]; norm_num
+    have hall := hyp.sigmaCoeff_eq_zero_of_vanishOnV hVeq app hψZ hψ2 hψV
+    have hcoeff : hyp.sigmaCoeff hVeq app (η - φ) (hyp.omegaProdEquiv.symm ξ)
+        = ClassFunction.inner (η - φ) (hyp.chiFam hVeq app (hyp.omegaProdEquiv.symm ξ)) := rfl
+    have h1 : ClassFunction.inner (η - φ) η = 0 := by
+      have h := hall (hyp.omegaProdEquiv.symm ξ)
+      rw [hcoeff, ← hηchi] at h
+      exact h
+    rw [ClassFunction.inner_sub_left, hη1, hc] at h1
+    norm_num at h1
+  · -- `c = 1`: `‖ψ‖² = 0`, so `φ = η`
+    have hzero : η - φ = 0 := by
+      refine eq_zero_of_inner_self_re_eq_zero ?_
+      rw [hsub]
+      norm_num
+    exact (sub_eq_zero.mp hzero).symm
+
 end GenericBridge
 
 /-! ## The (8.8) canonical-pair packaging (issue 9079 item (ii))
@@ -283,6 +450,7 @@ setups share `W = K ⊔ K*` and (by swap-invariance) the TI-set `V`. -/
 section PairPackaging
 
 open OddOrder.GroupTheory
+open scoped Pointwise
 
 /- projections of the §10 → §5 bridge (definitional; named for `rw`-chains) -/
 
@@ -343,6 +511,72 @@ theorem section16_partner_typePData_W_eq [Finite G]
     (dataT : TypePData mp.T) (hTW1 : dataT.W1 = mp.Kstar) :
     dataT.W = mp.K ⊔ mp.Kstar := by
   rw [dataT.W_eq, hTW1, section16_partner_typePData_W2_eq hG dataT hTW1, sup_comm]
+
+/-- **The `W₁`-reconciled partner `TypePData` exists** (the `T`-side producer, closing the
+sourcing gap of the pair packaging; issue 9079).  `T` is type non-I, so it carries *some*
+type-`P` datum (`typePData_of_isTypeNonI`); its cyclic factor `W₁` and the pair's dual
+κ-Hall `K*` both complement `T' = [T,T]` in `T` (`M_complement`,
+`typeP_derivedInG_isComplement_kappaHall`), so they are `T`-conjugate by Schur–Zassenhaus
+(`IsComplement'.exists_conj_of_coprime`; `(|T'|, [T:T']) = 1` from the κ-Hall complement).
+Conjugating the whole datum (`TypePData.conj`, conjugation by an element of `T` fixes `T`)
+realigns `W₁` to `K*`; the dual factor `W₂ = K` then comes for free
+(`section16_partner_typePData_W2_eq`).
+
+No `IsTypeP2 mp.T` is needed — contrast `exists_typePData_W1_eq_of_isTypeP2`, whose
+`(κ∪σ)'`-Hall complement `U` requires the `P₂`-only `M_F`-internal decomposition; here the
+datum's own complement `U` is merely transported, never rebuilt. -/
+theorem exists_section16_partner_typePData [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (mp : Section16MaximalPair G) :
+    ∃ dataT : TypePData mp.T, dataT.W1 = mp.Kstar ∧ dataT.W2 = mp.K := by
+  classical
+  -- an arbitrary type-`P` datum on `T` (from `T_nonI`)
+  obtain ⟨data₀⟩ := typePData_of_isTypeNonI mp.T_nonI
+  haveI : IsCyclic ↥mp.Kstar := mp.isCyclic_Kstar
+  -- `K*` complements `T'` in `T` (the κ-Hall complement, ungated for type `P`)
+  have hKcompl := OddOrder.BG.Ch4.S14.typeP_derivedInG_isComplement_kappaHall hG
+    mp.T_maximal mp.T_typeP mp.Kstar_le_T mp.Kstar_hall
+  -- `T'.subgroupOf T` is normal (it is the commutator subgroup of `↥T`)
+  have hT'sub : (derivedInG mp.T).subgroupOf mp.T = commutator ↥mp.T :=
+    Subgroup.comap_map_eq_self_of_injective mp.T.subtype_injective _
+  haveI : ((derivedInG mp.T).subgroupOf mp.T).Normal := by rw [hT'sub]; infer_instance
+  -- `(|T'|, [T : T']) = 1`: the κ-Hall complement has coprime order
+  have hN : Nat.Coprime (Nat.card ↥((derivedInG mp.T).subgroupOf mp.T))
+      ((derivedInG mp.T).subgroupOf mp.T).index := by
+    rw [hKcompl.symm.index_eq_card]
+    exact OddOrder.BG.Ch4.S14.coprime_card_derived_kappaHall_of_isComplement'
+      mp.Kstar_hall hKcompl
+  haveI hTsolv : IsSolvable ↥mp.T := hG.solvable_of_mem_maximalSubgroups mp.T_maximal
+  have hSolv : IsSolvable ↥((derivedInG mp.T).subgroupOf mp.T) ∨
+      IsSolvable (↥mp.T ⧸ (derivedInG mp.T).subgroupOf mp.T) :=
+    Or.inl (solvable_of_solvable_injective
+      (Subgroup.subtype_injective ((derivedInG mp.T).subgroupOf mp.T)))
+  -- Schur–Zassenhaus: the two complements `data₀.W1`, `K*` of `T'` are `T`-conjugate
+  obtain ⟨n, -, hn⟩ := Subgroup.IsComplement'.exists_conj_of_coprime hN hSolv
+    data₀.M_complement hKcompl
+  -- lift the `↥T`-level conjugacy to a `G`-level pointwise-`smul` equation
+  set g : G := (n : G) with hgdef
+  have hcomp : mp.T.subtype.comp (MulAut.conj n).toMonoidHom
+      = (MulAut.conj g).toMonoidHom.comp mp.T.subtype := by
+    ext k
+    simp only [MonoidHom.comp_apply, Subgroup.coe_subtype, MulEquiv.coe_toMonoidHom,
+      MulAut.conj_apply, hgdef, Subgroup.coe_mul, Subgroup.coe_inv]
+  have hW1map : data₀.W1.map (MulAut.conj g).toMonoidHom = mp.Kstar := by
+    have key := congrArg (Subgroup.map mp.T.subtype) hn
+    rw [Subgroup.map_map, hcomp, ← Subgroup.map_map,
+      Subgroup.map_subgroupOf_eq_of_le data₀.W1_le,
+      Subgroup.map_subgroupOf_eq_of_le mp.Kstar_le_T] at key
+    exact key
+  have hW1smul : (MulAut.conj g) • data₀.W1 = mp.Kstar := by
+    rw [pointwise_mulAut_smul_eq_map]; exact hW1map
+  -- conjugation by `g ∈ T` fixes `T`; transport the whole datum and cast back
+  have hgT : (MulAut.conj g) • mp.T = mp.T := Subgroup.conj_smul_eq_self_of_mem n.2
+  have hcastW1 : ∀ {S : Subgroup G} (h : S = mp.T) (d : TypePData S), (h ▸ d).W1 = d.W1 := by
+    intro S h d; subst h; rfl
+  have hTW1 : (hgT ▸ data₀.conj (MulAut.conj g)).W1 = mp.Kstar := by
+    rw [hcastW1 hgT,
+      show (data₀.conj (MulAut.conj g)).W1 = (MulAut.conj g) • data₀.W1 from rfl, hW1smul]
+  exact ⟨hgT ▸ data₀.conj (MulAut.conj g), hTW1,
+    section16_partner_typePData_W2_eq hG _ hTW1⟩
 
 open scoped FiniteInduce in
 /-- **The canonical pair shares its TI-set `V`** (Peterfalvi (8.8) for the §10 → §5
@@ -426,6 +660,53 @@ theorem section16_pair_sigma_eq [Finite G]
         (αT : ClassFunction ↥(typePData_toTICyclicHypothesis dataT hodd).W ℂ) :=
   ticyclic_sigma_eq_of_V_eq _ _ rfl rfl (section16_pair_tic_V_eq hG tp hodd dataT hTW1)
     appS appT αS αT hα
+
+/- The type-II → canonical-partner reduction (Coq `Frob_der1_type2` head, issue 9079 item 3) -/
+
+/-- The type-II-designated member of the canonical pair is indeed of type II:
+`mp.S_typeP2` (Peterfalvi (13.2.a)) through the BG type dictionary
+(`isTypeII_of_isTypeP2`, Proposition 16.1). -/
+theorem section16_S_isTypeII [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (mp : Section16MaximalPair G) :
+    IsTypeII mp.S :=
+  OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG mp.S_maximal mp.S_typeP2
+
+/-- **Peterfalvi (10.7) reduction, covering step** (Coq `Frob_der1_type2` head,
+`PFsection10.v:552-556`): every type-II maximal subgroup `L` is conjugate to a member of
+the canonical pair — to `mp.S`, or to `mp.T` with `mp.T` itself then of type II (types are
+conjugation-invariant, `isTypeII_pointwise_smul`).  The type-I branch of the (8.8) covering
+`theorem88_caseB` is killed by type exclusivity (`not_isTypeI_of_isTypeNonI`).
+
+The `T`-branch is **not refutable from the pair data alone**: Peterfalvi (13.2.a) is
+one-directional ("if `q < p` then `S` is of type II"), so the larger-κ member `mp.T` may
+also be of type II; the Coq proof kills its corresponding branch only under the §10
+contextual hypothesis `notMtype2` (the ambient pair member there is assumed not of type 2).
+Consumers either use the returned `IsTypeII mp.T` certificate symmetrically (the pair
+machinery of this file is `S`/`T`-symmetric through `exists_section16_partner_typePData`)
+or discharge it with `exists_conj_eq_S_of_isTypeII` below. -/
+theorem conj_eq_S_or_conj_eq_T_of_isTypeII [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (mp : Section16MaximalPair G)
+    {L : Subgroup G} (hL : L ∈ maximalSubgroups G) (hLII : IsTypeII L) :
+    (∃ g : G, MulAut.conj g • L = mp.S) ∨
+      ((∃ g : G, MulAut.conj g • L = mp.T) ∧ IsTypeII mp.T) := by
+  rcases mp.theorem88_caseB L hL with hI | hS | hT
+  · exact absurd hI (OddOrder.BG.Ch4.S16.not_isTypeI_of_isTypeNonI hG hL (Or.inl hLII))
+  · exact Or.inl hS
+  · refine Or.inr ⟨hT, ?_⟩
+    obtain ⟨g, hg⟩ := hT
+    exact hg ▸ isTypeII_pointwise_smul (MulAut.conj g) hLII
+
+/-- **Peterfalvi (10.7) reduction, strong form**: if the partner `mp.T` is moreover not of
+type II, every type-II maximal subgroup is conjugate to `mp.S` — the exact Lean form of the
+Coq branch kill (`FTtypeJ` + `notMtype2`). -/
+theorem exists_conj_eq_S_of_isTypeII [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (mp : Section16MaximalPair G)
+    (hT : ¬ IsTypeII mp.T)
+    {L : Subgroup G} (hL : L ∈ maximalSubgroups G) (hLII : IsTypeII L) :
+    ∃ g : G, MulAut.conj g • L = mp.S := by
+  rcases conj_eq_S_or_conj_eq_T_of_isTypeII hG mp hL hLII with hS | ⟨-, hTII⟩
+  · exact hS
+  · exact absurd hTII hT
 
 end PairPackaging
 
