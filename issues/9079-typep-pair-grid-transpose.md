@@ -256,3 +256,53 @@ dataT.W1 = mp.Kstar ∧ dataT.W2 = mp.K` — sorry-free / axiom-clean (3-standar
 - ✅ item 3 (type-II L → canonical partner 還元): part 1.7 (disjunction 版)
 - ⏳ item 4 (行和 pin 変換) + **part 2 本体** (grid 指標 per-index σ-同定 =
   (3.5)-determination or (3.7) 係数 rigidity) — 次 iteration。
+
+## 2026-07-10 part 2 第一陣 LANDED (6dfc4e9e): (3.5)-determination core
+
+### route 判定: (a) 採用、(b) は不要と確定
+- **書籍 (3.5) は存在文のみ** (mmd 04.5 確認: "There is an orthonormal family (χ_ij) …" —
+  一意性 clause 無し)。証明の交叉組合せ論 ((3.5.2)/(3.5.4)) が実質 family を pin する。
+- **Coq の形式化が正解形**: `eq_in_cycTIiso` (PFsection3.v:1750) =
+  「φ ∈ dirr G が V 上 ω と一致 ⟹ φ = σω」— **σ-像は V-制限だけで pin される**。
+  pair transpose 同定 `cycTIisoC` (1849) はこれ + V の swap 不変性 (setUC =
+  自分の ticyclic_Vdiff_eq_of_swap!) + (3.2.c) restrict で **2 行**。
+  PFsection10:632 の `etaC i j : sigS (w_ j i) = eta_ i j` が (10.7) での消費形。
+- **(b) との関係**: 本 route が消費する (3.7)/(3.8) は S05_SigmaTrichotomy の自レーン
+  既存 engine (`sigmaCoeff_eq_zero_of_vanishOnV`) のみ — **9076 (lane c、§3 rigidity
+  eq_signed_sub_cTIiso) への依存ゼロ**。境界侵犯なし。
+
+### landed (3 宣言、S05-generic、GenericBridge 節)
+- `inner_intCast_of_mem_ZIrr` — ZIrr×ZIrr 内積整数性 (右 slot span 帰納)。
+  ⚠ upstream hoist 候補 (ZIrrFourier.lean が自然な家)。
+- `ticyclic_V_nonempty` — V ≠ ∅ (supportInVdiffEquiv.symm、W₁/W₂ 非自明)。
+- **`ticyclic_eq_sigma_omega_of_eqOn_V`** (eq_in_cycTIiso の Lean 版) —
+  φ ∈ ZIrr、⟨φ,φ⟩ = 1、φ|_V = ω(ξ)|_V ⟹ φ = σ(ω(ξ))。
+  Coq mirror 証明: c = ⟨φ,σω⟩ ∈ ℤ; ‖σω∓φ‖² = 2∓2c ≥ 0 → c ∈ {-1,0,1};
+  c=1 → 正定値性で φ = σω / c=0 → ‖ψ‖²=2 + ψ|_V=0 → 全 σ-係数 0
+  (sigmaCoeff_eq_zero_of_vanishOnV) が ⟨ψ,σω⟩=1 と矛盾 / c=-1 → ω が非空 V 上
+  0 (linear char の unit 値と矛盾)。
+
+### 残 assembly (part 2 第二陣、fresh agent 向け設計):
+Coq `cycTIisoC` の Lean 版 = **pair 両側 σ の per-index 同定**:
+```
+σ_T (ω_T(ξ')) = σ_S (ω_S(ξ))   (ξ' = ξ の swap-transport)
+```
+手順 (全部品 landed 済):
+1. hyp_S := typePData_toTICyclicHypothesis tp.Sdata hodd / hyp_T := 同 dataT
+   (dataT := exists_section16_partner_typePData で取得)。
+2. ξ' : hyp_T.W →* ℂˣ を ξ : hyp_S.W →* ℂˣ から W-同一性 (section16_pair 系の
+   hW : hyp_S.W = hyp_T.W、derivable) で transport — **MonoidHom.comp
+   (Subgroup.inclusion hW.ge)-流の値レベル transport を推奨** (part-1 の
+   ticyclicSupportedOnVCongr と同型、cast ゼロ)。
+3. apply `ticyclic_eq_sigma_omega_of_eqOn_V` (hyp := hyp_T, ξ := ξ',
+   φ := σ_S(ω_S(ξ))): hφZ = sigma_mem_ZIrr (ω ∈ ZIrr)、hφ1 = sigma_inner +
+   irr norm 1 (or chiFam_spec 対角)、hφV = (3.2.c) sigma_apply_irreducible… on
+   S-side + V-同一 (section16_pair_tic_V_eq) + ω_S/ω_T の V 上一致 (値レベル、
+   transport の rfl-性)。
+4. 帰結: alignedOmegaSigmaGrid (M-side) と certainTypeOmegaSigma (S-side、
+   typeIIHypothesis46 の ticVdiff — こちらの V/W と typePData bridge の V/W の
+   一致 lemma が追加で要る可能性 → 要確認) の per-index 翻訳、そして item 4
+   (行和 pin 変換) へ。
+注意: ω_S(ξ) の IrreducibleCharacter norm: hφ1 は
+`sigma_inner_irreducibleCharacter` + `irreducibleCharacter_inner_eq_ite` (対角) で
+1 行のはず。
