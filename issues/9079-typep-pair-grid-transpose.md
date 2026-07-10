@@ -470,3 +470,32 @@ skeleton) → (c) aux WLOG 差し替え + Frobenius 結論 conj 転送 (obligati
    Sdata、hSW1/hSW2 := hdata ▸ tp-式) + §9 counts 再 instantiate + package.elim →
    IsFrobeniusGroup (derivedInG mp.S) → conj 転送 (maxNilpotentNormalHall equivariance +
    complement flexibility) → 旧 aux/gate の deprecate。
+
+### 2026-07-10 obligation 3-(5.3.b) 調査結果 (次 iteration の実装設計)
+**Coq 証明構造** (`coherent_ortho_cycTIiso` PFsection8:839): τ₁(irr χ) = R(χ)-列の
+signed 部分和 (`mem_coherent_sum_subseq`、(5.5)) + R-元 ⊥ σ-grid (`FTtypeP_base_ortho`、
+R 構成時に焼き込み)。Coq の R-構成は prDade 機構 (9014 chain: cyclicTIiso → primeTIred →
+uniform_prTIred_coherent → FTtypeP_coherent_TIred) 経由。
+**repo 資産**: (5.5)-engine は lane-b が本日 landed
+(`coherent_extension_mem_span_Rset_of_mem`、S14_MaximalI/PairCoherence:400 —
+S07.CharacterPsiDecomposition.ofProjection + eq_sum_of_psi_eq_zero の S07-generic 核心を
+S14-文脈で instantiate した worked template。同 pattern を T2-R-family で再演すれば
+τ₂(λ) ∈ ℤ[R(λ)] が出る)。
+**★ base-ortho の constituent trick** (新規設計、prDade 焼き込みを回避):
+R(λ) = {χ₊, χ₋} (dadeOrthonormalCharacterImageFamilyOfDiff、orthonormal irr、
+τ_S(λ−λ̄) = χ₊ − χ₋)。grid 元 η = chiFam-member は ±irreducible。
+⟨τ_S(λ−λ̄), η⟩ = 0 が示せれば ⟨χ₊,η⟩ = ⟨χ₋,η⟩ =: c ∈ {0,±1}; c = ±1 なら
+χ₊ = ±η = χ₋ で orthonormal 対に矛盾 ⟹ c = 0 ⟹ 各 R-元 ⊥ η。
+**⟹ (5.3.b) の残 kernel = 単一 cross-inner**: ⟨τ_side(φ−φ̄), σ-grid 元⟩ = 0
+(S-side: τ_S = h46.tau vs M-grid / M-side: hyp.tau vs 自 grid)。
+- 注: zeta 側を `orthogonality_of_w1_lt_w2` (Prop109:100、zeta_ortho_grid そのもの) で
+  討とうとするのは**不可** — gate 文脈は type III/IV で w2 < w1
+  (card_kappaHall_lt_of_isTypeIIIorIV) ⟹ hw : w1 < w2 が偽側。(10.9) は別 dichotomy。
+  両 fields とも (5.5)+constituent trick で対称に討つのが正。
+- cross-inner の証明素材: (2.6)/(4.6) Dade 随伴 (inner_induce/restrict 系) +
+  σ-grid の V-side 挙動 (sigma_apply_…of_mem_V / vanish off conj(V))、または
+  (8.18.b)-disjointness 系。Prop109 の STEP-1 機構 (tau_muColumnZero_sub_zeta_eq 等)
+  が M-side の類似計算 precedent。
+実装順: (i) T2-R-family での (5.5) 再演 (lane-b template mirror) → (ii) cross-inner
+kernel (S-side から) → (iii) constituent trick 組立 → lam_ortho_grid / zeta_ortho_grid
+discharge (S12_TypeIICrossIsometryPair の sorry 2 本)。
