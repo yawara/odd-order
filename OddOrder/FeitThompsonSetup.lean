@@ -1308,6 +1308,45 @@ theorem kstar_le_S : mp.Kstar ≤ mp.S := by
 
 variable (tp : Section16TypePStructure mp)
 
+/-! #### The two §6 Hypothesis instances of `S` share their `W₁`/`W₂` (issue 2038)
+
+The κ-Hall instance `mp.certainTypeS` (grid producer, `muS`) and the `Sdata`-instance
+`typePData_toS06Hypothesis tp.Sdata` (the `hypothesis46OfTypePData`/engines side) carry
+propositionally equal cyclic factors: `Sdata.W1 = tp.W1 = mp.K` and `Sdata.W2 = tp.W2 =
+mp.Kstar`.  These equalities ground the per-`ω` rigidity identification of the two `μ`-grids
+(`irreducibleCharacterFamily_eq_of_difference_eq`). -/
+
+/-- `W₁` of the `Sdata`-instance §6 Hypothesis equals `certainTypeS`'s. -/
+theorem sdataS06_W1_eq_certainTypeS
+    (hHall : Nat.Coprime (Nat.card ↥(OddOrder.GroupTheory.derivedInG mp.S))
+      (Nat.card ↥tp.Sdata.W1)) :
+    (OddOrder.Peterfalvi.S12.typePData_toS06Hypothesis tp.Sdata hG.odd hHall).W1
+      = (mp.certainTypeS hG).W1 := by
+  have hlhs : (OddOrder.Peterfalvi.S12.typePData_toS06Hypothesis tp.Sdata hG.odd hHall).W1
+      = tp.Sdata.W1.subgroupOf mp.S := by
+    unfold OddOrder.Peterfalvi.S12.typePData_toS06Hypothesis; rfl
+  rw [hlhs, tp.Sdata_W1_eq, tp.W1_eq_K hG, certainTypeS_W1_eq]
+
+/-- `W₂` of the `Sdata`-instance §6 Hypothesis equals `certainTypeS`'s. -/
+theorem sdataS06_W2_eq_certainTypeS
+    (hHall : Nat.Coprime (Nat.card ↥(OddOrder.GroupTheory.derivedInG mp.S))
+      (Nat.card ↥tp.Sdata.W1)) :
+    (OddOrder.Peterfalvi.S12.typePData_toS06Hypothesis tp.Sdata hG.odd hHall).W2
+      = (mp.certainTypeS hG).W2 := by
+  have hlhs : (OddOrder.Peterfalvi.S12.typePData_toS06Hypothesis tp.Sdata hG.odd hHall).W2
+      = tp.Sdata.W2.subgroupOf mp.S := by
+    unfold OddOrder.Peterfalvi.S12.typePData_toS06Hypothesis; rfl
+  rw [hlhs, tp.Sdata_W2_eq, tp.W2_eq_Kstar hG, certainTypeS_W2_eq]
+
+/-- The joins `W = W₁ ⊔ W₂` of the two §6 Hypothesis instances of `S` coincide. -/
+theorem sdataS06_W_join_eq_certainTypeS
+    (hHall : Nat.Coprime (Nat.card ↥(OddOrder.GroupTheory.derivedInG mp.S))
+      (Nat.card ↥tp.Sdata.W1)) :
+    (OddOrder.Peterfalvi.S12.typePData_toS06Hypothesis tp.Sdata hG.odd hHall).W1
+        ⊔ (OddOrder.Peterfalvi.S12.typePData_toS06Hypothesis tp.Sdata hG.odd hHall).W2
+      = (mp.certainTypeS hG).W1 ⊔ (mp.certainTypeS hG).W2 := by
+  rw [sdataS06_W1_eq_certainTypeS hG mp tp hHall, sdataS06_W2_eq_certainTypeS hG mp tp hHall]
+
 /-- `|certainTypeS.W₁| = tp.q` (both are `|mp.K|`). -/
 theorem cardCertainTypeS_W1 : Nat.card ↥(mp.certainTypeS hG).W1 = tp.q := by
   rw [certainTypeS_W1_eq hG mp, Nat.card_congr (Subgroup.subgroupOfEquivOfLe mp.K_le_S).toEquiv,
