@@ -81,65 +81,6 @@ theorem divisor_modEq_one {hyp : Hypothesis (G := G)} (data : CaseBForTData hyp)
 
 end CaseBForTData
 
-/-- The genuinely character/field-gated inputs of the `T`-side **(13.15)** `v`-value (04.16 p. 87,
-"`q ≢ 1 (mod p)`, and so `v = (q^p − 1)/(q − 1)` by (13.15)").  Packaged as an existential over the
-cofactor `x` (`v·x = (q^p − 1)/(q − 1)`) and the `T`-side norm parameter `mᵀ`, carrying exactly the
-case-(9.7.b) data that Peterfalvi's proof of (13.15) consumes with the roles of `p, q` swapped: the
-(13.10)-dual analytic inequality, the (13.11)-dual `mᵀ`-lower bounds, and `v ≠ 1`.
-
-These land once the generic §13 estimates do (issue 9013 案 A → `typeP_Galois`, issue 9000) together
-with the `T`-side field model (`TFieldModelData`, issue-9000 sphere).  This is the *single* gated
-residue of `T_side_caseB_facts.2`: the proven side-agnostic numeric engine
-`S15.caseB_order_u_full_of_not_modEq` (`S16_CaseBOrder`) discharges all the arithmetic from these.
-(The `(13.11.c)` bound `h11c` is *not* needed on the `T`-side — it is vacuous since `p ≠ 3`.) -/
-theorem tSide_caseB_v_gated_inputs [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
-    ∃ (x : ℕ) (mT : ℚ),
-      hyp.base.v * x = (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1) ∧
-        hyp.base.v ≠ 1 ∧ x ≠ 0 ∧
-        (5 ≤ hyp.base.p → (7 : ℚ) / 10 < mT) ∧
-        (7 ≤ hyp.base.p → (8 : ℚ) / 10 < mT) ∧
-        mT < (hyp.base.p : ℚ) * ((hyp.base.q : ℚ) ^ hyp.base.p - 1)
-          / ((hyp.base.q : ℚ) ^ (hyp.base.p - 1) * (x : ℚ) * ((hyp.base.q : ℚ) - 1)) := by
-  sorry
-
-/-- **Peterfalvi (14.4) `T`-side numeric facts**: in case (9.7.b) for `T` (which holds since
-`q < p ⟹ p ≠ 3`, by (13.13) applied to `T`), the dual centralizer parameter vanishes (`D = ⊥`,
-dual of (13.12) `c = 1`) and `v` takes its full cyclotomic value (`v = (q^p−1)/(q−1)`, dual of
-(13.15)).  The §13 `T`-side obligation feeding (14.4). -/
-theorem T_side_caseB_facts [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
-    hyp.base.D = ⊥ ∧
-      hyp.base.v = (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1) := by
-  refine ⟨?_, ?_⟩
-  · -- **Peterfalvi (13.12) dual** `d = 1`: `D = V ⊓ C_G(Q) = ⊥`, the canonical §15 obligation
-    -- `V_inf_centralizer_Q_eq_bot` (`T` type-II from `T_typeII` (14.9)).
-    rw [hyp.base.D_eq]
-    exact OddOrder.Peterfalvi.S15.V_inf_centralizer_Q_eq_bot _hG hyp.base (T_typeII _hG hyp)
-  · -- **Peterfalvi (13.15) dual** via the *proven* side-agnostic numeric engine
-    -- `caseB_order_u_full_of_not_modEq` (`S16_CaseBOrder`) with the roles of `p, q` swapped
-    -- (`04.16` p. 87 applies (13.15) to `T`).  The ungated arithmetic — primality, oddness, the
-    -- branch selector `q ≢ 1 (mod p)`, the vacuous `p = 3` bound, and `¬ p ∣ v` (from the (13.14)-dual
-    -- divisor congruence) — is discharged here; the char/field content is the single gated residue
-    -- `tSide_caseB_v_gated_inputs`.
-    obtain ⟨x, mT, hux, hv1, hx0, hm5, hm7, hanalytic⟩ := tSide_caseB_v_gated_inputs _hG hyp
-    have hvdvd : hyp.base.v ∣ (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1) := ⟨x, hux.symm⟩
-    have hpnv : ¬ hyp.base.p ∣ hyp.base.v := by
-      intro hpv
-      have hpmod : hyp.base.p ≡ 1 [MOD hyp.base.p] :=
-        hyp.tSide_cyclotomic_quotient_divisor_modEq_one hyp.base.p
-          hyp.base.p_prime.pos.ne' (hpv.trans hvdvd)
-      have h1 : (1 : ℕ) < hyp.base.p := hyp.base.p_prime.one_lt
-      have hpmod' : hyp.base.p % hyp.base.p = 1 % hyp.base.p := hpmod
-      rw [Nat.mod_self, Nat.mod_eq_of_lt h1] at hpmod'
-      exact absurd hpmod' (by norm_num)
-    exact OddOrder.Peterfalvi.S15.caseB_order_u_full_of_not_modEq
-      hyp.base.q_prime hyp.base.p_prime hyp.base.three_le_q
-      (by have := hyp.five_le_p; omega) (ne_of_lt hyp.q_lt_p)
-      hyp.base.q_odd hyp.base.p_odd hyp.q_not_modEq_one_mod_p
-      hux hv1 hpnv hx0 hm5 hm7
-      (fun hp3 => absurd hp3 (by have := hyp.five_le_p; omega)) hanalytic
-
 /-- **Peterfalvi (14.4)**: case (9.7.b) holds for `T`, and `v = (q^p - 1) / (q - 1)`.  The numeric
 content (`D = ⊥`, `v` full) is the named §13 obligation `T_side_caseB_facts`; the case-(9.7.b)
 proposition is carried trivially (no consumer reads it). -/

@@ -549,6 +549,21 @@ theorem T_typeIII_ratio_le_of_sSide_gap [Finite G] [Fintype G] [Invertible (Nat.
       ClassFunction.inner_smul_left, horth b hb b hb, if_pos rfl, mul_one, sub_self]
   exact T_typeIII_ratio_le_of_gamma_bridge hyp calT1 Γ Γ₁ x hcount horth hdecomp hΓ₁ hx hnorm
 
+/-- **Peterfalvi (13.4)/(14.4), `T`-side case (9.7.b)**: the `T`-side centralizer parameter
+vanishes and `v` has its full cyclotomic value.  This is obtained directly from the (13.3)
+character-degree package and the (13.4) cross-expansion, before the (14.9) type-II conclusion.
+
+Keeping this producer upstream of `T_typeIII_ratio_le` is essential: (13.4) is an input to the
+(14.9) contradiction, whereas deriving the same facts from `T_typeII` would create the cycle
+`T_isTypeP2 → T_typeIII_ratio_le → T_side_caseB_facts → T_typeII → T_isTypeP2`. -/
+theorem T_side_caseB_facts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    hyp.base.D = ⊥ ∧
+      hyp.base.v = (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1) := by
+  obtain ⟨chars⟩ := OddOrder.Peterfalvi.S15.character_degree_analysis hG hyp.base
+  obtain ⟨hD, hv, _hQ⟩ := OddOrder.Peterfalvi.S15.lambda_forces_T_caseB hG chars
+  exact ⟨hD, hv⟩
+
 /-- **Peterfalvi (14.9), the character body** — the structural `≤` half of the ratio comparison, the
 sole deep obligation of (14.9).  Coq `PFsection14` `FTtypeP_min_typeII`, lines 737--853: assuming `T`
 is type III, build `calT1 = seqIndD QV T QV Q` (the degree-`p` induced characters of `T`, from
@@ -728,19 +743,57 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           hτ.extension_inner_eq ζ ζ (Submodule.subset_span hζT) (Submodule.subset_span hζT)]
       rw [hsrc, if_neg hζζ', (hirr ζ hζT).inner_self_eq_one] at h1
       exact one_ne_zero h1.symm
-  -- **The gated `S`-side `βₛ` bridge content** (one documented residual `sorry`), now reduced by the
-  -- `T_typeIII_ratio_le_of_sSide_gap` extraction engine to *just* the `βₛ`-gap facts — the orthogonal
-  -- split (`Γ₁`/`hdecomp`/`hΓ₁`) is **no longer** part of the residual (the engine derives it):
-  --   • `hcount`  = `|calT1| = (v−1)/p` — the coherent count `hcount_V` (`|calT1_set| = (|V|−1)/p`,
-  --     proven, via `T_typeIII_calT1_family`) composed with the (13.12) `d = 1` substitution
-  --     `v = |V|` (`S15.V_inf_centralizer_Q_eq_bot`, lane-b);
+  -- The coherent extension is injective on `calT1_set`: equality of two images would turn the
+  -- source cross-inner-product `0` into the source self-inner-product `1`.
+  have hinj : Set.InjOn (⇑hτ.extension) (↑calT1_set.toFinset : Set _) := by
+    intro ζ hζ ζ' hζ' heq
+    have hζS : ζ ∈ calT1_set := by simpa using hζ
+    have hζ'S : ζ' ∈ calT1_set := by simpa using hζ'
+    by_contra hne
+    have hEq : ClassFunction.inner ζ ζ' = ClassFunction.inner ζ ζ := by
+      rw [← hτ.extension_inner_eq ζ ζ' (Submodule.subset_span hζS)
+          (Submodule.subset_span hζ'S), ← heq,
+        hτ.extension_inner_eq ζ ζ (Submodule.subset_span hζS) (Submodule.subset_span hζS)]
+    rw [hyp07.pairwise_orthogonal hζS hζ'S hne, (hirr ζ hζS).inner_self_eq_one] at hEq
+    exact zero_ne_one hEq
+  have hcalcard : calT1.card = calT1_set.toFinset.card := by
+    rw [hcalT1img, Finset.card_image_of_injOn hinj]
+  have hsourcecard :
+      calT1_set.toFinset.card = (Nat.card ↥hyp.base.V - 1) / hyp.base.p := by
+    rw [← Set.ncard_eq_toFinset_card' calT1_set, hcalT1, Set.ncard_coe_finset]
+    exact hcount_V
+  -- (13.4) gives `D = ⊥`; hence `d = |D| = 1` and `|V| = v d = v`.
+  have hDbot : hyp.base.D = ⊥ := (T_side_caseB_facts hG hyp).1
+  have hd1 : hyp.base.d = 1 := by
+    rw [hyp.base.d_eq_card_D, hDbot, Subgroup.card_bot]
+  have hVcard : Nat.card ↥hyp.base.V = hyp.base.v := by
+    rw [hyp.base.card_V_eq_vd, hd1, mul_one]
+  -- The same (13.4) value makes `v ≡ 1 (mod p)`, so the exact Nat quotient casts to the
+  -- rational ratio used by the Bessel engine.
+  have hvfull := (T_side_caseB_facts hG hyp).2
+  have hvodd : Odd hyp.base.v := by
+    rw [hvfull]
+    exact hyp.tSide_cyclotomic_quotient_odd
+  have hvdvd :
+      hyp.base.v ∣ (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1) := by
+    rw [hvfull]
+  have hvmod : hyp.base.v ≡ 1 [MOD hyp.base.p] :=
+    hyp.tSide_cyclotomic_quotient_divisor_modEq_one
+      hyp.base.v hvodd.pos.ne' hvdvd
+  have hpdiv : hyp.base.p ∣ hyp.base.v - 1 :=
+    (Nat.modEq_iff_dvd' hvodd.pos).mp hvmod.symm
+  have hcount : (calT1.card : ℚ) =
+      ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) := by
+    rw [hcalcard, hsourcecard, hVcard]
+    exact Nat.cast_div hpdiv (Nat.cast_ne_zero.mpr hyp.base.p_prime.ne_zero)
+  -- **The gated `S`-side `βₛ` bridge content** (one documented residual `sorry`), now reduced
+  -- to the gap coefficients and projected norm:
   --   • `hxcoe`/`hx` = the `S`-side gap coefficients `⟨Γ, ζ⟩ = x_ζ ∈ ℤ` with parity nonzeroness
   --     `x_ζ ≠ 0` (Coq `nzT1_Ga`, via `S09.cfdot_real_vchar_even`);
   --   • `hnorm`   = the `S`-side norm bound `⟨Γ,Γ⟩ ≤ (u−1)/q` on the bridge gap.
   -- (`horth` is discharged from the (14.9) coherence; `hdecomp`/`hΓ₁` from the engine.)
-  obtain ⟨Γ, x, hcount, hxcoe, hx, hnorm⟩ :
+  obtain ⟨Γ, x, hxcoe, hx, hnorm⟩ :
       ∃ (Γ : ClassFunction G ℂ) (x : ClassFunction G ℂ → ℤ),
-        (calT1.card : ℚ) = ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) ∧
         (∀ a ∈ calT1, ClassFunction.inner Γ a = ((x a : ℝ) : ℂ)) ∧
         (∀ a ∈ calT1, x a ≠ 0) ∧
         (ClassFunction.inner Γ Γ).re ≤
