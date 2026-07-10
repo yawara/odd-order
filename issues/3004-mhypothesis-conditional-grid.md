@@ -323,3 +323,34 @@ transitive gate を明記した。`chiRhoCF_congr_hyp` の axiom-clean assert �
   `tSide_caseB_v_gated_inputs` :1060) → `SubgroupM.lean` (`s_side_frobenius_kernel` :187 /
   `t_side_caseB_fieldModel` :247) → `ComparingLM.lean` の sorried def 3 本 (:345-366)。
   いずれも ungated (issue 4004/9013 の担当領域)。Coq 併読 = PFsection{8,14,16}.v。
+
+## lane-c T-side 進捗 + hub 意図の独立監査 (2026-07-10 夜)
+
+commit `3070d08e` で (14.9) の T-side η-grid 直交を axiom-clean に landing。
+
+- `T_typeIII_calT1_difference_support`: `calT1` member difference は
+  `A₁(T) = (T')#`-supported。
+- `T_typeIII_coherent_image_inner_eta_eq_zero`: A₁(T) Dade map を reconciled type-P1
+  datumの full A₀(T) Dade map の restriction と同定し、regular W 上の消滅を
+  `eta_orthogonal_of_norm_one_pair_vanish` へ渡して、各 coherent image の η 直交を証明。
+- `T_typeIII_ratio_le` の residual から η-直交 conjunct を削除。残る local `sorry` は
+  `∃ x, ⟨Gamma,tau1 zeta⟩ = x_zeta ∧ x_zeta ≠ 0` のみ。
+- leaf build 4093 green、AxiomsCheck 4127 green。新 theorem 2 本を axiom-clean assert 登録。
+
+hub の「T-side cluster」選択は正しい。一方、「いずれも ungated」は宣言単位では広すぎるため、
+Coq `nzT1_Ga` (PFsection14.v:770--830) まで独立 trace して次のように補正する。
+
+1. 残る parity は T-side だけでは閉じず、S-side `Gamma` の virtuality/realness を使う。
+   現在の concrete producer は `betaGrid_A0_support` / `gammaGrid_real` の既存 S15
+   residual を通る。
+2. Coq の real virtual character `Delta` は T-side `primeTIred` から作る。generic
+   `PrimeTIResidueData` は landed 済みだが、`S15.Hypothesis` の T-side nu-gridへの
+   grounding と `o_eta0_betaT0` 型の cyclic-TI/Dade cross relation は未接続。
+3. `T_not_isTypeIV_of_isTypeP1` の本体は Coq (11.9) `typeP_Galois` producer であり、
+   repo の §11 coherence frontier (`sibleyTarget_H0C` 等) に genuine upstream work が残る。
+4. `T_isTypeP2` 内の strict `>` forward residual は別で ungated。旧 cycle 説明は
+
+直後の main sync で lane-b の `SupportedSpanOrthogonality` (Pf 1.3.a/b) と
+`S05_OmegaSpanning` が landing。これは上記 1--2 の最上流基盤を実際に前進させるが、
+現時点では `prTIirr_id` instantiation に必要な induction expansion `hInd` が次 frontier で、
+`nzT1_Ga` を直接閉じる public theorem はまだ無いことも確認した。

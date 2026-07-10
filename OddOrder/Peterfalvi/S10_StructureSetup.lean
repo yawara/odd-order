@@ -385,7 +385,11 @@ noncomputable abbrev A1 (M : Subgroup G) (tau : PeterfalviType) := OddOrder.Grou
 /-- **Peterfalvi (8.11)**: if `M` has one of the five Peterfalvi types, then
 `M_F` and `M_s` are Hall subgroups of `G`.
 
-The proof is a BG Section 16 consequence, not a local Peterfalvi argument. -/
+The proof is a BG Section 16 consequence, not a local Peterfalvi argument: `M_s = M_σ`
+(`mainSubgroup_eq_Msigma`, BG Prop 16.1) is an ambient Hall subgroup by BG Theorem A(1)
+(`Msigma_isHall`, re-indexed to `π(M_σ)` by `primeFactors_Msigma_eq_sigma`), and `M_F` combines
+its Hall-in-`M` property (`maxNilpotentNormalHall_isHall`) with `M_F ≤ M_σ` for the
+`[G : M]`-part of its index. -/
 theorem hall_maxNilpotentNormalHall_and_mainSubgroup [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
     {tau : PeterfalviType} (hType : HasPeterfalviType tau M) :
@@ -393,7 +397,41 @@ theorem hall_maxNilpotentNormalHall_and_mainSubgroup [Finite G]
         (maxNilpotentNormalHall M) ∧
       Ch03.IsHallSubgroup (Nat.card ↥(mainSubgroup M tau)).primeFactors
         (mainSubgroup M tau) := by
-  sorry
+  have hMsHall := OddOrder.BG.Ch3.S10.Msigma_isHall hG hM
+  constructor
+  · refine ⟨fun p hp => hp, fun p hpidx hpH => ?_⟩
+    have hp_prime : p.Prime := (Nat.mem_primeFactors.mp hpidx).1
+    -- `p ∈ σ(M)`, via `M_F ≤ M_σ` and `π(M_σ) = σ(M)`.
+    have hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M :=
+      (OddOrder.BG.Ch4.S16.primeFactors_Msigma_eq_sigma hG hM p).mp
+        (Nat.mem_primeFactors.mpr ⟨hp_prime,
+          (Nat.dvd_of_mem_primeFactors hpH).trans (Subgroup.card_dvd_of_le
+            (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hM)),
+          Nat.card_pos.ne'⟩)
+    -- Split `[G : M_F] = [M : M_F] · [G : M]`.
+    have hrel : ((maxNilpotentNormalHall M).subgroupOf M).index * M.index
+        = (maxNilpotentNormalHall M).index :=
+      Subgroup.relIndex_mul_index (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le M)
+    have hp_dvd : p ∣ ((maxNilpotentNormalHall M).subgroupOf M).index * M.index := by
+      rw [hrel]; exact Nat.dvd_of_mem_primeFactors hpidx
+    rcases hp_prime.dvd_mul.mp hp_dvd with hin | hout
+    · -- the `[M : M_F]`-part is coprime to `|M_F|`: `M_F` is Hall in `M`.
+      exact (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall M).2 p
+        (Nat.mem_primeFactors.mpr ⟨hp_prime, hin, Subgroup.index_ne_zero_of_finite⟩) hpH
+    · -- the `[G : M]`-part divides `[G : M_σ]`, which avoids `σ(M)`-primes.
+      have hpMσidx : p ∣ (OddOrder.BG.Ch3.S10.Msigma M).index :=
+        hout.trans ⟨((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index,
+          ((Nat.mul_comm _ _).trans
+            (Subgroup.relIndex_mul_index (OddOrder.BG.Ch3.S10.Msigma_le M))).symm⟩
+      exact hMsHall.2 p
+        (Nat.mem_primeFactors.mpr ⟨hp_prime, hpMσidx, Subgroup.index_ne_zero_of_finite⟩) hpσ
+  · -- `M_s = M_σ` (BG Prop 16.1); the Hall property is `Msigma_isHall` re-indexed to `π(M_σ)`.
+    show Ch03.IsHallSubgroup
+      (Nat.card ↥(OddOrder.GroupTheory.mainSubgroup M tau)).primeFactors
+      (OddOrder.GroupTheory.mainSubgroup M tau)
+    rw [OddOrder.BG.Ch4.S16.mainSubgroup_eq_Msigma hG hM hType]
+    exact ⟨fun p hp => hp, fun p hpidx hp => hMsHall.2 p hpidx
+      ((OddOrder.BG.Ch4.S16.primeFactors_Msigma_eq_sigma hG hM p).mp hp)⟩
 
 /-- **Peterfalvi (8.12.b)**, faithful form: type I/II Sylow-complement centralizer control.
 
