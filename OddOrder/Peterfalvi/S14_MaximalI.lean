@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S14_MaximalI.Hypothesis
 import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancy
+import OddOrder.Peterfalvi.S14_MaximalI.PairCoherence
 import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructure
 import OddOrder.Peterfalvi.S14_MaximalI.MinimalCounterexample
 import OddOrder.Peterfalvi.S14_MaximalI.DadeContradiction
