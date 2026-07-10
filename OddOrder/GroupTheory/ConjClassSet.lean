@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 import Mathlib.Algebra.Group.Conj
 import Mathlib.Algebra.Group.Subgroup.Lattice
 import Mathlib.Tactic.Group
+import Mathlib.GroupTheory.Index
+import Mathlib.Data.Set.Card
 
 /-!
 # Conjugacy-closure of a subset `𝒞_G(T)`
@@ -117,6 +119,37 @@ theorem mem_conjClassSetIn_conj_iff {H : Subgroup G} {T : Set G} {g : G} (hg : g
     refine ⟨t, ht, g * b, mul_mem hg hb, ?_⟩
     have e : g * b * t * (g * b)⁻¹ = g * (b * t * b⁻¹) * g⁻¹ := by group
     rw [e, hbe]
+
+/-- **Union bound for the conjugacy saturation**: if `L` stabilises `A` under conjugation
+(elementwise), then `𝒞_G(A)` is covered by the `[G : L]` conjugates `A^g` (`g` over coset
+representatives), so `|𝒞_G(A)| ≤ |A| · [G : L]`.  The `≤` companion of the exact TI-count
+`ncard_conjClassSet_of_isTISubset`; no disjointness needed.
+
+Proof by a counting surjection: `(q, a) ↦ q.out · a · q.out⁻¹` from `(G ⧸ L) × A` covers
+`𝒞_G(A)` — for `y = g·t·g⁻¹` the corrected element `(r⁻¹g)·t·(r⁻¹g)⁻¹` (`r = (mk g).out`,
+`r⁻¹g ∈ L`) lies in `A` by the stabiliser hypothesis. -/
+theorem ncard_conjClassSet_le [Finite G] {A : Set G} {L : Subgroup G}
+    (hstab : ∀ l ∈ L, ∀ t ∈ A, l * t * l⁻¹ ∈ A) :
+    (conjClassSet A).ncard ≤ A.ncard * L.index := by
+  classical
+  set f : (G ⧸ L) × ↥A → G := fun p => p.1.out * (p.2 : G) * p.1.out⁻¹ with hf
+  have himg : conjClassSet A ⊆ Set.range f := by
+    rintro y ⟨t, ht, g, rfl⟩
+    set r : G := (QuotientGroup.mk g : G ⧸ L).out with hr
+    have hrg : r⁻¹ * g ∈ L := by
+      rw [← QuotientGroup.eq]
+      exact Quotient.out_eq _
+    have hta : (r⁻¹ * g) * t * (r⁻¹ * g)⁻¹ ∈ A := hstab _ hrg t ht
+    refine ⟨⟨QuotientGroup.mk g, ⟨_, hta⟩⟩, ?_⟩
+    simp only [hf, ← hr]
+    group
+  calc (conjClassSet A).ncard
+      ≤ (Set.range f).ncard := Set.ncard_le_ncard himg (Set.toFinite _)
+    _ ≤ Nat.card ((G ⧸ L) × ↥A) := by
+        rw [← Set.image_univ, ← Set.ncard_univ ((G ⧸ L) × ↥A)]
+        exact Set.ncard_image_le (Set.toFinite _)
+    _ = A.ncard * L.index := by
+        rw [Nat.card_prod, Nat.card_coe_set_eq, Subgroup.index, mul_comm]
 
 end OddOrder.GroupTheory
 
