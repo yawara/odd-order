@@ -56,9 +56,14 @@ as the bridge for identifying the `S`-side σ-grid (`certainTypeOmegaSigma`) wit
 
 * `ticyclic_eq_sigma_omega_of_eqOn_V`: the **(3.5)-determination** (Coq `eq_in_cycTIiso`) —
   a norm-one virtual character agreeing with the linear character `ω` on `V` *is* `ω^σ`.
-  The grid vectors are pinned by their `V`-restrictions, which is what identifies the two
-  σ-grids of a pair per index (Coq `cycTIisoC`; the assembly is the remaining step of
-  issue 9079 part 2).
+  The grid vectors are pinned by their `V`-restrictions.
+* `ticyclic_sigma_omega_eq_of_V_eq` / `section16_pair_sigma_omega_eq`: the **per-index
+  σ-grid identification** (Coq `cycTIisoC`) — two setups sharing `V` and `W` (in
+  particular the two sides of the canonical pair) have `σ₁(ω(ξ)) = σ₂(ω(ξ'))` with `ξ'`
+  the value-restriction of `ξ` along the `W`-identification.  This is the grid transpose
+  itself; what remains of issue 9079 part 2 is its translation into the named grids
+  (`certainTypeOmegaSigma` ↔ `alignedOmegaSigmaGrid`) and the row-sum pin transfer
+  (item 4).
 
 ## Design note
 
@@ -435,6 +440,40 @@ theorem ticyclic_eq_sigma_omega_of_eqOn_V
       norm_num
     exact (sub_eq_zero.mp hzero).symm
 
+/-- **The per-index σ-grid identification** (Coq `cycTIisoC`, `PFsection3.v:1849`): two
+TI-cyclic setups sharing the TI-set `V` and the ambient `W` have the *same* σ-image on each
+grid character — `σ₁(ω(ξ)) = σ₂(ω(ξ'))`, where `ξ'` is `ξ` read along the `W`-identification
+(value restriction along `Subgroup.inclusion`, no cast).
+
+The grid characters are not `V`-supported, so this does **not** follow from the Dade-map
+agreement (`ticyclic_sigma_eq_of_V_eq`); it is the (3.5)-determination
+(`ticyclic_eq_sigma_omega_of_eqOn_V`) instead: `σ₁(ω(ξ))` is a norm-one virtual character
+(σ is an isometry into `ZIrr`) agreeing with `ω(ξ')` on the shared `V` ((3.2.c) on the
+`hyp₁` side — `ξ` and `ξ'` take the same values), so it *is* `σ₂(ω(ξ'))`. -/
+theorem ticyclic_sigma_omega_eq_of_V_eq
+    (hyp₁ hyp₂ : OddOrder.Peterfalvi.S05.TICyclicHypothesis G)
+    [Fintype hyp₁.W] [Invertible (Nat.card hyp₁.W : ℂ)]
+    [Fintype hyp₂.W] [Invertible (Nat.card hyp₂.W : ℂ)]
+    (hVeq₁ : hyp₁.V = hyp₁.Vdiff) (hVeq₂ : hyp₂.V = hyp₂.Vdiff)
+    (hV : hyp₁.V = hyp₂.V) (hW : hyp₁.W = hyp₂.W)
+    (app₁ : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication (G := G) hyp₁)
+    (app₂ : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication (G := G) hyp₂)
+    (ξ : hyp₁.W →* ℂˣ) :
+    hyp₁.sigma hVeq₁ app₁ (hyp₁.omega ξ : ClassFunction hyp₁.W ℂ)
+      = hyp₂.sigma hVeq₂ app₂
+          (hyp₂.omega (ξ.comp (Subgroup.inclusion hW.ge)) : ClassFunction hyp₂.W ℂ) := by
+  refine ticyclic_eq_sigma_omega_of_eqOn_V hyp₂ hVeq₂ app₂
+    (ξ.comp (Subgroup.inclusion hW.ge))
+    (hyp₁.sigma_mem_ZIrr hVeq₁ app₁
+      (IsIrreducibleCharacter.mem_ZIrr (hyp₁.omega ξ).2)) ?_ ?_
+  · rw [hyp₁.sigma_inner hVeq₁ app₁, irreducibleCharacter_inner_eq_ite, if_pos rfl]
+  · intro v hv₂
+    have hv₁ : v ∈ hyp₁.V := hV ▸ hv₂
+    rw [hyp₁.sigma_apply_irreducibleCharacter_of_mem_V hVeq₁ app₁ (hyp₁.omega ξ) hv₁,
+      OddOrder.Peterfalvi.S05.TICyclicHypothesis.omega_apply,
+      OddOrder.Peterfalvi.S05.TICyclicHypothesis.omega_apply]
+    rfl
+
 end GenericBridge
 
 /-! ## The (8.8) canonical-pair packaging (issue 9079 item (ii))
@@ -579,6 +618,25 @@ theorem exists_section16_partner_typePData [Finite G]
     section16_partner_typePData_W2_eq hG _ hTW1⟩
 
 open scoped FiniteInduce in
+/-- **The canonical pair shares its ambient `W`** (Peterfalvi (8.8), `S ∩ T = W`): the
+`S`-side reconciled datum and a `W₁`-reconciled `T`-side datum give `TICyclicHypothesis`s
+with the same `W = K ⊔ K*` — the `S`-side by `Sdata_W1_eq`/`Sdata_W2_eq` and the pair
+reconciliation, the `T`-side by `section16_partner_typePData_W_eq`.  This is the `hW` input
+of the per-index σ-grid identification (`ticyclic_sigma_omega_eq_of_V_eq`). -/
+theorem section16_pair_tic_W_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPair G}
+    (tp : Section16TypePStructure mp) (hodd : Odd (Nat.card G))
+    (dataT : TypePData mp.T) (hTW1 : dataT.W1 = mp.Kstar) :
+    (typePData_toTICyclicHypothesis tp.Sdata hodd).W
+      = (typePData_toTICyclicHypothesis dataT hodd).W := by
+  have hSW1 : tp.Sdata.W1 = mp.K :=
+    tp.Sdata_W1_eq.trans (tp.W1_eq_K_and_W2_eq_Kstar hG).1
+  have hSW2 : tp.Sdata.W2 = mp.Kstar :=
+    tp.Sdata_W2_eq.trans (tp.W1_eq_K_and_W2_eq_Kstar hG).2
+  rw [typePData_toTICyclicHypothesis_W, typePData_toTICyclicHypothesis_W, tp.Sdata.W_eq,
+    hSW1, hSW2, section16_partner_typePData_W_eq hG dataT hTW1]
+
+open scoped FiniteInduce in
 /-- **The canonical pair shares its TI-set `V`** (Peterfalvi (8.8) for the §10 → §5
 bridges): the `S`-side reconciled datum `tp.Sdata` and a `W₁`-reconciled `T`-side datum
 give `TICyclicHypothesis`s with the *same* `V = W ∖ (K ∪ K*)` — the `W`-blocks agree up to
@@ -595,9 +653,8 @@ theorem section16_pair_tic_V_eq [Finite G]
   have hSW2 : tp.Sdata.W2 = mp.Kstar :=
     tp.Sdata_W2_eq.trans (tp.W1_eq_K_and_W2_eq_Kstar hG).2
   have hTW2 : dataT.W2 = mp.K := section16_partner_typePData_W2_eq hG dataT hTW1
-  refine ticyclic_V_eq_of_swap _ _ rfl rfl ?_ ?_ ?_
-  · rw [typePData_toTICyclicHypothesis_W, typePData_toTICyclicHypothesis_W, tp.Sdata.W_eq,
-      hSW1, hSW2, section16_partner_typePData_W_eq hG dataT hTW1]
+  refine ticyclic_V_eq_of_swap _ _ rfl rfl
+    (section16_pair_tic_W_eq hG tp hodd dataT hTW1) ?_ ?_
   · rw [typePData_toTICyclicHypothesis_W1, typePData_toTICyclicHypothesis_W2, hSW1, hTW2]
   · rw [typePData_toTICyclicHypothesis_W2, typePData_toTICyclicHypothesis_W1, hSW2, hTW1]
 
@@ -660,6 +717,37 @@ theorem section16_pair_sigma_eq [Finite G]
         (αT : ClassFunction ↥(typePData_toTICyclicHypothesis dataT hodd).W ℂ) :=
   ticyclic_sigma_eq_of_V_eq _ _ rfl rfl (section16_pair_tic_V_eq hG tp hodd dataT hTW1)
     appS appT αS αT hα
+
+open scoped FiniteInduce in
+/-- **The per-index identification of the canonical pair's σ-grids** (Coq `cycTIisoC` at
+the (8.8) pair, `PFsection10.v:632` `etaC`; issue 9079 part 2): for each linear character
+`ξ` of the shared `W`, the `S`-side σ-image of the grid character `ω(ξ)` **is** the
+`T`-side σ-image of `ω(ξ')`, where `ξ'` reads `ξ` along the `W`-identification
+(`section16_pair_tic_W_eq`).  Unlike the `CF(W, V)`-agreement (`section16_pair_sigma_eq`)
+this pins the grid vectors themselves — the (3.5)-determination
+(`ticyclic_eq_sigma_omega_of_eqOn_V`) applied over the shared TI-set
+(`section16_pair_tic_V_eq`).  This is the index-by-index translation between the two
+σ-grids of the (10.7) pair-witness route. -/
+theorem section16_pair_sigma_omega_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPair G}
+    (tp : Section16TypePStructure mp) (hodd : Odd (Nat.card G))
+    (dataT : TypePData mp.T) (hTW1 : dataT.W1 = mp.Kstar)
+    (appS : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication (G := G)
+      (typePData_toTICyclicHypothesis tp.Sdata hodd))
+    (appT : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication (G := G)
+      (typePData_toTICyclicHypothesis dataT hodd))
+    (ξ : (typePData_toTICyclicHypothesis tp.Sdata hodd).W →* ℂˣ) :
+    (typePData_toTICyclicHypothesis tp.Sdata hodd).sigma rfl appS
+        ((typePData_toTICyclicHypothesis tp.Sdata hodd).omega ξ
+          : ClassFunction (typePData_toTICyclicHypothesis tp.Sdata hodd).W ℂ)
+      = (typePData_toTICyclicHypothesis dataT hodd).sigma rfl appT
+          ((typePData_toTICyclicHypothesis dataT hodd).omega
+              (ξ.comp (Subgroup.inclusion
+                (section16_pair_tic_W_eq hG tp hodd dataT hTW1).ge))
+            : ClassFunction (typePData_toTICyclicHypothesis dataT hodd).W ℂ) :=
+  ticyclic_sigma_omega_eq_of_V_eq _ _ rfl rfl
+    (section16_pair_tic_V_eq hG tp hodd dataT hTW1)
+    (section16_pair_tic_W_eq hG tp hodd dataT hTW1) appS appT ξ
 
 /- The type-II → canonical-partner reduction (Coq `Frob_der1_type2` head, issue 9079 item 3) -/
 
