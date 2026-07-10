@@ -419,3 +419,20 @@ Coq `cycTIisoC` の Lean 版 = **pair 両側 σ の per-index 同定**:
 注意: ω_S(ξ) の IrreducibleCharacter norm: hφ1 は
 `sigma_inner_irreducibleCharacter` + `irreducibleCharacter_inner_eq_ite` (対角) で
 1 行のはず。
+
+### 2026-07-10 loop 続報: R1 (pair cluster 一般化) LANDED (f1b48365)
+pair lemmas 7 本を (dataS, hSW1 : dataS.W1 = mp.K, hSW2 : dataS.W2 = mp.Kstar) 形へ。
+理由 = row-pin で S-side は S11 setup の data.typeP (tp.Sdata と propositional 等価のみ)
+— 依存型 rewrite (χ₂ 型が data.typeP 依存) を回避する正しい一般性。
+**次 = R2 row-pin theorem** `exists_nu_extension_eq_alignedRow_at_pair`:
+`∃ r' delta', pm ∧ c.extension nu = δ' • ∑_j aligned r' j`。組立 (全 interface 確認済):
+1. hnuIKF := typeII_sOf_subset_inducedKernelFamily data Y hnu_mem →
+   ⟨χ₂, hne1, hkeq⟩ := typeII_reducible_inducedKernelFamily_eq_columnSum (data.typeP)
+2. hdich := typeII_nu_tau2_dichotomy … c hne1 hkeq 0 (2 枝: ±sign • ∑_p chiFam (p, kcol±))
+3. 各枝: section16_pair_chiFam_columnSum_transpose (dataS := data.typeP、hSW1/hSW2 :=
+   hdata ▸ tp-式、dataT := hyp.typeP、hTW1 := hKstar.symm、appS := ticVdiffFullDade…、
+   appT := hyp.canonicalFullDadeApp hG hG.odd) — ticVdiff rfl で型 defeq
+4. Hypothesis.exists_alignedOmegaSigmaGrid_row_sum_eq_chiFam_fiber (r'char := kcol±∘τ)
+5. delta' := ±(columnFamily χ₂).sign、pm := .sign_eq (neg 枝は ∓)
+註: tau2 := c.extension は既に IntegralCharacterMap (packaging 不要)。
+gate 全 fields 組立 (obligation-3 sorried) は row-pin 後、gate file 側で。
