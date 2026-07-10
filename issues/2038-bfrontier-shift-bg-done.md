@@ -1144,3 +1144,30 @@ conjugatesIntoSet 支持 (support_induceSum 系) 経由。(iii) 消費側 (S15_H
 pins / mu_row0_ne) の requirement 形を先に確認してから供給形を決める (lane-c file のため
 b は供給のみ、cite 形の合意は issue 経由)。9080 step 1 (TypeICovering migration) は
 本配線ユニット完了後。
+
+## ✅✅ (2026-07-11、lane-b /loop iter 28) — **mu_orthonormal grounding + (13.18) pin 1/3 (mu_row0_ne) 閉鎖**
+
+消費側精査 → pins の gate は「hyp.mu の grid-property grounding」と確定 → 3002-pattern で実施
+(commit 4e8c7880、full build 4149 green・AxiomsCheck OK):
+
+1. **S15.Hypothesis に `mu_orthonormal` field** (SubcoherenceInputs、b-owned) — full-grid
+   直交正規性 (4.3.b)。Section16Inputs + character-data 層 (FeitThompsonSetup) にも同 field。
+2. **producer 側 discharge = `Section16CharacterData.muS_orthonormal` 実証明** (FeitThompson.lean、
+   muS = columnFamily.mu の列内 injective + 列間 columnFamily_mu_ne、omegaS_inner と同型 ~20 行)。
+   両 derivation site に threading。construction site 破れゼロ (S15.Hypothesis の構築は spine
+   1 箇所のみ)。
+3. **`mu_row0_ne` (S15_HonestTypeP2A0、c file) の sorry を実証明で閉鎖** — pin 自身の docstring が
+   宣言していた interface (「b-side field 待ち」) の完遂、3 行 (mu_orthonormal + if_neg)。
+   cross-lane 編集 self-flag。⚠ 学び: field の inner は **scoped FiniteInduce instance** で
+   elaborate される — 消費側の local `haveI` (Fintype.ofFinite/invertibleOfNonzero) とは
+   instance 項不一致で rw 不可 → lemma 全体を `open scoped FiniteInduce in` に統一
+   ([[lean-instance-defeq-traps]] の新実例)。
+
+**S15_HonestTypeP2A0 実 sorry 3 → 2** (残 = tauS_mu_row0_diff_support :878 /
+tauS_mu_row0_vanish_on_V :896)。両 pin の engines (`residueS_mu2_diff_support` /
+`residueS_mu2_diff_dade_apply_of_mem_V`) は **proven 済** (c、hyp46S 経由) — 残 gap は
+(a) pin signature の j≠0 修正 (9076 over-claim fix、consumer `_hj` pass = b の S15_SAndT 側)、
+(b) hyp.mu = residueS.mu2 の **等式 grounding** (mu_orthonormal より強い、mu field ↔ residue grid
+同定; engines の結論を pin の hyp.mu 形へ transport するのに必要) + η/ω^σ-grid 同定 (V-value pin)。
+次 iter: (a) の signature 修正 + (b) の設計 (等式 field か、pin ごと residueS 形へ restate か —
+consumer tauS_mu_row0_cross の要求形を S15_SAndT:4020 で確認してから)。9080 step 1 はその後。
