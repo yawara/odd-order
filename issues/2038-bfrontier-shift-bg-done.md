@@ -922,3 +922,16 @@ equiv_restrict_compl_ortho port から着手。
   (mu2Grid W∖W₂-値) → residueS transport → S15 grounding fields → mu_row0_ne/pins →
   B(i)(iii) → PVSbeta assembly = betaGrid_A0_support → gammaGrid 系 → (13.19) producer。
   次 iter: (1.3) port 実装開始 (直交補分解の repo 在庫確認から)。
+
+## ✅✅ (2026-07-11、lane-b /loop iter 15) — **Pf (1.3.a/b) core 完全 proven** (依存鎖の底 landed)
+
+新 shared leaf `GroupTheory/RepresentationTheory/SupportedSpanOrthogonality.lean` (sorry-free 一発 green):
+- `eq_zero_on_iff_forall_inner_eq_zero_of_span` ((1.3.a) core): conj-不変 A + A-supported spanning
+  family Φ に対し「D は A 上 0 ↔ D ⊥ 全 Φ i」。非自明方向 = indicator split (conj-不変性で
+  class function、S09 χ₁ パターン) + disjoint-support 直交 + span_induction + ⟨D_A,D_A⟩=0。
+- `apply_eq_on_of_forall_inner_eq` ((1.3.b) 値同定半分): Φ-pairing が一致する 2 つの CF は A 上一致。
+**次 (依存鎖を上へ)**: (i) normedTI(W∖W₂) 供給 — Φ := ew-基底 (CF(W, W∖W₂) の spanning family) の
+構成と、その Ind-image が mu2Grid の δ·μ grid と pairing 一致することの確認 (Coq :361 の
+instantiation)、(ii) mu2Grid の W∖W₂-値 identity (`prTIirr_id` 対応) を PrimeTIResidue に追加。
+Φ-spanning は supportedSubmodule (W∖W₂-in-W) の基底 = ω-grid の差族 (V2base = ew_ ij) —
+S05/S06 の ω-grid API から組む。
