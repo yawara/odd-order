@@ -1,4 +1,5 @@
 import OddOrder.FeitThompsonSetup
+import OddOrder.Peterfalvi.S15_HonestTypeP2A0
 
 /-!
 # TAIL
@@ -341,6 +342,70 @@ theorem muS_orthonormal (i k : Fin tp.q) (j l : Fin tp.p) :
   · rw [if_neg ((mp.certainTypeS hG).columnFamily_mu_ne
         (fun hc => hjl ((chi2enum hG mp tp).injective hc)) _ _),
       if_neg (by simp [hjl])]
+
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
+/-- **The type-`P₂` `Hypothesis46` on the `muS` producer instance** (issue 2038, the shortcut
+that avoids the two-instance grid identification): a §6 `Hypothesis46 (A(S)) S` whose
+`toHypothesis` is the κ-Hall instance `mp.certainTypeS` — the *same* instance whose
+`columnFamily` is the `muS` grid — so the §6 certain-type engines
+(`certainType_diff_supp_subset_A0`, `certainType_diff_dade_apply_eq_of_mem_V`) apply to `muS`
+directly.  The `tic` reconciliations are the `W₁/W₂/K`-equalities of the two §6 instances
+(`sdataS06_*`/`certainTypeS_*_eq`); the Dade data is the honest `'A0(S)`-Dade of
+`dadeSupportHypothesisData_honestTypeP2A0Set`; the kernel-family subgroup is `M_σ(S)` with the
+`A(S)`-covering of `mem_honestTypeP2ASet` (mirroring `S15.Hypothesis.hyp46S`). -/
+noncomputable def hyp46Smp :
+    OddOrder.Peterfalvi.S06.Hypothesis46
+      (OddOrder.Peterfalvi.S15.honestTypeP2ASet mp.S) mp.S :=
+  { toHypothesis := mp.certainTypeS hG
+    dade := ((OddOrder.Peterfalvi.S15.dadeSupportHypothesisData_honestTypeP2A0Set hG
+          mp.S_maximal mp.S_typeP2 tp.Sdata).some.dade).restrict Set.subset_union_left
+        (fun l _ ha => OddOrder.Peterfalvi.S15.honestTypeP2ASet_conj_mem l.2 ha)
+    tic := OddOrder.Peterfalvi.S12.typePData_toTICyclicHypothesis tp.Sdata hG.odd
+    tic_W1 := by
+      show tp.Sdata.W1 = _
+      rw [certainTypeS_W1_eq, Subgroup.map_subgroupOf_eq_of_le mp.K_le_S,
+        tp.Sdata_W1_eq, tp.W1_eq_K hG]
+    tic_W2 := by
+      show tp.Sdata.W2 = _
+      rw [certainTypeS_W2_eq, Subgroup.map_subgroupOf_eq_of_le (kstar_le_S hG mp),
+        tp.Sdata_W2_eq, tp.W2_eq_Kstar hG]
+    tic_V := rfl
+    subH := (OddOrder.BG.Ch3.S10.Msigma mp.S).subgroupOf mp.S
+    subH_normal := by
+      rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
+    W2_le_subH := by
+      rw [certainTypeS_W2_eq, ← tp.W2_eq_Kstar hG, ← tp.Sdata_W2_eq]
+      refine Subgroup.subgroupOf_mono mp.S ?_
+      have hW2H : tp.Sdata.W2 ≤ tp.Sdata.H := le_trans tp.Sdata.W2_le inf_le_left
+      rw [tp.Sdata.H_eq] at hW2H
+      exact le_trans hW2H
+        (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG mp.S_maximal)
+    subH_le_K := by
+      rw [certainTypeS_K_eq]
+      exact Subgroup.subgroupOf_mono mp.S
+        (OddOrder.BG.Ch3.S10.Msigma_le_derived hG mp.S_maximal)
+    A_covers := by
+      intro hh hhσ hh1 x hx hx1
+      rw [Subgroup.mem_inf] at hx
+      obtain ⟨hxC, hxD⟩ := hx
+      rw [certainTypeS_K_eq, Subgroup.mem_subgroupOf] at hxD
+      rw [Subgroup.mem_subgroupOf] at hhσ
+      rw [Subgroup.mem_centralizer_iff] at hxC
+      rw [OddOrder.Peterfalvi.S15.mem_honestTypeP2ASet]
+      refine ⟨hxD, ?_, (hh : G), ⟨hhσ, ?_⟩, ?_⟩
+      · simpa using hx1
+      · simpa using hh1
+      · rw [Subgroup.mem_centralizer_iff]
+        rintro g rfl
+        have hcomm := hxC (hh : ↥mp.S) rfl
+        have := congrArg (mp.S.subtype) hcomm
+        simpa using this
+    dade0 := (OddOrder.Peterfalvi.S15.dadeSupportHypothesisData_honestTypeP2A0Set hG
+        mp.S_maximal mp.S_typeP2 tp.Sdata).some.dade
+    tau := ((OddOrder.Peterfalvi.S15.dadeSupportHypothesisData_honestTypeP2A0Set hG
+          mp.S_maximal mp.S_typeP2 tp.Sdata).some.dade).fullDadeIsometryData
+      (OddOrder.Peterfalvi.S15.dadeSupportHypothesisData_honestTypeP2A0Set hG
+        mp.S_maximal mp.S_typeP2 tp.Sdata).some.hconj }
 
 /-- The `omegaS` are linear characters: `ω_{ij}(1) = 1`. -/
 theorem omegaS_apply_one (i : Fin tp.q) (j : Fin tp.p) :
