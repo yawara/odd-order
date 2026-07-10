@@ -451,3 +451,22 @@ at pair — nu_tau2_eq/tau2 (= c.extension)/r'/delta' は row-pin で実、oblig
 skeleton) → (c) aux WLOG 差し替え + Frobenius 結論 conj 転送 (obligation 3 と並行)。
 接続部品は全て landed: hSW1/hSW2 := hdata ▸ (tp.Sdata_W1_eq.trans
 (tp.W1_eq_K_and_W2_eq_Kstar hG).1) 等 (Subgroup-level、依存なし)。
+
+### tail 続報: (a) split + (b) pair-package producer LANDED (00bb893f + 9f944c66)
+- (a) `S12_TICyclicSigmaBridge.lean` (574 行、generic 層) ← `S12_TypeIIGridTranspose`
+  (966 行、pair 実体化) の 2-leaf 構成へ。namespace/下流不変。
+- (b) `S12_TypeIICrossIsometryPair.lean` (新 leaf): `exists_typeIICrossIsometryData_at_pair`
+  — tau2 (= c.extension) + r'/delta'/nu_tau2_eq (= row pin) を**実生産**、
+  obligation-3 の 4 fields (lam_ortho_grid/zeta_ortho_grid/zeta_lam_ortho/cross_zero)
+  のみ sorry (単一 discharge 点)。gate 本体は import cycle で cite 不可 — aux 差し替えは
+  本 leaf 下流。
+**残 (優先順 = 上流+文書順)**:
+1. **obligation 3-(5.3.b)**: lam_ortho_grid / zeta_ortho_grid — coherent image ⊥ σ-grid
+   (Coq coherent_ortho_cycTIiso)。§5 章内容、s10_7 note update⁵ の部品survey参照。
+2. **obligation 3-(8.18.b)**: zeta_lam_ortho / cross_zero — support disjointness
+   (disjoint_conjugatesIntoSet_of_centralizer 等 landed 部品あり)。
+3. **(c) aux 差し替え**: 新 leaf (S12_TypeIICrossIsometryPair 下流) に aux の pair-witness
+   版 — WLOG entry (exists_seeded_pair_conj_typeII) + setup 組立 (exists_typesIIIIIIVSetup_
+   Sdata、hSW1/hSW2 := hdata ▸ tp-式) + §9 counts 再 instantiate + package.elim →
+   IsFrobeniusGroup (derivedInG mp.S) → conj 転送 (maxNilpotentNormalHall equivariance +
+   complement flexibility) → 旧 aux/gate の deprecate。
