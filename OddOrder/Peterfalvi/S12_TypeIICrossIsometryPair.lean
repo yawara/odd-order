@@ -150,6 +150,173 @@ theorem typeII_tau_diff_inner_chiFam_eq_zero [Finite G]
       (typeIIHypothesis46 hG hSmax hSII data.typeP)) hψZ hψ2 hψV
   exact hall P
 
+open scoped Classical FiniteInduce in
+/-- **The (5.3.b) base orthogonality, per `R`-element** (Coq `FTtypeP_base_ortho`): every
+member of the dispatched `R(λ)`-family is orthogonal to every (3.5) grid vector `χ_P`.
+
+The constituent trick over the kernel `typeII_tau_diff_inner_chiFam_eq_zero`: an
+`R`-element `α` with `⟨α, χ_P⟩ ≠ 0` would satisfy `χ_P = ±α` (both are norm-one virtual
+characters, so the integer inner product is `±1` and the difference/sum has norm `0`);
+but then the flat expansion `τ_S(λ − λ̄) = ∑_{β ∈ R(λ)} β` (`image_eq`) pairs with `χ_P`
+to `⟨α, χ_P⟩ = ±1 ≠ 0` (all other terms die by orthonormality of `R(λ)`), contradicting
+the kernel. -/
+theorem typeII_R_mem_inner_chiFam_eq_zero [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S)
+    (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup S)
+    [NeZero (Nat.card (typeIIHypothesis46 hG hSmax hSII data.typeP).W1)]
+    {Y : Subgroup G} {lam nu : ClassFunction ↥S ℂ}
+    (hlam_mem : lam ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (hlam_irr : IsIrreducibleCharacter lam)
+    (hnu_mem : nu ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (hdeg : lam 1 = nu 1)
+    {α : ClassFunction G ℂ}
+    (hα : α ∈ (typeII_T2_memberRFamily hG hSmax hSII data hlam_mem hnu_mem hdeg
+      (Set.mem_insert _ _)).imageSet)
+    (P : ((OddOrder.Peterfalvi.S06.ticVdiff
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)).W1.subgroupOf
+        (OddOrder.Peterfalvi.S06.ticVdiff
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)).W →* ℂˣ) ×
+      ((OddOrder.Peterfalvi.S06.ticVdiff
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)).W2.subgroupOf
+        (OddOrder.Peterfalvi.S06.ticVdiff
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)).W →* ℂˣ)) :
+    ClassFunction.inner α
+      ((OddOrder.Peterfalvi.S06.ticVdiff
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)).chiFam rfl
+        (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)) P) = 0 := by
+  classical
+  by_contra hne
+  -- both sides are norm-one virtual characters
+  have hαZ : α ∈ ZIrr G :=
+    (typeII_T2_memberRFamily hG hSmax hSII data hlam_mem hnu_mem hdeg
+      (Set.mem_insert _ _)).mem_ZIrr α hα
+  have hα1 : ClassFunction.inner α α = 1 :=
+    (typeII_T2_memberRFamily hG hSmax hSII data hlam_mem hnu_mem hdeg
+      (Set.mem_insert _ _)).inner_self_of_mem hα
+  have hPZ : (OddOrder.Peterfalvi.S06.ticVdiff
+      (typeIIHypothesis46 hG hSmax hSII data.typeP)).chiFam rfl
+      (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)) P ∈ ZIrr G :=
+    ((OddOrder.Peterfalvi.S06.ticVdiff
+      (typeIIHypothesis46 hG hSmax hSII data.typeP)).chiFam_spec rfl
+      (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+        (typeIIHypothesis46 hG hSmax hSII data.typeP))).2.1 P
+  have hP1 : ClassFunction.inner
+      ((OddOrder.Peterfalvi.S06.ticVdiff
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)).chiFam rfl
+        (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)) P)
+      ((OddOrder.Peterfalvi.S06.ticVdiff
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)).chiFam rfl
+        (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)) P) = 1 := by
+    rw [((OddOrder.Peterfalvi.S06.ticVdiff
+      (typeIIHypothesis46 hG hSmax hSII data.typeP)).chiFam_spec rfl
+      (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+        (typeIIHypothesis46 hG hSmax hSII data.typeP))).2.2.1, if_pos rfl]
+  -- the integer inner product is `±1`
+  obtain ⟨c, hc⟩ := inner_intCast_of_mem_ZIrr hαZ hPZ
+  have hcne : c ≠ 0 := by
+    intro h0
+    rw [h0] at hc
+    exact hne (by rw [hc]; norm_num)
+  have hcstar : ClassFunction.inner
+      ((OddOrder.Peterfalvi.S06.ticVdiff
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)).chiFam rfl
+        (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)) P) α = (c : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hc, star_intCast]
+  have hsub : ClassFunction.inner
+      (α - (OddOrder.Peterfalvi.S06.ticVdiff
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)).chiFam rfl
+        (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)) P)
+      (α - (OddOrder.Peterfalvi.S06.ticVdiff
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)).chiFam rfl
+        (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)) P) = ((2 - 2 * c : ℤ) : ℂ) := by
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right, hα1, hP1, hc, hcstar]
+    push_cast; ring
+  have hadd : ClassFunction.inner
+      (α + (OddOrder.Peterfalvi.S06.ticVdiff
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)).chiFam rfl
+        (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)) P)
+      (α + (OddOrder.Peterfalvi.S06.ticVdiff
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)).chiFam rfl
+        (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)) P) = ((2 + 2 * c : ℤ) : ℂ) := by
+    rw [ClassFunction.inner_add_left, ClassFunction.inner_add_right,
+      ClassFunction.inner_add_right, hα1, hP1, hc, hcstar]
+    push_cast; ring
+  have hle : c ≤ 1 := by
+    have h0 := inner_self_re_nonneg (α - (OddOrder.Peterfalvi.S06.ticVdiff
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)).chiFam rfl
+      (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)) P)
+    rw [hsub, Complex.intCast_re] at h0
+    have : (0 : ℤ) ≤ 2 - 2 * c := by exact_mod_cast h0
+    omega
+  have hge : -1 ≤ c := by
+    have h0 := inner_self_re_nonneg (α + (OddOrder.Peterfalvi.S06.ticVdiff
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)).chiFam rfl
+      (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)) P)
+    rw [hadd, Complex.intCast_re] at h0
+    have : (0 : ℤ) ≤ 2 + 2 * c := by exact_mod_cast h0
+    omega
+  -- `χ_P = ±α`
+  have hPeq : (OddOrder.Peterfalvi.S06.ticVdiff
+      (typeIIHypothesis46 hG hSmax hSII data.typeP)).chiFam rfl
+      (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)) P = (c : ℂ) • α := by
+    interval_cases c
+    · -- `c = −1`: `χ_P = −α`
+      have hzero : α + (OddOrder.Peterfalvi.S06.ticVdiff
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)).chiFam rfl
+          (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+            (typeIIHypothesis46 hG hSmax hSII data.typeP)) P = 0 := by
+        refine eq_zero_of_inner_self_re_eq_zero ?_
+        rw [hadd]
+        norm_num
+      rw [show (((-1 : ℤ) : ℂ)) = -1 from by norm_num, neg_one_smul]
+      exact eq_neg_of_add_eq_zero_right hzero
+    · exact absurd rfl hcne
+    · -- `c = 1`: `χ_P = α`
+      have hzero : α - (OddOrder.Peterfalvi.S06.ticVdiff
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)).chiFam rfl
+          (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+            (typeIIHypothesis46 hG hSmax hSII data.typeP)) P = 0 := by
+        refine eq_zero_of_inner_self_re_eq_zero ?_
+        rw [hsub]
+        norm_num
+      rw [show (((1 : ℤ) : ℂ)) = 1 from by norm_num, one_smul]
+      exact (sub_eq_zero.mp hzero).symm
+  -- the flat `R`-expansion pairs to `±1 ≠ 0`, contradicting the kernel
+  have hk1 := typeII_tau_diff_inner_chiFam_eq_zero hG hSmax hSII data hlam_mem hlam_irr P
+  rw [(typeII_T2_memberRFamily hG hSmax hSII data hlam_mem hnu_mem hdeg
+      (Set.mem_insert _ _)).image_eq,
+    OddOrder.RepresentationTheory.inner_sum_left] at hk1
+  have hsingle : ∀ β ∈ (typeII_T2_memberRFamily hG hSmax hSII data hlam_mem hnu_mem hdeg
+      (Set.mem_insert _ _)).imageSet, β ≠ α →
+      ClassFunction.inner β
+        ((OddOrder.Peterfalvi.S06.ticVdiff
+            (typeIIHypothesis46 hG hSmax hSII data.typeP)).chiFam rfl
+          (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+            (typeIIHypothesis46 hG hSmax hSII data.typeP)) P) = 0 := by
+    intro β hβ hβne
+    rw [hPeq, OddOrder.RepresentationTheory.inner_smul_right,
+      (typeII_T2_memberRFamily hG hSmax hSII data hlam_mem hnu_mem hdeg
+        (Set.mem_insert _ _)).orthonormal β hβ α hα, if_neg hβne]
+    simp
+  rw [Finset.sum_eq_single α hsingle (fun h => absurd hα h)] at hk1
+  rw [hPeq, OddOrder.RepresentationTheory.inner_smul_right, hα1, mul_one] at hk1
+  have : (c : ℂ) = 0 := star_eq_zero.mp hk1
+  exact hcne (by exact_mod_cast this)
+
 set_option linter.unusedVariables false in
 open scoped Classical FiniteInduce in
 /-- **The (10.7) cross-isometry package at the canonical pair** (Coq `Frob_der1_type2`,
