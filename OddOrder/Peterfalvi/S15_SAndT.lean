@@ -268,25 +268,6 @@ theorem exists_typeIFrobeniusData_W2_le [Finite G] (_hG : OddOrder.BG.IsMinimalS
   rw [this]
   exact Subgroup.map_mono hx
 
-/-- **`S`-side dual of `complement_inf_Q_structure`** (V-side, gated): for the `W₂`-containing
-Frobenius complement `E`, `E ⊓ P = W₂` and `E ⊄ P`.  Mirror of the gated `complement_inf_Q_structure`
-(the §13 residual `E ∩ P = W₂`); declared sorried per the hub cite-gated directive.
-
-⚠ **Over-strong (hub issue 3004, ruling 3)**: the V-side dual of (13.17.c) is a genuine
-**dichotomy** — `L = H ⋊ W₂` (so `E = W₂ ≤ N_G(W₂)`, `e = p`) or `L = H ⋊ (W₂W₁^y)` (`e = pq`) —
-and unlike the S-side (where (14.5)'s `e = q < p` argument kills the small branch) the `E = W₂`
-branch **cannot be excluded** before (14.11): the exclusion would need `q ≤ e`, which fails on
-that branch (`q < p = e`).  The unconditional second conjunct `¬ E ≤ P` is therefore only
-fillable through (14.11) itself (a hoisted conclusion).  New consumers must cite
-`complement_inf_P_structure_dichotomy` below; this form is kept only until the §16
-`exists_MHypothesis` restructure (issue 3004, ruling 1) migrates and will then be deleted. -/
-theorem complement_inf_P_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) {L : Subgroup G}
-    (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
-    (hW2E : hyp.W2 ≤ frob.complement.map L.subtype) :
-    frob.complement.map L.subtype ⊓ hyp.P = hyp.W2 ∧
-      ¬ frob.complement.map L.subtype ≤ hyp.P := sorry
-
 /-- **Peterfalvi (13.17.c), V-side dual — faithful dichotomy form** (hub issue 3004, ruling 3):
 for the `W₂`-containing Frobenius complement `E` of the type-I maximal `L` over `N_G(V)`, either
 `E = W₂` (the `L = H ⋊ W₂` branch, `e = p`), or `E ⊓ P = W₂` and `E ⊄ P` (the
@@ -410,8 +391,8 @@ theorem P_W1_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 /-- **The `e = pq` branch computation** (V-side): from the (13.17.c)-dual second-branch facts
 `E ⊓ P = W₂` and `E ⊄ P`, the complement order is `p q`.  This is the sorry-free arithmetic core
-shared by `complement_card_eq_pq_V` (deprecated unconditional form) and
-`complement_card_p_or_pq_V` (faithful dichotomy form). -/
+of `complement_card_p_or_pq_V` (the faithful dichotomy form; the deprecated unconditional
+`complement_card_eq_pq_V` family was deleted per hub issue 3004 ruling 3). -/
 theorem complement_card_eq_pq_V_of_structure [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) {L : Subgroup G}
@@ -455,21 +436,6 @@ theorem complement_card_eq_pq_V_of_structure [Finite G]
     Nat.card_congr (Subgroup.equivMapOfInjective frob.complement L.subtype
       L.subtype_injective).toEquiv, hEmcard]
 
-/-- **`T`-side dual of `complement_card_eq_pq`** (V-side).
-
-⚠ **Deprecated over-strong form (hub issue 3004, ruling 3)**: consumes the unconditional
-`complement_inf_P_structure`, whose `¬ E ≤ P` conjunct cannot be discharged before (14.11)
-(the `E = W₂`, `e = p` branch of the (13.17.c)-dual is live).  New consumers must cite
-`complement_card_p_or_pq_V`; this form will be deleted once the §16 `exists_MHypothesis`
-restructure (issue 3004, ruling 1) migrates. -/
-theorem complement_card_eq_pq_V [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) {L : Subgroup G}
-    (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
-    (hW2E : hyp.W2 ≤ frob.complement.map L.subtype) :
-    Nat.card ↥frob.complement = hyp.p * hyp.q := by
-  obtain ⟨hInf, hnle⟩ := complement_inf_P_structure _hG hyp frob hW2E
-  exact complement_card_eq_pq_V_of_structure _hG hyp frob hW2E hInf hnle
-
 /-- **Peterfalvi (13.17.c), V-side dual — the complement-order dichotomy** (hub issue 3004,
 ruling 3): the `W₂`-containing Frobenius complement of the type-I maximal `L` over `N_G(V)` has
 order `p` (the `L = H ⋊ W₂` branch) or `p q` (the `L = H ⋊ (W₂W₁^y)` branch).  The faithful
@@ -486,72 +452,6 @@ theorem complement_card_p_or_pq_V [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleO
     exact hyp.p_eq_card_W2.symm
   · exact Or.inr (complement_card_eq_pq_V_of_structure _hG hyp frob hW2E hInf hnle)
 
-/-- **`T`-side dual of `TypeIOverNormalizerData`** (V-side): the type-I-over-`N_G(V)` structure of a
-maximal `L` for `T` type II — its Frobenius decomposition with `V` in the kernel `L_F` and a
-`W₁`-conjugate in the complement (order `p q`). -/
-structure TypeIOverNormalizerDataV (hyp : Hypothesis (G := G)) where
-  L : Subgroup G
-  H : Subgroup G
-  L_maximal : L ∈ maximalSubgroups G
-  H_eq_LF : H = maxNilpotentNormalHall L
-  normalizer_V_le_L : Subgroup.normalizer (hyp.V : Set G) ≤ L
-  frobenius : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L
-  V_le_H : hyp.V ≤ H
-  /-- **Peterfalvi (13.17.c)/(14.5)**: the Frobenius complement has order `p q` (the `W₂W₁^y`
-  alternative). -/
-  complement_card_eq_pq : Nat.card ↥frobenius.complement = hyp.p * hyp.q
-  /-- **Peterfalvi (13.17.c)/(14.5)**: a conjugate `W₁^y` (`y ∈ P`) lies in the Frobenius
-  complement of `L`. -/
-  exists_y_W1_conj_le_complement :
-    ∃ y ∈ hyp.P, (MulAut.conj y • hyp.W1 : Subgroup G) ≤
-      frobenius.complement.map L.subtype
-
-/-- **`T`-side dual of `typeI_overNormalizer_complement`** (Pf (13.17.c), V-side): the
-`W₂`-containing Frobenius complement of `L` over `N_G(V)` has order `p q` and contains a conjugate
-`W₁^y` (`y ∈ P`).  Mirror; the `∃ y` extraction reuses the generic `exists_mem_conj_W2_le_of_dvd_card`
-with `(Q, W2, E) := (P, W1, E)`. -/
-theorem typeI_overNormalizer_complement_V [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (_hTTypeII : IsTypeII hyp.T) {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
-    (_hNVL : Subgroup.normalizer (hyp.V : Set G) ≤ L)
-    (_hVH : hyp.V ≤ maxNilpotentNormalHall L)
-    (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
-    (hW2E : hyp.W2 ≤ frob.complement.map L.subtype) :
-    Nat.card ↥frob.complement = hyp.p * hyp.q ∧
-      ∃ y ∈ hyp.P, (MulAut.conj y • hyp.W1 : Subgroup G) ≤
-        frob.complement.map L.subtype := by
-  have hcard := complement_card_eq_pq_V _hG hyp frob hW2E
-  refine ⟨hcard, ?_⟩
-  obtain ⟨hWnorm, hdisj, hpP⟩ := P_W1_structure _hG hyp
-  have hEPW1 := complement_le_PW1 _hG hyp frob hW2E
-  haveI hPsolv : IsSolvable ↥hyp.P := by
-    have hPS : hyp.P ≤ hyp.S := by
-      rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
-    have hSlt : hyp.S < ⊤ := lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hyp.S_maximal).1
-    exact _hG.solvable_of_lt_top hyp.P (lt_of_le_of_lt hPS hSlt)
-  have hqE : hyp.q ∣ Nat.card ↥(frob.complement.map L.subtype) := by
-    rw [Nat.card_congr (Subgroup.equivMapOfInjective frob.complement L.subtype
-      L.subtype_injective).toEquiv.symm, hcard]
-    exact dvd_mul_left hyp.q hyp.p
-  exact exists_mem_conj_W2_le_of_dvd_card hWnorm hPsolv hdisj hyp.q_prime
-    hyp.q_eq_card_W1.symm hpP hEPW1 hqE
-
-/-- **`T`-side dual of `typeII_overNormalizer_frobenius`** (Pf (13.17), V-side): for `T` type II, a
-maximal subgroup over `N_G(V)` is type-I Frobenius, contains `V` in its kernel, and has a complement
-of order `p q` with a conjugate `W₁^y`.  Assembled from `exists_typeI_maximal_overNormalizer_V`,
-`exists_typeIFrobeniusData_W2_le`, and `typeI_overNormalizer_complement_V`. -/
-theorem typeII_overNormalizer_frobenius_V [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (hTTypeII : IsTypeII hyp.T) :
-    ∃ data : TypeIOverNormalizerDataV hyp,
-      data.frobenius.kernel_eq_MF ∧ (hyp.V ≤ data.H) := by
-  obtain ⟨L, hLmax, hLtypeI, hNVL, hVH⟩ :=
-    exists_typeI_maximal_overNormalizer_V _hG hyp hTTypeII
-  obtain ⟨frob, hker, hW2E⟩ := exists_typeIFrobeniusData_W2_le _hG hyp hLmax hLtypeI hNVL
-  obtain ⟨hcard, hy⟩ :=
-    typeI_overNormalizer_complement_V _hG hyp hTTypeII hLmax hNVL hVH frob hW2E
-  exact ⟨⟨L, maxNilpotentNormalHall L, hLmax, rfl, hNVL, frob, hVH, hcard, hy⟩, hker, hVH⟩
-
 /-- **Frobenius index bridge** (Pf (14.11), structural): for a type-I maximal `M` with
 `TypeIFrobeniusData`, the index `|M : M_F|` of the Fitting kernel equals the order of the Frobenius
 complement.  Immediate from the complement structure `M = M_F ⋊ complement` (`IsComplement'`) and the
@@ -563,34 +463,6 @@ theorem typeIFrobenius_kernel_index_eq_complement {M : Subgroup G}
     ((maxNilpotentNormalHall M).subgroupOf M).index = Nat.card data.complement := by
   rw [← data.typeI.typeF.H_eq]
   exact data.frobenius.isComplement.symm.index_eq_card
-
-/-- **Peterfalvi (14.10), structural foundation**: for `T` of type II, there is a type-I maximal
-subgroup `M` over `N_G(V)` carrying a §14 `S14.Hypothesis`, with Fitting-kernel index
-`|M : M_F| = p q`.  Assembled from the V-side producer `typeII_overNormalizer_frobenius_V` (`M`,
-maximality, `N_G(V) ≤ M`, the Frobenius complement of order `p q`), `S14.exists_typeI_hypothesis`
-(the (12.1) `Hypothesis` from `IsTypeI M`), and the index bridge
-`typeIFrobenius_kernel_index_eq_complement` (`|M : M_F| = |complement| = p q`).  This is the
-sorry-free structural half of `exists_MHypothesis` — it supplies `MHypothesis`'s
-`M`/`K = M_F`/`typeIHyp`/`e_eq_index`/`complement_card_eq_pq` fields; the §7/§8/§13 character carrier
-(`h78`, `betaM`, the σ counts) is isolated separately.  Gated on `T_typeII` (14.9) for `IsTypeII T`,
-cited at the §16 consumer.
-
-⚠ **Deprecated over-strong form (hub issue 3004, ruling 3)**: the unconditional `index = p q`
-transits the unfillable `¬ E ≤ P` of `complement_inf_P_structure`.  New consumers must cite
-`exists_M_structural_dichotomy`; this form will be deleted once the §16 `exists_MHypothesis`
-restructure (issue 3004, ruling 1) migrates. -/
-theorem exists_M_structural [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (hTII : IsTypeII hyp.T) :
-    ∃ (M : Subgroup G) (_typeIHyp : OddOrder.Peterfalvi.S14.Hypothesis M),
-      M ∈ maximalSubgroups G ∧
-        Subgroup.normalizer (hyp.V : Set G) ≤ M ∧
-          ((maxNilpotentNormalHall M).subgroupOf M).index = hyp.p * hyp.q := by
-  obtain ⟨vdata, _hker, _hVH⟩ := typeII_overNormalizer_frobenius_V hG hyp hTII
-  have hMtypeI : IsTypeI vdata.L := ⟨vdata.frobenius.typeI⟩
-  obtain ⟨typeIHyp⟩ := OddOrder.Peterfalvi.S14.exists_typeI_hypothesis hG vdata.L_maximal hMtypeI
-  refine ⟨vdata.L, typeIHyp, vdata.L_maximal, vdata.normalizer_V_le_L, ?_⟩
-  rw [typeIFrobenius_kernel_index_eq_complement vdata.frobenius]
-  exact vdata.complement_card_eq_pq
 
 /-- **Peterfalvi (14.10), structural foundation — faithful dichotomy form** (hub issue 3004,
 ruling 3): for `T` of type II, there is a type-I maximal subgroup `M` over `N_G(V)` carrying a §14
