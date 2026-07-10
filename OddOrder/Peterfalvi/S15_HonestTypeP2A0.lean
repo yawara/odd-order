@@ -707,6 +707,7 @@ cross-relation is a pure assembly around the (3.8) rigidity engine `S16.eta_diff
 lemmas (`prTIres`/`prDade_sub_TIirr_on`/`prTIirr_id`, `PFsection4.v`), the shared prime-`TI` residue
 foundation tracked in issue 9014. -/
 
+open scoped FiniteInduce in
 /-- **Prime-`TI` row-`0` cross-column distinctness** (issue 9076 piece 4c-4): distinct columns of
 row `0` carry distinct `μ`-entries, `μ_{0j} ≠ μ_{0,#1}` for `j ≠ #1`.  This is the cross-column
 injectivity of the prime-`TI` residue grid: the `μ_{ij}` are pairwise-distinct irreducibles across
@@ -718,9 +719,6 @@ theorem Hypothesis.mu_row0_ne [Finite G] (hyp : Hypothesis (G := G)) {j : Fin hy
     hyp.mu ⟨0, hyp.q_prime.pos⟩ j
       ≠ hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩ := by
   classical
-  haveI : Fintype ↥hyp.S := Fintype.ofFinite _
-  haveI : Invertible (Nat.card ↥hyp.S : ℂ) :=
-    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   intro heq
   -- The diagonal value `⟨μ_{0,#1}, μ_{0,#1}⟩ = 1` (irreducibility, `mu_irreducible`).
   have hdiag : OddOrder.RepresentationTheory.ClassFunction.inner
@@ -728,15 +726,14 @@ theorem Hypothesis.mu_row0_ne [Finite G] (hyp : Hypothesis (G := G)) {j : Fin hy
       (hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩) = 1 :=
     (hyp.mu_irreducible ⟨0, hyp.q_prime.pos⟩
       ⟨1, by have := hyp.three_le_p; omega⟩).inner_self_eq_one
-  -- The off-diagonal (row-`0` cross-column) value `⟨μ_{0j}, μ_{0,#1}⟩ = 0` (`j ≠ #1`) is the **sole
-  -- genuine content** — the prime-`TI` grounding, transported from the `sorry`-free
-  -- `PrimeTIResidueData.mu2_orthonormal` once `hyp.mu` is grounded to the residue grid `residueS.mu2`
-  -- (a grid-property field on `S15.Hypothesis`, b-side; discharged in the spine where
-  -- `Section16CharacterData.muS = columnFamily.mu = residueS.mu2`, cf. `S13_PrimeTIResidueBridge`).
-  -- Under-determined by the abstract `Hypothesis` axioms (`mu_col_injective` is within-column only;
-  -- the induced `mu_definition` fixes only column differences).  Issues 9076/3002/9014.
+  -- The off-diagonal (row-`0` cross-column) value `⟨μ_{0j}, μ_{0,#1}⟩ = 0` (`j ≠ #1`) is the
+  -- prime-`TI` grounding: the full-grid orthonormality field `mu_orthonormal` (b-side, issues
+  -- 9076/3002/9014), discharged in the spine by `Section16CharacterData.muS_orthonormal`
+  -- (`muS = columnFamily.mu = residueS.mu2`, cf. `S13_PrimeTIResidueBridge`).
   have hoff : OddOrder.RepresentationTheory.ClassFunction.inner (hyp.mu ⟨0, hyp.q_prime.pos⟩ j)
-      (hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩) = 0 := sorry
+      (hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩) = 0 := by
+    rw [hyp.mu_orthonormal]
+    exact if_neg (fun hc => hj hc.2)
   rw [heq, hdiag] at hoff
   exact one_ne_zero hoff
 

@@ -1144,3 +1144,158 @@ conjugatesIntoSet 支持 (support_induceSum 系) 経由。(iii) 消費側 (S15_H
 pins / mu_row0_ne) の requirement 形を先に確認してから供給形を決める (lane-c file のため
 b は供給のみ、cite 形の合意は issue 経由)。9080 step 1 (TypeICovering migration) は
 本配線ユニット完了後。
+
+## ✅✅ (2026-07-11、lane-b /loop iter 28) — **mu_orthonormal grounding + (13.18) pin 1/3 (mu_row0_ne) 閉鎖**
+
+消費側精査 → pins の gate は「hyp.mu の grid-property grounding」と確定 → 3002-pattern で実施
+(commit 4e8c7880、full build 4149 green・AxiomsCheck OK):
+
+1. **S15.Hypothesis に `mu_orthonormal` field** (SubcoherenceInputs、b-owned) — full-grid
+   直交正規性 (4.3.b)。Section16Inputs + character-data 層 (FeitThompsonSetup) にも同 field。
+2. **producer 側 discharge = `Section16CharacterData.muS_orthonormal` 実証明** (FeitThompson.lean、
+   muS = columnFamily.mu の列内 injective + 列間 columnFamily_mu_ne、omegaS_inner と同型 ~20 行)。
+   両 derivation site に threading。construction site 破れゼロ (S15.Hypothesis の構築は spine
+   1 箇所のみ)。
+3. **`mu_row0_ne` (S15_HonestTypeP2A0、c file) の sorry を実証明で閉鎖** — pin 自身の docstring が
+   宣言していた interface (「b-side field 待ち」) の完遂、3 行 (mu_orthonormal + if_neg)。
+   cross-lane 編集 self-flag。⚠ 学び: field の inner は **scoped FiniteInduce instance** で
+   elaborate される — 消費側の local `haveI` (Fintype.ofFinite/invertibleOfNonzero) とは
+   instance 項不一致で rw 不可 → lemma 全体を `open scoped FiniteInduce in` に統一
+   ([[lean-instance-defeq-traps]] の新実例)。
+
+**S15_HonestTypeP2A0 実 sorry 3 → 2** (残 = tauS_mu_row0_diff_support :878 /
+tauS_mu_row0_vanish_on_V :896)。両 pin の engines (`residueS_mu2_diff_support` /
+`residueS_mu2_diff_dade_apply_of_mem_V`) は **proven 済** (c、hyp46S 経由) — 残 gap は
+(a) pin signature の j≠0 修正 (9076 over-claim fix、consumer `_hj` pass = b の S15_SAndT 側)、
+(b) hyp.mu = residueS.mu2 の **等式 grounding** (mu_orthonormal より強い、mu field ↔ residue grid
+同定; engines の結論を pin の hyp.mu 形へ transport するのに必要) + η/ω^σ-grid 同定 (V-value pin)。
+次 iter: (a) の signature 修正 + (b) の設計 (等式 field か、pin ごと residueS 形へ restate か —
+consumer tauS_mu_row0_cross の要求形を S15_SAndT:4020 で確認してから)。9080 step 1 はその後。
+
+## 📋 (2026-07-11、lane-b /loop iter 29) — 残 2 pins の設計確定 (consumer 精査)
+
+- **`tauS_mu_row0_cross` (S15_SAndT:1129、(13.18.c) cross-relation) は body 完全 proven** —
+  消費 = mu_row0_ne (✅ iter 28) + `tauS_mu_row0_diff_support` + `tauS_mu_row0_vanish_on_V`
+  (= S15_HonestTypeP2A0 の残 2 sorry) + eta_diff_rigidity (proven)。**pins 2/3 が閉じれば
+  (13.18.c) → gammaGrid_defGamma チェーンが閉じる**。docstring の「prTIirr_id 未 port」は stale
+  (iter 26 で否定済) — 実体は grounding 問題のみ。
+- consumer の pin 呼び出しは `tauS_mu_row0_diff_support j` / `tauS_mu_row0_vanish_on_V hG j x hx`
+  — j≠0 (`_hj`) は consumer 側に既在で signature 追加時に pass 可能 (9076 fix)。
+- **設計決定 (B: field-statement 方式)**: pins 2/3 は抽象 Hypothesis から under-determined
+  (mu が residue grid である linking が要る)。mu_orthonormal (iter 28) と同型に、pin 相当の
+  **property fields を S15.Hypothesis + 2 上位層に追加**し、producer (FT.lean cd-construction、
+  mu := muS = columnFamily.mu) で実証明 discharge → pin theorems は field 射影 + j≠0 修正。
+  - field 案: `mu_row_diff_support` (∀ i j k, j≠0 → k≠0 → 等次数 → (mu i j − mu i k).support ⊆
+    A₀-form) / `mu_diff_dade_vanish_on_V` (V-value 形は eta を含む — eta_definition (η=ω^τ) と
+    τ₃ regular-set 恒等 (tau3_apply_of_regular field) + certainTypeOmegaSigma の同定が producer
+    discharge の部品)。
+  - ⚠ producer 層の engine は **mp.certainTypeS** (Section16MaximalPair 由来) — S15_HonestTypeP2A0
+    の engines (residueS_mu2_diff_support 等) は **hyp.s06S/hyp46S** 由来で別 instance。producer
+    discharge は certainTypeS-level の S06 engines (`certainType_diff_supp_subset_A0` /
+    `certainType_diff_dade_apply_eq_of_mem_V`) を直接使う (support 側は producer の A₀-Dade と
+    hyp46S-A₀ の同定が必要 — ここが次 iter の精査点)。
+- 副 finding: lane-c 新 leaf `TGapPrimeTI.lean` (14.9 T-side) が S13_PrimeTIResidueBridge を
+  消費開始 — b の bridge が cross-lane で cite され始めた (良い信号、干渉なし)。
+
+次 iter: (1) producer 層の A₀-Dade/hyp46S 同定を精査 (FT.lean cd-construction の Dade 部品と
+honestTypeP2A0Set の対応)、(2) support field から実装 (V-value field は η 同定込みで後続)。
+
+## 📋 (2026-07-11、lane-b /loop iter 30) — producer 層 A₀-Dade 可用性 precheck 完了
+
+**確定**: `Hypothesis.dadeHypS0` (S15_HonestTypeP2A0:581) は
+`(dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.S_maximal hyp.S_typeP2 hyp.Sdata).some.dade`
+— **hG + S_maximal + S_typeP2 + Sdata のみが入力** (hyp の他 fields 不要)。∴ producer (FT.lean
+cd-construction) 層でも mp-level の同名 4 部品から**同じ A₀-Dade + mp-level Hypothesis46**
+(hyp46S の構築 [S15_HonestTypeP2A0:660-699] の hyp.* → mp.* 置換コピー) を構築できる。
+
+**support field 実装手順 (次 iter、確定形)**:
+1. **field** (3 層: SubcoherenceInputs / FTSetup inputs / FTSetup cd): `mu_diff_support :
+   ∀ (i : Fin q) {j k : Fin p}, (j:ℕ) ≠ 0 → (k:ℕ) ≠ 0 → mu i j 1 = mu i k 1 →
+   (mu i j − mu i k).support ⊆ S04.supportInSubgroup (honestTypeP2A0Set S Sdata) S`
+   (S/Sdata は各層の対応 field; cd 層は mp.S + cd の Sdata source — cd/inputs の Sdata field 名を
+   実装時に確認)。
+2. **producer discharge**: FT.lean に `Section16CharacterData.hyp46Smp` (mp-level Hypothesis46、
+   hyp46S のコピー) + `muS_diff_support` (= S15_HonestTypeP2A0 の `residueS_mu2_diff_support` の
+   証明を mp-level に写す: charGroupW2Equiv → chi2enum、residueS.mu2 → muS、
+   certainType_diff_supp_subset_A0 (hyp46Smp) 適用)。
+3. **pin 修正** (S15_HonestTypeP2A0:878、self-flag): `tauS_mu_row0_diff_support` に
+   `(hj0 : (j:ℕ) ≠ 0)` 追加 (9076 fix) + body = field 射影 (`hyp.mu_diff_support 0 hj0 one_ne
+   hdeg` — hdeg は row-0 の mu2 次数一致: `mu_degree_modEq_delta` からは出ない (mod q 合同のみ)。
+   **⚠ hdeg 供給が非自明**: 原文 (4.8) は残基次数一致 (両列 residue が同次数) — Coq は consumer
+   が具体次数で discharge。row-0 では μ_{0j}(1) = residue-degree、j,k≠0 で一致は §13 の具体
+   次数事実 — S15.Hypothesis に既存 field があるか (mu_degree 系) 実装時に確認、なければ
+   `forall_columnFamily_mu_apply_one_eq_of_sum_eq` (iter 28 記録の hdeg 供給候補) を producer
+   で使い hdeg-free の row-0 特化 field にする)。
+4. consumer (S15_SAndT:1152 `hsupp := hyp.tauS_mu_row0_diff_support j`) に `_hj` pass (1-line)。
+V-value pin (pin 3) は support field 完了後に同型で (η 同定込み)。
+
+## 📋 (2026-07-11、lane-b /loop iter 31) — hdeg 供給の正体確定、設計完結
+
+- **S06 に次数機構は完備**: `columnFamily_mu_apply_one_eq` (列内次数一定、proven) +
+  `forall_columnFamily_mu_apply_one_eq_of_sum_eq` (列和一致 → 行別一致、proven、
+  S06_CertainTypeIsometry:824)。∴ hdeg (行別) ⟸ **列和次数一致 μ_j(1) = μ_k(1) (j,k≠0)**
+  ⟺ residue 次数一致 χ_j(1) = χ_k(1) (μ_j = Ind_{S'}^S χ_j、mu_colSum_eq_induce)。
+- **residue 次数一致は repo 不在の genuine §13 math** (grep 確認: S13/S15 に mu 次数 fact 無し、
+  S06 は (4.3.d) mod-q のみ)。数学的内容 = Pf (13.3)-region「μ_j(1) = qu (j≠0)」: S' = PU が
+  **Frobenius kernel P** (type-P₂ の (13.2)/(8.4) 構造) ⟹ 非線形 Irr(PU) は全て Ind_P^{PU}(線形)
+  で次数 u ⟹ 全 j≠0 で χ_j(1) = u。P-nonlinear 性は cfker_prTIres field と接続。
+- **∴ 最終実装順 (確定)**:
+  1. **支持 field (hdeg-parametric、math-risk ゼロ)**: `mu_diff_support` を 3 層 +
+     producer discharge (mp-level Hypothesis46 + certainType_diff_supp_subset_A0、hdeg は
+     hypothesis で素通し) + pin へ hj0/hk0/hdeg 追加 + 射影。
+  2. **genuine math unit: residue 次数一致** — PU Frobenius kernel P ⟹ 非自明 residue 次数 = u。
+     置き場 = S06 側 (certainType 層、PU-Frobenius 仮定 parametric) or S13 bridge (S-instance)。
+     Isaacs Ch.6 Frobenius character theory (Ind from kernel) の在庫確認から。
+  3. consumer 配線: field `mu_row0_apply_one_eq`-形 or 直接 (2) を cite して
+     tauS_mu_row0_diff_support / tauS_mu_row0_cross の hdeg discharge。
+  4. V-value pin (pin 3) は 1-3 後に同型 (η/ω^σ 同定込み)。
+
+## ⚠📋 (2026-07-11、lane-b /loop iter 32) — support field の前提 blocker: def 再配置が要る
+
+producer 部品は全て確認済 (`tp.Sdata : TypePData mp.S` / `mp.S_maximal` / `mp.S_typeP2` 存在 →
+hyp46Smp copy 可)。しかし **field 文の語彙が不足**:
+- `honestTypeP2A0Set (M) (data)` の定義は **S15_HonestTypeP2A0.lean:47 (lane-c file)** —
+  SubcoherenceInputs (S15.Hypothesis の家) から参照不可 (import 逆方向)。
+- `honestTypeP2ASet (M)` は SubcoherenceInputs **:537 = structure (:74) より後方** — field から
+  前方参照不可 (b-owned なので structure 前へ移動は可)。
+- A₀ の V-part (`conjClassSetIn M (typePData_toTICyclicHypothesis data hodd).V`) は hodd 依存 —
+  S15.Hypothesis が hodd/odd_card field を持つか要確認。
+
+**解決案 (次 iter で選択・実施)**:
+- **案 X (推奨)**: `honestTypeP2ASet` を SubcoherenceInputs の structure 前へ移動 (b-owned、
+  同 file 内 reorder のみ) + `honestTypeP2A0Set` を **S15_HonestTypeP2A0 から SubcoherenceInputs
+  (structure 前) へ移設** (c file からの移設 = hub/c 調整 or 9000 issue で claim; 定義は
+  honestTypeP2ASet ∪ conjClass 形で軽量、下流 import 不変 [S15_HonestTypeP2A0 は Setup を import
+  済ゆえ再 export で無破壊])。その後 field 追加 (iter 30-31 の設計どおり)。
+- **案 Y**: field を諦め、pins 2/3 を **hG-引数付き theorem のまま S15_HonestTypeP2A0 内で
+  discharge** — hyp.mu と residueS.mu2 を結ぶには grounding が要る点は不変だが、mu_orthonormal
+  同様の「pin 専用の弱い field」(例: `mu_eq_certainType_grid : ∃ (同定 data), ...`) でなく、
+  **mu_definition (13.1.e) から mu を residue grid と同定する一意性定理** (Ind-差 = δ(μ-差) が
+  mu を列ごと anchor+順序まで pin する — mu_orthonormal + mu_definition + delta で mu = muS を
+  導出できるか) を精査。可能なら **field 追加ゼロ**で pins が閉じる (最も honest)。
+次 iter: 案 Y の一意性精査 (mu_definition の pin 力) を 30 分 → 不成立なら案 X 実施。
+
+## 📋 (2026-07-11、lane-b /loop iter 33) — 案 Y 一意性検証: mu-given-omega は成立、omega-grounding に帰着
+
+**案 Y の数学検証 (机上、成立)**: mu_definition (列差 Ind 恒等式) + mu_irreducible +
+mu_col_injective だけで **grid は (omega, delta) から一意**:
+2 解 mu, mu' は列差一致 → mu i j = mu' i j + c (c = anchor 差、i-独立)。c ≠ 0 なら ‖c‖² = 2、
+norm 展開で i≠0 に ⟨mu' i j, mu 0 j⟩ = −1 を強制 — genuine irreducible 同士の inner は {0,1}
+ゆえ矛盾 (q ≥ 2 で i≠0 存在) → c = 0 → mu = mu'。**この一意性補題は単体で landing 価値あり**
+(グリッド grounding の全てをこれ 1 本で「omega/delta grounding」に帰着させる)。
+
+**ただし pins 2/3 には不十分**: 一意性は hyp.mu を「hyp.omega が生成する grid」に pin するが、
+support/V-value の certain-type 幾何は **hyp.omega = (transported chiColumn grid)** の grounding
+を要する — omega の既存 property fields (mul/orthonormal/pow/row-col-zero、2033/3002) は
+omega を relabeling まで pin するのみ (生成元べき enumeration の同定が別途要る)。
+∴ **案 X (def 再配置 + field) が pins の実務 route で確定**。一意性補題は独立 unit として後続
+(mu-grounding 系の整理に使う)。
+
+**次 iter (案 X 実施、順序)**:
+1. `honestTypeP2ASet` (:537) を SubcoherenceInputs 内で structure (:74) 前へ移動 (b-owned reorder、
+   下流不変)。
+2. `honestTypeP2A0Set` の移設 (S15_HonestTypeP2A0:47 → SubcoherenceInputs structure 前) —
+   c-file からの移設は 9000-issue で claim + self-flag (定義 1 個 + hodd 依存の V-part;
+   S15.Hypothesis の odd_card/hodd field 有無を確認し、無ければ A₀ 形を「A ∪ (hodd 引数付き
+   V-conj 部)」でなく **field 側で hodd を仮定に取る**か検討)。
+3. field 追加 (iter 30 設計) + producer discharge (hyp46Smp) + pin 修正。

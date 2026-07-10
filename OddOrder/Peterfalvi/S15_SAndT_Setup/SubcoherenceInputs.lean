@@ -198,6 +198,16 @@ structure Hypothesis where
   `μ_j = ∑_i μ_{ij}` sums of `q ≥ 2` distinct irreducibles — hence reducible, the (13.3.a)
   entry condition. -/
   mu_col_injective : ∀ j : Fin p, Function.Injective (fun i : Fin q => mu i j)
+  /-- **Peterfalvi (4.3.b), full-grid orthonormality** (issues 9076/9014, the `(13.18)`
+  grounding): the `μ_{ij}` are pairwise-distinct irreducibles across the *whole* grid,
+  `⟨μ_{ij}, μ_{kl}⟩ = [(i,j) = (k,l)]`.  Within a column this refines `mu_irreducible` +
+  `mu_col_injective`; the cross-column part is the prime-TI residue-grid fact
+  (S06 `columnFamily_mu_ne` / `PrimeTIResidueData.mu2_orthonormal`), supplied by the
+  producer from `Section16CharacterData.muS_orthonormal`.  Discharges the `(13.18)` pin
+  `mu_row0_ne` (row-`0` cross-column distinctness, `S15_HonestTypeP2A0`). -/
+  mu_orthonormal : ∀ (i k : Fin q) (j l : Fin p),
+    OddOrder.RepresentationTheory.ClassFunction.inner (mu i j) (mu k l)
+      = if i = k ∧ j = l then 1 else 0
   /-- **Peterfalvi (4.5.a) for the `S`-grid** (issue 2035 μ-linkage): each `μ`-column sum is
   induced from an irreducible character of `S' = [S,S]` — the §4 certain-type identity
   `μ_j = Ind_{S'}^S χ_j` (`induce_restrict_certainType_eq`), the constructive membership
