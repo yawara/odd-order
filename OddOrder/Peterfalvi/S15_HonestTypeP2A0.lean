@@ -41,12 +41,6 @@ open OddOrder.GroupTheory
 
 variable {G : Type*} [Group G]
 
-/-- **The honest type-`P₂` `A₀`-support**: `A₀(S) = A(S) ∪ V^S`, with `A(S) = honestTypeP2ASet S`
-(the correct `M_σ^#`-indexed support) and `V^S = conjClassSetIn S (typePV S data)` the `S`-conjugacy
-closure of the cyclic-`TI` regular set `V_S = W ∖ (W₁ ∪ W₂)`. -/
-def honestTypeP2A0Set (M : Subgroup G) (data : TypePData M) : Set G :=
-  honestTypeP2ASet M ∪ conjClassSetIn M (typePV M data)
-
 /-- `A(S) ⊆ A₀(S)`: the honest type-`P₂` support is contained in its `A₀`-completion. -/
 theorem honestTypeP2ASet_subset_A0Set {M : Subgroup G} (data : TypePData M) :
     honestTypeP2ASet M ⊆ honestTypeP2A0Set M data :=

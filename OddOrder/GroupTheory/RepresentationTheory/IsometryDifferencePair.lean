@@ -1041,4 +1041,72 @@ theorem mu_ne_of_forall_inner_difference_eq_zero
 
 end SignedIrreducibleDifferenceFamily
 
+/-- **Anchored-difference rigidity** (the (13.1.e) grid-uniqueness core, issue 2038): two
+families of irreducible characters with the same anchored differences
+`ν_i − ν_0 = ν'_i − ν'_0` coincide, provided `ν'` is injective and `n ≥ 2`.
+
+If the anchors differ, the shift `c = ν_0 − ν'_0` has `‖c‖² = 2`, and expanding
+`1 = ‖ν_1‖² = ‖ν'_1 + c‖²` forces `⟨ν'_1, ν_0⟩ + ⟨ν_0, ν'_1⟩ = −2` — impossible since inner
+products of irreducible characters lie in `{0, 1}`.  With equal anchors the differences pin
+every member. -/
+theorem irreducibleCharacterFamily_eq_of_difference_eq
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {n : ℕ} [NeZero n] (hn : 2 ≤ n)
+    (ν ν' : Fin n → IrreducibleCharacter G)
+    (hinj' : Function.Injective ν')
+    (hdiff : ∀ i, (ν i : ClassFunction G ℂ) - (ν 0 : ClassFunction G ℂ)
+      = (ν' i : ClassFunction G ℂ) - (ν' 0 : ClassFunction G ℂ)) :
+    ∀ i, ν i = ν' i := by
+  classical
+  have hanchor : ν 0 = ν' 0 := by
+    by_contra h0
+    let one : Fin n := ⟨1, by omega⟩
+    have hone : one ≠ 0 := by
+      intro h
+      have h1 : (1 : ℕ) = 0 := by
+        have := congrArg Fin.val h
+        rw [Fin.val_zero] at this
+        exact this
+      exact absurd h1 (by omega)
+    -- `ν_1 = ν'_1 + (ν_0 − ν'_0)`.
+    have heq : (ν one : ClassFunction G ℂ)
+        = (ν' one : ClassFunction G ℂ)
+          + ((ν 0 : ClassFunction G ℂ) - (ν' 0 : ClassFunction G ℂ)) := by
+      have h := hdiff one
+      have hre : (ν' one : ClassFunction G ℂ)
+          + ((ν 0 : ClassFunction G ℂ) - (ν' 0 : ClassFunction G ℂ))
+          = ((ν' one : ClassFunction G ℂ) - (ν' 0 : ClassFunction G ℂ))
+            + (ν 0 : ClassFunction G ℂ) := by abel
+      rw [hre, ← h]
+      abel
+    -- Expand `1 = ‖ν_1‖²` through the shift.
+    have hνν : ClassFunction.inner (ν one : ClassFunction G ℂ) (ν one : ClassFunction G ℂ)
+        = 1 := by
+      rw [irreducibleCharacter_inner_eq_ite, if_pos rfl]
+    rw [heq, ClassFunction.inner_add_left, ClassFunction.inner_add_right,
+      ClassFunction.inner_add_right, ClassFunction.inner_sub_left,
+      ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right, ClassFunction.inner_sub_right] at hνν
+    rw [irreducibleCharacter_inner_eq_ite (ν' one) (ν' one), if_pos rfl,
+      irreducibleCharacter_inner_eq_ite (ν' one) (ν' 0),
+      if_neg (fun hc => hone (hinj' hc)),
+      irreducibleCharacter_inner_eq_ite (ν' 0) (ν' one),
+      if_neg (fun hc => hone (hinj' hc.symm)),
+      irreducibleCharacter_inner_eq_ite (ν 0) (ν 0), if_pos rfl,
+      irreducibleCharacter_inner_eq_ite (ν 0) (ν' 0), if_neg h0,
+      irreducibleCharacter_inner_eq_ite (ν' 0) (ν 0),
+      if_neg (fun hc => h0 hc.symm),
+      irreducibleCharacter_inner_eq_ite (ν' 0) (ν' 0), if_pos rfl,
+      irreducibleCharacter_inner_eq_ite (ν' one) (ν 0),
+      irreducibleCharacter_inner_eq_ite (ν 0) (ν' one)] at hνν
+    by_cases hxu : ν' one = ν 0
+    · rw [if_pos hxu, if_pos hxu.symm] at hνν
+      norm_num at hνν
+    · rw [if_neg hxu, if_neg (fun hc => hxu hc.symm)] at hνν
+      norm_num at hνν
+  intro i
+  have h := hdiff i
+  rw [hanchor] at h
+  exact IrreducibleCharacter.ext (sub_left_inj.mp h)
+
 end OddOrder.RepresentationTheory
