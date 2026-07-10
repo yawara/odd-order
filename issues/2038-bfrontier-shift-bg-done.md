@@ -1432,3 +1432,18 @@ Hypothesis46 は `CertainTypeHypothesis A L` を extends し tic/subH/dade0/tau 
   tp.Sdata).some.dade / tau := .fullDadeIsometryData hconj。
 **次 iter: hyp46Smp 本体構築** (FT.lean、~70 行、hyp46S [S15_HonestTypeP2A0:660-699] を鋳型に
 上記部品で) → muS_diff_support (certainType_diff_supp_subset_A0 直適用) → field 3 層 → pins。
+
+## ✅✅ (2026-07-11、lane-b /loop iter 41) — **hyp46Smp landed** (shortcut 本体)
+
+**`Section16CharacterData.hyp46Smp : Hypothesis46 (honestTypeP2ASet mp.S) mp.S`** (FT.lean、
+commit 60179463、full build 4150 green・AxiomsCheck OK) — toHypothesis := mp.certainTypeS で
+**§6 engines が muS grid に直接適用可能に** (grid 同定不要)。tic reconciliation は iter 38/40 の
+instance equalities で discharge、dade = A₀(S)-Dade、subH = M_σ(S) + A(S)-covering (hyp46S mirror)。
+初回 build の instance clash (haveI Fintype G vs scoped ambientFintype) は haveI 除去で解消。
+新 import: FT.lean ← S15_HonestTypeP2A0 (cycle なし)。
+
+**次 iter: `muS_diff_support`** — `certainType_diff_supp_subset_A0 (hyp46Smp hG mp tp)` を
+muS 差 (nontrivial columns j,k、hdeg 仮説) に適用する engine lemma (residueS_mu2_diff_support
+[S15_HonestTypeP2A0:759-794] の hyp46Smp 版、chi2enum で nontrivial 化)。その後: field 3 層
+(mu_diff_support、iter 30 設計) + producer threading + pins 修正 + V-value 側
+(certainType_diff_dade_apply_eq_of_mem_V at hyp46Smp)。
