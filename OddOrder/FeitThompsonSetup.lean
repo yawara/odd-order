@@ -1299,6 +1299,13 @@ theorem certainTypeS_W1_eq : (mp.certainTypeS hG).W1 = mp.K.subgroupOf mp.S := b
 theorem certainTypeS_W2_eq : (mp.certainTypeS hG).W2 = mp.Kstar.subgroupOf mp.S := by
   unfold Section16MaximalPair.certainTypeS certainTypeHypothesis_of_typeP_kappaHall; rfl
 
+/-- `K` of `certainTypeS` is `(derivedInG mp.S).subgroupOf mp.S` (the (4.2) convention `K = S'`;
+same literal field as the `Sdata`-instance `typePData_toS06Hypothesis`, so the two §6 Hypothesis
+instances of `S` share `K` on the nose — issue 2038 `hyp46Smp` shortcut). -/
+theorem certainTypeS_K_eq :
+    (mp.certainTypeS hG).K = (derivedInG mp.S).subgroupOf mp.S := by
+  unfold Section16MaximalPair.certainTypeS certainTypeHypothesis_of_typeP_kappaHall; rfl
+
 include hG in
 /-- `mp.Kstar ≤ mp.S` (it lies in `S ∩ T = K ⊔ K*`). -/
 theorem kstar_le_S : mp.Kstar ≤ mp.S := by
