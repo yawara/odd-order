@@ -132,7 +132,18 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > の独立追記**以外**）/ sorry regression（証明済→sorry）/ 新規 `axiom` / push 失敗 / 想定外の git 状態
 > / **レーン範囲逸脱（下記 step 1.5 = 自所有外の Pf/BG S-ファイルを編集; ユーザー方針 2026-06-22）**。
 > **非問題（通常継続）= ** 「変化なし」/ 新 decl の faithful scaffold sorry 増 / 独立追記コンフリクトの両保持解決
-> / 共有ファイル編集（AxiomsCheck.lean 追記・OddOrder.lean import・`OddOrder/GroupTheory/**`・`OddOrder/Mathlib/**` 共有 infra・notes・issues）。
+> / 共有ファイル編集（AxiomsCheck.lean 追記・OddOrder.lean import・`OddOrder/GroupTheory/**`・`OddOrder/Mathlib/**` 共有 infra・notes・issues）
+> / **上流 signature 変更への機械的 call-site 追従**（下記 🔩）/ **自所有 sorried decl の不要化削除** (sorry 減、
+> 上流再配線で obligation 自体が消える型 — 先例 = b の `witness_psi_degree` 削除 49607ba9)。
+>
+> **🔩 機械的 call-site 追従は非逸脱 (hub 裁定 2026-07-10 tick、一般ルール化)**: レーンが**自所有 upstream 宣言の
+> signature を変更** (引数追加・仮説引数化・リネーム) したとき、その **consumer call-site の機械的追従編集**は
+> 他レーン所有 file 内であっても範囲逸脱としない。条件 (全て): (i) 追従は引数供給/名前置換のみで対象宣言の
+> statement・証明内容を変えない、(ii) 数行規模、(iii) commit message で self-flag、(iv) build green。
+> 根拠 = 0096 拡張 (proof-only de-gate) ・「S08_CaseBCoherence2 1 行追従」と同系の先例統合。逸脱判定は
+> 「他レーンの active 数学に触ったか」であり「diff が他レーン file に掛かったか」ではない。
+> 先例 = b の `witness_L_hzeta0nu` hAH 仮説引数化に伴う S16 下流 2 file × 1 行追従 (49607ba9、
+> c は codex 運用中の active file だったが hunk 非交差で問題なし)。
 >
 > **🔧 範囲逸脱の是正 = 成果を無駄にせず軌道修正（ユーザー方針 2026-07-06）**: レーン範囲逸脱で halt+flag した後、
 > その逸脱に **genuine output（実証明・実構成・sorry-free work）が含まれるなら discard/revert せず、hub が軌道修正で

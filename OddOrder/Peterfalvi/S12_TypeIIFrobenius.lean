@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.S12_Section9Counts
 import OddOrder.Peterfalvi.S11_MaximalII_III_IV
 import OddOrder.Peterfalvi.S04_DadeIsometryBasic
+import OddOrder.Peterfalvi.S12_TypeIIDadeBase
+import OddOrder.Peterfalvi.S07_PivotCoherence
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TaxonomyOutput
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges
@@ -53,383 +55,6 @@ open OddOrder.RepresentationTheory
 
 variable {G : Type*} [Group G]
 
-/-! ## Peterfalvi (8.16): the `S`-side Dade base for a Type-II maximal
-
-The (10.7) left branch needs the Dade isometry `τ_S` of the pair `(A(S), S)` for the Type-II
-maximal `S`, where `A(S) = ⋃_{x∈S_σ^#} C_{S'}(x)^#` is the honest (8.10) type-`P` support
-(`centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)`; the §9 family differences are
-`A(S)`-supported by (8.15)/(4.7), and the equal-degree difference `ν − λ` vanishes at `1`).
-
-Peterfalvi proves (8.16) — `A₀(S), A(S), A₁(S)` are TI-subsets of `G` with normalizer `S` — by
-checking that every (8.14) signalizer `R(a)` is trivial and citing (2.3).  We instead assemble
-the TI property of `A(S)` directly from three proven ingredients, avoiding the (8.15) signalizer
-machinery altogether (all signalizers being trivial, Hypothesis (2.2) is `of_isTISubset`):
-
-* on `A₁(S) = S_F^#` the (8.6.a) kernel TI-property (`TypePNontrivialCore`, with
-  `N_G(S_F) = S` by maximality and simplicity);
-* on `A(S) − A₁(S)` the BG Theorem B(5) TI-subset `A(M) − M_σ`
-  (`theoremB_A_minus_Msigma_isTISubset`, transported through `A(S) ⊆ ASet S U` for a
-  `(κ∪σ)'`-Hall `U` with `S' = U ⊔ S_σ`, BG Lemma 15.1(b) via `typeP_exists_hall_derived_eq`);
-* no cross fusion: `S_σ`-membership of an element of `S` is determined by its order
-  (`mem_Msigma_iff_isPiElement_sigma` + `isPiElement_conj`), so a `G`-conjugation cannot move a
-  point between `A₁(S)` and `A(S) − A₁(S)`.
-
-The type-II specialization enters through `S_F = S_σ`
-(`maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II`) and `IsTypeP S` (`isTypeP_of_isTypeNonI`);
-no `II → P₂` taxonomy bridge is needed. -/
-
-section DadeBase
-
-open OddOrder.BG.Ch3.S10
-
-/-- **Peterfalvi (8.16), TI part, for the honest type-II `A(S)`**: for a Type-II maximal
-subgroup `S`, the (8.10) support `A(S) = ⋃_{x∈S_σ^#} C_{S'}(x)^#` is a TI-subset of `G` with
-normalizer bound `S`.
-
-The proof splits a conjugation `g·a·g⁻¹ = b` with `a, b ∈ A(S)` by `S_σ`-membership: both in
-`A₁(S) = S_σ^# = S_F^#` is the (8.6.a) kernel TI-property; both outside is BG Theorem B(5)
-(`A(S) − S_σ ⊆ ASet S U − S_σ`, a TI-subset); and the mixed cases are impossible because
-`S_σ`-membership inside `S` depends only on the element's order. -/
-theorem typeII_centralizerSupport_isTISubset [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
-    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) :
-    OddOrder.GroupTheory.IsTISubset
-      (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)) S := by
-  classical
-  obtain ⟨iiData⟩ := id hSII
-  obtain ⟨-, -, hTI⟩ := iiData.common
-  -- `S_F = S_σ` (type II) and `S_F ≠ ⊥`.
-  have hMσF : maxNilpotentNormalHall S = Msigma S :=
-    OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II hG hSmax
-      (Or.inr hSII)
-  have hFne : maxNilpotentNormalHall S ≠ ⊥ := by
-    rw [hMσF]; exact Msigma_ne_bot hG hSmax
-  -- `N_G(S_F) = S`: `S` normalizes its normal Hall core, the normalizer is proper (simplicity),
-  -- and `S` is a coatom.
-  have hNS : Subgroup.normalizer ((maxNilpotentNormalHall S : Subgroup G) : Set G) = S := by
-    have hle : S ≤ Subgroup.normalizer ((maxNilpotentNormalHall S : Subgroup G) : Set G) := by
-      intro s hs
-      rw [hMσF, Msigma]
-      exact OddOrder.GroupTheory.le_normalizer_opiCoreInG (sigma S) S hs
-    by_contra hne
-    have hNtop : Subgroup.normalizer ((maxNilpotentNormalHall S : Subgroup G) : Set G) = ⊤ :=
-      hSmax.2 _ (lt_of_le_of_ne hle fun h => hne h.symm)
-    haveI hHnormal : (maxNilpotentNormalHall S).Normal :=
-      Subgroup.normalizer_eq_top_iff.mp hNtop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (maxNilpotentNormalHall S) hHnormal with hb | ht
-    · exact hFne hb
-    · exact hSmax.1
-        (top_le_iff.mp (ht ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le S))
-  -- `IsTypeP S` and a `(κ∪σ)'`-Hall `U` with `S' = U ⊔ S_σ` (BG Lemma 15.1(b)), plus a
-  -- `κ(S)`-Hall `K` (Hall's theorem in the solvable `S`), feeding Theorem B(5).
-  have hP : OddOrder.BG.Ch4.S14.IsTypeP S :=
-    OddOrder.BG.Ch4.S16.isTypeP_of_isTypeNonI hG hSmax (Or.inl hSII)
-  obtain ⟨U, hU, hder⟩ := OddOrder.BG.Ch4.S16.typeP_exists_hall_derived_eq hG hSmax hP
-  have hUM : U ≤ S :=
-    (le_sup_left.trans hder.ge).trans (Subgroup.map_subtype_le _)
-  haveI : IsSolvable ↥S := hG.solvable_of_mem_maximalSubgroups hSmax
-  obtain ⟨K', hK'⟩ :=
-    OddOrder.Isaacs.Ch03.hall_E_exists (G := ↥S) (OddOrder.BG.Ch4.S14.kappa S)
-  have hKM : K'.map S.subtype ≤ S := Subgroup.map_subtype_le K'
-  have hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa S)
-      ((K'.map S.subtype).subgroupOf S) := by
-    have hKeq : (K'.map S.subtype).subgroupOf S = K' :=
-      Subgroup.comap_map_eq_self_of_injective S.subtype_injective K'
-    rw [hKeq]; exact hK'
-  have hTIB := OddOrder.BG.Ch4.S16.theoremB_A_minus_Msigma_isTISubset hG hSmax hKM hUM hK hU
-  -- the conjugation `g·a·g⁻¹ ∈ A(S)` for `a ∈ A(S)`, split by `S_σ`-membership.
-  rintro g ⟨a, ha, hga⟩
-  obtain ⟨haM', ha1, z, hzσ, hzC⟩ := ha
-  obtain ⟨hgaM', hga1, w, hwσ, hwC⟩ := hga
-  have haS : a ∈ S := Subgroup.map_subtype_le _ haM'
-  have hgaS : g * a * g⁻¹ ∈ S := Subgroup.map_subtype_le _ hgaM'
-  by_cases haσ : a ∈ Msigma S
-  · by_cases hgaσ : g * a * g⁻¹ ∈ Msigma S
-    · -- both in `A₁(S) = S_F^#`: the (8.6.a) kernel TI-property.
-      have hg := hTI g ⟨a,
-        ⟨by rw [hMσF]; exact SetLike.mem_coe.mpr haσ, by simpa using ha1⟩,
-        ⟨by rw [hMσF]; exact SetLike.mem_coe.mpr hgaσ, by simpa using hga1⟩⟩
-      rwa [hNS] at hg
-    · -- `a ∈ S_σ`, `g·a·g⁻¹ ∉ S_σ`: impossible, `S_σ`-membership is order-determined.
-      exact absurd
-        ((OddOrder.BG.Ch4.S14.mem_Msigma_iff_isPiElement_sigma hG hSmax hgaS).mpr
-          (OddOrder.BG.Ch4.S14.isPiElement_conj g
-            ((OddOrder.BG.Ch4.S14.mem_Msigma_iff_isPiElement_sigma hG hSmax haS).mp haσ)))
-        hgaσ
-  · by_cases hgaσ : g * a * g⁻¹ ∈ Msigma S
-    · -- `a ∉ S_σ`, `g·a·g⁻¹ ∈ S_σ`: the same order argument along `g⁻¹`.
-      refine absurd ?_ haσ
-      have hπ := OddOrder.BG.Ch4.S14.isPiElement_conj g⁻¹
-        ((OddOrder.BG.Ch4.S14.mem_Msigma_iff_isPiElement_sigma hG hSmax hgaS).mp hgaσ)
-      rw [show g⁻¹ * (g * a * g⁻¹) * g⁻¹⁻¹ = a by group] at hπ
-      exact (OddOrder.BG.Ch4.S14.mem_Msigma_iff_isPiElement_sigma hG hSmax haS).mpr hπ
-    · -- both in `A(S) − S_σ ⊆ ASet S U − S_σ`: BG Theorem B(5).
-      have hmem : ∀ {y : G}, y ∈ S → y ∈ derivedInG S →
-          ∀ {x : G}, x ∈ sharpSubgroup (Msigma S) → y ∈ Subgroup.centralizer ({x} : Set G) →
-          y ∉ Msigma S →
-          y ∈ OddOrder.BG.Ch4.S16.ASet S U \ ((Msigma S : Subgroup G) : Set G) := by
-        intro y hyS hyM' x hxσ hxC hyσ
-        refine ⟨⟨⟨hyS, fun hbot => ?_⟩, ?_⟩, fun h => hyσ (SetLike.mem_coe.mp h)⟩
-        · have hxmem : x ∈ Msigma S ⊓ Subgroup.centralizer ({y} : Set G) :=
-            Subgroup.mem_inf.mpr ⟨SetLike.mem_coe.mp hxσ.1, by
-              rw [Subgroup.mem_centralizer_singleton_iff]
-              exact (Subgroup.mem_centralizer_singleton_iff.mp hxC).symm⟩
-          rw [hbot, Subgroup.mem_bot] at hxmem
-          exact hxσ.2 (Set.mem_singleton_iff.mpr hxmem)
-        · exact SetLike.mem_coe.mpr (hder ▸ hyM')
-      exact hTIB g ⟨a, hmem haS haM' hzσ hzC haσ, hmem hgaS hgaM' hwσ hwC hgaσ⟩
-
-/-- The honest type-II support `A(S)` is `S`-conjugation stable (both `S' = derivedInG S` and
-`S_σ = Msigma S` are normalized by `S`); the `hL_norm` input of Hypothesis (2.2). -/
-theorem centralizerSupport_sharpMsigma_conj_mem [Finite G] {S : Subgroup G} {m : G}
-    (hm : m ∈ S) {y : G}
-    (hy : y ∈ centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)) :
-    m * y * m⁻¹ ∈ centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S) := by
-  obtain ⟨hyM', hy1, x, hxσ, hyC⟩ := hy
-  have hmM' : m ∈ Subgroup.normalizer ((derivedInG S : Subgroup G) : Set G) :=
-    OddOrder.BG.Ch3.S10.le_normalizer_derivedInG S hm
-  have hmMσ : m ∈ Subgroup.normalizer ((Msigma S : Subgroup G) : Set G) := by
-    rw [Msigma]
-    exact OddOrder.GroupTheory.le_normalizer_opiCoreInG (sigma S) S hm
-  refine ⟨(Subgroup.mem_normalizer_iff.mp hmM' y).mp hyM',
-    fun h => hy1 (by
-      have hyeq : y = m⁻¹ * (m * y * m⁻¹) * m := by group
-      rw [hyeq, h]; group),
-    m * x * m⁻¹, OddOrder.Peterfalvi.S10.sharpSubgroup_conj_mem hmMσ hxσ, ?_⟩
-  rw [Subgroup.mem_centralizer_singleton_iff] at hyC ⊢
-  calc m * y * m⁻¹ * (m * x * m⁻¹) = m * (y * x) * m⁻¹ := by group
-    _ = m * (x * y) * m⁻¹ := by rw [hyC]
-    _ = m * x * m⁻¹ * (m * y * m⁻¹) := by group
-
-open scoped Classical FiniteInduce in
-/-- **Peterfalvi (8.16) ⇒ Hypothesis (2.2) for `(A(S), S)`, Type II**: the honest type-II Dade
-base.  All (8.14) signalizers are trivial — `A(S)` is a TI-subset
-(`typeII_centralizerSupport_isTISubset`) — so Hypothesis (2.2) is `of_isTISubset` with
-`H(a) = ⊥`.  This is the `τ_S` foundation of the (10.7) left branch: the coherence engine
-(5.7) runs over the Dade isometry of this hypothesis. -/
-noncomputable def typeIIDadeHypothesis [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
-    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) :
-    OddOrder.Peterfalvi.S04.Hypothesis G
-      (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)) S :=
-  OddOrder.Peterfalvi.S04.Hypothesis.of_isTISubset
-    (fun _y hy => OddOrder.Peterfalvi.S04.mem_sharp.mpr ⟨Set.mem_univ _, hy.2.1⟩)
-    (fun _y hy => Subgroup.map_subtype_le _ hy.1)
-    (fun l _a ha => centralizerSupport_sharpMsigma_conj_mem l.2 ha)
-    (typeII_centralizerSupport_isTISubset hG hSmax hSII)
-
-/-- **Peterfalvi (8.16), centralizer containment**: `C_G(y) ≤ S` for every point of the
-type-II support `A(S)` (the "(8.16): `C_G(y) ⊆ S` for all `y ∈ A(S)`" form that (12.10)
-cites).  Immediate from the TI property: any `c ∈ C_G(y)` fixes `y ∈ A(S) ∩ A(S)^c`. -/
-theorem typeII_centralizer_le_of_mem_centralizerSupport [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
-    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) {y : G}
-    (hy : y ∈ centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)) :
-    Subgroup.centralizer ({y} : Set G) ≤ S := by
-  intro c hc
-  refine typeII_centralizerSupport_isTISubset hG hSmax hSII c ⟨y, hy, ?_⟩
-  have hcy : c * y * c⁻¹ = y := by
-    rw [mul_inv_eq_iff_eq_mul]
-    exact Subgroup.mem_centralizer_singleton_iff.mp hc
-  rw [hcy]; exact hy
-
-open scoped Classical FiniteInduce in
-/-- The (8.16) Dade hypothesis has every signalizer `H(a) = ⊥` (by construction,
-`of_isTISubset`), so the kernel assignment is trivially `S`-conjugation invariant — the
-`hconj` input of the §4 full Dade isometry (2.6). -/
-theorem typeIIDadeHypothesis_hConjInvariant [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
-    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) :
-    (typeIIDadeHypothesis hG hSmax hSII).HConjInvariant :=
-  OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl)
-
-open scoped Classical FiniteInduce in
-/-- **The (10.7) `S`-side Dade base map `τ_S`**: the §4 Dade isometry of the (8.16) hypothesis
-`(A(S), S)`, lifted to a total `IntegralCharacterMap ↥S G`.  On `A(S)`-supported class
-functions it is the honest (2.5) Dade map (`S07.dadeIntegralCharacterMap_apply_of_support`);
-its (2.6.a) isometry and (2.6.b) `ℤ[Irr]`-preservation on the supported sublattice are supplied
-by the generic `S07.dadeIntegralCharacterMap_inner_eq_on_supported_span` /
-`S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported` at the hypothesis
-`typeIIDadeHypothesis hG hSmax hSII` with `hconj = typeIIDadeHypothesis_hConjInvariant …`.
-This is the map the (5.7) engine (`S07.uniform_degree_coherence_of_families`) runs over in the
-(10.7) left branch. -/
-noncomputable def typeIITau [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
-    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) :
-    OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥S G :=
-  OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (typeIIDadeHypothesis hG hSmax hSII)
-    ((typeIIDadeHypothesis hG hSmax hSII).fullDadeIsometryData
-      (typeIIDadeHypothesis_hConjInvariant hG hSmax hSII))
-
-open OddOrder.Peterfalvi.S11 in
-open scoped Classical FiniteInduce in
-/-- **Peterfalvi (4.7)/(8.15), §9-family induced support, type-II instance**:
-`Supp (Ind_{HU}^S ξ) ⊆ A(S) ∪ {1}` for every `ξ ∈ 𝒳` (the (9.5) family, `H ⊄ Ker ξ`), with
-`A(S) = ⋃_{x∈S_σ^#} C_{S'}(x)^#` the honest (8.10) type-II support.
-
-Generic (`TypesIIIIIIVSetup`-level) mirror of the `S15.Hypothesis`-locked
-`sSet_member_support_subset_A` (whose proof this replays; the S15 instance is downstream of
-this file):
-
-* `support_induce_subset_conjugatesIntoSet`: a nonvanishing point of `Ind_{HU}^S ξ` is
-  `S`-conjugate to a nonvanishing point `w ∈ HU` of `ξ`;
-* the (1.2) core (`irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot`,
-  contrapositive) forces a nontrivial `d ∈ H` centralizing `w`; the chain
-  `H = S_F = S_σ` (`TypePData.H_eq` + `maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II`)
-  makes `d` an `S_σ^#`-witness, so `w ∈ A(S)` (`w ∈ HU = S'` by
-  `huSub_eq_derivedInG_subgroupOf`);
-* `A(S)` is `S`-conjugation invariant (`centralizerSupport_sharpMsigma_conj_mem`), so the
-  original point lies in `A(S) ∪ {1}` too. -/
-theorem typeII_sSet_member_support_subset [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
-    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S)
-    (data : TypesIIIIIIVSetup S)
-    {ξ : IrreducibleCharacter ↥(huSub data)} (hξ : ξ ∈ xiSet data) :
-    (induceHU data (ξ : ClassFunction ↥(huSub data) ℂ)).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup
-        (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)) S ∪ {1} := by
-  classical
-  -- `H = S_F = S_σ` (type II).
-  have hHσ : data.H = Msigma S := by
-    show data.typeP.H = Msigma S
-    rw [data.typeP.H_eq]
-    exact OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II hG
-      hSmax (Or.inr hSII)
-  -- the (1.2) core: a nonvanishing `w ∈ HU` with `(w:S:G) ≠ 1` lies in `A(S)`.
-  have hcore : ∀ w : ↥(huSub data),
-      (ξ : ClassFunction ↥(huSub data) ℂ) w ≠ 0 → ((w : ↥S) : G) ≠ 1 →
-      ((w : ↥S) : G) ∈ centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S) := by
-    intro w hwval hwne
-    haveI := hInHu_normal data
-    have hCne : OddOrder.Peterfalvi.S03.centralizerInSubgroup (hInHu data) w ≠ ⊥ := fun hbot =>
-      hwval
-        (OddOrder.Peterfalvi.S03.irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot
-          ξ hξ hbot)
-    obtain ⟨d, hd_mem, hd_ne⟩ := (Subgroup.bot_or_exists_ne_one _).resolve_left hCne
-    rw [OddOrder.Peterfalvi.S03.mem_centralizerInSubgroup] at hd_mem
-    obtain ⟨hd_H, hd_comm⟩ := hd_mem
-    -- `d`'s ambient image lies in `H = S_σ`, is nontrivial, and commutes with `w`.
-    have hdS_H : (d : ↥S) ∈ data.H.subgroupOf S := (Subgroup.mem_subgroupOf).mp hd_H
-    have hdH_G : ((d : ↥S) : G) ∈ data.H := (Subgroup.mem_subgroupOf).mp hdS_H
-    have hdG_ne : ((d : ↥S) : G) ≠ 1 := fun he => hd_ne (by
-      apply Subtype.ext; apply Subtype.ext; exact he)
-    have hcommG : ((d : ↥S) : G) * ((w : ↥S) : G) = ((w : ↥S) : G) * ((d : ↥S) : G) := by
-      have := congrArg (fun t : ↥S => (t : G)) (Subtype.ext_iff.mp hd_comm)
-      simpa using this
-    -- assemble the `A(S)`-membership with witness `d ∈ S_σ^#`.
-    refine ⟨?_, hwne, ((d : ↥S) : G), ?_, ?_⟩
-    · have hwHU : (w : ↥S) ∈ (derivedInG S).subgroupOf S := by
-        rw [← huSub_eq_derivedInG_subgroupOf]; exact w.2
-      exact (Subgroup.mem_subgroupOf).mp hwHU
-    · refine (Set.mem_sdiff _).mpr ⟨?_, fun he => hdG_ne (Set.mem_singleton_iff.mp he)⟩
-      exact SetLike.mem_coe.mpr (hHσ ▸ hdH_G)
-    · rw [Subgroup.mem_centralizer_singleton_iff]
-      exact hcommG.symm
-  -- assemble via `support_induce_subset_conjugatesIntoSet` + conjugation invariance.
-  intro x hx
-  rw [Set.mem_union, Set.mem_singleton_iff]
-  by_cases hx1 : x = 1
-  · exact Or.inr hx1
-  have hxsupp : (induceHU data (ξ : ClassFunction ↥(huSub data) ℂ)) x ≠ 0 :=
-    ClassFunction.mem_support.mp hx
-  have hx_conj : x ∈ ClassFunction.conjugatesIntoSet (huSub data)
-      ((ξ : ClassFunction ↥(huSub data) ℂ)).support := by
-    have hind : induceHU data (ξ : ClassFunction ↥(huSub data) ℂ)
-        = ClassFunction.induce (huSub data) (ξ : ClassFunction ↥(huSub data) ℂ) := rfl
-    refine ClassFunction.support_induce_subset_conjugatesIntoSet (subset_refl _) ?_
-    rw [← hind]; exact hxsupp
-  rw [ClassFunction.mem_conjugatesIntoSet] at hx_conj
-  obtain ⟨c, hc, hcsupp⟩ := hx_conj
-  set w : ↥(huSub data) := ⟨c⁻¹ * x * c, hc⟩ with hw_def
-  have hw_val : (ξ : ClassFunction ↥(huSub data) ℂ) w ≠ 0 := ClassFunction.mem_support.mp hcsupp
-  have hxeq : (x : G) = (c : G) * ((w : ↥S) : G) * (c : G)⁻¹ := by
-    show (x : G) = (c : G) * ((c : G)⁻¹ * (x : G) * (c : G)) * (c : G)⁻¹
-    group
-  have hwne : ((w : ↥S) : G) ≠ 1 := by
-    intro he
-    apply hx1
-    have hxG : (x : G) = 1 := by rw [hxeq, he]; group
-    exact Subtype.ext hxG
-  have hwA : ((w : ↥S) : G) ∈
-      centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S) := hcore w hw_val hwne
-  refine Or.inl ?_
-  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup, hxeq]
-  exact centralizerSupport_sharpMsigma_conj_mem c.2 hwA
-
-open OddOrder.Peterfalvi.S11 in
-open scoped Classical FiniteInduce in
-/-- **Equal-degree §9-family differences are `A(S)`-supported** (the (5.7) engine's
-`hsuppdiff` input for the (10.7) `T2`-family): for `ξ, η ∈ 𝒳` whose inductions share a degree,
-`Supp (Ind ξ − Ind η) ⊆ A(S)` as an `↥S`-support.  Each member's support lies in
-`A(S) ∪ {1}` (`typeII_sSet_member_support_subset`) and the equal degrees kill the `1`-point. -/
-theorem typeII_sSet_diff_support_subset [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
-    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S)
-    (data : TypesIIIIIIVSetup S)
-    {ξ η : IrreducibleCharacter ↥(huSub data)}
-    (hξ : ξ ∈ xiSet data) (hη : η ∈ xiSet data)
-    (hdeg : induceHU data (ξ : ClassFunction ↥(huSub data) ℂ) 1
-      = induceHU data (η : ClassFunction ↥(huSub data) ℂ) 1) :
-    ((induceHU data (ξ : ClassFunction ↥(huSub data) ℂ)
-        - induceHU data (η : ClassFunction ↥(huSub data) ℂ)).support)
-      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
-        (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)) S := by
-  intro x hx
-  have hx0 : (induceHU data (ξ : ClassFunction ↥(huSub data) ℂ)
-      - induceHU data (η : ClassFunction ↥(huSub data) ℂ)) x ≠ 0 :=
-    ClassFunction.mem_support.mp hx
-  have hx1 : x ≠ 1 := by
-    intro he
-    apply hx0
-    rw [he, ClassFunction.sub_apply, hdeg, sub_self]
-  have hmem : x ∈ (induceHU data (ξ : ClassFunction ↥(huSub data) ℂ)).support ∪
-      (induceHU data (η : ClassFunction ↥(huSub data) ℂ)).support :=
-    ClassFunction.support_sub_subset _ _ hx
-  rcases hmem with h | h
-  · rcases typeII_sSet_member_support_subset hG hSmax hSII data hξ h with h' | h'
-    · exact h'
-    · exact absurd (Set.mem_singleton_iff.mp h') hx1
-  · rcases typeII_sSet_member_support_subset hG hSmax hSII data hη h with h' | h'
-    · exact h'
-    · exact absurd (Set.mem_singleton_iff.mp h') hx1
-
-open OddOrder.Peterfalvi.S11 in
-open scoped Classical FiniteInduce in
-/-- **(5.3.a) conjugate-difference support, type-II instance**: `Supp ((Ind ξ)̄ − Ind ξ) ⊆ A(S)`
-as an `↥S`-support — the `hdiffsupp` input of the irreducible members' `R`-data
-(`S07.dadeCharacterDifferenceImageOfDiff`).  The conjugate has the same support, and the
-difference vanishes at `1` (the degree `q·ξ(1)` is a positive natural, self-conjugate). -/
-theorem typeII_sSet_member_diffsupp [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
-    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S)
-    (data : TypesIIIIIIVSetup S)
-    {ξ : IrreducibleCharacter ↥(huSub data)} (hξ : ξ ∈ xiSet data) :
-    ((induceHU data (ξ : ClassFunction ↥(huSub data) ℂ)).conj
-        - induceHU data (ξ : ClassFunction ↥(huSub data) ℂ)).support
-      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
-        (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)) S := by
-  set φ : ClassFunction ↥S ℂ :=
-    induceHU data (ξ : ClassFunction ↥(huSub data) ℂ) with hφ
-  have hsupp_eq : φ.conj.support = φ.support := by
-    ext y
-    simp only [ClassFunction.mem_support, ne_eq, ClassFunction.conj_apply, star_eq_zero]
-  intro x hx
-  have hx0 : (φ.conj - φ) x ≠ 0 := hx
-  have hxsupp : x ∈ φ.support := by
-    have hxU := ClassFunction.support_sub_subset _ _ hx
-    rwa [hsupp_eq, Set.union_self] at hxU
-  rcases typeII_sSet_member_support_subset hG hSmax hSII data hξ (hφ ▸ hxsupp) with h | h
-  · exact h
-  · exfalso
-    rw [Set.mem_singleton_iff] at h
-    subst h
-    obtain ⟨d, _, hd⟩ :=
-      OddOrder.RepresentationTheory.irreducibleCharacter_apply_one_eq_pos_natCast ξ
-    apply hx0
-    rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hφ, induceHU_apply_one_eq_q_mul, hd,
-      star_mul', star_natCast, star_natCast, sub_self]
-
-end DadeBase
 
 /-! ## Peterfalvi (8.16) ⇒ Hypothesis (4.6) for `(A(S), S)`: the `S`-side certain-type instance
 
@@ -741,6 +366,754 @@ theorem typeII_reducible_inducedKernelFamily_eq_columnSum [Finite G]
   refine ⟨χ₂', hχ₂'ne, ?_⟩
   rw [← hχ₂', h.coe_chiRestrict]
   exact h.induce_restrict_certainType_eq χ₂'
+
+open scoped Classical FiniteInduce in
+/-- The (8.16) `A₀(S)` Dade base has conjugation-invariant (trivial) signalizers: every
+`H(a) = ⊥` by the `of_isTISubset` construction.  The `hconj` input of the §4 full Dade
+isometry (2.6) at `typeIIHypothesis46 … |>.dade0`; since `HConjInvariant` is a proposition,
+this is definitionally interchangeable with the proof baked into `typeIIHypothesis46 … |>.tau`. -/
+theorem typeIIHypothesis46_dade0_hConjInvariant [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) (data : TypePData S) :
+    (typeIIHypothesis46 hG hSmax hSII data).dade0.HConjInvariant :=
+  OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl)
+
+open scoped Classical FiniteInduce in
+/-- **The `S`-side Dade image of an `A(S)`-supported function vanishes on the exceptional set
+`V`** (type-II mirror of the §12 `S13.tau_apply_eq_zero_of_mem_typePV`, over the (8.16)
+`A₀(S)`-Dade base): for `α` supported on `A(S)` and `v ∈ (ticVdiff h46).V = W ∖ (W₁ ∪ W₂) =
+typePV S`, the image `α^{τ_S}` vanishes at `v`.
+
+`V^S ⊆ A₀(S)`, so `v` **is** a Dade base point: the explicit (2.5) evaluation
+(`dadeValue_eq` with witness `a = v`, `h = 1`) gives `α^{τ_S}(v) = α(v)`, which vanishes
+because `v ∉ S'` (`typePData_typePV_not_mem_derived`) while `α` is supported on
+`A(S) ⊆ S'`.  This is the anchor of the `S`-side cross-orthogonality `R(μ_j) ⊥ R(χ)`
+(`typeII_certainTypeR_imageSet_orthogonal_dadeOfDiff`). -/
+theorem typeII_tau_apply_eq_zero_of_mem_ticVdiffV [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) (data : TypePData S)
+    {α : ClassFunction ↥S ℂ}
+    (hαsupp : α.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)) S)
+    {v : G}
+    (hv : v ∈ (OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)).V) :
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+      (typeIIHypothesis46 hG hSmax hSII data).dade0
+      (typeIIHypothesis46 hG hSmax hSII data).tau α v = 0 := by
+  classical
+  -- `v ∈ typePV S` (the `ticVdiff` exceptional set is definitionally `W ∖ (W₁ ∪ W₂)`)
+  have hvPV : v ∈ typePV S data := hv
+  -- `v ∈ A₀(S)` (the `V^S`-part, conjugator `1`)
+  have hvA0 : v ∈ centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)
+      ∪ conjClassSetIn S (typePV S data) :=
+    Or.inr ⟨v, hvPV, 1, S.one_mem, by group⟩
+  -- `α` is `A₀`-supported (monotone from `A(S)`-supported)
+  have hαA0 : α.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)
+        ∪ conjClassSetIn S (typePV S data)) S :=
+    hαsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono Set.subset_union_left)
+  -- evaluate the explicit (2.5) Dade map at the base point `a = v`, `h = 1`
+  rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support
+      (typeIIHypothesis46 hG hSmax hSII data).dade0 _ hαA0,
+    OddOrder.Peterfalvi.S04.Hypothesis.dadeMap_apply,
+    (typeIIHypothesis46 hG hSmax hSII data).dade0.dadeValue_eq _ (a := ⟨v, hvA0⟩)
+      (Subgroup.one_mem _) (by rw [mul_one])]
+  -- `α(v) = 0`: `v ∉ S'` while `α` is `A(S) ⊆ S'`-supported
+  by_contra hne
+  have hmem := hαsupp (ClassFunction.mem_support.mpr hne)
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at hmem
+  exact OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived data hvPV hmem.1
+
+open scoped Classical FiniteInduce in
+/-- **(5.2.e) certain-type column vs irreducible break cross-orthogonality, type-II `S`-side**
+`R(μ_j) ⊥ R(χ)` — the (10.7) analogue of the §12
+`S13.certainTypeR_imageSet_orthogonal_dadeOfDiff_typeP` (which is downstream of this leaf), over
+the (8.16) `A₀(S)`-Dade base `typeIIHypothesis46 … |>.dade0`.
+
+The proof is the same mirror of the Sibley `certainTypeR_imageSet_orthogonal_dadeOfDiff`: the
+disjointness machine (`inner_smul_chiFam_eq_zero_of_diff_vanishOnV` on `ticVdiff h46`) and the
+two-element `R(χ)` capture are `h46`-generic; the single anchor — vanishing of `(χ − χ̄)^{τ_S}`
+on the exceptional `V` — is `typeII_tau_apply_eq_zero_of_mem_ticVdiffV` (base-point evaluation,
+`V^S ⊆ A₀(S)`).  The conjugate difference is `A(S)`-supported (`hdiffsuppχA`, feeding the
+anchor) and `A₀(S)`-supported (`hdiffsuppχ`, defining the Dade image family `R(χ)`).  This is
+the irr × column case of the (10.7) `T2`-family `hRorth`. -/
+theorem typeII_certainTypeR_imageSet_orthogonal_dadeOfDiff [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) (data : TypePData S)
+    [NeZero (Nat.card (typeIIHypothesis46 hG hSmax hSII data).W1)]
+    {χ₂ : ((typeIIHypothesis46 hG hSmax hSII data).W2.subgroupOf
+      ((typeIIHypothesis46 hG hSmax hSII data).W1
+        ⊔ (typeIIHypothesis46 hG hSmax hSII data).W2)) →* ℂˣ}
+    (hχ₂ : χ₂ ≠ 1)
+    (hdeg : (∑ i, (((typeIIHypothesis46 hG hSmax hSII data).columnFamily χ₂).mu i
+        : ClassFunction ↥S ℂ) 1)
+      = (∑ i, (((typeIIHypothesis46 hG hSmax hSII data).columnFamily χ₂⁻¹).mu i
+        : ClassFunction ↥S ℂ) 1))
+    (χ : IrreducibleCharacter ↥S)
+    (hrealχ : ¬ ClassFunction.IsReal (χ : ClassFunction ↥S ℂ))
+    (hdiffsuppχA : (((χ : ClassFunction ↥S ℂ).conj - (χ : ClassFunction ↥S ℂ)
+      : ClassFunction ↥S ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)) S)
+    (hdiffsuppχ : (((χ : ClassFunction ↥S ℂ).conj - (χ : ClassFunction ↥S ℂ)
+      : ClassFunction ↥S ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)
+          ∪ conjClassSetIn S (typePV S data)) S) :
+    ∀ α ∈ (OddOrder.Peterfalvi.S06.certainTypeR (typeIIHypothesis46 hG hSmax hSII data)
+        hχ₂ hdeg).imageSet,
+    ∀ β ∈ (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
+        (typeIIHypothesis46 hG hSmax hSII data).dade0
+        (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data)
+        χ hrealχ hdiffsuppχ).imageSet,
+      ClassFunction.inner α β = 0 := by
+  classical
+  -- `hmin`: `2 < min(w₁, w₂)` for the `ticVdiff` exceptional structure.
+  have hmin : 2 < min
+      (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)).W1)
+      (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)).W2) := by
+    have h1 := (OddOrder.Peterfalvi.S06.ticVdiff
+      (typeIIHypothesis46 hG hSmax hSII data)).three_le_card_W1
+    have h2 := (OddOrder.Peterfalvi.S06.ticVdiff
+      (typeIIHypothesis46 hG hSmax hSII data)).three_le_card_W2
+    omega
+  -- core disjointness brick (mirror of the Sibley/§12 `key`)
+  have key : ∀ (χ₂' : ((typeIIHypothesis46 hG hSmax hSII data).W2.subgroupOf
+      ((typeIIHypothesis46 hG hSmax hSII data).W1
+        ⊔ (typeIIHypothesis46 hG hSmax hSII data).W2)) →* ℂˣ)
+      (i : Fin (Nat.card (typeIIHypothesis46 hG hSmax hSII data).W1)) {c c' : ℂ}
+      {ξ ξ' : ClassFunction G ℂ},
+      ξ ∈ ZIrr G → ClassFunction.inner ξ ξ = 1 → ξ' ∈ ZIrr G →
+      ClassFunction.inner ξ' ξ' = 1 →
+      ClassFunction.inner ξ ξ' = 0 → c ≠ 0 →
+      (∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)).V,
+        (c • ξ - c' • ξ') v = 0) →
+      ClassFunction.inner (c • ξ)
+        (OddOrder.Peterfalvi.S06.certainTypeOmegaSigma
+          (typeIIHypothesis46 hG hSmax hSII data) χ₂' i) = 0 := by
+    intro χ₂' i c c' ξ ξ' hξZ hξ1 hξ'Z hξ'1 hξξ' hc hvanish
+    rw [OddOrder.Peterfalvi.S06.certainTypeOmegaSigma_eq_chiFam]
+    exact OddOrder.Peterfalvi.S08.inner_smul_chiFam_eq_zero_of_diff_vanishOnV
+      (OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)) rfl
+      (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication (typeIIHypothesis46 hG hSmax hSII data))
+      hξZ hξ1 hξ'Z hξ'1 hξξ' hc hvanish hmin _
+  -- `(χ − χ̄)^{τ_S}` vanishes on `V` (the type-II anchor, base-point evaluation)
+  have hsuppsub : (((χ : ClassFunction ↥S ℂ) - (χ : ClassFunction ↥S ℂ).conj
+      : ClassFunction ↥S ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)) S := by
+    rw [show (χ : ClassFunction ↥S ℂ) - (χ : ClassFunction ↥S ℂ).conj =
+        -((χ : ClassFunction ↥S ℂ).conj - (χ : ClassFunction ↥S ℂ)) by abel,
+      ClassFunction.support_neg]
+    exact hdiffsuppχA
+  have htauvanish : ∀ v ∈
+      (OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)).V,
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+        (typeIIHypothesis46 hG hSmax hSII data).dade0
+        (typeIIHypothesis46 hG hSmax hSII data).tau
+        ((χ : ClassFunction ↥S ℂ) - (χ : ClassFunction ↥S ℂ).conj) v = 0 :=
+    fun v hv => typeII_tau_apply_eq_zero_of_mem_ticVdiffV hG hSmax hSII data hsuppsub hv
+  -- capture the two-element `R(χ)` abstractly
+  obtain ⟨cd, hcd⟩ :
+      ∃ cd : OddOrder.Peterfalvi.S07.CharacterDifferenceImage (G := G)
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+          (typeIIHypothesis46 hG hSmax hSII data).dade0
+          ((typeIIHypothesis46 hG hSmax hSII data).dade0.fullDadeIsometryData
+            (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data)))
+        (χ : ClassFunction ↥S ℂ),
+        OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
+            (typeIIHypothesis46 hG hSmax hSII data).dade0
+            (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data) χ hrealχ hdiffsuppχ
+          = cd.toOrthonormalImage := ⟨_, rfl⟩
+  have hcdimg : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+      (typeIIHypothesis46 hG hSmax hSII data).dade0
+      ((typeIIHypothesis46 hG hSmax hSII data).dade0.fullDadeIsometryData
+        (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data))
+      ((χ : ClassFunction ↥S ℂ) - (χ : ClassFunction ↥S ℂ).conj)
+      = (cd.sign : ℂ) • cd.muClassFunction - (cd.sign : ℂ) • cd.nuClassFunction := by
+    rw [cd.image_eq, smul_sub, Int.cast_smul_eq_zsmul, Int.cast_smul_eq_zsmul]
+  have hμZ : cd.muClassFunction ∈ ZIrr G := cd.mu.mem_ZIrr
+  have hνZ : cd.nuClassFunction ∈ ZIrr G := cd.nu.mem_ZIrr
+  have hμ1 : ClassFunction.inner cd.muClassFunction cd.muClassFunction = 1 := by
+    have h := irreducibleCharacter_inner_eq_ite cd.mu cd.mu; rwa [if_pos rfl] at h
+  have hν1 : ClassFunction.inner cd.nuClassFunction cd.nuClassFunction = 1 := by
+    have h := irreducibleCharacter_inner_eq_ite cd.nu cd.nu; rwa [if_pos rfl] at h
+  have hμν : ClassFunction.inner cd.muClassFunction cd.nuClassFunction = 0 := by
+    have h := irreducibleCharacter_inner_eq_ite cd.mu cd.nu; rwa [if_neg cd.distinct] at h
+  have hνμ : ClassFunction.inner cd.nuClassFunction cd.muClassFunction = 0 := by
+    have h := irreducibleCharacter_inner_eq_ite cd.nu cd.mu
+    rwa [if_neg (Ne.symm cd.distinct)] at h
+  have hsignC : (cd.sign : ℂ) ≠ 0 := by rcases cd.sign_eq with h | h <;> simp [h]
+  have hnsignC : (-(cd.sign : ℂ)) ≠ 0 := by rcases cd.sign_eq with h | h <;> simp [h]
+  intro α hα β hβ
+  rw [hcd] at hβ
+  simp only [OddOrder.Peterfalvi.S07.CharacterDifferenceImage.toOrthonormalImage,
+    Finset.mem_insert, Finset.mem_singleton] at hβ
+  simp only [OddOrder.Peterfalvi.S06.certainTypeR, Finset.mem_image] at hα
+  obtain ⟨⟨b, i⟩, -, rfl⟩ := hα
+  have hvanishμν : ∀ v ∈
+      (OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)).V,
+      ((cd.sign : ℂ) • cd.muClassFunction - (cd.sign : ℂ) • cd.nuClassFunction) v = 0 := by
+    intro v hv; rw [← hcdimg]; exact htauvanish v hv
+  have hvanishνμ : ∀ v ∈
+      (OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)).V,
+      ((-(cd.sign : ℂ)) • cd.nuClassFunction - (-(cd.sign : ℂ)) • cd.muClassFunction) v = 0 := by
+    intro v hv
+    rw [show (-(cd.sign : ℂ)) • cd.nuClassFunction - (-(cd.sign : ℂ)) • cd.muClassFunction
+        = (cd.sign : ℂ) • cd.muClassFunction - (cd.sign : ℂ) • cd.nuClassFunction by
+      rw [neg_smul, neg_smul]; abel]
+    exact hvanishμν v hv
+  have hμcast : cd.sign • cd.muClassFunction = (cd.sign : ℂ) • cd.muClassFunction :=
+    (Int.cast_smul_eq_zsmul ℂ cd.sign cd.muClassFunction).symm
+  have hνcast : (-cd.sign) • cd.nuClassFunction = (-(cd.sign : ℂ)) • cd.nuClassFunction := by
+    rw [← Int.cast_smul_eq_zsmul ℂ (-cd.sign) cd.nuClassFunction, Int.cast_neg]
+  rcases hβ with rfl | rfl <;> cases b <;>
+    simp only [OddOrder.Peterfalvi.S06.certainTypeRImage]
+  · rw [hμcast, OddOrder.RepresentationTheory.inner_conj_symm,
+      OddOrder.RepresentationTheory.inner_smul_right,
+      key χ₂ i hμZ hμ1 hνZ hν1 hμν hsignC hvanishμν, mul_zero, star_zero]
+  · rw [hμcast, OddOrder.RepresentationTheory.inner_conj_symm,
+      OddOrder.RepresentationTheory.inner_smul_right,
+      key χ₂⁻¹ i hμZ hμ1 hνZ hν1 hμν hsignC hvanishμν, mul_zero, star_zero]
+  · rw [hνcast, OddOrder.RepresentationTheory.inner_conj_symm,
+      OddOrder.RepresentationTheory.inner_smul_right,
+      key χ₂ i hνZ hν1 hμZ hμ1 hνμ hnsignC hvanishνμ, mul_zero, star_zero]
+  · rw [hνcast, OddOrder.RepresentationTheory.inner_conj_symm,
+      OddOrder.RepresentationTheory.inner_smul_right,
+      key χ₂⁻¹ i hνZ hν1 hμZ hμ1 hνμ hnsignC hvanishνμ, mul_zero, star_zero]
+
+/-! ### The (10.7) `T2 = {λ, λ̄, ν, ν̄}` family: membership, support and degree bookkeeping -/
+
+/-- **Equal-degree differences of `A ∪ {1}`-supported class functions are `A`-supported** —
+the abstract core of the (4.7)-style `hsuppdiff` inputs (each member's support lies in
+`A ∪ {1}` and the shared degree kills the `1`-point).  Abstracted from
+`typeII_sSet_diff_support_subset` so the `T2`-family conjugates (whose member-support facts
+come from support-invariance of conjugation, not from `xiSet`-membership) feed the same
+engine input. -/
+theorem diff_support_subset_of_support_subset_union_one {L : Subgroup G}
+    {A : Set ↥L} {a b : ClassFunction ↥L ℂ}
+    (ha : a.support ⊆ A ∪ {1}) (hb : b.support ⊆ A ∪ {1}) (hdeg : a 1 = b 1) :
+    (a - b).support ⊆ A := by
+  intro x hx
+  have hx0 : (a - b) x ≠ 0 := ClassFunction.mem_support.mp hx
+  have hx1 : x ≠ 1 := by
+    intro he
+    apply hx0
+    rw [he, ClassFunction.sub_apply, hdeg, sub_self]
+  rcases ClassFunction.support_sub_subset a b hx with h | h
+  · rcases ha h with h' | h'
+    · exact h'
+    · exact absurd (Set.mem_singleton_iff.mp h') hx1
+  · rcases hb h with h' | h'
+    · exact h'
+    · exact absurd (Set.mem_singleton_iff.mp h') hx1
+
+/-- Complex conjugation preserves the support of a class function. -/
+theorem conj_support_eq {L : Subgroup G} (φ : ClassFunction ↥L ℂ) :
+    φ.conj.support = φ.support := by
+  ext y
+  simp only [ClassFunction.mem_support, ne_eq, ClassFunction.conj_apply, star_eq_zero]
+
+open OddOrder.Peterfalvi.S11 in
+open scoped Classical FiniteInduce in
+/-- **`𝒮(Y)`-members have positive natural degree**: `φ(1) = q·ξ(1) ∈ ℕ₊` (the (9.5) degree
+formula `induceHU_apply_one_eq_q_mul` on the irreducible source degree).  Supplies the
+`T2`-family's `hdeg0` (nonzero pivot degree) and the conjugate-degree realness
+(`star (φ 1) = φ 1`). -/
+theorem typeII_sOf_apply_one_eq_pos_natCast [Finite G] {S : Subgroup G}
+    (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup S) {Y : Subgroup G}
+    {φ : ClassFunction ↥S ℂ} (hφ : φ ∈ OddOrder.Peterfalvi.S11.sOf data Y) :
+    ∃ n : ℕ, 0 < n ∧ φ 1 = (n : ℂ) := by
+  obtain ⟨ξ, -, rfl⟩ := hφ
+  obtain ⟨d, hd0, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast ξ
+  refine ⟨data.q * d, Nat.mul_pos Nat.card_pos hd0, ?_⟩
+  rw [induceHU_apply_one_eq_q_mul, hd]
+  push_cast
+  ring
+
+open OddOrder.Peterfalvi.S11 in
+open scoped Classical FiniteInduce in
+/-- **The `T2`-family lands in the kernel-filtered family**: every member of
+`{λ, λ̄, ν, ν̄}` (with `λ, ν ∈ 𝒮(Y)`) lies in `inducedKernelFamily S' (Y ∩ S)` — the base
+members via the world-bridge `typeII_sOf_subset_inducedKernelFamily`, their conjugates via
+the family's conjugation-closure.  Feeds the pairwise-orthogonality / no-real / `ℤIrr`
+engine inputs. -/
+theorem typeII_T2_subset_inducedKernelFamily [Finite G] {S : Subgroup G}
+    (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup S) {Y : Subgroup G}
+    {lam nu : ClassFunction ↥S ℂ}
+    (hlam_mem : lam ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (hnu_mem : nu ∈ OddOrder.Peterfalvi.S11.sOf data Y) :
+    ∀ η ∈ ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥S ℂ)),
+      η ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG S).subgroupOf S) (Y.subgroupOf S) := by
+  have hlam := typeII_sOf_subset_inducedKernelFamily data Y hlam_mem
+  have hnu := typeII_sOf_subset_inducedKernelFamily data Y hnu_mem
+  rintro η (rfl | rfl | rfl | rfl)
+  · exact hlam
+  · exact OddOrder.Peterfalvi.S08.inducedKernelFamily_closedUnderConjugate _ hlam
+  · exact hnu
+  · exact OddOrder.Peterfalvi.S08.inducedKernelFamily_closedUnderConjugate _ hnu
+
+open OddOrder.Peterfalvi.S11 in
+open scoped Classical FiniteInduce in
+/-- **`T2`-member supports lie in `A(S) ∪ {1}`**: the base members by the landed (4.7)
+`typeII_sSet_member_support_subset`, the conjugates by support-invariance of conjugation
+(`conj_support_eq`). -/
+theorem typeII_T2_member_support [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S)
+    (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup S) {Y : Subgroup G}
+    {lam nu : ClassFunction ↥S ℂ}
+    (hlam_mem : lam ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (hnu_mem : nu ∈ OddOrder.Peterfalvi.S11.sOf data Y) :
+    ∀ η ∈ ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥S ℂ)),
+      η.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+        (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)) S ∪ {1} := by
+  have hbase : ∀ {φ : ClassFunction ↥S ℂ}, φ ∈ OddOrder.Peterfalvi.S11.sOf data Y →
+      φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+        (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)) S ∪ {1} := by
+    intro φ hφ
+    obtain ⟨ξ, hξ, rfl⟩ := hφ
+    exact typeII_sSet_member_support_subset hG hSmax hSII data
+      (OddOrder.Peterfalvi.S11.xiOf_subset_xiSet data Y hξ)
+  rintro η (rfl | rfl | rfl | rfl)
+  · exact hbase hlam_mem
+  · rw [conj_support_eq]; exact hbase hlam_mem
+  · exact hbase hnu_mem
+  · rw [conj_support_eq]; exact hbase hnu_mem
+
+open OddOrder.Peterfalvi.S11 in
+open scoped Classical FiniteInduce in
+/-- **`T2` has uniform degree `λ(1)`**: the base members by the (10.7) hypothesis
+`λ(1) = ν(1)`, the conjugates because the shared degree is a natural number
+(`typeII_sOf_apply_one_eq_pos_natCast`), hence fixed by the conjugation
+`φ̄(1) = star (φ(1))`. -/
+theorem typeII_T2_apply_one_eq [Finite G] {S : Subgroup G}
+    (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup S) {Y : Subgroup G}
+    {lam nu : ClassFunction ↥S ℂ}
+    (hlam_mem : lam ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (hnu_mem : nu ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (hdeg : lam 1 = nu 1) :
+    ∀ η ∈ ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥S ℂ)), η 1 = lam 1 := by
+  obtain ⟨n, -, hn⟩ := typeII_sOf_apply_one_eq_pos_natCast data hlam_mem
+  obtain ⟨m, -, hm⟩ := typeII_sOf_apply_one_eq_pos_natCast data hnu_mem
+  rintro η (rfl | rfl | rfl | rfl)
+  · rfl
+  · rw [ClassFunction.conj_apply, hn, star_natCast]
+  · exact hdeg.symm
+  · rw [ClassFunction.conj_apply, hm, star_natCast, ← hm, ← hdeg]
+
+/-! ### The (10.7) `T2` per-member `R`-data dispatch -/
+
+open scoped Classical FiniteInduce in
+/-- **Per-member orthonormal `R`-family over the (10.7) `T2 = {λ, λ̄, ν, ν̄}`** (the raw
+(5.2.d) datum for the norm-general (5.7) engine `uniform_degree_coherence_of_families`),
+over the `S`-side `A₀(S)`-Dade base `typeIIHypothesis46 … |>.dade0`.
+
+Dispatch mirrors the §13 `caseB_sOf_memberRFamily`, by irreducibility (not by member
+identity):
+
+* **irreducible `η`** (`λ` or `λ̄`) — the 2-element signed Dade family
+  `dadeOrthonormalCharacterImageFamilyOfDiff`; realness from the kernel-filtered family's
+  no-real property, difference-support from `typeII_T2_member_support` + the degree
+  realness (`typeII_T2_apply_one_eq`);
+* **reducible `η`** (`ν` or `ν̄`) — the (9.8) classification
+  `typeII_reducible_inducedKernelFamily_eq_columnSum` produces the column `χ₂ ≠ 1` with
+  `η = columnSum χ₂`, and the `R`-family is `S06.certainTypeR` rebuilt at the abstract
+  member (the `imageSet`/`orthonormal`/`mem_ZIrr` fields are `η`-independent, `image_eq`
+  is re-proved through the classification equation) — so
+  `(typeII_T2_memberRFamily …).imageSet` is *definitionally* `certainTypeR.imageSet`.
+
+Both branches land definitionally on
+`τ_S = dadeIntegralCharacterMap (typeIIHypothesis46 …).dade0 (typeIIHypothesis46 …).tau`
+(the `tau` field is `fullDadeIsometryData` of the `dade0` field at the proof-irrelevant
+`hconj`), so no `congrMap` seam. -/
+noncomputable def typeII_T2_memberRFamily [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S)
+    (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup S)
+    [NeZero (Nat.card (typeIIHypothesis46 hG hSmax hSII data.typeP).W1)]
+    {Y : Subgroup G} {lam nu : ClassFunction ↥S ℂ}
+    (hlam_mem : lam ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (hnu_mem : nu ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (hdeg : lam 1 = nu 1)
+    {η : ClassFunction ↥S ℂ}
+    (hη : η ∈ ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥S ℂ))) :
+    OddOrder.Peterfalvi.S07.OrthonormalCharacterImageFamily
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+        (typeIIHypothesis46 hG hSmax hSII data.typeP).dade0
+        (typeIIHypothesis46 hG hSmax hSII data.typeP).tau) η := by
+  classical
+  have hModd : Odd (Nat.card ↥S) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card S)
+  have hηIKF : η ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+      ((derivedInG S).subgroupOf S) (Y.subgroupOf S) :=
+    typeII_T2_subset_inducedKernelFamily data hlam_mem hnu_mem η hη
+  by_cases hirr : IsIrreducibleCharacter η
+  · -- irreducible: the signed Dade family over the `A₀(S)` base
+    have hreal : ¬ ClassFunction.IsReal (η : ClassFunction ↥S ℂ) :=
+      OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters hModd
+        (Y.subgroupOf S) hηIKF
+    have hdiffsupp : ((η : ClassFunction ↥S ℂ).conj - η).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup
+          (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)
+            ∪ conjClassSetIn S (typePV S data.typeP)) S := by
+      refine (diff_support_subset_of_support_subset_union_one
+        (by rw [conj_support_eq]
+            exact typeII_T2_member_support hG hSmax hSII data hlam_mem hnu_mem η hη)
+        (typeII_T2_member_support hG hSmax hSII data hlam_mem hnu_mem η hη) ?_).trans
+        (OddOrder.Peterfalvi.S04.supportInSubgroup_mono Set.subset_union_left)
+      rw [ClassFunction.conj_apply,
+        typeII_T2_apply_one_eq data hlam_mem hnu_mem hdeg η hη]
+      obtain ⟨n, -, hn⟩ := typeII_sOf_apply_one_eq_pos_natCast data hlam_mem
+      rw [hn, star_natCast]
+    exact OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
+      (typeIIHypothesis46 hG hSmax hSII data.typeP).dade0
+      (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data.typeP)
+      ⟨η, hirr⟩ hreal hdiffsupp
+  · -- reducible: rebuild `certainTypeR` at the abstract member (column extracted by choice)
+    have hex := typeII_reducible_inducedKernelFamily_eq_columnSum hG hSmax hSII data.typeP
+      hηIKF hirr
+    let χ₂ := hex.choose
+    have hχ₂ne : χ₂ ≠ 1 := hex.choose_spec.1
+    have hkeq : η = OddOrder.Peterfalvi.S06.columnSum
+        (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂ := hex.choose_spec.2
+    exact
+      { imageSet := (OddOrder.Peterfalvi.S06.certainTypeR
+          (typeIIHypothesis46 hG hSmax hSII data.typeP) hχ₂ne
+          (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one
+            (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂).symm).imageSet
+        mem_ZIrr := (OddOrder.Peterfalvi.S06.certainTypeR
+          (typeIIHypothesis46 hG hSmax hSII data.typeP) hχ₂ne
+          (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one
+            (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂).symm).mem_ZIrr
+        orthonormal := (OddOrder.Peterfalvi.S06.certainTypeR
+          (typeIIHypothesis46 hG hSmax hSII data.typeP) hχ₂ne
+          (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one
+            (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂).symm).orthonormal
+        image_eq := by
+          rw [hkeq]
+          exact (OddOrder.Peterfalvi.S06.certainTypeR
+            (typeIIHypothesis46 hG hSmax hSII data.typeP) hχ₂ne
+            (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one
+              (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂).symm).image_eq }
+
+open scoped Classical FiniteInduce in
+/-- **`typeII_T2_memberRFamily` reduction, irreducible case**: for an irreducible `T2`-member
+`η`, the dispatched `R`-family *is* `dadeOrthonormalCharacterImageFamilyOfDiff` (imageSet
+form).  The realness and support proofs are existential (proof-irrelevant inputs to a
+proof-independent `imageSet`), so the (5.2.e) cross lemmas apply after rewriting. -/
+theorem typeII_T2_memberRFamily_imageSet_of_irr [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S)
+    (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup S)
+    [NeZero (Nat.card (typeIIHypothesis46 hG hSmax hSII data.typeP).W1)]
+    {Y : Subgroup G} {lam nu : ClassFunction ↥S ℂ}
+    (hlam_mem : lam ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (hnu_mem : nu ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (hdeg : lam 1 = nu 1)
+    {η : ClassFunction ↥S ℂ}
+    (hη : η ∈ ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥S ℂ)))
+    (hirr : IsIrreducibleCharacter η) :
+    ∃ (hr : ¬ ClassFunction.IsReal η)
+      (hs : (η.conj - η).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+        (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)
+          ∪ conjClassSetIn S (typePV S data.typeP)) S),
+      (typeII_T2_memberRFamily hG hSmax hSII data hlam_mem hnu_mem hdeg hη).imageSet =
+        (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
+          (typeIIHypothesis46 hG hSmax hSII data.typeP).dade0
+          (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data.typeP)
+          ⟨η, hirr⟩ hr hs).imageSet := by
+  classical
+  have hModd : Odd (Nat.card ↥S) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card S)
+  have hηIKF : η ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+      ((derivedInG S).subgroupOf S) (Y.subgroupOf S) :=
+    typeII_T2_subset_inducedKernelFamily data hlam_mem hnu_mem η hη
+  refine ⟨OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters hModd
+      (Y.subgroupOf S) hηIKF, ?_, ?_⟩
+  · refine (diff_support_subset_of_support_subset_union_one
+      (by rw [conj_support_eq]
+          exact typeII_T2_member_support hG hSmax hSII data hlam_mem hnu_mem η hη)
+      (typeII_T2_member_support hG hSmax hSII data hlam_mem hnu_mem η hη) ?_).trans
+      (OddOrder.Peterfalvi.S04.supportInSubgroup_mono Set.subset_union_left)
+    rw [ClassFunction.conj_apply,
+      typeII_T2_apply_one_eq data hlam_mem hnu_mem hdeg η hη]
+    obtain ⟨n, -, hn⟩ := typeII_sOf_apply_one_eq_pos_natCast data hlam_mem
+    rw [hn, star_natCast]
+  · unfold typeII_T2_memberRFamily
+    rw [dif_pos hirr]
+
+open scoped Classical FiniteInduce in
+/-- **`typeII_T2_memberRFamily` reduction, column case**: for a reducible `T2`-member `η`,
+the dispatched `R`-family *is* `certainTypeR` at the classified column `χ₂` (imageSet form),
+exposed existentially together with the membership equation `η = columnSum χ₂` (which
+supplies the `≠`-side conditions of the μ×μ cross-orthogonality). -/
+theorem typeII_T2_memberRFamily_imageSet_of_col [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S)
+    (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup S)
+    [NeZero (Nat.card (typeIIHypothesis46 hG hSmax hSII data.typeP).W1)]
+    {Y : Subgroup G} {lam nu : ClassFunction ↥S ℂ}
+    (hlam_mem : lam ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (hnu_mem : nu ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (hdeg : lam 1 = nu 1)
+    {η : ClassFunction ↥S ℂ}
+    (hη : η ∈ ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥S ℂ)))
+    (hcol : ¬ IsIrreducibleCharacter η) :
+    ∃ (χ₂ : ((typeIIHypothesis46 hG hSmax hSII data.typeP).W2.subgroupOf
+        ((typeIIHypothesis46 hG hSmax hSII data.typeP).W1
+          ⊔ (typeIIHypothesis46 hG hSmax hSII data.typeP).W2)) →* ℂˣ)
+      (hχ₂ne : χ₂ ≠ 1),
+      η = OddOrder.Peterfalvi.S06.columnSum
+        (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂ ∧
+      (typeII_T2_memberRFamily hG hSmax hSII data hlam_mem hnu_mem hdeg hη).imageSet =
+        (OddOrder.Peterfalvi.S06.certainTypeR
+          (typeIIHypothesis46 hG hSmax hSII data.typeP) hχ₂ne
+          (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one
+            (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂).symm).imageSet := by
+  classical
+  have hηIKF : η ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+      ((derivedInG S).subgroupOf S) (Y.subgroupOf S) :=
+    typeII_T2_subset_inducedKernelFamily data hlam_mem hnu_mem η hη
+  have hex := typeII_reducible_inducedKernelFamily_eq_columnSum hG hSmax hSII data.typeP
+    hηIKF hcol
+  refine ⟨hex.choose, hex.choose_spec.1, hex.choose_spec.2, ?_⟩
+  unfold typeII_T2_memberRFamily
+  rw [dif_neg hcol]
+
+set_option maxHeartbeats 1600000 in
+-- the `2×2` dichotomy case split repeatedly matches the reduced dispatched families against
+-- the (5.2.e) lemmas through the `tau = fullDadeIsometryData` proof-irrelevance defeq
+open scoped Classical FiniteInduce in
+/-- **(5.2.e) cross-orthogonality of the dispatched `T2` `R`-families** (the `hRorth` input
+of the norm-general (5.7) engine over `T2 = {λ, λ̄, ν, ν̄}`): for members `φ, ξ` with
+`⟨φ, ξ⟩ = ⟨φ, ξ̄⟩ = 0`, the `R`-families satisfy `R(φ) ⊥ R(ξ)`.  The `2×2` dispatch mirrors
+the §13 `caseB_sOf_memberRFamily_orthogonal`:
+
+* **irr × irr** — the generic `S08.dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal`;
+  the extra scalars `⟨φ̄, ξ⟩`, `⟨φ̄, ξ̄⟩` are `star`-conjugates of the inputs;
+* **irr × column** / **column × irr** — the landed
+  `typeII_certainTypeR_imageSet_orthogonal_dadeOfDiff` (with an `inner_conj_symm` swap for
+  the irr-on-left order);
+* **column × column** — `S06.certainTypeR_imageSet_orthogonal_certainTypeR`, the `χ₂ ≠ χ₂'`
+  and `χ₂ ≠ χ₂'⁻¹` side conditions from `⟨φ, ξ⟩ = 0` / `⟨φ, ξ̄⟩ = 0` (else `φ = ξ` resp.
+  `φ = ξ̄` has inner product `w₁ ≠ 0`). -/
+theorem typeII_T2_memberRFamily_orthogonal [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S)
+    (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup S)
+    [NeZero (Nat.card (typeIIHypothesis46 hG hSmax hSII data.typeP).W1)]
+    {Y : Subgroup G} {lam nu : ClassFunction ↥S ℂ}
+    (hlam_mem : lam ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (hnu_mem : nu ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (hdeg : lam 1 = nu 1)
+    {φ ξ : ClassFunction ↥S ℂ}
+    (hφ : φ ∈ ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥S ℂ)))
+    (hξ : ξ ∈ ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥S ℂ)))
+    (h1 : ClassFunction.inner φ ξ = 0) (h2 : ClassFunction.inner φ ξ.conj = 0) :
+    (typeII_T2_memberRFamily hG hSmax hSII data hlam_mem hnu_mem hdeg hφ).Orthogonal
+      (typeII_T2_memberRFamily hG hSmax hSII data hlam_mem hnu_mem hdeg hξ) := by
+  classical
+  -- `A(S)`-support of an irreducible member's conjugate difference (the anchor input of the
+  -- μ×irr cross-orthogonality)
+  have hIrrA : ∀ {ζ : ClassFunction ↥S ℂ},
+      ζ ∈ ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥S ℂ)) →
+      ((ζ.conj - ζ).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+        (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)) S) := by
+    intro ζ hζ
+    refine diff_support_subset_of_support_subset_union_one
+      (by rw [conj_support_eq]
+          exact typeII_T2_member_support hG hSmax hSII data hlam_mem hnu_mem ζ hζ)
+      (typeII_T2_member_support hG hSmax hSII data hlam_mem hnu_mem ζ hζ) ?_
+    rw [ClassFunction.conj_apply,
+      typeII_T2_apply_one_eq data hlam_mem hnu_mem hdeg ζ hζ]
+    obtain ⟨n, -, hn⟩ := typeII_sOf_apply_one_eq_pos_natCast data hlam_mem
+    rw [hn, star_natCast]
+  have hw1ne : (Nat.card (typeIIHypothesis46 hG hSmax hSII data.typeP).W1 : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr (NeZero.ne _)
+  intro α hα β hβ
+  by_cases hφirr : IsIrreducibleCharacter φ <;> by_cases hξirr : IsIrreducibleCharacter ξ
+  · -- irr × irr
+    obtain ⟨hrφ, hsφ, hφeq⟩ := typeII_T2_memberRFamily_imageSet_of_irr hG hSmax hSII data
+      hlam_mem hnu_mem hdeg hφ hφirr
+    obtain ⟨hrξ, hsξ, hξeq⟩ := typeII_T2_memberRFamily_imageSet_of_irr hG hSmax hSII data
+      hlam_mem hnu_mem hdeg hξ hξirr
+    rw [hφeq] at hα
+    rw [hξeq] at hβ
+    have hbarχ : ClassFunction.inner φ.conj ξ = 0 := by
+      rw [← ClassFunction.conj_conj ξ, inner_conj_conj, h2, star_zero]
+    have hbarχbar : ClassFunction.inner φ.conj ξ.conj = 0 := by
+      rw [inner_conj_conj, h1, star_zero]
+    exact OddOrder.Peterfalvi.S08.dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal
+      (typeIIHypothesis46 hG hSmax hSII data.typeP).dade0
+      (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data.typeP)
+      (x := ⟨φ, hφirr⟩) (χ := ⟨ξ, hξirr⟩)
+      hrφ hsφ hrξ hsξ h1 h2 hbarχ hbarχbar α hα β hβ
+  · -- irr × column
+    obtain ⟨hrφ, hsφ, hφeq⟩ := typeII_T2_memberRFamily_imageSet_of_irr hG hSmax hSII data
+      hlam_mem hnu_mem hdeg hφ hφirr
+    obtain ⟨k, hk0, hkeq, hξeq⟩ := typeII_T2_memberRFamily_imageSet_of_col hG hSmax hSII data
+      hlam_mem hnu_mem hdeg hξ hξirr
+    rw [hφeq] at hα
+    rw [hξeq] at hβ
+    rw [OddOrder.RepresentationTheory.inner_conj_symm β α]
+    rw [typeII_certainTypeR_imageSet_orthogonal_dadeOfDiff hG hSmax hSII data.typeP hk0
+      (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one
+        (typeIIHypothesis46 hG hSmax hSII data.typeP) k).symm
+      ⟨φ, hφirr⟩ hrφ (hIrrA hφ) hsφ β hβ α hα, star_zero]
+  · -- column × irr
+    obtain ⟨k, hk0, hkeq, hφeq⟩ := typeII_T2_memberRFamily_imageSet_of_col hG hSmax hSII data
+      hlam_mem hnu_mem hdeg hφ hφirr
+    obtain ⟨hrξ, hsξ, hξeq⟩ := typeII_T2_memberRFamily_imageSet_of_irr hG hSmax hSII data
+      hlam_mem hnu_mem hdeg hξ hξirr
+    rw [hφeq] at hα
+    rw [hξeq] at hβ
+    exact typeII_certainTypeR_imageSet_orthogonal_dadeOfDiff hG hSmax hSII data.typeP hk0
+      (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one
+        (typeIIHypothesis46 hG hSmax hSII data.typeP) k).symm
+      ⟨ξ, hξirr⟩ hrξ (hIrrA hξ) hsξ α hα β hβ
+  · -- column × column
+    obtain ⟨kφ, hkφ0, hkφeq, hφeq⟩ := typeII_T2_memberRFamily_imageSet_of_col hG hSmax hSII
+      data hlam_mem hnu_mem hdeg hφ hφirr
+    obtain ⟨kξ, hkξ0, hkξeq, hξeq⟩ := typeII_T2_memberRFamily_imageSet_of_col hG hSmax hSII
+      data hlam_mem hnu_mem hdeg hξ hξirr
+    rw [hφeq] at hα
+    rw [hξeq] at hβ
+    have hne1 : kφ ≠ kξ := by
+      intro heq
+      have hφξ : φ = ξ := by rw [hkφeq, hkξeq, heq]
+      rw [hφξ, hkξeq, OddOrder.Peterfalvi.S06.columnSum_def,
+        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl] at h1
+      exact hw1ne h1
+    have hne2 : kφ ≠ kξ⁻¹ := by
+      intro heq
+      have hφξc : φ = ξ.conj := by
+        rw [hkφeq, heq, ← OddOrder.Peterfalvi.S06.columnSum_conj_eq, hkξeq]
+      rw [hφξc, hkξeq, OddOrder.Peterfalvi.S06.columnSum_conj_eq,
+        OddOrder.Peterfalvi.S06.columnSum_def,
+        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl] at h2
+      exact hw1ne h2
+    exact OddOrder.Peterfalvi.S06.certainTypeR_imageSet_orthogonal_certainTypeR
+      (typeIIHypothesis46 hG hSmax hSII data.typeP) hkφ0 hkξ0
+      (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one
+        (typeIIHypothesis46 hG hSmax hSII data.typeP) kφ).symm
+      (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one
+        (typeIIHypothesis46 hG hSmax hSII data.typeP) kξ).symm
+      hne1 hne2 α hα β hβ
+
+set_option maxHeartbeats 1600000 in
+-- the engine threads the dispatched `R`-families and the `hZdiff`/`hiso` inputs through the
+-- `tau = fullDadeIsometryData` proof-irrelevance defeq, which is feasible but expensive
+open OddOrder.Peterfalvi.S11 in
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (5.7) for the (10.7) `T2 = {λ, λ̄, ν, ν̄}` family — obligation 1 of
+`exists_typeIICrossIsometryData`**: for an irreducible `λ` and a reducible `ν` of equal degree
+in the `S`-side §9 family `𝒮(Y)`, the 4-element family `T2` is coherent over the `S`-side
+`A₀(S)`-Dade isometry `τ_S` (the (8.16) `typeIIHypothesis46` base).
+
+One shot of the norm-general uniform-degree engine
+(`uniform_degree_coherence_of_families`), with pivot `λ` (norm `1`), second member `ν`, the
+per-member `R`-data dispatch `typeII_T2_memberRFamily` and its (5.2.e) cross-orthogonality
+`typeII_T2_memberRFamily_orthogonal`; the family-level facts (pairwise orthogonality,
+no-real, `ℤIrr`) flow through `inducedKernelFamily`, the support facts through the (4.7)
+`typeII_T2_member_support` and the degree bookkeeping `typeII_T2_apply_one_eq`. -/
+theorem typeII_T2_coherent [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S)
+    (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup S)
+    [NeZero (Nat.card (typeIIHypothesis46 hG hSmax hSII data.typeP).W1)]
+    {Y : Subgroup G} {lam nu : ClassFunction ↥S ℂ}
+    (hlam_mem : lam ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (hlam_irr : IsIrreducibleCharacter lam)
+    (hnu_mem : nu ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (hnu_red : ¬ IsIrreducibleCharacter nu)
+    (hdeg : lam 1 = nu 1) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+        (typeIIHypothesis46 hG hSmax hSII data.typeP).dade0
+        (typeIIHypothesis46 hG hSmax hSII data.typeP).tau)
+      ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥S ℂ))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)
+          ∪ conjClassSetIn S (typePV S data.typeP)) S)) := by
+  classical
+  have hModd : Odd (Nat.card ↥S) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card S)
+  have hT2IKF := typeII_T2_subset_inducedKernelFamily data hlam_mem hnu_mem
+  have hT2supp := typeII_T2_member_support hG hSmax hSII data hlam_mem hnu_mem
+  have hT2one := typeII_T2_apply_one_eq data hlam_mem hnu_mem hdeg
+  -- uniform `A₀(S)`-support of member differences
+  have hsuppdiff : ∀ a ∈ ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥S ℂ)),
+      ∀ b ∈ ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥S ℂ)),
+      ((a - b : ClassFunction ↥S ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup
+          (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)
+            ∪ conjClassSetIn S (typePV S data.typeP)) S := by
+    intro a ha b hb
+    exact (diff_support_subset_of_support_subset_union_one (hT2supp a ha) (hT2supp b hb)
+      ((hT2one a ha).trans (hT2one b hb).symm)).trans
+      (OddOrder.Peterfalvi.S04.supportInSubgroup_mono Set.subset_union_left)
+  refine OddOrder.Peterfalvi.S07.uniform_degree_coherence_of_families
+    (Set.Finite.insert _ (Set.Finite.insert _ (Set.Finite.insert _ (Set.finite_singleton _))))
+    (Set.mem_insert _ _)
+    (fun η hη => typeII_T2_memberRFamily hG hSmax hSII data hlam_mem hnu_mem hdeg hη)
+    (fun a ha b hb hab =>
+      OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal
+        (hT2IKF a ha) (hT2IKF b hb) hab)
+    ?hconj
+    (fun a ha h =>
+      OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters hModd
+        (Y.subgroupOf S) (hT2IKF a ha) h.symm)
+    ⟨1, by
+      have h := irreducibleCharacter_inner_eq_ite ⟨lam, hlam_irr⟩ ⟨lam, hlam_irr⟩
+      rw [if_pos rfl] at h
+      simpa using h⟩
+    (fun {φ ψ} hφ hψ =>
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
+        (typeIIHypothesis46 hG hSmax hSII data.typeP).dade0
+        (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data.typeP)
+        (OddOrder.Peterfalvi.S07.support_subset_of_mem_zSupportedSpan hφ)
+        (OddOrder.Peterfalvi.S07.support_subset_of_mem_zSupportedSpan hψ))
+    (fun a ha b hb =>
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+        (typeIIHypothesis46 hG hSmax hSII data.typeP).dade0
+        (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data.typeP)
+        (hsuppdiff a ha b hb)
+        (Submodule.sub_mem _
+          (OddOrder.Peterfalvi.S08.inducedKernelFamily_mem_ZIrr (hT2IKF a ha))
+          (OddOrder.Peterfalvi.S08.inducedKernelFamily_mem_ZIrr (hT2IKF b hb))))
+    hsuppdiff
+    (fun {φ ξ} hφ hξ h1 h2 =>
+      typeII_T2_memberRFamily_orthogonal hG hSmax hSII data hlam_mem hnu_mem hdeg
+        hφ hξ h1 h2)
+    hT2one
+    ?hdeg0
+    ?h1A
+    (Set.mem_insert_of_mem _ (Set.mem_insert_of_mem _ (Set.mem_insert _ _)))
+    (fun h => hnu_red (h ▸ hlam_irr))
+  case hconj =>
+    rintro a (rfl | rfl | rfl | rfl)
+    · exact Set.mem_insert_of_mem _ (Set.mem_insert _ _)
+    · rw [ClassFunction.conj_conj]
+      exact Set.mem_insert _ _
+    · exact Set.mem_insert_of_mem _ (Set.mem_insert_of_mem _
+        (Set.mem_insert_of_mem _ rfl))
+    · rw [ClassFunction.conj_conj]
+      exact Set.mem_insert_of_mem _ (Set.mem_insert_of_mem _ (Set.mem_insert _ _))
+  case hdeg0 =>
+    obtain ⟨n, hn0, hn⟩ := typeII_sOf_apply_one_eq_pos_natCast data hlam_mem
+    rw [hn]
+    exact Nat.cast_ne_zero.mpr hn0.ne'
+  case h1A =>
+    intro hmem
+    rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at hmem
+    rcases hmem with h | ⟨t, htV, h, -, heq⟩
+    · exact h.2.1 rfl
+    · have ht1 : t = 1 := by
+        have h2 : t = h⁻¹ * (h * t * h⁻¹) * h := by group
+        rw [h2, heq, OneMemClass.coe_one]
+        group
+      exact htV.2 ((Set.mem_union _ _ _).mpr (Or.inl (by
+        rw [ht1]
+        exact SetLike.mem_coe.mpr data.typeP.W1.one_mem)))
 
 end Hypothesis46Instance
 
