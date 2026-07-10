@@ -752,3 +752,22 @@ S15_HonestTypeP2A0 に mu_row0 engine (mu_row0_ne proven / tauS_mu_row0_{diff_su
 
 **リスク注記**: B(i) の ψ P-support と C の (2.1) 対応物が repo 未在なら追加 pin/新規補題
 (数十〜百行級)。D は self-contained で即着手可。
+
+## ✅📋 (2026-07-10 続¹²、lane-b /loop iter 4-5) — 部品 D landed + 部品 A は既存 API で inflation 橋 1 本のみ
+
+- **iter 4 (commit 7a7039cd)**: 部品 D `sharpP_union_V_subset_A0` **完全 proven** (P^#∪V_S ⊆ 'A0(S))。
+  P=Msigma (S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II + isTypeII_of_isTypeP2、
+  SubcoherenceInputs:1096 の hPeq パターン)、P≤S′、self-centralize。V^S 側は def の右成分。
+- **iter 5 (調査、重複回避 3 回目)**: 部品 A の一般補題は **両方 Machinery135 に既存**:
+  `induce_one_eq_zero_of_mem_normal_inf_bot` (kernel^# で 0) + `induce_one_eq_one_of_mem_complement`
+  (complement^# で 1、Frobenius TI)。さらに **S̄=S/P への Frobenius 輸送 setup が
+  indPW1_inner_self_aux:694-756 に完備** (typeP_uW1_frobenius → e : ↥(U⊔W₁)≃*S̄ →
+  isFrobeniusGroup_map_equiv → hAmatch : W̄₁ = Ā = (PW₁)/P)。
+- **∴ 部品 A の残実装 = inflation 橋 1 本**: `indPW1_apply_eq_one_of_mem_W1_sharp`
+  (x∈W₁^# → indPW1 hyp x = 1)。手順: (1) `induce_one_eq_compHom_induce_one_of_le hNA` で
+  indPW1 = (Ind_Ā^{S̄} 1)∘mk′ (aux:689-691 の rw)、(2) 値 = Ind_Ā 1 (x̄)、(3) x̄∈Ā ∧ x̄≠1
+  (W₁⊓P=⊥ 系 disjointness で x∉P)、(4) `induce_one_eq_one_of_mem_complement hFrob`。
+  setup は aux:694-756 複製 (aux は private ゆえ共通抽出 refactor は hub 委任候補、まず動くものを)。
+  同型の `indPW1_apply_eq_zero` (PU∖P で 0、A(i)) も同 setup: (PW₁)^S∩PU=P group calc +
+  induce_one_eq_zero (P̄=⊥ 側でなく S 内直接計算の方が素直か — Coq は PU-case を S 内で処理)。
+  次 iter: この 2 本を実装。
