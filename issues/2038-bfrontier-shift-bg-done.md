@@ -1314,3 +1314,27 @@ producer discharge (hyp46Smp = hyp46S copy [dadeSupportHypothesisData_honestType
 mp.S_maximal mp.S_typeP2 tp.Sdata + subH=M_σ 4 論証、S15_HonestTypeP2A0:660-699 参照] +
 muS_diff_support = residueS_mu2_diff_support の mp-level 写し [chi2enum 版]) + pin 修正
 (hj0/hk0/hdeg 化) + consumer `_hj` pass。
+
+## ⚠📋 (2026-07-11、lane-b /loop iter 35) — 真の残 content 確定: 2 つの S06 instance の grid 同定
+
+field 追加の producer discharge 精査で **make-or-break 事実**:
+- **producer grid `muS` は `mp.certainTypeS` 上** = `certainTypeHypothesis_of_typeP_kappaHall`
+  構築 (FTSetup:1142、kappaHall-based)。
+- **engines (certainType_diff_supp_subset_A0 経由の hyp46S/hyp46Smp) は
+  `typePData_toS06Hypothesis (Sdata)` 上** (hypothesis46OfTypePData が toHypothesis を hardcode)。
+- 両者は **別 instance の S06.Hypothesis** (W₁/W₂ は Sdata_W1_eq 等で propositionally 一致するが
+  columnFamily は各 instance の `.choose`) — ∴ **muS-grid と engine-grid の同定**が pins 2/3 の
+  真の残 mathematical content (c が pins を「grounding 待ち」と sorried にした本当の理由)。
+
+**同定 plan (iter 33 の一意性がまさに道具)**:
+1. **一意性補題 landing** (次 iter、self-contained): 同一 (Ind, ω-族, δ) に対する (13.1.e) 恒等式の
+   解 grid は一意 — iter 33 検証済の議論 (列差一致 + anchor 差 c の norm 矛盾、
+   irreducible inner ∈ {0,1})。置き場 = IsometryDifferencePair or S06 層
+   (`SignedIrreducibleDifferenceFamily.eq_of_signedDifference_eq`-形: 2 family が
+   ∀ i, signedDifference 一致 + sign 一致 → mu 一致; あるいは Ind-恒等式形で)。
+2. **ω-grid 同定**: certainTypeS.chiColumn ↔ (Sdata-instance).chiColumn — 両者は同じ W ≤ S の
+   線形指標 grid (enumeration 差)。omegaProdChar の自然性 + W₁/W₂ set-equalities で。
+3. mu-grid 同定 (1+2) → engines の結論を muS/hyp.mu 形へ transport → pins/field discharge。
+
+**当面の実装順変更**: field 3 層追加は同定完了後に延期 (field 文自体は iter 34 で語彙 ready)。
+次 iter = 一意性補題 (step 1) の Lean 化 — 数学は検証済ゆえ実装のみ。
