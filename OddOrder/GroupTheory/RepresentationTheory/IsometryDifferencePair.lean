@@ -926,4 +926,119 @@ theorem isometry_difference_pair_structure
         (1 : ℤ) • ((μFun i : ClassFunction G ℂ) - (μFun 0 : ClassFunction G ℂ))
       rw [hμne i hi, hμ0, hβ_i, one_zsmul]
 
+namespace SignedIrreducibleDifferenceFamily
+
+/-! ### Cross-family matching
+
+Two signed irreducible-difference families whose difference families are pairwise
+orthogonal have disjoint irreducible supports.  This is the cross-column matching step of
+the Coq `primeTIirr_spec` construction (`PFsection4.v:296-330`, `inj_Imu`): the per-column
+families extracted by `isometry_difference_pair_structure` from the `ω`-grid columns
+assemble into a jointly injective (hence jointly orthonormal) grid `μ_{ij}`. -/
+
+/-- Orthogonality of the signed differences descends to the unsigned differences: the two
+signs multiply to a unit.  (The converse holds by the same computation; this direction is
+the one used when the signed differences are identified with isometric images.) -/
+theorem inner_difference_eq_zero_of_signedDifference
+    [Invertible (Nat.card G : ℂ)]
+    {n m : ℕ} [NeZero n] [NeZero m]
+    (data : SignedIrreducibleDifferenceFamily G n)
+    (data' : SignedIrreducibleDifferenceFamily G m) {i : Fin n} {j : Fin m}
+    (h : ClassFunction.inner (data.signedDifference i) (data'.signedDifference j) = 0) :
+    ClassFunction.inner (data.difference i) (data'.difference j) = 0 := by
+  rw [← data.sign_smul_signedDifference i, ← data'.sign_smul_signedDifference j,
+    ← Int.cast_smul_eq_zsmul ℂ, ← Int.cast_smul_eq_zsmul ℂ,
+    ClassFunction.inner_smul_left, ClassFunction.inner_smul_right, h, mul_zero, mul_zero]
+
+/-- **Cross-family disjointness from difference orthogonality** (Coq `PFsection4.v:296-330`,
+the `inj_Imu` cross-column matching).  If the difference families of two signed
+irreducible-difference families, each with at least two members, are pairwise orthogonal,
+then their irreducible supports are disjoint: `μ_i ≠ μ'_j` for all `i, j`.
+
+Expanding `⟨μ_i - μ_0, μ'_j - μ'_0⟩ = 0` into Kronecker deltas: the anchors must differ
+(else the relation at a nonzero index pair reads `-δ = 1`), no `μ_i` can hit the anchor
+`μ'_0` and symmetrically no `μ'_j` can hit `μ_0` (else the family repeats a member), and
+with all edge deltas zero every interior delta vanishes. -/
+theorem mu_ne_of_forall_inner_difference_eq_zero
+    [Invertible (Nat.card G : ℂ)]
+    {n m : ℕ} [NeZero n] [NeZero m] (hn : 2 ≤ n) (hm : 2 ≤ m)
+    (data : SignedIrreducibleDifferenceFamily G n)
+    (data' : SignedIrreducibleDifferenceFamily G m)
+    (horth : ∀ i j, ClassFunction.inner (data.difference i) (data'.difference j) = 0) :
+    ∀ i j, data.mu i ≠ data'.mu j := by
+  classical
+  -- Kronecker expansion of each orthogonality relation.
+  have hE : ∀ i j,
+      (if data.mu i = data'.mu j then (1 : ℂ) else 0)
+        - (if data.mu i = data'.mu 0 then (1 : ℂ) else 0)
+        - (if data.mu 0 = data'.mu j then (1 : ℂ) else 0)
+        + (if data.mu 0 = data'.mu 0 then (1 : ℂ) else 0) = 0 := by
+    intro i j
+    have h := horth i j
+    simp only [difference_apply, classFunction_apply] at h
+    rwa [irreducibleCharacter_inner_sub_sub_eq_ite] at h
+  let one : Fin n := ⟨1, by omega⟩
+  let one' : Fin m := ⟨1, by omega⟩
+  have hone : one ≠ 0 := by
+    intro h
+    have h1 : (1 : ℕ) = 0 := by
+      have := congrArg Fin.val h
+      rw [Fin.val_zero] at this
+      exact this
+    exact absurd h1 (by omega)
+  have hone' : one' ≠ 0 := by
+    intro h
+    have h1 : (1 : ℕ) = 0 := by
+      have := congrArg Fin.val h
+      rw [Fin.val_zero] at this
+      exact this
+    exact absurd h1 (by omega)
+  -- Step 1: the anchors differ.
+  have h00 : data.mu 0 ≠ data'.mu 0 := by
+    intro h00
+    have hE11 := hE one one'
+    rw [if_pos h00,
+      if_neg (fun hc : data.mu one = data'.mu 0 =>
+        hone (data.injective (hc.trans h00.symm))),
+      if_neg (fun hc : data.mu 0 = data'.mu one' =>
+        hone' (data'.injective (h00.symm.trans hc)).symm)] at hE11
+    by_cases hx : data.mu one = data'.mu one'
+    · rw [if_pos hx] at hE11; norm_num at hE11
+    · rw [if_neg hx] at hE11; norm_num at hE11
+  -- Step 2: no member of `data` hits the anchor of `data'`.
+  have hi0 : ∀ i, data.mu i ≠ data'.mu 0 := by
+    intro i hc
+    by_cases hi : i = 0
+    · exact h00 (hi ▸ hc)
+    · have hEi := hE i one'
+      rw [if_pos hc, if_neg h00,
+        if_neg (fun ha : data.mu i = data'.mu one' =>
+          hone' (data'.injective (ha.symm.trans hc)))] at hEi
+      by_cases hx : data.mu 0 = data'.mu one'
+      · rw [if_pos hx] at hEi; norm_num at hEi
+      · rw [if_neg hx] at hEi; norm_num at hEi
+  -- Step 3: no member of `data'` hits the anchor of `data`.
+  have h0j : ∀ j, data.mu 0 ≠ data'.mu j := by
+    intro j hc
+    by_cases hj : j = 0
+    · exact h00 (hj ▸ hc)
+    · have hEj := hE one j
+      rw [if_pos hc, if_neg h00,
+        if_neg (fun ha : data.mu one = data'.mu j =>
+          hone (data.injective (ha.trans hc.symm)))] at hEj
+      by_cases hx : data.mu one = data'.mu 0
+      · rw [if_pos hx] at hEj; norm_num at hEj
+      · rw [if_neg hx] at hEj; norm_num at hEj
+  -- Step 4: interior deltas vanish.
+  intro i j hc
+  by_cases hi : i = 0
+  · exact h0j j (hi ▸ hc)
+  by_cases hj : j = 0
+  · exact hi0 i (hj ▸ hc)
+  have hEij := hE i j
+  rw [if_pos hc, if_neg (hi0 i), if_neg (h0j j), if_neg h00] at hEij
+  norm_num at hEij
+
+end SignedIrreducibleDifferenceFamily
+
 end OddOrder.RepresentationTheory
