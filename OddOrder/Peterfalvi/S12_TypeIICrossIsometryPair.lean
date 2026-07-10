@@ -487,7 +487,7 @@ orthogonal to `λ^{τ₂}` by (5.5) + the constituent trick
 (`typeII_T2_extension_lam_inner_chiFam_eq_zero`). -/
 theorem Hypothesis.extension_lam_inner_alignedGrid_eq_zero_at_pair [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    (hyp : Hypothesis M) {mp : Section16MaximalPair G}
+    (hyp : Hypothesis M) {mp : Section16MaximalPairCore G}
     (hT : mp.T = M) (hKstar : mp.Kstar = hyp.typeP.W1)
     {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S}
     (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar)
@@ -692,7 +692,7 @@ for the nonconjugate pair (BG Theorem 13.9, `sigma_disjoint_of_nonconjugate`); b
 `M_σ`'s are Hall, so a common prime divisor would lie in the empty intersection. -/
 theorem typeP_pair_core_order_coprime [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    (hyp : Hypothesis M) {mp : Section16MaximalPair G}
+    (hyp : Hypothesis M) {mp : Section16MaximalPairCore G}
     (hT : mp.T = M) (hKstar : mp.Kstar = hyp.typeP.W1)
     {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S}
     (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar)
@@ -751,7 +751,7 @@ uniqueness pins `N₀ = S^g`, a conjugate of the type-II `S`, hence type `P₂` 
 contradicting type III/IV/V (`not_isTypeI_of_isTypeNonI`). -/
 theorem typeP_pair_escaping_centralizer_not_le_conj_partner [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    (hyp : Hypothesis M) {mp : Section16MaximalPair G}
+    (hyp : Hypothesis M) {mp : Section16MaximalPairCore G}
     (hT : mp.T = M) (hKstar : mp.Kstar = hyp.typeP.W1)
     {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S}
     (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar)
@@ -810,7 +810,7 @@ type-generic (8.12)) pins `ℳ(C_G(b)) = {S}`.  If `C_G(a) ≤ M`, then
 (8.13.c4) exclusion (`typeP_pair_escaping_centralizer_not_le_conj_partner`). -/
 theorem typeP_pair_base_bare_not_isConj [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    (hyp : Hypothesis M) {mp : Section16MaximalPair G}
+    (hyp : Hypothesis M) {mp : Section16MaximalPairCore G}
     (hT : mp.T = M) (hKstar : mp.Kstar = hyp.typeP.W1)
     {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S}
     (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar)
@@ -946,7 +946,7 @@ an `A(S)`-point (powers stay in `S′` and keep the centralizer witness).  The b
 `typeP_pair_base_bare_not_isConj`. -/
 theorem typeP_pair_base_not_isConj [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    (hyp : Hypothesis M) {mp : Section16MaximalPair G}
+    (hyp : Hypothesis M) {mp : Section16MaximalPairCore G}
     (hT : mp.T = M) (hKstar : mp.Kstar = hyp.typeP.W1)
     {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S}
     (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar)
@@ -1018,7 +1018,7 @@ base-point disjointness (`typeP_pair_base_not_isConj`), so the supports are disj
 the inner product vanishes (`inner_eq_zero_of_disjoint_support`). -/
 theorem Hypothesis.cross_dade_inner_eq_zero_at_pair [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    (hyp : Hypothesis M) {mp : Section16MaximalPair G}
+    (hyp : Hypothesis M) {mp : Section16MaximalPairCore G}
     (hT : mp.T = M) (hKstar : mp.Kstar = hyp.typeP.W1)
     {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S}
     (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar)
@@ -1094,7 +1094,7 @@ disjointness (`cross_dade_inner_eq_zero_at_pair`) and both vanishing at `1`
 `orthonormal_vchar_diff_ortho` applies. -/
 theorem Hypothesis.tau1_zeta_inner_extension_lam_eq_zero_at_pair [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    (hyp : Hypothesis M) {mp : Section16MaximalPair G}
+    (hyp : Hypothesis M) {mp : Section16MaximalPairCore G}
     (hT : mp.T = M) (hKstar : mp.Kstar = hyp.typeP.W1)
     {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S}
     (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar)
@@ -1238,7 +1238,7 @@ Both sides are Dade images of supported lattice elements: `μ_s = ∑_i μ_{is} 
 (`cross_dade_inner_eq_zero_at_pair`) kills the cross inner product. -/
 theorem Hypothesis.tau1_muColumn_sub_zeta_inner_extension_diff_eq_zero_at_pair [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    (hyp : Hypothesis M) {mp : Section16MaximalPair G}
+    (hyp : Hypothesis M) {mp : Section16MaximalPairCore G}
     (hT : mp.T = M) (hKstar : mp.Kstar = hyp.typeP.W1)
     {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S}
     (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar)
@@ -1349,7 +1349,7 @@ theorem exists_typeIICrossIsometryData_at_pair [Finite G]
     (hζ1 : params.zeta 1 = (hyp.w1 : ℂ))
     (hμd : ∀ (i : Fin hyp.w1) (j : Fin hyp.w2), j ≠ 0 →
       hyp.muGrid hG hG.odd i j 1 = (params.d : ℂ))
-    {mp : Section16MaximalPair G}
+    {mp : Section16MaximalPairCore G}
     (hT : mp.T = M) (hKstar : mp.Kstar = hyp.typeP.W1)
     {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S}
     (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar)
@@ -1403,7 +1403,7 @@ theorem typeII_HU_frobenius_of_coherent_at_pair [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     {hyp : Hypothesis M} {params : CharacterParameters hyp}
     (coh : CoherentHypothesis hyp params)
-    {mp : Section16MaximalPair G}
+    {mp : Section16MaximalPairCore G}
     (hT : mp.T = M) (hKstar : mp.Kstar = hyp.typeP.W1)
     {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S}
     (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar) :
