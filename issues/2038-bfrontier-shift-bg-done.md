@@ -1074,3 +1074,73 @@ isometry_difference_pair_structure の τ-引数形 (linear map か pairwise inn
 消える (per-column 符号差は (1.3.b) の orthonormality に影響しない — dmu_k := ε_col•μ_k は常に
 orthonormal)。その後: prime-TI instantiation (列 = fixed W₂-char、ω-grid → hTI 仮説パラメータ) →
 hInd (列抽出+pairing collapse) → (1.3.b) → (3.9.a) → prTIirr_id。
+
+## ✅ (2026-07-11、lane-b /loop iter 25) — 列間整合 (inj_Imu) landed
+
+IsometryDifferencePair.lean 末尾に SignedIrreducibleDifferenceFamily「Cross-family matching」
+section 追加 (commit fd7b130d、一発 green、full build 4148・AxiomsCheck OK):
+
+- **`mu_ne_of_forall_inner_difference_eq_zero`** (Coq inj_Imu :296-330): 2 family (n,m≥2) の
+  difference 全直交 ⟹ μ-grid 全 disjoint。Kronecker 展開 E(i,j) → anchors distinct →
+  縁 delta 0 (単射性) → 内部 delta 0。iter 24 末尾の導出精査どおり一発実装。
+- **`inner_difference_eq_zero_of_signedDifference`**: signed 直交 → unsigned 直交 (符号は unit、
+  sign_smul_signedDifference + Int.cast_smul + inner_smul_left/right)。
+
+**⟹ generic 部品は完備**: (i) TI-isometry (iter 23) / (ii) 列抽出 (iter 24) / (iii) 列間 disjoint
+(本 iter) / (iv) cross-level (1.3.b) + ω-差族 spanning (iter 15-19) / (v) (3.9.a) 同定 (existing)。
+
+**次 iter (prime-TI instantiation 開始)**: S05 側の設計精査 —
+(1) ω の型と grid 構造 (S05_TICyclic omega / S05_OmegaSpanning sndPart、Irr W ≃ Irr W₁ × Irr W₂
+の積分解 equiv の有無、wFst/wSnd)、(2) 列の Fin-enumeration (列 = fixed W₂-char、0-anchor =
+sndPart lift; 積 equiv があれば直接、なければ Finset.equivFin [[lean-coherence-subfamily-enumeration]])、
+(3) hTI : IsTISubset (W∖W₂ G-level) W 仮説パラメータの設計 (iter 20 (b) 案)、
+(4) 置き場 = PrimeTIResidue.lean vs 新 S05 leaf。精査後、列ごと instantiation
+(induce_difference_pair_structure_of_isTISubset 適用可能形) を実装。
+
+## ⚠✅ (2026-07-11、lane-b /loop iter 26) — **大訂正: prTIirr_id (4.3.c) は S06 に 2026-06-10 から完全 landed 済**
+
+instantiation 精査で判明 ([[verify-port-state-by-number-not-coq-name]] の再発、同 memory に追記済):
+
+- **`certainType_apply_eq_of_mem_V`** (S06_CertainTypeCharacters:958、sorry-free) = **prTIirr_id
+  (4.3.c) first part そのもの**: `μ_{ij}(x) = δ_j·ω_{ij}(x)` for `x ∈ sdiffTICyclicHypothesis.V`
+  (**= W∖W₂ 全体**、V ⊊ W∖W₂ ではない — sdiff hypothesis の V が W∖W₂)。commit acd39ea1
+  (2026-06-10)「Pf (4.3.c) first part」。同 file に (4.3.c) second part
+  (`certainType_vanishes_of_ne`) / (4.3.d) / **σ-grounding `sigma_chiColumn_eq_certainType`**
+  (σ(ω_{ij}) = δ_j·μ_{ij}、iter 11 の「gap 2: columnFamily.mu ↔ mu2Grid 同定」も実質解消) まで完備。
+- **S06 の内部 route**: columnFamily ((1.4) per-column、isometry は sdiffFullDadeIsometryData =
+  Dade package 経由) → certainTypeRestrictDiff ⊥ omegaColumnDiffBasis (Step 4) →
+  apply_eq_zero_of_mem_V_of_inner_omegaColumnDiff (masking) → 値恒等式。つまり iter 20-22 で設計した
+  a-d route (TI-isometry → 列抽出 → (1.3.b) → (3.9.a)) の instantiation は**全て不要**。
+- **iter 12-25 の評価**: 「W∖W₂-値は未 port」の診断 (iter 12) は Coq 名 grep
+  (prTIirr_id/equiv_restrict_compl_ortho) による検索ミス — `git log -S "4.3"` で一発だった。
+  iter 15-19 の (1.3) 三部作 + ω-差族 spanning、iter 23-25 の TI-isometry/generic 列抽出/列間
+  disjoint は **generic shared infra として維持** (S06 版は CertainTypeHypothesis 固定・Dade 依存、
+  generic 版は任意 TI 文脈で軽量) — ただし本 route の必要部品としては superseded。
+
+**真の残 gap (修正後、iter 20 依存鎖の再評価)**: S06 (4.3.c) → residue chain の**配線のみ**:
+1. **ofS06Hypothesis companion lemma** (PrimeTIResidue.lean): `(ofS06Hypothesis h H hW2H).mu2 i j`
+   の W∖W₂-値 = `certainType_apply_eq_of_mem_V` の Fin-index 形 (mu2 = columnFamily.mu は rfl)。
+2. **residueS 形** (S13_PrimeTIResidueBridge、b-owned): hyp.residueS の mu2 値恒等式。
+3. **S15 grounding**: B(i) (S′∖P→0) / B(ii) (1→u) / B(iii) (W₁^#: 列和 Σ_i δω_{ij}(x)、
+   ω₁-full-dual 和消滅) を primeTIred/beta 消費形で。
+次 iter: 1+2 実装。
+
+## ✅ (2026-07-11、lane-b /loop iter 27) — 配線 layer-1 landed: 値恒等式の residue-grid 形
+
+- merge conflict (issues/9080 の hub RULING と b 認知の同位置追記) を両保持で解決 —
+  **hub ruling: 9080 migration 承認、S14 側 owner = b、b の scheduling 裁量** (現 2038 配線
+  ユニット完了後に engage、b 側記録と整合)。
+- **`PrimeTIResidueData.ofS06Hypothesis_mu2_apply_of_mem_V`** (PrimeTIResidue.lean、commit
+  0aa97038、full build 4149 green・AxiomsCheck OK): ofS06Hypothesis grid の
+  `mu2 i j (x) = δ_j·ω_{ij}(x)` on W∖W₂ — S06 `certainType_apply_eq_of_mem_V` の
+  charGroupW2Equiv 経由 Fin-index 形 (mu2 = columnFamily.mu は rfl ゆえ 1-term proof)。
+
+**次 iter (配線続き、上流優先)**: S15 grounding 向け B-部品の消費形 —
+(i) W₁^# ⊆ sdiffV membership bridge (x ∈ W₁∖{1} → x ∈ W∖W₂) の所在確認 or 追加、
+(ii) B(iii) 形: 列和 `Σ_i mu2 i j (x)` for x ∈ W₁^# = δ_j·Σ_i ω_{ij}(x) = 0 (j≠0 列;
+ω₁-full-dual 和消滅 Σ_i ω₁ⁱ(x) = 0 for x ≠ 1 — 既存 character-sum lemma を探索:
+CharacterCompleteness/SecondOrthogonality 系 or 新規 ~30 行)、B(i) (S′∖P → 0) は
+conjugatesIntoSet 支持 (support_induceSum 系) 経由。(iii) 消費側 (S15_HonestTypeP2A0 の
+pins / mu_row0_ne) の requirement 形を先に確認してから供給形を決める (lane-c file のため
+b は供給のみ、cite 形の合意は issue 経由)。9080 step 1 (TypeICovering migration) は
+本配線ユニット完了後。

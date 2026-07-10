@@ -480,6 +480,13 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
   sorry も拾うため、worktree では +N に見えても branch HEAD（コミット済）は不変なことがある。**merge が運ぶのは
   コミット済状態のみ**ゆえ、sorry ゲートの authoritative 判定は **trial merge 後に main 側で `grep -rnE … OddOrder/`**
   （= 実際に staged されるコミット済加算分）で行う。staged が notes のみ/該当 .lean を含まなければ worktree の +N は誤報。
+- **⚠ 「空 sync merge」判定は stale になる (2026-07-11 実害)**: tick 冒頭で `git diff main <lane>` が
+  空 (= sync のみ) でも、a/b の merge・build を待つ間に lane が新 commit を push しうる。空と判断して
+  `git merge --no-ff <lane>` を **--no-commit なし + push 連鎖**で実行した結果、未検証 .lean (新 leaf
+  74 行) が build 前に main に載った (事後検証で green・実害なし)。対策: (1) **merge 直前に
+  `git rev-list main..<lane>` を再確認** (tick 冒頭の値を使い回さない)、(2) sync-only でも
+  **常に `--no-commit` で trial merge** し staged を見てから commit、(3) **push は全レーン検証完了後の
+  単独コマンド** (merge と同一 bash に連鎖させない)。
 - **lane が merge 済み commit を amend した場合** (実例 2026-06-11, `b582007f`→`9581665d`):
   ff 同期が "Diverging branches" で落ちる。対処: (1) `git log --oneline -3 <branch>` +
   `git merge-base main <branch>` で amend (親が main の merge 前 HEAD) を確認、(2) 通常の
