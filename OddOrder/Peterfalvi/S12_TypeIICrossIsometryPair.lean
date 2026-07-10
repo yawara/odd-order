@@ -680,14 +680,16 @@ theorem Hypothesis.supportInSubgroup_sharp_derived_subset_A0 [Finite G] {M : Sub
 
 set_option linter.unusedVariables false in
 set_option linter.unusedVariables false in
-open scoped Classical FiniteInduce in
-/-- **Peterfalvi (8.17.a) at the canonical pair, order-coprimality instance**: the order of
-an `(M′)^#`-point of the type-`P₁` `M = mp.T` is coprime to `|S_F| = |M_σ(S)|` of the
-type-II member `mp.S`.  This is the `coxTs`-step of Coq `FT_Dade_support_disjoint`
-(`part_a2`): `|a|` divides `|M_s| = |M′|` (the FTcore of a type-`P₁` maximal), and the
-FTcore prime supports of nonconjugate maximal subgroups are **disjoint** (Peterfalvi
-(8.17.a), Coq `FT_Dade_support_partition` — `π(G)` is partitioned by the `π(M_i_s)`).
-**`sorry`d as the (8.17.a) instance** (issue 9079 obligation 3). -/
+open scoped Classical FiniteInduce Pointwise in
+/-- **The core-order coprimality at the canonical pair** (the `coxTs`-step of Coq
+`FT_Dade_support_disjoint` `part_a2`): the order of an `(M′)^#`-point of the type-`P₁`
+`M = mp.T` is coprime to `|S_F| = |M_σ(S)|` of the type-II member `mp.S`.
+
+No (8.17.a) partition is needed at this instance: the type-`P₁` structure collapses the
+FTcore to the σ-Hall — `M′ = M_σ(M)` (Coq `typePfacts`,
+`isTypeP1_derivedInG_eq_Msigma`) — so `|a|` is a `σ(M)`-number, and `σ(M) ∩ σ(S) = ∅`
+for the nonconjugate pair (BG Theorem 13.9, `sigma_disjoint_of_nonconjugate`); both
+`M_σ`'s are Hall, so a common prime divisor would lie in the empty intersection. -/
 theorem typeP_pair_core_order_coprime [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hyp : Hypothesis M) {mp : Section16MaximalPair G}
@@ -696,7 +698,39 @@ theorem typeP_pair_core_order_coprime [Finite G]
     (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar)
     {a : G} (haM' : a ∈ sharpSubgroup (derivedInG M)) (ha0 : a ∈ typePA0 M hyp.typeP) :
     Nat.Coprime (orderOf a) (Nat.card (OddOrder.BG.Ch3.S10.Msigma mp.S)) := by
-  sorry
+  classical
+  -- the type-`P₁` `M` has `M′ = M_σ(M)` (BG `typePfacts`)
+  have hP : OddOrder.BG.Ch4.S14.IsTypeP M :=
+    OddOrder.BG.Ch4.S16.isTypeP_of_isTypeNonI hG hyp.maximal
+      (Or.inr hyp.type_alt)
+  have hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M := by
+    refine ⟨hP, ?_⟩
+    by_contra hne
+    exact not_isTypeP2_of_isTypeIII_or_IV_or_V hG hyp.maximal hyp.type_alt ⟨hP, hne⟩
+  have hM'σ : derivedInG M = OddOrder.BG.Ch3.S10.Msigma M :=
+    OddOrder.BG.Ch4.S16.isTypeP1_derivedInG_eq_Msigma hG hyp.maximal hP1
+  -- `σ`-disjointness of the nonconjugate pair (BG Theorem 13.9)
+  have hnc : ¬ ∃ g : G, MulAut.conj g • M = mp.S := by
+    rintro ⟨g, hg⟩
+    exact mp.S_T_not_conj ⟨g⁻¹, by
+      rw [← hg, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul, hT]⟩
+  have hdisj : Disjoint (OddOrder.BG.Ch3.S10.sigma M) (OddOrder.BG.Ch3.S10.sigma mp.S) :=
+    OddOrder.BG.Ch3.S13.sigma_disjoint_of_nonconjugate hG hyp.maximal mp.S_maximal hnc
+  -- a common prime would lie in `σ(M) ∩ σ(S) = ∅`
+  by_contra hne
+  obtain ⟨q, hqp, hqdvd⟩ := Nat.exists_prime_and_dvd hne
+  have hqa : q ∣ Nat.card (OddOrder.BG.Ch3.S10.Msigma M) :=
+    (hqdvd.trans (Nat.gcd_dvd_left _ _)).trans
+      (Subgroup.orderOf_dvd_natCard _ (hM'σ ▸ haM'.1))
+  have hqσM : q ∈ OddOrder.BG.Ch3.S10.sigma M :=
+    (OddOrder.BG.Ch3.S10.Msigma_isHall hG hyp.maximal).1 q
+      (Nat.mem_primeFactors.mpr ⟨hqp, hqa, Nat.card_pos.ne'⟩)
+  have hqb : q ∣ Nat.card (OddOrder.BG.Ch3.S10.Msigma mp.S) :=
+    hqdvd.trans (Nat.gcd_dvd_right _ _)
+  have hqσS : q ∈ OddOrder.BG.Ch3.S10.sigma mp.S :=
+    (OddOrder.BG.Ch3.S10.Msigma_isHall hG mp.S_maximal).1 q
+      (Nat.mem_primeFactors.mpr ⟨hqp, hqb, Nat.card_pos.ne'⟩)
+  exact (Set.disjoint_left.mp hdisj hqσM) hqσS
 
 set_option linter.unusedVariables false in
 open scoped Classical FiniteInduce Pointwise in
@@ -707,9 +741,14 @@ a conjugate of the type-II member `mp.S`.
 Coq `FTsupport_facts` (b)+(c4) + the (10.7) consumer's `notFrobM`: the escaping `A₀`-point
 has a *unique* supporting maximal `N[a]` (8.13.b), here `= S^g` by `C_G(a) ≤ S^g`; and
 (8.13.c4) says a type-II supporter forces `M` to be a Frobenius group with kernel `M_F` —
-impossible for the type-`P₁` `M` (Coq `typePF_exclusion`).  **`sorry`d as the (8.13.c4)
-instance** (issue 9079 obligation 3; `escapingCentralizers_control` is the open §8
-upstream of the (b)-part). -/
+impossible for the type-`P₁` `M`.
+
+Proven from **BG Theorem D(4)** (`theoremD_msigma_conjugacy_and_centralizers`): the
+type-`P₁` collapse `M′ = M_σ` puts `a ∈ M_σ(M)^#`, D(4) attaches to the escaping `a` a
+supporting maximal `N₀` with the package clause `IsTypeP2 N₀ → IsTypeF M ∧ …`; the given
+uniqueness pins `N₀ = S^g`, a conjugate of the type-II `S`, hence type `P₂` (Proposition
+16.1(b), `proposition_type_classification`); the fired clause makes `M` type `F` = type I —
+contradicting type III/IV/V (`not_isTypeI_of_isTypeNonI`). -/
 theorem typeP_pair_escaping_centralizer_not_le_conj_partner [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hyp : Hypothesis M) {mp : Section16MaximalPair G}
@@ -718,9 +757,42 @@ theorem typeP_pair_escaping_centralizer_not_le_conj_partner [Finite G]
     (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar)
     {a : G} (haM' : a ∈ sharpSubgroup (derivedInG M)) (ha0 : a ∈ typePA0 M hyp.typeP)
     (hesc : ¬ Subgroup.centralizer ({a} : Set G) ≤ M)
-    {g : G} (hland : Subgroup.centralizer ({a} : Set G) ≤ MulAut.conj g • mp.S) :
+    {g : G} (huniq : ∀ N ∈ maximalSubgroupsContaining
+      (Subgroup.centralizer ({a} : Set G)), N = MulAut.conj g • mp.S) :
     False := by
-  sorry
+  classical
+  -- the type-`P₁` collapse puts `a` in `M_σ(M)^#`
+  have hP : OddOrder.BG.Ch4.S14.IsTypeP M :=
+    OddOrder.BG.Ch4.S16.isTypeP_of_isTypeNonI hG hyp.maximal (Or.inr hyp.type_alt)
+  have hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M := by
+    refine ⟨hP, ?_⟩
+    by_contra hne
+    exact not_isTypeP2_of_isTypeIII_or_IV_or_V hG hyp.maximal hyp.type_alt ⟨hP, hne⟩
+  have hM'σ : derivedInG M = OddOrder.BG.Ch3.S10.Msigma M :=
+    OddOrder.BG.Ch4.S16.isTypeP1_derivedInG_eq_Msigma hG hyp.maximal hP1
+  have haσ : a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M := by
+    show a ∈ sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma M)
+    rw [← hM'σ]
+    exact haM'
+  -- BG Theorem D(4): the unique supporting maximal with the type-`F`/`P₂` package
+  obtain ⟨-, -, -, hD4⟩ :=
+    OddOrder.BG.Ch4.S16.theoremD_msigma_conjugacy_and_centralizers hG hyp.maximal
+  obtain ⟨R, -, N₀, hQ, -⟩ := hD4 a haσ hesc
+  obtain ⟨hN₀mem, -, -, -, -, -, hP2clause⟩ := hQ
+  have hN₀eq : N₀ = MulAut.conj g • mp.S := huniq N₀ hN₀mem
+  have hN₀max : N₀ ∈ maximalSubgroups G := (mem_maximalSubgroupsContaining.mp hN₀mem).1
+  -- `N₀` is a conjugate of the type-II `S`, hence type `P₂` (Proposition 16.1(b))
+  have hN₀II : IsTypeII N₀ := by
+    rw [hN₀eq]
+    exact isTypeII_pointwise_smul (MulAut.conj g) (section16_S_isTypeII hG mp)
+  obtain ⟨-, hIIiff, -⟩ :=
+    OddOrder.BG.Ch4.S16.proposition_type_classification hG hN₀max
+  -- fire the (c4)-clause: `M` is type `F` = type I — contradicting type III/IV/V
+  obtain ⟨hFM, -, -⟩ := hP2clause (hIIiff.mp hN₀II)
+  obtain ⟨hIiffM, -, -⟩ :=
+    OddOrder.BG.Ch4.S16.proposition_type_classification hG hyp.maximal
+  exact OddOrder.BG.Ch4.S16.not_isTypeI_of_isTypeNonI hG hyp.maximal
+    (Or.inr hyp.type_alt) (hIiffM.mpr hFM)
 
 open scoped Classical FiniteInduce Pointwise in
 /-- **Peterfalvi (8.18.b), bare base-point disjointness at the canonical pair — the
@@ -847,13 +919,20 @@ theorem typeP_pair_base_bare_not_isConj [Finite G]
       rfl
     have hCbS : Subgroup.centralizer ({b} : Set G) ≤ mp.S :=
       (mem_maximalSubgroupsContaining.mp hSmem).2
-    have hland : Subgroup.centralizer ({a} : Set G) ≤ MulAut.conj c⁻¹ • mp.S := by
-      have hstep : MulAut.conj c⁻¹ • Subgroup.centralizer ({b} : Set G)
-          ≤ MulAut.conj c⁻¹ • mp.S :=
-        Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hCbS
-      rwa [hCconj, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul] at hstep
+    have huniq : ∀ N ∈ maximalSubgroupsContaining
+        (Subgroup.centralizer ({a} : Set G)), N = MulAut.conj c⁻¹ • mp.S := by
+      intro N hN
+      rw [mem_maximalSubgroupsContaining] at hN
+      have hcN : MulAut.conj c • N ∈ maximalSubgroupsContaining
+          (Subgroup.centralizer ({b} : Set G)) := by
+        rw [mem_maximalSubgroupsContaining]
+        refine ⟨OddOrder.BG.Ch3.S12.isCoatom_conj_smul (mem_maximalSubgroups.mp hN.1), ?_⟩
+        rw [hCconj]
+        exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hN.2
+      rw [hB, Set.mem_singleton_iff] at hcN
+      rw [← hcN, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
     exact typeP_pair_escaping_centralizer_not_le_conj_partner hG hyp hT hKstar hSW1 hSW2
-      haM' ha0 hCa hland
+      haM' ha0 hCa huniq
 
 open scoped Classical FiniteInduce in
 /-- **Peterfalvi (8.18.b), base-point disjointness at the canonical pair** (the
@@ -1307,5 +1386,96 @@ theorem exists_typeIICrossIsometryData_at_pair [Finite G]
            cross_zero := fun s hs =>
              hyp.tau1_muColumn_sub_zeta_inner_extension_diff_eq_zero_at_pair hG hT hKstar
                hSW1 hSW2 coh hζ1 hμd hlam_mem hlam_irr hnu_mem hdeg c s hs }⟩
+
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (10.7) at the canonical pair member** (Coq `Frob_der1_type2`, assembled):
+under Hypothesis (10.4) for `M`, the `(K, K*)`-reconciled Types-II/III/IV setup on the
+pair's type-II member `mp.S` has `[S,S] = S_F ⋊ U` Frobenius with kernel `S_F`.
+
+The dichotomy assembly of `typeII_HU_frobenius_of_coherent_aux`, with the sorried gate
+replaced by the **honest pair-witness producer** (`exists_typeIICrossIsometryData_at_pair`,
+axiom-clean): the §9 Clifford dichotomy's contradiction branches (Case A and the
+non-exceptional Case B) produce an equal-degree irreducible/reducible pair in `𝒮(H₀)`,
+whose (10.7) cross-isometry package is contradictory (`TypeIICrossIsometryData.elim`
+against the (10.2)/(10.3) canonical parameters, `exists_charParameters_full`); the
+exceptional Case B yields the Frobenius structure directly (Peterfalvi (9.10)). -/
+theorem typeII_HU_frobenius_of_coherent_at_pair [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    {hyp : Hypothesis M} {params : CharacterParameters hyp}
+    (coh : CoherentHypothesis hyp params)
+    {mp : Section16MaximalPair G}
+    (hT : mp.T = M) (hKstar : mp.Kstar = hyp.typeP.W1)
+    {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S}
+    (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar) :
+    OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(derivedInG mp.S)
+      (data.typeP.H.subgroupOf (derivedInG mp.S))
+      (data.typeP.U.subgroupOf (derivedInG mp.S)) := by
+  haveI := hyp.finiteG
+  classical
+  haveI : NeZero (Nat.card (typeIIHypothesis46 hG mp.S_maximal
+      (section16_S_isTypeII hG mp) data.typeP).W1) := ⟨Nat.card_pos.ne'⟩
+  -- the (10.3) canonical parameters carrying the grid/`ζ` pins
+  obtain ⟨params', hmu, hos, hzS, hz1, hzconj, hδpm, hδj⟩ := hyp.exists_charParameters_full hG
+  let coh' : CoherentHypothesis hyp params' := ⟨coh.coherent⟩
+  have hμd : ∀ (i : Fin hyp.w1) (j : Fin hyp.w2), j ≠ 0 →
+      hyp.muGrid hG hG.odd i j 1 = (params'.d : ℂ) := fun i j hj => by
+    rw [← hmu]
+    exact params'.degree_independent i j hj
+  obtain ⟨chief, -⟩ := OddOrder.Peterfalvi.S11.exists_chiefFactorData hG data
+  -- §9 character data (only the genuine `u`/`u_eq` pair is consumed by the counts)
+  let chars : OddOrder.Peterfalvi.S11.Section11CharacterData data chief :=
+    { u := Nat.card ↥(((OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom
+          (N := chief.N) chief.N_aInvariant).comp
+          (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype).range)
+      u_eq_card_quotient := rfl
+      H0CprimeSupport := ∅
+      tau := 0
+      quotientSemidirectFrobenius := True }
+  -- the reducible `ν ∈ 𝒮(H₀)`: the (9.8.a)/(9.9.b) count `p − 1 ≥ 1`
+  have hred_ne : {φ ∈ OddOrder.Peterfalvi.S11.sOf data chief.H0 |
+      ¬ IsIrreducibleCharacter φ}.Nonempty := by
+    apply Set.nonempty_of_ncard_ne_zero
+    rw [OddOrder.Peterfalvi.S11.reducible_count_sOf_H0 hG chief]
+    have := chief.p_prime.two_le
+    omega
+  obtain ⟨nu, hnu_mem, hnu_red⟩ := hred_ne
+  -- the left-branch refutation, now through the honest pair-witness producer
+  have hleft : ∀ lam : ClassFunction ↥mp.S ℂ,
+      lam ∈ OddOrder.Peterfalvi.S11.sOf data chief.H0 → IsIrreducibleCharacter lam →
+      lam 1 = nu 1 → False := fun lam hlam_mem hlam_irr hdeg =>
+    (exists_typeIICrossIsometryData_at_pair hG coh' hz1 hμd hT hKstar hSW1 hSW2
+      hlam_mem hlam_irr hnu_mem hnu_red hdeg).elim fun pkg =>
+      pkg.elim hG hmu hos hzS hz1 hzconj hδpm hδj
+  -- the §9 Clifford dichotomy
+  rcases OddOrder.Peterfalvi.S11.clifford_dichotomy hG chars with hA | hB
+  · -- Case A: (9.8.c) irreducible + (9.8.b) reducible degree — contradiction
+    exfalso
+    obtain ⟨caseA⟩ := hA
+    obtain ⟨-, hbred, ⟨lam, hlam_mem, hlam_irr, hlam_deg⟩, -⟩ :=
+      OddOrder.Peterfalvi.S11.caseA_character_counts hG chars caseA
+    have hnu_deg := (hbred nu hnu_mem hnu_red).1
+    exact hleft lam
+      (OddOrder.Peterfalvi.S11.sOf_antitone data le_sup_left hlam_mem)
+      hlam_irr (by rw [hlam_deg, hnu_deg])
+  · -- Case B: split on the exceptional condition
+    obtain ⟨caseB⟩ := hB
+    by_cases hex : ∃ χ ∈ chars.SOf (chief.H0 ⊔ chars.Cprime),
+        IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * chars.u : ℕ) : ℂ)
+    · -- non-exceptional: the degree-`q·u` irreducible exists — contradiction
+      exfalso
+      obtain ⟨lam, hlam_mem, hlam_irr, hlam_deg⟩ := hex
+      obtain ⟨-, -, hbred, -⟩ :=
+        OddOrder.Peterfalvi.S11.caseB_character_counts hG chars caseB
+      have hnu_deg := (hbred nu hnu_mem hnu_red).1
+      exact hleft lam
+        (OddOrder.Peterfalvi.S11.sOf_antitone data le_sup_left hlam_mem)
+        hlam_irr (by rw [hlam_deg, hnu_deg])
+    · -- exceptional: (9.10) gives the `H ⊔ U` Frobenius on the `derivedInG mp.S` carrier
+      have hfrobHU := (OddOrder.Peterfalvi.S11.exceptional_case_frobenius_realization
+        hG chars caseB hex).2.2 (section16_S_isTypeII hG mp)
+      have hM'eq : derivedInG mp.S = data.typeP.H ⊔ data.typeP.U := by
+        rw [data.typeP.derivedInG_eq_fitting_sup_U, ← data.typeP.H_eq]
+      rw [hM'eq]
+      exact hfrobHU
 
 end OddOrder.Peterfalvi.S12
