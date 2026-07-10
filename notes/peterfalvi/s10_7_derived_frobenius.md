@@ -441,6 +441,20 @@ Parseval ⟹ **X = δ·Σ_p χ_{(p,kcol)} ∨ X = −δ·Σ_p χ_{(p,jcol)}**」
 実装順 (次 iteration): 3 の index bookkeeping 精査 → (5.5)-for-ν/λ → 2 の V-vanish 組立 →
 S05 endgame 適用 → dichotomy 整形。その後 obligation 2(b) (S↔M grid transpose) と 3。
 
+**進捗 (2026-07-10 続き)**: ~~(5.5)-for-ν/λ~~ **DONE (c6d4b780)** — 新 leaf
+`S12_TypeIIColumnPin.lean` に `typeII_T2_extension_columnSum_eq_sum` (τ₂ν = ΣE、|E|=w₁) +
+`typeII_T2_extension_lam_eq_single` (τ₂λ = 単一 Dade 成分)。sorry-free/axiom-clean。
+S06 (4.8) index bookkeeping も精査済: `sigmaCoeff_psi_eq` pattern (chiFam_spec .2.2.1 で
+ite 化) + `omegaProdCharTic_ne`/`omegaProdEquiv_symm_omegaProdCharTic_ne` (列単射) が既存 —
+2 列支持の hsupp には **q-成分の i-独立性** (omegaProdEquiv.symm (omegaProdCharTic h χ₂ i) の
+第 2 成分が i に依らない) が追加で要る (S05 `omegaProdEquiv_symm_omegaProdChar` :
+symm (omegaProdChar p q) = (p,q) 経由で omegaProdCharTic = omegaProdChar (transport i)
+(transport χ₂) 形の分解 lemma を書く)。
+⚠ Lean 知見: 識別子に λ 不可 (予約語) / proof 内 `set` は theorem binder を再束縛して
+shadow 事故 (c✝) → subst + full-term 直書き。
+残 = step 2 (V-vanishing: R(λ)-member ⊥ 全 ω の standalone 抽出 → τ₂λ|_V = 0 →
+zeta1-trick で τ₂ν|_V = 0) → step 3 (S05 endgame + dichotomy 整形)。
+
 ### 2026-07-10 update⁹ — ★★ typeII_T2_coherent LANDED (408e9650) — obligation 1 完成
 
 **T2 = {λ,λ̄,ν,ν̄} の (5.7) coherence が sorry-free/axiom-clean で閉じた** (τ₂ の存在 =
