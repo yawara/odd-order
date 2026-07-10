@@ -532,3 +532,47 @@ typeII_T2_memberRFamily の R(λ)-block (dadeOrthonormalCharacterImageFamilyOfDi
 c := typeII_T2_coherent の extension、hsupp/inner 部品は k1 と共通。
 その後 k3 (constituent trick: k1 + orthonormal ±irr 対 + grid=±irr) → lam_ortho_grid
 (per-index 還元込み、pair leaf の sorry 1 本目 discharge) → k4 M-mirror。
+
+## 2026-07-10 obligation 3 LANDED (4 fields 全 discharge、(8.18.b) 単一 sorry 化)
+
+producer `exists_typeIICrossIsometryData_at_pair` の obligation-3 sorry 4 本を全て実 route で
+discharge (69dd1bda + 9733220f + ef1396e2 + 2d110469 + 本 commit)。leaf 残 sorry =
+`cross_dade_inner_eq_zero_at_pair` (Coq oST、(8.18.b)) の **1 本のみ**。
+
+### landed 構造
+- **lam_ortho_grid** = (5.5) k2 span (`typeII_T2_extension_lam_mem_span_RFamily`、ofProjection
+  (ψ:=0) template) + k3 constituent trick + per-index transpose chain
+  (`ticyclic_chiFam_transpose` generic / `section16_pair_chiFam_transpose_T` pair /
+  `exists_alignedOmegaSigmaGrid_chiFam_family` M-side) + span 帰納 (要素変数化必須 —
+  compound 要素への direct induction は "Index not variable")。
+- **zeta_ortho_grid** = `Hypothesis.tau1_zeta_inner_alignedGrid_eq_zero` —
+  `tau1_zeta_vanishes_on_typePV` (Isometry106) の中間形を full-𝒮 coherence で standalone 抽出。
+- **zeta_lam_ortho** = 共役対差分 trick → `orthonormal_vchar_diff_ortho` (S09 port)。
+  差分 = Dade 像 (`tau_zeta_sub_conj_eq_tau1` M-side / `extends_on_supported` + map_sub S-side)、
+  1-消滅 = `dadeIntegralCharacterMap_apply_one_eq_zero`。
+- **cross_zero** = α = μ_s − d·ζ の span/degree/support plumbing
+  (`muGrid_column_sum_mem_inducedFamily` + degree_independent + 新 helper
+  `mem_zSpan_inducedFamily_support_sharp_derived` / `supportInSubgroup_sharp_derived_subset_A0`)
+  → 同じ (8.18.b) 核心。producer に (hζ1 : params.zeta 1 = w₁) 追加 (Coq zeta1w1 対応;
+  CharacterParameters は ζ-degree を field に持たない)。
+
+### ★ 残 = (8.18.b) 本体 `cross_dade_inner_eq_zero_at_pair` の honest 証明 (次 iteration)
+**構造的発見**: A₀ 全体の thickened 支持は pair で disjoint に**ならない** (両側が V-共役類を
+共有)。正しくは M-side (M′)^# = A₁(M)-restricted thickening vs S-side A(S)-closure。
+honest 経路 (Coq PFsection10:563-576 + PFsection8 FT_Dade_support_disjoint):
+1. **支持制限 Dade 像 bound** (新規、S04 plumbing): supp(τφ) ⊆ ⋃_{a ∈ A ∩ supp φ}
+   conj(a·H(a)) (dadeValue_eq: 値は φ(a))。S-side は H ≡ ⊥ (8.16 TI-route) で bare closure。
+2. **(8.13.c4) clause** (未 port): supporting maximal L が type II なら M は Frobenius with
+   kernel M_F (Coq FTsupport_facts (c4)、BGsummaryII)。既存 `escapingCentralizers_control`
+   (S10_StructureSetup:509、sorried) は (b)+type-clause のみで c4 条件文を欠く → 忠実拡張
+   statement を §8 側に追加 (sorried-cite、(8.13) は独立上流 obligation)。
+3. **typePF exclusion**: type-P₁ M (III/IV/V) は Frobenius with kernel M_F でない
+   (kappa ≠ ∅ / isTypeI_iff_isTypeF 経由、要 port 確認)。
+4. 組立: 共有点 → supporting 配置 → c4 → Frobenius → exclusion 矛盾。
+参考: type-I pair 版 `ftThickenedSupport_mixed_disjoint_of_nonconjugate`
+(S10_MinimalSimpleStructure:574、同型 assembly の precedent)。
+
+### その後の残り (9079 tail)
+- (c) aux 差し替え: WLOG entry (exists_seeded_pair_conj_typeII) + setup 組立 + producer 接続 +
+  結論 Frobenius conj 転送。producer の hζ1 は (10.2) ζ-構成 (exists_zeta_in_inducedFamily_
+  degree_w1) から供給。
