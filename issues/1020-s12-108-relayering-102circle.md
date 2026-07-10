@@ -104,3 +104,43 @@ card_kappaHall_lt_of_isTypeIIIorIV) は Phase 1 後の残消費を調査の上�
 **着手順の判断**: Phase 2 (hB cover-bound engine、hypothesis-parameterized) は
 taint と独立な純 genuine math で設計リスクなし → **次 tick は Phase 2 から**
 (Phase 1a の refactor は影響全数調査と併せて fresh context で)。
+
+## 2026-07-11 tick⁸ — ★★ Phase 2 完結 (hB の数学が全て landed)
+
+`Hypothesis.g1_div_le_of_partner` (MaximalBasic、axiom-clean) が estimate の
+hB sorry と同形の ℚ 不等式を hypothesis-parameterized で完全証明。積み上げ
+(全て axiom-clean、commits 20d5db9a…d9502c0a + 本 commit):
+V-capture / Hall 共役 / 被覆コア / union-bound 計数 (generic + H#) /
+W-分解 / V-order / 支持制限 (Ã₀∩cop ⊆ Ã) / Nat-count bound / ℚ 除算。
+
+**Phase 3 (次)**: 供給 8 hypothesis の discharge を pair leaf 下流の新 leaf
+(S12_Noncoherence) で:
+- hprime = w₂ prime (dII.common / theorem88_caseB_prime_orders 系)
+- hcop = typePData_W1_hall_coprime
+- hHall = (8.11) hall_maxNilpotentNormalHall_and_mainSubgroup (閉鎖済!)
+- hcent = (8.6.a) — 要 port 確認 (§8 の type-II TI clause)
+- hfrobcap = (10.7)' typeII_HU_frobenius_of_coherent' の kernel-centralizer 帰結
+  (IsFrobeniusGroup.centralizer_kernel_le、subgroupOf 橋)
+- hW1card/hW2card/hWcard = pair の W-block pin (mp.Kstar_eq 系 +
+  card_mul_eq_of_disjoint_sup_le_isCyclic (FTS:1167))
++ estimate/S_not_coherent の hypothesis-parameterized 変種を MaximalBasic に
+  並設 → 無条件版を S12_Noncoherence で (13.2.a)-circle 回避 (Phase 1a) と併せて。
+
+## 2026-07-11 tick⁹ — Phase 3 前半完了: S_not_coherent_of_partner が axiom-clean
+
+- **parameterized 変種 2 本 landed** (MaximalBasic、共に sorryAx なし):
+  `typeII_coherence_contradiction_estimate_of_partner` (hB = g1_div_le_of_partner で実 discharge) +
+  **`S_not_coherent_of_partner`** — (10.8) 本体が partner 供給 modulo で完全証明。
+- **供給 ledger (実測済)**:
+  - hcent ((8.6.a)) = `typeII_centralizer_le_of_mem_mainSubgroup` (S14 WitnessSylowCyclic:929、
+    **axiom-clean 実測**) or 直接 `typeP_core_centralizer_le_of_mem_fitting` + H_eq。
+  - hHall = (8.11) (6b08f22d 閉鎖済) + H_eq/mainSubgroup .II 変換。
+  - hprime = hW1card ▸ hyp.w2_prime。hcop = typePData_W1_hall_coprime。
+  - hfrobcap = (10.7)' typeII_HU_frobenius_of_coherent' +
+    IsFrobeniusGroup.centralizer_kernel_le の subgroupOf 橋 (機械的、pair leaf 下流)。
+  - hW2card/hWcard/hSidx/hU7 = **pair-linkage** (M-seeded mp: mp.Kstar = hyp.typeP.W1 literal、
+    dataS.W2 = mp.Kstar pin (tp.Sdata_W2_eq 系)、|mp.K| = w₂ の同定は
+    K_eq + M-side centralizer_W1 の reconcile — 要小組立)。
+- **次 = S12_Noncoherence.lean** (pair leaf import の新 leaf): 供給組立 →
+  無条件 S_not_coherent-v2。その際 (13.2.a)-circle (Phase 1a) に注意 —
+  v2 の証明が K_lt_Kstar 系を経由しないよう M-seeded route の clean 部分のみ使う。
