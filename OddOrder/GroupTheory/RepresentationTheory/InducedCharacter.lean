@@ -11,6 +11,7 @@ import Mathlib.Tactic.Group
 import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
 import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.TISubset
 
 /-!
 # Classical induction sums for class functions
@@ -663,6 +664,105 @@ theorem induce_inner_trivial (H : Subgroup G) [Fintype H]
   rw [hres]
 
 end FrobeniusReciprocity
+
+section TIInduction
+
+/-! ### Induction from a TI-subset: value identity and isometry
+
+For a TI-subset `A ⊆ G` with normalizer-bound `H` (`OddOrder.GroupTheory.IsTISubset A H`) and
+class functions on `H` vanishing off `A`, induction returns the original values on `A`, hence is
+an isometry on `A`-supported class functions (Isaacs, *Character Theory of Finite Groups*,
+Lemma 7.7; Coq `PFsection2.normedTI_Ind_id` / `normedTI_isometry`, proved there through the
+degenerate Dade context of Peterfalvi (2.3), here directly from the induction formula).  Only
+the `|H|` summands with conjugator inside `H` survive in the induction sum — any other
+nonvanishing summand would exhibit an overlap of two distinct conjugates of `A` — and each
+surviving summand contributes the original value.
+
+This is the `h_isom` input of the prime-TI value identity `prTIirr_id` (Peterfalvi (4.3.c)):
+`W ∖ W₂` is a TI-subset in the type-P₂ context, so induction from `CF(W, W ∖ W₂)` is an
+isometry onto its image. -/
+
+open OddOrder.GroupTheory (IsTISubset)
+
+/-- **TI value identity** (Isaacs CTFG Lemma 7.7, identity part; Coq `normedTI_Ind_id`): for a
+TI-subset `A` with normalizer-bound `H` and a class function `θ` on `H` vanishing off `A`, the
+induced class function restricts back to the original values on `A`: `Ind_H^G θ (a) = θ a` for
+`a ∈ H` with `↑a ∈ A`.
+
+In the induction sum at `a`, a summand with conjugator `x ∉ H` and `x⁻¹ a x ∈ H` can be nonzero
+only if `x⁻¹ a x ∈ A` (support of `θ`), which by the TI condition forces `x⁻¹ ∈ H` — a
+contradiction; so the sum collapses to the `|H|` conjugators in `H`, each contributing `θ a` by
+conjugation invariance. -/
+theorem induce_apply_coe_of_isTISubset (H : Subgroup G)
+    [Invertible (Nat.card H : k)]
+    {A : Set G} (hTI : IsTISubset A H)
+    {θ : ClassFunction ↥H k} (hθ : ∀ x : ↥H, (x : G) ∉ A → θ x = 0)
+    {a : ↥H} (ha : (a : G) ∈ A) :
+    induce H θ (a : G) = θ a := by
+  classical
+  letI : Fintype ↥H := Fintype.ofFinite ↥H
+  rw [induce_apply]
+  set s : Finset G := Finset.univ.filter (fun x : G => x ∈ H) with hs
+  have hmem_iff : ∀ x : G, x ∈ s ↔ x ∈ H := fun x => by simp [hs]
+  -- Off-`H` conjugators contribute nothing: a nonzero term would place `x⁻¹ a x` in the
+  -- support `A`, and the TI condition would force `x ∈ H`.
+  have hcollapse : (∑ x : G, induceTerm H θ x (a : G))
+      = ∑ x ∈ s, induceTerm H θ x (a : G) := by
+    refine (Finset.sum_subset (Finset.filter_subset _ _) ?_).symm
+    intro x _ hx
+    have hxH : x ∉ H := fun hc => hx ((hmem_iff x).mpr hc)
+    by_cases hmem : x⁻¹ * (a : G) * x ∈ H
+    · rw [induceTerm_of_mem θ hmem]
+      by_contra hne
+      have hAin : x⁻¹ * (a : G) * x ∈ A := by
+        by_contra hnot
+        exact hne (hθ ⟨x⁻¹ * (a : G) * x, hmem⟩ hnot)
+      have hinv : x⁻¹ ∈ H := hTI x⁻¹ ⟨(a : G), ha, by rw [inv_inv]; exact hAin⟩
+      exact hxH (by simpa using H.inv_mem hinv)
+    · exact induceTerm_of_not_mem θ hmem
+  -- Conjugators in `H` each contribute `θ a`, by conjugation invariance of `θ`.
+  have hconst : (∑ x ∈ s, induceTerm H θ x (a : G)) = ∑ _x : ↥H, θ a := by
+    rw [Finset.sum_subtype s hmem_iff (fun x => induceTerm H θ x (a : G))]
+    refine Finset.sum_congr rfl fun h _ => ?_
+    have hmem : (h : G)⁻¹ * (a : G) * (h : G) ∈ H :=
+      H.mul_mem (H.mul_mem (H.inv_mem h.2) a.2) h.2
+    rw [induceTerm_of_mem θ hmem]
+    have hcast : (⟨(h : G)⁻¹ * (a : G) * (h : G), hmem⟩ : ↥H) = h⁻¹ * a * h⁻¹⁻¹ :=
+      Subtype.ext (by simp)
+    rw [hcast]
+    exact θ.conj_eq a h⁻¹
+  rw [hcollapse, hconst, Finset.sum_const, Finset.card_univ, nsmul_eq_mul,
+    ← Nat.card_eq_fintype_card, ← mul_assoc, invOf_mul_self, one_mul]
+
+variable [StarRing k]
+
+/-- **TI induction isometry** (Isaacs CTFG Lemma 7.7, isometry part; Coq `normedTI_isometry`):
+for a TI-subset `A` with normalizer-bound `H` and class functions `θ, ψ` on `H` vanishing off
+`A`, induction preserves inner products: `⟨Ind_H^G θ, Ind_H^G ψ⟩_G = ⟨θ, ψ⟩_H`.
+
+Frobenius reciprocity gives `⟨Ind θ, Ind ψ⟩_G = ⟨θ, Res(Ind ψ)⟩_H`, and by the TI value
+identity `Res(Ind ψ)` agrees with `ψ` on `A`, which carries the support of `θ`. -/
+theorem inner_induce_eq_of_isTISubset (H : Subgroup G) [Fintype H]
+    [Invertible (Nat.card G : k)] [Invertible (Nat.card H : k)]
+    {A : Set G} (hTI : IsTISubset A H)
+    {θ ψ : ClassFunction ↥H k}
+    (hθ : ∀ x : ↥H, (x : G) ∉ A → θ x = 0) (hψ : ∀ x : ↥H, (x : G) ∉ A → ψ x = 0) :
+    ClassFunction.inner (induce H θ) (induce H ψ) = ClassFunction.inner θ ψ := by
+  rw [inner_induce_eq_inner_restrict]
+  have hdiff : ClassFunction.inner θ (restrict H (induce H ψ) - ψ) = 0 := by
+    refine inner_eq_zero_of_disjoint_support ?_
+    rw [Set.disjoint_left]
+    intro x hxθ hxd
+    rw [mem_support] at hxθ hxd
+    have hxA : (x : G) ∈ A := by
+      by_contra h
+      exact hxθ (hθ x h)
+    refine hxd ?_
+    rw [sub_apply, restrict_apply, induce_apply_coe_of_isTISubset H hTI hψ hxA, sub_self]
+  rw [inner_sub_right] at hdiff
+  exact sub_eq_zero.mp hdiff
+
+end TIInduction
 
 section NormalSubgroupValue
 
