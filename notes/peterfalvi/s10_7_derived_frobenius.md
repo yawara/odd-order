@@ -403,6 +403,32 @@ update⁶ 手順 3 の本丸 infra が閉じた。S12_TypeIIFrobenius に新 sec
    hN (pivot norm) = λ irreducible norm 1 / hiso+hZdiff = S07 generic (h46.dade0+hconj)。
    ⚠ S13:1466 前例の maxHeartbeats 1600000 級 elaboration 注意。
 
+### 2026-07-10 update⁹ — ★★ typeII_T2_coherent LANDED (408e9650) — obligation 1 完成
+
+**T2 = {λ,λ̄,ν,ν̄} の (5.7) coherence が sorry-free/axiom-clean で閉じた** (τ₂ の存在 =
+`exists_typeIICrossIsometryData` obligation 1 の実体)。update⁸ checklist 全項目実行済:
+家族 bookkeeping 5 本 + R-dispatch (`typeII_T2_memberRFamily` + imageSet 抽出 2 本) +
+hRorth (`typeII_T2_memberRFamily_orthogonal`、2×2) + engine 呼び出し (`typeII_T2_coherent`)。
+file hygiene: 1799 行 > 1500 → (8.16) DadeBase を `S12_TypeIIDadeBase.lean` へ prefix-split
+(a882fc09、下流不変、full build 4132 green)。
+
+⚠ Lean 知見 (再発防止): S08 の `{x : IrreducibleCharacter}` implicit に plain な
+ClassFunction を関連付ける呼び出しは `↑?x ≡ φ` 非 pattern unification で whnf 1.6M 爆発 —
+**bundled 引数は named-arg で explicit 渡し** `(x := ⟨φ, hφirr⟩)`。dispatch def の
+choice-extract は `let χ₂ := hex.choose` + have 束縛 (rw motive 依存切り、S13 pattern)。
+
+**残 obligations (update⁵ の 2-3、いずれも genuine 新規)**:
+2. **(5.8) S-side pin + shared grid**: τ₂(ν) = ±Σ_j ω^{aligned}_{r'j}。
+   (a) τ₂ と τ_S の supported-agreement + (3.7) 係数 rigidity で τ₂(ν) を S-grid 列和に pin
+   (M-side template = 自レーン既証明の `exists_muColumn_tau1_eq_sum_R` → `muColumn_tau1_pin`
+   chain、S12_Core)。**T2-coherence が landed した今、certainTypeR.image_eq が
+   τ_S(ν−ν̄) = Σ R(ν) を既に供給**している点が M-side との差 (入口が軽い)。
+   (b) S-grid = M-grid transpose ((8.8) pair S∩M=W + (3.2) σ-uniqueness) — 真の deep、
+   typeP_pair 圏 (0098 item 1 未 claim → 着手時 9000 claim)。
+3. **(8.18.b) disjointness**: Disjoint Ã₁(M) Ã(S) → cross_zero/zeta_lam_ortho。
+   engine 部品 landed (`disjoint_conjugatesIntoSet_of_centralizer` 等、update⁵ 参照)。
+上流優先: 2(a) → 2(b)/3。
+
 ### 2026-07-10 update⁸ — hRorth core LANDED (bfb1c48d) + T2 assembly checklist (次 iteration)
 
 **LANDED (sorry-free/axiom-clean)**: `typeII_tau_apply_eq_zero_of_mem_ticVdiffV` (V-vanishing
