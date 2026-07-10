@@ -1388,6 +1388,105 @@ theorem exists_typesIIIIIIVSetup_Sdata [Finite G]
            type_alt := Or.inl hSII },
     rfl⟩
 
+open scoped Classical FiniteInduce in
+/-- **The (10.7) `ν^{τ₂}` row pin at the canonical pair** (issue 9079, the assembled grid
+transpose): for the pair's type-II member `mp.S` with a `(K, K*)`-reconciled §9 setup and a
+`T2`-coherence `c` (from `typeII_T2_coherent`), the coherent image of the reducible `ν` is
+a **signed row sum of the `M`-side aligned σ-grid** — the exact
+`TypeIICrossIsometryData.nu_tau2_eq` shape.
+
+Chain: the (9.8) classification pins `ν` to a nontrivial column sum
+(`typeII_reducible_inducedKernelFamily_eq_columnSum`); the (5.8) dichotomy pins `ν^{τ₂}` to
+`±δ` times a full `S`-grid column (`typeII_nu_tau2_dichotomy`, running on
+`ticVdiff_typeIIHypothesis46_eq`'s bridge); the pair transpose turns the column into a
+`T = M`-side row (`section16_pair_chiFam_columnSum_transpose` at `dataT := hyp.typeP`,
+`mp.Kstar = hyp.typeP.W1`); and the fiber sweep identifies that row with an aligned-grid
+row (`exists_alignedOmegaSigmaGrid_row_sum_eq_chiFam_fiber`). -/
+theorem Hypothesis.exists_nu_extension_eq_alignedRow_at_pair [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : Hypothesis M) {mp : Section16MaximalPair G}
+    (hT : mp.T = M) (hKstar : mp.Kstar = hyp.typeP.W1)
+    {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S}
+    (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar)
+    [NeZero (Nat.card (typeIIHypothesis46 hG mp.S_maximal
+      (section16_S_isTypeII hG mp) data.typeP).W1)]
+    {Y : Subgroup G} {lam nu : ClassFunction ↥mp.S ℂ}
+    (hlam_mem : lam ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (hlam_irr : IsIrreducibleCharacter lam)
+    (hnu_mem : nu ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (hnu_red : ¬ IsIrreducibleCharacter nu)
+    (hdeg : lam 1 = nu 1)
+    (c : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+        (typeIIHypothesis46 hG mp.S_maximal (section16_S_isTypeII hG mp) data.typeP).dade0
+        (typeIIHypothesis46 hG mp.S_maximal (section16_S_isTypeII hG mp) data.typeP).tau)
+      ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥mp.S ℂ))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (centralizerSupport (sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma mp.S))
+            (derivedInG mp.S)
+          ∪ conjClassSetIn mp.S (typePV mp.S data.typeP)) mp.S)) :
+    ∃ (r' : Fin hyp.w1) (delta' : ℤ), (delta' = 1 ∨ delta' = -1) ∧
+      c.extension nu
+        = (delta' : ℂ) • ∑ j : Fin hyp.w2, hyp.alignedOmegaSigmaGrid hG hG.odd r' j := by
+  classical
+  subst hT
+  -- `ν` is a nontrivial column sum ((9.8) classification through the world bridge)
+  obtain ⟨χ₂, hne1, hkeq⟩ := typeII_reducible_inducedKernelFamily_eq_columnSum hG
+    mp.S_maximal (section16_S_isTypeII hG mp) data.typeP
+    (typeII_sOf_subset_inducedKernelFamily data Y hnu_mem) hnu_red
+  -- the (5.8) dichotomy: `ν^{τ₂} = ±δ · (full S-grid column)`
+  have hdich := typeII_nu_tau2_dichotomy hG mp.S_maximal (section16_S_isTypeII hG mp) data
+    hlam_mem hlam_irr hnu_mem hdeg c hne1 hkeq 0
+  -- any full `S`-grid column sum is an aligned-grid row sum (transpose + fiber sweep)
+  have key : ∀ kcol : ((typePData_toTICyclicHypothesis data.typeP hG.odd).W2.subgroupOf
+      (typePData_toTICyclicHypothesis data.typeP hG.odd).W) →* ℂˣ,
+      ∃ r' : Fin hyp.w1,
+        ∑ p : ((typePData_toTICyclicHypothesis data.typeP hG.odd).W1.subgroupOf
+            (typePData_toTICyclicHypothesis data.typeP hG.odd).W) →* ℂˣ,
+          (typePData_toTICyclicHypothesis data.typeP hG.odd).chiFam rfl
+            (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+              (typeIIHypothesis46 hG mp.S_maximal (section16_S_isTypeII hG mp) data.typeP))
+            (p, kcol)
+          = ∑ j : Fin hyp.w2, hyp.alignedOmegaSigmaGrid hG hG.odd r' j := by
+    intro kcol
+    have htrans := section16_pair_chiFam_columnSum_transpose hG hG.odd hSW1 hSW2
+      hyp.typeP hKstar.symm
+      (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+        (typeIIHypothesis46 hG mp.S_maximal (section16_S_isTypeII hG mp) data.typeP))
+      (hyp.canonicalFullDadeApp hG hG.odd) kcol
+    obtain ⟨r', hr'⟩ := hyp.exists_alignedOmegaSigmaGrid_row_sum_eq_chiFam_fiber hG hG.odd
+      (kcol.comp (subgroupOfTransport
+        (section16_pair_tic_W_eq hG hG.odd hSW1 hSW2 hyp.typeP hKstar.symm).ge
+        (section16_pair_tic_W2_eq_W1 hG hG.odd hSW2 hyp.typeP hKstar.symm).ge))
+    exact ⟨r', htrans.trans hr'⟩
+  rcases hdich with h | h
+  · obtain ⟨r', hrow⟩ := key
+      (((OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG mp.S_maximal
+          (section16_S_isTypeII hG mp) data.typeP)).omegaProdEquiv.symm
+        (OddOrder.Peterfalvi.S06.omegaProdCharTic (typeIIHypothesis46 hG mp.S_maximal
+          (section16_S_isTypeII hG mp) data.typeP) χ₂ 0)).2)
+    refine ⟨r', ((typeIIHypothesis46 hG mp.S_maximal (section16_S_isTypeII hG mp)
+        data.typeP).columnFamily χ₂).sign,
+      ((typeIIHypothesis46 hG mp.S_maximal (section16_S_isTypeII hG mp)
+        data.typeP).columnFamily χ₂).sign_eq, ?_⟩
+    rw [h]
+    exact congrArg (fun x => ((((typeIIHypothesis46 hG mp.S_maximal
+      (section16_S_isTypeII hG mp) data.typeP).columnFamily χ₂).sign : ℂ)) • x) hrow
+  · obtain ⟨r', hrow⟩ := key
+      (((OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG mp.S_maximal
+          (section16_S_isTypeII hG mp) data.typeP)).omegaProdEquiv.symm
+        (OddOrder.Peterfalvi.S06.omegaProdCharTic (typeIIHypothesis46 hG mp.S_maximal
+          (section16_S_isTypeII hG mp) data.typeP) χ₂⁻¹ 0)).2)
+    refine ⟨r', -((typeIIHypothesis46 hG mp.S_maximal (section16_S_isTypeII hG mp)
+        data.typeP).columnFamily χ₂).sign, ?_, ?_⟩
+    · rcases ((typeIIHypothesis46 hG mp.S_maximal (section16_S_isTypeII hG mp)
+          data.typeP).columnFamily χ₂).sign_eq with hs | hs
+      · exact Or.inr (by rw [hs])
+      · exact Or.inl (by rw [hs]; norm_num)
+    · rw [h, Int.cast_neg]
+      exact congrArg (fun x => (-((((typeIIHypothesis46 hG mp.S_maximal
+        (section16_S_isTypeII hG mp) data.typeP).columnFamily χ₂).sign : ℂ))) • x) hrow
+
 end PairPackaging
 
 end OddOrder.Peterfalvi.S12
