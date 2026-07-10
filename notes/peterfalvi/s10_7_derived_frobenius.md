@@ -455,6 +455,21 @@ shadow 事故 (c✝) → subst + full-term 直書き。
 残 = step 2 (V-vanishing: R(λ)-member ⊥ 全 ω の standalone 抽出 → τ₂λ|_V = 0 →
 zeta1-trick で τ₂ν|_V = 0) → step 3 (S05 endgame + dichotomy 整形)。
 
+**進捗²**: ~~key-brick standalone~~ **DONE (156e3906)**:
+`typeII_dadeOfDiff_member_inner_omegaSigma_eq_zero` (R(λ)-member ⊥ 全 grid 列)。
+**残る glue = (3.2.e) 「⊥ 全 σ-image → V-vanish」の G-side 版** — 設計確定済:
+- σ = Ind on CF(W,V) 橋 (`sigma_eq_induce_of_supportedOnV`): 両者 conjugatesOfSet V 支持
+  (`full_map_eq_zero_of_not_mem_conjugatesOfSet_V` / induce 版) + V 上一致
+  (`full_map_eq_of_mem_V` S05_TICyclic:215 vs TI-induction 値 — V-TI で g v g⁻¹ ∈ V →
+  g ∈ N(V) = W → 全項 = α(v)) + class-fn は V^G-支持なら V-値で決定。
+- reciprocity = `ClassFunction.inner_induce_eq_inner_restrict` (既存 ✓、
+  CliffordCorrespondence:71 の証明内で使用) で ⟨σα, ψ⟩ = ⟨α, Res_W ψ⟩。
+- W-side 完結: `vanishOnV_of_inner_alphaCF` (S05_SigmaIsometry:268) に
+  f := ClassFunction.restrict hyp.W ψ を食わせ f|_V = 0 = ψ|_V。
+  alphaCF は ω-組合せ ⊆ CF(W,V) → σ(alphaCF) は χFam-組合せ → ⊥ 仮定から 0。
+その後: τ₂λ|_V = 0 ((5.5) singleton + key-brick + glue) → zeta1-trick (λ1·ν − ν1·λ の
+smul-diff support helper 1 本) → τ₂ν|_V = 0 → S05 endgame。
+
 ### 2026-07-10 update⁹ — ★★ typeII_T2_coherent LANDED (408e9650) — obligation 1 完成
 
 **T2 = {λ,λ̄,ν,ν̄} の (5.7) coherence が sorry-free/axiom-clean で閉じた** (τ₂ の存在 =
