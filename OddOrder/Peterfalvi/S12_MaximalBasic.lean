@@ -500,6 +500,49 @@ theorem Hypothesis.exists_typeII_partner_card_U_ge_seven [Finite G]
     obtain ⟨k, hk⟩ := hw2odd; omega
   omega
 
+/-- **`V`-elements have order divisible by a `|W₁|`-prime** (the (8.10)/(10.8) support
+bookkeeping): `v ∈ V = W ∖ (W₁ ∪ W₂)` factors as `v₁·v₂` with `v₁ ∈ W₁ ∖ {1}`
+(`TypePData.exists_mul_eq_of_mem_W`; a trivial `W₁`-part would put `v ∈ W₂`), and any prime of
+`orderOf v₁ ∣ |W₁|` divides `orderOf v` — a power killing `v` puts `v₁ ^ n ∈ W₁ ⊓ W₂ = ⊥`. -/
+theorem exists_prime_dvd_orderOf_of_mem_typePV [Finite G] {M : Subgroup G}
+    (data : TypePData M) {v : G} (hv : v ∈ typePV M data) :
+    ∃ p : ℕ, p.Prime ∧ p ∣ orderOf v ∧ p ∣ Nat.card ↥data.W1 := by
+  have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
+  have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
+  obtain ⟨hvW, hvnot⟩ := hv
+  rw [Set.mem_union] at hvnot
+  push_neg at hvnot
+  obtain ⟨v₁, hv₁, v₂, hv₂, rfl⟩ :=
+    data.exists_mul_eq_of_mem_W (SetLike.mem_coe.mp hvW)
+  have hv₁ne : v₁ ≠ 1 := by
+    rintro rfl
+    exact hvnot.2 (by simpa using hv₂)
+  obtain ⟨p, hp, hpd⟩ := Nat.exists_prime_and_dvd
+    (fun h => hv₁ne (orderOf_eq_one_iff.mp h))
+  have hpW1 : p ∣ Nat.card ↥data.W1 := by
+    refine hpd.trans ?_
+    have h1 : orderOf v₁ = orderOf (⟨v₁, hv₁⟩ : ↥data.W1) :=
+      orderOf_injective data.W1.subtype data.W1.subtype_injective ⟨v₁, hv₁⟩
+    rw [h1]
+    exact orderOf_dvd_natCard _
+  have hcomm : Commute v₁ v₂ := by
+    haveI := data.W_cyclic
+    letI : CommGroup ↥data.W := IsCyclic.commGroup
+    have := mul_comm (⟨v₁, hW1le hv₁⟩ : ↥data.W) ⟨v₂, hW2le hv₂⟩
+    exact Subtype.ext_iff.mp this
+  refine ⟨p, hp, ?_, hpW1⟩
+  have hkill : v₁ ^ orderOf (v₁ * v₂) = 1 := by
+    have h1 : (v₁ * v₂) ^ orderOf (v₁ * v₂) = 1 := pow_orderOf_eq_one _
+    rw [hcomm.mul_pow] at h1
+    have hmem : v₁ ^ orderOf (v₁ * v₂) ∈ data.W1 ⊓ data.W2 := by
+      refine ⟨data.W1.pow_mem hv₁ _, ?_⟩
+      have heq : v₁ ^ orderOf (v₁ * v₂) = (v₂ ^ orderOf (v₁ * v₂))⁻¹ :=
+        eq_inv_of_mul_eq_one_right (((hcomm.pow_pow _ _).symm.eq).trans h1)
+      rw [heq]
+      exact data.W2.inv_mem (data.W2.pow_mem hv₂ _)
+    rwa [disjoint_iff.mp (typePData_disjoint_W1_W2 data), Subgroup.mem_bot] at hmem
+  exact hpd.trans (orderOf_dvd_of_pow_eq_one hkill)
+
 /-- **The `(S_F#)^G` union bound of the (10.8) TI-counting** (p. 60 line 91, `≤`-form): the
 conjugacy saturation of the kernel sharp-set of a type-`P` maximal `S` has at most
 `(|S_F| − 1)·[G : S]` elements.  `S` stabilises `H# = H ∖ {1}` under conjugation (`H ⊴ S`), so
@@ -526,7 +569,7 @@ theorem ncard_conjClassSet_sharp_H_le [Finite G] {S : Subgroup G} (data : TypePD
       simpa [mul_assoc] using this
   have hle := OddOrder.GroupTheory.ncard_conjClassSet_le (L := S) hstab
   have hA : ((data.H : Set G) \ {1}).ncard = Nat.card ↥data.H - 1 := by
-    rw [Set.ncard_diff_singleton_of_mem (by exact one_mem data.H),
+    rw [Set.ncard_sdiff_singleton_of_mem (by exact one_mem data.H),
       ← Nat.card_coe_set_eq]
     rfl
   rwa [hA] at hle

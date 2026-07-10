@@ -453,6 +453,36 @@ noncomputable def typeIThickenedA (L M : Subgroup G) (data : TypeIData M) : Set 
 noncomputable def typePThickenedA (L M : Subgroup G) (data : TypePData M) : Set G :=
   thickenedSupport L M (typePA M data)
 
+
+/-- **`W = W₁·W₂` factorization**: every element of `W = W₁ ⊔ W₂` (cyclic, hence commutative)
+is a product `v₁ · v₂` with `v₁ ∈ W₁`, `v₂ ∈ W₂` — the coprod of the two inclusions surjects
+onto `W`.  No disjointness or coprimality is needed. -/
+theorem TypePData.exists_mul_eq_of_mem_W {M : Subgroup G} (data : TypePData M)
+    {v : G} (hv : v ∈ data.W) :
+    ∃ v₁ ∈ data.W1, ∃ v₂ ∈ data.W2, v₁ * v₂ = v := by
+  haveI := data.W_cyclic
+  letI : CommGroup ↥data.W := IsCyclic.commGroup
+  have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
+  have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
+  set f := (Subgroup.inclusion hW1le).coprod (Subgroup.inclusion hW2le) with hf
+  have hrange : ∀ w : ↥data.W, w ∈ f.range := by
+    have hsub : data.W1.subgroupOf data.W ⊔ data.W2.subgroupOf data.W ≤ f.range := by
+      refine sup_le ?_ ?_
+      · rw [← Subgroup.inclusion_range hW1le]
+        rintro x ⟨y, rfl⟩
+        exact ⟨(y, 1), by simp [hf, MonoidHom.coprod_apply]⟩
+      · rw [← Subgroup.inclusion_range hW2le]
+        rintro x ⟨y, rfl⟩
+        exact ⟨(1, y), by simp [hf, MonoidHom.coprod_apply]⟩
+    intro w
+    refine hsub ?_
+    rw [← Subgroup.subgroupOf_sup hW1le hW2le, ← data.W_eq]
+    exact Subgroup.mem_subgroupOf.mpr w.2
+  obtain ⟨⟨y₁, y₂⟩, hy⟩ := hrange ⟨v, hv⟩
+  refine ⟨(y₁ : G), y₁.2, (y₂ : G), y₂.2, ?_⟩
+  have := congrArg (Subtype.val (p := fun x => x ∈ data.W)) hy
+  simpa [hf, MonoidHom.coprod_apply] using this
+
 /-- Peterfalvi (8.14), the thickened `A_0(M)` for type-`P` data. -/
 noncomputable def typePThickenedA0 (L M : Subgroup G) (data : TypePData M) : Set G :=
   thickenedSupport L M (typePA0 M data)
