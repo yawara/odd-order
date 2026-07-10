@@ -362,6 +362,37 @@ c は temporary-hold 中 — 必要になった時点で 9000 claim を検討)�
      「ν が column である」ことの S11-level 供給源 (`caseA/caseB_character_counts` の
      hbred が ν の deg=qu しか言わない — column 性は §6 経由) を精査してから設計。
 
+## 2026-07-10 update⁷ — ★ S-side Hypothesis46 instance LANDED (f0772198、sorry-free/axiom-clean)
+
+update⁶ 手順 3 の本丸 infra が閉じた。S12_TypeIIFrobenius に新 section Hypothesis46Instance:
+
+- **`typePV_orderOf_not_dvd_card_derived`** (TypePData-generic): V-元の位数 ∤ |M'|。
+  W = W₁⊔W₂ 分解 + Lagrange + (4.2.a) Hall coprime → v ∈ ⟨v^{w₁}⟩ ⊆ W₂ 矛盾。
+  Coq `FTsupport0` (BGsection16:194) の order 特徴付け ('A0 = 'A ∪ {非π(M')-elt かつ 非π(M')'-elt})
+  の type-data 形 — **mixed case の共役不変分離子**。
+- **`typeII_A0_isTISubset`**: (8.16) A₀(S) = A(S) ∪ V^S の TI。4-case:
+  (A,A) = landed / (V,V) = `typePData_V_ti` (normalizer W ≤ S) / mixed = orderOf 分離。
+  ⚠ Coq (8.16) は (8.15) Dade hyp + signalizer 自明化経由 (逆順: A₀ 先、A/A₁ は normedTI_S subset) —
+  repo は (8.15) 一般機構を持たないので直接 TI (方針は landed A(S)-TI と同じ 3-case 拡張)。
+- **`typeIIDadeHypothesis0`**: A₀(S)-level S04.Hypothesis (of_isTISubset)。
+- **`typeIIHypothesis46`**: `S06.Hypothesis46 (A(S)) S` 完全 instance。
+  **subH = S_F.subgroupOf S** ((8.15) type-II の H = M_s = S_F; M-side の H = K と異なる) →
+  A_covers は honest A(S) の定義でほぼ自明 (S_F = S_σ via maxNilpotentNormalHall_eq_Msigma)。
+  dade = landed typeIIDadeHypothesis / dade0+tau = 新 A₀ 構築 / tic 系 = M-side と同 pattern。
+  パラメータは `data : TypePData S` (consumer は data.typeP を渡す)。
+
+### 残 = update⁶ 手順 3 の T2 R-data 続き (次 iteration)
+1. **reducible→column 分類の S-side mirror**: `reducible_mem_inducedKernelFamily_eq_muGrid_columnSum`
+   (S12_HcBound:578) は statement が M-locked (muGrid) だが証明本体は §6-generic
+   (`h.induce_not_isIrreducible_iff` + `chiRestrict_one_eq_trivial` + `induce_restrict_certainType_eq`)。
+   S-side は muGrid を経由せず **`∃ χ₂ ≠ 1, ν = columnSum h46.toHypothesis χ₂`** 形で直接
+   (typeIIHypothesis46 の toHypothesis = typePData_toS06Hypothesis に対して)。
+   sOf → inducedKernelFamily bridge の S11-generic 版が要確認 (S13 は SOf_eq 経由で locked)。
+2. R(ν) = `S06.certainTypeR (typeIIHypothesis46 …)` + R(λ) = Dade 2-elt 族 + hRorth (S13 dispatch mirror)。
+3. T2 = {λ,λ̄,ν,ν̄} 家族で (5.7) engine (`uniform_degree_coherence_of_families`)。
+   ⚠ engine の τ は **A₀-level** (certainTypeR が h46.tau = dade0 の map を強制) — landed の
+   A(S)-level typeIITau でなく typeIIHypothesis46 の tau 側で組む (A ⊆ A₀ で support lemmas は通る)。
+
 ### update⁵ 補遺² — S-side Dade の support-set 選定 (次 iteration の最初の判断)
 - **A₁(S) = S_F^# の TI は即座に取れる**: `TypePNontrivialCore` が kernel-sharp TI を
   field で保持 (`typeP_core_centralizer_le_of_mem_fitting` の hTI destructure) +
