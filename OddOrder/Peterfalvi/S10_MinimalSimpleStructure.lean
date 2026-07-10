@@ -788,6 +788,64 @@ noncomputable def nonTypeICovering_of_isTypeP [Finite G] (hG : OddOrder.BG.IsMin
     exact OddOrder.BG.Ch4.S14.conjClassSet_T_Mtilde_disjoint hG D hMref hMPref hKMref hKref
       hKstarref hUref (data.maximal j)
 
+/-! ### The no-escaping collapse of the faithful cover
+
+`BGTheoremETypeICovering.cover_subset_kernels` (the (8.8.a)-case collapse of the thickened
+cover `M̃ = ⋃_{x ∈ M_σ#} x·R(x)` onto `M_σ# = (M_F)#`) is **not** a Section-8 fact: BG Theorem E
+keeps the `R(x)`-thickening (BG Thm D(4) puts `R(x) = C_{N_σ}(x)` inside the *neighbour's*
+kernel), and Peterfalvi collapses it only inside the (12.17) proof, where Theorem (12.7) (every
+type-I maximal is a Frobenius group with kernel `M_F`) kills escaping centralizers.  The two
+lemmas below supply the collapse from exactly that no-escaping hypothesis, so the §12 consumer
+can discharge it once (12.7) is in scope. -/
+
+/-- **`R(x)` collapses when the centralizer does not escape** (the (12.17)-side degeneration of
+BG Theorem 14.4): if `M ∈ 𝓜_σ(x)` and `C_G(x) ≤ M`, then `R(x) = 1`.  In the multi-maximal
+case the Theorem-14.4 sharp transitivity of `R(x) ≤ C_G(x)` on `𝓜_σ(x)` yields `r ∈ R(x) ≤ M`
+conjugating `M` onto a *different* member of `𝓜_σ(x)`, absurd for `r ∈ M`. -/
+theorem Rsub_eq_bot_of_centralizer_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : OddOrder.BG.Ch4.S14.SigmaDecompositionData G) {x : G} {M : Subgroup G}
+    (hM : M ∈ OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement x)
+    (hc : Subgroup.centralizer ({x} : Set G) ≤ M) :
+    OddOrder.BG.Ch4.S14.Rsub hG D x = ⊥ := by
+  classical
+  have hnot : ¬ (x ≠ 1 ∧ D.length x = 1 ∧
+      1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement x).ncard) := by
+    rintro ⟨hx1, hlen, hgt⟩
+    -- a second member `L ≠ M` of `𝓜_σ(x)`
+    haveI : Finite (Subgroup G) :=
+      Finite.of_injective (fun H : Subgroup G => (H : Set G)) SetLike.coe_injective
+    have hnt : (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement x).Nontrivial :=
+      Set.one_lt_ncard_iff_nontrivial.mp hgt
+    obtain ⟨L, hL, hLM⟩ := hnt.exists_ne M
+    -- the Theorem-14.4 sharp transitivity of `R(x)` on `𝓜_σ(x)`, at the pair `(M, L)`
+    obtain ⟨N, hNspec, -⟩ :=
+      (OddOrder.BG.Ch4.S14.sigmaLength_one_centralizer_structure hG D hx1 hlen).2 hgt
+    obtain ⟨r, ⟨hrmem, hrconj⟩, -⟩ := (hNspec.2.2.2.2.2.2 M hM).2.2.2 L hL
+    have hrM : r ∈ M := hc (Subgroup.mem_inf.mp hrmem).2
+    exact hLM (hrconj.symm.trans
+      (conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hrM)))
+  rw [OddOrder.BG.Ch4.S14.Rsub, dif_neg hnot]
+
+/-- **The no-escaping collapse `M̃ = M_σ#`** (the (12.17)-case degeneration of the faithful BG
+Theorem E cover): if no centralizer of an `M_σ#`-element escapes `M`, every signalizer `R(x)`
+is trivial and the thickened `M̃ = ⋃_{x ∈ M_σ#} x·R(x)` collapses onto `M_σ#`. -/
+theorem Mtilde_eq_sigmaSharp_of_forall_centralizer_le [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : OddOrder.BG.Ch4.S14.SigmaDecompositionData G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G)
+    (hesc : ∀ x ∈ OddOrder.BG.Ch4.S14.sigmaSharp M,
+      Subgroup.centralizer ({x} : Set G) ≤ M) :
+    OddOrder.BG.Ch4.S14.Mtilde hG D M = OddOrder.BG.Ch4.S14.sigmaSharp M := by
+  refine Set.Subset.antisymm ?_ (OddOrder.BG.Ch4.S14.sigmaSharp_subset_Mtilde hG D)
+  rintro g ⟨x, hx, x', hx', rfl⟩
+  have hxM : x ∈ OddOrder.BG.Ch3.S10.Msigma M := by
+    have hx0 := hx
+    rw [OddOrder.BG.Ch4.S14.sigmaSharp, sharpSubgroup, Set.mem_sdiff, SetLike.mem_coe] at hx0
+    exact hx0.1
+  have hbot := Rsub_eq_bot_of_centralizer_le hG D ⟨hM, hxM⟩ (hesc x hx)
+  rw [hbot, Subgroup.mem_bot] at hx'
+  rwa [hx', mul_one]
+
 /-- **Peterfalvi (8.17)**: BG Theorem E, repackaged as the Section 10 covering
 interface.
 
@@ -885,10 +943,52 @@ theorem bgTheoremE_cover_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       OddOrder.BG.Ch4.S14.exists_typeP_data hG hMrefmax
     exact Or.inr ⟨nonTypeICovering_of_isTypeP hG _ (fun _ => rfl) hMrefmax hMrefP hKMref hKref
       hKstarref hUref⟩
-  · -- `𝓜_P = ∅` (every maximal is type-F/I): the Type-I covering.  Its `cover_subset_kernels`
-    -- (`M̃_i ⊆ ((M_i)_F)#` conjugates) is the §8 / route-B endpoint (`bgTheoremE_cover_data`'s
-    -- TypeICovering side, owned by the §8 Dade work in lane-a/c), so this branch remains gated.
-    sorry
+  · -- `𝓜_P = ∅` (every maximal is type-F/I): the Type-I covering.  Fields 1–2 are the faithful
+    -- BG Cor 14.9 all-type-`F` cover and Lemma 14.5(b) disjointness; only the kernel collapse
+    -- (field 3) stays open.
+    have hPempty : OddOrder.BG.Ch4.S14.maximalTypePFamily G = ∅ :=
+      Set.not_nonempty_iff_eq_empty.mp hP
+    have htypeF : ∀ M' ∈ maximalSubgroups G, OddOrder.BG.Ch4.S14.IsTypeF M' := fun M' hM'max =>
+      OddOrder.BG.Ch4.S14.isTypeF_iff_not_isTypeP.mpr fun hPM' =>
+        Set.notMem_empty M'
+          (hPempty ▸ (⟨hM'max, hPM'⟩ : M' ∈ OddOrder.BG.Ch4.S14.maximalTypePFamily G))
+    refine Or.inl ⟨?_, ?_, ?_⟩
+    · -- `cover_nonidentity`: BG Cor 14.9 (the all-type-`F` cover), converted to representatives.
+      refine (OddOrder.BG.Ch4.S14.sharpSubgroup_top_eq_iUnion_conjClassSet_Mtilde_of_typeF hG
+        htypeF).trans ?_
+      ext g
+      simp only [Set.mem_iUnion₂, Set.mem_iUnion, exists_prop]
+      constructor
+      · intro hex
+        obtain ⟨Mi, hMirep, hg⟩ :=
+          (OddOrder.BG.Ch4.S16.mem_conjClassSet_Mtilde_maximals_iff_reps hG hrepsMax
+            (fun H hH => (hreps H hH).exists) g).mp hex
+        refine ⟨⟨e ⟨Mi, hMirep⟩⟩, ?_⟩
+        simp only [ULift.down_up, Equiv.symm_apply_apply]
+        exact hg
+      · rintro ⟨j, hg⟩
+        exact ⟨(e.symm j.down).1, hrepsMax _ (e.symm j.down).2, hg⟩
+    · -- `pairwise_disjoint_thickened`: Lemma 14.5(b) over nonconjugate representatives.
+      intro j _ k _ hjk
+      have hnc : ¬ OddOrder.BG.Ch4.S14.IsConjugateSubgroup
+          (e.symm j.down).1 (e.symm k.down).1 := by
+        intro hconj
+        apply hjk
+        obtain ⟨_, _, huniq⟩ := hreps (e.symm j.down).1 (hrepsMax _ (e.symm j.down).2)
+        exact ULift.ext _ _ (e.symm.injective (Subtype.ext
+          ((huniq _ ⟨(e.symm j.down).2, OddOrder.BG.Ch4.S14.IsConjugateSubgroup.refl _⟩).trans
+            (huniq _ ⟨(e.symm k.down).2, hconj⟩).symm)))
+      exact OddOrder.BG.Ch4.S14.conjClassSet_Mtilde_disjoint hG D
+        (hrepsMax _ (e.symm j.down).2) (hrepsMax _ (e.symm k.down).2) hnc
+    · -- `cover_subset_kernels` — **mis-layered (§12-gated)**: the collapse `M̃ᵢ ⊆ 𝒞(((Mᵢ)_F)#)`
+      -- is not provable at the §8 layer (BG Theorem E keeps the `R(x)`-thickening; Thm D(4)
+      -- puts `R(x) = C_{N_σ}(x)` inside the *neighbour's* kernel, so a twisted `x·x'` with
+      -- `x' ≠ 1` has primes outside `σ(Mᵢ)`).  Peterfalvi collapses it only inside the (12.17)
+      -- proof: Theorem (12.7) (type-I maximals are Frobenius) kills escaping centralizers and
+      -- `Mtilde_eq_sigmaSharp_of_forall_centralizer_le` gives `M̃ᵢ = (Mᵢ)_σ# = ((Mᵢ)_F)#`.
+      -- (12.7) lives downstream (S14, import-blocked here), so the honest discharge belongs to
+      -- the §12 consumer; see issue 9080.
+      sorry
 
 /-- **Peterfalvi (8.18.c)**: the final support-exclusion relation in Section 10.  For **non-conjugate
 type-I** maximal subgroups `S, T`, the sharp sets `A₁(S) = (S_F)^#` and `A₁(T) = (T_F)^#` cannot
