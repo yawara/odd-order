@@ -125,3 +125,5 @@ issue は trial ログの追記継続のため open 維持、次の節目 (T-sid
   landing 9/9、churn 0。上記 ⚖️ 裁定のとおり **KEEP 確定**。
 - 2026-07-11 (tick、merge 7edf1b07): (14.9) supported T-side beta zero 実証明 (AxiomsCheck 追従・
   dup なし)。10/10。KEEP 後も観察は簡略化して継続 (dup チェックは通常レーン水準に緩和)。
+- 2026-07-11 (tick、merge 87d6be02): (14.9) T-side delta reality + orthogonality (新 leaf TGapDelta、
+  既存 2 定理の in-place 強化 + 旧 statement の系再導出 — dup flag は誤検出)。11/11。
