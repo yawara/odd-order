@@ -302,7 +302,7 @@ type-II `S`-side; standalone form of the key brick inside
 
 With the (5.5) singleton form `λ^{τ₂} ∈ R(λ)` this makes `λ^{τ₂}` orthogonal to the whole
 grid — the input of the (3.2.e) `V`-vanishing of `λ^{τ₂}` in the (5.8) `ν`-pin. -/
-theorem typeII_dadeOfDiff_member_inner_omegaSigma_eq_zero [Finite G]
+theorem typeII_dadeOfDiff_member_inner_chiFam_eq_zero [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
     (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) (data : TypePData S)
     [NeZero (Nat.card (typeIIHypothesis46 hG hSmax hSII data).W1)]
@@ -322,12 +322,16 @@ theorem typeII_dadeOfDiff_member_inner_omegaSigma_eq_zero [Finite G]
       (typeIIHypothesis46 hG hSmax hSII data).dade0
       (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data)
       χ hrealχ hdiffsuppχ).imageSet)
-    (χ₂' : ((typeIIHypothesis46 hG hSmax hSII data).W2.subgroupOf
-      ((typeIIHypothesis46 hG hSmax hSII data).W1 ⊔ (typeIIHypothesis46 hG hSmax hSII data).W2)) →* ℂˣ)
-    (i : Fin (Nat.card (typeIIHypothesis46 hG hSmax hSII data).W1)) :
+    (pq : (((OddOrder.Peterfalvi.S06.ticVdiff
+        (typeIIHypothesis46 hG hSmax hSII data)).W1.subgroupOf
+          (OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)).W) →* ℂˣ)
+      × (((OddOrder.Peterfalvi.S06.ticVdiff
+        (typeIIHypothesis46 hG hSmax hSII data)).W2.subgroupOf
+          (OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)).W) →* ℂˣ)) :
     ClassFunction.inner β
-      (OddOrder.Peterfalvi.S06.certainTypeOmegaSigma
-        (typeIIHypothesis46 hG hSmax hSII data) χ₂' i) = 0 := by
+      ((OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)).chiFam rfl
+        (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+          (typeIIHypothesis46 hG hSmax hSII data)) pq) = 0 := by
   classical
   -- `hmin`: `2 < min(w₁, w₂)` for the `ticVdiff` exceptional structure.
   have hmin : 2 < min
@@ -346,10 +350,10 @@ theorem typeII_dadeOfDiff_member_inner_omegaSigma_eq_zero [Finite G]
       (∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)).V,
         (c • ξ - c' • ξ') v = 0) →
       ClassFunction.inner (c • ξ)
-        (OddOrder.Peterfalvi.S06.certainTypeOmegaSigma
-          (typeIIHypothesis46 hG hSmax hSII data) χ₂' i) = 0 := by
+        ((OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)).chiFam rfl
+          (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+            (typeIIHypothesis46 hG hSmax hSII data)) pq) = 0 := by
     intro c c' ξ ξ' hξZ hξ1 hξ'Z hξ'1 hξξ' hc hvanish
-    rw [OddOrder.Peterfalvi.S06.certainTypeOmegaSigma_eq_chiFam]
     exact OddOrder.Peterfalvi.S08.inner_smul_chiFam_eq_zero_of_diff_vanishOnV
       (OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)) rfl
       (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication (typeIIHypothesis46 hG hSmax hSII data))
@@ -363,7 +367,8 @@ theorem typeII_dadeOfDiff_member_inner_omegaSigma_eq_zero [Finite G]
         -((χ : ClassFunction ↥S ℂ).conj - (χ : ClassFunction ↥S ℂ)) by abel,
       ClassFunction.support_neg]
     exact hdiffsuppχA
-  have htauvanish : ∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)).V,
+  have htauvanish : ∀ v ∈
+      (OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)).V,
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
         (typeIIHypothesis46 hG hSmax hSII data).dade0 (typeIIHypothesis46 hG hSmax hSII data).tau
         ((χ : ClassFunction ↥S ℂ) - (χ : ClassFunction ↥S ℂ).conj) v = 0 :=
@@ -371,7 +376,8 @@ theorem typeII_dadeOfDiff_member_inner_omegaSigma_eq_zero [Finite G]
   -- capture the two-element `R(χ)` abstractly and split the membership
   obtain ⟨cd, hcd⟩ :
       ∃ cd : OddOrder.Peterfalvi.S07.CharacterDifferenceImage (G := G)
-        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (typeIIHypothesis46 hG hSmax hSII data).dade0
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+          (typeIIHypothesis46 hG hSmax hSII data).dade0
           ((typeIIHypothesis46 hG hSmax hSII data).dade0.fullDadeIsometryData
             (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data)))
         (χ : ClassFunction ↥S ℂ),
@@ -379,7 +385,8 @@ theorem typeII_dadeOfDiff_member_inner_omegaSigma_eq_zero [Finite G]
             (typeIIHypothesis46 hG hSmax hSII data).dade0
             (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data) χ hrealχ hdiffsuppχ
           = cd.toOrthonormalImage := ⟨_, rfl⟩
-  have hcdimg : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (typeIIHypothesis46 hG hSmax hSII data).dade0
+  have hcdimg : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+      (typeIIHypothesis46 hG hSmax hSII data).dade0
       ((typeIIHypothesis46 hG hSmax hSII data).dade0.fullDadeIsometryData
         (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data))
       ((χ : ClassFunction ↥S ℂ) - (χ : ClassFunction ↥S ℂ).conj)
@@ -398,10 +405,12 @@ theorem typeII_dadeOfDiff_member_inner_omegaSigma_eq_zero [Finite G]
     rwa [if_neg (Ne.symm cd.distinct)] at h
   have hsignC : (cd.sign : ℂ) ≠ 0 := by rcases cd.sign_eq with h | h <;> simp [h]
   have hnsignC : (-(cd.sign : ℂ)) ≠ 0 := by rcases cd.sign_eq with h | h <;> simp [h]
-  have hvanishμν : ∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)).V,
+  have hvanishμν : ∀ v ∈
+      (OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)).V,
       ((cd.sign : ℂ) • cd.muClassFunction - (cd.sign : ℂ) • cd.nuClassFunction) v = 0 := by
     intro v hv; rw [← hcdimg]; exact htauvanish v hv
-  have hvanishνμ : ∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)).V,
+  have hvanishνμ : ∀ v ∈
+      (OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)).V,
       ((-(cd.sign : ℂ)) • cd.nuClassFunction - (-(cd.sign : ℂ)) • cd.muClassFunction) v = 0 := by
     intro v hv
     rw [show (-(cd.sign : ℂ)) • cd.nuClassFunction - (-(cd.sign : ℂ)) • cd.muClassFunction
@@ -418,6 +427,236 @@ theorem typeII_dadeOfDiff_member_inner_omegaSigma_eq_zero [Finite G]
   · rw [show (-cd.sign) • cd.nuClassFunction = (-(cd.sign : ℂ)) • cd.nuClassFunction by
       rw [← Int.cast_smul_eq_zsmul ℂ (-cd.sign) cd.nuClassFunction, Int.cast_neg]]
     exact key hνZ hν1 hμZ hμ1 hνμ hnsignC hvanishνμ
+
+open scoped Classical FiniteInduce in
+/-- **The (3.1) `V`-TI Dade map is induction**: on `CF(W, V)` the full Dade map of the
+TI-cyclic hypothesis coincides with `Ind_W^G`.  Both are class functions supported on the
+conjugates of `V` (`full_map_eq_zero_of_not_mem_conjugatesOfSet_V`; induction of a
+`V`-supported function), and on `V` itself both evaluate to `α(v)` — the Dade map by the
+base-point property (`full_map_eq_of_mem_V`), the induction because the TI property makes
+every nonvanishing conjugator normalize into `W` (`V_ti` + `W_normalizes_V`), contributing
+`|W|` equal terms against the `⅟|W|` normalization.
+
+This is the bridge that turns the `σ`-adjunction into honest Frobenius reciprocity
+(`ClassFunction.inner_induce_eq_inner_restrict`) in the (3.2.e) vanishing criterion. -/
+theorem ticyclic_full_map_eq_induce [Finite G]
+    (hyp : OddOrder.Peterfalvi.S05.TICyclicHypothesis G)
+    (app : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication (G := G) hyp)
+    (α : OddOrder.Peterfalvi.S05.TICyclicHypothesis.SupportedOnV ℂ hyp) :
+    (app.tau.toDadeMap α : ClassFunction G ℂ)
+      = ClassFunction.induce hyp.W (α : ClassFunction ↥hyp.W ℂ) := by
+  classical
+  -- values of `α` vanish off `V`
+  have hαoff : ∀ (w : ↥hyp.W), (↑w : G) ∉ hyp.V → (α : ClassFunction ↥hyp.W ℂ) w = 0 := by
+    intro w hw
+    by_contra hne
+    exact hw (OddOrder.Peterfalvi.S04.mem_supportInSubgroup.mp
+      ((ClassFunction.mem_supportedSubmodule.mp α.2) (ClassFunction.mem_support.mpr hne)))
+  ext g
+  by_cases hg : g ∈ Group.conjugatesOfSet hyp.V
+  · -- both sides are class functions; evaluate at the `V`-representative
+    obtain ⟨v, hv, hconj⟩ := Group.mem_conjugatesOfSet_iff.mp hg
+    rw [← (app.tau.toDadeMap α : ClassFunction G ℂ).of_isConj hconj,
+      ← (ClassFunction.induce hyp.W (α : ClassFunction ↥hyp.W ℂ)).of_isConj hconj,
+      OddOrder.Peterfalvi.S05.TICyclicHypothesis.full_map_eq_of_mem_V app α hv,
+      ClassFunction.induce_apply]
+    -- the conjugators with `x⁻¹vx ∈ W` are exactly `x ∈ W`, each contributing `α(v)`
+    have hterm : ∀ x : G, ClassFunction.induceTerm hyp.W (α : ClassFunction ↥hyp.W ℂ) x v
+        = if x ∈ hyp.W then (α : ClassFunction ↥hyp.W ℂ) ⟨v, hyp.V_subset_W hv⟩ else 0 := by
+      intro x
+      by_cases hxW : x ∈ hyp.W
+      · have hxv : x⁻¹ * v * x ∈ hyp.V := by
+          have := hyp.W_normalizes_V (⟨x, hxW⟩ : ↥hyp.W)⁻¹ hv
+          simpa using this
+        have hxvW : x⁻¹ * v * x ∈ hyp.W := hyp.V_subset_W hxv
+        rw [ClassFunction.induceTerm_of_mem _ hxvW, if_pos hxW]
+        -- `x⁻¹vx` is `W`-conjugate to `v`
+        exact (α : ClassFunction ↥hyp.W ℂ).of_isConj (isConj_iff.mpr
+          ⟨(⟨x, hxW⟩ : ↥hyp.W)⁻¹, Subtype.ext (by simp [mul_assoc])⟩) |>.symm
+      · rw [if_neg hxW]
+        by_cases hxvW : x⁻¹ * v * x ∈ hyp.W
+        · rw [ClassFunction.induceTerm_of_mem _ hxvW]
+          refine hαoff _ (fun hxvV => hxW ?_)
+          have := hyp.V_ti x⁻¹ ⟨v, hv, by simpa using hxvV⟩
+          simpa using this
+        · exact ClassFunction.induceTerm_of_not_mem _ hxvW
+    rw [Finset.sum_congr rfl (fun x _ => hterm x), Finset.sum_ite, Finset.sum_const,
+      Finset.sum_const_zero, add_zero]
+    have hcard : (Finset.univ.filter (fun x : G => x ∈ hyp.W)).card
+        = Nat.card ↥hyp.W := by
+      rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
+    rw [hcard, nsmul_eq_mul, ← mul_assoc, invOf_mul_self, one_mul]
+  · rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.full_map_eq_zero_of_not_mem_conjugatesOfSet_V
+      app α hg, ClassFunction.induce_apply]
+    have hterm : ∀ x : G, ClassFunction.induceTerm hyp.W (α : ClassFunction ↥hyp.W ℂ) x g = 0 := by
+      intro x
+      by_cases hxgW : x⁻¹ * g * x ∈ hyp.W
+      · rw [ClassFunction.induceTerm_of_mem _ hxgW]
+        refine hαoff _ (fun hxgV => hg ?_)
+        refine Group.mem_conjugatesOfSet_iff.mpr ⟨x⁻¹ * g * x, hxgV, ?_⟩
+        exact isConj_iff.mpr ⟨x, by group⟩
+      · exact ClassFunction.induceTerm_of_not_mem _ hxgW
+    rw [Finset.sum_congr rfl (fun x _ => hterm x), Finset.sum_const_zero, mul_zero]
+
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (3.2)(e)**: a class function of `G` orthogonal to the whole `σ`-image family
+`{χ_{pq}}` vanishes on `V` (Coq `ortho_cycTIiso_vanish`).
+
+Frobenius reciprocity (`inner_induce_eq_inner_restrict`) through the `σ = Ind` bridge
+(`ticyclic_full_map_eq_induce`) turns the grid-orthogonality of `ψ` into the
+`α_{pq}`-orthogonality of `Res_W ψ` (each `σ(α_{pq})` is a four-term `χ`-combination by
+`alphaCF_eq_omega_combination` + `sigma_omega`); the `(1.3)(a)`-engine
+`vanishOnV_of_inner_alphaCF` then forces `(Res_W ψ)|_V = 0`, i.e. `ψ|_V = 0`.
+
+Together with the (5.5) singleton `λ^{τ₂} ∈ R(λ)` and the grid-orthogonality of the
+`R(λ)`-members (`typeII_dadeOfDiff_member_inner_omegaSigma_eq_zero`) this gives the
+`V`-vanishing of `λ^{τ₂}` in the (5.8) `ν`-pin. -/
+theorem ticyclic_apply_eq_zero_of_forall_inner_chiFam [Finite G]
+    (hyp : OddOrder.Peterfalvi.S05.TICyclicHypothesis G) (hVeq : hyp.V = hyp.Vdiff)
+    (app : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication (G := G) hyp)
+    {ψ : ClassFunction G ℂ}
+    (h : ∀ pq : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ),
+      ClassFunction.inner ψ (hyp.chiFam hVeq app pq) = 0)
+    {v : G} (hv : v ∈ hyp.V) : ψ v = 0 := by
+  classical
+  -- flipped-order grid orthogonality
+  have hχ0 : ∀ pq, ClassFunction.inner (hyp.chiFam hVeq app pq) ψ = 0 := fun pq => by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, h pq, star_zero]
+  -- `Res_W ψ ⊥ α_{pq}` via reciprocity through `σ = Ind`
+  have hf : ∀ (p : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (q : (hyp.W2.subgroupOf hyp.W) →* ℂˣ),
+      p ≠ 1 → q ≠ 1 →
+      ClassFunction.inner (hyp.alphaCF p q) (ClassFunction.restrict hyp.W ψ) = 0 := by
+    intro p q _ _
+    rw [← ClassFunction.inner_induce_eq_inner_restrict hyp.W (hyp.alphaCF p q) ψ]
+    have hbridge : ClassFunction.induce hyp.W (hyp.alphaCF p q)
+        = hyp.sigma hVeq app (hyp.alphaCF p q) := by
+      rw [show hyp.alphaCF p q
+          = ((hyp.alpha hVeq p q : OddOrder.Peterfalvi.S05.TICyclicHypothesis.SupportedOnV ℂ hyp)
+            : ClassFunction ↥hyp.W ℂ) from rfl,
+        ← ticyclic_full_map_eq_induce hyp app (hyp.alpha hVeq p q),
+        OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_eq_tau]
+    rw [hbridge, OddOrder.Peterfalvi.S05.TICyclicHypothesis.alphaCF_eq_omega_combination,
+      map_add, map_sub, map_sub,
+      OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_omega,
+      OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_omega,
+      OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_omega,
+      OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_omega]
+    simp only [ClassFunction.inner_add_left, ClassFunction.inner_sub_left, hχ0,
+      sub_zero, add_zero, zero_sub, neg_zero, zero_add]
+  have hres := OddOrder.Peterfalvi.S05.TICyclicHypothesis.vanishOnV_of_inner_alphaCF hyp hVeq
+    hf hv
+  rwa [ClassFunction.restrict_apply] at hres
+
+open scoped Classical FiniteInduce in
+/-- **`λ^{τ₂}` vanishes on the exceptional set `V`** (the first half of the `V`-vanishing
+transfer): by (5.5) `λ^{τ₂}` is a single `R(λ)`-constituent, each of which is orthogonal to
+the whole `σ`-image family (`typeII_dadeOfDiff_member_inner_chiFam_eq_zero`); the (3.2)(e)
+criterion (`ticyclic_apply_eq_zero_of_forall_inner_chiFam`) then kills its `V`-values. -/
+theorem typeII_T2_extension_lam_apply_eq_zero_of_mem_V [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S)
+    (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup S)
+    [NeZero (Nat.card (typeIIHypothesis46 hG hSmax hSII data.typeP).W1)]
+    {Y : Subgroup G} {lam nu : ClassFunction ↥S ℂ}
+    (hlam_mem : lam ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (hlam_irr : IsIrreducibleCharacter lam)
+    (hnu_mem : nu ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (hdeg : lam 1 = nu 1)
+    (c : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+        (typeIIHypothesis46 hG hSmax hSII data.typeP).dade0
+        (typeIIHypothesis46 hG hSmax hSII data.typeP).tau)
+      ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥S ℂ))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)
+          ∪ conjClassSetIn S (typePV S data.typeP)) S))
+    {v : G}
+    (hv : v ∈ (OddOrder.Peterfalvi.S06.ticVdiff
+      (typeIIHypothesis46 hG hSmax hSII data.typeP)).V) :
+    c.extension lam v = 0 := by
+  classical
+  obtain ⟨hr, hs, α, hαmem, hα⟩ := typeII_T2_extension_lam_eq_single hG hSmax hSII data
+    hlam_mem hlam_irr hnu_mem hdeg c
+  -- the `A(S)`-level support of the conjugate difference (the cross lemma's anchor input)
+  have hT2supp := typeII_T2_member_support hG hSmax hSII data hlam_mem hnu_mem
+  have hT2one := typeII_T2_apply_one_eq data hlam_mem hnu_mem hdeg
+  have hlamT2 : lam ∈ ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥S ℂ)) :=
+    Set.mem_insert _ _
+  have hlamcT2 : lam.conj ∈ ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥S ℂ)) :=
+    Set.mem_insert_of_mem _ (Set.mem_insert _ _)
+  have hsA : (lam.conj - lam).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)) S :=
+    diff_support_subset_of_support_subset_union_one (hT2supp lam.conj hlamcT2)
+      (hT2supp lam hlamT2)
+      (by rw [hT2one lam.conj hlamcT2, hT2one lam hlamT2])
+  refine ticyclic_apply_eq_zero_of_forall_inner_chiFam
+    (OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data.typeP)) rfl
+    (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+      (typeIIHypothesis46 hG hSmax hSII data.typeP))
+    (fun pq => ?_) hv
+  rw [hα]
+  exact typeII_dadeOfDiff_member_inner_chiFam_eq_zero hG hSmax hSII data.typeP
+    ⟨lam, hlam_irr⟩ hr hsA hs hαmem pq
+
+open scoped Classical FiniteInduce in
+/-- **`ν^{τ₂}` vanishes on the exceptional set `V`**: since `λ` and `ν` share a degree, the
+difference `ν − λ` is `A(S)`-supported, so `τ₂(ν − λ) = τ_S(ν − λ)` (coherence agreement)
+vanishes on `V` by the (8.16) base-point anchor; with `λ^{τ₂}|_V = 0`
+(`typeII_T2_extension_lam_apply_eq_zero_of_mem_V`) this transfers to `ν^{τ₂}`.  (The
+equal-degree situation makes Coq's scaled `zeta1 = ζ(1)·μ − μ(1)·ζ` unnecessary.) -/
+theorem typeII_T2_extension_nu_apply_eq_zero_of_mem_V [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S)
+    (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup S)
+    [NeZero (Nat.card (typeIIHypothesis46 hG hSmax hSII data.typeP).W1)]
+    {Y : Subgroup G} {lam nu : ClassFunction ↥S ℂ}
+    (hlam_mem : lam ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (hlam_irr : IsIrreducibleCharacter lam)
+    (hnu_mem : nu ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (hdeg : lam 1 = nu 1)
+    (c : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+        (typeIIHypothesis46 hG hSmax hSII data.typeP).dade0
+        (typeIIHypothesis46 hG hSmax hSII data.typeP).tau)
+      ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥S ℂ))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)
+          ∪ conjClassSetIn S (typePV S data.typeP)) S))
+    {v : G}
+    (hv : v ∈ (OddOrder.Peterfalvi.S06.ticVdiff
+      (typeIIHypothesis46 hG hSmax hSII data.typeP)).V) :
+    c.extension nu v = 0 := by
+  classical
+  have hT2supp := typeII_T2_member_support hG hSmax hSII data hlam_mem hnu_mem
+  have hT2one := typeII_T2_apply_one_eq data hlam_mem hnu_mem hdeg
+  have hlamT2 : lam ∈ ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥S ℂ)) :=
+    Set.mem_insert _ _
+  have hνT2 : nu ∈ ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥S ℂ)) :=
+    Set.mem_insert_of_mem _ (Set.mem_insert_of_mem _ (Set.mem_insert _ _))
+  -- `ν − λ` is `A(S)`-supported (equal degrees) and lies in `ℤ[T2]`
+  have hnulamsupp : ((nu - lam : ClassFunction ↥S ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)) S :=
+    diff_support_subset_of_support_subset_union_one (hT2supp nu hνT2) (hT2supp lam hlamT2)
+      (by rw [hT2one nu hνT2, hT2one lam hlamT2])
+  have hz1span : (nu - lam) ∈ OddOrder.Peterfalvi.S07.zSupportedSpan
+      ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥S ℂ))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)
+          ∪ conjClassSetIn S (typePV S data.typeP)) S) :=
+    ⟨Submodule.sub_mem _ (Submodule.subset_span hνT2) (Submodule.subset_span hlamT2),
+      hnulamsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono Set.subset_union_left)⟩
+  -- `τ₂(ν − λ) = τ_S(ν − λ)` vanishes at `v` (base-point anchor)
+  have hagree := c.extends_on_supported _ hz1span
+  have hτv := typeII_tau_apply_eq_zero_of_mem_ticVdiffV hG hSmax hSII data.typeP hnulamsupp hv
+  have hdiffv : c.extension (nu - lam) v = 0 := by rw [hagree]; exact hτv
+  have hlamv := typeII_T2_extension_lam_apply_eq_zero_of_mem_V hG hSmax hSII data
+    hlam_mem hlam_irr hnu_mem hdeg c hv
+  have hexp : c.extension (nu - lam) v = c.extension nu v - c.extension lam v := by
+    rw [map_sub]
+    rfl
+  rw [hexp, hlamv, sub_zero] at hdiffv
+  exact hdiffv
 
 end ColumnPin
 

@@ -470,6 +470,62 @@ zeta1-trick で τ₂ν|_V = 0) → step 3 (S05 endgame + dichotomy 整形)。
 その後: τ₂λ|_V = 0 ((5.5) singleton + key-brick + glue) → zeta1-trick (λ1·ν − ν1·λ の
 smul-diff support helper 1 本) → τ₂ν|_V = 0 → S05 endgame。
 
+**進捗³**: ~~(3.2.e) glue~~ **DONE (7b02ae31)**: `ticyclic_full_map_eq_induce` (σ=Ind on
+CF(W,V)、TI-counting) + `ticyclic_apply_eq_zero_of_forall_inner_chiFam` (Coq
+ortho_cycTIiso_vanish — repo に無かった (3.2.e) gap を S05-generic に閉じた。upstream hoist
+候補)。**残 = 純組立**: (a) τ₂λ|_V = 0 — (5.5) singleton (τ₂λ = α ∈ R(λ)) + 156e3906
+(α ⊥ 全 ω) + glue (⚠ glue の仮定は ∀pq の chiFam-form — ω→chiFam は
+certainTypeOmegaSigma_eq_chiFam、**全 pq への到達** = (χ₂',i) ↦ pq の全射が要 —
+omegaProdEquiv.symm 全射 ✓ × omegaProdCharTic の (χ₂,i)-range = 全 Ŵ の確認 1 lemma,
+S05 `omegaProdEquiv_symm_omegaProdChar` + w1CharEquiv/ticW₂-transport 全射で)。
+(b) zeta1 = λ1•ν − ν1•λ: supported (smul-diff helper) → τ₂zeta1 = τ_S zeta1 (extends) →
+V-値 0 (landed anchor) → λ1·τ₂ν(v) = ν1·τ₂λ(v) = 0 → τ₂ν|_V = 0 (λ1 ≠ 0)。
+(c) S05 endgame 適用 (update¹⁰ の 3-5) → typeII_nu_tau2_dichotomy。
+
+**進捗⁴ (741109f0)**: ~~(a) τ₂λ|_V = 0~~ ~~(b) τ₂ν|_V = 0~~ **step 2 完全 DONE**。
+発見 2 点: (i) `inner_smul_chiFam_...` は既に ∀pq-chiFam 形 → **全射 lemma 不要**
+(156e3906 を chiFam-primary に refactor)。(ii) **λ, ν 等次数ゆえ scaled zeta1 不要** —
+ν − λ が直接 A(S)-supported で anchor が効く。⚠ λ-in-identifier 3 度目 (hλv 等) —
+**識別子には lam/nu を使う** (λ は予約語、ν は可だが混在回避)。
+**残 = step 3 (最終 assembly) のみ**: `typeII_nu_tau2_dichotomy` =
+S05 `eq_smul_chiFam_column_of_vanishOnV` ((ticVdiff h46) rfl (ticVdiffFullDadeApplication…)) を
+X := c.extension (columnSum χ₂) に適用。入力チェックリスト:
+- hψV ✓ (741109f0 の nu-side、typePV↔ticVdiff.V defeq)
+- σ-coeff 2 列支持 + {0,δ}/{0,−δ}: (5.5) E-形 (c6d4b780) から。τ₂ν = Σ_{α∈E}α、
+  E ⊆ certainTypeRImage の像 → sigmaCoeff pq = ⟨Σ E, chiFam pq⟩ = Σ_{α∈E}⟨α, chiFam pq⟩ —
+  各 α = ±δ_j ω_{χ₂/χ₂⁻¹, i} = ±δ_j chiFam P_i (certainTypeOmegaSigma_eq_chiFam) +
+  chiFam 直交性 ((ticVdiff).chiFam_spec .2.2.1) → coeff = ±δ_j·[P ∈ E-index]。
+  2 列条件の jcol/kcol := omegaProdEquiv.symm (omegaProdCharTic h χ₂/χ₂⁻¹ i).2 —
+  **q-成分の i-独立性 lemma がここで必要** (omegaProdCharTic の分解、
+  S05 omegaProdEquiv_symm_omegaProdChar + tic_W₂-transport; sigmaCoeff_psi_eq (S06:515) の
+  pattern 参照)。row-条件 hk/hj: ∀p 形 — p ∉ P-image の行は coeff 0 (支持)。
+- hδ = (columnFamily χ₂).sign (sign_eq) / hXnorm ✓ (extension_inner_eq + mu_sum_inner) /
+- hParseval: ⟨X,X⟩ = w₁ = |E| = Σ_pq |coeff|² (coeff = ±δ on E-indices、0 else;
+  E-index 単射 = certainTypeRImage_injective + omegaProdEquiv_symm_omegaProdCharTic_ne)。
+- 結論整形: chiFam-form → certainTypeOmegaSigma 逆翻訳 (eq_chiFam.symm) で
+  τ₂ν = δ·Σ_i ω_{χ₂,i} ∨ τ₂ν = −δ·Σ_i ω_{χ₂⁻¹,i}。
+
+**進捗⁵ — q-成分 lemma の実装設計確定 (API 発見済、次 iteration で実装)**:
+`omegaProdCharTic h χ₂ i := (sdiffTICyclicHypothesis.omegaProdChar (h.w1CharEquiv i) χ₂).comp
+(ticWEquivSdiffW h)` (S06_CertainTypeIsometry:125、クリーンな合成形)。成分 lemma:
+- **(L1) snd の i-独立性**: `(ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂ i) |>.2`
+  は i に依らない。証明: `omegaProdEquiv_symm_eq` (S05_SigmaIsometry:133、
+  symm ξ = (ξ|_{W₁}, ξ|_{W₂})) で .2 = restriction; MonoidHom.ext w (w ∈ tic-W₂-of-W);
+  値 = omegaProdChar (w1CharEquiv i) χ₂ (e w) — e w の sdiff-W₂ 帰属
+  (`coe_ticWEquivSdiffW` S06:112 + tic_W2 = W2.map subtype) → `wFst_eq_one_of_mem_W2` で
+  W₁-因子 = 1 → 値 = χ₂(wSnd (e w)) i-free ✓。
+- **(L1') fst の χ₂-独立性**: 対称 (wSnd_eq_one_of_mem_W1、値 = w1CharEquiv i (wFst…))。
+- **(L2) 列単射 (snd)**: χ₂ ≠ χ₂' → snd 成分相異。
+  `omegaProdEquiv_symm_omegaProdCharTic_ne` (S06:既存、pair-ne) + (L1') fst 一致 → snd 相異 ✓。
+⚠ ticVdiff h の W₁/W₂ は h.tic の fields (ticVdiff は tic の W-系を再利用) — subgroupOf の
+基準が (ticVdiff h).W = h.tic.W で一致することを確認しつつ書く。
+endgame 適用の残り組立は本 note 直上のチェックリスト通り
+(E-Finset → T := 添字 preimage、coeff 計算 = sigmaCoeff_psi_eq (S06:515) の
+chiFam_spec .2.2.1 pattern、hδ = (columnFamily χ₂).sign + sign_eq)。
+その後 = obligation 2(b) (S↔M grid transpose、0098 item 1 → 9000 claim) + obligation 3
+((8.18.b) disjointness) — dichotomy が landed すれば `exists_typeIICrossIsometryData` の
+残 gap はこの 2 つ。
+
 ### 2026-07-10 update⁹ — ★★ typeII_T2_coherent LANDED (408e9650) — obligation 1 完成
 
 **T2 = {λ,λ̄,ν,ν̄} の (5.7) coherence が sorry-free/axiom-clean で閉じた** (τ₂ の存在 =
