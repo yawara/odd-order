@@ -625,3 +625,32 @@ WLOG entry (`Hypothesis.exists_seeded_pair_conj_typeII`) + setup 組立
 instantiate + 新 producer 接続 (hζ1/hμd は (10.2)/(10.3) canonical 構成から供給) +
 package.elim → IsFrobeniusGroup (derivedInG mp.S) → conj 転送
 (maxNilpotentNormalHall equivariance + complement flexibility) → 旧 gate deprecate。
+
+## 2026-07-10 (c) 前半 LANDED (a239c479): pair member 上の (10.7) 完全証明
+
+`typeII_HU_frobenius_of_coherent_at_pair` — **axiom-clean [propext, Classical.choice,
+Quot.sound]**。旧 aux の dichotomy assembly を honest producer で mirror
+(hleft = exists_typeIICrossIsometryData_at_pair + elim; hz1/hμd は
+exists_charParameters_full から)。§9 dichotomy/counts/例外 (9.10) は全て sorry-free
+上流と実証確認。**Peterfalvi (10.7) が pair member 上で完全に閉じた。**
+
+### (c) 後半の設計 (次 iteration、部品全て存在確認済)
+一般 type-II (S, data) → 結論 IsFrobenius (derivedInG S) (data.typeP.H) (data.typeP.U):
+1. WLOG: `exists_seeded_pair_conj_typeII` → mp, g, conj g • S = mp.S。
+2. **Hall 調整**: conj g • data.typeP.W1 と mp.K は共に mp.S の κ-Hall (cyclic) →
+   Hall-C 共役で n ∈ mp.S、u := n·g として conj u • data.typeP.W1 = mp.K。
+3. **data forward-conj**: data₃ := data.typeP.conj (MulAut.conj u) : TypePData mp.S
+   (TypePData.conj = 全 field 移送済既存資産; H₃ = conj u • H、U₃ = conj u • U、
+   H_eq は maxNilpotentNormalHall_pointwise_smul で再確立済 @ MaximalSubgroupTypeConj:469)。
+   hSW1 : data₃.W1 = mp.K ✓ (2 の調整)。hSW2 : data₃.W2 = mp.Kstar — **S-side W₂ 強制
+   lemma が必要** (T-side 版 section16_partner_typePData_W2_eq の mirror:
+   TypePData mp.S with W1 = mp.K → W2 = mp.Kstar; centralizer_W1 + pair の
+   Kstar-側 field で導出)。
+4. setup₃ := ⟨mp.S_maximal, data₃, nontrivial-transfer, Or.inl (section16_S_isTypeII)⟩。
+5. at_pair → IsFrobenius (derivedInG mp.S) (H₃-sub) (U₃-sub)。
+6. **transport back は自明化**: H₃/U₃ = conj u • (元の H/U) なので
+   `IsFrobeniusGroup.mapEquiv` (FrobeniusGroupQuotient:104) を conj u⁻¹-制限 iso
+   ↥(derivedInG mp.S) ≃* ↥(derivedInG S) に適用 → H/U がそのまま戻る
+   (U-complement flexibility 不要!)。carrier 橋 = map_subgroupOf_eq_of_le ×2 +
+   subtype-comp (S15 CountingLayer exists_typePData_U_eq_V の precedent)。
+7. 新 aux を typeII_HU_frobenius_of_coherent に配線 → 旧 gate deprecate。
