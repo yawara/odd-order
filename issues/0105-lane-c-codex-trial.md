@@ -69,3 +69,7 @@ trial の裁定 (codex 継続 or Claude へ swap-back) が本 issue に記録さ
   (commit message は "prove" と主張)。gate が transitive sorryAx 依存を検出 → abort + 差し戻し
   (詳細 = 3004 ⛔ 節)。**開示規律の違反であり数学の欠陥ではない**点に注意 — dup なし・逸脱なし・
   S05 engine cite は正しい。トレンド: genuine landing 3/4、churn 0、規律違反 1 (開示形式)。
+- 2026-07-10 (手動 tick、a/b 合流 1651cfca/4ff26f59): **c は保留 (ユーザー指示: codex が起動し
+  きれていない)**。c の未マージ = b68e14ae 系 3 commits のまま新 commit なし (差し戻し未対応は
+  起動未完了ゆえ評価対象外)。次 tick 以降: c に新 commit が出たら通常 range-check + 3004 ⛔ の
+  差し戻し条件 (AxiomsCheck 追従 or sorry-free 回復 + self-flag) を確認して合流判定。
