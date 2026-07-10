@@ -556,7 +556,7 @@ which `T = M` and `Kstar = W₁` **literally** — no conjugation re-basing of t
 machinery.  The labelling is forced (no relabel case split): `M` is not `P₂`, so the
 duality disjunction pins `P₂` (hence type II, hence the *smaller* κ-Hall,
 `isTypeP2_of_typeP_kappaHall_lt` contrapositive) onto the partner side. -/
-theorem exists_section16MaximalPair_data_around [Finite G]
+theorem exists_section16MaximalPairCore_data_around [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M W1 : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (hP : OddOrder.BG.Ch4.S14.IsTypeP M)
     (hnotP2 : ¬ OddOrder.BG.Ch4.S14.IsTypeP2 M)
@@ -574,7 +574,7 @@ theorem exists_section16MaximalPair_data_around [Finite G]
       OddOrder.BG.Ch4.S14.IsTypeP S ∧
       ¬ OddOrder.BG.Ch4.S14.IsConjugateSubgroup S M ∧
       K = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (W1 : Set G) ∧
-      IsCyclic ↥(K ⊔ W1) ∧ Nat.card ↥K < Nat.card ↥W1 := by
+      IsCyclic ↥(K ⊔ W1) := by
   classical
   -- the type dictionaries (mirroring `exists_section16MaximalPair_data`)
   have notTypeI_imp_typeP : ∀ N : Subgroup G, N ∈ maximalSubgroups G →
@@ -610,15 +610,9 @@ theorem exists_section16MaximalPair_data_around [Finite G]
   have hSne : Mstar ≠ M := by
     rintro rfl
     exact hMnconjMs (OddOrder.BG.Ch4.S14.IsConjugateSubgroup.refl Mstar)
-  -- `|K| < |W₁|`: the two κ-Hall orders differ, and `|W₁| < |K|` would make `M` type `P₂`
-  have hne := OddOrder.BG.Ch4.S14.card_kappaHall_ne_card_Kstar hP hW1M hW1hall hKdef
-  have hlt : Nat.card ↥K < Nat.card ↥W1 := by
-    rcases lt_or_gt_of_ne hne with hlt' | hgt
-    · exact absurd (isTypeP2_of_typeP_kappaHall_lt hG hM hP hW1M hW1hall hKdef hlt') hnotP2
-    · exact hgt
   refine ⟨Mstar, K, hMsMem, hSne, typeP_imp_nonI Mstar hMsMem hMsP,
     typeP_imp_nonI M hM hP, hMsII, ?_, hKleMs, hKhall, hW1eq, hMsP,
-    fun h => hMnconjMs h.symm, hKdef, ?_, hlt⟩
+    fun h => hMnconjMs h.symm, hKdef, ?_⟩
   · -- the covering, with the partner slot first
     intro N hN
     by_cases hNI : IsTypeI N
@@ -627,6 +621,80 @@ theorem exists_section16MaximalPair_data_around [Finite G]
       · exact Or.inr (Or.inr hNM)
       · exact Or.inr (Or.inl hNMs)
   · rw [sup_comm]; exact hcyc
+
+/-- **The `M`-seeded canonical-pair data, κ-ordered form**: `exists_section16MaximalPairCore_data_around`
+together with the (13.2.a)-deep ordering `|K| < |W₁|` (`isTypeP2_of_typeP_kappaHall_lt`
+contrapositive).  ⚠ This ordering routes through (10.10) ← (10.8); order-free consumers — the
+(10.7)/(10.8) chain — must use the `Core` form (issue 1020 Phase 1a). -/
+theorem exists_section16MaximalPair_data_around [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M W1 : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : OddOrder.BG.Ch4.S14.IsTypeP M)
+    (hnotP2 : ¬ OddOrder.BG.Ch4.S14.IsTypeP2 M)
+    (hW1M : W1 ≤ M)
+    (hW1hall : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M)
+      (W1.subgroupOf M)) :
+    ∃ S K : Subgroup G,
+      S ∈ maximalSubgroups G ∧ S ≠ M ∧
+      IsTypeNonI S ∧ IsTypeNonI M ∧ IsTypeII S ∧
+      (∀ N : Subgroup G, N ∈ maximalSubgroups G →
+        IsTypeI N ∨ (∃ g : G, MulAut.conj g • N = S) ∨ (∃ g : G, MulAut.conj g • N = M)) ∧
+      K ≤ S ∧
+      OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa S) (K.subgroupOf S) ∧
+      W1 = OddOrder.BG.Ch3.S10.Msigma S ⊓ Subgroup.centralizer (K : Set G) ∧
+      OddOrder.BG.Ch4.S14.IsTypeP S ∧
+      ¬ OddOrder.BG.Ch4.S14.IsConjugateSubgroup S M ∧
+      K = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (W1 : Set G) ∧
+      IsCyclic ↥(K ⊔ W1) ∧ Nat.card ↥K < Nat.card ↥W1 := by
+  obtain ⟨S, K, hSmax, hSne, hSnonI, hMnonI, hSII, hcov, hKleS, hKhall, hW1eq, hSP,
+    hSnconj, hKdef, hcyc⟩ :=
+    exists_section16MaximalPairCore_data_around hG hM hP hnotP2 hW1M hW1hall
+  have hne := OddOrder.BG.Ch4.S14.card_kappaHall_ne_card_Kstar hP hW1M hW1hall hKdef
+  have hlt : Nat.card ↥K < Nat.card ↥W1 := by
+    rcases lt_or_gt_of_ne hne with hlt' | hgt
+    · exact absurd (isTypeP2_of_typeP_kappaHall_lt hG hM hP hW1M hW1hall hKdef hlt') hnotP2
+    · exact hgt
+  exact ⟨S, K, hSmax, hSne, hSnonI, hMnonI, hSII, hcov, hKleS, hKhall, hW1eq, hSP,
+    hSnconj, hKdef, hcyc, hlt⟩
+
+/-- **The `M`-seeded canonical pair, order-free `Core` form** (issue 1020 Phase 1a): a
+`Section16MaximalPairCore` with `T = M` and `Kstar = W₁` literally, produced without any
+(13.2.a)/`K_lt_Kstar` content — the pair the de-tainted (10.7)/(10.8) chain runs on. -/
+theorem exists_section16MaximalPairCore_around [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M W1 : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : OddOrder.BG.Ch4.S14.IsTypeP M)
+    (hnotP2 : ¬ OddOrder.BG.Ch4.S14.IsTypeP2 M)
+    (hW1M : W1 ≤ M)
+    (hW1hall : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M)
+      (W1.subgroupOf M)) :
+    ∃ mp : Section16MaximalPairCore G, mp.T = M ∧ mp.Kstar = W1 := by
+  classical
+  obtain ⟨S, K, hSmax, hSneM, hSnonI, hMnonI, hSII, hcov, hKleS, hKhall, hW1eq, hSP,
+    hSnconj, hKdef, hcyc⟩ :=
+    exists_section16MaximalPairCore_data_around hG hM hP hnotP2 hW1M hW1hall
+  exact ⟨{ S := S
+           T := M
+           K := K
+           Kstar := W1
+           S_maximal := hSmax
+           T_maximal := hM
+           S_ne_T := hSneM
+           S_nonI := hSnonI
+           T_nonI := hMnonI
+           one_typeII := Or.inl hSII
+           theorem88_caseB := hcov
+           K_le_S := hKleS
+           K_hall := hKhall
+           Kstar_eq := hW1eq
+           S_typeP := hSP
+           T_typeP := hP
+           S_T_not_conj := hSnconj
+           Kstar_le_T := hW1M
+           Kstar_hall := hW1hall
+           K_eq := hKdef
+           Z_cyclic := hcyc
+           S_typeP2 :=
+             (OddOrder.BG.Ch4.S16.proposition_type_classification hG hSmax).2.1.mp hSII },
+    rfl, rfl⟩
 
 /-- **The `M`-seeded canonical pair** (packaging of
 `exists_section16MaximalPair_data_around`): a `Section16MaximalPair` whose `T`-member is
