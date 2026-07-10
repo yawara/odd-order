@@ -1031,6 +1031,130 @@ theorem not_isTypeP2_of_isTypeIII_or_IV_or_V [Finite G]
     · exact (hdV.mp hV).1
   exact hP2.2 hP1.2
 
+/-- **The `M`-seeded canonical-pair data** (the pair-witness route of (10.7), issue 9079):
+for a type-`P` non-`P₂` maximal `M` and a κ-Hall factor `W₁ ≤ M` (in practice
+`hyp.typeP.W1`, `typePData_W1_isHallSubgroup_kappa`), BG `typeP_duality` **seeded at
+`(M, W₁)`** produces the canonical partner `S` with the full Section16MaximalPair data in
+which `T = M` and `Kstar = W₁` **literally** — no conjugation re-basing of the §10
+machinery.  The labelling is forced (no relabel case split): `M` is not `P₂`, so the
+duality disjunction pins `P₂` (hence type II, hence the *smaller* κ-Hall,
+`isTypeP2_of_typeP_kappaHall_lt` contrapositive) onto the partner side. -/
+theorem exists_section16MaximalPair_data_around [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M W1 : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : OddOrder.BG.Ch4.S14.IsTypeP M)
+    (hnotP2 : ¬ OddOrder.BG.Ch4.S14.IsTypeP2 M)
+    (hW1M : W1 ≤ M)
+    (hW1hall : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M)
+      (W1.subgroupOf M)) :
+    ∃ S K : Subgroup G,
+      S ∈ maximalSubgroups G ∧ S ≠ M ∧
+      IsTypeNonI S ∧ IsTypeNonI M ∧ IsTypeII S ∧
+      (∀ N : Subgroup G, N ∈ maximalSubgroups G →
+        IsTypeI N ∨ (∃ g : G, MulAut.conj g • N = S) ∨ (∃ g : G, MulAut.conj g • N = M)) ∧
+      K ≤ S ∧
+      OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa S) (K.subgroupOf S) ∧
+      W1 = OddOrder.BG.Ch3.S10.Msigma S ⊓ Subgroup.centralizer (K : Set G) ∧
+      OddOrder.BG.Ch4.S14.IsTypeP S ∧
+      ¬ OddOrder.BG.Ch4.S14.IsConjugateSubgroup S M ∧
+      K = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (W1 : Set G) ∧
+      IsCyclic ↥(K ⊔ W1) ∧ Nat.card ↥K < Nat.card ↥W1 := by
+  classical
+  -- the type dictionaries (mirroring `exists_section16MaximalPair_data`)
+  have notTypeI_imp_typeP : ∀ N : Subgroup G, N ∈ maximalSubgroups G →
+      ¬ IsTypeI N → OddOrder.BG.Ch4.S14.IsTypeP N := by
+    intro N hN hnotI
+    have hiff := (OddOrder.BG.Ch4.S16.proposition_type_classification hG hN).1
+    have hnotF : ¬ OddOrder.BG.Ch4.S14.IsTypeF N := fun hF => hnotI (hiff.mpr hF)
+    rw [OddOrder.BG.Ch4.S14.IsTypeP, Set.nonempty_iff_ne_empty]
+    exact fun he => hnotF he
+  have typeP_imp_nonI : ∀ N : Subgroup G, N ∈ maximalSubgroups G →
+      OddOrder.BG.Ch4.S14.IsTypeP N → IsTypeNonI N := by
+    intro N hN hPN
+    obtain ⟨_, hbII, hcIII_IV, hdV, _, _⟩ :=
+      OddOrder.BG.Ch4.S16.proposition_type_classification hG hN
+    by_cases hk : OddOrder.BG.Ch4.S14.kappa N = OddOrder.BG.Ch4.S14.sigmaComplementPrimes N
+    · have hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 N := ⟨hPN, hk⟩
+      by_cases hMF : OddOrder.BG.Ch4.S15.MF N = OddOrder.BG.Ch3.S10.Msigma N
+      · exact Or.inr (Or.inr (Or.inr (hdV.mpr ⟨hP1, hMF⟩)))
+      · rcases hcIII_IV.mpr ⟨hP1, hMF⟩ with hIII | hIV
+        · exact Or.inr (Or.inl hIII)
+        · exact Or.inr (Or.inr (Or.inl hIV))
+    · exact Or.inl (hbII.mpr ⟨hPN, hk⟩)
+  -- the partner via `typeP_duality`, seeded at `(M, W₁)`
+  set K : Subgroup G :=
+    OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (W1 : Set G) with hKdef
+  obtain ⟨-, -, Mstar, ⟨hMsMem, hMsP, hMnconjMs, ⟨hKleMs, hKhall, hW1eq⟩,
+      hcyc, -, hP2disj, hcover⟩, -⟩ :=
+    OddOrder.BG.Ch4.S14.typeP_duality hG hM hP hW1M hW1hall hKdef
+  -- the labelling is forced: `M` is not `P₂`, so the partner is
+  have hP2Ms : OddOrder.BG.Ch4.S14.IsTypeP2 Mstar := hP2disj.resolve_left hnotP2
+  have hMsII : IsTypeII Mstar :=
+    (OddOrder.BG.Ch4.S16.proposition_type_classification hG hMsMem).2.1.mpr hP2Ms
+  have hSne : Mstar ≠ M := by
+    rintro rfl
+    exact hMnconjMs (OddOrder.BG.Ch4.S14.IsConjugateSubgroup.refl Mstar)
+  -- `|K| < |W₁|`: the two κ-Hall orders differ, and `|W₁| < |K|` would make `M` type `P₂`
+  have hne := OddOrder.BG.Ch4.S14.card_kappaHall_ne_card_Kstar hP hW1M hW1hall hKdef
+  have hlt : Nat.card ↥K < Nat.card ↥W1 := by
+    rcases lt_or_gt_of_ne hne with hlt' | hgt
+    · exact absurd (isTypeP2_of_typeP_kappaHall_lt hG hM hP hW1M hW1hall hKdef hlt') hnotP2
+    · exact hgt
+  refine ⟨Mstar, K, hMsMem, hSne, typeP_imp_nonI Mstar hMsMem hMsP,
+    typeP_imp_nonI M hM hP, hMsII, ?_, hKleMs, hKhall, hW1eq, hMsP,
+    fun h => hMnconjMs h.symm, hKdef, ?_, hlt⟩
+  · -- the covering, with the partner slot first
+    intro N hN
+    by_cases hNI : IsTypeI N
+    · exact Or.inl hNI
+    · rcases hcover N hN (notTypeI_imp_typeP N hN hNI) with hNM | hNMs
+      · exact Or.inr (Or.inr hNM)
+      · exact Or.inr (Or.inl hNMs)
+  · rw [sup_comm]; exact hcyc
+
+/-- **The `M`-seeded canonical pair** (packaging of
+`exists_section16MaximalPair_data_around`): a `Section16MaximalPair` whose `T`-member is
+the given `M` and whose dual κ-Hall factor is the given `W₁`.  This is the pair the (10.7)
+pair-witness route runs on: the §10 machinery of `M` plugs into the pair lemmas with
+`dataT := hyp.typeP` and `hTW1 : hyp.typeP.W1 = mp.Kstar` along the returned equations
+(`typePData_W1_isHallSubgroup_kappa` supplies the Hall seed). -/
+theorem exists_section16MaximalPair_around [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M W1 : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : OddOrder.BG.Ch4.S14.IsTypeP M)
+    (hnotP2 : ¬ OddOrder.BG.Ch4.S14.IsTypeP2 M)
+    (hW1M : W1 ≤ M)
+    (hW1hall : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M)
+      (W1.subgroupOf M)) :
+    ∃ mp : Section16MaximalPair G, mp.T = M ∧ mp.Kstar = W1 := by
+  classical
+  obtain ⟨S, K, hSmax, hSneM, hSnonI, hMnonI, hSII, hcov, hKleS, hKhall, hW1eq, hSP,
+    hSnconj, hKdef, hcyc, hlt⟩ :=
+    exists_section16MaximalPair_data_around hG hM hP hnotP2 hW1M hW1hall
+  exact ⟨{ S := S
+           T := M
+           K := K
+           Kstar := W1
+           S_maximal := hSmax
+           T_maximal := hM
+           S_ne_T := hSneM
+           S_nonI := hSnonI
+           T_nonI := hMnonI
+           one_typeII := Or.inl hSII
+           theorem88_caseB := hcov
+           K_le_S := hKleS
+           K_hall := hKhall
+           Kstar_eq := hW1eq
+           S_typeP := hSP
+           T_typeP := hP
+           S_T_not_conj := hSnconj
+           Kstar_le_T := hW1M
+           Kstar_hall := hW1hall
+           K_eq := hKdef
+           Z_cyclic := hcyc
+           K_lt_Kstar := hlt
+           S_typeP2 :=
+             (OddOrder.BG.Ch4.S16.proposition_type_classification hG hSmax).2.1.mp hSII },
+    rfl, rfl⟩
+
 /- The `M`-side conversion: an aligned-grid row is a full `chiFam` fiber (issue 9079 item 4) -/
 
 open scoped Classical FiniteInduce in

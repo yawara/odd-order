@@ -62,3 +62,10 @@ trial の裁定 (codex 継続 or Claude へ swap-back) が本 issue に記録さ
 - notes/meta/merge_monitor.md — レーン表 + 🤖 lane c codex ブロック + ⚰ lane d 退役ブロック (2026-07-07)
 - issues/4001 / 4004 / 9013 / 9077 (c frontier)、issues/closed/9006・9007 (旧 lane d の genuine 実績)
 - commits: 8ff313b1 (S-side Dade landing = mirror source) / 97a528e0 (§14.6 frobPU)
+
+- 2026-07-10 (tick #12): **初のネガティブシグナル — merge abort 1 件**。c の b68e14ae
+  ((14.11.2) M-side signed η expansion 実証明、sorry 3 本純減) は数学的には有望だが、sorry-free
+  assert 済み 4 宣言を sorried 依存へ再配線した際に **AxiomsCheck 追従なし・self-flag なし**
+  (commit message は "prove" と主張)。gate が transitive sorryAx 依存を検出 → abort + 差し戻し
+  (詳細 = 3004 ⛔ 節)。**開示規律の違反であり数学の欠陥ではない**点に注意 — dup なし・逸脱なし・
+  S05 engine cite は正しい。トレンド: genuine landing 3/4、churn 0、規律違反 1 (開示形式)。
