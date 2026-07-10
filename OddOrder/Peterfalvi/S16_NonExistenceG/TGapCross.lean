@@ -95,6 +95,53 @@ theorem tSideDadeMap_eq_full_typeP1DadeMap_of_support [Finite G]
   exact full.dade.dadeMap_restrict_apply hA1A0 hA1norm
     ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφsupp⟩
 
+open scoped Classical in
+/-- **Peterfalvi (13.2.e), exact T-side Dade=induction bridge.**
+
+Once the full type-`P₁` `A₀(T)` Dade datum has trivial point stabilizers—the
+Lean form of Coq's `normedTI 'A0(T) G T` conclusion—the (2.5) uniqueness theorem
+identifies its Dade map with `Ind_T^G`.  Composing with
+`tSideDadeMap_eq_full_typeP1DadeMap_of_support` gives the (14.9) map
+`τ_T φ = Ind_T^G φ` for every `A₁(T)`-supported `φ`.
+
+The only non-formal input is `hH`; no normed-TI content is hidden in this theorem. -/
+theorem tSideDadeMap_eq_induce_of_full_typeP1_H_eq_bot [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    [Fintype ↥hyp.base.T] [Invertible (Nat.card ↥hyp.base.T : ℂ)]
+    (dataT : OddOrder.GroupTheory.TypePData hyp.base.T)
+    (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T)
+    (hH : ∀ a,
+      ((OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_typePA0_of_isTypeP1
+        hG hyp.base.T_maximal dataT hP1).some.dade.H a) = ⊥)
+    {φ : ClassFunction ↥hyp.base.T ℂ}
+    (hφsupp : φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T) :
+    tSideDadeMap hyp hG φ = ClassFunction.induce hyp.base.T φ := by
+  classical
+  let full := (OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_typePA0_of_isTypeP1
+    hG hyp.base.T_maximal dataT hP1).some
+  have hPA : OddOrder.GroupTheory.typePA hyp.base.T dataT =
+      OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T :=
+    OddOrder.Peterfalvi.S10.typePA_eq_sigmaSharp_of_isTypeP1
+      hG hyp.base.T_maximal dataT hP1
+  have hA1A0 : OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T ⊆
+      OddOrder.GroupTheory.typePA0 hyp.base.T dataT := by
+    rw [← hPA]
+    exact Set.subset_union_left
+  have hfullSupp : φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (OddOrder.GroupTheory.typePA0 hyp.base.T dataT) hyp.base.T :=
+    hφsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono hA1A0)
+  rw [tSideDadeMap_eq_full_typeP1DadeMap_of_support hG hyp dataT hP1 hφsupp,
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support full.dade
+      (full.dade.fullDadeIsometryData full.hconj) hfullSupp]
+  have hind := OddOrder.Peterfalvi.S14.isDadeMap_induce_of_forall_H_eq_bot full.dade
+    (by simpa only [full] using hH)
+  have heq := OddOrder.Peterfalvi.S04.IsDadeMap.unique
+    (full.dade.isDadeMap_dadeMap (k := ℂ)) hind
+  exact congrFun heq ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hfullSupp⟩
+
 /-- The inner product of two virtual characters is symmetric: its value is
 an integer, hence fixed by complex conjugation. -/
 theorem inner_eq_swap_of_mem_ZIrr [Fintype G]
