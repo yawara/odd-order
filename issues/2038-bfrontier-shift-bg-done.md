@@ -626,3 +626,37 @@ coh.extension 線形化 + ζ₀ := chi0 で組む)。
 **最終**: witness_value_norm_package の sorry を全 conjunct 供給で置換
 (mval/h_psig_int = counterexample_psi_int_*、normRhoM = A₁-chiRhoCF norm、normRho = 上記、
 hA = counterexample_chiRhoA1_normSq_ge、hB/hC = 本プラン)。
+
+## ✅✅✅ COMPLETE (2026-07-10 続⁸、lane-b 再開) — **witness_value_norm_package 完全 proven、(12.16) norm contract 完結** (S14 on-path ungated sorry = 0)
+
+続⁷ の hB/hC 配線プランを完遂 (4 commits: d223ed1a split / bb86103c hB / c1bfe83f hC-prep / 3fb0aec7 hC+fill)。
+full build **4140 jobs green + AxiomsCheck OK**。S14 実 sorry 6→**4** (残 = sibleyTarget_frobI off-path /
+typeIIIorIV S13-gated / P₂-crux 2 のみ = **ungated on-path 0**)。
+
+1. **分割 (d223ed1a)**: DadeContradiction 2075 行 → 3 leaf: `DadeContradiction` (1416、(12.13)-(12.15) 部品) /
+   **`NormPackage`** (新、import RhoMEvaluation — CounterexampleDadeData/witness_value_norm_package/
+   exists_counterexample_dade_data/counterexample_contradiction/pi_empty/typeI_frobenius/typeIA_eq_sharp) /
+   **`TypeICovering`** (新、(12.17)+theorem88)。witness_value_norm_package が ρM 機構 (RhoMEvaluation) を
+   cite できる位置に移動 — これが分割の必然理由 (import 方向)。
+2. **hB (bb86103c)**: `witness_dade_psi_rho_norm_ge` — witness_L_zeta_bound の (hyp,coh,dade)-parametric 版。
+   鍵 = placed family を **dade.chi に anchor** (exists_placed_induced_family χdist:=dade.chi) →
+   ζ₀ = Ind(θ0) = dade.chi → zetaNuRhoNormSqGeOfDade の bound が ‖chiRhoCF dade.psi‖² に直接着地
+   (kernelOrder/complementIndex は rfl、zetaNuRhoNormSq は show+rw[h0,←hψeq] 1 発 — whnf-wall 無し)。
+3. **hC prep (c1bfe83f)**: `ftThickenedSupport_mono` / `dadeSupport_restrict_subset_ftThickenedSupport`
+   (restrict datum の §4 support ⊆ Ã(A₁)) / `A1_eq_sharpSubgroup_H` / `hypothesis71SharpKernel_dadeSupport_subset`。
+   hypothesis71SharpKernel の hsub/hnorm を top-level (`sharpSubgroup_H_conj_mem`) に抽出 (unification 用)。
+   **ψ(1)≠0 は新規不要**: 既存 `one_le_normSq_apply_one_of_mem_ZIrr_of_inner_self_one` (InducedIrreducible、
+   (13.10) Parseval 用に既設) が丁度 — ZIrrFourier に書いた draft は重複で破棄 (claim-before-build の教訓)。
+4. **hC + fill (3fb0aec7)**: `witness_dade_psi_rhoM_rho_normSq_lt_one` — (7.3) 両側 (L=toHypothesis71 /
+   M=hypothesis71SharpKernel+restricted isometry) + **(8.18.c) mixed disjointness はどちらの枝でも十分**
+   (witness は A(L)=A₁(L) ゆえ swap 枝も A1_eq+mono で落ちる、続⁷ の鍵発見どおり) + 1∉support ×2 +
+   ‖ψ‖²=1 (coh isometry + Frobenius induced) + ‖ψ(1)‖²≥1 で strict。witness_value_norm_package は
+   7 conjunct 全供給 (h_const=psi_constant_on_xK / mval=counterexample_psi_int_* / h2e / hidx /
+   hA=counterexample_chiRhoA1_normSq_ge / hB / hC、chi0-bundle は witness_dade_psi_apply_x_eq_chi パターン)。
+
+**⟹ (12.16) counterexample_contradiction / (12.7) pi_empty / typeI_frobenius が own-proof sorry-free 化**
+(transitive residual は既知の witness-chain/D(4)/(12.2.a) producer 系のみ)。
+
+**次の b-frontier (上流優先+文書順)**: S14 on-path ungated 枯渇 → issues/3004 HUB RULING の b 宛 work item 2 件
+(裁定 2 = S15_SAndT `TypeIOrthogonalityGridData` の (13.19) 忠実 restate [betaL_eta_independent 除去] /
+裁定 3 = V-side `exists_M_structural`/`complement_inf_P_structure` の (13.17.c)-dual 二分岐 weaken) へ。
