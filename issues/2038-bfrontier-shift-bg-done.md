@@ -501,3 +501,45 @@ cross-family の constituent 次数 d₁=d₂ は自動でない ((1.7.c): d = |
 N 側 (12.4) `orthogonal_character_constant_on_coset` + cross-orth ψ ⊥ R_N)。
 要新設 infra: Frobenius 性の conj transport (witness_L_not_conj_M の Msigma_conj_smul 同型)。
 その後 step 3 (K−K′ constancy 合成、(12.5) M 版が今回できたので配線可能) → 4 (h_psig_int) → 5 (hA)。
+
+## ✅ (2026-07-10 続⁴、lane-b /loop) — (12.15) step 2-3 の下部構造 3 commits (ebbca083 / 51fc5484)
+
+1. **(12.5)-M chain の非 Frobenius 一般化** (ebbca083): hAH 等式 (A(L)=H^#、Frobenius 専用) を
+   (hsub : H^# ⊆ A(M)) + (h1A : 1 ∉ A(M)) に置換 — 供給補題 `sharpSubgroup_H_subset_typeIA` /
+   `one_notMem_typeIA` (MaximalSubgroupType def-site、additive)。
+   **合成 lemma `psi_constant_on_kernel_sub_derived_ofData`** (PairCoherence 末尾、clean axioms):
+   ψ constant on H−H′ ← (12.5)-M + claim-1 evaluation (仮説 `heval` にパラメータ化) +
+   `mem_commutator_subgroupOf_iff` bridge。
+2. **claim-1 前提 2 本** (51fc5484、MinimalCounterexample):
+   `counterexample_not_frobenius_MF` ((8.13.c4) furthermore の反駁形 — escape 構造の IsTypeP2 枝を殺す) /
+   `witness_L_not_conj_of_kernel_centralizer_ne_bot` ((12.15) N≁L step、element-level 転送)。
+
+**残 = claim-1 組立** (`counterexample_chiRho_apply_eq_on_K_sharp`、次 iteration の主タスク)。設計確定済:
+```
+∀ g ∈ ctr.K, g ≠ 1 → hypM.toHypothesis71.chiRho ψ ⟨g, K≤M⟩ = ψ g
+```
+via `chiRho_apply_eq_of_forall_coset hypM.toHypothesis71 ψ hgA hcoset` (L-side
+`witness_chiRho_apply_eq_of_forall_K` のパターン、DadeContradiction:381-396 mirror):
+- hgA : g ∈ typeIA M = `sharpSubgroup_H_subset_typeIA` + hHK (hypM.H=K)。
+- hcoset : ∀ y ∈ H(g)=ftSupportKernel、ψ(g·y)=ψ(g)。branch `hypM.dadeData.H_eq_ftSupportKernel`:
+  - non-escaping: `ftSupportKernel_eq_bot_of_not_escaping` → y=1 trivial。
+  - escaping: g ∈ sigmaSharp M (K=Msigma via MF_eq_Msigma + g≠1)、
+    `exists_RData_escape_structure hG ctr.M_maximal hx hesc` → N conjuncts:
+    (i) FT_signalizerBase g = N pin: `maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape`
+        → 𝓜(C_G(g))={N₀}、escape-N ∈ 𝓜 → N=N₀; base = choose ∈ {N₀}
+        (witness_ftSupportKernel_le_K:363-367 パターン) → ftSupportKernel g = Msigma N ⊓ C_G(g) = R。
+    (ii) N type F (P2 枝は counterexample_not_frobenius_MF で殺す — D(4) の furthermore package が
+        M-Frobenius-over-Msigma を出すので直接矛盾)。
+    (iii) hypN := exists_typeI_hypothesis hG hNmax (isTypeI_of_isTypeF ... — N typeF → IsTypeI N の
+        変換 lemma 要確認、issue 2038 続³ で言及の `isTypeI_of_isTypeF`)。
+    (iv) g ∈ N (C_G(g)∋g≤N)、g ∉ N_F: escape 構造の `x ∈ ASet N ⊤ \ Msigma N` conjunct +
+        maxNilpotentNormalHall N = Msigma N (`maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2`)。
+    (v) C_{N_F}(g) ≠ ⊥: R ≠ ⊥ conjunct (Msigma N ⊓ C ≠ ⊥) + 同上の =。
+    (vi) N ≁ L: `witness_L_not_conj_of_kernel_centralizer_ne_bot` (iv)(v) を食わせる。
+    (vii) N-side (12.4): `orthogonal_character_constant_on_coset hG hypN data_N horth_N hgN hgNF`
+        (data_N = `character_decomposition_and_dade_domain`、horth_N =
+        `coherent_extension_constituent_orthogonal_Rset_of_nonconjugate` w/ (vi)、
+        psi_constant_on_xK:214-230 の M→N 置換 mirror) → ψ constant on g·N_F ⊇ g·R ✓。
+- 注: chiRho vs chiRhoCF の apply bridge (`chiRhoCF` = CF-bundle) — witness 側の対応箇所を mirror。
+最後に h_psig_int 配線: hconst := psi_constant_on_kernel_sub_derived_ofData (heval := claim-1) →
+`rhoM_integer_values`。その後 hA/hC (norm 側、(7.3)+(8.17))。
