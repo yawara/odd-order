@@ -1481,3 +1481,26 @@ honestTypeP2A0Set 移設がそのまま効いた。A0S field は vestigial (∅ 
 3. V-value pin は support 完了後に同型 (certainType_diff_dade_apply_eq_of_mem_V at hyp46Smp +
    η/ω^σ 同定)。
 次 iter: 1 (pin 修正、機械的) → 2 の hdeg unit 設計。
+
+## ⚠→✅ (2026-07-11、lane-b /loop iter 43 続) — field threading は sorryAx 混入で revert (1b12b8cf)
+
+**incident**: c2400d81 (field 3 層 + producer) は leaf build green だったが **AxiomsCheck で red** —
+`section16CharacterData_of_isMinimalSimpleOdd` (従来 sorry-free の spine producer) に sorryAx が
+推移混入。原因 = producer discharge が muS_diff_support → hyp46Smp → **dade0
+(dadeSupportHypothesisData_honestTypeP2A0Set = deep FT-support pin `not_isConj_honestTypeP2ASet_typePV`
+sorried) を term として運ぶ**ため — engine の証明がその field を使うかに関係なく axioms に入る。
+[[scaffold-sorry-free-not-done]] の HOLD (従来 sorry-free spine への sorry 混入禁止) に抵触 → revert。
+**手順ミス 2 点も記録**: (1) `lake build | tail` は pipe で exit status が隠れ、`&&` chain が
+red のまま commit を通した — [[lean-build-discipline]]「build 検証と commit は別 bash」違反の実害。
+(2) full build を commit 前でなく後に回した。以後: build は単独 bash + `${PIPESTATUS[0]}` 確認。
+
+**fix-forward 計画 (次 iter)**:
+1. **(4.7) 依存精査**: `chiRestrict_apply_eq_zero_of_not_mem_union` (z∈K case の鍵) が
+   CertainTypeHypothesis の **dade field を証明で使うか** grep/精読。
+   - 使わない (A_covers/構造のみ) → **Dade-free engine variant** を S06 に additive 追加
+     (Hypothesis + tic + tic_W1/W2/V + A_covers 系のみ取る) → muS_diff_support を variant 経由に
+     → producer sorry-free 維持で field 再 landing (c2400d81 の re-apply + engine 切替)。
+   - 使う → sorryAx routing は本質的 (honest sorried-cite)。その場合の選択: (a) AxiomsCheck の
+     当該 assert を sorryAx-許容形に更新 (spine producer の性質変化を明示 docstring 化)、
+     (b) field discharge を producer でなく別層に移す設計再考。(a) は HOLD との整合を hub に
+     9000-issue で確認してから (unsound でないが「sorry-free spine への混入」の解釈事項)。
