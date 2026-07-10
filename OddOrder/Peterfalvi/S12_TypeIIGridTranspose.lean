@@ -792,6 +792,33 @@ theorem section16_pair_tic_W_eq [Finite G]
     hSW1, hSW2, section16_partner_typePData_W_eq hG dataT hTW1]
 
 open scoped FiniteInduce in
+/-- **The canonical pair swaps the first factor**: the `S`-side `W₁` is the `T`-side `W₂`
+(both are the κ-Hall `mp.K` — Peterfalvi (8.8), the role swap of the pair). -/
+theorem section16_pair_tic_W1_eq_W2 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPair G}
+    (tp : Section16TypePStructure mp) (hodd : Odd (Nat.card G))
+    (dataT : TypePData mp.T) (hTW1 : dataT.W1 = mp.Kstar) :
+    (typePData_toTICyclicHypothesis tp.Sdata hodd).W1
+      = (typePData_toTICyclicHypothesis dataT hodd).W2 := by
+  have hSW1 : tp.Sdata.W1 = mp.K :=
+    tp.Sdata_W1_eq.trans (tp.W1_eq_K_and_W2_eq_Kstar hG).1
+  have hTW2 : dataT.W2 = mp.K := section16_partner_typePData_W2_eq hG dataT hTW1
+  rw [typePData_toTICyclicHypothesis_W1, typePData_toTICyclicHypothesis_W2, hSW1, hTW2]
+
+open scoped FiniteInduce in
+/-- **The canonical pair swaps the second factor**: the `S`-side `W₂` is the `T`-side `W₁`
+(both are the dual κ-Hall `mp.Kstar`). -/
+theorem section16_pair_tic_W2_eq_W1 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPair G}
+    (tp : Section16TypePStructure mp) (hodd : Odd (Nat.card G))
+    (dataT : TypePData mp.T) (hTW1 : dataT.W1 = mp.Kstar) :
+    (typePData_toTICyclicHypothesis tp.Sdata hodd).W2
+      = (typePData_toTICyclicHypothesis dataT hodd).W1 := by
+  have hSW2 : tp.Sdata.W2 = mp.Kstar :=
+    tp.Sdata_W2_eq.trans (tp.W1_eq_K_and_W2_eq_Kstar hG).2
+  rw [typePData_toTICyclicHypothesis_W2, typePData_toTICyclicHypothesis_W1, hSW2, hTW1]
+
+open scoped FiniteInduce in
 /-- **The canonical pair shares its TI-set `V`** (Peterfalvi (8.8) for the §10 → §5
 bridges): the `S`-side reconciled datum `tp.Sdata` and a `W₁`-reconciled `T`-side datum
 give `TICyclicHypothesis`s with the *same* `V = W ∖ (K ∪ K*)` — the `W`-blocks agree up to
@@ -802,16 +829,11 @@ theorem section16_pair_tic_V_eq [Finite G]
     (tp : Section16TypePStructure mp) (hodd : Odd (Nat.card G))
     (dataT : TypePData mp.T) (hTW1 : dataT.W1 = mp.Kstar) :
     (typePData_toTICyclicHypothesis tp.Sdata hodd).V
-      = (typePData_toTICyclicHypothesis dataT hodd).V := by
-  have hSW1 : tp.Sdata.W1 = mp.K :=
-    tp.Sdata_W1_eq.trans (tp.W1_eq_K_and_W2_eq_Kstar hG).1
-  have hSW2 : tp.Sdata.W2 = mp.Kstar :=
-    tp.Sdata_W2_eq.trans (tp.W1_eq_K_and_W2_eq_Kstar hG).2
-  have hTW2 : dataT.W2 = mp.K := section16_partner_typePData_W2_eq hG dataT hTW1
-  refine ticyclic_V_eq_of_swap _ _ rfl rfl
-    (section16_pair_tic_W_eq hG tp hodd dataT hTW1) ?_ ?_
-  · rw [typePData_toTICyclicHypothesis_W1, typePData_toTICyclicHypothesis_W2, hSW1, hTW2]
-  · rw [typePData_toTICyclicHypothesis_W2, typePData_toTICyclicHypothesis_W1, hSW2, hTW1]
+      = (typePData_toTICyclicHypothesis dataT hodd).V :=
+  ticyclic_V_eq_of_swap _ _ rfl rfl
+    (section16_pair_tic_W_eq hG tp hodd dataT hTW1)
+    (section16_pair_tic_W1_eq_W2 hG tp hodd dataT hTW1)
+    (section16_pair_tic_W2_eq_W1 hG tp hodd dataT hTW1)
 
 open scoped FiniteInduce in
 /-- **The canonical pair's Dade maps agree on `CF(W, V)`** (Peterfalvi (2.5) uniqueness for
@@ -903,6 +925,38 @@ theorem section16_pair_sigma_omega_eq [Finite G]
   ticyclic_sigma_omega_eq_of_V_eq _ _ rfl rfl
     (section16_pair_tic_V_eq hG tp hodd dataT hTW1)
     (section16_pair_tic_W_eq hG tp hodd dataT hTW1) appS appT ξ
+
+open scoped Classical FiniteInduce in
+/-- **The (5.8) column sum of the `S`-side grid is a row sum of the `T`-side grid**
+(issue 9079 item 4 at the canonical pair): the full `S`-grid column at `kcol` — the shape
+of the dichotomy `typeII_nu_tau2_dichotomy` (whose `ticVdiff` setup *is* the `S`-side
+bridge, `ticVdiff_typeIIHypothesis46_eq`) — equals the full `T`-grid row at the transported
+index.  Pair instance of `ticyclic_chiFam_columnSum_transpose` over the shared `V`/`W` and
+the role swap. -/
+theorem section16_pair_chiFam_columnSum_transpose [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPair G}
+    (tp : Section16TypePStructure mp) (hodd : Odd (Nat.card G))
+    (dataT : TypePData mp.T) (hTW1 : dataT.W1 = mp.Kstar)
+    (appS : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication (G := G)
+      (typePData_toTICyclicHypothesis tp.Sdata hodd))
+    (appT : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication (G := G)
+      (typePData_toTICyclicHypothesis dataT hodd))
+    (kcol : ((typePData_toTICyclicHypothesis tp.Sdata hodd).W2.subgroupOf
+      (typePData_toTICyclicHypothesis tp.Sdata hodd).W) →* ℂˣ) :
+    ∑ p : ((typePData_toTICyclicHypothesis tp.Sdata hodd).W1.subgroupOf
+        (typePData_toTICyclicHypothesis tp.Sdata hodd).W) →* ℂˣ,
+      (typePData_toTICyclicHypothesis tp.Sdata hodd).chiFam rfl appS (p, kcol)
+      = ∑ q : ((typePData_toTICyclicHypothesis dataT hodd).W2.subgroupOf
+          (typePData_toTICyclicHypothesis dataT hodd).W) →* ℂˣ,
+        (typePData_toTICyclicHypothesis dataT hodd).chiFam rfl appT
+          (kcol.comp (subgroupOfTransport
+            (section16_pair_tic_W_eq hG tp hodd dataT hTW1).ge
+            (section16_pair_tic_W2_eq_W1 hG tp hodd dataT hTW1).ge), q) :=
+  ticyclic_chiFam_columnSum_transpose _ _ rfl rfl
+    (section16_pair_tic_V_eq hG tp hodd dataT hTW1)
+    (section16_pair_tic_W_eq hG tp hodd dataT hTW1)
+    (section16_pair_tic_W1_eq_W2 hG tp hodd dataT hTW1)
+    (section16_pair_tic_W2_eq_W1 hG tp hodd dataT hTW1) appS appT kcol
 
 /- The type-II → canonical-partner reduction (Coq `Frob_der1_type2` head, issue 9079 item 3) -/
 
