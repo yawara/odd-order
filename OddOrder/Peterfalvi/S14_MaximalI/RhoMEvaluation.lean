@@ -197,6 +197,31 @@ theorem counterexample_chiRho_eval_of_mem_K_sharp [Finite G]
   rw [← hypM.dadeData.H_eq_ftSupportKernel ⟨g, hgA⟩]
   exact hy
 
+/-- Conjugation by `M` preserves the sharp kernel `H_M^# = K^#` (the kernel is `subgroupOf`-normal
+and conjugation fixes `≠ 1`) — the `L_normalizes_A` input of the `A₁(M)`-restricted Dade datum. -/
+theorem sharpSubgroup_H_conj_mem [Finite G]
+    {ctr : CounterexampleHypothesis (G := G)} (hypM : Hypothesis ctr.M) :
+    ∀ (l : ↥ctr.M) ⦃a : G⦄, a ∈ sharpSubgroup hypM.typeI.typeF.H →
+      (l : G) * a * (l : G)⁻¹ ∈ sharpSubgroup hypM.typeI.typeF.H := by
+  intro l a ha
+  haveI hnormal : ((hypM.typeI.typeF.H).subgroupOf ctr.M).Normal := by
+    rw [hypM.typeI.typeF.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal ctr.M
+  have haH : a ∈ hypM.typeI.typeF.H := ha.1
+  have haM : a ∈ ctr.M := hypM.typeI.typeF.H_le haH
+  refine ⟨?_, ?_⟩
+  · -- conjugation stays in the normal `H`
+    have hmem := hnormal.conj_mem ⟨a, haM⟩ (Subgroup.mem_subgroupOf.mpr haH) l
+    have hcoe := Subgroup.mem_subgroupOf.mp hmem
+    simpa using hcoe
+  · -- conjugation preserves `≠ 1`
+    intro h1
+    refine ha.2 ?_
+    rw [Set.mem_singleton_iff] at h1 ⊢
+    calc a = (l : G)⁻¹ * ((l : G) * a * (l : G)⁻¹) * (l : G) := by group
+      _ = (l : G)⁻¹ * 1 * (l : G) := by rw [h1]
+      _ = 1 := by group
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **The (12.15) `ρ_M`-machinery over `A₁(M) = K^#`** — the (7.1) data with `M` and `A₁(M)`
 in place of `L` and `A`, exactly as Peterfalvi defines `ρ_M`.  Built by restricting the
@@ -208,34 +233,15 @@ noncomputable def hypothesis71SharpKernel [Finite G]
     {ctr : CounterexampleHypothesis (G := G)} (hypM : Hypothesis ctr.M) :
     OddOrder.Peterfalvi.S09.Hypothesis71 G
       (sharpSubgroup hypM.typeI.typeF.H) ctr.M :=
-  have hsub : sharpSubgroup hypM.typeI.typeF.H ⊆
-      OddOrder.GroupTheory.typeIA ctr.M hypM.typeI :=
-    sharpSubgroup_H_subset_typeIA hypM.typeI
-  have hnorm : ∀ (l : ↥ctr.M) ⦃a : G⦄, a ∈ sharpSubgroup hypM.typeI.typeF.H →
-      (l : G) * a * (l : G)⁻¹ ∈ sharpSubgroup hypM.typeI.typeF.H := by
-    intro l a ha
-    haveI hnormal : ((hypM.typeI.typeF.H).subgroupOf ctr.M).Normal := by
-      rw [hypM.typeI.typeF.H_eq]
-      exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal ctr.M
-    have haH : a ∈ hypM.typeI.typeF.H := ha.1
-    have haM : a ∈ ctr.M := hypM.typeI.typeF.H_le haH
-    refine ⟨?_, ?_⟩
-    · -- conjugation stays in the normal `H`
-      have hmem := hnormal.conj_mem ⟨a, haM⟩ (Subgroup.mem_subgroupOf.mpr haH) l
-      have hcoe := Subgroup.mem_subgroupOf.mp hmem
-      simpa using hcoe
-    · -- conjugation preserves `≠ 1`
-      intro h1
-      refine ha.2 ?_
-      rw [Set.mem_singleton_iff] at h1 ⊢
-      calc a = (l : G)⁻¹ * ((l : G) * a * (l : G)⁻¹) * (l : G) := by group
-        _ = (l : G)⁻¹ * 1 * (l : G) := by rw [h1]
-        _ = 1 := by group
-  { hyp := hypM.dadeData.dade.restrict hsub hnorm
-    τ := ((hypM.dadeData.dade.fullDadeIsometryData hypM.hconj).restrict hsub hnorm).toDadeMap
-    isDadeMap := ((hypM.dadeData.dade.fullDadeIsometryData hypM.hconj).restrict hsub
-      hnorm).toDadeIsometryData.isDadeMap
-    hConjInvariant := hypM.hconj.restrict hsub hnorm }
+  { hyp := hypM.dadeData.dade.restrict (sharpSubgroup_H_subset_typeIA hypM.typeI)
+      (sharpSubgroup_H_conj_mem hypM)
+    τ := ((hypM.dadeData.dade.fullDadeIsometryData hypM.hconj).restrict
+      (sharpSubgroup_H_subset_typeIA hypM.typeI) (sharpSubgroup_H_conj_mem hypM)).toDadeMap
+    isDadeMap := ((hypM.dadeData.dade.fullDadeIsometryData hypM.hconj).restrict
+      (sharpSubgroup_H_subset_typeIA hypM.typeI)
+      (sharpSubgroup_H_conj_mem hypM)).toDadeIsometryData.isDadeMap
+    hConjInvariant := hypM.hconj.restrict (sharpSubgroup_H_subset_typeIA hypM.typeI)
+      (sharpSubgroup_H_conj_mem hypM) }
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.15), first claim, `A₁(M)`-form**: the `A₁(M) = K^#`-based `ρ_M`
@@ -451,5 +457,66 @@ theorem counterexample_psi_int_on_K_sub_Kprime [Finite G]
     g hgK hgK'
 
 
+/-! ### (7.3)/(8.17) support geometry for the `hC` estimate
+
+The (12.16) `hC` bound `‖ψ^{ρM}‖² + ‖ψ^ρ‖² < 1` integrates the two (7.3) upper bounds over
+the *disjoint* thickened supports `Ã₁(M)` and `Ã(L)` ((8.17)/(8.18.c)).  These lemmas pin the
+§4 Dade supports of the two `Hypothesis71` data to the §10 faithful thickened supports:
+the `L`-side is `dadeSupport_eq_ftThickenedSupport` (already a `DadeSupportHypothesisData`
+lemma), the `M`-side restricted datum needs the ⊆ direction below. -/
+
+/-- **Monotonicity of the faithful thickened support** in the base set: `A₁ ⊆ A₂` implies
+`Ã(M, A₁) ⊆ Ã(M, A₂)` — the per-point kernels agree (`ftSupportKernel_restrict`), so each
+thickened coset over `A₁` is a thickened coset over `A₂`. -/
+theorem ftThickenedSupport_mono {M : Subgroup G} {A₁ A₂ : Set G} (h : A₁ ⊆ A₂) :
+    OddOrder.Peterfalvi.S10.ftThickenedSupport M A₁ ⊆
+      OddOrder.Peterfalvi.S10.ftThickenedSupport M A₂ := by
+  rintro g ⟨x, hx, hg⟩
+  refine ⟨x, h hx, ?_⟩
+  rwa [OddOrder.Peterfalvi.S10.ftSupportKernel_restrict h hx] at hg
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The restricted faithful Dade support lands in the restricted thickened support**: for a
+faithful (8.15) datum on `A` and an `M`-stable `A₁ ⊆ A`, the §4 Dade support of the restricted
+datum is contained in `Ã(M, A₁)`.  The restriction keeps the per-point kernels
+(`S04.Hypothesis.restrict` / `ftSupportKernel_restrict`), so each support point is a conjugate
+of a thickened `A₁`-coset.  (The `⊆` direction of `dadeSupport_eq_ftThickenedSupport` for the
+restricted datum — all the `hC` integration needs.) -/
+theorem dadeSupport_restrict_subset_ftThickenedSupport [Finite G] {M : Subgroup G}
+    {A A₁ : Set G} (d : OddOrder.Peterfalvi.S10.DadeSupportHypothesisData M A)
+    (hA₁A : A₁ ⊆ A)
+    (hA₁norm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁) :
+    (d.dade.restrict hA₁A hA₁norm).dadeSupport ⊆
+      OddOrder.Peterfalvi.S10.ftThickenedSupport M A₁ := by
+  intro g hg
+  obtain ⟨a, h, hh, hconj⟩ := (d.dade.restrict hA₁A hA₁norm).mem_dadeSupport_iff.mp hg
+  obtain ⟨c, hc⟩ := isConj_iff.mp hconj
+  refine ⟨a.1, a.2, ?_⟩
+  rw [OddOrder.GroupTheory.mem_conjClassSet]
+  refine ⟨a.1 * h, ⟨h, ?_, rfl⟩, c, hc⟩
+  rw [SetLike.mem_coe, OddOrder.Peterfalvi.S10.ftSupportKernel_restrict hA₁A a.2,
+    ← d.H_eq_ftSupportKernel ⟨a.1, hA₁A a.2⟩]
+  exact hh
+
+/-- **`A₁(M) = H_M^#` for a (12.1) Hypothesis**: the Peterfalvi (8.10) `A₁`-set of a type-I
+maximal is the sharp kernel `H^#` (`H = M_F = mainSubgroup`), via the `H_eq` identification. -/
+theorem A1_eq_sharpSubgroup_H {M : Subgroup G} (hyp : Hypothesis M) :
+    A1 M PeterfalviType.I = sharpSubgroup hyp.typeI.typeF.H := by
+  show sharpSubgroup (mainSubgroup M PeterfalviType.I) = _
+  rw [show mainSubgroup M PeterfalviType.I = maxNilpotentNormalHall M from rfl,
+    hyp.typeI.typeF.H_eq]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The `A₁(M)`-based `ρ_M` datum's Dade support lands in `Ã₁(M)`** — the
+`hypothesis71SharpKernel` specialization of `dadeSupport_restrict_subset_ftThickenedSupport`,
+in the `A1`-set shape that the (8.18.c) mixed disjointness
+(`nonconjugate_thickened_mixed_disjoint_or_swap`) speaks. -/
+theorem hypothesis71SharpKernel_dadeSupport_subset [Finite G]
+    {ctr : CounterexampleHypothesis (G := G)} (hypM : Hypothesis ctr.M) :
+    (hypothesis71SharpKernel hypM).hyp.dadeSupport ⊆
+      OddOrder.Peterfalvi.S10.ftThickenedSupport ctr.M (A1 ctr.M PeterfalviType.I) := by
+  rw [A1_eq_sharpSubgroup_H hypM]
+  exact dadeSupport_restrict_subset_ftThickenedSupport hypM.dadeData
+    (sharpSubgroup_H_subset_typeIA hypM.typeI) (sharpSubgroup_H_conj_mem hypM)
 
 end OddOrder.Peterfalvi.S14
