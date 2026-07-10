@@ -519,6 +519,10 @@ X := c.extension (columnSum χ₂) に適用。入力チェックリスト:
   `omegaProdEquiv_symm_omegaProdCharTic_ne` (S06:既存、pair-ne) + (L1') fst 一致 → snd 相異 ✓。
 ⚠ ticVdiff h の W₁/W₂ は h.tic の fields (ticVdiff は tic の W-系を再利用) — subgroupOf の
 基準が (ticVdiff h).W = h.tic.W で一致することを確認しつつ書く。
+**進捗⁶ (df0cc78a)**: ~~L1/L1'/L2~~ **DONE** (+ 橋像帰属 helper 2 本、Hypothesis46-generic)。
+⚠ (ticVdiff h).W ≡ h.tic.W の型 spelling 差 → **erw** 必須。
+**残 = endgame 適用本体 1 本** (`typeII_nu_tau2_dichotomy`): kcol/jcol := 成分 (L1 で
+well-defined)、σ-coeff 計算、S05 endgame 呼び出し、逆翻訳。
 endgame 適用の残り組立は本 note 直上のチェックリスト通り
 (E-Finset → T := 添字 preimage、coeff 計算 = sigmaCoeff_psi_eq (S06:515) の
 chiFam_spec .2.2.1 pattern、hδ = (columnFamily χ₂).sign + sign_eq)。
