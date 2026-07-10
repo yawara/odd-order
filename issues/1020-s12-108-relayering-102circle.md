@@ -157,3 +157,13 @@ W-分解 / V-order / 支持制限 (Ã₀∩cop ⊆ Ã) / Nat-count bound / ℚ �
   (capstone chain の discharge 位置を pair-leaf 下流へ)。
 - 順序確定: **Phase 1a → v2 (S12_Noncoherence) → (10.10)-v2 → FTS (13.2.a)-trio
   relayer + S15/S16 repoint (hub 調整) → (11.3)/(11.8) 側 migration**。
+
+## 2026-07-11 tick¹¹ — Phase 1a 前半完了 (切断点 landed)
+
+- **Section16MaximalPairCore split** (0e5a0bb1): K_lt_Kstar を extends 層へ、
+  下流 (pair leaves / S15 / S16 / FeitThompson) 全て無変更 green。
+- **exists_section16MaximalPairCore_around axiom-clean 実測** — M-seeded pair が
+  (13.2.a) なしで構成可能に。消費面測定: pair chain の mp-投影は全て Core fields
+  (K_lt_Kstar 投影ゼロ、tp 使用は around 系のみ)。
+- 残: chain retarget (seeded/reconcile/at_pair/(10.7)' の binder を Core へ +
+  isCyclic_K/Kstar Core 版) → (10.7)' taint 再測 → v2 組立へ。
