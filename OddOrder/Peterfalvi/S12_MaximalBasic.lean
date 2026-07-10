@@ -617,6 +617,39 @@ theorem Hypothesis.mem_restricted_dadeSupport_of_coprime [Finite G] {M : Subgrou
     have hpw1 : p ∣ hyp.w1 := hpw
     exact hp.ne_one (Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hpg hpw1))
 
+/-- **The pair κ-Hall dual is `W₂`**: `M_σ ⊓ C_G(W₁) = W₂` for type-`P` data.  This is the
+identification `K = W₂(M)` of the `M`-seeded maximal pair (`mp.K_eq` has exactly this LHS with
+`mp.Kstar = W₁` literal), the pair-linkage input of the (10.8) partner supply (issue 1020).
+
+`⊇`: `W₂ ≤ H = M_F ≤ M_σ` (`maxNilpotentNormalHall_le_Msigma`) and `W₂` centralises `W₁`
+(both sit in the commutative `W`).  `⊆`: `M_σ ≤ M′` (`Msigma_le_derived`), and
+`M′ ⊓ C_G(w) = W₂` for a nonidentity `w ∈ W₁` (`centralizer_W1`). -/
+theorem typePData_Msigma_inf_centralizer_W1_eq_W2 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (data : TypePData M) :
+    OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (data.W1 : Set G) = data.W2 := by
+  have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
+  have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
+  apply le_antisymm
+  · -- `⊆`: pass through `M′ ⊓ C_G(w) = W₂` at a nonidentity `w ∈ W₁`
+    obtain ⟨w, hwW1, hwne⟩ :=
+      (data.W1.bot_or_exists_ne_one).resolve_left data.W1_nontrivial
+    rintro x ⟨hxσ, hxc⟩
+    rw [← data.centralizer_W1 w hwW1 hwne]
+    refine ⟨OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM hxσ, ?_⟩
+    exact Subgroup.centralizer_le (by simpa using hwW1) hxc
+  · -- `⊇`: `W₂ ≤ M_σ` via `H = M_F`, and `W₂` centralises `W₁` inside the commutative `W`
+    refine le_inf ?_ ?_
+    · refine le_trans ?_ (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hM)
+      exact data.H_eq ▸ (data.W2_le.trans (inf_le_left.trans le_rfl))
+    · intro x hx
+      rw [Subgroup.mem_centralizer_iff]
+      intro w hw
+      haveI := data.W_cyclic
+      letI : CommGroup ↥data.W := IsCyclic.commGroup
+      have := mul_comm (⟨w, hW1le hw⟩ : ↥data.W) ⟨x, hW2le hx⟩
+      exact Subtype.ext_iff.mp this
+
 /-- **The `(S_F#)^G` union bound of the (10.8) TI-counting** (p. 60 line 91, `≤`-form): the
 conjugacy saturation of the kernel sharp-set of a type-`P` maximal `S` has at most
 `(|S_F| − 1)·[G : S]` elements.  `S` stabilises `H# = H ∖ {1}` under conjugation (`H ⊴ S`), so
