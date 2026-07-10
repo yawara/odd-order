@@ -972,3 +972,22 @@ A := {w | w ∉ W₂-sub} (W abelian → conj-inv 自明)、mu := mu2Grid 族 (o
 **残る供給 = hInd**: Ind_W^S(ω-diff) = Σ⟨diff,·⟩•(δ·μ) — σ (3.2 cyclicTIiso) の
 「A₁-supported diff で σ = Ind」性質 (TICyclicHypothesis の σ↔Ind agreement API、
 sigma_apply 系 or dadeIntegralCharacterMap 系) を次 iter で精査 → instantiation。
+
+## 📋 (2026-07-11、lane-b /loop iter 20) — prTIirr_id への最終帰着: σ↔Ind の W∖W₂-拡張一致 1 点
+
+**構造発見 (instantiation の簡約)**: cross-level (1.3.b) の mu 族を **σ(ω_χ) 族** (= δ·mu2Grid、
+`sigma_omega_eq_mu2GridSign_smul_mu2Grid`) に取ると:
+- orthonormality: ⟨σω,σω'⟩ = δδ'⟨μ,μ'⟩ = Kronecker ✓ (σ isometry + sign²=1)
+- ⟨Φ_j, ω_k⟩ = [k=χ]−[k=sndPart χ] (ω orthonormal) → hInd ⟺ **Ind(Φ_j) = σ(Φ_j)**
+- 結論 = Res(σ(ω_χ)) = ω_χ on W∖W₂ = **prTIirr_id の σ-form** (mu2Grid 形へ sign 1 発)
+**∴ 残 gap は 1 点**: 「Ind(ω_χ − ω_{sndPart χ}) = σ(ω_χ − ω_{sndPart χ})」(W∖W₂-supported diff
+での σ↔Ind agreement — 既存 `sigma_eq_tau` (3.2.a) は V-supported 限定)。
+**その証明に必要なもの**: ‖Ind diff‖² = ‖diff‖² (= 2) — **Ind の W∖W₂-isometry** =
+Coq `normedTI_prTIset : normedTI (W∖W₂) S W` (prime-TI 文脈仮定、cycTI の V-TI より強い) 由来
+(`normedTI_isometry`)。TICyclicHypothesis は V-conj 条件のみ field 化 — W∖W₂-TI は
+(a) TICyclicHypothesis 新 field (carrier enrichment、既存 producer 追従要)、
+(b) 定理の仮説パラメータ (prime-TI 消費側 [S = type-P₂ maximal] が (8.x)/(13.x) 幾何から供給)、
+の選択。**(b) が軽い** — prTIirr_id 対応を「hTI : W∖W₂ TI-条件 (S-conj が W-normalizer 経由のみ)」
+仮説付き lemma として PrimeTIResidue に置き、S-side 供給は別途。ただし ‖Ind diff‖² = 2 の導出
+(TI → induction norm) 自体も port 要 (Coq normedTI_isometry / Isaacs 系 — repo の
+`IsTISubset`/`normedTI` 対応 [G2 で触った isTISubset_honestTypeP2ASet 系] を次 iter で確認)。
