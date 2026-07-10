@@ -436,3 +436,18 @@ pair lemmas 7 本を (dataS, hSW1 : dataS.W1 = mp.K, hSW2 : dataS.W2 = mp.Kstar)
 5. delta' := ±(columnFamily χ₂).sign、pm := .sign_eq (neg 枝は ∓)
 註: tau2 := c.extension は既に IntegralCharacterMap (packaging 不要)。
 gate 全 fields 組立 (obligation-3 sorried) は row-pin 後、gate file 側で。
+
+### ★★ R2 row-pin LANDED (31856bed) — nu_tau2_eq 消費形が完全閉鎖
+`Hypothesis.exists_nu_extension_eq_alignedRow_at_pair` — **完全 axiom-clean (sorryAx なし)**。
+(9.8)分類 → (5.8)dichotomy → pair transpose → fiber sweep の全 chain。
+技術 crumbs: hT は subst (M 自由変数、cast ゼロ) / kcol は明示項渡し (metavar+defeq
+同時解決は unifier 放棄) / 負枝符号 = Int.cast_neg。
+**⚠ leaf 1492 行 — 次の追加前に prefix-split 必須** (GenericBridge 節 (~85-614、凍結) を
+新 upstream leaf (例 S12_TicyclicSigmaBridge) へ、transpose leaf が import。module 名
+不変で下流無変更)。
+**残 (9079 tail)**: (a) leaf 分割 → (b) gate-package assembly (TypeIICrossIsometryData
+at pair — nu_tau2_eq/tau2 (= c.extension)/r'/delta' は row-pin で実、obligation-3 の
+4 fields (lam_ortho_grid/zeta_ortho_grid/zeta_lam_ortho/cross_zero) は sorried-cite
+skeleton) → (c) aux WLOG 差し替え + Frobenius 結論 conj 転送 (obligation 3 と並行)。
+接続部品は全て landed: hSW1/hSW2 := hdata ▸ (tp.Sdata_W1_eq.trans
+(tp.W1_eq_K_and_W2_eq_Kstar hG).1) 等 (Subgroup-level、依存なし)。
