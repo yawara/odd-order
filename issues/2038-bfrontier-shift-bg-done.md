@@ -900,3 +900,75 @@ Frobenius-reciprocity + 基底展開で self-contained に証明可能な見込�
 prTIirr_id 対応 (`mu2Grid_apply_eq_of_mem_W_sub_W2`) を mu2Grid API に追加。
 これが (13.18)/(13.19) cluster の真の最上流 — 9014 continuation として次 session/iter で
 equiv_restrict_compl_ortho port から着手。
+
+## 📋 (2026-07-10 続²⁰、lane-b /loop iter 14) — 依存鎖の底 = Peterfalvi (1.3.a)/(1.3.b) 未 port 確定
+
+- **equiv_restrict_compl(_ortho) = Peterfalvi (1.3.a)/(1.3.b)** (Coq PFsection1:87/123 — §1 の
+  一般原理、mathcomp 本体でない)。repo S03_PreliminaryCharacter の (1.3) 部は
+  `inductionCoefficient` API + `IsInductionExpansion` predicate のみで**本体定理は未 port**
+  (docstring 自認: 「numerical Frobenius-reciprocity theorem remains routed to the
+  InducedCharacter proof core」)。
+- **(1.3.a) statement**: H ≤ G、A ⊴ H、Φ basis of CF(H,A)、μ ∈ CF(G):
+  `{on A, μ = Σ d_i·χ_i} ↔ ∀j, Σ_i ⟨Φ_j,χ_i⟩·d_i^* = ⟨Ind Φ_j, μ⟩`。
+  証明部品: D := Res μ − Σd_i χ_i の CF(H,H∖A)-membership ⟺ 内積条件
+  (Frobenius reciprocity + **CF(H) = CF(H,A) ⊕ CF(H,H∖A) 直交補分解** [cfun_complement/
+  cfdot_complement — repo 対応要確認] + 基底展開)。
+- **(1.3.b)**: + mu_ orthonormal + `Ind Φ_j = Σ⟨Φ_j,χ_i⟩·mu_i` → ∀i {on A, mu_i = χ_i} ∧
+  (⊥全mu → A 上 0)。(a) の 2 instantiation。
+- **port 配置**: S03 系新 leaf (例 `S03_RestrictComplement.lean`、§1=S03 文書順で最上流) or
+  RepresentationTheory shared leaf。mathlib Basis over supportedSubmodule + repo の
+  inner_induce_eq_inner_restrict で self-contained。
+- **依存鎖 (確定、深→浅)**: (1.3.b) port → normedTI(W∖W₂) 供給 → prTIirr_id 対応
+  (mu2Grid W∖W₂-値) → residueS transport → S15 grounding fields → mu_row0_ne/pins →
+  B(i)(iii) → PVSbeta assembly = betaGrid_A0_support → gammaGrid 系 → (13.19) producer。
+  次 iter: (1.3) port 実装開始 (直交補分解の repo 在庫確認から)。
+
+## ✅✅ (2026-07-11、lane-b /loop iter 15) — **Pf (1.3.a/b) core 完全 proven** (依存鎖の底 landed)
+
+新 shared leaf `GroupTheory/RepresentationTheory/SupportedSpanOrthogonality.lean` (sorry-free 一発 green):
+- `eq_zero_on_iff_forall_inner_eq_zero_of_span` ((1.3.a) core): conj-不変 A + A-supported spanning
+  family Φ に対し「D は A 上 0 ↔ D ⊥ 全 Φ i」。非自明方向 = indicator split (conj-不変性で
+  class function、S09 χ₁ パターン) + disjoint-support 直交 + span_induction + ⟨D_A,D_A⟩=0。
+- `apply_eq_on_of_forall_inner_eq` ((1.3.b) 値同定半分): Φ-pairing が一致する 2 つの CF は A 上一致。
+**次 (依存鎖を上へ)**: (i) normedTI(W∖W₂) 供給 — Φ := ew-基底 (CF(W, W∖W₂) の spanning family) の
+構成と、その Ind-image が mu2Grid の δ·μ grid と pairing 一致することの確認 (Coq :361 の
+instantiation)、(ii) mu2Grid の W∖W₂-値 identity (`prTIirr_id` 対応) を PrimeTIResidue に追加。
+Φ-spanning は supportedSubmodule (W∖W₂-in-W) の基底 = ω-grid の差族 (V2base = ew_ ij) —
+S05/S06 の ω-grid API から組む。
+
+## ✅ (2026-07-11、lane-b /loop iter 16) — Fourier 展開補題 landed ((1.3.a) core の univ-instance)
+
+`eq_sum_inner_smul_of_orthonormal_of_span_top` (SupportedSpanOrthogonality 追記、sorry-free
+一発 green): orthonormal spanning family Φ で f = Σ⟨f,Φi⟩•Φi。証明 = (1.3.a) core @ A=univ +
+orthonormal collapse + inner_conj_symm。
+**次 (ω-差族 spanning への残 3 部品)**: (i) span top bridge (span_irreducibleCharacter_eq_top
+[CharacterCompleteness:683] + omega_surjective [S05_TICyclic:343] → CF(↥W) = span(range ω))、
+(ii) W₂-vanishing → 行和 0 (f = Σc_χ ω_χ、x∈W₂ で ω_χ(x) = χのW₂成分値 → W₂-char 独立性で
+Σ_{W₁成分} c = 0 per W₂-char)、(iii) 差族 reassembly (行和 0 ⟹ f = Σ_j Σ_i c_ij(ω_ij−ω_0j))。
+wFst/wSnd (W=W₁×W₂ 射影、S05) で char の積分解。
+
+## ✅ (2026-07-11、lane-b /loop iter 17-18) — ω-差族 spanning 完成 (V2basis spanning 半分 landed)
+
+- iter 17 (707c6e62): `S05_OmegaSpanning` 新 leaf — `span_omega_eq_top` (Irr W = ω-range +
+  completeness) + `eq_sum_inner_smul_omega` (ω-Fourier 展開)。
+- iter 18 (本 commit): `sndPart` (W₂-成分 lift、Coq w_ 0 j) + **`supported_le_span_omega_sub_sndPart`**
+  (CF(W,W∖W₂) ⊆ span{ω_χ − ω_{sndPart χ}})。**W₂-char 独立性論法を完全回避**: Fourier split の
+  残余 g は W₂ 上 0 かつ W₂-成分のみ依存 → 恒等 0。
+**次 = cross-level (1.3.b) wrapper**: H ≤ G、A ⊆ H、Φ_j ∈ CF(H,A) spanning、mu_i ∈ CF(G)
+orthonormal、`Ind Φ_j = Σ_i ⟨Φ_j,χ_i⟩•mu_i` → mu_i = χ_i on A。導出 = Res mu_i に (1.3.a) core:
+⟨Φ_j, Res mu_i⟩ = ⟨Ind Φ_j, mu_i⟩ (inner_induce_eq_inner_restrict) = ⟨Φ_j,χ_i⟩ (orthonormal
+collapse) → D := Res mu_i − χ_i ⊥ 全 Φ → D = 0 on A。SupportedSpanOrthogonality に追記 →
+その後 mu2Grid instantiation (Φ := ω-差族 [今回 landed]、mu_ := δ·mu2Grid 族、hypothesis =
+sigma_omega_eq_mu2GridSign_smul_mu2Grid 経由) で prTIirr_id 対応が閉じる。
+
+## ✅ (2026-07-11、lane-b /loop iter 19) — cross-level (1.3.b) landed、(1.3) 三部作完成
+
+`restrict_apply_eq_on_of_induce_eq_sum` (SupportedSpanOrthogonality、一発 green): H≤G、conj-不変
+A⊆H、A-supported spanning Φ、CF(G) orthonormal mu 族、`Ind Φ_j = Σ_k ⟨Φ_j,χ_k⟩•mu_k` →
+Res(mu i) = χ i on A。reciprocity + orthonormal collapse + 同一群版で 3 行帰着。
+**(1.3) port 完了** (core / 同一群 / cross-level / Fourier / ω-差族 spanning の 5 点セット)。
+**次 = mu2Grid instantiation (prTIirr_id)**: Φ := ω_χ−ω_{sndPart χ} 族 (supported ✓ spanning ✓)、
+A := {w | w ∉ W₂-sub} (W abelian → conj-inv 自明)、mu := mu2Grid 族 (orthonormal ✓)、
+**残る供給 = hInd**: Ind_W^S(ω-diff) = Σ⟨diff,·⟩•(δ·μ) — σ (3.2 cyclicTIiso) の
+「A₁-supported diff で σ = Ind」性質 (TICyclicHypothesis の σ↔Ind agreement API、
+sigma_apply 系 or dadeIntegralCharacterMap 系) を次 iter で精査 → instantiation。

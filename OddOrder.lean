@@ -182,6 +182,7 @@ import OddOrder.Peterfalvi.S03_PreliminaryCharacter
 import OddOrder.Peterfalvi.S03b_Vanishing
 import OddOrder.Peterfalvi.S04_DadeIsometry
 import OddOrder.Peterfalvi.S05_TICyclic
+import OddOrder.Peterfalvi.S05_OmegaSpanning
 import OddOrder.Peterfalvi.S05_SignedTripleGrid
 import OddOrder.Peterfalvi.S05_SigmaIsometry
 import OddOrder.Peterfalvi.S05_IntegralSigma

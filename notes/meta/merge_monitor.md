@@ -272,6 +272,19 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > を編集しても逸脱でない (lane a が S05_Grid* を編集したら逸脱; c が S05 の char-核 file = S05_TICyclic 等を
 > 編集したら従来どおり逸脱)。詳細 = issues/9076。
 >
+> **carve-out (issue 9014/2038, hub 裁定 2026-07-11 監視 tick — merge 側で記録)**:
+> `OddOrder/Peterfalvi/S05_OmegaSpanning.lean` (lane b が新規作成、Pf (3.3)/(1.3) ω-grid spanning +
+> Fourier 展開 = (13.18) B(iii) port chain の底、9014 claim の port 対象 `equiv_restrict_compl_ortho`
+> 系) は名目上 lane a の S05 regex に掛かるが **lane b 所有**として扱う (carve-out 0090/0101/9076 と
+> 同型 = 名目 regex でなく内容で割当)。根拠: (1) sorry-free の genuine port (153 行、汎用核は共有
+> `GroupTheory/RepresentationTheory/SupportedSpanOrthogonality.lean` に分離済 = 配置規律も正)、
+> (2) 新規宣言に main との dup なし (hub 確認済)、(3) lane a は本 file 非接触 (S05_TICyclic を import
+> cite する consumer 関係のみ)、(4) claim = open 9014 (claim-before-build 準拠)。⟹ step 1.5 で b が
+> S05_OmegaSpanning を編集しても逸脱でない (a が編集したら逸脱; b が他の S05 char-核 file を編集したら
+> 従来どおり逸脱)。⚠ 合流時に root closure 欠落 (どこからも import されず) を hub が検出 →
+> OddOrder.lean に import 追記で修正 (step 3b 機械的修正)。b は今後新 leaf 作成時に OddOrder.lean
+> 追記まで込みで commit すること。
+>
 > **carve-out 拡張 (issue 9076 piece 4c, hub 裁定 2026-07-08 監視 tick)**: `OddOrder/Peterfalvi/S15_HonestTypeP2A0.lean`
 > (lane c が新規作成、Pf (8.10)/(8.15) honest `'A0(S) = 'A(S) ∪ V^S` 定義 + set-level facts) は名目上
 > S15 = **lane b 領域**だが、issue 9076 の piece 4c (A0-Dade correctness fix — 現 (13.18) は 'A(S)-Dade
