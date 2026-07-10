@@ -38,6 +38,15 @@ trial の裁定 (codex 継続 or Claude へ swap-back) が本 issue に記録さ
 ## trial ログ
 
 - 2026-07-10: handoff 一式作成 (note + merge_monitor 反映)。codex 起動待ち。
+- 2026-07-10 (tick #3): **codex-c 初回 output = issue 3004 (HUB 裁定要求)。強い正のシグナル。**
+  内容 = `MHypothesis` (SubgroupMCore.lean) が (14.11) の結論 (e=pq / signed η-expansion) を
+  (14.10) carrier の無条件 field に hoist し (14.11.1) 自身が消費する循環の診断。hub が原文
+  mmd・Coq PFsection14・Lean 現物を独立照合し **全面 CONFIRMED** (3004 HUB RULING 裁定 1)。
+  さらに hub 側検証で b の V-side 供給 `exists_M_structural` の同型 over-strength も発見
+  (裁定 3、c の指摘の自然な延長)。挙動面も規約準拠: Lean を編集せず issue で STOP・引用は
+  file:line 精密・dup なし (差分は issues/ のみ)。旧 lane d の失敗モード (dup churn) の兆候なし。
+  評価素材として質・規律とも現時点で Claude レーンと遜色なし。次の観察点 = 裁定 1 の実装
+  (実際の Lean restructure) の質。
 
 ## 参照
 
