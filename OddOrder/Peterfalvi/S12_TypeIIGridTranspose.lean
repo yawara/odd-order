@@ -44,6 +44,10 @@ as the bridge for identifying the `S`-side σ-grid (`certainTypeOmegaSigma`) wit
   whose `W₁` is the dual factor `mp.Kstar` has `W₂ = mp.K` (the (8.4.b) centralizer law) and
   shares `W` and `V` with the reconciled `mp.S`-side `tp.Sdata`, so the two
   `typePData_toTICyclicHypothesis` bridges have equal Dade maps and σ's on `CF(W, V)`.
+* `exists_section16_partner_typePData`: the `T`-side **producer** — a `TypePData mp.T` with
+  `W₁ = mp.Kstar` (hence `W₂ = mp.K`) exists, by Schur–Zassenhaus conjugation of the datum
+  of `typePData_of_isTypeNonI` (no `IsTypeP2 mp.T` needed).  This discharges the hypothesis
+  pair `(dataT, hTW1)` of the packaging lemmas above.
 
 ## Design note
 
@@ -56,9 +60,10 @@ rigidity step ((3.7)-style), which is part 2 of the transpose (issue 9079).
 For the canonical pair, only the `S`-side `TypePData` is canonically reconciled to the pair
 factors (`tp.Sdata` with `Sdata_W1_eq`; the `W₁`-prescribing producer
 `exists_typePData_W1_eq_of_isTypeP2` is gated on type `P₂`, which `Section16MaximalPair`
-pins only for `S` via `S_typeP2`).  The pair lemmas therefore take the `T`-side datum as a
-hypothesis `(dataT : TypePData mp.T) (hTW1 : dataT.W1 = mp.Kstar)` — the exact shape that
-producer emits — and derive everything else; see issue 9079 for the sourcing gap record.
+pins only for `S` via `S_typeP2`).  The pair lemmas take the `T`-side datum as a hypothesis
+pair `(dataT : TypePData mp.T) (hTW1 : dataT.W1 = mp.Kstar)`, and
+`exists_section16_partner_typePData` supplies it `P₂`-free — by Schur–Zassenhaus conjugacy
+of complements of `T'`, transported through the whole-datum `TypePData.conj`.
 -/
 
 namespace OddOrder.Peterfalvi.S12
@@ -283,6 +288,7 @@ setups share `W = K ⊔ K*` and (by swap-invariance) the TI-set `V`. -/
 section PairPackaging
 
 open OddOrder.GroupTheory
+open scoped Pointwise
 
 /- projections of the §10 → §5 bridge (definitional; named for `rw`-chains) -/
 
@@ -343,6 +349,72 @@ theorem section16_partner_typePData_W_eq [Finite G]
     (dataT : TypePData mp.T) (hTW1 : dataT.W1 = mp.Kstar) :
     dataT.W = mp.K ⊔ mp.Kstar := by
   rw [dataT.W_eq, hTW1, section16_partner_typePData_W2_eq hG dataT hTW1, sup_comm]
+
+/-- **The `W₁`-reconciled partner `TypePData` exists** (the `T`-side producer, closing the
+sourcing gap of the pair packaging; issue 9079).  `T` is type non-I, so it carries *some*
+type-`P` datum (`typePData_of_isTypeNonI`); its cyclic factor `W₁` and the pair's dual
+κ-Hall `K*` both complement `T' = [T,T]` in `T` (`M_complement`,
+`typeP_derivedInG_isComplement_kappaHall`), so they are `T`-conjugate by Schur–Zassenhaus
+(`IsComplement'.exists_conj_of_coprime`; `(|T'|, [T:T']) = 1` from the κ-Hall complement).
+Conjugating the whole datum (`TypePData.conj`, conjugation by an element of `T` fixes `T`)
+realigns `W₁` to `K*`; the dual factor `W₂ = K` then comes for free
+(`section16_partner_typePData_W2_eq`).
+
+No `IsTypeP2 mp.T` is needed — contrast `exists_typePData_W1_eq_of_isTypeP2`, whose
+`(κ∪σ)'`-Hall complement `U` requires the `P₂`-only `M_F`-internal decomposition; here the
+datum's own complement `U` is merely transported, never rebuilt. -/
+theorem exists_section16_partner_typePData [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (mp : Section16MaximalPair G) :
+    ∃ dataT : TypePData mp.T, dataT.W1 = mp.Kstar ∧ dataT.W2 = mp.K := by
+  classical
+  -- an arbitrary type-`P` datum on `T` (from `T_nonI`)
+  obtain ⟨data₀⟩ := typePData_of_isTypeNonI mp.T_nonI
+  haveI : IsCyclic ↥mp.Kstar := mp.isCyclic_Kstar
+  -- `K*` complements `T'` in `T` (the κ-Hall complement, ungated for type `P`)
+  have hKcompl := OddOrder.BG.Ch4.S14.typeP_derivedInG_isComplement_kappaHall hG
+    mp.T_maximal mp.T_typeP mp.Kstar_le_T mp.Kstar_hall
+  -- `T'.subgroupOf T` is normal (it is the commutator subgroup of `↥T`)
+  have hT'sub : (derivedInG mp.T).subgroupOf mp.T = commutator ↥mp.T :=
+    Subgroup.comap_map_eq_self_of_injective mp.T.subtype_injective _
+  haveI : ((derivedInG mp.T).subgroupOf mp.T).Normal := by rw [hT'sub]; infer_instance
+  -- `(|T'|, [T : T']) = 1`: the κ-Hall complement has coprime order
+  have hN : Nat.Coprime (Nat.card ↥((derivedInG mp.T).subgroupOf mp.T))
+      ((derivedInG mp.T).subgroupOf mp.T).index := by
+    rw [hKcompl.symm.index_eq_card]
+    exact OddOrder.BG.Ch4.S14.coprime_card_derived_kappaHall_of_isComplement'
+      mp.Kstar_hall hKcompl
+  haveI hTsolv : IsSolvable ↥mp.T := hG.solvable_of_mem_maximalSubgroups mp.T_maximal
+  have hSolv : IsSolvable ↥((derivedInG mp.T).subgroupOf mp.T) ∨
+      IsSolvable (↥mp.T ⧸ (derivedInG mp.T).subgroupOf mp.T) :=
+    Or.inl (solvable_of_solvable_injective
+      (Subgroup.subtype_injective ((derivedInG mp.T).subgroupOf mp.T)))
+  -- Schur–Zassenhaus: the two complements `data₀.W1`, `K*` of `T'` are `T`-conjugate
+  obtain ⟨n, -, hn⟩ := Subgroup.IsComplement'.exists_conj_of_coprime hN hSolv
+    data₀.M_complement hKcompl
+  -- lift the `↥T`-level conjugacy to a `G`-level pointwise-`smul` equation
+  set g : G := (n : G) with hgdef
+  have hcomp : mp.T.subtype.comp (MulAut.conj n).toMonoidHom
+      = (MulAut.conj g).toMonoidHom.comp mp.T.subtype := by
+    ext k
+    simp only [MonoidHom.comp_apply, Subgroup.coe_subtype, MulEquiv.coe_toMonoidHom,
+      MulAut.conj_apply, hgdef, Subgroup.coe_mul, Subgroup.coe_inv]
+  have hW1map : data₀.W1.map (MulAut.conj g).toMonoidHom = mp.Kstar := by
+    have key := congrArg (Subgroup.map mp.T.subtype) hn
+    rw [Subgroup.map_map, hcomp, ← Subgroup.map_map,
+      Subgroup.map_subgroupOf_eq_of_le data₀.W1_le,
+      Subgroup.map_subgroupOf_eq_of_le mp.Kstar_le_T] at key
+    exact key
+  have hW1smul : (MulAut.conj g) • data₀.W1 = mp.Kstar := by
+    rw [pointwise_mulAut_smul_eq_map]; exact hW1map
+  -- conjugation by `g ∈ T` fixes `T`; transport the whole datum and cast back
+  have hgT : (MulAut.conj g) • mp.T = mp.T := Subgroup.conj_smul_eq_self_of_mem n.2
+  have hcastW1 : ∀ {S : Subgroup G} (h : S = mp.T) (d : TypePData S), (h ▸ d).W1 = d.W1 := by
+    intro S h d; subst h; rfl
+  have hTW1 : (hgT ▸ data₀.conj (MulAut.conj g)).W1 = mp.Kstar := by
+    rw [hcastW1 hgT,
+      show (data₀.conj (MulAut.conj g)).W1 = (MulAut.conj g) • data₀.W1 from rfl, hW1smul]
+  exact ⟨hgT ▸ data₀.conj (MulAut.conj g), hTW1,
+    section16_partner_typePData_W2_eq hG _ hTW1⟩
 
 open scoped FiniteInduce in
 /-- **The canonical pair shares its TI-set `V`** (Peterfalvi (8.8) for the §10 → §5
