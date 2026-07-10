@@ -1338,3 +1338,21 @@ field 追加の producer discharge 精査で **make-or-break 事実**:
 
 **当面の実装順変更**: field 3 層追加は同定完了後に延期 (field 文自体は iter 34 で語彙 ready)。
 次 iter = 一意性補題 (step 1) の Lean 化 — 数学は検証済ゆえ実装のみ。
+
+## ✅ (2026-07-11、lane-b /loop iter 36) — grid 一意性 (anchored-difference rigidity) landed
+
+**`irreducibleCharacterFamily_eq_of_difference_eq`** (IsometryDifferencePair.lean、commit 512b3c82、
+一発 green、full build 4150・AxiomsCheck OK): 差族一致 (ν_i − ν_0 = ν'_i − ν'_0) + ν' 単射 +
+n ≥ 2 ⟹ ν = ν'。iter 33 検証の anchor-shift norm 矛盾論法どおり。
+
+**⟹ (13.1.e) 型 grid は (ω, δ, Ind) から一意** — certainTypeS ↔ Sdata-instance の mu-grid 同定は
+「両 instance の **ω-grid + δ + Ind の同定**」に帰着 (iter 35 plan step 2)。
+
+**次 iter (同定 step 2 = ω-grid 同定の精査)**: certainTypeS.chiColumn と
+(typePData_toS06Hypothesis Sdata).chiColumn の関係 — 両者の W (W₁ ⊔ W₂) は同一部分群か
+(certainTypeHypothesis_of_typeP_kappaHall の W₁/W₂ = mp.K/mp.Kstar vs Sdata の W1/W2 —
+tp.Sdata_W1_eq : Sdata.W1 = tp.W1 と mp.K との関係、FTSetup の certainTypeS_W1_eq/W2_eq
+[FT.lean iter 28 で見た] が既にこの同定の一部)。同一なら chiColumn は同じ型の grid で
+enumeration (w1CharEquiv/両 instance の生成元べき) の突合せのみ。δ/Ind は W 同定に従属。
+その後: 同定合成 → engines の muS-transport → pins 2/3 discharge → field 追加は不要になる
+可能性 (同定が直接 pin を出すなら iter 30-34 の field 計画は簡約) — 同定完了時に再判断。
