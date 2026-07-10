@@ -176,3 +176,21 @@ mathlib 配置) は将来の PR 解禁時に利用する。
 - **スキップ (低価値と裁定)**: P3-7 `wielandt_card_combine` 沈降 (現配置 = 唯一の consumer と同 file、
   実害なし)。P3-9 docstring 言語一括書換 (新規は英語収束、既存はそのまま)。
 - 検証: full rebuild green (4136 jobs / 12m25s)、AxiomsCheck OK、sorry 82 不変、新 axiom なし。
+
+## moore57 からの batch 1 消費報告 (2026-07-10 続)
+
+moore57 は pin を `582ae6bd` へ bump し batch 1 を消費した (moore57 commit `352cc8e8`)。
+
+- **P1-1 ✓ 消費成功**: `FreeActionOrbitCount` leaf を direct import し、moore57 側の
+  proof-shape 複製を本物の re-export に置換。import 重量問題は完全解消 — 提案どおりの効果。
+- **P3-5 ✓ 移行コストゼロ**: moore57 の参照は `open` 経由解決だったため表記変更なしで green。
+- **P1-2 △ de-private では不足 (実測)**: hub の「まず de-private で足りるか見る」への回答。
+  Order275 サイト (5²·11, 特定生成元 σ₀ の `zpowers σ₀` が正規、という形) では
+  `card_sylow_q_of_card_eq_sq_mul_prime` (任意 Sylow の card = q) は
+  factorization 計算 (~6 行) しか代替せず、「zpowers σ₀ を Sylow として構成 → n_q=1 →
+  一意性で normality を zpowers へ移送」の骨格は残る (接着 +5 行で net ゼロ)。
+  **真の需要 = sharpened 直接形**、しかも normality を「与えられた q-部分群」へ着地させる形:
+  `p < q → ¬ q ∣ p^2 - 1 → Nat.card G = p^2 * q → (K : Subgroup G) → Nat.card K = q →
+   K.Normal` (∃ 形でなく、order-q 部分群がそのまま THE normal Sylow になる形)。
+  これなら Order275 サイトは 30 行 → 1 call。優先度は低 (現サイトは green の閉じた結果) —
+  次に p²q 形の新規サイトが立ったときで良い。
