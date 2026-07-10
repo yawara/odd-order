@@ -1,4 +1,5 @@
 import OddOrder.Peterfalvi.S16_NonExistenceG.TSideTypeP
+import OddOrder.Peterfalvi.S16_NonExistenceG.KeyInequalityArithmetic
 import OddOrder.Peterfalvi.S16_GridExpansion
 
 /-!
@@ -836,6 +837,100 @@ theorem T_side_caseB_facts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   obtain ⟨hD, hv, _hQ⟩ := OddOrder.Peterfalvi.S15.lambda_forces_T_caseB hG chars
   exact ⟨hD, hv⟩
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- The (13.18) gap `Γ` is a virtual character.  Its Dade term is virtual because
+`β_{#1} = Ind_{PW₁}^S 1 - μ_{0,#1}` is virtual and has the (13.18.a) `A₀(S)` support;
+subtracting `1_G` and adding `η_{0,#1}` preserves `ZIrr` membership.
+
+This proof deliberately exposes its existing upstream gate: the only non-formal input is
+`S15.betaGrid_A0_support`, whose prime-TI value producer is lane-b's (13.18) frontier. -/
+private theorem sSideGamma_mem_ZIrr [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    OddOrder.Peterfalvi.S15.GammaGrid hG hyp.base ∈ ZIrr G := by
+  classical
+  let PW1 := (hyp.base.P ⊔ hyp.base.W1).subgroupOf hyp.base.S
+  have htrivZ : trivialClassFunction ↥PW1 ∈ ZIrr ↥PW1 := by
+    simpa [IrreducibleCharacter.coe_trivialIrreducibleCharacter] using
+      (trivialIrreducibleCharacter ↥PW1).mem_ZIrr
+  have hindZ : ClassFunction.induce PW1 (trivialClassFunction ↥PW1) ∈
+      ZIrr ↥hyp.base.S :=
+    ClassFunction.induce_mem_ZIrr PW1 htrivZ
+  let j : Fin hyp.base.p := ⟨1, by have := hyp.base.three_le_p; omega⟩
+  have hbetaZ : OddOrder.Peterfalvi.S15.betaGrid hyp.base j ∈ ZIrr ↥hyp.base.S := by
+    rw [OddOrder.Peterfalvi.S15.betaGrid, OddOrder.Peterfalvi.S15.indPW1]
+    exact (ZIrr ↥hyp.base.S).sub_mem hindZ
+      (hyp.base.mu_irreducible ⟨0, hyp.base.q_prime.pos⟩ j).mem_ZIrr
+  have htauZ : OddOrder.Peterfalvi.S15.tauSbetaGrid hG hyp.base ∈ ZIrr G := by
+    simpa [OddOrder.Peterfalvi.S15.tauSbetaGrid, j] using
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+        (hyp.base.dadeHypS0 hG) (hyp.base.dadeHypS0_hconj hG)
+        (OddOrder.Peterfalvi.S15.betaGrid_A0_support hG hyp.base j (by simp [j])) hbetaZ)
+  have honeZ : (trivialIrreducibleCharacter G : ClassFunction G ℂ) ∈ ZIrr G :=
+    (trivialIrreducibleCharacter G).mem_ZIrr
+  have hetaZ : hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ j ∈ ZIrr G :=
+    eta_mem_ZIrr hyp.base _ _
+  change OddOrder.Peterfalvi.S15.tauSbetaGrid hG hyp.base -
+      (trivialIrreducibleCharacter G : ClassFunction G ℂ) + hyp.base.eta _ j ∈ ZIrr G
+  exact (ZIrr G).add_mem ((ZIrr G).sub_mem htauZ honeZ) hetaZ
+
+open scoped Classical in
+/-- **Peterfalvi (14.9), `nzT1_Ga` parity extraction.**  Let `Γ` and every member of the coherent
+`calT1` image be virtual characters.  If each member `a` admits the real virtual residual `Δ_a`
+from the (14.9) expansion, with both `Δ_a` and `Γ` orthogonal to `1_G` and
+`⟨Γ,a⟩ = 1 + ⟨Δ_a,Γ⟩`, then `⟨Γ,a⟩` is an odd integer and hence nonzero.
+
+The parity statement is exactly `RepresentationTheory.cfdot_real_vchar_even`: `⟨Δ_a,Γ⟩` is even because
+trivial coefficients vanish.  This theorem performs all integrality/parity bookkeeping after the
+genuine `Δ_a` construction; no prime-TI or Dade hypothesis is hidden in its conclusion. -/
+theorem gap_coefficients_nonzero_of_delta_parity [Fintype G]
+    [Invertible (Nat.card G : ℂ)] (hodd : Odd (Nat.card G))
+    (calT1 : Finset (ClassFunction G ℂ)) (Γ : ClassFunction G ℂ)
+    (hΓZ : Γ ∈ ZIrr G) (hΓR : ClassFunction.IsReal Γ)
+    (hΓ1 : ClassFunction.inner Γ
+      (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 0)
+    (hmemZ : ∀ a ∈ calT1, a ∈ ZIrr G)
+    (hDelta : ∀ a ∈ calT1, ∃ Δ : ClassFunction G ℂ,
+      Δ ∈ ZIrr G ∧ ClassFunction.IsReal Δ ∧
+        ClassFunction.inner Δ
+          (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 0 ∧
+        ClassFunction.inner Γ a = 1 + ClassFunction.inner Δ Γ) :
+    ∃ x : ClassFunction G ℂ → ℤ,
+      (∀ a ∈ calT1, ClassFunction.inner Γ a = ((x a : ℝ) : ℂ)) ∧
+        ∀ a ∈ calT1, x a ≠ 0 := by
+  let x : ClassFunction G ℂ → ℤ := fun a =>
+    if ha : a ∈ calT1 then
+      (ClassFunction.inner_mem_ZIrr_int hΓZ (hmemZ a ha)).choose
+    else 0
+  have hxcoe : ∀ a ∈ calT1, ClassFunction.inner Γ a = ((x a : ℝ) : ℂ) := by
+    intro a ha
+    rw [show x a = (ClassFunction.inner_mem_ZIrr_int hΓZ (hmemZ a ha)).choose by
+      simp only [x, dif_pos ha]]
+    exact_mod_cast (ClassFunction.inner_mem_ZIrr_int hΓZ (hmemZ a ha)).choose_spec
+  refine ⟨x, hxcoe, ?_⟩
+  intro a ha hxa0
+  obtain ⟨Δ, hΔZ, hΔR, hΔ1, hrelation⟩ := hDelta a ha
+  obtain ⟨m, c, d, hm, hc, hd, heven⟩ :=
+    OddOrder.RepresentationTheory.cfdot_real_vchar_even hodd hΔZ hΔR hΓZ hΓR
+  have hc0 : c = 0 := by
+    rw [hΔ1] at hc
+    exact_mod_cast hc
+  have hd0 : d = 0 := by
+    rw [hΓ1] at hd
+    exact_mod_cast hd
+  have hm_even : Even m := by
+    simpa [hc0, hd0] using heven
+  have hcast : ((x a : ℤ) : ℂ) = ((1 + m : ℤ) : ℂ) := by
+    calc
+      ((x a : ℤ) : ℂ) = ClassFunction.inner Γ a := by
+        exact_mod_cast (hxcoe a ha).symm
+      _ = 1 + ClassFunction.inner Δ Γ := hrelation
+      _ = ((1 + m : ℤ) : ℂ) := by rw [← hm]; push_cast; ring
+  have hxint : x a = 1 + m := by
+    exact_mod_cast hcast
+  rcases hm_even with ⟨k, hk⟩
+  omega
+
 /-- **Peterfalvi (14.9), the character body** — the structural `≤` half of the ratio comparison, the
 sole deep obligation of (14.9).  Coq `PFsection14` `FTtypeP_min_typeII`, lines 737--853: assuming `T`
 is type III, build `calT1 = seqIndD QV T QV Q` (the degree-`p` induced characters of `T`, from
@@ -984,19 +1079,42 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) := by
     rw [hcalcard, hsourcecard, hVcard]
     exact Nat.cast_div hpdiv (Nat.cast_ne_zero.mpr hyp.base.p_prime.ne_zero)
-  -- **The gated `S`-side `βₛ` bridge content** (one documented residual `sorry`), now reduced
-  -- to the gap coefficients alone:
-  --   • `hxcoe`/`hx` = the `S`-side gap coefficients `⟨Γ, ζ⟩ = x_ζ ∈ ℤ` with parity nonzeroness
-  --     `x_ζ ≠ 0` (Coq `nzT1_Ga`, via `S09.cfdot_real_vchar_even`);
-  -- The gap itself and the genuine (13.18.d) projected norm are the concrete, correctly stated
-  -- `betaData_of_grid.Gamma` and `Y_norm_bound`; they are no longer part of this residual.
+  -- The genuine (13.18) gap is the concrete `GammaGrid`.  Its virtuality follows from the
+  -- supported S-side Dade image; reality and principal orthogonality are the faithful BetaData
+  -- fields.  The coherent images are virtual characters by the coherent-extension contract.
   let betaData := OddOrder.Peterfalvi.S15.betaData_of_grid hG hyp.base
     ⟨1, hyp.base.p_prime.one_lt⟩ (by simp)
+  have hGammaZ : betaData.Gamma ∈ ZIrr G := by
+    simpa [betaData, OddOrder.Peterfalvi.S15.betaData_of_grid] using
+      (sSideGamma_mem_ZIrr hG hyp)
+  have hGammaR : ClassFunction.IsReal betaData.Gamma :=
+    betaData.Gamma_real
+  have hGamma1 : ClassFunction.inner betaData.Gamma
+      (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 0 := by
+    exact betaData.Gamma_orthogonal_one
+  have hmemZ : ∀ a ∈ calT1, a ∈ ZIrr G := by
+    intro a ha
+    rw [hcalT1img, Finset.mem_image] at ha
+    obtain ⟨ζ, hζT, rfl⟩ := ha
+    rw [Set.mem_toFinset] at hζT
+    exact hτ.extension_mem_ZIrr ζ (Submodule.subset_span hζT)
+  -- This is now the exact remaining (14.9) character construction: for each coherent image
+  -- `a = τ₁ζ`, build `Δ_a = τ_T(ν₀ - ζ) - 1_G + a`, prove it real/virtual and orthogonal
+  -- to `1_G`, and establish the expansion `⟨Γ,a⟩ = 1 + ⟨Δ_a,Γ⟩`.  All integrality and
+  -- parity bookkeeping after this witness is discharged by the theorem below.
+  have hDelta : ∀ a ∈ calT1, ∃ Δ : ClassFunction G ℂ,
+      Δ ∈ ZIrr G ∧ ClassFunction.IsReal Δ ∧
+        ClassFunction.inner Δ
+          (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 0 ∧
+        ClassFunction.inner betaData.Gamma a =
+          1 + ClassFunction.inner Δ betaData.Gamma := by
+    sorry
   obtain ⟨x, hxcoe, hx⟩ :
       ∃ (x : ClassFunction G ℂ → ℤ),
         (∀ a ∈ calT1, ClassFunction.inner betaData.Gamma a = ((x a : ℝ) : ℂ)) ∧
         (∀ a ∈ calT1, x a ≠ 0) := by
-    sorry
+    exact gap_coefficients_nonzero_of_delta_parity hG.odd calT1 betaData.Gamma
+      hGammaZ hGammaR hGamma1 hmemZ hDelta
   have hdiff_supp := T_typeIII_calT1_difference_support
     hyp hG hIII 𝒯 hlinear calT1_set hcalT1
   have heta : ∀ a ∈ calT1, ∀ (i : Fin hyp.base.q) (k : Fin hyp.base.p),
@@ -1196,11 +1314,11 @@ determination), whence the character body forces `(v − 1)/p ≤ (u − 1)/q` (
 contradicting (14.8) `key_inequality`'s `(v − 1)/p > (u − 1)/q`.
 
 The two deep pieces are isolated as `T_typeIII_ratio_le` (character body) and
-`T_isTypeIII_of_isTypeP1` (type determination), both consumed below.  The `>` half is (14.8);
-because the file's `T_typeII` feeds `T_side_caseB_facts` (whose case-(9.7.b) `v`-value is what
-`key_inequality`'s `>` rests on), `T_isTypeP2` is strictly upstream of `key_inequality` in this
-file's linearization and cannot cite it — so the `>` fact is left as this theorem's single residual,
-a documented forward reference to `key_inequality` (proved later in this same file). -/
+`T_isTypeIII_of_isTypeP1` (type determination), both consumed below.  The `>` half is (14.8): its
+pure cyclotomic comparison lives upstream in `KeyInequalityArithmetic`, while the two group-theoretic
+order inputs are the direct (13.4) producer `T_side_caseB_facts` and the (13.15) producer
+`S15.caseB_order_u_data`.  Thus no forward reference through the later `key_inequality` theorem is
+needed. -/
 theorem T_isTypeP2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     OddOrder.BG.Ch4.S14.IsTypeP2 hyp.base.T := by
@@ -1215,14 +1333,38 @@ theorem T_isTypeP2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   -- The character body then gives the type-III Γ-bridge estimate `(v − 1)/p ≤ (u − 1)/q`.
   have hle : ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) ≤
       ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) := T_typeIII_ratio_le hG hyp hIII
-  -- (14.8) `key_inequality` gives the strict `>`, contradicting `hle`.  `key_inequality` is proved
-  -- below in this file but is unreachable here (its `>` rests on the case-(9.7.b) `v`-value, which
-  -- flows through `T_side_caseB_facts ← T_typeII ← T_isTypeP2`), so the `>` is this theorem's
-  -- single documented forward residual.
+  -- The arithmetic half of (14.8), separated from the later `key_inequality` packaging.
+  have hratio := cyclotomic_ratio_gt_of_q_lt_p
+    hyp.base.p_prime hyp.base.q_prime hyp.base.p_odd hyp.base.q_odd hyp.q_lt_p
+  -- Its T-side order input is the direct (13.4) producer, which is upstream of `T_isTypeP2`.
+  have hvfull := (T_side_caseB_facts hG hyp).2
+  -- The S-side order input is exactly the two-branch conclusion of (13.15).
+  let Sord := OddOrder.Peterfalvi.S15.caseB_order_u_data hG hyp.base (caseB_for_S := True) trivial
+  have hu_le_full :
+      hyp.base.u ≤ (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) := by
+    by_cases hmod : hyp.base.p ≡ 1 [MOD hyp.base.q]
+    · rw [Sord.u_eq_of_p_modEq_one hmod]
+      have hp1_pos : 0 < hyp.base.p - 1 := by
+        have hp2 : 2 ≤ hyp.base.p := hyp.base.p_prime.two_le
+        omega
+      have hden_le : hyp.base.p - 1 ≤ hyp.base.q * (hyp.base.p - 1) := by
+        have hqpos : 1 ≤ hyp.base.q := hyp.base.q_prime.one_le
+        nlinarith [Nat.mul_le_mul_right (hyp.base.p - 1) hqpos]
+      exact Nat.div_le_div_left hden_le hp1_pos
+    · rw [Sord.u_eq_of_not_modEq_one hmod]
+  have hqpos : (0 : ℚ) < hyp.base.q := by
+    exact_mod_cast hyp.base.q_prime.pos
+  have hu_sub : ((hyp.base.u - 1 : ℕ) : ℚ) ≤
+      (((hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) - 1 : ℕ) : ℚ) := by
+    exact_mod_cast Nat.sub_le_sub_right hu_le_full 1
+  have hu_div : ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) ≤
+      (((hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) - 1 : ℕ) : ℚ) /
+        (hyp.base.q : ℚ) :=
+    div_le_div_of_nonneg_right hu_sub (le_of_lt hqpos)
   have hgt : ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
       ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) := by
-    -- (14.8) = `(key_inequality hG hyp).2`; forward-referenced.
-    sorry
+    rw [hvfull]
+    exact lt_of_le_of_lt hu_div hratio
   exact absurd hle (not_le.mpr hgt)
 
 /-- **Peterfalvi (14.9)**: the subgroup `T` is of Type II.  Dual to the `S`-side `(13.2.a)` line

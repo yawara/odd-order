@@ -3342,6 +3342,10 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.q_pow_gt_p_pow
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.Hypothesis.q_pow_gt_p_pow
 set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.cyclotomic_quotient_sub_one_ge_pow_pred
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.gap_coefficients_nonzero_of_delta_parity
+set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.CaseBForSData.u_le_full_cyclotomic
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.CaseBForSData.two_q_lt_u
 set_option linter.style.longLine false in
