@@ -681,3 +681,23 @@ honest な producer obligation になった — 「S-side cascade off-path」(20
 (2.1) W-coset conjugacy / Frobenius counting — 各部品の Lean 所在 survey から次 iteration 開始。
 3002 の b-side は全完了済 (2026-07-07)、s15_s_and_t.md の (13.3) G1 assembly は S-side
 CharacterDegreeData 系で off-path ruling との整合要確認 — (13.18)/(13.19) を先行する。
+
+## 📋 (2026-07-10 続⁹、lane-b /loop iter 1) — (13.18.a) betaGrid_support survey (Coq PVSbeta 精読)
+
+**Coq PFsection13 `FTtypeP_bridge_facts` (:1792-1870) の PVSbeta 証明構造** (= 原文 (13.18.a)):
+β_j = Ind_{P⋊W₁}^S 1 − μ_0j、主張 = β_j ∈ CF(S, P^# ∪ V_S) (V_S = (W−W₁∪W₂)^S)。
+z ∉ P^#∪V_S で Ind(1)(z) = μ_0j(z) を場合分け:
+1. **z ∈ PU (=S′)**: (i) z=1 → 両辺 u (γ(1)=u [index 計算]、μ_0j(1)=(1/q)μ_j(1)=u [cfRes_prTIirr])。
+   (ii) z∉P → 両辺 0 (μ_j は Ind-from-Fitting ゆえ P 外 0 [seqInd_on+FTprTIred_Ind_Fitting]、
+   Ind(1) は (PW₁)^S∩PU=P の外 0 [group_modl 計算])。
+2. **z ∈ S−PU**: rcoset partition + `partition_cent_rcoset` + StypeP.prPUW1 で z ~ x·y (x∈W₁^#、y∈W₂)。
+   y≠1 → z∈V_S 矛盾。y=1 → z~x∈W₁^#: Ind(1)(x) = γ(x̄) = 1 (**gammaW1**: S̄=S/P Frobenius +
+   normedTI W₁bar → induction 値 1) / μ_0j(x) = 1 (prTIirr_id + linear 値)。
+3. A0beta: P^#∪V_S ⊆ A₀(S) は別 step。
+
+**Lean 側の対応課題**: 現 statement は grid form `supp(β_j) ⊆ ⋃_i supp(μ_ij)` (consumer 向け restate)。
+Coq の P^#∪V_S 形との橋 (「μ_ij 族の support が P^#∪V_S を覆う/一致する」) の要否を含め、次 iteration で
+(a) consumer ((13.19) producer / gammaGrid_real) が実際に必要とする形を確認、(b) 部品の Lean 所在
+(S̄=S/P Frobenius = `typeP_uW1_frobenius` 済 [indPW1_inner_self_aux で使用中]、μ_0j Res 公式 =
+mu2Grid/PrimeTIResidue 系、class_support W₁^# 分解 = (2.1) 対応物) を grep、(c) statement 忠実性の
+判定 (grid form が over/under-strong でないか) — 不忠実なら restate (0757c158 と同型の faithfulness 修正)。
