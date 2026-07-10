@@ -776,6 +776,498 @@ theorem omegaProdCharTic_symm_snd_ne [Fintype G] [Fintype ↥L]
 
 end IndexComponents
 
+set_option maxHeartbeats 1600000 in
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (5.8) for the type-II `S`-side column — the `ν^{τ₂}` dichotomy** (Coq
+`coherent_prDade_TIred`): the coherent image of the reducible `T2`-column
+`ν = μ_{χ₂} = columnSum χ₂` is a **signed full `σ`-grid column**,
+`ν^{τ₂} = δ·∑_p χ_{(p, kcol)}` or `ν^{τ₂} = −δ·∑_p χ_{(p, jcol)}` (`δ = (columnFamily χ₂).sign`,
+`kcol`/`jcol` the `W₂`-components of the `χ₂`/`χ₂⁻¹` grid indices).
+
+Assembly of the landed pieces through the S05 `σ`-coefficient endgame
+`eq_smul_chiFam_column_of_vanishOnV`: the (5.5) subsum `ν^{τ₂} = ∑_{x ∈ T} R(x)`
+(`typeII_T2_extension_columnSum_eq_sum`, reindexed along the injective
+`certainTypeRImage`), the `V`-vanishing (`typeII_T2_extension_nu_apply_eq_zero_of_mem_V`),
+the two-column `{0, ±δ}` coefficient grid (grid orthonormality + the index component
+lemmas `omegaProdCharTic_symm_snd_eq`/`_ne`), the norm `‖ν^{τ₂}‖² = w₁` (coherence isometry +
+the column Gram entry) and Parseval (the coefficients enumerate the orthonormal subsum). -/
+theorem typeII_nu_tau2_dichotomy [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S)
+    (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup S)
+    [NeZero (Nat.card (typeIIHypothesis46 hG hSmax hSII data.typeP).W1)]
+    {Y : Subgroup G} {lam nu : ClassFunction ↥S ℂ}
+    (hlam_mem : lam ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (hlam_irr : IsIrreducibleCharacter lam)
+    (hnu_mem : nu ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (hdeg : lam 1 = nu 1)
+    (c : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+        (typeIIHypothesis46 hG hSmax hSII data.typeP).dade0
+        (typeIIHypothesis46 hG hSmax hSII data.typeP).tau)
+      ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥S ℂ))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)
+          ∪ conjClassSetIn S (typePV S data.typeP)) S))
+    {χ₂ : ((typeIIHypothesis46 hG hSmax hSII data.typeP).W2.subgroupOf
+        ((typeIIHypothesis46 hG hSmax hSII data.typeP).W1
+          ⊔ (typeIIHypothesis46 hG hSmax hSII data.typeP).W2)) →* ℂˣ}
+    (hne1 : χ₂ ≠ 1)
+    (hkeq : nu = OddOrder.Peterfalvi.S06.columnSum
+      (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂)
+    (i₀ : Fin (Nat.card (typeIIHypothesis46 hG hSmax hSII data.typeP).W1)) :
+    c.extension nu
+        = (((typeIIHypothesis46 hG hSmax hSII data.typeP).columnFamily χ₂).sign : ℂ)
+          • ∑ p, (OddOrder.Peterfalvi.S06.ticVdiff
+              (typeIIHypothesis46 hG hSmax hSII data.typeP)).chiFam rfl
+            (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+              (typeIIHypothesis46 hG hSmax hSII data.typeP))
+            (p, ((OddOrder.Peterfalvi.S06.ticVdiff
+                (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+              (OddOrder.Peterfalvi.S06.omegaProdCharTic
+                (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂ i₀)).2) ∨
+      c.extension nu
+        = (-(((typeIIHypothesis46 hG hSmax hSII data.typeP).columnFamily χ₂).sign : ℂ))
+          • ∑ p, (OddOrder.Peterfalvi.S06.ticVdiff
+              (typeIIHypothesis46 hG hSmax hSII data.typeP)).chiFam rfl
+            (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+              (typeIIHypothesis46 hG hSmax hSII data.typeP))
+            (p, ((OddOrder.Peterfalvi.S06.ticVdiff
+                (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+              (OddOrder.Peterfalvi.S06.omegaProdCharTic
+                (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂⁻¹ i₀)).2) := by
+  classical
+  obtain ⟨E, hEsub, hEsum, hEcard⟩ := typeII_T2_extension_columnSum_eq_sum hG hSmax hSII data
+    hlam_mem hnu_mem hdeg c hne1 hkeq
+  -- shorthands (plain `have`-free abbreviations via local notation would not fold; spell out)
+  set δ : ℂ := (((typeIIHypothesis46 hG hSmax hSII data.typeP).columnFamily χ₂).sign : ℂ)
+    with hδdef
+  have hδpm : δ = 1 ∨ δ = -1 := by
+    rcases ((typeIIHypothesis46 hG hSmax hSII data.typeP).columnFamily χ₂).sign_eq with h | h
+    · left; rw [hδdef, h]; norm_num
+    · right; rw [hδdef, h]; norm_num
+  have hδstar : star δ = δ := by rcases hδpm with h | h <;> rw [h] <;> norm_num
+  have hδsq : δ * δ = 1 := by rcases hδpm with h | h <;> rw [h] <;> norm_num
+  have hsstar : ∀ b : Bool, star (cond b (-δ) δ) = cond b (-δ) δ := by
+    intro b; cases b
+    · exact hδstar
+    · show star (-δ) = -δ
+      rw [star_neg, hδstar]
+  have hssq : ∀ b : Bool, (cond b (-δ) δ) * (cond b (-δ) δ) = 1 := by
+    intro b; cases b
+    · exact hδsq
+    · show (-δ) * (-δ) = 1
+      rw [neg_mul_neg]; exact hδsq
+  have hχinv : χ₂⁻¹ ≠ χ₂ := OddOrder.Peterfalvi.S06.column_inv_ne_self
+    (typeIIHypothesis46 hG hSmax hSII data.typeP) hne1
+  -- reindex the (5.5) subsum along the injective `R`-family (the `muColumn_tau1_pin` pattern)
+  have hRinj : Function.Injective (OddOrder.Peterfalvi.S06.certainTypeRImage
+      (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂ χ₂⁻¹) :=
+    OddOrder.Peterfalvi.S06.certainTypeRImage_injective _ hχinv.symm
+  have hEsub' : E ⊆ Finset.univ.image (OddOrder.Peterfalvi.S06.certainTypeRImage
+      (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂ χ₂⁻¹) := hEsub
+  set T : Finset (Bool × Fin (Nat.card (typeIIHypothesis46 hG hSmax hSII data.typeP).W1)) :=
+    Finset.univ.filter (fun x => OddOrder.Peterfalvi.S06.certainTypeRImage
+      (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂ χ₂⁻¹ x ∈ E) with hTdef
+  have hImT : T.image (OddOrder.Peterfalvi.S06.certainTypeRImage
+      (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂ χ₂⁻¹) = E := by
+    apply Finset.ext; intro α
+    simp only [Finset.mem_image, hTdef, Finset.mem_filter, Finset.mem_univ, true_and]
+    constructor
+    · rintro ⟨x, hx, rfl⟩; exact hx
+    · intro hα
+      obtain ⟨x, -, hx⟩ := Finset.mem_image.mp (hEsub' hα)
+      exact ⟨x, by rw [hx]; exact hα, hx⟩
+  have hSumT : ∑ x ∈ T, OddOrder.Peterfalvi.S06.certainTypeRImage
+      (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂ χ₂⁻¹ x = ∑ α ∈ E, α := by
+    rw [← hImT, Finset.sum_image (fun x _ y _ h => hRinj h)]
+  have hCardT : (T.card : ℂ)
+      = (Nat.card (typeIIHypothesis46 hG hSmax hSII data.typeP).W1 : ℂ) := by
+    have hc : (T.image (OddOrder.Peterfalvi.S06.certainTypeRImage
+        (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂ χ₂⁻¹)).card = E.card := by
+      rw [hImT]
+    rw [Finset.card_image_of_injOn (fun x _ y _ h => hRinj h)] at hc
+    rw [hc]; exact hEcard
+  have hXT : c.extension nu = ∑ x ∈ T, OddOrder.Peterfalvi.S06.certainTypeRImage
+      (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂ χ₂⁻¹ x := by
+    rw [hEsum, hSumT]
+  -- the grid-index map and the `chiFam`-form of the `R`-members
+  have hRP : ∀ x : Bool × Fin (Nat.card (typeIIHypothesis46 hG hSmax hSII data.typeP).W1),
+      OddOrder.Peterfalvi.S06.certainTypeRImage
+        (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂ χ₂⁻¹ x
+      = (cond x.1 (-δ) δ) • (OddOrder.Peterfalvi.S06.ticVdiff
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)).chiFam rfl
+        (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+          (typeIIHypothesis46 hG hSmax hSII data.typeP))
+        ((OddOrder.Peterfalvi.S06.ticVdiff
+            (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+          (OddOrder.Peterfalvi.S06.omegaProdCharTic
+            (typeIIHypothesis46 hG hSmax hSII data.typeP) (cond x.1 χ₂⁻¹ χ₂) x.2)) := by
+    rintro ⟨b, i⟩
+    cases b
+    · show OddOrder.Peterfalvi.S06.certainTypeRImage _ χ₂ χ₂⁻¹ (false, i) = δ • _
+      simp only [OddOrder.Peterfalvi.S06.certainTypeRImage]
+      rw [OddOrder.Peterfalvi.S06.certainTypeOmegaSigma_eq_chiFam, hδdef]
+      rfl
+    · show OddOrder.Peterfalvi.S06.certainTypeRImage _ χ₂ χ₂⁻¹ (true, i) = (-δ) • _
+      simp only [OddOrder.Peterfalvi.S06.certainTypeRImage]
+      rw [OddOrder.Peterfalvi.S06.certainTypeOmegaSigma_eq_chiFam, hδdef]
+      rfl
+  -- σ-coefficient formula
+  have hcoeff : ∀ pq, (OddOrder.Peterfalvi.S06.ticVdiff
+      (typeIIHypothesis46 hG hSmax hSII data.typeP)).sigmaCoeff rfl
+      (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)) (c.extension nu) pq
+      = ∑ x ∈ T, (cond x.1 (-δ) δ)
+        * (if (OddOrder.Peterfalvi.S06.ticVdiff
+            (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+          (OddOrder.Peterfalvi.S06.omegaProdCharTic
+            (typeIIHypothesis46 hG hSmax hSII data.typeP) (cond x.1 χ₂⁻¹ χ₂) x.2) = pq
+          then (1 : ℂ) else 0) := by
+    intro pq
+    rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff, hXT,
+      OddOrder.RepresentationTheory.inner_sum_left]
+    refine Finset.sum_congr rfl fun x _ => ?_
+    rw [hRP x, ClassFunction.inner_smul_left,
+      ((OddOrder.Peterfalvi.S06.ticVdiff
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)).chiFam_spec rfl
+        (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+          (typeIIHypothesis46 hG hSmax hSII data.typeP))).2.2.1]
+  -- the two columns and their separation
+  have hsndF : ∀ i, ((OddOrder.Peterfalvi.S06.ticVdiff
+      (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+      (OddOrder.Peterfalvi.S06.omegaProdCharTic
+        (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂ i)).2
+      = ((OddOrder.Peterfalvi.S06.ticVdiff
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+      (OddOrder.Peterfalvi.S06.omegaProdCharTic
+        (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂ i₀)).2 := fun i =>
+    omegaProdCharTic_symm_snd_eq (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂ i i₀
+  have hsndT : ∀ i, ((OddOrder.Peterfalvi.S06.ticVdiff
+      (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+      (OddOrder.Peterfalvi.S06.omegaProdCharTic
+        (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂⁻¹ i)).2
+      = ((OddOrder.Peterfalvi.S06.ticVdiff
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+      (OddOrder.Peterfalvi.S06.omegaProdCharTic
+        (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂⁻¹ i₀)).2 := fun i =>
+    omegaProdCharTic_symm_snd_eq (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂⁻¹ i i₀
+  have hkj : ((OddOrder.Peterfalvi.S06.ticVdiff
+      (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+      (OddOrder.Peterfalvi.S06.omegaProdCharTic
+        (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂⁻¹ i₀)).2
+      ≠ ((OddOrder.Peterfalvi.S06.ticVdiff
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+      (OddOrder.Peterfalvi.S06.omegaProdCharTic
+        (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂ i₀)).2 :=
+    omegaProdCharTic_symm_snd_ne (typeIIHypothesis46 hG hSmax hSII data.typeP) hχinv i₀
+  -- per-column row-injectivity of the grid-index map (via the injective `R`-family)
+  have hPinjF : ∀ i i' : Fin (Nat.card (typeIIHypothesis46 hG hSmax hSII data.typeP).W1),
+      ((OddOrder.Peterfalvi.S06.ticVdiff
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+        (OddOrder.Peterfalvi.S06.omegaProdCharTic
+          (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂ i))
+      = ((OddOrder.Peterfalvi.S06.ticVdiff
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+        (OddOrder.Peterfalvi.S06.omegaProdCharTic
+          (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂ i')) → i = i' := by
+    intro i i' hP
+    have hReq : OddOrder.Peterfalvi.S06.certainTypeRImage
+        (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂ χ₂⁻¹ (false, i)
+        = OddOrder.Peterfalvi.S06.certainTypeRImage
+          (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂ χ₂⁻¹ (false, i') := by
+      rw [hRP (false, i), hRP (false, i')]
+      exact congrArg _ (congrArg _ hP)
+    have := hRinj hReq
+    exact (Prod.ext_iff.mp this).2
+  have hPinjT : ∀ i i' : Fin (Nat.card (typeIIHypothesis46 hG hSmax hSII data.typeP).W1),
+      ((OddOrder.Peterfalvi.S06.ticVdiff
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+        (OddOrder.Peterfalvi.S06.omegaProdCharTic
+          (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂⁻¹ i))
+      = ((OddOrder.Peterfalvi.S06.ticVdiff
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+        (OddOrder.Peterfalvi.S06.omegaProdCharTic
+          (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂⁻¹ i')) → i = i' := by
+    intro i i' hP
+    have hReq : OddOrder.Peterfalvi.S06.certainTypeRImage
+        (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂ χ₂⁻¹ (true, i)
+        = OddOrder.Peterfalvi.S06.certainTypeRImage
+          (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂ χ₂⁻¹ (true, i') := by
+      rw [hRP (true, i), hRP (true, i')]
+      exact congrArg _ (congrArg _ hP)
+    have := hRinj hReq
+    exact (Prod.ext_iff.mp this).2
+  -- full injectivity of the (cond-indexed) grid-index map on `Bool × Fin w₁`
+  have hPinj : ∀ x y : Bool × Fin (Nat.card (typeIIHypothesis46 hG hSmax hSII data.typeP).W1),
+      ((OddOrder.Peterfalvi.S06.ticVdiff
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+        (OddOrder.Peterfalvi.S06.omegaProdCharTic
+          (typeIIHypothesis46 hG hSmax hSII data.typeP) (cond x.1 χ₂⁻¹ χ₂) x.2))
+      = ((OddOrder.Peterfalvi.S06.ticVdiff
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+        (OddOrder.Peterfalvi.S06.omegaProdCharTic
+          (typeIIHypothesis46 hG hSmax hSII data.typeP) (cond y.1 χ₂⁻¹ χ₂) y.2)) → x = y := by
+    rintro ⟨b, i⟩ ⟨b', i'⟩ hP
+    cases b <;> cases b'
+    · exact Prod.ext rfl (hPinjF i i' hP)
+    · exact absurd ((hsndF i).symm.trans ((congrArg Prod.snd hP).trans (hsndT i'))) (Ne.symm hkj)
+    · exact absurd ((hsndT i).symm.trans ((congrArg Prod.snd hP).trans (hsndF i'))) hkj
+    · exact Prod.ext rfl (hPinjT i i' hP)
+  -- the endgame inputs
+  have hψV : ∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff
+      (typeIIHypothesis46 hG hSmax hSII data.typeP)).V, c.extension nu v = 0 := fun v hv =>
+    typeII_T2_extension_nu_apply_eq_zero_of_mem_V hG hSmax hSII data hlam_mem hlam_irr
+      hnu_mem hdeg c hv
+  have hsupp : ∀ pq, pq.2 ≠ ((OddOrder.Peterfalvi.S06.ticVdiff
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+        (OddOrder.Peterfalvi.S06.omegaProdCharTic
+          (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂⁻¹ i₀)).2 →
+      pq.2 ≠ ((OddOrder.Peterfalvi.S06.ticVdiff
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+        (OddOrder.Peterfalvi.S06.omegaProdCharTic
+          (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂ i₀)).2 →
+      (OddOrder.Peterfalvi.S06.ticVdiff
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)).sigmaCoeff rfl
+        (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)) (c.extension nu) pq = 0 := by
+    intro pq hpj hpk
+    rw [hcoeff]
+    refine Finset.sum_eq_zero fun x hx => ?_
+    rcases x with ⟨b, i⟩
+    cases b
+    · dsimp only
+      rw [show (bif false then χ₂⁻¹ else χ₂) = χ₂ from rfl,
+        if_neg (fun hP => hpk (((congrArg Prod.snd hP).symm.trans (hsndF i)) : pq.2 = _)),
+        mul_zero]
+    · dsimp only
+      rw [show (bif true then χ₂⁻¹ else χ₂) = χ₂⁻¹ from rfl,
+        if_neg (fun hP => hpj (((congrArg Prod.snd hP).symm.trans (hsndT i)) : pq.2 = _)),
+        mul_zero]
+  have hk : ∀ p, (OddOrder.Peterfalvi.S06.ticVdiff
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)).sigmaCoeff rfl
+        (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)) (c.extension nu)
+        (p, ((OddOrder.Peterfalvi.S06.ticVdiff
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+          (OddOrder.Peterfalvi.S06.omegaProdCharTic
+            (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂ i₀)).2) = 0 ∨
+      (OddOrder.Peterfalvi.S06.ticVdiff
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)).sigmaCoeff rfl
+        (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)) (c.extension nu)
+        (p, ((OddOrder.Peterfalvi.S06.ticVdiff
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+          (OddOrder.Peterfalvi.S06.omegaProdCharTic
+            (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂ i₀)).2) = δ := by
+    intro p
+    rw [hcoeff]
+    by_cases hex : ∃ x ∈ T, ((OddOrder.Peterfalvi.S06.ticVdiff
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+        (OddOrder.Peterfalvi.S06.omegaProdCharTic
+          (typeIIHypothesis46 hG hSmax hSII data.typeP) (cond x.1 χ₂⁻¹ χ₂) x.2))
+        = (p, ((OddOrder.Peterfalvi.S06.ticVdiff
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+          (OddOrder.Peterfalvi.S06.omegaProdCharTic
+            (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂ i₀)).2)
+    · obtain ⟨x₁, hx₁T, hx₁P⟩ := hex
+      -- `x₁` is a `false`-index (a `true`-hit would equate `jcol = kcol`)
+      have hx₁b : x₁.1 = false := by
+        rcases x₁ with ⟨b, i⟩
+        cases b
+        · rfl
+        · exact absurd (((hsndT i).symm.trans (congrArg Prod.snd hx₁P)) :
+            _ = _) hkj
+      right
+      rw [Finset.sum_eq_single x₁ (fun y hyT hyne => by
+        rw [if_neg (fun hP => hyne (hPinj y x₁ (hP.trans hx₁P.symm))), mul_zero])
+        (fun h => absurd hx₁T h), if_pos hx₁P]
+      rcases x₁ with ⟨b, i⟩
+      cases b
+      · show δ * 1 = δ
+        rw [mul_one]
+      · exact absurd hx₁b (by simp)
+    · left
+      refine Finset.sum_eq_zero fun y hyT => ?_
+      rw [if_neg (fun hP => hex ⟨y, hyT, hP⟩), mul_zero]
+  have hj : ∀ p, (OddOrder.Peterfalvi.S06.ticVdiff
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)).sigmaCoeff rfl
+        (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)) (c.extension nu)
+        (p, ((OddOrder.Peterfalvi.S06.ticVdiff
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+          (OddOrder.Peterfalvi.S06.omegaProdCharTic
+            (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂⁻¹ i₀)).2) = 0 ∨
+      (OddOrder.Peterfalvi.S06.ticVdiff
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)).sigmaCoeff rfl
+        (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)) (c.extension nu)
+        (p, ((OddOrder.Peterfalvi.S06.ticVdiff
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+          (OddOrder.Peterfalvi.S06.omegaProdCharTic
+            (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂⁻¹ i₀)).2) = -δ := by
+    intro p
+    rw [hcoeff]
+    by_cases hex : ∃ x ∈ T, ((OddOrder.Peterfalvi.S06.ticVdiff
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+        (OddOrder.Peterfalvi.S06.omegaProdCharTic
+          (typeIIHypothesis46 hG hSmax hSII data.typeP) (cond x.1 χ₂⁻¹ χ₂) x.2))
+        = (p, ((OddOrder.Peterfalvi.S06.ticVdiff
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+          (OddOrder.Peterfalvi.S06.omegaProdCharTic
+            (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂⁻¹ i₀)).2)
+    · obtain ⟨x₁, hx₁T, hx₁P⟩ := hex
+      have hx₁b : x₁.1 = true := by
+        rcases x₁ with ⟨b, i⟩
+        cases b
+        · exact absurd (((hsndF i).symm.trans (congrArg Prod.snd hx₁P)) :
+            _ = _) (Ne.symm hkj)
+        · rfl
+      right
+      rw [Finset.sum_eq_single x₁ (fun y hyT hyne => by
+        rw [if_neg (fun hP => hyne (hPinj y x₁ (hP.trans hx₁P.symm))), mul_zero])
+        (fun h => absurd hx₁T h), if_pos hx₁P]
+      rcases x₁ with ⟨b, i⟩
+      cases b
+      · exact absurd hx₁b (by simp)
+      · show (-δ) * 1 = -δ
+        rw [mul_one]
+    · left
+      refine Finset.sum_eq_zero fun y hyT => ?_
+      rw [if_neg (fun hP => hex ⟨y, hyT, hP⟩), mul_zero]
+  -- norm and Parseval
+  have hνT2 : nu ∈ ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥S ℂ)) :=
+    Set.mem_insert_of_mem _ (Set.mem_insert_of_mem _ (Set.mem_insert _ _))
+  have hcardW1 : (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff
+      (typeIIHypothesis46 hG hSmax hSII data.typeP)).W1 : ℂ)
+      = (Nat.card (typeIIHypothesis46 hG hSmax hSII data.typeP).W1 : ℂ) := by
+    congr 1
+    rw [show (OddOrder.Peterfalvi.S06.ticVdiff
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)).W1
+      = (typeIIHypothesis46 hG hSmax hSII data.typeP).tic.W1 from rfl,
+      (typeIIHypothesis46 hG hSmax hSII data.typeP).tic_W1]
+    exact (Nat.card_congr (Subgroup.equivMapOfInjective _ _ S.subtype_injective).toEquiv).symm
+  have hXnorm : ClassFunction.inner (c.extension nu) (c.extension nu)
+      = (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)).W1 : ℂ) := by
+    rw [hcardW1,
+      c.extension_inner_eq nu nu (Submodule.subset_span hνT2) (Submodule.subset_span hνT2),
+      hkeq, OddOrder.Peterfalvi.S06.columnSum_def,
+      OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl]
+  have hParseval : ClassFunction.inner (c.extension nu) (c.extension nu)
+      = ∑ pq, (OddOrder.Peterfalvi.S06.ticVdiff
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)).sigmaCoeff rfl
+          (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+            (typeIIHypothesis46 hG hSmax hSII data.typeP)) (c.extension nu) pq
+        * star ((OddOrder.Peterfalvi.S06.ticVdiff
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)).sigmaCoeff rfl
+          (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+            (typeIIHypothesis46 hG hSmax hSII data.typeP)) (c.extension nu) pq) := by
+    have hRHS : ∑ pq, (OddOrder.Peterfalvi.S06.ticVdiff
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)).sigmaCoeff rfl
+          (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+            (typeIIHypothesis46 hG hSmax hSII data.typeP)) (c.extension nu) pq
+        * star ((OddOrder.Peterfalvi.S06.ticVdiff
+          (typeIIHypothesis46 hG hSmax hSII data.typeP)).sigmaCoeff rfl
+          (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+            (typeIIHypothesis46 hG hSmax hSII data.typeP)) (c.extension nu) pq)
+        = (T.card : ℂ) := by
+      have hterm : ∀ pq, (OddOrder.Peterfalvi.S06.ticVdiff
+            (typeIIHypothesis46 hG hSmax hSII data.typeP)).sigmaCoeff rfl
+            (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+              (typeIIHypothesis46 hG hSmax hSII data.typeP)) (c.extension nu) pq
+          * star ((OddOrder.Peterfalvi.S06.ticVdiff
+            (typeIIHypothesis46 hG hSmax hSII data.typeP)).sigmaCoeff rfl
+            (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+              (typeIIHypothesis46 hG hSmax hSII data.typeP)) (c.extension nu) pq)
+          = ∑ x ∈ T, ∑ y ∈ T, ((cond x.1 (-δ) δ) * (cond y.1 (-δ) δ))
+            * ((if (OddOrder.Peterfalvi.S06.ticVdiff
+                (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+              (OddOrder.Peterfalvi.S06.omegaProdCharTic
+                (typeIIHypothesis46 hG hSmax hSII data.typeP) (cond x.1 χ₂⁻¹ χ₂) x.2) = pq
+              then (1 : ℂ) else 0)
+            * (if (OddOrder.Peterfalvi.S06.ticVdiff
+                (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+              (OddOrder.Peterfalvi.S06.omegaProdCharTic
+                (typeIIHypothesis46 hG hSmax hSII data.typeP) (cond y.1 χ₂⁻¹ χ₂) y.2) = pq
+              then (1 : ℂ) else 0)) := by
+        intro pq
+        rw [hcoeff, star_sum, Finset.sum_mul_sum]
+        refine Finset.sum_congr rfl fun x _ => Finset.sum_congr rfl fun y _ => ?_
+        have hsy : star ((cond y.1 (-δ) δ) * (if (OddOrder.Peterfalvi.S06.ticVdiff
+            (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+            (OddOrder.Peterfalvi.S06.omegaProdCharTic
+              (typeIIHypothesis46 hG hSmax hSII data.typeP) (cond y.1 χ₂⁻¹ χ₂) y.2) = pq
+            then (1 : ℂ) else 0))
+            = (cond y.1 (-δ) δ) * (if (OddOrder.Peterfalvi.S06.ticVdiff
+            (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+            (OddOrder.Peterfalvi.S06.omegaProdCharTic
+              (typeIIHypothesis46 hG hSmax hSII data.typeP) (cond y.1 χ₂⁻¹ χ₂) y.2) = pq
+            then (1 : ℂ) else 0) := by
+          rw [star_mul', hsstar y.1]
+          congr 1
+          split
+          · exact star_one ℂ
+          · exact star_zero ℂ
+        rw [hsy]
+        ring
+      rw [Finset.sum_congr rfl fun pq _ => hterm pq]
+      rw [Finset.sum_comm]
+      have hinner : ∀ x ∈ T, ∑ y ∈ T, ∑ pq, ((cond x.1 (-δ) δ) * (cond y.1 (-δ) δ))
+          * ((if (OddOrder.Peterfalvi.S06.ticVdiff
+              (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+            (OddOrder.Peterfalvi.S06.omegaProdCharTic
+              (typeIIHypothesis46 hG hSmax hSII data.typeP) (cond x.1 χ₂⁻¹ χ₂) x.2) = pq
+            then (1 : ℂ) else 0)
+          * (if (OddOrder.Peterfalvi.S06.ticVdiff
+              (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+            (OddOrder.Peterfalvi.S06.omegaProdCharTic
+              (typeIIHypothesis46 hG hSmax hSII data.typeP) (cond y.1 χ₂⁻¹ χ₂) y.2) = pq
+            then (1 : ℂ) else 0)) = 1 := by
+        intro x hxT
+        rw [Finset.sum_eq_single x (fun y hyT hyne => ?_) (fun h => absurd hxT h)]
+        · -- diagonal `y = x`: the `pq`-sum hits exactly `pq = P x`
+          rw [Finset.sum_eq_single (((OddOrder.Peterfalvi.S06.ticVdiff
+              (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+            (OddOrder.Peterfalvi.S06.omegaProdCharTic
+              (typeIIHypothesis46 hG hSmax hSII data.typeP) (cond x.1 χ₂⁻¹ χ₂) x.2)))
+            (fun pq _ hpqne => by rw [if_neg (fun hh => hpqne hh.symm), mul_zero, mul_zero])
+            (fun h => absurd (Finset.mem_univ _) h)]
+          rw [if_pos rfl, mul_one, mul_one, hssq]
+        · -- off-diagonal: `P y ≠ P x` kills every `pq`
+          refine Finset.sum_eq_zero fun pq _ => ?_
+          by_cases hx : ((OddOrder.Peterfalvi.S06.ticVdiff
+              (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+            (OddOrder.Peterfalvi.S06.omegaProdCharTic
+              (typeIIHypothesis46 hG hSmax hSII data.typeP) (cond x.1 χ₂⁻¹ χ₂) x.2)) = pq
+          · rw [if_pos hx, if_neg (fun hy => hyne (hPinj y x (hy.trans hx.symm))),
+              mul_zero, mul_zero]
+          · rw [if_neg hx, zero_mul, mul_zero]
+      have hstep : ∀ x ∈ T, (∑ pq, ∑ y ∈ T, ((cond x.1 (-δ) δ) * (cond y.1 (-δ) δ))
+          * ((if (OddOrder.Peterfalvi.S06.ticVdiff
+              (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+            (OddOrder.Peterfalvi.S06.omegaProdCharTic
+              (typeIIHypothesis46 hG hSmax hSII data.typeP) (cond x.1 χ₂⁻¹ χ₂) x.2) = pq
+            then (1 : ℂ) else 0)
+          * (if (OddOrder.Peterfalvi.S06.ticVdiff
+              (typeIIHypothesis46 hG hSmax hSII data.typeP)).omegaProdEquiv.symm
+            (OddOrder.Peterfalvi.S06.omegaProdCharTic
+              (typeIIHypothesis46 hG hSmax hSII data.typeP) (cond y.1 χ₂⁻¹ χ₂) y.2) = pq
+            then (1 : ℂ) else 0))) = 1 := by
+        intro x hx
+        rw [Finset.sum_comm]
+        exact hinner x hx
+      rw [Finset.sum_congr rfl hstep, Finset.sum_const, nsmul_eq_mul, mul_one]
+    rw [hRHS, hXnorm, hcardW1, ← hCardT]
+  -- fire the S05 endgame
+  rcases (OddOrder.Peterfalvi.S06.ticVdiff
+      (typeIIHypothesis46 hG hSmax hSII data.typeP)).eq_smul_chiFam_column_of_vanishOnV rfl
+      (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
+        (typeIIHypothesis46 hG hSmax hSII data.typeP)) hψV hkj hsupp hδpm hk hj hXnorm
+      hParseval with hcase | hcase
+  · left; rw [hδdef] at hcase; exact hcase
+  · right; rw [hδdef] at hcase; exact hcase
+
 end ColumnPin
 
 end OddOrder.Peterfalvi.S12
