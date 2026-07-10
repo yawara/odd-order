@@ -499,3 +499,25 @@ R(λ) = {χ₊, χ₋} (dadeOrthonormalCharacterImageFamilyOfDiff、orthonormal 
 実装順: (i) T2-R-family での (5.5) 再演 (lane-b template mirror) → (ii) cross-inner
 kernel (S-side から) → (iii) constituent trick 組立 → lam_ortho_grid / zeta_ortho_grid
 discharge (S12_TypeIICrossIsometryPair の sorry 2 本)。
+
+### ★ (5.3.b) 完全写像 (Coq oS1sigma 精読、全部品 landed 確認) — 次 iteration は組立のみ
+Coq の base-ortho kernel は support 論法でなく **(3.8) NC-カウント**だが、その実体は:
+ψ = φ−φ̄ は A(L)-supported (A₀ の V-part に触れない) ⟹ **τψ は conj(V) 上 vanish**
+⟹ norm² = 2 + V-vanishing ⟹ 全 σ-係数 0 (= 各 grid 元と直交)。
+**repo 対応 (全 landed)**:
+- V-vanishing anchor = `typeII_tau_apply_eq_zero_of_mem_ticVdiffV` (S-side、update⁸ landed)
+- 係数消滅 engine = `sigmaCoeff_eq_zero_of_vanishOnV` (S05_SigmaTrichotomy:69、
+  hψZ + ‖ψ‖²=2 + V-vanish → 全 sigmaCoeff 0; sigmaCoeff = ⟨·, chiFam P⟩ rfl)
+- **lam_ortho_grid の S-side 還元**: aligned_M(i,j) = σ_S-grid 元 (per-index 同定
+  section16_pair_sigma_omega_eq + fiber/haligned 系) ⟹ ⟨aligned, τ₂λ⟩ は
+  ⟨chiFam_S P, τ₂λ⟩ に等しい — **全て S-side で閉じる**
+- (5.5): τ₂λ = R(λ)-constituents の signed 和 — lane-b template
+  (coherent_extension_mem_span_Rset_of_mem の ofProjection/eq_sum_of_psi_eq_zero
+  pattern) を typeII_T2_memberRFamily で再演
+- constituent trick: ⟨τ_S(λ−λ̄), chiFam P⟩ = 0 + R(λ) = {χ₊,χ₋} orthonormal ±irr +
+  chiFam P = ±irr ⟹ ⟨χ±, chiFam P⟩ = 0 (c=±1 なら χ₊=±grid=χ₋ 矛盾)
+- zeta 側 = 同型を M-side で (τ_M(ζ−ζ̄) の V_M-vanishing anchor は S-side anchor の
+  M-mirror — hyp.tau + typePV M; 要 1 lemma、同 pattern)
+組立順: (k1) S-side kernel ⟨τ_S(λ−λ̄), chiFam_S P⟩ = 0 (anchor + norm2 + engine) →
+(k2) (5.5) 再演 → (k3) constituent trick → lam_ortho_grid (per-index 還元込み) →
+(k4) M-mirror で zeta_ortho_grid。
