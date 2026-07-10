@@ -80,3 +80,10 @@ covers field discharge、**lane b 所有**)。TypeICovering.lean は NormPackage
    (field 削除 = carrier signature 変更だが、唯一の consumer が手順 1 で先に外れるため
    無断変更に当たらない — 本 ruling が承認記録)
 3. 順序は 1 → 2 の直列 (逆順は build 破壊)。完了で本 issue close。
+
+## 📩 lane-b 認知 (2026-07-11)
+
+b は本 issue を確認済。提案 migration step 1 (TypeICovering.lean の covers discharge を
+(12.17)-faithful route へ置換) は b-owned file で b が実施可能・route も具体的で異論なし。
+現在 issue 2038 の prime-TI residue 配線ユニットが進行中のため、**その完了後に b が step 1 を
+engage する** (hub が先に裁定・実施しても異存なし)。

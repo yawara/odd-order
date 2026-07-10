@@ -656,6 +656,29 @@ noncomputable def _root_.OddOrder.RepresentationTheory.PrimeTIResidueData.ofS06H
         rw [Equiv.apply_symm_apply, hχ₂]
       · exact Or.inr ⟨hirr, fun i j => hne (h.charGroupW2Equiv j) i⟩ }
 
+/-- **Peterfalvi (4.3.c) in residue-grid form** (Coq `prTIirr_id`, issue 2038/9014): the
+prime-TI irreducibles of the `ofS06Hypothesis` residue grid satisfy the value identity
+`mu2 i j (x) = δ_j · ω_{ij}(x)` on the TI set `W ∖ W₂` (`= sdiffTICyclicHypothesis.V`).
+The grid entry `mu2 i j` is definitionally the certain-type character
+`(columnFamily (e j)).mu i` (`e = charGroupW2Equiv`), so this is
+`certainType_apply_eq_of_mem_V` reindexed through the `Fin`-index bridge; `δ_j` is the
+column sign `(columnFamily (e j)).sign` and `ω_{ij}` the column character
+`chiColumn (e j) i` of `W = W₁ ⊔ W₂`.
+
+This is the supply point of the `(13.18)` residue values (issue 2038 B-parts): the
+`W₁^#`-values (`x ∈ W₁ ∖ {1} ⊆ W ∖ W₂`) and the column-sum (`primeTIred`) values follow by
+evaluating the right-hand side. -/
+theorem _root_.OddOrder.RepresentationTheory.PrimeTIResidueData.ofS06Hypothesis_mu2_apply_of_mem_V
+    [Fintype ↥h.K] (H : Subgroup ↥h.K) (hW2H : h.W2.subgroupOf h.K ≤ H)
+    (i : Fin (Nat.card h.W1)) (j : Fin (Nat.card h.W2))
+    {v : L} (hv : v ∈ h.sdiffTICyclicHypothesis.V) :
+    ((PrimeTIResidueData.ofS06Hypothesis h H hW2H).mu2 i j : ClassFunction L ℂ) v
+      = ((h.columnFamily (h.charGroupW2Equiv j)).sign : ℂ)
+        * (h.chiColumn (h.charGroupW2Equiv j) i :
+            ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+          ⟨v, h.sdiffTICyclicHypothesis.V_subset_W hv⟩ :=
+  h.certainType_apply_eq_of_mem_V (h.charGroupW2Equiv j) i hv
+
 end OddOrder.Peterfalvi.S06.Hypothesis
 
 /-! ## Relocated from `S05_SigmaIsometry` (hub ruling 9014/fcfc0644): the `μ` extraction grid
