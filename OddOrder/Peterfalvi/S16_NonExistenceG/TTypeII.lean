@@ -1108,6 +1108,42 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 0 ∧
         ClassFunction.inner betaData.Gamma a =
           1 + ClassFunction.inner Δ betaData.Gamma := by
+    intro a ha
+    rw [hcalT1img, Finset.mem_image] at ha
+    obtain ⟨ζ, hζT, rfl⟩ := ha
+    rw [Set.mem_toFinset] at hζT
+    have hζform := hζT
+    rw [hcalT1, Finset.mem_coe, Finset.mem_image] at hζform
+    obtain ⟨θ, hθ, hζeq⟩ := hζform
+    have hζsupp_ind := typeIII_induced_source_support hyp θ
+    have hζsupp : ζ.support ⊆
+        ((derivedInG hyp.base.T).subgroupOf hyp.base.T :
+          Set ↥hyp.base.T) :=
+      hζeq ▸ hζsupp_ind
+    have hζ1_ind :=
+      typeIII_induced_source_degree hyp θ (hlinear θ hθ)
+    have hζ1 : ζ 1 = (hyp.base.p : ℂ) :=
+      hζeq ▸ hζ1_ind
+    obtain ⟨ν0, hνZ, hνR, hβZ, hβsupp, hτβZ, hτβ1, hβconj⟩ :=
+      exists_typeIII_primeTIDifference hG hyp hIII
+        (hirr ζ hζT).mem_ZIrr hζsupp hζ1
+    let Δ : ClassFunction G ℂ :=
+      tSideDadeMap hyp hG (ν0 - ζ) -
+          (trivialIrreducibleCharacter G : ClassFunction G ℂ) +
+        hτ.extension ζ
+    have hOneZ :
+        (trivialIrreducibleCharacter G : ClassFunction G ℂ) ∈ ZIrr G :=
+      (trivialIrreducibleCharacter G).mem_ZIrr
+    have hExtZ : hτ.extension ζ ∈ ZIrr G :=
+      hτ.extension_mem_ZIrr ζ (Submodule.subset_span hζT)
+    have hΔZ : Δ ∈ ZIrr G := by
+      change tSideDadeMap hyp hG (ν0 - ζ) -
+          (trivialIrreducibleCharacter G : ClassFunction G ℂ) +
+        hτ.extension ζ ∈ ZIrr G
+      exact (ZIrr G).add_mem ((ZIrr G).sub_mem hτβZ hOneZ) hExtZ
+    refine ⟨Δ, hΔZ, ?_⟩
+    -- Remaining: conjugation coherence makes `Δ` real, (2.7) makes it
+    -- orthogonal to `1_G`, and the S/T gap calculation gives the cross-inner identity.
     sorry
   obtain ⟨x, hxcoe, hx⟩ :
       ∃ (x : ClassFunction G ℂ → ℤ),

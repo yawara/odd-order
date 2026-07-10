@@ -123,3 +123,5 @@ issue は trial ログの追記継続のため open 維持、次の節目 (T-sid
   merge+push 連鎖で main に載った — 事後検証で build green 4150 jobs / AxiomsCheck OK を確認、
   実害なし。**c 側の落ち度ではない** (gotcha を merge_monitor 注意節に記録)。トレンド: genuine
   landing 9/9、churn 0。上記 ⚖️ 裁定のとおり **KEEP 確定**。
+- 2026-07-11 (tick、merge 7edf1b07): (14.9) supported T-side beta zero 実証明 (AxiomsCheck 追従・
+  dup なし)。10/10。KEEP 後も観察は簡略化して継続 (dup チェックは通常レーン水準に緩和)。

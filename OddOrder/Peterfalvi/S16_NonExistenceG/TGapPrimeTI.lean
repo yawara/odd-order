@@ -71,4 +71,156 @@ theorem exists_typeIII_primeTIredZero [Finite G]
       _ = (hyp.base.p : ℂ) := by
         rw [T_typeIII_card_W1 hyp td]
 
+open scoped Classical in
+/-- **Peterfalvi (2.7), specialised to the T-side Dade map.**  A class function
+supported on `A₁(T) = supportInSubgroup (sigmaSharp T) T` has the same
+trivial-character multiplicity before and after applying `τ_T`. -/
+theorem tSideDadeMap_inner_trivial [Finite G]
+    (hyp : Hypothesis (G := G)) [Fintype G] [Fintype ↥hyp.base.T]
+    [Invertible (Nat.card G : ℂ)]
+    [Invertible (Nat.card ↥hyp.base.T : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {φ : ClassFunction ↥hyp.base.T ℂ}
+    (hφ : φ.support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T) :
+    ClassFunction.inner (tSideDadeMap hyp hG φ) (trivialClassFunction G) =
+      ClassFunction.inner φ (trivialClassFunction ↥hyp.base.T) := by
+  let side := (tSideDadeSupport_nonempty hG hyp).some
+  have hmem : φ ∈ ClassFunction.supportedSubmodule
+      (G := ↥hyp.base.T) (k := ℂ)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T) :=
+    (ClassFunction.mem_supportedSubmodule).mpr hφ
+  have he : tSideDadeMap hyp hG φ =
+      side.dade.dadeMap (k := ℂ) ⟨φ, hmem⟩ := by
+    change OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap side.dade
+        (side.dade.fullDadeIsometryData side.hconj) φ =
+      side.dade.dadeMap (k := ℂ) ⟨φ, hmem⟩
+    rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support
+      side.dade _ hφ]
+  have hψ : ∀ a : {a : G //
+      a ∈ OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T},
+      (trivialClassFunction ↥hyp.base.T)
+          ⟨a.1, side.dade.subset_L a.2⟩ =
+        OddOrder.Peterfalvi.S04.adjointAverageFun side.dade
+          (trivialClassFunction G) ⟨a.1, side.dade.subset_L a.2⟩ := by
+    intro a
+    rw [OddOrder.Peterfalvi.S04.adjointAverageFun, dif_pos a.2]
+    simp only [trivialClassFunction_apply, Finset.sum_const, nsmul_eq_mul,
+      mul_one, Finset.card_univ, ← Nat.card_eq_fintype_card]
+    rw [inv_mul_cancel₀]
+    exact_mod_cast Nat.card_pos.ne'
+  rw [he]
+  exact OddOrder.Peterfalvi.S04.adjoint_formula side.dade
+    side.dade.dadeMap
+    (side.dade.isDadeMap_dadeMap (k := ℂ)) side.hconj
+    ⟨φ, hmem⟩ (trivialClassFunction G)
+    (trivialClassFunction ↥hyp.base.T) hψ
+
+open scoped Classical in
+/-- **Peterfalvi (14.9): the supported T-side difference
+`βT0 = ν₀ - ζ`.**  If `ζ` is a degree-`p` virtual character supported on
+`T'`, the concrete prime-TI anchor `ν₀` gives an integral difference
+supported on `(T')^# = A₁(T)`.  Consequently its genuine T-side Dade image is
+again a virtual character and vanishes at the identity. -/
+theorem exists_typeIII_primeTIDifference [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    [Fintype G] [Fintype ↥hyp.base.T]
+    [Invertible (Nat.card G : ℂ)]
+    [Invertible (Nat.card ↥hyp.base.T : ℂ)]
+    (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T)
+    {ζ : ClassFunction ↥hyp.base.T ℂ}
+    (hζZ : ζ ∈ ZIrr ↥hyp.base.T)
+    (hζsupp : ζ.support ⊆
+      ((derivedInG hyp.base.T).subgroupOf hyp.base.T :
+        Set ↥hyp.base.T))
+    (hζ1 : ζ 1 = (hyp.base.p : ℂ)) :
+    ∃ ν0 : ClassFunction ↥hyp.base.T ℂ,
+      ν0 ∈ ZIrr ↥hyp.base.T ∧
+        ClassFunction.IsReal ν0 ∧
+        (ν0 - ζ) ∈ ZIrr ↥hyp.base.T ∧
+        (ν0 - ζ).support ⊆
+          OddOrder.Peterfalvi.S04.supportInSubgroup
+            (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T ∧
+        tSideDadeMap hyp hG (ν0 - ζ) ∈ ZIrr G ∧
+        tSideDadeMap hyp hG (ν0 - ζ) 1 = 0 ∧
+        (ν0 - ζ).conj = ν0 - ζ.conj := by
+  obtain ⟨ν0, hνZ, hνR, hνsupp, hν1⟩ :=
+    exists_typeIII_primeTIredZero hG hyp hIII
+  have hβZ : ν0 - ζ ∈ ZIrr ↥hyp.base.T :=
+    (ZIrr ↥hyp.base.T).sub_mem hνZ hζZ
+  have hA :
+      OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T =
+        (derivedInG hyp.base.T : Set G) \ {1} :=
+    T_typeIII_sigmaSharp_eq hG hyp hIII
+  have hβsupp : (ν0 - ζ).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T := by
+    intro x hx
+    have hxK : x ∈
+        (derivedInG hyp.base.T).subgroupOf hyp.base.T := by
+      rcases ClassFunction.support_sub_subset ν0 ζ hx with hx | hx
+      · exact hνsupp hx
+      · exact hζsupp hx
+    have hx1 : x ≠ 1 := by
+      intro he
+      apply ClassFunction.mem_support.mp hx
+      rw [he, ClassFunction.sub_apply, hν1, hζ1, sub_self]
+    exact (OddOrder.Peterfalvi.S09.Cert.mem_supportInSubgroup_sharp_subgroupOf_iff
+      (derivedInG hyp.base.T) hA x).2 ⟨hxK, hx1⟩
+  let side := (tSideDadeSupport_nonempty hG hyp).some
+  have hτZ : tSideDadeMap hyp hG (ν0 - ζ) ∈ ZIrr G := by
+    simpa [tSideDadeMap] using
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+        side.dade side.hconj hβsupp hβZ)
+  have hτ1 : tSideDadeMap hyp hG (ν0 - ζ) 1 = 0 := by
+    simpa [tSideDadeMap] using
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one_eq_zero
+        side.dade side.hconj hβsupp)
+  refine ⟨ν0, hνZ, hνR, hβZ, hβsupp, hτZ, hτ1, ?_⟩
+  rw [ClassFunction.conj_sub, hνR]
+
+open scoped Classical in
+/-- A `calT1` source induced from the normal subgroup `T'` is supported on `T'`. -/
+theorem typeIII_induced_source_support [Finite G]
+    (hyp : Hypothesis (G := G))
+    [Fintype ↥hyp.base.T]
+    [Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
+    [Invertible (Nat.card ↥hyp.base.T : ℂ)]
+    [Invertible
+      (Nat.card ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) : ℂ)]
+    (θ : IrreducibleCharacter
+      ((derivedInG hyp.base.T).subgroupOf hyp.base.T)) :
+    (ClassFunction.induce
+      ((derivedInG hyp.base.T).subgroupOf hyp.base.T)
+        θ.toClassFunction).support ⊆
+      ((derivedInG hyp.base.T).subgroupOf hyp.base.T :
+        Set ↥hyp.base.T) := by
+  haveI : ((derivedInG hyp.base.T).subgroupOf hyp.base.T).Normal :=
+    T_derivedSubgroupOf_normal hyp
+  intro x hx
+  by_contra h
+  apply ClassFunction.mem_support.mp hx
+  exact ClassFunction.induce_eq_zero_of_not_mem_normal θ.toClassFunction h
+
+open scoped Classical in
+/-- A linear `calT1` source induces to degree `[T:T'] = p`. -/
+theorem typeIII_induced_source_degree [Finite G]
+    (hyp : Hypothesis (G := G))
+    [Fintype ↥hyp.base.T]
+    [Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
+    [Invertible (Nat.card ↥hyp.base.T : ℂ)]
+    [Invertible
+      (Nat.card ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) : ℂ)]
+    (θ : IrreducibleCharacter
+      ((derivedInG hyp.base.T).subgroupOf hyp.base.T))
+    (hθ1 : (θ.toClassFunction :
+      ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) → ℂ) 1 = 1) :
+    ClassFunction.induce
+      ((derivedInG hyp.base.T).subgroupOf hyp.base.T)
+        θ.toClassFunction 1 = (hyp.base.p : ℂ) := by
+  rw [ClassFunction.induce_apply_one, T_derived_index_eq_p hyp,
+    hθ1, mul_one]
 end OddOrder.Peterfalvi.S16
