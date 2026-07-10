@@ -1387,4 +1387,95 @@ theorem exists_typeIICrossIsometryData_at_pair [Finite G]
              hyp.tau1_muColumn_sub_zeta_inner_extension_diff_eq_zero_at_pair hG hT hKstar
                hSW1 hSW2 coh hζ1 hμd hlam_mem hlam_irr hnu_mem hdeg c s hs }⟩
 
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (10.7) at the canonical pair member** (Coq `Frob_der1_type2`, assembled):
+under Hypothesis (10.4) for `M`, the `(K, K*)`-reconciled Types-II/III/IV setup on the
+pair's type-II member `mp.S` has `[S,S] = S_F ⋊ U` Frobenius with kernel `S_F`.
+
+The dichotomy assembly of `typeII_HU_frobenius_of_coherent_aux`, with the sorried gate
+replaced by the **honest pair-witness producer** (`exists_typeIICrossIsometryData_at_pair`,
+axiom-clean): the §9 Clifford dichotomy's contradiction branches (Case A and the
+non-exceptional Case B) produce an equal-degree irreducible/reducible pair in `𝒮(H₀)`,
+whose (10.7) cross-isometry package is contradictory (`TypeIICrossIsometryData.elim`
+against the (10.2)/(10.3) canonical parameters, `exists_charParameters_full`); the
+exceptional Case B yields the Frobenius structure directly (Peterfalvi (9.10)). -/
+theorem typeII_HU_frobenius_of_coherent_at_pair [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    {hyp : Hypothesis M} {params : CharacterParameters hyp}
+    (coh : CoherentHypothesis hyp params)
+    {mp : Section16MaximalPair G}
+    (hT : mp.T = M) (hKstar : mp.Kstar = hyp.typeP.W1)
+    {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S}
+    (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar) :
+    OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(derivedInG mp.S)
+      (data.typeP.H.subgroupOf (derivedInG mp.S))
+      (data.typeP.U.subgroupOf (derivedInG mp.S)) := by
+  haveI := hyp.finiteG
+  classical
+  haveI : NeZero (Nat.card (typeIIHypothesis46 hG mp.S_maximal
+      (section16_S_isTypeII hG mp) data.typeP).W1) := ⟨Nat.card_pos.ne'⟩
+  -- the (10.3) canonical parameters carrying the grid/`ζ` pins
+  obtain ⟨params', hmu, hos, hzS, hz1, hzconj, hδpm, hδj⟩ := hyp.exists_charParameters_full hG
+  let coh' : CoherentHypothesis hyp params' := ⟨coh.coherent⟩
+  have hμd : ∀ (i : Fin hyp.w1) (j : Fin hyp.w2), j ≠ 0 →
+      hyp.muGrid hG hG.odd i j 1 = (params'.d : ℂ) := fun i j hj => by
+    rw [← hmu]
+    exact params'.degree_independent i j hj
+  obtain ⟨chief, -⟩ := OddOrder.Peterfalvi.S11.exists_chiefFactorData hG data
+  -- §9 character data (only the genuine `u`/`u_eq` pair is consumed by the counts)
+  let chars : OddOrder.Peterfalvi.S11.Section11CharacterData data chief :=
+    { u := Nat.card ↥(((OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom
+          (N := chief.N) chief.N_aInvariant).comp
+          (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype).range)
+      u_eq_card_quotient := rfl
+      H0CprimeSupport := ∅
+      tau := 0
+      quotientSemidirectFrobenius := True }
+  -- the reducible `ν ∈ 𝒮(H₀)`: the (9.8.a)/(9.9.b) count `p − 1 ≥ 1`
+  have hred_ne : {φ ∈ OddOrder.Peterfalvi.S11.sOf data chief.H0 |
+      ¬ IsIrreducibleCharacter φ}.Nonempty := by
+    apply Set.nonempty_of_ncard_ne_zero
+    rw [OddOrder.Peterfalvi.S11.reducible_count_sOf_H0 hG chief]
+    have := chief.p_prime.two_le
+    omega
+  obtain ⟨nu, hnu_mem, hnu_red⟩ := hred_ne
+  -- the left-branch refutation, now through the honest pair-witness producer
+  have hleft : ∀ lam : ClassFunction ↥mp.S ℂ,
+      lam ∈ OddOrder.Peterfalvi.S11.sOf data chief.H0 → IsIrreducibleCharacter lam →
+      lam 1 = nu 1 → False := fun lam hlam_mem hlam_irr hdeg =>
+    (exists_typeIICrossIsometryData_at_pair hG coh' hz1 hμd hT hKstar hSW1 hSW2
+      hlam_mem hlam_irr hnu_mem hnu_red hdeg).elim fun pkg =>
+      pkg.elim hG hmu hos hzS hz1 hzconj hδpm hδj
+  -- the §9 Clifford dichotomy
+  rcases OddOrder.Peterfalvi.S11.clifford_dichotomy hG chars with hA | hB
+  · -- Case A: (9.8.c) irreducible + (9.8.b) reducible degree — contradiction
+    exfalso
+    obtain ⟨caseA⟩ := hA
+    obtain ⟨-, hbred, ⟨lam, hlam_mem, hlam_irr, hlam_deg⟩, -⟩ :=
+      OddOrder.Peterfalvi.S11.caseA_character_counts hG chars caseA
+    have hnu_deg := (hbred nu hnu_mem hnu_red).1
+    exact hleft lam
+      (OddOrder.Peterfalvi.S11.sOf_antitone data le_sup_left hlam_mem)
+      hlam_irr (by rw [hlam_deg, hnu_deg])
+  · -- Case B: split on the exceptional condition
+    obtain ⟨caseB⟩ := hB
+    by_cases hex : ∃ χ ∈ chars.SOf (chief.H0 ⊔ chars.Cprime),
+        IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * chars.u : ℕ) : ℂ)
+    · -- non-exceptional: the degree-`q·u` irreducible exists — contradiction
+      exfalso
+      obtain ⟨lam, hlam_mem, hlam_irr, hlam_deg⟩ := hex
+      obtain ⟨-, -, hbred, -⟩ :=
+        OddOrder.Peterfalvi.S11.caseB_character_counts hG chars caseB
+      have hnu_deg := (hbred nu hnu_mem hnu_red).1
+      exact hleft lam
+        (OddOrder.Peterfalvi.S11.sOf_antitone data le_sup_left hlam_mem)
+        hlam_irr (by rw [hlam_deg, hnu_deg])
+    · -- exceptional: (9.10) gives the `H ⊔ U` Frobenius on the `derivedInG mp.S` carrier
+      have hfrobHU := (OddOrder.Peterfalvi.S11.exceptional_case_frobenius_realization
+        hG chars caseB hex).2.2 (section16_S_isTypeII hG mp)
+      have hM'eq : derivedInG mp.S = data.typeP.H ⊔ data.typeP.U := by
+        rw [data.typeP.derivedInG_eq_fitting_sup_U, ← data.typeP.H_eq]
+      rw [hM'eq]
+      exact hfrobHU
+
 end OddOrder.Peterfalvi.S12
