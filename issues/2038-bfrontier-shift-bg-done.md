@@ -771,3 +771,17 @@ S15_HonestTypeP2A0 に mu_row0 engine (mu_row0_ne proven / tauS_mu_row0_{diff_su
   同型の `indPW1_apply_eq_zero` (PU∖P で 0、A(i)) も同 setup: (PW₁)^S∩PU=P group calc +
   induce_one_eq_zero (P̄=⊥ 側でなく S 内直接計算の方が素直か — Coq は PU-case を S 内で処理)。
   次 iter: この 2 本を実装。
+
+## ✅ (2026-07-10 続¹³、lane-b /loop iter 6-7) — 部品 A 完了 (Ind 側の値 2 本 landed)
+
+- **iter 6 (b03c7f62)**: `indPW1_apply_eq_one_of_mem_W1_sharp` (A(ii)、Coq gammaW1) —
+  mod-P inflation (induce_one_eq_compHom_induce_one_of_le) + S̄=Ū⋊W̄₁ Frobenius 輸送
+  (aux setup 複製) + induce_one_eq_one_of_mem_complement。一発 green。
+- **iter 7 (本 commit)**: `indPW1_apply_eq_zero_of_mem_derived_not_mem_P` (A(i)、PU-case) —
+  conjugator 空: 共役は normal S′ に留まり、(P⊔W₁)⊓S′ ∋ w は PW₁=P*W₁ 分解 + W₁⊓S′=⊥ で
+  w∈P (elementwise Dedekind; ⚠ Subgroup lattice は non-modular ゆえ
+  order.sup_inf_assoc_of_le は使えない — coe_mul 分解が正道)、z∈P^g=P 矛盾。
+- **残 = 部品 B** (μ_0j の値 3 点: (i) S′∖P → 0 [mu_definition の W^S-support + colSum P-support、
+  ψ P-support 未 field ゆえ要追加調査]、(ii) 1 → u、(iii) W₁^# → 1 [prime-TI residue 9014/
+  S13_PrimeTIResidueBridge grounding]) + **部品 C** (z∈S−S′ → z ~ x·y、x∈W₁^#、y∈W₂ の分解) +
+  assembly (pointwise → support ⊆)。B(iii)/C が深い — 次 iter は B の部品在庫精査から。
