@@ -96,3 +96,7 @@ trial の裁定 (codex 継続 or Claude へ swap-back) が本 issue に記録さ
   重複なし)、新 axiom なし、AxiomsCheck 問題なし。**turn-idle 挙動の確認**: 前 tick で診断した
   「turn 完了 → 指示待ち」は、ユーザーの一言 + issue 誘導で解消し即 genuine work に復帰。
   トレンド: genuine landing 6/6、churn 0。数学の質・規律とも keep 相当を維持。
+- 2026-07-11 (tick、merge 6e303902): T-side (14.9) η直交性の実証明 2 本 (dup なし)。特筆:
+  **AxiomsCheck assert 2 本を自発追記** — tick #12 で指摘した開示規律が完全に定着 (指示なしで
+  proven 宣言の assert 登録まで自己完結)。3004 に T-side frontier audit も記録。トレンド:
+  genuine landing 7/7、churn 0、規律違反再発なし。
