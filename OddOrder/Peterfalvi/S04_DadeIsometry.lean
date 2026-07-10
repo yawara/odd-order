@@ -644,6 +644,25 @@ theorem map_eq_of_mem_hCoset {hyp : Hypothesis G A L} {τ : DadeMap (G := G) k A
   rcases hg with ⟨h, hh, rfl⟩
   exact hτ.map_eq_of_isConj_hCoset α (a.1 * h) a h hh (IsConj.refl _)
 
+/-- **The support of a Dade image is the thickening of the argument's support**
+(the value-level converse of the (2.5) defining equations): a nonzero value `α^τ(g) ≠ 0`
+exhibits a base point `a ∈ A` with `α(a) ≠ 0` and `g` conjugate into the coset `aH(a)`.
+This is the *restricted* support bound `Supp(α^τ) ⊆ ⋃_{a ∈ A ∩ Supp α} (aH(a))^G` — finer
+than `dadeSupport` (which unions over all of `A`), and the mechanism by which support
+refinements of `α` (e.g. `A₁`-supported members of the (10.1) family) restrict the image
+support (Peterfalvi (8.17)/(8.18) support geometry). -/
+theorem exists_base_of_map_apply_ne_zero {hyp : Hypothesis G A L}
+    {τ : DadeMap (G := G) k A L} (hτ : IsDadeMap hyp τ)
+    (α : SupportedClassFunctions (G := G) k A L) {g : G} (hg : τ α g ≠ 0) :
+    ∃ a : {a : G // a ∈ A}, ∃ h ∈ hyp.H a, IsConj (a.1 * h) g ∧
+      (α : ClassFunction L k) ⟨a.1, hyp.mem_L a.2⟩ ≠ 0 := by
+  have hgsupp : g ∈ hyp.dadeSupport := by
+    by_contra hn
+    exact hg (hτ.map_eq_zero_of_not_mem_dadeSupport α g hn)
+  obtain ⟨a, h, hh, hconj⟩ := hyp.mem_dadeSupport_iff.mp hgsupp
+  exact ⟨a, h, hh, hconj,
+    fun h0 => hg ((hτ.map_eq_of_isConj_hCoset α g a h hh hconj).trans h0)⟩
+
 /-- **Peterfalvi (2.5), uniqueness.**  The defining equations of the Dade map pin it
 down completely: any two candidate maps satisfying `IsDadeMap hyp` agree.  On
 `dadeSupport` both values are `α(a)` for a common witness `a` (`map_eq_of_isConj_hCoset`),
