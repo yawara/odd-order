@@ -1464,3 +1464,20 @@ producer-side support fact が、hyp46Smp (iter 41) 経由で同定ゼロで完�
 その後: pin `tauS_mu_row0_diff_support` (S15_HonestTypeP2A0:~878) の signature 修正 (hj0+hdeg) +
 field 射影化、consumer (S15_SAndT tauS_mu_row0_cross) の `_hj`+hdeg pass — hdeg 供給は
 iter 31 の residue 次数一致 (PU-Frobenius、genuine math unit) が最後のピース。
+
+## ✅✅ (2026-07-11、lane-b /loop iter 43) — **mu_diff_support field 3 層 + producer 完成** (一発 green)
+
+commit 上記 (full build 4151 green・AxiomsCheck OK): S15.Hypothesis / Section16Inputs / cd 層に
+hdeg-parametric field、producer discharge = muS_diff_support (iter 42)、両 threading。
+FTSetup の閉包に SubcoherenceInputs が既在 (S15.FiniteInduce open が証左) で iter 34 の
+honestTypeP2A0Set 移設がそのまま効いた。A0S field は vestigial (∅ placeholder) と確認 — 不使用。
+
+**残チェーン (13.18 support pin 閉鎖まで)**:
+1. pin `tauS_mu_row0_diff_support` (S15_HonestTypeP2A0:~890) の signature 修正 (hj0 + hdeg 追加、
+   9076 honest fix) + body = `hyp.mu_diff_support` 射影 (Fin-ne ↔ val-ne 変換)。
+2. consumer `tauS_mu_row0_cross` (S15_SAndT:1152) に `_hj` + hdeg pass — **hdeg 供給 =
+   residue 次数一致 (iter 31: PU Frobenius kernel P ⟹ 非自明 residue 次数 u、Pf (13.3) 系
+   genuine math unit)** が最後のピース。
+3. V-value pin は support 完了後に同型 (certainType_diff_dade_apply_eq_of_mem_V at hyp46Smp +
+   η/ω^σ 同定)。
+次 iter: 1 (pin 修正、機械的) → 2 の hdeg unit 設計。
