@@ -657,6 +657,27 @@ typeIIIorIV S13-gated / P₂-crux 2 のみ = **ungated on-path 0**)。
 **⟹ (12.16) counterexample_contradiction / (12.7) pi_empty / typeI_frobenius が own-proof sorry-free 化**
 (transitive residual は既知の witness-chain/D(4)/(12.2.a) producer 系のみ)。
 
-**次の b-frontier (上流優先+文書順)**: S14 on-path ungated 枯渇 → issues/3004 HUB RULING の b 宛 work item 2 件
-(裁定 2 = S15_SAndT `TypeIOrthogonalityGridData` の (13.19) 忠実 restate [betaL_eta_independent 除去] /
-裁定 3 = V-side `exists_M_structural`/`complement_inf_P_structure` の (13.17.c)-dual 二分岐 weaken) へ。
+**次の b-frontier (上流優先+文書順)** — ⚠ 当初「3004 裁定 2・3 へ」と書いたが**両方とも別 b セッションが
+完了済み** (0757c158 restate + 5dc4e84a cleanup、issue 3004 実施報告参照; 二重作業を回避)。改めて残 b-owned
+実 sorry を再スキャン (comment-strip): S15_SAndT_Setup 11 (QD_sharp_centralizer_le_T / tSide_theta_package /
+basic_structure_gated / sibleyTarget_S / character_degree_analysis / exists_muT_index /
+exists_etaT_alphaFun_one_int / numeric_bounds / pc_le_maxNilpotentNormalHall / caseA_parameters /
+caseB_order_u) + S15_SAndT 7 (complement_inf_Q_structure / complement_inf_P_structure_dichotomy /
+betaGrid_support / betaGrid_A0_support / gammaGrid_real / gammaGrid_Y_norm_bound /
+typeIOrthogonalityGridData_of_typeISetup) + S15_Gate3 1。次候補 (要 3002/1017 末尾との整合確認):
+(a) s15_s_and_t.md 2026-07-07 LIVE STATUS の (13.3) G1 assembly 続行、(b) (13.18) betaGrid_support /
+(13.19) producer 実証明 ((13.17.c) E=W₁ 排除の上流)、(c) off-path vestigial (sibleyTarget_S 等) は
+do-not-complete 維持。
+
+**frontier 確定 (同日、調査済)**: 次 = **(b) の (13.18)/(13.19) cluster** (S15_SAndT、b 所有)。根拠:
+(i) 0757c158 の忠実 restate により `typeIOrthogonalityGridData_of_typeISetup` が W-side η-grid spine の
+honest な producer obligation になった — 「S-side cascade off-path」(2026-07-02 ruling) の対象
+(sibleyTarget_S/character_degree_analysis/tauS placeholder) とは**別物** (こちらは η_ij grid = spine 側)。
+(ii) c の (14.11) restructure (3004 裁定 1) は (13.19.c) を「明示 hypothesis パラメータ、**b landing 後に
+差し替え**」で待っている = 本物の downstream 需要。(iii) 文書順: (13.18) betaGrid_support →
+(13.18.c/d) gammaGrid_real / gammaGrid_Y_norm_bound → (13.19) producer → その下流で (13.17.c)
+`complement_inf_Q_structure` の E=W₁ 排除 ((13.19.c1)+(14.5) 論法) が閉じる。原文 (13.18) proof
+(mmd 04.15 p.83) の部品: (4.5.a) Res μ_0j / (13.3.a)(13.12) vanishing / (1.6.b) inflation 同定 /
+(2.1) W-coset conjugacy / Frobenius counting — 各部品の Lean 所在 survey から次 iteration 開始。
+3002 の b-side は全完了済 (2026-07-07)、s15_s_and_t.md の (13.3) G1 assembly は S-side
+CharacterDegreeData 系で off-path ruling との整合要確認 — (13.18)/(13.19) を先行する。
