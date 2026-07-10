@@ -407,6 +407,34 @@ noncomputable def hyp46Smp :
       (OddOrder.Peterfalvi.S15.dadeSupportHypothesisData_honestTypeP2A0Set hG
         mp.S_maximal mp.S_typeP2 tp.Sdata).some.hconj }
 
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
+/-- **Peterfalvi (4.8) conclusion (1) on the `muS` grid** (Coq `prDade_sub_TIirr_on`; the
+`(13.18)` support engine in producer vocabulary): for nontrivial equal-degree columns
+`j, k ≠ 0`, the `μ`-column difference `μ_{ij} − μ_{ik}` is supported in
+`A₀(S) = A(S) ∪ V^S`.  The §6 support engine `certainType_diff_supp_subset_A0` applied at
+`hyp46Smp`, whose `toHypothesis` is the `muS` instance `mp.certainTypeS` — no grid
+identification needed. -/
+theorem muS_diff_support (i : Fin tp.q) {j k : Fin tp.p}
+    (hj0 : j ≠ ⟨0, tp.p_prime.pos⟩) (hk0 : k ≠ ⟨0, tp.p_prime.pos⟩)
+    (hdeg : muS hG mp tp i j 1 = muS hG mp tp i k 1) :
+    (muS hG mp tp i j - muS hG mp tp i k).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.Peterfalvi.S15.honestTypeP2A0Set mp.S tp.Sdata) mp.S := by
+  classical
+  haveI : NeZero (Nat.card ↥(hyp46Smp hG mp tp).W1) :=
+    inferInstanceAs (NeZero (Nat.card ↥(mp.certainTypeS hG).W1))
+  have hχj : chi2enum hG mp tp j ≠ 1 := by
+    intro hc
+    exact hj0 ((chi2enum hG mp tp).injective (hc.trans (chi2enum_zero hG mp tp).symm))
+  have hχk : chi2enum hG mp tp k ≠ 1 := by
+    intro hc
+    exact hk0 ((chi2enum hG mp tp).injective (hc.trans (chi2enum_zero hG mp tp).symm))
+  intro z hz
+  rw [OddOrder.RepresentationTheory.ClassFunction.mem_support] at hz
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+  exact OddOrder.Peterfalvi.S06.certainType_diff_supp_subset_A0 (hyp46Smp hG mp tp)
+    hχj hχk (eqQ hG mp tp i) hdeg hz
+
 /-- The `omegaS` are linear characters: `ω_{ij}(1) = 1`. -/
 theorem omegaS_apply_one (i : Fin tp.q) (j : Fin tp.p) :
     omegaS hG mp tp i j 1 = 1 := by
