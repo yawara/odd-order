@@ -810,3 +810,20 @@ S15.Hypothesis の producer は未構成 (grep で不在確認 — 仮説 carrie
 か、s06S の card 同定 (q_eq_card_W1 系) を介した enum-free 形か — 次 iter で residueS/mu2 の型を
 精査して設計確定 → field 追加 → tauS_mu_row0 pins (S15_HonestTypeP2A0:877/891 sorry) の discharge →
 B(i)/(iii) → PVSbeta assembly。
+
+## 📋 (2026-07-10 続¹⁵、lane-b /loop iter 9) — grounding 設計確定: 「性質 field 化」(3002 同型、循環回避)
+
+- **scan 訂正**: S15_HonestTypeP2A0 (b 系列 9076 file、git log 確認) に実 sorry **3 本**が残存
+  (前回の b-owned scan の対象 glob 外だった): `mu_row0_ne` (:739 hoff 直交のみ sorry) /
+  `tauS_mu_row0_diff_support` (:881) / `tauS_mu_row0_vanish_on_V` (:899)。3 本とも
+  「grounding 後は proven engine (residueS_mu2_diff_support / V-value engine / mu2 直交) の
+  rewriting」と docstring 明記。
+- **grounding field の設計判断**: `mu = residueS.mu2` を S15.Hypothesis の field に直接書くのは
+  **不可** — residueS は Hypothesis 自身を引数に取る def (S13_PrimeTIResidueBridge:75) ゆえ循環。
+  正道 = **grounding の帰結を性質 field 化** (3002「7 grid property fields」と同型、構成可能性 =
+  spine 構成時に mu := residueS.mu2 と置けば discharge 可能なので sound、hoisted-conclusion には
+  非該当)。候補 field: `mu_orthonormal` (grid 全体 pairwise 直交 — mu_row0_ne の hoff を閉じる) +
+  B(iii) 用の W₁-値 or (4.8) residue-値 field (residueS.mu2 の対応 API を S13 で確認してから確定)。
+- 次 iter: S13_PrimeTIResidueBridge の mu2 API 精査 (orthonormality / W₁^# 値 / degree) →
+  field リスト確定 → SubcoherenceInputs.Hypothesis へ追加 (producer 未構成ゆえ追従なし、
+  ただし既存 mock/instance が repo に無いか grep してから) → mu_row0_ne 等 discharge。
