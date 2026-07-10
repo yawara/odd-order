@@ -1416,3 +1416,91 @@ Hypothesis46 は `CertainTypeHypothesis A L` を extends し tic/subH/dade0/tau 
 残る — 将来の grounding 系で使う)。iter 38 の W-equalities は本 shortcut の tic_W1/W2 discharge に
 そのまま使う ✓ 無駄なし。**次 iter: CertainTypeHypothesis 構造確認 → hyp46Smp (certainTypeS-based)
 構築開始** → muS_diff_support (engines 直適用) → field 3 層 → pins。
+
+## ✅ (2026-07-11、lane-b /loop iter 40) — shortcut 前提 3 点完備 (K も literal 一致)
+
+- **CertainTypeHypothesis = S06.Hypothesis + `dade` 1 field のみ** (S06_DadeIsometryCertain:469) —
+  certainTypeS-based Hypothesis46 の直接構築は完全に仕様化済。
+- **`certainTypeS_K_eq` landed** (commit 9448dffe、full build 4150 green): kappaHall constructor の
+  K は literal `(derivedInG M).subgroupOf M` = Sdata-instance と同一 — K の同定も unfold+rfl。
+- ∴ shortcut 構築の全 discharge 部品確認済: toHypothesis := certainTypeS / dade :=
+  dade0mp.restrict / tic := typePData_toTICyclicHypothesis tp.Sdata / tic_W1-W2 (iter 38 +
+  map_subgroupOf_eq_of_le + W1_eq_K 合成) / tic_V rfl / subH := Msigma.subgroupOf /
+  W2_le_subH (certainTypeS_W2_eq → Kstar = Sdata.W2 → H ≤ Msigma chain) / subH_le_K
+  (certainTypeS_K_eq + Msigma_le_derived) / A_covers (hyp46S コピー + K_eq rewrite) /
+  dade0 := (dadeSupportHypothesisData_honestTypeP2A0Set hG mp.S_maximal mp.S_typeP2
+  tp.Sdata).some.dade / tau := .fullDadeIsometryData hconj。
+**次 iter: hyp46Smp 本体構築** (FT.lean、~70 行、hyp46S [S15_HonestTypeP2A0:660-699] を鋳型に
+上記部品で) → muS_diff_support (certainType_diff_supp_subset_A0 直適用) → field 3 層 → pins。
+
+## ✅✅ (2026-07-11、lane-b /loop iter 41) — **hyp46Smp landed** (shortcut 本体)
+
+**`Section16CharacterData.hyp46Smp : Hypothesis46 (honestTypeP2ASet mp.S) mp.S`** (FT.lean、
+commit 60179463、full build 4150 green・AxiomsCheck OK) — toHypothesis := mp.certainTypeS で
+**§6 engines が muS grid に直接適用可能に** (grid 同定不要)。tic reconciliation は iter 38/40 の
+instance equalities で discharge、dade = A₀(S)-Dade、subH = M_σ(S) + A(S)-covering (hyp46S mirror)。
+初回 build の instance clash (haveI Fintype G vs scoped ambientFintype) は haveI 除去で解消。
+新 import: FT.lean ← S15_HonestTypeP2A0 (cycle なし)。
+
+**次 iter: `muS_diff_support`** — `certainType_diff_supp_subset_A0 (hyp46Smp hG mp tp)` を
+muS 差 (nontrivial columns j,k、hdeg 仮説) に適用する engine lemma (residueS_mu2_diff_support
+[S15_HonestTypeP2A0:759-794] の hyp46Smp 版、chi2enum で nontrivial 化)。その後: field 3 層
+(mu_diff_support、iter 30 設計) + producer threading + pins 修正 + V-value 側
+(certainType_diff_dade_apply_eq_of_mem_V at hyp46Smp)。
+
+## ✅✅ (2026-07-11、lane-b /loop iter 42) — **muS_diff_support landed** (support engine 完成)
+
+`Section16CharacterData.muS_diff_support` (FT.lean、一発 green、full build 4150 green・
+AxiomsCheck OK): 非自明等次数列 j,k≠0 の muS 差の support ⊆ A₀(S) —
+`certainType_diff_supp_subset_A0 (hyp46Smp)` + chi2enum 非自明化 + eqQ 行 reindex。
+NeZero は inferInstanceAs bridge (def-opaque projection)。
+
+**⟹ shortcut route の実り**: iter 30 で「certainTypeS ↔ Sdata grid 同定が要る」と見えた
+producer-side support fact が、hyp46Smp (iter 41) 経由で同定ゼロで完成。
+
+**次 iter: field threading** — `mu_diff_support` field を 3 層 (SubcoherenceInputs S15.Hypothesis
+[hdeg-parametric、iter 30 設計の signature] / FTSetup inputs / FTSetup cd) に追加し、producer
+(FT.lean cd-construction) で `muS_diff_support` を discharge、inputs/hypothesis threading。
+その後: pin `tauS_mu_row0_diff_support` (S15_HonestTypeP2A0:~878) の signature 修正 (hj0+hdeg) +
+field 射影化、consumer (S15_SAndT tauS_mu_row0_cross) の `_hj`+hdeg pass — hdeg 供給は
+iter 31 の residue 次数一致 (PU-Frobenius、genuine math unit) が最後のピース。
+
+## ✅✅ (2026-07-11、lane-b /loop iter 43) — **mu_diff_support field 3 層 + producer 完成** (一発 green)
+
+commit 上記 (full build 4151 green・AxiomsCheck OK): S15.Hypothesis / Section16Inputs / cd 層に
+hdeg-parametric field、producer discharge = muS_diff_support (iter 42)、両 threading。
+FTSetup の閉包に SubcoherenceInputs が既在 (S15.FiniteInduce open が証左) で iter 34 の
+honestTypeP2A0Set 移設がそのまま効いた。A0S field は vestigial (∅ placeholder) と確認 — 不使用。
+
+**残チェーン (13.18 support pin 閉鎖まで)**:
+1. pin `tauS_mu_row0_diff_support` (S15_HonestTypeP2A0:~890) の signature 修正 (hj0 + hdeg 追加、
+   9076 honest fix) + body = `hyp.mu_diff_support` 射影 (Fin-ne ↔ val-ne 変換)。
+2. consumer `tauS_mu_row0_cross` (S15_SAndT:1152) に `_hj` + hdeg pass — **hdeg 供給 =
+   residue 次数一致 (iter 31: PU Frobenius kernel P ⟹ 非自明 residue 次数 u、Pf (13.3) 系
+   genuine math unit)** が最後のピース。
+3. V-value pin は support 完了後に同型 (certainType_diff_dade_apply_eq_of_mem_V at hyp46Smp +
+   η/ω^σ 同定)。
+次 iter: 1 (pin 修正、機械的) → 2 の hdeg unit 設計。
+
+## ⚠→✅ (2026-07-11、lane-b /loop iter 43 続) — field threading は sorryAx 混入で revert (1b12b8cf)
+
+**incident**: c2400d81 (field 3 層 + producer) は leaf build green だったが **AxiomsCheck で red** —
+`section16CharacterData_of_isMinimalSimpleOdd` (従来 sorry-free の spine producer) に sorryAx が
+推移混入。原因 = producer discharge が muS_diff_support → hyp46Smp → **dade0
+(dadeSupportHypothesisData_honestTypeP2A0Set = deep FT-support pin `not_isConj_honestTypeP2ASet_typePV`
+sorried) を term として運ぶ**ため — engine の証明がその field を使うかに関係なく axioms に入る。
+[[scaffold-sorry-free-not-done]] の HOLD (従来 sorry-free spine への sorry 混入禁止) に抵触 → revert。
+**手順ミス 2 点も記録**: (1) `lake build | tail` は pipe で exit status が隠れ、`&&` chain が
+red のまま commit を通した — [[lean-build-discipline]]「build 検証と commit は別 bash」違反の実害。
+(2) full build を commit 前でなく後に回した。以後: build は単独 bash + `${PIPESTATUS[0]}` 確認。
+
+**fix-forward 計画 (次 iter)**:
+1. **(4.7) 依存精査**: `chiRestrict_apply_eq_zero_of_not_mem_union` (z∈K case の鍵) が
+   CertainTypeHypothesis の **dade field を証明で使うか** grep/精読。
+   - 使わない (A_covers/構造のみ) → **Dade-free engine variant** を S06 に additive 追加
+     (Hypothesis + tic + tic_W1/W2/V + A_covers 系のみ取る) → muS_diff_support を variant 経由に
+     → producer sorry-free 維持で field 再 landing (c2400d81 の re-apply + engine 切替)。
+   - 使う → sorryAx routing は本質的 (honest sorried-cite)。その場合の選択: (a) AxiomsCheck の
+     当該 assert を sorryAx-許容形に更新 (spine producer の性質変化を明示 docstring 化)、
+     (b) field discharge を producer でなく別層に移す設計再考。(a) は HOLD との整合を hub に
+     9000-issue で確認してから (unsound でないが「sorry-free spine への混入」の解釈事項)。
