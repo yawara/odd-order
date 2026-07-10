@@ -614,6 +614,234 @@ theorem Hypothesis.tau1_zeta_inner_alignedGrid_eq_zero [Finite G] {M : Subgroup 
     rw [(tic.chiFam_spec hVeq app).2.2.1, if_pos rfl]
   exact inner_left_eq_zero_of_inner_sub_eq_zero haZ hsZ ha1 hb1 hs1 hab hdiff
 
+open scoped FiniteInduce in
+/-- **`ℤ[𝒮]`-combinations vanishing at `1` are supported in `(M′)^#`** (the `zchar_on`/`defA1`
+step of Coq `Frob_der1_type2`): every member of `inducedFamily M` is induced from the normal
+`M′`, hence vanishes off `M′` (a ℤ-linear property, so every lattice element does); vanishing
+at `1` then pins the support inside the sharp set.  This is the `M`-side support refinement
+`supp ⊆ A₁(M) = (M′)^#` feeding the (8.18.b) disjointness (`A₀`-support alone would not do:
+the pair's `A₀`-sets share the conjugates of `V`). -/
+theorem Hypothesis.mem_zSpan_inducedFamily_support_sharp_derived [Finite G] {M : Subgroup G}
+    (hyp : Hypothesis M) {φ : ClassFunction ↥M ℂ}
+    (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M) (inducedFamily M))
+    (hφ1 : φ 1 = 0) :
+    φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (sharpSubgroup (derivedInG M)) M := by
+  haveI := hyp.finiteG
+  classical
+  have hKcomm : (derivedInG M).subgroupOf M = commutator ↥M := by
+    rw [derivedInG, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+  haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
+  -- every lattice element vanishes off `M′` (span induction, the property is ℤ-linear)
+  have hvanish : ∀ χ ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M) (inducedFamily M),
+      ∀ w : ↥M, w ∉ (derivedInG M).subgroupOf M → χ w = 0 := by
+    intro χ hχ
+    induction hχ using Submodule.span_induction with
+    | mem x hx =>
+        intro w hw
+        obtain ⟨θ, -, hxeq⟩ := hx
+        rw [hxeq]
+        exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hw
+    | zero => intro w _; rfl
+    | add x y _ _ ihx ihy =>
+        intro w hw
+        rw [ClassFunction.add_apply, ihx w hw, ihy w hw, add_zero]
+    | smul a x _ ih =>
+        intro w hw
+        rw [← Int.cast_smul_eq_zsmul ℂ a x, ClassFunction.smul_apply, ih w hw, mul_zero]
+  intro z hz
+  rw [ClassFunction.mem_support] at hz
+  have hzK : z ∈ (derivedInG M).subgroupOf M := by
+    by_contra hzK
+    exact hz (hvanish φ hφ z hzK)
+  have hz1 : z ≠ 1 := by rintro rfl; exact hz hφ1
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+  exact ⟨Subgroup.mem_subgroupOf.mp hzK,
+    fun h0 => hz1 (Subtype.ext (Set.mem_singleton_iff.mp h0))⟩
+
+set_option linter.unusedVariables false in
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (8.18.b), cross-Dade orthogonality at the canonical pair** (Coq `oST` of
+`Frob_der1_type2`, `PFsection10.v:577-590`): for `φ` a `(M′)^#`-supported class function of
+the type-`P₁` `M = mp.T` and `ψ` an `A(S)`-supported class function of the type-II member
+`mp.S`, the two Dade images are orthogonal, `⟨φ^{τ_M}, ψ^{τ_S}⟩ = 0`.
+
+The image supports are the **restricted** thickenings: `Supp(φ^{τ_M}) ⊆ Ã₁(M)` (the Dade
+value at `g ~ a·h` is `φ(a)`, so only base points in `Supp(φ) ⊆ A₁(M) = (M′)^#`
+contribute) and `Supp(ψ^{τ_S}) ⊆ Ã(S)` (the (8.16) TI-route has trivial signalizers, so the
+thickening is the bare conjugation closure).  These are disjoint — Peterfalvi (8.18.b): a
+common point would produce a supporting configuration `FTsupports M (S^x)`, whose (8.13.c4)
+unique supporting maximal is of type I or II, and the type-II case forces `M` to be a
+Frobenius group with kernel `M_F` — impossible for the type-`P₁` `M` (Coq
+`typePF_exclusion`).  **`sorry`d as the single remaining (8.18.b) obligation** of the
+(10.7) frontier (issue 9079 obligation 3; the (8.13) control `escapingCentralizers_control`
+upstream is itself an open §8 obligation). -/
+theorem Hypothesis.cross_dade_inner_eq_zero_at_pair [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : Hypothesis M) {mp : Section16MaximalPair G}
+    (hT : mp.T = M) (hKstar : mp.Kstar = hyp.typeP.W1)
+    {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S}
+    (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar)
+    [NeZero (Nat.card (typeIIHypothesis46 hG mp.S_maximal
+      (section16_S_isTypeII hG mp) data.typeP).W1)]
+    {φ : ClassFunction ↥M ℂ} {ψ : ClassFunction ↥mp.S ℂ}
+    (hφsupp : φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (sharpSubgroup (derivedInG M)) M)
+    (hψsupp : ψ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (centralizerSupport (sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma mp.S))
+        (derivedInG mp.S)) mp.S) :
+    ClassFunction.inner (hyp.tau φ)
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+        (typeIIHypothesis46 hG mp.S_maximal (section16_S_isTypeII hG mp) data.typeP).dade0
+        (typeIIHypothesis46 hG mp.S_maximal (section16_S_isTypeII hG mp) data.typeP).tau ψ)
+      = 0 := by
+  sorry
+
+open scoped Classical FiniteInduce in
+/-- **The (10.7) cross-side orthogonality `⟨ζ^{τ₁}, λ^{τ₂}⟩ = 0`** (the `zeta_lam_ortho`
+production; Coq `Frob_der1_type2`'s `orthonormal_vchar_diff_ortho` step): the `M`-side
+coherent image of `ζ` is orthogonal to the `S`-side coherent image of `λ`.
+
+The conjugate-pair difference trick: `{ζ^{τ₁}, ζ̄^{τ₁}}` and `{λ^{τ₂}, λ̄^{τ₂}}` are
+orthonormal pairs of virtual characters (the coherence isometries on distinct
+irreducibles), the differences are the Dade images `(ζ − ζ̄)^{τ_M}` and `(λ − λ̄)^{τ_S}`
+(coherence agreement on the supported lattice) — orthogonal by the (8.18.b) support
+disjointness (`cross_dade_inner_eq_zero_at_pair`) and both vanishing at `1`
+(`dadeIntegralCharacterMap_apply_one_eq_zero`), so the cross-orthogonality primitive
+`orthonormal_vchar_diff_ortho` applies. -/
+theorem Hypothesis.tau1_zeta_inner_extension_lam_eq_zero_at_pair [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : Hypothesis M) {mp : Section16MaximalPair G}
+    (hT : mp.T = M) (hKstar : mp.Kstar = hyp.typeP.W1)
+    {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S}
+    (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar)
+    [NeZero (Nat.card (typeIIHypothesis46 hG mp.S_maximal
+      (section16_S_isTypeII hG mp) data.typeP).W1)]
+    {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    {Y : Subgroup G} {lam nu : ClassFunction ↥mp.S ℂ}
+    (hlam_mem : lam ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (hlam_irr : IsIrreducibleCharacter lam)
+    (_hnu_mem : nu ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (_hdeg : lam 1 = nu 1)
+    (c : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+        (typeIIHypothesis46 hG mp.S_maximal (section16_S_isTypeII hG mp) data.typeP).dade0
+        (typeIIHypothesis46 hG mp.S_maximal (section16_S_isTypeII hG mp) data.typeP).tau)
+      ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥mp.S ℂ))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (centralizerSupport (sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma mp.S))
+            (derivedInG mp.S)
+          ∪ conjClassSetIn mp.S (typePV mp.S data.typeP)) mp.S)) :
+    ClassFunction.inner (coh.tau1 params.zeta) (c.extension lam) = 0 := by
+  classical
+  subst hT
+  -- `M`-side pieces: `ζ`, `ζ̄`, their coherent images
+  have hζS : params.zeta ∈ inducedFamily mp.T := params.zeta_mem_S
+  have hζirr := params.zeta_irreducible
+  have hModd : Odd (Nat.card ↥mp.T) :=
+    hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card mp.T)
+  have hζne : params.zeta.conj ≠ params.zeta := inducedFamily_hasNoRealCharacters hModd hζS
+  have hζcS : params.zeta.conj ∈ inducedFamily mp.T :=
+    inducedFamily_closedUnderConjugate mp.T hζS
+  have haZ : coh.tau1 params.zeta ∈ ZIrr G :=
+    coh.coherent.extension_mem_ZIrr _ (Submodule.subset_span hζS)
+  have hbZ : coh.tau1 params.zeta.conj ∈ ZIrr G :=
+    coh.coherent.extension_mem_ZIrr _ (Submodule.subset_span hζcS)
+  have ha1 := hyp.zeta_tau1_inner_self hG hG.odd coh hζS hζirr
+  have hb1 := hyp.zeta_tau1_inner_self hG hG.odd coh hζcS hζirr.conj
+  have hab : ClassFunction.inner (coh.tau1 params.zeta) (coh.tau1 params.zeta.conj) = 0 := by
+    change ClassFunction.inner (coh.coherent.extension _) (coh.coherent.extension _) = 0
+    rw [coh.coherent.extension_inner_eq _ _ (Submodule.subset_span hζS)
+        (Submodule.subset_span hζcS),
+      OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr.conj,
+      if_neg (fun h => hζne h.symm)]
+  -- `S`-side pieces: `λ`, `λ̄`, their coherent images (as in the (5.5) span lemma)
+  have hSmodd : Odd (Nat.card ↥mp.S) :=
+    hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card mp.S)
+  have hlamIKF := typeII_sOf_subset_inducedKernelFamily data Y hlam_mem
+  have hr : ¬ ClassFunction.IsReal lam :=
+    OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters hSmodd
+      (Y.subgroupOf mp.S) hlamIKF
+  have hlamne : lam ≠ lam.conj := fun h => hr h.symm
+  have hlam_zspan : lam ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥mp.S)
+      ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥mp.S ℂ)) :=
+    Submodule.subset_span (Set.mem_insert _ _)
+  have hlamc_zspan : lam.conj ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥mp.S)
+      ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥mp.S ℂ)) :=
+    Submodule.subset_span (Set.mem_insert_of_mem _ (Set.mem_insert _ _))
+  have hcZ : c.extension lam ∈ ZIrr G := c.extension_mem_ZIrr _ hlam_zspan
+  have hdZ : c.extension lam.conj ∈ ZIrr G := c.extension_mem_ZIrr _ hlamc_zspan
+  have hc1 : ClassFunction.inner (c.extension lam) (c.extension lam) = 1 := by
+    rw [c.extension_inner_eq _ _ hlam_zspan hlam_zspan]
+    exact hlam_irr.inner_self_eq_one
+  have hd1 : ClassFunction.inner (c.extension lam.conj) (c.extension lam.conj) = 1 := by
+    rw [c.extension_inner_eq _ _ hlamc_zspan hlamc_zspan]
+    exact hlam_irr.conj.inner_self_eq_one
+  have hcd : ClassFunction.inner (c.extension lam) (c.extension lam.conj) = 0 := by
+    rw [c.extension_inner_eq _ _ hlam_zspan hlamc_zspan,
+      OddOrder.RepresentationTheory.irr_cf_inner hlam_irr hlam_irr.conj,
+      if_neg (fun h => hlamne h)]
+  -- supports of the two differences
+  have hsupp : (lam - lam.conj).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (centralizerSupport (sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma mp.S))
+        (derivedInG mp.S)) mp.S := by
+    have hmem := typeII_T2_member_support hG mp.S_maximal (section16_S_isTypeII hG mp) data
+      hlam_mem hlam_mem
+    refine diff_support_subset_of_support_subset_union_one
+      (hmem lam (by simp)) (hmem lam.conj (by simp)) ?_
+    obtain ⟨n, -, hn⟩ := typeII_sOf_apply_one_eq_pos_natCast data hlam_mem
+    rw [ClassFunction.conj_apply, hn, star_natCast]
+  have hsuppA0 : (lam - lam.conj).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (centralizerSupport (sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma mp.S))
+          (derivedInG mp.S)
+        ∪ conjClassSetIn mp.S (typePV mp.S data.typeP)) mp.S :=
+    hsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono Set.subset_union_left)
+  have hζ1conj : params.zeta.conj 1 = params.zeta 1 := by
+    obtain ⟨nn, -, hn, -⟩ := hζirr.exists_natDegree_charValue_one_dvd_card
+    simp only [ClassFunction.conj_apply, hn, star_natCast]
+  have hφsupp : (params.zeta - params.zeta.conj).support
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+        (sharpSubgroup (derivedInG mp.T)) mp.T :=
+    hyp.mem_zSpan_inducedFamily_support_sharp_derived
+      (Submodule.sub_mem _ (Submodule.subset_span hζS) (Submodule.subset_span hζcS))
+      (by rw [ClassFunction.sub_apply, hζ1conj, sub_self])
+  -- the two difference identities: coherent images = Dade images
+  have hMdiff : coh.tau1 params.zeta - coh.tau1 params.zeta.conj
+      = hyp.tau (params.zeta - params.zeta.conj) :=
+    (hyp.tau_zeta_sub_conj_eq_tau1 hG hG.odd coh hζS hζirr).symm
+  have hSdiff : c.extension lam - c.extension lam.conj
+      = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+        (typeIIHypothesis46 hG mp.S_maximal (section16_S_isTypeII hG mp) data.typeP).dade0
+        (typeIIHypothesis46 hG mp.S_maximal (section16_S_isTypeII hG mp) data.typeP).tau
+        (lam - lam.conj) := by
+    rw [← c.extends_on_supported _
+      ⟨Submodule.sub_mem _ hlam_zspan hlamc_zspan, hsuppA0⟩, map_sub]
+  -- (8.18.b): the differences are orthogonal
+  have hdiff : ClassFunction.inner
+      (coh.tau1 params.zeta - coh.tau1 params.zeta.conj)
+      (c.extension lam - c.extension lam.conj) = 0 := by
+    rw [hMdiff, hSdiff]
+    exact hyp.cross_dade_inner_eq_zero_at_pair hG rfl hKstar hSW1 hSW2 hφsupp hsupp
+  -- both differences vanish at `1`
+  have hab1 : (coh.tau1 params.zeta) 1 = (coh.tau1 params.zeta.conj) 1 := by
+    have hz : (coh.tau1 params.zeta - coh.tau1 params.zeta.conj) (1 : G) = 0 := by
+      rw [hMdiff]
+      exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one_eq_zero
+        hyp.dadeData.dade hyp.hconj (hyp.zeta_sub_conj_support hG hG.odd hζS hζirr)
+    rw [ClassFunction.sub_apply] at hz
+    exact sub_eq_zero.mp hz
+  have hcd1 : (c.extension lam) 1 = (c.extension lam.conj) 1 := by
+    have hz : (c.extension lam - c.extension lam.conj) (1 : G) = 0 := by
+      rw [hSdiff]
+      exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one_eq_zero
+        (typeIIHypothesis46 hG mp.S_maximal (section16_S_isTypeII hG mp) data.typeP).dade0
+        (typeIIHypothesis46_dade0_hConjInvariant hG mp.S_maximal
+          (section16_S_isTypeII hG mp) data.typeP) hsuppA0
+    rw [ClassFunction.sub_apply] at hz
+    exact sub_eq_zero.mp hz
+  exact orthonormal_vchar_diff_ortho haZ hbZ hcZ hdZ ha1 hb1 hc1 hd1 hab hcd hdiff hab1 hcd1
+
 set_option linter.unusedVariables false in
 open scoped Classical FiniteInduce in
 /-- **The (10.7) cross-isometry package at the canonical pair** (Coq `Frob_der1_type2`,
@@ -661,7 +889,9 @@ theorem exists_typeIICrossIsometryData_at_pair [Finite G]
            zeta_ortho_grid := fun i j =>
              hyp.tau1_zeta_inner_alignedGrid_eq_zero hG hG.odd coh params.zeta_mem_S
                params.zeta_irreducible i j
-           zeta_lam_ortho := sorry
+           zeta_lam_ortho :=
+             hyp.tau1_zeta_inner_extension_lam_eq_zero_at_pair hG hT hKstar hSW1 hSW2
+               coh hlam_mem hlam_irr hnu_mem hdeg c
            cross_zero := sorry }⟩
 
 end OddOrder.Peterfalvi.S12
