@@ -1338,3 +1338,81 @@ field 追加の producer discharge 精査で **make-or-break 事実**:
 
 **当面の実装順変更**: field 3 層追加は同定完了後に延期 (field 文自体は iter 34 で語彙 ready)。
 次 iter = 一意性補題 (step 1) の Lean 化 — 数学は検証済ゆえ実装のみ。
+
+## ✅ (2026-07-11、lane-b /loop iter 36) — grid 一意性 (anchored-difference rigidity) landed
+
+**`irreducibleCharacterFamily_eq_of_difference_eq`** (IsometryDifferencePair.lean、commit 512b3c82、
+一発 green、full build 4150・AxiomsCheck OK): 差族一致 (ν_i − ν_0 = ν'_i − ν'_0) + ν' 単射 +
+n ≥ 2 ⟹ ν = ν'。iter 33 検証の anchor-shift norm 矛盾論法どおり。
+
+**⟹ (13.1.e) 型 grid は (ω, δ, Ind) から一意** — certainTypeS ↔ Sdata-instance の mu-grid 同定は
+「両 instance の **ω-grid + δ + Ind の同定**」に帰着 (iter 35 plan step 2)。
+
+**次 iter (同定 step 2 = ω-grid 同定の精査)**: certainTypeS.chiColumn と
+(typePData_toS06Hypothesis Sdata).chiColumn の関係 — 両者の W (W₁ ⊔ W₂) は同一部分群か
+(certainTypeHypothesis_of_typeP_kappaHall の W₁/W₂ = mp.K/mp.Kstar vs Sdata の W1/W2 —
+tp.Sdata_W1_eq : Sdata.W1 = tp.W1 と mp.K との関係、FTSetup の certainTypeS_W1_eq/W2_eq
+[FT.lean iter 28 で見た] が既にこの同定の一部)。同一なら chiColumn は同じ型の grid で
+enumeration (w1CharEquiv/両 instance の生成元べき) の突合せのみ。δ/Ind は W 同定に従属。
+その後: 同定合成 → engines の muS-transport → pins 2/3 discharge → field 追加は不要になる
+可能性 (同定が直接 pin を出すなら iter 30-34 の field 計画は簡約) — 同定完了時に再判断。
+
+## 📋 (2026-07-11、lane-b /loop iter 37) — ω-grid 同定精査: W 同一 (propositional) + enum-回避 route
+
+**確認事実**:
+- certainTypeS: W1 = mp.K.subgroupOf mp.S / W2 = mp.Kstar.subgroupOf mp.S (**proven**:
+  certainTypeS_W1_eq/W2_eq、FTSetup:1295/1299)。
+- Sdata-instance (typePData_toS06Hypothesis): W1 = Sdata.W1.subgroupOf M / W2 = Sdata.W2.subgroupOf M
+  (**literal fields**、S12 Hypothesis.lean:1219-1220)。
+- bridges: tp.Sdata_W1_eq (Sdata.W1 = tp.W1) + tp.W2_eq_Kstar 系 (tp ↔ mp.K/Kstar) —
+  ∴ **両 instance の W₁/W₂/W は propositionally 同一部分群** (合成 1-2 step)。
+
+**同定の実装 route (enum-matching 回避、refined)**: 添字ごとの grid 対応 (w1CharEquiv 突合せ) は
+不要 — pins は support/V-value という **membership-invariant** な性質ゆえ:
+per-ω rigidity route = certainTypeS の列 (anchor 付き族、ω-族 F への (13.1.e) 恒等式) と
+Sdata-instance の同じ F に対応する列 (W-同定 subgroupCongr で F を移送) に
+`irreducibleCharacterFamily_eq_of_difference_eq` (iter 36) → **列単位で grid 一致** →
+hyp.mu i j は Sdata-grid の member (列非自明性も対応) → engines の support/V-value bound が
+そのまま適用可能。実装部品: (i) W₁/W₂/W equalities の合成 lemma、(ii) subgroupCongr 下での
+chiColumn/Ind の naturality (induce_compHom_subgroupCongr [InducedCharacter 末尾に既存!] が
+Ind 側)、(iii) 列対応 + rigidity 適用、(iv) engines transport。次 iter: (i)+(ii) から実装。
+
+## ✅ (2026-07-11、lane-b /loop iter 38) — 同定 base layer landed: 両 S06 instance の W₁/W₂ 一致
+
+`sdataS06_W1_eq_certainTypeS` / `W2` / `W_join` (FeitThompsonSetup、commit 3fb7a754、
+full build 4150 green・AxiomsCheck OK) — Sdata-instance (engines 側) と certainTypeS
+(muS producer 側) の W₁/W₂/W が propositionally 一致 (Sdata_W1_eq + tp.W1_eq_K/W2_eq_Kstar +
+certainTypeS_W1_eq/W2_eq の合成、projection は unfold+rfl で通過)。
+
+**次 iter (同定 step (ii) = naturality)**: W-同定の subgroupCongr `e : (Sdata-inst).W ≃* (cts).W`
+の下で (a) 線形指標 grid の対応 (chiColumn = omega ∘ omegaProdChar — compHom e.toMonoidHom での
+移送)、(b) Ind の naturality (`induce_compHom_subgroupCongr` [InducedCharacter 末尾、既存] を
+W1⊔W2-join equality で instantiate)。その後 step (iii) 列対応 + rigidity。
+
+## 📋✨ (2026-07-11、lane-b /loop iter 39) — SHORTCUT 確定: certainTypeS-based Hypothesis46 直接構築
+
+Hypothesis46 の構造精査 (S06_CertainHypothesis46:40) で **grid 同定を丸ごと回避する route** を確認:
+Hypothesis46 は `CertainTypeHypothesis A L` を extends し tic/subH/dade0/tau を持つのみ —
+**toCertainTypeHypothesis を mp.certainTypeS ベースで直接組めば、engines
+(certainType_diff_supp_subset_A0 等) が muS grid にそのまま効く** (identification 不要)。
+
+**構築部品と discharge 見込み**:
+- tic := typePData_toTICyclicHypothesis tp.Sdata hG.odd (ambient、両 route 共通)。
+  tic_W1/W2: 「tic.W1 = (certainTypeS.W1).map subtype」 = Sdata-route の
+  map_subgroupOf_eq_of_le + **iter 38 の W-equalities** で rewrite ✓。tic_V: rfl ✓。
+- subH := Msigma.subgroupOf + W2_le_subH: certainTypeS_W2_eq → Kstar = Sdata.W2 (Sdata_W2_eq 逆) →
+  Sdata.W2 ≤ H ≤ Msigma (hyp46S と同じ chain) ✓。
+- A_covers: hyp46S のコピー (toCertainTypeHypothesis.K = certainTypeS.K — **K-equality
+  certainTypeS.K = (derivedInG S).subgroupOf S が要る**: certainTypeS_K_eq の有無 grep、
+  無ければ unfold+rfl で追加 [certainTypeHypothesis_of_typeP_kappaHall の K field])。
+- dade0 := (dadeSupportHypothesisData_honestTypeP2A0Set hG mp.S_maximal mp.S_typeP2
+  tp.Sdata).some.dade — target type (A ∪ conjClassSetIn S tic.V) は honestTypeP2A0Set と
+  defeq (hyp46S と同 trick) ✓。tau := dade0.fullDadeIsometryData hconj ✓。
+- **CertainTypeHypothesis の A-関連 fields** (toCertainTypeHypothesis が S06.Hypothesis に何を
+  足すか) を次 iter 冒頭で確認 — hyp46S は hypothesis46OfTypePData 経由でこれらを自動で得ていた;
+  直接構築ではここが新規 discharge 点。
+
+**route 変更**: iter 37 の per-ω rigidity 同定は不要に (rigidity 補題 [iter 36] は独立 infra として
+残る — 将来の grounding 系で使う)。iter 38 の W-equalities は本 shortcut の tic_W1/W2 discharge に
+そのまま使う ✓ 無駄なし。**次 iter: CertainTypeHypothesis 構造確認 → hyp46Smp (certainTypeS-based)
+構築開始** → muS_diff_support (engines 直適用) → field 3 層 → pins。
