@@ -64,6 +64,23 @@ end FiniteInduce
 
 /-! ## (13.1): the `S,T` hypothesis -/
 
+/-- **Peterfalvi (8.10), the honest type-`P₂` support `A(M) = ⋃_{x∈M_σ^#} C_{M'}(x)^#`.**  The
+nonidentity elements of the derived subgroup `M' = derivedInG M` centralizing some nonidentity
+element of `M_σ`.  This is the correct type-`P₂` `A(M)` (issue 9008), strictly smaller than the
+`typePA = (M')^#` over-claim (it excludes the Frobenius-complement points `U^#`). -/
+def honestTypeP2ASet (M : Subgroup G) : Set G :=
+  OddOrder.GroupTheory.centralizerSupport
+    (OddOrder.GroupTheory.sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma M)) (derivedInG M)
+
+/-- **The honest type-`P₂` `A₀`-support**: `A₀(S) = A(S) ∪ V^S`, with `A(S) = honestTypeP2ASet S`
+(the correct `M_σ^#`-indexed support) and `V^S = conjClassSetIn S (typePV S data)` the `S`-conjugacy
+closure of the cyclic-`TI` regular set `V_S = W ∖ (W₁ ∪ W₂)`.  (Relocated from
+`S15_HonestTypeP2A0` so the `(13.18)` grid-property fields of `Hypothesis` below can state their
+`A₀`-support bounds; issue 2038.) -/
+def honestTypeP2A0Set (M : Subgroup G) (data : OddOrder.GroupTheory.TypePData M) : Set G :=
+  honestTypeP2ASet M ∪ OddOrder.GroupTheory.conjClassSetIn M
+    (OddOrder.GroupTheory.typePV M data)
+
 open scoped FiniteInduce in
 /-- **Peterfalvi (13.1)**: the main setup for the two maximal subgroups `S` and
 `T` in case (b) of Theorem (8.8).
@@ -529,14 +546,6 @@ Following 9008 Option A, `A(S)` reduces to the type-I `ASet` bridge: `A(S) ⊆ A
 (`typeP_hall_derived_eq_and_abelian`) and every `A(S)`-point centralizes a nonidentity `S_σ`-element
 (so lies in `\widehat{S_σ}`).  The three (8.13) obligations then flow through the type-agnostic BG
 Theorem-II machinery, exactly as in the type-I `dadeSupportHypotheses_typeI` assembly. -/
-
-/-- **Peterfalvi (8.10), the honest type-`P₂` support `A(M) = ⋃_{x∈M_σ^#} C_{M'}(x)^#`.**  The
-nonidentity elements of the derived subgroup `M' = derivedInG M` centralizing some nonidentity
-element of `M_σ`.  This is the correct type-`P₂` `A(M)` (issue 9008), strictly smaller than the
-`typePA = (M')^#` over-claim (it excludes the Frobenius-complement points `U^#`). -/
-def honestTypeP2ASet (M : Subgroup G) : Set G :=
-  OddOrder.GroupTheory.centralizerSupport
-    (OddOrder.GroupTheory.sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma M)) (derivedInG M)
 
 @[simp] theorem mem_honestTypeP2ASet {M : Subgroup G} {y : G} :
     y ∈ honestTypeP2ASet M ↔
