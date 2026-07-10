@@ -504,6 +504,24 @@ X := c.extension (columnSum χ₂) に適用。入力チェックリスト:
   E-index 単射 = certainTypeRImage_injective + omegaProdEquiv_symm_omegaProdCharTic_ne)。
 - 結論整形: chiFam-form → certainTypeOmegaSigma 逆翻訳 (eq_chiFam.symm) で
   τ₂ν = δ·Σ_i ω_{χ₂,i} ∨ τ₂ν = −δ·Σ_i ω_{χ₂⁻¹,i}。
+
+**進捗⁵ — q-成分 lemma の実装設計確定 (API 発見済、次 iteration で実装)**:
+`omegaProdCharTic h χ₂ i := (sdiffTICyclicHypothesis.omegaProdChar (h.w1CharEquiv i) χ₂).comp
+(ticWEquivSdiffW h)` (S06_CertainTypeIsometry:125、クリーンな合成形)。成分 lemma:
+- **(L1) snd の i-独立性**: `(ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂ i) |>.2`
+  は i に依らない。証明: `omegaProdEquiv_symm_eq` (S05_SigmaIsometry:133、
+  symm ξ = (ξ|_{W₁}, ξ|_{W₂})) で .2 = restriction; MonoidHom.ext w (w ∈ tic-W₂-of-W);
+  値 = omegaProdChar (w1CharEquiv i) χ₂ (e w) — e w の sdiff-W₂ 帰属
+  (`coe_ticWEquivSdiffW` S06:112 + tic_W2 = W2.map subtype) → `wFst_eq_one_of_mem_W2` で
+  W₁-因子 = 1 → 値 = χ₂(wSnd (e w)) i-free ✓。
+- **(L1') fst の χ₂-独立性**: 対称 (wSnd_eq_one_of_mem_W1、値 = w1CharEquiv i (wFst…))。
+- **(L2) 列単射 (snd)**: χ₂ ≠ χ₂' → snd 成分相異。
+  `omegaProdEquiv_symm_omegaProdCharTic_ne` (S06:既存、pair-ne) + (L1') fst 一致 → snd 相異 ✓。
+⚠ ticVdiff h の W₁/W₂ は h.tic の fields (ticVdiff は tic の W-系を再利用) — subgroupOf の
+基準が (ticVdiff h).W = h.tic.W で一致することを確認しつつ書く。
+endgame 適用の残り組立は本 note 直上のチェックリスト通り
+(E-Finset → T := 添字 preimage、coeff 計算 = sigmaCoeff_psi_eq (S06:515) の
+chiFam_spec .2.2.1 pattern、hδ = (columnFamily χ₂).sign + sign_eq)。
 その後 = obligation 2(b) (S↔M grid transpose、0098 item 1 → 9000 claim) + obligation 3
 ((8.18.b) disjointness) — dichotomy が landed すれば `exists_typeIICrossIsometryData` の
 残 gap はこの 2 つ。
