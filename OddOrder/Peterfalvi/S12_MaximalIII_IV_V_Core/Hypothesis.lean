@@ -933,6 +933,115 @@ theorem exists_conj_mem_typePV_of_not_mem_derived [Finite G] {S : Subgroup G}
       rwa [mul_inv_cancel_right] at this
     exact hwne (Subgroup.mem_bot.mp (hdisj.le_bot ⟨hwW1, hwW2⟩))
 
+/-- **A `p`-element whose prime divides a Hall subgroup's order is conjugate into it** (the
+(8.11)-consumption step of the (10.8) covering).  The Sylow `p`-subgroups of `H` are full Sylow
+`p`-subgroups of `G` (the Hall index is prime to `p`), and every `p`-element lies in some Sylow
+`p`-subgroup, so Sylow conjugacy lands `a` in a conjugate of `H`.  ⚠ Hoist candidate
+(`IsHallSubgroup`-generic, no type-`P` content; natural home = Isaacs Ch03 Hall theory). -/
+theorem exists_conj_mem_of_isHallSubgroup_of_orderOf_pow [Finite G] {H : Subgroup G}
+    (hHall : OddOrder.Isaacs.Ch03.IsHallSubgroup (Nat.card ↥H).primeFactors H)
+    {p k : ℕ} (hp : p.Prime) (hpH : p ∣ Nat.card ↥H)
+    {a : G} (hoa : orderOf a = p ^ k) :
+    ∃ g : G, g * a * g⁻¹ ∈ H := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  -- the Hall index is prime to `p`, so `p` has full multiplicity in `H`
+  have hidx : ¬ p ∣ H.index := fun hdvd =>
+    hHall.2 p (Nat.mem_primeFactors.mpr ⟨hp, hdvd, Subgroup.index_ne_zero_of_finite⟩)
+      (Nat.mem_primeFactors.mpr ⟨hp, hpH, Nat.card_pos.ne'⟩)
+  have hfac : (Nat.card G).factorization p = (Nat.card ↥H).factorization p := by
+    rw [← Subgroup.card_mul_index H,
+      Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
+      Finsupp.add_apply, Nat.factorization_eq_zero_of_not_dvd hidx, add_zero]
+  -- a Sylow `p`-subgroup of `H`, pushed to `G`, is a full Sylow `p`-subgroup of `G`
+  obtain ⟨Q⟩ : Nonempty (Sylow p ↥H) := inferInstance
+  have hQmap : Nat.card ↥((Q : Subgroup ↥H).map H.subtype)
+      = p ^ (Nat.card G).factorization p := by
+    rw [Nat.card_congr
+        (Subgroup.equivMapOfInjective (Q : Subgroup ↥H) H.subtype
+          H.subtype_injective).symm.toEquiv,
+      Q.card_eq_multiplicity, hfac]
+  -- Sylow conjugacy moves `a` into that copy of `H`
+  have hpa : IsPGroup p ↥(Subgroup.zpowers a) :=
+    IsPGroup.of_card (by rw [Nat.card_zpowers, hoa])
+  obtain ⟨P, hPle⟩ := hpa.exists_le_sylow
+  obtain ⟨g, hgPQ⟩ := MulAction.exists_smul_eq G P
+    (Sylow.ofCard ((Q : Subgroup ↥H).map H.subtype) hQmap)
+  have haP : a ∈ (P : Subgroup G) := hPle (Subgroup.mem_zpowers a)
+  have hmem : g * a * g⁻¹ ∈ (Q : Subgroup ↥H).map H.subtype := by
+    have hsub : ((g • P : Sylow p G) : Subgroup G) = (Q : Subgroup ↥H).map H.subtype := by
+      rw [hgPQ, Sylow.coe_ofCard]
+    rw [← hsub, Sylow.coe_subgroup_smul]
+    have := Subgroup.smul_mem_pointwise_smul _ (MulAut.conj g) _ haP
+    simpa [MulAut.smul_def, MulAut.conj_apply] using this
+  exact ⟨g, Subgroup.map_subtype_le _ hmem⟩
+
+/-- **The `G₁`-covering core of Peterfalvi (10.8)** (p. 60 lines 89–91): with the partner data
+supplied — `|W₁|` prime and coprime to `|[S,S]|`, `H` a Hall subgroup of `G` ((8.11)),
+centralizers of `H#`-elements captured in `S` ((8.6.a)), and the Frobenius-kernel capture
+`C_{[S,S]}(H#) ⊆ H` (the (10.7) consequence) — every element whose order is not coprime to
+`|W₂|` lies in the conjugates of `H# = H ∖ {1}` or of `V = W ∖ (W₁ ∪ W₂)`.
+
+Peterfalvi's route: an order-`p` power `a` of `x` (`p ∣ gcd(|x|, |W₂|)`) is conjugate into `H`
+(`W₂ ≤ H` Hall), the conjugate `y` of `x` centralises `b = a^g ∈ H#`, so `y ∈ S`; inside
+`[S,S]` the Frobenius kernel absorbs it (`y ∈ H#`), and outside, the coprime-coset analysis
+(`exists_conj_mem_typePV_of_not_mem_derived`) lands it in `V`. -/
+theorem mem_conjClassSet_sharpH_or_typePV_of_not_coprime [Finite G] {S : Subgroup G}
+    (data : TypePData S) (hprime : (Nat.card ↥data.W1).Prime)
+    (hcop : Nat.Coprime (Nat.card ↥(derivedInG S)) (Nat.card ↥data.W1))
+    (hHall : OddOrder.Isaacs.Ch03.IsHallSubgroup (Nat.card ↥data.H).primeFactors data.H)
+    (hcent : ∀ b ∈ data.H, b ≠ 1 → Subgroup.centralizer ({b} : Set G) ≤ S)
+    (hfrobcap : ∀ b ∈ data.H, b ≠ 1 → ∀ y ∈ derivedInG S,
+      y ∈ Subgroup.centralizer ({b} : Set G) → y ∈ data.H)
+    {x : G} (hxord : ¬ (orderOf x).Coprime (Nat.card ↥data.W2)) :
+    x ∈ conjClassSet ((data.H : Set G) \ {1}) ∪ conjClassSet (typePV S data) := by
+  classical
+  -- a prime `p` dividing both `orderOf x` and `|W₂|`, and the order-`p` power `a` of `x`
+  obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hxord
+  have hpx : p ∣ orderOf x := hpdvd.trans (Nat.gcd_dvd_left _ _)
+  have hpw : p ∣ Nat.card ↥data.W2 := hpdvd.trans (Nat.gcd_dvd_right _ _)
+  have hxne1 : orderOf x ≠ 1 := fun h =>
+    hxord (by rw [h]; exact Nat.coprime_one_left _)
+  set a := x ^ (orderOf x / p) with ha
+  have hoa : orderOf a = p := orderOf_pow_orderOf_div (orderOf_pos x).ne' hpx
+  have hane : a ≠ 1 := fun h => hp.ne_one (by rw [← hoa, h, orderOf_one])
+  have hcommxa : Commute x a := (Commute.refl x).pow_right _
+  -- conjugate `a` into `H` ((8.11) Hall step; `p ∣ |W₂| ∣ |H|`)
+  have hpH : p ∣ Nat.card ↥data.H :=
+    hpw.trans (Subgroup.card_dvd_of_le (data.W2_le.trans inf_le_left))
+  obtain ⟨g, hga⟩ := exists_conj_mem_of_isHallSubgroup_of_orderOf_pow hHall hp hpH
+    (k := 1) (by rw [hoa, pow_one])
+  -- the conjugate `y = x^g` centralises `b = a^g ∈ H#`, so `y ∈ S` ((8.6.a))
+  set b := g * a * g⁻¹ with hb
+  set y := g * x * g⁻¹ with hy
+  have hbne : b ≠ 1 := by
+    intro h
+    apply hane
+    have := congrArg (fun z => g⁻¹ * z * g) h
+    simpa [hb, mul_assoc] using this
+  have hycomm : y ∈ Subgroup.centralizer ({b} : Set G) := by
+    have hc := hcommxa.map (MulAut.conj g).toMonoidHom
+    simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply] at hc
+    rw [Subgroup.mem_centralizer_iff]
+    intro z hz
+    rw [Set.mem_singleton_iff.mp hz, hb, hy]
+    exact hc.symm.eq
+  have hyS : y ∈ S := hcent b hga hbne hycomm
+  have hoy : orderOf y = orderOf x := by
+    have := orderOf_injective (MulAut.conj g).toMonoidHom (MulAut.conj g).injective x
+    simpa [hy, MulAut.conj_apply] using this
+  by_cases hyd : y ∈ derivedInG S
+  · -- inside `[S,S]`: the Frobenius kernel absorbs the centralising element
+    left
+    have hyH : y ∈ data.H := hfrobcap b hga hbne y hyd hycomm
+    have hyne : y ≠ 1 := fun h => hxne1 (by rw [← hoy, h, orderOf_one])
+    exact ⟨y, ⟨hyH, hyne⟩, g⁻¹, by rw [hy]; group⟩
+  · -- outside `[S,S]`: the coprime-coset analysis lands in `V`
+    right
+    obtain ⟨s, _, hsv⟩ := exists_conj_mem_typePV_of_not_mem_derived data hprime hcop hyS hyd
+      (by rw [hoy]; exact hxord)
+    exact ⟨s * y * s⁻¹, hsv, (s * g)⁻¹, by rw [hy]; group⟩
+
 /-- `W₂ ≤ M` for type-`P` data (`W₂ ≤ H ⊓ M'' ≤ M' ≤ M`). -/
 theorem typePData_W2_le_self {M : Subgroup G} (data : TypePData M) : data.W2 ≤ M :=
   (data.W2_le.trans (le_trans inf_le_right (Subgroup.map_subtype_le _))).trans
