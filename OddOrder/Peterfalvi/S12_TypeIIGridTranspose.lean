@@ -54,13 +54,18 @@ as the bridge for identifying the `S`-side σ-grid (`certainTypeOmegaSigma`) wit
   partner; the strong form takes `¬ IsTypeII mp.T` as a hypothesis, mirroring Coq's
   contextual `notMtype2`).
 
+* `ticyclic_eq_sigma_omega_of_eqOn_V`: the **(3.5)-determination** (Coq `eq_in_cycTIiso`) —
+  a norm-one virtual character agreeing with the linear character `ω` on `V` *is* `ω^σ`.
+  The grid vectors are pinned by their `V`-restrictions, which is what identifies the two
+  σ-grids of a pair per index (Coq `cycTIisoC`; the assembly is the remaining step of
+  issue 9079 part 2).
+
 ## Design note
 
-On non-`V`-supported class functions (e.g. the grid characters `ω_{ij}` themselves) the two
-`σ`'s are *not* identified by this file: `σ` is built from a choice of the (3.5) family
-`chiFam`, and only its restriction to `CF(W, V)` is pinned by the Dade map (via
-`sigma_eq_tau`).  Identifying the full grids requires the (3.5)-determination / coefficient
-rigidity step ((3.7)-style), which is part 2 of the transpose (issue 9079).
+On non-`V`-supported class functions, `σ` is built from a choice of the (3.5) family
+`chiFam`, and its restriction to `CF(W, V)` is pinned by the Dade map (`sigma_eq_tau`);
+the σ-image of a single grid character `ω` is nevertheless pinned by its `V`-restriction
+alone (`ticyclic_eq_sigma_omega_of_eqOn_V`, the (3.7)/(3.8)-counting uniqueness).
 
 For the canonical pair, only the `S`-side `TypePData` is canonically reconciled to the pair
 factors (`tp.Sdata` with `Sdata_W1_eq`; the `W₁`-prescribing producer
@@ -277,6 +282,158 @@ theorem ticyclic_sigma_congr_eq
           ((ticyclicSupportedOnVCongr hyp₁ hyp₂ hV hW α) : ClassFunction ↥hyp₂.W ℂ) :=
   ticyclic_sigma_eq_of_V_eq hyp₁ hyp₂ hVeq₁ hVeq₂ hV app₁ app₂ α
     (ticyclicSupportedOnVCongr hyp₁ hyp₂ hV hW α) (fun _ _ _ => rfl)
+
+/- The (3.5)-determination: a ±irreducible agreeing with `ω` on `V` *is* `ω^σ` -/
+
+/-- Integrality of the inner product on `ZIrr` (both slots): `⟨φ, η⟩ ∈ ℤ` for virtual
+characters `φ, η`.  Right-slot span induction over `Irr(G)` on top of the single-irreducible
+case `mem_ZIrr_inner_int`. -/
+theorem inner_intCast_of_mem_ZIrr {φ η : ClassFunction G ℂ}
+    (hφ : φ ∈ ZIrr G) (hη : η ∈ ZIrr G) :
+    ∃ m : ℤ, ClassFunction.inner φ η = (m : ℂ) := by
+  rw [ZIrr_eq_span] at hη
+  induction hη using Submodule.span_induction with
+  | mem x hx => exact mem_ZIrr_inner_int (⟨x, hx⟩ : IrreducibleCharacter G) hφ
+  | zero =>
+      refine ⟨0, ?_⟩
+      rw [show (0 : ClassFunction G ℂ) = (0 : ℂ) • 0 from (zero_smul ℂ _).symm,
+        OddOrder.RepresentationTheory.inner_smul_right]
+      simp
+  | add x y _ _ ihx ihy =>
+      obtain ⟨mx, hmx⟩ := ihx
+      obtain ⟨my, hmy⟩ := ihy
+      refine ⟨mx + my, ?_⟩
+      rw [ClassFunction.inner_add_right, hmx, hmy]
+      push_cast; ring
+  | smul a x _ ih =>
+      obtain ⟨m, hm⟩ := ih
+      refine ⟨a * m, ?_⟩
+      rw [← Int.cast_smul_eq_zsmul ℂ a x, OddOrder.RepresentationTheory.inner_smul_right,
+        hm, star_intCast]
+      push_cast; ring
+
+omit [Invertible (Nat.card G : ℂ)] in
+/-- The TI-set `V = W ∖ (W₁ ∪ W₂)` of a (3.1) setup is nonempty: both cyclic factors are
+nontrivial, so the internal product `W = W₁ × W₂` has an element with both components
+nontrivial (`supportInVdiffEquiv`). -/
+theorem ticyclic_V_nonempty (hyp : OddOrder.Peterfalvi.S05.TICyclicHypothesis G)
+    (hVeq : hyp.V = hyp.Vdiff) : hyp.V.Nonempty := by
+  have hne1 : hyp.W1.subgroupOf hyp.W ≠ ⊥ := by
+    rw [ne_eq, Subgroup.subgroupOf_eq_bot]
+    exact fun hd => hyp.W1_nontrivial (hd.eq_bot_of_le hyp.W1_le_W)
+  have hne2 : hyp.W2.subgroupOf hyp.W ≠ ⊥ := by
+    rw [ne_eq, Subgroup.subgroupOf_eq_bot]
+    exact fun hd => hyp.W2_nontrivial (hd.eq_bot_of_le hyp.W2_le_W)
+  haveI := (Subgroup.nontrivial_iff_ne_bot _).mpr hne1
+  haveI := (Subgroup.nontrivial_iff_ne_bot _).mpr hne2
+  obtain ⟨a, ha⟩ := exists_ne (1 : ↥(hyp.W1.subgroupOf hyp.W))
+  obtain ⟨b, hb⟩ := exists_ne (1 : ↥(hyp.W2.subgroupOf hyp.W))
+  refine ⟨(((hyp.supportInVdiffEquiv.symm (⟨a, ha⟩, ⟨b, hb⟩)).1 : ↥hyp.W) : G), ?_⟩
+  rw [hVeq]
+  exact OddOrder.Peterfalvi.S04.mem_supportInSubgroup.mp
+    (hyp.supportInVdiffEquiv.symm (⟨a, ha⟩, ⟨b, hb⟩)).2
+
+/-- **The (3.5)-determination of the σ-grid** (Coq `eq_in_cycTIiso`, `PFsection3.v:1750`):
+a norm-one virtual character of `G` that agrees on `V` with the linear character
+`ω = ω(ξ)` of `W` **is** `ω^σ`.  This is the uniqueness underlying the per-index
+identification of the two σ-grids of an (8.8) pair (Coq `cycTIisoC`): the grid vectors are
+pinned by their `V`-restrictions alone.
+
+Proof (mirroring Coq): let `η = ω^σ` and `ψ = η − φ`; `ψ` vanishes on `V` (both agree with
+`ω` there — (3.2.c) `sigma_apply_irreducibleCharacter_of_mem_V` for `η`).  The integer
+`c = ⟨φ, η⟩` satisfies `‖η ∓ φ‖² = 2 ∓ 2c ≥ 0`, so `c ∈ {−1, 0, 1}`:
+`c = 1` forces `ψ = 0` (positive definiteness); `c = 0` gives `‖ψ‖² = 2`, so all
+σ-coefficients of the `V`-vanishing `ψ` vanish (`sigmaCoeff_eq_zero_of_vanishOnV`, the
+(3.7)/(3.8) counting) — contradicting `⟨ψ, η⟩ = 1`; `c = −1` forces `φ = −η`, making
+`ω` vanish on the nonempty `V` — impossible for a unit-valued linear character. -/
+theorem ticyclic_eq_sigma_omega_of_eqOn_V
+    (hyp : OddOrder.Peterfalvi.S05.TICyclicHypothesis G)
+    [Fintype hyp.W] [Invertible (Nat.card hyp.W : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff)
+    (app : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication (G := G) hyp)
+    (ξ : hyp.W →* ℂˣ) {φ : ClassFunction G ℂ}
+    (hφZ : φ ∈ ZIrr G) (hφ1 : ClassFunction.inner φ φ = 1)
+    (hφV : ∀ (v : G) (hv : v ∈ hyp.V),
+      φ v = (hyp.omega ξ : ClassFunction hyp.W ℂ) ⟨v, hyp.V_subset_W hv⟩) :
+    φ = hyp.sigma hVeq app (hyp.omega ξ : ClassFunction hyp.W ℂ) := by
+  classical
+  set η := hyp.sigma hVeq app (hyp.omega ξ : ClassFunction hyp.W ℂ) with hηdef
+  -- `η` is the (3.5) family member at the index of `ξ`: `ZIrr`, norm one
+  have hηchi : η = hyp.chiFam hVeq app (hyp.omegaProdEquiv.symm ξ) :=
+    hyp.sigma_omega hVeq app ξ
+  have hηZ : η ∈ ZIrr G := by
+    rw [hηchi]; exact (hyp.chiFam_spec hVeq app).2.1 _
+  have hη1 : ClassFunction.inner η η = 1 := by
+    rw [hηchi, (hyp.chiFam_spec hVeq app).2.2.1, if_pos rfl]
+  -- `η` agrees with `ω` on `V` ((3.2.c)), so `ψ = η − φ` vanishes on `V`
+  have hηV : ∀ (v : G) (hv : v ∈ hyp.V),
+      η v = (hyp.omega ξ : ClassFunction hyp.W ℂ) ⟨v, hyp.V_subset_W hv⟩ := fun v hv =>
+    hyp.sigma_apply_irreducibleCharacter_of_mem_V hVeq app (hyp.omega ξ) hv
+  have hψV : ∀ v ∈ hyp.V, (η - φ) v = 0 := fun v hv => by
+    rw [ClassFunction.sub_apply, hηV v hv, hφV v hv, sub_self]
+  -- the integer inner product `c = ⟨φ, η⟩`
+  obtain ⟨c, hc⟩ := inner_intCast_of_mem_ZIrr hφZ hηZ
+  have hcstar : ClassFunction.inner η φ = (c : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hc, star_intCast]
+  -- `‖η − φ‖² = 2 − 2c` and `‖φ + η‖² = 2 + 2c`
+  have hsub : ClassFunction.inner (η - φ) (η - φ) = ((2 - 2 * c : ℤ) : ℂ) := by
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right, hη1, hφ1, hc, hcstar]
+    push_cast; ring
+  have hadd : ClassFunction.inner (φ + η) (φ + η) = ((2 + 2 * c : ℤ) : ℂ) := by
+    rw [ClassFunction.inner_add_left, ClassFunction.inner_add_right,
+      ClassFunction.inner_add_right, hη1, hφ1, hc, hcstar]
+    push_cast; ring
+  -- positivity bounds: `−1 ≤ c ≤ 1`
+  have hle : c ≤ 1 := by
+    have h0 := inner_self_re_nonneg (η - φ)
+    rw [hsub, Complex.intCast_re] at h0
+    have : (0 : ℤ) ≤ 2 - 2 * c := by exact_mod_cast h0
+    omega
+  have hge : -1 ≤ c := by
+    have h0 := inner_self_re_nonneg (φ + η)
+    rw [hadd, Complex.intCast_re] at h0
+    have : (0 : ℤ) ≤ 2 + 2 * c := by exact_mod_cast h0
+    omega
+  interval_cases c
+  · -- `c = −1`: `φ = −η`, so `ω` vanishes on the nonempty `V` — impossible
+    exfalso
+    have hzero : φ + η = 0 := by
+      refine eq_zero_of_inner_self_re_eq_zero ?_
+      rw [hadd]
+      norm_num
+    obtain ⟨v, hv⟩ := ticyclic_V_nonempty hyp hVeq
+    have hφv : φ v = -(η v) := by
+      have h := congrArg (fun f : ClassFunction G ℂ => f v) hzero
+      simp only [ClassFunction.add_apply, ClassFunction.zero_apply] at h
+      exact eq_neg_of_add_eq_zero_left h
+    have homega : (hyp.omega ξ : ClassFunction hyp.W ℂ) ⟨v, hyp.V_subset_W hv⟩ = 0 := by
+      have h1 := hφV v hv
+      have h2 := hηV v hv
+      rw [hφv, h2] at h1
+      -- `−ω(v) = ω(v)` forces `ω(v) = 0`
+      linear_combination -h1 / 2
+    rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.omega_apply] at homega
+    exact Units.ne_zero _ homega
+  · -- `c = 0`: `‖ψ‖² = 2` and `ψ|_V = 0`, so all σ-coefficients vanish — but `⟨ψ, η⟩ = 1`
+    exfalso
+    have hψZ : η - φ ∈ ZIrr G := Submodule.sub_mem _ hηZ hφZ
+    have hψ2 : ClassFunction.inner (η - φ) (η - φ) = 2 := by rw [hsub]; norm_num
+    have hall := hyp.sigmaCoeff_eq_zero_of_vanishOnV hVeq app hψZ hψ2 hψV
+    have hcoeff : hyp.sigmaCoeff hVeq app (η - φ) (hyp.omegaProdEquiv.symm ξ)
+        = ClassFunction.inner (η - φ) (hyp.chiFam hVeq app (hyp.omegaProdEquiv.symm ξ)) := rfl
+    have h1 : ClassFunction.inner (η - φ) η = 0 := by
+      have h := hall (hyp.omegaProdEquiv.symm ξ)
+      rw [hcoeff, ← hηchi] at h
+      exact h
+    rw [ClassFunction.inner_sub_left, hη1, hc] at h1
+    norm_num at h1
+  · -- `c = 1`: `‖ψ‖² = 0`, so `φ = η`
+    have hzero : η - φ = 0 := by
+      refine eq_zero_of_inner_self_re_eq_zero ?_
+      rw [hsub]
+      norm_num
+    exact (sub_eq_zero.mp hzero).symm
 
 end GenericBridge
 
