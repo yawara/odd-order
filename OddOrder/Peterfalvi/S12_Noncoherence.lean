@@ -158,4 +158,17 @@ theorem S_not_coherent_unconditional [Finite G]
     hSidx hU7 hprime hcop hHall hcent hfrobcap hW2card hWcard
   exact typeII_noncoherence_arithmetic hw1 hu7' hw2 hMp hbound
 
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.10), unconditional**: `G` has no maximal subgroup of type V — the
+`S12.no_typeV_maximal` conclusion re-founded on the unconditional (10.8)
+(`S_not_coherent_unconditional`), so its dependencies stay axiom-clean (issue 1020,
+consumer-migration step 1). -/
+theorem no_typeV_maximal_unconditional [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
+    ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ IsTypeV M := by
+  rintro ⟨M, hMmax, hMV⟩
+  obtain ⟨hyp⟩ := exists_hypothesis_of_typeIIIorIVorV hG hMmax (Or.inr (Or.inr hMV))
+  obtain ⟨params, -⟩ := w2_prime_and_parameter_independence hG hyp
+  exact S_not_coherent_unconditional hG hyp (typeV_forces_coherence hG hMV params)
+
 end OddOrder.Peterfalvi.S12
