@@ -522,6 +522,98 @@ theorem Hypothesis.extension_lam_inner_alignedGrid_eq_zero_at_pair [Finite G]
   exact typeII_T2_extension_lam_inner_chiFam_eq_zero hG mp.S_maximal
     (section16_S_isTypeII hG mp) data hlam_mem hlam_irr hnu_mem hdeg c _
 
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (5.3.b), `M`-side: `ζ^{τ₁}` is orthogonal to the aligned σ-grid** (the
+`zeta_ortho_grid` production — the full-`𝒮`-coherence form of the grid-orthogonality
+intermediate of `tau1_zeta_vanishes_on_typePV`; cf. its `S(HC)`-port
+`SHC_extension_inner_alignedOmegaSigma_eq_zero`).
+
+`(ζ − ζ̄)^τ = ζ^{τ₁} − ζ̄^{τ₁}` (`tau_zeta_sub_conj_eq_tau1`) vanishes on `V`
+(`tau_zeta_sub_conj_vanishes_on_typePV`) and has at most `2 < min(w₁, w₂)` nonzero
+σ-coefficients (each `τ₁`-image is norm-`1` with at most one,
+`ncard_inner_chiFam_ne_zero_le_one`), so every σ-coefficient dies
+(`sigmaCoeff_eq_zero_of_sigmaNC_lt`); the norm-`1` projection
+(`inner_left_eq_zero_of_inner_sub_eq_zero`) upgrades the difference orthogonality to
+`⟨ζ^{τ₁}, χ_P⟩ = 0`, and the aligned grid vector **is** a `χ_P`
+(`exists_alignedOmegaSigmaGrid_chiFam_family`). -/
+theorem Hypothesis.tau1_zeta_inner_alignedGrid_eq_zero [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (i : Fin hyp.w1) (j : Fin hyp.w2) :
+    ClassFunction.inner (coh.tau1 ζ) (hyp.alignedOmegaSigmaGrid hG hodd i j) = 0 := by
+  haveI := hyp.finiteG
+  classical
+  have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+  have hζne : ζ.conj ≠ ζ := inducedFamily_hasNoRealCharacters hModd hζS
+  let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
+  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  let app := hyp.canonicalFullDadeApp hG hodd
+  have hVeq : tic.V = tic.Vdiff := rfl
+  obtain ⟨P, -, hPeq⟩ := hyp.exists_alignedOmegaSigmaGrid_chiFam_family hG hodd i
+  rw [hPeq j]
+  have hζcS : ζ.conj ∈ inducedFamily M := inducedFamily_closedUnderConjugate M hζS
+  have hζcirr : IsIrreducibleCharacter ζ.conj := hζirr.conj
+  have haZ : coh.tau1 ζ ∈ ZIrr G :=
+    coh.coherent.extension_mem_ZIrr ζ (Submodule.subset_span hζS)
+  have hbZ : coh.tau1 ζ.conj ∈ ZIrr G :=
+    coh.coherent.extension_mem_ZIrr ζ.conj (Submodule.subset_span hζcS)
+  have ha1 : ClassFunction.inner (coh.tau1 ζ) (coh.tau1 ζ) = 1 :=
+    hyp.zeta_tau1_inner_self hG hodd coh hζS hζirr
+  have hb1 : ClassFunction.inner (coh.tau1 ζ.conj) (coh.tau1 ζ.conj) = 1 :=
+    hyp.zeta_tau1_inner_self hG hodd coh hζcS hζcirr
+  have hab : ClassFunction.inner (coh.tau1 ζ) (coh.tau1 ζ.conj) = 0 := by
+    change ClassFunction.inner (coh.coherent.extension ζ) (coh.coherent.extension ζ.conj) = 0
+    rw [coh.coherent.extension_inner_eq _ _ (Submodule.subset_span hζS)
+        (Submodule.subset_span hζcS),
+      OddOrder.RepresentationTheory.irr_cf_inner hζirr hζcirr, if_neg (fun h => hζne h.symm)]
+  -- `(ζ − ζ̄)^τ` vanishes on `V`, with `NC ≤ 2 < min(w₁, w₂)`
+  have hvanish : ∀ w ∈ tic.V, hyp.tau (ζ - ζ.conj) w = 0 := fun w hw =>
+    hyp.tau_zeta_sub_conj_vanishes_on_typePV hG hodd hζS hζirr hw
+  have hNC : tic.sigmaNC hVeq app (hyp.tau (ζ - ζ.conj))
+      < min (Nat.card ↥tic.W1) (Nat.card ↥tic.W2) := by
+    have hbound : tic.sigmaNC hVeq app (hyp.tau (ζ - ζ.conj)) ≤ 2 := by
+      have hsub : {pq | tic.sigmaCoeff hVeq app (hyp.tau (ζ - ζ.conj)) pq ≠ 0} ⊆
+          {pq | ClassFunction.inner (coh.tau1 ζ) (tic.chiFam hVeq app pq) ≠ 0} ∪
+          {pq | ClassFunction.inner (coh.tau1 ζ.conj) (tic.chiFam hVeq app pq) ≠ 0} := by
+        intro pq hpq
+        by_contra hcon
+        simp only [Set.mem_union, Set.mem_setOf_eq, not_or, not_not] at hcon
+        apply hpq
+        change ClassFunction.inner (hyp.tau (ζ - ζ.conj)) (tic.chiFam hVeq app pq) = 0
+        rw [hyp.tau_zeta_sub_conj_eq_tau1 hG hodd coh hζS hζirr,
+          ClassFunction.inner_sub_left, hcon.1, hcon.2, sub_zero]
+      calc tic.sigmaNC hVeq app (hyp.tau (ζ - ζ.conj))
+          = {pq | tic.sigmaCoeff hVeq app (hyp.tau (ζ - ζ.conj)) pq ≠ 0}.ncard := rfl
+        _ ≤ ({pq | ClassFunction.inner (coh.tau1 ζ) (tic.chiFam hVeq app pq) ≠ 0} ∪
+              {pq | ClassFunction.inner (coh.tau1 ζ.conj)
+                (tic.chiFam hVeq app pq) ≠ 0}).ncard :=
+            Set.ncard_le_ncard hsub (Set.toFinite _)
+        _ ≤ {pq | ClassFunction.inner (coh.tau1 ζ) (tic.chiFam hVeq app pq) ≠ 0}.ncard +
+              {pq | ClassFunction.inner (coh.tau1 ζ.conj)
+                (tic.chiFam hVeq app pq) ≠ 0}.ncard :=
+            Set.ncard_union_le _ _
+        _ ≤ 1 + 1 := by
+            gcongr
+            · exact tic.ncard_inner_chiFam_ne_zero_le_one hVeq app haZ ha1
+            · exact tic.ncard_inner_chiFam_ne_zero_le_one hVeq app hbZ hb1
+        _ = 2 := rfl
+    have h3a := tic.three_le_card_W1
+    have h3b := tic.three_le_card_W2
+    omega
+  -- σ-coefficient of the difference at `P j` dies; project to the `ζ^{τ₁}`-slot
+  have hL3 : tic.sigmaCoeff hVeq app (hyp.tau (ζ - ζ.conj)) (P j) = 0 :=
+    tic.sigmaCoeff_eq_zero_of_sigmaNC_lt hVeq app hvanish hNC (P j)
+  have hdiff : ClassFunction.inner (coh.tau1 ζ - coh.tau1 ζ.conj)
+      (tic.chiFam hVeq app (P j)) = 0 := by
+    rw [← hyp.tau_zeta_sub_conj_eq_tau1 hG hodd coh hζS hζirr]; exact hL3
+  have hsZ : tic.chiFam hVeq app (P j) ∈ ZIrr G := (tic.chiFam_spec hVeq app).2.1 (P j)
+  have hs1 : ClassFunction.inner (tic.chiFam hVeq app (P j))
+      (tic.chiFam hVeq app (P j)) = 1 := by
+    rw [(tic.chiFam_spec hVeq app).2.2.1, if_pos rfl]
+  exact inner_left_eq_zero_of_inner_sub_eq_zero haZ hsZ ha1 hb1 hs1 hab hdiff
+
 set_option linter.unusedVariables false in
 open scoped Classical FiniteInduce in
 /-- **The (10.7) cross-isometry package at the canonical pair** (Coq `Frob_der1_type2`,
@@ -566,7 +658,9 @@ theorem exists_typeIICrossIsometryData_at_pair [Finite G]
            lam_ortho_grid := fun i j =>
              hyp.extension_lam_inner_alignedGrid_eq_zero_at_pair hG hT hKstar hSW1 hSW2
                hlam_mem hlam_irr hnu_mem hdeg c i j
-           zeta_ortho_grid := sorry
+           zeta_ortho_grid := fun i j =>
+             hyp.tau1_zeta_inner_alignedGrid_eq_zero hG hG.odd coh params.zeta_mem_S
+               params.zeta_irreducible i j
            zeta_lam_ortho := sorry
            cross_zero := sorry }⟩
 
