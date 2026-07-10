@@ -1199,3 +1199,32 @@ consumer tauS_mu_row0_cross の要求形を S15_SAndT:4020 で確認してから
 
 次 iter: (1) producer 層の A₀-Dade/hyp46S 同定を精査 (FT.lean cd-construction の Dade 部品と
 honestTypeP2A0Set の対応)、(2) support field から実装 (V-value field は η 同定込みで後続)。
+
+## 📋 (2026-07-11、lane-b /loop iter 30) — producer 層 A₀-Dade 可用性 precheck 完了
+
+**確定**: `Hypothesis.dadeHypS0` (S15_HonestTypeP2A0:581) は
+`(dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.S_maximal hyp.S_typeP2 hyp.Sdata).some.dade`
+— **hG + S_maximal + S_typeP2 + Sdata のみが入力** (hyp の他 fields 不要)。∴ producer (FT.lean
+cd-construction) 層でも mp-level の同名 4 部品から**同じ A₀-Dade + mp-level Hypothesis46**
+(hyp46S の構築 [S15_HonestTypeP2A0:660-699] の hyp.* → mp.* 置換コピー) を構築できる。
+
+**support field 実装手順 (次 iter、確定形)**:
+1. **field** (3 層: SubcoherenceInputs / FTSetup inputs / FTSetup cd): `mu_diff_support :
+   ∀ (i : Fin q) {j k : Fin p}, (j:ℕ) ≠ 0 → (k:ℕ) ≠ 0 → mu i j 1 = mu i k 1 →
+   (mu i j − mu i k).support ⊆ S04.supportInSubgroup (honestTypeP2A0Set S Sdata) S`
+   (S/Sdata は各層の対応 field; cd 層は mp.S + cd の Sdata source — cd/inputs の Sdata field 名を
+   実装時に確認)。
+2. **producer discharge**: FT.lean に `Section16CharacterData.hyp46Smp` (mp-level Hypothesis46、
+   hyp46S のコピー) + `muS_diff_support` (= S15_HonestTypeP2A0 の `residueS_mu2_diff_support` の
+   証明を mp-level に写す: charGroupW2Equiv → chi2enum、residueS.mu2 → muS、
+   certainType_diff_supp_subset_A0 (hyp46Smp) 適用)。
+3. **pin 修正** (S15_HonestTypeP2A0:878、self-flag): `tauS_mu_row0_diff_support` に
+   `(hj0 : (j:ℕ) ≠ 0)` 追加 (9076 fix) + body = field 射影 (`hyp.mu_diff_support 0 hj0 one_ne
+   hdeg` — hdeg は row-0 の mu2 次数一致: `mu_degree_modEq_delta` からは出ない (mod q 合同のみ)。
+   **⚠ hdeg 供給が非自明**: 原文 (4.8) は残基次数一致 (両列 residue が同次数) — Coq は consumer
+   が具体次数で discharge。row-0 では μ_{0j}(1) = residue-degree、j,k≠0 で一致は §13 の具体
+   次数事実 — S15.Hypothesis に既存 field があるか (mu_degree 系) 実装時に確認、なければ
+   `forall_columnFamily_mu_apply_one_eq_of_sum_eq` (iter 28 記録の hdeg 供給候補) を producer
+   で使い hdeg-free の row-0 特化 field にする)。
+4. consumer (S15_SAndT:1152 `hsupp := hyp.tauS_mu_row0_diff_support j`) に `_hj` pass (1-line)。
+V-value pin (pin 3) は support field 完了後に同型で (η 同定込み)。
