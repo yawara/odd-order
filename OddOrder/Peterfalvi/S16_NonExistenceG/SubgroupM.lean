@@ -284,7 +284,8 @@ For `g ∈ G₀` (an element of order prime to `pq` lying outside `Ã(M)`):
 These are the Dade-character integrality/symmetry facts of Peterfalvi (3.9) specialised to the
 `M`-grid plus the support vanishing of (14.10); their honest construction lives in the §3/§4
 Dade-isometry layer (the abstract §16 `ω`/`η`/`tau3` carriers do not yet pin it). -/
-structure EtaGenericData (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) where
+structure EtaGenericData [Finite G]
+    (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) where
   eta_int : ∀ g ∈ Mdata.G0, ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
     ∃ m : ℤ, hyp.base.eta i j g = (m : ℂ)
   eta_pair : ∀ g ∈ Mdata.G0, ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
@@ -510,30 +511,14 @@ theorem MHypothesis.rhoNormSq_ge_lower [Finite G] {hyp : Hypothesis (G := G)}
     1 - (Mdata.e : ℝ) / (Mdata.k : ℝ)
       ≤ (Mdata.toFamilyHypothesis71).chiRhoNormSq (Mdata.tau1 Mdata.psi) 0 := by
   rw [Mdata.chiRhoNormSq_eq_zetaNuRhoNormSq]
-  -- `K ≤ M` for the index/card bookkeeping.
-  have hKleM : Mdata.K ≤ Mdata.M :=
-    Mdata.K_eq_MF ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le Mdata.M
   -- `h78.kernelOrder = |K| = k`.
   have hko : Mdata.h78.kernelOrder = Mdata.k := by
     rw [Mdata.k_eq_card_K]
     show Nat.card ↥(Mdata.h78.hyp76.H) = Nat.card ↥Mdata.K
     rw [Mdata.h78_H_eq]
-  -- `h78.complementIndex = |M:K| = e`.
-  have hci : Mdata.h78.complementIndex = Mdata.e := by
-    have hmul := Mdata.h78.kernelOrder_mul_complementIndex_eq_card_L
-    rw [hko, Mdata.k_eq_card_K] at hmul
-    have hcardK : Nat.card ↥(Mdata.K.subgroupOf Mdata.M) = Nat.card ↥Mdata.K :=
-      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKleM).toEquiv
-    have hidx : Nat.card ↥Mdata.K * (Mdata.K.subgroupOf Mdata.M).index = Nat.card ↥Mdata.M := by
-      rw [← hcardK]; exact Subgroup.card_mul_index _
-    have hidxe : (Mdata.K.subgroupOf Mdata.M).index = Mdata.e :=
-      Mdata.e_eq_index.symm
-    rw [hidxe] at hidx
-    have hKpos : 0 < Nat.card ↥Mdata.K := Nat.card_pos
-    exact Nat.eq_of_mul_eq_mul_left hKpos (hmul.trans hidx.symm)
   -- Rewrite the (7.8.b) carrier into `e`/`k` and conclude.
   have key := Mdata.h78_zetaNuRho_normSq_ge
-  rw [hci, hko] at key
+  rw [Mdata.h78_complementIndex_eq_e, hko] at key
   exact key
 
 /-- **The type-I Dade support is the kernel sharp** `A(M) = K#`, the §8 cardinality input
@@ -1113,7 +1098,55 @@ theorem MHypothesis.complementIndex_eq_pq_of_K_eq_V [Finite G]
     (Mdata : MHypothesis hyp) (_hKV : Mdata.K = hyp.base.V)
     (_hcases : Mdata.e = hyp.base.p ∨ Mdata.e = hyp.base.p * hyp.base.q) :
     Mdata.e = hyp.base.p * hyp.base.q := by
-  sorry
+  classical
+  rcases _hcases with hp | hpq
+  · exfalso
+    have hMI : IsTypeI Mdata.M := ⟨Mdata.typeIHyp.typeI⟩
+    obtain ⟨frob, _hker, hW2E⟩ :=
+      OddOrder.Peterfalvi.S15.exists_typeIFrobeniusData_W2_le
+        _hG hyp.base Mdata.M_maximal hMI Mdata.normalizer_V_le_M
+    have hEcard : Nat.card ↥(frob.complement.map Mdata.M.subtype) =
+        Nat.card ↥frob.complement :=
+      Subgroup.card_map_of_injective (K := frob.complement) Mdata.M.subtype_injective
+    have hCcard : Nat.card ↥frob.complement = Mdata.e := by
+      rw [← OddOrder.Peterfalvi.S15.typeIFrobenius_kernel_index_eq_complement frob,
+        ← Mdata.K_eq_MF, ← Mdata.e_eq_index]
+    have hEW2 : frob.complement.map Mdata.M.subtype = hyp.base.W2 := by
+      apply Eq.symm
+      apply Subgroup.eq_of_le_of_card_ge hW2E
+      rw [hEcard, hCcard, hp, hyp.base.p_eq_card_W2]
+    have hH_V : frob.typeI.typeF.H = hyp.base.V := by
+      rw [frob.typeI.typeF.H_eq, ← Mdata.K_eq_MF, _hKV]
+    have hdecomp :
+        frob.typeI.typeF.H ⊔ frob.complement.map Mdata.M.subtype = Mdata.M := by
+      have hmap := congrArg (Subgroup.map Mdata.M.subtype)
+        frob.frobenius.isComplement.sup_eq_top
+      rwa [Subgroup.map_sup,
+        Subgroup.map_subgroupOf_eq_of_le frob.typeI.typeF.H_le,
+        ← MonoidHom.range_eq_map, Subgroup.range_subtype] at hmap
+    have hM_eq : Mdata.M = hyp.base.V ⊔ hyp.base.W2 := by
+      rw [hH_V, hEW2] at hdecomp
+      exact hdecomp.symm
+    have hVleT : hyp.base.V ≤ hyp.base.T :=
+      (le_sup_right.trans hyp.base.T_deriv_eq_QV.ge).trans (Subgroup.map_subtype_le _)
+    have hW2leW : hyp.base.W2 ≤ hyp.base.W := by
+      rw [hyp.base.W_eq_join]
+      exact le_sup_right
+    have hWleT : hyp.base.W ≤ hyp.base.T := by
+      rw [hyp.base.W_eq_inter]
+      exact inf_le_right
+    have hMleT : Mdata.M ≤ hyp.base.T := by
+      rw [hM_eq]
+      exact sup_le hVleT (hW2leW.trans hWleT)
+    obtain ⟨tdata⟩ := T_typeII _hG hyp
+    have hcop := OddOrder.Peterfalvi.S15.coprime_card_V_card_Q_of_disjoint
+      hyp.base tdata hyp.base.Q_inf_V_eq_bot
+    have hNVT : ¬ Subgroup.normalizer (hyp.base.V : Set G) ≤ hyp.base.T :=
+      OddOrder.Peterfalvi.S15.not_normalizer_V_le_T _hG hyp.base tdata
+        (OddOrder.Peterfalvi.S15.exists_conj_typeP_V_of_coprime
+          _hG hyp.base tdata hcop)
+    exact hNVT (Mdata.normalizer_V_le_M.trans hMleT)
+  · exact hpq
 
 /-- **Peterfalvi (14.11)**: `K = V` and `|M : K| = p q`.
 

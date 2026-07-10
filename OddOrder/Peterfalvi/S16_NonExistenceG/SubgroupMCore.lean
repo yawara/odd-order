@@ -1,3 +1,6 @@
+import OddOrder.Peterfalvi.S16_PairingBessel
+import OddOrder.Peterfalvi.S16_NonExistenceG.CoherentEtaOrthogonality
+import OddOrder.Peterfalvi.S16_NonExistenceG.CoherentProjectionRigidity
 import OddOrder.Peterfalvi.S16_NonExistenceG.KeyInequality
 
 /-!
@@ -31,25 +34,15 @@ structure MHypothesis (hyp : Hypothesis (G := G)) where
   M_maximal : M ∈ maximalSubgroups G
   normalizer_V_le_M : Subgroup.normalizer (hyp.base.V : Set G) ≤ M
   K_eq_MF : K = maxNilpotentNormalHall M
-  /-- **Peterfalvi (12.1) for `M`**: the genuine type-I Dade setup of the maximal subgroup `M`
-  over `N_G(V)` — its `TypeIData`, the (8.15) Dade support data for `A(M)`, and the support-kernel
-  conjugation invariance.  This is the honest carrier (sorry-free constructible from `IsTypeI M`
-  via `S14.exists_typeI_hypothesis`) supplying the concrete `S04.Hypothesis`/`S04.DadeMap` that
-  bridge `M` to the §7 ρ-machinery (`S09.Hypothesis71`/`FamilyHypothesis71`/`family_inequality`),
-  the common §3/§4 Dade foundation of the (14.11) norm-cascade producers. -/
-  typeIHyp : OddOrder.Peterfalvi.S14.Hypothesis M
-  /-- **Peterfalvi (7.8) for `M`**: the §7 coherence data (`S09.Hypothesis78`) of the type-I
-  maximal subgroup `M` on its Dade support `A(M) = typeIA M`.  Its (7.8.a) `β`-decomposition and
-  (7.8.b) norm estimates feed the (14.11) cascade producers (`betaM_expansion_data` via
-  `betaMExpansionData_of_hypothesis78`; `normCascadeData` via `family_inequality`).  The genuine
-  M-coherence supply (Pf §5–§8 + §13/§14), isolated here as the single honest obligation that
-  `exists_MHypothesis` discharges. -/
-  h78 : OddOrder.Peterfalvi.S09.Hypothesis78 G
-    (OddOrder.GroupTheory.typeIA M typeIHyp.typeI) M
-  Mset : Set (ClassFunction ↥M ℂ)
-  tau : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G
-  tau1 : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G
-  psi : ClassFunction ↥M ℂ
+  /-- The minimal odd-order counterexample fixed throughout §14.  Retaining this proof lets the
+  coherent bundle expose its canonical `Hypothesis78` without erasing the proof argument used in
+  that construction. -/
+  hG : OddOrder.BG.IsMinimalSimpleOdd G
+  /-- **Peterfalvi (5)--(8)/(12.1) for `M`**: the complete constructible type-I coherence bundle:
+  the Dade setup, Frobenius complement, coherent extension, and placed induced family.  Earlier
+  versions kept only the derived raw `Hypothesis78`, losing the family/coherence pins needed by
+  (13.19) and (14.11.2).  This is upstream proof data, not a conclusion of (14.11). -/
+  coherent78 : TypeICoherent78Data M
   e : ℕ
   k : ℕ
   /-- **Peterfalvi (14.10)**: `e = |M : K|` (the degree of `ψ`).  De-opacified from the former
@@ -59,38 +52,20 @@ structure MHypothesis (hyp : Hypothesis (G := G)) where
   `e = p` or `e = p q`.  This is upstream input to (14.11), not either of its conclusions. -/
   complementIndex_cases : e = hyp.base.p ∨ e = hyp.base.p * hyp.base.q
   k_eq_card_K : k = Nat.card ↥K
-  psi_mem : psi ∈ Mset
-  psi_degree_eq_e : psi 1 = (e : ℂ)
-  betaM : ClassFunction G ℂ
-  /-- **Peterfalvi (14.10)**: `betaM` is `β_M^τ`, the image under the Dade isometry `τ` of
-  `β_M = Ind_K^M 1_K − ψ`.  Still carried as an opaque `Prop` pending the induce/`Invertible`
-  instance plumbing needed to spell `Ind_K^M 1_K` inside a field type (lane-c §16). -/
-  betaM_formula : Prop
-  betaM_formula_holds : betaM_formula
-  /-- **Peterfalvi (7.8.a) for `M`**: `β_M^τ` is the Dade image `β` carried by `h78`. -/
-  betaM_eq : betaM = h78.beta
-  /-- **Peterfalvi (14.10)/(7.8)**: `ψ^{τ₁}` is the coherent image `ζ^ν` of the distinguished `ζ`. -/
-  psi_tau1_eq : tau1 psi = h78.nu (h78.hyp76.zeta h78.zetaDistinct)
   G0 : Set G
-  /-- **Peterfalvi (14.10)/(7.5)**: the test character `ψ^{τ₁}` has norm one — it is the
-  Dade-isometry `τ₁`-image of the unit-norm coherent `ζ`, hence admissible in the family
-  inequality (7.5) `S09.family_inequality`.  V-side dual of
-  `S12.Hypothesis.inner_tau1_zeta_self_eq_one`; a genuine consequence of `tau1` being an isometry
-  on `ℤ[ℳ]` and `ψ ∈ ℳ` irreducible. -/
-  psi_tau1_norm_one : ClassFunction.inner (tau1 psi) (tau1 psi) = 1
   /-- **Peterfalvi (14.11.3)/(14.11.4)**: `G₀ ⊆ G − Ã(M)`.  The (14.11.3) set
   `G₀ = G − [Ã(M) ∪ (W#)^G ∪ (P#)^G ∪ (Q#)^G]` lies inside the family `(7.4)` support complement
   `famG₀ = (toFamilyHypothesis71).G0 = G − Ã(M)`, since every `g ∈ G₀` is off the Dade support
   `Ã(M)` of `A(M)` (`typeIHyp.dadeData.dade.dadeSupport`).  This is the inclusion `G₀ ⊆ famG₀`
   used to drop the `G₀`-part of the (7.5) sum in (14.11.4). -/
-  G0_off_dadeSupport : ∀ g ∈ G0, g ∉ typeIHyp.dadeData.dade.dadeSupport
+  G0_off_dadeSupport : ∀ g ∈ G0, g ∉ coherent78.typeIHyp.dadeData.dade.dadeSupport
   /-- **Peterfalvi (14.11.3)/(14.11.4)**: the complement of `G₀` is covered by the Dade support
   `Ã(M)` and the three orbits `(W − (W₁∪W₂))^G`, `(P#)^G`, `(Q#)^G`.  Concretely, `G₀` is the
   (14.11.3) set `G − [Ã(M) ∪ (W−(W₁∪W₂))^G ∪ (P#)^G ∪ (Q#)^G]`, so any `g` off `Ã(M)` and off `G₀`
   lies in the orbit union.  This is the §8 TI-counting input: `famG₀ ∖ G₀ ⊆ orbits` lets the
   `(7.5)` `G₀`-drop in line 83 (`chiRhoNormSq_psi_le_line83`) be bounded by the orbit cardinalities
   (the genuine §8 structural fact, supplied from the partner type-`P` structure). -/
-  G0_orbit_cover : ∀ g : G, g ∉ typeIHyp.dadeData.dade.dadeSupport → g ∉ G0 →
+  G0_orbit_cover : ∀ g : G, g ∉ coherent78.typeIHyp.dadeData.dade.dadeSupport → g ∉ G0 →
     g ∈ OddOrder.GroupTheory.conjClassSet
           ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G)))
         ∪ OddOrder.GroupTheory.conjClassSet (OddOrder.GroupTheory.sharpSubgroup hyp.base.P)
@@ -128,31 +103,134 @@ structure MHypothesis (hyp : Hypothesis (G := G)) where
   /-- **Peterfalvi (14.11.4)**: `|N_G(Q)| = |Q| v p` (the `T`-side partner). -/
   card_normalizer_Q_eq : Nat.card ↥(Subgroup.normalizer (hyp.base.Q : Set G))
     = Nat.card ↥hyp.base.Q * hyp.base.v * hyp.base.p
-  /-- **Peterfalvi (7.1)/(14.11.4) bridge compatibility.**  The underlying `(7.1)` Dade hypothesis
-  of the §7 coherence datum `h78` is the type-I Dade support hypothesis of `M` carried by
-  `typeIHyp` (i.e. `h78` is built over the same `(M, A(M))` Dade map that powers the family
-  inequality (7.5) via `toFamilyHypothesis71`).  Since `S09.Hypothesis71.chiRho` depends only on
-  the support hypothesis `H71.hyp` (the `H(a)`-family), not on the chosen Dade map `τ`, this
-  identifies the `ρ`-image of `h78` (used in `zetaNuRho`, (7.8.b)) with the family member's
-  `ρ`-image, so the `ρ`-norm `‖ψ^{τ₁ρ}‖²` of (14.11.4) equals `h78.zetaNuRhoNormSq`.  Holds by
-  `rfl` for any `h78` built from `typeIHyp.dadeData`; carried so `exists_MHypothesis` supplies a
-  compatible `h78`. -/
-  h78_hyp_eq : h78.hyp76.hyp71.hyp = typeIHyp.dadeData.dade
-  /-- **Peterfalvi (7.6)/(14.10).**  The normal kernel `H` of the §7 coherence datum `h78` is the
-  Fitting kernel `K = M_F`.  (For type-I `M`, `A(M) = K^#` is the Dade support; the coherent family
-  `T = {Ind_K^M θ}` has kernel `K`.)  Gives `h78.kernelOrder = |K| = k` and
-  `h78.complementIndex = |M : K| = e` for the unconditional (7.8.b) lower bound. -/
-  h78_H_eq : h78.hyp76.H = K
-  /-- **Peterfalvi (7.8.b) for `M`** — the coherence-norm lower bound
-  `‖ζ^{νρ}‖² ≥ 1 − e/h = 1 − |M:K|/|K|`.  This is
-  `S09.Hypothesis78.NormEstimates.zetaNuRho_norm_sq_ge` for the coherent type-I `M`, with the
-  small-index hypothesis `smallIndex` (`2·|M:K| + 1 ≤ |K|`) discharged by the Frobenius
-  structure of `M`.  The genuine §7 Dade content of the (14.11.4)
-  lower bound, isolated here as part of the `exists_MHypothesis` obligation. -/
-  h78_zetaNuRho_normSq_ge :
-    1 - (h78.complementIndex : ℝ) / (h78.kernelOrder : ℝ) ≤ h78.zetaNuRhoNormSq
-
 namespace MHypothesis
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce
+
+/-- The type-I Dade setup retained inside the complete coherent bundle. -/
+abbrev typeIHyp [Finite G] {hyp : Hypothesis (G := G)} (Mdata : MHypothesis hyp) :
+    OddOrder.Peterfalvi.S14.Hypothesis Mdata.M := Mdata.coherent78.typeIHyp
+
+/-- The canonical §7.8 datum derived from the retained coherent bundle. -/
+noncomputable abbrev h78 [Finite G] {hyp : Hypothesis (G := G)} (Mdata : MHypothesis hyp) :
+    OddOrder.Peterfalvi.S09.Hypothesis78 G
+      (OddOrder.GroupTheory.typeIA Mdata.M Mdata.typeIHyp.typeI) Mdata.M :=
+  Mdata.coherent78.h78 Mdata.hG
+
+/-- Peterfalvi's coherent source family `𝓜`. -/
+noncomputable abbrev Mset [Finite G] {hyp : Hypothesis (G := G)} (Mdata : MHypothesis hyp) :
+    Set (ClassFunction ↥Mdata.M ℂ) := Mdata.typeIHyp.Sset
+
+/-- The Dade isometry `τ` on the type-I source. -/
+noncomputable abbrev tau [Finite G] {hyp : Hypothesis (G := G)} (Mdata : MHypothesis hyp) :
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥Mdata.M G := Mdata.typeIHyp.tau
+
+/-- The coherent extension `τ₁`; unlike `τ`, it is defined on every member of `𝓜`. -/
+noncomputable abbrev tau1 [Finite G] {hyp : Hypothesis (G := G)} (Mdata : MHypothesis hyp) :
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥Mdata.M G := Mdata.coherent78.coh.extension
+
+/-- The placed distinguished member `ψ = ζ₀` of degree `[M : K]`. -/
+noncomputable abbrev psi [Finite G] {hyp : Hypothesis (G := G)} (Mdata : MHypothesis hyp) :
+    ClassFunction ↥Mdata.M ℂ := Mdata.coherent78.zeta 0
+
+/-- `β_M^τ`, the canonical §7.8 Dade image attached to the retained coherent bundle. -/
+noncomputable abbrev betaM [Finite G] {hyp : Hypothesis (G := G)} (Mdata : MHypothesis hyp) :
+    ClassFunction G ℂ := Mdata.h78.beta
+
+/-- The distinguished member belongs to the coherent source family. -/
+theorem psi_mem [Finite G] {hyp : Hypothesis (G := G)} (Mdata : MHypothesis hyp) :
+    Mdata.psi ∈ Mdata.Mset := by
+  exact Mdata.coherent78.zeta_mem_Sset (Ne.symm Mdata.coherent78.ind1H_ne_zero)
+
+/-- The distinguished member has degree `e = [M : K]`. -/
+theorem psi_degree_eq_e [Finite G] {hyp : Hypothesis (G := G)}
+    (Mdata : MHypothesis hyp) : Mdata.psi 1 = (Mdata.e : ℂ) := by
+  have hK : Mdata.K = Mdata.coherent78.kernel := by
+    calc
+      Mdata.K = maxNilpotentNormalHall Mdata.M := Mdata.K_eq_MF
+      _ = Mdata.coherent78.kernel := Mdata.typeIHyp.typeI.typeF.H_eq.symm
+  have hidx : Mdata.coherent78.kernelIn.index =
+      (Mdata.K.subgroupOf Mdata.M).index := by
+    change (Mdata.coherent78.kernel.subgroupOf Mdata.M).index =
+      (Mdata.K.subgroupOf Mdata.M).index
+    rw [← hK]
+  calc
+    Mdata.psi 1 = (Mdata.coherent78.kernelIn.index : ℂ) := Mdata.coherent78.deg0
+    _ = (Mdata.e : ℂ) := by rw [hidx, ← Mdata.e_eq_index]
+
+@[simp] theorem betaM_eq [Finite G] {hyp : Hypothesis (G := G)} (Mdata : MHypothesis hyp) :
+    Mdata.betaM = Mdata.h78.beta := rfl
+
+/-- The canonical `β_M` is the Dade image of `Ind_K^M 1_K - ψ`. -/
+theorem betaM_eq_tau_induce_sub_psi [Finite G] {hyp : Hypothesis (G := G)}
+    (Mdata : MHypothesis hyp) :
+    Mdata.betaM = Mdata.tau
+      (ClassFunction.induce (Mdata.K.subgroupOf Mdata.M)
+        (trivialClassFunction ↥(Mdata.K.subgroupOf Mdata.M)) - Mdata.psi) := by
+  rw [Mdata.K_eq_MF, ← Mdata.typeIHyp.typeI.typeF.H_eq]
+  rw [Mdata.betaM_eq, OddOrder.Peterfalvi.S09.Hypothesis78.beta_def]
+  change Mdata.typeIHyp.toHypothesis71.τ _ = Mdata.typeIHyp.tau _
+  rw [Mdata.typeIHyp.toHypothesis71_tau_apply]
+  apply congrArg Mdata.typeIHyp.tau
+  change Mdata.h78.hyp76.zeta Mdata.h78.ind1H -
+      Mdata.h78.hyp76.zeta Mdata.h78.zetaDistinct = _
+  rw [Mdata.coherent78.h78_ind1H_eq Mdata.hG,
+    Mdata.coherent78.h78_zeta_eq Mdata.hG,
+    Mdata.coherent78.h78_zetaDistinct_eq Mdata.hG,
+    Mdata.coherent78.h78_zeta_eq Mdata.hG]
+  change ClassFunction.induce Mdata.coherent78.kernelIn
+      (Mdata.coherent78.θ Mdata.coherent78.ind1H : ClassFunction _ ℂ) -
+        Mdata.coherent78.zeta 0 = _
+  rw [Mdata.coherent78.triv,
+    IrreducibleCharacter.coe_trivialIrreducibleCharacter]
+
+@[simp] theorem psi_tau1_eq [Finite G] {hyp : Hypothesis (G := G)} (Mdata : MHypothesis hyp) :
+    Mdata.tau1 Mdata.psi =
+      Mdata.h78.nu (Mdata.h78.hyp76.zeta Mdata.h78.zetaDistinct) := rfl
+
+@[simp] theorem h78_hyp_eq [Finite G] {hyp : Hypothesis (G := G)} (Mdata : MHypothesis hyp) :
+    Mdata.h78.hyp76.hyp71.hyp = Mdata.typeIHyp.dadeData.dade :=
+  Mdata.coherent78.h78_hyp_eq Mdata.hG
+
+theorem h78_H_eq [Finite G] {hyp : Hypothesis (G := G)} (Mdata : MHypothesis hyp) :
+    Mdata.h78.hyp76.H = Mdata.K := by
+  calc Mdata.h78.hyp76.H = Mdata.coherent78.kernel :=
+        Mdata.coherent78.h78_H_eq Mdata.hG
+    _ = maxNilpotentNormalHall Mdata.M := Mdata.typeIHyp.typeI.typeF.H_eq
+    _ = Mdata.K := Mdata.K_eq_MF.symm
+
+/-- The complement index of the canonical (7.8) bundle is the concrete index `e = |M : K|`
+carried by `MHypothesis`. -/
+theorem h78_complementIndex_eq_e [Finite G] {hyp : Hypothesis (G := G)}
+    (Mdata : MHypothesis hyp) : Mdata.h78.complementIndex = Mdata.e := by
+  have hKleM : Mdata.K ≤ Mdata.M :=
+    Mdata.K_eq_MF ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le Mdata.M
+  have hko : Mdata.h78.kernelOrder = Mdata.k := by
+    rw [Mdata.k_eq_card_K]
+    show Nat.card ↥(Mdata.h78.hyp76.H) = Nat.card ↥Mdata.K
+    rw [Mdata.h78_H_eq]
+  have hmul := Mdata.h78.kernelOrder_mul_complementIndex_eq_card_L
+  rw [hko, Mdata.k_eq_card_K] at hmul
+  have hcardK : Nat.card ↥(Mdata.K.subgroupOf Mdata.M) = Nat.card ↥Mdata.K :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKleM).toEquiv
+  have hidx : Nat.card ↥Mdata.K * (Mdata.K.subgroupOf Mdata.M).index = Nat.card ↥Mdata.M := by
+    rw [← hcardK]
+    exact Subgroup.card_mul_index _
+  rw [← Mdata.e_eq_index] at hidx
+  exact Nat.eq_of_mul_eq_mul_left Nat.card_pos (hmul.trans hidx.symm)
+
+theorem psi_tau1_norm_one [Finite G] {hyp : Hypothesis (G := G)}
+    (Mdata : MHypothesis hyp) :
+    ClassFunction.inner (Mdata.tau1 Mdata.psi) (Mdata.tau1 Mdata.psi) = 1 := by
+  simpa using Mdata.coherent78.nu_zeta_norm_one Mdata.hG
+    (i := Mdata.h78.zetaDistinct) Mdata.h78.zetaDistinct_ne_ind1H
+
+theorem h78_zetaNuRho_normSq_ge [Finite G] {hyp : Hypothesis (G := G)}
+    (Mdata : MHypothesis hyp) :
+    1 - (Mdata.h78.complementIndex : ℝ) / (Mdata.h78.kernelOrder : ℝ) ≤
+      Mdata.h78.zetaNuRhoNormSq :=
+  (Mdata.coherent78.normEstimates Mdata.hG).zetaNuRho_norm_sq_ge
+    (Mdata.coherent78.smallIndex Mdata.hG)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **The Peterfalvi (7.4) one-member family `{(M, A(M))}` for the V-side type-I subgroup `M`** —
@@ -855,7 +933,8 @@ isolating the genuine character-theoretic content of (14.11.2) away from the pur
 All fields are the conditional conclusion of the (14.11.2) support-coherence argument: besides
 the §3/§4/§5 Dade machinery it uses coefficient projection, norm tightness, and residual
 vanishing.  Cf. `EtaGenericData` for the dual generic-set carrier. -/
-structure BetaMExpansionData (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) where
+structure BetaMExpansionData [Finite G]
+    (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) where
   /-- The equality `e = p q`, obtained in the same norm-collapse as the signed expansion. -/
   e_eq_pq : Mdata.e = hyp.base.p * hyp.base.q
   /-- The residual `Δ` of the (7.8.a) Dade expansion `β_M = 1_G − χ + Δ`. -/
@@ -901,7 +980,206 @@ noncomputable def betaM_expansion_data [Finite G] (_hG : OddOrder.BG.IsMinimalSi
       OddOrder.Peterfalvi.S15.OddIntegerInner Mdata.betaM
         (hyp.base.eta i ⟨0, hyp.base.p_prime.pos⟩)) :
     BetaMExpansionData hyp Mdata := by
-  sorry
+  classical
+  haveI := Mdata.coherent78.kernelIn_normal
+  set H78 := Mdata.h78 with hH78
+  set BD := Mdata.coherent78.betaDecomp Mdata.hG with hBD
+  -- The Fourier coefficients of `β_M` on the `η`-grid are integers.
+  have hbetaZ : Mdata.betaM ∈ ZIrr G := by
+    exact H78.beta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible
+      (Mdata.coherent78.h78_ind_mem_ZIrr Mdata.hG)
+      (Mdata.coherent78.h78_zeta_irreducible Mdata.hG)
+  have hint : ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
+      ∃ n : ℤ, ClassFunction.inner Mdata.betaM (hyp.base.eta i j) = (n : ℂ) :=
+    fun i j => ClassFunction.inner_mem_ZIrr_int hbetaZ (eta_mem_ZIrr hyp.base i j)
+  choose m hcoeff using hint
+  -- Every coherent family image, hence also the weighted sum, is orthogonal to the grid.
+  have hDadeAvoid :=
+    OrthogonalitySwitchData.mSide_dadeSupport_avoids_regular
+      (hyp := hyp) Mdata.hG Mdata.M_maximal Mdata.coherent78
+  have hetaNu : ∀ (k : Fin (Mdata.coherent78.n + 1)), k ≠ H78.ind1H →
+      ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
+        ClassFunction.inner (H78.nu (H78.hyp76.zeta k)) (hyp.base.eta i j) = 0 := by
+    intro k hk i j
+    rw [OddOrder.RepresentationTheory.inner_conj_symm,
+      OrthogonalitySwitchData.caseB_eta_orthogonal_nu_zeta_at
+        Mdata.hG hyp.base Mdata.coherent78 hDadeAvoid hk i j,
+      star_zero]
+  have hWeta : ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
+      ClassFunction.inner H78.weightedNuSum (hyp.base.eta i j) = 0 := by
+    intro i j
+    rw [show H78.weightedNuSum =
+        ∑ k ∈ (Finset.univ.erase H78.ind1H),
+          (H78.hyp76.zeta k (1 : ↥Mdata.M) /
+            (H78.hyp76.zeta H78.zetaDistinct (1 : ↥Mdata.M) *
+              ClassFunction.inner (H78.hyp76.zeta k) (H78.hyp76.zeta k))) •
+            H78.nu (H78.hyp76.zeta k) from rfl]
+    rw [inner_sum_left]
+    refine Finset.sum_eq_zero fun k hk => ?_
+    rw [ClassFunction.inner_smul_left, hetaNu k (Finset.mem_erase.mp hk).1 i j, mul_zero]
+  -- Consequently the grid projection of `β_M` is the projection of `1_G + Γ`.
+  set phi : ClassFunction G ℂ :=
+    OddOrder.Peterfalvi.S09.Hypothesis71.constOne G + BD.Gamma with hphi
+  have hphi_coeff : ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
+      ClassFunction.inner phi (hyp.base.eta i j) = (m i j : ℂ) := by
+    intro i j
+    rw [← hcoeff i j, hphi,
+      show Mdata.betaM = H78.beta by rw [hH78],
+      show H78.beta = OddOrder.Peterfalvi.S09.Hypothesis71.constOne G
+          - H78.nu (H78.hyp76.zeta H78.zetaDistinct)
+          + (BD.a : ℂ) • H78.weightedNuSum + BD.Gamma from BD.beta_eq]
+    simp only [ClassFunction.inner_add_left, ClassFunction.inner_sub_left,
+      ClassFunction.inner_smul_left,
+      hetaNu H78.zetaDistinct H78.zetaDistinct_ne_ind1H i j, hWeta i j, mul_zero,
+      sub_zero, add_zero]
+  -- The principal coefficient is one.
+  have heta0 : hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩ =
+      OddOrder.Peterfalvi.S09.Hypothesis71.constOne G := by
+    rw [eta_principal_eq_trivial hyp.base]
+    exact ClassFunction.ext fun _ => rfl
+  have hprincipalInner : ClassFunction.inner Mdata.betaM
+      (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩) = 1 := by
+    rw [heta0, show Mdata.betaM = H78.beta by rw [hH78],
+      H78.beta_eq_constOne_sub_zetaImage_add_delta,
+      ClassFunction.inner_add_left, ClassFunction.inner_sub_left,
+      OddOrder.Peterfalvi.S09.Hypothesis71.constOne_inner_self_eq_one,
+      BD.orth_one H78.zetaDistinct H78.zetaDistinct_ne_ind1H,
+      H78.delta_orth_one BD]
+    ring
+  have hprincipal : m ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩ = 1 := by
+    have hm := hcoeff ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩
+    have hc : ((m ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩ : ℤ) : ℂ) = 1 :=
+      hm.symm.trans hprincipalInner
+    exact_mod_cast hc
+  -- Support avoidance gives the four-corner relation (3.7).
+  have hbetaVanish : ∀ x ∈ conjClassSet
+      ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G))),
+      Mdata.betaM x = 0 := by
+    intro x hx
+    by_contra hval
+    exact hDadeAvoid x hx
+      (H78.beta_support_subset_dadeSupport (ClassFunction.mem_support.mpr hval))
+  have hrelation : ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
+      m i j + m ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩ =
+        m i ⟨0, hyp.base.p_prime.pos⟩ + m ⟨0, hyp.base.q_prime.pos⟩ j := by
+    intro i j
+    have h := inner_eta_grid_relation hyp.base hbetaVanish i j
+    rw [hcoeff i j,
+      hcoeff ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩,
+      hcoeff i ⟨0, hyp.base.p_prime.pos⟩,
+      hcoeff ⟨0, hyp.base.q_prime.pos⟩ j] at h
+    exact_mod_cast h
+  -- The selected (13.19.c) alternatives make the two non-principal axes odd.
+  have hrow : ∀ j, j ≠ ⟨0, hyp.base.p_prime.pos⟩ →
+      Odd (m ⟨0, hyp.base.q_prime.pos⟩ j) := by
+    intro j hj
+    have hjnat : (j : ℕ) ≠ 0 := by
+      intro hj0
+      apply hj
+      apply Fin.ext
+      exact hj0
+    obtain ⟨n, hnodd, hn⟩ := _hrow j hjnat
+    have hnval : ClassFunction.inner Mdata.betaM
+        (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ j) = (n : ℂ) := hn
+    have hcast : ((m ⟨0, hyp.base.q_prime.pos⟩ j : ℤ) : ℂ) = (n : ℂ) :=
+      (hcoeff ⟨0, hyp.base.q_prime.pos⟩ j).symm.trans hnval
+    have hmn : m ⟨0, hyp.base.q_prime.pos⟩ j = n := by exact_mod_cast hcast
+    rwa [hmn]
+  have hcol : ∀ i, i ≠ ⟨0, hyp.base.q_prime.pos⟩ →
+      Odd (m i ⟨0, hyp.base.p_prime.pos⟩) := by
+    intro i hi
+    have hinat : (i : ℕ) ≠ 0 := by
+      intro hi0
+      apply hi
+      apply Fin.ext
+      exact hi0
+    obtain ⟨n, hnodd, hn⟩ := _hcol i hinat
+    have hnval : ClassFunction.inner Mdata.betaM
+        (hyp.base.eta i ⟨0, hyp.base.p_prime.pos⟩) = (n : ℂ) := hn
+    have hcast : ((m i ⟨0, hyp.base.p_prime.pos⟩ : ℤ) : ℂ) = (n : ℂ) :=
+      (hcoeff i ⟨0, hyp.base.p_prime.pos⟩).symm.trans hnval
+    have hmn : m i ⟨0, hyp.base.p_prime.pos⟩ = n := by exact_mod_cast hcast
+    rwa [hmn]
+  have hecomp : H78.complementIndex = Mdata.e := by
+    rw [hH78]
+    exact Mdata.h78_complementIndex_eq_e
+  obtain ⟨hepqH, hpm, hgrid⟩ :=
+    Mdata.coherent78.etaGrid_projection_rigidity Mdata.hG hyp.base m
+      (by simpa [phi, BD] using hphi_coeff) hprincipal hrelation hrow hcol (by
+        rw [hecomp]
+        exact _he_le)
+  have hepq : Mdata.e = hyp.base.p * hyp.base.q := by
+    rw [← hecomp]
+    exact hepqH
+  set X : ClassFunction G ℂ := etaGridProjection hyp.base m with hX
+  set chi : ClassFunction G ℂ := X - Mdata.betaM with hchi
+  have hchiSelf : ClassFunction.inner chi chi = 1 := by
+    rw [hchi, hX, show Mdata.betaM = H78.beta by rw [hH78]]
+    exact Mdata.coherent78.etaGrid_projection_sub_beta_norm_one Mdata.hG hyp.base m
+      hpm hepqH (by simpa [hH78] using hcoeff)
+  have hetaNuData : ∀ (k : Fin (Mdata.coherent78.n + 1)),
+      k ≠ Mdata.coherent78.ind1H → ∀ i j,
+        ClassFunction.inner
+          ((Mdata.coherent78.h78 Mdata.hG).nu
+            ((Mdata.coherent78.h78 Mdata.hG).hyp76.zeta k))
+          (hyp.base.eta i j) = 0 := by
+    intro k hk i j
+    have hk' : k ≠ (Mdata.coherent78.h78 Mdata.hG).ind1H := by
+      rw [Mdata.coherent78.h78_ind1H_eq Mdata.hG]
+      exact hk
+    rw [OddOrder.RepresentationTheory.inner_conj_symm,
+      OrthogonalitySwitchData.caseB_eta_orthogonal_nu_zeta_at
+        Mdata.hG hyp.base Mdata.coherent78 hDadeAvoid hk' i j,
+      star_zero]
+  have hclassSource :
+      chi = Mdata.h78.nu (Mdata.h78.hyp76.zeta Mdata.h78.zetaDistinct) ∨
+      chi = -Mdata.h78.nu (Mdata.h78.hyp76.zeta Mdata.h78.zetaDistinct).conj := by
+    simpa [hchi, hX] using
+      (Mdata.coherent78.etaGrid_projection_sub_beta_classification
+        Mdata.hG hyp.base m hetaNuData (by simpa [hchi, hX, hH78] using hchiSelf))
+  have hclass :
+      chi = Mdata.tau1 Mdata.psi ∨ chi = -(Mdata.tau1 Mdata.psi.conj) := by
+    rcases hclassSource with h | h
+    · left
+      exact h
+    · right
+      rw [Mdata.coherent78.h78_zetaDistinct_eq Mdata.hG,
+        Mdata.coherent78.h78_zeta_eq Mdata.hG] at h
+      exact h
+  -- Both classified branches have the pointwise norm of `ψ^{τ₁}`.
+  have hpsiS : Mdata.psi ∈ Mdata.typeIHyp.Sset := Mdata.psi_mem
+  have h2 : ∃ psi ∈ Mdata.typeIHyp.Sset, psi ≠ Mdata.psi := by
+    obtain ⟨j₁, hj₁ne, hj₁⟩ := Mdata.coherent78.exists_conjIndex Mdata.hG
+    have hj₁mem : Mdata.h78.hyp76.zeta j₁ ∈ Mdata.typeIHyp.Sset :=
+      Mdata.coherent78.zeta_mem_Sset (by
+        rw [← Mdata.coherent78.h78_ind1H_eq Mdata.hG]
+        exact hj₁ne)
+    refine ⟨Mdata.h78.hyp76.zeta j₁, hj₁mem, ?_⟩
+    rw [hj₁]
+    exact (Mdata.coherent78.h78_zeta_ne_conj Mdata.hG Mdata.hG.odd).symm
+  have hconj : (Mdata.tau1 Mdata.psi).conj = Mdata.tau1 Mdata.psi.conj :=
+    Mdata.coherent78.coherence_extension_conj Mdata.hG hpsiS h2
+  have hchiNorm : ∀ g : G, ‖chi g‖ = ‖(Mdata.tau1 Mdata.psi) g‖ := by
+    intro g
+    rcases hclass with h | h
+    · rw [h]
+    · rw [h, ClassFunction.neg_apply, norm_neg, ← hconj,
+        ClassFunction.conj_apply, norm_star]
+  refine
+    { e_eq_pq := hepq
+      delta := BD.Gamma
+      chi := chi
+      chi_norm := hchiNorm
+      chi_classification := hclass
+      betaM_seven_eight := ?_
+      signs := m
+      signs_pm_one := hpm
+      grid_eq := ?_ }
+  · rw [hchi, hX, show Mdata.betaM = H78.beta by rw [hH78]]
+    rw [← show OddOrder.Peterfalvi.S09.Hypothesis71.constOne G + BD.Gamma =
+        etaGridProjection hyp.base m by simpa [BD] using hgrid]
+    abel
+  · simpa [BD, hX, etaGridProjection] using hgrid
 
 /-- **§16 → §7 bridge for the `β_M` (7.8.a) decomposition.**  Given a concrete `S09.Hypothesis78`
 for `M` whose Dade image `β` and coherent image `ζ^ν` are identified with the abstract §16 carriers
