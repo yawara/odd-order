@@ -84,6 +84,7 @@ of complements of `T'`, transported through the whole-datum `TypePData.conj`.
 namespace OddOrder.Peterfalvi.S12
 
 open OddOrder.RepresentationTheory
+open scoped IsMulCommutative
 
 variable {G : Type*} [Group G]
 
@@ -474,6 +475,144 @@ theorem ticyclic_sigma_omega_eq_of_V_eq
       OddOrder.Peterfalvi.S05.TICyclicHypothesis.omega_apply]
     rfl
 
+/-! ### The column → row transpose of σ-grid sums (issue 9079 item 4, generic core)
+
+A pair situation swaps the roles of `W₁` and `W₂`.  Under the identifications
+`hyp₁.W = hyp₂.W`, `hyp₁.W1 = hyp₂.W2`, `hyp₁.W2 = hyp₂.W1`, a *column* of the `hyp₁`-grid
+(the (5.8) shape `∑_p χ_{(p, kcol)}`, `kcol` fixed) is a *row* of the `hyp₂`-grid: each
+grid vector transposes by the per-index identification (`ticyclic_sigma_omega_eq_of_V_eq`),
+and the index translation is the two-level `subgroupOf`-transport of the character pair
+(`ω`-factors swap along the `W`-decomposition, `ticyclic_wFstSnd_inclusion_of_swap`). -/
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
+/-- Value-level transport of `subgroupOf`-members along inclusions of both the ambient and
+the subgroup: `⟨⟨v, _⟩, _⟩ ↦ ⟨⟨v, _⟩, _⟩` (membership proofs re-derived, no `Eq.rec`).
+Upstream-hoist candidate (`OddOrder/Mathlib/Subgroup.lean`). -/
+def subgroupOfTransport {W W' H H' : Subgroup G} (hW : W' ≤ W) (hH : H' ≤ H) :
+    ↥(H'.subgroupOf W') →* ↥(H.subgroupOf W) :=
+  MonoidHom.codRestrict ((Subgroup.inclusion hW).comp (H'.subgroupOf W').subtype)
+    (H.subgroupOf W) fun x => by
+      rw [Subgroup.mem_subgroupOf, MonoidHom.comp_apply, Subgroup.coe_inclusion]
+      exact hH (Subgroup.mem_subgroupOf.mp x.2)
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
+@[simp] theorem subgroupOfTransport_coe {W W' H H' : Subgroup G} (hW : W' ≤ W) (hH : H' ≤ H)
+    (x : ↥(H'.subgroupOf W')) :
+    ((subgroupOfTransport hW hH x : ↥W) : G) = ((x : ↥W') : G) := rfl
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
+/-- Precomposition with the two-level transport is a bijection of character groups: the
+transports in the two directions compose to the identity by proof irrelevance (the
+underlying element never moves). -/
+def subgroupOfTransportCharEquiv {W W' H H' : Subgroup G}
+    (hW : W' ≤ W) (hW' : W ≤ W') (hH : H' ≤ H) (hH' : H ≤ H') :
+    (↥(H.subgroupOf W) →* ℂˣ) ≃ (↥(H'.subgroupOf W') →* ℂˣ) where
+  toFun χ := χ.comp (subgroupOfTransport hW hH)
+  invFun χ := χ.comp (subgroupOfTransport hW' hH')
+  left_inv _ := MonoidHom.ext fun _ => rfl
+  right_inv _ := MonoidHom.ext fun _ => rfl
+
+omit [Invertible (Nat.card G : ℂ)] in
+/-- **The `W = W₁ × W₂` decomposition transposes along a role swap**: reading a
+`hyp₂.W`-element in `hyp₁` (same `W`, factors swapped), its `hyp₁`-`W₁`-component is its
+`hyp₂`-`W₂`-component and vice versa — the internal-product decomposition is unique, and
+the two factorizations differ only by the (abelian) reordering. -/
+theorem ticyclic_wFstSnd_inclusion_of_swap
+    (hyp₁ hyp₂ : OddOrder.Peterfalvi.S05.TICyclicHypothesis G)
+    (hW : hyp₁.W = hyp₂.W) (hW12 : hyp₁.W1 = hyp₂.W2) (hW21 : hyp₁.W2 = hyp₂.W1)
+    (w : ↥hyp₂.W) :
+    hyp₁.wFst (Subgroup.inclusion hW.ge w)
+        = subgroupOfTransport hW.ge hW12.ge (hyp₂.wSnd w)
+      ∧ hyp₁.wSnd (Subgroup.inclusion hW.ge w)
+        = subgroupOfTransport hW.ge hW21.ge (hyp₂.wFst w) := by
+  have hcomm : hyp₂.wProj2 w * hyp₂.wProj1 w = w := by
+    haveI := hyp₂.isMulCommutative_W
+    rw [mul_comm]
+    exact hyp₂.wProj1_mul_wProj2 w
+  have hsymm : hyp₁.wProdEquiv.symm (Subgroup.inclusion hW.ge w)
+      = (subgroupOfTransport hW.ge hW12.ge (hyp₂.wSnd w),
+         subgroupOfTransport hW.ge hW21.ge (hyp₂.wFst w)) := by
+    apply hyp₁.wProdEquiv.injective
+    rw [MulEquiv.apply_symm_apply, hyp₁.wProdEquiv_apply]
+    apply Subtype.ext
+    calc ((Subgroup.inclusion hW.ge w : ↥hyp₁.W) : G)
+        = ((w : ↥hyp₂.W) : G) := by rw [Subgroup.coe_inclusion]
+      _ = ((hyp₂.wProj2 w * hyp₂.wProj1 w : ↥hyp₂.W) : G) := by rw [hcomm]
+      _ = ((subgroupOfTransport hW.ge hW12.ge (hyp₂.wSnd w) : ↥hyp₁.W) : G)
+            * ((subgroupOfTransport hW.ge hW21.ge (hyp₂.wFst w) : ↥hyp₁.W) : G) := by
+          rw [Subgroup.coe_mul, subgroupOfTransport_coe, subgroupOfTransport_coe]
+          rfl
+      _ = (((subgroupOfTransport hW.ge hW12.ge (hyp₂.wSnd w) : ↥hyp₁.W)
+            * (subgroupOfTransport hW.ge hW21.ge (hyp₂.wFst w) : ↥hyp₁.W) : ↥hyp₁.W) : G) := by
+          rw [Subgroup.coe_mul]
+  exact ⟨by rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.wFst_apply, hsymm],
+    by rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.wSnd_apply, hsymm]⟩
+
+omit [Invertible (Nat.card G : ℂ)] in
+/-- **The grid characters transpose along a role swap** (the index translation of the
+(8.8) grid transpose): reading the `hyp₁`-grid character `ω_{(p, kcol)}` on `hyp₂.W`
+(same `W`), it is the `hyp₂`-grid character at the transported *swapped* pair —
+the `W₁`-factor `p` becomes the `W₂`-factor and the `W₂`-factor `kcol` the `W₁`-factor. -/
+theorem ticyclic_omegaProdChar_comp_inclusion_of_swap
+    (hyp₁ hyp₂ : OddOrder.Peterfalvi.S05.TICyclicHypothesis G)
+    (hW : hyp₁.W = hyp₂.W) (hW12 : hyp₁.W1 = hyp₂.W2) (hW21 : hyp₁.W2 = hyp₂.W1)
+    (p : (hyp₁.W1.subgroupOf hyp₁.W) →* ℂˣ) (kcol : (hyp₁.W2.subgroupOf hyp₁.W) →* ℂˣ) :
+    (hyp₁.omegaProdChar p kcol).comp (Subgroup.inclusion hW.ge)
+      = hyp₂.omegaProdChar (kcol.comp (subgroupOfTransport hW.ge hW21.ge))
+          (p.comp (subgroupOfTransport hW.ge hW12.ge)) := by
+  ext w
+  obtain ⟨h1, h2⟩ := ticyclic_wFstSnd_inclusion_of_swap hyp₁ hyp₂ hW hW12 hW21 w
+  simp only [MonoidHom.comp_apply, OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaProdChar,
+    MonoidHom.mul_apply]
+  rw [h1, h2, mul_comm]
+
+open scoped Classical in
+/-- **The (5.8) column sum is a row sum of the transposed grid** (issue 9079 item 4, the
+generic core of the `S`-grid = `M`-grid transpose): for two TI-cyclic setups sharing `V`
+and `W` with the `W₁`/`W₂` roles swapped, the full `hyp₁`-grid column at `kcol` equals the
+full `hyp₂`-grid row at the transported index `kcol'`.  Every grid vector transposes by the
+(3.5)-determination (`ticyclic_sigma_omega_eq_of_V_eq` at the index translation
+`ticyclic_omegaProdChar_comp_inclusion_of_swap`), and the summation reindexes along the
+character-group bijection `p ↦ p ∘ transport`.
+
+This is what turns the `S`-side (5.8) column pin (`typeII_nu_tau2_dichotomy`) into the
+`M`-side row-sum form `ν^{τ₂} = ±∑_j ω_{r'j}^σ` that the (10.7) cross-isometry package
+(`TypeIICrossIsometryData.nu_tau2_eq`) consumes. -/
+theorem ticyclic_chiFam_columnSum_transpose
+    (hyp₁ hyp₂ : OddOrder.Peterfalvi.S05.TICyclicHypothesis G)
+    [Fintype hyp₁.W] [Invertible (Nat.card hyp₁.W : ℂ)]
+    [Fintype hyp₂.W] [Invertible (Nat.card hyp₂.W : ℂ)]
+    [Fintype ((hyp₁.W1.subgroupOf hyp₁.W) →* ℂˣ)]
+    [Fintype ((hyp₂.W2.subgroupOf hyp₂.W) →* ℂˣ)]
+    (hVeq₁ : hyp₁.V = hyp₁.Vdiff) (hVeq₂ : hyp₂.V = hyp₂.Vdiff)
+    (hV : hyp₁.V = hyp₂.V) (hW : hyp₁.W = hyp₂.W)
+    (hW12 : hyp₁.W1 = hyp₂.W2) (hW21 : hyp₁.W2 = hyp₂.W1)
+    (app₁ : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication (G := G) hyp₁)
+    (app₂ : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication (G := G) hyp₂)
+    (kcol : (hyp₁.W2.subgroupOf hyp₁.W) →* ℂˣ) :
+    ∑ p : (hyp₁.W1.subgroupOf hyp₁.W) →* ℂˣ, hyp₁.chiFam hVeq₁ app₁ (p, kcol)
+      = ∑ q : (hyp₂.W2.subgroupOf hyp₂.W) →* ℂˣ,
+          hyp₂.chiFam hVeq₂ app₂ (kcol.comp (subgroupOfTransport hW.ge hW21.ge), q) := by
+  refine Fintype.sum_equiv
+    (subgroupOfTransportCharEquiv hW.ge hW.le hW12.ge hW12.le) _ _ fun p => ?_
+  -- the `hyp₁`-grid vector at `(p, kcol)` is `σ₁(ω(ξ))` at `ξ = ω_{(p, kcol)}`
+  have h1 : hyp₁.chiFam hVeq₁ app₁ (p, kcol)
+      = hyp₁.sigma hVeq₁ app₁
+          (hyp₁.omega (hyp₁.omegaProdChar p kcol) : ClassFunction hyp₁.W ℂ) := by
+    rw [hyp₁.sigma_omega hVeq₁ app₁, hyp₁.omegaProdEquiv_symm_omegaProdChar]
+  -- transpose per index, then read the transported character as a `hyp₂`-grid pair
+  have h2 := ticyclic_sigma_omega_eq_of_V_eq hyp₁ hyp₂ hVeq₁ hVeq₂ hV hW app₁ app₂
+    (hyp₁.omegaProdChar p kcol)
+  have h3 := ticyclic_omegaProdChar_comp_inclusion_of_swap hyp₁ hyp₂ hW hW12 hW21 p kcol
+  have h4 : hyp₂.sigma hVeq₂ app₂
+      (hyp₂.omega (hyp₂.omegaProdChar (kcol.comp (subgroupOfTransport hW.ge hW21.ge))
+          (p.comp (subgroupOfTransport hW.ge hW12.ge))) : ClassFunction hyp₂.W ℂ)
+      = hyp₂.chiFam hVeq₂ app₂ (kcol.comp (subgroupOfTransport hW.ge hW21.ge),
+          p.comp (subgroupOfTransport hW.ge hW12.ge)) := by
+    rw [hyp₂.sigma_omega hVeq₂ app₂, hyp₂.omegaProdEquiv_symm_omegaProdChar]
+  rw [h1, h2, h3, h4]
+  rfl
+
 end GenericBridge
 
 /-! ## The (8.8) canonical-pair packaging (issue 9079 item (ii))
@@ -521,6 +660,22 @@ theorem typePData_toTICyclicHypothesis_V_eq_Vdiff [Finite G] {M : Subgroup G}
     (data : TypePData M) (hodd : Odd (Nat.card G)) :
     (typePData_toTICyclicHypothesis data hodd).V
       = (typePData_toTICyclicHypothesis data hodd).Vdiff := rfl
+
+open scoped FiniteInduce in
+/-- **The `S`-side (10.7) σ-machinery runs on the §10 → §5 bridge**: the `ticVdiff` of the
+type-II Hypothesis (4.6) instance (`typeIIHypothesis46`, the setup of the (5.8) dichotomy
+`typeII_nu_tau2_dichotomy`) **is** `typePData_toTICyclicHypothesis data hodd` — the `tic`
+field of `typeIIHypothesis46` is that bridge, `ticVdiff` re-reads its `W`-block with the
+`Vdiff`-shaped TI-set, and the bridge's own `V` is `Vdiff`-shaped definitionally.  All data
+fields agree by `rfl` and every other field is a proof, so the two are definitionally equal
+(structure eta + proof irrelevance).  This connects the `S`-side dichotomy to the pair
+lemmas above without any reconciliation. -/
+theorem ticVdiff_typeIIHypothesis46_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) (data : TypePData S)
+    (hodd : Odd (Nat.card G)) :
+    OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)
+      = typePData_toTICyclicHypothesis data hodd := rfl
 
 /-- **The (8.4.b) centralizer law pins the partner's dual factor**: a `TypePData` on the
 canonical partner `mp.T` whose cyclic factor `W₁` is the pair's dual κ-Hall `mp.Kstar`
