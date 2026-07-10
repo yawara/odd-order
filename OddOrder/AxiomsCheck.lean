@@ -3346,6 +3346,8 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.gap_coefficients_nonzero_of_delta_parity
 set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.exists_typeIII_primeTIredZero
+set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.CaseBForSData.u_le_full_cyclotomic
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.CaseBForSData.two_q_lt_u
 set_option linter.style.longLine false in
