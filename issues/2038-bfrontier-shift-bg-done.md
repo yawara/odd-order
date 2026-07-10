@@ -471,3 +471,33 @@ h_psig_int (ψ(g)=mval) + hA (ρM norm):
 5. **hA**: ‖ψ^{ρM}‖²_M ≥ (|K−K′|/|M|)·mval² — chiRho の norm 展開 + 3 の定数値 (K−K′ 上 |ψ^{ρM}| = |mval|)。
 
 実装順: 1a (2-char uniform image) → 1b (M 係数一致) → 1c ((12.5) M 版) → 2 → 3 → 4 → 5。
+
+## ✅✅ (2026-07-10 続³、lane-b /loop) — **(12.15) 実装キュー step 1 完遂: (12.5) M 版 coh-free 化** (commit f4255870)
+
+新 leaf `S14_MaximalI/PairCoherence.lean` (706 行、全 sorry-free、標準 axioms のみ):
+
+- **(1.5.c) Sset facts**: `Sset_pairwise_orthogonal` (`induce_eq_induce_iff_conj` +
+  `inner_induce_eq_zero_of_not_conj` 既存 infra で直接) / `decomposition_{inner_self_card,
+  inner_conj_eq_zero,ne_conj,apply_one_pos_natCast,mem_ZIrr}` / 制約 count 補題 2 本。
+- **`RsetImageFamily`** ((12.2.b) bundled): R(χ) を `OrthonormalCharacterImageFamily` に束ね
+  `(χ−χ̄)^τ = Σ_{R(χ)} α` (cross-block 直交 = `constituentDiff_tau_inner_eq_zero_of_ne_across`)。
+- **`pair_tau_diff_mem_span`**: 等次数 χ₁,χ₂ ∈ S で `τ(χ₁−χ₂) ∈ ℤ[R(χ₁)∪R(χ₂)]`。
+- **`chiRhoCF_restrict_constant_off_derived_ofData`** = **(12.5) M 版** (horth は Rset 形 =
+  原文の仮説形)。
+
+**⚠ 設計変更 (前セッション設計 1a からの deviation、重要)**: 設計was「`exists_uniform_image_of_constituents`
+を等次数 2-character 版に拡張 (T := S(χ₁)∪S(χ₂)∪conj)」— これは**数学的ギャップあり**:
+cross-family の constituent 次数 d₁=d₂ は自動でない ((1.7.c): d = |L:I_L(θ)|·θ(1)、inertia 指数は
+θ ごとに異なりうる)。**採用 route = 原文/Coq 忠実の character-level quadruple coherence**:
+{χ₁,χ₂,χ̄₁,χ̄₂} (等次数、reducible メンバー) に norm-general (5.7) engine
+`uniform_degree_coherence_of_families` (S07_PivotCoherence 既存!) を適用 → norm-general (5.5)
+(`ofProjection (ψ:=0)` + `eq_sum_of_psi_eq_zero`、これも既存) で各 `coh.extension χᵢ ∈ ℤ[R(χᵢ)]`
+(`coherent_extension_mem_span_Rset_of_mem` 新設、再利用可能)。Coq `pair_degree_coherence` +
+`mem_coherent_sum_subseq` (PFsection5) と同構造。
+
+**次 = (12.15) step 2** (キュー継続): 第 1 主張 ψ^{ρM}(g) = ψ(g) on K^# —
+`chiRho_apply_eq_of_forall_coset` + H(g) 場合分け (non-escaping trivial / escaping:
+(8.13.c4) N type I + (8.13.c1) C_{N_F}(g)≠1 → N not-Frobenius-with-kernel-N_F → N ≁ L、
+N 側 (12.4) `orthogonal_character_constant_on_coset` + cross-orth ψ ⊥ R_N)。
+要新設 infra: Frobenius 性の conj transport (witness_L_not_conj_M の Msigma_conj_smul 同型)。
+その後 step 3 (K−K′ constancy 合成、(12.5) M 版が今回できたので配線可能) → 4 (h_psig_int) → 5 (hA)。
