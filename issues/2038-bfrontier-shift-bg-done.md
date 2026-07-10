@@ -972,3 +972,62 @@ A := {w | w ∉ W₂-sub} (W abelian → conj-inv 自明)、mu := mu2Grid 族 (o
 **残る供給 = hInd**: Ind_W^S(ω-diff) = Σ⟨diff,·⟩•(δ·μ) — σ (3.2 cyclicTIiso) の
 「A₁-supported diff で σ = Ind」性質 (TICyclicHypothesis の σ↔Ind agreement API、
 sigma_apply 系 or dadeIntegralCharacterMap 系) を次 iter で精査 → instantiation。
+
+## 📋 (2026-07-11、lane-b /loop iter 20) — prTIirr_id への最終帰着: σ↔Ind の W∖W₂-拡張一致 1 点
+
+**構造発見 (instantiation の簡約)**: cross-level (1.3.b) の mu 族を **σ(ω_χ) 族** (= δ·mu2Grid、
+`sigma_omega_eq_mu2GridSign_smul_mu2Grid`) に取ると:
+- orthonormality: ⟨σω,σω'⟩ = δδ'⟨μ,μ'⟩ = Kronecker ✓ (σ isometry + sign²=1)
+- ⟨Φ_j, ω_k⟩ = [k=χ]−[k=sndPart χ] (ω orthonormal) → hInd ⟺ **Ind(Φ_j) = σ(Φ_j)**
+- 結論 = Res(σ(ω_χ)) = ω_χ on W∖W₂ = **prTIirr_id の σ-form** (mu2Grid 形へ sign 1 発)
+**∴ 残 gap は 1 点**: 「Ind(ω_χ − ω_{sndPart χ}) = σ(ω_χ − ω_{sndPart χ})」(W∖W₂-supported diff
+での σ↔Ind agreement — 既存 `sigma_eq_tau` (3.2.a) は V-supported 限定)。
+**その証明に必要なもの**: ‖Ind diff‖² = ‖diff‖² (= 2) — **Ind の W∖W₂-isometry** =
+Coq `normedTI_prTIset : normedTI (W∖W₂) S W` (prime-TI 文脈仮定、cycTI の V-TI より強い) 由来
+(`normedTI_isometry`)。TICyclicHypothesis は V-conj 条件のみ field 化 — W∖W₂-TI は
+(a) TICyclicHypothesis 新 field (carrier enrichment、既存 producer 追従要)、
+(b) 定理の仮説パラメータ (prime-TI 消費側 [S = type-P₂ maximal] が (8.x)/(13.x) 幾何から供給)、
+の選択。**(b) が軽い** — prTIirr_id 対応を「hTI : W∖W₂ TI-条件 (S-conj が W-normalizer 経由のみ)」
+仮説付き lemma として PrimeTIResidue に置き、S-side 供給は別途。ただし ‖Ind diff‖² = 2 の導出
+(TI → induction norm) 自体も port 要 (Coq normedTI_isometry / Isaacs 系 — repo の
+`IsTISubset`/`normedTI` 対応 [G2 で触った isTISubset_honestTypeP2ASet 系] を次 iter で確認)。
+
+**追記 (iter 20 末)**: TICyclicHypothesis fields 実確認 — TI は `V_ti : IsTISubset V W` のみ ✓。
+`S04.Hypothesis.of_isTISubset` (S05_TICyclic:71) が「TI → Dade datum」の既存 bridge で、
+W∖W₂-TI 仮説からの Ind-isometry はこれで組める。**同定 route の鍵候補 =
+`eq_sigma_of_apply_eq_on_V` (S05_SigmaIsometry:814)**: Coq :361-387 後半の「Ind-based μ と
+σ-based μ の同定」は V-値一致 + norm-1 ZIrr rigidity の形 — 次 iter は
+eq_sigma_of_apply_eq_on_V の statement 精読から (これが刺されば normedTI-isometry port すら
+不要で prTIirr_id が閉じる可能性)。
+
+## 📋 (2026-07-11、lane-b /loop iter 21) — prTIirr_id の完全 route 確定 ((3.9.a) が同定 step に直刺し)
+
+**`eq_sigma_of_apply_eq_on_V` (S05_SigmaIsometry:814) = Pf (3.9.a)、完全 proven**:
+χ ∈ ZIrr ∧ ‖χ‖²=1 ∧ V 上 ω と一致 → **χ = σ(ω)** ((3.8) NC-rigidity で係数 pin)。
+
+**∴ Coq :288-387 の Lean 化 route が完全確定** (全 4 step、うち 2 は landed/existing):
+- **a. Ind-based signed family 抽出**: Ind(ω_χ − ω_{sndPart χ}) ∈ ZIrr、norm 2、pairwise 直交
+  (W∖W₂-TI 仮説 → `S04.Hypothesis.of_isTISubset` + `tau_eq_induce` の Ind-isometry) →
+  signed-irr 差 dmu_χ − dmu_{sndPart χ} 形に分解 (§3 (1.4) core `isometry_difference_pair_structure`
+  [IsometryDifferencePair、landed 済] の再利用を次 iter で確認)。
+- **b. equiv_restrict**: cross-level (1.3.b) `restrict_apply_eq_on_of_induce_eq_sum` (**landed**) を
+  Φ := ω-差族 (spanning **landed**)、mu := dmu 族に適用 → dmu の W∖W₂-値 = ω-値。
+- **c. (3.9.a) 同定**: dmu_k は ZIrr ∧ norm 1 ∧ V ⊆ W∖W₂ 上 ω_k と一致 (b の制限) →
+  `eq_sigma_of_apply_eq_on_V` で **dmu_k = σ(ω_k)** (existing、port 不要!)。
+- **d. 合成**: σ(ω_k) の W∖W₂-値 = ω_k 値 = **prTIirr_id (4.3.c)** ✓ → mu2Grid 形へは
+  sigma_omega_eq_mu2GridSign_smul_mu2Grid で sign 変換。
+残実装 = a の family 抽出 (isometry_difference_pair_structure 再利用性) + hTI (W∖W₂ IsTISubset)
+仮説の設計 + b-d assembly。次 iter: isometry_difference_pair_structure の signature 精読。
+
+## 📋 (2026-07-11、lane-b /loop iter 22) — step a の部品設計確定
+
+- `isometry_difference_pair_structure` 結論 = `∃ data : SignedIrreducibleDifferenceFamily G n,
+  ∀ i, τ(χ_i − χ_0) = data.signedDifference i` — **Coq dmu 抽出の Lean 版そのもの** ✓ 再利用。
+  適用は **列ごと** (fixed W₂-char ψ、χ 族 := {ω(ω₁ⁱ·ψ)}ᵢ 0-anchored、全 degree 1 ✓ distinct ✓)。
+  列間整合 (Coq inj_Imu) は直交性で別途 — Coq :296-330 の写し。
+- **h_isom 入力 = TI→Ind-isometry、直接証明で新設** (`of_isTISubset` datum 経由より軽い):
+  `inner_induce_eq_of_isTISubset : IsTISubset A H → f,g A-supported → ⟨Ind f, Ind g⟩_G = ⟨f,g⟩_H`。
+  証明 = reciprocity + **Res Ind g = g on A** (TI-collapse: (Ind g)(a) の conjugator が
+  g-support 制約 + TI で全部 H 内 → class-fn 値 g(a) に collapse — induce_apply_eq_sum_filter /
+  induceTerm API [Machinery135 の induce_one_apply と同系])。~60 行 self-contained。
+  次 iter: これを実装 (置き場 = SupportedSpanOrthogonality or InducedCharacter 追記)。
