@@ -827,3 +827,28 @@ B(i)/(iii) → PVSbeta assembly。
 - 次 iter: S13_PrimeTIResidueBridge の mu2 API 精査 (orthonormality / W₁^# 値 / degree) →
   field リスト確定 → SubcoherenceInputs.Hypothesis へ追加 (producer 未構成ゆえ追従なし、
   ただし既存 mock/instance が repo に無いか grep してから) → mu_row0_ne 等 discharge。
+
+## 📋 (2026-07-10 続¹⁶、lane-b /loop iter 10) — PrimeTIResidueData API 精査完了、field 設計最終形
+
+**PrimeTIResidueData (9014) の在庫**: mu2 (IrreducibleCharacter grid) / **mu2_orthonormal** (4.3.b) /
+**chi_eq_restrict** (chi j = Res_{PU}(mu2 0 j)、restriction の i-独立 = (4.5.a)) /
+**induce_chi_eq_sum** (Ind_{PU}(chi j) = Σ_i mu2 i j) / chi_zero / cfker_prTIres (4.5.b) /
+prTIres_irr_cases (残: 全て posited-field、constructor ofS06Hypothesis で discharge 済の設計)。
+
+**B 部品との対応**:
+- B(i) (S′∖P → μ_0j = 0): chi_eq_restrict + induce_chi_eq_sum + cfker 系で residue 側は完結可能
+  (Coq と同じ Res/Ind 計算)。grounding 後に S15 側へ transport。
+- B(ii) (1 → u): induce_chi_eq_sum の degree + chi_zero。
+- **B(iii) (W₁^# → 1) の真の gap = prTIirr_id (Coq PFsection4) 相当の W₁^#-値が PrimeTIResidueData
+  に未 port** — cyclicTIiso 由来の mathcomp theorem で、9014 の port は distinctness/支持/V-値まで。
+  正道 = PrimeTIResidueData に W₁-値 field を追加 (他 fields と同じ posited パターン、constructor
+  拡張は 9014 続き) — ただし構造は shared (b port、9014)、constructor ofS06Hypothesis の追従が要る
+  (field 追加 = constructor red → discharge 実装まで 1 unit)。
+- S15.Hypothesis 側の性質 field 化 (mu_orthonormal / mu_res_row_indep / mu_W1_value) は
+  residue 側が揃ってから一括が効率的。
+
+**工程再評価**: (13.18) full port = 9014 拡張 (W₁-値 field + constructor discharge) →
+S15 grounding fields → pins/mu_row0_ne discharge → PVSbeta assembly の multi-session 級。
+部品 D/A は landed 済、B/C は上記経路で継続。次 iter: 9014 の constructor
+(ofS06Hypothesis) の W₁-値 discharge 可能性を精査 (S06 側に W₁-restriction 値があるか) —
+可能なら field+constructor を 1 commit で。
