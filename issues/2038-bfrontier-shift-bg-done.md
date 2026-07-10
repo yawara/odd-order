@@ -436,3 +436,38 @@ issues/3004 の HUB RULING に **b 宛 work item 2 件**: 裁定 2 = S15_SAndT `
 の (13.19) 忠実 restate (`betaL_eta_independent` は over-strong で除去要)、裁定 3 = V-side
 `exists_M_structural`/`complement_inf_P_structure` の無条件 index=pq を (13.17.c)-dual 二分岐へ
 weaken ((14.5) の除外論法は q<p 非対称で V-side に双対化できない)。詳細 = issues/3004 HUB RULING。
+
+## ✅ (2026-07-10 続²、lane-b /loop) — (12.5) 完全 proven + (12.15) 攻略設計 (次セッション用)
+
+**landed (commit b2df1a76)**: `chiRhoCF_restrict_constant_off_derived` (RhoConstancy) = **Peterfalvi
+(12.5) 完成** — ψ ⊥ coherent images ⟹ Res_H(ψ^ρ) constant on H−H′。既存 proven 部品
+(`chiRhoCF_restrict_inner_eq_of_equal_degree` + `commutator_induce_constituents_apply_one_eq` +
+`inner_induce_constituent_eq_of_apply_one_eq` + `constant_off_normal_of_inner_block_const`) の合成のみ。
++ `ClassFunction.innerSum_star_comm`/`inner_star_comm` (shared infra)。
+
+**(12.15) 攻略設計 (調査済、次セッションの実装キュー)** — 目標 = witness_value_norm_package の
+h_psig_int (ψ(g)=mval) + hA (ρM norm):
+
+1. **(12.5) M 版 (coh-free 化) が先決**: 現 `chiRhoCF_restrict_constant_off_derived` は
+   coh : IsCoherent (家族全体) を要求 — witness L 用は OK だが **M (counterexample、非 Frobenius) には
+   家族 coherence が無い**。原文 (12.5) は (12.2)+(5.7) の **pairwise coherence** ({χ₁,χ₂,χ̄₁,χ̄₂}) しか
+   使わない。coh 使用箇所は `chiRhoCF_inner_eq_of_equal_degree` の
+   `coh.extends_on_supported` 1 箇所のみ — 必要なのは **⟨τ(χ₁−χ₂), ψ⟩ = 0**、その supply は
+   τ(χ₁−χ₂) ∈ ℤ[R(χ₁)∪R(χ₂)] ((5.5)) + horth (Rset 形、psi_constant_on_xK と同一供給)。
+   **実装**: `exists_uniform_image_of_constituents` (RhoConstancy:789、単一 χ の conjugate-closed
+   constituent set T の uniform coherent image、(12.4) pin (a) の機械) を **等次数 2-character 版**
+   (T := constituents(χ₁) ∪ constituents(χ₂) ∪ conj、等次数なので同じ isometry_difference_pair_structure
+   が効く) に拡張 → (χ₁−χ₂)^τ ∈ ℤ[R(χ₁)∪R(χ₂)] → M 版係数一致 (chiRho_adjoint reciprocity 経由、
+   coh-free) → (12.5) M 版。
+2. **第 1 主張 ψ^{ρM}(g) = ψ(g) on K^#**: chiRho_apply_eq_of_forall_coset + H(g) 場合分け —
+   non-escaping: H(g)=⊥ trivial。escaping: H(g) = FT_signalizer g ≤ (N[g])_σ = (N[g])_F
+   (N[g] type I、(8.13.c4))、ψ constant on g·N_F は **N 側 (12.4)**
+   (orthogonal_character_constant_on_coset hypN) + cross-orth ψ ⊥ R_N。N ≁ L は「C_{N_F}(g) ≠ 1
+   (8.13.c1) ⟹ N not Frobenius w/ kernel N_F」vs「L Frobenius (12.10)」+ **Frobenius 性の conj
+   transport** (witness_L_not_conj_M の Msigma_conj_smul と同型の infra、要新設)。
+3. **合成**: 1+2 → ψ constant on K−K′ (`mem_commutator_subgroupOf_iff` bridge、
+   derivedInG K = ctr.Kprime は Kprime_eq: rfl)。
+4. **h_psig_int**: 3 + `rhoM_integer_values` (proven、constancy 入力)。
+5. **hA**: ‖ψ^{ρM}‖²_M ≥ (|K−K′|/|M|)·mval² — chiRho の norm 展開 + 3 の定数値 (K−K′ 上 |ψ^{ρM}| = |mval|)。
+
+実装順: 1a (2-char uniform image) → 1b (M 係数一致) → 1c ((12.5) M 版) → 2 → 3 → 4 → 5。

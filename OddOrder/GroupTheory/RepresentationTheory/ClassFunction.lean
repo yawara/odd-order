@@ -336,6 +336,27 @@ theorem inner_compHom_mulEquiv {H : Type*} [Group H] [Fintype H] (e : H ≃* G)
     _ = inner φ ψ := by rw [← mul_assoc, invOf_mul_self, one_mul]
 
 
+/-- The unscaled inner sum is star-symmetric: `Σ φ(g)·star(ψ(g)) = star (Σ ψ(g)·star(φ(g)))`. -/
+theorem innerSum_star_comm (φ ψ : ClassFunction G k) :
+    innerSum φ ψ = star (innerSum ψ φ) := by
+  unfold innerSum
+  rw [show star (∑ g : G, ψ g * star (φ g)) = ∑ g : G, star (ψ g * star (φ g)) from
+    map_sum starAddEquiv _ _]
+  simp only [star_mul, star_star]
+
+/-- The normalized inner product is star-symmetric: `⟨φ, ψ⟩ = star ⟨ψ, φ⟩`. -/
+theorem inner_star_comm [Invertible (Nat.card G : k)] (φ ψ : ClassFunction G k) :
+    inner φ ψ = star (inner ψ φ) := by
+  have hstar : (Nat.card G : k) * star (inner ψ φ) = star ((Nat.card G : k) * inner ψ φ) := by
+    rw [star_mul, star_natCast]
+    exact mul_comm _ _
+  have h : (Nat.card G : k) * inner φ ψ = (Nat.card G : k) * star (inner ψ φ) := by
+    rw [card_mul_inner, innerSum_star_comm, hstar, card_mul_inner]
+  calc inner φ ψ = ⅟(Nat.card G : k) * ((Nat.card G : k) * inner φ ψ) := by
+        rw [← mul_assoc, invOf_mul_self, one_mul]
+    _ = ⅟(Nat.card G : k) * ((Nat.card G : k) * star (inner ψ φ)) := by rw [h]
+    _ = star (inner ψ φ) := by rw [← mul_assoc, invOf_mul_self, one_mul]
+
 /-- If two class functions have disjoint supports, their unscaled inner sum vanishes:
 every summand `φ g * star (ψ g)` is zero because `g` lies outside at least one support. -/
 theorem innerSum_eq_zero_of_disjoint_support {φ ψ : ClassFunction G k}
