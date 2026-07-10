@@ -1074,3 +1074,25 @@ isometry_difference_pair_structure の τ-引数形 (linear map か pairwise inn
 消える (per-column 符号差は (1.3.b) の orthonormality に影響しない — dmu_k := ε_col•μ_k は常に
 orthonormal)。その後: prime-TI instantiation (列 = fixed W₂-char、ω-grid → hTI 仮説パラメータ) →
 hInd (列抽出+pairing collapse) → (1.3.b) → (3.9.a) → prTIirr_id。
+
+## ✅ (2026-07-11、lane-b /loop iter 25) — 列間整合 (inj_Imu) landed
+
+IsometryDifferencePair.lean 末尾に SignedIrreducibleDifferenceFamily「Cross-family matching」
+section 追加 (commit fd7b130d、一発 green、full build 4148・AxiomsCheck OK):
+
+- **`mu_ne_of_forall_inner_difference_eq_zero`** (Coq inj_Imu :296-330): 2 family (n,m≥2) の
+  difference 全直交 ⟹ μ-grid 全 disjoint。Kronecker 展開 E(i,j) → anchors distinct →
+  縁 delta 0 (単射性) → 内部 delta 0。iter 24 末尾の導出精査どおり一発実装。
+- **`inner_difference_eq_zero_of_signedDifference`**: signed 直交 → unsigned 直交 (符号は unit、
+  sign_smul_signedDifference + Int.cast_smul + inner_smul_left/right)。
+
+**⟹ generic 部品は完備**: (i) TI-isometry (iter 23) / (ii) 列抽出 (iter 24) / (iii) 列間 disjoint
+(本 iter) / (iv) cross-level (1.3.b) + ω-差族 spanning (iter 15-19) / (v) (3.9.a) 同定 (existing)。
+
+**次 iter (prime-TI instantiation 開始)**: S05 側の設計精査 —
+(1) ω の型と grid 構造 (S05_TICyclic omega / S05_OmegaSpanning sndPart、Irr W ≃ Irr W₁ × Irr W₂
+の積分解 equiv の有無、wFst/wSnd)、(2) 列の Fin-enumeration (列 = fixed W₂-char、0-anchor =
+sndPart lift; 積 equiv があれば直接、なければ Finset.equivFin [[lean-coherence-subfamily-enumeration]])、
+(3) hTI : IsTISubset (W∖W₂ G-level) W 仮説パラメータの設計 (iter 20 (b) 案)、
+(4) 置き場 = PrimeTIResidue.lean vs 新 S05 leaf。精査後、列ごと instantiation
+(induce_difference_pair_structure_of_isTISubset 適用可能形) を実装。
