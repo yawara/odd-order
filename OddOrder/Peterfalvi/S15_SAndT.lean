@@ -1072,6 +1072,37 @@ theorem gammaGrid_defGamma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         - (hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩
           - hyp.eta ⟨0, hyp.q_prime.pos⟩ j) by abel, key, sub_self]
 
+/-- **The Coq `A0beta` inclusion `P^# ∪ V_S ⊆ 'A0(S)`** (the final step of (13.18.a)): the sharp
+Fitting kernel `P^#` and the `S`-class-closure of the cyclic-TI set `V = W − (W₁ ∪ W₂)` both land
+in the honest `A₀(S) = A(S) ∪ V^S`.  The `V^S` part is the definitional right component (after the
+`Sdata.W1/W2` synchronization); `P^#` lands in `A(S) = centralizerSupport (S_σ^#) S'` because
+`P = S_F = S_σ` (type `P₂`, `maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II`), `P ≤ S' = P ⊔ U`,
+and every element self-centralizes. -/
+theorem sharpP_union_V_subset_A0 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    sharpSubgroup hyp.P ∪
+        conjClassSetIn hyp.S (typePV hyp.S hyp.Sdata)
+      ⊆ honestTypeP2A0Set hyp.S hyp.Sdata := by
+  have hPeq : hyp.P = OddOrder.BG.Ch3.S10.Msigma hyp.S := by
+    rw [hyp.P_eq_SF]
+    exact OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II hG
+      hyp.S_maximal
+      (Or.inr (OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.S_maximal hyp.S_typeP2))
+  intro z hz
+  rcases hz with hzP | hzV
+  · -- `P^# ⊆ A(S) ⊆ A₀(S)`.
+    refine honestTypeP2ASet_subset_A0Set hyp.Sdata ?_
+    obtain ⟨hzP_mem, hz1⟩ := hzP
+    rw [Set.mem_singleton_iff] at hz1
+    refine mem_honestTypeP2ASet.mpr ⟨?_, hz1, z, ⟨hPeq ▸ hzP_mem, ?_⟩, ?_⟩
+    · have hPle : hyp.P ≤ derivedInG hyp.S := by
+        rw [hyp.S_deriv_eq_PU]; exact le_sup_left
+      exact hPle hzP_mem
+    · rwa [Set.mem_singleton_iff]
+    · exact Subgroup.mem_centralizer_iff.mpr fun w hw => by
+        rw [Set.mem_singleton_iff] at hw; subst hw; rfl
+  · exact Set.mem_union_right _ hzV
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.18.a), `'A0(S)`-support form**: `supp(β_j) ⊆ 'A0(S)` for `j ≠ 0`.
 
