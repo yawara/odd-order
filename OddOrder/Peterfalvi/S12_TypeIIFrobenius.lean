@@ -673,6 +673,75 @@ noncomputable def typeIIHypothesis46 [Finite G]
     tau := (typeIIDadeHypothesis0 hG hSmax hSII data).fullDadeIsometryData
       (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl)) }
 
+open OddOrder.Peterfalvi.S11 in
+open scoped Classical FiniteInduce in
+/-- **World-bridge, `S`-side subset direction**: the §9 induced family `𝒮(Y)` of a
+Types-II/III/IV setup lands in the §6/§8 kernel-filtered family
+`S(Y) = inducedKernelFamily S' (Y ∩ S)`.  Both families induce from `HU = S'`
+(`huSub_eq_derivedInG_subgroupOf`), and the `H ⊄ Ker` condition of `xiSet` supplies the
+`θ ≠ 1` of `inducedKernelFamily`.
+
+Setup-generic mirror of the `S13.Hypothesis`-locked `sOf_subset_SOf` (S13 is downstream of
+this leaf, so it cannot be cited here; dedup candidate on a future upstream hoist).  Feeds the
+`(9.8)` reducible classification and the `inducedKernelFamily_*` support/orthogonality/no-real
+facts to the (10.7) `T2`-family. -/
+theorem typeII_sOf_subset_inducedKernelFamily [Finite G] {S : Subgroup G}
+    (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup S) (Y : Subgroup G) :
+    OddOrder.Peterfalvi.S11.sOf data Y ⊆
+      OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG S).subgroupOf S) (Y.subgroupOf S) := by
+  classical
+  have hHU : huSub data = (derivedInG S).subgroupOf S :=
+    huSub_eq_derivedInG_subgroupOf data
+  rintro _ ⟨χ, hχ, rfl⟩
+  rw [← hHU, OddOrder.Peterfalvi.S08.mem_inducedKernelFamily]
+  refine ⟨χ, ?_, hχ.2, induceHU_eq_induce data χ⟩
+  intro htriv
+  exact hχ.1 (by rw [htriv]; simp [OddOrder.Peterfalvi.S03.characterKernel])
+
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (9.8)-classification at the type-II `S`-side bridge family**: a *reducible*
+member of `inducedKernelFamily S' B` (any kernel filter `B`) is a nontrivial certain-type
+column sum `μ_j = columnSum χ₂` of the `S`-side Hypothesis (4.6) instance
+(`typeIIHypothesis46`).
+
+Setup-generic mirror of the `M`-side
+`Hypothesis.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum` (S12_HcBound), stopping at
+the raw column form (no `Fin w₂` re-indexing): the reducible source is a Clifford restriction
+`θ = χ_j = chiRestrict χ₂` (Peterfalvi (4.5.b), `induce_not_isIrreducible_iff`), the trivial
+column is excluded by the family's `θ ≠ 1` (`chiRestrict_one_eq_trivial`), and the (4.5.a)
+induction identity `induce_restrict_certainType_eq` rewrites `Ind_{S'}^S θ` as the column sum.
+This is the "`ν` is a column" input of the (10.7) reducible `R(ν)`-datum
+(`S06.certainTypeR`). -/
+theorem typeII_reducible_inducedKernelFamily_eq_columnSum [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) (data : TypePData S)
+    [NeZero (Nat.card (typeIIHypothesis46 hG hSmax hSII data).W1)]
+    {B : Subgroup ↥S} {ψ : ClassFunction ↥S ℂ}
+    (hψ : ψ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+      ((derivedInG S).subgroupOf S) B)
+    (hred : ¬ IsIrreducibleCharacter ψ) :
+    ∃ χ₂ : ((typeIIHypothesis46 hG hSmax hSII data).W2.subgroupOf
+        ((typeIIHypothesis46 hG hSmax hSII data).W1
+          ⊔ (typeIIHypothesis46 hG hSmax hSII data).W2)) →* ℂˣ,
+      χ₂ ≠ 1 ∧
+        ψ = OddOrder.Peterfalvi.S06.columnSum (typeIIHypothesis46 hG hSmax hSII data) χ₂ := by
+  classical
+  obtain ⟨θ, hθne, -, rfl⟩ := hψ
+  set h : OddOrder.Peterfalvi.S06.Hypothesis ↥S :=
+    (typeIIHypothesis46 hG hSmax hSII data).toHypothesis with hh
+  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  -- the reducible source is a §6 column `χ_j`
+  obtain ⟨χ₂', hχ₂'⟩ := (h.induce_not_isIrreducible_iff θ).mp hred
+  have hχ₂'ne : χ₂' ≠ 1 := by
+    rintro rfl
+    rw [h.chiRestrict_one_eq_trivial] at hχ₂'
+    exact hθne hχ₂'.symm
+  refine ⟨χ₂', hχ₂'ne, ?_⟩
+  rw [← hχ₂', h.coe_chiRestrict]
+  exact h.induce_restrict_certainType_eq χ₂'
+
 end Hypothesis46Instance
 
 /-! ## The (10.7) cross-isometry package -/
