@@ -123,3 +123,60 @@ CF(W,V) 上で同一 map」を無 cast で供給するので、(b) の rigidity 
   共有されるため、`IsDadeMap.unique`/lemma 3 が cast なしで直接効く見込み。
 - item 3: type-II L → canonical partner 還元 glue。
 - item 4: 行和 pin 変換 (dichotomy の S-列和 → M-行和)。
+
+## 2026-07-10 part 1.5 LANDED (7354b626): item (ii) pair 対称化 / V-W 共有 packaging
+
+S12_TypeIIGridTranspose に 12 宣言追加 (432 行)。全て sorry-free / axiom-clean
+(3-standard のみ — **BG S16 の centralizer law / W_structure 連鎖は上流 sorry なし**を
+axiom check で実証確認)。import に `OddOrder.FeitThompsonSetup` 追加 (cycle なし:
+FTS 閉包は S12_TypeII* leaf を含まない — S13_CoreStructure/S13_Orthogonality 経由確認済)。
+
+### 宣言一覧 (part 1 の 9 宣言に追加)
+**Generic 層** (S05-generic、`section GenericBridge` [Fintype G]):
+- `ticyclic_Vdiff_eq_of_swap` — Vdiff = W ∖ (W₁ ∪ W₂) の W₁↔W₂ swap 不変性
+  (Set.union_comm 一撃)
+- `ticyclic_V_eq_of_swap` — Vdiff-形 (hVeq₁/hVeq₂) + W 共有 + swap ⟹ V 一致
+
+**Pair 層** (`section PairPackaging`、[Finite G] + open scoped FiniteInduce per-decl):
+- `typePData_toTICyclicHypothesis_{W,W1,W2,V}` (@[simp] rfl) + `_V_eq_Vdiff` (rfl) —
+  §10→§5 bridge の projection 補題。**注**: bridge の hVeq は rfl (V := typePV は
+  Vdiff と definitional) — CharacterParameters の `chiFam rfl` precedent と整合。
+- `section16_partner_typePData_W2_eq` — **T-side W₂ 強制**: dataT.W1 = mp.Kstar なら
+  dataT.W2 = mp.K。証明 = dataT.centralizer_W1 (x ∈ K*#) +
+  `BG.Ch4.S16.typeP_derivedInG_inf_centralizer_kappaElement_eq` (mp.K_eq を pairing に)。
+  K* ≠ ⊥ は `S14.card_kappaHall_ne_one`。
+- `section16_partner_typePData_W_eq` — dataT.W = mp.K ⊔ mp.Kstar (W_eq + sup_comm)
+- `section16_pair_tic_V_eq` — S-side `tp.Sdata` bridge と T-side bridge の **V 同一**。
+  S-side W-block: Sdata_W1_eq/Sdata_W2_eq + `W1_eq_K_and_W2_eq_Kstar hG` で (K, K*)、
+  T-side (K*, K) → swap 不変性で V 一致。
+- `section16_pair_toDadeMap_eq` / `section16_pair_sigma_eq` — canonical pair の
+  Dade map / σ の CF(W,V) 上一致 (part-1 核心 lemma の pair instance、pointwise hα 形)
+
+### ★ 2a 調査結果: 両側 TypePData の所在 (構造的 gap 1 点)
+- **S-side: 完備**。`Section16TypePStructure.Sdata : TypePData mp.S` が reconciled
+  (Sdata_W1_eq/Sdata_W2_eq + W1_eq_K_and_W2_eq_Kstar で W-block = (K, K*) に pin 済)。
+- **T-side: 構造的に欠落**。Section16TypePStructure は **Tdata を持たない** (field
+  docstring 明記: "Only S is determinate — T need not be type-P₂, so no symmetric
+  Tdata")。W₁-prescribing producer `exists_typePData_W1_eq_of_isTypeP2`
+  (FeitThompsonSetup:857) は **IsTypeP2 gate** — mp は `S_typeP2` のみ供給
+  (T_typeP2 は保証されない)。`typePData_of_isTypeNonI mp.T_nonI` は
+  Nonempty (TypePData T) を出すが **W₁ が uncontrolled** (T′ の任意 complement —
+  複数 witness 間で W₁ は共役までしか一致しない)。
+- **packaging の設計対応**: pair 層は T-side を仮説対
+  `(dataT : TypePData mp.T) (hTW1 : dataT.W1 = mp.Kstar)` で受ける —
+  `exists_typePData_W1_eq_of_isTypeP2` が emit する exact な形。W₂ = K / W = K⊔K* /
+  V-共有 / σ-一致は全部そこから**導出済**なので、T-side producer が閉じれば無変更で
+  plug in。
+- **T-side producer の closing 経路 (次 iteration 以降の選択肢)**:
+  (a) P₂-gate の精査 — 実際に P₂ が要るのは供給 lemma 3 本
+  (`typeP2_mf_internal_fitting_decomposition` / `typeP_hall_derived_eq_and_abelian` /
+  `isHall_kappaSigmaCompl_of_isTypeP2_complement`)。underlying engine
+  `BG.Ch4.S16.typePData_of_isTypeP_of_inputs` は IsTypeP + 分解 inputs 駆動 —
+  T 用に inputs を P₂ なしで供給できるか (BG §14/15 の T-side 構造) が本体。
+  (b) (10.7) の実消費形の再確認 — gate `exists_typeIICrossIsometryData`
+  (S12_TypeIIFrobenius:1206) の M-side は既に `hyp.typeP : TypePData M` を持つ。
+  pair-witness route では M = partner なので、**M-side typeP の W₁ を mp.Kstar に
+  reconcile する** (conjugacy adjust / TypePData conjugation transport) 路が (a) の
+  代替。なお S12_TypeIIFrobenius は FeitThompsonSetup を import しない (逆も無い) —
+  gate の pair-witness 再構成時は gate 側 (or 新 leaf) が FTS を import する方向で
+  cycle なし (確認済)。
