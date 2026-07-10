@@ -991,3 +991,11 @@ Coq `normedTI_prTIset : normedTI (W∖W₂) S W` (prime-TI 文脈仮定、cycTI 
 仮説付き lemma として PrimeTIResidue に置き、S-side 供給は別途。ただし ‖Ind diff‖² = 2 の導出
 (TI → induction norm) 自体も port 要 (Coq normedTI_isometry / Isaacs 系 — repo の
 `IsTISubset`/`normedTI` 対応 [G2 で触った isTISubset_honestTypeP2ASet 系] を次 iter で確認)。
+
+**追記 (iter 20 末)**: TICyclicHypothesis fields 実確認 — TI は `V_ti : IsTISubset V W` のみ ✓。
+`S04.Hypothesis.of_isTISubset` (S05_TICyclic:71) が「TI → Dade datum」の既存 bridge で、
+W∖W₂-TI 仮説からの Ind-isometry はこれで組める。**同定 route の鍵候補 =
+`eq_sigma_of_apply_eq_on_V` (S05_SigmaIsometry:814)**: Coq :361-387 後半の「Ind-based μ と
+σ-based μ の同定」は V-値一致 + norm-1 ZIrr rigidity の形 — 次 iter は
+eq_sigma_of_apply_eq_on_V の statement 精読から (これが刺されば normedTI-isometry port すら
+不要で prTIirr_id が閉じる可能性)。
