@@ -883,3 +883,20 @@ mu2Grid_eq_sign_smul_sigma_omega + σ-値 + δ の (4.4)-normalization (delta_ze
   構造を示唆 — W₁^#-値の port は (a) primeTIirr_spec の W∖W₂ 拡張値を Coq :288-387 から直 port、
   (b) V-値 + ‖·‖ + 整数値 ((3.9.c)) から W₁^#-値を再導出、の 2 route。次 iter: Coq :288-387 の
   該当補題 (spec の W∖W₂ 成分がどの cycTI 原理から出るか) を精読して route 選択。
+
+## 📋 (2026-07-10 続¹⁹、lane-b /loop iter 13) — primeTIirr_spec 精読完了: port 最深部 = equiv_restrict_compl_ortho
+
+**Coq primeTIirr_spec (:288-387) の W∖W₂-値 (c) の導出構造**:
+1. `isoV2 := normedTI_isometry normedTI_prTIset` — **W∖W₂ が S 内 normedTI** ⟹ Ind が
+   Z[Sj, W∖W₂] 上 isometry。
+2. `vchar_isometry_base` — isometry image の signed-irr 抽出 (repo mu2Grid が対応済の部分)。
+3. **`equiv_restrict_compl_ortho`** (mathcomp、:361) — V2base (CF(W, W∖W₂) の ew-基底) との
+   内積一致から **W∖W₂ 上の pointwise 値一致** を出す同値原理。muW = δ·μ grid が基底内積で
+   ω と一致 → `{in W :\: W2, mu2 =1 δ·ω}` (= prTIirr_id)。
+**⟹ B(iii) port の残 3 部品**: (i) normedTI (W∖W₂) S W 相当 (TICyclicHypothesis field
+の有無要確認 — G2 で W₁-class normedTI は触った)、(ii) equiv_restrict_compl_ortho の
+repo 対応 (grep 未ヒット → 新規 port、mathcomp character theory 一般原理、
+Frobenius-reciprocity + 基底展開で self-contained に証明可能な見込み)、(iii) 両者の合成で
+prTIirr_id 対応 (`mu2Grid_apply_eq_of_mem_W_sub_W2`) を mu2Grid API に追加。
+これが (13.18)/(13.19) cluster の真の最上流 — 9014 continuation として次 session/iter で
+equiv_restrict_compl_ortho port から着手。
