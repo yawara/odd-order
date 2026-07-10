@@ -37,10 +37,12 @@ open scoped Pointwise
 variable {G : Type*} [Group G]
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (12.15), first claim**: `ψ^{ρ_M}(g) = ψ(g)` for `g ∈ K^#`, where
-`ψ = coh.extension χ₀` is the witness Dade character of (12.13) and `ρ_M` is the (7.1)
-`ρ`-machinery of the counterexample `M` (`hypM.toHypothesis71`). -/
-theorem counterexample_chiRho_eval_of_mem_K_sharp [Finite G]
+/-- **Peterfalvi (12.15), the coset-constancy core**: `ψ` is constant on the signalizer coset
+`g·H(g)` of any `g ∈ K^#` (`H(g) = ftSupportKernel`, the faithful (8.14) kernel).  This is the
+`hconst` input of the `ρ`-collapse `chiRho_apply_eq_of_forall_coset`, isolated so that the
+`A(M)`- and `A₁(M)`-based `ρ_M` evaluations can both consume it (the kernel does not depend on
+the ambient support, `ftSupportKernel_restrict`). -/
+theorem counterexample_psi_constant_on_signalizer_coset [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
     (hyp : Hypothesis data.L)
@@ -52,25 +54,11 @@ theorem counterexample_chiRho_eval_of_mem_K_sharp [Finite G]
     {ψ : ClassFunction G ℂ}
     (hpsi : ψ = coh.extension (chi0 : ClassFunction ↥data.L ℂ))
     (hypM : Hypothesis ctr.M)
-    {g : G} (hgK : g ∈ ctr.K) (hg1 : g ≠ 1) (hgM : g ∈ ctr.M) :
-    hypM.toHypothesis71.chiRho ψ ⟨g, hgM⟩ = ψ g := by
+    {g : G} (hgK : g ∈ ctr.K) (hg1 : g ≠ 1) :
+    ∀ y ∈ OddOrder.Peterfalvi.S10.ftSupportKernel ctr.M
+      (OddOrder.GroupTheory.typeIA ctr.M hypM.typeI) g, ψ (g * y) = ψ g := by
   classical
-  have hHK : hypM.typeI.typeF.H = ctr.K :=
-    hypM.typeI.typeF.H_eq.trans ctr.K_eq_MF.symm
-  -- `g ∈ A(M)` (it lies in `K^# = H_M^# ⊆ A(M)`).
-  have hgA : ((⟨g, hgM⟩ : ↥ctr.M) : G) ∈
-      OddOrder.GroupTheory.typeIA ctr.M hypM.typeI := by
-    refine sharpSubgroup_H_subset_typeIA hypM.typeI ⟨?_, ?_⟩
-    · exact SetLike.mem_coe.mpr (hHK ▸ hgK)
-    · simpa using hg1
-  refine OddOrder.Peterfalvi.S09.Hypothesis71.chiRho_apply_eq_of_forall_coset
-    hypM.toHypothesis71 ψ hgA ?_
-  intro y hy
-  -- Identify the local kernel with the faithful (8.14) signalizer.
-  have hyKer : y ∈ OddOrder.Peterfalvi.S10.ftSupportKernel ctr.M
-      (OddOrder.GroupTheory.typeIA ctr.M hypM.typeI) g := by
-    rw [← hypM.dadeData.H_eq_ftSupportKernel ⟨g, hgA⟩]
-    exact hy
+  intro y hyKer
   by_cases hesc : g ∈ OddOrder.GroupTheory.escapingCentralizerSet ctr.M
       (OddOrder.GroupTheory.typeIA ctr.M hypM.typeI)
   · -- Escaping branch.
@@ -175,6 +163,117 @@ theorem counterexample_chiRho_eval_of_mem_K_sharp [Finite G]
     rw [hyKer, mul_one]
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.15), first claim**: `ψ^{ρ_M}(g) = ψ(g)` for `g ∈ K^#`, where
+`ψ = coh.extension χ₀` is the witness Dade character of (12.13) and `ρ_M` is the (7.1)
+`ρ`-machinery of the counterexample `M` over the full support `A(M)`
+(`hypM.toHypothesis71`). -/
+theorem counterexample_chiRho_eval_of_mem_K_sharp [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
+    (hyp : Hypothesis data.L)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+    {chi0 : IrreducibleCharacter ↥data.L}
+    (data0 : CharacterDecompositionData hyp (chi0 : ClassFunction ↥data.L ℂ))
+    (hchi0 : chi0 ∈ data0.constituents)
+    (hchi0_mem : (chi0 : ClassFunction ↥data.L ℂ) ∈ hyp.Sset)
+    {ψ : ClassFunction G ℂ}
+    (hpsi : ψ = coh.extension (chi0 : ClassFunction ↥data.L ℂ))
+    (hypM : Hypothesis ctr.M)
+    {g : G} (hgK : g ∈ ctr.K) (hg1 : g ≠ 1) (hgM : g ∈ ctr.M) :
+    hypM.toHypothesis71.chiRho ψ ⟨g, hgM⟩ = ψ g := by
+  classical
+  have hHK : hypM.typeI.typeF.H = ctr.K :=
+    hypM.typeI.typeF.H_eq.trans ctr.K_eq_MF.symm
+  have hgA : ((⟨g, hgM⟩ : ↥ctr.M) : G) ∈
+      OddOrder.GroupTheory.typeIA ctr.M hypM.typeI := by
+    refine sharpSubgroup_H_subset_typeIA hypM.typeI ⟨?_, ?_⟩
+    · exact SetLike.mem_coe.mpr (hHK ▸ hgK)
+    · simpa using hg1
+  refine OddOrder.Peterfalvi.S09.Hypothesis71.chiRho_apply_eq_of_forall_coset
+    hypM.toHypothesis71 ψ hgA ?_
+  intro y hy
+  refine counterexample_psi_constant_on_signalizer_coset hG data hyp coh data0 hchi0
+    hchi0_mem hpsi hypM hgK hg1 y ?_
+  rw [← hypM.dadeData.H_eq_ftSupportKernel ⟨g, hgA⟩]
+  exact hy
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The (12.15) `ρ_M`-machinery over `A₁(M) = K^#`** — the (7.1) data with `M` and `A₁(M)`
+in place of `L` and `A`, exactly as Peterfalvi defines `ρ_M`.  Built by restricting the
+counterexample's §10 Dade datum from `A(M)` to the `M`-stable subset `K^# = H_M^# ⊆ A(M)`
+(`S04.Hypothesis.restrict` / `FullDadeIsometryData.restrict` / `HConjInvariant.restrict`, the
+S12 type-`P` `toHypothesis71` pattern).  The `A₁`-based `ρ_M` is the one whose (7.3) norm bound
+runs over the thickened `Ã₁(M)`, disjoint from `Ã₁(L)` by (8.17) — the (12.16) requirement. -/
+noncomputable def hypothesis71SharpKernel [Finite G]
+    {ctr : CounterexampleHypothesis (G := G)} (hypM : Hypothesis ctr.M) :
+    OddOrder.Peterfalvi.S09.Hypothesis71 G
+      (sharpSubgroup hypM.typeI.typeF.H) ctr.M :=
+  have hsub : sharpSubgroup hypM.typeI.typeF.H ⊆
+      OddOrder.GroupTheory.typeIA ctr.M hypM.typeI :=
+    sharpSubgroup_H_subset_typeIA hypM.typeI
+  have hnorm : ∀ (l : ↥ctr.M) ⦃a : G⦄, a ∈ sharpSubgroup hypM.typeI.typeF.H →
+      (l : G) * a * (l : G)⁻¹ ∈ sharpSubgroup hypM.typeI.typeF.H := by
+    intro l a ha
+    haveI hnormal : ((hypM.typeI.typeF.H).subgroupOf ctr.M).Normal := by
+      rw [hypM.typeI.typeF.H_eq]
+      exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal ctr.M
+    have haH : a ∈ hypM.typeI.typeF.H := ha.1
+    have haM : a ∈ ctr.M := hypM.typeI.typeF.H_le haH
+    refine ⟨?_, ?_⟩
+    · -- conjugation stays in the normal `H`
+      have hmem := hnormal.conj_mem ⟨a, haM⟩ (Subgroup.mem_subgroupOf.mpr haH) l
+      have hcoe := Subgroup.mem_subgroupOf.mp hmem
+      simpa using hcoe
+    · -- conjugation preserves `≠ 1`
+      intro h1
+      refine ha.2 ?_
+      rw [Set.mem_singleton_iff] at h1 ⊢
+      calc a = (l : G)⁻¹ * ((l : G) * a * (l : G)⁻¹) * (l : G) := by group
+        _ = (l : G)⁻¹ * 1 * (l : G) := by rw [h1]
+        _ = 1 := by group
+  { hyp := hypM.dadeData.dade.restrict hsub hnorm
+    τ := ((hypM.dadeData.dade.fullDadeIsometryData hypM.hconj).restrict hsub hnorm).toDadeMap
+    isDadeMap := ((hypM.dadeData.dade.fullDadeIsometryData hypM.hconj).restrict hsub
+      hnorm).toDadeIsometryData.isDadeMap
+    hConjInvariant := hypM.hconj.restrict hsub hnorm }
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.15), first claim, `A₁(M)`-form**: the `A₁(M) = K^#`-based `ρ_M`
+(`hypothesis71SharpKernel`) evaluates identically: `ψ^{ρ_M}(g) = ψ(g)` for `g ∈ K^#`.  Same
+collapse as the `A(M)`-form — the restricted datum's local kernel at `g` is the same faithful
+signalizer (`S04.Hypothesis.restrict` keeps the per-point `H`). -/
+theorem counterexample_chiRhoA1_eval_of_mem_K_sharp [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
+    (hyp : Hypothesis data.L)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+    {chi0 : IrreducibleCharacter ↥data.L}
+    (data0 : CharacterDecompositionData hyp (chi0 : ClassFunction ↥data.L ℂ))
+    (hchi0 : chi0 ∈ data0.constituents)
+    (hchi0_mem : (chi0 : ClassFunction ↥data.L ℂ) ∈ hyp.Sset)
+    {ψ : ClassFunction G ℂ}
+    (hpsi : ψ = coh.extension (chi0 : ClassFunction ↥data.L ℂ))
+    (hypM : Hypothesis ctr.M)
+    {g : G} (hgK : g ∈ ctr.K) (hg1 : g ≠ 1) (hgM : g ∈ ctr.M) :
+    (hypothesis71SharpKernel hypM).chiRho ψ ⟨g, hgM⟩ = ψ g := by
+  classical
+  have hHK : hypM.typeI.typeF.H = ctr.K :=
+    hypM.typeI.typeF.H_eq.trans ctr.K_eq_MF.symm
+  have hgA1 : ((⟨g, hgM⟩ : ↥ctr.M) : G) ∈ sharpSubgroup hypM.typeI.typeF.H := by
+    refine ⟨?_, ?_⟩
+    · exact SetLike.mem_coe.mpr (hHK ▸ hgK)
+    · simpa using hg1
+  refine OddOrder.Peterfalvi.S09.Hypothesis71.chiRho_apply_eq_of_forall_coset
+    (hypothesis71SharpKernel hypM) ψ hgA1 ?_
+  intro y hy
+  refine counterexample_psi_constant_on_signalizer_coset hG data hyp coh data0 hchi0
+    hchi0_mem hpsi hypM hgK hg1 y ?_
+  -- the restricted datum's kernel at `g` is the original one (`restrict_H` is `rfl`)
+  rw [← hypM.dadeData.H_eq_ftSupportKernel
+    ⟨g, sharpSubgroup_H_subset_typeIA hypM.typeI hgA1⟩]
+  exact hy
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.15), second claim**: the witness Dade character `ψ` is **constant on
 `K − K′`** — the (12.5)-M constancy of `ψ^{ρ_M}` (`psi_constant_on_kernel_sub_derived_ofData`,
 coherence-free, with the `(12.3)+(5.5)` cross-orthogonality supply from `L ≁ M`) transported to
@@ -221,6 +320,113 @@ theorem counterexample_psi_constant_on_K_sub_Kprime [Finite G]
     (by rw [hHK]; exact hg₂K) (by rw [hK']; exact hg₂K')
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.16), the `hA` norm lower bound**:
+`(|K| − |K′|)/|M| · mval² ≤ ‖ψ^{ρ_M}‖²` for the `A₁(M)`-based `ρ_M`.  The squared norm is
+`|M|⁻¹ Σ_{m ∈ M} ‖ψ^{ρ_M}(m)‖²`; restricting the sum to the `|K| − |K′|` elements of `K − K′`,
+where `ψ^{ρ_M} = ψ = mval` (the three (12.15) claims), gives the bound. -/
+theorem counterexample_chiRhoA1_normSq_ge [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
+    (hyp : Hypothesis data.L)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+    {chi0 : IrreducibleCharacter ↥data.L}
+    (data0 : CharacterDecompositionData hyp (chi0 : ClassFunction ↥data.L ℂ))
+    (hchi0 : chi0 ∈ data0.constituents)
+    (hchi0_mem : (chi0 : ClassFunction ↥data.L ℂ) ∈ hyp.Sset)
+    {ψ : ClassFunction G ℂ}
+    (hpsi : ψ = coh.extension (chi0 : ClassFunction ↥data.L ℂ))
+    (hypM : Hypothesis ctr.M)
+    {mval : ℤ} {g0 : G} (hg0K : g0 ∈ ctr.K) (hg0K' : g0 ∉ ctr.Kprime)
+    (hmval : ψ g0 = (mval : ℂ)) :
+    ((Nat.card ↥ctr.K : ℝ) - (Nat.card ↥ctr.Kprime : ℝ)) / (Nat.card ↥ctr.M : ℝ)
+        * (mval : ℝ) ^ 2
+      ≤ (ClassFunction.inner ((hypothesis71SharpKernel hypM).chiRhoCF ψ)
+          ((hypothesis71SharpKernel hypM).chiRhoCF ψ)).re := by
+  classical
+  set f : ClassFunction ↥ctr.M ℂ := (hypothesis71SharpKernel hypM).chiRhoCF ψ with hf
+  have hKM : ctr.K ≤ ctr.M :=
+    ctr.K_eq_MF ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le ctr.M
+  have hK'K : ctr.Kprime ≤ ctr.K := ctr.Kprime_eq ▸ Subgroup.map_subtype_le _
+  -- the squared norm as a real sum
+  have hre : (ClassFunction.inner f f).re
+      = (Nat.card ↥ctr.M : ℝ)⁻¹ * ∑ m : ↥ctr.M, ‖f m‖ ^ 2 := by
+    have hinner : ClassFunction.inner f f = (Nat.card ↥ctr.M : ℂ)⁻¹ *
+        ((∑ m : ↥ctr.M, ‖f m‖ ^ 2 : ℝ) : ℂ) := by
+      rw [ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.innerSum, invOf_eq_inv]
+      congr 1
+      rw [Complex.ofReal_sum]
+      refine Finset.sum_congr rfl fun m _ => ?_
+      rw [Complex.star_def, Complex.mul_conj, Complex.normSq_eq_norm_sq]
+    have hcast : (Nat.card ↥ctr.M : ℂ)⁻¹ * ((∑ m : ↥ctr.M, ‖f m‖ ^ 2 : ℝ) : ℂ)
+        = ((((Nat.card ↥ctr.M : ℝ))⁻¹ * ∑ m : ↥ctr.M, ‖f m‖ ^ 2 : ℝ) : ℂ) := by
+      push_cast
+      ring
+    rw [hinner, hcast, Complex.ofReal_re]
+  -- the `K − K′` sampling set
+  set S : Finset ↥ctr.M :=
+    Finset.univ.filter (fun m : ↥ctr.M => (m : G) ∈ ctr.K ∧ (m : G) ∉ ctr.Kprime) with hS
+  -- each sampled value is `mval`
+  have hval : ∀ m ∈ S, ‖f m‖ ^ 2 = (mval : ℝ) ^ 2 := by
+    intro m hm
+    obtain ⟨hmK, hmK'⟩ := (Finset.mem_filter.mp hm).2
+    have hm1 : (m : G) ≠ 1 := fun h => hmK' (h ▸ ctr.Kprime.one_mem)
+    have heval : f m = ψ (m : G) := by
+      rw [hf, OddOrder.Peterfalvi.S09.Hypothesis71.chiRhoCF_apply]
+      exact counterexample_chiRhoA1_eval_of_mem_K_sharp hG data hyp coh data0 hchi0
+        hchi0_mem hpsi hypM hmK hm1 m.2
+    have hconst : ψ (m : G) = ψ g0 :=
+      counterexample_psi_constant_on_K_sub_Kprime hG data hyp coh data0 hchi0 hchi0_mem
+        hpsi hypM hmK hmK' hg0K hg0K'
+    rw [heval, hconst, hmval]
+    rw [show ‖((mval : ℤ) : ℂ)‖ = |(mval : ℝ)| by
+      rw [← Complex.ofReal_intCast, Complex.norm_real, Real.norm_eq_abs]]
+    exact sq_abs _
+  -- `|S| = |K| − |K′|`
+  have hcardS : S.card = Nat.card ↥ctr.K - Nat.card ↥ctr.Kprime := by
+    have hsplit : S = (Finset.univ.filter (fun m : ↥ctr.M => (m : G) ∈ ctr.K)) \
+        (Finset.univ.filter (fun m : ↥ctr.M => (m : G) ∈ ctr.Kprime)) := by
+      ext m
+      simp only [hS, Finset.mem_filter, Finset.mem_sdiff, Finset.mem_univ, true_and]
+    have hsubKK' : (Finset.univ.filter (fun m : ↥ctr.M => (m : G) ∈ ctr.Kprime)) ⊆
+        (Finset.univ.filter (fun m : ↥ctr.M => (m : G) ∈ ctr.K)) := by
+      intro m hm
+      rw [Finset.mem_filter] at hm ⊢
+      exact ⟨hm.1, hK'K hm.2⟩
+    have hcardK : (Finset.univ.filter (fun m : ↥ctr.M => (m : G) ∈ ctr.K)).card
+        = Nat.card ↥ctr.K := by
+      rw [← Fintype.card_subtype, ← Nat.card_eq_fintype_card]
+      exact Nat.card_congr
+        ⟨fun m => ⟨(m.1 : G), m.2⟩, fun k => ⟨⟨(k : G), hKM k.2⟩, k.2⟩,
+          fun m => by ext; rfl, fun k => by ext; rfl⟩
+    have hcardK' : (Finset.univ.filter (fun m : ↥ctr.M => (m : G) ∈ ctr.Kprime)).card
+        = Nat.card ↥ctr.Kprime := by
+      rw [← Fintype.card_subtype, ← Nat.card_eq_fintype_card]
+      exact Nat.card_congr
+        ⟨fun m => ⟨(m.1 : G), m.2⟩, fun k => ⟨⟨(k : G), hKM (hK'K k.2)⟩, k.2⟩,
+          fun m => by ext; rfl, fun k => by ext; rfl⟩
+    rw [hsplit, Finset.card_sdiff, Finset.inter_eq_left.mpr hsubKK', hcardK, hcardK']
+  -- assemble
+  have hK'leK : Nat.card ↥ctr.Kprime ≤ Nat.card ↥ctr.K :=
+    Nat.le_of_dvd Nat.card_pos (Subgroup.card_dvd_of_le hK'K)
+  have hlb : ((Nat.card ↥ctr.K : ℝ) - (Nat.card ↥ctr.Kprime : ℝ)) * (mval : ℝ) ^ 2
+      ≤ ∑ m : ↥ctr.M, ‖f m‖ ^ 2 := by
+    have h1 : ((Nat.card ↥ctr.K : ℝ) - (Nat.card ↥ctr.Kprime : ℝ)) * (mval : ℝ) ^ 2
+        = ∑ _m ∈ S, (mval : ℝ) ^ 2 := by
+      rw [Finset.sum_const, nsmul_eq_mul, hcardS, Nat.cast_sub hK'leK]
+    rw [h1, ← Finset.sum_congr rfl hval]
+    exact Finset.sum_le_sum_of_subset_of_nonneg (Finset.subset_univ S)
+      (fun m _ _ => by positivity)
+  have hMpos : (0 : ℝ) < (Nat.card ↥ctr.M : ℝ) := by exact_mod_cast Nat.card_pos
+  rw [hre]
+  calc ((Nat.card ↥ctr.K : ℝ) - (Nat.card ↥ctr.Kprime : ℝ)) / (Nat.card ↥ctr.M : ℝ)
+        * (mval : ℝ) ^ 2
+      = (Nat.card ↥ctr.M : ℝ)⁻¹
+        * (((Nat.card ↥ctr.K : ℝ) - (Nat.card ↥ctr.Kprime : ℝ)) * (mval : ℝ) ^ 2) := by
+        ring
+    _ ≤ (Nat.card ↥ctr.M : ℝ)⁻¹ * ∑ m : ↥ctr.M, ‖f m‖ ^ 2 := by
+        exact mul_le_mul_of_nonneg_left hlb (inv_nonneg.mpr hMpos.le)
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.15), third claim**: `ψ(g) ∈ ℤ` for `g ∈ K − K′` — the constancy of the
 second claim fed into the rationality/integrality argument `rhoM_integer_values`. -/
 theorem counterexample_psi_int_on_K_sub_Kprime [Finite G]
@@ -243,5 +449,7 @@ theorem counterexample_psi_int_on_K_sub_Kprime [Finite G]
       counterexample_psi_constant_on_K_sub_Kprime hG data hyp coh data0 hchi0 hchi0_mem
         hpsi hypM h1 h2 h3 h4)
     g hgK hgK'
+
+
 
 end OddOrder.Peterfalvi.S14
