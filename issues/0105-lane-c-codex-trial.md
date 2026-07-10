@@ -1,0 +1,47 @@
+---
+id: 105
+slug: lane-c-codex-trial
+title: "lane c を codex 5.6 (GPT-5.6) 運用に切替 — trial 追跡 + hub dup チェック"
+created: 2026-07-10
+---
+
+# lane c を codex 5.6 (GPT-5.6) 運用に切替 — trial 追跡 + hub dup チェック
+
+## 背景
+
+- GPT-5.6 (Sol/Terra/Luna) が 2026-07-09 リリースされ Codex にも展開。ユーザー裁定 (2026-07-10):
+  3 レーンのうち 1 つを codex 5.6 に任せる trial → hub 所見で **lane c** を選定。
+- 選定理由・kickoff prompt・ユーザー操作手順の正本 =
+  [notes/meta/lane_c_codex_handoff_2026_07_10.md](../notes/meta/lane_c_codex_handoff_2026_07_10.md)。
+  要旨: c の現 frontier (landing 済み S-side Dade `8ff313b1` / §14.6 `97a528e0` の T-side dual mirror =
+  issue 4004/9013、u-value gate = 9077) が template-mirror 型で、旧 lane d (codex、2026-07-07 退役) の
+  実証済みの強みに合致。a (唯一の bare feitThompson sorry) と b (carve-out 最複雑) は不適。
+- 旧 lane d の再活性化トリガー (i)「S-side landing → T-side mirror」は `8ff313b1` で成立したが、
+  d 再作成でなく c の operator 切替で対応 (T-side mirror は c territory)。
+- 所有・issue base (3000)・hub 合流ゲートは不変 (モデル非依存)。可逆 — churn なら operator を
+  Claude に戻すだけ (branch/worktree/成果は不変)。
+
+## やること
+
+- [ ] **ユーザー**: 現行 Claude lane-c セッション (/loop) を停止 → codex 5.6 を `/home/ywr/odd-order-c`
+      で起動 (`ODD_ISSUE_BASE=3000`、kickoff prompt は handoff note から)
+- [ ] **hub**: c の各合流 tick で新規宣言の dup チェック (最初の ~5 tick 重点; 手順 = merge_monitor 🤖 ブロック)。
+      dup 主体 tick は merge abort + 本 issue に記録 + de-dup 差し戻し
+- [ ] **hub**: tick ごとの観察 (genuine landing / churn / 範囲逸脱) を本 issue の「trial ログ」節に追記
+- [ ] **hub**: 数 tick (~2 日、目安 2026-07-12) で keep / swap-back を裁定し本 issue に記録
+
+## 完了条件
+
+trial の裁定 (codex 継続 or Claude へ swap-back) が本 issue に記録され、merge_monitor.md の
+🤖 ブロック / レーン表がその結果に更新されている。
+
+## trial ログ
+
+- 2026-07-10: handoff 一式作成 (note + merge_monitor 反映)。codex 起動待ち。
+
+## 参照
+
+- notes/meta/lane_c_codex_handoff_2026_07_10.md (正本)
+- notes/meta/merge_monitor.md — レーン表 + 🤖 lane c codex ブロック + ⚰ lane d 退役ブロック (2026-07-07)
+- issues/4001 / 4004 / 9013 / 9077 (c frontier)、issues/closed/9006・9007 (旧 lane d の genuine 実績)
+- commits: 8ff313b1 (S-side Dade landing = mirror source) / 97a528e0 (§14.6 frobPU)
