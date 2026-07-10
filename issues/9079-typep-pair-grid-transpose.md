@@ -282,7 +282,50 @@ dataT.W1 = mp.Kstar ∧ dataT.W2 = mp.K` — sorry-free / axiom-clean (3-standar
   (sigmaCoeff_eq_zero_of_vanishOnV) が ⟨ψ,σω⟩=1 と矛盾 / c=-1 → ω が非空 V 上
   0 (linear char の unit 値と矛盾)。
 
-### 残 assembly (part 2 第二陣、fresh agent 向け設計):
+## 2026-07-10 part 2 第二陣 LANDED (3d6df7c2 + 5a521768 + ea13fb44): per-index 同定 + 列和→行和 transpose
+
+**3 commit で cycTIisoC assembly + item 4 の generic/pair 層が完成** (全宣言 sorry-free /
+axiom-clean 3-standard):
+
+1. **per-index σ-同定** (3d6df7c2): `ticyclic_sigma_omega_eq_of_V_eq` (generic、V/W 共有で
+   σ₁(ω(ξ)) = σ₂(ω(ξ∘incl))) + `section16_pair_tic_W_eq` + `section16_pair_sigma_omega_eq`
+   (pair instance)。ξ-transport は MonoidHom.comp (Subgroup.inclusion hW.ge)、cast ゼロ。
+2. **列和→行和 transpose generic core** (5a521768): `subgroupOfTransport` (2 層 subgroupOf
+   value-transport、mathlib hoist 候補) + `subgroupOfTransportCharEquiv` (逆合成 = rfl) +
+   `ticyclic_wFstSnd_inclusion_of_swap` (W=W₁×W₂ 分解の swap 転置、wProdEquiv.injective) +
+   `ticyclic_omegaProdChar_comp_inclusion_of_swap` (index 翻訳 ω_{(p,kcol)}∘incl =
+   ω_{(kcol∘τ,p∘τ')}) + ★`ticyclic_chiFam_columnSum_transpose` (∑_p chiFam₁(p,kcol) =
+   ∑_q chiFam₂(kcol∘τ,q)、Fintype.sum_equiv reindex)。
+3. **S-side rfl 同定** (5a521768): ★`ticVdiff_typeIIHypothesis46_eq` —
+   `ticVdiff (typeIIHypothesis46 hG hSmax hSII data) = typePData_toTICyclicHypothesis data hodd`
+   が **rfl** (tic field がその bridge そのもの + 全 data field rfl + proof irrelevance)。
+   「要確認」だった S-side V/W 一致は無料で決着 — **dichotomy の chiFam と pair 機構が無変換で接続**。
+4. **pair instance** (ea13fb44): swap 等式の抽出 (`section16_pair_tic_W1_eq_W2`/`W2_eq_W1`) +
+   ★`section16_pair_chiFam_columnSum_transpose` (S-grid 全列和 = T-grid 全行和 at pair)。
+
+**M-side 発見 (次段の鍵、コード確認済)**: `Hypothesis.toHypothesis46` (M-side、
+S12_MaximalIII_IV_V_Core/Hypothesis.lean:1057) も `tic := typePData_toTICyclicHypothesis
+hyp.typeP hodd` を field に持つ (S-side と完全同型) → M-side ticVdiff too = rfl。
+`alignedOmegaSigmaGrid` の σ も同 bridge 上 (CharacterParameters.lean:138) — pair 機構の
+T-side は `dataT := hyp.typeP` で直結。
+
+### 残 (次 iteration): M-side 変換 + gate 組立
+1. **M-side fiber 変換**: `∑_q chiFam_M (r'char, q) = ∑_{j : Fin w2} alignedOmegaSigmaGrid r' j`。
+   部品: (a) aligned char = `omegaProdCharTic h46_M (χ₂ j) i'` の同定 — aligned の
+   `e` (subgroupOfEquivOfLe∘subgroupCongr) と `ticWEquivSdiffW h46_M` は同 type 間の
+   coe-coherent MulEquiv ⟹ ext+coe-injective で equal (coe_ticWEquivSdiffW S06:112)。
+   h46_M.toHypothesis = aligned の h も rfl-same。
+   (b) fst/snd 独立性 = ColumnPin IndexComponents (omegaProdCharTic_symm_{fst,snd}_eq/_ne、
+   Hypothesis46-generic ゆえ h46_M にそのまま適用可)。
+   (c) j ↦ snd-index の全射性 = cardinality (χ₂ enum = finCardEquivCharacterGroup∘finCongr
+   bijective + e-precompose bijective)。r'char は i-enum の全射性で任意に hit。
+2. **gate 組立** (`exists_typeIICrossIsometryData` の pair-witness 再構成): S ~ mp.S / M ~ mp.T
+   の共役 re-basing。M 非 type-II (notMtype2 相当) → `exists_conj_eq_S_of_isTypeII` の hT を
+   M~mp.T 経由で discharge → S-枝一意。conj 転送は結論レベル (Coq 流) が軽い。
+   Section16MaximalPair の conj-transport (TypePData.conj 相当の pair 版) が要るか要精査。
+3. 行和 pin の符号/添字整形 (dichotomy の ±δ • ∑ → gate の delta' • ∑ ω_{r'j})。
+
+### 残 assembly (part 2 第二陣、fresh agent 向け設計) — ↑で実施済み (履歴として保存):
 Coq `cycTIisoC` の Lean 版 = **pair 両側 σ の per-index 同定**:
 ```
 σ_T (ω_T(ξ')) = σ_S (ω_S(ξ))   (ξ' = ξ の swap-transport)
