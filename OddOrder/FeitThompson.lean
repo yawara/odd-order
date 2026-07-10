@@ -1269,6 +1269,8 @@ noncomputable def section16CharacterData_of_isMinimalSimpleOdd {G : Type*} [Grou
             (Section16CharacterData.chi2enum hG mp tp j)).injective)
             (OddOrder.RepresentationTheory.IrreducibleCharacter.ext h))
       mu_orthonormal := Section16CharacterData.muS_orthonormal hG mp tp
+      mu_diff_support := fun i {j k} hj0 hk0 hdeg =>
+        Section16CharacterData.muS_diff_support hG mp tp i hj0 hk0 hdeg
       mu_colSum_eq_induce := fun j => by
         refine ⟨ClassFunction.restrict ((derivedInG mp.S).subgroupOf mp.S)
             (((mp.certainTypeS hG).columnFamily
@@ -1399,6 +1401,7 @@ noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [F
     mu_irreducible := cd.mu_irreducible
     mu_col_injective := cd.mu_col_injective
     mu_orthonormal := cd.mu_orthonormal
+    mu_diff_support := cd.mu_diff_support
     mu_colSum_eq_induce := cd.mu_colSum_eq_induce
     nu_definition := cd.nu_definition
     q_lt_p := tp.q_lt_p
@@ -1524,6 +1527,7 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       mu_irreducible := inp.mu_irreducible
       mu_col_injective := inp.mu_col_injective
       mu_orthonormal := inp.mu_orthonormal
+      mu_diff_support := inp.mu_diff_support
       mu_colSum_eq_induce := inp.mu_colSum_eq_induce
       nu_definition := inp.nu_definition
       m := 1 - 1 / ((inp.q : ℚ) - 1) - ((inp.q : ℚ) - 1) / (inp.q : ℚ) ^ inp.p +
