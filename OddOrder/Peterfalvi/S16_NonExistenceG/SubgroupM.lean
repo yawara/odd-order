@@ -499,15 +499,15 @@ theorem MHypothesis.chiRhoNormSq_eq_zetaNuRhoNormSq [Finite G] {hyp : Hypothesis
   congr 1
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (14.11.4), the lower bound** `1 − pq/k ≤ ‖ψ^{τ₁ρ}‖²` — the genuine (7.8.b)
-coherence-norm content of (14.11.4).  Combines the (7.8.b) lower bound for the coherent type-I `M`
-(`h78_zetaNuRho_normSq_ge`) with the index identities `h78.kernelOrder = |K| = k` and
-`h78.complementIndex = |M:K| = p q` (`h78_H_eq`, `e_eq_index`, `complement_card_eq_pq`) via the norm
-bridge `chiRhoNormSq_eq_zetaNuRhoNormSq`.  This is the `lower` field of the `NormCascadeData`
-producer `normCascadeData`; the remaining gate is the upper-bound §8 TI-counting. -/
+/-- **Peterfalvi (7.8.b), the unconditional lower bound**
+`1 − e/k ≤ ‖ψ^{τ₁ρ}‖²`.  Combines the coherence-norm estimate for the type-I `M`
+(`h78_zetaNuRho_normSq_ge`) with `h78.kernelOrder = |K| = k` and
+`h78.complementIndex = |M:K| = e` (`h78_H_eq`, `e_eq_index`) via
+`chiRhoNormSq_eq_zetaNuRhoNormSq`.  The conditional producer `normCascadeData` rewrites
+`e = p q` only after (14.11.2). -/
 theorem MHypothesis.rhoNormSq_ge_lower [Finite G] {hyp : Hypothesis (G := G)}
     (Mdata : MHypothesis hyp) :
-    1 - ((hyp.base.p * hyp.base.q : ℕ) : ℝ) / (Mdata.k : ℝ)
+    1 - (Mdata.e : ℝ) / (Mdata.k : ℝ)
       ≤ (Mdata.toFamilyHypothesis71).chiRhoNormSq (Mdata.tau1 Mdata.psi) 0 := by
   rw [Mdata.chiRhoNormSq_eq_zetaNuRhoNormSq]
   -- `K ≤ M` for the index/card bookkeeping.
@@ -518,20 +518,20 @@ theorem MHypothesis.rhoNormSq_ge_lower [Finite G] {hyp : Hypothesis (G := G)}
     rw [Mdata.k_eq_card_K]
     show Nat.card ↥(Mdata.h78.hyp76.H) = Nat.card ↥Mdata.K
     rw [Mdata.h78_H_eq]
-  -- `h78.complementIndex = |M:K| = p q`.
-  have hci : Mdata.h78.complementIndex = hyp.base.p * hyp.base.q := by
+  -- `h78.complementIndex = |M:K| = e`.
+  have hci : Mdata.h78.complementIndex = Mdata.e := by
     have hmul := Mdata.h78.kernelOrder_mul_complementIndex_eq_card_L
     rw [hko, Mdata.k_eq_card_K] at hmul
     have hcardK : Nat.card ↥(Mdata.K.subgroupOf Mdata.M) = Nat.card ↥Mdata.K :=
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKleM).toEquiv
     have hidx : Nat.card ↥Mdata.K * (Mdata.K.subgroupOf Mdata.M).index = Nat.card ↥Mdata.M := by
       rw [← hcardK]; exact Subgroup.card_mul_index _
-    have hidxpq : (Mdata.K.subgroupOf Mdata.M).index = hyp.base.p * hyp.base.q := by
-      rw [← Mdata.e_eq_index]; exact Mdata.complement_card_eq_pq
-    rw [hidxpq] at hidx
+    have hidxe : (Mdata.K.subgroupOf Mdata.M).index = Mdata.e :=
+      Mdata.e_eq_index.symm
+    rw [hidxe] at hidx
     have hKpos : 0 < Nat.card ↥Mdata.K := Nat.card_pos
     exact Nat.eq_of_mul_eq_mul_left hKpos (hmul.trans hidx.symm)
-  -- Rewrite the (7.8.b) carrier into `p q`/`k` and conclude.
+  -- Rewrite the (7.8.b) carrier into `e`/`k` and conclude.
   have key := Mdata.h78_zetaNuRho_normSq_ge
   rw [hci, hko] at key
   exact key
@@ -593,20 +593,20 @@ theorem MHypothesis.card_typeIA_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
   rw [hTI, hHK, Mdata.k_eq_card_K, Nat.card_coe_set_eq, OddOrder.GroupTheory.sharpSubgroup,
     Set.ncard_sdiff (Set.singleton_subset_iff.mpr Mdata.K.one_mem), Set.ncard_singleton, hc]
 
-/-- **Peterfalvi (14.11): `|M| = p q k`** — the order of the type-I maximal `M`, from
-`[M : K] = e = pq` (`e_eq_index`, `complement_card_eq_pq`) and `|K| = k` (`k_eq_card_K`) by Lagrange.
-The denominator of the §8 cardinality input `|A(M)|/|M| = (k − 1)/(kpq)` of (14.11.4). -/
+/-- **Peterfalvi (14.10): `|M| = e k`** — the unconditional order of the type-I maximal `M`,
+from `[M : K] = e` (`e_eq_index`) and `|K| = k` (`k_eq_card_K`) by Lagrange.  The conditional
+(14.11.4) upper bound substitutes `e = p q` only after (14.11.2). -/
 theorem MHypothesis.card_M_eq {hyp : Hypothesis (G := G)} (Mdata : MHypothesis hyp) :
-    Nat.card ↥Mdata.M = hyp.base.p * hyp.base.q * Mdata.k := by
+    Nat.card ↥Mdata.M = Mdata.e * Mdata.k := by
   have hKleM : Mdata.K ≤ Mdata.M :=
     Mdata.K_eq_MF ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le Mdata.M
   have hcardK : Nat.card ↥(Mdata.K.subgroupOf Mdata.M) = Nat.card ↥Mdata.K :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKleM).toEquiv
   have hidx : Nat.card ↥Mdata.K * (Mdata.K.subgroupOf Mdata.M).index = Nat.card ↥Mdata.M := by
     rw [← hcardK]; exact Subgroup.card_mul_index _
-  have hidxpq : (Mdata.K.subgroupOf Mdata.M).index = hyp.base.p * hyp.base.q := by
-    rw [← Mdata.e_eq_index]; exact Mdata.complement_card_eq_pq
-  rw [hidxpq] at hidx
+  have hidxe : (Mdata.K.subgroupOf Mdata.M).index = Mdata.e :=
+    Mdata.e_eq_index.symm
+  rw [hidxe] at hidx
   rw [← hidx, Mdata.k_eq_card_K]; ring
 
 /-- **The exceptional set `W − (W₁ ∪ W₂)` of a cyclic `W = W₁ × W₂` is a TI-subset with
@@ -869,7 +869,7 @@ then `normCascade_upper_loosen`.  The remaining §8 structural input is the TI/n
 Frobenius pieces `W`, `P`, `Q` (the type-I analogue of S12 (10.8)'s `G₁ ⊆ (H#)^G ∪ V^G`). -/
 theorem MHypothesis.line83_le_displayed_upper [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
-    (Mdata : MHypothesis hyp) :
+    (Mdata : MHypothesis hyp) (hepq : Mdata.e = hyp.base.p * hyp.base.q) :
     (Nat.card ↥(OddOrder.GroupTheory.typeIA Mdata.M Mdata.typeIHyp.typeI) : ℝ)
         / (Nat.card ↥Mdata.M : ℝ)
       + (Nat.card G : ℝ)⁻¹ * ((Nat.card (Mdata.toFamilyHypothesis71).G0 : ℝ)
@@ -959,7 +959,7 @@ theorem MHypothesis.line83_le_displayed_upper [Finite G]
   have hAterm : (Nat.card ↥(OddOrder.GroupTheory.typeIA Mdata.M Mdata.typeIHyp.typeI) : ℝ)
         / (Nat.card ↥Mdata.M : ℝ)
       = ((Mdata.k : ℝ) - 1) / ((Mdata.k * hyp.base.p * hyp.base.q : ℕ) : ℝ) := by
-    rw [Mdata.card_typeIA_eq hG, Mdata.card_M_eq]
+    rw [Mdata.card_typeIA_eq hG, Mdata.card_M_eq, hepq]
     have hkR : ((Mdata.k - 1 : ℕ) : ℝ) = (Mdata.k : ℝ) - 1 := by
       have : 1 ≤ Mdata.k := hkpos
       push_cast [Nat.cast_sub this]; ring
@@ -1037,8 +1037,9 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Faithful §7 Dade producer for (14.11.4).**  The `ρ`-norm is the concrete family-inequality
 norm `(toFamilyHypothesis71).chiRhoNormSq (ψ^{τ₁}) 0` for the `(M, A(M))` map `ρ`.
 
-* `lower` is **proven** (`MHypothesis.rhoNormSq_ge_lower`): the (7.8.b) coherence-norm lower bound
-  `1 − pq/k ≤ ‖ψ^{τ₁ρ}‖²` (via the `h78` carrier and the bridge `chiRhoNormSq_eq_zetaNuRhoNormSq`).
+* `lower` uses the **proven** unconditional estimate `1 − e/k ≤ ‖ψ^{τ₁ρ}‖²`
+  (`MHypothesis.rhoNormSq_ge_lower`, via `h78` and `chiRhoNormSq_eq_zetaNuRhoNormSq`) and rewrites
+  `e = p q` only after the conditional (14.11.2) producer.
 * `upper` is the remaining genuine obligation: the **§8 TI-counting** of the `(W#)^G`/`(P#)^G`/
   `(Q#)^G` orbit contributions that turns the line-83 bound (`chiRhoNormSq_psi_le_line83`, proven)
   into the raw estimate, which `normCascade_upper_loosen` (proven) then loosens to the displayed
@@ -1047,12 +1048,19 @@ norm `(toFamilyHypothesis71).chiRhoNormSq (ψ^{τ₁}) 0` for the `(M, A(M))` ma
 noncomputable def normCascadeData [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (Mdata : MHypothesis hyp) (hne : Mdata.K ≠ hyp.base.V) :
-    NormCascadeData hyp Mdata where
-  rhoNormSq := (Mdata.toFamilyHypothesis71).chiRhoNormSq (Mdata.tau1 Mdata.psi) 0
-  lower := Mdata.rhoNormSq_ge_lower
-  -- line-83 (`chiRhoNormSq_psi_le_line83`, proven) chained with the §8 TI-counting step
-  -- (`line83_le_displayed_upper`, the single remaining gate).
-  upper := le_trans (Mdata.chiRhoNormSq_psi_le_line83 _hG hne) (Mdata.line83_le_displayed_upper _hG)
+    NormCascadeData hyp Mdata := by
+  have hepq := (betaM_expansion _hG hyp Mdata hne).1
+  refine {
+    rhoNormSq := (Mdata.toFamilyHypothesis71).chiRhoNormSq (Mdata.tau1 Mdata.psi) 0
+    lower := ?_
+    upper := ?_
+  }
+  · rw [← hepq]
+    exact Mdata.rhoNormSq_ge_lower
+  · -- line-83 (`chiRhoNormSq_psi_le_line83`, proven) chained with the §8 TI-counting step
+    -- (`line83_le_displayed_upper`, the single remaining gate).
+    exact le_trans (Mdata.chiRhoNormSq_psi_le_line83 _hG hne)
+      (Mdata.line83_le_displayed_upper _hG hepq)
 
 /-- **Peterfalvi (14.11.4)**: the character-theoretic norm calculation produces the displayed
 rational inequality `normCascadeBound hyp k`.
@@ -1094,6 +1102,19 @@ theorem contradiction_of_K_ne_V [Finite G]
     (main_size_bounds _hG hyp Mdata hne)
     (normCascadeBound_of_charData _hG hyp Mdata hne)
 
+/-- **Peterfalvi (13.17.c)-dual specialised in the §14 context.**  Once `K = V`, the
+alternative complement branch `e = p` is excluded by (14.9), leaving `e = p q`.
+
+This is the second named hand-off boundary from issue 3004.  It deliberately depends on the
+proved kernel equality instead of restoring an unconditional `e = p q` field on
+`MHypothesis`. -/
+theorem MHypothesis.complementIndex_eq_pq_of_K_eq_V [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (Mdata : MHypothesis hyp) (_hKV : Mdata.K = hyp.base.V)
+    (_hcases : Mdata.e = hyp.base.p ∨ Mdata.e = hyp.base.p * hyp.base.q) :
+    Mdata.e = hyp.base.p * hyp.base.q := by
+  sorry
+
 /-- **Peterfalvi (14.11)**: `K = V` and `|M : K| = p q`.
 
 The `K = V` half is now a genuine consequence of the (14.11.1)--(14.11.4)
@@ -1105,12 +1126,11 @@ type-I structure of `M` directly. -/
 theorem K_eq_V_index_pq [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (Ldata : LHypothesis hyp) (Mdata : MHypothesis hyp) :
     Mdata.K = hyp.base.V ∧ Mdata.e = hyp.base.p * hyp.base.q := by
-  refine ⟨?_, ?_⟩
-  · -- (14.11.1)--(14.11.4): `K ≠ V` is contradictory.
+  have hKV : Mdata.K = hyp.base.V := by
+    -- (14.11.1)--(14.11.4): `K ≠ V` is contradictory.
     by_contra hne
     exact contradiction_of_K_ne_V _hG hyp Ldata Mdata hne
-  · -- `|M : K| = p q` from the type-I structure of `M`, carried by `MHypothesis`
-    -- (V-side dual of `LHypothesis.typeI_complement_card_eq_pq`).
-    exact Mdata.complement_card_eq_pq
+  have hcases := Mdata.complementIndex_eq_p_or_pq _hG
+  exact ⟨hKV, Mdata.complementIndex_eq_pq_of_K_eq_V _hG hKV hcases⟩
 
 end OddOrder.Peterfalvi.S16
