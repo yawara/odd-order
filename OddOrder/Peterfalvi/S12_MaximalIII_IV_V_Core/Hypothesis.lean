@@ -787,6 +787,152 @@ theorem typePData_conjClassSet_typePV_ncard [Finite G] {M : Subgroup G} (data : 
   rw [OddOrder.BG.Ch4.S14.ncard_conjClassSet_of_isTISubset (OddOrder.Peterfalvi.S10.typePData_V_ti data)
     (typePData_W_normalizes_typePV data), typePData_typePV_ncard]
 
+/-- **The (10.8) `V`-capture step** (Peterfalvi p. 60, the `x ∈ S − HU` branch of the `G₁`
+covering, in the (2.1)-style coprime-coset form): an element of a type-`P` maximal `S` outside
+the derived subgroup whose order is not coprime to `|W₂|` is conjugate into `V = W ∖ (W₁ ∪ W₂)`.
+
+The commuting `π`-decomposition `x = a·b` (`π = {|W₁|}`, `exists_isPiElement_mul`) has
+`b ∈ [S,S]` (its image in the order-`|W₁|` quotient is a `π′`-element), so `a ∉ [S,S]`; Sylow
+conjugacy moves the `|W₁|`-element `a` into `W₁` (`|W₁|` prime and coprime to `|[S,S]|`, so `W₁`
+is a full Sylow of `S`), carrying `b` into `[S,S] ⊓ C_G(w) = W₂` (`centralizer_W1`).  If the
+`W₂`-part is trivial the conjugate lies in `W₁`, forcing the order of `x` to divide `|W₁|`,
+coprime to `|W₂|` (`typePData_coprime_card_W1_W2`) — excluded; so both parts are nontrivial and
+the conjugate lies in `V`. -/
+theorem exists_conj_mem_typePV_of_not_mem_derived [Finite G] {S : Subgroup G}
+    (data : TypePData S) (hprime : (Nat.card ↥data.W1).Prime)
+    (hcop : Nat.Coprime (Nat.card ↥(derivedInG S)) (Nat.card ↥data.W1))
+    {x : G} (hxS : x ∈ S) (hxnot : x ∉ derivedInG S)
+    (hxord : ¬ (orderOf x).Coprime (Nat.card ↥data.W2)) :
+    ∃ s ∈ S, s * x * s⁻¹ ∈ typePV S data := by
+  classical
+  set p : ℕ := Nat.card ↥data.W1 with hp
+  -- the commuting `{p}`-decomposition of `x`, inside `⟨x⟩ ≤ S`
+  obtain ⟨a, b, hab, hcomm, haπ, hbπ', haz, hbz⟩ :=
+    OddOrder.GroupTheory.exists_isPiElement_mul ({p} : Set ℕ) x
+  have hzle : Subgroup.zpowers x ≤ S := Subgroup.zpowers_le.mpr hxS
+  have haS : a ∈ S := hzle haz
+  have hbS : b ∈ S := hzle hbz
+  -- `p ∤ orderOf b` (a `{p}ᶜ`-element)
+  have hpb : ¬ p ∣ orderOf b := fun hdvd =>
+    (hbπ' p (Nat.mem_primeFactors.mpr ⟨hprime, hdvd, (orderOf_pos b).ne'⟩)) rfl
+  -- `b ∈ [S,S]`: its image in the order-`p` quotient `↥S ⧸ [S,S]` is trivial
+  have hNnorm : ((derivedInG S).subgroupOf S).Normal := by
+    have heq : (derivedInG S).subgroupOf S = commutator ↥S := by
+      rw [derivedInG, Subgroup.subgroupOf,
+        Subgroup.comap_map_eq_self_of_injective S.subtype_injective]
+    rw [heq]; infer_instance
+  have hbS' : b ∈ derivedInG S := by
+    have hql : orderOf ((QuotientGroup.mk' ((derivedInG S).subgroupOf S)) ⟨b, hbS⟩)
+        ∣ orderOf (⟨b, hbS⟩ : ↥S) := orderOf_map_dvd _ _
+    have hqr : orderOf ((QuotientGroup.mk' ((derivedInG S).subgroupOf S)) ⟨b, hbS⟩) ∣ p := by
+      have hcard : Nat.card (↥S ⧸ (derivedInG S).subgroupOf S) = p := by
+        rw [hp]; exact data.card_W1_eq_derived_index.symm
+      exact hcard ▸ orderOf_dvd_natCard _
+    have hob : orderOf (⟨b, hbS⟩ : ↥S) = orderOf b :=
+      (orderOf_injective S.subtype S.subtype_injective ⟨b, hbS⟩).symm
+    have h1 : orderOf ((QuotientGroup.mk' ((derivedInG S).subgroupOf S)) ⟨b, hbS⟩) = 1 := by
+      rcases (Nat.dvd_prime hprime).mp hqr with h | h
+      · exact h
+      · exact absurd (h ▸ (hob ▸ hql)) hpb
+    have hker := orderOf_eq_one_iff.mp h1
+    rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff (⟨b, hbS⟩ : ↥S)] at hker
+    exact Subgroup.mem_subgroupOf.mp hker
+  -- hence the `{p}`-part `a` is outside `[S,S]`; in particular `a ≠ 1`
+  have haS' : a ∉ derivedInG S := fun haIn => hxnot (hab ▸ mul_mem haIn hbS')
+  have hane : a ≠ 1 := fun h => haS' (h ▸ one_mem _)
+  -- `orderOf a` is a `p`-power
+  have hopow : orderOf a = p ^ (orderOf a).primeFactorsList.length :=
+    Nat.eq_prime_pow_of_unique_prime_dvd (orderOf_pos a).ne'
+      (fun {d} hd hdvd => Set.mem_singleton_iff.mp
+        (haπ d (Nat.mem_primeFactors.mpr ⟨hd, hdvd, (orderOf_pos a).ne'⟩)))
+  -- Sylow: conjugate the `p`-element `a` into `W₁`, inside `↥S`
+  haveI : Fact p.Prime := ⟨hprime⟩
+  have hcardS : Nat.card ↥S = Nat.card ↥(derivedInG S) * p := by
+    have h := Subgroup.card_mul_index ((derivedInG S).subgroupOf S)
+    have hle : derivedInG S ≤ S := Subgroup.map_subtype_le _
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv] at h
+    rw [← h, hp, data.card_W1_eq_derived_index]
+  have hfacS : (Nat.card ↥S).factorization p = 1 := by
+    rw [hcardS, Nat.factorization_mul (Nat.card_pos).ne' (hprime.pos).ne', Finsupp.add_apply,
+      Nat.factorization_eq_zero_of_not_dvd
+        ((Nat.Prime.coprime_iff_not_dvd hprime).mp hcop.symm),
+      Nat.Prime.factorization_self hprime]
+  have hQcard : Nat.card ↥(data.W1.subgroupOf S) = p ^ (Nat.card ↥S).factorization p := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.W1_le).toEquiv, hfacS, pow_one, hp]
+  have hoaS : orderOf (⟨a, haS⟩ : ↥S) = orderOf a :=
+    (orderOf_injective S.subtype S.subtype_injective ⟨a, haS⟩).symm
+  have hpgroup : IsPGroup p ↥(Subgroup.zpowers (⟨a, haS⟩ : ↥S)) :=
+    IsPGroup.of_card (by rw [Nat.card_zpowers, hoaS, hopow])
+  obtain ⟨P, hPle⟩ := hpgroup.exists_le_sylow
+  obtain ⟨g, hgPQ⟩ :=
+    MulAction.exists_smul_eq ↥S P (Sylow.ofCard (data.W1.subgroupOf S) hQcard)
+  have haP : (⟨a, haS⟩ : ↥S) ∈ (P : Subgroup ↥S) := hPle (Subgroup.mem_zpowers _)
+  have haQ : g * (⟨a, haS⟩ : ↥S) * g⁻¹ ∈ data.W1.subgroupOf S := by
+    have hsub : ((g • P : Sylow p ↥S) : Subgroup ↥S) = data.W1.subgroupOf S := by
+      rw [hgPQ, Sylow.coe_ofCard]
+    rw [← hsub, Sylow.coe_subgroup_smul]
+    have := Subgroup.smul_mem_pointwise_smul _ (MulAut.conj g) _ haP
+    simpa [MulAut.smul_def, MulAut.conj_apply] using this
+  -- transport to `G`: `w = s·a·s⁻¹ ∈ W₁`, `u = s·b·s⁻¹ ∈ [S,S] ⊓ C_G(w) = W₂`
+  set s : G := (g : G) with hs
+  set w : G := s * a * s⁻¹ with hw
+  set u : G := s * b * s⁻¹ with hu
+  have hwW1 : w ∈ data.W1 := by
+    have h := Subgroup.mem_subgroupOf.mp haQ
+    simpa [hw, hs] using h
+  have hwne : w ≠ 1 := by
+    intro h
+    apply hane
+    have := congrArg (fun z => s⁻¹ * z * s) h
+    simpa [hw, mul_assoc] using this
+  have huS' : u ∈ derivedInG S := by
+    have := hNnorm.conj_mem ⟨b, hbS⟩ (Subgroup.mem_subgroupOf.mpr hbS') g
+    have hcoe : ((g * (⟨b, hbS⟩ : ↥S) * g⁻¹ : ↥S) : G) ∈ derivedInG S :=
+      Subgroup.mem_subgroupOf.mp this
+    simpa [hu, hs] using hcoe
+  have hcomm' : Commute w u := by
+    have := hcomm.map (MulAut.conj s).toMonoidHom
+    simpa [hw, hu, MulAut.conj_apply] using this
+  have huW2 : u ∈ data.W2 := by
+    rw [← data.centralizer_W1 w hwW1 hwne]
+    exact Subgroup.mem_inf.mpr ⟨huS',
+      Subgroup.mem_centralizer_singleton_iff.mpr hcomm'.symm.eq⟩
+  have hconj : s * x * s⁻¹ = w * u := by
+    rw [hw, hu, ← hab]; group
+  -- the `W₂`-part is nontrivial: otherwise `orderOf x ∣ |W₁|`, coprime to `|W₂|`
+  have hune : u ≠ 1 := by
+    intro h1
+    apply hxord
+    have hxw : s * x * s⁻¹ = w := by rw [hconj, h1, mul_one]
+    have hoxw : orderOf x = orderOf w := by
+      have := orderOf_injective (MulAut.conj s).toMonoidHom (MulAut.conj s).injective x
+      rw [← this]
+      simp [MulAut.conj_apply, hxw]
+    have hdvd : orderOf x ∣ p := by
+      rw [hoxw]
+      have h1 : orderOf w = orderOf (⟨w, hwW1⟩ : ↥data.W1) :=
+        orderOf_injective data.W1.subtype data.W1.subtype_injective ⟨w, hwW1⟩
+      rw [h1, hp]
+      exact orderOf_dvd_natCard _
+    exact Nat.Coprime.coprime_dvd_left hdvd (hp ▸ typePData_coprime_card_W1_W2 data)
+  -- assemble: `w·u ∈ V = W ∖ (W₁ ∪ W₂)`
+  have hgS : s ∈ S := g.2
+  refine ⟨s, hgS, ?_⟩
+  rw [hconj]
+  have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
+  have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
+  have hdisj := typePData_disjoint_W1_W2 data
+  simp only [typePV, Set.mem_sdiff, Set.mem_union, SetLike.mem_coe, not_or]
+  refine ⟨mul_mem (hW1le hwW1) (hW2le huW2), fun hmem => ?_, fun hmem => ?_⟩
+  · have huW1 : u ∈ data.W1 := by
+      have := mul_mem (inv_mem hwW1) hmem
+      rwa [inv_mul_cancel_left] at this
+    exact hune (Subgroup.mem_bot.mp (hdisj.le_bot ⟨huW1, huW2⟩))
+  · have hwW2 : w ∈ data.W2 := by
+      have := mul_mem hmem (inv_mem huW2)
+      rwa [mul_inv_cancel_right] at this
+    exact hwne (Subgroup.mem_bot.mp (hdisj.le_bot ⟨hwW1, hwW2⟩))
+
 /-- `W₂ ≤ M` for type-`P` data (`W₂ ≤ H ⊓ M'' ≤ M' ≤ M`). -/
 theorem typePData_W2_le_self {M : Subgroup G} (data : TypePData M) : data.W2 ≤ M :=
   (data.W2_le.trans (le_trans inf_le_right (Subgroup.map_subtype_le _))).trans
