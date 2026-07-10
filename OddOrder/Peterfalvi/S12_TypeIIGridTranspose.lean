@@ -1369,6 +1369,23 @@ theorem Hypothesis.exists_seeded_pair_conj_typeII [Finite G]
   obtain ⟨g, hg⟩ := exists_conj_eq_S_of_isTypeII hG mp hTnotII hSmax hSII
   exact ⟨mp, g, hT, hKstar, hg⟩
 
+/-- **The §9 setup on the pair's `S`-member, wired to the reconciled datum**: a
+`TypesIIIIIIVSetup mp.S` whose `typeP` **is** `tp.Sdata` — so the (5.8) dichotomy machinery
+instantiated on `mp.S` (whose `ticVdiff` is `typePData_toTICyclicHypothesis data.typeP _`,
+`ticVdiff_typeIIHypothesis46_eq`) runs on the same `TICyclicHypothesis` as the pair lemmas'
+`S`-side.  The (8.6) nontrivial core transfers from the type-II witness of `mp.S`
+(`TypePNontrivialCore.transfer`). -/
+theorem exists_typesIIIIIIVSetup_Sdata [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPair G}
+    (tp : Section16TypePStructure mp) :
+    ∃ data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S, data.typeP = tp.Sdata := by
+  have hSII := section16_S_isTypeII hG mp
+  exact ⟨{ maximal := mp.S_maximal
+           typeP := tp.Sdata
+           nontrivial := hSII.some.common.transfer tp.Sdata
+           type_alt := Or.inl hSII },
+    rfl⟩
+
 end PairPackaging
 
 end OddOrder.Peterfalvi.S12
