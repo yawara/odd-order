@@ -1018,3 +1018,16 @@ eq_sigma_of_apply_eq_on_V の statement 精読から (これが刺されば norm
   sigma_omega_eq_mu2GridSign_smul_mu2Grid で sign 変換。
 残実装 = a の family 抽出 (isometry_difference_pair_structure 再利用性) + hTI (W∖W₂ IsTISubset)
 仮説の設計 + b-d assembly。次 iter: isometry_difference_pair_structure の signature 精読。
+
+## 📋 (2026-07-11、lane-b /loop iter 22) — step a の部品設計確定
+
+- `isometry_difference_pair_structure` 結論 = `∃ data : SignedIrreducibleDifferenceFamily G n,
+  ∀ i, τ(χ_i − χ_0) = data.signedDifference i` — **Coq dmu 抽出の Lean 版そのもの** ✓ 再利用。
+  適用は **列ごと** (fixed W₂-char ψ、χ 族 := {ω(ω₁ⁱ·ψ)}ᵢ 0-anchored、全 degree 1 ✓ distinct ✓)。
+  列間整合 (Coq inj_Imu) は直交性で別途 — Coq :296-330 の写し。
+- **h_isom 入力 = TI→Ind-isometry、直接証明で新設** (`of_isTISubset` datum 経由より軽い):
+  `inner_induce_eq_of_isTISubset : IsTISubset A H → f,g A-supported → ⟨Ind f, Ind g⟩_G = ⟨f,g⟩_H`。
+  証明 = reciprocity + **Res Ind g = g on A** (TI-collapse: (Ind g)(a) の conjugator が
+  g-support 制約 + TI で全部 H 内 → class-fn 値 g(a) に collapse — induce_apply_eq_sum_filter /
+  induceTerm API [Machinery135 の induce_one_apply と同系])。~60 行 self-contained。
+  次 iter: これを実装 (置き場 = SupportedSpanOrthogonality or InducedCharacter 追記)。
