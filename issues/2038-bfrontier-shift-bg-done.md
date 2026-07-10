@@ -1124,3 +1124,23 @@ instantiation 精査で判明 ([[verify-port-state-by-number-not-coq-name]] の�
 3. **S15 grounding**: B(i) (S′∖P→0) / B(ii) (1→u) / B(iii) (W₁^#: 列和 Σ_i δω_{ij}(x)、
    ω₁-full-dual 和消滅) を primeTIred/beta 消費形で。
 次 iter: 1+2 実装。
+
+## ✅ (2026-07-11、lane-b /loop iter 27) — 配線 layer-1 landed: 値恒等式の residue-grid 形
+
+- merge conflict (issues/9080 の hub RULING と b 認知の同位置追記) を両保持で解決 —
+  **hub ruling: 9080 migration 承認、S14 側 owner = b、b の scheduling 裁量** (現 2038 配線
+  ユニット完了後に engage、b 側記録と整合)。
+- **`PrimeTIResidueData.ofS06Hypothesis_mu2_apply_of_mem_V`** (PrimeTIResidue.lean、commit
+  0aa97038、full build 4149 green・AxiomsCheck OK): ofS06Hypothesis grid の
+  `mu2 i j (x) = δ_j·ω_{ij}(x)` on W∖W₂ — S06 `certainType_apply_eq_of_mem_V` の
+  charGroupW2Equiv 経由 Fin-index 形 (mu2 = columnFamily.mu は rfl ゆえ 1-term proof)。
+
+**次 iter (配線続き、上流優先)**: S15 grounding 向け B-部品の消費形 —
+(i) W₁^# ⊆ sdiffV membership bridge (x ∈ W₁∖{1} → x ∈ W∖W₂) の所在確認 or 追加、
+(ii) B(iii) 形: 列和 `Σ_i mu2 i j (x)` for x ∈ W₁^# = δ_j·Σ_i ω_{ij}(x) = 0 (j≠0 列;
+ω₁-full-dual 和消滅 Σ_i ω₁ⁱ(x) = 0 for x ≠ 1 — 既存 character-sum lemma を探索:
+CharacterCompleteness/SecondOrthogonality 系 or 新規 ~30 行)、B(i) (S′∖P → 0) は
+conjugatesIntoSet 支持 (support_induceSum 系) 経由。(iii) 消費側 (S15_HonestTypeP2A0 の
+pins / mu_row0_ne) の requirement 形を先に確認してから供給形を決める (lane-c file のため
+b は供給のみ、cite 形の合意は issue 経由)。9080 step 1 (TypeICovering migration) は
+本配線ユニット完了後。
