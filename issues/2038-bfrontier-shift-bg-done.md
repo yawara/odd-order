@@ -1447,3 +1447,20 @@ muS 差 (nontrivial columns j,k、hdeg 仮説) に適用する engine lemma (res
 [S15_HonestTypeP2A0:759-794] の hyp46Smp 版、chi2enum で nontrivial 化)。その後: field 3 層
 (mu_diff_support、iter 30 設計) + producer threading + pins 修正 + V-value 側
 (certainType_diff_dade_apply_eq_of_mem_V at hyp46Smp)。
+
+## ✅✅ (2026-07-11、lane-b /loop iter 42) — **muS_diff_support landed** (support engine 完成)
+
+`Section16CharacterData.muS_diff_support` (FT.lean、一発 green、full build 4150 green・
+AxiomsCheck OK): 非自明等次数列 j,k≠0 の muS 差の support ⊆ A₀(S) —
+`certainType_diff_supp_subset_A0 (hyp46Smp)` + chi2enum 非自明化 + eqQ 行 reindex。
+NeZero は inferInstanceAs bridge (def-opaque projection)。
+
+**⟹ shortcut route の実り**: iter 30 で「certainTypeS ↔ Sdata grid 同定が要る」と見えた
+producer-side support fact が、hyp46Smp (iter 41) 経由で同定ゼロで完成。
+
+**次 iter: field threading** — `mu_diff_support` field を 3 層 (SubcoherenceInputs S15.Hypothesis
+[hdeg-parametric、iter 30 設計の signature] / FTSetup inputs / FTSetup cd) に追加し、producer
+(FT.lean cd-construction) で `muS_diff_support` を discharge、inputs/hypothesis threading。
+その後: pin `tauS_mu_row0_diff_support` (S15_HonestTypeP2A0:~878) の signature 修正 (hj0+hdeg) +
+field 射影化、consumer (S15_SAndT tauS_mu_row0_cross) の `_hj`+hdeg pass — hdeg 供給は
+iter 31 の residue 次数一致 (PU-Frobenius、genuine math unit) が最後のピース。
