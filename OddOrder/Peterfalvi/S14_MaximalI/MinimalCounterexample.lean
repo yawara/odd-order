@@ -1417,5 +1417,147 @@ theorem two_mul_card_complement_le [Finite G]
   · -- `e ∣ p + 1`: `2e ≤ p + 1`.
     exact key (ctr.p + 1) (by omega) (Odd.add_one hpodd) h
 
+/-- **The counterexample `M` is not a Frobenius group with kernel `M_σ = K`** (the (12.8)
+non-Frobenius content, from `P₀` noncyclic): a Frobenius decomposition `M = M_σ ⋊ E` with
+**cyclic** `E` would make the quotient `M/M_σ ≅ E` cyclic, and the noncyclic `p`-group `P₀`
+(with `p ∤ |K| = |M_σ|`) injects into that quotient — contradiction.
+
+Stated to refute exactly the `IsTypeP2 N` branch package of BG Theorem D(4)
+(`exists_RData_escape_structure`), which is the Peterfalvi (8.13.c4) "furthermore" clause:
+a type-`P₂` signalizer neighbour `N[g]` forces `M` Frobenius over `M_σ` with cyclic
+complement. -/
+theorem counterexample_not_frobenius_MF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (ctr : CounterexampleHypothesis (G := G)) :
+    ¬ ∃ E : Subgroup G, E ≤ ctr.M ∧ IsCyclic ↥E ∧
+        Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma ctr.M).subgroupOf ctr.M)
+          (E.subgroupOf ctr.M) ∧
+        OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥ctr.M
+          ((OddOrder.BG.Ch3.S10.Msigma ctr.M).subgroupOf ctr.M) (E.subgroupOf ctr.M) := by
+  classical
+  rintro ⟨E, hEM, hEcyc, hcompl, -⟩
+  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  set Q : Subgroup ↥ctr.M := (OddOrder.BG.Ch3.S10.Msigma ctr.M).subgroupOf ctr.M with hQ
+  haveI hQnormal : Q.Normal := by
+    rw [hQ, OddOrder.BG.Ch3.S10.Msigma_subgroupOf]
+    infer_instance
+  -- `|Q| = |K|`, so `|P₀| = pⁿ` is coprime to `|Q|` (`p ∤ |K|`).
+  have hQcard : Nat.card ↥Q = Nat.card ↥ctr.K := by
+    rw [hQ, ← MF_eq_Msigma hG ctr]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+      (ctr.K_eq_MF ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le ctr.M)).toEquiv
+  set P' : Subgroup ↥ctr.M := ctr.P0.subgroupOf ctr.M with hP'
+  have hP'card : Nat.card ↥P' = Nat.card ↥ctr.P0 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe ctr.P0_le_M).toEquiv
+  have hPQbot : P' ⊓ Q = ⊥ := by
+    have hcop : Nat.Coprime (Nat.card ↥P') (Nat.card ↥Q) := by
+      obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp ctr.P0_pGroup
+      rw [hP'card, hQcard, hn]
+      exact ((Nat.Prime.coprime_iff_not_dvd ctr.p_prime).mpr (p_not_dvd_card_K ctr)).pow_left n
+    exact disjoint_iff.mp (Subgroup.disjoint_of_coprime_natCard hcop)
+  -- The quotient `M/Q ≅ E` is cyclic.
+  haveI hEsub_cyc : IsCyclic ↥(E.subgroupOf ctr.M) := by
+    haveI := hEcyc
+    exact isCyclic_of_surjective (Subgroup.subgroupOfEquivOfLe hEM).symm.toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hEM).symm.surjective
+  haveI hquot_cyc : IsCyclic (↥ctr.M ⧸ Q) := by
+    refine isCyclic_of_surjective
+      ((QuotientGroup.mk' Q).comp (E.subgroupOf ctr.M).subtype) ?_
+    intro q
+    obtain ⟨m, rfl⟩ := QuotientGroup.mk'_surjective Q q
+    obtain ⟨⟨q0, e0⟩, hqe⟩ := (hcompl.existsUnique m).exists
+    refine ⟨⟨(e0 : ↥ctr.M), SetLike.mem_coe.mp e0.2⟩, ?_⟩
+    have hq0 : (QuotientGroup.mk' Q) (q0 : ↥ctr.M) = 1 :=
+      (QuotientGroup.eq_one_iff _).mpr (SetLike.mem_coe.mp q0.2)
+    calc ((QuotientGroup.mk' Q).comp (E.subgroupOf ctr.M).subtype)
+          ⟨(e0 : ↥ctr.M), SetLike.mem_coe.mp e0.2⟩
+        = (QuotientGroup.mk' Q) (e0 : ↥ctr.M) := rfl
+      _ = (QuotientGroup.mk' Q) (q0 : ↥ctr.M) * (QuotientGroup.mk' Q) (e0 : ↥ctr.M) := by
+          rw [hq0, one_mul]
+      _ = (QuotientGroup.mk' Q) ((q0 : ↥ctr.M) * (e0 : ↥ctr.M)) := by rw [map_mul]
+      _ = (QuotientGroup.mk' Q) m := by rw [hqe]
+  -- `P₀` injects into the cyclic quotient, so it is cyclic — contradiction with `P0_noncyclic`.
+  have hinj : Function.Injective ((QuotientGroup.mk' Q).comp P'.subtype) := by
+    rw [← MonoidHom.ker_eq_bot_iff, eq_bot_iff]
+    intro x hx
+    have hxQ : (x : ↥ctr.M) ∈ Q :=
+      (QuotientGroup.eq_one_iff _).mp (MonoidHom.mem_ker.mp hx)
+    have hxPQ : (x : ↥ctr.M) ∈ P' ⊓ Q := ⟨x.2, hxQ⟩
+    rw [hPQbot, Subgroup.mem_bot] at hxPQ
+    exact Subgroup.mem_bot.mpr (Subtype.ext hxPQ)
+  haveI hP'cyc : IsCyclic ↥P' :=
+    isCyclic_of_surjective (MonoidHom.ofInjective hinj).symm.toMonoidHom
+      (MonoidHom.ofInjective hinj).symm.surjective
+  exact ctr.P0_noncyclic (isCyclic_of_surjective
+    (Subgroup.subgroupOfEquivOfLe ctr.P0_le_M).toMonoidHom
+    (Subgroup.subgroupOfEquivOfLe ctr.P0_le_M).surjective)
+
+/-- **The witness `L` is not conjugate to a maximal `N` with a non-kernel element centralizing
+the kernel** (the (12.15) `N ≁ L` step): if some `g ∈ N ∖ N_F` has `C_{N_F}(g) ≠ 1`, then `N`
+is not a Frobenius group with kernel `N_F` — but every conjugate of the witness `L` is: the
+Frobenius structure of `L` ((12.10), `witness_L_frobenius`) transports along `conj c`
+(`maxNilpotentNormalHall_pointwise_smul`), and non-kernel elements of a Frobenius group act
+fixed-point-freely on the kernel
+(`IsFrobeniusGroup.centralizer_inf_kernel_eq_bot_of_not_mem`). -/
+theorem witness_L_not_conj_of_kernel_centralizer_ne_bot [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
+    {N : Subgroup G} {g : G} (hgN : g ∈ N)
+    (hgNF : g ∉ maxNilpotentNormalHall N)
+    (hR : maxNilpotentNormalHall N ⊓ Subgroup.centralizer ({g} : Set G) ≠ ⊥) :
+    ¬ ∃ c : G, MulAut.conj c • data.L = N := by
+  rintro ⟨c, hc⟩
+  obtain ⟨frob, -⟩ := witness_L_frobenius hG data
+  -- kernel transport: `N_F = (conj c) • L_F`.
+  have hNF : maxNilpotentNormalHall N
+      = MulAut.conj c • maxNilpotentNormalHall data.L := by
+    rw [← hc, maxNilpotentNormalHall_pointwise_smul]
+  -- pull `g` back to `L`.
+  set g' : G := (MulAut.conj c)⁻¹ • g with hg'
+  have hg'L : g' ∈ data.L :=
+    Subgroup.mem_pointwise_smul_iff_inv_smul_mem.mp (hc ▸ hgN)
+  have hg'LF : g' ∉ maxNilpotentNormalHall data.L := by
+    intro hmem
+    refine hgNF ?_
+    rw [hNF]
+    have hsm : MulAut.conj c • g' ∈ MulAut.conj c • maxNilpotentNormalHall data.L :=
+      Subgroup.smul_mem_pointwise_smul _ _ _ hmem
+    rwa [hg', smul_inv_smul] at hsm
+  -- pull a nontrivial centralizing kernel element back to `L_F`.
+  have hex : ∃ x ∈ maxNilpotentNormalHall N ⊓ Subgroup.centralizer ({g} : Set G), x ≠ 1 := by
+    by_contra h
+    push Not at h
+    exact hR (eq_bot_iff.mpr fun x hx => Subgroup.mem_bot.mpr (h x hx))
+  obtain ⟨x, hxmem, hxne⟩ := hex
+  obtain ⟨hxNF, hxcent⟩ := Subgroup.mem_inf.mp hxmem
+  set x' : G := (MulAut.conj c)⁻¹ • x with hx'
+  have hx'LF : x' ∈ maxNilpotentNormalHall data.L :=
+    Subgroup.mem_pointwise_smul_iff_inv_smul_mem.mp (hNF ▸ hxNF)
+  have hx'ne : x' ≠ 1 := by
+    intro h1
+    apply hxne
+    have : MulAut.conj c • x' = MulAut.conj c • (1 : G) := by rw [h1]
+    rwa [hx', smul_inv_smul, MulAut.smul_def, map_one] at this
+  have hcomm : x' * g' = g' * x' := by
+    have hgx : g * x = x * g := (Subgroup.mem_centralizer_singleton_iff.mp hxcent).symm
+    rw [hg', hx', ← smul_mul', ← smul_mul', hgx]
+  -- contradiction with the Frobenius fixed-point-freeness of `L`.
+  have hg'L' : (⟨g', hg'L⟩ : ↥data.L) ∉ frob.typeI.typeF.H.subgroupOf data.L := by
+    intro hmem
+    exact hg'LF (frob.typeI.typeF.H_eq ▸ Subgroup.mem_subgroupOf.mp hmem)
+  have hFPF := IsFrobeniusGroup.centralizer_inf_kernel_eq_bot_of_not_mem frob.frobenius hg'L'
+  have hx'L : x' ∈ data.L :=
+    OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le data.L hx'LF
+  have hxLmem : (⟨x', hx'L⟩ : ↥data.L) ∈
+      Subgroup.centralizer ({(⟨g', hg'L⟩ : ↥data.L)} : Set ↥data.L) ⊓
+        frob.typeI.typeF.H.subgroupOf data.L := by
+    refine Subgroup.mem_inf.mpr ⟨?_, ?_⟩
+    · rw [Subgroup.mem_centralizer_singleton_iff]
+      apply Subtype.ext
+      push_cast
+      exact hcomm
+    · exact Subgroup.mem_subgroupOf.mpr (frob.typeI.typeF.H_eq ▸ hx'LF)
+  rw [hFPF, Subgroup.mem_bot] at hxLmem
+  exact hx'ne (by simpa using congrArg (fun z : ↥data.L => (z : G)) hxLmem)
+
 end OddOrder.Peterfalvi.S14
 
