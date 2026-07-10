@@ -648,6 +648,96 @@ theorem ncard_conjClassSet_sharp_H_le [Finite G] {S : Subgroup G} (data : TypePD
     rfl
   rwa [hA] at hle
 
+open scoped Classical FiniteInduce in
+/-- **The (10.8) `G₁`-count bound, Nat form** (p. 60 lines 89–91): with the type-II partner
+data supplied, the restricted-support complement count `|famG₀| = |∁Ã(M)|` is bounded by the
+full-support `w₁`-coprime filter plus the two covering counts `(|S_F|−1)·[G:S]` and
+`|V|·[G:W]`.
+
+`∁Ã(M)` splits along `w₁`-coprimality; the coprime part equals the full-support coprime filter
+(`mem_restricted_dadeSupport_of_coprime` + support monotonicity), and the non-coprime part is
+covered by `𝒞((S_F)#) ∪ 𝒞(V_S)` (`mem_conjClassSet_sharpH_or_typePV_of_not_coprime`), counted
+by `ncard_conjClassSet_sharp_H_le` and `typePData_conjClassSet_typePV_ncard`. -/
+theorem Hypothesis.g1_card_le_of_partner [Finite G] {M S : Subgroup G} (hyp : Hypothesis M)
+    (data : TypePData S) (hprime : (Nat.card ↥data.W1).Prime)
+    (hcop : Nat.Coprime (Nat.card ↥(derivedInG S)) (Nat.card ↥data.W1))
+    (hHall : OddOrder.Isaacs.Ch03.IsHallSubgroup (Nat.card ↥data.H).primeFactors data.H)
+    (hcent : ∀ b ∈ data.H, b ≠ 1 → Subgroup.centralizer ({b} : Set G) ≤ S)
+    (hfrobcap : ∀ b ∈ data.H, b ≠ 1 → ∀ y ∈ derivedInG S,
+      y ∈ Subgroup.centralizer ({b} : Set G) → y ∈ data.H)
+    (hW2card : Nat.card ↥data.W2 = hyp.w1) :
+    Nat.card (hyp.toFamilyHypothesis71).G0
+      ≤ (Finset.univ.filter (fun g : G => g ∉ hyp.dadeData.dade.dadeSupport
+          ∧ (orderOf g).Coprime hyp.w1)).card
+        + ((Nat.card ↥data.H - 1) * S.index
+            + (Nat.card ↥data.W1 * Nat.card ↥data.W2 - Nat.card ↥data.W1
+                - Nat.card ↥data.W2 + 1) * data.W.index) := by
+  classical
+  -- `famG₀` is the complement of the restricted support (the `Fin 1` family collapses)
+  have hG0eq : (hyp.toFamilyHypothesis71).G0
+      = {g : G | g ∉ hyp.toHypothesis71.hyp.dadeSupport} := by
+    ext g
+    rw [(hyp.toFamilyHypothesis71).mem_G0_iff]
+    exact ⟨fun h => h 0, fun h _ => h⟩
+  have hcard0 : Nat.card (hyp.toFamilyHypothesis71).G0
+      = (Finset.univ.filter
+          (fun g : G => g ∉ hyp.toHypothesis71.hyp.dadeSupport)).card := by
+    rw [hG0eq, Nat.card_coe_set_eq, Set.ncard_eq_toFinset_card', Set.toFinset_setOf]
+  -- split the complement along `w₁`-coprimality
+  have hsplit : (Finset.univ.filter
+        (fun g : G => g ∉ hyp.toHypothesis71.hyp.dadeSupport)).card
+      = (Finset.univ.filter (fun g : G => g ∉ hyp.toHypothesis71.hyp.dadeSupport
+          ∧ (orderOf g).Coprime hyp.w1)).card
+        + (Finset.univ.filter (fun g : G => g ∉ hyp.toHypothesis71.hyp.dadeSupport
+            ∧ ¬ (orderOf g).Coprime hyp.w1)).card := by
+    rw [← Finset.filter_filter, ← Finset.filter_filter,
+      Finset.filter_card_add_filter_neg_card_eq_card]
+  -- support monotonicity: the restricted support sits inside the full one
+  have hRF : hyp.toHypothesis71.hyp.dadeSupport ⊆ hyp.dadeData.dade.dadeSupport := by
+    intro x hx
+    obtain ⟨a, h, hh, hconj⟩ := hyp.toHypothesis71.hyp.mem_dadeSupport_iff.mp hx
+    exact hyp.dadeData.dade.mem_dadeSupport_iff.mpr
+      ⟨⟨a.1, Set.subset_union_left a.2⟩, h, hh, hconj⟩
+  -- the coprime part is the full-support coprime filter
+  have hcopeq : (Finset.univ.filter (fun g : G => g ∉ hyp.toHypothesis71.hyp.dadeSupport
+        ∧ (orderOf g).Coprime hyp.w1)).card
+      = (Finset.univ.filter (fun g : G => g ∉ hyp.dadeData.dade.dadeSupport
+          ∧ (orderOf g).Coprime hyp.w1)).card := by
+    congr 1
+    refine Finset.filter_congr fun g _ => ?_
+    constructor
+    · rintro ⟨hgR, hgcop⟩
+      exact ⟨fun hgF => hgR (hyp.mem_restricted_dadeSupport_of_coprime hgF hgcop), hgcop⟩
+    · rintro ⟨hgF, hgcop⟩
+      exact ⟨fun hgR => hgF (hRF hgR), hgcop⟩
+  -- the non-coprime part is covered by `𝒞((S_F)#) ∪ 𝒞(V_S)`
+  have hsub : {g : G | g ∉ hyp.toHypothesis71.hyp.dadeSupport
+        ∧ ¬ (orderOf g).Coprime hyp.w1}
+      ⊆ conjClassSet ((data.H : Set G) \ {1}) ∪ conjClassSet (typePV S data) := by
+    rintro g ⟨-, hgnc⟩
+    exact mem_conjClassSet_sharpH_or_typePV_of_not_coprime data hprime hcop hHall hcent
+      hfrobcap (by rwa [hW2card])
+  have hnc_le : (Finset.univ.filter (fun g : G => g ∉ hyp.toHypothesis71.hyp.dadeSupport
+        ∧ ¬ (orderOf g).Coprime hyp.w1)).card
+      ≤ (Nat.card ↥data.H - 1) * S.index
+        + (Nat.card ↥data.W1 * Nat.card ↥data.W2 - Nat.card ↥data.W1
+            - Nat.card ↥data.W2 + 1) * data.W.index := by
+    calc (Finset.univ.filter (fun g : G => g ∉ hyp.toHypothesis71.hyp.dadeSupport
+          ∧ ¬ (orderOf g).Coprime hyp.w1)).card
+        = {g : G | g ∉ hyp.toHypothesis71.hyp.dadeSupport
+            ∧ ¬ (orderOf g).Coprime hyp.w1}.ncard := by
+          rw [Set.ncard_eq_toFinset_card', Set.toFinset_setOf]
+      _ ≤ (conjClassSet ((data.H : Set G) \ {1})
+            ∪ conjClassSet (typePV S data)).ncard :=
+          Set.ncard_le_ncard hsub (Set.toFinite _)
+      _ ≤ (conjClassSet ((data.H : Set G) \ {1})).ncard
+            + (conjClassSet (typePV S data)).ncard := Set.ncard_union_le _ _
+      _ ≤ _ := by
+          rw [typePData_conjClassSet_typePV_ncard]
+          exact Nat.add_le_add_right (ncard_conjClassSet_sharp_H_le data) _
+  rw [hcard0, hsplit, hcopeq]
+  exact Nat.add_le_add_left hnc_le _
+
 /-- **Type-`P` order factorization** `|M| = |M_F|·|U|·|W₁|`.  The type-`P` decomposition is a double
 semidirect product `M = (H ⋊ U) ⋊ W₁`: `W₁` complements the derived subgroup `M' = [M,M]` in `M`
 (`M_complement`, `|M| = |M'|·|W₁|`), and `U` complements the Fitting kernel `H = M_F` in `M'`
