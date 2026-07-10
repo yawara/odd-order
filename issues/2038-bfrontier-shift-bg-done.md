@@ -870,3 +870,16 @@ S15 grounding fields → pins/mu_row0_ne discharge → PVSbeta assembly の mult
 
 どちらも 9014 の続き (cyclicTIiso port の残り)。gap 1 が閉じれば B(iii) は
 mu2Grid_eq_sign_smul_sigma_omega + σ-値 + δ の (4.4)-normalization (delta_zero_eq_one 系) で組める。
+
+## 📋 (2026-07-10 続¹⁸、lane-b /loop iter 12) — gap 1 の正体確定: σ(ω) の W₁^#-値 (Coq primeTIirr_spec 内蔵)
+
+- repo σ-値 API は **V 上のみ** (`sigma_apply_of_mem_V` (3.5.a)、S05_SigmaIsometry:327)。W₁^# は V 外。
+- Coq `prTIirr_id : {in W :\: W2, mu2_ i j =1 delta_ j *: w_ i j}` (PFsection4:403) の証明は
+  `by case: primeTIirr_spec` — **W∖W₂-値 (W₁^# 込み) は primeTIirr_spec (:288-387、dirr_dIirr 構成)
+  に内蔵**。repo の mu2Grid は同 spec の「σ(ω) = δ•μ 大域一致」半分を port 済
+  (`sigma_omega_eq_mu2GridSign_smul_mu2Grid`) ゆえ、**B(iii) は完全に「σ(ω_0j)(x) = ω_0j(x) = 1
+  for x ∈ W₁^#」= cycTI の W∖W₂-値拡張に帰着**。
+- 理論構造メモ: `eq_sigma_of_apply_eq_on_V` (:814) の存在は V-値+直交で σ-image が pin される
+  構造を示唆 — W₁^#-値の port は (a) primeTIirr_spec の W∖W₂ 拡張値を Coq :288-387 から直 port、
+  (b) V-値 + ‖·‖ + 整数値 ((3.9.c)) から W₁^#-値を再導出、の 2 route。次 iter: Coq :288-387 の
+  該当補題 (spec の W∖W₂ 成分がどの cycTI 原理から出るか) を精読して route 選択。
