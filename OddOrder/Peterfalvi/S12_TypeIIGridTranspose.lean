@@ -1341,6 +1341,34 @@ theorem exists_conj_eq_S_of_isTypeII [Finite G]
   · exact hS
   · exact absurd hTII hT
 
+/-- **The (10.7) WLOG entry** (Coq `Frob_der1_type2` head, the pair-witness reduction):
+under Hypothesis (10.1) for `M`, every type-II maximal subgroup `S` is conjugate to the
+`S`-member of an `M`-seeded canonical pair — a `Section16MaximalPair` with `T = M` and
+`Kstar = hyp.typeP.W1` **literally**, so the §10 grid machinery of `M` plugs into the pair
+lemmas with `dataT := hyp.typeP` unchanged.
+
+Assembly: the seed Hall-ness is `typePData_W1_isHallSubgroup_kappa`, the non-`P₂`-ness of
+`M` is `not_isTypeP2_of_isTypeIII_or_IV_or_V` at `hyp.type_alt`, the pair is
+`exists_section16MaximalPair_around`, and the `T`-branch of the covering reduction
+(`exists_conj_eq_S_of_isTypeII`) is killed by that same non-`P₂`-ness (Coq's contextual
+`notMtype2`). -/
+theorem Hypothesis.exists_seeded_pair_conj_typeII [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    {S : Subgroup G} (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) :
+    ∃ (mp : Section16MaximalPair G) (g : G),
+      mp.T = M ∧ mp.Kstar = hyp.typeP.W1 ∧ MulAut.conj g • S = mp.S := by
+  have hP : OddOrder.BG.Ch4.S14.IsTypeP M := hyp.bgTypeP hG
+  have hnotP2 : ¬ OddOrder.BG.Ch4.S14.IsTypeP2 M :=
+    not_isTypeP2_of_isTypeIII_or_IV_or_V hG hyp.maximal hyp.type_alt
+  obtain ⟨mp, hT, hKstar⟩ := exists_section16MaximalPair_around hG hyp.maximal hP hnotP2
+    hyp.typeP.W1_le (typePData_W1_isHallSubgroup_kappa hG hyp.maximal hP hyp.typeP)
+  have hTnotII : ¬ IsTypeII mp.T := by
+    rw [hT]
+    exact fun hII => hnotP2
+      ((OddOrder.BG.Ch4.S16.proposition_type_classification hG hyp.maximal).2.1.mp hII)
+  obtain ⟨g, hg⟩ := exists_conj_eq_S_of_isTypeII hG mp hTnotII hSmax hSII
+  exact ⟨mp, g, hT, hKstar, hg⟩
+
 end PairPackaging
 
 end OddOrder.Peterfalvi.S12
