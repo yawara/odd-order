@@ -543,3 +543,25 @@ via `chiRho_apply_eq_of_forall_coset hypM.toHypothesis71 ψ hgA hcoset` (L-side
 - 注: chiRho vs chiRhoCF の apply bridge (`chiRhoCF` = CF-bundle) — witness 側の対応箇所を mirror。
 最後に h_psig_int 配線: hconst := psi_constant_on_kernel_sub_derived_ofData (heval := claim-1) →
 `rhoM_integer_values`。その後 hA/hC (norm 側、(7.3)+(8.17))。
+
+## ✅✅ (2026-07-10 続⁵、lane-b /loop) — **(12.15) 全 3 主張 proven** (commit 1f2706aa)
+
+新 leaf `S14_MaximalI/RhoMEvaluation.lean` — 実装キュー step 2-4 完遂 (own-proof 全て sorry-free):
+
+1. **claim-1 `counterexample_chiRho_eval_of_mem_K_sharp`** (ψ^{ρM}(g)=ψ(g) on K^#):
+   H(g) 場合分け。escaping 枝 = **BG Theorem D(4) `exists_RData_escape_structure` (それ自体
+   fully sorry-free と判明!)** → N=N[g] pin (σ-sharp escape singleton + FT_signalizerBase choose) →
+   P₂ 枝は `counterexample_not_frobenius_MF` で殺す ((8.13.c4) furthermore package が M-Frobenius を
+   出すので直撃) → N type I (`isTypeI_of_isTypeF`、clean) + N_F=N_σ → g∈N∖N_F・C_{N_F}(g)≠1 →
+   N≁L (`witness_L_not_conj_of_kernel_centralizer_ne_bot`) → N-side (12.4) で ψ constant on g·N_F。
+2. **claim-2 `counterexample_psi_constant_on_K_sub_Kprime`**: (12.5)-M 合成 lemma + claim-1 (heval 供給)。
+3. **claim-3 `counterexample_psi_int_on_K_sub_Kprime`**: claim-2 → proven `rhoM_integer_values`。
+
+transitive sorry は既知 residual のみ (`exists_typeI_hypothesis` producer 系 / witness chain)。
+D(4)/isTypeI_of_isTypeF/(12.2.a) producer は clean axioms。
+
+**⟹ witness_value_norm_package の conjunct 状況更新**: h_const ✅ / h_psig_int ✅ (今回、
+counterexample_psi_int_* を dade.psi = coh.extension chi0 で instantiate + mval obtain) /
+h2e ✅ / hidx ✅ / **残 = hB 配線 (witness_L_zeta_bound → dade.psi 形) + hA ((12.15) norm 関係、
+‖ψ^{ρM}‖² ≥ (|K−K′|/|M|)mval²、claim-1+2 と chiRho norm 展開) + hC ((7.3)+(8.17) 分離)**。
+次 iteration = hA (claim-1/2 の直接続き、chiRhoCF ノルムを K−K′ 上で下から評価) → hB → hC。
