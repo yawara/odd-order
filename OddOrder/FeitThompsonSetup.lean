@@ -213,6 +213,14 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
   S_U_commutative : IsMulCommutative ↥U
   /-- **W₂-reconciliation**: intrinsic `Sdata.W2 = C_{S'}(W₁#)` equals abstract `W₂` (= `K*`). -/
   Sdata_W2_eq : Sdata.W2 = W2
+  /-- **Peterfalvi (4.8), `μ`-column-difference support** (issues 9076/9014): nontrivial
+  equal-degree columns have `A₀(S)`-supported `μ`-differences. -/
+  mu_diff_support : ∀ (i : Fin q) {j k : Fin p},
+    j ≠ ⟨0, p_prime.pos⟩ → k ≠ ⟨0, p_prime.pos⟩ →
+    mu i j 1 = mu i k 1 →
+    (mu i j - mu i k).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.Peterfalvi.S15.honestTypeP2A0Set S Sdata) S
   /- Grid property fields (issue 3002): the (3.2)/(3.3)/(3.4) character-theoretic content of
   `tau3`/`omega`, threaded from `Section16CharacterData` into `S15.Hypothesis`. -/
   /-- **Peterfalvi (3.2), isometry part**: `τ₃` preserves the class-function inner product. -/
@@ -445,6 +453,13 @@ structure Section16CharacterData {G : Type*} [Group G] [Finite G]
   mu_orthonormal : ∀ (i k : Fin tp.q) (j l : Fin tp.p),
     OddOrder.RepresentationTheory.ClassFunction.inner (mu i j) (mu k l)
       = if i = k ∧ j = l then 1 else 0
+  /-- **Peterfalvi (4.8)** (issues 9076/9014): `A₀(S)`-support of the `μ`-column differences. -/
+  mu_diff_support : ∀ (i : Fin tp.q) {j k : Fin tp.p},
+    j ≠ ⟨0, tp.p_prime.pos⟩ → k ≠ ⟨0, tp.p_prime.pos⟩ →
+    mu i j 1 = mu i k 1 →
+    (mu i j - mu i k).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.Peterfalvi.S15.honestTypeP2A0Set mp.S tp.Sdata) mp.S
   mu_colSum_eq_induce : ∀ j : Fin tp.p,
     ∃ ψ : ClassFunction ↥((derivedInG mp.S).subgroupOf mp.S) ℂ,
       OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ ∧
