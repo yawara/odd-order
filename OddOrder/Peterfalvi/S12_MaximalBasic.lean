@@ -1228,6 +1228,11 @@ theorem typeII_coherence_contradiction_estimate [Finite G]
   -- (`typeII_derived_frobenius`) + (8.6.a)/(8.11).  See `notes/peterfalvi/s10_7_derived_frobenius.md`.
   have hB : g1g ≤ ((Nat.card ↥dII.typeP.H : ℚ) - 1) / (Nat.card ↥S : ℚ)
       + ((hyp.w1 : ℚ) * hyp.w2 - hyp.w1 - hyp.w2 + 1) / ((hyp.w1 : ℚ) * hyp.w2) := by
+    -- ⚠ DO NOT fill here: this generic partner lacks the pair linkage; the honest hB is
+    -- `g1_div_le_of_partner`, discharged in `typeII_coherence_contradiction_estimate_of_partner`
+    -- and consumed unconditionally by `S12_Noncoherence.S_not_coherent_unconditional`
+    -- (downstream; import-blocked here).  This whole theorem is superseded — new consumers
+    -- cite the `_of_partner`/`_unconditional` forms (issue 1020).
     sorry
   -- assemble via the proven pure-`ℚ` analytic chain (lines 87--99).
   have hw1 : 1 ≤ hyp.w1 := Nat.card_pos
