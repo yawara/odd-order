@@ -348,6 +348,25 @@ S-reduction := exists_conj_eq_S_of_isTypeII
 instantiate — TypesIIIIIIVSetup 4-field 組立 + 結論 Frobenius の conj 転送) +
 dichotomy→pair transpose→fiber lemma の連結 + c.extension→tau2 packaging + 符号。
 
+**✅ threading 前半 LANDED (8908ee50 + 7cc90fb7)**:
+- `Hypothesis.exists_seeded_pair_conj_typeII` — WLOG entry: 任意 type-II S ↦
+  ∃ mp g, mp.T = M ∧ mp.Kstar = hyp.typeP.W1 ∧ conj g • S = mp.S (T-枝 kill 込み)。
+- `exists_typesIIIIIIVSetup_Sdata` — TypesIIIIIIVSetup mp.S with typeP = tp.Sdata
+  (axiom-clean; nontrivial core は TypePNontrivialCore.transfer)。
+**次 (残り 2 段)**:
+1. **pair-instance gate 変種** (本丸): (mp.S, Sdata-setup) 文脈で gate fields 1-3 を
+   実生産 — tau2 := typeII_T2_coherent の c.extension packaging (IntegralCharacterMap 化)、
+   nu_tau2_eq := typeII_nu_tau2_dichotomy (ticVdiff rfl 接続)
+   → section16_pair_chiFam_columnSum_transpose (dataT := hyp.typeP、hTW1 := hKstar.symm、
+   appT := hyp.canonicalFullDadeApp) → exists_alignedOmegaSigmaGrid_row_sum_eq_chiFam_fiber
+   (r'char := kcol∘τ)。obligation-3 fields (cross_zero 系) は sorried-cite で前倒し可。
+   ⚠ 要設計: dichotomy の ±δ dichotomy 形 → gate の (r', delta') 存在形への整形
+   (delta'_pm ✓ sign ± どちらでも)。χ₂/hkeq 供給 = typeII_reducible_inducedKernelFamily_
+   eq_columnSum 系 (aux の hred_ne pattern 参照)。
+2. **結論 conj-転送**: IsFrobeniusGroup (derivedInG mp.S) H' U' → (derivedInG S) H U。
+   H = S_F canonical (maxNilpotentNormalHall の conj равивариantность) + U complement
+   conjugacy flexibility。aux 差し替えはこの後。
+
 ### 残 = gate 組立 (次 iteration)。★設計確定 (2026-07-10 調査、conj-transport 不要 route):
 **発見**: `BG.Ch4.S14.typeP_duality` (TypePDuality.lean:982) は**任意の type-P maximal M**
 に対し stated (K = κ-Hall seed) — canonical pair を「conj で寄せる」のでなく
