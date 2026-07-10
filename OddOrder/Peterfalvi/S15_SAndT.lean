@@ -795,6 +795,119 @@ theorem indPW1_inner_self [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   convert indPW1_inner_self_aux _hG hyp using 2
   exact Subsingleton.elim _ _
 
+open OddOrder.Isaacs in
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(13.18.a), the `W₁^#`-value of the induced trivial character** (Coq `gammaW1`):
+`Ind_{P⋊W₁}^S 1 (x) = 1` for `x ∈ W₁^#`.  Mod-`P` inflation
+(`induce_one_eq_compHom_induce_one_of_le`) turns the value into `γ(x̄)` for
+`γ = Ind_{Ā}^{S̄} 1`; the `S̄ ≅ U ⋊ W₁` Frobenius transport (the `indPW1_inner_self_aux`
+setup) and the Frobenius trivial-intersection complement value
+(`induce_one_eq_one_of_mem_complement`) give `γ(x̄) = 1`, with `x̄ ≠ 1` because
+`W₁ ⊓ P = ⊥` (`uW1_isComplement_P`). -/
+theorem indPW1_apply_eq_one_of_mem_W1_sharp [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {x : ↥hyp.S} (hxW1 : (x : G) ∈ hyp.W1) (hx1 : x ≠ 1) :
+    indPW1 hyp x = 1 := by
+  classical
+  -- Structural setup (the `indPW1_inner_self_aux` pattern).
+  have hcompl := uW1_isComplement_P hyp
+  have hM'_le_S : derivedInG hyp.S ≤ hyp.S := Subgroup.map_subtype_le _
+  have hP_le_M' : hyp.P ≤ derivedInG hyp.S := by rw [hyp.S_deriv_eq_PU]; exact le_sup_left
+  have hP_le_S : hyp.P ≤ hyp.S := hP_le_M'.trans hM'_le_S
+  have hW1_le_S : hyp.W1 ≤ hyp.S := hyp.Sdata_W1_eq ▸ hyp.Sdata.W1_le
+  have hU_le_M' : hyp.U ≤ derivedInG hyp.S := by rw [hyp.S_deriv_eq_PU]; exact le_sup_right
+  have hUW1_le_S : hyp.U ⊔ hyp.W1 ≤ hyp.S := sup_le (hU_le_M'.trans hM'_le_S) hW1_le_S
+  have hW1_le_UW1 : hyp.W1 ≤ hyp.U ⊔ hyp.W1 := le_sup_right
+  have hW1_le_PW1 : hyp.W1 ≤ hyp.P ⊔ hyp.W1 := le_sup_right
+  have hP_le_PW1 : hyp.P ≤ hyp.P ⊔ hyp.W1 := le_sup_left
+  have hPW1_le_S : hyp.P ⊔ hyp.W1 ≤ hyp.S := sup_le hP_le_S hW1_le_S
+  have hS_norm_P : hyp.S ≤ Subgroup.normalizer (hyp.P : Set G) := by
+    rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
+  haveI hPnorm : (hyp.P.subgroupOf hyp.S).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hP_le_S).mpr hS_norm_P
+  have hNA : hyp.P.subgroupOf hyp.S ≤ (hyp.P ⊔ hyp.W1).subgroupOf hyp.S :=
+    Subgroup.comap_mono hP_le_PW1
+  -- Inflation: `indPW1 x = γ(x̄)`.
+  rw [show indPW1 hyp = ClassFunction.induce ((hyp.P ⊔ hyp.W1).subgroupOf hyp.S)
+        (trivialClassFunction _) from rfl,
+    OddOrder.RepresentationTheory.induce_one_eq_compHom_induce_one_of_le hNA,
+    OddOrder.RepresentationTheory.ClassFunction.compHom_apply]
+  -- The `S̄ = Ū ⋊ W̄₁` Frobenius transport (`indPW1_inner_self_aux` pattern).
+  have hSdataUne : hyp.Sdata.U ≠ ⊥ := (hyp.toTypesIIIIIIVSetupS _hG).nontrivial.1
+  have hUW1frob : Ch06.IsFrobeniusGroup ↥(hyp.U ⊔ hyp.W1)
+      (hyp.U.subgroupOf (hyp.U ⊔ hyp.W1)) (hyp.W1.subgroupOf (hyp.U ⊔ hyp.W1)) := by
+    have h := S11.typeP_uW1_frobenius hyp.Sdata hSdataUne
+    rw [hyp.Sdata_U_eq, hyp.Sdata_W1_eq] at h
+    exact h
+  set f : ↥(hyp.U ⊔ hyp.W1) →* (↥hyp.S ⧸ hyp.P.subgroupOf hyp.S) :=
+    (QuotientGroup.mk' (hyp.P.subgroupOf hyp.S)).comp (Subgroup.inclusion hUW1_le_S) with hf
+  have he_apply : ∀ w : ↥(hyp.U ⊔ hyp.W1),
+      f w = QuotientGroup.mk (⟨(w : G), hUW1_le_S w.2⟩ : ↥hyp.S) := by
+    intro w
+    rw [hf, MonoidHom.comp_apply, QuotientGroup.mk'_apply]
+    rfl
+  have hinj : Function.Injective f := by
+    rw [injective_iff_map_eq_one]
+    intro w hw
+    rw [he_apply, QuotientGroup.eq_one_iff, Subgroup.mem_subgroupOf] at hw
+    have hwUW1S : (⟨(w : G), hUW1_le_S w.2⟩ : ↥hyp.S) ∈ (hyp.U ⊔ hyp.W1).subgroupOf hyp.S := by
+      rw [Subgroup.mem_subgroupOf]; exact w.2
+    have hbot : (⟨(w : G), hUW1_le_S w.2⟩ : ↥hyp.S)
+        ∈ ((hyp.U ⊔ hyp.W1).subgroupOf hyp.S) ⊓ (hyp.P.subgroupOf hyp.S) :=
+      Subgroup.mem_inf.mpr ⟨hwUW1S, Subgroup.mem_subgroupOf.mpr hw⟩
+    rw [disjoint_iff.mp hcompl.disjoint, Subgroup.mem_bot] at hbot
+    exact Subtype.ext (by simpa using congrArg Subtype.val hbot)
+  have hcard : Fintype.card ↥(hyp.U ⊔ hyp.W1)
+      = Fintype.card (↥hyp.S ⧸ hyp.P.subgroupOf hyp.S) := by
+    rw [← Nat.card_eq_fintype_card, ← Nat.card_eq_fintype_card,
+      show Nat.card (↥hyp.S ⧸ hyp.P.subgroupOf hyp.S) = (hyp.P.subgroupOf hyp.S).index from rfl,
+      hcompl.index_eq_card, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUW1_le_S).toEquiv]
+  set e : ↥(hyp.U ⊔ hyp.W1) ≃* (↥hyp.S ⧸ hyp.P.subgroupOf hyp.S) :=
+    MulEquiv.ofBijective f ((Fintype.bijective_iff_injective_and_card f).mpr ⟨hinj, hcard⟩) with he
+  have he_toMonoidHom : ∀ w, e.toMonoidHom w = f w := fun _ => rfl
+  have hFrob := Ch06.isFrobeniusGroup_map_equiv hUW1frob e
+  have hAmatch : (hyp.W1.subgroupOf (hyp.U ⊔ hyp.W1)).map e.toMonoidHom
+      = ((hyp.P ⊔ hyp.W1).subgroupOf hyp.S).map
+          (QuotientGroup.mk' (hyp.P.subgroupOf hyp.S)) := by
+    apply le_antisymm
+    · rintro _ ⟨w, hwW1, rfl⟩
+      have hwW1' : (w : G) ∈ hyp.W1 := Subgroup.mem_subgroupOf.mp (SetLike.mem_coe.mp hwW1)
+      refine Subgroup.mem_map.mpr ⟨⟨(w : G), hPW1_le_S (hW1_le_PW1 hwW1')⟩,
+        Subgroup.mem_subgroupOf.mpr (hW1_le_PW1 hwW1'), ?_⟩
+      rw [QuotientGroup.mk'_apply, he_toMonoidHom, he_apply]
+    · rintro _ ⟨s, hsPW1, rfl⟩
+      have hsG : (s : G) ∈ hyp.P ⊔ hyp.W1 :=
+        Subgroup.mem_subgroupOf.mp (SetLike.mem_coe.mp hsPW1)
+      have hsmem : (s : G) ∈ (↑(hyp.P ⊔ hyp.W1) : Set G) := hsG
+      rw [Subgroup.coe_mul_of_right_le_normalizer_left hyp.P hyp.W1 (hW1_le_S.trans hS_norm_P)]
+        at hsmem
+      obtain ⟨p, hp, w, hw, hpw⟩ := Set.mem_mul.mp hsmem
+      have hwW1 : w ∈ hyp.W1 := SetLike.mem_coe.mp hw
+      have hpP : p ∈ hyp.P := SetLike.mem_coe.mp hp
+      refine Subgroup.mem_map.mpr ⟨⟨w, hW1_le_UW1 hwW1⟩,
+        Subgroup.mem_subgroupOf.mpr hwW1, ?_⟩
+      have hs_eq : s = (⟨p, hP_le_S hpP⟩ : ↥hyp.S) * ⟨w, hW1_le_S hwW1⟩ :=
+        Subtype.ext (by rw [Subgroup.coe_mul]; exact hpw.symm)
+      have hp1 : QuotientGroup.mk' (hyp.P.subgroupOf hyp.S) ⟨p, hP_le_S hpP⟩ = 1 := by
+        rw [← MonoidHom.mem_ker, QuotientGroup.ker_mk']; exact Subgroup.mem_subgroupOf.mpr hpP
+      rw [he_toMonoidHom, he_apply, ← QuotientGroup.mk'_apply, hs_eq, map_mul, hp1, one_mul]
+  rw [hAmatch] at hFrob
+  -- `x̄ ∈ Ā` and `x̄ ≠ 1`; conclude by the Frobenius complement value.
+  have hxA : QuotientGroup.mk' (hyp.P.subgroupOf hyp.S) x
+      ∈ ((hyp.P ⊔ hyp.W1).subgroupOf hyp.S).map
+          (QuotientGroup.mk' (hyp.P.subgroupOf hyp.S)) :=
+    Subgroup.mem_map.mpr ⟨x, Subgroup.mem_subgroupOf.mpr (hW1_le_PW1 hxW1), rfl⟩
+  have hx1' : QuotientGroup.mk' (hyp.P.subgroupOf hyp.S) x ≠ 1 := by
+    intro h1
+    rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at h1
+    have hxUW1S : x ∈ (hyp.U ⊔ hyp.W1).subgroupOf hyp.S :=
+      Subgroup.mem_subgroupOf.mpr (hW1_le_UW1 hxW1)
+    have hbot : x ∈ ((hyp.U ⊔ hyp.W1).subgroupOf hyp.S) ⊓ (hyp.P.subgroupOf hyp.S) :=
+      Subgroup.mem_inf.mpr ⟨hxUW1S, h1⟩
+    rw [disjoint_iff.mp hcompl.disjoint, Subgroup.mem_bot] at hbot
+    exact hx1 hbot
+  exact induce_one_eq_one_of_mem_complement hFrob hxA hx1'
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **`P ⊄ ker μ_{0j}`** (Pf (13.18.b) kernel step, `S`-side).  For `j ≠ 0`, the base-row grid
 irreducible `μ_{0j}` does not have the Fitting kernel `P` in its character kernel.
