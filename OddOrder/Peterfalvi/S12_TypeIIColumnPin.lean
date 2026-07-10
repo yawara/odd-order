@@ -419,6 +419,125 @@ theorem typeII_dadeOfDiff_member_inner_omegaSigma_eq_zero [Finite G]
       rw [← Int.cast_smul_eq_zsmul ℂ (-cd.sign) cd.nuClassFunction, Int.cast_neg]]
     exact key hνZ hν1 hμZ hμ1 hνμ hnsignC hvanishνμ
 
+open scoped Classical FiniteInduce in
+/-- **The (3.1) `V`-TI Dade map is induction**: on `CF(W, V)` the full Dade map of the
+TI-cyclic hypothesis coincides with `Ind_W^G`.  Both are class functions supported on the
+conjugates of `V` (`full_map_eq_zero_of_not_mem_conjugatesOfSet_V`; induction of a
+`V`-supported function), and on `V` itself both evaluate to `α(v)` — the Dade map by the
+base-point property (`full_map_eq_of_mem_V`), the induction because the TI property makes
+every nonvanishing conjugator normalize into `W` (`V_ti` + `W_normalizes_V`), contributing
+`|W|` equal terms against the `⅟|W|` normalization.
+
+This is the bridge that turns the `σ`-adjunction into honest Frobenius reciprocity
+(`ClassFunction.inner_induce_eq_inner_restrict`) in the (3.2.e) vanishing criterion. -/
+theorem ticyclic_full_map_eq_induce [Finite G]
+    (hyp : OddOrder.Peterfalvi.S05.TICyclicHypothesis G)
+    (app : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication (G := G) hyp)
+    (α : OddOrder.Peterfalvi.S05.TICyclicHypothesis.SupportedOnV ℂ hyp) :
+    (app.tau.toDadeMap α : ClassFunction G ℂ)
+      = ClassFunction.induce hyp.W (α : ClassFunction ↥hyp.W ℂ) := by
+  classical
+  -- values of `α` vanish off `V`
+  have hαoff : ∀ (w : ↥hyp.W), (↑w : G) ∉ hyp.V → (α : ClassFunction ↥hyp.W ℂ) w = 0 := by
+    intro w hw
+    by_contra hne
+    exact hw (OddOrder.Peterfalvi.S04.mem_supportInSubgroup.mp
+      ((ClassFunction.mem_supportedSubmodule.mp α.2) (ClassFunction.mem_support.mpr hne)))
+  ext g
+  by_cases hg : g ∈ Group.conjugatesOfSet hyp.V
+  · -- both sides are class functions; evaluate at the `V`-representative
+    obtain ⟨v, hv, hconj⟩ := Group.mem_conjugatesOfSet_iff.mp hg
+    rw [← (app.tau.toDadeMap α : ClassFunction G ℂ).of_isConj hconj,
+      ← (ClassFunction.induce hyp.W (α : ClassFunction ↥hyp.W ℂ)).of_isConj hconj,
+      OddOrder.Peterfalvi.S05.TICyclicHypothesis.full_map_eq_of_mem_V app α hv,
+      ClassFunction.induce_apply]
+    -- the conjugators with `x⁻¹vx ∈ W` are exactly `x ∈ W`, each contributing `α(v)`
+    have hterm : ∀ x : G, ClassFunction.induceTerm hyp.W (α : ClassFunction ↥hyp.W ℂ) x v
+        = if x ∈ hyp.W then (α : ClassFunction ↥hyp.W ℂ) ⟨v, hyp.V_subset_W hv⟩ else 0 := by
+      intro x
+      by_cases hxW : x ∈ hyp.W
+      · have hxv : x⁻¹ * v * x ∈ hyp.V := by
+          have := hyp.W_normalizes_V (⟨x, hxW⟩ : ↥hyp.W)⁻¹ hv
+          simpa using this
+        have hxvW : x⁻¹ * v * x ∈ hyp.W := hyp.V_subset_W hxv
+        rw [ClassFunction.induceTerm_of_mem _ hxvW, if_pos hxW]
+        -- `x⁻¹vx` is `W`-conjugate to `v`
+        exact (α : ClassFunction ↥hyp.W ℂ).of_isConj (isConj_iff.mpr
+          ⟨(⟨x, hxW⟩ : ↥hyp.W)⁻¹, Subtype.ext (by simp [mul_assoc])⟩) |>.symm
+      · rw [if_neg hxW]
+        by_cases hxvW : x⁻¹ * v * x ∈ hyp.W
+        · rw [ClassFunction.induceTerm_of_mem _ hxvW]
+          refine hαoff _ (fun hxvV => hxW ?_)
+          have := hyp.V_ti x⁻¹ ⟨v, hv, by simpa using hxvV⟩
+          simpa using this
+        · exact ClassFunction.induceTerm_of_not_mem _ hxvW
+    rw [Finset.sum_congr rfl (fun x _ => hterm x), Finset.sum_ite, Finset.sum_const,
+      Finset.sum_const_zero, add_zero]
+    have hcard : (Finset.univ.filter (fun x : G => x ∈ hyp.W)).card
+        = Nat.card ↥hyp.W := by
+      rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
+    rw [hcard, nsmul_eq_mul, ← mul_assoc, invOf_mul_self, one_mul]
+  · rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.full_map_eq_zero_of_not_mem_conjugatesOfSet_V
+      app α hg, ClassFunction.induce_apply]
+    have hterm : ∀ x : G, ClassFunction.induceTerm hyp.W (α : ClassFunction ↥hyp.W ℂ) x g = 0 := by
+      intro x
+      by_cases hxgW : x⁻¹ * g * x ∈ hyp.W
+      · rw [ClassFunction.induceTerm_of_mem _ hxgW]
+        refine hαoff _ (fun hxgV => hg ?_)
+        refine Group.mem_conjugatesOfSet_iff.mpr ⟨x⁻¹ * g * x, hxgV, ?_⟩
+        exact isConj_iff.mpr ⟨x, by group⟩
+      · exact ClassFunction.induceTerm_of_not_mem _ hxgW
+    rw [Finset.sum_congr rfl (fun x _ => hterm x), Finset.sum_const_zero, mul_zero]
+
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (3.2)(e)**: a class function of `G` orthogonal to the whole `σ`-image family
+`{χ_{pq}}` vanishes on `V` (Coq `ortho_cycTIiso_vanish`).
+
+Frobenius reciprocity (`inner_induce_eq_inner_restrict`) through the `σ = Ind` bridge
+(`ticyclic_full_map_eq_induce`) turns the grid-orthogonality of `ψ` into the
+`α_{pq}`-orthogonality of `Res_W ψ` (each `σ(α_{pq})` is a four-term `χ`-combination by
+`alphaCF_eq_omega_combination` + `sigma_omega`); the `(1.3)(a)`-engine
+`vanishOnV_of_inner_alphaCF` then forces `(Res_W ψ)|_V = 0`, i.e. `ψ|_V = 0`.
+
+Together with the (5.5) singleton `λ^{τ₂} ∈ R(λ)` and the grid-orthogonality of the
+`R(λ)`-members (`typeII_dadeOfDiff_member_inner_omegaSigma_eq_zero`) this gives the
+`V`-vanishing of `λ^{τ₂}` in the (5.8) `ν`-pin. -/
+theorem ticyclic_apply_eq_zero_of_forall_inner_chiFam [Finite G]
+    (hyp : OddOrder.Peterfalvi.S05.TICyclicHypothesis G) (hVeq : hyp.V = hyp.Vdiff)
+    (app : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication (G := G) hyp)
+    {ψ : ClassFunction G ℂ}
+    (h : ∀ pq : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ),
+      ClassFunction.inner ψ (hyp.chiFam hVeq app pq) = 0)
+    {v : G} (hv : v ∈ hyp.V) : ψ v = 0 := by
+  classical
+  -- flipped-order grid orthogonality
+  have hχ0 : ∀ pq, ClassFunction.inner (hyp.chiFam hVeq app pq) ψ = 0 := fun pq => by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, h pq, star_zero]
+  -- `Res_W ψ ⊥ α_{pq}` via reciprocity through `σ = Ind`
+  have hf : ∀ (p : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (q : (hyp.W2.subgroupOf hyp.W) →* ℂˣ),
+      p ≠ 1 → q ≠ 1 →
+      ClassFunction.inner (hyp.alphaCF p q) (ClassFunction.restrict hyp.W ψ) = 0 := by
+    intro p q _ _
+    rw [← ClassFunction.inner_induce_eq_inner_restrict hyp.W (hyp.alphaCF p q) ψ]
+    have hbridge : ClassFunction.induce hyp.W (hyp.alphaCF p q)
+        = hyp.sigma hVeq app (hyp.alphaCF p q) := by
+      rw [show hyp.alphaCF p q
+          = ((hyp.alpha hVeq p q : OddOrder.Peterfalvi.S05.TICyclicHypothesis.SupportedOnV ℂ hyp)
+            : ClassFunction ↥hyp.W ℂ) from rfl,
+        ← ticyclic_full_map_eq_induce hyp app (hyp.alpha hVeq p q),
+        OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_eq_tau]
+    rw [hbridge, OddOrder.Peterfalvi.S05.TICyclicHypothesis.alphaCF_eq_omega_combination,
+      map_add, map_sub, map_sub,
+      OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_omega,
+      OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_omega,
+      OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_omega,
+      OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_omega]
+    simp only [ClassFunction.inner_add_left, ClassFunction.inner_sub_left, hχ0,
+      sub_zero, add_zero, zero_sub, neg_zero, zero_add]
+  have hres := OddOrder.Peterfalvi.S05.TICyclicHypothesis.vanishOnV_of_inner_alphaCF hyp hVeq
+    hf hv
+  rwa [ClassFunction.restrict_apply] at hres
+
 end ColumnPin
 
 end OddOrder.Peterfalvi.S12
