@@ -445,3 +445,29 @@ feature commit: `8cd092f7`。
   は再利用可能だが、これだけでは (a)/(b) を与えない。
 - main `45421289` まで再同期し `HEAD..main = 0`。統合後 `TGapCross` / `TTypeII` /
   AxiomsCheck (4131 jobs) green、`git diff --check` clean。新 axiom・新 sorry なし。
+
+## lane-c T-side (13.2.e) Dade restriction / induction bridge (2026-07-11)
+
+feature commits: `08ea38d4`, `47fa6c67`。
+
+- `tSideDadeMap_eq_full_typeP1DadeMap_of_support` を実証明。`A₁(T)=T_σ#` の
+  `tSideDadeMap` datum と、reconciled `TypePData T` が作る full `A₀(T)=A(T)∪V^T`
+  datumについて、`ftSupportKernel_restrict` で各 `H(a)` が一致することを示し、
+  Dade hypothesis extensionality + (2.11) `dadeMap_restrict_apply` から両 map の一致を得た。
+  `T_typeIII_coherent_image_inner_eta_eq_zero` に重複していた local proof はこの公開補題へ
+  再配線した。
+- `tSideDadeMap_eq_induce_of_full_typeP1_H_eq_bot` を実証明。full datum の
+  `∀ a, H(a)=⊥` だけを入力に、(2.5) Dade-map uniqueness
+  `isDadeMap_induce_of_forall_H_eq_bot` と上の restriction reconciliation を合成し、
+  `A₁(T)`-supported `φ` に対する `τ_T φ = Ind_T^G φ` を閉じた。
+- したがって Coq `PFsection14.v:819` の `{in CF(T,A₀(T)), tauT = Ind}` を使う箇所で残る
+  T-side input は、full type-P₁ datum の stabilizer 自明性 `∀a,H(a)=⊥` のみ。
+  map equality・restriction・support coercion は全て closed。
+- Coq `FTtypeP_facts(e)` の `normedTI A₀` 証明 (`PFsection13.v:222--242`) を独立照合。
+  単なる `A₁⊆A₀` や type-P₁ datum construction からは出ず、`x^g∈A₀ ↔ g∈T` を示す
+  BG support theorem + unique maximal overgroup + Type-I Frobenius regularity + type-P/F exclusion
+  の本体が必要。S-side type-P₂ の既存 `forall_dadeHypS0_H_eq_bot` は
+  `escaping_honestTypeP2A0Set_eq_empty` を使うため、そのまま T/type-P₁ へ転用はできない。
+  次 frontier はこの type-P₁ `A₀` non-escaping/normedTI producer。
+- `TGapCross` / `TTypeII` / AxiomsCheck (4131 jobs) green、`git diff --check` clean。
+  追加3公開 theorem は AxiomsCheck 登録済み、新 axiom・新 sorry なし。
