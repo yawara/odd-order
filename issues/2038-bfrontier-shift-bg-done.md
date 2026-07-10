@@ -401,3 +401,31 @@ reusable) + `chiRho_nu_zeta0_apply_eq_zeta0_ofDade` (a=0 counting → c 係数 u
 **残 wire (次)**: (iii) hconst (witness Dade datum の H(x)=R(x)⊆K + proven `psi_constant_on_xK`) で
 ρ-collapse `chiRho_apply_eq_of_forall_coset` → ψ(x) = ψ^ρ(x) = ζ₀(x)、(iv) S14 witness 文脈
 (`witness_psi_degree` / `witness_value_norm_package` h_psix) への配線。
+
+## ✅✅ (2026-07-10 続、lane-b) — **(12.14) witness full form 完成 + h_psix 配線 + witness_psi_degree 削除** (S14 実 sorry 6→5)
+
+上記「残 wire」(iii)(iv) を完遂 (commits 9c80627f / 49607ba9、full build 4131 green・AxiomsCheck 2148 OK):
+
+1. **ρ-collapse chain (9c80627f)**: `witness_x_mem_L`/`witness_x_mem_typeIA` (x∈P₀⊆L_F、x∈A(L)) /
+   `witness_maximalContaining_centralizer_eq_singleton` (Theorem-D singleton 𝓜(C_G(x))={M}、x は
+   L-σ-sharp escaping) / `witness_ftSupportKernel_le_K` (R(x)=(N[x])_σ⊓C_G(x)≤K、N[x]=M pin +
+   MF_eq_Msigma) / `witness_chiRho_apply_eq_of_forall_K` (x·K constancy → χ^ρ(x)=χ(x))。
+2. **witness full form (49607ba9)**: `witness_dade_psi_apply_x_eq_chi` — witness の (12.13) dade で
+   **ψ(x) = χ(x)** (constancy [psi_constant_on_xK 初配線、hLM = 新 `witness_L_not_conj_M`:
+   Msigma_conj_smul 輸送で p∣|L_σ| vs p∤|M_σ|] + collapse + evaluation の 3 部品合成)。
+   供給部品: `counterexample_three_le_p` / `witness_p_sq_le_card_kernel` / `witness_two_mul_index_le_p_add_one`。
+3. **h_psix route B**: `exists_counterexample_dade_data` の h_psix を「ψ(x)=χ(x) + χ(x)≡χ(1)=e
+   (L側 1.10.a `exists_integral_apply_sub_of_commute`)」に再配線。原文どおり ψ(1)=e 不要 →
+   **`witness_psi_degree` (sorry) を削除**。
+4. **⚠ 循環バグ発見+解消**: `Hypothesis.typeIA_eq_sharp` は (12.7) `typeI_frobenius`=`pi_empty`=
+   `counterexample_contradiction` 経由 — **(12.16) supply chain から使うと論理循環** (Lean の前方参照
+   エラーとして顕在化; 既存 `witness_L_hypothesis78`/`witness_L_zeta_bound`/`witness_L_hzeta0nu` にも
+   潜在していた = witness_value_norm_package が sorry のため未検出だった)。新 `witness_typeIA_eq_sharp`
+   ((12.10) `witness_L_frobenius` 経由、(12.7)-free) に全張り替え。`witness_L_hzeta0nu` は hAH 仮説
+   引数化 (S16 下流 2 呼び出し [lane-c files PairingCoherence/ComparingLM] は文脈既存供給で 1-line 追従
+   — signature 変更に伴う build 修復の最小機械的追従、self-flag)。
+
+**残 S14 on-path sorry = `witness_value_norm_package` 1 つ** (+P₂-crux gated 2)。conjunct 状況:
+h_const ✅ (psi_constant_on_xK、配線実証済) / h2e ✅ / hidx ✅ / hB ✅ (witness_L_zeta_bound、H78→dade.psi
+形変換要) / **残 = h_psig_int ((12.15) 前半 constancy on K−K′ + proven rhoM_integer_values) +
+hA ((12.15) ρM norm relation) + hC ((7.3)+(8.17))**。次 = 文書順で (12.15)。
