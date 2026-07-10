@@ -1,4 +1,5 @@
 import OddOrder.Peterfalvi.S16_NonExistenceG.TSideTypeP
+import OddOrder.Peterfalvi.S16_NonExistenceG.KeyInequalityArithmetic
 import OddOrder.Peterfalvi.S16_GridExpansion
 
 /-!
@@ -1196,11 +1197,11 @@ determination), whence the character body forces `(v − 1)/p ≤ (u − 1)/q` (
 contradicting (14.8) `key_inequality`'s `(v − 1)/p > (u − 1)/q`.
 
 The two deep pieces are isolated as `T_typeIII_ratio_le` (character body) and
-`T_isTypeIII_of_isTypeP1` (type determination), both consumed below.  The `>` half is (14.8);
-because the file's `T_typeII` feeds `T_side_caseB_facts` (whose case-(9.7.b) `v`-value is what
-`key_inequality`'s `>` rests on), `T_isTypeP2` is strictly upstream of `key_inequality` in this
-file's linearization and cannot cite it — so the `>` fact is left as this theorem's single residual,
-a documented forward reference to `key_inequality` (proved later in this same file). -/
+`T_isTypeIII_of_isTypeP1` (type determination), both consumed below.  The `>` half is (14.8): its
+pure cyclotomic comparison lives upstream in `KeyInequalityArithmetic`, while the two group-theoretic
+order inputs are the direct (13.4) producer `T_side_caseB_facts` and the (13.15) producer
+`S15.caseB_order_u_data`.  Thus no forward reference through the later `key_inequality` theorem is
+needed. -/
 theorem T_isTypeP2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     OddOrder.BG.Ch4.S14.IsTypeP2 hyp.base.T := by
@@ -1215,14 +1216,38 @@ theorem T_isTypeP2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   -- The character body then gives the type-III Γ-bridge estimate `(v − 1)/p ≤ (u − 1)/q`.
   have hle : ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) ≤
       ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) := T_typeIII_ratio_le hG hyp hIII
-  -- (14.8) `key_inequality` gives the strict `>`, contradicting `hle`.  `key_inequality` is proved
-  -- below in this file but is unreachable here (its `>` rests on the case-(9.7.b) `v`-value, which
-  -- flows through `T_side_caseB_facts ← T_typeII ← T_isTypeP2`), so the `>` is this theorem's
-  -- single documented forward residual.
+  -- The arithmetic half of (14.8), separated from the later `key_inequality` packaging.
+  have hratio := cyclotomic_ratio_gt_of_q_lt_p
+    hyp.base.p_prime hyp.base.q_prime hyp.base.p_odd hyp.base.q_odd hyp.q_lt_p
+  -- Its T-side order input is the direct (13.4) producer, which is upstream of `T_isTypeP2`.
+  have hvfull := (T_side_caseB_facts hG hyp).2
+  -- The S-side order input is exactly the two-branch conclusion of (13.15).
+  let Sord := OddOrder.Peterfalvi.S15.caseB_order_u_data hG hyp.base (caseB_for_S := True) trivial
+  have hu_le_full :
+      hyp.base.u ≤ (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) := by
+    by_cases hmod : hyp.base.p ≡ 1 [MOD hyp.base.q]
+    · rw [Sord.u_eq_of_p_modEq_one hmod]
+      have hp1_pos : 0 < hyp.base.p - 1 := by
+        have hp2 : 2 ≤ hyp.base.p := hyp.base.p_prime.two_le
+        omega
+      have hden_le : hyp.base.p - 1 ≤ hyp.base.q * (hyp.base.p - 1) := by
+        have hqpos : 1 ≤ hyp.base.q := hyp.base.q_prime.one_le
+        nlinarith [Nat.mul_le_mul_right (hyp.base.p - 1) hqpos]
+      exact Nat.div_le_div_left hden_le hp1_pos
+    · rw [Sord.u_eq_of_not_modEq_one hmod]
+  have hqpos : (0 : ℚ) < hyp.base.q := by
+    exact_mod_cast hyp.base.q_prime.pos
+  have hu_sub : ((hyp.base.u - 1 : ℕ) : ℚ) ≤
+      (((hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) - 1 : ℕ) : ℚ) := by
+    exact_mod_cast Nat.sub_le_sub_right hu_le_full 1
+  have hu_div : ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) ≤
+      (((hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) - 1 : ℕ) : ℚ) /
+        (hyp.base.q : ℚ) :=
+    div_le_div_of_nonneg_right hu_sub (le_of_lt hqpos)
   have hgt : ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
       ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) := by
-    -- (14.8) = `(key_inequality hG hyp).2`; forward-referenced.
-    sorry
+    rw [hvfull]
+    exact lt_of_le_of_lt hu_div hratio
   exact absurd hle (not_le.mpr hgt)
 
 /-- **Peterfalvi (14.9)**: the subgroup `T` is of Type II.  Dual to the `S`-side `(13.2.a)` line
