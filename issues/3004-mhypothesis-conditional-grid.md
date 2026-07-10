@@ -401,3 +401,22 @@ feature commit: `16af4562`。
 - commit 前に main `e880a0a5` まで同期し `HEAD..main = 0`。
   同期後 `TTypeII` + AxiomsCheck 4128-job build green、`git diff --check` clean。
   新 axiom・新 sorry なし。
+
+## lane-c T-side (14.9) Δ reality / principal orthogonality (2026-07-11)
+
+feature commit: `4c08dd8c`。
+
+- T-side prime-TI anchor `ν₀` の principal coefficient
+  `⟨ν₀,1_T⟩ = 1` を構成し、Dade map が supported class function の
+  trivial multiplicity を保存することを実証明した。
+- T coherent extension が非主 family member 上で `1_G` と直交し、複素共役と可換することを
+  A₀(T) support bridge から証明。これと Dade map の共役可換性から
+  `Δ = τ_T(ν₀-ζ)-1_G+τ₁ζ` の realness を閉じた。
+- `T_typeIII_ratio_le` へ上記を配線し、`Δ ∈ ZIrr G`、
+  `IsReal Δ`、`⟨Δ,1_G⟩ = 0` を concrete witness ごと構成した。
+- 残る local `sorry` は exact cross-inner identity
+  `⟨Γ,τ₁ζ⟩ = 1 + ⟨Δ,Γ⟩` のみ。独立な Coq trace では
+  `o_eta0_betaT0` 型の T-side β–η row と S/T Dade cross orthogonality に分解される。
+  次 frontier はこれらを別 leaf で実証明し、線形展開で identity を閉じること。
+- main `74ec694a` まで再同期し `HEAD..main = 0`。統合後 AxiomsCheck 4130 jobs green、
+  `git diff --check` clean。追加 theorem はすべて許容公理のみ、新 axiom・新 sorry なし。

@@ -1,4 +1,4 @@
-import OddOrder.Peterfalvi.S16_NonExistenceG.TGapPrimeTI
+import OddOrder.Peterfalvi.S16_NonExistenceG.TGapDelta
 import OddOrder.Peterfalvi.S16_NonExistenceG.KeyInequalityArithmetic
 import OddOrder.Peterfalvi.S16_GridExpansion
 
@@ -1098,6 +1098,8 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     obtain ⟨ζ, hζT, rfl⟩ := ha
     rw [Set.mem_toFinset] at hζT
     exact hτ.extension_mem_ZIrr ζ (Submodule.subset_span hζT)
+  have hdiff_supp := T_typeIII_calT1_difference_support
+    hyp hG hIII 𝒯 hlinear calT1_set hcalT1
   -- This is now the exact remaining (14.9) character construction: for each coherent image
   -- `a = τ₁ζ`, build `Δ_a = τ_T(ν₀ - ζ) - 1_G + a`, prove it real/virtual and orthogonal
   -- to `1_G`, and establish the expansion `⟨Γ,a⟩ = 1 + ⟨Δ_a,Γ⟩`.  All integrality and
@@ -1124,9 +1126,41 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       typeIII_induced_source_degree hyp θ (hlinear θ hθ)
     have hζ1 : ζ 1 = (hyp.base.p : ℂ) :=
       hζeq ▸ hζ1_ind
-    obtain ⟨ν0, hνZ, hνR, hβZ, hβsupp, hτβZ, hτβ1, hβconj⟩ :=
-      exists_typeIII_primeTIDifference hG hyp hIII
+    obtain ⟨ν0, hνZ, hνR, hβZ, hβsupp, hτβZ, hτβ1, hβconj, hνinner⟩ :=
+      exists_typeIII_primeTIDifference_with_anchor_inner hG hyp hIII
         (hirr ζ hζT).mem_ZIrr hζsupp hζ1
+    have hζone : ClassFunction.inner ζ
+        (trivialClassFunction ↥hyp.base.T) = 0 := by
+      rw [← hζeq]
+      exact OddOrder.Peterfalvi.S09.Cert.inner_induce_constOne_eq_zero
+        ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ (hne θ hθ)
+    have hβinner : ClassFunction.inner (ν0 - ζ)
+        (trivialClassFunction ↥hyp.base.T) = 1 := by
+      rw [ClassFunction.inner_sub_left, hνinner, hζone, sub_zero]
+    have hτβinner : ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ))
+        (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 1 := by
+      change ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ))
+        (trivialClassFunction G) = 1
+      rw [tSideDadeMap_inner_trivial hyp hG hβsupp, hβinner]
+    have htrivSelf : ClassFunction.inner
+        (trivialIrreducibleCharacter G : ClassFunction G ℂ)
+        (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 1 :=
+      (trivialIrreducibleCharacter G).isIrreducible.inner_self_eq_one
+    have hζcT : ζ.conj ∈ calT1_set := hyp07.conjugate_closed hζT
+    have hExtOne : ClassFunction.inner (hτ.extension ζ)
+        (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 0 := by
+      change ClassFunction.inner (hτ.extension ζ)
+        (trivialClassFunction G) = 0
+      exact tSideCoherentExtension_inner_trivial hyp hG hyp07 hτ hζT
+        (hirr ζ hζT) hζone
+        (hdiff_supp ζ.conj hζcT ζ hζT)
+    have hExtConj : (hτ.extension ζ).conj = hτ.extension ζ.conj :=
+      tSideCoherentExtension_conj hyp hG hIII 𝒯 hne calT1_set hcalT1
+        hyp07 hτ hirr hζT
+    have hζdiffSupp : (ζ - ζ.conj).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup
+          (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T :=
+      hdiff_supp ζ hζT ζ.conj hζcT
     let Δ : ClassFunction G ℂ :=
       tSideDadeMap hyp hG (ν0 - ζ) -
           (trivialIrreducibleCharacter G : ClassFunction G ℂ) +
@@ -1141,18 +1175,35 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           (trivialIrreducibleCharacter G : ClassFunction G ℂ) +
         hτ.extension ζ ∈ ZIrr G
       exact (ZIrr G).add_mem ((ZIrr G).sub_mem hτβZ hOneZ) hExtZ
-    refine ⟨Δ, hΔZ, ?_⟩
-    -- Remaining: conjugation coherence makes `Δ` real, (2.7) makes it
-    -- orthogonal to `1_G`, and the S/T gap calculation gives the cross-inner identity.
-    sorry
+    have hΔreal : ClassFunction.IsReal Δ := by
+      change ClassFunction.IsReal
+        (tSideDadeMap hyp hG (ν0 - ζ) -
+          (trivialIrreducibleCharacter G : ClassFunction G ℂ) +
+          hτ.extension ζ)
+      exact tSideDelta_isReal hyp hG hτ hζT hζcT hβsupp hζdiffSupp
+        hβconj hExtConj
+    have hΔone : ClassFunction.inner Δ
+        (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 0 := by
+      change ClassFunction.inner
+          (tSideDadeMap hyp hG (ν0 - ζ) -
+              (trivialIrreducibleCharacter G : ClassFunction G ℂ) +
+            hτ.extension ζ)
+          (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 0
+      rw [ClassFunction.inner_add_left, ClassFunction.inner_sub_left,
+        hτβinner, htrivSelf]
+      rw [hExtOne]
+      norm_num
+    have hrelation : ClassFunction.inner betaData.Gamma (hτ.extension ζ) =
+        1 + ClassFunction.inner Δ betaData.Gamma := by
+      -- Remaining: the S/T gap calculation gives the cross-inner identity.
+      sorry
+    exact ⟨Δ, hΔZ, hΔreal, hΔone, hrelation⟩
   obtain ⟨x, hxcoe, hx⟩ :
       ∃ (x : ClassFunction G ℂ → ℤ),
         (∀ a ∈ calT1, ClassFunction.inner betaData.Gamma a = ((x a : ℝ) : ℂ)) ∧
         (∀ a ∈ calT1, x a ≠ 0) := by
     exact gap_coefficients_nonzero_of_delta_parity hG.odd calT1 betaData.Gamma
       hGammaZ hGammaR hGamma1 hmemZ hDelta
-  have hdiff_supp := T_typeIII_calT1_difference_support
-    hyp hG hIII 𝒯 hlinear calT1_set hcalT1
   have heta : ∀ a ∈ calT1, ∀ (i : Fin hyp.base.q) (k : Fin hyp.base.p),
       ClassFunction.inner a (hyp.base.eta i k) = 0 := by
     intro a ha i k

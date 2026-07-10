@@ -25,7 +25,7 @@ is induced from `T'` and hence supported there, and has degree
 
 These are precisely the source-side inputs for the supported Dade difference
 `βT0 = ν₀ - ζ`; no S-side gap or cross-maximal relation is used. -/
-theorem exists_typeIII_primeTIredZero [Finite G]
+theorem exists_typeIII_primeTIredZero_with_inner [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G))
     (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T) :
@@ -35,7 +35,8 @@ theorem exists_typeIII_primeTIredZero [Finite G]
         ν0.support ⊆
           ((derivedInG hyp.base.T).subgroupOf hyp.base.T :
             Set ↥hyp.base.T) ∧
-        ν0 1 = (hyp.base.p : ℂ) := by
+        ν0 1 = (hyp.base.p : ℂ) ∧
+        ClassFunction.inner ν0 (trivialClassFunction ↥hyp.base.T) = 1 := by
   classical
   let td : OddOrder.GroupTheory.TypeIIIData hyp.base.T := hIII.some
   have hP : OddOrder.BG.Ch4.S14.IsTypeP hyp.base.T :=
@@ -49,7 +50,7 @@ theorem exists_typeIII_primeTIredZero [Finite G]
   let residue : PrimeTIResidueData ↥hyp.base.T s06.K
       (Nat.card ↥s06.W1) (Nat.card ↥s06.W2) :=
     PrimeTIResidueData.ofS06Hypothesis s06 ⊤ le_top
-  refine ⟨residue.primeTIred 0, residue.prTIred_mem_ZIrr 0, ?_, ?_, ?_⟩
+  refine ⟨residue.primeTIred 0, residue.prTIred_mem_ZIrr 0, ?_, ?_, ?_, ?_⟩
   · change (residue.primeTIred 0).conj = residue.primeTIred 0
     rw [← residue.cfInd_prTIres 0, residue.prTIres0,
       ClassFunction.induce_conj, trivialClassFunction_isReal]
@@ -70,6 +71,34 @@ theorem exists_typeIII_primeTIredZero [Finite G]
           (Subgroup.subgroupOfEquivOfLe td.typeP.W1_le).toEquiv
       _ = (hyp.base.p : ℂ) := by
         rw [T_typeIII_card_W1 hyp td]
+  · change ClassFunction.inner (residue.primeTIred 0)
+        (trivialClassFunction ↥hyp.base.T) = 1
+    rw [← residue.cfInd_prTIres 0, residue.prTIres0]
+    have hconst :
+        OddOrder.Peterfalvi.S09.Hypothesis71.constOne ↥hyp.base.T =
+          trivialClassFunction ↥hyp.base.T := by
+      ext t
+      simp [OddOrder.Peterfalvi.S09.Hypothesis71.constOne]
+    rw [← hconst]
+    exact OddOrder.Peterfalvi.S09.Cert.inner_induce_trivialChar_constOne_eq_one s06.K
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- The T-side prime-TI anchor, with the Frobenius-reciprocity coefficient
+projected away for consumers that only need support and degree. -/
+theorem exists_typeIII_primeTIredZero [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T) :
+    ∃ ν0 : ClassFunction ↥hyp.base.T ℂ,
+      ν0 ∈ ZIrr ↥hyp.base.T ∧
+        ClassFunction.IsReal ν0 ∧
+        ν0.support ⊆
+          ((derivedInG hyp.base.T).subgroupOf hyp.base.T :
+            Set ↥hyp.base.T) ∧
+        ν0 1 = (hyp.base.p : ℂ) := by
+  obtain ⟨ν0, hνZ, hνR, hνsupp, hν1, _⟩ :=
+    exists_typeIII_primeTIredZero_with_inner hG hyp hIII
+  exact ⟨ν0, hνZ, hνR, hνsupp, hν1⟩
 
 open scoped Classical in
 /-- **Peterfalvi (2.7), specialised to the T-side Dade map.**  A class function
@@ -124,12 +153,12 @@ open scoped Classical in
 `T'`, the concrete prime-TI anchor `ν₀` gives an integral difference
 supported on `(T')^# = A₁(T)`.  Consequently its genuine T-side Dade image is
 again a virtual character and vanishes at the identity. -/
-theorem exists_typeIII_primeTIDifference [Finite G]
+theorem exists_typeIII_primeTIDifference_with_anchor_inner [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G))
-    [Fintype G] [Fintype ↥hyp.base.T]
+    [Fintype G] [fintypeT : Fintype ↥hyp.base.T]
     [Invertible (Nat.card G : ℂ)]
-    [Invertible (Nat.card ↥hyp.base.T : ℂ)]
+    [invertibleT : Invertible (Nat.card ↥hyp.base.T : ℂ)]
     (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T)
     {ζ : ClassFunction ↥hyp.base.T ℂ}
     (hζZ : ζ ∈ ZIrr ↥hyp.base.T)
@@ -146,9 +175,20 @@ theorem exists_typeIII_primeTIDifference [Finite G]
             (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T ∧
         tSideDadeMap hyp hG (ν0 - ζ) ∈ ZIrr G ∧
         tSideDadeMap hyp hG (ν0 - ζ) 1 = 0 ∧
-        (ν0 - ζ).conj = ν0 - ζ.conj := by
-  obtain ⟨ν0, hνZ, hνR, hνsupp, hν1⟩ :=
-    exists_typeIII_primeTIredZero hG hyp hIII
+        (ν0 - ζ).conj = ν0 - ζ.conj ∧
+        ClassFunction.inner ν0 (trivialClassFunction ↥hyp.base.T) = 1 := by
+  have hfintypeT : fintypeT =
+      OddOrder.Peterfalvi.S12.FiniteInduce.finiteSubFintype hyp.base.T :=
+    Subsingleton.elim _ _
+  subst fintypeT
+  have hinvertibleT : invertibleT =
+      OddOrder.Peterfalvi.S12.FiniteInduce.natCardInvC hyp.base.T :=
+    Subsingleton.elim _ _
+  subst invertibleT
+  letI : Invertible (Nat.card ↥hyp.base.T : ℂ) :=
+    OddOrder.Peterfalvi.S12.FiniteInduce.natCardInvC hyp.base.T
+  obtain ⟨ν0, hνZ, hνR, hνsupp, hν1, hνinner⟩ :=
+    exists_typeIII_primeTIredZero_with_inner hG hyp hIII
   have hβZ : ν0 - ζ ∈ ZIrr ↥hyp.base.T :=
     (ZIrr ↥hyp.base.T).sub_mem hνZ hζZ
   have hA :
@@ -179,8 +219,39 @@ theorem exists_typeIII_primeTIDifference [Finite G]
     simpa [tSideDadeMap] using
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one_eq_zero
         side.dade side.hconj hβsupp)
-  refine ⟨ν0, hνZ, hνR, hβZ, hβsupp, hτZ, hτ1, ?_⟩
+  refine ⟨ν0, hνZ, hνR, hβZ, hβsupp, hτZ, hτ1, ?_, hνinner⟩
   rw [ClassFunction.conj_sub, hνR]
+
+open scoped Classical in
+/-- The supported T-side difference with the anchor's principal coefficient
+projected away for existing consumers. -/
+theorem exists_typeIII_primeTIDifference [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    [Fintype G] [Fintype ↥hyp.base.T]
+    [Invertible (Nat.card G : ℂ)]
+    [Invertible (Nat.card ↥hyp.base.T : ℂ)]
+    (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T)
+    {ζ : ClassFunction ↥hyp.base.T ℂ}
+    (hζZ : ζ ∈ ZIrr ↥hyp.base.T)
+    (hζsupp : ζ.support ⊆
+      ((derivedInG hyp.base.T).subgroupOf hyp.base.T :
+        Set ↥hyp.base.T))
+    (hζ1 : ζ 1 = (hyp.base.p : ℂ)) :
+    ∃ ν0 : ClassFunction ↥hyp.base.T ℂ,
+      ν0 ∈ ZIrr ↥hyp.base.T ∧
+        ClassFunction.IsReal ν0 ∧
+        (ν0 - ζ) ∈ ZIrr ↥hyp.base.T ∧
+        (ν0 - ζ).support ⊆
+          OddOrder.Peterfalvi.S04.supportInSubgroup
+            (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T ∧
+        tSideDadeMap hyp hG (ν0 - ζ) ∈ ZIrr G ∧
+        tSideDadeMap hyp hG (ν0 - ζ) 1 = 0 ∧
+        (ν0 - ζ).conj = ν0 - ζ.conj := by
+  obtain ⟨ν0, hνZ, hνR, hβZ, hβsupp, hτZ, hτ1, hβconj, _⟩ :=
+    exists_typeIII_primeTIDifference_with_anchor_inner hG hyp hIII
+      hζZ hζsupp hζ1
+  exact ⟨ν0, hνZ, hνR, hβZ, hβsupp, hτZ, hτ1, hβconj⟩
 
 open scoped Classical in
 /-- A `calT1` source induced from the normal subgroup `T'` is supported on `T'`. -/
