@@ -500,6 +500,37 @@ theorem Hypothesis.exists_typeII_partner_card_U_ge_seven [Finite G]
     obtain ⟨k, hk⟩ := hw2odd; omega
   omega
 
+/-- **The `(S_F#)^G` union bound of the (10.8) TI-counting** (p. 60 line 91, `≤`-form): the
+conjugacy saturation of the kernel sharp-set of a type-`P` maximal `S` has at most
+`(|S_F| − 1)·[G : S]` elements.  `S` stabilises `H# = H ∖ {1}` under conjugation (`H ⊴ S`), so
+the union bound `ncard_conjClassSet_le` applies with `L = S`; no TI-property is needed for the
+upper bound. -/
+theorem ncard_conjClassSet_sharp_H_le [Finite G] {S : Subgroup G} (data : TypePData S) :
+    (conjClassSet ((data.H : Set G) \ {1})).ncard ≤ (Nat.card ↥data.H - 1) * S.index := by
+  have hHle : data.H ≤ S := data.H_le.trans (Subgroup.map_subtype_le _)
+  have hstab : ∀ l ∈ S, ∀ t ∈ (data.H : Set G) \ {1},
+      l * t * l⁻¹ ∈ (data.H : Set G) \ {1} := by
+    rintro l hl t ⟨htH, htne⟩
+    have htH' : t ∈ data.H := htH
+    have hnorm := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal S
+    have hconj : l * t * l⁻¹ ∈ maxNilpotentNormalHall S := by
+      have hmem := hnorm.conj_mem ⟨t, hHle htH'⟩
+        (Subgroup.mem_subgroupOf.mpr (data.H_eq ▸ htH')) ⟨l, hl⟩
+      exact Subgroup.mem_subgroupOf.mp hmem
+    refine ⟨?_, ?_⟩
+    · rw [SetLike.mem_coe, data.H_eq]; exact hconj
+    · intro h1
+      apply htne
+      rw [Set.mem_singleton_iff]
+      have := congrArg (fun z => l⁻¹ * z * l) (Set.mem_singleton_iff.mp h1)
+      simpa [mul_assoc] using this
+  have hle := OddOrder.GroupTheory.ncard_conjClassSet_le (L := S) hstab
+  have hA : ((data.H : Set G) \ {1}).ncard = Nat.card ↥data.H - 1 := by
+    rw [Set.ncard_diff_singleton_of_mem (by exact one_mem data.H),
+      ← Nat.card_coe_set_eq]
+    rfl
+  rwa [hA] at hle
+
 /-- **Type-`P` order factorization** `|M| = |M_F|·|U|·|W₁|`.  The type-`P` decomposition is a double
 semidirect product `M = (H ⋊ U) ⋊ W₁`: `W₁` complements the derived subgroup `M' = [M,M]` in `M`
 (`M_complement`, `|M| = |M'|·|W₁|`), and `U` complements the Fitting kernel `H = M_F` in `M'`
