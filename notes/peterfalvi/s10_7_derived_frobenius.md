@@ -403,6 +403,50 @@ update⁶ 手順 3 の本丸 infra が閉じた。S12_TypeIIFrobenius に新 sec
    hN (pivot norm) = λ irreducible norm 1 / hiso+hZdiff = S07 generic (h46.dade0+hconj)。
    ⚠ S13:1466 前例の maxHeartbeats 1600000 級 elaboration 注意。
 
+### 2026-07-10 update⁸ — hRorth core LANDED (bfb1c48d) + T2 assembly checklist (次 iteration)
+
+**LANDED (sorry-free/axiom-clean)**: `typeII_tau_apply_eq_zero_of_mem_ticVdiffV` (V-vanishing
+anchor、(2.5) base-point 評価 + `typePData_typePV_not_mem_derived`) +
+`typeII_certainTypeR_imageSet_orthogonal_dadeOfDiff` (R(μ_j)⊥R(χ)、S13 _typeP 版 mirror) +
+`typeIIHypothesis46_dade0_hConjInvariant`。
+⚠ Lean 技術 crumb: proof 内 `set h46 := typeIIHypothesis46 …` は goal の occurrence を fold
+できず後続 rw が全滅 — S13 同様 **full term 通貫**が正 (python \bh46\b 展開で解決)。
+
+**残 = T2 assembly 一本** (`typeII_T2_coherent`、engine 呼び出し)。checklist:
+- **hRorth dispatch**: 対象 pair は irr×col / col×irr のみ (conj-pair は precondition
+  `inner φ ξ = 0 ∧ inner φ ξ.conj = 0` で自動除外 — (λ,λ̄): ⟨λ,λ̄.conj⟩=⟨λ,λ⟩=1≠0 /
+  (ν,ν̄) 同様)。col×irr は landed lemma の swap (inner_conj_symm + star_zero)。
+- **R-dispatch def**: 4-case dite (Classical、η = lam / lam.conj / nu / nu.conj) +
+  eq-transport。imageSet 抽出 lemma を dif_pos/dif_neg で 4 本 (S13 の rebuild pattern 参照;
+  ▸ の imageSet は subst で処理可)。R(λ/λ̄) = `dadeOrthonormalCharacterImageFamilyOfDiff
+  h46.dade0 (typeIIHypothesis46_dade0_hConjInvariant …)` / R(ν) = 分類
+  (`typeII_reducible_inducedKernelFamily_eq_columnSum` choice-extract) → `certainTypeR`
+  (hdeg = `columnSum_inv_apply_one`) / R(ν̄) = χ₂⁻¹ 版 (ν̄ = columnSum χ₂⁻¹ via
+  `columnSum_conj_eq`; (χ₂⁻¹)⁻¹ = χ₂ は inv_inv)。
+- **T2 ⊆ IKF**: λ,ν = `typeII_sOf_subset_inducedKernelFamily` (landed)、bars =
+  `S08.inducedKernelFamily_closedUnderConjugate` (名要確認)。
+- **horth** = `S08.inducedKernelFamily_pairwise_orthogonal` / **hnr** =
+  `S08.inducedKernelFamily_hasNoRealCharacters` (Odd |S| = hG.odd.of_dvd_nat) / bars は
+  conj_conj + symm で還元。
+- **hsuppdiff**: 汎用 helper 1 本 (`ha : a.supp ⊆ A∪{1} → hb → a1=b1 → (a−b).supp ⊆ A` —
+  landed `typeII_sSet_diff_support_subset` の proof を抽象化) + member-support 4 本
+  (λ,ν = landed `typeII_sSet_member_support_subset`、bars = conj は support 不変
+  (`conj_apply`+`star_eq_zero` — landed `typeII_sSet_member_diffsupp` の hsupp_eq pattern))
+  + A(S)→A₀ mono。degree: bars の deg = star(deg) = deg
+  (`irreducibleCharacter_apply_one_eq_pos_natCast` for source ξ + `induceHU_apply_one_eq_q_mul`
+  + star_natCast — landed member_diffsupp と同 pattern)。
+- **hN** = ⟨1, irreducibleCharacter_inner_eq_ite…⟩ / **hdeg0** = q·ξ(1) natCast ≠ 0 /
+  **h1A**: 1 ∉ supportInSubgroup A₀ S (mem_supportInSubgroup + A₀ 各部の ≠1) /
+  **hη₂** = ν (≠ λ: irr vs red)。
+- **hiso** = `S07.dadeIntegralCharacterMap_inner_eq_on_supported_span` +
+  `S07.support_subset_of_mem_zSupportedSpan` / **hZdiff** =
+  `S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported` + `S08.inducedKernelFamily_mem_ZIrr`
+  (S13:1534-1542 の mirror)。
+- statement: `Nonempty (S07.IsCoherent (S07.dadeIntegralCharacterMap h46.dade0 h46.tau)
+  {lam, lam.conj, nu, nu.conj} (S04.supportInSubgroup (A(S) ∪ conjClassSetIn S (typePV S
+  data.typeP)) S))` + [NeZero (Nat.card h46.W1)] binder (consumer 供給は one_lt_card_W1)。
+  ⚠ full term 通貫 (set 禁止)。⚠ maxHeartbeats 前例 S13:1466。
+
 ### update⁵ 補遺² — S-side Dade の support-set 選定 (次 iteration の最初の判断)
 - **A₁(S) = S_F^# の TI は即座に取れる**: `TypePNontrivialCore` が kernel-sharp TI を
   field で保持 (`typeP_core_centralizer_le_of_mem_fitting` の hTI destructure) +
