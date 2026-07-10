@@ -318,6 +318,18 @@ dichotomy 列和 →(pair transpose)→ T-grid 行和 →(fiber lemma)→ aligne
 haveI `NeZero (Nat.card h46.W1)` は h-版と別に要 (syntactic instance) / step1 は
 change + `congr 1` (compHom↔linearIrred-comp は defeq、congr が閉じる)。
 
+### gate 組立第一陣 LANDED (910419f5): M-seed 前提 2 本
+`isHallSubgroup_of_card_eq` + ★`typePData_W1_isHallSubgroup_kappa` (W₁ 自身が κ(M)-Hall;
+typePData_W1_hall_coprime の proof mirror + card-transfer) + `not_isTypeP2_of_isTypeIII_or_IV_or_V`
+(P₁/P₂ 排他)。これで下記設計 1 の duality seed (K := hyp.typeP.W1) と、強形 reduction の
+¬IsTypeII discharge / K_lt_Kstar 導出の材料が揃った。
+**次 = P3/P4**: `exists_section16MaximalPair_data` (FTS:526) の M-seed mirror
+(相違: seed = (M, hyp.typeP.W1)、relabel case-split なし — M 非 P₂ ⟹ partner が
+P₂/smaller 側と強制 (not_isTypeP2 + isTypeP2_of_typeP_kappaHall_lt (FTS:703) 対偶 +
+card_kappaHall_ne_card_Kstar)) → structure 化 (mirror FTS:726)、置き場 = 本 leaf。
+その後 P5: `section16TypePStructure_of_isMinimalSimpleOdd` が mp-generic か確認
+(mp-generic なら tp は無料)。
+
 ### 残 = gate 組立 (次 iteration)。★設計確定 (2026-07-10 調査、conj-transport 不要 route):
 **発見**: `BG.Ch4.S14.typeP_duality` (TypePDuality.lean:982) は**任意の type-P maximal M**
 に対し stated (K = κ-Hall seed) — canonical pair を「conj で寄せる」のでなく
