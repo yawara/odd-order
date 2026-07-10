@@ -7085,6 +7085,17 @@ first block, foundation of BG Theorem E's Lemma 14.5(c) count.  Axiom-clean. -/
 trivIset.  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.sigma_cover_disjoint_of_inputs
 
+/-! **Peterfalvi (5.3.b)/(14.9), T-side eta-grid orthogonality** (`S16_NonExistenceG`,
+lane c).  A calT1 member difference is supported on `A₁(T) = (T')#`; the T-side Dade
+map is the restriction of the full type-P1 `A₀(T)` map, whose image vanishes on the
+regular `W`-set.  The norm-two rigidity engine then makes each coherent image
+orthogonal to every `eta_ij`.  Both the reusable support input and the final
+orthogonality theorem are axiom-clean. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.T_typeIII_calT1_difference_support
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.T_typeIII_coherent_image_inner_eta_eq_zero
+
 /-! **Peterfalvi (14.11.4) `ρ`-norm bridge** (`S16_NonExistenceG`, lane γ/POLE-2).  The
 family-inequality `ρ`-norm `(toFamilyHypothesis71).chiRhoNormSq (ψ^{τ₁}) 0` equals the (7.8.b)
 coherence-norm `h78.zetaNuRhoNormSq`, since `S09.Hypothesis71.chiRho` depends only on the support
