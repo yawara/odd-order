@@ -501,3 +501,128 @@ cross-family の constituent 次数 d₁=d₂ は自動でない ((1.7.c): d = |
 N 側 (12.4) `orthogonal_character_constant_on_coset` + cross-orth ψ ⊥ R_N)。
 要新設 infra: Frobenius 性の conj transport (witness_L_not_conj_M の Msigma_conj_smul 同型)。
 その後 step 3 (K−K′ constancy 合成、(12.5) M 版が今回できたので配線可能) → 4 (h_psig_int) → 5 (hA)。
+
+## ✅ (2026-07-10 続⁴、lane-b /loop) — (12.15) step 2-3 の下部構造 3 commits (ebbca083 / 51fc5484)
+
+1. **(12.5)-M chain の非 Frobenius 一般化** (ebbca083): hAH 等式 (A(L)=H^#、Frobenius 専用) を
+   (hsub : H^# ⊆ A(M)) + (h1A : 1 ∉ A(M)) に置換 — 供給補題 `sharpSubgroup_H_subset_typeIA` /
+   `one_notMem_typeIA` (MaximalSubgroupType def-site、additive)。
+   **合成 lemma `psi_constant_on_kernel_sub_derived_ofData`** (PairCoherence 末尾、clean axioms):
+   ψ constant on H−H′ ← (12.5)-M + claim-1 evaluation (仮説 `heval` にパラメータ化) +
+   `mem_commutator_subgroupOf_iff` bridge。
+2. **claim-1 前提 2 本** (51fc5484、MinimalCounterexample):
+   `counterexample_not_frobenius_MF` ((8.13.c4) furthermore の反駁形 — escape 構造の IsTypeP2 枝を殺す) /
+   `witness_L_not_conj_of_kernel_centralizer_ne_bot` ((12.15) N≁L step、element-level 転送)。
+
+**残 = claim-1 組立** (`counterexample_chiRho_apply_eq_on_K_sharp`、次 iteration の主タスク)。設計確定済:
+```
+∀ g ∈ ctr.K, g ≠ 1 → hypM.toHypothesis71.chiRho ψ ⟨g, K≤M⟩ = ψ g
+```
+via `chiRho_apply_eq_of_forall_coset hypM.toHypothesis71 ψ hgA hcoset` (L-side
+`witness_chiRho_apply_eq_of_forall_K` のパターン、DadeContradiction:381-396 mirror):
+- hgA : g ∈ typeIA M = `sharpSubgroup_H_subset_typeIA` + hHK (hypM.H=K)。
+- hcoset : ∀ y ∈ H(g)=ftSupportKernel、ψ(g·y)=ψ(g)。branch `hypM.dadeData.H_eq_ftSupportKernel`:
+  - non-escaping: `ftSupportKernel_eq_bot_of_not_escaping` → y=1 trivial。
+  - escaping: g ∈ sigmaSharp M (K=Msigma via MF_eq_Msigma + g≠1)、
+    `exists_RData_escape_structure hG ctr.M_maximal hx hesc` → N conjuncts:
+    (i) FT_signalizerBase g = N pin: `maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape`
+        → 𝓜(C_G(g))={N₀}、escape-N ∈ 𝓜 → N=N₀; base = choose ∈ {N₀}
+        (witness_ftSupportKernel_le_K:363-367 パターン) → ftSupportKernel g = Msigma N ⊓ C_G(g) = R。
+    (ii) N type F (P2 枝は counterexample_not_frobenius_MF で殺す — D(4) の furthermore package が
+        M-Frobenius-over-Msigma を出すので直接矛盾)。
+    (iii) hypN := exists_typeI_hypothesis hG hNmax (isTypeI_of_isTypeF ... — N typeF → IsTypeI N の
+        変換 lemma 要確認、issue 2038 続³ で言及の `isTypeI_of_isTypeF`)。
+    (iv) g ∈ N (C_G(g)∋g≤N)、g ∉ N_F: escape 構造の `x ∈ ASet N ⊤ \ Msigma N` conjunct +
+        maxNilpotentNormalHall N = Msigma N (`maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2`)。
+    (v) C_{N_F}(g) ≠ ⊥: R ≠ ⊥ conjunct (Msigma N ⊓ C ≠ ⊥) + 同上の =。
+    (vi) N ≁ L: `witness_L_not_conj_of_kernel_centralizer_ne_bot` (iv)(v) を食わせる。
+    (vii) N-side (12.4): `orthogonal_character_constant_on_coset hG hypN data_N horth_N hgN hgNF`
+        (data_N = `character_decomposition_and_dade_domain`、horth_N =
+        `coherent_extension_constituent_orthogonal_Rset_of_nonconjugate` w/ (vi)、
+        psi_constant_on_xK:214-230 の M→N 置換 mirror) → ψ constant on g·N_F ⊇ g·R ✓。
+- 注: chiRho vs chiRhoCF の apply bridge (`chiRhoCF` = CF-bundle) — witness 側の対応箇所を mirror。
+最後に h_psig_int 配線: hconst := psi_constant_on_kernel_sub_derived_ofData (heval := claim-1) →
+`rhoM_integer_values`。その後 hA/hC (norm 側、(7.3)+(8.17))。
+
+## ✅✅ (2026-07-10 続⁵、lane-b /loop) — **(12.15) 全 3 主張 proven** (commit 1f2706aa)
+
+新 leaf `S14_MaximalI/RhoMEvaluation.lean` — 実装キュー step 2-4 完遂 (own-proof 全て sorry-free):
+
+1. **claim-1 `counterexample_chiRho_eval_of_mem_K_sharp`** (ψ^{ρM}(g)=ψ(g) on K^#):
+   H(g) 場合分け。escaping 枝 = **BG Theorem D(4) `exists_RData_escape_structure` (それ自体
+   fully sorry-free と判明!)** → N=N[g] pin (σ-sharp escape singleton + FT_signalizerBase choose) →
+   P₂ 枝は `counterexample_not_frobenius_MF` で殺す ((8.13.c4) furthermore package が M-Frobenius を
+   出すので直撃) → N type I (`isTypeI_of_isTypeF`、clean) + N_F=N_σ → g∈N∖N_F・C_{N_F}(g)≠1 →
+   N≁L (`witness_L_not_conj_of_kernel_centralizer_ne_bot`) → N-side (12.4) で ψ constant on g·N_F。
+2. **claim-2 `counterexample_psi_constant_on_K_sub_Kprime`**: (12.5)-M 合成 lemma + claim-1 (heval 供給)。
+3. **claim-3 `counterexample_psi_int_on_K_sub_Kprime`**: claim-2 → proven `rhoM_integer_values`。
+
+transitive sorry は既知 residual のみ (`exists_typeI_hypothesis` producer 系 / witness chain)。
+D(4)/isTypeI_of_isTypeF/(12.2.a) producer は clean axioms。
+
+**⟹ witness_value_norm_package の conjunct 状況更新**: h_const ✅ / h_psig_int ✅ (今回、
+counterexample_psi_int_* を dade.psi = coh.extension chi0 で instantiate + mval obtain) /
+h2e ✅ / hidx ✅ / **残 = hB 配線 (witness_L_zeta_bound → dade.psi 形) + hA ((12.15) norm 関係、
+‖ψ^{ρM}‖² ≥ (|K−K′|/|M|)mval²、claim-1+2 と chiRho norm 展開) + hC ((7.3)+(8.17) 分離)**。
+次 iteration = hA (claim-1/2 の直接続き、chiRhoCF ノルムを K−K′ 上で下から評価) → hB → hC。
+
+## ✅ (2026-07-10 続⁶、lane-b /loop) — **hA landed: A₁(M)-based ρM + norm 下界** (commit 86255c2d)
+
+キュー step 5 (hA)。RhoMEvaluation に追加:
+- **`hypothesis71SharpKernel`** = (12.15) が定義するとおりの **A₁(M)=K^# ベース ρM**
+  (S04/FullDadeIsometryData/HConjInvariant の `.restrict` 3 点、S12 type-P toHypothesis71 パターン、
+  own axioms clean)。**⚠ 設計上の要点**: (12.16) の hC は (7.3) 上界が thickened Ã₁(M) 上を走り
+  (8.17) で Ã₁(L) と disjoint であることを要するため、A(M) 全体ベースの hypM.toHypothesis71 では
+  **不可** — A₁ 版が必須 (このため claim-1 を constancy core + wrapper に refactor し A₁ 版 eval
+  `counterexample_chiRhoA1_eval_of_mem_K_sharp` を追加)。
+- **`counterexample_chiRhoA1_normSq_ge` (hA)**: ‖ψ^{ρM}‖² ≥ (|K|−|K′|)/|M|·mval² —
+  ノルム展開 |M|⁻¹Σ_m + K−K′ の |K|−|K′| 点 (claims 1-3 で値 mval) でサンプリング。
+
+**残 (witness_value_norm_package 完成まで)**:
+- **hB**: `witness_L_zeta_bound` (proven、H78 形) → dade.psi 形へ変換 (配線)。normRho の定義を
+  L-side ‖ψ^ρ‖² に取り hB = 1 − e/|H| ≤ normRho。
+- **hC**: normRhoM + normRho < 1。部品: (i) (7.3) `chiRho_integral_inequality` を両側に適用
+  (L-side は hyp.toHypothesis71 [A(L)=A₁(L) Frobenius ✓]、M-side は hypothesis71SharpKernel)、
+  (ii) **thickened dadeSupport disjointness**: Ã₁(M) ∩ Ã(L) = ∅ ((8.17)/(8.18.c) — Lean 側の
+  dadeSupport-disjointness lemma を要調査/新設: `nonconjugate_diffImage_inner_zero` が使う
+  (8.18.c) 幾何の supply を確認)、(iii) ‖ψ‖² = 1 (coh isometry: ⟨ext χ₀, ext χ₀⟩ = ⟨χ₀,χ₀⟩ = 1)、
+  (iv) 厳密不等号: ψ(1) ≠ 0 (ψ ∈ ZIrr, ‖ψ‖=1 → ψ = ±irreducible → ψ(1) = ±deg ≠ 0;
+  (5.5) E-subsum |E|=1 route)。両 (7.3) 和 + 1∉Ã 系 + ψ(1)² 項で < 1。
+- 最後: witness_value_norm_package の sorry を conjunct 供給で置換 (mval := claim-3 の witness g、
+  normRhoM := ‖chiRhoCF_{A₁}ψ‖².re、normRho := L-side)。
+
+## 📋 (2026-07-10 続⁷、lane-b /loop) — hB/hC 完全配線プラン (調査完了、次 iteration 実装)
+
+**hC の鍵発見**: 必要な対称 disjointness Ã₁(L)∩Ã₁(M)=∅ は、既存
+`nonconjugate_thickened_mixed_disjoint_or_swap` (RhoConstancy:239、proven) の mixed 二択
+(Disjoint Ã(L₁) Ã₁(L₂) ∨ swap) の**どちらの枝からも従う** (Ã₁ ⊆ Ã 単調性のみ) — 新幾何不要。
+sets は `S10.ftThickenedSupport Lᵢ (typeIA/A1)` 形。
+
+**hC 組立** (normRhoM + normRho < 1):
+1. (7.3) `chiRho_integral_inequality` (Hypothesis71:439、proven) を両側に:
+   L-side H71 = hyp.toHypothesis71 (A(L)=A₁(L) Frobenius)、M-side = `hypothesis71SharpKernel`。
+   hiso 供給: L = `(hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).toDadeIsometryData.isDadeIsometry`、
+   M = restricted 版 (S12 `toFamilyHypothesis71` の isDadeIsometry パターン)。
+2. 上界和の統合: dadeSupport(L-datum) ∩ dadeSupport(M-A₁-datum) = ∅。bridge 要:
+   S04.Hypothesis.dadeSupport (⋃ conjugatesOfSet (hCoset a)) ↔ S10.ftThickenedSupport (faithful
+   datum で一致するはず — S10 に bridge lemma を grep/新設)。A₁ 側の集合同定:
+   `A1 L .I = sharpSubgroup (mainSubgroup L .I)` と私の `sharpSubgroup hypM.typeI.typeF.H` の一致
+   (mainSubgroup .I の def 確認 + H_eq)。
+3. Σ_{Ã₁(M) ⊔ Ã(L)} ‖ψ‖² ≤ Σ_{G∖{1}} ‖ψ‖² = |G|(‖ψ‖²) − ‖ψ(1)‖²:
+   1 ∉ 両 support = `S04.Hypothesis.one_notMem_dadeSupport` (proven、AxiomsCheck 済) ×2。
+4. ‖ψ‖² = 1: `coh.extension_inner_eq` + χ₀ irreducible norm-1。
+5. **厳密性 ψ(1) ≠ 0**: ψ ∈ ZIrr ∧ ⟨ψ,ψ⟩=1 → ψ = ±μ (単一 irreducible) → ψ(1) = ±deg ≠ 0。
+   Parseval `inner_self_eq_sum_sq_of_repr` (ZIrrFourier:222) で Σn_i²=1 → 単一 ±1 (新 lemma ~40 行)。
+
+**hB 配線**: `witness_L_zeta_bound` (DadeContradiction:1506、proven) は自前 (hyp, H78) を ∃-生成 —
+package の (hyp, coh, dade) に**結合する版が必要**: (a) proof body を (hyp)(coh) 引数版に refactor
+(witness_L_hypothesis_frobenius / coherence dispatch 部分だけが hyp/coh 生成箇所)、(b) H78 の
+zetaDistinct を **dade.chi の family-index に placed** する必要 (現 `exists_witness_placed_family` は
+θ0 = degree-e member を place — dade.chi も `exists_distinguished_char` の degree-e member なので
+**同一 index 0 に押し込めるか、placed-family の θ0 を dade.chi そのものにする変種**を作る)。
+その後 normRho := H78.zetaNuRhoNormSq = ‖hyp.toHypothesis71.chiRhoCF (ν ζ₀)‖².re が
+‖chiRhoCF dade.psi‖².re に一致 (ν ζ₀ = coh.extension chi0 = dade.psi の同定、H78 構成時に ν :=
+coh.extension 線形化 + ζ₀ := chi0 で組む)。
+**最終**: witness_value_norm_package の sorry を全 conjunct 供給で置換
+(mval/h_psig_int = counterexample_psi_int_*、normRhoM = A₁-chiRhoCF norm、normRho = 上記、
+hA = counterexample_chiRhoA1_normSq_ge、hB/hC = 本プラン)。

@@ -385,6 +385,23 @@ theorem constituents_not_conj_of_inner_conj_eq_zero {L : Subgroup G} [Finite G]
   rw [Finset.card_eq_zero.mp hcard] at hmem
   exact absurd hmem (Finset.notMem_empty φ₁)
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Inclusion form of `Sset_diff_support_subset_ambientA`** for a general (non-Frobenius)
+type-`I` maximal: the difference of equal-degree members is supported in `A(L)`, needing only
+`H^# ⊆ A(L)` (`sharpSubgroup_H_subset_typeIA`), not the Frobenius equality `A(L) = H^#`. -/
+theorem Sset_diff_support_subset_ambientA_of_sharp_subset {L : Subgroup G} [Finite G]
+    (hyp : Hypothesis L)
+    {χ₁ χ₂ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Sset) (hχ₂ : χ₂ ∈ hyp.Sset)
+    (hdeg : χ₁ (1 : ↥L) = χ₂ (1 : ↥L))
+    (hsub : sharpSubgroup hyp.typeI.typeF.H ⊆ hyp.ambientA) :
+    (χ₁ - χ₂).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L := by
+  intro x hx
+  rw [ClassFunction.mem_support] at hx
+  have hnot : ¬((x : G) ∉ hyp.H ∨ x = 1) := fun h =>
+    hx (Sset_diff_vanishes_off_H_sharp hyp hχ₁ hχ₂ hdeg h)
+  push Not at hnot
+  exact hsub ⟨hnot.1, fun h1 => hnot.2 (Subtype.ext h1)⟩
+
 /-! ## (5.7) pair coherence and the (5.5) span membership -/
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -448,7 +465,8 @@ extension on the `A(L)`-supported difference `χ₁ − χ₂`, and (5.5)
 degenerate cases `χ₂ = χ₁` (zero) and `χ₂ = χ̄₁` (the (12.2.b) image equation) are direct. -/
 theorem pair_tau_diff_mem_span {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
     (data : ∀ χ ∈ hyp.Sset, CharacterDecompositionData hyp χ)
-    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
+    (hsub : sharpSubgroup hyp.typeI.typeF.H ⊆ hyp.ambientA)
+    (h1A : (1 : G) ∉ hyp.ambientA)
     {χ₁ χ₂ : ClassFunction ↥L ℂ} (h₁ : χ₁ ∈ hyp.Sset) (h₂ : χ₂ ∈ hyp.Sset)
     (hdeg : χ₁ (1 : ↥L) = χ₂ (1 : ↥L)) :
     hyp.tau (χ₁ - χ₂) ∈
@@ -494,8 +512,8 @@ theorem pair_tau_diff_mem_span {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
   -- supports: differences of quadruple members are `A(L)`-supported
   have hsuppQ : ∀ a ∈ Squad, ∀ b ∈ Squad, ((a - b : ClassFunction ↥L ℂ)).support ⊆ hyp.A := by
     intro a ha b hb
-    exact Sset_diff_support_subset_ambientA hyp (hmemS a ha) (hmemS b hb)
-      ((hdegQ a ha).trans (hdegQ b hb).symm) hAH
+    exact Sset_diff_support_subset_ambientA_of_sharp_subset hyp (hmemS a ha) (hmemS b hb)
+      ((hdegQ a ha).trans (hdegQ b hb).symm) hsub
   -- (5.7): the quadruple is coherent
   have hcohQ : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau Squad hyp.A) := by
     refine OddOrder.Peterfalvi.S07.uniform_degree_coherence_of_families
@@ -559,8 +577,8 @@ theorem pair_tau_diff_mem_span {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
     · -- `1 ∉ A`
       intro h1
       have hmem : ((1 : ↥L) : G) ∈ hyp.ambientA := h1
-      rw [hAH] at hmem
-      exact hmem.2 (by rw [Set.mem_singleton_iff, OneMemClass.coe_one])
+      rw [OneMemClass.coe_one] at hmem
+      exact h1A hmem
   obtain ⟨coh⟩ := hcohQ
   -- (5.5) on each of `χ₁`, `χ₂`
   have hmem₁ : χ₁ ∈ Squad := Set.mem_insert _ _
@@ -600,14 +618,15 @@ application, where the maximal `M` is not a Frobenius group and carries no famil
 theorem chiRhoCF_inner_eq_of_equal_degree_ofData {L : Subgroup G} [Finite G]
     (hyp : Hypothesis L)
     (data : ∀ χ ∈ hyp.Sset, CharacterDecompositionData hyp χ)
-    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1}) {ψ : ClassFunction G ℂ}
+    (hsub : sharpSubgroup hyp.typeI.typeF.H ⊆ hyp.ambientA)
+    (h1A : (1 : G) ∉ hyp.ambientA) {ψ : ClassFunction G ℂ}
     (horth : ∀ χ (hχ : χ ∈ hyp.Sset), ∀ α ∈ Rset (data χ hχ), ClassFunction.inner ψ α = 0)
     {χ₁ χ₂ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Sset) (hχ₂ : χ₂ ∈ hyp.Sset)
     (hdeg : χ₁ (1 : ↥L) = χ₂ (1 : ↥L)) :
     ClassFunction.inner χ₁ (hyp.toHypothesis71.chiRhoCF ψ)
       = ClassFunction.inner χ₂ (hyp.toHypothesis71.chiRhoCF ψ) := by
   haveI := hyp.finiteG
-  have hsupp := Sset_diff_support_subset_ambientA hyp hχ₁ hχ₂ hdeg hAH
+  have hsupp := Sset_diff_support_subset_ambientA_of_sharp_subset hyp hχ₁ hχ₂ hdeg hsub
   set α : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ (typeIA L hyp.typeI) L :=
     ⟨χ₁ - χ₂, (ClassFunction.mem_supportedSubmodule).mpr hsupp⟩ with hα
   have hkey : ClassFunction.inner (χ₁ - χ₂) (hyp.toHypothesis71.chiRhoCF ψ) = 0 := by
@@ -620,7 +639,7 @@ theorem chiRhoCF_inner_eq_of_equal_degree_ofData {L : Subgroup G} [Finite G]
           rcases hβ with hβ | hβ
           · exact horth χ₁ hχ₁ β hβ
           · exact horth χ₂ hχ₂ β hβ)
-        (pair_tau_diff_mem_span hyp data hAH hχ₁ hχ₂ hdeg)
+        (pair_tau_diff_mem_span hyp data hsub h1A hχ₁ hχ₂ hdeg)
     rw [← hrec, hyp.toHypothesis71_tau_apply α, hαcoe,
       inner_conj_symm ψ (hyp.tau (χ₁ - χ₂)), h0, star_zero]
   rw [ClassFunction.inner_sub_left] at hkey
@@ -633,7 +652,8 @@ of equal degree, `⟨θ₁, Res_H ρψ⟩ = ⟨θ₂, Res_H ρψ⟩`. -/
 theorem chiRhoCF_restrict_inner_eq_of_equal_degree_ofData {L : Subgroup G} [Finite G]
     (hyp : Hypothesis L)
     (data : ∀ χ ∈ hyp.Sset, CharacterDecompositionData hyp χ)
-    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1}) {ψ : ClassFunction G ℂ}
+    (hsub : sharpSubgroup hyp.typeI.typeF.H ⊆ hyp.ambientA)
+    (h1A : (1 : G) ∉ hyp.ambientA) {ψ : ClassFunction G ℂ}
     (horth : ∀ χ (hχ : χ ∈ hyp.Sset), ∀ α ∈ Rset (data χ hχ), ClassFunction.inner ψ α = 0)
     {χ₁ χ₂ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Sset) (hχ₂ : χ₂ ∈ hyp.Sset)
     (hdeg : χ₁ (1 : ↥L) = χ₂ (1 : ↥L))
@@ -645,7 +665,7 @@ theorem chiRhoCF_restrict_inner_eq_of_equal_degree_ofData {L : Subgroup G} [Fini
       = ClassFunction.inner θ₂ (ClassFunction.restrict ((hyp.typeI.typeF.H).subgroupOf L)
         (hyp.toHypothesis71.chiRhoCF ψ)) := by
   haveI := hyp.finiteG
-  have hfact := chiRhoCF_inner_eq_of_equal_degree_ofData hyp data hAH horth hχ₁ hχ₂ hdeg
+  have hfact := chiRhoCF_inner_eq_of_equal_degree_ofData hyp data hsub h1A horth hχ₁ hχ₂ hdeg
   rw [hθ₁, hθ₂, ClassFunction.inner_induce_eq_inner_restrict,
     ClassFunction.inner_induce_eq_inner_restrict] at hfact
   exact hfact
@@ -664,7 +684,8 @@ pair-coherence route (`chiRhoCF_restrict_inner_eq_of_equal_degree_ofData`). -/
 theorem chiRhoCF_restrict_constant_off_derived_ofData {L : Subgroup G} [Finite G]
     (hyp : Hypothesis L)
     (data : ∀ χ ∈ hyp.Sset, CharacterDecompositionData hyp χ)
-    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1}) {ψ : ClassFunction G ℂ}
+    (hsub : sharpSubgroup hyp.typeI.typeF.H ⊆ hyp.ambientA)
+    (h1A : (1 : G) ∉ hyp.ambientA) {ψ : ClassFunction G ℂ}
     (horth : ∀ χ (hχ : χ ∈ hyp.Sset), ∀ α ∈ Rset (data χ hχ), ClassFunction.inner ψ α = 0)
     {x y : ↥((hyp.typeI.typeF.H).subgroupOf L)}
     (hx : x ∉ commutator ↥((hyp.typeI.typeF.H).subgroupOf L))
@@ -692,7 +713,7 @@ theorem chiRhoCF_restrict_constant_off_derived_ofData {L : Subgroup G} [Finite G
     have hdegχ : ClassFunction.induce Hc (θ₁ : ClassFunction ↥Hc ℂ) (1 : ↥L)
         = ClassFunction.induce Hc (θ₂ : ClassFunction ↥Hc ℂ) (1 : ↥L) := by
       rw [ClassFunction.induce_apply_one, ClassFunction.induce_apply_one, hdegθ]
-    have h := chiRhoCF_restrict_inner_eq_of_equal_degree_ofData hyp data hAH horth
+    have h := chiRhoCF_restrict_inner_eq_of_equal_degree_ofData hyp data hsub h1A horth
       hχ₁ hχ₂ hdegχ rfl rfl
     rw [ClassFunction.inner_star_comm g (θ₁ : ClassFunction ↥Hc ℂ),
       ClassFunction.inner_star_comm g (θ₂ : ClassFunction ↥Hc ℂ), h]
@@ -701,5 +722,40 @@ theorem chiRhoCF_restrict_constant_off_derived_ofData {L : Subgroup G} [Finite G
       OddOrder.RepresentationTheory.commutator_induce_constituents_apply_one_eq ρ θ₁ θ₂ hlo₁ hlo₂
     exact OddOrder.RepresentationTheory.inner_induce_constituent_eq_of_apply_one_eq
       hlo₁ hlo₂ hdegθ
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.15), the constancy composition**: `ψ` itself is constant on `H − H′` — the
+(12.5) conclusion for the `ρ`-image (`chiRhoCF_restrict_constant_off_derived_ofData`) transferred
+to `ψ` by the (12.15) first claim `ψ^ρ(g) = ψ(g)` on `H^#`, taken here as the hypothesis
+`heval` (the `H(g)`-case-split evaluation, (8.13)-supplied by the caller).
+
+The `g ∉ H′` membership forces `g ≠ 1` (`1 ∈ H′`), so `heval` is only ever invoked on `H^#`.
+Instantiated at the counterexample `M` (`H = M_F = K`), this is exactly the "`ψ` is constant on
+`K − K′`" clause of (12.15), the `hconst` input of `rhoM_integer_values`. -/
+theorem psi_constant_on_kernel_sub_derived_ofData {L : Subgroup G} [Finite G]
+    (hyp : Hypothesis L)
+    (data : ∀ χ ∈ hyp.Sset, CharacterDecompositionData hyp χ)
+    (hsub : sharpSubgroup hyp.typeI.typeF.H ⊆ hyp.ambientA)
+    (h1A : (1 : G) ∉ hyp.ambientA) {ψ : ClassFunction G ℂ}
+    (horth : ∀ χ (hχ : χ ∈ hyp.Sset), ∀ α ∈ Rset (data χ hχ), ClassFunction.inner ψ α = 0)
+    (heval : ∀ g : G, ∀ hg : g ∈ hyp.typeI.typeF.H, g ≠ 1 →
+      hyp.toHypothesis71.chiRhoCF ψ (⟨g, hyp.typeI.typeF.H_le hg⟩ : ↥L) = ψ g)
+    {g₁ g₂ : G} (hg₁ : g₁ ∈ hyp.typeI.typeF.H) (hg₁' : g₁ ∉ derivedInG hyp.typeI.typeF.H)
+    (hg₂ : g₂ ∈ hyp.typeI.typeF.H) (hg₂' : g₂ ∉ derivedInG hyp.typeI.typeF.H) :
+    ψ g₁ = ψ g₂ := by
+  haveI := hyp.finiteG
+  have hg₁1 : g₁ ≠ 1 := fun h => hg₁' (h ▸ Subgroup.one_mem _)
+  have hg₂1 : g₂ ≠ 1 := fun h => hg₂' (h ▸ Subgroup.one_mem _)
+  set Hc := ((hyp.typeI.typeF.H).subgroupOf L) with hHc
+  set x₁ : ↥Hc := ⟨⟨g₁, hyp.typeI.typeF.H_le hg₁⟩, Subgroup.mem_subgroupOf.mpr hg₁⟩ with hx₁
+  set x₂ : ↥Hc := ⟨⟨g₂, hyp.typeI.typeF.H_le hg₂⟩, Subgroup.mem_subgroupOf.mpr hg₂⟩ with hx₂
+  have hx₁c : x₁ ∉ commutator ↥Hc := fun hc =>
+    hg₁' ((mem_commutator_subgroupOf_iff hyp.typeI.typeF.H_le x₁).mp hc)
+  have hx₂c : x₂ ∉ commutator ↥Hc := fun hc =>
+    hg₂' ((mem_commutator_subgroupOf_iff hyp.typeI.typeF.H_le x₂).mp hc)
+  have h125 := chiRhoCF_restrict_constant_off_derived_ofData hyp data hsub h1A horth hx₁c hx₂c
+  rw [ClassFunction.restrict_apply, ClassFunction.restrict_apply] at h125
+  rw [← heval g₁ hg₁ hg₁1, ← heval g₂ hg₂ hg₂1]
+  exact h125
 
 end OddOrder.Peterfalvi.S14
