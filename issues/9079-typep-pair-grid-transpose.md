@@ -348,6 +348,25 @@ S-reduction := exists_conj_eq_S_of_isTypeII
 instantiate — TypesIIIIIIVSetup 4-field 組立 + 結論 Frobenius の conj 転送) +
 dichotomy→pair transpose→fiber lemma の連結 + c.extension→tau2 packaging + 符号。
 
+**✅ threading 前半 LANDED (8908ee50 + 7cc90fb7)**:
+- `Hypothesis.exists_seeded_pair_conj_typeII` — WLOG entry: 任意 type-II S ↦
+  ∃ mp g, mp.T = M ∧ mp.Kstar = hyp.typeP.W1 ∧ conj g • S = mp.S (T-枝 kill 込み)。
+- `exists_typesIIIIIIVSetup_Sdata` — TypesIIIIIIVSetup mp.S with typeP = tp.Sdata
+  (axiom-clean; nontrivial core は TypePNontrivialCore.transfer)。
+**次 (残り 2 段)**:
+1. **pair-instance gate 変種** (本丸): (mp.S, Sdata-setup) 文脈で gate fields 1-3 を
+   実生産 — tau2 := typeII_T2_coherent の c.extension packaging (IntegralCharacterMap 化)、
+   nu_tau2_eq := typeII_nu_tau2_dichotomy (ticVdiff rfl 接続)
+   → section16_pair_chiFam_columnSum_transpose (dataT := hyp.typeP、hTW1 := hKstar.symm、
+   appT := hyp.canonicalFullDadeApp) → exists_alignedOmegaSigmaGrid_row_sum_eq_chiFam_fiber
+   (r'char := kcol∘τ)。obligation-3 fields (cross_zero 系) は sorried-cite で前倒し可。
+   ⚠ 要設計: dichotomy の ±δ dichotomy 形 → gate の (r', delta') 存在形への整形
+   (delta'_pm ✓ sign ± どちらでも)。χ₂/hkeq 供給 = typeII_reducible_inducedKernelFamily_
+   eq_columnSum 系 (aux の hred_ne pattern 参照)。
+2. **結論 conj-転送**: IsFrobeniusGroup (derivedInG mp.S) H' U' → (derivedInG S) H U。
+   H = S_F canonical (maxNilpotentNormalHall の conj равивариantность) + U complement
+   conjugacy flexibility。aux 差し替えはこの後。
+
 ### 残 = gate 組立 (次 iteration)。★設計確定 (2026-07-10 調査、conj-transport 不要 route):
 **発見**: `BG.Ch4.S14.typeP_duality` (TypePDuality.lean:982) は**任意の type-P maximal M**
 に対し stated (K = κ-Hall seed) — canonical pair を「conj で寄せる」のでなく
@@ -400,3 +419,116 @@ Coq `cycTIisoC` の Lean 版 = **pair 両側 σ の per-index 同定**:
 注意: ω_S(ξ) の IrreducibleCharacter norm: hφ1 は
 `sigma_inner_irreducibleCharacter` + `irreducibleCharacter_inner_eq_ite` (対角) で
 1 行のはず。
+
+### 2026-07-10 loop 続報: R1 (pair cluster 一般化) LANDED (f1b48365)
+pair lemmas 7 本を (dataS, hSW1 : dataS.W1 = mp.K, hSW2 : dataS.W2 = mp.Kstar) 形へ。
+理由 = row-pin で S-side は S11 setup の data.typeP (tp.Sdata と propositional 等価のみ)
+— 依存型 rewrite (χ₂ 型が data.typeP 依存) を回避する正しい一般性。
+**次 = R2 row-pin theorem** `exists_nu_extension_eq_alignedRow_at_pair`:
+`∃ r' delta', pm ∧ c.extension nu = δ' • ∑_j aligned r' j`。組立 (全 interface 確認済):
+1. hnuIKF := typeII_sOf_subset_inducedKernelFamily data Y hnu_mem →
+   ⟨χ₂, hne1, hkeq⟩ := typeII_reducible_inducedKernelFamily_eq_columnSum (data.typeP)
+2. hdich := typeII_nu_tau2_dichotomy … c hne1 hkeq 0 (2 枝: ±sign • ∑_p chiFam (p, kcol±))
+3. 各枝: section16_pair_chiFam_columnSum_transpose (dataS := data.typeP、hSW1/hSW2 :=
+   hdata ▸ tp-式、dataT := hyp.typeP、hTW1 := hKstar.symm、appS := ticVdiffFullDade…、
+   appT := hyp.canonicalFullDadeApp hG hG.odd) — ticVdiff rfl で型 defeq
+4. Hypothesis.exists_alignedOmegaSigmaGrid_row_sum_eq_chiFam_fiber (r'char := kcol±∘τ)
+5. delta' := ±(columnFamily χ₂).sign、pm := .sign_eq (neg 枝は ∓)
+註: tau2 := c.extension は既に IntegralCharacterMap (packaging 不要)。
+gate 全 fields 組立 (obligation-3 sorried) は row-pin 後、gate file 側で。
+
+### ★★ R2 row-pin LANDED (31856bed) — nu_tau2_eq 消費形が完全閉鎖
+`Hypothesis.exists_nu_extension_eq_alignedRow_at_pair` — **完全 axiom-clean (sorryAx なし)**。
+(9.8)分類 → (5.8)dichotomy → pair transpose → fiber sweep の全 chain。
+技術 crumbs: hT は subst (M 自由変数、cast ゼロ) / kcol は明示項渡し (metavar+defeq
+同時解決は unifier 放棄) / 負枝符号 = Int.cast_neg。
+**⚠ leaf 1492 行 — 次の追加前に prefix-split 必須** (GenericBridge 節 (~85-614、凍結) を
+新 upstream leaf (例 S12_TicyclicSigmaBridge) へ、transpose leaf が import。module 名
+不変で下流無変更)。
+**残 (9079 tail)**: (a) leaf 分割 → (b) gate-package assembly (TypeIICrossIsometryData
+at pair — nu_tau2_eq/tau2 (= c.extension)/r'/delta' は row-pin で実、obligation-3 の
+4 fields (lam_ortho_grid/zeta_ortho_grid/zeta_lam_ortho/cross_zero) は sorried-cite
+skeleton) → (c) aux WLOG 差し替え + Frobenius 結論 conj 転送 (obligation 3 と並行)。
+接続部品は全て landed: hSW1/hSW2 := hdata ▸ (tp.Sdata_W1_eq.trans
+(tp.W1_eq_K_and_W2_eq_Kstar hG).1) 等 (Subgroup-level、依存なし)。
+
+### tail 続報: (a) split + (b) pair-package producer LANDED (00bb893f + 9f944c66)
+- (a) `S12_TICyclicSigmaBridge.lean` (574 行、generic 層) ← `S12_TypeIIGridTranspose`
+  (966 行、pair 実体化) の 2-leaf 構成へ。namespace/下流不変。
+- (b) `S12_TypeIICrossIsometryPair.lean` (新 leaf): `exists_typeIICrossIsometryData_at_pair`
+  — tau2 (= c.extension) + r'/delta'/nu_tau2_eq (= row pin) を**実生産**、
+  obligation-3 の 4 fields (lam_ortho_grid/zeta_ortho_grid/zeta_lam_ortho/cross_zero)
+  のみ sorry (単一 discharge 点)。gate 本体は import cycle で cite 不可 — aux 差し替えは
+  本 leaf 下流。
+**残 (優先順 = 上流+文書順)**:
+1. **obligation 3-(5.3.b)**: lam_ortho_grid / zeta_ortho_grid — coherent image ⊥ σ-grid
+   (Coq coherent_ortho_cycTIiso)。§5 章内容、s10_7 note update⁵ の部品survey参照。
+2. **obligation 3-(8.18.b)**: zeta_lam_ortho / cross_zero — support disjointness
+   (disjoint_conjugatesIntoSet_of_centralizer 等 landed 部品あり)。
+3. **(c) aux 差し替え**: 新 leaf (S12_TypeIICrossIsometryPair 下流) に aux の pair-witness
+   版 — WLOG entry (exists_seeded_pair_conj_typeII) + setup 組立 (exists_typesIIIIIIVSetup_
+   Sdata、hSW1/hSW2 := hdata ▸ tp-式) + §9 counts 再 instantiate + package.elim →
+   IsFrobeniusGroup (derivedInG mp.S) → conj 転送 (maxNilpotentNormalHall equivariance +
+   complement flexibility) → 旧 aux/gate の deprecate。
+
+### 2026-07-10 obligation 3-(5.3.b) 調査結果 (次 iteration の実装設計)
+**Coq 証明構造** (`coherent_ortho_cycTIiso` PFsection8:839): τ₁(irr χ) = R(χ)-列の
+signed 部分和 (`mem_coherent_sum_subseq`、(5.5)) + R-元 ⊥ σ-grid (`FTtypeP_base_ortho`、
+R 構成時に焼き込み)。Coq の R-構成は prDade 機構 (9014 chain: cyclicTIiso → primeTIred →
+uniform_prTIred_coherent → FTtypeP_coherent_TIred) 経由。
+**repo 資産**: (5.5)-engine は lane-b が本日 landed
+(`coherent_extension_mem_span_Rset_of_mem`、S14_MaximalI/PairCoherence:400 —
+S07.CharacterPsiDecomposition.ofProjection + eq_sum_of_psi_eq_zero の S07-generic 核心を
+S14-文脈で instantiate した worked template。同 pattern を T2-R-family で再演すれば
+τ₂(λ) ∈ ℤ[R(λ)] が出る)。
+**★ base-ortho の constituent trick** (新規設計、prDade 焼き込みを回避):
+R(λ) = {χ₊, χ₋} (dadeOrthonormalCharacterImageFamilyOfDiff、orthonormal irr、
+τ_S(λ−λ̄) = χ₊ − χ₋)。grid 元 η = chiFam-member は ±irreducible。
+⟨τ_S(λ−λ̄), η⟩ = 0 が示せれば ⟨χ₊,η⟩ = ⟨χ₋,η⟩ =: c ∈ {0,±1}; c = ±1 なら
+χ₊ = ±η = χ₋ で orthonormal 対に矛盾 ⟹ c = 0 ⟹ 各 R-元 ⊥ η。
+**⟹ (5.3.b) の残 kernel = 単一 cross-inner**: ⟨τ_side(φ−φ̄), σ-grid 元⟩ = 0
+(S-side: τ_S = h46.tau vs M-grid / M-side: hyp.tau vs 自 grid)。
+- 注: zeta 側を `orthogonality_of_w1_lt_w2` (Prop109:100、zeta_ortho_grid そのもの) で
+  討とうとするのは**不可** — gate 文脈は type III/IV で w2 < w1
+  (card_kappaHall_lt_of_isTypeIIIorIV) ⟹ hw : w1 < w2 が偽側。(10.9) は別 dichotomy。
+  両 fields とも (5.5)+constituent trick で対称に討つのが正。
+- cross-inner の証明素材: (2.6)/(4.6) Dade 随伴 (inner_induce/restrict 系) +
+  σ-grid の V-side 挙動 (sigma_apply_…of_mem_V / vanish off conj(V))、または
+  (8.18.b)-disjointness 系。Prop109 の STEP-1 機構 (tau_muColumnZero_sub_zeta_eq 等)
+  が M-side の類似計算 precedent。
+実装順: (i) T2-R-family での (5.5) 再演 (lane-b template mirror) → (ii) cross-inner
+kernel (S-side から) → (iii) constituent trick 組立 → lam_ortho_grid / zeta_ortho_grid
+discharge (S12_TypeIICrossIsometryPair の sorry 2 本)。
+
+### ★ (5.3.b) 完全写像 (Coq oS1sigma 精読、全部品 landed 確認) — 次 iteration は組立のみ
+Coq の base-ortho kernel は support 論法でなく **(3.8) NC-カウント**だが、その実体は:
+ψ = φ−φ̄ は A(L)-supported (A₀ の V-part に触れない) ⟹ **τψ は conj(V) 上 vanish**
+⟹ norm² = 2 + V-vanishing ⟹ 全 σ-係数 0 (= 各 grid 元と直交)。
+**repo 対応 (全 landed)**:
+- V-vanishing anchor = `typeII_tau_apply_eq_zero_of_mem_ticVdiffV` (S-side、update⁸ landed)
+- 係数消滅 engine = `sigmaCoeff_eq_zero_of_vanishOnV` (S05_SigmaTrichotomy:69、
+  hψZ + ‖ψ‖²=2 + V-vanish → 全 sigmaCoeff 0; sigmaCoeff = ⟨·, chiFam P⟩ rfl)
+- **lam_ortho_grid の S-side 還元**: aligned_M(i,j) = σ_S-grid 元 (per-index 同定
+  section16_pair_sigma_omega_eq + fiber/haligned 系) ⟹ ⟨aligned, τ₂λ⟩ は
+  ⟨chiFam_S P, τ₂λ⟩ に等しい — **全て S-side で閉じる**
+- (5.5): τ₂λ = R(λ)-constituents の signed 和 — lane-b template
+  (coherent_extension_mem_span_Rset_of_mem の ofProjection/eq_sum_of_psi_eq_zero
+  pattern) を typeII_T2_memberRFamily で再演
+- constituent trick: ⟨τ_S(λ−λ̄), chiFam P⟩ = 0 + R(λ) = {χ₊,χ₋} orthonormal ±irr +
+  chiFam P = ±irr ⟹ ⟨χ±, chiFam P⟩ = 0 (c=±1 なら χ₊=±grid=χ₋ 矛盾)
+- zeta 側 = 同型を M-side で (τ_M(ζ−ζ̄) の V_M-vanishing anchor は S-side anchor の
+  M-mirror — hyp.tau + typePV M; 要 1 lemma、同 pattern)
+組立順: (k1) S-side kernel ⟨τ_S(λ−λ̄), chiFam_S P⟩ = 0 (anchor + norm2 + engine) →
+(k2) (5.5) 再演 → (k3) constituent trick → lam_ortho_grid (per-index 還元込み) →
+(k4) M-mirror で zeta_ortho_grid。
+
+### k1 LANDED (44ea7140): (5.3.b) base-ortho kernel — axiom-clean
+`typeII_tau_diff_inner_chiFam_eq_zero` (S12_TypeIICrossIsometryPair)。crumbs: dade0 の
+A は A₀-形 (明示型注釈で monotone 拡張) / mem_ZIrr_of_supported は (hsupp)(hZ) 順 /
+hconj は typeIIHypothesis46_dade0_hConjInvariant。
+**次 = k2**: τ₂λ ∈ ℤ[R(λ)]-form ((5.5) 再演)。lane-b template
+(PairCoherence:400 の ofProjection (ψ:=0) + eq_sum_of_psi_eq_zero) を
+typeII_T2_memberRFamily の R(λ)-block (dadeOrthonormalCharacterImageFamilyOfDiff) で。
+c := typeII_T2_coherent の extension、hsupp/inner 部品は k1 と共通。
+その後 k3 (constituent trick: k1 + orthonormal ±irr 対 + grid=±irr) → lam_ortho_grid
+(per-index 還元込み、pair leaf の sorry 1 本目 discharge) → k4 M-mirror。
