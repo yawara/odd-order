@@ -70,3 +70,37 @@ card_kappaHall_lt_of_isTypeIIIorIV) は Phase 1 後の残消費を調査の上�
 - notes/peterfalvi/s12_10_8_noncoherence.md 2026-07-06 audit (prime-TI 必要説は
   pair route で supersede 済; 本 issue が現行正)
 - 6b08f22d ((8.11) 閉鎖 = hB の入力)
+
+## 2026-07-11 tick² — Phase 1 の精密化 (K_lt_Kstar 依存の実測)
+
+**確認事実**:
+- (13.2.a) の term 消費 = 2 点のみ: GridTranspose:617 (M-seeded producer の hlt 導出) +
+  FTS:760 (canonical producer の S_typeP2 fill)。
+- M-seeded producer の **P₂-pin は既に clean** (`typeP_duality` の disjunction
+  `hP2disj.resolve_left hnotP2` — Thm C 置換すら不要)。dirty なのは
+  **`K_lt_Kstar` field の fill のみ** (|K(S)| < |W₁(M)| = order↔P₂ 相関 = (13.2.a) そのもの、
+  M-seeded では labelling 自由度が無く回避不能)。
+- canonical producer は逆配置: order = labelling で free / S_typeP2 = (13.2.a)。
+  ⟹ **structure が (order, P₂) の相関を同時要求する限り、どちらかの producer 経路で
+  (13.2.a) が必須** — 相関自体が (13.2.a) の内容だから。
+- (10.7)' chain は K_lt_Kstar を**実消費**する: (i) tp-producer
+  `section16TypePStructure_of_isMinimalSimpleOdd` (FTS:1026) が components 呼び出しに
+  `mp.K_lt_Kstar` を渡す (q<p labelling)、(ii) `Section16TypePStructure.W1_eq_K_and_W2_eq_Kstar`
+  (FTS:1202) のラベル一致算術 (|K|=q の pin) — pair lemmas の hSW1/hSW2 供給元。
+- **q<p は Pf §13 の章規約** (本では (13.2.a) の後で初めて確立)。§16 packaging
+  (Section16TypePStructure) がそれを field 化し、pair-route (10.7)' が §10 の身分で
+  消費しているのが anachronism の正体。
+
+**Phase 1 改訂 (1a = 本命)**: pair-(10.7)' chain の **q<p-free 化**:
+- `Section16MaximalPairCore` split (K_lt_Kstar 抜き; `extends` で現行互換)。
+- pair lemmas の W-block pin を `W1_eq_K_and_W2_eq_Kstar` (order-matching) から
+  **construction-level pin** (typePData_of_kappaHall_hallComplement は `.W₁ = mp.K` を
+  直接与える — order-free) に差し替え。tp packaging の q<p を chain から外す。
+- M-seeded producer は Core を emit (完全 clean) + `.toFull` 拡張 lemma ((13.2.a) cite、
+  order が要る消費者用に分離)。
+- 影響調査 TODO: pair leaves 内の `W1_eq_K_and_W2_eq_Kstar` / `tp.q`/`tp.p` 投影の全数、
+  S15/S16 (b/c) の Section16MaximalPair ⟨⟩-constructor / K_lt_Kstar / q_lt_p 使用。
+
+**着手順の判断**: Phase 2 (hB cover-bound engine、hypothesis-parameterized) は
+taint と独立な純 genuine math で設計リスクなし → **次 tick は Phase 2 から**
+(Phase 1a の refactor は影響全数調査と併せて fresh context で)。
