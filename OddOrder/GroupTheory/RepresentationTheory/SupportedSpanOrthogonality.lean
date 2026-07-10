@@ -132,4 +132,40 @@ theorem apply_eq_on_of_forall_inner_eq
   change f a - g a = 0 at h0
   exact sub_eq_zero.mp h0
 
+open scoped Classical in
+/-- **Fourier expansion over an orthonormal spanning family**: if `Φ` is orthonormal and spans
+all class functions, every `f` is `Σ_i ⟨f, Φ i⟩ • Φ i`.  (The `A = univ` instance of the (1.3.a)
+core; for `Φ = Irr Γ` this is the classical Fourier expansion, but the family form also serves
+the `ω`-grid of a cyclic `W` directly.) -/
+theorem eq_sum_inner_smul_of_orthonormal_of_span_top
+    {ι : Type*} [Fintype ι] (Φ : ι → ClassFunction Γ ℂ)
+    (horth : ∀ i j, ClassFunction.inner (Φ i) (Φ j) = if i = j then 1 else 0)
+    (hspan : (⊤ : Submodule ℂ (ClassFunction Γ ℂ)) ≤ Submodule.span ℂ (Set.range Φ))
+    (f : ClassFunction Γ ℂ) :
+    f = ∑ i, ClassFunction.inner f (Φ i) • Φ i := by
+  classical
+  have hAconj : ∀ (h : Γ) ⦃a : Γ⦄, a ∈ (Set.univ : Set Γ) → h * a * h⁻¹ ∈ Set.univ :=
+    fun _ _ _ => Set.mem_univ _
+  have hΦA : ∀ i, Φ i ∈ ClassFunction.supportedSubmodule (Set.univ : Set Γ) := fun i =>
+    ClassFunction.mem_supportedSubmodule.mpr fun x _ => Set.mem_univ x
+  have hspan' : ClassFunction.supportedSubmodule (Set.univ : Set Γ)
+      ≤ Submodule.span ℂ (Set.range Φ) := fun x _ => hspan (Submodule.mem_top)
+  set D : ClassFunction Γ ℂ := f - ∑ i, ClassFunction.inner f (Φ i) • Φ i with hD_def
+  have hDzero : ∀ a ∈ (Set.univ : Set Γ), D a = 0 := by
+    refine (eq_zero_on_iff_forall_inner_eq_zero_of_span hAconj Φ hΦA hspan' D).mpr ?_
+    intro j
+    rw [hD_def, ClassFunction.inner_sub_right, inner_sum_right]
+    have hsum : ∑ i, ClassFunction.inner (Φ j) (ClassFunction.inner f (Φ i) • Φ i)
+        = star (ClassFunction.inner f (Φ j)) := by
+      rw [Finset.sum_eq_single j]
+      · rw [inner_smul_right, horth, if_pos rfl, mul_one]
+      · intro i _ hij
+        rw [inner_smul_right, horth, if_neg (Ne.symm hij), mul_zero]
+      · intro h; exact absurd (Finset.mem_univ j) h
+    rw [hsum, ← inner_conj_symm, sub_self]
+  ext a
+  have h0 := hDzero a (Set.mem_univ a)
+  change f a - (∑ i, ClassFunction.inner f (Φ i) • Φ i) a = 0 at h0
+  exact sub_eq_zero.mp h0
+
 end OddOrder.RepresentationTheory
