@@ -47,3 +47,26 @@ created: 2026-07-10
 - 9014 (primeTI residue API) とも独立。
 
 owner: lane a / 起点 note: notes/peterfalvi/s10_7_derived_frobenius.md 進捗⁸
+
+## 2026-07-10 coverage 調査結果 (Explore agent、実装前提の確定)
+
+**既存資産 (全て確認済)**:
+- `Section16MaximalPair` (FeitThompsonSetup:292-334): S/T + `theorem88_caseB`
+  (**分類 clause 有**: ∀ M maximal, IsTypeI ∨ conj•M = S ∨ conj•M = T) + `S_typeP2` +
+  K/K* (= W₁/W₂)。producer `section16MaximalPair_of_isMinimalSimpleOdd` (726-760、本体 sorry-free;
+  推移依存に §11/§13 残 sorry — 本レーンが現在埋めている (5.8)/(10.8) 系そのもの、sorried-cite で可)。
+- `certainTypeS`/`certainTypeT` (1132-1153): S06.Hypothesis を **W₁/W₂ swap** で両側構成済。
+- `W_structure` (1180-1196): S ⊓ T = K ⊔ K* + cyclic。`Section16TypePStructure.W1_eq_K_and_W2_eq_Kstar` (1203)。
+- `typeP_duality` (= pair_witness 相当、∃! partner) + `theoremC_paired_structure` covering。
+- `IsDadeMap.unique` (S04_DadeIsometry:651、sorry-free)。
+
+**足りない部品 (優先順、全て exists_typeIICrossIsometryData の単一 sorry に集約)**:
+1. **σ-grid pair transpose bridge** (核心新規): certainTypeOmegaSigma (S-side、certainTypeT の
+   W-swap 基盤) = alignedOmegaSigmaGrid (M-side) の transpose。材料 = 共有 W + (3.2) σ 一意性
+   (IsDadeMap.unique — 両 σ は同一 (G, V-TI) の Dade map)。S05_SignedTripleGrid の
+   `IsSignedTripleGrid.transpose` (1489) は grid primitive として再利用可。
+2. **pair 対称化** (`typeP_pair_sym` 相当の `.swap`): 現状不在 — S↔T/K↔K*/W₁↔W₂。
+3. **type-II L → canonical partner 還元 glue** (組立のみ、新規部品不要):
+   theorem88_caseB + typeP_duality + type 排他。
+4. **行和 pin 変換**: 1 が入れば dichotomy (typeII_nu_tau2_dichotomy、landed) の
+   S-列和 → M-行和変換で nu_tau2_eq が従う。
