@@ -999,3 +999,22 @@ W∖W₂-TI 仮説からの Ind-isometry はこれで組める。**同定 route 
 σ-based μ の同定」は V-値一致 + norm-1 ZIrr rigidity の形 — 次 iter は
 eq_sigma_of_apply_eq_on_V の statement 精読から (これが刺されば normedTI-isometry port すら
 不要で prTIirr_id が閉じる可能性)。
+
+## 📋 (2026-07-11、lane-b /loop iter 21) — prTIirr_id の完全 route 確定 ((3.9.a) が同定 step に直刺し)
+
+**`eq_sigma_of_apply_eq_on_V` (S05_SigmaIsometry:814) = Pf (3.9.a)、完全 proven**:
+χ ∈ ZIrr ∧ ‖χ‖²=1 ∧ V 上 ω と一致 → **χ = σ(ω)** ((3.8) NC-rigidity で係数 pin)。
+
+**∴ Coq :288-387 の Lean 化 route が完全確定** (全 4 step、うち 2 は landed/existing):
+- **a. Ind-based signed family 抽出**: Ind(ω_χ − ω_{sndPart χ}) ∈ ZIrr、norm 2、pairwise 直交
+  (W∖W₂-TI 仮説 → `S04.Hypothesis.of_isTISubset` + `tau_eq_induce` の Ind-isometry) →
+  signed-irr 差 dmu_χ − dmu_{sndPart χ} 形に分解 (§3 (1.4) core `isometry_difference_pair_structure`
+  [IsometryDifferencePair、landed 済] の再利用を次 iter で確認)。
+- **b. equiv_restrict**: cross-level (1.3.b) `restrict_apply_eq_on_of_induce_eq_sum` (**landed**) を
+  Φ := ω-差族 (spanning **landed**)、mu := dmu 族に適用 → dmu の W∖W₂-値 = ω-値。
+- **c. (3.9.a) 同定**: dmu_k は ZIrr ∧ norm 1 ∧ V ⊆ W∖W₂ 上 ω_k と一致 (b の制限) →
+  `eq_sigma_of_apply_eq_on_V` で **dmu_k = σ(ω_k)** (existing、port 不要!)。
+- **d. 合成**: σ(ω_k) の W∖W₂-値 = ω_k 値 = **prTIirr_id (4.3.c)** ✓ → mu2Grid 形へは
+  sigma_omega_eq_mu2GridSign_smul_mu2Grid で sign 変換。
+残実装 = a の family 抽出 (isometry_difference_pair_structure 再利用性) + hTI (W∖W₂ IsTISubset)
+仮説の設計 + b-d assembly。次 iter: isometry_difference_pair_structure の signature 精読。
