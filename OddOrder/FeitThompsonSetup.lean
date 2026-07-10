@@ -1129,18 +1129,26 @@ noncomputable def certainTypeHypothesis_of_typeP_kappaHall {G : Type*} [Group G]
         exact hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card (K ⊔ Kstar)) }
 
 /-- The cyclic factors `mp.K`, `mp.Kstar` are cyclic (subgroups of the cyclic `Z = K ⊔ K*`). -/
-theorem Section16MaximalPair.isCyclic_K {G : Type*} [Group G] [Finite G]
-    (mp : Section16MaximalPair G) : IsCyclic ↥mp.K :=
+theorem Section16MaximalPairCore.isCyclic_K {G : Type*} [Group G] [Finite G]
+    (mp : Section16MaximalPairCore G) : IsCyclic ↥mp.K :=
   haveI : IsCyclic ↥(mp.K ⊔ mp.Kstar) := mp.Z_cyclic
   isCyclic_of_injective (Subgroup.inclusion (le_sup_left : mp.K ≤ mp.K ⊔ mp.Kstar))
     (Subgroup.inclusion_injective _)
 
+theorem Section16MaximalPair.isCyclic_K {G : Type*} [Group G] [Finite G]
+    (mp : Section16MaximalPair G) : IsCyclic ↥mp.K :=
+  mp.toSection16MaximalPairCore.isCyclic_K
+
 /-- The cyclic factors `mp.K`, `mp.Kstar` are cyclic (subgroups of the cyclic `Z = K ⊔ K*`). -/
-theorem Section16MaximalPair.isCyclic_Kstar {G : Type*} [Group G] [Finite G]
-    (mp : Section16MaximalPair G) : IsCyclic ↥mp.Kstar :=
+theorem Section16MaximalPairCore.isCyclic_Kstar {G : Type*} [Group G] [Finite G]
+    (mp : Section16MaximalPairCore G) : IsCyclic ↥mp.Kstar :=
   haveI : IsCyclic ↥(mp.K ⊔ mp.Kstar) := mp.Z_cyclic
   isCyclic_of_injective (Subgroup.inclusion (le_sup_right : mp.Kstar ≤ mp.K ⊔ mp.Kstar))
     (Subgroup.inclusion_injective _)
+
+theorem Section16MaximalPair.isCyclic_Kstar {G : Type*} [Group G] [Finite G]
+    (mp : Section16MaximalPair G) : IsCyclic ↥mp.Kstar :=
+  mp.toSection16MaximalPairCore.isCyclic_Kstar
 
 /-- **The S-side §6 certain-type Hypothesis** (cd producer building block): `mp.S` with `W₁ = mp.K`,
 `W₂ = mp.Kstar`.  Wires `certainTypeHypothesis_of_typeP_kappaHall` to `mp`'s κ-Hall data

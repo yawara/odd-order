@@ -143,7 +143,7 @@ automatically has `W₂ = mp.K`.  Both are the `T'`-centralizer of any `x ∈ K*
 by the `centralizer_W1` field, `mp.K` by BG Theorem A(5)
 (`typeP_derivedInG_inf_centralizer_kappaElement_eq` with the pairing `mp.K_eq`). -/
 theorem section16_partner_typePData_W2_eq [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPair G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPairCore G}
     (dataT : TypePData mp.T) (hTW1 : dataT.W1 = mp.Kstar) :
     dataT.W2 = mp.K := by
   -- a nonidentity element of the dual κ-Hall `K* ≠ ⊥`
@@ -161,7 +161,7 @@ theorem section16_partner_typePData_W2_eq [Finite G]
 /-- A `W₁`-reconciled partner `TypePData` has the pair's full cyclic factor:
 `dataT.W = K ⊔ K*` (from `W = W₁ ⊔ W₂`, `W₁ = K*`, `W₂ = K`, and commutativity of `⊔`). -/
 theorem section16_partner_typePData_W_eq [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPair G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPairCore G}
     (dataT : TypePData mp.T) (hTW1 : dataT.W1 = mp.Kstar) :
     dataT.W = mp.K ⊔ mp.Kstar := by
   rw [dataT.W_eq, hTW1, section16_partner_typePData_W2_eq hG dataT hTW1, sup_comm]
@@ -180,7 +180,7 @@ No `IsTypeP2 mp.T` is needed — contrast `exists_typePData_W1_eq_of_isTypeP2`, 
 `(κ∪σ)'`-Hall complement `U` requires the `P₂`-only `M_F`-internal decomposition; here the
 datum's own complement `U` is merely transported, never rebuilt. -/
 theorem exists_section16_partner_typePData [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (mp : Section16MaximalPair G) :
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (mp : Section16MaximalPairCore G) :
     ∃ dataT : TypePData mp.T, dataT.W1 = mp.Kstar ∧ dataT.W2 = mp.K := by
   classical
   -- an arbitrary type-`P` datum on `T` (from `T_nonI`)
@@ -239,7 +239,7 @@ the `S'`-centralizer of any `x ∈ K^#`: `data.W₂` by the `centralizer_W1` fie
 BG Theorem A(5) (`typeP_derivedInG_inf_centralizer_kappaElement_eq` with the pairing
 `mp.Kstar_eq`). -/
 theorem section16_S_typePData_W2_eq [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPair G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPairCore G}
     (dataS : TypePData mp.S) (hSW1 : dataS.W1 = mp.K) :
     dataS.W2 = mp.Kstar := by
   have hKne : mp.K ≠ ⊥ := fun hbot =>
@@ -262,7 +262,7 @@ via `Sdata_W1_eq`/`Sdata_W2_eq` + `W1_eq_K_and_W2_eq_Kstar`, and transfer to any
 `TypesIIIIIIVSetup` datum equal to it.)  This is the `hW` input of the per-index σ-grid
 identification (`ticyclic_sigma_omega_eq_of_V_eq`). -/
 theorem section16_pair_tic_W_eq [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPair G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPairCore G}
     (hodd : Odd (Nat.card G))
     {dataS : TypePData mp.S} (hSW1 : dataS.W1 = mp.K) (hSW2 : dataS.W2 = mp.Kstar)
     (dataT : TypePData mp.T) (hTW1 : dataT.W1 = mp.Kstar) :
@@ -275,7 +275,7 @@ open scoped FiniteInduce in
 /-- **The canonical pair swaps the first factor**: the `S`-side `W₁` is the `T`-side `W₂`
 (both are the κ-Hall `mp.K` — Peterfalvi (8.8), the role swap of the pair). -/
 theorem section16_pair_tic_W1_eq_W2 [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPair G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPairCore G}
     (hodd : Odd (Nat.card G))
     {dataS : TypePData mp.S} (hSW1 : dataS.W1 = mp.K)
     (dataT : TypePData mp.T) (hTW1 : dataT.W1 = mp.Kstar) :
@@ -288,7 +288,7 @@ open scoped FiniteInduce in
 /-- **The canonical pair swaps the second factor**: the `S`-side `W₂` is the `T`-side `W₁`
 (both are the dual κ-Hall `mp.Kstar`). -/
 theorem section16_pair_tic_W2_eq_W1 [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPair G}
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPairCore G}
     (hodd : Odd (Nat.card G))
     {dataS : TypePData mp.S} (hSW2 : dataS.W2 = mp.Kstar)
     (dataT : TypePData mp.T) (hTW1 : dataT.W1 = mp.Kstar) :
@@ -303,7 +303,7 @@ give `TICyclicHypothesis`s with the *same* `V = W ∖ (K ∪ K*)` — the `W`-bl
 the role swap `W₁ ↔ W₂` (`S`-side `(K, K*)`, `T`-side `(K*, K)`), and `V` is
 swap-invariant (`ticyclic_V_eq_of_swap`). -/
 theorem section16_pair_tic_V_eq [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPair G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPairCore G}
     (hodd : Odd (Nat.card G))
     {dataS : TypePData mp.S} (hSW1 : dataS.W1 = mp.K) (hSW2 : dataS.W2 = mp.Kstar)
     (dataT : TypePData mp.T) (hTW1 : dataT.W1 = mp.Kstar) :
@@ -320,7 +320,7 @@ the (8.8) pair): the `S`-side and `T`-side §10 → §5 bridges share `V`, so th
 maps agree on supported class functions with equal `V`-values
 (`ticyclic_toDadeMap_eq_of_V_eq` at `section16_pair_tic_V_eq`). -/
 theorem section16_pair_toDadeMap_eq [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPair G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPairCore G}
     (hodd : Odd (Nat.card G))
     {dataS : TypePData mp.S} (hSW1 : dataS.W1 = mp.K) (hSW2 : dataS.W2 = mp.Kstar)
     (dataT : TypePData mp.T) (hTW1 : dataT.W1 = mp.Kstar)
@@ -351,7 +351,7 @@ that agree on the shared `V`.  Combined with the (3.5) grid description
 (`exists_alignedOmegaSigmaGrid_chiFam_family`) this is the cast-free entry point for the
 `S`-grid = `M`-grid transpose of the (10.7) pair-witness route. -/
 theorem section16_pair_sigma_eq [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPair G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPairCore G}
     (hodd : Odd (Nat.card G))
     {dataS : TypePData mp.S} (hSW1 : dataS.W1 = mp.K) (hSW2 : dataS.W2 = mp.Kstar)
     (dataT : TypePData mp.T) (hTW1 : dataT.W1 = mp.Kstar)
@@ -387,7 +387,7 @@ this pins the grid vectors themselves — the (3.5)-determination
 (`section16_pair_tic_V_eq`).  This is the index-by-index translation between the two
 σ-grids of the (10.7) pair-witness route. -/
 theorem section16_pair_sigma_omega_eq [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPair G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPairCore G}
     (hodd : Odd (Nat.card G))
     {dataS : TypePData mp.S} (hSW1 : dataS.W1 = mp.K) (hSW2 : dataS.W2 = mp.Kstar)
     (dataT : TypePData mp.T) (hTW1 : dataT.W1 = mp.Kstar)
@@ -416,7 +416,7 @@ bridge, `ticVdiff_typeIIHypothesis46_eq`) — equals the full `T`-grid row at th
 index.  Pair instance of `ticyclic_chiFam_columnSum_transpose` over the shared `V`/`W` and
 the role swap. -/
 theorem section16_pair_chiFam_columnSum_transpose [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPair G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPairCore G}
     (hodd : Odd (Nat.card G))
     {dataS : TypePData mp.S} (hSW1 : dataS.W1 = mp.K) (hSW2 : dataS.W2 = mp.Kstar)
     (dataT : TypePData mp.T) (hTW1 : dataT.W1 = mp.Kstar)
@@ -449,7 +449,7 @@ roles read from the `T`-side (the swap equalities reversed).  This is what reduc
 `M`-side aligned-grid orthogonality claim ((5.3.b) `lam_ortho_grid`) to a pure `S`-side
 grid computation. -/
 theorem section16_pair_chiFam_transpose_T [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPair G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPairCore G}
     (hodd : Odd (Nat.card G))
     {dataS : TypePData mp.S} (hSW1 : dataS.W1 = mp.K) (hSW2 : dataS.W2 = mp.Kstar)
     (dataT : TypePData mp.T) (hTW1 : dataT.W1 = mp.Kstar)
@@ -885,7 +885,7 @@ theorem Hypothesis.exists_alignedOmegaSigmaGrid_row_sum_eq_chiFam_fiber [Finite 
 `mp.S_typeP2` (Peterfalvi (13.2.a)) through the BG type dictionary
 (`isTypeII_of_isTypeP2`, Proposition 16.1). -/
 theorem section16_S_isTypeII [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (mp : Section16MaximalPair G) :
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (mp : Section16MaximalPairCore G) :
     IsTypeII mp.S :=
   OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG mp.S_maximal mp.S_typeP2
 
@@ -903,7 +903,7 @@ Consumers either use the returned `IsTypeII mp.T` certificate symmetrically (the
 machinery of this file is `S`/`T`-symmetric through `exists_section16_partner_typePData`)
 or discharge it with `exists_conj_eq_S_of_isTypeII` below. -/
 theorem conj_eq_S_or_conj_eq_T_of_isTypeII [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (mp : Section16MaximalPair G)
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (mp : Section16MaximalPairCore G)
     {L : Subgroup G} (hL : L ∈ maximalSubgroups G) (hLII : IsTypeII L) :
     (∃ g : G, MulAut.conj g • L = mp.S) ∨
       ((∃ g : G, MulAut.conj g • L = mp.T) ∧ IsTypeII mp.T) := by
@@ -918,7 +918,7 @@ theorem conj_eq_S_or_conj_eq_T_of_isTypeII [Finite G]
 type II, every type-II maximal subgroup is conjugate to `mp.S` — the exact Lean form of the
 Coq branch kill (`FTtypeJ` + `notMtype2`). -/
 theorem exists_conj_eq_S_of_isTypeII [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (mp : Section16MaximalPair G)
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (mp : Section16MaximalPairCore G)
     (hT : ¬ IsTypeII mp.T)
     {L : Subgroup G} (hL : L ∈ maximalSubgroups G) (hLII : IsTypeII L) :
     ∃ g : G, MulAut.conj g • L = mp.S := by
@@ -940,12 +940,12 @@ Assembly: the seed Hall-ness is `typePData_W1_isHallSubgroup_kappa`, the non-`P�
 theorem Hypothesis.exists_seeded_pair_conj_typeII [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     {S : Subgroup G} (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) :
-    ∃ (mp : Section16MaximalPair G) (g : G),
+    ∃ (mp : Section16MaximalPairCore G) (g : G),
       mp.T = M ∧ mp.Kstar = hyp.typeP.W1 ∧ MulAut.conj g • S = mp.S := by
   have hP : OddOrder.BG.Ch4.S14.IsTypeP M := hyp.bgTypeP hG
   have hnotP2 : ¬ OddOrder.BG.Ch4.S14.IsTypeP2 M :=
     not_isTypeP2_of_isTypeIII_or_IV_or_V hG hyp.maximal hyp.type_alt
-  obtain ⟨mp, hT, hKstar⟩ := exists_section16MaximalPair_around hG hyp.maximal hP hnotP2
+  obtain ⟨mp, hT, hKstar⟩ := exists_section16MaximalPairCore_around hG hyp.maximal hP hnotP2
     hyp.typeP.W1_le (typePData_W1_isHallSubgroup_kappa hG hyp.maximal hP hyp.typeP)
   have hTnotII : ¬ IsTypeII mp.T := by
     rw [hT]
@@ -964,7 +964,7 @@ theorem exists_typesIIIIIIVSetup_Sdata [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPair G}
     (tp : Section16TypePStructure mp) :
     ∃ data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S, data.typeP = tp.Sdata := by
-  have hSII := section16_S_isTypeII hG mp
+  have hSII := section16_S_isTypeII hG mp.toSection16MaximalPairCore
   exact ⟨{ maximal := mp.S_maximal
            typeP := tp.Sdata
            nontrivial := hSII.some.common.transfer tp.Sdata
@@ -987,7 +987,7 @@ Chain: the (9.8) classification pins `ν` to a nontrivial column sum
 row (`exists_alignedOmegaSigmaGrid_row_sum_eq_chiFam_fiber`). -/
 theorem Hypothesis.exists_nu_extension_eq_alignedRow_at_pair [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    (hyp : Hypothesis M) {mp : Section16MaximalPair G}
+    (hyp : Hypothesis M) {mp : Section16MaximalPairCore G}
     (hT : mp.T = M) (hKstar : mp.Kstar = hyp.typeP.W1)
     {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S}
     (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar)
@@ -1087,7 +1087,7 @@ theorem exists_reconciled_conj_typePData_S [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     {S : Subgroup G} (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S)
     (dataP : TypePData S) :
-    ∃ (mp : Section16MaximalPair G) (u : G) (dataS : TypePData mp.S),
+    ∃ (mp : Section16MaximalPairCore G) (u : G) (dataS : TypePData mp.S),
       mp.T = M ∧ mp.Kstar = hyp.typeP.W1 ∧
       MulAut.conj u • S = mp.S ∧
       dataS.W1 = mp.K ∧ dataS.W2 = mp.Kstar ∧

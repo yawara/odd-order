@@ -432,3 +432,21 @@ independently of (10.7), is the **(7.8.b)-for-`(M,M')` `Hypothesis78` instance**
 `rhoNormSq_ge_lower` pattern ported to the type-`P` `M`, `H=M'`, `ν=coh.tau1`) — a real reusable §7 brick that
 proves `hA`'s lower-bound half — but it does not on its own discharge the estimate.  The estimate's closure is
 gated on (10.7) ⟹ the prime-TI-reducible apparatus (issue 2030 territory).
+
+## 2026-07-11 (lane a /loop、13 ticks) — ★★★★ (10.8) 無条件版 COMPLETE
+
+**`S12_Noncoherence.S_not_coherent_unconditional` = [propext, Classical.choice, Quot.sound]**
+(無条件・sorryAx ゼロ)。本 note の 2026-07-06 audit の「choke point = (10.7) → prime-TI 必須」
+は 9079 pair route + issue 1020 の 3 phase で完全 supersede:
+- hB: 被覆 (V-capture + Hall 共役 + Frobenius 捕捉) + union-bound 計数 + 支持制限
+  (Ã₀∩cop ⊆ Ã) + ℚ 算術を全て実証明 (g1_div_le_of_partner)。
+- (13.2.a) 論理循環 ((10.8)→(10.7)→13.2.a→(10.10)→(10.8)) を発見し、
+  Section16MaximalPairCore split で切断 → (10.7)' も axiom-clean 化。
+- 供給組立 = M-seeded Core pair + reconcile + K = W₂ 同定 + (8.11)[本日閉鎖]。
+正本 = issue 1020。旧 S_not_coherent/estimate/hB-sorry は superseded (警告注記済)、
+consumer migration が残 (1020 cascade)。
+
+**次の genuine frontier (この cluster)**: `typeV_forces_coherence` (S12_MaximalIII_IV_V、
+bare sorry) = (10.10.1)-(10.10.4) の §6-trichotomy ((6.8)/(5.7)/(6.5.c) + (8.7) cases)。
+S14 の (12.6) assembly (frobenius_typeI_coherent_of_cyclicQuotient 系、sorry-free) が
+type-I 側の同型 template。
