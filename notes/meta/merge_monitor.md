@@ -292,6 +292,13 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > 同型 = 内容で割当)。根拠: 新 leaf (b の `S15_SAndT` を編集せず `honestTypeP2ASet` (b の
 > `S15_SAndT_Setup:552`) を cite して拡張)、b は S15 を触っていない (衝突なし)。⟹ step 1.5 で c が
 > S15_HonestTypeP2A0 を編集しても逸脱でない (b が編集したら逸脱)。
+> **⟹ 相互 carve-out 追記 (hub 裁定 2026-07-11 監視 tick)**: 上記「b が編集したら逸脱」を
+> **def-層 (語彙) に限り緩和**する。b は自所有 `S15.Hypothesis` carrier の field 追加に必要な
+> **上流語彙 def の移設・機械的追従** (実例 = `honestTypeP2A0Set` を SubcoherenceInputs へ移設、
+> def 本体は namespace 修飾以外不変、iter32-34 で self-flag) を行ってよい (🔩 + 9014 相互
+> carve-out と同型)。条件: (i) def/statement の意味不変、(ii) c の set-level facts・A0-Dade
+> content (theorem/lemma) には非接触、(iii) issue self-flag、(iv) build green。c の theorem 層は
+> 従来どおり c 専有 (b が触ったら逸脱)。移設後の def-層の恒久所有 = b (SubcoherenceInputs 内)。
 >
 > **✅ coordination 点 解決 = carve-out 拡張 #2 付与 (issue 9076 piece 4c-3, hub 裁定 2026-07-08 監視 tick)**:
 > 上記注記の「⚠ 将来 coordination 点 (`tauS_mu_row0_cross` の A0-Dade 化 statement 変更 = b territory、
