@@ -431,6 +431,319 @@ theorem typeII_sSet_member_diffsupp [Finite G]
 
 end DadeBase
 
+/-! ## Peterfalvi (8.16) ⇒ Hypothesis (4.6) for `(A(S), S)`: the `S`-side certain-type instance
+
+The (10.7) left branch runs the (5.7) engine over the reducible column family `R(ν)`
+(`S06.certainTypeR`), which consumes an `S06.Hypothesis46 (A(S)) S` — Peterfalvi's "(8.15):
+Hypothesis (4.6) holds with `L = S`, `K = S'`, `A = A(S)`, `A₀ = A₀(S)`, `H = S_F`" for the
+Type-II maximal `S`.  The `M`-side precedent (`Hypothesis.toHypothesis46`) receives its
+`A₀`-level Dade datum as a hoisted §10 field; here we *construct* it: Peterfalvi (8.16) claims
+`A₀(S) = A(S) ∪ V^S` is also a TI-subset, and the three-case extension of the landed `A(S)`
+argument proves it —
+
+* `(A, A)`: the landed `typeII_centralizerSupport_isTISubset`;
+* `(V^S, V^S)`: the (3.1)/(4.3.a) ambient TI property of `V` (`typePData_V_ti`, normalizer
+  bound `W ≤ S`);
+* mixed: **impossible** — `orderOf` separates the two parts.  `A(S) ⊆ (S')^#` consists of
+  `π(S')`-elements, while an exceptional `v ∈ V` has a nontrivial `W₁`-component whose order
+  is coprime to `|S'|` (the (4.2.a) Hall coprimality `typePData_W1_hall_coprime`), so
+  `orderOf v ∤ |S'|` (`typePV_orderOf_not_dvd_card_derived`); conjugation preserves orders.
+
+This mirrors the Coq `FTsupport0` definition (`BGsection16.v:194`), whose exceptional part is
+the *order-characterized* set `{x ∈ M | x` neither a `π(M')`- nor a `π(M')'`-element`}` —
+`FTsupp0_typeP` (`PFsection8.v:772`) identifies it with `V^M` for type-`P` maximals. -/
+
+section Hypothesis46Instance
+
+open OddOrder.BG.Ch3.S10
+
+/-- **Type-`P` exceptional elements have order outside `π(M')`**: for `v ∈ V = W − (W₁ ∪ W₂)`,
+`orderOf v ∤ |M'|`.
+
+Decompose `v = a·b` along the cyclic (hence abelian) `W = W₁ ⊔ W₂`.  If `orderOf v` divided
+`|M'|` it would be coprime to `w₁ = |W₁|` (the (4.2.a) Hall coprimality `hHall`), so
+`v ∈ ⟨v^{w₁}⟩` (the power map by a coprime exponent preserves the cyclic subgroup); but
+`v^{w₁} = a^{w₁}·b^{w₁} = b^{w₁} ∈ W₂` (Lagrange kills the `W₁`-component), forcing `v ∈ W₂` —
+contradicting `v ∉ W₁ ∪ W₂`.
+
+This is the conjugation-invariant separator between `A(S) ⊆ (S')^#` (whose elements are
+`π(S')`-elements) and the exceptional part `V^S` of `A₀(S)` in the (8.16) TI argument; it is
+the type-data form of the Coq `FTsupport0` order characterization (`BGsection16.v:194`). -/
+theorem typePV_orderOf_not_dvd_card_derived [Finite G] {M : Subgroup G} (data : TypePData M)
+    (hHall : Nat.Coprime (Nat.card ↥(derivedInG M)) (Nat.card ↥data.W1))
+    {v : G} (hv : v ∈ typePV M data) :
+    ¬ orderOf v ∣ Nat.card ↥(derivedInG M) := by
+  intro hdvd
+  simp only [typePV, Set.mem_sdiff, Set.mem_union, SetLike.mem_coe, not_or] at hv
+  obtain ⟨hvW, -, hvnW2⟩ := hv
+  -- decompose `v = a·b` along `W = W₁ ⊔ W₂` (the cyclic `W` is abelian)
+  haveI hcyc : IsCyclic ↥data.W := data.W_cyclic
+  letI : CommGroup ↥data.W := hcyc.commGroup
+  have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
+  have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
+  have hsup : data.W1.subgroupOf data.W ⊔ data.W2.subgroupOf data.W = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hW1le hW2le, ← data.W_eq, Subgroup.subgroupOf_self]
+  have hvmem : (⟨v, hvW⟩ : ↥data.W) ∈
+      data.W1.subgroupOf data.W ⊔ data.W2.subgroupOf data.W := by
+    rw [hsup]; exact Subgroup.mem_top _
+  rw [Subgroup.mem_sup] at hvmem
+  obtain ⟨a, ha, b, hb, hab⟩ := hvmem
+  have haW1 : ((a : ↥data.W) : G) ∈ data.W1 := Subgroup.mem_subgroupOf.mp ha
+  have hbW2 : ((b : ↥data.W) : G) ∈ data.W2 := Subgroup.mem_subgroupOf.mp hb
+  have habG : ((a : ↥data.W) : G) * ((b : ↥data.W) : G) = v := by
+    have := congrArg (Subtype.val) hab
+    simpa using this
+  -- `v^{w₁} = b^{w₁} ∈ W₂`: the `W₁`-part dies by Lagrange, the factors commute in `W`
+  set w₁ := Nat.card ↥data.W1 with hw₁def
+  have hcomm : Commute ((a : ↥data.W) : G) ((b : ↥data.W) : G) :=
+    OddOrder.Peterfalvi.S06.commute_of_mem_of_isCyclic data.W_cyclic (hW1le haW1) (hW2le hbW2)
+  have hapow : ((a : ↥data.W) : G) ^ w₁ = 1 := by
+    have h1 : (⟨((a : ↥data.W) : G), haW1⟩ : ↥data.W1) ^ w₁ = 1 := pow_card_eq_one'
+    have := congrArg (Subtype.val) h1
+    simpa using this
+  have hvpow : v ^ w₁ ∈ data.W2 := by
+    rw [← habG, hcomm.mul_pow, hapow, one_mul]
+    exact pow_mem hbW2 w₁
+  -- coprimality: `orderOf v` is coprime to `w₁`, so `⟨v^{w₁}⟩ = ⟨v⟩ ∋ v`
+  have hcop : (orderOf v).Coprime w₁ := hHall.coprime_dvd_left hdvd
+  have hord : orderOf (v ^ w₁) = orderOf v := by
+    rw [orderOf_pow, hcop.gcd_eq_one, Nat.div_one]
+  have hzle : Subgroup.zpowers (v ^ w₁) ≤ Subgroup.zpowers v :=
+    Subgroup.zpowers_le.mpr ((Subgroup.zpowers v).pow_mem (Subgroup.mem_zpowers v) w₁)
+  have hzeq : Subgroup.zpowers (v ^ w₁) = Subgroup.zpowers v :=
+    Subgroup.eq_of_le_of_card_ge hzle
+      (by rw [Nat.card_zpowers, Nat.card_zpowers, hord])
+  obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp (hzeq ▸ Subgroup.mem_zpowers v)
+  exact hvnW2 (hk ▸ zpow_mem hvpow k)
+
+/-- **Peterfalvi (8.16), TI part, for the full `A₀(S) = A(S) ∪ V^S`** of a Type-II maximal:
+the (8.10) enlarged support `A₀(S) = A(S) ∪ conjClassSetIn S V` is a TI-subset of `G` with
+normalizer bound `S`.
+
+Four cases for `a, g·a·g⁻¹ ∈ A₀(S)`: both in `A(S)` is the landed
+`typeII_centralizerSupport_isTISubset`; both in `V^S` reduces (conjugating the `S`-parts away)
+to the ambient (3.1) TI property `V ∩ V^h ≠ ∅ → h ∈ W` (`typePData_V_ti`) with `W ≤ S`; and
+the mixed cases are impossible because conjugation preserves element orders while `orderOf`
+separates `A(S)` from `V^S` (`typePV_orderOf_not_dvd_card_derived`). -/
+theorem typeII_A0_isTISubset [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) (data : TypePData S) :
+    OddOrder.GroupTheory.IsTISubset
+      (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)
+        ∪ conjClassSetIn S (typePV S data)) S := by
+  classical
+  have hP : OddOrder.BG.Ch4.S14.IsTypeP S :=
+    OddOrder.BG.Ch4.S16.isTypeP_of_isTypeNonI hG hSmax (Or.inl hSII)
+  have hHall := typePData_W1_hall_coprime hG hSmax hP data
+  have hWle : data.W ≤ S := typePData_W_le_self data
+  -- the order separator: `A(S)`-elements have order dividing `|S'|`, `V^S`-elements do not
+  have hAord : ∀ {x : G}, x ∈ centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S) →
+      orderOf x ∣ Nat.card ↥(derivedInG S) := by
+    intro x hx
+    have h1 := orderOf_dvd_natCard (⟨x, hx.1⟩ : ↥(derivedInG S))
+    rwa [← Subgroup.orderOf_coe] at h1
+  have hVord : ∀ {x : G}, x ∈ conjClassSetIn S (typePV S data) →
+      ¬ orderOf x ∣ Nat.card ↥(derivedInG S) := by
+    rintro x ⟨t, htV, h, -, rfl⟩
+    have hoeq : orderOf (h * t * h⁻¹) = orderOf t := by
+      have := orderOf_injective (MulAut.conj h).toMonoidHom (MulEquiv.injective _) t
+      simpa [MulAut.conj_apply] using this
+    rw [hoeq]
+    exact typePV_orderOf_not_dvd_card_derived data hHall htV
+  have horder : ∀ (g x : G), orderOf (g * x * g⁻¹) = orderOf x := by
+    intro g x
+    have := orderOf_injective (MulAut.conj g).toMonoidHom (MulEquiv.injective _) x
+    simpa [MulAut.conj_apply] using this
+  rintro g ⟨a, ha, hga⟩
+  rcases ha with haA | haV
+  · rcases hga with hgaA | hgaV
+    · -- `(A, A)`: the landed (8.16) `A(S)`-TI
+      exact typeII_centralizerSupport_isTISubset hG hSmax hSII g ⟨a, haA, hgaA⟩
+    · -- `(A, V^S)`: impossible by the order separator
+      exact absurd (horder g a ▸ hAord haA) (hVord hgaV)
+  · rcases hga with hgaA | hgaV
+    · -- `(V^S, A)`: impossible by the order separator
+      exact absurd (horder g a ▸ hAord hgaA) (hVord haV)
+    · -- `(V^S, V^S)`: the ambient (3.1) `V`-TI, then `W ≤ S`
+      obtain ⟨t, htV, s, hsS, rfl⟩ := haV
+      obtain ⟨t', ht'V, s', hs'S, heq⟩ := hgaV
+      have hconj : (s'⁻¹ * g * s) * t * (s'⁻¹ * g * s)⁻¹ = t' := by
+        have h3 : s' * ((s'⁻¹ * g * s) * t * (s'⁻¹ * g * s)⁻¹) * s'⁻¹
+            = s' * t' * s'⁻¹ := by
+          rw [heq]; group
+        exact mul_left_cancel (mul_right_cancel h3)
+      have hmemW : s'⁻¹ * g * s ∈ data.W :=
+        OddOrder.Peterfalvi.S10.typePData_V_ti data (s'⁻¹ * g * s)
+          ⟨t, htV, hconj ▸ ht'V⟩
+      have hgeq : g = s' * (s'⁻¹ * g * s) * s⁻¹ := by group
+      rw [hgeq]
+      exact S.mul_mem (S.mul_mem hs'S (hWle hmemW)) (S.inv_mem hsS)
+
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (8.16) ⇒ Hypothesis (2.2) for `(A₀(S), S)`, Type II**: the honest type-II Dade
+base on the *enlarged* support `A₀(S) = A(S) ∪ V^S`.  All (8.14) signalizers are trivial —
+`A₀(S)` is a TI-subset (`typeII_A0_isTISubset`) — so Hypothesis (2.2) is `of_isTISubset` with
+`H(a) = ⊥`.  This is the `dade0` datum of the `S`-side Hypothesis (4.6)
+(`typeIIHypothesis46`), over which the reducible-column `R`-family `S06.certainTypeR` and its
+Dade identities run. -/
+noncomputable def typeIIDadeHypothesis0 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) (data : TypePData S) :
+    OddOrder.Peterfalvi.S04.Hypothesis G
+      (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)
+        ∪ conjClassSetIn S (typePV S data)) S :=
+  OddOrder.Peterfalvi.S04.Hypothesis.of_isTISubset
+    (by
+      rintro y (hy | ⟨t, htV, h, -, rfl⟩)
+      · exact OddOrder.Peterfalvi.S04.mem_sharp.mpr ⟨Set.mem_univ _, hy.2.1⟩
+      · refine OddOrder.Peterfalvi.S04.mem_sharp.mpr ⟨Set.mem_univ _, fun h1 => htV.2 ?_⟩
+        have ht1 : t = 1 := by
+          have hteq : t = h⁻¹ * (h * t * h⁻¹) * h := by group
+          rw [hteq, h1]; group
+        exact (Set.mem_union _ _ _).mpr (Or.inl (by
+          rw [ht1]; exact SetLike.mem_coe.mpr data.W1.one_mem)))
+    (by
+      rintro y (hy | ⟨t, htV, h, hhS, rfl⟩)
+      · exact Subgroup.map_subtype_le _ hy.1
+      · exact S.mul_mem (S.mul_mem hhS (typePData_W_le_self data htV.1)) (S.inv_mem hhS))
+    (by
+      rintro l a (ha | ⟨t, htV, h, hhS, rfl⟩)
+      · exact Or.inl (centralizerSupport_sharpMsigma_conj_mem l.2 ha)
+      · exact Or.inr ⟨t, htV, (l : G) * h, S.mul_mem l.2 hhS, by group⟩)
+    (typeII_A0_isTISubset hG hSmax hSII data)
+
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (8.15) for Type II / the (10.7) sentence "Hypothesis (4.6) holds with `L = S`,
+`K = S'`, `A = A(S)`, `A₀ = A₀(S)`, `H = S_F`"**: a Type-II maximal subgroup `S` instantiates
+the §4/§6 Hypothesis (4.6) carrier `S06.Hypothesis46 (A(S)) S`, with the honest (8.10) support
+`A(S) = ⋃_{x∈S_σ^#} C_{S'}(x)^#`.
+
+Field sources (mirroring the `M`-side `Hypothesis.toHypothesis46`, but with every Dade datum
+*constructed* rather than hoisted):
+
+* the (4.2) structural part: `typePData_toS06Hypothesis` (Hall coprimality from
+  `typePData_W1_hall_coprime`, BG `IsTypeP` from `isTypeP_of_isTypeNonI`);
+* the `A`-side Dade datum: the landed (8.16) `typeIIDadeHypothesis`;
+* the ambient (3.1) TI-cyclic data (4.6.b): `typePData_toTICyclicHypothesis`, with the same
+  `subgroupOf`-vs-ambient matching as the `M`-side (`Subgroup.map_subgroupOf_eq_of_le`, `rfl`);
+* (4.6.c): `H := S_F` — the (10.7)/(8.15) choice for type II (`M`-side types III–V take
+  `H = K`); `W₂ ≤ S_F` and `S_F ≤ S'` are the `TypePData` fields, normality is
+  `S ≤ N_G(S_F)`;
+* (4.6.d): the covering `⋃_{h∈S_F^#} C_{S'}(h)^# ⊆ A(S)` holds *by definition* of the honest
+  `A(S)`: `S_F = S_σ` for type II (`maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II`), so
+  every such element carries an `S_σ^#`-witness;
+* (4.6.d)/(4.6.e): the `A₀`-side Dade datum and isometry are the (8.16) TI construction
+  `typeIIDadeHypothesis0` (with the trivial-signalizer `hconj`), on
+  `A(S) ∪ conjClassSetIn S V` — definitionally the required `A ∪ V^L` shape. -/
+noncomputable def typeIIHypothesis46 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) (data : TypePData S) :
+    OddOrder.Peterfalvi.S06.Hypothesis46
+      (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)) S :=
+  { toHypothesis := typePData_toS06Hypothesis data hG.odd
+      (typePData_W1_hall_coprime hG hSmax
+        (OddOrder.BG.Ch4.S16.isTypeP_of_isTypeNonI hG hSmax (Or.inl hSII)) data)
+    dade := typeIIDadeHypothesis hG hSmax hSII
+    tic := typePData_toTICyclicHypothesis data hG.odd
+    tic_W1 := (Subgroup.map_subgroupOf_eq_of_le data.W1_le).symm
+    tic_W2 := (Subgroup.map_subgroupOf_eq_of_le (typePData_W2_le_self data)).symm
+    tic_V := rfl
+    subH := data.H.subgroupOf S
+    subH_normal := by
+      refine (Subgroup.normal_subgroupOf_iff_le_normalizer
+        (data.H_le.trans (Subgroup.map_subtype_le _))).mpr ?_
+      rw [data.H_eq]
+      exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer S
+    W2_le_subH := Subgroup.comap_mono (data.W2_le.trans inf_le_left)
+    subH_le_K := Subgroup.comap_mono data.H_le
+    A_covers := by
+      intro hh hhH hhne x hx hxne
+      -- the witness `z = (hh : G) ∈ S_σ^#`: `S_F = S_σ` for type II
+      have hhσ : (hh : G) ∈ Msigma S := by
+        rw [← OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II
+          hG hSmax (Or.inr hSII), ← data.H_eq]
+        exact Subgroup.mem_subgroupOf.mp hhH
+      obtain ⟨hxC, hxK⟩ := Subgroup.mem_inf.mp hx
+      refine ⟨Subgroup.mem_subgroupOf.mp hxK, fun h1 => hxne (Subtype.ext h1),
+        (hh : G), (Set.mem_sdiff _).mpr ⟨SetLike.mem_coe.mpr hhσ,
+          fun he => hhne (Subtype.ext (Set.mem_singleton_iff.mp he))⟩, ?_⟩
+      rw [Subgroup.mem_centralizer_singleton_iff]
+      exact congrArg Subtype.val (Subgroup.mem_centralizer_singleton_iff.mp hxC)
+    dade0 := typeIIDadeHypothesis0 hG hSmax hSII data
+    tau := (typeIIDadeHypothesis0 hG hSmax hSII data).fullDadeIsometryData
+      (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl)) }
+
+open OddOrder.Peterfalvi.S11 in
+open scoped Classical FiniteInduce in
+/-- **World-bridge, `S`-side subset direction**: the §9 induced family `𝒮(Y)` of a
+Types-II/III/IV setup lands in the §6/§8 kernel-filtered family
+`S(Y) = inducedKernelFamily S' (Y ∩ S)`.  Both families induce from `HU = S'`
+(`huSub_eq_derivedInG_subgroupOf`), and the `H ⊄ Ker` condition of `xiSet` supplies the
+`θ ≠ 1` of `inducedKernelFamily`.
+
+Setup-generic mirror of the `S13.Hypothesis`-locked `sOf_subset_SOf` (S13 is downstream of
+this leaf, so it cannot be cited here; dedup candidate on a future upstream hoist).  Feeds the
+`(9.8)` reducible classification and the `inducedKernelFamily_*` support/orthogonality/no-real
+facts to the (10.7) `T2`-family. -/
+theorem typeII_sOf_subset_inducedKernelFamily [Finite G] {S : Subgroup G}
+    (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup S) (Y : Subgroup G) :
+    OddOrder.Peterfalvi.S11.sOf data Y ⊆
+      OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG S).subgroupOf S) (Y.subgroupOf S) := by
+  classical
+  have hHU : huSub data = (derivedInG S).subgroupOf S :=
+    huSub_eq_derivedInG_subgroupOf data
+  rintro _ ⟨χ, hχ, rfl⟩
+  rw [← hHU, OddOrder.Peterfalvi.S08.mem_inducedKernelFamily]
+  refine ⟨χ, ?_, hχ.2, induceHU_eq_induce data χ⟩
+  intro htriv
+  exact hχ.1 (by rw [htriv]; simp [OddOrder.Peterfalvi.S03.characterKernel])
+
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (9.8)-classification at the type-II `S`-side bridge family**: a *reducible*
+member of `inducedKernelFamily S' B` (any kernel filter `B`) is a nontrivial certain-type
+column sum `μ_j = columnSum χ₂` of the `S`-side Hypothesis (4.6) instance
+(`typeIIHypothesis46`).
+
+Setup-generic mirror of the `M`-side
+`Hypothesis.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum` (S12_HcBound), stopping at
+the raw column form (no `Fin w₂` re-indexing): the reducible source is a Clifford restriction
+`θ = χ_j = chiRestrict χ₂` (Peterfalvi (4.5.b), `induce_not_isIrreducible_iff`), the trivial
+column is excluded by the family's `θ ≠ 1` (`chiRestrict_one_eq_trivial`), and the (4.5.a)
+induction identity `induce_restrict_certainType_eq` rewrites `Ind_{S'}^S θ` as the column sum.
+This is the "`ν` is a column" input of the (10.7) reducible `R(ν)`-datum
+(`S06.certainTypeR`). -/
+theorem typeII_reducible_inducedKernelFamily_eq_columnSum [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) (data : TypePData S)
+    [NeZero (Nat.card (typeIIHypothesis46 hG hSmax hSII data).W1)]
+    {B : Subgroup ↥S} {ψ : ClassFunction ↥S ℂ}
+    (hψ : ψ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+      ((derivedInG S).subgroupOf S) B)
+    (hred : ¬ IsIrreducibleCharacter ψ) :
+    ∃ χ₂ : ((typeIIHypothesis46 hG hSmax hSII data).W2.subgroupOf
+        ((typeIIHypothesis46 hG hSmax hSII data).W1
+          ⊔ (typeIIHypothesis46 hG hSmax hSII data).W2)) →* ℂˣ,
+      χ₂ ≠ 1 ∧
+        ψ = OddOrder.Peterfalvi.S06.columnSum (typeIIHypothesis46 hG hSmax hSII data) χ₂ := by
+  classical
+  obtain ⟨θ, hθne, -, rfl⟩ := hψ
+  set h : OddOrder.Peterfalvi.S06.Hypothesis ↥S :=
+    (typeIIHypothesis46 hG hSmax hSII data).toHypothesis with hh
+  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  -- the reducible source is a §6 column `χ_j`
+  obtain ⟨χ₂', hχ₂'⟩ := (h.induce_not_isIrreducible_iff θ).mp hred
+  have hχ₂'ne : χ₂' ≠ 1 := by
+    rintro rfl
+    rw [h.chiRestrict_one_eq_trivial] at hχ₂'
+    exact hθne hχ₂'.symm
+  refine ⟨χ₂', hχ₂'ne, ?_⟩
+  rw [← hχ₂', h.coe_chiRestrict]
+  exact h.induce_restrict_certainType_eq χ₂'
+
+end Hypothesis46Instance
+
 /-! ## The (10.7) cross-isometry package -/
 
 /-- **Peterfalvi (10.7), left-branch cross-isometry data** for a Type-II maximal `S`

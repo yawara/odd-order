@@ -29,8 +29,20 @@
 |---|---|---|---|---|---|
 | **a** | `a` | `odd-order-a` | α **S12 (11.8) unique feitThompson sorry** + §7 on-path norm (2026-07-04 再々編) | `Peterfalvi/S(0[3-9]|1[0-3])*` + `FeitThompson.lean` (全体) | 1000 |
 | **b** | `b` | `odd-order-b` | β **§16 endgame char cascade = S15 (13.9)-(13.19)** (2026-07-04 再々編; §12 Dade は完遂・cite-only) | `Peterfalvi/{S15_SAndT_Setup, S15_SAndT}.lean` (c→b, 2026-07-04) + `S14_MaximalI.lean` + coherence file 群 + carve-out 0090/0096 | 2000 |
-| **c** | `c` | `odd-order-c` | γ **S16 非存在 + ♻ 2026-07-07 REACTIVATE (issue 0098 パッケージ 5 件)**: typeP_pair port (§8 新 shared leaf) / semilinear (9.7.b) field-model leaf / S-side βₛ bridge carve-out (S15_SAndT.lean:3616 BetaData 領域) / §14 Γ-bridge assembly / hcard2 verify | `Peterfalvi/S16_NonExistenceG.lean` + 構成的 Clifford (9002 完了) + carve-out: reconciled_typePData_T 残 field (S15_SAndT_Setup:4520/:4590) ・BetaData 領域 (S15_SAndT:3616) + 新 shared leaf (claim-before-build) | 3000 |
+| **c** | `c` | `odd-order-c` | γ 🤖 **codex 5.6 運用 (2026-07-10, issue 0105)** · **S16 非存在 + ♻ 2026-07-07 REACTIVATE (issue 0098 パッケージ 5 件)**: typeP_pair port (§8 新 shared leaf) / semilinear (9.7.b) field-model leaf / S-side βₛ bridge carve-out (S15_SAndT.lean:3616 BetaData 領域) / §14 Γ-bridge assembly / hcard2 verify | `Peterfalvi/S16_NonExistenceG.lean` + 構成的 Clifford (9002 完了) + carve-out: reconciled_typePData_T 残 field (S15_SAndT_Setup:4520/:4590) ・BetaData 領域 (S15_SAndT:3616) + 新 shared leaf (claim-before-build) | 3000 |
 | ~~**d**~~ | — | — | ⚰ **退役 (2026-07-07, ユーザー裁定)** — codex 運用 shared-infra レーン。worktree/branch 削除済 | — | — |
+
+> **🤖 lane c = codex 5.6 (GPT-5.6) 運用 (2026-07-10, ユーザー裁定, issue 0105)**: lane c の operator を
+> Claude から codex 5.6 に切替 (trial)。**所有・issue base (3000)・合流ゲートは不変** (build green /
+> AxiomsCheck / sorry regression / 範囲逸脱チェックはモデル非依存)。handoff・kickoff prompt の正本 =
+> [`lane_c_codex_handoff_2026_07_10.md`](lane_c_codex_handoff_2026_07_10.md)。旧 lane d 再活性化トリガー (i)
+> 「S-side landing → T-side mirror」は 8ff313b1 で成立したが、d 再作成でなく c の operator 切替で対応
+> (T-side mirror = c territory)。**hub 追加チェック (最初の ~5 tick 重点)**: c の合流 tick で
+> `git diff main...c -- '*.lean' | grep -E '^\+\s*(theorem|lemma|def) '` の新規宣言に対し既存 API との
+> dup を spot-grep (旧 lane d の失敗モード = 既存 S01/GroupTheory 補題の複製 churn)。**dup 主体の tick は
+> merge せず abort** + issue 0105 に記録 + notes/issue で c に de-dup (cite 置換) を差し戻す — これは
+> ⛔ STOP でなく**通常継続** (ループは止めない、ユーザー escalation 不要)。数 tick (~2 日) で
+> keep / swap-back を hub が裁定 (評価軸 = genuine landing、sorry 数でない)。裁定は issue 0105 に記録。
 
 > **⚰ 2026-07-07 — lane d (codex) 退役 (ユーザー裁定)**: 徹底調査で **FT frontier (Peterfalvi 72 + BG 15 実 sorry) に codex 単独で閉じられる genuine・on-path・非衝突・非gated な実 sorry は存在しない**と確定 (Peterfalvi=全て gated/深いchar/a-b-c衝突/偽/off-path; BG 非b分=AppD/AppE 全て consumer 0・unimported の off-path scaffold)。構造的理由: FT 残 frontier は深く密結合な char/local-analysis で「切り出せる mechanical leaf」がほぼ無く、codex に軽タスクを与えると dup relocation の churn に流れる (直近 2 tick = 計 14 補題が全て既存 S01 補題の複製、net-genuine 0)。⟹ 3 レーン (a/b/c) に集約。worktree `/home/ywr/odd-order-d` + branch `d` 削除 (churn は net-zero、reflog 復元可)。**♻ 再活性化トリガー (将来)**: (i) proven S-side の **T-side dual** (`V_inf_centralizer_Q_eq_bot` 等) の gate ((14.9) T-typeII 構造) が a/b で landing → codex が template を mirror; (ii) a/b/c が特定 group-theory helper を明示 pull-request。いずれか発生時に `git worktree add /home/ywr/odd-order-d -b d` で再作成 (issue base 4000)。**⚠ ユーザーは codex の /loop セッションを停止すること** (worktree 消失後は codex が git エラーで空転)。
 

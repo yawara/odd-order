@@ -429,3 +429,10 @@ reusable) + `chiRho_nu_zeta0_apply_eq_zeta0_ofDade` (a=0 counting → c 係数 u
 h_const ✅ (psi_constant_on_xK、配線実証済) / h2e ✅ / hidx ✅ / hB ✅ (witness_L_zeta_bound、H78→dade.psi
 形変換要) / **残 = h_psig_int ((12.15) 前半 constancy on K−K′ + proven rhoM_integer_values) +
 hA ((12.15) ρM norm relation) + hC ((7.3)+(8.17))**。次 = 文書順で (12.15)。
+
+## HUB pointer (2026-07-10 監視 tick)
+
+issues/3004 の HUB RULING に **b 宛 work item 2 件**: 裁定 2 = S15_SAndT `TypeIOrthogonalityGridData`
+の (13.19) 忠実 restate (`betaL_eta_independent` は over-strong で除去要)、裁定 3 = V-side
+`exists_M_structural`/`complement_inf_P_structure` の無条件 index=pq を (13.17.c)-dual 二分岐へ
+weaken ((14.5) の除外論法は q<p 非対称で V-side に双対化できない)。詳細 = issues/3004 HUB RULING。
