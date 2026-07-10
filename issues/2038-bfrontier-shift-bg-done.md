@@ -1171,3 +1171,31 @@ tauS_mu_row0_vanish_on_V :896)。両 pin の engines (`residueS_mu2_diff_support
 同定; engines の結論を pin の hyp.mu 形へ transport するのに必要) + η/ω^σ-grid 同定 (V-value pin)。
 次 iter: (a) の signature 修正 + (b) の設計 (等式 field か、pin ごと residueS 形へ restate か —
 consumer tauS_mu_row0_cross の要求形を S15_SAndT:4020 で確認してから)。9080 step 1 はその後。
+
+## 📋 (2026-07-11、lane-b /loop iter 29) — 残 2 pins の設計確定 (consumer 精査)
+
+- **`tauS_mu_row0_cross` (S15_SAndT:1129、(13.18.c) cross-relation) は body 完全 proven** —
+  消費 = mu_row0_ne (✅ iter 28) + `tauS_mu_row0_diff_support` + `tauS_mu_row0_vanish_on_V`
+  (= S15_HonestTypeP2A0 の残 2 sorry) + eta_diff_rigidity (proven)。**pins 2/3 が閉じれば
+  (13.18.c) → gammaGrid_defGamma チェーンが閉じる**。docstring の「prTIirr_id 未 port」は stale
+  (iter 26 で否定済) — 実体は grounding 問題のみ。
+- consumer の pin 呼び出しは `tauS_mu_row0_diff_support j` / `tauS_mu_row0_vanish_on_V hG j x hx`
+  — j≠0 (`_hj`) は consumer 側に既在で signature 追加時に pass 可能 (9076 fix)。
+- **設計決定 (B: field-statement 方式)**: pins 2/3 は抽象 Hypothesis から under-determined
+  (mu が residue grid である linking が要る)。mu_orthonormal (iter 28) と同型に、pin 相当の
+  **property fields を S15.Hypothesis + 2 上位層に追加**し、producer (FT.lean cd-construction、
+  mu := muS = columnFamily.mu) で実証明 discharge → pin theorems は field 射影 + j≠0 修正。
+  - field 案: `mu_row_diff_support` (∀ i j k, j≠0 → k≠0 → 等次数 → (mu i j − mu i k).support ⊆
+    A₀-form) / `mu_diff_dade_vanish_on_V` (V-value 形は eta を含む — eta_definition (η=ω^τ) と
+    τ₃ regular-set 恒等 (tau3_apply_of_regular field) + certainTypeOmegaSigma の同定が producer
+    discharge の部品)。
+  - ⚠ producer 層の engine は **mp.certainTypeS** (Section16MaximalPair 由来) — S15_HonestTypeP2A0
+    の engines (residueS_mu2_diff_support 等) は **hyp.s06S/hyp46S** 由来で別 instance。producer
+    discharge は certainTypeS-level の S06 engines (`certainType_diff_supp_subset_A0` /
+    `certainType_diff_dade_apply_eq_of_mem_V`) を直接使う (support 側は producer の A₀-Dade と
+    hyp46S-A₀ の同定が必要 — ここが次 iter の精査点)。
+- 副 finding: lane-c 新 leaf `TGapPrimeTI.lean` (14.9 T-side) が S13_PrimeTIResidueBridge を
+  消費開始 — b の bridge が cross-lane で cite され始めた (良い信号、干渉なし)。
+
+次 iter: (1) producer 層の A₀-Dade/hyp46S 同定を精査 (FT.lean cd-construction の Dade 部品と
+honestTypeP2A0Set の対応)、(2) support field から実装 (V-value field は η 同定込みで後続)。
