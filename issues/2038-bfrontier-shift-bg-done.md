@@ -1249,3 +1249,28 @@ V-value pin (pin 3) は support field 完了後に同型で (η 同定込み)。
   3. consumer 配線: field `mu_row0_apply_one_eq`-形 or 直接 (2) を cite して
      tauS_mu_row0_diff_support / tauS_mu_row0_cross の hdeg discharge。
   4. V-value pin (pin 3) は 1-3 後に同型 (η/ω^σ 同定込み)。
+
+## ⚠📋 (2026-07-11、lane-b /loop iter 32) — support field の前提 blocker: def 再配置が要る
+
+producer 部品は全て確認済 (`tp.Sdata : TypePData mp.S` / `mp.S_maximal` / `mp.S_typeP2` 存在 →
+hyp46Smp copy 可)。しかし **field 文の語彙が不足**:
+- `honestTypeP2A0Set (M) (data)` の定義は **S15_HonestTypeP2A0.lean:47 (lane-c file)** —
+  SubcoherenceInputs (S15.Hypothesis の家) から参照不可 (import 逆方向)。
+- `honestTypeP2ASet (M)` は SubcoherenceInputs **:537 = structure (:74) より後方** — field から
+  前方参照不可 (b-owned なので structure 前へ移動は可)。
+- A₀ の V-part (`conjClassSetIn M (typePData_toTICyclicHypothesis data hodd).V`) は hodd 依存 —
+  S15.Hypothesis が hodd/odd_card field を持つか要確認。
+
+**解決案 (次 iter で選択・実施)**:
+- **案 X (推奨)**: `honestTypeP2ASet` を SubcoherenceInputs の structure 前へ移動 (b-owned、
+  同 file 内 reorder のみ) + `honestTypeP2A0Set` を **S15_HonestTypeP2A0 から SubcoherenceInputs
+  (structure 前) へ移設** (c file からの移設 = hub/c 調整 or 9000 issue で claim; 定義は
+  honestTypeP2ASet ∪ conjClass 形で軽量、下流 import 不変 [S15_HonestTypeP2A0 は Setup を import
+  済ゆえ再 export で無破壊])。その後 field 追加 (iter 30-31 の設計どおり)。
+- **案 Y**: field を諦め、pins 2/3 を **hG-引数付き theorem のまま S15_HonestTypeP2A0 内で
+  discharge** — hyp.mu と residueS.mu2 を結ぶには grounding が要る点は不変だが、mu_orthonormal
+  同様の「pin 専用の弱い field」(例: `mu_eq_certainType_grid : ∃ (同定 data), ...`) でなく、
+  **mu_definition (13.1.e) から mu を residue grid と同定する一意性定理** (Ind-差 = δ(μ-差) が
+  mu を列ごと anchor+順序まで pin する — mu_orthonormal + mu_definition + delta で mu = muS を
+  導出できるか) を精査。可能なら **field 追加ゼロ**で pins が閉じる (最も honest)。
+次 iter: 案 Y の一意性精査 (mu_definition の pin 力) を 30 分 → 不成立なら案 X 実施。
