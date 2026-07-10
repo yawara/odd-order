@@ -1913,4 +1913,59 @@ theorem mem_commutator_subgroupOf_iff {L H : Subgroup G} (hHL : H ≤ L)
     rw [← hcomm_H, Subgroup.mem_subgroupOf]
   rw [hstep1, hstep2, hcoe]
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.5)**: for `ψ ∈ CF(G)` orthogonal to the coherent images of the family
+(`⟨ψ, χ^ν⟩ = 0` for every `χ ∈ S`), the restriction of the `ρ`-image to `H` is **constant on
+`H − H′`** (elements of `H` outside the derived subgroup).
+
+Assembly of the proven pieces: the equal-degree coefficient equality
+`chiRhoCF_restrict_inner_eq_of_equal_degree` (`⟨θ₁, Res ρψ⟩ = ⟨θ₂, Res ρψ⟩` for equal-degree
+non-trivial `θᵢ`, star-flipped via `ClassFunction.inner_star_comm`), the Clifford (1.7.b) equal
+degree of the constituents over a fixed `λ ∈ Irr H′`
+(`commutator_induce_constituents_apply_one_eq`), the equal multiplicity
+(`inner_induce_constituent_eq_of_apply_one_eq`), and the `DpsiH` span core
+`constant_off_normal_of_inner_block_const` (`Res ρψ = Σ_λ a_λ Ind_{H′}^H λ + a·1_H`, each
+`Ind_{H′}^H λ` vanishing off `H′`). -/
+theorem chiRhoCF_restrict_constant_off_derived {L : Subgroup G} [Finite G]
+    (hyp : Hypothesis L)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1}) {ψ : ClassFunction G ℂ}
+    (horth : ∀ χ ∈ hyp.Sset, ClassFunction.inner ψ (coh.extension χ) = 0)
+    {x y : ↥((hyp.typeI.typeF.H).subgroupOf L)}
+    (hx : x ∉ commutator ↥((hyp.typeI.typeF.H).subgroupOf L))
+    (hy : y ∉ commutator ↥((hyp.typeI.typeF.H).subgroupOf L)) :
+    ClassFunction.restrict ((hyp.typeI.typeF.H).subgroupOf L)
+        (hyp.toHypothesis71.chiRhoCF ψ) x
+      = ClassFunction.restrict ((hyp.typeI.typeF.H).subgroupOf L)
+        (hyp.toHypothesis71.chiRhoCF ψ) y := by
+  haveI := hyp.finiteG
+  classical
+  set Hc := ((hyp.typeI.typeF.H).subgroupOf L) with hHc
+  set g : ClassFunction ↥Hc ℂ :=
+    ClassFunction.restrict Hc (hyp.toHypothesis71.chiRhoCF ψ) with hg
+  haveI : Fintype ↥(commutator ↥Hc) := Fintype.ofFinite _
+  haveI : Invertible (Nat.card ↥(commutator ↥Hc) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : Fintype (IrreducibleCharacter ↥Hc) := Fintype.ofFinite _
+  refine OddOrder.RepresentationTheory.constant_off_normal_of_inner_block_const g
+    (fun θ₁ θ₂ ρ hθ₁t hθ₂t hlo₁ hlo₂ => ?_) (fun θ₁ θ₂ ρ hlo₁ hlo₂ => ?_) hx hy
+  · -- Block-constant coefficients on the non-trivial constituents.
+    have hdegθ : (θ₁ : ClassFunction ↥Hc ℂ) 1 = (θ₂ : ClassFunction ↥Hc ℂ) 1 :=
+      OddOrder.RepresentationTheory.commutator_induce_constituents_apply_one_eq ρ θ₁ θ₂ hlo₁ hlo₂
+    have hχ₁ : ClassFunction.induce Hc (θ₁ : ClassFunction ↥Hc ℂ) ∈ hyp.Sset := ⟨θ₁, hθ₁t, rfl⟩
+    have hχ₂ : ClassFunction.induce Hc (θ₂ : ClassFunction ↥Hc ℂ) ∈ hyp.Sset := ⟨θ₂, hθ₂t, rfl⟩
+    have hdegχ : ClassFunction.induce Hc (θ₁ : ClassFunction ↥Hc ℂ) (1 : ↥L)
+        = ClassFunction.induce Hc (θ₂ : ClassFunction ↥Hc ℂ) (1 : ↥L) := by
+      rw [ClassFunction.induce_apply_one, ClassFunction.induce_apply_one, hdegθ]
+    have h := chiRhoCF_restrict_inner_eq_of_equal_degree hyp coh hχ₁ hχ₂ hdegχ hAH
+      (horth _ hχ₁) (horth _ hχ₂) rfl rfl
+    rw [ClassFunction.inner_star_comm g (θ₁ : ClassFunction ↥Hc ℂ),
+      ClassFunction.inner_star_comm g (θ₂ : ClassFunction ↥Hc ℂ), h]
+  · -- Block-constant multiplicities.
+    have hdegθ : (θ₁ : ClassFunction ↥Hc ℂ) 1 = (θ₂ : ClassFunction ↥Hc ℂ) 1 :=
+      OddOrder.RepresentationTheory.commutator_induce_constituents_apply_one_eq ρ θ₁ θ₂ hlo₁ hlo₂
+    exact OddOrder.RepresentationTheory.inner_induce_constituent_eq_of_apply_one_eq
+      hlo₁ hlo₂ hdegθ
+
 end OddOrder.Peterfalvi.S14
+
