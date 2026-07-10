@@ -378,3 +378,33 @@ witness_L_zeta_bound (hB、既 proven) と同じ供給ライン。
 
 working tree: S09_CertificateDischarge.lean に WIP (clear_value 版、build 赤)。
 original snapshot = scratchpad/S09_CertificateDischarge.lean.bak。
+
+## ✅✅ (2026-07-10、lane-b 再開) — whnf-wall 突破、`chiRho_nu_zeta0_apply_eq_zeta0_ofDade` 完全 proven
+
+休止前 snapshot の whnf-wall を **root-cause 特定して解決** (S09_CertificateDischarge sorry 0 維持)。
+
+**診断経過** (試行 (b)+(c) 複合で決着):
+1. `@` 全明示適用 (instance synthesis / HO unification 排除) → **依然爆発** → 犯人は synthesis でない。
+2. `set_option diagnostics true` → **`Subgroup.toSubmonoid ↦ 1,982,312 unfold** / SetLike.coe 116k /
+   Cardinal.mk→Quotient.mk 9.7k` — defeq が `↥(H.subgroupOf L)` の membership/instance 実装比較に降下。
+3. 最終 application を軽量 wrapper `chiRho_apply_eq_zeta0_sharp` (hc を仮説に取る、ofDade context 無し)
+   に分離 → **wrapper 単体はデフォルト 200k で green** → K 具体項自体は無罪、重い context との相互作用。
+4. wrapper 呼び出しでも χ 明示書き下しでは爆発 → **真犯人 = exact 内に新規書き下した χ 項
+   `ν (induce …)` の再 elaboration が、statement elaboration と instance 実装レベルで異なる Expr を生成**
+   し、goal との defeq が instance 項の中身比較 (Subgroup.toSubmonoid の海) へ降下。
+5. **χ を `_` にして goal からの unification で同一 Expr を拾わせる → 即 green** (800k 内)。
+
+**landed 形**: `chiRho_apply_eq_zeta0_sharp` (sharp-support 幾何 discharge 済の isolation wrapper、
+reusable) + `chiRho_nu_zeta0_apply_eq_zeta0_ofDade` (a=0 counting → c 係数 uniform 化 → two-sided
+(7.7.a) evaluation、ψ^ρ(x) = ζ₀(x) on A)。**(12.14) の evaluation 本体が ofDade 実現形で完結**。
+
+**残 wire (次)**: (iii) hconst (witness Dade datum の H(x)=R(x)⊆K + proven `psi_constant_on_xK`) で
+ρ-collapse `chiRho_apply_eq_of_forall_coset` → ψ(x) = ψ^ρ(x) = ζ₀(x)、(iv) S14 witness 文脈
+(`witness_psi_degree` / `witness_value_norm_package` h_psix) への配線。
+
+## HUB pointer (2026-07-10 監視 tick)
+
+issues/3004 の HUB RULING に **b 宛 work item 2 件**: 裁定 2 = S15_SAndT `TypeIOrthogonalityGridData`
+の (13.19) 忠実 restate (`betaL_eta_independent` は over-strong で除去要)、裁定 3 = V-side
+`exists_M_structural`/`complement_inf_P_structure` の無条件 index=pq を (13.17.c)-dual 二分岐へ
+weaken ((14.5) の除外論法は q<p 非対称で V-side に双対化できない)。詳細 = issues/3004 HUB RULING。

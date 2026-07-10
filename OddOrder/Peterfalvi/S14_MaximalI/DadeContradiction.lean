@@ -842,6 +842,126 @@ theorem Hypothesis.typeIA_eq_sharp [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
     rw [fdata.typeI.typeF.H_eq, hyp.typeI.typeF.H_eq]
   exact hyp.typeIA_eq_sharp_of_frobenius (hKf ▸ fdata.frobenius)
 
+/-- The witness `x` lies in `L` (via `x ∈ P₀ ⊆ L_F ≤ L`, Peterfalvi (12.10)). -/
+theorem witness_x_mem_L [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
+    data.x ∈ data.L :=
+  OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le data.L
+    (witness_P0_le_kernel hG data data.x_mem_P0)
+
+/-- The witness `x` lies in the type-I support `A(L) = L_F^#` (Peterfalvi (12.1)/(12.10)):
+`x ∈ P₀ ⊆ L_F = typeF.H` and `x ≠ 1`. -/
+theorem witness_x_mem_typeIA [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
+    (hyp : Hypothesis data.L) :
+    data.x ∈ OddOrder.GroupTheory.typeIA data.L hyp.typeI := by
+  rw [Hypothesis.typeIA_eq_sharp hG hyp]
+  refine Set.mem_diff_of_mem ?_ (by simpa using data.x_ne_one)
+  rw [SetLike.mem_coe, hyp.typeI.typeF.H_eq]
+  exact witness_P0_le_kernel hG data data.x_mem_P0
+
+/-- **The witness maximal pin `𝓜(C_G(x)) = {M}`** (Peterfalvi (12.9)/(12.14), the `N[x] = M`
+identification).  The witness `x ∈ Ω₁(P₀)^# ⊆ L_F = L_σ` is a `σ`-sharp element of `L` escaping
+`L` (`C_G(x) ⊄ L`, (12.9)), so the BG Theorem-D singleton
+(`maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape`) pins a unique
+maximal over `C_G(x)`; it is `M` because `C_G(x) ≤ N_G(⟨x⟩) ≤ M` ((12.9)). -/
+theorem witness_maximalContaining_centralizer_eq_singleton [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
+    OddOrder.GroupTheory.maximalSubgroupsContaining
+      (Subgroup.centralizer ({data.x} : Set G)) = {ctr.M} := by
+  classical
+  have hLtypeI : IsTypeI data.L := witness_L_isTypeI hG data
+  have hLF_eq : maxNilpotentNormalHall data.L = OddOrder.BG.Ch3.S10.Msigma data.L :=
+    (OddOrder.BG.Ch4.S16.proposition_type_classification hG data.L_maximal).2.2.2.2.2.mpr
+      (Or.inl hLtypeI)
+  have hxσ : data.x ∈ OddOrder.BG.Ch4.S14.sigmaSharp data.L :=
+    ⟨hLF_eq ▸ witness_P0_le_kernel hG data data.x_mem_P0, by simpa using data.x_ne_one⟩
+  have hCM : Subgroup.centralizer ({data.x} : Set G) ≤ ctr.M := by
+    refine le_trans ?_ data.normalizer_closure_x_le_M
+    rw [← Subgroup.centralizer_closure]
+    exact Subgroup.centralizer_le_normalizer _
+  obtain ⟨N₀, hN₀⟩ :=
+    OddOrder.BG.Ch4.S16.maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape
+      hG data.L_maximal hxσ data.centralizer_x_not_le_L
+  have hMN₀ : ctr.M = N₀ := by
+    have hMin : ctr.M ∈ OddOrder.GroupTheory.maximalSubgroupsContaining
+        (Subgroup.centralizer ({data.x} : Set G)) := ⟨ctr.M_maximal, hCM⟩
+    rw [hN₀] at hMin
+    exact hMin
+  rw [hN₀, hMN₀]
+
+/-- **Peterfalvi (12.14), `R(x) = C_K(x) ⊆ K`** (Definition (8.14) at the witness): the faithful
+Dade kernel of the witness `x` lands in `K = M_F`.  On the escaping branch the kernel is
+`R(x) = (N[x])_σ ⊓ C_G(x)` with `N[x] = M` (the singleton pin
+`witness_maximalContaining_centralizer_eq_singleton`) and `M_σ = M_F = K` for the type-I
+counterexample (`MF_eq_Msigma`); the non-escaping branch is `⊥`.  Stated for an arbitrary
+support set `A` (the escaping branch does not depend on it). -/
+theorem witness_ftSupportKernel_le_K [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
+    {A : Set G} :
+    OddOrder.Peterfalvi.S10.ftSupportKernel data.L A data.x ≤ ctr.K := by
+  classical
+  by_cases hesc : data.x ∈ OddOrder.GroupTheory.escapingCentralizerSet data.L A
+  · rw [OddOrder.Peterfalvi.S10.ftSupportKernel_eq_of_escaping hesc]
+    -- The branch condition of `FT_signalizerBase`: `1 < |𝓜_σ(x)|` and `𝓜(C_G(x)) ≠ ∅`.
+    have hLtypeI : IsTypeI data.L := witness_L_isTypeI hG data
+    have hLF_eq : maxNilpotentNormalHall data.L = OddOrder.BG.Ch3.S10.Msigma data.L :=
+      (OddOrder.BG.Ch4.S16.proposition_type_classification hG data.L_maximal).2.2.2.2.2.mpr
+        (Or.inl hLtypeI)
+    have hxLσ : data.x ∈ OddOrder.BG.Ch3.S10.Msigma data.L :=
+      hLF_eq ▸ witness_P0_le_kernel hG data data.x_mem_P0
+    have hsing := witness_maximalContaining_centralizer_eq_singleton hG data
+    have hgt : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement data.x).ncard := by
+      by_contra h
+      push Not at h
+      exact data.centralizer_x_not_le_L
+        (OddOrder.BG.Ch4.S16.centralizer_le_of_maximalSigma_le_one hG data.L_maximal hxLσ
+          data.x_ne_one h)
+    have hne : (OddOrder.GroupTheory.maximalSubgroupsContaining
+        (Subgroup.centralizer ({data.x} : Set G))).Nonempty := by
+      rw [hsing]
+      exact ⟨ctr.M, rfl⟩
+    have hcond : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement data.x).ncard ∧
+        (OddOrder.GroupTheory.maximalSubgroupsContaining
+          (Subgroup.centralizer ({data.x} : Set G))).Nonempty := ⟨hgt, hne⟩
+    -- `N[x] = M`: the chosen member of the singleton `𝓜(C_G(x)) = {M}`.
+    have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase data.x = hcond.2.choose := dif_pos hcond
+    have hch : hcond.2.choose ∈ ({ctr.M} : Set (Subgroup G)) :=
+      (Set.ext_iff.mp hsing _).mp hcond.2.choose_spec
+    have hbase : OddOrder.BG.Ch4.S16.FT_signalizerBase data.x = ctr.M :=
+      hb.trans (Set.mem_singleton_iff.mp hch)
+    calc OddOrder.BG.Ch4.S16.FT_signalizer data.x
+        ≤ OddOrder.BG.Ch3.S10.Msigma (OddOrder.BG.Ch4.S16.FT_signalizerBase data.x) :=
+          inf_le_left
+      _ = ctr.K := by rw [hbase, ← MF_eq_Msigma hG ctr]
+  · rw [OddOrder.Peterfalvi.S10.ftSupportKernel_eq_bot_of_not_escaping hesc]
+    exact bot_le
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.14), the `ψ^ρ(x) = ψ(x)` collapse**: any `χ ∈ CF(G)` constant on the coset
+`x·K` (e.g. `ψ = dade.psi`, via `psi_constant_on_xK`) has `ρ`-average at the witness `x` equal to
+its value: `χ^ρ(x) = χ(x)`.  The local Dade kernel is `H(x) = R(x) ⊆ K`
+(`H_eq_ftSupportKernel` + `witness_ftSupportKernel_le_K`), so the `x·K`-constancy restricts to
+the `H(x)`-coset and the `ρ`-average collapses (`chiRho_apply_eq_of_forall_coset`). -/
+theorem witness_chiRho_apply_eq_of_forall_K [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
+    (hyp : Hypothesis data.L) (χ : ClassFunction G ℂ)
+    (hconst : ∀ g : G, g ∈ ctr.K → χ (data.x * g) = χ data.x)
+    (hxL : data.x ∈ data.L) :
+    hyp.toHypothesis71.chiRho χ ⟨data.x, hxL⟩ = χ data.x := by
+  have hxA : ((⟨data.x, hxL⟩ : ↥data.L) : G) ∈ OddOrder.GroupTheory.typeIA data.L hyp.typeI :=
+    witness_x_mem_typeIA hG data hyp
+  refine OddOrder.Peterfalvi.S09.Hypothesis71.chiRho_apply_eq_of_forall_coset
+    hyp.toHypothesis71 χ hxA ?_
+  intro y hy
+  refine hconst y (witness_ftSupportKernel_le_K hG data
+    (A := OddOrder.GroupTheory.typeIA data.L hyp.typeI) ?_)
+  rw [← hyp.dadeData.H_eq_ftSupportKernel ⟨data.x, hxA⟩]
+  exact hy
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 open OddOrder.Peterfalvi.S09.Cert in
 /-- **Peterfalvi (7.8)/(12.16), the witness `Hypothesis78`**: the second maximal subgroup `L` of
