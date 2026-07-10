@@ -375,3 +375,29 @@ feature commit: `ee09b1cb`。
   これら上流 gate の解消を主張しない。
 - `TTypeII` / `KeyInequality` leaf build green、AxiomsCheck 4128-job green、
   `git diff --check` clean。新 axiom・新 sorry なし (`TTypeII` の local sorry は 1 件減)。
+
+## lane-c T-side (14.9) `nzT1_Ga` parity core 抽出 (2026-07-11)
+
+feature commit: `16af4562`。
+
+- Peterfalvi 原文 (14.9) と Coq `PFsection14.v:770--830` を独立に再照合し、
+  `⟨Γ,τ₁ζ⟩ = 1 + ⟨Δ,Γ⟩` と real virtual characters の parity が
+  nonzero coefficient を与えることを確認した。
+- axiom-clean な `gap_coefficients_nonzero_of_delta_parity` を実証明。virtuality から整数係数を
+  抽出し、`cfdot_real_vchar_even` と両 principal coefficient の消滅から偶数 `m` を得て、
+  係数 `1+m` が非零であるところまで完全に閉じた。AxiomsCheck に登録済み。
+- concrete `GammaGrid ∈ ZIrr G` は
+  `betaGrid = Ind_{PW₁}^S 1 - μ_{0,1}`、`betaGrid_A0_support`、Dade map の
+  `ZIrr` 保存、trivial/`eta` の virtuality から構成。さらに
+  `BetaData.Gamma_real` / `Gamma_orthogonal_one` と coherent extension の
+  `extension_mem_ZIrr` を `T_typeIII_ratio_le` へ実配線した。
+- local `sorry` の総数は不変だが、旧「整数非零係数一式」の opaque residual を除去し、
+  各 `a = τ₁ζ` に対する
+  `Δ_a = τ_T(ν₀-ζ)-1_G+a` の virtuality / realness / principal orthogonality と
+  `⟨Γ,a⟩ = 1 + ⟨Δ_a,Γ⟩` の構成だけへ正確に縮小した。
+- upstream gate は開示済み: `GammaGrid` virtuality は既存
+  `S15.betaGrid_A0_support` に推移依存し、残る `Δ_a` は T-side prime-TI/`ν₀`
+  grounding と Dade cross relation を要する。これらを閉じたとは主張しない。
+- commit 前に main `e880a0a5` まで同期し `HEAD..main = 0`。
+  同期後 `TTypeII` + AxiomsCheck 4128-job build green、`git diff --check` clean。
+  新 axiom・新 sorry なし。
