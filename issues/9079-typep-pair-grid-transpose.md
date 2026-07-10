@@ -576,3 +576,29 @@ honest 経路 (Coq PFsection10:563-576 + PFsection8 FT_Dade_support_disjoint):
 - (c) aux 差し替え: WLOG entry (exists_seeded_pair_conj_typeII) + setup 組立 + producer 接続 +
   結論 Frobenius conj 転送。producer の hζ1 は (10.2) ζ-構成 (exists_zeta_in_inducedFamily_
   degree_w1) から供給。
+
+## 2026-07-10 loop 続報: (8.18.b) の段階的実証明化 — 残 2 点の §8 instance に narrowing
+
+3 commit (c0c58ee4 → 42cb3909 → 5d3c1188) で opaque だった (8.18.b) sorry を分解:
+
+1. **oST character plumbing 実証明** (c0c58ee4): 支持制限 Dade 抽出
+   (`IsDadeMap.exists_base_of_map_apply_ne_zero`) ×2 + S-side H≡⊥ + disjoint-support
+   内積消滅 → 共役幾何 `typeP_pair_base_not_isConj` に還元。
+2. **thickening 還元実証明** (42cb3909): h ∈ H(a) は (2.2) で a と可換・互いに素位数 →
+   CRT で a = (a·h)^k → b^k が再び A(S)-点 → bare case へ。
+3. **bare-case landing analysis 実証明** (5d3c1188、Coq part_a2):
+   b は (κ∪σ)′(S)-元 (κ: S′ = W₁-complement / σ: (P1)) → BG 15.1(c)
+   `uniqueMaximal_of_kappaSigmaCompl_element` (**type-generic と判明**、
+   hall_E_exists で κσ′-Hall は type-data 不要) → ℳ(C(b)) = {S} →
+   C(a) ≤ M 枝は mp.S_T_not_conj (pair field!) で kill / 脱出枝は (S2) へ。
+
+### 残 = §8 instance 2 点 (いずれも忠実 statement + 経路 docstring 済)
+- **(P1)** `typeP_pair_core_order_coprime`: Coprime |a| |Mσ(S)| for a ∈ (M′)^# —
+  (8.17.a) FTcore-π-partition (Coq FT_Dade_support_partition) の pair instance。
+  σ(M)-部は sigma_disjoint_of_nonconjugate (BG 13.9、証明済) で落ちるが、
+  M′ の U-部 ((κ∪σ)′(M)-primes) × σ(S) の排除が partition の本体。
+- **(S2)** `typeP_pair_escaping_centralizer_not_le_conj_partner`: M-脱出 A₀-点の
+  C(a) ≤ S^g → False — (8.13.b/c4) (Coq FTsupport_facts、BGsummaryII) +
+  typePF exclusion。上流 `escapingCentralizers_control` (S10:509) は既存 sorried。
+
+axioms: 全 chain の sorryAx はこの 2 点 (+既知上流) 経由のみ。
