@@ -47,6 +47,14 @@ trial の裁定 (codex 継続 or Claude へ swap-back) が本 issue に記録さ
   file:line 精密・dup なし (差分は issues/ のみ)。旧 lane d の失敗モード (dup churn) の兆候なし。
   評価素材として質・規律とも現時点で Claude レーンと遜色なし。次の観察点 = 裁定 1 の実装
   (実際の Lean restructure) の質。
+- 2026-07-10 (tick #6): **codex-c 2 回目 output = 裁定 1 の実装 landing (merge 2b6acd98)。質は高い。**
+  6 file / +479−239 の restructure を一発 build green で landing: (14.11) 結論 field 4 件除去、
+  b の landed dichotomy への乗り換え (不忠実 API を自主回避)、(14.11.1) strict gap と
+  (13.19.c) bound-枝排除の**実証明** (sorry-free の genuine math を含む)、Coq mirror の conditional
+  producer 化、AxiomsCheck 追従、gate map 文書化まで自己完結。dup なし・新 axiom なし・逸脱なし。
+  sorry +2 は事前承認済み faithful scaffold。**中間評価: genuine landing 2/2、churn 0。旧 lane d の
+  懸念は現時点で不成立**。残 = deep obligation 3 件 (K=V 分岐 / grid 同期 / parity+Bessel core) の
+  実証明が最終試金石。
 
 ## 参照
 

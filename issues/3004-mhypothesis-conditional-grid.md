@@ -225,3 +225,15 @@ c の issue が触れていない第 3 の同型問題:
   `complement_card_p_or_pq_V` (= p ∨ = pq)、`exists_M_structural_dichotomy` (index = p ∨ pq)。
   既存無条件形 3 件は deprecation 注記付き温存 (c の exists_MHypothesis 乗り換え後に削除、hub 合流管理)。
 - full build 4131 green / AxiomsCheck 2148 OK。
+
+## HUB 追記 (2026-07-10 tick #6): c 実装受理 — 残 obligation と b cleanup
+
+- c の裁定 1 実装 (daa09628) を merge 2b6acd98 で受理 (build green / AxiomsCheck OK / dup なし /
+  sorry +2 = 事前承認済 scaffold)。(14.10) assembly は再 sorry-free、(14.11.1) strict gap と
+  bound-枝排除は実証明で landing。
+- **残 obligation (c)**: (i) `complementIndex_eq_pq_of_K_eq_V` (K=V 分岐の二分岐解消、(14.9) 論法)、
+  (ii) `exists_betaMGridData` (b producer の Dade image と `Mdata.h78.beta` の同期)、
+  (iii) conditional (14.11.2) producer の parity+Bessel core。gate map = notes/peterfalvi/s16_nonexistence_gate_map.md。
+- **b cleanup 解禁**: c は `vdata.complement_card_eq_pq` (無条件形) を読まなくなった → b は
+  deprecation 温存していた無条件 3 宣言 (`complement_inf_P_structure`/`complement_card_eq_pq_V`/
+  `exists_M_structural`) を削除してよい (次回 main sync 後、consumer 0 を grep 確認の上)。
