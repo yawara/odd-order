@@ -658,6 +658,124 @@ theorem typeII_T2_extension_nu_apply_eq_zero_of_mem_V [Finite G]
   rw [hexp, hlamv, sub_zero] at hdiffv
   exact hdiffv
 
+section IndexComponents
+
+variable {A : Set G} {L : Subgroup G}
+
+open scoped Classical in
+/-- The bridge image of a `tic`-side `W₂`-part element lies in the `sdiff`-side `W₂`-part
+(underlying `G`-elements agree, `coe_ticWEquivSdiffW`, and `tic.W₂` is the `L`-image of
+`W₂`, `tic_W2`). -/
+theorem ticWEquivSdiffW_mem_W2 [Fintype G] [Fintype ↥L]
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
+    (h : OddOrder.Peterfalvi.S06.Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    {g : h.tic.W} (hg : (g : G) ∈ h.tic.W2) :
+    OddOrder.Peterfalvi.S06.ticWEquivSdiffW h g
+      ∈ h.sdiffTICyclicHypothesis.W2.subgroupOf h.sdiffTICyclicHypothesis.W := by
+  rw [Subgroup.mem_subgroupOf]
+  have hwG : (((OddOrder.Peterfalvi.S06.ticWEquivSdiffW h g) : ↥L) : G) = (g : G) :=
+    OddOrder.Peterfalvi.S06.coe_ticWEquivSdiffW h g
+  rw [h.tic_W2] at hg
+  obtain ⟨y, hy, hyeq⟩ := hg
+  have hLeq : ((OddOrder.Peterfalvi.S06.ticWEquivSdiffW h g) : ↥L) = y :=
+    Subtype.ext (by rw [hwG, ← hyeq]; rfl)
+  rw [hLeq]
+  exact hy
+
+open scoped Classical in
+/-- `W₁`-part companion of `ticWEquivSdiffW_mem_W2`. -/
+theorem ticWEquivSdiffW_mem_W1 [Fintype G] [Fintype ↥L]
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
+    (h : OddOrder.Peterfalvi.S06.Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    {g : h.tic.W} (hg : (g : G) ∈ h.tic.W1) :
+    OddOrder.Peterfalvi.S06.ticWEquivSdiffW h g
+      ∈ h.sdiffTICyclicHypothesis.W1.subgroupOf h.sdiffTICyclicHypothesis.W := by
+  rw [Subgroup.mem_subgroupOf]
+  have hwG : (((OddOrder.Peterfalvi.S06.ticWEquivSdiffW h g) : ↥L) : G) = (g : G) :=
+    OddOrder.Peterfalvi.S06.coe_ticWEquivSdiffW h g
+  rw [h.tic_W1] at hg
+  obtain ⟨y, hy, hyeq⟩ := hg
+  have hLeq : ((OddOrder.Peterfalvi.S06.ticWEquivSdiffW h g) : ↥L) = y :=
+    Subtype.ext (by rw [hwG, ← hyeq]; rfl)
+  rw [hLeq]
+  exact hy
+
+open scoped Classical in
+/-- **The `σ`-grid index of `ω_{χ₂,i}` has `W₂`-component independent of the row `i`**: the
+second component of `omegaProdEquiv.symm (omegaProdCharTic h χ₂ i)` — the restriction of the
+transported product character to the `W₂`-part — sees only the `χ₂`-factor
+(`chiColumn_apply_of_mem_W2`).  This is the "column" well-definedness behind the two-column
+σ-coefficient support of `ν^{τ₂}` in the (5.8) endgame. -/
+theorem omegaProdCharTic_symm_snd_eq [Fintype G] [Fintype ↥L]
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
+    (h : OddOrder.Peterfalvi.S06.Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i i' : Fin (Nat.card h.W1)) :
+    ((OddOrder.Peterfalvi.S06.ticVdiff h).omegaProdEquiv.symm
+      (OddOrder.Peterfalvi.S06.omegaProdCharTic h χ₂ i)).2
+    = ((OddOrder.Peterfalvi.S06.ticVdiff h).omegaProdEquiv.symm
+      (OddOrder.Peterfalvi.S06.omegaProdCharTic h χ₂ i')).2 := by
+  classical
+  rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaProdEquiv_symm_eq,
+    OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaProdEquiv_symm_eq]
+  refine MonoidHom.ext fun w => Units.ext ?_
+  simp only [MonoidHom.comp_apply]
+  have hmem : OddOrder.Peterfalvi.S06.ticWEquivSdiffW h
+      (((OddOrder.Peterfalvi.S06.ticVdiff h).W2.subgroupOf
+        (OddOrder.Peterfalvi.S06.ticVdiff h).W).subtype w)
+      ∈ h.sdiffTICyclicHypothesis.W2.subgroupOf h.sdiffTICyclicHypothesis.W :=
+    ticWEquivSdiffW_mem_W2 h (Subgroup.mem_subgroupOf.mp w.2)
+  erw [OddOrder.Peterfalvi.S06.omegaProdCharTic_apply,
+    OddOrder.Peterfalvi.S06.omegaProdCharTic_apply,
+    OddOrder.Peterfalvi.S06.chiColumn_apply_of_mem_W2 h χ₂ i hmem,
+    OddOrder.Peterfalvi.S06.chiColumn_apply_of_mem_W2 h χ₂ i' hmem]
+
+open scoped Classical in
+/-- **The `σ`-grid index of `ω_{χ₂,i}` has `W₁`-component independent of the column `χ₂`**:
+the first component sees only the row factor (`chiColumn_apply_of_mem_W1`). -/
+theorem omegaProdCharTic_symm_fst_eq [Fintype G] [Fintype ↥L]
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
+    (h : OddOrder.Peterfalvi.S06.Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    ((OddOrder.Peterfalvi.S06.ticVdiff h).omegaProdEquiv.symm
+      (OddOrder.Peterfalvi.S06.omegaProdCharTic h χ₂ i)).1
+    = ((OddOrder.Peterfalvi.S06.ticVdiff h).omegaProdEquiv.symm
+      (OddOrder.Peterfalvi.S06.omegaProdCharTic h χ₂' i)).1 := by
+  classical
+  rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaProdEquiv_symm_eq,
+    OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaProdEquiv_symm_eq]
+  refine MonoidHom.ext fun w => Units.ext ?_
+  simp only [MonoidHom.comp_apply]
+  have hmem : OddOrder.Peterfalvi.S06.ticWEquivSdiffW h
+      (((OddOrder.Peterfalvi.S06.ticVdiff h).W1.subgroupOf
+        (OddOrder.Peterfalvi.S06.ticVdiff h).W).subtype w)
+      ∈ h.sdiffTICyclicHypothesis.W1.subgroupOf h.sdiffTICyclicHypothesis.W :=
+    ticWEquivSdiffW_mem_W1 h (Subgroup.mem_subgroupOf.mp w.2)
+  erw [OddOrder.Peterfalvi.S06.omegaProdCharTic_apply,
+    OddOrder.Peterfalvi.S06.omegaProdCharTic_apply,
+    OddOrder.Peterfalvi.S06.chiColumn_apply_of_mem_W1 h χ₂ i hmem,
+    OddOrder.Peterfalvi.S06.chiColumn_apply_of_mem_W1 h χ₂' i hmem]
+
+open scoped Classical in
+/-- **Distinct columns give distinct `W₂`-components**: for `χ₂ ≠ χ₂'`, the second components
+of the transported grid indices differ (the full pairs differ by
+`omegaProdEquiv_symm_omegaProdCharTic_ne` while the first components agree by
+`omegaProdCharTic_symm_fst_eq`).  Supplies the `jcol ≠ kcol` hypothesis of the (5.8)
+endgame. -/
+theorem omegaProdCharTic_symm_snd_ne [Fintype G] [Fintype ↥L]
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
+    (h : OddOrder.Peterfalvi.S06.Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hne : χ₂ ≠ χ₂')
+    (i : Fin (Nat.card h.W1)) :
+    ((OddOrder.Peterfalvi.S06.ticVdiff h).omegaProdEquiv.symm
+      (OddOrder.Peterfalvi.S06.omegaProdCharTic h χ₂ i)).2
+    ≠ ((OddOrder.Peterfalvi.S06.ticVdiff h).omegaProdEquiv.symm
+      (OddOrder.Peterfalvi.S06.omegaProdCharTic h χ₂' i)).2 := by
+  intro heq
+  refine OddOrder.Peterfalvi.S06.omegaProdEquiv_symm_omegaProdCharTic_ne h hne i ?_
+  exact Prod.ext (omegaProdCharTic_symm_fst_eq h χ₂ χ₂' i) heq
+
+end IndexComponents
+
 end ColumnPin
 
 end OddOrder.Peterfalvi.S12
