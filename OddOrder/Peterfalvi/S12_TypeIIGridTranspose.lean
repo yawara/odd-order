@@ -232,6 +232,27 @@ theorem exists_section16_partner_typePData [Finite G]
   exact ⟨hgT ▸ data₀.conj (MulAut.conj g), hTW1,
     section16_partner_typePData_W2_eq hG _ hTW1⟩
 
+/-- **The (8.4.b) centralizer law pins the member's dual factor** (`S`-side mirror of
+`section16_partner_typePData_W2_eq`): a `TypePData` on the pair's type-II member `mp.S`
+whose cyclic factor `W₁` is the κ-Hall `mp.K` automatically has `W₂ = mp.K*`.  Both are
+the `S'`-centralizer of any `x ∈ K^#`: `data.W₂` by the `centralizer_W1` field, `mp.K*` by
+BG Theorem A(5) (`typeP_derivedInG_inf_centralizer_kappaElement_eq` with the pairing
+`mp.Kstar_eq`). -/
+theorem section16_S_typePData_W2_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPair G}
+    (dataS : TypePData mp.S) (hSW1 : dataS.W1 = mp.K) :
+    dataS.W2 = mp.Kstar := by
+  have hKne : mp.K ≠ ⊥ := fun hbot =>
+    OddOrder.BG.Ch4.S14.card_kappaHall_ne_one mp.S_typeP mp.K_le_S mp.K_hall
+      (Subgroup.card_eq_one.mpr hbot)
+  haveI := (Subgroup.nontrivial_iff_ne_bot mp.K).mpr hKne
+  obtain ⟨⟨x, hxK⟩, hxne⟩ := exists_ne (1 : ↥mp.K)
+  have hxne' : x ≠ 1 := fun h => hxne (Subtype.ext h)
+  have hcen := dataS.centralizer_W1 x (hSW1.symm ▸ hxK) hxne'
+  have hkstar := OddOrder.BG.Ch4.S16.typeP_derivedInG_inf_centralizer_kappaElement_eq hG
+    mp.S_maximal mp.S_typeP mp.K_le_S mp.K_hall mp.Kstar_eq x hxK hxne'
+  exact hcen.symm.trans hkstar
+
 open scoped FiniteInduce in
 /-- **The canonical pair shares its ambient `W`** (Peterfalvi (8.8), `S ∩ T = W`): a
 `(K, K*)`-reconciled `S`-side datum and a `W₁`-reconciled `T`-side datum give
@@ -980,6 +1001,89 @@ theorem Hypothesis.exists_nu_extension_eq_alignedRow_at_pair [Finite G]
     · rw [h, Int.cast_neg]
       exact congrArg (fun x => (-((((typeIIHypothesis46 hG mp.S_maximal
         (section16_S_isTypeII hG mp) data.typeP).columnFamily χ₂).sign : ℂ))) • x) hrow
+
+/-- **Any type-II datum transports onto the canonical pair member with its factors
+tracked** (the WLOG engine of the (10.7) conjugation transfer, issue 9079 (c)): for a
+type-II maximal `S` with a `TypePData`, there are an `M`-seeded pair, a conjugator `u`
+with `S^u = mp.S`, and a `(K, K*)`-reconciled datum on `mp.S` whose Fitting factor `H` and
+complement `U` are the **conjugates of the given datum's** — so a Frobenius conclusion at
+the pair member transports back to the given factors verbatim.
+
+Composition of the seeded-pair reduction (`exists_seeded_pair_conj_typeII`) with the
+Schur–Zassenhaus realignment of `exists_section16_partner_typePData` run on the `S`-side:
+the transported `W₁` and the κ-Hall `mp.K` both complement `[mp.S, mp.S]`
+(`M_complement` / `typeP_derivedInG_isComplement_kappaHall`), so an `mp.S`-conjugation
+aligns them; `W₂ = K*` follows (`section16_S_typePData_W2_eq`), and conjugating the whole
+datum (`TypePData.conj`) carries `H` and `U` along. -/
+theorem exists_reconciled_conj_typePData_S [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    {S : Subgroup G} (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S)
+    (dataP : TypePData S) :
+    ∃ (mp : Section16MaximalPair G) (u : G) (dataS : TypePData mp.S),
+      mp.T = M ∧ mp.Kstar = hyp.typeP.W1 ∧
+      MulAut.conj u • S = mp.S ∧
+      dataS.W1 = mp.K ∧ dataS.W2 = mp.Kstar ∧
+      dataS.H = MulAut.conj u • dataP.H ∧ dataS.U = MulAut.conj u • dataP.U := by
+  classical
+  obtain ⟨mp, g₀, hT, hKstar, hgS⟩ := hyp.exists_seeded_pair_conj_typeII hG hSmax hSII
+  -- move the datum onto `mp.S`
+  set data₁ : TypePData mp.S := hgS ▸ dataP.conj (MulAut.conj g₀) with hdata₁
+  have hcastW1 : ∀ {X : Subgroup G} (h : X = mp.S) (d : TypePData X), (h ▸ d).W1 = d.W1 := by
+    intro X h d; subst h; rfl
+  have hcastH : ∀ {X : Subgroup G} (h : X = mp.S) (d : TypePData X), (h ▸ d).H = d.H := by
+    intro X h d; subst h; rfl
+  have hcastU : ∀ {X : Subgroup G} (h : X = mp.S) (d : TypePData X), (h ▸ d).U = d.U := by
+    intro X h d; subst h; rfl
+  have hd₁W1 : data₁.W1 = MulAut.conj g₀ • dataP.W1 := hcastW1 hgS _
+  have hd₁H : data₁.H = MulAut.conj g₀ • dataP.H := hcastH hgS _
+  have hd₁U : data₁.U = MulAut.conj g₀ • dataP.U := hcastU hgS _
+  -- Schur–Zassenhaus: realign `data₁.W1` onto the κ-Hall `mp.K` inside `mp.S`
+  haveI : IsCyclic ↥mp.K := mp.isCyclic_K
+  have hKcompl := OddOrder.BG.Ch4.S14.typeP_derivedInG_isComplement_kappaHall hG
+    mp.S_maximal mp.S_typeP mp.K_le_S mp.K_hall
+  have hS'sub : (derivedInG mp.S).subgroupOf mp.S = commutator ↥mp.S :=
+    Subgroup.comap_map_eq_self_of_injective mp.S.subtype_injective _
+  haveI : ((derivedInG mp.S).subgroupOf mp.S).Normal := by rw [hS'sub]; infer_instance
+  have hN : Nat.Coprime (Nat.card ↥((derivedInG mp.S).subgroupOf mp.S))
+      ((derivedInG mp.S).subgroupOf mp.S).index := by
+    rw [hKcompl.symm.index_eq_card]
+    exact OddOrder.BG.Ch4.S14.coprime_card_derived_kappaHall_of_isComplement'
+      mp.K_hall hKcompl
+  haveI hSsolv : IsSolvable ↥mp.S := hG.solvable_of_mem_maximalSubgroups mp.S_maximal
+  have hSolv : IsSolvable ↥((derivedInG mp.S).subgroupOf mp.S) ∨
+      IsSolvable (↥mp.S ⧸ (derivedInG mp.S).subgroupOf mp.S) :=
+    Or.inl (solvable_of_solvable_injective
+      (Subgroup.subtype_injective ((derivedInG mp.S).subgroupOf mp.S)))
+  obtain ⟨n, -, hn⟩ := Subgroup.IsComplement'.exists_conj_of_coprime hN hSolv
+    data₁.M_complement hKcompl
+  set g : G := (n : G) with hgdef
+  have hcomp : mp.S.subtype.comp (MulAut.conj n).toMonoidHom
+      = (MulAut.conj g).toMonoidHom.comp mp.S.subtype := by
+    ext k
+    simp only [MonoidHom.comp_apply, Subgroup.coe_subtype, MulEquiv.coe_toMonoidHom,
+      MulAut.conj_apply, hgdef, Subgroup.coe_mul, Subgroup.coe_inv]
+  have hW1map : data₁.W1.map (MulAut.conj g).toMonoidHom = mp.K := by
+    have key := congrArg (Subgroup.map mp.S.subtype) hn
+    rw [Subgroup.map_map, hcomp, ← Subgroup.map_map,
+      Subgroup.map_subgroupOf_eq_of_le data₁.W1_le,
+      Subgroup.map_subgroupOf_eq_of_le mp.K_le_S] at key
+    exact key
+  have hW1smul : (MulAut.conj g) • data₁.W1 = mp.K := by
+    rw [pointwise_mulAut_smul_eq_map]; exact hW1map
+  have hgSfix : (MulAut.conj g) • mp.S = mp.S := Subgroup.conj_smul_eq_self_of_mem n.2
+  set dataS : TypePData mp.S := hgSfix ▸ data₁.conj (MulAut.conj g) with hdataS
+  have hSW1 : dataS.W1 = mp.K := by
+    rw [hdataS, hcastW1 hgSfix,
+      show (data₁.conj (MulAut.conj g)).W1 = (MulAut.conj g) • data₁.W1 from rfl, hW1smul]
+  refine ⟨mp, g * g₀, dataS, hT, hKstar, ?_, hSW1,
+    section16_S_typePData_W2_eq hG dataS hSW1, ?_, ?_⟩
+  · rw [map_mul, mul_smul, hgS, hgSfix]
+  · rw [hdataS, hcastH hgSfix,
+      show (data₁.conj (MulAut.conj g)).H = (MulAut.conj g) • data₁.H from rfl, hd₁H,
+      ← mul_smul, ← map_mul]
+  · rw [hdataS, hcastU hgSfix,
+      show (data₁.conj (MulAut.conj g)).U = (MulAut.conj g) • data₁.U from rfl, hd₁U,
+      ← mul_smul, ← map_mul]
 
 end PairPackaging
 
