@@ -1416,3 +1416,19 @@ Hypothesis46 は `CertainTypeHypothesis A L` を extends し tic/subH/dade0/tau 
 残る — 将来の grounding 系で使う)。iter 38 の W-equalities は本 shortcut の tic_W1/W2 discharge に
 そのまま使う ✓ 無駄なし。**次 iter: CertainTypeHypothesis 構造確認 → hyp46Smp (certainTypeS-based)
 構築開始** → muS_diff_support (engines 直適用) → field 3 層 → pins。
+
+## ✅ (2026-07-11、lane-b /loop iter 40) — shortcut 前提 3 点完備 (K も literal 一致)
+
+- **CertainTypeHypothesis = S06.Hypothesis + `dade` 1 field のみ** (S06_DadeIsometryCertain:469) —
+  certainTypeS-based Hypothesis46 の直接構築は完全に仕様化済。
+- **`certainTypeS_K_eq` landed** (commit 9448dffe、full build 4150 green): kappaHall constructor の
+  K は literal `(derivedInG M).subgroupOf M` = Sdata-instance と同一 — K の同定も unfold+rfl。
+- ∴ shortcut 構築の全 discharge 部品確認済: toHypothesis := certainTypeS / dade :=
+  dade0mp.restrict / tic := typePData_toTICyclicHypothesis tp.Sdata / tic_W1-W2 (iter 38 +
+  map_subgroupOf_eq_of_le + W1_eq_K 合成) / tic_V rfl / subH := Msigma.subgroupOf /
+  W2_le_subH (certainTypeS_W2_eq → Kstar = Sdata.W2 → H ≤ Msigma chain) / subH_le_K
+  (certainTypeS_K_eq + Msigma_le_derived) / A_covers (hyp46S コピー + K_eq rewrite) /
+  dade0 := (dadeSupportHypothesisData_honestTypeP2A0Set hG mp.S_maximal mp.S_typeP2
+  tp.Sdata).some.dade / tau := .fullDadeIsometryData hconj。
+**次 iter: hyp46Smp 本体構築** (FT.lean、~70 行、hyp46S [S15_HonestTypeP2A0:660-699] を鋳型に
+上記部品で) → muS_diff_support (certainType_diff_supp_subset_A0 直適用) → field 3 層 → pins。
