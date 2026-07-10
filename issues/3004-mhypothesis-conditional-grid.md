@@ -420,3 +420,28 @@ feature commit: `4c08dd8c`。
   次 frontier はこれらを別 leaf で実証明し、線形展開で identity を閉じること。
 - main `74ec694a` まで再同期し `HEAD..main = 0`。統合後 AxiomsCheck 4130 jobs green、
   `git diff --check` clean。追加 theorem はすべて許容公理のみ、新 axiom・新 sorry なし。
+
+## lane-c T-side (14.9) gap identity の完全展開 (2026-07-11)
+
+feature commit: `8cd092f7`。
+
+- 新 leaf `TGapCross.lean` に、virtual-character 内積の Hermitian 対称化
+  `inner_eq_swap_of_mem_ZIrr`、η-grid の零列 projection から
+  `⟨b,η_{0j}⟩=[j=0]` を得る `tSide_beta_inner_eta_of_zeroColumn_projection`、および
+  `Γ`/`Δ` を展開して gap identity を得る `gap_cross_inner_identity` を実証明した。
+- `T_typeIII_ratio_le` の旧 opaque residual
+  `⟨Γ,τ₁ζ⟩ = 1 + ⟨Δ,Γ⟩` を上記へ配線。残る単一 local `sorry` は次の exact conjunction:
+  (a) Coq (11.9) `FTtype34_structure` の projection
+  `⟨η_{0j},τ_T(ν₀-ζ)⟩ = ⟨η_{0j},∑ᵢη_{i0}⟩`、
+  (b) Coq (14.9) の S/T support 分離
+  `⟨τ_T(ν₀-ζ),τ_Sβ_S⟩=0`。以後の η 係数評価・trivial 項消去・内積展開は全て closed。
+- 独立検証による補正: (b) は canonical-pair の (8.18.b) を直接使うものではない。
+  `β_S` は full `A₀(S)` support を持つため、その仮定に合わない。Coq
+  `PFsection14.v:798--820` は `τ_Sβ_S` が `class_support (T')#` の外、
+  `τ_Tβ_{T,0}=Ind_T^G β_{T,0}` がその内側に support されることから直交を得る。
+- 次 frontier は上流優先で (a) の §11 projection producer と、(b) の
+  `FTtypeP_facts(e)` 型 `A₀(T)` normedTI/Dade=Ind + S-side p-divisibility support separation。
+  `T_typeIII_coherent_image_inner_eta_eq_zero` に既にある A₁/A₀ Dade restriction reconciliation
+  は再利用可能だが、これだけでは (a)/(b) を与えない。
+- main `45421289` まで再同期し `HEAD..main = 0`。統合後 `TGapCross` / `TTypeII` /
+  AxiomsCheck (4131 jobs) green、`git diff --check` clean。新 axiom・新 sorry なし。
