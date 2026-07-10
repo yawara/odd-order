@@ -48,6 +48,11 @@ as the bridge for identifying the `S`-side σ-grid (`certainTypeOmegaSigma`) wit
   `W₁ = mp.Kstar` (hence `W₂ = mp.K`) exists, by Schur–Zassenhaus conjugation of the datum
   of `typePData_of_isTypeNonI` (no `IsTypeP2 mp.T` needed).  This discharges the hypothesis
   pair `(dataT, hTW1)` of the packaging lemmas above.
+* `conj_eq_S_or_conj_eq_T_of_isTypeII` / `exists_conj_eq_S_of_isTypeII`: the (10.7)
+  **reduction glue** — every type-II maximal subgroup is conjugate to `mp.S`, or to `mp.T`
+  with the certificate `IsTypeII mp.T` (Peterfalvi (13.2.a) does not exclude a type-II
+  partner; the strong form takes `¬ IsTypeII mp.T` as a hypothesis, mirroring Coq's
+  contextual `notMtype2`).
 
 ## Design note
 
@@ -498,6 +503,53 @@ theorem section16_pair_sigma_eq [Finite G]
         (αT : ClassFunction ↥(typePData_toTICyclicHypothesis dataT hodd).W ℂ) :=
   ticyclic_sigma_eq_of_V_eq _ _ rfl rfl (section16_pair_tic_V_eq hG tp hodd dataT hTW1)
     appS appT αS αT hα
+
+/- The type-II → canonical-partner reduction (Coq `Frob_der1_type2` head, issue 9079 item 3) -/
+
+/-- The type-II-designated member of the canonical pair is indeed of type II:
+`mp.S_typeP2` (Peterfalvi (13.2.a)) through the BG type dictionary
+(`isTypeII_of_isTypeP2`, Proposition 16.1). -/
+theorem section16_S_isTypeII [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (mp : Section16MaximalPair G) :
+    IsTypeII mp.S :=
+  OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG mp.S_maximal mp.S_typeP2
+
+/-- **Peterfalvi (10.7) reduction, covering step** (Coq `Frob_der1_type2` head,
+`PFsection10.v:552-556`): every type-II maximal subgroup `L` is conjugate to a member of
+the canonical pair — to `mp.S`, or to `mp.T` with `mp.T` itself then of type II (types are
+conjugation-invariant, `isTypeII_pointwise_smul`).  The type-I branch of the (8.8) covering
+`theorem88_caseB` is killed by type exclusivity (`not_isTypeI_of_isTypeNonI`).
+
+The `T`-branch is **not refutable from the pair data alone**: Peterfalvi (13.2.a) is
+one-directional ("if `q < p` then `S` is of type II"), so the larger-κ member `mp.T` may
+also be of type II; the Coq proof kills its corresponding branch only under the §10
+contextual hypothesis `notMtype2` (the ambient pair member there is assumed not of type 2).
+Consumers either use the returned `IsTypeII mp.T` certificate symmetrically (the pair
+machinery of this file is `S`/`T`-symmetric through `exists_section16_partner_typePData`)
+or discharge it with `exists_conj_eq_S_of_isTypeII` below. -/
+theorem conj_eq_S_or_conj_eq_T_of_isTypeII [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (mp : Section16MaximalPair G)
+    {L : Subgroup G} (hL : L ∈ maximalSubgroups G) (hLII : IsTypeII L) :
+    (∃ g : G, MulAut.conj g • L = mp.S) ∨
+      ((∃ g : G, MulAut.conj g • L = mp.T) ∧ IsTypeII mp.T) := by
+  rcases mp.theorem88_caseB L hL with hI | hS | hT
+  · exact absurd hI (OddOrder.BG.Ch4.S16.not_isTypeI_of_isTypeNonI hG hL (Or.inl hLII))
+  · exact Or.inl hS
+  · refine Or.inr ⟨hT, ?_⟩
+    obtain ⟨g, hg⟩ := hT
+    exact hg ▸ isTypeII_pointwise_smul (MulAut.conj g) hLII
+
+/-- **Peterfalvi (10.7) reduction, strong form**: if the partner `mp.T` is moreover not of
+type II, every type-II maximal subgroup is conjugate to `mp.S` — the exact Lean form of the
+Coq branch kill (`FTtypeJ` + `notMtype2`). -/
+theorem exists_conj_eq_S_of_isTypeII [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (mp : Section16MaximalPair G)
+    (hT : ¬ IsTypeII mp.T)
+    {L : Subgroup G} (hL : L ∈ maximalSubgroups G) (hLII : IsTypeII L) :
+    ∃ g : G, MulAut.conj g • L = mp.S := by
+  rcases conj_eq_S_or_conj_eq_T_of_isTypeII hG mp hL hLII with hS | ⟨-, hTII⟩
+  · exact hS
+  · exact absurd hTII hT
 
 end PairPackaging
 
