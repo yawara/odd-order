@@ -701,3 +701,19 @@ Coq の P^#∪V_S 形との橋 (「μ_ij 族の support が P^#∪V_S を覆う/
 (S̄=S/P Frobenius = `typeP_uW1_frobenius` 済 [indPW1_inner_self_aux で使用中]、μ_0j Res 公式 =
 mu2Grid/PrimeTIResidue 系、class_support W₁^# 分解 = (2.1) 対応物) を grep、(c) statement 忠実性の
 判定 (grid form が over/under-strong でないか) — 不忠実なら restate (0757c158 と同型の faithfulness 修正)。
+
+## 📋 (2026-07-10 続¹⁰、lane-b /loop iter 2) — (13.18) 依存構造確定: betaGrid_A0_support が単一 gate
+
+- **gammaGrid_orthogonal_one (13.18.c 前半) は既に proven** (aux:1107-1181、9076 の
+  sInstance_dade0_eq_induce bridge + Frobenius reciprocity + eta_orthonormal) — 消費する sorry は
+  `betaGrid_A0_support` のみ。docstring 明記: 「This single 'A0-support obligation is what both
+  gammaGrid_orthogonal_one and gammaGrid_Y_norm_bound reduce to」。
+- **∴ 攻略順確定**: (1) `betaGrid_A0_support` (= Coq PVSbeta+A0beta、続⁹ の証明構造) →
+  (2) `betaGrid_support` (grid form、PVSbeta の系 or 独立計算) → (3) `gammaGrid_real`
+  (conj-commutation: cfAutInd/Dtau/prTIirr_aut/cfAut_cycTIiso の port) → (4) `gammaGrid_Y_norm_bound`
+  ((13.18.d)、betaGrid_norm proven + on-support isometry + (a)(c))。
+- `honestTypeP2A0Set M data = honestTypeP2ASet M ∪ conjClassSetIn M (typePV M data)` (S15_HonestTypeP2A0)
+  — Coq の P^# ∪ V_S ⊆ A₀(S) (A0beta step) は typePV との同定で処理する見込み。
+- 次 iter: typePV def / hyp.mu の supplied fields (S15_SAndTDefs) / prTIirr_id 対応
+  (S13_PrimeTIResidueBridge の residueS/mu2_ne — b 自身が port 済) を精査して PVSbeta port の
+  Lean 実装計画を固める → 実装。
