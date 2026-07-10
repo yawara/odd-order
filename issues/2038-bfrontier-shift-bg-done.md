@@ -1052,3 +1052,25 @@ h_isom 入力 = 本 commit の `inner_induce_eq_of_isTISubset` (hTI : IsTISubset
 仮説パラメータ; supported 側は ω-差族の W∖W₂-supported [landed 済])。突合せ点:
 isometry_difference_pair_structure の τ-引数形 (linear map か pairwise inner 条件か) を精読し、
 τ := Ind_W^S に instantiate できる形か確認 → 列間整合 (Coq inj_Imu、直交性) は次々 iter。
+
+## ✅ (2026-07-11、lane-b /loop iter 24) — step a 完成: TI 誘導の signed family 抽出 (generic)
+
+新 shared leaf `GroupTheory/RepresentationTheory/TIInducedFamily.lean` (commit d067219d、
+一発 green、full build 4148・AxiomsCheck OK):
+
+- **`induce_difference_pair_structure_of_isTISubset`**: A TI (bound H)、n≥2 個の等次数 distinct
+  irreducible χᵢ が off-A 一致 ⟹ ∃ SignedIrreducibleDifferenceFamily (n 個の distinct μᵢ + 一様
+  符号 ε) で `Ind_H^G(χᵢ−χ₀) = ε•(μᵢ−μ₀)`。iter 23 の TI-isometry + (1.4)
+  isometry_difference_pair_structure の合成 (ZIrr = induce_mem_ZIrr / degree-0 = induce_apply_one /
+  isometry = inner_induce_eq_of_isTISubset)。Ind の ℤ-linear bundle は inline 構成。root 登録済。
+
+**次 iter (列間整合 = Coq inj_Imu :296-330 の Lean 版)**: 組合せ補題を IsometryDifferencePair.lean に
+追加 — 2 つの SignedIrreducibleDifferenceFamily (n,m ≥ 2) が全 difference 直交
+(`⟨data.difference i, data'.difference j⟩ = 0 ∀i,j`) ⟹ **μ-grid 全体 disjoint**
+(`data.mu i ≠ data'.mu j ∀i,j`)。**導出精査済 (このセッション)**: a_ij := [μᵢ=μ'ⱼ] の Kronecker
+展開 E(i,j): a_ij − a_i0 − a_0j + a_00 = 0 (irreducibleCharacter_inner_sub_sub_eq_ite 既存) から
+(1) a_00=1 なら i,j≠0 で −a_ij=1 矛盾 → anchors distinct、(2) a_i0=1 (i≠0) なら a_ij=1+a_0j≥1 ∀j≠0
+→ μ' 単射性矛盾 (m≥2 で足りる) → 縁 0、(3) a_ij = a_i0+a_0j = 0。sign は ⟨εd, ε'd'⟩=εε'⟨d,d'⟩ で
+消える (per-column 符号差は (1.3.b) の orthonormality に影響しない — dmu_k := ε_col•μ_k は常に
+orthonormal)。その後: prime-TI instantiation (列 = fixed W₂-char、ω-grid → hTI 仮説パラメータ) →
+hInd (列抽出+pairing collapse) → (1.3.b) → (3.9.a) → prTIirr_id。
