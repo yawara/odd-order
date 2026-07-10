@@ -503,17 +503,16 @@ theorem T_typeIII_ratio_le_of_gamma_bridge [Finite G]
   exact hbessel
 
 open scoped Classical in
-/-- **(14.9) Γ-bridge extraction engine** (issue 0098 item 4, de-serialization skeleton).  Given the
-`S`-side gap `Γ` whose inner products against the orthonormal coherent family `calT1` are the integer
-coefficients `x_ζ = ⟨Γ, ζ⟩` (each `≠ 0` — the `nzT1_Ga` parity input), plus the norm bound
-`⟨Γ,Γ⟩ ≤ (u−1)/q`, the orthogonal projection `Γ₁ := Γ − ∑_ζ x_ζ·ζ` is `calT1`-orthogonal
-(`hΓ₁`, from orthonormality), so the proven Bessel skeleton `T_typeIII_ratio_le_of_gamma_bridge`
-closes the ratio.
+/-- **(14.9) Γ-bridge extraction engine.**  Given the `S`-side gap `Γ`, its integral nonzero
+coefficients on the orthonormal coherent family `calT1`, and the orthogonality of that family to the
+η-grid, define the complementary term `Γ₁ := Γ - ∑_ζ x_ζ·ζ`.  Orthonormality makes `Γ₁`
+orthogonal to every family member, hence to the projection sum.  The projection sum is η-grid
+orthogonal by hypothesis, so the genuine **Peterfalvi (13.18.d)** field `BetaData.Y_norm_bound`
+applies to the split `Γ = Γ₁ + ∑_ζ x_ζ·ζ`.
 
-This isolates the **genuine assembly** — the orthogonal split (`hdecomp`/`hΓ₁`) — from the
-lane-b-gated `S`-side `βₛ` content (the gap `Γ` with its parity `hx` and norm `hnorm`), which enters
-as hypotheses.  `T_typeIII_ratio_le`'s residual then reduces to *just* the `βₛ`-gap existence, ready
-to cite once the `S`-side `βₛ` bridge (item 3 / issue 9013) lands. -/
+The resulting bound is on the projection sum—not on `Γ` itself—and feeds the proven Bessel skeleton
+`T_typeIII_ratio_le_of_gamma_bridge`.  Thus this theorem exactly matches the corrected (13.18.d)
+statement and assumes no overstrong full-gap norm bound. -/
 theorem T_typeIII_ratio_le_of_sSide_gap [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hyp : Hypothesis (G := G)) (calT1 : Finset (ClassFunction G ℂ))
     (horth : ∀ a ∈ calT1, ∀ b ∈ calT1,
@@ -522,8 +521,14 @@ theorem T_typeIII_ratio_le_of_sSide_gap [Finite G] [Fintype G] [Invertible (Nat.
     (Γ : ClassFunction G ℂ) (x : ClassFunction G ℂ → ℤ)
     (hxcoe : ∀ a ∈ calT1, ClassFunction.inner Γ a = ((x a : ℝ) : ℂ))
     (hx : ∀ a ∈ calT1, x a ≠ 0)
-    (hnorm : (ClassFunction.inner Γ Γ).re ≤
-      ((((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) : ℚ) : ℝ)) :
+    (heta : ∀ a ∈ calT1, ∀ (i : Fin hyp.base.q) (k : Fin hyp.base.p),
+      ClassFunction.inner a (hyp.base.eta i k) = 0)
+    (hYnorm : ∀ (X Y : ClassFunction G ℂ), Γ = X + Y →
+      ClassFunction.inner X Y = 0 →
+      (∀ (i : Fin hyp.base.q) (k : Fin hyp.base.p),
+        ClassFunction.inner Y (hyp.base.eta i k) = 0) →
+      (ClassFunction.inner Y Y).re ≤
+        ((hyp.base.u : ℚ) - 1) / (hyp.base.q : ℚ)) :
     ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) ≤
       ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) := by
   classical
@@ -547,8 +552,60 @@ theorem T_typeIII_ratio_le_of_sSide_gap [Finite G] [Fintype G] [Invertible (Nat.
           rw [ClassFunction.inner_smul_left, horth a ha b hb, if_neg hab, mul_zero])
         (fun hbni => absurd hb hbni),
       ClassFunction.inner_smul_left, horth b hb b hb, if_pos rfl, mul_one, sub_self]
-  exact T_typeIII_ratio_le_of_gamma_bridge hyp calT1 Γ Γ₁ x hcount horth hdecomp hΓ₁ hx hnorm
-
+  -- The projection sum is the `Y` in (13.18.d).  Its complement `Γ₁` is orthogonal to it
+  -- because `Γ₁` is orthogonal to every member of `calT1`.
+  have hΓ₁sum : ClassFunction.inner Γ₁
+      (∑ a ∈ calT1, ((x a : ℝ) : ℂ) • a) = 0 := by
+    have hsum_right : ∀ (s : Finset (ClassFunction G ℂ)),
+        ClassFunction.inner Γ₁ (∑ a ∈ s, ((x a : ℝ) : ℂ) • a)
+          = ∑ a ∈ s, ClassFunction.inner Γ₁ (((x a : ℝ) : ℂ) • a) := by
+      intro s
+      induction s using Finset.induction_on with
+      | empty => simp
+      | @insert c s hc ih =>
+          rw [Finset.sum_insert hc, ClassFunction.inner_add_right, ih, Finset.sum_insert hc]
+    rw [hsum_right calT1]
+    apply Finset.sum_eq_zero
+    intro a ha
+    rw [ClassFunction.inner_smul_right, hΓ₁ a ha, mul_zero]
+  have hsum_eta : ∀ (i : Fin hyp.base.q) (k : Fin hyp.base.p),
+      ClassFunction.inner (∑ a ∈ calT1, ((x a : ℝ) : ℂ) • a)
+        (hyp.base.eta i k) = 0 := by
+    intro i k
+    have hsum_left : ∀ (s : Finset (ClassFunction G ℂ)),
+        ClassFunction.inner (∑ a ∈ s, ((x a : ℝ) : ℂ) • a) (hyp.base.eta i k)
+          = ∑ a ∈ s,
+            ClassFunction.inner (((x a : ℝ) : ℂ) • a) (hyp.base.eta i k) := by
+      intro s
+      induction s using Finset.induction_on with
+      | empty => simp
+      | @insert c s hc ih =>
+          rw [Finset.sum_insert hc, ClassFunction.inner_add_left, ih, Finset.sum_insert hc]
+    rw [hsum_left calT1]
+    apply Finset.sum_eq_zero
+    intro a ha
+    rw [ClassFunction.inner_smul_left, heta a ha i k, mul_zero]
+  have hdecomp' : Γ = Γ₁ + ∑ a ∈ calT1, ((x a : ℝ) : ℂ) • a := by
+    rw [hdecomp]
+    abel
+  have hnormRaw := hYnorm Γ₁
+    (∑ a ∈ calT1, ((x a : ℝ) : ℂ) • a) hdecomp' hΓ₁sum hsum_eta
+  have hu1 : 1 ≤ hyp.base.u := by
+    have huc : 0 < hyp.base.u * hyp.base.c := by
+      rw [← hyp.base.card_U_eq_uc]
+      exact Nat.card_pos
+    exact (CanonicallyOrderedAdd.mul_pos.mp huc).1
+  have hsubcast : ((hyp.base.u - 1 : ℕ) : ℚ) = (hyp.base.u : ℚ) - 1 := by
+    rw [Nat.cast_sub hu1]
+    norm_num
+  have hnorm : (ClassFunction.inner
+      (∑ a ∈ calT1, ((x a : ℝ) : ℂ) • a)
+      (∑ a ∈ calT1, ((x a : ℝ) : ℂ) • a)).re ≤
+        ((((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) : ℚ) : ℝ) := by
+    rw [hsubcast]
+    simpa using hnormRaw
+  exact T_typeIII_ratio_le_of_gamma_bridge hyp calT1
+    (∑ a ∈ calT1, ((x a : ℝ) : ℂ) • a) 0 x hcount horth (by simp) (by simp) hx hnorm
 /-- **Peterfalvi (13.4)/(14.4), `T`-side case (9.7.b)**: the `T`-side centralizer parameter
 vanishes and `v` has its full cyclotomic value.  This is obtained directly from the (13.3)
 character-degree package and the (13.4) cross-expansion, before the (14.9) type-II conclusion.
@@ -787,19 +844,23 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [hcalcard, hsourcecard, hVcard]
     exact Nat.cast_div hpdiv (Nat.cast_ne_zero.mpr hyp.base.p_prime.ne_zero)
   -- **The gated `S`-side `βₛ` bridge content** (one documented residual `sorry`), now reduced
-  -- to the gap coefficients and projected norm:
+  -- to the gap coefficients and their η-grid orthogonality:
   --   • `hxcoe`/`hx` = the `S`-side gap coefficients `⟨Γ, ζ⟩ = x_ζ ∈ ℤ` with parity nonzeroness
   --     `x_ζ ≠ 0` (Coq `nzT1_Ga`, via `S09.cfdot_real_vchar_even`);
-  --   • `hnorm`   = the `S`-side norm bound `⟨Γ,Γ⟩ ≤ (u−1)/q` on the bridge gap.
-  -- (`horth` is discharged from the (14.9) coherence; `hdecomp`/`hΓ₁` from the engine.)
-  obtain ⟨Γ, x, hxcoe, hx, hnorm⟩ :
-      ∃ (Γ : ClassFunction G ℂ) (x : ClassFunction G ℂ → ℤ),
-        (∀ a ∈ calT1, ClassFunction.inner Γ a = ((x a : ℝ) : ℂ)) ∧
+  --   • `heta` = every coherent image is orthogonal to the η-grid.
+  -- The gap itself and the genuine (13.18.d) projected norm are the concrete, correctly stated
+  -- `betaData_of_grid.Gamma` and `Y_norm_bound`; they are no longer part of this residual.
+  let betaData := OddOrder.Peterfalvi.S15.betaData_of_grid hG hyp.base
+    ⟨1, hyp.base.p_prime.one_lt⟩ (by simp)
+  obtain ⟨x, hxcoe, hx, heta⟩ :
+      ∃ (x : ClassFunction G ℂ → ℤ),
+        (∀ a ∈ calT1, ClassFunction.inner betaData.Gamma a = ((x a : ℝ) : ℂ)) ∧
         (∀ a ∈ calT1, x a ≠ 0) ∧
-        (ClassFunction.inner Γ Γ).re ≤
-          ((((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) : ℚ) : ℝ) := by
+        (∀ a ∈ calT1, ∀ (i : Fin hyp.base.q) (k : Fin hyp.base.p),
+          ClassFunction.inner a (hyp.base.eta i k) = 0) := by
     sorry
-  exact T_typeIII_ratio_le_of_sSide_gap hyp calT1 horth hcount Γ x hxcoe hx hnorm
+  exact T_typeIII_ratio_le_of_sSide_gap hyp calT1 horth hcount
+    betaData.Gamma x hxcoe hx heta betaData.Y_norm_bound
 
 /-- **Complement-conjugacy transfer of commutativity `V → d.U`** (`T`-side, ungated by (14.9)).
 Given that the `κ`-Hall complement `V` of `Q = T_F` in `T' = [T,T]` is abelian, *any* type-`P`
