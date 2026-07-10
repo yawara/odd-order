@@ -1031,3 +1031,24 @@ eq_sigma_of_apply_eq_on_V の statement 精読から (これが刺されば norm
   g-support 制約 + TI で全部 H 内 → class-fn 値 g(a) に collapse — induce_apply_eq_sum_filter /
   induceTerm API [Machinery135 の induce_one_apply と同系])。~60 行 self-contained。
   次 iter: これを実装 (置き場 = SupportedSpanOrthogonality or InducedCharacter 追記)。
+
+## ✅ (2026-07-11、lane-b /loop iter 23) — TI→Ind-isometry landed (step a の h_isom 入力完成)
+
+iter 22 設計どおり実装 (commit d9625eed、InducedCharacter.lean 新 section TIInduction、
+full build 4147 green・AxiomsCheck OK):
+
+- **`induce_apply_coe_of_isTISubset`** (TI 値恒等式 = Isaacs CTFG Lemma 7.7 identity part / Coq
+  `normedTI_Ind_id`): A TI (normalizer-bound H)、θ off-A 消滅 ⟹ `Ind_H^G θ (↑a) = θ a` on A。
+  証明 = induction sum の直接計算: off-H conjugator の非零項は A の 2 共役 overlap を作り TI で
+  conjugator ∈ H に矛盾 / in-H 項は conj_eq で各 θ a → ⅟|H|·|H|·θ a。
+- **`inner_induce_eq_of_isTISubset`** (isometry part / Coq `normedTI_isometry`): θ,ψ off-A 消滅 ⟹
+  `⟨Ind θ, Ind ψ⟩_G = ⟨θ,ψ⟩_H`。reciprocity + 値恒等式 + disjoint-support 直交の 3 行合成。
+- 一般 CommRing k で成立 (StarRing は isometry のみ)。Coq の Dade-経由 (`normedTI_Dade`) を
+  回避した self-contained 直接証明 ~100 行。新 import = GroupTheory.TISubset (mathlib-only leaf)。
+
+**次 iter (step a 本体)**: 列ごと signed family 抽出 — fixed W₂-char ψ の族 {ω(ω₁ⁱ·ψ)}ᵢ
+(0-anchored、degree 1、distinct) の差族に `isometry_difference_pair_structure` を適用。
+h_isom 入力 = 本 commit の `inner_induce_eq_of_isTISubset` (hTI : IsTISubset (W∖W₂ G-level) W
+仮説パラメータ; supported 側は ω-差族の W∖W₂-supported [landed 済])。突合せ点:
+isometry_difference_pair_structure の τ-引数形 (linear map か pairwise inner 条件か) を精読し、
+τ := Ind_W^S に instantiate できる形か確認 → 列間整合 (Coq inj_Imu、直交性) は次々 iter。
