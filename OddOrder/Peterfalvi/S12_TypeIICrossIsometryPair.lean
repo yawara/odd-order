@@ -842,6 +842,130 @@ theorem Hypothesis.tau1_zeta_inner_extension_lam_eq_zero_at_pair [Finite G]
     exact sub_eq_zero.mp hz
   exact orthonormal_vchar_diff_ortho haZ hbZ hcZ hdZ ha1 hb1 hc1 hd1 hab hcd hdiff hab1 hcd1
 
+open scoped FiniteInduce in
+/-- **`(M′)^# ⊆ A₀(M)`**: every nonidentity element of the derived subgroup centralizes
+itself (a nonidentity element of `M`), so it lies in the `A(M)`-disjunct of `typePA0` —
+the same witness as `inducedFamily_sub_support`'s tail.  Composes the sharp-support
+refinement back into the `A₀`-supported lattice (`extends_on_supported`). -/
+theorem Hypothesis.supportInSubgroup_sharp_derived_subset_A0 [Finite G] {M : Subgroup G}
+    (hyp : Hypothesis M) :
+    OddOrder.Peterfalvi.S04.supportInSubgroup (sharpSubgroup (derivedInG M)) M
+      ⊆ hyp.A0 := by
+  intro z hz
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at hz
+  obtain ⟨hzM', hz1⟩ := hz
+  show (z : G) ∈ typePA0 M hyp.typeP
+  unfold typePA0
+  rw [Set.mem_union]
+  left
+  exact ⟨hzM', hz1, (z : G), ⟨z.2, hz1⟩, Subgroup.mem_centralizer_singleton_iff.mpr rfl⟩
+
+open scoped Classical FiniteInduce in
+/-- **The (10.7) `cross_zero` production** (Coq `Frob_der1_type2`'s
+`'[alpha^\tau, beta^{tau2}] = 0` step): for a nontrivial column `s`, the `τ₁`-image of
+`α = μ_s − d·ζ` is orthogonal to `ν^{τ₂} − λ^{τ₂}`.
+
+Both sides are Dade images of supported lattice elements: `μ_s = ∑_i μ_{is} ∈ 𝒮`
+(`muGrid_column_sum_mem_inducedFamily`) and `ζ ∈ 𝒮` with `α(1) = w₁·d − d·w₁ = 0`
+((10.3) degree independence and `ζ(1) = w₁`), so `α` is `(M′)^#`-supported
+(`mem_zSpan_inducedFamily_support_sharp_derived`) and `τ₁α = α^{τ_M}`
+(`extends_on_supported` through `(M′)^# ⊆ A₀`); `ν − λ` is `A(S)`-supported with
+`τ₂(ν − λ) = (ν − λ)^{τ_S}`.  The (8.18.b) support disjointness
+(`cross_dade_inner_eq_zero_at_pair`) kills the cross inner product. -/
+theorem Hypothesis.tau1_muColumn_sub_zeta_inner_extension_diff_eq_zero_at_pair [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : Hypothesis M) {mp : Section16MaximalPair G}
+    (hT : mp.T = M) (hKstar : mp.Kstar = hyp.typeP.W1)
+    {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S}
+    (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar)
+    [NeZero (Nat.card (typeIIHypothesis46 hG mp.S_maximal
+      (section16_S_isTypeII hG mp) data.typeP).W1)]
+    {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    (hζ1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (hμd : ∀ (i : Fin hyp.w1) (j : Fin hyp.w2), j ≠ 0 →
+      hyp.muGrid hG hG.odd i j 1 = (params.d : ℂ))
+    {Y : Subgroup G} {lam nu : ClassFunction ↥mp.S ℂ}
+    (hlam_mem : lam ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (_hlam_irr : IsIrreducibleCharacter lam)
+    (hnu_mem : nu ∈ OddOrder.Peterfalvi.S11.sOf data Y)
+    (hdeg : lam 1 = nu 1)
+    (c : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+        (typeIIHypothesis46 hG mp.S_maximal (section16_S_isTypeII hG mp) data.typeP).dade0
+        (typeIIHypothesis46 hG mp.S_maximal (section16_S_isTypeII hG mp) data.typeP).tau)
+      ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥mp.S ℂ))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (centralizerSupport (sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma mp.S))
+            (derivedInG mp.S)
+          ∪ conjClassSetIn mp.S (typePV mp.S data.typeP)) mp.S))
+    (s : Fin hyp.w2) (hs : s ≠ 0) :
+    ClassFunction.inner
+      (coh.tau1 ((∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i s)
+        - (params.d : ℂ) • params.zeta))
+      (c.extension nu - c.extension lam) = 0 := by
+  classical
+  subst hT
+  -- `M`-side: `α = μ_s − d·ζ` is a `1`-vanishing lattice element, `(M′)^#`-supported
+  have hd01 : hyp.muGrid hG hG.odd 0 s 1 ≠ 1 := by
+    rw [hμd 0 s hs]
+    intro h
+    have hd : params.d = 1 := by exact_mod_cast h
+    have := params.d_gt_one
+    omega
+  have hμS : (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i s) ∈ inducedFamily mp.T :=
+    hyp.muGrid_column_sum_mem_inducedFamily hG hG.odd s hd01
+  have hdsmul : (params.d : ℂ) • params.zeta = (params.d : ℤ) • params.zeta := by
+    rw [← Int.cast_smul_eq_zsmul ℂ (params.d : ℤ) params.zeta]
+    norm_num
+  have hαspan : (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i s)
+      - (params.d : ℂ) • params.zeta
+      ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥mp.T) (inducedFamily mp.T) := by
+    refine Submodule.sub_mem _ (Submodule.subset_span hμS) ?_
+    rw [hdsmul]
+    exact Submodule.smul_mem _ _ (Submodule.subset_span params.zeta_mem_S)
+  have hα1 : ((∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i s)
+      - (params.d : ℂ) • params.zeta) 1 = 0 := by
+    rw [ClassFunction.sub_apply, ClassFunction.smul_apply, hζ1,
+      ClassFunction.finset_sum_apply,
+      Finset.sum_congr rfl (fun i _ => hμd i s hs),
+      Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+    ring
+  have hαsharp := hyp.mem_zSpan_inducedFamily_support_sharp_derived hαspan hα1
+  have hM : coh.tau1 ((∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i s)
+      - (params.d : ℂ) • params.zeta)
+      = hyp.tau ((∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i s)
+        - (params.d : ℂ) • params.zeta) :=
+    coh.coherent.extends_on_supported _
+      ⟨hαspan, hαsharp.trans hyp.supportInSubgroup_sharp_derived_subset_A0⟩
+  -- `S`-side: `ν − λ` is `A(S)`-supported
+  have hψsupp : (nu - lam).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (centralizerSupport (sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma mp.S))
+        (derivedInG mp.S)) mp.S := by
+    have hmem := typeII_T2_member_support hG mp.S_maximal (section16_S_isTypeII hG mp) data
+      hlam_mem hnu_mem
+    exact diff_support_subset_of_support_subset_union_one
+      (hmem nu (by simp)) (hmem lam (by simp)) hdeg.symm
+  have hψA0 : (nu - lam).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (centralizerSupport (sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma mp.S))
+          (derivedInG mp.S)
+        ∪ conjClassSetIn mp.S (typePV mp.S data.typeP)) mp.S :=
+    hψsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono Set.subset_union_left)
+  have hnu_zspan : nu ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥mp.S)
+      ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥mp.S ℂ)) :=
+    Submodule.subset_span (Set.mem_insert_of_mem _
+      (Set.mem_insert_of_mem _ (Set.mem_insert _ _)))
+  have hlam_zspan : lam ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥mp.S)
+      ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥mp.S ℂ)) :=
+    Submodule.subset_span (Set.mem_insert _ _)
+  have hS : c.extension nu - c.extension lam
+      = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+        (typeIIHypothesis46 hG mp.S_maximal (section16_S_isTypeII hG mp) data.typeP).dade0
+        (typeIIHypothesis46 hG mp.S_maximal (section16_S_isTypeII hG mp) data.typeP).tau
+        (nu - lam) := by
+    rw [← c.extends_on_supported _ ⟨Submodule.sub_mem _ hnu_zspan hlam_zspan, hψA0⟩, map_sub]
+  rw [hM, hS]
+  exact hyp.cross_dade_inner_eq_zero_at_pair hG rfl hKstar hSW1 hSW2 hαsharp hψsupp
+
 set_option linter.unusedVariables false in
 open scoped Classical FiniteInduce in
 /-- **The (10.7) cross-isometry package at the canonical pair** (Coq `Frob_der1_type2`,
@@ -858,6 +982,9 @@ theorem exists_typeIICrossIsometryData_at_pair [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     {hyp : Hypothesis M} {params : CharacterParameters hyp}
     (coh : CoherentHypothesis hyp params)
+    (hζ1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (hμd : ∀ (i : Fin hyp.w1) (j : Fin hyp.w2), j ≠ 0 →
+      hyp.muGrid hG hG.odd i j 1 = (params.d : ℂ))
     {mp : Section16MaximalPair G}
     (hT : mp.T = M) (hKstar : mp.Kstar = hyp.typeP.W1)
     {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S}
@@ -892,6 +1019,8 @@ theorem exists_typeIICrossIsometryData_at_pair [Finite G]
            zeta_lam_ortho :=
              hyp.tau1_zeta_inner_extension_lam_eq_zero_at_pair hG hT hKstar hSW1 hSW2
                coh hlam_mem hlam_irr hnu_mem hdeg c
-           cross_zero := sorry }⟩
+           cross_zero := fun s hs =>
+             hyp.tau1_muColumn_sub_zeta_inner_extension_diff_eq_zero_at_pair hG hT hKstar
+               hSW1 hSW2 coh hζ1 hμd hlam_mem hlam_irr hnu_mem hdeg c s hs }⟩
 
 end OddOrder.Peterfalvi.S12
