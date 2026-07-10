@@ -247,3 +247,25 @@ HUB 追記 tick #6 の解禁に基づき削除実施。consumer-0 grep 確認の
 `typeII_overNormalizer_frobenius_V` — 指名 3 宣言のためだけに存在する同族無条件 pq carrier、
 S15_SAndT 内部完結・外部 consumer 0)。dichotomy 系 4 宣言は温存
 (`exists_M_structural_dichotomy` は独立 route ゆえ無影響)。full build 4135 green・AxiomsCheck OK。
+
+## ⛔ HUB: c の b68e14ae/0e24a40b 合流を abort (2026-07-10 tick、merge-safety)
+
+**事象**: merge candidate は build green だが **AxiomsCheck FAILED** — sorry-free と assert 済みの
+4 宣言 (`betaM_axis_odd_of_main_size_bounds` :6845 / `betaMExpansionData_of_hypothesis78` :6855 /
+`MHypothesis.chiRhoNormSq_eq_zetaNuRhoNormSq` :7091 / `MHypothesis.rhoNormSq_ge_lower` :7101) が
+`sorryAx` に transitive 依存するようになった (hub 実測 `#print axioms` で確認)。b68e14ae が
+これらを sorried 依存 (推定 `exists_betaMGridData` 系) へ再配線した際、**AxiomsCheck の追従更新
+なし・commit message での self-flag なし** ("prove the M-side signed eta expansion" と proven 主張のみ)。
+
+**裁定**: 3004 の merge-gate 事前承認は「faithfulness repair による再 gate 化」を許可するが、
+条件 (i) self-flag + (iv) AxiomsCheck 追従を**必須**とする。本 commit は両条件を欠くため
+**undisclosed transitive sorry-regression として不合格 → `git merge --abort`** (main は不変、
+c の直前 landing までは有効)。
+
+**c への差し戻し指示** (次回 main sync で本節を読むこと):
+1. 4 宣言の sorryAx 依存が**意図した再 gate 化**なら: AxiomsCheck の該当 4 assert を
+   sorry-tolerant 形へ更新し、commit message で「どの sorried 依存に gate されたか」を self-flag
+   して再提出。
+2. 意図せぬ依存 (proof 変更の副作用) なら: sorry-free を回復して再提出。
+3. いずれの場合も b68e14ae の数学本体 (signed expansion の parity+Bessel) は保全対象 —
+   revert せず開示形式のみ修正すること。
