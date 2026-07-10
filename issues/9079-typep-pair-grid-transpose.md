@@ -225,3 +225,34 @@ dataT.W1 = mp.Kstar ∧ dataT.W2 = mp.K` — sorry-free / axiom-clean (3-standar
    typeP_duality) + item 4 (行和 pin 変換)。
 3. gate `exists_typeIICrossIsometryData` の pair-witness 再構成時は gate 側が
    FeitThompsonSetup (or 本 leaf) を import する (cycle なし確認済)。
+
+## 2026-07-10 part 1.7 LANDED (98fb466d): item 3 還元 glue — disjunction 版
+
+3 宣言 sorry-free / axiom-clean (3-standard):
+- `section16_S_isTypeII` — IsTypeII mp.S (S_typeP2 + `isTypeII_of_isTypeP2` dictionary)
+- `conj_eq_S_or_conj_eq_T_of_isTypeII` — 任意 type-II maximal L について
+  (∃g, conj g • L = mp.S) ∨ ((∃g, conj g • L = mp.T) ∧ **IsTypeII mp.T**)。
+  theorem88_caseB → type-I 枝は `not_isTypeI_of_isTypeNonI` (IsTypeNonI = 4-or の
+  Or.inl) で排除、T-枝は `isTypeII_pointwise_smul` で type-II 証明書付与。
+- `exists_conj_eq_S_of_isTypeII` — 条件付き strong 形 (仮説 ¬IsTypeII mp.T)。
+
+### ★ T-枝の排除可否判定 (調査結果): 無条件 strong 版は成立しない
+- **Peterfalvi (13.2.a) は片方向**: mmd 原文 "S is of Type II or Type III.
+  If q<p, then S is of Type II" — 小さい側の type-II を保証するだけで、大きい側
+  T の type-II を**排除しない** (T が type II の可能性は理論上 open)。
+- **Coq も同様**: PFsection10 `Frob_der1_type2` の M-枝 kill は
+  `rewrite defL FTtypeJ` + **文脈仮説 notMtype2** (§10 の ambient M が type 2 でない
+  という section hypothesis) — 無条件の排除は Coq にも無い。
+- **設計対応**: disjunction + 証明書 + 条件付き strong の 3 段 API。T-枝が発火した
+  場合は IsTypeII mp.T 証明書付きで、pair 機構は S/T 対称
+  (exists_section16_partner_typePData で T-side TypePData も取れる) ゆえ消費側
+  ((10.7) gate の pair-witness 再構成) で対称に処理できる。gate 側が
+  notMtype2-相当の文脈 (M-side は §10 の Hypothesis M で type III/IV/V) を持つ
+  場合は strong 形が直接効く。
+
+### issue scope 総括 (part 1–1.7 で landed 済 / 残)
+- ✅ item 1 (σ-grid pair transpose bridge の CF(W,V) 層): part 1 + 1.5
+- ✅ item 2 (pair 対称化 / V-W 共有): part 1.5 + 1.6 (T-side producer)
+- ✅ item 3 (type-II L → canonical partner 還元): part 1.7 (disjunction 版)
+- ⏳ item 4 (行和 pin 変換) + **part 2 本体** (grid 指標 per-index σ-同定 =
+  (3.5)-determination or (3.7) 係数 rigidity) — 次 iteration。
