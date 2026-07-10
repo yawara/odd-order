@@ -69,3 +69,18 @@ trial の裁定 (codex 継続 or Claude へ swap-back) が本 issue に記録さ
   (commit message は "prove" と主張)。gate が transitive sorryAx 依存を検出 → abort + 差し戻し
   (詳細 = 3004 ⛔ 節)。**開示規律の違反であり数学の欠陥ではない**点に注意 — dup なし・逸脱なし・
   S05 engine cite は正しい。トレンド: genuine landing 3/4、churn 0、規律違反 1 (開示形式)。
+- 2026-07-10 (手動 tick、a/b 合流 1651cfca/4ff26f59): **c は保留 (ユーザー指示: codex が起動し
+  きれていない)**。c の未マージ = b68e14ae 系 3 commits のまま新 commit なし (差し戻し未対応は
+  起動未完了ゆえ評価対象外)。次 tick 以降: c に新 commit が出たら通常 range-check + 3004 ⛔ の
+  差し戻し条件 (AxiomsCheck 追従 or sorry-free 回復 + self-flag) を確認して合流判定。
+- 2026-07-10 (cron tick、a/b 合流 e28c7735/a57e5c7a): **codex-c が差し戻しに完全対応した新 commit
+  `dc2368c8` を提出 — hub 検査は全項目パス、ただし合流はユーザーの保留指示が未解除のため実施せず**。
+  検査結果: (i) 3004 指示 1 どおり AxiomsCheck 4 assert を unregister + 各所に transitive gate の
+  詳細 doc、commit message でも self-flag (開示規律の是正確認)。(ii) resume audit が taint 根を
+  定数単位で特定 (h78 の computed accessor 化、4 proof body に新 sorry なし)。(iii) さらに genuine
+  improvement: β global uniqueness の overclaim を除去し η係数 choice-invariance
+  (`typeIGrid_betaL_inner_eta_eq_h78_beta`) を実証明、producer 残 sorry を `grid.phi ∈ Sset` へ縮小。
+  (iv) lane-b API への残修正 2 点 (phi_mem_Sset field / tau1 parameterize) を 3004 に精密記録
+  (越境編集せず issue 経由 = 規約準拠)。範囲逸脱なし・shared-infra dup なし・新 axiom なし。
+  トレンド: genuine landing 4/5、churn 0、規律違反 1 (是正済)。**→ ユーザーが保留解除したら次 tick で
+  通常ゲート (trial merge + build + AxiomsCheck) を通して合流する**。

@@ -383,6 +383,20 @@ def A1 (M : Subgroup G) (tau : PeterfalviType) : Set G :=
 def typeIA (M : Subgroup G) (data : TypeIData M) : Set G :=
   centralizerSupport (sharpSubgroup data.typeF.H) M
 
+/-- `1 ∉ A(M)`: the type-`I` support `typeIA` consists of nonidentity elements. -/
+theorem one_notMem_typeIA {M : Subgroup G} (data : TypeIData M) :
+    (1 : G) ∉ typeIA M data := fun h => h.2.1 rfl
+
+/-- `H^# ⊆ A(M)` for type-`I` data (the Coq `Fcore_sub_FTsupp` shape): a nonidentity element
+of the kernel `H = M_F` lies in the support `A(M)` — it centralizes itself.  For a Frobenius
+`M` this inclusion is an equality, but for a general type-`I` maximal `A(M)` is strictly
+larger; the (12.5) chain needs only this inclusion. -/
+theorem sharpSubgroup_H_subset_typeIA {M : Subgroup G} (data : TypeIData M) :
+    sharpSubgroup data.typeF.H ⊆ typeIA M data := by
+  intro y hy
+  refine ⟨data.typeF.H_le hy.1, fun h1 => hy.2 h1, y, hy, ?_⟩
+  exact Subgroup.mem_centralizer_iff.mpr fun g hg => by rw [Set.mem_singleton_iff.mp hg]
+
 /-- The `A(M)` set associated to type `P` data. -/
 def typePA (M : Subgroup G) (_data : TypePData M) : Set G :=
   centralizerSupport (sharpSubgroup M) (derivedInG M)
