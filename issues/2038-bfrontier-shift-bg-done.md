@@ -935,3 +935,14 @@ equiv_restrict_compl_ortho port から着手。
 instantiation)、(ii) mu2Grid の W∖W₂-値 identity (`prTIirr_id` 対応) を PrimeTIResidue に追加。
 Φ-spanning は supportedSubmodule (W∖W₂-in-W) の基底 = ω-grid の差族 (V2base = ew_ ij) —
 S05/S06 の ω-grid API から組む。
+
+## ✅ (2026-07-11、lane-b /loop iter 16) — Fourier 展開補題 landed ((1.3.a) core の univ-instance)
+
+`eq_sum_inner_smul_of_orthonormal_of_span_top` (SupportedSpanOrthogonality 追記、sorry-free
+一発 green): orthonormal spanning family Φ で f = Σ⟨f,Φi⟩•Φi。証明 = (1.3.a) core @ A=univ +
+orthonormal collapse + inner_conj_symm。
+**次 (ω-差族 spanning への残 3 部品)**: (i) span top bridge (span_irreducibleCharacter_eq_top
+[CharacterCompleteness:683] + omega_surjective [S05_TICyclic:343] → CF(↥W) = span(range ω))、
+(ii) W₂-vanishing → 行和 0 (f = Σc_χ ω_χ、x∈W₂ で ω_χ(x) = χのW₂成分値 → W₂-char 独立性で
+Σ_{W₁成分} c = 0 per W₂-char)、(iii) 差族 reassembly (行和 0 ⟹ f = Σ_j Σ_i c_ij(ω_ij−ω_0j))。
+wFst/wSnd (W=W₁×W₂ 射影、S05) で char の積分解。
