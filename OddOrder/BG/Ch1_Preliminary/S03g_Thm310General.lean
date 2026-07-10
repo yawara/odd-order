@@ -189,7 +189,7 @@ theorem isIrreducible_lift_of_trivial [Nontrivial V] (ρ : Representation F G V)
   · refine Or.inr (Subrepresentation.toSubmodule_injective ?_)
     exact (congrArg Subrepresentation.toSubmodule h : Sρ.toSubmodule = (⊤ : Submodule F V))
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+open OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom quotientMulAutHom_apply_mk') in
 /-- **Case B brick — the Frobenius FPF action lifts to the quotient kernel** (issue 8013 piece 3,
 Proposition 1.5(d)).  If `r ∈ R` acts fixed-point-freely on `K` (`C_K(r) = 1`, the Frobenius

@@ -733,7 +733,7 @@ theorem aInvariant_hall_conj {G A : Type*} [Group G] [Finite G] [IsSolvable G]
   refine ⟨c, hc_fix, ?_⟩
   exact congrArg Subtype.val hc_smul
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+open OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom quotientMulAutHom_apply_mk') in
 /-- An `A`-invariant subgroup maps to an `A`-invariant subgroup in an `A`-invariant
 quotient. This is the quotient-action transport used in BG Prop. 1.5(b). -/
@@ -749,7 +749,7 @@ private theorem isAInvariant_map_mk'
   obtain ⟨g, hg, rfl⟩ := hq
   exact ⟨(φ a) g, hH.smul_mem a hg, by rw [quotientMulAutHom_apply_mk']⟩
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+open OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom quotientMulAutHom_apply_mk') in
 /-- The preimage of an invariant subgroup of an `A`-invariant quotient is invariant in the
 original group. -/
@@ -855,7 +855,7 @@ private theorem coprime_card_quotient_of_coprime
     Nat.Coprime (Nat.card A) (Nat.card (G ⧸ N)) :=
   hCop.coprime_dvd_right (Subgroup.card_quotient_dvd_card N)
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+open OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom) in
 /-- Pull back a quotient Hall subgroup containing the image of `K`.
 
@@ -1311,7 +1311,7 @@ private theorem top_preimage_branch_frame
       simpa [cG] using congrArg Subtype.val hy_eq
 
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+open OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom) in
 /-- Induction kernel for BG Prop. 1.5(b). -/
 private theorem aInvariant_piSubgroup_le_aInvariant_hall_aux :

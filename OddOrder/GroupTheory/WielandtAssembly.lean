@@ -35,7 +35,7 @@ namespace OddOrder.GroupTheory
 
 open OddOrder.Isaacs.Ch03 (IsAInvariant)
 
-local notation3 "quotMulAut " hN => OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN
+local notation3 "quotMulAut " hN => OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN
 
 /-- The **per-chief-factor Wielandt identity**, uniformly over all finite groups `H` carrying an
 `L`-action and all elementary-abelian `L`-invariant normal subgroups `N ◁ H` (of *prime* exponent

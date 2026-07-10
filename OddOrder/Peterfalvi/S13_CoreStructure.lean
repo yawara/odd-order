@@ -958,7 +958,7 @@ theorem Hypothesis.H0_eq_Hprime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
     have hinv : OddOrder.Isaacs.Ch03.IsAInvariant φU
         (_root_.commutator ↥hyp.base.typeP.H) :=
       OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic _
-    set φbar := OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hinv with hφbar
+    set φbar := OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hinv with hφbar
     -- coprimality `(|U|, |H̄|) = 1`
     have hUne : hyp.base.typeP.U ≠ ⊥ := by
       rw [← hyp.setup_typeP_eq]; exact hyp.s11Setup.nontrivial.1
@@ -979,7 +979,7 @@ theorem Hypothesis.H0_eq_Hprime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
     set π := QuotientGroup.mk' (_root_.commutator ↥hyp.base.typeP.H) with hπ
     have hfix : π ⟨h₀, hH0le hh₀⟩ ∈ Subgroup.fixedPointsOfMulAut φbar := by
       intro û
-      rw [hφbar, OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk']
+      rw [hφbar, OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk']
       have heq : φU û ⟨h₀, hH0le hh₀⟩ = ⟨h₀, hH0le hh₀⟩ := by
         refine Subtype.ext ?_
         have hcoe : ((φU û ⟨h₀, hH0le hh₀⟩ : ↥hyp.base.typeP.H) : G)
@@ -1247,7 +1247,7 @@ theorem C_eq_cSub [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgro
     rw [MonoidHom.mem_ker] at hker
     have happ := DFunLike.congr_fun hker (QuotientGroup.mk' hyp.chief.N ⟨g, hgH'⟩)
     rw [OddOrder.Peterfalvi.S11.uActionHom, MonoidHom.comp_apply,
-      OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk',
+      OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk',
       MulAut.one_apply] at happ
     -- `N = ⊥` ⟹ the quotient map is injective ⟹ `typeP_conjAction l ⟨g,·⟩ = ⟨g,·⟩`
     have hinj : Function.Injective (QuotientGroup.mk' hyp.chief.N) := by

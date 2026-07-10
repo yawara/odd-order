@@ -450,7 +450,7 @@ noncomputable def Hypothesis.toTypesIIIIIIVSetupS [Finite G]
           nontrivial := ⟨hUne, hW1prime, tdata.common.2.2⟩
           type_alt := Or.inl hSII }
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **§9 character data on `S`** (S12-mk mirror; degree-only placeholders): `u = |Ū|` is
 rfl-pinned to the `U`-action image; `tau := hyp.tauS`, `H0CprimeSupport := ∅` and
 `quotientSemidirectFrobenius := True` are the documented count/degree-only placeholders (as in

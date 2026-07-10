@@ -393,7 +393,7 @@ noncomputable def Hypothesis.sSetIrrDeg_coherent [Fintype G] [Finite G]
   exact OddOrder.Peterfalvi.S07.coherent_subset_of_constant_degree hyp'
     (subset_refl _) hyp'.conjugate_closed hSfin h2 hirr hZIrr hconst hdeg0 h1A hsuppdiff
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **Honest §9 character data on `S`** (issue 2035 step 3): the `mkSection11CharacterDataS`
 mirror with the *genuine* coherence inputs — `tau := Ind_S^G` (`indS`, Peterfalvi (13.2.e)) and
 `H0CprimeSupport := (C')^#` (`cprimeSharpS`, the `S`-instance degeneration of `(H₀ ⊔ C')^#` via
@@ -787,7 +787,7 @@ theorem Hypothesis.P_elementaryAbelian [Finite G]
       ((QuotientGroup.quotientMulEquivOfEq hN).trans QuotientGroup.quotientBot) h
   rwa [hHeq] at hEA
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **`C_U(H̄) = C`** for the `S`-instance: the §9 kernel `cSub` (`= C_U(H̄)`) equals Peterfalvi's
 `C = C_U(P) = U ⊓ C_G(P)`.  The reverse `C ≤ cSub` is general (an element of `U` centralizing
 `H = P` acts trivially on any quotient of `H`, so lies in the action kernel); the forward
@@ -844,7 +844,7 @@ theorem Hypothesis.toTypesIIIIIIVSetupS_cSub_eq_C [Finite G]
       ext q
       refine QuotientGroup.induction_on q ?_
       intro x
-      rw [OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply
+      rw [OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply
         chief.N_aInvariant bUW1 x, MulAut.one_apply]
       congr 1
       apply Subtype.ext

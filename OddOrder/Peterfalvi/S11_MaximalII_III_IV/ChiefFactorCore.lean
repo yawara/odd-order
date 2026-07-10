@@ -20,7 +20,7 @@ open scoped Pointwise
 variable {G : Type*} [Group G]
 
 open OddOrder.Isaacs.Ch03 (IsAInvariant isAInvariant_iff_smul_mem)
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
 
 variable {M : Subgroup G}
 
@@ -319,7 +319,7 @@ theorem mem_cSub_of_mem_U_of_centralizes [Finite G] {M : Subgroup G}
     induction q using QuotientGroup.induction_on with
     | _ h =>
       rw [uActionHom, MonoidHom.comp_apply,
-        OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply,
+        OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply,
         MulAut.one_apply]
       -- conjugation by `x` fixes `h` since `x` centralizes `H`
       have hfix : (typeP_conjAction data.typeP
@@ -481,7 +481,7 @@ theorem hInHu_inf_uInHu_le_cInHu [Finite G] {M : Subgroup G} (data : TypesIIIIII
     induction q using QuotientGroup.induction_on with
     | _ h =>
       rw [uActionHom, MonoidHom.comp_apply,
-        OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply,
+        OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply,
         MulAut.one_apply]
       have hconj : (typeP_conjAction data.typeP
           ((data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype a) h)

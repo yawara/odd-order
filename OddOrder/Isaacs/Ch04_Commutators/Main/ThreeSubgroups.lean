@@ -801,7 +801,7 @@ theorem _root_.OddOrder.Isaacs.Ch03.IsAInvariant.map_subtype_of_characteristic
 /-- **A-不変正規部分群で割った商群への誘導作用**.
 
 `N` が `φ` で不変なら, 各 `φ a` は `G/N` の自己同型を誘導する. -/
-noncomputable def OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom
+noncomputable def _root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom
     {A G : Type*} [Group A] [Group G] {φ : A →* MulAut G}
     {N : Subgroup G} [N.Normal]
     (hN : OddOrder.Isaacs.Ch03.IsAInvariant φ N) : A →* MulAut (G ⧸ N) where
@@ -819,20 +819,28 @@ noncomputable def OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom
     intro g
     simp [map_mul]
 
-@[simp] lemma OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk'
+@[simp] lemma _root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk'
     {A G : Type*} [Group A] [Group G] {φ : A →* MulAut G}
     {N : Subgroup G} [N.Normal]
     (hN : OddOrder.Isaacs.Ch03.IsAInvariant φ N) (a : A) (g : G) :
-    (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN a)
+    (_root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN a)
         (QuotientGroup.mk' N g) =
       QuotientGroup.mk' N ((φ a) g) := rfl
 
-@[simp] lemma OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply
+@[simp] lemma _root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply
     {A G : Type*} [Group A] [Group G] {φ : A →* MulAut G}
     {N : Subgroup G} [N.Normal]
     (hN : OddOrder.Isaacs.Ch03.IsAInvariant φ N) (a : A) (g : G) :
-    (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN a) (g : G ⧸ N) =
+    (_root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN a) (g : G ⧸ N) =
       ((φ a) g : G ⧸ N) := rfl
+
+/- Note (issue 0106): `quotientMulAutHom` and its two `simp` lemmas were originally declared with
+a qualified head *inside* `namespace OddOrder.Isaacs.Ch04`, yielding the doubled real name
+`OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.…`.  They now live at the intended single namespace
+(`_root_.` head above).  No deprecated aliases are kept: alias constants under the doubled name
+would make every qualified reference ambiguous in files that `open OddOrder.Isaacs.Ch04`
+file-wide.  Downstream consumers of the old doubled name: drop the `OddOrder.Isaacs.Ch04.`
+prefix. -/
 
 /-- **Isaacs Corollary 3.28 / BG Proposition 1.5(d), subgroup form**: for a coprime
 action `φ : A → MulAut G` and an `A`-invariant normal subgroup `N`, the fixed points of
@@ -841,7 +849,7 @@ theorem fixedPointsOfMulAut_quotientMulAutHom_eq_map
     {G A : Type*} [Group G] [Finite G] [Group A] [Finite A] {φ : A →* MulAut G}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G)) (hSolv : IsSolvable A ∨ IsSolvable G)
     {N : Subgroup G} [N.Normal] (hN : OddOrder.Isaacs.Ch03.IsAInvariant φ N) :
-    Subgroup.fixedPointsOfMulAut (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN) =
+    Subgroup.fixedPointsOfMulAut (_root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN) =
       (Subgroup.fixedPointsOfMulAut φ).map (QuotientGroup.mk' N) := by
   refine le_antisymm ?_ ?_
   · intro q hq
@@ -850,7 +858,7 @@ theorem fixedPointsOfMulAut_quotientMulAutHom_eq_map
     have hg_fix : ∀ a : A, ∃ n ∈ N, (φ a) g = g * n := by
       intro a
       have hga := hq a
-      rw [OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk',
+      rw [_root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk',
         QuotientGroup.mk'_apply, QuotientGroup.mk'_apply, QuotientGroup.eq] at hga
       exact ⟨g⁻¹ * (φ a) g, by simpa using N.inv_mem hga, by group⟩
     obtain ⟨c, hc_fix, n, hn, hcn⟩ := coprime_fixedPoints_quotient hCop hSolv hN hg_fix
@@ -862,7 +870,7 @@ theorem fixedPointsOfMulAut_quotientMulAutHom_eq_map
     rw [Subgroup.mem_fixedPointsOfMulAut] at hc
     rw [Subgroup.mem_comap, Subgroup.mem_fixedPointsOfMulAut]
     intro a
-    rw [OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk', hc a]
+    rw [_root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk', hc a]
 
 /-- An `A`-invariant subgroup maps to an invariant subgroup in an
 `A`-invariant quotient. -/
@@ -872,14 +880,14 @@ theorem _root_.OddOrder.Isaacs.Ch03.IsAInvariant.map_quotient
     (hN : OddOrder.Isaacs.Ch03.IsAInvariant φ N)
     {H : Subgroup G} (hH : OddOrder.Isaacs.Ch03.IsAInvariant φ H) :
     OddOrder.Isaacs.Ch03.IsAInvariant
-      (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN)
+      (_root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN)
       (H.map (QuotientGroup.mk' N)) := by
   rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
   intro a q hq
   rw [Subgroup.mem_map] at hq ⊢
   obtain ⟨g, hg, rfl⟩ := hq
   exact ⟨(φ a) g, hH.smul_mem a hg, by
-    rw [OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk']⟩
+    rw [_root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk']⟩
 
 /-- The preimage of an invariant subgroup of an `A`-invariant quotient is
 invariant in the original group. -/
@@ -889,12 +897,12 @@ theorem _root_.OddOrder.Isaacs.Ch03.IsAInvariant.comap_quotient
     (hN : OddOrder.Isaacs.Ch03.IsAInvariant φ N)
     {Y : Subgroup (G ⧸ N)}
     (hY : OddOrder.Isaacs.Ch03.IsAInvariant
-      (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN) Y) :
+      (_root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN) Y) :
     OddOrder.Isaacs.Ch03.IsAInvariant φ (Y.comap (QuotientGroup.mk' N)) := by
   rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
   intro a g hg
   rw [Subgroup.mem_comap] at hg ⊢
-  rw [← OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk']
+  rw [← _root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk']
   exact hY.smul_mem a hg
 
 /-- Pull back a quotient Hall subgroup containing the image of `K`.
@@ -907,7 +915,7 @@ theorem _root_.OddOrder.Isaacs.Ch03.IsAInvariant.exists_comap_quotient_hall
     {Hbar : Subgroup (G ⧸ M)}
     (hHbar_hall : OddOrder.Isaacs.Ch03.IsHallSubgroup π Hbar)
     (hHbar_inv : OddOrder.Isaacs.Ch03.IsAInvariant
-      (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hM) Hbar)
+      (_root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hM) Hbar)
     (hK_image_le : K.map (QuotientGroup.mk' M) ≤ Hbar) :
     ∃ H : Subgroup G,
       OddOrder.Isaacs.Ch03.IsAInvariant φ H ∧ K ≤ H ∧
@@ -932,7 +940,7 @@ theorem actionCommutator_quotient_eq_map
     {A G : Type*} [Group A] [Group G] {φ : A →* MulAut G}
     {N : Subgroup G} [N.Normal]
     (hN : OddOrder.Isaacs.Ch03.IsAInvariant φ N) :
-    actionCommutator (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN) =
+    actionCommutator (_root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN) =
       (actionCommutator φ).map (QuotientGroup.mk' N) := by
   rw [actionCommutator, actionCommutator, MonoidHom.map_closure]
   congr 1
@@ -952,12 +960,12 @@ theorem actionCommutator_quotient_eq_bot_of_le
     {N : Subgroup G} [N.Normal]
     (hN : OddOrder.Isaacs.Ch03.IsAInvariant φ N)
     (h_le : actionCommutator φ ≤ N) :
-    actionCommutator (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN) = ⊥ := by
+    actionCommutator (_root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN) = ⊥ := by
   rw [actionCommutator_eq_bot_iff_acts_trivially]
   intro a q
   refine QuotientGroup.induction_on q ?_
   intro g
-  rw [OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply]
+  rw [_root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply]
   rw [QuotientGroup.eq]
   simpa [mul_inv_rev] using
     N.inv_mem ((actionCommutator_le_iff_left φ N).mp h_le a g)
@@ -969,7 +977,7 @@ theorem fixedPoints_quotient_eq_top_of_commutator_le_fitting
     (hRK : R ≤ Subgroup.normalizer (K : Set G))
     (hcomm : ⁅K, R⁆ ≤ (OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype) :
     Subgroup.fixedPointsOfMulAut
-      (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom
+      (_root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom
         (OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic
           (H := OddOrder.Isaacs.Ch01.fitting ↥K)
           ((Subgroup.normalizerMonoidHom K).comp (Subgroup.inclusion hRK)))) = ⊤ := by
@@ -981,7 +989,7 @@ theorem fixedPoints_quotient_eq_top_of_commutator_le_fitting
     have h := actionCommutator_conj_map_subtype hRK
     rw [← h] at hcomm
     exact Subgroup.map_le_map_iff_of_injective K.subtype_injective |>.mp hcomm
-  have hbot : actionCommutator (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hFinv) =
+  have hbot : actionCommutator (_root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hFinv) =
       ⊥ := by
     rw [actionCommutator_quotient_eq_map, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']
     exact hac_le

@@ -20,7 +20,7 @@ open scoped Pointwise
 variable {G : Type*} [Group G]
 
 open OddOrder.Isaacs.Ch03 (IsAInvariant isAInvariant_iff_smul_mem)
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
 
 variable {M : Subgroup G}
 

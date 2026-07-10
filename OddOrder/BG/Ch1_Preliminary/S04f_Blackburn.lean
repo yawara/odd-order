@@ -14,7 +14,7 @@ open scoped Pointwise commutatorElement
 namespace OddOrder.BG.Ch1.S04
 open OddOrder.GroupTheory
 open OddOrder.Isaacs.Ch03 (IsAInvariant)
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+open OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom quotientMulAutHom_apply)
 open OddOrder.BG.Ch1_Preliminary (isAInvariant_map_subtype_of_restrict
   isAInvariant_subgroupOf_restrict)

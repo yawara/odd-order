@@ -309,21 +309,54 @@ hyp.typeP hodd` を field に持つ (S-side と完全同型) → M-side ticVdiff
 `alignedOmegaSigmaGrid` の σ も同 bridge 上 (CharacterParameters.lean:138) — pair 機構の
 T-side は `dataT := hyp.typeP` で直結。
 
-### 残 (次 iteration): M-side 変換 + gate 組立
-1. **M-side fiber 変換**: `∑_q chiFam_M (r'char, q) = ∑_{j : Fin w2} alignedOmegaSigmaGrid r' j`。
-   部品: (a) aligned char = `omegaProdCharTic h46_M (χ₂ j) i'` の同定 — aligned の
-   `e` (subgroupOfEquivOfLe∘subgroupCongr) と `ticWEquivSdiffW h46_M` は同 type 間の
-   coe-coherent MulEquiv ⟹ ext+coe-injective で equal (coe_ticWEquivSdiffW S06:112)。
-   h46_M.toHypothesis = aligned の h も rfl-same。
-   (b) fst/snd 独立性 = ColumnPin IndexComponents (omegaProdCharTic_symm_{fst,snd}_eq/_ne、
-   Hypothesis46-generic ゆえ h46_M にそのまま適用可)。
-   (c) j ↦ snd-index の全射性 = cardinality (χ₂ enum = finCardEquivCharacterGroup∘finCongr
-   bijective + e-precompose bijective)。r'char は i-enum の全射性で任意に hit。
-2. **gate 組立** (`exists_typeIICrossIsometryData` の pair-witness 再構成): S ~ mp.S / M ~ mp.T
-   の共役 re-basing。M 非 type-II (notMtype2 相当) → `exists_conj_eq_S_of_isTypeII` の hT を
-   M~mp.T 経由で discharge → S-枝一意。conj 転送は結論レベル (Coq 流) が軽い。
-   Section16MaximalPair の conj-transport (TypePData.conj 相当の pair 版) が要るか要精査。
-3. 行和 pin の符号/添字整形 (dichotomy の ±δ • ∑ → gate の delta' • ∑ ω_{r'j})。
+### ✅ M-side fiber 変換 LANDED (3de82514)
+`Hypothesis.exists_alignedOmegaSigmaGrid_row_sum_eq_chiFam_fiber` — 設計どおり
+(e = ticWEquivSdiffW pointwise (双方 coe-rfl/coe_ticWEquivSdiffW) + ColumnPin
+IndexComponents + Pontryagin counting)。**item 4 の変換チェーンが全リンク閉じた**:
+dichotomy 列和 →(pair transpose)→ T-grid 行和 →(fiber lemma)→ aligned 行和 = gate 消費形。
+⚠ 実装 crumb: `Nat.bijective_iff_injective_and_card` + card 等式は defeq (`rfl`/hcardW1) /
+haveI `NeZero (Nat.card h46.W1)` は h-版と別に要 (syntactic instance) / step1 は
+change + `congr 1` (compHom↔linearIrred-comp は defeq、congr が閉じる)。
+
+### gate 組立第一陣 LANDED (910419f5): M-seed 前提 2 本
+`isHallSubgroup_of_card_eq` + ★`typePData_W1_isHallSubgroup_kappa` (W₁ 自身が κ(M)-Hall;
+typePData_W1_hall_coprime の proof mirror + card-transfer) + `not_isTypeP2_of_isTypeIII_or_IV_or_V`
+(P₁/P₂ 排他)。これで下記設計 1 の duality seed (K := hyp.typeP.W1) と、強形 reduction の
+¬IsTypeII discharge / K_lt_Kstar 導出の材料が揃った。
+**次 = P3/P4**: `exists_section16MaximalPair_data` (FTS:526) の M-seed mirror
+(相違: seed = (M, hyp.typeP.W1)、relabel case-split なし — M 非 P₂ ⟹ partner が
+P₂/smaller 側と強制 (not_isTypeP2 + isTypeP2_of_typeP_kappaHall_lt (FTS:703) 対偶 +
+card_kappaHall_ne_card_Kstar)) → structure 化 (mirror FTS:726)、置き場 = 本 leaf。
+その後 P5: `section16TypePStructure_of_isMinimalSimpleOdd` が mp-generic か確認
+(mp-generic なら tp は無料)。
+
+### 残 = gate 組立 (次 iteration)。★設計確定 (2026-07-10 調査、conj-transport 不要 route):
+**発見**: `BG.Ch4.S14.typeP_duality` (TypePDuality.lean:982) は**任意の type-P maximal M**
+に対し stated (K = κ-Hall seed) — canonical pair を「conj で寄せる」のでなく
+**§10 の M の周りに直接 pair を建てる**:
+1. **W1-seeded pair producer** `section16MaximalPair_around_M` (新規、
+   `section16MaximalPair_of_isMinimalSimpleOdd` FTS:726 の proof を M-seed で mirror):
+   typeP_duality hG hyp.maximal (bgTypeP) (K := κ-Hall containing story: hyp.typeP.W1 が
+   κ(M)-Hall — typePData_W1_hall 系で supply) ⟹ mp with **mp.T = M (literal)**、
+   **mp.Kstar = hyp.typeP.W1 (rfl by construction)** ⟹ pair 機構の (dataT, hTW1) =
+   (hyp.typeP, rfl)。IsTypeP2 M ∨ IsTypeP2 Mstar + M は III/IV/V (hyp.type_alt) ⟹
+   mp.S := Mstar が P₂-member。
+2. **S-side WLOG (consumer restructure、char-data conj-transport 完全回避)**:
+   `typeII_HU_frobenius_of_coherent_aux` (S12_TypeIIFrobenius:1332) の側で、任意 type-II
+   (S, data) を `exists_conj_eq_S_of_isTypeII` (hT := ¬IsTypeII M ⟸ hyp.type_alt +
+   type 排他) で mp.S に reduce し、**S11 setup/chars/coherence を mp.S 上で新規
+   instantiate** (TypesIIIIIIVSetup = {maximal, typeP, nontrivial, type_alt} の 4-field
+   組立; typeP = tp.Sdata、nontrivial = (8.6) TypePNontrivialCore producer、
+   type_alt = Or.inl (section16_S_isTypeII))。Coq PFsection10 が §10 で char data を
+   on-demand 構築するのと同型 — **char-theoretic 対象は一切 conj しない**。
+   結論 (IsFrobeniusGroup (derivedInG S) H U) のみ conj g で S へ transport
+   (H = S_F は canonical ⟹ conj-image 一致; U は complement conjugacy flexibility)。
+3. **gate field threading**: mp.S 上で dichotomy (`typeII_nu_tau2_dichotomy`、
+   ticVdiff_typeIIHypothesis46_eq で pair 機構に直結) → pair transpose
+   (appT := hyp.canonicalFullDadeApp) → fiber lemma → nu_tau2_eq。
+   c.extension → tau2 packaging + 符号 (columnFamily sign → delta')。
+4. obligation 3 ((8.18.b) disjointness → cross_zero/zeta_lam_ortho/*_ortho_grid) は別線
+   (s10_7 note update⁵)。
 
 ### 残 assembly (part 2 第二陣、fresh agent 向け設計) — ↑で実施済み (履歴として保存):
 Coq `cycTIisoC` の Lean 版 = **pair 両側 σ の per-index 同定**:

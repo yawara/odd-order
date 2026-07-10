@@ -197,7 +197,7 @@ structure RankTwoWitnessData (ctr : CounterexampleHypothesis (G := G)) where
   /-- `C_G(x) ⊄ L`. -/
   centralizer_x_not_le_L : ¬ (Subgroup.centralizer ({x} : Set G) ≤ L)
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+open OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom quotientMulAutHom_apply_mk') in
 /-- **Group-theoretic core of Peterfalvi (12.9)** (fully general, `§8`-independent).
 
@@ -1307,7 +1307,7 @@ theorem p_not_dvd_card_K [Finite G] (ctr : CounterexampleHypothesis (G := G)) :
     rwa [Subgroup.relIndex]
   exact Nat.Prime.not_dvd_one ctr.p_prime (hcop ▸ Nat.dvd_gcd hdvd ctr.p_dvd_index)
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+open OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom quotientMulAutHom_apply_mk') in
 /-- **Peterfalvi (8.1.c) → (12.16) numeric input: `4·|K'| ≤ |K|`** (the `hidx` field of
 `CounterexampleDadeData`).

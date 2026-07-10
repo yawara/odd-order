@@ -50,7 +50,7 @@ variable {G : Type*} [Group G]
 
 /-! ## The `Hypothesis (10.1)` → §9 bridge -/
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **Construct the §9 `Section11CharacterData` from the §10 `Hypothesis`** (the key unblocker for
 the (11.8.1) §9 counts).  Given the §9 setup `data` (`toTypesIIIIIIVSetup`) and a chief factor
 `chief` (`exists_chiefFactorData`), the §9 character datum's *character* fields are all derived from
@@ -120,7 +120,7 @@ theorem Hypothesis.card_U_modEq_one [Finite G] {M : Subgroup G} (hyp : Hypothesi
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv] at h
   exact h
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **Peterfalvi (11.8.1), the chief-factor image congruence `|Ū| ≡ 1 (mod q)`.**  The genuine `u`
 field of the constructed §9 character datum, `u = |Ū| = |U/C_U(H̄)|` (the image of `U` in
 `Aut(H̄)`, `mkSection11CharacterData.u`), satisfies `|Ū| ≡ 1 (mod w₁ = q)`.
@@ -140,7 +140,7 @@ theorem Hypothesis.mkSection11CharacterData_u_modEq_one [Finite G] {M : Subgroup
     (quotientMulAutHom (N := chief.N) chief.N_aInvariant)
   rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv] at hgen
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 open OddOrder.Peterfalvi.S11 in
 /-- **Peterfalvi (11.8.1), the index identification `u = |U : C|`** (`C = U ⊓ C_G(H)`), under the
 (11.7) collapse `H₀ = 1` (i.e. the chief-factor kernel `chief.N = ⊥`).
@@ -191,7 +191,7 @@ theorem Hypothesis.u_eq_relIndex_C [Finite G] {M : Subgroup G} (hyp : Hypothesis
           ((⟨g, hg⟩ : ↥data.typeP.H) : ↥data.typeP.H ⧸ chief.N)
           = ((⟨g, hg⟩ : ↥data.typeP.H) : ↥data.typeP.H ⧸ chief.N) := by
         rw [hv]; rfl
-      rw [hφ, OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply,
+      rw [hφ, OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply,
         QuotientGroup.eq, hN] at happ
       have hmem : (typeP_conjAction data.typeP
           (Subgroup.inclusion (le_sup_left : data.typeP.U ≤ L) v)
@@ -207,7 +207,7 @@ theorem Hypothesis.u_eq_relIndex_C [Finite G] {M : Subgroup G} (hyp : Hypothesis
       apply MulEquiv.ext
       intro y
       refine QuotientGroup.induction_on y (fun g => ?_)
-      rw [hφ, OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply]
+      rw [hφ, OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply]
       change ((typeP_conjAction data.typeP
         (Subgroup.inclusion (le_sup_left : data.typeP.U ≤ L) v) g : ↥data.typeP.H)
         : ↥data.typeP.H ⧸ chief.N) = _

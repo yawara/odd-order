@@ -285,3 +285,48 @@ theorem dvd_card_sub_one_of_free_off_unique_fixed
   exact dvd_mul_left d _
 
 end OddOrder.GroupTheory.FreeActionOrbitCount
+
+/-!
+## Free-action divisibility (relocated)
+
+Extracted from `OddOrder/GroupTheory/RepresentationTheory/ClassSumCongruence.lean` (issue 0106):
+generic material relocated to a light-import leaf so downstream consumers need not pull the
+class-sum congruence machinery (rep theory + complex analysis + integral closure).  Declarations
+keep their original `OddOrder.RepresentationTheory` namespace so existing call sites are unchanged.
+-/
+
+namespace OddOrder.RepresentationTheory
+
+
+/-- **A free action of a finite group divides the cardinality of the set acted on.** If a finite
+group `Γ` acts on a finite type `β` *freely* — every point has trivial stabilizer — then
+`|Γ| ∣ |β|`.  Equivalently (the contrapositive direction used below): if every orbit has the full
+size `|Γ|`, the set decomposes as a disjoint union of `|Γ|`-element orbits.
+
+This is the orbit-counting primitive behind Peterfalvi (6.7.1): a `p`-group `P` acting
+fixed-point-freely (here `freely`) on a finite set `Ω` forces `|P| ∣ |Ω|`.  The proof is the
+free-action decomposition `β ≃ (β / Γ) × Γ` (`MulAction.selfEquivOrbitsQuotientProd`), which makes
+`|β| = |β / Γ| · |Γ|`. -/
+theorem card_dvd_of_stabilizer_eq_bot {Γ : Type*} [Group Γ] [Finite Γ] {β : Type*} [Finite β]
+    [MulAction Γ β] (h : ∀ b : β, MulAction.stabilizer Γ b = ⊥) :
+    Nat.card Γ ∣ Nat.card β := by
+  have e := MulAction.selfEquivOrbitsQuotientProd (α := Γ) (β := β) h
+  rw [Nat.card_congr e, Nat.card_prod]
+  exact Dvd.intro_left _ rfl
+
+/-- **A finite group acting with no non-trivial fixed pairs divides the cardinality.** Variant of
+`card_dvd_of_stabilizer_eq_bot` whose hypothesis is the form actually checked in Peterfalvi (6.7.1):
+no element `x ≠ 1` fixes any point.  (Trivial stabilizers and "no non-identity element fixes a
+point" are equivalent for a group action.) -/
+theorem card_dvd_of_no_nontrivial_fixed {Γ : Type*} [Group Γ] [Finite Γ] {β : Type*} [Finite β]
+    [MulAction Γ β] (h : ∀ (x : Γ), x ≠ 1 → ∀ b : β, x • b ≠ b) :
+    Nat.card Γ ∣ Nat.card β := by
+  refine card_dvd_of_stabilizer_eq_bot fun b => ?_
+  rw [eq_bot_iff]
+  intro x hx
+  rw [MulAction.mem_stabilizer_iff] at hx
+  by_contra hx1
+  exact h x (by simpa using hx1) b hx
+
+
+end OddOrder.RepresentationTheory

@@ -53,7 +53,7 @@ open OddOrder.Isaacs.Ch03 (IsAInvariant)
 open OddOrder.Isaacs.Ch04
 open OddOrder.GroupTheory
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+open OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom quotientMulAutHom_apply_mk' quotientMulAutHom_apply)
 open OddOrder.BG.Ch1.S01 (coprime_actsTrivially_of_normal_and_quotient)
 open OddOrder.BG.Ch1.OperatorQuotientAction (actionCommutator_restrict_self_map_subtype_eq)

@@ -36,7 +36,7 @@ variable {G : Type*} [Group G]
 
 /-- Helper: For `|G| = p² · q` with `p, q` distinct primes,
 the cardinality of any Sylow `q`-subgroup is `q`. -/
-private lemma card_sylow_q_of_card_eq_sq_mul_prime
+lemma card_sylow_q_of_card_eq_sq_mul_prime
     [Finite G] {p q : ℕ} [hp : Fact p.Prime] [hq : Fact q.Prime]
     (hpq : p ≠ q) (hcard : Nat.card G = p ^ 2 * q) (Q : Sylow q G) :
     Nat.card (Q : Subgroup G) = q := by
@@ -50,7 +50,7 @@ private lemma card_sylow_q_of_card_eq_sq_mul_prime
 
 /-- Helper: For `|G| = p² · q` with `p, q` distinct primes,
 the cardinality of any Sylow `p`-subgroup is `p²`. -/
-private lemma card_sylow_p_of_card_eq_sq_mul_prime
+lemma card_sylow_p_of_card_eq_sq_mul_prime
     [Finite G] {p q : ℕ} [hp : Fact p.Prime] [hq : Fact q.Prime]
     (hpq : p ≠ q) (hcard : Nat.card G = p ^ 2 * q) (P : Sylow p G) :
     Nat.card (P : Subgroup G) = p ^ 2 := by

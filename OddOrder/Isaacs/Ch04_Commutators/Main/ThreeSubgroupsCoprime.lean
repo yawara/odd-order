@@ -706,7 +706,7 @@ private theorem actionCommutator_isPGroup_of_iter_eq_bot_aux
             (φ := φ) hN_inv (K := U))
       let q : G →* G ⧸ U_G := QuotientGroup.mk' U_G
       let φbar : A →* MulAut (G ⧸ U_G) :=
-        OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hU_inv
+        _root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hU_inv
       let Nbar : Subgroup (G ⧸ U_G) := N.map q
       have h_ac_bar : actionCommutator φbar = Nbar := by
         rw [actionCommutator_quotient_eq_map hU_inv]
@@ -717,9 +717,9 @@ private theorem actionCommutator_isPGroup_of_iter_eq_bot_aux
             (N := actionCommutator ψN) hNA_pgroup)
       have hNbar_fixed : Nbar ≤ Subgroup.fixedPointsOfMulAut φbar := by
         rintro y ⟨g, hgN, rfl⟩ a
-        change (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hU_inv a)
+        change (_root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hU_inv a)
             (QuotientGroup.mk' U_G g) = QuotientGroup.mk' U_G g
-        rw [OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk']
+        rw [_root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk']
         change (((φ a) g : G) : G ⧸ U_G) = (g : G ⧸ U_G)
         rw [QuotientGroup.eq]
         have hdeltaN :
@@ -866,7 +866,7 @@ private theorem actionCommutator_isNilpotent_of_iter_eq_bot_aux :
         have hF_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ F := by
           simpa [F] using OddOrder.Isaacs.Ch03.IsAInvariant.fittingSubgroup φ
         let φF : A →* MulAut (G ⧸ F) :=
-          OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hF_inv
+          _root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hF_inv
         have hSylow_le_ker :
             ∀ p0 : (Nat.card A).primeFactors, ∀ P : Sylow p0.val A,
               (P : Subgroup A) ≤ φF.ker := by
@@ -895,9 +895,9 @@ private theorem actionCommutator_isNilpotent_of_iter_eq_bot_aux :
           ext y
           refine QuotientGroup.induction_on y ?_
           intro g
-          change (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hF_inv a)
+          change (_root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hF_inv a)
               (QuotientGroup.mk' F g) = QuotientGroup.mk' F g
-          rw [OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk']
+          rw [_root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk']
           change (((φ a) g : G) : G ⧸ F) = (g : G ⧸ F)
           rw [QuotientGroup.eq]
           have hdelta : g⁻¹ * (φ a) g ∈ F := by

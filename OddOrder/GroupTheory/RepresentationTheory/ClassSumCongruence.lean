@@ -16,6 +16,10 @@ import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.GroupTheory.GroupAction.Quotient
 import OddOrder.GroupTheory.TISubset
 import OddOrder.Algebra.AlgInt
+import OddOrder.GroupTheory.FreeActionOrbitCount
+import OddOrder.GroupTheory.ConjClassSet
+import OddOrder.GroupTheory.ConjClassCardinality
+import OddOrder.Mathlib.Sylow
 import Mathlib.RingTheory.IntegralClosure.IsIntegral.Basic
 import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
 import Mathlib.RingTheory.Finiteness.Basic
@@ -307,16 +311,6 @@ section StructureCoeffAtIdentity
 private theorem mk_eq_one_iff_eq_one {w : G} : ConjClasses.mk w = 1 ↔ w = 1 := by
   rw [ConjClasses.one_eq_mk_one, ConjClasses.mk_eq_mk_iff_isConj, isConj_one_left]
 
-/-- Conjugacy of inverses is determined at the level of classes: `mk a = mk b ⟹ mk a⁻¹ = mk b⁻¹`.
-(A two-line consequence of `IsConj a b ⟹ IsConj a⁻¹ b⁻¹`, kept local to avoid the import cycle
-`ClassSumAlgebra ← ZIrr ← IrrIndexing ← BrauerPermutation`, where `ConjClasses.isConj_inv`
-lives.) -/
-theorem mk_inv_eq_of_mk_eq {a b : G} (h : ConjClasses.mk a = ConjClasses.mk b) :
-    ConjClasses.mk a⁻¹ = ConjClasses.mk b⁻¹ := by
-  rw [ConjClasses.mk_eq_mk_iff_isConj] at h ⊢
-  obtain ⟨c, rfl⟩ := isConj_iff.mp h
-  exact isConj_iff.mpr ⟨c, by group⟩
-
 variable [Fintype G] [DecidableEq (ConjClasses G)]
 
 /-- **Peterfalvi (6.7.3), structure constant `a_{ij0} = 0`.** The coefficient of the *identity*
@@ -391,40 +385,6 @@ theorem classSumCoeff_self_inv_one_eq_card (z : G) :
   classSumCoeff_one_eq_card _ _ fun _ hu => mk_inv_eq_of_mk_eq hu
 
 end StructureCoeffAtIdentity
-
-section FreeActionDivisibility
-
-/-- **A free action of a finite group divides the cardinality of the set acted on.** If a finite
-group `Γ` acts on a finite type `β` *freely* — every point has trivial stabilizer — then
-`|Γ| ∣ |β|`.  Equivalently (the contrapositive direction used below): if every orbit has the full
-size `|Γ|`, the set decomposes as a disjoint union of `|Γ|`-element orbits.
-
-This is the orbit-counting primitive behind Peterfalvi (6.7.1): a `p`-group `P` acting
-fixed-point-freely (here `freely`) on a finite set `Ω` forces `|P| ∣ |Ω|`.  The proof is the
-free-action decomposition `β ≃ (β / Γ) × Γ` (`MulAction.selfEquivOrbitsQuotientProd`), which makes
-`|β| = |β / Γ| · |Γ|`. -/
-theorem card_dvd_of_stabilizer_eq_bot {Γ : Type*} [Group Γ] [Finite Γ] {β : Type*} [Finite β]
-    [MulAction Γ β] (h : ∀ b : β, MulAction.stabilizer Γ b = ⊥) :
-    Nat.card Γ ∣ Nat.card β := by
-  have e := MulAction.selfEquivOrbitsQuotientProd (α := Γ) (β := β) h
-  rw [Nat.card_congr e, Nat.card_prod]
-  exact Dvd.intro_left _ rfl
-
-/-- **A finite group acting with no non-trivial fixed pairs divides the cardinality.** Variant of
-`card_dvd_of_stabilizer_eq_bot` whose hypothesis is the form actually checked in Peterfalvi (6.7.1):
-no element `x ≠ 1` fixes any point.  (Trivial stabilizers and "no non-identity element fixes a
-point" are equivalent for a group action.) -/
-theorem card_dvd_of_no_nontrivial_fixed {Γ : Type*} [Group Γ] [Finite Γ] {β : Type*} [Finite β]
-    [MulAction Γ β] (h : ∀ (x : Γ), x ≠ 1 → ∀ b : β, x • b ≠ b) :
-    Nat.card Γ ∣ Nat.card β := by
-  refine card_dvd_of_stabilizer_eq_bot fun b => ?_
-  rw [eq_bot_iff]
-  intro x hx
-  rw [MulAction.mem_stabilizer_iff] at hx
-  by_contra hx1
-  exact h x (by simpa using hx1) b hx
-
-end FreeActionDivisibility
 
 section PairAction
 
@@ -510,30 +470,6 @@ end PairAction
 section FixedPointFree
 
 open OddOrder.GroupTheory
-
-/-- **A `p`-element normalizing a Sylow `p`-subgroup lies in it.** If `P` is a Sylow `p`-subgroup
-of `G` and `u ∈ N_G(P)` generates a `p`-group `⟨u⟩` (i.e. `u` is a `p`-element), then `u ∈ P`.
-
-This is the "`y` is a `p`-element of `L`, and so `y ∈ P`" step of Peterfalvi (6.7.1): in
-`L = N_G(P)` the Sylow `p`-subgroup `P` is normal, hence the unique one, so every `p`-element of `L`
-lies in `P`.  Proof: `P ⊔ ⟨u⟩` is a `p`-group (both factors are `p`-groups and `⟨u⟩ ≤ N_G(P)`,
-`IsPGroup.to_sup_of_normal_left'`); since `P` is a *maximal* `p`-subgroup (`Sylow.is_maximal'`) and
-`P ≤ P ⊔ ⟨u⟩`, this forces `P ⊔ ⟨u⟩ = P`, whence `u ∈ P`. -/
-theorem mem_sylow_of_mem_normalizer_of_isPGroup {p : ℕ} [Fact p.Prime] (P : Sylow p G) {u : G}
-    (hu : u ∈ Subgroup.normalizer (P : Subgroup G)) (hup : IsPGroup p (Subgroup.zpowers u)) :
-    u ∈ (P : Subgroup G) := by
-  -- `⟨u⟩ ≤ N_G(P)`, so `P ⊔ ⟨u⟩` is a `p`-group.
-  have hzle : Subgroup.zpowers u ≤ Subgroup.normalizer (P : Subgroup G) :=
-    Subgroup.zpowers_le.mpr hu
-  have hsup : IsPGroup p ((P : Subgroup G) ⊔ Subgroup.zpowers u : Subgroup G) :=
-    IsPGroup.to_sup_of_normal_left' P.2 hup hzle
-  -- `P` is maximal among `p`-subgroups, and `P ≤ P ⊔ ⟨u⟩`, so the join collapses to `P`.
-  have heq : ((P : Subgroup G) ⊔ Subgroup.zpowers u : Subgroup G) = (P : Subgroup G) :=
-    P.3 hsup le_sup_left
-  -- `u ∈ ⟨u⟩ ≤ P ⊔ ⟨u⟩ = P`.
-  have humem : u ∈ ((P : Subgroup G) ⊔ Subgroup.zpowers u : Subgroup G) :=
-    (le_sup_right : Subgroup.zpowers u ≤ _) (Subgroup.mem_zpowers u)
-  rwa [heq] at humem
 
 /-- **Peterfalvi (6.7.1)** (fixed-point-free hypothesis).  Setup of (6.7): `P` a Sylow `p`-subgroup
 of the finite group `G`, `L = N_G(P)`, `P^# = P ∖ {1}` a TI-subset of `G` (with normalizer-bound
@@ -650,84 +586,6 @@ theorem fixedPointFree_classPair_of_isTISubset {p : ℕ} [Fact p.Prime] (P : Syl
   exact hCs (u * v) hqs (Z.mul_mem huZ hvZ)
 
 end FixedPointFree
-
-section ClassSizeCoprime
-
-open MulAction
-
-variable [Finite G]
-
-/-- **The conjugacy-class size is the index of the centralizer** (orbit-stabilizer).  The number of
-elements in the class `⟦z⟧` (`{x ∣ mk x = mk z}`) equals `[G : C_G(z)]`.  This is the
-orbit-stabilizer theorem for the conjugation action `ConjAct G ↷ G`, whose orbit at `z` is the
-class `(mk z).carrier` and whose stabilizer is the centralizer `C_G(z)`. -/
-theorem card_class_eq_index_centralizer (z : G) :
-    Nat.card { x : G // ConjClasses.mk x = ConjClasses.mk z }
-      = (Subgroup.centralizer {z}).index := by
-  classical
-  letI : Fintype G := Fintype.ofFinite G
-  -- `|C_G(z)| = |stabilizer (ConjAct G) z|`: the isomorphism `toConjAct : G ≃* ConjAct G` carries
-  -- `C_G(z)` bijectively onto the stabilizer (`stabilizer_eq_centralizer`).
-  have hcard_cent : Nat.card (Subgroup.centralizer ({z} : Set G))
-      = Nat.card (stabilizer (ConjAct G) z) := by
-    refine Nat.card_congr (Equiv.subtypeEquiv (ConjAct.toConjAct (G := G)).toEquiv fun x => ?_)
-    rw [ConjAct.stabilizer_eq_centralizer]
-    simp only [MulEquiv.toEquiv_eq_coe, EquivLike.coe_coe, Subgroup.mem_centralizer_iff,
-      Set.mem_singleton_iff, forall_eq]
-    constructor
-    · intro h
-      rw [← ConjAct.toConjAct_mul, ← ConjAct.toConjAct_mul, h]
-    · intro h
-      have := congrArg ConjAct.ofConjAct h
-      simpa using this
-  -- Orbit-stabilizer (`Fintype.card`): `|orbit| * |stabilizer| = |ConjAct G| = |G|`.
-  have hos := MulAction.card_orbit_mul_card_stabilizer_eq_card_group (ConjAct G) z
-  rw [ConjAct.card] at hos
-  -- The orbit is the class `(mk z).carrier`, so `|class| * |C_G(z)| = |G|`.
-  have hclass : Nat.card { x : G // ConjClasses.mk x = ConjClasses.mk z }
-      * Nat.card (Subgroup.centralizer ({z} : Set G)) = Nat.card G := by
-    rw [hcard_cent]
-    rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
-    rw [← hos]
-    congr 1
-    -- `{x // mk x = mk z} ≃ orbit (ConjAct G) z` via `orbit = (mk z).carrier`.
-    refine Fintype.card_congr (Equiv.subtypeEquiv (Equiv.refl G) fun x => ?_)
-    rw [ConjAct.orbit_eq_carrier_conjClasses]
-    rw [ConjClasses.mem_carrier_iff_mk_eq]
-    rfl
-  -- `[G : C_G(z)] * |C_G(z)| = |G|` too (`index_mul_card`); cancel the positive `|C_G(z)|`.
-  have hidx := (Subgroup.centralizer ({z} : Set G)).index_mul_card
-  have hpos : 0 < Nat.card (Subgroup.centralizer ({z} : Set G)) := Nat.card_pos
-  have := hclass.trans hidx.symm
-  exact Nat.eq_of_mul_eq_mul_right hpos this
-
-/-- **Peterfalvi (6.7.3), coprimality atom `(|C₁|, p) = 1`.** Under the (6.7) setup, with `z` an
-element centralized by all of the Sylow `p`-subgroup `P` (`P ≤ C_G(z)`, which holds when
-`z ∈ Z(P)`), the size `|C₁| = |⟦z⟧|` of the conjugacy class of `z` is coprime (over `ℤ`) to the
-order `|P|`.
-
-Reason: `|⟦z⟧| = [G : C_G(z)]` (orbit-stabilizer).  Since `P ≤ C_G(z)`, `[G : C_G(z)] ∣ [G : P]`
-(`index_dvd_of_le`), and `p ∤ [G : P]` (`Sylow.not_dvd_index`), so `p ∤ |⟦z⟧|`.  As `|P| = p^k`,
-this gives `IsCoprime |⟦z⟧| |P|`. -/
-theorem coprime_card_class_card_sylow {p : ℕ} [Fact p.Prime] (P : Sylow p G) {z : G}
-    (hPz : (P : Subgroup G) ≤ Subgroup.centralizer {z}) :
-    IsCoprime (Nat.card { x : G // ConjClasses.mk x = ConjClasses.mk z } : ℤ)
-      (Nat.card (P : Subgroup G) : ℤ) := by
-  -- `p ∤ |⟦z⟧|`: `|⟦z⟧| = [G:C_G(z)]`, which divides `[G:P]`, and `p ∤ [G:P]`.
-  have hndvd : ¬ p ∣ Nat.card { x : G // ConjClasses.mk x = ConjClasses.mk z } := by
-    rw [card_class_eq_index_centralizer]
-    intro hp
-    exact P.not_dvd_index (hp.trans (Subgroup.index_dvd_of_le hPz))
-  -- `|P| = p ^ k`.
-  obtain ⟨k, hk⟩ := (IsPGroup.iff_card.mp P.2)
-  -- Coprimality in `ℕ` (`|⟦z⟧|` coprime to `p ^ k`), transferred to `ℤ`.
-  have hcopN : Nat.Coprime (Nat.card { x : G // ConjClasses.mk x = ConjClasses.mk z })
-      (Nat.card (P : Subgroup G)) := by
-    rw [hk]
-    exact ((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr hndvd).symm.pow_right k
-  exact_mod_cast hcopN.isCoprime
-
-end ClassSizeCoprime
 
 section CentralCharacter
 
@@ -1168,14 +1026,6 @@ end CharacterIntegrality
 
 section CharacterValuesIntegral
 
-/-- **A root of unity is an algebraic integer.** If `x : ℂ` satisfies `x ^ n = 1` with `n ≠ 0`,
-then `x` is integral over `ℤ` — it is a root of the monic polynomial `X ^ n - 1`. -/
-theorem isIntegral_of_pow_eq_one {x : ℂ} {n : ℕ} (hn : n ≠ 0) (hx : x ^ n = 1) :
-    IsIntegral ℤ x := by
-  refine ⟨Polynomial.X ^ n - Polynomial.C 1, ?_, ?_⟩
-  · exact Polynomial.monic_X_pow_sub_C 1 hn
-  · simp [hx]
-
 variable {V : Type*} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
 
 /-- **Eigenvalues of a finite-order endomorphism are roots of unity.** If `f : End ℂ V` satisfies
@@ -1226,64 +1076,6 @@ theorem character_isIntegral (ρ : Representation ℂ G V) [Finite G] (g : G) :
   have hroot : (ρ g).charpoly.IsRoot μ :=
     (Polynomial.mem_roots ((ρ g).charpoly_monic).ne_zero).mp hμ
   exact isIntegral_of_pow_eq_one hn (pow_eq_one_of_isRoot_charpoly_of_pow_eq_one hfn hroot)
-
-/-- **A complex number of unit modulus with real part `1` is `1`.** If `‖z‖ = 1` and `z.re = 1`
-then `z = 1`: from `z.re ^ 2 + z.im ^ 2 = ‖z‖ ^ 2 = 1` and `z.re = 1` we get `z.im = 0`. -/
-private theorem eq_one_of_norm_eq_one_of_re_eq_one {z : ℂ} (hz : ‖z‖ = 1) (hre : z.re = 1) :
-    z = 1 := by
-  -- `z.im ^ 2 = ‖z‖ ^ 2 - z.re ^ 2 = 1 - 1 = 0`, so `z.im = 0`; with `z.re = 1` this is `1`.
-  have hns : z.re * z.re + z.im * z.im = 1 := by
-    rw [← Complex.normSq_apply, Complex.normSq_eq_norm_sq, hz]; norm_num
-  have him : z.im = 0 := by nlinarith [sq_nonneg z.im, hns, hre]
-  apply Complex.ext <;> simp [hre, him]
-
-/-- **A complex number of unit modulus has real part at most `1`.** -/
-private theorem re_le_one_of_norm_eq_one {z : ℂ} (hz : ‖z‖ = 1) : z.re ≤ 1 := by
-  have hns : z.re * z.re + z.im * z.im = 1 := by
-    rw [← Complex.normSq_apply, Complex.normSq_eq_norm_sq, hz]; norm_num
-  nlinarith [sq_nonneg z.im, sq_nonneg (z.re - 1), hns]
-
-/-- **Unit complex numbers summing to their count are all `1`** (the equality case of the triangle
-inequality, for the keystone `character g = degree ⟹ ρ g = id`).  If a multiset `s` of complex
-numbers has `‖z‖ = 1` for every `z ∈ s` and `∑_{z ∈ s} z = card s`, then `z = 1` for every
-`z ∈ s`.
-
-Proof (real-part / non-negative-sum argument).  Taking real parts of `∑ z = card s` gives
-`∑ z.re = card s`.  Each `z.re ≤ ‖z‖ = 1`, so the multiset `card s · 1 - ∑ z.re = ∑ (1 - z.re)`
-is a sum of non-negatives equal to `0`; hence every `1 - z.re = 0`, i.e. `z.re = 1`.  A unit-modulus
-complex number with real part `1` is `1` (`eq_one_of_norm_eq_one_of_re_eq_one`). -/
-theorem all_eq_one_of_norm_eq_one_of_sum_eq_card {s : Multiset ℂ}
-    (hnorm : ∀ z ∈ s, ‖z‖ = 1) (hsum : s.sum = (Multiset.card s : ℂ)) :
-    ∀ z ∈ s, z = 1 := by
-  -- Reduce to `z.re = 1` for every `z ∈ s`, then apply the unit-modulus rigidity.
-  suffices hre : ∀ z ∈ s, z.re = 1 by
-    intro z hz; exact eq_one_of_norm_eq_one_of_re_eq_one (hnorm z hz) (hre z hz)
-  -- The deficits `1 - z.re ≥ 0` sum to `card s - ∑ z.re = card s - (∑ z).re = card s - card s = 0`.
-  have hdef_sum : (s.map fun z => 1 - z.re).sum = 0 := by
-    -- `∑ (1 - z.re) = card s · 1 - ∑ z.re`, computed by induction on the multiset.
-    have key : ∀ t : Multiset ℂ,
-        (t.map fun z => 1 - z.re).sum = (Multiset.card t : ℝ) - (t.map fun z => z.re).sum := by
-      intro t
-      induction t using Multiset.induction with
-      | empty => simp
-      | cons a t ih => simp only [Multiset.map_cons, Multiset.sum_cons, Multiset.card_cons,
-          ih, Nat.cast_add, Nat.cast_one]; ring
-    rw [key]
-    -- `(∑ z).re = ∑ z.re` (real part is additive over the multiset).
-    have hre_sum : (s.map fun z => z.re).sum = ((s.sum).re : ℝ) := by
-      have := map_multiset_sum Complex.reAddGroupHom s
-      simpa [Complex.coe_reAddGroupHom] using this.symm
-    rw [hre_sum, hsum]; simp
-  -- Each deficit is non-negative, and their sum is `0`, so each deficit is `0`.
-  have hnn : ∀ x ∈ (s.map fun z => 1 - z.re), (0 : ℝ) ≤ x := by
-    intro x hx
-    rw [Multiset.mem_map] at hx
-    obtain ⟨z, hzs, rfl⟩ := hx
-    linarith [re_le_one_of_norm_eq_one (hnorm z hzs)]
-  have hzero := Multiset.all_zero_of_le_zero_le_of_sum_eq_zero hnn hdef_sum
-  intro z hz
-  have : (1 : ℝ) - z.re = 0 := hzero _ (Multiset.mem_map_of_mem _ hz)
-  linarith
 
 variable {V : Type*} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
 
@@ -1436,28 +1228,6 @@ theorem subrepresentation_character_eq_one_of_character_eq_one
   rw [show ρ'.toRepresentation.character g
         = LinearMap.trace ℂ ρ'.toSubmodule (ρ'.toRepresentation g) from rfl, hrestr,
       Representation.char_one, LinearMap.trace_id]
-
-/-- **A rational algebraic integer is an integer.** If `q : ℚ` is integral over `ℤ` when viewed
-inside `ℂ`, then `q` is the image of an integer: there is `n : ℤ` with `(q : ℂ) = n`.
-
-`ℤ` is integrally closed (it is a `UniqueFactorizationMonoid`, hence integrally closed in its
-fraction field `ℚ`).  Transferring `IsIntegral ℤ (q : ℂ)` down the injective `ℚ`-algebra map
-`ℚ ↪ ℂ` gives `IsIntegral ℤ q`, and integral closure then yields the integer. -/
-theorem isIntegral_rat_imp_int {q : ℚ} (h : IsIntegral ℤ (q : ℂ)) :
-    ∃ n : ℤ, (q : ℂ) = n := by
-  -- `(q : ℂ) = algebraMap ℚ ℂ q`; transfer integrality down the injection `ℚ ↪ ℂ`.
-  have hqℂ : (q : ℂ) = algebraMap ℚ ℂ q := (eq_ratCast (algebraMap ℚ ℂ) q).symm
-  rw [hqℂ] at h
-  have hQ : IsIntegral ℤ q :=
-    (isIntegral_algebraMap_iff (FaithfulSMul.algebraMap_injective ℚ ℂ)).mp h
-  -- `ℤ` is integrally closed in `ℚ` (it is a UFD), so `q = (n : ℚ)` for some `n : ℤ`.
-  obtain ⟨n, hn⟩ := IsIntegrallyClosed.isIntegral_iff.mp hQ
-  refine ⟨n, ?_⟩
-  -- `hn : algebraMap ℤ ℚ n = q`, i.e. `(n : ℚ) = q`; cast up to `ℂ`.
-  rw [algebraMap_int_eq, Int.coe_castRingHom] at hn
-  rw [← hn]
-  push_cast
-  ring
 
 end CharacterValuesIntegral
 

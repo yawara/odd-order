@@ -958,6 +958,218 @@ theorem section16_pair_chiFam_columnSum_transpose [Finite G]
     (section16_pair_tic_W1_eq_W2 hG tp hodd dataT hTW1)
     (section16_pair_tic_W2_eq_W1 hG tp hodd dataT hTW1) appS appT kcol
 
+/- Prerequisites for the `M`-seeded pair producer (issue 9079, gate assembly) -/
+
+/-- `IsHallSubgroup` is determined by the order: a subgroup of the same order as a Hall
+`π`-subgroup is itself Hall (the index is pinned by Lagrange).  Upstream-hoist candidate
+(`Isaacs/Ch03`). -/
+theorem isHallSubgroup_of_card_eq {L : Type*} [Group L] [Finite L] {π : Set ℕ}
+    {H K : Subgroup L} (hH : OddOrder.Isaacs.Ch03.IsHallSubgroup π H)
+    (hcard : Nat.card K = Nat.card H) :
+    OddOrder.Isaacs.Ch03.IsHallSubgroup π K := by
+  have h1 := Subgroup.card_mul_index H
+  have h2 := Subgroup.card_mul_index K
+  rw [hcard] at h2
+  have hindex : K.index = H.index :=
+    Nat.eq_of_mul_eq_mul_left Nat.card_pos (h2.trans h1.symm)
+  exact ⟨fun p hp => hH.1 p (by rwa [hcard] at hp),
+    fun p hp => hH.2 p (by rwa [hindex] at hp)⟩
+
+/-- **The cyclic factor `W₁` of a type-`P` datum is itself a κ-Hall subgroup**: `|W₁| = [M:M']`
+equals the order of any Hall `κ(M)`-subgroup (`card_kappaHall_eq_derived_index`,
+`TypePData.card_W1_eq_derived_index`), and Hall-ness is a card/index property
+(`isHallSubgroup_of_card_eq`).  This is what lets the `M`-seeded pair construction
+(`typeP_duality` at the §10 ambient `M`) take `K := hyp.typeP.W1` literally, so the pair's
+dual factor is `W₁` by construction — no conjugation re-basing. -/
+theorem typePData_W1_isHallSubgroup_kappa [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : OddOrder.BG.Ch4.S14.IsTypeP M)
+    (data : TypePData M) :
+    OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M)
+      (data.W1.subgroupOf M) := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  obtain ⟨K, hKM, hK, -⟩ :=
+    OddOrder.BG.Ch4.S14.exists_isHallSubgroup_kappa_ge hG hM (X := ⊥) bot_le (by simp)
+  -- `K` is cyclic by BG Theorem A (mirror of `typePData_W1_hall_coprime`)
+  obtain ⟨U', hU'hall, -⟩ :=
+    OddOrder.Isaacs.Ch03.hall_D (G := ↥M)
+      (π := (OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U := ⊥) (by simp)
+  have hUeq : (U'.map M.subtype).subgroupOf M = U' :=
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective U'
+  have hU : OddOrder.Isaacs.Ch03.IsHallSubgroup
+      ((OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+      ((U'.map M.subtype).subgroupOf M) := by rw [hUeq]; exact hU'hall
+  haveI : IsCyclic ↥K :=
+    (OddOrder.BG.Ch4.S15.typeP_auxiliary_structure hG hM hKM (Subgroup.map_subtype_le U')
+      hK rfl hU).2.1
+  have hKW1 : Nat.card ↥K = Nat.card ↥data.W1 := by
+    rw [OddOrder.BG.Ch4.S16.card_kappaHall_eq_derived_index hG hM hP hKM hK,
+      data.card_W1_eq_derived_index]
+  refine isHallSubgroup_of_card_eq hK ?_
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.W1_le).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv, hKW1]
+
+/-- A maximal subgroup of type III, IV or V is **not** of type `P₂`: these types are `P₁`
+(`kappa = sigmaComplementPrimes`, the BG §16 classification dictionary), and `P₁`/`P₂` are
+exclusive by definition.  Discharges the `¬ IsTypeII mp.T` hypothesis of the strong
+reduction `exists_conj_eq_S_of_isTypeII` when the pair is seeded at the §10 ambient `M`
+(`Hypothesis.type_alt`); the same exclusivity forces the seeded pair's `P₂`-member (hence
+the smaller κ-Hall, `K_lt_Kstar`) onto the partner side. -/
+theorem not_isTypeP2_of_isTypeIII_or_IV_or_V [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G)
+    (halt : IsTypeIII M ∨ IsTypeIV M ∨ IsTypeV M) :
+    ¬ OddOrder.BG.Ch4.S14.IsTypeP2 M := by
+  intro hP2
+  obtain ⟨-, -, hcIII_IV, hdV, -, -⟩ :=
+    OddOrder.BG.Ch4.S16.proposition_type_classification hG hM
+  have hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M := by
+    rcases halt with hIII | hIV | hV
+    · exact (hcIII_IV.mp (Or.inl hIII)).1
+    · exact (hcIII_IV.mp (Or.inr hIV)).1
+    · exact (hdV.mp hV).1
+  exact hP2.2 hP1.2
+
+/- The `M`-side conversion: an aligned-grid row is a full `chiFam` fiber (issue 9079 item 4) -/
+
+open scoped Classical FiniteInduce in
+/-- **The §10 aligned σ-grid row is a full `χ`-family fiber sum** (the `M`-side half of the
+(10.7) grid transpose): for every `W₁`-index character `r'char` of the §10 → §5 bridge
+there is a row `r'` of `alignedOmegaSigmaGrid` whose sum over the full row equals the
+`chiFam`-fiber sum `∑_q χ_{(r'char, q)}`.
+
+The aligned grid at `(i, j)` is the `χ`-family member at the index
+`omegaProdEquiv.symm (omegaProdCharTic (χ₂ j) i')` — as in
+`exists_alignedOmegaSigmaGrid_chiFam_family`, with the internal transport `e` identified
+pointwise with `ticWEquivSdiffW` (both fix the underlying element).  Its first index
+component is constant along the row and enumerates `Ŵ₁` bijectively in `i`
+(`omegaProdCharTic_symm_fst_eq` and Pontryagin counting `card_charGroup_subgroupOf`); its
+second is constant in `i` and enumerates `Ŵ₂` bijectively in `j`
+(`omegaProdCharTic_symm_snd_eq`/`_ne`).  So the row at the preimage of `r'char` sweeps
+exactly the fiber.  This turns the transposed (5.8) column sum
+(`section16_pair_chiFam_columnSum_transpose`) into the `nu_tau2_eq` row-sum shape of the
+(10.7) cross-isometry package. -/
+theorem Hypothesis.exists_alignedOmegaSigmaGrid_row_sum_eq_chiFam_fiber [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (r'char : ((typePData_toTICyclicHypothesis hyp.typeP hodd).W1.subgroupOf
+      (typePData_toTICyclicHypothesis hyp.typeP hodd).W) →* ℂˣ) :
+    ∃ r' : Fin hyp.w1,
+      ∑ q : ((typePData_toTICyclicHypothesis hyp.typeP hodd).W2.subgroupOf
+          (typePData_toTICyclicHypothesis hyp.typeP hodd).W) →* ℂˣ,
+        (typePData_toTICyclicHypothesis hyp.typeP hodd).chiFam rfl
+          (hyp.canonicalFullDadeApp hG hodd) (r'char, q)
+        = ∑ j : Fin hyp.w2, hyp.alignedOmegaSigmaGrid hG hodd r' j := by
+  haveI := hyp.finiteG
+  classical
+  -- context of `alignedOmegaSigmaGrid` (mirror of `exists_alignedOmegaSigmaGrid_chiFam_family`)
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  let χ₂ : Fin hyp.w2 → (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
+    fun j => finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j)
+  let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
+  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  let e : ↥tic.W ≃* ↥(h.W1 ⊔ h.W2) :=
+    (Subgroup.subgroupOfEquivOfLe (typePData_W_le_self hyp.typeP)).symm.trans
+      (MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm)
+  let h46 := hyp.toHypothesis46 hG hodd
+  haveI : NeZero (Nat.card h46.W1) := ⟨by have := h46.one_lt_card_W1; omega⟩
+  -- the internal bridge `e` is `ticWEquivSdiffW h46` pointwise (both fix the `G`-element)
+  have hew : ∀ x : ↥tic.W,
+      e x = OddOrder.Peterfalvi.S06.ticWEquivSdiffW h46 x := fun x => by
+    apply Subtype.ext
+    apply Subtype.ext
+    exact (OddOrder.Peterfalvi.S06.coe_ticWEquivSdiffW h46 x).symm
+  -- the aligned grid value, in `chiFam`-at-`omegaProdCharTic`-index form
+  have haligned : ∀ (i : Fin hyp.w1) (j : Fin hyp.w2),
+      hyp.alignedOmegaSigmaGrid hG hodd i j
+        = tic.chiFam rfl (hyp.canonicalFullDadeApp hG hodd)
+            (tic.omegaProdEquiv.symm
+              (OddOrder.Peterfalvi.S06.omegaProdCharTic h46 (χ₂ j)
+                (finCongr hcardW1.symm i))) := by
+    intro i j
+    have hchar : OddOrder.Peterfalvi.S06.omegaProdCharTic h46 (χ₂ j) (finCongr hcardW1.symm i)
+        = (h.sdiffTICyclicHypothesis.omegaProdChar
+            (h.w1CharEquiv (finCongr hcardW1.symm i)) (χ₂ j)).comp e.toMonoidHom := by
+      refine MonoidHom.ext fun x => ?_
+      change (h.sdiffTICyclicHypothesis.omegaProdChar
+            (h.w1CharEquiv (finCongr hcardW1.symm i)) (χ₂ j))
+            (OddOrder.Peterfalvi.S06.ticWEquivSdiffW h46 x)
+          = (h.sdiffTICyclicHypothesis.omegaProdChar
+            (h.w1CharEquiv (finCongr hcardW1.symm i)) (χ₂ j)) (e x)
+      rw [hew x]
+    have step1 : hyp.alignedOmegaSigmaGrid hG hodd i j
+        = tic.sigma rfl (hyp.canonicalFullDadeApp hG hodd)
+            ((tic.omega ((h.sdiffTICyclicHypothesis.omegaProdChar
+                (h.w1CharEquiv (finCongr hcardW1.symm i)) (χ₂ j)).comp e.toMonoidHom))
+              : ClassFunction ↥tic.W ℂ) := by
+      change tic.sigmaIntegral rfl (hyp.canonicalFullDadeApp hG hodd) _ = _
+      rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_apply]
+      congr 1
+    rw [step1, hchar, tic.sigma_omega rfl (hyp.canonicalFullDadeApp hG hodd)]
+  -- the row-index map `r'' ↦ fst(index)`: constant in the column, bijective onto `Ŵ₁`
+  let F : Fin hyp.w1 → ((tic.W1.subgroupOf tic.W) →* ℂˣ) := fun r'' =>
+    (tic.omegaProdEquiv.symm (OddOrder.Peterfalvi.S06.omegaProdCharTic h46 1
+      (finCongr hcardW1.symm r''))).1
+  have hFinj : Function.Injective F := by
+    intro a b hab
+    have hsnd := omegaProdCharTic_symm_snd_eq h46 1
+      (finCongr hcardW1.symm a) (finCongr hcardW1.symm b)
+    have h1 : OddOrder.Peterfalvi.S06.omegaProdCharTic h46 1 (finCongr hcardW1.symm a)
+        = OddOrder.Peterfalvi.S06.omegaProdCharTic h46 1 (finCongr hcardW1.symm b) :=
+      tic.omegaProdEquiv.symm.injective (Prod.ext hab hsnd)
+    have h2 := (MonoidHom.cancel_right
+      (MulEquiv.surjective (OddOrder.Peterfalvi.S06.ticWEquivSdiffW h46))).mp h1
+    have h3 := (h.sdiffTICyclicHypothesis.omegaProdChar_inj h2).1
+    exact (finCongr hcardW1.symm).injective (h.w1CharEquiv.injective h3)
+  have hFbij : Function.Bijective F := by
+    refine (Nat.bijective_iff_injective_and_card F).mpr ⟨hFinj, ?_⟩
+    rw [Nat.card_eq_fintype_card, Fintype.card_fin,
+      tic.card_charGroup_subgroupOf tic.W1_le_W]
+    rfl
+  -- the column-index map `j ↦ snd(index)`: constant in the row, bijective onto `Ŵ₂`
+  let Gcol : Fin hyp.w2 → ((tic.W2.subgroupOf tic.W) →* ℂˣ) := fun j =>
+    (tic.omegaProdEquiv.symm (OddOrder.Peterfalvi.S06.omegaProdCharTic h46 (χ₂ j) 0)).2
+  have hGinj : Function.Injective Gcol := by
+    intro a b hab
+    by_contra hne
+    exact omegaProdCharTic_symm_snd_ne h46
+      (fun hχ => hne ((finCongr hcardW2sub.symm).injective
+        ((finCardEquivCharacterGroup _).injective hχ))) 0 hab
+  have hGbij : Function.Bijective Gcol := by
+    refine (Nat.bijective_iff_injective_and_card Gcol).mpr ⟨hGinj, ?_⟩
+    rw [Nat.card_eq_fintype_card, Fintype.card_fin,
+      tic.card_charGroup_subgroupOf tic.W2_le_W]
+    rfl
+  -- pick the row hitting `r'char`, then sweep the fiber
+  obtain ⟨r', hr'⟩ := hFbij.surjective r'char
+  refine ⟨r', ?_⟩
+  calc ∑ q : ((tic.W2.subgroupOf tic.W) →* ℂˣ),
+        tic.chiFam rfl (hyp.canonicalFullDadeApp hG hodd) (r'char, q)
+      = ∑ j : Fin hyp.w2,
+          tic.chiFam rfl (hyp.canonicalFullDadeApp hG hodd) (r'char, Gcol j) :=
+        (Fintype.sum_bijective Gcol hGbij _ _ (fun _ => rfl)).symm
+    _ = ∑ j : Fin hyp.w2, hyp.alignedOmegaSigmaGrid hG hodd r' j := by
+        refine Finset.sum_congr rfl fun j _ => ?_
+        rw [haligned r' j]
+        congr 1
+        refine Prod.ext ?_ ?_
+        · exact ((omegaProdCharTic_symm_fst_eq h46 (χ₂ j) 1
+            (finCongr hcardW1.symm r')).trans hr').symm
+        · exact (omegaProdCharTic_symm_snd_eq h46 (χ₂ j) (finCongr hcardW1.symm r') 0).symm
+
 /- The type-II → canonical-partner reduction (Coq `Frob_der1_type2` head, issue 9079 item 3) -/
 
 /-- The type-II-designated member of the canonical pair is indeed of type II:

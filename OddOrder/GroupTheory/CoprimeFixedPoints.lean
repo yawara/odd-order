@@ -63,19 +63,19 @@ theorem map_fixedSubgroup_eq_fixedSubgroup_quotient [N.Normal] [Finite ↥X] [Fi
     (hCop : Nat.Coprime (Nat.card ↥X) (Nat.card H))
     (hSolv : IsSolvable ↥X ∨ IsSolvable H) :
     (fixedSubgroup φ X).map (QuotientGroup.mk' N) =
-      fixedSubgroup (OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN) X := by
+      fixedSubgroup (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN) X := by
   ext q
   simp only [Subgroup.mem_map, mem_fixedSubgroup]
   constructor
   · rintro ⟨c, hc, rfl⟩ l hl
-    rw [OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk' hN, hc l hl]
+    rw [OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk' hN, hc l hl]
   · intro hq
     obtain ⟨g, rfl⟩ := QuotientGroup.mk'_surjective N q
     -- The coset `gN` is `X`-fixed: each `φ l g` lies in `gN`.
     have hfix : ∀ a : ↥X, ∃ n ∈ N, (φ.comp X.subtype) a g = g * n := by
       intro a
       have h := hq (X.subtype a) a.2
-      rw [OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk' hN,
+      rw [OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk' hN,
         QuotientGroup.mk'_eq_mk'] at h
       obtain ⟨z, hz, hzeq⟩ := h
       exact ⟨z⁻¹, N.inv_mem hz, by
@@ -103,11 +103,11 @@ theorem card_fixedSubgroup_eq_mul [N.Normal] [Finite ↥X] [Finite H]
     (hSolv : IsSolvable ↥X ∨ IsSolvable H) :
     Nat.card ↥(fixedSubgroup φ X) =
       Nat.card ↥((fixedSubgroup φ X ⊓ N : Subgroup H)) *
-        Nat.card ↥(fixedSubgroup (OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN) X) := by
+        Nat.card ↥(fixedSubgroup (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN) X) := by
   set C := fixedSubgroup φ X with hC
   -- The reduction map `f : C →* H/N`, its image and its kernel.
   have hr : ((QuotientGroup.mk' N).comp C.subtype).range =
-      fixedSubgroup (OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN) X := by
+      fixedSubgroup (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN) X := by
     rw [MonoidHom.range_comp, Subgroup.range_subtype, hC]
     exact map_fixedSubgroup_eq_fixedSubgroup_quotient hN hCop hSolv
   have hke : ((QuotientGroup.mk' N).comp C.subtype).ker = N.subgroupOf C := by
@@ -155,7 +155,7 @@ section AssemblyStep
 `quotientMulAutHom` has an awkward fully-qualified name (it is declared inside `namespace …Ch04`
 with a `…Ch03`-qualified head, see the `naming wart` note in
 `notes/peterfalvi/s11_wielandt_91_design.md`). -/
-local notation3 "quotMulAut " hN => OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN
+local notation3 "quotMulAut " hN => OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN
 
 variable {L H : Type*} [Group L] [Group H]
 

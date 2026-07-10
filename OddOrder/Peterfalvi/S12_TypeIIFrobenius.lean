@@ -1348,7 +1348,7 @@ theorem typeII_HU_frobenius_of_coherent_aux [Finite G]
   -- §9 character data: only the genuine `u`/`u_eq` pair is consumed by the counts; the
   -- coherence-only fields are inert placeholders (cf. `Hypothesis.mkSection11CharacterData`).
   let chars : OddOrder.Peterfalvi.S11.Section11CharacterData data chief :=
-    { u := Nat.card ↥(((OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom
+    { u := Nat.card ↥(((OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom
           (N := chief.N) chief.N_aInvariant).comp
           (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype).range)
       u_eq_card_quotient := rfl

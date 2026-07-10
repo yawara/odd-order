@@ -87,7 +87,7 @@ variable {R : Type*} [Group R] {A : Type*} [Group A] {φ : A →* MulAut R}
 -- The quotient action `φ̄ : A →* MulAut (R ⧸ S)` lives in Ch04 but, owing to a missing `_root_`
 -- in its declaration, has the (doubly-nested) real name below. We reference it explicitly,
 -- matching existing call sites (`S7A2_NormalPThm75.lean`); the rename is a separate cleanup task.
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+open OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom quotientMulAutHom_apply_mk') in
 /-- An `A`-invariant subgroup maps to an `A`-invariant subgroup under the quotient action
 `φ̄ = quotientMulAutHom hS`. -/
@@ -100,7 +100,7 @@ theorem isAInvariant_map_mk' {S : Subgroup R} [S.Normal] (hS : IsAInvariant φ S
   obtain ⟨g, hg, rfl⟩ := hq
   exact ⟨(φ a) g, hH.smul_mem a hg, by rw [quotientMulAutHom_apply_mk']⟩
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+open OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom quotientMulAutHom_apply_mk') in
 /-- The preimage under `mk' S` of a `φ̄`-invariant subgroup is `φ`-invariant. -/
 theorem isAInvariant_comap_mk' {S : Subgroup R} [S.Normal] (hS : IsAInvariant φ S)
@@ -145,7 +145,7 @@ noncomputable def mulAutToEnd (W : Type*) [Group W] [IsMulCommutative W] (p : �
   map_one' := by ext x; rfl
   map_mul' φ ψ := by ext x; rfl
 
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **N-4 Maschke bridge** (BG §4; supports Thm 4.12(a) step a-3 and Thm 4.16 Case B-2).
 
 Let `φ : A →* MulAut R` with `(|A|, |R|)` coprime, `p` prime with `p ∣ |R|`, `S` an

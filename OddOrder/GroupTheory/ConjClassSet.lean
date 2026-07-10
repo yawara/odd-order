@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.Algebra.Group.Conj
 import Mathlib.Algebra.Group.Subgroup.Lattice
 import Mathlib.Tactic.Group
 
@@ -118,3 +119,29 @@ theorem mem_conjClassSetIn_conj_iff {H : Subgroup G} {T : Set G} {g : G} (hg : g
     rw [e, hbe]
 
 end OddOrder.GroupTheory
+
+/-!
+## Conjugacy classes of inverses (relocated)
+
+Extracted from `OddOrder/GroupTheory/RepresentationTheory/ClassSumCongruence.lean` (issue 0106):
+generic material relocated to a light-import leaf so downstream consumers need not pull the
+class-sum congruence machinery (rep theory + complex analysis + integral closure).  Declarations
+keep their original `OddOrder.RepresentationTheory` namespace so existing call sites are unchanged.
+-/
+
+namespace OddOrder.RepresentationTheory
+
+variable {G : Type*} [Group G]
+
+/-- Conjugacy of inverses is determined at the level of classes: `mk a = mk b ⟹ mk a⁻¹ = mk b⁻¹`.
+(A two-line consequence of `IsConj a b ⟹ IsConj a⁻¹ b⁻¹`; relocated here from
+`ClassSumCongruence` (issue 0106) so light consumers avoid its heavy import closure.) -/
+theorem mk_inv_eq_of_mk_eq {a b : G} (h : ConjClasses.mk a = ConjClasses.mk b) :
+    ConjClasses.mk a⁻¹ = ConjClasses.mk b⁻¹ := by
+  rw [ConjClasses.mk_eq_mk_iff_isConj] at h ⊢
+  obtain ⟨c, rfl⟩ := isConj_iff.mp h
+  exact isConj_iff.mpr ⟨c, by group⟩
+
+
+
+end OddOrder.RepresentationTheory

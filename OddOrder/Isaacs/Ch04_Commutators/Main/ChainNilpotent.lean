@@ -768,12 +768,12 @@ private theorem iterCommutator_inl_inr_quotient_eq_bot
     (h_iter : iterCommutator (SemidirectProduct.inl : G →* G ⋊[φ] A).range
         (SemidirectProduct.inr : A →* G ⋊[φ] A).range m = ⊥) :
     let φbar : A →* MulAut (G ⧸ N) :=
-      OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN
+      _root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN
     iterCommutator (SemidirectProduct.inl : G ⧸ N →* (G ⧸ N) ⋊[φbar] A).range
         (SemidirectProduct.inr : A →* (G ⧸ N) ⋊[φbar] A).range m = ⊥ := by
   dsimp
   let φbar : A →* MulAut (G ⧸ N) :=
-    OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN
+    _root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN
   let F : G ⋊[φ] A →* (G ⧸ N) ⋊[φbar] A :=
     SemidirectProduct.map (QuotientGroup.mk' N) (MonoidHom.id A) (fun a => by
       ext g
@@ -828,10 +828,10 @@ private lemma actionCommutatorInfty_quotient_eq_map
     {N : Subgroup G} [N.Normal]
     (hN : OddOrder.Isaacs.Ch03.IsAInvariant φ N) :
     actionCommutatorInfty
-        (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN) =
+        (_root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN) =
       (actionCommutatorInfty φ).map (QuotientGroup.mk' N) := by
   change actionCommutator
-        (phiInfty (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN)) =
+        (phiInfty (_root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN)) =
       (actionCommutator (phiInfty φ)).map (QuotientGroup.mk' N)
   rw [actionCommutator, actionCommutator, MonoidHom.map_closure]
   congr 1
@@ -974,7 +974,7 @@ private theorem actionCommutatorInfty_eq_bot_of_iter_eq_bot_aux :
         simpa [C] using actionCommutatorInfty_fix_ne_bot_of_ne_bot
           (φ := φ) (m := m) h_iter hK_bot
       let φbar : A →* MulAut (G ⧸ C) :=
-        OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hC_inv
+        _root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hC_inv
       have h_iter_bar :
           iterCommutator (SemidirectProduct.inl : G ⧸ C →* (G ⧸ C) ⋊[φbar] A).range
               (SemidirectProduct.inr : A →* (G ⧸ C) ⋊[φbar] A).range m = ⊥ := by

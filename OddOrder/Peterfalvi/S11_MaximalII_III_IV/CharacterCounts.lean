@@ -14,7 +14,7 @@ open scoped Pointwise
 variable {G : Type*} [Group G]
 
 open OddOrder.Isaacs.Ch03 (IsAInvariant isAInvariant_iff_smul_mem)
-open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
 
 variable {M : Subgroup G}
 
@@ -312,7 +312,7 @@ theorem commutator_cSub_H_le_H0 [Finite G] {M : Subgroup G} (data : TypesIIIIIIV
   have hWN : W ∈ chief.N := by
     have hmk : (QuotientGroup.mk' chief.N) W = 1 := by
       rw [hW, map_mul, map_inv,
-        ← OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk'
+        ← OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk'
           chief.N_aInvariant z hH, hz1, MulAut.one_apply, mul_inv_cancel]
     have hker := MonoidHom.mem_ker.mpr hmk
     rwa [QuotientGroup.ker_mk'] at hker
