@@ -660,23 +660,283 @@ theorem Hypothesis.mem_zSpan_inducedFamily_support_sharp_derived [Finite G] {M :
   exact ⟨Subgroup.mem_subgroupOf.mp hzK,
     fun h0 => hz1 (Subtype.ext (Set.mem_singleton_iff.mp h0))⟩
 
+open scoped FiniteInduce in
+/-- **`(M′)^# ⊆ A₀(M)`**: every nonidentity element of the derived subgroup centralizes
+itself (a nonidentity element of `M`), so it lies in the `A(M)`-disjunct of `typePA0` —
+the same witness as `inducedFamily_sub_support`'s tail.  Composes the sharp-support
+refinement back into the `A₀`-supported lattice (`extends_on_supported`). -/
+theorem Hypothesis.supportInSubgroup_sharp_derived_subset_A0 [Finite G] {M : Subgroup G}
+    (hyp : Hypothesis M) :
+    OddOrder.Peterfalvi.S04.supportInSubgroup (sharpSubgroup (derivedInG M)) M
+      ⊆ hyp.A0 := by
+  intro z hz
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at hz
+  obtain ⟨hzM', hz1⟩ := hz
+  show (z : G) ∈ typePA0 M hyp.typeP
+  unfold typePA0
+  rw [Set.mem_union]
+  left
+  exact ⟨hzM', hz1, (z : G), ⟨z.2, hz1⟩, Subgroup.mem_centralizer_singleton_iff.mpr rfl⟩
+
 set_option linter.unusedVariables false in
+set_option linter.unusedVariables false in
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (8.17.a) at the canonical pair, order-coprimality instance**: the order of
+an `(M′)^#`-point of the type-`P₁` `M = mp.T` is coprime to `|S_F| = |M_σ(S)|` of the
+type-II member `mp.S`.  This is the `coxTs`-step of Coq `FT_Dade_support_disjoint`
+(`part_a2`): `|a|` divides `|M_s| = |M′|` (the FTcore of a type-`P₁` maximal), and the
+FTcore prime supports of nonconjugate maximal subgroups are **disjoint** (Peterfalvi
+(8.17.a), Coq `FT_Dade_support_partition` — `π(G)` is partitioned by the `π(M_i_s)`).
+**`sorry`d as the (8.17.a) instance** (issue 9079 obligation 3). -/
+theorem typeP_pair_core_order_coprime [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : Hypothesis M) {mp : Section16MaximalPair G}
+    (hT : mp.T = M) (hKstar : mp.Kstar = hyp.typeP.W1)
+    {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S}
+    (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar)
+    {a : G} (haM' : a ∈ sharpSubgroup (derivedInG M)) (ha0 : a ∈ typePA0 M hyp.typeP) :
+    Nat.Coprime (orderOf a) (Nat.card (OddOrder.BG.Ch3.S10.Msigma mp.S)) := by
+  sorry
+
+set_option linter.unusedVariables false in
+open scoped Classical FiniteInduce Pointwise in
+/-- **Peterfalvi (8.13.b/c4) at the canonical pair, escape-landing exclusion**: an
+`(M′)^#`-point of the type-`P₁` `M = mp.T` whose centralizer **escapes `M`** cannot land in
+a conjugate of the type-II member `mp.S`.
+
+Coq `FTsupport_facts` (b)+(c4) + the (10.7) consumer's `notFrobM`: the escaping `A₀`-point
+has a *unique* supporting maximal `N[a]` (8.13.b), here `= S^g` by `C_G(a) ≤ S^g`; and
+(8.13.c4) says a type-II supporter forces `M` to be a Frobenius group with kernel `M_F` —
+impossible for the type-`P₁` `M` (Coq `typePF_exclusion`).  **`sorry`d as the (8.13.c4)
+instance** (issue 9079 obligation 3; `escapingCentralizers_control` is the open §8
+upstream of the (b)-part). -/
+theorem typeP_pair_escaping_centralizer_not_le_conj_partner [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : Hypothesis M) {mp : Section16MaximalPair G}
+    (hT : mp.T = M) (hKstar : mp.Kstar = hyp.typeP.W1)
+    {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S}
+    (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar)
+    {a : G} (haM' : a ∈ sharpSubgroup (derivedInG M)) (ha0 : a ∈ typePA0 M hyp.typeP)
+    (hesc : ¬ Subgroup.centralizer ({a} : Set G) ≤ M)
+    {g : G} (hland : Subgroup.centralizer ({a} : Set G) ≤ MulAut.conj g • mp.S) :
+    False := by
+  sorry
+
+open scoped Classical FiniteInduce Pointwise in
+/-- **Peterfalvi (8.18.b), bare base-point disjointness at the canonical pair — the
+landing analysis** (Coq `part_a2` of `FT_Dade_support_disjoint`): no `(M′)^#`-point of the
+type-`P₁` `M = mp.T` is conjugate to an `A(S)`-point of the type-II member `mp.S`.
+
+Suppose `c·a·c⁻¹ = b ∈ A(S)`.  Then `b` is a `(κ(S) ∪ σ(S))′`-element of `S`: its `σ`-part
+dies by the (8.17.a) core-order coprimality (`typeP_pair_core_order_coprime`), its
+`κ`-part because `b ∈ S′` and `S′` complements the cyclic `κ(S)`-Hall `W₁`
+((8.4)/`typeP_derivedInG_isComplement_kappaHall`).  The `A(S)`-witness `u ∈ M_σ(S)^#`
+commutes with `b`, so BG Lemma 15.1(c) (`uniqueMaximal_of_kappaSigmaCompl_element`, the
+type-generic (8.12)) pins `ℳ(C_G(b)) = {S}`.  If `C_G(a) ≤ M`, then
+`C_G(b) = C_G(a)^c ≤ M^c` forces `M^c = S` — contradicting the pair's nonconjugacy
+(`mp.S_T_not_conj`).  Otherwise `a` escapes `M` while `C_G(a) ≤ S^{c⁻¹}` — killed by the
+(8.13.c4) exclusion (`typeP_pair_escaping_centralizer_not_le_conj_partner`). -/
+theorem typeP_pair_base_bare_not_isConj [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : Hypothesis M) {mp : Section16MaximalPair G}
+    (hT : mp.T = M) (hKstar : mp.Kstar = hyp.typeP.W1)
+    {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S}
+    (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar)
+    {a : G} (haM' : a ∈ sharpSubgroup (derivedInG M)) (ha0 : a ∈ typePA0 M hyp.typeP)
+    {b : G} (hbS : b ∈ centralizerSupport
+      (sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma mp.S)) (derivedInG mp.S)) :
+    ¬ IsConj a b := by
+  classical
+  intro hconj
+  haveI : IsSolvable ↥mp.S := hG.solvable_of_mem_maximalSubgroups mp.S_maximal
+  obtain ⟨c, hc⟩ := isConj_iff.mp hconj
+  obtain ⟨hbM', hb1, u, huS, hbu⟩ := hbS
+  have ha1 : a ≠ 1 := fun h0 => haM'.2 (Set.mem_singleton_iff.mpr h0)
+  have hbne : b ≠ 1 := fun h0 => hb1 h0
+  have hordeq : orderOf b = orderOf a := by
+    rw [← hc]
+    exact orderOf_injective (MulAut.conj c).toMonoidHom (MulAut.conj c).injective a
+  -- `b` is a `(κ(S) ∪ σ(S))′`-element
+  have hcopMσ := typeP_pair_core_order_coprime hG hyp hT hKstar hSW1 hSW2 haM' ha0
+  have hSP : OddOrder.BG.Ch4.S14.IsTypeP mp.S :=
+    OddOrder.BG.Ch4.S14.isTypeP_of_isTypeP2 mp.S_typeP2
+  have hW1hall := typePData_W1_isHallSubgroup_kappa hG mp.S_maximal hSP data.typeP
+  haveI : IsCyclic ↥data.typeP.W1 := data.typeP.W1_cyclic
+  have hcompl := OddOrder.BG.Ch4.S14.typeP_derivedInG_isComplement_kappaHall hG
+    mp.S_maximal hSP data.typeP.W1_le hW1hall
+  have hcardS' : Nat.card ((derivedInG mp.S).subgroupOf mp.S) = Nat.card (derivedInG mp.S) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+      (OddOrder.Peterfalvi.S11.derivedInG_le_self mp.S)).toEquiv
+  have hyπ : OddOrder.GroupTheory.IsPiElement
+      ((OddOrder.BG.Ch4.S14.kappa mp.S ∪ OddOrder.BG.Ch3.S10.sigma mp.S)ᶜ) b := by
+    intro q hq
+    obtain ⟨hqp, hqdvd, -⟩ := Nat.mem_primeFactors.mp hq
+    simp only [Set.mem_compl_iff, Set.mem_union, not_or]
+    constructor
+    · -- `q ∉ κ(S)`: `q ∣ |b| ∣ |S′| = index(W₁)`, and the Hall `W₁` has `κ`-free index
+      intro hqκ
+      have hbord : orderOf b ∣ Nat.card (derivedInG mp.S) :=
+        Subgroup.orderOf_dvd_natCard _ hbM'
+      have hqidx : q ∣ ((data.typeP.W1).subgroupOf mp.S).index := by
+        rw [hcompl.index_eq_card, hcardS']
+        exact hqdvd.trans hbord
+      exact hW1hall.2 q (Nat.mem_primeFactors.mpr
+        ⟨hqp, hqidx, Subgroup.index_ne_zero_of_finite⟩) hqκ
+    · -- `q ∉ σ(S)`: `σ`-primes divide `|M_σ(S)|`, coprime to `|a| = |b|` by (8.17.a)
+      intro hqσ
+      have hHall := OddOrder.BG.Ch3.S10.Msigma_isHall hG mp.S_maximal
+      have hqnidx : ¬ q ∣ (OddOrder.BG.Ch3.S10.Msigma mp.S).index := fun hdvd =>
+        hHall.2 q (Nat.mem_primeFactors.mpr
+          ⟨hqp, hdvd, Subgroup.index_ne_zero_of_finite⟩) hqσ
+      have hqG : q ∣ Nat.card G := hqdvd.trans (orderOf_dvd_natCard b)
+      have hqMσ : q ∣ Nat.card (OddOrder.BG.Ch3.S10.Msigma mp.S) := by
+        rcases (Nat.Prime.dvd_mul hqp).mp
+          ((Subgroup.card_mul_index (OddOrder.BG.Ch3.S10.Msigma mp.S)) ▸ hqG) with h | h
+        · exact h
+        · exact absurd h hqnidx
+      have hgcd : q ∣ Nat.gcd (orderOf a) (Nat.card (OddOrder.BG.Ch3.S10.Msigma mp.S)) :=
+        Nat.dvd_gcd (hordeq ▸ hqdvd) hqMσ
+      rw [Nat.Coprime.gcd_eq_one hcopMσ] at hgcd
+      exact hqp.one_lt.ne' (Nat.dvd_one.mp hgcd)
+  -- the `(κ∪σ)′`-Hall of `S` (Hall E in the solvable `S`)
+  obtain ⟨U', hU'⟩ := OddOrder.Isaacs.Ch03.hall_E_exists (G := ↥mp.S)
+    ((OddOrder.BG.Ch4.S14.kappa mp.S ∪ OddOrder.BG.Ch3.S10.sigma mp.S)ᶜ)
+  have hUeq : (U'.map mp.S.subtype).subgroupOf mp.S = U' :=
+    Subgroup.comap_map_eq_self_of_injective mp.S.subtype_injective U'
+  have hUhall : OddOrder.Isaacs.Ch03.IsHallSubgroup
+      ((OddOrder.BG.Ch4.S14.kappa mp.S ∪ OddOrder.BG.Ch3.S10.sigma mp.S)ᶜ)
+      ((U'.map mp.S.subtype).subgroupOf mp.S) := by
+    rw [hUeq]
+    exact hU'
+  -- BG 15.1(c): `ℳ(C_G(b)) = {S}`
+  have hbmem : b ∈ mp.S := OddOrder.Peterfalvi.S11.derivedInG_le_self mp.S hbM'
+  have hCne : OddOrder.BG.Ch3.S10.Msigma mp.S ⊓
+      Subgroup.centralizer ({b} : Set G) ≠ ⊥ := by
+    intro hbot
+    have humem : u ∈ OddOrder.BG.Ch3.S10.Msigma mp.S ⊓
+        Subgroup.centralizer ({b} : Set G) := by
+      refine Subgroup.mem_inf.mpr ⟨huS.1, Subgroup.mem_centralizer_iff.mpr fun z hz => ?_⟩
+      rw [Set.mem_singleton_iff] at hz
+      subst hz
+      exact Subgroup.mem_centralizer_singleton_iff.mp hbu
+    rw [hbot] at humem
+    exact huS.2 (Set.mem_singleton_iff.mpr (Subgroup.mem_bot.mp humem))
+  have hB := OddOrder.BG.Ch4.S16.uniqueMaximal_of_kappaSigmaCompl_element hG mp.S_maximal
+    (Subgroup.map_subtype_le U') hUhall hbmem hbne hyπ hCne
+  -- transport: `C_G(b) = C_G(a)^c`
+  have hCconj : Subgroup.centralizer ({b} : Set G)
+      = MulAut.conj c • Subgroup.centralizer ({a} : Set G) := by
+    rw [← hc]
+    exact (OddOrder.Peterfalvi.S10.conj_smul_centralizer_singleton' c a).symm
+  by_cases hCa : Subgroup.centralizer ({a} : Set G) ≤ M
+  · -- `C_G(b) ≤ M^c`, so `M^c = S` — contradicting the pair's nonconjugacy
+    have hMc : MulAut.conj c • M ∈ maximalSubgroupsContaining
+        (Subgroup.centralizer ({b} : Set G)) := by
+      rw [mem_maximalSubgroupsContaining]
+      refine ⟨OddOrder.BG.Ch3.S12.isCoatom_conj_smul
+        (mem_maximalSubgroups.mp (hT ▸ mp.T_maximal)), ?_⟩
+      rw [hCconj]
+      exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hCa
+    rw [hB, Set.mem_singleton_iff] at hMc
+    exact mp.S_T_not_conj ⟨c⁻¹, by
+      rw [← hMc, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul, hT]⟩
+  · -- `a` escapes `M` while `C_G(a) ≤ S^{c⁻¹}` — the (8.13.c4) exclusion
+    have hSmem : mp.S ∈ maximalSubgroupsContaining
+        (Subgroup.centralizer ({b} : Set G)) := by
+      rw [hB]
+      rfl
+    have hCbS : Subgroup.centralizer ({b} : Set G) ≤ mp.S :=
+      (mem_maximalSubgroupsContaining.mp hSmem).2
+    have hland : Subgroup.centralizer ({a} : Set G) ≤ MulAut.conj c⁻¹ • mp.S := by
+      have hstep : MulAut.conj c⁻¹ • Subgroup.centralizer ({b} : Set G)
+          ≤ MulAut.conj c⁻¹ • mp.S :=
+        Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hCbS
+      rwa [hCconj, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul] at hstep
+    exact typeP_pair_escaping_centralizer_not_le_conj_partner hG hyp hT hKstar hSW1 hSW2
+      haM' ha0 hCa hland
+
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (8.18.b), base-point disjointness at the canonical pair** (the
+support-geometry core of Coq `oST`): no `H(a)`-thickened `A₁(M)`-point of the type-`P₁`
+`M = mp.T` is conjugate to an `A(S)`-point of the type-II member `mp.S`.
+
+**The thickening reduces to the bare case by a power trick**: `h ∈ H(a)` commutes with `a`
+((2.2) `H(a) ≤ C_G(a)`) with coprime order (`|H(a)| ⊥ |C_M(a)|` and `|a| ∣ |C_M(a)|`), so
+CRT provides `k` with `(a·h)^k = a`; conjugating, `a` is conjugate to `b^k`, which is again
+an `A(S)`-point (powers stay in `S′` and keep the centralizer witness).  The bare case is
+`typeP_pair_base_bare_not_isConj`. -/
+theorem typeP_pair_base_not_isConj [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : Hypothesis M) {mp : Section16MaximalPair G}
+    (hT : mp.T = M) (hKstar : mp.Kstar = hyp.typeP.W1)
+    {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S}
+    (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar)
+    {a : G} (haM' : a ∈ sharpSubgroup (derivedInG M)) (ha0 : a ∈ typePA0 M hyp.typeP)
+    {h : G} (hh : h ∈ hyp.dadeData.dade.H ⟨a, ha0⟩)
+    {b : G} (hbS : b ∈ centralizerSupport
+      (sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma mp.S)) (derivedInG mp.S)) :
+    ¬ IsConj (a * h) b := by
+  classical
+  -- `a` and `h` commute with coprime orders ((2.2): `H(a) ≤ C_G(a)`, `|H(a)| ⊥ |C_M(a)|`),
+  -- so `a` is a *power* of `a·h` (CRT), hence of `b` after conjugation — reducing to the
+  -- bare case `a ~ b^k ∈ A(S)`.
+  intro hconj
+  have ha1 : a ≠ 1 := fun h0 => haM'.2 (Set.mem_singleton_iff.mpr h0)
+  have hHle : hyp.dadeData.dade.H ⟨a, ha0⟩ ≤ Subgroup.centralizer ({a} : Set G) := by
+    rw [hyp.dadeData.dade.centralizer_eq_sup ⟨a, ha0⟩]
+    exact le_sup_left
+  have hcomm : Commute a h := (Subgroup.mem_centralizer_singleton_iff.mp (hHle hh)).symm
+  -- coprime orders
+  have hha : orderOf h ∣ Nat.card (hyp.dadeData.dade.H ⟨a, ha0⟩) :=
+    Subgroup.orderOf_dvd_natCard _ hh
+  have haa : orderOf a ∣ Nat.card
+      (OddOrder.Peterfalvi.S04.centralizerIn M a) :=
+    Subgroup.orderOf_dvd_natCard _
+      (OddOrder.Peterfalvi.S04.mem_centralizerIn.mpr
+        ⟨hyp.dadeData.dade.mem_L ha0, rfl⟩)
+  have hcopHC := hyp.dadeData.dade.centralizer_coprime ⟨a, ha0⟩ ⟨a, ha0⟩
+  have hcop : Nat.Coprime (orderOf a) (orderOf h) :=
+    (hcopHC.coprime_dvd_left hha).symm.coprime_dvd_left haa
+  -- CRT: `(a·h)^k = a` for `k ≡ 1 (mod |a|)`, `k ≡ 0 (mod |h|)`
+  obtain ⟨k, hk1, hk0⟩ := Nat.chineseRemainder hcop 1 0
+  have hpow : (a * h) ^ k = a := by
+    rw [hcomm.mul_pow]
+    have h1 : a ^ k = a ^ 1 := pow_eq_pow_iff_modEq.mpr hk1
+    have h2 : h ^ k = h ^ 0 := pow_eq_pow_iff_modEq.mpr hk0
+    rw [h1, h2, pow_one, pow_zero, mul_one]
+  -- transport along the conjugacy: `b^k` is a conjugate of `a`
+  obtain ⟨c, hc⟩ := isConj_iff.mp hconj
+  have hbk : b ^ k = c * a * c⁻¹ := by
+    rw [← hc, conj_pow, hpow]
+  -- `b^k` is again an `A(S)`-point (a power stays in `S′` and keeps the centralizer witness)
+  obtain ⟨hbM', hb1, u, huS, hbu⟩ := hbS
+  have hbkS : b ^ k ∈ centralizerSupport
+      (sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma mp.S)) (derivedInG mp.S) := by
+    refine ⟨Subgroup.pow_mem _ hbM' k, ?_, u, huS,
+      Subgroup.pow_mem (Subgroup.centralizer _) hbu k⟩
+    intro h0
+    apply ha1
+    have h1 : c * a * c⁻¹ = 1 := by rw [← hbk, h0]
+    have h2 : a = c⁻¹ * (c * a * c⁻¹) * c := by group
+    rw [h2, h1]
+    group
+  -- the bare case kills `a ~ b^k`
+  exact typeP_pair_base_bare_not_isConj hG hyp hT hKstar hSW1 hSW2 haM' ha0 hbkS
+    (isConj_iff.mpr ⟨c, hbk.symm⟩)
+
 open scoped Classical FiniteInduce in
 /-- **Peterfalvi (8.18.b), cross-Dade orthogonality at the canonical pair** (Coq `oST` of
 `Frob_der1_type2`, `PFsection10.v:577-590`): for `φ` a `(M′)^#`-supported class function of
 the type-`P₁` `M = mp.T` and `ψ` an `A(S)`-supported class function of the type-II member
 `mp.S`, the two Dade images are orthogonal, `⟨φ^{τ_M}, ψ^{τ_S}⟩ = 0`.
 
-The image supports are the **restricted** thickenings: `Supp(φ^{τ_M}) ⊆ Ã₁(M)` (the Dade
-value at `g ~ a·h` is `φ(a)`, so only base points in `Supp(φ) ⊆ A₁(M) = (M′)^#`
-contribute) and `Supp(ψ^{τ_S}) ⊆ Ã(S)` (the (8.16) TI-route has trivial signalizers, so the
-thickening is the bare conjugation closure).  These are disjoint — Peterfalvi (8.18.b): a
-common point would produce a supporting configuration `FTsupports M (S^x)`, whose (8.13.c4)
-unique supporting maximal is of type I or II, and the type-II case forces `M` to be a
-Frobenius group with kernel `M_F` — impossible for the type-`P₁` `M` (Coq
-`typePF_exclusion`).  **`sorry`d as the single remaining (8.18.b) obligation** of the
-(10.7) frontier (issue 9079 obligation 3; the (8.13) control `escapingCentralizers_control`
-upstream is itself an open §8 obligation). -/
+The image supports are the **restricted** thickenings
+(`IsDadeMap.exists_base_of_map_apply_ne_zero`): a nonvanishing point of `φ^{τ_M}` is
+conjugate to `a·h` with `a ∈ Supp(φ) ⊆ A₁(M) = (M′)^#` and `h ∈ H(a)`, and a nonvanishing
+point of `ψ^{τ_S}` is conjugate to a bare `b ∈ Supp(ψ) ⊆ A(S)` (the (8.16) TI-route has
+trivial signalizers).  A common point would make `a·h ~ b` — impossible by the (8.18.b)
+base-point disjointness (`typeP_pair_base_not_isConj`), so the supports are disjoint and
+the inner product vanishes (`inner_eq_zero_of_disjoint_support`). -/
 theorem Hypothesis.cross_dade_inner_eq_zero_at_pair [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hyp : Hypothesis M) {mp : Section16MaximalPair G}
@@ -696,7 +956,50 @@ theorem Hypothesis.cross_dade_inner_eq_zero_at_pair [Finite G]
         (typeIIHypothesis46 hG mp.S_maximal (section16_S_isTypeII hG mp) data.typeP).dade0
         (typeIIHypothesis46 hG mp.S_maximal (section16_S_isTypeII hG mp) data.typeP).tau ψ)
       = 0 := by
-  sorry
+  classical
+  have hφA0 : φ.support ⊆ hyp.A0 :=
+    hφsupp.trans hyp.supportInSubgroup_sharp_derived_subset_A0
+  have hψA0 : ψ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (centralizerSupport (sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma mp.S))
+          (derivedInG mp.S)
+        ∪ conjClassSetIn mp.S (typePV mp.S data.typeP)) mp.S :=
+    hψsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono Set.subset_union_left)
+  refine ClassFunction.inner_eq_zero_of_disjoint_support ?_
+  rw [Set.disjoint_left]
+  intro g hg1 hg2
+  rw [ClassFunction.mem_support] at hg1 hg2
+  -- `M`-side base point: `g ~ a·h`, `a ∈ Supp(φ) ⊆ (M′)^#`, `h ∈ H(a)`
+  have hg1' : (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) φ) g ≠ 0 := hg1
+  rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support
+    hyp.dadeData.dade _ hφA0] at hg1'
+  obtain ⟨a, h, hh, hconja, hvala⟩ :=
+    OddOrder.Peterfalvi.S04.IsDadeMap.exists_base_of_map_apply_ne_zero
+      (hyp.dadeData.dade.isDadeMap_dadeMap (k := ℂ)) _ hg1'
+  have haM' : a.1 ∈ sharpSubgroup (derivedInG M) := by
+    have := hφsupp (ClassFunction.mem_support.mpr hvala)
+    rwa [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at this
+  -- `S`-side base point: `g ~ b·k` with `k ∈ ⊥`, so `g ~ b`, `b ∈ Supp(ψ) ⊆ A(S)`
+  rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support
+    (typeIIHypothesis46 hG mp.S_maximal (section16_S_isTypeII hG mp) data.typeP).dade0
+    _ hψA0] at hg2
+  obtain ⟨b, k, hk, hconjb, hvalb⟩ :=
+    OddOrder.Peterfalvi.S04.IsDadeMap.exists_base_of_map_apply_ne_zero
+      ((typeIIHypothesis46 hG mp.S_maximal (section16_S_isTypeII hG mp)
+        data.typeP).dade0.isDadeMap_dadeMap (k := ℂ)) _ hg2
+  have hbS : b.1 ∈ centralizerSupport
+      (sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma mp.S)) (derivedInG mp.S) := by
+    have := hψsupp (ClassFunction.mem_support.mpr hvalb)
+    rwa [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at this
+  -- the TI-route has trivial signalizers: `k = 1`
+  have hk1 : k = 1 := by
+    have hbot : (typeIIHypothesis46 hG mp.S_maximal (section16_S_isTypeII hG mp)
+        data.typeP).dade0.H b = ⊥ := rfl
+    rw [hbot, Subgroup.mem_bot] at hk
+    exact hk
+  -- combine the conjugacies: `a·h ~ g ~ b`
+  exact typeP_pair_base_not_isConj hG hyp hT hKstar hSW1 hSW2 haM' a.2 hh hbS
+    (hconja.trans (by rw [hk1, mul_one] at hconjb; exact hconjb.symm))
 
 open scoped Classical FiniteInduce in
 /-- **The (10.7) cross-side orthogonality `⟨ζ^{τ₁}, λ^{τ₂}⟩ = 0`** (the `zeta_lam_ortho`
@@ -841,24 +1144,6 @@ theorem Hypothesis.tau1_zeta_inner_extension_lam_eq_zero_at_pair [Finite G]
     rw [ClassFunction.sub_apply] at hz
     exact sub_eq_zero.mp hz
   exact orthonormal_vchar_diff_ortho haZ hbZ hcZ hdZ ha1 hb1 hc1 hd1 hab hcd hdiff hab1 hcd1
-
-open scoped FiniteInduce in
-/-- **`(M′)^# ⊆ A₀(M)`**: every nonidentity element of the derived subgroup centralizes
-itself (a nonidentity element of `M`), so it lies in the `A(M)`-disjunct of `typePA0` —
-the same witness as `inducedFamily_sub_support`'s tail.  Composes the sharp-support
-refinement back into the `A₀`-supported lattice (`extends_on_supported`). -/
-theorem Hypothesis.supportInSubgroup_sharp_derived_subset_A0 [Finite G] {M : Subgroup G}
-    (hyp : Hypothesis M) :
-    OddOrder.Peterfalvi.S04.supportInSubgroup (sharpSubgroup (derivedInG M)) M
-      ⊆ hyp.A0 := by
-  intro z hz
-  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at hz
-  obtain ⟨hzM', hz1⟩ := hz
-  show (z : G) ∈ typePA0 M hyp.typeP
-  unfold typePA0
-  rw [Set.mem_union]
-  left
-  exact ⟨hzM', hz1, (z : G), ⟨z.2, hz1⟩, Subgroup.mem_centralizer_singleton_iff.mpr rfl⟩
 
 open scoped Classical FiniteInduce in
 /-- **The (10.7) `cross_zero` production** (Coq `Frob_der1_type2`'s
