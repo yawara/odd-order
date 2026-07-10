@@ -738,6 +738,90 @@ theorem Hypothesis.g1_card_le_of_partner [Finite G] {M S : Subgroup G} (hyp : Hy
   rw [hcard0, hsplit, hcopeq]
   exact Nat.add_le_add_left hnc_le _
 
+open scoped Classical FiniteInduce in
+/-- **The (10.8) `hB` bound** (p. 60 lines 89–91, the rational form consumed by
+`typeII_coherence_contradiction_estimate`): with the type-II partner data supplied,
+
+`(|famG₀| − #{g ∉ Ã₀, (|g|, w₁) = 1}) / |G| ≤ (|S_F| − 1)/|S| + (w₁w₂ − w₁ − w₂ + 1)/(w₁w₂)`.
+
+The rational form of `g1_card_le_of_partner`, divided by `|G| = |S|·[G:S] = |W|·[G:W]`. -/
+theorem Hypothesis.g1_div_le_of_partner [Finite G] {M S : Subgroup G} (hyp : Hypothesis M)
+    (data : TypePData S) (hprime : (Nat.card ↥data.W1).Prime)
+    (hcop : Nat.Coprime (Nat.card ↥(derivedInG S)) (Nat.card ↥data.W1))
+    (hHall : OddOrder.Isaacs.Ch03.IsHallSubgroup (Nat.card ↥data.H).primeFactors data.H)
+    (hcent : ∀ b ∈ data.H, b ≠ 1 → Subgroup.centralizer ({b} : Set G) ≤ S)
+    (hfrobcap : ∀ b ∈ data.H, b ≠ 1 → ∀ y ∈ derivedInG S,
+      y ∈ Subgroup.centralizer ({b} : Set G) → y ∈ data.H)
+    (hW1card : Nat.card ↥data.W1 = hyp.w2) (hW2card : Nat.card ↥data.W2 = hyp.w1)
+    (hWcard : Nat.card ↥data.W = hyp.w1 * hyp.w2) :
+    ((Nat.card (hyp.toFamilyHypothesis71).G0 : ℚ)
+        - ((Finset.univ.filter (fun g : G => g ∉ hyp.dadeData.dade.dadeSupport
+            ∧ (orderOf g).Coprime hyp.w1)).card : ℚ)) / (Nat.card G : ℚ)
+      ≤ ((Nat.card ↥data.H : ℚ) - 1) / (Nat.card ↥S : ℚ)
+        + ((hyp.w1 : ℚ) * hyp.w2 - hyp.w1 - hyp.w2 + 1) / ((hyp.w1 : ℚ) * hyp.w2) := by
+  classical
+  have hNat := hyp.g1_card_le_of_partner data hprime hcop hHall hcent hfrobcap hW2card
+  -- cardinalities and nonvanishing
+  have hcH : 1 ≤ Nat.card ↥data.H := Nat.card_pos
+  have hcW1 : 2 ≤ Nat.card ↥data.W1 :=
+    (Subgroup.one_lt_card_iff_ne_bot _).mpr data.W1_nontrivial
+  have hcW2 : 2 ≤ Nat.card ↥data.W2 :=
+    (Subgroup.one_lt_card_iff_ne_bot _).mpr data.W2_nontrivial
+  have hsub1 : Nat.card ↥data.W1 ≤ Nat.card ↥data.W1 * Nat.card ↥data.W2 :=
+    Nat.le_mul_of_pos_right _ (by omega)
+  have hsub2 : Nat.card ↥data.W2
+      ≤ Nat.card ↥data.W1 * Nat.card ↥data.W2 - Nat.card ↥data.W1 := by
+    have hfac : Nat.card ↥data.W1 * Nat.card ↥data.W2 - Nat.card ↥data.W1
+        = Nat.card ↥data.W1 * (Nat.card ↥data.W2 - 1) := by
+      rw [Nat.mul_sub, mul_one]
+    rw [hfac]
+    calc Nat.card ↥data.W2 ≤ 2 * (Nat.card ↥data.W2 - 1) := by omega
+      _ ≤ Nat.card ↥data.W1 * (Nat.card ↥data.W2 - 1) :=
+          Nat.mul_le_mul_right _ hcW1
+  have hSidx0 : (S.index : ℚ) ≠ 0 := by
+    exact_mod_cast Subgroup.index_ne_zero_of_finite
+  have hWidx0 : (data.W.index : ℚ) ≠ 0 := by
+    exact_mod_cast Subgroup.index_ne_zero_of_finite
+  have hG0 : (0 : ℚ) < (Nat.card G : ℚ) := by exact_mod_cast Nat.card_pos
+  -- `|G| = |S|·[G:S]` and `|G| = |W|·[G:W]`, in `ℚ`
+  have hGS : (Nat.card G : ℚ) = (Nat.card ↥S : ℚ) * (S.index : ℚ) := by
+    exact_mod_cast (Subgroup.card_mul_index S).symm
+  have hGW : (Nat.card G : ℚ) = (Nat.card ↥data.W : ℚ) * (data.W.index : ℚ) := by
+    exact_mod_cast (Subgroup.card_mul_index data.W).symm
+  -- the numerator bound, cast to `ℚ`
+  have hnum : (Nat.card (hyp.toFamilyHypothesis71).G0 : ℚ)
+      - ((Finset.univ.filter (fun g : G => g ∉ hyp.dadeData.dade.dadeSupport
+          ∧ (orderOf g).Coprime hyp.w1)).card : ℚ)
+      ≤ ((Nat.card ↥data.H : ℚ) - 1) * (S.index : ℚ)
+        + ((Nat.card ↥data.W1 : ℚ) * (Nat.card ↥data.W2 : ℚ) - (Nat.card ↥data.W1 : ℚ)
+            - (Nat.card ↥data.W2 : ℚ) + 1) * (data.W.index : ℚ) := by
+    have hc := (Nat.cast_le (α := ℚ)).mpr hNat
+    push_cast [Nat.cast_sub hcH, Nat.cast_sub hsub1, Nat.cast_sub hsub2] at hc
+    linarith
+  -- divide by `|G|` and split into the two orbit terms
+  calc ((Nat.card (hyp.toFamilyHypothesis71).G0 : ℚ)
+        - ((Finset.univ.filter (fun g : G => g ∉ hyp.dadeData.dade.dadeSupport
+            ∧ (orderOf g).Coprime hyp.w1)).card : ℚ)) / (Nat.card G : ℚ)
+      ≤ (((Nat.card ↥data.H : ℚ) - 1) * (S.index : ℚ)
+          + ((Nat.card ↥data.W1 : ℚ) * (Nat.card ↥data.W2 : ℚ) - (Nat.card ↥data.W1 : ℚ)
+              - (Nat.card ↥data.W2 : ℚ) + 1) * (data.W.index : ℚ)) / (Nat.card G : ℚ) := by
+        gcongr
+    _ = ((Nat.card ↥data.H : ℚ) - 1) / (Nat.card ↥S : ℚ)
+          + ((Nat.card ↥data.W1 : ℚ) * (Nat.card ↥data.W2 : ℚ) - (Nat.card ↥data.W1 : ℚ)
+              - (Nat.card ↥data.W2 : ℚ) + 1) / (Nat.card ↥data.W : ℚ) := by
+        rw [add_div]
+        congr 1
+        · rw [hGS, mul_div_mul_right _ _ hSidx0]
+        · rw [hGW, mul_div_mul_right _ _ hWidx0]
+    _ = ((Nat.card ↥data.H : ℚ) - 1) / (Nat.card ↥S : ℚ)
+          + ((hyp.w1 : ℚ) * hyp.w2 - hyp.w1 - hyp.w2 + 1) / ((hyp.w1 : ℚ) * hyp.w2) := by
+        have e1 : (Nat.card ↥data.W1 : ℚ) = (hyp.w2 : ℚ) := by exact_mod_cast hW1card
+        have e2 : (Nat.card ↥data.W2 : ℚ) = (hyp.w1 : ℚ) := by exact_mod_cast hW2card
+        have e3 : (Nat.card ↥data.W : ℚ) = (hyp.w1 : ℚ) * (hyp.w2 : ℚ) := by
+          exact_mod_cast hWcard
+        rw [e1, e2, e3]
+        ring
+
 /-- **Type-`P` order factorization** `|M| = |M_F|·|U|·|W₁|`.  The type-`P` decomposition is a double
 semidirect product `M = (H ⋊ U) ⋊ W₁`: `W₁` complements the derived subgroup `M' = [M,M]` in `M`
 (`M_complement`, `|M| = |M'|·|W₁|`), and `U` complements the Fitting kernel `H = M_F` in `M'`
