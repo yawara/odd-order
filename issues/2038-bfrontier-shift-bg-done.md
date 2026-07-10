@@ -565,3 +565,28 @@ counterexample_psi_int_* を dade.psi = coh.extension chi0 で instantiate + mva
 h2e ✅ / hidx ✅ / **残 = hB 配線 (witness_L_zeta_bound → dade.psi 形) + hA ((12.15) norm 関係、
 ‖ψ^{ρM}‖² ≥ (|K−K′|/|M|)mval²、claim-1+2 と chiRho norm 展開) + hC ((7.3)+(8.17) 分離)**。
 次 iteration = hA (claim-1/2 の直接続き、chiRhoCF ノルムを K−K′ 上で下から評価) → hB → hC。
+
+## ✅ (2026-07-10 続⁶、lane-b /loop) — **hA landed: A₁(M)-based ρM + norm 下界** (commit 86255c2d)
+
+キュー step 5 (hA)。RhoMEvaluation に追加:
+- **`hypothesis71SharpKernel`** = (12.15) が定義するとおりの **A₁(M)=K^# ベース ρM**
+  (S04/FullDadeIsometryData/HConjInvariant の `.restrict` 3 点、S12 type-P toHypothesis71 パターン、
+  own axioms clean)。**⚠ 設計上の要点**: (12.16) の hC は (7.3) 上界が thickened Ã₁(M) 上を走り
+  (8.17) で Ã₁(L) と disjoint であることを要するため、A(M) 全体ベースの hypM.toHypothesis71 では
+  **不可** — A₁ 版が必須 (このため claim-1 を constancy core + wrapper に refactor し A₁ 版 eval
+  `counterexample_chiRhoA1_eval_of_mem_K_sharp` を追加)。
+- **`counterexample_chiRhoA1_normSq_ge` (hA)**: ‖ψ^{ρM}‖² ≥ (|K|−|K′|)/|M|·mval² —
+  ノルム展開 |M|⁻¹Σ_m + K−K′ の |K|−|K′| 点 (claims 1-3 で値 mval) でサンプリング。
+
+**残 (witness_value_norm_package 完成まで)**:
+- **hB**: `witness_L_zeta_bound` (proven、H78 形) → dade.psi 形へ変換 (配線)。normRho の定義を
+  L-side ‖ψ^ρ‖² に取り hB = 1 − e/|H| ≤ normRho。
+- **hC**: normRhoM + normRho < 1。部品: (i) (7.3) `chiRho_integral_inequality` を両側に適用
+  (L-side は hyp.toHypothesis71 [A(L)=A₁(L) Frobenius ✓]、M-side は hypothesis71SharpKernel)、
+  (ii) **thickened dadeSupport disjointness**: Ã₁(M) ∩ Ã(L) = ∅ ((8.17)/(8.18.c) — Lean 側の
+  dadeSupport-disjointness lemma を要調査/新設: `nonconjugate_diffImage_inner_zero` が使う
+  (8.18.c) 幾何の supply を確認)、(iii) ‖ψ‖² = 1 (coh isometry: ⟨ext χ₀, ext χ₀⟩ = ⟨χ₀,χ₀⟩ = 1)、
+  (iv) 厳密不等号: ψ(1) ≠ 0 (ψ ∈ ZIrr, ‖ψ‖=1 → ψ = ±irreducible → ψ(1) = ±deg ≠ 0;
+  (5.5) E-subsum |E|=1 route)。両 (7.3) 和 + 1∉Ã 系 + ψ(1)² 項で < 1。
+- 最後: witness_value_norm_package の sorry を conjunct 供給で置換 (mval := claim-3 の witness g、
+  normRhoM := ‖chiRhoCF_{A₁}ψ‖².re、normRho := L-side)。
