@@ -403,6 +403,151 @@ update⁶ 手順 3 の本丸 infra が閉じた。S12_TypeIIFrobenius に新 sec
    hN (pivot norm) = λ irreducible norm 1 / hiso+hZdiff = S07 generic (h46.dade0+hconj)。
    ⚠ S13:1466 前例の maxHeartbeats 1600000 級 elaboration 注意。
 
+### 2026-07-10 update¹⁰ — obligation 2(a) の (5.8) route 完全マップ (調査完了、実装は次 iteration)
+
+★ **(5.8) endgame は既に formalize 済み**: `eq_smul_chiFam_column_of_vanishOnV`
+(S05_SigmaTrichotomy:456) が「X|_V = 0 + σ-coeff 2 列支持 ({0,δ}/{0,−δ}) + ‖X‖² = w₁ +
+Parseval ⟹ **X = δ·Σ_p χ_{(p,kcol)} ∨ X = −δ·Σ_p χ_{(p,jcol)}**」の dichotomy を供給。
+★ **Coq (5.8) (`coherent_prDade_TIred`, PFsection5:1371) の結論も dichotomy** (±sign × k/k̄ 列)
+— `TypeIICrossIsometryData` の (r', δ') は存在的 packaging ゆえ **dichotomy で十分**
+(M-side 流の exact pin 不要、α_{ij}/ζ 機構の mirror 不要)。
+
+**X := τ₂(ν) への適用に要る glue** (Coq proof 精読済、逐一対応):
+1. **(5.5)-for-ν**: τ₂(ν) = Σ_{α∈E} α、E ⊆ certainTypeR.imageSet、|E| = w₁。
+   M-side `exists_muColumn_tau1_eq_sum_R` (DadeCalculations:211-280) の mirror:
+   `CharacterPsiDecomposition.ofProjection` + `eq_sum_of_psi_eq_zero`。
+   ⟨ν,ν̄⟩ = 0 は `columnFamily_mu_sum_inner` + `column_inv_ne_self`;
+   extends_on_supported の zSupportedSpan T2 A₀ 入力は landed hsuppdiff で。
+2. **hψV: τ₂(ν)|_V = 0** — Coq の zeta1-trick: zeta1 := λ(1)·ν − ν(1)·λ (A(S)-supported、
+   deg 相殺 — landed diff-helper の smul 版 1 本要)。τ₂(zeta1) = τ_S(zeta1) (supported) の
+   V-値 = 0 (**landed anchor** `typeII_tau_apply_eq_zero_of_mem_ticVdiffV`) →
+   τ₂(ν)(v) = (ν1/λ1)·τ₂(λ)(v) → **τ₂(λ)|_V = 0 が残り**:
+   (5.5)-for-λ (card 1 → τ₂λ = ± 単一 Dade 成分) + R(λ)-member ⊥ 全 ω 列
+   (landed cross lemma の `key` brick は既に ∀χ₂'-general — standalone 抽出) +
+   「⊥ 全 σ-image → V-vanish」glue (W-side は `vanishOnV_of_inner_alphaCF`
+   S05_SigmaIsometry:268; G-side 版の有無要確認 — 無ければ index 全射性経由)。
+3. **σ-coeff 計算**: `sigmaCoeff := ⟨ψ, chiFam pq⟩` (S05_SigmaIsometry:501) — τ₂ν = ΣE +
+   chiFam 直交性から直接。2 列支持: E ⊆ ±δω_{χ₂/χ₂⁻¹} + **index 翻訳**
+   `certainTypeOmegaSigma_eq_chiFam` (S06_CertainTypeIsometry:165、
+   ω_{χ₂,i} = chiFam (omegaProdEquiv.symm (omegaProdCharTic h χ₂ i)))。
+   ⚠ q-成分の i-独立性 + (χ₂,i) ↦ pq の単射/全射 bookkeeping — S06 (4.8) 機構
+   (`certainType_diff_dade_eq` の NC≤4 計算) に既存 lemma がある可能性大、先に精査。
+4. **hXnorm** = extension_inner_eq (ν ∈ zSpan T2) + columnFamily_mu_sum_inner (w₁)。
+   **hParseval** = ΣE 直交形から (coeff = [α∈E]·±δ、Σ|coeff|² = |E| = w₁ = ‖X‖²)。
+5. **hyp/app**: ticVdiff (typeIIHypothesis46 …) + rfl + ticVdiffFullDadeApplication
+   (全て landed cross lemma と同じ instances)。結論の chiFam-form → certainTypeOmegaSigma
+   逆翻訳で `typeII_nu_tau2_dichotomy` に整形。
+
+実装順 (次 iteration): 3 の index bookkeeping 精査 → (5.5)-for-ν/λ → 2 の V-vanish 組立 →
+S05 endgame 適用 → dichotomy 整形。その後 obligation 2(b) (S↔M grid transpose) と 3。
+
+**進捗 (2026-07-10 続き)**: ~~(5.5)-for-ν/λ~~ **DONE (c6d4b780)** — 新 leaf
+`S12_TypeIIColumnPin.lean` に `typeII_T2_extension_columnSum_eq_sum` (τ₂ν = ΣE、|E|=w₁) +
+`typeII_T2_extension_lam_eq_single` (τ₂λ = 単一 Dade 成分)。sorry-free/axiom-clean。
+S06 (4.8) index bookkeeping も精査済: `sigmaCoeff_psi_eq` pattern (chiFam_spec .2.2.1 で
+ite 化) + `omegaProdCharTic_ne`/`omegaProdEquiv_symm_omegaProdCharTic_ne` (列単射) が既存 —
+2 列支持の hsupp には **q-成分の i-独立性** (omegaProdEquiv.symm (omegaProdCharTic h χ₂ i) の
+第 2 成分が i に依らない) が追加で要る (S05 `omegaProdEquiv_symm_omegaProdChar` :
+symm (omegaProdChar p q) = (p,q) 経由で omegaProdCharTic = omegaProdChar (transport i)
+(transport χ₂) 形の分解 lemma を書く)。
+⚠ Lean 知見: 識別子に λ 不可 (予約語) / proof 内 `set` は theorem binder を再束縛して
+shadow 事故 (c✝) → subst + full-term 直書き。
+残 = step 2 (V-vanishing: R(λ)-member ⊥ 全 ω の standalone 抽出 → τ₂λ|_V = 0 →
+zeta1-trick で τ₂ν|_V = 0) → step 3 (S05 endgame + dichotomy 整形)。
+
+**進捗²**: ~~key-brick standalone~~ **DONE (156e3906)**:
+`typeII_dadeOfDiff_member_inner_omegaSigma_eq_zero` (R(λ)-member ⊥ 全 grid 列)。
+**残る glue = (3.2.e) 「⊥ 全 σ-image → V-vanish」の G-side 版** — 設計確定済:
+- σ = Ind on CF(W,V) 橋 (`sigma_eq_induce_of_supportedOnV`): 両者 conjugatesOfSet V 支持
+  (`full_map_eq_zero_of_not_mem_conjugatesOfSet_V` / induce 版) + V 上一致
+  (`full_map_eq_of_mem_V` S05_TICyclic:215 vs TI-induction 値 — V-TI で g v g⁻¹ ∈ V →
+  g ∈ N(V) = W → 全項 = α(v)) + class-fn は V^G-支持なら V-値で決定。
+- reciprocity = `ClassFunction.inner_induce_eq_inner_restrict` (既存 ✓、
+  CliffordCorrespondence:71 の証明内で使用) で ⟨σα, ψ⟩ = ⟨α, Res_W ψ⟩。
+- W-side 完結: `vanishOnV_of_inner_alphaCF` (S05_SigmaIsometry:268) に
+  f := ClassFunction.restrict hyp.W ψ を食わせ f|_V = 0 = ψ|_V。
+  alphaCF は ω-組合せ ⊆ CF(W,V) → σ(alphaCF) は χFam-組合せ → ⊥ 仮定から 0。
+その後: τ₂λ|_V = 0 ((5.5) singleton + key-brick + glue) → zeta1-trick (λ1·ν − ν1·λ の
+smul-diff support helper 1 本) → τ₂ν|_V = 0 → S05 endgame。
+
+**進捗³**: ~~(3.2.e) glue~~ **DONE (7b02ae31)**: `ticyclic_full_map_eq_induce` (σ=Ind on
+CF(W,V)、TI-counting) + `ticyclic_apply_eq_zero_of_forall_inner_chiFam` (Coq
+ortho_cycTIiso_vanish — repo に無かった (3.2.e) gap を S05-generic に閉じた。upstream hoist
+候補)。**残 = 純組立**: (a) τ₂λ|_V = 0 — (5.5) singleton (τ₂λ = α ∈ R(λ)) + 156e3906
+(α ⊥ 全 ω) + glue (⚠ glue の仮定は ∀pq の chiFam-form — ω→chiFam は
+certainTypeOmegaSigma_eq_chiFam、**全 pq への到達** = (χ₂',i) ↦ pq の全射が要 —
+omegaProdEquiv.symm 全射 ✓ × omegaProdCharTic の (χ₂,i)-range = 全 Ŵ の確認 1 lemma,
+S05 `omegaProdEquiv_symm_omegaProdChar` + w1CharEquiv/ticW₂-transport 全射で)。
+(b) zeta1 = λ1•ν − ν1•λ: supported (smul-diff helper) → τ₂zeta1 = τ_S zeta1 (extends) →
+V-値 0 (landed anchor) → λ1·τ₂ν(v) = ν1·τ₂λ(v) = 0 → τ₂ν|_V = 0 (λ1 ≠ 0)。
+(c) S05 endgame 適用 (update¹⁰ の 3-5) → typeII_nu_tau2_dichotomy。
+
+**進捗⁴ (741109f0)**: ~~(a) τ₂λ|_V = 0~~ ~~(b) τ₂ν|_V = 0~~ **step 2 完全 DONE**。
+発見 2 点: (i) `inner_smul_chiFam_...` は既に ∀pq-chiFam 形 → **全射 lemma 不要**
+(156e3906 を chiFam-primary に refactor)。(ii) **λ, ν 等次数ゆえ scaled zeta1 不要** —
+ν − λ が直接 A(S)-supported で anchor が効く。⚠ λ-in-identifier 3 度目 (hλv 等) —
+**識別子には lam/nu を使う** (λ は予約語、ν は可だが混在回避)。
+**残 = step 3 (最終 assembly) のみ**: `typeII_nu_tau2_dichotomy` =
+S05 `eq_smul_chiFam_column_of_vanishOnV` ((ticVdiff h46) rfl (ticVdiffFullDadeApplication…)) を
+X := c.extension (columnSum χ₂) に適用。入力チェックリスト:
+- hψV ✓ (741109f0 の nu-side、typePV↔ticVdiff.V defeq)
+- σ-coeff 2 列支持 + {0,δ}/{0,−δ}: (5.5) E-形 (c6d4b780) から。τ₂ν = Σ_{α∈E}α、
+  E ⊆ certainTypeRImage の像 → sigmaCoeff pq = ⟨Σ E, chiFam pq⟩ = Σ_{α∈E}⟨α, chiFam pq⟩ —
+  各 α = ±δ_j ω_{χ₂/χ₂⁻¹, i} = ±δ_j chiFam P_i (certainTypeOmegaSigma_eq_chiFam) +
+  chiFam 直交性 ((ticVdiff).chiFam_spec .2.2.1) → coeff = ±δ_j·[P ∈ E-index]。
+  2 列条件の jcol/kcol := omegaProdEquiv.symm (omegaProdCharTic h χ₂/χ₂⁻¹ i).2 —
+  **q-成分の i-独立性 lemma がここで必要** (omegaProdCharTic の分解、
+  S05 omegaProdEquiv_symm_omegaProdChar + tic_W₂-transport; sigmaCoeff_psi_eq (S06:515) の
+  pattern 参照)。row-条件 hk/hj: ∀p 形 — p ∉ P-image の行は coeff 0 (支持)。
+- hδ = (columnFamily χ₂).sign (sign_eq) / hXnorm ✓ (extension_inner_eq + mu_sum_inner) /
+- hParseval: ⟨X,X⟩ = w₁ = |E| = Σ_pq |coeff|² (coeff = ±δ on E-indices、0 else;
+  E-index 単射 = certainTypeRImage_injective + omegaProdEquiv_symm_omegaProdCharTic_ne)。
+- 結論整形: chiFam-form → certainTypeOmegaSigma 逆翻訳 (eq_chiFam.symm) で
+  τ₂ν = δ·Σ_i ω_{χ₂,i} ∨ τ₂ν = −δ·Σ_i ω_{χ₂⁻¹,i}。
+
+**進捗⁵ — q-成分 lemma の実装設計確定 (API 発見済、次 iteration で実装)**:
+`omegaProdCharTic h χ₂ i := (sdiffTICyclicHypothesis.omegaProdChar (h.w1CharEquiv i) χ₂).comp
+(ticWEquivSdiffW h)` (S06_CertainTypeIsometry:125、クリーンな合成形)。成分 lemma:
+- **(L1) snd の i-独立性**: `(ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂ i) |>.2`
+  は i に依らない。証明: `omegaProdEquiv_symm_eq` (S05_SigmaIsometry:133、
+  symm ξ = (ξ|_{W₁}, ξ|_{W₂})) で .2 = restriction; MonoidHom.ext w (w ∈ tic-W₂-of-W);
+  値 = omegaProdChar (w1CharEquiv i) χ₂ (e w) — e w の sdiff-W₂ 帰属
+  (`coe_ticWEquivSdiffW` S06:112 + tic_W2 = W2.map subtype) → `wFst_eq_one_of_mem_W2` で
+  W₁-因子 = 1 → 値 = χ₂(wSnd (e w)) i-free ✓。
+- **(L1') fst の χ₂-独立性**: 対称 (wSnd_eq_one_of_mem_W1、値 = w1CharEquiv i (wFst…))。
+- **(L2) 列単射 (snd)**: χ₂ ≠ χ₂' → snd 成分相異。
+  `omegaProdEquiv_symm_omegaProdCharTic_ne` (S06:既存、pair-ne) + (L1') fst 一致 → snd 相異 ✓。
+⚠ ticVdiff h の W₁/W₂ は h.tic の fields (ticVdiff は tic の W-系を再利用) — subgroupOf の
+基準が (ticVdiff h).W = h.tic.W で一致することを確認しつつ書く。
+**進捗⁸ — obligation 2(b) の scoping 確定 + 9079 claim (実装は次 iteration)**:
+Coq (10.7) (`Frob_der1_type2` PFsection10:549) の精読で **route 再構成が判明**:
+(i) 任意 type-II L でなく **M の pair partner S** (`FTtypeP_pair_witness`) に対して
+cross-isometry を証明、(ii) pair の type-2 分類 clause で `L = S^x`、(iii) 共役転送
+(`FrobeniusJker` 相当)。⟹ `exists_typeIICrossIsometryData` の現行 signature (任意 S) は
+partner-witness + 転送に**再構成すべき** (T2/dichotomy 機構は S-generic ゆえ partner 上で
+そのまま効く)。transpose の鍵候補 = **Dade-map 一意性** (両 σ が同じ (G,V)-TI の Dade map
+⟹ 同一; `IsDadeMap.unique`)。repo 資産 = `Section16MaximalPair` (FeitThompsonSetup:292、
+typeP_pair_W_structure + certainTypeS/T 済) — 次 iteration は coverage 精査から。
+claim = **issue 9079** (9076 (c, §3 rigidity) とは非重複を明記)。
+
+**進捗⁷ (b5a20e11) — ★★ obligation 2(a) 完成**: `typeII_nu_tau2_dichotomy` landed
+(sorry-free/axiom-clean、leaf 1273 行)。(5.8) の S-side pin = Coq coherent_prDade_TIred の
+dichotomy 形。T-添字化 → σ-coeff 公式 → 2 列支持 → S05 endgame 一撃。
+**残 obligations = 2(b) S↔M grid transpose (typeP_pair 圏、0098 item 1 → 着手時 9000 claim) +
+3 ((8.18.b) disjointness、update⁵ 参照)** — この 2 つが `exists_typeIICrossIsometryData` の
+最後の gap (dichotomy → TypeIICrossIsometryData fields への整形は 2(b) の transpose とセット)。
+
+**進捗⁶ (df0cc78a)**: ~~L1/L1'/L2~~ **DONE** (+ 橋像帰属 helper 2 本、Hypothesis46-generic)。
+⚠ (ticVdiff h).W ≡ h.tic.W の型 spelling 差 → **erw** 必須。
+**残 = endgame 適用本体 1 本** (`typeII_nu_tau2_dichotomy`): kcol/jcol := 成分 (L1 で
+well-defined)、σ-coeff 計算、S05 endgame 呼び出し、逆翻訳。
+endgame 適用の残り組立は本 note 直上のチェックリスト通り
+(E-Finset → T := 添字 preimage、coeff 計算 = sigmaCoeff_psi_eq (S06:515) の
+chiFam_spec .2.2.1 pattern、hδ = (columnFamily χ₂).sign + sign_eq)。
+その後 = obligation 2(b) (S↔M grid transpose、0098 item 1 → 9000 claim) + obligation 3
+((8.18.b) disjointness) — dichotomy が landed すれば `exists_typeIICrossIsometryData` の
+残 gap はこの 2 つ。
+
 ### 2026-07-10 update⁹ — ★★ typeII_T2_coherent LANDED (408e9650) — obligation 1 完成
 
 **T2 = {λ,λ̄,ν,ν̄} の (5.7) coherence が sorry-free/axiom-clean で閉じた** (τ₂ の存在 =

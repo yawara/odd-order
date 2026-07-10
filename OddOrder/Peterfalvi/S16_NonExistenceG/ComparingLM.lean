@@ -361,8 +361,8 @@ noncomputable def lSideGridCoeffData [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
   -- parity.  Verified c-unreachable: the proven `NC ≤ 2` engine
   -- `grid_eq_zero_of_relation_of_card_le_two` (S16_GridExpansion) does not apply here (all `p q ≥ 15`
   -- coefficients are `±1`, so `NC = p q ≫ 2`), and the `bessel` proof only yields `⟨Y,Y⟩ ≥ 0`, not the
-  -- tight `⟨Y,Y⟩ = 0`.  Mirror: the M-side `MHypothesis.betaGrid` (identical statement) is discharged
-  -- by an explicit `sorry` at `exists_MHypothesis` tagged "genuine Track A obligation (issue 3002)".
+  -- tight `⟨Y,Y⟩ = 0`.  The M-side analogue is now the conditional
+  -- `betaM_expansion_data`; it is not stored on the unconditional (14.10) carrier.
   grid_mem := sorry
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -371,8 +371,8 @@ The residual `Δ_L = β_L − 1_G + ζ_0^ν` of the (7.8.a) Dade decomposition
 (`beta_eq_constOne_sub_zetaImage_add_delta`, PROVEN) combines with the principal `1_G` to a
 `±1`-signed sum of the whole `η`-grid: `1_G + Δ_L = Σ_{ij} ε_ij η_ij`, `ε_ij ∈ {±1}`.
 
-This is the L-analog of the `M`-side field `MHypothesis.betaGrid` (which `betaM_expansion`
-consumes), and of the Coq `FTtype2_support_coherence` core.  Here it is *proven* from the faithful
+This is the L-analog of the M-side conditional `betaM_expansion_data`, and of the Coq
+`FTtype2_support_coherence` core.  Here it is *proven* from the faithful
 §14 grid-coefficient carrier `LSideGridCoeffData` and the PROVEN (3.7) four-corner relation
 (`betaL_grid_relation`):
 
@@ -1103,24 +1103,25 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 open OddOrder.Peterfalvi.S09 in
 open OddOrder.Peterfalvi.S09.Cert in
 /-- **Peterfalvi (7.8) for the V-side `M`** — the §7 coherence datum `S09.Hypothesis78` of the
-type-I maximal subgroup `M` over `N_G(V)`, together with its structural data (maximality,
-`N_G(V) ≤ M`, Fitting-kernel index `p q`).
+type-I maximal subgroup `M` over `N_G(V)`, together with its structural data (maximality and
+`N_G(V) ≤ M`).
 
 This is the **V-side dual of `witness_L_hypothesis78`** (the (12.16) witness-side coherence):
 `M`'s coherence is produced by the general type-I Frobenius engine `S14.frobenius_typeI_coherent`
-(`M` is type-I Frobenius over `N_G(V)` with kernel `M_F`, from `typeII_overNormalizer_frobenius_V`),
+(`M` is the witness from the faithful `S15.exists_M_structural_dichotomy`, and (12.7)
+`S14.typeI_frobenius` supplies its Frobenius structure with kernel `M_F`),
 and the (7.8) datum is assembled by the same `hypothesis78OfDade` construction (placed family
 `exists_witness_placed_family`, `nu_isometry` from `coherence_extension_inner_eq_on_family`,
-`hagree` from `coherence_hagree_dadeMap`).  Subsumes `exists_M_structural` and additionally supplies
-the `h78` field of `MHypothesis` — the single **grid-independent** honest obligation of
-`exists_MHypothesis` (the `betaGrid`/`betaM` fields remain gated on the §13 `η`-grid carrier, issue
-3002). -/
+`hagree` from `coherence_hagree_dadeMap`).  It exports exactly the faithful (13.17.c)-dual
+alternatives `|M:M_F| = p ∨ |M:M_F| = p q`, never the unconditional second branch, and additionally
+supplies the `h78` field of `MHypothesis`. -/
 theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (hTII : IsTypeII hyp.base.T) :
     ∃ (M : Subgroup G) (typeIHyp : OddOrder.Peterfalvi.S14.Hypothesis M),
       M ∈ maximalSubgroups G ∧
         Subgroup.normalizer (hyp.base.V : Set G) ≤ M ∧
-          ((maxNilpotentNormalHall M).subgroupOf M).index = hyp.base.p * hyp.base.q ∧
+          (((maxNilpotentNormalHall M).subgroupOf M).index = hyp.base.p ∨
+            ((maxNilpotentNormalHall M).subgroupOf M).index = hyp.base.p * hyp.base.q) ∧
           ∃ h78 : OddOrder.Peterfalvi.S09.Hypothesis78 G
               (OddOrder.GroupTheory.typeIA M typeIHyp.typeI) M,
             h78.hyp76.H = maxNilpotentNormalHall M ∧
@@ -1132,38 +1133,33 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
               (1 : ℝ) - (h78.complementIndex : ℝ) / (h78.kernelOrder : ℝ)
                 ≤ h78.zetaNuRhoNormSq := by
   classical
-  obtain ⟨vdata, _hker, _hVH⟩ :=
-    OddOrder.Peterfalvi.S15.typeII_overNormalizer_frobenius_V hG hyp.base hTII
-  have hMtypeI : IsTypeI vdata.L := ⟨vdata.frobenius.typeI⟩
-  obtain ⟨typeIHyp⟩ :=
-    OddOrder.Peterfalvi.S14.exists_typeI_hypothesis hG vdata.L_maximal hMtypeI
-  have hindex : ((maxNilpotentNormalHall vdata.L).subgroupOf vdata.L).index
-      = hyp.base.p * hyp.base.q := by
-    rw [OddOrder.Peterfalvi.S15.typeIFrobenius_kernel_index_eq_complement vdata.frobenius]
-    exact vdata.complement_card_eq_pq
-  refine ⟨vdata.L, typeIHyp, vdata.L_maximal, vdata.normalizer_V_le_L, hindex, ?_⟩
+  obtain ⟨M, typeIHyp, hMmax, hnormV, hindexCases⟩ :=
+    OddOrder.Peterfalvi.S15.exists_M_structural_dichotomy hG hyp.base hTII
+  obtain ⟨fdata, _⟩ :=
+    OddOrder.Peterfalvi.S14.typeI_frobenius hG hMmax ⟨typeIHyp.typeI⟩
+  refine ⟨M, typeIHyp, hMmax, hnormV, hindexCases, ?_⟩
   -- Coherence for `M` via the general type-I Frobenius engine: the Frobenius witness for
-  -- `typeIHyp.H = M_F` comes from `vdata.frobenius` (both kernels are `maxNilpotentNormalHall M`).
-  have hHeq : typeIHyp.typeI.typeF.H = vdata.frobenius.typeI.typeF.H := by
-    rw [typeIHyp.typeI.typeF.H_eq, vdata.frobenius.typeI.typeF.H_eq]
-  have hfrob : ∃ C : Subgroup ↥vdata.L,
-      OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥vdata.L
-        ((typeIHyp.typeI.typeF.H).subgroupOf vdata.L) C :=
-    ⟨vdata.frobenius.complement, by rw [hHeq]; exact vdata.frobenius.frobenius⟩
+  -- `typeIHyp.H = M_F` comes from (12.7) (both kernels are `maxNilpotentNormalHall M`).
+  have hHeq : typeIHyp.typeI.typeF.H = fdata.typeI.typeF.H := by
+    rw [typeIHyp.typeI.typeF.H_eq, fdata.typeI.typeF.H_eq]
+  have hfrob : ∃ C : Subgroup ↥M,
+      OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M
+        ((typeIHyp.typeI.typeF.H).subgroupOf M) C :=
+    ⟨fdata.complement, by rw [hHeq]; exact fdata.frobenius⟩
   obtain ⟨coh⟩ := OddOrder.Peterfalvi.S14.frobenius_typeI_coherent hG typeIHyp hfrob
   -- Mirror `witness_L_hypothesis78`'s `hypothesis78OfDade` assembly (generic in the hypothesis).
-  have hHL : typeIHyp.typeI.typeF.H ≤ vdata.L := typeIHyp.typeI.typeF.H_le
-  haveI hKnormal : ((typeIHyp.typeI.typeF.H).subgroupOf vdata.L).Normal := by
+  have hHL : typeIHyp.typeI.typeF.H ≤ M := typeIHyp.typeI.typeF.H_le
+  haveI hKnormal : ((typeIHyp.typeI.typeF.H).subgroupOf M).Normal := by
     rw [typeIHyp.typeI.typeF.H_eq]
-    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal vdata.L
-  have hAH : OddOrder.GroupTheory.typeIA vdata.L typeIHyp.typeI
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal M
+  have hAH : OddOrder.GroupTheory.typeIA M typeIHyp.typeI
       = (typeIHyp.typeI.typeF.H : Set G) \ {1} :=
     OddOrder.Peterfalvi.S14.Hypothesis.typeIA_eq_sharp hG typeIHyp
-  have hHnorm : ∀ (l : ↥vdata.L) {h : G}, h ∈ typeIHyp.typeI.typeF.H →
+  have hHnorm : ∀ (l : ↥M) {h : G}, h ∈ typeIHyp.typeI.typeF.H →
       (l : G) * h * (l : G)⁻¹ ∈ typeIHyp.typeI.typeF.H := by
     intro l h hh
-    have hhL : h ∈ vdata.L := hHL hh
-    have hmem : (⟨h, hhL⟩ : ↥vdata.L) ∈ (typeIHyp.typeI.typeF.H).subgroupOf vdata.L :=
+    have hhL : h ∈ M := hHL hh
+    have hmem : (⟨h, hhL⟩ : ↥M) ∈ (typeIHyp.typeI.typeF.H).subgroupOf M :=
       (Subgroup.mem_subgroupOf).mpr hh
     have hconj := hKnormal.conj_mem ⟨h, hhL⟩ hmem l
     rw [Subgroup.mem_subgroupOf] at hconj
@@ -1171,43 +1167,43 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   obtain ⟨n, θ, ind1H, hind1H, hdeg0, htriv, hinj, hcover⟩ :=
     OddOrder.Peterfalvi.S14.exists_witness_placed_family typeIHyp
   have hSmem : ∀ i, i ≠ ind1H →
-      ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf vdata.L)
+      ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf M)
           (θ i : ClassFunction _ ℂ) ∈ typeIHyp.Sset := by
     intro i hi
     refine ⟨θ i, fun htriv_i => hi (hinj ?_), rfl⟩
-    change ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf vdata.L)
+    change ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf M)
         (θ i : ClassFunction _ ℂ)
-        = ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf vdata.L)
+        = ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf M)
           (θ ind1H : ClassFunction _ ℂ)
     rw [htriv_i, htriv]
   let d : Fin (n + 1) → ℂ :=
-    fun i => (θ i : ClassFunction ↥((typeIHyp.typeI.typeF.H).subgroupOf vdata.L) ℂ)
-      (1 : ↥((typeIHyp.typeI.typeF.H).subgroupOf vdata.L))
-  have hd : ∀ i, d i = (θ i : ClassFunction ↥((typeIHyp.typeI.typeF.H).subgroupOf vdata.L) ℂ)
-      (1 : ↥((typeIHyp.typeI.typeF.H).subgroupOf vdata.L)) := fun _ => rfl
-  have hdeg : ∀ i, ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf vdata.L)
-        (θ i : ClassFunction _ ℂ) (1 : ↥vdata.L)
-      = d i * ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf vdata.L)
-        (θ 0 : ClassFunction _ ℂ) (1 : ↥vdata.L) := by
+    fun i => (θ i : ClassFunction ↥((typeIHyp.typeI.typeF.H).subgroupOf M) ℂ)
+      (1 : ↥((typeIHyp.typeI.typeF.H).subgroupOf M))
+  have hd : ∀ i, d i = (θ i : ClassFunction ↥((typeIHyp.typeI.typeF.H).subgroupOf M) ℂ)
+      (1 : ↥((typeIHyp.typeI.typeF.H).subgroupOf M)) := fun _ => rfl
+  have hdeg : ∀ i, ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf M)
+        (θ i : ClassFunction _ ℂ) (1 : ↥M)
+      = d i * ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf M)
+        (θ 0 : ClassFunction _ ℂ) (1 : ↥M) := by
     intro i
-    rw [ClassFunction.induce_apply_one ((typeIHyp.typeI.typeF.H).subgroupOf vdata.L)
+    rw [ClassFunction.induce_apply_one ((typeIHyp.typeI.typeF.H).subgroupOf M)
         (θ i : ClassFunction _ ℂ), hdeg0, hd i]
     ring
-  have hdeg_match : ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf vdata.L)
-        (θ 0 : ClassFunction _ ℂ) (1 : ↥vdata.L)
-      = ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf vdata.L)
-        (θ ind1H : ClassFunction _ ℂ) (1 : ↥vdata.L) := by
+  have hdeg_match : ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf M)
+        (θ 0 : ClassFunction _ ℂ) (1 : ↥M)
+      = ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf M)
+        (θ ind1H : ClassFunction _ ℂ) (1 : ↥M) := by
     rw [hdeg0, htriv]
-    change (((typeIHyp.typeI.typeF.H).subgroupOf vdata.L).index : ℂ)
-        = ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf vdata.L)
-          (trivialClassFunction ↥((typeIHyp.typeI.typeF.H).subgroupOf vdata.L)) (1 : ↥vdata.L)
+    change (((typeIHyp.typeI.typeF.H).subgroupOf M).index : ℂ)
+        = ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf M)
+          (trivialClassFunction ↥((typeIHyp.typeI.typeF.H).subgroupOf M)) (1 : ↥M)
     rw [induce_trivialChar_apply_eq_index _ (Subgroup.one_mem _)]
-  have psi_support : ∀ i, (ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf vdata.L)
+  have psi_support : ∀ i, (ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf M)
         (θ i : ClassFunction _ ℂ)
-      - d i • ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf vdata.L)
+      - d i • ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf M)
           (θ 0 : ClassFunction _ ℂ)).support
       ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
-          (OddOrder.GroupTheory.typeIA vdata.L typeIHyp.typeI) vdata.L := by
+          (OddOrder.GroupTheory.typeIA M typeIHyp.typeI) M := by
     intro i
     refine (induce_diff_support (θ i) (θ 0) (d i) (hdeg i)).trans ?_
     intro x hx
@@ -1216,23 +1212,23 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       ⟨hx.1, hx.2⟩
   have hnu_isometry : ∀ i j : Fin (n + 1), i ≠ ind1H → j ≠ ind1H →
       ClassFunction.inner (coh.extension (ClassFunction.induce
-          (typeIHyp.typeI.typeF.H.subgroupOf vdata.L) (θ i : ClassFunction _ ℂ)))
+          (typeIHyp.typeI.typeF.H.subgroupOf M) (θ i : ClassFunction _ ℂ)))
         (coh.extension (ClassFunction.induce
-          (typeIHyp.typeI.typeF.H.subgroupOf vdata.L) (θ j : ClassFunction _ ℂ)))
+          (typeIHyp.typeI.typeF.H.subgroupOf M) (θ j : ClassFunction _ ℂ)))
         = ClassFunction.inner (ClassFunction.induce
-            (typeIHyp.typeI.typeF.H.subgroupOf vdata.L) (θ i : ClassFunction _ ℂ))
-          (ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf vdata.L)
+            (typeIHyp.typeI.typeF.H.subgroupOf M) (θ i : ClassFunction _ ℂ))
+          (ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf M)
             (θ j : ClassFunction _ ℂ)) :=
     fun i j hi hj => coherence_extension_inner_eq_on_family coh (hSmem i hi) (hSmem j hj)
   have hagree : ∀ i : Fin (n + 1), i ≠ 0 → i ≠ ind1H →
       typeIHyp.toHypothesis71.τ ⟨ClassFunction.induce
-          (typeIHyp.typeI.typeF.H.subgroupOf vdata.L) (θ i : ClassFunction _ ℂ)
-          - d i • ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf vdata.L)
+          (typeIHyp.typeI.typeF.H.subgroupOf M) (θ i : ClassFunction _ ℂ)
+          - d i • ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf M)
             (θ 0 : ClassFunction _ ℂ), psi_support i⟩
-        = coh.extension (ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf vdata.L)
+        = coh.extension (ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf M)
             (θ i : ClassFunction _ ℂ))
           - d i • coh.extension (ClassFunction.induce
-            (typeIHyp.typeI.typeF.H.subgroupOf vdata.L) (θ 0 : ClassFunction _ ℂ)) := by
+            (typeIHyp.typeI.typeF.H.subgroupOf M) (θ 0 : ClassFunction _ ℂ)) := by
     intro i _ hi_ind
     obtain ⟨deg_i, -, hdeg_i_eq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast (θ i)
     exact coherence_hagree_dadeMap typeIHyp.dadeData.dade typeIHyp.hconj coh
@@ -1245,26 +1241,26 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   · exact typeIHyp.typeI.typeF.H_eq
   · -- **Peterfalvi (7.6)/(14.10)**: the induced principal `ζ_{ind1H} = Ind_K 1_K` has
     -- degree `[M:K]` at `1` (`θ ind1H = 1_K` + `induce_trivialChar_apply_eq_index`).
-    show ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf vdata.L)
-        (θ ind1H : ClassFunction _ ℂ) (1 : vdata.L)
-        = (((maxNilpotentNormalHall vdata.L).subgroupOf vdata.L).index : ℂ)
+    show ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf M)
+        (θ ind1H : ClassFunction _ ℂ) (1 : M)
+        = (((maxNilpotentNormalHall M).subgroupOf M).index : ℂ)
     rw [htriv, ← typeIHyp.typeI.typeF.H_eq]
     exact induce_trivialChar_apply_eq_index _ (Subgroup.one_mem _)
   · -- **Peterfalvi (7.8)**: the distinguished `ζ = ζ_0 = Ind_K θ_0` (`θ_0 ≠ 1_K`) is irreducible
     -- (Frobenius, [Is] 6.34), hence `‖ζ‖² = 1` — the `ζ_0` unit-norm input to the (7.5)/(7.8) machinery.
     obtain ⟨C, hFrobG⟩ := hfrob
     have hθ0_ne : θ 0 ≠ trivialIrreducibleCharacter
-        ↥(typeIHyp.typeI.typeF.H.subgroupOf vdata.L) := by
+        ↥(typeIHyp.typeI.typeF.H.subgroupOf M) := by
       intro h0triv
       refine hind1H ?_
-      exact (hinj (show ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf vdata.L)
+      exact (hinj (show ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf M)
             (θ 0 : ClassFunction _ ℂ)
-          = ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf vdata.L)
+          = ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf M)
             (θ ind1H : ClassFunction _ ℂ) from by rw [h0triv, htriv])).symm
     show ClassFunction.inner
-        (ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf vdata.L)
+        (ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf M)
           (θ 0 : ClassFunction _ ℂ))
-        (ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf vdata.L)
+        (ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf M)
           (θ 0 : ClassFunction _ ℂ)) = 1
     exact inner_self_induce_eq_one_of_frobeniusGroup hFrobG (θ 0) hθ0_ne
   · -- **Peterfalvi (7.8.b)**: the coherence-norm lower bound `1 − e/h ≤ ‖ζ_0^{νρ}‖²` for the
@@ -1275,25 +1271,25 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     -- (`frobenius_two_mul_card_complement_add_one_le_card_kernel`).
     obtain ⟨C, hFrobG⟩ := hfrob
     have hθ0_ne : θ 0 ≠ trivialIrreducibleCharacter
-        ↥(typeIHyp.typeI.typeF.H.subgroupOf vdata.L) := by
+        ↥(typeIHyp.typeI.typeF.H.subgroupOf M) := by
       intro h0triv
       refine hind1H ?_
-      exact (hinj (show ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf vdata.L)
+      exact (hinj (show ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf M)
             (θ 0 : ClassFunction _ ℂ)
-          = ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf vdata.L)
+          = ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf M)
             (θ ind1H : ClassFunction _ ℂ) from by rw [h0triv, htriv])).symm
     set H78 := hypothesis78OfDade typeIHyp.toHypothesis71
       (typeIHyp.dadeData.dade.fullDadeIsometryData typeIHyp.hconj).toDadeIsometryData.isDadeIsometry
       typeIHyp.typeI.typeF.H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H htriv
       hdeg_match coh.extension hnu_isometry hagree with hH78def
-    have hKcard : Nat.card ↥(typeIHyp.typeI.typeF.H.subgroupOf vdata.L)
+    have hKcard : Nat.card ↥(typeIHyp.typeI.typeF.H.subgroupOf M)
         = Nat.card typeIHyp.typeI.typeF.H :=
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHL).toEquiv
-    have hKodd : Odd (Nat.card ↥(typeIHyp.typeI.typeF.H.subgroupOf vdata.L)) :=
-      (hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card vdata.L)).of_dvd_nat
+    have hKodd : Odd (Nat.card ↥(typeIHyp.typeI.typeF.H.subgroupOf M)) :=
+      (hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)).of_dvd_nat
         (Subgroup.card_subgroup_dvd_card _)
     have hCodd : Odd (Nat.card ↥C) :=
-      (hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card vdata.L)).of_dvd_nat
+      (hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)).of_dvd_nat
         (Subgroup.card_subgroup_dvd_card C)
     obtain ⟨a, ha⟩ := exists_betaDecomp_a H78
       (Submodule.sub_mem _
@@ -1304,12 +1300,12 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       have hfrobB := OddOrder.Peterfalvi.S14.frobenius_two_mul_card_complement_add_one_le_card_kernel
         hFrobG hKodd hCodd hFrobG.ne_bot_kernel
       show 2 * H78.complementIndex + 1 ≤ H78.kernelOrder
-      have hke : H78.kernelOrder = Nat.card ↥(typeIHyp.typeI.typeF.H.subgroupOf vdata.L) := by
+      have hke : H78.kernelOrder = Nat.card ↥(typeIHyp.typeI.typeF.H.subgroupOf M) := by
         rw [hKcard]; rfl
-      have hcompl : Nat.card ↥(typeIHyp.typeI.typeF.H.subgroupOf vdata.L) * Nat.card ↥C
-          = Nat.card ↥vdata.L := hFrobG.isComplement.card_mul_card
+      have hcompl : Nat.card ↥(typeIHyp.typeI.typeF.H.subgroupOf M) * Nat.card ↥C
+          = Nat.card ↥M := hFrobG.isComplement.card_mul_card
       have hce : H78.complementIndex = Nat.card ↥C := by
-        show Nat.card ↥vdata.L / Nat.card typeIHyp.typeI.typeF.H = Nat.card ↥C
+        show Nat.card ↥M / Nat.card typeIHyp.typeI.typeF.H = Nat.card ↥C
         rw [← hKcard, ← hcompl, Nat.mul_div_cancel_left _ Nat.card_pos]
       rw [hke, hce]; exact hfrobB
     exact zetaNuRhoNormSqGeOfDade typeIHyp.toHypothesis71
@@ -1327,7 +1323,8 @@ for the `V`-side with the Dade data and the virtual character `β_M` of (14.10).
 The whole structural / σ-counting / set-theoretic content is discharged genuinely:
 the type-I subgroup `M`, its `S14.Hypothesis` `typeIHyp`, and the §7 coherence datum
 `h78` come from `exists_M_hypothesis78` (the V-side dual of `witness_L_hypothesis78`,
-built through `typeII_overNormalizer_frobenius_V` + `frobenius_typeI_coherent`); the
+built through `exists_M_structural_dichotomy` + `typeI_frobenius` +
+`frobenius_typeI_coherent`); the
 `Mset`/`tau`/`tau1`/`psi`/`G0`/`betaM` data are read off `h78`; the TI / normalizer
 facts are the `base_*` helpers; and the two `G0` covering facts are elementary set
 algebra on the (14.11.3) complement `G₀ = G − [Ã(M) ∪ (W−(W₁∪W₂))^G ∪ (P#)^G ∪ (Q#)^G]`.
@@ -1337,35 +1334,26 @@ Instance coherence across the producer/consumer boundary is handled by opening
 `MHypothesis`'s field types and `exists_M_hypothesis78`'s existential are built with),
 so no competing `Fintype.ofFinite`/`Invertible` is introduced.
 
-Two obligations are discharged genuinely, via extra witnesses on `exists_M_hypothesis78`:
-* `psi_degree_eq_e` (`ζ(1) = e = pq`): the producer witnesses `ζ_{ind1H}(1) = [M:K]`
-  (`θ ind1H = 1_K` + `induce_trivialChar_apply_eq_index`), then `zeta_one_eq_ind1H_one` +
-  `hindex` (`[M:K] = pq`) close it;
+Three obligations are discharged genuinely, via extra witnesses on `exists_M_hypothesis78`:
+* `complementIndex_cases`: the faithful (13.17.c)-dual dichotomy from
+  `S15.exists_M_structural_dichotomy`;
+* `psi_degree_eq_e` (`ζ(1) = e = [M:K]`): the producer witnesses
+  `ζ_{ind1H}(1) = [M:K]` (`θ ind1H = 1_K` + `induce_trivialChar_apply_eq_index`), and
+  `e` is definitionally that actual index;
 * `psi_tau1_norm_one` (`‖ψ^{τ₁}‖² = 1`): the producer witnesses `‖ζ‖² = 1` (the distinguished
   `ζ = Ind_K θ_0`, `θ_0 ≠ 1_K`, is Frobenius-irreducible —
   `inner_self_induce_eq_one_of_frobeniusGroup`), and `tau1 = ν` is a family isometry on it
   (`nu_isometry`).
 
-One residual obligation remains isolated as the genuine deep §13 character content (gated on
-the η-grid theory, not on this assembly): the joint existence of the `±1` signs with the
-(13.1.d) η-grid expansion of `1_G + Δ` (Track A, issue 3002), consumed by the
-`betaSigns`/`betaSigns_pm`/`betaGrid` fields — no specific sign choice is asserted. -/
+No conclusion of (14.11) is packaged here: `e = p q`, the `±1` signs, and the η-grid expansion
+are produced only in the `K ≠ V` branch by `betaM_expansion_data`. -/
 theorem exists_MHypothesis [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     Nonempty (MHypothesis hyp) := by
   have hTII : IsTypeII hyp.base.T := T_typeII _hG hyp
-  obtain ⟨M, typeIHyp, hM_max, hnorm_V, hindex, h78, hH_maxnilp, hhyp_dade, hdeg_ind1H, hnorm1,
-      hnormSq⟩ :=
+  obtain ⟨M, typeIHyp, hM_max, hnorm_V, hindexCases, h78, hH_maxnilp, hhyp_dade,
+      hdeg_ind1H, hnorm1, hnormSq⟩ :=
     exists_M_hypothesis78 _hG hyp hTII
-  -- **Peterfalvi (13.1.d)**: the `η`-grid expansion of `1_G + Δ` with `±1` signs.  The genuine
-  -- Track A obligation (issue 3002): the signs and the expansion are supplied together, so no
-  -- specific (false) sign choice is asserted — only their honest joint existence is deferred.
-  obtain ⟨betaSignsData, hbetaSigns_pm, hbetaGrid⟩ :
-      ∃ signs : Fin hyp.base.q → Fin hyp.base.p → ℤ,
-        (∀ i j, signs i j = 1 ∨ signs i j = -1) ∧
-        OddOrder.Peterfalvi.S09.Hypothesis71.constOne G + h78.delta =
-          ∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (signs i j : ℂ) • hyp.base.eta i j :=
-    sorry
   refine ⟨{
     M := M
     K := maxNilpotentNormalHall M
@@ -1378,10 +1366,10 @@ theorem exists_MHypothesis [Finite G]
     tau := h78.nu
     tau1 := h78.nu
     psi := h78.hyp76.zeta h78.zetaDistinct
-    e := hyp.base.p * hyp.base.q
+    e := ((maxNilpotentNormalHall M).subgroupOf M).index
     k := Nat.card ↥(maxNilpotentNormalHall M)
-    e_eq_index := hindex.symm
-    complement_card_eq_pq := rfl
+    e_eq_index := rfl
+    complementIndex_cases := hindexCases
     k_eq_card_K := rfl
     psi_mem := ⟨h78.zetaDistinct, rfl⟩
     psi_degree_eq_e := ?psiDeg
@@ -1390,9 +1378,6 @@ theorem exists_MHypothesis [Finite G]
     betaM_formula_holds := trivial
     betaM_eq := rfl
     psi_tau1_eq := rfl
-    betaSigns := betaSignsData
-    betaSigns_pm := hbetaSigns_pm
-    betaGrid := hbetaGrid
     G0 := Set.univ \ (typeIHyp.dadeData.dade.dadeSupport ∪
       (conjClassSet ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G)))
         ∪ conjClassSet (sharpSubgroup hyp.base.P)
@@ -1433,9 +1418,9 @@ theorem exists_MHypothesis [Finite G]
     rcases hmem with h | h
     · exact absurd h hgd
     · exact h
-  -- **Peterfalvi (7.6)/(14.10)**: `ψ(1) = ζ_{ind1H}(1) = [M:K] = e = pq` — the induced
+  -- **Peterfalvi (7.6)/(14.10)**: `ψ(1) = ζ_{ind1H}(1) = [M:K] = e` — the induced
   -- principal degree, genuinely discharged via `exists_M_hypothesis78`'s degree witness.
-  case psiDeg => rw [h78.zeta_one_eq_ind1H_one, hdeg_ind1H, hindex]
+  case psiDeg => rw [h78.zeta_one_eq_ind1H_one, hdeg_ind1H]
   -- **Peterfalvi (7.5)/(7.8)**: `‖ψ^{τ₁}‖² = ‖ζ‖² = 1` — `τ₁ = ν` is a family isometry
   -- (`nu_isometry`, `ζ = ψ` non-`ind1H`) and `ζ` is unit-norm (`hnorm1`, Frobenius irreducible).
   case normOne =>
@@ -1498,5 +1483,3 @@ theorem nonexistence_of_G [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   exact (not_lt_of_ge (bgAppendixC data)) hyp.q_lt_p
 
 end OddOrder.Peterfalvi.S16
-
-

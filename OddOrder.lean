@@ -245,6 +245,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV
 import OddOrder.Peterfalvi.S11_ImprimitiveUBound
 import OddOrder.Peterfalvi.S11_NineElevenCoherence
 import OddOrder.Peterfalvi.S12_MaximalIII_IV_V
+import OddOrder.Peterfalvi.S12_TypeIIColumnPin
+import OddOrder.Peterfalvi.S12_TypeIIGridTranspose
 import OddOrder.Peterfalvi.S13_SixTwoBridge
 import OddOrder.Peterfalvi.S13_MaximalIII_IV
 import OddOrder.Peterfalvi.S13_ElementaryAbelianKernel
