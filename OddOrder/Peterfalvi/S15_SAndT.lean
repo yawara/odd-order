@@ -270,13 +270,37 @@ theorem exists_typeIFrobeniusData_W2_le [Finite G] (_hG : OddOrder.BG.IsMinimalS
 
 /-- **`S`-side dual of `complement_inf_Q_structure`** (V-side, gated): for the `W₂`-containing
 Frobenius complement `E`, `E ⊓ P = W₂` and `E ⊄ P`.  Mirror of the gated `complement_inf_Q_structure`
-(the §13 residual `E ∩ P = W₂`); declared sorried per the hub cite-gated directive. -/
+(the §13 residual `E ∩ P = W₂`); declared sorried per the hub cite-gated directive.
+
+⚠ **Over-strong (hub issue 3004, ruling 3)**: the V-side dual of (13.17.c) is a genuine
+**dichotomy** — `L = H ⋊ W₂` (so `E = W₂ ≤ N_G(W₂)`, `e = p`) or `L = H ⋊ (W₂W₁^y)` (`e = pq`) —
+and unlike the S-side (where (14.5)'s `e = q < p` argument kills the small branch) the `E = W₂`
+branch **cannot be excluded** before (14.11): the exclusion would need `q ≤ e`, which fails on
+that branch (`q < p = e`).  The unconditional second conjunct `¬ E ≤ P` is therefore only
+fillable through (14.11) itself (a hoisted conclusion).  New consumers must cite
+`complement_inf_P_structure_dichotomy` below; this form is kept only until the §16
+`exists_MHypothesis` restructure (issue 3004, ruling 1) migrates and will then be deleted. -/
 theorem complement_inf_P_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) {L : Subgroup G}
     (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
     (hW2E : hyp.W2 ≤ frob.complement.map L.subtype) :
     frob.complement.map L.subtype ⊓ hyp.P = hyp.W2 ∧
       ¬ frob.complement.map L.subtype ≤ hyp.P := sorry
+
+/-- **Peterfalvi (13.17.c), V-side dual — faithful dichotomy form** (hub issue 3004, ruling 3):
+for the `W₂`-containing Frobenius complement `E` of the type-I maximal `L` over `N_G(V)`, either
+`E = W₂` (the `L = H ⋊ W₂` branch, `e = p`), or `E ⊓ P = W₂` and `E ⊄ P` (the
+`L = H ⋊ (W₂W₁^y)` branch, leading to `e = pq`).  Unlike the S-side
+(`complement_inf_Q_structure`, whose small branch is excluded by (14.5)), both branches are live
+here; the resolution to `e = pq` happens only inside (14.11). -/
+theorem complement_inf_P_structure_dichotomy [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) {L : Subgroup G}
+    (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
+    (hW2E : hyp.W2 ≤ frob.complement.map L.subtype) :
+    frob.complement.map L.subtype = hyp.W2 ∨
+      (frob.complement.map L.subtype ⊓ hyp.P = hyp.W2 ∧
+        ¬ frob.complement.map L.subtype ≤ hyp.P) := sorry
 
 /-- **`S`-side dual of `complement_le_QW2`** (V-side Huppert step): the `W₂`-containing Frobenius
 complement `E` satisfies `E ≤ P W₁`.  Mirror of `complement_le_QW2` with `W₁/Q ↔ W₂/P`: `W₂` (of
@@ -384,17 +408,20 @@ theorem P_W1_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have hqdvd1 : hyp.q ∣ 1 := hcopPW1 ▸ Nat.dvd_gcd hq (dvd_refl hyp.q)
     exact hyp.q_prime.one_lt.ne' (Nat.dvd_one.mp hqdvd1)
 
-/-- **`T`-side dual of `complement_card_eq_pq`** (Pf (13.17.c)/(14.5), V-side): the `W₂`-containing
-Frobenius complement of the type-I subgroup `L` over `N_G(V)` has order `p q`.  Mirror with the
-`P`/`W₁` ↔ `Q`/`W₂` roles swapped; consumes the V-side complement-structure obligations. -/
-theorem complement_card_eq_pq_V [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+/-- **The `e = pq` branch computation** (V-side): from the (13.17.c)-dual second-branch facts
+`E ⊓ P = W₂` and `E ⊄ P`, the complement order is `p q`.  This is the sorry-free arithmetic core
+shared by `complement_card_eq_pq_V` (deprecated unconditional form) and
+`complement_card_p_or_pq_V` (faithful dichotomy form). -/
+theorem complement_card_eq_pq_V_of_structure [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) {L : Subgroup G}
     (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
-    (hW2E : hyp.W2 ≤ frob.complement.map L.subtype) :
+    (hW2E : hyp.W2 ≤ frob.complement.map L.subtype)
+    (hInf : frob.complement.map L.subtype ⊓ hyp.P = hyp.W2)
+    (hnle : ¬ frob.complement.map L.subtype ≤ hyp.P) :
     Nat.card ↥frob.complement = hyp.p * hyp.q := by
   set Em := frob.complement.map L.subtype with hEm
   set Hg := hyp.P ⊔ hyp.W1 with hHg
-  obtain ⟨hInf, hnle⟩ := complement_inf_P_structure _hG hyp frob hW2E
   have hEH : Em ≤ Hg := complement_le_PW1 _hG hyp frob hW2E
   obtain ⟨hWnorm, hdisj, _⟩ := P_W1_structure _hG hyp
   have hPleH : hyp.P ≤ Hg := le_sup_left
@@ -427,6 +454,37 @@ theorem complement_card_eq_pq_V [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd
   rw [show Nat.card ↥frob.complement = Nat.card ↥Em from
     Nat.card_congr (Subgroup.equivMapOfInjective frob.complement L.subtype
       L.subtype_injective).toEquiv, hEmcard]
+
+/-- **`T`-side dual of `complement_card_eq_pq`** (V-side).
+
+⚠ **Deprecated over-strong form (hub issue 3004, ruling 3)**: consumes the unconditional
+`complement_inf_P_structure`, whose `¬ E ≤ P` conjunct cannot be discharged before (14.11)
+(the `E = W₂`, `e = p` branch of the (13.17.c)-dual is live).  New consumers must cite
+`complement_card_p_or_pq_V`; this form will be deleted once the §16 `exists_MHypothesis`
+restructure (issue 3004, ruling 1) migrates. -/
+theorem complement_card_eq_pq_V [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) {L : Subgroup G}
+    (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
+    (hW2E : hyp.W2 ≤ frob.complement.map L.subtype) :
+    Nat.card ↥frob.complement = hyp.p * hyp.q := by
+  obtain ⟨hInf, hnle⟩ := complement_inf_P_structure _hG hyp frob hW2E
+  exact complement_card_eq_pq_V_of_structure _hG hyp frob hW2E hInf hnle
+
+/-- **Peterfalvi (13.17.c), V-side dual — the complement-order dichotomy** (hub issue 3004,
+ruling 3): the `W₂`-containing Frobenius complement of the type-I maximal `L` over `N_G(V)` has
+order `p` (the `L = H ⋊ W₂` branch) or `p q` (the `L = H ⋊ (W₂W₁^y)` branch).  The faithful
+V-side export: unlike the S-side, the small branch cannot be excluded before (14.11). -/
+theorem complement_card_p_or_pq_V [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) {L : Subgroup G}
+    (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
+    (hW2E : hyp.W2 ≤ frob.complement.map L.subtype) :
+    Nat.card ↥frob.complement = hyp.p ∨ Nat.card ↥frob.complement = hyp.p * hyp.q := by
+  rcases complement_inf_P_structure_dichotomy _hG hyp frob hW2E with hW2 | ⟨hInf, hnle⟩
+  · left
+    rw [Nat.card_congr (Subgroup.equivMapOfInjective frob.complement L.subtype
+      L.subtype_injective).toEquiv, hW2]
+    exact hyp.p_eq_card_W2.symm
+  · exact Or.inr (complement_card_eq_pq_V_of_structure _hG hyp frob hW2E hInf hnle)
 
 /-- **`T`-side dual of `TypeIOverNormalizerData`** (V-side): the type-I-over-`N_G(V)` structure of a
 maximal `L` for `T` type II — its Frobenius decomposition with `V` in the kernel `L_F` and a
@@ -515,7 +573,12 @@ maximality, `N_G(V) ≤ M`, the Frobenius complement of order `p q`), `S14.exist
 sorry-free structural half of `exists_MHypothesis` — it supplies `MHypothesis`'s
 `M`/`K = M_F`/`typeIHyp`/`e_eq_index`/`complement_card_eq_pq` fields; the §7/§8/§13 character carrier
 (`h78`, `betaM`, the σ counts) is isolated separately.  Gated on `T_typeII` (14.9) for `IsTypeII T`,
-cited at the §16 consumer. -/
+cited at the §16 consumer.
+
+⚠ **Deprecated over-strong form (hub issue 3004, ruling 3)**: the unconditional `index = p q`
+transits the unfillable `¬ E ≤ P` of `complement_inf_P_structure`.  New consumers must cite
+`exists_M_structural_dichotomy`; this form will be deleted once the §16 `exists_MHypothesis`
+restructure (issue 3004, ruling 1) migrates. -/
 theorem exists_M_structural [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (hTII : IsTypeII hyp.T) :
     ∃ (M : Subgroup G) (_typeIHyp : OddOrder.Peterfalvi.S14.Hypothesis M),
@@ -528,6 +591,27 @@ theorem exists_M_structural [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   refine ⟨vdata.L, typeIHyp, vdata.L_maximal, vdata.normalizer_V_le_L, ?_⟩
   rw [typeIFrobenius_kernel_index_eq_complement vdata.frobenius]
   exact vdata.complement_card_eq_pq
+
+/-- **Peterfalvi (14.10), structural foundation — faithful dichotomy form** (hub issue 3004,
+ruling 3): for `T` of type II, there is a type-I maximal subgroup `M` over `N_G(V)` carrying a §14
+`S14.Hypothesis`, with Fitting-kernel index `|M : M_F| = p` or `= p q` (the (13.17.c)-dual
+complement dichotomy `complement_card_p_or_pq_V`; the resolution to `p q` happens only inside
+(14.11): the `K ≠ V` branch by the (14.11.2) character argument, the `K = V` branch by excluding
+`E = W₂` in the §14 context).  The restructured §16 `exists_MHypothesis` cites this form. -/
+theorem exists_M_structural_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hTII : IsTypeII hyp.T) :
+    ∃ (M : Subgroup G) (_typeIHyp : OddOrder.Peterfalvi.S14.Hypothesis M),
+      M ∈ maximalSubgroups G ∧
+        Subgroup.normalizer (hyp.V : Set G) ≤ M ∧
+          (((maxNilpotentNormalHall M).subgroupOf M).index = hyp.p ∨
+            ((maxNilpotentNormalHall M).subgroupOf M).index = hyp.p * hyp.q) := by
+  obtain ⟨L, hLmax, hLtypeI, hNVL, _hVH⟩ :=
+    exists_typeI_maximal_overNormalizer_V hG hyp hTII
+  obtain ⟨frob, _hker, hW2E⟩ := exists_typeIFrobeniusData_W2_le hG hyp hLmax hLtypeI hNVL
+  obtain ⟨typeIHyp⟩ := OddOrder.Peterfalvi.S14.exists_typeI_hypothesis hG hLmax hLtypeI
+  refine ⟨L, typeIHyp, hLmax, hNVL, ?_⟩
+  rw [typeIFrobenius_kernel_index_eq_complement frob]
+  exact complement_card_p_or_pq_V hG hyp frob hW2E
 
 /-- Carrier for the virtual character `beta_j` and `Gamma_j` in Peterfalvi (13.18).
 
@@ -1439,26 +1523,52 @@ structure TypeIOrthogonalityGridData (hyp : Hypothesis (G := G)) {L : Subgroup G
   phi_degree_eq_e : phi 1 = (e : ℂ)
   betaL : ClassFunction G ℂ
   betaS : ClassFunction G ℂ
+  /-- The T-side companion `β_T^τ` (the S↔T-swapped `β_S^τ`), pairing with `φ^{τ₁}` in the dual
+  (13.19.c1) parity. -/
+  betaT : ClassFunction G ℂ
   disjoint_support : Disjoint betaL.support betaS.support
+  /-- **(13.19)**: `β_L` is the Dade image `β_L^τ = (Ind_H^L 1_H − φ)^{τ₁}` (the extension
+  `τ₁ = typeISetup.tau` agrees with `τ` on the `A(L)`-supported `Ind_H^L 1_H − φ`). -/
+  betaL_eq :
+    ∀ [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
+      [Invertible (Nat.card ↥((typeISetup.H).subgroupOf L) : ℂ)],
+      betaL = typeISetup.tau
+        (ClassFunction.induce ((typeISetup.H).subgroupOf L)
+          (trivialClassFunction ↥((typeISetup.H).subgroupOf L)) - phi)
   Ltau_orthogonal_eta :
     ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
       ∀ (i : Fin hyp.q) (j : Fin hyp.p),
         ClassFunction.inner (typeISetup.tau phi) (hyp.eta i j) = 0
-  betaL_eta_independent :
+  /-- **(13.19.c)**, first clause: `(β_L^τ, η_{0j})` is independent of `j` for `1 ≤ j < p`. -/
+  betaL_eta0_row_constant :
     ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
-      ∀ (i : Fin hyp.q) (j : Fin hyp.p), ClassFunction.inner betaL (hyp.eta i j) = 0
-  /-- **(13.19.c)** S-side dichotomy: the degree bound or the `η_0j` odd-parity alternative. -/
+      ∀ (j j' : Fin hyp.p), (j : ℕ) ≠ 0 → (j' : ℕ) ≠ 0 →
+        ClassFunction.inner betaL (hyp.eta ⟨0, hyp.q_prime.pos⟩ j)
+          = ClassFunction.inner betaL (hyp.eta ⟨0, hyp.q_prime.pos⟩ j')
+  /-- **(13.19.c)**, first clause after the S↔T swap: `(β_L^τ, η_{i0})` is independent of `i`
+  for `1 ≤ i < q`. -/
+  betaL_eta0_col_constant :
+    ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
+      ∀ (i i' : Fin hyp.q), (i : ℕ) ≠ 0 → (i' : ℕ) ≠ 0 →
+        ClassFunction.inner betaL (hyp.eta i ⟨0, hyp.p_prime.pos⟩)
+          = ClassFunction.inner betaL (hyp.eta i' ⟨0, hyp.p_prime.pos⟩)
+  /-- **(13.19.c)** S-side dichotomy, faithful form: **(c1)** `(β_S^τ, φ^{τ₁}) ≡ 1 (mod 2)` and
+  the degree bound `(|H|−1)/e ≤ (u−1)/q`, or **(c2)** the `η_{0j}` odd-parity and `p ≤ e`. -/
   caseC :
-    (((Nat.card ↥typeISetup.H - 1 : ℕ) : ℚ) / (e : ℚ) ≤
-        ((hyp.u - 1 : ℕ) : ℚ) / (hyp.q : ℚ)) ∨
-      (∀ j : Fin hyp.p, (j : ℕ) ≠ 0 →
-        OddIntegerInner betaL (hyp.eta ⟨0, hyp.q_prime.pos⟩ j))
-  /-- **(13.19.c)** T-side (S↔T swapped) dichotomy: `(v−1)/p` bound or the `η_i0` odd-parity. -/
+    (OddIntegerInner betaS (typeISetup.tau phi) ∧
+      (((Nat.card ↥typeISetup.H - 1 : ℕ) : ℚ) / (e : ℚ) ≤
+        ((hyp.u - 1 : ℕ) : ℚ) / (hyp.q : ℚ))) ∨
+      ((∀ j : Fin hyp.p, (j : ℕ) ≠ 0 →
+        OddIntegerInner betaL (hyp.eta ⟨0, hyp.q_prime.pos⟩ j)) ∧ hyp.p ≤ e)
+  /-- **(13.19.c)** T-side (S↔T swapped) dichotomy, faithful form: **(c1)**
+  `(β_T^τ, φ^{τ₁}) ≡ 1 (mod 2)` and `(|H|−1)/e ≤ (v−1)/p`, or **(c2)** the `η_{i0}` odd-parity
+  and `q ≤ e`. -/
   caseC_dual :
-    (((Nat.card ↥typeISetup.H - 1 : ℕ) : ℚ) / (e : ℚ) ≤
-        ((hyp.v - 1 : ℕ) : ℚ) / (hyp.p : ℚ)) ∨
-      (∀ i : Fin hyp.q, (i : ℕ) ≠ 0 →
-        OddIntegerInner betaL (hyp.eta i ⟨0, hyp.p_prime.pos⟩))
+    (OddIntegerInner betaT (typeISetup.tau phi) ∧
+      (((Nat.card ↥typeISetup.H - 1 : ℕ) : ℚ) / (e : ℚ) ≤
+        ((hyp.v - 1 : ℕ) : ℚ) / (hyp.p : ℚ))) ∨
+      ((∀ i : Fin hyp.q, (i : ℕ) ≠ 0 →
+        OddIntegerInner betaL (hyp.eta i ⟨0, hyp.p_prime.pos⟩)) ∧ hyp.q ≤ e)
 
 /-- **Faithful §13 producer for Peterfalvi (13.19).**  The grid/Dade data and facts of (13.19) for a
 type-I maximal `L` with its (12.1) Hypothesis `typeISetup`.  The construction is the §3/§4/§5
@@ -1471,19 +1581,20 @@ noncomputable def typeIOrthogonalityGridData_of_typeISetup [Finite G]
     {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L) :
     TypeIOrthogonalityGridData hyp typeISetup := sorry
 
-/-- **Peterfalvi (13.19)**: a type-I maximal subgroup has Dade images
-orthogonal to the `eta_ij`; on each zero axis, one of the two final parity
-cases holds.
+/-- **Peterfalvi (13.19)**: a type-I maximal subgroup has `𝓛^{τ₁}` orthogonal to the `eta_ij`,
+`(β_L^τ, η_{0j})` constant along each zero axis, and on each zero axis one of the two (13.19.c)
+cases — the faithful conjunction forms `(c1) = parity ∧ degree bound` and
+`(c2) = η-axis odd-parity ∧ p ≤ e` — holds.
 
 De-opacified (W3 §15): the honest §14 content — the (12.1) `S14.Hypothesis` of `L`
 (`S14.exists_typeI_hypothesis`) and its genuine Dade map `τ₁ = typeISetup.tau` — is constructed here;
 the opaque `Prop` fields of `TypeIOrthogonalityData` are instantiated to the **genuine** (13.19)
-statements (grid orthogonality of `β_L`, the disjoint support, and the two (13.19.c) case flags as
-the actual degree bound / `η`-axis odd-parity propositions).  The dichotomy implication fields
-(`caseC1_bound`, `caseC2_eta0j_odd`, dual) are then the **identity** — no over-claim beyond the
-textbook.  The only grid-dependent atoms (`β_L`, `β_S`, the orthogonalities, and the (13.19.c)
-disjunctions) come from the faithful producer `typeIOrthogonalityGridData_of_typeISetup`, whose type
-is the genuine (13.19) grid content. -/
+statements.  `betaL_eta_independent` is instantiated to the faithful (13.19.c) first clause — the
+zero-axis **constancy** of `(β_L^τ, η_{0j})`/`(β_L^τ, η_{i0})` (NOT orthogonality: in case (c2)
+these inner products are odd).  The dichotomy implication fields (`caseC1_bound`,
+`caseC2_eta0j_odd`, dual) are the conjunction projections.  The grid-dependent atoms come from the
+faithful producer `typeIOrthogonalityGridData_of_typeISetup`, whose type is the genuine (13.19)
+grid content. -/
 theorem typeI_orthogonality_dichotomy [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G) (hLI : IsTypeI L) :
@@ -1496,8 +1607,8 @@ theorem typeI_orthogonality_dichotomy [Finite G]
   obtain ⟨typeISetup⟩ := OddOrder.Peterfalvi.S14.exists_typeI_hypothesis _hG hLmax hLI
   -- The grid/Dade atoms and facts (the single deep obligation).
   let g := typeIOrthogonalityGridData_of_typeISetup _hG hyp typeISetup
-  -- Assemble `TypeIOrthogonalityData` with the genuine opaque-`Prop` choices and identity
-  -- dichotomy implication fields.
+  -- Assemble `TypeIOrthogonalityData` with the genuine opaque-`Prop` choices and
+  -- conjunction-projection dichotomy implication fields.
   refine ⟨{ typeISetup := typeISetup
             e := g.e
             e_eq_index := ((maxNilpotentNormalHall L).subgroupOf L).index = g.e
@@ -1514,26 +1625,34 @@ theorem typeI_orthogonality_dichotomy [Finite G]
                 ∀ (i : Fin hyp.q) (j : Fin hyp.p),
                   ClassFunction.inner (typeISetup.tau g.phi) (hyp.eta i j) = 0
             betaL_eta_independent :=
-              ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
-                ∀ (i : Fin hyp.q) (j : Fin hyp.p),
-                  ClassFunction.inner g.betaL (hyp.eta i j) = 0
+              (∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
+                ∀ (j j' : Fin hyp.p), (j : ℕ) ≠ 0 → (j' : ℕ) ≠ 0 →
+                  ClassFunction.inner g.betaL (hyp.eta ⟨0, hyp.q_prime.pos⟩ j)
+                    = ClassFunction.inner g.betaL (hyp.eta ⟨0, hyp.q_prime.pos⟩ j')) ∧
+              (∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
+                ∀ (i i' : Fin hyp.q), (i : ℕ) ≠ 0 → (i' : ℕ) ≠ 0 →
+                  ClassFunction.inner g.betaL (hyp.eta i ⟨0, hyp.p_prime.pos⟩)
+                    = ClassFunction.inner g.betaL (hyp.eta i' ⟨0, hyp.p_prime.pos⟩))
             caseC1 :=
-              (((Nat.card ↥typeISetup.H - 1 : ℕ) : ℚ) / (g.e : ℚ) ≤
-                ((hyp.u - 1 : ℕ) : ℚ) / (hyp.q : ℚ))
+              OddIntegerInner g.betaS (typeISetup.tau g.phi) ∧
+                (((Nat.card ↥typeISetup.H - 1 : ℕ) : ℚ) / (g.e : ℚ) ≤
+                  ((hyp.u - 1 : ℕ) : ℚ) / (hyp.q : ℚ))
             caseC2 :=
               (∀ j : Fin hyp.p, (j : ℕ) ≠ 0 →
-                OddIntegerInner g.betaL (hyp.eta ⟨0, hyp.q_prime.pos⟩ j))
-            caseC2_eta0j_odd := fun h => h
-            caseC1_bound := fun h => h
+                OddIntegerInner g.betaL (hyp.eta ⟨0, hyp.q_prime.pos⟩ j)) ∧ hyp.p ≤ g.e
+            caseC2_eta0j_odd := fun h => h.1
+            caseC1_bound := fun h => h.2
             caseC1_dual :=
-              (((Nat.card ↥typeISetup.H - 1 : ℕ) : ℚ) / (g.e : ℚ) ≤
-                ((hyp.v - 1 : ℕ) : ℚ) / (hyp.p : ℚ))
+              OddIntegerInner g.betaT (typeISetup.tau g.phi) ∧
+                (((Nat.card ↥typeISetup.H - 1 : ℕ) : ℚ) / (g.e : ℚ) ≤
+                  ((hyp.v - 1 : ℕ) : ℚ) / (hyp.p : ℚ))
             caseC2_dual :=
               (∀ i : Fin hyp.q, (i : ℕ) ≠ 0 →
-                OddIntegerInner g.betaL (hyp.eta i ⟨0, hyp.p_prime.pos⟩))
-            caseC2_dual_etai0_odd := fun h => h
-            caseC1_dual_bound := fun h => h },
-    g.disjoint_support, g.Ltau_orthogonal_eta, g.betaL_eta_independent, g.caseC, g.caseC_dual⟩
+                OddIntegerInner g.betaL (hyp.eta i ⟨0, hyp.p_prime.pos⟩)) ∧ hyp.q ≤ g.e
+            caseC2_dual_etai0_odd := fun h => h.1
+            caseC1_dual_bound := fun h => h.2 },
+    g.disjoint_support, g.Ltau_orthogonal_eta,
+    ⟨g.betaL_eta0_row_constant, g.betaL_eta0_col_constant⟩, g.caseC, g.caseC_dual⟩
 
 end OddOrder.Peterfalvi.S15
 

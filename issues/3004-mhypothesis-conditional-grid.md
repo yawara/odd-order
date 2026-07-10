@@ -177,3 +177,17 @@ c の issue が触れていない第 3 の同型問題:
   β frontier のキューに組み込む (順序は b の上流優先+文書順の自律判断; issues/2038 に pointer
   追記済)。b が異論 (diagnosis への反証) を持つ場合は本 issue に追記 — hub が再検証する。
 - **hub**: c/b の当該 merge を本チェックリストと突合。本 ruling は issues/0105 trial ログにも記録。
+
+## ✅ b 実施報告 (2026-07-10、lane-b) — 裁定 2・3 完了 (commit 0757c158)
+
+- **裁定 2**: `TypeIOrthogonalityGridData` を (13.19) 忠実形に restate — `betaL_eta_independent`
+  除去 → zero-axis 定数性 `betaL_eta0_row_constant`/`betaL_eta0_col_constant`、caseC/caseC_dual を
+  conjunction 二分岐 ((c1) parity ∧ bound / (c2) odd ∧ p ≤ e、dual は betaT/q ≤ e)、`betaT` +
+  `betaL_eq` (Dade-image 同定) field 追加。`typeI_orthogonality_dichotomy` の opaque-Prop 代入を
+  忠実形に更新。**TypeIOrthogonalityData interface と ∃-conjunct 位置は不変** — c の BetaVanishing
+  は無修正 green。c は restructure 時に明示 hypothesis パラメータを本 grid data の caseC 系に差し替え可。
+- **裁定 3**: additive 実装 — `complement_inf_P_structure_dichotomy` (E = W₂ ∨ (E⊓P=W₂ ∧ ¬E≤P)、
+  sorried)、`complement_card_eq_pq_V_of_structure` (pq 枝の sorry-free core 切り出し)、
+  `complement_card_p_or_pq_V` (= p ∨ = pq)、`exists_M_structural_dichotomy` (index = p ∨ pq)。
+  既存無条件形 3 件は deprecation 注記付き温存 (c の exists_MHypothesis 乗り換え後に削除、hub 合流管理)。
+- full build 4131 green / AxiomsCheck 2148 OK。
