@@ -563,4 +563,43 @@ theorem eta_orthogonal_of_norm_one_pair_vanish [Finite G]
     exact hnz hrel
   exact hχne (hp_eq ▸ hc_eq)
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Signed-irreducible two-term classification.**  Let `α`, `β`, and `χ` be norm-one
+virtual characters, with `α ⊥ β`.  If `⟨α - β, χ⟩ = 1`, then `χ = α` or `χ = -β`.
+
+This is the Lean form of the `cfdot_add_dirr_eq1` step at the end of Peterfalvi (14.11.2):
+after the orthogonal projection has produced a norm-one virtual residual `χ`, its pairing with
+`ψ^{τ₁} - ψ̄^{τ₁}` determines which of the two signed irreducibles it is. -/
+theorem eq_left_or_neg_right_of_inner_sub_eq_one [Finite G]
+    {α β χ : ClassFunction G ℂ}
+    (hαZ : α ∈ ZIrr G) (hβZ : β ∈ ZIrr G) (hχZ : χ ∈ ZIrr G)
+    (hα1 : ClassFunction.inner α α = 1)
+    (hβ1 : ClassFunction.inner β β = 1)
+    (hχ1 : ClassFunction.inner χ χ = 1)
+    (hαβ : ClassFunction.inner α β = 0)
+    (hpair : ClassFunction.inner (α - β) χ = 1) :
+    χ = α ∨ χ = -β := by
+  have hrel : ClassFunction.inner α χ - ClassFunction.inner β χ = 1 := by
+    rwa [ClassFunction.inner_sub_left] at hpair
+  by_cases hαχ : ClassFunction.inner α χ = 0
+  · right
+    have hβχ : ClassFunction.inner β χ = -1 := by
+      rw [hαχ, zero_sub] at hrel
+      linear_combination -hrel
+    have hβχ_ne : ClassFunction.inner β χ ≠ 0 := by rw [hβχ]; norm_num
+    have hχeq := eq_inner_smul_of_inner_ne_zero hβZ hχZ hβ1 hχ1 hβχ_ne
+    rw [hβχ] at hχeq
+    simpa using hχeq
+  · left
+    have hβχ : ClassFunction.inner β χ = 0 := by
+      by_contra hβχ_ne
+      have hχeq := eq_inner_smul_of_inner_ne_zero hβZ hχZ hβ1 hχ1 hβχ_ne
+      apply hαχ
+      rw [hχeq, OddOrder.RepresentationTheory.inner_smul_right, hαβ, mul_zero]
+    have hαχ_eq : ClassFunction.inner α χ = 1 := by
+      rwa [hβχ, sub_zero] at hrel
+    have hχeq := eq_inner_smul_of_inner_ne_zero hαZ hχZ hα1 hχ1 hαχ
+    rw [hαχ_eq] at hχeq
+    simpa using hχeq
+
 end OddOrder.Peterfalvi.S16
