@@ -785,3 +785,28 @@ S15_HonestTypeP2A0 に mu_row0 engine (mu_row0_ne proven / tauS_mu_row0_{diff_su
   ψ P-support 未 field ゆえ要追加調査]、(ii) 1 → u、(iii) W₁^# → 1 [prime-TI residue 9014/
   S13_PrimeTIResidueBridge grounding]) + **部品 C** (z∈S−S′ → z ~ x·y、x∈W₁^#、y∈W₂ の分解) +
   assembly (pointwise → support ⊆)。B(iii)/C が深い — 次 iter は B の部品在庫精査から。
+
+## 📋 (2026-07-10 続¹⁴、lane-b /loop iter 8) — 部品 B 診断: gate = mu-grounding (3002 残の b-side field)
+
+**発見**: S15_HonestTypeP2A0 に (13.18) 用 engine が **proven で 2 本既存**:
+- `Hypothesis.residueS_mu2_diff_support` (:758) — residue grid の equal-degree 列差 μ2_ij−μ2_ik が
+  A₀(S)-supported (§6 certainType_diff_supp_subset_A0 @ hyp46S で実証明済)。
+- V-value engine (:806+) — τ_S(μ2 差)(v) = δ(ω^σ差)(v) on V_S。
+両 engine の注記が明言: **残 gap = grid grounding `hyp.mu = residueS.mu2` (b-side field、9076/3002 予告) のみ**。
+
+**部品 B の診断**:
+- B(iii) (W₁^# → μ_0j = 1): mu_definition から直接出そうとすると Ind_W^S の W₁^# 値計算 =
+  prime-TI/N_S(W) 幾何に落ちる (9014 系) — **grounding 経由が正道** (residue 側は
+  prTIirr 値 API を既に持つ)。
+- B(i) (S′∖P → 0): mu_definition (行差 W^S-supported) + mu_colSum_eq_induce (Σ = Ind_{S′}ψ) +
+  ψ の P-support (未 field) — こちらも grounding 経由なら residue API から一括の可能性。
+- B(ii) (1 → u): colSum degree + 行一致 (grounding 不要で可能そうだが単独では使い道薄)。
+
+**∴ 次の作業単位 = mu-grounding field の設計+追加** (SubcoherenceInputs.Hypothesis、b 所有):
+S15.Hypothesis の producer は未構成 (grep で不在確認 — 仮説 carrier) ゆえ **field 追加の producer
+追従は現状不要**、3002 の「7 grid property fields 追加」先例と同型の自律 carrier enrichment。
+設計課題: residueS は hG-依存 (hyp.residueS hG) + index が Fin q vs Fin (Nat.card W1) で cast 要
+(NeZero instances)。field は hG-quantified 形 (`∀ hG, mu i j = (residueS hG).mu2 (castIdx i) (castIdx j)`)
+か、s06S の card 同定 (q_eq_card_W1 系) を介した enum-free 形か — 次 iter で residueS/mu2 の型を
+精査して設計確定 → field 追加 → tauS_mu_row0 pins (S15_HonestTypeP2A0:877/891 sorry) の discharge →
+B(i)/(iii) → PVSbeta assembly。
