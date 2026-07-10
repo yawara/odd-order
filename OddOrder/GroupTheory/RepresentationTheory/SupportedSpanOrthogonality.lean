@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 
 /-!
 # Peterfalvi (1.3.a), the restriction–complement equivalence core
@@ -131,6 +132,44 @@ theorem apply_eq_on_of_forall_inner_eq
   have h0 := h a ha
   change f a - g a = 0 at h0
   exact sub_eq_zero.mp h0
+
+open scoped Classical in
+/-- **Peterfalvi (1.3.b), cross-level value identification**: for `H ≤ G`, a conjugation-invariant
+`A ⊆ H` with an `A`-supported spanning family `Φ`, and an orthonormal family `mu` in `CF(G)`
+matched to a family `χ` in `CF(H)` by the induction expansions
+`Ind Φ_j = Σ_k ⟨Φ_j, χ_k⟩ • mu_k`, each `mu i` restricts to `χ i` on `A`.
+
+Frobenius reciprocity turns the expansion into `⟨Φ_j, Res (mu i)⟩ = ⟨Φ_j, χ i⟩` (orthonormal
+collapse of the sum), and the same-group identification `apply_eq_on_of_forall_inner_eq`
+finishes.  This is the Coq `equiv_restrict_compl_ortho` shape that extracts the prime-TI value
+identity `prTIirr_id` (4.3.c). -/
+theorem restrict_apply_eq_on_of_induce_eq_sum
+    {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {H : Subgroup G} [Fintype H] [Invertible (Nat.card ↥H : ℂ)]
+    {A : Set ↥H} (hAconj : ∀ (h : ↥H) ⦃a : ↥H⦄, a ∈ A → h * a * h⁻¹ ∈ A)
+    {ι κ : Type*} [Fintype κ] (Φ : ι → ClassFunction ↥H ℂ)
+    (hΦA : ∀ j, Φ j ∈ ClassFunction.supportedSubmodule A)
+    (hspan : ClassFunction.supportedSubmodule A ≤ Submodule.span ℂ (Set.range Φ))
+    (χ : κ → ClassFunction ↥H ℂ) (mu : κ → ClassFunction G ℂ)
+    (hmu_orth : ∀ i k, ClassFunction.inner (mu i) (mu k) = if i = k then 1 else 0)
+    (hInd : ∀ j, ClassFunction.induce H (Φ j)
+      = ∑ k, ClassFunction.inner (Φ j) (χ k) • mu k)
+    (i : κ) :
+    ∀ a ∈ A, ClassFunction.restrict H (mu i) a = χ i a := by
+  classical
+  refine apply_eq_on_of_forall_inner_eq hAconj Φ hΦA hspan
+    (ClassFunction.restrict H (mu i)) (χ i) ?_
+  intro j
+  have hrecip : ClassFunction.inner (Φ j) (ClassFunction.restrict H (mu i))
+      = ClassFunction.inner (ClassFunction.induce H (Φ j)) (mu i) :=
+    (ClassFunction.inner_induce_eq_inner_restrict H (Φ j) (mu i)).symm
+  rw [hrecip, hInd j, inner_sum_left]
+  rw [Finset.sum_eq_single i]
+  · rw [ClassFunction.inner_smul_left, hmu_orth, if_pos rfl, mul_one]
+  · intro k _ hki
+    rw [ClassFunction.inner_smul_left, hmu_orth, if_neg hki, mul_zero]
+  · intro h
+    exact absurd (Finset.mem_univ i) h
 
 open scoped Classical in
 /-- **Fourier expansion over an orthonormal spanning family**: if `Φ` is orthonormal and spans
