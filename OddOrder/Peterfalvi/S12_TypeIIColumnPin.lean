@@ -293,6 +293,132 @@ theorem typeII_T2_extension_lam_eq_single [Finite G]
   refine ⟨hr, hs, α, hEsub (by rw [hα]; exact Finset.mem_singleton_self α), ?_⟩
   rw [hτ1, hEsum, hα, Finset.sum_singleton]
 
+set_option maxHeartbeats 800000 in
+open scoped Classical FiniteInduce in
+/-- **The `R(λ)`-members are orthogonal to the whole `σ`-grid** (Peterfalvi (5.3.b) for the
+type-II `S`-side; standalone form of the key brick inside
+`typeII_certainTypeR_imageSet_orthogonal_dadeOfDiff`, quantified over *every* grid column
+`χ₂'`): each Dade constituent `β` of `(χ − χ̄)^{τ_S}` satisfies `⟨β, ω_{χ₂',i}^σ⟩ = 0`.
+
+With the (5.5) singleton form `λ^{τ₂} ∈ R(λ)` this makes `λ^{τ₂}` orthogonal to the whole
+grid — the input of the (3.2.e) `V`-vanishing of `λ^{τ₂}` in the (5.8) `ν`-pin. -/
+theorem typeII_dadeOfDiff_member_inner_omegaSigma_eq_zero [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) (data : TypePData S)
+    [NeZero (Nat.card (typeIIHypothesis46 hG hSmax hSII data).W1)]
+    (χ : IrreducibleCharacter ↥S)
+    (hrealχ : ¬ ClassFunction.IsReal (χ : ClassFunction ↥S ℂ))
+    (hdiffsuppχA : (((χ : ClassFunction ↥S ℂ).conj - (χ : ClassFunction ↥S ℂ)
+      : ClassFunction ↥S ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)) S)
+    (hdiffsuppχ : (((χ : ClassFunction ↥S ℂ).conj - (χ : ClassFunction ↥S ℂ)
+      : ClassFunction ↥S ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)
+          ∪ conjClassSetIn S (typePV S data)) S)
+    {β : ClassFunction G ℂ}
+    (hβ : β ∈ (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
+      (typeIIHypothesis46 hG hSmax hSII data).dade0
+      (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data)
+      χ hrealχ hdiffsuppχ).imageSet)
+    (χ₂' : ((typeIIHypothesis46 hG hSmax hSII data).W2.subgroupOf
+      ((typeIIHypothesis46 hG hSmax hSII data).W1 ⊔ (typeIIHypothesis46 hG hSmax hSII data).W2)) →* ℂˣ)
+    (i : Fin (Nat.card (typeIIHypothesis46 hG hSmax hSII data).W1)) :
+    ClassFunction.inner β
+      (OddOrder.Peterfalvi.S06.certainTypeOmegaSigma
+        (typeIIHypothesis46 hG hSmax hSII data) χ₂' i) = 0 := by
+  classical
+  -- `hmin`: `2 < min(w₁, w₂)` for the `ticVdiff` exceptional structure.
+  have hmin : 2 < min
+      (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)).W1)
+      (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)).W2) := by
+    have h1 := (OddOrder.Peterfalvi.S06.ticVdiff
+      (typeIIHypothesis46 hG hSmax hSII data)).three_le_card_W1
+    have h2 := (OddOrder.Peterfalvi.S06.ticVdiff
+      (typeIIHypothesis46 hG hSmax hSII data)).three_le_card_W2
+    omega
+  -- core disjointness brick (as in the landed cross lemma)
+  have key : ∀ {c c' : ℂ} {ξ ξ' : ClassFunction G ℂ},
+      ξ ∈ ZIrr G → ClassFunction.inner ξ ξ = 1 → ξ' ∈ ZIrr G →
+      ClassFunction.inner ξ' ξ' = 1 →
+      ClassFunction.inner ξ ξ' = 0 → c ≠ 0 →
+      (∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)).V,
+        (c • ξ - c' • ξ') v = 0) →
+      ClassFunction.inner (c • ξ)
+        (OddOrder.Peterfalvi.S06.certainTypeOmegaSigma
+          (typeIIHypothesis46 hG hSmax hSII data) χ₂' i) = 0 := by
+    intro c c' ξ ξ' hξZ hξ1 hξ'Z hξ'1 hξξ' hc hvanish
+    rw [OddOrder.Peterfalvi.S06.certainTypeOmegaSigma_eq_chiFam]
+    exact OddOrder.Peterfalvi.S08.inner_smul_chiFam_eq_zero_of_diff_vanishOnV
+      (OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)) rfl
+      (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication (typeIIHypothesis46 hG hSmax hSII data))
+      hξZ hξ1 hξ'Z hξ'1 hξξ' hc hvanish hmin _
+  -- `(χ − χ̄)^{τ_S}` vanishes on `V` (the type-II anchor)
+  have hsuppsub : (((χ : ClassFunction ↥S ℂ) - (χ : ClassFunction ↥S ℂ).conj
+      : ClassFunction ↥S ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)) S := by
+    rw [show (χ : ClassFunction ↥S ℂ) - (χ : ClassFunction ↥S ℂ).conj =
+        -((χ : ClassFunction ↥S ℂ).conj - (χ : ClassFunction ↥S ℂ)) by abel,
+      ClassFunction.support_neg]
+    exact hdiffsuppχA
+  have htauvanish : ∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)).V,
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+        (typeIIHypothesis46 hG hSmax hSII data).dade0 (typeIIHypothesis46 hG hSmax hSII data).tau
+        ((χ : ClassFunction ↥S ℂ) - (χ : ClassFunction ↥S ℂ).conj) v = 0 :=
+    fun v hv => typeII_tau_apply_eq_zero_of_mem_ticVdiffV hG hSmax hSII data hsuppsub hv
+  -- capture the two-element `R(χ)` abstractly and split the membership
+  obtain ⟨cd, hcd⟩ :
+      ∃ cd : OddOrder.Peterfalvi.S07.CharacterDifferenceImage (G := G)
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (typeIIHypothesis46 hG hSmax hSII data).dade0
+          ((typeIIHypothesis46 hG hSmax hSII data).dade0.fullDadeIsometryData
+            (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data)))
+        (χ : ClassFunction ↥S ℂ),
+        OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
+            (typeIIHypothesis46 hG hSmax hSII data).dade0
+            (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data) χ hrealχ hdiffsuppχ
+          = cd.toOrthonormalImage := ⟨_, rfl⟩
+  have hcdimg : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (typeIIHypothesis46 hG hSmax hSII data).dade0
+      ((typeIIHypothesis46 hG hSmax hSII data).dade0.fullDadeIsometryData
+        (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data))
+      ((χ : ClassFunction ↥S ℂ) - (χ : ClassFunction ↥S ℂ).conj)
+      = (cd.sign : ℂ) • cd.muClassFunction - (cd.sign : ℂ) • cd.nuClassFunction := by
+    rw [cd.image_eq, smul_sub, Int.cast_smul_eq_zsmul, Int.cast_smul_eq_zsmul]
+  have hμZ : cd.muClassFunction ∈ ZIrr G := cd.mu.mem_ZIrr
+  have hνZ : cd.nuClassFunction ∈ ZIrr G := cd.nu.mem_ZIrr
+  have hμ1 : ClassFunction.inner cd.muClassFunction cd.muClassFunction = 1 := by
+    have h := irreducibleCharacter_inner_eq_ite cd.mu cd.mu; rwa [if_pos rfl] at h
+  have hν1 : ClassFunction.inner cd.nuClassFunction cd.nuClassFunction = 1 := by
+    have h := irreducibleCharacter_inner_eq_ite cd.nu cd.nu; rwa [if_pos rfl] at h
+  have hμν : ClassFunction.inner cd.muClassFunction cd.nuClassFunction = 0 := by
+    have h := irreducibleCharacter_inner_eq_ite cd.mu cd.nu; rwa [if_neg cd.distinct] at h
+  have hνμ : ClassFunction.inner cd.nuClassFunction cd.muClassFunction = 0 := by
+    have h := irreducibleCharacter_inner_eq_ite cd.nu cd.mu
+    rwa [if_neg (Ne.symm cd.distinct)] at h
+  have hsignC : (cd.sign : ℂ) ≠ 0 := by rcases cd.sign_eq with h | h <;> simp [h]
+  have hnsignC : (-(cd.sign : ℂ)) ≠ 0 := by rcases cd.sign_eq with h | h <;> simp [h]
+  have hvanishμν : ∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)).V,
+      ((cd.sign : ℂ) • cd.muClassFunction - (cd.sign : ℂ) • cd.nuClassFunction) v = 0 := by
+    intro v hv; rw [← hcdimg]; exact htauvanish v hv
+  have hvanishνμ : ∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff (typeIIHypothesis46 hG hSmax hSII data)).V,
+      ((-(cd.sign : ℂ)) • cd.nuClassFunction - (-(cd.sign : ℂ)) • cd.muClassFunction) v = 0 := by
+    intro v hv
+    rw [show (-(cd.sign : ℂ)) • cd.nuClassFunction - (-(cd.sign : ℂ)) • cd.muClassFunction
+        = (cd.sign : ℂ) • cd.muClassFunction - (cd.sign : ℂ) • cd.nuClassFunction by
+      rw [neg_smul, neg_smul]; abel]
+    exact hvanishμν v hv
+  rw [hcd] at hβ
+  simp only [OddOrder.Peterfalvi.S07.CharacterDifferenceImage.toOrthonormalImage,
+    Finset.mem_insert, Finset.mem_singleton] at hβ
+  rcases hβ with rfl | rfl
+  · rw [show cd.sign • cd.muClassFunction = (cd.sign : ℂ) • cd.muClassFunction from
+      (Int.cast_smul_eq_zsmul ℂ cd.sign cd.muClassFunction).symm]
+    exact key hμZ hμ1 hνZ hν1 hμν hsignC hvanishμν
+  · rw [show (-cd.sign) • cd.nuClassFunction = (-(cd.sign : ℂ)) • cd.nuClassFunction by
+      rw [← Int.cast_smul_eq_zsmul ℂ (-cd.sign) cd.nuClassFunction, Int.cast_neg]]
+    exact key hνZ hν1 hμZ hμ1 hνμ hnsignC hvanishνμ
+
 end ColumnPin
 
 end OddOrder.Peterfalvi.S12
