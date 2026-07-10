@@ -227,6 +227,174 @@ theorem witness_dade_psi_rho_norm_ge [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
   rw [← he2] at hbound
   exact hbound
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+open OddOrder.Peterfalvi.S09 in
+open OddOrder.Peterfalvi.S09.Cert in
+/-- **Peterfalvi (7.3) + (8.17), the witness `hC`**: for the witness Dade character
+`ψ = dade.psi`, the two `ρ`-norms sum to less than `1`:
+`‖ψ^{ρ_M}‖² + ‖ψ^ρ‖² < 1`, where `ρ_M` is the `A₁(M) = K^#`-based collapse
+(`hypothesis71SharpKernel`) and `ρ` the `A(L)`-based one.
+
+Proof shape (Peterfalvi p. 68): apply the (7.3) integral inequality on both sides; the two
+upper bounds integrate `‖ψ‖²` over the thickened supports `Ã₁(M)` and `Ã(L)`, which are
+**disjoint** by the (8.18.c) mixed disjointness (`nonconjugate_thickened_mixed_disjoint_or_swap`
+— either branch suffices: the witness `L` has `A(L) = A₁(L)` (Frobenius), and `Ã₁ ⊆ Ã` is
+monotone).  Neither support contains `1`, so the joint integral is at most
+`‖ψ‖² − |G|⁻¹·‖ψ(1)‖² = 1 − |G|⁻¹·‖ψ(1)‖²`, and `ψ(1) ≠ 0` (`ψ ∈ ℤ[Irr G]` of norm `1` is
+`±` an irreducible, `one_le_normSq_apply_one_of_mem_ZIrr_of_inner_self_one`) makes it
+strictly less than `1`. -/
+theorem witness_dade_psi_rhoM_rho_normSq_lt_one [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
+    (hyp : Hypothesis data.L)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+    (dade : DadeNotation hyp)
+    (hψeq : dade.psi = coh.extension dade.chi)
+    (hψZ : dade.psi ∈ ZIrr G)
+    (hypM : Hypothesis ctr.M) :
+    (ClassFunction.inner ((hypothesis71SharpKernel hypM).chiRhoCF dade.psi)
+        ((hypothesis71SharpKernel hypM).chiRhoCF dade.psi)).re
+      + (ClassFunction.inner (hyp.toHypothesis71.chiRhoCF dade.psi)
+          (hyp.toHypothesis71.chiRhoCF dade.psi)).re < 1 := by
+  classical
+  -- `‖ψ‖² = 1`: the coherent extension is isometric on `S ∋ dade.chi`, and members of `S`
+  -- are norm-`1` induced characters of the Frobenius kernel.
+  obtain ⟨frob, -⟩ := witness_L_frobenius hG data
+  have hHfrob : hyp.typeI.typeF.H = frob.typeI.typeF.H := by
+    rw [hyp.typeI.typeF.H_eq, frob.typeI.typeF.H_eq]
+  have hC : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥data.L
+      ((hyp.typeI.typeF.H).subgroupOf data.L) frob.complement := by
+    rw [hHfrob]; exact frob.frobenius
+  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf data.L).Normal := by
+    rw [hyp.typeI.typeF.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal data.L
+  obtain ⟨θlin, hθlin_ne, hχ_eq⟩ := dade.chi_mem
+  have hnorm1 : ClassFunction.inner dade.psi dade.psi = 1 := by
+    rw [hψeq, coherence_extension_inner_eq_on_family coh dade.chi_mem dade.chi_mem, hχ_eq]
+    exact inner_self_induce_eq_one_of_frobeniusGroup hC θlin hθlin_ne
+  -- The two (7.3) integral inequalities.
+  have h73L := Hypothesis71.chiRho_integral_inequality hyp.toHypothesis71
+    (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).toDadeIsometryData.isDadeIsometry
+    dade.psi
+  have h73M := Hypothesis71.chiRho_integral_inequality (hypothesis71SharpKernel hypM)
+    ((hypM.dadeData.dade.fullDadeIsometryData hypM.hconj).restrict
+      (sharpSubgroup_H_subset_typeIA hypM.typeI)
+      (sharpSubgroup_H_conj_mem hypM)).toDadeIsometryData.isDadeIsometry
+    dade.psi
+  -- The two Dade supports are disjoint ((8.18.c), either branch).
+  have hsuppL_eq : hyp.toHypothesis71.hyp.dadeSupport
+      = OddOrder.Peterfalvi.S10.ftThickenedSupport data.L (typeIA data.L hyp.typeI) :=
+    hyp.dadeData.dadeSupport_eq_ftThickenedSupport
+  have hsuppM_sub := hypothesis71SharpKernel_dadeSupport_subset hypM
+  have hdisjSet : Disjoint hyp.toHypothesis71.hyp.dadeSupport
+      ((hypothesis71SharpKernel hypM).hyp.dadeSupport) := by
+    rcases nonconjugate_thickened_mixed_disjoint_or_swap hG hyp hypM
+      (witness_L_not_conj_M hG data) with hd | hd
+    · -- `Ã(L) ∩ Ã₁(M) = ∅`
+      exact Disjoint.mono hsuppL_eq.le hsuppM_sub hd
+    · -- `Ã(M) ∩ Ã₁(L) = ∅`; `Ã₁(M) ⊆ Ã(M)` and the witness `Ã(L) = Ã₁(L)`
+      have hMsub : (hypothesis71SharpKernel hypM).hyp.dadeSupport ⊆
+          OddOrder.Peterfalvi.S10.ftThickenedSupport ctr.M (typeIA ctr.M hypM.typeI) := by
+        refine hsuppM_sub.trans (ftThickenedSupport_mono ?_)
+        rw [A1_eq_sharpSubgroup_H hypM]
+        exact sharpSubgroup_H_subset_typeIA hypM.typeI
+      have hLsub : hyp.toHypothesis71.hyp.dadeSupport ⊆
+          OddOrder.Peterfalvi.S10.ftThickenedSupport data.L
+            (A1 data.L PeterfalviType.I) := by
+      -- `typeIA L = H^# = A₁(L)` for the Frobenius witness
+        rw [hsuppL_eq,
+          show typeIA data.L hyp.typeI = A1 data.L PeterfalviType.I from
+            (witness_typeIA_eq_sharp hG data hyp).trans (A1_eq_sharpSubgroup_H hyp).symm]
+      exact Disjoint.mono hLsub hMsub hd.symm
+  -- Finset forms of the two supports.
+  set SL : Finset G :=
+    Finset.univ.filter (fun x : G => x ∈ hyp.toHypothesis71.hyp.dadeSupport) with hSL
+  set SM : Finset G :=
+    Finset.univ.filter
+      (fun x : G => x ∈ (hypothesis71SharpKernel hypM).hyp.dadeSupport) with hSM
+  have hdisjFin : Disjoint SL SM := by
+    rw [Finset.disjoint_left]
+    intro x hxL hxM
+    rw [hSL, Finset.mem_filter] at hxL
+    rw [hSM, Finset.mem_filter] at hxM
+    exact Set.disjoint_left.mp hdisjSet hxL.2 hxM.2
+  -- ℝ-forms of the (7.3) right-hand sides.
+  have hre : ∀ s : Finset G,
+      (((Nat.card G : ℂ)⁻¹ * ((∑ x ∈ s, ‖(dade.psi : G → ℂ) x‖ ^ 2 : ℝ) : ℂ))).re
+        = (Nat.card G : ℝ)⁻¹ * ∑ x ∈ s, ‖(dade.psi : G → ℂ) x‖ ^ 2 := by
+    intro s
+    rw [show ((Nat.card G : ℂ))⁻¹ = (((Nat.card G : ℝ)⁻¹ : ℝ) : ℂ) by push_cast; ring,
+      ← Complex.ofReal_mul, Complex.ofReal_re]
+  -- Combine: the joint integral over `SL ∪ SM` is `< 1`.
+  have hone_L : (1 : G) ∉ hyp.toHypothesis71.hyp.dadeSupport :=
+    OddOrder.Peterfalvi.S04.Hypothesis.one_notMem_dadeSupport _
+  have hone_M : (1 : G) ∉ (hypothesis71SharpKernel hypM).hyp.dadeSupport :=
+    OddOrder.Peterfalvi.S04.Hypothesis.one_notMem_dadeSupport _
+  have hsub_erase : SL ∪ SM ⊆ Finset.univ.erase 1 := by
+    intro x hx
+    refine Finset.mem_erase.mpr ⟨?_, Finset.mem_univ x⟩
+    rintro rfl
+    rcases Finset.mem_union.mp hx with h | h
+    · exact hone_L (Finset.mem_filter.mp h).2
+    · exact hone_M (Finset.mem_filter.mp h).2
+  have hsum_union_le : ∑ x ∈ SL ∪ SM, ‖(dade.psi : G → ℂ) x‖ ^ 2
+      ≤ ∑ x ∈ Finset.univ.erase 1, ‖(dade.psi : G → ℂ) x‖ ^ 2 :=
+    Finset.sum_le_sum_of_subset_of_nonneg hsub_erase (fun x _ _ => by positivity)
+  -- Total Parseval mass: `∑_G ‖ψ‖² = |G|` (from `‖ψ‖² = 1`).
+  have htotal : ∑ x : G, ‖(dade.psi : G → ℂ) x‖ ^ 2 = (Nat.card G : ℝ) := by
+    have h := inner_self_eq_realCast (G := G) dade.psi
+    rw [hnorm1] at h
+    have hr : (1 : ℝ) = (Nat.card G : ℝ)⁻¹ * ∑ x : G, Complex.normSq (dade.psi x) := by
+      exact_mod_cast h
+    have hns : (∑ x : G, Complex.normSq (dade.psi x))
+        = ∑ x : G, ‖(dade.psi : G → ℂ) x‖ ^ 2 :=
+      Finset.sum_congr rfl fun x _ => Complex.normSq_eq_norm_sq _
+    have hGne : (Nat.card G : ℝ) ≠ 0 := by
+      have : (0 : ℝ) < Nat.card G := by exact_mod_cast Nat.card_pos
+      exact this.ne'
+    rw [hns] at hr
+    field_simp at hr
+    linarith
+  have herase : ∑ x ∈ Finset.univ.erase 1, ‖(dade.psi : G → ℂ) x‖ ^ 2
+      = (Nat.card G : ℝ) - ‖(dade.psi : G → ℂ) 1‖ ^ 2 := by
+    have h := Finset.add_sum_erase Finset.univ
+      (fun x : G => ‖(dade.psi : G → ℂ) x‖ ^ 2) (Finset.mem_univ 1)
+    rw [htotal] at h
+    linarith
+  -- Strictness: `‖ψ(1)‖² ≥ 1`.
+  have hpsi1 : 1 ≤ ‖(dade.psi : G → ℂ) 1‖ ^ 2 :=
+    one_le_normSq_apply_one_of_mem_ZIrr_of_inner_self_one hψZ hnorm1
+  have hGpos : (0 : ℝ) < (Nat.card G : ℝ) := by exact_mod_cast Nat.card_pos
+  -- Assemble.
+  rw [hre SL] at h73L
+  rw [hre SM] at h73M
+  have hsum_split : ∑ x ∈ SL, ‖(dade.psi : G → ℂ) x‖ ^ 2
+        + ∑ x ∈ SM, ‖(dade.psi : G → ℂ) x‖ ^ 2
+      = ∑ x ∈ SL ∪ SM, ‖(dade.psi : G → ℂ) x‖ ^ 2 :=
+    (Finset.sum_union hdisjFin).symm
+  have hbound : (Nat.card G : ℝ)⁻¹ * (∑ x ∈ SL, ‖(dade.psi : G → ℂ) x‖ ^ 2)
+      + (Nat.card G : ℝ)⁻¹ * (∑ x ∈ SM, ‖(dade.psi : G → ℂ) x‖ ^ 2) < 1 := by
+    have hinv_pos : (0 : ℝ) < (Nat.card G : ℝ)⁻¹ := by positivity
+    have hchain : ∑ x ∈ SL, ‖(dade.psi : G → ℂ) x‖ ^ 2
+          + ∑ x ∈ SM, ‖(dade.psi : G → ℂ) x‖ ^ 2
+        ≤ (Nat.card G : ℝ) - ‖(dade.psi : G → ℂ) 1‖ ^ 2 := by
+      rw [hsum_split, ← herase]
+      exact hsum_union_le
+    have h1 : (Nat.card G : ℝ) - ‖(dade.psi : G → ℂ) 1‖ ^ 2 ≤ (Nat.card G : ℝ) - 1 := by
+      linarith
+    calc (Nat.card G : ℝ)⁻¹ * (∑ x ∈ SL, ‖(dade.psi : G → ℂ) x‖ ^ 2)
+          + (Nat.card G : ℝ)⁻¹ * (∑ x ∈ SM, ‖(dade.psi : G → ℂ) x‖ ^ 2)
+        = (Nat.card G : ℝ)⁻¹ * (∑ x ∈ SL, ‖(dade.psi : G → ℂ) x‖ ^ 2
+            + ∑ x ∈ SM, ‖(dade.psi : G → ℂ) x‖ ^ 2) := by ring
+      _ ≤ (Nat.card G : ℝ)⁻¹ * ((Nat.card G : ℝ) - 1) := by
+          have := hchain.trans h1
+          exact mul_le_mul_of_nonneg_left this hinv_pos.le
+      _ < 1 := by
+          rw [mul_sub, inv_mul_cancel₀ hGpos.ne']
+          have : (0 : ℝ) < (Nat.card G : ℝ)⁻¹ * 1 := by positivity
+          linarith
+  linarith [h73M, h73L, hbound]
+
 /-- **Peterfalvi (12.13)–(12.16), the character/norm contract** packaging every fact that the
 numerical endgame `counterexample_contradiction_of_facts` consumes.  Bundling them here isolates the
 deep §7/§12 content — the Dade calculation `ψ = χ^{τ₁}` of (12.13), the coset/value facts
@@ -318,7 +486,58 @@ theorem witness_value_norm_package [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
           * (mval : ℝ) ^ 2 ≤ normRhoM ∧
       (1 : ℝ) - (dade.e : ℝ) / (Nat.card ↥(hyp.typeI.typeF.H) : ℝ) ≤ normRho ∧
       normRhoM + normRho < 1 := by
-  sorry
+  classical
+  subst hLeq
+  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  -- The type-I (12.1) Hypothesis for `M`.
+  obtain ⟨hypM⟩ := exists_typeI_hypothesis hG ctr.M_maximal ctr.M_typeI
+  -- The Frobenius witness for `L` (for the `S`-irreducibility of `dade.chi`).
+  obtain ⟨frob, -⟩ := witness_L_frobenius hG data
+  have hHfrob : hyp.typeI.typeF.H = frob.typeI.typeF.H := by
+    rw [hyp.typeI.typeF.H_eq, frob.typeI.typeF.H_eq]
+  have hC : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥data.L
+      ((hyp.typeI.typeF.H).subgroupOf data.L) frob.complement := by
+    rw [hHfrob]; exact frob.frobenius
+  -- Bundle `dade.chi` as an irreducible with its (12.2) decomposition data.
+  have hchi0_irr : IsIrreducibleCharacter dade.chi :=
+    Sset_isIrreducibleCharacter hyp hC dade.chi_mem
+  obtain ⟨chi0, hchi0_coe⟩ : ∃ t : IrreducibleCharacter ↥data.L,
+      (t : ClassFunction ↥data.L ℂ) = dade.chi := ⟨⟨_, hchi0_irr⟩, rfl⟩
+  have hchi0_mem : (chi0 : ClassFunction ↥data.L ℂ) ∈ hyp.Sset := by
+    rw [hchi0_coe]; exact dade.chi_mem
+  have data0 : CharacterDecompositionData hyp (chi0 : ClassFunction ↥data.L ℂ) :=
+    (character_decomposition_and_dade_domain hG hyp hchi0_mem).choose
+  have hchi0_cons : chi0 ∈ data0.constituents := by
+    obtain ⟨φ, hφcoe, hφmem⟩ := Sset_self_mem_constituents hyp hC hchi0_mem data0
+    have hφeq : φ = chi0 := Subtype.ext hφcoe
+    rwa [hφeq] at hφmem
+  have hpsi0 : dade.psi = coh.extension (chi0 : ClassFunction ↥data.L ℂ) := by
+    rw [hchi0_coe]; exact hψeq
+  -- (12.15): `ψ(g) = mval ∈ ℤ` on `K − K′`.
+  obtain ⟨mval, hmval⟩ := counterexample_psi_int_on_K_sub_Kprime hG data hyp coh data0
+    hchi0_cons hchi0_mem hpsi0 hψZ hypM hgK hgK'
+  refine ⟨mval,
+    (ClassFunction.inner ((hypothesis71SharpKernel hypM).chiRhoCF dade.psi)
+      ((hypothesis71SharpKernel hypM).chiRhoCF dade.psi)).re,
+    (ClassFunction.inner (hyp.toHypothesis71.chiRhoCF dade.psi)
+      (hyp.toHypothesis71.chiRhoCF dade.psi)).re,
+    ?_, hmval, ?_, ?_, ?_, ?_, ?_⟩
+  · -- (12.14): `ψ` constant on the coset `x·K`.
+    exact psi_constant_on_xK hG hyp coh data dade data0 hchi0_cons hchi0_mem hpsi0
+      (witness_L_not_conj_M hG data) g hgK
+  · -- (12.12): `2e ≤ p + 1`.
+    have h := witness_two_mul_index_le_p_add_one hG data hyp
+    rw [he_eq]
+    exact_mod_cast h
+  · -- (8.1.c): `4·|K′| ≤ |K|`.
+    exact_mod_cast four_mul_card_Kprime_le hG ctr
+  · -- (12.15) norm relation `hA`.
+    exact counterexample_chiRhoA1_normSq_ge hG data hyp coh data0 hchi0_cons hchi0_mem
+      hpsi0 hypM hgK hgK' hmval
+  · -- (7.8.b) `hB`.
+    exact witness_dade_psi_rho_norm_ge hG data hyp coh dade hψeq he_eq
+  · -- (7.3)+(8.17) `hC`.
+    exact witness_dade_psi_rhoM_rho_normSq_lt_one hG data hyp coh dade hψeq hψZ hypM
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.13)–(12.15) + (7.3)/(7.8.b)**, the construction of the character/norm contract

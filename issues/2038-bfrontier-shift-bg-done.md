@@ -626,3 +626,129 @@ coh.extension 線形化 + ζ₀ := chi0 で組む)。
 **最終**: witness_value_norm_package の sorry を全 conjunct 供給で置換
 (mval/h_psig_int = counterexample_psi_int_*、normRhoM = A₁-chiRhoCF norm、normRho = 上記、
 hA = counterexample_chiRhoA1_normSq_ge、hB/hC = 本プラン)。
+
+## ✅✅✅ COMPLETE (2026-07-10 続⁸、lane-b 再開) — **witness_value_norm_package 完全 proven、(12.16) norm contract 完結** (S14 on-path ungated sorry = 0)
+
+続⁷ の hB/hC 配線プランを完遂 (4 commits: d223ed1a split / bb86103c hB / c1bfe83f hC-prep / 3fb0aec7 hC+fill)。
+full build **4140 jobs green + AxiomsCheck OK**。S14 実 sorry 6→**4** (残 = sibleyTarget_frobI off-path /
+typeIIIorIV S13-gated / P₂-crux 2 のみ = **ungated on-path 0**)。
+
+1. **分割 (d223ed1a)**: DadeContradiction 2075 行 → 3 leaf: `DadeContradiction` (1416、(12.13)-(12.15) 部品) /
+   **`NormPackage`** (新、import RhoMEvaluation — CounterexampleDadeData/witness_value_norm_package/
+   exists_counterexample_dade_data/counterexample_contradiction/pi_empty/typeI_frobenius/typeIA_eq_sharp) /
+   **`TypeICovering`** (新、(12.17)+theorem88)。witness_value_norm_package が ρM 機構 (RhoMEvaluation) を
+   cite できる位置に移動 — これが分割の必然理由 (import 方向)。
+2. **hB (bb86103c)**: `witness_dade_psi_rho_norm_ge` — witness_L_zeta_bound の (hyp,coh,dade)-parametric 版。
+   鍵 = placed family を **dade.chi に anchor** (exists_placed_induced_family χdist:=dade.chi) →
+   ζ₀ = Ind(θ0) = dade.chi → zetaNuRhoNormSqGeOfDade の bound が ‖chiRhoCF dade.psi‖² に直接着地
+   (kernelOrder/complementIndex は rfl、zetaNuRhoNormSq は show+rw[h0,←hψeq] 1 発 — whnf-wall 無し)。
+3. **hC prep (c1bfe83f)**: `ftThickenedSupport_mono` / `dadeSupport_restrict_subset_ftThickenedSupport`
+   (restrict datum の §4 support ⊆ Ã(A₁)) / `A1_eq_sharpSubgroup_H` / `hypothesis71SharpKernel_dadeSupport_subset`。
+   hypothesis71SharpKernel の hsub/hnorm を top-level (`sharpSubgroup_H_conj_mem`) に抽出 (unification 用)。
+   **ψ(1)≠0 は新規不要**: 既存 `one_le_normSq_apply_one_of_mem_ZIrr_of_inner_self_one` (InducedIrreducible、
+   (13.10) Parseval 用に既設) が丁度 — ZIrrFourier に書いた draft は重複で破棄 (claim-before-build の教訓)。
+4. **hC + fill (3fb0aec7)**: `witness_dade_psi_rhoM_rho_normSq_lt_one` — (7.3) 両側 (L=toHypothesis71 /
+   M=hypothesis71SharpKernel+restricted isometry) + **(8.18.c) mixed disjointness はどちらの枝でも十分**
+   (witness は A(L)=A₁(L) ゆえ swap 枝も A1_eq+mono で落ちる、続⁷ の鍵発見どおり) + 1∉support ×2 +
+   ‖ψ‖²=1 (coh isometry + Frobenius induced) + ‖ψ(1)‖²≥1 で strict。witness_value_norm_package は
+   7 conjunct 全供給 (h_const=psi_constant_on_xK / mval=counterexample_psi_int_* / h2e / hidx /
+   hA=counterexample_chiRhoA1_normSq_ge / hB / hC、chi0-bundle は witness_dade_psi_apply_x_eq_chi パターン)。
+
+**⟹ (12.16) counterexample_contradiction / (12.7) pi_empty / typeI_frobenius が own-proof sorry-free 化**
+(transitive residual は既知の witness-chain/D(4)/(12.2.a) producer 系のみ)。
+
+**次の b-frontier (上流優先+文書順)** — ⚠ 当初「3004 裁定 2・3 へ」と書いたが**両方とも別 b セッションが
+完了済み** (0757c158 restate + 5dc4e84a cleanup、issue 3004 実施報告参照; 二重作業を回避)。改めて残 b-owned
+実 sorry を再スキャン (comment-strip): S15_SAndT_Setup 11 (QD_sharp_centralizer_le_T / tSide_theta_package /
+basic_structure_gated / sibleyTarget_S / character_degree_analysis / exists_muT_index /
+exists_etaT_alphaFun_one_int / numeric_bounds / pc_le_maxNilpotentNormalHall / caseA_parameters /
+caseB_order_u) + S15_SAndT 7 (complement_inf_Q_structure / complement_inf_P_structure_dichotomy /
+betaGrid_support / betaGrid_A0_support / gammaGrid_real / gammaGrid_Y_norm_bound /
+typeIOrthogonalityGridData_of_typeISetup) + S15_Gate3 1。次候補 (要 3002/1017 末尾との整合確認):
+(a) s15_s_and_t.md 2026-07-07 LIVE STATUS の (13.3) G1 assembly 続行、(b) (13.18) betaGrid_support /
+(13.19) producer 実証明 ((13.17.c) E=W₁ 排除の上流)、(c) off-path vestigial (sibleyTarget_S 等) は
+do-not-complete 維持。
+
+**frontier 確定 (同日、調査済)**: 次 = **(b) の (13.18)/(13.19) cluster** (S15_SAndT、b 所有)。根拠:
+(i) 0757c158 の忠実 restate により `typeIOrthogonalityGridData_of_typeISetup` が W-side η-grid spine の
+honest な producer obligation になった — 「S-side cascade off-path」(2026-07-02 ruling) の対象
+(sibleyTarget_S/character_degree_analysis/tauS placeholder) とは**別物** (こちらは η_ij grid = spine 側)。
+(ii) c の (14.11) restructure (3004 裁定 1) は (13.19.c) を「明示 hypothesis パラメータ、**b landing 後に
+差し替え**」で待っている = 本物の downstream 需要。(iii) 文書順: (13.18) betaGrid_support →
+(13.18.c/d) gammaGrid_real / gammaGrid_Y_norm_bound → (13.19) producer → その下流で (13.17.c)
+`complement_inf_Q_structure` の E=W₁ 排除 ((13.19.c1)+(14.5) 論法) が閉じる。原文 (13.18) proof
+(mmd 04.15 p.83) の部品: (4.5.a) Res μ_0j / (13.3.a)(13.12) vanishing / (1.6.b) inflation 同定 /
+(2.1) W-coset conjugacy / Frobenius counting — 各部品の Lean 所在 survey から次 iteration 開始。
+3002 の b-side は全完了済 (2026-07-07)、s15_s_and_t.md の (13.3) G1 assembly は S-side
+CharacterDegreeData 系で off-path ruling との整合要確認 — (13.18)/(13.19) を先行する。
+
+## 📋 (2026-07-10 続⁹、lane-b /loop iter 1) — (13.18.a) betaGrid_support survey (Coq PVSbeta 精読)
+
+**Coq PFsection13 `FTtypeP_bridge_facts` (:1792-1870) の PVSbeta 証明構造** (= 原文 (13.18.a)):
+β_j = Ind_{P⋊W₁}^S 1 − μ_0j、主張 = β_j ∈ CF(S, P^# ∪ V_S) (V_S = (W−W₁∪W₂)^S)。
+z ∉ P^#∪V_S で Ind(1)(z) = μ_0j(z) を場合分け:
+1. **z ∈ PU (=S′)**: (i) z=1 → 両辺 u (γ(1)=u [index 計算]、μ_0j(1)=(1/q)μ_j(1)=u [cfRes_prTIirr])。
+   (ii) z∉P → 両辺 0 (μ_j は Ind-from-Fitting ゆえ P 外 0 [seqInd_on+FTprTIred_Ind_Fitting]、
+   Ind(1) は (PW₁)^S∩PU=P の外 0 [group_modl 計算])。
+2. **z ∈ S−PU**: rcoset partition + `partition_cent_rcoset` + StypeP.prPUW1 で z ~ x·y (x∈W₁^#、y∈W₂)。
+   y≠1 → z∈V_S 矛盾。y=1 → z~x∈W₁^#: Ind(1)(x) = γ(x̄) = 1 (**gammaW1**: S̄=S/P Frobenius +
+   normedTI W₁bar → induction 値 1) / μ_0j(x) = 1 (prTIirr_id + linear 値)。
+3. A0beta: P^#∪V_S ⊆ A₀(S) は別 step。
+
+**Lean 側の対応課題**: 現 statement は grid form `supp(β_j) ⊆ ⋃_i supp(μ_ij)` (consumer 向け restate)。
+Coq の P^#∪V_S 形との橋 (「μ_ij 族の support が P^#∪V_S を覆う/一致する」) の要否を含め、次 iteration で
+(a) consumer ((13.19) producer / gammaGrid_real) が実際に必要とする形を確認、(b) 部品の Lean 所在
+(S̄=S/P Frobenius = `typeP_uW1_frobenius` 済 [indPW1_inner_self_aux で使用中]、μ_0j Res 公式 =
+mu2Grid/PrimeTIResidue 系、class_support W₁^# 分解 = (2.1) 対応物) を grep、(c) statement 忠実性の
+判定 (grid form が over/under-strong でないか) — 不忠実なら restate (0757c158 と同型の faithfulness 修正)。
+
+## 📋 (2026-07-10 続¹⁰、lane-b /loop iter 2) — (13.18) 依存構造確定: betaGrid_A0_support が単一 gate
+
+- **gammaGrid_orthogonal_one (13.18.c 前半) は既に proven** (aux:1107-1181、9076 の
+  sInstance_dade0_eq_induce bridge + Frobenius reciprocity + eta_orthonormal) — 消費する sorry は
+  `betaGrid_A0_support` のみ。docstring 明記: 「This single 'A0-support obligation is what both
+  gammaGrid_orthogonal_one and gammaGrid_Y_norm_bound reduce to」。
+- **∴ 攻略順確定**: (1) `betaGrid_A0_support` (= Coq PVSbeta+A0beta、続⁹ の証明構造) →
+  (2) `betaGrid_support` (grid form、PVSbeta の系 or 独立計算) → (3) `gammaGrid_real`
+  (conj-commutation: cfAutInd/Dtau/prTIirr_aut/cfAut_cycTIiso の port) → (4) `gammaGrid_Y_norm_bound`
+  ((13.18.d)、betaGrid_norm proven + on-support isometry + (a)(c))。
+- `honestTypeP2A0Set M data = honestTypeP2ASet M ∪ conjClassSetIn M (typePV M data)` (S15_HonestTypeP2A0)
+  — Coq の P^# ∪ V_S ⊆ A₀(S) (A0beta step) は typePV との同定で処理する見込み。
+- 次 iter: typePV def / hyp.mu の supplied fields (S15_SAndTDefs) / prTIirr_id 対応
+  (S13_PrimeTIResidueBridge の residueS/mu2_ne — b 自身が port 済) を精査して PVSbeta port の
+  Lean 実装計画を固める → 実装。
+
+## 📋 (2026-07-10 続¹¹、lane-b /loop iter 3) — betaGrid_A0_support port の部品階層 (実装計画確定)
+
+**部品在庫確認済**: mu supplied fields (SubcoherenceInputs:156-210) = `mu_definition` ((13.1.e)
+Ind_W^S(ω_ij−ω_0j) = δ_j(μ_ij−μ_0j)) / `mu_degree_modEq_delta` / `mu_colSum_eq_induce` ((4.5.a)
+Σ_i μ_ij = Ind_{S'}ψ、ψ irred) / `mu_irreducible` / `mu_col_injective`。
+`honestTypeP2ASet M = centralizerSupport (Msigma M)^# (derivedInG M)` (mem iff: y∈S′ ∧ y≠1 ∧
+∃x∈Msigma^#, y∈C(x))。`typePV = W∖(W₁∪W₂)` (Coq cyclicTIset と一致)。
+S15_HonestTypeP2A0 に mu_row0 engine (mu_row0_ne proven / tauS_mu_row0_{diff_support,vanish_on_V}
+= (13.18) pins、「hyp.mu grounded to residueS.mu2 で discharge、ungated」注記 :658)。
+
+**Coq PVSbeta → Lean 部品階層** (実装順 D→A→B→C→assembly):
+- **D (浅い、次 iter 着手)**: `P^# ∪ (typePV)^S ⊆ honestTypeP2A0Set hyp.S hyp.Sdata`。
+  P^# ⊆ honestTypeP2ASet: y∈P^# → y∈S′ (P≤S′=P⊔U) ∧ ∃x:=y∈Msigma^# (要 **P = Msigma S 同定**
+  — S type-P₂ の MF=Msigma、S14 の MF_eq_Msigma 対応物を S15 で確認/新設) ∧ y∈C(y)。
+  V_S 側は honestTypeP2A0Set def の右 union 成分 (ほぼ rfl) + hyp.W1/W2 ↔ Sdata.W1/W2 同定
+  (hyp.Sdata_W1_eq 既存)。
+- **A (Ind_{PW₁}^S 1 の値)**: (i) PU 上: (PW₁)^S ∩ PU = P (group calc、Coq group_modl 対応) で
+  P 外 0; P 上は γ=Ind_{W̄₁}^{S̄}1 の mod-P inflation (indPW1_inner_self_aux:688-694 の
+  induce_one_eq_compHom_induce_one_of_le + typeP_uW1_frobenius が既に同じ変換を実装済 — 流用)。
+  (ii) W₁^# 上: **gammaW1** = S̄ Frobenius + normedTI W̄₁ → γ(x̄)=1。normedTI は
+  `escaping_honestTypeP2ASet_eq_empty`/G2 系 (76d1b27b) で W₁-class 版があるか要 grep。
+- **B (μ_0j の値)**: (i) S′∖P → 0: mu_definition で μ_ij−μ_0j が W^S-supported (Ind_W の support)
+  → S′∖W^S 上で全行一致 → q·μ_0j = Σμ_ij = Ind_{S'}ψ、ψ の P-support (Coq FTprTIred_Ind_Fitting
+  対応 — mu_colSum_eq_induce の ψ が P-supported かは field に無い、要追加調査/追加 pin) → 0。
+  (ii) μ_0j(1) = u: colSum degree + 行一致から。(iii) W₁^# 上 = 1: prime-TI residue (9014、
+  S13_PrimeTIResidueBridge residueS/mu2 grounding — S15_HonestTypeP2A0:658 の grounding 経路)。
+- **C (S−S′ 分解)**: z∈S−S′ → z ~_S x·y (x∈W₁^#、y∈W₂)。Coq: rcosets partition +
+  partition_cent_rcoset + StypeP.prPUW1 (Frobenius 性)。Lean: S = S′⋊W₁ (S_deriv_eq_PU +
+  complement) + W₂ 側 …新規幾何、(2.1) 対応物の有無を要 grep (BG §14 に類似?)。
+- **assembly**: cfun_onP 型の pointwise 論法 (z ∉ P^#∪V_S → β_j(z)=0) を Lean の
+  Set/support ⊆ に書き換え。
+
+**リスク注記**: B(i) の ψ P-support と C の (2.1) 対応物が repo 未在なら追加 pin/新規補題
+(数十〜百行級)。D は self-contained で即着手可。
