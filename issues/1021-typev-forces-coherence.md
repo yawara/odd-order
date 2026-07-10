@@ -71,3 +71,8 @@ book (10.10) の「type V なら 𝒮 coherent」((10.8) との矛盾用)。
   (ii) さもなくば Sibley 側を h46.dade ベースで組む (dade_H_eq_bot を h46 側から) —
   case-(a) の TI が R(a) = 1 を強制する事実 ((2.3)-route) を経由。
 - 出力 transport: isCoherent_of_supportedSpan_le + S_eq→inducedFamily ✓ (前 tick 済)。
+
+## tick¹⁸ 測定 pointer
+dadeData 供給 = `S10.dadeSupportHypothesisData_typePA0_of_isTypeP1` (Nonempty-producer)。
+h46.dade 同定の実測 = この producer の H(a)-choice を読む (S10 側 (8.15)-構成)。
+type-P₂ branch は sorried と注記あり — type-V (P₁) 側は生きている。次 tick はここから。
