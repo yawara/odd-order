@@ -269,17 +269,6 @@ structure Hypothesis where
   `Sdata.W2 = K*` (`typePData_of_kappaHall_hallComplement_W2`); discharges `card_P_eq` and hence
   `basic_structure_gated.P_order` (issue 3001/4014). -/
   Sdata_W2_eq : Sdata.W2 = W2
-  /-- **Peterfalvi (4.8), `μ`-column-difference support** (issues 9076/9014, the `(13.18)`
-  support grounding; Coq `prDade_sub_TIirr_on`): for nontrivial equal-degree columns
-  `j, k ≠ 0`, the difference `μ_{ij} − μ_{ik}` is supported in `A₀(S) = A(S) ∪ V^S`.
-  Supplied by the producer from `Section16CharacterData.muS_diff_support` (the §6 support
-  engine `certainType_diff_supp_subset_A0` at the `muS`-instance `Hypothesis46` `hyp46Smp`).
-  Discharges the `(13.18)` support pin `tauS_mu_row0_diff_support` (`S15_HonestTypeP2A0`). -/
-  mu_diff_support : ∀ (i : Fin q) {j k : Fin p},
-    j ≠ ⟨0, p_prime.pos⟩ → k ≠ ⟨0, p_prime.pos⟩ →
-    mu i j 1 = mu i k 1 →
-    (mu i j - mu i k).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set S Sdata) S
   /- ### Grid property fields (issue 3002)
 
   The (3.2)/(3.3)/(3.4) character-theoretic content of the Dade grid carriers `tau3`/`omega`,
