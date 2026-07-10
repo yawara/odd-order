@@ -1356,3 +1356,23 @@ tp.Sdata_W1_eq : Sdata.W1 = tp.W1 と mp.K との関係、FTSetup の certainTyp
 enumeration (w1CharEquiv/両 instance の生成元べき) の突合せのみ。δ/Ind は W 同定に従属。
 その後: 同定合成 → engines の muS-transport → pins 2/3 discharge → field 追加は不要になる
 可能性 (同定が直接 pin を出すなら iter 30-34 の field 計画は簡約) — 同定完了時に再判断。
+
+## 📋 (2026-07-11、lane-b /loop iter 37) — ω-grid 同定精査: W 同一 (propositional) + enum-回避 route
+
+**確認事実**:
+- certainTypeS: W1 = mp.K.subgroupOf mp.S / W2 = mp.Kstar.subgroupOf mp.S (**proven**:
+  certainTypeS_W1_eq/W2_eq、FTSetup:1295/1299)。
+- Sdata-instance (typePData_toS06Hypothesis): W1 = Sdata.W1.subgroupOf M / W2 = Sdata.W2.subgroupOf M
+  (**literal fields**、S12 Hypothesis.lean:1219-1220)。
+- bridges: tp.Sdata_W1_eq (Sdata.W1 = tp.W1) + tp.W2_eq_Kstar 系 (tp ↔ mp.K/Kstar) —
+  ∴ **両 instance の W₁/W₂/W は propositionally 同一部分群** (合成 1-2 step)。
+
+**同定の実装 route (enum-matching 回避、refined)**: 添字ごとの grid 対応 (w1CharEquiv 突合せ) は
+不要 — pins は support/V-value という **membership-invariant** な性質ゆえ:
+per-ω rigidity route = certainTypeS の列 (anchor 付き族、ω-族 F への (13.1.e) 恒等式) と
+Sdata-instance の同じ F に対応する列 (W-同定 subgroupCongr で F を移送) に
+`irreducibleCharacterFamily_eq_of_difference_eq` (iter 36) → **列単位で grid 一致** →
+hyp.mu i j は Sdata-grid の member (列非自明性も対応) → engines の support/V-value bound が
+そのまま適用可能。実装部品: (i) W₁/W₂/W equalities の合成 lemma、(ii) subgroupCongr 下での
+chiColumn/Ind の naturality (induce_compHom_subgroupCongr [InducedCharacter 末尾に既存!] が
+Ind 側)、(iii) 列対応 + rigidity 適用、(iv) engines transport。次 iter: (i)+(ii) から実装。
