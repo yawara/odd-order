@@ -84,3 +84,8 @@ trial の裁定 (codex 継続 or Claude へ swap-back) が本 issue に記録さ
   (越境編集せず issue 経由 = 規約準拠)。範囲逸脱なし・shared-infra dup なし・新 axiom なし。
   トレンド: genuine landing 4/5、churn 0、規律違反 1 (是正済)。**→ ユーザーが保留解除したら次 tick で
   通常ゲート (trial merge + build + AxiomsCheck) を通して合流する**。
+- 2026-07-10 (保留解除 tick): **ユーザー「Cもマージしましょう」で保留解除 → c 合流完了
+  (merge beed4f70)**。b68e14ae 系 + dc2368c8 の 7 commits、build green 4144 jobs /
+  AxiomsCheck OK (4 assert は disclosed unregister) / 新 axiom なし / sorry 83→81 (−2 実証明)。
+  (14.11.2) parity+Bessel 本体 = deep obligation の 1 本目が landing。トレンド: genuine landing
+  5/5 (abort 分は是正後に受理)、churn 0。監視 cron は c を通常対象に復帰。
