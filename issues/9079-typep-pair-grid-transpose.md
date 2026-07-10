@@ -602,3 +602,26 @@ honest 経路 (Coq PFsection10:563-576 + PFsection8 FT_Dade_support_disjoint):
   typePF exclusion。上流 `escapingCentralizers_control` (S10:509) は既存 sorried。
 
 axioms: 全 chain の sorryAx はこの 2 点 (+既知上流) 経由のみ。
+
+## 2026-07-10 ★★ obligation 3 完全閉鎖 — (8.18.b) 全 chain 実証明 (sorryAx ゼロ)
+
+(P1)/(S2) の残 2 sorry を同 loop 内で実証明 (8eac1c21 + 6376a9b2):
+
+- **(P1)**: (8.17.a) partition は不要と判明 — type-P₁ collapse
+  `isTypeP1_derivedInG_eq_Msigma` (M′ = M_σ、TypeP1Criteria:208) で |a| は σ(M)-数、
+  BG 13.9 `sigma_disjoint_of_nonconjugate` + Mσ-Hall で即決着。
+- **(S2)**: (8.13.c4) は **BG Theorem D(4) が完全 package 済**
+  (`theoremD_msigma_conjugacy_and_centralizers`、sorry-free) — D(4) の
+  P₂-supporter 節 (IsTypeP2 N → IsTypeF M ∧ …) + ℳ(C(b))={S} の conj 移送 +
+  Prop 16.1(b) (II↔P₂) + 型排他で False。
+
+★★ **`exists_typeIICrossIsometryData_at_pair` = [propext, Classical.choice, Quot.sound]**
+— (10.7) cross-isometry package の producer が完全 axiom-clean。4 fields 全て honest。
+
+### 残 (9079 tail、最終項目) = (c) aux 差し替え
+`typeII_HU_frobenius_of_coherent_aux` (S12_TypeIIFrobenius:1332) の pair-witness 再構成:
+WLOG entry (`Hypothesis.exists_seeded_pair_conj_typeII`) + setup 組立
+(`exists_typesIIIIIIVSetup_Sdata`、hSW1/hSW2 := hdata ▸ tp-式) + §9 counts 再
+instantiate + 新 producer 接続 (hζ1/hμd は (10.2)/(10.3) canonical 構成から供給) +
+package.elim → IsFrobeniusGroup (derivedInG mp.S) → conj 転送
+(maxNilpotentNormalHall equivariance + complement flexibility) → 旧 gate deprecate。
