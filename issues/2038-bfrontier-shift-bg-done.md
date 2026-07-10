@@ -1274,3 +1274,28 @@ hyp46Smp copy 可)。しかし **field 文の語彙が不足**:
   mu を列ごと anchor+順序まで pin する — mu_orthonormal + mu_definition + delta で mu = muS を
   導出できるか) を精査。可能なら **field 追加ゼロ**で pins が閉じる (最も honest)。
 次 iter: 案 Y の一意性精査 (mu_definition の pin 力) を 30 分 → 不成立なら案 X 実施。
+
+## 📋 (2026-07-11、lane-b /loop iter 33) — 案 Y 一意性検証: mu-given-omega は成立、omega-grounding に帰着
+
+**案 Y の数学検証 (机上、成立)**: mu_definition (列差 Ind 恒等式) + mu_irreducible +
+mu_col_injective だけで **grid は (omega, delta) から一意**:
+2 解 mu, mu' は列差一致 → mu i j = mu' i j + c (c = anchor 差、i-独立)。c ≠ 0 なら ‖c‖² = 2、
+norm 展開で i≠0 に ⟨mu' i j, mu 0 j⟩ = −1 を強制 — genuine irreducible 同士の inner は {0,1}
+ゆえ矛盾 (q ≥ 2 で i≠0 存在) → c = 0 → mu = mu'。**この一意性補題は単体で landing 価値あり**
+(グリッド grounding の全てをこれ 1 本で「omega/delta grounding」に帰着させる)。
+
+**ただし pins 2/3 には不十分**: 一意性は hyp.mu を「hyp.omega が生成する grid」に pin するが、
+support/V-value の certain-type 幾何は **hyp.omega = (transported chiColumn grid)** の grounding
+を要する — omega の既存 property fields (mul/orthonormal/pow/row-col-zero、2033/3002) は
+omega を relabeling まで pin するのみ (生成元べき enumeration の同定が別途要る)。
+∴ **案 X (def 再配置 + field) が pins の実務 route で確定**。一意性補題は独立 unit として後続
+(mu-grounding 系の整理に使う)。
+
+**次 iter (案 X 実施、順序)**:
+1. `honestTypeP2ASet` (:537) を SubcoherenceInputs 内で structure (:74) 前へ移動 (b-owned reorder、
+   下流不変)。
+2. `honestTypeP2A0Set` の移設 (S15_HonestTypeP2A0:47 → SubcoherenceInputs structure 前) —
+   c-file からの移設は 9000-issue で claim + self-flag (定義 1 個 + hodd 依存の V-part;
+   S15.Hypothesis の odd_card/hodd field 有無を確認し、無ければ A₀ 形を「A ∪ (hodd 引数付き
+   V-conj 部)」でなく **field 側で hodd を仮定に取る**か検討)。
+3. field 追加 (iter 30 設計) + producer discharge (hyp46Smp) + pin 修正。
