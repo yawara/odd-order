@@ -839,25 +839,39 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (13.19), synchronized M-side grid source.**
 
 Lane b's corrected `TypeIOrthogonalityGridData` now carries the faithful conjunction alternatives
-and an actual Dade-image equation.  The remaining interface obligation is to synchronize the
-producer's chosen Dade image with the distinguished `betaM` already chosen by `Mdata.h78`.
-The existential form is essential: lane b's current parameter-free producer does not expose a
-uniqueness theorem that would identify its particular choice with `Mdata.h78`. -/
+and an actual Dade-image equation.  The remaining interface obligation is only to expose that the
+producer's internally chosen `phi` belongs to the concrete coherent family `typeIHyp.Sset`.
+The current lane-b carrier records `phi_mem : phi ∈ Lset` but does not identify its free `Lset`
+with `typeISetup.Sset`.  Once this membership is exposed, (13.19.b) coherence shows that changing
+the distinguished family member does not change any `eta`-grid coefficient of the associated
+`beta`; no false uniqueness of the two class functions is required. -/
 theorem exists_betaMGridData [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) :
     ∃ grid : OddOrder.Peterfalvi.S15.TypeIOrthogonalityGridData hyp.base Mdata.typeIHyp,
-      grid.betaL = Mdata.betaM := by
+      grid.phi ∈ Mdata.typeIHyp.Sset := by
   sorry
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (13.19.c), faithful M-side source adapter.**  Projects the corrected conjunction
-alternatives supplied by lane b, after synchronizing its `β_L^τ` with the actual `Mdata.betaM`. -/
+alternatives supplied by lane b.  The choice-invariance theorem identifies the `eta` coefficients
+of its `β_L^τ` with those of the actual `Mdata.betaM`; it does not overclaim equality of the two
+class functions. -/
 theorem betaMGridParityAlternatives [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) :
     BetaMGridParityAlternatives hyp Mdata := by
-  obtain ⟨grid, hbeta⟩ := exists_betaMGridData _hG hyp Mdata
+  obtain ⟨grid, hphi⟩ := exists_betaMGridData _hG hyp Mdata
+  have hbeta : Mdata.betaM =
+      OrthogonalitySwitchData.coherentBeta _hG Mdata.coherent78 := rfl
+  have hcoeff : ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
+      ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
+        ClassFunction.inner grid.betaL (hyp.base.eta i j) =
+          ClassFunction.inner Mdata.betaM (hyp.base.eta i j) := by
+    intro _ _ i j
+    rw [hbeta]
+    exact OrthogonalitySwitchData.typeIGrid_betaL_inner_eta_eq_h78_beta
+      _hG Mdata.M_maximal Mdata.coherent78 grid hphi i j
   have heM : Mdata.e = ((maxNilpotentNormalHall Mdata.M).subgroupOf Mdata.M).index := by
     rw [Mdata.e_eq_index, Mdata.K_eq_MF]
   have he : grid.e = Mdata.e := grid.e_eq_index.symm.trans heM.symm
@@ -874,8 +888,16 @@ theorem betaMGridParityAlternatives [Finite G]
       exact h
     · right
       intro j hj
-      have h := hodd.1 j hj
-      rwa [hbeta] at h
+      obtain ⟨n, hn, hinner⟩ := hodd.1 j hj
+      refine ⟨n, hn, ?_⟩
+      intro _ _
+      calc
+        ClassFunction.inner Mdata.betaM
+            (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ j) =
+            ClassFunction.inner grid.betaL
+              (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ j) :=
+          (hcoeff ⟨0, hyp.base.q_prime.pos⟩ j).symm
+        _ = (n : ℂ) := hinner
   · rcases grid.caseC_dual with hbound | hodd
     · left
       have h := hbound.2
@@ -883,8 +905,16 @@ theorem betaMGridParityAlternatives [Finite G]
       exact h
     · right
       intro i hi
-      have h := hodd.1 i hi
-      rwa [hbeta] at h
+      obtain ⟨n, hn, hinner⟩ := hodd.1 i hi
+      refine ⟨n, hn, ?_⟩
+      intro _ _
+      calc
+        ClassFunction.inner Mdata.betaM
+            (hyp.base.eta i ⟨0, hyp.base.p_prime.pos⟩) =
+            ClassFunction.inner grid.betaL
+              (hyp.base.eta i ⟨0, hyp.base.p_prime.pos⟩) :=
+          (hcoeff i ⟨0, hyp.base.p_prime.pos⟩).symm
+        _ = (n : ℂ) := hinner
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (14.11.1) → (13.19.c)**: the two strict size gaps exclude both degree-bound

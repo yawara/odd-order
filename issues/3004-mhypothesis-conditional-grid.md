@@ -269,3 +269,44 @@ c の直前 landing までは有効)。
 2. 意図せぬ依存 (proof 変更の副作用) なら: sorry-free を回復して再提出。
 3. いずれの場合も b68e14ae の数学本体 (signed expansion の parity+Bessel) は保全対象 —
    revert せず開示形式のみ修正すること。
+
+## lane-c follow-up (2026-07-10): β の uniqueness を除去し、η係数の choice-invariance を実証明
+
+`exists_betaMGridData` の残件を原文・Coq (`PFsection13.v` の `FTtypeI_bridge_facts`) と再照合した。
+次数 `e` の coherent-family member は一般に複数あり得るため、lane-b producer が選ぶ
+`grid.phi` と `Mdata.psi`、従って二つの β class function 自体の equality / uniqueness は要求すべきでない。
+
+C-owned の実証明として次を landing 準備した。
+
+- `typeIGrid_betaL_inner_eta_eq_h78_beta`: 同次数の `grid.phi, zeta₀ ∈ typeIHyp.Sset` の差は
+  `A(M)`-supported。coherence agreement で
+  `τ(zeta₀-grid.phi)=ν(zeta₀)-ν(grid.phi)` とし、(13.19.b) の full-family η直交性から、
+  `grid.betaL` と canonical `h78.beta` の **全 η係数が一致**することを証明。
+- `betaMGridParityAlternatives` は β の global equality でなく上の係数 equality により
+  row/column の `OddIntegerInner` を actual `Mdata.betaM` へ移送する形に再配線。
+- `exists_betaMGridData` の唯一の `sorry` は
+  `∃ grid, grid.phi ∈ Mdata.typeIHyp.Sset` へ縮小。旧 `grid.betaL = Mdata.betaM` overclaim は除去。
+
+この経路で判明した lane-b API の残修正は二点。
+
+1. `TypeIOrthogonalityGridData.phi_mem` は現在 `phi ∈ Lset` だが `Lset` が free field で、
+   `Lset = typeISetup.Sset` が無い。`Lset` を実 family に固定するか、proved field
+   `phi_mem_Sset : phi ∈ typeISetup.Sset` を追加する必要がある。
+2. `Ltau_orthogonal_eta` と case-(c1) parity は現在 base Dade map `typeISetup.tau phi` を使うが、
+   原文/Coq は coherent extension `tau1 phi`。honest producer closure 前に `coh`/`tau1` を明示入力・field
+   として parameterize する必要がある。Coq の最小入力は `(tau1, phi, cohL, Lphi, phi1e)`。
+
+対象 2 module の 4094-job build green、`git diff --check` clean、新 axiom・新 sorry なし。
+
+## lane-c resume audit (2026-07-10): abort 指示の AxiomsCheck 追従
+
+main 同期後、hub が指摘した 4 宣言の `sorryAx` を再現し、依存根を定数単位で監査した。
+`betaM_axis_odd_of_main_size_bounds` / `betaMExpansionData_of_hypothesis78` だけでなく、grid と
+独立な `MHypothesis.chiRhoNormSq_eq_zetaNuRhoNormSq` / `rhoNormSq_ge_lower` も同じ taint を持つ。
+根は `exists_betaMGridData` 単独ではなく、b68e14ae で `MHypothesis.h78` を raw field から
+`coherent78.h78 hG` の computed accessor に変えたことにある。各 statement が `Mdata.betaM` または
+`Mdata.h78` を含むため、computed `Hypothesis78` の構成に残る upstream Dade-isometry `sorryAx` が
+型を通じて推移的に現れる。4 proof body 自体には新しい `sorry` は無い。
+
+hub の差し戻し指示 1 に従い、`AxiomsCheck.lean` の4 assertを一時未登録とし、各箇所にこの既存
+transitive gate を明記した。`chiRhoCF_congr_hyp` の axiom-clean assert は維持する。

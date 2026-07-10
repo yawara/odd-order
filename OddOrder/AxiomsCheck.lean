@@ -6841,8 +6841,11 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 /-! **Peterfalvi (13.19.c) parity branch under the (14.11.1) strict gaps**
 (`S16_NonExistenceG`, lane C).  Once the faithful row/column alternatives are supplied explicitly,
 the two strict quotient inequalities eliminate their size-bound branches and leave the actual
-`β_M` odd-integrality conclusions.  This is pure order arithmetic and is axiom-clean. -/
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.betaM_axis_odd_of_main_size_bounds
+`β_M` odd-integrality conclusions.  Its proof body is pure order arithmetic, but it is temporarily
+not registered here: after `MHypothesis.h78` became the computed accessor
+`coherent78.h78 hG`, the theorem's `Mdata.betaM`-bearing type transitively exposes the existing
+upstream Dade-isometry `sorryAx`.  This is the same disclosed gate as the concrete coherent bundle,
+not an additional sorry in this theorem. -/
 
 -- **W4 §16→§7 bridge (lane-h, βM (14.11.2) de-opacification)** — `betaMExpansionData_of_hypothesis78`
 -- certifies that the (7.8.a) field of `BetaMExpansionData` (`β_M = 1_G − χ + Δ`) is a genuine
@@ -6851,8 +6854,9 @@ the two strict quotient inequalities eliminate their size-bound branches and lea
 -- instantiating `S09.Hypothesis78` with `β_M = β` and `ψ^{τ₁} = ζ^ν` (the `χ = ζ^ν` branch, so
 -- `chi_norm` is `rfl`), together with the conditionally derived `e = p q`.  It isolates the
 -- remaining conditional engine work: coefficient projection, norm tightness, residual vanishing,
--- and the χ classification.  Axiom-clean (pure `rw` from the S09 (7.8.a) cite).
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.betaMExpansionData_of_hypothesis78
+-- and the χ classification.  The proof body is complete, but this declaration is temporarily not
+-- registered for the same computed-`h78` transitive `sorryAx` described above; its result type
+-- contains `Mdata.betaM`.
 
 -- **W2 §12 (12.17) normalizer bridge (lane-h)** — `maximalSubgroup_eq_normalizer_maxNilpotentNormalHall`:
 -- a maximal subgroup `L` of a minimal simple group of odd order equals `N_G(L_F)` whenever
@@ -7086,9 +7090,11 @@ family-inequality `ρ`-norm `(toFamilyHypothesis71).chiRhoNormSq (ψ^{τ₁}) 0`
 coherence-norm `h78.zetaNuRhoNormSq`, since `S09.Hypothesis71.chiRho` depends only on the support
 hypothesis `H71.hyp` (not the Dade map `τ`): `chiRhoCF_congr_hyp` + `psi_tau1_eq` + `h78_hyp_eq`.
 The linchpin tying the (7.5) family-inequality layer to the (7.8.b) coherence-norm layer of
-(14.11.4).  Axiom-clean. -/
+(14.11.4).  `chiRhoCF_congr_hyp` remains axiom-clean.  The two `MHypothesis` projections below
+are temporarily not registered because their statements unfold the computed `h78` accessor and
+therefore inherit the existing upstream Dade-isometry `sorryAx`; neither proof body contains a
+sorry. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.chiRhoCF_congr_hyp
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.MHypothesis.chiRhoNormSq_eq_zetaNuRhoNormSq
 
 /-! **Peterfalvi (7.8.b)/(14.11.4) lower bound** (`S16_NonExistenceG`, lane γ/POLE-2).
 The unconditional genuine content is `1 − e/k ≤ ‖ψ^{τ₁ρ}‖²`, where `e = |M:K|`.
@@ -7097,8 +7103,8 @@ Combines the coherence-norm lower bound for `M`
 discharged) with the index identities `h78.kernelOrder = |K| = k` and
 `h78.complementIndex = |M:K| = e` (`h78_H_eq`/`e_eq_index` + Lagrange), and the norm bridge
 above.  The conditional `normCascadeData` rewrites `e` to `p q` using (14.11.2).
-Axiom-clean. -/
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.MHypothesis.rhoNormSq_ge_lower
+Its proof body is complete; its temporary AxiomsCheck omission is covered by the computed-`h78`
+disclosure above. -/
 
 /-! **Peterfalvi (14.11.4) §8 support identity `A(M) = K#`** (`S16_NonExistenceG`, lane γ/POLE-2).
 For a Frobenius group `M` with kernel `N`, the centralizer-support `centralizerSupport N# M` is

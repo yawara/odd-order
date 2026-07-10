@@ -306,5 +306,138 @@ theorem mSide_dadeSupport_avoids_regular [Finite G]
     Nat.Coprime.coprime_dvd_left hxord (card_kernel_coprime_pq hG hMmax dataM).symm
   exact dadeSupport_not_coprime_card_kernel hG dataM hdade hcop
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- The canonical §7.8 beta attached to a coherent type-I bundle, exposed as a class function
+independent of later choices of `Fintype G`. -/
+noncomputable def coherentBeta [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (dataM : TypeICoherent78Data M) : ClassFunction G ℂ :=
+  (dataM.h78 hG).beta
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (13.19.b), invariance of the `eta`-grid coefficients under the choice of
+distinguished coherent-family member.**
+
+Let `grid.phi` be the member chosen by the §13 type-I grid producer and let `zeta 0` be the member
+chosen by the §7.8 coherent bundle.  Both lie in the same coherent family and have the common
+degree `[M : M_F]`.  Hence their difference is supported in `A(M)`, so the Dade map sends it to the
+difference of their coherent images.  Every coherent image is orthogonal to the `eta`-grid by
+(13.19.b); consequently replacing `grid.phi` by `zeta 0` changes the associated Dade `beta` by a
+function orthogonal to every `eta_ij`.
+
+This is the choice-free synchronization needed by (14.11.2): it deliberately asserts equality of
+the grid coefficients, not equality of the two `beta` class functions (which need not hold for
+different distinguished family members). -/
+theorem typeIGrid_betaL_inner_eta_eq_h78_beta [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    {M : Subgroup G} (hMmax : M ∈ maximalSubgroups G) (dataM : TypeICoherent78Data M)
+    (grid : OddOrder.Peterfalvi.S15.TypeIOrthogonalityGridData
+      hyp.base dataM.typeIHyp)
+    (hphi : grid.phi ∈ dataM.typeIHyp.Sset) :
+    ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
+      ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
+        ClassFunction.inner grid.betaL (hyp.base.eta i j) =
+          ClassFunction.inner (coherentBeta hG dataM) (hyp.base.eta i j) := by
+  classical
+  intro fintypeG invertibleG i j
+  have hfintype : fintypeG =
+      OddOrder.Peterfalvi.S12.FiniteInduce.finiteGFintype := Subsingleton.elim _ _
+  subst fintypeG
+  have hinvertible : invertibleG =
+      OddOrder.Peterfalvi.S12.FiniteInduce.natCardInvCG := Subsingleton.elim _ _
+  subst invertibleG
+  haveI := dataM.kernelIn_normal
+  -- The two selected family members have the same degree, namely the complement index.
+  have he : grid.e = dataM.kernelIn.index := by
+    rw [← grid.e_eq_index]
+    change ((maxNilpotentNormalHall M).subgroupOf M).index =
+      ((dataM.typeIHyp.typeI.typeF.H).subgroupOf M).index
+    rw [dataM.typeIHyp.typeI.typeF.H_eq]
+  have hdeg : dataM.zeta 0 (1 : ↥M) = grid.phi (1 : ↥M) := by
+    rw [dataM.deg0, grid.phi_degree_eq_e, he]
+  -- Their difference lies in the supported coherent lattice, so `tau = tau1` on it.
+  have hsharp : dataM.typeIHyp.ambientA = (dataM.kernel : Set G) \ {1} := by
+    simpa [OddOrder.Peterfalvi.S14.Hypothesis.ambientA] using dataM.typeIA_eq_sharp hG
+  have hsupp : (dataM.zeta 0 - grid.phi).support ⊆ dataM.typeIHyp.A := by
+    simpa [OddOrder.Peterfalvi.S14.Hypothesis.A,
+      OddOrder.Peterfalvi.S14.Hypothesis.ambientA] using
+      (OddOrder.Peterfalvi.S14.Sset_diff_support_subset_ambientA dataM.typeIHyp
+        (dataM.zeta_mem_Sset (Ne.symm dataM.ind1H_ne_zero)) hphi hdeg hsharp)
+  have hagree : dataM.typeIHyp.tau (dataM.zeta 0 - grid.phi) =
+      dataM.coh.extension (dataM.zeta 0) - dataM.coh.extension grid.phi := by
+    rw [← map_sub]
+    exact (dataM.coh.extends_on_supported (dataM.zeta 0 - grid.phi)
+      ⟨Submodule.sub_mem _
+          (Submodule.subset_span (dataM.zeta_mem_Sset (Ne.symm dataM.ind1H_ne_zero)))
+          (Submodule.subset_span hphi),
+        hsupp⟩).symm
+  -- The canonical §7.8 beta is `tau (Ind 1 - zeta 0)`.
+  have hbeta : coherentBeta hG dataM = dataM.typeIHyp.tau
+      (ClassFunction.induce ((dataM.typeIHyp.typeI.typeF.H).subgroupOf M)
+        (trivialClassFunction ↥((dataM.typeIHyp.typeI.typeF.H).subgroupOf M)) - dataM.zeta 0) := by
+    rw [coherentBeta]
+    rw [OddOrder.Peterfalvi.S09.Hypothesis78.beta_def]
+    change dataM.typeIHyp.toHypothesis71.τ _ = dataM.typeIHyp.tau _
+    rw [dataM.typeIHyp.toHypothesis71_tau_apply]
+    apply congrArg dataM.typeIHyp.tau
+    change (dataM.h78 hG).hyp76.zeta (dataM.h78 hG).ind1H -
+        (dataM.h78 hG).hyp76.zeta (dataM.h78 hG).zetaDistinct = _
+    rw [dataM.h78_ind1H_eq, dataM.h78_zeta_eq,
+      dataM.h78_zetaDistinct_eq, dataM.h78_zeta_eq]
+    change ClassFunction.induce dataM.kernelIn
+        (dataM.θ dataM.ind1H : ClassFunction _ ℂ) - dataM.zeta 0 = _
+    rw [dataM.triv, IrreducibleCharacter.coe_trivialIrreducibleCharacter]
+  -- Thus the difference of the two beta functions is the coherent-image difference.
+  have hbetaDiff : grid.betaL - coherentBeta hG dataM =
+      dataM.coh.extension (dataM.zeta 0) - dataM.coh.extension grid.phi := by
+    rw [grid.betaL_eq, hbeta, ← hagree, ← map_sub]
+    apply congrArg dataM.typeIHyp.tau
+    change (ClassFunction.induce ((dataM.typeIHyp.typeI.typeF.H).subgroupOf M)
+        (trivialClassFunction ↥((dataM.typeIHyp.typeI.typeF.H).subgroupOf M)) - grid.phi) -
+      (ClassFunction.induce ((dataM.typeIHyp.typeI.typeF.H).subgroupOf M)
+        (trivialClassFunction ↥((dataM.typeIHyp.typeI.typeF.H).subgroupOf M)) - dataM.zeta 0) =
+      dataM.zeta 0 - grid.phi
+    abel
+  -- Realize `grid.phi` as one of the placed induced family members.
+  obtain ⟨theta, htheta, hphi_eq⟩ := hphi
+  obtain ⟨k, hk⟩ := dataM.cover theta
+  have hkphi : dataM.zeta k = grid.phi := hk.trans hphi_eq.symm
+  have hk_ne : k ≠ dataM.ind1H := by
+    intro hk_ind
+    apply OddOrder.Peterfalvi.S09.Cert.induce_ne_trivialChar_induce
+      dataM.kernelIn theta htheta
+    calc
+      ClassFunction.induce dataM.kernelIn (theta : ClassFunction _ ℂ) = grid.phi := hphi_eq.symm
+      _ = dataM.zeta k := hkphi.symm
+      _ = dataM.zeta dataM.ind1H := by rw [hk_ind]
+      _ = ClassFunction.induce dataM.kernelIn
+          (trivialIrreducibleCharacter ↥dataM.kernelIn : ClassFunction _ ℂ) := by
+        change ClassFunction.induce dataM.kernelIn
+            (dataM.θ dataM.ind1H : ClassFunction _ ℂ) = _
+        rw [dataM.triv, IrreducibleCharacter.coe_trivialIrreducibleCharacter]
+  have hDadeAvoid := mSide_dadeSupport_avoids_regular (hyp := hyp) hG hMmax dataM
+  have hzero_ne : (0 : Fin (dataM.n + 1)) ≠ (dataM.h78 hG).ind1H := by
+    rw [dataM.h78_ind1H_eq]
+    exact Ne.symm dataM.ind1H_ne_zero
+  have hk_ne' : k ≠ (dataM.h78 hG).ind1H := by
+    rw [dataM.h78_ind1H_eq]
+    exact hk_ne
+  have horth_zero : ClassFunction.inner (dataM.coh.extension (dataM.zeta 0))
+      (hyp.base.eta i j) = 0 := by
+    have h := caseB_eta_orthogonal_nu_zeta_at
+      hG hyp.base dataM hDadeAvoid hzero_ne i j
+    rw [dataM.h78_nu_eq, dataM.h78_zeta_eq] at h
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, h, star_zero]
+  have horth_phi : ClassFunction.inner (dataM.coh.extension grid.phi)
+      (hyp.base.eta i j) = 0 := by
+    have h := caseB_eta_orthogonal_nu_zeta_at
+      hG hyp.base dataM hDadeAvoid hk_ne' i j
+    rw [dataM.h78_nu_eq, dataM.h78_zeta_eq] at h
+    rw [← hkphi, OddOrder.RepresentationTheory.inner_conj_symm, h, star_zero]
+  have hdiff : ClassFunction.inner (grid.betaL - coherentBeta hG dataM)
+      (hyp.base.eta i j) = 0 := by
+    rw [hbetaDiff, ClassFunction.inner_sub_left, horth_zero, horth_phi, sub_zero]
+  rw [ClassFunction.inner_sub_left, sub_eq_zero] at hdiff
+  exact hdiff
+
 end OrthogonalitySwitchData
 end OddOrder.Peterfalvi.S16
