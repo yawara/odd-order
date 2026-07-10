@@ -89,3 +89,10 @@ trial の裁定 (codex 継続 or Claude へ swap-back) が本 issue に記録さ
   AxiomsCheck OK (4 assert は disclosed unregister) / 新 axiom なし / sorry 83→81 (−2 実証明)。
   (14.11.2) parity+Bessel 本体 = deep obligation の 1 本目が landing。トレンド: genuine landing
   5/5 (abort 分は是正後に受理)、churn 0。監視 cron は c を通常対象に復帰。
+- 2026-07-10 (深夜 tick、merge 81920598): **codex-c 再稼働 — hub の 3004 誘導どおり T-side (14.9)
+  へ**。2 commits: (i) SubgroupL.lean (1959 行) の自主分割 — T-side type-II cluster を新 leaf
+  TTypeII.lean へ移設 (粒度規約の自発遵守)、(ii) T-side case B + calT1 count 配線の実証明
+  (hVcomm 等 residual sorry discharge、sorry −1)。dup flag は全て移設由来と hub 確認 (真の
+  重複なし)、新 axiom なし、AxiomsCheck 問題なし。**turn-idle 挙動の確認**: 前 tick で診断した
+  「turn 完了 → 指示待ち」は、ユーザーの一言 + issue 誘導で解消し即 genuine work に復帰。
+  トレンド: genuine landing 6/6、churn 0。数学の質・規律とも keep 相当を維持。

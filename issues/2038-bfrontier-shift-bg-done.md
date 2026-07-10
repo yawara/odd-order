@@ -785,3 +785,118 @@ S15_HonestTypeP2A0 に mu_row0 engine (mu_row0_ne proven / tauS_mu_row0_{diff_su
   ψ P-support 未 field ゆえ要追加調査]、(ii) 1 → u、(iii) W₁^# → 1 [prime-TI residue 9014/
   S13_PrimeTIResidueBridge grounding]) + **部品 C** (z∈S−S′ → z ~ x·y、x∈W₁^#、y∈W₂ の分解) +
   assembly (pointwise → support ⊆)。B(iii)/C が深い — 次 iter は B の部品在庫精査から。
+
+## 📋 (2026-07-10 続¹⁴、lane-b /loop iter 8) — 部品 B 診断: gate = mu-grounding (3002 残の b-side field)
+
+**発見**: S15_HonestTypeP2A0 に (13.18) 用 engine が **proven で 2 本既存**:
+- `Hypothesis.residueS_mu2_diff_support` (:758) — residue grid の equal-degree 列差 μ2_ij−μ2_ik が
+  A₀(S)-supported (§6 certainType_diff_supp_subset_A0 @ hyp46S で実証明済)。
+- V-value engine (:806+) — τ_S(μ2 差)(v) = δ(ω^σ差)(v) on V_S。
+両 engine の注記が明言: **残 gap = grid grounding `hyp.mu = residueS.mu2` (b-side field、9076/3002 予告) のみ**。
+
+**部品 B の診断**:
+- B(iii) (W₁^# → μ_0j = 1): mu_definition から直接出そうとすると Ind_W^S の W₁^# 値計算 =
+  prime-TI/N_S(W) 幾何に落ちる (9014 系) — **grounding 経由が正道** (residue 側は
+  prTIirr 値 API を既に持つ)。
+- B(i) (S′∖P → 0): mu_definition (行差 W^S-supported) + mu_colSum_eq_induce (Σ = Ind_{S′}ψ) +
+  ψ の P-support (未 field) — こちらも grounding 経由なら residue API から一括の可能性。
+- B(ii) (1 → u): colSum degree + 行一致 (grounding 不要で可能そうだが単独では使い道薄)。
+
+**∴ 次の作業単位 = mu-grounding field の設計+追加** (SubcoherenceInputs.Hypothesis、b 所有):
+S15.Hypothesis の producer は未構成 (grep で不在確認 — 仮説 carrier) ゆえ **field 追加の producer
+追従は現状不要**、3002 の「7 grid property fields 追加」先例と同型の自律 carrier enrichment。
+設計課題: residueS は hG-依存 (hyp.residueS hG) + index が Fin q vs Fin (Nat.card W1) で cast 要
+(NeZero instances)。field は hG-quantified 形 (`∀ hG, mu i j = (residueS hG).mu2 (castIdx i) (castIdx j)`)
+か、s06S の card 同定 (q_eq_card_W1 系) を介した enum-free 形か — 次 iter で residueS/mu2 の型を
+精査して設計確定 → field 追加 → tauS_mu_row0 pins (S15_HonestTypeP2A0:877/891 sorry) の discharge →
+B(i)/(iii) → PVSbeta assembly。
+
+## 📋 (2026-07-10 続¹⁵、lane-b /loop iter 9) — grounding 設計確定: 「性質 field 化」(3002 同型、循環回避)
+
+- **scan 訂正**: S15_HonestTypeP2A0 (b 系列 9076 file、git log 確認) に実 sorry **3 本**が残存
+  (前回の b-owned scan の対象 glob 外だった): `mu_row0_ne` (:739 hoff 直交のみ sorry) /
+  `tauS_mu_row0_diff_support` (:881) / `tauS_mu_row0_vanish_on_V` (:899)。3 本とも
+  「grounding 後は proven engine (residueS_mu2_diff_support / V-value engine / mu2 直交) の
+  rewriting」と docstring 明記。
+- **grounding field の設計判断**: `mu = residueS.mu2` を S15.Hypothesis の field に直接書くのは
+  **不可** — residueS は Hypothesis 自身を引数に取る def (S13_PrimeTIResidueBridge:75) ゆえ循環。
+  正道 = **grounding の帰結を性質 field 化** (3002「7 grid property fields」と同型、構成可能性 =
+  spine 構成時に mu := residueS.mu2 と置けば discharge 可能なので sound、hoisted-conclusion には
+  非該当)。候補 field: `mu_orthonormal` (grid 全体 pairwise 直交 — mu_row0_ne の hoff を閉じる) +
+  B(iii) 用の W₁-値 or (4.8) residue-値 field (residueS.mu2 の対応 API を S13 で確認してから確定)。
+- 次 iter: S13_PrimeTIResidueBridge の mu2 API 精査 (orthonormality / W₁^# 値 / degree) →
+  field リスト確定 → SubcoherenceInputs.Hypothesis へ追加 (producer 未構成ゆえ追従なし、
+  ただし既存 mock/instance が repo に無いか grep してから) → mu_row0_ne 等 discharge。
+
+## 📋 (2026-07-10 続¹⁶、lane-b /loop iter 10) — PrimeTIResidueData API 精査完了、field 設計最終形
+
+**PrimeTIResidueData (9014) の在庫**: mu2 (IrreducibleCharacter grid) / **mu2_orthonormal** (4.3.b) /
+**chi_eq_restrict** (chi j = Res_{PU}(mu2 0 j)、restriction の i-独立 = (4.5.a)) /
+**induce_chi_eq_sum** (Ind_{PU}(chi j) = Σ_i mu2 i j) / chi_zero / cfker_prTIres (4.5.b) /
+prTIres_irr_cases (残: 全て posited-field、constructor ofS06Hypothesis で discharge 済の設計)。
+
+**B 部品との対応**:
+- B(i) (S′∖P → μ_0j = 0): chi_eq_restrict + induce_chi_eq_sum + cfker 系で residue 側は完結可能
+  (Coq と同じ Res/Ind 計算)。grounding 後に S15 側へ transport。
+- B(ii) (1 → u): induce_chi_eq_sum の degree + chi_zero。
+- **B(iii) (W₁^# → 1) の真の gap = prTIirr_id (Coq PFsection4) 相当の W₁^#-値が PrimeTIResidueData
+  に未 port** — cyclicTIiso 由来の mathcomp theorem で、9014 の port は distinctness/支持/V-値まで。
+  正道 = PrimeTIResidueData に W₁-値 field を追加 (他 fields と同じ posited パターン、constructor
+  拡張は 9014 続き) — ただし構造は shared (b port、9014)、constructor ofS06Hypothesis の追従が要る
+  (field 追加 = constructor red → discharge 実装まで 1 unit)。
+- S15.Hypothesis 側の性質 field 化 (mu_orthonormal / mu_res_row_indep / mu_W1_value) は
+  residue 側が揃ってから一括が効率的。
+
+**工程再評価**: (13.18) full port = 9014 拡張 (W₁-値 field + constructor discharge) →
+S15 grounding fields → pins/mu_row0_ne discharge → PVSbeta assembly の multi-session 級。
+部品 D/A は landed 済、B/C は上記経路で継続。次 iter: 9014 の constructor
+(ofS06Hypothesis) の W₁-値 discharge 可能性を精査 (S06 側に W₁-restriction 値があるか) —
+可能なら field+constructor を 1 commit で。
+
+## 📋 (2026-07-10 続¹⁷、lane-b /loop iter 11) — B(iii) への残 gap が 2 点に絞れた
+
+**ofS06Hypothesis constructor 精読**: mu2 i j := (columnFamily (charGroupW2Equiv j)).mu i —
+全 field が S06 定理で discharge 済 (mu2_orthonormal/chi_res/ind_chi/chi_zero/cfker/dichotomy)。
+**同 file に mu2Grid (σ-grounding) が移設済**: `mu2Grid_eq_sign_smul_sigma_omega` = **μ = δ·σ(ω)**
+(sign ±1 = mu2GridSign) + mu2Grid_orthonormal/injective。
+
+**∴ B(iii) (μ_0j(x)=1 on W₁^#) への残 gap は 2 点**:
+1. **σ(ω) の W₁^#-値 API**: TICyclicHypothesis の σ (cyclicTIiso (3.2)) が W 上で ω とどう関係するか
+   (Coq prTIirr_id の中身 = cycTI の W-値 identity)。x∈W₁^# で σ(ω_0j)(x) = ω_0j(x) = 1
+   (ω_0j の W₁-part = trivial)。TICyclicHypothesis の値 API の有無を次 iter で精査。
+2. **columnFamily.mu ↔ mu2Grid の同定**: residueS の mu2 は columnFamily 経由、σ-値は mu2Grid 経由 —
+   両 μ-grid の同定 (どちらも orthonormal + 同 column 構造だが identification が要る;
+   「σ-grounding down-payment」の表現は full 接続が未了を示唆)。
+
+どちらも 9014 の続き (cyclicTIiso port の残り)。gap 1 が閉じれば B(iii) は
+mu2Grid_eq_sign_smul_sigma_omega + σ-値 + δ の (4.4)-normalization (delta_zero_eq_one 系) で組める。
+
+## 📋 (2026-07-10 続¹⁸、lane-b /loop iter 12) — gap 1 の正体確定: σ(ω) の W₁^#-値 (Coq primeTIirr_spec 内蔵)
+
+- repo σ-値 API は **V 上のみ** (`sigma_apply_of_mem_V` (3.5.a)、S05_SigmaIsometry:327)。W₁^# は V 外。
+- Coq `prTIirr_id : {in W :\: W2, mu2_ i j =1 delta_ j *: w_ i j}` (PFsection4:403) の証明は
+  `by case: primeTIirr_spec` — **W∖W₂-値 (W₁^# 込み) は primeTIirr_spec (:288-387、dirr_dIirr 構成)
+  に内蔵**。repo の mu2Grid は同 spec の「σ(ω) = δ•μ 大域一致」半分を port 済
+  (`sigma_omega_eq_mu2GridSign_smul_mu2Grid`) ゆえ、**B(iii) は完全に「σ(ω_0j)(x) = ω_0j(x) = 1
+  for x ∈ W₁^#」= cycTI の W∖W₂-値拡張に帰着**。
+- 理論構造メモ: `eq_sigma_of_apply_eq_on_V` (:814) の存在は V-値+直交で σ-image が pin される
+  構造を示唆 — W₁^#-値の port は (a) primeTIirr_spec の W∖W₂ 拡張値を Coq :288-387 から直 port、
+  (b) V-値 + ‖·‖ + 整数値 ((3.9.c)) から W₁^#-値を再導出、の 2 route。次 iter: Coq :288-387 の
+  該当補題 (spec の W∖W₂ 成分がどの cycTI 原理から出るか) を精読して route 選択。
+
+## 📋 (2026-07-10 続¹⁹、lane-b /loop iter 13) — primeTIirr_spec 精読完了: port 最深部 = equiv_restrict_compl_ortho
+
+**Coq primeTIirr_spec (:288-387) の W∖W₂-値 (c) の導出構造**:
+1. `isoV2 := normedTI_isometry normedTI_prTIset` — **W∖W₂ が S 内 normedTI** ⟹ Ind が
+   Z[Sj, W∖W₂] 上 isometry。
+2. `vchar_isometry_base` — isometry image の signed-irr 抽出 (repo mu2Grid が対応済の部分)。
+3. **`equiv_restrict_compl_ortho`** (mathcomp、:361) — V2base (CF(W, W∖W₂) の ew-基底) との
+   内積一致から **W∖W₂ 上の pointwise 値一致** を出す同値原理。muW = δ·μ grid が基底内積で
+   ω と一致 → `{in W :\: W2, mu2 =1 δ·ω}` (= prTIirr_id)。
+**⟹ B(iii) port の残 3 部品**: (i) normedTI (W∖W₂) S W 相当 (TICyclicHypothesis field
+の有無要確認 — G2 で W₁-class normedTI は触った)、(ii) equiv_restrict_compl_ortho の
+repo 対応 (grep 未ヒット → 新規 port、mathcomp character theory 一般原理、
+Frobenius-reciprocity + 基底展開で self-contained に証明可能な見込み)、(iii) 両者の合成で
+prTIirr_id 対応 (`mu2Grid_apply_eq_of_mem_W_sub_W2`) を mu2Grid API に追加。
+これが (13.18)/(13.19) cluster の真の最上流 — 9014 continuation として次 session/iter で
+equiv_restrict_compl_ortho port から着手。
