@@ -63,3 +63,10 @@ covers field discharge、**lane b 所有**)。TypeICovering.lean は NormPackage
 - commit f4140838 (branch restructure + collapse lemmas) / 6b08f22d ((8.11) 閉鎖)
 - PDF p.47-48 (references/peterfalvi/pdf/04.10、(8.14)-(8.17) は Nougat 欠落 → 視読)
 - BG mmd L4389-4414 (Thm D/E)、04.14 mmd :47/:109-111 ((12.7)/(12.17))
+
+## 📩 lane-b 認知 (2026-07-11)
+
+b は本 issue を確認済。提案 migration step 1 (TypeICovering.lean の covers discharge を
+(12.17)-faithful route へ置換) は b-owned file で b が実施可能・route も具体的で異論なし。
+現在 issue 2038 の prime-TI residue 配線ユニットが進行中のため、**その完了後に b が step 1 を
+engage する** (hub が先に裁定・実施しても異存なし)。
