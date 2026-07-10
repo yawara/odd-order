@@ -17,19 +17,6 @@ open scoped BigOperators
 
 variable {G : Type*} [Group G]
 
-/-- Two Peterfalvi (2.2) hypotheses on the same support and subgroup are equal once their
-`H`-fields agree.  The `H`-field is the only data field; all other fields are propositions. -/
-private theorem dadeHypothesis_eq_of_H_eq [Fintype G] {A : Set G} {L : Subgroup G}
-    {h₁ h₂ : OddOrder.Peterfalvi.S04.Hypothesis G A L}
-    (hH : ∀ a, h₁.H a = h₂.H a) : h₁ = h₂ := by
-  obtain ⟨s₁, l₁, n₁, H₁, c₁, ce₁, cd₁, hn₁, cc₁⟩ := h₁
-  obtain ⟨s₂, l₂, n₂, H₂, c₂, ce₂, cd₂, hn₂, cc₂⟩ := h₂
-  have hHeq : H₁ = H₂ := funext hH
-  subst hHeq
-  rfl
-
-
-
 open scoped Classical in
 /-- **Peterfalvi (14.9): assembling the T-side `S07.Hypothesis` (`hyp07`)** (issue 9072, steps 2--4)
 — the coherence-carrier constructor feeding `T_typeIII_calT1_coherent`.
@@ -551,7 +538,6 @@ theorem T_typeIII_coherent_image_inner_eta_eq_zero [Finite G]
   subst invertibleG
   haveI := hyp.base.finiteG
   classical
-  let side := (tSideDadeSupport_nonempty hG hyp).some
   let dataT := (OddOrder.Peterfalvi.S15.reconciled_typePData_T hG hyp.base).choose
   have hdata := (OddOrder.Peterfalvi.S15.reconciled_typePData_T hG hyp.base).choose_spec
   have hU : dataT.U = hyp.base.V := hdata.1
@@ -570,17 +556,6 @@ theorem T_typeIII_coherent_image_inner_eta_eq_zero [Finite G]
       OddOrder.GroupTheory.typePA0 hyp.base.T dataT := by
     rw [← hPA]
     exact Set.subset_union_left
-  have hA1norm : ∀ (l : ↥hyp.base.T) ⦃a : G⦄,
-      a ∈ OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T →
-        (l : G) * a * (l : G)⁻¹ ∈ OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T :=
-    side.dade.L_normalizes_A
-  let restricted := full.dade.restrict hA1A0 hA1norm
-  have hH : ∀ a, restricted.H a = side.dade.H a := by
-    intro a
-    rw [OddOrder.Peterfalvi.S04.Hypothesis.restrict_H,
-      full.H_eq_ftSupportKernel, side.H_eq_ftSupportKernel]
-    exact (OddOrder.Peterfalvi.S10.ftSupportKernel_restrict hA1A0 a.2).symm
-  have hdade : restricted = side.dade := dadeHypothesis_eq_of_H_eq hH
   have hζc : ζ.conj ∈ S := hconj hζ
   have hdiffSpan : ζ - ζ.conj ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.base.T) S :=
     Submodule.sub_mem _ (Submodule.subset_span hζ) (Submodule.subset_span hζc)
@@ -597,14 +572,8 @@ theorem T_typeIII_coherent_image_inner_eta_eq_zero [Finite G]
   have hmaps : tSideDadeMap hyp hG (ζ - ζ.conj) =
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap full.dade
         (full.dade.fullDadeIsometryData full.hconj) (ζ - ζ.conj) := by
-    rw [tSideDadeMap,
-      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support side.dade
-        (side.dade.fullDadeIsometryData side.hconj) hdiffSupp,
-      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support full.dade
-        (full.dade.fullDadeIsometryData full.hconj) hfullSupp]
-    rw [← hdade]
-    exact full.dade.dadeMap_restrict_apply hA1A0 hA1norm
-      ⟨ζ - ζ.conj, (ClassFunction.mem_supportedSubmodule).mpr hdiffSupp⟩
+    simpa only [full] using
+      tSideDadeMap_eq_full_typeP1DadeMap_of_support hG hyp dataT hP1 hdiffSupp
   have hextDiff : coh.extension ζ - coh.extension ζ.conj =
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap full.dade
         (full.dade.fullDadeIsometryData full.hconj) (ζ - ζ.conj) := by
