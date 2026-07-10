@@ -310,3 +310,16 @@ main 同期後、hub が指摘した 4 宣言の `sorryAx` を再現し、依存
 
 hub の差し戻し指示 1 に従い、`AxiomsCheck.lean` の4 assertを一時未登録とし、各箇所にこの既存
 transitive gate を明記した。`chiRhoCF_congr_hyp` の axiom-clean assert は維持する。
+
+## HUB 追記 (2026-07-10 夜): (ii) は b 待ち — c の次 frontier は T-side cluster
+
+- 残 obligation の現況: (i) `complementIndex_eq_pq_of_K_eq_V` = **実証明済み確認** /
+  (iii) parity+Bessel = **landing 済み** (merge beed4f70) / (ii) `exists_betaMGridData` =
+  c 特定の lane-b API 残修正 2 点 (phi_mem_Sset field / tau1 parameterize) 待ち。
+  b の次 frontier は (13.18)/(13.19) cluster (issues/2038) なので自然に解消見込み — **c は (ii) を
+  poll せず b の landing を待てばよい** (main sync で入ってくる)。
+- **c の次 frontier (上流優先 + 文書順、charter = T-side mirror)**: `SubgroupL.lean` の T-side
+  cluster (`T_typeIII_ratio_le` :747 / `T_not_isTypeIV_of_isTypeP1` :893 / `T_isTypeP2` :960 /
+  `tSide_caseB_v_gated_inputs` :1060) → `SubgroupM.lean` (`s_side_frobenius_kernel` :187 /
+  `t_side_caseB_fieldModel` :247) → `ComparingLM.lean` の sorried def 3 本 (:345-366)。
+  いずれも ungated (issue 4004/9013 の担当領域)。Coq 併読 = PFsection{8,14,16}.v。
