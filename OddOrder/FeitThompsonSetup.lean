@@ -294,7 +294,7 @@ The maximal pair `S, T`, their (non-)types, the "at least one Type II" disjuncti
 and the case-(b) trichotomy of (8.8).  These are the fields of `Section16Inputs`
 that mention only `S, T`.  Producer: `section16MaximalPair_of_isMinimalSimpleOdd`
 (BG §16 main results). -/
-structure Section16MaximalPair (G : Type*) [Group G] [Finite G] where
+structure Section16MaximalPairCore (G : Type*) [Group G] [Finite G] where
   S : Subgroup G
   T : Subgroup G
   S_maximal : S ∈ maximalSubgroups G
@@ -325,18 +325,24 @@ structure Section16MaximalPair (G : Type*) [Group G] [Finite G] where
   Kstar_hall : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa T) (Kstar.subgroupOf T)
   K_eq : K = BG.Ch3.S10.Msigma T ⊓ Subgroup.centralizer (Kstar : Set G)
   Z_cyclic : IsCyclic ↥(K ⊔ Kstar)
+  /-- **Peterfalvi (13.2.a)**: the `S`-member of the pair is of type `P₂` (Type II).  In the
+  canonical producer this is pinned via `isTypeP2_of_typeP_kappaHall_lt` on the smaller-κ
+  labelling; in the `M`-seeded producer it is the clean resolution of the `typeP_duality`
+  disjunction against `¬ IsTypeP2 M` (no (13.2.a) content; issue 1020 Phase 1a). -/
+  S_typeP2 : BG.Ch4.S14.IsTypeP2 S
+
+/-- **The κ-ordered maximal pair**: `Section16MaximalPairCore` together with the ordering
+`|K| < |K*|`.  The ordering is genuinely Peterfalvi-(13.2.a)-deep (its available proofs route
+through (10.10) ← (10.8)), so the (10.7)/(10.8) chain must consume only the order-free
+`Core` (issue 1020, the (13.2.a) circle); the `q < p`-pinned §15/§16 packaging keeps the
+full structure. -/
+structure Section16MaximalPair (G : Type*) [Group G] [Finite G]
+    extends Section16MaximalPairCore G where
   /-- **Ordering** `|K| < |K*|`: the pair is labelled so that the κ-Hall factor of `S` is the
   smaller of the two coprime factors of `W = K × K*`.  Established by relabelling `S ↔ T` in
   `exists_section16MaximalPair_data` (`card_kappaHall_ne_card_Kstar` makes the two orders distinct,
   so one of the two labellings has `|K| < |K*|`).  This pins the otherwise-ambiguous `q < p`. -/
-  K_lt_Kstar : Nat.card ↥K < Nat.card ↥Kstar
-  /-- **Peterfalvi (13.2.a)**: the smaller-κ member `S` of the pair (`|K| < |K*|`) is of type `P₂`
-  (Type II).  This pins the type-duality disjunction `IsTypeP2 S ∨ IsTypeP2 T` (BG Theorem 14.7,
-  which carries no order information) onto the side fixed by `K_lt_Kstar`.  Supplied by
-  `section16MaximalPair_of_isMinimalSimpleOdd` via `isTypeP2_of_typeP_kappaHall_lt`; it is the
-  determinate type the §15 `basic_structure` carrier wiring consumes
-  (`exists_typePData_W1_eq_of_isTypeP2`, relane #4 / issues 4009/2019). -/
-  S_typeP2 : BG.Ch4.S14.IsTypeP2 S
+  K_lt_Kstar : Nat.card ↥toSection16MaximalPairCore.K < Nat.card ↥toSection16MaximalPairCore.Kstar
 
 /-- **BG §14 type-P duality / cyclic-counting output** — *owned by lane-f*.
 
