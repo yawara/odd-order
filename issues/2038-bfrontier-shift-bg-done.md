@@ -1031,3 +1031,46 @@ eq_sigma_of_apply_eq_on_V の statement 精読から (これが刺されば norm
   g-support 制約 + TI で全部 H 内 → class-fn 値 g(a) に collapse — induce_apply_eq_sum_filter /
   induceTerm API [Machinery135 の induce_one_apply と同系])。~60 行 self-contained。
   次 iter: これを実装 (置き場 = SupportedSpanOrthogonality or InducedCharacter 追記)。
+
+## ✅ (2026-07-11、lane-b /loop iter 23) — TI→Ind-isometry landed (step a の h_isom 入力完成)
+
+iter 22 設計どおり実装 (commit d9625eed、InducedCharacter.lean 新 section TIInduction、
+full build 4147 green・AxiomsCheck OK):
+
+- **`induce_apply_coe_of_isTISubset`** (TI 値恒等式 = Isaacs CTFG Lemma 7.7 identity part / Coq
+  `normedTI_Ind_id`): A TI (normalizer-bound H)、θ off-A 消滅 ⟹ `Ind_H^G θ (↑a) = θ a` on A。
+  証明 = induction sum の直接計算: off-H conjugator の非零項は A の 2 共役 overlap を作り TI で
+  conjugator ∈ H に矛盾 / in-H 項は conj_eq で各 θ a → ⅟|H|·|H|·θ a。
+- **`inner_induce_eq_of_isTISubset`** (isometry part / Coq `normedTI_isometry`): θ,ψ off-A 消滅 ⟹
+  `⟨Ind θ, Ind ψ⟩_G = ⟨θ,ψ⟩_H`。reciprocity + 値恒等式 + disjoint-support 直交の 3 行合成。
+- 一般 CommRing k で成立 (StarRing は isometry のみ)。Coq の Dade-経由 (`normedTI_Dade`) を
+  回避した self-contained 直接証明 ~100 行。新 import = GroupTheory.TISubset (mathlib-only leaf)。
+
+**次 iter (step a 本体)**: 列ごと signed family 抽出 — fixed W₂-char ψ の族 {ω(ω₁ⁱ·ψ)}ᵢ
+(0-anchored、degree 1、distinct) の差族に `isometry_difference_pair_structure` を適用。
+h_isom 入力 = 本 commit の `inner_induce_eq_of_isTISubset` (hTI : IsTISubset (W∖W₂ G-level) W
+仮説パラメータ; supported 側は ω-差族の W∖W₂-supported [landed 済])。突合せ点:
+isometry_difference_pair_structure の τ-引数形 (linear map か pairwise inner 条件か) を精読し、
+τ := Ind_W^S に instantiate できる形か確認 → 列間整合 (Coq inj_Imu、直交性) は次々 iter。
+
+## ✅ (2026-07-11、lane-b /loop iter 24) — step a 完成: TI 誘導の signed family 抽出 (generic)
+
+新 shared leaf `GroupTheory/RepresentationTheory/TIInducedFamily.lean` (commit d067219d、
+一発 green、full build 4148・AxiomsCheck OK):
+
+- **`induce_difference_pair_structure_of_isTISubset`**: A TI (bound H)、n≥2 個の等次数 distinct
+  irreducible χᵢ が off-A 一致 ⟹ ∃ SignedIrreducibleDifferenceFamily (n 個の distinct μᵢ + 一様
+  符号 ε) で `Ind_H^G(χᵢ−χ₀) = ε•(μᵢ−μ₀)`。iter 23 の TI-isometry + (1.4)
+  isometry_difference_pair_structure の合成 (ZIrr = induce_mem_ZIrr / degree-0 = induce_apply_one /
+  isometry = inner_induce_eq_of_isTISubset)。Ind の ℤ-linear bundle は inline 構成。root 登録済。
+
+**次 iter (列間整合 = Coq inj_Imu :296-330 の Lean 版)**: 組合せ補題を IsometryDifferencePair.lean に
+追加 — 2 つの SignedIrreducibleDifferenceFamily (n,m ≥ 2) が全 difference 直交
+(`⟨data.difference i, data'.difference j⟩ = 0 ∀i,j`) ⟹ **μ-grid 全体 disjoint**
+(`data.mu i ≠ data'.mu j ∀i,j`)。**導出精査済 (このセッション)**: a_ij := [μᵢ=μ'ⱼ] の Kronecker
+展開 E(i,j): a_ij − a_i0 − a_0j + a_00 = 0 (irreducibleCharacter_inner_sub_sub_eq_ite 既存) から
+(1) a_00=1 なら i,j≠0 で −a_ij=1 矛盾 → anchors distinct、(2) a_i0=1 (i≠0) なら a_ij=1+a_0j≥1 ∀j≠0
+→ μ' 単射性矛盾 (m≥2 で足りる) → 縁 0、(3) a_ij = a_i0+a_0j = 0。sign は ⟨εd, ε'd'⟩=εε'⟨d,d'⟩ で
+消える (per-column 符号差は (1.3.b) の orthonormality に影響しない — dmu_k := ε_col•μ_k は常に
+orthonormal)。その後: prime-TI instantiation (列 = fixed W₂-char、ω-grid → hTI 仮説パラメータ) →
+hInd (列抽出+pairing collapse) → (1.3.b) → (3.9.a) → prTIirr_id。

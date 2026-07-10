@@ -88,6 +88,7 @@ import OddOrder.GroupTheory.RepresentationTheory.LineScalarCharacter
 import OddOrder.GroupTheory.RepresentationTheory.TypePGaloisUBound
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialSinger
 import OddOrder.GroupTheory.RepresentationTheory.SkolemNoether
+import OddOrder.GroupTheory.RepresentationTheory.TIInducedFamily
 import OddOrder.GroupTheory.RepresentationTheory.WielandtCounting
 import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
 import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
