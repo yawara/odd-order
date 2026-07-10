@@ -106,3 +106,47 @@ class-sum 合同) に加え、class sum と無関係な汎用補題を同居さ�
   現需要は充足)、Theorem131 (§2 解消後)。
 - 評価詳細: moore57 `plans/reference/research_oddorder_main_usable_theorems.md`
   「2026-07-10 続: 採用判定」節。
+
+## HUB RULING (2026-07-10、hub 自律裁定)
+
+**検証**: 主要 claim を hub が現物確認 — ClassSumCongruence = 実測 1833 行 ✓ /
+`card_sylow_{p,q}_of_card_eq_sq_mul_prime` = `private lemma` (L39/53)、cube 版は public ✓ /
+二重 qualified namespace wart = ChainNilpotent.lean:771/776 の full-qualified 呼びで実害 ✓。
+カタログの質は高く、work-order でない旨の切り分けも適切。受理する。
+
+**方針 (FT-path policy との整合)**: 本カタログは FT 数学を前進させないため**レーンには一切
+振らない** (a/b/c の frontier 不変)。一方 file-granularity enforcement と shared-foundation
+hygiene は hub の既存 duty であり、以下のとおり hub が引き取る。
+
+### batch 1 — hub 実施 (次の quiet window = 全レーン未マージ 0 の tick で「変化なし」の代わりに実施)
+
+Theorem131 / ClassSumCongruence はともに最上流 (Ch01/GroupTheory) で編集 = 準 full rebuild ゆえ、
+**1 バッチにまとめて rebuild 代を 1 回で払う**:
+
+1. **P1-2**: `card_sylow_{p,q}_of_card_eq_sq_mul_prime` の de-private (cube 版との visibility 統一)。
+   sharpened 直接形 (`¬ q ∣ p²−1` ⟹ Sylow-q 正規) は de-private で足りるか moore57 の実需で判断
+   (まず de-private のみ)。
+2. **P1-1**: ClassSumCongruence から generic 補題 8 本を提案どおりの行き先へ抽出
+   (GroupAction 軽量 leaf / ConjClasses / Sylow / 共役類 / Algebra-AlgInt 系)。元 file には
+   re-export しない (下流は新 leaf を direct import; 本 repo 内 consumer は hub が張り替え)。
+   1833 行 → 大幅減で 2000 天井からも離れる。
+3. **P3-5**: namespace wart — 定義サイトを単一 namespace に移し、旧名は `@[deprecated]` alias
+   温存 (moore57 pin 破壊回避)。ChainNilpotent 2 call-site を追従。
+4. **P2-3 の dup 疑い 3 件** (`sum_pow_val_eq_zero`/`orbitSetoid`/`perm_pow_val_add`) を mathlib
+   照合し、実 dup なら wrapper 方針どおり redirect。
+5. P3-7 (`wielandt_card_combine` 沈降) は上記のついで実施可、P3-9 (docstring 言語) は新規英語
+   収束のみ (既存の一括書換はしない)。
+
+### queue (トリガー付き、実施保留)
+
+- **P2-3 (CyclicPermEigenCount 一般化)・P2-4 ((1.10) 合成 corollary 等)**: トリガー = FT レーンが
+  同 API を実需で要求した時 (その時点で supply として実施、carve-out は不要 — shared foundation)。
+  ⚠ **P2-4 末尾の (13.10) 平均化形は b の §13 cascade が将来必要とする可能性が高い** — b が
+  (13.10) averaging に到達したら本カタログの該当項を supply 形で実施すること (b 宛メモ)。
+- P3-6 (`fixedSubgroup` API 拡充)・P3-8 (文書所在ずれ): 同上 (低優先 catalog)。
+
+### moore57 への返答要点 (ユーザー経由)
+
+検査 10 定理 transitive axiom-clean の確認と具体的 findings に感謝。P1 は batch 1 で解消予定、
+P2 はトリガー付き queue (moore57 側 HOLD トリガーと対応)。upstream 候補メモ (card-dvd 系の
+mathlib 配置) は将来の PR 解禁時に利用する。
