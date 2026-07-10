@@ -475,7 +475,7 @@ noncomputable def betaDecomp (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     data.ind1H data.ind1H_ne_zero data.triv data.zeta_deg_match
     data.coh.extension data.nu_isometry (data.hagree hG)
     (OddOrder.Peterfalvi.S14.witness_L_hzeta0nu hG data.typeIHyp data.hFrob data.coh
-      (data.θ 0) data.theta_zero_ne_trivial)
+      (data.typeIA_eq_sharp hG) (data.θ 0) data.theta_zero_ne_trivial)
     data.zeta_zero_norm_one
     (Classical.choose (exists_betaDecomp_a (data.h78 hG)
       (Submodule.sub_mem _

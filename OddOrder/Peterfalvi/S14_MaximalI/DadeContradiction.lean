@@ -261,6 +261,528 @@ theorem psi_constant_on_xK [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   intro g hg
   exact orthogonal_character_constant_on_coset hG hypM data_M horth hxM hxK g (hHK ▸ hg)
 
+/-- The witness `x` lies in `L` (via `x ∈ P₀ ⊆ L_F ≤ L`, Peterfalvi (12.10)). -/
+theorem witness_x_mem_L [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
+    data.x ∈ data.L :=
+  OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le data.L
+    (witness_P0_le_kernel hG data data.x_mem_P0)
+
+/-- **Peterfalvi (12.1)/(12.10) for the witness `L`: `A(L) = L_F^#`** — the (12.7)-free form.
+The witness `L` is Frobenius by (12.10) (`witness_L_frobenius`, proved from minimality alone), so
+`typeIA_eq_sharp_of_frobenius` applies directly.  The general `Hypothesis.typeIA_eq_sharp` routes
+through (12.7) `typeI_frobenius` = `pi_empty` = the (12.16) contradiction itself, so it must not
+be used in the (12.16) supply chain (circularity). -/
+theorem witness_typeIA_eq_sharp [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
+    (hyp : Hypothesis data.L) :
+    OddOrder.GroupTheory.typeIA data.L hyp.typeI = (hyp.typeI.typeF.H : Set G) \ {1} := by
+  obtain ⟨frob, -⟩ := witness_L_frobenius hG data
+  have hKf : frob.typeI.typeF.H = hyp.typeI.typeF.H := by
+    rw [frob.typeI.typeF.H_eq, hyp.typeI.typeF.H_eq]
+  exact hyp.typeIA_eq_sharp_of_frobenius (hKf ▸ frob.frobenius)
+
+/-- The witness `x` lies in the type-I support `A(L) = L_F^#` (Peterfalvi (12.1)/(12.10)):
+`x ∈ P₀ ⊆ L_F = typeF.H` and `x ≠ 1`. -/
+theorem witness_x_mem_typeIA [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
+    (hyp : Hypothesis data.L) :
+    data.x ∈ OddOrder.GroupTheory.typeIA data.L hyp.typeI := by
+  rw [witness_typeIA_eq_sharp hG data hyp]
+  refine Set.mem_diff_of_mem ?_ (by simpa using data.x_ne_one)
+  rw [SetLike.mem_coe, hyp.typeI.typeF.H_eq]
+  exact witness_P0_le_kernel hG data data.x_mem_P0
+
+/-- **The witness maximal pin `𝓜(C_G(x)) = {M}`** (Peterfalvi (12.9)/(12.14), the `N[x] = M`
+identification).  The witness `x ∈ Ω₁(P₀)^# ⊆ L_F = L_σ` is a `σ`-sharp element of `L` escaping
+`L` (`C_G(x) ⊄ L`, (12.9)), so the BG Theorem-D singleton
+(`maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape`) pins a unique
+maximal over `C_G(x)`; it is `M` because `C_G(x) ≤ N_G(⟨x⟩) ≤ M` ((12.9)). -/
+theorem witness_maximalContaining_centralizer_eq_singleton [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
+    OddOrder.GroupTheory.maximalSubgroupsContaining
+      (Subgroup.centralizer ({data.x} : Set G)) = {ctr.M} := by
+  classical
+  have hLtypeI : IsTypeI data.L := witness_L_isTypeI hG data
+  have hLF_eq : maxNilpotentNormalHall data.L = OddOrder.BG.Ch3.S10.Msigma data.L :=
+    (OddOrder.BG.Ch4.S16.proposition_type_classification hG data.L_maximal).2.2.2.2.2.mpr
+      (Or.inl hLtypeI)
+  have hxσ : data.x ∈ OddOrder.BG.Ch4.S14.sigmaSharp data.L :=
+    ⟨hLF_eq ▸ witness_P0_le_kernel hG data data.x_mem_P0, by simpa using data.x_ne_one⟩
+  have hCM : Subgroup.centralizer ({data.x} : Set G) ≤ ctr.M := by
+    refine le_trans ?_ data.normalizer_closure_x_le_M
+    rw [← Subgroup.centralizer_closure]
+    exact Subgroup.centralizer_le_normalizer _
+  obtain ⟨N₀, hN₀⟩ :=
+    OddOrder.BG.Ch4.S16.maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape
+      hG data.L_maximal hxσ data.centralizer_x_not_le_L
+  have hMN₀ : ctr.M = N₀ := by
+    have hMin : ctr.M ∈ OddOrder.GroupTheory.maximalSubgroupsContaining
+        (Subgroup.centralizer ({data.x} : Set G)) := ⟨ctr.M_maximal, hCM⟩
+    rw [hN₀] at hMin
+    exact hMin
+  rw [hN₀, hMN₀]
+
+/-- **Peterfalvi (12.14), `R(x) = C_K(x) ⊆ K`** (Definition (8.14) at the witness): the faithful
+Dade kernel of the witness `x` lands in `K = M_F`.  On the escaping branch the kernel is
+`R(x) = (N[x])_σ ⊓ C_G(x)` with `N[x] = M` (the singleton pin
+`witness_maximalContaining_centralizer_eq_singleton`) and `M_σ = M_F = K` for the type-I
+counterexample (`MF_eq_Msigma`); the non-escaping branch is `⊥`.  Stated for an arbitrary
+support set `A` (the escaping branch does not depend on it). -/
+theorem witness_ftSupportKernel_le_K [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
+    {A : Set G} :
+    OddOrder.Peterfalvi.S10.ftSupportKernel data.L A data.x ≤ ctr.K := by
+  classical
+  by_cases hesc : data.x ∈ OddOrder.GroupTheory.escapingCentralizerSet data.L A
+  · rw [OddOrder.Peterfalvi.S10.ftSupportKernel_eq_of_escaping hesc]
+    -- The branch condition of `FT_signalizerBase`: `1 < |𝓜_σ(x)|` and `𝓜(C_G(x)) ≠ ∅`.
+    have hLtypeI : IsTypeI data.L := witness_L_isTypeI hG data
+    have hLF_eq : maxNilpotentNormalHall data.L = OddOrder.BG.Ch3.S10.Msigma data.L :=
+      (OddOrder.BG.Ch4.S16.proposition_type_classification hG data.L_maximal).2.2.2.2.2.mpr
+        (Or.inl hLtypeI)
+    have hxLσ : data.x ∈ OddOrder.BG.Ch3.S10.Msigma data.L :=
+      hLF_eq ▸ witness_P0_le_kernel hG data data.x_mem_P0
+    have hsing := witness_maximalContaining_centralizer_eq_singleton hG data
+    have hgt : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement data.x).ncard := by
+      by_contra h
+      push Not at h
+      exact data.centralizer_x_not_le_L
+        (OddOrder.BG.Ch4.S16.centralizer_le_of_maximalSigma_le_one hG data.L_maximal hxLσ
+          data.x_ne_one h)
+    have hne : (OddOrder.GroupTheory.maximalSubgroupsContaining
+        (Subgroup.centralizer ({data.x} : Set G))).Nonempty := by
+      rw [hsing]
+      exact ⟨ctr.M, rfl⟩
+    have hcond : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement data.x).ncard ∧
+        (OddOrder.GroupTheory.maximalSubgroupsContaining
+          (Subgroup.centralizer ({data.x} : Set G))).Nonempty := ⟨hgt, hne⟩
+    -- `N[x] = M`: the chosen member of the singleton `𝓜(C_G(x)) = {M}`.
+    have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase data.x = hcond.2.choose := dif_pos hcond
+    have hch : hcond.2.choose ∈ ({ctr.M} : Set (Subgroup G)) :=
+      (Set.ext_iff.mp hsing _).mp hcond.2.choose_spec
+    have hbase : OddOrder.BG.Ch4.S16.FT_signalizerBase data.x = ctr.M :=
+      hb.trans (Set.mem_singleton_iff.mp hch)
+    calc OddOrder.BG.Ch4.S16.FT_signalizer data.x
+        ≤ OddOrder.BG.Ch3.S10.Msigma (OddOrder.BG.Ch4.S16.FT_signalizerBase data.x) :=
+          inf_le_left
+      _ = ctr.K := by rw [hbase, ← MF_eq_Msigma hG ctr]
+  · rw [OddOrder.Peterfalvi.S10.ftSupportKernel_eq_bot_of_not_escaping hesc]
+    exact bot_le
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.14), the `ψ^ρ(x) = ψ(x)` collapse**: any `χ ∈ CF(G)` constant on the coset
+`x·K` (e.g. `ψ = dade.psi`, via `psi_constant_on_xK`) has `ρ`-average at the witness `x` equal to
+its value: `χ^ρ(x) = χ(x)`.  The local Dade kernel is `H(x) = R(x) ⊆ K`
+(`H_eq_ftSupportKernel` + `witness_ftSupportKernel_le_K`), so the `x·K`-constancy restricts to
+the `H(x)`-coset and the `ρ`-average collapses (`chiRho_apply_eq_of_forall_coset`). -/
+theorem witness_chiRho_apply_eq_of_forall_K [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
+    (hyp : Hypothesis data.L) (χ : ClassFunction G ℂ)
+    (hconst : ∀ g : G, g ∈ ctr.K → χ (data.x * g) = χ data.x)
+    (hxL : data.x ∈ data.L) :
+    hyp.toHypothesis71.chiRho χ ⟨data.x, hxL⟩ = χ data.x := by
+  have hxA : ((⟨data.x, hxL⟩ : ↥data.L) : G) ∈ OddOrder.GroupTheory.typeIA data.L hyp.typeI :=
+    witness_x_mem_typeIA hG data hyp
+  refine OddOrder.Peterfalvi.S09.Hypothesis71.chiRho_apply_eq_of_forall_coset
+    hyp.toHypothesis71 χ hxA ?_
+  intro y hy
+  refine hconst y (witness_ftSupportKernel_le_K hG data
+    (A := OddOrder.GroupTheory.typeIA data.L hyp.typeI) ?_)
+  rw [← hyp.dadeData.H_eq_ftSupportKernel ⟨data.x, hxA⟩]
+  exact hy
+
+/-- **The witness `L` is not conjugate to `M`** ((12.14): "`p` divides `|L_s|` but not `|M_s|`").
+`P₀ ≤ L_F = L_σ` gives `p ∣ |L_σ|`, while `|M_σ| = |K|` is prime to `p` (`p_not_dvd_card_K`);
+a conjugation `L^g = M` would carry `L_σ` onto `M_σ` (`Msigma_conj_smul`), contradiction. -/
+theorem witness_L_not_conj_M [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
+    ¬ ∃ g : G, MulAut.conj g • data.L = ctr.M := by
+  rintro ⟨g, hg⟩
+  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  -- `p ∣ |P₀| ∣ |L_σ|`.
+  have hLtypeI : IsTypeI data.L := witness_L_isTypeI hG data
+  have hLF_eq : maxNilpotentNormalHall data.L = OddOrder.BG.Ch3.S10.Msigma data.L :=
+    (OddOrder.BG.Ch4.S16.proposition_type_classification hG data.L_maximal).2.2.2.2.2.mpr
+      (Or.inl hLtypeI)
+  have hP0le : ctr.P0 ≤ OddOrder.BG.Ch3.S10.Msigma data.L :=
+    hLF_eq ▸ witness_P0_le_kernel hG data
+  haveI : Nontrivial ↥ctr.P0 := by
+    by_contra h
+    rw [not_nontrivial_iff_subsingleton] at h
+    exact ctr.P0_noncyclic isCyclic_of_subsingleton
+  obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp ctr.P0_pGroup
+  have hpP0 : ctr.p ∣ Nat.card ↥ctr.P0 := by
+    rcases Nat.eq_zero_or_pos n with h0 | hpos
+    · rw [h0, pow_zero] at hn
+      exact absurd hn Finite.one_lt_card.ne'
+    · rw [hn]
+      exact dvd_pow_self _ hpos.ne'
+  have hpLσ : ctr.p ∣ Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma data.L) :=
+    hpP0.trans (Subgroup.card_dvd_of_le hP0le)
+  -- Transport along the conjugation: `|L_σ| = |(L^g)_σ| = |M_σ| = |K|`.
+  have hcard : Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma data.L)
+      = Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma ctr.M) := by
+    rw [← hg, OddOrder.BG.Ch4.S14.Msigma_conj_smul]
+    exact Nat.card_congr
+      (Subgroup.equivSMul (MulAut.conj g) (OddOrder.BG.Ch3.S10.Msigma data.L)).toEquiv
+  rw [hcard, ← MF_eq_Msigma hG ctr] at hpLσ
+  exact p_not_dvd_card_K ctr hpLσ
+
+/-- **The counterexample prime is at least `3`** (`p` is an odd prime: `p ∣ [M:K] ∣ |G|` odd). -/
+theorem counterexample_three_le_p [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (ctr : CounterexampleHypothesis (G := G)) : 3 ≤ ctr.p := by
+  have hpG : ctr.p ∣ Nat.card G := by
+    have h1 : ctr.p ∣ (ctr.K.subgroupOf ctr.M).index := by
+      have := ctr.p_dvd_index
+      rwa [Subgroup.relIndex] at this
+    exact (h1.trans (Subgroup.index_dvd_card _)).trans (Subgroup.card_subgroup_dvd_card ctr.M)
+  have hpodd : Odd ctr.p := hG.odd.of_dvd_nat hpG
+  have h2 := ctr.p_prime.two_le
+  have hne : ctr.p ≠ 2 := fun h => by
+    rw [h] at hpodd
+    exact (by decide : ¬ Odd 2) hpodd
+  omega
+
+/-- **Peterfalvi (12.14), the `p² ≤ h` size input**: `P₀ ⊆ H = L_F` is a noncyclic `p`-group, so
+`p² ∣ |P₀| ∣ |H|`. -/
+theorem witness_p_sq_le_card_kernel [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
+    (hyp : Hypothesis data.L) :
+    ctr.p ^ 2 ≤ Nat.card ↥(hyp.typeI.typeF.H) := by
+  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp ctr.P0_pGroup
+  -- Noncyclic forces `n ≥ 2` (order `1` and order `p` groups are cyclic).
+  have hn2 : 2 ≤ n := by
+    by_contra h
+    push Not at h
+    interval_cases n
+    · rw [pow_zero] at hn
+      haveI : Subsingleton ↥ctr.P0 := Nat.card_eq_one_iff_unique.mp hn |>.1
+      exact ctr.P0_noncyclic isCyclic_of_subsingleton
+    · rw [pow_one] at hn
+      exact ctr.P0_noncyclic (isCyclic_of_prime_card hn)
+  have hp2 : ctr.p ^ 2 ∣ Nat.card ↥ctr.P0 := hn ▸ pow_dvd_pow _ hn2
+  have hP0H : ctr.P0 ≤ hyp.typeI.typeF.H := by
+    rw [hyp.typeI.typeF.H_eq]
+    exact witness_P0_le_kernel hG data
+  calc ctr.p ^ 2 ≤ Nat.card ↥ctr.P0 := Nat.le_of_dvd Nat.card_pos hp2
+    _ ≤ Nat.card ↥(hyp.typeI.typeF.H) :=
+        Nat.le_of_dvd Nat.card_pos (Subgroup.card_dvd_of_le hP0H)
+
+/-- **Peterfalvi (12.12), the `2e ≤ p + 1` bound in kernel-index form**: the witness complement
+order `e = [L : H]` satisfies `2e ≤ p + 1` (`two_mul_card_complement_le`, transported along
+`IsComplement'.index_eq_card` and the kernel identification `typeF.H = L_F`). -/
+theorem witness_two_mul_index_le_p_add_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
+    (hyp : Hypothesis data.L) :
+    2 * ((hyp.typeI.typeF.H).subgroupOf data.L).index ≤ ctr.p + 1 := by
+  obtain ⟨fdata, -⟩ := witness_L_frobenius hG data
+  have h2e := two_mul_card_complement_le hG data fdata
+  have hidx : ((fdata.typeI.typeF.H).subgroupOf data.L).index = Nat.card ↥fdata.complement :=
+    fdata.frobenius.isComplement.symm.index_eq_card
+  have hHeq : fdata.typeI.typeF.H = hyp.typeI.typeF.H := by
+    rw [fdata.typeI.typeF.H_eq, hyp.typeI.typeF.H_eq]
+  rw [hHeq] at hidx
+  omega
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+open OddOrder.Peterfalvi.S09 in
+open OddOrder.Peterfalvi.S09.Cert in
+/-- **Peterfalvi (7.8.a) for the witness `L`: `⟨ζ_0^ν, 1_G⟩ = 0`** (`hzeta0nu`, the last input to
+the (7.8.b) bound `hB`).  The abstract `IsCoherent` does not carry orthogonality to `1_G`, but it
+is recovered from the **complex conjugate** `ζ̄_0 = Ind θ̄_0 ∈ S` (`Sset_closedUnderConjugate`) — a
+second member of the *same degree*, distinct from `ζ_0` because `L` has odd order (no nontrivial
+real irreducible, `not_isReal_of_ne_trivial_of_odd_card'`).  `coherence_extension_orthogonal_constOne`
+then forces `⟨ν ζ_0, 1_G⟩ = 0`.  Holds for **any** nontrivial `θ_0` (degree-`e`/linearity unused). -/
+theorem witness_L_hzeta0nu [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {L : Subgroup G} (hyp : Hypothesis L) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+    (hAH : typeIA L hyp.typeI = ((hyp.typeI.typeF.H) : Set G) \ {1})
+    (θ0 : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L))
+    (hθ0 : θ0 ≠ trivialIrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L)) :
+    ClassFunction.inner
+        (coh.extension (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+          (θ0 : ClassFunction _ ℂ))) (Hypothesis71.constOne G) = 0 := by
+  classical
+  have hodd : Odd (Nat.card ↥L) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card L)
+  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+    rw [hyp.typeI.typeF.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
+  -- The complex conjugate character `θ̄_0` is again nontrivial irreducible.  Introduce it
+  -- **opaquely** (via `obtain`, not `let`), carrying only its coercion `↑θ̄_0 = (↑θ_0)‾`: a `let`
+  -- gets its coercion re-unfolded inside every `induce` coset sum, blowing the `whnf` budget.
+  obtain ⟨θ0', hθ0'coe⟩ :
+      ∃ t : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L),
+        (t : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)
+          = (θ0 : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ).conj :=
+    ⟨⟨(θ0 : ClassFunction _ ℂ).conj, θ0.isIrreducible.conj⟩, rfl⟩
+  have hθ0' : θ0' ≠ trivialIrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) := by
+    intro h
+    apply hθ0
+    have hcoe : (θ0 : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ).conj
+        = trivialClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) := by
+      rw [← hθ0'coe]
+      have h2 := congrArg
+        (fun c : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) =>
+          (c : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)) h
+      simpa using h2
+    apply Subtype.ext
+    show (θ0 : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)
+      = trivialClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L)
+    rw [← ClassFunction.conj_conj (θ0 : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ), hcoe]
+    exact trivialClassFunction_isReal
+  -- The two members `ζ_0 = Ind θ_0`, `ζ̄_0 = Ind θ̄_0 ∈ S`.
+  have hmem0 : ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+      (θ0 : ClassFunction _ ℂ) ∈ hyp.Sset := ⟨θ0, hθ0, rfl⟩
+  have hmem0' : ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+      (θ0' : ClassFunction _ ℂ) ∈ hyp.Sset := ⟨θ0', hθ0', rfl⟩
+  -- Norms `= 1` (Frobenius), orthogonality to `1_L`, irreducibility.
+  have hnorm0 := inner_self_induce_eq_one_of_frobeniusGroup hfrob θ0 hθ0
+  have hnorm0' := inner_self_induce_eq_one_of_frobeniusGroup hfrob θ0' hθ0'
+  have h1_0 := inner_induce_constOne_eq_zero ((hyp.typeI.typeF.H).subgroupOf L) θ0 hθ0
+  have h1_0' := inner_induce_constOne_eq_zero ((hyp.typeI.typeF.H).subgroupOf L) θ0' hθ0'
+  -- `⟨ζ_0, ζ̄_0⟩ = 0` (odd-order Frobenius: `ζ_0` non-real), from the reusable general helper
+  -- (`hθ0'coe : ↑θ̄_0 = (↑θ_0)‾` reindexes it to `θ_0'`).
+  have horth : ClassFunction.inner
+      (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) (θ0 : ClassFunction _ ℂ))
+      (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) (θ0' : ClassFunction _ ℂ)) = 0 := by
+    rw [hθ0'coe]
+    exact inner_induce_conj_eq_zero_of_frobenius_of_odd hodd hfrob θ0 hθ0
+  -- The equal-degree difference is `A(L) = H#`-supported.
+  have hdeg' : ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) (θ0' : ClassFunction _ ℂ)
+        (1 : ↥L)
+      = 1 * ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) (θ0 : ClassFunction _ ℂ)
+        (1 : ↥L) := by
+    rw [one_mul, ClassFunction.induce_apply_one, ClassFunction.induce_apply_one]
+    congr 1
+    rw [hθ0'coe, ClassFunction.conj_apply]
+    obtain ⟨n, -, hn⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ0
+    rw [hn, star_natCast]
+  have hsupp : (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) (θ0' : ClassFunction _ ℂ)
+      - ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+        (θ0 : ClassFunction _ ℂ)).support ⊆ hyp.A := by
+    have hds := induce_diff_support (K := (hyp.typeI.typeF.H).subgroupOf L) θ0' θ0 1 hdeg'
+    rw [one_smul] at hds
+    intro x hx
+    have hxd := hds hx
+    rw [Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff] at hxd
+    exact (mem_supportInSubgroup_sharp_subgroupOf_iff hyp.typeI.typeF.H hAH x).mpr ⟨hxd.1, hxd.2⟩
+  -- The Dade `⊥ 1_G` transport and `ℂ`-linearity of `τ = hyp.tau`.
+  have htau1 : ∀ φ : ClassFunction ↥L ℂ, φ.support ⊆ hyp.A →
+      ClassFunction.inner (hyp.tau φ) (Hypothesis71.constOne G)
+        = ClassFunction.inner φ (Hypothesis71.constOne L) := by
+    intro φ hφ
+    rw [show hyp.tau φ = hyp.dadeData.dade.dadeMap
+        ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφ⟩ from
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) hφ]
+    exact inner_tau_supported_constOne hyp.toHypothesis71
+      ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφ⟩
+  have hτ_smul : ∀ (c : ℂ) (x : ClassFunction ↥L ℂ), hyp.tau (c • x) = c • hyp.tau x :=
+    dadeIntegralCharacterMap_smul_complex hyp.dadeData.dade
+      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)
+  exact coherence_extension_orthogonal_constOne coh hτ_smul htau1 hmem0 hmem0'
+    hnorm0 hnorm0' horth hsupp h1_0 h1_0'
+
+set_option maxHeartbeats 800000 in
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+open OddOrder.Peterfalvi.S09 in
+open OddOrder.Peterfalvi.S09.Cert in
+/-- **Peterfalvi (12.14) for the witness, full form: `ψ(x) = χ(x)`.**  The witness `L` of (12.9)
+carries a (12.13) Dade calculation `dade` — with `χ = dade.chi = Ind θ_0` the distinguished
+degree-`e` member and `ψ = dade.psi = χ^{τ₁}` its coherent extension — whose value at the witness
+`x` is `ψ(x) = χ(x)`.
+
+Peterfalvi's proof, assembled from the three proven pieces:
+* `ψ` is constant on `x·K` ((12.3)+(12.4)+(5.5): `L ≁ M` by `witness_L_not_conj_M`, then
+  `psi_constant_on_xK`);
+* `ψ^ρ(x) = ψ(x)` (the `ρ`-collapse: `R(x) = C_K(x) ⊆ K` per Definition (8.14), so constancy on
+  `x·K` collapses the `ρ`-average — `witness_chiRho_apply_eq_of_forall_K`);
+* `ψ^ρ(x) = χ(x)` (the (7.8.a) `a = 0` counting and the two-sided (7.7.a) evaluation —
+  `chiRho_nu_zeta0_apply_eq_zeta0_ofDade`, fed by the witness `Hypothesis78` assembly of
+  `witness_L_hypothesis78`/`witness_L_zeta_bound` plus the size inputs `3 ≤ p`
+  (`counterexample_three_le_p`), `p² ≤ h` (`witness_p_sq_le_card_kernel`), and `2e ≤ p + 1`
+  (`witness_two_mul_index_le_p_add_one`)).
+
+This is the (12.16) `h_psix` feed: with the `L`-side (1.10.a) congruence
+`χ(x) ≡ χ(1) = e (mod 1 − ε)` it gives `ψ(x) ≡ e (mod 1 − ε)` without the coherent-extension
+degree identity `ψ(1) = e`. -/
+theorem witness_dade_psi_apply_x_eq_chi [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
+    ∃ (hyp : Hypothesis data.L)
+      (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+      (dade : DadeNotation hyp),
+      dade.psi = coh.extension dade.chi ∧
+      dade.e = ((hyp.typeI.typeF.H).subgroupOf data.L).index ∧
+      dade.psi ∈ ZIrr G ∧
+      dade.chi ∈ ZIrr ↥data.L ∧
+      dade.psi data.x = dade.chi ⟨data.x, witness_x_mem_L hG data⟩ := by
+  classical
+  obtain ⟨hyp, C, hC, hNonTI⟩ := witness_L_hypothesis_frobenius hG data
+  obtain ⟨coh⟩ : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) := by
+    rcases hyp.typeI.alternative with hTI | hab | hexp
+    · exact absurd hTI hNonTI
+    · exact frobenius_typeI_coherent_of_abelianKernel hG hyp ⟨C, hC⟩ hab
+    · exact frobenius_typeI_coherent_of_cyclicQuotient hG hyp ⟨C, hC⟩ hexp
+  have hHL : hyp.typeI.typeF.H ≤ data.L := hyp.typeI.typeF.H_le
+  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf data.L).Normal := by
+    rw [hyp.typeI.typeF.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal data.L
+  haveI : (hyp.H.subgroupOf data.L).Normal := hKnormal
+  have hAH : typeIA data.L hyp.typeI = (hyp.typeI.typeF.H : Set G) \ {1} :=
+    witness_typeIA_eq_sharp hG data hyp
+  have hHnorm : ∀ (l : ↥data.L) {h : G}, h ∈ hyp.typeI.typeF.H →
+      (l : G) * h * (l : G)⁻¹ ∈ hyp.typeI.typeF.H := by
+    intro l h hh
+    have hhL : h ∈ data.L := hHL hh
+    have hmem : (⟨h, hhL⟩ : ↥data.L) ∈ (hyp.typeI.typeF.H).subgroupOf data.L :=
+      (Subgroup.mem_subgroupOf).mpr hh
+    have hconj := hKnormal.conj_mem ⟨h, hhL⟩ hmem l
+    rw [Subgroup.mem_subgroupOf] at hconj
+    simpa using hconj
+  obtain ⟨n, θ, ind1H, hind1H, hdeg0, htriv, hinj, hcover⟩ := exists_witness_placed_family hyp
+  have hSmem : ∀ i, i ≠ ind1H →
+      ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L) (θ i : ClassFunction _ ℂ)
+        ∈ hyp.Sset := by
+    intro i hi
+    refine ⟨θ i, fun htriv_i => hi (hinj ?_), rfl⟩
+    change ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L) (θ i : ClassFunction _ ℂ)
+        = ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L) (θ ind1H : ClassFunction _ ℂ)
+    rw [htriv_i, htriv]
+  have hθ0_ne : θ 0 ≠ trivialIrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf data.L) := by
+    intro h
+    refine hind1H (hinj ?_).symm
+    change ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L) (θ 0 : ClassFunction _ ℂ)
+        = ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L) (θ ind1H : ClassFunction _ ℂ)
+    rw [h, htriv]
+  let d : Fin (n + 1) → ℂ :=
+    fun i => (θ i : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf data.L) ℂ)
+      (1 : ↥((hyp.typeI.typeF.H).subgroupOf data.L))
+  have hd : ∀ i, d i = (θ i : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf data.L) ℂ)
+      (1 : ↥((hyp.typeI.typeF.H).subgroupOf data.L)) := fun _ => rfl
+  have hdeg : ∀ i, ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L)
+        (θ i : ClassFunction _ ℂ) (1 : ↥data.L)
+      = d i * ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L)
+        (θ 0 : ClassFunction _ ℂ) (1 : ↥data.L) := by
+    intro i
+    rw [ClassFunction.induce_apply_one ((hyp.typeI.typeF.H).subgroupOf data.L)
+        (θ i : ClassFunction _ ℂ), hdeg0, hd i]
+    ring
+  have hdeg_match : ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L)
+        (θ 0 : ClassFunction _ ℂ) (1 : ↥data.L)
+      = ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L)
+        (θ ind1H : ClassFunction _ ℂ) (1 : ↥data.L) := by
+    rw [hdeg0, htriv]
+    change (((hyp.typeI.typeF.H).subgroupOf data.L).index : ℂ)
+        = ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L)
+          (trivialClassFunction ↥((hyp.typeI.typeF.H).subgroupOf data.L)) (1 : ↥data.L)
+    rw [induce_trivialChar_apply_eq_index _ (Subgroup.one_mem _)]
+  have psi_support : ∀ i, (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L)
+        (θ i : ClassFunction _ ℂ)
+      - d i • ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L)
+          (θ 0 : ClassFunction _ ℂ)).support
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (typeIA data.L hyp.typeI) data.L := by
+    intro i
+    refine (induce_diff_support (θ i) (θ 0) (d i) (hdeg i)).trans ?_
+    intro x hx
+    rw [Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff] at hx
+    exact (mem_supportInSubgroup_sharp_subgroupOf_iff hyp.typeI.typeF.H hAH x).mpr ⟨hx.1, hx.2⟩
+  have hnu_isometry : ∀ i j : Fin (n + 1), i ≠ ind1H → j ≠ ind1H →
+      ClassFunction.inner (coh.extension
+          (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L) (θ i : ClassFunction _ ℂ)))
+          (coh.extension
+          (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L) (θ j : ClassFunction _ ℂ)))
+        = ClassFunction.inner
+          (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L) (θ i : ClassFunction _ ℂ))
+          (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L) (θ j : ClassFunction _ ℂ)) :=
+    fun i j hi hj => coherence_extension_inner_eq_on_family coh (hSmem i hi) (hSmem j hj)
+  have hagree : ∀ i : Fin (n + 1), i ≠ 0 → i ≠ ind1H →
+      hyp.toHypothesis71.τ ⟨ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L)
+          (θ i : ClassFunction _ ℂ)
+          - d i • ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L)
+            (θ 0 : ClassFunction _ ℂ), psi_support i⟩
+        = coh.extension (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L)
+            (θ i : ClassFunction _ ℂ))
+          - d i • coh.extension (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L)
+            (θ 0 : ClassFunction _ ℂ)) := by
+    intro i _ hi_ind
+    obtain ⟨deg_i, -, hdeg_i_eq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast (θ i)
+    exact coherence_hagree_dadeMap hyp.dadeData.dade hyp.hconj coh
+      (hSmem i hi_ind) (hSmem 0 (Ne.symm hind1H)) (m0 := 1) (mi := deg_i) (by norm_num)
+      (by rw [hd i, hdeg_i_eq, Nat.cast_one, div_one]) (psi_support i)
+  -- The distinguished member `ζ_0 = Ind θ_0 ∈ S` and its (12.13) Dade calculation.
+  have hmem0 : ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L)
+      (θ 0 : ClassFunction _ ℂ) ∈ hyp.Sset := hSmem 0 (Ne.symm hind1H)
+  set dade : DadeNotation hyp := dadeNotation_of_coherence hyp coh
+    (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L) (θ 0 : ClassFunction _ ℂ))
+    hmem0 ((hyp.typeI.typeF.H).subgroupOf data.L).index hdeg0 with hdade
+  have hψZ : dade.psi ∈ ZIrr G := coh.extension_mem_ZIrr _ (Submodule.subset_span hmem0)
+  -- (12.14) constancy: `ψ` is constant on `x·K` (via `L ≁ M`).
+  have hchi0_irr : IsIrreducibleCharacter (ClassFunction.induce
+      ((hyp.typeI.typeF.H).subgroupOf data.L) (θ 0 : ClassFunction _ ℂ)) :=
+    Sset_isIrreducibleCharacter hyp hC hmem0
+  obtain ⟨chi0, hchi0_coe⟩ : ∃ t : IrreducibleCharacter ↥data.L,
+      (t : ClassFunction ↥data.L ℂ) = ClassFunction.induce
+        ((hyp.typeI.typeF.H).subgroupOf data.L) (θ 0 : ClassFunction _ ℂ) :=
+    ⟨⟨_, hchi0_irr⟩, rfl⟩
+  have hchi0_mem : (chi0 : ClassFunction ↥data.L ℂ) ∈ hyp.Sset := by
+    rw [hchi0_coe]; exact hmem0
+  have data0 : CharacterDecompositionData hyp (chi0 : ClassFunction ↥data.L ℂ) :=
+    (character_decomposition_and_dade_domain hG hyp hchi0_mem).choose
+  have hchi0_cons : chi0 ∈ data0.constituents := by
+    obtain ⟨φ, hφcoe, hφmem⟩ := Sset_self_mem_constituents hyp hC hchi0_mem data0
+    have hφeq : φ = chi0 := Subtype.ext hφcoe
+    rwa [hφeq] at hφmem
+  have hpsi_chi0 : dade.psi = coh.extension (chi0 : ClassFunction ↥data.L ℂ) := by
+    rw [hchi0_coe, hdade]
+    rfl
+  have hconst : ∀ g : G, g ∈ ctr.K → dade.psi (data.x * g) = dade.psi data.x :=
+    psi_constant_on_xK hG hyp coh data dade data0 hchi0_cons hchi0_mem hpsi_chi0
+      (witness_L_not_conj_M hG data)
+  -- The `ρ`-collapse `ψ^ρ(x) = ψ(x)`.
+  have hxL : data.x ∈ data.L := witness_x_mem_L hG data
+  have hcollapse : hyp.toHypothesis71.chiRho dade.psi ⟨data.x, hxL⟩ = dade.psi data.x :=
+    witness_chiRho_apply_eq_of_forall_K hG data hyp dade.psi hconst hxL
+  -- The (7.8) input `a`: `(β, ζ_0^ν) + 1 ∈ ℤ`.
+  set H78 := hypothesis78OfDade hyp.toHypothesis71
+    (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).toDadeIsometryData.isDadeIsometry
+    hyp.typeI.typeF.H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H htriv
+    hdeg_match coh.extension hnu_isometry hagree with hH78def
+  obtain ⟨a, ha⟩ := exists_betaDecomp_a H78
+    (Submodule.sub_mem _
+      (ClassFunction.induce_mem_ZIrr _ (θ ind1H).property.mem_ZIrr)
+      (ClassFunction.induce_mem_ZIrr _ (θ 0).property.mem_ZIrr))
+    (coh.extension_mem_ZIrr _ (Submodule.subset_span hmem0))
+  rw [hH78def] at ha
+  -- Size inputs: `3 ≤ p`, `p² ≤ h`, `2e ≤ p + 1`.
+  have hp3 : 3 ≤ ctr.p := counterexample_three_le_p hG ctr
+  have hph : (ctr.p : ℝ) ^ 2 ≤ (Nat.card ↥(hyp.typeI.typeF.H) : ℝ) := by
+    exact_mod_cast witness_p_sq_le_card_kernel hG data hyp
+  have h2e : 2 * ((((hyp.typeI.typeF.H).subgroupOf data.L).index : ℝ)) ≤ (ctr.p : ℝ) + 1 := by
+    exact_mod_cast witness_two_mul_index_le_p_add_one hG data hyp
+  -- The two-sided (7.7.a) evaluation `ψ^ρ(x) = ζ_0(x)`.
+  have hxA : ((⟨data.x, hxL⟩ : ↥data.L) : G) ∈ typeIA data.L hyp.typeI :=
+    witness_x_mem_typeIA hG data hyp
+  have heval := chiRho_nu_zeta0_apply_eq_zeta0_ofDade hyp.toHypothesis71
+    (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).toDadeIsometryData.isDadeIsometry
+    hyp.typeI.typeF.H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H htriv
+    hdeg_match coh.extension hnu_isometry hagree
+    (witness_L_hzeta0nu hG hyp hC coh hAH (θ 0) hθ0_ne)
+    (inner_self_induce_eq_one_of_frobeniusGroup hC (θ 0) hθ0_ne)
+    a ha (Sset_isIrreducibleCharacter hyp hC hmem0) hp3 hph h2e hxA
+  refine ⟨hyp, coh, dade, rfl, rfl, hψZ, IsIrreducibleCharacter.mem_ZIrr hchi0_irr, ?_⟩
+  calc dade.psi data.x
+      = hyp.toHypothesis71.chiRho dade.psi ⟨data.x, hxL⟩ := hcollapse.symm
+    _ = ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L)
+        (θ 0 : ClassFunction _ ℂ) ⟨data.x, hxL⟩ := heval
+    _ = dade.chi ⟨data.x, hxL⟩ := rfl
+
+
 /-- **Peterfalvi (12.16), the cyclotomic congruence at `x`** (the `h_psix` field of
 `CounterexampleDadeData`): for a virtual character `ψ ∈ ℤ[Irr G]`, an order-`p` element `x`, and a
 primitive `p`-th root `ε`, if `ψ(1) = e` then `ψ(x) ≡ e (mod 1 - ε)`, i.e. `∃ w` integral with
@@ -625,28 +1147,11 @@ structure CounterexampleDadeData {ctr : CounterexampleHypothesis (G := G)}
   hB : (1 : ℝ) - (e : ℝ) / kH ≤ normRho
   hC : normRhoM + normRho < 1
 
-open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (12.13)/(12.16), the coherent-extension degree preservation**
-(`dade.psi 1 = e`, the `ψ(1) = χ(1) = e` input of `h_psix`).  For the witness `L`'s (12.13) Dade
-calculation `ψ = χ^{τ₁}` (`ψ = coh.extension χ`, `χ ∈ S`, `χ(1) = e = [L:H]`), the coherent
-extension preserves the value at `1`: `ψ(1) = χ(1) = e`.
-
-**Genuinely still-missing** as a usable equality: `IsCoherent` (`S07.IsCoherent`) only records the
-lattice-relative *isometry* (`extension_inner_eq`) and the supported-agreement
-(`extends_on_supported`) of the coherent extension; degree preservation `(extension χ)(1) = χ(1)` is
-a separate (7.7.a)/(7.8.a) fact (`ψ = χ_1^{τ_1}` matches degrees because the Dade extension `τ₁`
-sends `χ` to an irreducible constituent of the same degree) that is not exposed as an `IsCoherent`
-field nor assembled elsewhere for the witness.  The statement is **sound**: it is the genuine
-(12.13) degree identity for the witness's distinguished `χ ∈ S` (tied to `hyp`/`dade` via `coh`
-and the `dade.psi = coh.extension dade.chi` shape recorded by `hψeq`), true because the
-(7.8) coherent extension of a type-I family is degree-preserving on `S`. -/
-theorem witness_psi_degree [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {L : Subgroup G} (hyp : Hypothesis L)
-    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
-    (dade : DadeNotation hyp)
-    (hψeq : dade.psi = coh.extension dade.chi) :
-    dade.psi (1 : G) = (dade.e : ℂ) := by
-  sorry
+/-! The former `witness_psi_degree` obligation (`ψ(1) = e`, the coherent-extension degree
+preservation) has been **removed**: Peterfalvi's (12.16) does not use it.  The `h_psix`
+congruence `ψ(x) ≡ e (mod 1 − ε)` is instead supplied by the proven (12.14) evaluation
+`ψ(x) = χ(x)` (`witness_dade_psi_apply_x_eq_chi`) combined with the `L`-side (1.10.a)
+congruence `χ(x) ≡ χ(1) = e` — see `exists_counterexample_dade_data`. -/
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.14)/(12.15) + (7.3)/(7.8.b)/(8.17), the witness value/norm package** — the
@@ -705,7 +1210,8 @@ each `CounterexampleDadeData` field is discharged:
 * `e := dade.e = [L:H]`, `he : 3 ≤ e` from `three_le_index` (`|U|` odd `> 1`);
 * `kK`/`kKp`/`kM`/`kH` := `|K|`/`|K'|`/`|M|`/`|H|` with positivity from `Nat.card_pos`, and
   `hM : |M| ≤ |K|·|H|` from `card_M_le` (12.11);
-* `h_psix` from `psi_apply_x_sub_e_cyclotomic` (1.10.a) fed by `witness_psi_degree` (`ψ(1) = e`);
+* `h_psix` from the proven (12.14) evaluation `ψ(x) = χ(x)` (`witness_dade_psi_apply_x_eq_chi`)
+  and the `L`-side (1.10.a) congruence `χ(x) ≡ χ(1) = e (mod 1 − ε)`;
 * `mval`/`h_const`/`h_psig_int`/`h2e`/`hidx`/`hA`/`hB`/`hC` from the deep value/norm package
   `witness_value_norm_package` (the (12.14)/(12.15)/(12.12)/(8.1.c)/(7.x) content). -/
 theorem exists_counterexample_dade_data [Finite G]
@@ -715,26 +1221,28 @@ theorem exists_counterexample_dade_data [Finite G]
     Nonempty (CounterexampleDadeData witness g) := by
   classical
   haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
-  -- (12.6) coherence + distinguished `χ ∈ S` of degree `e = [L:H]`; realize (12.13) `dade`.
-  obtain ⟨hyp, ⟨coh⟩⟩ := witness_L_coherent hG witness
-  obtain ⟨χ, hχ, hdeg⟩ := exists_distinguished_char hyp
-  set dade : DadeNotation hyp :=
-    dadeNotation_of_coherence hyp coh χ hχ
-      ((hyp.typeI.typeF.H).subgroupOf witness.L).index hdeg with hdade
-  -- `ψ = coh.extension χ ∈ ℤ[Irr G]` and `dade.e = [L:H]`.
-  have hψeq : dade.psi = coh.extension dade.chi := rfl
-  have he_eq : dade.e = ((hyp.typeI.typeF.H).subgroupOf witness.L).index := rfl
-  have hψZ : dade.psi ∈ ZIrr G := coh.extension_mem_ZIrr χ (Submodule.subset_span hχ)
+  -- The witness (12.13) Dade calculation with its proven (12.14) evaluation `ψ(x) = χ(x)`.
+  obtain ⟨hyp, coh, dade, hψeq, he_eq, hψZ, hχZ, hψx_eq⟩ :=
+    witness_dade_psi_apply_x_eq_chi hG witness
   -- A primitive `p`-th root of unity.
   obtain ⟨ε, hε⟩ : ∃ ε : ℂ, IsPrimitiveRoot ε ctr.p :=
     ⟨_, Complex.isPrimitiveRoot_exp ctr.p ctr.p_prime.pos.ne'⟩
   -- `3 ≤ e = [L:H]`.
   have hthree : 3 ≤ dade.e := he_eq ▸ three_le_index hG hyp
-  -- `ψ(1) = e`, hence the (1.10.a) cyclotomic congruence at `x` (`h_psix`).
-  have hψ1 : dade.psi (1 : G) = (dade.e : ℂ) :=
-    witness_psi_degree hG hyp coh dade hψeq
-  have h_psix : ∃ w : ℂ, IsIntegral ℤ w ∧ dade.psi witness.x - (dade.e : ℂ) = (1 - ε) * w :=
-    psi_apply_x_sub_e_cyclotomic ctr.p_prime.pos hε hψZ witness.x_mem_omega1 hψ1
+  -- (12.14) + the `L`-side (1.10.a): `ψ(x) = χ(x) ≡ χ(1) = e (mod 1 − ε)` (`h_psix`),
+  -- with no coherent-extension degree identity `ψ(1) = e` needed.
+  have hxL : witness.x ∈ witness.L := witness_x_mem_L hG witness
+  have hxp : (⟨witness.x, hxL⟩ : ↥witness.L) ^ ctr.p = 1 := by
+    apply Subtype.ext
+    push_cast
+    exact witness.x_mem_omega1
+  obtain ⟨w, hw, hweq⟩ := OddOrder.RepresentationTheory.exists_integral_apply_sub_of_commute
+    ctr.p_prime.pos hε hχZ hxp (Commute.one_right _)
+  rw [mul_one, dade.chi_degree_eq_e] at hweq
+  have h_psix : ∃ w : ℂ, IsIntegral ℤ w ∧ dade.psi witness.x - (dade.e : ℂ) = (1 - ε) * w := by
+    refine ⟨w, hw, ?_⟩
+    rw [hψx_eq]
+    exact hweq
   -- `H = L_F` (kernel of the witness) has the same order as the maximal nilpotent normal Hall.
   have hHcard : (Nat.card ↥(hyp.typeI.typeF.H) : ℝ)
       = (Nat.card ↥(maxNilpotentNormalHall witness.L) : ℝ) := by
@@ -842,125 +1350,6 @@ theorem Hypothesis.typeIA_eq_sharp [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
     rw [fdata.typeI.typeF.H_eq, hyp.typeI.typeF.H_eq]
   exact hyp.typeIA_eq_sharp_of_frobenius (hKf ▸ fdata.frobenius)
 
-/-- The witness `x` lies in `L` (via `x ∈ P₀ ⊆ L_F ≤ L`, Peterfalvi (12.10)). -/
-theorem witness_x_mem_L [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
-    data.x ∈ data.L :=
-  OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le data.L
-    (witness_P0_le_kernel hG data data.x_mem_P0)
-
-/-- The witness `x` lies in the type-I support `A(L) = L_F^#` (Peterfalvi (12.1)/(12.10)):
-`x ∈ P₀ ⊆ L_F = typeF.H` and `x ≠ 1`. -/
-theorem witness_x_mem_typeIA [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
-    (hyp : Hypothesis data.L) :
-    data.x ∈ OddOrder.GroupTheory.typeIA data.L hyp.typeI := by
-  rw [Hypothesis.typeIA_eq_sharp hG hyp]
-  refine Set.mem_diff_of_mem ?_ (by simpa using data.x_ne_one)
-  rw [SetLike.mem_coe, hyp.typeI.typeF.H_eq]
-  exact witness_P0_le_kernel hG data data.x_mem_P0
-
-/-- **The witness maximal pin `𝓜(C_G(x)) = {M}`** (Peterfalvi (12.9)/(12.14), the `N[x] = M`
-identification).  The witness `x ∈ Ω₁(P₀)^# ⊆ L_F = L_σ` is a `σ`-sharp element of `L` escaping
-`L` (`C_G(x) ⊄ L`, (12.9)), so the BG Theorem-D singleton
-(`maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape`) pins a unique
-maximal over `C_G(x)`; it is `M` because `C_G(x) ≤ N_G(⟨x⟩) ≤ M` ((12.9)). -/
-theorem witness_maximalContaining_centralizer_eq_singleton [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
-    OddOrder.GroupTheory.maximalSubgroupsContaining
-      (Subgroup.centralizer ({data.x} : Set G)) = {ctr.M} := by
-  classical
-  have hLtypeI : IsTypeI data.L := witness_L_isTypeI hG data
-  have hLF_eq : maxNilpotentNormalHall data.L = OddOrder.BG.Ch3.S10.Msigma data.L :=
-    (OddOrder.BG.Ch4.S16.proposition_type_classification hG data.L_maximal).2.2.2.2.2.mpr
-      (Or.inl hLtypeI)
-  have hxσ : data.x ∈ OddOrder.BG.Ch4.S14.sigmaSharp data.L :=
-    ⟨hLF_eq ▸ witness_P0_le_kernel hG data data.x_mem_P0, by simpa using data.x_ne_one⟩
-  have hCM : Subgroup.centralizer ({data.x} : Set G) ≤ ctr.M := by
-    refine le_trans ?_ data.normalizer_closure_x_le_M
-    rw [← Subgroup.centralizer_closure]
-    exact Subgroup.centralizer_le_normalizer _
-  obtain ⟨N₀, hN₀⟩ :=
-    OddOrder.BG.Ch4.S16.maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape
-      hG data.L_maximal hxσ data.centralizer_x_not_le_L
-  have hMN₀ : ctr.M = N₀ := by
-    have hMin : ctr.M ∈ OddOrder.GroupTheory.maximalSubgroupsContaining
-        (Subgroup.centralizer ({data.x} : Set G)) := ⟨ctr.M_maximal, hCM⟩
-    rw [hN₀] at hMin
-    exact hMin
-  rw [hN₀, hMN₀]
-
-/-- **Peterfalvi (12.14), `R(x) = C_K(x) ⊆ K`** (Definition (8.14) at the witness): the faithful
-Dade kernel of the witness `x` lands in `K = M_F`.  On the escaping branch the kernel is
-`R(x) = (N[x])_σ ⊓ C_G(x)` with `N[x] = M` (the singleton pin
-`witness_maximalContaining_centralizer_eq_singleton`) and `M_σ = M_F = K` for the type-I
-counterexample (`MF_eq_Msigma`); the non-escaping branch is `⊥`.  Stated for an arbitrary
-support set `A` (the escaping branch does not depend on it). -/
-theorem witness_ftSupportKernel_le_K [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
-    {A : Set G} :
-    OddOrder.Peterfalvi.S10.ftSupportKernel data.L A data.x ≤ ctr.K := by
-  classical
-  by_cases hesc : data.x ∈ OddOrder.GroupTheory.escapingCentralizerSet data.L A
-  · rw [OddOrder.Peterfalvi.S10.ftSupportKernel_eq_of_escaping hesc]
-    -- The branch condition of `FT_signalizerBase`: `1 < |𝓜_σ(x)|` and `𝓜(C_G(x)) ≠ ∅`.
-    have hLtypeI : IsTypeI data.L := witness_L_isTypeI hG data
-    have hLF_eq : maxNilpotentNormalHall data.L = OddOrder.BG.Ch3.S10.Msigma data.L :=
-      (OddOrder.BG.Ch4.S16.proposition_type_classification hG data.L_maximal).2.2.2.2.2.mpr
-        (Or.inl hLtypeI)
-    have hxLσ : data.x ∈ OddOrder.BG.Ch3.S10.Msigma data.L :=
-      hLF_eq ▸ witness_P0_le_kernel hG data data.x_mem_P0
-    have hsing := witness_maximalContaining_centralizer_eq_singleton hG data
-    have hgt : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement data.x).ncard := by
-      by_contra h
-      push Not at h
-      exact data.centralizer_x_not_le_L
-        (OddOrder.BG.Ch4.S16.centralizer_le_of_maximalSigma_le_one hG data.L_maximal hxLσ
-          data.x_ne_one h)
-    have hne : (OddOrder.GroupTheory.maximalSubgroupsContaining
-        (Subgroup.centralizer ({data.x} : Set G))).Nonempty := by
-      rw [hsing]
-      exact ⟨ctr.M, rfl⟩
-    have hcond : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement data.x).ncard ∧
-        (OddOrder.GroupTheory.maximalSubgroupsContaining
-          (Subgroup.centralizer ({data.x} : Set G))).Nonempty := ⟨hgt, hne⟩
-    -- `N[x] = M`: the chosen member of the singleton `𝓜(C_G(x)) = {M}`.
-    have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase data.x = hcond.2.choose := dif_pos hcond
-    have hch : hcond.2.choose ∈ ({ctr.M} : Set (Subgroup G)) :=
-      (Set.ext_iff.mp hsing _).mp hcond.2.choose_spec
-    have hbase : OddOrder.BG.Ch4.S16.FT_signalizerBase data.x = ctr.M :=
-      hb.trans (Set.mem_singleton_iff.mp hch)
-    calc OddOrder.BG.Ch4.S16.FT_signalizer data.x
-        ≤ OddOrder.BG.Ch3.S10.Msigma (OddOrder.BG.Ch4.S16.FT_signalizerBase data.x) :=
-          inf_le_left
-      _ = ctr.K := by rw [hbase, ← MF_eq_Msigma hG ctr]
-  · rw [OddOrder.Peterfalvi.S10.ftSupportKernel_eq_bot_of_not_escaping hesc]
-    exact bot_le
-
-open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (12.14), the `ψ^ρ(x) = ψ(x)` collapse**: any `χ ∈ CF(G)` constant on the coset
-`x·K` (e.g. `ψ = dade.psi`, via `psi_constant_on_xK`) has `ρ`-average at the witness `x` equal to
-its value: `χ^ρ(x) = χ(x)`.  The local Dade kernel is `H(x) = R(x) ⊆ K`
-(`H_eq_ftSupportKernel` + `witness_ftSupportKernel_le_K`), so the `x·K`-constancy restricts to
-the `H(x)`-coset and the `ρ`-average collapses (`chiRho_apply_eq_of_forall_coset`). -/
-theorem witness_chiRho_apply_eq_of_forall_K [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
-    (hyp : Hypothesis data.L) (χ : ClassFunction G ℂ)
-    (hconst : ∀ g : G, g ∈ ctr.K → χ (data.x * g) = χ data.x)
-    (hxL : data.x ∈ data.L) :
-    hyp.toHypothesis71.chiRho χ ⟨data.x, hxL⟩ = χ data.x := by
-  have hxA : ((⟨data.x, hxL⟩ : ↥data.L) : G) ∈ OddOrder.GroupTheory.typeIA data.L hyp.typeI :=
-    witness_x_mem_typeIA hG data hyp
-  refine OddOrder.Peterfalvi.S09.Hypothesis71.chiRho_apply_eq_of_forall_coset
-    hyp.toHypothesis71 χ hxA ?_
-  intro y hy
-  refine hconst y (witness_ftSupportKernel_le_K hG data
-    (A := OddOrder.GroupTheory.typeIA data.L hyp.typeI) ?_)
-  rw [← hyp.dadeData.H_eq_ftSupportKernel ⟨data.x, hxA⟩]
-  exact hy
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 open OddOrder.Peterfalvi.S09.Cert in
@@ -995,7 +1384,7 @@ theorem witness_L_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal data.L
   -- (12.1): the type-I support `A(L)` is `H#`.
   have hAH : typeIA data.L hyp.typeI = (hyp.typeI.typeF.H : Set G) \ {1} :=
-    Hypothesis.typeIA_eq_sharp hG hyp
+    witness_typeIA_eq_sharp hG data hyp
   -- `H = L_F` is `L`-conjugation invariant (from the `subgroupOf`-normality).
   have hHnorm : ∀ (l : ↥data.L) {h : G}, h ∈ hyp.typeI.typeF.H →
       (l : G) * h * (l : G)⁻¹ ∈ hyp.typeI.typeF.H := by
@@ -1068,106 +1457,6 @@ theorem witness_L_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
       (hSmem i hi_ind) (hSmem 0 (Ne.symm hind1H)) (m0 := 1) (mi := deg_i) (by norm_num)
       (by rw [hd i, hdeg_i_eq, Nat.cast_one, div_one]) (psi_support i)
 
-open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-open OddOrder.Peterfalvi.S09 in
-open OddOrder.Peterfalvi.S09.Cert in
-/-- **Peterfalvi (7.8.a) for the witness `L`: `⟨ζ_0^ν, 1_G⟩ = 0`** (`hzeta0nu`, the last input to
-the (7.8.b) bound `hB`).  The abstract `IsCoherent` does not carry orthogonality to `1_G`, but it
-is recovered from the **complex conjugate** `ζ̄_0 = Ind θ̄_0 ∈ S` (`Sset_closedUnderConjugate`) — a
-second member of the *same degree*, distinct from `ζ_0` because `L` has odd order (no nontrivial
-real irreducible, `not_isReal_of_ne_trivial_of_odd_card'`).  `coherence_extension_orthogonal_constOne`
-then forces `⟨ν ζ_0, 1_G⟩ = 0`.  Holds for **any** nontrivial `θ_0` (degree-`e`/linearity unused). -/
-theorem witness_L_hzeta0nu [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {L : Subgroup G} (hyp : Hypothesis L) {C : Subgroup ↥L}
-    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
-    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
-    (θ0 : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L))
-    (hθ0 : θ0 ≠ trivialIrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L)) :
-    ClassFunction.inner
-        (coh.extension (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
-          (θ0 : ClassFunction _ ℂ))) (Hypothesis71.constOne G) = 0 := by
-  classical
-  have hodd : Odd (Nat.card ↥L) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card L)
-  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
-    rw [hyp.typeI.typeF.H_eq]
-    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
-  -- The complex conjugate character `θ̄_0` is again nontrivial irreducible.  Introduce it
-  -- **opaquely** (via `obtain`, not `let`), carrying only its coercion `↑θ̄_0 = (↑θ_0)‾`: a `let`
-  -- gets its coercion re-unfolded inside every `induce` coset sum, blowing the `whnf` budget.
-  obtain ⟨θ0', hθ0'coe⟩ :
-      ∃ t : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L),
-        (t : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)
-          = (θ0 : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ).conj :=
-    ⟨⟨(θ0 : ClassFunction _ ℂ).conj, θ0.isIrreducible.conj⟩, rfl⟩
-  have hθ0' : θ0' ≠ trivialIrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) := by
-    intro h
-    apply hθ0
-    have hcoe : (θ0 : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ).conj
-        = trivialClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) := by
-      rw [← hθ0'coe]
-      have h2 := congrArg
-        (fun c : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) =>
-          (c : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)) h
-      simpa using h2
-    apply Subtype.ext
-    show (θ0 : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)
-      = trivialClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L)
-    rw [← ClassFunction.conj_conj (θ0 : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ), hcoe]
-    exact trivialClassFunction_isReal
-  -- The two members `ζ_0 = Ind θ_0`, `ζ̄_0 = Ind θ̄_0 ∈ S`.
-  have hmem0 : ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
-      (θ0 : ClassFunction _ ℂ) ∈ hyp.Sset := ⟨θ0, hθ0, rfl⟩
-  have hmem0' : ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
-      (θ0' : ClassFunction _ ℂ) ∈ hyp.Sset := ⟨θ0', hθ0', rfl⟩
-  -- Norms `= 1` (Frobenius), orthogonality to `1_L`, irreducibility.
-  have hnorm0 := inner_self_induce_eq_one_of_frobeniusGroup hfrob θ0 hθ0
-  have hnorm0' := inner_self_induce_eq_one_of_frobeniusGroup hfrob θ0' hθ0'
-  have h1_0 := inner_induce_constOne_eq_zero ((hyp.typeI.typeF.H).subgroupOf L) θ0 hθ0
-  have h1_0' := inner_induce_constOne_eq_zero ((hyp.typeI.typeF.H).subgroupOf L) θ0' hθ0'
-  -- `⟨ζ_0, ζ̄_0⟩ = 0` (odd-order Frobenius: `ζ_0` non-real), from the reusable general helper
-  -- (`hθ0'coe : ↑θ̄_0 = (↑θ_0)‾` reindexes it to `θ_0'`).
-  have horth : ClassFunction.inner
-      (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) (θ0 : ClassFunction _ ℂ))
-      (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) (θ0' : ClassFunction _ ℂ)) = 0 := by
-    rw [hθ0'coe]
-    exact inner_induce_conj_eq_zero_of_frobenius_of_odd hodd hfrob θ0 hθ0
-  -- The equal-degree difference is `A(L) = H#`-supported.
-  have hAH : typeIA L hyp.typeI = ((hyp.typeI.typeF.H) : Set G) \ {1} :=
-    Hypothesis.typeIA_eq_sharp hG hyp
-  have hdeg' : ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) (θ0' : ClassFunction _ ℂ)
-        (1 : ↥L)
-      = 1 * ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) (θ0 : ClassFunction _ ℂ)
-        (1 : ↥L) := by
-    rw [one_mul, ClassFunction.induce_apply_one, ClassFunction.induce_apply_one]
-    congr 1
-    rw [hθ0'coe, ClassFunction.conj_apply]
-    obtain ⟨n, -, hn⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ0
-    rw [hn, star_natCast]
-  have hsupp : (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) (θ0' : ClassFunction _ ℂ)
-      - ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
-        (θ0 : ClassFunction _ ℂ)).support ⊆ hyp.A := by
-    have hds := induce_diff_support (K := (hyp.typeI.typeF.H).subgroupOf L) θ0' θ0 1 hdeg'
-    rw [one_smul] at hds
-    intro x hx
-    have hxd := hds hx
-    rw [Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff] at hxd
-    exact (mem_supportInSubgroup_sharp_subgroupOf_iff hyp.typeI.typeF.H hAH x).mpr ⟨hxd.1, hxd.2⟩
-  -- The Dade `⊥ 1_G` transport and `ℂ`-linearity of `τ = hyp.tau`.
-  have htau1 : ∀ φ : ClassFunction ↥L ℂ, φ.support ⊆ hyp.A →
-      ClassFunction.inner (hyp.tau φ) (Hypothesis71.constOne G)
-        = ClassFunction.inner φ (Hypothesis71.constOne L) := by
-    intro φ hφ
-    rw [show hyp.tau φ = hyp.dadeData.dade.dadeMap
-        ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφ⟩ from
-      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support hyp.dadeData.dade
-        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) hφ]
-    exact inner_tau_supported_constOne hyp.toHypothesis71
-      ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφ⟩
-  have hτ_smul : ∀ (c : ℂ) (x : ClassFunction ↥L ℂ), hyp.tau (c • x) = c • hyp.tau x :=
-    dadeIntegralCharacterMap_smul_complex hyp.dadeData.dade
-      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)
-  exact coherence_extension_orthogonal_constOne coh hτ_smul htau1 hmem0 hmem0'
-    hnorm0 hnorm0' horth hsupp h1_0 h1_0'
 
 /-- **Peterfalvi (7.8.b)/(12.12) size condition for an odd-order Frobenius group**: if a finite
 Frobenius group has kernel `N` and complement `A` both of **odd** order, with `N ≠ ⊥`, then
@@ -1234,7 +1523,7 @@ theorem witness_L_zeta_bound [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   -- `hC`'s kernel is written with the `hyp.H` accessor; register the normality in that form too.
   haveI : (hyp.H.subgroupOf data.L).Normal := hKnormal
   have hAH : typeIA data.L hyp.typeI = (hyp.typeI.typeF.H : Set G) \ {1} :=
-    Hypothesis.typeIA_eq_sharp hG hyp
+    witness_typeIA_eq_sharp hG data hyp
   have hHnorm : ∀ (l : ↥data.L) {h : G}, h ∈ hyp.typeI.typeF.H →
       (l : G) * h * (l : G)⁻¹ ∈ hyp.typeI.typeF.H := by
     intro l h hh
@@ -1356,8 +1645,9 @@ theorem witness_L_zeta_bound [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).toDadeIsometryData.isDadeIsometry
     hyp.typeI.typeF.H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H htriv hdeg_match
     coh.extension hnu_isometry hagree
-    (witness_L_hzeta0nu hG hyp hC coh (θ 0) hθ0_ne)
+    (witness_L_hzeta0nu hG hyp hC coh hAH (θ 0) hθ0_ne)
     (inner_self_induce_eq_one_of_frobeniusGroup hC (θ 0) hθ0_ne) a ha hsmall
+
 
 /-! ## (12.17): forcing case (b) of Theorem (8.8) — the all-type-I non-existence argument
 
