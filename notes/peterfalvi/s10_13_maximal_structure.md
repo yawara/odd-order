@@ -697,3 +697,15 @@ w₂=p で count は p、H̄-nontriviality で j=0 column を除いて **p-1** =
   同一視 ((1.6): H₀⊆Ker の M-文字 = M/H₀-文字)。その下で reducibility + H̄-nontriviality 対応。
 - (B3) `card_reducible_Hnontrivial_induce_eq_W2_sub_one` を H=H̄, w₂=p で instantiate → (9.9.b) count。
 次手 = B1 (S10、`typePData_toS06Hypothesis` 商版)。
+
+## 2026-07-11 (lane a): (8.11) 閉鎖 + (8.17) type-I branch の mis-layering 決着
+
+- **(8.11) `hall_maxNilpotentNormalHall_and_mainSubgroup` は完全証明済** (6b08f22d、
+  axiom-clean)。上の表の「Iₛ / BG endpoint 待ち」は解消 — BG 側 (Msigma_isHall /
+  mainSubgroup_eq_Msigma / primeFactors_Msigma_eq_sigma / maxNilpotentNormalHall_isHall)
+  は全て landed 済だった。消費: S14 WitnessSylowCyclic ×4 + (10.8) hB。
+- **(8.17) type-I branch**: cover_nonidentity + pairwise_disjoint は実証明 (f4140838)。
+  `cover_subset_kernels` は **§8 では証明不能な mis-layered claim** と判明 (BG Thm E は
+  R(x)-thickening を保持; collapse は (12.17) 証明内で (12.7) から)。migration 計画 =
+  **issue 9080** (S14 側で typeI_frobenius + 新 collapse lemma
+  `Mtilde_eq_sigmaSharp_of_forall_centralizer_le` を使う; その後 field 削除)。
