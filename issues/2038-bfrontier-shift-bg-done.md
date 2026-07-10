@@ -1376,3 +1376,15 @@ hyp.mu i j は Sdata-grid の member (列非自明性も対応) → engines の 
 そのまま適用可能。実装部品: (i) W₁/W₂/W equalities の合成 lemma、(ii) subgroupCongr 下での
 chiColumn/Ind の naturality (induce_compHom_subgroupCongr [InducedCharacter 末尾に既存!] が
 Ind 側)、(iii) 列対応 + rigidity 適用、(iv) engines transport。次 iter: (i)+(ii) から実装。
+
+## ✅ (2026-07-11、lane-b /loop iter 38) — 同定 base layer landed: 両 S06 instance の W₁/W₂ 一致
+
+`sdataS06_W1_eq_certainTypeS` / `W2` / `W_join` (FeitThompsonSetup、commit 3fb7a754、
+full build 4150 green・AxiomsCheck OK) — Sdata-instance (engines 側) と certainTypeS
+(muS producer 側) の W₁/W₂/W が propositionally 一致 (Sdata_W1_eq + tp.W1_eq_K/W2_eq_Kstar +
+certainTypeS_W1_eq/W2_eq の合成、projection は unfold+rfl で通過)。
+
+**次 iter (同定 step (ii) = naturality)**: W-同定の subgroupCongr `e : (Sdata-inst).W ≃* (cts).W`
+の下で (a) 線形指標 grid の対応 (chiColumn = omega ∘ omegaProdChar — compHom e.toMonoidHom での
+移送)、(b) Ind の naturality (`induce_compHom_subgroupCongr` [InducedCharacter 末尾、既存] を
+W1⊔W2-join equality で instantiate)。その後 step (iii) 列対応 + rigidity。
