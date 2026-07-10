@@ -1388,3 +1388,31 @@ certainTypeS_W1_eq/W2_eq の合成、projection は unfold+rfl で通過)。
 の下で (a) 線形指標 grid の対応 (chiColumn = omega ∘ omegaProdChar — compHom e.toMonoidHom での
 移送)、(b) Ind の naturality (`induce_compHom_subgroupCongr` [InducedCharacter 末尾、既存] を
 W1⊔W2-join equality で instantiate)。その後 step (iii) 列対応 + rigidity。
+
+## 📋✨ (2026-07-11、lane-b /loop iter 39) — SHORTCUT 確定: certainTypeS-based Hypothesis46 直接構築
+
+Hypothesis46 の構造精査 (S06_CertainHypothesis46:40) で **grid 同定を丸ごと回避する route** を確認:
+Hypothesis46 は `CertainTypeHypothesis A L` を extends し tic/subH/dade0/tau を持つのみ —
+**toCertainTypeHypothesis を mp.certainTypeS ベースで直接組めば、engines
+(certainType_diff_supp_subset_A0 等) が muS grid にそのまま効く** (identification 不要)。
+
+**構築部品と discharge 見込み**:
+- tic := typePData_toTICyclicHypothesis tp.Sdata hG.odd (ambient、両 route 共通)。
+  tic_W1/W2: 「tic.W1 = (certainTypeS.W1).map subtype」 = Sdata-route の
+  map_subgroupOf_eq_of_le + **iter 38 の W-equalities** で rewrite ✓。tic_V: rfl ✓。
+- subH := Msigma.subgroupOf + W2_le_subH: certainTypeS_W2_eq → Kstar = Sdata.W2 (Sdata_W2_eq 逆) →
+  Sdata.W2 ≤ H ≤ Msigma (hyp46S と同じ chain) ✓。
+- A_covers: hyp46S のコピー (toCertainTypeHypothesis.K = certainTypeS.K — **K-equality
+  certainTypeS.K = (derivedInG S).subgroupOf S が要る**: certainTypeS_K_eq の有無 grep、
+  無ければ unfold+rfl で追加 [certainTypeHypothesis_of_typeP_kappaHall の K field])。
+- dade0 := (dadeSupportHypothesisData_honestTypeP2A0Set hG mp.S_maximal mp.S_typeP2
+  tp.Sdata).some.dade — target type (A ∪ conjClassSetIn S tic.V) は honestTypeP2A0Set と
+  defeq (hyp46S と同 trick) ✓。tau := dade0.fullDadeIsometryData hconj ✓。
+- **CertainTypeHypothesis の A-関連 fields** (toCertainTypeHypothesis が S06.Hypothesis に何を
+  足すか) を次 iter 冒頭で確認 — hyp46S は hypothesis46OfTypePData 経由でこれらを自動で得ていた;
+  直接構築ではここが新規 discharge 点。
+
+**route 変更**: iter 37 の per-ω rigidity 同定は不要に (rigidity 補題 [iter 36] は独立 infra として
+残る — 将来の grounding 系で使う)。iter 38 の W-equalities は本 shortcut の tic_W1/W2 discharge に
+そのまま使う ✓ 無駄なし。**次 iter: CertainTypeHypothesis 構造確認 → hyp46Smp (certainTypeS-based)
+構築開始** → muS_diff_support (engines 直適用) → field 3 層 → pins。
