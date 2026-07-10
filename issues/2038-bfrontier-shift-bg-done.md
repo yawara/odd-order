@@ -1299,3 +1299,18 @@ omega を relabeling まで pin するのみ (生成元べき enumeration の同
    S15.Hypothesis の odd_card/hodd field 有無を確認し、無ければ A₀ 形を「A ∪ (hodd 引数付き
    V-conj 部)」でなく **field 側で hodd を仮定に取る**か検討)。
 3. field 追加 (iter 30 設計) + producer discharge (hyp46Smp) + pin 修正。
+
+## ✅ (2026-07-11、lane-b /loop iter 34) — 案 X step 1-2 完了: A/A₀-support def 移設
+
+`honestTypeP2ASet` (同 file 内前方移動) + `honestTypeP2A0Set` (S15_HonestTypeP2A0 [c file、
+self-flag content-preserving 移設] → SubcoherenceInputs structure 前) — 両 def が S15.Hypothesis
+の field 語彙で使用可能に (commit 上記、full build 4150 green・AxiomsCheck OK)。typePV/
+conjClassSetIn は GroupTheory 層で既に閉包内、hodd-free 確認済。
+
+**次 iter (案 X step 3 = iter 30 設計の field 追加本体)**:
+`mu_diff_support : ∀ (i : Fin q) {j k : Fin p}, (j:ℕ)≠0 → (k:ℕ)≠0 → mu i j 1 = mu i k 1 →
+((mu i j − mu i k)).support ⊆ S04.supportInSubgroup (honestTypeP2A0Set S Sdata) S` を 3 層 +
+producer discharge (hyp46Smp = hyp46S copy [dadeSupportHypothesisData_honestTypeP2A0Set hG
+mp.S_maximal mp.S_typeP2 tp.Sdata + subH=M_σ 4 論証、S15_HonestTypeP2A0:660-699 参照] +
+muS_diff_support = residueS_mu2_diff_support の mp-level 写し [chi2enum 版]) + pin 修正
+(hj0/hk0/hdeg 化) + consumer `_hj` pass。
