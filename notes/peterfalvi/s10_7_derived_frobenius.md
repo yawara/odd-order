@@ -470,6 +470,18 @@ zeta1-trick で τ₂ν|_V = 0) → step 3 (S05 endgame + dichotomy 整形)。
 その後: τ₂λ|_V = 0 ((5.5) singleton + key-brick + glue) → zeta1-trick (λ1·ν − ν1·λ の
 smul-diff support helper 1 本) → τ₂ν|_V = 0 → S05 endgame。
 
+**進捗³**: ~~(3.2.e) glue~~ **DONE (7b02ae31)**: `ticyclic_full_map_eq_induce` (σ=Ind on
+CF(W,V)、TI-counting) + `ticyclic_apply_eq_zero_of_forall_inner_chiFam` (Coq
+ortho_cycTIiso_vanish — repo に無かった (3.2.e) gap を S05-generic に閉じた。upstream hoist
+候補)。**残 = 純組立**: (a) τ₂λ|_V = 0 — (5.5) singleton (τ₂λ = α ∈ R(λ)) + 156e3906
+(α ⊥ 全 ω) + glue (⚠ glue の仮定は ∀pq の chiFam-form — ω→chiFam は
+certainTypeOmegaSigma_eq_chiFam、**全 pq への到達** = (χ₂',i) ↦ pq の全射が要 —
+omegaProdEquiv.symm 全射 ✓ × omegaProdCharTic の (χ₂,i)-range = 全 Ŵ の確認 1 lemma,
+S05 `omegaProdEquiv_symm_omegaProdChar` + w1CharEquiv/ticW₂-transport 全射で)。
+(b) zeta1 = λ1•ν − ν1•λ: supported (smul-diff helper) → τ₂zeta1 = τ_S zeta1 (extends) →
+V-値 0 (landed anchor) → λ1·τ₂ν(v) = ν1·τ₂λ(v) = 0 → τ₂ν|_V = 0 (λ1 ≠ 0)。
+(c) S05 endgame 適用 (update¹⁰ の 3-5) → typeII_nu_tau2_dichotomy。
+
 ### 2026-07-10 update⁹ — ★★ typeII_T2_coherent LANDED (408e9650) — obligation 1 完成
 
 **T2 = {λ,λ̄,ν,ν̄} の (5.7) coherence が sorry-free/axiom-clean で閉じた** (τ₂ の存在 =
