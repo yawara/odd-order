@@ -144,3 +144,16 @@ W-分解 / V-order / 支持制限 (Ã₀∩cop ⊆ Ã) / Nat-count bound / ℚ �
 - **次 = S12_Noncoherence.lean** (pair leaf import の新 leaf): 供給組立 →
   無条件 S_not_coherent-v2。その際 (13.2.a)-circle (Phase 1a) に注意 —
   v2 の証明が K_lt_Kstar 系を経由しないよう M-seeded route の clean 部分のみ使う。
+
+## 2026-07-11 tick¹⁰ — pair-linkage 核 landed + 移行 cascade の精密化
+
+- `typePData_Msigma_inf_centralizer_W1_eq_W2` (K = W₂ literal 同定、axiom-clean、a2ff7e87)。
+- **⚠ v2 組立の taint 分析 (実装前に確定)**: 現 M-seeded mp-producer で v2 を組むと
+  K_lt_Kstar fill → (13.2.a) → **no_typeV_maximal 依存**が v2 に入る ⟹
+  no_typeV_maximal 自身は v2 へ migrate 不能 (依存順)。⟹ **Phase 1a (Core-split、
+  K_lt_Kstar-free M-seeded producer) は v2 の前提**であって後回し不可。
+- **(11.3) 消費者も上流**: S_H0C_not_coherent (S13_Lemmas113To115) は FTS 上流 →
+  v2 直 cite 不能。(11.8)-capstone 側の migration も Phase 3 後半に含む
+  (capstone chain の discharge 位置を pair-leaf 下流へ)。
+- 順序確定: **Phase 1a → v2 (S12_Noncoherence) → (10.10)-v2 → FTS (13.2.a)-trio
+  relayer + S15/S16 repoint (hub 調整) → (11.3)/(11.8) 側 migration**。
