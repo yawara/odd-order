@@ -35,6 +35,17 @@ created: 2026-07-10
 trial の裁定 (codex 継続 or Claude へ swap-back) が本 issue に記録され、merge_monitor.md の
 🤖 ブロック / レーン表がその結果に更新されている。
 
+## ⚖️ 裁定 (2026-07-11、hub): **KEEP — lane c は codex 5.6 運用を継続**
+
+エビデンス (下記 trial ログ全体): genuine landing 9/9・churn 0。deep obligation 3 種
+((14.11.2) parity+Bessel / K=V 分岐 / grid 同期) を全て実証明で消化し、T-side mirror
+((14.8)/(14.9) cluster) へ自律進行。規律違反 1 件 (tick #12 AxiomsCheck 未追従) は差し戻し後に
+是正され、以後 AxiomsCheck 追記・粒度分割・issue 自己記録が指示なしで定着。旧 lane d の
+懸念 (dup churn) は全期間で不成立 (同名 flag は全て自主分割の移設由来)。唯一の運用差 =
+turn 終了で停止する (Claude /loop 相当の自走なし) — ユーザーの再開一言で解消、swap-back
+理由には当たらない。本裁定で「やること」の keep/swap-back 判定は完了 (期限 2026-07-12 前倒し)。
+issue は trial ログの追記継続のため open 維持、次の節目 (T-side cluster 完了) で close 判定。
+
 ## trial ログ
 
 - 2026-07-10: handoff 一式作成 (note + merge_monitor 反映)。codex 起動待ち。
@@ -106,3 +117,9 @@ trial の裁定 (codex 継続 or Claude へ swap-back) が本 issue に記録さ
   待たず keep 相当のエビデンス充分** — 数学 8 連続 genuine (deep obligation 3 種を全て実証明で消化)、
   規律は違反 1 回→是正後に自発遵守が定着、分割規約も自主実践。正式 keep 裁定は次 tick で記録予定
   (ユーザー異議があればその場で swap-back 可能)。
+- 2026-07-11 (tick、merge ef2166db): (14.9) T-side prime-TI anchor 構築 (新 leaf TGapPrimeTI.lean
+  74 行、TTypeII が import、AxiomsCheck assert 2 本自発追記、dup なし)。⚠ hub 側の手順スリップ:
+  tick 冒頭の「c は sync のみ」判定が stale 化 (検証待ち中に c が新 commit を push) し、未検証のまま
+  merge+push 連鎖で main に載った — 事後検証で build green 4150 jobs / AxiomsCheck OK を確認、
+  実害なし。**c 側の落ち度ではない** (gotcha を merge_monitor 注意節に記録)。トレンド: genuine
+  landing 9/9、churn 0。上記 ⚖️ 裁定のとおり **KEEP 確定**。

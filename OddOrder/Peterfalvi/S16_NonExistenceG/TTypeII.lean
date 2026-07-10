@@ -1,4 +1,4 @@
-import OddOrder.Peterfalvi.S16_NonExistenceG.TSideTypeP
+import OddOrder.Peterfalvi.S16_NonExistenceG.TGapPrimeTI
 import OddOrder.Peterfalvi.S16_NonExistenceG.KeyInequalityArithmetic
 import OddOrder.Peterfalvi.S16_GridExpansion
 
