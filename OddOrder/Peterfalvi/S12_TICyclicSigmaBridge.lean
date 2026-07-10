@@ -522,6 +522,42 @@ theorem ticyclic_omegaProdChar_comp_inclusion_of_swap
     MonoidHom.mul_apply]
   rw [h1, h2, mul_comm]
 
+/-- **The grid vectors transpose per index** (Coq `cycTIisoC` in `chiFam` form; the
+single-index core of `ticyclic_chiFam_columnSum_transpose`): for two TI-cyclic setups
+sharing `V` and `W` with the `W₁`/`W₂` roles swapped, each `hyp₁`-grid vector **is** the
+`hyp₂`-grid vector at the transported *swapped* index.  The vector at `P = (p, kcol)` is
+`σ₁(ω(ω_{(p, kcol)}))`; the (3.5)-determination transposes the σ's
+(`ticyclic_sigma_omega_eq_of_V_eq`), and the index translation is
+`ticyclic_omegaProdChar_comp_inclusion_of_swap`. -/
+theorem ticyclic_chiFam_transpose
+    (hyp₁ hyp₂ : OddOrder.Peterfalvi.S05.TICyclicHypothesis G)
+    [Fintype hyp₁.W] [Invertible (Nat.card hyp₁.W : ℂ)]
+    [Fintype hyp₂.W] [Invertible (Nat.card hyp₂.W : ℂ)]
+    (hVeq₁ : hyp₁.V = hyp₁.Vdiff) (hVeq₂ : hyp₂.V = hyp₂.Vdiff)
+    (hV : hyp₁.V = hyp₂.V) (hW : hyp₁.W = hyp₂.W)
+    (hW12 : hyp₁.W1 = hyp₂.W2) (hW21 : hyp₁.W2 = hyp₂.W1)
+    (app₁ : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication (G := G) hyp₁)
+    (app₂ : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication (G := G) hyp₂)
+    (P : ((hyp₁.W1.subgroupOf hyp₁.W) →* ℂˣ) × ((hyp₁.W2.subgroupOf hyp₁.W) →* ℂˣ)) :
+    hyp₁.chiFam hVeq₁ app₁ P
+      = hyp₂.chiFam hVeq₂ app₂ (P.2.comp (subgroupOfTransport hW.ge hW21.ge),
+          P.1.comp (subgroupOfTransport hW.ge hW12.ge)) := by
+  obtain ⟨p, kcol⟩ := P
+  have h1 : hyp₁.chiFam hVeq₁ app₁ (p, kcol)
+      = hyp₁.sigma hVeq₁ app₁
+          (hyp₁.omega (hyp₁.omegaProdChar p kcol) : ClassFunction hyp₁.W ℂ) := by
+    rw [hyp₁.sigma_omega hVeq₁ app₁, hyp₁.omegaProdEquiv_symm_omegaProdChar]
+  have h2 := ticyclic_sigma_omega_eq_of_V_eq hyp₁ hyp₂ hVeq₁ hVeq₂ hV hW app₁ app₂
+    (hyp₁.omegaProdChar p kcol)
+  have h3 := ticyclic_omegaProdChar_comp_inclusion_of_swap hyp₁ hyp₂ hW hW12 hW21 p kcol
+  have h4 : hyp₂.sigma hVeq₂ app₂
+      (hyp₂.omega (hyp₂.omegaProdChar (kcol.comp (subgroupOfTransport hW.ge hW21.ge))
+          (p.comp (subgroupOfTransport hW.ge hW12.ge))) : ClassFunction hyp₂.W ℂ)
+      = hyp₂.chiFam hVeq₂ app₂ (kcol.comp (subgroupOfTransport hW.ge hW21.ge),
+          p.comp (subgroupOfTransport hW.ge hW12.ge)) := by
+    rw [hyp₂.sigma_omega hVeq₂ app₂, hyp₂.omegaProdEquiv_symm_omegaProdChar]
+  rw [h1, h2, h3, h4]
+
 open scoped Classical in
 /-- **The (5.8) column sum is a row sum of the transposed grid** (issue 9079 item 4, the
 generic core of the `S`-grid = `M`-grid transpose): for two TI-cyclic setups sharing `V`
