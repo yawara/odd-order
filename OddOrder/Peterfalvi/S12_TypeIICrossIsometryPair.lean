@@ -680,14 +680,16 @@ theorem Hypothesis.supportInSubgroup_sharp_derived_subset_A0 [Finite G] {M : Sub
 
 set_option linter.unusedVariables false in
 set_option linter.unusedVariables false in
-open scoped Classical FiniteInduce in
-/-- **Peterfalvi (8.17.a) at the canonical pair, order-coprimality instance**: the order of
-an `(M′)^#`-point of the type-`P₁` `M = mp.T` is coprime to `|S_F| = |M_σ(S)|` of the
-type-II member `mp.S`.  This is the `coxTs`-step of Coq `FT_Dade_support_disjoint`
-(`part_a2`): `|a|` divides `|M_s| = |M′|` (the FTcore of a type-`P₁` maximal), and the
-FTcore prime supports of nonconjugate maximal subgroups are **disjoint** (Peterfalvi
-(8.17.a), Coq `FT_Dade_support_partition` — `π(G)` is partitioned by the `π(M_i_s)`).
-**`sorry`d as the (8.17.a) instance** (issue 9079 obligation 3). -/
+open scoped Classical FiniteInduce Pointwise in
+/-- **The core-order coprimality at the canonical pair** (the `coxTs`-step of Coq
+`FT_Dade_support_disjoint` `part_a2`): the order of an `(M′)^#`-point of the type-`P₁`
+`M = mp.T` is coprime to `|S_F| = |M_σ(S)|` of the type-II member `mp.S`.
+
+No (8.17.a) partition is needed at this instance: the type-`P₁` structure collapses the
+FTcore to the σ-Hall — `M′ = M_σ(M)` (Coq `typePfacts`,
+`isTypeP1_derivedInG_eq_Msigma`) — so `|a|` is a `σ(M)`-number, and `σ(M) ∩ σ(S) = ∅`
+for the nonconjugate pair (BG Theorem 13.9, `sigma_disjoint_of_nonconjugate`); both
+`M_σ`'s are Hall, so a common prime divisor would lie in the empty intersection. -/
 theorem typeP_pair_core_order_coprime [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hyp : Hypothesis M) {mp : Section16MaximalPair G}
@@ -696,7 +698,39 @@ theorem typeP_pair_core_order_coprime [Finite G]
     (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar)
     {a : G} (haM' : a ∈ sharpSubgroup (derivedInG M)) (ha0 : a ∈ typePA0 M hyp.typeP) :
     Nat.Coprime (orderOf a) (Nat.card (OddOrder.BG.Ch3.S10.Msigma mp.S)) := by
-  sorry
+  classical
+  -- the type-`P₁` `M` has `M′ = M_σ(M)` (BG `typePfacts`)
+  have hP : OddOrder.BG.Ch4.S14.IsTypeP M :=
+    OddOrder.BG.Ch4.S16.isTypeP_of_isTypeNonI hG hyp.maximal
+      (Or.inr hyp.type_alt)
+  have hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M := by
+    refine ⟨hP, ?_⟩
+    by_contra hne
+    exact not_isTypeP2_of_isTypeIII_or_IV_or_V hG hyp.maximal hyp.type_alt ⟨hP, hne⟩
+  have hM'σ : derivedInG M = OddOrder.BG.Ch3.S10.Msigma M :=
+    OddOrder.BG.Ch4.S16.isTypeP1_derivedInG_eq_Msigma hG hyp.maximal hP1
+  -- `σ`-disjointness of the nonconjugate pair (BG Theorem 13.9)
+  have hnc : ¬ ∃ g : G, MulAut.conj g • M = mp.S := by
+    rintro ⟨g, hg⟩
+    exact mp.S_T_not_conj ⟨g⁻¹, by
+      rw [← hg, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul, hT]⟩
+  have hdisj : Disjoint (OddOrder.BG.Ch3.S10.sigma M) (OddOrder.BG.Ch3.S10.sigma mp.S) :=
+    OddOrder.BG.Ch3.S13.sigma_disjoint_of_nonconjugate hG hyp.maximal mp.S_maximal hnc
+  -- a common prime would lie in `σ(M) ∩ σ(S) = ∅`
+  by_contra hne
+  obtain ⟨q, hqp, hqdvd⟩ := Nat.exists_prime_and_dvd hne
+  have hqa : q ∣ Nat.card (OddOrder.BG.Ch3.S10.Msigma M) :=
+    (hqdvd.trans (Nat.gcd_dvd_left _ _)).trans
+      (Subgroup.orderOf_dvd_natCard _ (hM'σ ▸ haM'.1))
+  have hqσM : q ∈ OddOrder.BG.Ch3.S10.sigma M :=
+    (OddOrder.BG.Ch3.S10.Msigma_isHall hG hyp.maximal).1 q
+      (Nat.mem_primeFactors.mpr ⟨hqp, hqa, Nat.card_pos.ne'⟩)
+  have hqb : q ∣ Nat.card (OddOrder.BG.Ch3.S10.Msigma mp.S) :=
+    hqdvd.trans (Nat.gcd_dvd_right _ _)
+  have hqσS : q ∈ OddOrder.BG.Ch3.S10.sigma mp.S :=
+    (OddOrder.BG.Ch3.S10.Msigma_isHall hG mp.S_maximal).1 q
+      (Nat.mem_primeFactors.mpr ⟨hqp, hqb, Nat.card_pos.ne'⟩)
+  exact (Set.disjoint_left.mp hdisj hqσM) hqσS
 
 set_option linter.unusedVariables false in
 open scoped Classical FiniteInduce Pointwise in
