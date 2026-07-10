@@ -420,6 +420,40 @@ theorem section16_pair_chiFam_columnSum_transpose [Finite G]
     (section16_pair_tic_W1_eq_W2 hG hodd hSW1 dataT hTW1)
     (section16_pair_tic_W2_eq_W1 hG hodd hSW2 dataT hTW1) appS appT kcol
 
+open scoped Classical FiniteInduce in
+/-- **The per-index grid transpose at the canonical pair, `T`-side → `S`-side** (Coq `etaC`
+in the consumption direction): each `T = M`-side grid vector **is** an `S`-side grid vector
+at the transported swapped index.  Pair instance of `ticyclic_chiFam_transpose` with the
+roles read from the `T`-side (the swap equalities reversed).  This is what reduces an
+`M`-side aligned-grid orthogonality claim ((5.3.b) `lam_ortho_grid`) to a pure `S`-side
+grid computation. -/
+theorem section16_pair_chiFam_transpose_T [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {mp : Section16MaximalPair G}
+    (hodd : Odd (Nat.card G))
+    {dataS : TypePData mp.S} (hSW1 : dataS.W1 = mp.K) (hSW2 : dataS.W2 = mp.Kstar)
+    (dataT : TypePData mp.T) (hTW1 : dataT.W1 = mp.Kstar)
+    (appS : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication (G := G)
+      (typePData_toTICyclicHypothesis dataS hodd))
+    (appT : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication (G := G)
+      (typePData_toTICyclicHypothesis dataT hodd))
+    (P : ((typePData_toTICyclicHypothesis dataT hodd).W1.subgroupOf
+        (typePData_toTICyclicHypothesis dataT hodd).W →* ℂˣ) ×
+      ((typePData_toTICyclicHypothesis dataT hodd).W2.subgroupOf
+        (typePData_toTICyclicHypothesis dataT hodd).W →* ℂˣ)) :
+    (typePData_toTICyclicHypothesis dataT hodd).chiFam rfl appT P
+      = (typePData_toTICyclicHypothesis dataS hodd).chiFam rfl appS
+          (P.2.comp (subgroupOfTransport
+              (section16_pair_tic_W_eq hG hodd hSW1 hSW2 dataT hTW1).symm.ge
+              (section16_pair_tic_W1_eq_W2 hG hodd hSW1 dataT hTW1).symm.ge),
+            P.1.comp (subgroupOfTransport
+              (section16_pair_tic_W_eq hG hodd hSW1 hSW2 dataT hTW1).symm.ge
+              (section16_pair_tic_W2_eq_W1 hG hodd hSW2 dataT hTW1).symm.ge)) :=
+  ticyclic_chiFam_transpose _ _ rfl rfl
+    (section16_pair_tic_V_eq hG hodd hSW1 hSW2 dataT hTW1).symm
+    (section16_pair_tic_W_eq hG hodd hSW1 hSW2 dataT hTW1).symm
+    (section16_pair_tic_W2_eq_W1 hG hodd hSW2 dataT hTW1).symm
+    (section16_pair_tic_W1_eq_W2 hG hodd hSW1 dataT hTW1).symm appT appS P
+
 /- Prerequisites for the `M`-seeded pair producer (issue 9079, gate assembly) -/
 
 /-- `IsHallSubgroup` is determined by the order: a subgroup of the same order as a Hall
