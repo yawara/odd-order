@@ -3364,6 +3364,13 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.tSideDelta_isReal
 set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.inner_eq_swap_of_mem_ZIrr
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.gap_cross_inner_identity
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.tSide_beta_inner_eta_of_zeroColumn_projection
+set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.typeIII_induced_source_support
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.typeIII_induced_source_degree

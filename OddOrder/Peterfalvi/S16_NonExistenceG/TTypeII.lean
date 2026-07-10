@@ -1,4 +1,4 @@
-import OddOrder.Peterfalvi.S16_NonExistenceG.TGapDelta
+import OddOrder.Peterfalvi.S16_NonExistenceG.TGapCross
 import OddOrder.Peterfalvi.S16_NonExistenceG.KeyInequalityArithmetic
 import OddOrder.Peterfalvi.S16_GridExpansion
 
@@ -1195,8 +1195,47 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       norm_num
     have hrelation : ClassFunction.inner betaData.Gamma (hτ.extension ζ) =
         1 + ClassFunction.inner Δ betaData.Gamma := by
-      -- Remaining: the S/T gap calculation gives the cross-inner identity.
-      sorry
+      -- The remaining deep input is precisely Coq's pair
+      -- `o_eta0_betaT0` + `QV'betaS ⟂ Ind_T^G betaT0`: the (11.9) projection of the
+      -- T-side bridge onto the η-grid, and the (14.9) S/T support separation.
+      have hdeep :
+          (∀ j : Fin hyp.base.p,
+            ClassFunction.inner
+                (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ j)
+                (tSideDadeMap hyp hG (ν0 - ζ)) =
+              ClassFunction.inner
+                (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ j)
+                (∑ i : Fin hyp.base.q,
+                  hyp.base.eta i ⟨0, hyp.base.p_prime.pos⟩)) ∧
+          ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ))
+            (OddOrder.Peterfalvi.S15.tauSbetaGrid hG hyp.base) = 0 := by
+        sorry
+      have hτβeta : ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ))
+          (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩
+            ⟨1, by have := hyp.base.three_le_p; omega⟩) = 0 := by
+        have hne0 :
+            (⟨1, by have := hyp.base.three_le_p; omega⟩ : Fin hyp.base.p) ≠
+              ⟨0, hyp.base.p_prime.pos⟩ := by
+          intro h
+          have hv := congrArg Fin.val h
+          norm_num at hv
+        have hrow := tSide_beta_inner_eta_of_zeroColumn_projection
+          hyp.base (tSideDadeMap hyp hG (ν0 - ζ)) hdeep.1
+          ⟨1, by have := hyp.base.three_le_p; omega⟩
+        simpa only [if_neg hne0] using hrow
+      have hΓdef : betaData.Gamma =
+          OddOrder.Peterfalvi.S15.tauSbetaGrid hG hyp.base -
+              (trivialIrreducibleCharacter G : ClassFunction G ℂ) +
+            hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩
+              ⟨1, by have := hyp.base.three_le_p; omega⟩ := by
+        rfl
+      have hΔdef : Δ =
+          tSideDadeMap hyp hG (ν0 - ζ) -
+              (trivialIrreducibleCharacter G : ClassFunction G ℂ) +
+            hτ.extension ζ := by
+        rfl
+      exact gap_cross_inner_identity hGammaZ hExtZ hOneZ hΓdef hΔdef
+        hτβinner hdeep.2 hτβeta hGamma1
     exact ⟨Δ, hΔZ, hΔreal, hΔone, hrelation⟩
   obtain ⟨x, hxcoe, hx⟩ :
       ∃ (x : ClassFunction G ℂ → ℤ),
