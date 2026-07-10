@@ -960,3 +960,15 @@ orthonormal、`Ind Φ_j = Σ_i ⟨Φ_j,χ_i⟩•mu_i` → mu_i = χ_i on A。�
 collapse) → D := Res mu_i − χ_i ⊥ 全 Φ → D = 0 on A。SupportedSpanOrthogonality に追記 →
 その後 mu2Grid instantiation (Φ := ω-差族 [今回 landed]、mu_ := δ·mu2Grid 族、hypothesis =
 sigma_omega_eq_mu2GridSign_smul_mu2Grid 経由) で prTIirr_id 対応が閉じる。
+
+## ✅ (2026-07-11、lane-b /loop iter 19) — cross-level (1.3.b) landed、(1.3) 三部作完成
+
+`restrict_apply_eq_on_of_induce_eq_sum` (SupportedSpanOrthogonality、一発 green): H≤G、conj-不変
+A⊆H、A-supported spanning Φ、CF(G) orthonormal mu 族、`Ind Φ_j = Σ_k ⟨Φ_j,χ_k⟩•mu_k` →
+Res(mu i) = χ i on A。reciprocity + orthonormal collapse + 同一群版で 3 行帰着。
+**(1.3) port 完了** (core / 同一群 / cross-level / Fourier / ω-差族 spanning の 5 点セット)。
+**次 = mu2Grid instantiation (prTIirr_id)**: Φ := ω_χ−ω_{sndPart χ} 族 (supported ✓ spanning ✓)、
+A := {w | w ∉ W₂-sub} (W abelian → conj-inv 自明)、mu := mu2Grid 族 (orthonormal ✓)、
+**残る供給 = hInd**: Ind_W^S(ω-diff) = Σ⟨diff,·⟩•(δ·μ) — σ (3.2 cyclicTIiso) の
+「A₁-supported diff で σ = Ind」性質 (TICyclicHypothesis の σ↔Ind agreement API、
+sigma_apply 系 or dadeIntegralCharacterMap 系) を次 iter で精査 → instantiation。
