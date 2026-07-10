@@ -1096,3 +1096,31 @@ sndPart lift; 積 equiv があれば直接、なければ Finset.equivFin [[lean
 (3) hTI : IsTISubset (W∖W₂ G-level) W 仮説パラメータの設計 (iter 20 (b) 案)、
 (4) 置き場 = PrimeTIResidue.lean vs 新 S05 leaf。精査後、列ごと instantiation
 (induce_difference_pair_structure_of_isTISubset 適用可能形) を実装。
+
+## ⚠✅ (2026-07-11、lane-b /loop iter 26) — **大訂正: prTIirr_id (4.3.c) は S06 に 2026-06-10 から完全 landed 済**
+
+instantiation 精査で判明 ([[verify-port-state-by-number-not-coq-name]] の再発、同 memory に追記済):
+
+- **`certainType_apply_eq_of_mem_V`** (S06_CertainTypeCharacters:958、sorry-free) = **prTIirr_id
+  (4.3.c) first part そのもの**: `μ_{ij}(x) = δ_j·ω_{ij}(x)` for `x ∈ sdiffTICyclicHypothesis.V`
+  (**= W∖W₂ 全体**、V ⊊ W∖W₂ ではない — sdiff hypothesis の V が W∖W₂)。commit acd39ea1
+  (2026-06-10)「Pf (4.3.c) first part」。同 file に (4.3.c) second part
+  (`certainType_vanishes_of_ne`) / (4.3.d) / **σ-grounding `sigma_chiColumn_eq_certainType`**
+  (σ(ω_{ij}) = δ_j·μ_{ij}、iter 11 の「gap 2: columnFamily.mu ↔ mu2Grid 同定」も実質解消) まで完備。
+- **S06 の内部 route**: columnFamily ((1.4) per-column、isometry は sdiffFullDadeIsometryData =
+  Dade package 経由) → certainTypeRestrictDiff ⊥ omegaColumnDiffBasis (Step 4) →
+  apply_eq_zero_of_mem_V_of_inner_omegaColumnDiff (masking) → 値恒等式。つまり iter 20-22 で設計した
+  a-d route (TI-isometry → 列抽出 → (1.3.b) → (3.9.a)) の instantiation は**全て不要**。
+- **iter 12-25 の評価**: 「W∖W₂-値は未 port」の診断 (iter 12) は Coq 名 grep
+  (prTIirr_id/equiv_restrict_compl_ortho) による検索ミス — `git log -S "4.3"` で一発だった。
+  iter 15-19 の (1.3) 三部作 + ω-差族 spanning、iter 23-25 の TI-isometry/generic 列抽出/列間
+  disjoint は **generic shared infra として維持** (S06 版は CertainTypeHypothesis 固定・Dade 依存、
+  generic 版は任意 TI 文脈で軽量) — ただし本 route の必要部品としては superseded。
+
+**真の残 gap (修正後、iter 20 依存鎖の再評価)**: S06 (4.3.c) → residue chain の**配線のみ**:
+1. **ofS06Hypothesis companion lemma** (PrimeTIResidue.lean): `(ofS06Hypothesis h H hW2H).mu2 i j`
+   の W∖W₂-値 = `certainType_apply_eq_of_mem_V` の Fin-index 形 (mu2 = columnFamily.mu は rfl)。
+2. **residueS 形** (S13_PrimeTIResidueBridge、b-owned): hyp.residueS の mu2 値恒等式。
+3. **S15 grounding**: B(i) (S′∖P→0) / B(ii) (1→u) / B(iii) (W₁^#: 列和 Σ_i δω_{ij}(x)、
+   ω₁-full-dual 和消滅) を primeTIred/beta 消費形で。
+次 iter: 1+2 実装。
