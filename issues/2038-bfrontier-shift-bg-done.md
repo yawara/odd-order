@@ -900,3 +900,25 @@ Frobenius-reciprocity + 基底展開で self-contained に証明可能な見込�
 prTIirr_id 対応 (`mu2Grid_apply_eq_of_mem_W_sub_W2`) を mu2Grid API に追加。
 これが (13.18)/(13.19) cluster の真の最上流 — 9014 continuation として次 session/iter で
 equiv_restrict_compl_ortho port から着手。
+
+## 📋 (2026-07-10 続²⁰、lane-b /loop iter 14) — 依存鎖の底 = Peterfalvi (1.3.a)/(1.3.b) 未 port 確定
+
+- **equiv_restrict_compl(_ortho) = Peterfalvi (1.3.a)/(1.3.b)** (Coq PFsection1:87/123 — §1 の
+  一般原理、mathcomp 本体でない)。repo S03_PreliminaryCharacter の (1.3) 部は
+  `inductionCoefficient` API + `IsInductionExpansion` predicate のみで**本体定理は未 port**
+  (docstring 自認: 「numerical Frobenius-reciprocity theorem remains routed to the
+  InducedCharacter proof core」)。
+- **(1.3.a) statement**: H ≤ G、A ⊴ H、Φ basis of CF(H,A)、μ ∈ CF(G):
+  `{on A, μ = Σ d_i·χ_i} ↔ ∀j, Σ_i ⟨Φ_j,χ_i⟩·d_i^* = ⟨Ind Φ_j, μ⟩`。
+  証明部品: D := Res μ − Σd_i χ_i の CF(H,H∖A)-membership ⟺ 内積条件
+  (Frobenius reciprocity + **CF(H) = CF(H,A) ⊕ CF(H,H∖A) 直交補分解** [cfun_complement/
+  cfdot_complement — repo 対応要確認] + 基底展開)。
+- **(1.3.b)**: + mu_ orthonormal + `Ind Φ_j = Σ⟨Φ_j,χ_i⟩·mu_i` → ∀i {on A, mu_i = χ_i} ∧
+  (⊥全mu → A 上 0)。(a) の 2 instantiation。
+- **port 配置**: S03 系新 leaf (例 `S03_RestrictComplement.lean`、§1=S03 文書順で最上流) or
+  RepresentationTheory shared leaf。mathlib Basis over supportedSubmodule + repo の
+  inner_induce_eq_inner_restrict で self-contained。
+- **依存鎖 (確定、深→浅)**: (1.3.b) port → normedTI(W∖W₂) 供給 → prTIirr_id 対応
+  (mu2Grid W∖W₂-値) → residueS transport → S15 grounding fields → mu_row0_ne/pins →
+  B(i)(iii) → PVSbeta assembly = betaGrid_A0_support → gammaGrid 系 → (13.19) producer。
+  次 iter: (1.3) port 実装開始 (直交補分解の repo 在庫確認から)。
