@@ -52,3 +52,22 @@ book (10.10) の「type V なら 𝒮 coherent」((10.8) との矛盾用)。
   (11.4)/(11.5) filtration route (S13_Lemmas113To115、type II/III/IV 向けに proven —
   type V 適用可否の確認が次) or S08_SixTwoGeneral の非-TI 形。
 - **case (c)**: (10.10.1)-(10.10.4) + (10.9) refutation — 最深、最後。
+
+## 2026-07-11 tick¹⁷ — case-(a) 供給連鎖の完全 map (残る設計点 1 つ)
+
+- **h46 producer 発見**: `Hypothesis.toHypothesis46` (S12_Core:1057、hyp 自身の完全 (4.6)!)。
+  type V では typePA = ⋃_{x∈H#}C_{M'}(x)# = **H#** (M' = H) なので A-param も一致。
+  side conditions: W₂ prime = w2_prime ✓ / W₂ ≤ [H,H] = W2_le (≤ secondDerived) ✓ /
+  coprime = hall ✓。K = H ✓ (M' = H)。
+- **SibleyDade 組立部品**: split = M_complement (U=⊥) / dade = S04.of_isTISubset
+  ((a)-TI から、H a = ⊥ ✓ dade_H_eq_bot) / S_eq = inducedFamily 同定 /
+  cases = Or.inr ⟨toHypothesis46, …⟩。
+- **⚠ 残る設計点**: `h46.dade = dade` field — toHypothesis46.dade は A₀-Dade の
+  restrict (H(a) = 継承 signalizer、⊥ とは限らない) vs TI-構成 dade (H ≡ ⊥)。
+  同定には dadeHypothesis_eq_of_forall_H_eq_bot (9079 part 1、両側 H≡⊥ 要) —
+  つまり **hyp.dadeData の H(a) が type-V-case-(a) で ⊥ かは data 依存**。
+  解決候補: (i) hyp.dadeData 構築 (exists_hypothesis_of_typeIIIorIVorV、axiom-clean!)
+  の H(a)-fields を実測 — (8.15)-構成が type V/case-(a) で ⊥ を選んでいれば同定可;
+  (ii) さもなくば Sibley 側を h46.dade ベースで組む (dade_H_eq_bot を h46 側から) —
+  case-(a) の TI が R(a) = 1 を強制する事実 ((2.3)-route) を経由。
+- 出力 transport: isCoherent_of_supportedSpan_le + S_eq→inducedFamily ✓ (前 tick 済)。
