@@ -741,9 +741,14 @@ a conjugate of the type-II member `mp.S`.
 Coq `FTsupport_facts` (b)+(c4) + the (10.7) consumer's `notFrobM`: the escaping `A₀`-point
 has a *unique* supporting maximal `N[a]` (8.13.b), here `= S^g` by `C_G(a) ≤ S^g`; and
 (8.13.c4) says a type-II supporter forces `M` to be a Frobenius group with kernel `M_F` —
-impossible for the type-`P₁` `M` (Coq `typePF_exclusion`).  **`sorry`d as the (8.13.c4)
-instance** (issue 9079 obligation 3; `escapingCentralizers_control` is the open §8
-upstream of the (b)-part). -/
+impossible for the type-`P₁` `M`.
+
+Proven from **BG Theorem D(4)** (`theoremD_msigma_conjugacy_and_centralizers`): the
+type-`P₁` collapse `M′ = M_σ` puts `a ∈ M_σ(M)^#`, D(4) attaches to the escaping `a` a
+supporting maximal `N₀` with the package clause `IsTypeP2 N₀ → IsTypeF M ∧ …`; the given
+uniqueness pins `N₀ = S^g`, a conjugate of the type-II `S`, hence type `P₂` (Proposition
+16.1(b), `proposition_type_classification`); the fired clause makes `M` type `F` = type I —
+contradicting type III/IV/V (`not_isTypeI_of_isTypeNonI`). -/
 theorem typeP_pair_escaping_centralizer_not_le_conj_partner [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hyp : Hypothesis M) {mp : Section16MaximalPair G}
@@ -752,9 +757,42 @@ theorem typeP_pair_escaping_centralizer_not_le_conj_partner [Finite G]
     (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar)
     {a : G} (haM' : a ∈ sharpSubgroup (derivedInG M)) (ha0 : a ∈ typePA0 M hyp.typeP)
     (hesc : ¬ Subgroup.centralizer ({a} : Set G) ≤ M)
-    {g : G} (hland : Subgroup.centralizer ({a} : Set G) ≤ MulAut.conj g • mp.S) :
+    {g : G} (huniq : ∀ N ∈ maximalSubgroupsContaining
+      (Subgroup.centralizer ({a} : Set G)), N = MulAut.conj g • mp.S) :
     False := by
-  sorry
+  classical
+  -- the type-`P₁` collapse puts `a` in `M_σ(M)^#`
+  have hP : OddOrder.BG.Ch4.S14.IsTypeP M :=
+    OddOrder.BG.Ch4.S16.isTypeP_of_isTypeNonI hG hyp.maximal (Or.inr hyp.type_alt)
+  have hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M := by
+    refine ⟨hP, ?_⟩
+    by_contra hne
+    exact not_isTypeP2_of_isTypeIII_or_IV_or_V hG hyp.maximal hyp.type_alt ⟨hP, hne⟩
+  have hM'σ : derivedInG M = OddOrder.BG.Ch3.S10.Msigma M :=
+    OddOrder.BG.Ch4.S16.isTypeP1_derivedInG_eq_Msigma hG hyp.maximal hP1
+  have haσ : a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M := by
+    show a ∈ sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma M)
+    rw [← hM'σ]
+    exact haM'
+  -- BG Theorem D(4): the unique supporting maximal with the type-`F`/`P₂` package
+  obtain ⟨-, -, -, hD4⟩ :=
+    OddOrder.BG.Ch4.S16.theoremD_msigma_conjugacy_and_centralizers hG hyp.maximal
+  obtain ⟨R, -, N₀, hQ, -⟩ := hD4 a haσ hesc
+  obtain ⟨hN₀mem, -, -, -, -, -, hP2clause⟩ := hQ
+  have hN₀eq : N₀ = MulAut.conj g • mp.S := huniq N₀ hN₀mem
+  have hN₀max : N₀ ∈ maximalSubgroups G := (mem_maximalSubgroupsContaining.mp hN₀mem).1
+  -- `N₀` is a conjugate of the type-II `S`, hence type `P₂` (Proposition 16.1(b))
+  have hN₀II : IsTypeII N₀ := by
+    rw [hN₀eq]
+    exact isTypeII_pointwise_smul (MulAut.conj g) (section16_S_isTypeII hG mp)
+  obtain ⟨-, hIIiff, -⟩ :=
+    OddOrder.BG.Ch4.S16.proposition_type_classification hG hN₀max
+  -- fire the (c4)-clause: `M` is type `F` = type I — contradicting type III/IV/V
+  obtain ⟨hFM, -, -⟩ := hP2clause (hIIiff.mp hN₀II)
+  obtain ⟨hIiffM, -, -⟩ :=
+    OddOrder.BG.Ch4.S16.proposition_type_classification hG hyp.maximal
+  exact OddOrder.BG.Ch4.S16.not_isTypeI_of_isTypeNonI hG hyp.maximal
+    (Or.inr hyp.type_alt) (hIiffM.mpr hFM)
 
 open scoped Classical FiniteInduce Pointwise in
 /-- **Peterfalvi (8.18.b), bare base-point disjointness at the canonical pair — the
@@ -881,13 +919,20 @@ theorem typeP_pair_base_bare_not_isConj [Finite G]
       rfl
     have hCbS : Subgroup.centralizer ({b} : Set G) ≤ mp.S :=
       (mem_maximalSubgroupsContaining.mp hSmem).2
-    have hland : Subgroup.centralizer ({a} : Set G) ≤ MulAut.conj c⁻¹ • mp.S := by
-      have hstep : MulAut.conj c⁻¹ • Subgroup.centralizer ({b} : Set G)
-          ≤ MulAut.conj c⁻¹ • mp.S :=
-        Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hCbS
-      rwa [hCconj, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul] at hstep
+    have huniq : ∀ N ∈ maximalSubgroupsContaining
+        (Subgroup.centralizer ({a} : Set G)), N = MulAut.conj c⁻¹ • mp.S := by
+      intro N hN
+      rw [mem_maximalSubgroupsContaining] at hN
+      have hcN : MulAut.conj c • N ∈ maximalSubgroupsContaining
+          (Subgroup.centralizer ({b} : Set G)) := by
+        rw [mem_maximalSubgroupsContaining]
+        refine ⟨OddOrder.BG.Ch3.S12.isCoatom_conj_smul (mem_maximalSubgroups.mp hN.1), ?_⟩
+        rw [hCconj]
+        exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hN.2
+      rw [hB, Set.mem_singleton_iff] at hcN
+      rw [← hcN, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
     exact typeP_pair_escaping_centralizer_not_le_conj_partner hG hyp hT hKstar hSW1 hSW2
-      haM' ha0 hCa hland
+      haM' ha0 hCa huniq
 
 open scoped Classical FiniteInduce in
 /-- **Peterfalvi (8.18.b), base-point disjointness at the canonical pair** (the
