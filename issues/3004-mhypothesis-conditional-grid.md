@@ -237,3 +237,13 @@ c の issue が触れていない第 3 の同型問題:
 - **b cleanup 解禁**: c は `vdata.complement_card_eq_pq` (無条件形) を読まなくなった → b は
   deprecation 温存していた無条件 3 宣言 (`complement_inf_P_structure`/`complement_card_eq_pq_V`/
   `exists_M_structural`) を削除してよい (次回 main sync 後、consumer 0 を grep 確認の上)。
+
+## ✅ b cleanup 実施 (2026-07-10、lane-b、commit 5dc4e84a)
+
+HUB 追記 tick #6 の解禁に基づき削除実施。consumer-0 grep 確認の上、無条件 pq チェーン**全体**
+(6 宣言) を削除: 指名 3 宣言 (`complement_inf_P_structure` [sorried] /
+`complement_card_eq_pq_V` / `exists_M_structural`) + 中間 3 つ
+(`TypeIOverNormalizerDataV` / `typeI_overNormalizer_complement_V` /
+`typeII_overNormalizer_frobenius_V` — 指名 3 宣言のためだけに存在する同族無条件 pq carrier、
+S15_SAndT 内部完結・外部 consumer 0)。dichotomy 系 4 宣言は温存
+(`exists_M_structural_dichotomy` は独立 route ゆえ無影響)。full build 4135 green・AxiomsCheck OK。
