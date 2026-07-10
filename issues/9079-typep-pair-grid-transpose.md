@@ -654,3 +654,24 @@ exists_charParameters_full から)。§9 dichotomy/counts/例外 (9.10) は全�
    (U-complement flexibility 不要!)。carrier 橋 = map_subgroupOf_eq_of_le ×2 +
    subtype-comp (S15 CountingLayer exists_typePData_U_eq_V の precedent)。
 7. 新 aux を typeII_HU_frobenius_of_coherent に配線 → 旧 gate deprecate。
+
+## 2026-07-11 (c) part B LANDED (2aa6da12): 一般 type-II の (10.7) 完成
+
+`typeII_HU_frobenius_of_coherent'` (pair leaf 末尾) — 任意 type-II (S, setup) の
+(10.7) Frobenius。part A の WLOG engine + at_pair + IsFrobeniusGroup.mapEquiv
+(conj-制限 iso、carrier 橋は defeq show + pointwise-smul mem lemmas)。
+sorryAx = 既知上流 isTypeP2_of_typeP_kappaHall_lt (13.2.a) のみ。
+
+### 配線の知見と残タスク
+- ⚠ **S12_MaximalBasic は pair leaf の上流** (FTS ← S13_CoreStructure ←
+  S12_MaximalIII_IV_V ← Props109To1011 ← Prop109 ← MaximalBasic) — 旧
+  `typeII_derived_frobenius` の frobenius field を直接 repoint すると cycle。
+  **`typeII_derived_frobenius` に実 consumer は現状ゼロ** (S07/S11 の docstring
+  言及のみ) → 将来の実消費側が pair leaf の `typeII_HU_frobenius_of_coherent'`
+  (または新 packaging) を直接 cite する方針。旧 gate `exists_typeIICrossIsometryData`
+  + 旧 aux は consumer 不在確認後に hub deprecation 対象。
+- ⚠ pair leaf 1570 行 (>1500) — 分割対象: 候補 = (8.18.b) 支持幾何 cluster
+  (typeP_pair_* 5 定理) を新 sibling `S12_TypeIIPairSupportGeometry.lean` へ
+  prefix-split (下流 import 不変、hub 委任可)。
+- 9079 の主要 arc はこれで **全項目完了** (item 1-4 + part 1-2 + obligation 3 +
+  (c))。残 = 上記 2 整理タスクのみ。

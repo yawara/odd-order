@@ -1478,4 +1478,93 @@ theorem typeII_HU_frobenius_of_coherent_at_pair [Finite G]
       rw [hM'eq]
       exact hfrobHU
 
+open scoped Classical FiniteInduce Pointwise in
+/-- **Peterfalvi (10.7)** (setup form, pair-witness route; Coq `Frob_der1_type2`): under
+Hypothesis (10.4) for `M`, every Type-II maximal `S` with a Types-II/III/IV setup has
+`[S,S] = S_F ⋊ U` Frobenius with kernel `S_F`, on the given datum's factors.
+
+The honest replacement of `typeII_HU_frobenius_of_coherent_aux` (whose left branch cited
+the sorried gate `exists_typeIICrossIsometryData`): the WLOG engine
+`exists_reconciled_conj_typePData_S` transports the datum onto the canonical pair member
+`mp.S` with `H`/`U` carried along as conjugates; the pair-member theorem
+`typeII_HU_frobenius_of_coherent_at_pair` (fully proven) gives the Frobenius structure
+there; and `IsFrobeniusGroup.mapEquiv` along the inverse conjugation returns it on the
+original factors verbatim. -/
+theorem typeII_HU_frobenius_of_coherent' [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    {hyp : Hypothesis M} {params : CharacterParameters hyp}
+    (coh : CoherentHypothesis hyp params)
+    {S : Subgroup G} (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup S)
+    (hSII : IsTypeII S) :
+    OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(derivedInG S)
+      (data.typeP.H.subgroupOf (derivedInG S))
+      (data.typeP.U.subgroupOf (derivedInG S)) := by
+  haveI := hyp.finiteG
+  classical
+  -- WLOG: transport the datum onto the canonical pair member, `H`/`U` tracked
+  obtain ⟨mp, u, dataS, hT, hKstar, huS, hSW1, hSW2, hH, hU⟩ :=
+    exists_reconciled_conj_typePData_S hG hyp data.maximal hSII data.typeP
+  obtain ⟨dII⟩ := section16_S_isTypeII hG mp
+  -- (10.7) at the pair member, on the reconciled setup
+  have hfrob := typeII_HU_frobenius_of_coherent_at_pair hG coh hT hKstar
+    (data := { maximal := mp.S_maximal
+               typeP := dataS
+               nontrivial := dII.common.transfer dataS
+               type_alt := Or.inl (section16_S_isTypeII hG mp) }) hSW1 hSW2
+  have hfrob2 : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(derivedInG mp.S)
+      ((MulAut.conj u • data.typeP.H).subgroupOf (derivedInG mp.S))
+      ((MulAut.conj u • data.typeP.U).subgroupOf (derivedInG mp.S)) := by
+    rw [← hH, ← hU]
+    exact hfrob
+  -- the two factors sit inside `[S,S]`
+  have hM'eq : derivedInG S = data.typeP.H ⊔ data.typeP.U := by
+    rw [data.typeP.derivedInG_eq_fitting_sup_U, ← data.typeP.H_eq]
+  have hHle : data.typeP.H ≤ derivedInG S := by rw [hM'eq]; exact le_sup_left
+  have hUle : data.typeP.U ≤ derivedInG S := by rw [hM'eq]; exact le_sup_right
+  -- the conjugation isomorphism `[S,S] ≃* [mp.S, mp.S]`
+  have hD : (derivedInG S).map (MulAut.conj u).toMonoidHom = derivedInG mp.S := by
+    have h1 : MulAut.conj u • derivedInG S = derivedInG mp.S := by
+      rw [derivedInG_pointwise_smul, huS]
+    rw [← h1]
+    rfl
+  set e : ↥(derivedInG S) ≃* ↥(derivedInG mp.S) :=
+    ((MulAut.conj u).subgroupMap (derivedInG S)).trans
+      (MulEquiv.subgroupCongr hD) with he
+  -- carrier bridge: `map e.symm ((u • X).subgroupOf [mp.S,mp.S]) = X.subgroupOf [S,S]`
+  have hbridge : ∀ X : Subgroup G,
+      ((MulAut.conj u • X).subgroupOf (derivedInG mp.S)).map e.symm.toMonoidHom
+        = X.subgroupOf (derivedInG S) := by
+    intro X
+    have hcoe : ∀ z : ↥(derivedInG S), ((e z : ↥(derivedInG mp.S)) : G)
+        = u * (z : G) * u⁻¹ := fun z => rfl
+    ext z
+    simp only [Subgroup.mem_map, Subgroup.mem_subgroupOf]
+    constructor
+    · rintro ⟨w, hw, rfl⟩
+      show ((e.symm w : ↥(derivedInG S)) : G) ∈ X
+      have hz : ((e.symm w : ↥(derivedInG S)) : G)
+          = u⁻¹ * ((w : ↥(derivedInG mp.S)) : G) * u := by
+        have := hcoe (e.symm w)
+        rw [MulEquiv.apply_symm_apply] at this
+        have h2 := congrArg (fun x => u⁻¹ * x * u) this
+        simpa [mul_assoc] using h2.symm
+      rw [hz]
+      rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hw
+      have hinv : (MulAut.conj u)⁻¹ • ((w : ↥(derivedInG mp.S)) : G)
+          = u⁻¹ * ((w : ↥(derivedInG mp.S)) : G) * u := by
+        rw [← map_inv, MulAut.smul_def, MulAut.conj_apply, inv_inv]
+      rwa [hinv] at hw
+    · intro hz
+      refine ⟨e z, ?_, by simp⟩
+      show ((e z : ↥(derivedInG mp.S)) : G) ∈ MulAut.conj u • X
+      rw [hcoe z]
+      have : u * (z : G) * u⁻¹ = (MulAut.conj u) • (z : G) := by
+        rw [MulAut.smul_def, MulAut.conj_apply]
+      rw [this]
+      exact Subgroup.smul_mem_pointwise_smul _ _ _ hz
+  -- transport back
+  have hfrob' := hfrob2.mapEquiv e.symm
+  rw [hbridge data.typeP.H, hbridge data.typeP.U] at hfrob'
+  exact hfrob'
+
 end OddOrder.Peterfalvi.S12
