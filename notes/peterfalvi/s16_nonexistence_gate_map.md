@@ -1,5 +1,53 @@
 # Pf §16 — non-existence (`S16_NonExistenceG.lean`) gate map — lane-c (2026-06-22)
 
+## ⭐ 2026-07-10 CURRENT — issue 3004 conditional (14.10)/(14.11) architecture
+
+2026-07-08 の「`exists_MHypothesis.betaGrid` gate」という分類は **superseded**。
+原文 (14.10) には `e=pq` / signs / grid expansion は無く、これらを無条件 fieldにした旧
+`MHypothesis` は (14.11.1–2) 自身を循環させていた。Hub ruling
+(`issues/3004-mhypothesis-conditional-grid.md`) に従い次へ修正:
+
+```text
+(14.10) MHypothesis
+  e = actual |M:K|
+       │
+       ├─ b: (13.17.c)-dual  e=p ∨ e=pq ──▶ e≤pq
+       │                                      │
+       └─ K≠V ──▶ (14.11.1) strict gaps ─────┤
+                                              ├─ b: faithful (13.19.c) alternatives
+                                              │          │
+                                              │          ▼ bound branches excluded
+                                              └─▶ c: betaM_expansion_data
+                                                    e=pq + ±1 + Y=0 + χ classification
+                                                    + signed expansion
+```
+
+実装済み:
+
+- `MHypothesis` の `complement_card_eq_pq` / `betaSigns` / `betaSigns_pm` /
+  `betaGrid` を削除。`exists_MHypothesis` は actual indexで sorry-free構成。
+- `main_size_bounds_structural`: `K≠V + e≤pq` から
+  `k>2pv` と **strict** `(k−1)/e>(v−1)/p` を実証明。
+- `BetaMGridParityAlternatives`: actual `betaM` に対する (13.19.c) の二つの
+  bound-or-parity disjunction。b の corrected conjunction API から射影し、
+  `betaM_axis_odd_of_main_size_bounds` は両 bound枝を実証明で排除。
+- 無条件 norm/card API は `e` 一般形、`e=pq` は conditional norm cascade内でのみ使用。
+
+残 frontier:
+
+| owner | named boundary | 内容 |
+|---|---|---|
+| b | `complement_inf_P_structure_dichotomy` | faithful (13.17.c)-dual theorem body |
+| b | `typeIOrthogonalityGridData_of_typeISetup` | faithful (13.19) deep producer |
+| c/b interface | `exists_betaMGridData` | b の chosen Dade image と `Mdata.h78.beta` の同期 |
+| c | `betaM_expansion_data` | projection + tightness + `Y=0` + χ classification |
+| c | `complementIndex_eq_pq_of_K_eq_V` | K=V 後の small branch 排除 |
+
+`ComparingLM` の L-side `grid_mem` を入力 fieldにしている旧 engineも、同じ generic
+tightness engineへ将来再配線する。旧 over-strong `betaL_eta_independent` は citeしない。
+
+---
+
 ## ⭐ 2026-07-08 CURRENT — definitive gate map (lane-c /loop, 全数検証)
 
 **C cluster の全 13 live sorry (S16_NonExistenceG 10 + S15_HonestTypeP2A0 pin 3) は 2 つの
