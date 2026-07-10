@@ -179,3 +179,11 @@ Core_around (mp.Kstar = hyp.typeP.W1 literal) + K = W₂ 同定
 (typePData_Msigma_inf_centralizer_W1_eq_W2 → mp.K = hyp.typeP.W2 literal) +
 reconcile (dataS.W1 = mp.K / W2 = mp.Kstar) + (10.7)'-kernel 橋 (hfrobcap) +
 (8.11)/(8.6.a)/w2_prime/hall_coprime → S_not_coherent_of_partner 適用。
+
+## 2026-07-11 tick¹³ — ★★★★ (10.8) 無条件版 landing (axiom-clean)
+
+`S_not_coherent_unconditional` (S12_Noncoherence.lean) =
+[propext, Classical.choice, Quot.sound] 実測。Phase 1-3 の主要 arc 完結。
+残 = consumer migration: (10.10)-v2 (no_typeV_maximal を v2-cite で下流に再構成) →
+FTS (13.2.a)-trio の relayer (S15/S16 repoint、hub 調整) → (11.3)-v2 +
+(11.8)-capstone 側 → 旧 S_not_coherent/estimate/hB-sorry の deprecate。
