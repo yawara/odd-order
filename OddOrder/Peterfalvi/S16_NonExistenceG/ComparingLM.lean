@@ -1320,30 +1320,15 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 with its Dade data exists.  Symmetric to `exists_LHypothesis`, packaging (13.17)
 for the `V`-side with the Dade data and the virtual character `β_M` of (14.10).
 
-The whole structural / σ-counting / set-theoretic content is discharged genuinely:
-the type-I subgroup `M`, its `S14.Hypothesis` `typeIHyp`, and the §7 coherence datum
-`h78` come from `exists_M_hypothesis78` (the V-side dual of `witness_L_hypothesis78`,
-built through `exists_M_structural_dichotomy` + `typeI_frobenius` +
-`frobenius_typeI_coherent`); the
-`Mset`/`tau`/`tau1`/`psi`/`G0`/`betaM` data are read off `h78`; the TI / normalizer
-facts are the `base_*` helpers; and the two `G0` covering facts are elementary set
-algebra on the (14.11.3) complement `G₀ = G − [Ã(M) ∪ (W−(W₁∪W₂))^G ∪ (P#)^G ∪ (Q#)^G]`.
+The structural subgroup and the faithful (13.17.c)-dual index dichotomy come from
+`S15.exists_M_structural_dichotomy`.  The complete §5--§8 character data then comes from
+`TypeICoherent78Data.nonempty`: one bundle supplies the Dade setup, coherent extension, placed
+family, distinguished `ψ = ζ₀`, and its canonical `Hypothesis78`.  Thus `τ`, `τ₁`, `ψ`, and `β_M`
+are computed accessors of the same bundle rather than independently chosen carrier fields.
 
-Instance coherence across the producer/consumer boundary is handled by opening
-`S12.FiniteInduce` (the same scoped `Fintype`/`Invertible` instances that
-`MHypothesis`'s field types and `exists_M_hypothesis78`'s existential are built with),
-so no competing `Fintype.ofFinite`/`Invertible` is introduced.
-
-Three obligations are discharged genuinely, via extra witnesses on `exists_M_hypothesis78`:
-* `complementIndex_cases`: the faithful (13.17.c)-dual dichotomy from
-  `S15.exists_M_structural_dichotomy`;
-* `psi_degree_eq_e` (`ζ(1) = e = [M:K]`): the producer witnesses
-  `ζ_{ind1H}(1) = [M:K]` (`θ ind1H = 1_K` + `induce_trivialChar_apply_eq_index`), and
-  `e` is definitionally that actual index;
-* `psi_tau1_norm_one` (`‖ψ^{τ₁}‖² = 1`): the producer witnesses `‖ζ‖² = 1` (the distinguished
-  `ζ = Ind_K θ_0`, `θ_0 ≠ 1_K`, is Frobenius-irreducible —
-  `inner_self_induce_eq_one_of_frobeniusGroup`), and `tau1 = ν` is a family isometry on it
-  (`nu_isometry`).
+The TI / normalizer facts are the `base_*` helpers.  The two `G0` covering facts are elementary
+set algebra on the (14.11.3) complement
+`G₀ = G − [Ã(M) ∪ (W−(W₁∪W₂))^G ∪ (P#)^G ∪ (Q#)^G]`.
 
 No conclusion of (14.11) is packaged here: `e = p q`, the `±1` signs, and the η-grid expansion
 are produced only in the `K ≠ V` branch by `betaM_expansion_data`. -/
@@ -1351,38 +1336,27 @@ theorem exists_MHypothesis [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     Nonempty (MHypothesis hyp) := by
   have hTII : IsTypeII hyp.base.T := T_typeII _hG hyp
-  obtain ⟨M, typeIHyp, hM_max, hnorm_V, hindexCases, h78, hH_maxnilp, hhyp_dade,
-      hdeg_ind1H, hnorm1, hnormSq⟩ :=
-    exists_M_hypothesis78 _hG hyp hTII
+  obtain ⟨M, structuralHyp, hM_max, hnorm_V, hindexCases⟩ :=
+    OddOrder.Peterfalvi.S15.exists_M_structural_dichotomy _hG hyp.base hTII
+  obtain ⟨dataM⟩ :=
+    TypeICoherent78Data.nonempty _hG hM_max ⟨structuralHyp.typeI⟩
   refine ⟨{
     M := M
     K := maxNilpotentNormalHall M
     M_maximal := hM_max
     normalizer_V_le_M := hnorm_V
     K_eq_MF := rfl
-    typeIHyp := typeIHyp
-    h78 := h78
-    Mset := Set.range h78.hyp76.zeta
-    tau := h78.nu
-    tau1 := h78.nu
-    psi := h78.hyp76.zeta h78.zetaDistinct
+    hG := _hG
+    coherent78 := dataM
     e := ((maxNilpotentNormalHall M).subgroupOf M).index
     k := Nat.card ↥(maxNilpotentNormalHall M)
     e_eq_index := rfl
     complementIndex_cases := hindexCases
     k_eq_card_K := rfl
-    psi_mem := ⟨h78.zetaDistinct, rfl⟩
-    psi_degree_eq_e := ?psiDeg
-    betaM := h78.beta
-    betaM_formula := True
-    betaM_formula_holds := trivial
-    betaM_eq := rfl
-    psi_tau1_eq := rfl
-    G0 := Set.univ \ (typeIHyp.dadeData.dade.dadeSupport ∪
+    G0 := Set.univ \ (dataM.typeIHyp.dadeData.dade.dadeSupport ∪
       (conjClassSet ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G)))
         ∪ conjClassSet (sharpSubgroup hyp.base.P)
         ∪ conjClassSet (sharpSubgroup hyp.base.Q)))
-    psi_tau1_norm_one := ?normOne
     G0_off_dadeSupport := ?offDade
     G0_orbit_cover := ?orbCover
     G0_avoid := ?avoid
@@ -1391,9 +1365,6 @@ theorem exists_MHypothesis [Finite G]
     Q_isTI := base_Q_isTI _hG hyp hTII
     card_normalizer_P_eq := base_card_normalizer_P_eq _hG hyp
     card_normalizer_Q_eq := base_card_normalizer_Q_eq _hG hyp hTII
-    h78_hyp_eq := hhyp_dade
-    h78_H_eq := hH_maxnilp
-    h78_zetaNuRho_normSq_ge := ?normSq
   }⟩
   case offDade =>
     intro g hg hin
@@ -1409,7 +1380,7 @@ theorem exists_MHypothesis [Finite G]
       fun h => hg.2 (Set.mem_union_right _ (Set.mem_union_right _ h))⟩
   case orbCover =>
     intro g hgd hg0
-    have hmem : g ∈ typeIHyp.dadeData.dade.dadeSupport ∪
+    have hmem : g ∈ dataM.typeIHyp.dadeData.dade.dadeSupport ∪
         (conjClassSet ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G)))
           ∪ conjClassSet (sharpSubgroup hyp.base.P)
           ∪ conjClassSet (sharpSubgroup hyp.base.Q)) := by
@@ -1418,18 +1389,6 @@ theorem exists_MHypothesis [Finite G]
     rcases hmem with h | h
     · exact absurd h hgd
     · exact h
-  -- **Peterfalvi (7.6)/(14.10)**: `ψ(1) = ζ_{ind1H}(1) = [M:K] = e` — the induced
-  -- principal degree, genuinely discharged via `exists_M_hypothesis78`'s degree witness.
-  case psiDeg => rw [h78.zeta_one_eq_ind1H_one, hdeg_ind1H]
-  -- **Peterfalvi (7.5)/(7.8)**: `‖ψ^{τ₁}‖² = ‖ζ‖² = 1` — `τ₁ = ν` is a family isometry
-  -- (`nu_isometry`, `ζ = ψ` non-`ind1H`) and `ζ` is unit-norm (`hnorm1`, Frobenius irreducible).
-  case normOne =>
-    rw [h78.nu_isometry h78.zetaDistinct h78.zetaDistinct h78.zetaDistinct_ne_ind1H
-      h78.zetaDistinct_ne_ind1H]
-    exact hnorm1
-  -- **Peterfalvi (7.8.b)**: the coherence-norm lower bound, now genuinely discharged by the
-  -- `exists_M_hypothesis78` witness (via the concrete §7 producer `zetaNuRhoNormSqGeOfDade`).
-  case normSq => exact hnormSq
 
 /-- **Peterfalvi (14.16)**→(14.7) bridge: if the Fitting kernel `H` of `L`
 coincides with `U`, then `U` is characteristic in `H` — it is the whole of `H`,
