@@ -908,6 +908,78 @@ theorem indPW1_apply_eq_one_of_mem_W1_sharp [Finite G]
     exact hx1 hbot
   exact induce_one_eq_one_of_mem_complement hFrob hxA hx1'
 
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(13.18.a), vanishing of the induced trivial character on `S′ − P`** (the `PU`-case of the
+Coq `PVSbeta`): `Ind_{P⋊W₁}^S 1 (z) = 0` for `z ∈ S′ ∖ P`.  The conjugator set is empty: a
+conjugate `g⁻¹zg ∈ PW₁` also lies in the normal `S′`, and `(P ⊔ W₁) ⊓ S′ = P` by the Dedekind
+modular law (`P ≤ S′`, `W₁ ⊓ S′ = ⊥` from the `M_complement` disjointness), so `z` would lie in
+the normal `P` — contradiction. -/
+theorem indPW1_apply_eq_zero_of_mem_derived_not_mem_P [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {z : ↥hyp.S} (hzS' : (z : G) ∈ derivedInG hyp.S) (hzP : (z : G) ∉ hyp.P) :
+    indPW1 hyp z = 0 := by
+  classical
+  have hM'_le_S : derivedInG hyp.S ≤ hyp.S := Subgroup.map_subtype_le _
+  have hP_le_M' : hyp.P ≤ derivedInG hyp.S := by rw [hyp.S_deriv_eq_PU]; exact le_sup_left
+  have hP_le_S : hyp.P ≤ hyp.S := hP_le_M'.trans hM'_le_S
+  have hW1_le_S : hyp.W1 ≤ hyp.S := hyp.Sdata_W1_eq ▸ hyp.Sdata.W1_le
+  have hS_norm_P : hyp.S ≤ Subgroup.normalizer (hyp.P : Set G) := by
+    rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
+  haveI hPnorm : (hyp.P.subgroupOf hyp.S).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hP_le_S).mpr hS_norm_P
+  -- `W₁ ⊓ S′ = ⊥` (the `M_complement` disjointness, `uW1_isComplement_P` pattern).
+  have hM'W1 : derivedInG hyp.S ⊓ hyp.W1 = ⊥ := by
+    have hd := disjoint_iff.mp hyp.Sdata.M_complement.disjoint
+    rw [eq_bot_iff]; rintro x ⟨hxM', hxW1⟩
+    have hxS : x ∈ hyp.S := hM'_le_S hxM'
+    have hmem : (⟨x, hxS⟩ : ↥hyp.S) ∈
+        ((derivedInG hyp.S).subgroupOf hyp.S) ⊓ (hyp.Sdata.W1.subgroupOf hyp.S) :=
+      ⟨Subgroup.mem_subgroupOf.mpr hxM', Subgroup.mem_subgroupOf.mpr (hyp.Sdata_W1_eq ▸ hxW1)⟩
+    rw [hd, Subgroup.mem_bot] at hmem
+    rw [Subgroup.mem_bot]; simpa using Subtype.ext_iff.mp hmem
+  -- Dedekind-style: an element of `(P ⊔ W₁) ⊓ S′` lies in `P` (factor `w = p·w₁` through the
+  -- coset decomposition `PW₁ = P * W₁`, then `w₁ ∈ W₁ ⊓ S′ = ⊥`).
+  have hPW1S' : ∀ {w : G}, w ∈ hyp.P ⊔ hyp.W1 → w ∈ derivedInG hyp.S → w ∈ hyp.P := by
+    intro w hwPW1 hwS'
+    have hwmem : w ∈ (↑(hyp.P ⊔ hyp.W1) : Set G) := hwPW1
+    rw [Subgroup.coe_mul_of_right_le_normalizer_left hyp.P hyp.W1
+      (hW1_le_S.trans hS_norm_P)] at hwmem
+    obtain ⟨p, hp, w1, hw1, hpw⟩ := Set.mem_mul.mp hwmem
+    have hw1S' : w1 ∈ derivedInG hyp.S := by
+      have hw1eq : w1 = p⁻¹ * w := by rw [← hpw]; group
+      rw [hw1eq]
+      exact Subgroup.mul_mem _ (Subgroup.inv_mem _ (hP_le_M' (SetLike.mem_coe.mp hp))) hwS'
+    have hw1bot : w1 ∈ derivedInG hyp.S ⊓ hyp.W1 :=
+      Subgroup.mem_inf.mpr ⟨hw1S', SetLike.mem_coe.mp hw1⟩
+    rw [hM'W1, Subgroup.mem_bot] at hw1bot
+    have hweq : w = p := by rw [← hpw, hw1bot, mul_one]
+    rw [hweq]
+    exact SetLike.mem_coe.mp hp
+  rw [show indPW1 hyp = ClassFunction.induce ((hyp.P ⊔ hyp.W1).subgroupOf hyp.S)
+        (trivialClassFunction _) from rfl, induce_one_apply]
+  have hempty : (Finset.univ.filter
+      (fun g : ↥hyp.S => g⁻¹ * z * g ∈ (hyp.P ⊔ hyp.W1).subgroupOf hyp.S)) = ∅ := by
+    rw [Finset.filter_eq_empty_iff]
+    intro g _ hmem
+    have hwPW1 : ((g⁻¹ * z * g : ↥hyp.S) : G) ∈ hyp.P ⊔ hyp.W1 :=
+      Subgroup.mem_subgroupOf.mp hmem
+    -- The conjugate stays in the normal `S′`.
+    have hwS' : ((g⁻¹ * z * g : ↥hyp.S) : G) ∈ derivedInG hyp.S := by
+      have hz' : z ∈ (derivedInG hyp.S).subgroupOf hyp.S := Subgroup.mem_subgroupOf.mpr hzS'
+      have hconj := (inferInstance :
+        ((derivedInG hyp.S).subgroupOf hyp.S).Normal).conj_mem z hz' g⁻¹
+      rw [inv_inv] at hconj
+      have : g⁻¹ * z * g ∈ (derivedInG hyp.S).subgroupOf hyp.S := hconj
+      exact Subgroup.mem_subgroupOf.mp this
+    -- Dedekind puts it in `P`, so `z` lies in the normal `P` — contradiction.
+    have hwP : g⁻¹ * z * g ∈ hyp.P.subgroupOf hyp.S :=
+      Subgroup.mem_subgroupOf.mpr (hPW1S' hwPW1 hwS')
+    have hzback := hPnorm.conj_mem _ hwP g
+    have hzz : g * (g⁻¹ * z * g) * g⁻¹ = z := by group
+    rw [hzz] at hzback
+    exact hzP (Subgroup.mem_subgroupOf.mp hzback)
+  rw [hempty, Finset.card_empty, Nat.cast_zero, mul_zero]
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **`P ⊄ ker μ_{0j}`** (Pf (13.18.b) kernel step, `S`-side).  For `j ≠ 0`, the base-row grid
 irreducible `μ_{0j}` does not have the Fitting kernel `P` in its character kernel.
