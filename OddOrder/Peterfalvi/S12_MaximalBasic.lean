@@ -500,6 +500,123 @@ theorem Hypothesis.exists_typeII_partner_card_U_ge_seven [Finite G]
     obtain ⟨k, hk⟩ := hw2odd; omega
   omega
 
+/-- **`V`-elements have order divisible by a `|W₁|`-prime** (the (8.10)/(10.8) support
+bookkeeping): `v ∈ V = W ∖ (W₁ ∪ W₂)` factors as `v₁·v₂` with `v₁ ∈ W₁ ∖ {1}`
+(`TypePData.exists_mul_eq_of_mem_W`; a trivial `W₁`-part would put `v ∈ W₂`), and any prime of
+`orderOf v₁ ∣ |W₁|` divides `orderOf v` — a power killing `v` puts `v₁ ^ n ∈ W₁ ⊓ W₂ = ⊥`. -/
+theorem exists_prime_dvd_orderOf_of_mem_typePV [Finite G] {M : Subgroup G}
+    (data : TypePData M) {v : G} (hv : v ∈ typePV M data) :
+    ∃ p : ℕ, p.Prime ∧ p ∣ orderOf v ∧ p ∣ Nat.card ↥data.W1 := by
+  have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
+  have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
+  obtain ⟨hvW, hvnot⟩ := hv
+  rw [Set.mem_union] at hvnot
+  push_neg at hvnot
+  obtain ⟨v₁, hv₁, v₂, hv₂, rfl⟩ :=
+    data.exists_mul_eq_of_mem_W (SetLike.mem_coe.mp hvW)
+  have hv₁ne : v₁ ≠ 1 := by
+    rintro rfl
+    exact hvnot.2 (by simpa using hv₂)
+  obtain ⟨p, hp, hpd⟩ := Nat.exists_prime_and_dvd
+    (fun h => hv₁ne (orderOf_eq_one_iff.mp h))
+  have hpW1 : p ∣ Nat.card ↥data.W1 := by
+    refine hpd.trans ?_
+    have h1 : orderOf v₁ = orderOf (⟨v₁, hv₁⟩ : ↥data.W1) :=
+      orderOf_injective data.W1.subtype data.W1.subtype_injective ⟨v₁, hv₁⟩
+    rw [h1]
+    exact orderOf_dvd_natCard _
+  have hcomm : Commute v₁ v₂ := by
+    haveI := data.W_cyclic
+    letI : CommGroup ↥data.W := IsCyclic.commGroup
+    have := mul_comm (⟨v₁, hW1le hv₁⟩ : ↥data.W) ⟨v₂, hW2le hv₂⟩
+    exact Subtype.ext_iff.mp this
+  refine ⟨p, hp, ?_, hpW1⟩
+  have hkill : v₁ ^ orderOf (v₁ * v₂) = 1 := by
+    have h1 : (v₁ * v₂) ^ orderOf (v₁ * v₂) = 1 := pow_orderOf_eq_one _
+    rw [hcomm.mul_pow] at h1
+    have hmem : v₁ ^ orderOf (v₁ * v₂) ∈ data.W1 ⊓ data.W2 := by
+      refine ⟨data.W1.pow_mem hv₁ _, ?_⟩
+      have heq : v₁ ^ orderOf (v₁ * v₂) = (v₂ ^ orderOf (v₁ * v₂))⁻¹ :=
+        eq_inv_of_mul_eq_one_right (((hcomm.pow_pow _ _).symm.eq).trans h1)
+      rw [heq]
+      exact data.W2.inv_mem (data.W2.pow_mem hv₂ _)
+    rwa [disjoint_iff.mp (typePData_disjoint_W1_W2 data), Subgroup.mem_bot] at hmem
+  exact hpd.trans (orderOf_dvd_of_pow_eq_one hkill)
+
+open scoped Classical FiniteInduce in
+/-- **Coprime-order elements of the full Dade support lie in the `A(M)`-restricted support**
+(the (10.8) `G₀`-bookkeeping): the extra support over `A₀(M) ∖ A(M) = V^M` consists of
+conjugates of `a·h` with `a` conjugate into `V` — whose order is divisible by a `w₁`-prime
+(`exists_prime_dvd_orderOf_of_mem_typePV`, carried through the coprime `H(a)`-part) — so an
+element of `w₁`-coprime order must arise from the `A(M)`-part. -/
+theorem Hypothesis.mem_restricted_dadeSupport_of_coprime [Finite G] {M : Subgroup G}
+    (hyp : Hypothesis M) {g : G} (hg : g ∈ hyp.dadeData.dade.dadeSupport)
+    (hcop : (orderOf g).Coprime hyp.w1) :
+    g ∈ hyp.toHypothesis71.hyp.dadeSupport := by
+  classical
+  obtain ⟨a, h, hh, hconj⟩ := hyp.dadeData.dade.mem_dadeSupport_iff.mp hg
+  have ha2 : a.1 ∈ typePA M hyp.typeP ∪ conjClassSetIn M (typePV M hyp.typeP) := a.2
+  rcases ha2 with haA | haV
+  · -- the `A(M)`-part: the same witness lives in the restricted support
+    exact hyp.toHypothesis71.hyp.mem_dadeSupport_iff.mpr ⟨⟨a.1, haA⟩, h, hh, hconj⟩
+  · -- the `V^M`-part: its orders are divisible by a `w₁`-prime — contradiction
+    exfalso
+    obtain ⟨t, htV, m, hmM, hma⟩ := haV
+    obtain ⟨p, hp, hpv, hpw⟩ := exists_prime_dvd_orderOf_of_mem_typePV hyp.typeP htV
+    -- `p ∣ orderOf a` (conjugation-invariance of the order)
+    have hoa : orderOf a.1 = orderOf t := by
+      rw [← hma]
+      have := orderOf_injective (MulAut.conj m).toMonoidHom (MulAut.conj m).injective t
+      simpa [MulAut.conj_apply] using this
+    have hpa : p ∣ orderOf a.1 := hoa ▸ hpv
+    -- `h ∈ H(a)` commutes with `a` and has coprime order ((2.2.b)/(2.2.c))
+    have hhc : h ∈ Subgroup.centralizer ({a.1} : Set G) := by
+      have hsup : h ∈ hyp.dadeData.dade.H a ⊔ OddOrder.Peterfalvi.S04.centralizerIn M a.1 :=
+        (le_sup_left : hyp.dadeData.dade.H a ≤ _) hh
+      rwa [← hyp.dadeData.dade.centralizer_eq_sup a] at hsup
+    have hcomm : Commute a.1 h :=
+      Subgroup.mem_centralizer_iff.mp hhc a.1 rfl
+    have hcopah : Nat.Coprime (orderOf a.1) (orderOf h) := by
+      have h1 : orderOf h ∣ Nat.card (hyp.dadeData.dade.H a) := by
+        have he : orderOf h = orderOf (⟨h, hh⟩ : ↥(hyp.dadeData.dade.H a)) :=
+          orderOf_injective (hyp.dadeData.dade.H a).subtype
+            (hyp.dadeData.dade.H a).subtype_injective ⟨h, hh⟩
+        rw [he]; exact orderOf_dvd_natCard _
+      have h2 : orderOf a.1 ∣ Nat.card (OddOrder.Peterfalvi.S04.centralizerIn M a.1) := by
+        have haC : a.1 ∈ OddOrder.Peterfalvi.S04.centralizerIn M a.1 :=
+          ⟨hyp.dadeData.dade.subset_L a.2, Subgroup.mem_centralizer_iff.mpr
+            (fun z hz => by rw [Set.mem_singleton_iff.mp hz])⟩
+        have he : orderOf a.1 = orderOf (⟨a.1, haC⟩ : ↥(OddOrder.Peterfalvi.S04.centralizerIn M a.1)) :=
+          orderOf_injective (OddOrder.Peterfalvi.S04.centralizerIn M a.1).subtype
+            (OddOrder.Peterfalvi.S04.centralizerIn M a.1).subtype_injective ⟨a.1, haC⟩
+        rw [he]; exact orderOf_dvd_natCard _
+      exact ((hyp.dadeData.dade.centralizer_coprime a a).coprime_dvd_left h1).coprime_dvd_right
+        h2 |>.symm
+    -- `p ∣ orderOf (a·h)`: the killing power lands `a ^ n` in the trivial coprime overlap
+    have hpah : p ∣ orderOf (a.1 * h) := by
+      have hkill : a.1 ^ orderOf (a.1 * h) = 1 := by
+        have h1 : (a.1 * h) ^ orderOf (a.1 * h) = 1 := pow_orderOf_eq_one _
+        rw [hcomm.mul_pow] at h1
+        have hd1 : orderOf (a.1 ^ orderOf (a.1 * h)) ∣ orderOf a.1 := orderOf_pow_dvd _
+        have hd2 : orderOf (a.1 ^ orderOf (a.1 * h)) ∣ orderOf h := by
+          have heq : a.1 ^ orderOf (a.1 * h) = (h ^ orderOf (a.1 * h))⁻¹ :=
+            eq_inv_of_mul_eq_one_left h1
+          rw [heq, orderOf_inv]
+          exact orderOf_pow_dvd _
+        have hone : orderOf (a.1 ^ orderOf (a.1 * h)) = 1 :=
+          Nat.dvd_one.mp (hcopah ▸ Nat.dvd_gcd hd1 hd2)
+        exact orderOf_eq_one_iff.mp hone
+      exact hpa.trans (orderOf_dvd_of_pow_eq_one hkill)
+    -- transport along the conjugacy to `g` and contradict the coprimality
+    have hog : orderOf g = orderOf (a.1 * h) := by
+      obtain ⟨c, hc⟩ := isConj_iff.mp hconj
+      rw [← hc]
+      have := orderOf_injective (MulAut.conj c).toMonoidHom (MulAut.conj c).injective (a.1 * h)
+      simpa [MulAut.conj_apply] using this
+    have hpg : p ∣ orderOf g := hog ▸ hpah
+    have hpw1 : p ∣ hyp.w1 := hpw
+    exact hp.ne_one (Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hpg hpw1))
+
 /-- **The `(S_F#)^G` union bound of the (10.8) TI-counting** (p. 60 line 91, `≤`-form): the
 conjugacy saturation of the kernel sharp-set of a type-`P` maximal `S` has at most
 `(|S_F| − 1)·[G : S]` elements.  `S` stabilises `H# = H ∖ {1}` under conjugation (`H ⊴ S`), so
@@ -526,10 +643,184 @@ theorem ncard_conjClassSet_sharp_H_le [Finite G] {S : Subgroup G} (data : TypePD
       simpa [mul_assoc] using this
   have hle := OddOrder.GroupTheory.ncard_conjClassSet_le (L := S) hstab
   have hA : ((data.H : Set G) \ {1}).ncard = Nat.card ↥data.H - 1 := by
-    rw [Set.ncard_diff_singleton_of_mem (by exact one_mem data.H),
+    rw [Set.ncard_sdiff_singleton_of_mem (by exact one_mem data.H),
       ← Nat.card_coe_set_eq]
     rfl
   rwa [hA] at hle
+
+open scoped Classical FiniteInduce in
+/-- **The (10.8) `G₁`-count bound, Nat form** (p. 60 lines 89–91): with the type-II partner
+data supplied, the restricted-support complement count `|famG₀| = |∁Ã(M)|` is bounded by the
+full-support `w₁`-coprime filter plus the two covering counts `(|S_F|−1)·[G:S]` and
+`|V|·[G:W]`.
+
+`∁Ã(M)` splits along `w₁`-coprimality; the coprime part equals the full-support coprime filter
+(`mem_restricted_dadeSupport_of_coprime` + support monotonicity), and the non-coprime part is
+covered by `𝒞((S_F)#) ∪ 𝒞(V_S)` (`mem_conjClassSet_sharpH_or_typePV_of_not_coprime`), counted
+by `ncard_conjClassSet_sharp_H_le` and `typePData_conjClassSet_typePV_ncard`. -/
+theorem Hypothesis.g1_card_le_of_partner [Finite G] {M S : Subgroup G} (hyp : Hypothesis M)
+    (data : TypePData S) (hprime : (Nat.card ↥data.W1).Prime)
+    (hcop : Nat.Coprime (Nat.card ↥(derivedInG S)) (Nat.card ↥data.W1))
+    (hHall : OddOrder.Isaacs.Ch03.IsHallSubgroup (Nat.card ↥data.H).primeFactors data.H)
+    (hcent : ∀ b ∈ data.H, b ≠ 1 → Subgroup.centralizer ({b} : Set G) ≤ S)
+    (hfrobcap : ∀ b ∈ data.H, b ≠ 1 → ∀ y ∈ derivedInG S,
+      y ∈ Subgroup.centralizer ({b} : Set G) → y ∈ data.H)
+    (hW2card : Nat.card ↥data.W2 = hyp.w1) :
+    Nat.card (hyp.toFamilyHypothesis71).G0
+      ≤ (Finset.univ.filter (fun g : G => g ∉ hyp.dadeData.dade.dadeSupport
+          ∧ (orderOf g).Coprime hyp.w1)).card
+        + ((Nat.card ↥data.H - 1) * S.index
+            + (Nat.card ↥data.W1 * Nat.card ↥data.W2 - Nat.card ↥data.W1
+                - Nat.card ↥data.W2 + 1) * data.W.index) := by
+  classical
+  -- `famG₀` is the complement of the restricted support (the `Fin 1` family collapses)
+  have hG0eq : (hyp.toFamilyHypothesis71).G0
+      = {g : G | g ∉ hyp.toHypothesis71.hyp.dadeSupport} := by
+    ext g
+    rw [(hyp.toFamilyHypothesis71).mem_G0_iff]
+    exact ⟨fun h => h 0, fun h _ => h⟩
+  have hcard0 : Nat.card (hyp.toFamilyHypothesis71).G0
+      = (Finset.univ.filter
+          (fun g : G => g ∉ hyp.toHypothesis71.hyp.dadeSupport)).card := by
+    rw [hG0eq, Nat.card_coe_set_eq, Set.ncard_eq_toFinset_card', Set.toFinset_setOf]
+  -- split the complement along `w₁`-coprimality
+  have hsplit : (Finset.univ.filter
+        (fun g : G => g ∉ hyp.toHypothesis71.hyp.dadeSupport)).card
+      = (Finset.univ.filter (fun g : G => g ∉ hyp.toHypothesis71.hyp.dadeSupport
+          ∧ (orderOf g).Coprime hyp.w1)).card
+        + (Finset.univ.filter (fun g : G => g ∉ hyp.toHypothesis71.hyp.dadeSupport
+            ∧ ¬ (orderOf g).Coprime hyp.w1)).card := by
+    rw [← Finset.filter_filter, ← Finset.filter_filter,
+      Finset.filter_card_add_filter_neg_card_eq_card]
+  -- support monotonicity: the restricted support sits inside the full one
+  have hRF : hyp.toHypothesis71.hyp.dadeSupport ⊆ hyp.dadeData.dade.dadeSupport := by
+    intro x hx
+    obtain ⟨a, h, hh, hconj⟩ := hyp.toHypothesis71.hyp.mem_dadeSupport_iff.mp hx
+    exact hyp.dadeData.dade.mem_dadeSupport_iff.mpr
+      ⟨⟨a.1, Set.subset_union_left a.2⟩, h, hh, hconj⟩
+  -- the coprime part is the full-support coprime filter
+  have hcopeq : (Finset.univ.filter (fun g : G => g ∉ hyp.toHypothesis71.hyp.dadeSupport
+        ∧ (orderOf g).Coprime hyp.w1)).card
+      = (Finset.univ.filter (fun g : G => g ∉ hyp.dadeData.dade.dadeSupport
+          ∧ (orderOf g).Coprime hyp.w1)).card := by
+    congr 1
+    refine Finset.filter_congr fun g _ => ?_
+    constructor
+    · rintro ⟨hgR, hgcop⟩
+      exact ⟨fun hgF => hgR (hyp.mem_restricted_dadeSupport_of_coprime hgF hgcop), hgcop⟩
+    · rintro ⟨hgF, hgcop⟩
+      exact ⟨fun hgR => hgF (hRF hgR), hgcop⟩
+  -- the non-coprime part is covered by `𝒞((S_F)#) ∪ 𝒞(V_S)`
+  have hsub : {g : G | g ∉ hyp.toHypothesis71.hyp.dadeSupport
+        ∧ ¬ (orderOf g).Coprime hyp.w1}
+      ⊆ conjClassSet ((data.H : Set G) \ {1}) ∪ conjClassSet (typePV S data) := by
+    rintro g ⟨-, hgnc⟩
+    exact mem_conjClassSet_sharpH_or_typePV_of_not_coprime data hprime hcop hHall hcent
+      hfrobcap (by rwa [hW2card])
+  have hnc_le : (Finset.univ.filter (fun g : G => g ∉ hyp.toHypothesis71.hyp.dadeSupport
+        ∧ ¬ (orderOf g).Coprime hyp.w1)).card
+      ≤ (Nat.card ↥data.H - 1) * S.index
+        + (Nat.card ↥data.W1 * Nat.card ↥data.W2 - Nat.card ↥data.W1
+            - Nat.card ↥data.W2 + 1) * data.W.index := by
+    calc (Finset.univ.filter (fun g : G => g ∉ hyp.toHypothesis71.hyp.dadeSupport
+          ∧ ¬ (orderOf g).Coprime hyp.w1)).card
+        = {g : G | g ∉ hyp.toHypothesis71.hyp.dadeSupport
+            ∧ ¬ (orderOf g).Coprime hyp.w1}.ncard := by
+          rw [Set.ncard_eq_toFinset_card', Set.toFinset_setOf]
+      _ ≤ (conjClassSet ((data.H : Set G) \ {1})
+            ∪ conjClassSet (typePV S data)).ncard :=
+          Set.ncard_le_ncard hsub (Set.toFinite _)
+      _ ≤ (conjClassSet ((data.H : Set G) \ {1})).ncard
+            + (conjClassSet (typePV S data)).ncard := Set.ncard_union_le _ _
+      _ ≤ _ := by
+          rw [typePData_conjClassSet_typePV_ncard]
+          exact Nat.add_le_add_right (ncard_conjClassSet_sharp_H_le data) _
+  rw [hcard0, hsplit, hcopeq]
+  exact Nat.add_le_add_left hnc_le _
+
+open scoped Classical FiniteInduce in
+/-- **The (10.8) `hB` bound** (p. 60 lines 89–91, the rational form consumed by
+`typeII_coherence_contradiction_estimate`): with the type-II partner data supplied,
+
+`(|famG₀| − #{g ∉ Ã₀, (|g|, w₁) = 1}) / |G| ≤ (|S_F| − 1)/|S| + (w₁w₂ − w₁ − w₂ + 1)/(w₁w₂)`.
+
+The rational form of `g1_card_le_of_partner`, divided by `|G| = |S|·[G:S] = |W|·[G:W]`. -/
+theorem Hypothesis.g1_div_le_of_partner [Finite G] {M S : Subgroup G} (hyp : Hypothesis M)
+    (data : TypePData S) (hprime : (Nat.card ↥data.W1).Prime)
+    (hcop : Nat.Coprime (Nat.card ↥(derivedInG S)) (Nat.card ↥data.W1))
+    (hHall : OddOrder.Isaacs.Ch03.IsHallSubgroup (Nat.card ↥data.H).primeFactors data.H)
+    (hcent : ∀ b ∈ data.H, b ≠ 1 → Subgroup.centralizer ({b} : Set G) ≤ S)
+    (hfrobcap : ∀ b ∈ data.H, b ≠ 1 → ∀ y ∈ derivedInG S,
+      y ∈ Subgroup.centralizer ({b} : Set G) → y ∈ data.H)
+    (hW1card : Nat.card ↥data.W1 = hyp.w2) (hW2card : Nat.card ↥data.W2 = hyp.w1)
+    (hWcard : Nat.card ↥data.W = hyp.w1 * hyp.w2) :
+    ((Nat.card (hyp.toFamilyHypothesis71).G0 : ℚ)
+        - ((Finset.univ.filter (fun g : G => g ∉ hyp.dadeData.dade.dadeSupport
+            ∧ (orderOf g).Coprime hyp.w1)).card : ℚ)) / (Nat.card G : ℚ)
+      ≤ ((Nat.card ↥data.H : ℚ) - 1) / (Nat.card ↥S : ℚ)
+        + ((hyp.w1 : ℚ) * hyp.w2 - hyp.w1 - hyp.w2 + 1) / ((hyp.w1 : ℚ) * hyp.w2) := by
+  classical
+  have hNat := hyp.g1_card_le_of_partner data hprime hcop hHall hcent hfrobcap hW2card
+  -- cardinalities and nonvanishing
+  have hcH : 1 ≤ Nat.card ↥data.H := Nat.card_pos
+  have hcW1 : 2 ≤ Nat.card ↥data.W1 :=
+    (Subgroup.one_lt_card_iff_ne_bot _).mpr data.W1_nontrivial
+  have hcW2 : 2 ≤ Nat.card ↥data.W2 :=
+    (Subgroup.one_lt_card_iff_ne_bot _).mpr data.W2_nontrivial
+  have hsub1 : Nat.card ↥data.W1 ≤ Nat.card ↥data.W1 * Nat.card ↥data.W2 :=
+    Nat.le_mul_of_pos_right _ (by omega)
+  have hsub2 : Nat.card ↥data.W2
+      ≤ Nat.card ↥data.W1 * Nat.card ↥data.W2 - Nat.card ↥data.W1 := by
+    have hfac : Nat.card ↥data.W1 * Nat.card ↥data.W2 - Nat.card ↥data.W1
+        = Nat.card ↥data.W1 * (Nat.card ↥data.W2 - 1) := by
+      rw [Nat.mul_sub, mul_one]
+    rw [hfac]
+    calc Nat.card ↥data.W2 ≤ 2 * (Nat.card ↥data.W2 - 1) := by omega
+      _ ≤ Nat.card ↥data.W1 * (Nat.card ↥data.W2 - 1) :=
+          Nat.mul_le_mul_right _ hcW1
+  have hSidx0 : (S.index : ℚ) ≠ 0 := by
+    exact_mod_cast Subgroup.index_ne_zero_of_finite
+  have hWidx0 : (data.W.index : ℚ) ≠ 0 := by
+    exact_mod_cast Subgroup.index_ne_zero_of_finite
+  have hG0 : (0 : ℚ) < (Nat.card G : ℚ) := by exact_mod_cast Nat.card_pos
+  -- `|G| = |S|·[G:S]` and `|G| = |W|·[G:W]`, in `ℚ`
+  have hGS : (Nat.card G : ℚ) = (Nat.card ↥S : ℚ) * (S.index : ℚ) := by
+    exact_mod_cast (Subgroup.card_mul_index S).symm
+  have hGW : (Nat.card G : ℚ) = (Nat.card ↥data.W : ℚ) * (data.W.index : ℚ) := by
+    exact_mod_cast (Subgroup.card_mul_index data.W).symm
+  -- the numerator bound, cast to `ℚ`
+  have hnum : (Nat.card (hyp.toFamilyHypothesis71).G0 : ℚ)
+      - ((Finset.univ.filter (fun g : G => g ∉ hyp.dadeData.dade.dadeSupport
+          ∧ (orderOf g).Coprime hyp.w1)).card : ℚ)
+      ≤ ((Nat.card ↥data.H : ℚ) - 1) * (S.index : ℚ)
+        + ((Nat.card ↥data.W1 : ℚ) * (Nat.card ↥data.W2 : ℚ) - (Nat.card ↥data.W1 : ℚ)
+            - (Nat.card ↥data.W2 : ℚ) + 1) * (data.W.index : ℚ) := by
+    have hc := (Nat.cast_le (α := ℚ)).mpr hNat
+    push_cast [Nat.cast_sub hcH, Nat.cast_sub hsub1, Nat.cast_sub hsub2] at hc
+    linarith
+  -- divide by `|G|` and split into the two orbit terms
+  calc ((Nat.card (hyp.toFamilyHypothesis71).G0 : ℚ)
+        - ((Finset.univ.filter (fun g : G => g ∉ hyp.dadeData.dade.dadeSupport
+            ∧ (orderOf g).Coprime hyp.w1)).card : ℚ)) / (Nat.card G : ℚ)
+      ≤ (((Nat.card ↥data.H : ℚ) - 1) * (S.index : ℚ)
+          + ((Nat.card ↥data.W1 : ℚ) * (Nat.card ↥data.W2 : ℚ) - (Nat.card ↥data.W1 : ℚ)
+              - (Nat.card ↥data.W2 : ℚ) + 1) * (data.W.index : ℚ)) / (Nat.card G : ℚ) := by
+        gcongr
+    _ = ((Nat.card ↥data.H : ℚ) - 1) / (Nat.card ↥S : ℚ)
+          + ((Nat.card ↥data.W1 : ℚ) * (Nat.card ↥data.W2 : ℚ) - (Nat.card ↥data.W1 : ℚ)
+              - (Nat.card ↥data.W2 : ℚ) + 1) / (Nat.card ↥data.W : ℚ) := by
+        rw [add_div]
+        congr 1
+        · rw [hGS, mul_div_mul_right _ _ hSidx0]
+        · rw [hGW, mul_div_mul_right _ _ hWidx0]
+    _ = ((Nat.card ↥data.H : ℚ) - 1) / (Nat.card ↥S : ℚ)
+          + ((hyp.w1 : ℚ) * hyp.w2 - hyp.w1 - hyp.w2 + 1) / ((hyp.w1 : ℚ) * hyp.w2) := by
+        have e1 : (Nat.card ↥data.W1 : ℚ) = (hyp.w2 : ℚ) := by exact_mod_cast hW1card
+        have e2 : (Nat.card ↥data.W2 : ℚ) = (hyp.w1 : ℚ) := by exact_mod_cast hW2card
+        have e3 : (Nat.card ↥data.W : ℚ) = (hyp.w1 : ℚ) * (hyp.w2 : ℚ) := by
+          exact_mod_cast hWcard
+        rw [e1, e2, e3]
+        ring
 
 /-- **Type-`P` order factorization** `|M| = |M_F|·|U|·|W₁|`.  The type-`P` decomposition is a double
 semidirect product `M = (H ⋊ U) ⋊ W₁`: `W₁` complements the derived subgroup `M' = [M,M]` in `M`
@@ -912,6 +1203,105 @@ theorem typeII_coherence_contradiction_estimate [Finite G]
   have hH : 1 ≤ Nat.card ↥dII.typeP.H := Nat.card_pos
   have hMp : 1 ≤ Nat.card ↥(derivedInG M) := Nat.card_pos
   exact typeII_coherence_estimate_chain hw1 hw2 hu hH hMp hS_struct hA hB
+
+open scoped Classical FiniteInduce in
+/-- **The (10.8) coherence-contradiction estimate, partner-supplied form** (issue 1020
+Phase 3): `typeII_coherence_contradiction_estimate` with the Type-II partner and its
+§8/(10.7) supply facts taken as hypotheses, so that `hB` is discharged by
+`g1_div_le_of_partner`.  The unconditional form is assembled downstream, where the pair
+machinery provides the supply; see issue 1020. -/
+theorem typeII_coherence_contradiction_estimate_of_partner [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    {hyp : Hypothesis M} {params : CharacterParameters hyp}
+    (coh : CoherentHypothesis hyp params)
+    {S : Subgroup G} (dII : TypeIIData S)
+    (hSidx : ((derivedInG S).subgroupOf S).index = hyp.w2)
+    (hU7 : 7 ≤ Nat.card ↥dII.typeP.U)
+    (hprime : (Nat.card ↥dII.typeP.W1).Prime)
+    (hcop : Nat.Coprime (Nat.card ↥(derivedInG S)) (Nat.card ↥dII.typeP.W1))
+    (hHall : OddOrder.Isaacs.Ch03.IsHallSubgroup
+      (Nat.card ↥dII.typeP.H).primeFactors dII.typeP.H)
+    (hcent : ∀ b ∈ dII.typeP.H, b ≠ 1 → Subgroup.centralizer ({b} : Set G) ≤ S)
+    (hfrobcap : ∀ b ∈ dII.typeP.H, b ≠ 1 → ∀ y ∈ derivedInG S,
+      y ∈ Subgroup.centralizer ({b} : Set G) → y ∈ dII.typeP.H)
+    (hW2card : Nat.card ↥dII.typeP.W2 = hyp.w1)
+    (hWcard : Nat.card ↥dII.typeP.W = hyp.w1 * hyp.w2) :
+    ∃ u : ℕ, 7 ≤ u ∧
+      (1 : ℚ) - 1 / (hyp.w1 : ℚ) - 1 / (u : ℚ)
+        < (hyp.w1 : ℚ) * (hyp.w2 : ℚ) / (Nat.card ↥(derivedInG M) : ℚ) := by
+  classical
+  obtain ⟨params', hmu, hos, hzS, hz1, hzconj, hδpm, hδj⟩ := hyp.exists_charParameters_full hG
+  let coh' : CoherentHypothesis hyp params' := ⟨coh.coherent⟩
+  refine ⟨Nat.card ↥dII.typeP.U, hU7, ?_⟩
+  have hW1card : Nat.card ↥dII.typeP.W1 = hyp.w2 := by
+    rw [dII.typeP.card_W1_eq_derived_index]; exact hSidx
+  have hS_struct : Nat.card ↥S = Nat.card ↥dII.typeP.H * Nat.card ↥dII.typeP.U * hyp.w2 := by
+    rw [typePData_card_eq_H_mul_U_mul_W1 dII.typeP, hW1card]
+  have h83 := hyp.chiRhoNormSq_zeta_le_line83 hG coh' hmu hos hzS hz1 hzconj hδpm hδj
+  have h78 := hyp.chiRhoNormSq_zeta_ge_line78 hG coh' hmu hos hzS hz1 hzconj hδpm hδj
+  set g1g : ℚ := ((Nat.card (hyp.toFamilyHypothesis71).G0 : ℚ)
+      - ((Finset.univ.filter (fun g : G => g ∉ hyp.dadeData.dade.dadeSupport
+          ∧ (orderOf g).Coprime hyp.w1)).card : ℚ)) / (Nat.card G : ℚ) with hg1g_def
+  have hA : (1 : ℚ) - g1g - 1 / (hyp.w1 : ℚ)
+      < (hyp.w1 : ℚ) / (Nat.card ↥(derivedInG M) : ℚ) := by
+    have hpaR : (Nat.card ↥(typePA M hyp.typeP) : ℝ) / (Nat.card ↥M : ℝ)
+        < 1 / (hyp.w1 : ℝ) := by
+      have h := (Rat.cast_lt (K := ℝ)).mpr hyp.card_typePA_div_card_lt_inv_w1
+      push_cast at h; exact h
+    have hg1gR : (g1g : ℝ) = (Nat.card G : ℝ)⁻¹
+        * ((Nat.card (hyp.toFamilyHypothesis71).G0 : ℝ)
+          - ((Finset.univ.filter (fun g : G => g ∉ hyp.dadeData.dade.dadeSupport
+              ∧ (orderOf g).Coprime hyp.w1)).card : ℝ)) := by
+      rw [hg1g_def]; push_cast; rw [div_eq_inv_mul]
+    rw [← Rat.cast_lt (K := ℝ)]
+    push_cast
+    linarith [h78, h83, hpaR, hg1gR]
+  have hB : g1g ≤ ((Nat.card ↥dII.typeP.H : ℚ) - 1) / (Nat.card ↥S : ℚ)
+      + ((hyp.w1 : ℚ) * hyp.w2 - hyp.w1 - hyp.w2 + 1) / ((hyp.w1 : ℚ) * hyp.w2) := by
+    rw [hg1g_def]
+    exact hyp.g1_div_le_of_partner dII.typeP hprime hcop hHall hcent hfrobcap
+      hW1card hW2card hWcard
+  have hw1 : 1 ≤ hyp.w1 := Nat.card_pos
+  have hw2 : 1 ≤ hyp.w2 := Nat.card_pos
+  have hu : 1 ≤ Nat.card ↥dII.typeP.U := by omega
+  have hH : 1 ≤ Nat.card ↥dII.typeP.H := Nat.card_pos
+  have hMp : 1 ≤ Nat.card ↥(derivedInG M) := Nat.card_pos
+  exact typeII_coherence_estimate_chain hw1 hw2 hu hH hMp hS_struct hA hB
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.8), partner-supplied form**: `S_not_coherent` with the Type-II partner
+and its supply facts as hypotheses (issue 1020 Phase 3) — sorry-free.  The unconditional
+`S_not_coherent` is recovered downstream once the pair machinery discharges the supply. -/
+theorem S_not_coherent_of_partner [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : Hypothesis M)
+    {S : Subgroup G} (dII : TypeIIData S)
+    (hSidx : ((derivedInG S).subgroupOf S).index = hyp.w2)
+    (hU7 : 7 ≤ Nat.card ↥dII.typeP.U)
+    (hprime : (Nat.card ↥dII.typeP.W1).Prime)
+    (hcop : Nat.Coprime (Nat.card ↥(derivedInG S)) (Nat.card ↥dII.typeP.W1))
+    (hHall : OddOrder.Isaacs.Ch03.IsHallSubgroup
+      (Nat.card ↥dII.typeP.H).primeFactors dII.typeP.H)
+    (hcent : ∀ b ∈ dII.typeP.H, b ≠ 1 → Subgroup.centralizer ({b} : Set G) ≤ S)
+    (hfrobcap : ∀ b ∈ dII.typeP.H, b ≠ 1 → ∀ y ∈ derivedInG S,
+      y ∈ Subgroup.centralizer ({b} : Set G) → y ∈ dII.typeP.H)
+    (hW2card : Nat.card ↥dII.typeP.W2 = hyp.w1)
+    (hWcard : Nat.card ↥dII.typeP.W = hyp.w1 * hyp.w2) :
+    ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A0) := by
+  rintro ⟨hcoh⟩
+  obtain ⟨params, -⟩ := w2_prime_and_parameter_independence hG hyp
+  let coh : CoherentHypothesis hyp params := ⟨hcoh⟩
+  have hw1odd : Odd hyp.w1 :=
+    hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card hyp.W1)
+  have hw1gt : 1 < hyp.w1 :=
+    (Subgroup.one_lt_card_iff_ne_bot _).mpr hyp.typeP.W1_nontrivial
+  have hw1 : 3 ≤ hyp.w1 := by
+    obtain ⟨k, hk⟩ := hw1odd; omega
+  have hw2 : 1 ≤ hyp.w2 := Nat.card_pos
+  have hMp : (2 * hyp.w1 + 1) * hyp.w2 ≤ Nat.card ↥(derivedInG M) := hyp.card_derived_ge hG
+  obtain ⟨u, hu7, hbound⟩ := typeII_coherence_contradiction_estimate_of_partner hG coh dII
+    hSidx hU7 hprime hcop hHall hcent hfrobcap hW2card hWcard
+  exact typeII_noncoherence_arithmetic hw1 hu7 hw2 hMp hbound
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (10.8)**: under Hypothesis (10.1), the character family `S` is
