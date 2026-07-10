@@ -348,9 +348,30 @@ Coq `nzT1_Ga` (PFsection14.v:770--830) まで独立 trace して次のように�
    grounding と `o_eta0_betaT0` 型の cyclic-TI/Dade cross relation は未接続。
 3. `T_not_isTypeIV_of_isTypeP1` の本体は Coq (11.9) `typeP_Galois` producer であり、
    repo の §11 coherence frontier (`sibleyTarget_H0C` 等) に genuine upstream work が残る。
-4. `T_isTypeP2` 内の strict `>` forward residual は別で ungated。旧 cycle 説明は
+4. `T_isTypeP2` 内の strict `>` forward residual は別で ungated。旧 cycle 説明は import DAG
+   上の配置問題で、pure arithmetic を上流 leaf へ分離すれば解消できる。
 
 直後の main sync で lane-b の `SupportedSpanOrthogonality` (Pf 1.3.a/b) と
 `S05_OmegaSpanning` が landing。これは上記 1--2 の最上流基盤を実際に前進させるが、
 現時点では `prTIirr_id` instantiation に必要な induction expansion `hInd` が次 frontier で、
 `nzT1_Ga` を直接閉じる public theorem はまだ無いことも確認した。
+
+## lane-c T-side (14.8) 算術分離 + forward residual 解消 (2026-07-11)
+
+feature commit: `ee09b1cb`。
+
+- `KeyInequality.lean` から (14.8) の pure arithmetic 10 宣言を
+  `KeyInequalityArithmetic.lean` へ移し、`TTypeII.lean` から循環なしに import できる配置にした。
+  公開名は不変 (`q_pow_gt_p_pow` / `Hypothesis.q_pow_gt_p_pow` /
+  `cyclotomic_quotient_sub_one_ge_pow_pred` / `cyclotomic_ratio_gt_of_q_lt_p`)。
+- `T_isTypeP2` の strict `>` は、axiom-clean な `cyclotomic_ratio_gt_of_q_lt_p`、直接の
+  T-side (13.4) producer `T_side_caseB_facts`、S-side (13.15) producer
+  `S15.caseB_order_u_data` から構成した。後段 `key_inequality` への偽の forward reference と
+  local `sorry` は消滅。
+- 独立検証上の重要な区別: pure arithmetic 4 公開宣言は既存 AxiomsCheck で引き続き
+  axiom-clean。一方 `T_isTypeP2` 全体は、既存の (13.15) `caseB_order_u`、
+  `T_typeIII_ratio_le` の `nzT1_Ga`、(11.9) `T_not_isTypeIV_of_isTypeP1` などの upstream
+  residual に依存する。したがって今回の成果は local false cycle の除去と honest wiring であり、
+  これら上流 gate の解消を主張しない。
+- `TTypeII` / `KeyInequality` leaf build green、AxiomsCheck 4128-job green、
+  `git diff --check` clean。新 axiom・新 sorry なし (`TTypeII` の local sorry は 1 件減)。
