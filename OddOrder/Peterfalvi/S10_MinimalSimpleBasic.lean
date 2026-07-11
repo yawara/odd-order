@@ -1227,6 +1227,48 @@ theorem sigmaSharp_isConj_conj_in_M [Finite G] (hG : OddOrder.BG.IsMinimalSimple
     _ = g * a * g⁻¹ := by rw [hca]
     _ = b := hg
 
+/-- **Peterfalvi (8.13)**: centralizers escaping a maximal subgroup are controlled by `A_1(M)`
+and a unique maximal subgroup of type I or II.
+
+Here `X` is `A_1(M)` (any Peterfalvi type) or the type-`P` support `A_0(M)` of (8.10) in its
+faithful **`P₁` regime** (`IsTypeP1`, i.e. types III/IV/V; issue 9008: the repo `typePA0`
+over-claims for type `P₂` = II — its `A`-part `(M')^#` includes the Frobenius-complement points
+`U^#` that Peterfalvi's actual `A(M)` excludes, and for those the escape control is not a
+(8.13) fact.  The honest type-II support is the strictly smaller `honestTypeP2A0Set`, S15).
+
+The `D ⊆ A₁(M)` clause is the (8.13.b) escape reduction: `V^M`-points are non-escaping and the
+`A`-part is already `σ`-sharp (`escaping_typePA0_mem_sigmaSharp_of_isTypeP1`), while
+`A₁(M) = M_σ^#` for every type (`A1_eq_sigmaSharp`).  The `∃!` clause is the BG §16 signalizer
+uniqueness `existsUnique_maximal_centralizer_le_typeI_or_typeII` — BG Theorem II, Theorem B(5)
+and Theorem D(4), exactly the book's Reference line for (8.13). -/
+theorem escapingCentralizers_control [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {tau : PeterfalviType} (hType : HasPeterfalviType tau M) {X : Set G}
+    (hX : X = A1 M tau ∨
+      OddOrder.BG.Ch4.S14.IsTypeP1 M ∧ ∃ data : TypePData M, X = typePA0 M data) :
+    let D := escapingCentralizerSet M X
+    D ⊆ A1 M tau ∧
+      ∀ x : G, x ∈ D →
+        ∃! L : Subgroup G,
+          L ∈ maximalSubgroups G ∧ Subgroup.centralizer ({x} : Set G) ≤ L ∧
+            (IsTypeI L ∨ IsTypeII L) := by
+  intro D
+  have key : ∀ x ∈ D, x ∈ OddOrder.BG.Ch4.S14.sigmaSharp M := by
+    intro x hx
+    obtain ⟨hxX, hesc⟩ := hx
+    rcases hX with hA1 | ⟨hP1, data, hA0⟩
+    · subst hA1
+      have hx1 : x ∈ OddOrder.GroupTheory.A1 M tau := hxX
+      rwa [OddOrder.BG.Ch4.S16.A1_eq_sigmaSharp hG hM hType] at hx1
+    · subst hA0
+      exact escaping_typePA0_mem_sigmaSharp_of_isTypeP1 hG hM data hP1 ⟨hxX, hesc⟩
+  refine ⟨fun x hx => ?_, fun x hx => ?_⟩
+  · show x ∈ OddOrder.GroupTheory.A1 M tau
+    rw [OddOrder.BG.Ch4.S16.A1_eq_sigmaSharp hG hM hType]
+    exact key x hx
+  · exact OddOrder.BG.Ch4.S16.existsUnique_maximal_centralizer_le_typeI_or_typeII hG hM
+      (key x hx) hx.2
+
 /-- **Mixed-case vacuity for the type-`P₁` `A_0`-support**: an `M_σ^#`-point (`= A(M)` for `P₁`) and
 a `V^M`-point are never `G`-conjugate.  An `M_σ^#`-point is a `σ(M)`-element, conjugation preserves
 this, and a `σ(M)`-element `v ∈ M` lies in the normal `σ`-Hall `M_σ = M'` (type `P₁`), contradicting

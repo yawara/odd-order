@@ -7430,3 +7430,13 @@ when (11.5)/`H0_eq_Hprime` closes. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.coherent_extension_eq_sum_memberRFamily
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.coherent_extension_cross_orthogonal
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.exists_bridge_target_of_budget
+
+/-! **Peterfalvi (8.13), axiom-clean** (lane a, 2026-07-12).  The escaping-centralizer control:
+for `X = A₁(M)` (any Peterfalvi type) or the type-`P₁` `A₀(M)` (`typePA0`; the `P₁` restriction
+is honest — issue 9008: `typePA0` over-claims for type II), every `x ∈ X` with `C_G(x) ⊄ M` lies
+in `A₁(M) = M_σ^#` and `C_G(x)` sits inside a *unique* maximal subgroup of type I/II.  Pure
+assembly of the BG §16 signalizer machinery (`A1_eq_sigmaSharp`,
+`escaping_typePA0_mem_sigmaSharp_of_isTypeP1`,
+`existsUnique_maximal_centralizer_le_typeI_or_typeII` — BG Theorem II / B(5) / D(4), the book's
+Reference line), all of which is axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.escapingCentralizers_control

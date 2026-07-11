@@ -540,23 +540,11 @@ theorem typeII_normalizer_not_le_of_typePData [Finite G]
   rw [htrans] at hle
   exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mp (hle.trans_eq hMconj.symm)
 
-/-- **Peterfalvi (8.13)**: centralizers escaping a maximal subgroup are controlled
-by `A_1(M)` and a unique maximal subgroup of type I or II.
+/-! ## (8.14)--(8.17): support notation and TI-covering facts
 
-Here `X` is either `A_1(M)` or the type-`P` set `A_0(M)` from (8.10). -/
-theorem escapingCentralizers_control [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
-    {tau : PeterfalviType} (hType : HasPeterfalviType tau M) {X : Set G}
-    (hX : X = A1 M tau ∨ ∃ data : TypePData M, X = typePA0 M data) :
-    let D := escapingCentralizerSet M X
-    D ⊆ A1 M tau ∧
-      ∀ x : G, x ∈ D →
-        ∃! L : Subgroup G,
-          L ∈ maximalSubgroups G ∧ Subgroup.centralizer ({x} : Set G) ≤ L ∧
-            (IsTypeI L ∨ IsTypeII L) := by
-  sorry
-
-/-! ## (8.14)--(8.17): support notation and TI-covering facts -/
+(Peterfalvi (8.13), `escapingCentralizers_control`, lives downstream in
+`S10_MinimalSimpleBasic`, next to its `(8.13.a)`/`(8.13.b)` ingredients
+`conjClassSetIn_typePV_isConj_conj_in_M` / `escaping_typePA0_mem_sigmaSharp_of_isTypeP1`.) -/
 
 /- **Peterfalvi (8.16) — RETIRED** (false-as-stated + unconsumed; loop¹⁰⁶ finding, executed lane-a
 /loop 2026-07-07).  The former `typeII_A_sets_TI` / `typeII_A_sets_normalizer` claimed the *full*
