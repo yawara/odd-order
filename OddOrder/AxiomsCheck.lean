@@ -3364,6 +3364,21 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.tSideDelta_isReal
 set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.dadeHypothesis_eq_of_H_eq
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.tSideDadeMap_eq_full_typeP1DadeMap_of_support
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.tSideDadeMap_eq_induce_of_full_typeP1_H_eq_bot
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.inner_eq_swap_of_mem_ZIrr
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.gap_cross_inner_identity
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.tSide_beta_inner_eta_of_zeroColumn_projection
+set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.typeIII_induced_source_support
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.typeIII_induced_source_degree
@@ -7269,6 +7284,7 @@ The side-agnostic embedding `SemilinearFieldModel.fieldModelEmbedding` (injectiv
 of the `P`-side engine above.  All `sorry`-free; the sole T-side gate (`t_side_caseB_fieldModel`'s
 field-data existence) is not on this list. -/
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.SemilinearFieldModel.fieldModelEmbedding
-#assert_only_allowed_axioms OddOrder.RepresentationTheory.SemilinearFieldModel.hcompatLift_of_equivariant
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.SemilinearFieldModel.hcompatLift_of_equivariant
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.tFieldModelData_of_repr
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.TFieldModelData.derived_inf_centralizer_le_Q

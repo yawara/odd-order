@@ -127,3 +127,7 @@ issue は trial ログの追記継続のため open 維持、次の節目 (T-sid
   dup なし)。10/10。KEEP 後も観察は簡略化して継続 (dup チェックは通常レーン水準に緩和)。
 - 2026-07-11 (tick、merge 87d6be02): (14.9) T-side delta reality + orthogonality (新 leaf TGapDelta、
   既存 2 定理の in-place 強化 + 旧 statement の系再導出 — dup flag は誤検出)。11/11。
+- 2026-07-11 (tick、merge 本 tick): (13.2e) T-side Dade induction bridge + (14.9) S/T gap を exact
+  deep inputs (`hdeep` = Coq `o_eta0_betaT0` + support separation 対) へ縮小 (sorry ±0 = narrowing、
+  regression でない)。新 leaf TGapCross (245 行)、`dadeHypothesis_eq_of_H_eq` は TTypeII private の
+  public 化移設 (dup でない、cross-file private 禁止規約の遵守)。dup チェック clean。12/12。
