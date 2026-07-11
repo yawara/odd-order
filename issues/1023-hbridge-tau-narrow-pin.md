@@ -307,3 +307,27 @@ IsCoherent 構成は既存 IntegralCharacterMap 機構 (Zisometry_of_cfnorm 相�
    ⟹ ξ(1)·⟨c.ext μ₁, ωcol₁⟩ = ξ(1)·w₁、ξ(1) ≠ 0 → ⟨c.ext μ₁, ωcol₁⟩ = w₁。
 4. norm 論法: ‖c.ext μ₁‖² = ‖μ₁‖² = w₁ (extension_inner_eq)、‖ωcol₁‖² = w₁
    (alignedOmegaSigmaGrid_inner)、⟨,⟩ = w₁ → ‖差‖² = 0 → **c.ext μ₁ = ωcol₁**。
+
+## 2026-07-12 tick¹⁴ — ★★★★ case-1 完全証明 (c9d3c92f)、case-2 精密化
+
+- case-1 (∃ irr ξ) sorry-free。S13_Orthogonality の残 bare sorry = capstone hbridge_τ 1 本。
+- **case-2 分析の更新**:
+  - w₂ ≥ 5 では irr 不要の変種が可能: γ = μ_k(1)•μ₁ − μ₁(1)•μ_k (第 2 の列 k ∉ {1, 1̄}) で
+    同じ γ-trick が走る (⟨c.ext μ_k, Ω₁⟩ = 0 は R(μ_k)-family (col k/k̄ 台) ⊥ col-1 grid)。
+  - **w₂ = 3 all-reducible では counting+列独立で符号反転解 (c.ext μ₁ = Ω₂ = conj-column) が
+    生き残る** (座標分析済) — Coq の odd_eq_conj_irr1 排除に対応する内容が本質的に必要。
+    ⟹ 素直な canonical **swap-構成** (ext₀ : columnSum k ↦ Ω_k、hcol-diff で τ-agreement、
+    両側 orthonormal で等長) で回避が正道 (tick⁸ 案)。全 w₂ を single 構成でカバーできるので
+    w₂≥5 変種も不要になる。
+  - 構成の道具: IntegralCharacterMap を orthogonal family 上の像指定から作る constructor —
+    glue engine (exists_integralCharacterMap_glue_of_orthogonal) の内部機構を確認して再利用
+    (S07 の Zisometry_of_cfnorm 相当)。supported-characterization は
+    inducedKernelFamily_zSpan_support_of_apply_one_eq_zero の逆向き不要 (τ-agreement は
+    supported 元 = 係数和 0 = 列差 lattice 上で hcol-diff から直接)。
+  - ⚠ 正確には「𝒮(H₀C) all-reducible ⟹ 𝒮(H₀C) ⊆ {μ-columns}」(SOf_reducible_eq_columnSum)
+    だが逆包含は不要 — 構成は family = 𝒮(H₀C) の members への像指定で足りる (各 member が
+    ある column ⟹ 像 = 対応 Ω_k; well-defined 性 = column-指定の一意性 (列は相異なる character、
+    columnSum injective in k — 2×2 の hne1-論法で列 index 一意)。
+- **exists_pinned 組立**: case split `∃ ξ ∈ 𝒮(H₀C), Irr ξ` → case-1 (coherent_sOf_H0C の c を
+  pin 付きで返す) / else → case-2 構成。capstone は exists_pinned の c を glue に使い、
+  hbridge_τ = pin + ν-線形性。
