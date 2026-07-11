@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.S13_MaximalIII_IV
 import OddOrder.Peterfalvi.S07_Subcoherent
 import OddOrder.Peterfalvi.S11_NineElevenCoherence
+import OddOrder.Peterfalvi.S13_CoreStructure
+import OddOrder.Peterfalvi.S13_SixTwoBridge
 
 /-!
 # Peterfalvi (9.11), case (9.7.a): the maximality-induction entry point
@@ -360,5 +362,350 @@ theorem caseA_refuter_of_equality_refutation [Finite G]
   -- hand the configuration to the (9.11.2)–(9.11.8) refutation
   exact hrefuteEq S₂ hS₁sub hS₂sub hS₂conj hS₂coh ⟨χ₀, hχ₀⟩ hpairs
     h2a hCUprime hS3deg hcount hFboundU
+
+/-! ### The (5.6) pair-bound bundle discharged (issue 9083, Phase E-PairBound)
+
+Book (9.11.1) right endpoint: *"… `≤ ∑_{ψ∈𝒮₂} ψ(1)²/‖ψ‖² ≤ 2q²aχ(1)`"* — Theorem (5.6) applied
+at the maximal coherent `𝒮₂` with the degree-`qa` anchor `χ₁ ∈ 𝒮₁ ⊆ 𝒮₂` and the pair-refuted
+break `χ ∈ 𝒮₃` (Coq `PFsection9.v:1608-1618`, the `extend_coherent` branch read contrapositively).
+The norm-weighted engine is `S08.coherentDegreeSqNormBound_of_not_coherentW_k`; its member
+ratios `deg(ψ) = ψ(1)/χ₁(1) = (source degree)/a ∈ ℕ` are supplied by the case-(a) divisibility
+(9.8.a) `a ∣ (source degree)` (`caseA_source_degree_dvd_a`, Coq `a_dv_XH0` — exactly the
+divisibility Coq feeds `extend_coherent`'s `xi1 1%g %| chi 1%g` side condition), and the
+per-member Dade decompositions come from the §11 grid supply `S12.sixTwoDecompositionData`
+((5.2.d) + (5.2.e), issue 2022). -/
+
+/-- **Peterfalvi (9.8.a), member-degree dictionary for `𝒮(H₀ ⊔ Y)`** (Coq `a_dv_XH0` in member
+form): in Clifford case (a), every member `Ind_{HU}^M ξ` of a §9 family whose source kernel
+contains `H₀` has degree `q·a·e` for some `e : ℕ` — the source degree `ξ(1)` is divisible by the
+Clifford integer `a` (`caseA_source_degree_dvd_a`).  This is the per-member degree-ratio supply
+of the (5.6) pair-bound assembly `nineElevenPairBound`: ratios are taken against the degree-`qa`
+anchor, so each member's ratio is the natural `e = ξ(1)/a`. -/
+theorem caseA_sOf_source_degree_ratio [Finite G] {M : Subgroup G}
+    {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup M}
+    {chief : OddOrder.Peterfalvi.S11.ChiefFactorData data}
+    {chars : OddOrder.Peterfalvi.S11.Section11CharacterData data chief}
+    (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData chars)
+    {Y : Subgroup G} {ψ : ClassFunction ↥M ℂ}
+    (hψ : ψ ∈ OddOrder.Peterfalvi.S11.sOf data (chief.H0 ⊔ Y)) :
+    ∃ e : ℕ, (ψ : ↥M → ℂ) 1 = ((data.q * caseA.a * e : ℕ) : ℂ) := by
+  classical
+  obtain ⟨ξ, hξ, rfl⟩ := hψ
+  obtain ⟨dξ, -, hdξ⟩ := irreducibleCharacter_apply_one_eq_pos_natCast ξ
+  have hker : ((chief.H0.subgroupOf M).subgroupOf (OddOrder.Peterfalvi.S11.huSub data) :
+      Set ↥(OddOrder.Peterfalvi.S11.huSub data)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel
+        (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub data) ℂ) :=
+    subset_trans (SetLike.coe_subset_coe.mpr (Subgroup.subgroupOf_mono _
+      (Subgroup.subgroupOf_mono _ le_sup_left))) hξ.2
+  obtain ⟨e, he⟩ := OddOrder.Peterfalvi.S11.caseA_source_degree_dvd_a caseA hξ.1 hker hdξ
+  refine ⟨e, ?_⟩
+  rw [OddOrder.Peterfalvi.S11.induceHU_apply_one_eq_q_mul, hdξ, he]
+  push_cast
+  ring
+
+set_option maxHeartbeats 3200000 in
+-- the (5.6) engine and the grid decomposition supply thread the
+-- `hyp.base.tau = dadeIntegralCharacterMap` / `hyp.base.A0 = supportInSubgroup` defeqs,
+-- which is feasible but expensive (same as `caseB_coherent_sOf_H0Cprime`)
+/-- **Peterfalvi (9.11.1), the (5.6) pair-bound bundle, discharged** (issue 9083 Phase
+E-PairBound).
+
+For a pair-refuted `χ ∈ 𝒮₃ = 𝒮(H₀C′) ∖ 𝒮₂`: the member dictionary gives `χ = Ind_{HU}^M ζ` with
+`χ(1) = q·d`, `d = ζ(1)`; the source-degree bound `d ≤ u` is `xiOf_H0Cprime_source_apply_one_le_u`
+(the (9.11.1) preamble: `ζ` lies over a linear character of `HC` since `⁅HC,HC⁆ ≤ H₀C′ ⊆ Ker ζ`);
+and every finite `F ⊆ 𝒮₂` obeys `sumnS F ≤ 2q²a·d` — Theorem (5.6) at the degree-`qa` anchor
+`χ₁ ∈ 𝒮₁ ⊆ 𝒮₂` (from the positive (9.8.d) count, as in the base case), read contrapositively
+through the norm-weighted engine `coherentDegreeSqNormBound_of_not_coherentW_k`:
+
+* member ratios `deg(ψ) = ψ(1)/χ₁(1) = (source degree)/a ∈ ℕ` by the (9.8.a) divisibility
+  `a ∣ (source degree)` (`caseA_sOf_source_degree_ratio`, Coq `a_dv_XH0`), anchor ratio `1`,
+  break ratio `χ(1)/χ₁(1) = d/a`;
+* Gram data (orthogonality, positive squared norms), scaled-difference supports, `ZIrr`
+  integrality, and the two generation clauses from the general kernel-family layer
+  (`S08_SixTwoGeneral`, as in `inducedKernelFamily_degreeSqNormReBound_of_break_k`);
+* the break decomposition `Da` and the per-member (5.2.d)/(5.2.e) R-data from the §11 grid
+  supply `S12.sixTwoDecompositionData` (issue 2022);
+
+then `sumnS F ≤ sumnS 𝒮₂ = (qa)²·∑ deg²/‖·‖² ≤ (qa)²·2·(d/a) = 2q²a·d`
+(`sumnS_le_of_subset` + the raw↔normalized rescaling). -/
+theorem nineElevenPairBound [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief)) :
+    NineElevenPairBound hyp caseA := by
+  haveI := hyp.base.finiteG
+  classical
+  intro S₂ hS₁sub hS₂sub hS₂conj hS₂coh χ hχ hnc
+  obtain ⟨hχS, hχnotS₂⟩ := hχ
+  obtain ⟨cohS₂⟩ := hS₂coh
+  have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+  have hq : 0 < hyp.s11Setup.q := hyp.s11Setup.nontrivial.2.1.pos
+  -- ── the break dictionary: `χ = Ind_{HU}^M ζ`, `χ(1) = q·d`, `a ∣ d`, `d ≤ u`
+  obtain ⟨ζ, hζ, rfl⟩ := hχS
+  obtain ⟨d, -, hdζ⟩ := irreducibleCharacter_apply_one_eq_pos_natCast ζ
+  have hχdeg : (OddOrder.Peterfalvi.S11.induceHU hyp.s11Setup
+      (ζ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ) : ↥M → ℂ) 1
+      = ((hyp.s11Setup.q * d : ℕ) : ℂ) := by
+    rw [OddOrder.Peterfalvi.S11.induceHU_apply_one_eq_q_mul, hdζ]
+    push_cast
+    ring
+  -- `a ∣ d` ((9.8.a), Coq `a_dv_XH0`)
+  have hkerζ : ((hyp.chief.H0.subgroupOf M).subgroupOf
+      (OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) :
+      Set ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel
+        (ζ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ) :=
+    subset_trans (SetLike.coe_subset_coe.mpr (Subgroup.subgroupOf_mono _
+      (Subgroup.subgroupOf_mono _ le_sup_left))) hζ.2
+  obtain ⟨e, he⟩ := OddOrder.Peterfalvi.S11.caseA_source_degree_dvd_a caseA hζ.1 hkerζ hdζ
+  -- `d ≤ u` (the (9.11.1) preamble source-degree bound)
+  have hCp : OddOrder.Peterfalvi.S11.cprimeSub hyp.s11Setup hyp.chief = derivedInG hyp.C := by
+    change derivedInG (OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief) = derivedInG hyp.C
+    rw [C_eq_cSub hG hyp]
+  have hζ' : ζ ∈ OddOrder.Peterfalvi.S11.xiOf hyp.s11Setup
+      (hyp.chief.H0 ⊔ (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).Cprime) := by
+    show ζ ∈ OddOrder.Peterfalvi.S11.xiOf hyp.s11Setup
+      (hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.cprimeSub hyp.s11Setup hyp.chief)
+    rw [hCp]
+    exact hζ
+  have hduC := OddOrder.Peterfalvi.S11.xiOf_H0Cprime_source_apply_one_le_u
+    (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief) hζ'
+  rw [hdζ] at hduC
+  have hdu : d ≤ (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u := by
+    have h := (Complex.le_def.mp hduC).1
+    rw [Complex.natCast_re, Complex.natCast_re] at h
+    exact_mod_cast h
+  refine ⟨d, hχdeg, hdu, ?_⟩
+  -- ── the anchor: a degree-`qa` irreducible of `𝒮(H₀U′)`, transported into `S₂` via `hS₁sub`
+  have hp1 : 0 < hyp.chief.p - 1 := Nat.sub_pos_of_lt hyp.chief.p_prime.one_lt
+  have hrel : 0 < (OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup).relIndex hyp.s11Setup.U :=
+    lt_of_lt_of_le
+      (OddOrder.Peterfalvi.S11.u_odd hG
+        (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief)).pos
+      (OddOrder.Peterfalvi.S11.u_le_relIndex_uprimeSub_U
+        (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief))
+  have hNpos := lt_of_lt_of_le (mul_pos hp1 hrel)
+    (OddOrder.Peterfalvi.S11.caseA_character_count_exact hG caseA)
+  have hne : {φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup
+      (hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup) |
+      IsIrreducibleCharacter φ ∧ φ 1 = ((hyp.s11Setup.q * caseA.a : ℕ) : ℂ)}.Nonempty := by
+    apply Set.nonempty_of_ncard_ne_zero
+    intro h0
+    rw [h0, Nat.zero_mul] at hNpos
+    exact absurd hNpos (lt_irrefl 0)
+  have hCU : hyp.C ≤ hyp.s11Setup.U := by
+    show hyp.C ≤ hyp.s11Setup.typeP.U
+    rw [hyp.setup_typeP_eq]; exact hyp.C_le_U
+  have hle : hyp.H0Cprime
+      ≤ hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup := by
+    show hyp.chief.H0 ⊔ derivedInG hyp.C
+      ≤ hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup
+    refine sup_le_sup_left ?_ hyp.chief.H0
+    show derivedInG hyp.C ≤ derivedInG hyp.s11Setup.U
+    rw [OddOrder.Peterfalvi.S11.derivedInG_eq_commutator hyp.C,
+      OddOrder.Peterfalvi.S11.derivedInG_eq_commutator hyp.s11Setup.U]
+    exact Subgroup.commutator_mono hCU hCU
+  obtain ⟨χ₁, hχ₁sOfU', hχ₁irr, hχ₁deg⟩ := hne
+  have hχ₁S₂ : χ₁ ∈ S₂ :=
+    hS₁sub ⟨OddOrder.Peterfalvi.S11.sOf_antitone hyp.s11Setup hle hχ₁sOfU', hχ₁irr, hχ₁deg⟩
+  -- ── `S₂` is finite; enumerate it and locate the anchor index
+  have hSfin : (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime).Finite :=
+    (OddOrder.Peterfalvi.S08.inducedKernelFamily_finite
+        (K := (derivedInG M).subgroupOf M) (hyp.H0Cprime.subgroupOf M)).subset
+      (fun x hx => by rw [← hyp.SOf_eq]; exact hyp.sOf_subset_SOf hyp.H0Cprime hx)
+  have hS₂fin : S₂.Finite := hSfin.subset hS₂sub
+  obtain ⟨k, χmem, hinj, hrange⟩ := OddOrder.Peterfalvi.S08.exists_finEnum_general hS₂fin
+  have hmemS1set : ∀ j, χmem j ∈ S₂ := fun j => hrange ▸ Set.mem_range_self j
+  have hχ₁mem : χ₁ ∈ Set.range χmem := hrange ▸ hχ₁S₂
+  obtain ⟨i₁, hi₁eq⟩ := hχ₁mem
+  subst hi₁eq
+  -- ── the world-bridge `S₂ ⊆ 𝒮(H₀C′) ⊆ S(H₀C′) ⊆ S(⊥)` and the break memberships
+  have hIKF : ∀ ⦃x : ClassFunction ↥M ℂ⦄,
+      x ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime →
+      x ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) := fun x hx =>
+    OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone bot_le
+      (by rw [← hyp.SOf_eq]; exact hyp.sOf_subset_SOf hyp.H0Cprime hx)
+  have hS₂bot : S₂ ⊆ OddOrder.Peterfalvi.S08.inducedKernelFamily
+      ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) := fun x hx => hIKF (hS₂sub hx)
+  have hmemfam : ∀ j, χmem j ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+      ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) := fun j => hS₂bot (hmemS1set j)
+  have hχsOf : OddOrder.Peterfalvi.S11.induceHU hyp.s11Setup
+      (ζ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ)
+      ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime := ⟨ζ, hζ, rfl⟩
+  have hψB : OddOrder.Peterfalvi.S11.induceHU hyp.s11Setup
+      (ζ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ)
+      ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) (hyp.H0Cprime.subgroupOf M) := by
+    rw [← hyp.SOf_eq]
+    exact hyp.sOf_subset_SOf hyp.H0Cprime hχsOf
+  have hχcnotS₂ : (OddOrder.Peterfalvi.S11.induceHU hyp.s11Setup
+      (ζ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ)).conj ∉ S₂ := by
+    intro hc
+    apply hχnotS₂
+    have h := hS₂conj hc
+    rwa [ClassFunction.conj_conj] at h
+  -- ── member degree ratios against the degree-`qa` anchor ((9.8.a))
+  choose deg hdeg using fun j : Fin k =>
+    caseA_sOf_source_degree_ratio caseA
+      (show χmem j ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup
+          (hyp.chief.H0 ⊔ derivedInG hyp.C) from hS₂sub (hmemS1set j))
+  have hdeg_anchor : ∀ j, (χmem j : ↥M → ℂ) 1 = (deg j : ℂ) * (χmem i₁ : ↥M → ℂ) 1 := by
+    intro j
+    rw [hdeg j, hχ₁deg]
+    push_cast
+    ring
+  have ha1 : deg i₁ = 1 := by
+    have h : hyp.s11Setup.q * caseA.a * 1 = hyp.s11Setup.q * caseA.a * deg i₁ := by
+      rw [mul_one]
+      exact Nat.cast_inj.mp (hχ₁deg.symm.trans (hdeg i₁))
+    exact (Nat.eq_of_mul_eq_mul_left (Nat.mul_pos hq caseA.a_pos) h).symm
+  -- ── the break ratio `e = d/a` against the anchor
+  have hψdeg : (OddOrder.Peterfalvi.S11.induceHU hyp.s11Setup
+      (ζ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ) : ↥M → ℂ) 1
+      = (e : ℂ) * (χmem i₁ : ↥M → ℂ) 1 := by
+    rw [hχdeg, hχ₁deg, he]
+    push_cast
+    ring
+  -- ── the §11 grid decomposition supply ((5.2.d)/(5.2.e), issue 2022)
+  have hnt : OddOrder.GroupTheory.TypePNontrivialCore M hyp.base.typeP :=
+    OddOrder.GroupTheory.typePNontrivialCore_of_isTypeIIIorIV hyp.type_alt hyp.base.typeP
+  have hsub : S₂ ⊆ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) (hyp.H0Cprime.subgroupOf M) ∪
+      OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) (hyp.H0Cprime.subgroupOf M) := fun x hx =>
+    Or.inl (by rw [← hyp.SOf_eq]; exact hyp.sOf_subset_SOf hyp.H0Cprime (hS₂sub hx))
+  obtain ⟨Da, hDatau1, hdatum⟩ := hyp.base.sixTwoDecompositionData hG
+    (hyp.params_mu_eq hG hG.odd) hyp.params_delta_pm
+    (fun j hj => hyp.params_delta_sign hG hG.odd j hj)
+    hyp.params_zeta_mem hyp.params_zeta_degree hyp.type_alt hnt
+    ((OddOrder.Peterfalvi.S11.exists_chiefFactorData hG
+      (hyp.base.toTypesIIIIIIVSetup hyp.type_alt hnt)).choose)
+    (hyp.H0Cprime.subgroupOf M) (hyp.H0Cprime.subgroupOf M)
+    S₂ hS₂conj hsub cohS₂
+    (OddOrder.Peterfalvi.S11.induceHU hyp.s11Setup
+      (ζ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ))
+    hψB hχnotS₂ hχcnotS₂ (χmem i₁) (hmemS1set i₁) e hψdeg hnc
+  choose Dfun hDorth hDtau using hdatum
+  -- ── break-character fields, supports, integrality, generation (general kernel layer)
+  obtain ⟨-, hψψne, hψbψbne, hψbψ, hψψb, hdiffsuppψ, hψ_S1, hψbar_S1⟩ :=
+    OddOrder.Peterfalvi.S08.inducedKernelFamily_breakChar_fields hModd
+      hyp.base.mderivSharp_subset_A0 hS₂bot hψB hχnotS₂ hχcnotS₂
+  have hmemdegdiffsupp : ∀ i : Fin k, i ∈ (Finset.univ : Finset (Fin k)) →
+      ((χmem i - deg i • χmem i₁).support ⊆ hyp.base.A0) := fun i _ =>
+    OddOrder.Peterfalvi.S08.inducedKernelFamily_scaledDiff_support
+      hyp.base.mderivSharp_subset_A0 (hmemfam i) (hmemfam i₁) (hdeg_anchor i)
+  have hdiffasuppψ : ((OddOrder.Peterfalvi.S11.induceHU hyp.s11Setup
+      (ζ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ))
+        - e • χmem i₁).support ⊆ hyp.base.A0 :=
+    OddOrder.Peterfalvi.S08.inducedKernelFamily_scaledDiff_support
+      hyp.base.mderivSharp_subset_A0 hψB (hmemfam i₁) hψdeg
+  have htau1ψ : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.base.dadeData.dade
+      (hyp.base.dadeData.dade.fullDadeIsometryData hyp.base.hconj)
+      ((OddOrder.Peterfalvi.S11.induceHU hyp.s11Setup
+        (ζ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ))
+          - e • χmem i₁) ∈ ZIrr G := by
+    refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+      hyp.base.dadeData.dade hyp.base.hconj hdiffasuppψ ?_
+    refine Submodule.sub_mem _
+      (OddOrder.Peterfalvi.S08.inducedKernelFamily_mem_ZIrr hψB) ?_
+    exact nsmul_mem (OddOrder.Peterfalvi.S08.inducedKernelFamily_mem_ZIrr (hmemfam i₁)) e
+  have hcover : ∀ x ∈ S₂, ∃ j, j ∈ (Finset.univ : Finset (Fin k)) ∧ χmem j = x := by
+    intro x hx
+    rw [← hrange] at hx
+    obtain ⟨j, hj⟩ := hx
+    exact ⟨j, Finset.mem_univ j, hj⟩
+  have hSgen :=
+    OddOrder.Peterfalvi.S07.span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs
+      (s := (Finset.univ : Finset (Fin k))) (χmem := χmem) (deg := deg) (i₁ := i₁)
+      hcover (Finset.mem_univ i₁) (fun j _ => hmemS1set j) hmemdegdiffsupp
+  have hbar1 : ((OddOrder.Peterfalvi.S11.induceHU hyp.s11Setup
+      (ζ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ)).conj : ↥M → ℂ) 1
+      = (OddOrder.Peterfalvi.S11.induceHU hyp.s11Setup
+        (ζ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ) : ↥M → ℂ) 1 := by
+    rw [ClassFunction.conj_apply, hχdeg]
+    exact star_natCast _
+  have hχ₁ne : (χmem i₁ : ↥M → ℂ) 1 ≠ 0 := by
+    rw [hχ₁deg]
+    exact Nat.cast_ne_zero.mpr (Nat.mul_pos hq caseA.a_pos).ne'
+  have hgen :=
+    OddOrder.Peterfalvi.S07.zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration
+      (χ := OddOrder.Peterfalvi.S11.induceHU hyp.s11Setup
+        (ζ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ))
+      (chibar := (OddOrder.Peterfalvi.S11.induceHU hyp.s11Setup
+        (ζ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ)).conj)
+      (chi1 := χmem i₁) (a := e)
+      hSgen hψdeg hbar1 hχ₁ne hyp.base.one_notMem_A0
+  -- ── Gram data: positive real squared norms, weighted orthogonality, anchor norm `1`
+  have hmcpos : ∀ j, 0 < (ClassFunction.inner (χmem j) (χmem j)).re := fun j =>
+    (OddOrder.Peterfalvi.S08.inducedKernelFamily_inner_self_real_pos (hmemfam j)).2
+  have hmemortho : ∀ i j, ClassFunction.inner (χmem i) (χmem j)
+      = @ite ℂ (i = j) (Classical.propDecidable (i = j))
+          (((ClassFunction.inner (χmem i) (χmem i)).re : ℝ) : ℂ) 0 := by
+    intro i j
+    by_cases hij : i = j
+    · subst hij
+      rw [if_pos rfl]
+      exact (OddOrder.Peterfalvi.S08.inducedKernelFamily_inner_self_real_pos (hmemfam i)).1
+    · rw [if_neg hij]
+      exact OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal
+        (hmemfam i) (hmemfam j) (fun h => hij (hinj h))
+  have hanchorNorm : (ClassFunction.inner (χmem i₁) (χmem i₁)).re = 1 := by
+    have hval : ClassFunction.inner (χmem i₁) (χmem i₁) = 1 := by
+      have h := irreducibleCharacter_inner_eq_ite
+        (⟨χmem i₁, hχ₁irr⟩ : IrreducibleCharacter ↥M) ⟨χmem i₁, hχ₁irr⟩
+      rwa [if_pos rfl] at h
+    rw [hval, Complex.one_re]
+  -- ── fire the norm-weighted (5.6) engine (contrapositive of `xAdjoinStepW_k`)
+  have hbound := OddOrder.Peterfalvi.S08.coherentDegreeSqNormBound_of_not_coherentW_k
+    hyp.base.dadeData.dade hyp.base.hconj cohS₂
+    (OddOrder.Peterfalvi.S11.induceHU hyp.s11Setup
+      (ζ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ))
+    hdiffsuppψ hψψne hψbψbne hψψb hψbψ hψ_S1 hψbar_S1
+    (Finset.univ : Finset (Fin k)) χmem deg i₁ (Finset.mem_univ i₁)
+    hmemdegdiffsupp (fun j _ => hmemS1set j)
+    (fun j => (ClassFunction.inner (χmem j) (χmem j)).re) (fun j _ => hmcpos j)
+    (fun i _ j _ => hmemortho i j) hanchorNorm
+    (fun i _ => Dfun (χmem i) (hmemS1set i))
+    Da hDatau1
+    (fun i _ => hDorth (χmem i) (hmemS1set i))
+    (fun i _ => hDtau (χmem i) (hmemS1set i))
+    hdiffasuppψ htau1ψ ha1 hSgen hgen hnc
+  -- ── rescale: `sumnS F ≤ sumnS S₂ = (qa)²·∑ deg²/‖·‖² ≤ (qa)²·2·e = 2q²a·d`
+  intro F hF
+  have hFsub : F ⊆ hS₂fin.toFinset := fun ψ hψ => hS₂fin.mem_toFinset.mpr (hF hψ)
+  have henum : OddOrder.Peterfalvi.S07.sumnS hS₂fin.toFinset
+      = ∑ j : Fin k, OddOrder.Peterfalvi.S07.Snorm (χmem j) := by
+    rw [OddOrder.Peterfalvi.S07.sumnS,
+      show hS₂fin.toFinset = (Set.range χmem).toFinset by
+        ext ψ; rw [Set.Finite.mem_toFinset, Set.mem_toFinset, hrange],
+      OddOrder.Peterfalvi.S08.sum_toFinset_range_eq hinj]
+  have hsnorm : ∀ j : Fin k, OddOrder.Peterfalvi.S07.Snorm (χmem j)
+      = ((deg j : ℝ) * ((hyp.s11Setup.q * caseA.a : ℕ) : ℝ)) ^ 2
+        / (ClassFunction.inner (χmem j) (χmem j)).re := by
+    intro j
+    unfold OddOrder.Peterfalvi.S07.Snorm
+    congr 1
+    rw [hdeg j, Complex.natCast_re]
+    push_cast
+    ring
+  calc OddOrder.Peterfalvi.S07.sumnS F
+      ≤ OddOrder.Peterfalvi.S07.sumnS hS₂fin.toFinset :=
+        OddOrder.Peterfalvi.S07.sumnS_le_of_subset hFsub
+    _ = ∑ j : Fin k, OddOrder.Peterfalvi.S07.Snorm (χmem j) := henum
+    _ = ∑ j : Fin k, ((deg j : ℝ) * ((hyp.s11Setup.q * caseA.a : ℕ) : ℝ)) ^ 2
+          / (ClassFunction.inner (χmem j) (χmem j)).re :=
+        Finset.sum_congr rfl (fun j _ => hsnorm j)
+    _ = ((hyp.s11Setup.q * caseA.a : ℕ) : ℝ) ^ 2
+          * ∑ j : Fin k, (deg j : ℝ) ^ 2 / (ClassFunction.inner (χmem j) (χmem j)).re := by
+        rw [Finset.mul_sum]
+        exact Finset.sum_congr rfl (fun j _ => by ring)
+    _ ≤ ((hyp.s11Setup.q * caseA.a : ℕ) : ℝ) ^ 2 * (2 * (e : ℝ)) :=
+        mul_le_mul_of_nonneg_left hbound (sq_nonneg _)
+    _ = 2 * (hyp.s11Setup.q : ℝ) ^ 2 * (caseA.a : ℝ) * (d : ℝ) := by
+        rw [he]
+        push_cast
+        ring
 
 end OddOrder.Peterfalvi.S13
