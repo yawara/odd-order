@@ -126,7 +126,31 @@ theorem tSideDadeMap_etaGrid_relation [Finite G]
     (tSideDadeMap_vanish_on_etaRegular hG hyp hIII hφsupp) i j
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (11.9)(a), integral T-side projection with four-corner relation.** -/
+/-- **Peterfalvi (11.9)(a), the principal T-side eta coefficient.**
+Dade reciprocity preserves the trivial multiplicity, and `η₀₀ = 1_G`. -/
+theorem tSideDadeMap_inner_eta_principal [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    [fintypeG : Fintype G]
+    [invertibleG : Invertible (Nat.card G : ℂ)]
+    [Fintype ↥hyp.base.T] [Invertible (Nat.card ↥hyp.base.T : ℂ)]
+    {φ : ClassFunction ↥hyp.base.T ℂ}
+    (hφsupp : φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T) :
+    ClassFunction.inner (tSideDadeMap hyp hG φ)
+        (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩) =
+      ClassFunction.inner φ (trivialClassFunction ↥hyp.base.T) := by
+  have hf : fintypeG =
+      OddOrder.Peterfalvi.S12.FiniteInduce.finiteGFintype := Subsingleton.elim _ _
+  subst fintypeG
+  have hi : invertibleG =
+      OddOrder.Peterfalvi.S12.FiniteInduce.natCardInvCG := Subsingleton.elim _ _
+  subst invertibleG
+  rw [eta_principal_eq_trivial hyp.base,
+    tSideDadeMap_inner_trivial hyp hG hφsupp]
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.9)(a), integral T-side projection with principal and four-corner data.** -/
 theorem exists_tSide_etaGrid_intProjection_with_relation [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G))
@@ -136,6 +160,8 @@ theorem exists_tSide_etaGrid_intProjection_with_relation [Finite G]
     {φ : ClassFunction ↥hyp.base.T ℂ}
     (hφsupp : φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
       (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T)
+    (hφone : ClassFunction.inner φ
+      (trivialClassFunction ↥hyp.base.T) = 1)
     (hτZ : tSideDadeMap hyp hG φ ∈ ZIrr G)
     (hτnorm : ClassFunction.inner (tSideDadeMap hyp hG φ) (tSideDadeMap hyp hG φ) =
       (((hyp.base.p : ℤ) + 1) : ℂ)) :
@@ -149,10 +175,17 @@ theorem exists_tSide_etaGrid_intProjection_with_relation [Finite G]
             (tSideDadeMap hyp hG φ - etaGridProjection hyp.base m) ∧
       (∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (m i j) ^ 2 : ℤ) ≤
         (hyp.base.p : ℤ) + 1 ∧
-      ∀ i j, m i j + m ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩ =
-        m i ⟨0, hyp.base.p_prime.pos⟩ + m ⟨0, hyp.base.q_prime.pos⟩ j := by
+      m ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩ = 1 ∧
+      (∀ i j, m i j + m ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩ =
+        m i ⟨0, hyp.base.p_prime.pos⟩ + m ⟨0, hyp.base.q_prime.pos⟩ j) := by
   obtain ⟨m, hcoeff, hpyth, hbound⟩ :=
     exists_etaGrid_intProjection_of_inner_self_eq hyp.base hτZ hτnorm
+  have hprincipalC := tSideDadeMap_inner_eta_principal hG hyp hφsupp
+  rw [hφone,
+    hcoeff ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩] at hprincipalC
+  have hprincipal :
+      m ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩ = 1 := by
+    exact_mod_cast hprincipalC
   have hrelation : ∀ i j,
       m i j + m ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩ =
         m i ⟨0, hyp.base.p_prime.pos⟩ + m ⟨0, hyp.base.q_prime.pos⟩ j := by
@@ -163,7 +196,7 @@ theorem exists_tSide_etaGrid_intProjection_with_relation [Finite G]
       hcoeff i ⟨0, hyp.base.p_prime.pos⟩,
       hcoeff ⟨0, hyp.base.q_prime.pos⟩ j] at h
     exact_mod_cast h
-  exact ⟨m, hcoeff, hpyth, hbound, hrelation⟩
+  exact ⟨m, hcoeff, hpyth, hbound, hprincipal, hrelation⟩
 
 /-- **Peterfalvi (11.9)(a), the axis-coefficient arithmetic.**
 Suppose the nonprincipal row and column coefficients are constant, the four-corner
