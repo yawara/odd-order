@@ -1086,18 +1086,18 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have hζform := hζT
     rw [hcalT1, Finset.mem_coe, Finset.mem_image] at hζform
     obtain ⟨θ, hθ, hζeq⟩ := hζform
-    have hζsupp_ind := typeIII_induced_source_support hyp θ
-    have hζsupp : ζ.support ⊆
-        ((derivedInG hyp.base.T).subgroupOf hyp.base.T :
-          Set ↥hyp.base.T) :=
-      hζeq ▸ hζsupp_ind
     have hζ1_ind :=
       typeIII_induced_source_degree hyp θ (hlinear θ hθ)
     have hζ1 : ζ 1 = (hyp.base.p : ℂ) :=
       hζeq ▸ hζ1_ind
-    obtain ⟨ν0, hνZ, hνR, hβZ, hβsupp, hτβZ, hτβ1, hβconj, hνinner⟩ :=
-      exists_typeIII_primeTIDifference_with_anchor_inner hG hyp hIII
-        (hirr ζ hζT).mem_ZIrr hζsupp hζ1
+    have hζirr_ind : IsIrreducibleCharacter (ClassFunction.induce
+        ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction) := by
+      simpa only [hζeq] using hirr ζ hζT
+    obtain ⟨ν0, hνZ, hνR, hβZ, hβsupp, hτβZ, hτβ1, hβconj,
+        hνinner, hβnorm, hτβnorm⟩ :=
+      exists_typeIII_induced_primeTIDifference_with_norm
+        hG hyp hIII θ (hne θ hθ) hζirr_ind hζ1_ind
+    rw [hζeq] at hβZ hβsupp hτβZ hτβ1 hβconj hβnorm hτβnorm
     have hζone : ClassFunction.inner ζ
         (trivialClassFunction ↥hyp.base.T) = 0 := by
       rw [← hζeq]
@@ -1164,10 +1164,12 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       norm_num
     have hrelation : ClassFunction.inner betaData.Gamma (hτ.extension ζ) =
         1 + ClassFunction.inner Δ betaData.Gamma := by
-      -- The remaining deep input is precisely Coq's pair
-      -- `o_eta0_betaT0` + `QV'betaS ⟂ Ind_T^G betaT0`: the (11.9) projection of the
-      -- T-side bridge onto the η-grid, and the (14.9) S/T support separation.
-      have hdeep :
+      -- The remaining deep inputs are now the exact upstream producers:
+      -- (i) Coq's (11.9) zero-column projection `o_eta0_betaT0`;
+      -- (ii) the two prime-TI residue values used in `PVSbeta`.
+      -- The S/T cross orthogonality is no longer assumed: the landed exact-support
+      -- consumer proves it from (ii), Type-P₁ normed-TI, and order separation.
+      have hresidual :
           (∀ j : Fin hyp.base.p,
             ClassFunction.inner
                 (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ j)
@@ -1176,9 +1178,27 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
                 (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ j)
                 (∑ i : Fin hyp.base.q,
                   hyp.base.eta i ⟨0, hyp.base.p_prime.pos⟩)) ∧
-          ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ))
-            (OddOrder.Peterfalvi.S15.tauSbetaGrid hG hyp.base) = 0 := by
+          (∀ z : ↥hyp.base.S,
+            (z : G) ∈ OddOrder.GroupTheory.derivedInG hyp.base.S →
+            (z : G) ∉ hyp.base.P →
+            hyp.base.mu ⟨0, hyp.base.q_prime.pos⟩
+              ⟨1, by have := hyp.base.three_le_p; omega⟩ z = 0) ∧
+          (∀ x : ↥hyp.base.S, (x : G) ∈ hyp.base.W1 → x ≠ 1 →
+            hyp.base.mu ⟨0, hyp.base.q_prime.pos⟩
+              ⟨1, by have := hyp.base.three_le_p; omega⟩ x = 1) := by
         sorry
+      have hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T := by
+        obtain ⟨_, _, hcIII_IV, _, _, _⟩ :=
+          OddOrder.BG.Ch4.S16.proposition_type_classification
+            hG hyp.base.T_maximal
+        exact (hcIII_IV.mp (Or.inl hIII)).1
+      let dataT :=
+        (OddOrder.Peterfalvi.S15.reconciled_typePData_T hG hyp.base).choose
+      have hcross :
+          ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ))
+            (OddOrder.Peterfalvi.S15.tauSbetaGrid hG hyp.base) = 0 :=
+        tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_mu_values
+          hG hyp dataT hP1 hresidual.2.1 hresidual.2.2 hβsupp
       have hτβeta : ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ))
           (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩
             ⟨1, by have := hyp.base.three_le_p; omega⟩) = 0 := by
@@ -1189,7 +1209,7 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           have hv := congrArg Fin.val h
           norm_num at hv
         have hrow := tSide_beta_inner_eta_of_zeroColumn_projection
-          hyp.base (tSideDadeMap hyp hG (ν0 - ζ)) hdeep.1
+          hyp.base (tSideDadeMap hyp hG (ν0 - ζ)) hresidual.1
           ⟨1, by have := hyp.base.three_le_p; omega⟩
         simpa only [if_neg hne0] using hrow
       have hΓdef : betaData.Gamma =
@@ -1204,7 +1224,7 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
             hτ.extension ζ := by
         rfl
       exact gap_cross_inner_identity hGammaZ hExtZ hOneZ hΓdef hΔdef
-        hτβinner hdeep.2 hτβeta hGamma1
+        hτβinner hcross hτβeta hGamma1
     exact ⟨Δ, hΔZ, hΔreal, hΔone, hrelation⟩
   obtain ⟨x, hxcoe, hx⟩ :
       ∃ (x : ClassFunction G ℂ → ℤ),

@@ -606,3 +606,49 @@ feature commit: `f686612e`。
   既存 wrappers により直ちに閉じる。
 - main merge `e29e69a3` 後、`TGapCross` と AxiomsCheck (4131 jobs) を単独実行し green。
   `git diff --check` clean。新 axiom・新 sorry なし。
+
+## lane-c (14.9) cross term の exact-value 配線 (2026-07-11)
+
+feature commit: `43033a7b`。
+
+- `T_typeIII_ratio_le` の opaque 入力から S/T cross 直交そのものを除去した。
+  残る入力は (11.9) の zero-column projection と、前節で同定した μ₀₁ の二つの
+  pointwise value (`S′−P` 上 0、`W₁#` 上 1) だけである。
+- Type-III 仮定から BG の type classification により `IsTypeP1 T` を導き、
+  `reconciled_typePData_T` と
+  `tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_mu_values` を接続した。これにより cross term は
+  exact values、Type-P₁ normed-TI、order separation、β-support の既証明 chain から導出され、
+  `gap_cross_inner_identity` へ渡される。
+- main に入った `S12.Hypothesis.SHC_tau_muColumnZero_sub_zeta` も独立に照合したが、仮定
+  `w₁ < w₂` は T-side の `w₁=p`, `w₂=q` と `q<p` に対して向きが逆であり、今回の
+  zero-column projection を直接 discharge しない。このため hub 追記の方向性は cross 側では
+  正しく、projection 側には別 producer が依然必要である。
+- `TTypeII.lean` は 1497 行で 1500-line trigger 未満。leaf build と
+  AxiomsCheck (4134 jobs) は exit 0、`git diff --check` clean。実 `sorry` は従来の 2 箇所のまま、
+  新 axiom・新 sorry なし。commit 前 `git merge main` は up to date。
+
+## lane-c (11.9.a) T-side projection の norm producer (2026-07-11)
+
+feature commits: `b8b493c0`, `ad35e55f`。
+
+- Coq `PFsection11.v` の `FTtype34_structure` (11.9)(a) と、`PFsection14.v` での消費箇所を
+  再照合した。必要な `o_eta0_betaT0` は Type-V case-(c) の列 identity そのものではなく、
+  `bridgeS1` の η-grid projection rigidity から得る。issue 9079 の transpose API も確認したが、
+  同 issue 自身が type III/IV では `w₂<w₁` のため `w₁<w₂` route は使えないと記録しており、
+  σ-grid transpose はこの projection の向きを反転して解決するものではない。
+- `exists_typeIII_primeTIredZero_with_projectionData` で concrete
+  `ν₀ = Ind_{T'}^T 1` の `⟨ν₀,ν₀⟩=p` と、全 nonprincipal source
+  `θ` に対する `⟨ν₀,Ind θ⟩=0` を実証明した。Coq の `cfnorm_prTIred` / `omuS1` に対応する。
+- `exists_typeIII_primeTIDifference_induced_inner_self` で
+  `βT0=ν₀−Ind θ` の source norm `⟨βT0,βT0⟩=p+1` を実証明。
+  `exists_typeIII_induced_primeTIDifference_with_norm` は同じ concrete `ν₀` について
+  support、virtuality、conjugation、identity-value と Dade image を組み立て、supported
+  Dade isometry から `⟨τ_T βT0,τ_T βT0⟩=p+1` まで保持する。
+- `T_typeIII_ratio_le` は旧 generic anchor からこの full producer へ配線済み。
+  したがって projection 本体の次 frontier は norm の生産ではなく、Coq `bridgeS1` の
+  η-grid coefficient rigidity: `a₀₀=1`、integer coefficients、four-corner relation、
+  norm bound と non-orthogonality/automorphism orbit を合成して off-axis coefficient を
+  0 にする部分である。
+- 3 theorem は AxiomsCheck 登録済み。`TGapPrimeTI` / `TTypeII` / AxiomsCheck
+  (4134 jobs) は exit 0、`git diff --check` clean。`TGapPrimeTI` は sorry-free、
+  `TTypeII` は 1497 行・既存 2 sorry のまま。新 axiom・新 sorry なし。
