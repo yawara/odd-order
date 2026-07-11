@@ -374,3 +374,119 @@ sorryAx ゼロ; C_eq_cSub debt も不使用: C = U′ 同定は hCUprime を cha
   (α^τ 直交性、pair-refutation ← (9.11.6-8))」で discharge、
   `NineElevenSTwoExtraction` と併せて `nineElevenEqualityRefutation_of_sTwoExtraction_normBound`
   が閉じ、S13_Orthogonality:130 の live sorry が置換される。
+
+---
+
+# Phase E 完了 (部分: items 1-3 + 配線, 2026-07-11, lane a)
+
+**(9.11) port の残 5 obligations のうち 1/2/3(9.11.6 まで)/4/5(条件付き) を landed**。
+残 = **`NineElevenSevenEightRefutation` ただ 1 つ** ((9.11.7)-(9.11.8) coherent-pair 構成)。
+自前 sorry 0 (S13_Orthogonality:134 の既存 live sorry の**縮小**のみ)・新 axiom 0・append-only
+(sanctioned な `coherent_sOf_H0C` body 差し替えを除く)。
+
+## item 1: `NineElevenTwoTIWitness` discharge — 新 leaf `S11_NineElevenTIWitness.lean` (327 行)
+
+book (9.11.2) 表示文 "if w ∈ W₁^# then U₁ ∩ U₁^w = C" を equality-configuration degree
+dichotomy から discharge (`nineElevenTwoTIWitness_of_degree_dichotomy`, **axiom-clean 実測**):
+
+- **membership 辞書** `mem_cuSubOf_of_forall_smul_eq` / `forall_smul_eq_of_mem_cuSubOf`
+  (`cuSubOf` の double-map kernel 実現の pointwise 化);
+- **W₁↔summand 共役辞書** `conj_smul_cuSubOf_of_Hpart_smul`: `H_j = φ(x)•H_i` ⟹
+  `C_U(H_i)^x = C_U(H_j)` (共役等変性 `φ(xgx⁻¹) = φ(x)φ(g)φ(x)⁻¹`);
+- **free-orbit 構造**: `exists_w1_rep_Hpart` (各 summand は S₀ の W₁-translate — orbitRep の
+  U-part は `S0_aInvariant` が吸収)、`Hpart_injective` (独立 order-p summand の相異)、
+  `forall_w1_exists_Hpart_smul` (rep 写像 Fin q ↪ W₁ は |W₁| = q で全単射 ⟹ summand 集合 =
+  S₀ の full free W₁-orbit)、`exists_zpow_of_mem_W1` (素数位数生成);
+- **assembly**: all-equal 分岐は `C = U₁` (`mem_cSub_of_forall_mem_cuSubOf`) で TI 自明
+  (u = a 吸収、Phase B と同型); mixed 分岐は `U₁^w ≠ U₁` (さもなくば `⟨w⟩ = W₁` が U₁ を固定し
+  free-orbit 推移性で全 centralizer 一致 → 矛盾) → pair dichotomy が index u を pin →
+  index equality で `U₁ ∩ U₁^w = C`。
+- S13 corollary `caseA_nineElevenTwo_tiWitness` (hS3deg/hS2deg → witness; sorryAx =
+  既存 `C_eq_cSub` debt のみ、Phase B/C corollary と同一)。
+
+## item 2: `NineElevenSTwoExtraction` discharge — `S11_NineElevenCaseA.lean` 追記 (+220 行)
+
+book (9.11.1) "Then 𝒮₂ = 𝒮₁" (Coq `eqS12`)。**`nineElevenSTwoExtraction` は axiom-clean 実測**
+(C_eq_cSub debt 不使用!):
+
+- `sOf_mem_Snorm_pos`: 全 𝒮-member の Snorm 重みは正 (次数 q·d ≥ q、‖·‖² > 0);
+- `caseA_sTwo_subset_degreeQaCut` (**subset 強形**, axiom-clean): 飽和 bound `2q²au` の下で
+  `𝒮₂ ⊆ 𝒮₁′` — `sumnS 𝒮₁′ = |𝒮₁′|·(qa)² = q²·(p−1)·[U:U′] = 2q²au` ((9.8.d) count equality +
+  `C = U′` + `2a = p−1`) が bound を単独で正確に満たし、𝒮₁′-外 member の正 Snorm が超過;
+- degree 形 = named Prop の discharge。(9.11.7-8) が使う「𝒮₂-member は irreducible」も
+  subset 強形が供給。
+
+## item 3 (部分): `NineElevenNormBound` を (9.11.6) まで discharge — 新 leaf
+`S11_NineElevenAlphaBound.lean` (898 行、自前 sorry 0)
+
+- **Bessel count** `card_le_inner_self_re_of_orthonormal_inner_int_ne` (axiom-clean):
+  正規直交族 + 非零整数 pairing ⟹ `|T| ≤ ‖A‖²` (Coq `cnorm_dconstt` の Fourier-free 形);
+- **hunif-free member R-dispatch** `sOf_H0Cprime_memberRFamily{,_orthogonal}` (axiom-clean):
+  caseB dispatch の `hunif` は member dichotomy の**捨てられる** irr-branch にしか給餌しない
+  と判明 → mixed-degree equality configuration 用に直接複製 (reducible →
+  `reducible_mem_inducedKernelFamily_eq_muGrid_columnSum` 直行);
+- **τ₃** `caseA_sThree_coherent` (axiom-clean): 𝒮₃ = 𝒮(H₀C′)∖𝒮₂ は uniform degree qu
+  (squeeze 出力) で (5.7) norm-general engine が発火 — book p.57 "let τ₃ be an extension …
+  can be seen from (5.7)" の実現;
+- **(9.11.6) dichotomy** `nineElevenNormBound_of_sevenEightRefutation`: `⟨α^τ, λ^{τ₃}⟩` は
+  λ ∈ 𝒮₃ で**定数** (τ₃ は A₀-supported 等次差で τ と一致 + Dade isometry + `⟨α, λ⟩ = 0`
+  [γ ⊥ 全 member ← `nineElevenGamma_inner_induceHU`; ψ₁ ∈ 𝒮₂ vs λ ∉ 𝒮₂ 直交])。
+  非零 → 𝒮₄ の τ₃-像が α^τ の相異 unit constituents で Bessel が `|𝒮₄| ≤ ‖α‖² = N`
+  (NormBound 結論); 零 = book (9.11.6) `α^τ ⊥ 𝒮₃^{τ₃}` → named residual へ。
+  α-context は Phase-D bundle の γ/ψ₁-explicit 複製 (TIWitness は item 1 が供給)。
+
+## items 4-5 (配線): assembler + 条件付き capstone + live sorry の縮小
+
+- `nineElevenEqualityRefutation_of_sevenEightRefutation`: equality refutation =
+  **residual 1 本**に帰着 (items 1+2+3 + Phase A-D 全層合流);
+- `coherent_sOf_H0Cprime_of_sevenEightRefutation` (S13_Orthogonality 追記): (9.11) 全体の
+  条件付き capstone — `∀ caseA, NineElevenSevenEightRefutation` ⟹ `𝒮(H₀C′)` coherent;
+- **S13_Orthogonality:134 live sorry の縮小** (sanctioned body 差し替え、statement 不変):
+  `coherent_sOf_H0C` の caseA-refuter 供給が squeeze + Phase B/C/D/E 全層経由になり、残る
+  sorry の型は `NineElevenSevenEightRefutation hyp caseA` そのもの (= 残 obligation の正確な
+  surface)。sorry 数不変 (1 site)、sorryAx 状態不変。
+
+## axioms 実測 (全て `#print axioms`)
+
+- axiom-clean (propext/Classical.choice/Quot.sound のみ):
+  `nineElevenTwoTIWitness_of_degree_dichotomy`, `conj_smul_cuSubOf_of_Hpart_smul`,
+  `forall_w1_exists_Hpart_smul`, `nineElevenSTwoExtraction`, `caseA_sTwo_subset_degreeQaCut`,
+  `sOf_mem_Snorm_pos`, `card_le_inner_self_re_of_orthonormal_inner_int_ne`,
+  `sOf_H0Cprime_memberRFamily_orthogonal`, `caseA_sThree_coherent` — AxiomsCheck に
+  8 asserts 追加 (7500 行 cap へ bump)。
+- sorryAx (既存 upstream 由来のみ、本 Phase の新規分ゼロ):
+  `caseA_nineElevenTwo_tiWitness` / `nineElevenNormBound_of_sevenEightRefutation` /
+  `nineElevenEqualityRefutation_of_sevenEightRefutation` = **`C_eq_cSub` debt**
+  (caseB/Phase-B/C と同一); `coherent_sOf_H0Cprime_of_sevenEightRefutation` /
+  `coherent_sOf_H0C` = 上記 + 縮小済 live sorry。
+
+## 残 gap (精密): `NineElevenSevenEightRefutation` = (9.11.7)-(9.11.8)
+
+**contract** (S11_NineElevenAlphaBound.lean): equality configuration (12 antecedents) +
+`c₃ : IsCoherent τ 𝒮₃ A₀` + α = γ − ψ₁ fine structure (ψ₁ ∈ 𝒮₂ irr degree-qa; γ ∈ ℤ[Irr M]
+degree-qa, `∀ φ ∈ 𝒮(H₀C′), ⟨γ, φ⟩ = 0`; supp α ⊆ A₀) + **(9.11.6) 出力**
+`∀ λ ∈ 𝒮₃, ⟨α^τ, λ^{τ₃}⟩ = 0` → False。
+
+**証明経路** (Coq PFsection9.v:2048-2227 mirror; 次 session の設計図):
+1. 文脈内で再導出可能な数値: `N < |𝒮₄|` (= `nineElevenFive_refutation` の対偶 +
+   Phase C/D bundles) ⟹ `𝒮₄ ≠ ∅` (N ≥ 1); λ₁ ∈ 𝒮₄ 取得; `u ≠ a` (λ₁ irr degree-qu ∉ 𝒮₂ vs
+   𝒮₁-set ⊆ 𝒮₂); `a ∣ u` (C ≤ U₁ ≤ U の relIndex 連鎖) ⟹ e := u/a ≥ 2。
+2. **(9.11.7)**: β = λ₁ − e·ψ₁; β^τ の τ₁𝒮₂/τ₃𝒮₄-Fourier 分解 → Γ ∈ ℤ[τ₃𝒮₄], ‖Γ‖² = 1,
+   b ∈ {0,1}, Δ = 0 (ノルム簿記 ‖β‖² = e² + 1, |𝒮₂| = 2e)。**必要な新 infra**:
+   τ₁𝒮₂ ⊥ τ₃𝒮₄ (Coq `coherent_ortho` — (5.5) `mem_coherent_sum_subseq` 相当を
+   `CharacterPsiDecomposition`/`eq_sum_of_psi_eq_zero` (S07 NormInequalities, landed) から
+   両 coherence の R-族に適用 + R-族 cross-orthogonality [landed:
+   `sOf_H0Cprime_memberRFamily_orthogonal`])。
+3. **(9.11.8)**: ⟨α^τ, β^τ⟩ = ⟨α, β⟩ = e (γ-orth + ψ₁ norm-1); α^τ の τ₁𝒮₂-Fourier
+   (⟨α^τ, τ₁ψ − τ₁ψ₁⟩ = ⟨α, ψ−ψ₁⟩ = 1 型) + α^τ ⊥ Γ ((9.11.6)) → b·2e − … ≡ 0 (mod e)
+   → b = 0 (b ∈ {0,1}, e ≥ 2)。
+4. β^τ = Γ − e·τ₁ψ₁ から `𝒮₂ ∪ {λ₁, λ̄₁}` の coherent 拡張構成 (Coq
+   `extend_coherent_with` PFsection5.v:1059 の port — `subcoherent_norm`/(5.4) 対応物は
+   `CharacterPsiDecomposition` 系; pair-lattice 側は `isCoherent_pair_of_differenceImage`
+   (S07_CoherenceConstantDegree:86) + union-isometry 貼り合わせ) → `hpairs λ₁` と矛盾。
+規模見積: extend_coherent_with + coherent_ortho port で 1-2 session 級 (Phase B/D 同等)。
+
+## 検証
+
+- 全 touched leaf + `lake build OddOrder` (4164 jobs, ~1m45s) + `lake build
+  OddOrder.AxiomsCheck` green。commits: bf04cba4 (items 1-2) / e5971490 (item 3 + 配線)。

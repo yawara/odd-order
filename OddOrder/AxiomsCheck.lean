@@ -126,7 +126,7 @@ import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 
 -- 機械列挙ファイル (flagship axioms check) のため分割対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 7400
+set_option linter.style.longFile 7500
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -7390,3 +7390,23 @@ the `γ = Ind_{HU₁}^M 1` context facts (support in `HU = M′`, degree `qa`, o
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.nineElevenGamma_inner_self_mul_u
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.nineElevenGamma_inner_induceHU
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.caseA_nineElevenFour_norm_inputs
+
+/-! **Peterfalvi (9.11.1)/(9.11.2)/(9.11.6) Phase-E layers, axiom-clean** (issue 9083 Phase E,
+lane a).  The (9.11.2) TI-witness discharge (`U₁ ∩ U₁^w = C` for `w ∈ W₁^#`, via the
+`W₁ ↔` Clifford-summand conjugation dictionary and the free-orbit structure of the summands),
+the (9.11.1) `𝒮₂ = 𝒮₁` extraction (the saturated-bound subset form and its degree form
+`nineElevenSTwoExtraction`), the Bessel constituent count, the `hunif`-free member
+`R`-dispatch cross-orthogonality, and the `τ₃`-coherence of `𝒮₃` (Peterfalvi (5.7) at the
+uniform degree `qu`).  The `Hypothesis`-level corollaries (`caseA_nineElevenTwo_tiWitness`,
+`nineElevenNormBound_of_sevenEightRefutation`, `coherent_sOf_H0Cprime_of_sevenEightRefutation`)
+carry the pre-existing upstream `C_eq_cSub` sorryAx debt (as the Phase-B/C corollaries and
+caseB do) and join this list when (11.5)/`H0_eq_Hprime` closes. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.nineElevenTwoTIWitness_of_degree_dichotomy
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.conj_smul_cuSubOf_of_Hpart_smul
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.forall_w1_exists_Hpart_smul
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.nineElevenSTwoExtraction
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.caseA_sTwo_subset_degreeQaCut
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S13.card_le_inner_self_re_of_orthonormal_inner_int_ne
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.sOf_H0Cprime_memberRFamily_orthogonal
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.caseA_sThree_coherent

@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S13_CoreStructure
 import OddOrder.Peterfalvi.S11_NineElevenCaseA
+import OddOrder.Peterfalvi.S11_NineElevenAlphaBound
 import OddOrder.Peterfalvi.S07_BridgeCoherent
 
 /-!
@@ -125,9 +126,15 @@ theorem coherent_sOf_H0C [Finite G]
         (by rw [← hyp.SOf_eq]; exact hyp.sOf_subset_SOf hyp.H0C hx)
     have hμc : μ.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
       Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hμmem
+    -- the refuter is discharged through the (9.11.1) squeeze + the Phase-B/C/D/E layers;
+    -- the sole remaining sorry is the (9.11.7)–(9.11.8) coherent-pair construction
+    -- `NineElevenSevenEightRefutation` (issue 9083 Phase E residual)
     refine ⟨coherent_sOf_H0C_of_coherent_sOf_H0Cprime hyp
       (OddOrder.Peterfalvi.S13.caseA_coherent_sOf_H0Cprime_of_refuter hG hyp caseA
-        (by sorry)).some ⟨μ.conj - μ, ⟨?_, ?_⟩, ?_⟩⟩
+        (caseA_refuter_of_equality_refutation hG hyp caseA
+          (nineElevenPairBound hG hyp caseA)
+          (nineElevenEqualityRefutation_of_sevenEightRefutation hG hyp caseA
+            (by sorry)))).some ⟨μ.conj - μ, ⟨?_, ?_⟩, ?_⟩⟩
     · exact Submodule.sub_mem _ (Submodule.subset_span hμc) (Submodule.subset_span hμmem)
     · exact OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support
         hyp.base.mderivSharp_subset_A0 (hIKF hμmem)
@@ -470,5 +477,28 @@ theorem coherent_sOf_H0Cprime_of_equality_refutation [Finite G]
       (caseA_refuter_of_equality_refutation hG hyp caseA (hbound caseA) (hrefuteEq caseA))
   · -- **caseB**: the landed norm-general coherence (issue 9075).
     exact caseB_coherent_sOf_H0Cprime hG hyp hB.some
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.11), reduced to the single (9.11.7)–(9.11.8) residual** (issue 9083
+Phase E): with the (5.6) pair bound (`nineElevenPairBound`, Phase E-PairBound), the
+`𝒮₂ = 𝒮₁` extraction (`nineElevenSTwoExtraction`), the (9.11.2) TI-witness, the (9.11.3)
+count, the (9.11.4) Mackey norm, and the (9.11.6) dichotomy
+(`nineElevenNormBound_of_sevenEightRefutation`) all landed, the coherence of `𝒮(H₀C′)`
+follows from the one remaining named input: the (9.11.7)–(9.11.8) coherent-pair
+construction `NineElevenSevenEightRefutation`, quantified over the caseA datum.  Once that
+is discharged, this becomes the unconditional (9.11) and replaces the live sorry of
+`coherent_sOf_H0C`. -/
+theorem coherent_sOf_H0Cprime_of_sevenEightRefutation [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
+    (h78 : ∀ caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
+        (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief),
+      NineElevenSevenEightRefutation hyp caseA) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+      (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) hyp.base.A0) :=
+  coherent_sOf_H0Cprime_of_equality_refutation hG hyp
+    (fun caseA => nineElevenPairBound hG hyp caseA)
+    (fun caseA =>
+      nineElevenEqualityRefutation_of_sevenEightRefutation hG hyp caseA (h78 caseA))
 
 end OddOrder.Peterfalvi.S13
