@@ -450,3 +450,24 @@ consumer migration が残 (1020 cascade)。
 bare sorry) = (10.10.1)-(10.10.4) の §6-trichotomy ((6.8)/(5.7)/(6.5.c) + (8.7) cases)。
 S14 の (12.6) assembly (frobenius_typeI_coherent_of_cyclicQuotient 系、sorry-free) が
 type-I 側の同型 template。
+
+---
+
+## 2026-07-11 update (issue 1020 close): (10.8)/(10.10)/(13.2.a) の書籍 DAG 復元・完了
+
+上記「次の genuine frontier = typeV_forces_coherence」は**完了・supersede** (issue 1021:
+`typeV_forces_coherence_v2`、S12_Noncoherence)。現アーキテクチャ (正本 = closed issue 1020):
+
+- **`S12_Noncoherence.lean`** (pair leaf 下流) = 無条件 (10.8) `S_not_coherent_unconditional`
+  (axiom-clean) + (10.10) `typeV_forces_coherence_v2`/`no_typeV_maximal_unconditional`
+  (残 sorry = (6.5) gates ×3、issue 2022 lane b)。
+- **`S13_TypeDetermination.lean`** (Noncoherence 下流、issue 1020 Phase 3 新設) =
+  (13.2.a)-trio (`card_kappaHall_lt_of_isTypeIIIorIV`/`…_isTypeP1`/`isTypeP2_of_typeP_kappaHall_lt`、
+  FTS から移設) + canonical pair producer + κ-ordered M-seeded pair + (11.3)/(11.9.b) の
+  unconditional heir (`S_H0C_not_coherent_unconditional`/`w2_lt_w1_of_hypothesis_H0C_unconditional`)。
+  spine (13.2.a) 経路の residual = §14 Sibley glue (6.7)/(5.8) + (9.11) caseA refuter +
+  (6.5) gates。**旧 (10.8) hB・legacy (10.10) bare sorry は spine 経路から消滅**。
+- **legacy 残置** (削除しない): 旧 `S_not_coherent`/`no_typeV_maximal`/`S_H0C_not_coherent` は
+  上流 S13-world (`isTypeIIIorIV` S13_SixTwoBridge / `coherent_quotient_bound`) の
+  forward-cite 用 (import 位相上 heir を cite 不能)。各 docstring に **Legacy** 注記済。
+- followup: lane c TTypeII repoint = issue 1022 (任意 hygiene)。

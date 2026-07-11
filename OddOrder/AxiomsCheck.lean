@@ -6881,8 +6881,10 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- Hall `M'`, so are `S`-conjugate (Schur–Zassenhaus), and conjugating `M_σ ⊓ C(K)` onto
 -- `M_σ ⊓ C(W₁) = W₂` (with `M_σ` `S`-invariant) gives the order.  No character theory; this is the
 -- group-theoretic half that, paired with the §11 reduction `w₂ < w₁`, closes the unique bare
--- `feitThompson` sorry `card_kappaHall_lt_of_isTypeIIIorIV` (whose residual is now only the genuine
--- Peterfalvi (11.8), `S12.exists_zeta_residual_not_orthogonal`); it also supplies, with
+-- `feitThompson` sorry `card_kappaHall_lt_of_isTypeIIIorIV` (whose residual is now the genuine
+-- Peterfalvi (11.8) refuter core `S13.exists_zeta_residual_not_orthogonal_H0C_of_refuter` — the
+-- §14 Sibley glue (6.7)/(5.8) and the (9.11) caseA refuter, issues 1019/1020); it also supplies,
+-- with
 -- `typeP_duality`, the (8.8) Type-II partner `S10.exists_typeII_maximal_with_w2_of_typeP`.
 -- Axiom-clean.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.card_Msigma_inf_centralizer_eq_card_W2
@@ -7370,8 +7372,8 @@ field-data existence) is not on this list. -/
 `hstruct`/`h8`/numeric pins are engine hypotheses, discharged by the (10.10.2)
 structure work).  Per the 2026-07-11 hub notice in issue 1021, the assert for
 `no_typeV_maximal_unconditional` itself is a *completion condition* of issue 1021
-(it still cites the sorried `typeV_forces_coherence`; it joins this list when the
-v2 assembly closes). -/
+(the v2 assembly `typeV_forces_coherence_v2` is landed; the remaining `sorry`s are the
+three (6.5) gate lemmas, issue 2022 — it joins this list when those close). -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.S_not_coherent_unconditional
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.typeV_caseA_coherence
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.typeV_caseC_coherence_engine

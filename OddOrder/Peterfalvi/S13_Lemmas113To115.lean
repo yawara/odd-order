@@ -139,7 +139,11 @@ theorem coherent_S_of_coherent_SH0C [Finite G]
 
 If it were, Theorem (6.3) (`coherent_S_of_coherent_SH0C`) would make the full family `S` coherent,
 contradicting Theorem (10.8) (`S12.S_not_coherent`).  The theorem is thereby reduced, with no
-`sorry` of its own, to those two cited results. -/
+`sorry` of its own, to those two cited results.
+
+**Legacy** (issue 1020 Phase 3): the honest heir is `S_H0C_not_coherent_unconditional`
+(`S13_TypeDetermination`, on the axiom-clean (10.8)); this version remains for the upstream
+consumers (`coherent_quotient_bound`) above the pair machinery in the import DAG. -/
 theorem S_H0C_not_coherent [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hyp : Hypothesis M) :

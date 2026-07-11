@@ -1665,7 +1665,14 @@ By (10.8) (`S_not_coherent`) the family `S` of any type-III/IV/V maximal is not
 coherent; but a type-V maximal forces `S` to be coherent by (10.10.1)–(10.10.4)
 (`typeV_forces_coherence`).  These now refer to the *genuine* Dade isometry,
 induced family, and support carried by the faithful (10.1) `Hypothesis` (built by
-`exists_hypothesis_of_typeIIIorIVorV`), so the contradiction is honest. -/
+`exists_hypothesis_of_typeIIIorIVorV`), so the contradiction is honest.
+
+**Legacy** (issue 1020 Phase 3): the honest heir is `no_typeV_maximal_unconditional`
+(`S12_Noncoherence` — the (10.8) side axiom-clean via the partner supply, the (10.10) side the
+three-branch `typeV_forces_coherence_v2` whose only `sorry`s are the (6.5) gates, issue 2022).
+This version remains as the forward-citation for the upstream `S13`-world
+(`S12.Hypothesis.isTypeIIIorIV`, `S13_SixTwoBridge`) and other consumers above the pair
+machinery in the import DAG; downstream consumers should cite the heir. -/
 theorem no_typeV_maximal [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ IsTypeV M := by
   rintro ⟨M, hMmax, hMV⟩

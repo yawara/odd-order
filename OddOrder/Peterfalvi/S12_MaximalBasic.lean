@@ -1371,7 +1371,12 @@ coherent, build the `(10.4)` coherent-extension datum (`CoherentHypothesis`, wit
 parameters from `w2_prime_and_parameter_independence`); the structural bound
 `|M'| ≥ (2w₁+1)w₂` (`card_derived_ge`), the norm-counting estimate
 `1 − 1/w₁ − 1/|U| < w₁w₂/|M'|` with `|U| ≥ 7` (`typeII_coherence_contradiction_estimate`), and the
-pure-`ℚ` arithmetic contradiction (`typeII_noncoherence_arithmetic`) together give `False`. -/
+pure-`ℚ` arithmetic contradiction (`typeII_noncoherence_arithmetic`) together give `False`.
+
+**Legacy** (issue 1020 Phase 3): the honest heir is `S_not_coherent_unconditional`
+(`S12_Noncoherence`, axiom-clean — the estimate's `hB` is discharged there by the partner supply).
+This version remains only for the upstream `S13`-world consumers (`S_H0C_not_coherent`, the legacy
+(10.10)), which sit above the pair machinery in the import DAG and cannot cite the heir. -/
 theorem S_not_coherent [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hyp : Hypothesis M) :
