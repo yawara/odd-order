@@ -88,3 +88,32 @@ capstone 文脈では ζ ∈ S(HC) (hζHC) + coh (S(HC)-coherence) があるの�
 S05 `eq_smul_chiFam_column_of_vanishOnV` の仮定から判定 → route 確定。
 (α)/(β) いずれも hmixed ((6.7)) 側の Coq 対応 (PFsection11 の b≡0) 精読が有益 —
 `coq/theories/PFsection11.v` の該当 congruence を併読すること。
+
+## 2026-07-12 tick⁴ — ★ route (γ) 確定 (Coq PFsection11:905-990 (11.8.6) 完全解読)
+
+routes (α)/(β) を supersede。Coq の (11.8.6) は我々の capstone + 両 sorry と 1:1 対応で、
+解法が読める:
+
+1. **共通 core = `coherent_ortho`** (Coq PFsection5:~960、bridge_coherent 直前):
+   cross-image 直交 ⟨τ₂-image, τ₁-image⟩ = 0。Coq は subcoherent 構造から出すが、証明の実体は
+   **(5.5) per-member R-family 和 + R-family 間の直交** — 我々の
+   OrthonormalCharacterImageFamily/(5.5) 機構で subcoherent 全体なしに mirror 可能。
+   これが **hmixed をそのまま discharge** し、下記 γ-trick にも必須。
+   character-level cross 直交は既在 (`SOf_HC_inner_sOf_H0C_eq_zero`)。
+2. **hbridge_τ = WLOG-swap** (Coq `without loss tau2muj`): 与えられた hsofC を pin しない。
+   - **all-reducible case** (𝒮(H₀C) ∩ Irr = ∅): coherence を `uniform_prTIred_coherent` 相当
+     (uniform-degree μ-column family の canonical σ-column coherence、pin 内蔵) に**交換**。
+     我々側の対応物 = uniform_degree_coherence_of_families 系 or 9083 機構の column-image 付
+     変種 — capstone は hsofC を「∃ pin 付き coherence」に差し替えて使う構造に再編。
+   - **irr case** (ξ ∈ 𝒮(H₀C) ∩ Irr): `FTtypeP_coherent_TIred` 相当の (5.8)-dichotomy
+     (columnRImage (5.5) で mirror 可) + γ = ξ(1)μ_j − μ_j(1)ξ の Dade 等長計算で
+     ⟨τ₂(μ_j), ω-col⟩ ≠ 0 → + 側強制。符号反転 case の排除 = odd_eq_conj_irr1 (奇数位数で
+     χ̄ = χ ⟺ χ = 1) — mathlib/repo に対応物確認。
+   - bridge θ = μ_j − dζ、tau θ = ω-col − d·ζ^{τ₁} は我々の hcol ✓ 既有。
+3. **実装順**: (i) coherent_ortho core (新規、S07 层? ⚠ S07_Coherence* は lane b glob —
+   置き場は S07_BridgeCoherent (a 所有) or S13 側 assembly、hub 摩擦回避) → hmixed 閉鎖
+   (ii) WLOG-swap 再編で hbridge_τ (iii) 両者で capstone sorry-free 化 →
+   (11.9.b)-unconditional の residual が caseA refuter (lane b) のみに。
+
+Coq 参照: PFsection5.v:960-1056 (coherent_ortho + bridge_coherent) /
+PFsection11.v:905-990 ((11.8.6) 本体、tau2muj WLOG、γ-trick、odd 排除)。
