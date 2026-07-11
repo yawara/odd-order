@@ -1691,3 +1691,24 @@ linter 赤だった (leaf build 検証漏れ) — 事後修正。
 (文書順 13.18 < 13.19)。部品状況: betaGrid_norm (13.18.b) proven / gammaGrid_orthogonal_one +
 gammaGrid_real (13.18.c) proven / Dade 等長 = dadeIntegralCharacterMap_inner_eq_on_supported_span。
 Coq 対応 = PFsection13.v:1915-1934 (leqif 鎖)。
+
+## ✅ (2026-07-12、/loop iter 9) — (13.18.d) gammaGrid_Y_norm_bound 完全証明
+
+**(13.18) ブロック完結** (commit 04db3152): a support / b norm / c orthogonal+real+defGamma /
+d Y-norm の全てが実証明済み。(13.18.d) は Coq leqif 鎖 (PFsection13.v:1915-1934) を
+sorried 依存なしで Lean 化:
+- 等長 (dadeIntegralCharacterMap_inner_eq_of_supported、proven) + betaGrid_norm →
+  ⟨τβ₁,τβ₁⟩ = (u−1)/q+2、Pythagoras 4 段、整数性 a=⟨Γ,η₀₁⟩∈ℤ (新規 gammaGrid_mem_ZIrr:
+  Dade=Ind bridge + induce_mem_ZIrr + tau3_mem_ZIrr)、Γ-real (iter 8) + eta_conj で
+  ⟨Γ,η₀₋₁⟩=a、締めは ‖X₁‖²≥0 + m²+(m−1)²≥1。
+- 新規汎用部品 (IsReal.lean): inner_conj_conj / inner_self_eq_ofReal /
+  inner_self_re_nonneg / inner_self_eq_re。既存 inner_mem_ZIrr_int (InducedCharacter) を発見
+  (ZIrr 両側整数性は新設不要だった)。
+- ⚠ 技法メモ: (i) obtain の引数内 by-block は goal が metavar になり rw 不能 → 事前 have に
+  分離。(ii) push_cast 後の linarith は int-cast atom (↑(m*m+…)) と展開形 ((m:ℝ)*(m:ℝ)) の
+  不一致で死ぬ → push_cast at hyp ⊢ で両方揃える。(iii) le_or_lt が unknown (現 pin) →
+  by_cases + omega。
+
+**S15_SAndT 系残 sorry 2**: E⊄Q (complement_not_le_Q、S15_ComplementStructure:86、
+(13.17.c) 系) / TypeIOrtho producer (S15_SAndT:1638、(13.19))。
+**次 = complement_not_le_Q (E⊄Q)** — 文書順 13.17 < 13.19。
