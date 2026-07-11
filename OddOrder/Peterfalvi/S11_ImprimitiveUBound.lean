@@ -343,4 +343,130 @@ theorem u_le_cyclotomicQuotient [Finite G] {M : Subgroup G} {data : TypesIIIIIIV
     exact caseA_u_le_cyclotomicQuotient chars
       (clifford_caseA_data chars hS₀ne hS₀inv hS₀card hirr₀)
 
+/-- **`C_Ū(W̄₁) = 1`** — the fixed subgroup of the `W₁`-conjugation on the descended `U`-action
+quotient `Ū = U/C_U(H̄)` is trivial.  The coprime fixed-point descent (Isaacs Cor 3.28,
+`map_fixedSubgroup_eq_fixedSubgroup_quotient`) identifies `C_Ū(W̄₁)` with the image of `C_U(W₁)`,
+which is trivial by the Frobenius fixed-point-freeness of `(U ⊔ W₁, U, W₁)`
+(`typeP_uW1_frobenius`).  Extracted from the `hconst`-side argument
+(`uActionHom_eq_one_of_commute_mulAut`) so that the orbit-count congruence
+`card_uActionHom_range_modEq_one` can consume the same fixed-point-freeness. -/
+theorem fixedSubgroup_quotient_uActionKer_eq_bot [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    [(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).Normal]
+    (hNinv : IsAInvariant
+      (MulAut.conjNormal :
+        ↥(data.typeP.U ⊔ data.typeP.W1)
+          →* MulAut ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
+      (uActionHom data chief).ker) :
+    fixedSubgroup (quotientMulAutHom hNinv)
+      (data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) = ⊥ := by
+  haveI : chief.N.Normal := chief.N_normal
+  have frob := typeP_uW1_frobenius data.typeP data.nontrivial.1
+  -- Coprimality `|W₁| ⟂ |U|` and solvability of the cyclic `W₁`.
+  have hCop : Nat.Coprime
+      (Nat.card ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
+      (Nat.card ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))) :=
+    frob.coprime_card_kernel_complement.symm
+  haveI hXcyc : IsCyclic ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) := by
+    haveI := data.typeP.W1_cyclic
+    exact isCyclic_of_surjective _
+      (Subgroup.subgroupOfEquivOfLe le_sup_right).symm.surjective
+  have hSolv : IsSolvable ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1))
+      ∨ IsSolvable ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) := by
+    left
+    letI := hXcyc.commGroup
+    infer_instance
+  -- `C_U(W₁) = 1`: the Frobenius fixed-point-freeness.
+  have hfixbot : fixedSubgroup
+      (MulAut.conjNormal :
+        ↥(data.typeP.U ⊔ data.typeP.W1)
+          →* MulAut ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
+      (data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) = ⊥ := by
+    rw [eq_bot_iff]
+    intro x hx
+    rw [mem_fixedSubgroup] at hx
+    rw [Subgroup.mem_bot]
+    by_contra hxne
+    obtain ⟨w, hwW1, hwne⟩ :=
+      data.typeP.W1.bot_or_exists_ne_one.resolve_left data.typeP.W1_nontrivial
+    have hŵX : (⟨w, Subgroup.mem_sup_right hwW1⟩ : ↥(data.typeP.U ⊔ data.typeP.W1))
+        ∈ data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1) :=
+      Subgroup.mem_subgroupOf.mpr hwW1
+    have hvaleq : (⟨w, Subgroup.mem_sup_right hwW1⟩ : ↥(data.typeP.U ⊔ data.typeP.W1))
+          * (x : ↥(data.typeP.U ⊔ data.typeP.W1))
+          * (⟨w, Subgroup.mem_sup_right hwW1⟩ : ↥(data.typeP.U ⊔ data.typeP.W1))⁻¹
+        = (x : ↥(data.typeP.U ⊔ data.typeP.W1)) := by
+      have h := congrArg Subtype.val (hx _ hŵX)
+      rwa [MulAut.conjNormal_apply] at h
+    exact frob.conj_frobenius _ hŵX (fun h => hwne (congrArg Subtype.val h))
+      (x : ↥(data.typeP.U ⊔ data.typeP.W1)) x.2
+      (fun h => hxne (OneMemClass.coe_eq_one.mp h)) hvaleq
+  -- Descend: `C_Ū(W̄₁)` is the image of `C_U(W₁) = 1`.
+  have hmap := map_fixedSubgroup_eq_fixedSubgroup_quotient hNinv hCop hSolv
+  rw [hfixbot, Subgroup.map_bot] at hmap
+  exact hmap.symm
+
+/-- **The `W₁`-orbit congruence `u ≡ 1 (mod q)`** (Coq `Frobenius_dvd_ker1 frobUW1bar`,
+`PFsection11.v:1190`).  The `W₁`-conjugation on the `U`-action image `Ū = U/C_U(H̄)` is
+fixed-point-free (`fixedSubgroup_quotient_uActionKer_eq_bot`), so the prime-order `W₁` partitions
+`Ū \ {1}` into orbits of size `q = |W₁|`, giving `|Ū| ≡ 1 (mod q)`.
+
+This is the `q ∣ u − 1` input of the Peterfalvi (11.9.c) non-Galois contradiction
+`q ≤ u − 1 < u = a ≤ p − 1 < p` against (11.9.b) `p < q` (issue 1024). -/
+theorem card_uActionHom_range_modEq_one [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    Nat.card ↥(MonoidHom.range (uActionHom data chief)) ≡ 1 [MOD data.q] := by
+  classical
+  haveI : chief.N.Normal := chief.N_normal
+  have frob := typeP_uW1_frobenius data.typeP data.nontrivial.1
+  haveI hUnorm : (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).Normal := frob.isNormal
+  -- The kernel `C = C_U(H̄)` of the `U`-action is invariant under `L`-conjugation.
+  have hNinv : IsAInvariant
+      (MulAut.conjNormal :
+        ↥(data.typeP.U ⊔ data.typeP.W1)
+          →* MulAut ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
+      (uActionHom data chief).ker := by
+    rw [isAInvariant_iff_smul_mem]
+    intro l x hx
+    rw [MonoidHom.mem_ker] at hx ⊢
+    rw [uActionHom_conjNormal chief l x, hx, mul_one, mul_inv_cancel]
+  set W₁sub := data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1) with hW₁sub
+  set Q := (↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))
+    ⧸ (uActionHom data chief).ker) with hQdef
+  -- `W₁` acts on the quotient `Q = U/C` through the descended conjugation.
+  letI : MulAction ↥W₁sub Q :=
+    MulAction.compHom Q ((quotientMulAutHom hNinv).comp W₁sub.subtype)
+  have hsmul : ∀ (w : ↥W₁sub) (x : Q), w • x = quotientMulAutHom hNinv (w : _) x := fun _ _ => rfl
+  -- The fixed points are exactly `C_Ū(W̄₁) = 1`.
+  have hfix : MulAction.fixedPoints ↥W₁sub Q = ({1} : Set Q) := by
+    have hbot := fixedSubgroup_quotient_uActionKer_eq_bot chief hNinv
+    ext x
+    simp only [MulAction.mem_fixedPoints, Set.mem_singleton_iff]
+    constructor
+    · intro h
+      have hx : x ∈ fixedSubgroup (quotientMulAutHom hNinv) W₁sub := by
+        rw [mem_fixedSubgroup]
+        intro l hl
+        have := h ⟨l, hl⟩
+        rwa [hsmul] at this
+      rwa [hbot, Subgroup.mem_bot] at hx
+    · rintro rfl w
+      rw [hsmul]
+      exact map_one (quotientMulAutHom hNinv (w : _))
+  -- `W₁sub` is a `q`-group of order exactly `q` (prime).
+  haveI : Fact (data.q).Prime := ⟨data.nontrivial.2.1⟩
+  have hW1card : Nat.card ↥W₁sub = data.q :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv
+  have hPG : IsPGroup data.q ↥W₁sub := IsPGroup.of_card (by rw [hW1card, pow_one])
+  -- Orbit count: `|Q| ≡ |fixedPoints| = 1 (mod q)`.
+  have hmod := hPG.card_modEq_card_fixedPoints Q
+  have hfixcard : Nat.card (MulAction.fixedPoints ↥W₁sub Q) = 1 := by
+    rw [hfix]
+    exact Nat.card_unique
+  rw [hfixcard] at hmod
+  -- Transport along `Q ≅ Ū` (first isomorphism theorem).
+  have hQcard : Nat.card Q = Nat.card ↥(MonoidHom.range (uActionHom data chief)) :=
+    Nat.card_congr (QuotientGroup.quotientKerEquivRange (uActionHom data chief)).toEquiv
+  rwa [hQcard] at hmod
+
 end OddOrder.Peterfalvi.S11
