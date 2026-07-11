@@ -97,19 +97,26 @@ Hypothesis (11.2) (M maximal, type III/IV)、ζ ∈ 𝒮(HC):
   - SHCSet = {ζ ∈ inducedFamily | irr ∧ ζ1=w1} (membership tuple ⟨hζS,hζirr,hζ1⟩ で span cite)。
 
   **新規に要る sub-lemma 4 本**:
-  - **(G1) μ₀ 列の mapRingEquiv 不変性**: `certainType_mu_conj_eq` (S06_CertainTypeConjugation) の
-    一般 σ 版 → mapRingEquiv σ (Σᵢ muGrid i 0) = Σᵢ muGrid i 0 (χ₂=1 列は σ で列不変・行 permute、
-    和不変)。fallback = 値有理性 route (列0 = M′-kernel 線形指標列: `muGrid_zero_column_apply_one`
-    (CharacterParameters:1434) + within-column 機構で値 ∈ {0..} 有理 → pointwise 固定)。
+  - [x] **(G1) DONE**: `Hypothesis.mapRingEquiv_muColumnZero_sum` (S12_Prop109、sorry-free) —
+    μ₀ = Ind_K^M 1_K route (induce_restrict_certainType_eq @ χ₂=1 + chiRestrict_one_eq_trivial +
+    mapRingEquiv_induce)。S06 一般σ版 mu_conj_eq は不要だった。
   - [x] **(G2) DONE (bb79851d)**: shared leaf `GaloisInnerTransport.lean` (等長 + 定数性 engine の
     2 本、sorry-free)。9085 で claim + c 側 dedup を hub へ依頼。旧記述: `inner_mapRingEquiv_eq_of_mem_ZIrr` は
     S16_NonExistenceG/TGapGalois.lean (c 所有、S16-deep import) に在り S13 から import 不可 —
     GaloisCharacter.lean へ hoist (proof は c 版 mirror、`apply_inv_eq_star_of_mem_ZIrr` +
     `inner_mem_ZIrr_int` cite、~30 行)。9000 scan 済 (claim 衝突なし)。hub へ dedup note。
-  - **(G3) grid の Galois index-作用**: mapRingEquiv σ (alignedOmegaSigmaGrid i j) =
-    alignedOmegaSigmaGrid i' j' — sigma_mapRingEquiv_comm + hbridge + product 構造
-    `exists_alignedOmegaSigmaGrid_chiFam_product` (ρ,κ injective→bijective、card一致) で index 算術。
-    j≠0 の Galois 軌道 = 全非自明列 (w₂ 素数)、i-側固定は exists_complexRingEquiv_pow_and_fixed。
+  - **(G3、narrow 化済 2026-07-12 iter4)**: 一般 index-作用は不要 — 必要なのは
+    **行0/列0 上の pair-move のみ** (分離性が残りを埋める):
+    `∃ σ, mapRingEquiv σ (chiFam (p, κ₀)) = chiFam (p', κ₀)` (p,p' 非自明 W₁-char、κ₀ = 自明
+    W₂-char は全 σ 固定 ⟹ **exists_complexRingEquiv_pow_and_fixed 不要**、
+    `exists_complexRingEquiv_pow_of_rootsOfUnity` で足りる) + 行0 対称版。
+    部品: (i) char-group 素数位数巡回transitivity (p'=p^k, k coprime — w₁ 素数で自動)、
+    (ii) chiFam pair の冪 = pair の成分冪 (κ₀ 自明側は固定)、
+    (iii) `exists_mapRingEquiv_sigma_omega_pow` (S05:936) で σ 実現。
+    定数性本体は **G2 engine `inner_eq_intCast_of_mapRingEquiv_eq_add`** に
+    φ=ψ (hφ: mapRingEquiv σ ψ = ψ + τ(ζ−ζ^σ) ⟸ τ-comm (supp 要) + G1 + additivity)、
+    correction⊥η' = `SHC_extension_inner_alignedOmegaSigma_eq_zero` ×2 (ζ, ζ^σ ∈ SHCSet ⟸ G4 +
+    galoisMap irr + deg σ-固定) を渡すだけ。
   - [x] **(G4) DONE**: `inducedFamily_closedUnderMapRingEquiv` (S12_Core/Hypothesis.lean、
     galoisMap + `ClassFunction.mapRingEquiv_induce` (S08_CaseBCoherence 既存) で ~30 行、sorry-free)。
   - **(G1 補足)**: c の `primeTIred_zero_mapRingEquiv` (TGapGalois:71) が「prTIred 0 = Ind 1 は

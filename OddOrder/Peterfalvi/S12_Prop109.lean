@@ -84,6 +84,64 @@ theorem Hypothesis.muColumnZero_inner_trivial [Finite G]
   · intro h; exact absurd (Finset.mem_univ _) h
 
 open scoped FiniteInduce in
+/-- **The column-`0` `μ`-sum is Galois-fixed**: `σ(μ_0) = μ_0` for every coefficient automorphism
+`σ : ℂ ≃+* ℂ`.  The column-`0` sum is the induction of the trivial character of `K = HC`
+(`μ_0 = ∑_i μ_{i0} = Ind_K^M (Res_K μ_{00}) = Ind_K^M 1_K` — Peterfalvi (4.5.a)
+`induce_restrict_certainType_eq` at `χ₂ = 1` with the trivial restriction
+`chiRestrict_one_eq_trivial`), and induction commutes with `mapRingEquiv`
+(`ClassFunction.mapRingEquiv_induce`) while the trivial character is `σ`-fixed.  This is the
+`M`-side `ν(μ_0) = μ_0` input (Coq `prTIred_aut` + `aut_Iirr0`) of the Galois row/column-constancy
+step of the (11.9.a) grid analysis (issue 1024 G1; cf. the `T`-side
+`primeTIred_zero_mapRingEquiv`). -/
+theorem Hypothesis.mapRingEquiv_muColumnZero_sum [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) (σ : ℂ ≃+* ℂ) :
+    ClassFunction.mapRingEquiv σ (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0)
+      = ∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0 := by
+  haveI := hyp.finiteG
+  classical
+  -- Reconstruct the §6 host, as in `muGrid_zero_zero_eq_trivial`.
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have hdual0 : finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2))
+      (finCongr hcardW2sub.symm (0 : Fin hyp.w2)) = 1 := by
+    rw [show finCongr hcardW2sub.symm (0 : Fin hyp.w2) = 0 from by apply Fin.ext; simp,
+      finCardEquivCharacterGroup_zero]
+  -- the column-`0` sum in the §6 host: reindex `Fin w₁ ≃ Fin |W₁|`, rewrite the dual `0 ↦ 1`.
+  have hsum : (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0)
+      = ∑ i', ((h.columnFamily 1).mu i' : ClassFunction ↥M ℂ) := by
+    have hterm : ∀ i : Fin hyp.w1, hyp.muGrid hG hodd i 0
+        = ((h.columnFamily 1).mu (finCongr hcardW1.symm i) : ClassFunction ↥M ℂ) := by
+      intro i
+      have e : hyp.muGrid hG hodd i 0
+          = ((h.columnFamily (finCardEquivCharacterGroup _
+              (finCongr hcardW2sub.symm (0 : Fin hyp.w2)))).mu
+              (finCongr hcardW1.symm i) : ClassFunction ↥M ℂ) := by
+        unfold Hypothesis.muGrid; rfl
+      rw [e, hdual0]
+    rw [Finset.sum_congr rfl (fun i _ => hterm i)]
+    exact Fintype.sum_equiv (finCongr hcardW1.symm) _ _ (fun i => rfl)
+  -- `μ_0 = Ind_K^M 1_K`: (4.5.a) at `χ₂ = 1` with the trivial restriction.
+  have hres : ClassFunction.restrict h.K ((h.columnFamily 1).mu 0 : ClassFunction ↥M ℂ)
+      = trivialClassFunction ↥h.K := by
+    rw [← h.coe_chiRestrict 1, h.chiRestrict_one_eq_trivial,
+      IrreducibleCharacter.coe_trivialIrreducibleCharacter]
+  rw [hsum, ← h.induce_restrict_certainType_eq 1, hres, ClassFunction.mapRingEquiv_induce]
+  congr 1
+  ext x
+  rw [ClassFunction.mapRingEquiv_apply, trivialClassFunction_apply, map_one]
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (10.9)**: when `w_1 < w_2`, the residual character `χ = ζ^{τ₁}` of the
 `(10.9)` decomposition `(μ_0 − ζ)^τ = ∑_i ω_{i0}^σ − χ` is orthogonal to the aligned `σ`-grid
 `(Irr W)^σ`, and `‖χ‖² = 1`.
