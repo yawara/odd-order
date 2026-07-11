@@ -171,3 +171,7 @@ issue は trial ログの追記継続のため open 維持、次の節目 (T-sid
 - 2026-07-12 (tick、merge 3143edb3): (11.9a) Galois orbit から eta-axis 係数定数性 + virtual-char
   inner product 保存 (+185、実 sorry ±0、assert 2 本通過)。a の issue 1022 を DAG cycle 検証で
   impossible-close (対象 = c 所有 TTypeII、cross-lane 対応として適切)。24/24。
+- 2026-07-12 (tick、merge dbf9c8d9): ω_S char Galois orbit 層を FT.lean (a 所有) に additive 構築 —
+  signature 不変・statement 完全保存の proof 縮約・9 assert 登録・carrier threading は自ら hub gate
+  に分離して未実装 (模範的 claim-before-build)。hub は merge 時承認 + threading 条件付き事前承認
+  (3004)。25/25。
