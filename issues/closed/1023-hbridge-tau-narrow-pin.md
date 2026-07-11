@@ -331,3 +331,17 @@ IsCoherent 構成は既存 IntegralCharacterMap 機構 (Zisometry_of_cfnorm 相�
 - **exists_pinned 組立**: case split `∃ ξ ∈ 𝒮(H₀C), Irr ξ` → case-1 (coherent_sOf_H0C の c を
   pin 付きで返す) / else → case-2 構成。capstone は exists_pinned の c を glue に使い、
   hbridge_τ = pin + ν-線形性。
+
+## 2026-07-12 tick¹⁵ — ★★★★★ 完遂: hbridge_τ discharge、capstone sorry-free (issue close)
+
+- commits: 39b8e023 (SOf-generic dispatch) → 87da4bdf (hmixed) → f3d0f84b (world-bridge) →
+  9baa4b26/c9d3c92f (case-1 γ-trick pin) → (case-2 skeleton/充填) → 8d5ec014 (hbridge_τ)。
+- **S13_Orthogonality は bare-sorry ゼロ**。capstone (11.8.6) は pinned-coherence 経由で完結:
+  case-1 (γ-trick、dichotomy/separability/odd-conjugation 全て不要の直接 norm 論法) +
+  case-2 (canonical coherentImageMap 構成、Coq uniform_prTIred swap の構成的実体)。
+- axiom 実測: capstone / w2_lt_w1_of_hypothesis_H0C_unconditional = [propext, sorryAx,
+  Classical.choice, Quot.sound] — **sorryAx は coherent_sOf_H0C 内の caseA refuter
+  (lane b S11_NineElevenCoherence) 経由のみ**。(11.9.b)-unconditional → (13.2.a) → spine の
+  lane-a 側 math は全て実証明済。
+- full build green (4166 jobs、AxiomsCheck 含む)。
+- followup (別 issue 不要の備忘): H0Cprime 版 dispatch 5+2 decls の SOf 版への fold (低優先)。
