@@ -115,6 +115,8 @@ import OddOrder.Peterfalvi.S08_SixTwoGeneral
 import OddOrder.Peterfalvi.S13_CoreStructure
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.Peterfalvi.S10_CoherenceWiring
+import OddOrder.Peterfalvi.S12_Noncoherence
+import OddOrder.Peterfalvi.S12_TypeVCaseC
 import OddOrder.FeitThompson
 import OddOrder.BG.AppC_NormSet
 import OddOrder.BG.AppC_FrobeniusClassSum
@@ -7323,3 +7325,17 @@ field-data existence) is not on this list. -/
   OddOrder.RepresentationTheory.SemilinearFieldModel.hcompatLift_of_equivariant
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.tFieldModelData_of_repr
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.TFieldModelData.derived_inf_centralizer_le_Q
+
+/-! **Peterfalvi (10.8) unconditional + (10.10) case-(a)/(c) engines, axiom-clean**
+(issues 1020/1021, lane a).  The unconditional (10.8) `S_not_coherent_unconditional`
+(issue 1020 ★★★★), the (10.10) case-(a) coherence `typeV_caseA_coherence`
+(Sibley/(6.8) route, ticks 19–24), and the case-(c) coherence engine
+`typeV_caseC_coherence_engine` ((10.10.3)/(10.10.4) SHC route, ticks 26–33; its
+`hstruct`/`h8`/numeric pins are engine hypotheses, discharged by the (10.10.2)
+structure work).  Per the 2026-07-11 hub notice in issue 1021, the assert for
+`no_typeV_maximal_unconditional` itself is a *completion condition* of issue 1021
+(it still cites the sorried `typeV_forces_coherence`; it joins this list when the
+v2 assembly closes). -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.S_not_coherent_unconditional
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.typeV_caseA_coherence
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.typeV_caseC_coherence_engine
