@@ -220,6 +220,45 @@ type-P₂ branch は sorried と注記あり — type-V (P₁) 側は生きて�
 - 次: (10.10.2) (S = S₁ ∪ {μ_j}、S₁ = (p²−1)/w₁ 個の deg-w₁ irreducibles、
   d=p, δ=−1, n=2) の部材 survey (subagent 委譲済) → 実装。
 
+## 2026-07-11 tick²⁵b — (c)-body survey 完了 (subagent)、実装 plan 確定
+
+**再利用可 (全て既存・ungated)**:
+- `CharacterParameters` (Core/CharacterParameters:1584) は d/delta/n を実 field で
+  保持 + `n_formula` (n·w₁ = d−δ) + `alpha` def + `alpha_support` (A₀-支持) ✓。
+  `typeV_parameter_formula`/`typeV_coherence_formula` field は vestigial opaque
+  (producer が True を入れる; de-scaffold 済で非 load-bearing)。
+- producer `w2_prime_and_parameter_independence` (同:1885) → genuine params +
+  (10.3) 事実。強化版 `exists_charParameters_full` (:1935) は mu/omegaSigma =
+  実 grid (rfl)・ζ∈S・ζ(1)=w₁・ζ̄≠ζ・δ=±1 まで露出。
+- **S₁ = `hyp.SHCSet`** (S12_Prop109:609、deg-w₁ irreducible cut) +
+  **`SHC_isCoherent`** (:629) = (5.7) の S₁-coherence (τ₁ = .extension) ✓
+  ungated!(10.10.3) 第 1 文はこれで即。
+- (10.9) 諸形態 ✓ / `typeV_param_arithmetic` ✓ / grid 代数 (Isometry105/106) ✓。
+
+**Gap = 本物の新規 work (本 issue の残り本体)**:
+1. **方向逆転**: `alpha_tau_image` (Isometry106:805) 等 30 個の (10.5)/(10.6)
+   consumer は全部 `coh : CoherentHypothesis hyp params` (**full-S coherent
+   仮定**、(10.8)-方向) 相対。(10.10.3)/(10.10.4) は **S₁-only coherence
+   相対**で α^τ を再証明 → μ_j^τ = δ∑ω − d·ζ^{τ₁} → **full-S coherence を
+   構成** (ν := τ₁ on S₁, ν(μ_j) := δ∑_i ω_ij^σ) — この glue が未形式化。
+2. (10.10.2) 構造: case (c) で S − S₁ = {μ_j}、|S₁| = (p²−1)/w₁ — p³-群の
+   指標次数 (θ(1) ∈ {1,p})・H′=Z(H)・W₂=H′。genuine p-group 指標論。
+3. μ_j(1) = d·w₁ (degree_independent の行和、小)。
+4. ⚠ **数値 pin の gate**: (10.10.1) の hbound (|H:H′| = p² ≤ 4w₁²+1) は
+   (6.5.a) 由来 = issue 2022 gate。⟹ **engine 化**: case-(c) coherence 本体を
+   明示数値仮説 (hd : d = p / hδ : delta = −1 / hn : n = 2 / hS₁card /
+   hw₁₂ : w₁ < w₂) でパラメータ化して ungated に実証明し、pin の discharge
+   ((10.10.1)+(10.10.2) 経由、hbound は sorried-cite) を分離する —
+  gated-endpoint-skeleton パターン。
+**実装順 (次 tick から)**: 新 leaf S12_TypeVCaseC.lean —
+  (i) muColumn def (μ_j = ∑_i mu i j) + degree = d·w₁ + Z[S₁]-membership 系
+  (ii) S₁-relative α^τ (alpha_tau_image の S₁-版; Isometry106:805 の証明を
+  SHC-coherence 相対に写経+ (10.9) で (μ₀−ζ)^τ pin)
+  (iii) (10.10.4) glue: ν 構成 + IsCoherent hyp.tau hyp.Sset hyp.A0
+  (iv) (10.10.2) 構造 lemma 群 (p³ 指標論) — (iii) と並行可
+  (v) v2 assembly: trichotomy → case (a) = typeV_caseA_coherence ✓ /
+  case (b) = (6.5.c)-cite (sorried、2022 gate) / case (c) = engine + pins。
+
 ## 2026-07-11 tick²⁴ — ★★ case-(a) 完全証明: typeV_caseA_coherence (commit 6e4800d5)
 
 - `typeV_caseA_coherence` (S13_Lemmas113To115 末尾、sorry-free):
