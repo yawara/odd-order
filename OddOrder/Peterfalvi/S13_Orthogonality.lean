@@ -203,6 +203,71 @@ theorem exists_glue_nu_H0C [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
     coh.extension hY.extension
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **World-bridge for the σ-grids** (issue 1023 tick¹²): the §6 certain-type σ-image
+`certainTypeOmegaSigma` of the `μ`-column character, dispatched by the `SOf_memberRFamily`
+machinery over `h46 = hyp.toHypothesis46`, **is** the §10 `alignedOmegaSigmaGrid` entry.
+Both are the (3.2) `σ` of the same TI-cyclic setup — `h46.tic` is *literally*
+`typePData_toTICyclicHypothesis` (the `toHypothesis46` field), so `ticVdiff h46` and the
+grid's `tic` agree definitionally — applied to pointwise-equal transported `ω`-characters
+(`omegaProdCharTic_apply` vs the grid's `compHom e (chiColumn …)`; both transports are
+carrier-identities, `coe_ticWEquivSdiffW`). -/
+theorem certainTypeOmegaSigma_muColumnChar_eq_aligned [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)
+    [NeZero (Nat.card (hyp.toHypothesis46 hG hG.odd).W1)]
+    (hcw1 : Nat.card ↥(hyp.toHypothesis46 hG hG.odd).W1 = hyp.w1)
+    (i : Fin hyp.w1) (j : Fin hyp.w2) :
+    OddOrder.Peterfalvi.S06.certainTypeOmegaSigma (hyp.toHypothesis46 hG hG.odd)
+        (hyp.muColumnChar hG hG.odd j) (finCongr hcw1.symm i)
+      = hyp.alignedOmegaSigmaGrid hG hG.odd i j := by
+  haveI := hyp.finiteG
+  classical
+  -- the two setups agree definitionally (`toHypothesis46.tic` is the grid `tic` by field literal)
+  show (OddOrder.Peterfalvi.S06.ticVdiff (hyp.toHypothesis46 hG hG.odd)).sigma rfl
+      (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication (hyp.toHypothesis46 hG hG.odd))
+      ((OddOrder.Peterfalvi.S06.ticVdiff (hyp.toHypothesis46 hG hG.odd)).omega
+        (OddOrder.Peterfalvi.S06.omegaProdCharTic (hyp.toHypothesis46 hG hG.odd)
+          (hyp.muColumnChar hG hG.odd j) (finCongr hcw1.symm i)))
+    = hyp.alignedOmegaSigmaGrid hG hG.odd i j
+  -- unfold the grid to its `σ`-form (defeq through the def's `let`s)
+  rw [show hyp.alignedOmegaSigmaGrid hG hG.odd i j
+      = (OddOrder.Peterfalvi.S06.ticVdiff (hyp.toHypothesis46 hG hG.odd)).sigma rfl
+          (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication (hyp.toHypothesis46 hG hG.odd))
+          (ClassFunction.compHom
+            (((Subgroup.subgroupOfEquivOfLe (OddOrder.Peterfalvi.S12.typePData_W_le_self hyp.typeP)).symm.trans
+              (MulEquiv.subgroupCongr
+                (OddOrder.Peterfalvi.S12.typePData_sup_subgroupOf_eq hyp.typeP).symm)).toMonoidHom)
+            ((hyp.toHypothesis46 hG hG.odd).chiColumn (hyp.muColumnChar hG hG.odd j)
+              (finCongr hcw1.symm i)
+              : ClassFunction
+                  (hyp.toHypothesis46 hG hG.odd).sdiffTICyclicHypothesis.W ℂ)) from rfl]
+  -- same σ of pointwise-equal inputs
+  congr 1
+  ext w
+  -- LHS value: `ω(ω_{ij}^{tic})(w) = chiColumn χ₂ i (ticWEquivSdiffW w)`
+  have hL : ((OddOrder.Peterfalvi.S06.ticVdiff (hyp.toHypothesis46 hG hG.odd)).omega
+        (OddOrder.Peterfalvi.S06.omegaProdCharTic (hyp.toHypothesis46 hG hG.odd)
+          (hyp.muColumnChar hG hG.odd j) (finCongr hcw1.symm i))
+        : ClassFunction _ ℂ) w
+      = ((hyp.toHypothesis46 hG hG.odd).chiColumn (hyp.muColumnChar hG hG.odd j)
+          (finCongr hcw1.symm i)
+          : ClassFunction (hyp.toHypothesis46 hG hG.odd).sdiffTICyclicHypothesis.W ℂ)
+        (OddOrder.Peterfalvi.S06.ticWEquivSdiffW (hyp.toHypothesis46 hG hG.odd) w) := by
+    rw [(OddOrder.Peterfalvi.S06.ticVdiff (hyp.toHypothesis46 hG hG.odd)).omega_apply]
+    exact OddOrder.Peterfalvi.S06.omegaProdCharTic_apply (hyp.toHypothesis46 hG hG.odd)
+      (hyp.muColumnChar hG hG.odd j) (finCongr hcw1.symm i) w
+  refine hL.trans ?_
+  -- RHS value: `compHom e (chiColumn)(w) = chiColumn (e w)`; the two transports of `w`
+  -- share the ambient element (`coe_ticWEquivSdiffW`), so `chiColumn` agrees.
+  rw [ClassFunction.compHom_apply]
+  refine congrArg _ ?_
+  apply Subtype.ext
+  apply Subtype.ext
+  have h1 := OddOrder.Peterfalvi.S06.coe_ticWEquivSdiffW (hyp.toHypothesis46 hG hG.odd) w
+  rw [h1]
+  rfl
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (11.8.6) narrow union-coherence capstone** — targeting the *narrow* family `S(H₀C)`
 via the `𝒮(H₀C)` coherence (contradicting (11.3)), NOT the deprecated wide `Sset \ SHCSet`
 uniform-degree route (false for non-Galois type III/IV, issue 1019).
