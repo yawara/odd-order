@@ -898,3 +898,33 @@ projection dichotomy から refuter までの signature-free assembly。S-side (
    は b 所有ゆえ b の 2038 進行と衝突しない hunk 配置 (不明なら b に notes で一報)。
 3. **9084 裁定**: TGapCross 4 定理の S15 正本 redirect + (14.9) endpoint discharge を承認、
    owner = c (詳細 = 9084 RULING)。
+
+### projection norm compression と 9084 discharge 完了 (2026-07-12 深夜)
+
+feature commits: `6ed2d8cf`, `9d27be05`。
+
+- `TGapProjectionRigidity.lean` に full-grid bookkeeping を実装した。
+  `etaGrid_axis_sum_eq_sum_sq` は principal point・二つの非主軸・interior を分割し、
+  four-corner relation から全 interior coefficient が `m_11` に等しいことを使って、
+  三係数式と `sum_ij m_ij^2` の exact equality を証明する。
+- `etaGrid_axis_bound_of_sum_sq_le` と
+  `etaGrid_coefficients_eq_column_or_row_of_sum_sq_le` により、既存の sharp full-grid bound
+  `sum m_ij^2 <= p` を中間の posited axis bound なしに column-or-row 二分法へ直接渡せる。
+  3 theorem は全て AxiomsCheck green、新 `sorry`・新 axiom なし。
+- issue 9084 (a): S16 に一時的にあった `PW1_index_eq_u`, `betaGrid_apply_one_eq_zero`,
+  二つの hypothesis-parametrized beta-support theorem、および S15 へ移設済みの旧
+  `sSide_mu_row0_apply_eq_zero_of_mem_derived_not_mem_P` を削除した。正本は S15 の
+  `PW1_index_eq_u` / `betaGrid_apply_one_eq_zero` / `betaGrid_support` / Hypothesis method。
+- issue 9084 (b): `tSideDadeMap_inner_tauSbetaGrid_eq_zero` を S15 `betaGrid_support` の
+  direct cite で構成し、`hmuD` / `hmuW1` 仮説を signature から除去した。TTypeII caller も
+  この endpoint に切り替え、`hresidual` は sharp norm bound と zero-column projection の
+  二項だけになった。局所 `sorry` が担うのは後者一項のみ。
+- 独立 AxiomsCheck では `S15.betaGrid_support` と無条件 cross-Dade endpoint の両方が
+  既存 upstream `sorryAx` を一つ継承することを確認した。従って「仮説なし」は signature
+  について正しいが axiom-clean とは扱わず、両 assert は pending コメントに戻した。
+  最終 AxiomsCheck (4149 jobs) は green。
+
+残る C frontier は zero-column projection そのもの。今回の norm compression により
+算術側の入力 mismatch は解消したため、未接続なのは (1) concrete full Galois orbit の
+3-carrier threading から axis constancy を得ること、(2) column-or-row 二分法の wrong-axis を
+Peterfalvi (11.8) non-orthogonality で排除すること、の二点である。
