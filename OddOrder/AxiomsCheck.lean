@@ -3370,7 +3370,19 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S16.tSideDadeMap_eq_full_typeP1DadeMap_of_support
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.fullTypeP1Dade_H_eq_bot_of_typePA_centralizer_le
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.fullTypeP1Dade_H_eq_bot_of_isTISubset
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.tSideDadeMap_eq_induce_of_full_typeP1_H_eq_bot
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.tSideDadeMap_eq_induce_of_typePA_centralizer_le
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.tSideDadeMap_eq_induce_of_isTISubset
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.inner_eq_swap_of_mem_ZIrr
 set_option linter.style.longLine false in

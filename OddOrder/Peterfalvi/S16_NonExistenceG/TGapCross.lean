@@ -96,6 +96,61 @@ theorem tSideDadeMap_eq_full_typeP1DadeMap_of_support [Finite G]
     ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφsupp⟩
 
 open scoped Classical in
+/-- **Peterfalvi (13.2.e), reduction of full `A₀(T)` normed-TI to `A(T)`.**
+
+The exceptional `V^T` part is already non-escaping, so centralizer containment on
+`A(T)=typePA(T)` implies every full `A₀(T)` point is non-escaping. Hence the faithful
+Dade stabilizer `H(a)=ftSupportKernel ... a` is bottom. -/
+theorem fullTypeP1Dade_H_eq_bot_of_typePA_centralizer_le [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    [Fintype G]
+    (dataT : OddOrder.GroupTheory.TypePData hyp.base.T)
+    (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T)
+    (hA : ∀ x ∈ OddOrder.GroupTheory.typePA hyp.base.T dataT,
+      Subgroup.centralizer ({x} : Set G) ≤ hyp.base.T) :
+    ∀ a,
+      ((OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_typePA0_of_isTypeP1
+        hG hyp.base.T_maximal dataT hP1).some.dade.H a) = ⊥ := by
+  classical
+  let full := (OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_typePA0_of_isTypeP1
+    hG hyp.base.T_maximal dataT hP1).some
+  have hA0 : ∀ x ∈ OddOrder.GroupTheory.typePA0 hyp.base.T dataT,
+      Subgroup.centralizer ({x} : Set G) ≤ hyp.base.T := by
+    intro x hx
+    change x ∈ OddOrder.GroupTheory.typePA hyp.base.T dataT ∪
+      OddOrder.GroupTheory.conjClassSetIn hyp.base.T
+        (OddOrder.GroupTheory.typePV hyp.base.T dataT) at hx
+    rcases hx with hxA | hxV
+    · exact hA x hxA
+    · exact OddOrder.Peterfalvi.S15.conjClassSetIn_typePV_centralizer_le_M dataT hxV
+  intro a
+  change full.dade.H a = ⊥
+  rw [full.H_eq_ftSupportKernel]
+  exact OddOrder.Peterfalvi.S10.ftSupportKernel_eq_bot_of_not_escaping
+    (fun hesc => hesc.2 (hA0 a.1 a.2))
+
+open scoped Classical in
+/-- **Peterfalvi (13.2.e), full `A₀(T)` normed-TI gives trivial Dade stabilizers.**
+
+This is the direct bridge from the Coq conclusion `normedTI 'A0(T) G T` to the selected
+full type-`P₁` Dade datum.  TI controls each point centralizer, while the exceptional
+`V^T` reduction is handled by `fullTypeP1Dade_H_eq_bot_of_typePA_centralizer_le`. -/
+theorem fullTypeP1Dade_H_eq_bot_of_isTISubset [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    [Fintype G]
+    (dataT : OddOrder.GroupTheory.TypePData hyp.base.T)
+    (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T)
+    (hTI : OddOrder.GroupTheory.IsTISubset
+      (OddOrder.GroupTheory.typePA0 hyp.base.T dataT) hyp.base.T) :
+    ∀ a,
+      ((OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_typePA0_of_isTypeP1
+        hG hyp.base.T_maximal dataT hP1).some.dade.H a) = ⊥ :=
+  fullTypeP1Dade_H_eq_bot_of_typePA_centralizer_le hG hyp dataT hP1 fun _ hx =>
+    hTI.centralizer_le (Set.mem_union_left _ hx)
+
+open scoped Classical in
 /-- **Peterfalvi (13.2.e), exact T-side Dade=induction bridge.**
 
 Once the full type-`P₁` `A₀(T)` Dade datum has trivial point stabilizers—the
@@ -141,6 +196,49 @@ theorem tSideDadeMap_eq_induce_of_full_typeP1_H_eq_bot [Finite G]
   have heq := OddOrder.Peterfalvi.S04.IsDadeMap.unique
     (full.dade.isDadeMap_dadeMap (k := ℂ)) hind
   exact congrFun heq ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hfullSupp⟩
+
+open scoped Classical in
+/-- **Peterfalvi (13.2.e), T-side Dade=induction from `A(T)` centralizers.**
+
+This is the consumer form of
+`fullTypeP1Dade_H_eq_bot_of_typePA_centralizer_le`: the already-settled exceptional
+`V^T` part leaves only centralizer containment on the ordinary type-`P` set. -/
+theorem tSideDadeMap_eq_induce_of_typePA_centralizer_le [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    [Fintype ↥hyp.base.T] [Invertible (Nat.card ↥hyp.base.T : ℂ)]
+    (dataT : OddOrder.GroupTheory.TypePData hyp.base.T)
+    (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T)
+    (hA : ∀ x ∈ OddOrder.GroupTheory.typePA hyp.base.T dataT,
+      Subgroup.centralizer ({x} : Set G) ≤ hyp.base.T)
+    {φ : ClassFunction ↥hyp.base.T ℂ}
+    (hφsupp : φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T) :
+    tSideDadeMap hyp hG φ = ClassFunction.induce hyp.base.T φ := by
+  exact tSideDadeMap_eq_induce_of_full_typeP1_H_eq_bot hG hyp dataT hP1
+    (fullTypeP1Dade_H_eq_bot_of_typePA_centralizer_le hG hyp dataT hP1 hA) hφsupp
+
+open scoped Classical in
+/-- **Peterfalvi (13.2.e), T-side Dade=induction from full `A₀(T)` normed-TI.**
+
+This is the form consumed by (14.9): once the genuine `A₀(T)` TI theorem is available,
+the reconciled T-side Dade map is induction on every `A₁(T)`-supported class function. -/
+theorem tSideDadeMap_eq_induce_of_isTISubset [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    [Fintype ↥hyp.base.T] [Invertible (Nat.card ↥hyp.base.T : ℂ)]
+    (dataT : OddOrder.GroupTheory.TypePData hyp.base.T)
+    (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T)
+    (hTI : OddOrder.GroupTheory.IsTISubset
+      (OddOrder.GroupTheory.typePA0 hyp.base.T dataT) hyp.base.T)
+    {φ : ClassFunction ↥hyp.base.T ℂ}
+    (hφsupp : φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T) :
+    tSideDadeMap hyp hG φ = ClassFunction.induce hyp.base.T φ :=
+  tSideDadeMap_eq_induce_of_full_typeP1_H_eq_bot hG hyp dataT hP1
+    (fullTypeP1Dade_H_eq_bot_of_isTISubset hG hyp dataT hP1 hTI) hφsupp
 
 /-- The inner product of two virtual characters is symmetric: its value is
 an integer, hence fixed by complex conjugation. -/
