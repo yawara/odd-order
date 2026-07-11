@@ -374,3 +374,13 @@ SHC_tau_muGridAlpha_eq_of_eight_le_SHCcount (count 形、h8 のみ残る外部�
 residual 形を SHC-extension と同定) で作り、ν := (τ₁ on Z[S₁]) ⊕ (μ_j ↦ δ∑ω_ij)
 を IsCoherent hyp.tau hyp.Sset hyp.A0 に組む (nonzero/isometry/agree/ZIrr 4 field;
 S = S₁ ⊔ {μ_j} の (10.10.2) 構造は hS 仮説で engine 化)。
+
+## 2026-07-11 tick³¹ — (10.10.4) column 計算 landed (delegate 成功、commit 5058c353)
+SHC_tau_muColumn_sub_smul_zeta: (μ_j − d·ζ)^τ = δ∑_i ω_ij^σ − d·ζ^{τ₁}
+(sorry-free、精密 spec 委譲の初成功例)。残入力 = hpin ((10.9) pin):
+hyp.tau (∑_i μ_i0 − ζ) = ∑_i ω_i0^σ − coh.extension ζ。book (10.10.4) 第 1 文:
+(α_ij, μ₀−ζ) = −δ+n と (10.9)((μ₀−ζ)^τ = ∑ω_i0 − χ、‖χ‖=1、χ ⊥ (Irr W)^σ) +
+(10.10.3) から χ = ζ^{τ₁} を同定 (w₁<w₂ 要 — (10.10.1))。素材 = S12_Prop109 の
+residual 諸形態 (:87/:322/:354/:503) + SHC extension の性質。その後:
+(10.10.4) 本体 = ν 構成 (IsCoherent 4-field、S = S₁ ⊔ {μ_j} は (10.10.2)
+構造仮説で engine 化) → (10.10.2) p³-構造 → v2 assembly。
