@@ -7518,3 +7518,4 @@ the Peterfalvi (11.9.c) non-Galois contradiction `q ≤ u − 1 < u = a ≤ p �
 (3.9.b) 行/列定数性の generic 核 (S16 TGapGalois の generic 部 hoist)。 -/
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.inner_mapRingEquiv_eq_of_mem_ZIrr
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.inner_eq_intCast_of_mapRingEquiv_eq_add
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.inducedFamily_closedUnderMapRingEquiv
