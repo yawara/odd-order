@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S12_TypeIIColumnPin
+import OddOrder.Peterfalvi.S05_SigmaTrichotomy
 
 /-!
 # Peterfalvi (2.5)/(3.2)/(3.5): the generic σ-agreement and transpose bridge
