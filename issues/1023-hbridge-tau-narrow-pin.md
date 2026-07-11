@@ -215,3 +215,21 @@ IsCoherent 構成は既存 IntegralCharacterMap 機構 (Zisometry_of_cfnorm 相�
 - μ column self-norm = `Hypothesis.muGrid_column_sum_inner_self` (CharacterParameters:1160)。
 - E-card: SOf-(5.5) は card 節なし → ‖ext ψ‖² = ‖ψ‖² (isometry) + E orthonormal から
   |E| = w₁ を導出 (inner_sum で #E)。
+
+## 2026-07-12 tick⁹ — 論法の最終単純化 + bridge が唯一の残ブロック
+
+- **norm 論法で (5.5)-counting 後半は不要**: ⟨c.ext μ₁, ωcol₁⟩ = w₁ さえ得れば、等長
+  ‖c.ext μ₁‖² = w₁ + ‖ωcol₁‖² = w₁ (aligned orthonormal) ⟹ ‖c.ext μ₁ − ωcol₁‖² = 0 ⟹ pin。
+- ⟨c.ext μ₁, ωcol₁⟩ = w₁ の γ-trick 展開で残る非自明項 = **⟨c.ext ξ, ωcol₁⟩ = 0** (irr ξ)。
+  これは ξ の (5.5) (2-elt dadeOfDiff family) + **dadeOfDiff-member ⊥ aligned-grid** を要し、
+  既存 lemma は certainTypeR(-family) ⊥ dadeOfDiff 形のみ ⟹
+  **certainTypeR/certainTypeOmegaSigma ↔ alignedOmegaSigmaGrid の world-bridge が不可避**。
+  (純 grid-座標 counting での回避も検討 → 列独立性+等長だけでは w₂=3 で不足、(5.5) support
+  論法 (w₂≥5) も同じ bridge を要する — bridge が唯一の残ブロックと確定。)
+- **次の具体 lemma**: `certainTypeRImage h46 (muColumnChar k) (muColumnChar k)⁻¹ (false, i)
+  = δ • alignedOmegaSigmaGrid i' k` 型の同定 (aligned の def は同じ chiColumn 系 transport —
+  CharacterParameters:105-135 と S06_CertainTypeIsometry:165 certainTypeOmegaSigma_eq_chiFam を
+  突き合わせ)。これが載れば: ⟨dadeOfDiff, aligned⟩ = 0 (既存 certainTypeR⊥dadeOfDiff 経由) と
+  ⟨certainTypeR-member, ωcol⟩ 計算の両方が開通し、case-1 が norm 論法で完結。
+- case-2 (all-reducible) は tick⁸ どおり canonical 構成 (bridge 不要 — hcol と等長のみ)。
+  実装順を逆転してもよい: case-2 が self-contained ゆえ先に載せられる。
