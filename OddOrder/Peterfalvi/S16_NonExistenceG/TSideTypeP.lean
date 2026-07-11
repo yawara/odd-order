@@ -914,6 +914,27 @@ theorem T_typeIII_calT1_family [Finite G] (hyp : Hypothesis (G := G))
     T_typeIII_calT1_family_galois hyp td
   exact ⟨𝒯, hinertia, hne, hlinear, hconj, hcard⟩
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+open scoped Classical in
+/-- Galois closure passes from a source family to its induced family. -/
+theorem inducedFamily_mapRingEquiv_mem
+    {L : Type*} [Group L] [Fintype L]
+    (K : Subgroup L) [Fintype K] [Invertible (Nat.card K : ℂ)]
+    (𝒯 : Finset (IrreducibleCharacter K))
+    (hgalois : ∀ (σc : ℂ ≃+* ℂ) θ, θ ∈ 𝒯 →
+      IrreducibleCharacter.galoisMap σc θ ∈ 𝒯)
+    (σc : ℂ ≃+* ℂ) {ζ : ClassFunction L ℂ}
+    (hζ : ζ ∈ (↑(𝒯.image (fun θ =>
+      ClassFunction.induce K θ.toClassFunction)) :
+        Set (ClassFunction L ℂ))) :
+    ClassFunction.mapRingEquiv σc ζ ∈
+      (↑(𝒯.image (fun θ => ClassFunction.induce K θ.toClassFunction)) :
+        Set (ClassFunction L ℂ)) := by
+  rw [Finset.mem_coe, Finset.mem_image] at hζ ⊢
+  obtain ⟨θ, hθ, rfl⟩ := hζ
+  refine ⟨IrreducibleCharacter.galoisMap σc θ, hgalois σc θ hθ, ?_⟩
+  exact (ClassFunction.mapRingEquiv_induce σc θ.toClassFunction).symm
+
 /-- **The intrinsic type-III kernel size bound `2p + 1 ≤ |V|`** (ungated, the crude `hcard2` input).
 The intrinsic `U ⋊ W₁` Frobenius (`T_typeIII_UW1_frobenius`) has odd kernel `U` (`|U| = |V|`,
 `T_typeIII_card_U`) and odd complement `W₁` (`|W₁| = p`, `T_typeIII_card_W1`); the odd-order Frobenius

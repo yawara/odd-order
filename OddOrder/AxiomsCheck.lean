@@ -3374,6 +3374,8 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.T_typeIII_calT1_family_galois
 set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.inducedFamily_mapRingEquiv_mem
+set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.primeTIred_zero_mapRingEquiv
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.tSideDadeMap_mapRingEquiv_bridge
