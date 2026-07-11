@@ -215,4 +215,85 @@ theorem axis_coefficients_eq_column_or_row
     right
     refine ⟨ha10, by omega, ha11⟩
 
+/-- Lift the three-coefficient arithmetic classification to the full eta-grid.
+The axis-constancy hypotheses are the exact output expected from Peterfalvi (3.9)(b)
+and Dade--Galois commutation. -/
+theorem etaGrid_coefficients_eq_column_or_row
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    (hqp : base.q < base.p)
+    (m : Fin base.q → Fin base.p → ℤ)
+    (hprincipal :
+      m ⟨0, base.q_prime.pos⟩ ⟨0, base.p_prime.pos⟩ = 1)
+    (hrow : ∀ i, i ≠ ⟨0, base.q_prime.pos⟩ →
+      m i ⟨0, base.p_prime.pos⟩ =
+        m ⟨1, base.q_prime.one_lt⟩ ⟨0, base.p_prime.pos⟩)
+    (hcol : ∀ j, j ≠ ⟨0, base.p_prime.pos⟩ →
+      m ⟨0, base.q_prime.pos⟩ j =
+        m ⟨0, base.q_prime.pos⟩ ⟨1, base.p_prime.one_lt⟩)
+    (hrelation : ∀ i j,
+      m i j + m ⟨0, base.q_prime.pos⟩ ⟨0, base.p_prime.pos⟩ =
+        m i ⟨0, base.p_prime.pos⟩ + m ⟨0, base.q_prime.pos⟩ j)
+    (haxisBound :
+      1 + ((base.q : ℤ) - 1) *
+            m ⟨1, base.q_prime.one_lt⟩ ⟨0, base.p_prime.pos⟩ ^ 2 +
+          ((base.p : ℤ) - 1) *
+            m ⟨0, base.q_prime.pos⟩ ⟨1, base.p_prime.one_lt⟩ ^ 2 +
+          ((base.q : ℤ) - 1) * ((base.p : ℤ) - 1) *
+            m ⟨1, base.q_prime.one_lt⟩ ⟨1, base.p_prime.one_lt⟩ ^ 2 ≤
+        (base.p : ℤ)) :
+    (∀ i j, m i j = if j = ⟨0, base.p_prime.pos⟩ then 1 else 0) ∨
+      (∀ i j, m i j = if i = ⟨0, base.q_prime.pos⟩ then 1 else 0) := by
+  let i0 : Fin base.q := ⟨0, base.q_prime.pos⟩
+  let j0 : Fin base.p := ⟨0, base.p_prime.pos⟩
+  let i1 : Fin base.q := ⟨1, base.q_prime.one_lt⟩
+  let j1 : Fin base.p := ⟨1, base.p_prime.one_lt⟩
+  have hqZ : (3 : ℤ) ≤ base.q := by exact_mod_cast base.three_le_q
+  have hpZ : (3 : ℤ) ≤ base.p := by exact_mod_cast base.three_le_p
+  have hqpZ : (base.q : ℤ) < base.p := by exact_mod_cast hqp
+  have haxis := axis_coefficients_eq_column_or_row hqZ hpZ hqpZ
+    (show m i1 j1 = m i1 j0 + m i0 j1 - 1 by
+      have h := hrelation i1 j1
+      have hp0 : m i0 j0 = 1 := by simpa [i0, j0] using hprincipal
+      change m i1 j1 + m i0 j0 = m i1 j0 + m i0 j1 at h
+      rw [hp0] at h
+      omega)
+    (by simpa [i0, j0, i1, j1] using haxisBound)
+  rcases haxis with hcolumn | hrowAxis
+  · left
+    intro i j
+    by_cases hj : j = j0
+    · rw [if_pos (by simpa [j0] using hj)]
+      by_cases hi : i = i0
+      · rw [hi, hj]
+        simpa [i0, j0] using hprincipal
+      · rw [hj]
+        simpa [i0, j0, i1] using
+          (hrow i (by simpa [i0] using hi)).trans hcolumn.1
+    · rw [if_neg (by simpa [j0] using hj)]
+      by_cases hi : i = i0
+      · rw [hi]
+        simpa [i0, j0, j1] using (hcol j (by simpa [j0] using hj)).trans hcolumn.2.1
+      · have h := hrelation i j
+        rw [hprincipal, hrow i (by simpa [i0] using hi),
+          hcol j (by simpa [j0] using hj), hcolumn.1, hcolumn.2.1] at h
+        omega
+  · right
+    intro i j
+    by_cases hi : i = i0
+    · rw [if_pos (by simpa [i0] using hi)]
+      by_cases hj : j = j0
+      · rw [hi, hj]
+        simpa [i0, j0] using hprincipal
+      · rw [hi]
+        simpa [i0, j0, j1] using
+          (hcol j (by simpa [j0] using hj)).trans hrowAxis.2.1
+    · rw [if_neg (by simpa [i0] using hi)]
+      by_cases hj : j = j0
+      · rw [hj]
+        simpa [i0, j0, i1] using (hrow i (by simpa [i0] using hi)).trans hrowAxis.1
+      · have h := hrelation i j
+        rw [hprincipal, hrow i (by simpa [i0] using hi),
+          hcol j (by simpa [j0] using hj), hrowAxis.1, hrowAxis.2.1] at h
+        omega
+
 end OddOrder.Peterfalvi.S16
