@@ -157,3 +157,14 @@ assert は厳格形のまま)。
 threading、3 files +30 行、構築サイト不変を確認済) → AxiomsCheck の producer assert
 (厳格形のまま) が green を維持することを確認 → 本 issue close。その後 9076
 (tauS_mu_row0_diff_support の hj0/hdeg signature 修正) が field から discharge 可能。
+
+---
+
+## ✅ CLOSE (2026-07-11 hub tick、merge 7a8c3d47): 完了条件を hub 検証
+
+c2400d81 re-landing (ab1a776d) 合流後の full build で **spine producer
+`section16CharacterData_of_isMinimalSimpleOdd` の厳格 assert が green**
+(AxiomsCheck:6857 OK、3 axioms 全 allowlist、build 4167 jobs EXIT=0)。
+mu_diff_support grounding field 3 層 + producer が sorryAx 混入なしで landed —
+裁定 (b) Core-split の目的を完全達成。HOLD 不変量は一度も破られず。
+次: 9076 (tauS_mu_row0_diff_support の signature 修正) が field から discharge 可能 (b 記録)。

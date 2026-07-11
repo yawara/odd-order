@@ -161,3 +161,6 @@ issue は trial ログの追記継続のため open 維持、次の節目 (T-sid
   (19/19 継続)。
 - 2026-07-11 (tick、merge f5ebbe06): 再起動後即 genuine 復帰 — (11.9a) conjugate anchor orthogonality
   保持 (+52、実 sorry ±0、assert 1 本 build 通過)。20/20。
+- 2026-07-11 (tick、merge 7a8c3d47): (11.9a) Galois bridge transport 分解 + strict T projection bound。
+  TTypeII (肥大化) を TTypeIICoherence へ自主分割 (633 行移設、粒度規約の自発遵守 2 回目)。新 leaf
+  2 件とも配線済 (orphan なし)、実 sorry ±0。21/21。
