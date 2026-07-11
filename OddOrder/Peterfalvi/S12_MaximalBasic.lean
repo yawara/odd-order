@@ -617,6 +617,27 @@ theorem Hypothesis.mem_restricted_dadeSupport_of_coprime [Finite G] {M : Subgrou
     have hpw1 : p ∣ hyp.w1 := hpw
     exact hp.ne_one (Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hpg hpw1))
 
+/-- **The (8.7) type-V trichotomy transfers across `TypePData` choices** (issue 1021): the
+alternative field of a `TypeVData` mentions only `H = M_F` (data-independent, `H_eq`) and
+`|W₁| = [M : M′]` (data-independent, `card_W1_eq_derived_index`), so it holds verbatim for any
+other `TypePData` of the same `M` — in particular for the (10.1) `Hypothesis`'s own datum. -/
+theorem TypeVData.alternative_transfer [Finite G] {M : Subgroup G}
+    (dV : OddOrder.GroupTheory.TypeVData M) (data : TypePData M) :
+    OddOrder.GroupTheory.IsTISubset (sharpSubgroup data.H)
+      (Subgroup.normalizer (data.H : Set G)) ∨
+    (∃ p : ℕ, p.Prime ∧ p ∈ (Nat.card ↥data.H).primeFactors ∧
+      Nat.card ↥data.W1 ∣ p - 1 ∧ IsCyclic ↥(opiCoreInG {p}ᶜ data.H)) ∨
+    (∃ p : ℕ, p.Prime ∧ p ∈ (Nat.card ↥data.H).primeFactors ∧
+      Nat.card ↥(opiCoreInG {p} data.H) = p ^ 3 ∧ Nat.card ↥data.W1 ∣ p + 1 ∧
+      IsCyclic ↥(opiCoreInG {p}ᶜ data.H)) := by
+  have hH : dV.typeP.H = data.H := dV.typeP.H_eq.trans data.H_eq.symm
+  have hW1 : Nat.card ↥dV.typeP.W1 = Nat.card ↥data.W1 := by
+    rw [dV.typeP.card_W1_eq_derived_index, data.card_W1_eq_derived_index]
+  rcases dV.alternative with h | h | h
+  · exact Or.inl (hH ▸ h)
+  · exact Or.inr (Or.inl (hW1 ▸ hH ▸ h))
+  · exact Or.inr (Or.inr (hW1 ▸ hH ▸ h))
+
 /-- **The pair κ-Hall dual is `W₂`**: `M_σ ⊓ C_G(W₁) = W₂` for type-`P` data.  This is the
 identification `K = W₂(M)` of the `M`-seeded maximal pair (`mp.K_eq` has exactly this LHS with
 `mp.Kstar = W₁` literal), the pair-linkage input of the (10.8) partner supply (issue 1020).
