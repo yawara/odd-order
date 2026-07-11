@@ -247,4 +247,83 @@ theorem Hypothesis.SHC_tau_muGridAlpha_eq_of_eight_le_SHCcount [Finite G] {M : S
   exact hyp.SHC_tau_muGridAlpha_eq_of_eight_le_card hG coh hodd i hj0 hζS hζirr hζ1 hζne
     hdeg hμ0 hnf hδj hdζ h0ζ hδpm hneq (by rw [hcard]; exact h8) hZ horth hRmem hRrev
 
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (10.10.4), the column computation**: summing the (10.10.3) images
+`α_{ij}^τ = δ·(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}` over the `w₁` rows and pinning the first
+column by (10.9) gives the coherent-extension glue for the column character
+`μ_j = ∑_i μ_{ij}`:
+
+`(μ_j − d·ζ)^τ = δ·(μ_0 − ζ)^τ + ∑_i α_{ij}^τ = δ·∑_i ω_{ij}^σ − d·ζ^{τ₁}`.
+
+The `ζ`-coefficient collapses through `n·w₁ = d − δ` (`hnf`): on the source side
+`−δ − n·w₁ = −d` (so `μ_j − d·ζ = δ·(μ_0 − ζ) + ∑_i α_{ij}` is exact), and on the image side
+`δ + n·w₁ = d` reassembles the `−d·ζ^{τ₁}` tail.  The (10.9) pin
+`(μ_0 − ζ)^τ = ∑_i ω_{i0}^σ − ζ^{τ₁}` is supplied separately as `hpin`. -/
+theorem Hypothesis.SHC_tau_muColumn_sub_smul_zeta [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
+    (hodd : Odd (Nat.card G))
+    {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hζne : ζ.conj ≠ ζ) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : ∀ i, hyp.muGrid hG hodd i j 1 = (d : ℂ))
+    (hμ0 : ∀ i, hyp.muGrid hG hodd i 0 1 = 1)
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ) (hδj : hyp.muColumnSign hG hodd j = δ)
+    (hdζ : ∀ i, hyp.muGrid hG hodd i j 1 ≠ ζ 1)
+    (h0ζ : ∀ i, hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hδpm : δ = 1 ∨ δ = -1) (hneq : n = 2)
+    (h8 : 8 ≤ (Finset.univ.filter fun χ : IrreducibleCharacter ↥M =>
+      (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
+        (χ : ClassFunction ↥M ℂ) 1 = (hyp.w1 : ℂ)).card)
+    (hpin : hyp.tau ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - ζ)
+        = (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i 0) - coh.extension ζ) :
+    hyp.tau ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j) - (d : ℂ) • ζ)
+      = (δ : ℂ) • (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i j)
+        - (d : ℂ) • coh.extension ζ := by
+  -- the (10.3) index relation, cast to `ℂ`: `d = δ + w₁·n`
+  have hd' : (d : ℂ) = (δ : ℂ) + (hyp.w1 : ℂ) * (n : ℂ) := by
+    have h := congrArg (Int.cast : ℤ → ℂ) hnf
+    push_cast at h
+    linear_combination -h
+  -- the per-row (10.10.3) images `α_{ij}^τ = δ·(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}`
+  have htau_i : ∀ i : Fin hyp.w1, hyp.tau (hyp.muGrid hG hodd i j
+        - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+      = (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j
+          - hyp.alignedOmegaSigmaGrid hG hodd i 0) - (n : ℂ) • coh.extension ζ := fun i =>
+    hyp.SHC_tau_muGridAlpha_eq_of_eight_le_SHCcount hG coh hodd i hj0 hζS hζirr hζ1 hζne
+      (hdeg i) (hμ0 i) hnf hδj (hdζ i) (h0ζ i) hδpm hneq h8
+  -- the `δ`-scaled (10.9) pin `(δ·(μ_0 − ζ))^τ = δ·(∑_i ω_{i0}^σ − ζ^{τ₁})`
+  have hpinδ : hyp.tau ((δ : ℂ) • ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - ζ))
+      = (δ : ℂ) • ((∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i 0)
+          - coh.extension ζ) := by
+    rw [Int.cast_smul_eq_zsmul ℂ δ ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - ζ),
+      map_zsmul, hpin, Int.cast_smul_eq_zsmul ℂ δ]
+  -- source-side regrouping `μ_j − d·ζ = δ·(μ_0 − ζ) + ∑_i α_{ij}` (ζ-coefficient `−δ − n·w₁ = −d`)
+  have hsum_mu : ∑ i : Fin hyp.w1, (hyp.muGrid hG hodd i j
+        - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+      = (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j)
+        - (δ : ℂ) • (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0)
+        - ((hyp.w1 : ℂ) * (n : ℂ)) • ζ := by
+    rw [Finset.sum_sub_distrib, Finset.sum_sub_distrib, Finset.smul_sum, Finset.sum_const,
+      Finset.card_univ, Fintype.card_fin, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul]
+  have hsrc : (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j) - (d : ℂ) • ζ
+      = (δ : ℂ) • ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - ζ)
+        + ∑ i : Fin hyp.w1, (hyp.muGrid hG hodd i j
+            - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ) := by
+    rw [hsum_mu, hd']
+    module
+  -- image-side collapse of the `α`-sum
+  have hsum_om : ∑ i : Fin hyp.w1, ((δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j
+        - hyp.alignedOmegaSigmaGrid hG hodd i 0) - (n : ℂ) • coh.extension ζ)
+      = (δ : ℂ) • ((∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i j)
+          - (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i 0))
+        - ((hyp.w1 : ℂ) * (n : ℂ)) • coh.extension ζ := by
+    rw [Finset.sum_sub_distrib, ← Finset.smul_sum (r := (δ : ℂ)), Finset.sum_sub_distrib,
+      Finset.sum_const, Finset.card_univ, Fintype.card_fin, ← Nat.cast_smul_eq_nsmul ℂ,
+      smul_smul]
+  rw [hsrc, map_add, map_sum, hpinδ]
+  simp only [htau_i]
+  rw [hsum_om, hd']
+  module
+
 end OddOrder.Peterfalvi.S12
