@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.S10_MinimalSimpleBasic
 import OddOrder.Peterfalvi.S08_YsetInner
 import OddOrder.Peterfalvi.S06_CertainHypothesis46
+import OddOrder.Peterfalvi.S08_CoherenceCorePart1
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core
 
 /-!
 # Peterfalvi (10.10) case (a): type-V Sibley coordinates
@@ -199,5 +201,87 @@ theorem TypeVData.isNilpotent_derivedInG_subgroupOf [Finite G] {M : Subgroup G}
   exact Group.nilpotent_of_mulEquiv
     (Subgroup.subgroupOfEquivOfLe
       (show derivedInG M ≤ M from Subgroup.map_subtype_le _)).symm
+
+open scoped FiniteInduce in
+/-- **The Peterfalvi (6.8) Sibley datum for a type-V maximal in case (8.7)(a)** (the
+first sentence of the (10.10) proof).  Assembles a
+`SibleyDadeHypothesis G M ((M').subgroupOf M)` from the §10 Hypothesis (10.1):
+
+* the split `M = M' ⋊ W₁` and its side conditions are the `TypePData` fields;
+* `H = M'` is nilpotent because type V has `M' = M_F`
+  (`TypeVData.isNilpotent_derivedInG_subgroupOf`);
+* `H^#` is TI relative to `M` by the (8.7)(a) alternative upgraded through
+  `N_G(M') = M` (`typePA_isTISubset_of_typeV_TI`);
+* the §4 Dade datum is the (10.1) `dadeData.dade` restricted to `A(M)` and recoordinated
+  to `sharpImage` (`hypothesis46CastSet` of `toHypothesis46`) — so the (6.8)(c2) branch
+  holds with **the same** `h46` and `h46.dade = dade` is `rfl`;
+* its local subgroups vanish by the (2.3) reverse direction
+  (`H_eq_bot_of_isTISubset`), as the TI situation forces — no producer measurement
+  needed (issue 1021 tick¹⁹).
+
+Feeding this to `S08.sibleySetup_is_coherent` yields the (6.8) coherence for
+`S = {Ind_{M'}^M θ | θ ≠ 1}` — the field `S` is definitionally `inducedFamily M`, i.e.
+the (10.1) `hyp.Sset`, so the case-(a) output needs no family identification. -/
+noncomputable def typeVSibleyDadeHypothesis [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : Hypothesis M) (dV : TypeVData M)
+    (hTI : IsTISubset (sharpSubgroup hyp.typeP.H)
+      (Subgroup.normalizer (hyp.typeP.H : Set G))) :
+    OddOrder.Peterfalvi.S08.SibleyDadeHypothesis G M ((derivedInG M).subgroupOf M) :=
+  have hodd : Odd (Nat.card G) := hG.odd
+  have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  have hW2der : hyp.typeP.W2 ≤ derivedInG M :=
+    hyp.typeP.W2_le.trans (inf_le_left.trans hyp.typeP.H_le)
+  have hW2M : hyp.typeP.W2 ≤ M := hW2der.trans hM'le
+  have hset : typePA M hyp.typeP
+      = OddOrder.Peterfalvi.S08.sharpImage ((derivedInG M).subgroupOf M) :=
+    (typePA_eq_sharpSubgroup_derivedInG M hyp.typeP).trans
+      (sharpImage_subgroupOf_derivedInG M).symm
+  let h46 := hypothesis46CastSet hset (hyp.toHypothesis46 hG hodd)
+  have hTI_M : IsTISubset
+      (OddOrder.Peterfalvi.S08.sharpImage ((derivedInG M).subgroupOf M)) M :=
+    hset ▸ typePA_isTISubset_of_typeV_TI hG hyp.maximal dV hyp.typeP hTI
+  { W1 := hyp.typeP.W1.subgroupOf M
+    H_ne_bot := by
+      rw [ne_eq, Subgroup.subgroupOf_eq_bot]
+      intro hdisj
+      have hbot : derivedInG M = ⊥ := disjoint_self.mp (hdisj.mono_right hM'le)
+      exact hyp.typeP.W2_nontrivial (le_bot_iff.mp (hbot ▸ hW2der))
+    H_normal := by
+      rw [show (derivedInG M).subgroupOf M = commutator ↥M by
+        rw [derivedInG, Subgroup.subgroupOf,
+          Subgroup.comap_map_eq_self_of_injective M.subtype_injective]]
+      infer_instance
+    H_nilpotent := TypeVData.isNilpotent_derivedInG_subgroupOf dV
+    split := hyp.typeP.M_complement
+    W1_nontrivial := by
+      rw [ne_eq, Subgroup.subgroupOf_eq_bot]
+      exact fun hdisj => hyp.typeP.W1_nontrivial
+        (disjoint_self.mp (hdisj.mono_right hyp.typeP.W1_le))
+    card_L_odd := hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+    H_sharp_ti := hTI_M
+    dade := h46.dade
+    hconj := OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot
+      h46.dade (fun a => h46.dade.H_eq_bot_of_isTISubset hTI_M a)
+    dade_H_eq_bot := fun a => h46.dade.H_eq_bot_of_isTISubset hTI_M a
+    S := inducedFamily M
+    S_eq := rfl
+    cases := Or.inr ⟨h46, rfl,
+      by rw [hypothesis46CastSet_K]; rfl,
+      by rw [hypothesis46CastSet_W1]; rfl,
+      by
+        rw [hypothesis46CastSet_W2]
+        have hcard : Nat.card ↥((hyp.toHypothesis46 hG hodd).W2)
+            = Nat.card ↥hyp.typeP.W2 :=
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2M).toEquiv
+        rw [hcard]
+        exact hyp.w2_prime hG,
+      by
+        rw [hypothesis46CastSet_W2]
+        exact TypePData.W2_subgroupOf_le_commutator hyp.typeP,
+      by
+        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'le).toEquiv,
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.typeP.W1_le).toEquiv]
+        exact typePData_W1_hall_coprime hG hyp.maximal (hyp.bgTypeP hG) hyp.typeP⟩ }
 
 end OddOrder.Peterfalvi.S12
