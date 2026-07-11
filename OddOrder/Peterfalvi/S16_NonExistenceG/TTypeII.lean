@@ -584,6 +584,15 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       -- zero-row branch of the proven (11.9) column-or-row dichotomy.
       -- The S/T cross orthogonality is no longer assumed: the landed exact-support
       -- consumer proves it from prime-TI support, Type-P₁ normed-TI, and order separation.
+      have hnotZeroRowProjection :
+          ¬ ∀ i : Fin hyp.base.q, ∀ j : Fin hyp.base.p,
+            ClassFunction.inner
+                (tSideDadeMap hyp hG (ν0 - ζ) -
+                  ∑ j' : Fin hyp.base.p,
+                    hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ j')
+                (hyp.base.eta i j) = 0 := by
+        -- Coq (11.8), `FTtype34_not_ortho_cycTIiso`.
+        sorry
       have hresidual :
           (∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (mT i j) ^ 2 : ℤ) ≤
               (hyp.base.p : ℤ) ∧
@@ -601,7 +610,11 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
             hyp.base (tSideDadeMap hyp hG (ν0 - ζ)) mT hmT hcolumn
         · -- Coq (11.8): exclude the zero-row projection.
           exfalso
-          sorry
+          apply hnotZeroRowProjection
+          intro i j
+          rw [← etaGridProjection_eq_zeroRow_of_coefficients_eq_row hyp.base mT hrow]
+          exact etaGrid_projection_residual_inner_eta_eq_zero
+            hyp.base (tSideDadeMap hyp hG (ν0 - ζ)) mT hmT i j
       have hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T := by
         obtain ⟨_, _, hcIII_IV, _, _, _⟩ :=
           OddOrder.BG.Ch4.S16.proposition_type_classification

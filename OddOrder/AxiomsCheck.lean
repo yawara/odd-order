@@ -126,7 +126,7 @@ import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 
 -- 機械列挙ファイル (flagship axioms check) のため分割対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 7500
+set_option linter.style.longFile 7700
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -3490,6 +3490,14 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.etaGrid_zeroColumn_projection_of_coefficients_eq_column
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.etaGridProjection_inner_eta
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.etaGrid_projection_residual_inner_eta_eq_zero
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.etaGridProjection_eq_zeroRow_of_coefficients_eq_row
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.typeIII_induced_source_support
 set_option linter.style.longLine false in
