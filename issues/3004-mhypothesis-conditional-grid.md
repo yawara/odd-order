@@ -585,3 +585,24 @@ AxiomsCheck red となったため、hub が fix-forward で除去した (数学
 戻す。**運用規約の再確認**: sorried-cite 定理 (deep input が未 discharge のもの) は assert しない —
 assert は「現に sorry-free」の tripwire であり、意図の宣言ではない。push 前に
 `lake build OddOrder.AxiomsCheck` の **exit code** まで確認すること (`| tail` は exit を潰す)。
+
+## lane-c (13.18.a) beta support の pointwise-value 縮約 (2026-07-11)
+
+feature commit: `f686612e`。
+
+- `betaGrid_support_sharpP_union_typePV_of_values` を実証明。`betaGrid` の値について
+  (i) 単位元で 0、(ii) `S′−P` 上で μ₀ⱼ が 0、(iii) `W₁#` 上で μ₀ⱼ が 1、の三入力だけから
+  `supp(betaGrid) ⊆ P# ∪ conjClassSetIn S (typePV S Sdata)` を得る。
+  証明は (2.1) `mem_compl_conj_into_W` と、既存の `indPW1` の `S′−P` / `W₁#` 値公式を
+  group case split で合成する。この定理単体は `#print axioms` で
+  `propext` / `Classical.choice` / `Quot.sound` のみと確認し、AxiomsCheck に登録した。
+- `PW1_index_eq_u`、`betaGrid_apply_one_eq_zero`、および μ-value から上記 support と
+  cross-Dade 直交へ運ぶ wrappers も実証明した。ただしこれらは既存の cardinality/order
+  chain や Type-P₁ escape/BG D(4) chain を通じて `sorryAx` を推移継承するため、
+  AxiomsCheck には登録しない。
+- 従って (13.18.a) の character-side residual は、group-support の集合論ではなく exact に
+  μ₀ⱼ の二つの pointwise value (`S′−P` 上 0、`W₁#` 上 1) へ縮約された。
+  end-to-end の cross term は、これらの exact values と上記 upstream gates が閉じた時点で
+  既存 wrappers により直ちに閉じる。
+- main merge `e29e69a3` 後、`TGapCross` と AxiomsCheck (4131 jobs) を単独実行し green。
+  `git diff --check` clean。新 axiom・新 sorry なし。
