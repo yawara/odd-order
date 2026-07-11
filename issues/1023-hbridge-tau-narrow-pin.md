@@ -117,3 +117,20 @@ routes (α)/(β) を supersede。Coq の (11.8.6) は我々の capstone + 両 so
 
 Coq 参照: PFsection5.v:960-1056 (coherent_ortho + bridge_coherent) /
 PFsection11.v:905-990 ((11.8.6) 本体、tau2muj WLOG、γ-trick、odd 排除)。
+
+## 2026-07-12 tick⁵ — coherent_ortho port の stratum 一般化が hmixed への最短路
+
+- 9083 の port (`coherent_extension_eq_sum_memberRFamily` / `coherent_extension_cross_orthogonal`、
+  S11_NineElevenPairAdjoin:342/:404、axiom-clean) は **T₁,T₂ ⊆ 𝒮(H₀C′) 固定** —
+  R-dispatcher `sOf_H0Cprime_memberRFamily` とその `_orthogonal` が H0Cprime stratum 特化。
+- hmixed = ⟨c₂.ext χ, c₁.ext φ⟩ = 0 for χ ∈ 𝒮(H₀C), φ ∈ S(HC) — **異 stratum cross**。
+  必要な一般化: R-dispatcher と cross-orthogonality を「S((M′)#) = inducedKernelFamily ⊥ の
+  conj-closed 部分族」レベルに持ち上げ (証明 body は stratum を hIKF ↓ ⊥-family 経由でしか
+  使っていない — :355-360/:418-423 の hIKF が唯一の stratum 接点、⊥-antitone で任意 stratum
+  から落ちる)。両 stratum の族が ⊥-family 内で pairwise 直交 ✓
+  (inducedKernelFamily_pairwise_orthogonal) / χ ∉ {φ, φ̄} ✓ (stratum 素、既存
+  SOf_HC_inner_sOf_H0C_eq_zero 系)。
+- **実装 plan (次 tick)**: S11_NineElevenPairAdjoin の CoherentOrtho section に
+  stratum-generic 変種 (`memberRFamily` の ⊥-family 版 + cross_orthogonal の 2-stratum 版) を
+  追加 (dispatcher 構築 :~200-330 の stratum 依存を先に読む) → S13_Orthogonality capstone の
+  hmixed を実 discharge。hbridge_τ (WLOG-swap) は hmixed 後。
