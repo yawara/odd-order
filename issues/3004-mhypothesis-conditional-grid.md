@@ -606,3 +606,23 @@ feature commit: `f686612e`。
   既存 wrappers により直ちに閉じる。
 - main merge `e29e69a3` 後、`TGapCross` と AxiomsCheck (4131 jobs) を単独実行し green。
   `git diff --check` clean。新 axiom・新 sorry なし。
+
+## lane-c (14.9) cross term の exact-value 配線 (2026-07-11)
+
+feature commit: `43033a7b`。
+
+- `T_typeIII_ratio_le` の opaque 入力から S/T cross 直交そのものを除去した。
+  残る入力は (11.9) の zero-column projection と、前節で同定した μ₀₁ の二つの
+  pointwise value (`S′−P` 上 0、`W₁#` 上 1) だけである。
+- Type-III 仮定から BG の type classification により `IsTypeP1 T` を導き、
+  `reconciled_typePData_T` と
+  `tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_mu_values` を接続した。これにより cross term は
+  exact values、Type-P₁ normed-TI、order separation、β-support の既証明 chain から導出され、
+  `gap_cross_inner_identity` へ渡される。
+- main に入った `S12.Hypothesis.SHC_tau_muColumnZero_sub_zeta` も独立に照合したが、仮定
+  `w₁ < w₂` は T-side の `w₁=p`, `w₂=q` と `q<p` に対して向きが逆であり、今回の
+  zero-column projection を直接 discharge しない。このため hub 追記の方向性は cross 側では
+  正しく、projection 側には別 producer が依然必要である。
+- `TTypeII.lean` は 1497 行で 1500-line trigger 未満。leaf build と
+  AxiomsCheck (4134 jobs) は exit 0、`git diff --check` clean。実 `sorry` は従来の 2 箇所のまま、
+  新 axiom・新 sorry なし。commit 前 `git merge main` は up to date。
