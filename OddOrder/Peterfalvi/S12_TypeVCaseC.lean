@@ -983,3 +983,83 @@ noncomputable def Hypothesis.typeV_caseC_coherence_engine [Finite G] {M : Subgro
     hmixed Dset hDτ hgen
 
 end OddOrder.Peterfalvi.S12
+
+/-! ### (10.10.2): the case-(c) structural package — `p³` character theory
+
+Peterfalvi (10.10.2): "`S = S₁ ∪ {μ_j | 0 < j < p}`, where `S₁` consists of `(p²−1)/w₁`
+irreducible characters of degree `w₁`.  In the notation of (10.3), `d = p`, `δ = −1` and
+`n = 2`."  Case (c) of Definition (8.7) supplies `|H| = p³` for `H = M′` non-abelian and
+`p = w₂`; this section derives the structural conclusions feeding
+`typeV_caseC_coherence_engine`: the abelianization order `|H : H′| = p²`
+(via `IsExtraspecial.of_card_eq_prime_cube`, which is Peterfalvi's "`H′ = Z(H)` has order
+`p`"), the `h8` count `|S₁| = 4(w₁−1) ≥ 8`, the identification `W₂ = H′ = M″`, and the
+`hstruct` dichotomy `φ ∈ S₁ ∨ φ = μ_j`.  The numeric pins `δ = −1`, `n = 2` from
+`d = p = 2w₁ − 1` are the earlier `delta_eq_neg_one` / `n_eq_two`. -/
+
+namespace OddOrder.Peterfalvi.S12
+
+open OddOrder.RepresentationTheory
+open OddOrder.GroupTheory
+
+variable {G : Type*} [Group G]
+
+/-- **Peterfalvi (10.10.2), the abelianization order**: a non-abelian group of order `p³` has
+`|K/K′| = p²`.  Book: "Since `H` is a non-abelian group of order `p³`, `H′ = Z(H)` has order
+`p`" — this is `IsExtraspecial.of_card_eq_prime_cube` (which also gives `K′ = Z(K)`), and
+`|K| = |K/K′|·|K′|` leaves `|K/K′| = p³/p = p²`.  This is the order of `H/H′` behind the
+`S₁`-count `(|H : H′| − 1)/w₁ = (p² − 1)/w₁` of (10.10.2). -/
+theorem card_abelianization_eq_prime_sq_of_card_eq_prime_cube {K : Type*} [Group K] [Finite K]
+    {p : ℕ} (hp : p.Prime) (hcard : Nat.card K = p ^ 3)
+    (hnonab : ¬ IsMulCommutative K) :
+    Nat.card (Abelianization K) = p ^ 2 := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hext : IsExtraspecial p K :=
+    IsExtraspecial.of_card_eq_prime_cube hcard fun hcomm => hnonab ⟨⟨hcomm⟩⟩
+  have hcomm_card : Nat.card ↥(commutator K) = p := hext.commutator_card
+  have heq := Subgroup.card_eq_card_quotient_mul_card_subgroup (commutator K)
+  rw [hcard, hcomm_card] at heq
+  have habel : Nat.card (Abelianization K) = Nat.card (K ⧸ commutator K) := rfl
+  have hmul : Nat.card (K ⧸ commutator K) * p = p ^ 2 * p := by rw [← heq]; ring
+  rw [habel]
+  exact Nat.eq_of_mul_eq_mul_right hp.pos hmul
+
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (10.10.2), the `h8` count `|S₁| = 4(w₁ − 1) ≥ 8`**: with `|M′| = p³`
+non-abelian and `p = 2w₁ − 1` ((10.10.1)), the degree-`w₁` irreducible members of `S`
+number `|S₁| = (p² − 1)/w₁ = 4(w₁ − 1) ≥ 8` (for `w₁ ≥ 3`).  Combines the (11.8.1) orbit
+count `|M′/M″| = w₁·|S₁| + 1` (`card_abelianization_derived_eq_w1_mul_card_SHCSet_add_one`)
+with the abelianization order `|M′/M″| = p²`
+(`card_abelianization_eq_prime_sq_of_card_eq_prime_cube`):
+`w₁·|S₁| + 1 = (2w₁ − 1)²` forces `|S₁| = 4w₁ − 4`.  This discharges the `h8` input of
+`typeV_caseC_coherence_engine` and of the (10.10.3) computations. -/
+theorem Hypothesis.eight_le_SHCcount_of_card_eq_prime_cube [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) {p : ℕ} (hp : p.Prime)
+    (hcard : Nat.card ↥((derivedInG M).subgroupOf M) = p ^ 3)
+    (hnonab : ¬ IsMulCommutative ↥((derivedInG M).subgroupOf M))
+    (hp2w1 : (p : ℤ) = 2 * (hyp.w1 : ℤ) - 1) (hw13 : 3 ≤ hyp.w1) :
+    8 ≤ (Finset.univ.filter fun χ : IrreducibleCharacter ↥M =>
+      (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
+        (χ : ClassFunction ↥M ℂ) 1 = (hyp.w1 : ℂ)).card := by
+  haveI := hyp.finiteG
+  classical
+  have horbit := hyp.card_abelianization_derived_eq_w1_mul_card_SHCSet_add_one hG
+  rw [card_abelianization_eq_prime_sq_of_card_eq_prime_cube hp hcard hnonab] at horbit
+  have hZ : (p : ℤ) ^ 2 = (hyp.w1 : ℤ)
+      * ((Finset.univ.filter fun χ : IrreducibleCharacter ↥M =>
+          (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
+            (χ : ClassFunction ↥M ℂ) 1 = (hyp.w1 : ℂ)).card : ℤ) + 1 := by
+    exact_mod_cast horbit
+  rw [hp2w1] at hZ
+  have hw13' : (3 : ℤ) ≤ (hyp.w1 : ℤ) := by exact_mod_cast hw13
+  have hcardeq : ((Finset.univ.filter fun χ : IrreducibleCharacter ↥M =>
+      (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
+        (χ : ClassFunction ↥M ℂ) 1 = (hyp.w1 : ℂ)).card : ℤ) = 4 * (hyp.w1 : ℤ) - 4 := by
+    have hw1ne : (hyp.w1 : ℤ) ≠ 0 := by omega
+    refine mul_left_cancel₀ hw1ne ?_
+    linear_combination -hZ
+  have h8 : (8 : ℤ) ≤ ((Finset.univ.filter fun χ : IrreducibleCharacter ↥M =>
+      (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
+        (χ : ClassFunction ↥M ℂ) 1 = (hyp.w1 : ℂ)).card : ℤ) := by omega
+  exact_mod_cast h8
+
+end OddOrder.Peterfalvi.S12
