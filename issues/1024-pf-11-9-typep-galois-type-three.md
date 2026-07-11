@@ -78,7 +78,51 @@ Hypothesis (11.2) (M maximal, type III/IV)、ζ ∈ 𝒮(HC):
       部品: a₀₀=1/ψ∈ZIrr/‖ψ‖²=w₁+1/vanish-on-V は (10.9)
       `inner_tau_muColumnZero_sub_zeta_alignedOmegaSigma_of_w1_lt_w2` (S12_Prop109:369) と同一
       pattern。SHC-coherence 直交 (τ₁(ζ−ζ̄)⊥grid 系) = S12_Prop109:798-993 の SHC_extension 群。
-      **未在 = grid の cfAut равivariance (Coq cycTIiso_aut_exists / cfExp_prime_transitive)**。
+
+  ### P2 実装計画 (2026-07-12 iteration 2 survey — 材料名 code-level 確定済)
+
+  **Galois toolbox は大部分既存**:
+  - ν 存在 (ζ↦ζ^k 実現の ℂ≃+*ℂ): `exists_complexRingEquiv_pow_of_rootsOfUnity` /
+    **`exists_complexRingEquiv_pow_and_fixed`** (a-側固定+b-側 k 乗 = CRT 形、行/列の片側固定に使う)
+    / `exists_pow_forall_rootsOfUnity` (CyclotomicGaloisAction.lean)。
+  - **τ∘ν=ν∘τ**: `dadeIntegralCharacterMap_mapRingEquiv_comm` (S07_CoherenceGalois:51)。
+  - **σ∘ν=ν∘σ**: `sigma_mapRingEquiv_comm` (S05_SigmaIsometry:885) +
+    `exists_mapRingEquiv_sigma_omega_pow` (:936) + galoisMap-omega-power bridge
+    (`exists_intCast_sigma_omega_apply` :1097 の hbridge パターン = (3.9)(c) 実装)。
+  - Adams=Galois: `mapRingEquiv_apply_eq_apply_pow_of_mem_ZIrr` (CyclotomicGaloisAction:186)。
+  - (5.3.b) τ₁ζ⊥grid: **`SHC_extension_inner_alignedOmegaSigma_eq_zero`**
+    (S12_Props109To1011:367、coh : IsCoherent tau SHCSet A0 で)。SHC coherence 供給 =
+    `SHC_isCoherent` (S12_Prop109:629)。τ(ζ−ζ̄) 橋 = `tau_zeta_sub_conj_eq_SHC_extension` (:968)。
+  - ZIrr 内積の ℤ 値: `inner_mem_ZIrr_int` (InducedCharacter.lean、shared ✓)。
+  - SHCSet = {ζ ∈ inducedFamily | irr ∧ ζ1=w1} (membership tuple ⟨hζS,hζirr,hζ1⟩ で span cite)。
+
+  **新規に要る sub-lemma 4 本**:
+  - **(G1) μ₀ 列の mapRingEquiv 不変性**: `certainType_mu_conj_eq` (S06_CertainTypeConjugation) の
+    一般 σ 版 → mapRingEquiv σ (Σᵢ muGrid i 0) = Σᵢ muGrid i 0 (χ₂=1 列は σ で列不変・行 permute、
+    和不変)。fallback = 値有理性 route (列0 = M′-kernel 線形指標列: `muGrid_zero_column_apply_one`
+    (CharacterParameters:1434) + within-column 機構で値 ∈ {0..} 有理 → pointwise 固定)。
+  - **(G2) ZIrr-Galois 等長 ⟨νf,νg⟩=⟨f,g⟩ の shared 化**: `inner_mapRingEquiv_eq_of_mem_ZIrr` は
+    S16_NonExistenceG/TGapGalois.lean (c 所有、S16-deep import) に在り S13 から import 不可 —
+    GaloisCharacter.lean へ hoist (proof は c 版 mirror、`apply_inv_eq_star_of_mem_ZIrr` +
+    `inner_mem_ZIrr_int` cite、~30 行)。9000 scan 済 (claim 衝突なし)。hub へ dedup note。
+  - **(G3) grid の Galois index-作用**: mapRingEquiv σ (alignedOmegaSigmaGrid i j) =
+    alignedOmegaSigmaGrid i' j' — sigma_mapRingEquiv_comm + hbridge + product 構造
+    `exists_alignedOmegaSigmaGrid_chiFam_product` (ρ,κ injective→bijective、card一致) で index 算術。
+    j≠0 の Galois 軌道 = 全非自明列 (w₂ 素数)、i-側固定は exists_complexRingEquiv_pow_and_fixed。
+  - **(G4) inducedFamily の mapRingEquiv 安定性**: conj 版 `inducedFamily_closedUnderConjugate` の
+    一般 σ 版 (galoisMap on Irr(M′) + induce-mapRingEquiv 可換)。
+
+  **a_aut + 組立** (書籍 (a) mirror):
+  ν(τφ) = τφ + τ(ζ−ζ^ν)、τ(ζ−ζ^ν) = τ₁ζ−τ₁ζ^ν ⊥ grid ⟹
+  a(νη) = ⟨ν(τφ), νη⟩ (G2) = ⟨τφ + ⊥grid 項, νη⟩ = a(η) ⟹ 行/列定数性
+  a_i0 = a₁₀ (i≠0)、a_0j = a₀₁ (j≠0)。分離 (`sigmaCoeff_add_eq`) で a_ij = a_i0+a_0j−1。
+  Bessel: Σa² + ‖χ‖² = ‖ψ‖² = w₁+1、χ≠0 (⟨ψ,τ(ζ−ζ̄)⟩=−1≠0 + τ(ζ−ζ̄)⊥grid) + ‖χ‖²∈ℕ ⟹
+  Σa² ≤ w₁。Σa² = 1+(w₁−1)a₁₀²+(w₂−1)a₀₁²+(w₁−1)(w₂−1)a₁₁² (a∈ℤ)。
+  case: a₁₁≠0 ⟹ (w₁−1)(w₂−1)≤w₁−1 ⟹ w₂≤2 ✗ (w₂≥3 奇素数)。a₁₁=0 ⟹ a₀₁=1−a₁₀。
+  a₁₀≠0 ⟹ (w₁−1)a₁₀²≥w₁−1 ⟹ a₀₁=0 ⟹ a₁₀=1 ⟹ X=列0 ⟹ h118 矛盾。∴ a₁₀=0、a₀₁=1 = 行0 形。∎
+  新 leaf = `S13_TypeIIIGalois.lean` (import: S13_Orthogonality + S12_Props109To1011 +
+  S07_CoherenceGalois + S06_CertainTypeConjugation)。着手順 = G2 (shared hoist) → G4 → G1 → G3 →
+  本体。
 - [ ] **P3 (c) 組立**: u=a → q<p 矛盾 → Galois → `U_cyclic` → `isTypeIII_of_isTypeIIIorIV`
       (普遍 Type-IV 排除) + T-side 供給形 (c が cite する signature)。
   - [x] **q∣u−1 部品 landed (2026-07-12)**: `card_uActionHom_range_modEq_one` (u ≡ 1 mod q、
