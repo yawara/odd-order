@@ -1419,6 +1419,10 @@ noncomputable def section16CharacterData_of_isMinimalSimpleOdd {G : Type*} [Grou
           exact hx (OddOrder.GroupTheory.mem_conjClassSet.mpr ⟨a, ha, c, hc⟩))
       eta_row_vanish_of_one_zero := fun x h0 i hi =>
         Section16CharacterData.tau3W_omegaS_row_vanish_of_one_zero hG mp tp h0 i hi
+      eta_row_galois_orbit :=
+        Section16CharacterData.tau3W_omegaS_row_galois_orbit hG mp tp
+      eta_column_galois_orbit :=
+        Section16CharacterData.tau3W_omegaS_column_galois_orbit hG mp tp
       eta_intCast_of_coprime := fun g hg i j =>
         Section16CharacterData.tau3W_omegaS_intCast_of_coprime hG mp tp i j hg
       eta_pair_of_coprime := fun g hg i j =>
@@ -1519,6 +1523,8 @@ noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [F
     eta_complete_vanish := cd.eta_complete_vanish
     eta_fourcorner_vanish := cd.eta_fourcorner_vanish
     eta_row_vanish_of_one_zero := cd.eta_row_vanish_of_one_zero
+    eta_row_galois_orbit := cd.eta_row_galois_orbit
+    eta_column_galois_orbit := cd.eta_column_galois_orbit
     eta_intCast_of_coprime := cd.eta_intCast_of_coprime
     eta_pair_of_coprime := cd.eta_pair_of_coprime
     eta_principal_of_coprime := cd.eta_principal_of_coprime }
@@ -1648,6 +1654,8 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       eta_complete_vanish := inp.eta_complete_vanish
       eta_fourcorner_vanish := inp.eta_fourcorner_vanish
       eta_row_vanish_of_one_zero := inp.eta_row_vanish_of_one_zero
+      eta_row_galois_orbit := inp.eta_row_galois_orbit
+      eta_column_galois_orbit := inp.eta_column_galois_orbit
       eta_intCast_of_coprime := inp.eta_intCast_of_coprime
       eta_pair_of_coprime := inp.eta_pair_of_coprime
       eta_principal_of_coprime := inp.eta_principal_of_coprime }
@@ -1769,4 +1777,3 @@ theorem feitThompson {G : Type*} [Group G] [Finite G]
   feitThompson_of_noMinimalSimpleOdd (fun _ _ _ hG => noMinimalSimpleOdd hG) hodd
 
 end OddOrder
-
