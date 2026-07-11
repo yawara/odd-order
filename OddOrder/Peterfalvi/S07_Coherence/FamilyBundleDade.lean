@@ -341,6 +341,21 @@ theorem dadeIntegralCharacterMap_apply_of_support (hyp : S04.Hypothesis G A L)
   simpa [dadeIntegralCharacterMap, LinearMap.restrictScalars_apply,
     Hypothesis.dadeLinearMap_apply] using key
 
+/-- **The Dade lift commutes with conjugation on supported inputs** (Coq `Dtau` conj step of
+`GammaReal`): on `CF(L, A)` the lift is the §4 Dade map (`…_apply_of_support`), which is a
+pointwise evaluation and hence `star`-equivariant (`Hypothesis.dadeMap_conj`); the conjugate
+input is supported on the same set. -/
+theorem dadeIntegralCharacterMap_conj_of_support (hyp : S04.Hypothesis G A L)
+    (dade : S04.FullDadeIsometryData (G := G) hyp)
+    {φ : ClassFunction (↥L) ℂ} (hφ : φ.support ⊆ supportInSubgroup A L) :
+    (dadeIntegralCharacterMap hyp dade φ).conj
+      = dadeIntegralCharacterMap hyp dade φ.conj := by
+  have hφc : φ.conj.support ⊆ supportInSubgroup A L := by
+    rw [ClassFunction.conj_support]; exact hφ
+  rw [dadeIntegralCharacterMap_apply_of_support hyp dade hφ,
+    dadeIntegralCharacterMap_apply_of_support hyp dade hφc,
+    hyp.dadeMap_conj]
+
 /-- Every element of the integral span `ℤ[S]` of a set `S` of **supported** class functions is
 itself supported.
 
