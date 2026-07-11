@@ -134,3 +134,15 @@ PFsection11.v:905-990 ((11.8.6) 本体、tau2muj WLOG、γ-trick、odd 排除)�
   stratum-generic 変種 (`memberRFamily` の ⊥-family 版 + cross_orthogonal の 2-stratum 版) を
   追加 (dispatcher 構築 :~200-330 の stratum 依存を先に読む) → S13_Orthogonality capstone の
   hmixed を実 discharge。hbridge_τ (WLOG-swap) は hmixed 後。
+
+## 2026-07-12 tick⁶ — ★★ hmixed 完全 discharge (commits 39b8e023 + 87da4bdf)
+
+- SOf-stratum-generic dispatch (5 decls、AlphaBound) + 2-stratum coherent_ortho (2 decls、
+  PairAdjoin) が共に**一発 green**。capstone の hmixed sorry を実証明に置換 (両辺 0:
+  character-level cross-zero + image-level cross_orthogonal)。
+- **capstone 残 sorry = hbridge_τ 1 本のみ** (S13_Orthogonality:348)。
+- 残作業 = tick⁴ route (γ) の WLOG-swap: capstone を「pin 付き 𝒮(H₀C)-coherence の存在」で
+  再編 (all-reducible case = uniform canonical coherence に交換 / irr case = (5.8)-dichotomy +
+  ⟨τ₂μ, ω-col⟩ ≠ 0 内積論法 + odd-conjugation 符号排除)。γ-trick の cross-直交は
+  SOf_coherent_extension_cross_orthogonal (本 tick で landed) が供給。
+- followup (低優先): H0Cprime 版 dispatch 5+2 decls を SOf 版の thin instance に fold。
