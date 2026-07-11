@@ -1150,7 +1150,7 @@ theorem tauS_mu_row0_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have hμne : hyp.mu ⟨0, hyp.q_prime.pos⟩ j
         ≠ hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩ :=
       hyp.mu_row0_ne hj1
-    have hsupp := hyp.tauS_mu_row0_diff_support j
+    have hsupp := hyp.tauS_mu_row0_diff_support j _hj
     have hZIrrS : (hyp.mu ⟨0, hyp.q_prime.pos⟩ j
           - hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)
         ∈ ZIrr (↥hyp.S) :=
@@ -1203,7 +1203,7 @@ theorem tauS_mu_row0_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           - ((1 : ℤ) : ℂ) • (hyp.eta ⟨0, hyp.q_prime.pos⟩ j
               - hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)) x = 0 := by
       intro x hx
-      have hv := hyp.tauS_mu_row0_vanish_on_V hG j x hx
+      have hv := hyp.tauS_mu_row0_vanish_on_V hG j _hj x hx
       simpa [hD] using hv
     -- (3.8) rigidity: a norm-`2` `ZIrr` character agreeing with `η_{0j} − η_{0,#1}` on `V` is it.
     have hrig := OddOrder.Peterfalvi.S16.eta_diff_rigidity hyp hXZ hX2

@@ -850,26 +850,40 @@ theorem Hypothesis.residueS_mu2_diff_dade_apply_of_mem_V [Finite G]
   exact OddOrder.Peterfalvi.S06.certainType_diff_dade_apply_eq_of_mem_V
     (hyp.hyp46S hG) hχj hχk i hdeg hv
 
+/-- **Peterfalvi (13.3)(a), row-`0` degree equality** (Coq `FTprTIred1`, `PFsection13.v:276`,
+through `prTIred_1`, `PFsection4.v:552`): for `j ≥ 1` the reducible column sum `μ_j` is induced
+from a *linear* character of the abelian Fitting factor `PC` (Pf (13.3)(a), via
+`typeP_reducible_core_Ind`), so `μ_j(1) = uq` uniformly in `j`, whence the per-entry degrees
+`μ_{0j}(1) = μ_j(1)/w₁ = u` agree across nontrivial columns.  This equality form is exactly how
+Coq's `defGamma` discharges the degree hypothesis of `prDade_sub_TIirr`
+(`PFsection13.v:1909`: `mulfI (neq0CG W1)` cancellation against `prTIred_1` + `FTprTIred1`).
+Genuine Pf (13.3)(a) mathematics — not derivable from the abstract grid fields
+(`mu_degree_modEq_delta` gives only the mod-`q` congruence); cf. issues 9076/9014. -/
+theorem Hypothesis.mu_row0_apply_one_eq [Finite G] (hyp : Hypothesis (G := G))
+    {j k : Fin hyp.p} (hj0 : (j : ℕ) ≠ 0) (hk0 : (k : ℕ) ≠ 0) :
+    hyp.mu ⟨0, hyp.q_prime.pos⟩ j 1 = hyp.mu ⟨0, hyp.q_prime.pos⟩ k 1 := sorry
+
 /-- **Prime-`TI` support pin** (Coq `prDade_sub_TIirr_on`, `PFsection4.v`): the `μ`-column
 difference `μ_{0j} − μ_{0,#1}` is supported inside `A₀(S) = A(S) ∪ V^S` — its support meets `S`
 only in `P^# ∪ V_S`, because the two prime-`TI` residues share the same `1_S`-part off `A₀(S)` and
 it cancels in the difference.  This is the `S`-side instance of Coq `prDade_sub_TIirr_on`
-(`μ2_{ij} − μ2_{ik} ∈ 'CF(S, 'A0)`).  Prime-`TI` theory, cf. issue 9014.
+(`μ2_{ij} − μ2_{ik} ∈ 'CF(S, 'A0)`).
 
-**⚠ over-claim (2026-07-08 lane-c 精査; issue 9076)**: 本 pin は `∀ j` だが **`j = 0` で偽**、`j ≠ 0`
-が要る。consumer `tauS_mu_row0_cross` (S15_SAndT:4020) は `(_hj : (j:ℕ) ≠ 0)` を持ち **j≠0 でのみ**
-呼ぶ。j=0 は trivial column: `chi_zero`+`chi_res` ⟹ `mu2 0 0 (1) = 1` (Res_PU = trivial) だが
-`mu2 0 j (j≠0)` は residue degree ⟹ `(μ_{00}−μ_{0,#1})(1) ≠ 0`、`1 ∉ A₀` ゆえ support ⊄ A₀
-(`certainType_diff_supp_subset_A0` の `z=1` 分岐が `hdeg` を要求、S06_CertainTypeIsometry:287)。
-**honest fix** = signature に `(hj0 : (j:ℕ) ≠ 0)` を追加 (b が consumer で `_hj` を pass、cross-lane
-2-step)。**honest close (j≠0)** = `hyp46S` の `certainTypeDiffSupported` (`hdeg` は
-`forall_columnFamily_mu_apply_one_eq_of_sum_eq` 経由 — 両 residue column の sum-degree 一致) +
-grounding `hyp.mu = residueS.mu2`. -/
+**Honest signature (issue 9076, 2026-07-11)**: carries `(hj0 : (j:ℕ) ≠ 0)` — the unrestricted
+`∀ j` form is *false* at the trivial column `j = 0` (`μ_{00}(1) = 1 ≠ μ_{0,#1}(1)`, and `1 ∉ A₀`).
+The sole consumer `tauS_mu_row0_cross` (S15_SAndT) passes its `_hj`.  Discharged from the
+`(13.18)` grounding field `mu_diff_support` (issue 9081: producer-supplied from the proven
+`Section16CharacterData.muS_diff_support`, Dade-free via `hyp46SmpCore`); the remaining supply is
+the degree equality `mu_row0_apply_one_eq` (Pf (13.3)(a)). -/
 theorem Hypothesis.tauS_mu_row0_diff_support [Finite G] (hyp : Hypothesis (G := G))
-    (j : Fin hyp.p) :
+    (j : Fin hyp.p) (hj0 : (j : ℕ) ≠ 0) :
     (hyp.mu ⟨0, hyp.q_prime.pos⟩ j
         - hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩).support
-      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set hyp.S hyp.Sdata) hyp.S := sorry
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set hyp.S hyp.Sdata) hyp.S :=
+  hyp.mu_diff_support ⟨0, hyp.q_prime.pos⟩
+    (fun h => hj0 (congrArg Fin.val h))
+    (fun h => one_ne_zero (congrArg Fin.val h))
+    (hyp.mu_row0_apply_one_eq hj0 one_ne_zero)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Prime-`TI` `V`-value pin** (Coq `prTIirr_id` + Dade `Dade_id` on the regular set): on the
@@ -878,9 +892,14 @@ regular classes `conjClassSet(W \ (W₁ ∪ W₂)) = V^S`, the `'A0(S)`-Dade lif
 same `ω`-value there: `τ_S = Ind_S^G` on `A₀(S)`-support (`normedTI 'A0`, `H = ⊥`) followed by the
 prime-`TI` restriction identity `μ_{0j}|_V = ω`-value (Coq `prTIirr_id`), matching
 `η_{0j}|_V = ω_{0j}|_V` (the (3.3) `τ₃ = Dade` identity on `V`).  Prime-`TI` theory, cf. issue
-9014. -/
+9014.
+
+**Honest signature (issue 9076, 2026-07-11)**: carries `(hj0 : (j:ℕ) ≠ 0)` — the `V`-value
+identity is meaningful only for the residue columns `j ≠ 0` (same honest fix as
+`tauS_mu_row0_diff_support`); the sole consumer `tauS_mu_row0_cross` passes its `_hj`. -/
 theorem Hypothesis.tauS_mu_row0_vanish_on_V [Fintype G] [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) (j : Fin hyp.p) :
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) (j : Fin hyp.p)
+    (hj0 : (j : ℕ) ≠ 0) :
     ∀ x ∈ conjClassSet ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))),
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
           ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG))
