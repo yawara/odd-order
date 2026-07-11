@@ -293,17 +293,18 @@ is type III, build `calT1 = seqIndD QV T QV Q` (the degree-`p` induced character
 `T' = Q ⊔ V` via `T_deriv_eq_QV`), coherent by uniform-degree coherence
 (`S07.coherent_of_constant_degree` / Coq `uniform_degree_coherence`).
 
-The T-side inputs are now fully constructed: `T_typeIII_calT1_family` and its orbit count give
+The T-side family data are constructed: `T_typeIII_calT1_family_galois` and its orbit count give
 `|calT1| = (|V|−1)/p`; `T_typeIII_calT1_isCoherent` supplies the coherent extension; the direct
 (13.4) producer `T_side_caseB_facts` gives `D = ⊥`, hence `|V| = v`; and
 `T_typeIII_coherent_image_inner_eta_eq_zero` proves every coherent image orthogonal to the shared
 `eta`-grid by restricting the full type-P1 Dade map and applying the norm-two rigidity engine.
 
-Consequently the sole residual is the S-side gap parity statement: integers `x_ζ` with
-`⟨Γ, τ₁ζ⟩ = x_ζ ≠ 0` for every `ζ ∈ calT1` (Coq `nzT1_Ga`, using
-`cfdot_real_vchar_even`).  Once supplied, the proven Γ-Bessel skeleton
-`T_typeIII_ratio_le_of_sSide_gap` combines orthogonality, the exact count, and the concrete
-(13.18.d) bound `betaData.Y_norm_bound` to obtain
+The prime-TI anchor is fixed by coefficient Galois automorphisms, so the full eta-axis orbits now
+give axis constancy and the sharp norm gives the column-or-row projection dichotomy.  The sole
+remaining local residual in this ratio theorem is Coq (11.8)
+`FTtype34_not_ortho_cycTIiso`, which excludes the wrong zero-row alternative.  After it, the proven
+Γ-Bessel skeleton `T_typeIII_ratio_le_of_sSide_gap` combines orthogonality, the exact count, and
+the concrete (13.18.d) bound `betaData.Y_norm_bound` to obtain
 `(v − 1)/p ≤ (u − 1)/q`, contradicting the strict (14.8) inequality. -/
 theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T) :
@@ -332,8 +333,8 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   -- the coherent map `τ₁ = hτ.extension`.  Its image `calT1 := τ₁(calT1_set)` is an **orthonormal**
   -- set of `G`-class functions (`horth`), because `τ₁` is an isometry on `ℤ[calT1_set]`
   -- (`IsCoherent.extension_inner_eq`) and the source members are orthonormal irreducibles.
-  obtain ⟨𝒯, hinertia, hne, hlinear, hconj𝒯, hcount_V⟩ :=
-    T_typeIII_calT1_family hyp hIII.some
+  obtain ⟨𝒯, hinertia, hne, hlinear, hconj𝒯, hgalois𝒯, hcount_V⟩ :=
+    T_typeIII_calT1_family_galois hyp hIII.some
   set calT1_set : Set (ClassFunction ↥hyp.base.T ℂ) :=
     ↑(𝒯.image (fun θ => ClassFunction.induce
       ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction)) with hcalT1
@@ -456,6 +457,12 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact hτ.extension_mem_ZIrr ζ (Submodule.subset_span hζT)
   have hdiff_supp := T_typeIII_calT1_difference_support
     hyp hG hIII 𝒯 hlinear calT1_set hcalT1
+  have hgaloisT : ∀ (sigma : ℂ ≃+* ℂ) ξ, ξ ∈ calT1_set →
+      ClassFunction.mapRingEquiv sigma ξ ∈ calT1_set := by
+    intro sigma ξ hξ
+    rw [hcalT1] at hξ ⊢
+    exact inducedFamily_mapRingEquiv_mem
+      ((derivedInG hyp.base.T).subgroupOf hyp.base.T) 𝒯 hgalois𝒯 sigma hξ
   -- This is now the exact remaining (14.9) character construction: for each coherent image
   -- `a = τ₁ζ`, build `Δ_a = τ_T(ν₀ - ζ) - 1_G + a`, prove it real/virtual and orthogonal
   -- to `1_G`, and establish the expansion `⟨Γ,a⟩ = 1 + ⟨Δ_a,Γ⟩`.  All integrality and
@@ -481,8 +488,8 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction) := by
       simpa only [hζeq] using hirr ζ hζT
     obtain ⟨ν0, hνZ, hνR, hβZ, hβsupp, hτβZ, hτβ1, hβconj,
-        hνinner, hνζ, hνζc, hβnorm, hτβnorm⟩ :=
-      exists_typeIII_induced_primeTIDifference_with_norm_and_anchor_orthogonality
+        hνinner, hνζ, hνζc, hβnorm, hτβnorm, hνfixed⟩ :=
+      exists_typeIII_induced_primeTIDifference_with_norm_anchor_orthogonality_and_galois
         hG hyp hIII θ (hne θ hθ) hζirr_ind hζ1_ind
     rw [hζeq] at hβZ hβsupp hτβZ hτβ1 hβconj hνζ hνζc hβnorm hτβnorm
     have hζone : ClassFunction.inner ζ
@@ -504,6 +511,17 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           (hyp.base.p : ℤ) :=
       etaGrid_projection_sum_sq_le_of_residual_ne_zero
         hyp.base hτβZ hτβnorm mT hmT hperpT
+    have horbits := eta_axis_galois_orbits_of_hypothesis hyp.base
+    have haxis := tSideDadeMap_eta_axis_coefficients_constant
+      hG hyp hβZ hβsupp hτ hζT hgaloisT hdiff_supp
+      (fun ξ hξ i j =>
+        T_typeIII_coherent_image_inner_eta_eq_zero hG hyp hIII
+          hyp07.conjugate_closed hyp07.no_real_characters
+          (fun χ hχ => hdiff_supp χ hχ χ.conj (hyp07.conjugate_closed hχ))
+          hτ hξ (hirr ξ hξ) i j)
+      mT hmT hνfixed horbits.1 horbits.2
+    have hshape := etaGrid_coefficients_eq_column_or_row_of_sum_sq_le
+      hyp.base hyp.q_lt_p mT hprincipalT haxis.1 haxis.2 hrelationT hsumSqT
     have hτβinner : ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ))
         (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 1 := by
       change ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ))
@@ -562,11 +580,10 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       norm_num
     have hrelation : ClassFunction.inner betaData.Gamma (hτ.extension ζ) =
         1 + ClassFunction.inner Δ betaData.Gamma := by
-      -- The remaining deep inputs are now the exact upstream producers:
-      -- (i) Coq's (11.9) zero-column projection `o_eta0_betaT0`;
-      -- (ii) the two prime-TI residue values used in `PVSbeta`.
+      -- The remaining deep input is now exact: Coq (11.8) rules out the
+      -- zero-row branch of the proven (11.9) column-or-row dichotomy.
       -- The S/T cross orthogonality is no longer assumed: the landed exact-support
-      -- consumer proves it from (ii), Type-P₁ normed-TI, and order separation.
+      -- consumer proves it from prime-TI support, Type-P₁ normed-TI, and order separation.
       have hresidual :
           (∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (mT i j) ^ 2 : ℤ) ≤
               (hyp.base.p : ℤ) ∧
@@ -579,8 +596,12 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
                 (∑ i : Fin hyp.base.q,
                   hyp.base.eta i ⟨0, hyp.base.p_prime.pos⟩)) := by
         refine ⟨hsumSqT, ?_⟩
-        -- Coq (11.9): the remaining zero-column projection producer.
-        sorry
+        rcases hshape with hcolumn | hrow
+        · exact etaGrid_zeroColumn_projection_of_coefficients_eq_column
+            hyp.base (tSideDadeMap hyp hG (ν0 - ζ)) mT hmT hcolumn
+        · -- Coq (11.8): exclude the zero-row projection.
+          exfalso
+          sorry
       have hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T := by
         obtain ⟨_, _, hcIII_IV, _, _, _⟩ :=
           OddOrder.BG.Ch4.S16.proposition_type_classification
