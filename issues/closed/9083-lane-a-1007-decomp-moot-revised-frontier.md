@@ -326,3 +326,51 @@ append-only) + `S11_NineElevenCaseA.lean` 追記 (+234 行、append-only)。自�
   corollary 経由; caseB/E-PairBound/B と同一 debt、本 commit の追加分ではない)。
 - ⚠ **hub への分割 flag**: `S11_NineElevenCoherence.lean` が 1511 行 (>1500 trigger)。
   凍結境界での prefix-split (または dir 化) を hub に委任 (本 commit は append-only を維持)。
+
+---
+
+# Phase D 完了 (2026-07-11, lane a)
+
+**(9.11.4) Mackey norm + support を landed** — 新 leaf `S11_NineElevenMackeyNorm.lean`
+(877 行、自前 sorry 0・新 axiom 0) + `S11_NineElevenCaseA.lean` 追記 (+170 行、append-only)。
+**全成果 axiom-clean 実測** (propext/Classical.choice/Quot.sound のみ — S13 bundle 含め
+sorryAx ゼロ; C_eq_cSub debt も不使用: C = U′ 同定は hCUprime を chars-level defeq で消費)。
+
+- **gating 判定 (指示の 30min check)**: **UNGATED**。(a) Pf (2.1) は S04_InduceConjFinset に
+  複数 landed (不使用で済んだ); (b) A(M)-support bridge: 本形式化では **A(M) = (M′)^# が定理**
+  (`typePA_eq_sharpSubgroup_derivedInG`) + `mderivSharp_subset_A0` で `(M′)^# ⊆ A₀(M)` ⟹
+  **Coq gap-patch (PFsection9.v:1476-1483 の Philip Hall/solvability/(2.1)) は本設計では不要**
+  (HU₁ ≤ M′ から自明); (c) Hall/solvability 不要。
+- **構成 (book (9.11.4) / Coq PFsection9.v:1863-1952 の port)**:
+  - **averaging-projector vanishing** (`sum_apply_mul_eq_zero_of_not_subset_characterKernel`):
+    N ◁ Γ, χ irr, N ⊄ Ker χ ⟹ Σ_{n∈N} χ(ny) = 0 — rep-level (T = Σρ(n) の range は
+    subrep; ⊤ なら N ⊆ Ker、⊥ なら T = 0)。Coq の `sub_cfker_constt_Ind_irr`
+    constituent-kernel 機構の代替。⟨γ, ψ₁⟩ = 0 は **source ζ の H ⊄ Ker (xiSet 所属そのもの)**
+    まで Frobenius reciprocity + 誘導公式で降ろして発火 (`inner_induce_trivial_induce_eq_zero`)
+    — M-level の kernel-avoidance 論法 (character bound) 不要。
+  - **Mackey count**: `‖Ind_K^M 1‖²·|K|² = Σ_{x∈M} |K ∩ ˣK|`
+    (`inner_induce_trivial_self_mul_card_sq`) + `(H·U)·W₁`-fibred 評価
+    `Σ = |H|²·|U|·(|U₁| + (q−1)|C|)` (`sum_card_inf_conjSMul_eq`; Dedekind 恒等式
+    `(H⊔U₁)⊓(H⊔V) = H⊔(U₁⊓V)` + U₁ ◁ U (U′ ≤ U₁ ← equality config C = U′) +
+    W₁ ≤ N(U))。book の λ(x)-count を **商群指標転送なしの部分群算術**で実現
+    (Coq の cfIndMod/cfIndIsom/cfIndInd 層を回避)。
+  - **γ-context 層** (`nineElevenGamma_*`): supp γ ⊆ HU / γ(1) = qa ([M:HU₁] 鎖) /
+    ⟨γ, Ind_{HU} ζ⟩ = 0 (∀ζ ∈ 𝒳) / **‖γ‖²·u = a·u + (q−1)·a²** (cleared form)。
+  - **S13 bundle `caseA_nineElevenFour_norm_inputs`**: equality config (hCUprime + hcount)
+    + TI-witness ⟹ `∃ N, N·u = (a+1)·u + (q−1)·a² ∧ ∃ α ∈ ℤ[Irr M], supp α ⊆ A₀ ∧ ‖α‖² = N`
+    — ψ₁ は hcount 正値性から 𝒮₁-family で選択、α = γ − ψ₁、‖α‖² = ‖γ‖²+1
+    (`cfnorm_sub_irreducible_orthogonal`)、整数性は ZIrr Fourier
+    (`mem_ZIrr_inner_self_eq_sum_sq`)、support は HU = M′ + 次数相殺 α(1) = qa−qa = 0 +
+    `mderivSharp_subset_A0`。**NineElevenNormBound の hnorm 半分がこれで供給**;
+    残 = `|𝒮₄| ≤ N = ‖α‖²` ((9.11.5-8)、Phase E が同じ α を τ 経由で消費)。
+- **残された ONE 名前付き Prop = `NineElevenTwoTIWitness`** (book (9.11.2) の表示文
+  そのもの: "if w ∈ W₁^# then U₁ ∩ U₁^w = C" + witness U₁ = C_U(H₁) の standing facts
+  C ≤ U₁ ≤ U, [U:U₁] = a — 全て landed lemma で book-true)。discharge には Phase-B pair
+  dichotomy (`nineElevenTwo_relIndex_dichotomy`) + **W₁ ↔ Clifford summand 共役辞書
+  `C_U(H₁)^w = C_U(H₁^w)`** (`Hpart_orbit` の実現、Phase E)。all-pairs-a 分岐では
+  U₁ = C で witness は自明に立つ (u = a 吸収と同型)。
+- **AxiomsCheck**: 主要 7 定理の `#assert_only_allowed_axioms` を追加。
+- 消費側: Phase E は `NineElevenNormBound` を「本 bundle (hnorm+α) + |𝒮₄| ≤ ‖α‖²
+  (α^τ 直交性、pair-refutation ← (9.11.6-8))」で discharge、
+  `NineElevenSTwoExtraction` と併せて `nineElevenEqualityRefutation_of_sTwoExtraction_normBound`
+  が閉じ、S13_Orthogonality:130 の live sorry が置換される。

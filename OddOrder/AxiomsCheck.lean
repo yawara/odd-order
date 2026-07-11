@@ -7372,3 +7372,21 @@ v2 assembly closes). -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.S_not_coherent_unconditional
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.typeV_caseA_coherence
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.typeV_caseC_coherence_engine
+
+/-! **Peterfalvi (9.11.4) Mackey norm + support, axiom-clean** (issue 9083 Phase D, lane a).
+The averaging-projector coset-sum vanishing (the `⟨γ, ψ₁⟩ = 0` engine), the Mackey
+conjugation count `‖Ind_K^M 1‖²·|K|² = Σ_x |K ∩ ˣK|` with its `(H·U)·W₁`-fibred evaluation,
+the `γ = Ind_{HU₁}^M 1` context facts (support in `HU = M′`, degree `qa`, orthogonality to
+`Ind_{HU}^M 𝒳`, cleared norm `‖γ‖²·u = a·u + (q−1)a²` under the (9.11.2) TI-witness
+`NineElevenTwoTIWitness`), and the `Hypothesis`-level (9.11.4) bundle
+`caseA_nineElevenFour_norm_inputs` (`∃ N, N·u = (a+1)u + (q−1)a²` realized by an
+`A₀`-supported `α = γ − ψ₁ ∈ ℤ[Irr M]` with `‖α‖² = N` — the `hnorm` half of
+`NineElevenNormBound`; the `|𝒮₄| ≤ N` half is Phase E). -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S11.sum_apply_mul_eq_zero_of_not_subset_characterKernel
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.inner_induce_trivial_induce_eq_zero
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.inner_induce_trivial_self_mul_card_sq
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sum_card_inf_conjSMul_eq
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.nineElevenGamma_inner_self_mul_u
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.nineElevenGamma_inner_induceHU
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.caseA_nineElevenFour_norm_inputs
