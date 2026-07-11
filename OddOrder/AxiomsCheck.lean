@@ -7296,6 +7296,7 @@ The side-agnostic embedding `SemilinearFieldModel.fieldModelEmbedding` (injectiv
 of the `P`-side engine above.  All `sorry`-free; the sole T-side gate (`t_side_caseB_fieldModel`'s
 field-data existence) is not on this list. -/
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.SemilinearFieldModel.fieldModelEmbedding
-#assert_only_allowed_axioms OddOrder.RepresentationTheory.SemilinearFieldModel.hcompatLift_of_equivariant
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.SemilinearFieldModel.hcompatLift_of_equivariant
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.tFieldModelData_of_repr
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.TFieldModelData.derived_inf_centralizer_le_Q
