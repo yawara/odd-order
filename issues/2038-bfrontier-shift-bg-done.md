@@ -1560,3 +1560,22 @@ threading のみ 9081 裁定待ち。
 **次 frontier 候補 (S15_SAndT bare sorry 7、文書順)**: :33 type-I Frobenius complement ⊄ Q pin /
 :284 同 P-side / :660 betaGrid support / :1305 (support 系) / :1420 GammaGrid.conj real /
 :1439 (13.18.d) Y-norm bound / :1670 TypeIOrthogonalityGridData。
+
+## 📋 (2026-07-12) 次 frontier 着手調査: (13.17.c) pin `complement_inf_Q_structure` (S15_SAndT:28) の分解
+
+原文 p.82 + 既存資産の精査結果 — pin (E∩Q = W₁ ∧ E ⊄ Q) は**非対称な 2 成分**:
+
+1. **E∩Q = W₁ (組める、部品全 proven/gated-B1)**:
+   - ⊇: `hW1E` (W₁ ≤ E) + **`W1_le_Q`** (S15_SAndTBasic:172、proven)
+   - ⊆: E∩Q は q-group (`card_Q_eq` |Q|=q^p、gated §13 counting residual B1 — Q_W2_structure が既に
+     同 gate を使用) → E の Sylow-q 内 → **cyclic** (BG Prop 3.9 = S03g_Thm310 完全証明 +
+     Isaacs Ch06 OddComplement 系) → E∩Q ⊆ Q **elementary abelian** ((13.2.a) T-side) →
+     cyclic ∧ elem-abelian → |E∩Q| ∈ {1,q} → ⊇W₁ (order q) で = W₁。
+2. **E ⊄ Q (深い、分離すべき)**: E=W₁ alternative の排除 = (14.5)/(13.19.c1) 依存
+   (S15_Gate3:733 docstring は「(14.5) exclusion」、S15_SAndT:24 は「(13.19.c1)/(13.2.a)」)。
+   §14 の interaction math — 独立 pin として isolate するのが正しい形。
+
+**実装プラン (次単位)**: pin を 2 分割 — `complement_inf_Q_eq_W1` (実証明、上記 1) +
+`complement_not_le_Q` (isolated sorry、(13.19.c1) provenance 明記)。既存 consumer
+`complement_card_eq_pq` (S15_SAndT:44) は両方 cite で不変。
+Huppert step `complement_le_QW2` / `Q_W2_structure` は S15_Gate3 で proven 済。
