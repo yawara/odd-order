@@ -662,9 +662,11 @@ with, for `θ ∈ 𝒯`:
 * `hlinear : θ(1) = 1` (inflation of a *linear* `θ̄`, since `QV/Q ≅ U` is abelian, `td.U_commutative`);
 * `hconj𝒯 : θ̄ ∈ 𝒯` (**complex** conjugate, `compHom` commutes with `star`, and `Irr(QV/Q)` is
   complex-conj-closed with non-principality preserved);
+* `hgalois𝒯 : θ ∈ 𝒯 ⟹ σθ ∈ 𝒯` for every coefficient automorphism `σ`, since inflation
+  commutes pointwise with `mapRingEquiv` and Galois transport preserves non-principality;
 and with the count `|calT1_image| = (|V| − 1)/p`.  This packages the "pure transcription" `𝒯`-build
 so the (14.9) coherence carrier `horth` is dischargeable end-to-end. -/
-theorem T_typeIII_calT1_family [Finite G] (hyp : Hypothesis (G := G))
+theorem T_typeIII_calT1_family_galois [Finite G] (hyp : Hypothesis (G := G))
     [Fintype ↥hyp.base.T] [Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
     [Invertible (Nat.card ↥hyp.base.T : ℂ)]
     [Invertible (Nat.card ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) : ℂ)]
@@ -681,6 +683,8 @@ theorem T_typeIII_calT1_family [Finite G] (hyp : Hypothesis (G := G))
         (⟨(θ : ClassFunction ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) ℂ).conj,
           θ.isIrreducible.conj⟩ :
           IrreducibleCharacter ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)) ∈ 𝒯) ∧
+      (∀ (σc : ℂ ≃+* ℂ) θ, θ ∈ 𝒯 →
+        IrreducibleCharacter.galoisMap σc θ ∈ 𝒯) ∧
       (𝒯.image (fun θ => ClassFunction.induce
         ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction)).card
         = (Nat.card ↥hyp.base.V - 1) / hyp.base.p := by
@@ -733,7 +737,7 @@ theorem T_typeIII_calT1_family [Finite G] (hyp : Hypothesis (G := G))
     exact IrreducibleCharacter.ext (hqinj this)
   set 𝒯 := (Finset.univ.filter (fun θbar : IrreducibleCharacter ↥Hbar =>
       θbar ≠ trivialIrreducibleCharacter ↥Hbar)).image infl with h𝒯
-  refine ⟨𝒯, ?_, ?_, ?_, ?_, ?_⟩
+  refine ⟨𝒯, ?_, ?_, ?_, ?_, ?_, ?_⟩
   -- hinertia
   · intro θ hθ
     rw [h𝒯, Finset.mem_image] at hθ
@@ -797,6 +801,32 @@ theorem T_typeIII_calT1_family [Finite G] (hyp : Hypothesis (G := G))
         = (ClassFunction.compHom q (θbar : ClassFunction ↥Hbar ℂ)).conj
       ext x
       simp [ClassFunction.compHom_apply, ClassFunction.conj_apply]
+  -- Arbitrary coefficient automorphisms preserve the inflated non-principal family.
+  · intro σc θ hθ
+    rw [h𝒯, Finset.mem_image] at hθ ⊢
+    obtain ⟨θbar, hθbar, rfl⟩ := hθ
+    rw [Finset.mem_filter] at hθbar
+    refine ⟨IrreducibleCharacter.galoisMap σc θbar, ?_, ?_⟩
+    · rw [Finset.mem_filter]
+      refine ⟨Finset.mem_univ _, ?_⟩
+      intro hcontra
+      apply hθbar.2
+      apply IrreducibleCharacter.ext
+      ext x
+      have hx := congrArg (fun c : IrreducibleCharacter ↥Hbar =>
+        ((c : ClassFunction ↥Hbar ℂ) x)) hcontra
+      have hx' := congrArg σc.symm hx
+      simpa [IrreducibleCharacter.galoisMap,
+        IrreducibleCharacter.coe_trivialIrreducibleCharacter,
+        trivialClassFunction_apply] using hx'
+    · apply IrreducibleCharacter.ext
+      show ClassFunction.compHom q
+          (IrreducibleCharacter.galoisMap σc θbar : ClassFunction ↥Hbar ℂ) =
+        ClassFunction.mapRingEquiv σc
+          (ClassFunction.compHom q (θbar : ClassFunction ↥Hbar ℂ))
+      ext x
+      simp [IrreducibleCharacter.galoisMap, ClassFunction.compHom_apply,
+        ClassFunction.mapRingEquiv_apply]
   -- hcard : `|calT1_image| = (|V| − 1)/p`.
   · have hinertia : ∀ θ ∈ 𝒯,
         IrreducibleCharacter.inertia (G := ↥hyp.base.T)
@@ -855,6 +885,55 @@ theorem T_typeIII_calT1_family [Finite G] (hyp : Hypothesis (G := G))
       rw [this]
     rw [← hcard]
     exact calT1_image_induce_card_eq hyp hHnormal 𝒯 hconj hinertia
+
+open scoped IsMulCommutative in
+open scoped Classical in
+/-- Compatibility projection of `T_typeIII_calT1_family_galois`, retaining the
+original family interface for coherence consumers that only need conjugate closure. -/
+theorem T_typeIII_calT1_family [Finite G] (hyp : Hypothesis (G := G))
+    [Fintype ↥hyp.base.T] [Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
+    [Invertible (Nat.card ↥hyp.base.T : ℂ)]
+    [Invertible (Nat.card ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) : ℂ)]
+    (td : TypeIIIData hyp.base.T) :
+    ∃ 𝒯 : Finset (IrreducibleCharacter ((derivedInG hyp.base.T).subgroupOf hyp.base.T)),
+      (∀ θ ∈ 𝒯,
+        IrreducibleCharacter.inertia (G := ↥hyp.base.T)
+            (H := (derivedInG hyp.base.T).subgroupOf hyp.base.T) θ
+          = (derivedInG hyp.base.T).subgroupOf hyp.base.T) ∧
+      (∀ θ ∈ 𝒯, θ ≠ trivialIrreducibleCharacter _) ∧
+      (∀ θ ∈ 𝒯, (θ.toClassFunction :
+        ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) → ℂ) 1 = 1) ∧
+      (∀ θ ∈ 𝒯,
+        (⟨(θ : ClassFunction ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) ℂ).conj,
+          θ.isIrreducible.conj⟩ :
+          IrreducibleCharacter ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)) ∈ 𝒯) ∧
+      (𝒯.image (fun θ => ClassFunction.induce
+        ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction)).card
+        = (Nat.card ↥hyp.base.V - 1) / hyp.base.p := by
+  obtain ⟨𝒯, hinertia, hne, hlinear, hconj, _, hcard⟩ :=
+    T_typeIII_calT1_family_galois hyp td
+  exact ⟨𝒯, hinertia, hne, hlinear, hconj, hcard⟩
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+open scoped Classical in
+/-- Galois closure passes from a source family to its induced family. -/
+theorem inducedFamily_mapRingEquiv_mem
+    {L : Type*} [Group L] [Fintype L]
+    (K : Subgroup L) [Fintype K] [Invertible (Nat.card K : ℂ)]
+    (𝒯 : Finset (IrreducibleCharacter K))
+    (hgalois : ∀ (σc : ℂ ≃+* ℂ) θ, θ ∈ 𝒯 →
+      IrreducibleCharacter.galoisMap σc θ ∈ 𝒯)
+    (σc : ℂ ≃+* ℂ) {ζ : ClassFunction L ℂ}
+    (hζ : ζ ∈ (↑(𝒯.image (fun θ =>
+      ClassFunction.induce K θ.toClassFunction)) :
+        Set (ClassFunction L ℂ))) :
+    ClassFunction.mapRingEquiv σc ζ ∈
+      (↑(𝒯.image (fun θ => ClassFunction.induce K θ.toClassFunction)) :
+        Set (ClassFunction L ℂ)) := by
+  rw [Finset.mem_coe, Finset.mem_image] at hζ ⊢
+  obtain ⟨θ, hθ, rfl⟩ := hζ
+  refine ⟨IrreducibleCharacter.galoisMap σc θ, hgalois σc θ hθ, ?_⟩
+  exact (ClassFunction.mapRingEquiv_induce σc θ.toClassFunction).symm
 
 /-- **The intrinsic type-III kernel size bound `2p + 1 ≤ |V|`** (ungated, the crude `hcard2` input).
 The intrinsic `U ⋊ W₁` Frobenius (`T_typeIII_UW1_frobenius`) has odd kernel `U` (`|U| = |V|`,

@@ -18,6 +18,21 @@ namespace OddOrder.Peterfalvi.S16
 
 open OddOrder.RepresentationTheory
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- The canonical prime-TI anchor `primeTIred 0 = Ind 1` is fixed by every
+coefficient automorphism.  This is the source-side fixed point used in
+Peterfalvi Galois transport identity. -/
+theorem primeTIred_zero_mapRingEquiv
+    {S : Type*} [Group S] [Fintype S]
+    {PU : Subgroup S} [Fintype PU] [Invertible (Nat.card PU : Complex)]
+    {q p : Nat} [NeZero q] [NeZero p]
+    (D : PrimeTIResidueData S PU q p) (sigma : RingEquiv Complex Complex) :
+    ClassFunction.mapRingEquiv sigma (D.primeTIred 0) = D.primeTIred 0 := by
+  rw [(D.cfInd_prTIres 0).symm, D.prTIres0, ClassFunction.mapRingEquiv_induce]
+  congr 1
+  ext x
+  simp [ClassFunction.mapRingEquiv_apply, trivialClassFunction_apply]
+
 variable {G : Type*} [Group G]
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
