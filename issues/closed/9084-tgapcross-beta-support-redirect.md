@@ -67,3 +67,15 @@ S15-level の 3 定理と**一時重複**が生じている:
 - **(b) 承認**: (14.9) cross-Dade endpoints の hmuD/hmuW1 仮説を proven 2 補題で discharge した
   corollary 化も c-side で実施。
 - 実施タイミングは c の自律 (急がない)。完了で本 issue close。
+
+## 完了 (2026-07-12, lane c)
+
+commit: `9d27be05` (`refactor(PF 14.9): discharge S-side beta support`)。
+
+- (a) S16 側の重複4定理を削除し、S15 へ移設済みの旧 `sSide_mu...` も削除した。
+  stale AxiomsCheck assert と全 caller を追従済み。
+- (b) 無条件 signature の `tSideDadeMap_inner_tauSbetaGrid_eq_zero` を追加し、TTypeII から
+  `hmuD` / `hmuW1` を除去した。残る `hresidual` は sharp norm bound + zero-column projection。
+- `lake build OddOrder.AxiomsCheck` 成功 (4149 jobs)。ただし独立に assert を試すと
+  `S15.betaGrid_support` と新 endpoint は既存 upstream `sorryAx` を継承するため、
+  axiom-clean とは主張せず pending コメントを残した。
