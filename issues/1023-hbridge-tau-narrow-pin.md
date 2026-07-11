@@ -286,3 +286,24 @@ IsCoherent 構成は既存 IntegralCharacterMap 機構 (Zisometry_of_cfnorm 相�
   certainTypeOmegaSigma_eq_chiFam (S06_CertainTypeIsometry:165) × (3.5) index 翻訳。
 - 次 tick: 上記 3 signature を読み bridge lemma を書く (置き場 = S13_Orthogonality 直
   or 新 leaf; S13_Orthogonality に import TICyclicSigmaBridge を追加)。
+
+## 2026-07-12 tick¹³ — ★★★ world-bridge landed (f3d0f84b)
+
+`certainTypeOmegaSigma_muColumnChar_eq_aligned` green。核 = toHypothesis46.tic の field literal
+で両 σ が定義的同一 tic 上 (show/rfl 通過!)、入力は pointwise transport 同定。
+
+**case-1 実装 spec (次 tick)** — `mu1_pin_of_irr_mem` (任意 c : IsCoherent tau (sOf H0C) A0):
+仮説 = capstone 同型 (coh, hζHC, hζdeg@1, hcol@1) + (ξ, hξ ∈ sOf H0C, hξirr)。
+1. γ := ξ(1)•μ₁ − μ₁(1)•ξ ∈ ℤ[sOf H0C] (ℂ-smul→ℤ-smul cast は hdζspan pattern)、γ(1)=0 →
+   A₀-supp (inducedKernelFamily_zSpan_support_of_apply_one_eq_zero) → c.ext γ = τγ。
+2. θ := μ₁ − d•ζ A₀-supp (capstone hbridge_supp pattern) →
+   ⟨τγ, τθ⟩ = ⟨γ, θ⟩ (hyp.tau_inner_eq_of_supported) = ξ(1)·w₁
+   (⟨μ₁,ζ⟩=⟨ξ,ζ⟩=0 cross-stratum (SOf_HC_inner_sOf_H0C_eq_zero)、⟨ξ,μ₁⟩=0 同-stratum、
+   ‖μ₁‖² = w₁ (muGrid_column_sum_inner_self + muGrid_columnSum_eq_columnSum))。
+3. LHS 展開 (τθ = ωcol₁ − d•coh.ext ζ は hcol@1): ⟨c.ext ξ, coh.ext ζ⟩ = ⟨c.ext μ₁, coh.ext ζ⟩ = 0
+   (2-stratum cross_orthogonal)。⟨c.ext ξ, ωcol₁⟩ = 0: SOf-(5.5) → ext ξ = ∑E'、
+   E' ⊆ dadeOfDiff imageSet (SOf_memberRFamily_imageSet_of_irr); ω_{i1} = bridge =
+   ±(certainTypeR-member) → certainTypeR_imageSet_orthogonal_dadeOfDiff_typeP で 0。
+   ⟹ ξ(1)·⟨c.ext μ₁, ωcol₁⟩ = ξ(1)·w₁、ξ(1) ≠ 0 → ⟨c.ext μ₁, ωcol₁⟩ = w₁。
+4. norm 論法: ‖c.ext μ₁‖² = ‖μ₁‖² = w₁ (extension_inner_eq)、‖ωcol₁‖² = w₁
+   (alignedOmegaSigmaGrid_inner)、⟨,⟩ = w₁ → ‖差‖² = 0 → **c.ext μ₁ = ωcol₁**。
