@@ -324,12 +324,18 @@ theorem exists_typeIFrobeniusData_W2_le [Finite G] (_hG : OddOrder.BG.IsMinimalS
   rw [this]
   exact Subgroup.map_mono hx
 
-/-- **Peterfalvi (13.17.c), V-side dual — faithful dichotomy form** (hub issue 3004, ruling 3):
-for the `W₂`-containing Frobenius complement `E` of the type-I maximal `L` over `N_G(V)`, either
-`E = W₂` (the `L = H ⋊ W₂` branch, `e = p`), or `E ⊓ P = W₂` and `E ⊄ P` (the
+/-- **Peterfalvi (13.17.c), V-side dual — faithful dichotomy form, proven** (hub issue 3004,
+ruling 3): for the `W₂`-containing Frobenius complement `E` of the type-I maximal `L` over
+`N_G(V)`, either `E = W₂` (the `L = H ⋊ W₂` branch, `e = p`), or `E ⊓ P = W₂` and `E ⊄ P` (the
 `L = H ⋊ (W₂W₁^y)` branch, leading to `e = pq`).  Unlike the S-side
 (`complement_inf_Q_eq_W1`/`complement_not_le_Q`, whose small branch is excluded by (14.5)), both
-branches are live here; the resolution to `e = pq` happens only inside (14.11). -/
+branches are live here; the resolution to `e = pq` happens only inside (14.11).
+
+*Proof.*  `E ⊓ P = W₂` holds unconditionally, by the mirror of `complement_inf_Q_eq_W1`:
+`W₂ ≤ E ⊓ P` (`hW2E` + `W2_le_P`), and conversely `E ⊓ P` is a `p`-subgroup of the elementary
+abelian `P` (`P_elementaryAbelian`, (13.2.a)) inside the Z-group `E`
+(`isZGroup_complement_of_isFrobeniusGroup_of_odd`), hence cyclic of exponent `p`, so of order
+`p = |W₂|`.  The dichotomy is then `by_cases` on `E ≤ P`: if so, `E = E ⊓ P = W₂`. -/
 theorem complement_inf_P_structure_dichotomy [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) {L : Subgroup G}
@@ -337,7 +343,52 @@ theorem complement_inf_P_structure_dichotomy [Finite G]
     (hW2E : hyp.W2 ≤ frob.complement.map L.subtype) :
     frob.complement.map L.subtype = hyp.W2 ∨
       (frob.complement.map L.subtype ⊓ hyp.P = hyp.W2 ∧
-        ¬ frob.complement.map L.subtype ≤ hyp.P) := sorry
+        ¬ frob.complement.map L.subtype ≤ hyp.P) := by
+  classical
+  set Em := frob.complement.map L.subtype with hEm
+  have hInf : Em ⊓ hyp.P = hyp.W2 := by
+    have hW2le : hyp.W2 ≤ Em ⊓ hyp.P := le_inf hW2E (W2_le_P _hG hyp)
+    have hodd : Odd (Nat.card ↥frob.complement) := _hG.odd.of_dvd_nat
+      ((Subgroup.card_subgroup_dvd_card _).trans (Subgroup.card_subgroup_dvd_card L))
+    haveI hZE : _root_.IsZGroup ↥frob.complement :=
+      OddOrder.Isaacs.Ch06.isZGroup_complement_of_isFrobeniusGroup_of_odd frob.frobenius hodd
+    haveI hZEm : _root_.IsZGroup ↥Em := _root_.IsZGroup.of_injective
+      (f := ((Subgroup.equivMapOfInjective frob.complement L.subtype
+        Subtype.coe_injective).symm : ↥Em ≃* ↥frob.complement).toMonoidHom)
+      (MulEquiv.injective _)
+    have hPeA := hyp.P_elementaryAbelian _hG
+    set R : Subgroup ↥Em := (Em ⊓ hyp.P).subgroupOf Em with hRdef
+    have hexp : ∀ x : ↥R, x ^ hyp.p = 1 := by
+      intro x
+      have hgP : ((x : ↥Em) : G) ∈ hyp.P := (Subgroup.mem_subgroupOf.mp x.2).2
+      have hp1 := hPeA.2 (⟨((x : ↥Em) : G), hgP⟩ : ↥hyp.P)
+      have hg1 : (((x : ↥Em) : G)) ^ hyp.p = 1 := by
+        simpa using congrArg Subtype.val hp1
+      apply Subtype.ext; apply Subtype.ext
+      push_cast
+      exact hg1
+    have hpg : IsPGroup hyp.p ↥R := fun x => ⟨1, by rw [pow_one]; exact hexp x⟩
+    haveI hFp : Fact hyp.p.Prime := ⟨hyp.p_prime⟩
+    haveI hcyc : IsCyclic ↥R := hpg.isCyclic_of_isZGroup
+    obtain ⟨g, hgen⟩ := hcyc.exists_generator
+    have hcard_dvd : Nat.card ↥R ∣ hyp.p := by
+      rw [← orderOf_eq_card_of_forall_mem_zpowers hgen]
+      exact orderOf_dvd_of_pow_eq_one (hexp g)
+    have hcardR : Nat.card ↥(Em ⊓ hyp.P) = Nat.card ↥R :=
+      (Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+        (inf_le_left : Em ⊓ hyp.P ≤ Em)).toEquiv).symm
+    have hple : hyp.p ≤ Nat.card ↥(Em ⊓ hyp.P) := by
+      rw [hyp.p_eq_card_W2]
+      exact Subgroup.card_le_of_le hW2le
+    have hcard_eq : Nat.card ↥(Em ⊓ hyp.P) = hyp.p :=
+      le_antisymm (hcardR ▸ Nat.le_of_dvd hyp.p_prime.pos hcard_dvd) hple
+    exact (Subgroup.eq_of_le_of_card_ge hW2le
+      (by rw [hcard_eq, hyp.p_eq_card_W2])).symm
+  by_cases hle : Em ≤ hyp.P
+  · left
+    rw [← hInf, inf_eq_left.mpr hle]
+  · right
+    exact ⟨hInf, hle⟩
 
 /-- **`S`-side dual of `complement_le_QW2`** (V-side Huppert step): the `W₂`-containing Frobenius
 complement `E` satisfies `E ≤ P W₁`.  Mirror of `complement_le_QW2` with `W₁/Q ↔ W₂/P`: `W₂` (of

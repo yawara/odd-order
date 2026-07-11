@@ -1549,6 +1549,31 @@ theorem Hypothesis.delta_eq_one_S [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
   · rw [hj]; exact hyp.delta_zero_eq_one
   · exact hyp.delta_eq_one_of_ne_zero hG j hj
 
+/-- **Peterfalvi (4.3.c)+(13.3.c), the `W₁#` `μ`-value**: `μ_{0j}(x) = 1` for `x ∈ W₁`,
+`x ≠ 1`.  The (4.3.c) value identity `mu_apply_of_not_mem_W2` applies (`x ∉ W₂` since
+`W₁ ⊓ W₂ = ⊥` and `x ≠ 1`), giving `μ_{0j}(x) = δ_j·ω_{0j}(x)`; then `δ_j = 1`
+(`delta_eq_one_S`, Pf (13.3.c)) and the row-`0` `ω`-value `ω_{0j}|_{W₁} = 1`
+(`omega_row_zero_apply_of_mem_W1`).  This is the `hmuW1` input of the (13.18.a) exact
+`β`-support `betaGrid_support_sharpP_union_typePV_of_values` (`S16_NonExistenceG/TGapCross`)
+and of the original support argument (Pf p.83 "`μ_{0j}(x) = ω_{0j}(x) = 1`"). -/
+theorem Hypothesis.mu_row0_apply_eq_one_of_mem_W1 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (j : Fin hyp.p) (x : ↥hyp.S) (hxW1 : (x : G) ∈ hyp.W1) (hx1 : x ≠ 1) :
+    hyp.mu ⟨0, hyp.q_prime.pos⟩ j x = 1 := by
+  have hxW : (x : G) ∈ hyp.W := by
+    rw [hyp.W_eq_join]; exact Subgroup.mem_sup_left hxW1
+  have hxW2 : (x : G) ∉ (hyp.W2 : Set G) := by
+    intro hmem
+    apply hx1
+    have hinf : (x : G) ∈ hyp.W1 ⊓ hyp.W2 := ⟨hxW1, hmem⟩
+    rw [hyp.W1_inf_W2_eq_bot, Subgroup.mem_bot] at hinf
+    exact Subtype.ext hinf
+  have hval := hyp.mu_apply_of_not_mem_W2 ⟨0, hyp.q_prime.pos⟩ j (x : G) hxW x.2 hxW2
+  rw [show (⟨(x : G), x.2⟩ : ↥hyp.S) = x from rfl] at hval
+  rw [hval, hyp.delta_eq_one_S hG j,
+    hyp.omega_row_zero_apply_of_mem_W1 j ⟨(x : G), hxW⟩ hxW1]
+  norm_num
+
 /-- `|T| = |Q|·(vd)·p` — the `T`-side order decomposition, read off the reconciled type-`P`
 datum (`M_complement`/`derived_complement` of `reconciled_typePData_T`) with `|V| = vd` and
 `|W₂| = p`. -/
