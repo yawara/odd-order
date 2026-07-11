@@ -379,6 +379,22 @@ theorem normal_of_card_prime_of_isFrobeniusAction_of_odd
     have : k = r₀ := by rw [hk_eq, hν1, one_mul]
     rw [this]; exact hr₀
 
+/-- **Z-group property, subgroup-pair form** (Step 1 for a bundled Frobenius group): in a finite
+Frobenius group `G = N ⋊ A` whose complement `A` has **odd order**, `A` is a Z-group — every
+Sylow subgroup of `A` is cyclic ([BG] Proposition 3.9 for the complement; the conjugation action
+of `A` on the kernel `N` is Frobenius, and `isZGroup_of_isFrobeniusAction_of_odd` applies).
+Combined with mathlib's `IsPGroup.isCyclic_of_isZGroup` (and the `Subgroup` instance), every
+prime-power-order subgroup of `A` is cyclic. -/
+theorem isZGroup_complement_of_isFrobeniusGroup_of_odd
+    {G : Type*} [Group G] [Finite G] {N A : Subgroup G}
+    (hFrob : IsFrobeniusGroup G N A) (hodd : Odd (Nat.card ↥A)) :
+    IsZGroup ↥A := by
+  letI : N.Normal := hFrob.isNormal
+  letI : MulDistribMulAction ↥A ↥N :=
+    MulDistribMulAction.compHom ↥N ((MulAut.conjNormal (H := N)).comp A.subtype)
+  haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hFrob.ne_bot_kernel
+  exact isZGroup_of_isFrobeniusAction_of_odd hFrob.toFrobeniusAction hodd
+
 /-- **Huppert V.8.18 b), subgroup-pair form.**  In a finite Frobenius group `G = N ⋊ A` whose
 complement `A` has **odd order**, every subgroup `R ≤ A` of prime order is normal in `A`. -/
 theorem normal_of_card_prime_of_isFrobeniusGroup_of_odd
