@@ -1100,4 +1100,292 @@ theorem Hypothesis.W2_eq_secondDerivedInAmbient_of_card_eq_prime_cube [Finite G]
   have hcardW2 : Nat.card ↥hyp.typeP.W2 = p := by rw [hpw2]; rfl
   exact Subgroup.eq_of_le_of_card_ge hW2le (by rw [hcardM'', hcardW2])
 
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (10.10.2), linearity of irreducibly-inducing sources**: for `H = M′`
+non-abelian of order `p³` (`p = w₂`), a `θ ∈ Irr M′` whose induction `Ind_{M′}^M θ` is
+*irreducible* is linear, `θ(1) = 1` (no nontriviality needed: `θ(1) = 1` holds for the
+trivial `θ` outright).
+
+Book: "If `θ ∈ Irr H`, then `θ(1)` divides `p³` but `θ(1)² ≤ p³`, whence `θ(1) = 1` or
+`θ(1) = p`. ... Then `∑_{0<j<p} θ_j(1)² = (p − 1)p² = |H| − |H : H′|`.  Thus
+`S − S₁ = {μ_j | 0 < j < p}`."  Counting form of that exhaustion: the reducible-inducing
+sources are exactly the `w₂ = p` certain-type columns `χ_j`
+(`card_reducible_induce_eq_W2`); the trivial column is the trivial character
+(`chiRestrict_one_eq_trivial`) and no nontrivial *linear* source induces reducibly
+(`inertia_eq_derived_of_linear` + [Is] 6.34), so the `p − 1` nontrivial columns are
+nonlinear.  The nonlinear sources number exactly `p − 1`: degrees are `p`-powers `p^k`
+(`exists_characterDegree_eq_prime_pow_of_isPGroup`) with `p^{2k} ≤ ∑_θ θ(1)² = p³`
+(`sumIrreducibleDegreeSq`), so nonlinear degrees are `p`, and the Burnside sum
+`p² + #NL·p² = p³` (linear count `= |M′{}^{ab}| = p²`,
+`card_filter_degree_one_eq_card_abelianization` +
+`card_abelianization_eq_prime_sq_of_card_eq_prime_cube`) gives `#NL = p − 1`.  Hence
+*every* nonlinear source is a column and induces reducibly; contrapositively an
+irreducibly-inducing source is linear. -/
+theorem Hypothesis.linear_of_induce_isIrreducible_of_card_eq_prime_cube [Finite G]
+    {M : Subgroup G} (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) {p : ℕ} (hp : p.Prime) (hpw2 : p = hyp.w2)
+    (hcard : Nat.card ↥((derivedInG M).subgroupOf M) = p ^ 3)
+    (hnonab : ¬ IsMulCommutative ↥((derivedInG M).subgroupOf M))
+    {θ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M)}
+    (hirr : IsIrreducibleCharacter (ClassFunction.induce ((derivedInG M).subgroupOf M)
+      (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ))) :
+    (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1 := by
+  haveI := hyp.finiteG
+  haveI : Fact p.Prime := ⟨hp⟩
+  classical
+  -- the §6 certain-type hypothesis and its instances (as in
+  -- `reducible_mem_inducedKernelFamily_eq_muGrid_columnSum`)
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  letI : Fintype ↥M := Fintype.ofFinite _
+  letI : Fintype ↥h.K := Fintype.ofFinite _
+  letI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  -- natural degrees `dg` on `Irr M′`
+  choose dg dgpos hdgeq using fun χ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+    irreducibleCharacter_apply_one_eq_pos_natCast χ
+  -- Burnside degree-sum: `∑ dg² = p³`
+  have hpg : IsPGroup p ↥((derivedInG M).subgroupOf M) := IsPGroup.of_card hcard
+  have hsumC := OddOrder.RepresentationTheory.sumIrreducibleDegreeSq
+    (G := ↥((derivedInG M).subgroupOf M))
+  rw [hcard] at hsumC
+  have hsum : ∑ χ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M), dg χ ^ 2
+      = p ^ 3 := by
+    have hC : ((∑ χ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M), dg χ ^ 2 : ℕ) : ℂ)
+        = ((p ^ 3 : ℕ) : ℂ) := by
+      rw [Nat.cast_sum, ← hsumC]
+      exact Finset.sum_congr rfl fun χ _ => by rw [Nat.cast_pow, hdgeq χ]
+    exact_mod_cast hC
+  -- degree dichotomy: nonlinear degrees are `p` (a `p`-power `p^k`, `k ≥ 1`, `2k ≤ 3`)
+  have hdg_nl : ∀ χ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M),
+      ¬ (χ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1 → dg χ = p := by
+    intro χ hχ
+    obtain ⟨k, hk⟩ :=
+      OddOrder.Peterfalvi.S03.exists_characterDegree_eq_prime_pow_of_isPGroup hpg χ
+    have hdgk : dg χ = p ^ k := by
+      have hcast : ((dg χ : ℕ) : ℂ) = ((p ^ k : ℕ) : ℂ) := by
+        rw [← hdgeq χ, Nat.cast_pow]
+        exact hk
+      exact_mod_cast hcast
+    have hk0 : k ≠ 0 := by
+      rintro rfl
+      rw [pow_zero] at hdgk
+      exact hχ (by rw [hdgeq χ, hdgk, Nat.cast_one])
+    have hle : dg χ ^ 2 ≤ p ^ 3 := by
+      rw [← hsum]
+      exact Finset.single_le_sum (f := fun χ' => dg χ' ^ 2)
+        (fun i _ => Nat.zero_le _) (Finset.mem_univ χ)
+    rw [hdgk, ← pow_mul] at hle
+    have h2k : k * 2 ≤ 3 := (Nat.pow_le_pow_iff_right hp.one_lt).mp hle
+    have hk1 : k = 1 := by omega
+    rw [hdgk, hk1, pow_one]
+  -- the linear count `p²` and the nonlinear count `p − 1`
+  have hLin : (Finset.univ.filter
+      fun χ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+        (χ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1).card = p ^ 2 := by
+    rw [card_filter_degree_one_eq_card_abelianization]
+    exact card_abelianization_eq_prime_sq_of_card_eq_prime_cube hp hcard hnonab
+  have hNL : (Finset.univ.filter
+      fun χ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+        ¬ (χ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1).card = p - 1 := by
+    have hLsum : ∑ χ ∈ Finset.univ.filter
+        (fun χ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+          (χ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1), dg χ ^ 2
+        = p ^ 2 := by
+      rw [← hLin, Finset.card_eq_sum_ones]
+      refine Finset.sum_congr rfl fun χ hχ => ?_
+      rw [Finset.mem_filter] at hχ
+      have hdg1 : dg χ = 1 := by
+        have hcast : ((dg χ : ℕ) : ℂ) = ((1 : ℕ) : ℂ) := by
+          rw [← hdgeq χ, Nat.cast_one]
+          exact hχ.2
+        exact_mod_cast hcast
+      rw [hdg1, one_pow]
+    have hNsum : ∑ χ ∈ Finset.univ.filter
+        (fun χ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+          ¬ (χ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1), dg χ ^ 2
+        = (Finset.univ.filter
+          (fun χ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+            ¬ (χ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1)).card
+          * p ^ 2 := by
+      calc ∑ χ ∈ Finset.univ.filter
+            (fun χ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+              ¬ (χ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1), dg χ ^ 2
+          = ∑ _χ ∈ Finset.univ.filter
+            (fun χ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+              ¬ (χ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1), p ^ 2 :=
+            Finset.sum_congr rfl fun χ hχ => by
+              rw [Finset.mem_filter] at hχ
+              rw [hdg_nl χ hχ.2]
+        _ = (Finset.univ.filter
+            (fun χ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+              ¬ (χ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1)).card
+            * p ^ 2 := by
+            rw [Finset.sum_const, smul_eq_mul]
+    have htotal := Finset.sum_filter_add_sum_filter_not Finset.univ
+      (fun χ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+        (χ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1)
+      (fun χ => dg χ ^ 2)
+    rw [hsum, hLsum, hNsum] at htotal
+    have h1 : (1 + (Finset.univ.filter
+        (fun χ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+          ¬ (χ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1)).card) * p ^ 2
+        = p * p ^ 2 := by
+      have hpp : p * p ^ 2 = p ^ 3 := by ring
+      rw [add_mul, one_mul, hpp]
+      exact htotal
+    have h2 := Nat.eq_of_mul_eq_mul_right (pow_pos hp.pos 2) h1
+    omega
+  -- the reducible-inducing sources: exactly `w₂ = p` of them (the columns `χ_j`)
+  have hRed : (Finset.univ.filter
+      fun χ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+        ¬ IsIrreducibleCharacter (ClassFunction.induce ((derivedInG M).subgroupOf M)
+          (χ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ))).card = p := by
+    have hW2card : Nat.card ↥h.W2 = p := by
+      rw [hpw2]
+      exact Nat.card_congr
+        (Subgroup.subgroupOfEquivOfLe (typePData_W2_le_self hyp.typeP)).toEquiv
+    have hbij : Nat.card {χ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) //
+        ¬ IsIrreducibleCharacter (ClassFunction.induce ((derivedInG M).subgroupOf M)
+          (χ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ))} = p :=
+      (h.card_reducible_induce_eq_W2).trans hW2card
+    rw [← hbij, Nat.card_eq_fintype_card, Fintype.card_subtype]
+  -- the trivial character induces reducibly (the trivial column)
+  have htrivRed : trivialIrreducibleCharacter ↥((derivedInG M).subgroupOf M)
+      ∈ Finset.univ.filter
+        (fun χ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+          ¬ IsIrreducibleCharacter (ClassFunction.induce ((derivedInG M).subgroupOf M)
+            (χ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ))) := by
+    rw [Finset.mem_filter]
+    refine ⟨Finset.mem_univ _, ?_⟩
+    have h1 := h.induce_chiRestrict_not_isIrreducible 1
+    rwa [h.chiRestrict_one_eq_trivial] at h1
+  -- nontrivial reducible-inducing sources are nonlinear (linear nontrivial ⟹ Ind irreducible)
+  have hsub : (Finset.univ.filter
+      fun χ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+        ¬ IsIrreducibleCharacter (ClassFunction.induce ((derivedInG M).subgroupOf M)
+          (χ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ))).erase
+        (trivialIrreducibleCharacter ↥((derivedInG M).subgroupOf M))
+      ⊆ Finset.univ.filter
+        (fun χ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+          ¬ (χ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1) := by
+    intro χ hχ
+    rw [Finset.mem_erase] at hχ
+    obtain ⟨hχne, hχRed⟩ := hχ
+    rw [Finset.mem_filter] at hχRed ⊢
+    refine ⟨Finset.mem_univ _, fun hlin => ?_⟩
+    exact hχRed.2 (isIrreducibleCharacter_induce_of_inertia_eq χ
+      (hyp.inertia_eq_derived_of_linear hG hχne hlin))
+  -- equal counts `p − 1` force equality: every nonlinear source induces reducibly
+  have heq : (Finset.univ.filter
+      fun χ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+        ¬ IsIrreducibleCharacter (ClassFunction.induce ((derivedInG M).subgroupOf M)
+          (χ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ))).erase
+        (trivialIrreducibleCharacter ↥((derivedInG M).subgroupOf M))
+      = Finset.univ.filter
+        (fun χ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+          ¬ (χ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1) := by
+    refine Finset.eq_of_subset_of_card_le hsub ?_
+    rw [hNL, Finset.card_erase_of_mem htrivRed, hRed]
+  -- conclude: an irreducibly-inducing nontrivial `θ` cannot be nonlinear
+  by_contra hlin
+  have hθNL : θ ∈ Finset.univ.filter
+      (fun χ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+        ¬ (χ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1) := by
+    rw [Finset.mem_filter]
+    exact ⟨Finset.mem_univ _, hlin⟩
+  rw [← heq, Finset.mem_erase, Finset.mem_filter] at hθNL
+  exact hθNL.2.2 hirr
+
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (10.10.2), the structure of `S`** — the `hstruct` input of
+`typeV_caseC_coherence_engine`: with `H = M′` non-abelian of order `p³` (`p = w₂`, case (c)
+of Definition (8.7)), every member of `S = {Ind_{M′}^M θ | θ ≠ 1}` is either a degree-`w₁`
+irreducible (a member of `S₁ = S(HC)`) or a nonzero μ-grid column sum
+`μ_j = ∑_i μ_{ij}`.
+
+Book: "`S = S₁ ∪ {μ_j | 0 < j < p}`".  Dichotomy on `φ = Ind_{M′}^M θ`:
+
+* `φ` irreducible — the source is linear
+  (`linear_of_induce_isIrreducible_of_card_eq_prime_cube`, the `p³` counting), so
+  `φ(1) = [M : M′]·θ(1) = w₁` (`induce_apply_one` + `card_W1_eq_derived_index`) and
+  `φ ∈ S(HC)`;
+* `φ` reducible — the source is a certain-type column `χ_j` (`induce_not_isIrreducible_iff`)
+  with `j ≠ 0` (`θ ≠ 1`, `chiRestrict_one_eq_trivial`), and `Ind_{M′}^M χ_j = μ_j`
+  (`induce_restrict_certainType_eq`; the type-V clone of the type-III/IV
+  `reducible_mem_inducedKernelFamily_eq_muGrid_columnSum`, whose `htype`/`chief` inputs its
+  proof never used). -/
+theorem Hypothesis.mem_SHCSet_or_eq_muGrid_columnSum_of_card_eq_prime_cube [Finite G]
+    {M : Subgroup G} (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) {p : ℕ} (hp : p.Prime) (hpw2 : p = hyp.w2)
+    (hcard : Nat.card ↥((derivedInG M).subgroupOf M) = p ^ 3)
+    (hnonab : ¬ IsMulCommutative ↥((derivedInG M).subgroupOf M)) :
+    ∀ φ ∈ hyp.Sset, φ ∈ hyp.SHCSet ∨
+      ∃ j : Fin hyp.w2, j ≠ 0 ∧ φ = ∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j := by
+  haveI := hyp.finiteG
+  classical
+  intro φ hφS
+  have hφmem : φ ∈ inducedFamily M := hφS
+  obtain ⟨θ, hθne, rfl⟩ := hφmem
+  by_cases hirr : IsIrreducibleCharacter (ClassFunction.induce ((derivedInG M).subgroupOf M)
+      (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ))
+  · -- irreducible: linear source, degree `w₁` — an `S₁ = S(HC)` member
+    left
+    have hθ1 : (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1 :=
+      hyp.linear_of_induce_isIrreducible_of_card_eq_prime_cube hG hodd hp hpw2 hcard hnonab
+        hirr
+    refine ⟨⟨θ, hθne, rfl⟩, hirr, ?_⟩
+    have hidx : ((derivedInG M).subgroupOf M).index = hyp.w1 :=
+      hyp.typeP.card_W1_eq_derived_index.symm
+    rw [ClassFunction.induce_apply_one, hθ1, mul_one, hidx]
+  · -- reducible: a nonzero μ-grid column sum (type-V clone of
+    -- `reducible_mem_inducedKernelFamily_eq_muGrid_columnSum`)
+    right
+    let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+    haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+    haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+    letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+    letI : Fintype ↥M := Fintype.ofFinite _
+    letI : Fintype ↥h.K := Fintype.ofFinite _
+    letI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+    have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+    have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+    have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+    have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+      exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+    haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+    have hFk : ∀ j : Fin hyp.w2, (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j)
+        = ClassFunction.induce h.K
+            ((h.chiRestrict (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j)))
+              : ClassFunction ↥h.K ℂ) := by
+      intro j
+      rw [h.coe_chiRestrict, h.induce_restrict_certainType_eq,
+        ← Equiv.sum_comp (finCongr hcardW1.symm)
+        (fun i' => ((h.columnFamily
+          (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j))).mu i'
+            : ClassFunction ↥M ℂ))]
+      exact Finset.sum_congr rfl (fun i _ => by unfold Hypothesis.muGrid; rfl)
+    obtain ⟨χ₂', hχ₂'⟩ := (h.induce_not_isIrreducible_iff θ).mp hirr
+    have hχ₂'ne : χ₂' ≠ 1 := by
+      rintro rfl
+      rw [h.chiRestrict_one_eq_trivial] at hχ₂'
+      exact hθne hχ₂'.symm
+    refine ⟨finCongr hcardW2sub ((finCardEquivCharacterGroup _).symm χ₂'), ?_, ?_⟩
+    · intro h0
+      apply hχ₂'ne
+      have hs0 : (finCardEquivCharacterGroup
+          ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))).symm χ₂' = 0 := by
+        have := congrArg (finCongr hcardW2sub.symm) h0
+        simpa using this
+      calc χ₂' = finCardEquivCharacterGroup _
+            ((finCardEquivCharacterGroup _).symm χ₂') := (Equiv.apply_symm_apply _ _).symm
+        _ = finCardEquivCharacterGroup _ 0 := by rw [hs0]
+        _ = 1 := finCardEquivCharacterGroup_zero _
+    · rw [hFk, show finCongr hcardW2sub.symm
+          (finCongr hcardW2sub ((finCardEquivCharacterGroup _).symm χ₂'))
+          = (finCardEquivCharacterGroup _).symm χ₂' from by simp,
+        Equiv.apply_symm_apply, hχ₂']
+      exact rfl
+
 end OddOrder.Peterfalvi.S12
