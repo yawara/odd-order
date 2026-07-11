@@ -255,3 +255,16 @@ IsCoherent 構成は既存 IntegralCharacterMap 機構 (Zisometry_of_cfnorm 相�
 - 次 tick: ticyclic_sigma_congr_eq の正確な signature + certainTypeOmegaSigma def +
   muColumnChar def を読み、bridge lemma を実装 (置き場 = S12_MaximalIII_IV_V_Core の
   CharacterParameters 隣接 or 新 leaf; ~80-150 行)。
+
+## 2026-07-12 tick¹¹ — DAG 解決: generic (2.5)/(3.2) 層の prefix-split で in-place discharge 可能
+
+- ⚠ TICyclicSigmaBridge (bridge API の在処) は ColumnPin 下流 = S13_Orthogonality から import 不能。
+- **解決 = prefix-split**: TICyclicSigmaBridge の generic 層 (:57-~300、dadeMap_unique /
+  ticyclic_sigma_eq_of_V_eq / _congr_eq / (3.5)-determination — S05/S04-generic、ColumnPin 内容
+  不使用見込み) を新上流 leaf (例 S12_TICyclicUniqueness.lean) へ hoist、TICyclicSigmaBridge は
+  それを import (下流無変更)。これで bridge lemma → case-1/2 → capstone hbridge_τ を
+  **S13_Orthogonality in-place** で discharge でき、v2-capstone 複製が不要に。
+- 実行順: (1) generic block の依存面確認 → prefix-split + build (2) bridge lemma
+  (certainTypeOmegaSigma h46 ↔ alignedOmegaSigmaGrid; 両者 = 同一 W/V 上の 2 tic の σ、
+  入力 char は omegaProdCharTic_apply / compHom-chiColumn で同定、sigmaIntegral vs sigma の
+  wrapper 差を確認) (3) case-1 norm 組立 + case-2 canonical + capstone 差し替え。
