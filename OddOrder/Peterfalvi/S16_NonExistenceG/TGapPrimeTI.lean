@@ -166,6 +166,58 @@ theorem exists_typeIII_primeTIredZero_with_projectionData [Finite G]
     rw [← residue.cfInd_prTIres 0, residue.prTIres0]
     exact OddOrder.RepresentationTheory.inner_induce_trivial_induce_eq_zero hθ
 
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.9)(a), the prime-TI anchor is orthogonal to a conjugate pair.**
+For a nonprincipal irreducible source `θ` of `T'`, retain the universal projection data of
+`ν₀ = Ind_{T'}^T 1` together with its two specialisations
+`ν₀ ⟂ Ind θ` and `ν₀ ⟂ (Ind θ)̄ = Ind θ̄`.
+
+The conjugate source is still nonprincipal: if `θ̄ = 1`, conjugating once more gives `θ = 1`.
+This is the exact source-pair input used to show
+`⟨ν₀ - Ind θ, Ind θ - (Ind θ)̄⟩ = -1`. -/
+theorem exists_typeIII_primeTIredZero_with_conjugateProjectionData [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T)
+    (θ : IrreducibleCharacter
+      ((derivedInG hyp.base.T).subgroupOf hyp.base.T))
+    (hθne : θ ≠ trivialIrreducibleCharacter _) :
+    ∃ ν0 : ClassFunction ↥hyp.base.T ℂ,
+      ν0 ∈ ZIrr ↥hyp.base.T ∧
+        ClassFunction.IsReal ν0 ∧
+        ν0.support ⊆
+          ((derivedInG hyp.base.T).subgroupOf hyp.base.T : Set ↥hyp.base.T) ∧
+        ν0 1 = (hyp.base.p : ℂ) ∧
+        ClassFunction.inner ν0 (trivialClassFunction ↥hyp.base.T) = 1 ∧
+        ClassFunction.inner ν0 ν0 = (hyp.base.p : ℂ) ∧
+        (∀ ξ : IrreducibleCharacter
+            ((derivedInG hyp.base.T).subgroupOf hyp.base.T),
+          ξ ≠ trivialIrreducibleCharacter _ →
+          ClassFunction.inner ν0
+            (ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T)
+              ξ.toClassFunction) = 0) ∧
+        ClassFunction.inner ν0
+          (ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T)
+            θ.toClassFunction) = 0 ∧
+        ClassFunction.inner ν0
+          (ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T)
+            θ.toClassFunction).conj = 0 := by
+  obtain ⟨ν0, hνZ, hνR, hνsupp, hν1, hνone, hνnorm, hνorth⟩ :=
+    exists_typeIII_primeTIredZero_with_projectionData hG hyp hIII
+  let θc : IrreducibleCharacter
+      ((derivedInG hyp.base.T).subgroupOf hyp.base.T) :=
+    ⟨(θ : ClassFunction ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) ℂ).conj,
+      θ.isIrreducible.conj⟩
+  have hθcne : θc ≠ trivialIrreducibleCharacter _ :=
+    OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.irreducibleCharacter_conj_ne_trivial
+      hθne
+  refine ⟨ν0, hνZ, hνR, hνsupp, hν1, hνone, hνnorm, hνorth,
+    hνorth θ hθne, ?_⟩
+  rw [ClassFunction.induce_conj
+    ((derivedInG hyp.base.T).subgroupOf hyp.base.T)
+    (θ : ClassFunction ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) ℂ)]
+  exact hνorth θc hθcne
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (11.9)(a), norm of the T-side bridge source.**
 For a nonprincipal irreducible source `θ` of `T'`, the bridge
