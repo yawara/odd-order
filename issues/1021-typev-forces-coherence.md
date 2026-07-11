@@ -310,3 +310,10 @@ type-P₂ branch は sorried と注記あり — type-V (P₁) 側は生きて�
   同型を再宣言せず S13 に最終組立 lemma を置く**。→ 次 tick: S13 の import
   チェーン確認後、最終組立 (typeV_caseA_coherence) は S13_Lemmas113To115 か
   新 leaf (S13 直下) に配置、v2 (S12_Noncoherence) の import に追加。
+
+## 2026-07-11 tick²⁶ — S12_TypeVCaseC 開始 (commit 578e35e6)
+muColumn / muColumn_apply_one (= d·w₁) / sum_alpha_eq (∑α = μ_j − δμ_0 − (d−δ)ζ)
+landed sorry-free。次 = (10.10.3) の S₁-relative α^τ: Isometry106:805
+(alpha_tau_image、full-S coh 相対) の証明を読み、SHC_isCoherent (S12_Prop109:629)
+相対に書き直す。ζ^{τ₁} は SHC-extension、(μ₀−ζ)^τ pin は S12_Prop109 の
+(10.9) 諸形態から。その後 (10.10.4) glue (ν := τ₁ on S₁ + ν(μ_j) := δ∑ω)。
