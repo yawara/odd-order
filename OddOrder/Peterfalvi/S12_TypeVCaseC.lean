@@ -1,0 +1,121 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core
+
+/-!
+# Peterfalvi (10.10.2)–(10.10.4): type-V case (c) — column characters
+
+T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000),
+§10, pp. 58-63, Theorem (10.10) proof, case (c) of Definition (8.7).
+
+Case-(c) cluster of `typeV_forces_coherence` (issue 1021): the column characters
+`μ_j = ∑_{0≤i<w₁} μ_{ij}` of the (10.3) grid — Peterfalvi's reducible members of
+`S` in case (c) — their degree `μ_j(1) = d·w₁` ((10.10.2)), and the (10.10.4)
+column identity `∑_i α_{ij} = μ_j − δ·μ_0 − (d−δ)·ζ`, the source-side algebra of
+the coherent-extension glue `(μ_j − d·ζ)^τ = δ·(μ_0 − ζ)^τ + ∑_i α_{ij}^τ`.
+-/
+
+namespace OddOrder.Peterfalvi.S12
+
+open OddOrder.RepresentationTheory
+
+variable {G : Type*} [Group G] {M : Subgroup G}
+
+namespace CharacterParameters
+
+variable {hyp : Hypothesis M}
+
+/-- The **column character** `μ_j = ∑_{0≤i<w₁} μ_{ij}` of the (10.3) grid — Peterfalvi's
+`μ_j`, the (reducible) members of `S − S₁` in case (c) of the (10.10) proof. -/
+noncomputable def muColumn (params : CharacterParameters hyp) (j : Fin hyp.w2) :
+    ClassFunction ↥M ℂ :=
+  ∑ i : Fin hyp.w1, params.mu i j
+
+/-- **`μ_j(1) = d·w₁`** for `j ≠ 0` — the degree of the column character, the degree half of
+(10.10.2)'s "the elements of `S − S₁` have degree `p·w₁`" (with `d = p` in case (c)).  Each
+grid entry has degree `d` (`degree_independent`), and there are `w₁` rows. -/
+theorem muColumn_apply_one (params : CharacterParameters hyp) {j : Fin hyp.w2}
+    (hj : j ≠ 0) :
+    params.muColumn j 1 = (params.d : ℂ) * (hyp.w1 : ℂ) := by
+  rw [muColumn, ClassFunction.finset_sum_apply,
+    Finset.sum_congr rfl (fun i _ => params.degree_independent i j hj),
+    Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_comm]
+
+/-- **The (10.10.4) column identity**: `∑_i α_{ij} = μ_j − δ·μ_0 − (d−δ)·ζ`.  Summing the
+(10.5) definition `α_{ij} = μ_{ij} − δ·μ_{i0} − n·ζ` over the `w₁` rows collapses the
+`ζ`-coefficient to `n·w₁ = d − δ` (`n_formula`).  This is the source-side identity behind
+`(μ_j − d·ζ)^τ = δ·(μ_0 − ζ)^τ + ∑_i α_{ij}^τ` in the (10.10.4) coherence computation. -/
+theorem sum_alpha_eq (params : CharacterParameters hyp) (j : Fin hyp.w2) :
+    ∑ i : Fin hyp.w1, params.alpha i j
+      = params.muColumn j - (params.delta : ℂ) • params.muColumn 0
+        - (((params.d : ℤ) - params.delta : ℤ) : ℂ) • params.zeta := by
+  have hcast : ((params.n : ℂ)) * (hyp.w1 : ℂ) = (((params.d : ℤ) - params.delta : ℤ) : ℂ) := by
+    exact_mod_cast congrArg (Int.cast : ℤ → ℂ) params.n_formula
+  calc ∑ i : Fin hyp.w1, params.alpha i j
+      = ∑ i : Fin hyp.w1,
+          (params.mu i j - (params.delta : ℂ) • params.mu i 0 - (params.n : ℂ) • params.zeta) :=
+        Finset.sum_congr rfl (fun i _ => params.alpha_def i j)
+    _ = (∑ i : Fin hyp.w1, params.mu i j)
+          - (params.delta : ℂ) • (∑ i : Fin hyp.w1, params.mu i 0)
+          - ((params.n : ℂ) * (hyp.w1 : ℂ)) • params.zeta := by
+        rw [Finset.sum_sub_distrib, Finset.sum_sub_distrib, Finset.smul_sum, Finset.sum_const,
+          Finset.card_univ, Fintype.card_fin, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, mul_comm]
+    _ = params.muColumn j - (params.delta : ℂ) • params.muColumn 0
+          - (((params.d : ℤ) - params.delta : ℤ) : ℂ) • params.zeta := by
+        rw [hcast, muColumn, muColumn]
+
+end CharacterParameters
+
+/-- **The (10.10.3) coefficient vanishing, pure arithmetic**: if `c·a² − 4a − 2 ≤ 0` with
+`c ≥ 8` (book: `c = |S₁| = 4(w₁−1) ≥ 8` and `n = 2`, so the norm inequality reads
+`|S₁|a² − 2an − 2 ≤ 0`), then the integer coefficient `a` is `0`. -/
+theorem alpha_coefficient_eq_zero {c a : ℤ} (hc : 8 ≤ c)
+    (h : c * a ^ 2 - 4 * a - 2 ≤ 0) : a = 0 := by
+  by_contra ha
+  have h1 : 1 ≤ a ∨ a ≤ -1 := by omega
+  rcases h1 with h1 | h1
+  · nlinarith [sq_nonneg a, sq_nonneg (a - 1)]
+  · nlinarith [sq_nonneg a, sq_nonneg (a + 1)]
+
+namespace CharacterParameters
+
+variable {hyp : Hypothesis M}
+
+/-- **The (10.10.2) index pin `n = 2`**: with `d = p = 2w₁ − 1` and `δ = −1`, the (10.3)
+relation `n·w₁ = d − δ = 2w₁` forces `n = 2`. -/
+theorem n_eq_two (params : CharacterParameters hyp) (hw1 : 0 < hyp.w1)
+    (hd : (params.d : ℤ) = 2 * (hyp.w1 : ℤ) - 1) (hδ : params.delta = -1) :
+    params.n = 2 := by
+  have h := params.n_formula
+  rw [hd, hδ] at h
+  have hw1' : (0 : ℤ) < (hyp.w1 : ℤ) := by exact_mod_cast hw1
+  have h2 : (params.n : ℤ) * (hyp.w1 : ℤ) = 2 * (hyp.w1 : ℤ) := by linarith
+  have : (params.n : ℤ) = 2 := mul_right_cancel₀ hw1'.ne' h2
+  exact_mod_cast this
+
+/-- **The (10.10.2) sign pin `δ = −1`**: with `d = p = 2w₁ − 1` and `w₁ ≥ 3`, the sign
+`δ = +1` is impossible — `n·w₁ = d − 1 = 2w₁ − 2` would give `w₁ ∣ 2`.  (The `δ = ±1`
+dichotomy is Peterfalvi (10.3), `muColumnSign_eq_one_or_neg_one`.) -/
+theorem delta_eq_neg_one (params : CharacterParameters hyp) (hw1 : 3 ≤ hyp.w1)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hd : (params.d : ℤ) = 2 * (hyp.w1 : ℤ) - 1) :
+    params.delta = -1 := by
+  rcases hδpm with h1 | h
+  · exfalso
+    have h := params.n_formula
+    rw [hd, h1] at h
+    have hdvd : (hyp.w1 : ℤ) ∣ 2 := by
+      have h2 : ((params.n : ℤ) - 2) * (hyp.w1 : ℤ) = -2 := by linear_combination h
+      have : (hyp.w1 : ℤ) ∣ -2 := Dvd.intro_left _ h2
+      exact (dvd_neg.mp this)
+    have hle : (hyp.w1 : ℤ) ≤ 2 := Int.le_of_dvd (by norm_num) hdvd
+    have : (3 : ℤ) ≤ (hyp.w1 : ℤ) := by exact_mod_cast hw1
+    omega
+  · exact h
+
+end CharacterParameters
+
+end OddOrder.Peterfalvi.S12

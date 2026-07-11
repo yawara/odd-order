@@ -198,6 +198,107 @@ type-P₂ branch は sorried と注記あり — type-V (P₁) 側は生きて�
   `dadeICM hyp.dadeData.dade (….fullDadeIsometryData hyp.hconj)` (S12_Core/Hypothesis:375) —
   **両 tau は同形 (dade だけ違う)** / `dadeIntegralCharacterMap` +
   `dadeIntegralCharacterMap_apply_of_support` = S07_Coherence/FamilyBundleDade:320/330。
+## 2026-07-11 tick²⁵ — not-(a) 縮約は issue 2022 gate、(c)-body へ転進
+
+- **not-(a) 縮約の Lean 経路確定** (book 04.8 mmd L50-72 精読):
+  (6.4) = (6.1) + |L| odd + M ⊴ L ≤ K, K/M nilpotent + L/H₁ Frobenius
+  (H₁/M = [K/M,K/M])。(6.5) = 「S(M) 非 coherent なら (a) K/H₁ chief +
+  |K:H₁| ≤ 4|L:K|²+1 / (b) K/M non-abelian p-group / (c) |L:K| ∤ p−1」。
+  (10.10) では (M,H,1): (6.5.b) の p = w₂ (w₂ prime | |H|)、(8.7)-case-(b) の
+  w₁|p−1 は (6.5.c) と矛盾 → (b) 排除。(6.5.a) の bound が (10.10.1) の入力。
+- **⚠ gate**: (6.5)-general は (6.3)-general 経由で **general six_two =
+  issue 2022 (lane b 所有、open) に gated** (six_three_descent /
+  six_three_index_bound_general は 2022 で sorry-free 済、six_two のみ残)。
+  (6.5) の算術 brick (six_five_index/chief_factor/c_contradiction、
+  six_five_c_arith) は既存。**(6.4)-carrier (Lean 構造) は未存在** —
+  general (6.5) の組立は issue 2022 の延長線 = b の territory。lane a は
+  claim せず、v2 配線時に signature-correct sorried cite で前倒しする。
+- **policy (A) 適用**: not-(a) は externally gated → **ungated な自クラスタの
+  (c)-body へ転進** (文書順でも (10.9) → (10.10.2-4) が正)。(10.9) は
+  **S12_Prop109 に形式化済み** (a₀₀ 定数項 / residual-orthogonal /
+  norm w₁+1 / σ-coefficient の coherence-free 諸形態) ✓。
+- 次: (10.10.2) (S = S₁ ∪ {μ_j}、S₁ = (p²−1)/w₁ 個の deg-w₁ irreducibles、
+  d=p, δ=−1, n=2) の部材 survey (subagent 委譲済) → 実装。
+
+## 2026-07-11 tick²⁵b — (c)-body survey 完了 (subagent)、実装 plan 確定
+
+**再利用可 (全て既存・ungated)**:
+- `CharacterParameters` (Core/CharacterParameters:1584) は d/delta/n を実 field で
+  保持 + `n_formula` (n·w₁ = d−δ) + `alpha` def + `alpha_support` (A₀-支持) ✓。
+  `typeV_parameter_formula`/`typeV_coherence_formula` field は vestigial opaque
+  (producer が True を入れる; de-scaffold 済で非 load-bearing)。
+- producer `w2_prime_and_parameter_independence` (同:1885) → genuine params +
+  (10.3) 事実。強化版 `exists_charParameters_full` (:1935) は mu/omegaSigma =
+  実 grid (rfl)・ζ∈S・ζ(1)=w₁・ζ̄≠ζ・δ=±1 まで露出。
+- **S₁ = `hyp.SHCSet`** (S12_Prop109:609、deg-w₁ irreducible cut) +
+  **`SHC_isCoherent`** (:629) = (5.7) の S₁-coherence (τ₁ = .extension) ✓
+  ungated!(10.10.3) 第 1 文はこれで即。
+- (10.9) 諸形態 ✓ / `typeV_param_arithmetic` ✓ / grid 代数 (Isometry105/106) ✓。
+
+**Gap = 本物の新規 work (本 issue の残り本体)**:
+1. **方向逆転**: `alpha_tau_image` (Isometry106:805) 等 30 個の (10.5)/(10.6)
+   consumer は全部 `coh : CoherentHypothesis hyp params` (**full-S coherent
+   仮定**、(10.8)-方向) 相対。(10.10.3)/(10.10.4) は **S₁-only coherence
+   相対**で α^τ を再証明 → μ_j^τ = δ∑ω − d·ζ^{τ₁} → **full-S coherence を
+   構成** (ν := τ₁ on S₁, ν(μ_j) := δ∑_i ω_ij^σ) — この glue が未形式化。
+2. (10.10.2) 構造: case (c) で S − S₁ = {μ_j}、|S₁| = (p²−1)/w₁ — p³-群の
+   指標次数 (θ(1) ∈ {1,p})・H′=Z(H)・W₂=H′。genuine p-group 指標論。
+3. μ_j(1) = d·w₁ (degree_independent の行和、小)。
+4. ⚠ **数値 pin の gate**: (10.10.1) の hbound (|H:H′| = p² ≤ 4w₁²+1) は
+   (6.5.a) 由来 = issue 2022 gate。⟹ **engine 化**: case-(c) coherence 本体を
+   明示数値仮説 (hd : d = p / hδ : delta = −1 / hn : n = 2 / hS₁card /
+   hw₁₂ : w₁ < w₂) でパラメータ化して ungated に実証明し、pin の discharge
+   ((10.10.1)+(10.10.2) 経由、hbound は sorried-cite) を分離する —
+  gated-endpoint-skeleton パターン。
+**実装順 (次 tick から)**: 新 leaf S12_TypeVCaseC.lean —
+  (i) muColumn def (μ_j = ∑_i mu i j) + degree = d·w₁ + Z[S₁]-membership 系
+  (ii) S₁-relative α^τ (alpha_tau_image の S₁-版; Isometry106:805 の証明を
+  SHC-coherence 相対に写経+ (10.9) で (μ₀−ζ)^τ pin)
+  (iii) (10.10.4) glue: ν 構成 + IsCoherent hyp.tau hyp.Sset hyp.A0
+  (iv) (10.10.2) 構造 lemma 群 (p³ 指標論) — (iii) と並行可
+  (v) v2 assembly: trichotomy → case (a) = typeV_caseA_coherence ✓ /
+  case (b) = (6.5.c)-cite (sorried、2022 gate) / case (c) = engine + pins。
+
+## 2026-07-11 tick²⁴ — ★★ case-(a) 完全証明: typeV_caseA_coherence (commit 6e4800d5)
+
+- `typeV_caseA_coherence` (S13_Lemmas113To115 末尾、sorry-free):
+  型 V + (8.7)(a) TI → `IsCoherent hyp.tau hyp.Sset hyp.A0`。
+  組立 = capstone → congrMap (tau_agree) → supportedSpan_le (witness ζ̄−ζ)。
+  inducedKernelFamily の ⊥-kernel membership + one_mem_characterKernel で
+  witness 部品を全流用 (S13:436-453 mirror)。
+- **(10.10) case-(a) はこれで book-faithful に閉じた**。tick¹⁵ 起点の設計
+  (v2 方式・S12_Noncoherence 配線) の case-(a) 供給が完成。
+- 残り: **not-(a) 縮約** ((8.4.d)+(8.15) → Hyp (6.4) for (M,H,1) → (6.5.b) で
+  「H non-abelian p-group (p=w₂) でなければ coherent」→ (6.5.c) が case (b)
+  排除) と **case (c)** ((10.10.1)-(10.10.4)、typeV_param_arithmetic ✓済 +
+  grid 組立)。次 tick: S08 の (6.4)/(6.5.b)/(6.5.c) engine の Lean 所在 survey
+  (six_five_* 断片は S08_CoherenceCorePart1/PGroupReduction に確認済み — 
+  Hypothesis (6.4) carrier の有無と (6.5.b)/(6.5.c) の statement 形を特定)。
+- v2 配線 (typeV_forces_coherence_v2 @ S12_Noncoherence) は 3 分岐が揃って
+  から: case-(a) は本 lemma + dV.alternative_transfer の Or.inl で接続。
+
+## 2026-07-11 tick²³ — tau-agreement landed (commit 6880c3e6)
+
+- `dadeIntegralCharacterMap_eq_of_forall_H_eq_bot` ((2.5) integral-map 版、
+  梱包差全吸収) + `typeVSibleyDadeHypothesis_tau_agree` (Sibley τ = hyp.tau
+  on (M')^#-supported) — 両方 sorry-free、S12_TypeVSibley (今 ~370 行)。
+- import 追加: S12_TICyclicSigmaBridge (uniqueness hammer) +
+  S08_CaseBCoherence2 (congrMap + restrict_eq_of_support)。
+- **case-(a) 残り = 最終組立のみ**: c0 := sibleySetup_is_coherent
+  (typeVSibleyDadeHypothesis …) : IsCoherent sib.tau (inducedFamily M) A_sharp
+  → .congrMap (tau_agree、zSupportedSpan 元は mem_supportedSubmodule 経由で
+  support ⊆ 条件へ) → IsCoherent hyp.tau (inducedFamily M) A_sharp
+  → isCoherent_of_supportedSpan_le (hle = 「Ind は M'-set 外 0」+ one_notMem_A0、
+  witness = ζ̄−ζ) → IsCoherent hyp.tau hyp.Sset hyp.A0 (Sset=inducedFamily rfl、
+  A0 = supportInSubgroup typePA0 rfl)。配置は S13_Lemmas113To115 (S12_TypeVSibley
+  を import 追加、supportedSpan_le がそこ在住) → v2 は S12_Noncoherence が S13 を
+  import できるか次第。
+- 部品検索残: 「Ind_{H}^{M} θ の support ⊆ H-set」lemma (induce の外部消滅) と
+  Sset 非空 (exists_zeta_in_inducedFamily_degree_w1 S12_Core:1376 ✓) +
+  ζ̄−ζ ≠ 0 (odd order no real char) + conj-closure (inducedFamily_closedUnderConjugate
+  S12_Core:61 ✓) + conjDiff support (inducedKernelFamily_conjDiff_support 系 or
+  mderivSharp_subset_A0 経由)。
+
 - **DAG**: S12_Noncoherence は S12_TypeIICrossIsometryPair + S14 を import —
   S13_Lemmas113To115 は import して**いない**。transport ③ を書く場所:
   S13_Lemmas113To115 は S12_TypeVSibley を import できるか? (S13 ← S12_Core
@@ -209,3 +310,36 @@ type-P₂ branch は sorried と注記あり — type-V (P₁) 側は生きて�
   同型を再宣言せず S13 に最終組立 lemma を置く**。→ 次 tick: S13 の import
   チェーン確認後、最終組立 (typeV_caseA_coherence) は S13_Lemmas113To115 か
   新 leaf (S13 直下) に配置、v2 (S12_Noncoherence) の import に追加。
+
+## 2026-07-11 tick²⁶ — S12_TypeVCaseC 開始 (commit 578e35e6)
+muColumn / muColumn_apply_one (= d·w₁) / sum_alpha_eq (∑α = μ_j − δμ_0 − (d−δ)ζ)
+landed sorry-free。次 = (10.10.3) の S₁-relative α^τ: Isometry106:805
+(alpha_tau_image、full-S coh 相対) の証明を読み、SHC_isCoherent (S12_Prop109:629)
+相対に書き直す。ζ^{τ₁} は SHC-extension、(μ₀−ζ)^τ pin は S12_Prop109 の
+(10.9) 諸形態から。その後 (10.10.4) glue (ν := τ₁ on S₁ + ν(μ_j) := δ∑ω)。
+
+## 2026-07-11 tick²⁷ — ★(10.10.3) は 9 割既存と判明 (subagent 依存 map)
+
+- **`SHC_tau_muGridAlpha_eq` (S12_Props109To1011:631) が S₁-relative (10.10.3)
+  そのもの** (sorry-free、§11 (11.8) 用に構築済): coh : IsCoherent hyp.tau
+  hyp.SHCSet hyp.A0 相対で α^τ = δ(ω−ω) − n·coh.extension ζ。追加仮説は
+  **hα0 : ⟨α^τ, coh.extension ζ⟩ = −n のみ**。SHC 側 V-vanishing clone 群
+  (SHC_muGridPsi/tau1_zeta_vanishes、SHC_muGridAlpha_tau_X_inner) も既存。
+- **full-S 版が SHC 化不能な理由** (確認済): muGridAlpha_tau1_zeta_eq_neg_n
+  (Isometry106:102) の a=0 論法が可約列 μ_k に coh.tau1/isometry を使う
+  (Isometry106:126/131) — μ_k ∉ Z[S₁]。⟹ wrapper 不可、book 経路 (b) が正。
+- **hα0 discharge の既存版は §11 固定** (muGridAlpha_tau_residual_norm :914、
+  hRn : R.card = n) — (10.10.3) は |S₁| = 4(w₁−1) ≥ 8, n = 2 で別物。
+  **新規 work = ~40 行の a=0 lemma**: exists_SHC_extension_orthonormal (:768) +
+  inner_self_eq_sum_sq_add_of_intProjection (:835) +
+  muGridAlpha_tau_inner_SHC_extension_sub (:714、係数一定) +
+  sum_sq_eq_of_split (:872、|R| symbolic 済!) + int_le_of_add_inner_self_eq
+  (:892) + muGridAlpha_tau_inner_self (Isometry105:480、‖α^τ‖²=2+n²) +
+  **alpha_coefficient_eq_zero (tick²⁷ 済✓)**。
+- **|S₁| ≥ 8**: card_abelianization_derived_eq_w1_mul_card_SHCSet_add_one
+  (S12_Section9Counts:488、|M'/M''| = w₁·|S₁|+1) + case-(c) の |H:H'| = p²
+  (p³-構造、未形式化) + p = 2w₁−1 → |S₁| = 4(w₁−1)。engine では
+  hS1card : 8 ≤ |SHCSet| を仮説に取り、構造 work と分離。
+- 次 tick: (10.10.3)-flavor a=0 lemma (S12_TypeVCaseC、
+  muGridAlpha_tau_residual_norm :914 を hRn 無しで clone) → hα0 →
+  SHC_tau_muGridAlpha_eq 接続の thin corollary (n=2, δ=−1 pin)。
