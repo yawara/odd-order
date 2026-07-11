@@ -1518,3 +1518,24 @@ threading のみ 9081 裁定待ち。
 次 iter: S14_MaximalI/TypeICovering.lean:292 の covers discharge を (12.17)-faithful route へ
 (9080 の手順 1: no-escaping 導出 [theoremD D(3)/(4) + (12.7) typeI_frobenius Frobenius 矛盾] +
 `Mtilde_eq_sigmaSharp_of_forall_centralizer_le` + `mainSubgroup_eq_Msigma` → cover = 𝒞(kernel#))。
+
+## ✅✅ (2026-07-11、lane-b 再開 session) — **(13.18) support pin 完全閉鎖** (9081 close + pin 2 proven)
+
+1. **9081 close**: c2400d81 cherry-pick re-landing (conflict 無し)。Core-split (ef1f172a) 済みゆえ
+   producer は hyp46SmpCore (Dade-free) 経由 — AxiomsCheck 厳格 assert green のまま。
+2. **pin 2 `tauS_mu_row0_diff_support` 完全証明** (commit 8fb98c7a → 3c3bde4e):
+   signature に hG + hj0 (9076 honest fix、consumer `_hj` pass)、body = field `mu_diff_support`
+   + **proven `mu_apply_one_eq_u`** の 2-cite。**iter 31 で想定した「hdeg = 残 genuine math unit」は
+   既に CountingLayer に proven で存在した** (mu_j_isIndPC (13.3.a isIndPC、S11 reducible_sOf_H0_isIndHC
+   接続済) → mu_j_degree (=uq) → mu_apply_one_eq_u (per-entry =u))。Coq defGamma の 2-step
+   (prDade_sub_TIirr + FTprTIred1 mulfI-cancel、PFsection13.v:1909) と同一構造。
+3. pin 3 `tauS_mu_row0_vanish_on_V` にも hj0 追加 (honest 化、sorried のまま)。
+
+**(13.18) 残 = pin 3 (V-value) のみ**。分解 (Coq prTIirr_id = PFsection4.v:403
+`{in W :\: W2, mu2_ i j =1 delta_ j *: w_ i j}` + FTprTIsign δ=1):
+- (i) μ-value grounding field (prTIirr_id 弱形): `mu i j (w) = omega i j (w)` on regular W∖(W₁∪W₂)
+  (δ=1 織込 or δ付き) — producer discharge は muS の V-value (Dade-free route の確認が先: §6 値
+  identity が tau を射影するか、または §12 muGrid V-value 経由)
+- (ii) τ_S = Ind on A0-support: `sInstance_dade0_eq_induce` **proven** (4c-2d)
+- (iii) V^S-TI で Ind 値 = 元値 (abstract、typePData_V_ti + induce class formula)
+- (iv) η 側: `eta_eq_tau_omega` + `tau3_apply_of_regular` (fields 既在)
