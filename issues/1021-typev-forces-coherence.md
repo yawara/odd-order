@@ -401,6 +401,34 @@ cX = 列像から直構成 (‖μ_j‖² = w₁ = ‖δ∑ω‖²)、D := {μ_j 
 hDτ = 完結した image 計算。(10.10.2) 構造 (S = S₁ ⊔ {μ_j}) は hstruct
 仮説で engine 化。
 
+## 2026-07-11 tick³³ — ★(10.10.4) ν-glue landed: typeV_caseC_coherence_engine (delegate 成功 #3、commit 90c8f658)
+
+`Hypothesis.typeV_caseC_coherence_engine` (S12_TypeVCaseC 末尾、sorry-free・axiom-clean
+[propext, Classical.choice, Quot.sound] を #print axioms で確認済):
+coh : IsCoherent tau SHCSet A0 + (10.10.3)-列データ (∀ j ≠ 0 形の hdeg/hδj/hdζ +
+hμ0/hnf/hδpm/hneq/h8/hw12) + **hstruct** ((10.10.2) 構造: ∀ φ ∈ Sset,
+φ ∈ SHCSet ∨ ∃ j ≠ 0, φ = ∑_i muGrid i j) → **IsCoherent hyp.tau hyp.Sset hyp.A0**。
+- route = 予定通り §7 union engine (withDiagonal): X = {μ_j}、Y = SHCSet、
+  D = {μ_j − d·ζ}、hDτ = tick³¹∘³² の image 計算。ν は
+  exists_integralCharacterMap_glue_of_orthogonal (S07 Fourier glue) +
+  新 helper exists_muColumnSum_imageMap (列→δ∑ω^σ の coherentImageMap)。
+- cX ({μ_j}-coherence) 4 fields: isometry = 列 Gram 両側 (新 helper
+  muColumnSum_inner / omegaSigmaColumnSum_inner、δ²=1) を
+  mixed_inner_eq_on_zSpan_of_eq_on (X=Y) で span 化 / extends = 支持列結合は
+  係数和 0 (1 ∉ A₀、次数 d·w₁≠0) ⇒ ℤ[D] 経由 eq_on_zSpan_of_eq_on / ZIrr =
+  alignedOmegaSigmaGrid_mem_ZIrr / nonzero = μ₁−μ₂ (支持 = D-対角 2 本の差)。
+- hgen: 支持元 = ∑c_j(μ_j−dζ) (∈ℤ[D]) + (v + (∑c·d)ζ) (∈ zSupp SHCSet A₀);
+  新 helper muColumnSum_sub_smul_zeta_support ((μ_j−dζ) は A₀-支持、
+  muColumnZero_sub_zeta_support の d-scaled 一般化)。
+- hmixed/hsrc: 度数直交 (muColumnSum_inner_eq_zero_of_apply_one_ne) +
+  (5.3.b) SHC_extension_inner_alignedOmegaSigma_eq_zero;
+  span 化は S08.inner_eq_zero_of_mem_span_of_pairwise_orthogonal (閉包内 ✓)。
+- 追加 bookkeeping 仮説は **不要だった**: ζ∈SHCSet は hζS/hζirr/hζ1 から、
+  μ_j ∈ Sset は muGrid_column_sum_mem_inducedFamily (d = 2w₁+δ ≥ 5 ≠ 1)、
+  d ≠ 0 は hnf+hneq+hδpm+w₁≥3 から導出。
+残 = **(10.10.2) 構造** (hstruct + h8 + 数値 pin d=p/δ=−1/n=2 の discharge、
+p³-群指標論) → v2 assembly (trichotomy 配線)。
+
 ## 🧭 HUB 通知 (2026-07-11 tick): S12_TypeVCaseC / S12_Noncoherence の graph 配線を hub が補完
 
 両 leaf は OddOrder.lean からの import 到達が無く **orphan** だった (= full build が一度も
@@ -409,3 +437,14 @@ elaborate していない; "build green" は空判定)。hub が OddOrder.lean �
 今後の新 leaf は **OddOrder.lean への import 追加を同 commit に含める**こと。また ★★★★
 `no_typeV_maximal_unconditional` (S12_Noncoherence) は AxiomsCheck に assert が無く axiom-clean
 主張が un-tripwired — **a が AxiomsCheck assert を追加すること** (issue 1020/1021 の完了条件に含める)。
+
+## 2026-07-11 tick³⁴ — hub 通知対応: AxiomsCheck tripwire 3 本 (4138 jobs green)
+S_not_coherent_unconditional / typeV_caseA_coherence /
+typeV_caseC_coherence_engine を assert 化 + 新 leaf 2 本を AxiomsCheck import へ。
+no_typeV_maximal_unconditional の assert = 1021 完了条件として文書化。
+残 frontier = **(10.10.2) 構造 discharge** (hstruct: S = S₁ ⊔ {μ_j} / h8:
+|S₁| ≥ 8 / 数値 pin d=p=2w₁−1, δ=−1, n=2 — p³-群指標論: |H|=p³ (case-(c)
+trichotomy) → H' = Z(H) order p → W₂ = H' → (H/H')⋊W₁ Frobenius →
+deg-1 は (p²−1)/w₁ 個の w₁-束 → S₁; deg-p は θ(1)²≤p³ → {μ_j})
+→ **v2 assembly** (S12_Noncoherence: trichotomy → caseA lemma / (6.5.c)
+sorried-cite / caseC engine+pins) → no_typeV_maximal_unconditional 配線。
