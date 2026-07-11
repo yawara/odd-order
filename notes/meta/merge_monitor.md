@@ -494,6 +494,18 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
   `git rev-list main..<lane>` を再確認** (tick 冒頭の値を使い回さない)、(2) sync-only でも
   **常に `--no-commit` で trial merge** し staged を見てから commit、(3) **push は全レーン検証完了後の
   単独コマンド** (merge と同一 bash に連鎖させない)。
+  - **⚠⚠ 再発 (2026-07-11 同日 2 度目、今回は実害 = red main push) → SHA 固定を必須化**: 上記 (1)-(3) が
+    advice 止まりで再度素通りした (検査は `0a128d16` 時点、merge が未検査の新 tip `5f2e11cb` を取り込み、
+    その中の AxiomsCheck assert 5 本が sorryAx 依存で red — c は codex 運用で push が速く、检査→merge の
+    数分の窓でも stale 化する)。**以後必須の手順**: tick 冒頭で `TIP=$(git rev-parse <lane>)` を採取し、
+    範囲逸脱・axiom・sorry の全検査を **その $TIP に対して**行い、merge も **`git merge --no-ff $TIP`**
+    (branch 名でなく **SHA を merge**) で行う。これで検査対象と取り込み対象が構造的に一致し、stale-tip
+    混入は不可能になる。tick 中に lane が進んでいれば差分は次 tick に自然に回る。
+  - **⚠ `lake build … | tail` は exit code を隠蔽する (2026-07-11 実害の相方)**: pipe の最終コマンド
+    (tail/grep) の exit 0 が build 失敗を上書きし、後続の `git push` 連鎖が red を通した。**build は
+    `> log 2>&1` リダイレクト + `echo EXIT=$?` で exit code を明示確認**し、push は green 確認を
+    **読んだ後の別 bash** で行う (上記 (3) の強化; [[lean-build-discipline]] の「build 検証と commit は
+    別 bash」は push にも適用)。
 - **lane が merge 済み commit を amend した場合** (実例 2026-06-11, `b582007f`→`9581665d`):
   ff 同期が "Diverging branches" で落ちる。対処: (1) `git log --oneline -3 <branch>` +
   `git merge-base main <branch>` で amend (親が main の merge 前 HEAD) を確認、(2) 通常の
