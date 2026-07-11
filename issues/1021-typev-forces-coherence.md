@@ -76,3 +76,34 @@ book (10.10) の「type V なら 𝒮 coherent」((10.8) との矛盾用)。
 dadeData 供給 = `S10.dadeSupportHypothesisData_typePA0_of_isTypeP1` (Nonempty-producer)。
 h46.dade 同定の実測 = この producer の H(a)-choice を読む (S10 側 (8.15)-構成)。
 type-P₂ branch は sorried と注記あり — type-V (P₁) 側は生きている。次 tick はここから。
+
+## 2026-07-11 tick¹⁹ — ★設計点解消 (data-independent)、(2.3) 逆方向 landed
+
+- **producer 実測** (参考): engine = `dadeSupportHypothesisData_of_subset_escaping_sigmaSharp`
+  (S10:1608)、H := `ftSupportKernel M X` = escaping なら `FT_signalizer a`、
+  non-escaping なら ⊥。つまり「H(a)=⊥ ⟺ C_G(a) ≤ M」。
+- **しかし実測は不要になった**: `S04.Hypothesis.H_eq_bot_of_centralizer_le` /
+  `H_eq_bot_of_isTISubset` landed (S04_DadeIsometryBasic、commit 5c946ed5)。
+  centralizer_eq_sup + centralizer_disjoint だけから **任意の** (2.2) datum で
+  C_G(a) ≤ L → H(a) = ⊥。⟹ case-(a) TI から h46.dade の H ≡ ⊥ が opaque な
+  hyp.dadeData のまま出る。**SibleyDadeHypothesis の dade field に h46.dade
+  自身を渡す**: `dade_H_eq_bot` = 新 lemma、`cases` の `h46.dade = dade` = **rfl**。
+  TI-側 S04.of_isTISubset 構成も dadeHypothesis_eq_of_forall_H_eq_bot も不要。
+- **⚠ TI の相対先**: TypeVData.alternative (a) =
+  `IsTISubset (sharpSubgroup typeP.H) (normalizer (typeP.H :Set G))` — **N_G(H) 相対**。
+  M-相対へは `IsTISubset.mono` でなく N_G(H) = M の同定 (H = M' ≠ 1 normal、M maximal、
+  M ≤ N_G(H) ≠ G) → 既存 lemma を探す (S09 系に必ずある)。+ A-param 座標合わせ
+  (sharpSubgroup typeP.H : Set G / sharpImage (H:Subgroup ↥M) / typePA)。
+- **book (10.10) 場合分けの訂正** (本 issue 冒頭記載を修正; mmd 04.12 L113):
+  case (c) は False でなく **(10.10.1)–(10.10.4) が honest に coherent を結論**。
+  not-(a) は trichotomy の (b)/(c) 直行でなく: (8.4.d)+(8.15) → **Hyp (6.4) for
+  (L,K,M):=(M,H,1)** → **(6.5.b)** で「H non-abelian p-group (p=w₂) でなければ
+  coherent」→ **(6.5.c)** が case (b) を排除 → case (c) のみ残り |H|=p³。
+  ⟹ 実装も (b) を個別に扱わず (6.4)-engine 側で潰すのが book-faithful。
+- **(6.8) capstone 確認**: `sibleySetup_is_coherent` (S08_CoherenceTheorems:52) は
+  **完成済 (sorry 無)** : hyp.CoherenceTarget。case-(a) は
+  ① SibleyDadeHypothesis 構成 (座標合わせ + h46 = toHypothesis46) →
+  ② capstone → ③ transport (tau-agreement (S04.restrict 系) +
+  isCoherent_of_supportedSpan_le + Sset=inducedFamily 同定) の 3 段。
+- 次 tick: `toHypothesis46` (S12_Core:1057) の実 signature 読解 → ① の座標合わせ
+  (L=M、H : Subgroup ↥M、A-param) を開始。
