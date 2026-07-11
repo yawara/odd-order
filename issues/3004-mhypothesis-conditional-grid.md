@@ -522,3 +522,28 @@ feature commit: `506d30ac`。
   `inner_induce_induce_eq_zero_of_disjoint` で cross inner product は形式的に 0 になる。
 - `TGapCross` / AxiomsCheck (4131 jobs) green。追加4公開 theorem は許容公理のみ。
   新 axiom・新 sorry なし。
+
+## lane-c T-side (14.9) exact cross-Dade consumer (2026-07-11)
+
+feature commit: `4a2f33c5`。
+
+- `tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_exact_supports` を実証明し、前節で閉じた
+  exact carrier の order separation を S/T 両 Dade map へ最後まで配線した。
+- T-side は full `A₀(T)` normed-TI 入力
+  `IsTISubset (typePA0 T dataT) T` から既証明の
+  `tSideDadeMap_eq_induce_of_isTISubset` を通じて `τ_T φ = Ind_T^G φ` とする。
+  `sigmaSharp T = (T')#` も type-P₁ reconciliation から theorem 内で導出する。
+- S-side は exact character support
+  `supp(betaGrid) ⊆ P# ∪ conjClassSetIn S (typePV S Sdata)` を
+  `sharpP_union_V_subset_A0` に通し、既証明の `sInstance_dade0_eq_induce` から
+  `τ_S betaGrid = Ind_S^G betaGrid` とする。
+- 最後は `disjoint_conjugatesIntoSet_sharpP_union_typePV_Tderived` と
+  `inner_induce_induce_eq_zero_of_disjoint` の合成で
+  `⟨τ_T φ, τ_S betaGrid⟩ = 0`。support coercion・Dade=Ind・induced support・直交性の
+  追加 residual は残らない。
+- 従って cross term で残る genuine upstream producer は exact に二つ:
+  (1) Type-P₁/III branch の `A₀(T)` TI (Coq `PFsection13.v:222--242`)、
+  (2) (13.18.a) の sharper `betaGrid` support。後者は現存の弱い
+  `betaGrid_A0_support` では代替できない。
+- `TGapCross` / AxiomsCheck (4131 jobs) green。新 theorem は許容公理のみ、
+  新 axiom・新 sorry なし。commit 前 `HEAD..main = 0`。
