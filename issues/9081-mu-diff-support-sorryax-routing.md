@@ -129,3 +129,12 @@ muS_diff_support → `hyp46Smp` (certainTypeS-based Hypothesis46、FT.lean:360) 
 - V-value pin 側 (`certainType_diff_dade_apply_eq_of_mem_V`) が tau 本質使用で sorried-cite に
   なる点は issue 記載どおり問題なし (off-spine cite の正規形)。
 - 再 landing 順序 (9080 step 1 との前後) は b の自律判断。
+
+## 🧭 HUB 状態記録 (2026-07-11 19:53 tick): b セッション停止を検出 — WIP は worktree に保全済み
+
+b の Core-split WIP (9 files、+165/−50: S06_CertainHypothesis46 + chain 4 file + FT.lean +
+Isometry105 / TypeIIColumnPin / S15_HonestTypeP2A0 の call-site 追従) は **10:36–10:41 で凍結**
+(以後 9h 無活動 = セッション停止とみられる)。**WIP は b worktree に uncommitted のまま保全されている**
+— hub は非接触 (b territory)。**b 再起動時**: `git status` で本 WIP を確認し、Core-split を途中から
+再開すること (裁定条件は上の HUB RULING 節: field 名保存・producer sorry-free 維持・AxiomsCheck
+assert は厳格形のまま)。
