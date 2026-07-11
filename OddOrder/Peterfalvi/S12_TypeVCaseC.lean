@@ -1388,4 +1388,94 @@ theorem Hypothesis.mem_SHCSet_or_eq_muGrid_columnSum_of_card_eq_prime_cube [Fini
         Equiv.apply_symm_apply, hχ₂']
       exact rfl
 
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (10.10.2), the grid-degree identification `d = p`**: with `H = M′` of order
+`p³`, the common nontrivial-column degree `d = μ_{ij}(1)` of the (10.3) grid equals `p`
+(book: "In the notation of (10.3), `d = p`").
+
+The column sum `μ_1 = ∑_i μ_{i1}` (the column `j = 1` exists since `w₂` is prime) lies in
+`S = {Ind_{M′}^M θ | θ ≠ 1}` (`muGrid_column_sum_mem_inducedFamily`, using `d ≠ 1`), so its
+degree computes two ways: `w₁·d` row-by-row (`hdeg`) and `[M : M′]·θ(1) = w₁·θ(1)` through
+the induction (`induce_apply_one` + `card_W1_eq_derived_index`) — hence `θ(1) = d`.  As an
+irreducible degree of the `p`-group `M′`, `d = p^k`
+(`exists_natDegree_characterDegree_eq_prime_pow_of_isPGroup`) with
+`d² ≤ ∑_{θ' ∈ Irr M′} θ'(1)² = |M′| = p³` (`sumIrreducibleDegreeSq`), so `2k ≤ 3`; and
+`d > 1` ((10.3), `d_gt_one`) rules out `k = 0`, leaving `k = 1`, i.e. `d = p`.  This pins
+the (10.10.1) arithmetic `p = 2w₁ − 1` onto the grid parameter `d` for the numeric inputs
+(`delta_eq_neg_one` / `n_eq_two`) of `typeV_caseC_coherence_engine`. -/
+theorem Hypothesis.muGrid_degree_eq_prime_of_card_eq_prime_cube [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) {p : ℕ} (hp : p.Prime)
+    (hcard : Nat.card ↥((derivedInG M).subgroupOf M) = p ^ 3)
+    {d : ℕ} (hd1 : 1 < d)
+    (hdeg : ∀ (i : Fin hyp.w1) (j : Fin hyp.w2), j ≠ 0 →
+      hyp.muGrid hG hodd i j 1 = (d : ℂ)) :
+    d = p := by
+  haveI := hyp.finiteG
+  haveI : Fact p.Prime := ⟨hp⟩
+  classical
+  have hw2ge : 2 ≤ hyp.w2 := (hyp.w2_prime hG).two_le
+  have hj : (⟨1, by omega⟩ : Fin hyp.w2) ≠ 0 := Fin.ne_of_val_ne (by simp)
+  have h3 : (3 : ℕ) ≤ hyp.w1 :=
+    (typePData_toTICyclicHypothesis hyp.typeP hodd).three_le_card_W1
+  have hw1C : (hyp.w1 : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr (by omega)
+  -- `μ_1 = Ind_{M′}^M θ` for a (nontrivial) irreducible `θ` of `M′`
+  have hμS : (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i (⟨1, by omega⟩ : Fin hyp.w2))
+      ∈ inducedFamily M := by
+    refine hyp.muGrid_column_sum_mem_inducedFamily hG hodd _ ?_
+    rw [hdeg 0 _ hj]
+    intro hone
+    have hd' : d = 1 := by exact_mod_cast hone
+    omega
+  obtain ⟨θ, -, hθeq⟩ := hμS
+  -- degree of the column, row-by-row: `w₁·d`
+  have hcol : (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i (⟨1, by omega⟩ : Fin hyp.w2)) 1
+      = (hyp.w1 : ℂ) * (d : ℂ) := by
+    rw [ClassFunction.finset_sum_apply, Finset.sum_congr rfl (fun i _ => hdeg i _ hj),
+      Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+  -- `θ(1) = p^k` with a natural witness `e`
+  have hpg : IsPGroup p ↥((derivedInG M).subgroupOf M) := IsPGroup.of_card hcard
+  obtain ⟨e, k, hepos, hedeg, hepk⟩ :=
+    OddOrder.Peterfalvi.S03.exists_natDegree_characterDegree_eq_prime_pow_of_isPGroup hpg θ
+  rw [OddOrder.Peterfalvi.S03.characterDegree_def] at hedeg
+  -- degree of the column, through the induction: `w₁·e`
+  have hidx : ((derivedInG M).subgroupOf M).index = hyp.w1 :=
+    hyp.typeP.card_W1_eq_derived_index.symm
+  have hind : (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i (⟨1, by omega⟩ : Fin hyp.w2)) 1
+      = (hyp.w1 : ℂ) * (e : ℂ) := by
+    rw [hθeq, ClassFunction.induce_apply_one, hidx, hedeg]
+  -- cancel `w₁`: `d = e`
+  have hde : d = e := by
+    have hC : (hyp.w1 : ℂ) * (d : ℂ) = (hyp.w1 : ℂ) * (e : ℂ) := by rw [← hcol, hind]
+    exact_mod_cast mul_left_cancel₀ hw1C hC
+  -- Burnside bound: `e² ≤ ∑ θ'(1)² = p³`
+  choose dg dgpos hdgeq using fun χ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+    irreducibleCharacter_apply_one_eq_pos_natCast χ
+  have hsumC := OddOrder.RepresentationTheory.sumIrreducibleDegreeSq
+    (G := ↥((derivedInG M).subgroupOf M))
+  rw [hcard] at hsumC
+  have hsum : ∑ χ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M), dg χ ^ 2
+      = p ^ 3 := by
+    have hC : ((∑ χ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M), dg χ ^ 2 : ℕ) : ℂ)
+        = ((p ^ 3 : ℕ) : ℂ) := by
+      rw [Nat.cast_sum, ← hsumC]
+      exact Finset.sum_congr rfl fun χ _ => by rw [Nat.cast_pow, hdgeq χ]
+    exact_mod_cast hC
+  have hdgθ : dg θ = e := by
+    have hC : ((dg θ : ℕ) : ℂ) = ((e : ℕ) : ℂ) := by rw [← hdgeq θ, hedeg]
+    exact_mod_cast hC
+  have hle : e ^ 2 ≤ p ^ 3 := by
+    rw [← hdgθ, ← hsum]
+    exact Finset.single_le_sum (f := fun χ' => dg χ' ^ 2) (fun i _ => Nat.zero_le _)
+      (Finset.mem_univ θ)
+  -- `2k ≤ 3` and `k ≠ 0` force `k = 1`
+  rw [hepk, ← pow_mul] at hle
+  have h2k : k * 2 ≤ 3 := (Nat.pow_le_pow_iff_right hp.one_lt).mp hle
+  have hk0 : k ≠ 0 := by
+    rintro rfl
+    rw [pow_zero] at hepk
+    omega
+  have hk1 : k = 1 := by omega
+  rw [hde, hepk, hk1, pow_one]
+
 end OddOrder.Peterfalvi.S12

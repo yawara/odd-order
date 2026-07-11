@@ -1643,7 +1643,14 @@ dropping the former opaque `typeV_parameter_formula`/`typeV_coherence_formula : 
 excluded by (6.5.c); case (c) (`|H| = p³`, `w₁ ∣ p+1`) runs the parameter calculation
 (`typeV_param_arithmetic` gives `p = 2w₁−1`, then `d = p`, `δ = −1`, `n = 2`) and the σ-grid column
 identities (reusing the (11.8) `muGrid`/`alignedOmegaSigmaGrid`/coherent-extension machinery).
-Gated on the §6/§8 coherence inputs (6.5.a/6.8) and the type-V `|H| = p³` structure. -/
+Gated on the §6/§8 coherence inputs (6.5.a/6.8) and the type-V `|H| = p³` structure.
+
+**Superseded (issue 1021)**: use `typeV_forces_coherence_v2` (S12_Noncoherence) — the honest
+three-branch assembly (case (a) = `S13.typeV_caseA_coherence`, case (b) refuted, case (c) =
+`typeV_caseC_coherence_engine` + the (10.10.2) package) whose only sorries are the explicit
+(6.5) gate lemmas (issue 2022).  This bare-sorry form remains only for the legacy
+`no_typeV_maximal` consumer (this file sits upstream of `S12_Noncoherence` in the import DAG,
+so it cannot be rewired). -/
 theorem typeV_forces_coherence [Finite G] [Fintype G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Fintype ↥M]
     [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]

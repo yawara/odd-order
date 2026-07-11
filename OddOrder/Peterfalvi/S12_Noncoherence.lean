@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S12_TypeIICrossIsometryPair
+import OddOrder.Peterfalvi.S12_TypeVCaseC
+import OddOrder.Peterfalvi.S13_Lemmas113To115
 import OddOrder.Peterfalvi.S14_MaximalI.WitnessSylowCyclic
 
 /-!
@@ -158,17 +160,247 @@ theorem S_not_coherent_unconditional [Finite G]
     hSidx hU7 hprime hcop hHall hcent hfrobcap hW2card hWcard
   exact typeII_noncoherence_arithmetic hw1 hu7' hw2 hMp hbound
 
+/-! ### Peterfalvi (10.10): type V forces coherence — the three-branch v2 assembly (issue 1021)
+
+Book (10.10) proof (mmd 04.12 L113): "By Theorem (10.8), it suffices to show that, if
+Hypothesis (10.1) holds and `M` is of Type V, then `𝒮` is coherent.  Set `H = M′` and
+`H′ = M″`.  If case (a) of Definition (8.7) holds, then `𝒮` is coherent by Theorem (6.8).
+By (8.4.d) and (8.15), we see that Hypothesis (6.4) holds for the groups denoted by `L`, `K`
+and `M` in Hypothesis (6.4) being `M`, `H` and `1` respectively.  By (6.5.b), we may assume
+that `H` is a non-abelian `p`-group for some prime number `p`; then `p = w₂` because `w₂` is
+a prime divisor of `|H|`.  By (6.5.c), case (b) of Definition (8.7) does not hold.  Thus,
+case (c) of Definition (8.7) holds, `|H| = p³` and `w₁` divides `p + 1`."
+
+Case (a) is the landed `S13.typeV_caseA_coherence` ((6.8) route, sorry-free); the not-(a)
+reduction consumes the (6.5) consequences of Hypothesis (6.4) for `(L, K, M) := (M, M′, 1)`,
+stated below as three explicit gate lemmas **sorried pending issue 2022** (general `six_two`
+→ (6.3)-general → (6.5); the (6.4) carrier and the general (6.5) assembly are the lane-b
+chain), which kill case (b) outright and pin case (c) to `|M′| = w₂³`, `p = w₂ = 2w₁ − 1`,
+`δ = −1`, `n = 2` — where the sorry-free (10.10.2)–(10.10.4) package
+(`typeV_caseC_coherence_engine` + P1–P4, S12_TypeVCaseC) produces the coherence. -/
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (6.5.a) for `(L, K, M) := (M, M′, 1)`** — the (10.10.1) index bound.
+
+Book (p. 33): "**(6.5)** Assume Hypothesis (6.4) and that `𝒮(M)` is not coherent.
+**(a)** `K/H₁` is a chief factor of `L` and `|K : H₁| ≤ 4|L : K|² + 1`."  Here
+"**(6.4) Hypothesis.** (a) Assume that Hypothesis (6.1) holds and that `|L|` is odd.
+(b) Let `M` be a normal subgroup of `L` contained in `K` such that `K/M` is nilpotent.
+(c) Let `H₁/M` be the commutator subgroup of `K/M`.  Assume that `L/H₁` is a Frobenius group
+with kernel `K/H₁`."
+
+Instantiated at `(L, K, M) := (M, M′, 1)` for a type-V maximal `M` of the (10.1)
+`Hypothesis` ((8.4.d)+(8.15) supply Hypothesis (6.4): type V makes `K = M′ = M_F` nilpotent
+and `L/H₁ = M/M″` Frobenius with kernel `M′/M″`): `H₁ = [M′, M′] = M″`, so
+`|K : H₁| = |M′ : M″|` is the abelianization order of `M′` and `|L : K| = |M : M′| = w₁`;
+noncoherence of `𝒮(1) = 𝒮` yields `|M′ : M″| ≤ 4w₁² + 1` — the input of the (10.10.1)
+parameter calculation `p = 2w₁ − 1` (`typeV_param_arithmetic`, with `|M′ : M″| = p²` from
+`card_abelianization_eq_prime_sq_of_card_eq_prime_cube`).
+
+**Gated on issue 2022** (general `six_two` → (6.3)-general → (6.5); `six_three_descent` /
+`six_three_index_bound_general` are landed there, `six_two` and the (6.4) carrier remain):
+the statement is book-faithful; the proof is `sorry` pending that chain. -/
+theorem typeV_sixFiveA_bound [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hV : IsTypeV M)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A0)) :
+    Nat.card (Abelianization ↥((derivedInG M).subgroupOf M)) ≤ 4 * hyp.w1 ^ 2 + 1 := by
+  sorry
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (6.5.b) for `(L, K, M) := (M, M′, 1)`** — the not-(a) `p`-group reduction.
+
+Book (p. 33): "**(6.5)** Assume Hypothesis (6.4) and that `𝒮(M)` is not coherent. …
+**(b)** There is a prime number `p` such that `K/M` is a non-abelian `p`-group."
+
+Instantiated at `(L, K, M) := (M, M′, 1)` (see `typeV_sixFiveA_bound` for the (6.4)
+instantiation): if `𝒮` is not coherent then `M′` is a non-abelian `p`-group.  The prime is
+folded to `p = w₂` following the (10.10) proof ("then `p = w₂` because `w₂` is a prime
+divisor of `|H|`" — `W₂ ≤ M″ ≤ M′` with `w₂` prime, `Hypothesis.w2_prime`), so the
+conclusion is stated with `hyp.w2` directly.
+
+**Gated on issue 2022**: the statement is book-faithful; the proof is `sorry` pending the
+general `six_two` → (6.3)-general → (6.5) chain (lane b). -/
+theorem typeV_sixFiveB_pGroup [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hV : IsTypeV M)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A0)) :
+    IsPGroup hyp.w2 ↥(derivedInG M) ∧ ¬ IsMulCommutative ↥(derivedInG M) := by
+  sorry
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (6.5.c) for `(L, K, M) := (M, M′, 1)`** — the case-(b) killer.
+
+Book (p. 33): "**(6.5)** Assume Hypothesis (6.4) and that `𝒮(M)` is not coherent. …
+**(c)** `|L : K|` does not divide `p − 1`."
+
+Instantiated at `(L, K, M) := (M, M′, 1)`: `|L : K| = w₁` and `p = w₂`
+(`typeV_sixFiveB_pGroup`), so `w₁ ∤ w₂ − 1` (natural subtraction; `w₂ ≥ 3`).  In the (10.10)
+proof this refutes case (b) of Definition (8.7): its prime `p′` with `w₁ ∣ p′ − 1` lies in
+`(Nat.card ↥M′).primeFactors` of the `w₂`-group `M′`, so `p′ = w₂` — contradiction.
+
+**Gated on issue 2022**: the statement is book-faithful; the proof is `sorry` pending the
+general `six_two` → (6.3)-general → (6.5) chain (lane b). -/
+theorem typeV_sixFiveC_not_dvd [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hV : IsTypeV M)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A0)) :
+    ¬ (hyp.w1 ∣ hyp.w2 - 1) := by
+  sorry
+
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (10.10.1)–(10.10.4): a type-V maximal forces `𝒮` coherent** — the honest
+three-branch assembly (issue 1021; supersedes the bare-sorry `typeV_forces_coherence` of
+`S12_MaximalIII_IV_V`).
+
+If `𝒮` is coherent there is nothing to prove; otherwise the (8.7) trichotomy of the type-V
+datum (`TypeVData.alternative_transfer`, moved onto `hyp.typeP`) splits:
+
+* **case (a)** (`H^# = (M′)^#` TI in `N_G(H)`): coherent by Theorem (6.8) — the landed
+  sorry-free `S13.typeV_caseA_coherence`;
+* **not (a)**: the (6.5) gates fire on the noncoherence — `M′` is a non-abelian `w₂`-group
+  (`typeV_sixFiveB_pGroup`), so **case (b)** is refuted: its prime `p′` divides `|M′| = w₂^m`,
+  hence `p′ = w₂` and `w₁ ∣ w₂ − 1` contradicts `typeV_sixFiveC_not_dvd`;
+* **case (c)**: `O_p(H) = H` (a `p`-group is its own `p`-core), so `|M′| = p³` with `p = w₂`
+  and `w₁ ∣ p + 1`; the (6.5.a) bound (`typeV_sixFiveA_bound`) with `|M′ : M″| = p²` (P1)
+  runs (10.10.1) (`typeV_param_arithmetic`): `p = 2w₁ − 1`, `w₁ < w₂`; the grid parameter is
+  pinned `d = p` (`muGrid_degree_eq_prime_of_card_eq_prime_cube`), whence `δ = −1`, `n = 2`
+  (`delta_eq_neg_one` / `n_eq_two`); P2 supplies `|S₁| ≥ 8`, P4 the structure
+  `S = S₁ ∪ {μ_j}`, and the (5.7) coherence `SHC_isCoherent` of `S₁` feeds the sorry-free
+  (10.10.4) engine `typeV_caseC_coherence_engine`.
+
+The **only** `sorry`s below this theorem are the three (6.5) gate lemmas (issue 2022); the
+assembly itself and the whole case-(c) package are sorry-free. -/
+theorem typeV_forces_coherence_v2 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : Hypothesis M) (hV : IsTypeV M) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A0) := by
+  by_cases hnc : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A0)
+  · exact hnc
+  -- `𝒮` not coherent: run the (8.7) trichotomy of the type-V datum on `hyp.typeP`
+  obtain ⟨dV⟩ := hV
+  have hHeq : derivedInG M = hyp.typeP.H := TypeVData.derivedInG_eq_H dV hyp.typeP
+  have hw1eq : hyp.w1 = Nat.card ↥hyp.typeP.W1 := rfl
+  rcases TypeVData.alternative_transfer dV hyp.typeP with hTI | hbc
+  · -- case (a): `(M′)^#` is TI — Theorem (6.8) via the Sibley route
+    exact ⟨OddOrder.Peterfalvi.S13.typeV_caseA_coherence hG hyp dV hTI⟩
+  -- not-(a): the (6.5) gates fire on the noncoherence hypothesis
+  obtain ⟨hpgrp, hnonab⟩ := typeV_sixFiveB_pGroup hG hyp ⟨dV⟩ hnc
+  have hnd := typeV_sixFiveC_not_dvd hG hyp ⟨dV⟩ hnc
+  have hw2prime : hyp.w2.Prime := hyp.w2_prime hG
+  haveI : Fact hyp.w2.Prime := ⟨hw2prime⟩
+  obtain ⟨m, hm⟩ := hpgrp.exists_card_eq
+  rcases hbc with ⟨p', hp', hp'mem, hw1dvd, -⟩ | ⟨p, hp, hpmem, hOp, hdvdp1, -⟩
+  · -- case (b) refuted: `p′ ∣ |M′| = w₂^m` gives `p′ = w₂`, so `w₁ ∣ w₂ − 1` — against (6.5.c)
+    have hp'w2 : p' = hyp.w2 := by
+      have hdvdH : p' ∣ Nat.card ↥(derivedInG M) := by
+        rw [hHeq]
+        exact (Nat.mem_primeFactors.mp hp'mem).2.1
+      rw [hm] at hdvdH
+      exact (Nat.prime_dvd_prime_iff_eq hp' hw2prime).mp (hp'.dvd_of_dvd_pow hdvdH)
+    rw [hp'w2, ← hw1eq] at hw1dvd
+    exact absurd hw1dvd hnd
+  · -- case (c): `|M′| = p³`, `w₁ ∣ p + 1` — the (10.10.1)–(10.10.4) engine
+    haveI : Fact p.Prime := ⟨hp⟩
+    have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
+    -- `p = w₂` (a prime divisor of the `w₂`-group `M′`)
+    have hpw2 : p = hyp.w2 := by
+      have hdvdH : p ∣ Nat.card ↥(derivedInG M) := by
+        rw [hHeq]
+        exact (Nat.mem_primeFactors.mp hpmem).2.1
+      rw [hm] at hdvdH
+      exact (Nat.prime_dvd_prime_iff_eq hp hw2prime).mp (hp.dvd_of_dvd_pow hdvdH)
+    -- `M′` is a `p`-group, so `O_p(M′) = M′` and the case-(c) datum reads `|M′| = p³`
+    have hHp : IsPGroup p ↥hyp.typeP.H := by
+      rw [hpw2, ← hHeq]
+      exact hpgrp
+    have hcore : opiCoreInG ({p} : Set ℕ) hyp.typeP.H = hyp.typeP.H :=
+      le_antisymm (opiCoreInG_le _ _)
+        (le_opiCoreInG_of_normal_of_isPiSubgroup le_rfl
+          (by rw [Subgroup.subgroupOf_self]; infer_instance)
+          (isPiSubgroup_singleton_of_isPGroup hHp))
+    have hcardH : Nat.card ↥((derivedInG M).subgroupOf M) = p ^ 3 := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'le).toEquiv, hHeq, ← hcore]
+      exact hOp
+    -- non-abelianness in the `subgroupOf` coordinate (P1/P2/P4 speak `(M′).subgroupOf M`)
+    have hnonab' : ¬ IsMulCommutative ↥((derivedInG M).subgroupOf M) := by
+      intro hcomm
+      refine hnonab ⟨⟨fun a b => ?_⟩⟩
+      obtain ⟨x, rfl⟩ := (Subgroup.subgroupOfEquivOfLe hM'le).surjective a
+      obtain ⟨y, rfl⟩ := (Subgroup.subgroupOfEquivOfLe hM'le).surjective b
+      rw [← map_mul, ← map_mul, hcomm.is_comm.comm x y]
+    -- (10.10.1): `p = 2w₁ − 1` and `w₁ < w₂` from the (6.5.a) bound and `|M′ : M″| = p²`
+    have hbound := typeV_sixFiveA_bound hG hyp ⟨dV⟩ hnc
+    have hab : Nat.card (Abelianization ↥((derivedInG M).subgroupOf M)) = p ^ 2 :=
+      card_abelianization_eq_prime_sq_of_card_eq_prime_cube hp hcardH hnonab'
+    have hboundp : p ^ 2 ≤ 4 * hyp.w1 ^ 2 + 1 := by
+      rw [← hab]
+      exact hbound
+    have hpodd : Odd p := by
+      rw [hpw2]
+      exact hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card hyp.W2)
+    have hw1odd : Odd hyp.w1 :=
+      hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card hyp.W1)
+    have hw1gt : 1 < hyp.w1 :=
+      (Subgroup.one_lt_card_iff_ne_bot _).mpr hyp.typeP.W1_nontrivial
+    have hw13 : 3 ≤ hyp.w1 := by obtain ⟨k, hk⟩ := hw1odd; omega
+    have hdvd : hyp.w1 ∣ p + 1 := by
+      rw [hw1eq]
+      exact hdvdp1
+    obtain ⟨hp2w1, hw1ltp⟩ := typeV_param_arithmetic hpodd hw1odd hw1gt hdvd hboundp
+    have hw12 : hyp.w1 < hyp.w2 := by omega
+    have hp2w1Z : (p : ℤ) = 2 * (hyp.w1 : ℤ) - 1 := by omega
+    -- the (10.2)/(10.3) parameter package with the (10.3) facts exposed
+    obtain ⟨params, hmu, -, hζS, hζ1, hζne, hδpm, hδj⟩ := hyp.exists_charParameters_full hG
+    have hdeg : ∀ (i : Fin hyp.w1) (j : Fin hyp.w2), j ≠ 0 →
+        hyp.muGrid hG hG.odd i j 1 = (params.d : ℂ) := by
+      intro i j hj
+      rw [← hmu]
+      exact params.degree_independent i j hj
+    -- (10.10.2) numeric pins: `d = p`, `δ = −1`, `n = 2`
+    have hdp : params.d = p :=
+      hyp.muGrid_degree_eq_prime_of_card_eq_prime_cube hG hG.odd hp hcardH
+        params.d_gt_one hdeg
+    have hdZ : (params.d : ℤ) = 2 * (hyp.w1 : ℤ) - 1 := by
+      rw [hdp]
+      exact hp2w1Z
+    have hδ : params.delta = -1 := params.delta_eq_neg_one hw13 hδpm hdZ
+    have hn2 : params.n = 2 := params.n_eq_two (by omega) hdZ hδ
+    -- grid degree data: zero column has degree `1`, both degrees avoid `ζ(1) = w₁`
+    have hμ0 : ∀ i, hyp.muGrid hG hG.odd i 0 1 = 1 := fun i =>
+      hyp.muGrid_zero_column_apply_one hG hG.odd i
+    have hdζ : ∀ (i : Fin hyp.w1) (j : Fin hyp.w2), j ≠ 0 →
+        hyp.muGrid hG hG.odd i j 1 ≠ params.zeta 1 := by
+      intro i j hj
+      rw [hdeg i j hj, hζ1]
+      have hne : params.d ≠ hyp.w1 := by omega
+      exact fun h => hne (by exact_mod_cast h)
+    have h0ζ : ∀ i, hyp.muGrid hG hG.odd i 0 1 ≠ params.zeta 1 := by
+      intro i
+      rw [hμ0 i, hζ1]
+      intro h
+      have h1 : (1 : ℕ) = hyp.w1 := by exact_mod_cast h
+      omega
+    -- (10.10.2) structure package: the `h8` count and the dichotomy `S = S₁ ∪ {μ_j}`
+    have h8 := hyp.eight_le_SHCcount_of_card_eq_prime_cube hG hp hcardH hnonab' hp2w1Z hw13
+    have hstruct := hyp.mem_SHCSet_or_eq_muGrid_columnSum_of_card_eq_prime_cube hG hG.odd
+      hp hpw2 hcardH hnonab'
+    -- (5.7): `S₁ = S(HC)` is coherent; fire the (10.10.4) engine
+    exact ⟨hyp.typeV_caseC_coherence_engine hG (hyp.SHC_isCoherent hG) hG.odd hζS
+      params.zeta_irreducible hζ1 hζne hdeg hμ0 params.n_formula hδj hdζ h0ζ hδpm hn2 h8
+      hw12 hstruct⟩
+
 open scoped FiniteInduce in
 /-- **Peterfalvi (10.10), unconditional**: `G` has no maximal subgroup of type V — the
 `S12.no_typeV_maximal` conclusion re-founded on the unconditional (10.8)
-(`S_not_coherent_unconditional`), so its dependencies stay axiom-clean (issue 1020,
-consumer-migration step 1). -/
+(`S_not_coherent_unconditional`) and the three-branch (10.10.1)–(10.10.4) assembly
+`typeV_forces_coherence_v2` (issue 1021), whose only remaining `sorry`s are the (6.5) gate
+lemmas (issue 2022). -/
 theorem no_typeV_maximal_unconditional [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ IsTypeV M := by
   rintro ⟨M, hMmax, hMV⟩
   obtain ⟨hyp⟩ := exists_hypothesis_of_typeIIIorIVorV hG hMmax (Or.inr (Or.inr hMV))
-  obtain ⟨params, -⟩ := w2_prime_and_parameter_independence hG hyp
-  exact S_not_coherent_unconditional hG hyp (typeV_forces_coherence hG hMV params)
+  exact S_not_coherent_unconditional hG hyp (typeV_forces_coherence_v2 hG hyp hMV)
 
 end OddOrder.Peterfalvi.S12
