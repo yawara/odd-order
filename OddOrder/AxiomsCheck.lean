@@ -3405,11 +3405,24 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.disjoint_conjugatesIntoSet_sharpP_union_typePV_Tderived
 set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.PW1_index_eq_u
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.betaGrid_apply_one_eq_zero
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.betaGrid_support_sharpP_union_typePV_of_values
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.betaGrid_support_sharpP_union_typePV_of_mu_values
+set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_exact_supports
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_beta_support
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_mu_values
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.inner_eq_swap_of_mem_ZIrr
 set_option linter.style.longLine false in
