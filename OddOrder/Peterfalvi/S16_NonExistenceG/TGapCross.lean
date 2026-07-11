@@ -96,6 +96,80 @@ theorem tSideDadeMap_eq_full_typeP1DadeMap_of_support [Finite G]
     ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφsupp⟩
 
 open scoped Classical in
+/-- **Peterfalvi (13.2.e), type-`P₁` `A₀(M)` has no escaping point.**
+
+This is the Type-`P₁` instance of Coq `FTtypeP_facts(e)` (`PFsection13.v:224–242`).
+An escaping `A₀(M)` point is `M_σ#` by (8.13.b).  BG Theorem D(4) attaches a unique
+maximal neighbour `N`, of type `F` or `P₂`.  In the type-`F` branch, Peterfalvi (12.7)
+Frobenius-kernel regularity forces the point into `N_σ`, contradicting D(4).  In the
+type-`P₂` branch, D(4) makes `M` type `F`, contradicting that `M` is type `P₁`.
+
+This is the genuine group-theoretic producer behind the T-side full-`A₀` normed-TI
+input; it does not use the downstream conclusion that `T` is type II. -/
+theorem escaping_typePA0_eq_empty_of_isTypeP1 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ OddOrder.GroupTheory.maximalSubgroups G)
+    (data : OddOrder.GroupTheory.TypePData M)
+    (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M) :
+    OddOrder.GroupTheory.escapingCentralizerSet M
+      (OddOrder.GroupTheory.typePA0 M data) = ∅ := by
+  rw [Set.eq_empty_iff_forall_notMem]
+  rintro a haesc
+  have haσ : a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M :=
+    OddOrder.Peterfalvi.S10.escaping_typePA0_mem_sigmaSharp_of_isTypeP1
+      hG hM data hP1 haesc
+  obtain ⟨R, -, N, ⟨hNmem, -, hMFN, hxAN, hNtype, -, hP2imp⟩, -⟩ :=
+    OddOrder.BG.Ch4.S16.exists_RData_escape_structure hG hM haσ haesc.2
+  rcases hNtype with hNF | hNP2
+  · have hNmax : N ∈ OddOrder.GroupTheory.maximalSubgroups G := hNmem.1
+    have hNI : OddOrder.GroupTheory.IsTypeI N :=
+      (OddOrder.Peterfalvi.S10Interface.isTypeI_iff_isTypeF hG hNmax).mpr hNF
+    obtain ⟨fdata, -⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius hG hNmax hNI
+    have hker : fdata.typeI.typeF.H = OddOrder.BG.Ch3.S10.Msigma N := by
+      rw [fdata.typeI.typeF.H_eq]
+      exact hMFN
+    obtain ⟨haN, hne⟩ : a ∈ OddOrder.BG.Ch4.S16.hatMsigma N := hxAN.1.1
+    obtain ⟨z, hz1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hne
+    obtain ⟨hzMσ, hzC⟩ := Subgroup.mem_inf.mp z.2
+    have hzN : (z : G) ∈ N := OddOrder.BG.Ch3.S10.Msigma_le N hzMσ
+    have hzG1 : (z : G) ≠ 1 := fun h => hz1 (Subtype.ext h)
+    have haker : (⟨a, haN⟩ : ↥N) ∈ fdata.typeI.typeF.H.subgroupOf N := by
+      refine fdata.frobenius.centralizer_kernel_le ⟨(z : G), hzN⟩
+        (Subgroup.mem_subgroupOf.mpr (by rw [hker]; exact hzMσ))
+        (fun h => hzG1 (congrArg Subtype.val h)) ?_
+      rw [Subgroup.mem_centralizer_singleton_iff]
+      exact Subtype.ext (Subgroup.mem_centralizer_singleton_iff.mp hzC).symm
+    exact hxAN.2 (SetLike.mem_coe.mpr
+      (by rw [← hker]; exact Subgroup.mem_subgroupOf.mp haker))
+  · obtain ⟨hFM, -⟩ := hP2imp hNP2
+    exact OddOrder.BG.Ch4.S14.not_isTypeP_and_isTypeF ⟨hP1.1, hFM⟩
+
+open scoped Classical in
+/-- **Peterfalvi (13.2.e), full type-`P₁` `A₀(M)` is a TI-subset.**
+
+The escape exclusion above makes every faithful Dade stabilizer trivial; Peterfalvi
+(2.3), already encoded by `Hypothesis.isTISubset_of_forall_H_eq_bot`, then supplies the
+full TI statement.  This is Coq's `normedTI 'A0(M) G M` conclusion with no downstream
+type-II assumption. -/
+theorem typePA0_isTISubset_of_isTypeP1 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ OddOrder.GroupTheory.maximalSubgroups G)
+    (data : OddOrder.GroupTheory.TypePData M)
+    (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M) :
+    OddOrder.GroupTheory.IsTISubset (OddOrder.GroupTheory.typePA0 M data) M := by
+  letI := Fintype.ofFinite G
+  let full := (OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_typePA0_of_isTypeP1
+    hG hM data hP1).some
+  apply full.dade.isTISubset_of_forall_H_eq_bot
+  intro a
+  rw [full.H_eq_ftSupportKernel]
+  exact OddOrder.Peterfalvi.S10.ftSupportKernel_eq_bot_of_not_escaping (by
+    intro haesc
+    have hempty := escaping_typePA0_eq_empty_of_isTypeP1 hG hM data hP1
+    rw [hempty] at haesc
+    exact Set.notMem_empty a.1 haesc)
+
+open scoped Classical in
 /-- **Peterfalvi (13.2.e), reduction of full `A₀(T)` normed-TI to `A(T)`.**
 
 The exceptional `V^T` part is already non-escaping, so centralizer containment on
@@ -240,6 +314,25 @@ theorem tSideDadeMap_eq_induce_of_isTISubset [Finite G]
   tSideDadeMap_eq_induce_of_full_typeP1_H_eq_bot hG hyp dataT hP1
     (fullTypeP1Dade_H_eq_bot_of_isTISubset hG hyp dataT hP1 hTI) hφsupp
 
+open scoped Classical in
+/-- **Peterfalvi (13.2.e), exact T-side Dade=induction theorem.**
+
+The Type-`P₁` escape analysis now supplies full `A₀(T)` normed-TI internally, so no
+TI hypothesis or downstream type-II conclusion remains in the consumer interface. -/
+theorem tSideDadeMap_eq_induce_of_isTypeP1 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    [Fintype ↥hyp.base.T] [Invertible (Nat.card ↥hyp.base.T : ℂ)]
+    (dataT : OddOrder.GroupTheory.TypePData hyp.base.T)
+    (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T)
+    {φ : ClassFunction ↥hyp.base.T ℂ}
+    (hφsupp : φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T) :
+    tSideDadeMap hyp hG φ = ClassFunction.induce hyp.base.T φ :=
+  tSideDadeMap_eq_induce_of_isTISubset hG hyp dataT hP1
+    (typePA0_isTISubset_of_isTypeP1 hG hyp.base.T_maximal dataT hP1) hφsupp
+
 /-- Conjugate closures are disjoint when a prime divides every order on the left
 and no order on the right.
 
@@ -382,8 +475,9 @@ induction, while `supp(β_S) ⊆ P# ∪ V_S` places the S-side Dade map in its a
 `A₀(S)` induction range.  The exact order separator above then makes the induced
 characters orthogonal.
 
-No support or TI content is hidden here: `hTI` and `hbeta` are precisely the two deep
-inputs still to be supplied by Peterfalvi (13.2.e) and (13.18.a), respectively. -/
+No support or TI content is hidden here: `hTI` and `hbeta` are the two exact inputs of
+this reusable boundary theorem.  The Type-`P₁` TI producer is now proved above; the
+specialized theorem below discharges `hTI` and retains only the (13.18.a) β support. -/
 theorem tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_exact_supports [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G))
@@ -442,6 +536,33 @@ theorem tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_exact_supports [Finite G]
   exact OddOrder.Peterfalvi.S15.inner_induce_induce_eq_zero_of_disjoint
     hφderiv hbeta
       (disjoint_conjugatesIntoSet_sharpP_union_typePV_Tderived hG hyp).symm
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (14.9), cross-Dade orthogonality from the exact β support.**
+
+The Type-`P₁` full-`A₀(T)` TI theorem is now proved internally, so the only remaining
+character-theoretic input for the S/T Dade cross term is Peterfalvi (13.18.a)'s exact
+`β_S` support statement. -/
+theorem tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_beta_support [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    [fintypeG : Fintype G] [invertibleG : Invertible (Nat.card G : ℂ)]
+    (dataT : OddOrder.GroupTheory.TypePData hyp.base.T)
+    (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T)
+    (hbeta : (OddOrder.Peterfalvi.S15.betaGrid hyp.base
+      ⟨1, by have := hyp.base.three_le_p; omega⟩).support ⊆
+        {y : ↥hyp.base.S |
+          (y : G) ∈ OddOrder.GroupTheory.sharpSubgroup hyp.base.P ∪
+            OddOrder.GroupTheory.conjClassSetIn hyp.base.S
+              (OddOrder.GroupTheory.typePV hyp.base.S hyp.base.Sdata)})
+    {φ : ClassFunction ↥hyp.base.T ℂ}
+    (hφsupp : φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T) :
+    ClassFunction.inner (tSideDadeMap hyp hG φ)
+      (OddOrder.Peterfalvi.S15.tauSbetaGrid hG hyp.base) = 0 :=
+  tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_exact_supports hG hyp dataT hP1
+    (typePA0_isTISubset_of_isTypeP1 hG hyp.base.T_maximal dataT hP1)
+    hbeta hφsupp
 
 /-- The inner product of two virtual characters is symmetric: its value is
 an integer, hence fixed by complex conjugation. -/

@@ -3370,6 +3370,12 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S16.tSideDadeMap_eq_full_typeP1DadeMap_of_support
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.escaping_typePA0_eq_empty_of_isTypeP1
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.typePA0_isTISubset_of_isTypeP1
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.fullTypeP1Dade_H_eq_bot_of_typePA_centralizer_le
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
@@ -3385,6 +3391,9 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S16.tSideDadeMap_eq_induce_of_isTISubset
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.tSideDadeMap_eq_induce_of_isTypeP1
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.disjoint_conjugatesIntoSet_of_prime_order_separator
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
@@ -3398,6 +3407,9 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_exact_supports
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_beta_support
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.inner_eq_swap_of_mem_ZIrr
 set_option linter.style.longLine false in
