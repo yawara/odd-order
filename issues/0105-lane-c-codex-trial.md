@@ -159,3 +159,5 @@ issue は trial ログの追記継続のため open 維持、次の節目 (T-sid
 - 2026-07-11 19:53 (tick): ⏸ c turn-idle 再発 (ab1ac336 後 ~1.5h 書き込みなし、tree clean)。前回
   同様「ユーザーの一言」で再開可 (次 target = 3004 の anchor orthogonality)。数学品質に問題なし
   (19/19 継続)。
+- 2026-07-11 (tick、merge f5ebbe06): 再起動後即 genuine 復帰 — (11.9a) conjugate anchor orthogonality
+  保持 (+52、実 sorry ±0、assert 1 本 build 通過)。20/20。
