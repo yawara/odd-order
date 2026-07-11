@@ -134,3 +134,137 @@ PFsection11.v:905-990 ((11.8.6) 本体、tau2muj WLOG、γ-trick、odd 排除)�
   stratum-generic 変種 (`memberRFamily` の ⊥-family 版 + cross_orthogonal の 2-stratum 版) を
   追加 (dispatcher 構築 :~200-330 の stratum 依存を先に読む) → S13_Orthogonality capstone の
   hmixed を実 discharge。hbridge_τ (WLOG-swap) は hmixed 後。
+
+## 2026-07-12 tick⁶ — ★★ hmixed 完全 discharge (commits 39b8e023 + 87da4bdf)
+
+- SOf-stratum-generic dispatch (5 decls、AlphaBound) + 2-stratum coherent_ortho (2 decls、
+  PairAdjoin) が共に**一発 green**。capstone の hmixed sorry を実証明に置換 (両辺 0:
+  character-level cross-zero + image-level cross_orthogonal)。
+- **capstone 残 sorry = hbridge_τ 1 本のみ** (S13_Orthogonality:348)。
+- 残作業 = tick⁴ route (γ) の WLOG-swap: capstone を「pin 付き 𝒮(H₀C)-coherence の存在」で
+  再編 (all-reducible case = uniform canonical coherence に交換 / irr case = (5.8)-dichotomy +
+  ⟨τ₂μ, ω-col⟩ ≠ 0 内積論法 + odd-conjugation 符号排除)。γ-trick の cross-直交は
+  SOf_coherent_extension_cross_orthogonal (本 tick で landed) が供給。
+- followup (低優先): H0Cprime 版 dispatch 5+2 decls を SOf 版の thin instance に fold。
+
+## 2026-07-12 tick⁷ — hbridge_τ 部品状況 (hmixed 完了後の再評価)
+
+tick⁶ の landed 機構で γ-trick (Coq irr-case) の cross 項が**全て**処理可能に:
+- ⟨ext ξ, ζ^{τ₁}⟩ = 0 / ⟨ext μ_j, ζ^{τ₁}⟩ = 0: **2-stratum cross_orthogonal (landed)** ✓
+  (ζ ∈ S(HC)、ξ/μ_j ∈ 𝒮(H₀C))。
+- ⟨ext ξ, ω-col⟩ = 0 (irr ξ): dadeOfDiff ⊥ σ-grid 系
+  (certainTypeR_imageSet_orthogonal_dadeOfDiff_typeP 隣接、既在) + SOf-(5.5)。
+- γ = ξ(1)μ_j − μ_j(1)ξ の A₀-support + extends_on_supported + Dade 等長 → 内積計算 ✓ 部品既在。
+- narrow (5.5) (SOf_coherent_extension_eq_sum_memberRFamily) ⟹ ext(μ_j) = ∑_{α∈E} α、
+  E ⊆ certainTypeR imageSet (2q 元: +ω_{ij} 側 q 個 ∪ −ω̄ 側 q 個)。|E| = w₁ は norm から
+  (card 節は SOf 版で落としたが isometry + orthonormal で導出可)。
+
+**残る本丸 = dichotomy の後半**: ⟨∑E, ω-col⟩ ≠ 0 は「E ∩ 正側 ≠ ∅」までしか与えない。
+E = 正側全列 の強制は (a) Coq FTtypeP_coherent_TIred 型の (5.8) separability
+(S-side TypeIIColumnPin の endgame `eq_smul_chiFam_column_of_vanishOnV` mirror、V-vanishing 要) or
+(b) 列独立性 (SOf-diff: ext(μ_j − μ_k) = τ(μ_j − μ_k) = hcol-diff = ω_j − ω_k、A₀-supported ゆえ
+extends_on_supported で**タダ**!) + 1 列の pin を全列に伝播 + Parseval/counting で 1 列を決める
+組合せ論。**(b) が有望**: hcol-diff により δ=1 も自動 (tick⁴)、残るは
+「∑_j ⟨ext μ_j の E_j 分解⟩ の大域 counting」1 点。次 tick: (b) の counting を詰める
+(E_j ⊆ 2q-元、|E_j| = q、E_j − E_k = 列差固定、certainTypeR の j-列/j̄-列構造で交差評価)。
+
+## 2026-07-12 tick⁸ — ★ route (b) 最終形: dichotomy 完全不要の 2-case 論法 (設計完成)
+
+**目標 lemma**: `exists_pinned_coherent_sOf_H0C`:
+hcol (capstone の既存仮説) の下で
+`∃ c : IsCoherent tau (sOf s11Setup H0C) A0, c.extension (∑ᵢ μ_{i1}) = ∑ᵢ ω^σ_{i1}`。
+capstone は coherent_sOf_H0C の代わりにこれを使い、hbridge_τ = pin 節そのもの (ν-線形性計算)。
+
+**case 1 — ∃ irr ξ ∈ 𝒮(H₀C)** (任意の coherence c が pin を持つ):
+γ = ξ(1)·μ₁ − μ₁(1)·ξ ∈ ℤ[𝒮(H₀C)]、γ(1)=0 → A₀-supported
+(`inducedKernelFamily_zSpan_support_of_apply_one_eq_zero`、capstone 内で使用実績あり) →
+c.ext γ = τγ (extends_on_supported)。⟨τγ, τθ⟩ = ⟨γ, θ⟩ (Dade 等長、θ = μ₁ − dζ A₀-supported)
+= ξ(1)·q (直交: ξ⊥μ₁⊥ζ 全て stratum/family 直交)。他方 LHS 展開で
+⟨c.ext ξ, ωcol₁⟩ = 0 (ξ の 2-elt dadeOfDiff R-family ⊥ σ-grid) +
+⟨c.ext ξ, coh.ext ζ⟩ = ⟨c.ext μ₁, coh.ext ζ⟩ = 0 (**2-stratum cross_orthogonal、tick⁶ landed**)
+⟹ **⟨c.ext μ₁, ωcol₁⟩ = q**。SOf-(5.5): c.ext μ₁ = ∑E、E ⊆ certainTypeR imageSet
+(P₁ ∪ N₁、|E| = q from 等長 norm)、⟨∑E, ωcol₁⟩ = #(E∩P₁) = q ⟹ E = P₁ ⟹ pin ✓。
+w₂ = 3 含む全ケースで dichotomy/separability/V-vanishing 一切不要。
+
+**case 2 — 𝒮(H₀C) all-reducible** (= 全 member が μ-column、Coq WLOG-swap の構成的実体):
+canonical pinned coherence を**構成**: ext₀(μ_k) := ωcol_k の ℤ-線形拡張。
+等長 ✓ (両側 orthonormal ×√q scaling: ⟨μ_j,μ_k⟩ = q·δ = ⟨ωcol_j,ωcol_k⟩)。
+τ-agreement on ℤ[𝒮(H₀C), A₀]: supported 元 = 係数和 0 の column 結合 (値-at-1 特徴付け) =
+差分 lattice、τ(μ_j − μ_k) = ωcol_j − ωcol_k は **hcol の差** ⟹ agreement ✓。
+IsCoherent 構成は既存 IntegralCharacterMap 機構 (Zisometry_of_cfnorm 相当) で。
+
+**実装順 (次 tick)**: (i) case-1 γ-trick lemma (`pinned_of_irr_mem`、任意 c) — 部品全在庫、
+~120 行 (ii) case-2 構成 (~150 行、supported-characterization の在庫確認:
+`inducedKernelFamily_zSpan_support…` の逆向き + 係数和) (iii) exists_pinned + capstone 再配線
++ hbridge_τ 差し替え (iv) full build/AxiomsCheck。完了で capstone sorry-free →
+(11.9.b)-unconditional residual = caseA refuter (lane b) のみ。
+
+### tick⁸ᵇ — 実装 API ノート (case 1)
+
+- `certainTypeRImage h χ₂ χ₂' (b, i) = (columnFamily χ₂).sign • certainTypeOmegaSigma …`
+  (S06_CertainTypeCoherence:544 の inner lemma 参照) — R-member は **δ-signed**。
+  ⟹ γ-trick の帰結 ⟨ext μ₁, ωcol₁⟩ = w₁ は δ·#(E∩正側) = w₁ を与え、δ = 1 と
+  E = 正側全列を**同時に**強制 (tick⁴ の hcol-diff δ 導出は不要になる)。
+- world-bridge 注意: R-family は h46-world の `certainTypeOmegaSigma`、capstone/hcol は
+  `hyp.base.alignedOmegaSigmaGrid`。同定 lemma (aligned の定義経由、
+  `muGrid_columnSum_eq_columnSum` の σ-grid 版) を実装時に特定すること
+  (候補 grep: alignedOmegaSigmaGrid_eq / certainTypeOmegaSigma…aligned)。
+- Dade 内積保存 = S04_DadeIsometry :1023 以降の complex interface
+  (hyp.base.dadeData.dade 系 bundled — capstone 世界での τ-inner 保存の正確な accessor を
+  実装時に確認; 代替 = c.extension_inner_eq を γ, θ に…不可 (θ ∉ ℤ[T]) → Dade 側必須)。
+- μ column self-norm = `Hypothesis.muGrid_column_sum_inner_self` (CharacterParameters:1160)。
+- E-card: SOf-(5.5) は card 節なし → ‖ext ψ‖² = ‖ψ‖² (isometry) + E orthonormal から
+  |E| = w₁ を導出 (inner_sum で #E)。
+
+## 2026-07-12 tick⁹ — 論法の最終単純化 + bridge が唯一の残ブロック
+
+- **norm 論法で (5.5)-counting 後半は不要**: ⟨c.ext μ₁, ωcol₁⟩ = w₁ さえ得れば、等長
+  ‖c.ext μ₁‖² = w₁ + ‖ωcol₁‖² = w₁ (aligned orthonormal) ⟹ ‖c.ext μ₁ − ωcol₁‖² = 0 ⟹ pin。
+- ⟨c.ext μ₁, ωcol₁⟩ = w₁ の γ-trick 展開で残る非自明項 = **⟨c.ext ξ, ωcol₁⟩ = 0** (irr ξ)。
+  これは ξ の (5.5) (2-elt dadeOfDiff family) + **dadeOfDiff-member ⊥ aligned-grid** を要し、
+  既存 lemma は certainTypeR(-family) ⊥ dadeOfDiff 形のみ ⟹
+  **certainTypeR/certainTypeOmegaSigma ↔ alignedOmegaSigmaGrid の world-bridge が不可避**。
+  (純 grid-座標 counting での回避も検討 → 列独立性+等長だけでは w₂=3 で不足、(5.5) support
+  論法 (w₂≥5) も同じ bridge を要する — bridge が唯一の残ブロックと確定。)
+- **次の具体 lemma**: `certainTypeRImage h46 (muColumnChar k) (muColumnChar k)⁻¹ (false, i)
+  = δ • alignedOmegaSigmaGrid i' k` 型の同定 (aligned の def は同じ chiColumn 系 transport —
+  CharacterParameters:105-135 と S06_CertainTypeIsometry:165 certainTypeOmegaSigma_eq_chiFam を
+  突き合わせ)。これが載れば: ⟨dadeOfDiff, aligned⟩ = 0 (既存 certainTypeR⊥dadeOfDiff 経由) と
+  ⟨certainTypeR-member, ωcol⟩ 計算の両方が開通し、case-1 が norm 論法で完結。
+- case-2 (all-reducible) は tick⁸ どおり canonical 構成 (bridge 不要 — hcol と等長のみ)。
+  実装順を逆転してもよい: case-2 が self-contained ゆえ先に載せられる。
+
+## 2026-07-12 tick¹⁰ — bridge 実装 spec (API 特定完了)
+
+- **完成品 API 発見**: `S12_TICyclicSigmaBridge` の `ticyclic_sigma_eq_of_V_eq` (:212) /
+  `ticyclic_sigma_congr_eq` (:233) — 「W/V を共有する 2 つの TI-cyclic setup の σ は
+  CF(W,V) 上一致 (transported form、congr 込み)」。(2.5)/(3.2) 一意性の generic 層。
+- **bridge lemma spec**: `certainTypeOmegaSigma h46 χ₂ i` (h46 = hyp.base.toCertainTypeHypothesis
+  の ticVdiff world) と `hyp.base.alignedOmegaSigmaGrid i' j'` (typePData tic world) の同定。
+  両者は同じ chiColumn (aligned の def CharacterParameters:135-152 は
+  compHom e (h.chiColumn χ₂ (finCongr i)) の σ; e = subgroupOfEquivOfLe ∘ subgroupCongr
+  (typePData_sup_subgroupOf_eq)) → ticyclic_sigma_congr_eq で σ を同定し、
+  index 帳簿 (χ₂ = finCardEquivCharacterGroup (finCongr j)、i via finCongr hcardW1) を合わせる。
+- これが載ると: R-family (certainTypeR、S06 world) の member = ±δ•aligned ⟹
+  ⟨R-member, ωcol⟩ 計算・dadeOfDiff ⊥ aligned (既存 S06 cross suite の transport) が開通、
+  case-1 が norm 論法で完結 (tick⁹)。
+- 代替 route (却下ではなく備忘): SOf dispatcher の reducible branch を columnRImage
+  (aligned-based、columnImageFamilyCohFree) に差し替える手もあるが、_orthogonal の
+  aligned×dadeOfDiff cross を新規に要し (S-side 版 typeII_dadeOfDiff_member_inner_chiFam_eq_zero
+  :305 の M-side 化)、bridge の方が S06 suite 全体を一括 transport でき再利用性が高い。
+- 次 tick: ticyclic_sigma_congr_eq の正確な signature + certainTypeOmegaSigma def +
+  muColumnChar def を読み、bridge lemma を実装 (置き場 = S12_MaximalIII_IV_V_Core の
+  CharacterParameters 隣接 or 新 leaf; ~80-150 行)。
+
+## 2026-07-12 tick¹¹ — DAG 解決: generic (2.5)/(3.2) 層の prefix-split で in-place discharge 可能
+
+- ⚠ TICyclicSigmaBridge (bridge API の在処) は ColumnPin 下流 = S13_Orthogonality から import 不能。
+- **解決 = prefix-split**: TICyclicSigmaBridge の generic 層 (:57-~300、dadeMap_unique /
+  ticyclic_sigma_eq_of_V_eq / _congr_eq / (3.5)-determination — S05/S04-generic、ColumnPin 内容
+  不使用見込み) を新上流 leaf (例 S12_TICyclicUniqueness.lean) へ hoist、TICyclicSigmaBridge は
+  それを import (下流無変更)。これで bridge lemma → case-1/2 → capstone hbridge_τ を
+  **S13_Orthogonality in-place** で discharge でき、v2-capstone 複製が不要に。
+- 実行順: (1) generic block の依存面確認 → prefix-split + build (2) bridge lemma
+  (certainTypeOmegaSigma h46 ↔ alignedOmegaSigmaGrid; 両者 = 同一 W/V 上の 2 tic の σ、
+  入力 char は omegaProdCharTic_apply / compHom-chiColumn で同定、sigmaIntegral vs sigma の
+  wrapper 差を確認) (3) case-1 norm 組立 + case-2 canonical + capstone 差し替え。

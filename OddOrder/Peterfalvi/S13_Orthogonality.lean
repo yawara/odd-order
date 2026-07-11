@@ -296,12 +296,35 @@ theorem coherent_SOf_H0C_of_column_identities [Finite G]
     (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩) ((d : ℂ) • ζ)
     hχmem ?hφY (inducedKernelFamily_mem_apply_one_ne_zero (hIKF hχmem)) ?hbridge_supp ?hbridge_τ
   case hmixed =>
-    -- **(6.7) image-side orthogonality** (§14/Sibley-gated, the `b ≡ 0` congruence — the SAME
-    -- genuine content as the old `hmixed`).  After the `ν`-agreements the goal is
-    -- `⟨χ^{τ₂}, φ^{τ₁}⟩ = ⟨χ, φ⟩` (`χ ∈ 𝒮(H₀C)`, `φ ∈ S(HC)`).
+    -- **(6.7) image-side orthogonality** (the Coq `coherent_ortho`): after the `ν`-agreements
+    -- the goal is `⟨χ^{τ₂}, φ^{τ₁}⟩ = ⟨χ, φ⟩` (`χ ∈ 𝒮(H₀C)`, `φ ∈ S(HC)`).  Both sides vanish:
+    -- the characters are cross-orthogonal (`SOf_HC_inner_sOf_H0C_eq_zero`), and the coherent
+    -- images are partial `R`-family sums over cross-orthogonal families
+    -- (`SOf_coherent_extension_cross_orthogonal`, the two-stratum (5.5)+(5.2.e) engine,
+    -- issue 1023).
     intro x hx y hy
     rw [hagreeSof x hx, hagreeSHC y hy]
-    sorry
+    have hxc : x.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
+      Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hx
+    have hyc : y.conj ∈ hyp.SOf hyp.HC := by
+      rw [hyp.SOf_eq] at hy ⊢
+      exact OddOrder.Peterfalvi.S08.inducedKernelFamily_closedUnderConjugate _ hy
+    have hxy0 : ClassFunction.inner x y = 0 := by
+      rw [OddOrder.RepresentationTheory.inner_conj_symm,
+        SOf_HC_inner_sOf_H0C_eq_zero hyp hy hx, star_zero]
+    have hxyc0 : ClassFunction.inner x y.conj = 0 := by
+      rw [OddOrder.RepresentationTheory.inner_conj_symm,
+        SOf_HC_inner_sOf_H0C_eq_zero hyp hyc hx, star_zero]
+    have hxx : ClassFunction.inner x x ≠ 0 := by
+      obtain ⟨he, hpos⟩ :=
+        OddOrder.Peterfalvi.S08.inducedKernelFamily_inner_self_real_pos (hIKF hx)
+      rw [he]; exact Complex.ofReal_ne_zero.mpr hpos.ne'
+    have hne1 : x ≠ y := fun h => by cases h; exact hxx hxy0
+    have hne2 : x ≠ y.conj := fun h => by cases h; exact hxx hxyc0
+    rw [hxy0]
+    exact SOf_coherent_extension_cross_orthogonal hG hyp
+      (hyp.sOf_subset_SOf hyp.H0C) (le_refl (hyp.SOf hyp.HC)) hsofC coh
+      hx hxc hy hyc hne1 hne2
   case hφY =>
     -- `(d:ℂ)•ζ ∈ ℤ[S(HC)]`: now discharged from `hζHC : ζ ∈ S(HC)` (threaded into the signature).
     exact hdζspan
