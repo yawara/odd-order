@@ -165,3 +165,47 @@ type-P₂ branch は sorried と注記あり — type-V (P₁) 側は生きて�
      あるか要確認 (無ければ transport は S13 側 or 新 mid-leaf)。
   4. その後: not-(a) route ((6.4)+(6.5.b)/(6.5.c) engine survey) → case (c)
      ((10.10.1)-(10.10.4) grid、最深)。
+
+## 2026-07-11 tick²² — transport 設計確定 (cast-elim 不要、uniqueness hammer 経由)
+
+既存 API 調査の結果、case-(a) transport は全部品既存で組める:
+
+- **congrMap**: `S07.IsCoherent.congrMap` (S08_CaseBCoherence2:1084) —
+  τ₁-coherence + lattice 上の τ₁=τ₂ → τ₂-coherence。
+- **(2.11) restrict 一致**: `dadeIntegralCharacterMap_restrict_eq_of_support`
+  (同:1138) — dadeICM(restrict) φ = dadeICM(full) φ (A₁-supported φ)。
+  A := typePA0、A₁ := sharpImage H_M で hyp.tau 側に直接適用可。
+- **tau-agreement の cast seam 解消**: sib.tau (castSet 経由の dade) vs
+  restrict-直の dade — **cast-elim lemma 不要**。両者とも
+  (sharpImage H_M, M) 上の Hypothesis で **H ≡ ⊥** (H_eq_bot_of_isTISubset、
+  data-independent) ⟹ `dadeMap_unique_of_forall_H_eq_bot` (S12_TICyclicSigmaBridge:70、
+  (2.5)-uniqueness、**異なる hyp 梱包でも同 (A,L) なら DadeMap 等しい**) で
+  同一視。手順: dadeICM_apply_of_support で両辺を .toDadeMap 値に落とす →
+  hammer で map 等式 → congrArg。
+- **support 拡大 A→A₀**: `isCoherent_of_supportedSpan_le` (S13_Lemmas113To115:318)。
+  hle (ℤ[S,A₀] ⊆ ℤ[S,A_sharp]) は「Ind_{M'}^M θ は M'-set 外で 0」+
+  「1 ∉ A₀ (hyp.one_notMem_A0)」— S13:367-387 の columnSum 版 proof を
+  inducedFamily 版 (induce の off-M' 消滅 lemma) で mirror。witness = 任意
+  ζ ∈ S の ζ̄ − ζ (S13:436-453 の inducedKernelFamily 版 mirror;
+  mderivSharp_subset_A0 ✓ 既存)。
+- **§10 interface 実例**: `certainTypeSet_isCoherent_A0` (S13:349) が 𝒯-版の
+  完全 template (そこは dade0-経由で seam 無し; S-版の私の経路は seam 有りで
+  上記 hammer を挟む点だけ違う)。
+- **確定 signature** (次 tick 即用):
+  `SibleyDadeHypothesis.tau` = abbrev、`dadeICM hyp.dade (hyp.dade.fullDadeIsometryData hyp.hconj)`
+  (S08_YsetConjugation:37) / `CoherenceTarget` = abbrev `IsCoherent hyp.tau hyp.S
+  (supportInSubgroup (sharpImage H) L)` (同:45) / S12 `Hypothesis.tau` =
+  `dadeICM hyp.dadeData.dade (….fullDadeIsometryData hyp.hconj)` (S12_Core/Hypothesis:375) —
+  **両 tau は同形 (dade だけ違う)** / `dadeIntegralCharacterMap` +
+  `dadeIntegralCharacterMap_apply_of_support` = S07_Coherence/FamilyBundleDade:320/330。
+- **DAG**: S12_Noncoherence は S12_TypeIICrossIsometryPair + S14 を import —
+  S13_Lemmas113To115 は import して**いない**。transport ③ を書く場所:
+  S13_Lemmas113To115 は S12_TypeVSibley を import できるか? (S13 ← S12_Core
+  経由で S12_TypeVSibley と独立 → S13 に置くのは可だが、v2 の配線先
+  S12_Noncoherence が S13 を import する必要が生じる)。**代替: transport を
+  S12_TypeVSibley に置き、isCoherent_of_supportedSpan_le だけ S13 から
+  S12_TypeVSibley へは import 不可 (S13 が下流) → supportedSpan_le の一般
+  lemma は S13:318 のものを S07-side へ hoist するか、S12_TypeVSibley で
+  同型を再宣言せず S13 に最終組立 lemma を置く**。→ 次 tick: S13 の import
+  チェーン確認後、最終組立 (typeV_caseA_coherence) は S13_Lemmas113To115 か
+  新 leaf (S13 直下) に配置、v2 (S12_Noncoherence) の import に追加。
