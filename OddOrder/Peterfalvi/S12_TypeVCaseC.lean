@@ -1062,4 +1062,42 @@ theorem Hypothesis.eight_le_SHCcount_of_card_eq_prime_cube [Finite G] {M : Subgr
         (χ : ClassFunction ↥M ℂ) 1 = (hyp.w1 : ℂ)).card : ℤ) := by omega
   exact_mod_cast h8
 
+/-- **Peterfalvi (10.10.2), `W₂ = H′ = M″`**: "Since `H` is a non-abelian group of order
+`p³`, `H′ = Z(H)` has order `p`, and `W₂ = H′` since `W₂ ⊆ H′`."  The `TypePData` field
+`W2_le` gives `W₂ ≤ H ⊓ M″ ≤ M″`; `IsExtraspecial.of_card_eq_prime_cube` gives
+`|M″| = |(M′)′| = p` (transported from the `↥M`-coordinate commutator along the injective
+subtypes, `Subgroup.map_subtype_commutator`); and `|W₂| = w₂ = p`, so the two subgroups of
+the same finite order are equal (`Subgroup.eq_of_le_of_card_ge`). -/
+theorem Hypothesis.W2_eq_secondDerivedInAmbient_of_card_eq_prime_cube [Finite G]
+    {M : Subgroup G} (hyp : Hypothesis M) {p : ℕ} (hp : p.Prime) (hpw2 : p = hyp.w2)
+    (hcard : Nat.card ↥((derivedInG M).subgroupOf M) = p ^ 3)
+    (hnonab : ¬ IsMulCommutative ↥((derivedInG M).subgroupOf M)) :
+    hyp.typeP.W2 = secondDerivedInAmbient M := by
+  haveI := hyp.finiteG
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hext : IsExtraspecial p ↥((derivedInG M).subgroupOf M) :=
+    IsExtraspecial.of_card_eq_prime_cube hcard fun hcomm => hnonab ⟨⟨hcomm⟩⟩
+  have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  -- `|⁅M′, M′⁆| = p` in the `↥M`-coordinate (`(M′)′ = Z(M′)` has order `p`)
+  have hcard_KK : Nat.card ↥(⁅(derivedInG M).subgroupOf M, (derivedInG M).subgroupOf M⁆ :
+      Subgroup ↥M) = p := by
+    rw [← Subgroup.map_subtype_commutator ((derivedInG M).subgroupOf M),
+      Nat.card_congr (Subgroup.equivMapOfInjective _ _
+        ((derivedInG M).subgroupOf M).subtype_injective).symm.toEquiv]
+    exact hext.commutator_card
+  -- transport to the ambient `M″` (the `hmap` of `TypePData.W2_subgroupOf_le_commutator`)
+  have hmap : Subgroup.map M.subtype
+      ⁅(derivedInG M).subgroupOf M, (derivedInG M).subgroupOf M⁆
+        = secondDerivedInAmbient M := by
+    rw [Subgroup.map_commutator, Subgroup.subgroupOf_map_subtype, inf_of_le_left hM'le]
+    exact (Subgroup.map_subtype_commutator (derivedInG M)).symm
+  have hcardM'' : Nat.card ↥(secondDerivedInAmbient M) = p := by
+    rw [← hmap, Nat.card_congr (Subgroup.equivMapOfInjective _ _
+      M.subtype_injective).symm.toEquiv]
+    exact hcard_KK
+  -- `W₂ ≤ M″` with equal prime orders
+  have hW2le : hyp.typeP.W2 ≤ secondDerivedInAmbient M := hyp.typeP.W2_le.trans inf_le_right
+  have hcardW2 : Nat.card ↥hyp.typeP.W2 = p := by rw [hpw2]; rfl
+  exact Subgroup.eq_of_le_of_card_ge hW2le (by rw [hcardM'', hcardW2])
+
 end OddOrder.Peterfalvi.S12
