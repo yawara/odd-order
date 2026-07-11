@@ -861,10 +861,6 @@ theorem coherent_SOf_H0C_of_column_identities [Finite G]
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := by
   haveI := hyp.base.finiteG
   classical
-  -- `hsofC` = the unconditional `𝒮(H₀C)`-coherence (this file's `coherent_sOf_H0C`) = the bridge
-  -- engine's `X`-side coherence; `coh` (`S(HC)`) is the `Y`-side.  `ν` is the `τ₃` glue of the two.
-  obtain ⟨hsofC⟩ := coherent_sOf_H0C hG hyp
-  obtain ⟨ν, hagreeSHC, hagreeSof⟩ := exists_glue_nu_H0C hyp coh hsofC
   -- The reducible μ-column bridge anchor `χ = ∑ᵢ μ_{i1} ∈ 𝒮(H₀C)`, at the nonzero column `j = 1`.
   have hw2 : 1 < hyp.base.w2 := hyp.params.w2_prime.one_lt
   have hk1 : (⟨1, hw2⟩ : Fin hyp.base.w2) ≠ 0 := by
@@ -890,6 +886,29 @@ theorem coherent_SOf_H0C_of_column_identities [Finite G]
       rw [← Int.cast_smul_eq_zsmul ℂ (d : ℤ) ζ, Int.cast_natCast]
     rw [hcast]
     exact Submodule.smul_mem _ (d : ℤ) (Submodule.subset_span hζHC)
+  -- the `A₀`-support of the bridge `θ = ∑ᵢ μ_{i1} − dζ` (degree match `hζdeg`)
+  have hθsupp : (((∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩)
+      - (d : ℂ) • ζ : ClassFunction ↥M ℂ)).support ⊆ hyp.base.A0 := by
+    have h := OddOrder.Peterfalvi.S08.inducedKernelFamily_scaledDiff_support
+      hyp.base.mderivSharp_subset_A0 (hIKF hχmem) (hXbridge hζHC) (hζdeg ⟨1, hw2⟩ hk1)
+    rwa [← Nat.cast_smul_eq_nsmul ℂ d ζ] at h
+  -- **the pinned `𝒮(H₀C)`-coherence** (issue 1023, the Coq `tau2muj` WLOG made constructive):
+  -- case-1 (γ-trick, an irreducible member exists) or case-2 (all-reducible canonical
+  -- construction); `hpin` is the (5.8) μ-column image pin that discharges `hbridge_τ` below.
+  obtain ⟨hsofC, hpin⟩ : ∃ c : OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+      (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C) hyp.base.A0,
+      c.extension (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩)
+        = ∑ i : Fin hyp.base.w1, hyp.base.alignedOmegaSigmaGrid hG hG.odd i ⟨1, hw2⟩ := by
+    by_cases hirr : ∃ ξ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C,
+        IsIrreducibleCharacter ξ
+    · obtain ⟨ξ, hξ, hξirr⟩ := hirr
+      obtain ⟨c⟩ := coherent_sOf_H0C hG hyp
+      exact ⟨c, coherent_sOf_H0C_extension_muColumnSum_pin_of_irr hG hyp c coh hζHC hw2
+        hθsupp (hcol ⟨1, hw2⟩ hk1) hξ hξirr⟩
+    · push_neg at hirr
+      exact exists_pinned_coherent_sOf_H0C_of_all_reducible hG hyp
+        (coherent_sOf_H0C hG hyp).some hw2 hcol hirr
+  obtain ⟨ν, hagreeSHC, hagreeSof⟩ := exists_glue_nu_H0C hyp coh hsofC
   refine ⟨?_⟩
   rw [hyp.SOf_H0C_eq_SOf_HC_union_sOf, Set.union_comm]
   -- **`bridge_coherent`** (no generation hypothesis) — engine `X = 𝒮(H₀C)`, `Y = S(HC)`.
@@ -950,13 +969,19 @@ theorem coherent_SOf_H0C_of_column_identities [Finite G]
         hyp.base.mderivSharp_subset_A0 (hIKF hχmem) (hXbridge hζHC) (hζdeg ⟨1, hw2⟩ hk1)
       rwa [← Nat.cast_smul_eq_nsmul ℂ d ζ] at h
   case hbridge_τ =>
-    -- **(5.8) bridge `τ`-agreement `ν(∑ᵢ μ_{i1} − dζ) = τ(∑ᵢ μ_{i1} − dζ)`** (§14/§9 genuine
-    -- content — the honest heir of the old `hDτ` sorry).  Via the `ν`-agreements and `hcol` this
-    -- reduces to `hsofC.extension (∑ᵢ μ_{i1}) = ∑ᵢ ω^σ_{i1}`: the `𝒮(H₀C)` coherent extension sends
-    -- the reducible μ-column to the aligned ω^σ-column.  `coherent_sOf_H0C` carries no such μ-column
-    -- image pin (Peterfalvi (10.6.a) `muColumn_tau1_pin` gives it only for the `Sset`-coherence
-    -- `CoherentHypothesis`, not the narrow `𝒮(H₀C)` one), so this is the residual §14/§9 gate.
-    sorry
+    -- **(5.8) bridge `τ`-agreement `ν(∑ᵢ μ_{i1} − dζ) = τ(∑ᵢ μ_{i1} − dζ)`**: via the
+    -- `ν`-agreements this is `hsofC.extension (∑ᵢ μ_{i1}) − d·ζ^{τ₁} = ∑ᵢ ω^σ_{i1} − d·ζ^{τ₁}`,
+    -- i.e. the (5.8) μ-column image pin `hpin` of the pinned coherence (issue 1023), matched
+    -- against the column identity `hcol`.
+    have hνμ : ν (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩)
+        = hsofC.extension (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩) :=
+      hagreeSof _ hχmem
+    have hνζ : ν ((d : ℂ) • ζ) = (d : ℂ) • coh.extension ζ := by
+      have hcast : (d : ℂ) • ζ = (d : ℤ) • ζ := by
+        rw [← Int.cast_smul_eq_zsmul ℂ (d : ℤ) ζ, Int.cast_natCast]
+      rw [hcast, map_zsmul, hagreeSHC ζ hζHC, ← Int.cast_smul_eq_zsmul ℂ (d : ℤ),
+        Int.cast_natCast]
+    rw [map_sub, hνμ, hνζ, hpin, hcol ⟨1, hw2⟩ hk1]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (11.8), the genuine non-orthogonality — narrow `𝒮(H₀C)` route, refuter core**
