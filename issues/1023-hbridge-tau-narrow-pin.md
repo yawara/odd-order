@@ -268,3 +268,21 @@ IsCoherent 構成は既存 IntegralCharacterMap 機構 (Zisometry_of_cfnorm 相�
   (certainTypeOmegaSigma h46 ↔ alignedOmegaSigmaGrid; 両者 = 同一 W/V 上の 2 tic の σ、
   入力 char は omegaProdCharTic_apply / compHom-chiColumn で同定、sigmaIntegral vs sigma の
   wrapper 差を確認) (3) case-1 norm 組立 + case-2 canonical + capstone 差し替え。
+
+## 2026-07-12 tick¹² — bridge lemma の最終 spec (import 弱化 landed、全 API 確定)
+
+- import 弱化 commit 済 (TICyclicSigmaBridge → S05-layer、下流 green 4134 jobs)。
+- `sigmaIntegral_apply : sigmaIntegral … φ = sigma … φ` は **rfl** (S05_IntegralSigma:52) —
+  aligned (sigmaIntegral) と certainTypeOmegaSigma (sigma) の wrapper 差は消える。
+- ⚠ ticyclic_sigma_congr_eq は α : SupportedOnV 限定 — ω(char) 入力には使えない。
+  **正 API = (3.5)-determination `ticyclic_sigma_omega_eq_of_V_eq`** (TICyclicSigmaBridge :298+、
+  transpose lemma が同用途で使用): σ₁(ω₁ ξ) = σ₂(ω₂ ξ') for transported ξ'。
+- 両 tic の W/V 同一性: (ticVdiff h).W = h.tic.W = (h.W1⊔h.W2).map M.subtype (tic_W_eq_map) と
+  typePData tic の W — typePData_sup_subgroupOf_eq で同定。transport の carrier-coe は
+  coe_ticWEquivSdiffW (:117) と aligned の e (subgroupOfEquivOfLe∘subgroupCongr、coe = id) で
+  両方 identity ⟹ 文字の同定は pointwise rfl-adjacent。
+- aligned の def は tactic-mode (unfold 困難) → **chiFam 特徴付け経由**:
+  exists_alignedOmegaSigmaGrid_chiFam_family (CharacterParameters:175) ×
+  certainTypeOmegaSigma_eq_chiFam (S06_CertainTypeIsometry:165) × (3.5) index 翻訳。
+- 次 tick: 上記 3 signature を読み bridge lemma を書く (置き場 = S13_Orthogonality 直
+  or 新 leaf; S13_Orthogonality に import TICyclicSigmaBridge を追加)。
