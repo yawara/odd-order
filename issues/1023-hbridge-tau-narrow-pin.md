@@ -233,3 +233,25 @@ IsCoherent 構成は既存 IntegralCharacterMap 機構 (Zisometry_of_cfnorm 相�
   ⟨certainTypeR-member, ωcol⟩ 計算の両方が開通し、case-1 が norm 論法で完結。
 - case-2 (all-reducible) は tick⁸ どおり canonical 構成 (bridge 不要 — hcol と等長のみ)。
   実装順を逆転してもよい: case-2 が self-contained ゆえ先に載せられる。
+
+## 2026-07-12 tick¹⁰ — bridge 実装 spec (API 特定完了)
+
+- **完成品 API 発見**: `S12_TICyclicSigmaBridge` の `ticyclic_sigma_eq_of_V_eq` (:212) /
+  `ticyclic_sigma_congr_eq` (:233) — 「W/V を共有する 2 つの TI-cyclic setup の σ は
+  CF(W,V) 上一致 (transported form、congr 込み)」。(2.5)/(3.2) 一意性の generic 層。
+- **bridge lemma spec**: `certainTypeOmegaSigma h46 χ₂ i` (h46 = hyp.base.toCertainTypeHypothesis
+  の ticVdiff world) と `hyp.base.alignedOmegaSigmaGrid i' j'` (typePData tic world) の同定。
+  両者は同じ chiColumn (aligned の def CharacterParameters:135-152 は
+  compHom e (h.chiColumn χ₂ (finCongr i)) の σ; e = subgroupOfEquivOfLe ∘ subgroupCongr
+  (typePData_sup_subgroupOf_eq)) → ticyclic_sigma_congr_eq で σ を同定し、
+  index 帳簿 (χ₂ = finCardEquivCharacterGroup (finCongr j)、i via finCongr hcardW1) を合わせる。
+- これが載ると: R-family (certainTypeR、S06 world) の member = ±δ•aligned ⟹
+  ⟨R-member, ωcol⟩ 計算・dadeOfDiff ⊥ aligned (既存 S06 cross suite の transport) が開通、
+  case-1 が norm 論法で完結 (tick⁹)。
+- 代替 route (却下ではなく備忘): SOf dispatcher の reducible branch を columnRImage
+  (aligned-based、columnImageFamilyCohFree) に差し替える手もあるが、_orthogonal の
+  aligned×dadeOfDiff cross を新規に要し (S-side 版 typeII_dadeOfDiff_member_inner_chiFam_eq_zero
+  :305 の M-side 化)、bridge の方が S06 suite 全体を一括 transport でき再利用性が高い。
+- 次 tick: ticyclic_sigma_congr_eq の正確な signature + certainTypeOmegaSigma def +
+  muColumnChar def を読み、bridge lemma を実装 (置き場 = S12_MaximalIII_IV_V_Core の
+  CharacterParameters 隣接 or 新 leaf; ~80-150 行)。
