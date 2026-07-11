@@ -66,10 +66,26 @@ Hypothesis (11.2) (M maximal, type III/IV)、ζ ∈ 𝒮(HC):
 
 ## やること (上流優先 + 文書順)
 
-- [ ] **P1 (9.8.d)-existence** (§9、最上流): 非Galois block data から λ 構成 (S11 世界)。
+- [x] **P1 (9.8.d)-existence** (§9、最上流): ✅ **既 landed と判明** (survey 訂正) —
+      `caseA_character_counts` (ThetaCountAssembly:724、sorry-free) の conjunct 4 が
+      (9.8.d) count `((p−1)/a)·(|U|/(a|U′|)) ≤ #{qa-irreducibles in 𝒮(H₀U′)}`。
+      λ 存在は正値性 ((p−1)/a ≥ 1 ⟸ a∣p−1、|U|/(a|U′|) ≥ 1 ⟸ a∣[U:U′]) から。
+      (9.8.b) μ_j 度数 qu / (9.8.c) も同 theorem。CliffordCaseAData が a_pos/a_dvd_p_sub_one 持ち。
 - [ ] **P2 (11.9.a)** 行0射影 (§11): S13 新 leaf で grid 係数解析。
+      ⚠ (3.8) trichotomy は転置方向で NC 境界不成立 (NC≤w₁+1 は列 w₁ 本/行 w₂ 本双方を許す) —
+      書籍通りの **Galois 定数性 (3.9.b) + (3.7) 分離 + norm≤q + case 分析**が必要。
+      case 分析: all-zero は a₀₀=1 で、列枝は h118 ((11.8) refuter) で排除 → 行0枝。
+      部品: a₀₀=1/ψ∈ZIrr/‖ψ‖²=w₁+1/vanish-on-V は (10.9)
+      `inner_tau_muColumnZero_sub_zeta_alignedOmegaSigma_of_w1_lt_w2` (S12_Prop109:369) と同一
+      pattern。SHC-coherence 直交 (τ₁(ζ−ζ̄)⊥grid 系) = S12_Prop109:798-993 の SHC_extension 群。
+      **未在 = grid の cfAut равivariance (Coq cycTIiso_aut_exists / cfExp_prime_transitive)**。
 - [ ] **P3 (c) 組立**: u=a → q<p 矛盾 → Galois → `U_cyclic` → `isTypeIII_of_isTypeIIIorIV`
       (普遍 Type-IV 排除) + T-side 供給形 (c が cite する signature)。
+  - [x] **q∣u−1 部品 landed (2026-07-12)**: `card_uActionHom_range_modEq_one` (u ≡ 1 mod q、
+        S11_ImprimitiveUBound、sorry-free・build 一発 green) + 抽出補題
+        `fixedSubgroup_quotient_uActionKer_eq_bot` (C_Ū(W̄₁)=1)。AxiomsCheck 登録。
+  - 残: nilpotent + U/U′ cyclic → U cyclic (mathlib/Isaacs 確認 — Coq
+        cyclic_nilpotent_quo_der1_cyclic 対応)、u=a pin 議論 (S11↔S13 world bridge)、組立。
 - [ ] AxiomsCheck 登録 + consumer への配線 note (1016/9013/2018 参照)。
 
 ## 完了条件
