@@ -1,4 +1,4 @@
-import OddOrder.Peterfalvi.S16_NonExistenceG.TGapDelta
+import OddOrder.Peterfalvi.S16_NonExistenceG.TGapCross
 import OddOrder.Peterfalvi.S16_NonExistenceG.KeyInequalityArithmetic
 import OddOrder.Peterfalvi.S16_GridExpansion
 
@@ -16,19 +16,6 @@ open scoped Pointwise
 open scoped BigOperators
 
 variable {G : Type*} [Group G]
-
-/-- Two Peterfalvi (2.2) hypotheses on the same support and subgroup are equal once their
-`H`-fields agree.  The `H`-field is the only data field; all other fields are propositions. -/
-private theorem dadeHypothesis_eq_of_H_eq [Fintype G] {A : Set G} {L : Subgroup G}
-    {h₁ h₂ : OddOrder.Peterfalvi.S04.Hypothesis G A L}
-    (hH : ∀ a, h₁.H a = h₂.H a) : h₁ = h₂ := by
-  obtain ⟨s₁, l₁, n₁, H₁, c₁, ce₁, cd₁, hn₁, cc₁⟩ := h₁
-  obtain ⟨s₂, l₂, n₂, H₂, c₂, ce₂, cd₂, hn₂, cc₂⟩ := h₂
-  have hHeq : H₁ = H₂ := funext hH
-  subst hHeq
-  rfl
-
-
 
 open scoped Classical in
 /-- **Peterfalvi (14.9): assembling the T-side `S07.Hypothesis` (`hyp07`)** (issue 9072, steps 2--4)
@@ -551,7 +538,6 @@ theorem T_typeIII_coherent_image_inner_eta_eq_zero [Finite G]
   subst invertibleG
   haveI := hyp.base.finiteG
   classical
-  let side := (tSideDadeSupport_nonempty hG hyp).some
   let dataT := (OddOrder.Peterfalvi.S15.reconciled_typePData_T hG hyp.base).choose
   have hdata := (OddOrder.Peterfalvi.S15.reconciled_typePData_T hG hyp.base).choose_spec
   have hU : dataT.U = hyp.base.V := hdata.1
@@ -570,17 +556,6 @@ theorem T_typeIII_coherent_image_inner_eta_eq_zero [Finite G]
       OddOrder.GroupTheory.typePA0 hyp.base.T dataT := by
     rw [← hPA]
     exact Set.subset_union_left
-  have hA1norm : ∀ (l : ↥hyp.base.T) ⦃a : G⦄,
-      a ∈ OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T →
-        (l : G) * a * (l : G)⁻¹ ∈ OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T :=
-    side.dade.L_normalizes_A
-  let restricted := full.dade.restrict hA1A0 hA1norm
-  have hH : ∀ a, restricted.H a = side.dade.H a := by
-    intro a
-    rw [OddOrder.Peterfalvi.S04.Hypothesis.restrict_H,
-      full.H_eq_ftSupportKernel, side.H_eq_ftSupportKernel]
-    exact (OddOrder.Peterfalvi.S10.ftSupportKernel_restrict hA1A0 a.2).symm
-  have hdade : restricted = side.dade := dadeHypothesis_eq_of_H_eq hH
   have hζc : ζ.conj ∈ S := hconj hζ
   have hdiffSpan : ζ - ζ.conj ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.base.T) S :=
     Submodule.sub_mem _ (Submodule.subset_span hζ) (Submodule.subset_span hζc)
@@ -597,14 +572,8 @@ theorem T_typeIII_coherent_image_inner_eta_eq_zero [Finite G]
   have hmaps : tSideDadeMap hyp hG (ζ - ζ.conj) =
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap full.dade
         (full.dade.fullDadeIsometryData full.hconj) (ζ - ζ.conj) := by
-    rw [tSideDadeMap,
-      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support side.dade
-        (side.dade.fullDadeIsometryData side.hconj) hdiffSupp,
-      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support full.dade
-        (full.dade.fullDadeIsometryData full.hconj) hfullSupp]
-    rw [← hdade]
-    exact full.dade.dadeMap_restrict_apply hA1A0 hA1norm
-      ⟨ζ - ζ.conj, (ClassFunction.mem_supportedSubmodule).mpr hdiffSupp⟩
+    simpa only [full] using
+      tSideDadeMap_eq_full_typeP1DadeMap_of_support hG hyp dataT hP1 hdiffSupp
   have hextDiff : coh.extension ζ - coh.extension ζ.conj =
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap full.dade
         (full.dade.fullDadeIsometryData full.hconj) (ζ - ζ.conj) := by
@@ -1195,8 +1164,47 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       norm_num
     have hrelation : ClassFunction.inner betaData.Gamma (hτ.extension ζ) =
         1 + ClassFunction.inner Δ betaData.Gamma := by
-      -- Remaining: the S/T gap calculation gives the cross-inner identity.
-      sorry
+      -- The remaining deep input is precisely Coq's pair
+      -- `o_eta0_betaT0` + `QV'betaS ⟂ Ind_T^G betaT0`: the (11.9) projection of the
+      -- T-side bridge onto the η-grid, and the (14.9) S/T support separation.
+      have hdeep :
+          (∀ j : Fin hyp.base.p,
+            ClassFunction.inner
+                (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ j)
+                (tSideDadeMap hyp hG (ν0 - ζ)) =
+              ClassFunction.inner
+                (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ j)
+                (∑ i : Fin hyp.base.q,
+                  hyp.base.eta i ⟨0, hyp.base.p_prime.pos⟩)) ∧
+          ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ))
+            (OddOrder.Peterfalvi.S15.tauSbetaGrid hG hyp.base) = 0 := by
+        sorry
+      have hτβeta : ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ))
+          (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩
+            ⟨1, by have := hyp.base.three_le_p; omega⟩) = 0 := by
+        have hne0 :
+            (⟨1, by have := hyp.base.three_le_p; omega⟩ : Fin hyp.base.p) ≠
+              ⟨0, hyp.base.p_prime.pos⟩ := by
+          intro h
+          have hv := congrArg Fin.val h
+          norm_num at hv
+        have hrow := tSide_beta_inner_eta_of_zeroColumn_projection
+          hyp.base (tSideDadeMap hyp hG (ν0 - ζ)) hdeep.1
+          ⟨1, by have := hyp.base.three_le_p; omega⟩
+        simpa only [if_neg hne0] using hrow
+      have hΓdef : betaData.Gamma =
+          OddOrder.Peterfalvi.S15.tauSbetaGrid hG hyp.base -
+              (trivialIrreducibleCharacter G : ClassFunction G ℂ) +
+            hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩
+              ⟨1, by have := hyp.base.three_le_p; omega⟩ := by
+        rfl
+      have hΔdef : Δ =
+          tSideDadeMap hyp hG (ν0 - ζ) -
+              (trivialIrreducibleCharacter G : ClassFunction G ℂ) +
+            hτ.extension ζ := by
+        rfl
+      exact gap_cross_inner_identity hGammaZ hExtZ hOneZ hΓdef hΔdef
+        hτβinner hdeep.2 hτβeta hGamma1
     exact ⟨Δ, hΔZ, hΔreal, hΔone, hrelation⟩
   obtain ⟨x, hxcoe, hx⟩ :
       ∃ (x : ClassFunction G ℂ → ℤ),
