@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.Algebra.Star.Basic
 import Mathlib.Algebra.Star.Module
 import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
+import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
 import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
 
 /-!
@@ -66,6 +67,12 @@ def conj (φ : ClassFunction G k) : ClassFunction G k :=
 @[simp] theorem conj_support (φ : ClassFunction G k) : φ.conj.support = φ.support := by
   ext g
   simp [ClassFunction.mem_support, star_eq_zero]
+
+/-- `ClassFunction.conj` **is** the coefficientwise complex conjugation
+(`mapRingEquiv Complex.conjAe`): both are pointwise `star`. -/
+theorem conj_eq_mapRingEquiv_conjAe {G : Type*} [Group G] (φ : ClassFunction G ℂ) :
+    φ.conj = ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv φ :=
+  ClassFunction.ext fun _ => rfl
 
 @[simp] theorem conj_zero : (0 : ClassFunction G k).conj = 0 := by
   ext g

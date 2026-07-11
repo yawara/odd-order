@@ -1660,3 +1660,14 @@ dadeIntegralCharacterMap_conj_of_support (S07 lift)。
 - assembly gammaGrid_real: Γ̄ = D(β̄₁)−1+η̄_{01} (conj_sub/add + trivial real +
   Dade-conj [A0beta support]) = D(β_{j'})−1+η_{0,j'} (β̄₁ = Ind1−μ̄_{01}、induce_conj +
   mu_conj、j' = finNeg #1 ≠ 0) = Γ (proven gammaGrid_defGamma at j')。
+
+## ✅ (2026-07-12、/loop iter 7) — GammaReal 部品 2: producer conj-pair 3 本 (commit 上記)
+
+omegaS_conj / muS_conj / tau3W_omegaS_conj + eqQ_finNeg_eq_rowInv + conj↔mapRingEquiv bridge。
+**残 = 仕上げ 1 unit**: (i) SubcoherenceInputs + Section16Inputs + cd に `mu_conj`/`eta_conj`
+fields (finNeg 形、omega_conj は不要 — assembly は μ/η のみ)、producer discharge = muS_conj /
+tau3W_omegaS_conj (eta := τ₃∘ω 供給ゆえ直結)、(ii) assembly gammaGrid_real:
+Γ̄ = D(β̄₁)−1+η̄_{01} → β̄₁ = Ind1−μ̄_{01} (conj_sub + induce_conj + trivial-real + mu_conj)
+= β_{finNeg #1}、D-conj = dadeIntegralCharacterMap_conj_of_support (A0beta support、iter 5-6)、
+η̄_{01} = η_{0,finNeg #1} (eta_conj) → = Γ (proven gammaGrid_defGamma at finNeg #1 ≠ 0)。
+⚠ conj rw の instance 罠は congrArg (実型注釈) 方式で回避 (commit message 参照)。
