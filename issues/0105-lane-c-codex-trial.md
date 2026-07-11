@@ -166,3 +166,5 @@ issue は trial ログの追記継続のため open 維持、次の節目 (T-sid
   2 件とも配線済 (orphan なし)、実 sorry ±0。21/21。
 - 2026-07-11 (tick、merge 61113a9a): (11.9a) Galois transport 3 連 — canonical prime-TI anchor 固定
   + calT1 の Galois closure + induction transport (+102、実 sorry ±0、assert 2 本 build 通過)。22/22。
+- 2026-07-12 (tick、merge 544c98e2): (11.9a) integral eta coefficients の Galois transport (+83、実
+  sorry ±0、assert 2 本 build 通過)。23/23。
