@@ -248,6 +248,129 @@ theorem axis_coefficients_eq_column_or_row
     right
     refine ⟨ha10, by omega, ha11⟩
 
+/-- **Peterfalvi (11.9)(a), full-grid norm compression.**  If the eta-projection coefficients
+are constant on each nonprincipal axis and satisfy the four-corner relation, their full squared
+norm is exactly the three-coefficient expression used by `axis_coefficients_eq_column_or_row`.
+
+This is the finite-grid bookkeeping between the already-proven sharp projection bound
+`sum m_ij^2 <= p` and the arithmetic dichotomy.  It partitions each axis into its principal point
+and complement; the four-corner relation makes every interior coefficient equal to `m_11`. -/
+theorem etaGrid_axis_sum_eq_sum_sq
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    (m : Fin base.q → Fin base.p → ℤ)
+    (hprincipal :
+      m ⟨0, base.q_prime.pos⟩ ⟨0, base.p_prime.pos⟩ = 1)
+    (hrow : ∀ i, i ≠ ⟨0, base.q_prime.pos⟩ →
+      m i ⟨0, base.p_prime.pos⟩ =
+        m ⟨1, base.q_prime.one_lt⟩ ⟨0, base.p_prime.pos⟩)
+    (hcol : ∀ j, j ≠ ⟨0, base.p_prime.pos⟩ →
+      m ⟨0, base.q_prime.pos⟩ j =
+        m ⟨0, base.q_prime.pos⟩ ⟨1, base.p_prime.one_lt⟩)
+    (hrelation : ∀ i j,
+      m i j + m ⟨0, base.q_prime.pos⟩ ⟨0, base.p_prime.pos⟩ =
+        m i ⟨0, base.p_prime.pos⟩ + m ⟨0, base.q_prime.pos⟩ j) :
+    1 + ((base.q : ℤ) - 1) *
+          m ⟨1, base.q_prime.one_lt⟩ ⟨0, base.p_prime.pos⟩ ^ 2 +
+        ((base.p : ℤ) - 1) *
+          m ⟨0, base.q_prime.pos⟩ ⟨1, base.p_prime.one_lt⟩ ^ 2 +
+        ((base.q : ℤ) - 1) * ((base.p : ℤ) - 1) *
+          m ⟨1, base.q_prime.one_lt⟩ ⟨1, base.p_prime.one_lt⟩ ^ 2 =
+      ∑ i : Fin base.q, ∑ j : Fin base.p, (m i j) ^ 2 := by
+  classical
+  let i0 : Fin base.q := ⟨0, base.q_prime.pos⟩
+  let j0 : Fin base.p := ⟨0, base.p_prime.pos⟩
+  let i1 : Fin base.q := ⟨1, base.q_prime.one_lt⟩
+  let j1 : Fin base.p := ⟨1, base.p_prime.one_lt⟩
+  have hinter : ∀ i, i ≠ i0 → ∀ j, j ≠ j0 → m i j = m i1 j1 := by
+    intro i hi j hj
+    have hij := hrelation i j
+    have h11 := hrelation i1 j1
+    have h00 : m i0 j0 = 1 := by simpa [i0, j0] using hprincipal
+    have hi0 : m i j0 = m i1 j0 := by
+      simpa [i0, i1, j0] using hrow i (by simpa [i0] using hi)
+    have h0j : m i0 j = m i0 j1 := by
+      simpa [i0, j0, j1] using hcol j (by simpa [j0] using hj)
+    change m i j + m i0 j0 = m i j0 + m i0 j at hij
+    change m i1 j1 + m i0 j0 = m i1 j0 + m i0 j1 at h11
+    rw [h00, hi0, h0j] at hij
+    rw [h00] at h11
+    omega
+  have sum_eq_base_add_const : ∀ {n : ℕ} (x0 : Fin n) (f : Fin n → ℤ) (a b : ℤ),
+      f x0 = a → (∀ x, x ≠ x0 → f x = b) →
+        (∑ x : Fin n, f x) = a + ((n : ℤ) - 1) * b := by
+    intro n x0 f a b hx0 hrest
+    have hn : 1 ≤ n := by
+      have hx0lt := x0.isLt
+      omega
+    calc
+      (∑ x : Fin n, f x) =
+          (∑ x ∈ Finset.univ.erase x0, f x) + f x0 :=
+        (Finset.sum_erase_add Finset.univ f (Finset.mem_univ x0)).symm
+      _ = (∑ x ∈ Finset.univ.erase x0, b) + a := by
+        rw [hx0]
+        congr 1
+        exact Finset.sum_congr rfl fun x hx => hrest x (Finset.ne_of_mem_erase hx)
+      _ = a + ((n : ℤ) - 1) * b := by
+        rw [Finset.sum_const, nsmul_eq_mul, Finset.card_erase_of_mem (Finset.mem_univ x0),
+          Finset.card_univ, Fintype.card_fin]
+        push_cast [Nat.cast_sub hn]
+        ring
+  have hrow0 : (∑ j : Fin base.p, (m i0 j) ^ 2) =
+      1 + ((base.p : ℤ) - 1) * (m i0 j1) ^ 2 := by
+    apply sum_eq_base_add_const j0 _ 1 ((m i0 j1) ^ 2)
+    · simp only [i0, j0, hprincipal, one_pow]
+    · intro j hj
+      rw [hcol j (by simpa [j0] using hj)]
+  have hrowOther : ∀ i, i ≠ i0 →
+      (∑ j : Fin base.p, (m i j) ^ 2) =
+        (m i1 j0) ^ 2 + ((base.p : ℤ) - 1) * (m i1 j1) ^ 2 := by
+    intro i hi
+    apply sum_eq_base_add_const j0 _ ((m i1 j0) ^ 2) ((m i1 j1) ^ 2)
+    · rw [hrow i (by simpa [i0] using hi)]
+    · intro j hj
+      rw [hinter i hi j hj]
+  have hgrid := sum_eq_base_add_const i0
+    (fun i => ∑ j : Fin base.p, (m i j) ^ 2)
+    (1 + ((base.p : ℤ) - 1) * (m i0 j1) ^ 2)
+    ((m i1 j0) ^ 2 + ((base.p : ℤ) - 1) * (m i1 j1) ^ 2)
+    hrow0 hrowOther
+  change
+    1 + ((base.q : ℤ) - 1) * (m i1 j0) ^ 2 +
+          ((base.p : ℤ) - 1) * (m i0 j1) ^ 2 +
+          ((base.q : ℤ) - 1) * ((base.p : ℤ) - 1) * (m i1 j1) ^ 2 =
+        ∑ i : Fin base.q, ∑ j : Fin base.p, (m i j) ^ 2
+  calc
+    _ = 1 + ((base.p : ℤ) - 1) * (m i0 j1) ^ 2 +
+          ((base.q : ℤ) - 1) *
+            ((m i1 j0) ^ 2 + ((base.p : ℤ) - 1) * (m i1 j1) ^ 2) := by ring
+    _ = _ := hgrid.symm
+
+/-- The sharp full-grid coefficient bound supplies the axis bound expected by the arithmetic
+dichotomy. -/
+theorem etaGrid_axis_bound_of_sum_sq_le
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    (m : Fin base.q → Fin base.p → ℤ)
+    (hprincipal :
+      m ⟨0, base.q_prime.pos⟩ ⟨0, base.p_prime.pos⟩ = 1)
+    (hrow : ∀ i, i ≠ ⟨0, base.q_prime.pos⟩ →
+      m i ⟨0, base.p_prime.pos⟩ =
+        m ⟨1, base.q_prime.one_lt⟩ ⟨0, base.p_prime.pos⟩)
+    (hcol : ∀ j, j ≠ ⟨0, base.p_prime.pos⟩ →
+      m ⟨0, base.q_prime.pos⟩ j =
+        m ⟨0, base.q_prime.pos⟩ ⟨1, base.p_prime.one_lt⟩)
+    (hrelation : ∀ i j,
+      m i j + m ⟨0, base.q_prime.pos⟩ ⟨0, base.p_prime.pos⟩ =
+        m i ⟨0, base.p_prime.pos⟩ + m ⟨0, base.q_prime.pos⟩ j)
+    (hfull : (∑ i : Fin base.q, ∑ j : Fin base.p, (m i j) ^ 2 : ℤ) ≤ base.p) :
+    1 + ((base.q : ℤ) - 1) *
+          m ⟨1, base.q_prime.one_lt⟩ ⟨0, base.p_prime.pos⟩ ^ 2 +
+        ((base.p : ℤ) - 1) *
+          m ⟨0, base.q_prime.pos⟩ ⟨1, base.p_prime.one_lt⟩ ^ 2 +
+        ((base.q : ℤ) - 1) * ((base.p : ℤ) - 1) *
+          m ⟨1, base.q_prime.one_lt⟩ ⟨1, base.p_prime.one_lt⟩ ^ 2 ≤ base.p := by
+  rw [etaGrid_axis_sum_eq_sum_sq base m hprincipal hrow hcol hrelation]
+  exact hfull
+
 /-- Lift the three-coefficient arithmetic classification to the full eta-grid.
 The axis-constancy hypotheses are the exact output expected from Peterfalvi (3.9)(b)
 and Dade--Galois commutation. -/
@@ -328,5 +451,31 @@ theorem etaGrid_coefficients_eq_column_or_row
         rw [hprincipal, hrow i (by simpa [i0] using hi),
           hcol j (by simpa [j0] using hj), hrowAxis.1, hrowAxis.2.1] at h
         omega
+
+/-- **Peterfalvi (11.9)(a), eta-grid projection rigidity.**  The sharp bound on the full
+integer projection grid, together with the Galois-axis constancy and the four-corner relation,
+forces the grid to be a coordinate row or column.  Unlike
+`etaGrid_coefficients_eq_column_or_row`, this is stated with the full squared norm produced by
+the projection argument. -/
+theorem etaGrid_coefficients_eq_column_or_row_of_sum_sq_le
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    (hqp : base.q < base.p)
+    (m : Fin base.q → Fin base.p → ℤ)
+    (hprincipal :
+      m ⟨0, base.q_prime.pos⟩ ⟨0, base.p_prime.pos⟩ = 1)
+    (hrow : ∀ i, i ≠ ⟨0, base.q_prime.pos⟩ →
+      m i ⟨0, base.p_prime.pos⟩ =
+        m ⟨1, base.q_prime.one_lt⟩ ⟨0, base.p_prime.pos⟩)
+    (hcol : ∀ j, j ≠ ⟨0, base.p_prime.pos⟩ →
+      m ⟨0, base.q_prime.pos⟩ j =
+        m ⟨0, base.q_prime.pos⟩ ⟨1, base.p_prime.one_lt⟩)
+    (hrelation : ∀ i j,
+      m i j + m ⟨0, base.q_prime.pos⟩ ⟨0, base.p_prime.pos⟩ =
+        m i ⟨0, base.p_prime.pos⟩ + m ⟨0, base.q_prime.pos⟩ j)
+    (hfull : (∑ i : Fin base.q, ∑ j : Fin base.p, (m i j) ^ 2 : ℤ) ≤ base.p) :
+    (∀ i j, m i j = if j = ⟨0, base.p_prime.pos⟩ then 1 else 0) ∨
+      (∀ i j, m i j = if i = ⟨0, base.q_prime.pos⟩ then 1 else 0) := by
+  apply etaGrid_coefficients_eq_column_or_row base hqp m hprincipal hrow hcol hrelation
+  exact etaGrid_axis_bound_of_sum_sq_le base m hprincipal hrow hcol hrelation hfull
 
 end OddOrder.Peterfalvi.S16

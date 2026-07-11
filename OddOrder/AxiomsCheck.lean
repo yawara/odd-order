@@ -3471,7 +3471,16 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S16.axis_coefficients_eq_column_or_row
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.etaGrid_axis_sum_eq_sum_sq
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.etaGrid_axis_bound_of_sum_sq_le
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.etaGrid_coefficients_eq_column_or_row
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.etaGrid_coefficients_eq_column_or_row_of_sum_sq_le
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.typeIII_induced_source_support
 set_option linter.style.longLine false in
