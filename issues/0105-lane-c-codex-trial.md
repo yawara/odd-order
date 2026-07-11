@@ -149,3 +149,5 @@ issue は trial ログの追記継続のため open 維持、次の節目 (T-sid
 - 2026-07-11 (tick、merge ae4ebf77): (11.9a) eta projection bound + T-side grid relation + full grid
   dichotomy (新 leaf TGapProjection / TGapProjectionRigidity、TTypeII 経由で graph 配線済 = orphan
   なし、実 sorry ±0、assert 3 本 build 通過)。16/16。
+- 2026-07-11 (tick、merge a3736fc7): (11.9a) principal eta coefficient pin (実 sorry ±0、assert 1 本
+  build 通過)。17/17。
