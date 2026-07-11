@@ -866,3 +866,16 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
   repair、`.lake/build` cache 流用、coq submodule back-pointer 修復済)。全 4 レーン main `5f1c0be2` に同期・
   **0 unmerged** で監視開始。旧 relane #1-#12 / lane f/b/h/c の詳細履歴は `ft_frontier_remap_2026_06_25.md`
   + git log に温存 (本ファイルからは除去してクリーン化)。
+
+- **⚠ orphan module は「build green」をすり抜ける (2026-07-11 実害、hub 配線で修正)**: `lake build OddOrder`
+  が検証するのは **root `OddOrder.lean` からの推移 import closure のみ**。新 leaf を merge しても
+  OddOrder.lean (または既存 consumer) への import 配線が無ければ**一度も elaborate されずに
+  "Build completed successfully"** になる (実例: a の `S12_Noncoherence` — ★★★★
+  `no_typeV_maximal_unconditional` 本体 — と `S12_TypeVCaseC`、07-06 の
+  `GroupTheory/RepresentationTheory{,.SubrepresentationKernel}` の計 4 module が orphan、
+  うち Noncoherence は AxiomsCheck の assert も無く un-tripwired だった)。**対策 (tick 手順に追加)**:
+  新規 .lean file を含む merge の後は **orphan scan** — `OddOrder/**/*.lean` の module 集合と
+  `.lake/build/lib/lean/OddOrder/**/*.olean` の集合を突合し、差分があれば OddOrder.lean へ import を
+  追加 (共有ファイルの sanctioned 編集) してから build green を判定する。加えて lane 側は新 leaf 作成時に
+  OddOrder.lean 配線 + (flagship 級なら) AxiomsCheck assert 追加までを 1 commit に含めるのが正
+  (c は TTypeII が import する形で遵守済みの先例)。

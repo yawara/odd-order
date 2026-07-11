@@ -400,3 +400,12 @@ hyp.span_inner_SHCSet_diff_eq_zero 同伴): X := {μ_j}、Y := SHCSet、
 cX = 列像から直構成 (‖μ_j‖² = w₁ = ‖δ∑ω‖²)、D := {μ_j − d·ζ} with
 hDτ = 完結した image 計算。(10.10.2) 構造 (S = S₁ ⊔ {μ_j}) は hstruct
 仮説で engine 化。
+
+## 🧭 HUB 通知 (2026-07-11 tick): S12_TypeVCaseC / S12_Noncoherence の graph 配線を hub が補完
+
+両 leaf は OddOrder.lean からの import 到達が無く **orphan** だった (= full build が一度も
+elaborate していない; "build green" は空判定)。hub が OddOrder.lean に import を追加し、
+**4157 jobs で全て green を確認済み** (両 leaf とも現 main で正しくコンパイルする — 成果は健在)。
+今後の新 leaf は **OddOrder.lean への import 追加を同 commit に含める**こと。また ★★★★
+`no_typeV_maximal_unconditional` (S12_Noncoherence) は AxiomsCheck に assert が無く axiom-clean
+主張が un-tripwired — **a が AxiomsCheck assert を追加すること** (issue 1020/1021 の完了条件に含める)。

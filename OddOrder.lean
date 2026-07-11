@@ -22,6 +22,7 @@ import OddOrder.GroupTheory.OmegaSubgroup
 import OddOrder.GroupTheory.OpResidual
 import OddOrder.GroupTheory.PRank
 import OddOrder.GroupTheory.PiElementDecomposition
+import OddOrder.GroupTheory.RepresentationTheory
 import OddOrder.GroupTheory.RepresentationTheory.AInvariantSubrep
 import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
@@ -249,6 +250,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV
 import OddOrder.Peterfalvi.S11_ImprimitiveUBound
 import OddOrder.Peterfalvi.S11_NineElevenCoherence
 import OddOrder.Peterfalvi.S12_MaximalIII_IV_V
+import OddOrder.Peterfalvi.S12_Noncoherence
+import OddOrder.Peterfalvi.S12_TypeVCaseC
 import OddOrder.Peterfalvi.S12_TypeIIColumnPin
 import OddOrder.Peterfalvi.S12_TypeIIGridTranspose
 import OddOrder.Peterfalvi.S12_TypeIICrossIsometryPair
