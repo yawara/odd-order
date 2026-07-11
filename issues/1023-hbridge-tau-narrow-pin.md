@@ -167,3 +167,34 @@ extends_on_supported で**タダ**!) + 1 列の pin を全列に伝播 + Parseva
 組合せ論。**(b) が有望**: hcol-diff により δ=1 も自動 (tick⁴)、残るは
 「∑_j ⟨ext μ_j の E_j 分解⟩ の大域 counting」1 点。次 tick: (b) の counting を詰める
 (E_j ⊆ 2q-元、|E_j| = q、E_j − E_k = 列差固定、certainTypeR の j-列/j̄-列構造で交差評価)。
+
+## 2026-07-12 tick⁸ — ★ route (b) 最終形: dichotomy 完全不要の 2-case 論法 (設計完成)
+
+**目標 lemma**: `exists_pinned_coherent_sOf_H0C`:
+hcol (capstone の既存仮説) の下で
+`∃ c : IsCoherent tau (sOf s11Setup H0C) A0, c.extension (∑ᵢ μ_{i1}) = ∑ᵢ ω^σ_{i1}`。
+capstone は coherent_sOf_H0C の代わりにこれを使い、hbridge_τ = pin 節そのもの (ν-線形性計算)。
+
+**case 1 — ∃ irr ξ ∈ 𝒮(H₀C)** (任意の coherence c が pin を持つ):
+γ = ξ(1)·μ₁ − μ₁(1)·ξ ∈ ℤ[𝒮(H₀C)]、γ(1)=0 → A₀-supported
+(`inducedKernelFamily_zSpan_support_of_apply_one_eq_zero`、capstone 内で使用実績あり) →
+c.ext γ = τγ (extends_on_supported)。⟨τγ, τθ⟩ = ⟨γ, θ⟩ (Dade 等長、θ = μ₁ − dζ A₀-supported)
+= ξ(1)·q (直交: ξ⊥μ₁⊥ζ 全て stratum/family 直交)。他方 LHS 展開で
+⟨c.ext ξ, ωcol₁⟩ = 0 (ξ の 2-elt dadeOfDiff R-family ⊥ σ-grid) +
+⟨c.ext ξ, coh.ext ζ⟩ = ⟨c.ext μ₁, coh.ext ζ⟩ = 0 (**2-stratum cross_orthogonal、tick⁶ landed**)
+⟹ **⟨c.ext μ₁, ωcol₁⟩ = q**。SOf-(5.5): c.ext μ₁ = ∑E、E ⊆ certainTypeR imageSet
+(P₁ ∪ N₁、|E| = q from 等長 norm)、⟨∑E, ωcol₁⟩ = #(E∩P₁) = q ⟹ E = P₁ ⟹ pin ✓。
+w₂ = 3 含む全ケースで dichotomy/separability/V-vanishing 一切不要。
+
+**case 2 — 𝒮(H₀C) all-reducible** (= 全 member が μ-column、Coq WLOG-swap の構成的実体):
+canonical pinned coherence を**構成**: ext₀(μ_k) := ωcol_k の ℤ-線形拡張。
+等長 ✓ (両側 orthonormal ×√q scaling: ⟨μ_j,μ_k⟩ = q·δ = ⟨ωcol_j,ωcol_k⟩)。
+τ-agreement on ℤ[𝒮(H₀C), A₀]: supported 元 = 係数和 0 の column 結合 (値-at-1 特徴付け) =
+差分 lattice、τ(μ_j − μ_k) = ωcol_j − ωcol_k は **hcol の差** ⟹ agreement ✓。
+IsCoherent 構成は既存 IntegralCharacterMap 機構 (Zisometry_of_cfnorm 相当) で。
+
+**実装順 (次 tick)**: (i) case-1 γ-trick lemma (`pinned_of_irr_mem`、任意 c) — 部品全在庫、
+~120 行 (ii) case-2 構成 (~150 行、supported-characterization の在庫確認:
+`inducedKernelFamily_zSpan_support…` の逆向き + 係数和) (iii) exists_pinned + capstone 再配線
++ hbridge_τ 差し替え (iv) full build/AxiomsCheck。完了で capstone sorry-free →
+(11.9.b)-unconditional residual = caseA refuter (lane b) のみ。
