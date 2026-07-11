@@ -7410,3 +7410,18 @@ caseB do) and join this list when (11.5)/`H0_eq_Hprime` closes. -/
   OddOrder.Peterfalvi.S13.card_le_inner_self_re_of_orthonormal_inner_int_ne
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.sOf_H0Cprime_memberRFamily_orthogonal
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.caseA_sThree_coherent
+
+/-! **Peterfalvi (9.11.7)–(9.11.8) coherent-pair adjunction, axiom-clean** (issue 9083 Phase
+E-final, lane a).  The union-pair coherent extension (Coq `extend_coherent_with` +
+`bridge_coherent`, Peterfalvi (5.6.3)), the (5.5) partial-sum evaluation of coherent
+extensions (Coq `mem_coherent_sum_subseq`), the `coherent_ortho` cross-orthogonality, and
+the (9.11.7)–(9.11.8) projection budget (`‖Γ‖² = 1`, `Δ = 0`, `b = 0`, and the bridge
+`β^τ = Γ − e·τ₁ψ₁`).  The discharge `nineElevenSevenEightRefutation` itself and the (9.11)
+capstones `coherent_sOf_H0Cprime` / `coherent_sOf_H0C` carry the pre-existing upstream
+`C_eq_cSub` sorryAx debt (as the Phase-B/C corollaries and caseB do) and join this list
+when (11.5)/`H0_eq_Hprime` closes. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.unionPairExtension
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.isCoherent_union_pair_of_bridge
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.coherent_extension_eq_sum_memberRFamily
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.coherent_extension_cross_orthogonal
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.exists_bridge_target_of_budget

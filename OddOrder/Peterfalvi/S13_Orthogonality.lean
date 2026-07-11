@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.S13_CoreStructure
 import OddOrder.Peterfalvi.S11_NineElevenCaseA
 import OddOrder.Peterfalvi.S11_NineElevenAlphaBound
+import OddOrder.Peterfalvi.S11_NineElevenPairAdjoin
 import OddOrder.Peterfalvi.S07_BridgeCoherent
 
 /-!
@@ -127,14 +128,15 @@ theorem coherent_sOf_H0C [Finite G]
     have hμc : μ.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
       Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hμmem
     -- the refuter is discharged through the (9.11.1) squeeze + the Phase-B/C/D/E layers;
-    -- the sole remaining sorry is the (9.11.7)–(9.11.8) coherent-pair construction
-    -- `NineElevenSevenEightRefutation` (issue 9083 Phase E residual)
+    -- the (9.11.7)–(9.11.8) coherent-pair construction is `nineElevenSevenEightRefutation`
+    -- (issue 9083 Phase E-final, `S11_NineElevenPairAdjoin`)
     refine ⟨coherent_sOf_H0C_of_coherent_sOf_H0Cprime hyp
       (OddOrder.Peterfalvi.S13.caseA_coherent_sOf_H0Cprime_of_refuter hG hyp caseA
         (caseA_refuter_of_equality_refutation hG hyp caseA
           (nineElevenPairBound hG hyp caseA)
           (nineElevenEqualityRefutation_of_sevenEightRefutation hG hyp caseA
-            (by sorry)))).some ⟨μ.conj - μ, ⟨?_, ?_⟩, ?_⟩⟩
+            (nineElevenSevenEightRefutation hG hyp caseA)))).some
+      ⟨μ.conj - μ, ⟨?_, ?_⟩, ?_⟩⟩
     · exact Submodule.sub_mem _ (Submodule.subset_span hμc) (Submodule.subset_span hμmem)
     · exact OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support
         hyp.base.mderivSharp_subset_A0 (hIKF hμmem)
@@ -500,5 +502,18 @@ theorem coherent_sOf_H0Cprime_of_sevenEightRefutation [Finite G]
     (fun caseA => nineElevenPairBound hG hyp caseA)
     (fun caseA =>
       nineElevenEqualityRefutation_of_sevenEightRefutation hG hyp caseA (h78 caseA))
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.11)** (Coq `Ptype_core_coherence`, `PFsection9.v:1484`): the family
+`𝒮(H₀C′)` is coherent — **unconditional**.  The (9.11.7)–(9.11.8) coherent-pair
+construction (`nineElevenSevenEightRefutation`, issue 9083 Phase E-final) discharges the
+last hypothesis of `coherent_sOf_H0Cprime_of_sevenEightRefutation`. -/
+theorem coherent_sOf_H0Cprime [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)] :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+      (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) hyp.base.A0) :=
+  coherent_sOf_H0Cprime_of_sevenEightRefutation hG hyp
+    (fun caseA => nineElevenSevenEightRefutation hG hyp caseA)
 
 end OddOrder.Peterfalvi.S13
