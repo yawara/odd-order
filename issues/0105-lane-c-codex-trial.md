@@ -168,3 +168,6 @@ issue は trial ログの追記継続のため open 維持、次の節目 (T-sid
   + calT1 の Galois closure + induction transport (+102、実 sorry ±0、assert 2 本 build 通過)。22/22。
 - 2026-07-12 (tick、merge 544c98e2): (11.9a) integral eta coefficients の Galois transport (+83、実
   sorry ±0、assert 2 本 build 通過)。23/23。
+- 2026-07-12 (tick、merge 3143edb3): (11.9a) Galois orbit から eta-axis 係数定数性 + virtual-char
+  inner product 保存 (+185、実 sorry ±0、assert 2 本通過)。a の issue 1022 を DAG cycle 検証で
+  impossible-close (対象 = c 所有 TTypeII、cross-lane 対応として適切)。24/24。
