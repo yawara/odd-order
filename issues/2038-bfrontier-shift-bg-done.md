@@ -1712,3 +1712,21 @@ sorried 依存なしで Lean 化:
 **S15_SAndT 系残 sorry 2**: E⊄Q (complement_not_le_Q、S15_ComplementStructure:86、
 (13.17.c) 系) / TypeIOrtho producer (S15_SAndT:1638、(13.19))。
 **次 = complement_not_le_Q (E⊄Q)** — 文書順 13.17 < 13.19。
+
+## ✅ (2026-07-12、/loop iter 10) — (14.5) E⊄Q faithful 化 + 実証明
+
+**E⊄Q (complement_not_le_Q) は (13.17.c) の over-claim だった** (commit 3f590fb0):
+原文 (13.17.c) も Coq `FTtypeII_support_facts` (c) も「E = W₁ ∨ |E| = pq」の disjunction を
+保持。正体 = **(14.5)**: q < p 下で (13.19.c2) p ≤ e を排除 → (c1) 数値制約 → H = U →
+L = UW₁ ≤ S が N(U)⊄S (Type II) に矛盾。(14.5) 形 signature で完全実証明 — (13.19) 器
+(GridData、sorried producer) の caseC を直接 consume。**GridData は既に faithful だった**
+(e_eq_index 実等式 + caseC の p≤e half 込み — 器補強不要)。consumer chain
+(card_eq_pq / typeI_overNormalizer / typeII_overNormalizer) は threading + TAIL 移設、
+S16 exists_LHypothesis は hNUS を proven チェーン (P_inf_U_eq_bot→coprime→conj-bridge→
+not_normalizer_U_le_S) で供給。**S15_ComplementStructure sorry 0**。
+
+**S15 系残 bare sorry = typeIOrthogonalityGridData_of_typeISetup (S15_SAndT:1638) 唯一**。
+次 = この (13.19) producer 本体。中身: (i) L の §3-§5 Dade 層 (τ-isometry σ-pinned) から
+Ltau_orthogonal_eta / betaL_eq、(ii) (13.19.c) parity/degree dichotomy (coherence bounds、
+NC 論法 (3.8))、(iii) e_eq_index / phi (degree e の Ind_H^L irreducible)。Coq 対応 =
+PFsection13 FTtype1_coherence / FTtype1_Ind_irr 以降の (13.19) 本体 (~:1975-)。
