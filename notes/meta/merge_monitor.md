@@ -530,6 +530,9 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-12 (tick 5) — a のみ合流**: **a=2** ((11.9.a) G1 部品 `mapRingEquiv_muColumnZero_sum`
+  μ₀ 列和の Galois 固定性、S12_Prop109 +58 全 proven + 1024 G3 narrow 化設計) / b=0 / c=0。
+  build green (4171 jobs, 4m24s)・AxiomsCheck OK・sorry 65→65・新 axiom なし。push `2b2a73e9..802c540c`。
 - **2026-07-12 (tick 4) — 全 3 レーン合流: ★ (13.17.c) over-claim 修正 = E⊄Q faithful 化 (b)**:
   **a=2** (新 shared leaf `GaloisInnerTransport.lean` +99 全 proven、**claim-before-build 完全準拠**
   (9085 起票 + OddOrder.lean 配線込み); S12 `inducedFamily_closedUnderMapRingEquiv` +30) /
