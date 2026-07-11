@@ -168,3 +168,15 @@ c2400d81 re-landing (ab1a776d) 合流後の full build で **spine producer
 mu_diff_support grounding field 3 層 + producer が sorryAx 混入なしで landed —
 裁定 (b) Core-split の目的を完全達成。HOLD 不変量は一度も破られず。
 次: 9076 (tauS_mu_row0_diff_support の signature 修正) が field から discharge 可能 (b 記録)。
+
+---
+
+## ✅ CLOSE (2026-07-11, lane b): c2400d81 re-landing 完了
+
+- cherry-pick ab1a776d (conflict 無し、3 files +30 行): `mu_diff_support` field threading
+  (SubcoherenceInputs + Section16Inputs + FeitThompsonSetup cd 層) + producer discharge
+  (`Section16CharacterData.muS_diff_support`、Core-split 後は hyp46SmpCore 経由で Dade-free)。
+- **検証**: leaf build green / AxiomsCheck green (producer assert
+  `section16CharacterData_of_isMinimalSimpleOdd` は厳格形のまま、AxiomsCheck:6852) /
+  full build 4165 jobs green (15s)。sorryAx 非混入を確認 — HUB RULING の実装条件を全て充足。
+- 次: 9076 の pin `tauS_mu_row0_diff_support` signature fix (hj0/hdeg) + field discharge (lane b 継続)。
