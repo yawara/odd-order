@@ -148,10 +148,11 @@ theorem Hypothesis.tau_muGrid_zeroRow_diff [Finite G] (hG : OddOrder.BG.IsMinima
       OddOrder.Peterfalvi.S04.supportInSubgroup
         (typePA M hyp.typeP ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M :=
     ClassFunction.mem_supportedSubmodule.mp
-      (OddOrder.Peterfalvi.S06.certainTypeDiffSupported h46 hχ₂ne1 hχ₂'ne1 i0 hdeg).2
+      (OddOrder.Peterfalvi.S06.certainTypeDiffSupported h46.toCore hχ₂ne1 hχ₂'ne1 i0 hdeg).2
   have happly : hyp.tau (hyp.muGrid hG hodd 0 j - hyp.muGrid hG hodd 0 k)
       = h46.tau.toDadeMap
-          (OddOrder.Peterfalvi.S06.certainTypeDiffSupported h46 hχ₂ne1 hχ₂'ne1 i0 hdeg) := by
+          (OddOrder.Peterfalvi.S06.certainTypeDiffSupported h46.toCore hχ₂ne1 hχ₂'ne1 i0
+            hdeg) := by
     have h1 : hyp.tau (hyp.muGrid hG hodd 0 j - hyp.muGrid hG hodd 0 k)
         = h46.dade0.dadeMap (k := ℂ)
             ⟨hyp.muGrid hG hodd 0 j - hyp.muGrid hG hodd 0 k,

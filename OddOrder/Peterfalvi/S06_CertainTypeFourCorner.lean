@@ -116,9 +116,9 @@ theorem chiColumn_fourcorner_mem_supportedSubmodule (h : Hypothesis46 A L)
   · -- `(w : L) ∈ W₁`: column difference cancels (row-only dependence)
     have hwmem : w ∈ h.sdiffTICyclicHypothesis.W1.subgroupOf h.sdiffTICyclicHypothesis.W :=
       Subgroup.mem_subgroupOf.mpr h1
-    simp only [ClassFunction.sub_apply, chiColumn_apply_of_mem_W1 h χ₂ i hwmem,
-      chiColumn_apply_of_mem_W1 h χ₂ 0 hwmem, chiColumn_apply_of_mem_W1 h 1 i hwmem,
-      chiColumn_apply_of_mem_W1 h 1 0 hwmem]
+    simp only [ClassFunction.sub_apply, chiColumn_apply_of_mem_W1 h.toCore χ₂ i hwmem,
+      chiColumn_apply_of_mem_W1 h.toCore χ₂ 0 hwmem, chiColumn_apply_of_mem_W1 h.toCore 1 i hwmem,
+      chiColumn_apply_of_mem_W1 h.toCore 1 0 hwmem]
     ring
   · -- `(w : L) ∈ W₂`: row difference cancels (column-only dependence)
     have hwmem : w ∈ h.sdiffTICyclicHypothesis.W2.subgroupOf h.sdiffTICyclicHypothesis.W :=

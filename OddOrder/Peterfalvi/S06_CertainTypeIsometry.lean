@@ -176,7 +176,7 @@ columns `χ₂, χ₂'`.  If the certain-type characters `μ_{ij}` and `μ_{ik}`
 By the degree congruence (4.3.d), `μ_{ij}(1) ≡ δ_j` and `μ_{ik}(1) ≡ δ_k` modulo `w₁`, so the
 equal-degree hypothesis forces `w₁ ∣ (δ_j − δ_k)`.  Since `δ_j, δ_k ∈ {±1}` and `w₁ ≥ 3`
 (`W₁ ≠ 1` of odd order), the only multiple of `w₁` in `[-2, 2]` is `0`. -/
-theorem certainType_sign_eq_of_degree_eq (h : Hypothesis46 A L)
+theorem certainType_sign_eq_of_degree_eq (h : Hypothesis46Core A L)
     [NeZero (Nat.card h.W1)] [Fintype ↥(h.W1 ⊔ h.W2)]
     [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1))
@@ -213,7 +213,7 @@ theorem certainType_sign_eq_of_degree_eq (h : Hypothesis46 A L)
 the `W₂`-projection `wSnd` is trivial on `W₁` (`wSnd_eq_one_of_mem_W1`), so
 `ω_{ij}(w) = (w1CharEquiv i)(wFst w)` for every column `χ₂`.  (Generalizes `chiColumn_one_apply`
 — the `χ₂ = 1` column for all `w` — to every column, with the point restricted to `W₁`.) -/
-theorem chiColumn_apply_of_mem_W1 (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+theorem chiColumn_apply_of_mem_W1 (h : Hypothesis46Core A L) [NeZero (Nat.card h.W1)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1))
     {w : ↥h.sdiffTICyclicHypothesis.W}
     (hw : w ∈ h.sdiffTICyclicHypothesis.W1.subgroupOf h.sdiffTICyclicHypothesis.W) :
@@ -234,7 +234,7 @@ On `W₁^# ⊆ W − W₂` the (4.3.c) value identity gives `μ_{ij}(w) = δ_j·
 `μ_{ik}(w) = δ_k·ω_{ik}(w)`; `δ_j = δ_k` (step (1), `certainType_sign_eq_of_degree_eq`) and the
 column-independence of `ω` on `W₁` (`chiColumn_apply_of_mem_W1`) make these equal.  At `1` it is
 the equal-degree hypothesis. -/
-theorem certainType_apply_eq_of_mem_W1 (h : Hypothesis46 A L)
+theorem certainType_apply_eq_of_mem_W1 (h : Hypothesis46Core A L)
     [NeZero (Nat.card h.W1)] [Fintype ↥(h.W1 ⊔ h.W2)]
     [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1))
@@ -272,7 +272,7 @@ Proof by cases on `z`:
 * `z ∈ L − K`: by (2.1) (`mem_compl_conj_into_W`) `z` is `L`-conjugate to `x·y` with `x ∈ W₁^#`,
   `y ∈ W₂`; then `x·y ∈ W − W₂`, so its image lies in `tic.V = ↑W \ ↑W₂` (`tic_V`), and
   `L.subtype z` is an `L`-conjugate of it, i.e. lies in `V^L`. -/
-theorem certainType_diff_supp_subset_A0 (h : Hypothesis46 A L)
+theorem certainType_diff_supp_subset_A0 (h : Hypothesis46Core A L)
     [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
     [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1)
@@ -303,7 +303,7 @@ theorem certainType_diff_supp_subset_A0 (h : Hypothesis46 A L)
       -- where the difference vanishes by step (2)), so `x·y ∈ V = W − (W₁ ∪ W₂)` and `z ∈ V^L`.
       right
       obtain ⟨c, x, hxW1, hx1, y, hyW2, hcxy⟩ :=
-        (h.toCertainTypeHypothesis.toHypothesis).mem_compl_conj_into_W hzK
+        (h.toHypothesis).mem_compl_conj_into_W hzK
       have hz_eq : z = c * (x * y) * c⁻¹ := by rw [← hcxy]; group
       -- `y ≠ 1`: otherwise `μ_{ij} − μ_{ik}` vanishes at `z` (the `W₁`-agreement, step (2)).
       have hy1 : y ≠ 1 := by
@@ -354,7 +354,7 @@ theorem certainType_diff_supp_subset_A0 (h : Hypothesis46 A L)
 /-- `μ_{ij} − μ_{ik}` as an element of Peterfalvi's `CF(L, A₀)` (`SupportedClassFunctions` on
 `A₀ = A ∪ V^L`), the domain element fed to the certain-type Dade isometry `τ`.  The support
 condition is exactly conclusion (1) `certainType_diff_supp_subset_A0`. -/
-noncomputable def certainTypeDiffSupported (h : Hypothesis46 A L)
+noncomputable def certainTypeDiffSupported (h : Hypothesis46Core A L)
     [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
     [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1)
@@ -400,7 +400,7 @@ theorem certainType_diff_dade_apply_eq_of_mem_V (h : Hypothesis46 A L)
     (hdeg : ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
           = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1)
     {v : G} (hv : v ∈ (ticVdiff h).V) :
-    h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg) v
+    h.tau.toDadeMap (certainTypeDiffSupported h.toCore hχ₂ hχ₂' i hdeg) v
       = ((h.columnFamily χ₂).sign : ℂ)
         * (certainTypeOmegaSigma h χ₂ i v - certainTypeOmegaSigma h χ₂' i v) := by
   -- `v ∈ tic.V` (the same TI set), hence `v ∈ A₀`
@@ -427,7 +427,7 @@ theorem certainType_diff_dade_apply_eq_of_mem_V (h : Hypothesis46 A L)
     h.certainType_apply_eq_of_mem_V χ₂' i hwsdiffV, hwpt,
     certainTypeOmegaSigma_apply_of_mem_V h χ₂ i hv,
     certainTypeOmegaSigma_apply_of_mem_V h χ₂' i hv,
-    certainType_sign_eq_of_degree_eq h χ₂ χ₂' i hdeg]
+    certainType_sign_eq_of_degree_eq h.toCore χ₂ χ₂' i hdeg]
   ring
 
 /-- **Peterfalvi (4.8), step (5) input** (`‖φ‖² = 2`).  For distinct columns `χ₂ ≠ χ₂'`, the Dade
@@ -441,8 +441,8 @@ theorem certainType_diff_dade_inner_self (h : Hypothesis46 A L)
     (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1) (i : Fin (Nat.card h.W1))
     (hdeg : ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
           = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1) :
-    ClassFunction.inner (h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg))
-        (h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)) = 2 := by
+    ClassFunction.inner (h.tau.toDadeMap (certainTypeDiffSupported h.toCore hχ₂ hχ₂' i hdeg))
+        (h.tau.toDadeMap (certainTypeDiffSupported h.toCore hχ₂ hχ₂' i hdeg)) = 2 := by
   rw [h.tau.inner_eq]
   show ClassFunction.inner
       (((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ)
@@ -469,8 +469,8 @@ theorem sigmaNC_dade_le_two (h : Hypothesis46 A L)
     (hdeg : ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
           = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1) :
     (ticVdiff h).sigmaNC rfl (ticVdiffFullDadeApplication h)
-        (h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)) ≤ 2 := by
-  set φ := h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg) with hφdef
+        (h.tau.toDadeMap (certainTypeDiffSupported h.toCore hχ₂ hχ₂' i hdeg)) ≤ 2 := by
+  set φ := h.tau.toDadeMap (certainTypeDiffSupported h.toCore hχ₂ hχ₂' i hdeg) with hφdef
   have hφZ : φ ∈ ZIrr G := h.tau.maps_virtualCharacter _
     ((ZIrr (↥L)).sub_mem ((h.columnFamily χ₂).mu i).mem_ZIrr
       ((h.columnFamily χ₂').mu i).mem_ZIrr)
@@ -494,12 +494,12 @@ theorem sigmaCoeff_dade_eq_zero_or_one (h : Hypothesis46 A L)
     (pq : ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) ×
         ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ)) :
     (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h)
-        (h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)) pq = 0 ∨
+        (h.tau.toDadeMap (certainTypeDiffSupported h.toCore hχ₂ hχ₂' i hdeg)) pq = 0 ∨
       (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h)
-        (h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)) pq = 1 ∨
+        (h.tau.toDadeMap (certainTypeDiffSupported h.toCore hχ₂ hχ₂' i hdeg)) pq = 1 ∨
       (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h)
-        (h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)) pq = -1 := by
-  set φ := h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg) with hφdef
+        (h.tau.toDadeMap (certainTypeDiffSupported h.toCore hχ₂ hχ₂' i hdeg)) pq = -1 := by
+  set φ := h.tau.toDadeMap (certainTypeDiffSupported h.toCore hχ₂ hχ₂' i hdeg) with hφdef
   have hφZ : φ ∈ ZIrr G := h.tau.maps_virtualCharacter _
     ((ZIrr (↥L)).sub_mem ((h.columnFamily χ₂).mu i).mem_ZIrr
       ((h.columnFamily χ₂').mu i).mem_ZIrr)
@@ -569,13 +569,13 @@ theorem certainType_diff_dade_eq_of_all_sigmaCoeff_zero (h : Hypothesis46 A L)
     (hdeg : ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
           = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1)
     (hall : ∀ pq, (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h)
-        (h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)
+        (h.tau.toDadeMap (certainTypeDiffSupported h.toCore hχ₂ hχ₂' i hdeg)
           - (h.columnFamily χ₂).sign •
             (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i)) pq = 0) :
-    h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)
+    h.tau.toDadeMap (certainTypeDiffSupported h.toCore hχ₂ hχ₂' i hdeg)
       = (h.columnFamily χ₂).sign • (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i) := by
   classical
-  set φ := h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg) with hφ
+  set φ := h.tau.toDadeMap (certainTypeDiffSupported h.toCore hχ₂ hχ₂' i hdeg) with hφ
   set ωij := certainTypeOmegaSigma h χ₂ i with hωij
   set ωik := certainTypeOmegaSigma h χ₂' i with hωik
   set s : ℤ := (h.columnFamily χ₂).sign with hsdef
@@ -648,7 +648,7 @@ theorem certainType_diff_dade_eq (h : Hypothesis46 A L)
     (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1) (i : Fin (Nat.card h.W1))
     (hdeg : ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
           = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1) :
-    h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)
+    h.tau.toDadeMap (certainTypeDiffSupported h.toCore hχ₂ hχ₂' i hdeg)
       = (h.columnFamily χ₂).sign • (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i) := by
   classical
   haveI : Finite G := Finite.of_fintype G
@@ -657,7 +657,7 @@ theorem certainType_diff_dade_eq (h : Hypothesis46 A L)
   haveI : Finite (((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) ×
     ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ)) := Finite.of_fintype _
   apply certainType_diff_dade_eq_of_all_sigmaCoeff_zero h hχ hχ₂ hχ₂' i hdeg
-  set φ := h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg) with hφ
+  set φ := h.tau.toDadeMap (certainTypeDiffSupported h.toCore hχ₂ hχ₂' i hdeg) with hφ
   set ψ := φ - (h.columnFamily χ₂).sign •
     (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i) with hψ
   set a : ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) ×
@@ -790,7 +790,7 @@ theorem certainType_diff_dade_sum_eq (h : Hypothesis46 A L)
     (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1)
     (hdeg : ∀ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
                 = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1) :
-    h.tau.toDadeMap (∑ i, certainTypeDiffSupported h hχ₂ hχ₂' i (hdeg i))
+    h.tau.toDadeMap (∑ i, certainTypeDiffSupported h.toCore hχ₂ hχ₂' i (hdeg i))
       = (h.columnFamily χ₂).sign •
           ∑ i, (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i) := by
   rw [tau_toDadeMap_sum, Finset.smul_sum]
@@ -855,7 +855,7 @@ theorem certainType_diff_dade_sum_eq_of_degree (h : Hypothesis46 A L)
     (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1)
     (hdeg : ∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
           = ∑ i, ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1) :
-    h.tau.toDadeMap (∑ i, certainTypeDiffSupported h hχ₂ hχ₂' i
+    h.tau.toDadeMap (∑ i, certainTypeDiffSupported h.toCore hχ₂ hχ₂' i
         (forall_columnFamily_mu_apply_one_eq_of_sum_eq h χ₂ χ₂' hdeg i))
       = (h.columnFamily χ₂).sign •
           ∑ i, (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i) :=

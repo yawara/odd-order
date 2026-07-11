@@ -781,7 +781,7 @@ theorem Hypothesis.residueS_mu2_diff_support [Finite G] (hyp : Hypothesis (G := 
   intro z hz
   rw [OddOrder.RepresentationTheory.ClassFunction.mem_support] at hz
   rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
-  exact OddOrder.Peterfalvi.S06.certainType_diff_supp_subset_A0 (hyp.hyp46S hG)
+  exact OddOrder.Peterfalvi.S06.certainType_diff_supp_subset_A0 (hyp.hyp46S hG).toCore
     hχj hχk i hdeg hz
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -844,7 +844,7 @@ theorem Hypothesis.residueS_mu2_diff_dade_apply_of_mem_V [Finite G]
   have hφ : (⟨_, (OddOrder.RepresentationTheory.ClassFunction.mem_supportedSubmodule).mpr hsupp⟩
         : OddOrder.Peterfalvi.S04.SupportedClassFunctions ℂ
             (honestTypeP2A0Set hyp.S hyp.Sdata) hyp.S)
-      = OddOrder.Peterfalvi.S06.certainTypeDiffSupported (hyp.hyp46S hG) hχj hχk i hdeg :=
+      = OddOrder.Peterfalvi.S06.certainTypeDiffSupported (hyp.hyp46S hG).toCore hχj hχk i hdeg :=
     Subtype.ext rfl
   rw [hφ]
   exact OddOrder.Peterfalvi.S06.certainType_diff_dade_apply_eq_of_mem_V

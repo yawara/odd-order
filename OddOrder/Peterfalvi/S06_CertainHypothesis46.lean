@@ -33,10 +33,49 @@ open OddOrder.RepresentationTheory
 
 variable {G : Type*} [Group G] [Fintype G]
 
+/-- **Peterfalvi Hypothesis (4.6), Dade-free core** (issue 9081).  The structural part of
+Hypothesis (4.6): the certain-type structure (4.2) for `↥L` (the parent `Hypothesis ↥L`), the
+ambient TI-cyclic data (4.6.b), the normal subgroup `H` with `W₂ ⊆ H ⊆ K` (4.6.c), the covering
+condition (4.6.d), and the lightweight normalization `L_normalizes_A` — **without** the §4 Dade
+data (`dade`, `dade0`, `τ`) of the full `Hypothesis46`.
+
+This is the exact input type of the (4.7) support chain and the (4.8) conclusion-(1) engine
+(`certainType_diff_supp_subset_A0`), none of which project the Dade fields; typing them here keeps
+the Dade construction (in the §8/§15/§16 instantiations, a deep FT-support pin) out of their axiom
+closure.  The Dade-consuming §6 statements ((4.8) step (4) onward) stay on `Hypothesis46`; use
+`Hypothesis46.toCore` to feed them the shared core. -/
+structure Hypothesis46Core (A : Set G) (L : Subgroup G) [Fintype ↥L]
+    extends Hypothesis ↥L where
+  /-- `A` is closed under `L`-conjugation (the single consequence of the (4.6.d) Dade datum the
+  (4.7) support chain uses; supplied by `dade.L_normalizes_A` in the full (4.6)). -/
+  L_normalizes_A : ∀ (l : ↥L) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A
+  /-- (4.6.b): the ambient TI-cyclic Hypothesis (3.1) for `(G, W)`. -/
+  tic : OddOrder.Peterfalvi.S05.TICyclicHypothesis G
+  /-- `W₁` of (3.1) is the image of the certain-type `W₁ ≤ ↥L` under `L ↪ G`. -/
+  tic_W1 : tic.W1 = toHypothesis.W1.map L.subtype
+  /-- `W₂` of (3.1) is the image of the certain-type `W₂ ≤ ↥L` under `L ↪ G`. -/
+  tic_W2 : tic.W2 = toHypothesis.W2.map L.subtype
+  /-- (4.6.b): the TI-subset `V` of the ambient Hypothesis (3.1) is `W − (W₁ ∪ W₂)` (see
+  `Hypothesis46.tic_V`). -/
+  tic_V : tic.V = (↑tic.W : Set G) \ ((↑tic.W1 : Set G) ∪ (↑tic.W2 : Set G))
+  /-- (4.6.c): a normal subgroup `H ⊴ L`. -/
+  subH : Subgroup ↥L
+  subH_normal : subH.Normal
+  /-- (4.6.c): `W₂ ⊆ H`. -/
+  W2_le_subH : toHypothesis.W2 ≤ subH
+  /-- (4.6.c): `H ⊆ K`. -/
+  subH_le_K : subH ≤ toHypothesis.K
+  /-- (4.6.d): every nontrivial element of every `C_K(h)` (`h ∈ H^#`) lies in `A`
+  (the covering `⋃_{h∈H^#} C_K(h)^# ⊆ A`). -/
+  A_covers : ∀ (hh : ↥L), hh ∈ subH → hh ≠ 1 →
+    ∀ (x : ↥L), x ∈ Subgroup.centralizer ({hh} : Set ↥L) ⊓ toHypothesis.K →
+      x ≠ 1 → (L.subtype x) ∈ A
+
 /-- **Peterfalvi Hypothesis (4.6).**  See the module docstring.  Extends the certain-type Dade
 hypothesis `CertainTypeHypothesis A L` (= (4.2) for `↥L` + §4 Dade on `A`) with the ambient TI-cyclic
 data (3.1), the normal subgroup `H` with `W₂ ⊆ H ⊆ K`, the covering condition on `A`, and the Dade
-isometry `τ` relative to `A₀ = A ∪ V^L`. -/
+isometry `τ` relative to `A₀ = A ∪ V^L`.  The Dade-free structural part is `Hypothesis46Core`
+(`Hypothesis46.toCore`). -/
 structure Hypothesis46 (A : Set G) (L : Subgroup G) [Fintype ↥L]
     [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
     extends CertainTypeHypothesis A L where
@@ -72,5 +111,24 @@ structure Hypothesis46 (A : Set G) (L : Subgroup G) [Fintype ↥L]
     (A ∪ OddOrder.GroupTheory.conjClassSetIn L tic.V) L
   /-- (4.6.e): the Dade isometry `τ` relative to `A₀`. -/
   tau : OddOrder.Peterfalvi.S04.FullDadeIsometryData (G := G) dade0
+
+/-- The Dade-free core of a full Hypothesis (4.6): forget `dade`/`dade0`/`τ`, keeping the
+structural (4.2)+(4.6.b-d) data; the normalization `L_normalizes_A` is the one consequence of
+the `A`-Dade datum the (4.7) chain uses.  `@[reducible]` so that instance arguments and
+statements over `h.toCore` unify with the `h`-forms (`h.toCore.K ≡ h.K` etc.). -/
+@[reducible] def Hypothesis46.toCore {A : Set G} {L : Subgroup G} [Fintype ↥L]
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
+    (h : Hypothesis46 A L) : Hypothesis46Core A L where
+  toHypothesis := h.toCertainTypeHypothesis.toHypothesis
+  L_normalizes_A := h.dade.L_normalizes_A
+  tic := h.tic
+  tic_W1 := h.tic_W1
+  tic_W2 := h.tic_W2
+  tic_V := h.tic_V
+  subH := h.subH
+  subH_normal := h.subH_normal
+  W2_le_subH := h.W2_le_subH
+  subH_le_K := h.subH_le_K
+  A_covers := h.A_covers
 
 end OddOrder.Peterfalvi.S06
