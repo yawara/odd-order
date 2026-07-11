@@ -674,3 +674,29 @@ feature commit: `8c789fb4`。
 - 新 theorem は AxiomsCheck 登録済み。main `f35a8849` を同期後、AxiomsCheck
   (4139 jobs) は exit 0、`git diff --check` clean。`TGapProjection` は sorry-free、
   `TTypeII` は 1499 行・既存 2 sorry のまま。新 axiom・新 sorry なし。
+
+## lane-c (11.9.a) T-side four-corner 関係と axis 二分法 (2026-07-11)
+
+feature commit: `7476d279`。
+
+- 新 leaf `TGapProjectionRigidity.lean` に
+  `tSideDadeMap_vanish_on_etaRegular` を実証明した。`A(T)=T_σ#`-supported source について
+  restricted T-side Dade map を full type-P₁ map と同定し、regular type-P set `V(T)` 上では
+  source value に戻ることと `V(T)∩T'=∅` を用いて 0 とした。class invariance により shared
+  `W` の regular set の全 conjugacy saturation へ拡張する。
+- この vanishing を既存 (3.7) `inner_eta_grid_relation` へ接続し、T-side bridge の整数射影
+  係数について `mᵢⱼ+m₀₀=mᵢ₀+m₀ⱼ` を producer の出力に保持した。
+  `T_typeIII_ratio_le` も強化 producer を使用し、`hrelationT` まで materialize 済み。
+- 純算術定理 `axis_coefficients_eq_column_or_row` を実証明した。`3≤q<p`、axis constancy、
+  four-corner relation、sharpened projection bound `≤p` の下では、三係数
+  `(a₁₀,a₀₁,a₁₁)` は `(1,0,0)` (zero-column) または `(0,1,0)` (zero-row) の二候補だけ。
+  Coq `FTtype34_structure` と同じく、最後に (11.8) non-orthogonality が zero-row 候補を
+  排除する構造であり、transpose や type-V case-(c) の不等号反転には依存しない。
+- 従って次の exact producers は三つ: (i) `m₀₀=1` (既に source/Dade trivial pairing は
+  caller 内にあるため配線問題)、(ii) cyclotomic Galois action と Dade commutation による
+  nonzero row/column axis constancy、(iii) perpendicular residual `χ≠0` による現 bound
+  `≤p+1` から `≤p` への sharpen。これらを full-grid norm formula と二分法へ通し、
+  (11.8) で zero-row を排除すれば既存 `tSide_beta_inner_eta_of_zeroColumn_projection` が閉じる。
+- axis 二分法は AxiomsCheck 登録済み。AxiomsCheck (4140 jobs) は exit 0、
+  `git diff --check` clean。新 leaf は sorry-free、`TTypeII` は 1499 行・既存 2 sorry のまま。
+  新 axiom・新 sorry なし。
