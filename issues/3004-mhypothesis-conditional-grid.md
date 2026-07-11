@@ -856,3 +856,16 @@ main `cce4dbc8` の最新 `TTypeII.lean` を concrete producer landing 後に再
 (b) (11.8) wrong-axis refuter、
 (c) prime-TI `mu_01` derived-complement vanishing。
 orbit threading だけで `T_typeIII_ratio_le` が閉じるとは扱わない。
+
+## 🧭 HUB 承認記録 (2026-07-12 tick、merge 時)
+
+1. **ω_S Galois orbit 層の FT.lean additive 構築を承認** (c1fa962c 系、merge 済): hub 検証 —
+   structure signature 不変・既存定理の statement 完全保存 (proof 縮約のみ)・AxiomsCheck 9 本
+   登録・build green。a 所有 file への additive theorem 追加として carrier-field 先例に準拠。
+2. **保留中の 3-carrier full-orbit field threading を条件付き事前承認**: c の設計どおり
+   (Section16CharacterData / Section16Inputs / S15.Hypothesis に row/column full-orbit fields を
+   **同一 statement** で threading、concrete producer は構築済)。条件 = 9081 と同一: field 名
+   保存・spine producer の厳格 assert green 維持 (threading 後の full build で確認)・S15.Hypothesis
+   は b 所有ゆえ b の 2038 進行と衝突しない hunk 配置 (不明なら b に notes で一報)。
+3. **9084 裁定**: TGapCross 4 定理の S15 正本 redirect + (14.9) endpoint discharge を承認、
+   owner = c (詳細 = 9084 RULING)。
