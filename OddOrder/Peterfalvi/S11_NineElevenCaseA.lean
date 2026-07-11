@@ -762,4 +762,238 @@ theorem caseA_two_summand_inertia_inputs [Finite G]
   · exact Or.inr (hS2deg φ hφS₂)
   · exact Or.inl (hS3deg φ ⟨hφ', hφS₂⟩)
 
+/-! ### The (9.11.3) count inputs at the `Hypothesis` level (issue 9083, Phase C)
+
+Book (9.11.3): *"`|𝒮₄| = (1/q)·(((p^q−1)−(p−1)q)/u − (p−1))`"*.  The S11-level orbit split is
+landed as `S11.nineElevenThree_orbit_split` (`S11_NineElevenCoherence`); this section instantiates
+it in the `NineElevenEqualityRefutation` hypothesis budget, producing **exactly** the
+`hclass`/`hn` inputs of `S11.nineElevenCaseA_equality_refutation` at `n = |𝒮₄|·q + (p−1)` (so
+`hn` is `rfl`), with `𝒮₄` pinned to the concrete member family `nineElevenSFour`.  Together with
+the Phase-B inertia inputs (`caseA_two_summand_inertia_inputs`) this closes the assembler chain:
+`nineElevenEqualityRefutation_of_sTwoExtraction_normBound` reduces the remaining distance to
+`NineElevenEqualityRefutation` to the two named Phase-D/E `Prop`s `NineElevenSTwoExtraction`
+((9.11.1) equality forcing `𝒮₂ = 𝒮₁`) and `NineElevenNormBound` ((9.11.4) Mackey norm +
+(9.11.5)–(9.11.8) `|𝒮₄| ≤ ‖α‖²`). -/
+
+/-- **Peterfalvi (9.11.3)'s family `𝒮₄`**: the irreducible members of `𝒮₃ ∩ 𝒮(H₀C)`, i.e. the
+irreducible members of `𝒮(H₀C)` outside the maximal coherent `𝒮₂` (since `𝒮(H₀C) ⊆ 𝒮(H₀C′)`,
+"`∈ 𝒮₃`" is "`∉ 𝒮₂`" there).  Its cardinality is the `S4` of the (9.11.3) count
+(`caseA_nineElevenThree_count_inputs`) and of the (9.11.5)–(9.11.8) bound `|𝒮₄| ≤ ‖α‖²`
+(`NineElevenNormBound`). -/
+noncomputable def nineElevenSFour [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    (S₂ : Set (ClassFunction ↥M ℂ)) : Set (ClassFunction ↥M ℂ) :=
+  {φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup
+      (hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief) |
+    IsIrreducibleCharacter φ ∧ φ ∉ S₂}
+
+/-- **Peterfalvi (9.11.3) at the `Hypothesis` level: the count inputs** (issue 9083 Phase C).
+
+In the equality configuration — the degree-`qa` base subfamily inside `𝒮₂` (`hS₁sub`), the landed
+`𝒮₃`-degree fact `hS3deg`, the Phase-E `𝒮₂`-degree extraction `hS2deg`, `C = U′` (`hCUprime`),
+and the (9.8.d) count equality (`hcount`) — the `𝒳(H₀C)` class equation holds with the
+degree-`u` character count already split into `W₁`-orbits:
+
+`u + (|𝒮₄|·q + (p−1))·u² + q·(p−1)·u = p^q·u`.
+
+This is `S11.nineElevenCaseA_equality_refutation`'s `hclass` at `n = |𝒮₄|·q + (p−1)`, making its
+`hn` input definitional (`rfl`); `S4 = (nineElevenSFour hyp S₂).ncard` is the same cardinality
+that the (9.11.5)–(9.11.8) bound `hle : S4 ≤ N` (`NineElevenNormBound`) must control.  The
+`𝒮(H₀C′)`-level hypotheses are moved to the §9 families via `S11.sOf_antitone` along
+`H₀C′ ≤ H₀U′` (derived-subgroup monotonicity) and `H₀C′ ≤ H₀C` (`C_eq_cSub`). -/
+theorem caseA_nineElevenThree_count_inputs [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief))
+    {S₂ : Set (ClassFunction ↥M ℂ)}
+    (hS₁sub : {φ : ClassFunction ↥M ℂ |
+        φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime ∧
+        IsIrreducibleCharacter φ ∧
+        ((φ : ↥M → ℂ) 1 = ((hyp.s11Setup.q * caseA.a : ℕ) : ℂ))} ⊆ S₂)
+    (hS3deg : ∀ χ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime \ S₂,
+      (χ : ↥M → ℂ) 1 = ((hyp.s11Setup.q *
+        (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u : ℕ) : ℂ))
+    (hS2deg : ∀ χ ∈ S₂,
+      (χ : ↥M → ℂ) 1 = ((hyp.s11Setup.q * caseA.a : ℕ) : ℂ))
+    (hCUprime : (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).C
+      = (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).Uprime)
+    (hcount : {χ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup
+        (hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup) |
+        IsIrreducibleCharacter χ ∧
+        χ 1 = ((hyp.s11Setup.q * caseA.a : ℕ) : ℂ)}.ncard * (caseA.a * caseA.a)
+      = (hyp.chief.p - 1)
+        * ((OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup).relIndex hyp.s11Setup.U)) :
+    (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u
+      + ((nineElevenSFour hyp S₂).ncard * hyp.s11Setup.q + (hyp.chief.p - 1))
+        * (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u ^ 2
+      + hyp.s11Setup.q * (hyp.chief.p - 1)
+        * (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u
+      = hyp.chief.p ^ hyp.s11Setup.q
+        * (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u := by
+  haveI := hyp.base.finiteG
+  classical
+  -- `H₀C′ ≤ H₀U′` (`C′ = [C,C] ≤ [U,U] = U′`), as in `caseA_refuter_of_equality_refutation`
+  have hCUle : hyp.C ≤ hyp.s11Setup.U := by
+    show hyp.C ≤ hyp.s11Setup.typeP.U
+    rw [hyp.setup_typeP_eq]; exact hyp.C_le_U
+  have hleU' : hyp.H0Cprime
+      ≤ hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup := by
+    show hyp.chief.H0 ⊔ derivedInG hyp.C
+      ≤ hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup
+    refine sup_le_sup_left ?_ hyp.chief.H0
+    show derivedInG hyp.C ≤ derivedInG hyp.s11Setup.U
+    rw [OddOrder.Peterfalvi.S11.derivedInG_eq_commutator hyp.C,
+      OddOrder.Peterfalvi.S11.derivedInG_eq_commutator hyp.s11Setup.U]
+    exact Subgroup.commutator_mono hCUle hCUle
+  -- `H₀C′ ≤ H₀C` (`C′ ≤ C`, `C = cSub` by `C_eq_cSub`), as in the Phase-B corollary
+  have hleC : hyp.H0Cprime
+      ≤ hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief := by
+    show hyp.chief.H0 ⊔ derivedInG hyp.C ≤ _
+    refine sup_le_sup_left ?_ hyp.chief.H0
+    rw [C_eq_cSub hG hyp]
+    exact OddOrder.Peterfalvi.S11.cprimeSub_le_C hyp.s11Setup hyp.chief
+  -- the S11-level hypothesis shapes
+  have hS₁'sub : {χ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup
+      (hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup) |
+      IsIrreducibleCharacter χ ∧
+      χ 1 = ((hyp.s11Setup.q * caseA.a : ℕ) : ℂ)} ⊆ S₂ := fun χ hχ =>
+    hS₁sub ⟨OddOrder.Peterfalvi.S11.sOf_antitone hyp.s11Setup hleU' hχ.1, hχ.2.1, hχ.2.2⟩
+  have hS3deg' : ∀ χ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup
+      (hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief), χ ∉ S₂ →
+      χ 1 = ((hyp.s11Setup.q *
+        (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u : ℕ) : ℂ) :=
+    fun χ hχ hnot =>
+      hS3deg χ ⟨OddOrder.Peterfalvi.S11.sOf_antitone hyp.s11Setup hleC hχ, hnot⟩
+  exact OddOrder.Peterfalvi.S11.nineElevenThree_orbit_split hG caseA
+    hS₁'sub hS3deg' hS2deg hCUprime hcount
+
+/-- **Peterfalvi (9.11.1), the `𝒮₂ = 𝒮₁` extraction** (hypothesis shape, issue 9083 Phase E
+remainder).  Book (9.11.1): *"Furthermore, the inequalities above are equalities.  Then
+`𝒮₂ = 𝒮₁ ∩ 𝒮(H₀U′) ∩ Irr(M)`.  Therefore … `𝒮₂ = 𝒮₁`"* — at the saturated bound
+`sumnS 𝒮₂ ≤ 2q²au` every `𝒮₂`-member must have degree `qa`, since the degree-`qa` subfamily
+`𝒮₁′` alone already meets the bound (`(p−1)·[U:U′]·q² = 2q²au` at the equality configuration)
+and any additional member contributes positive `Snorm`.  This is the degree fact consumed by the
+(9.11.2) inertia inputs (`caseA_two_summand_inertia_inputs`) and the (9.11.3) count
+(`caseA_nineElevenThree_count_inputs`). -/
+def NineElevenSTwoExtraction [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief)) : Prop :=
+  ∀ S₂ : Set (ClassFunction ↥M ℂ),
+    {φ : ClassFunction ↥M ℂ |
+        φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime ∧
+        IsIrreducibleCharacter φ ∧
+        ((φ : ↥M → ℂ) 1 = ((hyp.s11Setup.q * caseA.a : ℕ) : ℂ))} ⊆ S₂ →
+      S₂ ⊆ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime →
+      OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₂ →
+      Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau S₂ hyp.base.A0) →
+      (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime \ S₂).Nonempty →
+      (∀ χ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime \ S₂,
+        ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+          (S₂ ∪ {χ, χ.conj}) hyp.base.A0)) →
+      2 * caseA.a = hyp.chief.p - 1 →
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).C
+        = (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).Uprime →
+      (∀ χ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime \ S₂,
+        (χ : ↥M → ℂ) 1 = ((hyp.s11Setup.q *
+          (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u : ℕ) : ℂ)) →
+      {χ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup
+          (hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup) |
+          IsIrreducibleCharacter χ ∧
+          χ 1 = ((hyp.s11Setup.q * caseA.a : ℕ) : ℂ)}.ncard * (caseA.a * caseA.a)
+        = (hyp.chief.p - 1)
+          * ((OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup).relIndex hyp.s11Setup.U) →
+      (∀ F : Finset (ClassFunction ↥M ℂ), ↑F ⊆ S₂ →
+        OddOrder.Peterfalvi.S07.sumnS F ≤ 2 * (hyp.s11Setup.q : ℝ) ^ 2 * (caseA.a : ℝ)
+          * ((hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u : ℝ)) →
+      ∀ χ ∈ S₂, (χ : ↥M → ℂ) 1 = ((hyp.s11Setup.q * caseA.a : ℕ) : ℂ)
+
+/-- **Peterfalvi (9.11.4)–(9.11.8), the norm bound** (hypothesis shape, issue 9083 Phases D/E).
+Book: **(9.11.4)** `α = Ind_{HU₁}^M 1 − ψ₁` has `Supp(α) ⊆ A(M)` and
+`‖α‖² = a + 1 + (q−1)a²/u` — in cleared form `N·u = (a+1)·u + (q−1)·a²` with `N = ‖α‖² ∈ ℕ`
+(the `‖α‖² = ‖γ‖² + 1` reduction is landed as `cfnorm_sub_irreducible_orthogonal`, the `‖γ‖²`
+Mackey double-coset count runs through the (9.11.2) identity `U₁ ∩ U₁ʷ = C`); **(9.11.5)–(9.11.8)**
+every `ξ ∈ 𝒮₄` with `⟨α^τ, ξ^τ⟩ ≠ 0` would let the pair `{ξ, ξ̄}` be coherently adjoined
+(the (9.11.6)–(9.11.8) construction), contradicting the pair clause — so distinct `𝒮₄`-members
+consume orthogonal unit slices of `α^τ` and `|𝒮₄| ≤ ‖α^τ‖² = ‖α‖² = N`. -/
+def NineElevenNormBound [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief)) : Prop :=
+  ∀ S₂ : Set (ClassFunction ↥M ℂ),
+    {φ : ClassFunction ↥M ℂ |
+        φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime ∧
+        IsIrreducibleCharacter φ ∧
+        ((φ : ↥M → ℂ) 1 = ((hyp.s11Setup.q * caseA.a : ℕ) : ℂ))} ⊆ S₂ →
+      S₂ ⊆ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime →
+      OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₂ →
+      Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau S₂ hyp.base.A0) →
+      (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime \ S₂).Nonempty →
+      (∀ χ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime \ S₂,
+        ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+          (S₂ ∪ {χ, χ.conj}) hyp.base.A0)) →
+      2 * caseA.a = hyp.chief.p - 1 →
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).C
+        = (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).Uprime →
+      (∀ χ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime \ S₂,
+        (χ : ↥M → ℂ) 1 = ((hyp.s11Setup.q *
+          (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u : ℕ) : ℂ)) →
+      {χ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup
+          (hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup) |
+          IsIrreducibleCharacter χ ∧
+          χ 1 = ((hyp.s11Setup.q * caseA.a : ℕ) : ℂ)}.ncard * (caseA.a * caseA.a)
+        = (hyp.chief.p - 1)
+          * ((OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup).relIndex hyp.s11Setup.U) →
+      (∀ F : Finset (ClassFunction ↥M ℂ), ↑F ⊆ S₂ →
+        OddOrder.Peterfalvi.S07.sumnS F ≤ 2 * (hyp.s11Setup.q : ℝ) ^ 2 * (caseA.a : ℝ)
+          * ((hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u : ℝ)) →
+      (∀ χ ∈ S₂, (χ : ↥M → ℂ) 1 = ((hyp.s11Setup.q * caseA.a : ℕ) : ℂ)) →
+      ∃ N : ℕ,
+        N * (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u
+          = (caseA.a + 1) * (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u
+            + (hyp.s11Setup.q - 1) * caseA.a ^ 2 ∧
+        (nineElevenSFour hyp S₂).ncard ≤ N
+
+/-- **Peterfalvi (9.11.2)–(9.11.5): the equality refutation, reduced to the Phase-D/E remainders**
+(issue 9083 Phase C assembler).  With Phases B ((9.11.2) `caseA_two_summand_inertia_inputs`) and
+C ((9.11.3) `caseA_nineElevenThree_count_inputs`) landed, `NineElevenEqualityRefutation` follows
+from the two remaining named inputs: the `𝒮₂ = 𝒮₁` degree extraction (`NineElevenSTwoExtraction`,
+Phase E) and the `|𝒮₄| ≤ ‖α‖²` norm bound (`NineElevenNormBound`, Phases D + E).  The spine is
+`S11.nineElevenCaseA_equality_refutation`, whose `hn` is definitional here (`n = |𝒮₄|·q + (p−1)`
+by construction), with `3 ≤ q` (odd prime), `1 ≤ u` (`u_odd`), and `p = 2a+1` (from the squeeze
+output `2a = p−1`) supplied on the spot. -/
+theorem nineElevenEqualityRefutation_of_sTwoExtraction_normBound [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief))
+    (hext : NineElevenSTwoExtraction hyp caseA)
+    (hnb : NineElevenNormBound hyp caseA) :
+    NineElevenEqualityRefutation hyp caseA := by
+  haveI := hyp.base.finiteG
+  classical
+  intro S₂ hS₁sub hS₂sub hS₂conj hS₂coh hS₃ne hpairs h2a hCUprime hS3deg hcount hFbound
+  -- Phase-E remainders
+  have hS2deg := hext S₂ hS₁sub hS₂sub hS₂conj hS₂coh hS₃ne hpairs h2a hCUprime hS3deg
+    hcount hFbound
+  obtain ⟨N, hnorm, hleN⟩ := hnb S₂ hS₁sub hS₂sub hS₂conj hS₂coh hS₃ne hpairs h2a hCUprime
+    hS3deg hcount hFbound hS2deg
+  -- Phase B: the (9.11.2) inertia inputs
+  obtain ⟨K₁, K₂, hK₁, hK₂, hCinf⟩ :=
+    caseA_two_summand_inertia_inputs hG hyp caseA hS3deg hS2deg
+  -- Phase C: the (9.11.3) count inputs
+  have hclass := caseA_nineElevenThree_count_inputs hG hyp caseA hS₁sub hS3deg hS2deg
+    hCUprime hcount
+  -- numeric side conditions: `q` odd prime `≥ 3`, `u ≥ 1`, `p = 2a + 1`
+  have hqp : (hyp.s11Setup.q).Prime := hyp.s11Setup.nontrivial.2.1
+  have hqodd : Odd hyp.s11Setup.q :=
+    hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card hyp.s11Setup.typeP.W1)
+  have hq3 : 3 ≤ hyp.s11Setup.q := by
+    obtain ⟨k, hk⟩ := hqodd
+    have h2 := hqp.two_le
+    omega
+  have hu : 1 ≤ (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u :=
+    (OddOrder.Peterfalvi.S11.u_odd hG
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief)).pos
+  have hp1 : 1 < hyp.chief.p := hyp.chief.p_prime.one_lt
+  have hpeq : hyp.chief.p = 2 * caseA.a + 1 := by omega
+  exact OddOrder.Peterfalvi.S11.nineElevenCaseA_equality_refutation caseA hq3 hu hpeq
+    hK₁ hK₂ hCinf hclass rfl hnorm hleN
+
 end OddOrder.Peterfalvi.S13
