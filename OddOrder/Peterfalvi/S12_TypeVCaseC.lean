@@ -69,4 +69,53 @@ theorem sum_alpha_eq (params : CharacterParameters hyp) (j : Fin hyp.w2) :
 
 end CharacterParameters
 
+/-- **The (10.10.3) coefficient vanishing, pure arithmetic**: if `c·a² − 4a − 2 ≤ 0` with
+`c ≥ 8` (book: `c = |S₁| = 4(w₁−1) ≥ 8` and `n = 2`, so the norm inequality reads
+`|S₁|a² − 2an − 2 ≤ 0`), then the integer coefficient `a` is `0`. -/
+theorem alpha_coefficient_eq_zero {c a : ℤ} (hc : 8 ≤ c)
+    (h : c * a ^ 2 - 4 * a - 2 ≤ 0) : a = 0 := by
+  by_contra ha
+  have h1 : 1 ≤ a ∨ a ≤ -1 := by omega
+  rcases h1 with h1 | h1
+  · nlinarith [sq_nonneg a, sq_nonneg (a - 1)]
+  · nlinarith [sq_nonneg a, sq_nonneg (a + 1)]
+
+namespace CharacterParameters
+
+variable {hyp : Hypothesis M}
+
+/-- **The (10.10.2) index pin `n = 2`**: with `d = p = 2w₁ − 1` and `δ = −1`, the (10.3)
+relation `n·w₁ = d − δ = 2w₁` forces `n = 2`. -/
+theorem n_eq_two (params : CharacterParameters hyp) (hw1 : 0 < hyp.w1)
+    (hd : (params.d : ℤ) = 2 * (hyp.w1 : ℤ) - 1) (hδ : params.delta = -1) :
+    params.n = 2 := by
+  have h := params.n_formula
+  rw [hd, hδ] at h
+  have hw1' : (0 : ℤ) < (hyp.w1 : ℤ) := by exact_mod_cast hw1
+  have h2 : (params.n : ℤ) * (hyp.w1 : ℤ) = 2 * (hyp.w1 : ℤ) := by linarith
+  have : (params.n : ℤ) = 2 := mul_right_cancel₀ hw1'.ne' h2
+  exact_mod_cast this
+
+/-- **The (10.10.2) sign pin `δ = −1`**: with `d = p = 2w₁ − 1` and `w₁ ≥ 3`, the sign
+`δ = +1` is impossible — `n·w₁ = d − 1 = 2w₁ − 2` would give `w₁ ∣ 2`.  (The `δ = ±1`
+dichotomy is Peterfalvi (10.3), `muColumnSign_eq_one_or_neg_one`.) -/
+theorem delta_eq_neg_one (params : CharacterParameters hyp) (hw1 : 3 ≤ hyp.w1)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hd : (params.d : ℤ) = 2 * (hyp.w1 : ℤ) - 1) :
+    params.delta = -1 := by
+  rcases hδpm with h1 | h
+  · exfalso
+    have h := params.n_formula
+    rw [hd, h1] at h
+    have hdvd : (hyp.w1 : ℤ) ∣ 2 := by
+      have h2 : ((params.n : ℤ) - 2) * (hyp.w1 : ℤ) = -2 := by linear_combination h
+      have : (hyp.w1 : ℤ) ∣ -2 := Dvd.intro_left _ h2
+      exact (dvd_neg.mp this)
+    have hle : (hyp.w1 : ℤ) ≤ 2 := Int.le_of_dvd (by norm_num) hdvd
+    have : (3 : ℤ) ≤ (hyp.w1 : ℤ) := by exact_mod_cast hw1
+    omega
+  · exact h
+
+end CharacterParameters
+
 end OddOrder.Peterfalvi.S12
