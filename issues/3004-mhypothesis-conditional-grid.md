@@ -547,3 +547,27 @@ feature commit: `4a2f33c5`。
   `betaGrid_A0_support` では代替できない。
 - `TGapCross` / AxiomsCheck (4131 jobs) green。新 theorem は許容公理のみ、
   新 axiom・新 sorry なし。commit 前 `HEAD..main = 0`。
+
+## lane-c T-side (13.2.e) Type-P₁ full A₀ normed-TI closure (2026-07-11)
+
+feature commit: `618a0285`。
+
+- Peterfalvi 原文 (13.2.e) と Coq `PFsection13.v:222--242` を再照合し、S-side の既存
+  `escaping_honestTypeP2ASet_eq_empty` と同じ BG Theorem D(4) escape package を
+  Type-P₁ `typePA0` へ正面から接続した。
+- `escaping_typePA0_eq_empty_of_isTypeP1` を実証明。既存 (8.13.b)
+  `escaping_typePA0_mem_sigmaSharp_of_isTypeP1` から escaping point を `M_σ#` に落とし、
+  D(4) の unique maximal neighbour `N` を取得した。`N` type-F branch は (12.7) の
+  Frobenius kernel regularity で `a ∈ N_σ` を強制して D(4) の `a ∉ N_σ` と矛盾、
+  type-P₂ branch は D(4) が `M` type-F を与えるため `M` type-P₁ と矛盾する。
+- `typePA0_isTISubset_of_isTypeP1` で escape exclusion を Dade hypothesis の (2.3)
+  `isTISubset_of_forall_H_eq_bot` に通し、Coq の
+  `normedTI 'A0(M) G M` の TI 本体を閉じた。downstream の `T_typeII` は不使用で循環なし。
+- `tSideDadeMap_eq_induce_of_isTypeP1` により T-side `τ_T=Ind_T^G` から `hTI` 仮定を除去。
+  さらに `tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_beta_support` まで配線し、14.9 の
+  S/T cross term は exact (13.18.a) β-support 一件だけを入力とする形になった。
+- 前節の「残る genuine producer は二つ」は更新され、現在は exact に一つ:
+  `supp(betaGrid base 1) ⊆ P# ∪ conjClassSetIn S (typePV S Sdata)`。
+  group/order separation、T normed-TI、両 Dade=Ind、induced-support orthogonality は closed。
+- `TGapCross` / AxiomsCheck (4131 jobs) green。追加4公開 theorem は許容公理のみ。
+  新 axiom・新 sorry なし。commit 前 `HEAD..main = 0`。
