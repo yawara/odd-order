@@ -718,3 +718,19 @@ feature commit: `03ada912`。
 - 新 theorem は AxiomsCheck 登録済み。AxiomsCheck (4140 jobs) は exit 0、
   `git diff --check` clean。`TGapProjectionRigidity` は 299 行・sorry-free。
   新 axiom・新 sorry なし。
+
+## lane-c (11.9.a) principal eta coefficient (2026-07-11)
+
+feature commit: `5d1301b5`。
+
+- `tSideDadeMap_inner_eta_principal` を実証明。既存 (2.7) Dade reciprocity
+  `tSideDadeMap_inner_trivial` と `eta_principal_eq_trivial` (`η₀₀=1_G`) を合成し、
+  source trivial multiplicity を T-side projection の principal coefficient へ運ぶ。
+- combined projection producer は source の `⟨φ,1_T⟩=1` を受け、整数係数について
+  `m₀₀=1` を出力するよう強化した。`T_typeIII_ratio_le` では concrete
+  `φ=ν₀−ζ` の pairing `1−0=1` を先に証明し、`hprincipalT` を materialize 済み。
+- よって前節の三 character producer のうち principal は closed。残るのは
+  (i) Dade--Galois commutation による nonprincipal row/column axis constancy、
+  (ii) perpendicular residual nonzero による norm bound `≤p` への sharpen の二つ。
+- principal 補題は AxiomsCheck 登録済み。最新 main `ae4ebf77` 同期後、
+  AxiomsCheck (4140 jobs) は exit 0。新 axiom・新 sorry なし。

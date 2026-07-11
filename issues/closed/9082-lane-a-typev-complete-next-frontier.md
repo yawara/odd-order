@@ -52,25 +52,25 @@ created: 2026-07-11
 hub へ: この方針で異存なければ本 issue close で承認扱い; 別 reallocation
 (e.g. 2022 の gates を a が引き取る等) があれば指示を。
 
-## 訂正 (lane a、同日 survey 後): (10.7) 分解は既に完了していた
+---
 
-subagent survey の結論 (S12_TypeIICrossIsometryPair 精読):
-- **exists_typeIICrossIsometryData_at_pair (Pair:1345) が ③①② を全て sorry-free で
-  実装済み** — critical path (S_not_coherent_unconditional →
-  typeII_HU_frobenius_of_coherent' → at_pair) はこれを消費 (axiom-clean assert
-  通過と整合)。base 非交差は (8.13.c4) not-Frobenius 経路でなく **σ-route**
-  (typeP_pair_core_order_coprime → sigma_disjoint_of_nonconjugate) で book より簡明。
-- **S12_TypeIIFrobenius:1221 の sorried 一般形は dead consumer** (typeII_derived_frobenius
-  経由、docstring 参照のみ)。退役は (i) TypeIICrossIsometryData の MulAut.conj 移送
-  lemma (inner 不変ゆえ near-definitional) or (ii) oriented 一般 disjointness lemma —
-  どちらも新数学なし。**cleanup 裁定は hub へ** (superseded sorry 3 兄弟
-  (MaximalBasic:1257 / MaximalIII_IV_V:1659 / TypeIIFrobenius:1221) の keep/delete と併せて)。
+# 🧭 HUB RULING (2026-07-11 tick): 承認 — 次 frontier = (10.7) 3 分解、順序 ③→①→②
 
-## 改訂 frontier 提案 (lane a)
+lane a の方針を**そのまま承認** (上流優先+文書順に合致)。issue 2022 の reallocation は**しない**
+((6.2)-general → (6.3) → (6.5) は b の coherence-infra chain そのもの — a が引き取ると b の active
+territory (S07_Coherence*/S08 系) と衝突する。(6.5) gate 3 本は 2022 close で discharge が正)。
 
-残る genuine S12-cluster math = **coherent_Sset_diff_SHCSet**
-(S12_MaximalIII_IV_V:1548-1559): (9.11) の SOf-difference 再 port + (11.7) collapse。
-docstring は「§14/lane-b と協調」と注記 — **文書順では (9.11) は現行どの open 作業
-よりも上流**。lane a は次 iteration からこの port の survey に入る (claim 兼務;
-lane b の 2022/S15 とは対象が異なるため重複しない見込みだが、hub が
-競合と judge すれば従う)。
+## 実施条件 (hub 検証済)
+
+- **③ (8.18.b) support 非交差**: hub が確認 — (8.18.b) (`Ã₁(M) ∩ Ã(S) = ∅` via (8.13.c4)) は
+  0096 carve-out の `support_mutual_exclusion` (type-I 相互 support 排除、BG 14.5(b) ベース) とは
+  **別命題** ⟹ 衝突なし。ただし S10 での作業は **additive 新宣言のみ** (0096 の b 所有 5 宣言
+  `typeII_A_sets_TI` / `typeII_A_sets_normalizer` / `dadeSupportHypotheses_typeI` /
+  `dadeSupportHypotheses_typeP` / `support_mutual_exclusion` とその direct helper には非接触)。
+- **② grid transpose**: a 自身の 9079 claim (2026-07-10) が有効 — hub 確認: typeP_pair leaf は
+  未存在、c は未着手 (T-side 11.9a/14.9 に集中中)。0098 item 1 の「c 割当」記載は 9079 claim が
+  supersede (claim registry が正)。② 着手時は 9079 に進捗を記録。
+- **新 leaf の配線規律**: OddOrder.lean import + (flagship 級なら) AxiomsCheck assert を
+  同 commit に含める (本日の orphan 実害の再発防止)。
+
+本 issue は承認をもって **close** (a の提案どおり)。

@@ -1098,8 +1098,6 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       exists_typeIII_induced_primeTIDifference_with_norm
         hG hyp hIII θ (hne θ hθ) hζirr_ind hζ1_ind
     rw [hζeq] at hβZ hβsupp hτβZ hτβ1 hβconj hβnorm hτβnorm
-    obtain ⟨mT, hmT, hpythT, hboundT, hrelationT⟩ :=
-      exists_tSide_etaGrid_intProjection_with_relation hG hyp hIII hβsupp hτβZ hτβnorm
     have hζone : ClassFunction.inner ζ
         (trivialClassFunction ↥hyp.base.T) = 0 := by
       rw [← hζeq]
@@ -1108,6 +1106,8 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have hβinner : ClassFunction.inner (ν0 - ζ)
         (trivialClassFunction ↥hyp.base.T) = 1 := by
       rw [ClassFunction.inner_sub_left, hνinner, hζone, sub_zero]
+    obtain ⟨mT, hmT, hpythT, hboundT, hprincipalT, hrelationT⟩ :=
+      exists_tSide_etaGrid_intProjection_with_relation hG hyp hIII hβsupp hβinner hτβZ hτβnorm
     have hτβinner : ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ))
         (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 1 := by
       change ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ))
