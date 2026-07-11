@@ -198,6 +198,28 @@ type-P₂ branch は sorried と注記あり — type-V (P₁) 側は生きて�
   `dadeICM hyp.dadeData.dade (….fullDadeIsometryData hyp.hconj)` (S12_Core/Hypothesis:375) —
   **両 tau は同形 (dade だけ違う)** / `dadeIntegralCharacterMap` +
   `dadeIntegralCharacterMap_apply_of_support` = S07_Coherence/FamilyBundleDade:320/330。
+## 2026-07-11 tick²³ — tau-agreement landed (commit 6880c3e6)
+
+- `dadeIntegralCharacterMap_eq_of_forall_H_eq_bot` ((2.5) integral-map 版、
+  梱包差全吸収) + `typeVSibleyDadeHypothesis_tau_agree` (Sibley τ = hyp.tau
+  on (M')^#-supported) — 両方 sorry-free、S12_TypeVSibley (今 ~370 行)。
+- import 追加: S12_TICyclicSigmaBridge (uniqueness hammer) +
+  S08_CaseBCoherence2 (congrMap + restrict_eq_of_support)。
+- **case-(a) 残り = 最終組立のみ**: c0 := sibleySetup_is_coherent
+  (typeVSibleyDadeHypothesis …) : IsCoherent sib.tau (inducedFamily M) A_sharp
+  → .congrMap (tau_agree、zSupportedSpan 元は mem_supportedSubmodule 経由で
+  support ⊆ 条件へ) → IsCoherent hyp.tau (inducedFamily M) A_sharp
+  → isCoherent_of_supportedSpan_le (hle = 「Ind は M'-set 外 0」+ one_notMem_A0、
+  witness = ζ̄−ζ) → IsCoherent hyp.tau hyp.Sset hyp.A0 (Sset=inducedFamily rfl、
+  A0 = supportInSubgroup typePA0 rfl)。配置は S13_Lemmas113To115 (S12_TypeVSibley
+  を import 追加、supportedSpan_le がそこ在住) → v2 は S12_Noncoherence が S13 を
+  import できるか次第。
+- 部品検索残: 「Ind_{H}^{M} θ の support ⊆ H-set」lemma (induce の外部消滅) と
+  Sset 非空 (exists_zeta_in_inducedFamily_degree_w1 S12_Core:1376 ✓) +
+  ζ̄−ζ ≠ 0 (odd order no real char) + conj-closure (inducedFamily_closedUnderConjugate
+  S12_Core:61 ✓) + conjDiff support (inducedKernelFamily_conjDiff_support 系 or
+  mderivSharp_subset_A0 経由)。
+
 - **DAG**: S12_Noncoherence は S12_TypeIICrossIsometryPair + S14 を import —
   S13_Lemmas113To115 は import して**いない**。transport ③ を書く場所:
   S13_Lemmas113To115 は S12_TypeVSibley を import できるか? (S13 ← S12_Core
