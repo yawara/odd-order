@@ -343,3 +343,13 @@ landed sorry-free。次 = (10.10.3) の S₁-relative α^τ: Isometry106:805
 - 次 tick: (10.10.3)-flavor a=0 lemma (S12_TypeVCaseC、
   muGridAlpha_tau_residual_norm :914 を hRn 無しで clone) → hα0 →
   SHC_tau_muGridAlpha_eq 接続の thin corollary (n=2, δ=−1 pin)。
+
+## 2026-07-11 tick²⁸ — ★(10.10.3) a=0 完了 (muGridAlpha_tau_inner_SHC_zeta_of_eight_le_card)
+S12_TypeVCaseC に landed (sorry-free)。次 = ① thin corollary
+(SHC_tau_muGridAlpha_eq :631 と合成、(10.10.3) full statement) →
+② (10.10.4) glue (ν 構成: τ₁ on Z[S₁] + ν(μ_j) := δ∑_i ω_ij^σ →
+IsCoherent hyp.tau hyp.Sset hyp.A0; sum_alpha_eq + muColumn_tau1_pin の
+SHC 版 + (10.9) (μ₀−ζ)^τ pin) → ③ |S₁| ≥ 8 / hR8 の discharge
+(card_abelianization_derived_eq_w1_mul_card_SHCSet_add_one
+S12_Section9Counts:488 + case-(c) |H:H'| = p² 構造 — engine 仮説で分離可)。
+R の供給 = exists_SHC_extension_orthonormal (S12_Props109To1011:768)。
