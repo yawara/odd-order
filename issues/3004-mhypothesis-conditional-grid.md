@@ -498,3 +498,27 @@ feature commit: `6b225750`。
   `class_support (T')#` の外にある p-divisibility support theorem が別途必要。
 - 最新 main merge 後 `TGapCross` + AxiomsCheck (4131 jobs) green。
   追加4公開 theorem は許容公理のみ、新 axiom・新 sorry なし。
+
+## lane-c T-side (14.9) S/T support order separation (2026-07-11)
+
+feature commit: `506d30ac`。
+
+- `disjoint_conjugatesIntoSet_of_prime_order_separator` で、左集合の全元の位数を prime `p`
+  が割り、右集合では一つも割らないなら、両者の `conjugatesIntoSet` が disjoint になる
+  一般 core を実証明。
+- T-side を `(T')#` に特殊化した
+  `disjoint_conjugatesIntoSet_S_Tderived_of_p_dvd` を実証明。
+  `p ∤ |T'|` は最終結論 `T_typeII` を使わず、ungated な type-P theorem
+  `coprime_card_derivedInG_index_of_isTypeP` と `[T:T']=p` から得たため循環は無い。
+- (13.18.a) の exact S-side carrier `P# ∪ V_S` の全元について
+  `p ∣ orderOf` を実証明。P-side は `|P|=p^q`、regular `V_S`-side は
+  `exists_sigma_prime_dvd_orderOf_typePV` と `S_σ=P` から σ-prime を `p` に同定した。
+  これを合成した `disjoint_conjugatesIntoSet_sharpP_union_typePV_Tderived` により、
+  Coq `QV'betaS` の group/order separation は完全に closed。
+- 残る character input は exact に
+  `supp(betaGrid) ⊆ {y : S | y ∈ P# ∪ conjClassSetIn S (typePV S Sdata)}`。
+  現在の `betaGrid_A0_support` はこれより弱く、また (13.18.a) residual 自体。
+  この sharper support が入れば、上記 disjointness + 両側 Dade=Ind + 既存
+  `inner_induce_induce_eq_zero_of_disjoint` で cross inner product は形式的に 0 になる。
+- `TGapCross` / AxiomsCheck (4131 jobs) green。追加4公開 theorem は許容公理のみ。
+  新 axiom・新 sorry なし。
