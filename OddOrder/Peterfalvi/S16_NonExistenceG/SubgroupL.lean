@@ -16,21 +16,49 @@ open scoped BigOperators
 
 variable {G : Type*} [Group G]
 
+/-- **(14.7) `hPU_disj` input**: `P ∩ U = 1`.  Since `P` is elementary abelian it
+centralizes itself, so `P ⊓ U ≤ U ⊓ C_G(P) = C = 1` by (13.12) `c = 1`.  Cites the
+(sorried) §13 producers `basic_structure` and `c_eq_one`. -/
+theorem P_inf_U_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    hyp.base.P ⊓ hyp.base.U = ⊥ := by
+  obtain ⟨data, _⟩ := OddOrder.Peterfalvi.S15.basic_structure hG hyp.base
+  haveI : IsMulCommutative ↥hyp.base.P :=
+    IsMulCommutative.of_comm data.P_elementaryAbelian.comm
+  have hP_le_cent : hyp.base.P ≤ Subgroup.centralizer (hyp.base.P : Set G) :=
+    Subgroup.le_centralizer (H := hyp.base.P)
+  have hC_bot : hyp.base.C = ⊥ := by
+    apply Subgroup.eq_bot_of_card_eq
+    rw [← hyp.base.c_eq_card_C, OddOrder.Peterfalvi.S15.c_eq_one hG hyp.base]
+  rw [eq_bot_iff, ← hC_bot, hyp.base.C_eq]
+  exact le_inf inf_le_right (inf_le_left.trans hP_le_cent)
+
 /-- **Peterfalvi (14.3)**: a type-I maximal subgroup `L` over `N_G(U)` exists.  Constructed by
-citing (13.17) `S15.typeII_overNormalizer_frobenius` for the type-I-over-normalizer Frobenius data
-(`S` is type II by `basic_structure` + (14.1) `q < p`); the complement order `|C| = p q` is a field
-`complement_card_eq_pq` of that data ((13.17.c)/(14.5)).  The (14.3.b) Dade data is not carried —
-it is unused by the §14 non-existence argument, so the carrier holds exactly the structural data the
-proof consumes.  Placed here (ahead of the (14.4)--(14.16) lemmas) so the mid-file numeric lemmas
-can construct an `LHypothesis` to feed the S-side case-(9.7.b) data `caseB_for_S`. -/
+citing the (14.5)-threaded `S15.typeII_overNormalizer_frobenius` for the
+type-I-over-normalizer Frobenius data (`S` is type II by `basic_structure` + (14.1) `q < p`);
+the complement order `|E| = p q` is a field `complement_card_eq_pq` of that data ((14.5) —
+the small (13.17.c) alternative `E = W₁` is excluded there via the (13.19.c) dichotomy under
+`q < p` and `N_G(U) ⊄ S`, the latter supplied here through the L~S rule-out chain
+`P_inf_U_eq_bot` → `coprime_card_U_card_P_of_disjoint` → `exists_conj_typeP_U_of_coprime` →
+`not_normalizer_U_le_S`).  The (14.3.b) Dade data is not carried — it is unused by the §14
+non-existence argument, so the carrier holds exactly the structural data the proof consumes.
+Placed here (ahead of the (14.4)--(14.16) lemmas) so the mid-file numeric lemmas can construct
+an `LHypothesis` to feed the S-side case-(9.7.b) data `caseB_for_S`. -/
 theorem exists_LHypothesis [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     Nonempty (LHypothesis hyp) := by
   obtain ⟨bdata, _⟩ := OddOrder.Peterfalvi.S15.basic_structure _hG hyp.base
   have hSII : IsTypeII hyp.base.S := bdata.q_lt_p_forces_typeII hyp.q_lt_p
   have hTII : IsTypeII hyp.base.T := T_typeII _hG hyp
+  obtain ⟨tdata⟩ := hSII
+  have hNUS : ¬ Subgroup.normalizer (hyp.base.U : Set G) ≤ hyp.base.S :=
+    OddOrder.Peterfalvi.S15.not_normalizer_U_le_S _hG hyp.base tdata
+      (OddOrder.Peterfalvi.S15.exists_conj_typeP_U_of_coprime _hG hyp.base tdata
+        (OddOrder.Peterfalvi.S15.coprime_card_U_card_P_of_disjoint hyp.base tdata
+          (P_inf_U_eq_bot _hG hyp)))
   obtain ⟨typeI_data, _, _⟩ :=
-    OddOrder.Peterfalvi.S15.typeII_overNormalizer_frobenius _hG hyp.base hSII hTII
+    OddOrder.Peterfalvi.S15.typeII_overNormalizer_frobenius _hG hyp.base ⟨tdata⟩ hTII
+      hyp.q_lt_p hNUS
   exact ⟨⟨typeI_data.L, typeI_data.H, typeI_data.L_maximal, typeI_data.normalizer_U_le_L,
     typeI_data.H_eq_LF, typeI_data, rfl, rfl, typeI_data.complement_card_eq_pq⟩⟩
 
@@ -584,23 +612,6 @@ theorem conj_mem_Q (hyp : Hypothesis (G := G)) (v : ↥hyp.base.V) (x : ↥hyp.b
     (v : G) * (x : G) * (v : G)⁻¹ ∈ hyp.base.Q := by
   have hv : (v : G) ∈ Subgroup.normalizer hyp.base.Q := V_le_normalizer_Q hyp v.2
   exact (Subgroup.mem_normalizer_iff.mp hv (x : G)).mp x.2
-
-/-- **(14.7) `hPU_disj` input**: `P ∩ U = 1`.  Since `P` is elementary abelian it
-centralizes itself, so `P ⊓ U ≤ U ⊓ C_G(P) = C = 1` by (13.12) `c = 1`.  Cites the
-(sorried) §13 producers `basic_structure` and `c_eq_one`. -/
-theorem P_inf_U_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
-    hyp.base.P ⊓ hyp.base.U = ⊥ := by
-  obtain ⟨data, _⟩ := OddOrder.Peterfalvi.S15.basic_structure hG hyp.base
-  haveI : IsMulCommutative ↥hyp.base.P :=
-    IsMulCommutative.of_comm data.P_elementaryAbelian.comm
-  have hP_le_cent : hyp.base.P ≤ Subgroup.centralizer (hyp.base.P : Set G) :=
-    Subgroup.le_centralizer (H := hyp.base.P)
-  have hC_bot : hyp.base.C = ⊥ := by
-    apply Subgroup.eq_bot_of_card_eq
-    rw [← hyp.base.c_eq_card_C, OddOrder.Peterfalvi.S15.c_eq_one hG hyp.base]
-  rw [eq_bot_iff, ← hC_bot, hyp.base.C_eq]
-  exact le_inf inf_le_right (inf_le_left.trans hP_le_cent)
 
 set_option maxHeartbeats 1000000 in
 open scoped IsMulCommutative in
