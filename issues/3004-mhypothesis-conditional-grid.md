@@ -626,3 +626,29 @@ feature commit: `43033a7b`。
 - `TTypeII.lean` は 1497 行で 1500-line trigger 未満。leaf build と
   AxiomsCheck (4134 jobs) は exit 0、`git diff --check` clean。実 `sorry` は従来の 2 箇所のまま、
   新 axiom・新 sorry なし。commit 前 `git merge main` は up to date。
+
+## lane-c (11.9.a) T-side projection の norm producer (2026-07-11)
+
+feature commits: `b8b493c0`, `ad35e55f`。
+
+- Coq `PFsection11.v` の `FTtype34_structure` (11.9)(a) と、`PFsection14.v` での消費箇所を
+  再照合した。必要な `o_eta0_betaT0` は Type-V case-(c) の列 identity そのものではなく、
+  `bridgeS1` の η-grid projection rigidity から得る。issue 9079 の transpose API も確認したが、
+  同 issue 自身が type III/IV では `w₂<w₁` のため `w₁<w₂` route は使えないと記録しており、
+  σ-grid transpose はこの projection の向きを反転して解決するものではない。
+- `exists_typeIII_primeTIredZero_with_projectionData` で concrete
+  `ν₀ = Ind_{T'}^T 1` の `⟨ν₀,ν₀⟩=p` と、全 nonprincipal source
+  `θ` に対する `⟨ν₀,Ind θ⟩=0` を実証明した。Coq の `cfnorm_prTIred` / `omuS1` に対応する。
+- `exists_typeIII_primeTIDifference_induced_inner_self` で
+  `βT0=ν₀−Ind θ` の source norm `⟨βT0,βT0⟩=p+1` を実証明。
+  `exists_typeIII_induced_primeTIDifference_with_norm` は同じ concrete `ν₀` について
+  support、virtuality、conjugation、identity-value と Dade image を組み立て、supported
+  Dade isometry から `⟨τ_T βT0,τ_T βT0⟩=p+1` まで保持する。
+- `T_typeIII_ratio_le` は旧 generic anchor からこの full producer へ配線済み。
+  したがって projection 本体の次 frontier は norm の生産ではなく、Coq `bridgeS1` の
+  η-grid coefficient rigidity: `a₀₀=1`、integer coefficients、four-corner relation、
+  norm bound と non-orthogonality/automorphism orbit を合成して off-axis coefficient を
+  0 にする部分である。
+- 3 theorem は AxiomsCheck 登録済み。`TGapPrimeTI` / `TTypeII` / AxiomsCheck
+  (4134 jobs) は exit 0、`git diff --check` clean。`TGapPrimeTI` は sorry-free、
+  `TTypeII` は 1497 行・既存 2 sorry のまま。新 axiom・新 sorry なし。
