@@ -62,6 +62,11 @@ def conj (φ : ClassFunction G k) : ClassFunction G k :=
   ext g
   simp
 
+/-- Conjugation does not move the support: `star x = 0 ↔ x = 0`. -/
+@[simp] theorem conj_support (φ : ClassFunction G k) : φ.conj.support = φ.support := by
+  ext g
+  simp [ClassFunction.mem_support, star_eq_zero]
+
 @[simp] theorem conj_zero : (0 : ClassFunction G k).conj = 0 := by
   ext g
   simp

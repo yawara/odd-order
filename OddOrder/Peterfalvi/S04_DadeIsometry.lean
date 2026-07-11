@@ -811,6 +811,27 @@ noncomputable def Hypothesis.dadeMap (hyp : Hypothesis G A L) :
     (α : SupportedClassFunctions (G := G) k A L) (g : G) :
     hyp.dadeMap α g = hyp.dadeValue α g := rfl
 
+/-- **The Dade map commutes with conjugation** (Coq `Dtau`+`cfAut` step of `GammaReal`): the
+`(2.5)` map is a pointwise evaluation `α(a)` on its support and `0` off it, so `star` passes
+through.  The conjugated input is supported on the same set (`conj_support`). -/
+theorem Hypothesis.dadeMap_conj [StarRing k] (hyp : Hypothesis G A L)
+    (α : SupportedClassFunctions (G := G) k A L) :
+    (hyp.dadeMap (k := k) α).conj
+      = hyp.dadeMap (k := k)
+          ⟨(α : ClassFunction (↥L) k).conj, by
+            rw [ClassFunction.mem_supportedSubmodule, ClassFunction.conj_support]
+            exact (ClassFunction.mem_supportedSubmodule).mp α.2⟩ := by
+  ext g
+  classical
+  by_cases hg : g ∈ hyp.dadeSupport
+  · obtain ⟨a, h, hh, hga⟩ := hyp.mem_dadeSupport_iff.mp hg
+    rw [ClassFunction.conj_apply, hyp.dadeMap_apply, hyp.dadeMap_apply,
+      hyp.dadeValue_eq α hh hga, hyp.dadeValue_eq _ hh hga]
+    rfl
+  · rw [ClassFunction.conj_apply, hyp.dadeMap_apply, hyp.dadeMap_apply,
+      hyp.dadeValue_of_not_mem_dadeSupport α hg,
+      hyp.dadeValue_of_not_mem_dadeSupport _ hg, star_zero]
+
 /-- The Peterfalvi (2.5) Dade map is `k`-linear in its argument.
 
 `dadeValue α g` is, at each `g ∈ dadeSupport`, the *evaluation* `α(a)` at a fixed base point `a`

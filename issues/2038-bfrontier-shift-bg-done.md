@@ -1626,3 +1626,37 @@ grid form (⋃ᵢ supp μ) は unfaithful restate と断定 (P^# 全点 nonzero 
 (commit 400e8649)。BetaData.support_formula / ∃-theorem も追従。**S15_SAndT bare sorry 6 → 5**:
 残 = :84 E⊄Q ((13.19.c1)) / :1563 / :1679 Γ-real / :1694 (13.18.d) Y-norm / :1932 TypeIOrtho。
 S16 TGapCross との一時重複は **issue 9084** で hub に redirect 裁定を依頼。
+
+## ✅ (2026-07-12、/loop iter 5) — betaGrid_A0_support (Coq A0beta) 完全証明
+
+exact form betaGrid_support + proven 包含 sharpP_union_V_subset_A0 の 3 行合成 (commit 0ffda798)。
+**S15_SAndT bare sorry 4**: :84 E⊄Q ((13.19.c1)) / :1682 gammaGrid_real / :1697 (13.18.d) Y-norm /
+:1935 TypeIOrtho。gammaGrid_orthogonal_one は既 proven (aux) と確認。
+
+**次 = :1682 gammaGrid_real (Coq GammaReal)。設計** (13.18.d は Γ-real に依存するため先):
+- 部品済: ClassFunction.conj 代数 (IsReal.lean: conj_sub/add/neg、trivial real)、
+  **induce_conj** (InducedCharacter:288)、defGamma (proven)、A0beta (今回)。
+- **要新設 1: CF-level conj-pair field** — `mu_conj : (mu i j).conj = mu (finNeg i) (finNeg j)`
+  + `eta_conj` 同型 (Coq prTIirr_aut / cfAut_cycTIiso)。既存 eta_pair_of_coprime は generic 元
+  限定で不足。producer discharge = 3002 keystone 資産 (omegaSChar_finNeg / chi2enum_finNeg /
+  w1CharEquiv_finNeg、power enumeration 化済) から muS/etaS の conj-pair を実証明。
+- **要新設 2: Dade lift と conj の可換** (Coq Dtau 相当) — dadeValue は点評価ゆえ pointwise
+  自明、`dadeIntegralCharacterMap_apply_of_support` 経由で supported input に対し
+  D(φ.conj) = (D φ).conj (φ, φ.conj とも supported — support は conj 不変 up to index)。
+- assembly: Γ̄ = D(β̄_{#1}) − 1_G + η̄_{01} = D(β_{negIdx}) − 1_G + η_{0,negIdx}
+  (β̄ = Ind1 − μ̄ = β_neg、induce_conj + trivial real + mu_conj) = Γ (defGamma at negIdx)。
+
+## ✅ (2026-07-12、/loop iter 6) — GammaReal 部品 1: Dade-conj 可換 (commit 242551a9)
+
+conj_support (IsReal) + Hypothesis.dadeMap_conj (S04、点評価の star 透過) +
+dadeIntegralCharacterMap_conj_of_support (S07 lift)。
+**次 iter = 部品 2+assembly**: conj-pair fields (`omega_conj`/`mu_conj`/`eta_conj`、finNeg index)
+を 3 層 (SubcoherenceInputs/Section16Inputs/cd) に追加し producer discharge:
+- mu_conj ← S06 `certainType_mu_conj_eq` (proven) + chi2enum_finNeg + eqQ_finNeg/rowInv 橋
+  + mapRingEquiv conjAe ↔ .conj bridge
+- omega_conj ← omegaSChar_finNeg (proven) + galoisMap_conj_omega
+- eta_conj ← FT:1610 で eta := τ₃∘ω 供給 — tau3W の conj-equivariance
+  (sigma_mapRingEquiv_comm、3002 keystone) + omega_conj
+- assembly gammaGrid_real: Γ̄ = D(β̄₁)−1+η̄_{01} (conj_sub/add + trivial real +
+  Dade-conj [A0beta support]) = D(β_{j'})−1+η_{0,j'} (β̄₁ = Ind1−μ̄_{01}、induce_conj +
+  mu_conj、j' = finNeg #1 ≠ 0) = Γ (proven gammaGrid_defGamma at j')。
