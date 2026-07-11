@@ -437,3 +437,14 @@ elaborate していない; "build green" は空判定)。hub が OddOrder.lean �
 今後の新 leaf は **OddOrder.lean への import 追加を同 commit に含める**こと。また ★★★★
 `no_typeV_maximal_unconditional` (S12_Noncoherence) は AxiomsCheck に assert が無く axiom-clean
 主張が un-tripwired — **a が AxiomsCheck assert を追加すること** (issue 1020/1021 の完了条件に含める)。
+
+## 2026-07-11 tick³⁴ — hub 通知対応: AxiomsCheck tripwire 3 本 (4138 jobs green)
+S_not_coherent_unconditional / typeV_caseA_coherence /
+typeV_caseC_coherence_engine を assert 化 + 新 leaf 2 本を AxiomsCheck import へ。
+no_typeV_maximal_unconditional の assert = 1021 完了条件として文書化。
+残 frontier = **(10.10.2) 構造 discharge** (hstruct: S = S₁ ⊔ {μ_j} / h8:
+|S₁| ≥ 8 / 数値 pin d=p=2w₁−1, δ=−1, n=2 — p³-群指標論: |H|=p³ (case-(c)
+trichotomy) → H' = Z(H) order p → W₂ = H' → (H/H')⋊W₁ Frobenius →
+deg-1 は (p²−1)/w₁ 個の w₁-束 → S₁; deg-p は θ(1)²≤p³ → {μ_j})
+→ **v2 assembly** (S12_Noncoherence: trichotomy → caseA lemma / (6.5.c)
+sorried-cite / caseC engine+pins) → no_typeV_maximal_unconditional 配線。
