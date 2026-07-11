@@ -692,20 +692,98 @@ theorem exists_pinned_coherent_sOf_H0C_of_all_reducible [Finite G]
   have hdegs : ∀ i : Fin n, ((χ i : ClassFunction ↥M ℂ) : ↥M → ℂ) 1
       = (((∑ i' : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i' ⟨1, hw2⟩ :
           ClassFunction ↥M ℂ)) : ↥M → ℂ) 1 := by
-    sorry
+    intro i
+    have hmu := hyp.params_mu_eq hG hG.odd
+    rw [hkfeq i, ClassFunction.finset_sum_apply, ClassFunction.finset_sum_apply]
+    refine Finset.sum_congr rfl fun i' _ => ?_
+    rw [← hmu, hyp.params.degree_independent i' (kf i) (hkf0 i),
+      hyp.params.degree_independent i' ⟨1, hw2⟩ hk1]
+  -- the member-index extraction from a set-membership
+  have hidxof : ∀ a ∈ F, ∃ i : Fin n, χ i = a := by
+    intro a ha
+    exact ⟨hFfin.toFinset.equivFin ⟨a, hFfin.mem_toFinset.mpr ha⟩, by simp [hχdef]⟩
   -- the three lattice fields
   have hinner : ∀ x y : ClassFunction ↥M ℂ,
       x ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M) F →
       y ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M) F →
       ClassFunction.inner (ν₀ x) (ν₀ y) = ClassFunction.inner x y := by
-    sorry
+    intro x y hx hy
+    induction hy using Submodule.span_induction with
+    | mem b hb =>
+        induction hx using Submodule.span_induction with
+        | mem a ha =>
+            obtain ⟨i, rfl⟩ := hidxof a ha
+            obtain ⟨j', rfl⟩ := hidxof b hb
+            rw [hν₀apply i, hν₀apply j', hΩcols, hχpair]
+            by_cases hij : i = j'
+            · subst hij; rw [if_pos rfl, if_pos rfl]
+            · rw [if_neg (fun h => hij (hkfinj _ _ h)), if_neg hij]
+        | zero => rw [map_zero, ClassFunction.inner_zero_left,
+            ClassFunction.inner_zero_left]
+        | add u v hu hv ihu ihv =>
+            rw [map_add, ClassFunction.inner_add_left, ClassFunction.inner_add_left,
+              ihu, ihv]
+        | smul m u hu ihu =>
+            rw [map_zsmul, ← Int.cast_smul_eq_zsmul ℂ m (ν₀ u),
+              ← Int.cast_smul_eq_zsmul ℂ m u, ClassFunction.inner_smul_left,
+              ClassFunction.inner_smul_left, ihu]
+    | zero => rw [map_zero, ClassFunction.inner_zero_right, ClassFunction.inner_zero_right]
+    | add u v hu hv ihu ihv =>
+        rw [map_add, ClassFunction.inner_add_right, ClassFunction.inner_add_right, ihu, ihv]
+    | smul m u hu ihu =>
+        rw [map_zsmul, ← Int.cast_smul_eq_zsmul ℂ m (ν₀ u),
+          ← Int.cast_smul_eq_zsmul ℂ m u, OddOrder.RepresentationTheory.inner_smul_right,
+          OddOrder.RepresentationTheory.inner_smul_right, ihu]
+  have hD1ne : (((∑ i' : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i' ⟨1, hw2⟩ :
+      ClassFunction ↥M ℂ)) : ↥M → ℂ) 1 ≠ 0 := by
+    have hμ1mem' : (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩) ∈ F := by
+      rw [hFdef, hyp.base.muGrid_columnSum_eq_columnSum hG hG.odd ⟨1, hw2⟩]
+      exact columnSum_muColumnChar_mem_sOf_H0C hG hyp ⟨1, hw2⟩ hk1
+    exact inducedKernelFamily_mem_apply_one_ne_zero (hIKF hμ1mem')
+  have hres : ∀ x ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M) F,
+      ν₀ x - hyp.base.tau x
+        = ((x 1) / (((∑ i' : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i' ⟨1, hw2⟩ :
+            ClassFunction ↥M ℂ)) : ↥M → ℂ) 1) • r := by
+    intro x hx
+    induction hx using Submodule.span_induction with
+    | mem a ha =>
+        obtain ⟨i, rfl⟩ := hidxof a ha
+        rw [hν₀apply i, hdegs i, div_self hD1ne, one_smul]
+        have h1 : Ωof (kf i) - hyp.base.tau (χ i) = r := by
+          conv_lhs => rw [hkfeq i]
+          exact hrconst (kf i) (hkf0 i)
+        exact h1
+    | zero => rw [map_zero, map_zero, ClassFunction.zero_apply, zero_div, zero_smul, sub_zero]
+    | add u v hu hv ihu ihv =>
+        rw [map_add, map_add, ClassFunction.add_apply, add_div, add_smul]
+        rw [show ν₀ u + ν₀ v - (hyp.base.tau u + hyp.base.tau v)
+            = (ν₀ u - hyp.base.tau u) + (ν₀ v - hyp.base.tau v) from by abel, ihu, ihv]
+    | smul m u hu ihu =>
+        rw [map_zsmul, map_zsmul, ← Int.cast_smul_eq_zsmul ℂ m (ν₀ u),
+          ← Int.cast_smul_eq_zsmul ℂ m (hyp.base.tau u), ← Int.cast_smul_eq_zsmul ℂ m u,
+          ClassFunction.smul_apply, ← smul_sub, ihu, smul_smul, mul_div_assoc]
   have hextends : ∀ x : ClassFunction ↥M ℂ,
       x ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥M) F hyp.base.A0 →
       ν₀ x = hyp.base.tau x := by
-    sorry
+    rintro x ⟨hxspan, hxsupp⟩
+    have hx1 : x 1 = 0 := by
+      by_contra h
+      exact hyp.base.one_notMem_A0 (hxsupp (ClassFunction.mem_support.mpr h))
+    have h := hres x hxspan
+    rw [hx1, zero_div, zero_smul, sub_eq_zero] at h
+    exact h
   have hZIrr : ∀ x : ClassFunction ↥M ℂ,
       x ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M) F → ν₀ x ∈ ZIrr G := by
-    sorry
+    intro x hx
+    induction hx using Submodule.span_induction with
+    | mem a ha =>
+        obtain ⟨i, rfl⟩ := hidxof a ha
+        rw [hν₀apply i]
+        exact Submodule.sum_mem _ fun i' _ =>
+          hyp.base.alignedOmegaSigmaGrid_mem_ZIrr hG hG.odd i' (kf i)
+    | zero => rw [map_zero]; exact Submodule.zero_mem _
+    | add u v hu hv ihu ihv => rw [map_add]; exact Submodule.add_mem _ ihu ihv
+    | smul m u hu ihu => rw [map_zsmul]; exact Submodule.smul_mem _ m ihu
   -- assemble; the pin is `hν₀apply` at the `μ₁`-member index
   have hμ1mem : (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩) ∈ F := by
     rw [hFdef, hyp.base.muGrid_columnSum_eq_columnSum hG hG.odd ⟨1, hw2⟩]
