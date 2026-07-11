@@ -240,6 +240,139 @@ theorem tSideDadeMap_eq_induce_of_isTISubset [Finite G]
   tSideDadeMap_eq_induce_of_full_typeP1_H_eq_bot hG hyp dataT hP1
     (fullTypeP1Dade_H_eq_bot_of_isTISubset hG hyp dataT hP1 hTI) hφsupp
 
+/-- Conjugate closures are disjoint when a prime divides every order on the left
+and no order on the right.
+
+This is the abstract order-separation core used in Peterfalvi (14.9). -/
+theorem disjoint_conjugatesIntoSet_of_prime_order_separator
+    {M N : Subgroup G} {A : Set ↥M} {B : Set ↥N} {p : ℕ}
+    (hA : ∀ y ∈ A, p ∣ orderOf (y : G))
+    (hB : ∀ z ∈ B, ¬ p ∣ orderOf (z : G)) :
+    Disjoint (ClassFunction.conjugatesIntoSet M A)
+      (ClassFunction.conjugatesIntoSet N B) := by
+  rw [Set.disjoint_left]
+  rintro g ⟨a, ha, hya⟩ ⟨b, hb, hzb⟩
+  have horda : orderOf (a⁻¹ * g * a) = orderOf g := by
+    simpa [MulAut.conj_apply] using
+      (orderOf_injective (MulAut.conj a⁻¹).toMonoidHom
+        (MulAut.conj a⁻¹).injective g)
+  have hordb : orderOf (b⁻¹ * g * b) = orderOf g := by
+    simpa [MulAut.conj_apply] using
+      (orderOf_injective (MulAut.conj b⁻¹).toMonoidHom
+        (MulAut.conj b⁻¹).injective g)
+  have hp : p ∣ orderOf g := by
+    rw [← horda]
+    exact hA ⟨a⁻¹ * g * a, ha⟩ hya
+  exact hB ⟨b⁻¹ * g * b, hb⟩ hzb (by rwa [hordb])
+
+/-- **Peterfalvi (14.9), the S/T order separator.**
+
+For a type-`P` maximal `T`, `[T:T']=p` and `|T'|` are coprime.  Consequently every
+element conjugate into `(T')#` has order prime to `p`, so its conjugate closure is
+disjoint from the closure of any S-side set whose elements all have order divisible by `p`.
+
+This is the group-theoretic core of Coq's `QV'betaS` support separation.  The remaining
+character input is precisely the (13.18.a) assertion that every point in the support of
+`β_S` has order divisible by `p`. -/
+theorem disjoint_conjugatesIntoSet_S_Tderived_of_p_dvd [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    {A : Set ↥hyp.base.S}
+    (hpA : ∀ y ∈ A, hyp.base.p ∣ orderOf (y : G)) :
+    Disjoint (ClassFunction.conjugatesIntoSet hyp.base.S A)
+      (ClassFunction.conjugatesIntoSet hyp.base.T
+        {z : ↥hyp.base.T |
+          (z : G) ∈ OddOrder.GroupTheory.sharpSubgroup
+            (OddOrder.GroupTheory.derivedInG hyp.base.T)}) := by
+  apply disjoint_conjugatesIntoSet_of_prime_order_separator hpA
+  intro z hz
+  have hP : OddOrder.BG.Ch4.S14.IsTypeP hyp.base.T :=
+    OddOrder.BG.Ch4.S16.isTypeP_of_isTypeNonI
+      hG hyp.base.T_maximal hyp.base.T_nonI
+  have hcop : Nat.Coprime
+      (Nat.card ↥(OddOrder.GroupTheory.derivedInG hyp.base.T)) hyp.base.p := by
+    have h := OddOrder.Peterfalvi.S15.coprime_card_derivedInG_index_of_isTypeP
+      hG hyp.base.T_maximal hP
+    rwa [T_derived_index_eq_p hyp] at h
+  have hord : orderOf (z : G) ∣
+      Nat.card ↥(OddOrder.GroupTheory.derivedInG hyp.base.T) := by
+    have hz' : (z : G) ∈ OddOrder.GroupTheory.derivedInG hyp.base.T := hz.1
+    have h1 := orderOf_dvd_natCard
+      (⟨(z : G), hz'⟩ : ↥(OddOrder.GroupTheory.derivedInG hyp.base.T))
+    rwa [← Subgroup.orderOf_coe] at h1
+  exact hyp.base.p_prime.coprime_iff_not_dvd.mp
+    ((hcop.coprime_dvd_left hord).symm)
+
+open scoped Classical in
+/-- **Peterfalvi (13.18.a), every point of `P# ∪ V_S` has p-divisible order.**
+
+On `P#` this is the p-group order criterion using `|P|=p^q`.  A regular
+`V_S = (W ∖ (W₁ ∪ W₂))^S` point has a σ-prime divisor; since
+`S_σ=P` and `|P|=p^q`, that prime is exactly `p`. -/
+theorem p_dvd_orderOf_of_mem_sharpP_union_typePV [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    {y : G}
+    (hy : y ∈ OddOrder.GroupTheory.sharpSubgroup hyp.base.P ∪
+      OddOrder.GroupTheory.conjClassSetIn hyp.base.S
+        (OddOrder.GroupTheory.typePV hyp.base.S hyp.base.Sdata)) :
+    hyp.base.p ∣ orderOf y := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  rcases hy with hyP | hyV
+  · have hPgroup : IsPGroup hyp.base.p ↥hyp.base.P :=
+      IsPGroup.of_card (hyp.base.card_P_eq hG hyp.base.Sdata_W2_eq)
+    have hdiv := hPgroup.dvd_orderOf (g := ⟨y, hyP.1⟩) (by
+      intro h
+      exact hyP.2 (congrArg Subtype.val h))
+    rwa [← Subgroup.orderOf_coe] at hdiv
+  · obtain ⟨v, hv, m, hmS, hmv⟩ := hyV
+    obtain ⟨r, hrord, hrσ⟩ :=
+      OddOrder.Peterfalvi.S15.exists_sigma_prime_dvd_orderOf_typePV
+        hG hyp.base.S_maximal hyp.base.Sdata hv
+    have hMsS : OddOrder.BG.Ch3.S10.Msigma hyp.base.S = hyp.base.P := by
+      rw [← OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II
+        hG hyp.base.S_maximal
+          (Or.inr (OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2
+            hG hyp.base.S_maximal hyp.base.S_typeP2))]
+      exact hyp.base.P_eq_SF.symm
+    have hrP : r ∈ (Nat.card ↥hyp.base.P).primeFactors := by
+      rw [← hMsS]
+      exact (OddOrder.BG.Ch4.S16.primeFactors_Msigma_eq_sigma
+        hG hyp.base.S_maximal r).mpr hrσ
+    rw [hyp.base.card_P_eq hG hyp.base.Sdata_W2_eq,
+      Nat.primeFactors_prime_pow hyp.base.q_prime.pos.ne' hyp.base.p_prime,
+      Finset.mem_singleton] at hrP
+    have hpv : hyp.base.p ∣ orderOf v :=
+      hrP ▸ Nat.dvd_of_mem_primeFactors hrord
+    have hord : orderOf y = orderOf v := by
+      rw [← hmv]
+      simpa [MulAut.conj_apply] using
+        (orderOf_injective (MulAut.conj m).toMonoidHom
+          (MulAut.conj m).injective v)
+    rwa [hord]
+
+/-- **Peterfalvi (13.18.a)/(14.9), exact S/T source-support separation.**
+
+The conjugate closure of the genuine S-side support carrier `P# ∪ V_S` is disjoint
+from the conjugate closure of `(T')#`.  This closes the group/order part of the
+`QV'betaS` argument; only the character statement
+`supp(β_S) ⊆ P# ∪ V_S` remains to feed it. -/
+theorem disjoint_conjugatesIntoSet_sharpP_union_typePV_Tderived [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    Disjoint
+      (ClassFunction.conjugatesIntoSet hyp.base.S
+        {y : ↥hyp.base.S |
+          (y : G) ∈ OddOrder.GroupTheory.sharpSubgroup hyp.base.P ∪
+            OddOrder.GroupTheory.conjClassSetIn hyp.base.S
+              (OddOrder.GroupTheory.typePV hyp.base.S hyp.base.Sdata)})
+      (ClassFunction.conjugatesIntoSet hyp.base.T
+        {z : ↥hyp.base.T |
+          (z : G) ∈ OddOrder.GroupTheory.sharpSubgroup
+            (OddOrder.GroupTheory.derivedInG hyp.base.T)}) :=
+  disjoint_conjugatesIntoSet_S_Tderived_of_p_dvd hG hyp fun _ hy =>
+    p_dvd_orderOf_of_mem_sharpP_union_typePV hG hyp hy
+
 /-- The inner product of two virtual characters is symmetric: its value is
 an integer, hence fixed by complex conjugation. -/
 theorem inner_eq_swap_of_mem_ZIrr [Fintype G]

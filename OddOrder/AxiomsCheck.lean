@@ -3384,6 +3384,18 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.tSideDadeMap_eq_induce_of_isTISubset
 set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.disjoint_conjugatesIntoSet_of_prime_order_separator
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.disjoint_conjugatesIntoSet_S_Tderived_of_p_dvd
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.p_dvd_orderOf_of_mem_sharpP_union_typePV
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.disjoint_conjugatesIntoSet_sharpP_union_typePV_Tderived
+set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.inner_eq_swap_of_mem_ZIrr
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.gap_cross_inner_identity
