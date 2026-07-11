@@ -234,21 +234,9 @@ theorem centralizer_le_L_of_mem_conj_toTICV (h : Hypothesis46 A L) {w : ↥L}
   rw [hceq]
   exact L.mul_mem (L.mul_mem l.2 hc'L) (L.inv_mem l.2)
 
-/-- **A §4 Dade-hypothesis fact**: if `C_G(a) ⊆ L` then the local subgroup `H(a) = ⊥`.  By (2.2)
-`C_G(a) = H(a) ⊔ C_L(a)` (`centralizer_eq_sup`) with `H(a) ⊓ C_L(a) = ⊥` (`centralizer_disjoint`);
-when `C_G(a) ⊆ L` the join factor `H(a)` already centralizes `a` inside `L`, so `H(a) ≤ C_L(a)`,
-and a subgroup disjoint from one it is contained in is trivial. -/
-theorem _root_.OddOrder.Peterfalvi.S04.Hypothesis.H_eq_bot_of_centralizer_le
-    {G : Type*} [Group G] [Fintype G] {A₀ : Set G} {L : Subgroup G}
-    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A₀ L) (a : {a : G // a ∈ A₀})
-    (hCL : Subgroup.centralizer ({a.1} : Set G) ≤ L) :
-    hyp.H a = ⊥ := by
-  have hHcent : hyp.H a ≤ Subgroup.centralizer ({a.1} : Set G) :=
-    le_sup_left.trans_eq (hyp.centralizer_eq_sup a).symm
-  have hle : hyp.H a ≤ OddOrder.Peterfalvi.S04.centralizerIn L a.1 := fun x hx =>
-    OddOrder.Peterfalvi.S04.mem_centralizerIn.mpr
-      ⟨hCL (hHcent hx), Subgroup.mem_centralizer_singleton_iff.mp (hHcent hx)⟩
-  exact (inf_eq_left.mpr hle).symm.trans (disjoint_iff.mp (hyp.centralizer_disjoint a))
+-- `S04.Hypothesis.H_eq_bot_of_centralizer_le` (used by `full_tau_eq_toTICDade_on_fourCorner`
+-- below) now lives at its topic home `S04_DadeIsometryBasic` (issue 1021 tick²¹ dedup: the
+-- out-of-home `_root_` declaration formerly here collided with the upstream copy).
 
 /-- **(4.10), the L-side four-corner is the toTICyclic Dade image of the carrier.**
 `β = δ_j(μ_{ij} − μ_{0j}) − (μ_{i0} − μ_{00}) = Ind_W^L α` (piece (a)), and the toTICyclic Dade map

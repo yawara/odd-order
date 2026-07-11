@@ -76,3 +76,136 @@ book (10.10) の「type V なら 𝒮 coherent」((10.8) との矛盾用)。
 dadeData 供給 = `S10.dadeSupportHypothesisData_typePA0_of_isTypeP1` (Nonempty-producer)。
 h46.dade 同定の実測 = この producer の H(a)-choice を読む (S10 側 (8.15)-構成)。
 type-P₂ branch は sorried と注記あり — type-V (P₁) 側は生きている。次 tick はここから。
+
+## 2026-07-11 tick¹⁹ — ★設計点解消 (data-independent)、(2.3) 逆方向 landed
+
+- **producer 実測** (参考): engine = `dadeSupportHypothesisData_of_subset_escaping_sigmaSharp`
+  (S10:1608)、H := `ftSupportKernel M X` = escaping なら `FT_signalizer a`、
+  non-escaping なら ⊥。つまり「H(a)=⊥ ⟺ C_G(a) ≤ M」。
+- **しかし実測は不要になった**: `S04.Hypothesis.H_eq_bot_of_centralizer_le` /
+  `H_eq_bot_of_isTISubset` landed (S04_DadeIsometryBasic、commit 5c946ed5)。
+  centralizer_eq_sup + centralizer_disjoint だけから **任意の** (2.2) datum で
+  C_G(a) ≤ L → H(a) = ⊥。⟹ case-(a) TI から h46.dade の H ≡ ⊥ が opaque な
+  hyp.dadeData のまま出る。**SibleyDadeHypothesis の dade field に h46.dade
+  自身を渡す**: `dade_H_eq_bot` = 新 lemma、`cases` の `h46.dade = dade` = **rfl**。
+  TI-側 S04.of_isTISubset 構成も dadeHypothesis_eq_of_forall_H_eq_bot も不要。
+- **⚠ TI の相対先**: TypeVData.alternative (a) =
+  `IsTISubset (sharpSubgroup typeP.H) (normalizer (typeP.H :Set G))` — **N_G(H) 相対**。
+  M-相対へは `IsTISubset.mono` でなく N_G(H) = M の同定 (H = M' ≠ 1 normal、M maximal、
+  M ≤ N_G(H) ≠ G) → 既存 lemma を探す (S09 系に必ずある)。+ A-param 座標合わせ
+  (sharpSubgroup typeP.H : Set G / sharpImage (H:Subgroup ↥M) / typePA)。
+- **book (10.10) 場合分けの訂正** (本 issue 冒頭記載を修正; mmd 04.12 L113):
+  case (c) は False でなく **(10.10.1)–(10.10.4) が honest に coherent を結論**。
+  not-(a) は trichotomy の (b)/(c) 直行でなく: (8.4.d)+(8.15) → **Hyp (6.4) for
+  (L,K,M):=(M,H,1)** → **(6.5.b)** で「H non-abelian p-group (p=w₂) でなければ
+  coherent」→ **(6.5.c)** が case (b) を排除 → case (c) のみ残り |H|=p³。
+  ⟹ 実装も (b) を個別に扱わず (6.4)-engine 側で潰すのが book-faithful。
+- **(6.8) capstone 確認**: `sibleySetup_is_coherent` (S08_CoherenceTheorems:52) は
+  **完成済 (sorry 無)** : hyp.CoherenceTarget。case-(a) は
+  ① SibleyDadeHypothesis 構成 (座標合わせ + h46 = toHypothesis46) →
+  ② capstone → ③ transport (tau-agreement (S04.restrict 系) +
+  isCoherent_of_supportedSpan_le + Sset=inducedFamily 同定) の 3 段。
+- 次 tick: `toHypothesis46` (S12_Core:1057) の実 signature 読解 → ① の座標合わせ
+  (L=M、H : Subgroup ↥M、A-param) を開始。
+
+## 2026-07-11 tick²⁰ — 座標層 landed (S12_TypeVSibley 新 leaf、commit 955b03a8)
+
+- `toHypothesis46` 実読 (S12_Core/Hypothesis.lean:1312): 出力 =
+  `S06.Hypothesis46 (typePA M hyp.typeP) M`、dade = `hyp.dadeData.dade.restrict`
+  (A₀→A)、dade0 = dadeData.dade そのもの、tau = fullDadeIsometryData。
+- **新 leaf S12_TypeVSibley** (S10_MinimalSimpleBasic + S08_YsetInner import):
+  `TypeVData.derivedInG_eq_H` (M'=M_F=data.H、任意 witness) /
+  `sharpImage_subgroupOf_derivedInG` / `normalizer_sharpSubgroup` (N(H^#)=N(H)) /
+  `normalizer_sharpSubgroup_derivedInG_eq` (N((M')^#)=M) /
+  `typePA_isTISubset_of_typeV_TI` (M-相対 TI)。全部 sorry-free。
+- **次 tick (assembly ①)**: SibleyDadeHypothesis G M ((derivedInG M).subgroupOf M) の
+  構成。残 field 素材: W1 = typeP.W1.subgroupOf M / split = M_complement /
+  H_normal = commutator normal (toS06 の K_normal 流用) / H_ne_bot = W2 経由 /
+  H_nilpotent = M_F nilpotent (maxNilpotentNormalHall) を subgroupOfEquivOfLe で
+  ↥H_M に transport / H_sharp_ti = tick²⁰ lemma + sharpImage 座標 rw /
+  dade = **A-param transport が必要**: toHypothesis46 は typePA-座標 →
+  sharpImage-座標へ。方針 = S04.Hypothesis.restrict を equality-subset で使う
+  (restrict hAB.le: Hypothesis G A M → Hypothesis G B M、H-field は値レベル
+  reindex、Eq.rec 無し)。Hypothesis46 全体の congr helper も同様に
+  restrict + A-indep fields 再梱包で作る (data field は dade/toHypothesis.dade
+  のみ、A_covers は Prop なので ▸ 可)。cases の h46.dade = dade は
+  「Sibley.dade := (congr した h46).dade」にすれば rfl。
+- dade_H_eq_bot = S04.Hypothesis.H_eq_bot_of_isTISubset (tick¹⁹) ✓ /
+  hconj = HConjInvariant.of_forall_H_eq_bot ✓ / w₂ prime = hyp.w2_prime ✓ /
+  W2 ≤ ⁅H_M,H_M⁆ = W2_le→secondDerived を subgroupOf へ ✓ /
+  coprime = typePData_W1_hall_coprime ✓。
+
+## 2026-07-11 tick²¹ — ★assembly ① 完成: typeVSibleyDadeHypothesis (sorry-free)
+
+- **`typeVSibleyDadeHypothesis` landed** (S12_TypeVSibley、commit 4c8af378):
+  型 V + (8.7)(a) TI → `SibleyDadeHypothesis G M ((M').subgroupOf M)` 全 field
+  実構成。dade = castSet(toHypothesis46).dade で **cases の h46.dade = dade は
+  rfl** (tick¹⁹ 設計実証)。**S := inducedFamily M (= hyp.Sset 定義一致)** —
+  case-(a) 出力の family 同定 (transport ③ の一部) が不要になった。
+- **⚠ instance 教訓**: consumer は [Finite G] のみ + `open scoped FiniteInduce in`
+  (S12_Core/Hypothesis.lean:25-41 の 4 scoped instances)。[Fintype G] や
+  [Invertible …] を binder に取ると toHypothesis46 の出力型と diamond →
+  "synthesized instance not defeq"。Isometry105 の signature が正パターン。
+- **⚠ 衝突事故と修正** (commit 67784bdd): tick¹⁹ の S04 追加が
+  S06_CertainTypeFourCorner:241 の同名 `_root_` 宣言 (同一 statement) と衝突
+  — leaf build では不可視の latent full-build 破壊だった。S06 側を削除して
+  S04 (topic home) に一本化。**教訓: namespace 追加宣言の前に repo-wide grep
+  必須** (claim-before-build の局所版)。
+- **残り (case (a) 完結まで)**:
+  1. `sibleySetup_is_coherent (typeVSibleyDadeHypothesis …)` を適用 →
+     `IsCoherent (Sibley.tau) (inducedFamily M) (supportInSubgroup (sharpImage H_M) M)`。
+  2. **tau-agreement**: Sibley.tau = dadeIntegralCharacterMap (casted h46.dade)
+     vs hyp.tau = dadeIntegralCharacterMap hyp.dadeData.dade (A₀-full)。
+     A-supported 元上の一致 = (2.11) restriction 系 (S04.restrict + IsDadeMap
+     uniqueness、dadeMap_unique_of_forall_H_eq_bot も使える — 両者 H≡⊥!)。
+  3. **support 拡大**: supportInSubgroup (sharpImage) → hyp.A0 =
+     supportInSubgroup (typePA0)。A ⊆ A₀ (union-left)。
+     `isCoherent_of_supportedSpan_le` (S13_Lemmas113To115:318) — **DAG 注意**:
+     S13 は S12 下流。v2 の配線先 S12_Noncoherence の import に S13 が既に
+     あるか要確認 (無ければ transport は S13 側 or 新 mid-leaf)。
+  4. その後: not-(a) route ((6.4)+(6.5.b)/(6.5.c) engine survey) → case (c)
+     ((10.10.1)-(10.10.4) grid、最深)。
+
+## 2026-07-11 tick²² — transport 設計確定 (cast-elim 不要、uniqueness hammer 経由)
+
+既存 API 調査の結果、case-(a) transport は全部品既存で組める:
+
+- **congrMap**: `S07.IsCoherent.congrMap` (S08_CaseBCoherence2:1084) —
+  τ₁-coherence + lattice 上の τ₁=τ₂ → τ₂-coherence。
+- **(2.11) restrict 一致**: `dadeIntegralCharacterMap_restrict_eq_of_support`
+  (同:1138) — dadeICM(restrict) φ = dadeICM(full) φ (A₁-supported φ)。
+  A := typePA0、A₁ := sharpImage H_M で hyp.tau 側に直接適用可。
+- **tau-agreement の cast seam 解消**: sib.tau (castSet 経由の dade) vs
+  restrict-直の dade — **cast-elim lemma 不要**。両者とも
+  (sharpImage H_M, M) 上の Hypothesis で **H ≡ ⊥** (H_eq_bot_of_isTISubset、
+  data-independent) ⟹ `dadeMap_unique_of_forall_H_eq_bot` (S12_TICyclicSigmaBridge:70、
+  (2.5)-uniqueness、**異なる hyp 梱包でも同 (A,L) なら DadeMap 等しい**) で
+  同一視。手順: dadeICM_apply_of_support で両辺を .toDadeMap 値に落とす →
+  hammer で map 等式 → congrArg。
+- **support 拡大 A→A₀**: `isCoherent_of_supportedSpan_le` (S13_Lemmas113To115:318)。
+  hle (ℤ[S,A₀] ⊆ ℤ[S,A_sharp]) は「Ind_{M'}^M θ は M'-set 外で 0」+
+  「1 ∉ A₀ (hyp.one_notMem_A0)」— S13:367-387 の columnSum 版 proof を
+  inducedFamily 版 (induce の off-M' 消滅 lemma) で mirror。witness = 任意
+  ζ ∈ S の ζ̄ − ζ (S13:436-453 の inducedKernelFamily 版 mirror;
+  mderivSharp_subset_A0 ✓ 既存)。
+- **§10 interface 実例**: `certainTypeSet_isCoherent_A0` (S13:349) が 𝒯-版の
+  完全 template (そこは dade0-経由で seam 無し; S-版の私の経路は seam 有りで
+  上記 hammer を挟む点だけ違う)。
+- **確定 signature** (次 tick 即用):
+  `SibleyDadeHypothesis.tau` = abbrev、`dadeICM hyp.dade (hyp.dade.fullDadeIsometryData hyp.hconj)`
+  (S08_YsetConjugation:37) / `CoherenceTarget` = abbrev `IsCoherent hyp.tau hyp.S
+  (supportInSubgroup (sharpImage H) L)` (同:45) / S12 `Hypothesis.tau` =
+  `dadeICM hyp.dadeData.dade (….fullDadeIsometryData hyp.hconj)` (S12_Core/Hypothesis:375) —
+  **両 tau は同形 (dade だけ違う)** / `dadeIntegralCharacterMap` +
+  `dadeIntegralCharacterMap_apply_of_support` = S07_Coherence/FamilyBundleDade:320/330。
+- **DAG**: S12_Noncoherence は S12_TypeIICrossIsometryPair + S14 を import —
+  S13_Lemmas113To115 は import して**いない**。transport ③ を書く場所:
+  S13_Lemmas113To115 は S12_TypeVSibley を import できるか? (S13 ← S12_Core
+  経由で S12_TypeVSibley と独立 → S13 に置くのは可だが、v2 の配線先
+  S12_Noncoherence が S13 を import する必要が生じる)。**代替: transport を
+  S12_TypeVSibley に置き、isCoherent_of_supportedSpan_le だけ S13 から
+  S12_TypeVSibley へは import 不可 (S13 が下流) → supportedSpan_le の一般
+  lemma は S13:318 のものを S07-side へ hoist するか、S12_TypeVSibley で
+  同型を再宣言せず S13 に最終組立 lemma を置く**。→ 次 tick: S13 の import
+  チェーン確認後、最終組立 (typeV_caseA_coherence) は S13_Lemmas113To115 か
+  新 leaf (S13 直下) に配置、v2 (S12_Noncoherence) の import に追加。
