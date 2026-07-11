@@ -198,6 +198,24 @@ type-P₂ branch は sorried と注記あり — type-V (P₁) 側は生きて�
   `dadeICM hyp.dadeData.dade (….fullDadeIsometryData hyp.hconj)` (S12_Core/Hypothesis:375) —
   **両 tau は同形 (dade だけ違う)** / `dadeIntegralCharacterMap` +
   `dadeIntegralCharacterMap_apply_of_support` = S07_Coherence/FamilyBundleDade:320/330。
+## 2026-07-11 tick²⁴ — ★★ case-(a) 完全証明: typeV_caseA_coherence (commit 6e4800d5)
+
+- `typeV_caseA_coherence` (S13_Lemmas113To115 末尾、sorry-free):
+  型 V + (8.7)(a) TI → `IsCoherent hyp.tau hyp.Sset hyp.A0`。
+  組立 = capstone → congrMap (tau_agree) → supportedSpan_le (witness ζ̄−ζ)。
+  inducedKernelFamily の ⊥-kernel membership + one_mem_characterKernel で
+  witness 部品を全流用 (S13:436-453 mirror)。
+- **(10.10) case-(a) はこれで book-faithful に閉じた**。tick¹⁵ 起点の設計
+  (v2 方式・S12_Noncoherence 配線) の case-(a) 供給が完成。
+- 残り: **not-(a) 縮約** ((8.4.d)+(8.15) → Hyp (6.4) for (M,H,1) → (6.5.b) で
+  「H non-abelian p-group (p=w₂) でなければ coherent」→ (6.5.c) が case (b)
+  排除) と **case (c)** ((10.10.1)-(10.10.4)、typeV_param_arithmetic ✓済 +
+  grid 組立)。次 tick: S08 の (6.4)/(6.5.b)/(6.5.c) engine の Lean 所在 survey
+  (six_five_* 断片は S08_CoherenceCorePart1/PGroupReduction に確認済み — 
+  Hypothesis (6.4) carrier の有無と (6.5.b)/(6.5.c) の statement 形を特定)。
+- v2 配線 (typeV_forces_coherence_v2 @ S12_Noncoherence) は 3 分岐が揃って
+  から: case-(a) は本 lemma + dV.alternative_transfer の Or.inl で接続。
+
 ## 2026-07-11 tick²³ — tau-agreement landed (commit 6880c3e6)
 
 - `dadeIntegralCharacterMap_eq_of_forall_H_eq_bot` ((2.5) integral-map 版、
