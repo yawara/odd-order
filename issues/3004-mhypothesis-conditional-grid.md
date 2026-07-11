@@ -734,3 +734,37 @@ feature commit: `5d1301b5`。
   (ii) perpendicular residual nonzero による norm bound `≤p` への sharpen の二つ。
 - principal 補題は AxiomsCheck 登録済み。最新 main `ae4ebf77` 同期後、
   AxiomsCheck (4140 jobs) は exit 0。新 axiom・新 sorry なし。
+
+## lane-c (11.9.a) nonzero eta residual と sharp norm bound (2026-07-11 夜)
+
+feature commits: `c56bf539`, `162fa7a9`。
+
+- `etaGridProjection_mem_ZIrr` を実証明し、整数 eta-grid 射影そのものが virtual
+  character であることを API 化した。
+- `etaGrid_projection_residual_ne_zero_of_inner` は、eta-grid 全体に直交する一方で
+  bridge `b` とは非直交な test character があれば
+  `b - etaGridProjection m ≠ 0` を返す。
+- `etaGrid_projection_sum_sq_le_of_residual_ne_zero` は、上の非零 residual が非零
+  virtual character なので Fourier norm が少なくとも `1` であることを証明し、
+  Pythagoras と `‖b‖²=p+1` から `∑mᵢⱼ²≤p` を導く。従って Coq `normX_le_q`
+  に対応する sharp bound の純射影部分は closed。
+- 新 leaf `TGapProjectionResidual.lean` の
+  `tSide_etaGridProjection_residual_ne_zero_of_coherent_pair` は Coq の
+  `χ≠0` 論法を faithful に実装した。supported Dade isometry で
+  `⟨φ,ζ−ζ̄⟩≠0` を G-side へ運び、coherence の
+  `τ_T(ζ−ζ̄)=τ₁ζ−τ₁ζ̄` と既証明の coherent-image/eta 直交から residual 非零を得る。
+- concrete `φ=ν₀−ζ` への残りは source pairing 一件だけ:
+  prime-TI anchor の既存内部事実
+  `⟨ν₀,Ind θ⟩=0` を `ζ` と `ζ̄` に再利用して
+  `⟨ν₀−ζ,ζ−ζ̄⟩=-1` を作る。現行 norm producer は同じ構成中にこの直交性を使うが
+  出力から落としているため、次は canonical anchor の直交 API を保全して接続する。
+- 独立検証として「four-corner + principal + `∑m²≤p` だけで axis constancy 不要」
+  という短絡は偽。反例は `q=3,p=7` で、2本の列を全て `1`、他を `0` とする格子:
+  principal/four-corner/平方和 `6≤7` を満たすが単一列・単一行でない。従って Coq の
+  `a_aut`（Dade--Galois + coherent correction）に対応する axis constancy は genuine に必要。
+- residual 側を concrete source pairing へ接続した後も、最後の主要 producer は
+  nonprincipal row/column axis constancy。現行 abstract `S15.Hypothesis` は
+  conjugation/vanishing transport しか公開せず full Galois orbit を保持しないため、
+  honest spine の concrete `tau3/omega` Galois API からの接続を引き続き追う。
+- 両 feature は AxiomsCheck 登録済み。main `b0813b64` 同期後
+  AxiomsCheck (4141 jobs) exit 0、`git diff --check` clean。新 axiom・新 sorry なし。
