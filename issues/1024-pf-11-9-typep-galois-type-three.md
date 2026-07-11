@@ -105,10 +105,18 @@ Hypothesis (11.2) (M maximal, type III/IV)、ζ ∈ 𝒮(HC):
     S16_NonExistenceG/TGapGalois.lean (c 所有、S16-deep import) に在り S13 から import 不可 —
     GaloisCharacter.lean へ hoist (proof は c 版 mirror、`apply_inv_eq_star_of_mem_ZIrr` +
     `inner_mem_ZIrr_int` cite、~30 行)。9000 scan 済 (claim 衝突なし)。hub へ dedup note。
-  - **(G3) grid の Galois index-作用**: mapRingEquiv σ (alignedOmegaSigmaGrid i j) =
-    alignedOmegaSigmaGrid i' j' — sigma_mapRingEquiv_comm + hbridge + product 構造
-    `exists_alignedOmegaSigmaGrid_chiFam_product` (ρ,κ injective→bijective、card一致) で index 算術。
-    j≠0 の Galois 軌道 = 全非自明列 (w₂ 素数)、i-側固定は exists_complexRingEquiv_pow_and_fixed。
+  - **(G3、narrow 化済 2026-07-12 iter4)**: 一般 index-作用は不要 — 必要なのは
+    **行0/列0 上の pair-move のみ** (分離性が残りを埋める):
+    `∃ σ, mapRingEquiv σ (chiFam (p, κ₀)) = chiFam (p', κ₀)` (p,p' 非自明 W₁-char、κ₀ = 自明
+    W₂-char は全 σ 固定 ⟹ **exists_complexRingEquiv_pow_and_fixed 不要**、
+    `exists_complexRingEquiv_pow_of_rootsOfUnity` で足りる) + 行0 対称版。
+    部品: (i) char-group 素数位数巡回transitivity (p'=p^k, k coprime — w₁ 素数で自動)、
+    (ii) chiFam pair の冪 = pair の成分冪 (κ₀ 自明側は固定)、
+    (iii) `exists_mapRingEquiv_sigma_omega_pow` (S05:936) で σ 実現。
+    定数性本体は **G2 engine `inner_eq_intCast_of_mapRingEquiv_eq_add`** に
+    φ=ψ (hφ: mapRingEquiv σ ψ = ψ + τ(ζ−ζ^σ) ⟸ τ-comm (supp 要) + G1 + additivity)、
+    correction⊥η' = `SHC_extension_inner_alignedOmegaSigma_eq_zero` ×2 (ζ, ζ^σ ∈ SHCSet ⟸ G4 +
+    galoisMap irr + deg σ-固定) を渡すだけ。
   - [x] **(G4) DONE**: `inducedFamily_closedUnderMapRingEquiv` (S12_Core/Hypothesis.lean、
     galoisMap + `ClassFunction.mapRingEquiv_induce` (S08_CaseBCoherence 既存) で ~30 行、sorry-free)。
   - **(G1 補足)**: c の `primeTIred_zero_mapRingEquiv` (TGapGalois:71) が「prTIred 0 = Ind 1 は
