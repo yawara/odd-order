@@ -115,6 +115,7 @@ import OddOrder.Peterfalvi.S08_SixTwoGeneral
 import OddOrder.Peterfalvi.S13_CoreStructure
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.Peterfalvi.S10_CoherenceWiring
+import OddOrder.GroupTheory.RepresentationTheory.GaloisInnerTransport
 import OddOrder.Peterfalvi.S11_ImprimitiveUBound
 import OddOrder.Peterfalvi.S12_Noncoherence
 import OddOrder.Peterfalvi.S12_TypeVCaseC
@@ -7511,3 +7512,9 @@ The Frobenius fixed-point-freeness of the `W₁`-conjugation on the `U`-action i
 the Peterfalvi (11.9.c) non-Galois contradiction `q ≤ u − 1 < u = a ≤ p − 1 < p`. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.fixedSubgroup_quotient_uActionKer_eq_bot
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.card_uActionHom_range_modEq_one
+
+/-! **ZIrr-Galois 内積 transport (shared leaf), axiom-clean** (lane a, 2026-07-12, issue 9085).
+`mapRingEquiv` の ZIrr 上 ℤ-等長性と Galois 係数定数性 engine — (10.9)/(11.9.a) 型 grid 解析の
+(3.9.b) 行/列定数性の generic 核 (S16 TGapGalois の generic 部 hoist)。 -/
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.inner_mapRingEquiv_eq_of_mem_ZIrr
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.inner_eq_intCast_of_mapRingEquiv_eq_add
