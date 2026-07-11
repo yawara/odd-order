@@ -134,3 +134,34 @@ type-P₂ branch は sorried と注記あり — type-V (P₁) 側は生きて�
   hconj = HConjInvariant.of_forall_H_eq_bot ✓ / w₂ prime = hyp.w2_prime ✓ /
   W2 ≤ ⁅H_M,H_M⁆ = W2_le→secondDerived を subgroupOf へ ✓ /
   coprime = typePData_W1_hall_coprime ✓。
+
+## 2026-07-11 tick²¹ — ★assembly ① 完成: typeVSibleyDadeHypothesis (sorry-free)
+
+- **`typeVSibleyDadeHypothesis` landed** (S12_TypeVSibley、commit 4c8af378):
+  型 V + (8.7)(a) TI → `SibleyDadeHypothesis G M ((M').subgroupOf M)` 全 field
+  実構成。dade = castSet(toHypothesis46).dade で **cases の h46.dade = dade は
+  rfl** (tick¹⁹ 設計実証)。**S := inducedFamily M (= hyp.Sset 定義一致)** —
+  case-(a) 出力の family 同定 (transport ③ の一部) が不要になった。
+- **⚠ instance 教訓**: consumer は [Finite G] のみ + `open scoped FiniteInduce in`
+  (S12_Core/Hypothesis.lean:25-41 の 4 scoped instances)。[Fintype G] や
+  [Invertible …] を binder に取ると toHypothesis46 の出力型と diamond →
+  "synthesized instance not defeq"。Isometry105 の signature が正パターン。
+- **⚠ 衝突事故と修正** (commit 67784bdd): tick¹⁹ の S04 追加が
+  S06_CertainTypeFourCorner:241 の同名 `_root_` 宣言 (同一 statement) と衝突
+  — leaf build では不可視の latent full-build 破壊だった。S06 側を削除して
+  S04 (topic home) に一本化。**教訓: namespace 追加宣言の前に repo-wide grep
+  必須** (claim-before-build の局所版)。
+- **残り (case (a) 完結まで)**:
+  1. `sibleySetup_is_coherent (typeVSibleyDadeHypothesis …)` を適用 →
+     `IsCoherent (Sibley.tau) (inducedFamily M) (supportInSubgroup (sharpImage H_M) M)`。
+  2. **tau-agreement**: Sibley.tau = dadeIntegralCharacterMap (casted h46.dade)
+     vs hyp.tau = dadeIntegralCharacterMap hyp.dadeData.dade (A₀-full)。
+     A-supported 元上の一致 = (2.11) restriction 系 (S04.restrict + IsDadeMap
+     uniqueness、dadeMap_unique_of_forall_H_eq_bot も使える — 両者 H≡⊥!)。
+  3. **support 拡大**: supportInSubgroup (sharpImage) → hyp.A0 =
+     supportInSubgroup (typePA0)。A ⊆ A₀ (union-left)。
+     `isCoherent_of_supportedSpan_le` (S13_Lemmas113To115:318) — **DAG 注意**:
+     S13 は S12 下流。v2 の配線先 S12_Noncoherence の import に S13 が既に
+     あるか要確認 (無ければ transport は S13 側 or 新 mid-leaf)。
+  4. その後: not-(a) route ((6.4)+(6.5.b)/(6.5.c) engine survey) → case (c)
+     ((10.10.1)-(10.10.4) grid、最深)。
