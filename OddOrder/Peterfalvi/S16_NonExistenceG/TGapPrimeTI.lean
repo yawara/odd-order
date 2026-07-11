@@ -1,5 +1,6 @@
 import OddOrder.Peterfalvi.S16_NonExistenceG.TSideTypeP
 import OddOrder.Peterfalvi.S13_PrimeTIResidueBridge
+import OddOrder.GroupTheory.RepresentationTheory.InducedDegreeSum
 
 /-!
 # Peterfalvi (14.9): the T-side prime-TI anchor
@@ -81,6 +82,132 @@ theorem exists_typeIII_primeTIredZero_with_inner [Finite G]
       simp [OddOrder.Peterfalvi.S09.Hypothesis71.constOne]
     rw [← hconst]
     exact OddOrder.Peterfalvi.S09.Cert.inner_induce_trivialChar_constOne_eq_one s06.K
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.9)(a), source data for the T-side projection.**
+The concrete prime-TI anchor `ν₀ = Ind_{T'}^T 1_{T'}` has self-inner-product `p`
+and is orthogonal to every `Ind_{T'}^T θ` with `θ ≠ 1`.
+
+These are Coq's `cfnorm_prTIred` and `omuS1` inputs in the norm-rigidity proof of
+`FTtype34_structure`. Keeping the universal induced-family orthogonality alongside
+the concrete anchor avoids replacing the (11.9)(a) projection by an opaque coefficient
+assumption downstream. -/
+theorem exists_typeIII_primeTIredZero_with_projectionData [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T) :
+    ∃ ν0 : ClassFunction ↥hyp.base.T ℂ,
+      ν0 ∈ ZIrr ↥hyp.base.T ∧
+        ClassFunction.IsReal ν0 ∧
+        ν0.support ⊆
+          ((derivedInG hyp.base.T).subgroupOf hyp.base.T : Set ↥hyp.base.T) ∧
+        ν0 1 = (hyp.base.p : ℂ) ∧
+        ClassFunction.inner ν0 (trivialClassFunction ↥hyp.base.T) = 1 ∧
+        ClassFunction.inner ν0 ν0 = (hyp.base.p : ℂ) ∧
+        ∀ θ : IrreducibleCharacter
+            ((derivedInG hyp.base.T).subgroupOf hyp.base.T),
+          θ ≠ trivialIrreducibleCharacter _ →
+          ClassFunction.inner ν0
+            (ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T)
+              θ.toClassFunction) = 0 := by
+  classical
+  let td : OddOrder.GroupTheory.TypeIIIData hyp.base.T := hIII.some
+  have hP : OddOrder.BG.Ch4.S14.IsTypeP hyp.base.T :=
+    OddOrder.BG.Ch4.S16.isTypeP_of_isTypeIII hG hyp.base.T_maximal hIII
+  let s06 : OddOrder.Peterfalvi.S06.Hypothesis ↥hyp.base.T :=
+    OddOrder.Peterfalvi.S12.typePData_toS06Hypothesis td.typeP hG.odd
+      (OddOrder.Peterfalvi.S12.typePData_W1_hall_coprime
+        hG hyp.base.T_maximal hP td.typeP)
+  letI : NeZero (Nat.card ↥s06.W1) := ⟨Nat.card_pos.ne'⟩
+  letI : NeZero (Nat.card ↥s06.W2) := ⟨Nat.card_pos.ne'⟩
+  let residue : PrimeTIResidueData ↥hyp.base.T s06.K
+      (Nat.card ↥s06.W1) (Nat.card ↥s06.W2) :=
+    PrimeTIResidueData.ofS06Hypothesis s06 ⊤ le_top
+  refine ⟨residue.primeTIred 0, residue.prTIred_mem_ZIrr 0, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  · change (residue.primeTIred 0).conj = residue.primeTIred 0
+    rw [← residue.cfInd_prTIres 0, residue.prTIres0,
+      ClassFunction.induce_conj, trivialClassFunction_isReal]
+  · haveI : s06.K.Normal := s06.K_normal
+    change (residue.primeTIred 0).support ⊆ (s06.K : Set ↥hyp.base.T)
+    rw [← residue.cfInd_prTIres 0, residue.prTIres0]
+    exact ClassFunction.support_induce_subset_of_normal s06.K
+      (trivialClassFunction ↥s06.K)
+  · calc
+      residue.primeTIred 0 1 = (Nat.card ↥s06.W1 : ℂ) := by
+        rw [← residue.cfInd_prTIres 0, residue.prTIres0,
+          ClassFunction.induce_apply_one, s06.index_K_eq,
+          trivialClassFunction_apply, mul_one]
+      _ = (Nat.card ↥td.typeP.W1 : ℂ) := by
+        congr 1
+        exact Nat.card_congr
+          (Subgroup.subgroupOfEquivOfLe td.typeP.W1_le).toEquiv
+      _ = (hyp.base.p : ℂ) := by rw [T_typeIII_card_W1 hyp td]
+  · change ClassFunction.inner (residue.primeTIred 0)
+        (trivialClassFunction ↥hyp.base.T) = 1
+    rw [← residue.cfInd_prTIres 0, residue.prTIres0]
+    have hconst :
+        OddOrder.Peterfalvi.S09.Hypothesis71.constOne ↥hyp.base.T =
+          trivialClassFunction ↥hyp.base.T := by
+      ext t
+      simp [OddOrder.Peterfalvi.S09.Hypothesis71.constOne]
+    rw [← hconst]
+    exact OddOrder.Peterfalvi.S09.Cert.inner_induce_trivialChar_constOne_eq_one s06.K
+  · calc
+      ClassFunction.inner (residue.primeTIred 0) (residue.primeTIred 0) =
+          (Nat.card ↥s06.W1 : ℂ) := residue.cfnorm_prTIred 0
+      _ = (Nat.card ↥td.typeP.W1 : ℂ) := by
+        congr 1
+        exact Nat.card_congr
+          (Subgroup.subgroupOfEquivOfLe td.typeP.W1_le).toEquiv
+      _ = (hyp.base.p : ℂ) := by rw [T_typeIII_card_W1 hyp td]
+  · intro θ hθ
+    change ClassFunction.inner (residue.primeTIred 0)
+        (ClassFunction.induce s06.K θ.toClassFunction) = 0
+    rw [← residue.cfInd_prTIres 0, residue.prTIres0]
+    exact OddOrder.RepresentationTheory.inner_induce_trivial_induce_eq_zero hθ
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.9)(a), norm of the T-side bridge source.**
+For a nonprincipal irreducible source `θ` of `T'`, the bridge
+`β_{T,0} = ν₀ - Ind_{T'}^T θ` has norm `p + 1`.
+
+This is the source-side equality used in Coq's `normX_le_q`: the anchor has
+norm `p`, the induced member has norm `1`, and the two cross terms vanish
+by `omuS1`. -/
+theorem exists_typeIII_primeTIDifference_induced_inner_self [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T)
+    (θ : IrreducibleCharacter
+      ((derivedInG hyp.base.T).subgroupOf hyp.base.T))
+    (hθne : θ ≠ trivialIrreducibleCharacter _)
+    (hζirr : IsIrreducibleCharacter
+      (ClassFunction.induce
+        ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction)) :
+    ∃ ν0 : ClassFunction ↥hyp.base.T ℂ,
+      ν0 ∈ ZIrr ↥hyp.base.T ∧
+        ClassFunction.IsReal ν0 ∧
+        ν0.support ⊆
+          ((derivedInG hyp.base.T).subgroupOf hyp.base.T : Set ↥hyp.base.T) ∧
+        ν0 1 = (hyp.base.p : ℂ) ∧
+        ClassFunction.inner ν0 (trivialClassFunction ↥hyp.base.T) = 1 ∧
+        ClassFunction.inner
+            (ν0 - ClassFunction.induce
+              ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction)
+            (ν0 - ClassFunction.induce
+              ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction) =
+          ((hyp.base.p : ℕ) + 1 : ℂ) := by
+  obtain ⟨ν0, hνZ, hνR, hνsupp, hν1, hνone, hνnorm, hνθ⟩ :=
+    exists_typeIII_primeTIredZero_with_projectionData hG hyp hIII
+  have hθν : ClassFunction.inner
+      (ClassFunction.induce
+        ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction) ν0 = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hνθ θ hθne, star_zero]
+  refine ⟨ν0, hνZ, hνR, hνsupp, hν1, hνone, ?_⟩
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_sub_right, hνnorm, hνθ θ hθne, hθν,
+    hζirr.inner_self_eq_one]
+  ring
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- The T-side prime-TI anchor, with the Frobenius-reciprocity coefficient
