@@ -373,6 +373,76 @@ theorem disjoint_conjugatesIntoSet_sharpP_union_typePV_Tderived [Finite G]
   disjoint_conjugatesIntoSet_S_Tderived_of_p_dvd hG hyp fun _ hy =>
     p_dvd_orderOf_of_mem_sharpP_union_typePV hG hyp hy
 
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (14.9), cross-Dade orthogonality from the exact support inputs.**
+
+This is the final consumer of the two genuine character-theoretic residuals in the
+`τ_T`/`τ_S` cross term.  Full `A₀(T)` normed-TI identifies the T-side Dade map with
+induction, while `supp(β_S) ⊆ P# ∪ V_S` places the S-side Dade map in its already-proved
+`A₀(S)` induction range.  The exact order separator above then makes the induced
+characters orthogonal.
+
+No support or TI content is hidden here: `hTI` and `hbeta` are precisely the two deep
+inputs still to be supplied by Peterfalvi (13.2.e) and (13.18.a), respectively. -/
+theorem tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_exact_supports [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    [fintypeG : Fintype G] [invertibleG : Invertible (Nat.card G : ℂ)]
+    (dataT : OddOrder.GroupTheory.TypePData hyp.base.T)
+    (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T)
+    (hTI : OddOrder.GroupTheory.IsTISubset
+      (OddOrder.GroupTheory.typePA0 hyp.base.T dataT) hyp.base.T)
+    (hbeta : (OddOrder.Peterfalvi.S15.betaGrid hyp.base
+      ⟨1, by have := hyp.base.three_le_p; omega⟩).support ⊆
+        {y : ↥hyp.base.S |
+          (y : G) ∈ OddOrder.GroupTheory.sharpSubgroup hyp.base.P ∪
+            OddOrder.GroupTheory.conjClassSetIn hyp.base.S
+              (OddOrder.GroupTheory.typePV hyp.base.S hyp.base.Sdata)})
+    {φ : ClassFunction ↥hyp.base.T ℂ}
+    (hφsupp : φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T) :
+    ClassFunction.inner (tSideDadeMap hyp hG φ)
+      (OddOrder.Peterfalvi.S15.tauSbetaGrid hG hyp.base) = 0 := by
+  have hfintype : fintypeG =
+      OddOrder.Peterfalvi.S12.FiniteInduce.finiteGFintype := Subsingleton.elim _ _
+  subst fintypeG
+  have hinvertible : invertibleG =
+      OddOrder.Peterfalvi.S12.FiniteInduce.natCardInvCG := Subsingleton.elim _ _
+  subst invertibleG
+  have hsig : OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T =
+      OddOrder.GroupTheory.sharpSubgroup
+        (OddOrder.GroupTheory.derivedInG hyp.base.T) := by
+    rw [← OddOrder.Peterfalvi.S10.typePA_eq_sigmaSharp_of_isTypeP1
+      hG hyp.base.T_maximal dataT hP1,
+      OddOrder.GroupTheory.typePA_eq_sharpSubgroup_derivedInG]
+  have hφderiv : φ.support ⊆
+      {z : ↥hyp.base.T |
+        (z : G) ∈ OddOrder.GroupTheory.sharpSubgroup
+          (OddOrder.GroupTheory.derivedInG hyp.base.T)} := by
+    intro z hz
+    have hz' := hφsupp hz
+    change (z : G) ∈ OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T at hz'
+    rwa [hsig] at hz'
+  have hbetaA0 : (OddOrder.Peterfalvi.S15.betaGrid hyp.base
+      ⟨1, by have := hyp.base.three_le_p; omega⟩).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.Peterfalvi.S15.honestTypeP2A0Set hyp.base.S hyp.base.Sdata)
+        hyp.base.S := by
+    intro y hy
+    exact OddOrder.Peterfalvi.S15.sharpP_union_V_subset_A0 hG hyp.base (hbeta hy)
+  have hTmap : tSideDadeMap hyp hG φ = ClassFunction.induce hyp.base.T φ :=
+    tSideDadeMap_eq_induce_of_isTISubset hG hyp dataT hP1 hTI hφsupp
+  have hSmap : OddOrder.Peterfalvi.S15.tauSbetaGrid hG hyp.base =
+      ClassFunction.induce hyp.base.S
+        (OddOrder.Peterfalvi.S15.betaGrid hyp.base
+          ⟨1, by have := hyp.base.three_le_p; omega⟩) := by
+    rw [OddOrder.Peterfalvi.S15.tauSbetaGrid]
+    exact hyp.base.sInstance_dade0_eq_induce hG hbetaA0
+  rw [hTmap, hSmap]
+  exact OddOrder.Peterfalvi.S15.inner_induce_induce_eq_zero_of_disjoint
+    hφderiv hbeta
+      (disjoint_conjugatesIntoSet_sharpP_union_typePV_Tderived hG hyp).symm
+
 /-- The inner product of two virtual characters is symmetric: its value is
 an integer, hence fixed by complex conjugation. -/
 theorem inner_eq_swap_of_mem_ZIrr [Fintype G]
