@@ -317,3 +317,29 @@ landed sorry-free。次 = (10.10.3) の S₁-relative α^τ: Isometry106:805
 (alpha_tau_image、full-S coh 相対) の証明を読み、SHC_isCoherent (S12_Prop109:629)
 相対に書き直す。ζ^{τ₁} は SHC-extension、(μ₀−ζ)^τ pin は S12_Prop109 の
 (10.9) 諸形態から。その後 (10.10.4) glue (ν := τ₁ on S₁ + ν(μ_j) := δ∑ω)。
+
+## 2026-07-11 tick²⁷ — ★(10.10.3) は 9 割既存と判明 (subagent 依存 map)
+
+- **`SHC_tau_muGridAlpha_eq` (S12_Props109To1011:631) が S₁-relative (10.10.3)
+  そのもの** (sorry-free、§11 (11.8) 用に構築済): coh : IsCoherent hyp.tau
+  hyp.SHCSet hyp.A0 相対で α^τ = δ(ω−ω) − n·coh.extension ζ。追加仮説は
+  **hα0 : ⟨α^τ, coh.extension ζ⟩ = −n のみ**。SHC 側 V-vanishing clone 群
+  (SHC_muGridPsi/tau1_zeta_vanishes、SHC_muGridAlpha_tau_X_inner) も既存。
+- **full-S 版が SHC 化不能な理由** (確認済): muGridAlpha_tau1_zeta_eq_neg_n
+  (Isometry106:102) の a=0 論法が可約列 μ_k に coh.tau1/isometry を使う
+  (Isometry106:126/131) — μ_k ∉ Z[S₁]。⟹ wrapper 不可、book 経路 (b) が正。
+- **hα0 discharge の既存版は §11 固定** (muGridAlpha_tau_residual_norm :914、
+  hRn : R.card = n) — (10.10.3) は |S₁| = 4(w₁−1) ≥ 8, n = 2 で別物。
+  **新規 work = ~40 行の a=0 lemma**: exists_SHC_extension_orthonormal (:768) +
+  inner_self_eq_sum_sq_add_of_intProjection (:835) +
+  muGridAlpha_tau_inner_SHC_extension_sub (:714、係数一定) +
+  sum_sq_eq_of_split (:872、|R| symbolic 済!) + int_le_of_add_inner_self_eq
+  (:892) + muGridAlpha_tau_inner_self (Isometry105:480、‖α^τ‖²=2+n²) +
+  **alpha_coefficient_eq_zero (tick²⁷ 済✓)**。
+- **|S₁| ≥ 8**: card_abelianization_derived_eq_w1_mul_card_SHCSet_add_one
+  (S12_Section9Counts:488、|M'/M''| = w₁·|S₁|+1) + case-(c) の |H:H'| = p²
+  (p³-構造、未形式化) + p = 2w₁−1 → |S₁| = 4(w₁−1)。engine では
+  hS1card : 8 ≤ |SHCSet| を仮説に取り、構造 work と分離。
+- 次 tick: (10.10.3)-flavor a=0 lemma (S12_TypeVCaseC、
+  muGridAlpha_tau_residual_norm :914 を hRn 無しで clone) → hα0 →
+  SHC_tau_muGridAlpha_eq 接続の thin corollary (n=2, δ=−1 pin)。
