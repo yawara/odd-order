@@ -10,6 +10,10 @@ import OddOrder.Peterfalvi.S15_Gate3
 
 Prefix-split from `OddOrder.Peterfalvi.S15_SAndT` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+-- ⚠ 一時例外 (issue 0102): 2000 行超過。次の prefix-split (凍結クラスタの押し出し) で解消予定。
+set_option linter.style.longFile 2200
+
 namespace OddOrder.Peterfalvi.S15
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory
@@ -1672,28 +1676,73 @@ theorem gammaGrid_orthogonal_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
   intro _ _
   convert gammaGrid_orthogonal_one_aux hG hyp using 2 <;> exact Subsingleton.elim _ _
 
-/-- **(13.18.c)** `Γ` is real: `Γ.conj = Γ`.
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(13.18.c)** `Γ` is real: `Γ.conj = Γ` — fully proven (Coq `GammaReal`,
+`PFsection13.v:1911`).
 
-⚠ DEEP §13 RESIDUAL, isolated obligation.  Coq `GammaReal`: conjugation commutes with `Ind` and
-with the Dade map (`cfAutInd`, `Dtau`), and sends grid entries to their conjugate index
-(`prTIirr_aut`, `cfAut_cycTIiso`: `η̄_{0j} = η_{0,-j}`, `μ̄_{0j} = μ_{0,-j}`), so
-`Γ̄ = τ_S(β̄_{#1}) − 1_G + η̄_{01}` collapses back to `Γ` via `defGamma` at the conjugate column.
-The Dade/grid conjugation-commutation facts are not yet in the repo. -/
+Conjugation commutes with the Dade lift on `A₀(S)`-supported inputs
+(`dadeIntegralCharacterMap_conj_of_support` at `betaGrid_A0_support`) and with induction
+(`induce_conj`, the trivial character being real), and sends grid entries to the negated index
+(`mu_conj`/`eta_conj`, the CF-level (4.9.a)/(3.9.a) fields; `finNeg 0 = 0`).  So
+`Γ̄ = τ_S(β_{−#1}) − 1_G + η_{0,−#1}`, which is `Γ` by the proven `j`-independence
+`gammaGrid_defGamma` at the conjugate column `−#1 = p−1 ≠ 0`. -/
 theorem gammaGrid_real [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
-    (GammaGrid hG hyp).conj = GammaGrid hG hyp := sorry
+    (GammaGrid hG hyp).conj = GammaGrid hG hyp := by
+  classical
+  set j1 : Fin hyp.p := ⟨1, by have := hyp.three_le_p; omega⟩ with hj1def
+  set j' : Fin hyp.p := OddOrder.Peterfalvi.S15.finNeg hyp.p_prime.pos j1 with hj'def
+  have hp3 := hyp.three_le_p
+  have hj'0 : (j' : ℕ) ≠ 0 := by
+    simp only [hj'def, OddOrder.Peterfalvi.S15.finNeg, hj1def]
+    rw [Nat.mod_eq_of_lt (by omega)]
+    omega
+  have hneg0 : OddOrder.Peterfalvi.S15.finNeg hyp.q_prime.pos ⟨0, hyp.q_prime.pos⟩
+      = ⟨0, hyp.q_prime.pos⟩ := by
+    apply Fin.ext
+    simp [OddOrder.Peterfalvi.S15.finNeg]
+  -- the trivial pieces are real
+  have hconst : (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G).conj
+      = OddOrder.Peterfalvi.S09.Hypothesis71.constOne G := by
+    ext g
+    simp [OddOrder.Peterfalvi.S09.Hypothesis71.constOne, ClassFunction.conj_apply]
+  -- `β̄_{#1} = β_{−#1}`: `Ind_{PW₁}^S 1` is real, `μ̄_{01} = μ_{0,−#1}`
+  have hbeta_conj : (betaGrid hyp j1).conj = betaGrid hyp j' := by
+    rw [betaGrid, betaGrid, ClassFunction.conj_sub, hyp.mu_conj ⟨0, hyp.q_prime.pos⟩ j1,
+      hneg0]
+    congr 1
+    rw [indPW1, ClassFunction.induce_conj]
+    congr 1
+    ext g
+    simp [ClassFunction.conj_apply, trivialClassFunction]
+  -- the Dade lift commutes with conjugation on the `A₀(S)`-supported `β_{#1}`
+  have hDconj : (tauSbetaGrid hG hyp).conj
+      = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
+          ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG))
+          (betaGrid hyp j') := by
+    rw [tauSbetaGrid,
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_conj_of_support _ _
+        (betaGrid_A0_support hG hyp j1 (by simp [hj1def])),
+      hbeta_conj]
+  -- assemble and close by `defGamma` at the conjugate column
+  rw [show GammaGrid hG hyp = tauSbetaGrid hG hyp
+      - OddOrder.Peterfalvi.S09.Hypothesis71.constOne G
+      + hyp.eta ⟨0, hyp.q_prime.pos⟩ j1 from rfl,
+    ClassFunction.conj_add, ClassFunction.conj_sub, hDconj, hconst,
+    hyp.eta_conj ⟨0, hyp.q_prime.pos⟩ j1, hneg0]
+  exact gammaGrid_defGamma hG hyp j' hj'0
 
 /-- **(13.18.d) residual-norm bound**: for any split `Γ = X + Y` with `X ⊥ Y` and `Y` orthogonal to
 the whole `η`-grid `{η_{ik}}`, `‖Y‖² ≤ (u−1)/q`.
 
 ⚠ DEEP §13 RESIDUAL, isolated obligation.  Coq's (13.18.d) argument (`PFsection13.v:1915-1934`)
 bounds `‖Y‖²` using `‖β_{#1}‖² = (u−1)/q + 2` (`betaGrid_norm`), the Dade isometry
-`‖τ_S β‖² = ‖β‖²` on `A₀(S)`-support (`dadeIntegralCharacterMap_inner_eq_on_supported_span`), and the
-decomposition `β_{#1} = Γ − η_{01} + 1_G` with the `η_{01}`/`1_G` orthogonalities peeled off, then
-splits off the grid-projection `X` (a `≠ 0` combination of the `η_{ik}`, whence the `X + Y` framing —
-`‖Γ‖²` itself is **not** bounded, correcting the earlier `Re⟨Γ,Γ⟩ ≤ (u−1)/q + 1` overstatement,
-issue 3003).  It needs the (13.18.a,c) orthogonalities plus the on-support isometry, hence gated on
-the same `A₀(S)` normedTI content. -/
+`‖τ_S β‖² = ‖β‖²` on `A₀(S)`-support (`dadeIntegralCharacterMap_inner_eq_on_supported_span`),
+and the decomposition `β_{#1} = Γ − η_{01} + 1_G` with the `η_{01}`/`1_G` orthogonalities peeled
+off, then splits off the grid-projection `X` (a `≠ 0` combination of the `η_{ik}`, whence the
+`X + Y` framing — `‖Γ‖²` itself is **not** bounded, correcting the earlier
+`Re⟨Γ,Γ⟩ ≤ (u−1)/q + 1` overstatement, issue 3003).  It needs the (13.18.a,c) orthogonalities
+plus the on-support isometry, hence gated on the same `A₀(S)` normedTI content. -/
 theorem gammaGrid_Y_norm_bound [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
@@ -1707,12 +1756,12 @@ and their genuine properties (support (13.18.a), the (13.18.b) norm `‖β_j‖�
 orthogonality of `Γ` to `1_G`, reality, and the (13.18.d) `‖Y‖²` residual bound) are supplied here.
 The concrete `β_j = betaGrid hyp j` and `Γ = GammaGrid hG hyp` are built from the honest `S`-side
 Dade isometry `τ_S` (`hyp.dadeHypS0`, **not** the `= 0` placeholder `hyp.tauS`) and the induced
-trivial character `Ind_{PW₁}^S 1`.  The bundled properties are the precisely-isolated §13 obligations
-`betaGrid_support` / `betaGrid_norm` / `gammaGrid_orthogonal_one` / `gammaGrid_real` /
-`gammaGrid_Y_norm_bound`; the (13.18.c) `j`-independence is the standalone `gammaGrid_defGamma`
-(proven, modulo the (4.8)/(5.3) cross-relation `tauS_mu_row0_cross`).  Their deep content bottoms out
-at the (13.2.e) `A₀(S)` normedTI Dade=Ind bridge, the (5.3) `S`↔`W` Dade cross-relation, and the
-Frobenius norm `norm_induce_one_frobenius`. -/
+trivial character `Ind_{PW₁}^S 1`.  The bundled properties are the precisely-isolated §13
+obligations `betaGrid_support` / `betaGrid_norm` / `gammaGrid_orthogonal_one` /
+`gammaGrid_real` / `gammaGrid_Y_norm_bound`; the (13.18.c) `j`-independence is the standalone
+`gammaGrid_defGamma` (proven, modulo the (4.8)/(5.3) cross-relation `tauS_mu_row0_cross`).
+Their deep content bottoms out at the (13.2.e) `A₀(S)` normedTI Dade=Ind bridge, the (5.3)
+`S`↔`W` Dade cross-relation, and the Frobenius norm `norm_induce_one_frobenius`. -/
 noncomputable def betaData_of_grid [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
@@ -1929,9 +1978,9 @@ structure TypeIOrthogonalityGridData (hyp : Hypothesis (G := G)) {L : Subgroup G
 /-- **Faithful §13 producer for Peterfalvi (13.19).**  The grid/Dade data and facts of (13.19) for a
 type-I maximal `L` with its (12.1) Hypothesis `typeISetup`.  The construction is the §3/§4/§5
 Dade-isometry layer for `L` (the (3.9) `τ`-isometry, σ-pinned via `S05_IntegralSigma`, giving the
-`η`-grid orthogonality) plus the (13.19.c) degree/parity dichotomy from the coherence bounds; this is
-the single isolated deep obligation.  Mirrors the `betaData_of_grid` / `betaM_expansion_data`
-producer pattern. -/
+`η`-grid orthogonality) plus the (13.19.c) degree/parity dichotomy from the coherence bounds;
+this is the single isolated deep obligation.  Mirrors the `betaData_of_grid` /
+`betaM_expansion_data` producer pattern. -/
 noncomputable def typeIOrthogonalityGridData_of_typeISetup [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L) :
@@ -1943,7 +1992,8 @@ cases — the faithful conjunction forms `(c1) = parity ∧ degree bound` and
 `(c2) = η-axis odd-parity ∧ p ≤ e` — holds.
 
 De-opacified (W3 §15): the honest §14 content — the (12.1) `S14.Hypothesis` of `L`
-(`S14.exists_typeI_hypothesis`) and its genuine Dade map `τ₁ = typeISetup.tau` — is constructed here;
+(`S14.exists_typeI_hypothesis`) and its genuine Dade map `τ₁ = typeISetup.tau` —
+is constructed here;
 the opaque `Prop` fields of `TypeIOrthogonalityData` are instantiated to the **genuine** (13.19)
 statements.  `betaL_eta_independent` is instantiated to the faithful (13.19.c) first clause — the
 zero-axis **constancy** of `(β_L^τ, η_{0j})`/`(β_L^τ, η_{i0})` (NOT orthogonality: in case (c2)
