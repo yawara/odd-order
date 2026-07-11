@@ -325,9 +325,12 @@ theorem coherent_SOf_H0C_of_column_identities [Finite G]
     sorry
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (11.8), the genuine non-orthogonality — narrow `𝒮(H₀C)` route** (the honest
-replacement of `S12.exists_zeta_residual_not_orthogonal`, which routed through the deprecated wide
-`Sset \ SHCSet` uniform-degree lemma, false for non-Galois type III/IV, issue 1019).
+/-- **Peterfalvi (11.8), the genuine non-orthogonality — narrow `𝒮(H₀C)` route, refuter core**
+(the honest replacement of `S12.exists_zeta_residual_not_orthogonal`, which routed through the
+deprecated wide `Sset \ SHCSet` uniform-degree lemma, false for non-Galois type III/IV, issue
+1019).  The closing (11.3) noncoherence is the `hrefute` hypothesis (issue 1020 Phase 3), so the
+legacy `S_H0C_not_coherent` (via the partner-sorried `S12.S_not_coherent`) and the unconditional
+heir (`S_H0C_not_coherent_unconditional`, `S13_TypeDetermination`) instantiate one proof.
 
 Under Hypothesis (10.1), there is an irreducible `ζ ∈ S = inducedFamily M` of degree `w₁` for which
 the residual `(μ₀ − ζ)^τ − ∑_i ω_{i0}^σ` is **not** orthogonal to `(Irr W)^σ`.  Same statement as the
@@ -345,13 +348,16 @@ hyp` holds only up to `hbase` (not definitionally), the whole goal is first `rw 
 into the `s13hyp.base`-world, so the S12 machinery and the narrow endpoint share one world and the
 `isCoherent_of_subset ν` restriction keeps `coh.extension = ν.extension` definitionally (feeding `hcol`
 into the capstone with no cast). -/
-theorem exists_zeta_residual_not_orthogonal_H0C [Finite G]
+theorem exists_zeta_residual_not_orthogonal_H0C_of_refuter [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)
     (htype : IsTypeIII M ∨ IsTypeIV M)
     (hM2 : secondDerivedInAmbient M
       = hyp.typeP.H ⊔ (hyp.typeP.U ⊓ Subgroup.centralizer (hyp.typeP.H : Set G)))
-    (hHcard : Nat.card ↥hyp.typeP.H = hyp.w2 ^ hyp.w1) :
+    (hHcard : Nat.card ↥hyp.typeP.H = hyp.w2 ^ hyp.w1)
+    (hrefute : ∀ s13hyp : Hypothesis M,
+      ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+        s13hyp.base.tau (s13hyp.SOf s13hyp.H0C) s13hyp.base.A0)) :
     ∃ ζ : ClassFunction ↥M ℂ, ζ ∈ OddOrder.Peterfalvi.S12.inducedFamily M ∧
       IsIrreducibleCharacter ζ ∧ ζ 1 = (hyp.w1 : ℂ) ∧
       ¬ ∀ (i : Fin hyp.w1) (j : Fin hyp.w2),
@@ -419,9 +425,31 @@ theorem exists_zeta_residual_not_orthogonal_H0C [Finite G]
   -- `hcol` and the unconditional `𝒮(H₀C)`-coherence (`coherent_sOf_H0C`, threaded inside).
   haveI : NeZero (Nat.card (s13hyp.base.toHypothesis46 hG hG.odd).W1) :=
     ⟨by have := (s13hyp.base.toHypothesis46 hG hG.odd).one_lt_card_W1; omega⟩
-  exact S_H0C_not_coherent hG s13hyp (coherent_SOf_H0C_of_column_identities hG s13hyp
+  exact hrefute s13hyp (coherent_SOf_H0C_of_column_identities hG s13hyp
     (isCoherent_of_subset ν (SOf_HC_subset_SHCSet hG s13hyp)
       (coherent_SOf_HC hG s13hyp).some.nonzero) hzS hζHC hζdeg hcol)
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.8)** — the legacy instantiation of
+`exists_zeta_residual_not_orthogonal_H0C_of_refuter` at (11.3) `S_H0C_not_coherent` (which
+routes through the partner-sorried `S12.S_not_coherent`; the honest unconditional
+instantiation lives in `S13_TypeDetermination`, issue 1020 Phase 3). -/
+theorem exists_zeta_residual_not_orthogonal_H0C [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M)
+    (hM2 : secondDerivedInAmbient M
+      = hyp.typeP.H ⊔ (hyp.typeP.U ⊓ Subgroup.centralizer (hyp.typeP.H : Set G)))
+    (hHcard : Nat.card ↥hyp.typeP.H = hyp.w2 ^ hyp.w1) :
+    ∃ ζ : ClassFunction ↥M ℂ, ζ ∈ OddOrder.Peterfalvi.S12.inducedFamily M ∧
+      IsIrreducibleCharacter ζ ∧ ζ 1 = (hyp.w1 : ℂ) ∧
+      ¬ ∀ (i : Fin hyp.w1) (j : Fin hyp.w2),
+        ClassFunction.inner
+          ((hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hG.odd i' 0) - ζ))
+            - ∑ i' : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hG.odd i' 0)
+          (hyp.alignedOmegaSigmaGrid hG hG.odd i j) = 0 :=
+  exists_zeta_residual_not_orthogonal_H0C_of_refuter hG hyp htype hM2 hHcard
+    (fun s13hyp => S_H0C_not_coherent hG s13hyp)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (11.9.b), narrow `𝒮(H₀C)` route** — `w₂ < w₁` (`q > p`) for the §10 hypothesis on a

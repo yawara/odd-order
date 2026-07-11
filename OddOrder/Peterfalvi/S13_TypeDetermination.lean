@@ -36,6 +36,44 @@ open OddOrder.GroupTheory
 open OddOrder.Isaacs
 open scoped Pointwise
 
+namespace Peterfalvi.S13
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce
+
+/-- **Peterfalvi (11.3), unconditional**: `𝒮(H₀C)` is not coherent — `S_H0C_not_coherent`
+re-founded on the unconditional Theorem (10.8) (`S12.S_not_coherent_unconditional`, whose
+partner supply is assembled internally; issue 1020 Phase 3).  If `𝒮(H₀C)` were coherent,
+Theorem (6.3) (`coherent_S_of_coherent_SH0C`) would make the full family `𝒮` coherent. -/
+theorem S_H0C_not_coherent_unconditional {G : Type*} [Group G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (s13hyp : Hypothesis M) :
+    ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      s13hyp.base.tau (s13hyp.SOf s13hyp.H0C) s13hyp.base.A0) :=
+  fun hcoh => OddOrder.Peterfalvi.S12.S_not_coherent_unconditional hG s13hyp.base
+    (coherent_S_of_coherent_SH0C hG s13hyp hcoh)
+
+/-- **Peterfalvi (11.9.b), unconditional** — `w₂ < w₁` for the §10 hypothesis on a type-III/IV
+maximal subgroup: the refuter core `exists_zeta_residual_not_orthogonal_H0C_of_refuter`
+instantiated at the unconditional (11.3) (`S_H0C_not_coherent_unconditional`), composed with
+the coherence-free reduction `w2_lt_w1_of_residual_not_orthogonal`.  This is the honest heir
+of `w2_lt_w1_of_hypothesis_H0C` (whose (11.3) routes through the partner-sorried
+`S12.S_not_coherent`), and the `feitThompson`-spine consumer via
+`card_kappaHall_lt_of_isTypeIIIorIV` below (issue 1020 Phase 3). -/
+theorem w2_lt_w1_of_hypothesis_H0C_unconditional {G : Type*} [Group G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M)
+    (hM2 : secondDerivedInAmbient M
+      = hyp.typeP.H ⊔ (hyp.typeP.U ⊓ Subgroup.centralizer (hyp.typeP.H : Set G)))
+    (hHcard : Nat.card ↥hyp.typeP.H = hyp.w2 ^ hyp.w1) :
+    hyp.w2 < hyp.w1 := by
+  obtain ⟨ζ, hζS, hζirr, hζ1, h118⟩ :=
+    exists_zeta_residual_not_orthogonal_H0C_of_refuter hG hyp htype hM2 hHcard
+      (fun s13hyp => S_H0C_not_coherent_unconditional hG s13hyp)
+  exact OddOrder.Peterfalvi.S12.w2_lt_w1_of_residual_not_orthogonal hG hyp hζS hζirr hζ1 h118
+
+end Peterfalvi.S13
+
 /-- **Peterfalvi (11.9.b), character core** (Peterfalvi §11
 coherence / Dade norm).  For a Type III/IV maximal subgroup `S` (the Hypothesis (11.2) case), with
 κ-Hall factor `K` and dual factor `K* = M_σ(S) ⊓ C_G(K)`, the coherence / norm-inequality bound on
@@ -46,11 +84,13 @@ The proof is now **fully assembled** from three pieces: (i) the carrier translat
 `K` and `W₁` complement `M'`, so both equal the derived index — `card_kappaHall_eq_derived_index`,
 `TypePData.card_W1_eq_derived_index`); (ii) the carrier translation `|K*| = w₂`
 (`card_Msigma_inf_centralizer_eq_card_W2`, axiom-clean BG §14 group theory); and (iii) the §11
-character reduction `w₂ < w₁` (`S13.w2_lt_w1_of_hypothesis_H0C` — the honest narrow-`𝒮(H₀C)` route,
-issue 1019; the deprecated wide `S12.w2_lt_w1_of_hypothesis` and its false uniform-degree lemma have
-been retired).  All of (i)/(ii) and the reduction spine of (iii) are proven; the residual is the
-genuine Peterfalvi (11.8) non-orthogonality (`S13.exists_zeta_residual_not_orthogonal_H0C`), whose
-remaining `sorry`s are the §14 Sibley glue `(6.7)`/`(5.8)`, the `(9.11)` caseA refuter, and `(10.8)`. -/
+character reduction `w₂ < w₁` (`S13.w2_lt_w1_of_hypothesis_H0C_unconditional` — the honest
+narrow-`𝒮(H₀C)` route on the unconditional (11.3), issues 1019/1020; the deprecated wide
+`S12.w2_lt_w1_of_hypothesis` and its false uniform-degree lemma have been retired).  All of
+(i)/(ii) and the reduction spine of (iii) are proven; the residual is the genuine Peterfalvi
+(11.8) non-orthogonality (`S13.exists_zeta_residual_not_orthogonal_H0C_of_refuter`), whose
+remaining `sorry`s are the §14 Sibley glue `(6.7)`/`(5.8)` and the `(9.11)` caseA refuter
+(the former `(10.8)` residual is discharged by `S_not_coherent_unconditional`). -/
 theorem card_kappaHall_lt_of_isTypeIIIorIV {G : Type*} [Group G] [Finite G]
     (hG : IsMinimalSimpleOdd G) {S K Kstar : Subgroup G}
     (hS : S ∈ maximalSubgroups G) (hSP : BG.Ch4.S14.IsTypeP S) (hKS : K ≤ S)
@@ -87,7 +127,8 @@ theorem card_kappaHall_lt_of_isTypeIIIorIV {G : Type*} [Group G] [Finite G]
   -- `S13.w2_lt_w1_of_hypothesis_H0C`, replacing the deprecated wide `S12.w2_lt_w1_of_hypothesis`
   -- whose uniform-degree lemma is false for non-Galois type III/IV, issue 1019).
   rw [hKstarw2, hKw1]
-  exact OddOrder.Peterfalvi.S13.w2_lt_w1_of_hypothesis_H0C hG hyp hIIIorIV hM2 hHcard
+  exact OddOrder.Peterfalvi.S13.w2_lt_w1_of_hypothesis_H0C_unconditional hG hyp hIIIorIV hM2
+    hHcard
 
 /-- **Peterfalvi (13.2.a), character core** (mmd §13, `references/peterfalvi/04.15_*`).
 
