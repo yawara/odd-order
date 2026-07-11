@@ -830,3 +830,29 @@ feature commit: `c1fa962c`.
   merge/design gate の対象として分離する。
 - main `cce4dbc8` 同期後、FeitThompson build と AxiomsCheck (4149 jobs) は exit 0。
   9 theorem を AxiomsCheck 登録済み。新 axiom・新 sorry なし。
+
+
+### main 同期後の TTypeII consumer 再監査 (2026-07-12)
+
+main `cce4dbc8` の最新 `TTypeII.lean` を concrete producer landing 後に再監査した。
+前節の「full orbit が T-side abstract consumer への残 input」という診断は
+`tSideDadeMap_eta_axis_coefficients_constant` 単体については正しいが、
+`T_typeIII_ratio_le` の最後の `hresidual` 全体については orbit だけでは閉じない。
+
+現 `TTypeII.lean` の局所 `sorry` は次の四出力を一括している:
+
+1. sharp norm bound `sum m_ij^2 <= p` — 最新 main で concrete residual 非零 producer から
+   既に実証明済み (`hsumSqT`)。
+2. zero-column projection equality — full row/column orbit を thread して axis constancy を得た後、
+   full-grid column-or-row 二分法を適用し、さらに (11.8) non-orthogonality で wrong-axis
+   alternative を排除する必要がある。
+3. `mu_01(z)=0` for `z in S' minus P` — 現 repo に abstract producer がなく、prime-TI
+   residue grid と `hyp.mu` の pointwise grounding がまだ必要。
+4. `mu_01(x)=1` on `W1#` — main で
+   `Hypothesis.mu_row0_apply_eq_one_of_mem_W1` が landing 済み。
+
+従って正確な次 frontier は三本:
+(a) concrete full-orbit の carrier threading、
+(b) (11.8) wrong-axis refuter、
+(c) prime-TI `mu_01` derived-complement vanishing。
+orbit threading だけで `T_typeIII_ratio_le` が閉じるとは扱わない。
