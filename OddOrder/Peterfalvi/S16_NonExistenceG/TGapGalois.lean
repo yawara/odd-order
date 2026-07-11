@@ -33,6 +33,22 @@ theorem primeTIred_zero_mapRingEquiv
   ext x
   simp [ClassFunction.mapRingEquiv_apply, trivialClassFunction_apply]
 
+/-- If a Galois transport changes `φ` only by a correction orthogonal to the
+transported test function, then every integral coefficient of `φ` is unchanged. -/
+theorem inner_eq_intCast_of_mapRingEquiv_eq_add
+    {L : Type*} [Group L] [Fintype L]
+    [Invertible (Nat.card L : ℂ)]
+    (σc : ℂ ≃+* ℂ) (hstar : ∀ z : ℂ, σc (star z) = star (σc z))
+    {φ η η' correction : ClassFunction L ℂ} (m : ℤ)
+    (hφ : ClassFunction.mapRingEquiv σc φ = φ + correction)
+    (hη : ClassFunction.mapRingEquiv σc η = η')
+    (hm : ClassFunction.inner φ η = (m : ℂ))
+    (hcorrection : ClassFunction.inner correction η' = 0) :
+    ClassFunction.inner φ η' = (m : ℂ) := by
+  have htransport := ClassFunction.mapRingEquiv_inner σc hstar φ η
+  rw [hφ, hη, ClassFunction.inner_add_left, hcorrection, add_zero, hm] at htransport
+  simpa using htransport
+
 variable {G : Type*} [Group G]
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -68,5 +84,66 @@ theorem tSideDadeMap_mapRingEquiv_bridge [Finite G]
   congr 1
   rw [ClassFunction.mapRingEquiv_sub, hν0]
   abel
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- A supported difference of two coherent-family members has Dade image
+orthogonal to every test function orthogonal to the two coherent images. -/
+theorem tSideDadeMap_inner_eq_zero_of_coherent_difference [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    [Fintype ↥hyp.base.T] [Invertible (Nat.card ↥hyp.base.T : ℂ)]
+    {S : Set (ClassFunction ↥hyp.base.T ℂ)}
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent (tSideDadeMap hyp hG) S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T))
+    {ζ ζ' : ClassFunction ↥hyp.base.T ℂ} (hζ : ζ ∈ S) (hζ' : ζ' ∈ S)
+    (hdiffSupp : (ζ - ζ').support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T)
+    {η : ClassFunction G ℂ}
+    (horth : ∀ ξ ∈ S, ClassFunction.inner (coh.extension ξ) η = 0) :
+    ClassFunction.inner (tSideDadeMap hyp hG (ζ - ζ')) η = 0 := by
+  have hdiffSupported : ζ - ζ' ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.base.T) S
+        (OddOrder.Peterfalvi.S04.supportInSubgroup
+          (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T) := by
+    refine ⟨Submodule.sub_mem _ (Submodule.subset_span hζ)
+      (Submodule.subset_span hζ'), hdiffSupp⟩
+  rw [← coh.extends_on_supported (ζ - ζ') hdiffSupported, map_sub,
+    ClassFunction.inner_sub_left, horth ζ hζ, horth ζ' hζ', sub_zero]
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.9)(a), integral coefficient transport** (Coq `a_aut`).
+The Galois bridge identity and coherent-difference orthogonality force an
+integral eta coefficient to be constant along the chosen Galois transport. -/
+theorem tSideDadeMap_inner_galois_eq_intCast [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    [Fintype ↥hyp.base.T] [Invertible (Nat.card ↥hyp.base.T : ℂ)]
+    (σc : ℂ ≃+* ℂ) (hstar : ∀ z : ℂ, σc (star z) = star (σc z))
+    {ν0 ζ : ClassFunction ↥hyp.base.T ℂ}
+    {η η' : ClassFunction G ℂ} (m : ℤ)
+    (hν0 : ClassFunction.mapRingEquiv σc ν0 = ν0)
+    (hbridgeSupp : (ν0 - ζ).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T)
+    (hη : ClassFunction.mapRingEquiv σc η = η')
+    (hm : ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ)) η = (m : ℂ))
+    {S : Set (ClassFunction ↥hyp.base.T ℂ)}
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent (tSideDadeMap hyp hG) S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T))
+    (hζ : ζ ∈ S) (hσζ : ClassFunction.mapRingEquiv σc ζ ∈ S)
+    (hcorrSupp : (ζ - ClassFunction.mapRingEquiv σc ζ).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T)
+    (horth : ∀ ξ ∈ S, ClassFunction.inner (coh.extension ξ) η' = 0) :
+    ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ)) η' = (m : ℂ) := by
+  apply inner_eq_intCast_of_mapRingEquiv_eq_add σc hstar m
+  · exact tSideDadeMap_mapRingEquiv_bridge hG hyp σc hν0 hbridgeSupp
+  · exact hη
+  · exact hm
+  · exact tSideDadeMap_inner_eq_zero_of_coherent_difference hG hyp coh
+      hζ hσζ hcorrSupp horth
 
 end OddOrder.Peterfalvi.S16
