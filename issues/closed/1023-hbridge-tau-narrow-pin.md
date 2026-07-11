@@ -307,3 +307,41 @@ IsCoherent 構成は既存 IntegralCharacterMap 機構 (Zisometry_of_cfnorm 相�
    ⟹ ξ(1)·⟨c.ext μ₁, ωcol₁⟩ = ξ(1)·w₁、ξ(1) ≠ 0 → ⟨c.ext μ₁, ωcol₁⟩ = w₁。
 4. norm 論法: ‖c.ext μ₁‖² = ‖μ₁‖² = w₁ (extension_inner_eq)、‖ωcol₁‖² = w₁
    (alignedOmegaSigmaGrid_inner)、⟨,⟩ = w₁ → ‖差‖² = 0 → **c.ext μ₁ = ωcol₁**。
+
+## 2026-07-12 tick¹⁴ — ★★★★ case-1 完全証明 (c9d3c92f)、case-2 精密化
+
+- case-1 (∃ irr ξ) sorry-free。S13_Orthogonality の残 bare sorry = capstone hbridge_τ 1 本。
+- **case-2 分析の更新**:
+  - w₂ ≥ 5 では irr 不要の変種が可能: γ = μ_k(1)•μ₁ − μ₁(1)•μ_k (第 2 の列 k ∉ {1, 1̄}) で
+    同じ γ-trick が走る (⟨c.ext μ_k, Ω₁⟩ = 0 は R(μ_k)-family (col k/k̄ 台) ⊥ col-1 grid)。
+  - **w₂ = 3 all-reducible では counting+列独立で符号反転解 (c.ext μ₁ = Ω₂ = conj-column) が
+    生き残る** (座標分析済) — Coq の odd_eq_conj_irr1 排除に対応する内容が本質的に必要。
+    ⟹ 素直な canonical **swap-構成** (ext₀ : columnSum k ↦ Ω_k、hcol-diff で τ-agreement、
+    両側 orthonormal で等長) で回避が正道 (tick⁸ 案)。全 w₂ を single 構成でカバーできるので
+    w₂≥5 変種も不要になる。
+  - 構成の道具: IntegralCharacterMap を orthogonal family 上の像指定から作る constructor —
+    glue engine (exists_integralCharacterMap_glue_of_orthogonal) の内部機構を確認して再利用
+    (S07 の Zisometry_of_cfnorm 相当)。supported-characterization は
+    inducedKernelFamily_zSpan_support_of_apply_one_eq_zero の逆向き不要 (τ-agreement は
+    supported 元 = 係数和 0 = 列差 lattice 上で hcol-diff から直接)。
+  - ⚠ 正確には「𝒮(H₀C) all-reducible ⟹ 𝒮(H₀C) ⊆ {μ-columns}」(SOf_reducible_eq_columnSum)
+    だが逆包含は不要 — 構成は family = 𝒮(H₀C) の members への像指定で足りる (各 member が
+    ある column ⟹ 像 = 対応 Ω_k; well-defined 性 = column-指定の一意性 (列は相異なる character、
+    columnSum injective in k — 2×2 の hne1-論法で列 index 一意)。
+- **exists_pinned 組立**: case split `∃ ξ ∈ 𝒮(H₀C), Irr ξ` → case-1 (coherent_sOf_H0C の c を
+  pin 付きで返す) / else → case-2 構成。capstone は exists_pinned の c を glue に使い、
+  hbridge_τ = pin + ν-線形性。
+
+## 2026-07-12 tick¹⁵ — ★★★★★ 完遂: hbridge_τ discharge、capstone sorry-free (issue close)
+
+- commits: 39b8e023 (SOf-generic dispatch) → 87da4bdf (hmixed) → f3d0f84b (world-bridge) →
+  9baa4b26/c9d3c92f (case-1 γ-trick pin) → (case-2 skeleton/充填) → 8d5ec014 (hbridge_τ)。
+- **S13_Orthogonality は bare-sorry ゼロ**。capstone (11.8.6) は pinned-coherence 経由で完結:
+  case-1 (γ-trick、dichotomy/separability/odd-conjugation 全て不要の直接 norm 論法) +
+  case-2 (canonical coherentImageMap 構成、Coq uniform_prTIred swap の構成的実体)。
+- axiom 実測: capstone / w2_lt_w1_of_hypothesis_H0C_unconditional = [propext, sorryAx,
+  Classical.choice, Quot.sound] — **sorryAx は coherent_sOf_H0C 内の caseA refuter
+  (lane b S11_NineElevenCoherence) 経由のみ**。(11.9.b)-unconditional → (13.2.a) → spine の
+  lane-a 側 math は全て実証明済。
+- full build green (4166 jobs、AxiomsCheck 含む)。
+- followup (別 issue 不要の備忘): H0Cprime 版 dispatch 5+2 decls の SOf 版への fold (低優先)。
