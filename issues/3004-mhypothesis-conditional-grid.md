@@ -700,3 +700,21 @@ feature commit: `7476d279`。
 - axis 二分法は AxiomsCheck 登録済み。AxiomsCheck (4140 jobs) は exit 0、
   `git diff --check` clean。新 leaf は sorry-free、`TTypeII` は 1499 行・既存 2 sorry のまま。
   新 axiom・新 sorry なし。
+
+## lane-c (11.9.a) full eta-grid 二分法 (2026-07-11)
+
+feature commit: `03ada912`。
+
+- `etaGrid_coefficients_eq_column_or_row` を実証明。principal coefficient `m₀₀=1`、
+  nonprincipal row/column axis constancy、four-corner relation、および三軸係数の norm bound を
+  入力し、全 `i,j` について係数関数そのものが
+  `mᵢⱼ=[j=0]` (zero-column) または `mᵢⱼ=[i=0]` (zero-row) のいずれかであることを返す。
+  前節の三係数二分法を、zero/nonzero index の全4ケースへ four-corner relation で持ち上げた。
+- したがって `bridgeS1` の純算術・full-grid reconstruction は closed。残る
+  character-theoretic inputs は (i) `m₀₀=1`、(ii) Galois による axis constancy、
+  (iii) residual nonzero による axis norm bound `≤p` の三つ。これらを新 theorem へ渡した後、
+  (11.8) non-orthogonality で zero-row alternative を排除すれば、目的の
+  `mᵢⱼ=[j=0]` と既存 projection-to-row consumer が得られる。
+- 新 theorem は AxiomsCheck 登録済み。AxiomsCheck (4140 jobs) は exit 0、
+  `git diff --check` clean。`TGapProjectionRigidity` は 299 行・sorry-free。
+  新 axiom・新 sorry なし。
