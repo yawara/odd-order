@@ -129,3 +129,20 @@ muS_diff_support → `hyp46Smp` (certainTypeS-based Hypothesis46、FT.lean:360) 
 - V-value pin 側 (`certainType_diff_dade_apply_eq_of_mem_V`) が tau 本質使用で sorried-cite に
   なる点は issue 記載どおり問題なし (off-spine cite の正規形)。
 - 再 landing 順序 (9080 step 1 との前後) は b の自律判断。
+
+## ✅ lane-b 実装 (2026-07-11, commit ef1f172a): Core-split 本体 landed
+
+裁定 (b) の実装条件 (i)(ii) + FT producer 側を完了:
+- `Hypothesis46Core` + `@[reducible] Hypothesis46.toCore` (S06_CertainHypothesis46)。
+  Hypothesis46 本体・field 名・dot-access は無変更 (a の S12_Core:1057 構築は無影響)。
+- (4.7)-chain 6 本 + (4.8)-(1) engine 5 本を Core-typed 化、call site 30 箇所 .toCore 追従。
+- `hyp46SmpCore` (FT.lean): Dade-free producer core。⚠ 実装知見: 証明 field を
+  `(hyp46Smp …).field` の projection で書くと **hyp46Smp 定数経由で sorried Dade pin が
+  axiom closure に入る** — verbatim 複製が必須。
+- **検証済**: full build green (4152 jobs) / `#print axioms muS_diff_support` =
+  standard 3 axioms のみ (sorryAx 消滅)。
+
+**残タスク (次セッション)**: c2400d81 の cherry-pick 再 landing (mu_diff_support field
+threading、3 files +30 行、構築サイト不変を確認済) → AxiomsCheck の producer assert
+(厳格形のまま) が green を維持することを確認 → 本 issue close。その後 9076
+(tauS_mu_row0_diff_support の hj0/hdeg signature 修正) が field から discharge 可能。
