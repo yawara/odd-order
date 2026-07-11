@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S10_MinimalSimpleBasic
 import OddOrder.Peterfalvi.S08_YsetInner
+import OddOrder.Peterfalvi.S06_CertainHypothesis46
 
 /-!
 # Peterfalvi (10.10) case (a): type-V Sibley coordinates
@@ -126,5 +127,77 @@ theorem typePA_isTISubset_of_typeV_TI [Finite G]
   rw [typePA_eq_sharpSubgroup_derivedInG, hHeq]
   rw [hN] at hTI
   exact hTI
+
+/-! ## Assembly prerequisites for the `SibleyDadeHypothesis` construction
+
+The (6.8)(c2) branch of the Sibley datum needs the (4.6) carrier `Hypothesis46` in the
+`sharpImage`-coordinate; `toHypothesis46` produces it in the `typePA`-coordinate.  The
+support-set parameters are propositionally equal (`typePA = (M')^# = sharpImage`), so a
+single structure-level cast (`castSet`) bridges them; its `dade` is then *the* Sibley
+`dade` field by definition (the `h46.dade = dade` conjunct of `cases` becomes `rfl`), and
+the `A`-independent projections (`K`, `W₁`, `W₂` — fields of the (4.2) part) are preserved
+(`castSet_K` etc., by `subst`). -/
+
+section CastSet
+
+variable [Fintype G] {A B : Set G} {L : Subgroup G} [Fintype ↥L]
+variable [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
+
+/-- Transport a Peterfalvi (4.6) carrier along an equality of support sets. -/
+def hypothesis46CastSet (h : A = B)
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A L) :
+    OddOrder.Peterfalvi.S06.Hypothesis46 B L := h ▸ h46
+
+@[simp] theorem hypothesis46CastSet_K (h : A = B)
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A L) :
+    (hypothesis46CastSet h h46).K = h46.K := by subst h; rfl
+
+@[simp] theorem hypothesis46CastSet_W1 (h : A = B)
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A L) :
+    (hypothesis46CastSet h h46).W1 = h46.W1 := by subst h; rfl
+
+@[simp] theorem hypothesis46CastSet_W2 (h : A = B)
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A L) :
+    (hypothesis46CastSet h h46).W2 = h46.W2 := by subst h; rfl
+
+end CastSet
+
+/-- **`W₂` lands in the derived subgroup of `M'` in the `↥M`-coordinate**:
+`W₂.subgroupOf M ≤ ⁅(M').subgroupOf M, (M').subgroupOf M⁆`.  From the `TypePData` field
+`W₂ ≤ H ⊓ M''` and the identification of the `↥M`-commutator of `(M').subgroupOf M` with
+the ambient second derived subgroup (`map_commutator` + `map_subtype_commutator`).  This is
+the `W₂ ≤ ⁅H, H⁆` side condition of the Sibley (6.8)(c2) `cases` conjunct. -/
+theorem TypePData.W2_subgroupOf_le_commutator {M : Subgroup G} (data : TypePData M) :
+    data.W2.subgroupOf M
+      ≤ ⁅(derivedInG M).subgroupOf M, (derivedInG M).subgroupOf M⁆ := by
+  have hmap : Subgroup.map M.subtype
+      ⁅(derivedInG M).subgroupOf M, (derivedInG M).subgroupOf M⁆
+        = secondDerivedInAmbient M := by
+    rw [Subgroup.map_commutator, Subgroup.subgroupOf_map_subtype,
+      inf_of_le_left (show derivedInG M ≤ M from Subgroup.map_subtype_le _)]
+    exact (Subgroup.map_subtype_commutator (derivedInG M)).symm
+  intro x hx
+  have hxsd : (x : G) ∈ secondDerivedInAmbient M :=
+    (inf_le_right : data.H ⊓ secondDerivedInAmbient M ≤ _)
+      (data.W2_le (Subgroup.mem_subgroupOf.mp hx))
+  rw [← hmap] at hxsd
+  obtain ⟨y, hyC, hyx⟩ := Subgroup.mem_map.mp hxsd
+  exact (Subtype.ext hyx : y = x) ▸ hyC
+
+/-- **Type V has nilpotent `(M').subgroupOf M`**: for type V, `M' = M_F` is the maximal
+nilpotent normal Hall subgroup (`derivedInG_eq_H` + `H_eq`), whose nilpotency transports
+to the `↥M`-coordinate along `subgroupOfEquivOfLe`.  This is the Sibley `H_nilpotent`
+field (Peterfalvi (6.8.a)). -/
+theorem TypeVData.isNilpotent_derivedInG_subgroupOf [Finite G] {M : Subgroup G}
+    (dV : TypeVData M) :
+    Group.IsNilpotent ↥((derivedInG M).subgroupOf M) := by
+  have hMF : derivedInG M = maxNilpotentNormalHall M :=
+    (TypeVData.derivedInG_eq_H dV dV.typeP).trans dV.typeP.H_eq
+  haveI : Group.IsNilpotent ↥(derivedInG M) := by
+    rw [hMF]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent M
+  exact Group.nilpotent_of_mulEquiv
+    (Subgroup.subgroupOfEquivOfLe
+      (show derivedInG M ≤ M from Subgroup.map_subtype_le _)).symm
 
 end OddOrder.Peterfalvi.S12
