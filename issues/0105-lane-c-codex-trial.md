@@ -164,3 +164,5 @@ issue は trial ログの追記継続のため open 維持、次の節目 (T-sid
 - 2026-07-11 (tick、merge 7a8c3d47): (11.9a) Galois bridge transport 分解 + strict T projection bound。
   TTypeII (肥大化) を TTypeIICoherence へ自主分割 (633 行移設、粒度規約の自発遵守 2 回目)。新 leaf
   2 件とも配線済 (orphan なし)、実 sorry ±0。21/21。
+- 2026-07-11 (tick、merge 61113a9a): (11.9a) Galois transport 3 連 — canonical prime-TI anchor 固定
+  + calT1 の Galois closure + induction transport (+102、実 sorry ±0、assert 2 本 build 通過)。22/22。
