@@ -153,3 +153,6 @@ issue は trial ログの追記継続のため open 維持、次の節目 (T-sid
   build 通過)。17/17。
 - 2026-07-11 (tick、merge b0813b64): (11.9a) eta projection residual bound 強化 (+89 行、実 sorry
   ±0、assert 3 本 build 通過)。18/18。
+- 2026-07-11 (tick、merge a99bda11): (11.9a) nonzero eta residual witness + anchor orthogonality
+  縮小 (新 leaf TGapProjectionResidual +138、hub file 経由の自主配線 = orphan 予防を自発遵守、
+  実 sorry ±0、assert 2 本 build 通過)。19/19。
