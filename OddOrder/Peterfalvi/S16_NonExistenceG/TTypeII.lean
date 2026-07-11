@@ -586,8 +586,16 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           (∀ x : ↥hyp.base.S, (x : G) ∈ hyp.base.W1 → x ≠ 1 →
             hyp.base.mu ⟨0, hyp.base.q_prime.pos⟩
               ⟨1, by have := hyp.base.three_le_p; omega⟩ x = 1) := by
-        refine ⟨hsumSqT, ?_⟩
-        sorry
+        refine ⟨hsumSqT, ?_, ?_, ?_⟩
+        · -- Coq (11.9): the remaining zero-column projection producer.
+          sorry
+        · intro z hzS' hzP
+          exact sSide_mu_row0_apply_eq_zero_of_mem_derived_not_mem_P
+            hG hyp.base ⟨1, by have := hyp.base.three_le_p; omega⟩
+              (fun h => one_ne_zero (congrArg Fin.val h)) z hzS' hzP
+        · intro x hxW1 hx1
+          exact hyp.base.mu_row0_apply_eq_one_of_mem_W1 hG
+            ⟨1, by have := hyp.base.three_le_p; omega⟩ x hxW1 hx1
       have hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T := by
         obtain ⟨_, _, hcIII_IV, _, _, _⟩ :=
           OddOrder.BG.Ch4.S16.proposition_type_classification
