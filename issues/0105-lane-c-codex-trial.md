@@ -175,3 +175,6 @@ issue は trial ログの追記継続のため open 維持、次の節目 (T-sid
   signature 不変・statement 完全保存の proof 縮約・9 assert 登録・carrier threading は自ら hub gate
   に分離して未実装 (模範的 claim-before-build)。hub は merge 時承認 + threading 条件付き事前承認
   (3004)。25/25。
+- 2026-07-12 (tick、merge 7dcbd371): **9084 redirect を実施して self-close** — TGapCross 4 定理を
+  S15 正本 cite に置換 (−207 行、dup 解消)、(11.9a) eta projection norm 圧縮 + (14.9) S-side beta
+  support discharge (+244、実 sorry ±0)。裁定→実施→close の full cycle を 1 tick で完結。26/26。
