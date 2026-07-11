@@ -93,4 +93,46 @@ theorem tSide_etaGridProjection_residual_ne_zero_of_coherent_pair [Finite G]
   rw [OddOrder.RepresentationTheory.inner_conj_symm, hcorr,
     ClassFunction.inner_sub_left, hζeta i j, hζceta i j, sub_zero, star_zero]
 
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- Specialise the coherent-pair residual witness to the bridge source `ν₀ - ζ`.
+It is enough that the prime-TI anchor `ν₀` be orthogonal to both `ζ` and `ζ̄`;
+the coherent family supplies `ζ ⟂ ζ̄` and irreducibility supplies `‖ζ‖² = 1`,
+so `⟨ν₀-ζ, ζ-ζ̄⟩ = -1`. -/
+theorem tSide_etaGridProjection_residual_ne_zero_of_anchor_orthogonal [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T)
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    [Fintype ↥hyp.base.T] [Invertible (Nat.card ↥hyp.base.T : ℂ)]
+    {S : Set (ClassFunction ↥hyp.base.T ℂ)}
+    (hyp07 : OddOrder.Peterfalvi.S07.Hypothesis
+      (L := ↥hyp.base.T) (G := G) S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T))
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent
+      (tSideDadeMap hyp hG) S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T))
+    (hsupp : ∀ ξ ∈ S, (ξ - ξ.conj).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T)
+    {ν0 ζ : ClassFunction ↥hyp.base.T ℂ}
+    (hζ : ζ ∈ S) (hζirr : IsIrreducibleCharacter ζ)
+    (hbridgeSupp : (ν0 - ζ).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T)
+    (hνζ : ClassFunction.inner ν0 ζ = 0)
+    (hνζc : ClassFunction.inner ν0 ζ.conj = 0)
+    (m : Fin hyp.base.q → Fin hyp.base.p → ℤ) :
+    tSideDadeMap hyp hG (ν0 - ζ) - etaGridProjection hyp.base m ≠ 0 := by
+  apply tSide_etaGridProjection_residual_ne_zero_of_coherent_pair
+    hG hyp hIII hyp07 coh hsupp hζ hζirr hbridgeSupp ?_ m
+  have hζc : ζ.conj ∈ S := hyp07.conjugate_closed hζ
+  have hζne : ζ ≠ ζ.conj := hyp07.ne_conj hζ
+  have hζζc : ClassFunction.inner ζ ζ.conj = 0 :=
+    hyp07.pairwise_orthogonal hζ hζc hζne
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_sub_right, hνζ, hνζc, hζirr.inner_self_eq_one, hζζc]
+  norm_num
+
 end OddOrder.Peterfalvi.S16
