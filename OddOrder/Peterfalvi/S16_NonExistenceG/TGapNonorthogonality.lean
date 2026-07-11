@@ -143,6 +143,67 @@ theorem s12Tau_zeroColumn_sub_eq_tSideDadeMap [Finite G]
   simpa only [hyp12, s12HypothesisOfTypePData,
     OddOrder.Peterfalvi.S12.Hypothesis.tau] using hmap.symm
 
+open scoped Classical in
+/-- **Peterfalvi (11.8.6), grid-parametric column assembly.**
+The opening identity is purely linear and does not depend on how the
+`omegaSigma` grid was constructed.  Given the rowwise `alpha` images and the
+normalized zero-column image for any grid, it assembles
+`tau (mu_j - d*zeta) = sum_i grid_ij - d*zeta^tau1`.
+
+This is the arbitrary-σ counterpart of
+`S12.Hypothesis.tau_muColumnSum_sub_zeta_eq_of_alphaImage`; it is needed for
+the S15 `eta` grid, whose σ-isometry is valid but not definitionally the
+canonical S12 choice. -/
+theorem tau_muColumnSum_sub_zeta_eq_of_grid_alphaImage [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
+    (j : Fin hyp.w2) {zeta : ClassFunction ↥M ℂ} {d n : ℕ}
+    (grid : Fin hyp.w1 → Fin hyp.w2 → ClassFunction G ℂ)
+    (hd : (d : ℂ) = (hyp.w1 : ℂ) * (n : ℂ) + 1)
+    (halpha : ∀ i : Fin hyp.w1,
+      hyp.tau
+          (hyp.muGrid hG hG.odd i j - hyp.muGrid hG hG.odd i 0 -
+            (n : ℂ) • zeta) =
+        grid i j - grid i 0 - (n : ℂ) • coh.extension zeta)
+    (hzero : hyp.tau
+        ((∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i 0) - zeta) =
+      (∑ i : Fin hyp.w1, grid i 0) - coh.extension zeta) :
+    hyp.tau
+        ((∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j) - (d : ℂ) • zeta) =
+      (∑ i : Fin hyp.w1, grid i j) - (d : ℂ) • coh.extension zeta := by
+  have hMlevel :
+      ((∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j) - (d : ℂ) • zeta) =
+        ((∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i 0) - zeta) +
+          ∑ i : Fin hyp.w1,
+            (hyp.muGrid hG hG.odd i j - hyp.muGrid hG hG.odd i 0 -
+              (n : ℂ) • zeta) := by
+    have hsum :
+        (∑ i : Fin hyp.w1,
+          (hyp.muGrid hG hG.odd i j - hyp.muGrid hG hG.odd i 0 -
+            (n : ℂ) • zeta)) =
+          (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j) -
+            (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i 0) -
+              ((hyp.w1 : ℂ) * (n : ℂ)) • zeta := by
+      rw [Finset.sum_sub_distrib, Finset.sum_sub_distrib, ← Finset.smul_sum,
+        Finset.sum_const, Finset.card_univ, Fintype.card_fin,
+        ← Nat.cast_smul_eq_nsmul (R := ℂ), smul_smul, mul_comm]
+    rw [hsum, hd]
+    module
+  rw [hMlevel, map_add, hzero, map_sum,
+    Finset.sum_congr rfl (fun i _ => halpha i)]
+  have hsum :
+      (∑ i : Fin hyp.w1,
+        (grid i j - grid i 0 - (n : ℂ) • coh.extension zeta)) =
+        (∑ i : Fin hyp.w1, grid i j) -
+          (∑ i : Fin hyp.w1, grid i 0) -
+            ((hyp.w1 : ℂ) * (n : ℂ)) • coh.extension zeta := by
+    rw [Finset.sum_sub_distrib, Finset.sum_sub_distrib, ← Finset.smul_sum,
+      Finset.sum_const, Finset.card_univ, Fintype.card_fin,
+      ← Nat.cast_smul_eq_nsmul (R := ℂ), smul_smul, mul_comm]
+  rw [hsum, hd]
+  module
+
 /-- **Peterfalvi (10.2)--(10.3), character parameters based at a specified
 family member.**  The arithmetic data `d`, `delta`, and `n` depend only on the
 maximal subgroup.  Hence the standard parameter construction can retain any
