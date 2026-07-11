@@ -1,4 +1,4 @@
-import OddOrder.Peterfalvi.S16_NonExistenceG.TGapCross
+import OddOrder.Peterfalvi.S16_NonExistenceG.TGapProjection
 import OddOrder.Peterfalvi.S16_NonExistenceG.KeyInequalityArithmetic
 import OddOrder.Peterfalvi.S16_GridExpansion
 
@@ -1098,6 +1098,8 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       exists_typeIII_induced_primeTIDifference_with_norm
         hG hyp hIII θ (hne θ hθ) hζirr_ind hζ1_ind
     rw [hζeq] at hβZ hβsupp hτβZ hτβ1 hβconj hβnorm hτβnorm
+    obtain ⟨mT, hmT, hpythT, hboundT⟩ :=
+      exists_etaGrid_intProjection_of_inner_self_eq hyp.base hτβZ hτβnorm
     have hζone : ClassFunction.inner ζ
         (trivialClassFunction ↥hyp.base.T) = 0 := by
       rw [← hζeq]
