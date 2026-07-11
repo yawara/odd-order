@@ -1154,24 +1154,256 @@ theorem gammaGrid_real [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     hyp.eta_conj ⟨0, hyp.q_prime.pos⟩ j1, hneg0]
   exact gammaGrid_defGamma hG hyp j' hj'0
 
-/-- **(13.18.d) residual-norm bound**: for any split `Γ = X + Y` with `X ⊥ Y` and `Y` orthogonal to
-the whole `η`-grid `{η_{ik}}`, `‖Y‖² ≤ (u−1)/q`.
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The (13.18) residual `Γ` is a virtual character**: each constituent of
+`Γ = τ_S(β_{#1}) − 1_G + η_{01}` lies in `ℤ[Irr G]` — the Dade image via the `'A0` Dade=Ind
+bridge (`sInstance_dade0_eq_induce` + `induce_mem_ZIrr`, with `β_{#1} ∈ ℤ[Irr S]` from
+`induce_mem_ZIrr` on the trivial character and irreducibility of `μ_{01}`), the trivial
+character, and `η_{01} = τ₃(ω_{01})` (`tau3_mem_ZIrr` + `omega_mem_ZIrr`).  Feeds the
+integrality of `⟨Γ, η_{01}⟩` in the (13.18.d) bound. -/
+theorem gammaGrid_mem_ZIrr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    GammaGrid hG hyp ∈ OddOrder.RepresentationTheory.ZIrr G := by
+  classical
+  have hp3 := hyp.three_le_p
+  set j1 : Fin hyp.p := ⟨1, by omega⟩ with hj1def
+  have hj1ne : (j1 : ℕ) ≠ 0 := by simp [hj1def]
+  have hβZ : betaGrid hyp j1 ∈ OddOrder.RepresentationTheory.ZIrr ↥hyp.S := by
+    refine Submodule.sub_mem _ ?_
+      (OddOrder.RepresentationTheory.IsIrreducibleCharacter.mem_ZIrr
+        (hyp.mu_irreducible _ j1))
+    have htriv := (OddOrder.RepresentationTheory.trivialIrreducibleCharacter
+      ↥((hyp.P ⊔ hyp.W1).subgroupOf hyp.S)).isIrreducible
+    rw [OddOrder.RepresentationTheory.IrreducibleCharacter.coe_trivialIrreducibleCharacter]
+      at htriv
+    exact OddOrder.RepresentationTheory.ClassFunction.induce_mem_ZIrr _
+      (OddOrder.RepresentationTheory.IsIrreducibleCharacter.mem_ZIrr htriv)
+  have hTZ : tauSbetaGrid hG hyp ∈ OddOrder.RepresentationTheory.ZIrr G := by
+    rw [tauSbetaGrid,
+      hyp.sInstance_dade0_eq_induce hG (betaGrid_A0_support hG hyp j1 hj1ne)]
+    exact OddOrder.RepresentationTheory.ClassFunction.induce_mem_ZIrr _ hβZ
+  rw [show GammaGrid hG hyp = tauSbetaGrid hG hyp
+      - OddOrder.Peterfalvi.S09.Hypothesis71.constOne G
+      + hyp.eta ⟨0, hyp.q_prime.pos⟩ j1 from rfl]
+  refine Submodule.add_mem _ (Submodule.sub_mem _ hTZ ?_) ?_
+  · have htriv := (OddOrder.RepresentationTheory.trivialIrreducibleCharacter G).isIrreducible
+    rw [OddOrder.RepresentationTheory.IrreducibleCharacter.coe_trivialIrreducibleCharacter]
+      at htriv
+    exact OddOrder.RepresentationTheory.IsIrreducibleCharacter.mem_ZIrr htriv
+  · rw [hyp.eta_eq_tau_omega]
+    exact hyp.tau3_mem_ZIrr _ (hyp.omega_mem_ZIrr _ j1)
 
-⚠ DEEP §13 RESIDUAL, isolated obligation.  Coq's (13.18.d) argument (`PFsection13.v:1915-1934`)
-bounds `‖Y‖²` using `‖β_{#1}‖² = (u−1)/q + 2` (`betaGrid_norm`), the Dade isometry
-`‖τ_S β‖² = ‖β‖²` on `A₀(S)`-support (`dadeIntegralCharacterMap_inner_eq_on_supported_span`),
-and the decomposition `β_{#1} = Γ − η_{01} + 1_G` with the `η_{01}`/`1_G` orthogonalities peeled
-off, then splits off the grid-projection `X` (a `≠ 0` combination of the `η_{ik}`, whence the
-`X + Y` framing — `‖Γ‖²` itself is **not** bounded, correcting the earlier
-`Re⟨Γ,Γ⟩ ≤ (u−1)/q + 1` overstatement, issue 3003).  It needs the (13.18.a,c) orthogonalities
-plus the on-support isometry, hence gated on the same `A₀(S)` normedTI content. -/
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- Core of the **(13.18.d) residual-norm bound**, with the `FiniteInduce`-scoped instances
+(Coq `PFsection13.v:1915-1934`).  The chain: `‖τ_S β₁‖² = ‖β₁‖² = (u−1)/q + 2` (Dade isometry
+on `A₀(S)`-support + `betaGrid_norm`); peel `1_G` (`⟨Γ,1⟩ = 0`, `⟨η_{01},1⟩ = 0`), peel `Y`
+(`X ⊥ Y`, `Y ⊥ η`-grid); then split `X − η_{01} = X₁ + a·η_{0,−1} + (a−1)·η_{01}` where
+`a = ⟨Γ, η_{01}⟩ ∈ ℤ` (`gammaGrid_mem_ZIrr`), using `Γ` real ((13.18.c)) and
+`η̄_{01} = η_{0,−1} ⊥ η_{01}`; drop `‖X₁‖² ≥ 0` and close with the integer inequality
+`a² + (a−1)² ≥ 1`. -/
+private theorem gammaGrid_Y_norm_bound_aux [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (X Y : ClassFunction G ℂ) (defXY : GammaGrid hG hyp = X + Y)
+    (oXY : ClassFunction.inner X Y = 0)
+    (oYeta : ∀ (i : Fin hyp.q) (k : Fin hyp.p), ClassFunction.inner Y (hyp.eta i k) = 0) :
+    (ClassFunction.inner Y Y).re ≤ ((hyp.u : ℚ) - 1) / (hyp.q : ℚ) := by
+  classical
+  have hp3 := hyp.three_le_p
+  set j1 : Fin hyp.p := ⟨1, by omega⟩ with hj1def
+  set i0 : Fin hyp.q := ⟨0, hyp.q_prime.pos⟩ with hi0def
+  set j' : Fin hyp.p := OddOrder.Peterfalvi.S15.finNeg hyp.p_prime.pos j1 with hj'def
+  have hj1ne : (j1 : ℕ) ≠ 0 := by simp [hj1def]
+  set η01 : ClassFunction G ℂ := hyp.eta i0 j1 with hη01def
+  set η01' : ClassFunction G ℂ := hyp.eta i0 j' with hη01'def
+  -- index bookkeeping: `j' ≠ j1`, `j1 ≠ 0`, `finNeg 0 = 0`
+  have hj'ne : j' ≠ j1 := by
+    intro h
+    have hval := congrArg Fin.val h
+    simp only [hj'def, OddOrder.Peterfalvi.S15.finNeg, hj1def] at hval
+    rw [Nat.mod_eq_of_lt (by omega)] at hval
+    omega
+  have hneg0 : OddOrder.Peterfalvi.S15.finNeg hyp.q_prime.pos i0 = i0 := by
+    apply Fin.ext
+    simp [OddOrder.Peterfalvi.S15.finNeg, hi0def]
+  -- `η̄_{01} = η_{0,−1}` (the (3.9.a) conj-pair field at `finNeg 0 = 0`)
+  have hconj : η01.conj = η01' := by
+    rw [hη01def, hyp.eta_conj i0 j1, hneg0, hη01'def, hj'def]
+  -- grid orthonormality instances
+  have h_11 : ClassFunction.inner η01 η01 = 1 := by
+    have h := OddOrder.Peterfalvi.S16.eta_orthonormal hyp i0 i0 j1 j1
+    rw [if_pos ⟨rfl, rfl⟩] at h
+    exact h
+  have h_1'1 : ClassFunction.inner η01' η01 = 0 := by
+    have h := OddOrder.Peterfalvi.S16.eta_orthonormal hyp i0 i0 j' j1
+    rw [if_neg (by rintro ⟨-, h2⟩; exact hj'ne h2)] at h
+    exact h
+  have h_11' : ClassFunction.inner η01 η01' = 0 := by
+    have h := OddOrder.Peterfalvi.S16.eta_orthonormal hyp i0 i0 j1 j'
+    rw [if_neg (by rintro ⟨-, h2⟩; exact hj'ne h2.symm)] at h
+    exact h
+  have h_1'1' : ClassFunction.inner η01' η01' = 1 := by
+    have h := OddOrder.Peterfalvi.S16.eta_orthonormal hyp i0 i0 j' j'
+    rw [if_pos ⟨rfl, rfl⟩] at h
+    exact h
+  -- `1_G = η_{00}` and its orthogonalities
+  have hone : OddOrder.Peterfalvi.S09.Hypothesis71.constOne G
+      = hyp.eta i0 ⟨0, hyp.p_prime.pos⟩ := by
+    rw [OddOrder.Peterfalvi.S16.eta_principal_eq_trivial hyp]
+    rfl
+  have hη01_one : ClassFunction.inner η01
+      (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G) = 0 := by
+    rw [hone]
+    have h := OddOrder.Peterfalvi.S16.eta_orthonormal hyp i0 i0 j1 ⟨0, hyp.p_prime.pos⟩
+    rw [if_neg (by
+      rintro ⟨-, h2⟩
+      exact hj1ne (by simpa using congrArg Fin.val h2))] at h
+    exact h
+  have hΓone : ClassFunction.inner (GammaGrid hG hyp)
+      (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G) = 0 :=
+    gammaGrid_orthogonal_one hG hyp
+  -- Pythagoras helper
+  have pyth : ∀ A B : ClassFunction G ℂ, ClassFunction.inner A B = 0 →
+      ClassFunction.inner (A + B) (A + B)
+        = ClassFunction.inner A A + ClassFunction.inner B B := by
+    intro A B hAB
+    have hBA : ClassFunction.inner B A = 0 := by
+      rw [ClassFunction.inner_star_comm, hAB, star_zero]
+    rw [ClassFunction.inner_add_left, ClassFunction.inner_add_right,
+      ClassFunction.inner_add_right, hAB, hBA]
+    ring
+  -- the isometry: `‖τ_S β₁‖² = ‖β₁‖² = (u−1)/q + 2`
+  have hTT : ClassFunction.inner (tauSbetaGrid hG hyp) (tauSbetaGrid hG hyp)
+      = ((((hyp.u : ℚ) - 1) / (hyp.q : ℚ) + 2 : ℚ) : ℂ) := by
+    rw [tauSbetaGrid,
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
+        (hyp.dadeHypS0 hG) (hyp.dadeHypS0_hconj hG)
+        (betaGrid_A0_support hG hyp j1 hj1ne) (betaGrid_A0_support hG hyp j1 hj1ne)]
+    exact betaGrid_norm hG hyp j1 hj1ne
+  -- Pythagoras 1: `τ_S β₁ = (Γ − η_{01}) + 1_G`
+  have hTdecomp : tauSbetaGrid hG hyp
+      = (GammaGrid hG hyp - η01) + OddOrder.Peterfalvi.S09.Hypothesis71.constOne G := by
+    rw [show GammaGrid hG hyp = tauSbetaGrid hG hyp
+        - OddOrder.Peterfalvi.S09.Hypothesis71.constOne G + η01 from rfl]
+    abel
+  have hP1 : ClassFunction.inner (tauSbetaGrid hG hyp) (tauSbetaGrid hG hyp)
+      = ClassFunction.inner (GammaGrid hG hyp - η01) (GammaGrid hG hyp - η01) + 1 := by
+    rw [hTdecomp, pyth _ _ (by
+      rw [ClassFunction.inner_sub_left, hΓone, hη01_one, sub_zero]),
+      OddOrder.Peterfalvi.S09.Hypothesis71.constOne_inner_self_eq_one]
+  -- Pythagoras 2: `Γ − η_{01} = (X − η_{01}) + Y`
+  have hP2 : ClassFunction.inner (GammaGrid hG hyp - η01) (GammaGrid hG hyp - η01)
+      = ClassFunction.inner (X - η01) (X - η01) + ClassFunction.inner Y Y := by
+    have hd : GammaGrid hG hyp - η01 = (X - η01) + Y := by rw [defXY]; abel
+    have oY01 : ClassFunction.inner Y η01 = 0 := oYeta i0 j1
+    rw [hd, pyth _ _ (by
+      rw [ClassFunction.inner_sub_left, oXY]
+      rw [show ClassFunction.inner η01 Y = 0 by
+        rw [ClassFunction.inner_star_comm, oY01, star_zero]]
+      ring)]
+  -- the grid coefficient `a = ⟨Γ, η_{01}⟩` is an integer `m`
+  have hηZ : η01 ∈ OddOrder.RepresentationTheory.ZIrr G := by
+    rw [hη01def, hyp.eta_eq_tau_omega]
+    exact hyp.tau3_mem_ZIrr _ (hyp.omega_mem_ZIrr i0 j1)
+  obtain ⟨m, hm⟩ := OddOrder.RepresentationTheory.ClassFunction.inner_mem_ZIrr_int
+    (gammaGrid_mem_ZIrr hG hyp) hηZ
+  -- `⟨X, η_{01}⟩ = m` and `⟨X, η_{0,−1}⟩ = m` (the latter via `Γ` real + conj-pair)
+  have hXη : ClassFunction.inner X η01 = (m : ℂ) := by
+    have h := congrArg (fun φ : ClassFunction G ℂ => ClassFunction.inner φ η01) defXY
+    simp only [ClassFunction.inner_add_left] at h
+    have oY01 : ClassFunction.inner Y η01 = 0 := oYeta i0 j1
+    rw [oY01, add_zero] at h
+    rw [← h, hm]
+  have hΓη' : ClassFunction.inner (GammaGrid hG hyp) η01' = (m : ℂ) := by
+    rw [← hconj, ← gammaGrid_real hG hyp,
+      OddOrder.RepresentationTheory.ClassFunction.inner_conj_conj,
+      ClassFunction.inner_star_comm, hm, star_intCast]
+  have hXη' : ClassFunction.inner X η01' = (m : ℂ) := by
+    have h := congrArg (fun φ : ClassFunction G ℂ => ClassFunction.inner φ η01') defXY
+    simp only [ClassFunction.inner_add_left] at h
+    have oY01' : ClassFunction.inner Y η01' = 0 := oYeta i0 j'
+    rw [oY01', add_zero] at h
+    rw [← h, hΓη']
+  -- Pythagoras 3+4: `X − η_{01} = (X₁ + m·η_{0,−1}) + (m−1)·η_{01}`
+  set X1 : ClassFunction G ℂ := X - (m : ℂ) • η01 - (m : ℂ) • η01' with hX1def
+  have hX1η : ClassFunction.inner X1 η01 = 0 := by
+    rw [hX1def, ClassFunction.inner_sub_left, ClassFunction.inner_sub_left,
+      ClassFunction.inner_smul_left, ClassFunction.inner_smul_left,
+      hXη, h_11, h_1'1]
+    ring
+  have hX1η' : ClassFunction.inner X1 η01' = 0 := by
+    rw [hX1def, ClassFunction.inner_sub_left, ClassFunction.inner_sub_left,
+      ClassFunction.inner_smul_left, ClassFunction.inner_smul_left,
+      hXη', h_11', h_1'1']
+    ring
+  have hXdecomp : X - η01 = (X1 + (m : ℂ) • η01') + ((m : ℂ) - 1) • η01 := by
+    rw [hX1def, sub_smul, one_smul]
+    abel
+  have hstar_m : star ((m : ℂ)) = (m : ℂ) := star_intCast m
+  have hstar_m1 : star ((m : ℂ) - 1) = (m : ℂ) - 1 := by
+    rw [star_sub, star_one, hstar_m]
+  have hP3 : ClassFunction.inner (X - η01) (X - η01)
+      = ClassFunction.inner (X1 + (m : ℂ) • η01') (X1 + (m : ℂ) • η01')
+        + ((m : ℂ) - 1) * ((m : ℂ) - 1) := by
+    rw [hXdecomp, pyth _ _ (by
+      rw [ClassFunction.inner_smul_right, ClassFunction.inner_add_left,
+        ClassFunction.inner_smul_left, hX1η, h_1'1]
+      ring)]
+    rw [ClassFunction.inner_smul_left, ClassFunction.inner_smul_right, hstar_m1, h_11]
+    ring
+  have hP4 : ClassFunction.inner (X1 + (m : ℂ) • η01') (X1 + (m : ℂ) • η01')
+      = ClassFunction.inner X1 X1 + (m : ℂ) * (m : ℂ) := by
+    rw [pyth _ _ (by rw [ClassFunction.inner_smul_right, hX1η', hstar_m]; ring),
+      ClassFunction.inner_smul_left, ClassFunction.inner_smul_right, hstar_m, h_1'1']
+    ring
+  -- assemble the ℂ-level identity and take real parts
+  have hX1re := OddOrder.RepresentationTheory.ClassFunction.inner_self_eq_re X1
+  have hchain : ((((hyp.u : ℚ) - 1) / (hyp.q : ℚ) + 2 : ℚ) : ℂ)
+      = (((ClassFunction.inner X1 X1).re : ℝ) : ℂ)
+        + ((m * m + (m - 1) * (m - 1) : ℤ) : ℂ)
+        + ClassFunction.inner Y Y + 1 := by
+    rw [← hTT, hP1, hP2, hP3, hP4, ← hX1re]
+    push_cast
+    ring
+  have hre := congrArg Complex.re hchain
+  simp only [Complex.add_re, Complex.one_re, Complex.ofReal_re, Complex.intCast_re,
+    Complex.ratCast_re] at hre
+  -- final integer inequality `m² + (m−1)² ≥ 1` and the nonnegativity of `‖X₁‖²`
+  have hmm1 : (1 : ℤ) ≤ m * m + (m - 1) * (m - 1) := by
+    by_cases h : 1 ≤ m
+    · nlinarith
+    · have h' : m ≤ 0 := by omega
+      nlinarith
+  have hX1nonneg : 0 ≤ (ClassFunction.inner X1 X1).re :=
+    OddOrder.RepresentationTheory.ClassFunction.inner_self_re_nonneg X1
+  have hmm1' : (1 : ℝ) ≤ ((m * m + (m - 1) * (m - 1) : ℤ) : ℝ) := by exact_mod_cast hmm1
+  have hgoal : (ClassFunction.inner Y Y).re
+      = ((((hyp.u : ℚ) - 1) / (hyp.q : ℚ) + 2 : ℚ) : ℝ)
+        - (ClassFunction.inner X1 X1).re
+        - ((m * m + (m - 1) * (m - 1) : ℤ) : ℝ) - 1 := by linarith [hre]
+  rw [hgoal]
+  push_cast at hmm1' ⊢
+  linarith
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(13.18.d) residual-norm bound**: for any split `Γ = X + Y` with `X ⊥ Y` and `Y` orthogonal
+to the whole `η`-grid `{η_{ik}}`, `‖Y‖² ≤ (u−1)/q` — fully proven (Coq `PFsection13.v:1915-1934`;
+the earlier `Re⟨Γ,Γ⟩ ≤ (u−1)/q + 1` overstatement was corrected in issue 3003: `‖Γ‖²` itself is
+**not** bounded, only the grid-orthogonal residual `Y`).  Public form of
+`gammaGrid_Y_norm_bound_aux`, reconciling the caller's `Fintype G`/`Invertible` instances with
+the `FiniteInduce`-scoped ones (both are `Subsingleton`). -/
 theorem gammaGrid_Y_norm_bound [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
       ∀ (X Y : ClassFunction G ℂ), GammaGrid hG hyp = X + Y →
         ClassFunction.inner X Y = 0 →
         (∀ (i : Fin hyp.q) (k : Fin hyp.p), ClassFunction.inner Y (hyp.eta i k) = 0) →
-        (ClassFunction.inner Y Y).re ≤ ((hyp.u : ℚ) - 1) / (hyp.q : ℚ) := sorry
+        (ClassFunction.inner Y Y).re ≤ ((hyp.u : ℚ) - 1) / (hyp.q : ℚ) := by
+  intro _ _ X Y defXY oXY oYeta
+  have h := gammaGrid_Y_norm_bound_aux hG hyp X Y defXY
+    (by convert oXY using 2; exact Subsingleton.elim _ _)
+    (fun i k => by convert oYeta i k using 2; exact Subsingleton.elim _ _)
+  convert h using 3
+  exact Subsingleton.elim _ _
 
 /-- **Faithful §13 producer for Peterfalvi (13.18).**  The (13.18) virtual characters `β_j`/`Γ`
 and their genuine properties (support (13.18.a), the (13.18.b) norm `‖β_j‖² = (u−1)/q + 2`,

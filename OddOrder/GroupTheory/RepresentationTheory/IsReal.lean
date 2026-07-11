@@ -121,6 +121,47 @@ theorem IsReal.sub {φ ψ : ClassFunction G k} (hφ : φ.IsReal) (hψ : ψ.IsRea
   unfold IsReal at *
   rw [conj_sub, hφ, hψ]
 
+section InnerConj
+
+variable [Fintype G]
+
+/-- Conjugating both arguments of the class-function inner product swaps them:
+`⟨φ̄, ψ̄⟩ = ⟨ψ, φ⟩` (equivalently `⟨φ̄, ψ̄⟩ = star ⟨φ, ψ⟩` via `inner_star_comm`). -/
+theorem inner_conj_conj [Invertible (Nat.card G : k)] (φ ψ : ClassFunction G k) :
+    ClassFunction.inner φ.conj ψ.conj = ClassFunction.inner ψ φ := by
+  rw [ClassFunction.inner, ClassFunction.inner, ClassFunction.innerSum,
+    ClassFunction.innerSum]
+  congr 1
+  exact Finset.sum_congr rfl fun g _ => by
+    rw [conj_apply, conj_apply, star_star, mul_comm]
+
+/-- Over `ℂ`, the self inner product `⟨φ, φ⟩` is the manifestly real (and nonnegative) value
+`|G|⁻¹ · ∑ |φ(g)|²`. -/
+theorem inner_self_eq_ofReal [Invertible (Nat.card G : ℂ)] (φ : ClassFunction G ℂ) :
+    ClassFunction.inner φ φ
+      = (((Nat.card G : ℝ)⁻¹ * ∑ g : G, Complex.normSq (φ g) : ℝ) : ℂ) := by
+  rw [ClassFunction.inner, ClassFunction.innerSum, invOf_eq_inv]
+  have hterm : ∀ g : G, φ g * star (φ g) = ((Complex.normSq (φ g) : ℝ) : ℂ) := fun g => by
+    rw [show star (φ g) = starRingEnd ℂ (φ g) from rfl, Complex.mul_conj]
+  simp only [hterm]
+  push_cast
+  ring
+
+/-- The self inner product has nonnegative real part. -/
+theorem inner_self_re_nonneg [Invertible (Nat.card G : ℂ)] (φ : ClassFunction G ℂ) :
+    0 ≤ (ClassFunction.inner φ φ).re := by
+  rw [inner_self_eq_ofReal, Complex.ofReal_re]
+  exact mul_nonneg (inv_nonneg.mpr (Nat.cast_nonneg _))
+    (Finset.sum_nonneg fun g _ => Complex.normSq_nonneg _)
+
+/-- The self inner product is real: it equals the `ℂ`-cast of its own real part. -/
+theorem inner_self_eq_re [Invertible (Nat.card G : ℂ)] (φ : ClassFunction G ℂ) :
+    ClassFunction.inner φ φ = ((ClassFunction.inner φ φ).re : ℂ) := by
+  rw [inner_self_eq_ofReal]
+  simp
+
+end InnerConj
+
 end ClassFunction
 
 variable {G : Type*} [Group G]
