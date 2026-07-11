@@ -430,46 +430,6 @@ theorem exists_zeta_residual_not_orthogonal_H0C_of_refuter [Finite G]
       (coherent_SOf_HC hG s13hyp).some.nonzero) hzS hζHC hζdeg hcol)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (11.8)** — the legacy instantiation of
-`exists_zeta_residual_not_orthogonal_H0C_of_refuter` at (11.3) `S_H0C_not_coherent` (which
-routes through the partner-sorried `S12.S_not_coherent`; the honest unconditional
-instantiation lives in `S13_TypeDetermination`, issue 1020 Phase 3). -/
-theorem exists_zeta_residual_not_orthogonal_H0C [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)
-    (htype : IsTypeIII M ∨ IsTypeIV M)
-    (hM2 : secondDerivedInAmbient M
-      = hyp.typeP.H ⊔ (hyp.typeP.U ⊓ Subgroup.centralizer (hyp.typeP.H : Set G)))
-    (hHcard : Nat.card ↥hyp.typeP.H = hyp.w2 ^ hyp.w1) :
-    ∃ ζ : ClassFunction ↥M ℂ, ζ ∈ OddOrder.Peterfalvi.S12.inducedFamily M ∧
-      IsIrreducibleCharacter ζ ∧ ζ 1 = (hyp.w1 : ℂ) ∧
-      ¬ ∀ (i : Fin hyp.w1) (j : Fin hyp.w2),
-        ClassFunction.inner
-          ((hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hG.odd i' 0) - ζ))
-            - ∑ i' : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hG.odd i' 0)
-          (hyp.alignedOmegaSigmaGrid hG hG.odd i j) = 0 :=
-  exists_zeta_residual_not_orthogonal_H0C_of_refuter hG hyp htype hM2 hHcard
-    (fun s13hyp => S_H0C_not_coherent hG s13hyp)
-
-open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (11.9.b), narrow `𝒮(H₀C)` route** — `w₂ < w₁` (`q > p`) for the §10 hypothesis on a
-type-III/IV/V maximal subgroup, via the honest narrow (11.8) `exists_zeta_residual_not_orthogonal_H0C`
-(replacing `S12.w2_lt_w1_of_hypothesis`, which routed through the false wide uniform-degree lemma,
-issue 1019) composed with the coherence-free reduction `w2_lt_w1_of_residual_not_orthogonal`.  This is
-the `feitThompson`-spine consumer (`card_kappaHall_lt_of_isTypeIIIorIV`). -/
-theorem w2_lt_w1_of_hypothesis_H0C [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)
-    (htype : IsTypeIII M ∨ IsTypeIV M)
-    (hM2 : secondDerivedInAmbient M
-      = hyp.typeP.H ⊔ (hyp.typeP.U ⊓ Subgroup.centralizer (hyp.typeP.H : Set G)))
-    (hHcard : Nat.card ↥hyp.typeP.H = hyp.w2 ^ hyp.w1) :
-    hyp.w2 < hyp.w1 := by
-  obtain ⟨ζ, hζS, hζirr, hζ1, h118⟩ :=
-    exists_zeta_residual_not_orthogonal_H0C hG hyp htype hM2 hHcard
-  exact OddOrder.Peterfalvi.S12.w2_lt_w1_of_residual_not_orthogonal hG hyp hζS hζirr hζ1 h118
-
-open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11), modulo the equality refutation: `𝒮(H₀C′)` is coherent on `A₀(M)`**
 (issue 9083 Phase A, the dichotomy dispatch).
 

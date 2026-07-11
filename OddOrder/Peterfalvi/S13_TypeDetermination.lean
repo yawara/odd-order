@@ -56,8 +56,8 @@ theorem S_H0C_not_coherent_unconditional {G : Type*} [Group G] [Finite G]
 maximal subgroup: the refuter core `exists_zeta_residual_not_orthogonal_H0C_of_refuter`
 instantiated at the unconditional (11.3) (`S_H0C_not_coherent_unconditional`), composed with
 the coherence-free reduction `w2_lt_w1_of_residual_not_orthogonal`.  This is the honest heir
-of `w2_lt_w1_of_hypothesis_H0C` (whose (11.3) routes through the partner-sorried
-`S12.S_not_coherent`), and the `feitThompson`-spine consumer via
+of the retired legacy `w2_lt_w1_of_hypothesis_H0C` (whose (11.3) routed through the
+partner-sorried `S12.S_not_coherent`), and the `feitThompson`-spine consumer via
 `card_kappaHall_lt_of_isTypeIIIorIV` below (issue 1020 Phase 3). -/
 theorem w2_lt_w1_of_hypothesis_H0C_unconditional {G : Type*} [Group G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
@@ -123,9 +123,8 @@ theorem card_kappaHall_lt_of_isTypeIIIorIV {G : Type*} [Group G] [Finite G]
     OddOrder.Peterfalvi.S13.secondDerived_eq_fitting_of_base hG hyp hIIIorIV
   have hHcard : Nat.card ↥hyp.typeP.H = hyp.w2 ^ hyp.w1 :=
     OddOrder.Peterfalvi.S13.card_H_eq_of_base hG hyp hIIIorIV
-  -- `w₂ < w₁` (Peterfalvi (11.9.b), from the genuine (11.8) via the honest narrow `𝒮(H₀C)` route —
-  -- `S13.w2_lt_w1_of_hypothesis_H0C`, replacing the deprecated wide `S12.w2_lt_w1_of_hypothesis`
-  -- whose uniform-degree lemma is false for non-Galois type III/IV, issue 1019).
+  -- `w₂ < w₁` (Peterfalvi (11.9.b), from the genuine (11.8) via the honest narrow `𝒮(H₀C)` route
+  -- on the unconditional (11.3) — `w2_lt_w1_of_hypothesis_H0C_unconditional`, issues 1019/1020).
   rw [hKstarw2, hKw1]
   exact OddOrder.Peterfalvi.S13.w2_lt_w1_of_hypothesis_H0C_unconditional hG hyp hIIIorIV hM2
     hHcard

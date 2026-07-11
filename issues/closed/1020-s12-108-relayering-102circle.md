@@ -187,3 +187,30 @@ reconcile (dataS.W1 = mp.K / W2 = mp.Kstar) + (10.7)'-kernel 橋 (hfrobcap) +
 残 = consumer migration: (10.10)-v2 (no_typeV_maximal を v2-cite で下流に再構成) →
 FTS (13.2.a)-trio の relayer (S15/S16 repoint、hub 調整) → (11.3)-v2 +
 (11.8)-capstone 側 → 旧 S_not_coherent/estimate/hB-sorry の deprecate。
+
+## 2026-07-11 tick¹⁴ — ★★★★★ Phase 3 consumer migration 完遂 (本 issue の全 arc 完了)
+
+- **FTS relayer landed** (79bd428d): (13.2.a)-trio + canonical producer を新 leaf
+  `S13_TypeDetermination.lean` (S12_Noncoherence 下流) へ移設 (namespace 保存、rename 0)。
+  `card_kappaHall_lt_of_isTypeP1` の type-V 排除 = `no_typeV_maximal_unconditional` cite に。
+  κ-ordered M-seeded pair 2 本 (data_around / around、term consumer 0) も GridTranspose
+  から同 leaf へ。**S15/S16 repoint は不要と確定** (S15.Hypothesis.S_typeP2 field 消費のみ、
+  FTS trio 直 cite なし) — 「hub 調整」項目は消滅。
+- **(11.3)/(11.8)-capstone v2 landed** (73dec37f): S13_Orthogonality の (11.8) を
+  `exists_zeta_residual_not_orthogonal_H0C_of_refuter` に factor ((11.3) を hrefute 仮説化)、
+  新 leaf に `S_H0C_not_coherent_unconditional` + `w2_lt_w1_of_hypothesis_H0C_unconditional`、
+  IIIorIV を repoint。**IIIorIV chain から旧 (10.8) hB 依存が消滅** — 残 residual =
+  §14 Sibley glue (6.7)/(5.8) + (9.11) caseA refuter + (6.5) gates (2022)。
+- **deprecate 実施**: legacy `w2_lt_w1_of_hypothesis_H0C` + legacy (11.8) instantiation
+  (共に consumer 0) を削除。旧 `S_not_coherent` / `no_typeV_maximal` / `S_H0C_not_coherent`
+  に **Legacy** supersede 注記 (下流 heir への pointer + 「上流 S13-world 用に残置」)。
+  AxiomsCheck の stale comment 2 箇所刷新。
+- **残置が正当な legacy 群 (削除・stub 化しない)**: `S12.Hypothesis.isTypeIIIorIV`
+  (S13_SixTwoBridge:75) が S13-hypothesis 世界の唯一の type-V eliminator で、import 位相上
+  (Noncoherence の遥か上流) 恒久的に旧 no_typeV_maximal の sorried-cite を要する
+  (forward-dep パターン、AxiomsCheck:2360 註が既に文書化)。同様に coherent_quotient_bound
+  (11.4) → 旧 S_H0C_not_coherent → 旧 S_not_coherent chain は上流ゆえ残置。
+  proven-modulo-hB の旧証明を sorry stub 化するのは「証明済→sorry regression」形状ゆえ不可。
+- **cross-lane followup → issue 1022**: lane c `S16_NonExistenceG/TTypeII.lean:1418` のみ
+  Noncoherence 下流化が可能な位置 (S16 は FTS 非依存) — repoint 提案を 1022 に切り出し。
+- 本 issue の計画 arc (循環発見 → Phase 1a/2/3 → migration → deprecate) は**全て完了** → close。
