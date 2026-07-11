@@ -471,3 +471,103 @@ feature commits: `08ea38d4`, `47fa6c67`。
   次 frontier はこの type-P₁ `A₀` non-escaping/normedTI producer。
 - `TGapCross` / `TTypeII` / AxiomsCheck (4131 jobs) green、`git diff --check` clean。
   追加3公開 theorem は AxiomsCheck 登録済み、新 axiom・新 sorry なし。
+
+## lane-c T-side (13.2.e) normedTI producer の exact frontier (2026-07-11)
+
+feature commit: `6b225750`。
+
+- `fullTypeP1Dade_H_eq_bot_of_typePA_centralizer_le` を実証明。
+  `A₀(T)=A(T)∪V^T` のうち例外側 `V^T` は既存
+  `conjClassSetIn_typePV_centralizer_le_M` で常に non-escaping なので、必要な中心化群包含を
+  通常側 `A(T)=typePA(T)` だけへ縮約した。そこから `ftSupportKernel=⊥`、さらに
+  `tSideDadeMap_eq_induce_of_typePA_centralizer_le` まで配線した。
+- Coq の結論をそのまま受ける
+  `fullTypeP1Dade_H_eq_bot_of_isTISubset` /
+  `tSideDadeMap_eq_induce_of_isTISubset` も実証明。したがって次の genuine producer は
+  `IsTISubset (typePA0 T dataT) T` 一個であり、これを得れば full datum の `H=⊥` と
+  `τ_T=Ind_T^G` は追加仮定なしで閉じる。
+- Coq `PFsection13.v:222--242` を再照合。この TI 証明は、escape を仮定して
+  `FTsupport_facts` の unique maximal overgroup を取り、Type-I branch を Frobenius regularity、
+  Type-F/P branch を exclusion で潰す本体である。単なる `A₁⊆A₀` ではない。
+- 既存 `S12.typeII_A0_isTISubset` は最終的に得る `T_typeII` には適用できるが、(14.9) の
+  contradiction 内では `hIII : IsTypeIII T` を仮定しており、Type II/III は相互排他的。
+  しかも `T_typeII` 自身がこの contradiction の下流なので、ここへ逆流させるのは循環。
+  よって次は Type-III/type-P₁ branch の上記 Coq 証明を正面から port する。
+- cross term のもう一方 `QV'betaS ⟂ Ind_T^G betaT0` も独立検索したが、既存
+  `betaGrid_A0_support` だけでは不足する。Coq 同様、`τ_S β_S` が
+  `class_support (T')#` の外にある p-divisibility support theorem が別途必要。
+- 最新 main merge 後 `TGapCross` + AxiomsCheck (4131 jobs) green。
+  追加4公開 theorem は許容公理のみ、新 axiom・新 sorry なし。
+
+## lane-c T-side (14.9) S/T support order separation (2026-07-11)
+
+feature commit: `506d30ac`。
+
+- `disjoint_conjugatesIntoSet_of_prime_order_separator` で、左集合の全元の位数を prime `p`
+  が割り、右集合では一つも割らないなら、両者の `conjugatesIntoSet` が disjoint になる
+  一般 core を実証明。
+- T-side を `(T')#` に特殊化した
+  `disjoint_conjugatesIntoSet_S_Tderived_of_p_dvd` を実証明。
+  `p ∤ |T'|` は最終結論 `T_typeII` を使わず、ungated な type-P theorem
+  `coprime_card_derivedInG_index_of_isTypeP` と `[T:T']=p` から得たため循環は無い。
+- (13.18.a) の exact S-side carrier `P# ∪ V_S` の全元について
+  `p ∣ orderOf` を実証明。P-side は `|P|=p^q`、regular `V_S`-side は
+  `exists_sigma_prime_dvd_orderOf_typePV` と `S_σ=P` から σ-prime を `p` に同定した。
+  これを合成した `disjoint_conjugatesIntoSet_sharpP_union_typePV_Tderived` により、
+  Coq `QV'betaS` の group/order separation は完全に closed。
+- 残る character input は exact に
+  `supp(betaGrid) ⊆ {y : S | y ∈ P# ∪ conjClassSetIn S (typePV S Sdata)}`。
+  現在の `betaGrid_A0_support` はこれより弱く、また (13.18.a) residual 自体。
+  この sharper support が入れば、上記 disjointness + 両側 Dade=Ind + 既存
+  `inner_induce_induce_eq_zero_of_disjoint` で cross inner product は形式的に 0 になる。
+- `TGapCross` / AxiomsCheck (4131 jobs) green。追加4公開 theorem は許容公理のみ。
+  新 axiom・新 sorry なし。
+
+## lane-c T-side (14.9) exact cross-Dade consumer (2026-07-11)
+
+feature commit: `4a2f33c5`。
+
+- `tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_exact_supports` を実証明し、前節で閉じた
+  exact carrier の order separation を S/T 両 Dade map へ最後まで配線した。
+- T-side は full `A₀(T)` normed-TI 入力
+  `IsTISubset (typePA0 T dataT) T` から既証明の
+  `tSideDadeMap_eq_induce_of_isTISubset` を通じて `τ_T φ = Ind_T^G φ` とする。
+  `sigmaSharp T = (T')#` も type-P₁ reconciliation から theorem 内で導出する。
+- S-side は exact character support
+  `supp(betaGrid) ⊆ P# ∪ conjClassSetIn S (typePV S Sdata)` を
+  `sharpP_union_V_subset_A0` に通し、既証明の `sInstance_dade0_eq_induce` から
+  `τ_S betaGrid = Ind_S^G betaGrid` とする。
+- 最後は `disjoint_conjugatesIntoSet_sharpP_union_typePV_Tderived` と
+  `inner_induce_induce_eq_zero_of_disjoint` の合成で
+  `⟨τ_T φ, τ_S betaGrid⟩ = 0`。support coercion・Dade=Ind・induced support・直交性の
+  追加 residual は残らない。
+- 従って cross term で残る genuine upstream producer は exact に二つ:
+  (1) Type-P₁/III branch の `A₀(T)` TI (Coq `PFsection13.v:222--242`)、
+  (2) (13.18.a) の sharper `betaGrid` support。後者は現存の弱い
+  `betaGrid_A0_support` では代替できない。
+- `TGapCross` / AxiomsCheck (4131 jobs) green。新 theorem は許容公理のみ、
+  新 axiom・新 sorry なし。commit 前 `HEAD..main = 0`。
+
+## lane-c T-side (13.2.e) Type-P₁ full A₀ normed-TI closure (2026-07-11)
+
+feature commit: `618a0285`。
+
+- Peterfalvi 原文 (13.2.e) と Coq `PFsection13.v:222--242` を再照合し、S-side の既存
+  `escaping_honestTypeP2ASet_eq_empty` と同じ BG Theorem D(4) escape package を
+  Type-P₁ `typePA0` へ正面から接続した。
+- `escaping_typePA0_eq_empty_of_isTypeP1` を実証明。既存 (8.13.b)
+  `escaping_typePA0_mem_sigmaSharp_of_isTypeP1` から escaping point を `M_σ#` に落とし、
+  D(4) の unique maximal neighbour `N` を取得した。`N` type-F branch は (12.7) の
+  Frobenius kernel regularity で `a ∈ N_σ` を強制して D(4) の `a ∉ N_σ` と矛盾、
+  type-P₂ branch は D(4) が `M` type-F を与えるため `M` type-P₁ と矛盾する。
+- `typePA0_isTISubset_of_isTypeP1` で escape exclusion を Dade hypothesis の (2.3)
+  `isTISubset_of_forall_H_eq_bot` に通し、Coq の
+  `normedTI 'A0(M) G M` の TI 本体を閉じた。downstream の `T_typeII` は不使用で循環なし。
+- `tSideDadeMap_eq_induce_of_isTypeP1` により T-side `τ_T=Ind_T^G` から `hTI` 仮定を除去。
+  さらに `tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_beta_support` まで配線し、14.9 の
+  S/T cross term は exact (13.18.a) β-support 一件だけを入力とする形になった。
+- 前節の「残る genuine producer は二つ」は更新され、現在は exact に一つ:
+  `supp(betaGrid base 1) ⊆ P# ∪ conjClassSetIn S (typePV S Sdata)`。
+  group/order separation、T normed-TI、両 Dade=Ind、induced-support orthogonality は closed。
+- `TGapCross` / AxiomsCheck (4131 jobs) green。追加4公開 theorem は許容公理のみ。
+  新 axiom・新 sorry なし。commit 前 `HEAD..main = 0`。
