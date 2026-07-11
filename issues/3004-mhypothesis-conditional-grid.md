@@ -857,6 +857,35 @@ main `cce4dbc8` の最新 `TTypeII.lean` を concrete producer landing 後に再
 (c) prime-TI `mu_01` derived-complement vanishing。
 orbit threading だけで `T_typeIII_ratio_le` が閉じるとは扱わない。
 
+### `mu_01` derived-complement vanishing の exact reduction (2026-07-12 夜)
+
+feature commit: `bc65b073`。
+
+- 前節 (c) を Coq `PFsection13.v` の `PVSbeta` (1833--1869) と Lean の現 API で再検証した。
+  S06 の `chiRestrict_apply_eq_zero_of_not_mem_union` は単一 `mu_01` に直接適用する theorem
+  ではなく、必要な経路は Coq と同じ二段階だった。
+- C 所有 leaf `TGapCross.lean` に
+  `sSide_mu_row0_apply_eq_zero_of_mem_derived_not_mem_P` を実装した。
+  `z in S' minus P` は `W` のどの S-共役にも入らない (`W <= P join W1`,
+  `W1 inter S' = 1`, `P normal S`) ため、`mu_definition` から列 j の全行が z 上で等しい。
+  さらに既存 `mu_j_isIndPC` と `C_eq_bot` で列和を `Ind_P^S theta` に落とし、P 外消滅と
+  `q != 0` から `mu_0j(z)=0` を得る。
+- TTypeII の `hresidual` bundle はこの theorem と既存
+  `mu_row0_apply_eq_one_of_mem_W1` を実際に cite する形へ更新した。局所 `sorry` が直接担う
+  出力は zero-column projection 一項だけになった。
+- ただし axiom closure を独立監査すると、この new theorem は既存
+  `pc_le_maxNilpotentNormalHall -> c_eq_one -> C_eq_bot` の `sorryAx` を継承する。
+  したがって AxiomsCheck 登録は行っていないし、(c) を fully axiom-clean とも扱わない。
+  正確な状態は「TTypeII 内の opaque pointwise pin を除去し、既存の honest-signature な
+  (13.12) PC-Hall gate へ依存を集約した」。新 axiom・新 sorry は追加していない。
+- レーン所有を再確認し、試作を置いた B 所有 `S15_SAndT.lean` の差分は完全に撤回して、
+  genuine output を C 所有 `TGapCross.lean` へ移設した。TTypeII build (4120 jobs) green。
+
+従って C 側の次 frontier は引き続き zero-column projection:
+full-orbit threading gate の外で進められるのは、(11.8) wrong-axis refuter の既存 API 接続と、
+projection dichotomy から refuter までの signature-free assembly。S-side (13.12)
+`pc_le_maxNilpotentNormalHall` は B/upstream 所有の実 gap として明示的に残る。
+
 ## 🧭 HUB 承認記録 (2026-07-12 tick、merge 時)
 
 1. **ω_S Galois orbit 層の FT.lean additive 構築を承認** (c1fa962c 系、merge 済): hub 検証 —
@@ -869,3 +898,33 @@ orbit threading だけで `T_typeIII_ratio_le` が閉じるとは扱わない。
    は b 所有ゆえ b の 2038 進行と衝突しない hunk 配置 (不明なら b に notes で一報)。
 3. **9084 裁定**: TGapCross 4 定理の S15 正本 redirect + (14.9) endpoint discharge を承認、
    owner = c (詳細 = 9084 RULING)。
+
+### projection norm compression と 9084 discharge 完了 (2026-07-12 深夜)
+
+feature commits: `6ed2d8cf`, `9d27be05`。
+
+- `TGapProjectionRigidity.lean` に full-grid bookkeeping を実装した。
+  `etaGrid_axis_sum_eq_sum_sq` は principal point・二つの非主軸・interior を分割し、
+  four-corner relation から全 interior coefficient が `m_11` に等しいことを使って、
+  三係数式と `sum_ij m_ij^2` の exact equality を証明する。
+- `etaGrid_axis_bound_of_sum_sq_le` と
+  `etaGrid_coefficients_eq_column_or_row_of_sum_sq_le` により、既存の sharp full-grid bound
+  `sum m_ij^2 <= p` を中間の posited axis bound なしに column-or-row 二分法へ直接渡せる。
+  3 theorem は全て AxiomsCheck green、新 `sorry`・新 axiom なし。
+- issue 9084 (a): S16 に一時的にあった `PW1_index_eq_u`, `betaGrid_apply_one_eq_zero`,
+  二つの hypothesis-parametrized beta-support theorem、および S15 へ移設済みの旧
+  `sSide_mu_row0_apply_eq_zero_of_mem_derived_not_mem_P` を削除した。正本は S15 の
+  `PW1_index_eq_u` / `betaGrid_apply_one_eq_zero` / `betaGrid_support` / Hypothesis method。
+- issue 9084 (b): `tSideDadeMap_inner_tauSbetaGrid_eq_zero` を S15 `betaGrid_support` の
+  direct cite で構成し、`hmuD` / `hmuW1` 仮説を signature から除去した。TTypeII caller も
+  この endpoint に切り替え、`hresidual` は sharp norm bound と zero-column projection の
+  二項だけになった。局所 `sorry` が担うのは後者一項のみ。
+- 独立 AxiomsCheck では `S15.betaGrid_support` と無条件 cross-Dade endpoint の両方が
+  既存 upstream `sorryAx` を一つ継承することを確認した。従って「仮説なし」は signature
+  について正しいが axiom-clean とは扱わず、両 assert は pending コメントに戻した。
+  最終 AxiomsCheck (4149 jobs) は green。
+
+残る C frontier は zero-column projection そのもの。今回の norm compression により
+算術側の入力 mismatch は解消したため、未接続なのは (1) concrete full Galois orbit の
+3-carrier threading から axis constancy を得ること、(2) column-or-row 二分法の wrong-axis を
+Peterfalvi (11.8) non-orthogonality で排除すること、の二点である。

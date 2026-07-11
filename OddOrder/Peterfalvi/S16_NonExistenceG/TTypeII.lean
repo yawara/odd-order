@@ -577,16 +577,9 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
               ClassFunction.inner
                 (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ j)
                 (∑ i : Fin hyp.base.q,
-                  hyp.base.eta i ⟨0, hyp.base.p_prime.pos⟩)) ∧
-          (∀ z : ↥hyp.base.S,
-            (z : G) ∈ OddOrder.GroupTheory.derivedInG hyp.base.S →
-            (z : G) ∉ hyp.base.P →
-            hyp.base.mu ⟨0, hyp.base.q_prime.pos⟩
-              ⟨1, by have := hyp.base.three_le_p; omega⟩ z = 0) ∧
-          (∀ x : ↥hyp.base.S, (x : G) ∈ hyp.base.W1 → x ≠ 1 →
-            hyp.base.mu ⟨0, hyp.base.q_prime.pos⟩
-              ⟨1, by have := hyp.base.three_le_p; omega⟩ x = 1) := by
+                  hyp.base.eta i ⟨0, hyp.base.p_prime.pos⟩)) := by
         refine ⟨hsumSqT, ?_⟩
+        -- Coq (11.9): the remaining zero-column projection producer.
         sorry
       have hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T := by
         obtain ⟨_, _, hcIII_IV, _, _, _⟩ :=
@@ -598,8 +591,7 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       have hcross :
           ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ))
             (OddOrder.Peterfalvi.S15.tauSbetaGrid hG hyp.base) = 0 :=
-        tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_mu_values
-          hG hyp dataT hP1 hresidual.2.2.1 hresidual.2.2.2 hβsupp
+        tSideDadeMap_inner_tauSbetaGrid_eq_zero hG hyp dataT hP1 hβsupp
       have hτβeta : ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ))
           (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩
             ⟨1, by have := hyp.base.three_le_p; omega⟩) = 0 := by
@@ -610,7 +602,7 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           have hv := congrArg Fin.val h
           norm_num at hv
         have hrow := tSide_beta_inner_eta_of_zeroColumn_projection
-          hyp.base (tSideDadeMap hyp hG (ν0 - ζ)) hresidual.2.1
+          hyp.base (tSideDadeMap hyp hG (ν0 - ζ)) hresidual.2
           ⟨1, by have := hyp.base.three_le_p; omega⟩
         simpa only [if_neg hne0] using hrow
       have hΓdef : betaData.Gamma =
