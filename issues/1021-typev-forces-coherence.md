@@ -107,3 +107,30 @@ type-P₂ branch は sorried と注記あり — type-V (P₁) 側は生きて�
   isCoherent_of_supportedSpan_le + Sset=inducedFamily 同定) の 3 段。
 - 次 tick: `toHypothesis46` (S12_Core:1057) の実 signature 読解 → ① の座標合わせ
   (L=M、H : Subgroup ↥M、A-param) を開始。
+
+## 2026-07-11 tick²⁰ — 座標層 landed (S12_TypeVSibley 新 leaf、commit 955b03a8)
+
+- `toHypothesis46` 実読 (S12_Core/Hypothesis.lean:1312): 出力 =
+  `S06.Hypothesis46 (typePA M hyp.typeP) M`、dade = `hyp.dadeData.dade.restrict`
+  (A₀→A)、dade0 = dadeData.dade そのもの、tau = fullDadeIsometryData。
+- **新 leaf S12_TypeVSibley** (S10_MinimalSimpleBasic + S08_YsetInner import):
+  `TypeVData.derivedInG_eq_H` (M'=M_F=data.H、任意 witness) /
+  `sharpImage_subgroupOf_derivedInG` / `normalizer_sharpSubgroup` (N(H^#)=N(H)) /
+  `normalizer_sharpSubgroup_derivedInG_eq` (N((M')^#)=M) /
+  `typePA_isTISubset_of_typeV_TI` (M-相対 TI)。全部 sorry-free。
+- **次 tick (assembly ①)**: SibleyDadeHypothesis G M ((derivedInG M).subgroupOf M) の
+  構成。残 field 素材: W1 = typeP.W1.subgroupOf M / split = M_complement /
+  H_normal = commutator normal (toS06 の K_normal 流用) / H_ne_bot = W2 経由 /
+  H_nilpotent = M_F nilpotent (maxNilpotentNormalHall) を subgroupOfEquivOfLe で
+  ↥H_M に transport / H_sharp_ti = tick²⁰ lemma + sharpImage 座標 rw /
+  dade = **A-param transport が必要**: toHypothesis46 は typePA-座標 →
+  sharpImage-座標へ。方針 = S04.Hypothesis.restrict を equality-subset で使う
+  (restrict hAB.le: Hypothesis G A M → Hypothesis G B M、H-field は値レベル
+  reindex、Eq.rec 無し)。Hypothesis46 全体の congr helper も同様に
+  restrict + A-indep fields 再梱包で作る (data field は dade/toHypothesis.dade
+  のみ、A_covers は Prop なので ▸ 可)。cases の h46.dade = dade は
+  「Sibley.dade := (congr した h46).dade」にすれば rfl。
+- dade_H_eq_bot = S04.Hypothesis.H_eq_bot_of_isTISubset (tick¹⁹) ✓ /
+  hconj = HConjInvariant.of_forall_H_eq_bot ✓ / w₂ prime = hyp.w2_prime ✓ /
+  W2 ≤ ⁅H_M,H_M⁆ = W2_le→secondDerived を subgroupOf へ ✓ /
+  coprime = typePData_W1_hall_coprime ✓。
