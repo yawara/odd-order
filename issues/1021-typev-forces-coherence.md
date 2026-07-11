@@ -198,6 +198,28 @@ type-P₂ branch は sorried と注記あり — type-V (P₁) 側は生きて�
   `dadeICM hyp.dadeData.dade (….fullDadeIsometryData hyp.hconj)` (S12_Core/Hypothesis:375) —
   **両 tau は同形 (dade だけ違う)** / `dadeIntegralCharacterMap` +
   `dadeIntegralCharacterMap_apply_of_support` = S07_Coherence/FamilyBundleDade:320/330。
+## 2026-07-11 tick²⁵ — not-(a) 縮約は issue 2022 gate、(c)-body へ転進
+
+- **not-(a) 縮約の Lean 経路確定** (book 04.8 mmd L50-72 精読):
+  (6.4) = (6.1) + |L| odd + M ⊴ L ≤ K, K/M nilpotent + L/H₁ Frobenius
+  (H₁/M = [K/M,K/M])。(6.5) = 「S(M) 非 coherent なら (a) K/H₁ chief +
+  |K:H₁| ≤ 4|L:K|²+1 / (b) K/M non-abelian p-group / (c) |L:K| ∤ p−1」。
+  (10.10) では (M,H,1): (6.5.b) の p = w₂ (w₂ prime | |H|)、(8.7)-case-(b) の
+  w₁|p−1 は (6.5.c) と矛盾 → (b) 排除。(6.5.a) の bound が (10.10.1) の入力。
+- **⚠ gate**: (6.5)-general は (6.3)-general 経由で **general six_two =
+  issue 2022 (lane b 所有、open) に gated** (six_three_descent /
+  six_three_index_bound_general は 2022 で sorry-free 済、six_two のみ残)。
+  (6.5) の算術 brick (six_five_index/chief_factor/c_contradiction、
+  six_five_c_arith) は既存。**(6.4)-carrier (Lean 構造) は未存在** —
+  general (6.5) の組立は issue 2022 の延長線 = b の territory。lane a は
+  claim せず、v2 配線時に signature-correct sorried cite で前倒しする。
+- **policy (A) 適用**: not-(a) は externally gated → **ungated な自クラスタの
+  (c)-body へ転進** (文書順でも (10.9) → (10.10.2-4) が正)。(10.9) は
+  **S12_Prop109 に形式化済み** (a₀₀ 定数項 / residual-orthogonal /
+  norm w₁+1 / σ-coefficient の coherence-free 諸形態) ✓。
+- 次: (10.10.2) (S = S₁ ∪ {μ_j}、S₁ = (p²−1)/w₁ 個の deg-w₁ irreducibles、
+  d=p, δ=−1, n=2) の部材 survey (subagent 委譲済) → 実装。
+
 ## 2026-07-11 tick²⁴ — ★★ case-(a) 完全証明: typeV_caseA_coherence (commit 6e4800d5)
 
 - `typeV_caseA_coherence` (S13_Lemmas113To115 末尾、sorry-free):
