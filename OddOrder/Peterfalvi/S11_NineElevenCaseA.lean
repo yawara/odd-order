@@ -7,6 +7,7 @@ import OddOrder.Peterfalvi.S13_MaximalIII_IV
 import OddOrder.Peterfalvi.S07_Subcoherent
 import OddOrder.Peterfalvi.S11_NineElevenCoherence
 import OddOrder.Peterfalvi.S11_NineElevenTwoSummand
+import OddOrder.Peterfalvi.S11_NineElevenMackeyNorm
 import OddOrder.Peterfalvi.S13_CoreStructure
 import OddOrder.Peterfalvi.S13_SixTwoBridge
 
@@ -995,5 +996,172 @@ theorem nineElevenEqualityRefutation_of_sTwoExtraction_normBound [Finite G]
   have hpeq : hyp.chief.p = 2 * caseA.a + 1 := by omega
   exact OddOrder.Peterfalvi.S11.nineElevenCaseA_equality_refutation caseA hq3 hu hpeq
     hK₁ hK₂ hCinf hclass rfl hnorm hleN
+
+/-! ### The (9.11.4) norm inputs at the `Hypothesis` level (issue 9083, Phase D)
+
+Book (9.11.4): *"Let `ψ₁ ∈ 𝒮₁`, let `γ = Ind_{HU₁}^M 1` and let `α = γ − ψ₁`.  Then
+`Supp(α) ⊆ A(M)` and `‖α‖² = a + 1 + (q−1)a²/u`"*.  The S11-level content is landed in
+`S11_NineElevenMackeyNorm` (`nineElevenGamma_*`: support, degree, orthogonality, and the
+Mackey conjugation count under the (9.11.2) TI-witness); this section instantiates it in
+the equality configuration, choosing `ψ₁` from the (9.8.d)-positive degree-`qa` family and
+producing the **cleared norm identity with its integrality**:
+
+`∃ N, N·u = (a+1)·u + (q−1)·a²` realized by a genuine `A₀`-supported virtual character `α`
+with `‖α‖² = N`.  This is the (9.11.4) half of `NineElevenNormBound`; the remaining
+(9.11.5)–(9.11.8) half is the bound `|𝒮₄| ≤ N = ‖α‖²` (Phase E), which consumes the same
+`α` through the Dade isometry (`α ∈ ℤ[Irr M]`, `Supp(α) ⊆ A₀`, so `α^τ` is defined and
+`‖α^τ‖² = N`). -/
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.11.4) at the `Hypothesis` level** (issue 9083 Phase D): in the equality
+configuration (`C = U′`, the (9.8.d) count equality) and given the (9.11.2) TI-witness
+(`NineElevenTwoTIWitness`), there is `N : ℕ` with
+
+`N·u = (a+1)·u + (q−1)·a²`
+
+realized as `N = ‖α‖²` for a virtual character `α = γ − ψ₁ ∈ ℤ[Irr M]` supported in
+`A₀(M)` — the book's `α` for `ψ₁ ∈ 𝒮₁` and `γ = Ind_{HU₁}^M 1`.  Support: both `γ` and
+`ψ₁` are supported in `HU = M′` (`nineElevenGamma_support`,
+`support_induce_subset_of_normal`), the value at `1` cancels (`γ(1) = qa = ψ₁(1)`), and
+`(M′)^# ⊆ A₀(M)` (`mderivSharp_subset_A0` — in this formalization `A(M) = (M′)^#` is a
+theorem, so the Coq gap-patch `PFsection9.v:1476-1483` is not needed).  Norm:
+`‖α‖² = ‖γ‖² + 1` (`cfnorm_sub_irreducible_orthogonal`, orthogonality from the
+averaging-projector engine at the source `H ⊄ Ker ζ`), and `‖γ‖²·u = a·u + (q−1)·a²`
+(`nineElevenGamma_inner_self_mul_u`, the Mackey count).  Integrality: `α ∈ ℤ[Irr M]` has
+`‖α‖²` a sum of squares of integers (`mem_ZIrr_inner_self_eq_sum_sq`). -/
+theorem caseA_nineElevenFour_norm_inputs [Finite G]
+    {M : Subgroup G} (hyp : Hypothesis M)
+    (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief))
+    (htw : OddOrder.Peterfalvi.S11.NineElevenTwoTIWitness caseA)
+    (hCUprime : (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).C
+      = (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).Uprime)
+    (hcount : {χ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup
+        (hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup) |
+        IsIrreducibleCharacter χ ∧
+        χ 1 = ((hyp.s11Setup.q * caseA.a : ℕ) : ℂ)}.ncard * (caseA.a * caseA.a)
+      = (hyp.chief.p - 1)
+        * ((OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup).relIndex hyp.s11Setup.U)) :
+    ∃ N : ℕ,
+      N * (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u
+        = (caseA.a + 1) * (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u
+          + (hyp.s11Setup.q - 1) * caseA.a ^ 2 ∧
+      ∃ α : ClassFunction ↥M ℂ,
+        α ∈ OddOrder.RepresentationTheory.ZIrr ↥M ∧
+        α.support ⊆ hyp.base.A0 ∧
+        ClassFunction.inner α α = (N : ℂ) := by
+  haveI := hyp.base.finiteG
+  classical
+  obtain ⟨U₁, hCU₁, hU₁U, hU₁a, hTI⟩ := htw
+  -- `U′ ≤ U₁` from the equality configuration `C = U′` (`chars.C = cSub`, `chars.Uprime =
+  -- uprimeSub` definitionally)
+  have hUpC : OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup
+      = OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief := by
+    have h : OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief
+        = OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup := hCUprime
+    exact h.symm
+  have hUpU₁ : OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup ≤ U₁ := by
+    rw [hUpC]; exact hCU₁
+  -- `ψ₁ ∈ 𝒮₁`: the degree-`qa` irreducible family is nonempty by the (9.8.d) count
+  have hrelne : (OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup).relIndex hyp.s11Setup.U
+      ≠ 0 :=
+    Subgroup.index_ne_zero_of_finite
+  have hcne : {χ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup
+      (hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup) |
+      IsIrreducibleCharacter χ ∧
+      χ 1 = ((hyp.s11Setup.q * caseA.a : ℕ) : ℂ)}.ncard ≠ 0 := by
+    intro h0
+    rw [h0, zero_mul] at hcount
+    have hp1 : 1 < hyp.chief.p := hyp.chief.p_prime.one_lt
+    have := Nat.pos_of_ne_zero hrelne
+    have : 0 < (hyp.chief.p - 1)
+        * ((OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup).relIndex hyp.s11Setup.U) :=
+      Nat.mul_pos (by omega) this
+    omega
+  obtain ⟨ψ₁, hψ₁sOf, hψ₁irr, hψ₁deg⟩ := Set.nonempty_of_ncard_ne_zero hcne
+  obtain ⟨ζ, hζmem, hψ₁eq⟩ := hψ₁sOf
+  have hζxi : ζ ∈ OddOrder.Peterfalvi.S11.xiSet hyp.s11Setup :=
+    OddOrder.Peterfalvi.S11.xiOf_subset_xiSet hyp.s11Setup _ hζmem
+  -- `γ = Ind_{HU₁}^M 1` and its landed (9.11.4) facts
+  set K : Subgroup ↥M := hyp.s11Setup.H.subgroupOf M ⊔ U₁.subgroupOf M with hKdef
+  set γ : ClassFunction ↥M ℂ :=
+    ClassFunction.induce K (trivialClassFunction ↥K) with hγdef
+  have hγsupp : γ.support ⊆ (OddOrder.Peterfalvi.S11.huSub hyp.s11Setup : Set ↥M) :=
+    OddOrder.Peterfalvi.S11.nineElevenGamma_support hyp.s11Setup hU₁U
+  have hγZIrr : γ ∈ OddOrder.RepresentationTheory.ZIrr ↥M :=
+    OddOrder.Peterfalvi.S11.nineElevenGamma_mem_ZIrr hyp.s11Setup U₁
+  have hγ1 : γ (1 : ↥M) = ((hyp.s11Setup.q * caseA.a : ℕ) : ℂ) :=
+    OddOrder.Peterfalvi.S11.nineElevenGamma_apply_one hyp.s11Setup hU₁U hU₁a
+  have hγγu : ClassFunction.inner γ γ
+        * ((hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u : ℂ)
+      = ((caseA.a * (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u
+          + (hyp.s11Setup.q - 1) * caseA.a ^ 2 : ℕ) : ℂ) :=
+    OddOrder.Peterfalvi.S11.nineElevenGamma_inner_self_mul_u
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief) hU₁U hUpU₁ hU₁a hTI
+  -- `induceHU` agrees with the scoped-instance induction term
+  have hindEq : OddOrder.Peterfalvi.S11.induceHU hyp.s11Setup
+        (ζ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ)
+      = ClassFunction.induce (OddOrder.Peterfalvi.S11.huSub hyp.s11Setup)
+        (ζ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ) := rfl
+  -- orthogonality `⟨γ, ψ₁⟩ = 0` and the norm split `‖α‖² = ‖γ‖² + 1`
+  have hγψ : ClassFunction.inner γ ψ₁ = 0 := by
+    rw [hψ₁eq, hindEq]
+    exact OddOrder.Peterfalvi.S11.nineElevenGamma_inner_induceHU hyp.s11Setup hU₁U hζxi
+  have hαα : ClassFunction.inner (γ - ψ₁) (γ - ψ₁) = ClassFunction.inner γ γ + 1 :=
+    OddOrder.Peterfalvi.S11.cfnorm_sub_irreducible_orthogonal hψ₁irr hγψ
+  -- `α ∈ ℤ[Irr M]` and the integrality of `‖α‖²`
+  have hαZIrr : γ - ψ₁ ∈ OddOrder.RepresentationTheory.ZIrr ↥M := by
+    refine Submodule.sub_mem _ hγZIrr ?_
+    rw [hψ₁eq]
+    exact OddOrder.Peterfalvi.S11.induceHU_mem_ZIrr hyp.s11Setup ζ
+  obtain ⟨c, -, -, hcsum⟩ :=
+    OddOrder.RepresentationTheory.mem_ZIrr_inner_self_eq_sum_sq hαZIrr
+  have hm0 : 0 ≤ ∑ x ∈ c.support, (c x) ^ 2 :=
+    Finset.sum_nonneg fun _ _ => sq_nonneg _
+  have hmval : ClassFunction.inner (γ - ψ₁) (γ - ψ₁)
+      = ((∑ x ∈ c.support, (c x) ^ 2 : ℤ) : ℂ) := by
+    rw [hcsum]
+    push_cast
+    rfl
+  set N : ℕ := (∑ x ∈ c.support, (c x) ^ 2).toNat with hNdef
+  have hNval : ((N : ℕ) : ℂ) = ClassFunction.inner (γ - ψ₁) (γ - ψ₁) := by
+    rw [hmval, hNdef]
+    exact_mod_cast congrArg (fun z : ℤ => (z : ℂ)) (Int.toNat_of_nonneg hm0)
+  refine ⟨N, ?_, γ - ψ₁, hαZIrr, ?_, hNval.symm⟩
+  · -- the cleared norm identity `N·u = (a+1)·u + (q−1)·a²`, by `ℕ`-cast injectivity
+    have h2 : ClassFunction.inner (γ - ψ₁) (γ - ψ₁)
+          * ((hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u : ℂ)
+        = ((caseA.a * (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u
+            + (hyp.s11Setup.q - 1) * caseA.a ^ 2 : ℕ) : ℂ)
+          + ((hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u : ℂ) := by
+      rw [hαα, add_mul, one_mul, hγγu]
+    have h3 : ((N * (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u : ℕ) : ℂ)
+        = (((caseA.a + 1)
+              * (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u
+            + (hyp.s11Setup.q - 1) * caseA.a ^ 2 : ℕ) : ℂ) := by
+      push_cast at h2 ⊢
+      rw [hNval]
+      linear_combination h2
+    exact Nat.cast_injective h3
+  · -- `Supp(α) ⊆ A₀(M)`: both parts supported in `HU = M′`, value at `1` cancels
+    intro x hx
+    have hxmem : x ∈ γ.support ∪ ψ₁.support :=
+      ClassFunction.support_sub_subset γ ψ₁ hx
+    have hxHU : x ∈ OddOrder.Peterfalvi.S11.huSub hyp.s11Setup := by
+      rcases hxmem with h | h
+      · exact hγsupp h
+      · have hψsupp : ψ₁.support
+            ⊆ (OddOrder.Peterfalvi.S11.huSub hyp.s11Setup : Set ↥M) := by
+          rw [hψ₁eq, hindEq]
+          exact ClassFunction.support_induce_subset_of_normal _ _
+        exact hψsupp h
+    have hx1 : x ≠ 1 := by
+      intro h1
+      rw [ClassFunction.mem_support, h1] at hx
+      apply hx
+      rw [ClassFunction.sub_apply, hγ1, hψ₁deg, sub_self]
+    have hxM' : x ∈ (derivedInG M).subgroupOf M := by
+      rwa [← OddOrder.Peterfalvi.S11.huSub_eq_derivedInG_subgroupOf]
+    exact hyp.base.mderivSharp_subset_A0 x hxM' hx1
 
 end OddOrder.Peterfalvi.S13
