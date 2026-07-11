@@ -268,6 +268,185 @@ theorem certainTypeOmegaSigma_muColumnChar_eq_aligned [Finite G]
   rfl
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The (5.8) `μ`-column pin for a narrow `𝒮(H₀C)`-coherence, irreducible case** (the Coq
+`FTtypeP_coherent_TIred`-side of the (11.8.6) `tau2muj` WLOG, issue 1023 tick¹³): if `𝒮(H₀C)`
+contains an irreducible `ξ`, then **any** coherent extension `c` of `𝒮(H₀C)` sends the
+reducible `μ`-column sum `μ₁ = ∑_i μ_{i1}` to the aligned `ω^σ`-column `∑_i ω^σ_{i1}` — with
+the *positive* sign.
+
+The γ-trick: `γ = ξ(1)·μ₁ − μ₁(1)·ξ ∈ ℤ[𝒮(H₀C)]` has degree `0`, hence is `A₀`-supported and
+`c`-extends as `τγ`; the Dade isometry on `A₀`-supported pairs gives
+`⟨c(γ), τθ⟩ = ⟨γ, θ⟩ = ξ(1)·w₁` (`θ = μ₁ − dζ`, the capstone bridge).  Expanding the left side
+along `τθ = ∑_i ω^σ_{i1} − d·ζ^{τ₁}` (`hθτ`, the column identity), every term except
+`ξ(1)·⟨c(μ₁), ∑ω^σ⟩` vanishes: the `ζ^{τ₁}`-crosses by the two-stratum `coherent_ortho`
+(`SOf_coherent_extension_cross_orthogonal`), the `⟨c(ξ), ∑ω^σ⟩`-cross by the (5.5) dispatch of
+`ξ` (a `dadeOfDiff` pair) against the grid members (the σ-grid world-bridge
+`certainTypeOmegaSigma_muColumnChar_eq_aligned` + `certainTypeR_imageSet_orthogonal_dadeOfDiff_typeP`).
+So `⟨c(μ₁), ∑ω^σ⟩ = w₁`; with `‖c(μ₁)‖² = ‖μ₁‖² = w₁` (isometry) and `‖∑ω^σ‖² = w₁`
+(orthonormal grid), positive-definiteness pins `c(μ₁) = ∑_i ω^σ_{i1}`. -/
+theorem coherent_sOf_H0C_extension_muColumnSum_pin_of_irr [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
+    (c : OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+      (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C) hyp.base.A0)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau (hyp.SOf hyp.HC) hyp.base.A0)
+    {ζ : ClassFunction ↥M ℂ} (hζHC : ζ ∈ hyp.SOf hyp.HC) {d : ℕ}
+    (hw2 : 1 < hyp.base.w2)
+    (hθsupp : (((∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩)
+        - (d : ℂ) • ζ : ClassFunction ↥M ℂ)).support ⊆ hyp.base.A0)
+    (hθτ : hyp.base.tau ((∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩)
+        - (d : ℂ) • ζ)
+      = (∑ i : Fin hyp.base.w1, hyp.base.alignedOmegaSigmaGrid hG hG.odd i ⟨1, hw2⟩)
+        - (d : ℂ) • coh.extension ζ)
+    {ξ : ClassFunction ↥M ℂ}
+    (hξ : ξ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C)
+    (hξirr : IsIrreducibleCharacter ξ) :
+    c.extension (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩)
+      = ∑ i : Fin hyp.base.w1, hyp.base.alignedOmegaSigmaGrid hG hG.odd i ⟨1, hw2⟩ := by
+  haveI := hyp.base.finiteG
+  classical
+  set μ : ClassFunction ↥M ℂ := ∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩
+    with hμdef
+  set Ω : ClassFunction G ℂ :=
+    ∑ i : Fin hyp.base.w1, hyp.base.alignedOmegaSigmaGrid hG hG.odd i ⟨1, hw2⟩ with hΩdef
+  have hk1 : (⟨1, hw2⟩ : Fin hyp.base.w2) ≠ 0 := by
+    intro heq; have := congrArg Fin.val heq; simp at this
+  -- memberships and conjugates
+  have hμmem : μ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C := by
+    rw [hμdef, hyp.base.muGrid_columnSum_eq_columnSum hG hG.odd ⟨1, hw2⟩]
+    exact columnSum_muColumnChar_mem_sOf_H0C hG hyp ⟨1, hw2⟩ hk1
+  have hμc : μ.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
+    Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hμmem
+  have hξc : ξ.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
+    Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hξ
+  have hIKF : ∀ ⦃x : ClassFunction ↥M ℂ⦄,
+      x ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C →
+      x ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) := fun {x} hx =>
+    OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone bot_le
+      (by rw [← hyp.SOf_eq]; exact hyp.sOf_subset_SOf hyp.H0C hx)
+  -- integer degrees `n_ξ = ξ(1)`, `n_μ = μ(1)` (nonzero)
+  obtain ⟨nξ, hnξ⟩ := inducedKernelFamily_mem_intDegree (hIKF hξ)
+  obtain ⟨nμ, hnμ⟩ := inducedKernelFamily_mem_intDegree (hIKF hμmem)
+  rw [OddOrder.Peterfalvi.S03.characterDegree_def] at hnξ hnμ
+  have hnξne : (nξ : ℂ) ≠ 0 := by
+    rw [← hnξ]; exact inducedKernelFamily_mem_apply_one_ne_zero (hIKF hξ)
+  -- the degree-0 combination `γ ∈ ℤ[𝒮(H₀C)]`, `A₀`-supported, extending as `τγ`
+  set γ : ClassFunction ↥M ℂ := nξ • μ - nμ • ξ with hγdef
+  have hγspan : γ ∈ Submodule.span ℤ (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C) :=
+    Submodule.sub_mem _ (Submodule.smul_mem _ nξ (Submodule.subset_span hμmem))
+      (Submodule.smul_mem _ nμ (Submodule.subset_span hξ))
+  have hγ1 : γ 1 = 0 := by
+    rw [hγdef, ClassFunction.sub_apply, ← Int.cast_smul_eq_zsmul ℂ nξ μ,
+      ← Int.cast_smul_eq_zsmul ℂ nμ ξ, ClassFunction.smul_apply, ClassFunction.smul_apply,
+      hnξ, hnμ]
+    ring
+  have hγsupp : γ.support ⊆ hyp.base.A0 := by
+    refine inducedKernelFamily_zSpan_support_of_apply_one_eq_zero
+      hyp.base.mderivSharp_subset_A0 (Submodule.span_mono (fun x hx => hIKF hx) hγspan) hγ1
+  have hextγ : c.extension γ = hyp.base.tau γ :=
+    c.extends_on_supported γ ⟨hγspan, hγsupp⟩
+  -- the Dade-isometry inner: `⟨c(γ), τθ⟩ = ⟨γ, θ⟩`
+  have hDade : ClassFunction.inner (c.extension γ)
+      (hyp.base.tau (μ - (d : ℂ) • ζ)) = ClassFunction.inner γ (μ - (d : ℂ) • ζ) := by
+    rw [hextγ]
+    exact hyp.base.tau_inner_eq_of_supported hγsupp hθsupp
+  -- character-level inners: `⟨μ,μ⟩ = w₁`, crosses vanish
+  have hμμ : ClassFunction.inner μ μ = (hyp.base.w1 : ℂ) :=
+    hyp.base.muGrid_column_sum_inner_self hG hG.odd ⟨1, hw2⟩
+  have hζc : ζ.conj ∈ hyp.SOf hyp.HC := by
+    rw [hyp.SOf_eq] at hζHC ⊢
+    exact OddOrder.Peterfalvi.S08.inducedKernelFamily_closedUnderConjugate _ hζHC
+  have hμζ : ClassFunction.inner μ ζ = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm,
+      SOf_HC_inner_sOf_H0C_eq_zero hyp hζHC hμmem, star_zero]
+  have hξζ : ClassFunction.inner ξ ζ = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm,
+      SOf_HC_inner_sOf_H0C_eq_zero hyp hζHC hξ, star_zero]
+  have hξself : ClassFunction.inner ξ ξ = 1 := hξirr.inner_self_eq_one
+  have hξne_μ : ξ ≠ μ := by
+    intro heq
+    rw [heq] at hξself
+    rw [hμμ] at hξself
+    have hw1ge : 3 ≤ hyp.base.w1 := by
+      have hodd : Odd hyp.base.w1 :=
+        hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card hyp.base.W1)
+      have hgt : 1 < hyp.base.w1 :=
+        (Subgroup.one_lt_card_iff_ne_bot _).mpr hyp.base.typeP.W1_nontrivial
+      obtain ⟨k, hk⟩ := hodd; omega
+    have h1' : (hyp.base.w1 : ℕ) = 1 := by exact_mod_cast hξself
+    omega
+  have hξμ : ClassFunction.inner ξ μ = 0 :=
+    OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal
+      (hIKF hξ) (hIKF hμmem) hξne_μ
+  -- `⟨γ, θ⟩ = n_ξ · w₁`
+  have hγθ : ClassFunction.inner γ (μ - (d : ℂ) • ζ) = (nξ : ℂ) * (hyp.base.w1 : ℂ) := by
+    rw [hγdef, ← Int.cast_smul_eq_zsmul ℂ nξ μ, ← Int.cast_smul_eq_zsmul ℂ nμ ξ]
+    simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+      hμμ, hμζ, hξμ, hξζ, star_natCast, mul_zero, sub_zero]
+  -- cross-vanishing at the image level
+  have hsub1 : OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C ⊆ hyp.SOf hyp.H0C :=
+    hyp.sOf_subset_SOf hyp.H0C
+  have hcross_μζ : ClassFunction.inner (c.extension μ) (coh.extension ζ) = 0 := by
+    refine SOf_coherent_extension_cross_orthogonal hG hyp hsub1
+      (le_refl (hyp.SOf hyp.HC)) c coh hμmem hμc hζHC hζc ?_ ?_
+    · intro heq
+      rw [heq] at hμζ
+      -- `⟨ζ, ζ⟩ ≠ 0`
+      obtain ⟨he, hpos⟩ := OddOrder.Peterfalvi.S08.inducedKernelFamily_inner_self_real_pos
+        (show ζ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+            ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) by
+          have h := hζHC; rw [hyp.SOf_eq] at h
+          exact OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone bot_le h)
+      rw [he] at hμζ
+      exact Complex.ofReal_ne_zero.mpr hpos.ne' hμζ
+    · intro heq
+      have hμζc : ClassFunction.inner μ ζ.conj = 0 := by
+        rw [OddOrder.RepresentationTheory.inner_conj_symm,
+          SOf_HC_inner_sOf_H0C_eq_zero hyp hζc hμmem, star_zero]
+      rw [heq] at hμζc
+      obtain ⟨he, hpos⟩ := OddOrder.Peterfalvi.S08.inducedKernelFamily_inner_self_real_pos
+        (show ζ.conj ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+            ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) by
+          have h := hζc; rw [hyp.SOf_eq] at h
+          exact OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone bot_le h)
+      rw [he] at hμζc
+      exact Complex.ofReal_ne_zero.mpr hpos.ne' hμζc
+  have hcross_ξζ : ClassFunction.inner (c.extension ξ) (coh.extension ζ) = 0 := by
+    refine SOf_coherent_extension_cross_orthogonal hG hyp hsub1
+      (le_refl (hyp.SOf hyp.HC)) c coh hξ hξc hζHC hζc ?_ ?_
+    · intro heq
+      rw [heq] at hξζ
+      obtain ⟨he, hpos⟩ := OddOrder.Peterfalvi.S08.inducedKernelFamily_inner_self_real_pos
+        (show ζ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+            ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) by
+          have h := hζHC; rw [hyp.SOf_eq] at h
+          exact OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone bot_le h)
+      rw [he] at hξζ
+      exact Complex.ofReal_ne_zero.mpr hpos.ne' hξζ
+    · intro heq
+      have hξζc : ClassFunction.inner ξ ζ.conj = 0 := by
+        rw [OddOrder.RepresentationTheory.inner_conj_symm,
+          SOf_HC_inner_sOf_H0C_eq_zero hyp hζc hξ, star_zero]
+      rw [heq] at hξζc
+      obtain ⟨he, hpos⟩ := OddOrder.Peterfalvi.S08.inducedKernelFamily_inner_self_real_pos
+        (show ζ.conj ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+            ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) by
+          have h := hζc; rw [hyp.SOf_eq] at h
+          exact OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone bot_le h)
+      rw [he] at hξζc
+      exact Complex.ofReal_ne_zero.mpr hpos.ne' hξζc
+  -- `⟨c(ξ), Ω⟩ = 0`: the (5.5) dispatch of `ξ` against the grid members via the world-bridge
+  have hcross_ξΩ : ClassFunction.inner (c.extension ξ) Ω = 0 := by
+    sorry
+  -- the γ-equation gives `⟨c(μ), Ω⟩ = w₁`
+  have hkey : ClassFunction.inner (c.extension μ) Ω = (hyp.base.w1 : ℂ) := by
+    sorry
+  -- norms and positive-definiteness
+  sorry
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (11.8.6) narrow union-coherence capstone** — targeting the *narrow* family `S(H₀C)`
 via the `𝒮(H₀C)` coherence (contradicting (11.3)), NOT the deprecated wide `Sset \ SHCSet`
 uniform-degree route (false for non-Galois type III/IV, issue 1019).
