@@ -29,3 +29,20 @@ S14 WitnessSylowCyclic — は Noncoherence の上流で repoint 不能、legacy
       `OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional hG ⟨…⟩` (signature 同形)
 - [ ] 効果: (14.9) T-side chain の (10.10) 依存が legacy 二重 sorry (typeV_forces_coherence
       bare + hB) から (6.5) gates (2022) に置換 = honest 化
+
+
+## lane-c 実施結果 (2026-07-12): DAG cycle のため repoint 不可、現状維持
+
+提案どおり `TTypeII.lean` から `S12_Noncoherence` を import して
+`no_typeV_maximal_unconditional` へ差し替えたが、実 build で次の循環を確認した:
+
+`TTypeII → S12_Noncoherence → S12_TypeIICrossIsometryPair →
+S12_TypeIIGridTranspose → FeitThompsonSetup → BG.AppC_FinalContradiction →
+S16_NonExistenceG → ... → TTypeII`.
+
+したがって issue 冒頭の「S16 は FeitThompsonSetup 非依存」という見込みは誤り。
+変更は即時撤回し、`lake build OddOrder.Peterfalvi.S16_NonExistenceG.TTypeII`
+(4120 jobs) green を再確認した。現 DAG のままでは unconditional heir への
+直接 repoint はできない。実現するなら `no_typeV_maximal_unconditional` の
+FeitThompsonSetup 非依存 core を循環の上流 leaf へ再配置する別 refactor が必要であり、
+この任意 hygiene issue は premise false として close する。

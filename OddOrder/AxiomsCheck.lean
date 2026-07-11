@@ -3376,6 +3376,8 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.inducedFamily_mapRingEquiv_mem
 set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.inner_mapRingEquiv_eq_of_mem_ZIrr
+set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.primeTIred_zero_mapRingEquiv
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.tSideDadeMap_mapRingEquiv_bridge
@@ -3385,6 +3387,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.tSideDadeMap_inner_eq_zero_of_coherent_difference
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.tSideDadeMap_inner_galois_eq_intCast
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.tSideDadeMap_eta_axis_coefficients_constant
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.tSideDadeMap_conj_of_support
 set_option linter.style.longLine false in
