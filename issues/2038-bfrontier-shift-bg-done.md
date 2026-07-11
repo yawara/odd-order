@@ -1608,3 +1608,13 @@ group-theoretic 部分は完全 proven)** が既在。残る仮説入力 = 2 つ
   ∃i μ_{ij}≠0 が必要 — Ind1|_P = u ≠ 0 ゆえ)。hmuD/hmuW1 完成後、BetaData の
   support_formula field を P^#∪V_S 形に差し替える再設計を検討 (consumer = S15_SAndT 内
   BetaData のみ; S16 は sharpP∪typePV 形を直接使用)。
+
+## ✅ (2026-07-12、/loop iter 3) — hmuD 実証明で (13.18.a) の 2 入力完備
+
+`mu_row0_apply_eq_zero_of_mem_derived_not_mem_P` (OrderDetermination) + 支持補題 5 本
+(C_eq_bot / H_eq_P / not_q_dvd_card_derived / W1_inf_derived_eq_bot /
+mu_colSum_support_subset_P) を実証明。**hmuD + hmuW1 が両方 proven** となり、S16 の
+`betaGrid_support_sharpP_union_typePV_of_mu_values` (proven 骨格) は仮説なしで instantiate
+可能。次: (i) S16 側 wiring (仮説 discharge 版) は c-territory — 2038 経由で通知、または
+(ii) S15_SAndT:765 grid form `betaGrid_support` の扱い (P^#∪V_S 形で BetaData を再設計 or
+grid form の P^#⊆⋃supp 部分を追加検証)。文書順の次 sorry = :765 自体。
