@@ -1618,3 +1618,11 @@ mu_colSum_support_subset_P) を実証明。**hmuD + hmuW1 が両方 proven** と
 可能。次: (i) S16 側 wiring (仮説 discharge 版) は c-territory — 2038 経由で通知、または
 (ii) S15_SAndT:765 grid form `betaGrid_support` の扱い (P^#∪V_S 形で BetaData を再設計 or
 grid form の P^#⊆⋃supp 部分を追加検証)。文書順の次 sorry = :765 自体。
+
+## ✅ (2026-07-12、/loop iter 4) — betaGrid_support を exact form (PVSbeta) で完全証明
+
+grid form (⋃ᵢ supp μ) は unfaithful restate と断定 (P^# 全点 nonzero μ-値を要求) — 3003 パターン
+で statement を Coq-faithful P^#∪V_S 形に修正し、hmuD/hmuW1 + (2.1) 骨格で**仮説なし完全証明**
+(commit 400e8649)。BetaData.support_formula / ∃-theorem も追従。**S15_SAndT bare sorry 6 → 5**:
+残 = :84 E⊄Q ((13.19.c1)) / :1563 / :1679 Γ-real / :1694 (13.18.d) Y-norm / :1932 TypeIOrtho。
+S16 TGapCross との一時重複は **issue 9084** で hub に redirect 裁定を依頼。
