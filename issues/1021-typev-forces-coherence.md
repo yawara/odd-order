@@ -353,3 +353,15 @@ SHC 版 + (10.9) (μ₀−ζ)^τ pin) → ③ |S₁| ≥ 8 / hR8 の discharge
 (card_abelianization_derived_eq_w1_mul_card_SHCSet_add_one
 S12_Section9Counts:488 + case-(c) |H:H'| = p² 構造 — engine 仮説で分離可)。
 R の供給 = exists_SHC_extension_orthonormal (S12_Props109To1011:768)。
+
+## 2026-07-11 tick²⁹ — ★(10.10.3) grid 恒等式完結 (SHC_tau_muGridAlpha_eq_of_eight_le_card)
+a=0 と SHC endgame の合成で α^τ = δ(ω−ω) − nζ^{τ₁} sorry-free。
+残: (i) R-free 化 — exists_SHC_extension_orthonormal (:768) は card 句を
+露出しない → R.card = SHC-filter s.card の bridge (SHC_extension_inj :752 で
+image-card 保存) を足すか、既存を card 付き existential に強化 (owner=自分の
+Props109To1011 なので後者可)。8 ≤ s.card の discharge は
+card_abelianization_derived_eq_w1_mul_card_SHCSet_add_one (Section9Counts:488)
++ case-(c) |H:H'| = p² + p = 2w₁−1 → w₁·|S₁| + 1 = p² → |S₁| = 4(w₁−1) ≥ 8。
+(ii) (10.10.4) glue: (μ_j − dζ)^τ = δ∑_i ω_ij^σ − d·ζ^{τ₁} (sum_alpha_eq +
+本 corollary の i-和 + (10.9) (μ₀−ζ)^τ pin) → ν 構成 → IsCoherent hyp.tau
+hyp.Sset hyp.A0。(iii) (10.10.2) 構造 (S = S₁ ∪ {μ_j}、p³ 指標論)。
