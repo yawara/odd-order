@@ -1645,3 +1645,18 @@ exact form betaGrid_support + proven 包含 sharpP_union_V_subset_A0 の 3 行�
   D(φ.conj) = (D φ).conj (φ, φ.conj とも supported — support は conj 不変 up to index)。
 - assembly: Γ̄ = D(β̄_{#1}) − 1_G + η̄_{01} = D(β_{negIdx}) − 1_G + η_{0,negIdx}
   (β̄ = Ind1 − μ̄ = β_neg、induce_conj + trivial real + mu_conj) = Γ (defGamma at negIdx)。
+
+## ✅ (2026-07-12、/loop iter 6) — GammaReal 部品 1: Dade-conj 可換 (commit 242551a9)
+
+conj_support (IsReal) + Hypothesis.dadeMap_conj (S04、点評価の star 透過) +
+dadeIntegralCharacterMap_conj_of_support (S07 lift)。
+**次 iter = 部品 2+assembly**: conj-pair fields (`omega_conj`/`mu_conj`/`eta_conj`、finNeg index)
+を 3 層 (SubcoherenceInputs/Section16Inputs/cd) に追加し producer discharge:
+- mu_conj ← S06 `certainType_mu_conj_eq` (proven) + chi2enum_finNeg + eqQ_finNeg/rowInv 橋
+  + mapRingEquiv conjAe ↔ .conj bridge
+- omega_conj ← omegaSChar_finNeg (proven) + galoisMap_conj_omega
+- eta_conj ← FT:1610 で eta := τ₃∘ω 供給 — tau3W の conj-equivariance
+  (sigma_mapRingEquiv_comm、3002 keystone) + omega_conj
+- assembly gammaGrid_real: Γ̄ = D(β̄₁)−1+η̄_{01} (conj_sub/add + trivial real +
+  Dade-conj [A0beta support]) = D(β_{j'})−1+η_{0,j'} (β̄₁ = Ind1−μ̄_{01}、induce_conj +
+  mu_conj、j' = finNeg #1 ≠ 0) = Γ (proven gammaGrid_defGamma at j')。
