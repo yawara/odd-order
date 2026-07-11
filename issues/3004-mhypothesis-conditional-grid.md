@@ -652,3 +652,25 @@ feature commits: `b8b493c0`, `ad35e55f`。
 - 3 theorem は AxiomsCheck 登録済み。`TGapPrimeTI` / `TTypeII` / AxiomsCheck
   (4134 jobs) は exit 0、`git diff --check` clean。`TGapPrimeTI` は sorry-free、
   `TTypeII` は 1497 行・既存 2 sorry のまま。新 axiom・新 sorry なし。
+
+## lane-c (11.9.a) T-side eta-grid 射影の実構成 (2026-07-11)
+
+feature commit: `8c789fb4`。
+
+- 新 leaf `TGapProjection.lean` に
+  `exists_etaGrid_intProjection_of_inner_self_eq` を実証明した。任意の virtual character
+  `b ∈ ZIrr(G)` と exact norm `⟨b,b⟩=p+1` から、full eta-grid に対する整数係数 `mᵢⱼ`、
+  係数 identity `⟨b,ηᵢⱼ⟩=mᵢⱼ`、直交射影の Pythagoras identity、および
+  `∑ᵢⱼ mᵢⱼ² ≤ p+1` を同時に構成する。最後の bound は perpendicular residual の
+  self-inner-product の実部非負性から導いた。
+- `T_typeIII_ratio_le` は前節の exact Dade-image norm producer を実際に消費し、
+  `mT`, `hmT`, `hpythT`, `hboundT` を materialize するよう配線した。従って
+  `bridgeS1` の norm / integral projection existence は residual ではない。
+- 残る coefficient-rigidity frontier は Coq `FTtype34_structure` の exact な後半:
+  `a₀₀=1`、four-corner relation、automorphism orbit による係数等式、および residual の
+  nonzero / non-orthogonality を組み合わせ、bound を sharpen して off-axis 係数を 0 にする。
+  これは type-V case-(c) の `w₁<w₂` theorem や transpose で代替せず、T-side の
+  `q<p` の向きで独立に証明する。
+- 新 theorem は AxiomsCheck 登録済み。main `f35a8849` を同期後、AxiomsCheck
+  (4139 jobs) は exit 0、`git diff --check` clean。`TGapProjection` は sorry-free、
+  `TTypeII` は 1499 行・既存 2 sorry のまま。新 axiom・新 sorry なし。
