@@ -92,7 +92,7 @@ These are Coq's `cfnorm_prTIred` and `omuS1` inputs in the norm-rigidity proof o
 `FTtype34_structure`. Keeping the universal induced-family orthogonality alongside
 the concrete anchor avoids replacing the (11.9)(a) projection by an opaque coefficient
 assumption downstream. -/
-theorem exists_typeIII_primeTIredZero_with_projectionData [Finite G]
+theorem exists_typeIII_primeTIredZero_with_projectionData_and_galois [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G))
     (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T) :
@@ -104,12 +104,14 @@ theorem exists_typeIII_primeTIredZero_with_projectionData [Finite G]
         ν0 1 = (hyp.base.p : ℂ) ∧
         ClassFunction.inner ν0 (trivialClassFunction ↥hyp.base.T) = 1 ∧
         ClassFunction.inner ν0 ν0 = (hyp.base.p : ℂ) ∧
-        ∀ θ : IrreducibleCharacter
+        (∀ θ : IrreducibleCharacter
             ((derivedInG hyp.base.T).subgroupOf hyp.base.T),
           θ ≠ trivialIrreducibleCharacter _ →
           ClassFunction.inner ν0
             (ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T)
-              θ.toClassFunction) = 0 := by
+              θ.toClassFunction) = 0) ∧
+        ∀ sigma : ℂ ≃+* ℂ,
+          ClassFunction.mapRingEquiv sigma ν0 = ν0 := by
   classical
   let td : OddOrder.GroupTheory.TypeIIIData hyp.base.T := hIII.some
   have hP : OddOrder.BG.Ch4.S14.IsTypeP hyp.base.T :=
@@ -123,7 +125,7 @@ theorem exists_typeIII_primeTIredZero_with_projectionData [Finite G]
   let residue : PrimeTIResidueData ↥hyp.base.T s06.K
       (Nat.card ↥s06.W1) (Nat.card ↥s06.W2) :=
     PrimeTIResidueData.ofS06Hypothesis s06 ⊤ le_top
-  refine ⟨residue.primeTIred 0, residue.prTIred_mem_ZIrr 0, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  refine ⟨residue.primeTIred 0, residue.prTIred_mem_ZIrr 0, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · change (residue.primeTIred 0).conj = residue.primeTIred 0
     rw [← residue.cfInd_prTIres 0, residue.prTIres0,
       ClassFunction.induce_conj, trivialClassFunction_isReal]
@@ -165,6 +167,37 @@ theorem exists_typeIII_primeTIredZero_with_projectionData [Finite G]
         (ClassFunction.induce s06.K θ.toClassFunction) = 0
     rw [← residue.cfInd_prTIres 0, residue.prTIres0]
     exact OddOrder.RepresentationTheory.inner_induce_trivial_induce_eq_zero hθ
+  · intro sigma
+    rw [← residue.cfInd_prTIres 0, residue.prTIres0,
+      ClassFunction.mapRingEquiv_induce]
+    congr 1
+    ext x
+    simp [ClassFunction.mapRingEquiv_apply, trivialClassFunction_apply]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- The projection data of the canonical T-side prime-TI anchor, with its
+coefficient-Galois fixedness projected away for existing consumers. -/
+theorem exists_typeIII_primeTIredZero_with_projectionData [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T) :
+    ∃ ν0 : ClassFunction ↥hyp.base.T ℂ,
+      ν0 ∈ ZIrr ↥hyp.base.T ∧
+        ClassFunction.IsReal ν0 ∧
+        ν0.support ⊆
+          ((derivedInG hyp.base.T).subgroupOf hyp.base.T : Set ↥hyp.base.T) ∧
+        ν0 1 = (hyp.base.p : ℂ) ∧
+        ClassFunction.inner ν0 (trivialClassFunction ↥hyp.base.T) = 1 ∧
+        ClassFunction.inner ν0 ν0 = (hyp.base.p : ℂ) ∧
+        ∀ θ : IrreducibleCharacter
+            ((derivedInG hyp.base.T).subgroupOf hyp.base.T),
+          θ ≠ trivialIrreducibleCharacter _ →
+          ClassFunction.inner ν0
+            (ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T)
+              θ.toClassFunction) = 0 := by
+  obtain ⟨ν0, hνZ, hνR, hνsupp, hν1, hνone, hνnorm, hνorth, _⟩ :=
+    exists_typeIII_primeTIredZero_with_projectionData_and_galois hG hyp hIII
+  exact ⟨ν0, hνZ, hνR, hνsupp, hν1, hνone, hνnorm, hνorth⟩
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (11.9)(a), the prime-TI anchor is orthogonal to a conjugate pair.**
@@ -621,6 +654,169 @@ open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 This is the projection-ready form of
 `exists_typeIII_induced_primeTIDifference_with_norm`: the same canonical prime-TI
 anchor is kept orthogonal to the induced source and its conjugate. -/
+theorem exists_typeIII_induced_primeTIDifference_with_norm_anchor_orthogonality_and_galois
+    [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    [fintypeG : Fintype G]
+    [fintypeT : Fintype ↥hyp.base.T]
+    [fintypeK : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
+    [invertibleG : Invertible (Nat.card G : ℂ)]
+    [invertibleT : Invertible (Nat.card ↥hyp.base.T : ℂ)]
+    [invertibleK :
+      Invertible (Nat.card ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) : ℂ)]
+    (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T)
+    (θ : IrreducibleCharacter
+      ((derivedInG hyp.base.T).subgroupOf hyp.base.T))
+    (hθne : θ ≠ trivialIrreducibleCharacter _)
+    (hζirr : IsIrreducibleCharacter
+      (ClassFunction.induce
+        ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction))
+    (hζ1 : ClassFunction.induce
+      ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction 1 =
+        (hyp.base.p : ℂ)) :
+    ∃ ν0 : ClassFunction ↥hyp.base.T ℂ,
+      ν0 ∈ ZIrr ↥hyp.base.T ∧
+        ClassFunction.IsReal ν0 ∧
+        (ν0 - ClassFunction.induce
+          ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction)
+            ∈ ZIrr ↥hyp.base.T ∧
+        (ν0 - ClassFunction.induce
+          ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction).support ⊆
+          OddOrder.Peterfalvi.S04.supportInSubgroup
+            (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T ∧
+        tSideDadeMap hyp hG
+          (ν0 - ClassFunction.induce
+            ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction) ∈ ZIrr G ∧
+        tSideDadeMap hyp hG
+          (ν0 - ClassFunction.induce
+            ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction) 1 = 0 ∧
+        (ν0 - ClassFunction.induce
+          ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction).conj =
+            ν0 - (ClassFunction.induce
+              ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction).conj ∧
+        ClassFunction.inner ν0 (trivialClassFunction ↥hyp.base.T) = 1 ∧
+        ClassFunction.inner ν0
+          (ClassFunction.induce
+            ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction) = 0 ∧
+        ClassFunction.inner ν0
+          (ClassFunction.induce
+            ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction).conj = 0 ∧
+        ClassFunction.inner
+            (ν0 - ClassFunction.induce
+              ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction)
+            (ν0 - ClassFunction.induce
+              ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction) =
+          ((hyp.base.p : ℕ) + 1 : ℂ) ∧
+        ClassFunction.inner
+            (tSideDadeMap hyp hG
+              (ν0 - ClassFunction.induce
+                ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction))
+            (tSideDadeMap hyp hG
+              (ν0 - ClassFunction.induce
+                ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction)) =
+          ((hyp.base.p : ℕ) + 1 : ℂ) ∧
+        ∀ sigma : ℂ ≃+* ℂ,
+          ClassFunction.mapRingEquiv sigma ν0 = ν0 := by
+  have hfg : fintypeG =
+      OddOrder.Peterfalvi.S12.FiniteInduce.finiteGFintype := Subsingleton.elim _ _
+  subst fintypeG
+  have hft : fintypeT =
+      OddOrder.Peterfalvi.S12.FiniteInduce.finiteSubFintype hyp.base.T :=
+    Subsingleton.elim _ _
+  subst fintypeT
+  have hfk : fintypeK =
+      OddOrder.Peterfalvi.S12.FiniteInduce.finiteSubFintype
+        ((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Subsingleton.elim _ _
+  subst fintypeK
+  have hig : invertibleG =
+      OddOrder.Peterfalvi.S12.FiniteInduce.natCardInvCG := Subsingleton.elim _ _
+  subst invertibleG
+  have hit : invertibleT =
+      OddOrder.Peterfalvi.S12.FiniteInduce.natCardInvC hyp.base.T :=
+    Subsingleton.elim _ _
+  subst invertibleT
+  have hik : invertibleK =
+      OddOrder.Peterfalvi.S12.FiniteInduce.natCardInvC
+        ((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Subsingleton.elim _ _
+  subst invertibleK
+  let ζ := ClassFunction.induce
+    ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction
+  change IsIrreducibleCharacter ζ at hζirr
+  change ζ 1 = (hyp.base.p : ℂ) at hζ1
+  obtain ⟨ν0, hνZ, hνR, hνsupp, hν1, hνone, hνnorm, hνorth, hνfixed⟩ :=
+    exists_typeIII_primeTIredZero_with_projectionData_and_galois hG hyp hIII
+  let θc : IrreducibleCharacter
+      ((derivedInG hyp.base.T).subgroupOf hyp.base.T) :=
+    ⟨(θ : ClassFunction ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) ℂ).conj,
+      θ.isIrreducible.conj⟩
+  have hθcne : θc ≠ trivialIrreducibleCharacter _ :=
+    OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.irreducibleCharacter_conj_ne_trivial
+      hθne
+  have hνζ : ClassFunction.inner ν0 ζ = 0 := hνorth θ hθne
+  have hνζc : ClassFunction.inner ν0 ζ.conj = 0 := by
+    rw [ClassFunction.induce_conj
+      ((derivedInG hyp.base.T).subgroupOf hyp.base.T)
+      (θ : ClassFunction ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) ℂ)]
+    exact hνorth θc hθcne
+  have hζsupp : ζ.support ⊆
+      ((derivedInG hyp.base.T).subgroupOf hyp.base.T : Set ↥hyp.base.T) :=
+    typeIII_induced_source_support hyp θ
+  have hβZ : ν0 - ζ ∈ ZIrr ↥hyp.base.T :=
+    (ZIrr ↥hyp.base.T).sub_mem hνZ hζirr.mem_ZIrr
+  have hA : OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T =
+      (derivedInG hyp.base.T : Set G) \ {1} :=
+    T_typeIII_sigmaSharp_eq hG hyp hIII
+  have hβsupp : (ν0 - ζ).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T := by
+    intro x hx
+    have hxK : x ∈ (derivedInG hyp.base.T).subgroupOf hyp.base.T := by
+      rcases ClassFunction.support_sub_subset ν0 ζ hx with hx | hx
+      · exact hνsupp hx
+      · exact hζsupp hx
+    have hx1 : x ≠ 1 := by
+      intro he
+      apply ClassFunction.mem_support.mp hx
+      rw [he, ClassFunction.sub_apply, hν1, hζ1, sub_self]
+    exact (OddOrder.Peterfalvi.S09.Cert.mem_supportInSubgroup_sharp_subgroupOf_iff
+      (derivedInG hyp.base.T) hA x).2 ⟨hxK, hx1⟩
+  let side := (tSideDadeSupport_nonempty hG hyp).some
+  have hτZ : tSideDadeMap hyp hG (ν0 - ζ) ∈ ZIrr G := by
+    simpa [tSideDadeMap] using
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+        side.dade side.hconj hβsupp hβZ)
+  have hτ1 : tSideDadeMap hyp hG (ν0 - ζ) 1 = 0 := by
+    simpa [tSideDadeMap] using
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one_eq_zero
+        side.dade side.hconj hβsupp)
+  have hζν : ClassFunction.inner ζ ν0 = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hνζ, star_zero]
+  have hβnorm : ClassFunction.inner (ν0 - ζ) (ν0 - ζ) =
+      ((hyp.base.p : ℕ) + 1 : ℂ) := by
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right, hνnorm, hνζ, hζν, hζirr.inner_self_eq_one]
+    ring
+  have hτnorm : ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ))
+      (tSideDadeMap hyp hG (ν0 - ζ)) = ((hyp.base.p : ℕ) + 1 : ℂ) := by
+    have hS : ∀ s ∈ ({ν0 - ζ} : Set (ClassFunction ↥hyp.base.T ℂ)),
+        s.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+          (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T := by
+      intro s hs
+      simpa only [Set.mem_singleton_iff] using hs ▸ hβsupp
+    rw [show tSideDadeMap hyp hG =
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap side.dade
+        (side.dade.fullDadeIsometryData side.hconj) from rfl]
+    rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
+      side.dade side.hconj hS
+      (Submodule.subset_span (Set.mem_singleton (ν0 - ζ)))
+      (Submodule.subset_span (Set.mem_singleton (ν0 - ζ))), hβnorm]
+  refine ⟨ν0, hνZ, hνR, hβZ, hβsupp, hτZ, hτ1, ?_, hνone,
+    hνζ, hνζc, hβnorm, hτnorm, hνfixed⟩
+  rw [ClassFunction.conj_sub, hνR]
+
+/-- The normed T-side prime-TI bridge with the canonical anchor's Galois
+fixedness projected away for existing consumers. -/
 theorem exists_typeIII_induced_primeTIDifference_with_norm_and_anchor_orthogonality
     [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -683,88 +879,11 @@ theorem exists_typeIII_induced_primeTIDifference_with_norm_and_anchor_orthogonal
               (ν0 - ClassFunction.induce
                 ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction)) =
           ((hyp.base.p : ℕ) + 1 : ℂ) := by
-  have hfg : fintypeG =
-      OddOrder.Peterfalvi.S12.FiniteInduce.finiteGFintype := Subsingleton.elim _ _
-  subst fintypeG
-  have hft : fintypeT =
-      OddOrder.Peterfalvi.S12.FiniteInduce.finiteSubFintype hyp.base.T :=
-    Subsingleton.elim _ _
-  subst fintypeT
-  have hfk : fintypeK =
-      OddOrder.Peterfalvi.S12.FiniteInduce.finiteSubFintype
-        ((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Subsingleton.elim _ _
-  subst fintypeK
-  have hig : invertibleG =
-      OddOrder.Peterfalvi.S12.FiniteInduce.natCardInvCG := Subsingleton.elim _ _
-  subst invertibleG
-  have hit : invertibleT =
-      OddOrder.Peterfalvi.S12.FiniteInduce.natCardInvC hyp.base.T :=
-    Subsingleton.elim _ _
-  subst invertibleT
-  have hik : invertibleK =
-      OddOrder.Peterfalvi.S12.FiniteInduce.natCardInvC
-        ((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Subsingleton.elim _ _
-  subst invertibleK
-  let ζ := ClassFunction.induce
-    ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction
-  change IsIrreducibleCharacter ζ at hζirr
-  change ζ 1 = (hyp.base.p : ℂ) at hζ1
-  obtain ⟨ν0, hνZ, hνR, hνsupp, hν1, hνone, hνnorm, _, hνζ, hνζc⟩ :=
-    exists_typeIII_primeTIredZero_with_conjugateProjectionData hG hyp hIII θ hθne
-  have hζsupp : ζ.support ⊆
-      ((derivedInG hyp.base.T).subgroupOf hyp.base.T : Set ↥hyp.base.T) :=
-    typeIII_induced_source_support hyp θ
-  have hβZ : ν0 - ζ ∈ ZIrr ↥hyp.base.T :=
-    (ZIrr ↥hyp.base.T).sub_mem hνZ hζirr.mem_ZIrr
-  have hA : OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T =
-      (derivedInG hyp.base.T : Set G) \ {1} :=
-    T_typeIII_sigmaSharp_eq hG hyp hIII
-  have hβsupp : (ν0 - ζ).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup
-        (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T := by
-    intro x hx
-    have hxK : x ∈ (derivedInG hyp.base.T).subgroupOf hyp.base.T := by
-      rcases ClassFunction.support_sub_subset ν0 ζ hx with hx | hx
-      · exact hνsupp hx
-      · exact hζsupp hx
-    have hx1 : x ≠ 1 := by
-      intro he
-      apply ClassFunction.mem_support.mp hx
-      rw [he, ClassFunction.sub_apply, hν1, hζ1, sub_self]
-    exact (OddOrder.Peterfalvi.S09.Cert.mem_supportInSubgroup_sharp_subgroupOf_iff
-      (derivedInG hyp.base.T) hA x).2 ⟨hxK, hx1⟩
-  let side := (tSideDadeSupport_nonempty hG hyp).some
-  have hτZ : tSideDadeMap hyp hG (ν0 - ζ) ∈ ZIrr G := by
-    simpa [tSideDadeMap] using
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-        side.dade side.hconj hβsupp hβZ)
-  have hτ1 : tSideDadeMap hyp hG (ν0 - ζ) 1 = 0 := by
-    simpa [tSideDadeMap] using
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one_eq_zero
-        side.dade side.hconj hβsupp)
-  have hζν : ClassFunction.inner ζ ν0 = 0 := by
-    rw [OddOrder.RepresentationTheory.inner_conj_symm, hνζ, star_zero]
-  have hβnorm : ClassFunction.inner (ν0 - ζ) (ν0 - ζ) =
-      ((hyp.base.p : ℕ) + 1 : ℂ) := by
-    rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
-      ClassFunction.inner_sub_right, hνnorm, hνζ, hζν, hζirr.inner_self_eq_one]
-    ring
-  have hτnorm : ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ))
-      (tSideDadeMap hyp hG (ν0 - ζ)) = ((hyp.base.p : ℕ) + 1 : ℂ) := by
-    have hS : ∀ s ∈ ({ν0 - ζ} : Set (ClassFunction ↥hyp.base.T ℂ)),
-        s.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
-          (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T := by
-      intro s hs
-      simpa only [Set.mem_singleton_iff] using hs ▸ hβsupp
-    rw [show tSideDadeMap hyp hG =
-      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap side.dade
-        (side.dade.fullDadeIsometryData side.hconj) from rfl]
-    rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-      side.dade side.hconj hS
-      (Submodule.subset_span (Set.mem_singleton (ν0 - ζ)))
-      (Submodule.subset_span (Set.mem_singleton (ν0 - ζ))), hβnorm]
-  refine ⟨ν0, hνZ, hνR, hβZ, hβsupp, hτZ, hτ1, ?_, hνone,
+  obtain ⟨ν0, hνZ, hνR, hβZ, hβsupp, hτZ, hτ1, hβconj, hνone,
+      hνζ, hνζc, hβnorm, hτnorm, _⟩ :=
+    exists_typeIII_induced_primeTIDifference_with_norm_anchor_orthogonality_and_galois
+      hG hyp hIII θ hθne hζirr hζ1
+  exact ⟨ν0, hνZ, hνR, hβZ, hβsupp, hτZ, hτ1, hβconj, hνone,
     hνζ, hνζc, hβnorm, hτnorm⟩
-  rw [ClassFunction.conj_sub, hνR]
 
 end OddOrder.Peterfalvi.S16

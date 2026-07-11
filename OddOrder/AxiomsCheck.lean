@@ -3359,6 +3359,9 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.exists_typeIII_primeTIredZero_with_projectionData
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.exists_typeIII_primeTIredZero_with_projectionData_and_galois
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.exists_typeIII_primeTIredZero_with_conjugateProjectionData
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.exists_typeIII_primeTIDifference_induced_inner_self
@@ -3367,6 +3370,9 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.exists_typeIII_induced_primeTIDifference_with_norm_and_anchor_orthogonality
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.exists_typeIII_induced_primeTIDifference_with_norm_anchor_orthogonality_and_galois
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.exists_typeIII_primeTIDifference_with_anchor_inner
 set_option linter.style.longLine false in
@@ -3481,6 +3487,9 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.etaGrid_coefficients_eq_column_or_row_of_sum_sq_le
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.etaGrid_zeroColumn_projection_of_coefficients_eq_column
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.typeIII_induced_source_support
 set_option linter.style.longLine false in
