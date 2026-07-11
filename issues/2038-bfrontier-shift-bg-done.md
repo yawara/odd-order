@@ -1539,3 +1539,24 @@ threading のみ 9081 裁定待ち。
 - (ii) τ_S = Ind on A0-support: `sInstance_dade0_eq_induce` **proven** (4c-2d)
 - (iii) V^S-TI で Ind 値 = 元値 (abstract、typePData_V_ti + induce class formula)
 - (iv) η 側: `eta_eq_tau_omega` + `tau3_apply_of_regular` (fields 既在)
+
+## ✅✅✅ (2026-07-12、lane-b 続行) — **pin 3 (V-value) も完全証明 — (13.18) 3-pin 全閉** (commit d46cadaa)
+
+前セクションの分解どおり一発 green:
+- **(i)** grounding field `mu_apply_of_not_mem_W2` (Coq prTIirr_id、W∖W₂、δ付き) を 3 層 +
+  producer discharge (`muS_apply_of_not_mem_W2` = §6 (4.3.c) `certainType_apply_eq_of_mem_V`
+  [base Hypothesis、**Dade-free** — hyp46 bundle 問題なし] + gridEquivE transport)。
+- **(ii)-(iv)** assembly は sInstance_dade0_eq_induce を経由せず **`dadeValue_eq` 直接** (x ~ w·1、
+  h=1 ∈ H=⊥) — Ind 値計算・V-TI 論法とも不要になり大幅短縮。
+- δ=1 は proven `delta_eq_one_S`、η 側は `eta_eq_tau_omega` + `tau3_apply_of_regular`。
+
+**S15_HonestTypeP2A0 = bare sorry 0**。9014/9076 の「3 isolated prime-TI pins」層は完全解消。
+3 pin の axiom 閉包に残る sorryAx は共有の深部 prerequisite に集約:
+`sibleyTarget_H0C` (S11 Coherence911:43、8-step induction port 待ち) /
+`escapingCentralizers_control` (S10_StructureSetup:547、(8.13)) /
+`bgTheoremE_cover_data` (S10_MinimalSimpleStructure:856) / dadeHypS0 存在系
+(honestTypeP2A0Set_tame_conj → BG §16 tame-embedding prerequisite、9081 hub 実測)。
+
+**次 frontier 候補 (S15_SAndT bare sorry 7、文書順)**: :33 type-I Frobenius complement ⊄ Q pin /
+:284 同 P-side / :660 betaGrid support / :1305 (support 系) / :1420 GammaGrid.conj real /
+:1439 (13.18.d) Y-norm bound / :1670 TypeIOrthogonalityGridData。
