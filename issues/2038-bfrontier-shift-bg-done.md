@@ -1579,3 +1579,12 @@ threading のみ 9081 裁定待ち。
 `complement_not_le_Q` (isolated sorry、(13.19.c1) provenance 明記)。既存 consumer
 `complement_card_eq_pq` (S15_SAndT:44) は両方 cite で不変。
 Huppert step `complement_le_QW2` / `Q_W2_structure` は S15_Gate3 で proven 済。
+
+## ✅ (2026-07-12、/loop iter 1) — V-side dichotomy `complement_inf_P_structure_dichotomy` 完全証明
+
+S15_SAndT:333 の sorry を実証明 (S-side mirror + by_cases E≤P、排除不要の faithful dichotomy 形)。
+部品 = W2_le_P / P_elementaryAbelian / isZGroup_complement_of_isFrobeniusGroup_of_odd (全 proven)。
+**S15_SAndT bare sorry 7 → 6**: 残 = :84 E⊄Q ((13.19.c1) 待ち — (14.5) 論理: E=W₁ → (13.19.c1)
+→ (u−1)/q ≤ (|H|−1)/e=q ≤ (u−1)/q → H=U → N_G(U)⊆L=UW₁⊆S が type II に矛盾。**(13.19) の
+形式化が真の上流**) / :765 (betaGrid support) / :1409 / :1525 (GammaGrid real) / :1540
+((13.18.d) norm bound) / :1774 (TypeIOrthogonalityGridData)。文書順の次 = :765。
