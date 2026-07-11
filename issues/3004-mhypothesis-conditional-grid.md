@@ -471,3 +471,30 @@ feature commits: `08ea38d4`, `47fa6c67`。
   次 frontier はこの type-P₁ `A₀` non-escaping/normedTI producer。
 - `TGapCross` / `TTypeII` / AxiomsCheck (4131 jobs) green、`git diff --check` clean。
   追加3公開 theorem は AxiomsCheck 登録済み、新 axiom・新 sorry なし。
+
+## lane-c T-side (13.2.e) normedTI producer の exact frontier (2026-07-11)
+
+feature commit: `6b225750`。
+
+- `fullTypeP1Dade_H_eq_bot_of_typePA_centralizer_le` を実証明。
+  `A₀(T)=A(T)∪V^T` のうち例外側 `V^T` は既存
+  `conjClassSetIn_typePV_centralizer_le_M` で常に non-escaping なので、必要な中心化群包含を
+  通常側 `A(T)=typePA(T)` だけへ縮約した。そこから `ftSupportKernel=⊥`、さらに
+  `tSideDadeMap_eq_induce_of_typePA_centralizer_le` まで配線した。
+- Coq の結論をそのまま受ける
+  `fullTypeP1Dade_H_eq_bot_of_isTISubset` /
+  `tSideDadeMap_eq_induce_of_isTISubset` も実証明。したがって次の genuine producer は
+  `IsTISubset (typePA0 T dataT) T` 一個であり、これを得れば full datum の `H=⊥` と
+  `τ_T=Ind_T^G` は追加仮定なしで閉じる。
+- Coq `PFsection13.v:222--242` を再照合。この TI 証明は、escape を仮定して
+  `FTsupport_facts` の unique maximal overgroup を取り、Type-I branch を Frobenius regularity、
+  Type-F/P branch を exclusion で潰す本体である。単なる `A₁⊆A₀` ではない。
+- 既存 `S12.typeII_A0_isTISubset` は最終的に得る `T_typeII` には適用できるが、(14.9) の
+  contradiction 内では `hIII : IsTypeIII T` を仮定しており、Type II/III は相互排他的。
+  しかも `T_typeII` 自身がこの contradiction の下流なので、ここへ逆流させるのは循環。
+  よって次は Type-III/type-P₁ branch の上記 Coq 証明を正面から port する。
+- cross term のもう一方 `QV'betaS ⟂ Ind_T^G betaT0` も独立検索したが、既存
+  `betaGrid_A0_support` だけでは不足する。Coq 同様、`τ_S β_S` が
+  `class_support (T')#` の外にある p-divisibility support theorem が別途必要。
+- 最新 main merge 後 `TGapCross` + AxiomsCheck (4131 jobs) green。
+  追加4公開 theorem は許容公理のみ、新 axiom・新 sorry なし。
