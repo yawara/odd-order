@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core
+import OddOrder.Peterfalvi.S12_Props109To1011
 
 /-!
 # Peterfalvi (10.10.2)–(10.10.4): type-V case (c) — column characters
@@ -117,5 +118,133 @@ theorem delta_eq_neg_one (params : CharacterParameters hyp) (hw1 : 3 ≤ hyp.w1)
   · exact h
 
 end CharacterParameters
+
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (10.10.3), the `a = 0` coefficient computation** — the type-V case-(c)
+counterpart of the (11.8.2) `muGridAlpha_tau_residual_norm`: projecting `α_{ij}^τ` onto the
+orthonormal `S₁^{τ₁} = R` gives a constant coefficient `a` off `ζ^{τ₁}`
+(`muGridAlpha_tau_inner_SHC_extension_sub`) and `a − n` at `ζ^{τ₁}`; Parseval + the norm
+`‖α_{ij}^τ‖² = 2 + n²` give `(a−n)² + (|R|−1)a² ≤ 2 + n²`, i.e. `|R|·a² − 2an − 2 ≤ 0`.
+In the (10.10.3) regime `n = 2` and `|R| = |S₁| = 4(w₁−1) ≥ 8` — as opposed to the
+(11.8.1) regime `|R| = n` — this forces `a = 0` (`alpha_coefficient_eq_zero`), so
+`⟨α_{ij}^τ, ζ^{τ₁}⟩ = −n`: exactly the `hα0` input of `SHC_tau_muGridAlpha_eq`, whence
+`α_{ij}^τ = δ(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}` ((10.10.3)). -/
+theorem Hypothesis.muGridAlpha_tau_inner_SHC_zeta_of_eight_le_card [Finite G]
+    {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
+    (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ) (hδj : hyp.muColumnSign hG hodd j = δ)
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hδpm : δ = 1 ∨ δ = -1) (hneq : n = 2)
+    {R : Finset (ClassFunction G ℂ)} (hR8 : 8 ≤ R.card)
+    (hZ : ∀ β ∈ R, β ∈ ZIrr G)
+    (horth : ∀ α ∈ R, ∀ β ∈ R, ClassFunction.inner α β = if α = β then (1 : ℂ) else 0)
+    (hRmem : ∀ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M → IsIrreducibleCharacter φ →
+      φ 1 = (hyp.w1 : ℂ) → coh.extension φ ∈ R)
+    (hRrev : ∀ β ∈ R, ∃ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+      φ 1 = (hyp.w1 : ℂ) ∧ β = coh.extension φ) :
+    ClassFunction.inner
+      (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+      (coh.extension ζ) = -(n : ℂ) := by
+  classical
+  have hζR : coh.extension ζ ∈ R := hRmem ζ hζS hζirr hζ1
+  have hαZ := hyp.muGridAlpha_tau_mem_ZIrr hG hodd i hj0 hζS hζirr hdeg hμ0 hζ1 hnf hδj
+  obtain ⟨c, Y, hcoeff, hnorm, hYorth, hdecomp, hYZ⟩ :=
+    inner_self_eq_sum_sq_add_of_intProjection hαZ hZ horth
+  set a : ℤ := c (coh.extension ζ) + (n : ℤ) with hadef
+  have hcζ : c (coh.extension ζ) = a - (n : ℤ) := by rw [hadef]; ring
+  have hcη : ∀ β ∈ R, β ≠ coh.extension ζ → c β = a := by
+    intro β hβR hβne
+    obtain ⟨η, hηS, hηirr, hη1, rfl⟩ := hRrev β hβR
+    have hηζ : η ≠ ζ := fun h => hβne (by rw [h])
+    have hsub := hyp.muGridAlpha_tau_inner_SHC_extension_sub hG coh hodd i hj0 hζS hζirr hζ1
+      hηS hηirr hη1 hηζ hdeg hμ0 hnf hδj hdζ h0ζ
+    rw [hcoeff _ hζR, hcoeff _ (hRmem η hηS hηirr hη1)] at hsub
+    have hcast : ((c (coh.extension η) : ℤ) : ℂ) = ((a : ℤ) : ℂ) := by
+      rw [hadef]; push_cast; linear_combination -hsub
+    exact_mod_cast hcast
+  have hsplit := sum_sq_eq_of_split hζR hcζ hcη
+  have hnorm2 := hyp.muGridAlpha_tau_inner_self hG hodd i hj0 hζS hζirr hdeg hμ0 hζ1 hnf hδj
+    hdζ h0ζ hδpm
+  rw [hnorm2, hsplit] at hnorm
+  have hineq : (a - (n : ℤ)) ^ 2 + ((R.card : ℤ) - 1) * a ^ 2 ≤ 2 + (n : ℤ) ^ 2 := by
+    apply int_le_of_add_inner_self_eq (Y := Y)
+    push_cast at hnorm ⊢
+    linear_combination -hnorm
+  have hc8 : (8 : ℤ) ≤ (R.card : ℤ) := by exact_mod_cast hR8
+  have ha0 : a = 0 := by
+    refine alpha_coefficient_eq_zero hc8 ?_
+    subst hneq
+    push_cast at hineq
+    nlinarith [hineq]
+  have hval := hcoeff _ hζR
+  rw [hcζ, ha0] at hval
+  rw [hval]
+  push_cast
+  ring
+
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (10.10.3)** (grid form): in the (10.10.3) regime — `n = 2` and an orthonormal
+`S₁^{τ₁} = R` with `|R| ≥ 8` — the Dade image of the (10.5) difference is
+`α_{ij}^τ = δ·(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}` with `ζ^{τ₁}` the `S₁`-coherent extension.
+Composition of the `a = 0` coefficient computation
+(`muGridAlpha_tau_inner_SHC_zeta_of_eight_le_card`) with the SHC (10.5) endgame
+(`SHC_tau_muGridAlpha_eq`). -/
+theorem Hypothesis.SHC_tau_muGridAlpha_eq_of_eight_le_card [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
+    (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hζne : ζ.conj ≠ ζ) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ) (hδj : hyp.muColumnSign hG hodd j = δ)
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hδpm : δ = 1 ∨ δ = -1) (hneq : n = 2)
+    {R : Finset (ClassFunction G ℂ)} (hR8 : 8 ≤ R.card)
+    (hZ : ∀ β ∈ R, β ∈ ZIrr G)
+    (horth : ∀ α ∈ R, ∀ β ∈ R, ClassFunction.inner α β = if α = β then (1 : ℂ) else 0)
+    (hRmem : ∀ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M → IsIrreducibleCharacter φ →
+      φ 1 = (hyp.w1 : ℂ) → coh.extension φ ∈ R)
+    (hRrev : ∀ β ∈ R, ∃ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+      φ 1 = (hyp.w1 : ℂ) ∧ β = coh.extension φ) :
+    hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+      = (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
+        - (n : ℂ) • coh.extension ζ :=
+  hyp.SHC_tau_muGridAlpha_eq hG coh hodd i hj0 hζS hζirr hζ1 hζne hdeg hμ0 hnf hδj hdζ h0ζ hδpm
+    (hyp.muGridAlpha_tau_inner_SHC_zeta_of_eight_le_card hG coh hodd i hj0 hζS hζirr hζ1
+      hdeg hμ0 hnf hδj hdζ h0ζ hδpm hneq hR8 hZ horth hRmem hRrev)
+
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (10.10.3), count form** (R-free): with `n = 2` and at least `8` degree-`w₁`
+irreducible members of `S` — the (10.10.2) count is `|S₁| = 4(w₁−1) ≥ 8` for `w₁ ≥ 3` —
+the (10.5) difference maps to `α_{ij}^τ = δ·(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}`.  The
+orthonormal family `S₁^{τ₁}` and its cardinality are supplied by
+`exists_SHC_extension_orthonormal`. -/
+theorem Hypothesis.SHC_tau_muGridAlpha_eq_of_eight_le_SHCcount [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
+    (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hζne : ζ.conj ≠ ζ) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ) (hδj : hyp.muColumnSign hG hodd j = δ)
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hδpm : δ = 1 ∨ δ = -1) (hneq : n = 2)
+    (h8 : 8 ≤ (Finset.univ.filter fun χ : IrreducibleCharacter ↥M =>
+      (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
+        (χ : ClassFunction ↥M ℂ) 1 = (hyp.w1 : ℂ)).card) :
+    hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+      = (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
+        - (n : ℂ) • coh.extension ζ := by
+  obtain ⟨R, hZ, horth, hRmem, hRrev, hcard⟩ := hyp.exists_SHC_extension_orthonormal hG coh
+  exact hyp.SHC_tau_muGridAlpha_eq_of_eight_le_card hG coh hodd i hj0 hζS hζirr hζ1 hζne
+    hdeg hμ0 hnf hδj hdζ h0ζ hδpm hneq (by rw [hcard]; exact h8) hZ horth hRmem hRrev
 
 end OddOrder.Peterfalvi.S12
