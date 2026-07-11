@@ -146,3 +146,24 @@ PFsection11.v:905-990 ((11.8.6) 本体、tau2muj WLOG、γ-trick、odd 排除)�
   ⟨τ₂μ, ω-col⟩ ≠ 0 内積論法 + odd-conjugation 符号排除)。γ-trick の cross-直交は
   SOf_coherent_extension_cross_orthogonal (本 tick で landed) が供給。
 - followup (低優先): H0Cprime 版 dispatch 5+2 decls を SOf 版の thin instance に fold。
+
+## 2026-07-12 tick⁷ — hbridge_τ 部品状況 (hmixed 完了後の再評価)
+
+tick⁶ の landed 機構で γ-trick (Coq irr-case) の cross 項が**全て**処理可能に:
+- ⟨ext ξ, ζ^{τ₁}⟩ = 0 / ⟨ext μ_j, ζ^{τ₁}⟩ = 0: **2-stratum cross_orthogonal (landed)** ✓
+  (ζ ∈ S(HC)、ξ/μ_j ∈ 𝒮(H₀C))。
+- ⟨ext ξ, ω-col⟩ = 0 (irr ξ): dadeOfDiff ⊥ σ-grid 系
+  (certainTypeR_imageSet_orthogonal_dadeOfDiff_typeP 隣接、既在) + SOf-(5.5)。
+- γ = ξ(1)μ_j − μ_j(1)ξ の A₀-support + extends_on_supported + Dade 等長 → 内積計算 ✓ 部品既在。
+- narrow (5.5) (SOf_coherent_extension_eq_sum_memberRFamily) ⟹ ext(μ_j) = ∑_{α∈E} α、
+  E ⊆ certainTypeR imageSet (2q 元: +ω_{ij} 側 q 個 ∪ −ω̄ 側 q 個)。|E| = w₁ は norm から
+  (card 節は SOf 版で落としたが isometry + orthonormal で導出可)。
+
+**残る本丸 = dichotomy の後半**: ⟨∑E, ω-col⟩ ≠ 0 は「E ∩ 正側 ≠ ∅」までしか与えない。
+E = 正側全列 の強制は (a) Coq FTtypeP_coherent_TIred 型の (5.8) separability
+(S-side TypeIIColumnPin の endgame `eq_smul_chiFam_column_of_vanishOnV` mirror、V-vanishing 要) or
+(b) 列独立性 (SOf-diff: ext(μ_j − μ_k) = τ(μ_j − μ_k) = hcol-diff = ω_j − ω_k、A₀-supported ゆえ
+extends_on_supported で**タダ**!) + 1 列の pin を全列に伝播 + Parseval/counting で 1 列を決める
+組合せ論。**(b) が有望**: hcol-diff により δ=1 も自動 (tick⁴)、残るは
+「∑_j ⟨ext μ_j の E_j 分解⟩ の大域 counting」1 点。次 tick: (b) の counting を詰める
+(E_j ⊆ 2q-元、|E_j| = q、E_j − E_k = 列差固定、certainTypeR の j-列/j̄-列構造で交差評価)。
