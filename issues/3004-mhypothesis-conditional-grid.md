@@ -928,3 +928,38 @@ feature commits: `6ed2d8cf`, `9d27be05`。
 算術側の入力 mismatch は解消したため、未接続なのは (1) concrete full Galois orbit の
 3-carrier threading から axis constancy を得ること、(2) column-or-row 二分法の wrong-axis を
 Peterfalvi (11.8) non-orthogonality で排除すること、の二点である。
+
+### T-side projection dichotomy の end-to-end 接続 (2026-07-12 深夜)
+
+feature commits: `3b34f141`, `d7d72e00`。
+
+- `Section16CharacterData → Section16Inputs → S15.Hypothesis` に threading 済みの
+  row/column full Galois orbit を `eta_axis_galois_orbits_of_hypothesis` で eta-grid 表記へ
+  変換した。同時に canonical `ν₀ = primeTIred 0` の既存構成から、任意の
+  `sigma : ℂ ≃+* ℂ` に対する `mapRingEquiv sigma ν₀ = ν₀` を producer 出力に
+  保全した。既存 existential theorem の signature は変更せず、strengthened theorem の
+  射影として残した。
+- `T_typeIII_calT1_family_galois` / `inducedFamily_mapRingEquiv_mem` で coherent source
+  family の Galois 閉性も実際に threading し、
+  `tSideDadeMap_eta_axis_coefficients_constant` を TTypeII 局所 context で discharge した。
+  sharp `sum m² ≤ p` と合成し、
+  `etaGrid_coefficients_eq_column_or_row_of_sum_sq_le` の二分まで到達した。
+- 正しい zero-column 係数 branch は
+  `etaGrid_zeroColumn_projection_of_coefficients_eq_column` で完全に証明済み。
+  wrong zero-row branch についても `etaGridProjection_inner_eta`,
+  `etaGrid_projection_residual_inner_eta_eq_zero`,
+  `etaGridProjection_eq_zeroRow_of_coefficients_eq_row` で線形代数部分を全て閉じた。
+- Coq `PFsection11.v` の `FTtype34_structure` を再読し、wrong branch を排除する
+  exact input は単な residual 非零ではなく
+  `FTtype34_not_ortho_cycTIiso`: `τ_T(ν₀−ζ) − ∑_j η_0j` が eta-grid 全体に
+  直交することの否定、と独立確認した。TTypeII 内の残る `sorry` はこの
+  statement そのものに縮約済みで、column-or-row 算術や projection 同定は
+  もはや含まない。
+- 既存 S13 (11.8) インフラも再監査したが、public endpoint
+  `exists_zeta_residual_not_orthogonal_H0C_of_refuter` は存在的な `ζ` のみを返し、
+  (11.9.a) が必要とする **任意の** `ζ ∈ calT1_set` 版ではない。また現行の
+  S15 T-side carrier から S12 `Hypothesis` world への bridge も無い。従って次 frontier は
+  existing existential endpoint を無理に cite することではなく、Coq の任意 `ζ` 版
+  (11.8) refuter を T-side data へ正規に接続すること。
+- leaf builds および AxiomsCheck (4149 jobs) green。新 axiom・新 `sorry` なし。
+  追加した producer/projection theorem は全て AxiomsCheck 登録済み。

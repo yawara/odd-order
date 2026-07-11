@@ -1,6 +1,6 @@
 # main 合流モニター — a/b/c レーン自動合流の運用手順
 
-> 横断運用ドキュメント。**監視ペースは hub のモデルで決まる (ユーザー 2026-07-09 明文化)**: **Fable 使用中 = 30 分間隔 `13,43 * * * *`** (速度考慮) / **Opus 使用中 = 15 分間隔 `7,22,37,52 * * * *`** (:00/:30 回避・均等割り)。履歴: 2026-07-05 Fable で 30 分 `13,43` → Opus 切替で 15 分復帰、2026-07-09 Fable で 30 分 (ユーザー指示)、2026-07-02〜07-05 は 15 分、2026-06-29〜07-02 は 30 分、それ以前は 15 分。cron は session-only ([[cron-dies-on-model-switch]]; CronCreate `durable:true` は本環境で disk 永続せず session-only 扱い) ゆえ、**再作成時は現行モデルに対応するペースで**作る。main worktree = `/home/ywr/odd-order`。
+> 横断運用ドキュメント。**監視ペースは hub のモデルで決まる (ユーザー 2026-07-09 明文化)**: **Fable 使用中 = 30 分間隔 `13,43 * * * *`** (速度考慮) / **Opus 使用中 = 15 分間隔 `7,22,37,52 * * * *`** (:00/:30 回避・均等割り)。履歴: 2026-07-12 Fable で 30 分 (ユーザー再確認・規約化再指示)、2026-07-05 Fable で 30 分 `13,43` → Opus 切替で 15 分復帰、2026-07-09 Fable で 30 分 (ユーザー指示)、2026-07-02〜07-05 は 15 分、2026-06-29〜07-02 は 30 分、それ以前は 15 分。cron は session-only ([[cron-dies-on-model-switch]]; CronCreate `durable:true` は本環境で disk 永続せず session-only 扱い) ゆえ、**再作成時は現行モデルに対応するペースで**作る。main worktree = `/home/ywr/odd-order`。
 > ユーザー方針: **「検証通過は自動合流」** — build green + axiom-clean + sorry regression なし + 新 axiom なしを
 > 満たすレーンを `--no-ff` で自動マージ。満たさなければ `git merge --abort` で報告。合流成立時は最後に
 > `git push origin main`（変化なし/全 abort なら push しない）。
@@ -530,6 +530,32 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-12 (tick 2, cron 初発火) — 全 3 レーン合流: ★ gammaGrid_real 完全証明 (b) + S15 分割 0102 完遂**:
+  a=1 (docs: issue 1024 = Pf (11.9) typeP_Galois/Type-III material survey + 証明計画、build 省略) /
+  **b=3** (★ **gammaGrid_real (Pf 13.18c, Coq GammaReal) 完全証明** — mu_conj/eta_conj fields 3 層追加+
+  producer discharge+assembly、2038 iter 8 完遂; **S15_SAndT prefix-split** → 新 leaf
+  `S15_ComplementStructure.lean` (597 行、sorried 6 decl 移動、S15_SAndT 1486 行に復帰 <1500)、
+  issue 0102 closed) / **c=2** (Pf (11.8): zero-row 排除 obligation を inline sorry から明示 statement
+  `hnotZeroRowProjection` (Coq `FTtype34_not_ortho_cycTIiso`) へ isolate + TGapProjectionRigidity
+  refuter infra +59)。⚠ c は multiple merge bases (2) — 3-dot が前 tick 済み FeitThompson 等を幻影表示、
+  per-commit 確認 + trial-merge staged で誤検出排除 (手順どおり)。build green ×2 (4169 jobs; 3m04s/1m25s)・
+  AxiomsCheck OK・count-sorry 68→67 (gammaGrid_real discharge −1、移動/isolate は ±対)・build 警告 66→65・
+  新 axiom なし。push `bb955e43..0641db84`。size watch: FeitThompson 1850/Setup 1650 (>1500、0079 既知・
+  co-edit hotspot 継続)、S15_SAndT は 0102 で解消。
+- **2026-07-12 — 監視再開 (ユーザー「各レーンを監視します」+ Fable 30 分規約化再指示) + b/c 合流**:
+  cron `1363241e` を Fable 規定 30 分 `13,43` で作成。CLAUDE.md・memory の残存「15分」固定表記を
+  モデル依存規約 (正本 = 本ファイル冒頭) に統一 (`0f61c418`)。初回 tick (SHA 固定手順): a=0 /
+  **b=3 commits** (Pf 3.9a/4.9a CF-level conj-pair producer 3 本 `omegaS_conj`/`muS_conj`/
+  `tau3W_omegaS_conj` + IsReal bridge; FeitThompson.lean への純 additive proven 追記 = 2038 供給、
+  先例 7dcbd371 と同型で merge 時 hub 承認、2038 self-flag 済) / **c=6 commits** (Pf 3.9b
+  `eta_row/column_galois_orbit` を忠実 field として S15.Hypothesis→Section16Inputs→cd→構成子の
+  全 chain に配線 — producer は main 既存 proven ⟹ 供給付き field 追加 = `S_U_commutative` 先例で
+  hub 承認; Pf 11.9a T-side projection dichotomy assemble = (11.9) 一枚岩 sorry を case split し
+  zero-column 側実証明・残 = zero-row 排除 (Coq 11.8) に narrowing)。build green ×2 (4168 jobs;
+  b 後 8m52s / c 後 2m58s)・AxiomsCheck OK・count-sorry 68→68 (build 警告 66 不変)・新 axiom なし・
+  0105 dup spot-check 清 (自前 TGap 系列拡張のみ)。push `cb479f50..0341a433`。⚠ size watch:
+  FeitThompson.lean 1844 / FeitThompsonSetup.lean 1630 (>1500) — 既存 issue 0079 に現況注記
+  (両者とも b/c の carrier 供給 co-edit hotspot ゆえ「idle 時に hub 分割」方針維持)。
 - **2026-07-07 (夜) — FT endgame 計画制定 (ユーザー依頼の総ざらい)**: 6-agent workflow (wf_4d2d6126) で
   sorry census (87 = on-path 64 / 凍結 23) / opacity (free carrier 残 = TFieldModelData のみ、axiom 0) /
   frontier 幅 (現在 8–9 → 終盤 S16 直列 spine に収束) / velocity / issues を総点検し、

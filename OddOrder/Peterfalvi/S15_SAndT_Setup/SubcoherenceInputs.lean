@@ -364,6 +364,16 @@ structure Hypothesis where
   eta_row_vanish_of_one_zero : ∀ x : G,
     tau3 (omega ⟨1, q_prime.one_lt⟩ ⟨0, p_prime.pos⟩) x = 0 →
     ∀ i : Fin q, i ≠ ⟨0, q_prime.pos⟩ → tau3 (omega i ⟨0, p_prime.pos⟩) x = 0
+  /-- **Peterfalvi (3.9.b), full row-axis Galois orbit.** -/
+  eta_row_galois_orbit : ∀ i : Fin q, i ≠ ⟨0, q_prime.pos⟩ →
+    ∃ u : ℂ ≃+* ℂ,
+      ClassFunction.mapRingEquiv u (tau3 (omega ⟨1, q_prime.one_lt⟩ ⟨0, p_prime.pos⟩)) =
+        tau3 (omega i ⟨0, p_prime.pos⟩)
+  /-- **Peterfalvi (3.9.b), full column-axis Galois orbit.** -/
+  eta_column_galois_orbit : ∀ j : Fin p, j ≠ ⟨0, p_prime.pos⟩ →
+    ∃ u : ℂ ≃+* ℂ,
+      ClassFunction.mapRingEquiv u (tau3 (omega ⟨0, q_prime.pos⟩ ⟨1, p_prime.one_lt⟩)) =
+        tau3 (omega ⟨0, q_prime.pos⟩ j)
   /-- **Peterfalvi (3.9.c), the `η`-grid integrality on generic elements** (issue-3002
   keystone): for `g` of order prime to `pq`, each grid value `η_{ij}(g) = (τ₃ω)_{ij}(g)` is a
   rational integer.  The genuine §3/§5 Dade-Galois fact (`σ` intertwines the cyclotomic Galois

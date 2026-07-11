@@ -289,6 +289,18 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
   eta_row_vanish_of_one_zero : ∀ x : G,
     tau3 (omega ⟨1, q_prime.one_lt⟩ ⟨0, p_prime.pos⟩) x = 0 →
     ∀ i : Fin q, i ≠ ⟨0, q_prime.pos⟩ → tau3 (omega i ⟨0, p_prime.pos⟩) x = 0
+  /-- **Peterfalvi (3.9.b), full row-axis Galois orbit**: every nonprincipal
+  `(τ₃ω)_{i0}` is coefficient-Galois conjugate to `(τ₃ω)_{10}`. -/
+  eta_row_galois_orbit : ∀ i : Fin q, i ≠ ⟨0, q_prime.pos⟩ →
+    ∃ u : ℂ ≃+* ℂ,
+      ClassFunction.mapRingEquiv u (tau3 (omega ⟨1, q_prime.one_lt⟩ ⟨0, p_prime.pos⟩)) =
+        tau3 (omega i ⟨0, p_prime.pos⟩)
+  /-- **Peterfalvi (3.9.b), full column-axis Galois orbit**: every nonprincipal
+  `(τ₃ω)_{0j}` is coefficient-Galois conjugate to `(τ₃ω)_{01}`. -/
+  eta_column_galois_orbit : ∀ j : Fin p, j ≠ ⟨0, p_prime.pos⟩ →
+    ∃ u : ℂ ≃+* ℂ,
+      ClassFunction.mapRingEquiv u (tau3 (omega ⟨0, q_prime.pos⟩ ⟨1, p_prime.one_lt⟩)) =
+        tau3 (omega ⟨0, q_prime.pos⟩ j)
   /-- **Peterfalvi (3.9.c)** (issue-3002 keystone): on elements of order prime to `pq`, the
   `η`-grid values `(τ₃ω)_{ij}(g)` are rational integers. -/
   eta_intCast_of_coprime : ∀ (g : G), Nat.Coprime (orderOf g) (p * q) →
@@ -558,6 +570,18 @@ structure Section16CharacterData {G : Type*} [Group G] [Finite G]
   eta_row_vanish_of_one_zero : ∀ x : G,
     tau3 (omega ⟨1, tp.q_prime.one_lt⟩ ⟨0, tp.p_prime.pos⟩) x = 0 →
     ∀ i : Fin tp.q, i ≠ ⟨0, tp.q_prime.pos⟩ → tau3 (omega i ⟨0, tp.p_prime.pos⟩) x = 0
+  /-- **Peterfalvi (3.9.b), full row-axis Galois orbit.** -/
+  eta_row_galois_orbit : ∀ i : Fin tp.q, i ≠ ⟨0, tp.q_prime.pos⟩ →
+    ∃ u : ℂ ≃+* ℂ,
+      ClassFunction.mapRingEquiv u
+          (tau3 (omega ⟨1, tp.q_prime.one_lt⟩ ⟨0, tp.p_prime.pos⟩)) =
+        tau3 (omega i ⟨0, tp.p_prime.pos⟩)
+  /-- **Peterfalvi (3.9.b), full column-axis Galois orbit.** -/
+  eta_column_galois_orbit : ∀ j : Fin tp.p, j ≠ ⟨0, tp.p_prime.pos⟩ →
+    ∃ u : ℂ ≃+* ℂ,
+      ClassFunction.mapRingEquiv u
+          (tau3 (omega ⟨0, tp.q_prime.pos⟩ ⟨1, tp.p_prime.one_lt⟩)) =
+        tau3 (omega ⟨0, tp.q_prime.pos⟩ j)
   /-- **Peterfalvi (3.9.c)** (issue-3002 keystone): on elements of order prime to `pq`, the
   `η`-grid values `(τ₃ω)_{ij}(g)` are rational integers.  Supplied from
   `tau3W_omegaS_intCast_of_coprime` (S05 σ-Galois integrality). -/
