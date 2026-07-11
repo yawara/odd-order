@@ -97,10 +97,9 @@ Hypothesis (11.2) (M maximal, type III/IV)、ζ ∈ 𝒮(HC):
   - SHCSet = {ζ ∈ inducedFamily | irr ∧ ζ1=w1} (membership tuple ⟨hζS,hζirr,hζ1⟩ で span cite)。
 
   **新規に要る sub-lemma 4 本**:
-  - **(G1) μ₀ 列の mapRingEquiv 不変性**: `certainType_mu_conj_eq` (S06_CertainTypeConjugation) の
-    一般 σ 版 → mapRingEquiv σ (Σᵢ muGrid i 0) = Σᵢ muGrid i 0 (χ₂=1 列は σ で列不変・行 permute、
-    和不変)。fallback = 値有理性 route (列0 = M′-kernel 線形指標列: `muGrid_zero_column_apply_one`
-    (CharacterParameters:1434) + within-column 機構で値 ∈ {0..} 有理 → pointwise 固定)。
+  - [x] **(G1) DONE**: `Hypothesis.mapRingEquiv_muColumnZero_sum` (S12_Prop109、sorry-free) —
+    μ₀ = Ind_K^M 1_K route (induce_restrict_certainType_eq @ χ₂=1 + chiRestrict_one_eq_trivial +
+    mapRingEquiv_induce)。S06 一般σ版 mu_conj_eq は不要だった。
   - [x] **(G2) DONE (bb79851d)**: shared leaf `GaloisInnerTransport.lean` (等長 + 定数性 engine の
     2 本、sorry-free)。9085 で claim + c 側 dedup を hub へ依頼。旧記述: `inner_mapRingEquiv_eq_of_mem_ZIrr` は
     S16_NonExistenceG/TGapGalois.lean (c 所有、S16-deep import) に在り S13 から import 不可 —

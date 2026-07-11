@@ -7528,3 +7528,4 @@ the Peterfalvi (11.9.c) non-Galois contradiction `q ≤ u − 1 < u = a ≤ p �
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.inner_mapRingEquiv_eq_of_mem_ZIrr
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.inner_eq_intCast_of_mapRingEquiv_eq_add
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.inducedFamily_closedUnderMapRingEquiv
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.mapRingEquiv_muColumnZero_sum
