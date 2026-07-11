@@ -892,7 +892,16 @@ prime-`TI` restriction identity `μ_{0j}|_V = ω`-value (Coq `prTIirr_id`), matc
 
 **Honest signature (issue 9076, 2026-07-11)**: carries `(hj0 : (j:ℕ) ≠ 0)` — the `V`-value
 identity is meaningful only for the residue columns `j ≠ 0` (same honest fix as
-`tauS_mu_row0_diff_support`); the sole consumer `tauS_mu_row0_cross` passes its `_hj`. -/
+`tauS_mu_row0_diff_support`); the sole consumer `tauS_mu_row0_cross` passes its `_hj`.
+
+**Fully discharged (2026-07-12)**: at a regular point `x ~ w` (`w ∈ V_W ⊆ A₀(S)`, the `V`-part
+of the honest `A₀` at the trivial conjugator) the Dade lift evaluates by the §2.5 point formula
+(`dadeIntegralCharacterMap_apply_of_support` at the proven pin-2 support, then `dadeValue_eq` at
+`h = 1` — all `A₀(S)`-stabilizers vanish, `forall_dadeHypS0_H_eq_bot`), giving the `S`-value
+`(μ_{0j} − μ_{0,#1})(w)`; the `(4.3.c)` grounding field `mu_apply_of_not_mem_W2` (Coq
+`prTIirr_id`) with `δ_j = 1` (`delta_eq_one_S`, Pf (13.3.c)) turns it into the `ω`-difference,
+which is exactly the `η`-difference value by `eta_eq_tau_omega` + `tau3_apply_of_regular`
+(the (3.2.c) regular-set identity). -/
 theorem Hypothesis.tauS_mu_row0_vanish_on_V [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) (j : Fin hyp.p)
     (hj0 : (j : ℕ) ≠ 0) :
@@ -902,6 +911,53 @@ theorem Hypothesis.tauS_mu_row0_vanish_on_V [Fintype G] [Finite G]
           (hyp.mu ⟨0, hyp.q_prime.pos⟩ j
             - hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)
         - (hyp.eta ⟨0, hyp.q_prime.pos⟩ j
-            - hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)) x = 0 := sorry
+            - hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)) x = 0 := by
+  classical
+  intro x hx
+  obtain ⟨w, hw, g, hg⟩ := OddOrder.GroupTheory.mem_conjClassSet.mp hx
+  have hwW : w ∈ hyp.W := hw.1
+  have hw12 : w ∉ (hyp.W1 : Set G) ∪ (hyp.W2 : Set G) := hw.2
+  have hw2 : w ∉ (hyp.W2 : Set G) := fun h => hw12 (Or.inr h)
+  have hwS : w ∈ hyp.S := ((le_of_eq hyp.W_eq_inter).trans inf_le_left) hwW
+  have hconjwx : IsConj w x := isConj_iff.mpr ⟨g, hg⟩
+  -- `w ∈ A₀(S)`: the `V`-part of the honest `A₀`, at the trivial conjugator
+  have hwV : w ∈ OddOrder.GroupTheory.typePV hyp.S hyp.Sdata := by
+    constructor
+    · have hWeq : (hyp.Sdata.W : Set G) = (hyp.W : Set G) := by
+        rw [hyp.Sdata.W_eq, hyp.Sdata_W1_eq, hyp.Sdata_W2_eq, ← hyp.W_eq_join]
+      rw [hWeq]; exact hwW
+    · rw [hyp.Sdata_W1_eq, hyp.Sdata_W2_eq]; exact hw12
+  have hwA0 : w ∈ honestTypeP2A0Set hyp.S hyp.Sdata :=
+    Or.inr (OddOrder.GroupTheory.subset_conjClassSetIn hwV)
+  -- the Dade lift's value at `x ~ w·1`: the `(2.5)` point formula at the pin-2 support
+  have hsupp := hyp.tauS_mu_row0_diff_support hG j hj0
+  rw [OddOrder.RepresentationTheory.ClassFunction.sub_apply,
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support (hyp.dadeHypS0 hG)
+      ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) hsupp,
+    (hyp.dadeHypS0 hG).dadeMap_apply]
+  have h1H : (1 : G) ∈ (hyp.dadeHypS0 hG).H ⟨w, hwA0⟩ := by
+    rw [hyp.forall_dadeHypS0_H_eq_bot hG ⟨w, hwA0⟩]
+    exact Subgroup.mem_bot.mpr rfl
+  have hconj1 : IsConj ((⟨w, hwA0⟩ :
+      {a : G // a ∈ honestTypeP2A0Set hyp.S hyp.Sdata}).1 * 1) x := by
+    rw [mul_one]; exact hconjwx
+  rw [(hyp.dadeHypS0 hG).dadeValue_eq _ h1H hconj1]
+  -- both sides reduce to the same `ω`-difference value at `w`
+  have hmu : ∀ (l : Fin hyp.p), (l : ℕ) ≠ 0 →
+      hyp.mu ⟨0, hyp.q_prime.pos⟩ l ⟨w, (hyp.dadeHypS0 hG).mem_L hwA0⟩
+        = hyp.omega ⟨0, hyp.q_prime.pos⟩ l ⟨w, hwW⟩ := by
+    intro l hl0
+    rw [hyp.mu_apply_of_not_mem_W2 ⟨0, hyp.q_prime.pos⟩ l w hwW
+      ((hyp.dadeHypS0 hG).mem_L hwA0) hw2, hyp.delta_eq_one_S hG l]
+    norm_num
+  have heta : ∀ (l : Fin hyp.p),
+      hyp.eta ⟨0, hyp.q_prime.pos⟩ l x = hyp.omega ⟨0, hyp.q_prime.pos⟩ l ⟨w, hwW⟩ := by
+    intro l
+    rw [(hyp.eta ⟨0, hyp.q_prime.pos⟩ l).of_isConj hconjwx.symm, hyp.eta_eq_tau_omega,
+      hyp.tau3_apply_of_regular _ w hwW hw12]
+  rw [OddOrder.RepresentationTheory.ClassFunction.sub_apply, OddOrder.RepresentationTheory.ClassFunction.sub_apply,
+    hmu j hj0, hmu ⟨1, by have := hyp.three_le_p; omega⟩ one_ne_zero,
+    heta j, heta ⟨1, by have := hyp.three_le_p; omega⟩]
+  ring
 
 end OddOrder.Peterfalvi.S15

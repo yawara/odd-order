@@ -280,6 +280,17 @@ structure Hypothesis where
     mu i j 1 = mu i k 1 →
     (mu i j - mu i k).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set S Sdata) S
+  /-- **Peterfalvi (4.3.c), value identity** (Coq `prTIirr_id`, `PFsection4.v:403`; issues
+  9076/9014, the `(13.18)` V-value grounding): on `W ∖ W₂` the `μ`-grid is the signed
+  `ω`-grid, `μ_{ij}(w) = δ_j·ω_{ij}(w)`.  Supplied by the producer from the §6 value
+  identity `certainType_apply_eq_of_mem_V` (the (1.3)/(4.3.c) value-match of the
+  certain-type construction — Dade-free, base `S06.Hypothesis` level).  With `δ_j = 1`
+  (`delta_eq_one_S`, Pf (13.3.c)) this becomes the prime-TI restriction identity
+  (`μ_{0j}|_{W∖W₂} = ω`-value) feeding the `(13.18)` V-value pin
+  `tauS_mu_row0_vanish_on_V`. -/
+  mu_apply_of_not_mem_W2 : ∀ (i : Fin q) (j : Fin p) (w : G) (hwW : w ∈ W)
+    (hwS : w ∈ S), w ∉ (W2 : Set G) →
+    mu i j ⟨w, hwS⟩ = (delta j : ℂ) * omega i j ⟨w, hwW⟩
   /- ### Grid property fields (issue 3002)
 
   The (3.2)/(3.3)/(3.4) character-theoretic content of the Dade grid carriers `tau3`/`omega`,
