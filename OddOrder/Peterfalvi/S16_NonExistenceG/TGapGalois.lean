@@ -201,4 +201,77 @@ theorem tSideDadeMap_inner_galois_eq_intCast [Finite G]
   · exact tSideDadeMap_inner_eq_zero_of_coherent_difference hG hyp coh
       hζ hσζ hcorrSupp horth
 
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.9)(a), Galois constancy on the two eta axes.**
+Assume the nonprincipal row and column eta characters are coefficient-Galois conjugate to
+`eta_10` and `eta_01`.  Galois closure of the coherent source family, supportedness of all
+family differences, and coherent-image orthogonality then turn `a_aut` into equality of the
+integer projection coefficients along each axis.  This is the character-theoretic input of
+`etaGrid_coefficients_eq_column_or_row`. -/
+theorem tSideDadeMap_eta_axis_coefficients_constant [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    [Fintype ↥hyp.base.T] [Invertible (Nat.card ↥hyp.base.T : ℂ)]
+    {nu0 zeta : ClassFunction ↥hyp.base.T ℂ}
+    (hbridgeZ : nu0 - zeta ∈ ZIrr ↥hyp.base.T)
+    (hbridgeSupp : (nu0 - zeta).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T)
+    {S : Set (ClassFunction ↥hyp.base.T ℂ)}
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent (tSideDadeMap hyp hG) S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T))
+    (hzeta : zeta ∈ S)
+    (hgalois : ∀ (sigma : ℂ ≃+* ℂ) xi, xi ∈ S →
+      ClassFunction.mapRingEquiv sigma xi ∈ S)
+    (hdiffSupp : ∀ xi ∈ S, ∀ xi' ∈ S, (xi - xi').support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T)
+    (horth : ∀ xi ∈ S, ∀ i : Fin hyp.base.q, ∀ j : Fin hyp.base.p,
+      ClassFunction.inner (coh.extension xi) (hyp.base.eta i j) = 0)
+    (m : Fin hyp.base.q → Fin hyp.base.p → ℤ)
+    (hm : ∀ i j, ClassFunction.inner (tSideDadeMap hyp hG (nu0 - zeta))
+      (hyp.base.eta i j) = (m i j : ℂ))
+    (hnu0 : ∀ sigma : ℂ ≃+* ℂ, ClassFunction.mapRingEquiv sigma nu0 = nu0)
+    (hrowOrbit : ∀ i : Fin hyp.base.q, i ≠ ⟨0, hyp.base.q_prime.pos⟩ →
+      ∃ sigma : ℂ ≃+* ℂ,
+        ClassFunction.mapRingEquiv sigma
+            (hyp.base.eta ⟨1, hyp.base.q_prime.one_lt⟩
+              ⟨0, hyp.base.p_prime.pos⟩) =
+          hyp.base.eta i ⟨0, hyp.base.p_prime.pos⟩)
+    (hcolumnOrbit : ∀ j : Fin hyp.base.p, j ≠ ⟨0, hyp.base.p_prime.pos⟩ →
+      ∃ sigma : ℂ ≃+* ℂ,
+        ClassFunction.mapRingEquiv sigma
+            (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩
+              ⟨1, hyp.base.p_prime.one_lt⟩) =
+          hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ j) :
+    (∀ i : Fin hyp.base.q, i ≠ ⟨0, hyp.base.q_prime.pos⟩ →
+      m i ⟨0, hyp.base.p_prime.pos⟩ =
+        m ⟨1, hyp.base.q_prime.one_lt⟩ ⟨0, hyp.base.p_prime.pos⟩) ∧
+    (∀ j : Fin hyp.base.p, j ≠ ⟨0, hyp.base.p_prime.pos⟩ →
+      m ⟨0, hyp.base.q_prime.pos⟩ j =
+        m ⟨0, hyp.base.q_prime.pos⟩ ⟨1, hyp.base.p_prime.one_lt⟩) := by
+  constructor
+  · intro i hi
+    obtain ⟨sigma, hsigma⟩ := hrowOrbit i hi
+    have hsigmaZ := hgalois sigma zeta hzeta
+    have htransport := tSideDadeMap_inner_galois_eq_intCast hG hyp sigma
+      (m ⟨1, hyp.base.q_prime.one_lt⟩ ⟨0, hyp.base.p_prime.pos⟩)
+      (hnu0 sigma) hbridgeZ hbridgeSupp hsigma
+      (eta_mem_ZIrr hyp.base _ _) (hm _ _) coh hzeta hsigmaZ
+      (hdiffSupp zeta hzeta _ hsigmaZ)
+      (fun xi hxi => horth xi hxi i ⟨0, hyp.base.p_prime.pos⟩)
+    exact Int.cast_injective ((hm i ⟨0, hyp.base.p_prime.pos⟩).symm.trans htransport)
+  · intro j hj
+    obtain ⟨sigma, hsigma⟩ := hcolumnOrbit j hj
+    have hsigmaZ := hgalois sigma zeta hzeta
+    have htransport := tSideDadeMap_inner_galois_eq_intCast hG hyp sigma
+      (m ⟨0, hyp.base.q_prime.pos⟩ ⟨1, hyp.base.p_prime.one_lt⟩)
+      (hnu0 sigma) hbridgeZ hbridgeSupp hsigma
+      (eta_mem_ZIrr hyp.base _ _) (hm _ _) coh hzeta hsigmaZ
+      (hdiffSupp zeta hzeta _ hsigmaZ)
+      (fun xi hxi => horth xi hxi ⟨0, hyp.base.q_prime.pos⟩ j)
+    exact Int.cast_injective ((hm ⟨0, hyp.base.q_prime.pos⟩ j).symm.trans htransport)
+
 end OddOrder.Peterfalvi.S16
