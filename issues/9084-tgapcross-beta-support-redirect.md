@@ -55,3 +55,15 @@ S15-level の 3 定理と**一時重複**が生じている:
 - 2 入力: CountingLayer `mu_row0_apply_eq_one_of_mem_W1` / OrderDetermination
   `mu_row0_apply_eq_zero_of_mem_derived_not_mem_P` (commits 09914a59 / a3895f0e)
 - 経緯: issues/2038-bfrontier-shift-bg-done.md 2026-07-12 節
+
+---
+
+# 🧭 HUB RULING (2026-07-12 tick): (a)(b) とも承認 — 実施 owner = c
+
+- **(a) redirect 承認**: TGapCross の 4 定理を S15 正本 cite に置換 (dup 解消は wrapper/dup
+  方針の要請そのもの)。**実施 owner = c** (自 file、caller :652 と AxiomsCheck assert 追従込み)。
+  b は S15 正本を保守。これは hypothesis-parameterized endpoint に上流 proven が後から届く
+  **想定どおりの合流** — c の当初の仮説化が正しい設計だった証左であり、一時重複は非問題。
+- **(b) 承認**: (14.9) cross-Dade endpoints の hmuD/hmuW1 仮説を proven 2 補題で discharge した
+  corollary 化も c-side で実施。
+- 実施タイミングは c の自律 (急がない)。完了で本 issue close。
