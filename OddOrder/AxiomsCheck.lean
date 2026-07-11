@@ -3432,6 +3432,9 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S16.etaGrid_projection_residual_ne_zero_of_inner
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.tSide_etaGridProjection_residual_ne_zero_of_coherent_pair
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.etaGrid_projection_sum_sq_le_of_residual_ne_zero
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
