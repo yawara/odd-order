@@ -1098,3 +1098,25 @@ lane a が §9 を完遂 (commits 14b67135/a9fb79d1/e33ca028/f66c3921):
   残る genuine gap = S-side Dade τS + M↔S support disjoint (`oST`) + FTtypeP_coherent_TIred
   相当の cross-isometry 計算 (Coq PFsection10:568-658 後半)。次の lane-a focused session で
   この S12 assembly に正面着手する。
+
+## 2026-07-12 update (lane a) — ⚠ 本 issue の (10.8) 動機は SUPERSEDED (issue 1020 完結)
+
+本 issue の背景 「(10.8) `typeII_coherence_contradiction_estimate` は hB 側 (10.7)
+`typeII_derived_frobenius` 経由で §5 不在に BLOCKED」は **2026-07-11/12 の issue 1020 arc で
+supersede された**:
+
+- **(10.7) は pair-witness route で axiom-clean に landed**: `typeII_HU_frobenius_of_coherent'`
+  (S12_TypeIICrossIsometryPair、issue 9079 + 1020 Phase 1a)。§5 uniform_degree_coherence /
+  subcoherence を経由しない。
+- **(10.8) は無条件・axiom-clean に landed**: `S_not_coherent_unconditional` (S12_Noncoherence、
+  hB は `g1_div_le_of_partner` で実 discharge)。
+- 旧 chain (`exists_typeIICrossIsometryData` sorried gate → 旧 `typeII_HU_frobenius_of_coherent`
+  → `typeII_derived_frobenius` → 旧 estimate hB) は **Legacy 注記済**・legacy (10.8) 専用。
+  ⚠ **lane b への注意**: `S07_Subcoherent.lean` の docstring 群 (:241/:313/:351/:610) は
+  「subcoherent supply が lane a の (10.7) typeII_derived_frobenius を閉じる」と述べるが、
+  この供給先は上記のとおり不要になった (heir が supply なしで clean)。S07_Subcoherent の
+  現在価値は **(6.5) gates (issue 2022) の general six_two chain** 側にある。
+
+**残る本 issue の scope** = §5 `uniform_degree_coherence` 一般形 + `subcoherent` R-datum が
+(6.5)/(6.8) 系 (issue 2022、lane b) と typeII 系のどこで依然必要かの再精査のみ。
+(10.8)/(10.7) unblock 目的としては closed 相当。hub の帰属裁定は「lane b (2022 と同根)」を提案。

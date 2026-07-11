@@ -1405,7 +1405,13 @@ theorem typeII_HU_frobenius_of_coherent_aux [Finite G]
 open scoped Classical FiniteInduce in
 /-- **Peterfalvi (10.7)** (Type-II datum form): under Hypothesis (10.4) for `M`, every
 Type-II maximal subgroup `S` has `[S,S] = S_F ⋊ U` Frobenius with kernel `S_F`, on the
-`derivedInG S` carrier with the type-`P` factors of the given `TypeIIData`. -/
+`derivedInG S` carrier with the type-`P` factors of the given `TypeIIData`.
+
+**Legacy** (issues 9079/1020): the honest heir is `typeII_HU_frobenius_of_coherent'`
+(`S12_TypeIICrossIsometryPair`, **axiom-clean** — the pair-witness route discharges the
+`exists_typeIICrossIsometryData` gate that this version still carries as a `sorry`).
+Downstream consumers use the heir; this version remains only for the legacy
+`typeII_derived_frobenius`/(10.8)-estimate chain of `S12_MaximalBasic`. -/
 theorem typeII_HU_frobenius_of_coherent [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     {hyp : Hypothesis M} {params : CharacterParameters hyp}
