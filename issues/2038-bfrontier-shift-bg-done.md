@@ -1504,3 +1504,17 @@ red のまま commit を通した — [[lean-build-discipline]]「build 検証�
      当該 assert を sorryAx-許容形に更新 (spine producer の性質変化を明示 docstring 化)、
      (b) field discharge を producer でなく別層に移す設計再考。(a) は HOLD との整合を hub に
      9000-issue で確認してから (unsound でないが「sorry-free spine への混入」の解釈事項)。
+
+## 📋 (2026-07-11、lane-b /loop iter 44) — sorryAx routing は本質的 (型が Dade を bundle)、9081 で hub 裁定へ
+
+(4.7)-chain 精査: `chiRestrict_apply_eq_zero_of_not_mem_union` 以下全て **Hypothesis46-typed** —
+engine 証明が dade0/tau を使わなくても、**hyp46Smp 定数の axioms 閉包に dade0 の sorried 存在 pin が
+入る** (型 bundle 由来、回避には Core-split refactor が要る)。2 解決策 (sorryAx 受容+assert 更新 vs
+Hypothesis46 Core-split) は spine invariant (HOLD) の解釈事項 → **issues/9081 で hub 裁定依頼**
+(commit 4bc8f9ad)。muS_diff_support (iter 42、hyp46Smp 込み) 自体は landed 済で green — field
+threading のみ 9081 裁定待ち。
+
+**b は裁定待ちの間 9080 step 1 (TypeICovering migration、hub 承認済・b-owned) へ切替**。
+次 iter: S14_MaximalI/TypeICovering.lean:292 の covers discharge を (12.17)-faithful route へ
+(9080 の手順 1: no-escaping 導出 [theoremD D(3)/(4) + (12.7) typeI_frobenius Frobenius 矛盾] +
+`Mtilde_eq_sigmaSharp_of_forall_centralizer_le` + `mainSubgroup_eq_Msigma` → cover = 𝒞(kernel#))。
