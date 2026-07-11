@@ -365,3 +365,12 @@ card_abelianization_derived_eq_w1_mul_card_SHCSet_add_one (Section9Counts:488)
 (ii) (10.10.4) glue: (μ_j − dζ)^τ = δ∑_i ω_ij^σ − d·ζ^{τ₁} (sum_alpha_eq +
 本 corollary の i-和 + (10.9) (μ₀−ζ)^τ pin) → ν 構成 → IsCoherent hyp.tau
 hyp.Sset hyp.A0。(iii) (10.10.2) 構造 (S = S₁ ∪ {μ_j}、p³ 指標論)。
+
+## 2026-07-11 tick³⁰ — (10.10.3) R-free 化完了
+exists_SHC_extension_orthonormal に card 句 (in-place、consumer 0 確認済) +
+SHC_tau_muGridAlpha_eq_of_eight_le_SHCcount (count 形、h8 のみ残る外部入力)。
+次 = (10.10.4) glue: (μ_j − dζ)^τ = δ∑_i ω_ij^σ − d·ζ^{τ₁} を count-形 (10.10.3)
+の i-和 + sum_alpha_eq + (10.9) pin ((μ₀−ζ)^τ = ∑ω_i0 − ζ^{τ₁}、S12_Prop109 の
+residual 形を SHC-extension と同定) で作り、ν := (τ₁ on Z[S₁]) ⊕ (μ_j ↦ δ∑ω_ij)
+を IsCoherent hyp.tau hyp.Sset hyp.A0 に組む (nonzero/isometry/agree/ZIrr 4 field;
+S = S₁ ⊔ {μ_j} の (10.10.2) 構造は hS 仮説で engine 化)。
