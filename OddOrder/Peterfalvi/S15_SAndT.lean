@@ -19,18 +19,73 @@ open scoped Pointwise
 variable {G : Type*} [Group G]
 
 
-/-- **Peterfalvi (13.17.c) §13 intersection structure.**  The `W₁`-containing Frobenius complement
-`E` of the type-I `L` meets `Q = T_F` exactly in `W₁` (Pf p.82 "`E ∩ Q = W₁`"), and is not
-contained in `Q` (the `E = W₁` alternative is excluded by Peterfalvi (13.19.c1)/(13.2.a)).  This is
-the genuine deep §13 structural datum behind the order `|E| = p q`; it is not reducible to the
-existing §13 residuals (`TypeIFrobeniusData` carries no complement-order field).  `:= sorry`,
-isolated — the order argument `complement_card_eq_pq` below is sorry-free modulo this. -/
-theorem complement_inf_Q_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+/-- **Peterfalvi (13.17.c), `E ∩ Q = W₁`** (Pf p.82) — the proven half of the §13 intersection
+structure.  `W₁ ≤ E ⊓ Q` from `hW1E` and `W1_le_Q` ((13.2.b) `T`-side).  Conversely `E ⊓ Q` is a
+`q`-subgroup of the elementary abelian `Q` (`Q_elementaryAbelian_T`, (13.2.a) `T`-side) sitting
+inside the odd-order Frobenius complement `E`, which is a Z-group ([BG] Prop 3.9 via
+Isaacs 6.9–6.11, `isZGroup_complement_of_isFrobeniusGroup_of_odd`); so `E ⊓ Q` is cyclic
+(`IsPGroup.isCyclic_of_isZGroup`), and a cyclic group of exponent `q` has order dividing `q` —
+with `|W₁| = q` from below, equality. -/
+theorem complement_inf_Q_eq_W1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T) {L : Subgroup G}
+    (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
+    (hW1E : hyp.W1 ≤ frob.complement.map L.subtype) :
+    frob.complement.map L.subtype ⊓ hyp.Q = hyp.W1 := by
+  classical
+  set Em := frob.complement.map L.subtype with hEm
+  have hW1le : hyp.W1 ≤ Em ⊓ hyp.Q := le_inf hW1E (W1_le_Q hG hyp)
+  -- `E` is a Z-group (odd Frobenius complement), and `Em ≅ E`.
+  have hodd : Odd (Nat.card ↥frob.complement) := hG.odd.of_dvd_nat
+    ((Subgroup.card_subgroup_dvd_card _).trans (Subgroup.card_subgroup_dvd_card L))
+  haveI hZE : _root_.IsZGroup ↥frob.complement :=
+    OddOrder.Isaacs.Ch06.isZGroup_complement_of_isFrobeniusGroup_of_odd frob.frobenius hodd
+  haveI hZEm : _root_.IsZGroup ↥Em := _root_.IsZGroup.of_injective
+    (f := ((Subgroup.equivMapOfInjective frob.complement L.subtype
+      Subtype.coe_injective).symm : ↥Em ≃* ↥frob.complement).toMonoidHom)
+    (MulEquiv.injective _)
+  -- `R := (Em ⊓ Q)` realized inside `Em` is a `q`-group (exponent `q` from `Q` elem.-abelian)
+  have hQeA := Q_elementaryAbelian_T hG hyp hTTypeII
+  set R : Subgroup ↥Em := (Em ⊓ hyp.Q).subgroupOf Em with hRdef
+  have hexp : ∀ x : ↥R, x ^ hyp.q = 1 := by
+    intro x
+    have hgQ : ((x : ↥Em) : G) ∈ hyp.Q := (Subgroup.mem_subgroupOf.mp x.2).2
+    have hq1 := hQeA.2 (⟨((x : ↥Em) : G), hgQ⟩ : ↥hyp.Q)
+    have hg1 : (((x : ↥Em) : G)) ^ hyp.q = 1 := by
+      simpa using congrArg Subtype.val hq1
+    apply Subtype.ext; apply Subtype.ext
+    push_cast
+    exact hg1
+  have hpg : IsPGroup hyp.q ↥R := fun x => ⟨1, by rw [pow_one]; exact hexp x⟩
+  haveI hFq : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
+  haveI hcyc : IsCyclic ↥R := hpg.isCyclic_of_isZGroup
+  -- cyclic of exponent `q` ⟹ `|E ⊓ Q| ∣ q`
+  obtain ⟨g, hgen⟩ := hcyc.exists_generator
+  have hgq : g ^ hyp.q = 1 := hexp g
+  have hcard_dvd : Nat.card ↥R ∣ hyp.q := by
+    rw [← orderOf_eq_card_of_forall_mem_zpowers hgen]
+    exact orderOf_dvd_of_pow_eq_one hgq
+  have hcardR : Nat.card ↥(Em ⊓ hyp.Q) = Nat.card ↥R :=
+    (Nat.card_congr (Subgroup.subgroupOfEquivOfLe (inf_le_left : Em ⊓ hyp.Q ≤ Em)).toEquiv).symm
+  -- `q = |W₁| ≤ |E ⊓ Q|` and `|E ⊓ Q| ∣ q` force `|E ⊓ Q| = q`
+  have hqle : hyp.q ≤ Nat.card ↥(Em ⊓ hyp.Q) := by
+    rw [hyp.q_eq_card_W1]
+    exact Subgroup.card_le_of_le hW1le
+  have hcard_eq : Nat.card ↥(Em ⊓ hyp.Q) = hyp.q :=
+    le_antisymm (hcardR ▸ Nat.le_of_dvd hyp.q_prime.pos hcard_dvd) hqle
+  exact (Subgroup.eq_of_le_of_card_ge hW1le
+    (by rw [hcard_eq, hyp.q_eq_card_W1])).symm
+
+/-- **Peterfalvi (13.17.c)/(13.19.c1), `E ⊄ Q`** — the exclusion of the `E = W₁` alternative of
+(13.17.c) ("either `L = H ⋊ W₁` or `L = H ⋊ (W₁W₂^y)`"): in the §13 endgame the small branch is
+ruled out by the (14.5)-side interaction (Pf (13.19.c1), with (13.2.a)).  Genuine deep §13/§14
+structural datum, not reducible to the existing residuals (`TypeIFrobeniusData` carries no
+complement-order field).  `:= sorry`, isolated — `complement_inf_Q_eq_W1` above and the order
+argument `complement_card_eq_pq` below are sorry-free modulo this. -/
+theorem complement_not_le_Q [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) {L : Subgroup G}
     (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
     (hW1E : hyp.W1 ≤ frob.complement.map L.subtype) :
-    frob.complement.map L.subtype ⊓ hyp.Q = hyp.W1 ∧
-      ¬ frob.complement.map L.subtype ≤ hyp.Q := sorry
+    ¬ frob.complement.map L.subtype ≤ hyp.Q := sorry
 
 /-- **Peterfalvi (13.17.c) order argument.**  The `W₁`-containing Frobenius complement `E` of `L`
 has order `p q`.
@@ -38,9 +93,9 @@ has order `p q`.
 *Proof (Pf p.82).*  `E ⊆ Q W₂` (`complement_le_QW2`), and `Q ⋊ W₂` has `Q ◁ Q W₂` with
 `[Q W₂ : Q] = |W₂| = p` (`Q_W2_structure`).  The relative index `[E : E ∩ Q]` divides `[Q W₂ : Q] = p`
 (normal-subgroup relative index, `relIndex_dvd_index_of_normal` inside `↥(Q W₂)`) and is `≠ 1` since
-`E ⊄ Q`, hence `= p`; with `E ∩ Q = W₁` of order `q`, `|E| = |E ∩ Q| · [E : E ∩ Q] = q p`.  The two
-§13 facts `E ∩ Q = W₁` and `E ⊄ Q` are isolated in `complement_inf_Q_structure`; everything else is
-sorry-free group theory. -/
+`E ⊄ Q`, hence `= p`; with `E ∩ Q = W₁` of order `q`, `|E| = |E ∩ Q| · [E : E ∩ Q] = q p`.
+`E ∩ Q = W₁` is proven (`complement_inf_Q_eq_W1`); the remaining §13 fact `E ⊄ Q` is isolated in
+`complement_not_le_Q`; everything else is sorry-free group theory. -/
 theorem complement_card_eq_pq [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T) {L : Subgroup G}
     (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
@@ -48,8 +103,9 @@ theorem complement_card_eq_pq [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G
     Nat.card ↥frob.complement = hyp.p * hyp.q := by
   set Em := frob.complement.map L.subtype with hEm
   set Hg := hyp.Q ⊔ hyp.W2 with hHg
-  -- §13 residual: `E ∩ Q = W₁` and `E ⊄ Q`.
-  obtain ⟨hInf, hnle⟩ := complement_inf_Q_structure _hG hyp frob hW1E
+  -- `E ∩ Q = W₁` (proven); §13 residual: `E ⊄ Q`.
+  have hInf := complement_inf_Q_eq_W1 _hG hyp hTTypeII frob hW1E
+  have hnle := complement_not_le_Q _hG hyp frob hW1E
   -- `E ⊆ Q W₂` (Huppert step) and the `Q ⋊ W₂` structure.
   have hEH : Em ≤ Hg := complement_le_QW2 _hG hyp hTTypeII frob hW1E
   obtain ⟨hWnorm, hdisj, _⟩ := Q_W2_structure _hG hyp hTTypeII
@@ -272,8 +328,8 @@ theorem exists_typeIFrobeniusData_W2_le [Finite G] (_hG : OddOrder.BG.IsMinimalS
 for the `W₂`-containing Frobenius complement `E` of the type-I maximal `L` over `N_G(V)`, either
 `E = W₂` (the `L = H ⋊ W₂` branch, `e = p`), or `E ⊓ P = W₂` and `E ⊄ P` (the
 `L = H ⋊ (W₂W₁^y)` branch, leading to `e = pq`).  Unlike the S-side
-(`complement_inf_Q_structure`, whose small branch is excluded by (14.5)), both branches are live
-here; the resolution to `e = pq` happens only inside (14.11). -/
+(`complement_inf_Q_eq_W1`/`complement_not_le_Q`, whose small branch is excluded by (14.5)), both
+branches are live here; the resolution to `e = pq` happens only inside (14.11). -/
 theorem complement_inf_P_structure_dichotomy [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) {L : Subgroup G}
