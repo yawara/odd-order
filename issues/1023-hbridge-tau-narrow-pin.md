@@ -198,3 +198,20 @@ IsCoherent 構成は既存 IntegralCharacterMap 機構 (Zisometry_of_cfnorm 相�
 `inducedKernelFamily_zSpan_support…` の逆向き + 係数和) (iii) exists_pinned + capstone 再配線
 + hbridge_τ 差し替え (iv) full build/AxiomsCheck。完了で capstone sorry-free →
 (11.9.b)-unconditional residual = caseA refuter (lane b) のみ。
+
+### tick⁸ᵇ — 実装 API ノート (case 1)
+
+- `certainTypeRImage h χ₂ χ₂' (b, i) = (columnFamily χ₂).sign • certainTypeOmegaSigma …`
+  (S06_CertainTypeCoherence:544 の inner lemma 参照) — R-member は **δ-signed**。
+  ⟹ γ-trick の帰結 ⟨ext μ₁, ωcol₁⟩ = w₁ は δ·#(E∩正側) = w₁ を与え、δ = 1 と
+  E = 正側全列を**同時に**強制 (tick⁴ の hcol-diff δ 導出は不要になる)。
+- world-bridge 注意: R-family は h46-world の `certainTypeOmegaSigma`、capstone/hcol は
+  `hyp.base.alignedOmegaSigmaGrid`。同定 lemma (aligned の定義経由、
+  `muGrid_columnSum_eq_columnSum` の σ-grid 版) を実装時に特定すること
+  (候補 grep: alignedOmegaSigmaGrid_eq / certainTypeOmegaSigma…aligned)。
+- Dade 内積保存 = S04_DadeIsometry :1023 以降の complex interface
+  (hyp.base.dadeData.dade 系 bundled — capstone 世界での τ-inner 保存の正確な accessor を
+  実装時に確認; 代替 = c.extension_inner_eq を γ, θ に…不可 (θ ∉ ℤ[T]) → Dade 側必須)。
+- μ column self-norm = `Hypothesis.muGrid_column_sum_inner_self` (CharacterParameters:1160)。
+- E-card: SOf-(5.5) は card 節なし → ‖ext ψ‖² = ‖ψ‖² (isometry) + E orthonormal から
+  |E| = w₁ を導出 (inner_sum で #E)。
