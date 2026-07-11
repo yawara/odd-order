@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S13_MaximalIII_IVBasic
+import OddOrder.Peterfalvi.S12_TypeVSibley
 
 /-!
 # S13_Lemmas113To115
@@ -1103,5 +1104,88 @@ noncomputable def adjoin_muColumnPair_of_irrFamily [Finite G]
     hmemdegdiffsupp (fun x hx => hsS₁ (Finset.mem_coe.mpr hx)) (fun _ => (1 : ℝ))
     (fun _ _ => one_pos) hmemortho rfl Dmem Da hDatau1 hortho_mem htau1Dmem
     hdiffasupp' htau1_memaχ rfl hDeg' hSgen hgen
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (10.10), case (a) of Definition (8.7)** ("If case (a) of Definition (8.7)
+holds, then `S` is coherent by Theorem (6.8)"): for a type-V maximal `M` whose kernel sharp
+set `H^# = (M')^#` is a TI-subset, the (10.1) family `S = hyp.Sset` is coherent for the §10
+Dade isometry `hyp.tau` on the support `A₀(M)`.
+
+Assembly: the sorry-free (6.8) capstone `sibleySetup_is_coherent` applied to the case-(a)
+Sibley datum `typeVSibleyDadeHypothesis` gives coherence for the Sibley–Dade map on the
+`(M')^#`-support (its `S`-field is definitionally `inducedFamily M = hyp.Sset`);
+`IsCoherent.congrMap` re-targets it to `hyp.tau` along the (2.11)+(2.5) agreement
+`typeVSibleyDadeHypothesis_tau_agree`; `isCoherent_of_supportedSpan_le` enlarges the support
+to `A₀(M)` — members `Ind_{M'}^M θ` vanish off `M'` and `1 ∉ A₀`, so an `A₀`-supported
+`ℤ[S]`-combination is already `(M')^#`-supported — with the `A₀`-witness `ζ̄ − ζ` (a member
+exists by (10.2), and odd order admits no real characters). -/
+noncomputable def typeV_caseA_coherence [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)
+    (dV : TypeVData M)
+    (hTI : IsTISubset (sharpSubgroup hyp.typeP.H)
+      (Subgroup.normalizer (hyp.typeP.H : Set G))) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A0 := by
+  classical
+  -- the (6.8) coherence on the `(M')^#`-support, for the Sibley–Dade map
+  have c0 := OddOrder.Peterfalvi.S08.sibleySetup_is_coherent
+    (OddOrder.Peterfalvi.S12.typeVSibleyDadeHypothesis hG hyp dV hTI)
+  -- re-target to `hyp.tau` along the (2.11)+(2.5) agreement (the family and support are
+  -- definitionally `hyp.Sset` and the `(M')^#`-support)
+  have c1 : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.Peterfalvi.S08.sharpImage ((derivedInG M).subgroupOf M)) M) :=
+    c0.congrMap (fun φ hφ =>
+      OddOrder.Peterfalvi.S12.typeVSibleyDadeHypothesis_tau_agree hG hyp dV hTI hφ.2)
+  refine isCoherent_of_supportedSpan_le c1 ?_ ?_
+  · -- `ℤ[S, A₀] ⊆ ℤ[S, (M')^#]`: members vanish off `M'`, and `1 ∉ A₀`
+    haveI hHnorm : ((derivedInG M).subgroupOf M).Normal := by
+      rw [show (derivedInG M).subgroupOf M = commutator ↥M by
+        rw [derivedInG, Subgroup.subgroupOf,
+          Subgroup.comap_map_eq_self_of_injective M.subtype_injective]]
+      infer_instance
+    rintro φ ⟨hφspan, hφsupp⟩
+    refine ⟨hφspan, ?_⟩
+    have hsuppH : φ.support ⊆ {x : ↥M | x ∈ (derivedInG M).subgroupOf M} := by
+      have hle' : OddOrder.Peterfalvi.S07.zSpan (L := ↥M) hyp.Sset ≤
+          (ClassFunction.supportedSubmodule (G := ↥M) (k := ℂ)
+            {x : ↥M | x ∈ (derivedInG M).subgroupOf M}).restrictScalars ℤ := by
+        refine Submodule.span_le.mpr (fun s hs => ?_)
+        obtain ⟨θ, -, rfl⟩ := hs
+        simp only [SetLike.mem_coe, Submodule.restrictScalars_mem,
+          ClassFunction.mem_supportedSubmodule]
+        intro x hx
+        rw [ClassFunction.mem_support] at hx
+        by_contra hxH
+        exact hx (ClassFunction.induce_apply_eq_zero_of_not_mem_normal _ _ hxH)
+      exact (ClassFunction.mem_supportedSubmodule).mp (hle' hφspan)
+    intro x hx
+    have hxA0 : x ∈ hyp.A0 := hφsupp hx
+    have hx1 : x ≠ 1 := fun h => hyp.one_notMem_A0 (h ▸ hxA0)
+    exact ⟨Subgroup.mem_map.mpr ⟨x, hsuppH hx, rfl⟩,
+      fun hc => hx1 (Subtype.ext (Set.mem_singleton_iff.mp hc))⟩
+  · -- the `A₀`-witness `ζ̄ − ζ` for a (10.2) member `ζ`
+    have hHall := OddOrder.Peterfalvi.S12.typePData_W1_hall_coprime hG hyp.maximal
+      (hyp.bgTypeP hG) hyp.typeP
+    obtain ⟨ζ, hζmem, -, -⟩ :=
+      OddOrder.Peterfalvi.S12.exists_zeta_in_inducedFamily_degree_w1 hyp.typeP hG.odd hHall
+    have hζSK : ζ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) ⊥ := by
+      obtain ⟨θ, hθne, hζeq⟩ := hζmem
+      refine ⟨θ, hθne, ?_, hζeq⟩
+      intro y hy
+      have hy1 : y = 1 :=
+        Subtype.ext (Subgroup.mem_bot.mp (Subgroup.mem_subgroupOf.mp hy))
+      rw [hy1]
+      exact OddOrder.Peterfalvi.S03.one_mem_characterKernel _
+    have hζc : ζ.conj ∈ hyp.Sset :=
+      OddOrder.Peterfalvi.S12.inducedFamily_closedUnderConjugate M hζmem
+    refine ⟨ζ.conj - ζ, ⟨?_, ?_⟩, ?_⟩
+    · exact Submodule.sub_mem _ (Submodule.subset_span hζc) (Submodule.subset_span hζmem)
+    · exact OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support
+        hyp.mderivSharp_subset_A0 hζSK
+    · intro h
+      exact OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters
+        (hyp.card_odd_of_isMinimalSimpleOdd hG) _ hζSK (sub_eq_zero.mp h)
 
 end OddOrder.Peterfalvi.S13
