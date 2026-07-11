@@ -856,3 +856,33 @@ main `cce4dbc8` の最新 `TTypeII.lean` を concrete producer landing 後に再
 (b) (11.8) wrong-axis refuter、
 (c) prime-TI `mu_01` derived-complement vanishing。
 orbit threading だけで `T_typeIII_ratio_le` が閉じるとは扱わない。
+
+
+### `mu_01` derived-complement vanishing の exact reduction (2026-07-12 夜)
+
+feature commit: `bc65b073`。
+
+- 前節 (c) を Coq `PFsection13.v` の `PVSbeta` (1833--1869) と Lean の現 API で再検証した。
+  S06 の `chiRestrict_apply_eq_zero_of_not_mem_union` は単一 `mu_01` に直接適用する theorem
+  ではなく、必要な経路は Coq と同じ二段階だった。
+- C 所有 leaf `TGapCross.lean` に
+  `sSide_mu_row0_apply_eq_zero_of_mem_derived_not_mem_P` を実装した。
+  `z in S' minus P` は `W` のどの S-共役にも入らない (`W <= P join W1`,
+  `W1 inter S' = 1`, `P normal S`) ため、`mu_definition` から列 j の全行が z 上で等しい。
+  さらに既存 `mu_j_isIndPC` と `C_eq_bot` で列和を `Ind_P^S theta` に落とし、P 外消滅と
+  `q != 0` から `mu_0j(z)=0` を得る。
+- TTypeII の `hresidual` bundle はこの theorem と既存
+  `mu_row0_apply_eq_one_of_mem_W1` を実際に cite する形へ更新した。局所 `sorry` が直接担う
+  出力は zero-column projection 一項だけになった。
+- ただし axiom closure を独立監査すると、この new theorem は既存
+  `pc_le_maxNilpotentNormalHall -> c_eq_one -> C_eq_bot` の `sorryAx` を継承する。
+  したがって AxiomsCheck 登録は行っていないし、(c) を fully axiom-clean とも扱わない。
+  正確な状態は「TTypeII 内の opaque pointwise pin を除去し、既存の honest-signature な
+  (13.12) PC-Hall gate へ依存を集約した」。新 axiom・新 sorry は追加していない。
+- レーン所有を再確認し、試作を置いた B 所有 `S15_SAndT.lean` の差分は完全に撤回して、
+  genuine output を C 所有 `TGapCross.lean` へ移設した。TTypeII build (4120 jobs) green。
+
+従って C 側の次 frontier は引き続き zero-column projection:
+full-orbit threading gate の外で進められるのは、(11.8) wrong-axis refuter の既存 API 接続と、
+projection dichotomy から refuter までの signature-free assembly。S-side (13.12)
+`pc_le_maxNilpotentNormalHall` は B/upstream 所有の実 gap として明示的に残る。
