@@ -530,6 +530,18 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-12 (tick 2, cron 初発火) — 全 3 レーン合流: ★ gammaGrid_real 完全証明 (b) + S15 分割 0102 完遂**:
+  a=1 (docs: issue 1024 = Pf (11.9) typeP_Galois/Type-III material survey + 証明計画、build 省略) /
+  **b=3** (★ **gammaGrid_real (Pf 13.18c, Coq GammaReal) 完全証明** — mu_conj/eta_conj fields 3 層追加+
+  producer discharge+assembly、2038 iter 8 完遂; **S15_SAndT prefix-split** → 新 leaf
+  `S15_ComplementStructure.lean` (597 行、sorried 6 decl 移動、S15_SAndT 1486 行に復帰 <1500)、
+  issue 0102 closed) / **c=2** (Pf (11.8): zero-row 排除 obligation を inline sorry から明示 statement
+  `hnotZeroRowProjection` (Coq `FTtype34_not_ortho_cycTIiso`) へ isolate + TGapProjectionRigidity
+  refuter infra +59)。⚠ c は multiple merge bases (2) — 3-dot が前 tick 済み FeitThompson 等を幻影表示、
+  per-commit 確認 + trial-merge staged で誤検出排除 (手順どおり)。build green ×2 (4169 jobs; 3m04s/1m25s)・
+  AxiomsCheck OK・count-sorry 68→67 (gammaGrid_real discharge −1、移動/isolate は ±対)・build 警告 66→65・
+  新 axiom なし。push `bb955e43..0641db84`。size watch: FeitThompson 1850/Setup 1650 (>1500、0079 既知・
+  co-edit hotspot 継続)、S15_SAndT は 0102 で解消。
 - **2026-07-12 — 監視再開 (ユーザー「各レーンを監視します」+ Fable 30 分規約化再指示) + b/c 合流**:
   cron `1363241e` を Fable 規定 30 分 `13,43` で作成。CLAUDE.md・memory の残存「15分」固定表記を
   モデル依存規約 (正本 = 本ファイル冒頭) に統一 (`0f61c418`)。初回 tick (SHA 固定手順): a=0 /
