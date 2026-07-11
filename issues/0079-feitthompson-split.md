@@ -55,3 +55,11 @@ prefix-split すれば FeitThompson.lean が ~1380 行に収まる。ただし c
 - 行数 refresh: `FeitThompson.lean` = **2058 行** (2026-07-02)。
 - 2026-06-24 lane-b note の cd cluster 境界 (~1102–1664 / ~1694–1710 / ~1750) は
   **line 番号 drift の可能性が高い — 実行時に要再検証** (再 grep)。
+
+## 2026-07-12 現況 (hub tick 注記)
+
+- `FeitThompson.lean` = **1844 行**、split-out 済の `FeitThompsonSetup.lean` も **1630 行** (>1500)。
+- 本 tick で b (conj-pair producer 追記) と c ((3.9.b) field 配線) が**同 tick に co-edit** — 依然
+  active な def-unit 共有 wiring hub であり、「全レーンが当該 cluster で idle なタイミングで hub が
+  prefix-split」の方針を維持 (今は分割しない)。**FeitThompsonSetup.lean も本 issue の対象に追加**
+  (carrier structure 宣言群 = Section16Inputs/Section16CharacterData の凝集境界で将来分割)。

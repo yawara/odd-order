@@ -530,6 +530,20 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-12 — 監視再開 (ユーザー「各レーンを監視します」+ Fable 30 分規約化再指示) + b/c 合流**:
+  cron `1363241e` を Fable 規定 30 分 `13,43` で作成。CLAUDE.md・memory の残存「15分」固定表記を
+  モデル依存規約 (正本 = 本ファイル冒頭) に統一 (`0f61c418`)。初回 tick (SHA 固定手順): a=0 /
+  **b=3 commits** (Pf 3.9a/4.9a CF-level conj-pair producer 3 本 `omegaS_conj`/`muS_conj`/
+  `tau3W_omegaS_conj` + IsReal bridge; FeitThompson.lean への純 additive proven 追記 = 2038 供給、
+  先例 7dcbd371 と同型で merge 時 hub 承認、2038 self-flag 済) / **c=6 commits** (Pf 3.9b
+  `eta_row/column_galois_orbit` を忠実 field として S15.Hypothesis→Section16Inputs→cd→構成子の
+  全 chain に配線 — producer は main 既存 proven ⟹ 供給付き field 追加 = `S_U_commutative` 先例で
+  hub 承認; Pf 11.9a T-side projection dichotomy assemble = (11.9) 一枚岩 sorry を case split し
+  zero-column 側実証明・残 = zero-row 排除 (Coq 11.8) に narrowing)。build green ×2 (4168 jobs;
+  b 後 8m52s / c 後 2m58s)・AxiomsCheck OK・count-sorry 68→68 (build 警告 66 不変)・新 axiom なし・
+  0105 dup spot-check 清 (自前 TGap 系列拡張のみ)。push `cb479f50..0341a433`。⚠ size watch:
+  FeitThompson.lean 1844 / FeitThompsonSetup.lean 1630 (>1500) — 既存 issue 0079 に現況注記
+  (両者とも b/c の carrier 供給 co-edit hotspot ゆえ「idle 時に hub 分割」方針維持)。
 - **2026-07-07 (夜) — FT endgame 計画制定 (ユーザー依頼の総ざらい)**: 6-agent workflow (wf_4d2d6126) で
   sorry census (87 = on-path 64 / 凍結 23) / opacity (free carrier 残 = TFieldModelData のみ、axiom 0) /
   frontier 幅 (現在 8–9 → 終盤 S16 直列 spine に収束) / velocity / issues を総点検し、
