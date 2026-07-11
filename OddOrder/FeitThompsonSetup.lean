@@ -221,6 +221,11 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
     (mu i j - mu i k).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup
         (OddOrder.Peterfalvi.S15.honestTypeP2A0Set S Sdata) S
+  /-- **Peterfalvi (4.3.c), value identity** (Coq `prTIirr_id`; issues 9076/9014): on `W ∖ W₂`
+  the `μ`-grid is the signed `ω`-grid, `μ_{ij}(w) = δ_j·ω_{ij}(w)`. -/
+  mu_apply_of_not_mem_W2 : ∀ (i : Fin q) (j : Fin p) (w : G) (hwW : w ∈ W)
+    (hwS : w ∈ S), w ∉ (W2 : Set G) →
+    mu i j ⟨w, hwS⟩ = (delta j : ℂ) * omega i j ⟨w, hwW⟩
   /- Grid property fields (issue 3002): the (3.2)/(3.3)/(3.4) character-theoretic content of
   `tau3`/`omega`, threaded from `Section16CharacterData` into `S15.Hypothesis`. -/
   /-- **Peterfalvi (3.2), isometry part**: `τ₃` preserves the class-function inner product. -/
@@ -460,6 +465,11 @@ structure Section16CharacterData {G : Type*} [Group G] [Finite G]
     (mu i j - mu i k).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup
         (OddOrder.Peterfalvi.S15.honestTypeP2A0Set mp.S tp.Sdata) mp.S
+  /-- **Peterfalvi (4.3.c), value identity** (Coq `prTIirr_id`; issues 9076/9014): on `W ∖ W₂`
+  the `μ`-grid is the signed `ω`-grid, `μ_{ij}(w) = δ_j·ω_{ij}(w)`. -/
+  mu_apply_of_not_mem_W2 : ∀ (i : Fin tp.q) (j : Fin tp.p) (w : G) (hwW : w ∈ tp.W)
+    (hwS : w ∈ mp.S), w ∉ (tp.W2 : Set G) →
+    mu i j ⟨w, hwS⟩ = (delta j : ℂ) * omega i j ⟨w, hwW⟩
   mu_colSum_eq_induce : ∀ j : Fin tp.p,
     ∃ ψ : ClassFunction ↥((derivedInG mp.S).subgroupOf mp.S) ℂ,
       OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ ∧
@@ -1475,6 +1485,37 @@ theorem gridEquivE_mem_W2 (w : ↥tp.W) (hw : (w : G) ∈ mp.Kstar) :
       (mp.certainTypeS hG).sdiffTICyclicHypothesis.W := by
   rw [Subgroup.mem_subgroupOf, certainTypeS_W2_eq hG mp, Subgroup.mem_subgroupOf, gridEquivE_coe]
   exact hw
+
+/-- **The S-side (4.3.c) value identity** (Coq `prTIirr_id`, `PFsection4.v:403`) — the cd
+producer's `mu_apply_of_not_mem_W2` field: on `W ∖ W₂` the `μ`-grid is the signed `ω`-grid,
+`μ_{ij}(w) = δ_j·ω_{ij}(w)`.  The §6 value identity `certainType_apply_eq_of_mem_V` at
+`certainTypeS` (Dade-free, base-`Hypothesis` level), with the `sdiff.V`-membership built from
+`tpW_subgroupOf_eq`/`certainTypeS_W2_eq` and the `chiColumn`/`omegaS` transport collapsing
+along `gridEquivE` (`gridEquivE_coe` is `rfl`). -/
+theorem muS_apply_of_not_mem_W2 (i : Fin tp.q) (j : Fin tp.p) (w : G) (hwW : w ∈ tp.W)
+    (hwS : w ∈ mp.S) (hw2 : w ∉ (tp.W2 : Set G)) :
+    muS hG mp tp i j ⟨w, hwS⟩
+      = (deltaS hG mp tp j : ℂ) * omegaS hG mp tp i j ⟨w, hwW⟩ := by
+  have hjoin : (⟨w, hwS⟩ : ↥mp.S) ∈ (mp.certainTypeS hG).sdiffTICyclicHypothesis.W := by
+    rw [← tpW_subgroupOf_eq hG mp tp]
+    exact Subgroup.mem_subgroupOf.mpr hwW
+  have hnot : (⟨w, hwS⟩ : ↥mp.S) ∉ ((mp.certainTypeS hG).W2 : Set ↥mp.S) := by
+    intro hmem
+    apply hw2
+    rw [tp.W2_eq_Kstar hG]
+    have hks := (certainTypeS_W2_eq hG mp) ▸ hmem
+    exact Subgroup.mem_subgroupOf.mp hks
+  have hv : (⟨w, hwS⟩ : ↥mp.S) ∈ (mp.certainTypeS hG).sdiffTICyclicHypothesis.V :=
+    ⟨SetLike.mem_coe.mpr hjoin, hnot⟩
+  have h43c := (mp.certainTypeS hG).certainType_apply_eq_of_mem_V
+    (chi2enum hG mp tp j) (eqQ hG mp tp i) hv
+  refine (show muS hG mp tp i j ⟨w, hwS⟩
+      = (((mp.certainTypeS hG).columnFamily (chi2enum hG mp tp j)).mu (eqQ hG mp tp i) :
+          ClassFunction ↥mp.S ℂ) ⟨w, hwS⟩ from rfl).trans (h43c.trans ?_)
+  rw [omegaS, ClassFunction.compHom_apply]
+  show (((mp.certainTypeS hG).columnFamily (chi2enum hG mp tp j)).sign : ℂ) * _
+      = (deltaS hG mp tp j : ℂ) * _
+  congr 1
 
 /-- **Value of `certainTypeS`'s product character on a transported `mp.K`-element**: only the
 `W₁`-factor `a` survives (`wFst` is the identity, `wSnd` is trivial, on a `W₁`-element).  This is the
