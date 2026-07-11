@@ -206,3 +206,32 @@ squeeze wiring + dichotomy dispatch を landed (sorry 0・新 axiom 0・append-o
 残 phase の直接ターゲット = `NineElevenPairBound` と `NineElevenEqualityRefutation` の 2 定理
 (両方 landed 時に `coherent_sOf_H0Cprime_of_equality_refutation` が無条件化 →
 S13_Orthogonality:130 の live sorry を置換)。
+
+---
+
+# Phase E-PairBound 完了 (2026-07-11, lane a)
+
+**`NineElevenPairBound` を discharge** — `nineElevenPairBound` (S11_NineElevenCaseA.lean、
+append-only +347 行、自前 sorry 0・新 axiom 0):
+
+- **`caseA_sOf_source_degree_ratio`** — (9.8.a) member-degree dictionary (Coq `a_dv_XH0`
+  member 形): `𝒮(H₀ ⊔ Y)` の各 member は degree `q·a·e` (`caseA_source_degree_dvd_a` 経由)。
+  Coq が `extend_coherent` の側条件 `xi1 1 %| chi 1` に食わせるのと同一の divisibility。
+- **`nineElevenPairBound`** — (5.6) pair-bound bundle 本体。break dictionary
+  (`χ = Ind ζ`, `χ(1) = q·d`) + `d ≤ u` (`xiOf_H0Cprime_source_apply_one_le_u`、
+  `H₀C′ = H₀ ⊔ C′` の同定は `C_eq_cSub`) + `a ∣ d`。bound は
+  `coherentDegreeSqNormBound_of_not_coherentW_k` (norm-weighted (5.6) 逆読み) を
+  degree-`qa` anchor ((9.8.d) count の正値性、Phase A base case と同一抽出) で発火:
+  per-member Dade data = **`S12.sixTwoDecompositionData`** ((5.2.d)/(5.2.e) grid 供給、
+  issue 2022 産・sorry-free)、Gram/support/ZIrr/generation = S08_SixTwoGeneral 層
+  (`inducedKernelFamily_degreeSqNormReBound_of_break_k` の assembly を anchor 度数 `qa`・
+  ratio `d/a` に組み替え)。rescale `sumnS F ≤ sumnS 𝒮₂ = (qa)²·Σ deg²/mc ≤ (qa)²·2(d/a)
+  = 2q²a·d`。
+- **axiom 実測**: `nineElevenPairBound` = propext/**sorryAx**/Classical.choice/Quot.sound。
+  sorryAx は**本 commit の追加分ではなく** `C_eq_cSub` (S13_CoreStructure) →
+  `H0_eq_Hprime`/(11.5) chain の既存 upstream 由来 — **caseB 分岐
+  (`caseB_coherent_sOf_H0Cprime`, 9075) が既に負っている同一 debt** (sorried-cite 規約適合)。
+  helper `caseA_sOf_source_degree_ratio` は axiom-clean。
+- 消費側: `caseA_refuter_of_equality_refutation` の `hbound` 仮説が直接充足可能に。
+  **残 = `NineElevenEqualityRefutation` のみ** (Phase B (9.11.2) / C (9.11.3) / D (9.11.4) /
+  E-remainder (9.11.5-8))。
