@@ -448,3 +448,37 @@ trichotomy) → H' = Z(H) order p → W₂ = H' → (H/H')⋊W₁ Frobenius →
 deg-1 は (p²−1)/w₁ 個の w₁-束 → S₁; deg-p は θ(1)²≤p³ → {μ_j})
 → **v2 assembly** (S12_Noncoherence: trichotomy → caseA lemma / (6.5.c)
 sorried-cite / caseC engine+pins) → no_typeV_maximal_unconditional 配線。
+
+## 2026-07-11 tick³⁵ — ★★(10.10.2) 構造 package 完全 landed (P1–P4 全て sorry-free)
+
+S12_TypeVCaseC 末尾に 5 lemma (commits c314d8a7 / 7af7f764 / f18275c2、全て
+axiom-clean [propext, Classical.choice, Quot.sound] を #print axioms 確認済、
+leaf build 4026 jobs green、file 1394 行):
+
+- **P1** `card_abelianization_eq_prime_sq_of_card_eq_prime_cube` (hyp-free 群論):
+  非可換 |K| = p³ → |K/K'| = p²。「H' = Z(H) has order p」は既存
+  `IsExtraspecial.of_card_eq_prime_cube` (GroupTheory/IsExtraspecial) がそのまま供給
+  (K' = Z(K)・|K'| = p の再 wrap はせず direct cite)。
+- **P2** `Hypothesis.eight_le_SHCcount_of_card_eq_prime_cube`: |M'| = p³ 非可換 +
+  p = 2w₁−1 + w₁ ≥ 3 → **h8** (engine の入力そのもの)。
+  Section9Counts:488 orbit count + P1: w₁|S₁|+1 = (2w₁−1)² → |S₁| = 4(w₁−1) ≥ 8。
+- **P3** `Hypothesis.W2_eq_secondDerivedInAmbient_of_card_eq_prime_cube`:
+  + p = w₂ → W₂ = M''。|M''| = p (IsExtraspecial commutator_card を
+  map_subtype_commutator ×2 で ambient へ) + W2_le + eq_of_le_of_card_ge。
+- **P4** `Hypothesis.linear_of_induce_isIrreducible_of_card_eq_prime_cube` +
+  `Hypothesis.mem_SHCSet_or_eq_muGrid_columnSum_of_card_eq_prime_cube`
+  (= **hstruct** そのもの、書中「S = S₁ ∪ {μ_j}」): 既約側 = 線型性 counting
+  (可約誘導 source = w₂ 本の certain-type 列 `card_reducible_induce_eq_W2`、
+  非自明線型は既約誘導 `inertia_eq_derived_of_linear`、非線型 #= p−1 は p-冪次数
+  + `sumIrreducibleDegreeSq` Burnside 和 + P1 → 個数一致で「非線型 ⟹ 可約誘導」
+  の対偶) + induce_apply_one で φ(1) = w₁ → S(HC)。可約側 = HcBound の
+  `reducible_mem_inducedKernelFamily_eq_muGrid_columnSum` の型 V clone (元証明は
+  htype/hnt/chief 未使用と確認 — §6 `induce_not_isIrreducible_iff` 経路を直組立)。
+
+**engine 入力の残依存が確定**: typeV_caseC_coherence_engine の h8 = P2、hstruct = P4
+は「|M'| = p³ 非可換 (p = w₂ prime) + p = 2w₁−1 + w₁ ≥ 3」から全て discharge 可。
+残 = **v2 assembly** (S12_Noncoherence 配線): trichotomy ((6.5.b) issue-2022-gated
+sorried-cite 含む) → case (a) = typeV_caseA_coherence ✓ / case (c) = engine + 数値 pin
+((10.10.1) p = 2w₁−1・w₁ < w₂ は (6.5.a) hbound gated、delta_eq_neg_one/n_eq_two ✓
+/ ζ 供給 = exists_zeta_in_inducedFamily_degree_w1 + hdeg/hδj/hμ0 grid 系) +
+no_typeV_maximal_unconditional の AxiomsCheck assert (1021 完了条件)。
