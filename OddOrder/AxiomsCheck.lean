@@ -6851,6 +6851,21 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaS_apply_one
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaS_mem_ZIrr
 
+-- **Concrete eta-axis Galois orbits (issue 3004 frontier, lane c)** — the S-side dual
+-- enumerations are literal powers of prime-order generators.  The S05 sigma transport therefore
+-- gives full class-function Galois orbits on both nonprincipal axes; the former row-only vanishing
+-- theorem is now just their pointwise zero corollary.  These are concrete producer theorems and do
+-- not change the abstract S15 carrier signature.
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaSChar_row_eq_pow
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaSChar_column_eq_pow
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.tau3W_omegaS_eq_sigma_omegaSChar
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaSChar_injective
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.orderOf_omegaSChar_row_base
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.orderOf_omegaSChar_column_base
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.tau3W_omegaS_row_galois_orbit
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.tau3W_omegaS_column_galois_orbit
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.tau3W_omegaS_row_vanish_of_one_zero
+
 -- **cd producer (POLE-1 `charData`)** — `section16CharacterData_of_isMinimalSimpleOdd` packs the
 -- proven grid building blocks (`omegaS`/`muS`/`nuT`/`deltaS`/`deltaPrimeT`/`tau3W` with the
 -- `(13.1.e)` identities `muS_definition`/`nuT_definition`) into the `Section16CharacterData` carrier.

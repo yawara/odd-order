@@ -800,3 +800,59 @@ feature commits: `51120309`, `9130596f`。
   したが、`TTypeII -> S12_Noncoherence -> ... -> FeitThompsonSetup ->
   S16_NonExistenceG -> TTypeII` の循環を確認。変更を撤回して TTypeII build
   (4120 jobs) green を復旧し、issue は premise false として close した。
+
+
+## lane-c concrete eta-axis full Galois orbit producer (2026-07-12)
+
+feature commit: `c1fa962c`.
+
+- Hub 追記の診断を concrete code 上で独立検証した。旧
+  `tau3W_omegaS_row_vanish_of_one_zero` は S05
+  `exists_mapRingEquiv_sigma_omega_pow` の full class-function equality `hu` を内部で
+  構成してから一点 `x` に評価しており、情報を pointwise vanishing へ落としていた。
+- S-side dual の二つの列挙が literal power enumeration であることから、
+  `omegaSChar_row_eq_pow` / `omegaSChar_column_eq_pow` を実証明した。両 axis の base
+  character がそれぞれ正確に prime order `q` / `p` を持つことも、axis の prime-power
+  triviality と grid injectivity から証明した。
+- `tau3W_omegaS_row_galois_orbit` と
+  `tau3W_omegaS_column_galois_orbit` は任意の nonzero index に対し
+  `mapRingEquiv u eta_base = eta_index` という full class-function equality を返す。
+  旧 row vanishing theorem はこの orbit equality の一点評価だけに縮約し、重複していた
+  cyclic-generator 探索を削除した。
+- concrete producer は `Section16CharacterData` namespace 内で完結し、今回
+  `Section16CharacterData` / `Section16Inputs` /
+  `Peterfalvi.S15.Hypothesis` の structure signature は変更していない。
+- threading DAG を再監査した結果、T-side abstract consumer
+  `tSideDadeMap_eta_axis_coefficients_constant` へ渡す signature-free 経路は存在しない。
+  canonical な経路は上記三 carrier に row/column full-orbit fields を同じ statement で
+  threading するものに一意である。これは既存 row pointwise field の情報を強める独立 field
+  追加であり、concrete producer 自体は既に構成済みだが、carrier signature 変更なので hub
+  merge/design gate の対象として分離する。
+- main `cce4dbc8` 同期後、FeitThompson build と AxiomsCheck (4149 jobs) は exit 0。
+  9 theorem を AxiomsCheck 登録済み。新 axiom・新 sorry なし。
+
+
+### main 同期後の TTypeII consumer 再監査 (2026-07-12)
+
+main `cce4dbc8` の最新 `TTypeII.lean` を concrete producer landing 後に再監査した。
+前節の「full orbit が T-side abstract consumer への残 input」という診断は
+`tSideDadeMap_eta_axis_coefficients_constant` 単体については正しいが、
+`T_typeIII_ratio_le` の最後の `hresidual` 全体については orbit だけでは閉じない。
+
+現 `TTypeII.lean` の局所 `sorry` は次の四出力を一括している:
+
+1. sharp norm bound `sum m_ij^2 <= p` — 最新 main で concrete residual 非零 producer から
+   既に実証明済み (`hsumSqT`)。
+2. zero-column projection equality — full row/column orbit を thread して axis constancy を得た後、
+   full-grid column-or-row 二分法を適用し、さらに (11.8) non-orthogonality で wrong-axis
+   alternative を排除する必要がある。
+3. `mu_01(z)=0` for `z in S' minus P` — 現 repo に abstract producer がなく、prime-TI
+   residue grid と `hyp.mu` の pointwise grounding がまだ必要。
+4. `mu_01(x)=1` on `W1#` — main で
+   `Hypothesis.mu_row0_apply_eq_one_of_mem_W1` が landing 済み。
+
+従って正確な次 frontier は三本:
+(a) concrete full-orbit の carrier threading、
+(b) (11.8) wrong-axis refuter、
+(c) prime-TI `mu_01` derived-complement vanishing。
+orbit threading だけで `T_typeIII_ratio_le` が閉じるとは扱わない。
