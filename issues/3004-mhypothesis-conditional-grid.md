@@ -768,3 +768,35 @@ feature commits: `c56bf539`, `162fa7a9`。
   honest spine の concrete `tau3/omega` Galois API からの接続を引き続き追う。
 - 両 feature は AxiomsCheck 登録済み。main `b0813b64` 同期後
   AxiomsCheck (4141 jobs) exit 0、`git diff --check` clean。新 axiom・新 sorry なし。
+
+
+## lane-c (11.9.a) star-free Galois transport と eta-axis constancy (2026-07-12)
+
+feature commits: `51120309`, `9130596f`。
+
+- Coq `a_aut` を再監査し、cyclotomic automorphism は一般には global な
+  complex-conjugation 可換性を仮定しないことを確認した。仮想指標値の
+  `chi(g⁻¹)=star(chi(g))` と内積の整数性を使い、
+  `inner_mapRingEquiv_eq_of_mem_ZIrr` を実証明した。これにより
+  `inner_eq_intCast_of_mapRingEquiv_eq_add` /
+  `tSideDadeMap_inner_galois_eq_intCast` から強すぎる `hstar` を除去し、
+  Coq と同じ任意の係数体自己同型で使える形に修正した。
+- `tSideDadeMap_eta_axis_coefficients_constant` を実証明。
+  T-side coherent source family の Galois 閉性、任意の family difference の
+  A₁(T)-support、coherent image の全 eta-grid 直交を `a_aut` と合成し、
+  eta-row/column orbit から整数射影係数の nonprincipal axis constancy を返す。
+- これで (11.9.a) projection の character-side residual は exact に
+  `mapRingEquiv sigma eta_10 = eta_i0` と
+  `mapRingEquiv sigma eta_01 = eta_0j` の full class-function orbit producer のみ。
+  honest spine `FeitThompson.lean` の
+  `tau3W_omegaS_row_vanish_of_one_zero` 内部には row 側の full equality
+  (`exists_mapRingEquiv_sigma_omega_pow` の witness `hu`) が既に構成されているが、
+  現行 `S15.Hypothesis` は pointwise vanishing transport だけを保持し、full orbit を
+  消去している。structure signature は無断変更せず、次 frontier はこの既存
+  concrete equality の再利用可能な producer 化と、column mirror、正規の threading。
+- 両 theorem は AxiomsCheck 登録済み。leaf build と AxiomsCheck (4149 jobs) green。
+  新 axiom・新 sorry なし。
+- 併せて issue 1022 の optional `S12.no_typeV_maximal_unconditional` repoint を実 build
+  したが、`TTypeII -> S12_Noncoherence -> ... -> FeitThompsonSetup ->
+  S16_NonExistenceG -> TTypeII` の循環を確認。変更を撤回して TTypeII build
+  (4120 jobs) green を復旧し、issue は premise false として close した。
