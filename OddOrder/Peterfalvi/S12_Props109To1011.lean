@@ -774,14 +774,17 @@ theorem Hypothesis.exists_SHC_extension_orthonormal [Finite G] {M : Subgroup G}
       (∀ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M → IsIrreducibleCharacter φ →
         φ 1 = (hyp.w1 : ℂ) → coh.extension φ ∈ R) ∧
       (∀ β ∈ R, ∃ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
-        φ 1 = (hyp.w1 : ℂ) ∧ β = coh.extension φ) := by
+        φ 1 = (hyp.w1 : ℂ) ∧ β = coh.extension φ) ∧
+      R.card = (Finset.univ.filter fun χ : IrreducibleCharacter ↥M =>
+        (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
+          (χ : ClassFunction ↥M ℂ) 1 = (hyp.w1 : ℂ)).card := by
   haveI := hyp.finiteG
   classical
   set s : Finset (IrreducibleCharacter ↥M) :=
     Finset.univ.filter (fun χ => (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
       (χ : ClassFunction ↥M ℂ) 1 = (hyp.w1 : ℂ)) with hs
   refine ⟨s.image (fun χ : IrreducibleCharacter ↥M =>
-      coh.extension (χ : ClassFunction ↥M ℂ)), ?_, ?_, ?_, ?_⟩
+      coh.extension (χ : ClassFunction ↥M ℂ)), ?_, ?_, ?_, ?_, ?_⟩
   · intro β hβ
     rw [Finset.mem_image] at hβ
     obtain ⟨χ, hχs, rfl⟩ := hβ
@@ -810,6 +813,14 @@ theorem Hypothesis.exists_SHC_extension_orthonormal [Finite G] {M : Subgroup G}
     obtain ⟨χ, hχs, rfl⟩ := hβ
     rw [hs, Finset.mem_filter] at hχs
     exact ⟨χ, hχs.2.1, χ.2, hχs.2.2, rfl⟩
+  · -- `|R| = |S₁|`: the image is injective (`SHC_extension_inj`)
+    refine Finset.card_image_of_injOn ?_
+    intro χ hχs χ' hχ's hext
+    have h1 := Finset.mem_coe.mp hχs
+    have h2 := Finset.mem_coe.mp hχ's
+    rw [hs, Finset.mem_filter] at h1 h2
+    exact Subtype.ext
+      (hyp.SHC_extension_inj hG coh h1.2.1 χ.2 h1.2.2 h2.2.1 χ'.2 h2.2.2 hext)
 
 /-- **Peterfalvi (11.8.2) arithmetic core**: the integer inequality `n·(a² − 2a) ≤ 2` with `2 ≤ n`
 forces `a ∈ {0, 1, 2}`.  (If `a ∉ {0, 1, 2}` then `a ≤ −1` or `a ≥ 3`, so `a² − 2a ≥ 3` and

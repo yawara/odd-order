@@ -220,4 +220,31 @@ theorem Hypothesis.SHC_tau_muGridAlpha_eq_of_eight_le_card [Finite G] {M : Subgr
     (hyp.muGridAlpha_tau_inner_SHC_zeta_of_eight_le_card hG coh hodd i hj0 hζS hζirr hζ1
       hdeg hμ0 hnf hδj hdζ h0ζ hδpm hneq hR8 hZ horth hRmem hRrev)
 
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (10.10.3), count form** (R-free): with `n = 2` and at least `8` degree-`w₁`
+irreducible members of `S` — the (10.10.2) count is `|S₁| = 4(w₁−1) ≥ 8` for `w₁ ≥ 3` —
+the (10.5) difference maps to `α_{ij}^τ = δ·(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}`.  The
+orthonormal family `S₁^{τ₁}` and its cardinality are supplied by
+`exists_SHC_extension_orthonormal`. -/
+theorem Hypothesis.SHC_tau_muGridAlpha_eq_of_eight_le_SHCcount [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
+    (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hζne : ζ.conj ≠ ζ) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ) (hδj : hyp.muColumnSign hG hodd j = δ)
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hδpm : δ = 1 ∨ δ = -1) (hneq : n = 2)
+    (h8 : 8 ≤ (Finset.univ.filter fun χ : IrreducibleCharacter ↥M =>
+      (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
+        (χ : ClassFunction ↥M ℂ) 1 = (hyp.w1 : ℂ)).card) :
+    hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+      = (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
+        - (n : ℂ) • coh.extension ζ := by
+  obtain ⟨R, hZ, horth, hRmem, hRrev, hcard⟩ := hyp.exists_SHC_extension_orthonormal hG coh
+  exact hyp.SHC_tau_muGridAlpha_eq_of_eight_le_card hG coh hodd i hj0 hζS hζirr hζ1 hζne
+    hdeg hμ0 hnf hδj hdζ h0ζ hδpm hneq (by rw [hcard]; exact h8) hZ horth hRmem hRrev
+
 end OddOrder.Peterfalvi.S12
