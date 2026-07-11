@@ -8,6 +8,8 @@ import OddOrder.Peterfalvi.S08_YsetInner
 import OddOrder.Peterfalvi.S06_CertainHypothesis46
 import OddOrder.Peterfalvi.S08_CoherenceCorePart1
 import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core
+import OddOrder.Peterfalvi.S12_TICyclicSigmaBridge
+import OddOrder.Peterfalvi.S08_CaseBCoherence2
 
 /-!
 # Peterfalvi (10.10) case (a): type-V Sibley coordinates
@@ -35,6 +37,7 @@ maximality/simplicity (the (8.15) normalizer identification
 namespace OddOrder.Peterfalvi.S12
 
 open OddOrder.GroupTheory
+open OddOrder.RepresentationTheory
 
 variable {G : Type*} [Group G]
 
@@ -283,5 +286,81 @@ noncomputable def typeVSibleyDadeHypothesis [Finite G]
         rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'le).toEquiv,
           Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.typeP.W1_le).toEquiv]
         exact typePData_W1_hall_coprime hG hyp.maximal (hyp.bgTypeP hG) hyp.typeP⟩ }
+
+section DadeUniqueness
+
+variable [Fintype G] {A : Set G} {L : Subgroup G} [Fintype ↥L]
+variable [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
+
+/-- **(2.5)-uniqueness for the integral character map**: two full Dade data over (possibly
+differently packaged) Hypothesis (2.2) data on the same pair `(A, L)`, both with all local
+subgroups trivial (the TI situation), give the same integral character map on `A`-supported
+functions.  `dadeIntegralCharacterMap` evaluates to the canonical `dadeMap` on the supported
+subspace (`dadeIntegralCharacterMap_apply_of_support`), and the canonical maps agree by the
+(2.5) uniqueness `dadeMap_unique_of_forall_H_eq_bot`.  This absorbs any packaging difference
+(restriction, support-set recoordination) between the two data. -/
+theorem dadeIntegralCharacterMap_eq_of_forall_H_eq_bot
+    {hyp₁ hyp₂ : OddOrder.Peterfalvi.S04.Hypothesis G A L}
+    (D₁ : OddOrder.Peterfalvi.S04.FullDadeIsometryData (G := G) hyp₁)
+    (D₂ : OddOrder.Peterfalvi.S04.FullDadeIsometryData (G := G) hyp₂)
+    (hH₁ : ∀ a, hyp₁.H a = ⊥) (hH₂ : ∀ a, hyp₂.H a = ⊥)
+    {φ : ClassFunction ↥L ℂ}
+    (hφ : φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L) :
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp₁ D₁ φ
+      = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp₂ D₂ φ := by
+  rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support hyp₁ D₁ hφ,
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support hyp₂ D₂ hφ,
+    dadeMap_unique_of_forall_H_eq_bot
+      (hyp₁.isDadeMap_dadeMap (k := ℂ)) (hyp₂.isDadeMap_dadeMap (k := ℂ)) hH₁ hH₂]
+
+end DadeUniqueness
+
+open scoped FiniteInduce in
+/-- **Case-(a) `τ`-agreement** (Peterfalvi (2.11) + (2.5)): the Sibley–Dade map of
+`typeVSibleyDadeHypothesis` agrees with the §10 Dade isometry `hyp.tau` on class functions
+supported in `(M')^#`.  `hyp.tau` restricts to the `(M')^#`-datum by (2.11)
+(`dadeIntegralCharacterMap_restrict_eq_of_support`), and the restricted datum agrees with the
+Sibley `dade` field by the (2.5) uniqueness on the TI pair — both local-subgroup families
+vanish (`H_eq_bot_of_isTISubset`), so the packaging difference (the `hypothesis46CastSet`
+recoordination) is invisible. -/
+theorem typeVSibleyDadeHypothesis_tau_agree [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : Hypothesis M) (dV : TypeVData M)
+    (hTI : IsTISubset (sharpSubgroup hyp.typeP.H)
+      (Subgroup.normalizer (hyp.typeP.H : Set G)))
+    {φ : ClassFunction ↥M ℂ}
+    (hφ : φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (OddOrder.Peterfalvi.S08.sharpImage ((derivedInG M).subgroupOf M)) M) :
+    (typeVSibleyDadeHypothesis hG hyp dV hTI).tau φ = hyp.tau φ := by
+  have hset : typePA M hyp.typeP
+      = OddOrder.Peterfalvi.S08.sharpImage ((derivedInG M).subgroupOf M) :=
+    (typePA_eq_sharpSubgroup_derivedInG M hyp.typeP).trans
+      (sharpImage_subgroupOf_derivedInG M).symm
+  have hTI_M : IsTISubset
+      (OddOrder.Peterfalvi.S08.sharpImage ((derivedInG M).subgroupOf M)) M :=
+    hset ▸ typePA_isTISubset_of_typeV_TI hG hyp.maximal dV hyp.typeP hTI
+  have hAsub : OddOrder.Peterfalvi.S08.sharpImage ((derivedInG M).subgroupOf M)
+      ⊆ typePA0 M hyp.typeP := by
+    rw [← hset]
+    exact Set.subset_union_left
+  have hnorm' : ∀ (l : ↥M) ⦃a : G⦄,
+      a ∈ OddOrder.Peterfalvi.S08.sharpImage ((derivedInG M).subgroupOf M) →
+      (↑l : G) * a * (↑l : G)⁻¹ ∈ OddOrder.Peterfalvi.S08.sharpImage
+        ((derivedInG M).subgroupOf M) := by
+    intro l a ha
+    rw [← hset] at ha ⊢
+    exact OddOrder.Peterfalvi.S10.typePA_conj_mem M hyp.typeP l.2 ha
+  -- (2.5): the Sibley datum agrees with the (2.11)-restricted `A₀`-datum on the TI pair
+  have h25 := dadeIntegralCharacterMap_eq_of_forall_H_eq_bot
+    ((typeVSibleyDadeHypothesis hG hyp dV hTI).dade.fullDadeIsometryData
+      (typeVSibleyDadeHypothesis hG hyp dV hTI).hconj)
+    ((hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).restrict hAsub hnorm')
+    (fun a => (typeVSibleyDadeHypothesis hG hyp dV hTI).dade.H_eq_bot_of_isTISubset hTI_M a)
+    (fun a => (hyp.dadeData.dade.restrict hAsub hnorm').H_eq_bot_of_isTISubset hTI_M a)
+    hφ
+  -- (2.11): the restricted datum's map is `hyp.tau` on `A`-supported functions
+  have h211 := OddOrder.Peterfalvi.S08.dadeIntegralCharacterMap_restrict_eq_of_support
+    hyp.dadeData.dade (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) hAsub hnorm' hφ
+  exact h25.trans h211
 
 end OddOrder.Peterfalvi.S12
