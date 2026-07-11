@@ -28,3 +28,26 @@ precision survey の断定:
   S07.irrSubcoherent + Rdatum 経由の別 route を使用中の模様)。配線されていなくても
   UNSOUND stand-in の置換は正当 (unsound scaffold は STOP-級の問題対象) だが、
   wiring の実態は §15/§16 側 (b/c) の設計に影響する。
+
+## (9.11) port 設計確定 (survey #3、5-phase plan)
+
+**honest route は ~80% landed 済**: 算術/refutation spine (nineElevenOne〜Five、
+S11_SingleFactorCentralizer/NineElevenCoherence)・S07 skeleton・caseB 完了
+(caseB_coherent_sOf_H0Cprime S13_CoreStructure:1482)・caseA reduction
+(caseA_coherent_sOf_H0Cprime_of_refuter S11_NineElevenCaseA:65) 全て sorry-free。
+**唯一の open gap = hrefute (S13_Orthogonality:130 の live sorry)** — これが
+9083 改訂² の対象そのもの (sibleyTarget_H0C は並行 dead-end; 置換は本 route)。
+
+Phase plan (詳細は survey 出力; 各 phase = 1 iteration 級):
+- **A (S, ungated)**: squeeze wiring + dichotomy dispatch — hrefute を equality
+  configuration + χ∈𝒮₃ 抽出まで落とし、coherent_sOf_H0Cprime 無条件版を組む。
+  部品: clifford_dichotomy / caseB / nineElevenOne_configuration /
+  coherentDegreeSqNormBound_of_not_coherentW / sumnS 系。全部品 proven。
+- **B (M)**: (9.11.2) two-summand inertia index (K₁/K₂ relIndex = a、C = K₁⊓K₂)。
+- **C (M, ungated)**: (9.11.3) W₁-orbit count split (hn : n = q|𝒮₄| + (p−1))。
+- **D (L, ⚠gated)**: (9.11.4) Mackey norm + HU₁ ⊆ {1}∪A(M) (Coq gap-patch:
+  Philip Hall/(2.1); §4 A(M)-support infra 要確認)。
+- **E (L, ungated)**: (9.11.6-8) α^τ⊥𝒮₃ → β^τ 分解 → b=0 → pair 構成
+  (isCoherent_pair_of_differenceImage) → refuter close。
+配線仕上げ: mkSection11CharacterData の H0CprimeSupport := ∅ → hyp.base.A0 pin
++ sSet→sOf 家族修正 (S12:1548-1554 の 3 blocker)。
