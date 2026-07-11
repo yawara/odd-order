@@ -60,7 +60,13 @@ The Frobenius structure is `typeII_HU_frobenius_of_coherent` (`S12_TypeIIFrobeni
 supplies an irreducible/reducible pair of equal degree `q·u`, which the (10.7) cross-isometry
 computation refutes (`TypeIICrossIsometryData.elim`, proven, against the named left-branch gate
 `exists_typeIICrossIsometryData`: T2-coherence (5.7) + shared-grid (5.8) + (8.18.b) support
-disjointness).  The `coh`/`hSmax`/`hG` hypotheses (10.4)/(10.1) are what the dichotomy consumes. -/
+disjointness).  The `coh`/`hSmax`/`hG` hypotheses (10.4)/(10.1) are what the dichotomy consumes.
+
+**Legacy** (issues 9079/1020): the honest (10.7) is `typeII_HU_frobenius_of_coherent'`
+(`S12_TypeIICrossIsometryPair`, axiom-clean via the pair-witness route) — the unconditional
+(10.8) (`S_not_coherent_unconditional`, `S12_Noncoherence`) consumes *that*, not this.  This
+version (through the sorried `exists_typeIICrossIsometryData` gate) remains only for the legacy
+in-file estimate/`S_not_coherent` chain; new consumers should cite the heir. -/
 theorem typeII_derived_frobenius [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     {hyp : Hypothesis M} {params : CharacterParameters hyp}
