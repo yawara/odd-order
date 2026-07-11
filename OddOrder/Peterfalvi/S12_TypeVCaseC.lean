@@ -188,4 +188,36 @@ theorem Hypothesis.muGridAlpha_tau_inner_SHC_zeta_of_eight_le_card [Finite G]
   push_cast
   ring
 
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (10.10.3)** (grid form): in the (10.10.3) regime — `n = 2` and an orthonormal
+`S₁^{τ₁} = R` with `|R| ≥ 8` — the Dade image of the (10.5) difference is
+`α_{ij}^τ = δ·(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}` with `ζ^{τ₁}` the `S₁`-coherent extension.
+Composition of the `a = 0` coefficient computation
+(`muGridAlpha_tau_inner_SHC_zeta_of_eight_le_card`) with the SHC (10.5) endgame
+(`SHC_tau_muGridAlpha_eq`). -/
+theorem Hypothesis.SHC_tau_muGridAlpha_eq_of_eight_le_card [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
+    (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hζne : ζ.conj ≠ ζ) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ) (hδj : hyp.muColumnSign hG hodd j = δ)
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hδpm : δ = 1 ∨ δ = -1) (hneq : n = 2)
+    {R : Finset (ClassFunction G ℂ)} (hR8 : 8 ≤ R.card)
+    (hZ : ∀ β ∈ R, β ∈ ZIrr G)
+    (horth : ∀ α ∈ R, ∀ β ∈ R, ClassFunction.inner α β = if α = β then (1 : ℂ) else 0)
+    (hRmem : ∀ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M → IsIrreducibleCharacter φ →
+      φ 1 = (hyp.w1 : ℂ) → coh.extension φ ∈ R)
+    (hRrev : ∀ β ∈ R, ∃ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+      φ 1 = (hyp.w1 : ℂ) ∧ β = coh.extension φ) :
+    hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+      = (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
+        - (n : ℂ) • coh.extension ζ :=
+  hyp.SHC_tau_muGridAlpha_eq hG coh hodd i hj0 hζS hζirr hζ1 hζne hdeg hμ0 hnf hδj hdζ h0ζ hδpm
+    (hyp.muGridAlpha_tau_inner_SHC_zeta_of_eight_le_card hG coh hodd i hj0 hζS hζirr hζ1
+      hdeg hμ0 hnf hδj hdζ h0ζ hδpm hneq hR8 hZ horth hRmem hRrev)
+
 end OddOrder.Peterfalvi.S12
