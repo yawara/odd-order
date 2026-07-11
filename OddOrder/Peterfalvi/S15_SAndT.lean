@@ -622,8 +622,14 @@ structure BetaData (hyp : Hypothesis (G := G)) where
   j_ne_zero : (j : ℕ) ≠ 0
   beta : ClassFunction ↥hyp.S ℂ
   Gamma : ClassFunction G ℂ
-  /-- **(13.18.a)** support control: `β_j` is supported on `S`'s η-carrier support. -/
-  support_formula : beta.support ⊆ ⋃ (i : Fin hyp.q), (hyp.mu i j).support
+  /-- **(13.18.a)** support control: `β_j ∈ CF(S, P^# ∪ V_S)` — the Coq-faithful exact carrier
+  (`PVSbeta`).  (The previous grid form `supp(β_j) ⊆ ⋃ᵢ supp(μ_{ij})` was an unfaithful
+  restate; issue-3003 pattern.) -/
+  support_formula : beta.support ⊆
+    {z : ↥hyp.S |
+      (z : G) ∈ OddOrder.GroupTheory.sharpSubgroup hyp.P ∪
+        OddOrder.GroupTheory.conjClassSetIn hyp.S
+          (OddOrder.GroupTheory.typePV hyp.S hyp.Sdata)}
   /-- **(13.18.b)** norm: `‖β_j‖²_S = (u−1)/q + 2`, whose `Ind_{PW₁}^S 1` half is
   `norm_induce_one_frobenius`. -/
   norm_formula :
@@ -755,16 +761,69 @@ noncomputable def GammaGrid [Finite G]
   tauSbetaGrid hG hyp - OddOrder.Peterfalvi.S09.Hypothesis71.constOne G
     + hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩
 
-/-- **(13.18.a) support control** (`S`-side, grid form): `supp(β_j) ⊆ ⋃_i supp(μ_{ij})`.
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (13.18.a), `[S : PW₁] = u`** (`S15` home; a copy temporarily also lives in
+`S16_NonExistenceG/TGapCross` — redirect tracked cross-lane).  The index is read from
+`|S| = p^q·u·q` and `|P W₁| = |P|·|W₁| = p^q·q`.  This is the degree of the permutation
+character `Ind_{PW₁}^S 1`. -/
+theorem PW1_index_eq_u [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    ((hyp.P ⊔ hyp.W1).subgroupOf hyp.S).index = hyp.u := by
+  have hD_le_S : OddOrder.GroupTheory.derivedInG hyp.S ≤ hyp.S := Subgroup.map_subtype_le _
+  have hP_le_D : hyp.P ≤ OddOrder.GroupTheory.derivedInG hyp.S := by
+    rw [hyp.S_deriv_eq_PU]
+    exact le_sup_left
+  have hP_le_S : hyp.P ≤ hyp.S := hP_le_D.trans hD_le_S
+  have hW1_le_S : hyp.W1 ≤ hyp.S := hyp.Sdata_W1_eq ▸ hyp.Sdata.W1_le
+  have hS_norm_P : hyp.S ≤ Subgroup.normalizer (hyp.P : Set G) := by
+    rw [hyp.P_eq_SF]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
+  have hW1norm : hyp.W1 ≤ Subgroup.normalizer (hyp.P : Set G) := hW1_le_S.trans hS_norm_P
+  have hDW1 : OddOrder.GroupTheory.derivedInG hyp.S ⊓ hyp.W1 = ⊥ := by
+    have hd := disjoint_iff.mp hyp.Sdata.M_complement.disjoint
+    rw [eq_bot_iff]
+    rintro x ⟨hxD, hxW1⟩
+    have hxS : x ∈ hyp.S := hD_le_S hxD
+    have hmem : (⟨x, hxS⟩ : ↥hyp.S) ∈
+        ((OddOrder.GroupTheory.derivedInG hyp.S).subgroupOf hyp.S) ⊓
+          (hyp.Sdata.W1.subgroupOf hyp.S) :=
+      ⟨Subgroup.mem_subgroupOf.mpr hxD,
+        Subgroup.mem_subgroupOf.mpr (hyp.Sdata_W1_eq ▸ hxW1)⟩
+    rw [hd, Subgroup.mem_bot] at hmem
+    rw [Subgroup.mem_bot]
+    simpa using Subtype.ext_iff.mp hmem
+  have hPW1disj : Disjoint hyp.P hyp.W1 :=
+    (disjoint_iff.mpr hDW1).mono hP_le_D (le_refl hyp.W1)
+  have hcardPW1 : Nat.card ↥(hyp.P ⊔ hyp.W1) = hyp.p ^ hyp.q * hyp.q := by
+    rw [sup_comm, OddOrder.BG.Ch3.S12.card_sup_eq_mul_of_le_normalizer_of_disjoint
+      hW1norm (disjoint_iff.mp hPW1disj.symm),
+      hyp.card_P_eq hG hyp.Sdata_W2_eq, ← hyp.q_eq_card_W1]
+    exact Nat.mul_comm hyp.q (hyp.p ^ hyp.q)
+  have hcardPW1S : Nat.card ↥((hyp.P ⊔ hyp.W1).subgroupOf hyp.S) =
+      hyp.p ^ hyp.q * hyp.q := by
+    rw [Nat.card_congr
+      (Subgroup.subgroupOfEquivOfLe (sup_le hP_le_S hW1_le_S)).toEquiv, hcardPW1]
+  have hm := Subgroup.card_mul_index ((hyp.P ⊔ hyp.W1).subgroupOf hyp.S)
+  rw [hcardPW1S, hyp.card_S_val hG, c_eq_one hG hyp, mul_one] at hm
+  have hpos : 0 < hyp.p ^ hyp.q * hyp.q :=
+    mul_pos (pow_pos hyp.p_prime.pos hyp.q) hyp.q_prime.pos
+  apply Nat.eq_of_mul_eq_mul_left hpos
+  calc
+    (hyp.p ^ hyp.q * hyp.q) * ((hyp.P ⊔ hyp.W1).subgroupOf hyp.S).index
+        = hyp.p ^ hyp.q * (hyp.u * hyp.q) := by simpa [mul_assoc] using hm
+    _ = (hyp.p ^ hyp.q * hyp.q) * hyp.u := by ring
 
-⚠ DEEP §13 RESIDUAL, isolated obligation.  This is Coq's `PVSbeta`/`A0beta` (`β_j ∈ CF(S, P^# ∪
-V_S) ⊆ CF(S, A₀(S))`), restated here in the grid-support form the (13.19)/(14.9) consumers use:
-off `⋃_i supp(μ_{ij})` the induced permutation character `Ind_{PW₁}^S 1` exactly cancels `μ_{0j}`.
-The cancellation is the `normedTI` structure of the `W₁`-classes in `S̄ = S/P` (Coq `gammaW1`,
-`Ptype_Fcore_sdprod`); no repo API yet supplies it. -/
-theorem betaGrid_support [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (_hj : (j : ℕ) ≠ 0) :
-    (betaGrid hyp j).support ⊆ ⋃ (i : Fin hyp.q), (hyp.mu i j).support := sorry
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (13.18.a), the bridge character vanishes at `1`**: `β_j(1) = 0` — the two
+degrees agree, `Ind_{PW₁}^S 1 (1) = [S:PW₁] = u = μ_{0j}(1)` (`PW1_index_eq_u`,
+`mu_apply_one_eq_u`). -/
+theorem betaGrid_apply_one_eq_zero [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
+    betaGrid hyp j 1 = 0 := by
+  have hj0 : j ≠ ⟨0, hyp.p_prime.pos⟩ := fun h => hj (by simp [h])
+  rw [betaGrid, OddOrder.RepresentationTheory.ClassFunction.sub_apply, indPW1,
+    ClassFunction.induce_apply_one, PW1_index_eq_u hG hyp, trivialClassFunction_apply,
+    mul_one, hyp.mu_apply_one_eq_u hG ⟨0, hyp.q_prime.pos⟩ j hj0, sub_self]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.18.b), Frobenius half** (`FiniteInduce`-instance form): `‖Ind_{PW₁}^S 1‖²_S = (u−1)/q + 1`.
@@ -1086,6 +1145,101 @@ theorem indPW1_apply_eq_zero_of_mem_derived_not_mem_P [Finite G]
     rw [hzz] at hzback
     exact hzP (Subgroup.mem_subgroupOf.mp hzback)
   rw [hempty, Finset.card_empty, Nat.cast_zero, mul_zero]
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (13.18.a), exact `β`-support** (Coq `PVSbeta`, `PFsection13.v:1833`):
+`supp(β_j) ⊆ P^# ∪ V_S^S` — the honest carrier `β_j ∈ CF(S, P^# ∪ V_S)`.
+
+Fully proven: the group-theoretic skeleton conjugates every point outside `S′` to `x·y` with
+`x ∈ W₁^#`, `y ∈ W₂` (Peterfalvi (2.1), `mem_compl_conj_into_W`); at `y = 1` the two proven
+`W₁^#`-values cancel (`indPW1_apply_eq_one_of_mem_W1_sharp`, `mu_row0_apply_eq_one_of_mem_W1` —
+the `(4.3.c)+(13.3.c)` value), otherwise `x·y ∈ V_S`; inside `S′` the two proven `S′−P`-values
+cancel (`indPW1_apply_eq_zero_of_mem_derived_not_mem_P`,
+`mu_row0_apply_eq_zero_of_mem_derived_not_mem_P` — the `(13.3.a)+(13.12)` vanishing), and at
+`1` the degrees agree (`betaGrid_apply_one_eq_zero`).
+
+⚠ The previous statement here (grid form `supp(β_j) ⊆ ⋃ᵢ supp(μ_{ij})`) was an unfaithful
+restate (it would additionally require every point of `P^#` to carry a nonzero `μ`-value) —
+replaced by the Coq-faithful carrier, issue-3003 pattern.  A hypothesis-parametrized copy of
+this skeleton lives in `S16_NonExistenceG/TGapCross`
+(`betaGrid_support_sharpP_union_typePV_of_values`) — cross-lane redirect tracked. -/
+theorem betaGrid_support [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
+    (betaGrid hyp j).support ⊆
+      {z : ↥hyp.S |
+        (z : G) ∈ OddOrder.GroupTheory.sharpSubgroup hyp.P ∪
+          OddOrder.GroupTheory.conjClassSetIn hyp.S
+            (OddOrder.GroupTheory.typePV hyp.S hyp.Sdata)} := by
+  classical
+  have hj0 : j ≠ ⟨0, hyp.p_prime.pos⟩ := fun h => hj (by simp [h])
+  intro z hz
+  rw [OddOrder.RepresentationTheory.ClassFunction.mem_support] at hz
+  by_cases hzD : (z : G) ∈ OddOrder.GroupTheory.derivedInG hyp.S
+  · by_cases hzP : (z : G) ∈ hyp.P
+    · by_cases hz1 : z = 1
+      · exact absurd (hz1 ▸ betaGrid_apply_one_eq_zero hG hyp j hj) hz
+      · exact Or.inl ⟨hzP, fun h => hz1 (Subtype.ext h)⟩
+    · exfalso
+      apply hz
+      rw [betaGrid, OddOrder.RepresentationTheory.ClassFunction.sub_apply,
+        indPW1_apply_eq_zero_of_mem_derived_not_mem_P hG hyp hzD hzP,
+        hyp.mu_row0_apply_eq_zero_of_mem_derived_not_mem_P hG j hj0 z hzD hzP, sub_self]
+  · set h := hyp.s06S hG with hs06
+    have hzK : z ∉ h.K := fun hzK => hzD (Subgroup.mem_subgroupOf.mp hzK)
+    obtain ⟨c, x, hxW1, hx1, y, hyW2, hconj⟩ := h.mem_compl_conj_into_W hzK
+    have hxW1G : (x : G) ∈ hyp.W1 := by
+      have hx := Subgroup.mem_subgroupOf.mp hxW1
+      rwa [hyp.Sdata_W1_eq] at hx
+    have hyW2G : (y : G) ∈ hyp.W2 := by
+      have hy := Subgroup.mem_subgroupOf.mp hyW2
+      rwa [hyp.Sdata_W2_eq] at hy
+    have hconjβ : betaGrid hyp j z = betaGrid hyp j (x * y) := by
+      rw [← hconj]
+      have hc := (betaGrid hyp j).conj_eq z c⁻¹
+      rw [inv_inv] at hc
+      exact hc.symm
+    have hy1 : y ≠ 1 := by
+      rintro rfl
+      apply hz
+      rw [hconjβ, mul_one, betaGrid, OddOrder.RepresentationTheory.ClassFunction.sub_apply,
+        indPW1_apply_eq_one_of_mem_W1_sharp hG hyp hxW1G hx1,
+        hyp.mu_row0_apply_eq_one_of_mem_W1 hG j x hxW1G hx1, sub_self]
+    right
+    rw [OddOrder.GroupTheory.mem_conjClassSetIn]
+    refine ⟨(x : G) * (y : G), ?_, (c : G), c.2, ?_⟩
+    · have hxW1data : (x : G) ∈ hyp.Sdata.W1 := Subgroup.mem_subgroupOf.mp hxW1
+      have hyW2data : (y : G) ∈ hyp.Sdata.W2 := Subgroup.mem_subgroupOf.mp hyW2
+      have hxyW : (x : G) * (y : G) ∈ hyp.Sdata.W := by
+        rw [hyp.Sdata.W_eq]
+        exact mul_mem (Subgroup.mem_sup_left hxW1data) (Subgroup.mem_sup_right hyW2data)
+      simp only [OddOrder.GroupTheory.typePV, Set.mem_sdiff, Set.mem_union,
+        SetLike.mem_coe, not_or]
+      refine ⟨hxyW, ?_, ?_⟩
+      · intro hxyW1
+        apply hy1
+        have hyW1 : (y : G) ∈ hyp.Sdata.W1 := by
+          have heq : (y : G) = (x : G)⁻¹ * ((x : G) * (y : G)) := by group
+          rw [heq]
+          exact mul_mem (inv_mem hxW1data) hxyW1
+        have hbot := (OddOrder.Peterfalvi.S12.typePData_disjoint_W1_W2 hyp.Sdata).le_bot
+          (Subgroup.mem_inf.mpr ⟨hyW1, hyW2data⟩)
+        rw [Subgroup.mem_bot] at hbot
+        exact Subtype.ext hbot
+      · intro hxyW2
+        apply hx1
+        have hxW2 : (x : G) ∈ hyp.Sdata.W2 := by
+          have heq : (x : G) = ((x : G) * (y : G)) * (y : G)⁻¹ := by group
+          rw [heq]
+          exact mul_mem hxyW2 (inv_mem hyW2data)
+        have hbot := (OddOrder.Peterfalvi.S12.typePData_disjoint_W1_W2 hyp.Sdata).le_bot
+          (Subgroup.mem_inf.mpr ⟨hxW1data, hxW2⟩)
+        rw [Subgroup.mem_bot] at hbot
+        exact Subtype.ext hbot
+    · have hconjG : (c : G)⁻¹ * (z : G) * (c : G) = (x : G) * (y : G) := by
+        have hc := congrArg hyp.S.subtype hconj
+        rwa [map_mul, map_mul, map_inv] at hc
+      rw [← hconjG]
+      group
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **`P ⊄ ker μ_{0j}`** (Pf (13.18.b) kernel step, `S`-side).  For `j ≠ 0`, the base-row grid
@@ -1585,7 +1739,11 @@ conjuncts were overstatements — issue 3003.) -/
 theorem beta_support_norm_and_remainder [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     ∃ data : BetaData hyp,
-      (data.beta.support ⊆ ⋃ (i : Fin hyp.q), (hyp.mu i data.j).support) ∧
+      (data.beta.support ⊆
+        {z : ↥hyp.S |
+          (z : G) ∈ OddOrder.GroupTheory.sharpSubgroup hyp.P ∪
+            OddOrder.GroupTheory.conjClassSetIn hyp.S
+              (OddOrder.GroupTheory.typePV hyp.S hyp.Sdata)}) ∧
         (∀ [Fintype ↥hyp.S] [Invertible (Nat.card ↥hyp.S : ℂ)],
           ClassFunction.inner data.beta data.beta
             = ((((hyp.u : ℚ) - 1) / (hyp.q : ℚ) + 2 : ℚ) : ℂ)) ∧
