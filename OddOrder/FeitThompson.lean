@@ -856,6 +856,71 @@ theorem omegaSChar_finNeg (i : Fin tp.q) (j : Fin tp.p) :
   congr 1
   exact Units.val_inv_eq_inv_val _
 
+/-- The `eqQ` reindex intertwines row negation (`S15.finNeg`) with the character-inversion
+row permutation `rowInv`: both send `i` to the index of the inverse `W₁`-character. -/
+theorem eqQ_finNeg_eq_rowInv (i : Fin tp.q) :
+    eqQ hG mp tp (OddOrder.Peterfalvi.S15.finNeg tp.q_prime.pos i)
+      = OddOrder.Peterfalvi.S06.rowInv (mp.certainTypeS hG) (eqQ hG mp tp i) := by
+  apply (mp.certainTypeS hG).w1CharEquiv.injective
+  rw [eqQ_finNeg hG mp tp i, (mp.certainTypeS hG).w1CharEquiv_finNeg,
+    OddOrder.Peterfalvi.S06.w1CharEquiv_rowInv]
+
+/-- **CF-level conjugation pairs the `ω`-grid at the negated index** (Peterfalvi (3.9.a),
+character half): `ω̄_{ij} = ω_{−i,−j}` — complex conjugation inverts the linear grid character
+(`galoisMap_conj_omega`), and index negation is character inversion (`omegaSChar_finNeg`). -/
+theorem omegaS_conj (i : Fin tp.q) (j : Fin tp.p) :
+    (omegaS hG mp tp i j).conj
+      = omegaS hG mp tp (OddOrder.Peterfalvi.S15.finNeg tp.q_prime.pos i)
+          (OddOrder.Peterfalvi.S15.finNeg tp.p_prime.pos j) := by
+  have hg2 := congrArg
+    (fun χ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(tiCyclicW hG mp tp).W =>
+      (χ : ClassFunction ↥(tiCyclicW hG mp tp).W ℂ))
+    (OddOrder.Peterfalvi.S06.galoisMap_conj_omega (tiCyclicW hG mp tp)
+      (omegaSChar hG mp tp i j))
+  simp only [IrreducibleCharacter.galoisMap_apply_coe] at hg2
+  rw [omegaS_eq_omega_omegaSChar, omegaS_eq_omega_omegaSChar, omegaSChar_finNeg,
+    ClassFunction.conj_eq_mapRingEquiv_conjAe]
+  exact hg2
+
+/-- **CF-level conjugation pairs the `μ`-grid at the negated index** (Peterfalvi (4.9)(a)):
+`μ̄_{ij} = μ_{−i,−j}` — the §6 conjugation bridge `certainType_mu_conj_eq` with the two
+power-enumeration index bridges (`chi2enum_finNeg`, `eqQ_finNeg_eq_rowInv`). -/
+theorem muS_conj (i : Fin tp.q) (j : Fin tp.p) :
+    (muS hG mp tp i j).conj
+      = muS hG mp tp (OddOrder.Peterfalvi.S15.finNeg tp.q_prime.pos i)
+          (OddOrder.Peterfalvi.S15.finNeg tp.p_prime.pos j) := by
+  have hg2 := congrArg
+    (fun χ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥mp.S =>
+      (χ : ClassFunction ↥mp.S ℂ))
+    (OddOrder.Peterfalvi.S06.certainType_mu_conj_eq (mp.certainTypeS hG)
+      (chi2enum hG mp tp j) (eqQ hG mp tp i))
+  simp only [IrreducibleCharacter.galoisMap_apply_coe] at hg2
+  rw [muS, muS, chi2enum_finNeg hG mp tp j, eqQ_finNeg_eq_rowInv hG mp tp i,
+    ClassFunction.conj_eq_mapRingEquiv_conjAe]
+  exact hg2
+
+/-- **CF-level conjugation pairs the `η = τ₃∘ω` grid at the negated index** (Peterfalvi (3.9.a),
+full CF form — strengthening the generic-element `tau3W_omegaS_pair_of_coprime` below):
+`(τ₃ω_{ij})̄ = τ₃ω_{−i,−j}`.  `σ` intertwines the coefficientwise Galois action
+(`sigma_mapRingEquiv_comm`), and conjugation inverts the grid character
+(`galoisMap_conj_omega` + `omegaSChar_finNeg`). -/
+theorem tau3W_omegaS_conj (i : Fin tp.q) (j : Fin tp.p) :
+    (tau3W hG mp tp (omegaS hG mp tp i j)).conj
+      = tau3W hG mp tp (omegaS hG mp tp (OddOrder.Peterfalvi.S15.finNeg tp.q_prime.pos i)
+          (OddOrder.Peterfalvi.S15.finNeg tp.p_prime.pos j)) := by
+  have hcomm := OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_mapRingEquiv_comm
+    (tiCyclicW hG mp tp) rfl (tiCyclicWDadeApp hG mp tp) Complex.conjAe.toRingEquiv
+    ((tiCyclicW hG mp tp).omega (omegaSChar hG mp tp i j))
+  have hg2 := congrArg
+    (fun χ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(tiCyclicW hG mp tp).W =>
+      (χ : ClassFunction ↥(tiCyclicW hG mp tp).W ℂ))
+    (OddOrder.Peterfalvi.S06.galoisMap_conj_omega (tiCyclicW hG mp tp)
+      (omegaSChar hG mp tp i j))
+  rw [hg2] at hcomm
+  rw [omegaS_eq_omega_omegaSChar, omegaS_eq_omega_omegaSChar, omegaSChar_finNeg,
+    ClassFunction.conj_eq_mapRingEquiv_conjAe]
+  exact hcomm
+
 /-- **Peterfalvi (3.9.a) conjugate-pair symmetry on generic elements** (issue-3002 supply):
 for `g` of order prime to `pq`, the `η`-grid pairs under the index negation `(i,j) ↦ (−i,−j)`
 (`S15.finNeg`), `(τ₃ω)_{−i,−j}(g) = (τ₃ω)_{ij}(g)`.
