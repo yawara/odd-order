@@ -91,8 +91,9 @@ and is orthogonal to every `Ind_{T'}^T θ` with `θ ≠ 1`.
 These are Coq's `cfnorm_prTIred` and `omuS1` inputs in the norm-rigidity proof of
 `FTtype34_structure`. Keeping the universal induced-family orthogonality alongside
 the concrete anchor avoids replacing the (11.9)(a) projection by an opaque coefficient
-assumption downstream. -/
-theorem exists_typeIII_primeTIredZero_with_projectionData_and_galois [Finite G]
+assumption downstream.  This strengthened producer also retains the defining equality
+`primeTIred 0 = Ind_{T'}^T 1`. -/
+theorem exists_typeIII_primeTIredZero_with_projectionData_galois_and_eq_induce [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G))
     (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T) :
@@ -110,8 +111,10 @@ theorem exists_typeIII_primeTIredZero_with_projectionData_and_galois [Finite G]
           ClassFunction.inner ν0
             (ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T)
               θ.toClassFunction) = 0) ∧
-        ∀ sigma : ℂ ≃+* ℂ,
-          ClassFunction.mapRingEquiv sigma ν0 = ν0 := by
+        (∀ sigma : ℂ ≃+* ℂ,
+          ClassFunction.mapRingEquiv sigma ν0 = ν0) ∧
+        ν0 = ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T)
+          (trivialClassFunction ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)) := by
   classical
   let td : OddOrder.GroupTheory.TypeIIIData hyp.base.T := hIII.some
   have hP : OddOrder.BG.Ch4.S14.IsTypeP hyp.base.T :=
@@ -125,7 +128,8 @@ theorem exists_typeIII_primeTIredZero_with_projectionData_and_galois [Finite G]
   let residue : PrimeTIResidueData ↥hyp.base.T s06.K
       (Nat.card ↥s06.W1) (Nat.card ↥s06.W2) :=
     PrimeTIResidueData.ofS06Hypothesis s06 ⊤ le_top
-  refine ⟨residue.primeTIred 0, residue.prTIred_mem_ZIrr 0, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  refine ⟨residue.primeTIred 0, residue.prTIred_mem_ZIrr 0,
+    ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · change (residue.primeTIred 0).conj = residue.primeTIred 0
     rw [← residue.cfInd_prTIres 0, residue.prTIres0,
       ClassFunction.induce_conj, trivialClassFunction_isReal]
@@ -173,6 +177,37 @@ theorem exists_typeIII_primeTIredZero_with_projectionData_and_galois [Finite G]
     congr 1
     ext x
     simp [ClassFunction.mapRingEquiv_apply, trivialClassFunction_apply]
+  · rw [← residue.cfInd_prTIres 0, residue.prTIres0]
+    change ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T)
+        (trivialClassFunction ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)) = _
+    rfl
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- The projection and Galois data of `primeTIred 0`, preserving the original
+consumer signature. -/
+theorem exists_typeIII_primeTIredZero_with_projectionData_and_galois [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T) :
+    ∃ ν0 : ClassFunction ↥hyp.base.T ℂ,
+      ν0 ∈ ZIrr ↥hyp.base.T ∧
+        ClassFunction.IsReal ν0 ∧
+        ν0.support ⊆
+          ((derivedInG hyp.base.T).subgroupOf hyp.base.T : Set ↥hyp.base.T) ∧
+        ν0 1 = (hyp.base.p : ℂ) ∧
+        ClassFunction.inner ν0 (trivialClassFunction ↥hyp.base.T) = 1 ∧
+        ClassFunction.inner ν0 ν0 = (hyp.base.p : ℂ) ∧
+        (∀ θ : IrreducibleCharacter
+            ((derivedInG hyp.base.T).subgroupOf hyp.base.T),
+          θ ≠ trivialIrreducibleCharacter _ →
+          ClassFunction.inner ν0
+            (ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T)
+              θ.toClassFunction) = 0) ∧
+        ∀ sigma : ℂ ≃+* ℂ,
+          ClassFunction.mapRingEquiv sigma ν0 = ν0 := by
+  obtain ⟨ν0, hνZ, hνR, hνsupp, hν1, hνone, hνnorm, hνorth, hgalois, -⟩ :=
+    exists_typeIII_primeTIredZero_with_projectionData_galois_and_eq_induce hG hyp hIII
+  exact ⟨ν0, hνZ, hνR, hνsupp, hν1, hνone, hνnorm, hνorth, hgalois⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- The projection data of the canonical T-side prime-TI anchor, with its
