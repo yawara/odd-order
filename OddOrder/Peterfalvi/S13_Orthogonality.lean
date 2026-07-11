@@ -438,13 +438,106 @@ theorem coherent_sOf_H0C_extension_muColumnSum_pin_of_irr [Finite G]
       rw [he] at hξζc
       exact Complex.ofReal_ne_zero.mpr hpos.ne' hξζc
   -- `⟨c(ξ), Ω⟩ = 0`: the (5.5) dispatch of `ξ` against the grid members via the world-bridge
+  have hcw1 : Nat.card ↥(hyp.base.toHypothesis46 hG hG.odd).W1 = hyp.base.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.base.typeP.W1_le).toEquiv
   have hcross_ξΩ : ClassFunction.inner (c.extension ξ) Ω = 0 := by
-    sorry
+    obtain ⟨E', hE'sub, hE'⟩ :=
+      SOf_coherent_extension_eq_sum_memberRFamily hG hyp hsub1 c hξ hξc
+    obtain ⟨hr, hs, himg⟩ := SOf_memberRFamily_imageSet_of_irr hG hyp (hsub1 hξ) hξirr
+    have hPA : ((ξ.conj - ξ : ClassFunction ↥M ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup
+          (OddOrder.GroupTheory.typePA M hyp.base.typeP) M := by
+      refine OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support ?_ (hIKF hξ)
+      intro y hyK hy1
+      rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup,
+        OddOrder.GroupTheory.typePA_eq_sharpSubgroup_derivedInG]
+      exact ⟨Subgroup.mem_subgroupOf.mp hyK,
+        fun h => hy1 (OneMemClass.coe_eq_one.mp (Set.mem_singleton_iff.mp h))⟩
+    rw [hE', OddOrder.RepresentationTheory.inner_sum_left]
+    refine Finset.sum_eq_zero fun α hα => ?_
+    have hαdade := hE'sub hα
+    rw [himg] at hαdade
+    rw [hΩdef, OddOrder.RepresentationTheory.inner_sum_right]
+    refine Finset.sum_eq_zero fun i _ => ?_
+    -- the grid member is (a `±1`-multiple of) a `certainTypeR`-member via the world-bridge
+    rw [← certainTypeOmegaSigma_muColumnChar_eq_aligned hG hyp.base hcw1 i ⟨1, hw2⟩]
+    have hsign := ((hyp.base.toHypothesis46 hG hG.odd).columnFamily
+      (hyp.base.muColumnChar hG hG.odd ⟨1, hw2⟩)).sign_eq
+    have hmemR : OddOrder.Peterfalvi.S06.certainTypeRImage
+        (hyp.base.toHypothesis46 hG hG.odd) (hyp.base.muColumnChar hG hG.odd ⟨1, hw2⟩)
+        (hyp.base.muColumnChar hG hG.odd ⟨1, hw2⟩)⁻¹ (false, finCongr hcw1.symm i)
+        ∈ (OddOrder.Peterfalvi.S06.certainTypeR (hyp.base.toHypothesis46 hG hG.odd)
+          (hyp.base.muColumnChar_ne_one hG hG.odd hk1)
+          (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one
+            (hyp.base.toHypothesis46 hG hG.odd)
+            (hyp.base.muColumnChar hG hG.odd ⟨1, hw2⟩)).symm).imageSet :=
+      Finset.mem_image_of_mem _ (Finset.mem_univ _)
+    have hRval : OddOrder.Peterfalvi.S06.certainTypeRImage
+        (hyp.base.toHypothesis46 hG hG.odd) (hyp.base.muColumnChar hG hG.odd ⟨1, hw2⟩)
+        (hyp.base.muColumnChar hG hG.odd ⟨1, hw2⟩)⁻¹ (false, finCongr hcw1.symm i)
+        = (((hyp.base.toHypothesis46 hG hG.odd).columnFamily
+            (hyp.base.muColumnChar hG hG.odd ⟨1, hw2⟩)).sign : ℂ)
+          • OddOrder.Peterfalvi.S06.certainTypeOmegaSigma (hyp.base.toHypothesis46 hG hG.odd)
+            (hyp.base.muColumnChar hG hG.odd ⟨1, hw2⟩) (finCongr hcw1.symm i) := rfl
+    have horth := certainTypeR_imageSet_orthogonal_dadeOfDiff_typeP hG hyp.base
+      (hyp.base.muColumnChar_ne_one hG hG.odd hk1)
+      (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one (hyp.base.toHypothesis46 hG hG.odd)
+        (hyp.base.muColumnChar hG hG.odd ⟨1, hw2⟩)).symm
+      ⟨ξ, hξirr⟩ hr hPA hs _ hmemR α hαdade
+    -- transfer `⟨R-member, α⟩ = 0` to `⟨α, ω^σ⟩ = 0` through the `±1` sign
+    have hζval : OddOrder.Peterfalvi.S06.certainTypeOmegaSigma
+        (hyp.base.toHypothesis46 hG hG.odd) (hyp.base.muColumnChar hG hG.odd ⟨1, hw2⟩)
+        (finCongr hcw1.symm i)
+        = (((hyp.base.toHypothesis46 hG hG.odd).columnFamily
+            (hyp.base.muColumnChar hG hG.odd ⟨1, hw2⟩)).sign : ℂ)
+          • OddOrder.Peterfalvi.S06.certainTypeRImage (hyp.base.toHypothesis46 hG hG.odd)
+            (hyp.base.muColumnChar hG hG.odd ⟨1, hw2⟩)
+            (hyp.base.muColumnChar hG hG.odd ⟨1, hw2⟩)⁻¹ (false, finCongr hcw1.symm i) := by
+      rw [hRval, smul_smul]
+      rcases hsign with h | h <;> rw [h] <;> norm_num
+    rw [hζval, OddOrder.RepresentationTheory.inner_smul_right,
+      OddOrder.RepresentationTheory.inner_conj_symm, horth, star_zero, mul_zero]
   -- the γ-equation gives `⟨c(μ), Ω⟩ = w₁`
   have hkey : ClassFunction.inner (c.extension μ) Ω = (hyp.base.w1 : ℂ) := by
-    sorry
-  -- norms and positive-definiteness
-  sorry
+    have hextsplit : c.extension γ
+        = (nξ : ℂ) • c.extension μ - (nμ : ℂ) • c.extension ξ := by
+      rw [hγdef, map_sub, map_zsmul, map_zsmul,
+        ← Int.cast_smul_eq_zsmul ℂ nξ (c.extension μ),
+        ← Int.cast_smul_eq_zsmul ℂ nμ (c.extension ξ)]
+    have h1 := hDade
+    rw [hθτ, hextsplit, hγθ] at h1
+    simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+      hcross_μζ, hcross_ξζ, hcross_ξΩ, star_natCast, mul_zero, sub_zero, zero_sub,
+      neg_zero] at h1
+    exact mul_left_cancel₀ hnξne h1
+  -- norms and positive-definiteness: `‖c(μ) − Ω‖² = 0`
+  have hextnorm : ClassFunction.inner (c.extension μ) (c.extension μ) = (hyp.base.w1 : ℂ) := by
+    rw [c.extension_inner_eq μ μ (Submodule.subset_span hμmem) (Submodule.subset_span hμmem),
+      hμμ]
+  have hrow : ∀ i : Fin hyp.base.w1,
+      ClassFunction.inner (hyp.base.alignedOmegaSigmaGrid hG hG.odd i ⟨1, hw2⟩) Ω = 1 := by
+    intro i
+    rw [hΩdef, OddOrder.RepresentationTheory.inner_sum_right]
+    rw [Finset.sum_eq_single i
+      (fun i' _ hne => by
+        rw [hyp.base.alignedOmegaSigmaGrid_inner hG hG.odd i i' ⟨1, hw2⟩ ⟨1, hw2⟩,
+          if_neg (fun h => hne h.1.symm)])
+      (fun h => absurd (Finset.mem_univ i) h)]
+    rw [hyp.base.alignedOmegaSigmaGrid_inner hG hG.odd i i ⟨1, hw2⟩ ⟨1, hw2⟩, if_pos ⟨rfl, rfl⟩]
+  have hΩnorm : ClassFunction.inner Ω Ω = (hyp.base.w1 : ℂ) := by
+    conv_lhs => rw [hΩdef]
+    rw [OddOrder.RepresentationTheory.inner_sum_left,
+      Finset.sum_congr rfl (fun i _ => hrow i)]
+    simp
+  have hΩext : ClassFunction.inner Ω (c.extension μ) = (hyp.base.w1 : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hkey, star_natCast]
+  have hdiff : ClassFunction.inner (c.extension μ - Ω) (c.extension μ - Ω) = 0 := by
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right, hextnorm, hΩnorm, hkey, hΩext]
+    ring
+  have hzero := OddOrder.Peterfalvi.S09.Cert.inner_self_eq_zero hdiff
+  exact sub_eq_zero.mp hzero
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (11.8.6) narrow union-coherence capstone** — targeting the *narrow* family `S(H₀C)`
