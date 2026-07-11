@@ -235,3 +235,44 @@ append-only +347 行、自前 sorry 0・新 axiom 0):
 - 消費側: `caseA_refuter_of_equality_refutation` の `hbound` 仮説が直接充足可能に。
   **残 = `NineElevenEqualityRefutation` のみ** (Phase B (9.11.2) / C (9.11.3) / D (9.11.4) /
   E-remainder (9.11.5-8))。
+
+---
+
+# Phase B 完了 (2026-07-11, lane a)
+
+**(9.11.2) two-summand inertia inputs を landed** — 新 leaf `S11_NineElevenTwoSummand.lean`
+(865 行、自前 sorry 0・新 axiom 0) + `S11_NineElevenCaseA.lean` 追記 (+59 行、append-only):
+
+- **構成 (book (9.11.2) / Coq PFsection9.v:1681-1790 `tiU1` の port)**:
+  two-summand character θ (`exists_caseA_two_summand_char`、H_i/H_j 上非自明・他 summand 上自明)
+  を inertia 部分群 `H·K` (K = `cuSubOf i ⊓ cuSubOf j` realized = `cuInHuPair`) 上の**線形**指標
+  `nineElevenTwoPsi` に拡張 (`SemidirectProduct.lift`、complement =
+  `hInHu_isComplement'_cuInHuPair` ← `H ⊓ K = ⊥`; lift 両立条件 = θ₀ の K-不変性 ←
+  landed `cuInHuPair_le_inertia`)。inertia(ψ) = H·K (landed `caseA_inertia_eq_hcuInHuPair`) ⟹
+  `ζ = Ind_{HK}^{HU} ψ` **irreducible** (`isIrreducibleCharacter_induce_of_inertia_eq`) of degree
+  `[HU:HK] = [U:K]` (landed index 連鎖) — book の "(1.6)/(1.7.c) applied to (HU)/(H₀C)" は
+  「線形 source を full inertia group から誘導」の形で実現 (商群経由不要、e=1 が構成から出る)。
+  ζ ∈ 𝒳(H₀C) (kernel: seed が H₀ を、complement 自明性が C ≤ K を kill; H ⊄ Ker: θ ≠ 1)、
+  member `Ind_{HU}^M ζ ∈ 𝒮(H₀C)` of degree `q·[U:K]`。
+- **dichotomy 解決 (`nineElevenTwo_two_summand_inertia`)**: hdeg (𝒮(H₀C)-member degree ∈
+  {qu, qa}) から `[U:K_{ij}] ∈ {u, a}` (q cancel)。**pair-uniform trick で book の W₁-orbit
+  propagation を置換**: (i) ある pair で = u ⟹ C ≤ K_{ij} + 等 relIndex ⟹ C = K_{ij}
+  (`relIndex_lt_relIndex_of_le_of_ne`); (ii) 全 pair で = a ⟹ 各 pair で K_{ij} = K_i = K_j ⟹
+  全 `cuSubOf` 一致 ⟹ C = ⋂_k C_U(H_k) = 共通値 (新補題 `mem_cSub_of_forall_mem_cuSubOf` +
+  `uActionHom_eq_one_of_forall_summand`、`Hpart_iSup` span 論法) ⟹ K₁ = K₂ = 共通値で
+  `C = K₁ ⊓ K₂` 成立。**book の「u ≠ a で矛盾」は不要** — 消費側 `nineElevenTwo_u_le_a_sq` は
+  ∃-form の K₁/K₂ で足り、u = a なら u ≤ a² が自明に真 (吸収)。
+- **S13 corollary `caseA_two_summand_inertia_inputs`** (S11_NineElevenCaseA.lean): equality
+  configuration の hS3deg (landed、𝒮₃ = degree qu) + **Phase-E remainder `hS2deg`**
+  (𝒮₂-member degree qa = 「𝒮₂=𝒮₁」抽出、名前付き仮説) から
+  `∃ K₁ K₂, relIndex = a ∧ relIndex = a ∧ chars.C = K₁ ⊓ K₂` —
+  `nineElevenCaseA_equality_refutation` の hK₁/hK₂/hCinf と**同形**。
+- **axiom 実測**: S11 層は全部 axiom-clean (`nineElevenTwo_two_summand_inertia` /
+  `nineElevenTwo_relIndex_dichotomy` / `nineElevenTwoZeta_mem_xiOf` /
+  `mem_cSub_of_forall_mem_cuSubOf` = propext/Classical.choice/Quot.sound のみ)。
+  S13 corollary のみ sorryAx — **既存 upstream `C_eq_cSub` 由来** (caseB/E-PairBound と同一 debt、
+  本 commit の追加分ではない)。
+- **残 = Phases C/D/E のみ**: C = (9.11.3) hclass (`sum_xiOf_H0C_degreeSq` landed、残 = |Ū| 項の
+  組立) + hn (W₁-orbit split)、D = (9.11.4) hnorm (Mackey)、E = (9.11.5-8) hle + `𝒮₂=𝒮₁` 抽出
+  (hS2deg 供給、saturated bound + Snorm>0) + pair 構成。B の出力は
+  `nineElevenCaseA_equality_refutation` に直結済み。

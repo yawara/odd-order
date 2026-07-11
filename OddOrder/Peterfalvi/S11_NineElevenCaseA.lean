@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.S13_MaximalIII_IV
 import OddOrder.Peterfalvi.S07_Subcoherent
 import OddOrder.Peterfalvi.S11_NineElevenCoherence
+import OddOrder.Peterfalvi.S11_NineElevenTwoSummand
 import OddOrder.Peterfalvi.S13_CoreStructure
 import OddOrder.Peterfalvi.S13_SixTwoBridge
 
@@ -707,5 +708,58 @@ theorem nineElevenPairBound [Finite G]
         rw [he]
         push_cast
         ring
+
+/-! ### The (9.11.2) two-summand inertia inputs at the `Hypothesis` level (issue 9083, Phase B)
+
+Book (9.11.2): *"if `w ∈ W₁^#` then `U₁ ∩ U₁^w = C`; moreover `u ≤ a²`."*  The S11-level identity
+is landed as `S11.nineElevenTwo_two_summand_inertia` (`S11_NineElevenTwoSummand`); this section
+instantiates it in the `NineElevenEqualityRefutation` hypothesis budget, discharging its
+degree-dichotomy input from the two configuration degree facts: the landed squeeze output
+`hS3deg` (every `𝒮₃`-member has degree `qu`) and the Phase-E `𝒮₂ = 𝒮₁` extraction `hS2deg`
+(every `𝒮₂`-member has degree `qa`, recoverable from the saturated bound since any
+non-degree-`qa` member adds `Snorm` beyond the equality).  The outputs are **exactly** the
+`hK₁`/`hK₂`/`hCinf` inputs of `S11.nineElevenCaseA_equality_refutation`; the remaining distance
+to `NineElevenEqualityRefutation` is Phases C ((9.11.3) `hclass`/`hn`), D ((9.11.4) `hnorm`),
+and E ((9.11.5-8) `hle` + the `𝒮₂ = 𝒮₁` extraction consumed here). -/
+
+/-- **Peterfalvi (9.11.2) at the `Hypothesis` level: the two-summand inertia inputs** (issue 9083
+Phase B).  In the equality configuration — given the landed `𝒮₃`-degree fact `hS3deg` and the
+Phase-E `𝒮₂`-degree extraction `hS2deg` — there are `K₁, K₂` (the single-factor centralizers
+`C_U(H_i)`, `C_U(H_j)` of two Clifford summands, or their common value) with
+`[U:K₁] = [U:K₂] = a` and `C = K₁ ⊓ K₂`, exactly the (9.11.2) inputs consumed by
+`S11.nineElevenCaseA_equality_refutation` (through `S11.nineElevenTwo_u_le_a_sq`, giving
+`u ≤ a²`).
+
+The degree dichotomy for `S11.nineElevenTwo_two_summand_inertia` is assembled by locating each
+`𝒮(H₀C)`-member inside `𝒮(H₀C′)` (`S11.sOf_antitone` along `H₀C′ ≤ H₀C`, i.e. `C′ ≤ C` via the
+§11/§9 kernel identification `C_eq_cSub`) and splitting on `𝒮₂`-membership. -/
+theorem caseA_two_summand_inertia_inputs [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief))
+    {S₂ : Set (ClassFunction ↥M ℂ)}
+    (hS3deg : ∀ χ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime \ S₂,
+      (χ : ↥M → ℂ) 1 = ((hyp.s11Setup.q *
+        (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u : ℕ) : ℂ))
+    (hS2deg : ∀ χ ∈ S₂,
+      (χ : ↥M → ℂ) 1 = ((hyp.s11Setup.q * caseA.a : ℕ) : ℂ)) :
+    ∃ K₁ K₂ : Subgroup G,
+      K₁.relIndex hyp.s11Setup.U = caseA.a ∧ K₂.relIndex hyp.s11Setup.U = caseA.a ∧
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).C = K₁ ⊓ K₂ := by
+  haveI := hyp.base.finiteG
+  refine OddOrder.Peterfalvi.S11.nineElevenTwo_two_summand_inertia caseA ?_
+  intro φ hφ
+  -- `𝒮(H₀C) ⊆ 𝒮(H₀C′)` along `H₀C′ ≤ H₀C` (`C′ = [C,C] ≤ C`, `C = cSub` by `C_eq_cSub`)
+  have hle : hyp.H0Cprime
+      ≤ hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief := by
+    show hyp.chief.H0 ⊔ derivedInG hyp.C ≤ _
+    refine sup_le_sup_left ?_ hyp.chief.H0
+    rw [C_eq_cSub hG hyp]
+    exact OddOrder.Peterfalvi.S11.cprimeSub_le_C hyp.s11Setup hyp.chief
+  have hφ' : φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime :=
+    OddOrder.Peterfalvi.S11.sOf_antitone hyp.s11Setup hle hφ
+  by_cases hφS₂ : φ ∈ S₂
+  · exact Or.inr (hS2deg φ hφS₂)
+  · exact Or.inl (hS3deg φ ⟨hφ', hφS₂⟩)
 
 end OddOrder.Peterfalvi.S13
