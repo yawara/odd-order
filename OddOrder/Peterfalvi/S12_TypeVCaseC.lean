@@ -326,4 +326,139 @@ theorem Hypothesis.SHC_tau_muColumn_sub_smul_zeta [Finite G] {M : Subgroup G}
   rw [hsum_om, hd']
   module
 
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (10.9)/(10.10.4), the column-`0` pin**: `(μ_0 − ζ)^τ = ∑_i ω_{i0}^σ − ζ^{τ₁}`,
+where `ζ^{τ₁} = coh.extension ζ` is the `S₁ = S(HC)`-coherent extension — the residual `χ` of the
+(10.9) decomposition **identified** with `ζ^{τ₁}` (book: "As `(α_{ij}, μ_0 − ζ) = −δ + n`, it
+follows from (10.9), (10.10.1) and (10.10.3) that `(μ_0 − ζ)^τ = ∑_{0≤i<w₁} ω_{i0}^σ − ζ^{τ₁}`").
+
+The coherence-free (10.9) σ-coefficient form
+(`inner_tau_muColumnZero_sub_zeta_alignedOmegaSigma_of_w1_lt_w2`, hence the hypothesis `w₁ < w₂`)
+pins `⟨ψ, ω_{ij}^σ⟩ = [j = 0]` for `ψ = (μ_0 − ζ)^τ`, and the Dade isometry gives
+`‖ψ‖² = ‖μ_0 − ζ‖² = w₁ + 1` (`inner_muColumnZero_sub_zeta_self`), so the residual
+`χ = ∑_i ω_{i0}^σ − ψ` has `‖χ‖² = w₁ − w₁ − w₁ + (w₁ + 1) = 1`.  The identification is the
+(10.10.4) pairing: transporting `(α_{0j}, μ_0 − ζ) = n − δ` through the Dade isometry
+(`muGridAlpha_tau_inner_zeroColumnSum_sub_zeta`) and expanding `α_{0j}^τ` by (10.10.3)
+(`SHC_tau_muGridAlpha_eq_of_eight_le_SHCcount`) forces `⟨ζ^{τ₁}, ψ⟩ = −1` (using `n = 2 ≠ 0`);
+with `⟨ζ^{τ₁}, ∑_i ω_{i0}^σ⟩ = 0` (`SHC_extension_inner_zeroColumnOmegaSigma_sum`, (5.3.b)) this
+gives `⟨ζ^{τ₁}, χ⟩ = 1`, and `‖ζ^{τ₁}‖² = 1 = ‖χ‖²` collapses
+`‖ζ^{τ₁} − χ‖² = 1 − 1 − 1 + 1 = 0`, i.e. `χ = ζ^{τ₁}` (positive-definiteness).  This discharges
+the `hpin` input of `SHC_tau_muColumn_sub_smul_zeta`. -/
+theorem Hypothesis.SHC_tau_muColumnZero_sub_zeta [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
+    (hodd : Odd (Nat.card G))
+    {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hζne : ζ.conj ≠ ζ) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : ∀ i, hyp.muGrid hG hodd i j 1 = (d : ℂ))
+    (hμ0 : ∀ i, hyp.muGrid hG hodd i 0 1 = 1)
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ) (hδj : hyp.muColumnSign hG hodd j = δ)
+    (hdζ : ∀ i, hyp.muGrid hG hodd i j 1 ≠ ζ 1)
+    (h0ζ : ∀ i, hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hδpm : δ = 1 ∨ δ = -1) (hneq : n = 2)
+    (h8 : 8 ≤ (Finset.univ.filter fun χ : IrreducibleCharacter ↥M =>
+      (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
+        (χ : ClassFunction ↥M ℂ) 1 = (hyp.w1 : ℂ)).card)
+    (hw12 : hyp.w1 < hyp.w2) :
+    hyp.tau ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - ζ)
+      = (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i 0) - coh.extension ζ := by
+  classical
+  -- `w₁ ≥ 3`, so the row `0` for the (10.10.4) α-pairing exists
+  have h3 : (3 : ℕ) ≤ hyp.w1 :=
+    (typePData_toTICyclicHypothesis hyp.typeP hodd).three_le_card_W1
+  haveI : NeZero hyp.w1 := ⟨by omega⟩
+  -- the (10.9) coherence-free σ-coefficients: `⟨ψ, ω_{ij'}^σ⟩ = [j' = 0]`
+  have hψω : ∀ (i : Fin hyp.w1) (j' : Fin hyp.w2),
+      ClassFunction.inner (hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ))
+        (hyp.alignedOmegaSigmaGrid hG hodd i j') = (if j' = 0 then (1 : ℂ) else 0) :=
+    fun i j' =>
+      inner_tau_muColumnZero_sub_zeta_alignedOmegaSigma_of_w1_lt_w2 hG hyp hζS hζirr hζ1 hw12 i j'
+  have hωψ : ∀ (i : Fin hyp.w1) (j' : Fin hyp.w2),
+      ClassFunction.inner (hyp.alignedOmegaSigmaGrid hG hodd i j')
+        (hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ))
+        = (if j' = 0 then (1 : ℂ) else 0) := by
+    intro i j'
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hψω i j']
+    by_cases hj' : j' = 0 <;> simp [hj']
+  -- the (10.10.4) pairing: `⟨ζ^{τ₁}, ψ⟩ = −1`
+  have hzψ : ClassFunction.inner (coh.extension ζ)
+      (hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ)) = -1 := by
+    have hpair := hyp.muGridAlpha_tau_inner_zeroColumnSum_sub_zeta hG hodd 0 hj0 hζS hζirr hζ1
+      (hdeg 0) (hμ0 0) hnf hδj (hdζ 0) (h0ζ 0)
+    rw [hyp.SHC_tau_muGridAlpha_eq_of_eight_le_SHCcount hG coh hodd 0 hj0 hζS hζirr hζ1 hζne
+      (hdeg 0) (hμ0 0) hnf hδj (hdζ 0) (h0ζ 0) hδpm hneq h8] at hpair
+    simp only [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left] at hpair
+    rw [hωψ 0 j, hωψ 0 0, if_neg hj0, if_pos rfl] at hpair
+    have hn : ((n : ℕ) : ℂ) = 2 := by rw [hneq]; norm_num
+    rw [hn] at hpair
+    linear_combination (-1 / 2 : ℂ) * hpair
+  -- (5.3.b): `⟨ζ^{τ₁}, ∑_i ω_{i0}^σ⟩ = 0`, and `‖ζ^{τ₁}‖² = 1`
+  have hzΩ : ClassFunction.inner (coh.extension ζ)
+      (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i 0) = 0 :=
+    hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG coh hodd hζS hζirr hζ1 hζne
+  have hzz : ClassFunction.inner (coh.extension ζ) (coh.extension ζ) = 1 :=
+    hyp.SHC_extension_inner_self hG coh hζS hζirr hζ1
+  -- the (10.9) norm data: `⟨ψ, Ω⟩ = ⟨Ω, ψ⟩ = ⟨Ω, Ω⟩ = w₁` and `⟨ψ, ψ⟩ = w₁ + 1`
+  have hsum1 : ∑ _i : Fin hyp.w1, (1 : ℂ) = (hyp.w1 : ℂ) := by
+    rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one]
+  have hψΩ : ClassFunction.inner
+      (hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ))
+      (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i 0) = (hyp.w1 : ℂ) := by
+    have h1 : ∀ i : Fin hyp.w1, ClassFunction.inner
+        (hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ))
+        (hyp.alignedOmegaSigmaGrid hG hodd i 0) = 1 := fun i => by
+      rw [hψω i 0, if_pos rfl]
+    rw [OddOrder.RepresentationTheory.inner_sum_right,
+      Finset.sum_congr rfl (fun i _ => h1 i), hsum1]
+  have hΩψ : ClassFunction.inner (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i 0)
+      (hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ)) = (hyp.w1 : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hψΩ, star_natCast]
+  have hΩΩ : ClassFunction.inner (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i 0)
+      (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i 0) = (hyp.w1 : ℂ) := by
+    have h1 : ∀ i : Fin hyp.w1, ClassFunction.inner (hyp.alignedOmegaSigmaGrid hG hodd i 0)
+        (∑ i' : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i' 0) = 1 := by
+      intro i
+      rw [OddOrder.RepresentationTheory.inner_sum_right, Finset.sum_eq_single i]
+      · rw [hyp.alignedOmegaSigmaGrid_inner hG hodd i i 0 0, if_pos ⟨rfl, rfl⟩]
+      · intro i' _ hi'
+        rw [hyp.alignedOmegaSigmaGrid_inner hG hodd i i' 0 0,
+          if_neg (fun hh => hi' hh.1.symm)]
+      · intro hmem
+        exact absurd (Finset.mem_univ _) hmem
+    rw [inner_sum_left, Finset.sum_congr rfl (fun i _ => h1 i), hsum1]
+  have hψψ : ClassFunction.inner
+      (hyp.tau ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - ζ))
+      (hyp.tau ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - ζ)) = ((hyp.w1 + 1 : ℕ) : ℂ) := by
+    have hsupp : ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - ζ).support ⊆ hyp.A0 :=
+      hyp.muColumnZero_sub_zeta_support hG hodd hζS hζ1
+    rw [hyp.tau_inner_eq_of_supported hsupp hsupp]
+    exact inner_muColumnZero_sub_zeta_self hG hyp hζirr hζ1
+  -- transposed values (conjugate symmetry; all values are real)
+  have hψz : ClassFunction.inner
+      (hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ)) (coh.extension ζ) = -1 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hzψ]
+    simp
+  have hΩz : ClassFunction.inner (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i 0)
+      (coh.extension ζ) = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hzΩ, star_zero]
+  -- Cauchy–Schwarz equality: `‖ζ^{τ₁} − (Ω − ψ)‖² = 1 − 1 − 1 + 1 = 0`, so `ζ^{τ₁} = Ω − ψ`
+  have hzero : ClassFunction.inner
+      (coh.extension ζ - ((∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i 0)
+        - hyp.tau ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - ζ)))
+      (coh.extension ζ - ((∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i 0)
+        - hyp.tau ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - ζ))) = 0 := by
+    simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, hzz, hzΩ, hzψ,
+      hΩz, hΩΩ, hΩψ, hψz, hψΩ, hψψ]
+    push_cast
+    ring
+  have heq : coh.extension ζ
+      = (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i 0)
+        - hyp.tau ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - ζ) :=
+    sub_eq_zero.mp (eq_zero_of_inner_self_re_eq_zero
+      (φ := coh.extension ζ - ((∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i 0)
+        - hyp.tau ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - ζ)))
+      (by rw [hzero]; exact Complex.zero_re))
+  rw [heq, sub_sub_cancel]
+
 end OddOrder.Peterfalvi.S12
