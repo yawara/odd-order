@@ -143,3 +143,6 @@ issue は trial ログの追記継続のため open 維持、次の節目 (T-sid
   実 sorry ±0)。**incident 対応の定着確認**: 新 assert は 1 本のみ (`…_of_values` =
   hypothesis-parameterized、build 通過) で、除去済み 5 本の再追加なし・pending コメント遵守 —
   3004 通知を正しく 消化した。14/14。
+- 2026-07-11 (tick、merge 589ddb66): (11.9a) T-side projection norm data + bridge norm 保存、(14.9)
+  residue cross-term 配線 (TGapPrimeTI +270 / TTypeII 改稿、実 sorry ±0)。新 assert 2 本は build 通過
+  (妥当)。15/15。
