@@ -138,3 +138,22 @@ Isometry105 / TypeIIColumnPin / S15_HonestTypeP2A0 の call-site 追従) は **1
 — hub は非接触 (b territory)。**b 再起動時**: `git status` で本 WIP を確認し、Core-split を途中から
 再開すること (裁定条件は上の HUB RULING 節: field 名保存・producer sorry-free 維持・AxiomsCheck
 assert は厳格形のまま)。
+
+---
+
+## ✅ lane-b 実装 (2026-07-11, commit ef1f172a): Core-split 本体 landed
+
+裁定 (b) の実装条件 (i)(ii) + FT producer 側を完了:
+- `Hypothesis46Core` + `@[reducible] Hypothesis46.toCore` (S06_CertainHypothesis46)。
+  Hypothesis46 本体・field 名・dot-access は無変更 (a の S12_Core:1057 構築は無影響)。
+- (4.7)-chain 6 本 + (4.8)-(1) engine 5 本を Core-typed 化、call site 30 箇所 .toCore 追従。
+- `hyp46SmpCore` (FT.lean): Dade-free producer core。⚠ 実装知見: 証明 field を
+  `(hyp46Smp …).field` の projection で書くと **hyp46Smp 定数経由で sorried Dade pin が
+  axiom closure に入る** — verbatim 複製が必須。
+- **検証済**: full build green (4152 jobs) / `#print axioms muS_diff_support` =
+  standard 3 axioms のみ (sorryAx 消滅)。
+
+**残タスク (次セッション)**: c2400d81 の cherry-pick 再 landing (mu_diff_support field
+threading、3 files +30 行、構築サイト不変を確認済) → AxiomsCheck の producer assert
+(厳格形のまま) が green を維持することを確認 → 本 issue close。その後 9076
+(tauS_mu_row0_diff_support の hj0/hdeg signature 修正) が field から discharge 可能。

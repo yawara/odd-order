@@ -254,7 +254,7 @@ theorem columnSum_apply_eq_zero_of_not_mem (h : Hypothesis46 A L) [NeZero (Nat.c
       = ClassFunction.induce h.K (h.chiRestrict χ₂ : ClassFunction ↥h.K ℂ) := by
     rw [columnSum_def, ← h.induce_restrict_certainType_eq χ₂, h.coe_chiRestrict χ₂]
   rw [hbridge]
-  exact induce_chiRestrict_apply_eq_zero_of_not_mem_union h hχ₂ hz
+  exact induce_chiRestrict_apply_eq_zero_of_not_mem_union h.toCore hχ₂ hz
 
 /-- **`Supp μ_j ⊆ supportInSubgroup A L ∪ {1}`** (Peterfalvi (4.7), set form).  The support of the
 certain-type column character sits inside the certain subgroup `A` together with the identity. -/
@@ -293,7 +293,7 @@ theorem certainType_columnSign_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)
     (hdeg : (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1)
       = (∑ i, ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1)) :
     (h.columnFamily χ₂).sign = (h.columnFamily χ₂').sign :=
-  certainType_sign_eq_of_degree_eq h χ₂ χ₂' 0
+  certainType_sign_eq_of_degree_eq h.toCore χ₂ χ₂' 0
     (forall_columnFamily_mu_apply_one_eq_of_sum_eq h χ₂ χ₂' hdeg 0)
 
 /-- **`Supp(μ_j − μ_k) ⊆ supportInSubgroup A L`** for same-degree certain-type columns.  Both
@@ -350,7 +350,7 @@ theorem certainTypeExtension_columnDiff_eq_dade (h : Hypothesis46 A L) [NeZero (
         (A ∪ OddOrder.GroupTheory.conjClassSetIn L h.tic.V) L :=
     (columnDiff_support_subset h hχ₂ hχ₂' hdeg).trans
       (S04.supportInSubgroup_mono Set.subset_union_left)
-  have hval : ((∑ i, certainTypeDiffSupported h hχ₂ hχ₂' i (hdi i) :
+  have hval : ((∑ i, certainTypeDiffSupported h.toCore hχ₂ hχ₂' i (hdi i) :
         OddOrder.Peterfalvi.S04.SupportedClassFunctions ℂ
           (A ∪ OddOrder.GroupTheory.conjClassSetIn L h.tic.V) L) :
         ClassFunction ↥L ℂ)

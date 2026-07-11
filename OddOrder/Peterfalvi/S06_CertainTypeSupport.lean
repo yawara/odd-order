@@ -91,7 +91,7 @@ The hypothesis `H ⊄ Ker χ` is phrased at the class-function level as
 `¬ (H ⊆ characterKernel χ)`, matching Peterfalvi (1.2).  A thin specialization of the structural
 `mem_A_of_apply_ne_zero_of_covers` to the `Hypothesis46` fields. -/
 theorem mem_A_of_apply_ne_zero_of_not_subset_characterKernel
-    (h : Hypothesis46 A L)
+    (h : Hypothesis46Core A L)
     (χ : IrreducibleCharacter ↥h.K)
     (hker : ¬ ((h.subH.subgroupOf h.K : Set ↥h.K) ⊆
       S03.characterKernel (χ : ClassFunction ↥h.K ℂ)))
@@ -108,7 +108,7 @@ ambient image lies outside `A ∪ {1}`.
 This is the contrapositive of `mem_A_of_apply_ne_zero_of_not_subset_characterKernel`,
 phrased for downstream consumers (the induced-support half of (4.7) and (4.8)). -/
 theorem apply_eq_zero_of_not_mem_union_of_not_subset_characterKernel
-    (h : Hypothesis46 A L)
+    (h : Hypothesis46Core A L)
     (χ : IrreducibleCharacter ↥h.K)
     (hker : ¬ ((h.subH.subgroupOf h.K : Set ↥h.K) ⊆
       S03.characterKernel (χ : ClassFunction ↥h.K ℂ)))
@@ -129,7 +129,7 @@ Proof: a nonvanishing point `z` of `Ind_K^L χ` is `L`-conjugate to a point `w �
 ambient image of `w` is in `A ∪ {1}`; since `A` is closed under `L`-conjugation
 (`L_normalizes_A`) and `z`, `w` are `L`-conjugate, the image of `z` is in `A ∪ {1}`. -/
 theorem induce_apply_eq_zero_of_not_mem_union_of_not_subset_characterKernel
-    (h : Hypothesis46 A L) [Invertible (Nat.card ↥h.K : ℂ)]
+    (h : Hypothesis46Core A L) [Invertible (Nat.card ↥h.K : ℂ)]
     (χ : IrreducibleCharacter ↥h.K)
     (hker : ¬ ((h.subH.subgroupOf h.K : Set ↥h.K) ⊆
       S03.characterKernel (χ : ClassFunction ↥h.K ℂ)))
@@ -156,7 +156,7 @@ theorem induce_apply_eq_zero_of_not_mem_union_of_not_subset_characterKernel
   have hwA : L.subtype (h.K.subtype (⟨x⁻¹ * z * x, hx⟩ : ↥h.K)) ∈ A :=
     mem_A_of_apply_ne_zero_of_not_subset_characterKernel h χ hker hw_ne hw_val
   rw [hKw] at hwA
-  exact hzA (by rw [hconj]; exact h.dade.L_normalizes_A x hwA)
+  exact hzA (by rw [hconj]; exact h.L_normalizes_A x hwA)
 
 /-! ### Peterfalvi (4.7), `j ≥ 1` half: `H ⊄ Ker χ_j`, hence `Supp χ_j, Supp μ_j ⊆ A ∪ {1}`
 
@@ -349,14 +349,14 @@ end ChiJ
 /-- **Peterfalvi (4.7), `j ≥ 1` kernel statement** in the Hypothesis (4.6) form: for a nontrivial
 column `χ₂ ≠ 1`, `H ⊄ Ker χ_j` (`H` the (4.6.c) normal subgroup, `W₂ ≤ H`). -/
 theorem not_subset_characterKernel_chiRestrict
-    (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    (h : Hypothesis46Core A L) [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
     [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) :
     ¬ ((h.subH.subgroupOf h.K : Set ↥h.K) ⊆
       S03.characterKernel (h.chiRestrict χ₂ : ClassFunction ↥h.K ℂ)) := by
   intro hker
   refine Hypothesis.not_subset_characterKernel_chiRestrict_of_ne_one
-    h.toCertainTypeHypothesis.toHypothesis hχ₂ ?_
+    h.toHypothesis hχ₂ ?_
   intro k hk
   refine hker ?_
   have hkW2 := Subgroup.mem_subgroupOf.mp hk
@@ -376,7 +376,7 @@ theorem chiRestrict_ne_trivialIrreducibleCharacter
     {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) :
     h.chiRestrict χ₂ ≠ trivialIrreducibleCharacter ↥h.K := by
   intro htriv
-  refine not_subset_characterKernel_chiRestrict h hχ₂ ?_
+  refine not_subset_characterKernel_chiRestrict h.toCore hχ₂ ?_
   rw [htriv, IrreducibleCharacter.coe_trivialIrreducibleCharacter,
     S03.characterKernel_trivialClassFunction]
   exact Set.subset_univ _
@@ -384,7 +384,7 @@ theorem chiRestrict_ne_trivialIrreducibleCharacter
 /-- **Peterfalvi (4.7), `j ≥ 1` support**: `Supp χ_j ⊆ A ∪ {1}` for a nontrivial column
 `χ₂ ≠ 1`. -/
 theorem chiRestrict_apply_eq_zero_of_not_mem_union
-    (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    (h : Hypothesis46Core A L) [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
     [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1)
     {g : ↥h.K} (hgA : L.subtype (h.K.subtype g) ∉ A ∪ ({1} : Set G)) :
@@ -395,7 +395,7 @@ theorem chiRestrict_apply_eq_zero_of_not_mem_union
 /-- **Peterfalvi (4.7), `j ≥ 1` induced support**: `Supp μ_j ⊆ A ∪ {1}` for a nontrivial column
 `χ₂ ≠ 1` (`μ_j = Ind_K^L χ_j = ∑_i μ_{ij}` by (4.5.a) `induce_restrict_certainType_eq`). -/
 theorem induce_chiRestrict_apply_eq_zero_of_not_mem_union
-    (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    (h : Hypothesis46Core A L) [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
     [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1)
     {z : ↥L} (hz : L.subtype z ∉ A ∪ ({1} : Set G)) :

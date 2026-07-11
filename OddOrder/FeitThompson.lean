@@ -408,12 +408,68 @@ noncomputable def hyp46Smp :
         mp.S_maximal mp.S_typeP2 tp.Sdata).some.hconj }
 
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
+/-- **The Dade-free (4.6) core on the `muS` producer instance** (issue 9081): the structural
+fields of `hyp46Smp` — the κ-Hall grid instance, `tic` reconciliations, `M_σ(S)` kernel family,
+`A(S)`-covering, and the `L`-conjugation invariance of `A(S)`
+(`honestTypeP2ASet_conj_mem`, honest) — **without** the Dade data.  The (4.7)/(4.8)-(1) support
+engines (`certainType_diff_supp_subset_A0`) run on this core, so their producer applications
+(`muS_diff_support`) stay clear of the `A₀(S)`-Dade existence pin
+(`dadeSupportHypothesisData_honestTypeP2A0Set`, currently sorried) that `hyp46Smp` bundles. -/
+noncomputable def hyp46SmpCore :
+    OddOrder.Peterfalvi.S06.Hypothesis46Core
+      (OddOrder.Peterfalvi.S15.honestTypeP2ASet mp.S) mp.S :=
+  { toHypothesis := mp.certainTypeS hG
+    L_normalizes_A := fun l _ ha => OddOrder.Peterfalvi.S15.honestTypeP2ASet_conj_mem l.2 ha
+    tic := OddOrder.Peterfalvi.S12.typePData_toTICyclicHypothesis tp.Sdata hG.odd
+    -- the structural proofs are verbatim copies of the `hyp46Smp` fields: citing the `hyp46Smp`
+    -- projections instead would pull its (sorried) `A₀(S)`-Dade pin into this axiom closure.
+    tic_W1 := by
+      show tp.Sdata.W1 = _
+      rw [certainTypeS_W1_eq, Subgroup.map_subgroupOf_eq_of_le mp.K_le_S,
+        tp.Sdata_W1_eq, tp.W1_eq_K hG]
+    tic_W2 := by
+      show tp.Sdata.W2 = _
+      rw [certainTypeS_W2_eq, Subgroup.map_subgroupOf_eq_of_le (kstar_le_S hG mp),
+        tp.Sdata_W2_eq, tp.W2_eq_Kstar hG]
+    tic_V := rfl
+    subH := (OddOrder.BG.Ch3.S10.Msigma mp.S).subgroupOf mp.S
+    subH_normal := by
+      rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
+    W2_le_subH := by
+      rw [certainTypeS_W2_eq, ← tp.W2_eq_Kstar hG, ← tp.Sdata_W2_eq]
+      refine Subgroup.subgroupOf_mono mp.S ?_
+      have hW2H : tp.Sdata.W2 ≤ tp.Sdata.H := le_trans tp.Sdata.W2_le inf_le_left
+      rw [tp.Sdata.H_eq] at hW2H
+      exact le_trans hW2H
+        (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG mp.S_maximal)
+    subH_le_K := by
+      rw [certainTypeS_K_eq]
+      exact Subgroup.subgroupOf_mono mp.S
+        (OddOrder.BG.Ch3.S10.Msigma_le_derived hG mp.S_maximal)
+    A_covers := by
+      intro hh hhσ hh1 x hx hx1
+      rw [Subgroup.mem_inf] at hx
+      obtain ⟨hxC, hxD⟩ := hx
+      rw [certainTypeS_K_eq, Subgroup.mem_subgroupOf] at hxD
+      rw [Subgroup.mem_subgroupOf] at hhσ
+      rw [Subgroup.mem_centralizer_iff] at hxC
+      rw [OddOrder.Peterfalvi.S15.mem_honestTypeP2ASet]
+      refine ⟨hxD, ?_, (hh : G), ⟨hhσ, ?_⟩, ?_⟩
+      · simpa using hx1
+      · simpa using hh1
+      · rw [Subgroup.mem_centralizer_iff]
+        rintro g rfl
+        have hcomm := hxC (hh : ↥mp.S) rfl
+        have := congrArg (mp.S.subtype) hcomm
+        simpa using this }
+
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
 /-- **Peterfalvi (4.8) conclusion (1) on the `muS` grid** (Coq `prDade_sub_TIirr_on`; the
 `(13.18)` support engine in producer vocabulary): for nontrivial equal-degree columns
 `j, k ≠ 0`, the `μ`-column difference `μ_{ij} − μ_{ik}` is supported in
-`A₀(S) = A(S) ∪ V^S`.  The §6 support engine `certainType_diff_supp_subset_A0` applied at
-`hyp46Smp`, whose `toHypothesis` is the `muS` instance `mp.certainTypeS` — no grid
-identification needed. -/
+`A₀(S) = A(S) ∪ V^S`.  The §6 support engine `certainType_diff_supp_subset_A0` applied at the
+Dade-free `hyp46SmpCore` (issue 9081), whose `toHypothesis` is the `muS` instance
+`mp.certainTypeS` — no grid identification needed, and no `A₀(S)`-Dade pin in the closure. -/
 theorem muS_diff_support (i : Fin tp.q) {j k : Fin tp.p}
     (hj0 : j ≠ ⟨0, tp.p_prime.pos⟩) (hk0 : k ≠ ⟨0, tp.p_prime.pos⟩)
     (hdeg : muS hG mp tp i j 1 = muS hG mp tp i k 1) :
@@ -421,7 +477,7 @@ theorem muS_diff_support (i : Fin tp.q) {j k : Fin tp.p}
       OddOrder.Peterfalvi.S04.supportInSubgroup
         (OddOrder.Peterfalvi.S15.honestTypeP2A0Set mp.S tp.Sdata) mp.S := by
   classical
-  haveI : NeZero (Nat.card ↥(hyp46Smp hG mp tp).W1) :=
+  haveI : NeZero (Nat.card ↥(hyp46SmpCore hG mp tp).W1) :=
     inferInstanceAs (NeZero (Nat.card ↥(mp.certainTypeS hG).W1))
   have hχj : chi2enum hG mp tp j ≠ 1 := by
     intro hc
@@ -432,7 +488,7 @@ theorem muS_diff_support (i : Fin tp.q) {j k : Fin tp.p}
   intro z hz
   rw [OddOrder.RepresentationTheory.ClassFunction.mem_support] at hz
   rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
-  exact OddOrder.Peterfalvi.S06.certainType_diff_supp_subset_A0 (hyp46Smp hG mp tp)
+  exact OddOrder.Peterfalvi.S06.certainType_diff_supp_subset_A0 (hyp46SmpCore hG mp tp)
     hχj hχk (eqQ hG mp tp i) hdeg hz
 
 /-- The `omegaS` are linear characters: `ω_{ij}(1) = 1`. -/

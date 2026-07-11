@@ -752,8 +752,8 @@ theorem omegaProdCharTic_symm_fst_eq [Fintype G] [Fintype ↥L]
     ticWEquivSdiffW_mem_W1 h (Subgroup.mem_subgroupOf.mp w.2)
   erw [OddOrder.Peterfalvi.S06.omegaProdCharTic_apply,
     OddOrder.Peterfalvi.S06.omegaProdCharTic_apply,
-    OddOrder.Peterfalvi.S06.chiColumn_apply_of_mem_W1 h χ₂ i hmem,
-    OddOrder.Peterfalvi.S06.chiColumn_apply_of_mem_W1 h χ₂' i hmem]
+    OddOrder.Peterfalvi.S06.chiColumn_apply_of_mem_W1 h.toCore χ₂ i hmem,
+    OddOrder.Peterfalvi.S06.chiColumn_apply_of_mem_W1 h.toCore χ₂' i hmem]
 
 open scoped Classical in
 /-- **Distinct columns give distinct `W₂`-components**: for `χ₂ ≠ χ₂'`, the second components
