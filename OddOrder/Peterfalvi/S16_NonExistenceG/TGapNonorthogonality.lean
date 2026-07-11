@@ -1,6 +1,7 @@
 import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.CharacterParameters
 import OddOrder.Peterfalvi.S13_MaximalIII_IVBasic
 import OddOrder.Peterfalvi.S13_Orthogonality
+import OddOrder.Peterfalvi.S16_NonExistenceG.TGapCross
 
 /-!
 # Peterfalvi (11.8): T-side non-orthogonality inputs
@@ -104,6 +105,43 @@ theorem s12_muGrid_zeroColumn_sum_eq_induce_trivial [Finite G]
     _ = ClassFunction.induce h.K (trivialClassFunction ↥h.K) := hsum.symm
     _ = ClassFunction.induce ((derivedInG M).subgroupOf M)
           (trivialClassFunction ↥((derivedInG M).subgroupOf M)) := rfl
+
+open scoped Classical in
+/-- **Peterfalvi (2.11)/(11.8), the Section 12 residual uses the T-side
+Dade map.**  For the specified type-`P₁` datum, the Section 12 full `A₀(T)`
+map restricts to the canonical `A₁(T)` map.  Together with the zero-column
+anchor above, this identifies the complete source term used by (11.8) with
+the `τ_T(ν₀-ζ)` term of (11.9.a). -/
+theorem s12Tau_zeroColumn_sub_eq_tSideDadeMap [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (side : Hypothesis (G := G))
+    (dataT : TypePData side.base.T)
+    (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 side.base.T)
+    (hIII : IsTypeIII side.base.T)
+    (zeta nu0 : ClassFunction ↥side.base.T ℂ)
+    (hnu0 : nu0 = ClassFunction.induce
+      ((derivedInG side.base.T).subgroupOf side.base.T)
+      (trivialClassFunction
+        ↥((derivedInG side.base.T).subgroupOf side.base.T)))
+    (hsupp : (nu0 - zeta).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.BG.Ch4.S14.sigmaSharp side.base.T) side.base.T) :
+    let hyp12 := s12HypothesisOfTypePData hG side.base.T_maximal dataT
+      (Or.inl hIII) hP1
+    hyp12.tau
+        ((∑ i : Fin hyp12.w1, hyp12.muGrid hG hG.odd i 0) - zeta) =
+      tSideDadeMap side hG (nu0 - zeta) := by
+  let hyp12 := s12HypothesisOfTypePData hG side.base.T_maximal dataT
+    (Or.inl hIII) hP1
+  have hanchor := s12_muGrid_zeroColumn_sum_eq_induce_trivial hG hyp12
+  have hmap := tSideDadeMap_eq_full_typeP1DadeMap_of_support
+    hG side dataT hP1 hsupp
+  change hyp12.tau
+      ((∑ i : Fin hyp12.w1, hyp12.muGrid hG hG.odd i 0) - zeta) =
+    tSideDadeMap side hG (nu0 - zeta)
+  rw [hanchor, ← hnu0]
+  simpa only [hyp12, s12HypothesisOfTypePData,
+    OddOrder.Peterfalvi.S12.Hypothesis.tau] using hmap.symm
 
 /-- **Peterfalvi (10.2)--(10.3), character parameters based at a specified
 family member.**  The arithmetic data `d`, `delta`, and `n` depend only on the
@@ -377,5 +415,40 @@ theorem member_residual_not_orthogonal_of_transposed_alignment [Finite G]
         simpa using Equiv.sum_comp (finCongr hp) (fun j' : Fin p => eta 0 j')
   rw [himage, hsum, hgrid]
   exact horth (finCongr hq j) (finCongr hp i)
+
+/-- Reindex a non-orthogonal rectangular residual after transposing its two
+axes.  Unlike `finCongr`, the equivalences may encode the independent
+enumeration choices made by two concrete character-grid producers; preserving
+the distinguished column-zero index is exactly what identifies the subtracted
+base row. -/
+theorem residual_not_orthogonal_of_transposed_reindexing
+    [Fintype G] {w1 w2 p q : ℕ}
+    [NeZero w1] [NeZero w2] [NeZero p] [NeZero q]
+    (source : ClassFunction G ℂ)
+    (grid : Fin w1 → Fin w2 → ClassFunction G ℂ)
+    (eta : Fin q → Fin p → ClassFunction G ℂ)
+    (rowEquiv : Fin w1 ≃ Fin p) (colEquiv : Fin w2 ≃ Fin q)
+    (hcol0 : colEquiv 0 = 0)
+    (hgrid : ∀ i j, grid i j = eta (colEquiv j) (rowEquiv i))
+    (hnot : ¬ ∀ (i : Fin w1) (j : Fin w2),
+      ClassFunction.inner
+        (source - ∑ i' : Fin w1, grid i' 0) (grid i j) = 0) :
+    ¬ ∀ (i : Fin q) (j : Fin p),
+      ClassFunction.inner
+        (source - ∑ j' : Fin p, eta 0 j') (eta i j) = 0 := by
+  intro horth
+  apply hnot
+  intro i j
+  have hsum : (∑ i' : Fin w1, grid i' 0) = ∑ j' : Fin p, eta 0 j' := by
+    calc
+      (∑ i' : Fin w1, grid i' 0) =
+          ∑ i' : Fin w1, eta 0 (rowEquiv i') := by
+        apply Finset.sum_congr rfl
+        intro i' _
+        rw [hgrid, hcol0]
+      _ = ∑ j' : Fin p, eta 0 j' := by
+        simpa using Equiv.sum_comp rowEquiv (fun j' : Fin p => eta 0 j')
+  rw [hsum, hgrid]
+  exact horth (colEquiv j) (rowEquiv i)
 
 end OddOrder.Peterfalvi.S16
