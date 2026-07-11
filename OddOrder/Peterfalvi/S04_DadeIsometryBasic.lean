@@ -328,6 +328,36 @@ theorem isTISubset_iff_exists_hypothesis_with_trivial_H
   · rintro ⟨hyp, hH⟩
     exact hyp.isTISubset_of_forall_H_eq_bot hH
 
+/-- If the full centralizer of a point `a ∈ A` lies in `L`, then the local
+subgroup `H(a)` of **any** Hypothesis (2.2) datum on `(A, L)` is trivial:
+`H(a) ≤ C_G(a)` by `centralizer_eq_sup`, so `C_G(a) ≤ L` places `H(a)` inside
+`C_L(a)`, and `centralizer_disjoint` then forces `H(a) = ⊥`.
+
+This is data-independent — it reads only the proof fields of the hypothesis, so
+it applies to opaque (2.2) data (e.g. a packaged `dadeData` field) without
+knowing how its `H` was constructed. -/
+theorem H_eq_bot_of_centralizer_le (hyp : Hypothesis G A L)
+    (a : {a : G // a ∈ A})
+    (hle : Subgroup.centralizer ({a.1} : Set G) ≤ L) : hyp.H a = ⊥ := by
+  have hHle : hyp.H a ≤ Subgroup.centralizer ({a.1} : Set G) :=
+    le_sup_left.trans (hyp.centralizer_eq_sup a).ge
+  have hHin : hyp.H a ≤ centralizerIn L a.1 := by
+    rw [centralizerIn]
+    exact le_inf (hHle.trans hle) hHle
+  exact (hyp.centralizer_disjoint a).eq_bot_of_le hHin
+
+/-- The reverse direction of **Peterfalvi (2.3)**: over a TI-subset `A`
+relative to `L`, **every** Hypothesis (2.2) datum has all local subgroups
+trivial, `H(a) = ⊥` — not just the canonical `of_isTISubset` one.  (TI places
+the whole centralizer `C_G(a) ≤ L` for `a ∈ A`, cf.
+`IsTISubset.centralizer_le`.)  Combined with the uniqueness
+`dadeHypothesis_eq_of_forall_H_eq_bot` (`S12_TICyclicSigmaBridge`), the (2.2)
+datum on a TI pair `(A, L)` is therefore unique. -/
+theorem H_eq_bot_of_isTISubset (hyp : Hypothesis G A L)
+    (hTI : OddOrder.GroupTheory.IsTISubset A L) (a : {a : G // a ∈ A}) :
+    hyp.H a = ⊥ :=
+  hyp.H_eq_bot_of_centralizer_le a (hTI.centralizer_le a.2)
+
 /-- Restrict Hypothesis (2.2) to an `L`-stable subset `A₁ ⊆ A`.
 
 This is the setup part of Peterfalvi (2.11).  The equality of the corresponding

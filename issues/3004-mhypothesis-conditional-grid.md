@@ -571,3 +571,17 @@ feature commit: `618a0285`。
   group/order separation、T normed-TI、両 Dade=Ind、induced-support orthogonality は closed。
 - `TGapCross` / AxiomsCheck (4131 jobs) green。追加4公開 theorem は許容公理のみ。
   新 axiom・新 sorry なし。commit 前 `HEAD..main = 0`。
+
+## 🧭 HUB 通知 (2026-07-11 fix-forward): AxiomsCheck assert 5 本を除去
+
+618a0285 で追加された assert のうち以下 5 本は **sorryAx 推移依存** (allowlist 違反) で
+AxiomsCheck red となったため、hub が fix-forward で除去した (数学本体は全て保全済・merge 済):
+
+- `escaping_typePA0_eq_empty_of_isTypeP1` / `typePA0_isTISubset_of_isTypeP1`
+- `tSideDadeMap_eq_induce_of_isTypeP1` (上 2 本の依存を継承)
+- `tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_exact_supports` / `…_of_beta_support` (S/T hdeep 系)
+
+**再登録条件**: 各定理の推移閉包から sorryAx が消えたとき (`#print axioms` で確認) に assert を
+戻す。**運用規約の再確認**: sorried-cite 定理 (deep input が未 discharge のもの) は assert しない —
+assert は「現に sorry-free」の tripwire であり、意図の宣言ではない。push 前に
+`lake build OddOrder.AxiomsCheck` の **exit code** まで確認すること (`| tail` は exit を潰す)。

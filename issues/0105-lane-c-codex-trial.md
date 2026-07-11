@@ -131,3 +131,11 @@ issue は trial ログの追記継続のため open 維持、次の節目 (T-sid
   deep inputs (`hdeep` = Coq `o_eta0_betaT0` + support separation 対) へ縮小 (sorry ±0 = narrowing、
   regression でない)。新 leaf TGapCross (245 行)、`dadeHypothesis_eq_of_H_eq` は TTypeII private の
   public 化移設 (dup でない、cross-file private 禁止規約の遵守)。dup チェック clean。12/12。
+- 2026-07-11 (tick、merge 4e408270 → hub fix-forward): ⚠ **incident (双方の手順ミス、実害 = red main
+  push → 同 tick 内 fix-forward 済)**。(i) **c 側**: 618a0285 の AxiomsCheck assert 15 本中 5 本が
+  **過剰主張** (sorried deep inputs (typePA0-TI 系 / S-T hdeep 系) に推移依存する定理を sorry-free と
+  assert) — 従来の開示規律 (「sorried-cite は assert しない」) からの初 regression。数学本体 (13.2e
+  normed-TI closure 等) は genuine で保全。(ii) **hub 側**: 検査 tip (0a128d16) と merge tip (5f2e11cb)
+  の stale 化 (2 度目) + `| tail` pipe による build exit code 隠蔽 + push 連鎖 — 対策を SHA 固定 merge
+  として必須化 (merge_monitor 注意節)。トレンド: genuine 13/13 (数学は今回も本物)、規律 slip 1 (assert
+  過剰主張、fix-forward で除去・3004 に再登録条件を通知)。KEEP 裁定に変更なし。
