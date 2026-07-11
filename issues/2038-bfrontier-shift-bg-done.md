@@ -1588,3 +1588,23 @@ S15_SAndT:333 の sorry を実証明 (S-side mirror + by_cases E≤P、排除不
 → (u−1)/q ≤ (|H|−1)/e=q ≤ (u−1)/q → H=U → N_G(U)⊆L=UW₁⊆S が type II に矛盾。**(13.19) の
 形式化が真の上流**) / :765 (betaGrid support) / :1409 / :1525 (GammaGrid real) / :1540
 ((13.18.d) norm bound) / :1774 (TypeIOrthogonalityGridData)。文書順の次 = :765。
+
+## ✅ (2026-07-12、/loop iter 2) — hmuW1 (W₁# μ-値 = 1) 実証明 + (13.18.a) の正しい構図判明
+
+**構図の訂正**: S15_SAndT:765 `betaGrid_support` (grid form ⋃ᵢ supp μ_{ij}) とは別に、**S16
+TGapCross に Coq-faithful 形 `betaGrid_support_sharpP_union_typePV_of_values` (P^#∪V_S 形、
+group-theoretic 部分は完全 proven)** が既在。残る仮説入力 = 2 つの μ-値のみ:
+- **hmuW1 (今回実証明)**: `Hypothesis.mu_row0_apply_eq_one_of_mem_W1` (CountingLayer) —
+  field (4.3.c) + δ=1 + ω row-0 値。
+- **hmuD (次 iter)**: μ_{0j} = 0 on S′−P。**abstract route 設計済**:
+  (a) z∈S′∖P → z∉W^S-classes (W∩S′=W₂⊆P 論法: z~w∈W ∧ z∈S′ normal → w∈W∩S′、
+      W₁∩S′=1 [q∤|S′|=p^q·u、u≡1 mod q] → w∈W₂⊆P → z∈P 矛盾)
+  (b) supp(μ_j) ⊆ P: mu_j_isIndPC (13.3.a) + c_eq_one (C=⊥ → hyp.H=P) + P normal +
+      induce-support lemma
+  (c) mu_definition (13.1.e) の z-点評価: z∉W^S → LHS=0 → μ_{ij}(z) 全 i 一致 →
+      q·μ_{0j}(z) = μ_j(z) = 0 (b) → μ_{0j}(z)=0
+  部品確認要: induce-support lemma / hyp.H = P (c_eq_one 帰結) / W₁⊓S′=⊥。
+- ⚠ S15 grid form :765 は「P^# ⊆ ⋃ᵢ supp μ_{ij}」を要し妥当性が非自明 (P^# の各点で
+  ∃i μ_{ij}≠0 が必要 — Ind1|_P = u ≠ 0 ゆえ)。hmuD/hmuW1 完成後、BetaData の
+  support_formula field を P^#∪V_S 形に差し替える再設計を検討 (consumer = S15_SAndT 内
+  BetaData のみ; S16 は sharpP∪typePV 形を直接使用)。
