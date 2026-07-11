@@ -432,4 +432,43 @@ theorem w2_lt_w1_of_hypothesis_H0C [Finite G]
     exists_zeta_residual_not_orthogonal_H0C hG hyp htype hM2 hHcard
   exact OddOrder.Peterfalvi.S12.w2_lt_w1_of_residual_not_orthogonal hG hyp hζS hζirr hζ1 h118
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.11), modulo the equality refutation: `𝒮(H₀C′)` is coherent on `A₀(M)`**
+(issue 9083 Phase A, the dichotomy dispatch).
+
+The full `Ptype_core_coherence` assembly with the two remaining honest caseA inputs taken as
+hypotheses: the Clifford dichotomy (9.7) `clifford_dichotomy` splits into
+
+* **caseB** — the landed norm-general coherence `caseB_coherent_sOf_H0Cprime` (issue 9075), and
+* **caseA** — the maximality reduction `caseA_coherent_sOf_H0Cprime_of_refuter`, whose refuter
+  clause is discharged by the (9.11.1) squeeze wiring `caseA_refuter_of_equality_refutation` from
+  the (5.6) pair-bound bundle `hbound` (`NineElevenPairBound`) and the (9.11.2)–(9.11.8)
+  equality-configuration refutation `hrefuteEq` (`NineElevenEqualityRefutation`), both quantified
+  over the dichotomy's caseA datum.
+
+Once the later 9083 phases discharge `hbound`/`hrefuteEq`, this becomes the unconditional (9.11);
+composed with the (11.7) transfer (`coherent_sOf_H0C_of_coherent_sOf_H0Cprime` + the reducible
+μ-column witness, as in `coherent_sOf_H0C`) it replaces the sole live sorry of that endpoint. -/
+theorem coherent_sOf_H0Cprime_of_equality_refutation [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
+    (hbound : ∀ caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
+        (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief),
+      NineElevenPairBound hyp caseA)
+    (hrefuteEq : ∀ caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
+        (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief),
+      NineElevenEqualityRefutation hyp caseA) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+      (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) hyp.base.A0) := by
+  haveI := hyp.base.finiteG
+  classical
+  rcases OddOrder.Peterfalvi.S11.clifford_dichotomy hG
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief) with hA | hB
+  · -- **caseA**: the (9.11.1) squeeze wiring discharges the maximality refuter.
+    have caseA := hA.some
+    exact caseA_coherent_sOf_H0Cprime_of_refuter hG hyp caseA
+      (caseA_refuter_of_equality_refutation hG hyp caseA (hbound caseA) (hrefuteEq caseA))
+  · -- **caseB**: the landed norm-general coherence (issue 9075).
+    exact caseB_coherent_sOf_H0Cprime hG hyp hB.some
+
 end OddOrder.Peterfalvi.S13

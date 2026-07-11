@@ -171,3 +171,38 @@ survey レベルの within-cluster pivot ((10.7)→diff-port→honest induction�
 **lane 自律で確定してよく、per-pivot の HUB 承認 issue は不要** (ft_path_policy §0 policy 5-6)。
 HUB issue が適切なのは今回の (i)(ii) のような **cross-territory claim 照会・他レーン影響の trace 依頼**
 のみ。9083 はこの回答をもって最終 close (5-phase plan A→E の実行は a 自律)。
+
+---
+
+# Phase A 完了 (2026-07-11, lane a)
+
+squeeze wiring + dichotomy dispatch を landed (sorry 0・新 axiom 0・append-only):
+
+- **`S11_NineElevenCaseA.lean`** (+222 行):
+  - `NineElevenPairBound` (Prop shape) — (5.6) pair-bound bundle。pair-refuted な χ∈𝒮₃ に
+    source degree `d ≤ u` (`χ(1) = q·d`) と `∀ F ⊆ 𝒮₂ finite, sumnS F ≤ 2q²a·d` を供給する形。
+    **Phase E (5.6)-engine 側 discharge 対象** (per-member Dade data を
+    `coherentDegreeSqNormBound_of_not_coherentW` に通し `sumnS_image_eq_anchorSq_mul` で rescale)。
+  - `NineElevenEqualityRefutation` (Prop shape) — equality configuration
+    (`2a = p−1`・`C = U′`・∀χ∈𝒮₃ deg = qu・count equality `n₁a² = (p−1)[U:U′]`・
+    saturated bound `∀F⊆𝒮₂, sumnS F ≤ 2q²au`) + full situation → False。
+    **Phase B/C/D/E の合流 discharge 対象** (`nineElevenCaseA_equality_refutation` が算術 spine;
+    B = (9.11.2) K₁/K₂ inertia、C = (9.11.3) hclass+hn、D = (9.11.4) hnorm、
+    E = (9.11.5-8) hle + pair 構成 + 𝒮₂=𝒮₁ 抽出 — 抽出は saturated bound から
+    Snorm>0 で回収可能)。
+  - `caseA_refuter_of_equality_refutation` — 上 2 つから S07 refuter clause を discharge。
+    (9.11.1) squeeze を **𝒮₃ の各 member ごとに**回す (book の "we may assume" wlog 不要化):
+    lower bound = `sumnS_irreducible_constant_degree` (𝒮₁′ = 𝒮(H₀U′) の degree-qa irr cut、
+    `sOf_antitone` で 𝒮₂ 内へ)、upper bound = bundle の F-instantiation、
+    `nineElevenOne_configuration` で closed circle。**axiom-clean 実測**
+    (propext/Classical.choice/Quot.sound のみ)。
+- **`S13_Orthogonality.lean`** (+39 行): `coherent_sOf_H0Cprime_of_equality_refutation` —
+  `clifford_dichotomy` dispatch、caseB → `caseB_coherent_sOf_H0Cprime` (9075)、
+  caseA → `caseA_coherent_sOf_H0Cprime_of_refuter` + Phase-A refuter。結論
+  `Nonempty (IsCoherent hyp.base.tau (sOf hyp.s11Setup hyp.H0Cprime) hyp.base.A0)`、
+  仮説は `∀ caseA, NineElevenPairBound/NineElevenEqualityRefutation` の 2 本のみ。
+  sorryAx は caseB 側 upstream 由来 (既存・9075 transitive) で本 commit の追加分は clean。
+
+残 phase の直接ターゲット = `NineElevenPairBound` と `NineElevenEqualityRefutation` の 2 定理
+(両方 landed 時に `coherent_sOf_H0Cprime_of_equality_refutation` が無条件化 →
+S13_Orthogonality:130 の live sorry を置換)。
