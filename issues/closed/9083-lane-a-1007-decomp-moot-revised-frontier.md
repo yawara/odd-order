@@ -276,3 +276,53 @@ append-only +347 行、自前 sorry 0・新 axiom 0):
   組立) + hn (W₁-orbit split)、D = (9.11.4) hnorm (Mackey)、E = (9.11.5-8) hle + `𝒮₂=𝒮₁` 抽出
   (hS2deg 供給、saturated bound + Snorm>0) + pair 構成。B の出力は
   `nineElevenCaseA_equality_refutation` に直結済み。
+
+---
+
+# Phase C 完了 (2026-07-11, lane a)
+
+**(9.11.3) W₁-orbit count split を landed** — `S11_NineElevenCoherence.lean` 追記 (+485 行、
+append-only) + `S11_NineElevenCaseA.lean` 追記 (+234 行、append-only)。自前 sorry 0・新 axiom 0。
+
+- **構成 (book (9.11.3) / Coq PFsection9.v `card_S4` の port)**: `hclass` を
+  **`n = |𝒮₄|·q + (p−1)` で直接証明**する設計 — `hn` は definitional (`rfl`) になり、
+  book の「n を先に数えて後から割る」を逆転 (ℕ-division 不要)。エンジンは `𝒳(H₀C)` の
+  `Ind_{HU}^M` fibration:
+  - **fibre = full M-conjugation orbit** (`card_filter_induce_eq_index_inertia`、
+    `𝒳(H₀C)` filter の conjugation-closedness は新補題
+    `subsetCharacterKernel_conjBy_iff_of_invariant` + `realized_conjByMulEquiv_mem`
+    — `H₀C`-realized/`H`-realized の M-正規性から);
+  - **orbit size dichotomy** (`[M:HU] = q` prime): 新補題
+    `inertia_index_eq_q_of_induce_irreducible` (‖Ind χ‖² = 1 ⟹ |I| = |HU| ⟹ index q —
+    (9.11.3) の「q conjugates under W₁」) /
+    `inertia_index_eq_one_of_induce_reducible` (index ∣ q prime、index = q なら
+    `isIrreducibleCharacter_induce_of_inertia_eq` で irreducible になり矛盾 — reducible
+    member は W₁-invariant single source);
+  - **3 分割**: reducible part (count p−1 = `reducible_count_sOf_H0C`、source degree u =
+    (9.8.b) `caseA_reducible_induceHU_apply_one_eq_qu`) / irr-in-𝒮₂ part (degree a、
+    `|𝒮₁′|·a² = (p−1)·[U:U′] = (p−1)·u` — hcount + `C = U′` + `relIndex_cSub_U_eq_u`) /
+    irr-outside-𝒮₂ part (= 𝒮₄、degree u);
+  - **台帳閉じ**: `sum_xiOf_H0C_degreeSq` (∑χ(1)² = p^q·u − u) に 3 部分の
+    card×degree² を代入、`linear_combination` で ℂ→`Nat.cast_inj`→ℕ。
+- **S11 主定理 `nineElevenThree_orbit_split`**: 仮説 = hS₁'sub (degree-qa 𝒮(H₀U′) ⊆ S₂)、
+  hS3deg' (𝒮(H₀C)∖S₂ degree qu)、hS2deg (S₂ degree qa)、hCU (`cSub = uprimeSub`)、hcount。
+  結論 = `u + (|𝒮₄|·q + (p−1))·u² + q(p−1)u = p^q·u` (hclass @ n := |𝒮₄|·q + (p−1))。
+- **S13 層** (`S11_NineElevenCaseA.lean`):
+  - `nineElevenSFour hyp S₂` — 𝒮₄ の正準 spelling ({φ ∈ 𝒮(H₀C) | irr ∧ φ ∉ S₂})。
+    **Phase E の `hle : |𝒮₄| ≤ N` はこの ncard を bound する契約**。
+  - `caseA_nineElevenThree_count_inputs` — equality-configuration budget から hclass を供給
+    (H₀C′ ≤ H₀U′ / H₀C′ ≤ H₀C の antitone 移送は Phase A/B と同型)。
+  - **Prop 形 `NineElevenSTwoExtraction`** ((9.11.1) 𝒮₂=𝒮₁ 抽出、Phase E) /
+    **`NineElevenNormBound`** ((9.11.4) hnorm + (9.11.5-8) |𝒮₄| ≤ ‖α‖²、Phase D+E) —
+    equality-configuration 全 11 antecedent で ∀-quantify した book-cited 名前付き仮説。
+  - **assembler `nineElevenEqualityRefutation_of_sTwoExtraction_normBound`**: 上記 2 Prop
+    ⟹ `NineElevenEqualityRefutation` (B+C 出力 + q≥3 (odd prime) + u≥1 (`u_odd`) +
+    p=2a+1 を内部供給、hn = `rfl`)。**残距離 = この 2 Prop の discharge のみ (= Phases D/E)**。
+- **axiom 実測**: S11 層は全部 axiom-clean (`nineElevenThree_orbit_split` /
+  `subsetCharacterKernel_conjBy_iff_of_invariant` / `realized_conjByMulEquiv_mem` /
+  `inertia_index_eq_q_of_induce_irreducible` / `inertia_index_eq_one_of_induce_reducible`
+  = propext/Classical.choice/Quot.sound のみ)。S13 層 (`caseA_nineElevenThree_count_inputs` /
+  assembler) のみ sorryAx — **既存 upstream `C_eq_cSub` 由来** (H₀C′ ≤ H₀C 移送と Phase-B
+  corollary 経由; caseB/E-PairBound/B と同一 debt、本 commit の追加分ではない)。
+- ⚠ **hub への分割 flag**: `S11_NineElevenCoherence.lean` が 1511 行 (>1500 trigger)。
+  凍結境界での prefix-split (または dir 化) を hub に委任 (本 commit は append-only を維持)。
