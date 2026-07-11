@@ -226,6 +226,16 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
   mu_apply_of_not_mem_W2 : ∀ (i : Fin q) (j : Fin p) (w : G) (hwW : w ∈ W)
     (hwS : w ∈ S), w ∉ (W2 : Set G) →
     mu i j ⟨w, hwS⟩ = (delta j : ℂ) * omega i j ⟨w, hwW⟩
+  /-- **Peterfalvi (4.9)(a)**: CF-level conjugation symmetry `μ̄_{ij} = μ_{−i,−j}`. -/
+  mu_conj : ∀ (i : Fin q) (j : Fin p),
+    (mu i j).conj = mu (OddOrder.Peterfalvi.S15.finNeg q_prime.pos i)
+      (OddOrder.Peterfalvi.S15.finNeg p_prime.pos j)
+  /-- **Peterfalvi (3.9.a)**: CF-level conjugation symmetry of the `τ₃∘ω` grid,
+  `(τ₃ω_{ij})̄ = τ₃ω_{−i,−j}` — the `η`-grid conj-pair in the pre-`η` form of this layer. -/
+  tau3_omega_conj : ∀ (i : Fin q) (j : Fin p),
+    (tau3 (omega i j)).conj
+      = tau3 (omega (OddOrder.Peterfalvi.S15.finNeg q_prime.pos i)
+          (OddOrder.Peterfalvi.S15.finNeg p_prime.pos j))
   /- Grid property fields (issue 3002): the (3.2)/(3.3)/(3.4) character-theoretic content of
   `tau3`/`omega`, threaded from `Section16CharacterData` into `S15.Hypothesis`. -/
   /-- **Peterfalvi (3.2), isometry part**: `τ₃` preserves the class-function inner product. -/
@@ -482,6 +492,16 @@ structure Section16CharacterData {G : Type*} [Group G] [Finite G]
   mu_apply_of_not_mem_W2 : ∀ (i : Fin tp.q) (j : Fin tp.p) (w : G) (hwW : w ∈ tp.W)
     (hwS : w ∈ mp.S), w ∉ (tp.W2 : Set G) →
     mu i j ⟨w, hwS⟩ = (delta j : ℂ) * omega i j ⟨w, hwW⟩
+  /-- **Peterfalvi (4.9)(a)**: CF-level conjugation symmetry `μ̄_{ij} = μ_{−i,−j}`. -/
+  mu_conj : ∀ (i : Fin tp.q) (j : Fin tp.p),
+    (mu i j).conj = mu (OddOrder.Peterfalvi.S15.finNeg tp.q_prime.pos i)
+      (OddOrder.Peterfalvi.S15.finNeg tp.p_prime.pos j)
+  /-- **Peterfalvi (3.9.a)**: CF-level conjugation symmetry of the `τ₃∘ω` grid,
+  `(τ₃ω_{ij})̄ = τ₃ω_{−i,−j}` — the `η`-grid conj-pair in the pre-`η` form of this layer. -/
+  tau3_omega_conj : ∀ (i : Fin tp.q) (j : Fin tp.p),
+    (tau3 (omega i j)).conj
+      = tau3 (omega (OddOrder.Peterfalvi.S15.finNeg tp.q_prime.pos i)
+          (OddOrder.Peterfalvi.S15.finNeg tp.p_prime.pos j))
   mu_colSum_eq_induce : ∀ j : Fin tp.p,
     ∃ ψ : ClassFunction ↥((derivedInG mp.S).subgroupOf mp.S) ℂ,
       OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ ∧

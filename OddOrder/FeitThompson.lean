@@ -1429,6 +1429,8 @@ noncomputable def section16CharacterData_of_isMinimalSimpleOdd {G : Type*} [Grou
         Section16CharacterData.muS_diff_support hG mp tp i hj0 hk0 hdeg
       mu_apply_of_not_mem_W2 := fun i j w hwW hwS hw2 =>
         Section16CharacterData.muS_apply_of_not_mem_W2 hG mp tp i j w hwW hwS hw2
+      mu_conj := Section16CharacterData.muS_conj hG mp tp
+      tau3_omega_conj := Section16CharacterData.tau3W_omegaS_conj hG mp tp
       mu_colSum_eq_induce := fun j => by
         refine ⟨ClassFunction.restrict ((derivedInG mp.S).subgroupOf mp.S)
             (((mp.certainTypeS hG).columnFamily
@@ -1565,6 +1567,8 @@ noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [F
     mu_orthonormal := cd.mu_orthonormal
     mu_diff_support := cd.mu_diff_support
     mu_apply_of_not_mem_W2 := cd.mu_apply_of_not_mem_W2
+    mu_conj := cd.mu_conj
+    tau3_omega_conj := cd.tau3_omega_conj
     mu_colSum_eq_induce := cd.mu_colSum_eq_induce
     nu_definition := cd.nu_definition
     q_lt_p := tp.q_lt_p
@@ -1694,6 +1698,8 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       mu_orthonormal := inp.mu_orthonormal
       mu_diff_support := inp.mu_diff_support
       mu_apply_of_not_mem_W2 := inp.mu_apply_of_not_mem_W2
+      mu_conj := inp.mu_conj
+      eta_conj := inp.tau3_omega_conj
       mu_colSum_eq_induce := inp.mu_colSum_eq_induce
       nu_definition := inp.nu_definition
       m := 1 - 1 / ((inp.q : ℚ) - 1) - ((inp.q : ℚ) - 1) / (inp.q : ℚ) ^ inp.p +
