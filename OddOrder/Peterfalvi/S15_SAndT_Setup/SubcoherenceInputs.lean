@@ -291,6 +291,20 @@ structure Hypothesis where
   mu_apply_of_not_mem_W2 : ∀ (i : Fin q) (j : Fin p) (w : G) (hwW : w ∈ W)
     (hwS : w ∈ S), w ∉ (W2 : Set G) →
     mu i j ⟨w, hwS⟩ = (delta j : ℂ) * omega i j ⟨w, hwW⟩
+  /-- **Peterfalvi (4.9)(a), CF-level conjugation symmetry of the `μ`-grid** (Coq
+  `prTIirr_aut`; the full-CF strengthening of the generic-element `eta_pair_of_coprime`
+  pattern): `μ̄_{ij} = μ_{−i,−j}`.  Supplied by the producer from `muS_conj`
+  (the §6 conjugation bridge `certainType_mu_conj_eq` with the power-enumeration index
+  bridges).  Feeds the (13.18.c) reality of `Γ` (`gammaGrid_real`). -/
+  mu_conj : ∀ (i : Fin q) (j : Fin p),
+    (mu i j).conj = mu (finNeg q_prime.pos i) (finNeg p_prime.pos j)
+  /-- **Peterfalvi (3.9.a), CF-level conjugation symmetry of the `η`-grid** (Coq
+  `cfAut_cycTIiso`): `η̄_{ij} = η_{−i,−j}`.  Supplied by the producer from
+  `tau3W_omegaS_conj` (`σ` Galois-intertwining `sigma_mapRingEquiv_comm` + linear-character
+  inversion `galoisMap_conj_omega`, through the power enumerations).  Feeds the (13.18.c)
+  reality of `Γ` (`gammaGrid_real`). -/
+  eta_conj : ∀ (i : Fin q) (j : Fin p),
+    (eta i j).conj = eta (finNeg q_prime.pos i) (finNeg p_prime.pos j)
   /- ### Grid property fields (issue 3002)
 
   The (3.2)/(3.3)/(3.4) character-theoretic content of the Dade grid carriers `tau3`/`omega`,
@@ -350,6 +364,16 @@ structure Hypothesis where
   eta_row_vanish_of_one_zero : ∀ x : G,
     tau3 (omega ⟨1, q_prime.one_lt⟩ ⟨0, p_prime.pos⟩) x = 0 →
     ∀ i : Fin q, i ≠ ⟨0, q_prime.pos⟩ → tau3 (omega i ⟨0, p_prime.pos⟩) x = 0
+  /-- **Peterfalvi (3.9.b), full row-axis Galois orbit.** -/
+  eta_row_galois_orbit : ∀ i : Fin q, i ≠ ⟨0, q_prime.pos⟩ →
+    ∃ u : ℂ ≃+* ℂ,
+      ClassFunction.mapRingEquiv u (tau3 (omega ⟨1, q_prime.one_lt⟩ ⟨0, p_prime.pos⟩)) =
+        tau3 (omega i ⟨0, p_prime.pos⟩)
+  /-- **Peterfalvi (3.9.b), full column-axis Galois orbit.** -/
+  eta_column_galois_orbit : ∀ j : Fin p, j ≠ ⟨0, p_prime.pos⟩ →
+    ∃ u : ℂ ≃+* ℂ,
+      ClassFunction.mapRingEquiv u (tau3 (omega ⟨0, q_prime.pos⟩ ⟨1, p_prime.one_lt⟩)) =
+        tau3 (omega ⟨0, q_prime.pos⟩ j)
   /-- **Peterfalvi (3.9.c), the `η`-grid integrality on generic elements** (issue-3002
   keystone): for `g` of order prime to `pq`, each grid value `η_{ij}(g) = (τ₃ω)_{ij}(g)` is a
   rational integer.  The genuine §3/§5 Dade-Galois fact (`σ` intertwines the cyclotomic Galois

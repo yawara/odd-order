@@ -274,4 +274,33 @@ theorem tSideDadeMap_eta_axis_coefficients_constant [Finite G]
       (fun xi hxi => horth xi hxi ⟨0, hyp.base.q_prime.pos⟩ j)
     exact Int.cast_injective ((hm ⟨0, hyp.base.q_prime.pos⟩ j).symm.trans htransport)
 
+/-- **Peterfalvi (3.9.b), the threaded full Galois orbits in eta-grid notation.**
+The Section 16 carrier stores the producer equalities in their canonical form
+`mapRingEquiv u (tau3 (omega ...)) = tau3 (omega ...)`; the defining identity
+`eta = tau3 ∘ omega` turns them into the exact row/column orbit pair consumed by
+`tSideDadeMap_eta_axis_coefficients_constant`. -/
+theorem eta_axis_galois_orbits_of_hypothesis
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+    (∀ i : Fin base.q, i ≠ ⟨0, base.q_prime.pos⟩ →
+      ∃ sigma : ℂ ≃+* ℂ,
+        ClassFunction.mapRingEquiv sigma
+            (base.eta ⟨1, base.q_prime.one_lt⟩ ⟨0, base.p_prime.pos⟩) =
+          base.eta i ⟨0, base.p_prime.pos⟩) ∧
+    (∀ j : Fin base.p, j ≠ ⟨0, base.p_prime.pos⟩ →
+      ∃ sigma : ℂ ≃+* ℂ,
+        ClassFunction.mapRingEquiv sigma
+            (base.eta ⟨0, base.q_prime.pos⟩ ⟨1, base.p_prime.one_lt⟩) =
+          base.eta ⟨0, base.q_prime.pos⟩ j) := by
+  constructor
+  · intro i hi
+    obtain ⟨sigma, hsigma⟩ := base.eta_row_galois_orbit i hi
+    refine ⟨sigma, ?_⟩
+    rw [base.eta_eq_tau_omega, base.eta_eq_tau_omega]
+    exact hsigma
+  · intro j hj
+    obtain ⟨sigma, hsigma⟩ := base.eta_column_galois_orbit j hj
+    refine ⟨sigma, ?_⟩
+    rw [base.eta_eq_tau_omega, base.eta_eq_tau_omega]
+    exact hsigma
+
 end OddOrder.Peterfalvi.S16

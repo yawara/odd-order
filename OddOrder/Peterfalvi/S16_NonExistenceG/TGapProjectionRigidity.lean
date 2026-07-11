@@ -478,4 +478,115 @@ theorem etaGrid_coefficients_eq_column_or_row_of_sum_sq_le
   apply etaGrid_coefficients_eq_column_or_row base hqp m hprincipal hrow hcol hrelation
   exact etaGrid_axis_bound_of_sum_sq_le base m hprincipal hrow hcol hrelation hfull
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- The eta-grid projection has precisely its defining coefficient against
+each eta character. -/
+theorem etaGridProjection_inner_eta [Finite G]
+    [fintypeG : Fintype G] [invertibleG : Invertible (Nat.card G : ℂ)]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    (m : Fin base.q → Fin base.p → ℤ) (k : Fin base.q) (l : Fin base.p) :
+    ClassFunction.inner (etaGridProjection base m) (base.eta k l) = (m k l : ℂ) := by
+  have hfintype : fintypeG =
+      OddOrder.Peterfalvi.S12.FiniteInduce.finiteGFintype := Subsingleton.elim _ _
+  subst fintypeG
+  have hinvertible : invertibleG =
+      OddOrder.Peterfalvi.S12.FiniteInduce.natCardInvCG := Subsingleton.elim _ _
+  subst invertibleG
+  rw [etaGridProjection, OddOrder.RepresentationTheory.inner_sum_left]
+  rw [Finset.sum_eq_single_of_mem k (Finset.mem_univ _) (fun i _ hik => by
+    rw [OddOrder.RepresentationTheory.inner_sum_left]
+    apply Finset.sum_eq_zero
+    intro j _
+    rw [ClassFunction.inner_smul_left, eta_orthonormal, if_neg, mul_zero]
+    exact fun h => hik h.1)]
+  rw [OddOrder.RepresentationTheory.inner_sum_left]
+  rw [Finset.sum_eq_single_of_mem l (Finset.mem_univ _) (fun j _ hjl => by
+    rw [ClassFunction.inner_smul_left, eta_orthonormal, if_neg, mul_zero]
+    exact fun h => hjl h.2)]
+  rw [ClassFunction.inner_smul_left, eta_orthonormal, if_pos ⟨rfl, rfl⟩, mul_one]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- Subtracting the eta-grid projection kills every eta coefficient. -/
+theorem etaGrid_projection_residual_inner_eta_eq_zero [Finite G]
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    (b : ClassFunction G ℂ) (m : Fin base.q → Fin base.p → ℤ)
+    (hm : ∀ i j, ClassFunction.inner b (base.eta i j) = (m i j : ℂ)) :
+    ∀ i j,
+      ClassFunction.inner (b - etaGridProjection base m) (base.eta i j) = 0 := by
+  intro i j
+  rw [ClassFunction.inner_sub_left, hm,
+    etaGridProjection_inner_eta base m i j, sub_self]
+
+/-- The second projection alternative is literally the zero-row eta sum. -/
+theorem etaGridProjection_eq_zeroRow_of_coefficients_eq_row
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    (m : Fin base.q → Fin base.p → ℤ)
+    (hrow : ∀ i j,
+      m i j = if i = ⟨0, base.q_prime.pos⟩ then 1 else 0) :
+    etaGridProjection base m =
+      ∑ j : Fin base.p, base.eta ⟨0, base.q_prime.pos⟩ j := by
+  classical
+  rw [etaGridProjection]
+  rw [Finset.sum_eq_single_of_mem (⟨0, base.q_prime.pos⟩ : Fin base.q)
+    (Finset.mem_univ _) (fun i _ hi => by
+      apply Finset.sum_eq_zero
+      intro j _
+      rw [hrow, if_neg hi, Int.cast_zero, zero_smul])]
+  apply Finset.sum_congr rfl
+  intro j _
+  rw [hrow, if_pos rfl, Int.cast_one, one_smul]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.9)(a), the zero-column coefficient shape is the
+zero-column eta projection.**  This is the instance-stable linear-algebra
+bridge from the surviving coefficient alternative to `eq_proj_eta`. -/
+theorem etaGrid_zeroColumn_projection_of_coefficients_eq_column [Finite G]
+    [fintypeG : Fintype G] [invertibleG : Invertible (Nat.card G : ℂ)]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    (b : ClassFunction G ℂ) (m : Fin base.q → Fin base.p → ℤ)
+    (hm : ∀ i j, ClassFunction.inner b (base.eta i j) = (m i j : ℂ))
+    (hcolumn : ∀ i j,
+      m i j = if j = ⟨0, base.p_prime.pos⟩ then 1 else 0) :
+    ∀ j : Fin base.p,
+      ClassFunction.inner (base.eta ⟨0, base.q_prime.pos⟩ j) b =
+        ClassFunction.inner (base.eta ⟨0, base.q_prime.pos⟩ j)
+          (∑ i : Fin base.q, base.eta i ⟨0, base.p_prime.pos⟩) := by
+  have hfintype : fintypeG =
+      OddOrder.Peterfalvi.S12.FiniteInduce.finiteGFintype := Subsingleton.elim _ _
+  subst fintypeG
+  have hinvertible : invertibleG =
+      OddOrder.Peterfalvi.S12.FiniteInduce.natCardInvCG := Subsingleton.elim _ _
+  subst invertibleG
+  intro j
+  have hleft : ClassFunction.inner (base.eta ⟨0, base.q_prime.pos⟩ j) b =
+      if j = ⟨0, base.p_prime.pos⟩ then 1 else 0 := by
+    calc
+      ClassFunction.inner (base.eta ⟨0, base.q_prime.pos⟩ j) b =
+          star (ClassFunction.inner b (base.eta ⟨0, base.q_prime.pos⟩ j)) :=
+        OddOrder.RepresentationTheory.inner_conj_symm _ _
+      _ = star (m ⟨0, base.q_prime.pos⟩ j : ℂ) := by rw [hm]
+      _ = if j = ⟨0, base.p_prime.pos⟩ then 1 else 0 := by
+        rw [hcolumn]
+        split <;> simp
+  have hright : ClassFunction.inner (base.eta ⟨0, base.q_prime.pos⟩ j)
+      (∑ i : Fin base.q, base.eta i ⟨0, base.p_prime.pos⟩) =
+        if j = ⟨0, base.p_prime.pos⟩ then 1 else 0 := by
+    rw [OddOrder.RepresentationTheory.inner_sum_right]
+    by_cases hj : j = ⟨0, base.p_prime.pos⟩
+    · subst j
+      rw [Finset.sum_eq_single_of_mem (⟨0, base.q_prime.pos⟩ : Fin base.q)
+        (Finset.mem_univ _) (fun i _ hi => by
+          rw [eta_orthonormal, if_neg]
+          rintro ⟨h, -⟩
+          exact hi h.symm)]
+      rw [eta_orthonormal, if_pos ⟨rfl, rfl⟩]
+      simp
+    · simp only [if_neg hj]
+      apply Finset.sum_eq_zero
+      intro i _
+      rw [eta_orthonormal, if_neg]
+      exact fun h => hj h.2
+  exact hleft.trans hright.symm
+
 end OddOrder.Peterfalvi.S16

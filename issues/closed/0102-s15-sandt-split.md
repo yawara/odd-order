@@ -40,3 +40,19 @@ S15_SAndT.lean (または後継 leaf 群) が各 1,500 行以下、full build gr
 - content 依存: [9076](9076-cyclicti-rigidity-dade-crossrel.md) (c の (13.18) carve-out)、
   [1016](1016-tside-typepdata-threading.md)、[3003](3003-gammagrid-overstatement-and-crossrel.md)
 - 検出 tick: 合流 `a3ecec5c` (2026-07-08)
+
+## ✅ 完了 (2026-07-12、lane b 実施)
+
+defer 前提 (dual-lane active frontier) の解消を確認して lane b が実施: lane c の未マージ
+commit は S15_SAndT に触れておらず (PF 11.x T-side 作業中)、本 file は単独レーン frontier
+だった。iter 4 (400e8649) 以降 2000 行超過で leaf が longFile linter 赤だった事後修正。
+
+- 凍結 prefix = (13.17.c)/(13.19.c1) complement/maximal 構造クラスタ 18 宣言を
+  `S15_ComplementStructure.lean` (597 行、記述的英語名) へ押し出し (commit 7578251d)
+- import チェーン: SAndTDefs (1084) → SAndTBasic (1176) → Gate3 (850) →
+  **ComplementStructure (597)** → SAndT TAIL (1486) — 全 leaf ≤1500 行
+- module 名不変・下流 import 不変 (root 登録は tail のみ)・sorry 3 本保存
+  (E⊄Q → ComplementStructure:86 / Y-norm SAndT:1168 / TypeIOrtho SAndT:1406)
+- leaf build OddOrder.FeitThompson green (error 0)
+
+完了条件 (各 leaf ≤1500・sorry 不変・下流不変) 充足。

@@ -1660,3 +1660,34 @@ dadeIntegralCharacterMap_conj_of_support (S07 lift)。
 - assembly gammaGrid_real: Γ̄ = D(β̄₁)−1+η̄_{01} (conj_sub/add + trivial real +
   Dade-conj [A0beta support]) = D(β_{j'})−1+η_{0,j'} (β̄₁ = Ind1−μ̄_{01}、induce_conj +
   mu_conj、j' = finNeg #1 ≠ 0) = Γ (proven gammaGrid_defGamma at j')。
+
+## ✅ (2026-07-12、/loop iter 7) — GammaReal 部品 2: producer conj-pair 3 本 (commit 上記)
+
+omegaS_conj / muS_conj / tau3W_omegaS_conj + eqQ_finNeg_eq_rowInv + conj↔mapRingEquiv bridge。
+**残 = 仕上げ 1 unit**: (i) SubcoherenceInputs + Section16Inputs + cd に `mu_conj`/`eta_conj`
+fields (finNeg 形、omega_conj は不要 — assembly は μ/η のみ)、producer discharge = muS_conj /
+tau3W_omegaS_conj (eta := τ₃∘ω 供給ゆえ直結)、(ii) assembly gammaGrid_real:
+Γ̄ = D(β̄₁)−1+η̄_{01} → β̄₁ = Ind1−μ̄_{01} (conj_sub + induce_conj + trivial-real + mu_conj)
+= β_{finNeg #1}、D-conj = dadeIntegralCharacterMap_conj_of_support (A0beta support、iter 5-6)、
+η̄_{01} = η_{0,finNeg #1} (eta_conj) → = Γ (proven gammaGrid_defGamma at finNeg #1 ≠ 0)。
+⚠ conj rw の instance 罠は congrArg (実型注釈) 方式で回避 (commit message 参照)。
+
+## ✅ (2026-07-12、/loop iter 8) — gammaGrid_real (Coq GammaReal) 完全証明 + S15_SAndT 再分割
+
+**(13.18.c) Γ-real 閉包** (commit 181391d7): conj-pair fields (`mu_conj` (4.9.a) / `eta_conj`
+(3.9.a)、finNeg 形) を SubcoherenceInputs / Section16Inputs / Section16CharacterData の 3 層に
+追加、producer discharge = iter 7 の muS_conj / tau3W_omegaS_conj (eta := τ₃∘ω 供給ゆえ直結)。
+assembly = 設計どおり: Γ̄ = D(β̄₁)−1+η̄₀₁ → β̄₁ = β_{finNeg #1} (conj_sub + induce_conj +
+trivial-real + mu_conj) → Dade-conj 可換 (A0beta support) → proven gammaGrid_defGamma at
+finNeg #1 ≠ 0。⚠ 落とし穴 2 つ: (i) `open scoped S12.FiniteInduce in` を **docstring より前**に
+置く (docstring–theorem 間は構文エラー)、(ii) iter 4 以降 S15_SAndT が 2000 行超で longFile
+linter 赤だった (leaf build 検証漏れ) — 事後修正。
+
+**S15_SAndT prefix-split** (commit 7578251d、issue 0102 closed): complement 構造クラスタ
+18 宣言 → `S15_ComplementStructure.lean` (597)。TAIL 1486 行。sorry 3 本保存。
+
+**S15_SAndT 系残 sorry 3**: E⊄Q (13.19.c1) → ComplementStructure:86 / (13.18.d) Y-norm
+→ SAndT:1168 / TypeIOrtho producer → SAndT:1406。**次 = (13.18.d) gammaGrid_Y_norm_bound**
+(文書順 13.18 < 13.19)。部品状況: betaGrid_norm (13.18.b) proven / gammaGrid_orthogonal_one +
+gammaGrid_real (13.18.c) proven / Dade 等長 = dadeIntegralCharacterMap_inner_eq_on_supported_span。
+Coq 対応 = PFsection13.v:1915-1934 (leqif 鎖)。

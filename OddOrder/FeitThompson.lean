@@ -856,6 +856,71 @@ theorem omegaSChar_finNeg (i : Fin tp.q) (j : Fin tp.p) :
   congr 1
   exact Units.val_inv_eq_inv_val _
 
+/-- The `eqQ` reindex intertwines row negation (`S15.finNeg`) with the character-inversion
+row permutation `rowInv`: both send `i` to the index of the inverse `W₁`-character. -/
+theorem eqQ_finNeg_eq_rowInv (i : Fin tp.q) :
+    eqQ hG mp tp (OddOrder.Peterfalvi.S15.finNeg tp.q_prime.pos i)
+      = OddOrder.Peterfalvi.S06.rowInv (mp.certainTypeS hG) (eqQ hG mp tp i) := by
+  apply (mp.certainTypeS hG).w1CharEquiv.injective
+  rw [eqQ_finNeg hG mp tp i, (mp.certainTypeS hG).w1CharEquiv_finNeg,
+    OddOrder.Peterfalvi.S06.w1CharEquiv_rowInv]
+
+/-- **CF-level conjugation pairs the `ω`-grid at the negated index** (Peterfalvi (3.9.a),
+character half): `ω̄_{ij} = ω_{−i,−j}` — complex conjugation inverts the linear grid character
+(`galoisMap_conj_omega`), and index negation is character inversion (`omegaSChar_finNeg`). -/
+theorem omegaS_conj (i : Fin tp.q) (j : Fin tp.p) :
+    (omegaS hG mp tp i j).conj
+      = omegaS hG mp tp (OddOrder.Peterfalvi.S15.finNeg tp.q_prime.pos i)
+          (OddOrder.Peterfalvi.S15.finNeg tp.p_prime.pos j) := by
+  have hg2 := congrArg
+    (fun χ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(tiCyclicW hG mp tp).W =>
+      (χ : ClassFunction ↥(tiCyclicW hG mp tp).W ℂ))
+    (OddOrder.Peterfalvi.S06.galoisMap_conj_omega (tiCyclicW hG mp tp)
+      (omegaSChar hG mp tp i j))
+  simp only [IrreducibleCharacter.galoisMap_apply_coe] at hg2
+  rw [omegaS_eq_omega_omegaSChar, omegaS_eq_omega_omegaSChar, omegaSChar_finNeg,
+    ClassFunction.conj_eq_mapRingEquiv_conjAe]
+  exact hg2
+
+/-- **CF-level conjugation pairs the `μ`-grid at the negated index** (Peterfalvi (4.9)(a)):
+`μ̄_{ij} = μ_{−i,−j}` — the §6 conjugation bridge `certainType_mu_conj_eq` with the two
+power-enumeration index bridges (`chi2enum_finNeg`, `eqQ_finNeg_eq_rowInv`). -/
+theorem muS_conj (i : Fin tp.q) (j : Fin tp.p) :
+    (muS hG mp tp i j).conj
+      = muS hG mp tp (OddOrder.Peterfalvi.S15.finNeg tp.q_prime.pos i)
+          (OddOrder.Peterfalvi.S15.finNeg tp.p_prime.pos j) := by
+  have hg2 := congrArg
+    (fun χ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥mp.S =>
+      (χ : ClassFunction ↥mp.S ℂ))
+    (OddOrder.Peterfalvi.S06.certainType_mu_conj_eq (mp.certainTypeS hG)
+      (chi2enum hG mp tp j) (eqQ hG mp tp i))
+  simp only [IrreducibleCharacter.galoisMap_apply_coe] at hg2
+  rw [muS, muS, chi2enum_finNeg hG mp tp j, eqQ_finNeg_eq_rowInv hG mp tp i,
+    ClassFunction.conj_eq_mapRingEquiv_conjAe]
+  exact hg2
+
+/-- **CF-level conjugation pairs the `η = τ₃∘ω` grid at the negated index** (Peterfalvi (3.9.a),
+full CF form — strengthening the generic-element `tau3W_omegaS_pair_of_coprime` below):
+`(τ₃ω_{ij})̄ = τ₃ω_{−i,−j}`.  `σ` intertwines the coefficientwise Galois action
+(`sigma_mapRingEquiv_comm`), and conjugation inverts the grid character
+(`galoisMap_conj_omega` + `omegaSChar_finNeg`). -/
+theorem tau3W_omegaS_conj (i : Fin tp.q) (j : Fin tp.p) :
+    (tau3W hG mp tp (omegaS hG mp tp i j)).conj
+      = tau3W hG mp tp (omegaS hG mp tp (OddOrder.Peterfalvi.S15.finNeg tp.q_prime.pos i)
+          (OddOrder.Peterfalvi.S15.finNeg tp.p_prime.pos j)) := by
+  have hcomm := OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_mapRingEquiv_comm
+    (tiCyclicW hG mp tp) rfl (tiCyclicWDadeApp hG mp tp) Complex.conjAe.toRingEquiv
+    ((tiCyclicW hG mp tp).omega (omegaSChar hG mp tp i j))
+  have hg2 := congrArg
+    (fun χ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(tiCyclicW hG mp tp).W =>
+      (χ : ClassFunction ↥(tiCyclicW hG mp tp).W ℂ))
+    (OddOrder.Peterfalvi.S06.galoisMap_conj_omega (tiCyclicW hG mp tp)
+      (omegaSChar hG mp tp i j))
+  rw [hg2] at hcomm
+  rw [omegaS_eq_omega_omegaSChar, omegaS_eq_omega_omegaSChar, omegaSChar_finNeg,
+    ClassFunction.conj_eq_mapRingEquiv_conjAe]
+  exact hcomm
+
 /-- **Peterfalvi (3.9.a) conjugate-pair symmetry on generic elements** (issue-3002 supply):
 for `g` of order prime to `pq`, the `η`-grid pairs under the index negation `(i,j) ↦ (−i,−j)`
 (`S15.finNeg`), `(τ₃ω)_{−i,−j}(g) = (τ₃ω)_{ij}(g)`.
@@ -1364,6 +1429,8 @@ noncomputable def section16CharacterData_of_isMinimalSimpleOdd {G : Type*} [Grou
         Section16CharacterData.muS_diff_support hG mp tp i hj0 hk0 hdeg
       mu_apply_of_not_mem_W2 := fun i j w hwW hwS hw2 =>
         Section16CharacterData.muS_apply_of_not_mem_W2 hG mp tp i j w hwW hwS hw2
+      mu_conj := Section16CharacterData.muS_conj hG mp tp
+      tau3_omega_conj := Section16CharacterData.tau3W_omegaS_conj hG mp tp
       mu_colSum_eq_induce := fun j => by
         refine ⟨ClassFunction.restrict ((derivedInG mp.S).subgroupOf mp.S)
             (((mp.certainTypeS hG).columnFamily
@@ -1419,6 +1486,10 @@ noncomputable def section16CharacterData_of_isMinimalSimpleOdd {G : Type*} [Grou
           exact hx (OddOrder.GroupTheory.mem_conjClassSet.mpr ⟨a, ha, c, hc⟩))
       eta_row_vanish_of_one_zero := fun x h0 i hi =>
         Section16CharacterData.tau3W_omegaS_row_vanish_of_one_zero hG mp tp h0 i hi
+      eta_row_galois_orbit :=
+        Section16CharacterData.tau3W_omegaS_row_galois_orbit hG mp tp
+      eta_column_galois_orbit :=
+        Section16CharacterData.tau3W_omegaS_column_galois_orbit hG mp tp
       eta_intCast_of_coprime := fun g hg i j =>
         Section16CharacterData.tau3W_omegaS_intCast_of_coprime hG mp tp i j hg
       eta_pair_of_coprime := fun g hg i j =>
@@ -1496,6 +1567,8 @@ noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [F
     mu_orthonormal := cd.mu_orthonormal
     mu_diff_support := cd.mu_diff_support
     mu_apply_of_not_mem_W2 := cd.mu_apply_of_not_mem_W2
+    mu_conj := cd.mu_conj
+    tau3_omega_conj := cd.tau3_omega_conj
     mu_colSum_eq_induce := cd.mu_colSum_eq_induce
     nu_definition := cd.nu_definition
     q_lt_p := tp.q_lt_p
@@ -1519,6 +1592,8 @@ noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [F
     eta_complete_vanish := cd.eta_complete_vanish
     eta_fourcorner_vanish := cd.eta_fourcorner_vanish
     eta_row_vanish_of_one_zero := cd.eta_row_vanish_of_one_zero
+    eta_row_galois_orbit := cd.eta_row_galois_orbit
+    eta_column_galois_orbit := cd.eta_column_galois_orbit
     eta_intCast_of_coprime := cd.eta_intCast_of_coprime
     eta_pair_of_coprime := cd.eta_pair_of_coprime
     eta_principal_of_coprime := cd.eta_principal_of_coprime }
@@ -1623,6 +1698,8 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       mu_orthonormal := inp.mu_orthonormal
       mu_diff_support := inp.mu_diff_support
       mu_apply_of_not_mem_W2 := inp.mu_apply_of_not_mem_W2
+      mu_conj := inp.mu_conj
+      eta_conj := inp.tau3_omega_conj
       mu_colSum_eq_induce := inp.mu_colSum_eq_induce
       nu_definition := inp.nu_definition
       m := 1 - 1 / ((inp.q : ℚ) - 1) - ((inp.q : ℚ) - 1) / (inp.q : ℚ) ^ inp.p +
@@ -1648,6 +1725,8 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       eta_complete_vanish := inp.eta_complete_vanish
       eta_fourcorner_vanish := inp.eta_fourcorner_vanish
       eta_row_vanish_of_one_zero := inp.eta_row_vanish_of_one_zero
+      eta_row_galois_orbit := inp.eta_row_galois_orbit
+      eta_column_galois_orbit := inp.eta_column_galois_orbit
       eta_intCast_of_coprime := inp.eta_intCast_of_coprime
       eta_pair_of_coprime := inp.eta_pair_of_coprime
       eta_principal_of_coprime := inp.eta_principal_of_coprime }
@@ -1769,4 +1848,3 @@ theorem feitThompson {G : Type*} [Group G] [Finite G]
   feitThompson_of_noMinimalSimpleOdd (fun _ _ _ hG => noMinimalSimpleOdd hG) hodd
 
 end OddOrder
-
