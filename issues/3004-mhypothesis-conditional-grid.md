@@ -800,3 +800,33 @@ feature commits: `51120309`, `9130596f`。
   したが、`TTypeII -> S12_Noncoherence -> ... -> FeitThompsonSetup ->
   S16_NonExistenceG -> TTypeII` の循環を確認。変更を撤回して TTypeII build
   (4120 jobs) green を復旧し、issue は premise false として close した。
+
+
+## lane-c concrete eta-axis full Galois orbit producer (2026-07-12)
+
+feature commit: `c1fa962c`.
+
+- Hub 追記の診断を concrete code 上で独立検証した。旧
+  `tau3W_omegaS_row_vanish_of_one_zero` は S05
+  `exists_mapRingEquiv_sigma_omega_pow` の full class-function equality `hu` を内部で
+  構成してから一点 `x` に評価しており、情報を pointwise vanishing へ落としていた。
+- S-side dual の二つの列挙が literal power enumeration であることから、
+  `omegaSChar_row_eq_pow` / `omegaSChar_column_eq_pow` を実証明した。両 axis の base
+  character がそれぞれ正確に prime order `q` / `p` を持つことも、axis の prime-power
+  triviality と grid injectivity から証明した。
+- `tau3W_omegaS_row_galois_orbit` と
+  `tau3W_omegaS_column_galois_orbit` は任意の nonzero index に対し
+  `mapRingEquiv u eta_base = eta_index` という full class-function equality を返す。
+  旧 row vanishing theorem はこの orbit equality の一点評価だけに縮約し、重複していた
+  cyclic-generator 探索を削除した。
+- concrete producer は `Section16CharacterData` namespace 内で完結し、今回
+  `Section16CharacterData` / `Section16Inputs` /
+  `Peterfalvi.S15.Hypothesis` の structure signature は変更していない。
+- threading DAG を再監査した結果、T-side abstract consumer
+  `tSideDadeMap_eta_axis_coefficients_constant` へ渡す signature-free 経路は存在しない。
+  canonical な経路は上記三 carrier に row/column full-orbit fields を同じ statement で
+  threading するものに一意である。これは既存 row pointwise field の情報を強める独立 field
+  追加であり、concrete producer 自体は既に構成済みだが、carrier signature 変更なので hub
+  merge/design gate の対象として分離する。
+- main `cce4dbc8` 同期後、FeitThompson build と AxiomsCheck (4149 jobs) は exit 0。
+  9 theorem を AxiomsCheck 登録済み。新 axiom・新 sorry なし。
