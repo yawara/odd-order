@@ -1086,18 +1086,18 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have hζform := hζT
     rw [hcalT1, Finset.mem_coe, Finset.mem_image] at hζform
     obtain ⟨θ, hθ, hζeq⟩ := hζform
-    have hζsupp_ind := typeIII_induced_source_support hyp θ
-    have hζsupp : ζ.support ⊆
-        ((derivedInG hyp.base.T).subgroupOf hyp.base.T :
-          Set ↥hyp.base.T) :=
-      hζeq ▸ hζsupp_ind
     have hζ1_ind :=
       typeIII_induced_source_degree hyp θ (hlinear θ hθ)
     have hζ1 : ζ 1 = (hyp.base.p : ℂ) :=
       hζeq ▸ hζ1_ind
-    obtain ⟨ν0, hνZ, hνR, hβZ, hβsupp, hτβZ, hτβ1, hβconj, hνinner⟩ :=
-      exists_typeIII_primeTIDifference_with_anchor_inner hG hyp hIII
-        (hirr ζ hζT).mem_ZIrr hζsupp hζ1
+    have hζirr_ind : IsIrreducibleCharacter (ClassFunction.induce
+        ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction) := by
+      simpa only [hζeq] using hirr ζ hζT
+    obtain ⟨ν0, hνZ, hνR, hβZ, hβsupp, hτβZ, hτβ1, hβconj,
+        hνinner, hβnorm, hτβnorm⟩ :=
+      exists_typeIII_induced_primeTIDifference_with_norm
+        hG hyp hIII θ (hne θ hθ) hζirr_ind hζ1_ind
+    rw [hζeq] at hβZ hβsupp hτβZ hτβ1 hβconj hβnorm hτβnorm
     have hζone : ClassFunction.inner ζ
         (trivialClassFunction ↥hyp.base.T) = 0 := by
       rw [← hζeq]

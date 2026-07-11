@@ -3358,6 +3358,8 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.exists_typeIII_primeTIDifference_induced_inner_self
 set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.exists_typeIII_induced_primeTIDifference_with_norm
+set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.exists_typeIII_primeTIDifference_with_anchor_inner
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.tSideCoherentExtension_inner_trivial
