@@ -850,20 +850,7 @@ theorem Hypothesis.residueS_mu2_diff_dade_apply_of_mem_V [Finite G]
   exact OddOrder.Peterfalvi.S06.certainType_diff_dade_apply_eq_of_mem_V
     (hyp.hyp46S hG) hχj hχk i hdeg hv
 
-/-- **Peterfalvi (13.3)(a), row-`0` degree equality** (Coq `FTprTIred1`, `PFsection13.v:276`,
-through `prTIred_1`, `PFsection4.v:552`): for `j ≥ 1` the reducible column sum `μ_j` is induced
-from a *linear* character of the abelian Fitting factor `PC` (Pf (13.3)(a), via
-`typeP_reducible_core_Ind`), so `μ_j(1) = uq` uniformly in `j`, whence the per-entry degrees
-`μ_{0j}(1) = μ_j(1)/w₁ = u` agree across nontrivial columns.  This equality form is exactly how
-Coq's `defGamma` discharges the degree hypothesis of `prDade_sub_TIirr`
-(`PFsection13.v:1909`: `mulfI (neq0CG W1)` cancellation against `prTIred_1` + `FTprTIred1`).
-Genuine Pf (13.3)(a) mathematics — not derivable from the abstract grid fields
-(`mu_degree_modEq_delta` gives only the mod-`q` congruence); cf. issues 9076/9014. -/
-theorem Hypothesis.mu_row0_apply_one_eq [Finite G] (hyp : Hypothesis (G := G))
-    {j k : Fin hyp.p} (hj0 : (j : ℕ) ≠ 0) (hk0 : (k : ℕ) ≠ 0) :
-    hyp.mu ⟨0, hyp.q_prime.pos⟩ j 1 = hyp.mu ⟨0, hyp.q_prime.pos⟩ k 1 := sorry
-
-/-- **Prime-`TI` support pin** (Coq `prDade_sub_TIirr_on`, `PFsection4.v`): the `μ`-column
+/-- **Prime-`TI` support pin, proven** (Coq `prDade_sub_TIirr_on`, `PFsection4.v`): the `μ`-column
 difference `μ_{0j} − μ_{0,#1}` is supported inside `A₀(S) = A(S) ∪ V^S` — its support meets `S`
 only in `P^# ∪ V_S`, because the two prime-`TI` residues share the same `1_S`-part off `A₀(S)` and
 it cancels in the difference.  This is the `S`-side instance of Coq `prDade_sub_TIirr_on`
@@ -871,11 +858,16 @@ it cancels in the difference.  This is the `S`-side instance of Coq `prDade_sub_
 
 **Honest signature (issue 9076, 2026-07-11)**: carries `(hj0 : (j:ℕ) ≠ 0)` — the unrestricted
 `∀ j` form is *false* at the trivial column `j = 0` (`μ_{00}(1) = 1 ≠ μ_{0,#1}(1)`, and `1 ∉ A₀`).
-The sole consumer `tauS_mu_row0_cross` (S15_SAndT) passes its `_hj`.  Discharged from the
-`(13.18)` grounding field `mu_diff_support` (issue 9081: producer-supplied from the proven
-`Section16CharacterData.muS_diff_support`, Dade-free via `hyp46SmpCore`); the remaining supply is
-the degree equality `mu_row0_apply_one_eq` (Pf (13.3)(a)). -/
-theorem Hypothesis.tauS_mu_row0_diff_support [Finite G] (hyp : Hypothesis (G := G))
+The sole consumer `tauS_mu_row0_cross` (S15_SAndT) passes its `_hj`.
+
+**Fully discharged (2026-07-11)**: the support claim is the `(13.18)` grounding field
+`mu_diff_support` (issue 9081: producer-supplied by the proven
+`Section16CharacterData.muS_diff_support`, Dade-free via `hyp46SmpCore`), and the degree
+hypothesis is the proven per-entry degree `mu_apply_one_eq_u` (Pf (13.3)(a): `μ_{ij}(1) = u` for
+`j ≠ 0`, via `mu_j_isIndPC` + `H_index_eq_uq`) — the same two steps Coq's `defGamma` uses
+(`prDade_sub_TIirr` + the `FTprTIred1` `mulfI`-cancellation, `PFsection13.v:1909`). -/
+theorem Hypothesis.tauS_mu_row0_diff_support [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (j : Fin hyp.p) (hj0 : (j : ℕ) ≠ 0) :
     (hyp.mu ⟨0, hyp.q_prime.pos⟩ j
         - hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩).support
@@ -883,7 +875,11 @@ theorem Hypothesis.tauS_mu_row0_diff_support [Finite G] (hyp : Hypothesis (G := 
   hyp.mu_diff_support ⟨0, hyp.q_prime.pos⟩
     (fun h => hj0 (congrArg Fin.val h))
     (fun h => one_ne_zero (congrArg Fin.val h))
-    (hyp.mu_row0_apply_one_eq hj0 one_ne_zero)
+    ((hyp.mu_apply_one_eq_u hG ⟨0, hyp.q_prime.pos⟩ j
+        (fun h => hj0 (congrArg Fin.val h))).trans
+      (hyp.mu_apply_one_eq_u hG ⟨0, hyp.q_prime.pos⟩
+        ⟨1, by have := hyp.three_le_p; omega⟩
+        (fun h => one_ne_zero (congrArg Fin.val h))).symm)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Prime-`TI` `V`-value pin** (Coq `prTIirr_id` + Dade `Dade_id` on the regular set): on the

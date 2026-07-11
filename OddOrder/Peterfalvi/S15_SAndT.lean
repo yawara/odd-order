@@ -1150,7 +1150,7 @@ theorem tauS_mu_row0_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have hμne : hyp.mu ⟨0, hyp.q_prime.pos⟩ j
         ≠ hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩ :=
       hyp.mu_row0_ne hj1
-    have hsupp := hyp.tauS_mu_row0_diff_support j _hj
+    have hsupp := hyp.tauS_mu_row0_diff_support hG j _hj
     have hZIrrS : (hyp.mu ⟨0, hyp.q_prime.pos⟩ j
           - hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)
         ∈ ZIrr (↥hyp.S) :=
