@@ -59,6 +59,7 @@ import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25Final
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25Group
 import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
+import OddOrder.GroupTheory.RepresentationTheory.GaloisInnerTransport
 import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Inertia
 import OddOrder.GroupTheory.RepresentationTheory.InertiaAbelianQuotient

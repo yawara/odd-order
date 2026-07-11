@@ -82,6 +82,36 @@ theorem inducedFamily_closedUnderConjugate [Finite G] (M : Subgroup G) :
     simpa using ClassFunction.induce_conj ((derivedInG M).subgroupOf M)
       (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ)
 
+open scoped FiniteInduce in
+/-- **The induced family `S` is closed under coefficient automorphisms** (the Galois analogue of
+`inducedFamily_closedUnderConjugate`): for `χ = Ind_{M'}^M θ ∈ S` and a ring automorphism
+`σ : ℂ ≃+* ℂ`, the transported `σχ = Ind_{M'}^M (σθ)` (`ClassFunction.mapRingEquiv_induce`), and
+`σθ = galoisMap σ θ` is again a non-trivial irreducible of `M'` (the trivial character is
+`σ`-fixed).  This is the `ζ^σ ∈ S` input of the Galois row/column-constancy step of the
+(11.9.a) grid analysis (Coq `aut_phi`/`cfAut_seqInd`, issue 1024). -/
+theorem inducedFamily_closedUnderMapRingEquiv [Finite G] (M : Subgroup G) (σ : ℂ ≃+* ℂ)
+    {φ : ClassFunction ↥M ℂ} (hφ : φ ∈ inducedFamily M) :
+    ClassFunction.mapRingEquiv σ φ ∈ inducedFamily M := by
+  classical
+  obtain ⟨θ, hθ_ne, hφeq⟩ := hφ
+  refine ⟨IrreducibleCharacter.galoisMap σ θ, ?_, ?_⟩
+  · -- `σθ ≠ 1`: else `θ = σ⁻¹(σθ) = σ⁻¹(1) = 1` (the trivial character is `σ`-fixed).
+    intro h
+    apply hθ_ne
+    have h' := congrArg (IrreducibleCharacter.galoisMap σ.symm) h
+    rw [IrreducibleCharacter.galoisMap_symm_galoisMap] at h'
+    rw [h']
+    apply Subtype.ext
+    show (IrreducibleCharacter.galoisMap σ.symm
+        (trivialIrreducibleCharacter ↥((derivedInG M).subgroupOf M))
+        : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ)
+      = trivialClassFunction ↥((derivedInG M).subgroupOf M)
+    ext x
+    rw [IrreducibleCharacter.galoisMap_apply_apply]
+    show σ.symm ((trivialClassFunction ↥((derivedInG M).subgroupOf M) : _ → ℂ) x) = _
+    rw [trivialClassFunction_apply, map_one]
+  · rw [hφeq, ClassFunction.mapRingEquiv_induce, IrreducibleCharacter.galoisMap_apply_coe]
+
 /-- **Complex conjugation commutes with `G`-conjugation** of class functions: for a normal
 subgroup `H ⊴ G`, `(θ^g)‾ = (θ‾)^g`.  Both sides evaluate to `star (θ ⟨g·h·g⁻¹⟩)`.  This is the
 `σ`-commutes-with-the-`M`-action input to the odd-order orbit argument showing that an induced
