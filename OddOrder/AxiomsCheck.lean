@@ -115,6 +115,7 @@ import OddOrder.Peterfalvi.S08_SixTwoGeneral
 import OddOrder.Peterfalvi.S13_CoreStructure
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.Peterfalvi.S10_CoherenceWiring
+import OddOrder.Peterfalvi.S11_ImprimitiveUBound
 import OddOrder.Peterfalvi.S12_Noncoherence
 import OddOrder.Peterfalvi.S12_TypeVCaseC
 import OddOrder.FeitThompson
@@ -7502,3 +7503,11 @@ assembly of the BG §16 signalizer machinery (`A1_eq_sigmaSharp`,
 `existsUnique_maximal_centralizer_le_typeI_or_typeII` — BG Theorem II / B(5) / D(4), the book's
 Reference line), all of which is axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.escapingCentralizers_control
+
+/-! **The `W₁`-orbit congruence `u ≡ 1 (mod q)`, axiom-clean** (lane a, 2026-07-12, issue 1024).
+The Frobenius fixed-point-freeness of the `W₁`-conjugation on the `U`-action image
+`Ū = U/C_U(H̄)` (`fixedSubgroup_quotient_uActionKer_eq_bot`, the coprime descent of
+`C_U(W₁) = 1`), and the prime-order orbit count `|Ū| ≡ 1 (mod q)` — the `q ∣ u − 1` input of
+the Peterfalvi (11.9.c) non-Galois contradiction `q ≤ u − 1 < u = a ≤ p − 1 < p`. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.fixedSubgroup_quotient_uActionKer_eq_bot
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.card_uActionHom_range_modEq_one
