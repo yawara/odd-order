@@ -482,3 +482,35 @@ sorried-cite 含む) → case (a) = typeV_caseA_coherence ✓ / case (c) = engin
 ((10.10.1) p = 2w₁−1・w₁ < w₂ は (6.5.a) hbound gated、delta_eq_neg_one/n_eq_two ✓
 / ζ 供給 = exists_zeta_in_inducedFamily_degree_w1 + hdeg/hδj/hμ0 grid 系) +
 no_typeV_maximal_unconditional の AxiomsCheck assert (1021 完了条件)。
+
+## 2026-07-11 tick³⁶ — ★★★ v2 assembly landed (commit f65b3f07): bare sorry 置換完了
+
+`typeV_forces_coherence_v2` (S12_Noncoherence、body sorry-free) が
+S12_MaximalIII_IV_V:1652 の bare sorry を置換。分岐状況:
+
+- **case (a) ✓ wired**: trichotomy (TypeVData.alternative_transfer) の TI 枝 →
+  `S13.typeV_caseA_coherence` (tick²⁴) 直結。import 追加 = S13_Lemmas113To115 +
+  S12_TypeVCaseC (cycle 無し、lake 4159 jobs green で確認)。
+- **case (b) ✓ refuted via gates**: p' ∈ primeFactors|M'| + (6.5.b) の
+  IsPGroup w₂ M' → p' = w₂ (exists_card_eq + prime_dvd_prime) → w₁ ∣ w₂−1 が
+  (6.5.c) と矛盾。
+- **case (c) ✓ engine wired**: O_p(M')=M' は le_opiCoreInG_of_normal_of_isPiSubgroup
+  (p-群は自分の p-core) → |M'| = p³ (subgroupOf 座標へ card/非可換 transport) →
+  (6.5.a)+P1+typeV_param_arithmetic → p = 2w₁−1, w₁<w₂ → **d = p は実証明**
+  (新 helper `muGrid_degree_eq_prime_of_card_eq_prime_cube` @ S12_TypeVCaseC、
+  sorried micro-gate 不要だった: μ₁ ∈ S の source θ の次数 = d、p-冪 + Burnside
+  p³ bound + d>1 → d=p; axiom-clean 確認済) → delta_eq_neg_one/n_eq_two →
+  P2 (h8) + P4 (hstruct) + SHC_isCoherent → engine。
+- **gates = 2022**: 唯一の sorry = `typeV_sixFiveA_bound` / `typeV_sixFiveB_pGroup`
+  / `typeV_sixFiveC_not_dvd` ((6.5.a/b/c) for (L,K,M)=(M,M',1)、book 引用
+  docstring 付き、hyp+IsTypeV+¬coherent を仮定)。general six_two → (6.3) →
+  (6.5) chain (lane b) が閉じたらここを実証明に置換。
+- **配線**: no_typeV_maximal_unconditional は v2 消費に rewire (params 経由撤去)。
+  旧 typeV_forces_coherence は superseded 注記 (legacy no_typeV_maximal 用に温存、
+  S12_MaximalIII_IV_V は S12_Noncoherence の上流ゆえ rewire 不可)。
+- **axioms**: v2 = [propext, sorryAx, Classical.choice, Quot.sound] (sorryAx は
+  3 gates 経由のみ)。AxiomsCheck 4140 jobs green (既存 assert 3 本無傷)。
+  no_typeV_maximal_unconditional の assert 追加は 2022 close 後 (完了条件のまま)。
+
+残 (1021 close 条件): 2022 の (6.5)-general 完成 → 3 gates 実証明化 →
+no_typeV_maximal_unconditional AxiomsCheck assert 追加。
