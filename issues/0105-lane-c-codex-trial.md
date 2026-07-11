@@ -139,3 +139,7 @@ issue は trial ログの追記継続のため open 維持、次の節目 (T-sid
   の stale 化 (2 度目) + `| tail` pipe による build exit code 隠蔽 + push 連鎖 — 対策を SHA 固定 merge
   として必須化 (merge_monitor 注意節)。トレンド: genuine 13/13 (数学は今回も本物)、規律 slip 1 (assert
   過剰主張、fix-forward で除去・3004 に再登録条件を通知)。KEEP 裁定に変更なし。
+- 2026-07-11 (tick、merge 3c02a3c5): (13.18a) beta support → residue values 縮小 (TGapCross +215、
+  実 sorry ±0)。**incident 対応の定着確認**: 新 assert は 1 本のみ (`…_of_values` =
+  hypothesis-parameterized、build 通過) で、除去済み 5 本の再追加なし・pending コメント遵守 —
+  3004 通知を正しく 消化した。14/14。
