@@ -99,6 +99,63 @@ private theorem not_nonTypeICovering_of_all_typeI (hG : OddOrder.BG.IsMinimalSim
     False := by
   sorry
 
+/-- **A type-I maximal has no "hat" beyond its kernel** (the (12.17)-side collapse of the (8.14)
+signalizer support): for a type-I maximal `N`, every element of `N` whose `N_σ`-centralizer is
+nontrivial already lies in `N_σ`.
+
+By (12.7) (`typeI_frobenius`) `N` is a Frobenius group with kernel `N_F = N_σ`
+(`maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2`), and the centralizer of a nonidentity
+kernel element is contained in the kernel (Isaacs Thm 6.4 (1) ⇒ (4),
+`IsFrobeniusGroup.centralizer_kernel_le`); so `x ∈ N` centralizing some `1 ≠ r ∈ N_σ` lies in
+`N_σ`. -/
+private theorem typeI_hatMsigma_subset_Msigma (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {N : Subgroup G} (hNmax : N ∈ maximalSubgroups G) (hNI : IsTypeI N) :
+    OddOrder.BG.Ch4.S16.hatMsigma N ⊆ (OddOrder.BG.Ch3.S10.Msigma N : Set G) := by
+  rintro x ⟨hxN, hRne⟩
+  -- a nonidentity element `r` of `N_σ ⊓ C_G(x)`
+  have hr : ∃ r ∈ OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G), r ≠ 1 := by
+    by_contra h
+    push Not at h
+    exact hRne (Subgroup.eq_bot_iff_forall _ |>.mpr h)
+  obtain ⟨r, hr, hr1⟩ := hr
+  have hrσ : r ∈ OddOrder.BG.Ch3.S10.Msigma N := (Subgroup.mem_inf.mp hr).1
+  have hrC : r ∈ Subgroup.centralizer ({x} : Set G) := (Subgroup.mem_inf.mp hr).2
+  have hrN : r ∈ N := OddOrder.BG.Ch3.S10.Msigma_le N hrσ
+  -- `N` is Frobenius with kernel `typeF.H = N_F = N_σ` ((12.7)).
+  obtain ⟨fd, -⟩ := typeI_frobenius hG hNmax hNI
+  have hHσ : fd.typeI.typeF.H = OddOrder.BG.Ch3.S10.Msigma N := by
+    rw [fd.typeI.typeF.H_eq]
+    exact OddOrder.BG.Ch4.S16.maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2 hG hNmax
+      (Or.inl ((OddOrder.BG.Ch4.S16.proposition_type_classification hG hNmax).1.mp hNI))
+  have hrH : r ∈ fd.typeI.typeF.H := by rw [hHσ]; exact hrσ
+  -- inside `↥N`: `x` centralizes the nonidentity kernel element `r`, so `x` is in the kernel.
+  have hcent := fd.frobenius.centralizer_kernel_le ⟨r, hrN⟩ (Subgroup.mem_subgroupOf.mpr hrH)
+    (fun h => hr1 (Subtype.ext_iff.mp h))
+  have hxbar : (⟨x, hxN⟩ : ↥N) ∈ Subgroup.centralizer ({(⟨r, hrN⟩ : ↥N)} : Set ↥N) := by
+    rw [Subgroup.mem_centralizer_singleton_iff]
+    exact Subtype.ext (Subgroup.mem_centralizer_singleton_iff.mp hrC).symm
+  have hxH : x ∈ fd.typeI.typeF.H := Subgroup.mem_subgroupOf.mp (hcent hxbar)
+  rw [hHσ] at hxH
+  exact hxH
+
+/-- **Peterfalvi (12.17), the no-escaping control**: in the all-type-I configuration, no
+centralizer of an `M_σ#`-element escapes `M`.
+
+An escape produces the BG Theorem D(4) neighbour `N` (`exists_RData_escape_structure`, the
+sorry-free escape structure of Theorem D) with `x ∈ Â_σ(N) ∖ N_σ`; but `N` is type I (`hall`),
+so `Â_σ(N) ⊆ N_σ` (`typeI_hatMsigma_subset_Msigma`) — contradiction.  This is the exact
+hypothesis under which the faithful BG Theorem E cover collapses onto the Frobenius kernels
+(`Mtilde_eq_sigmaSharp_of_forall_centralizer_le`, issue 9080). -/
+private theorem allTypeI_centralizer_le (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hall : ∀ N : Subgroup G, N ∈ maximalSubgroups G → IsTypeI N)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    ∀ x ∈ OddOrder.BG.Ch4.S14.sigmaSharp M, Subgroup.centralizer ({x} : Set G) ≤ M := by
+  intro x hx
+  by_contra hesc
+  obtain ⟨R, -, N, ⟨hNmem, -, -, hxA, -, -, -⟩, -⟩ :=
+    OddOrder.BG.Ch4.S16.exists_RData_escape_structure hG hM hx hesc
+  exact hxA.2 (typeI_hatMsigma_subset_Msigma hG hNmem.1 (hall N hNmem.1) hxA.1.1)
+
 /-- **§8/§10 covering inputs to Peterfalvi (12.17)** — the all-type-I case of Theorem (8.8).
 
 When every maximal subgroup of `G` is of type I, the §8 covering theory (BG Theorem E, (8.17), and
@@ -139,11 +196,13 @@ Built as an honest reduction from BG Theorem E (`S10.bgTheoremE_cover_data`): in
 every representative `M_i` has `data.tau i = .I` (type exclusivity, `not_isTypeI_of_isTypeNonI`), so
 `mainSubgroup (M_i) (τ_i) = (M_i)_F`.  The `reps`/`reps_maximal` plumbing, `coprime` (the (8.17)
 prime-factor partition is disjoint, hence the kernels are coprime), `two_le` (a single class would
-make `|G#| = (|M_s|-1)|G:M| < |G|-1 = |G#|`), and `covers` (the thickened cover lands in
-`(M_i)_F`-conjugates, `thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall`) are all
-discharged.  Two upstream facts remain isolated as residual sorries: `isTI`, the escaping-centralizer
-control (8.13.c1)+(2.3) making each kernel sharp-set a TI-subset; and the selection of the type-I
-cover branch under `hall`, the (8.8.a) dichotomy (BG §16, parallel to `theorem88_dichotomy`). -/
+make `|G#| = (|M_s|-1)|G:M| < |G|-1 = |G#|`), and `covers` (the (12.17)-faithful collapse, issue
+9080: no centralizer escapes by (12.7)+Theorem D(4) (`allTypeI_centralizer_le`), so the faithful
+BG Cor 14.9 cover collapses onto the kernels, `Mtilde_eq_sigmaSharp_of_forall_centralizer_le`) are
+all discharged.  Two upstream facts remain isolated as residual sorries: `isTI`, the
+escaping-centralizer control (8.13.c1)+(2.3) making each kernel sharp-set a TI-subset; and the
+selection of the type-I cover branch under `hall`, the (8.8.a) dichotomy (BG §16, parallel to
+`theorem88_dichotomy`). -/
 theorem exists_typeICovering (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hall : ∀ M : Subgroup G, M ∈ maximalSubgroups G → IsTypeI M) :
     Nonempty (TypeICovering hG hall) := by
@@ -278,23 +337,41 @@ theorem exists_typeICovering (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       have hcard2 : Nat.card ↥(maxNilpotentNormalHall (data.reps (e.symm j'))) ≠ 0 :=
         Nat.card_pos.ne'
       exact (Nat.disjoint_primeFactors hcard1 hcard2).mp hdisj
-    · -- **`covers`** (discharged): the faithful BG cover `𝒞_G(M̃_i)` lands in the conjugates of the
-      -- kernel sharp-set `((M_i)_F)#` (`BGTheoremETypeICovering.cover_subset_kernels`; in the
-      -- all-type-I case `R(x) = 1`, so `M̃_i = (M_i)_σ# = (M_i)_F#`).  Combined with the (8.17.a)
-      -- cover `cover_nonidentity`, every nonidentity `x` is conjugate into some `(M_i)_F#`.
+    · -- **`covers`** (discharged, the (12.17)-faithful route of issue 9080): the faithful BG
+      -- cover `𝒞_G(M̃)` (BG Cor 14.9, all-type-`F`) covers `G#`; in the all-type-I case no
+      -- centralizer escapes (`allTypeI_centralizer_le`, from (12.7) via Theorem D(4)), so every
+      -- signalizer is trivial and `M̃ = M_σ# = (M_F)#`
+      -- (`Mtilde_eq_sigmaSharp_of_forall_centralizer_le`); finally the witness maximal is moved
+      -- to its conjugacy representative.
       intro x hx1
-      have hxsharp : x ∈ sharpSubgroup (⊤ : Subgroup G) := by
-        simp only [sharpSubgroup, Subgroup.coe_top, Set.mem_sdiff, Set.mem_univ, true_and,
-          Set.mem_singleton_iff]
-        exact hx1
-      rw [hTypeI.cover_nonidentity] at hxsharp
-      obtain ⟨i, hxi⟩ := Set.mem_iUnion.mp hxsharp
-      obtain ⟨t, htMF, g, hgtx⟩ := hTypeI.cover_subset_kernels i hxi
-      refine ⟨e i, g⁻¹, ?_⟩
+      have htypeF : ∀ M' ∈ maximalSubgroups G, OddOrder.BG.Ch4.S14.IsTypeF M' := fun M' hM' =>
+        (OddOrder.BG.Ch4.S16.proposition_type_classification hG hM').1.mp (hall M' hM')
+      have hxsharp : x ∈ sharpSubgroup (⊤ : Subgroup G) := ⟨Subgroup.mem_top x, hx1⟩
+      rw [OddOrder.BG.Ch4.S14.sharpSubgroup_top_eq_iUnion_conjClassSet_Mtilde_of_typeF hG
+        htypeF] at hxsharp
+      obtain ⟨M, hMmax, hxM⟩ := Set.mem_iUnion₂.mp hxsharp
+      rw [OddOrder.Peterfalvi.S10.Mtilde_eq_sigmaSharp_of_forall_centralizer_le hG _ hMmax
+        (allTypeI_centralizer_le hG hall hMmax)] at hxM
+      -- `x = c * t * c⁻¹` with `t ∈ M_σ#`; move `M` to its representative `conj g • M = reps i`.
+      obtain ⟨t, ht, c, hc⟩ := hxM
+      obtain ⟨i, g, hgconj⟩ := data.representatives M hMmax
+      refine ⟨e i, g * c⁻¹, ?_⟩
       have hreps : data.reps (e.symm (e i)) = data.reps i := by rw [Equiv.symm_apply_apply]
-      have hconj : g⁻¹ * x * (g⁻¹)⁻¹ = t := by rw [inv_inv, ← hgtx]; group
-      rw [hreps, hconj]
-      exact htMF
+      have hyt : (g * c⁻¹) * x * (g * c⁻¹)⁻¹ = g * t * g⁻¹ := by rw [← hc]; group
+      rw [hreps, hyt]
+      -- `g t g⁻¹ ∈ (conj g • M)_σ# = (reps i)_σ# = ((reps i)_F)#`
+      have hmem : g * t * g⁻¹ ∈ MulAut.conj g • OddOrder.BG.Ch4.S14.sigmaSharp M := by
+        rw [show g * t * g⁻¹ = MulAut.conj g • t from by
+          rw [MulAut.smul_def, MulAut.conj_apply]]
+        exact Set.smul_mem_smul_set ht
+      rw [OddOrder.BG.Ch4.S14.sigmaSharp_conj_smul, hgconj] at hmem
+      have hσeq : OddOrder.BG.Ch4.S14.sigmaSharp (data.reps i)
+          = (maxNilpotentNormalHall (data.reps i) : Set G) \ {1} := by
+        rw [OddOrder.BG.Ch4.S16.maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2 hG
+          (data.maximal i) (Or.inl (htypeF _ (data.maximal i)))]
+        rfl
+      rw [← hσeq]
+      exact hmem
   · -- **(8.8.b) non-type-I cover branch**: ruled out when every maximal subgroup is type I.
     -- This is the all-type-I case of the (8.8) dichotomy (`theorem88_dichotomy`); under `hall`
     -- BG Theorem E returns the type-I cover, never the two-exceptional-subgroup case (the

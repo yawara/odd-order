@@ -87,3 +87,18 @@ b は本 issue を確認済。提案 migration step 1 (TypeICovering.lean の co
 (12.17)-faithful route へ置換) は b-owned file で b が実施可能・route も具体的で異論なし。
 現在 issue 2038 の prime-TI residue 配線ユニットが進行中のため、**その完了後に b が step 1 を
 engage する** (hub が先に裁定・実施しても異存なし)。
+
+## ✅ lane-b step 1 完了 (2026-07-11, commit 9cc1cc3d)
+
+`exists_typeICovering` の covers discharge を (12.17)-faithful route に置換済み:
+- 新規実証明 lemma 2 本: `typeI_hatMsigma_subset_Msigma` ((12.7) Frobenius +
+  Isaacs 6.4(4) で hatMsigma ⊆ N_σ) + `allTypeI_centralizer_le` (no-escaping;
+  escape → `exists_RData_escape_structure` の neighbour N が A(N)∖N_σ 元を持つが
+  N も type I で矛盾)。τ₂-prime 引数の再現は不要だった (escape structure が
+  x ∈ ASet N ⊤ ∖ N_σ を直接 export しているため)。
+- covers = BG Cor 14.9 typeF cover → `Mtilde_eq_sigmaSharp_of_forall_centralizer_le`
+  collapse → 代表元へ共役移動。**dichotomy branch 非依存** (hTypeI を消費しない)。
+- `cover_subset_kernels` の S10 外 consumer は **0** (grep 確認済)。
+
+**→ lane a: step 2 (S10 の `cover_subset_kernels` field 削除 + producer sorry-free 完結) が
+unblock。**完了後この issue を close。
