@@ -374,3 +374,29 @@ SHC_tau_muGridAlpha_eq_of_eight_le_SHCcount (count 形、h8 のみ残る外部�
 residual 形を SHC-extension と同定) で作り、ν := (τ₁ on Z[S₁]) ⊕ (μ_j ↦ δ∑ω_ij)
 を IsCoherent hyp.tau hyp.Sset hyp.A0 に組む (nonzero/isometry/agree/ZIrr 4 field;
 S = S₁ ⊔ {μ_j} の (10.10.2) 構造は hS 仮説で engine 化)。
+
+## 2026-07-11 tick³¹ — (10.10.4) column 計算 landed (delegate 成功、commit 5058c353)
+SHC_tau_muColumn_sub_smul_zeta: (μ_j − d·ζ)^τ = δ∑_i ω_ij^σ − d·ζ^{τ₁}
+(sorry-free、精密 spec 委譲の初成功例)。残入力 = hpin ((10.9) pin):
+hyp.tau (∑_i μ_i0 − ζ) = ∑_i ω_i0^σ − coh.extension ζ。book (10.10.4) 第 1 文:
+(α_ij, μ₀−ζ) = −δ+n と (10.9)((μ₀−ζ)^τ = ∑ω_i0 − χ、‖χ‖=1、χ ⊥ (Irr W)^σ) +
+(10.10.3) から χ = ζ^{τ₁} を同定 (w₁<w₂ 要 — (10.10.1))。素材 = S12_Prop109 の
+residual 諸形態 (:87/:322/:354/:503) + SHC extension の性質。その後:
+(10.10.4) 本体 = ν 構成 (IsCoherent 4-field、S = S₁ ⊔ {μ_j} は (10.10.2)
+構造仮説で engine 化) → (10.10.2) p³-構造 → v2 assembly。
+
+## 2026-07-11 tick³² — (10.9) pin landed (delegate 成功 #2、commit 95c278e3)
+SHC_tau_muColumnZero_sub_zeta: (μ₀−ζ)^τ = ∑ω_i0^σ − ζ^{τ₁} (sorry-free)。
+同定は norm-1 整数補題不要 — ‖ζ^{τ₁} − (∑ω−ψ)‖² = 0 + 正定値性
+(eq_zero_of_inner_self_re_eq_zero)。⟨α^τ,ψ⟩ = n−δ は
+muGridAlpha_tau_inner_zeroColumnSum_sub_zeta (Isometry105:954) 既存。
+**⟹ (10.10.4) の image 計算 chain 完結**: SHC_tau_muColumn_sub_smul_zeta ∘
+本 pin で (μ_j − dζ)^τ = δ∑ω_ij^σ − d·ζ^{τ₁} (合成 typecheck 検証済、
+caller は hw12 : w1 < w2 を供給)。
+残 = **ν-glue**: IsCoherent hyp.tau hyp.Sset hyp.A0 の構成。route =
+S07 union engine `coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal`
+(S12_MaximalIII_IV_V:1590 に §10-側の使用例あり、
+hyp.span_inner_SHCSet_diff_eq_zero 同伴): X := {μ_j}、Y := SHCSet、
+cX = 列像から直構成 (‖μ_j‖² = w₁ = ‖δ∑ω‖²)、D := {μ_j − d·ζ} with
+hDτ = 完結した image 計算。(10.10.2) 構造 (S = S₁ ⊔ {μ_j}) は hstruct
+仮説で engine 化。
