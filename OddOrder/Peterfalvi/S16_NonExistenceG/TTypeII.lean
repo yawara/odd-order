@@ -1,5 +1,5 @@
 import OddOrder.Peterfalvi.S16_NonExistenceG.TTypeIICoherence
-import OddOrder.Peterfalvi.S16_NonExistenceG.TGapProjectionResidual
+import OddOrder.Peterfalvi.S16_NonExistenceG.TGapGalois
 
 /-!
 # Peterfalvi (14.9): the T-side Type-II theorem
