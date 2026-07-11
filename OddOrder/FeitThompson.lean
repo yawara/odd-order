@@ -622,6 +622,74 @@ theorem omegaS_eq_omega_omegaSChar (i : Fin tp.q) (j : Fin tp.p) :
     omegaSChar, MonoidHom.comp_apply]
   rfl
 
+omit [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)] in
+/-- The row-axis underlying character is the corresponding power of the first
+nonprincipal row character. -/
+theorem omegaSChar_row_eq_pow (i : Fin tp.q) :
+    omegaSChar hG mp tp i ⟨0, tp.p_prime.pos⟩ =
+      omegaSChar hG mp tp ⟨1, tp.q_prime.one_lt⟩ ⟨0, tp.p_prime.pos⟩ ^ (i : ℕ) := by
+  let χ := (mp.certainTypeS hG).w1CharEquiv
+    (eqQ hG mp tp ⟨1, tp.q_prime.one_lt⟩)
+  have hpow : (mp.certainTypeS hG).w1CharEquiv (eqQ hG mp tp i) = χ ^ (i : ℕ) := by
+    simp [χ, OddOrder.Peterfalvi.S06.Hypothesis.w1CharEquiv,
+      OddOrder.Peterfalvi.S06.cyclicPowEnum_apply, eqQ]
+  unfold omegaSChar
+  rw [chi2enum_zero, hpow, (mp.certainTypeS hG).sdiffTICyclicHypothesis.omegaProdChar_one_right,
+    (mp.certainTypeS hG).sdiffTICyclicHypothesis.omegaProdChar_one_right]
+  apply MonoidHom.ext
+  intro w
+  simp only [MonoidHom.comp_apply]
+  exact (MonoidHom.pow_apply χ (i : ℕ) _).trans
+    (MonoidHom.pow_apply
+      ((χ.comp (mp.certainTypeS hG).sdiffTICyclicHypothesis.wFst).comp
+        (gridEquivE hG mp tp).toMonoidHom)
+      (i : ℕ) w).symm
+
+omit [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)] in
+/-- The column-axis underlying character is the corresponding power of the first
+nonprincipal column character. -/
+theorem omegaSChar_column_eq_pow (j : Fin tp.p) :
+    omegaSChar hG mp tp ⟨0, tp.q_prime.pos⟩ j =
+      omegaSChar hG mp tp ⟨0, tp.q_prime.pos⟩ ⟨1, tp.p_prime.one_lt⟩ ^ (j : ℕ) := by
+  let χ := chi2enum hG mp tp ⟨1, tp.p_prime.one_lt⟩
+  let χ₀ := (mp.certainTypeS hG).w1CharEquiv
+    (eqQ hG mp tp ⟨0, tp.q_prime.pos⟩)
+  have hpow : chi2enum hG mp tp j = χ ^ (j : ℕ) := by
+    simp [χ, chi2enum, OddOrder.Peterfalvi.S06.cyclicPowEnum_apply]
+  have hzero : eqQ hG mp tp ⟨0, tp.q_prime.pos⟩ = 0 := by
+    apply Fin.ext
+    simp [eqQ]
+  have hχ₀ : χ₀ = 1 := by
+    simp [χ₀, hzero]
+  unfold omegaSChar
+  rw [hpow]
+  apply MonoidHom.ext
+  intro w
+  simp only [OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaProdChar,
+    MonoidHom.comp_apply, MonoidHom.mul_apply]
+  change χ₀ _ * (χ ^ (j : ℕ)) _ =
+    (((χ₀.comp (mp.certainTypeS hG).sdiffTICyclicHypothesis.wFst *
+      χ.comp (mp.certainTypeS hG).sdiffTICyclicHypothesis.wSnd).comp
+        (gridEquivE hG mp tp).toMonoidHom) ^ (j : ℕ)) w
+  rw [hχ₀]
+  simp only [MonoidHom.one_apply, one_mul, MonoidHom.one_comp]
+  exact (MonoidHom.pow_apply χ (j : ℕ) _).trans
+    (MonoidHom.pow_apply
+      ((χ.comp (mp.certainTypeS hG).sdiffTICyclicHypothesis.wSnd).comp
+        (gridEquivE hG mp tp).toMonoidHom) (j : ℕ) w).symm
+
+omit [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)] in
+/-- The concrete Dade-grid member is the S05 sigma image of its underlying
+linear character. -/
+theorem tau3W_omegaS_eq_sigma_omegaSChar (i : Fin tp.q) (j : Fin tp.p) :
+    tau3W hG mp tp (omegaS hG mp tp i j) =
+      (tiCyclicW hG mp tp).sigma rfl (tiCyclicWDadeApp hG mp tp)
+        ((tiCyclicW hG mp tp).omega (omegaSChar hG mp tp i j) :
+          ClassFunction ↥(tiCyclicW hG mp tp).W ℂ) := by
+  rw [omegaS_eq_omega_omegaSChar]
+  change (tiCyclicW hG mp tp).sigmaIntegral rfl (tiCyclicWDadeApp hG mp tp) _ = _
+  rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_apply]
+
 omit [NeZero (Nat.card ↥(mp.certainTypeS hG).W1)] [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)] in
 /-- The cyclic factor `W = W₁ ⊔ W₂` has order `|W| = q·p` (`W₁ ∩ W₂ = ⊥`, `W₁` normalizes `W₂`
 since they commute). -/
@@ -643,6 +711,24 @@ theorem cardTPW : Nat.card ↥tp.W = tp.q * tp.p := by
       tp.W1_inf_W2_eq_bot,
     ← tp.q_eq_card_W1, ← tp.p_eq_card_W2]
 
+/-- The underlying-character grid is injective: orthonormal grid characters cannot have
+the same underlying linear character. -/
+theorem omegaSChar_injective :
+    Function.Injective
+      (fun ij : Fin tp.q × Fin tp.p => omegaSChar hG mp tp ij.1 ij.2) := by
+  intro ⟨i, j⟩ ⟨k, l⟩ h
+  by_contra hne
+  have hCF : omegaS hG mp tp i j = omegaS hG mp tp k l := by
+    rw [omegaS_eq_omega_omegaSChar, omegaS_eq_omega_omegaSChar]
+    exact congrArg _ (congrArg _ h)
+  have h1 := omegaS_inner hG mp tp i k j l
+  rw [hCF] at h1
+  have h2 := omegaS_inner hG mp tp k k l l
+  rw [h1] at h2
+  have hcond : ¬ (i = k ∧ j = l) := fun ⟨h1', h2'⟩ => hne (by rw [h1', h2'])
+  rw [if_neg hcond, if_pos (⟨rfl, rfl⟩ : k = k ∧ l = l)] at h2
+  exact zero_ne_one h2
+
 /-- **Exhaustion by counting**: every linear character of `↥tp.W` underlies some `omegaS i j` —
 the `(i,j) ↦ omegaSChar i j` map is injective (the `omegaS` are orthonormal, hence distinct)
 between types of the same cardinality `pq`. -/
@@ -651,21 +737,7 @@ theorem exists_omegaS_eq_omega (ξ : ↥tp.W →* ℂˣ) :
       omegaS hG mp tp i j = ((tiCyclicW hG mp tp).omega ξ).toClassFunction := by
   classical
   haveI : Fintype (↥tp.W →* ℂˣ) := Fintype.ofFinite _
-  -- injectivity of the pair map
-  have hinj : Function.Injective
-      (fun ij : Fin tp.q × Fin tp.p => omegaSChar hG mp tp ij.1 ij.2) := by
-    intro ⟨i, j⟩ ⟨k, l⟩ h
-    by_contra hne
-    have hCF : omegaS hG mp tp i j = omegaS hG mp tp k l := by
-      rw [omegaS_eq_omega_omegaSChar, omegaS_eq_omega_omegaSChar]
-      exact congrArg _ (congrArg _ h)
-    have h1 := omegaS_inner hG mp tp i k j l
-    rw [hCF] at h1
-    have h2 := omegaS_inner hG mp tp k k l l
-    rw [h1] at h2
-    have hcond : ¬ (i = k ∧ j = l) := fun ⟨h1', h2'⟩ => hne (by rw [h1', h2'])
-    rw [if_neg hcond, if_pos (⟨rfl, rfl⟩ : k = k ∧ l = l)] at h2
-    exact zero_ne_one h2
+  have hinj := omegaSChar_injective hG mp tp
   -- cardinalities agree: `|Fin q × Fin p| = pq = |W| = |Ŵ|`
   have hcardW : Nat.card ↥tp.W = tp.q * tp.p := cardTPW mp tp
   have hcardHom : Fintype.card (↥tp.W →* ℂˣ) = tp.q * tp.p := by
@@ -1066,126 +1138,144 @@ theorem tau3W_omegaS_fourcorner_vanish (i : Fin tp.q) (j : Fin tp.p)
           trivialClassFunction_apply]
   exact hev'.symm
 
-/-- **Peterfalvi (3.9.b), vanishing transport along the row** (issue-2036 supply): if the
-`η₁₀`-value vanishes at `x`, so do all `η_{i0}`-values for `i ≠ 0` — each `ω_{i0}` is a power
-`ω_{10}^k` with `k` coprime to `q` (`W` cyclic: the value at a generator determines the hom,
-and the nontrivial `ω_{i0}(w₀)` lie in the prime-order `μ_q = ⟨ω_{10}(w₀)⟩`), and the Galois
-twist `exists_mapRingEquiv_sigma_omega_pow` transports the vanishing. -/
+/-- The first nonprincipal row-axis character has the full prime order `q`. -/
+theorem orderOf_omegaSChar_row_base :
+    orderOf
+      (omegaSChar hG mp tp ⟨1, tp.q_prime.one_lt⟩ ⟨0, tp.p_prime.pos⟩) = tp.q := by
+  let ξ := omegaSChar hG mp tp ⟨1, tp.q_prime.one_lt⟩ ⟨0, tp.p_prime.pos⟩
+  have hpow : ξ ^ tp.q = 1 := by
+    dsimp [ξ]
+    refine monoidHom_eq_of_eqOn_W1_W2 mp tp ?_ ?_ <;>
+      intro w hw <;> refine Units.ext ?_
+    · rw [MonoidHom.pow_apply, Units.val_pow_eq_pow_val,
+        omegaSChar_val hG mp tp _ _ w, MonoidHom.one_apply, Units.val_one]
+      exact omegaS_pow_q_of_mem_W1 hG mp tp _ _ w hw
+    · rw [MonoidHom.pow_apply, Units.val_pow_eq_pow_val,
+        omegaSChar_val hG mp tp _ _ w, MonoidHom.one_apply, Units.val_one,
+        omegaS_col_zero_apply_of_mem_W2 hG mp tp _ w hw, one_pow]
+  have hzero :
+      omegaSChar hG mp tp ⟨0, tp.q_prime.pos⟩ ⟨0, tp.p_prime.pos⟩ = 1 := by
+    simpa using omegaSChar_row_eq_pow hG mp tp ⟨0, tp.q_prime.pos⟩
+  have hne : ξ ≠ 1 := by
+    intro hξ
+    have hξprime : omegaSChar hG mp tp ⟨1, tp.q_prime.one_lt⟩
+        ⟨0, tp.p_prime.pos⟩ = 1 := by simpa only [ξ] using hξ
+    have hp : ((⟨1, tp.q_prime.one_lt⟩ : Fin tp.q),
+        (⟨0, tp.p_prime.pos⟩ : Fin tp.p)) =
+        ((⟨0, tp.q_prime.pos⟩ : Fin tp.q),
+          (⟨0, tp.p_prime.pos⟩ : Fin tp.p)) :=
+      (omegaSChar_injective hG mp tp) (hξprime.trans hzero.symm)
+    have hv := congrArg (fun ij : Fin tp.q × Fin tp.p => (ij.1 : ℕ)) hp
+    norm_num at hv
+  have hdvd : orderOf ξ ∣ tp.q := orderOf_dvd_of_pow_eq_one hpow
+  rcases (Nat.dvd_prime tp.q_prime).mp hdvd with h | h
+  · exact absurd (orderOf_eq_one_iff.mp h) hne
+  · exact h
+
+/-- The first nonprincipal column-axis character has the full prime order `p`. -/
+theorem orderOf_omegaSChar_column_base :
+    orderOf
+      (omegaSChar hG mp tp ⟨0, tp.q_prime.pos⟩ ⟨1, tp.p_prime.one_lt⟩) = tp.p := by
+  let ξ := omegaSChar hG mp tp ⟨0, tp.q_prime.pos⟩ ⟨1, tp.p_prime.one_lt⟩
+  have hpow : ξ ^ tp.p = 1 := by
+    dsimp [ξ]
+    refine monoidHom_eq_of_eqOn_W1_W2 mp tp ?_ ?_ <;>
+      intro w hw <;> refine Units.ext ?_
+    · rw [MonoidHom.pow_apply, Units.val_pow_eq_pow_val,
+        omegaSChar_val hG mp tp _ _ w, MonoidHom.one_apply, Units.val_one,
+        omegaS_row_zero_apply_of_mem_W1 hG mp tp _ w hw, one_pow]
+    · rw [MonoidHom.pow_apply, Units.val_pow_eq_pow_val,
+        omegaSChar_val hG mp tp _ _ w, MonoidHom.one_apply, Units.val_one]
+      exact omegaS_pow_p_of_mem_W2 hG mp tp _ _ w hw
+  have hzero :
+      omegaSChar hG mp tp ⟨0, tp.q_prime.pos⟩ ⟨0, tp.p_prime.pos⟩ = 1 := by
+    simpa using omegaSChar_column_eq_pow hG mp tp ⟨0, tp.p_prime.pos⟩
+  have hne : ξ ≠ 1 := by
+    intro hξ
+    have hξprime : omegaSChar hG mp tp ⟨0, tp.q_prime.pos⟩
+        ⟨1, tp.p_prime.one_lt⟩ = 1 := by simpa only [ξ] using hξ
+    have hp : ((⟨0, tp.q_prime.pos⟩ : Fin tp.q),
+        (⟨1, tp.p_prime.one_lt⟩ : Fin tp.p)) =
+        ((⟨0, tp.q_prime.pos⟩ : Fin tp.q),
+          (⟨0, tp.p_prime.pos⟩ : Fin tp.p)) :=
+      (omegaSChar_injective hG mp tp) (hξprime.trans hzero.symm)
+    have hv := congrArg (fun ij : Fin tp.q × Fin tp.p => (ij.2 : ℕ)) hp
+    norm_num at hv
+  have hdvd : orderOf ξ ∣ tp.p := orderOf_dvd_of_pow_eq_one hpow
+  rcases (Nat.dvd_prime tp.p_prime).mp hdvd with h | h
+  · exact absurd (orderOf_eq_one_iff.mp h) hne
+  · exact h
+
+/-- Full Galois orbit of the nonprincipal row-axis `η`-characters. -/
+theorem tau3W_omegaS_row_galois_orbit (i : Fin tp.q)
+    (hi : i ≠ ⟨0, tp.q_prime.pos⟩) :
+    ∃ u : ℂ ≃+* ℂ,
+      ClassFunction.mapRingEquiv u
+          (tau3W hG mp tp
+            (omegaS hG mp tp ⟨1, tp.q_prime.one_lt⟩ ⟨0, tp.p_prime.pos⟩)) =
+        tau3W hG mp tp (omegaS hG mp tp i ⟨0, tp.p_prime.pos⟩) := by
+  let ξ := omegaSChar hG mp tp ⟨1, tp.q_prime.one_lt⟩ ⟨0, tp.p_prime.pos⟩
+  have hi0 : (i : ℕ) ≠ 0 := by
+    intro h
+    apply hi
+    apply Fin.ext
+    simpa using h
+  have hicop : (i : ℕ).Coprime (orderOf ξ) := by
+    rw [show orderOf ξ = tp.q by
+      simpa [ξ] using orderOf_omegaSChar_row_base hG mp tp]
+    exact Nat.coprime_comm.mp (tp.q_prime.coprime_iff_not_dvd.mpr
+      (Nat.not_dvd_of_pos_of_lt (Nat.pos_of_ne_zero hi0) i.isLt))
+  obtain ⟨u, hu, -⟩ :=
+    (tiCyclicW hG mp tp).exists_mapRingEquiv_sigma_omega_pow rfl
+      (tiCyclicWDadeApp hG mp tp) ξ hicop
+  refine ⟨u, ?_⟩
+  rw [tau3W_omegaS_eq_sigma_omegaSChar, tau3W_omegaS_eq_sigma_omegaSChar]
+  rw [omegaSChar_row_eq_pow hG mp tp i]
+  convert hu.symm using 1
+  all_goals simp [ξ]
+  all_goals rfl
+
+/-- Full Galois orbit of the nonprincipal column-axis `η`-characters. -/
+theorem tau3W_omegaS_column_galois_orbit (j : Fin tp.p)
+    (hj : j ≠ ⟨0, tp.p_prime.pos⟩) :
+    ∃ u : ℂ ≃+* ℂ,
+      ClassFunction.mapRingEquiv u
+          (tau3W hG mp tp
+            (omegaS hG mp tp ⟨0, tp.q_prime.pos⟩ ⟨1, tp.p_prime.one_lt⟩)) =
+        tau3W hG mp tp (omegaS hG mp tp ⟨0, tp.q_prime.pos⟩ j) := by
+  let ξ := omegaSChar hG mp tp ⟨0, tp.q_prime.pos⟩ ⟨1, tp.p_prime.one_lt⟩
+  have hj0 : (j : ℕ) ≠ 0 := by
+    intro h
+    apply hj
+    apply Fin.ext
+    simpa using h
+  have hjcop : (j : ℕ).Coprime (orderOf ξ) := by
+    rw [show orderOf ξ = tp.p by
+      simpa [ξ] using orderOf_omegaSChar_column_base hG mp tp]
+    exact Nat.coprime_comm.mp (tp.p_prime.coprime_iff_not_dvd.mpr
+      (Nat.not_dvd_of_pos_of_lt (Nat.pos_of_ne_zero hj0) j.isLt))
+  obtain ⟨u, hu, -⟩ :=
+    (tiCyclicW hG mp tp).exists_mapRingEquiv_sigma_omega_pow rfl
+      (tiCyclicWDadeApp hG mp tp) ξ hjcop
+  refine ⟨u, ?_⟩
+  rw [tau3W_omegaS_eq_sigma_omegaSChar, tau3W_omegaS_eq_sigma_omegaSChar]
+  rw [omegaSChar_column_eq_pow hG mp tp j]
+  convert hu.symm using 1
+  all_goals simp [ξ]
+  all_goals rfl
+
+/-- **Peterfalvi (3.9.b), vanishing transport along the row** (issue-2036 supply):
+if the `η₁₀`-value vanishes at `x`, so do all nonprincipal row-axis values.  This is the
+pointwise zero consequence of `tau3W_omegaS_row_galois_orbit`. -/
 theorem tau3W_omegaS_row_vanish_of_one_zero {x : G}
     (h0 : tau3W hG mp tp
       (omegaS hG mp tp ⟨1, tp.q_prime.one_lt⟩ ⟨0, tp.p_prime.pos⟩) x = 0)
     (i : Fin tp.q) (hi : i ≠ ⟨0, tp.q_prime.pos⟩) :
     tau3W hG mp tp (omegaS hG mp tp i ⟨0, tp.p_prime.pos⟩) x = 0 := by
-  classical
-  set ξ₁ := omegaSChar hG mp tp ⟨1, tp.q_prime.one_lt⟩ ⟨0, tp.p_prime.pos⟩ with hξ₁def
-  set ξᵢ := omegaSChar hG mp tp i ⟨0, tp.p_prime.pos⟩ with hξᵢdef
-  -- the column-0 characters are `q`-th-power trivial
-  have hpow : ∀ (k : Fin tp.q), (omegaSChar hG mp tp k ⟨0, tp.p_prime.pos⟩) ^ tp.q = 1 := by
-    intro k
-    refine monoidHom_eq_of_eqOn_W1_W2 mp tp ?_ ?_ <;> intro w hw <;> refine Units.ext ?_
-    · rw [MonoidHom.pow_apply, Units.val_pow_eq_pow_val,
-        omegaSChar_val hG mp tp _ _ w, MonoidHom.one_apply, Units.val_one]
-      exact omegaS_pow_q_of_mem_W1 hG mp tp k ⟨0, tp.p_prime.pos⟩ w hw
-    · rw [MonoidHom.pow_apply, Units.val_pow_eq_pow_val,
-        omegaSChar_val hG mp tp _ _ w, MonoidHom.one_apply, Units.val_one,
-        omegaS_col_zero_apply_of_mem_W2 hG mp tp k w hw, one_pow]
-  -- distinctness along the column, and the base cases
-  have hdistinct : ∀ (k l : Fin tp.q), k ≠ l →
-      omegaSChar hG mp tp k ⟨0, tp.p_prime.pos⟩
-        ≠ omegaSChar hG mp tp l ⟨0, tp.p_prime.pos⟩ := by
-    intro k l hne heq
-    have hCF : omegaS hG mp tp k ⟨0, tp.p_prime.pos⟩
-        = omegaS hG mp tp l ⟨0, tp.p_prime.pos⟩ := by
-      rw [omegaS_eq_omega_omegaSChar, omegaS_eq_omega_omegaSChar, heq]
-    have h1 := omegaS_inner hG mp tp k l ⟨0, tp.p_prime.pos⟩ ⟨0, tp.p_prime.pos⟩
-    rw [hCF] at h1
-    have h2 := omegaS_inner hG mp tp l l ⟨0, tp.p_prime.pos⟩ ⟨0, tp.p_prime.pos⟩
-    rw [h1] at h2
-    rw [if_neg (fun h => hne h.1), if_pos ⟨rfl, rfl⟩] at h2
-    exact zero_ne_one h2
-  have hξ₀ : omegaSChar hG mp tp ⟨0, tp.q_prime.pos⟩ ⟨0, tp.p_prime.pos⟩ = 1 := by
-    refine monoidHom_eq_of_eqOn_W1_W2 mp tp ?_ ?_ <;> intro w hw <;> refine Units.ext ?_
-    · rw [omegaSChar_val hG mp tp _ _ w, MonoidHom.one_apply, Units.val_one]
-      exact omegaS_row_zero_apply_of_mem_W1 hG mp tp _ w hw
-    · rw [omegaSChar_val hG mp tp _ _ w, MonoidHom.one_apply, Units.val_one]
-      exact omegaS_col_zero_apply_of_mem_W2 hG mp tp _ w hw
-  have hξ₁ne : ξ₁ ≠ 1 := by
-    rw [hξ₁def, ← hξ₀]
-    exact hdistinct _ _ (fun h => absurd (congrArg Fin.val h) (by norm_num))
-  have hξᵢne : ξᵢ ≠ 1 := by
-    rw [hξᵢdef, ← hξ₀]
-    exact hdistinct _ _ hi
-  -- a generator of `W` and hom-extensionality on it
-  haveI := tp.W_cyclic
-  obtain ⟨w₀, hw₀⟩ := IsCyclic.exists_generator (α := ↥tp.W)
-  have hext : ∀ χ χ' : ↥tp.W →* ℂˣ, χ w₀ = χ' w₀ → χ = χ' := by
-    intro χ χ' h
-    ext w
-    obtain ⟨m, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hw₀ w)
-    rw [map_zpow, map_zpow, h]
-  -- order bookkeeping: `orderOf (ξ₁ w₀) = orderOf ξ₁ = q`
-  have hordval : ∀ χ : ↥tp.W →* ℂˣ, χ ^ tp.q = 1 → orderOf (χ w₀) = orderOf χ := by
-    intro χ _
-    refine orderOf_eq_orderOf_iff.mpr (fun n => ⟨fun h => ?_, fun h => ?_⟩)
-    · refine hext (χ ^ n) 1 ?_
-      rw [MonoidHom.pow_apply, h, MonoidHom.one_apply]
-    · rw [← MonoidHom.pow_apply, h, MonoidHom.one_apply]
-  have hord₁ : orderOf ξ₁ = tp.q := by
-    have hdvd : orderOf ξ₁ ∣ tp.q := orderOf_dvd_of_pow_eq_one (hpow ⟨1, tp.q_prime.one_lt⟩)
-    rcases (Nat.dvd_prime tp.q_prime).mp hdvd with h | h
-    · exact absurd (orderOf_eq_one_iff.mp h) hξ₁ne
-    · exact h
-  -- `ξᵢ(w₀) = ξ₁(w₀)^k` with `0 < k < q`, so `ξᵢ = ξ₁^k` with `k` coprime to `q`
-  have hζ : IsPrimitiveRoot ((ξ₁ w₀ : ℂˣ) : ℂ) tp.q := by
-    have h1 : orderOf ((ξ₁ w₀ : ℂˣ) : ℂ) = tp.q := by
-      rw [orderOf_units, hordval ξ₁ (hpow ⟨1, tp.q_prime.one_lt⟩), hord₁]
-    rw [← h1]
-    exact IsPrimitiveRoot.orderOf _
-  have hvalpow : ((ξᵢ w₀ : ℂˣ) : ℂ) ^ tp.q = 1 := by
-    rw [← Units.val_pow_eq_pow_val, ← MonoidHom.pow_apply, hpow i, MonoidHom.one_apply,
-      Units.val_one]
-  haveI : NeZero tp.q := ⟨tp.q_prime.pos.ne'⟩
-  obtain ⟨k, hklt, hk⟩ := hζ.eq_pow_of_pow_eq_one hvalpow
-  have hkhom : ξᵢ = ξ₁ ^ k := by
-    refine hext _ _ (Units.ext ?_)
-    rw [MonoidHom.pow_apply, Units.val_pow_eq_pow_val, hk]
-  have hk0 : k ≠ 0 := by
-    intro h0'
-    refine hξᵢne ?_
-    rw [hkhom, h0']
-    exact pow_zero ξ₁
-  have hkcop : k.Coprime (orderOf ξ₁) := by
-    rw [hord₁]
-    exact Nat.coprime_comm.mp (tp.q_prime.coprime_iff_not_dvd.mpr
-      (Nat.not_dvd_of_pos_of_lt (Nat.pos_of_ne_zero hk0) hklt))
-  obtain ⟨u, hu, -⟩ := (tiCyclicW hG mp tp).exists_mapRingEquiv_sigma_omega_pow rfl
-    (tiCyclicWDadeApp hG mp tp) ξ₁ hkcop
-  have hid : ∀ (l : Fin tp.q),
-      tau3W hG mp tp (omegaS hG mp tp l ⟨0, tp.p_prime.pos⟩)
-        = (tiCyclicW hG mp tp).sigma rfl (tiCyclicWDadeApp hG mp tp)
-            ((tiCyclicW hG mp tp).omega (omegaSChar hG mp tp l ⟨0, tp.p_prime.pos⟩) :
-              ClassFunction ↥(tiCyclicW hG mp tp).W ℂ) := by
-    intro l
-    rw [omegaS_eq_omega_omegaSChar]
-    show (tiCyclicW hG mp tp).sigmaIntegral rfl (tiCyclicWDadeApp hG mp tp) _ = _
-    rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_apply]
-  have hgoal := congrArg (fun f : ClassFunction G ℂ => f x) (hid i)
-  have huv := congrArg (fun f : ClassFunction G ℂ => f x) hu
-  simp only [OddOrder.RepresentationTheory.ClassFunction.mapRingEquiv_apply] at huv
-  have h1v := congrArg (fun f : ClassFunction G ℂ => f x) (hid ⟨1, tp.q_prime.one_lt⟩)
-  calc tau3W hG mp tp (omegaS hG mp tp i ⟨0, tp.p_prime.pos⟩) x
-      = (tiCyclicW hG mp tp).sigma rfl (tiCyclicWDadeApp hG mp tp)
-          ((tiCyclicW hG mp tp).omega ξᵢ :
-            ClassFunction ↥(tiCyclicW hG mp tp).W ℂ) x := hgoal
-    _ = (tiCyclicW hG mp tp).sigma rfl (tiCyclicWDadeApp hG mp tp)
-          ((tiCyclicW hG mp tp).omega (ξ₁ ^ k) :
-            ClassFunction ↥(tiCyclicW hG mp tp).W ℂ) x := by rw [hkhom]
-    _ = u ((tiCyclicW hG mp tp).sigma rfl (tiCyclicWDadeApp hG mp tp)
-          ((tiCyclicW hG mp tp).omega ξ₁ :
-            ClassFunction ↥(tiCyclicW hG mp tp).W ℂ) x) := huv
-    _ = u (tau3W hG mp tp
-          (omegaS hG mp tp ⟨1, tp.q_prime.one_lt⟩ ⟨0, tp.p_prime.pos⟩) x) := by rw [← h1v]
-    _ = 0 := by rw [h0, map_zero]
+  obtain ⟨u, hu⟩ := tau3W_omegaS_row_galois_orbit hG mp tp i hi
+  have hv := congrArg (fun f : ClassFunction G ℂ => f x) hu
+  simp only [OddOrder.RepresentationTheory.ClassFunction.mapRingEquiv_apply, h0, map_zero] at hv
+  exact hv.symm
 
 end Section16CharacterData
 
