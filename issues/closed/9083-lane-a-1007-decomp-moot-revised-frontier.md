@@ -490,3 +490,60 @@ degree-qa, `∀ φ ∈ 𝒮(H₀C′), ⟨γ, φ⟩ = 0`; supp α ⊆ A₀) + **
 
 - 全 touched leaf + `lake build OddOrder` (4164 jobs, ~1m45s) + `lake build
   OddOrder.AxiomsCheck` green。commits: bf04cba4 (items 1-2) / e5971490 (item 3 + 配線)。
+
+---
+
+# Phase E-final 完了 (2026-07-11, lane a): `NineElevenSevenEightRefutation` discharge — (9.11) 完結
+
+**最終 residual を discharge し、Peterfalvi (9.11) (Coq `Ptype_core_coherence`) が閉じた。**
+新 leaf `S11_NineElevenPairAdjoin.lean` (1214 行、自前 sorry 0・新 axiom 0) +
+`coherent_sOf_H0C` の sanctioned fill (S13_Orthogonality、statement 不変)。
+commit 29c4decc。
+
+## 構成 (Phase-E record の設計図どおり、Coq PFsection9.v:2048-2227 mirror)
+
+- **`isCoherent_union_pair_of_bridge`** (Coq `extend_coherent_with` PFsection5.v:1059 +
+  `bridge_coherent` :1000 = Pf (5.6.3) の port): orthonormal 族 S の coherent 拡張 τ₁ +
+  pair {λ, λ̄} + 直交 targets X/Xc (‖·‖² = 1、(λ−λ̄)^τ = X−Xc) + **bridge**
+  (λ − E·ψ₀)^τ = X − E·τ₁ψ₀ ⟹ `IsCoherent τ (S ∪ {λ, λ̄}) A`。拡張 =
+  Fourier-projection (`unionPairExtension`); supported-lattice 上の τ-一致は
+  φ = φ' + (a+b)·(λ − E·ψ₀) + b·(λ̄ − λ) 再中心化 (φ' ∈ ℤ[S] supported) —
+  Coq の bridge_coherent 度数簿記を bypass。
+- **`coherent_extension_eq_sum_memberRFamily`** (Coq `mem_coherent_sum_subseq` = (5.5)):
+  `CharacterPsiDecomposition.ofProjection` @ ψ=0 (tau1 := coherent 拡張、agreement =
+  extends_on_supported @ ψ−ψ̄) + `eq_sum_of_psi_eq_zero`。
+- **`coherent_extension_cross_orthogonal`** (Coq `coherent_ortho`): (5.5) 両側 +
+  landed `sOf_H0Cprime_memberRFamily_orthogonal` ((5.2.e))。τ₁𝒮₂ ⊥ τ₃𝒮₄ を供給。
+- **`exists_bridge_target_of_budget`** ((9.11.7)+(9.11.8) projection budget、抽象
+  orthonormal-family 形 = Hypothesis-defeq 非依存で軽量): TB = Γ+B+Δ 分解、
+  ‖TB‖² = e²+1・|SF| = 2e・係数定数性 (off ψ₁, offset e) → ℤ-budget
+  1 = ‖Γ‖² + 2e·b(b−1) + ‖Δ‖² → ‖Γ‖² = 1・Δ = 0・b ∈ {0,1};
+  ⟨TA,TB⟩ = e・TA ⊥ θ₃ ((9.11.6)) → b = 1 なら e·(x+1) = 1 (e ≥ 2 で矛盾) → b = 0;
+  出力 = bridge TB = Γ − e·τ₁ψ₁ + Γ の 4 性質。
+- **`nineElevenSevenEightRefutation`** (discharge 本体): 𝒮₄ ≠ ∅ (arithmetic spine
+  `nineElevenCaseA_equality_refutation` の対偶 — Phase B/C/D bundles を再結線し
+  |𝒮₄| = 0 ≤ N を refute); e := [U₁:C] (TI-witness) で u = e·a
+  (`relIndex_mul_relIndex` + `relIndex_cSub_U_eq_u`)、e ≥ 2 (u ≠ a: degree-qa irr は
+  𝒮₁ ⊆ 𝒮₂ 行き); |𝒮₂| = 2e ((9.8.d) hcount + C = U′ + 2a = p−1、
+  `caseA_sTwo_subset_degreeQaCut` の集合等式経由); budget 発火 → union-pair 拡張 →
+  `hpairs λ₁` と矛盾。
+
+## 検証
+
+- **axioms 実測**: 新 infra 5 本 (`unionPairExtension` / `isCoherent_union_pair_of_bridge` /
+  `coherent_extension_eq_sum_memberRFamily` / `coherent_extension_cross_orthogonal` /
+  `exists_bridge_target_of_budget`) = **axiom-clean** (propext/Classical.choice/Quot.sound
+  のみ) — AxiomsCheck に 5 asserts 追加。
+  `nineElevenSevenEightRefutation` / `coherent_sOf_H0Cprime` (新・無条件 (9.11)) /
+  `coherent_sOf_H0C` (fill 後) = propext/**sorryAx**/Classical.choice/Quot.sound —
+  sorryAx は**既存 upstream `C_eq_cSub` debt のみ** (`#print axioms C_eq_cSub` で確認、
+  caseB/Phase-B/C corollaries と同一債務; (11.5)/`H0_eq_Hprime` close で自動解消)。
+- **sorry**: 本 leaf 0。S13_Orthogonality は 3 sites → 2 sites (残 2 =
+  `coherent_SOf_H0C_of_column_identities` 内、別 decl・§14-gated・pre-existing)。
+- full `lake build OddOrder` 4165 jobs 1m38s green (AxiomsCheck 含む)。
+
+## 残 (この route の外)
+
+(9.11) それ自体は完結。下流の honest 化残債 = `C_eq_cSub` chain ((11.5)
+`H0_eq_Hprime`) と `coherent_SOf_H0C_of_column_identities` の §14-gated 2 sorries
+(hmixed/hbridge_τ、issue 1019 update¹³) — 別 frontier。

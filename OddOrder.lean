@@ -253,6 +253,7 @@ import OddOrder.Peterfalvi.S11_NineElevenTwoSummand
 import OddOrder.Peterfalvi.S11_NineElevenMackeyNorm
 import OddOrder.Peterfalvi.S11_NineElevenTIWitness
 import OddOrder.Peterfalvi.S11_NineElevenAlphaBound
+import OddOrder.Peterfalvi.S11_NineElevenPairAdjoin
 import OddOrder.Peterfalvi.S12_MaximalIII_IV_V
 import OddOrder.Peterfalvi.S12_Noncoherence
 import OddOrder.Peterfalvi.S12_TypeVCaseC
