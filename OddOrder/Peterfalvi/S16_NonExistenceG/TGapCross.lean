@@ -16,9 +16,7 @@ on virtual characters.
 
 namespace OddOrder.Peterfalvi.S16
 
-open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory
-open OddOrder.Isaacs
 
 variable {G : Type*} [Group G]
 open scoped BigOperators
@@ -469,192 +467,6 @@ theorem disjoint_conjugatesIntoSet_sharpP_union_typePV_Tderived [Finite G]
     p_dvd_orderOf_of_mem_sharpP_union_typePV hG hyp hy
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (13.18.a), `[S : PW₁] = u`.**
-
-The index is read from `|S| = p^q·u·q` and
-`|P W₁| = |P|·|W₁| = p^q·q`; `P` is normal in `S` and `W₁ ∩ S′ = 1`.
-This is the degree of the permutation character `Ind_{PW₁}^S 1`. -/
-theorem PW1_index_eq_u [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
-    ((hyp.P ⊔ hyp.W1).subgroupOf hyp.S).index = hyp.u := by
-  have hD_le_S : OddOrder.GroupTheory.derivedInG hyp.S ≤ hyp.S := Subgroup.map_subtype_le _
-  have hP_le_D : hyp.P ≤ OddOrder.GroupTheory.derivedInG hyp.S := by
-    rw [hyp.S_deriv_eq_PU]
-    exact le_sup_left
-  have hP_le_S : hyp.P ≤ hyp.S := hP_le_D.trans hD_le_S
-  have hW1_le_S : hyp.W1 ≤ hyp.S := hyp.Sdata_W1_eq ▸ hyp.Sdata.W1_le
-  have hS_norm_P : hyp.S ≤ Subgroup.normalizer (hyp.P : Set G) := by
-    rw [hyp.P_eq_SF]
-    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
-  have hW1norm : hyp.W1 ≤ Subgroup.normalizer (hyp.P : Set G) := hW1_le_S.trans hS_norm_P
-  have hDW1 : OddOrder.GroupTheory.derivedInG hyp.S ⊓ hyp.W1 = ⊥ := by
-    have hd := disjoint_iff.mp hyp.Sdata.M_complement.disjoint
-    rw [eq_bot_iff]
-    rintro x ⟨hxD, hxW1⟩
-    have hxS : x ∈ hyp.S := hD_le_S hxD
-    have hmem : (⟨x, hxS⟩ : ↥hyp.S) ∈
-        ((OddOrder.GroupTheory.derivedInG hyp.S).subgroupOf hyp.S) ⊓
-          (hyp.Sdata.W1.subgroupOf hyp.S) :=
-      ⟨Subgroup.mem_subgroupOf.mpr hxD,
-        Subgroup.mem_subgroupOf.mpr (hyp.Sdata_W1_eq ▸ hxW1)⟩
-    rw [hd, Subgroup.mem_bot] at hmem
-    rw [Subgroup.mem_bot]
-    simpa using Subtype.ext_iff.mp hmem
-  have hPW1disj : Disjoint hyp.P hyp.W1 :=
-    (disjoint_iff.mpr hDW1).mono hP_le_D (le_refl hyp.W1)
-  have hcardPW1 : Nat.card ↥(hyp.P ⊔ hyp.W1) = hyp.p ^ hyp.q * hyp.q := by
-    rw [sup_comm, OddOrder.BG.Ch3.S12.card_sup_eq_mul_of_le_normalizer_of_disjoint
-      hW1norm (disjoint_iff.mp hPW1disj.symm),
-      hyp.card_P_eq hG hyp.Sdata_W2_eq, ← hyp.q_eq_card_W1]
-    exact Nat.mul_comm hyp.q (hyp.p ^ hyp.q)
-  have hcardPW1S : Nat.card ↥((hyp.P ⊔ hyp.W1).subgroupOf hyp.S) =
-      hyp.p ^ hyp.q * hyp.q := by
-    rw [Nat.card_congr
-      (Subgroup.subgroupOfEquivOfLe (sup_le hP_le_S hW1_le_S)).toEquiv, hcardPW1]
-  have hm := Subgroup.card_mul_index ((hyp.P ⊔ hyp.W1).subgroupOf hyp.S)
-  rw [hcardPW1S, hyp.card_S_val hG, OddOrder.Peterfalvi.S15.c_eq_one hG hyp,
-    mul_one] at hm
-  have hpos : 0 < hyp.p ^ hyp.q * hyp.q :=
-    mul_pos (pow_pos hyp.p_prime.pos hyp.q) hyp.q_prime.pos
-  apply Nat.eq_of_mul_eq_mul_left hpos
-  calc
-    (hyp.p ^ hyp.q * hyp.q) * ((hyp.P ⊔ hyp.W1).subgroupOf hyp.S).index
-        = hyp.p ^ hyp.q * (hyp.u * hyp.q) := by simpa [mul_assoc] using hm
-    _ = (hyp.p ^ hyp.q * hyp.q) * hyp.u := by ring
-
-open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (13.18.a), the bridge character vanishes at `1`.** -/
-theorem betaGrid_apply_one_eq_zero [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
-    (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
-    OddOrder.Peterfalvi.S15.betaGrid hyp j 1 = 0 := by
-  have hj0 : j ≠ ⟨0, hyp.p_prime.pos⟩ := fun h => hj (by simp [h])
-  rw [OddOrder.Peterfalvi.S15.betaGrid, ClassFunction.sub_apply,
-    OddOrder.Peterfalvi.S15.indPW1, ClassFunction.induce_apply_one,
-    PW1_index_eq_u hG hyp, trivialClassFunction_apply, mul_one,
-    hyp.mu_apply_one_eq_u hG ⟨0, hyp.q_prime.pos⟩ j hj0, sub_self]
-
-open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (13.18.a), exact β support reduced to prime-`TI` values.**
-
-The group-theoretic support argument needs only three pointwise character inputs:
-`β_j(1)=0`, `μ_{0j}=0` on `S′−P`, and `μ_{0j}=1` on `W₁#`.  The corresponding
-`Ind_{PW₁}^S 1` values are already proved.  Peterfalvi (2.1) conjugates every point
-outside `S′` to `x y` with `x∈W₁#`, `y∈W₂`; if `y=1` cancellation applies, and
-otherwise `xy∈V_S`.  Thus these three residue values imply the exact carrier
-`P# ∪ V_S`, with no Dade or order-separation content left. -/
-theorem betaGrid_support_sharpP_union_typePV_of_values [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (j : Fin hyp.base.p)
-    (hone : OddOrder.Peterfalvi.S15.betaGrid hyp.base j 1 = 0)
-    (hmuD : ∀ z : ↥hyp.base.S,
-      (z : G) ∈ OddOrder.GroupTheory.derivedInG hyp.base.S →
-      (z : G) ∉ hyp.base.P →
-      hyp.base.mu ⟨0, hyp.base.q_prime.pos⟩ j z = 0)
-    (hmuW1 : ∀ x : ↥hyp.base.S, (x : G) ∈ hyp.base.W1 → x ≠ 1 →
-      hyp.base.mu ⟨0, hyp.base.q_prime.pos⟩ j x = 1) :
-    (OddOrder.Peterfalvi.S15.betaGrid hyp.base j).support ⊆
-      {z : ↥hyp.base.S |
-        (z : G) ∈ OddOrder.GroupTheory.sharpSubgroup hyp.base.P ∪
-          OddOrder.GroupTheory.conjClassSetIn hyp.base.S
-            (OddOrder.GroupTheory.typePV hyp.base.S hyp.base.Sdata)} := by
-  intro z hz
-  rw [ClassFunction.mem_support] at hz
-  by_cases hzD : (z : G) ∈ OddOrder.GroupTheory.derivedInG hyp.base.S
-  · by_cases hzP : (z : G) ∈ hyp.base.P
-    · by_cases hz1 : z = 1
-      · exfalso
-        exact hz (hz1 ▸ hone)
-      · exact Or.inl ⟨hzP, fun h => hz1 (Subtype.ext h)⟩
-    · exfalso
-      apply hz
-      rw [OddOrder.Peterfalvi.S15.betaGrid, ClassFunction.sub_apply,
-        OddOrder.Peterfalvi.S15.indPW1_apply_eq_zero_of_mem_derived_not_mem_P
-          hG hyp.base hzD hzP,
-        hmuD z hzD hzP, sub_self]
-  · let h := hyp.base.s06S hG
-    have hzK : z ∉ h.K := by
-      intro hzK
-      exact hzD (Subgroup.mem_subgroupOf.mp hzK)
-    obtain ⟨c, x, hxW1, hx1, y, hyW2, hconj⟩ := h.mem_compl_conj_into_W hzK
-    have hxW1G : (x : G) ∈ hyp.base.W1 := by
-      have hx := Subgroup.mem_subgroupOf.mp hxW1
-      rwa [hyp.base.Sdata_W1_eq] at hx
-    have hyW2G : (y : G) ∈ hyp.base.W2 := by
-      have hy := Subgroup.mem_subgroupOf.mp hyW2
-      rwa [hyp.base.Sdata_W2_eq] at hy
-    have hconjβ : OddOrder.Peterfalvi.S15.betaGrid hyp.base j z =
-        OddOrder.Peterfalvi.S15.betaGrid hyp.base j (x * y) := by
-      rw [← hconj]
-      have hc := (OddOrder.Peterfalvi.S15.betaGrid hyp.base j).conj_eq z c⁻¹
-      rw [inv_inv] at hc
-      exact hc.symm
-    have hy1 : y ≠ 1 := by
-      rintro rfl
-      apply hz
-      rw [hconjβ, mul_one, OddOrder.Peterfalvi.S15.betaGrid, ClassFunction.sub_apply,
-        OddOrder.Peterfalvi.S15.indPW1_apply_eq_one_of_mem_W1_sharp
-          hG hyp.base hxW1G hx1,
-        hmuW1 x hxW1G hx1, sub_self]
-    right
-    rw [OddOrder.GroupTheory.mem_conjClassSetIn]
-    refine ⟨(x : G) * (y : G), ?_, (c : G), c.2, ?_⟩
-    · have hxW1data : (x : G) ∈ hyp.base.Sdata.W1 :=
-        Subgroup.mem_subgroupOf.mp hxW1
-      have hyW2data : (y : G) ∈ hyp.base.Sdata.W2 :=
-        Subgroup.mem_subgroupOf.mp hyW2
-      have hxyW : (x : G) * (y : G) ∈ hyp.base.Sdata.W := by
-        rw [hyp.base.Sdata.W_eq]
-        exact mul_mem (Subgroup.mem_sup_left hxW1data) (Subgroup.mem_sup_right hyW2data)
-      simp only [OddOrder.GroupTheory.typePV, Set.mem_sdiff, Set.mem_union,
-        SetLike.mem_coe, not_or]
-      refine ⟨hxyW, ?_, ?_⟩
-      · intro hxyW1
-        apply hy1
-        have hyW1 : (y : G) ∈ hyp.base.Sdata.W1 := by
-          have heq : (y : G) = (x : G)⁻¹ * ((x : G) * (y : G)) := by group
-          rw [heq]
-          exact mul_mem (inv_mem hxW1data) hxyW1
-        have hbot := (OddOrder.Peterfalvi.S12.typePData_disjoint_W1_W2 hyp.base.Sdata).le_bot
-          (Subgroup.mem_inf.mpr ⟨hyW1, hyW2data⟩)
-        rw [Subgroup.mem_bot] at hbot
-        exact Subtype.ext hbot
-      · intro hxyW2
-        apply hx1
-        have hxW2 : (x : G) ∈ hyp.base.Sdata.W2 := by
-          have heq : (x : G) = ((x : G) * (y : G)) * (y : G)⁻¹ := by group
-          rw [heq]
-          exact mul_mem hxyW2 (inv_mem hyW2data)
-        have hbot := (OddOrder.Peterfalvi.S12.typePData_disjoint_W1_W2 hyp.base.Sdata).le_bot
-          (Subgroup.mem_inf.mpr ⟨hxW1data, hxW2⟩)
-        rw [Subgroup.mem_bot] at hbot
-        exact Subtype.ext hbot
-    · have hconjG : (c : G)⁻¹ * (z : G) * (c : G) = (x : G) * (y : G) := by
-        have hc := congrArg hyp.base.S.subtype hconj
-        rwa [map_mul, map_mul, map_inv] at hc
-      rw [← hconjG]
-      group
-
-open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (13.18.a), exact β support from the two prime-`TI` μ-values.** -/
-theorem betaGrid_support_sharpP_union_typePV_of_mu_values [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (j : Fin hyp.base.p) (hj : (j : ℕ) ≠ 0)
-    (hmuD : ∀ z : ↥hyp.base.S,
-      (z : G) ∈ OddOrder.GroupTheory.derivedInG hyp.base.S →
-      (z : G) ∉ hyp.base.P →
-      hyp.base.mu ⟨0, hyp.base.q_prime.pos⟩ j z = 0)
-    (hmuW1 : ∀ x : ↥hyp.base.S, (x : G) ∈ hyp.base.W1 → x ≠ 1 →
-      hyp.base.mu ⟨0, hyp.base.q_prime.pos⟩ j x = 1) :
-    (OddOrder.Peterfalvi.S15.betaGrid hyp.base j).support ⊆
-      {z : ↥hyp.base.S |
-        (z : G) ∈ OddOrder.GroupTheory.sharpSubgroup hyp.base.P ∪
-          OddOrder.GroupTheory.conjClassSetIn hyp.base.S
-            (OddOrder.GroupTheory.typePV hyp.base.S hyp.base.Sdata)} :=
-  betaGrid_support_sharpP_union_typePV_of_values hG hyp j
-    (betaGrid_apply_one_eq_zero hG hyp.base j hj) hmuD hmuW1
-
-open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (14.9), cross-Dade orthogonality from the exact support inputs.**
 
 This is the final consumer of the two genuine character-theoretic residuals in the
@@ -753,32 +565,25 @@ theorem tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_beta_support [Finite G]
     hbeta hφsupp
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (14.9), cross-Dade orthogonality from the two prime-`TI` μ-values.**
+/-- **Peterfalvi (14.9), unconditional cross-Dade orthogonality.**
 
-All group structure, normed-TI, Dade=Ind, and support-separation steps are discharged;
-the only inputs are the two pointwise residue facts used in Coq `PVSbeta`. -/
-theorem tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_mu_values [Finite G]
+The S-side exact support is supplied by the fully proved `(13.18.a)` theorem
+`S15.betaGrid_support`; all group structure, normed-TI, Dade=Ind, and support-separation steps
+are therefore discharged. -/
+theorem tSideDadeMap_inner_tauSbetaGrid_eq_zero [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G))
     [fintypeG : Fintype G] [invertibleG : Invertible (Nat.card G : ℂ)]
     (dataT : OddOrder.GroupTheory.TypePData hyp.base.T)
     (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T)
-    (hmuD : ∀ z : ↥hyp.base.S,
-      (z : G) ∈ OddOrder.GroupTheory.derivedInG hyp.base.S →
-      (z : G) ∉ hyp.base.P →
-      hyp.base.mu ⟨0, hyp.base.q_prime.pos⟩
-        ⟨1, by have := hyp.base.three_le_p; omega⟩ z = 0)
-    (hmuW1 : ∀ x : ↥hyp.base.S, (x : G) ∈ hyp.base.W1 → x ≠ 1 →
-      hyp.base.mu ⟨0, hyp.base.q_prime.pos⟩
-        ⟨1, by have := hyp.base.three_le_p; omega⟩ x = 1)
     {φ : ClassFunction ↥hyp.base.T ℂ}
     (hφsupp : φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
       (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T) :
     ClassFunction.inner (tSideDadeMap hyp hG φ)
       (OddOrder.Peterfalvi.S15.tauSbetaGrid hG hyp.base) = 0 :=
   tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_beta_support hG hyp dataT hP1
-    (betaGrid_support_sharpP_union_typePV_of_mu_values hG hyp
-      ⟨1, by have := hyp.base.three_le_p; omega⟩ (by norm_num) hmuD hmuW1)
+    (OddOrder.Peterfalvi.S15.betaGrid_support hG hyp.base
+      ⟨1, by have := hyp.base.three_le_p; omega⟩ (by norm_num))
     hφsupp
 
 /-- The inner product of two virtual characters is symmetric: its value is
@@ -850,116 +655,6 @@ theorem tSide_beta_inner_eta_of_zeroColumn_projection [Finite G]
       OddOrder.RepresentationTheory.inner_conj_symm _ _
     _ = star (if j = ⟨0, base.p_prime.pos⟩ then 1 else 0) := by rw [hproj j, hsum]
     _ = if j = ⟨0, base.p_prime.pos⟩ then 1 else 0 := by split <;> simp
-
-open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (13.18.a), prime-`TI` residue value on `S' \ P`.**  For every nontrivial
-column `j`, the base-row residue vanishes at a derived-subgroup element outside the Fitting
-kernel: `μ_{0j}(z) = 0` for `z ∈ S' \ P`.
-
-This is the `mu2_ 0 j` half of Coq's `PVSbeta` argument (`PFsection13.v:1833`).  First,
-`mu_definition` shows that all entries in column `j` have the same value at `z`: the inducing
-subgroup `W = W₁ ⊔ W₂` is contained in `P ⊔ W₁` (`W₂ ≤ P`), while no `S`-conjugate of
-`z ∈ S' \ P` can lie in `P ⊔ W₁` (`W₁ ⊓ S' = 1` and `P ◁ S`).  Second, the column
-sum is induced from a linear character of `PC` (`mu_j_isIndPC`); Peterfalvi (13.12) gives
-`C = 1`, so it is induced from the normal subgroup `P` and therefore vanishes at `z`.  Since the
-column has `q ≠ 0` equal entries, its base entry vanishes.
-
-The local argument is complete; its current axiom closure inherits the existing upstream
-`pc_le_maxNilpotentNormalHall → c_eq_one → C_eq_bot` gate. -/
-theorem sSide_mu_row0_apply_eq_zero_of_mem_derived_not_mem_P [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
-    (j : Fin hyp.p) (hj : j ≠ ⟨0, hyp.p_prime.pos⟩) (z : ↥hyp.S)
-    (hzS' : (z : G) ∈ derivedInG hyp.S) (hzP : (z : G) ∉ hyp.P) :
-    hyp.mu ⟨0, hyp.q_prime.pos⟩ j z = 0 := by
-  classical
-  have hM'_le_S : derivedInG hyp.S ≤ hyp.S := Subgroup.map_subtype_le _
-  have hP_le_M' : hyp.P ≤ derivedInG hyp.S := by
-    rw [hyp.S_deriv_eq_PU]
-    exact le_sup_left
-  have hP_le_S : hyp.P ≤ hyp.S := hP_le_M'.trans hM'_le_S
-  have hW1_le_S : hyp.W1 ≤ hyp.S := hyp.Sdata_W1_eq ▸ hyp.Sdata.W1_le
-  have hS_norm_P : hyp.S ≤ Subgroup.normalizer (hyp.P : Set G) := by
-    rw [hyp.P_eq_SF]
-    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
-  haveI hPnorm : (hyp.P.subgroupOf hyp.S).Normal :=
-    (Subgroup.normal_subgroupOf_iff_le_normalizer hP_le_S).mpr hS_norm_P
-  have hM'W1 : derivedInG hyp.S ⊓ hyp.W1 = ⊥ := by
-    have hd := disjoint_iff.mp hyp.Sdata.M_complement.disjoint
-    rw [eq_bot_iff]
-    rintro x ⟨hxM', hxW1⟩
-    have hxS : x ∈ hyp.S := hM'_le_S hxM'
-    have hmem : (⟨x, hxS⟩ : ↥hyp.S) ∈
-        ((derivedInG hyp.S).subgroupOf hyp.S) ⊓ (hyp.Sdata.W1.subgroupOf hyp.S) :=
-      ⟨Subgroup.mem_subgroupOf.mpr hxM',
-        Subgroup.mem_subgroupOf.mpr (hyp.Sdata_W1_eq ▸ hxW1)⟩
-    rw [hd, Subgroup.mem_bot] at hmem
-    rw [Subgroup.mem_bot]
-    simpa using Subtype.ext_iff.mp hmem
-  have hPW1S' : ∀ {w : G}, w ∈ hyp.P ⊔ hyp.W1 → w ∈ derivedInG hyp.S → w ∈ hyp.P := by
-    intro w hwPW1 hwS'
-    have hwmem : w ∈ (↑(hyp.P ⊔ hyp.W1) : Set G) := hwPW1
-    rw [Subgroup.coe_mul_of_right_le_normalizer_left hyp.P hyp.W1
-      (hW1_le_S.trans hS_norm_P)] at hwmem
-    obtain ⟨p, hp, w1, hw1, hpw⟩ := Set.mem_mul.mp hwmem
-    have hw1S' : w1 ∈ derivedInG hyp.S := by
-      have hw1eq : w1 = p⁻¹ * w := by rw [← hpw]; group
-      rw [hw1eq]
-      exact Subgroup.mul_mem _ (Subgroup.inv_mem _ (hP_le_M' (SetLike.mem_coe.mp hp))) hwS'
-    have hw1bot : w1 ∈ derivedInG hyp.S ⊓ hyp.W1 :=
-      Subgroup.mem_inf.mpr ⟨hw1S', SetLike.mem_coe.mp hw1⟩
-    rw [hM'W1, Subgroup.mem_bot] at hw1bot
-    have hweq : w = p := by rw [← hpw, hw1bot, mul_one]
-    rw [hweq]
-    exact SetLike.mem_coe.mp hp
-  have hW2P : hyp.W2 ≤ hyp.P := OddOrder.Peterfalvi.S15.W2_le_P hG hyp
-  have hW_PW1 : hyp.W ≤ hyp.P ⊔ hyp.W1 := by
-    rw [hyp.W_eq_join]
-    exact sup_le le_sup_right (hW2P.trans le_sup_left)
-  have hz_not_conjW : z ∉ ClassFunction.conjugatesInto (hyp.W.subgroupOf hyp.S) := by
-    rintro ⟨g, hg⟩
-    have hwW : (((g⁻¹ * z * g : ↥hyp.S) : G)) ∈ hyp.W :=
-      Subgroup.mem_subgroupOf.mp hg
-    have hwS' : (((g⁻¹ * z * g : ↥hyp.S) : G)) ∈ derivedInG hyp.S := by
-      have hz' : z ∈ (derivedInG hyp.S).subgroupOf hyp.S :=
-        Subgroup.mem_subgroupOf.mpr hzS'
-      have hconj := (inferInstance : ((derivedInG hyp.S).subgroupOf hyp.S).Normal).conj_mem
-        z hz' g⁻¹
-      rw [inv_inv] at hconj
-      exact Subgroup.mem_subgroupOf.mp hconj
-    have hwP : g⁻¹ * z * g ∈ hyp.P.subgroupOf hyp.S :=
-      Subgroup.mem_subgroupOf.mpr (hPW1S' (hW_PW1 hwW) hwS')
-    have hzback := hPnorm.conj_mem _ hwP g
-    have hzz : g * (g⁻¹ * z * g) * g⁻¹ = z := by group
-    rw [hzz] at hzback
-    exact hzP (Subgroup.mem_subgroupOf.mp hzback)
-  have hrow : ∀ i : Fin hyp.q,
-      hyp.mu i j z = hyp.mu ⟨0, hyp.q_prime.pos⟩ j z := by
-    intro i
-    have hdef := hyp.mu_definition i j
-    have hval := congrArg (fun f : ClassFunction ↥hyp.S ℂ => f z) hdef
-    rw [ClassFunction.induce_eq_zero_of_not_conjugatesInto _ hz_not_conjW] at hval
-    have hδ : (hyp.delta j : ℂ) ≠ 0 := by
-      rcases hyp.delta_pm_one.1 j with h | h <;> rw [h] <;> norm_num
-    exact sub_eq_zero.mp ((mul_eq_zero.mp hval.symm).resolve_left hδ)
-  obtain ⟨θ, _hθirr, _hθ1, hsum⟩ :=
-    OddOrder.Peterfalvi.S15.Hypothesis.mu_j_isIndPC hG hyp j hj
-  have hHP : hyp.H = hyp.P := by
-    rw [OddOrder.Peterfalvi.S15.Hypothesis.H,
-      OddOrder.Peterfalvi.S15.C_eq_bot hG hyp, sup_bot_eq]
-  have hHPsub : hyp.P.subgroupOf hyp.S = hyp.H.subgroupOf hyp.S := by rw [hHP]
-  rw [← OddOrder.RepresentationTheory.induce_compHom_subgroupCongr hHPsub θ] at hsum
-  have hsumz := congrArg (fun f : ClassFunction ↥hyp.S ℂ => f z) hsum
-  have hzP' : z ∉ hyp.P.subgroupOf hyp.S := fun hz => hzP (Subgroup.mem_subgroupOf.mp hz)
-  rw [ClassFunction.induce_apply_eq_zero_of_not_mem_normal
-    (hyp.P.subgroupOf hyp.S) _ hzP'] at hsumz
-  rw [ClassFunction.finset_sum_apply,
-    Finset.sum_congr rfl (fun i _ => hrow i), Finset.sum_const, Finset.card_univ,
-    Fintype.card_fin, nsmul_eq_mul] at hsumz
-  have hq0 : (hyp.q : ℂ) ≠ 0 := by
-    rw [Nat.cast_ne_zero]
-    exact hyp.q_prime.pos.ne'
-  exact (mul_eq_zero.mp hsumz).resolve_left hq0
 
 /-- **Peterfalvi (14.9), S/T gap assembly.**
 

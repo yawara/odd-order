@@ -3432,12 +3432,10 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.disjoint_conjugatesIntoSet_sharpP_union_typePV_Tderived
-set_option linter.style.longLine false in
-#assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.betaGrid_support_sharpP_union_typePV_of_values
--- ⏳ pending (issue 3004): `tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_{exact_supports,
--- beta_support}` は S/T support 分離の sorried deep inputs (hdeep 系) に推移依存のため
--- assert しない (同上)。
+-- ⏳ pending (issues 3004/9084): `S15.betaGrid_support` は仮説なしの局所証明だが、
+-- 独立 AxiomsCheck では既存 upstream の `sorryAx` を継承する。これを cite する無条件 endpoint
+-- `tSideDadeMap_inner_tauSbetaGrid_eq_zero` も同じく `sorryAx` を継承するため assert しない。
+-- exact dependency を上流が閉じた時点で両方を再登録する (2026-07-12 lane c 検証)。
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.inner_eq_swap_of_mem_ZIrr
 set_option linter.style.longLine false in
