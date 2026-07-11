@@ -18,6 +18,93 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce
 
 variable {G : Type*} [Group G]
 
+/-- **Peterfalvi (10.1), the Section 12 carrier with a specified type-`P`
+decomposition.**  The standard existence theorem chooses an unspecified
+`TypePData`.  For cross-construction comparisons we must retain the already
+reconciled `W₁,W₂` factors; the faithful type-`P₁` Dade producer works for that
+specified datum verbatim. -/
+noncomputable def s12HypothesisOfTypePData [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (data : TypePData M)
+    (htype : IsTypeIII M ∨ IsTypeIV M ∨ IsTypeV M)
+    (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M) :
+    OddOrder.Peterfalvi.S12.Hypothesis M := by
+  let dadeData :=
+    (OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_typePA0_of_isTypeP1
+      hG hM data hP1).some
+  exact
+    { maximal := hM
+      typeP := data
+      type_alt := htype
+      dadeData := dadeData
+      hconj := dadeData.hconj }
+
+open scoped Classical in
+/-- **Peterfalvi (4.4)--(4.5), the Section 12 zero column is the prime-TI
+anchor.**  The column-`0` dual is trivial, so its distinguished constituent
+restricts to `1_{M'}`.  Summing the whole column and applying (4.5.a) therefore
+gives exactly `Ind_{M'}^M 1`, independently of every enumeration choice.
+
+This is the source-side identification needed to compare the Section 11
+residual with `primeTIred 0` in the T-side (11.9.a) projection. -/
+theorem s12_muGrid_zeroColumn_sum_eq_induce_trivial [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : OddOrder.Peterfalvi.S12.Hypothesis M) :
+    (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i 0) =
+      ClassFunction.induce ((derivedInG M).subgroupOf M)
+        (trivialClassFunction ↥((derivedInG M).subgroupOf M)) := by
+  haveI := hyp.finiteG
+  classical
+  let h := (hyp.toCertainTypeHypothesis hG hG.odd).toHypothesis
+  haveI hNeZ1 : NeZero (Nat.card h.W1) :=
+    ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M :=
+    OddOrder.Peterfalvi.S12.typePData_W2_le_self hyp.typeP
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) :=
+    ⟨Nat.card_pos.ne'⟩
+  let chi2 : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
+    OddOrder.Peterfalvi.S12.finCardEquivCharacterGroup _
+      (finCongr hcardW2sub.symm (0 : Fin hyp.w2))
+  have hchi2 : chi2 = 1 := by
+    dsimp only [chi2]
+    rw [show finCongr hcardW2sub.symm (0 : Fin hyp.w2) = 0 from by
+      apply Fin.ext
+      simp, OddOrder.Peterfalvi.S12.finCardEquivCharacterGroup_zero]
+  have hsum : ClassFunction.induce h.K
+        (ClassFunction.restrict h.K
+          ((h.columnFamily chi2).mu 0 : ClassFunction ↥M ℂ)) =
+      ∑ i : Fin (Nat.card h.W1),
+        ((h.columnFamily chi2).mu i : ClassFunction ↥M ℂ) :=
+    h.induce_restrict_certainType_eq chi2
+  have hsource : ClassFunction.restrict h.K
+        ((h.columnFamily chi2).mu 0 : ClassFunction ↥M ℂ) =
+      trivialClassFunction ↥h.K := by
+    rw [hchi2, h.certainType_zero_column_anchor.2]
+    ext x
+    simp
+  rw [hsource] at hsum
+  calc
+    (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i 0) =
+        ∑ i : Fin (Nat.card h.W1),
+          ((h.columnFamily chi2).mu i : ClassFunction ↥M ℂ) := by
+      rw [← Equiv.sum_comp (finCongr hcardW1.symm)
+        (fun i : Fin (Nat.card h.W1) =>
+          ((h.columnFamily chi2).mu i : ClassFunction ↥M ℂ))]
+      exact Finset.sum_congr rfl (fun i _ => by
+        unfold OddOrder.Peterfalvi.S12.Hypothesis.muGrid
+        rfl)
+    _ = ClassFunction.induce h.K (trivialClassFunction ↥h.K) := hsum.symm
+    _ = ClassFunction.induce ((derivedInG M).subgroupOf M)
+          (trivialClassFunction ↥((derivedInG M).subgroupOf M)) := rfl
+
 /-- **Peterfalvi (10.2)--(10.3), character parameters based at a specified
 family member.**  The arithmetic data `d`, `delta`, and `n` depend only on the
 maximal subgroup.  Hence the standard parameter construction can retain any
@@ -234,5 +321,61 @@ theorem member_residual_not_orthogonal_H0C_of_refuter [Finite G]
         (OddOrder.Peterfalvi.S13.SOf_HC_subset_SHCSet hG s13hyp)
         (OddOrder.Peterfalvi.S13.coherent_SOf_HC hG s13hyp).some.nonzero)
       hzS hzHC hzdeg hcol)
+
+/-- **Peterfalvi (11.8), transport to a transposed T-side grid.**
+The Section 12 calculation is indexed by `W₁ × W₂`, whereas the shared
+Section 16 grid writes the T-side factors in the transposed order `q × p`.
+Once the two cardinal identifications, the Dade image, and each grid entry
+are identified, non-orthogonality transports without any further character
+theory.  The hypotheses below are equalities of the concrete producers, not
+new mathematical assumptions hidden in a carrier. -/
+theorem member_residual_not_orthogonal_of_transposed_alignment [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M)
+    (hM2 : secondDerivedInAmbient M =
+      hyp.typeP.H ⊔
+        (hyp.typeP.U ⊓ Subgroup.centralizer (hyp.typeP.H : Set G)))
+    (hHcard : Nat.card ↥hyp.typeP.H = hyp.w2 ^ hyp.w1)
+    (hrefute : ∀ s13hyp : OddOrder.Peterfalvi.S13.Hypothesis M,
+      ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+        s13hyp.base.tau (s13hyp.SOf s13hyp.H0C) s13hyp.base.A0))
+    (zeta : ClassFunction ↥M ℂ)
+    (hzetaS : zeta ∈ OddOrder.Peterfalvi.S12.inducedFamily M)
+    (hzetairr : IsIrreducibleCharacter zeta)
+    (hzeta1 : zeta 1 = (hyp.w1 : ℂ))
+    {p q : ℕ} [NeZero p] [NeZero q]
+    (hp : hyp.w1 = p) (hq : hyp.w2 = q)
+    (tauT : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G)
+    (nu0 : ClassFunction ↥M ℂ)
+    (eta : Fin q → Fin p → ClassFunction G ℂ)
+    (himage : hyp.tau
+        ((∑ i' : Fin hyp.w1, hyp.muGrid hG hG.odd i' 0) - zeta) =
+      tauT (nu0 - zeta))
+    (hgrid : ∀ (i : Fin hyp.w1) (j : Fin hyp.w2),
+      hyp.alignedOmegaSigmaGrid hG hG.odd i j =
+        eta (finCongr hq j) (finCongr hp i)) :
+    ¬ ∀ (i : Fin q) (j : Fin p),
+      ClassFunction.inner
+        (tauT (nu0 - zeta) - ∑ j' : Fin p, eta 0 j')
+        (eta i j) = 0 := by
+  have hnot := member_residual_not_orthogonal_H0C_of_refuter
+    hG hyp htype hM2 hHcard hrefute zeta hzetaS hzetairr hzeta1
+  intro horth
+  apply hnot
+  intro i j
+  have hsum :
+      (∑ i' : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hG.odd i' 0) =
+        ∑ j' : Fin p, eta 0 j' := by
+    calc
+      (∑ i' : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hG.odd i' 0) =
+          ∑ i' : Fin hyp.w1, eta 0 (finCongr hp i') := by
+        apply Finset.sum_congr rfl
+        intro i' _
+        simpa using hgrid i' 0
+      _ = ∑ j' : Fin p, eta 0 j' := by
+        simpa using Equiv.sum_comp (finCongr hp) (fun j' : Fin p => eta 0 j')
+  rw [himage, hsum, hgrid]
+  exact horth (finCongr hq j) (finCongr hp i)
 
 end OddOrder.Peterfalvi.S16
