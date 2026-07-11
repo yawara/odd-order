@@ -1563,7 +1563,10 @@ and `gammaGrid_Y_norm_bound` reduce to** (the honest `'A0`-Dade=Ind bridge
 theorem betaGrid_A0_support [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
     (betaGrid hyp j).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set hyp.S hyp.Sdata) hyp.S := sorry
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set hyp.S hyp.Sdata) hyp.S := by
+  intro z hz
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+  exact sharpP_union_V_subset_A0 hG hyp (betaGrid_support hG hyp j hj hz)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.18.c)** `⟨Γ, 1_G⟩ = 0`.
