@@ -540,6 +540,202 @@ theorem coherent_sOf_H0C_extension_muColumnSum_pin_of_irr [Finite G]
   exact sub_eq_zero.mp hzero
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The canonical pinned `𝒮(H₀C)`-coherence, all-reducible case** (the Coq
+`uniform_prTIred_coherent` swap of the (11.8.6) `tau2muj` WLOG, issue 1023 tick¹⁴): if every
+member of `𝒮(H₀C)` is reducible — hence a `μ`-column sum (`SOf_reducible_eq_columnSum`) — the
+assignment `μ-column ↦ aligned ω^σ-column` extends to a coherent extension
+(`coherentImageMap` over the orthogonal member family), *pinned by construction*.
+
+Isometry: member pairs have `⟨μ_a, μ_b⟩ = w₁·[a=b] = ⟨Ω_a, Ω_b⟩` (column norms and the
+orthonormal grid).  τ-agreement: an `A₀`-supported lattice element has value `0` at `1`
+(`one_notMem_A0`); since all members share the degree `w₁·d` (`degree_independent`), the residual
+`ν₀ − τ` is `(x 1 / D)`-proportional to the column-independent constant
+`r = Ω_j − τ(μ_j)` (the `hcolC` column-identity differences), hence vanishes there. -/
+theorem exists_pinned_coherent_sOf_H0C_of_all_reducible [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
+    (c₀ : OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+      (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C) hyp.base.A0)
+    {Xζ : ClassFunction G ℂ} {ζ : ClassFunction ↥M ℂ} {d : ℕ}
+    (hw2 : 1 < hyp.base.w2)
+    (hcolC : ∀ j : Fin hyp.base.w2, j ≠ 0 →
+      hyp.base.tau ((∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i j) - (d : ℂ) • ζ)
+        = (∑ i : Fin hyp.base.w1, hyp.base.alignedOmegaSigmaGrid hG hG.odd i j)
+          - (d : ℂ) • Xζ)
+    (hallred : ∀ η ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C,
+      ¬ IsIrreducibleCharacter η) :
+    ∃ c : OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+        (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C) hyp.base.A0,
+      c.extension (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩)
+        = ∑ i : Fin hyp.base.w1, hyp.base.alignedOmegaSigmaGrid hG hG.odd i ⟨1, hw2⟩ := by
+  haveI := hyp.base.finiteG
+  classical
+  set F : Set (ClassFunction ↥M ℂ) := OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C
+    with hFdef
+  have hIKF : ∀ ⦃x : ClassFunction ↥M ℂ⦄, x ∈ F →
+      x ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) := fun {x} hx =>
+    OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone bot_le
+      (by rw [← hyp.SOf_eq]; exact hyp.sOf_subset_SOf hyp.H0C hx)
+  have hFfin : F.Finite :=
+    (OddOrder.Peterfalvi.S08.inducedKernelFamily_finite (⊥ : Subgroup ↥M)).subset
+      (fun _ hx => hIKF hx)
+  -- per-member column and grid data
+  have hcolof : ∀ a ∈ F, ∃ k : Fin hyp.base.w2, k ≠ 0 ∧
+      a = ∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i k := by
+    intro a ha
+    obtain ⟨k, hk0, hkeq⟩ := SOf_reducible_eq_columnSum hG hyp
+      (hyp.sOf_subset_SOf hyp.H0C ha) (hallred a ha)
+    exact ⟨k, hk0, hkeq.trans (hyp.base.muGrid_columnSum_eq_columnSum hG hG.odd k).symm⟩
+  -- the enumeration and the canonical map
+  set n := hFfin.toFinset.card with hndef
+  set χ : Fin n → ClassFunction ↥M ℂ := fun i => ↑(hFfin.toFinset.equivFin.symm i) with hχdef
+  have hχmem : ∀ i, χ i ∈ F := fun i =>
+    hFfin.mem_toFinset.mp (hFfin.toFinset.equivFin.symm i).2
+  have hχinj : Function.Injective χ := fun i j hij =>
+    (Equiv.injective _ (Subtype.ext hij) :)
+  set kf : Fin n → Fin hyp.base.w2 := fun i => (hcolof (χ i) (hχmem i)).choose with hkfdef
+  have hkf0 : ∀ i, kf i ≠ 0 := fun i => (hcolof (χ i) (hχmem i)).choose_spec.1
+  have hkfeq : ∀ i, χ i = ∑ i' : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i' (kf i) :=
+    fun i => (hcolof (χ i) (hχmem i)).choose_spec.2
+  set Ωof : Fin hyp.base.w2 → ClassFunction G ℂ :=
+    fun k => ∑ i : Fin hyp.base.w1, hyp.base.alignedOmegaSigmaGrid hG hG.odd i k with hΩofdef
+  -- pairwise data: `⟨μcol_j, μcol_k⟩ = w₁·[j=k]` and `⟨Ω_j, Ω_k⟩ = w₁·[j=k]`
+  have hμcols : ∀ j k : Fin hyp.base.w2,
+      ClassFunction.inner (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i j)
+        (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i k)
+      = if j = k then (hyp.base.w1 : ℂ) else 0 := by
+    intro j k
+    by_cases hjk : j = k
+    · subst hjk
+      rw [if_pos rfl]
+      exact hyp.base.muGrid_column_sum_inner_self hG hG.odd j
+    · rw [if_neg hjk, OddOrder.RepresentationTheory.inner_sum_left]
+      refine Finset.sum_eq_zero fun i _ => ?_
+      rw [OddOrder.RepresentationTheory.inner_sum_right]
+      exact Finset.sum_eq_zero fun i' _ =>
+        hyp.base.muGrid_inner_cross_column hG hG.odd i i' hjk
+  have hΩcols : ∀ j k : Fin hyp.base.w2,
+      ClassFunction.inner (Ωof j) (Ωof k) = if j = k then (hyp.base.w1 : ℂ) else 0 := by
+    intro j k
+    rw [hΩofdef]
+    rw [OddOrder.RepresentationTheory.inner_sum_left]
+    by_cases hjk : j = k
+    · subst hjk
+      rw [if_pos rfl]
+      have hrow : ∀ i : Fin hyp.base.w1,
+          ClassFunction.inner (hyp.base.alignedOmegaSigmaGrid hG hG.odd i j)
+            (∑ i' : Fin hyp.base.w1, hyp.base.alignedOmegaSigmaGrid hG hG.odd i' j) = 1 := by
+        intro i
+        rw [OddOrder.RepresentationTheory.inner_sum_right]
+        rw [Finset.sum_eq_single i
+          (fun i' _ hne => by
+            rw [hyp.base.alignedOmegaSigmaGrid_inner hG hG.odd i i' j j,
+              if_neg (fun h => hne h.1.symm)])
+          (fun h => absurd (Finset.mem_univ i) h)]
+        rw [hyp.base.alignedOmegaSigmaGrid_inner hG hG.odd i i j j, if_pos ⟨rfl, rfl⟩]
+      rw [Finset.sum_congr rfl (fun i _ => hrow i)]
+      simp
+    · rw [if_neg hjk]
+      refine Finset.sum_eq_zero fun i _ => ?_
+      rw [OddOrder.RepresentationTheory.inner_sum_right]
+      refine Finset.sum_eq_zero fun i' _ => ?_
+      rw [hyp.base.alignedOmegaSigmaGrid_inner hG hG.odd i i' j k,
+        if_neg (fun h => hjk h.2)]
+  -- distinct members have distinct columns
+  have hkfinj : ∀ i i' : Fin n, kf i = kf i' → i = i' := by
+    intro i i' hk
+    apply hχinj
+    rw [hkfeq i, hkfeq i', hk]
+  -- member-pair inners
+  have hχpair : ∀ i i' : Fin n, ClassFunction.inner (χ i) (χ i')
+      = if i = i' then (hyp.base.w1 : ℂ) else 0 := by
+    intro i i'
+    rw [hkfeq i, hkfeq i', hμcols]
+    by_cases hii : i = i'
+    · subst hii; rw [if_pos rfl, if_pos rfl]
+    · rw [if_neg (fun h => hii (hkfinj _ _ h)), if_neg hii]
+  have hw1ne0 : (hyp.base.w1 : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  have hχorth : ∀ i j : Fin n, i ≠ j → ClassFunction.inner (χ i) (χ j) = 0 := by
+    intro i j hij; rw [hχpair, if_neg hij]
+  have hχnorm : ∀ i : Fin n, ClassFunction.inner (χ i) (χ i) ≠ 0 := by
+    intro i; rw [hχpair, if_pos rfl]; exact hw1ne0
+  -- the canonical map and its member images
+  set ν₀ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G :=
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap.coherentImageMap χ
+      (fun i => (ClassFunction.inner (χ i) (χ i))⁻¹ • Ωof (kf i)) with hν₀def
+  have hν₀apply : ∀ i : Fin n, ν₀ (χ i) = Ωof (kf i) := fun i =>
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap.coherentImageMap_apply_eq_of_orthogonal hχorth hχnorm i
+  -- the column-independent residual `r = Ω_j − τ(μcol_j)`
+  set r : ClassFunction G ℂ :=
+    Ωof ⟨1, hw2⟩ - hyp.base.tau (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩)
+    with hrdef
+  have hk1 : (⟨1, hw2⟩ : Fin hyp.base.w2) ≠ 0 := by
+    intro heq; have := congrArg Fin.val heq; simp at this
+  have hrconst : ∀ j : Fin hyp.base.w2, j ≠ 0 →
+      Ωof j - hyp.base.tau (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i j) = r := by
+    intro j hj0
+    have h1 := hcolC j hj0
+    have h2 := hcolC ⟨1, hw2⟩ hk1
+    rw [map_sub] at h1 h2
+    rw [hrdef]
+    -- `τ μ_j − τ μ₁ = Ω_j − Ω₁` after the `dζ`-cancel
+    have hτdiff : hyp.base.tau (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i j)
+        - hyp.base.tau (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩)
+        = Ωof j - Ωof ⟨1, hw2⟩ := by
+      have := congrArg₂ (fun a b => a - b) h1 h2
+      simp only [sub_sub_sub_cancel_right] at this
+      exact this
+    rw [sub_eq_sub_iff_sub_eq_sub]
+    exact hτdiff.symm
+  -- member degrees are the common `w₁·d ≠ 0` — via the value-at-1 of column sums
+  have hdegs : ∀ i : Fin n, ((χ i : ClassFunction ↥M ℂ) : ↥M → ℂ) 1
+      = (((∑ i' : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i' ⟨1, hw2⟩ :
+          ClassFunction ↥M ℂ)) : ↥M → ℂ) 1 := by
+    sorry
+  -- the three lattice fields
+  have hinner : ∀ x y : ClassFunction ↥M ℂ,
+      x ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M) F →
+      y ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M) F →
+      ClassFunction.inner (ν₀ x) (ν₀ y) = ClassFunction.inner x y := by
+    sorry
+  have hextends : ∀ x : ClassFunction ↥M ℂ,
+      x ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥M) F hyp.base.A0 →
+      ν₀ x = hyp.base.tau x := by
+    sorry
+  have hZIrr : ∀ x : ClassFunction ↥M ℂ,
+      x ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M) F → ν₀ x ∈ ZIrr G := by
+    sorry
+  -- assemble; the pin is `hν₀apply` at the `μ₁`-member index
+  have hμ1mem : (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩) ∈ F := by
+    rw [hFdef, hyp.base.muGrid_columnSum_eq_columnSum hG hG.odd ⟨1, hw2⟩]
+    exact columnSum_muColumnChar_mem_sOf_H0C hG hyp ⟨1, hw2⟩ hk1
+  set i₁ : Fin n := hFfin.toFinset.equivFin
+    ⟨_, hFfin.mem_toFinset.mpr hμ1mem⟩ with hi₁def
+  have hχi₁ : χ i₁ = ∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩ := by
+    rw [hχdef, hi₁def]
+    simp
+  have hkfi₁ : kf i₁ = ⟨1, hw2⟩ := by
+    -- column uniqueness through the double computation of `⟨μcol_{kf i₁}, μcol_1⟩`
+    have hcols_eq : (∑ i' : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i' (kf i₁))
+        = ∑ i' : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i' ⟨1, hw2⟩ := by
+      rw [← hkfeq i₁, hχi₁]
+    have h2 : (if kf i₁ = (⟨1, hw2⟩ : Fin hyp.base.w2) then (hyp.base.w1 : ℂ) else 0)
+        = (hyp.base.w1 : ℂ) := by
+      rw [← hμcols, hcols_eq, hμcols, if_pos rfl]
+    by_contra hne
+    rw [if_neg hne] at h2
+    exact hw1ne0 h2.symm
+  refine ⟨{ nonzero := c₀.nonzero
+            extension := ν₀
+            extension_inner_eq := hinner
+            extends_on_supported := hextends
+            extension_mem_ZIrr := hZIrr }, ?_⟩
+  show ν₀ (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩)
+    = Ωof ⟨1, hw2⟩
+  rw [← hχi₁, hν₀apply i₁, hkfi₁]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (11.8.6) narrow union-coherence capstone** — targeting the *narrow* family `S(H₀C)`
 via the `𝒮(H₀C)` coherence (contradicting (11.3)), NOT the deprecated wide `Sset \ SHCSet`
 uniform-degree route (false for non-Galois type III/IV, issue 1019).
