@@ -7753,9 +7753,13 @@ h118 ((11.8) 非直交) 下で τ(μ₀−ζ) の σ-grid 係数 = 行0 indicato
 
 /-! **Peterfalvi (11.9.c) 非Galois u=a pin 部品, axiom-clean** (lane a, 2026-07-12, issue 1024).
 muColumnChar_zero / exists_muColumnChar_inv = Pontryagin 逆列 index。keystone
-`caseA_u_eq_a_of_residual_not_orthogonal` (u=a pin 本体) は証明完備だが
-`coherent_sOf_H0C` 経由で lane-b の (9.11.2) refuter sorry を推移 cite するため、
-その着地時にここへ登録する (sorried-cite 規約)。 -/
+`caseA_u_eq_a_of_residual_not_orthogonal` (u=a pin 本体) は証明完備。
+⚠ **訂正 (2026-07-12 lane-a census、issue 9088)**: 残 dirty は「lane-b の (9.11.2) refuter sorry」
+**でない** — `coherent_sOf_H0Cprime`→`nineElevenSevenEightRefutation` (body sorry-free) の
+optParam DEFAULT `(hncH0C := S_H0C_not_coherent)` `(htype := isTypeIIIorIV)` = **lane-a の
+(10.8)/(10.10) legacy 汚染 (issue 1025 [[lean-optparam-default-contaminates-axioms]])**。honest heir
+(`S_H0C_not_coherent_unconditional`/`no_typeV_maximal_unconditional`) 既存。着地 = 1025 の
+optParam→explicit+wrapper rework を (9.11)/(11.9) chain に適用時。 -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.muColumnChar_zero
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.exists_muColumnChar_inv
 
