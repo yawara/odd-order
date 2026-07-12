@@ -1817,3 +1817,67 @@ W 元 order ∣ pq ✓、P^# 元 = p-元 ✓。
 **実装順 (次 iter)**: (1) induce-support bridge (InducedCharacter) → (2)
 typeIA_eq_sharp (S10_MinimalSimpleBasic or MaximalSubgroupType) → (3) 本体
 typeIBetaL_betaS_disjoint_support。
+
+## ✅ (2026-07-12、/loop iter 16) — (13.19.a) 第 1-2 段
+
+typeIA_subset_sharpSubgroup_of_frobenius 実証明 (centralizer_kernel_le、G↔↥M 橋は
+Subtype.ext+push_cast; coe-mem は rwa 不可 → rw+exact hy.1)。induce の A-局在は
+**既存だった** (InducedCharacter:446/452 — grep 漏れ、同名新設で dup エラー)。
+**次 iter = 本体**: (a) β_L 入力の A(L)-supported 性 (supp(Ind1−φ) ⊆ H^#-conj ⊆
+A(L)-conj、typeIA_subset_sharp の逆 + conjugatesIntoSet)、(b) dadeSupport 分解と
+可換 coprime order 論法 (S04.Hypothesis.dadeSupport def + S10 data の
+coprime/cent fields を確認)、(c) tauSbetaGrid 側 = Ind_S^G + betaGrid_support +
+既存 support_induce_subset_conjugatesIntoSet、(d) order ∣ |P||W| vs prime of |H|。
+
+## 📐 (2026-07-12、/loop iter 17) — (13.19.a) 本体設計 FINAL
+
+**S04 構造確定**: dadeSupport = ⋃_a conjugatesOfSet(a·H(a))。h ∈ H(a) ≤ C_G(a)
+(centralizer_eq_sup) → Commute a h。**orderOf a ⟂ orderOf h**: centralizer_coprime
+(|H(a)| ⟂ |C_L(a)|) + a ∈ C_L(a) (自己中心化、a ∈ L) + orderOf h ∣ |H(a)|。
+順序積: coprime 可換で orderOf a ∣ orderOf (a·h) は 5 行手証明
+((ah)^n=1 → a^n = h^{−n} ∈ ⟨a⟩⊓⟨h⟩ = ⊥)。
+**本体スケッチ** (typeIBetaL_betaS_disjoint_support):
+1. hsupp_in : (Ind_H^L 1 − φ).support ⊆ supportInSubgroup (typeIA L typeI) L —
+   sub 両項は induce (φ = Ind θ、Sset destructure)、support_induce_subset_conjugatesInto
+   + 1∉supp (値 e−e=0、induce_apply_one) + conj 元 ≠1 → kernel-conj ∈ H^# →
+   sharpSubgroup_H_subset_typeIA + conjugatesIntoSet→supportInSubgroup 変換。
+2. supp(β_L^τ) ⊆ dadeSupport: dadeIntegralCharacterMap_apply_of_support (hsupp_in) +
+   IsDadeMap.map_eq_zero_of_not_mem_dadeSupport (dadeData.dade の dadeMap が IsDadeMap —
+   instance/lemma 名は S04 で hyp.dadeMap_isDadeMap 系を実装時 grep)。
+3. x ∈ dadeSupport → orderOf x に prime r ∣ |H_L| (a ≠ 1、orderOf a ∣ |H_L| は
+   a ∈ A(L) ⊆ H_L^# ← typeIA_subset_sharpSubgroup_of_frobenius [iter 16] +
+   typeI_frobenius で frobData 取得、orderOf_conj で conj 不変)。
+4. x ∈ supp(τ_S β) ⊆ conjugatesIntoSet S (P^#∪typePV) (sInstance_dade0_eq_induce +
+   betaGrid_support + support_induce_subset_conjugatesIntoSet [既存 :452]) →
+   orderOf x ∣ p^q·pq (P^# は p-群、typePV ⊆ W、|W|=pq — hyp.Sdata.W = hyp.W の
+   reconciliation field を実装時確認)。
+5. r ∈ {p,q} ∧ r ∣ |H_L| vs card_LF_coprime_pq (hnconjS/T は
+   not_conj_of_isTypeI_of_isTypeNonI で供給、q_not_dvd_kernel パターン) → 矛盾。
+**次 iter = この 5 段を一気に実装** (全部品所在確定済み)。
+
+## ✅ (2026-07-12、/loop iter 18) — (13.19.a) L1 (Ã 位数補題) 実証明
+
+exists_mem_A_prime_dvd_orderOf_of_mem_dadeSupport (S04_DadeIsometryBasic、一般形) 完。
+⚠ orderOf_conj は mathlib 現 pin に**無い** — orderOf_injective (MulAut.conj c).toMonoidHom
+で代替 (coe 形は show で明示)。mem_centralizerIn の第 2 成分は可換等式に直 rfl。
+**次 iter = L2**: typeIBetaL_support_subset_dadeSupport — (i) (Ind1−φ).support ⊆
+supportInSubgroup (typeIA) L ((Ind1−φ)(1) = e−e = 0 [φ hdeg 必要 → 義務 lemma の
+_hφ に hdeg も渡す形へ signature 拡張可]、非 1 元は conjugatesInto H' → H^#-conj →
+sharpSubgroup_H_subset_typeIA + dadeData.dade.L_normalizes_A で A(L) 内)、
+(ii) dadeIntegralCharacterMap_apply_of_support → hyp.dadeMap → IsDadeMap.
+map_eq_zero_of_not_mem_dadeSupport (dadeMap の IsDadeMap 供給 lemma を S04 で grep:
+isDadeMap_dadeMap 系)。**L3**: β_S order (sInstance bridge + betaGrid_support +
+support_induce_subset_conjugatesIntoSet :452 + P p-群/W order、Sdata.W↔hyp.W
+reconciliation field 確認)。**L4 = 合成** (L1 r ∣ |L_F| 化: A(L) ⊆ L_F^# [iter 16] +
+orderOf ∣ card、card_LF_coprime_pq で {p,q} 排除)。
+
+## ✅ (2026-07-12、/loop iter 19) — (13.19.a) L2 完 (β_L^τ ⊆ Ã)
+
+typeIBetaL_support_subset_dadeSupport 実証明 (tau の rfl-show unfold は instance 一致で
+素通り; φ-side induce は typeF.H 表記差 → 型注釈 have で defeq 橋)。
+**次 iter = L3 + L4 (合成)**: L3 = β_S 側 orderOf x ∣ p·q 系 (sInstance bridge +
+betaGrid_support + support_induce_subset_conjugatesIntoSet :452; P^# 元 order ∣ |P| = p^q、
+typePV ⊆ Sdata.W — Sdata.W と hyp.W の同定 field を確認、conjClassSetIn の元も conj で
+order 保存)。L4 = disjoint 本体: x ∈ 両 support → L1 (r ∣ orderOf a、a ∈ A(L) →
+typeIA_subset_sharpSubgroup_of_frobenius [typeI_frobenius で frobData] → orderOf a ∣ |L_F|
+→ r ∣ |L_F|) vs L3 (orderOf x の素因数 ⊆ {p,q}) + card_LF_coprime_pq → False。
