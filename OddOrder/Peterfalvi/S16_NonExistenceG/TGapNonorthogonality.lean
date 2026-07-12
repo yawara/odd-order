@@ -1139,6 +1139,97 @@ theorem Hypothesis.tau_muGridAlpha_apply_eq_of_grid_value_alignment [Finite G]
     ClassFunction.sub_apply, halign j hv, halign 0 hv,
     ← ClassFunction.sub_apply, ← ClassFunction.smul_apply]
 
+open scoped FiniteInduce in
+/-- The multiplicative character of the type-P subgroup `W` whose canonical
+sigma-image is `alignedOmegaSigmaGrid i j`.  This exposes the source character
+which was previously reconstructed only inside value-level proofs. -/
+noncomputable def Hypothesis.alignedOmegaSourceCharacter [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) (j : Fin hyp.w2) :
+    ↥(typePData_toTICyclicHypothesis hyp.typeP hodd).W →* ℂˣ := by
+  haveI := hyp.finiteG
+  classical
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI : NeZero (Nat.card h.W1) :=
+    ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) :=
+    ⟨Nat.card_pos.ne'⟩
+  let χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
+    finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j)
+  let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
+  let e : ↥tic.W ≃* ↥(h.W1 ⊔ h.W2) :=
+    (Subgroup.subgroupOfEquivOfLe (typePData_W_le_self hyp.typeP)).symm.trans
+      (MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm)
+  exact (h.sdiffTICyclicHypothesis.omegaProdChar
+    (h.w1CharEquiv (finCongr hcardW1.symm i)) χ₂).comp e.toMonoidHom
+
+open scoped FiniteInduce in
+/-- On the type-P regular set, an aligned sigma-grid entry restores its
+underlying multiplicative character.  This is the source-side counterpart of
+S15's `tau3_apply_of_regular`. -/
+theorem Hypothesis.alignedOmegaSigmaGrid_apply_eq_sourceCharacter [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) (j : Fin hyp.w2) {v : G}
+    (hv : v ∈ typePV M hyp.typeP) :
+    hyp.alignedOmegaSigmaGrid hG hodd i j v =
+      ((hyp.alignedOmegaSourceCharacter hG hodd i j
+        ⟨v, hv.1⟩ : ℂˣ) : ℂ) := by
+  haveI := hyp.finiteG
+  classical
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI : NeZero (Nat.card h.W1) :=
+    ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) :=
+    ⟨Nat.card_pos.ne'⟩
+  let χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
+    finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j)
+  let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
+  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  let app : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication tic :=
+    ⟨tic.toDadeHypothesis.fullDadeIsometryData
+      (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _
+        (fun _ => rfl))⟩
+  let e : ↥tic.W ≃* ↥(h.W1 ⊔ h.W2) :=
+    (Subgroup.subgroupOfEquivOfLe (typePData_W_le_self hyp.typeP)).symm.trans
+      (MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm)
+  have hvtic : v ∈ tic.V := hv
+  have eaos : hyp.alignedOmegaSigmaGrid hG hodd i j v =
+      (h.chiColumn χ₂ (finCongr hcardW1.symm i) :
+        ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+        (e ⟨v, tic.V_subset_W hvtic⟩) := by
+    unfold Hypothesis.alignedOmegaSigmaGrid
+    rw [tic.sigmaIntegral_apply_of_mem_V rfl app _ hvtic,
+      ClassFunction.compHom_apply]
+    rfl
+  have hsource : hyp.alignedOmegaSourceCharacter hG hodd i j =
+      (h.sdiffTICyclicHypothesis.omegaProdChar
+        (h.w1CharEquiv (finCongr hcardW1.symm i)) χ₂).comp e.toMonoidHom := by
+    unfold Hypothesis.alignedOmegaSourceCharacter
+    rfl
+  rw [eaos, hsource]
+  rfl
+
 end OddOrder.Peterfalvi.S12
 
 namespace OddOrder.Peterfalvi.S16

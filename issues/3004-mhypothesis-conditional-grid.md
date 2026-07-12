@@ -1093,3 +1093,17 @@ axis equivalenceを合成して zero-preserving
 `Fin dataT.w1 ≃ Fin base.p` / `Fin dataT.w2 ≃ Fin base.q` を構成する。その後、regular `v` 上で
 S12 `sigma` と S15 `tau3` がとも transported underlying character の値を返すことから
 `alignedOmegaSigmaGrid i k v = eta (colEquiv k) (rowEquiv i) v` を証明する。
+
+### S12 aligned-grid source character (2026-07-12 続行 5)
+
+- `alignedOmegaSourceCharacter` として、S12 `alignedOmegaSigmaGrid i j` の構成に実際に使う
+  `W ->* C^x` を公開 API へ抽出した。これは §6 `w1CharEquiv` と normalized
+  `finCardEquivCharacterGroup` の積文字を、type-P datum の `W` へ transport したもの。
+- `alignedOmegaSigmaGrid_apply_eq_sourceCharacter` は `v ∈ typePV` 上で canonical sigma-image
+  がこの underlying character の値をそのまま返すことを証明する。既存局所計算を theorem 化
+  したもので、S15 `tau3_apply_of_regular` と直接対応する。
+- leaf build green、新 `sorry`・新 axiom・carrier 変更なし。
+
+次は reconciled `dataT.W = base.W` による `alignedOmegaSourceCharacter` の transport と、
+zero-axis restriction equivalence の合成を実装する。regular-value equality 自体は、今回の
+source theorem と S15 `eta_eq_tau_omega` / `tau3_apply_of_regular` を rewrite すれば閉じる形になった。

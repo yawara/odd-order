@@ -3539,6 +3539,12 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S12.Hypothesis.tau_muGridAlpha_apply_eq_of_grid_value_alignment
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S12.Hypothesis.alignedOmegaSourceCharacter
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S12.Hypothesis.alignedOmegaSigmaGrid_apply_eq_sourceCharacter
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.eta_diff_classifier_of_typePV_value
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.eta_column_diff_rigidity
