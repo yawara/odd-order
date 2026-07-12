@@ -1793,3 +1793,27 @@ S04/S07 に既存 lemma があるか要調査)。
   (§8 typeIA の定義から: A(L) ⊆ ⋃ C_L(x)^# 系 — S10_Section8Dade 系 or
   S14.Hypothesis.ambientA の member order lemma を要調査)。
 **次 iter = A(L)-supportedness (φ/Ind の) と A(L) 位数構造の 2 点調査 → 実証明**。
+
+## 📐 (2026-07-12、/loop iter 15) — (13.19.a) 完全設計 (Coq :2010-2031 解読)
+
+**位数論法の実体** (constt 不要): x ∈ Ã(L) ∩ (P∪W)^G で矛盾 —
+(i) x ∈ (P∪W)^G → orderOf x ∣ |P|·|W| = p^q·pq → π(x) ⊆ {p,q}
+(ii) x ∈ Ã(L) = dadeSupport → x = conj(z·y)、y ∈ A(L) = **H^#** (Frobenius 等号!
+    Coq defA = FTsupp_Frobenius)、z ∈ R(y) (Dade signalizer、z ∈ C(y) かつ
+    orderOf z ⟂ |H|) → Commute z y + coprime → orderOf(zy) = orderOf z · orderOf y
+    (mathlib Commute.orderOf_mul_eq_...of_coprime) → prime of orderOf y (∣ |H|) が
+    orderOf x を割る
+(iii) (8.17.a) |H| ⟂ pq (card_LF_coprime_pq、cite 可) で矛盾。
+**Lean 部品所在**: A(L) ⊆ H^# は `IsFrobeniusGroup.centralizer_kernel_le` (Isaacs
+Ch06:572) + typeIA = centralizerSupport (sharpSubgroup H) M の定義から新設 lemma
+`typeIA_eq_sharpSubgroup_of_frobenius`; 逆包含 = sharpSubgroup_H_subset_typeIA (既存)。
+Ã 分解 = S04.Hypothesis.dadeSupport の membership (typeISetup.dadeData.dade の
+H(a)/R(a) fields: coprime + centralizing — S10.DadeSupportHypothesisData 経由)。
+β_L 側 supported 性: supp(Ind_H^L 1 − φ) ⊆ conjugatesInto H'、1 での値 0
+(induce_apply_one で e − e)、H^#-conj ⊆ A(L)-conj = A(L)。
+β_S 側: sInstance_dade0_eq_induce + betaGrid_support (P^#∪typePV、typePV ⊆ W∖(W₁∪W₂))
++ **新設** induce 版 conjugatesIntoSet 局在 (induceSum 版 :264 から ⅟-scalar bridge)。
+W 元 order ∣ pq ✓、P^# 元 = p-元 ✓。
+**実装順 (次 iter)**: (1) induce-support bridge (InducedCharacter) → (2)
+typeIA_eq_sharp (S10_MinimalSimpleBasic or MaximalSubgroupType) → (3) 本体
+typeIBetaL_betaS_disjoint_support。
