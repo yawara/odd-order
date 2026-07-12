@@ -54,22 +54,34 @@ AxiomsCheck:7757 + S13_Orthogonality:115 comment は keystone `caseA_u_eq_a_of_r
 | S10_MinimalSimpleStructure | 1 | §12-gated (issue 9080, downstream) |
 | S09_.../FrobeniusFamily | 1 | **off-path** (card_G0 (7.10)、2026-07-04 再々編で off-path 確定、issue 0044 cont.⁴⁸、凍結) |
 
-## 🧭 裁定要請
+## ✅ RESOLVED (2026-07-12 lane-a、追加 census で自己解決 — hub 裁定不要)
 
-**lane-a の genuine-new-math on-path frontier は実質枯渇** (主要 char cascade body 完成)。残 lane-a
-work は全て: (a) axiom-clean bookkeeping (1025 optParam→explicit rework、CLAUDE.md deprioritize 対象だが
-Wave3 feitThompson 閉包に必須)、(b) vestigial cleanup (S13_CoreStructure 3 + Coherence911 retire)、
-(c) off-path 凍結 (7.10)、(d) cross-lane gated (issue 2022 (6.5) coherence — owner 要確認)。
+**裁定要請は撤回**: 追加 census で **genuine lane-a on-path frontier を発見**。当初「issue 2022 (6.5)
+cross-lane gated」は誤り (2 重の誤帰属):
 
-hub 裁定を要する選択肢:
-- **(A)** lane-a が 1025 optParam→explicit rework を完遂 (done char cascade を axiom-clean 化、Wave3 前倒し)。
-  mechanical bookkeeping だが on-path・unambiguous lane-a・feitThompson 閉包の必要ステップ。
-- **(B)** issue 2022 (6.5) coherence が lane-a-doable genuine math なら lane-a へ (owner 確認要)。
-- **(C)** lane-a を別 cluster へ reallocate (b overload 吸収 / BG§15-16 等)。
-- **(D)** vestigial retire (S13_CoreStructure 3 + Coherence911 + sibleyTarget) を lane-a hygiene で。
+1. **issue 2022 の six_two/(5.2.d) は DONE** (loop 59, 2026-07-05, commit 1732c7c2、S13_SixTwoBridge
+   sorry 0)。lane-a が自身で完成済 (ownership は 2026-07-05 に lane-a 編入、header の「lane b」stale)。
+2. **⟹ S12_Noncoherence の 3 sorry (`typeV_sixFiveA/B/C`) は six_two landing で NEWLY UNBLOCKED** =
+   **genuine lane-a on-path char work** (bookkeeping でない)。`typeV_forces_coherence_v2`
+   (S12_Noncoherence:274、type-V 排除) の唯一の残 sorry で、docstring「(lane b)」は stale 誤帰属。
 
-lane-a default (裁定待ちの間、loop 継続): (A) 1025 rework に着手 (unambiguous lane-a・on-path)。
-ただし CLAUDE.md「sorry 数削減は指標でない」ゆえ (B)/(C) の genuine math があれば優先。hub 判断を仰ぐ。
+**genuine frontier = 3 つの (6.5) type-V gate の assembly** (S08 (6.5) infra + done (6.3)/six_two +
+type-V (6.4) instantiation):
+- `typeV_sixFiveA_bound` (6.5.a、`|M':M''|≤4w₁²+1`): (6.3)/six_two chain (`six_three_of_six_two_oracle`
+  done) を type-V (6.4) で instantiate。
+- `typeV_sixFiveB_pGroup` (6.5.b、M' non-abelian w₂-group): `S08_PGroupReduction` (6.5.b p-group
+  reduction) を wire。
+- `typeV_sixFiveC_not_dvd` (6.5.c、w₁∤w₂−1): `six_five_c_arith` (S08_PGroupReduction:149) を wire。
+これで `typeV_forces_coherence_v2` = type-V 排除が honest 完成 (on-path、type-determination に feed)。
+
+**∴ hub 裁定不要 — lane-a は (6.5) type-V assembly を進める** (option B の genuine math)。1025 axiom-clean
+bookkeeping は後回し (type-V 完成後、余力で)。vestigial retire (D) も後回し。→ closed。
+
+## (参考) 当初の裁定要請 (撤回済)
+
+~~lane-a frontier 枯渇 → hub 裁定~~ = 追加 census で genuine frontier 発見により moot。
+教訓: 「gated」判定前に必ず recursive census + 該当 producer の done 状態確認
+([[verify-port-state-by-number-not-coq-name]] [[sorry-census-must-include-subdirs]])。
 
 ## 参照
 
