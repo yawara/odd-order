@@ -1952,3 +1952,38 @@ discharge は sigmaIntegral の chiFam↔eta 同定のみ)。**(B) 推奨** (pro
 直 restate で済む)。discharge 箇所 = FeitThompson の tau3_* 系 property 供給ブロック
 (:271-)。(13.19.b) 本体は (B) + Ã-局在 (iter 20 部品) + ψ⊥ψ̄ (既存) で S15 内で閉じる。
 ⚠ merge +396 行 (4 files) — 次 iter 冒頭で統合 build 確認。
+
+## ✅✅ (2026-07-12、/loop iter 25) — (13.19.b) 完全証明 (義務 5 → 4) + τ₁ honest 化
+
+commit 267796c3。**(13.19.b) `coherent_extension_orthogonal_eta_of_mem_Sset` sorry-free**。
+
+**iter 22-24 の戦略 ((B) 形 field + FT 層 discharge) は不要だった** — 実装前の精査で
+[[verify-port-state-by-number-not-coq-name]] の再実例が判明:
+- S16_GridExpansion に (13.19.b) engine (`eta_orthogonal_of_norm_one_pair_vanish`、norm-1 dirr
+  剛性 `exists_sign_irr_of_inner_self_one`、norm-2 core `inner_eta_eq_zero_of_vanish_of_inner_self_eq_two`)
+  が **hyp 既存 field のみから proven 済み** (field 追加は冗長 — 一度追加した
+  eta_orthogonal_of_norm_two_vanish 3 層 + FT discharge は revert)。
+- S16_PairingCoherence に **TypeICoherent78Data** (12.1+12.6+12.7 coherence bundle、
+  `nonempty` existence 済み) + 全 API (exists_conjIndex_at / nu_zeta_norm_one /
+  nu_zeta_inner_nu_conj_eq_zero / nu_zeta_sub_conj_support_at)。
+- CoherentEtaOrthogonality (c-lane) に M-side (13.19.b) `caseB_eta_orthogonal_nu_zeta_at` +
+  avoid `mSide_dadeSupport_avoids_regular` (名前は M だが generic) が既存。
+
+**soundness 発見 (本 iter の核)**: 旧 `tau_apply_orthogonal_eta_of_mem_Sset` は
+`typeISetup.tau φ` (φ 単独 = 非 supported) への主張で **証明不可能な obligation だった** —
+`dadeIntegralCharacterMap` は supported CF 外では `LinearMap.exists_extend` の任意拡張 (junk)。
+FamilyBundleDade.lean:389 に「global IsIntegralIsometry は FT に存在しない
+(dim CF(L) > dim CF(G))」と明記。→ (13.19) 層 (GridData / caseC 義務 / dichotomy) を
+TypeICoherent78Data の τ₁ = coh.extension ベースに restate (b-owned S15_SAndT.lean 内で完結、
+下流 2 file は機械的 signature 追従のみ)。⚠ **同種の junk-τφ 主張が他に無いか audit 価値あり**
+(caseC 義務は今回 τ₁ 化したが、S13-S15 の他の τ-単独適用を将来確認)。
+
+新規 sorry-free: `typeI_dadeSupport_avoids_regular` ((13.19.a) avoid 形) /
+`exists_zeta_index_of_mem_Sset` (cover 逆向き)。instance 規律: IsCoherent は instance 引数を
+型に持つ → binder 形を廃し FiniteInduce scoped 統一。
+
+**残 (13.19) 義務 4 (全て 13.19.c)**: typeIBetaL_eta_row_constant / col_constant (β_L 側、
+supported ゆえ τ で honest、(4.8)+(13.18.a) 論法) / typeI_caseC_dichotomy / dual ((13.19)
+proof body、parity + degree bound)。**次 iter = 文書順で row_constant**: (13.18.a)
+μ-差分 support (`mu_diff_support` field 済) → (4.8) → ⟨β_L^τ, η_0j − η_0j'⟩ = 0。
+full build 4173 jobs green、AxiomsCheck OK。
