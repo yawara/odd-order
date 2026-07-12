@@ -7636,13 +7636,23 @@ field-data existence) is not on this list. -/
 (Sibley/(6.8) route, ticks 19–24), and the case-(c) coherence engine
 `typeV_caseC_coherence_engine` ((10.10.3)/(10.10.4) SHC route, ticks 26–33; its
 `hstruct`/`h8`/numeric pins are engine hypotheses, discharged by the (10.10.2)
-structure work).  Per the 2026-07-11 hub notice in issue 1021, the assert for
-`no_typeV_maximal_unconditional` itself is a *completion condition* of issue 1021
-(the v2 assembly `typeV_forces_coherence_v2` is landed; the remaining `sorry`s are the
-three (6.5) gate lemmas, issue 2022 — it joins this list when those close). -/
+structure work).  **The three (6.5) gate lemmas are now honestly closed** (issue 9089,
+lane a, 2026-07-12): the type-V `𝒮` noncoherence chain was unblocked by generalizing the
+§11/§13 six-two decomposition chain to be `htype`/`chief`-free (they were unused), and the
+`hcoh` irreducibility bridge (`induce_linear_isIrreducible` — a linear source of a type-`P`
+`Hypothesis` induces irreducibly, since the reducible-inducing sources are the nonlinear
+certain-type `χ_j`) was proven.  So `typeV_sixFiveA_bound` / `typeV_sixFiveB_pGroup` /
+`typeV_sixFiveC_not_dvd`, the assembly `typeV_forces_coherence_v2`, and the (10.10) capstone
+`no_typeV_maximal_unconditional` are all axiom-clean — pinned below. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.S_not_coherent_unconditional
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.typeV_caseA_coherence
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.typeV_caseC_coherence_engine
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.induce_linear_isIrreducible
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.typeV_sixFiveA_bound
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.typeV_sixFiveB_pGroup
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.typeV_sixFiveC_not_dvd
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.typeV_forces_coherence_v2
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional
 
 /-! **Peterfalvi (9.11.4) Mackey norm + support, axiom-clean** (issue 9083 Phase D, lane a).
 The averaging-projector coset-sum vanishing (the `⟨γ, ψ₁⟩ = 0` engine), the Mackey

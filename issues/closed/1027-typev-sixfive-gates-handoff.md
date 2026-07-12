@@ -89,3 +89,13 @@ docstring の「(lane b)」(:223/:243) は stale 誤帰属 → 編集ついで�
 - issue 2022 (six_two/(5.2.d) 完成、loop 1-59)、1025 (optParam 汚染)、0044 (7.10 off-path)、
   7001 (sibleyTarget unsound)、closed/9088 (frontier census)、closed/1026 (11.9 done)。
 - Coq `coq/theories/PFsection6.v` (6.5)、`PFsection11.v` (6.5 型V 消費部)。
+
+---
+
+## ✅ CLOSED (2026-07-12): (6.5) type-V gates 全完成
+
+3 gate (`typeV_sixFiveA_bound`/`typeV_sixFiveB_pGroup`/`typeV_sixFiveC_not_dvd`) + assembly
+`typeV_forces_coherence_v2` + capstone `no_typeV_maximal_unconditional` が honest 完成・
+axiom-clean (`[propext, Classical.choice, Quot.sound]` のみ、sorryAx なし — `#print axioms` 検証済)。
+型V排除 (Peterfalvi 10.10) が完全 sorry-free。実装 = issue 9089 (generalization + hcoh bridge)。
+commit: 6ce607ce (一般化) / 0a6d9c91 (6.5.a+bridge) / a9fbccfa (6.5.b/c) / AxiomsCheck pin。
