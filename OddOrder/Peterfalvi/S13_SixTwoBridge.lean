@@ -86,11 +86,12 @@ theorem isTypeIIIorIV [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 (`coprime_card_kernel_complement`).  This is the coprimality input of the `W₁`-fixed-point
 lifting on `M'/M''` behind the h56 anchor (Peterfalvi (8.4.d)). -/
 theorem coprime_card_W1_derived [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) :
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M) :
     Nat.Coprime (Nat.card ↥hyp.W1) (Nat.card ↥(derivedInG M)) := by
   haveI : Fintype G := Fintype.ofFinite _
   have hnt : TypePNontrivialCore M hyp.typeP :=
-    typePNontrivialCore_of_isTypeIIIorIV (hyp.isTypeIIIorIV hG) hyp.typeP
+    typePNontrivialCore_of_isTypeIIIorIV htype hyp.typeP
   have hU : hyp.typeP.U ≠ ⊥ := hnt.1
   -- `q` is coprime to `|H|`: `(|H|, |U ⊔ W₁|) = 1` and `|W₁| ∣ |U ⊔ W₁|`.
   have hcopH : Nat.Coprime (Nat.card ↥hyp.W1) (Nat.card ↥hyp.typeP.H) := by

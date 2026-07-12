@@ -420,7 +420,7 @@ theorem member_residual_not_orthogonal_H0C_of_refuter [Finite G]
       (OddOrder.Peterfalvi.S13.isCoherent_of_subset nu
         (OddOrder.Peterfalvi.S13.SOf_HC_subset_SHCSet hG s13hyp)
         (OddOrder.Peterfalvi.S13.coherent_SOf_HC hG s13hyp).some.nonzero)
-      hzS hzHC hzdeg hcol)
+      hzS hzHC hzdeg hcol (hrefute s13hyp) htype)
 
 /-- **Peterfalvi (11.8), transport to a transposed T-side grid.**
 The Section 12 calculation is indexed by `W₁ × W₂`, whereas the shared

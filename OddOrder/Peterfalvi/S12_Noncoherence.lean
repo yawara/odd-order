@@ -745,4 +745,18 @@ theorem no_typeV_maximal_unconditional [Finite G]
   obtain ⟨hyp⟩ := exists_hypothesis_of_typeIIIorIVorV hG hMmax (Or.inr (Or.inr hMV))
   exact S_not_coherent_unconditional hG hyp (typeV_forces_coherence_v2 hG hyp hMV)
 
+/-- **Peterfalvi (10.10) type dichotomy, unconditional**: the §11 hypothesis on a maximal `M`
+forces type III or IV — the honest heir of `S12.Hypothesis.isTypeIIIorIV` (`S13_SixTwoBridge`),
+with the type-V branch excluded by the axiom-clean `no_typeV_maximal_unconditional` instead of the
+legacy `no_typeV_maximal` (whose `typeV_forces_coherence` is a bare `sorry`).  This is
+`#print axioms`-clean and is the type-determination input threaded into the
+`card_kappaHall_lt_of_isTypeIIIorIV` spine (issue 1025). -/
+theorem isTypeIIIorIV_unconditional [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) : IsTypeIII M ∨ IsTypeIV M := by
+  haveI : Fintype G := Fintype.ofFinite _
+  rcases hyp.type_alt with h | h | h
+  · exact Or.inl h
+  · exact Or.inr h
+  · exact absurd ⟨M, hyp.maximal, h⟩ (no_typeV_maximal_unconditional hG)
+
 end OddOrder.Peterfalvi.S12

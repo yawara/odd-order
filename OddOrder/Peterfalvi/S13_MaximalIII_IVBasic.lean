@@ -857,7 +857,7 @@ theorem card_H0C [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
 /-- **`|HC : H₀C| = p^q`** — the `C`-factor cancels and `|H : H₀| = p^q` is the chief-factor
 order ((9.6), `quotient_order` + `typeIII_IV_p_eq_W2`). -/
 theorem H0C_relIndex_HC [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hyp : Hypothesis M) :
+    {M : Subgroup G} (hyp : Hypothesis M) (htype : IsTypeIII M ∨ IsTypeIV M) :
     hyp.H0C.relIndex hyp.HC = hyp.p ^ hyp.q := by
   have hHH : hyp.s11Setup.typeP.H = hyp.base.typeP.H := by
     rw [hyp.s11Setup.typeP.H_eq, hyp.base.typeP.H_eq]
@@ -868,7 +868,7 @@ theorem H0C_relIndex_HC [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv] at this
   -- `|H| = p^q · |H₀|` (chief factor)
   have hp_eq : hyp.chief.p = hyp.p := by
-    have h2 := hyp.chief.typeIII_IV_p_eq_W2 (hyp.base.isTypeIIIorIV hG)
+    have h2 := hyp.chief.typeIII_IV_p_eq_W2 htype
     rw [hyp.s11Setup_card_W2_eq] at h2
     exact h2.symm
   have horder : Nat.card ↥hyp.base.typeP.H = hyp.p ^ hyp.q * Nat.card ↥hyp.chief.H0 := by
@@ -892,13 +892,13 @@ theorem H0C_relIndex_HC [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 core), `p = |W₂|` is the chief-factor prime; both are odd (dividing `|G|`); and `p ≠ q`
 since `p ∣ |H|` while `q ∣ |U ⊔ W₁|`, which are coprime. -/
 theorem p_q_distinct_odd_primes [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hyp : Hypothesis M) :
+    {M : Subgroup G} (hyp : Hypothesis M) (htype : IsTypeIII M ∨ IsTypeIV M) :
     hyp.p.Prime ∧ hyp.q.Prime ∧ Odd hyp.p ∧ Odd hyp.q ∧ hyp.p ≠ hyp.q := by
   have hHH : hyp.s11Setup.typeP.H = hyp.base.typeP.H := by
     rw [hyp.s11Setup.typeP.H_eq, hyp.base.typeP.H_eq]
   -- `p` prime via the chief factor
   have hp_eq : hyp.chief.p = hyp.p := by
-    have h2 := hyp.chief.typeIII_IV_p_eq_W2 (hyp.base.isTypeIIIorIV hG)
+    have h2 := hyp.chief.typeIII_IV_p_eq_W2 htype
     rw [hyp.s11Setup_card_W2_eq] at h2
     exact h2.symm
   have hp_prime : hyp.p.Prime := hp_eq ▸ hyp.chief.p_prime
@@ -1206,7 +1206,8 @@ theorem C_lt_U {M : Subgroup G} (hyp : Hypothesis M) : hyp.C < hyp.base.typeP.U 
 (`centralizer_W1` + `W2_le`), so the induced action on `(HC)/M''` is fixed-point-free and
 Burnside gives the congruence (`W1_dvd_index_of_fixedPoints_le`). -/
 theorem q_dvd_secondDerived_relIndex_HC_sub_one [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M) :
     hyp.base.w1 ∣ (secondDerivedInAmbient M).relIndex hyp.HC - 1 := by
   classical
   haveI hHCn : ((hyp.HC.subgroupOf M)).Normal := hyp.HC_subgroupOf_normal
@@ -1235,7 +1236,7 @@ theorem q_dvd_secondDerived_relIndex_HC_sub_one [Finite G]
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe
         (hyp.HC_le_derived.trans (Subgroup.map_subtype_le _))).toEquiv
     rw [h1, h2]
-    exact (hyp.base.coprime_card_W1_derived hG).coprime_dvd_right
+    exact (hyp.base.coprime_card_W1_derived hG htype).coprime_dvd_right
       (Subgroup.card_dvd_of_le hyp.HC_le_derived)
   have hMinv : ∀ a : ↥(hyp.base.typeP.W1.subgroupOf M), ∀ m ∈ Msub, a • m ∈ Msub := by
     intro a m hm
