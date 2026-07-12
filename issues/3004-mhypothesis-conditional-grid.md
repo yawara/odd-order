@@ -1144,3 +1144,27 @@ normalized enumerations と両 target restriction equivalence の `symm_one` か
 次は二つの source axis を reconciled factor 上へ restrictし、既存 target zero-axis equivalence
 へ別々に送る。その積を full `omegaMonoidHomEquiv` の逆で eta pointer に戻せば、abstract
 omega label の未証明 separability に依存せず、zero-preserving transposed grid を構成できる。
+
+### zero-preserving transposed eta grid (2026-07-12 続行 8)
+
+- source の零行 character が intrinsic `W1` 上、零列 character が intrinsic `W2` 上で
+  trivial であることを、`omegaProdChar` の concrete factor evaluation から証明した。
+- reconciled swap `dataT.W2 = base.W1`, `dataT.W1 = base.W2` に沿う source-axis restriction を
+  target の `omegaW1RestrictionEquiv` / `omegaW2RestrictionEquiv` へ送り、zero-preserving
+  equivalence
+  `Fin dataT.w2 ≃ Fin base.q` / `Fin dataT.w1 ≃ Fin base.p` を構成した。
+- abstract label の separability は仮定せず、二つの target zero-axis characters の積を
+  `omegaMonoidHomEquiv.symm` へ戻す `alignedOmegaProductIndex` を構成した。この pointer が
+  direct source pointer `alignedOmegaEtaIndex` と一致し、source zero column / zero row が
+  target zero row / zero column へ正確に戻ることを証明した。
+- `alignedOmegaEtaGrid` として class-function grid を包装し、joint injectivity、orthonormality、
+  および `typePV` 上の
+  `alignedOmegaSigmaGrid i j v = alignedOmegaEtaGrid i j v` を閉じた。これで
+  regular-value grid enumeration alignment は完了した。
+- 最新 main (`7fe28d44`) 同期後の leaf build、および AxiomsCheck (4159 jobs) green。
+  全公開 API を AxiomsCheck に登録済み。新 `sorry`・新 axiom・carrier/signature 変更なし。
+
+次 frontier はこの `alignedOmegaEtaGrid` を既存 arbitrary-grid (11.8) chain に渡すこと:
+`tau_muGridAlpha_apply_eq_of_grid_value_alignment` と transposed eta classifier から `hclassify`
+を具体化し、arbitrary-grid beta の ZIrr / reality / trivial-orthogonality / parity を組んで
+conditional `Even a → a = 0` を unconditional `a = 0` と rowwise alpha-image へ上げる。
