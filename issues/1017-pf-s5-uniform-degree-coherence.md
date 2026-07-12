@@ -1324,3 +1324,28 @@ counting route も b 単独不可 (reducible count は lane-a S12、mu_colSum di
 column pair (j,−j) に generalize、`S16.eta_diff_rigidity` (S16_GridExpansion:390) 経由)。closes-no-sorry
 だが R-family (route B) が 9092 放電後に consume する core μ→η Dade 計算。次 = これを build (gated-endpoint
 prep、CLAUDE.md deferred-payoff 容認)。9092 放電後に R-family closing + caseA fold。
+
+## Update (2026-07-13, lane-b): caseB reducible R-family LANDED (route B), chain relocated below S16
+
+The Galois-case (caseB) reducible R-family is built **sorry-free**, closing the reducible branch of
+`sSet_caseB_memberRFamily` and dissolving the phantom cross-lane "μ-grounding" gate (issue 9092,
+now closed — the prior 748e6a27 "9014-blocked / route-A-invalid dead-end" record was wrong):
+
+- `S15_HonestTypeP2A0`: `tauS_mu_diff_support` / `tauS_mu_vanish_on_V` (all-rows/all-cols).
+- `S15_BridgeCharacter`: `tauS_mu_cross` — full-grid prime-TI Dade cross-relation (via
+  `S16.eta_diff_rigidity`, general in the row).
+- `S15_CaseBReducibleCoherence` (NEW downstream leaf): `sSet_reducible_eq_muColumnSum` (dichotomy
+  dispatch), `tauS_muColumn_diff_eq` (`τ_S(η−η̄) = ∑ᵢ(η_{ij}−η_{ik})`),
+  `sSet_caseB_reducible_memberRFamily` (the `2q`-element signed-η family). The self-contained caseB
+  → `coherent_H0Cprime_S` → `tau1S_ofHonest` cluster was relocated here from `HypothesisBasics`
+  (route B needs S16, which is downstream of HypothesisBasics; verified no external callers).
+
+Full `lake build OddOrder` green (4180 jobs). New R-family `#print axioms` = accepted dadeHypS0
+foundation only (no new axiom).
+
+**Remaining caseB residual (1 sorry):** `sSet_caseB_memberRFamily_orthogonal` — the 2×2 member-wise
+cross-orthogonality. Needs: (i) imageSet-reduction lemmas for `sSet_caseB_memberRFamily` (irr →
+`dadeOrthonormalCharacterImageFamilyOfDiff.imageSet`; red → `{η_{ij}} ∪ {−η_{ik}}`); (ii) red×red
+from `eta_orthonormal` (column disjointness from `⟨φ,ξ⟩=⟨φ,ξ̄⟩=0`), irr×red from
+`eta_orthogonal_of_norm_one_pair_vanish`, irr×irr from the landed (5.2.e) lemma. Closing → caseB
+`sSet_coherent_dade_caseB`/`indS_caseB`/`coherent_H0Cprime_S` fully sorry-free (caseA lift separate).
