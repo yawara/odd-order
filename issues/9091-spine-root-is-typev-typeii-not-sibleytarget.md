@@ -160,3 +160,18 @@ a の faithful CollectAxioms-replica metaprogram の finding を hub が独立 g
 
 **lane a への directive**: (9.11) port を止め、**spine の 2 legacy leaf sorry を CLEAN heir へ rewire** せよ
 (1025 の precise 版)。heir は既存・CLEAN・cycle 無しゆえ、spine bare-sorry-free は heir cite の rewire で達成可能。
+
+## ✅ lane-a 完了報告 (2026-07-13, commit e21c9acb)
+
+HUB RULING directive (spine の 2 legacy leaf sorry を CLEAN heir へ rewire) を完遂。
+`card_kappaHall_lt_of_isTypeIIIorIV` = **axiom-clean** (`#print axioms` = propext/Classical.choice/
+Quot.sound、sorryAx 無し; faithful CollectAxioms-replica でも `reaches sorryAx = false`)。
+full build green (4179 jobs)、AxiomsCheck 3 件登録 (card_kappaHall / isTypeIIIorIV_unconditional /
+card_kappaHall_lt_of_isTypeP1)。詳細 = issue 1025 (closed)。
+
+- 方式2 (explicit-param + legacy wrapper) を採用。方式1 (DAG relayer) は heir cluster が
+  S13_SixTwoBridge 依存で上流抽出不能ゆえ不採用 (task STEP-0 の判断どおり)。
+- 反復 localize で判明した「隠れ経路」: (i) `p_prime_and_card_H_eq` は §13 field `hyp.type_alt` で解決、
+  (ii) (11.6) `pComplementCore_eq_bot`→legacy `secondDerived_eq_HC` は hnc+htype threading で解決。
+  いずれも `#print axioms` を authoritative gate に反復収束 (RULING 3 の canonical tool 有効性を裏付け)。
+- ⚠ `feitThompson` は cross-lane sorry で依然 dirty (b の 1017 S-instance 等)。spine ≠ feitThompson。
