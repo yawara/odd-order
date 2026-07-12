@@ -894,7 +894,9 @@ theorem nineElevenSevenEightRefutation
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
     (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
-      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief)) :
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief))
+    (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp) :
     NineElevenSevenEightRefutation hyp caseA := by
   haveI := hyp.base.finiteG
   classical
@@ -925,7 +927,7 @@ theorem nineElevenSevenEightRefutation
     rwa [if_pos rfl] at h
   -- ── the (9.11.2) TI-witness supplies `U₁` with `C ≤ U₁ ≤ U`, `[U:U₁] = a`
   obtain ⟨U₁, hCU₁, hU₁U, hU₁a, -⟩ :=
-    caseA_nineElevenTwo_tiWitness hG hyp caseA hS3deg hS2deg
+    caseA_nineElevenTwo_tiWitness hG hyp caseA hS3deg hS2deg hncH0C
   obtain ⟨e, hedef⟩ : ∃ e : ℕ,
       e = (OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief).relIndex U₁ := ⟨_, rfl⟩
   have hue : e * caseA.a
@@ -937,11 +939,11 @@ theorem nineElevenSevenEightRefutation
       (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief)] at h
   -- ── the arithmetic spine refutes `|𝒮₄| ≤ N`, so `𝒮₄ ≠ ∅`
   obtain ⟨K₁, K₂, hK₁, hK₂, hCinf⟩ :=
-    caseA_two_summand_inertia_inputs hG hyp caseA hS3deg hS2deg
+    caseA_two_summand_inertia_inputs hG hyp caseA hS3deg hS2deg hncH0C
   have hclass := caseA_nineElevenThree_count_inputs hG hyp caseA hS₁sub hS3deg hS2deg
-    hCUprime hcount
+    hCUprime hcount hncH0C
   obtain ⟨N, hnorm, -⟩ := caseA_nineElevenFour_norm_inputs hyp caseA
-    (caseA_nineElevenTwo_tiWitness hG hyp caseA hS3deg hS2deg) hCUprime hcount
+    (caseA_nineElevenTwo_tiWitness hG hyp caseA hS3deg hS2deg hncH0C) hCUprime hcount
   have hqp : (hyp.s11Setup.q).Prime := hyp.s11Setup.nontrivial.2.1
   have hqodd : Odd hyp.s11Setup.q :=
     hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card hyp.s11Setup.typeP.W1)
@@ -969,7 +971,7 @@ theorem nineElevenSevenEightRefutation
       ≤ hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief := by
     change hyp.chief.H0 ⊔ derivedInG hyp.C ≤ _
     refine sup_le_sup_left ?_ hyp.chief.H0
-    rw [C_eq_cSub hG hyp]
+    rw [C_eq_cSub_of_noncoherent hG hyp hncH0C]
     exact OddOrder.Peterfalvi.S11.cprimeSub_le_C hyp.s11Setup hyp.chief
   have hS4sub : nineElevenSFour hyp S₂
       ⊆ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime \ S₂ := fun ξ hξ =>

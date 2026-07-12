@@ -102,7 +102,9 @@ glue `S07.coherentUnion_of_glued_of_bridge`; contradicting (11.3) `S_H0C_not_coh
 false wide uniform-degree route (issue 1019). -/
 theorem coherent_sOf_H0C [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
-    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)] :
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
+    (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
       (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C) hyp.base.A0) := by
   haveI := hyp.base.finiteG
@@ -118,7 +120,7 @@ theorem coherent_sOf_H0C [Finite G]
     set μ : ClassFunction ↥M ℂ := OddOrder.Peterfalvi.S06.columnSum
       (hyp.base.toHypothesis46 hG hG.odd) (hyp.base.muColumnChar hG hG.odd ⟨1, hw2⟩) with hμdef
     have hμmem : μ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
-      columnSum_muColumnChar_mem_sOf_H0C hG hyp ⟨1, hw2⟩ hk1
+      columnSum_muColumnChar_mem_sOf_H0C_of_noncoherent hG hyp ⟨1, hw2⟩ hk1 hncH0C
     have hIKF : ∀ ⦃x : ClassFunction ↥M ℂ⦄,
         x ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C →
         x ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
@@ -133,9 +135,9 @@ theorem coherent_sOf_H0C [Finite G]
     refine ⟨coherent_sOf_H0C_of_coherent_sOf_H0Cprime hyp
       (OddOrder.Peterfalvi.S13.caseA_coherent_sOf_H0Cprime_of_refuter hG hyp caseA
         (caseA_refuter_of_equality_refutation hG hyp caseA
-          (nineElevenPairBound hG hyp caseA)
+          (nineElevenPairBound hG hyp caseA hncH0C)
           (nineElevenEqualityRefutation_of_sevenEightRefutation hG hyp caseA
-            (nineElevenSevenEightRefutation hG hyp caseA)))).some
+            (nineElevenSevenEightRefutation hG hyp caseA hncH0C) hncH0C))).some
       ⟨μ.conj - μ, ⟨?_, ?_⟩, ?_⟩⟩
     · exact Submodule.sub_mem _ (Submodule.subset_span hμc) (Submodule.subset_span hμmem)
     · exact OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support
@@ -144,7 +146,7 @@ theorem coherent_sOf_H0C [Finite G]
       exact OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters
         (hyp.base.card_odd_of_isMinimalSimpleOdd hG) _ (hIKF hμmem) (sub_eq_zero.mp h)
   · -- **caseB**: the landed norm-general coherence (issue 9075) transferred to `𝒮(H₀C)`.
-    exact ⟨caseB_coherent_sOf_H0C hG hyp hB.some⟩
+    exact ⟨caseB_coherent_sOf_H0C hG hyp hB.some hncH0C⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(11.8.6) narrow `τ₃` glue map `ν` exists** — the world-bridge analogue of
@@ -300,7 +302,9 @@ theorem coherent_sOf_H0C_extension_muColumnSum_pin_of_irr [Finite G]
         - (d : ℂ) • coh.extension ζ)
     {ξ : ClassFunction ↥M ℂ}
     (hξ : ξ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C)
-    (hξirr : IsIrreducibleCharacter ξ) :
+    (hξirr : IsIrreducibleCharacter ξ)
+    (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp) :
     c.extension (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩)
       = ∑ i : Fin hyp.base.w1, hyp.base.alignedOmegaSigmaGrid hG hG.odd i ⟨1, hw2⟩ := by
   haveI := hyp.base.finiteG
@@ -314,7 +318,7 @@ theorem coherent_sOf_H0C_extension_muColumnSum_pin_of_irr [Finite G]
   -- memberships and conjugates
   have hμmem : μ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C := by
     rw [hμdef, hyp.base.muGrid_columnSum_eq_columnSum hG hG.odd ⟨1, hw2⟩]
-    exact columnSum_muColumnChar_mem_sOf_H0C hG hyp ⟨1, hw2⟩ hk1
+    exact columnSum_muColumnChar_mem_sOf_H0C_of_noncoherent hG hyp ⟨1, hw2⟩ hk1 hncH0C
   have hμc : μ.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
     Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hμmem
   have hξc : ξ.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
@@ -563,7 +567,9 @@ theorem exists_pinned_coherent_sOf_H0C_of_all_reducible [Finite G]
         = (∑ i : Fin hyp.base.w1, hyp.base.alignedOmegaSigmaGrid hG hG.odd i j)
           - (d : ℂ) • Xζ)
     (hallred : ∀ η ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C,
-      ¬ IsIrreducibleCharacter η) :
+      ¬ IsIrreducibleCharacter η)
+    (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp) :
     ∃ c : OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
         (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C) hyp.base.A0,
       c.extension (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩)
@@ -738,7 +744,7 @@ theorem exists_pinned_coherent_sOf_H0C_of_all_reducible [Finite G]
       ClassFunction ↥M ℂ)) : ↥M → ℂ) 1 ≠ 0 := by
     have hμ1mem' : (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩) ∈ F := by
       rw [hFdef, hyp.base.muGrid_columnSum_eq_columnSum hG hG.odd ⟨1, hw2⟩]
-      exact columnSum_muColumnChar_mem_sOf_H0C hG hyp ⟨1, hw2⟩ hk1
+      exact columnSum_muColumnChar_mem_sOf_H0C_of_noncoherent hG hyp ⟨1, hw2⟩ hk1 hncH0C
     exact inducedKernelFamily_mem_apply_one_ne_zero (hIKF hμ1mem')
   have hres : ∀ x ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M) F,
       ν₀ x - hyp.base.tau x
@@ -787,7 +793,7 @@ theorem exists_pinned_coherent_sOf_H0C_of_all_reducible [Finite G]
   -- assemble; the pin is `hν₀apply` at the `μ₁`-member index
   have hμ1mem : (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩) ∈ F := by
     rw [hFdef, hyp.base.muGrid_columnSum_eq_columnSum hG hG.odd ⟨1, hw2⟩]
-    exact columnSum_muColumnChar_mem_sOf_H0C hG hyp ⟨1, hw2⟩ hk1
+    exact columnSum_muColumnChar_mem_sOf_H0C_of_noncoherent hG hyp ⟨1, hw2⟩ hk1 hncH0C
   set i₁ : Fin n := hFfin.toFinset.equivFin
     ⟨_, hFfin.mem_toFinset.mpr hμ1mem⟩ with hi₁def
   have hχi₁ : χ i₁ = ∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩ := by
@@ -857,7 +863,9 @@ theorem coherent_SOf_H0C_of_column_identities [Finite G]
     (hcol : ∀ j : Fin hyp.base.w2, j ≠ 0 →
       hyp.base.tau ((∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i j) - (d : ℂ) • ζ)
         = (∑ i : Fin hyp.base.w1, hyp.base.alignedOmegaSigmaGrid hG hG.odd i j)
-          - (d : ℂ) • coh.extension ζ) :
+          - (d : ℂ) • coh.extension ζ)
+    (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := by
   haveI := hyp.base.finiteG
   classical
@@ -879,7 +887,7 @@ theorem coherent_SOf_H0C_of_column_identities [Finite G]
   have hχmem : (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩)
       ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C := by
     rw [hyp.base.muGrid_columnSum_eq_columnSum hG hG.odd ⟨1, hw2⟩]
-    exact columnSum_muColumnChar_mem_sOf_H0C hG hyp ⟨1, hw2⟩ hk1
+    exact columnSum_muColumnChar_mem_sOf_H0C_of_noncoherent hG hyp ⟨1, hw2⟩ hk1 hncH0C
   -- `d·ζ ∈ ℤ[S(HC)]`: `ζ ∈ S(HC)` (`hζHC`) plus `(d:ℂ)•ζ = (d:ℤ)•ζ` (a `zsmul` of a span member).
   have hdζspan : (d : ℂ) • ζ ∈ Submodule.span ℤ (hyp.SOf hyp.HC) := by
     have hcast : (d : ℂ) • ζ = (d : ℤ) • ζ := by
@@ -902,12 +910,12 @@ theorem coherent_SOf_H0C_of_column_identities [Finite G]
     by_cases hirr : ∃ ξ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C,
         IsIrreducibleCharacter ξ
     · obtain ⟨ξ, hξ, hξirr⟩ := hirr
-      obtain ⟨c⟩ := coherent_sOf_H0C hG hyp
+      obtain ⟨c⟩ := coherent_sOf_H0C hG hyp hncH0C
       exact ⟨c, coherent_sOf_H0C_extension_muColumnSum_pin_of_irr hG hyp c coh hζHC hw2
-        hθsupp (hcol ⟨1, hw2⟩ hk1) hξ hξirr⟩
+        hθsupp (hcol ⟨1, hw2⟩ hk1) hξ hξirr hncH0C⟩
     · push_neg at hirr
       exact exists_pinned_coherent_sOf_H0C_of_all_reducible hG hyp
-        (coherent_sOf_H0C hG hyp).some hw2 hcol hirr
+        (coherent_sOf_H0C hG hyp hncH0C).some hw2 hcol hirr hncH0C
   obtain ⟨ν, hagreeSHC, hagreeSof⟩ := exists_glue_nu_H0C hyp coh hsofC
   refine ⟨?_⟩
   rw [hyp.SOf_H0C_eq_SOf_HC_union_sOf, Set.union_comm]
@@ -1065,7 +1073,8 @@ theorem exists_zeta_residual_not_orthogonal_H0C_of_refuter [Finite G]
   -- (`SOf_secondDerived_eq` characterizes `S(M'')` as the degree-`w₁` irreducible subfamily;
   -- `secondDerived_eq_HC` (11.5) identifies `M'' = HC`).
   have hζHC : params.zeta ∈ s13hyp.SOf s13hyp.HC := by
-    rw [← secondDerived_eq_HC hG s13hyp, s13hyp.SOf_secondDerived_eq hG]
+    rw [← secondDerived_eq_HC_of_noncoherent hG s13hyp (hrefute s13hyp),
+      s13hyp.SOf_secondDerived_eq hG]
     exact ⟨hzS, params.zeta_irreducible, hz1⟩
   -- Degree match `(∑ᵢ μ_{ij})(1) = d·ζ(1)`: each `μ_{ij}(1) = d` (`degree_independent`, `j ≠ 0`),
   -- so the `w₁`-term sum is `w₁·d = d·w₁ = d·ζ(1)` (`hz1 : ζ(1) = w₁`).
@@ -1086,7 +1095,7 @@ theorem exists_zeta_residual_not_orthogonal_H0C_of_refuter [Finite G]
     ⟨by have := (s13hyp.base.toHypothesis46 hG hG.odd).one_lt_card_W1; omega⟩
   exact hrefute s13hyp (coherent_SOf_H0C_of_column_identities hG s13hyp
     (isCoherent_of_subset ν (SOf_HC_subset_SHCSet hG s13hyp)
-      (coherent_SOf_HC hG s13hyp).some.nonzero) hzS hζHC hζdeg hcol)
+      (coherent_SOf_HC hG s13hyp).some.nonzero) hzS hζHC hζdeg hcol (hrefute s13hyp))
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11), modulo the equality refutation: `𝒮(H₀C′)` is coherent on `A₀(M)`**

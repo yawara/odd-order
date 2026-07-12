@@ -435,7 +435,9 @@ then `sumnS F ≤ sumnS 𝒮₂ = (qa)²·∑ deg²/‖·‖² ≤ (qa)²·2·(d
 theorem nineElevenPairBound [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
-      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief)) :
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief))
+    (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp) :
     NineElevenPairBound hyp caseA := by
   haveI := hyp.base.finiteG
   classical
@@ -465,7 +467,7 @@ theorem nineElevenPairBound [Finite G]
   -- `d ≤ u` (the (9.11.1) preamble source-degree bound)
   have hCp : OddOrder.Peterfalvi.S11.cprimeSub hyp.s11Setup hyp.chief = derivedInG hyp.C := by
     change derivedInG (OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief) = derivedInG hyp.C
-    rw [C_eq_cSub hG hyp]
+    rw [C_eq_cSub_of_noncoherent hG hyp hncH0C]
   have hζ' : ζ ∈ OddOrder.Peterfalvi.S11.xiOf hyp.s11Setup
       (hyp.chief.H0 ⊔ (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).Cprime) := by
     show ζ ∈ OddOrder.Peterfalvi.S11.xiOf hyp.s11Setup
@@ -744,7 +746,9 @@ theorem caseA_two_summand_inertia_inputs [Finite G]
       (χ : ↥M → ℂ) 1 = ((hyp.s11Setup.q *
         (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u : ℕ) : ℂ))
     (hS2deg : ∀ χ ∈ S₂,
-      (χ : ↥M → ℂ) 1 = ((hyp.s11Setup.q * caseA.a : ℕ) : ℂ)) :
+      (χ : ↥M → ℂ) 1 = ((hyp.s11Setup.q * caseA.a : ℕ) : ℂ))
+    (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp) :
     ∃ K₁ K₂ : Subgroup G,
       K₁.relIndex hyp.s11Setup.U = caseA.a ∧ K₂.relIndex hyp.s11Setup.U = caseA.a ∧
       (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).C = K₁ ⊓ K₂ := by
@@ -756,7 +760,7 @@ theorem caseA_two_summand_inertia_inputs [Finite G]
       ≤ hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief := by
     show hyp.chief.H0 ⊔ derivedInG hyp.C ≤ _
     refine sup_le_sup_left ?_ hyp.chief.H0
-    rw [C_eq_cSub hG hyp]
+    rw [C_eq_cSub_of_noncoherent hG hyp hncH0C]
     exact OddOrder.Peterfalvi.S11.cprimeSub_le_C hyp.s11Setup hyp.chief
   have hφ' : φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime :=
     OddOrder.Peterfalvi.S11.sOf_antitone hyp.s11Setup hle hφ
@@ -823,7 +827,9 @@ theorem caseA_nineElevenThree_count_inputs [Finite G]
         IsIrreducibleCharacter χ ∧
         χ 1 = ((hyp.s11Setup.q * caseA.a : ℕ) : ℂ)}.ncard * (caseA.a * caseA.a)
       = (hyp.chief.p - 1)
-        * ((OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup).relIndex hyp.s11Setup.U)) :
+        * ((OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup).relIndex hyp.s11Setup.U))
+    (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp) :
     (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u
       + ((nineElevenSFour hyp S₂).ncard * hyp.s11Setup.q + (hyp.chief.p - 1))
         * (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u ^ 2
@@ -851,7 +857,7 @@ theorem caseA_nineElevenThree_count_inputs [Finite G]
       ≤ hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief := by
     show hyp.chief.H0 ⊔ derivedInG hyp.C ≤ _
     refine sup_le_sup_left ?_ hyp.chief.H0
-    rw [C_eq_cSub hG hyp]
+    rw [C_eq_cSub_of_noncoherent hG hyp hncH0C]
     exact OddOrder.Peterfalvi.S11.cprimeSub_le_C hyp.s11Setup hyp.chief
   -- the S11-level hypothesis shapes
   have hS₁'sub : {χ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup
@@ -966,7 +972,9 @@ theorem nineElevenEqualityRefutation_of_sTwoExtraction_normBound [Finite G]
     (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
       (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief))
     (hext : NineElevenSTwoExtraction hyp caseA)
-    (hnb : NineElevenNormBound hyp caseA) :
+    (hnb : NineElevenNormBound hyp caseA)
+    (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp) :
     NineElevenEqualityRefutation hyp caseA := by
   haveI := hyp.base.finiteG
   classical
@@ -978,10 +986,10 @@ theorem nineElevenEqualityRefutation_of_sTwoExtraction_normBound [Finite G]
     hS3deg hcount hFbound hS2deg
   -- Phase B: the (9.11.2) inertia inputs
   obtain ⟨K₁, K₂, hK₁, hK₂, hCinf⟩ :=
-    caseA_two_summand_inertia_inputs hG hyp caseA hS3deg hS2deg
+    caseA_two_summand_inertia_inputs hG hyp caseA hS3deg hS2deg hncH0C
   -- Phase C: the (9.11.3) count inputs
   have hclass := caseA_nineElevenThree_count_inputs hG hyp caseA hS₁sub hS3deg hS2deg
-    hCUprime hcount
+    hCUprime hcount hncH0C
   -- numeric side conditions: `q` odd prime `≥ 3`, `u ≥ 1`, `p = 2a + 1`
   have hqp : (hyp.s11Setup.q).Prime := hyp.s11Setup.nontrivial.2.1
   have hqodd : Odd hyp.s11Setup.q :=
@@ -1343,7 +1351,9 @@ theorem caseA_nineElevenTwo_tiWitness [Finite G]
       (χ : ↥M → ℂ) 1 = ((hyp.s11Setup.q *
         (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u : ℕ) : ℂ))
     (hS2deg : ∀ χ ∈ S₂,
-      (χ : ↥M → ℂ) 1 = ((hyp.s11Setup.q * caseA.a : ℕ) : ℂ)) :
+      (χ : ↥M → ℂ) 1 = ((hyp.s11Setup.q * caseA.a : ℕ) : ℂ))
+    (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp) :
     OddOrder.Peterfalvi.S11.NineElevenTwoTIWitness caseA := by
   haveI := hyp.base.finiteG
   refine OddOrder.Peterfalvi.S11.nineElevenTwoTIWitness_of_degree_dichotomy caseA ?_
@@ -1353,7 +1363,7 @@ theorem caseA_nineElevenTwo_tiWitness [Finite G]
       ≤ hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief := by
     change hyp.chief.H0 ⊔ derivedInG hyp.C ≤ _
     refine sup_le_sup_left ?_ hyp.chief.H0
-    rw [C_eq_cSub hG hyp]
+    rw [C_eq_cSub_of_noncoherent hG hyp hncH0C]
     exact OddOrder.Peterfalvi.S11.cprimeSub_le_C hyp.s11Setup hyp.chief
   have hφ' : φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime :=
     OddOrder.Peterfalvi.S11.sOf_antitone hyp.s11Setup hle hφ
