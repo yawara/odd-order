@@ -272,3 +272,13 @@ c の hVcomm が cite 可能な signature で供給される。
   S13_TypeDetermination ((11.9.b))、S11_ImprimitiveUBound (fpf 部品)、issue 9000 (σ-theory engine)
 - issues: 1012 ((9.8) counts — P1 と同根、B1 quotient bridge は §11 では H₀=⊥ で不要)、
   0101 (R1 pivot)、`notes/meta/ft_endgame_plan_2026_07_07.md` W2
+
+## 🧭 hub フォローオン (2026-07-12 監視 tick, 9077 RULING #3) — Type-IV 補題を S16 下 leaf へ抽出
+
+a が landing した `not_isTypeIV_of_mem_maximalSubgroups` 等の低レベル Type-IV/U-abelian 補題を
+lane c が TTypeII (S16) の `hVcomm` discharge に cite したいが、`S13_NonGaloisExclusion` が S16 を
+transitively import (S13_TypeDetermination 経由) するため **file-level cycle** で cite 不可
+(hub 検証済)。**hub 裁定 = 選択肢 (A): 当該 5 補題を S16-free な新 leaf (例 `S13_TypeIVExclusionCore.lean`,
+import は S13_TypeIIIGalois + S11_MaximalII_III_IV + NilpotentAbelianization のみ = closure に S16 無し)
+へ抽出。** 詳細タスク・要検証点 (proof が S13_TypeDetermination 固有内容を使うか) = issues/9077
+「HUB RULING #3」節。**割当 = lane a** (territory 内)。landing で c の hVcomm sorry が 1 本消える。
