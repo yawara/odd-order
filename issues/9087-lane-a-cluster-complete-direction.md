@@ -176,3 +176,26 @@ c (S16 assembly) の territory**。a が入ると dup。ただし a の type-II 
 1020 cluster の続き)。card_kappaHall と同様、clean-heir rewire で済むか genuine gap かを #print axioms +
 CollectAxioms で先に localize (9090/9091 の教訓 — hand-read 不可、authoritative tool で)。裁定待ちの間の
 type-II 上流精査は継続でよい。
+
+---
+
+## ⚠ UPDATE (2026-07-13、lane a): RULING #2 の target は既に DONE — off-spine legacy と確定 (次方向 hub 裁定要請)
+
+RULING #2 の directive 通り `exists_typeIICrossIsometryData` を **#print axioms authoritative で localize
+した結果、これは genuine gap でなく off-spine LEGACY**(9087 自身の census lines 35-36 が正しかった;
+RULING #2 の "clean-heir rewire でない genuine gap" は `c8528167` (2026-07-10) の stale snapshot 由来の誤り)。
+
+**検証済** (build 4150/4150、temp probe → read → delete): (10.7) の 3 obligation は全て pair-witness route で
+landed 済 — `typeII_T2_coherent` (obl.1、`408e9650`)、`typeII_nu_tau2_dichotomy` (obl.2a、`b5a20e11`)、
+`S12_TypeIIGridTranspose.lean` (obl.2b、sorry 0)、`exists_typeIICrossIsometryData_at_pair` (obl.3、AXIOM-CLEAN)。
+**honest heir `typeII_HU_frobenius_of_coherent'` (generic S) = AXIOM-CLEAN**、spine の
+`S_not_coherent_unconditional` が consume。`exists_typeIICrossIsometryData` (Frobenius:1206) は上流ゆえ下流
+`_at_pair` を cite = import cycle → in-place 閉包不能、埋めるのは (10.8) `S_not_coherent` と同型の legacy
+duplication = anti-pattern。詳細 = notes update¹¹ / issue 1028 UPDATE。
+
+**⟹ lane-a owned char-core territory (§10-13 type-II 含む) に genuine new math は残らず**(9087 census と一致)。
+本 target は「done、legacy」で 1028 close 候補。**次 lane-a 方向を hub 裁定されたい**(cross-lane §14/15/16 grab は
+RULING #2 で却下済ゆえ自律 grab しない)。有力候補 = **(1) legacy (10.7)/(10.8)/(10.10) subtree retire +
+`feitThompson` の honest-heir rewire**(1025 を card_kappaHall → feitThompson capstone へ拡張; legacy sorry を
+削除でき feitThompson dirty を honest に減らす; feitThompson wiring + cross-lane consumer に触れ hub sequencing 要、
+AxiomsCheck:7794)、副次 = **(2) 9079 close**(obl.2b 完了)、**(3) stale docstring cleanup**。

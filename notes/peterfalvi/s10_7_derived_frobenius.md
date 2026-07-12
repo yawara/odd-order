@@ -633,3 +633,35 @@ anchor、(2.5) base-point 評価 + `typePData_typePV_not_mem_derived`) +
   instantiate できるか (S15.Hypothesis 依存部の除去) を最初に確認し、
   (a) A₁-TI Dade で足りる形に支持集合を絞れるなら最軽、
   (b) 足りなければ honest A(S) + BG theoremB-TI 経由。
+
+## 2026-07-13 update¹¹ — ★★★ (10.7) type-II 全 obligation LANDED、honest heir axiom-clean 確定 — assigned target は off-spine LEGACY (frontier 枯渇 → hub 裁定要請)
+
+fresh session (RULING #2 handoff、issue 1028) が「obligation 1 = τ₂ 構成を実装せよ」で来たが、**STEP 0 の note 全読 + repo 全数検証で plan が stale と判明**。真の状態を authoritative `#print axioms` で確定した。**新規 Lean 変更なし**(既に done ゆえ; 検証 + 本 note/issue 記録のみ)。
+
+### 検証済の真の状態 (repo 全数、2026-07-13)
+handoff は `c8528167` (2026-07-10、step-1 分類 mirror) までの snapshot で書かれたが、その後 **obligation 1/2/3 が全て pair-witness route で landed** している(全て HEAD `037cf12c` の祖先、working tree clean):
+- **obligation 1** (τ₂ = T2 (5.7)-coherence): `typeII_T2_coherent` (`S12_TypeIIFrobenius:1019`) — `408e9650` で LANDED (update⁹)。
+- **obligation 2(a)** (ν^{τ₂} の (5.8) dichotomy pin): `typeII_nu_tau2_dichotomy` (`S12_TypeIIColumnPin:794`) — `b5a20e11` (進捗⁷)。
+- **obligation 2(b)** (S-grid = M-grid transpose、(8.8) pair): 新 leaf `S12_TypeIIGridTranspose.lean` (1083 行、**sorry 0**) — issue 9079 の scope、**完了**(hub は 9079 を close 可)。
+- **obligation 3** ((8.18.b) support disjointness): pair-witness assembly `exists_typeIICrossIsometryData_at_pair` (`S12_TypeIICrossIsometryPair:1345`、**sorry 0**) が `cross_zero`/`lam_ortho_grid`/`zeta_lam_ortho`/`zeta_ortho_grid` の全 4 support-geometry field を named lemma で discharge 済(⚠ この定理の docstring 1341-1344 は「4 field は sorry'd as the explicit frontier」と**嘘**を残す — stale、要 cleanup)。
+- **honest heir (generic S)**: `typeII_HU_frobenius_of_coherent'` (`S12_TypeIICrossIsometryPair:1493`) — 任意 type-II S に対し WLOG 共役転送(`exists_reconciled_conj_typePData_S` + `IsFrobeniusGroup.mapEquiv`)で [S,S] = S_F ⋊ U Frobenius を **sorry-free** で証明。**spine 側の (10.8) `S_not_coherent_unconditional` (`S12_Noncoherence:42`) が consume**。
+
+### authoritative `#print axioms` (temp probe、build 4150/4150、read 後 delete)
+- `typeII_HU_frobenius_of_coherent'` = `[propext, Classical.choice, Quot.sound]` — **AXIOM-CLEAN**
+- `exists_typeIICrossIsometryData_at_pair` = **AXIOM-CLEAN**
+- `S_not_coherent_unconditional` = **AXIOM-CLEAN** (spine 経由、AxiomsCheck:7647 と一致)
+- `exists_typeIICrossIsometryData` (assigned target、`S12_TypeIIFrobenius:1206`) = `[propext, sorryAx, …]` — **legacy sorry**
+- `typeII_derived_frobenius` (`S12_MaximalBasic:70`、legacy) = `[propext, sorryAx, …]`
+
+### ⟹ assigned target は off-spine LEGACY (RULING #2/1028 の "genuine gap" 分類は stale snapshot 由来の誤り)
+issue 9087 census (lines 35-36) が正しく「legacy import-DAG artifact (honest heir 既存)」と分類していた。architecture は (10.8) `S_not_coherent` と**完全同型**の意図的 legacy/honest split(両ファイルの docstring が明記):
+- **honest route** (spine): `exists_typeIICrossIsometryData_at_pair` → `typeII_HU_frobenius_of_coherent_at_pair` → `typeII_HU_frobenius_of_coherent'` → `S_not_coherent_unconditional`(pair 機構の**下流**ゆえ heir を cite 可)。
+- **legacy route** (off-spine): `exists_typeIICrossIsometryData` → `typeII_HU_frobenius_of_coherent` → `typeII_derived_frobenius`(`S12_MaximalBasic`、pair 機構の**上流**ゆえ heir を cite 不能)。live code consumer は**皆無**(全 7 参照が docstring/comment)。
+- import DAG: `Frobenius → GridTranspose → CrossIsometryPair → Noncoherence`。`exists_typeIICrossIsometryData` (Frobenius) が下流 `_at_pair` (CrossIsometryPair) を cite = **cycle** ⟹ in-place 閉包は不可。閉じるには pair-transport 機構を upstream に**重複移設**するしかなく、CLAUDE.md の anti-pattern(既に proven な heir があるのに sorry を消すためだけの duplication)。⟹ **filling は genuine progress でない**。spine 文字核 `card_kappaHall_lt_of_isTypeIIIorIV` は既に axiom-clean (AxiomsCheck:7797、issue 1025 で honest heir へ rewire 済)。
+
+### hub 裁定要請 (lane-a frontier 枯渇 — 本 target は done、cross-lane grab は RULING #2 が却下済)
+`exists_typeIICrossIsometryData` を in-place で埋めるのは anti-pattern ゆえしない。genuine な次手は**hub-level 判断**:
+1. **legacy (10.7)/(10.8)/(10.10) subtree の retire + `feitThompson` の honest-heir rewire**(issue 1025 を card_kappaHall から feitThompson capstone へ拡張)。これで `exists_typeIICrossIsometryData` 他 legacy sorry は**埋めるでなく削除**でき、feitThompson の transitive dirty を honest に減らせる。ただし feitThompson wiring + cross-lane §14/15/16 consumer に触れる ⟹ hub sequencing 要。AxiomsCheck:7794 が「feitThompson は legacy `no_typeV_maximal`/`S_not_coherent` を card_kappaHall subtree の**外**でなお cite」と記す通り。
+2. **issue 9079 close**(obligation 2(b) = GridTranspose 完了)。
+3. **stale docstring cleanup**: `_at_pair` の false-sorry claim、`exists_typeIICrossIsometryData`/1028 の "genuine gap" 表記。
+これらは全て hub 案件(spine capstone rewire / cross-lane / issue 管理)。lane-a の owned char-core territory に genuine new math は無し(9087 census と一致)。⟹ 本 session は STEP 0 STOP + 検証 + 記録に留め、次方向を 9087/1028 で hub に上げる。
