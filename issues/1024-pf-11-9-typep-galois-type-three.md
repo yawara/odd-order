@@ -162,6 +162,29 @@ Hypothesis (11.2) (M maximal, type III/IV)、ζ ∈ 𝒮(HC):
         cyclic_nilpotent_quo_der1_cyclic 対応)、u=a pin 議論 (S11↔S13 world bridge)、組立。
 - [ ] AxiomsCheck 登録 + consumer への配線 note (1016/9013/2018 参照)。
 
+## u=a pin 設計 (iter10 確定 — 実装は次 iteration)
+
+**⟨τφ, c μ_j⟩ = ±1 は一般 (5.8) port 不要** — b の (5.5) `coherent_extension_eq_sum_memberRFamily`
+(S11_NineElevenPairAdjoin:342、cite 可) で:
+1. ζ ∈ SOf HC: refuter 内 pattern 再利用 (`SOf_secondDerived_eq` + `secondDerived_eq_HC` —
+   deg-w1 irr ⟹ M″=HC kernel)。
+2. λ 家族橋: chars.SOf (H0⊔U′) → sOf s11Setup H0C (H0C = H₀⊔C、C=U′ (11.6)、def 揃え)。
+3. c := coherent_sOf_H0C; T := sOf H0C ⊆ sOf H0Cprime (kernel antitone) で (5.5):
+   c μ_j = Σ_{α∈E} α、E ⊆ R(μ_j).imageSet = certainTypeR imageSet
+   (`sOf_H0Cprime_memberRFamily_imageSet_of_col`、S11_NineElevenAlphaBound:285)。
+4. ‖c μ_j‖² = w₁ = |imageSet| ⟹ E = 全体; imageSet ↔ aligned 列
+   (`certainTypeOmegaSigma_muColumnChar_eq_aligned` — 所在確認要) ⟹
+   ⟨τφ, c μ_j⟩ = Σ_α ±δ_{row0} = ±1 ((11.9.a) 行0形)。
+5. ⟨φ,ψ⟩=0 (SOf_HC_inner_sOf_H0C_eq_zero + μ₀⊥λ irr-distinct)、ψ = μ_j − (u/a)•λ
+   supported ⟹ τψ = cψ ⟹ ±1 = (u/a)⟨τφ,cλ⟩ ⟹ **u = a** (整数性)。
+6. a>1: u=a=1 ⟹ U=C=U′ nilpotent ⟹ U=⊥ ✗ (nontrivial)。q∣u−1 (landed) ⟹
+   q ≤ u−1 < a ≤ p−1 < p、(11.9.b) p<q ✗ ⟹ **caseB (typeP_Galois)**。
+7. 帰結: Ubar_cyclic (caseB field) + C=U′ ⟹ U/U′ cyclic + U nilpotent ⟹ U cyclic
+   (**gap: nilpotent+cyclic-abelianization⟹cyclic** — mathlib/Isaacs 確認 or 新規 ~30 行:
+   Frattini H = U′·Φ... 標準: G' ≤ Φ(G) nilpotent + G/G' cyclic ⟹ G/Φ cyclic ⟹ G cyclic)
+   ⟹ IsMulCommutative U ⟹ ¬TypeIV。⚠ TypeIVData.typeP ≠ hyp.typeP — U の conjugacy
+   独立性 bridge 要 (MaximalSubgroupTypeConj の TypePData.conj 機構を確認)。
+
 ## 完了条件
 
 `isTypeIII_of_isTypeIIIorIV` (または同等の普遍 Type-IV 排除) が S13 で sorry-free、
