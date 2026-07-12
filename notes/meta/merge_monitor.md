@@ -536,6 +536,9 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-12 (tick 13) — c のみ合流**: **c=1** ((11.8) transposed eta grid align —
+  TGapGridAlignment 256→975 行 +719 全 proven、AxiomsCheck +73)。a=0 / b=0。build green
+  (4174 jobs)・AxiomsCheck OK (2342/0)・count-sorry 69→69・新 axiom なし。push `7fe28d44..1be17740`。
 - **2026-07-12 (tick 12, セッション再開初回) — 全 3 レーン合流**: **a=3** ((11.9.a)/1024 J0/J2:
   R(μ)-family conj-対合公式 `certainTypeRImage_conj` + `rowInv_zero` (S06 +43 全 proven) +
   t=0 退化排除 = conj-対合 route 設計 docs) / **b=7** (docs のみ: 2038 iter20-24 記録 —
