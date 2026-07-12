@@ -308,6 +308,17 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > carve-out と同型)。条件: (i) def/statement の意味不変、(ii) c の set-level facts・A0-Dade
 > content (theorem/lemma) には非接触、(iii) issue self-flag、(iv) build green。c の theorem 層は
 > 従来どおり c 専有 (b が触ったら逸脱)。移設後の def-層の恒久所有 = b (SubcoherenceInputs 内)。
+> **⟹ 相互 carve-out 拡張 #2 (hub 裁定 2026-07-13 監視 tick — merge 12123d9d)**: def-層に加え、b は
+> **自所有 `Hypothesis.*` char-cascade 定理の *additive* 追加**も S15_HonestTypeP2A0 で行ってよい (実例 =
+> `Hypothesis.tauS_mu_diff_support`/`tauS_mu_vanish_on_V` = (4.8) full-grid μ差 support/V-value、c の
+> `honestTypeP2A0Set` を **cite** して 1017 caseB R-family を閉じる)。条件: (i) **純 additive** (c の
+> set-level facts・A0-Dade theorem/lemma の改変・削除は依然逸脱)、(ii) 追加定理は b の `Hypothesis` char
+> 系で c の A0 def は cite のみ、(iii) issue self-flag、(iv) build green。根拠: genuine b char output・
+> c content 非接触 (merge 検証: `-theorem` 皆無)・c 非 ale ゆえ「軌道修正で保全」policy で受理。⟹ step 1.5 で
+> b が S15_HonestTypeP2A0 に additive `Hypothesis.*` char 定理を追加しても逸脱でない (c の A0-Dade
+> theorem/lemma 改変は逸脱)。同様に **S15_BridgeCharacter は混在 leaf で decl 単位判定** (b の (13.18/19)
+> char 系 = `tauS_mu_cross` 等の追加は b 領域、c の BetaData/tauS_mu_row0 系は c 専有 — tick 9 の decl-unit
+> ルール継続)。
 >
 > **✅ coordination 点 解決 = carve-out 拡張 #2 付与 (issue 9076 piece 4c-3, hub 裁定 2026-07-08 監視 tick)**:
 > 上記注記の「⚠ 将来 coordination 点 (`tauS_mu_row0_cross` の A0-Dade 化 statement 変更 = b territory、
