@@ -1817,3 +1817,14 @@ W 元 order ∣ pq ✓、P^# 元 = p-元 ✓。
 **実装順 (次 iter)**: (1) induce-support bridge (InducedCharacter) → (2)
 typeIA_eq_sharp (S10_MinimalSimpleBasic or MaximalSubgroupType) → (3) 本体
 typeIBetaL_betaS_disjoint_support。
+
+## ✅ (2026-07-12、/loop iter 16) — (13.19.a) 第 1-2 段
+
+typeIA_subset_sharpSubgroup_of_frobenius 実証明 (centralizer_kernel_le、G↔↥M 橋は
+Subtype.ext+push_cast; coe-mem は rwa 不可 → rw+exact hy.1)。induce の A-局在は
+**既存だった** (InducedCharacter:446/452 — grep 漏れ、同名新設で dup エラー)。
+**次 iter = 本体**: (a) β_L 入力の A(L)-supported 性 (supp(Ind1−φ) ⊆ H^#-conj ⊆
+A(L)-conj、typeIA_subset_sharp の逆 + conjugatesIntoSet)、(b) dadeSupport 分解と
+可換 coprime order 論法 (S04.Hypothesis.dadeSupport def + S10 data の
+coprime/cent fields を確認)、(c) tauSbetaGrid 側 = Ind_S^G + betaGrid_support +
+既存 support_induce_subset_conjugatesIntoSet、(d) order ∣ |P||W| vs prime of |H|。
