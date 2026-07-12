@@ -838,19 +838,29 @@ structure BetaMGridParityAlternatives [Finite G]
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (13.19), synchronized M-side grid source.**
 
-Lane b's corrected `TypeIOrthogonalityGridData` now carries the faithful conjunction alternatives
-and an actual Dade-image equation.  The remaining interface obligation is only to expose that the
-producer's internally chosen `phi` belongs to the concrete coherent family `typeIHyp.Sset`.
-The current lane-b carrier records `phi_mem : phi ∈ Lset` but does not identify its free `Lset`
-with `typeISetup.Sset`.  Once this membership is exposed, (13.19.b) coherence shows that changing
-the distinguished family member does not change any `eta`-grid coefficient of the associated
-`beta`; no false uniqueness of the two class functions is required. -/
+Lane b's corrected `TypeIOrthogonalityGridData` producer `typeIOrthogonalityGridData_of_coherent78`
+(Pf (13.19), landed 2026-07-12) now fixes the family `Lset := dataL.typeIHyp.Sset` and chooses the
+distinguished degree-`e` member via `exists_Sset_apply_one_eq_index`, so its `phi_mem` **is** the
+required `phi ∈ typeIHyp.Sset` membership.  This theorem therefore just instantiates that producer
+at `Mdata.coherent78` (supplying its `IsTypeP2 T` input from the (14.9) type determination) and
+projects the chosen member's membership; no false uniqueness of the two class functions is required. -/
 theorem exists_betaMGridData [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) :
     ∃ grid : OddOrder.Peterfalvi.S15.TypeIOrthogonalityGridData hyp.base Mdata.coherent78,
       grid.phi ∈ Mdata.typeIHyp.Sset := by
-  sorry
+  -- Lane b's faithful (13.19) producer `typeIOrthogonalityGridData_of_coherent78` now fixes
+  -- `Lset := dataL.typeIHyp.Sset` with `phi := choose (exists_Sset_apply_one_eq_index …)`, so the
+  -- chosen member is *in* `Sset` by construction.  Its `IsTypeP2 T` input is supplied here exactly
+  -- as the (14.9) type determination gives it (`T_typeII` ⟹ (16.*) classification), the same way
+  -- `BetaVanishing` feeds `typeI_orthogonality_dichotomy`.
+  have hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.base.T :=
+    ((OddOrder.BG.Ch4.S16.proposition_type_classification _hG hyp.base.T_maximal).2.1).mp
+      (T_typeII _hG hyp)
+  exact ⟨OddOrder.Peterfalvi.S15.typeIOrthogonalityGridData_of_coherent78 _hG hyp.base hT2
+      Mdata.coherent78,
+    (Classical.choose_spec (OddOrder.Peterfalvi.S15.exists_Sset_apply_one_eq_index _hG
+      Mdata.coherent78.typeIHyp)).1⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (13.19.c), faithful M-side source adapter.**  Projects the corrected conjunction
