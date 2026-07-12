@@ -915,8 +915,11 @@ conversely `H₀ ≤ H ≤ HC = M'' ≤ ⁅H,M'⁆ ⊔ U'` ((11.5) + the `K₁` 
 `U'`-part dies in `H ⊓ U = ⊥`, and in `H̄ = H/H'` the image of `⁅H,M'⁆` lies in the
 `U`-action commutator while the image of `H₀` is `U`-fixed ((9.6)/(9.1) conjunct 2);
 `C_{H̄}(U) ⊓ [H̄,U] = ⊥` (coprime Fitting on the abelian `H̄`, BG 1.6(d)) kills it. -/
-theorem Hypothesis.H0_eq_Hprime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hyp : Hypothesis M) :
+theorem Hypothesis.H0_eq_Hprime_of_noncoherent [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0)) :
     hyp.chief.H0 = hyp.Hprime := by
   classical
   rw [hyp.Hprime_eq,
@@ -933,7 +936,7 @@ theorem Hypothesis.H0_eq_Hprime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
     -- (c) trap: `h₀ ∈ ⁅H,M'⁆`
     have hh₀K : h₀ ∈ hyp.hKernel := by
       have hM'' : h₀ ∈ secondDerivedInAmbient M := by
-        rw [secondDerived_eq_HC hG hyp]
+        rw [secondDerived_eq_HC_of_noncoherent hG hyp hnc]
         exact Subgroup.mem_sup_left (hH0le hh₀)
       have hKU := hyp.secondDerived_le_hKernel_sup_derivedU hM''
       have hKleM : hyp.hKernel ≤ M := hyp.hKernel_le_H.trans hHle
@@ -1110,6 +1113,13 @@ theorem Hypothesis.H0_eq_Hprime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
     rw [hyp.chief.H0_eq]
     exact ⟨_, hmemN, rfl⟩
 
+/-- **Peterfalvi (11.6), `H₀ = H'`** (legacy wrapper): `H0_eq_Hprime_of_noncoherent` at the sorried
+(11.3) `S_H0C_not_coherent`, for the import-blocked upstream consumers (issue 1025). -/
+theorem Hypothesis.H0_eq_Hprime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.chief.H0 = hyp.Hprime :=
+  hyp.H0_eq_Hprime_of_noncoherent hG (S_H0C_not_coherent hG hyp)
+
 /-- **Peterfalvi (11.6)**: `H` is a `p`-group, `U` centralizes `H_0`, `H_0 = H'`, and `C = U'`.
 
 The second clause `U` centralizes `H_0` is **unconditional** (`U_centralizes_H0`, via (9.6)/(9.1)),
@@ -1142,8 +1152,10 @@ case by `caseA_fixed_contradiction` fed by the exponent chain (`chain_exponent_e
 the dichotomy and the case-A `W₁`-chain relation is the remaining work; left as this named crux so
 the two elementary-abelian/order corollaries below are sorry-free once it lands.
 See `notes/peterfalvi/s13_11_8_orthogonality.md`. -/
-theorem chief_H0_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hyp : Hypothesis M) :
+theorem chief_H0_eq_bot_of_noncoherent [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0)) :
     hyp.chief.H0 = ⊥ := by
   classical
   by_contra hne
@@ -1160,7 +1172,7 @@ theorem chief_H0_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact h2.symm
   -- `H₀ = H' = derivedInG (s11Setup.typeP.H)` ((11.6) `H0_eq_Hprime`)
   have hH0deriv : hyp.chief.H0 = derivedInG hyp.s11Setup.typeP.H := by
-    rw [hyp.H0_eq_Hprime hG, hyp.Hprime_eq, ← hHH]
+    rw [hyp.H0_eq_Hprime_of_noncoherent hG hnc, hyp.Hprime_eq, ← hHH]
   -- **case-B hypotheses of `chiefKernel_caseB_false`**
   have hpK : IsPGroup hyp.chief.p ↥hyp.s11Setup.H := by
     show IsPGroup hyp.chief.p ↥hyp.s11Setup.typeP.H
@@ -1200,17 +1212,33 @@ theorem chief_H0_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (caseA_fixes_of_action_chain hyp.chief hS₀card (fun v s hs => hS₀inv.smul_mem v hs)
         hAodd σ hmodd hσm hchain)
 
+/-- **Peterfalvi (11.7), `H₀ = ⊥`** (legacy wrapper): `chief_H0_eq_bot_of_noncoherent` at the
+sorried (11.3) `S_H0C_not_coherent`, for the import-blocked upstream consumers (issue 1025). -/
+theorem chief_H0_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.chief.H0 = ⊥ :=
+  chief_H0_eq_bot_of_noncoherent hG hyp (S_H0C_not_coherent hG hyp)
+
+/-- **(11.7) corollary — `N ◁ H` trivial, parametrized on (11.3) non-coherence** (issue 1025):
+`N = ⊥` from `chief_H0_eq_bot_of_noncoherent hnc` (`H₀ = N.map subtype = ⊥` + `subtype` injective). -/
+theorem chief_N_eq_bot_of_noncoherent [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0)) :
+    hyp.chief.N = ⊥ := by
+  have h := hyp.chief.H0_eq
+  rw [chief_H0_eq_bot_of_noncoherent hG hyp hnc, eq_comm, Subgroup.map_eq_bot_iff] at h
+  simpa using h
+
 /-- **(11.7) corollary — the chief kernel `N ◁ H` is trivial**: `N = ⊥`.  The chief kernel realised
 inside `↥H` is trivial because its `G`-image `H₀ = N.map H.subtype` is trivial (`chief_H0_eq_bot`)
 and `H.subtype` is injective.  Hence the chief factor `H̄ = ↥H ⧸ N ≅ ↥H` (used to transport the
 elementary-abelian/order data, and — via `H̄ = H` — to identify `C = C_U(H̄)` with `C_U(H) = hyp.C`
-for the (9.11) `hY` route). -/
+for the (9.11) `hY` route).  (Legacy wrapper of `chief_N_eq_bot_of_noncoherent`, issue 1025.) -/
 theorem chief_N_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) :
-    hyp.chief.N = ⊥ := by
-  have h := hyp.chief.H0_eq
-  rw [chief_H0_eq_bot hG hyp, eq_comm, Subgroup.map_eq_bot_iff] at h
-  simpa using h
+    hyp.chief.N = ⊥ :=
+  chief_N_eq_bot_of_noncoherent hG hyp (S_H0C_not_coherent hG hyp)
 
 /-- **Identification `C = cSub`** (Coq `Ptype_Fcompl_kernel_cent`): the §11 Fitting-complement
 `C = C_U(H)` (`hyp.C`, `C_eq_centralizer`) equals the §9 chief-factor action kernel `cSub = C_U(H̄)`.
@@ -1219,8 +1247,10 @@ Reverse (`cSub ≤ C_U(H)`) uses `H₀ = 1` (`chief_N_eq_bot`: `N = ⊥`, so `H�
 — acting trivially on `H̄` — centralizes `H` since the quotient by `⊥` is injective).  This makes the
 capstone family `𝒮(H₀ ⊔ C)` coincide with the (9.11) family `𝒮(H₀ ⊔ cSub)`, the connector for the
 `hY` route (issue 1019 update⁴⁸). -/
-theorem C_eq_cSub [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    (hyp : Hypothesis M) :
+theorem C_eq_cSub_of_noncoherent [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0)) :
     hyp.C = OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief := by
   have hHeq : hyp.s11Setup.typeP.H = hyp.base.typeP.H := by rw [hyp.setup_typeP_eq]
   have hUeq : hyp.s11Setup.typeP.U = hyp.base.typeP.U := by rw [hyp.setup_typeP_eq]
@@ -1231,7 +1261,7 @@ theorem C_eq_cSub [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgro
     exact OddOrder.Peterfalvi.S11.mem_cSub_of_mem_U_of_centralizes hyp.s11Setup hyp.chief
       (hUeq ▸ hx.1) (hHeq ▸ hx.2)
   · -- reverse: `cSub ≤ C_U(H)` (needs `N = ⊥`)
-    have hN : hyp.chief.N = ⊥ := chief_N_eq_bot hG hyp
+    have hN : hyp.chief.N = ⊥ := chief_N_eq_bot_of_noncoherent hG hyp hnc
     intro x hx
     rw [hyp.C_eq_centralizer, Subgroup.mem_inf]
     refine ⟨hUeq ▸ OddOrder.Peterfalvi.S11.cSub_le_U hyp.s11Setup hyp.chief hx, ?_⟩
@@ -1258,6 +1288,13 @@ theorem C_eq_cSub [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgro
     rw [OddOrder.Peterfalvi.S11.typeP_conjAction_apply] at hval
     -- `hval : (l : G) * g * (l : G)⁻¹ = g`; `(l : G) = x`
     exact (mul_inv_eq_iff_eq_mul.mp hval).symm
+
+/-- **Identification `C = cSub`** (legacy wrapper): `C_eq_cSub_of_noncoherent` at the sorried (11.3)
+`S_H0C_not_coherent`, for the import-blocked upstream consumers (issue 1025). -/
+theorem C_eq_cSub [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : Hypothesis M) :
+    hyp.C = OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief :=
+  C_eq_cSub_of_noncoherent hG hyp (S_H0C_not_coherent hG hyp)
 
 /-- **Peterfalvi (11.7)**: `H` is elementary abelian of order `p^q`, and `H_0 = 1`.
 
@@ -1390,10 +1427,12 @@ agrees with the producer (`TypesIIIIIIVSetup.eq_of_typeP_eq`, `setup_typeP_eq`);
 types III/IV (`chief_H0_eq_bot`), so this is `𝒮(H₀)`-membership over `hyp.s11Setup`; a reducible
 `𝒮(H₀)`-member lies in `𝒮(H₀ ⊔ cSub)` by the (9.9.b) count (`reducible_mem_sOf_H0C`); `cSub = C`
 (`C_eq_cSub`) identifies that family with `𝒮(H₀C)`. -/
-theorem columnSum_muColumnChar_mem_sOf_H0C [Finite G]
+theorem columnSum_muColumnChar_mem_sOf_H0C_of_noncoherent [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
-    (k : Fin hyp.base.w2) (hk : k ≠ 0) :
+    (k : Fin hyp.base.w2) (hk : k ≠ 0)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0)) :
     OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
         (hyp.base.muColumnChar hG hG.odd k)
       ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C := by
@@ -1414,15 +1453,26 @@ theorem columnSum_muColumnChar_mem_sOf_H0C [Finite G]
   have hmemH0 : OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
       (hyp.base.muColumnChar hG hG.odd k)
       ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.chief.H0 := by
-    rw [chief_H0_eq_bot hG hyp, heq]
+    rw [chief_H0_eq_bot_of_noncoherent hG hyp hnc, heq]
     exact OddOrder.Peterfalvi.S11.sOf_antitone _ bot_le hgrid.1
   -- (9.9.b): a reducible `𝒮(H₀)`-member lies in `𝒮(H₀ ⊔ cSub)`
   have hH0C := OddOrder.Peterfalvi.S11.reducible_mem_sOf_H0C hG
     (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief) _ hmemH0 hgrid.2
   -- `H₀ ⊔ cSub = H₀C` (`C = cSub`)
   change _ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup (hyp.chief.H0 ⊔ hyp.C)
-  rw [C_eq_cSub hG hyp]
+  rw [C_eq_cSub_of_noncoherent hG hyp hnc]
   exact hH0C
+
+/-- **(9.5)/(9.9.b) `𝒮(H₀C)`-membership** (legacy wrapper): `columnSum_muColumnChar_mem_sOf_H0C_of_noncoherent`
+at the sorried (11.3) `S_H0C_not_coherent`, for the import-blocked upstream consumers (issue 1025). -/
+theorem columnSum_muColumnChar_mem_sOf_H0C [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
+    (k : Fin hyp.base.w2) (hk : k ≠ 0) :
+    OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
+        (hyp.base.muColumnChar hG hG.odd k)
+      ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
+  columnSum_muColumnChar_mem_sOf_H0C_of_noncoherent hG hyp k hk (S_H0C_not_coherent hG hyp)
 
 /-- **Peterfalvi (9.5)/(9.9.b): the nontrivial column sums `μ_k` are `𝒮(H₀C′)`-members** — the
 `hμmem` input of the (9.11) caseB chain fold (`caseB_coherent_sOf_H0Cprime_of_mixed`).  Follows
