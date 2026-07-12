@@ -1904,3 +1904,20 @@ NC((ψ−ψ̄)^τ) ≤ ‖ψ−ψ̄‖² = 2 → (3.8) 帰結 + coherence (Dtau1
 (Dtau1 相当 — S14.Hypothesis.dadeData で τ₁ = τ そのもの: extension 不要かも —
 typeISetup.tau は total lift で ℤ[𝓛] 全体に定義済み ✓ Dtau1 は apply_of_support)。
 次 iter: この接続の設計から。
+
+## 📐 (2026-07-12、/loop iter 22) — (13.19.b) Coq 論法確定 + 引き継ぎ
+
+**Coq otau1eta (:2046-2060) の正確な構造**: Ψ := τ₁(ψ−ψ̄)、‖Ψ‖² = 2 (Itau1 等長 +
+ψ ⊥ ψ̄ [odd、seqInd_conjC_ortho — repo 対応 inner_induce_conj_eq_zero_of_frobenius_of_odd
+済!]) → NC(Ψ) ≤ 2 < min q p (cycTI_NC_norm) → **cycTI_NC_minn の対偶** (τ₁ψ が η_ij と
+非直交 → dirr 剛性で η = ±τ₁ψ → Ψ との内積 ≠ 0 → NC ≥ min、矛盾)。
+**Lean gap**: cycTI_NC_norm/cycTI_NC_minn 対応 (σ-grid の非直交格子点数 NC の下界剛性) は
+S05_SigmaTrichotomy の sigmaCoeff 系に部分対応 — ただし「G-level CF の grid 非直交 →
+NC ≥ min」形の直接 lemma は未確認。TGapNonorthogonality (lane c) は S12/S13 文脈で別物。
+**引き継ぎ (次セッション)**: (i) S05_SigmaTrichotomy の eq_smul_chiFam_diff_of_vanishOnV
+(:277) / eq_smul_chiFam_column_of_vanishOnV (:456) が cycTI_NC_minn 帰結の実体か精読、
+(ii) abstract hyp.eta との橋 = tau3/omega + sigmaIntegral (3002 keystone) — S16 assembly
+(FeitThompson.lean の cd 供給) がどう sigma-grid を hyp.eta に繋いだか読む、(iii) 橋が
+無ければ (13.19.b) を「abstract field 化」して producer discharge を S16 側に置く
+(3002 パターン; field: eta_orthogonal_of_wsharp_vanish_norm_two 形 — Ŵ-消滅 ∧ ‖·‖²=2 ∧
+ℤ[Irr] → ∀ij ⊥ η)。ψ−ψ̄ の Ŵ-消滅は iter 20 部品 (Ã-局在 + tiA_PWG) の変種で証明可。
