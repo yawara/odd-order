@@ -210,3 +210,31 @@ full build green 4128 jobs、AxiomsCheck OK、新 axiom 無し。
 - gate 残: pins ×3 (μ-grounding, b) / lSideGridCoeffData ×3 + betaGrid (β_S parity, b) /
   hu_full (u-value, b) / t_side field-data + hVcomm + v-value (9000, a) / V_inf ((13.4), b)。
   次 engine-prep 候補 = M-side betaGrid mirror (gate map 2026-07-09 追記節)。
+
+## 🎯 2026-07-12 lane-c (再開 session): (11.8) endpoint 着地 — T-side (14.9) ratio bound sorry-free
+
+再開時に前 session の未コミット (11.8) endpoint transport (mid-flight・build-broken) を発見 →
+完成させて着地 (commit `97a7a596`)。RULING #2 の gated-endpoint engine-prep 系列の一部。
+
+- **`T_typeIII_ratio_le` を local-sorry-free 化**: 最後の local sorry `hnotZeroRowProjection`
+  (Coq (11.8) `FTtype34_not_ortho_cycTIiso`) を、canonical refuter を global σ/η grid equality
+  + product pointer で η grid へ transport する `member_residual_not_orthogonal_eta_of_refuter`
+  (TGapGridAlignment) で discharge。詳細 = issue 3004 末尾。
+- 修正内容: TGapPrimeTI (`ν₀=Ind 1` 伝播)、TGapNonorthogonality (`s12Tau…` 結論の let 除去)、
+  local haveI `Fintype`/`Invertible` diamond の `Subsingleton.elim` 橋渡し。
+- full build 4177 jobs green・AxiomsCheck exit 0・新 axiom/sorry regression 無。
+
+**frontier 状態の更新**: これで T-side (14.9) の ungated endpoint-transport は完了。9077 本文の
+gate 表で `T_typeIII_ratio_le` に紐づいていた S-side βₛ 参照 (:1750) は本 endpoint とは別軸で、
+`T_typeIII_ratio_le` 自体は sorry-free 化。残 S16 sorry は全て a/b/9000 gate のまま
+(SubgroupM `s/t_side` = (9.7.b)/9000、SubgroupMCore `exists_betaMGridData` = b、
+ComparingLM `lSideGridCoeffData` = b、TTypeII `hVcomm` = (11.9.c) Type-IV)。
+
+**hVcomm 追加所見 (hub 宛、issue 3004 にも記載)**: lane a が (11.9.c) Type-IV 排除を landing し
+`hVcomm` の discharge lemma (`not_isTypeIV_of_mem_maximalSubgroups`) を明記したが、それが在る
+`S13_NonGaloisExclusion` は S16 を transitively import する上流 file ゆえ TTypeII から cite すると
+file-level cycle。discharge には hub 裁定 (a が低レベル (11.9.c) U-abelian 補題を S16 下の file へ
+分離、または spine consumer を a の版へ redirect) を要す。
+
+**方向**: RULING #2 の engine-prep 候補 (M-side betaGrid mirror 等) は b の grounding field 待ち。
+lane-c 独立 ungated frontier は再び枯渇。hub の reallocation/方向裁定を継続要請 (本 issue の standing ask)。

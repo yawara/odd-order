@@ -312,10 +312,12 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) ≤
       ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) := by
   -- Coq `FTtypeP_min_typeII` body (PFsection14.v:737--853): `calT1`/coherence + Γ-Bessel.
-  -- Reduced to the proven Γ-Bessel skeleton `T_typeIII_ratio_le_of_gamma_bridge`; its inputs are
-  -- the precisely-named char-cascade carriers, each a genuinely-missing construction kept as a
-  -- documented residual `sorry` here (NOT a gate on `T_typeIII_ratio_le`'s honest structure — the
-  -- Bessel/orthonormality/count arithmetic is fully proven in the skeleton).
+  -- Reduced to the proven Γ-Bessel skeleton `T_typeIII_ratio_le_of_gamma_bridge`; every char-cascade
+  -- carrier is now supplied, so this theorem carries **no local `sorry`**.  The last residual —
+  -- the Coq (11.8) `FTtype34_not_ortho_cycTIiso` non-orthogonality `hnotZeroRowProjection` — is now
+  -- discharged by transporting the canonical narrow-`𝒮(H₀C)` refuter through the global σ/η grid
+  -- identification ((3.9)(a) rigidity).  Upstream gates persist only transitively through the cited
+  -- sorried lemmas (Type-P₁ `A₀`-normed-TI, (13.18.a) β-support, §11 zero-column projection).
   classical
   haveI : Fintype G := Fintype.ofFinite G
   haveI : Invertible (Nat.card G : ℂ) :=
@@ -489,7 +491,7 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction) := by
       simpa only [hζeq] using hirr ζ hζT
     obtain ⟨ν0, hνZ, hνR, hβZ, hβsupp, hτβZ, hτβ1, hβconj,
-        hνinner, hνζ, hνζc, hβnorm, hτβnorm, hνfixed⟩ :=
+        hνinner, hνζ, hνζc, hβnorm, hτβnorm, hνfixed, hν0eq⟩ :=
       exists_typeIII_induced_primeTIDifference_with_norm_anchor_orthogonality_and_galois
         hG hyp hIII θ (hne θ hθ) hζirr_ind hζ1_ind
     rw [hζeq] at hβZ hβsupp hτβZ hτβ1 hβconj hνζ hνζc hβnorm hτβnorm
@@ -592,8 +594,70 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
                   ∑ j' : Fin hyp.base.p,
                     hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ j')
                 (hyp.base.eta i j) = 0 := by
-        -- Coq (11.8), `FTtype34_not_ortho_cycTIiso`.
-        sorry
+        -- Coq (11.8) `FTtype34_not_ortho_cycTIiso`: the canonical narrow-`𝒮(H₀C)`
+        -- refuter, transported through the global sigma/eta grid identification
+        -- ((3.9)(a) rigidity) and the Dade-image anchor `ν₀ = Ind_{T'}^T 1`.
+        have hP1' : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T := by
+          obtain ⟨_, _, hcIII_IV, _, _, _⟩ :=
+            OddOrder.BG.Ch4.S16.proposition_type_classification
+              hG hyp.base.T_maximal
+          exact (hcIII_IV.mp (Or.inl hIII)).1
+        obtain ⟨-, hW1spec, hW2spec⟩ :=
+          (OddOrder.Peterfalvi.S15.reconciled_typePData_T hG hyp.base).choose_spec
+        set dataT' :=
+          (OddOrder.Peterfalvi.S15.reconciled_typePData_T hG hyp.base).choose
+          with hdataT'
+        have hW : dataT'.W = hyp.base.W := by
+          rw [dataT'.W_eq, hW1spec, hW2spec, sup_comm, ← hyp.base.W_eq_join]
+        have hV : typePV hyp.base.T dataT' =
+            (hyp.base.W : Set G) \
+              ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G)) := by
+          unfold typePV
+          rw [hW, hW1spec, hW2spec, Set.union_comm]
+        -- `ζ`/`ν₀` were built under the local `haveI : Fintype ↥T := Fintype.ofFinite _`
+        -- instances (`this✝`), which are *definitionally* the scoped
+        -- `S12.FiniteInduce.finiteSubFintype`/`natCardInvC` but appear as opaque fvars, so the
+        -- scoped-instance `inducedFamily` / `s12Tau…` consumers need a `Subsingleton.elim` bridge.
+        have hzetaS : ζ ∈ OddOrder.Peterfalvi.S12.inducedFamily hyp.base.T :=
+          ⟨θ, hne θ hθ, by convert hζeq.symm using 2 <;> exact Subsingleton.elim _ _⟩
+        -- `hν0eq` carries the local `haveI` `Fintype`/`Invertible` diamond (opaque fvars,
+        -- definitionally the scoped `S12.FiniteInduce.*`), bridged by `Subsingleton.elim`.
+        have himage := s12Tau_zeroColumn_sub_eq_tSideDadeMap hG hyp dataT' hP1'
+          hIII ζ ν0
+          (by convert hν0eq using 2 <;> exact Subsingleton.elim _ _) hβsupp
+        have hzeta1 : ζ 1 =
+            ((s12HypothesisOfTypePData hG hyp.base.T_maximal dataT'
+              (Or.inl hIII) hP1').w1 : ℂ) := by
+          rw [show (s12HypothesisOfTypePData hG hyp.base.T_maximal dataT'
+              (Or.inl hIII) hP1').w1 = Nat.card ↥dataT'.W1 from rfl,
+            hW1spec, ← hyp.base.p_eq_card_W2]
+          exact hζ1
+        -- `member_residual…eta`'s `¬∀ … inner[scoped] … = 0` conclusion; the local goal states the
+        -- same `inner` under the `haveI` diamond, so bridge the reindexed `∀` per-entry.
+        have hkey := member_residual_not_orthogonal_eta_of_refuter hG hyp.base
+          (s12HypothesisOfTypePData hG hyp.base.T_maximal dataT'
+            (Or.inl hIII) hP1')
+          hW hW2spec hW1spec hV (Or.inl hIII)
+          (OddOrder.Peterfalvi.S13.secondDerived_eq_fitting_of_base hG
+            (s12HypothesisOfTypePData hG hyp.base.T_maximal dataT'
+              (Or.inl hIII) hP1') (Or.inl hIII))
+          (OddOrder.Peterfalvi.S13.card_H_eq_of_base hG
+            (s12HypothesisOfTypePData hG hyp.base.T_maximal dataT'
+              (Or.inl hIII) hP1') (Or.inl hIII))
+          -- `(11.3)` narrow-`𝒮(H₀C)` noncoherence.  The unconditional heir
+          -- `S_H0C_not_coherent_unconditional` lives behind the `S12_Noncoherence` pair
+          -- machinery, which transitively imports this S16 cluster; from here (upstream of that
+          -- back-edge) the in-DAG refuter is the legacy `S_H0C_not_coherent`, exactly as its
+          -- docstring reserves for consumers above the pair machinery.
+          (fun s13hyp =>
+            OddOrder.Peterfalvi.S13.S_H0C_not_coherent hG s13hyp)
+          ζ hzetaS (hirr ζ hζT) hzeta1
+          -- `source` is inferred from `himage` (scoped `tSideDadeMap`); the local goal states the
+          -- same `inner (tSideDadeMap …) …` under the `haveI` diamond, bridged per-entry below.
+          _ himage
+        intro hgoal
+        exact hkey (fun i j => by
+          convert hgoal i j <;> exact Subsingleton.elim _ _)
       have hresidual :
           (∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (mT i j) ^ 2 : ℤ) ≤
               (hyp.base.p : ℤ) ∧

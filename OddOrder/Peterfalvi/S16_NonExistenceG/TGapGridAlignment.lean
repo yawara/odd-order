@@ -1260,4 +1260,67 @@ theorem alignedOmegaSigmaGrid_eq_alignedOmegaEtaGrid [Finite G]
       exact alignedOmegaSigmaGrid_apply_eq_alignedOmegaEtaGrid
         hG base s12 hW hW1 hW2 hodd hV i j hv)
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.8), eta-grid endpoint** (Coq `FTtype34_not_ortho_cycTIiso`):
+the Section 12 residual of a degree-`w₁` member `ζ` is *not* orthogonal to the
+shared eta grid.  This transports the canonical refuter
+`member_residual_not_orthogonal_H0C_of_refuter` through the global sigma/eta
+grid identification: the zero-column sum becomes the eta zero-row sum via the
+zero-preserving transposed row enumeration, and each pairing entry is hit
+through the aligned product pointer.  The Dade-image identification of the
+source is taken as the `himage` input (discharged by
+`s12Tau_zeroColumn_sub_eq_tSideDadeMap` at the (14.9) consumer). -/
+theorem member_residual_not_orthogonal_eta_of_refuter [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    (s12 : OddOrder.Peterfalvi.S12.Hypothesis base.T)
+    (hW : s12.typeP.W = base.W)
+    (hW1 : s12.typeP.W2 = base.W1)
+    (hW2 : s12.typeP.W1 = base.W2)
+    (hV : typePV base.T s12.typeP =
+      (base.W : Set G) \ ((base.W1 : Set G) ∪ (base.W2 : Set G)))
+    (htype : IsTypeIII base.T ∨ IsTypeIV base.T)
+    (hM2 : secondDerivedInAmbient base.T =
+      s12.typeP.H ⊔
+        (s12.typeP.U ⊓ Subgroup.centralizer (s12.typeP.H : Set G)))
+    (hHcard : Nat.card ↥s12.typeP.H = s12.w2 ^ s12.w1)
+    (hrefute : ∀ s13hyp : OddOrder.Peterfalvi.S13.Hypothesis base.T,
+      ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+        s13hyp.base.tau (s13hyp.SOf s13hyp.H0C) s13hyp.base.A0))
+    (zeta : ClassFunction ↥base.T ℂ)
+    (hzetaS : zeta ∈ OddOrder.Peterfalvi.S12.inducedFamily base.T)
+    (hzetairr : IsIrreducibleCharacter zeta)
+    (hzeta1 : zeta 1 = (s12.w1 : ℂ))
+    (source : ClassFunction G ℂ)
+    (himage : s12.tau
+        ((∑ i' : Fin s12.w1, s12.muGrid hG hG.odd i' 0) - zeta) = source) :
+    ¬ ∀ (i : Fin base.q) (j : Fin base.p),
+      ClassFunction.inner
+        (source - ∑ j' : Fin base.p, base.eta ⟨0, base.q_prime.pos⟩ j')
+        (base.eta i j) = 0 := by
+  intro horth
+  apply member_residual_not_orthogonal_H0C_of_refuter hG s12 htype hM2 hHcard
+    hrefute zeta hzetaS hzetairr hzeta1
+  intro i j
+  have hglobal : ∀ (a : Fin s12.w1) (b : Fin s12.w2),
+      s12.alignedOmegaSigmaGrid hG hG.odd a b =
+        alignedOmegaEtaGrid hG base s12 hW hW1 hW2 hG.odd a b :=
+    fun a b => alignedOmegaSigmaGrid_eq_alignedOmegaEtaGrid
+      hG base s12 hW hW1 hW2 hG.odd hV a b
+  have hsum : (∑ i' : Fin s12.w1, s12.alignedOmegaSigmaGrid hG hG.odd i' 0) =
+      ∑ j' : Fin base.p, base.eta ⟨0, base.q_prime.pos⟩ j' := by
+    calc (∑ i' : Fin s12.w1, s12.alignedOmegaSigmaGrid hG hG.odd i' 0)
+        = ∑ i' : Fin s12.w1, base.eta ⟨0, base.q_prime.pos⟩
+            (alignedOmegaRowEquiv hG base s12 hW hW1 hW2 hG.odd i') := by
+          refine Finset.sum_congr rfl fun i' _ => ?_
+          rw [hglobal i' 0, alignedOmegaEtaGrid_zero_column]
+      _ = ∑ j' : Fin base.p, base.eta ⟨0, base.q_prime.pos⟩ j' := by
+          simpa using Equiv.sum_comp
+            (alignedOmegaRowEquiv hG base s12 hW hW1 hW2 hG.odd)
+            (fun j' : Fin base.p => base.eta ⟨0, base.q_prime.pos⟩ j')
+  rw [himage, hsum, hglobal i j]
+  exact horth
+    (alignedOmegaProductIndex hG base s12 hW hW1 hW2 hG.odd i j).1
+    (alignedOmegaProductIndex hG base s12 hW hW1 hW2 hG.odd i j).2
+
 end OddOrder.Peterfalvi.S16
