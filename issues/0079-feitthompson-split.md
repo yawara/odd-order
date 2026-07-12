@@ -63,3 +63,12 @@ prefix-split すれば FeitThompson.lean が ~1380 行に収まる。ただし c
   active な def-unit 共有 wiring hub であり、「全レーンが当該 cluster で idle なタイミングで hub が
   prefix-split」の方針を維持 (今は分割しない)。**FeitThompsonSetup.lean も本 issue の対象に追加**
   (carrier structure 宣言群 = Section16Inputs/Section16CharacterData の凝集境界で将来分割)。
+
+## 追記 (2026-07-13 監視 tick) — FeitThompsonSetup も >1500
+
+merge bca9bd9f (9092 mu_reducible_dichotomy carrier field) の size watch で:
+- `OddOrder/FeitThompson.lean` = 1853 行 (本 issue 対象)。
+- `OddOrder/FeitThompsonSetup.lean` = 1713 行 (>1500、carrier setup 対の file) も分割検討対象に含める。
+
+両 file は spine carrier で **lane-a の active frontier** (spine legacy-sorry rewire 進行中) ゆえ、
+分割は a の spine 作業が settle した後に hub が凍結境界で実施 (2000 hard 未達で deferred)。
