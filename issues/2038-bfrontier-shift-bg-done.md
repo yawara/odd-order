@@ -1760,3 +1760,17 @@ constant (13.19.c 第一節) / caseC・caseC_dual (dichotomy 本体)。
 S15_HonestTypeP2A0 の dadeHypS0/sInstance パターンの T-instance 化 — ただし T の型
 ((13.2.a) で T は type II ≠ P2 の可能性 — S_typeP2 の T-dual field の有無) を要確認。
 軽ければ次 iter で def 化、重ければ S-side パターン精査から。
+
+## ✅ (2026-07-12、/loop iter 13) — tauTbetaGrid honest 実装 (7 → 6)
+
+T-side 'A0 Dade instance (dadeHypT0/hconj、S15_HonestTypeP2A0) を generic 構成の T 適用で
+新設 (commit 1d7a1621)。IsTypeP2 T = (14.9) 帰結ゆえ**パラメータ化**が正しい層割り
+(TypePData T は sorry-free reconciled_typePData_T が supply — docstring の「declared
+sorried」は stale で実装は Fact A/B 経由で閉じ済み)。betaTGridChar = Ind_{QW₂}^T 1 − ν₁₀。
+threading は (14.5) chain + dichotomy + S16 供給 2 箇所 (dictionary .2.1 で II→P2)。
+**残 6 義務** (S15_SAndT:280-350): disjoint_support / orthogonal_eta / row / col /
+caseC / caseC_dual。**次 = typeIBetaL_betaS_disjoint_support (13.19.a)**: Ã(L) 元の位数は
+|H| の素因数で割れる vs (8.17.a) |H| ⟂ pq、β_S^τ 側 support は P^#∪(W∖W₁∪W₂)^G ⊆
+pq-元。部品: betaGrid_A0_support (proven) / card_LF_coprime_pq (gated B2) /
+dade lift の support 局在 (dadeIntegralCharacterMap の image support ⊆ conj closure —
+S04/S07 に既存 lemma があるか要調査)。
