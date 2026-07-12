@@ -331,7 +331,7 @@ theorem typeIGrid_betaL_inner_eta_eq_h78_beta [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
     {M : Subgroup G} (hMmax : M ∈ maximalSubgroups G) (dataM : TypeICoherent78Data M)
     (grid : OddOrder.Peterfalvi.S15.TypeIOrthogonalityGridData
-      hyp.base dataM.typeIHyp)
+      hyp.base dataM)
     (hphi : grid.phi ∈ dataM.typeIHyp.Sset) :
     ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
       ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
