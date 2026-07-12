@@ -97,6 +97,33 @@ landing に gate されるので、段階的に close 可。
 - 監査自体が裁定②の mandated deliverable ゆえ完了扱い。checklist の `sibleyTarget_H0C` は
   **「fill」でなく「induction port で置換」** に読み替え。
 
+## 📋 port plan — Coq `Ptype_core_coherence` 8-step induction (2026-07-12, lane-a 精読)
+
+Coq `PFsection9.v:1484-1571` の構造 (Lean port target = `coherent_H0C_commutator` の
+`cohereOfSibleyTarget` cite を置換):
+
+1. **subcoherent 供給**: `S_ H0C'` に対し subcoherent R を `FTtypeP_subcoherent` +
+   `subset_subcoherent` で取得 (Lean: S07/S08 subcoherent infra、要 grep 確認)。
+2. **case split `typeP_Galois`**:
+   - **Galois 枝 (一行)**: `uniform_degree_coherence scohS0` — 全 χ∈S_(H0C') が uniform degree
+     `#|M:HU|·u` (`typeP_Galois_characters` の `XOC'u`)。Lean `uniform_degree_coherence` は
+     issue 1017 で port 済の見込み (S07、要確認)。
+   - **非 Galois 枝 (本体、深い)**:
+     - `S1 = filter (·1 == q·a) (S_ H0C')` (degree-qa subfamily)。`cohS1` = `uniform_degree_coherence`
+       (q·a uniform、`typeP_nonGalois_characters` の構造)。
+     - **induction** (`elim: nS` on `size S3`、S3 = S_(H0C')∖S2 の complement): S2 を
+       conjugate-pair `(χ :: χ* :: S2)` で 1 組ずつ extend、S3 枯渇まで。空なら `subset_coherent`。
+     - **extension step (9.11.1)-(9.11.8)** = `without loss` + 8 steps (最難): S3 の χ を選び
+       `coherent (χ::χ*::S2)` を構成。norm bound `⟨X,X⟩≤q` + odd parity + degree qa 構造 +
+       maximality 矛盾。Coq :1571 以降を精読して port。
+3. **Lean 資産 (要 locate)**: `uniform_degree_coherence` (1017)、subcoherent(S_(H0C'))、
+   `typeP_Galois_characters`/`typeP_nonGalois_characters` の Lean 相当 (§9 char 構造、S11 に一部済)、
+   conjugate-pair coherence extension (S07 `IsCoherent` の extend 補題)。多くは §9/§7 で既 landing の
+   可能性 — port 前に S11/S07 を grep。
+
+⚠ deep multi-iteration。難所 (extension step) は Coq 精読 + 必要なら ChatGPT
+([[feedback-ask-chatgpt-for-elided-gaps]])。core = 非 Galois induction。
+
 ## 参照
 
 - `notes/meta/ft_path_policy.md` §4(endpoint A)
