@@ -2026,3 +2026,33 @@ full build 4173 jobs green、AxiomsCheck OK。
   `NuGridSupplyData (hyp)` + sorried producer (signature = mu-field 群の精密 mirror)。
   (2) `HypothesisSwap.lean` — swap constructor (~85 fields) + transport lemmas。
   (3) col_constant = row @ swap。(4) caseC (S-side 本体、Coq :2078-2185)。(5) caseC_dual = @ swap。
+
+## ✅✅ (2026-07-12、/loop iter 27) — (13.19.c) parity core `typeI_caseC_parity` 完全証明 (commit 4b33bc99)
+
+(13.19) grid 全体が唯一の深い義務 `typeI_caseC_dichotomy` (S15_SAndT.lean、sorry) に還元済み
+(iter 26 以降の swap 実装で col_constant/caseC_dual は transport 済)。本 iter でその**核**を landing:
+
+- **bridge `typeIBetaL_zeta0_eq_h78_beta`**: `β_L^τ(ζ_0) = (dataL.h78 hG).beta` (distinguished
+  member ζ_0 = dataL.zeta 0)。⟹ β_L 側は §7.8 の `betaDecomp`/`delta`/`normEstimates` 機械が直接適用可。
+  設計 = **option B** (caseC を任意 φ でなく ζ_0 で扱う; c-lane ComparingLM が既に (dataL.h78).beta を消費中で整合)。
+- **`typeI_caseC_parity`** (Coq `odd_bSphi_bLeta`): `∃ nS nL, ⟨β_S^τ,ζ_0^τ₁⟩=nS ∧ ⟨β_L^τ,η_01⟩=nL ∧ Odd(nS+nL)`。
+  `0=⟨β_L^τ,β_S^τ⟩` (disjoint支持) を β_L^τ=1−ζ_0^τ₁+Δ_L (delta) / β_S^τ=1−η_01+Γ_S (gammaGrid_defGamma)
+  で展開 + ⟨Δ_L,Γ_S⟩ even (`cfdot_real_vchar_even`: Δ_L real=`delta_isReal`=beta_conj_sub+coherence_extension_conj、
+  Γ_S real=`gammaGrid_real`、両 ⊥1)。
+
+### 残 = dichotomy 組立 (c1/c2 の bound 2 本) — 次 iter roadmap (全部品所在確定)
+
+parity core 出力 `Odd(nS+nL)` → nS odd XOR nL odd。
+- **nS odd → 左枝 (c1)**: `OddIntegerInner β_S ζ_0^τ₁` (parity から) ∧ **(|H|−1)/e ≤ (u−1)/q**。
+  bound = Γ_S を span(τ₁𝓛) へ orthogonal_split → 射影 X=bSphi·Σ a_ψ τ₁ψ →
+  `gammaGrid_Y_norm_bound` (Y:=X ⊥ η、(13.18.d)) で ‖X‖²≤(u−1)/q → bSphi²≥1 →
+  Σa²≤(u−1)/q、Σa²=(|H|−1)/e は `degree_sum_star`/`card_index_mul_sum_induced_family_degree_sq`。
+  近縁実装 = `bessel_bound_of_inner_beta_zeta_ne_zero` (S16_PairingBessel:421、M-side 版) を S-side に翻案。
+- **nL odd → 右枝 (c2)**: (∀j≠0 `OddIntegerInner β_L η_0j`、row constancy `typeIBetaL_eta_row_constant` で
+  nL odd を全 j へ) ∧ **p ≤ e**。bound = betaDecomp X=Γ (‖X‖²≤e−1 = `normEstimates.gamma_norm_sq_le
+  (smallIndex)`) の η-content: ⟨X,η_0j⟩=bLeta (beta_eq+row-const+⊥η/⊥1) → Bessel `‖X‖²≥Σ_{j≠0}|⟨X,η_0j⟩|²
+  =(p−1)·bLeta²≥p−1` → p−1≤‖X‖²≤e−1 → p≤e。要 orthonormal Bessel (mathlib/repo 要確認、cfnormDd 経由)。
+
+⚠ **import 追加要**: c1/c2 は `normEstimates`/`smallIndex`/`degree_sum_star`/`complementIndex_eq` =
+S16_PairingBessel 定義 (現 S15_SAndT 未 import、cycle 無し確認済)。次 iter 冒頭で
+`import OddOrder.Peterfalvi.S16_PairingBessel` 追加。full build 4173 green (parity core、純 additive)。
