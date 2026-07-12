@@ -1935,3 +1935,20 @@ grid_no_constant_column / eq_smul_…_of_all_sigmaCoeff_zero) は全て S05 に�
 keystone) が S05 の app/chiFam をどう instantiate したかを読み、(a) 直結なら (13.19.b) を
 S15 で直接証明、(b) 抽象層が厚ければ hyp に (13.19.b)-帰結 field を足して FT 側 discharge
 (3002 パターン)。次 iter = FeitThompson.lean の grid 供給部精読から。
+
+## ✅ (2026-07-12、/loop iter 24) — (13.19.b) 戦略確定: field 化 + FT 層 discharge
+
+**橋の実体**: hyp.tau3 = tau3W = `(tiCyclicW hG mp tp).sigmaIntegral rfl (tiCyclicWDadeApp)`
+(FeitThompson:268) — S05 の σ-isometry/chiFam 語彙に**直結**。ただし tiCyclicW /
+FullDadeApplication は FT 層構成物で S15 abstract 層からは不可視。
+∴ **(13.19.b) は hyp field 追加 + FT 層 producer discharge (3002 パターン) で閉じる**。
+field 設計 (次セッションで確定): Coq otau1eta の抽象単位は「X ∈ ℤ[Irr G]、‖X‖² = 2、
+X が Ŵ^G-消滅 → dirr 剛性: ∀ij (⟨X, η_ij⟩ = 0 ∨ η_ij = ±(X の半分))」— 実際の Coq は
+Ψ = τ₁ψ − τ₁ψ̄ 差形で η = ±τ₁ψ branch を ⟨Ψ,η⟩ ≠ 0 → NC ≥ min で殺す。候補形 2 つ:
+(A) sigmaCoeff-全零形「X ZIrr ∧ ‖X‖²=2 ∧ Ŵ-vanish ∧ (⟨X,η_ij⟩ ≠ 0 が高々…)」の直接
+NC-bound field、(B) eq_smul_chiFam_diff_of_vanishOnV の η-語彙 restate
+「X ZIrr ∧ ‖X‖²=2 ∧ (X − s(η_ij − η_kl)) Ŵ-vanish → X = s(η_ij − η_kl)」(S05 と 1:1、
+discharge は sigmaIntegral の chiFam↔eta 同定のみ)。**(B) 推奨** (producer が既存定理の
+直 restate で済む)。discharge 箇所 = FeitThompson の tau3_* 系 property 供給ブロック
+(:271-)。(13.19.b) 本体は (B) + Ã-局在 (iter 20 部品) + ψ⊥ψ̄ (既存) で S15 内で閉じる。
+⚠ merge +396 行 (4 files) — 次 iter 冒頭で統合 build 確認。
