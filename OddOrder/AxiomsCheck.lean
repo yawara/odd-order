@@ -119,6 +119,7 @@ import OddOrder.GroupTheory.RepresentationTheory.GaloisInnerTransport
 import OddOrder.Peterfalvi.S11_ImprimitiveUBound
 import OddOrder.Peterfalvi.S12_Noncoherence
 import OddOrder.Peterfalvi.S12_TypeVCaseC
+import OddOrder.Peterfalvi.S13_TypeIIIGalois
 import OddOrder.FeitThompson
 import OddOrder.BG.AppC_NormSet
 import OddOrder.BG.AppC_FrobeniusClassSum
@@ -7535,3 +7536,10 @@ the Peterfalvi (11.9.c) non-Galois contradiction `q ≤ u − 1 < u = a ≤ p �
 係数定数性入力。 -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_mapRingEquiv_chiFam_left_move
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_mapRingEquiv_chiFam_right_move
+
+/-! **(11.9.a) Galois 補正層 (S13_TypeIIIGalois), axiom-clean** (lane a, 2026-07-12, issue 1024 C0).
+Galois twist の S(HC)-stratum 安定性、τ(ζ−σζ) の τ₁-展開、および補正項の grid 直交 —
+a_aut 定数性 engine への hcorrection 供給。 -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.mapRingEquiv_mem_SHC_stratum
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.tau_zeta_sub_mapRingEquiv_eq_SHC_extension
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.tau_zeta_sub_mapRingEquiv_inner_alignedOmegaSigma_eq_zero
