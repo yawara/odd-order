@@ -2229,3 +2229,39 @@ u_bound 討伐後、b 所有残 sorry 15 本を全数 comment-strip census。**R
 使って assemble できるか精査 → 最上流 buildable field から証明 (policy「難所回避しない」; deep char frontier を engage)。
 tauS 非依存ゆえ off-path ruling には抵触しない。**hub 向け flag**: RULING ③ の「b 全 gated → gated-endpoint」は
 character_degree_analysis の on-path 性を見落とし。b は idle でなく本 (13.3) frontier を engage する。
+
+### frontier map 精緻化 (character_degree_analysis 各 field の proven/gap 確定)
+
+| field | Pf | 状態 |
+|---|---|---|
+| `mu_j_linear_induced` | 13.3.a | ✅ **proven** = `mu_j_isIndPC` (DegreesFirstSplit、μ-col=Ind linear of PC) |
+| `tau1S`/`tau1S_apply_induce_sub`/`tau1S_inner_induce`/`tau1S_induce_mem_ZIrr` | 13.2.d | ✅ proven engine `tau1S_ofHonest*` (= `coherent_H0Cprime_S.extension`) |
+| `lambda`+`lambda_irreducible`+`lambda_degree`+`lambda_induced_from_PC_linear` | 13.3.b | ⬜ **gap** (distinguished irreducible λ deg=uq、μ-col は reducible ゆえ別物、genuine 構成要) |
+| `tau1S_induce_inner_eta` | 4.1+5.3.b | ⬜ **gap** (η ⊥ tau1S(Ind θ)。⚠ (13.19.b) `coherent_extension_orthogonal_eta_of_mem_Sset` は **dataL** (type-I witness L の (12.1/6/7) coherence) で、tau1S = **coherent_H0Cprime_S** ((9.11) S-family) とは別 coherence → 直接流用不可、S-coherence 版 (5.3.b) 直交を要) |
+| `mu_col_tau1_eta_col_one` | **13.9.a** | ⬜ **gap crux** (distinguished col j₀ で tau1S(μ_{j₀})=δ∑η_{i1}) |
+| `mu_tau1_formula` | 13.3.c | ⬜ **gap** (一般 col tau1S(μ_j)=∑η_{ij}) |
+| `delta_eq_one` | 13.3.c | δ_j 側 ✅ (`delta_eq_one_of_ne_zero`+`delta_zero_eq_one`)、δ'_i 側は ν-data 依存 (deltaPrime、nuGridSupply sphere) — ⚠ ただし on-path consumer `lambda_forces_T_caseB` は本 field 不使用 → 2034 precedent で restate-drop 候補 |
+
+**結論**: character_degree_analysis は **genuine deep (13.3)/(13.9) char frontier** (b-owned、on-path、tauS 非依存)。
+(13.3.a) は proven、残 crux = (13.9.a) `mu_col_tau1_eta_col_one` + (13.3.c) `mu_tau1_formula` + (13.3.b) λ 構成 +
+(4.1/5.3.b) `tau1S_induce_inner_eta`。**次 iteration**: Coq PFsection13 + textbook (13.3)/(13.9) 精読で
+tau1S(μ_col)=η_col の argument を再構成 ([[feedback-ask-chatgpt-for-elided-gaps]])、最上流 buildable field から証明。
+CharacterDegreeData の restate (未使用 δ' field drop 等) も検討。これが b の gated-endpoint でない genuine 次 frontier。
+
+### 🗺 Coq PFsection13.v proof-strategy pointer (次 iteration の build 加速用)
+
+Coq が (13.3.c)/(13.9.a) の完全な argument を持つ (CLAUDE.md: Coq コメントが行間補完)。翻訳 map:
+- **L266** `(13.3)(a)` → Lean `mu_j_isIndPC` ✅ 既 proven。
+- **L307** `(13.3)(b)` → distinguished λ の構成 (`lambda_*` field)。
+- **L326-385** `(13.3)(c)` 本体: `Let mu_tau1red b := forall j, j != 0 -> tau1 (mu_ j) = (-1)^b *: \sum_i eta_ i (signW2 b j)`
+  (L340) — これが `mu_col_tau1_eta_col_one` (13.9.a) + `mu_tau1_formula` (13.3.c) の source。証明は
+  `[forall j, tau1(mu_ j) == \sum_i eta_ i j]` の boolP case 分け (L362、b=0 uniform / b=1 は p=3 sign-flip)。
+- **L573** `o_tau1_eta : {in 'Z[calSirr], forall zeta, '[tau1 zeta, eta_ i j] = 0}` → `tau1S_induce_inner_eta` (4.1/5.3.b)。
+- **L656** `oS1eta10` (calS1 ⊥ eta10) — 補助直交。
+- **⚠ L715-720**: Coq authors が **textbook (13.3.c)/(13.6) の logical gap を埋めた**と明記
+  (「zeta^tau1 must be orthogonal to eta_01 は wrong」)。Lean 翻訳時は Coq の修正版 argument に従う (textbook 直訳不可)。
+
+**次 iteration の着手順** (上流優先): (1) `o_tau1_eta` = `tau1S_induce_inner_eta` (最も self-contained、
+coherence 直交)、(2) `mu_tau1red` = `mu_col_tau1_eta_col_one`/`mu_tau1_formula` (L342-385 の case 分けを翻訳)、
+(3) λ 構成 (13.3.b)、(4) CharacterDegreeData 全 field assemble (未使用 δ' field は restate-drop 検討)。
+tau1S = `coherent_H0Cprime_S.extension` の coherence 性質を使う (dataL coherence ではない)。
