@@ -977,7 +977,7 @@ theorem Hypothesis.SHC_residual_eq_grid_diff [Finite G] {M : Subgroup G}
 
 open scoped FiniteInduce in
 /-- A row difference in an orthonormal grid pairs to `-1` with the zero-column sum. -/
-theorem grid_diff_inner_zeroColumnSum [Finite G] {w1 w2 : ℕ}
+theorem grid_diff_inner_zeroColumnSum [Finite G] {w1 w2 : ℕ} [NeZero w2]
     (grid : Fin w1 → Fin w2 → ClassFunction G ℂ)
     (hgridInner : ∀ i j i' j',
       ClassFunction.inner (grid i j) (grid i' j') =
@@ -1100,8 +1100,7 @@ theorem Hypothesis.charParam_a_eq_zero_of_grid_residualEq [Finite G]
       ClassFunction.inner_smul_left,
       grid_diff_inner_zeroColumnSum grid hgridInner i hj0,
       hgridExtensionOrth hζS hζirr hζ1,
-      hyp.R_sum_inner_grid_zeroColumnSum coh hRrev grid hgridExtensionOrth,
-      star_natCast, star_intCast]
+      hyp.R_sum_inner_grid_zeroColumnSum coh hRrev grid hgridExtensionOrth]
     ring
   rw [ClassFunction.inner_sub_right, hαgrid, hinner] at htrans
   have ha0 : (a : ℂ) = 0 := by
@@ -1109,3 +1108,48 @@ theorem Hypothesis.charParam_a_eq_zero_of_grid_residualEq [Finite G]
   exact_mod_cast ha0
 
 end OddOrder.Peterfalvi.S12
+
+namespace OddOrder.Peterfalvi.S16
+
+open OddOrder.GroupTheory
+open OddOrder.RepresentationTheory
+
+variable {G : Type*} [Group G]
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (3.8)/(11.8.2), eta residual classifier from regular values.**
+Suppose the regular set of a type-P datum is the shared S15 regular set.  If a
+norm-two virtual character agrees there with a signed eta row difference, then
+it equals that difference globally.  Class-function invariance upgrades the
+pointwise type-P equality to the conjugacy saturation consumed by
+`eta_diff_rigidity`.
+
+This is the concrete eta implementation of the `hclassify` input in
+`S12.Hypothesis.SHC_residual_eq_grid_diff`; only the source's regular-value pin
+remains for a particular T-side alpha. -/
+theorem eta_diff_classifier_of_typePV_value [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    {M : Subgroup G} (data : TypePData M)
+    (hV : typePV M data =
+      (base.W : Set G) \ ((base.W1 : Set G) ∪ (base.W2 : Set G)))
+    (i0 : Fin base.q) {j1 j2 : Fin base.p} (hj : j1 ≠ j2)
+    {s : ℤ} (hs : s = 1 ∨ s = -1)
+    {source : ClassFunction G ℂ}
+    (hsource : ∀ v ∈ typePV M data,
+      source v = ((s : ℂ) • (base.eta i0 j1 - base.eta i0 j2)) v) :
+    ∀ {Y : ClassFunction G ℂ}, Y ∈ ZIrr G →
+      ClassFunction.inner Y Y = 2 →
+      (∀ v ∈ typePV M data, Y v = source v) →
+      Y = (s : ℂ) • (base.eta i0 j1 - base.eta i0 j2) := by
+  intro Y hYZ hY2 hYsource
+  apply eta_diff_rigidity base hYZ hY2 i0 hj hs
+  intro x hx
+  obtain ⟨w, hw, g, hg⟩ := hx
+  have hconj : IsConj w x := isConj_iff.mpr ⟨g, hg⟩
+  have hwV : w ∈ typePV M data := hV.symm ▸ hw
+  rw [ClassFunction.sub_apply,
+    ← Y.of_isConj hconj,
+    ← (((s : ℂ) • (base.eta i0 j1 - base.eta i0 j2)).of_isConj hconj),
+    hYsource w hwV, hsource w hwV, sub_self]
+
+end OddOrder.Peterfalvi.S16

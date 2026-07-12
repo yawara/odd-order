@@ -1027,3 +1027,19 @@ feature commits: `d5f7fc38`, `061229b4`, `bb2c9868`, `960907f6`。
 これは carrier signature 変更を要するという診断ではない。既存 S15 fields が持つ
 `eta_eq_tau_omega`, isometry, virtuality, conjugation, four-corner, Galois orbit 等を theorem
 引数として使う proof generalization であり、次 iteration は eta 用 `hclassify` から進める。
+
+### eta norm-2 classifier 接続 (2026-07-12 続行)
+
+- 既存 `S16.eta_diff_rigidity` が S15 `eta` の orthonormality / `ZIrr` / (3.7) grid relation
+  から必要な norm-2 global classification を既に証明していることを確認した。
+- `eta_diff_classifier_of_typePV_value` を追加し、S12 `typePV(T,dataT)` と shared regular set
+  `W \\ (W1 ∪ W2)` の equality、およびその set 上の source-value equality から、class-function
+  conjugacy invariance を介して `eta_diff_rigidity` の conjugacy-saturation 仮定を構成した。
+  これで `hclassify` の global rigidity 部分は完了し、残る producer 入力は
+  `tau(alpha_ij)(v) = delta * (eta_transposed_ij - eta_transposed_i0)(v)` on `typePV` のみ。
+- 同時に clean rebuild が抽象 zero-column helper の暗黙条件不足を検出したため、
+  `grid_diff_inner_zeroColumnSum` に正当な `[NeZero w2]` を明示した。leaf / AxiomsCheck
+  (4156 jobs) green、許可外公理・新 `sorry` なし。
+
+次 frontier は reconciled `dataT.W1=W2`, `dataT.W2=W1`, `dataT.W=W` と S15
+`eta_eq_tau_omega` / `tau3_apply_of_regular` を用いて上記 source-value equality を証明すること。
