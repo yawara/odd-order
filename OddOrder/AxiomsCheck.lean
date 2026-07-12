@@ -3525,6 +3525,17 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S12.Hypothesis.exists_coherent_extension_h114_of_grid_orthogonal
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S12.Hypothesis.SHC_residual_eq_grid_diff
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.grid_diff_inner_zeroColumnSum
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S12.Hypothesis.R_sum_inner_grid_zeroColumnSum
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S12.Hypothesis.charParam_a_eq_zero_of_grid_residualEq
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.residual_not_orthogonal_of_transposed_reindexing
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.exists_charParameters_full_for_member

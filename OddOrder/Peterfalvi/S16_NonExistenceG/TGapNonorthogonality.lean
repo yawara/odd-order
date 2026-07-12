@@ -922,4 +922,190 @@ theorem Hypothesis.exists_coherent_extension_h114_of_grid_orthogonal [Finite G]
         hyp.SHC_swap_conj hG hodd hζS hζirr hζ1 htwo hχS hχirr hχ1),
       hyp.SHC_swap_grid_h114 hG hodd hζS hζirr hζ1 htwo grid h2⟩
 
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (11.8.2), arbitrary-grid residual identification.**
+The Parseval decomposition and coefficient bound are independent of sigma.
+Only the norm-two residual classifier is grid-specific, so it is exposed as
+`hclassify`; this is the exact input supplied by a concrete sigma-isometry. -/
+theorem Hypothesis.SHC_residual_eq_grid_diff [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
+    (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M)
+    (hζirr : IsIrreducibleCharacter ζ) (hζ1 : ζ 1 = (hyp.w1 : ℂ))
+    {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ))
+    (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ)
+    (hδj : hyp.muColumnSign hG hodd j = δ)
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1)
+    (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hδpm : δ = 1 ∨ δ = -1) (hn2 : 2 ≤ n)
+    {R : Finset (ClassFunction G ℂ)} (hRn : R.card = n)
+    (hZ : ∀ β ∈ R, β ∈ ZIrr G)
+    (horth : ∀ α ∈ R, ∀ β ∈ R,
+      ClassFunction.inner α β = if α = β then (1 : ℂ) else 0)
+    (hRmem : ∀ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M →
+      IsIrreducibleCharacter φ → φ 1 = (hyp.w1 : ℂ) → coh.extension φ ∈ R)
+    (hRrev : ∀ β ∈ R, ∃ φ : ClassFunction ↥M ℂ,
+      φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+        φ 1 = (hyp.w1 : ℂ) ∧ β = coh.extension φ)
+    (grid : Fin hyp.w1 → Fin hyp.w2 → ClassFunction G ℂ)
+    (hclassify : ∀ {Y : ClassFunction G ℂ}, Y ∈ ZIrr G →
+      ClassFunction.inner Y Y = 2 →
+      (∀ v ∈ typePV M hyp.typeP,
+        Y v = hyp.tau
+          (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 -
+            (n : ℂ) • ζ) v) →
+      Y = (δ : ℂ) • (grid i j - grid i 0)) :
+    ∃ (a : ℤ) (Y : ClassFunction G ℂ),
+      (a = 0 ∨ a = 1 ∨ a = 2) ∧
+      ClassFunction.inner
+        (hyp.tau (hyp.muGrid hG hodd i j -
+          (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+        (coh.extension ζ) = (a : ℂ) - (n : ℂ) ∧
+      ((a = 0 ∨ a = 2) → Y = (δ : ℂ) • (grid i j - grid i 0)) ∧
+      hyp.tau (hyp.muGrid hG hodd i j -
+          (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ) =
+        Y - (n : ℂ) • coh.extension ζ + (a : ℂ) • ∑ β ∈ R, β := by
+  obtain ⟨a, Y, hbound, _, hinner, _, hnorm2case, hYZ, hYV, hdecomp⟩ :=
+    hyp.muGridAlpha_tau_residual_norm hG coh hodd i hj0 hζS hζirr hζ1
+      hdeg hμ0 hnf hδj hdζ h0ζ hδpm hn2 hRn hZ horth hRmem hRrev
+  exact ⟨a, Y, hbound, hinner,
+    fun ha02 => hclassify hYZ (hnorm2case ha02) hYV, hdecomp⟩
+
+open scoped FiniteInduce in
+/-- A row difference in an orthonormal grid pairs to `-1` with the zero-column sum. -/
+theorem grid_diff_inner_zeroColumnSum [Finite G] {w1 w2 : ℕ}
+    (grid : Fin w1 → Fin w2 → ClassFunction G ℂ)
+    (hgridInner : ∀ i j i' j',
+      ClassFunction.inner (grid i j) (grid i' j') =
+        if i = i' ∧ j = j' then 1 else 0)
+    (i : Fin w1) {j : Fin w2} (hj0 : j ≠ 0) :
+    ClassFunction.inner (grid i j - grid i 0)
+      (∑ r : Fin w1, grid r 0) = -1 := by
+  classical
+  rw [ClassFunction.inner_sub_left,
+    OddOrder.RepresentationTheory.inner_sum_right,
+    OddOrder.RepresentationTheory.inner_sum_right]
+  have h1 : ∀ r : Fin w1, ClassFunction.inner (grid i j) (grid r 0) = 0 :=
+    fun r => by
+      rw [hgridInner i j r 0, if_neg]
+      rintro ⟨_, h⟩
+      exact hj0 h
+  have h2 : ∀ r : Fin w1,
+      ClassFunction.inner (grid i 0) (grid r 0) =
+        if i = r then (1 : ℂ) else 0 := fun r => by
+    rw [hgridInner i 0 r 0]
+    simp
+  rw [Finset.sum_congr rfl (fun r _ => h1 r),
+    Finset.sum_congr rfl (fun r _ => h2 r), Finset.sum_const_zero,
+    Finset.sum_ite_eq, if_pos (Finset.mem_univ i)]
+  ring
+
+open scoped FiniteInduce in
+/-- The sum of a coherent image family is orthogonal to an arbitrary grid's zero column
+whenever each family member is. -/
+theorem Hypothesis.R_sum_inner_grid_zeroColumnSum [Finite G] {M : Subgroup G}
+    (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
+    {R : Finset (ClassFunction G ℂ)}
+    (hRrev : ∀ β ∈ R, ∃ φ : ClassFunction ↥M ℂ,
+      φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+        φ 1 = (hyp.w1 : ℂ) ∧ β = coh.extension φ)
+    (grid : Fin hyp.w1 → Fin hyp.w2 → ClassFunction G ℂ)
+    (hext : ∀ {φ : ClassFunction ↥M ℂ}, φ ∈ inducedFamily M →
+      IsIrreducibleCharacter φ → φ 1 = (hyp.w1 : ℂ) →
+      ClassFunction.inner (coh.extension φ) (∑ r : Fin hyp.w1, grid r 0) = 0) :
+    ClassFunction.inner (∑ β ∈ R, β) (∑ r : Fin hyp.w1, grid r 0) = 0 := by
+  rw [inner_sum_left]
+  refine Finset.sum_eq_zero fun β hβR => ?_
+  obtain ⟨φ, hφS, hφirr, hφ1, rfl⟩ := hRrev β hβR
+  exact hext hφS hφirr hφ1
+
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (11.8.5), arbitrary-grid conditional coefficient vanishing.**
+Given the grid-parametric (11.8.2) residual classifier and h114 identity,
+the two-way inner-product computation forces every even coefficient `a` to vanish. -/
+theorem Hypothesis.charParam_a_eq_zero_of_grid_residualEq [Finite G]
+    {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
+    (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M)
+    (hζirr : IsIrreducibleCharacter ζ) (hζ1 : ζ 1 = (hyp.w1 : ℂ))
+    {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ))
+    (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ)
+    (hδj : hyp.muColumnSign hG hodd j = δ)
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1)
+    (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hδpm : δ = 1 ∨ δ = -1) (hn2 : 2 ≤ n)
+    {R : Finset (ClassFunction G ℂ)} (hRn : R.card = n)
+    (hZ : ∀ β ∈ R, β ∈ ZIrr G)
+    (horth : ∀ α ∈ R, ∀ β ∈ R,
+      ClassFunction.inner α β = if α = β then (1 : ℂ) else 0)
+    (hRmem : ∀ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M →
+      IsIrreducibleCharacter φ → φ 1 = (hyp.w1 : ℂ) → coh.extension φ ∈ R)
+    (hRrev : ∀ β ∈ R, ∃ φ : ClassFunction ↥M ℂ,
+      φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+        φ 1 = (hyp.w1 : ℂ) ∧ β = coh.extension φ)
+    (grid : Fin hyp.w1 → Fin hyp.w2 → ClassFunction G ℂ)
+    (hgridInner : ∀ i j i' j',
+      ClassFunction.inner (grid i j) (grid i' j') =
+        if i = i' ∧ j = j' then 1 else 0)
+    (hgridExtensionOrth : ∀ {φ : ClassFunction ↥M ℂ},
+      φ ∈ inducedFamily M → IsIrreducibleCharacter φ →
+      φ 1 = (hyp.w1 : ℂ) →
+      ClassFunction.inner (coh.extension φ) (∑ r : Fin hyp.w1, grid r 0) = 0)
+    (hclassify : ∀ {Y : ClassFunction G ℂ}, Y ∈ ZIrr G →
+      ClassFunction.inner Y Y = 2 →
+      (∀ v ∈ typePV M hyp.typeP,
+        Y v = hyp.tau
+          (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 -
+            (n : ℂ) • ζ) v) →
+      Y = (δ : ℂ) • (grid i j - grid i 0))
+    (h114 : hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ) =
+      (∑ r : Fin hyp.w1, grid r 0) - coh.extension ζ) :
+    ∃ a : ℤ, (a = 0 ∨ a = 1 ∨ a = 2) ∧
+      ClassFunction.inner
+        (hyp.tau (hyp.muGrid hG hodd i j -
+          (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+        (coh.extension ζ) = (a : ℂ) - (n : ℂ) ∧
+      (Even a → a = 0) := by
+  obtain ⟨a, Y, hbound, hinner, hYeq, hdecomp⟩ :=
+    hyp.SHC_residual_eq_grid_diff hG coh hodd i hj0 hζS hζirr hζ1
+      hdeg hμ0 hnf hδj hdζ h0ζ hδpm hn2 hRn hZ horth hRmem hRrev grid hclassify
+  refine ⟨a, hbound, hinner, ?_⟩
+  intro heven
+  have ha02 : a = 0 ∨ a = 2 := by
+    rcases hbound with h | h | h
+    · exact Or.inl h
+    · obtain ⟨k, hk⟩ := heven
+      omega
+    · exact Or.inr h
+  have hYd := hYeq ha02
+  have htrans := hyp.muGridAlpha_tau_inner_zeroColumnSum_sub_zeta
+    hG hodd i hj0 hζS hζirr hζ1 hdeg hμ0 hnf hδj hdζ h0ζ
+  rw [h114] at htrans
+  have hαgrid : ClassFunction.inner
+      (hyp.tau (hyp.muGrid hG hodd i j -
+        (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+      (∑ r : Fin hyp.w1, grid r 0) = -(δ : ℂ) := by
+    rw [hdecomp, hYd]
+    simp only [ClassFunction.inner_add_left, ClassFunction.inner_sub_left,
+      ClassFunction.inner_smul_left,
+      grid_diff_inner_zeroColumnSum grid hgridInner i hj0,
+      hgridExtensionOrth hζS hζirr hζ1,
+      hyp.R_sum_inner_grid_zeroColumnSum coh hRrev grid hgridExtensionOrth,
+      star_natCast, star_intCast]
+    ring
+  rw [ClassFunction.inner_sub_right, hαgrid, hinner] at htrans
+  have ha0 : (a : ℂ) = 0 := by
+    linear_combination -htrans
+  exact_mod_cast ha0
+
 end OddOrder.Peterfalvi.S12
