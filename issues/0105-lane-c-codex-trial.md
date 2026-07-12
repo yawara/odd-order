@@ -178,3 +178,8 @@ issue は trial ログの追記継続のため open 維持、次の節目 (T-sid
 - 2026-07-12 (tick、merge 7dcbd371): **9084 redirect を実施して self-close** — TGapCross 4 定理を
   S15 正本 cite に置換 (−207 行、dup 解消)、(11.9a) eta projection norm 圧縮 + (14.9) S-side beta
   support discharge (+244、実 sorry ±0)。裁定→実施→close の full cycle を 1 tick で完結。26/26。
+- 2026-07-12 13:20 (operator 交代、lane-c 自記): codex ホストが 12:54 に mid-turn 切断 (VS Code
+  リロード起因、直前 12:53 の d6544143 は commit 済みで作業損失なし・working tree clean)。ユーザー
+  裁定で operator を一時 Claude に戻す (本セッション)。次回 codex 再開予定。trial 評価 (26/26) は
+  不変 — 切断は infra 事由でモデル起因でない。frontier は 3004 末尾の記載どおり
+  `alignedOmegaEtaGrid` → (11.8) chain `hclassify` 接続から継続。
