@@ -2409,6 +2409,25 @@ framework-level port が要)。ただし subcoherent R 部品は既存、規模�
 ゆえ b は淡々と build。general coherence-ortho は他 consumer も unblock する高レバレッジ genuine infra。
 **次 iteration = step 1 (mem_coherent_sum_subseq) から**。
 
+## ✅ (2026-07-12 続⁴、lane-b /loop active build) — (A) build 大幅 de-risk: §5 machinery 既存 + FTtypeP_base_ortho の clean 導出発見
+
+step 1 `mem_coherent_sum_subseq` を build しようとして **§5 の hard machinery が既に Lean にある**と判明 (hub の (A) scope 見積を下方修正):
+- **(5.5) coherent_sum_subseq = `eq_sum_of_psi_eq_zero`** (S07_Coherence/NormInequalities:445): `D.tau1 χ = D.X = ∑_{α∈E} α`, E ⊆ R(χ)=`imageFamily.imageSet`。
+- **(5.4) subcoherent_split/norm = `CharacterPsiDecomposition`** (:33) + `ofProjection` smart constructor (:108): imageFamily(R) + coherence tau1 + isometry から CharacterPsiDecomposition を **projection で構成** (X/Y/coeff computed, not posited)。
+- ∴ step 1 は「新規 port」でなく既存 machinery の **application**。
+
+**FTtypeP_base_ortho (R ⊥ η) の clean 導出発見** (Coq は coherence-base が carry するが Lean は導出可):
+μ-ν = sign·τ(χ-χ̄)。`τ(χ-χ̄) ⊥ η` (Dade support avoids regular set、predecessor の 13.19.a `typeI_dadeSupport_avoids_regular`/`dadeSupport_betaGrid_disjoint_support` 系) ⟹ ⟨μ,η⟩=⟨ν,η⟩ (差の inner=0)。μ,ν,η 全 irreducible + μ≠ν ⟹ 両=1 なら μ=η=ν 矛盾 ⟹ 両=0 ⟹ **μ⊥η ∧ ν⊥η** = R⊥η。**新 coherence-base signature 不要**。
+
+**⟹ (A) build の全部品 tractable** (実装 roadmap):
+1. imageFamily R = `Sset_differenceImage` (S14:1143 既存、type-I) / S-instance 版は sSetIrrDeg の difference image。
+2. `τ(χ-χ̄) ⊥ η` = Dade support avoidance (既存 13.19.a 系を irr χ の difference に適用)。
+3. `FTtypeP_base_ortho` (R⊥η) = 上記 clean 導出 (新 helper、~30行)。
+4. `ofProjection`(imageFamily, coherent_H0Cprime_S.extension, isometry, ZIrr) → CharacterPsiDecomposition → `eq_sum_of_psi_eq_zero` → tau1(χ)=∑R-subseq。
+5. 合成: tau1(χ)=∑(R-subseq) ⊥ η (各 R 元 ⊥ η)。Ind θ を irr 展開+線形性で `tau1S_induce_inner_eta`。
+
+**⚠ 要確認 (次 iteration の着手点)**: (i) S-instance の imageFamily が indS(=Ind_S^G) base で χ-χ̄ が A₀(S)-supported ゆえ indS(χ-χ̄)=Dade=μ-ν になるか (13.2.e τ=Ind on A₀ + Sset difference の A₀-support)、(ii) coherence の isometry/ZIrr 供給 (`coherent_H0Cprime_S` の extension_inner_eq/extension_mem_ZIrr、既存)。**hub 注記**: (A) は ruling 想定より軽い (§5 machinery 既存)。**次 = step 3 FTtypeP_base_ortho helper から build**。
+
 ## 🧭 HUB 確認 (2026-07-12 監視 tick, Opus hub) — (A) は lane a と cleanly-separable、b は claim-before-build clear
 
 b の「単独着手前に lane a の (9.11) port が本 infra を内包するか確認」要請 (6fb4c3b1) に hub が dedup check:
@@ -2430,3 +2449,31 @@ pc_le と同一 root gate、(A) machinery 自体は tau1S 仮定で now-provable
 **bottleneck 追跡 (hub)**: character_degree_analysis + pc_le の最終 gate = a の (9.11) induction port
 (`coherent_H0C_commutator` honest、(6.8) sibleyTarget は 7001 で unsound 確定ゆえ非 route)。a は upstream-first で
 今 (6.5) type-V → 文書順で (9.11) に到達予定。b/c は (A)/T-side endpoint を prep しつつ a の (9.11) landing を待つ。
+
+## 🎯 (2026-07-12 続⁵、lane-b /loop) — (A) build = 既存 proven 定理 `T_typeIII_coherent_image_inner_eta_eq_zero` の S-side mirror に帰着 (route 確定)
+
+(3.8)-engine `eta_orthogonal_of_norm_one_pair_vanish` (S16_GridExpansion:494、proven) 経由が R-support route より
+clean と判明。しかも **T-side に完全な proven template** `T_typeIII_coherent_image_inner_eta_eq_zero`
+(TTypeIICoherence:516-631) が存在 — S-side `tau1S_induce_inner_eta` はこの **mirror**:
+
+**template 構造** (T-side、各行 S-side に写像):
+1. `coh.extension ζ` (= tau1S(χ)) の `hpsiZ`(ZIrr) = `extension_mem_ZIrr` / `hpsi1`(norm-1) =
+   `extension_inner_eq` + `hζirr.inner_self_eq_one` / `hcross`(distinct) = `extension_inner_eq` +
+   irr_inner + noReal。**全て coherence の一般 field** ゆえ S-side でそのまま。
+2. `hvanish`: `(coh.extension ζ − coh.extension ζ.conj) x = 0` on `conjClassSet(W∖(W1∪W2))` —
+   `extends_on_supported` で差 = Dade 像 (`dadeIntegralCharacterMap`)、`typePV ∉ derivedInG` +
+   support 外 vanish で消滅。**S-side 版は base=indS + (13.2.e) Ind=A₀(S)-Dade on supported**。
+3. `eta_orthogonal_of_norm_one_pair_vanish hyp.base ... hvanish` で finish。
+
+**S-side mirror の要部品** (次 iteration の build 対象):
+- coherence = `coherent_H0Cprime_S` (base τ=indS、support (C')^#=cprimeSharpS)。family = sSetIrrDeg or
+  H0C' irreducibles (要確認: どの irr family に対し tau1S_induce_inner_eta が要るか — Ind θ の irr 展開)。
+- S-side Dade map = `dadeHypS0` (既存、sSideGamma_mem_ZIrr:224 で使用) + `dadeIntegralCharacterMap`。
+- (13.2.e) `indS = A₀(S)-Dade on A₀(S)-supported` の identity (要 locate/build)。
+- 差 support: (C')^# ⊆ A₀(S) (要確認)。
+- `typePV(S) ∉ derivedInG S` 相当 (S-side、typePData_S)。
+
+**⟹ (A) は「新 framework port」でなく「proven T-side 定理の S-side mirror」**(~120 行、mechanical + S-side Dade 配線)。
+hub 注記: (A) scope は ruling 想定 (R-support machinery 新設) より大幅に軽い — 既存 engine + template の mirror。
+**次 iteration = tau1S_induce_inner_eta を T-side template mirror で build** (b territory Machinery135 or 新 S15 leaf、
+per-irr orthogonality → Ind θ 線形展開)。character_degree_analysis の残 field も順次。
