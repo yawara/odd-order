@@ -268,6 +268,29 @@ noncomputable def tauTbetaGrid [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     ((hyp.dadeHypT0 hG hT2 Tdata).fullDadeIsometryData (hyp.dadeHypT0_hconj hG hT2 Tdata))
     (betaTGridChar hyp)
 
+/-- **`A(M) ⊆ H^#` for a Frobenius type-I maximal** (with `sharpSubgroup_H_subset_typeIA`,
+equality — Coq `FTsupp_Frobenius`): an element of the type-I support `A(M)` centralizes some
+`y ∈ H^#`, and in a Frobenius group the centralizer of a nontrivial kernel element lies in the
+kernel (`IsFrobeniusGroup.centralizer_kernel_le`, Isaacs Thm 6.4). -/
+theorem typeIA_subset_sharpSubgroup_of_frobenius [Finite G] {M : Subgroup G}
+    (data : TypeIData M) {E : Subgroup ↥M}
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M (data.typeF.H.subgroupOf M) E) :
+    typeIA M data ⊆ sharpSubgroup data.typeF.H := by
+  rintro x ⟨hxM, hx1, y, hy, hxc⟩
+  have hyM : y ∈ M := data.typeF.H_le hy.1
+  have hyH' : (⟨y, hyM⟩ : ↥M) ∈ data.typeF.H.subgroupOf M := by
+    rw [Subgroup.mem_subgroupOf]
+    exact hy.1
+  have hy1' : (⟨y, hyM⟩ : ↥M) ≠ 1 := fun h => hy.2 (by
+    simpa using congrArg Subtype.val h)
+  have hxc' : (⟨x, hxM⟩ : ↥M) ∈ Subgroup.centralizer ({⟨y, hyM⟩} : Set ↥M) := by
+    rw [Subgroup.mem_centralizer_singleton_iff]
+    have hcomm := Subgroup.mem_centralizer_singleton_iff.mp hxc
+    exact Subtype.ext (by push_cast; exact hcomm)
+  have hxH' := hF.centralizer_kernel_le _ hyH' hy1' hxc'
+  rw [Subgroup.mem_subgroupOf] at hxH'
+  exact ⟨hxH', hx1⟩
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.19.a) support disjointness**: `Ã(L) ∩ (P^G ∪ W^G) = ∅` — the order of an `Ã(L)`-element
 is divisible by a prime divisor of `|H|`, and `|H|` is coprime to `p q` ((8.17.a)); `β_L^τ` is
