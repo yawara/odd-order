@@ -7568,3 +7568,4 @@ a_aut 定数性 engine への hcorrection 供給。 -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.mapRingEquiv_tau_muColumnZero_sub_zeta
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.inner_tau_muColumnZero_sub_zeta_columnZero_const
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.inner_tau_muColumnZero_sub_zeta_rowZero_const
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.sum_sq_inner_le_of_orthonormal
