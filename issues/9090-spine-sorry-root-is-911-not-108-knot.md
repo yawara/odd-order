@@ -108,3 +108,37 @@ b の 9090 coordination 応答 (update #37、commit 6fc5bbea) を hub が確認 
   a が port 時に shared engine を generalize したら b は main sync で re-point (通常 flow)。
 
 ⟹ 9087/9090 の裁定は完全に整合。a は (9.11) M-family port (b core cite)、b は S-instance assembly を独立継続。
+
+## ⛔ RETRACTION (2026-07-13, lane a) — 本 issue の finding は誤り。sibleyTarget は OFF-spine。1025(A+B) で十分
+
+> **本 9090 の finding と、それを追認した上記 HUB RULING の (9.11) M-instance port 割当は撤回する。**
+> 後続の port 着手時に lane a が **authoritative `#print axioms`** で再検証した結果、
+> **caseA は sibleyTarget を経由せず clean**、**sibleyTarget は type-II 経由の off-spine**と確定。
+> 正しい finding = **issue 9091**（9.11-port session の CollectAxioms-replica metaprogram + 本検証）。
+
+**authoritative 証拠（`#print axioms`、build 確認）**:
+- `caseA_coherent_sOf_H0Cprime_of_refuter` → **`[propext, Classical.choice, Quot.sound]`（sorryAx なし＝CLEAN）**。
+  `coherent_sOf_H0C` の caseA は body で **`caseA_coherent_sOf_H0Cprime_of_refuter` + refuter chain**
+  (`nineElevenPairBound`/`nineElevenSevenEightRefutation`) を使う（S13_Orthogonality:136–141、code-read）
+  — **sibleyTarget/coherent_H0C_commutator を一切呼ばない**。
+- `coherent_H0C_commutator` → **dirty (sorryAx、sibleyTarget 経由)**、だが実 consumer は
+  **`typeII_section11_coherence`（S12_MaximalIII_IV_V:1747、type-II）only** = type-III/IV spine
+  `card_kappaHall_lt_of_isTypeIIIorIV`（namespace `OddOrder`）から**到達しない**。
+
+**誤りの原因（本 issue と 1025-subagent 共通）**: `#print axioms` は sorryAx の**有無**しか出さず**どの sorry か**は
+出さない。1025-subagent が `coherent_sOf_H0C`（clean refuter caseA）と `coherent_H0C_commutator`
+（off-spine、sibleyTarget 消費）を hand-trace で混同 → 本 9090 がそれを検証せず伝播した。
+⚠ **教訓**: dirty theorem の sorry 特定は、candidate 中間 lemma への **authoritative `#print axioms`
+(clean/dirty)** + routing の code-read で行う。自作 reachability metaprogram は
+**inductInfo ctor / `_private` 再帰の漏れで under-count しやすい**（本 session の自作版は sorryAx を
+見落とした＝要 CollectAxioms 忠実複製）。
+
+**正しい frontier（= 元の RULING 9087(A) が正）**: spine dirty root は **(10.8)/(10.10) legacy optParam
+汚染 2 件**（`typeV_forces_coherence` via `isTypeIIIorIV`、`typeII_coherence_contradiction_estimate`
+via `S_H0C_not_coherent`）で、**両方 clean heir 有り**（`typeV_forces_coherence_v2` /
+`no_typeV_maximal_unconditional`（本 session (6.5) で完成）、`S_not_coherent_unconditional`）。
+⟹ **issue 1025 の A+B threading（clean heir を thread、または 9091 推奨の 方式1 = type-V heir cluster を
+`isTypeIIIorIV` の上流へ relocate）で spine axiom-clean 化十分。(9.11) port は不要**。
+
+**hub へ**: (9.11) M-instance port 割当を撤回し、lane a を **1025 A+B threading（方式1 feasibility を先に評価）**へ
+再割当されたい。territory・非 dup は 9090 上記 RULING のまま有効（Coherence911 は a 所有だが今回は触らない）。
