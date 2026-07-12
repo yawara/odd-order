@@ -1421,3 +1421,24 @@ caseA でも利用可能になる。これが caseA refuter の `xAdjoinStepW_k`
 `support(η−η̄)=support(η̄−η)` の符号 rewrite) に置換し、4 lemma から `chars`/`caseB` を除去 → caseB assembly
 の call-site (chars/caseB 引数) を更新。`sSet_caseB_member_diff_supported` (general x,y、uniform 次数依存) は
 caseB assembly の非共役差用に残す。別 session の focused refactor 推奨 (~32 call-site、build-green 維持)。
+
+## 2026-07-13 更新 #43 (lane b, /loop, hub[b] 検証) — ★#42 の「M-side 未 land」を訂正: nineElevenSevenEightRefutation は proven axiom-clean
+
+**#42 の主張「(9.11.7)-(9.11.8) refutation は M-instance でも未 land (h78 仮説、multi-session)」は誤り** —
+caseA subagent が **conditional 版 `coherent_sOf_H0Cprime_of_sevenEightRefutation` (h78 を取る) を見て、
+unconditional 版を見落とした** (9014/tauS_mu_row0_cross と同型の見落とし、本 session 3 度目)。
+
+**code-level 検証 (hub[b])**:
+- **`nineElevenSevenEightRefutation` (S11_NineElevenPairAdjoin:893) = 完全 proven、`#print axioms` =
+  `[propext, Classical.choice, Quot.sound]` = AXIOM-CLEAN** (dadeHypS 債務すら無)。⟹ M-instance の
+  (9.11.7)-(9.11.8) orthogonal-branch refutation は **landed** (9083 Phase E-final、commit 29c4decc)。
+- M-instance `coherent_sOf_H0Cprime` (S13_Orthogonality:1174) は unconditional (h78 を
+  `nineElevenSevenEightRefutation` で discharge 済)。sorryAx は accepted upstream C_eq_cSub 債務のみ。
+
+**⟹ 正しい caseA 状態**: S-instance caseA は **proven・axiom-clean な M-side (9.11.1)-(9.11.8) の MIRROR** =
+b-territory で buildable (「unbuildable/未 land」ではない)。substantial (M-side は Phase B/C/D/E の複数
+session を要した) だが、proven template があるゆえ caseB と同様の mirror 作業。本 session の caseA reduction
+(bare sorry → maximal-subfamily refutation skeleton、refuter に精密局在化、build green・新 axiom 無) は
+その mirror の第一段として妥当。次 = M-side `nineElevenSevenEightRefutation` +
+`nineElevenEqualityRefutation_of_sevenEightRefutation` + (9.11.1)-(9.11.6) 組立 (S11_NineElevenAlphaBound/
+PairAdjoin、READ-ONLY) を S-instance world (indS/A(S)、reducible R-family closed) に mirror。
