@@ -3679,6 +3679,13 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.alignedOmegaSigmaGrid_apply_eq_alignedOmegaEtaGrid
 set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.eta_pair_diff_rigidity
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.eta_pair_diff_classifier_of_typePV_value
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaEtaGrid_classifier
+set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.exists_omegaMonoidHom_eq
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
