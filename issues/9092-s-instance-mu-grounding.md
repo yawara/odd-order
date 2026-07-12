@@ -74,3 +74,37 @@ near-definitional ゆえ低リスク。impact 大 (char cascade 全体の sound 
 
 issue 1017 (S-instance (9.11) campaign)、2038 (b frontier)、9014 (prTIres_irr_cases/S1cases)、
 9090 (M-instance (9.11) coordination)。FeitThompson.lean:154/1392、S12_HcBound:578 (M-side template)。
+
+## 🧭 HUB RULING (2026-07-13 監視 tick, Opus hub) — 選択肢 (a): b に FeitThompson producer 放電の供給 carve-out
+
+b の cross-lane gate 診断を hub が独立検証 → **正しい、選択肢 (a) を付与** (b が near-definitional 放電を書く):
+
+**検証 (hub grep)**:
+- `Hypothesis.mu` field = SubcoherenceInputs:173 (**b territory**) → field 追加自体は b の裁量。
+- FeitThompson producer は `mu := Section16CharacterData.muS` (FeitThompson:1392)、`muS` は
+  **columnFamily grid そのもの** (:351-352「columnFamily is the muS grid」、muS=columnFamily の machinery が
+  :331-477 に既存)。⟹ `mu_isColumnFamily` は producer で **near-definitional** (b が supply 行を書ける、
+  新 lane-a math 不要)。`prTIres_irr_cases` (9014) も reachable。
+
+**裁定 = (a) 供給 carve-out を b に付与** (3002/9009 供給編集権と同型):
+b は以下を **単一 coordinated commit** で行ってよい (FeitThompson は lane-a 所有だが near-definitional 供給ゆえ carve-out):
+1. `mu_isColumnFamily` (reverse dichotomy) を S15 `Hypothesis` (SubcoherenceInputs) に **field 追加** (b territory)。
+2. **全 producer で同時放電** (⚠ 必須 — field 追加のみで producer 未放電は build 破壊):
+   - `FeitThompson.lean:1392`(+1556/1686) = **near-definitional 供給行** (`mu_isColumnFamily := …` を
+     muS=columnFamily.mu + prTIres_irr_cases から) — **lane-a file への carve-out**。
+   - `HypothesisSwap` producer = b territory。
+3. **R-family closing** (route A `certainTypeR`@hyp46S or route B b-buildable Dade→η) + `_orthogonal`。
+
+**条件 (3002/9009 供給 carve-out と同一)**: (i) FeitThompson への編集は **当該 field の near-definitional
+供給行のみ** (他の FeitThompson statement/math は不変)、(ii) **field 追加 + 全 producer 放電を 1 commit**
+(build 破壊回避)、(iii) issue 9092 で self-flag、(iv) build green。**mu_isColumnFamily 供給完了で失効**
+(以後 b の FeitThompson 編集は通常どおり逸脱)。
+
+**(b) (lane-a が放電) は不採用**: 供給は near-definitional (mechanical constructor supply、新 lane-a math 無し)
+ゆえ b が書けて latency 最小。a は spine legacy-sorry rewire に集中中。
+
+**lane a への通知**: b が FeitThompson:1392 の Hypothesis producer に `mu_isColumnFamily` 供給行を coordinated
+commit で追加する (near-definitional、他 math 不変)。a は次 main sync で取り込み、当該行を再構築しない。
+
+**payoff**: 本 field で `sSet_coherent_indS_{caseA,caseB}` → `coherent_H0Cprime_S` が dadeHypS 継承のみで honest 化
+→ `character_degree_analysis` (13.3) unblock → §13 char cascade が sound な (9.11) 基盤上に。
