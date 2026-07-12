@@ -243,8 +243,8 @@ structure Hypothesis where
   analogue of the M-side `reducible_mem_inducedKernelFamily_eq_muGrid_columnSum` (`S12_HcBound`);
   it is *supplied by the producer* from the §6 certain-type identity
   `μ = certainTypeS.columnFamily.mu` (the abstract `Hypothesis` cannot see this identification,
-  so the reverse dispatch is threaded as a field).  It is consumed by the caseB per-member
-  `R`-family (`sSet_caseB_memberRFamily`): a reducible `η ∈ 𝒮` bridges into `S(⊥)` — the `𝒳`
+  so the reverse dispatch is threaded as a field).  It is consumed by the (Clifford-case-agnostic)
+  per-member `R`-family (`sSet_memberRFamily`): a reducible `η ∈ 𝒮` bridges into `S(⊥)` — the `𝒳`
   condition `¬(H ⊆ Ker)` forces `η`'s source nontrivial — and is dispatched to its μ-column `j`,
   whose §6 `certainTypeR` image family is the (5.2.d) `R`-datum. -/
   mu_reducible_dichotomy : ∀ {X : Subgroup ↥S} {ψ : ClassFunction ↥S ℂ},

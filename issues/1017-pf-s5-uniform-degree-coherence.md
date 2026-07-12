@@ -1493,3 +1493,49 @@ cross-orthogonality に供給)、(5.6) pair-bound producer (`NineElevenPairBound
    これが `NineElevenEqualityRefutationS` の (9.11.7-8) coherent-pair 構成 (抽象 bridge に供給) を unblock。
 3. **`NineElevenEqualityRefutationS`** = generic `nineElevenCaseA_equality_refutation` + degree-dichotomy
    producer 3 種 + orbit-split で `S4 ≤ N` に還元、(9.11.7-8) が残る deepest。
+
+### update #45 (2026-07-13, lane b): per-member Dade `R`-family made Clifford-case-agnostic
+STEP 3 (the "genuinely S-instance-specific" caseA `R`-family) landed **by de-duplication** rather than
+mirroring: the caseB per-member `R`-family chain was **Clifford-case-agnostic all along** — every lemma
+(`sSet_(reducible_)memberRFamily(_ofColumns)`, `tauS_muColumn_diff_eq`, `sSet_irr_memberRFamily_eta_inner`,
+`sSet_memberRFamily_orthogonal`, imageSet reductions) threaded `chars`/`caseB` **only** to obtain the
+member+conjugate equal-degree fact `η̄(1)=η(1)`, which is automatic (conjugation preserves the real
+positive degree).  So the whole chain in `S15_CaseBReducibleCoherence.lean` was generalized in place:
+- dropped the vestigial `{chief}(chars)(caseB)` params (9 lemmas), renamed `sSet_caseB_…RFamily…` →
+  `sSet_…RFamily…` (case-agnostic names);
+- added **`Hypothesis.sSet_member_conjDiff_supported`** (`(η̄−η).support ⊆ A(S)` for any `η ∈ 𝒮`, via the
+  landed case-agnostic `sSet_member_diffsupp`) — **axiom-clean** `[propext,Classical.choice,Quot.sound]`;
+- the caseB support-uniformity route `sSet_caseB_member_diff_supported` is kept only for the engine's
+  *arbitrary-pair* ZIrr/support inputs (`sSet_coherent_dade_caseB`), which genuinely need caseB uniformity.
+
+Result: `Hypothesis.sSet_memberRFamily hG hη : OrthonormalCharacterImageFamily (dadeHypS-Dade) η` is now
+directly usable in the **caseA** non-Galois branch (feeds the (9.11.7)–(9.11.8) coherent-image
+cross-orthogonality via `sSet_memberRFamily_orthogonal`).  sorryAx = `dadeHypS` only (tolerated).
+**Regression preserved**: `sSet_coherent_indS_caseB` axioms unchanged `[propext,sorryAx,Classical.choice,Quot.sound]`.
+Full build green (4180 jobs, AxiomsCheck OK).  Remaining for the headline `sSet_caseA_nineElevenRefutation`:
+the squeeze reduction (step 1) + `NineElevenEqualityRefutationS` deep inputs (step 3) — both still open.
+
+## 2026-07-13 更新 #46 (lane b, /loop, hub[b] consolidation) — session 総括: caseB closed + caseA を multi-session frontier に整理
+
+**本 session の確定成果 (全 main 統合・build green 4180・新 axiom 無)**:
+- payoff (coherent_H0Cprime_S re-point off unsound sibleyTarget) / **9092 producer 放電** (ご依頼) /
+  **caseB FULLY CLOSED** (reducible R-family route B + _orthogonal、新 leaf 0-sorry、dadeHypS0-only) /
+  **caseA linchpin `sSet_eq_sOf_H0Cprime`** (axiom-clean、sSet=𝒮(H₀C') bridge) / **case-agnostic R-family**
+  (`sSet_memberRFamily`、caseB chain の de-dup で caseA でも citable、`sSet_member_conjDiff_supported` axiom-clean) /
+  caseA を named residual `sSet_caseA_nineElevenRefutation` へ reduce。
+- **4 誤診断を #print axioms で訂正** (prTIirr_id/tauS_mu_row0_cross/nineElevenSevenEightRefutation/reuse audit
+  — 全て proven と確定)。memory に pre-verify 対策記録。
+
+**caseA refuter = 確定 multi-session frontier (verified、mis-read でない)**: generic (9.11) arithmetic core
+(`nineElevenCaseA_equality_refutation` 等、tau-free) は reuse 可だが、**M-side の assembly 層
+(`caseA_refuter_of_equality_refutation` + deep-input producers `caseA_two_summand_inertia_inputs` 等) は
+`htype : IsTypeIII M ∨ IsTypeIV M` を要求** → type-P₂ の S は type II ゆえ instantiate 不可 (route-A の
+type-II 壁と同一)。⟹ generic core から S-instance 用に mirror 要 = M-side の 9083 phase A-E 相当の effort。
+
+**残 caseA 手順 (順、1017 #45)**: (a) `uprimeSub (toTypesIIIIIIVSetupS hG) = ⊥` + `sOf data ⊥ = sSet`
+(Cprime_eq_bot mirror) を land → squeeze cut = sSet を確立、(b) `sSet_caseA_nineElevenRefutation` +
+`sSet_coherent_indS_caseA` を S15_CaseBReducibleCoherence へ relocate (R-family citable に)、(c) ~113 行
+squeeze `caseA_refuter_of_equality_refutation` を mirror → sorry を `NineElevenPairBoundS` (5.6 pair-bound) +
+`NineElevenEqualityRefutationS` (tau-free `nineElevenCaseA_equality_refutation` + (9.11.7)-(9.11.8) budget、
+case-agnostic R-family で unblocked) の 2 residual に split。真の gate は全解消 (generic core reuse 可・
+R-family closed/case-agnostic・linchpin landed)、残は M-scale の wiring 労力。
