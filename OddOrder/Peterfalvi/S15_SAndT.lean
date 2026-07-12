@@ -247,6 +247,70 @@ theorem typeIBetaL_eq_tau_induce_sub [Finite G] {L : Subgroup G}
     | congr 1
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **`β_L^τ` is supported in `Ã(A(L))`**: the input `Ind_H^L 1 − φ` is `A(L)`-supported — at
+`1` the value is `e − e = 0` (`induce_apply_one` + the degree hypothesis), and off `1` its
+support lies in nontrivial kernel-conjugates (`support`s of both `Ind` terms), which land in
+`A(L)` by `H^# ⊆ A(L)` (`sharpSubgroup_H_subset_typeIA`) and the `L`-conjugation invariance of
+`A(L)` (`L_normalizes_A`).  Hence the Dade lift agrees with the (2.5) Dade map there
+(`dadeIntegralCharacterMap_apply_of_support`), which vanishes off `Ã(A(L)) = dadeSupport`
+(`IsDadeMap.map_eq_zero_of_not_mem_dadeSupport`). -/
+theorem typeIBetaL_support_subset_dadeSupport [Finite G] {L : Subgroup G}
+    (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L) (φ : ClassFunction ↥L ℂ)
+    (hφ : φ ∈ typeISetup.Sset)
+    (hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ)) :
+    (typeIBetaL typeISetup φ).support ⊆ typeISetup.dadeData.dade.dadeSupport := by
+  classical
+  set H' : Subgroup ↥L := (typeISetup.H).subgroupOf L with hH'def
+  set ι : ClassFunction ↥L ℂ :=
+    ClassFunction.induce H' (trivialClassFunction ↥H') with hιdef
+  have hsupp : (ι - φ).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (OddOrder.GroupTheory.typeIA L typeISetup.typeI) L := by
+    intro z hz
+    have hzne : (ι - φ) z ≠ 0 := hz
+    have hz1 : z ≠ 1 := by
+      rintro rfl
+      apply hzne
+      rw [ClassFunction.sub_apply, hιdef, ClassFunction.induce_apply_one,
+        trivialClassFunction_apply, mul_one, hdeg]
+      have hHeq : H' = (maxNilpotentNormalHall L).subgroupOf L := by
+        rw [hH'def]
+        show (typeISetup.typeI.typeF.H).subgroupOf L = _
+        rw [typeISetup.typeI.typeF.H_eq]
+      rw [hHeq, sub_self]
+    have hzc : z ∈ OddOrder.RepresentationTheory.ClassFunction.conjugatesInto H' := by
+      by_contra hnotc
+      apply hzne
+      rw [ClassFunction.sub_apply]
+      obtain ⟨θ, -, hφeq⟩ := hφ
+      have hφz : ClassFunction.induce ((typeISetup.typeI.typeF.H).subgroupOf L)
+          (θ : ClassFunction ↥((typeISetup.typeI.typeF.H).subgroupOf L) ℂ) z = 0 :=
+        ClassFunction.induce_eq_zero_of_not_conjugatesInto _ hnotc
+      rw [hιdef, ClassFunction.induce_eq_zero_of_not_conjugatesInto _ hnotc, hφeq, hφz,
+        sub_zero]
+    obtain ⟨c, hc⟩ := hzc
+    have hcne : c⁻¹ * z * c ≠ 1 := by
+      intro h1
+      apply hz1
+      have h2 := congrArg (fun w => c * w * c⁻¹) h1
+      simpa [mul_assoc] using h2
+    rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+    have hmem : ((c⁻¹ * z * c : ↥L) : G) ∈ sharpSubgroup typeISetup.typeI.typeF.H :=
+      ⟨Subgroup.mem_subgroupOf.mp hc, fun h1 => hcne (Subtype.ext h1)⟩
+    have hA := sharpSubgroup_H_subset_typeIA typeISetup.typeI hmem
+    have hconjA := typeISetup.dadeData.dade.L_normalizes_A c hA
+    simpa [mul_assoc] using hconjA
+  intro x hx
+  by_contra hnot
+  apply hx
+  show typeIBetaL typeISetup φ x = 0
+  rw [typeIBetaL,
+    show typeISetup.tau = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+        typeISetup.dadeData.dade
+        (typeISetup.dadeData.dade.fullDadeIsometryData typeISetup.hconj) from rfl,
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support _ _ hsupp]
+  exact (typeISetup.dadeData.dade.isDadeMap_dadeMap).map_eq_zero_of_not_mem_dadeSupport _ _ hnot
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **T-side (14.3.b) bridge character** `β_T = Ind_{QW₂}^T 1_{QW₂} − ν_{10} ∈ CF(T)` — the
 S↔T mirror of `betaGrid` (`β_S = Ind_{PW₁}^S 1 − μ_{01}`), with the grid entry `ν_{10}` in
 place of `μ_{01}`. -/
