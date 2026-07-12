@@ -7569,3 +7569,9 @@ a_aut 定数性 engine への hcorrection 供給。 -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.inner_tau_muColumnZero_sub_zeta_columnZero_const
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.inner_tau_muColumnZero_sub_zeta_rowZero_const
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.sum_sq_inner_le_of_orthonormal
+
+/-! **Peterfalvi (11.9.a) 行0射影, axiom-clean** (lane a, 2026-07-12, issue 1024).
+h118 ((11.8) 非直交) 下で τ(μ₀−ζ) の σ-grid 係数 = 行0 indicator。a₀₀=1 + Galois 定数性 +
+(3.7) 分離 + Bessel (w₁+1 予算) + 整数 case 分析 (列0形は h118 で排除) の完全組立。 -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.alignedOmegaSigmaGrid_columnZero_sum_inner
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.inner_tau_muColumnZero_sub_zeta_rowZero_of_residual_not_orthogonal
