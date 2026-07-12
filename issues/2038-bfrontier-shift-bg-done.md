@@ -2477,3 +2477,56 @@ clean と判明。しかも **T-side に完全な proven template** `T_typeIII_c
 hub 注記: (A) scope は ruling 想定 (R-support machinery 新設) より大幅に軽い — 既存 engine + template の mirror。
 **次 iteration = tau1S_induce_inner_eta を T-side template mirror で build** (b territory Machinery135 or 新 S15 leaf、
 per-irr orthogonality → Ind θ 線形展開)。character_degree_analysis の残 field も順次。
+
+## ✅✅ (2026-07-12 続⁶、lane-b /loop + subagent) — HUB RULING (A) の core engine **landed** (commit 39a8ba33)
+
+hub 裁定 (A) coherence-ortho machinery の core を新 leaf `CoherenceEtaOrthogonality.lean` に **proven landing**
+(full build 4178 green・AxiomsCheck OK・新 axiom/sorry 無、subagent build → hub[b] review+commit):
+
+- **`coherentIndS_image_inner_eta_eq_zero`** = proven T-side `T_typeIII_coherent_image_inner_eta_eq_zero` の
+  S-side mirror。coherence `coh : IsCoherent Ind_S^G 𝒮 A(S)` (A(S)=honestTypeP2ASet) の任意 coherent 像
+  `coh.extension ζ` (ζ irr) が η-grid 全体に直交。**hvanish 完全証明** (sInstance_dade0_eq_induce で
+  indS=A₀(S)-Dade / typePData_typePV_not_mem_derived / eta_orthogonal_of_norm_one_pair_vanish engine)。
+  parametrized (coh 仮説)、**non-vacuous** (A(S) は real Dade support、T-side の sigmaSharp と同型)。
+
+### ⚠ 重要 finding: `coherent_H0Cprime_S` の support は空 → re-grounding が真の gate (lane a)
+
+subagent 精査で判明: **`coherent_H0Cprime_S` の support `(C')^#=cprimeSharpS` は honest type-P₂ S で無条件に空**
+(`cprimeSharpS_eq_empty`、`C'=[C_U(P),C_U(P)]=⊥`)。∴ その `extends_on_supported` は 0 でしか発火せず、engine を
+直接 instantiate できない (hardcode すると ζ=ζ̄ 強制の vacuous)。**engine 実体化には `IsCoherent Ind_S^G 𝒮 A(S)`
+(A(S)-supported coherence) が要る = (13.3) re-grounding**。bridge `cprimeSharpS_subset_supportA` は ∅⊆A(S) で trivial
+ゆえ upgrade 不可 — A(S)-coherence は **lane a の honest (9.11) induction port (`Ptype_core_coherence`) が
+Dade support A(S) で直接供給**する (issue 1017: §5 coherence infra 着手=lane a、sibleyTarget_H0C は 7001 で unsound)。
+
+**⟹ b の (A) 貢献 = orthogonality engine (landed)。character_degree_analysis の `tau1S_induce_inner_eta` は
+「(A) engine ∘ A(S)-coherence」で proven-modulo — A(S)-coherence が lane a の (9.11) honest port に gated**
+(pc_le の typeP_Galois と同一 root cluster、gated-endpoint)。b は gated-endpoint prep (orthogonality engine) を
+完遂し、lane a の honest (9.11) landing で character_degree_analysis を一気に close 可能な態勢。
+
+**b の次**: character_degree_analysis の他 field (mu_col_tau1_eta_col_one 13.9.a / mu_tau1_formula 13.3.c) も
+同様に (A) engine + A(S)-coherence 前提の parametrized prep として build 可能 (gated-endpoint 前倒し)、or
+lane a の (9.11) honest port landing を待つ。hub 注記: (A) core は landed、残 (A) 系は同 (9.11) gate。
+
+## 🧭 (2026-07-12 続⁷、lane-b /loop) — 残 character_degree_analysis field の assess → gated-endpoint 収束
+
+(A) core engine landing 後、残 field を build しようと assess → 状況確定:
+- **mu_col_tau1_eta_col_one (13.9.a) / mu_tau1_formula (13.3.c) = Coq mu_tau1red** は **proven template 無**
+  (grep: FTtypeP_sum_Ind_Fitting_lb (13.6) / FTtypeP_sum_cycTIiso10_lb (13.7) / mu_tau1red は Lean 全て不在)。
+  ∴ (A) engine (T-side mirror) と違い **fresh deep port** = Coq (13.6)-(13.9) norm-bound machinery
+  (P1_int2_lb / 2-sided norm 下界 / boolP case 分け) の port が要る major effort。かつ **A(S)-coherence gate**。
+- lambda (13.3.b distinguished irr) も同 coherence gate。
+
+**⟹ b の clean (A)-buildable prep は (A) core engine (`coherentIndS_image_inner_eta_eq_zero`) で substantially
+完遂**。character_degree_analysis の残 assembly (mu_tau1red の (13.6-13.9) deep port + λ + A(S)-coherence) は
+(i) deep fresh port かつ (ii) lane a の honest (9.11) A(S)-coherence port に gated。
+
+**b の posture = gated-endpoint** (lane c と同型): 主要 buildable prep 完遂、lane a の (9.11) landing 待ち。
+- **re-engage trigger** = lane a の `coherent_H0C_commutator` honest (9.11) induction port landing
+  (A(S)-supported coherence 供給) → character_degree_analysis を (A) engine + mu_tau1red port で一気に close。
+- **代替 b-work** (gated 待ち中の genuine prep、優先度低): mu_tau1red の (13.6-13.9) norm-bound machinery を
+  A(S)-coherence 仮説下の parametrized port として先行 build (major、subagent 委譲候補、fresh session 適)。
+- **やらないこと**: typeP_Galois 再実装 (dup)、(9.11) coherent_H0C_commutator への descent (lane a territory)。
+
+**session 総括 (lane-b、2 concrete landing)**: u_bound cite 討伐 (13.2.c) + (A) core engine (5.3.b/coherent 像⊥η)。
+両者 proven・main 統合 (u_bound) / commit 済 ((A) engine)。設計: census 訂正 + hub 裁定 (A) + core 完遂 +
+re-grounding gate 特定。b は gated-endpoint prep を正しく前倒しし、lane a の (9.11) を待つ健全な状態。
