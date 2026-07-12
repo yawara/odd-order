@@ -1460,6 +1460,7 @@ noncomputable def section16CharacterData_of_isMinimalSimpleOdd {G : Type*} [Grou
                 ((derivedInG mp.S).subgroupOf mp.S)) := by
             rw [Section16CharacterData.certainTypeS_W2_eq hG mp, tp.W2_eq_Kstar hG]
           exact hseq ▸ hsub
+      mu_reducible_dichotomy := Section16CharacterData.muS_reducible_dichotomy hG mp tp
       nu_definition := Section16CharacterData.nuT_definition hG mp tp
       tau3_isometry := Section16CharacterData.tau3W_isometry hG mp tp
       tau3_trivial := Section16CharacterData.tau3W_trivial hG mp tp
@@ -1570,6 +1571,7 @@ noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [F
     mu_conj := cd.mu_conj
     tau3_omega_conj := cd.tau3_omega_conj
     mu_colSum_eq_induce := cd.mu_colSum_eq_induce
+    mu_reducible_dichotomy := cd.mu_reducible_dichotomy
     nu_definition := cd.nu_definition
     q_lt_p := tp.q_lt_p
     Sdata := tp.Sdata
@@ -1701,6 +1703,7 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       mu_conj := inp.mu_conj
       eta_conj := inp.tau3_omega_conj
       mu_colSum_eq_induce := inp.mu_colSum_eq_induce
+      mu_reducible_dichotomy := inp.mu_reducible_dichotomy
       nu_definition := inp.nu_definition
       m := 1 - 1 / ((inp.q : ℚ) - 1) - ((inp.q : ℚ) - 1) / (inp.q : ℚ) ^ inp.p +
         1 / (((inp.q : ℚ) - 1) * (inp.q : ℚ) ^ inp.p)
