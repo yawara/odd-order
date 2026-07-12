@@ -536,6 +536,18 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-12 (tick 14, セッション再開初回) — 全 3 レーン合流: ★ (11.9.c) u=a pin (a) + (13.19.b) 完全証明 + junk-τφ soundness 修正 (b)**:
+  **a=1** ((11.9.c) 非Galois u=a pin keystone `caseA_u_eq_a_of_residual_not_orthogonal` —
+  新 leaf S13_NonGaloisExclusion +716 sorry-free、conj-対合 + (11.9.a) 行0射影 + Dade pin;
+  S12 helper 2 件 AxiomsCheck 登録) / **b=2** (★ (13.19.b) `coherent_extension_orthogonal_eta_of_mem_Sset`
+  完全証明、義務 5→4。**soundness 核**: 旧義務 `tau_apply_orthogonal_eta_of_mem_Sset` は junk-τφ
+  (非 supported CF への任意拡張) で**証明不可能な obligation だった** → (13.19) 層を
+  TypeICoherent78Data τ₁ = coh.extension ベースに restate。S16 下流 2 file × 1 行は機械的 signature
+  追従 = 🔩 非逸脱 (commit self-flag 済)。⚠ b 自己 flag: 同種 junk-τφ 主張の audit 価値 → 2038 に記録済) /
+  **c=1** (0105 docs のみ: codex ホスト mid-turn 切断 (VS Code リロード、作業損失なし) → ユーザー裁定で
+  一時 Claude 交代、trial 評価 26/26 不変)。build green ×2 (4175 jobs)・AxiomsCheck OK・
+  **count-sorry 69→68** (unprovable 義務の削除、regression でない)・新 axiom なし・size watch 超過なし
+  (S13_NonGaloisExclusion 716 / S15_SAndT 1071)。
 - **2026-07-12 (tick 13) — c のみ合流**: **c=1** ((11.8) transposed eta grid align —
   TGapGridAlignment 256→975 行 +719 全 proven、AxiomsCheck +73)。a=0 / b=0。build green
   (4174 jobs)・AxiomsCheck OK (2342/0)・count-sorry 69→69・新 axiom なし。push `7fe28d44..1be17740`。
