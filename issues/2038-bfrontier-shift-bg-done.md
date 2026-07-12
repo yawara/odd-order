@@ -1987,3 +1987,42 @@ supported ゆえ τ で honest、(4.8)+(13.18.a) 論法) / typeI_caseC_dichotomy
 proof body、parity + degree bound)。**次 iter = 文書順で row_constant**: (13.18.a)
 μ-差分 support (`mu_diff_support` field 済) → (4.8) → ⟨β_L^τ, η_0j − η_0j'⟩ = 0。
 full build 4173 jobs green、AxiomsCheck OK。
+
+## ✅ (2026-07-12、/loop iter 26) — (13.19.c) row constancy 完全証明 (義務 4 → 3) + swap 設計確定
+
+**landed (commit c81a68d3)**: `typeIBetaL_eta_row_constant` sorry-free。Coq `betaLeta` 忠実:
+- `typeIBetaL_dadeS_betaGrid_disjoint_support` = (13.19.a) の任意非零列一般化 (Coq `o_tauL_S`)。
+  列引数 threading のみ (sInstance_dade0_eq_induce + betaGrid_A0_support/betaGrid_support は既に
+  j-generic だった)。旧 #1 形は特殊化として保持。
+- `typeIBetaL_inner_eta_row_sub_eq_zero`: gammaGrid_defGamma (13.18.c) を j,j' で取り
+  η_0j − η_0j' = τ_S β_j' − τ_S β_j (abel)、disjoint support で両項消滅。scoped-instance
+  世界で完結し、binder-instance 形へは convert + Subsingleton.elim で橋渡し (instance-defeq
+  trap 回避: D-term を binder 世界で再 elaborate しない)。
+- 署名変更: row_constant に `_hdeg` 追加 (β_L の A(L)-supported 性が真に要求; producer は
+  choose_spec .2 で供給)。
+
+**col_constant / caseC_dual の設計確定 — `Hypothesis.swap` 方式 (T-side mirror 却下)**:
+- Coq は (13.19) を S-orientation で 1 回証明し §14 で (T,S) swap 再 instantiate。repo の
+  対応物 = **`S15.Hypothesis.swap : Hypothesis` 構築** (S↔T, P↔Q, U↔V, C↔D, W1↔W2, q↔p,
+  u↔v, c↔d, mu↔nu transposed, delta↔deltaPrime, omega/eta transpose)。
+- **効果**: S-side (13.18)/(13.19) 全定理は ∀-hyp ゆえ swap instance で dual が自動成立 —
+  betaGrid_support / defGamma / row_constant / caseC が再証明なしで T-side 化。
+  col_constant = row_constant @ swap + eta-transpose transport (swap.eta j i := hyp.eta i j は
+  definitional)。caseC_dual = caseC @ swap (caseC 証明後に free)。typeIBetaL は hyp 非依存ゆえ
+  transport 不要。個別 mirror (~600-900 行) と違い将来の S-side 定理も全部 dual 化される。
+- **irreducible な未充足 = ν-side §4/§6 供給 ~10 facts** (swap constructor の入力):
+  nu_orthonormal / nu_irreducible / nu_row_injective / nu_rowSum_eq_induce / nu_diff_support
+  (reconciled Tdata-target) / nu_apply_of_not_mem_W1 / nu_conj / nu_degree_modEq_deltaPrime /
+  deltaPrime_zero_eq_one / V-commutative。全て mu-side field の W₁↔W₂ mirror で、discharge
+  route = FT-producer の certainTypeT (muS_* lemma 群の機械的 mirror、`mp.certainTypeT hG` 済)。
+  **FeitThompson{,Setup}.lean = a 所有** → field 追加+構成子供給は「c の S_U_commutative 先例」
+  (構成子供給付き hub 承認合流) に従い別 phase で 9000-claim + self-flag。
+- 検証済み: mu_definition@swap = nu_definition (index 完全整合) / Sdata@swap =
+  reconciled_typePData_T (proven) / S_typeP2@swap = hT2 (caseC_dual と同じ parameter、
+  col_constant にも hT2 追加要 — field/producer は既に hT2 持ち) / eta_row_vanish@swap は
+  eta_column_galois_orbit から導出可 / m_eq@swap = p,q 入替式を直接供給 / Q_inf_V@swap =
+  P_inf_U (proven チェーン、(14.5) で使用済)。
+- **実装順 (次 iter〜)**: (1) b-owned leaf `S15_SAndT_Setup/NuGridSupply.lean` — pin 構造
+  `NuGridSupplyData (hyp)` + sorried producer (signature = mu-field 群の精密 mirror)。
+  (2) `HypothesisSwap.lean` — swap constructor (~85 fields) + transport lemmas。
+  (3) col_constant = row @ swap。(4) caseC (S-side 本体、Coq :2078-2185)。(5) caseC_dual = @ swap。
