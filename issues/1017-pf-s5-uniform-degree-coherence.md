@@ -1158,3 +1158,60 @@ local haves (conj-closure・no-real・conjugate-diff support) を standalone 化
 3. `IsCoherent indS (full sSet) A(S)` を得たら同 `congrMap` step で `coherent_H0Cprime_S` を
    honest route へ re-point (`sibleyTarget_H0C` 置換; support は `A(S)`、`(C')^#⊆A(S)` bridge で
    `cprimeSharpS` へ絞る)。
+
+## 2026-07-12 更新 #36 (lane b) — ★残リスト step 1 完了 + h2 sub-gate RESOLVED (sorry-free) + caseA base coherence h0 landed
+
+更新 #35 末尾の「残 (full-family re-grounding、順に)」の **step 1 完了** + **step 2 の h2 sub-gate を
+positive に RESOLVE** (更新 #35 が「2-member count 未 landed」とした点の訂正) + **caseA base coherence
+`h0` (pair-adjoining lift の entry point) を landed**。全て build-green (`lake build OddOrder` 4179 jobs,
+3m11s)。
+
+### 1. 残リスト step 1 完了: (A)-engine 供給用 standalone lemma 化 (HypothesisBasics.lean、全 axiom-clean)
+`sSetIrrDeg_subcoherent`/`sSetIrrDeg_coherent` の local `have` を standalone theorem に切り出し、両所で cite:
+- `sSetIrrDeg_closedUnderConjugate` (hconj、`star d = d`)、`sSetIrrDeg_hasNoRealCharacters` (hnoReal、oddCardS)、
+  `sSetIrrDeg_member_support_subset` (⊆ A(S)∪{1})、`sSetIrrDeg_member_diff_supported` (member 差 ⊆ A(S)、
+  hsupp/hconjsupp/hsuppdiff)、`sSetIrrDeg_finite`。全て propext/Classical.choice/Quot.sound のみ (sorryAx 無)。
+
+### 2. (A) engine を S₁(d) 上で instantiate (CoherenceEtaOrthogonality.lean、coherence hypothesis 無)
+`sSetIrrDeg_coherentIndS_image_inner_eta_eq_zero` — S₁(d) の任意 coherent image `(sSetIrrDeg_coherent_indS
+…).some.extension ζ` が η-grid 全体に直交。hconj/hnoReal/hsupp/coh を全て landed piece で discharge (coherence
+仮説 0)。sorryAx は既存 Dade foundation (dadeHypS0) のみ inherit、新規 0。
+
+### 3. ★ h2 sub-gate RESOLVED (更新 #35 の「2-member count 未 landed」を訂正)
+`sSetIrrDeg_qa_two_le_ncard` (HypothesisBasics.lean、**完全 axiom-clean、sorryAx 無**):
+`CliffordCaseAData` を与えれば `2 ≤ (sSetIrrDeg hG (q·a)).ncard`。
+- **Coq PFsection9.v:1537-1551 の再現**: base `S1` は `0 < size S1` (1 member) のみ要る — 𝒮 が conjugate-closed
+  + no-real ゆえ χ と distinct χ̄ で `size ≥ 2` に倍化。
+- 1 member = **positive (9.8.d) count** `S11.caseA_exists_irreducible_qa` (landed、`(p−1)/a ≥ 1` via
+  `CliffordCaseAData.a_dvd_p_sub_one` = Coq `a_dv_p1`、`[C_U(S₀):U′] ≥ 1`)、その witness は `𝒮(H₀U′) ⊆ 𝒮`
+  (`sOf_subset_sSet`)。conj-closure + no-real で倍化。
+- ∴ 更新 #35 の「caseA_exists_...qa は existence のみ、2-member count 未 landed」は**訂正**: existence +
+  conjugacy doubling で 2-member は landed (新 count 不要)。
+
+### 4. caseA base coherence h0 (lift entry point) landed
+`sSetIrrDeg_qa_coherent_indS_caseA` (HypothesisBasics.lean): `CliffordCaseAData` から
+`Nonempty (IsCoherent Ind_S^G (sSetIrrDeg (q·a)) A(S))` を hd/hd0/h2 全 discharge で産む
+(`star_natCast`/`Nat.card_pos`+`a_pos`/上記 h2)。= Coq `Ptype_core_coherence` の pair-adjoining が start する
+base `h0`。sorryAx は既存 Dade (dadeHypS) のみ inherit。
+
+### 残 (full `sSet` への lift = (9.11.1)–(9.11.8)、順に)
+base `h0 = sSetIrrDeg_qa_coherent_indS_caseA` (caseA) / `sSetIrrDeg_coherent_indS` (caseB Galois、d=q·u で
+uniform ゆえ lift 不要) から `coherentOfPairChainCover` (S07_Coherence/CoherenceUnion:1620) で組む:
+1. **degree-monotone decomposition** (`hpairs`/`hcover`): `sSet ∖ S₁(qa)` を conjugate pair
+   `{χ, χ̄}` (irreducible、R-datum = 既 landed `sSet_member_differenceImage` の CharacterDifferenceImage)
+   + reducible `μ_j` (CharacterPsiDecomposition / OrthonormalCharacterImageFamily) に分解。要 degree-enum
+   (`exists_monotoneDegreeEnum` 相当を S-instance へ)。
+2. **per-pair (5.6)/(9.11.5) retarget** (`hstep`): `Snorm`/`sumnS` squeeze (S07_Subcoherent、landed sorry-free)
+   + `xAdjoinStepW` を各 adjoining step で発火。anchor prefix は S₀ = S₁(qa) 固定。
+3. 得た `IsCoherent indS (full sSet) A(S)` を `congrMap` で `coherent_H0Cprime_S` を honest route へ
+   re-point (更新 #35 step 3)。
+
+### ⚠ cross-lane coordination (9090 との関係)
+lane-a issue 9090 (2026-07-12) が「FT spine の bare sorry root = M-instance (9.11) case-a coherence
+`sibleyTarget_H0C` (Coherence911:43、honest port 要)」を確定し、hub に (9.11) の lane 帰属 reconcile を依頼。
+本 lane-b work は **S-instance** (9.11) coherence (`coherent_H0Cprime_S` re-grounding、S15_SAndT_Setup b-owned)
+で、同 Coq PFsection9.v:1484 の pair-adjoining 構造を使うが M-instance `sibleyTarget_H0C`/`Coherence911.lean` は
+一切触れていない (b-territory 内、shared engine は cite のみ)。hub は 9090 の reconcile 時に本 lane-b の
+S-instance (9.11) base landing (本更新) を合わせて確認されたい。
+
+**commit**: 329c1dd7 (step 1+2)、95863704 (h2)、58f15891 (base h0)。
