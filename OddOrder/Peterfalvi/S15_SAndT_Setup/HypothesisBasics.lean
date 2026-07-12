@@ -1,6 +1,7 @@
 import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
 import OddOrder.Peterfalvi.S11_ImprimitiveUBound
 import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
+import OddOrder.Peterfalvi.S11_NineElevenPairAdjoin
 
 /-!
 # TAIL
@@ -545,6 +546,50 @@ theorem sSet_finite {M : Subgroup G} [Finite G] (data : TypesIIIIIIVSetup M) :
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
+/-- **Peterfalvi (9.11.1)–(9.11.8), the `S`-instance equality-configuration refutation** (issue 1017,
+the sole residual of `sSet_coherent_indS_caseA`, mirroring the M-instance
+`nineElevenSevenEightRefutation` / `nineElevenEqualityRefutation_of_sevenEightRefutation`).
+
+Given a maximal proper coherent conjugation-closed `𝒮₂` with the degree-`q·a` base cut
+`S₁(q·a) ⊆ 𝒮₂ ⊊ 𝒮 = sSet`, `𝒮₃ = 𝒮 ∖ 𝒮₂ ≠ ∅` and *no* conjugate pair `{χ, χ̄}` (`χ ∈ 𝒮₃`)
+coherently adjoinable, derive `False`.
+
+**Reuse map (verified STEP-1 for the assembly, issue 1017 hub note).**  Via
+`sSet_eq_sOf_H0Cprime` the full family `𝒮` *is* the `H₀C′` stratum `sOf data (chief.H₀ ⊔ chars.Cprime)`,
+so the entire generic (9.11) apparatus — all phrased over `sOf data (chief.H₀ ⊔ …)`,
+`{data}{chief}{chars}(caseA)`-parametrized, hence directly instantiable at `data :=
+toTypesIIIIIIVSetupS hG` — applies:
+* the (9.11.2)–(9.11.5) arithmetic contradiction `S11.nineElevenCaseA_equality_refutation`;
+* the (9.11.1) squeeze `S11.nineElevenOne_configuration` + `S11.sumnS_irreducible_constant_degree`;
+* the world-facts *from the degree dichotomy*: `S11.nineElevenTwoTIWitness_of_degree_dichotomy`
+  (TI-witness), `S11.nineElevenTwo_two_summand_inertia` (inertia `C = K₁ ⊓ K₂`),
+  `S11.nineElevenGamma_inner_self_mul_u` (Mackey norm), `S11.nineElevenThree_orbit_split` (class eq);
+* the abstract projection budget `S13.exists_bridge_target_of_budget` and the (5.6.3) union-pair
+  extension `S13.isCoherent_union_pair_of_bridge` for the (9.11.7)–(9.11.8) coherent-pair adjunction.
+The genuinely `S`-specific pieces still to build are the caseA per-member Dade `R`-family (the
+analogue of the M-side `sOf_H0Cprime_memberRFamily`, feeding `𝒮₃`-coherence and the coherent-image
+cross-orthogonality) and the (5.6) pair-bound producer for the `indS`/`A(S)` world; the (9.11.7)–
+(9.11.8) orthogonal branch is itself a residual on the M-side (issue 9083 Phase E). -/
+theorem Hypothesis.sSet_caseA_nineElevenRefutation [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
+    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
+    (caseA : CliffordCaseAData chars)
+    (S₂ : Set (ClassFunction ↥hyp.S ℂ))
+    (hS₁S₂ : hyp.sSetIrrDeg hG (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ) ⊆ S₂)
+    (hS₂S : S₂ ⊆ sSet (hyp.toTypesIIIIIIVSetupS hG))
+    (hS₂conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₂)
+    (hS₂coh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.indS S₂
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)))
+    (hS₃ne : (sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂).Nonempty)
+    (hnopair : ∀ χ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂,
+      ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.indS (S₂ ∪ {χ, χ.conj})
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S))) :
+    False := by
+  sorry
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
 /-- **(9.11) non-Galois-branch coherence of the full family `𝒮 = sSet` on `Ind_S^G`** (issue 1017,
 caseA of Peterfalvi (9.11) `Ptype_core_coherence`, Coq `PFsection9.v:1484`).  In the non-Galois case
 (`CliffordCaseAData`) the honest §9 family `𝒮 = sSet` is **genuinely mixed-degree**: the degree-`q·a`
@@ -608,8 +653,8 @@ theorem Hypothesis.sSet_coherent_indS_caseA [Finite G]
   -- configuration refuted by (9.11.7)–(9.11.8).  See the theorem docstring for the three remaining
   -- `b`-territory prerequisites (caseA `R`-family; (9.11.1)–(9.11.6) squeeze assembly for `indS`/`A(S)`;
   -- the (9.11.7)–(9.11.8) refutation, still a residual even on the M-side, issue 9083).
-  intro S₂ _hS₁S₂ _hS₂S _hS₂conj _hS₂coh _hS₃ne _hnopair
-  sorry
+  intro S₂ hS₁S₂ hS₂S hS₂conj hS₂coh hS₃ne hnopair
+  exact hyp.sSet_caseA_nineElevenRefutation hG chars caseA S₂ hS₁S₂ hS₂S hS₂conj hS₂coh hS₃ne hnopair
 
 /-- **Peterfalvi (13.2.b), order part**: the Fitting kernel `P = S_F` has order `p^q`.
 
@@ -685,6 +730,58 @@ theorem Hypothesis.toTypesIIIIIIVSetupS_chief_H0_eq_bot [Finite G]
     chief.H0 = ⊥ := by
   rw [chief.H0_eq, hyp.toTypesIIIIIIVSetupS_chief_N_eq_bot hG chief]
   exact Subgroup.map_bot _
+
+open OddOrder.Peterfalvi.S11 in
+/-- **The honest `S`-instance family is its own `H₀C′` stratum**: `𝒮 = sSet = 𝒮(H₀C′)` (issue 1017,
+the linchpin bridging the `sSet` refuter to the generic (9.11) `sOf`-stratum machinery, which is
+uniformly phrased over `sOf data (chief.H₀ ⊔ …)`).  For the type-`P₂` maximal `S` the kernel data
+degenerates — `chief.H₀ = ⊥` (`toTypesIIIIIIVSetupS_chief_H0_eq_bot`) and `C′ = cprimeSub =
+derivedInG (cSub) = ⊥` (`cSub ≤ U` abelian by `S_U_commutative`, same argument as `Cprime_eq_bot`) —
+so `chief.H₀ ⊔ chars.Cprime = ⊥` and `𝒮(H₀C′) = 𝒮(⊥) = 𝒮`.  This is the `S`-instance analogue of the
+*identity* the M-side gets for free (there `H₀C′` is a genuine proper stratum of `𝒮`); it lets every
+generic (9.11) producer over `sOf data (chief.H₀ ⊔ Y)` be instantiated at the `S`-instance full
+family `sSet` (mirrors the caseB collapse used in `sSet_caseB_apply_one_eq_qu`). -/
+theorem Hypothesis.sSet_eq_sOf_H0Cprime [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
+    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief) :
+    sSet (hyp.toTypesIIIIIIVSetupS hG)
+      = sOf (hyp.toTypesIIIIIIVSetupS hG) (chief.H0 ⊔ chars.Cprime) := by
+  classical
+  have hH0 : chief.H0 = ⊥ := hyp.toTypesIIIIIIVSetupS_chief_H0_eq_bot hG chief
+  have hCp : chars.Cprime = ⊥ := by
+    show OddOrder.Peterfalvi.S11.cprimeSub (hyp.toTypesIIIIIIVSetupS hG) chief = ⊥
+    have hCU : OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief ≤ hyp.U :=
+      (OddOrder.Peterfalvi.S11.cSub_le_U _ _).trans (le_of_eq hyp.Sdata_U_eq)
+    have hCab : IsMulCommutative
+        ↥(OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief) :=
+      ⟨⟨fun a b => Subtype.ext (by
+        have h := hyp.S_U_commutative.is_comm.comm
+          (⟨(a : G), hCU a.2⟩ : ↥hyp.U) ⟨(b : G), hCU b.2⟩
+        simpa using congrArg Subtype.val h)⟩⟩
+    have hcomm : commutator
+        ↥(OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief) = ⊥ := by
+      rw [eq_bot_iff]
+      refine (Subgroup.commutator_le (H₁ := ⊤) (H₂ := ⊤) (H₃ := ⊥)).mpr (fun a _ b _ => ?_)
+      rw [Subgroup.mem_bot, commutatorElement_eq_one_iff_commute]
+      exact hCab.is_comm.comm a b
+    show derivedInG (OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief) = ⊥
+    rw [derivedInG, hcomm, Subgroup.map_bot]
+  rw [hH0, hCp, sup_bot_eq]
+  apply Set.Subset.antisymm
+  · -- `𝒮 ⊆ 𝒮(⊥)`: the `⊥`-kernel demand is vacuous (only the identity lies in `⊥`)
+    rintro φ ⟨χ, hχ, rfl⟩
+    refine ⟨χ, ?_, rfl⟩
+    rw [mem_xiOf]
+    refine ⟨hχ, ?_⟩
+    intro x hx
+    have hx1 : x = 1 := by
+      have h2 := Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp (SetLike.mem_coe.mp hx))
+      rw [Subgroup.mem_bot] at h2
+      exact Subtype.ext (Subtype.ext h2)
+    rw [hx1, OddOrder.Peterfalvi.S03.mem_characterKernel,
+      OddOrder.Peterfalvi.S03.characterDegree_def]
+  · exact sOf_subset_sSet _ _
 
 /-- **A subgroup of coprime `p`-order lies in a normal subgroup of `p`-coprime index.**  If
 `W ≤ S`, `P.subgroupOf S ⊴ S`, `p` is coprime to `[S : P]`, and every `w ∈ W` has order dividing
