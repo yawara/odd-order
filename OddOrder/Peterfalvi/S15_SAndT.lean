@@ -1060,11 +1060,149 @@ theorem typeI_caseC_bound_c2 [Finite G]
   exact_mod_cast this
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **`φ`-invariance identity** for the (13.19.c) dichotomy: for a degree-`e` member
+`φ ∈ 𝓛`, the coherent-image difference equals the `β_L^τ` difference,
+`φ^{τ₁} − ζ_0^{τ₁} = β_L^τ(ζ_0) − β_L^τ(φ)`.  Both sides are `τ₁(φ − ζ_0)`: `φ = ζ_k` with
+`d_k = 1` (equal degree, `exists_zeta_index_of_mem_Sset` + `zeta_deg`), so `φ − ζ_0` is
+`A(L)`-supported (`psi_support`), where the coherent extension agrees with `τ = typeIHyp.tau`
+(`extends_on_supported`); and `β_L^τ(ζ_0) − β_L^τ(φ) = τ(Ind − ζ_0) − τ(Ind − φ) = τ(φ − ζ_0)`
+by linearity.  This is the sole bridge from the `ζ_0`-based parity core/case bounds to the
+producer's arbitrary degree-`e` `φ`. -/
+theorem coh_extension_sub_zeta0_eq_typeIBetaL_sub [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G}
+    (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L)
+    (φ : ClassFunction ↥L ℂ) (hφ : φ ∈ dataL.typeIHyp.Sset)
+    (hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ)) :
+    dataL.coh.extension φ - dataL.coh.extension (dataL.zeta 0)
+      = typeIBetaL dataL.typeIHyp (dataL.zeta 0) - typeIBetaL dataL.typeIHyp φ := by
+  classical
+  haveI := dataL.kernelIn_normal
+  obtain ⟨k, hk_ne, hkφ⟩ := exists_zeta_index_of_mem_Sset hG dataL hφ
+  -- `ζ_0(1) = e`, hence `d_k = 1` (equal degree).
+  have hζ01 : dataL.zeta 0 (1 : ↥L) = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ) := by
+    rw [show dataL.zeta 0 (1 : ↥L)
+        = ClassFunction.induce dataL.kernelIn (dataL.θ 0 : ClassFunction _ ℂ) (1 : ↥L) from rfl,
+      dataL.deg0]
+    congr 2
+    show (dataL.typeIHyp.typeI.typeF.H).subgroupOf L = (maxNilpotentNormalHall L).subgroupOf L
+    rw [dataL.typeIHyp.typeI.typeF.H_eq]
+  have hidx_ne : (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr Subgroup.index_ne_zero_of_finite
+  have hdk1 : dataL.d k = 1 := by
+    have hzk := dataL.zeta_deg k
+    rw [hkφ, hdeg, hζ01] at hzk
+    have hmul : dataL.d k * (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ)
+        = 1 * (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ) := by
+      rw [one_mul]; exact hzk.symm
+    exact mul_right_cancel₀ hidx_ne hmul
+  -- `φ − ζ_0 ∈ zSupportedSpan 𝓛 A`.
+  have hmem : (φ - dataL.zeta 0) ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan dataL.typeIHyp.Sset dataL.typeIHyp.A := by
+    refine (OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff).mpr
+      ⟨Submodule.sub_mem _ (Submodule.subset_span hφ)
+        (Submodule.subset_span (dataL.zeta_mem_Sset (Ne.symm dataL.ind1H_ne_zero))), ?_⟩
+    have hval : φ - dataL.zeta 0 = dataL.zeta k - dataL.d k • dataL.zeta 0 := by
+      rw [hkφ, hdk1, one_smul]
+    rw [hval]
+    exact dataL.psi_support hG k
+  -- Both sides equal `τ(φ − ζ_0)`.
+  have hR : dataL.coh.extension φ - dataL.coh.extension (dataL.zeta 0)
+      = dataL.typeIHyp.tau (φ - dataL.zeta 0) := by
+    rw [← map_sub]; exact dataL.coh.extends_on_supported _ hmem
+  have hL : typeIBetaL dataL.typeIHyp (dataL.zeta 0) - typeIBetaL dataL.typeIHyp φ
+      = dataL.typeIHyp.tau (φ - dataL.zeta 0) := by
+    simp only [typeIBetaL]
+    rw [← map_sub]
+    congr 1
+    abel
+  rw [hR, hL]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(13.19.c) `β_S`-pairing `φ`-invariance**: `(β_S^τ, φ^{τ₁}) = (β_S^τ, ζ_0^{τ₁})` for any
+degree-`e` member `φ ∈ 𝓛`.  The difference is `(β_S^τ, β_L^τ(ζ_0) − β_L^τ(φ))`
+(`coh_extension_sub_zeta0_eq_typeIBetaL_sub`), and each `(β_S^τ, β_L^τ(ψ))` vanishes by the
+(13.19.a) support disjointness (`typeIBetaL_betaS_disjoint_support`). -/
+theorem tauSbetaGrid_inner_coh_extension_eq_zeta0 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {L : Subgroup G} (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L)
+    (φ : ClassFunction ↥L ℂ) (hφ : φ ∈ dataL.typeIHyp.Sset)
+    (hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ)) :
+    ClassFunction.inner (tauSbetaGrid hG hyp) (dataL.coh.extension φ)
+      = ClassFunction.inner (tauSbetaGrid hG hyp) (dataL.coh.extension (dataL.zeta 0)) := by
+  classical
+  haveI := dataL.kernelIn_normal
+  have hζ01 : dataL.zeta 0 (1 : ↥L) = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ) := by
+    rw [show dataL.zeta 0 (1 : ↥L)
+        = ClassFunction.induce dataL.kernelIn (dataL.θ 0 : ClassFunction _ ℂ) (1 : ↥L) from rfl,
+      dataL.deg0]
+    congr 2
+    show (dataL.typeIHyp.typeI.typeF.H).subgroupOf L = (maxNilpotentNormalHall L).subgroupOf L
+    rw [dataL.typeIHyp.typeI.typeF.H_eq]
+  have hid := coh_extension_sub_zeta0_eq_typeIBetaL_sub hG dataL φ hφ hdeg
+  rw [← sub_eq_zero, ← ClassFunction.inner_sub_right, hid, ClassFunction.inner_sub_right,
+    ClassFunction.inner_eq_zero_of_disjoint_support
+      (Disjoint.symm (typeIBetaL_betaS_disjoint_support hG hyp dataL.typeIHyp _
+        (dataL.zeta_mem_Sset (Ne.symm dataL.ind1H_ne_zero)) hζ01)),
+    ClassFunction.inner_eq_zero_of_disjoint_support
+      (Disjoint.symm (typeIBetaL_betaS_disjoint_support hG hyp dataL.typeIHyp _ hφ hdeg)),
+    sub_zero]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(13.19.c) `β_L`-`η`-pairing `φ`-invariance**: `(β_L^τ(φ), η_{0j}) = (β_L^τ(ζ_0), η_{0j})`
+for any degree-`e` member `φ ∈ 𝓛`.  The difference is `(β_L^τ(φ) − β_L^τ(ζ_0), η_{0j})`, and
+`β_L^τ(φ) − β_L^τ(ζ_0) = ζ_0^{τ₁} − φ^{τ₁}` (`coh_extension_sub_zeta0_eq_typeIBetaL_sub`);
+each coherent image is `⊥ η` ((13.19.b) `coherent_extension_orthogonal_eta_of_mem_Sset`). -/
+theorem typeIBetaL_inner_eta_eq_zeta0 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {L : Subgroup G} (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L)
+    (φ : ClassFunction ↥L ℂ) (hφ : φ ∈ dataL.typeIHyp.Sset)
+    (hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ)) (j : Fin hyp.p) :
+    ClassFunction.inner (typeIBetaL dataL.typeIHyp φ) (hyp.eta ⟨0, hyp.q_prime.pos⟩ j)
+      = ClassFunction.inner (typeIBetaL dataL.typeIHyp (dataL.zeta 0))
+          (hyp.eta ⟨0, hyp.q_prime.pos⟩ j) := by
+  classical
+  have hid := coh_extension_sub_zeta0_eq_typeIBetaL_sub hG dataL φ hφ hdeg
+  have hid' : typeIBetaL dataL.typeIHyp φ - typeIBetaL dataL.typeIHyp (dataL.zeta 0)
+      = dataL.coh.extension (dataL.zeta 0) - dataL.coh.extension φ := by
+    rw [show (typeIBetaL dataL.typeIHyp φ - typeIBetaL dataL.typeIHyp (dataL.zeta 0))
+        = -(typeIBetaL dataL.typeIHyp (dataL.zeta 0) - typeIBetaL dataL.typeIHyp φ) from
+          (neg_sub _ _).symm,
+      ← hid, neg_sub]
+  rw [← sub_eq_zero, ← ClassFunction.inner_sub_left, hid', ClassFunction.inner_sub_left,
+    coherent_extension_orthogonal_eta_of_mem_Sset hG hyp dataL _
+      (dataL.zeta_mem_Sset (Ne.symm dataL.ind1H_ne_zero)) _ _,
+    coherent_extension_orthogonal_eta_of_mem_Sset hG hyp dataL _ hφ _ _, sub_zero]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(13.19.c) case (c1) bound**: if `bSphi = (β_S^τ, ζ_0^{τ₁}) ≠ 0` (the S-parity is odd),
+then `(|H| − 1)/e ≤ (u − 1)/q`.  The `Γ_S = betaGrid`-residual expands over `𝓛^{τ₁}` with the
+`ν(ζ_i)`-coefficient `(Γ_S, ν(ζ_i)) = bSphi·d_i` (general disjoint support + coherence
+agreement); the (13.18.d) `η`-orthogonal norm bound `‖X‖² ≤ (u − 1)/q` on the projection
+`X = bSphi·Σ d_i ν(ζ_i)` then gives `bSphi²·Σ d_i² ≤ (u − 1)/q` with `Σ d_i² = (|H| − 1)/e`
+(`degree_sum_star`) and `bSphi² ≥ 1`.  Mirror of the M-side `bessel_bound_of_inner_beta_zeta_ne_zero`
+(S16_PairingBessel).  **Roadmap step 4 (issue 2038): remaining isolated obligation.** -/
+theorem typeI_caseC_bound_c1 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {L : Subgroup G} (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L) (nS : ℤ)
+    (hnS : ClassFunction.inner (tauSbetaGrid hG hyp) (dataL.coh.extension (dataL.zeta 0))
+        = (nS : ℂ))
+    (hnS0 : nS ≠ 0) :
+    (((Nat.card ↥dataL.typeIHyp.H - 1 : ℕ) : ℚ)
+        / (((maxNilpotentNormalHall L).subgroupOf L).index : ℚ) ≤
+      ((hyp.u - 1 : ℕ) : ℚ) / (hyp.q : ℚ)) := sorry
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.19.c) S-side dichotomy**: `(Γ_S, φ^{τ₁}) + (Γ_L, η_{01}) ≡ 1 (mod 2)` (from
 `0 = (β_L^τ, β_S^τ)` via (13.19.a)/(13.18.a) and the evenness of `(Γ_L, Γ_S)` ((13.18.c)+(1.1))),
 so one of (c1) `(β_S^τ, φ^{τ₁}) ≡ 1` — in which case (13.18.d) with `Γ_S`'s `𝓛^{τ₁}`-expansion
 bounds `(|H|−1)/e = Σaᵢ² ≤ (u−1)/q` — or (c2) `(β_L^τ, η_{0j}) ≡ 1`, in which case the
-`η`-coefficient parity forces `p ≤ e`.  Isolated obligation (the (13.19) proof body). -/
+`η`-coefficient parity forces `p ≤ e`.
+
+Assembled from the `ζ_0`-based parity core (`typeI_caseC_parity`) and case bounds
+(`typeI_caseC_bound_c1`/`typeI_caseC_bound_c2`) via the two `φ`-invariance bridges
+(`tauSbetaGrid_inner_coh_extension_eq_zeta0`, `typeIBetaL_inner_eta_eq_zeta0`) and the
+row constancy (`typeIBetaL_eta_row_constant`): `Odd (nS + nL)` dispatches to (c1) when `nS`
+is odd, else `nL` is odd and (c2) holds. -/
 theorem typeI_caseC_dichotomy [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {L : Subgroup G} (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L)
@@ -1076,7 +1214,39 @@ theorem typeI_caseC_dichotomy [Finite G]
         ((hyp.u - 1 : ℕ) : ℚ) / (hyp.q : ℚ))) ∨
       ((∀ j : Fin hyp.p, (j : ℕ) ≠ 0 →
         OddIntegerInner (typeIBetaL dataL.typeIHyp φ) (hyp.eta ⟨0, hyp.q_prime.pos⟩ j)) ∧
-        hyp.p ≤ ((maxNilpotentNormalHall L).subgroupOf L).index) := sorry
+        hyp.p ≤ ((maxNilpotentNormalHall L).subgroupOf L).index) := by
+  classical
+  obtain ⟨nS, nL, hnS, hnL, hodd⟩ := typeI_caseC_parity _hG hyp dataL
+  by_cases hSodd : Odd nS
+  · -- case (c1): the S-pairing `(β_S^τ, φ^{τ₁})` is odd.
+    -- ambient bridge (built before the instance-quantifier `intro`, to avoid re-elaboration).
+    have hbridge : ClassFunction.inner (tauSbetaGrid _hG hyp) (dataL.coh.extension φ) = (nS : ℂ) :=
+      (tauSbetaGrid_inner_coh_extension_eq_zeta0 _hG hyp dataL φ _hφ _hdeg).trans hnS
+    refine Or.inl ⟨⟨nS, hSodd, ?_⟩, typeI_caseC_bound_c1 _hG hyp dataL nS hnS
+      (by rintro rfl; obtain ⟨m, hm⟩ := hSodd; omega)⟩
+    intro _ _
+    convert hbridge using 2 <;> first | rfl | exact Subsingleton.elim _ _
+  · -- case (c2): `nS` even, so `nL` is odd and `p ≤ e`.
+    have hLodd : Odd nL := by
+      rw [Int.not_odd_iff_even] at hSodd
+      obtain ⟨a, ha⟩ := hSodd
+      obtain ⟨b, hb⟩ := hodd
+      exact ⟨b - a, by omega⟩
+    have hnL0 : nL ≠ 0 := by rintro rfl; obtain ⟨m, hm⟩ := hLodd; omega
+    -- ambient bridge: `(β_L^τ(φ), η_{0j}) = nL` for every `j ≠ 0` (row constancy + `φ`-invariance).
+    have hbridge : ∀ j : Fin hyp.p, (j : ℕ) ≠ 0 →
+        ClassFunction.inner (typeIBetaL dataL.typeIHyp φ) (hyp.eta ⟨0, hyp.q_prime.pos⟩ j)
+          = (nL : ℂ) := by
+      intro j hj
+      rw [typeIBetaL_eta_row_constant _hG hyp dataL.typeIHyp φ _hφ _hdeg j
+          ⟨1, by have := hyp.three_le_p; omega⟩ hj (by norm_num),
+        typeIBetaL_inner_eta_eq_zeta0 _hG hyp dataL φ _hφ _hdeg
+          ⟨1, by have := hyp.three_le_p; omega⟩]
+      exact hnL
+    refine Or.inr ⟨fun j hj => ⟨nL, hLodd, ?_⟩,
+      typeI_caseC_bound_c2 _hG hyp dataL nL hnL hnL0⟩
+    intro _ _
+    convert hbridge j hj using 2 <;> first | rfl | exact Subsingleton.elim _ _
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.19.c) T-side dichotomy** (S↔T swapped): the `typeI_caseC_dichotomy` instance at
