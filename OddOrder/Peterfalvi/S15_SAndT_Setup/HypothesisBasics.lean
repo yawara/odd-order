@@ -1,4 +1,6 @@
 import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+import OddOrder.Peterfalvi.S11_ImprimitiveUBound
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
 
 /-!
 # TAIL
@@ -867,6 +869,66 @@ theorem Hypothesis.toTypesIIIIIIVSetupS_cSub_eq_C [Finite G]
 
 
 
+/-- **Peterfalvi (13.2.c)/(9.7): the `u`-bound `u ≤ (p^q − 1)/(p − 1)` for the type-`P₂`
+member `S`**, unconditionally.  This is the honest discharge of `basic_structure_gated.u_bound`
+(Pf (13.2.c), issue 9000 lane-b cite / 2038 HUB ruling): lane a proved the unconditional §9/§11
+bound `S11.u_le_cyclotomicQuotient` (`chars.u ≤ (chief.p^data.q − 1)/(chief.p − 1)` for *any*
+`Section11CharacterData` on a `TypesIIIIIIVSetup`), and we cite it on the `S`-instance
+`toTypesIIIIIIVSetupS` after discharging the three identifications:
+* `data.q = q` (`|W₁| = q`, `q_eq_card_W1`);
+* `chief.p = p` (the chief prime, forced by `|P| = p^q = chief.p^q · |N|`);
+* `chars.u = u` (the `U`-action image `|Ū| = [U : C_U(P)] = |U|/|C| = uc/c = u`, via the proven
+  `relIndex_cSub_U_eq_u` `[U : C] = chars.u` and `cSub = C`, `card_U_eq_uc`).
+**Ungated** — depends only on `S11.u_le_cyclotomicQuotient` (proven, Clifford dichotomy) and the
+`S`-instance identities, not on the (11.9) `typeP_Galois` character body. -/
+theorem Hypothesis.u_le_cyclotomicQuotient [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    hyp.u ≤ (hyp.p ^ hyp.q - 1) / (hyp.p - 1) := by
+  classical
+  haveI := hyp.finiteG
+  obtain ⟨chief, _⟩ :=
+    OddOrder.Peterfalvi.S11.exists_chiefFactorData hG (hyp.toTypesIIIIIIVSetupS hG)
+  haveI := chief.N_normal
+  -- (i) the `S`-instance chief factor `q` equals `q = |W₁|`.
+  have hq : (hyp.toTypesIIIIIIVSetupS hG).q = hyp.q := by
+    change Nat.card ↥hyp.Sdata.W1 = hyp.q
+    rw [hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1]
+  -- (ii) the chief prime `chief.p = p`, from `|P| = p^q = chief.p^q · |N|`.
+  have hpp : chief.p = hyp.p := by
+    have hHeq : ((hyp.toTypesIIIIIIVSetupS hG).H : Subgroup G) = hyp.P := by
+      change hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
+    have hcardH : Nat.card ↥(hyp.toTypesIIIIIIVSetupS hG).H = hyp.p ^ hyp.q := by
+      rw [hHeq]; exact hyp.card_P_eq hG hyp.Sdata_W2_eq
+    have hquot := OddOrder.Peterfalvi.S11.chiefFactor_quotient_card chief
+    rw [hq] at hquot
+    have hsplitP := Subgroup.card_eq_card_quotient_mul_card_subgroup chief.N
+    rw [hquot, hcardH] at hsplitP
+    have hdvd : chief.p ∣ hyp.p ^ hyp.q :=
+      dvd_trans (dvd_pow_self chief.p hyp.q_prime.pos.ne') (hsplitP ▸ Dvd.intro _ rfl)
+    exact (Nat.prime_dvd_prime_iff_eq chief.p_prime hyp.p_prime).mp
+      (chief.p_prime.dvd_of_dvd_pow hdvd)
+  -- (iii) the `U`-action image order `chars.u = |Ū| = [U : C] = u`.
+  have hu_eq : (hyp.mkSection11CharacterDataS hG chief).u = hyp.u := by
+    have hc0 : 0 < hyp.c := hyp.c_eq_card_C ▸ Nat.card_pos
+    refine Nat.eq_of_mul_eq_mul_right hc0 ?_
+    have key : (hyp.mkSection11CharacterDataS hG chief).u
+        * Nat.card ↥(OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief)
+        = Nat.card ↥(hyp.toTypesIIIIIIVSetupS hG).U := by
+      rw [← OddOrder.Peterfalvi.S11.relIndex_cSub_U_eq_u (hyp.mkSection11CharacterDataS hG chief)]
+      have h := Subgroup.index_mul_card
+        ((OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief).subgroupOf
+          (hyp.toTypesIIIIIIVSetupS hG).U)
+      rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+        (OddOrder.Peterfalvi.S11.cSub_le_U (hyp.toTypesIIIIIIVSetupS hG) chief)).toEquiv] at h
+    rw [hyp.toTypesIIIIIIVSetupS_cSub_eq_C hG chief, ← hyp.c_eq_card_C,
+      show (hyp.toTypesIIIIIIVSetupS hG).U = hyp.U from hyp.Sdata_U_eq, hyp.card_U_eq_uc] at key
+    exact key
+  -- cite lane a's unconditional bound and rewrite through the three identifications.
+  have hbound :=
+    OddOrder.Peterfalvi.S11.u_le_cyclotomicQuotient (hyp.mkSection11CharacterDataS hG chief)
+  rw [hu_eq, hpp, hq] at hbound
+  exact hbound
+
 /-- **Peterfalvi (13.2.b,c,e)** structural producer: the `M_F`-structure of the type-`P₂` member
 `S`.  Faithful obligation on the §16 σ-structure (`BasicStructureGated` docstring).
 
@@ -874,16 +936,18 @@ theorem Hypothesis.toTypesIIIIIIVSetupS_cSub_eq_C [Finite G]
 * `U_commutative` from the carried `S_U_commutative` (BG Lemma 15.1(b) `typeP_hall_derived_eq_and_abelian`, `U` the `(κ∪σ)'`-Hall, supplied at construction);
 * `P_order` = `|P| = p^q` from `card_P_eq` fed by the carried `Sdata_W2_eq` (the intrinsic dual factor `Sdata.W2 = C_{S'}(W₁#)` equals the abstract `W₂ = K*`, via `typePData_of_kappaHall_hallComplement_W2`).
 
-The `A_0(S)`/`τ_S` clauses are the opaque scaffold Props (`True`).  The two remaining concrete
-residuals are the genuinely upstream σ-structure facts:
-* `P_elementaryAbelian` — Pf (11.7) = `S13_MaximalIII_IV.H_elementaryAbelian` (lane a §11);
-* `u_bound` — Pf (9.7) Singer-field bound `u ∣ (p^q−1)/(p−1)` (lane a §9). -/
+The `A_0(S)`/`τ_S` clauses are the opaque scaffold Props (`True`).  The two former concrete
+residuals are now **genuine** (both discharged ungated on the `S`-instance `toTypesIIIIIIVSetupS`):
+* `P_elementaryAbelian` — Pf (11.7), from the §11 chief factor `P = S_F` (`H₀ = ⊥`), via
+  `Hypothesis.P_elementaryAbelian`;
+* `u_bound` — Pf (9.7) `u ≤ (p^q−1)/(p−1)`, via `Hypothesis.u_le_cyclotomicQuotient`
+  (cites the proven unconditional `S11.u_le_cyclotomicQuotient`; issue 9000 lane-b cite). -/
 noncomputable def basic_structure_gated [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) : BasicStructureGated hyp where
   U_commutative := hyp.S_U_commutative
   P_elementaryAbelian := hyp.P_elementaryAbelian hG
   P_order := hyp.card_P_eq hG hyp.Sdata_W2_eq
-  u_bound := sorry
+  u_bound := hyp.u_le_cyclotomicQuotient hG
   A0S_TI := True
   A0S_TI_holds := trivial
   tauS_eq_induction := True
