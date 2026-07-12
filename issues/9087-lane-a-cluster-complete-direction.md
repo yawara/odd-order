@@ -113,3 +113,39 @@ cleanly-separable** (dup risk なし) と hub が確認。この 3 点が揃う�
 honest route (`S_not_coherent_unconditional` cite) で閉じて spine bare-sorry-free を達成せよ。
 foundational commit aec0d595 は保全。**⚠ size watch**: S13_CoreStructure が 1671 行 (>1500) —
 (10.8) 作業 settle 後に hub が分割 (issue 0110、a は当面気にせず frontier 継続でよい)。
+
+---
+
+## ✅ UPDATE (2026-07-13, lane a): 型III/IV char-core headline 完遂 → 次方向 hub 裁定要請
+
+本 session で lane-a の型III/IV char-core の 2 大 frontier を honest・axiom-clean 完遂:
+1. **型V排除 (Peterfalvi 10.10)** — (6.5) gates 3 本 + typeV_forces_coherence_v2 +
+   no_typeV_maximal_unconditional (issue 9089、six-two chain htype/chief-free 一般化 + hcoh
+   irreducibility bridge)。
+2. **`card_kappaHall_lt_of_isTypeIIIorIV` axiom-clean** (issue 1025 完了) — 2 legacy leaf sorry
+   (typeV_forces_coherence / typeII_coherence_contradiction_estimate) を clean heir へ rewire
+   (isTypeIIIorIV_unconditional 作成 + 40 dirty optParam default → explicit-param+wrapper)。
+   全て #print axioms + AxiomsCheck で検証済 (commit 6ce607ce/0a6d9c91/a9fbccfa/e21c9acb 他)。
+
+⚠ **途中の診断誤り訂正**: spine dirty root を一時 (9.11) sibleyTarget と誤判定 (9090) → authoritative
+#print axioms 再検証で off-spine と確定・撤回 (真 root = 上記 2 legacy、9091)。教訓 = memory
+[[verify-which-sorry-via-print-axioms-not-metaprogram]] (#print axioms は sorry 有無のみ; 自作
+reachability metaprogram は under-count)。
+
+### lane-a S09-S13 残 sorry census (10 個、全て非-genuine-frontier or 別クラスタ)
+- **off-path 凍結**: S09 `card_G0_lower_bound` (7.10、0044 で凍結)。
+- **legacy (clean heir 有、import-DAG 保持で意図的)**: `typeV_forces_coherence` (S12_MaximalIII_IV_V)、
+  `typeII_coherence_contradiction_estimate`/legacy `S_not_coherent` (S12_MaximalBasic)。
+- **vestigial (consumer 0、旧 packaging)**: S13_CoreStructure 3 (1027 で確定)。
+- **do-not-fill unsound (off-spine)**: `sibleyTarget_H0C` (Coherence911、7001)。
+- **genuine 候補だが型III/IV char-core と別クラスタ**: S12 `exists_typeIICrossIsometryData` (**type-II**
+  cross-isometry、typeII_HU_frobenius へ供給)、S10 `bgTheoremE_cover_data` (**BG §16**)。
+
+### hub への frontier 裁定要請
+型III/IV char-core は完遂ゆえ、次の lane-a 方向を裁定されたい:
+- (a) 上記 type-II 候補 (`exists_typeIICrossIsometryData`) を lane-a が engage (on-path type-II、
+  文書順で type-III/IV の隣) するか、
+- (b) feitThompson 残 ~23 leaf (cross-lane §14/§15/§16 T-side + type-P2) のうち lane-a 割当分があるか、
+- (c) 別クラスタへ reallocation か。
+CLAUDE.md「frontier 枯渇・方向・reallocation は hub 裁定」に従い surface (9087 前例の premature 宣言を
+避け、genuine 候補を明示)。lane-a は裁定待ちの間 best-available (type-II 候補の上流精査) を継続可。
