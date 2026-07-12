@@ -185,7 +185,32 @@ Hypothesis (11.2) (M maximal, type III/IV)、ζ ∈ 𝒮(HC):
    ⟹ IsMulCommutative U ⟹ ¬TypeIV。⚠ TypeIVData.typeP ≠ hyp.typeP — U の conjugacy
    独立性 bridge 要 (MaximalSubgroupTypeConj の TypePData.conj 機構を確認)。
 
-### iter11 深掘り: (5.5) 単独では不足 — t=0 退化の排除が要
+### ★ u=a pin 完全証明 (iter12, 2026-07-12): `caseA_u_eq_a_of_residual_not_orthogonal`
+
+**landed** (S13_NonGaloisExclusion.lean 新 leaf、sorry-free、build green): caseA + ζ/h118 下で
+`(mkSection11CharacterData …).u = caseA.a`。設計は iter10-11 の (5.5)+conj-対合 route を
+**dichotomy trick で強化**したもの:
+- **J3 の解決**: `extension_mapRingEquiv_comm` は S⊆既約を要求し μ (可約) に不適用 — 代わりに
+  `by_contra u≠a` (→ m := u/a ≥ 2) 分岐で **conj-等変性が整除からタダで出る**:
+  次数-0 の ζd := qa•μ − qu•λ は A₀-supported → c は τ に一致 → `tau_mapRingEquiv_comm` で
+  qa·D = qu·D′ (D := conj(cμ)−c(μ̄)、D′ := conj(cλ)−c(λ̄))。D の R-grid 係数 ∈ {−1,0,1}、
+  右辺は m≥2 の倍数 (D′∈ZIrr の整数係数) ⟹ **全係数 0**。μ̄-側の (5.5)/dispatcher/columnSum
+  単射性は一切不要 (相補性 f_p = e_p−1 は μ-側 image_eq から)。
+- **J4**: certainTypeRImage_conj (J0/J2) + rowInv_zero + J∘J=id で
+  [R(Jp)∈E]+[R p∈E]=1 → p=(false,0) で exactly-one。
+- **t=±1**: (11.9.a) 行0射影 + 世界橋 certainTypeOmegaSigma_muColumnChar_eq_aligned
+  (χ₂⁻¹-列は新 helper `exists_muColumnChar_inv` の kinv 経由) → t = ±δ = ±1。
+- **pin**: ψ = μ − m•λ (deg 0) の Dade pairing 0 = t − m·s → m ∣ 1 ✗ m≥2。∎
+- 新 helper (S12、axiom-clean・AxiomsCheck 登録済): `muColumnChar_zero`、
+  `exists_muColumnChar_inv`。keystone 本体は `coherent_sOf_H0C` 経由で lane-b (9.11.2)
+  refuter sorry を推移 cite (sorried-cite 規約; 着地時に AxiomsCheck 登録)。
+- P1 の λ existence/a∣u は前 iteration で landed (`caseA_exists_irreducible_qa`/`caseA_a_dvd_u`)。
+
+**残り (P3 続き)**: u=a → 非Galois 矛盾の組立 (q∣u−1 landed + a∣p−1 + u=a ⟹ q≤p−2<p vs
+(11.9.b) p<q) → caseB 帰結 → Ū cyclic + C=U′ ⟹ U cyclic (nilpotent+cyclic-ab gap) →
+IsMulCommutative U → ¬TypeIV → `isTypeIII_of_isTypeIIIorIV`。
+
+### iter11 深掘り (歴史): (5.5) 単独では不足 — t=0 退化の排除が要
 
 `certainTypeR.imageSet` = **2w₁ 員** (χ₂-半分 ±δ·ω^σ_{χ₂,i} と χ₂⁻¹-半分、
 `certainTypeRImage`、image_eq: τ(μ−μ̄) = Σ 全体)。(5.5) は c μ_j = Σ_E (|E|=w₁) までで、
