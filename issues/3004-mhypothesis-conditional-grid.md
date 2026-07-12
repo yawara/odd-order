@@ -1208,3 +1208,44 @@ feature commits: `0d8ec0f4` (hclassify), `406e5983` (keystone)。
     coordinatewise 仮定なので使わず inline)。
 (ii) TTypeII 局所 context の hrefute (S13 noncoherence) / hM2 / hHcard / hV / ζ 対応を
     discharge して `hnotZeroRowProjection` sorry を close。
+
+## ✅ lane-c (11.8) endpoint 着地: `T_typeIII_ratio_le` local-sorry-free (2026-07-12, commit 97a7a596)
+
+続行 9 の「endpoint transport 組立 (i)+(ii)」を実装し、`T_typeIII_ratio_le` の最後の
+local `sorry` (`hnotZeroRowProjection` = Coq (11.8) `FTtype34_not_ortho_cycTIiso`) を解消した。
+
+- **TGapGridAlignment** `member_residual_not_orthogonal_eta_of_refuter`: canonical
+  `member_residual_not_orthogonal_H0C_of_refuter` を global σ/η grid equality
+  (`alignedOmegaSigmaGrid_eq_alignedOmegaEtaGrid`) + product pointer injectivity +
+  zero-column lemma で η grid へ transport (Σ_{i'} grid_{i'0} = Σ_{j'} η_{0j'})。
+- **TGapPrimeTI**: `..._with_norm_anchor_orthogonality_and_galois` に `ν₀ = Ind_{T'}^T 1`
+  conjunct を追加 (`..._galois_and_eq_induce` から伝播)、himage anchor 入力に供給。
+- **TGapNonorthogonality**: `s12Tau_zeroColumn_sub_eq_tSideDadeMap` の結論から `let hyp12 :=`
+  を除去 (explicit form、defeq、consumer の zeta 摩擦解消)。
+- **TTypeII**: endpoint 配線。refuter は in-DAG legacy `S13.S_H0C_not_coherent`
+  (unconditional heir `S_H0C_not_coherent_unconditional` は `S12_Noncoherence` が S16 を
+  transitively import する back-edge の先ゆえ TTypeII からは cycle で到達不可)。
+  local `haveI` `Fintype`/`Invertible` diamond (opaque fvar、scoped `S12.FiniteInduce.*` と
+  defeq だが unify 不能) を各 interface で `Subsingleton.elim` 橋渡し (induce/tSideDadeMap/inner)。
+
+merge main (21674aef) 後の full build **4177 jobs green・AxiomsCheck exit 0**、新 axiom・
+sorry regression なし。TTypeII 残 local `sorry` は `T_not_isTypeIV_of_isTypeP1` の `hVcomm` のみ。
+
+### 🧭 HUB 宛: `hVcomm` (Type-IV 排除) の cross-lane discharge は DAG-blocked
+
+lane a が (11.9.c) Type-IV 排除を landing し、`S13_NonGaloisExclusion.lean:996-998` で
+「`hVcomm` residual は `not_isTypeIV_of_mem_maximalSubgroups hG hyp.base.T_maximal` で discharge」
+と明記している。しかし独立検証の結果、**`S13_NonGaloisExclusion` は S16 全体 (TTypeII 含む) を
+transitively import** しており (closure に TTypeII 在り)、TTypeII から cite すると **file-level
+cycle**。低レベル補題 `U_isMulCommutative_of_hypothesis` / `not_isTypeIV_of_hypothesis` /
+`isMulCommutative_typePData_U_of_typePData_U` / `U_isCyclic_of_hypothesis` 自体は S16 を使わない
+(lemma-level では非循環) が、同 file が S16 上流ゆえ全て到達不可。
+
+`T_not_isTypeIV_of_isTypeP1` / `T_isTypeIII_of_isTypeP1` の consumer は TTypeII 内のみ
+(`T_typeII` 系の type 判定、:910/:939)。discharge には hub 裁定で:
+- **(A)** a が低レベル (11.9.c) U-abelian 補題群を S16 より**下**の file へ分離 → TTypeII が
+  `U_isMulCommutative_of_hypothesis` 相当を cite して `hVcomm` を実証明、または
+- **(B)** FT spine の Type 判定 consumer を a の `not_isTypeIV_of_mem_maximalSubgroups` /
+  `isTypeIII_of_hypothesis` へ redirect し、TTypeII の `T_not_isTypeIV_of_isTypeP1` /
+  `T_isTypeIII_of_isTypeP1` を obsolete 化 (S16 downstream で discharge)。
+のいずれか。lane c 単独では不可 (a の file 構成 or spine 再配線を要す)。

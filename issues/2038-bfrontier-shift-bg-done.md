@@ -2026,3 +2026,81 @@ full build 4173 jobs green、AxiomsCheck OK。
   `NuGridSupplyData (hyp)` + sorried producer (signature = mu-field 群の精密 mirror)。
   (2) `HypothesisSwap.lean` — swap constructor (~85 fields) + transport lemmas。
   (3) col_constant = row @ swap。(4) caseC (S-side 本体、Coq :2078-2185)。(5) caseC_dual = @ swap。
+
+## ✅✅ (2026-07-12、/loop iter 27) — (13.19.c) parity core `typeI_caseC_parity` 完全証明 (commit 4b33bc99)
+
+(13.19) grid 全体が唯一の深い義務 `typeI_caseC_dichotomy` (S15_SAndT.lean、sorry) に還元済み
+(iter 26 以降の swap 実装で col_constant/caseC_dual は transport 済)。本 iter でその**核**を landing:
+
+- **bridge `typeIBetaL_zeta0_eq_h78_beta`**: `β_L^τ(ζ_0) = (dataL.h78 hG).beta` (distinguished
+  member ζ_0 = dataL.zeta 0)。⟹ β_L 側は §7.8 の `betaDecomp`/`delta`/`normEstimates` 機械が直接適用可。
+  設計 = **option B** (caseC を任意 φ でなく ζ_0 で扱う; c-lane ComparingLM が既に (dataL.h78).beta を消費中で整合)。
+- **`typeI_caseC_parity`** (Coq `odd_bSphi_bLeta`): `∃ nS nL, ⟨β_S^τ,ζ_0^τ₁⟩=nS ∧ ⟨β_L^τ,η_01⟩=nL ∧ Odd(nS+nL)`。
+  `0=⟨β_L^τ,β_S^τ⟩` (disjoint支持) を β_L^τ=1−ζ_0^τ₁+Δ_L (delta) / β_S^τ=1−η_01+Γ_S (gammaGrid_defGamma)
+  で展開 + ⟨Δ_L,Γ_S⟩ even (`cfdot_real_vchar_even`: Δ_L real=`delta_isReal`=beta_conj_sub+coherence_extension_conj、
+  Γ_S real=`gammaGrid_real`、両 ⊥1)。
+
+### 残 = dichotomy 組立 (c1/c2 の bound 2 本) — 次 iter roadmap (全部品所在確定)
+
+parity core 出力 `Odd(nS+nL)` → nS odd XOR nL odd。
+- **nS odd → 左枝 (c1)**: `OddIntegerInner β_S ζ_0^τ₁` (parity から) ∧ **(|H|−1)/e ≤ (u−1)/q**。
+  bound = Γ_S を span(τ₁𝓛) へ orthogonal_split → 射影 X=bSphi·Σ a_ψ τ₁ψ →
+  `gammaGrid_Y_norm_bound` (Y:=X ⊥ η、(13.18.d)) で ‖X‖²≤(u−1)/q → bSphi²≥1 →
+  Σa²≤(u−1)/q、Σa²=(|H|−1)/e は `degree_sum_star`/`card_index_mul_sum_induced_family_degree_sq`。
+  近縁実装 = `bessel_bound_of_inner_beta_zeta_ne_zero` (S16_PairingBessel:421、M-side 版) を S-side に翻案。
+- **nL odd → 右枝 (c2)**: (∀j≠0 `OddIntegerInner β_L η_0j`、row constancy `typeIBetaL_eta_row_constant` で
+  nL odd を全 j へ) ∧ **p ≤ e**。bound = betaDecomp X=Γ (‖X‖²≤e−1 = `normEstimates.gamma_norm_sq_le
+  (smallIndex)`) の η-content: ⟨X,η_0j⟩=bLeta (beta_eq+row-const+⊥η/⊥1) → Bessel `‖X‖²≥Σ_{j≠0}|⟨X,η_0j⟩|²
+  =(p−1)·bLeta²≥p−1` → p−1≤‖X‖²≤e−1 → p≤e。要 orthonormal Bessel (mathlib/repo 要確認、cfnormDd 経由)。
+
+⚠ **import 追加要**: c1/c2 は `normEstimates`/`smallIndex`/`degree_sum_star`/`complementIndex_eq` =
+S16_PairingBessel 定義 (現 S15_SAndT 未 import、cycle 無し確認済)。次 iter 冒頭で
+`import OddOrder.Peterfalvi.S16_PairingBessel` 追加。full build 4173 green (parity core、純 additive)。
+
+## ✅✅ (2026-07-12、/loop iter 28) — (13.19.c) case (c2) bound `typeI_caseC_bound_c2` (p≤e) 完全証明 (commit 583d2aa0)
+
+parity core (iter 27) に続き c2 bound を landing (Bessel bridge `sum_rat_weights_le_of_orthogonal_integer_decomposition`
+を p−1 個 orthonormal η_0j で適用、‖Γ_L‖²≤e−1 = normEstimates.gamma_norm_sq_le)。import S16_PairingBessel 追加。
+
+### 残 = (13.19.c) dichotomy 組立 + c1 bound。次 iter 精密 roadmap (全設計確定):
+
+**設計洞察 (重要)**: dichotomy は **φ-generic のまま組める** (producer 改修不要):
+`⟨β_S^τ, φ^{τ₁}⟩ = bSphi` は degree-e φ ∈ Sset で **φ-invariant** — `⟨β_S^τ, (φ−ζ_0)^{τ₁}⟩ = ⟨β_S^τ, τ(φ−ζ_0)⟩ = 0`
+(φ−ζ_0 degree-0 A(L)-supported → coherence agreement で τ₁=τ、**一般 disjoint support**で消滅)。
+同様 `⟨typeIBetaL φ, η_0j⟩ = ⟨h78.beta, η_0j⟩` φ-invariant (bridge `typeIGrid_betaL_inner_eta_eq_h78_beta`
+既存 or 自作)。⟹ parity (ζ_0) + φ-invariance で任意 φ の dichotomy 成立。
+
+**要 infra (c1 と共通の鍵)** = **一般 disjoint support** `⟨tauSbetaGrid, dataL.typeIHyp.tau ζ⟩ = 0`
+(ζ.support ⊆ supportInSubgroup(typeIA))。既存 `typeIBetaL_support_subset_dadeSupport` (support⊆dadeSupport) +
+`typeIBetaL_dadeS_betaGrid_disjoint_support` (dadeSupport ⊥ β_S) を **任意 supported ζ に一般化** (proof 同型:
+dadeIntegralCharacterMap_apply_of_support + map_eq_zero_of_not_mem_dadeSupport + typeI_dadeSupport_avoids_regular)。
+
+**c1 bound** `typeI_caseC_bound_c1` (nS odd → (|H|−1)/e ≤ (u−1)/q) = singleton Bessel (mirror
+`bessel_bound_of_inner_beta_zeta_ne_zero`、PairingBessel:421): v=Σ d_i ν(ζ_i)、Y=bSphi·v、
+Γ_S = (Γ_S−Y)+Y、Y⊥η、‖Y‖²=bSphi²·Σd² ≤ (u−1)/q (`gammaGrid_Y_norm_bound`)、bSphi²≥1、
+Σd²=(|H|−1)/e (`degree_sum_star`/`card_index_mul_sum_induced_family_degree_sq`)。
+key = **⟨Γ_S, ν(ζ_i)⟩ = bSphi·d_i** (一般 disjoint support で ⟨β_S^τ, ν(ζ_i)−d_i ν(ζ_0)⟩=0、
+ν(ζ_i)−d_i ν(ζ_0)=τ(ζ_i−d_i ζ_0) coherence agreement `hagree`)。
+
+**組立順** (次 iter): (1) 一般 disjoint support helper、(2) β_S pairing φ-invariance + β_L η φ-invariance、
+(3) c1 bound (sorried skeleton → 後で埋め)、(4) dichotomy = parity(ζ_0) + φ-invariance + c1 + c2 +
+row constancy。**full build 4173 green** (parity core + c2、純 additive)。⚠ S15_SAndT 1467 行 (1500 gate 接近、
+dichotomy 完成後に frozen typeIBetaL cluster を上流 leaf へ prefix-split)。
+
+### 精緻化 (iter 28 続): assembly の φ-invariance は一般 disjoint support **不要**
+
+**β_S pairing φ-invariance** `⟨β_S^τ, φ^{τ₁}⟩ = ⟨β_S^τ, ζ_0^{τ₁}⟩ (= bSphi)`:
+`φ^{τ₁} − ζ_0^{τ₁} = coh.ext(φ−ζ_0) = τ(φ−ζ_0) = typeIBetaL ζ_0 − typeIBetaL φ` (coh.ext/τ 線形 map_sub +
+extends_on_supported)、`⟨β_S^τ, typeIBetaL ψ⟩ = 0` (既存 `typeIBetaL_betaS_disjoint_support` +
+inner_eq_zero_of_disjoint_support、ψ=φ/ζ_0 両方 Sset degree-e)。⟹ 差 = 0−0 = 0。
+**β_L η φ-invariance** `⟨typeIBetaL φ, η_0j⟩ = ⟨typeIBetaL ζ_0, η_0j⟩`: 差 = ⟨τ(ζ_0−φ), η_0j⟩ =
+⟨coh.ext(ζ_0−φ), η_0j⟩ = 0 (coherent image ⊥ η)。技法 = `typeIGrid_betaL_inner_eta_eq_h78_beta`
+(CoherentEtaOrthogonality:330、S16 downstream ゆえ import 不可だが proof mirror 可) の map_sub+extends_on_supported+hagree。
+⚠ support-of-diff `(φ−ζ_0).support ⊆ supportInSubgroup(typeIA)` = φ=Ind θ_φ (degree-1、φ(1)=index=e·θ_φ(1)→θ_φ(1)=1)
+を unpack して `induce_diff_support` 系。**⟹ 一般 disjoint support は c1 bound の係数 `⟨Γ_S,ν(ζ_i)⟩=bSphi·d_i` のみが要**
+(ζ_i−d_i ζ_0 は Ind1 非経由ゆえ typeIBetaL 差に還元不可 → 真に一般形要)。
+
+**次 iter 実装順**: (1) β_S/β_L φ-invariance helper 2 本 (既存 infra + map_sub、~40行)、(2) c1 sorried skeleton、
+(3) dichotomy 組立 (parity + φ-invariance + c1 + c2 + row-const、~40行) — **これで monolithic sorry → c1 bound に isolate**。
+(4) 別途 c1 bound = 一般 disjoint support (~40行 refactor: `tauImage_support_subset_dadeSupport` 抽出 +
+`typeIBetaL_dadeS_betaGrid_disjoint_support` を一般化) + coefficient + singleton Bessel。

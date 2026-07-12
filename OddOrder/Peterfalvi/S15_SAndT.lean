@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S15_BridgeCharacter
 import OddOrder.Peterfalvi.S16_PairingCoherence
+import OddOrder.Peterfalvi.S16_PairingBessel
 import OddOrder.Peterfalvi.S16_GridExpansion
 
 /-!
@@ -727,17 +728,336 @@ theorem typeIBetaL_eta_row_constant [Finite G]
   convert h using 2
   exact Subsingleton.elim _ _
 
-/-- **(13.19.c), first clause (column form)**: the S↔T-swapped row constancy.  Isolated
-obligation. -/
+/-- **(13.19.c), first clause (column form)**: the S↔T-swapped row constancy — the
+`typeIBetaL_eta_row_constant` instance at `hyp.swap` (Coq's re-instantiation of the section
+with the pair roles interchanged).  The swap's `η`-grid is the transpose, so its row-`0`
+constancy *is* the column constancy of `hyp.eta`; `β_L^τ` is `hyp`-independent, so no
+transport is needed on the left argument.  Takes the (14.9)-conclusional `IsTypeP2 T` (like
+`typeI_caseC_dual_dichotomy`); the reconciled `TypePData T` and the ν-side grid supply come
+from `reconciled_typePData_T` and the `nuGridSupply` pin. -/
 theorem typeIBetaL_eta_col_constant [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
     {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L)
-    (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ typeISetup.Sset) :
+    (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ typeISetup.Sset)
+    (_hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ)) :
     ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
       ∀ (i i' : Fin hyp.q), (i : ℕ) ≠ 0 → (i' : ℕ) ≠ 0 →
         ClassFunction.inner (typeIBetaL typeISetup φ) (hyp.eta i ⟨0, hyp.p_prime.pos⟩)
           = ClassFunction.inner (typeIBetaL typeISetup φ)
-              (hyp.eta i' ⟨0, hyp.p_prime.pos⟩) := sorry
+              (hyp.eta i' ⟨0, hyp.p_prime.pos⟩) := by
+  intro _ _ i i' hi hi'
+  classical
+  obtain ⟨Tdata, hU, hW1, hW2⟩ := reconciled_typePData_T _hG hyp
+  exact typeIBetaL_eta_row_constant _hG
+    (hyp.swap hT2 Tdata hU hW1 hW2 (hyp.nuGridSupply _hG))
+    typeISetup φ _hφ _hdeg i i' hi hi'
+
+/-! #### (13.19.c) dichotomy — the isolated deep obligation
+
+We prove `typeI_caseC_dichotomy` for the **distinguished coherent-family member** `ζ_0 = dataL.zeta 0`
+(so the §7.8 `betaDecomp`/`normEstimates` of the bundle apply directly), and pass `ζ_0` as the
+producer's `φ`.  The pieces: the bridge `β_L^τ = (dataL.h78 hG).beta`, the parity core
+`⟨β_S^τ, ζ_0^{τ₁}⟩ + ⟨β_L^τ, η_{01}⟩ ≡ 1 (mod 2)`, and the two case bounds. -/
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Bridge**: `β_L^τ = τ₁(Ind_H^L 1_H − ζ_0)` at the distinguished member `ζ_0 = dataL.zeta 0` is
+literally the §7.8 `beta` of the bundle (`(dataL.h78 hG).beta = τ(Ind_H^L 1_H − ζ_0)`).  Both are
+the Dade image of `Ind_H^L 1_H − ζ_0`; the §9 `Hypothesis71.τ` and the §7 `tau` agree on supported
+inputs (`toHypothesis71_tau_apply`), and `ζ_{ind1H} = Ind_H^L 1_H` (`dataL.triv`). -/
+theorem typeIBetaL_zeta0_eq_h78_beta [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G}
+    (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L) :
+    typeIBetaL dataL.typeIHyp (dataL.zeta 0) = (dataL.h78 hG).beta := by
+  haveI := dataL.kernelIn_normal
+  rw [OddOrder.Peterfalvi.S09.Hypothesis78.beta_def]
+  change dataL.typeIHyp.tau _ = dataL.typeIHyp.toHypothesis71.τ _
+  rw [dataL.typeIHyp.toHypothesis71_tau_apply]
+  apply congrArg dataL.typeIHyp.tau
+  change ClassFunction.induce ((dataL.typeIHyp.H).subgroupOf L)
+      (trivialClassFunction ↥((dataL.typeIHyp.H).subgroupOf L)) - dataL.zeta 0
+    = (dataL.h78 hG).hyp76.zeta (dataL.h78 hG).ind1H
+      - (dataL.h78 hG).hyp76.zeta (dataL.h78 hG).zetaDistinct
+  rw [dataL.h78_ind1H_eq, dataL.h78_zeta_eq, dataL.h78_zetaDistinct_eq, dataL.h78_zeta_eq]
+  congr 1
+  -- `Ind_H^L 1_H = ζ_{ind1H}` (`θ ind1H = 1_H`, `dataL.triv`)
+  change ClassFunction.induce ((dataL.typeIHyp.H).subgroupOf L)
+      (trivialClassFunction ↥((dataL.typeIHyp.H).subgroupOf L))
+    = ClassFunction.induce dataL.kernelIn (dataL.θ dataL.ind1H : ClassFunction _ ℂ)
+  rw [dataL.triv, IrreducibleCharacter.coe_trivialIrreducibleCharacter]
+  rfl
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(13.19.c) parity core** (Coq `odd_bSphi_bLeta`): at the distinguished member `ζ_0`,
+the S-pairing `bSphi = ⟨β_S^τ, ζ_0^{τ₁}⟩` and the `η`-pairing `bLeta = ⟨β_L^τ, η_{01}⟩` are
+integers whose **sum is odd**.  From `0 = ⟨β_L^τ, β_S^τ⟩` (disjoint support (13.19.a)),
+`β_L^τ = 1 − ζ_0^{τ₁} + Δ_L` (the §7.8 residual `delta`), `β_S^τ = 1 − η_{01} + Γ_S`
+((13.18.c) `gammaGrid_defGamma`), and `⟨Δ_L, Γ_S⟩` even (`cfdot_real_vchar_even`: both real
+virtual characters orthogonal to `1_G`). -/
+theorem typeI_caseC_parity [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {L : Subgroup G} (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L) :
+    ∃ nS nL : ℤ,
+      ClassFunction.inner (tauSbetaGrid hG hyp)
+          (dataL.coh.extension (dataL.zeta 0)) = (nS : ℂ) ∧
+        ClassFunction.inner (typeIBetaL dataL.typeIHyp (dataL.zeta 0))
+            (hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)
+          = (nL : ℂ) ∧
+        Odd (nS + nL) := by
+  classical
+  -- Abbreviations (kept as explicit terms to avoid `set`-fold clashes with lemma outputs).
+  have hj1lt : (1 : ℕ) < hyp.p := by have := hyp.three_le_p; omega
+  -- `ζ_0^{τ₁} = ν(ζ_0)` (definitional bridge).
+  have hνζ : (dataL.h78 hG).nu ((dataL.h78 hG).hyp76.zeta (dataL.h78 hG).zetaDistinct)
+      = dataL.coh.extension (dataL.zeta 0) := rfl
+  -- ZIrr memberships.
+  have hζextZ : dataL.coh.extension (dataL.zeta 0) ∈ OddOrder.RepresentationTheory.ZIrr G :=
+    dataL.coh.extension_mem_ZIrr _
+      (Submodule.subset_span (dataL.zeta_mem_Sset (Ne.symm dataL.ind1H_ne_zero)))
+  have hΓSZ : GammaGrid hG hyp ∈ OddOrder.RepresentationTheory.ZIrr G := gammaGrid_mem_ZIrr hG hyp
+  have hβLZ : (dataL.h78 hG).beta ∈ OddOrder.RepresentationTheory.ZIrr G :=
+    (dataL.h78 hG).beta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible
+      (dataL.h78_ind_mem_ZIrr hG) (dataL.h78_zeta_irreducible hG)
+  have hη01Z : hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, hj1lt⟩ ∈ OddOrder.RepresentationTheory.ZIrr G :=
+    OddOrder.Peterfalvi.S16.eta_mem_ZIrr hyp _ _
+  -- `β_S^τ = Γ_S + 1 − η_{01}`  ((13.18.c) `gammaGrid_defGamma`).
+  have hβSdecomp : tauSbetaGrid hG hyp
+      = GammaGrid hG hyp + OddOrder.Peterfalvi.S09.Hypothesis71.constOne G
+        - hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, hj1lt⟩ := by
+    have h := gammaGrid_defGamma hG hyp ⟨1, hj1lt⟩ (by simp)
+    rw [tauSbetaGrid, ← h]; abel
+  -- `Δ_L = β_L^τ − 1 + ζ_0^{τ₁}`, hence `β_L^τ = 1 − ζ_0^{τ₁} + Δ_L`.
+  have hΔ : (dataL.h78 hG).delta
+      = (dataL.h78 hG).beta - OddOrder.Peterfalvi.S09.Hypothesis71.constOne G
+        + dataL.coh.extension (dataL.zeta 0) := by
+    rw [OddOrder.Peterfalvi.S09.Hypothesis78.delta, hνζ]
+  have hβLdecomp : (dataL.h78 hG).beta
+      = OddOrder.Peterfalvi.S09.Hypothesis71.constOne G - dataL.coh.extension (dataL.zeta 0)
+        + (dataL.h78 hG).delta := by rw [hΔ]; abel
+  -- The two output integers.
+  obtain ⟨nS, hnS⟩ := OddOrder.RepresentationTheory.ClassFunction.inner_mem_ZIrr_int hΓSZ hζextZ
+  obtain ⟨nL, hnL⟩ := OddOrder.RepresentationTheory.ClassFunction.inner_mem_ZIrr_int hβLZ hη01Z
+  -- `⟨Δ_L, Γ_S⟩` is an even integer  (`cfdot_real_vchar_even`, both real virtual `⊥ 1`).
+  obtain ⟨z, a, b, hz, ha, hb, heven⟩ := cfdot_real_vchar_even hG.odd
+    (dataL.delta_mem_ZIrr hG) (dataL.delta_isReal hG) hΓSZ (gammaGrid_real hG hyp)
+  have hΔ_one : ClassFunction.inner (dataL.h78 hG).delta
+      (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G) = 0 :=
+    (dataL.h78 hG).delta_orth_one (dataL.betaDecomp hG)
+  have hΓS_one : ClassFunction.inner (GammaGrid hG hyp)
+      (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G) = 0 := gammaGrid_orthogonal_one hG hyp
+  have ha0 : a = 0 := by
+    rw [show (trivialIrreducibleCharacter G : ClassFunction G ℂ)
+        = OddOrder.Peterfalvi.S09.Hypothesis71.constOne G from rfl, hΔ_one] at ha
+    exact_mod_cast ha
+  have hb0 : b = 0 := by
+    rw [show (trivialIrreducibleCharacter G : ClassFunction G ℂ)
+        = OddOrder.Peterfalvi.S09.Hypothesis71.constOne G from rfl, hΓS_one] at hb
+    exact_mod_cast hb
+  have hzeven : Even z := by rw [ha0, hb0] at heven; simpa using heven
+  -- vanishing inner products.
+  have hζ_one : ClassFunction.inner (dataL.coh.extension (dataL.zeta 0))
+      (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G) = 0 := by
+    rw [← hνζ]; exact (dataL.h78 hG).zetaImage_orth_one (dataL.betaDecomp hG)
+  have hζ_eta : ClassFunction.inner (dataL.coh.extension (dataL.zeta 0))
+      (hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, hj1lt⟩) = 0 :=
+    coherent_extension_orthogonal_eta_of_mem_Sset hG hyp dataL _
+      (dataL.zeta_mem_Sset (Ne.symm dataL.ind1H_ne_zero)) _ _
+  have h_one_ext : ClassFunction.inner (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G)
+      (dataL.coh.extension (dataL.zeta 0)) = 0 := by
+    rw [OddOrder.Peterfalvi.S09.Hypothesis71.ClassFunction.inner_symm, hζ_one, star_zero]
+  have h_eta_ext : ClassFunction.inner (hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, hj1lt⟩)
+      (dataL.coh.extension (dataL.zeta 0)) = 0 := by
+    rw [OddOrder.Peterfalvi.S09.Hypothesis71.ClassFunction.inner_symm, hζ_eta, star_zero]
+  have hone_eta : ClassFunction.inner (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G)
+      (hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, hj1lt⟩) = 0 := by
+    have h00 : OddOrder.Peterfalvi.S09.Hypothesis71.constOne G
+        = hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨0, hyp.p_prime.pos⟩ := by
+      rw [OddOrder.Peterfalvi.S16.eta_principal_eq_trivial hyp]; rfl
+    rw [h00, OddOrder.Peterfalvi.S16.eta_orthonormal hyp,
+      if_neg (by rintro ⟨-, h2⟩; exact absurd (congrArg Fin.val h2) (by simp))]
+  have hone_one : ClassFunction.inner (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G)
+      (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G) = 1 :=
+    OddOrder.Peterfalvi.S09.Hypothesis71.constOne_inner_self_eq_one
+  -- reversed-direction pieces.
+  have h_one_ΓS : ClassFunction.inner (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G)
+      (GammaGrid hG hyp) = 0 := by
+    rw [OddOrder.Peterfalvi.S09.Hypothesis71.ClassFunction.inner_symm, hΓS_one, star_zero]
+  have h_ζext_ΓS : ClassFunction.inner (dataL.coh.extension (dataL.zeta 0))
+      (GammaGrid hG hyp) = (nS : ℂ) := by
+    rw [OddOrder.Peterfalvi.S09.Hypothesis71.ClassFunction.inner_symm, hnS,
+      star_intCast]
+  -- `⟨Δ_L, η_{01}⟩ = ⟨β_L^τ, η_{01}⟩ = nL`.
+  have hΔ_eta : ClassFunction.inner (dataL.h78 hG).delta
+      (hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, hj1lt⟩) = (nL : ℂ) := by
+    rw [hΔ, ClassFunction.inner_add_left, ClassFunction.inner_sub_left, hone_eta, hζ_eta,
+      sub_zero, add_zero, hnL]
+  -- `⟨β_S^τ, ζ_0^{τ₁}⟩ = ⟨Γ_S, ζ_0^{τ₁}⟩ = nS`.
+  have hbS : ClassFunction.inner (tauSbetaGrid hG hyp) (dataL.coh.extension (dataL.zeta 0))
+      = (nS : ℂ) := by
+    rw [hβSdecomp, ClassFunction.inner_sub_left, ClassFunction.inner_add_left,
+      hnS, h_one_ext, h_eta_ext, add_zero, sub_zero]
+  refine ⟨nS, nL, hbS, by rw [typeIBetaL_zeta0_eq_h78_beta hG dataL]; exact hnL, ?_⟩
+  -- degree of the distinguished member.
+  have hdeg0 : dataL.zeta 0 (1 : ↥L)
+      = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ) := by
+    rw [show dataL.zeta 0 (1 : ↥L)
+        = ClassFunction.induce dataL.kernelIn (dataL.θ 0 : ClassFunction _ ℂ) (1 : ↥L) from rfl,
+      dataL.deg0]
+    congr 2
+    show (dataL.typeIHyp.typeI.typeF.H).subgroupOf L = (maxNilpotentNormalHall L).subgroupOf L
+    rw [dataL.typeIHyp.typeI.typeF.H_eq]
+  -- Parity: `0 = ⟨β_L^τ, β_S^τ⟩ = 1 − nS − nL + z`, hence `nS + nL = 1 + z` is odd.
+  have hdisj : ClassFunction.inner ((dataL.h78 hG).beta) (tauSbetaGrid hG hyp) = 0 := by
+    rw [← typeIBetaL_zeta0_eq_h78_beta hG dataL]
+    exact OddOrder.RepresentationTheory.ClassFunction.inner_eq_zero_of_disjoint_support
+      (typeIBetaL_betaS_disjoint_support hG hyp dataL.typeIHyp _
+        (dataL.zeta_mem_Sset (Ne.symm dataL.ind1H_ne_zero)) hdeg0)
+  have hkey : (0 : ℂ) = 1 - (nS : ℂ) - (nL : ℂ) + (z : ℂ) := by
+    have e := hdisj
+    rw [hβLdecomp, hβSdecomp] at e
+    simp only [ClassFunction.inner_add_left, ClassFunction.inner_sub_left,
+      ClassFunction.inner_add_right, ClassFunction.inner_sub_right] at e
+    rw [hone_one, hone_eta, h_one_ΓS, hζ_one, hζ_eta, h_ζext_ΓS, hΔ_one, hΔ_eta, ← hz] at e
+    linear_combination -e
+  have hInt : nS + nL = 1 + z := by
+    have h2 : ((nS + nL : ℤ) : ℂ) = ((1 + z : ℤ) : ℂ) := by push_cast; linear_combination hkey
+    exact_mod_cast h2
+  rw [hInt]
+  obtain ⟨k, hk⟩ := hzeven
+  exact ⟨k, by omega⟩
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(13.19.c) case (c2) bound**: if `bLeta = ⟨β_L^τ, η_{01}⟩ ≠ 0` (the `η`-parity is odd),
+then `p ≤ e`.  The §7.8 residual `Γ_L = betaDecomp.Gamma` has `⟨Γ_L, η_{0j}⟩ = bLeta` for every
+`j ≠ 0` (from `beta_eq`, row constancy (13.19.c), and `1/ζ_0^{τ₁}/W_L ⊥ η`), so the Bessel
+inequality against `‖Γ_L‖² ≤ e − 1` ((7.8.b) `normEstimates`) over the `p − 1` orthonormal
+`η_{0j}` gives `(p − 1)·bLeta² ≤ ‖Γ_L‖² ≤ e − 1`, hence `p − 1 ≤ e − 1`. -/
+theorem typeI_caseC_bound_c2 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {L : Subgroup G} (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L) (nL : ℤ)
+    (hnL : ClassFunction.inner (typeIBetaL dataL.typeIHyp (dataL.zeta 0))
+        (hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩) = (nL : ℂ))
+    (hnL0 : nL ≠ 0) :
+    hyp.p ≤ ((maxNilpotentNormalHall L).subgroupOf L).index := by
+  classical
+  haveI := dataL.kernelIn_normal
+  have hp0 : (0 : ℕ) < hyp.p := hyp.p_prime.pos
+  -- `e = [L:H]` in the two forms.
+  have he_eq : (dataL.h78 hG).complementIndex = ((maxNilpotentNormalHall L).subgroupOf L).index := by
+    rw [dataL.complementIndex_eq hG]
+    congr 1
+    show (dataL.typeIHyp.typeI.typeF.H).subgroupOf L = (maxNilpotentNormalHall L).subgroupOf L
+    rw [dataL.typeIHyp.typeI.typeF.H_eq]
+  -- degree hypothesis for the row-constancy citation.
+  have hdeg0 : dataL.zeta 0 (1 : ↥L)
+      = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ) := by
+    rw [show dataL.zeta 0 (1 : ↥L)
+        = ClassFunction.induce dataL.kernelIn (dataL.θ 0 : ClassFunction _ ℂ) (1 : ↥L) from rfl,
+      dataL.deg0]
+    congr 2
+    show (dataL.typeIHyp.typeI.typeF.H).subgroupOf L = (maxNilpotentNormalHall L).subgroupOf L
+    rw [dataL.typeIHyp.typeI.typeF.H_eq]
+  -- `Γ_L = β_L^τ − 1 + ζ_0^{τ₁} − a·W_L`.
+  have hΓ_eq : (dataL.betaDecomp hG).Gamma
+      = (dataL.h78 hG).beta - OddOrder.Peterfalvi.S09.Hypothesis71.constOne G
+        + (dataL.h78 hG).nu ((dataL.h78 hG).hyp76.zeta ((dataL.h78 hG).zetaDistinct))
+        - ((dataL.betaDecomp hG).a : ℂ) • (dataL.h78 hG).weightedNuSum := by
+    rw [(dataL.betaDecomp hG).beta_eq]; abel
+  -- `⟨Γ_L, η_{0j}⟩ = nL`  for every `j ≠ 0`.
+  have hXη : ∀ (j : Fin hyp.p), (j : ℕ) ≠ 0 →
+      ClassFunction.inner (dataL.betaDecomp hG).Gamma (hyp.eta ⟨0, hyp.q_prime.pos⟩ j)
+        = (nL : ℂ) := by
+    intro j hj
+    -- `⟨β_L^τ, η_{0j}⟩ = ⟨β_L^τ, η_{01}⟩ = nL`  (row constancy).
+    have hβη : ClassFunction.inner ((dataL.h78 hG).beta) (hyp.eta ⟨0, hyp.q_prime.pos⟩ j)
+        = (nL : ℂ) := by
+      rw [← typeIBetaL_zeta0_eq_h78_beta hG dataL,
+        typeIBetaL_eta_row_constant hG hyp dataL.typeIHyp (dataL.zeta 0)
+          (dataL.zeta_mem_Sset (Ne.symm dataL.ind1H_ne_zero)) hdeg0 j
+          ⟨1, by have := hyp.three_le_p; omega⟩ hj (by simp), hnL]
+    -- `⟨1, η_{0j}⟩ = 0`  (`η_{00} = 1`, orthonormal).
+    have h1η : ClassFunction.inner (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G)
+        (hyp.eta ⟨0, hyp.q_prime.pos⟩ j) = 0 := by
+      rw [show OddOrder.Peterfalvi.S09.Hypothesis71.constOne G
+          = hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨0, hyp.p_prime.pos⟩ by
+        rw [OddOrder.Peterfalvi.S16.eta_principal_eq_trivial hyp]; rfl,
+        OddOrder.Peterfalvi.S16.eta_orthonormal hyp,
+        if_neg (by rintro ⟨-, h2⟩; exact hj (congrArg Fin.val h2).symm)]
+    -- `⟨ζ_0^{τ₁}, η_{0j}⟩ = 0`  (coherent image `⊥ η`).
+    have hζη : ClassFunction.inner
+        ((dataL.h78 hG).nu ((dataL.h78 hG).hyp76.zeta ((dataL.h78 hG).zetaDistinct)))
+        (hyp.eta ⟨0, hyp.q_prime.pos⟩ j) = 0 := by
+      rw [show (dataL.h78 hG).nu ((dataL.h78 hG).hyp76.zeta ((dataL.h78 hG).zetaDistinct))
+          = dataL.coh.extension (dataL.zeta 0) from rfl]
+      exact coherent_extension_orthogonal_eta_of_mem_Sset hG hyp dataL _
+        (dataL.zeta_mem_Sset (Ne.symm dataL.ind1H_ne_zero)) _ _
+    -- `⟨W_L, η_{0j}⟩ = 0`  (each coherent image `⊥ η`).
+    have hWη : ClassFunction.inner ((dataL.h78 hG).weightedNuSum)
+        (hyp.eta ⟨0, hyp.q_prime.pos⟩ j) = 0 := by
+      rw [show (dataL.h78 hG).weightedNuSum
+          = ∑ i ∈ (Finset.univ.erase (dataL.h78 hG).ind1H),
+              ((dataL.h78 hG).hyp76.zeta i (1 : ↥L) /
+                ((dataL.h78 hG).hyp76.zeta ((dataL.h78 hG).zetaDistinct) (1 : ↥L) *
+                  ClassFunction.inner ((dataL.h78 hG).hyp76.zeta i)
+                    ((dataL.h78 hG).hyp76.zeta i))) •
+                (dataL.h78 hG).nu ((dataL.h78 hG).hyp76.zeta i) from rfl,
+        inner_sum_left _ _ _]
+      refine Finset.sum_eq_zero fun i hi => ?_
+      rw [ClassFunction.inner_smul_left,
+        show (dataL.h78 hG).nu ((dataL.h78 hG).hyp76.zeta i)
+          = dataL.coh.extension (dataL.zeta i) from rfl,
+        coherent_extension_orthogonal_eta_of_mem_Sset hG hyp dataL _
+          (dataL.zeta_mem_Sset (by
+            rw [← dataL.h78_ind1H_eq hG]; exact (Finset.mem_erase.mp hi).1)) _ _, mul_zero]
+    rw [hΓ_eq, ClassFunction.inner_sub_left, ClassFunction.inner_add_left,
+      ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, hβη, h1η, hζη, hWη,
+      mul_zero, sub_zero, add_zero, sub_zero]
+  -- Bessel bridge over the `p − 1` orthonormal `η_{0j}` (`j ≠ 0`).
+  set B : Finset (Fin hyp.p) := Finset.univ.erase ⟨0, hyp.p_prime.pos⟩ with hB
+  have hcardB : B.card = hyp.p - 1 := by
+    rw [hB, Finset.card_erase_of_mem (Finset.mem_univ _), Finset.card_univ, Fintype.card_fin]
+  have hbound := (dataL.normEstimates hG).gamma_norm_sq_le (dataL.smallIndex hG)
+  have happly := OddOrder.Peterfalvi.S09.sum_rat_weights_le_of_orthogonal_integer_decomposition
+    (ι := Fin hyp.p) B (fun j => hyp.eta ⟨0, hyp.q_prime.pos⟩ j) (fun _ => nL) (fun _ => (1 : ℚ))
+    ((dataL.betaDecomp hG).Gamma)
+    ((dataL.betaDecomp hG).Gamma
+      - ∑ j ∈ B, (((nL : ℝ) : ℂ)) • hyp.eta ⟨0, hyp.q_prime.pos⟩ j)
+    (((dataL.h78 hG).complementIndex : ℚ) - 1)
+    (by abel)
+    (fun i _ j _ => by
+      rw [OddOrder.Peterfalvi.S16.eta_orthonormal hyp]
+      by_cases hij : i = j
+      · rw [if_pos ⟨rfl, hij⟩, if_pos hij]; norm_num
+      · rw [if_neg (fun h => hij h.2), if_neg hij])
+    (fun j hj => by
+      have hj0 : (j : ℕ) ≠ 0 := by
+        rintro h0; exact (Finset.mem_erase.mp hj).1 (Fin.ext h0)
+      rw [ClassFunction.inner_sub_left, inner_sum_left,
+        Finset.sum_eq_single_of_mem j hj (fun k _ hkj => by
+          rw [ClassFunction.inner_smul_left,
+            OddOrder.Peterfalvi.S16.eta_orthonormal hyp,
+            if_neg (by rintro ⟨-, h2⟩; exact hkj h2), mul_zero]),
+        ClassFunction.inner_smul_left,
+        OddOrder.Peterfalvi.S16.eta_orthonormal hyp, if_pos ⟨rfl, rfl⟩, mul_one,
+        hXη j hj0]
+      push_cast; ring)
+    (fun _ _ => by norm_num)
+    (fun _ _ => hnL0)
+    (by
+      calc (ClassFunction.inner ((dataL.betaDecomp hG).Gamma)
+              ((dataL.betaDecomp hG).Gamma)).re
+          = (dataL.h78 hG).gammaNormSq (dataL.betaDecomp hG) := rfl
+        _ ≤ ((dataL.h78 hG).complementIndex : ℝ) - 1 := hbound
+        _ = (((((dataL.h78 hG).complementIndex : ℚ) - 1 : ℚ)) : ℝ) := by push_cast; ring)
+  -- `∑ 1 = p − 1 ≤ e − 1`, hence `p ≤ e`.
+  rw [Finset.sum_const, hcardB, nsmul_eq_mul, mul_one] at happly
+  have hpe : ((hyp.p : ℚ) - 1) ≤ ((dataL.h78 hG).complementIndex : ℚ) - 1 := by
+    have : ((hyp.p - 1 : ℕ) : ℚ) = (hyp.p : ℚ) - 1 := by
+      rw [Nat.cast_sub hp0]; norm_num
+    rwa [this] at happly
+  rw [← he_eq]
+  have : (hyp.p : ℚ) ≤ ((dataL.h78 hG).complementIndex : ℚ) := by linarith
+  exact_mod_cast this
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.19.c) S-side dichotomy**: `(Γ_S, φ^{τ₁}) + (Γ_L, η_{01}) ≡ 1 (mod 2)` (from
@@ -759,11 +1079,16 @@ theorem typeI_caseC_dichotomy [Finite G]
         hyp.p ≤ ((maxNilpotentNormalHall L).subgroupOf L).index) := sorry
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **(13.19.c) T-side dichotomy** (S↔T swapped): as `typeI_caseC_dichotomy` with
-`β_T`/`v`/`p` in place of `β_S`/`u`/`q`.  Isolated obligation. -/
+/-- **(13.19.c) T-side dichotomy** (S↔T swapped): the `typeI_caseC_dichotomy` instance at
+`hyp.swap` — the swap's `tauSbetaGrid` is definitionally `tauTbetaGrid` (both are the
+`'A0(T)`-Dade image of `Ind_{QW₂}^T 1 − ν_{10}`), its `u/q` are `v/p`, and its `η`-row-`0`
+axis is the `η`-column-`0` axis.  Requires the `Tdata` reconciliations (supplied by the
+producer from `reconciled_typePData_T`), so the swap's `A₀(T)`-carrier matches the one in
+`tauTbetaGrid`'s statement. -/
 theorem typeI_caseC_dual_dichotomy [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T) (Tdata : TypePData hyp.T)
+    (hU : Tdata.U = hyp.V) (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     {L : Subgroup G} (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L)
     (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ dataL.typeIHyp.Sset)
     (_hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ)) :
@@ -773,7 +1098,9 @@ theorem typeI_caseC_dual_dichotomy [Finite G]
         ((hyp.v - 1 : ℕ) : ℚ) / (hyp.p : ℚ))) ∨
       ((∀ i : Fin hyp.q, (i : ℕ) ≠ 0 →
         OddIntegerInner (typeIBetaL dataL.typeIHyp φ) (hyp.eta i ⟨0, hyp.p_prime.pos⟩)) ∧
-        hyp.q ≤ ((maxNilpotentNormalHall L).subgroupOf L).index) := sorry
+        hyp.q ≤ ((maxNilpotentNormalHall L).subgroupOf L).index) :=
+  typeI_caseC_dichotomy _hG (hyp.swap hT2 Tdata hU hW1 hW2 (hyp.nuGridSupply _hG))
+    dataL φ _hφ _hdeg
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Faithful §13 producer for Peterfalvi (13.19).**  The Tier-A structure — `e = [L:H]`
@@ -809,13 +1136,18 @@ noncomputable def typeIOrthogonalityGridData_of_coherent78 [Finite G]
     betaL_eta0_row_constant := typeIBetaL_eta_row_constant _hG hyp dataL.typeIHyp _
       (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).1
       (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).2
-    betaL_eta0_col_constant := typeIBetaL_eta_col_constant _hG hyp dataL.typeIHyp _
+    betaL_eta0_col_constant := typeIBetaL_eta_col_constant _hG hyp hT2 dataL.typeIHyp _
       (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).1
+      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).2
     caseC := typeI_caseC_dichotomy _hG hyp dataL _
       (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).1
       (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).2
     caseC_dual := typeI_caseC_dual_dichotomy _hG hyp hT2
-      (Classical.choose (OddOrder.Peterfalvi.S15.reconciled_typePData_T _hG hyp)) dataL _
+      (Classical.choose (OddOrder.Peterfalvi.S15.reconciled_typePData_T _hG hyp))
+      (Classical.choose_spec (OddOrder.Peterfalvi.S15.reconciled_typePData_T _hG hyp)).1
+      (Classical.choose_spec (OddOrder.Peterfalvi.S15.reconciled_typePData_T _hG hyp)).2.1
+      (Classical.choose_spec (OddOrder.Peterfalvi.S15.reconciled_typePData_T _hG hyp)).2.2
+      dataL _
       (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).1
       (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).2 }
 

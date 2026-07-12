@@ -78,3 +78,38 @@ hub が (B) を選ぶなら pivot。**S13 foundational commit (aec0d595) は (A)
 - issue 1025 (foundational refactor)、1024 (W2)、1020/9079 (honest-heir 移行)、9083 ((9.11) Phase E)
 - commit aec0d595 (S13 (11.4)-(11.7) parametrize)
 - CLAUDE.md「進捗の測り方」/「hub は cross-lane を自律裁定」
+
+## 🧭 HUB RULING (2026-07-12 監視 tick, Opus hub 自律裁定) — 選択肢 (A): (10.8) knot 閉包を継続
+
+**裁定 = (A) (10.8) knot 閉包を lane A が継続。(B) §15/§16 pivot は今は却下 (下記条件で将来再検討)。**
+
+**根拠**:
+1. **上流優先 + 文書順 (CLAUDE.md 標準方針、決定的)**: (A) = §10-11 ((10.8)/(9.11)) 内容、
+   (B) = §14-16 内容。§10-11 は文書順で上流ゆえ、着手可能な複数選択肢のタイブレークで (A) が先。
+   これは規約に codify された順序で、迷いなく (A)。
+2. **(A) は genuine (bookkeeping でない)**: 残 5 定理 (nineElevenPairBound /
+   caseA_two_summand_inertia_inputs / caseA_nineElevenThree_count_inputs /
+   caseA_nineElevenTwo_tiWitness / nineElevenSevenEightRefutation) は**未証明の (9.11) caseA char math**。
+   これらを証明 + honest route を thread する = 「sorried cite (`S12.S_not_coherent`) を実証明の
+   honest 版へ置換」= CLAUDE.md doneness 基準の「free-field/仮説を実証明に置換」に該当。**sorry 化を
+   避けて hoist する anti-pattern の逆** (実際に proof を積む)。lane A 自身の「新規数学でない」評価は
+   厳しすぎ — 5 caseA 定理は現に未形式化の genuine math。
+3. **landmark を「headline sorry 減らない」で deprioritize しない (CLAUDE.md 第2の誤り回避)**: spine
+   `feitThompson` の唯一 bare spine sorry (`card_kappaHall_lt_of_isTypeIIIorIV` residual) が (10.8) knot
+   ただ 1 点に局所化済 → (A) で**spine bare-sorry-free** 達成は本物の milestone。feitThompson が §14-16
+   の推移 sorry で dirty なままでも、それは「(A) を後回しにする理由」にならない (規約明記の反 anti-pattern)。
+4. **coordination risk ゼロ (対して (B) は dup churn 危険)**: (A) は全 lane A territory (S11/S13、
+   foundational 半分 aec0d595 完了・green)。(B) は §15/§16 = **b/c の active territory** に unspecified
+   target で入る → 退役 lane d の失敗モード (密結合 char/coherence に 2nd operator = dup churn)。
+   現に §14-16 は **b が (13.19) cascade を landing 中・c が S16 assembly** で active。a が pivot すると
+   衝突。(A) は a=§10-13 upstream / b,c=§14-16 の**clean な並列分担**を保つ。
+5. **(B) は target 未特定**: lane A 自身「具体 target 未特定・要調査」。責任ある pivot 裁定は不可能。
+
+**(B) 将来再検討の条件** (今は却下、以下 3 点が揃えば再考): (i) (A) landing で S13/S11 が凍結、
+(ii) §14-16 の**具体的な未所有 prerequisite** が特定され、(iii) それが **b/c の active work と
+cleanly-separable** (dup risk なし) と hub が確認。この 3 点が揃うまで a は (A)。
+
+**lane A への指示**: (A) を継続。5 caseA 定理 + consumer cascade threading を進め、(10.8) knot を
+honest route (`S_not_coherent_unconditional` cite) で閉じて spine bare-sorry-free を達成せよ。
+foundational commit aec0d595 は保全。**⚠ size watch**: S13_CoreStructure が 1671 行 (>1500) —
+(10.8) 作業 settle 後に hub が分割 (issue 0110、a は当面気にせず frontier 継続でよい)。

@@ -751,8 +751,11 @@ theorem exists_typeIII_induced_primeTIDifference_with_norm_anchor_orthogonality_
               (ν0 - ClassFunction.induce
                 ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction)) =
           ((hyp.base.p : ℕ) + 1 : ℂ) ∧
-        ∀ sigma : ℂ ≃+* ℂ,
-          ClassFunction.mapRingEquiv sigma ν0 = ν0 := by
+        (∀ sigma : ℂ ≃+* ℂ,
+          ClassFunction.mapRingEquiv sigma ν0 = ν0) ∧
+        ν0 = ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T)
+          (trivialClassFunction
+            ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)) := by
   have hfg : fintypeG =
       OddOrder.Peterfalvi.S12.FiniteInduce.finiteGFintype := Subsingleton.elim _ _
   subst fintypeG
@@ -779,8 +782,9 @@ theorem exists_typeIII_induced_primeTIDifference_with_norm_anchor_orthogonality_
     ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction
   change IsIrreducibleCharacter ζ at hζirr
   change ζ 1 = (hyp.base.p : ℂ) at hζ1
-  obtain ⟨ν0, hνZ, hνR, hνsupp, hν1, hνone, hνnorm, hνorth, hνfixed⟩ :=
-    exists_typeIII_primeTIredZero_with_projectionData_and_galois hG hyp hIII
+  obtain ⟨ν0, hνZ, hνR, hνsupp, hν1, hνone, hνnorm, hνorth, hνfixed, hνeq⟩ :=
+    exists_typeIII_primeTIredZero_with_projectionData_galois_and_eq_induce
+      hG hyp hIII
   let θc : IrreducibleCharacter
       ((derivedInG hyp.base.T).subgroupOf hyp.base.T) :=
     ⟨(θ : ClassFunction ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) ℂ).conj,
@@ -847,7 +851,7 @@ theorem exists_typeIII_induced_primeTIDifference_with_norm_anchor_orthogonality_
       (Submodule.subset_span (Set.mem_singleton (ν0 - ζ)))
       (Submodule.subset_span (Set.mem_singleton (ν0 - ζ))), hβnorm]
   refine ⟨ν0, hνZ, hνR, hβZ, hβsupp, hτZ, hτ1, ?_, hνone,
-    hνζ, hνζc, hβnorm, hτnorm, hνfixed⟩
+    hνζ, hνζc, hβnorm, hτnorm, hνfixed, hνeq⟩
   rw [ClassFunction.conj_sub, hνR]
 
 /-- The normed T-side prime-TI bridge with the canonical anchor's Galois
@@ -915,7 +919,7 @@ theorem exists_typeIII_induced_primeTIDifference_with_norm_and_anchor_orthogonal
                 ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction)) =
           ((hyp.base.p : ℕ) + 1 : ℂ) := by
   obtain ⟨ν0, hνZ, hνR, hβZ, hβsupp, hτZ, hτ1, hβconj, hνone,
-      hνζ, hνζc, hβnorm, hτnorm, _⟩ :=
+      hνζ, hνζc, hβnorm, hτnorm, -, -⟩ :=
     exists_typeIII_induced_primeTIDifference_with_norm_anchor_orthogonality_and_galois
       hG hyp hIII θ hθne hζirr hζ1
   exact ⟨ν0, hνZ, hνR, hβZ, hβsupp, hτZ, hτ1, hβconj, hνone,
