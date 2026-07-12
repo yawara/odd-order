@@ -3516,6 +3516,15 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S16.tau_muColumnSum_sub_zeta_eq_of_grid_alphaImage
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S12.Hypothesis.tau_muColumnZero_sub_zeta_dichotomy_of_grid_orthogonal
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S12.Hypothesis.SHC_swap_grid_h114
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S12.Hypothesis.exists_coherent_extension_h114_of_grid_orthogonal
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.residual_not_orthogonal_of_transposed_reindexing
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.exists_charParameters_full_for_member

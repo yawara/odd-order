@@ -996,16 +996,25 @@ feature commits: `d5f7fc38`, `061229b4`, `bb2c9868`, `960907f6`。
   従わない。従って「S12 aligned grid = eta を証明して既存 endpoint をそのまま rewrite」
   は正当な frontier ではないし、opaque equality field を追加して済ませてもならない。
 
-正しい次 frontier は Coq の theorem が本来そうであるように **arbitrary-σ 版 (11.8)** を
-現行 T-side carrier 上で組むこと。具体的には上流順に:
+正しい frontier は Coq の theorem が本来そうであるように **arbitrary-σ 版 (11.8)** を
+現行 T-side carrier 上で組むこと。2026-07-12 の続行で上流項目 (1) は完了した:
 
-1. `exists_coherent_extension_h114_of_orthogonal` の arbitrary-grid 版
-   (`h114 : tau(mu0-zeta) = sum grid_i0 - nu(zeta)`);
-2. (11.8.2)+(11.8.5) の rowwise alpha-image を arbitrary grid へ一般化
+- `tau_muColumnZero_sub_zeta_dichotomy_of_grid_orthogonal` は既存 (11.8.4) の
+  norm / integral-lattice proof を任意 grid に一般化した。canonical sigma 依存は
+  `hgridInner` (grid の正規直交性) と `hgridExtensionOrth` (coherent image と zero-column
+  sum の直交) の2入力だけへ切り出した。
+- branch 2 も `SHC_swap_grid_h114` で同じ grid のまま正規化し、最終消費 API
+  `exists_coherent_extension_h114_of_grid_orthogonal` が任意 grid に対する coherent
+  extension `nu` と `h114 : tau(mu0-zeta) = sum grid_i0 - nu(zeta)` を返す。
+- leaf build / AxiomsCheck (4156 jobs) green。3定理とも許可外公理なし、新 `sorry` なし。
+
+残りは上流順に:
+
+1. (11.8.2)+(11.8.5) の rowwise alpha-image を arbitrary grid へ一般化
    (four-corner / reality / parity / residual coefficient; S15 `eta` fields を使用);
-3. landing 済みの grid-parametric column assembly へ渡し、narrow `S(H0C)` coherence
+2. landing 済みの grid-parametric column assembly へ渡し、narrow `S(H0C)` coherence
    refuterで矛盾する。
 
 これは carrier signature 変更を要するという診断ではない。既存 S15 fields が持つ
 `eta_eq_tau_omega`, isometry, virtuality, conjugation, four-corner, Galois orbit 等を theorem
-引数として使う proof generalization であり、次 iteration は (1) から進める。
+引数として使う proof generalization であり、次 iteration は rowwise alpha-image から進める。
