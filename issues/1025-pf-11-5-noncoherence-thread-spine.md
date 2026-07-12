@@ -94,6 +94,45 @@ artifact**: `coherent_quotient_bound` が内部で `hyp.base.isTypeIIIorIV hG`
 **scope 改訂**: 当初「~15-25 theorem 1 pass」見積り → 実際は **artifact 数 × chain pass** の
 compounding。10.8 pass 完了 (green)。10.10 pass + 追加 artifact 探索が残 (bookkeeping、honest heir 存在)。
 
+## ⚠⚠ 第3の判明 = 方式そのものが欠陥 (optParam 汚染) — rework 要 (2026-07-12)
+
+10.8 (commit e63ad5a6) + 10.10 (commit 435b057a) を全 threading (S11×3 + S13_CoreStructure +
+S13_Orthogonality、~50 theorem、build green) してもなお `exists_zeta_residual` は
+`#print axioms` で **DIRTY**。全 named cite を probe しても clean なのに theorem が dirty という
+矛盾を最小例で解明:
+
+**optParam の dirty default `(hnc : … := S_H0C_not_coherent hG hyp)` /
+`(htype : … := hyp.base.isTypeIIIorIV hG)` は、call site で override しても theorem の
+`#print axioms` に default の sorryAx を焼き込む** (検証: `def fooOpt (x:=dd):=x` が dd の sorryAx を
+継承; memory [[lean-optparam-default-contaminates-axioms]])。⟹ S11/caseB/S13_Orthogonality を
+optParam で threading した全 theorem は default 汚染ゆえ、いくら clean な hnc/htype を渡しても
+clean にならない。
+
+### 正しい方式 = explicit param + legacy wrapper のみ (aec0d595 の hnc 方式)
+
+- `X_of_noncoherent (hnc) (htype) := [本体、cite を hnc/htype に]` を **explicit param (default 無し)** で作る。
+- 元の名前 `X := X_of_noncoherent … (S_H0C_not_coherent …) (isTypeIIIorIV …)` を **wrapper** にして
+  dirty legacy 値を供給。wrapper が dirty、_of_noncoherent は free param ゆえ clean。既存 consumer は
+  wrapper (元名) を呼ぶので非破壊。
+- aec0d595 の (11.4)-(11.7) hnc parametrize は**この正しい方式**ゆえ _of_noncoherent は clean。
+
+### rework の範囲 (~16 theorem を optParam → explicit+wrapper へ変換)
+
+S11 (nineElevenPairBound / caseA_two_summand / caseA_nineElevenThree / caseA_nineElevenTwo_tiWitness /
+nineElevenEqualityRefutation_of_sTwoExtraction_normBound / nineElevenSevenEightRefutation /
+nineElevenNormBound_of_sevenEightRefutation / nineElevenEqualityRefutation_of_sevenEightRefutation) +
+caseB (columnSum_Cprime / caseB_forall / caseB_coherent_sOf_H0Cprime / caseB_coherent_sOf_H0C) +
+S13_Orthogonality (coherent_sOf_H0C / pin×2 / coherent_SOf_H0C_of_column_identities) を rename+wrapper 化 +
+S13_Lemmas/S13_CoreStructure の htype を optParam→explicit 化 (wrapper が dirty htype 供給)。
+param LOGIC (どの sub-call か) は 435b057a で正しくマップ済 (rework 時に再利用可)。
+
+### scope の総括 (ユーザー判断材料)
+
+spine bare sorry 閉包 = **多 artifact (10.8/10.10/…) × chain**、かつ **explicit+wrapper でしか
+clean 化できない** (optParam 不可)。当初「~15-25 theorem 1 pass」→ 実際は全 bookkeeping で
+数十 theorem の rename+wrapper。honest math (unconditional 10.8/10.10 heir) は既存ゆえ、これは
+**import-DAG re-wire の bookkeeping** (新規数学の積み上げでない)。⟹ 継続価値の再判断を推奨。
+
 ## 注記
 
 - hnc の型 = `¬ Nonempty (IsCoherent hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0)`
