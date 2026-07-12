@@ -246,7 +246,8 @@ theorem caseA_u_eq_a_of_residual_not_orthogonal [Finite G]
   -- ### 2. the (5.5) expansion and the `R(μ)`-family
   have hTsub : OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C ⊆
       OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime := hyp.sOf_H0C_subset_sOf_H0Cprime
-  obtain ⟨c⟩ := coherent_sOf_H0C hG hyp
+  obtain ⟨c⟩ := coherent_sOf_H0C hG hyp (S_H0C_not_coherent hG hyp)
+    (hyp.base.isTypeIIIorIV hG)
   obtain ⟨E, hEsub, hEeq⟩ :=
     coherent_extension_eq_sum_memberRFamily hG hyp hTsub c hμmem hμc
   obtain ⟨k, hk0, hμcol, himg⟩ :=
@@ -751,8 +752,10 @@ theorem not_cliffordCaseA_of_hypothesis [Finite G]
       = hyp.base.typeP.H
         ⊔ (hyp.base.typeP.U ⊓ Subgroup.centralizer (hyp.base.typeP.H : Set G)) :=
     secondDerived_eq_fitting_of_base hG hyp.base hyp.type_alt
+      (fun s13 => S_H0C_not_coherent hG s13)
   have hHcard : Nat.card ↥hyp.base.typeP.H = hyp.base.w2 ^ hyp.base.w1 :=
     card_H_eq_of_base hG hyp.base hyp.type_alt
+      (fun s13 => S_H0C_not_coherent hG s13)
   -- (11.8): `ζ` and the grid non-orthogonality, via the unconditional (11.3)
   obtain ⟨ζ, hζS, hζirr, hζ1, h118⟩ :=
     exists_zeta_residual_not_orthogonal_H0C_of_refuter hG hyp.base hyp.type_alt hM2 hHcard

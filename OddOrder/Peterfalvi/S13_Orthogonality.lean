@@ -104,8 +104,8 @@ theorem coherent_sOf_H0C [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
     (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp)
-    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV hG) :
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
+    (htype : IsTypeIII M ∨ IsTypeIV M) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
       (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C) hyp.base.A0) := by
   haveI := hyp.base.finiteG
@@ -305,8 +305,8 @@ theorem coherent_sOf_H0C_extension_muColumnSum_pin_of_irr [Finite G]
     (hξ : ξ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C)
     (hξirr : IsIrreducibleCharacter ξ)
     (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp)
-    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV hG) :
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
+    (htype : IsTypeIII M ∨ IsTypeIV M) :
     c.extension (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩)
       = ∑ i : Fin hyp.base.w1, hyp.base.alignedOmegaSigmaGrid hG hG.odd i ⟨1, hw2⟩ := by
   haveI := hyp.base.finiteG
@@ -571,8 +571,8 @@ theorem exists_pinned_coherent_sOf_H0C_of_all_reducible [Finite G]
     (hallred : ∀ η ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C,
       ¬ IsIrreducibleCharacter η)
     (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp)
-    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV hG) :
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
+    (htype : IsTypeIII M ∨ IsTypeIV M) :
     ∃ c : OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
         (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C) hyp.base.A0,
       c.extension (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩)
@@ -868,8 +868,8 @@ theorem coherent_SOf_H0C_of_column_identities [Finite G]
         = (∑ i : Fin hyp.base.w1, hyp.base.alignedOmegaSigmaGrid hG hG.odd i j)
           - (d : ℂ) • coh.extension ζ)
     (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp)
-    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV hG) :
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
+    (htype : IsTypeIII M ∨ IsTypeIV M) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := by
   haveI := hyp.base.finiteG
   classical
@@ -1138,7 +1138,8 @@ theorem coherent_sOf_H0Cprime_of_equality_refutation [Finite G]
     exact caseA_coherent_sOf_H0Cprime_of_refuter hG hyp caseA
       (caseA_refuter_of_equality_refutation hG hyp caseA (hbound caseA) (hrefuteEq caseA))
   · -- **caseB**: the landed norm-general coherence (issue 9075).
-    exact caseB_coherent_sOf_H0Cprime hG hyp hB.some
+    exact caseB_coherent_sOf_H0Cprime hG hyp hB.some (S_H0C_not_coherent hG hyp)
+      (hyp.base.isTypeIIIorIV hG)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11), reduced to the single (9.11.7)–(9.11.8) residual** (issue 9083
@@ -1159,9 +1160,11 @@ theorem coherent_sOf_H0Cprime_of_sevenEightRefutation [Finite G]
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
       (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) hyp.base.A0) :=
   coherent_sOf_H0Cprime_of_equality_refutation hG hyp
-    (fun caseA => nineElevenPairBound hG hyp caseA)
+    (fun caseA => nineElevenPairBound hG hyp caseA (S_H0C_not_coherent hG hyp)
+      (hyp.base.isTypeIIIorIV hG))
     (fun caseA =>
-      nineElevenEqualityRefutation_of_sevenEightRefutation hG hyp caseA (h78 caseA))
+      nineElevenEqualityRefutation_of_sevenEightRefutation hG hyp caseA (h78 caseA)
+        (S_H0C_not_coherent hG hyp) (hyp.base.isTypeIIIorIV hG))
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11)** (Coq `Ptype_core_coherence`, `PFsection9.v:1484`): the family
@@ -1174,6 +1177,7 @@ theorem coherent_sOf_H0Cprime [Finite G]
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
       (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) hyp.base.A0) :=
   coherent_sOf_H0Cprime_of_sevenEightRefutation hG hyp
-    (fun caseA => nineElevenSevenEightRefutation hG hyp caseA)
+    (fun caseA => nineElevenSevenEightRefutation hG hyp caseA (S_H0C_not_coherent hG hyp)
+      (hyp.base.isTypeIIIorIV hG))
 
 end OddOrder.Peterfalvi.S13

@@ -34,7 +34,7 @@ filtration machinery (`S08_Theorem63`), not as a standalone "subfamily-coherent 
 statement, so discharging this is §6 character theory (lane-b). -/
 theorem coherent_S_of_coherent_SH0C [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    (hyp : Hypothesis M)
+    (hyp : Hypothesis M) (htype : IsTypeIII M ∨ IsTypeIV M)
     (_hcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0)) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
@@ -79,9 +79,9 @@ theorem coherent_S_of_coherent_SH0C [Finite G]
         show ((hyp.H0C.subgroupOf M).subgroupOf (hyp.HC.subgroupOf M)).index
           = (hyp.H0C.subgroupOf M).relIndex (hyp.HC.subgroupOf M) from rfl,
         Subgroup.relIndex_subgroupOf hHCleM]
-      exact hyp.H0C_relIndex_HC _hG
+      exact hyp.H0C_relIndex_HC _hG htype
     rw [hidx, hcardq]
-    obtain ⟨hp', hq', hpo, hqo, hne⟩ := hyp.p_q_distinct_odd_primes _hG
+    obtain ⟨hp', hq', hpo, hqo, hne⟩ := hyp.p_q_distinct_odd_primes _hG htype
     exact prime_pow_gt_four_mul_sq_add_one hp' hq' hpo hqo hne
   -- assemble via the (6.3) oracle
   have hmain := OddOrder.Peterfalvi.S08.six_three_of_six_two_oracle
@@ -129,9 +129,9 @@ theorem coherent_S_of_coherent_SH0C [Finite G]
     exact hyp.base.exists_source_of_coherence_dichotomy _hG
       (hyp.params_mu_eq _hG _hG.odd) hyp.params_delta_pm
       (hyp.params_delta_sign _hG _hG.odd) hyp.params_zeta_mem hyp.params_zeta_degree
-      (hyp.base.isTypeIIIorIV _hG)
+      htype
       (OddOrder.GroupTheory.typePNontrivialCore_of_isTypeIIIorIV
-        (hyp.base.isTypeIIIorIV _hG) hyp.base.typeP)
+        htype hyp.base.typeP)
       (OddOrder.Peterfalvi.S11.exists_chiefFactorData _hG _).choose
       hAne hBne hAcoh' hBncoh'
 
@@ -150,7 +150,7 @@ theorem S_H0C_not_coherent [Finite G]
     ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) :=
   fun hcoh => OddOrder.Peterfalvi.S12.S_not_coherent _hG hyp.base
-    (coherent_S_of_coherent_SH0C _hG hyp hcoh)
+    (coherent_S_of_coherent_SH0C _hG hyp (hyp.base.isTypeIIIorIV _hG) hcoh)
 
 /-- **Peterfalvi (11.4), parametrized on the (11.3) non-coherence** (issue 1025): if `S(H_1)`
 is coherent for a normal subgroup `H_1 < M'`, then `|M'/H_1| - 1 ≤ 2 q |U/C|` (the quotient
@@ -168,7 +168,7 @@ theorem coherent_quotient_bound_of_noncoherent [Finite G]
       hyp.base.tau (hyp.SOf H1) hyp.base.A0))
     (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
-    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV _hG) :
+    (htype : IsTypeIII M ∨ IsTypeIV M) :
     H1.relIndex (derivedInG M) ≤ 2 * hyp.q * hyp.C.relIndex hyp.U + 1 := by
   classical
   -- normality instances for the section subgroups and their traces
@@ -260,7 +260,7 @@ theorem coherent_quotient_bound [Finite G]
       hyp.base.tau (hyp.SOf H1) hyp.base.A0)) :
     H1.relIndex (derivedInG M) ≤ 2 * hyp.q * hyp.C.relIndex hyp.U + 1 :=
   coherent_quotient_bound_of_noncoherent _hG hyp hH1_norm hH1_lt hcoh
-    (S_H0C_not_coherent _hG hyp)
+    (S_H0C_not_coherent _hG hyp) (hyp.base.isTypeIIIorIV _hG)
 
 /-- **`HC < M'`** (sorry-free): if `HC = M'` then `U ≤ HC = H·C`; decomposing `u = a·b`
 (`a ∈ H`, `b ∈ C`) along the normal `H`-factor forces `a ∈ H ∩ U = ⊥`, so `u = b ∈ C`,
@@ -855,7 +855,7 @@ theorem HC_le_secondDerived_of_noncoherent [Finite G] (_hG : OddOrder.BG.IsMinim
     {M : Subgroup G} (hyp : Hypothesis M)
     (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
-    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV _hG) :
+    (htype : IsTypeIII M ∨ IsTypeIV M) :
     hyp.HC ≤ secondDerivedInAmbient M := by
   classical
   rw [← Subgroup.relIndex_eq_one]
@@ -900,7 +900,7 @@ theorem HC_le_secondDerived_of_noncoherent [Finite G] (_hG : OddOrder.BG.IsMinim
         _ ≤ 2 * hyp.q * v + 1 := h114
     omega
   -- `q ∣ X − 1`, `X` and `q` odd ⟹ `X = 1`
-  have hdvd : hyp.q ∣ X - 1 := hyp.q_dvd_secondDerived_relIndex_HC_sub_one _hG
+  have hdvd : hyp.q ∣ X - 1 := hyp.q_dvd_secondDerived_relIndex_HC_sub_one _hG htype
   have hXodd : Odd X := by
     refine _hG.odd.of_dvd_nat ?_
     calc X ∣ Nat.card ↥hyp.HC := Subgroup.relIndex_dvd_card _ _
@@ -931,6 +931,7 @@ theorem HC_le_secondDerived [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) :
     hyp.HC ≤ secondDerivedInAmbient M :=
   HC_le_secondDerived_of_noncoherent _hG hyp (S_H0C_not_coherent _hG hyp)
+    (hyp.base.isTypeIIIorIV _hG)
 
 /-- **Peterfalvi (11.5), parametrized on (11.3) non-coherence** (issue 1025): `M'' = HC` from the
 reverse `HC_le_secondDerived_of_noncoherent hnc` and the unconditional `secondDerived_le_HC`. -/
@@ -938,7 +939,7 @@ theorem secondDerived_eq_HC_of_noncoherent [Finite G] (_hG : OddOrder.BG.IsMinim
     {M : Subgroup G} (hyp : Hypothesis M)
     (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
-    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV _hG) :
+    (htype : IsTypeIII M ∨ IsTypeIV M) :
     secondDerivedInAmbient M = hyp.HC :=
   le_antisymm hyp.secondDerived_le_HC (HC_le_secondDerived_of_noncoherent _hG hyp hnc htype)
 
@@ -951,6 +952,7 @@ theorem secondDerived_eq_HC [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) :
     secondDerivedInAmbient M = hyp.HC :=
   secondDerived_eq_HC_of_noncoherent _hG hyp (S_H0C_not_coherent _hG hyp)
+    (hyp.base.isTypeIIIorIV _hG)
 
 /-- **Peterfalvi (11.6), `C = U'`**: `U' ≤ C` is (8.5.b) (`derivedU_le_C`); conversely
 `C ≤ HC = M'' ≤ H ⊔ U'` ((11.5) + `secondDerived_le_H_sup_derivedU`), and an

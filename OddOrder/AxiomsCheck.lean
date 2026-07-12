@@ -7779,3 +7779,20 @@ Pf (11.9.c) caseB 帰結の一般群論 engine (mathcomp `cyclic_nilpotent_quo_d
 #assert_only_allowed_axioms OddOrder.GroupTheory.commutator_eq_bot_of_isNilpotent_of_isCyclic_quotient
 #assert_only_allowed_axioms OddOrder.GroupTheory.isCyclic_of_isNilpotent_of_isCyclic_quotient
 #assert_only_allowed_axioms OddOrder.GroupTheory.isCyclic_of_isNilpotent_of_ker_le_commutator
+
+/-! **Peterfalvi (11.9.b) character core `card_kappaHall_lt_of_isTypeIIIorIV`, axiom-clean**
+(lane a, 2026-07-13, issues 1025/9091).  The FT-spine endpoint `|K*| < |K|` for a type-III/IV
+maximal subgroup — the honest heir of the retired legacy chain — is now `#print axioms`-clean:
+the (10.8) legacy `S12.S_not_coherent` (bare-sorry `typeII_coherence_contradiction_estimate`) and
+the (10.10) legacy `no_typeV_maximal` (bare-sorry `typeV_forces_coherence`) are fully rewired to
+their axiom-clean heirs `S_not_coherent_unconditional` / `no_typeV_maximal_unconditional`
+(`S12_Noncoherence`) via `isTypeIIIorIV_unconditional` + the `_of_noncoherent` explicit-parameter
+threading through the §11/§13 (11.3)-noncoherence chain (the optParam-DEFAULT contamination of
+commit 435b057a replaced by explicit params + legacy wrappers,
+[[lean-optparam-default-contaminates-axioms]]).  `card_kappaHall_lt_of_isTypeP1` (the type-`P₁`
+consumer) is clean as a corollary.  ⚠ `feitThompson` itself remains sorry-dirty via **other**
+consumers (cross-lane §14/§15/§16 T-side + the legacy `no_typeV_maximal`/`S_not_coherent` still
+cited off the card_kappaHall subtree); the spine character core is the lane-a contribution. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.isTypeIIIorIV_unconditional
+#assert_only_allowed_axioms OddOrder.card_kappaHall_lt_of_isTypeIIIorIV
+#assert_only_allowed_axioms OddOrder.card_kappaHall_lt_of_isTypeP1

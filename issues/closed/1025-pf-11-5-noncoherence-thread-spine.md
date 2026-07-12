@@ -195,3 +195,34 @@ heir CLEAN・fixable。`sibleyTarget_H0C` は spine に到達しない (reaches=
 (「(C) ゆえ A+B は無駄」) は無効。残 = optParam 汚染方式 (435b057a) を **explicit param + wrapper**
 (:111-127) へ rework + `coherent_S_of_coherent_SH0C`/`isTypeIIIorIV` 経路の htype 化。方式選択
 (DAG relayer vs pervasive threading) と継続可否は **hub 再裁定へ回付** (9091)。
+
+## ✅ 完了 (2026-07-13 lane-a, 方式2 explicit-param threading 実装、commit e21c9acb)
+
+第5判明どおり **A+B threading (necessary AND sufficient)** で spine
+`card_kappaHall_lt_of_isTypeIIIorIV` を **axiom-clean** 化。実測 `#print axioms` =
+`[propext, Classical.choice, Quot.sound]` (**sorryAx 無し**、faithful CollectAxioms-replica でも
+`sorryAx=false`)。full build green (4179 jobs) で AxiomsCheck assert 通過。
+
+**実装 (localize は canonical CollectAxioms-replica で反復収束)**:
+- 40 optParam DEFAULT (`hncH0C := S_H0C_not_coherent` / `htype := isTypeIIIorIV`) → explicit param
+  (script)。legacy wrapper は legacy 値を明示供給 (off-spine 不変)。435b057a の optParam 汚染訂正。
+- `isTypeIIIorIV_unconditional` (S12_Noncoherence) 新設 = clean heir; `S_H0C_not_coherent_unconditional`
+  が各 s13hyp に clean htype を供給するのに使用 (= issue 冒頭で heir が「なぜ要るか」の答)。
+- §13 Cat2 value-cite (`coherent_S_of_coherent_SH0C` / `H0C_relIndex_HC` / `p_q_distinct_odd_primes` /
+  `H_elementaryAbelian` / `chief_*_of_noncoherent` / `coprime_card_W1_derived` /
+  `q_dvd_secondDerived_relIndex_HC_sub_one`) に htype 明示 threading。
+- **`p_prime_and_card_H_eq` は §13 Hypothesis の clean field `hyp.type_alt` で置換** →
+  (11.6) H-structure cascade (opCore/p_mem_primeFactors/pComplement 系) の htype threading を回避。
+- (11.6) `H_isPGroup` / `pComplementCore_eq_bot` に hnc+htype threading
+  (line 514 `secondDerived_eq_HC` → `secondDerived_eq_HC_of_noncoherent`)。
+- entry point `secondDerived_eq_fitting_of_base` / `card_H_eq_of_base` に hrefute param 追加、
+  card_kappaHall が `S_H0C_not_coherent_unconditional` を clean refuter として供給。
+
+AxiomsCheck 登録: `card_kappaHall_lt_of_isTypeIIIorIV` / `isTypeIIIorIV_unconditional` /
+`card_kappaHall_lt_of_isTypeP1` (後者は heir 経由で clean 化した副産物)。
+
+⚠ **`feitThompson` 自体は依然 sorry-dirty** (issue 冒頭の「§14/§15/§16 cross-lane 推移 sorry が残る可能性」が
+的中)。feitThompson が到達する ~23 leaf sorry の中に `typeV_forces_coherence` /
+`typeII_coherence_contradiction_estimate` も残るが、それは **card_kappaHall subtree 外の別 consumer**
+(`no_typeV_maximal` の type-P2 用途、`caseB_order_u` 等) 経由。本 issue の scope = spine
+character core の clean 化は完遂。close。
