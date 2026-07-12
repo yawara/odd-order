@@ -88,6 +88,15 @@ structure NuGridSupplyData [Finite G] (hyp : Hypothesis (G := G)) : Prop where
         ¬ (((hyp.W1.subgroupOf hyp.T).subgroupOf ((derivedInG hyp.T).subgroupOf hyp.T) :
             Set ↥((derivedInG hyp.T).subgroupOf hyp.T)) ⊆
           OddOrder.Peterfalvi.S03.characterKernel ψ))
+  /-- **Peterfalvi (9.8)/(9.11) reverse dichotomy at `T`** (issue 9092, the ν-side swap-image of
+  `mu_reducible_dichotomy`): a reducible member of the `T`-side kernel-filter family `S(X)` over
+  `T' = derivedInG T` is a nonzero `ν`-row sum `∑_j ν_{ij}`, `i ≠ 0`.  Under the swap `S ↔ T`,
+  `μ ↔ νᵀ`, this is exactly the swapped instance's `mu_reducible_dichotomy` (the roles of row/column
+  transpose), so `Hypothesis.swap` consumes it verbatim. -/
+  nu_reducible_dichotomy : ∀ {X : Subgroup ↥hyp.T} {ψ : ClassFunction ↥hyp.T ℂ},
+    ψ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG hyp.T).subgroupOf hyp.T) X →
+    ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ →
+    ∃ i : Fin hyp.q, i ≠ ⟨0, hyp.q_prime.pos⟩ ∧ ψ = ∑ j : Fin hyp.p, hyp.nu i j
   /-- **Peterfalvi (4.8) at `T`, `ν`-row-difference support** (Coq `prDade_sub_TIirr_on`): for
   nontrivial equal-degree rows `i, k ≠ 0`, the difference `ν_{ij} − ν_{kj}` is supported in
   `A₀(T) = A(T) ∪ (V_T)^T`, for any `TypePData T` reconciled to the abstract `V`/`W₂`/`W₁`. -/
@@ -227,6 +236,7 @@ noncomputable def Hypothesis.swap [Finite G] (hyp : Hypothesis (G := G))
     · rw [if_pos h, if_pos ⟨h.2, h.1⟩]
     · rw [if_neg h, if_neg fun h' => h ⟨h'.2, h'.1⟩]
   mu_colSum_eq_induce := pins.nu_rowSum_eq_induce
+  mu_reducible_dichotomy := pins.nu_reducible_dichotomy
   nu_definition := fun i j => hyp.mu_definition j i
   m := 1 - 1 / ((hyp.p : ℚ) - 1) - ((hyp.p : ℚ) - 1) / (hyp.p : ℚ) ^ hyp.q +
     1 / (((hyp.p : ℚ) - 1) * (hyp.p : ℚ) ^ hyp.q)

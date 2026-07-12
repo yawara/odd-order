@@ -108,3 +108,48 @@ commit で追加する (near-definitional、他 math 不変)。a は次 main syn
 
 **payoff**: 本 field で `sSet_coherent_indS_{caseA,caseB}` → `coherent_H0Cprime_S` が dadeHypS 継承のみで honest 化
 → `character_degree_analysis` (13.3) unblock → §13 char cascade が sound な (9.11) 基盤上に。
+
+## ✅ SELF-FLAG (b /loop 2026-07-13、供給 carve-out 実施 — producer 放電完了、field + 全 producer)
+
+carve-out 条件 (i)-(iv) 全遵守で `mu_reducible_dichotomy` grounding field + **全 producer 放電**を single
+commit で landing (**build green**、新 axiom/新 sorry 無し)。R-family closing (consumer sorry) は別 follow-up。
+
+**field 形 (hG-free、M-side `reducible_mem_inducedKernelFamily_eq_muGrid_columnSum` `S12_HcBound:578` を mirror)**:
+`inducedKernelFamily` phrasing を採用 (issue の `mu_isColumnFamily` 案より consumer-bridgeable + M-side と同型)。
+```
+mu_reducible_dichotomy : ∀ {X : Subgroup ↥S} {ψ : ClassFunction ↥S ℂ},
+    ψ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG S).subgroupOf S) X →
+    ¬ IsIrreducibleCharacter ψ → ∃ j : Fin p, j ≠ ⟨0, p_prime.pos⟩ ∧ ψ = ∑ i : Fin q, mu i j
+```
+- **hG-free**: `sSet (toTypesIIIIIIVSetupS hG)` は hG を要し field 不可 → hG 非依存の `inducedKernelFamily
+  ((derivedInG S).subgroupOf S) X` で phrase (M-side と同じ family 型)。
+- **dischargeable**: producer で `mu = muS = certainTypeS.columnFamily.mu`、`induce_not_isIrreducible_iff`
+  (S06 §4.5.b) で reducible 源 θ = 列 χ_j を取り `chi2enum.symm` で j を供給。
+- **consumer-usable**: consumer は `η ∈ sSet (toTypesIIIIIIVSetupS hG)` を `sSet ⊆ inducedKernelFamily
+  ((derivedInG S).subgroupOf S) ⊥` (`xiSet` の `¬(H ⊆ Ker)` が源 nontrivial を強制) 経由で bridge 可
+  (M-side `caseB_sOf_member_dichotomy` の `sOf_subset_SOf`+`SOf_eq` パターンの S-side 版、follow-up で建設)。
+
+**放電 (全 producer)**:
+1. **root (spine, carve-out)** `section16CharacterData_of_isMinimalSimpleOdd` (FeitThompson.lean) —
+   実証明を FeitThompsonSetup.lean の top-level supply lemma **`Section16CharacterData.muS_reducible_dichotomy`**
+   に抽出 (giant def の whnf heartbeat 回避 + `muS_orthonormal`/`muS_diff_support` パターン踏襲)、
+   constructor は `mu_reducible_dichotomy := Section16CharacterData.muS_reducible_dichotomy hG mp tp` で cite。
+   proof = M-side mirror (~35 行、新 axiom/sorry 無し、`#print axioms` = `[propext, Classical.choice, Quot.sound]`)。
+2. **thread** `section16Inputs_of_isMinimalSimpleOdd` (`:= cd.mu_reducible_dichotomy`) /
+   `sectionSixteenHypothesis_of_inputs` base (`:= inp.mu_reducible_dichotomy`) — pass-through。
+3. **structures** `Section16CharacterData` / `Section16Inputs` (FeitThompsonSetup.lean) に field 追加。
+4. **HypothesisSwap** (b-owned) — swap は `mu i j = hyp.nu j i` ゆえ swap 側の `mu_reducible_dichotomy` は
+   **T-side ν-row dichotomy**。honest に処理: `NuGridSupplyData` に `nu_reducible_dichotomy` field を追加
+   (μ-field の swap-image、既存 ν-bundle パターン)、swap 放電 = `:= pins.nu_reducible_dichotomy` (alpha-eq で直接)。
+   **新 sorry 無し**: `NuGridSupplyData` の唯一 producer `nuGridSupply` は既に `sorry` ゆえ新 field を吸収
+   (sorried-cite でなく既存 sorry の拡張、feitThompson 経路外)。
+
+**carve-out 失効**: `mu_reducible_dichotomy` 供給完了 → 以後 b の FeitThompson{,Setup} 編集は通常逸脱。
+
+**build**: `lake build OddOrder` green (4179 jobs、incremental)。FeitThompson.lean 編集 = 当該 field の 3
+放電行のみ (他 statement/math 不変、行単位レビュー可)。
+
+**次 step (follow-up、別 commit)**: R-family closing = consumer `sSet_caseB_memberRFamily`
+(HypothesisBasics:948) の reducible 枝。route A: `η ∈ sSet` を `inducedKernelFamily ((derivedInG S).subgroupOf S) ⊥`
+に bridge (sSet-membership → 源 nontrivial) → `hyp.mu_reducible_dichotomy` で column j 取得 →
+`certainTypeR @ hyp46S` の image family を dispatch (+ `_orthogonal` を `eta_orthonormal` から)。

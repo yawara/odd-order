@@ -237,6 +237,20 @@ structure Hypothesis where
         ¬ (((W2.subgroupOf S).subgroupOf ((derivedInG S).subgroupOf S) :
             Set ↥((derivedInG S).subgroupOf S)) ⊆
           OddOrder.Peterfalvi.S03.characterKernel ψ))
+  /-- **Peterfalvi (9.8)/(9.11) reverse dichotomy (S-side R-family gate)** (issue 9092): a
+  *reducible* member of the general kernel-filter family `S(X)` over `S' = derivedInG S` (any
+  kernel demand `X`) is a nonzero `μ`-column sum `∑ᵢ μ_{ij}`, `j ≠ 0`.  This is the S-side
+  analogue of the M-side `reducible_mem_inducedKernelFamily_eq_muGrid_columnSum` (`S12_HcBound`);
+  it is *supplied by the producer* from the §6 certain-type identity
+  `μ = certainTypeS.columnFamily.mu` (the abstract `Hypothesis` cannot see this identification,
+  so the reverse dispatch is threaded as a field).  It is consumed by the caseB per-member
+  `R`-family (`sSet_caseB_memberRFamily`): a reducible `η ∈ 𝒮` bridges into `S(⊥)` — the `𝒳`
+  condition `¬(H ⊆ Ker)` forces `η`'s source nontrivial — and is dispatched to its μ-column `j`,
+  whose §6 `certainTypeR` image family is the (5.2.d) `R`-datum. -/
+  mu_reducible_dichotomy : ∀ {X : Subgroup ↥S} {ψ : ClassFunction ↥S ℂ},
+    ψ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG S).subgroupOf S) X →
+    ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ →
+    ∃ j : Fin p, j ≠ ⟨0, p_prime.pos⟩ ∧ ψ = ∑ i : Fin q, mu i j
   /-- **Peterfalvi (13.1.e)**: `Ind_W^T (ω_{ij} − ω_{i0}) = δ'_i (ν_{ij} − ν_{i0})`,
   with the canonical `Ind_W^T = ClassFunction.induce (W.subgroupOf T)` and
   `δ'_i = ±1` is `deltaPrime`. -/
