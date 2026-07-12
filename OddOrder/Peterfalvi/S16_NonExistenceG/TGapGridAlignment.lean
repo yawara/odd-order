@@ -972,4 +972,292 @@ theorem alignedOmegaSigmaGrid_apply_eq_alignedOmegaEtaGrid [Finite G]
   exact alignedOmegaSigmaGrid_apply_eq_eta_alignedIndex
     hG base s12 hW hodd hV i j hv
 
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (3.8), eta pair-difference rigidity.**
+A norm-two virtual character agreeing with `s • (η_{P₁} − η_{P₂})` for two
+*arbitrary distinct* grid labels on the conjugacy saturation of the shared
+regular set equals that difference globally.  The abstract engine
+`S05.orthonormalGrid_diff_rigidity` already permits arbitrary distinct grid
+points; this removes the same-row/same-column specialization, which the
+aligned product labels of the transposed T-side grid do not satisfy (no
+separability of the abstract omega labels is assumed). -/
+theorem eta_pair_diff_rigidity [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    {X : ClassFunction G ℂ} (hXZ : X ∈ ZIrr G)
+    (hX2 : ClassFunction.inner X X = 2)
+    {P1 P2 : Fin base.q × Fin base.p} (hP : P1 ≠ P2)
+    {s : ℤ} (hs : s = 1 ∨ s = -1)
+    (hvanish : ∀ x ∈ conjClassSet
+      ((base.W : Set G) \ ((base.W1 : Set G) ∪ (base.W2 : Set G))),
+      (X - (s : ℂ) • (base.eta P1.1 P1.2 - base.eta P2.1 P2.2)) x = 0) :
+    X = (s : ℂ) • (base.eta P1.1 P1.2 - base.eta P2.1 P2.2) := by
+  classical
+  have hcardq : Nat.card (Fin base.q) = base.q :=
+    Nat.card_eq_fintype_card.trans (Fintype.card_fin _)
+  have hcardp : Nat.card (Fin base.p) = base.p :=
+    Nat.card_eq_fintype_card.trans (Fintype.card_fin _)
+  have hsep : ∀ (i i' : Fin base.q) (j j' : Fin base.p),
+      ClassFunction.inner
+          (X - (s : ℂ) • (base.eta P1.1 P1.2 - base.eta P2.1 P2.2))
+          (base.eta i j) +
+        ClassFunction.inner
+          (X - (s : ℂ) • (base.eta P1.1 P1.2 - base.eta P2.1 P2.2))
+          (base.eta i' j') =
+      ClassFunction.inner
+          (X - (s : ℂ) • (base.eta P1.1 P1.2 - base.eta P2.1 P2.2))
+          (base.eta i j') +
+        ClassFunction.inner
+          (X - (s : ℂ) • (base.eta P1.1 P1.2 - base.eta P2.1 P2.2))
+          (base.eta i' j) := by
+    intro i i' j j'
+    have h1 := inner_eta_grid_relation base hvanish i j
+    have h2 := inner_eta_grid_relation base hvanish i' j'
+    have h3 := inner_eta_grid_relation base hvanish i j'
+    have h4 := inner_eta_grid_relation base hvanish i' j
+    linear_combination h1 + h2 - h3 - h4
+  have hmain := OddOrder.Peterfalvi.S05.orthonormalGrid_diff_rigidity
+    (fun pq : Fin base.q × Fin base.p => base.eta pq.1 pq.2)
+    (fun pq => eta_mem_ZIrr base pq.1 pq.2)
+    (fun a => by simpa using eta_orthonormal base a.1 a.1 a.2 a.2)
+    (fun a b hab => by
+      rw [eta_orthonormal base a.1 b.1 a.2 b.2, if_neg]
+      rintro ⟨h1, h2⟩
+      exact hab (Prod.ext h1 h2))
+    (by rw [hcardq]; exact base.three_le_q)
+    (by rw [hcardp]; exact base.three_le_p)
+    (by rw [hcardq]; exact base.q_odd)
+    (by rw [hcardp]; exact base.p_odd)
+    (by
+      rw [hcardq, hcardp]
+      exact (Nat.coprime_primes base.q_prime base.p_prime).mpr
+        (Ne.symm base.p_ne_q))
+    hXZ hX2 (P1 := P1) (P2 := P2) hP hs hsep
+  simpa using hmain
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (3.8)/(11.8.2), eta pair classifier from regular values.**
+The type-P regular-value bridge for an arbitrary distinct pair of eta labels:
+if a norm-two virtual character agrees on the type-P regular set with a
+signed difference of two eta entries, it equals that difference globally. -/
+theorem eta_pair_diff_classifier_of_typePV_value [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    {M : Subgroup G} (data : TypePData M)
+    (hV : typePV M data =
+      (base.W : Set G) \ ((base.W1 : Set G) ∪ (base.W2 : Set G)))
+    {P1 P2 : Fin base.q × Fin base.p} (hP : P1 ≠ P2)
+    {s : ℤ} (hs : s = 1 ∨ s = -1)
+    {source : ClassFunction G ℂ}
+    (hsource : ∀ v ∈ typePV M data,
+      source v = ((s : ℂ) • (base.eta P1.1 P1.2 - base.eta P2.1 P2.2)) v) :
+    ∀ {Y : ClassFunction G ℂ}, Y ∈ ZIrr G →
+      ClassFunction.inner Y Y = 2 →
+      (∀ v ∈ typePV M data, Y v = source v) →
+      Y = (s : ℂ) • (base.eta P1.1 P1.2 - base.eta P2.1 P2.2) := by
+  intro Y hYZ hY2 hYsource
+  apply eta_pair_diff_rigidity base hYZ hY2 hP hs
+  intro x hx
+  obtain ⟨w, hw, g, hg⟩ := hx
+  have hconj : IsConj w x := isConj_iff.mpr ⟨g, hg⟩
+  have hwV : w ∈ typePV M data := hV.symm ▸ hw
+  rw [ClassFunction.sub_apply, ← Y.of_isConj hconj,
+    ← (((s : ℂ) • (base.eta P1.1 P1.2 - base.eta P2.1 P2.2)).of_isConj hconj),
+    hYsource w hwV, hsource w hwV, sub_self]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.8.2), concrete `hclassify` for the aligned transposed
+eta grid.**  This discharges the norm-two residual classifier input of
+`S12.Hypothesis.SHC_residual_eq_grid_diff` and
+`S12.Hypothesis.charParam_a_eq_zero_of_grid_residualEq` at
+`grid := alignedOmegaEtaGrid`: the regular-value pin comes from
+`tau_muGridAlpha_apply_eq_of_grid_value_alignment` together with the
+sigma/eta regular-value agreement, and the global upgrade is the eta
+pair-difference rigidity.  No global equality of sigma isometries is used. -/
+theorem alignedOmegaEtaGrid_classifier [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    (s12 : OddOrder.Peterfalvi.S12.Hypothesis base.T)
+    (hW : s12.typeP.W = base.W)
+    (hW1 : s12.typeP.W2 = base.W1)
+    (hW2 : s12.typeP.W1 = base.W2)
+    (hodd : Odd (Nat.card G))
+    (hV : typePV base.T s12.typeP =
+      (base.W : Set G) \ ((base.W1 : Set G) ∪ (base.W2 : Set G)))
+    {i : Fin s12.w1} {j : Fin s12.w2} (hj : j ≠ 0)
+    {ζ : ClassFunction ↥base.T ℂ}
+    (hζS : ζ ∈ OddOrder.Peterfalvi.S12.inducedFamily base.T)
+    {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : s12.muGrid hG hodd i j 1 = (d : ℂ))
+    (hμ0 : s12.muGrid hG hodd i 0 1 = 1)
+    (hζ1 : ζ 1 = (s12.w1 : ℂ))
+    (hnf : (n : ℤ) * (s12.w1 : ℤ) = (d : ℤ) - δ)
+    (hδj : s12.muColumnSign hG hodd j = δ)
+    (hδpm : δ = 1 ∨ δ = -1) :
+    ∀ {Y : ClassFunction G ℂ}, Y ∈ ZIrr G →
+      ClassFunction.inner Y Y = 2 →
+      (∀ v ∈ typePV base.T s12.typeP,
+        Y v = s12.tau (s12.muGrid hG hodd i j -
+          (δ : ℂ) • s12.muGrid hG hodd i 0 - (n : ℂ) • ζ) v) →
+      Y = (δ : ℂ) •
+        (alignedOmegaEtaGrid hG base s12 hW hW1 hW2 hodd i j -
+          alignedOmegaEtaGrid hG base s12 hW hW1 hW2 hodd i 0) := by
+  have hsource := s12.tau_muGridAlpha_apply_eq_of_grid_value_alignment
+    hG hodd hj hζS hdeg hμ0 hζ1 hnf hδj
+    (alignedOmegaEtaGrid hG base s12 hW hW1 hW2 hodd)
+    (fun k {v} hv => alignedOmegaSigmaGrid_apply_eq_alignedOmegaEtaGrid
+      hG base s12 hW hW1 hW2 hodd hV i k hv)
+  have hPne : alignedOmegaProductIndex hG base s12 hW hW1 hW2 hodd i j ≠
+      alignedOmegaProductIndex hG base s12 hW hW1 hW2 hodd i 0 := by
+    intro h
+    have hpair : ((i, j) : Fin s12.w1 × Fin s12.w2) = (i, 0) :=
+      alignedOmegaProductIndex_injective hG base s12 hW hW1 hW2 hodd h
+    exact hj (congrArg Prod.snd hpair)
+  intro Y hYZ hY2 hYsource
+  exact eta_pair_diff_classifier_of_typePV_value base s12.typeP hV hPne hδpm
+    (fun v hv => (hsource v hv).trans rfl) hYZ hY2 hYsource
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (3.9)(a)** (Coq `eq_in_cycTIiso`): a norm-one virtual character
+agreeing with an eta-grid entry on the regular set `Ŵ = W ∖ (W₁ ∪ W₂)` equals
+that entry globally.  The difference `ψ = η_A − φ` vanishes on the conjugacy
+saturation of `Ŵ`, so its coefficient grid satisfies the (3.7) relation; each
+of `η_A` and `φ` is norm-one, so `ψ` has at most two nonzero grid coefficients,
+and the (3.8) small-support case forces them all to vanish.  In particular
+`⟨φ, η_A⟩ = 1`, and the norm computation gives `ψ = 0`.
+
+This is the rigidity behind Coq's `cycTIisoC`/`cycTIiso_irrel`: it upgrades the
+regular-value agreement of two independently constructed sigma isometries to a
+global equality of their grid entries, without any uniqueness assumption on
+the isometries themselves. -/
+theorem eta_eq_of_norm_one_regular_value_eq [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    {φ : ClassFunction G ℂ} (hφZ : φ ∈ ZIrr G)
+    (hφ1 : ClassFunction.inner φ φ = 1)
+    (A : Fin base.q × Fin base.p)
+    (hvals : ∀ w : G, w ∈ (base.W : Set G) →
+      w ∉ (base.W1 : Set G) ∪ (base.W2 : Set G) →
+      φ w = base.eta A.1 A.2 w) :
+    φ = base.eta A.1 A.2 := by
+  classical
+  set ψ : ClassFunction G ℂ := base.eta A.1 A.2 - φ with hψ
+  have hvanish : ∀ x ∈ conjClassSet
+      ((base.W : Set G) \ ((base.W1 : Set G) ∪ (base.W2 : Set G))), ψ x = 0 := by
+    intro x hx
+    obtain ⟨w, hw, g, hg⟩ := hx
+    have hconj : IsConj w x := isConj_iff.mpr ⟨g, hg⟩
+    rw [← ψ.of_isConj hconj, hψ, ClassFunction.sub_apply,
+      hvals w hw.1 hw.2, sub_self]
+  -- the orthonormal grid family, packaged for the norm-one support bound
+  have hgridZ : ∀ pq : Fin base.q × Fin base.p,
+      base.eta pq.1 pq.2 ∈ ZIrr G := fun pq => eta_mem_ZIrr base pq.1 pq.2
+  have hgridDiag : ∀ a : Fin base.q × Fin base.p,
+      ClassFunction.inner (base.eta a.1 a.2) (base.eta a.1 a.2) = 1 :=
+    fun a => by simpa using eta_orthonormal base a.1 a.1 a.2 a.2
+  have hgridOff : ∀ a b : Fin base.q × Fin base.p, a ≠ b →
+      ClassFunction.inner (base.eta a.1 a.2) (base.eta b.1 b.2) = 0 :=
+    fun a b hab => by
+      rw [eta_orthonormal base a.1 b.1 a.2 b.2, if_neg]
+      rintro ⟨h1, h2⟩
+      exact hab (Prod.ext h1 h2)
+  -- ψ has at most two nonzero grid coefficients
+  have hηNC := OddOrder.Peterfalvi.S05.ncard_inner_grid_ne_zero_le_one
+    (fun pq : Fin base.q × Fin base.p => base.eta pq.1 pq.2)
+    hgridZ hgridDiag hgridOff (hgridZ A) (hgridDiag A)
+  have hφNC := OddOrder.Peterfalvi.S05.ncard_inner_grid_ne_zero_le_one
+    (fun pq : Fin base.q × Fin base.p => base.eta pq.1 pq.2)
+    hgridZ hgridDiag hgridOff hφZ hφ1
+  have hNCset : {x : Fin base.q × Fin base.p |
+      ClassFunction.inner ψ (base.eta x.1 x.2) ≠ 0}.ncard ≤ 2 := by
+    have hsub : {x : Fin base.q × Fin base.p |
+        ClassFunction.inner ψ (base.eta x.1 x.2) ≠ 0} ⊆
+        {x : Fin base.q × Fin base.p |
+          ClassFunction.inner (base.eta A.1 A.2) (base.eta x.1 x.2) ≠ 0} ∪
+        {x : Fin base.q × Fin base.p |
+          ClassFunction.inner φ (base.eta x.1 x.2) ≠ 0} := by
+      intro x hx
+      by_contra hcon
+      simp only [Set.mem_union, Set.mem_setOf_eq, not_or, not_not] at hcon
+      apply hx
+      rw [hψ, ClassFunction.inner_sub_left, hcon.1, hcon.2, sub_zero]
+    calc {x : Fin base.q × Fin base.p |
+          ClassFunction.inner ψ (base.eta x.1 x.2) ≠ 0}.ncard
+        ≤ ({x : Fin base.q × Fin base.p |
+            ClassFunction.inner (base.eta A.1 A.2) (base.eta x.1 x.2) ≠ 0} ∪
+          {x : Fin base.q × Fin base.p |
+            ClassFunction.inner φ (base.eta x.1 x.2) ≠ 0}).ncard :=
+          Set.ncard_le_ncard hsub (Set.toFinite _)
+      _ ≤ {x : Fin base.q × Fin base.p |
+            ClassFunction.inner (base.eta A.1 A.2) (base.eta x.1 x.2) ≠ 0}.ncard +
+          {x : Fin base.q × Fin base.p |
+            ClassFunction.inner φ (base.eta x.1 x.2) ≠ 0}.ncard :=
+          Set.ncard_union_le _ _
+      _ ≤ 2 := by omega
+  have hNC : (Finset.univ.filter fun x : Fin base.q × Fin base.p =>
+      ClassFunction.inner ψ (base.eta x.1 x.2) ≠ 0).card ≤ 2 := by
+    calc (Finset.univ.filter fun x : Fin base.q × Fin base.p =>
+          ClassFunction.inner ψ (base.eta x.1 x.2) ≠ 0).card
+        = {x : Fin base.q × Fin base.p |
+            ClassFunction.inner ψ (base.eta x.1 x.2) ≠ 0}.toFinset.card := by
+          rw [Set.toFinset_setOf]
+      _ = {x : Fin base.q × Fin base.p |
+            ClassFunction.inner ψ (base.eta x.1 x.2) ≠ 0}.ncard :=
+          (Set.ncard_eq_toFinset_card' _).symm
+      _ ≤ 2 := hNCset
+  -- (3.7) + (3.8) small support: every grid coefficient of ψ vanishes
+  have hzero := grid_eq_zero_of_relation_of_card_le_two
+    base.three_le_q base.three_le_p
+    (a := fun i j => ClassFunction.inner ψ (base.eta i j))
+    ⟨0, base.q_prime.pos⟩ ⟨0, base.p_prime.pos⟩
+    (fun i j => inner_eta_grid_relation base hvanish i j) hNC
+  -- in particular `⟨φ, η_A⟩ = 1`, and the norm computation kills ψ
+  have hA : ClassFunction.inner φ (base.eta A.1 A.2) = 1 := by
+    have h0 := hzero A.1 A.2
+    rw [hψ, ClassFunction.inner_sub_left] at h0
+    linear_combination hgridDiag A - h0
+  have hAsymm : ClassFunction.inner (base.eta A.1 A.2) φ = 1 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hA]
+    simp
+  have hself : ClassFunction.inner ψ ψ = 0 := by
+    rw [hψ]
+    simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right]
+    rw [hφ1, hA, hAsymm, hgridDiag A]
+    ring
+  have hfin := eq_zero_of_inner_self_re_eq_zero (φ := ψ) (by rw [hself]; simp)
+  rw [hψ, sub_eq_zero] at hfin
+  exact hfin.symm
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Global sigma/eta grid identification** (Coq `cycTIisoC` for the T-side
+transposition): each concrete S12 aligned sigma-grid entry *equals* the
+corresponding coordinate-respecting eta-grid entry, globally.  The entry is a
+norm-one virtual character agreeing with the eta entry on the shared regular
+set, so (3.9)(a) rigidity applies.  This upgrades the landed regular-value
+alignment to the global grid equality consumed by the transposed (11.8)
+transport, with no carrier change and no sigma-map uniqueness assumption. -/
+theorem alignedOmegaSigmaGrid_eq_alignedOmegaEtaGrid [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    (s12 : OddOrder.Peterfalvi.S12.Hypothesis base.T)
+    (hW : s12.typeP.W = base.W)
+    (hW1 : s12.typeP.W2 = base.W1)
+    (hW2 : s12.typeP.W1 = base.W2)
+    (hodd : Odd (Nat.card G))
+    (hV : typePV base.T s12.typeP =
+      (base.W : Set G) \ ((base.W1 : Set G) ∪ (base.W2 : Set G)))
+    (i : Fin s12.w1) (j : Fin s12.w2) :
+    s12.alignedOmegaSigmaGrid hG hodd i j =
+      alignedOmegaEtaGrid hG base s12 hW hW1 hW2 hodd i j := by
+  have hnorm : ClassFunction.inner
+      (s12.alignedOmegaSigmaGrid hG hodd i j)
+      (s12.alignedOmegaSigmaGrid hG hodd i j) = 1 := by
+    rw [s12.alignedOmegaSigmaGrid_inner hG hodd i i j j]
+    simp
+  exact eta_eq_of_norm_one_regular_value_eq base
+    (s12.alignedOmegaSigmaGrid_mem_ZIrr hG hodd i j) hnorm
+    (alignedOmegaProductIndex hG base s12 hW hW1 hW2 hodd i j)
+    (fun w hwW hwnot => by
+      have hv : w ∈ typePV base.T s12.typeP := by
+        rw [hV]; exact ⟨hwW, hwnot⟩
+      exact alignedOmegaSigmaGrid_apply_eq_alignedOmegaEtaGrid
+        hG base s12 hW hW1 hW2 hodd hV i j hv)
+
 end OddOrder.Peterfalvi.S16
