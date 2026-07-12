@@ -848,7 +848,7 @@ the distinguished family member does not change any `eta`-grid coefficient of th
 theorem exists_betaMGridData [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) :
-    ∃ grid : OddOrder.Peterfalvi.S15.TypeIOrthogonalityGridData hyp.base Mdata.typeIHyp,
+    ∃ grid : OddOrder.Peterfalvi.S15.TypeIOrthogonalityGridData hyp.base Mdata.coherent78,
       grid.phi ∈ Mdata.typeIHyp.Sset := by
   sorry
 

@@ -4,12 +4,21 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S15_BridgeCharacter
+import OddOrder.Peterfalvi.S16_PairingCoherence
+import OddOrder.Peterfalvi.S16_GridExpansion
 
 /-!
 # TAIL
 
 Prefix-split from `OddOrder.Peterfalvi.S15_SAndT` (2000-line limit, issues 0103/0102):
 the (13.19) type-I orthogonality layer and the (14.5) complement exclusion.
+
+The (13.19) grid data is stated against the **(12.6) coherence bundle**
+`S16.TypeICoherent78Data L` (existence: `TypeICoherent78Data.nonempty`), whose
+`coh.extension` is the honest coherent extension `τ₁` of Peterfalvi (13.19) — the raw
+`typeISetup.tau` is a Dade lift that is *arbitrary* off the `A(L)`-supported subspace
+(`dim CF(L) > dim CF(G)` forbids a global isometry), so single-character images `φ^{τ₁}`
+must go through the coherence bundle.
 -/
 namespace OddOrder.Peterfalvi.S15
 open OddOrder.GroupTheory
@@ -103,6 +112,7 @@ theorem eta_axes_odd_of_caseC2_pair {hyp : Hypothesis (G := G)} {L : Subgroup G}
 
 end TypeIOrthogonalityData
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Faithful §13 grid/Dade producer for Peterfalvi (13.19).**
 
 Given a type-I maximal subgroup `L` with its (12.1) `S14.Hypothesis` `typeISetup`, this bundles the
@@ -118,10 +128,13 @@ genuinely grid-dependent data and facts of (13.19) against a concrete kernel ind
   `∀ j ≠ 0, ⟨β_L, η_0j⟩ ∈ 2ℤ+1` (dual: `(v−1)/p`, `η_i0`).
 
 Everything grid-dependent is isolated here; the assembling theorem
-`typeI_orthogonality_dichotomy` supplies the honest §14 `typeISetup`, the `τ₁ = typeISetup.tau`
-Dade map, and reads the dichotomy implication fields off as identities (no over-claim). -/
-structure TypeIOrthogonalityGridData (hyp : Hypothesis (G := G)) {L : Subgroup G}
-    (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L) where
+`typeI_orthogonality_dichotomy` supplies the honest §14 bundle `dataL` (whose
+`typeISetup = dataL.typeIHyp` is the (12.1) Dade setup and whose `τ₁ = dataL.coh.extension`
+is the (12.6) coherent extension), and reads the dichotomy implication fields off as
+identities (no over-claim).  Single-character images use `τ₁` (the raw `tau` is arbitrary
+off the supported subspace); the `A(L)`-supported difference `β_L` uses `tau` directly. -/
+structure TypeIOrthogonalityGridData [Finite G] (hyp : Hypothesis (G := G)) {L : Subgroup G}
+    (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L) where
   e : ℕ
   e_eq_index : ((maxNilpotentNormalHall L).subgroupOf L).index = e
   Lset : Set (ClassFunction ↥L ℂ)
@@ -135,17 +148,16 @@ structure TypeIOrthogonalityGridData (hyp : Hypothesis (G := G)) {L : Subgroup G
   betaT : ClassFunction G ℂ
   disjoint_support : Disjoint betaL.support betaS.support
   /-- **(13.19)**: `β_L` is the Dade image `β_L^τ = (Ind_H^L 1_H − φ)^{τ₁}` (the extension
-  `τ₁ = typeISetup.tau` agrees with `τ` on the `A(L)`-supported `Ind_H^L 1_H − φ`). -/
+  `τ₁` agrees with `τ = dataL.typeIHyp.tau` on the `A(L)`-supported `Ind_H^L 1_H − φ`). -/
   betaL_eq :
     ∀ [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
-      [Invertible (Nat.card ↥((typeISetup.H).subgroupOf L) : ℂ)],
-      betaL = typeISetup.tau
-        (ClassFunction.induce ((typeISetup.H).subgroupOf L)
-          (trivialClassFunction ↥((typeISetup.H).subgroupOf L)) - phi)
+      [Invertible (Nat.card ↥((dataL.typeIHyp.H).subgroupOf L) : ℂ)],
+      betaL = dataL.typeIHyp.tau
+        (ClassFunction.induce ((dataL.typeIHyp.H).subgroupOf L)
+          (trivialClassFunction ↥((dataL.typeIHyp.H).subgroupOf L)) - phi)
   Ltau_orthogonal_eta :
-    ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
-      ∀ (i : Fin hyp.q) (j : Fin hyp.p),
-        ClassFunction.inner (typeISetup.tau phi) (hyp.eta i j) = 0
+    ∀ (i : Fin hyp.q) (j : Fin hyp.p),
+      ClassFunction.inner (dataL.coh.extension phi) (hyp.eta i j) = 0
   /-- **(13.19.c)**, first clause: `(β_L^τ, η_{0j})` is independent of `j` for `1 ≤ j < p`. -/
   betaL_eta0_row_constant :
     ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
@@ -162,8 +174,8 @@ structure TypeIOrthogonalityGridData (hyp : Hypothesis (G := G)) {L : Subgroup G
   /-- **(13.19.c)** S-side dichotomy, faithful form: **(c1)** `(β_S^τ, φ^{τ₁}) ≡ 1 (mod 2)` and
   the degree bound `(|H|−1)/e ≤ (u−1)/q`, or **(c2)** the `η_{0j}` odd-parity and `p ≤ e`. -/
   caseC :
-    (OddIntegerInner betaS (typeISetup.tau phi) ∧
-      (((Nat.card ↥typeISetup.H - 1 : ℕ) : ℚ) / (e : ℚ) ≤
+    (OddIntegerInner betaS (dataL.coh.extension phi) ∧
+      (((Nat.card ↥dataL.typeIHyp.H - 1 : ℕ) : ℚ) / (e : ℚ) ≤
         ((hyp.u - 1 : ℕ) : ℚ) / (hyp.q : ℚ))) ∨
       ((∀ j : Fin hyp.p, (j : ℕ) ≠ 0 →
         OddIntegerInner betaL (hyp.eta ⟨0, hyp.q_prime.pos⟩ j)) ∧ hyp.p ≤ e)
@@ -171,8 +183,8 @@ structure TypeIOrthogonalityGridData (hyp : Hypothesis (G := G)) {L : Subgroup G
   `(β_T^τ, φ^{τ₁}) ≡ 1 (mod 2)` and `(|H|−1)/e ≤ (v−1)/p`, or **(c2)** the `η_{i0}` odd-parity
   and `q ≤ e`. -/
   caseC_dual :
-    (OddIntegerInner betaT (typeISetup.tau phi) ∧
-      (((Nat.card ↥typeISetup.H - 1 : ℕ) : ℚ) / (e : ℚ) ≤
+    (OddIntegerInner betaT (dataL.coh.extension phi) ∧
+      (((Nat.card ↥dataL.typeIHyp.H - 1 : ℕ) : ℚ) / (e : ℚ) ≤
         ((hyp.v - 1 : ℕ) : ℚ) / (hyp.p : ℚ))) ∨
       ((∀ i : Fin hyp.q, (i : ℕ) ≠ 0 →
         OddIntegerInner betaL (hyp.eta i ⟨0, hyp.p_prime.pos⟩)) ∧ hyp.q ≤ e)
@@ -468,16 +480,176 @@ theorem typeIBetaL_betaS_disjoint_support [Finite G]
   have hone : r ∣ 1 := hcop ▸ Nat.dvd_gcd hrLF hrpq
   exact hr.one_lt.ne' (Nat.dvd_one.mp hone)
 
-/-- **(13.19.b)**: `𝓛^{τ₁}` is orthogonal to the whole `η`-grid.  For `ψ ∈ 𝓛`,
-`(ψ − ψ̄)^τ` vanishes on `W ∖ (W₁ ∪ W₂)` by (13.19.a), so `NC((ψ−ψ̄)^τ) ≤ ‖ψ−ψ̄‖² = 2` and
-(3.8) forces `ψ^{τ₁} ⊥ η_{ij}`.  Isolated obligation. -/
-theorem tau_apply_orthogonal_eta_of_mem_Sset [Finite G]
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (13.19.a), Dade-support avoidance** (Coq `tiA_PWG` restricted to `Ŵ^G`): for
+a type-I maximal `L`, the Dade support `Ã(L)` avoids the regular-set saturation
+`Ŵ^G = (W ∖ (W₁ ∪ W₂))^G` — an `Ã(L)`-element has a prime divisor of `|L_F|` in its order
+(`exists_mem_A_prime_dvd_orderOf_of_mem_dadeSupport` + `A(L) ⊆ L_F^#`), while a
+`Ŵ^G`-element has order dividing `|W| = p q`, coprime to `|L_F|` ((8.17.a)
+`card_LF_coprime_pq`).  The conjugation-free core of `typeIBetaL_betaS_disjoint_support`. -/
+theorem typeI_dadeSupport_avoids_regular [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L)
-    (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ typeISetup.Sset) :
-    ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
-      ∀ (i : Fin hyp.q) (j : Fin hyp.p),
-        ClassFunction.inner (typeISetup.tau φ) (hyp.eta i j) = 0 := sorry
+    {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L) :
+    ∀ x ∈ OddOrder.GroupTheory.conjClassSet
+        ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))),
+      x ∉ typeISetup.dadeData.dade.dadeSupport := by
+  intro x hx hxD
+  -- L-side: a prime `r ∣ |L_F|` divides `orderOf x`
+  obtain ⟨a, haA, r, hr, hra, hrx⟩ :=
+    typeISetup.dadeData.dade.exists_mem_A_prime_dvd_orderOf_of_mem_dadeSupport hxD
+  obtain ⟨frob₀, -⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius _hG typeISetup.maximal
+    ⟨typeISetup.typeI⟩
+  have hHeq : frob₀.typeI.typeF.H = typeISetup.typeI.typeF.H :=
+    frob₀.typeI.typeF.H_eq.trans typeISetup.typeI.typeF.H_eq.symm
+  have hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L
+      ((typeISetup.typeI.typeF.H).subgroupOf L) frob₀.complement := by
+    have h := frob₀.frobenius
+    rwa [hHeq] at h
+  have haH := typeIA_subset_sharpSubgroup_of_frobenius typeISetup.typeI hfrob haA
+  have hrLF : r ∣ Nat.card ↥(maxNilpotentNormalHall L) := by
+    refine hra.trans ?_
+    have hdvd := Subgroup.orderOf_dvd_natCard typeISetup.typeI.typeF.H haH.1
+    rwa [typeISetup.typeI.typeF.H_eq] at hdvd
+  -- regular side: `orderOf x = orderOf w ∣ |W| = p q`
+  obtain ⟨w, hw, c, hcx⟩ := OddOrder.GroupTheory.mem_conjClassSet.mp hx
+  have hordx : orderOf x = orderOf w := by
+    rw [← hcx]
+    have hinj : orderOf ((MulAut.conj c).toMonoidHom w) = orderOf w :=
+      orderOf_injective (MulAut.conj c).toMonoidHom (MulEquiv.injective _) _
+    rw [← hinj]
+    congr 1
+  have hword : orderOf w ∣ hyp.p * hyp.q := by
+    have h := Subgroup.orderOf_dvd_natCard hyp.W hw.1
+    rwa [card_W_eq_pq hyp] at h
+  have hxord : orderOf x ∣ hyp.p * hyp.q := by rw [hordx]; exact hword
+  have hrpq : r ∣ hyp.p * hyp.q := hrx.trans hxord
+  -- a prime dividing both `|L_F|` and `p·q` contradicts (8.17.a)
+  have hnconjS := not_conj_of_isTypeI_of_isTypeNonI _hG ⟨typeISetup.typeI⟩
+    hyp.S_maximal hyp.S_nonI
+  have hnconjT := not_conj_of_isTypeI_of_isTypeNonI _hG ⟨typeISetup.typeI⟩
+    hyp.T_maximal hyp.T_nonI
+  have hcop := card_LF_coprime_pq _hG hyp typeISetup.maximal ⟨typeISetup.typeI⟩
+    hnconjS hnconjT
+  have hone : r ∣ 1 := hcop ▸ Nat.dvd_gcd hrLF hrpq
+  exact hr.one_lt.ne' (Nat.dvd_one.mp hone)
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Every family member is an enumerated `ζ_k` with `k ≠ ind1H`** — the converse of
+`TypeICoherent78Data.zeta_mem_Sset`.  The `cover` field supplies an index `k` with
+`ζ_k = Ind θ' = φ`; `k = ind1H` is impossible since `Ind 1_H` is real while the nontrivial
+induced irreducible `Ind θ'` is not (odd order, Peterfalvi (1.1)). -/
+theorem exists_zeta_index_of_mem_Sset [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G}
+    (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L)
+    {φ : ClassFunction ↥L ℂ} (hφ : φ ∈ dataL.typeIHyp.Sset) :
+    ∃ k : Fin (dataL.n + 1), k ≠ dataL.ind1H ∧ dataL.zeta k = φ := by
+  haveI := dataL.kernelIn_normal
+  obtain ⟨θ', hθ'ne, hφeq⟩ := hφ
+  obtain ⟨k, hk⟩ := dataL.cover θ'
+  have hk' : ClassFunction.induce dataL.kernelIn (dataL.θ k : ClassFunction _ ℂ)
+      = ClassFunction.induce dataL.kernelIn (θ' : ClassFunction _ ℂ) := hk
+  refine ⟨k, ?_, hk'.trans hφeq.symm⟩
+  -- `k = ind1H` would identify the non-real `Ind θ'` with the real `Ind 1_H`.
+  rintro rfl
+  have hind1 : ClassFunction.induce dataL.kernelIn (dataL.θ dataL.ind1H : ClassFunction _ ℂ)
+      = ClassFunction.induce dataL.kernelIn
+          (trivialClassFunction ↥dataL.kernelIn) := by
+    rw [dataL.triv]
+    rfl
+  have hreal : ClassFunction.IsReal
+      (ClassFunction.induce dataL.kernelIn (dataL.θ dataL.ind1H : ClassFunction _ ℂ)) := by
+    rw [hind1]
+    show (ClassFunction.induce dataL.kernelIn (trivialClassFunction _)).conj = _
+    rw [conj_induce]
+    exact congrArg _ trivialClassFunction_isReal
+  rw [hk'] at hreal
+  -- `Ind θ'` is a nontrivial irreducible (Frobenius), hence not real in odd order
+  have hirr : IsIrreducibleCharacter
+      (ClassFunction.induce dataL.kernelIn (θ' : ClassFunction _ ℂ)) :=
+    isIrreducibleCharacter_induce_of_frobeniusGroup dataL.hFrob θ' hθ'ne
+  have hodd_L : Odd (Nat.card ↥L) :=
+    _hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card _)
+  have hK_ne_top : dataL.kernelIn ≠ ⊤ := by
+    intro hKtop
+    refine dataL.hFrob.ne_bot_complement (le_bot_iff.mp ?_)
+    have hdisj := dataL.hFrob.isComplement.disjoint
+    rw [show (dataL.typeIHyp.typeI.typeF.H).subgroupOf L = dataL.kernelIn from rfl, hKtop]
+      at hdisj
+    simpa using hdisj.le_bot
+  have hidx : 1 < (dataL.kernelIn).index := Subgroup.one_lt_index_of_ne_top hK_ne_top
+  obtain ⟨di, hdi_pos, hdi⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ'
+  have hne_triv : (⟨ClassFunction.induce dataL.kernelIn (θ' : ClassFunction _ ℂ), hirr⟩ :
+      IrreducibleCharacter ↥L) ≠ trivialIrreducibleCharacter _ := by
+    intro h
+    have hcf : ClassFunction.induce dataL.kernelIn (θ' : ClassFunction _ ℂ)
+        = trivialClassFunction ↥L := by
+      have h2 := congrArg Subtype.val h
+      simpa [IrreducibleCharacter.coe_trivialIrreducibleCharacter] using h2
+    have hone : ((dataL.kernelIn).index : ℂ) * (di : ℂ) = 1 := by
+      rw [← hdi, ← ClassFunction.induce_apply_one dataL.kernelIn (θ' : ClassFunction _ ℂ),
+        hcf, trivialClassFunction_apply]
+    have : (dataL.kernelIn).index * di = 1 := by exact_mod_cast hone
+    have h1 : (dataL.kernelIn).index = 1 := by
+      rcases Nat.eq_one_of_mul_eq_one_right this with h; omega
+    omega
+  exact not_isReal_of_ne_trivial_of_odd_card' hodd_L hne_triv hreal
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (13.19.b)**: `𝓛^{τ₁}` is orthogonal to the whole `η`-grid, for the honest
+coherent extension `τ₁ = dataL.coh.extension`.  For `ψ ∈ 𝓛` (an enumerated `ζ_k`,
+`exists_zeta_index_of_mem_Sset`), the conjugate partner `ζ_{k'} = ζ̄_k` is again a family
+member (`exists_conjIndex_at`); `ζ_k^{τ₁} − ζ_{k'}^{τ₁}` is supported in `Ã(L)`
+(`nu_zeta_sub_conj_support_at`), which avoids `Ŵ^G` by (13.19.a)
+(`typeI_dadeSupport_avoids_regular`); the unit norms (`nu_zeta_norm_one`), conjugate
+orthogonality (`nu_zeta_inner_nu_conj_eq_zero`), and `ℤ[Irr G]`-membership feed the (3.8)
+rigidity engine `eta_orthogonal_of_norm_one_pair_vanish`. -/
+theorem coherent_extension_orthogonal_eta_of_mem_Sset [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {L : Subgroup G} (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L)
+    (φ : ClassFunction ↥L ℂ) (hφ : φ ∈ dataL.typeIHyp.Sset) :
+    ∀ (i : Fin hyp.q) (j : Fin hyp.p),
+      ClassFunction.inner (dataL.coh.extension φ) (hyp.eta i j) = 0 := by
+  classical
+  have core : ∀ (i : Fin hyp.q) (j : Fin hyp.p),
+      ClassFunction.inner (hyp.eta i j) (dataL.coh.extension φ) = 0 := by
+    obtain ⟨k, hk_ne, hkφ⟩ := exists_zeta_index_of_mem_Sset _hG dataL hφ
+    have hk78 : k ≠ (dataL.h78 _hG).ind1H := by
+      rw [dataL.h78_ind1H_eq]; exact hk_ne
+    obtain ⟨k', hk'_ne, hk'⟩ := dataL.exists_conjIndex_at _hG hk_ne
+    -- engine inputs from the coherence bundle
+    have hpsiZ : (dataL.h78 _hG).nu ((dataL.h78 _hG).hyp76.zeta k) ∈ ZIrr G := by
+      rw [dataL.h78_nu_eq, dataL.h78_zeta_eq]
+      exact dataL.coh.extension_mem_ZIrr _
+        (Submodule.subset_span (dataL.zeta_mem_Sset hk_ne))
+    have hconjZ : (dataL.h78 _hG).nu ((dataL.h78 _hG).hyp76.zeta k') ∈ ZIrr G := by
+      have hk'ne_data : k' ≠ dataL.ind1H := by
+        rw [← dataL.h78_ind1H_eq _hG]; exact hk'_ne
+      rw [dataL.h78_nu_eq, dataL.h78_zeta_eq]
+      exact dataL.coh.extension_mem_ZIrr _
+        (Submodule.subset_span (dataL.zeta_mem_Sset hk'ne_data))
+    have hpsi1 := dataL.nu_zeta_norm_one _hG hk78
+    have hconj1 := dataL.nu_zeta_norm_one _hG hk'_ne
+    have hcross := dataL.nu_zeta_inner_nu_conj_eq_zero _hG _hG.odd hk_ne hk'_ne hk'
+    have hsupp := dataL.nu_zeta_sub_conj_support_at _hG hk_ne hk'_ne hk'
+    have havoid := typeI_dadeSupport_avoids_regular _hG hyp dataL.typeIHyp
+    have hvanish : ∀ x ∈ OddOrder.GroupTheory.conjClassSet
+        ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))),
+        ((dataL.h78 _hG).nu ((dataL.h78 _hG).hyp76.zeta k)
+          - (dataL.h78 _hG).nu ((dataL.h78 _hG).hyp76.zeta k')) x = 0 := by
+      intro x hx
+      by_contra hval
+      have hxD := hsupp (ClassFunction.mem_support.mpr hval)
+      rw [dataL.h78_hyp_eq] at hxD
+      exact havoid x hx hxD
+    intro i j
+    have hengine := OddOrder.Peterfalvi.S16.eta_orthogonal_of_norm_one_pair_vanish hyp
+      hpsiZ hconjZ hpsi1 hconj1 hcross hvanish i j
+    have hid : (dataL.h78 _hG).nu ((dataL.h78 _hG).hyp76.zeta k)
+        = dataL.coh.extension φ := by
+      rw [dataL.h78_nu_eq, dataL.h78_zeta_eq, hkφ]
+    rwa [hid] at hengine
+  intro i j
+  rw [OddOrder.RepresentationTheory.inner_conj_symm, core i j, star_zero]
 
 /-- **(13.19.c), first clause (row form)**: `(β_L^τ, η_{0j})` is independent of `j ≥ 1` — by
 (13.18.a) `Supp(μ_{0j} − μ_{01}) ⊆ P^# ∪ (W∖(W₁∪W₂))^S`, (4.8) and (13.19.a) give
@@ -504,6 +676,7 @@ theorem typeIBetaL_eta_col_constant [Finite G]
           = ClassFunction.inner (typeIBetaL typeISetup φ)
               (hyp.eta i' ⟨0, hyp.p_prime.pos⟩) := sorry
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.19.c) S-side dichotomy**: `(Γ_S, φ^{τ₁}) + (Γ_L, η_{01}) ≡ 1 (mod 2)` (from
 `0 = (β_L^τ, β_S^τ)` via (13.19.a)/(13.18.a) and the evenness of `(Γ_L, Γ_S)` ((13.18.c)+(1.1))),
 so one of (c1) `(β_S^τ, φ^{τ₁}) ≡ 1` — in which case (13.18.d) with `Γ_S`'s `𝓛^{τ₁}`-expansion
@@ -511,86 +684,93 @@ bounds `(|H|−1)/e = Σaᵢ² ≤ (u−1)/q` — or (c2) `(β_L^τ, η_{0j}) �
 `η`-coefficient parity forces `p ≤ e`.  Isolated obligation (the (13.19) proof body). -/
 theorem typeI_caseC_dichotomy [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L)
-    (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ typeISetup.Sset)
+    {L : Subgroup G} (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L)
+    (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ dataL.typeIHyp.Sset)
     (_hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ)) :
-    (OddIntegerInner (tauSbetaGrid _hG hyp) (typeISetup.tau φ) ∧
-      (((Nat.card ↥typeISetup.H - 1 : ℕ) : ℚ)
+    (OddIntegerInner (tauSbetaGrid _hG hyp) (dataL.coh.extension φ) ∧
+      (((Nat.card ↥dataL.typeIHyp.H - 1 : ℕ) : ℚ)
           / (((maxNilpotentNormalHall L).subgroupOf L).index : ℚ) ≤
         ((hyp.u - 1 : ℕ) : ℚ) / (hyp.q : ℚ))) ∨
       ((∀ j : Fin hyp.p, (j : ℕ) ≠ 0 →
-        OddIntegerInner (typeIBetaL typeISetup φ) (hyp.eta ⟨0, hyp.q_prime.pos⟩ j)) ∧
+        OddIntegerInner (typeIBetaL dataL.typeIHyp φ) (hyp.eta ⟨0, hyp.q_prime.pos⟩ j)) ∧
         hyp.p ≤ ((maxNilpotentNormalHall L).subgroupOf L).index) := sorry
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.19.c) T-side dichotomy** (S↔T swapped): as `typeI_caseC_dichotomy` with
 `β_T`/`v`/`p` in place of `β_S`/`u`/`q`.  Isolated obligation. -/
 theorem typeI_caseC_dual_dichotomy [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T) (Tdata : TypePData hyp.T)
-    {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L)
-    (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ typeISetup.Sset)
+    {L : Subgroup G} (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L)
+    (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ dataL.typeIHyp.Sset)
     (_hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ)) :
-    (OddIntegerInner (tauTbetaGrid _hG hyp hT2 Tdata) (typeISetup.tau φ) ∧
-      (((Nat.card ↥typeISetup.H - 1 : ℕ) : ℚ)
+    (OddIntegerInner (tauTbetaGrid _hG hyp hT2 Tdata) (dataL.coh.extension φ) ∧
+      (((Nat.card ↥dataL.typeIHyp.H - 1 : ℕ) : ℚ)
           / (((maxNilpotentNormalHall L).subgroupOf L).index : ℚ) ≤
         ((hyp.v - 1 : ℕ) : ℚ) / (hyp.p : ℚ))) ∨
       ((∀ i : Fin hyp.q, (i : ℕ) ≠ 0 →
-        OddIntegerInner (typeIBetaL typeISetup φ) (hyp.eta i ⟨0, hyp.p_prime.pos⟩)) ∧
+        OddIntegerInner (typeIBetaL dataL.typeIHyp φ) (hyp.eta i ⟨0, hyp.p_prime.pos⟩)) ∧
         hyp.q ≤ ((maxNilpotentNormalHall L).subgroupOf L).index) := sorry
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Faithful §13 producer for Peterfalvi (13.19).**  The Tier-A structure — `e = [L:H]`
-(definitionally), the family `𝓛 = typeISetup.Sset`, a chosen degree-`e` member `φ`
+(definitionally), the family `𝓛 = dataL.typeIHyp.Sset`, a chosen degree-`e` member `φ`
 (`exists_Sset_apply_one_eq_index`), and the bridge images `β_L = typeIBetaL`,
-`β_S = tauSbetaGrid`, `β_T = tauTbetaGrid` — is genuinely constructed; the deep (13.19)
-facts are the isolated `φ`-parametric obligations above, consumed field-by-field. -/
-noncomputable def typeIOrthogonalityGridData_of_typeISetup [Finite G]
+`β_S = tauSbetaGrid`, `β_T = tauTbetaGrid` — is genuinely constructed; the (13.19.a)/(13.19.b)
+facts are **proven** (`typeIBetaL_betaS_disjoint_support`,
+`coherent_extension_orthogonal_eta_of_mem_Sset`); the remaining deep (13.19.c) facts are the
+isolated `φ`-parametric obligations above, consumed field-by-field. -/
+noncomputable def typeIOrthogonalityGridData_of_coherent78 [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
-    {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L) :
-    TypeIOrthogonalityGridData hyp typeISetup :=
+    {L : Subgroup G} (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L) :
+    TypeIOrthogonalityGridData hyp dataL :=
   { e := ((maxNilpotentNormalHall L).subgroupOf L).index
     e_eq_index := rfl
-    Lset := typeISetup.Sset
-    phi := Classical.choose (exists_Sset_apply_one_eq_index _hG typeISetup)
-    phi_mem := (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).1
-    phi_degree_eq_e := (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).2
-    betaL := typeIBetaL typeISetup
-      (Classical.choose (exists_Sset_apply_one_eq_index _hG typeISetup))
+    Lset := dataL.typeIHyp.Sset
+    phi := Classical.choose (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)
+    phi_mem := (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).1
+    phi_degree_eq_e :=
+      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).2
+    betaL := typeIBetaL dataL.typeIHyp
+      (Classical.choose (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp))
     betaS := tauSbetaGrid _hG hyp
     betaT := tauTbetaGrid _hG hyp hT2
       (Classical.choose (OddOrder.Peterfalvi.S15.reconciled_typePData_T _hG hyp))
-    disjoint_support := typeIBetaL_betaS_disjoint_support _hG hyp typeISetup _
-      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).1
-      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).2
-    betaL_eq := typeIBetaL_eq_tau_induce_sub typeISetup _
-    Ltau_orthogonal_eta := tau_apply_orthogonal_eta_of_mem_Sset _hG hyp typeISetup _
-      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).1
-    betaL_eta0_row_constant := typeIBetaL_eta_row_constant _hG hyp typeISetup _
-      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).1
-    betaL_eta0_col_constant := typeIBetaL_eta_col_constant _hG hyp typeISetup _
-      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).1
-    caseC := typeI_caseC_dichotomy _hG hyp typeISetup _
-      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).1
-      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).2
+    disjoint_support := typeIBetaL_betaS_disjoint_support _hG hyp dataL.typeIHyp _
+      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).1
+      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).2
+    betaL_eq := typeIBetaL_eq_tau_induce_sub dataL.typeIHyp _
+    Ltau_orthogonal_eta := coherent_extension_orthogonal_eta_of_mem_Sset _hG hyp dataL _
+      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).1
+    betaL_eta0_row_constant := typeIBetaL_eta_row_constant _hG hyp dataL.typeIHyp _
+      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).1
+    betaL_eta0_col_constant := typeIBetaL_eta_col_constant _hG hyp dataL.typeIHyp _
+      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).1
+    caseC := typeI_caseC_dichotomy _hG hyp dataL _
+      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).1
+      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).2
     caseC_dual := typeI_caseC_dual_dichotomy _hG hyp hT2
-      (Classical.choose (OddOrder.Peterfalvi.S15.reconciled_typePData_T _hG hyp)) typeISetup _
-      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).1
-      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).2 }
+      (Classical.choose (OddOrder.Peterfalvi.S15.reconciled_typePData_T _hG hyp)) dataL _
+      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).1
+      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).2 }
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (13.19)**: a type-I maximal subgroup has `𝓛^{τ₁}` orthogonal to the `eta_ij`,
 `(β_L^τ, η_{0j})` constant along each zero axis, and on each zero axis one of the two (13.19.c)
 cases — the faithful conjunction forms `(c1) = parity ∧ degree bound` and
 `(c2) = η-axis odd-parity ∧ p ≤ e` — holds.
 
-De-opacified (W3 §15): the honest §14 content — the (12.1) `S14.Hypothesis` of `L`
-(`S14.exists_typeI_hypothesis`) and its genuine Dade map `τ₁ = typeISetup.tau` —
+De-opacified (W3 §15): the honest §14 content — the (12.6) coherence bundle
+`S16.TypeICoherent78Data L` (`TypeICoherent78Data.nonempty`) with its (12.1) Dade setup
+`typeISetup = dataL.typeIHyp` and genuine coherent extension `τ₁ = dataL.coh.extension` —
 is constructed here;
 the opaque `Prop` fields of `TypeIOrthogonalityData` are instantiated to the **genuine** (13.19)
 statements.  `betaL_eta_independent` is instantiated to the faithful (13.19.c) first clause — the
 zero-axis **constancy** of `(β_L^τ, η_{0j})`/`(β_L^τ, η_{i0})` (NOT orthogonality: in case (c2)
 these inner products are odd).  The dichotomy implication fields (`caseC1_bound`,
 `caseC2_eta0j_odd`, dual) are the conjunction projections.  The grid-dependent atoms come from the
-faithful producer `typeIOrthogonalityGridData_of_typeISetup`, whose type is the genuine (13.19)
+faithful producer `typeIOrthogonalityGridData_of_coherent78`, whose type is the genuine (13.19)
 grid content. -/
 theorem typeI_orthogonality_dichotomy [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
@@ -601,17 +781,17 @@ theorem typeI_orthogonality_dichotomy [Finite G]
         data.betaL_eta_independent ∧
           (data.caseC1 ∨ data.caseC2) ∧
             (data.caseC1_dual ∨ data.caseC2_dual) := by
-  -- (12.1)/(14.*): the type-I maximal `L` carries a genuine `S14.Hypothesis` (honest own-logic).
-  obtain ⟨typeISetup⟩ := OddOrder.Peterfalvi.S14.exists_typeI_hypothesis _hG hLmax hLI
+  -- (12.1)/(12.6)/(14.*): the type-I maximal `L` carries a genuine coherence bundle.
+  obtain ⟨dataL⟩ := OddOrder.Peterfalvi.S16.TypeICoherent78Data.nonempty _hG hLmax hLI
   -- The grid/Dade atoms and facts (the single deep obligation).
-  let g := typeIOrthogonalityGridData_of_typeISetup _hG hyp hT2 typeISetup
+  let g := typeIOrthogonalityGridData_of_coherent78 _hG hyp hT2 dataL
   -- Assemble `TypeIOrthogonalityData` with the genuine opaque-`Prop` choices and
   -- conjunction-projection dichotomy implication fields.
-  refine ⟨{ typeISetup := typeISetup
+  refine ⟨{ typeISetup := dataL.typeIHyp
             e := g.e
             e_eq_index := ((maxNilpotentNormalHall L).subgroupOf L).index = g.e
             Lset := g.Lset
-            tau1 := typeISetup.tau
+            tau1 := dataL.coh.extension
             phi := g.phi
             phi_mem := g.phi_mem
             phi_degree_eq_e := g.phi_degree_eq_e
@@ -619,9 +799,8 @@ theorem typeI_orthogonality_dichotomy [Finite G]
             betaS := g.betaS
             disjoint_support := Disjoint g.betaL.support g.betaS.support
             Ltau_orthogonal_eta :=
-              ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
-                ∀ (i : Fin hyp.q) (j : Fin hyp.p),
-                  ClassFunction.inner (typeISetup.tau g.phi) (hyp.eta i j) = 0
+              ∀ (i : Fin hyp.q) (j : Fin hyp.p),
+                ClassFunction.inner (dataL.coh.extension g.phi) (hyp.eta i j) = 0
             betaL_eta_independent :=
               (∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
                 ∀ (j j' : Fin hyp.p), (j : ℕ) ≠ 0 → (j' : ℕ) ≠ 0 →
@@ -632,8 +811,8 @@ theorem typeI_orthogonality_dichotomy [Finite G]
                   ClassFunction.inner g.betaL (hyp.eta i ⟨0, hyp.p_prime.pos⟩)
                     = ClassFunction.inner g.betaL (hyp.eta i' ⟨0, hyp.p_prime.pos⟩))
             caseC1 :=
-              OddIntegerInner g.betaS (typeISetup.tau g.phi) ∧
-                (((Nat.card ↥typeISetup.H - 1 : ℕ) : ℚ) / (g.e : ℚ) ≤
+              OddIntegerInner g.betaS (dataL.coh.extension g.phi) ∧
+                (((Nat.card ↥dataL.typeIHyp.H - 1 : ℕ) : ℚ) / (g.e : ℚ) ≤
                   ((hyp.u - 1 : ℕ) : ℚ) / (hyp.q : ℚ))
             caseC2 :=
               (∀ j : Fin hyp.p, (j : ℕ) ≠ 0 →
@@ -641,8 +820,8 @@ theorem typeI_orthogonality_dichotomy [Finite G]
             caseC2_eta0j_odd := fun h => h.1
             caseC1_bound := fun h => h.2
             caseC1_dual :=
-              OddIntegerInner g.betaT (typeISetup.tau g.phi) ∧
-                (((Nat.card ↥typeISetup.H - 1 : ℕ) : ℚ) / (g.e : ℚ) ≤
+              OddIntegerInner g.betaT (dataL.coh.extension g.phi) ∧
+                (((Nat.card ↥dataL.typeIHyp.H - 1 : ℕ) : ℚ) / (g.e : ℚ) ≤
                   ((hyp.v - 1 : ℕ) : ℚ) / (hyp.p : ℚ))
             caseC2_dual :=
               (∀ i : Fin hyp.q, (i : ℕ) ≠ 0 →
@@ -663,13 +842,14 @@ excluded at (13.17) — Peterfalvi rules it out only in the §14 endgame: (14.5)
 issue-3003 pattern); the faithful (14.5) form and its two consumers live here, downstream of the
 (13.19) grid data they consume. -/
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (14.5), core exclusion**: under the §14 normalization `q < p` and the type-II
 fact `N_G(U) ⊄ S`, the `W₁`-containing Frobenius complement `E` of the type-I maximal
 `L ⊇ N_G(U)` is not contained in `Q`.
 
 *Proof (Pf p.87).*  If `E ≤ Q` then `E = E ⊓ Q = W₁` (`complement_inf_Q_eq_W1`), so the
 Fitting-kernel index of `L` is `e = |W₁| = q < p`.  The (13.19.c) dichotomy
-(`typeIOrthogonalityGridData_of_typeISetup`) then cannot hold in case (c2) (which forces
+(`typeIOrthogonalityGridData_of_coherent78`) then cannot hold in case (c2) (which forces
 `p ≤ e`), so the (c1) bound `(|H|−1)/e ≤ (u−1)/q` holds with `e = q`, giving `|H| ≤ u`.  With
 `U ≤ H` ((13.17.b), hypothesis `hUH`) and `u ≤ |U|` this forces `H = U`, so
 `L = H ⋊ E = U W₁ ≤ S` — contradicting `N_G(U) ≤ L` and `N_G(U) ⊄ S`. -/
@@ -699,9 +879,9 @@ theorem complement_not_le_Q [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hindex : ((maxNilpotentNormalHall L).subgroupOf L).index = hyp.q := by
     rw [typeIFrobenius_kernel_index_eq_complement frob, hEcard]
   -- the (13.19) grid data for `L`
-  obtain ⟨typeISetup⟩ := OddOrder.Peterfalvi.S14.exists_typeI_hypothesis _hG hLmax hLI
-  have hHL : typeISetup.H = maxNilpotentNormalHall L := typeISetup.typeI.typeF.H_eq
-  set g := typeIOrthogonalityGridData_of_typeISetup _hG hyp hT2 typeISetup with hgdef
+  obtain ⟨dataL⟩ := OddOrder.Peterfalvi.S16.TypeICoherent78Data.nonempty _hG hLmax hLI
+  have hHL : dataL.typeIHyp.H = maxNilpotentNormalHall L := dataL.typeIHyp.typeI.typeF.H_eq
+  set g := typeIOrthogonalityGridData_of_coherent78 _hG hyp hT2 dataL with hgdef
   have he_q : g.e = hyp.q := by rw [← g.e_eq_index, hindex]
   -- case (c2) is impossible: `p ≤ e = q < p`
   rcases g.caseC with ⟨-, hbound⟩ | ⟨-, hpe⟩
@@ -711,8 +891,8 @@ theorem complement_not_le_Q [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   -- case (c1): `(|H|−1)/q ≤ (u−1)/q` forces `|H| ≤ u ≤ |U| ≤ |H|`, so `H = U`
   rw [he_q] at hbound
   have hq0 : (0 : ℚ) < (hyp.q : ℚ) := by exact_mod_cast hyp.q_prime.pos
-  have hle_nat : Nat.card ↥typeISetup.H - 1 ≤ hyp.u - 1 := by
-    have h : ((Nat.card ↥typeISetup.H - 1 : ℕ) : ℚ) ≤ ((hyp.u - 1 : ℕ) : ℚ) := by
+  have hle_nat : Nat.card ↥dataL.typeIHyp.H - 1 ≤ hyp.u - 1 := by
+    have h : ((Nat.card ↥dataL.typeIHyp.H - 1 : ℕ) : ℚ) ≤ ((hyp.u - 1 : ℕ) : ℚ) := by
       have hmul := mul_le_mul_of_nonneg_right hbound hq0.le
       rwa [div_mul_cancel₀ _ hq0.ne', div_mul_cancel₀ _ hq0.ne'] at hmul
     exact_mod_cast h
@@ -729,7 +909,7 @@ theorem complement_not_le_Q [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact Nat.le_mul_of_pos_right _ hc
   have hU_le_H : Nat.card ↥hyp.U ≤ Nat.card ↥(maxNilpotentNormalHall L) :=
     Subgroup.card_le_of_le hUH
-  have hHpos : 0 < Nat.card ↥typeISetup.H := Nat.card_pos
+  have hHpos : 0 < Nat.card ↥dataL.typeIHyp.H := Nat.card_pos
   have hcard_eq : Nat.card ↥(maxNilpotentNormalHall L) = Nat.card ↥hyp.U := by
     rw [← hHL] at hU_le_H ⊢
     omega
