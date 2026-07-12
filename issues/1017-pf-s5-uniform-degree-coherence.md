@@ -1582,3 +1582,32 @@ R-family closed/case-agnostic・linchpin landed)、残は M-scale の wiring 労
   (htype-gated) を S-instance mirror → `nineElevenCaseA_equality_refutation` (tau-free、reuse) +
   (9.11.7)-(9.11.8) `nineElevenSevenEightRefutation` の S-instance mirror。M-side Phase B-E 相当の effort だが
   proven template あり。
+
+## 2026-07-13 更新 (lane b) — `nineElevenPairBoundS` (5.6) CLOSED (sorry-free modulo dadeHypS)
+
+`Hypothesis.nineElevenPairBoundS` (`S15_CaseBReducibleCoherence.lean`) の sorry を除去。`#print axioms` =
+`{propext, sorryAx, Classical.choice, Quot.sound}` の `sorryAx` は **`dadeHypS` 由来のみ** (landed
+`sSet_coherent_dade_caseB` / `sSet_memberRFamily` と同一; 受理済 Dade 基盤)。`lake build OddOrder` GREEN
+(4180 jobs)。
+
+**route** = M-side `nineElevenPairBound` (S11_NineElevenCaseA) の raw-engine 経路を honest `indS`/`A(S)`
+world に移植。M-specific `sixTwoDecompositionData` のみ、case-agnostic `sSet_memberRFamily` ベースの
+decomposition supply に差し替え:
+- **engine**: `S08.coherentDegreeSqNormBound_of_not_coherentW_k` を直接 fire (general
+  `inducedKernelFamily_degreeSqNormReBound_of_break_k` は `χ₁(1)=K.index` を焼き込むが (9.11) anchor は
+  degree `qa`≠`q`=K.index ゆえ不適; M-side 同様 raw engine を使用)。
+- **decomposition supply** (新 b-owned helpers, sorry-free modulo dadeHypS):
+  `sSet_breakPsiDecomp` (break `Da`, `ofProjection` + `sSet_memberRFamily`), `sSet_memberPsiDecomp`
+  (per-member `D`, coherent extension を tau1 に), orthogonality = `sSet_memberRFamily_orthogonal`。
+- **新 genuine bricks (sorryAx-FREE)**: `sSet_subset_inducedKernelFamily` (𝒮 ↪ S(⊥) 埋め込み),
+  `sSet_scaledDiff_support` (honest `A(S)` scaled-diff 台; general `inducedKernelFamily_scaledDiff_support`
+  の `hKsupp = (S′)^# ⊆ A(S)` は honest 小 support では **偽** ゆえ `sSet_member_support_subset` 経路で自作)。
+- **coherence 橋**: `hS₂coh` は `indS` 上 → `IsCoherent.congrMap` で Dade 上 `cohS₂` に変換
+  (`indS = Ind_S^G = τ` on `A(S)`-supported, `sInstance_dade_eq_induce`); `hnopair` も逆向き congrMap。
+- **degree bricks**: anchor = `S11.caseA_exists_irreducible_qa` (H0=Uprime=⊥ collapse で sSet に着地) ⊆ S₂;
+  break `d≤u` = `S11.xiOf_H0Cprime_source_apply_one_le_u`; source ratio = `S13.caseA_sOf_source_degree_ratio`
+  (`sSet_eq_sOf_H0Cprime` 経由)。
+
+**残 caseA residual** = `nineElevenEqualityRefutationS` (同 file :1421, 変更なし) = (9.11.2)-(9.11.8)
+equality-config refutation。M-side `nineElevenEqualityRefutation_of_sTwoExtraction_normBound` mirror で、
+(9.11.7)-(9.11.8) orthogonal 枝は M-side でも named residual (issue 9083 Phase E)。
