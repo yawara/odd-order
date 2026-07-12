@@ -1881,3 +1881,12 @@ typePV ⊆ Sdata.W — Sdata.W と hyp.W の同定 field を確認、conjClassSe
 order 保存)。L4 = disjoint 本体: x ∈ 両 support → L1 (r ∣ orderOf a、a ∈ A(L) →
 typeIA_subset_sharpSubgroup_of_frobenius [typeI_frobenius で frobData] → orderOf a ∣ |L_F|
 → r ∣ |L_F|) vs L3 (orderOf x の素因数 ⊆ {p,q}) + card_LF_coprime_pq → False。
+
+## ✅ (2026-07-12、/loop iter 20) — (13.19.a) disjoint_support 完全証明 (義務 6 → 5)
+
+L1 (Ã 位数、iter 18) + L2 (β_L^τ⊆Ã、iter 19) + L3/L4 一体 (S-side order + coprime 矛盾) を
+合成 (commit 662f4275)。card_LF_coprime_pq (8.17.a、Gate3 sorried) が唯一の sorried-cite。
+残 5 義務: orthogonal_eta (13.19.b、NC/(3.8)) / row・col constant (13.19.c 第一節、(4.8)) /
+caseC・caseC_dual (dichotomy 本体)。**次 = (13.19.b) orthogonal_eta**: ψ−ψ̄ の τ 像が
+W∖(W₁∪W₂) 上消滅 ((13.19.a) と同じ Ã-局在論法!今回の部品を再利用) → NC ≤ ‖ψ−ψ̄‖² = 2
+→ (3.8)。(3.8)/NC の repo 対応 (S05_TICyclic の NC 理論?) を要調査。
