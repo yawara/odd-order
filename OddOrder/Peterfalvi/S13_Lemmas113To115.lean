@@ -167,7 +167,8 @@ theorem coherent_quotient_bound_of_noncoherent [Finite G]
     (hcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       hyp.base.tau (hyp.SOf H1) hyp.base.A0))
     (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0)) :
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
+    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV _hG) :
     H1.relIndex (derivedInG M) ≤ 2 * hyp.q * hyp.C.relIndex hyp.U + 1 := by
   classical
   -- normality instances for the section subgroups and their traces
@@ -202,9 +203,9 @@ theorem coherent_quotient_bound_of_noncoherent [Finite G]
   have hbound := hyp.base.six_two_dichotomy_bound _hG
     (hyp.params_mu_eq _hG _hG.odd) hyp.params_delta_pm
     (hyp.params_delta_sign _hG _hG.odd) hyp.params_zeta_mem hyp.params_zeta_degree
-    (hyp.base.isTypeIIIorIV _hG)
+    htype
     (OddOrder.GroupTheory.typePNontrivialCore_of_isTypeIIIorIV
-      (hyp.base.isTypeIIIorIV _hG) hyp.base.typeP)
+      htype hyp.base.typeP)
     (OddOrder.Peterfalvi.S11.exists_chiefFactorData _hG _).choose
     (A' := H1.subgroupOf M) (B := hyp.H0C.subgroupOf M)
     (C := hyp.HC.subgroupOf M) (D := hyp.HC.subgroupOf M)
@@ -853,7 +854,8 @@ legacy wrapper `HC_le_secondDerived` supplies the sorried `S_H0C_not_coherent`. 
 theorem HC_le_secondDerived_of_noncoherent [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M)
     (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0)) :
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
+    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV _hG) :
     hyp.HC ≤ secondDerivedInAmbient M := by
   classical
   rw [← Subgroup.relIndex_eq_one]
@@ -863,7 +865,7 @@ theorem HC_le_secondDerived_of_noncoherent [Finite G] (_hG : OddOrder.BG.IsMinim
   have hM''lt : secondDerivedInAmbient M < derivedInG M :=
     lt_of_le_of_lt hyp.secondDerived_le_HC hHCltM'
   have h114 := coherent_quotient_bound_of_noncoherent _hG hyp le_normalizer_secondDerived hM''lt
-    (hyp.secondDerived_coherent _hG) hnc
+    (hyp.secondDerived_coherent _hG) hnc htype
   -- tower `|M':M''| = X·|U:C|`
   set X := (secondDerivedInAmbient M).relIndex hyp.HC with hX
   set v := hyp.C.relIndex hyp.U with hv
@@ -935,9 +937,10 @@ reverse `HC_le_secondDerived_of_noncoherent hnc` and the unconditional `secondDe
 theorem secondDerived_eq_HC_of_noncoherent [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M)
     (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0)) :
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
+    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV _hG) :
     secondDerivedInAmbient M = hyp.HC :=
-  le_antisymm hyp.secondDerived_le_HC (HC_le_secondDerived_of_noncoherent _hG hyp hnc)
+  le_antisymm hyp.secondDerived_le_HC (HC_le_secondDerived_of_noncoherent _hG hyp hnc htype)
 
 /-- **Peterfalvi (11.5)**: the second derived subgroup is `H C`, i.e. `M'' = HC`.
 

@@ -856,7 +856,8 @@ theorem nineElevenNormBound_of_sevenEightRefutation
       (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief))
     (h78 : NineElevenSevenEightRefutation hyp caseA)
     (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp) :
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp)
+    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV hG) :
     NineElevenNormBound hyp caseA := by
   haveI := hyp.base.finiteG
   classical
@@ -865,7 +866,7 @@ theorem nineElevenNormBound_of_sevenEightRefutation
   obtain ⟨c₃⟩ := caseA_sThree_coherent hG hyp hS₂conj hS₃ne hS3deg
   -- ── the (9.11.2) TI-witness and the (9.11.4) `α = γ − ψ₁` context (`γ`, `ψ₁` explicit)
   obtain ⟨U₁, hCU₁, hU₁U, hU₁a, hTI⟩ :=
-    caseA_nineElevenTwo_tiWitness hG hyp caseA hS3deg hS2deg hncH0C
+    caseA_nineElevenTwo_tiWitness hG hyp caseA hS3deg hS2deg hncH0C htype
   have hUpC : OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup
       = OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief := by
     have h : OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief
@@ -1060,7 +1061,7 @@ theorem nineElevenNormBound_of_sevenEightRefutation
         ≤ hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief := by
       change hyp.chief.H0 ⊔ derivedInG hyp.C ≤ _
       refine sup_le_sup_left ?_ hyp.chief.H0
-      rw [C_eq_cSub_of_noncoherent hG hyp hncH0C]
+      rw [C_eq_cSub_of_noncoherent hG hyp hncH0C htype]
       exact OddOrder.Peterfalvi.S11.cprimeSub_le_C hyp.s11Setup hyp.chief
     have hS4sub : nineElevenSFour hyp S₂
         ⊆ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime \ S₂ := fun ξ hξ =>
@@ -1131,10 +1132,11 @@ theorem nineElevenEqualityRefutation_of_sevenEightRefutation [Finite G]
       (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief))
     (h78 : NineElevenSevenEightRefutation hyp caseA)
     (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp) :
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp)
+    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV hG) :
     NineElevenEqualityRefutation hyp caseA :=
   nineElevenEqualityRefutation_of_sTwoExtraction_normBound hG hyp caseA
     (nineElevenSTwoExtraction hG hyp caseA)
-    (nineElevenNormBound_of_sevenEightRefutation hG hyp caseA h78 hncH0C) hncH0C
+    (nineElevenNormBound_of_sevenEightRefutation hG hyp caseA h78 hncH0C htype) hncH0C htype
 
 end OddOrder.Peterfalvi.S13

@@ -919,7 +919,8 @@ theorem Hypothesis.H0_eq_Hprime_of_noncoherent [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M)
     (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0)) :
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
+    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV hG) :
     hyp.chief.H0 = hyp.Hprime := by
   classical
   rw [hyp.Hprime_eq,
@@ -936,7 +937,7 @@ theorem Hypothesis.H0_eq_Hprime_of_noncoherent [Finite G]
     -- (c) trap: `h₀ ∈ ⁅H,M'⁆`
     have hh₀K : h₀ ∈ hyp.hKernel := by
       have hM'' : h₀ ∈ secondDerivedInAmbient M := by
-        rw [secondDerived_eq_HC_of_noncoherent hG hyp hnc]
+        rw [secondDerived_eq_HC_of_noncoherent hG hyp hnc htype]
         exact Subgroup.mem_sup_left (hH0le hh₀)
       have hKU := hyp.secondDerived_le_hKernel_sup_derivedU hM''
       have hKleM : hyp.hKernel ≤ M := hyp.hKernel_le_H.trans hHle
@@ -1155,7 +1156,8 @@ See `notes/peterfalvi/s13_11_8_orthogonality.md`. -/
 theorem chief_H0_eq_bot_of_noncoherent [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M)
     (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0)) :
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
+    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV hG) :
     hyp.chief.H0 = ⊥ := by
   classical
   by_contra hne
@@ -1172,7 +1174,7 @@ theorem chief_H0_eq_bot_of_noncoherent [Finite G] (hG : OddOrder.BG.IsMinimalSim
     exact h2.symm
   -- `H₀ = H' = derivedInG (s11Setup.typeP.H)` ((11.6) `H0_eq_Hprime`)
   have hH0deriv : hyp.chief.H0 = derivedInG hyp.s11Setup.typeP.H := by
-    rw [hyp.H0_eq_Hprime_of_noncoherent hG hnc, hyp.Hprime_eq, ← hHH]
+    rw [hyp.H0_eq_Hprime_of_noncoherent hG hnc htype, hyp.Hprime_eq, ← hHH]
   -- **case-B hypotheses of `chiefKernel_caseB_false`**
   have hpK : IsPGroup hyp.chief.p ↥hyp.s11Setup.H := by
     show IsPGroup hyp.chief.p ↥hyp.s11Setup.typeP.H
@@ -1224,10 +1226,11 @@ theorem chief_H0_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 theorem chief_N_eq_bot_of_noncoherent [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M)
     (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0)) :
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
+    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV hG) :
     hyp.chief.N = ⊥ := by
   have h := hyp.chief.H0_eq
-  rw [chief_H0_eq_bot_of_noncoherent hG hyp hnc, eq_comm, Subgroup.map_eq_bot_iff] at h
+  rw [chief_H0_eq_bot_of_noncoherent hG hyp hnc htype, eq_comm, Subgroup.map_eq_bot_iff] at h
   simpa using h
 
 /-- **(11.7) corollary — the chief kernel `N ◁ H` is trivial**: `N = ⊥`.  The chief kernel realised
@@ -1250,7 +1253,8 @@ capstone family `𝒮(H₀ ⊔ C)` coincide with the (9.11) family `𝒮(H₀ �
 theorem C_eq_cSub_of_noncoherent [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M)
     (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0)) :
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
+    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV hG) :
     hyp.C = OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief := by
   have hHeq : hyp.s11Setup.typeP.H = hyp.base.typeP.H := by rw [hyp.setup_typeP_eq]
   have hUeq : hyp.s11Setup.typeP.U = hyp.base.typeP.U := by rw [hyp.setup_typeP_eq]
@@ -1261,7 +1265,7 @@ theorem C_eq_cSub_of_noncoherent [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
     exact OddOrder.Peterfalvi.S11.mem_cSub_of_mem_U_of_centralizes hyp.s11Setup hyp.chief
       (hUeq ▸ hx.1) (hHeq ▸ hx.2)
   · -- reverse: `cSub ≤ C_U(H)` (needs `N = ⊥`)
-    have hN : hyp.chief.N = ⊥ := chief_N_eq_bot_of_noncoherent hG hyp hnc
+    have hN : hyp.chief.N = ⊥ := chief_N_eq_bot_of_noncoherent hG hyp hnc htype
     intro x hx
     rw [hyp.C_eq_centralizer, Subgroup.mem_inf]
     refine ⟨hUeq ▸ OddOrder.Peterfalvi.S11.cSub_le_U hyp.s11Setup hyp.chief hx, ?_⟩
@@ -1432,7 +1436,8 @@ theorem columnSum_muColumnChar_mem_sOf_H0C_of_noncoherent [Finite G]
     [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
     (k : Fin hyp.base.w2) (hk : k ≠ 0)
     (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0)) :
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
+    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV hG) :
     OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
         (hyp.base.muColumnChar hG hG.odd k)
       ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C := by
@@ -1453,14 +1458,14 @@ theorem columnSum_muColumnChar_mem_sOf_H0C_of_noncoherent [Finite G]
   have hmemH0 : OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
       (hyp.base.muColumnChar hG hG.odd k)
       ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.chief.H0 := by
-    rw [chief_H0_eq_bot_of_noncoherent hG hyp hnc, heq]
+    rw [chief_H0_eq_bot_of_noncoherent hG hyp hnc htype, heq]
     exact OddOrder.Peterfalvi.S11.sOf_antitone _ bot_le hgrid.1
   -- (9.9.b): a reducible `𝒮(H₀)`-member lies in `𝒮(H₀ ⊔ cSub)`
   have hH0C := OddOrder.Peterfalvi.S11.reducible_mem_sOf_H0C hG
     (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief) _ hmemH0 hgrid.2
   -- `H₀ ⊔ cSub = H₀C` (`C = cSub`)
   change _ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup (hyp.chief.H0 ⊔ hyp.C)
-  rw [C_eq_cSub_of_noncoherent hG hyp hnc]
+  rw [C_eq_cSub_of_noncoherent hG hyp hnc htype]
   exact hH0C
 
 /-- **(9.5)/(9.9.b) `𝒮(H₀C)`-membership** (legacy wrapper): `columnSum_muColumnChar_mem_sOf_H0C_of_noncoherent`
@@ -1483,12 +1488,13 @@ theorem columnSum_muColumnChar_mem_sOf_H0Cprime [Finite G]
     [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
     (k : Fin hyp.base.w2) (hk : k ≠ 0)
     (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp) :
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp)
+    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV hG) :
     OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
         (hyp.base.muColumnChar hG hG.odd k)
       ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime :=
   hyp.sOf_H0C_subset_sOf_H0Cprime
-    (columnSum_muColumnChar_mem_sOf_H0C_of_noncoherent hG hyp k hk hncH0C)
+    (columnSum_muColumnChar_mem_sOf_H0C_of_noncoherent hG hyp k hk hncH0C htype)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.9.a), caseB uniform degree on `𝒮(H₀C′)`** — the `hunif` input of the (9.11)
@@ -1501,7 +1507,8 @@ theorem caseB_forall_mem_sOf_H0Cprime_apply_one_eq_qu [Finite G]
     (caseB : OddOrder.Peterfalvi.S11.CliffordCaseBData
       (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief))
     (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp) :
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp)
+    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV hG) :
     ∀ φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
       (φ : ClassFunction ↥M ℂ) 1 =
         ((hyp.s11Setup.q *
@@ -1514,7 +1521,7 @@ theorem caseB_forall_mem_sOf_H0Cprime_apply_one_eq_qu [Finite G]
   have hCp : OddOrder.Peterfalvi.S11.cprimeSub hyp.s11Setup hyp.chief
       = derivedInG hyp.C := by
     change derivedInG (OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief) = derivedInG hyp.C
-    rw [C_eq_cSub_of_noncoherent hG hyp hncH0C]
+    rw [C_eq_cSub_of_noncoherent hG hyp hncH0C htype]
   rw [hCp]
   exact hφ
 
@@ -1540,7 +1547,8 @@ theorem caseB_coherent_sOf_H0Cprime [Finite G]
     (caseB : OddOrder.Peterfalvi.S11.CliffordCaseBData
       (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief))
     (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp) :
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp)
+    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV hG) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
       (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) hyp.base.A0) := by
   haveI := hyp.base.finiteG
@@ -1549,7 +1557,7 @@ theorem caseB_coherent_sOf_H0Cprime [Finite G]
   set d := hyp.s11Setup.q * (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u with hd
   have hunif : ∀ φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
       (φ : ClassFunction ↥M ℂ) 1 = (d : ℂ) :=
-    caseB_forall_mem_sOf_H0Cprime_apply_one_eq_qu hG hyp caseB hncH0C
+    caseB_forall_mem_sOf_H0Cprime_apply_one_eq_qu hG hyp caseB hncH0C htype
   -- the world-bridge `𝒮(H₀C′) → S(⊥)` (for the support / ZIrr / no-real / pairwise facts)
   have hIKF : ∀ ⦃x : ClassFunction ↥M ℂ⦄,
       x ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime →
@@ -1564,7 +1572,7 @@ theorem caseB_coherent_sOf_H0Cprime [Finite G]
   set μ₁ : ClassFunction ↥M ℂ := OddOrder.Peterfalvi.S06.columnSum
     (hyp.base.toHypothesis46 hG hG.odd) (hyp.base.muColumnChar hG hG.odd ⟨1, hw2⟩) with hμ₁def
   have hμ₁mem : μ₁ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime :=
-    columnSum_muColumnChar_mem_sOf_H0Cprime hG hyp ⟨1, hw2⟩ hk1 hncH0C
+    columnSum_muColumnChar_mem_sOf_H0Cprime hG hyp ⟨1, hw2⟩ hk1 hncH0C htype
   -- uniform support of member differences against the pivot anchor
   have hsuppdiff : ∀ a ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
       ∀ b ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
@@ -1630,7 +1638,8 @@ noncomputable def caseB_coherent_sOf_H0C [Finite G]
     (caseB : OddOrder.Peterfalvi.S11.CliffordCaseBData
       (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief))
     (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp) :
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp)
+    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV hG) :
     OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
       (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C) hyp.base.A0 := by
   haveI := hyp.base.finiteG
@@ -1642,7 +1651,7 @@ noncomputable def caseB_coherent_sOf_H0C [Finite G]
   set μ : ClassFunction ↥M ℂ := OddOrder.Peterfalvi.S06.columnSum
     (hyp.base.toHypothesis46 hG hG.odd) (hyp.base.muColumnChar hG hG.odd ⟨1, hw2⟩) with hμdef
   have hμmem : μ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
-    columnSum_muColumnChar_mem_sOf_H0C_of_noncoherent hG hyp ⟨1, hw2⟩ hk1 hncH0C
+    columnSum_muColumnChar_mem_sOf_H0C_of_noncoherent hG hyp ⟨1, hw2⟩ hk1 hncH0C htype
   -- the `𝒮(H₀C) → inducedKernelFamily(⊥)` world-bridge (for the support / no-real facts)
   have hIKF : ∀ ⦃x : ClassFunction ↥M ℂ⦄,
       x ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C →
@@ -1654,7 +1663,7 @@ noncomputable def caseB_coherent_sOf_H0C [Finite G]
   have hμc : μ.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
     Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hμmem
   refine coherent_sOf_H0C_of_coherent_sOf_H0Cprime hyp
-    (caseB_coherent_sOf_H0Cprime hG hyp caseB hncH0C).some ⟨μ.conj - μ, ⟨?_, ?_⟩, ?_⟩
+    (caseB_coherent_sOf_H0Cprime hG hyp caseB hncH0C htype).some ⟨μ.conj - μ, ⟨?_, ?_⟩, ?_⟩
   · -- `μ̄ − μ ∈ ℤ[𝒮(H₀C)]`
     exact Submodule.sub_mem _ (Submodule.subset_span hμc) (Submodule.subset_span hμmem)
   · -- `μ̄ − μ` is `A₀`-supported
