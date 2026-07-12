@@ -317,6 +317,12 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > (c が S15_SAndT の他領域 = b の char-family/(C')# 系を触ったら従来どおり逸脱; b はこの (13.18) ブロックを
 > 触らない)。**b は次回 main sync で c の rewire を取り込むこと、`tauS_mu_row0_cross` を再構築しない。**
 > 詳細 = issues/9076 piece 4c-3。
+> **⟹ 所在地更新 (2026-07-12 tick 9)**: b の 0103 系 prefix-split (merge 16bd816d) で、この c 所有
+> ブロック (BetaData 領域 + tauSbetaGrid/GammaGrid/tauS_mu_row0_cross/gammaGrid_defGamma) は
+> **バイト同一のまま `S15_BridgeCharacter.lean` へ移動** (hub 機械検証: 移設 1413 行中 1405 行同一、
+> 差分 8 行は b 自身の (13.19) producer 分解のみ)。以後 **c の carve-out はファイル追従 =
+> S15_BridgeCharacter.lean 内の当該宣言群** (c がそこを編集しても逸脱でない; b は同 file 内の自分の
+> (13.19) producer 系のみ編集し c 宣言に触らない — 混在 leaf につき step 1.5 は decl 単位で判定)。
 >
 > **carve-out (issue 9014/9076, hub 裁定 2026-07-08 監視 tick — merge 216b605d)**:
 > `OddOrder/Peterfalvi/S13_PrimeTIResidueBridge.lean` (lane b が新規作成、86 行、**namespace は
@@ -530,6 +536,32 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-12 (tick 9, レーン再開後初) — b/c 合流: (13.19) producer 分解 (b) + h114 一般化 (c)**:
+  tick 6-8 = 変化なし×3 (レーン停止をユーザーに flag → ユーザーが全レーン再起動)。**b=2**
+  ((13.19) producer monolith sorry を **Tier-A 実構成 + 明示義務 8 本**に分解 (net sorry +7 全て
+  faithful scaffold); S15_SAndT 再 prefix-split → 新 leaf `S15_BridgeCharacter.lean` 1479 行。
+  ⚠ **c carve-out (9076 4c-3 BetaData/(13.18) rewire) がバイト同一で新 leaf へ移動** — hub 機械検証
+  (1413 行中 1405 同一、差分 = b 自身の producer 分解のみ) で承認、所有マップに所在地更新を追記。
+  S15_SAndT は 649 行に縮小) / **c=1** ((11.8) h114 refuter の arbitrary-grid 一般化、
+  TGapNonorthogonality +410 全 proven) / a=0。build green ×2 (4172 jobs; 2m11s/1m14s)・AxiomsCheck OK・
+  count-sorry 65→72 (+7 義務化)・build 警告 63→70・新 axiom なし。push `080f9392..4fc7a99a`。
+- **2026-07-12 (tick 5) — a のみ合流**: **a=2** ((11.9.a) G1 部品 `mapRingEquiv_muColumnZero_sum`
+  μ₀ 列和の Galois 固定性、S12_Prop109 +58 全 proven + 1024 G3 narrow 化設計) / b=0 / c=0。
+  build green (4171 jobs, 4m24s)・AxiomsCheck OK・sorry 65→65・新 axiom なし。push `2b2a73e9..802c540c`。
+- **2026-07-12 (tick 4) — 全 3 レーン合流: ★ (13.17.c) over-claim 修正 = E⊄Q faithful 化 (b)**:
+  **a=2** (新 shared leaf `GaloisInnerTransport.lean` +99 全 proven、**claim-before-build 完全準拠**
+  (9085 起票 + OddOrder.lean 配線込み); S12 `inducedFamily_closedUnderMapRingEquiv` +30) /
+  **b=3** (★ **健全化**: (13.17.c) 無条件 E⊄Q は over-claim (原文・Coq FTtypeII_support_facts とも
+  disjunction 保持) と断定 → `complement_not_le_Q` を (14.5) 形 signature に faithful 化して
+  **完全実証明**; 3 定理を S15_ComplementStructure→S15_SAndT TAIL 移設 (b 所有内); **c file
+  SubgroupL.lean への 🔩 機械的追従** = exists_LHypothesis 引数供給 + P_inf_U_eq_bot バイト同一
+  file 内移動 — self-flag 済・c の active TGap 系非接触で hub 承認、**c は次回 sync で取り込み・
+  再移動しない**) / **c=3** (Pf (11.8) T-side residual image 同定 + column assembly grid の
+  arbitrary-sigma 一般化、TGapNonorthogonality +134 / TGapPrimeTI +45 全 proven)。
+  build green ×3 (4171 jobs; 5m00s/2m08s/1m28s)・AxiomsCheck OK・**count-sorry 66→65**
+  (complement_not_le_Q 実 discharge)・build 警告 64→63・新 axiom なし。push `067cac9d..214693bd`。
+  ⚠ 運用メモ: 本 tick 中に cron prompt が 7 件 queue (build 待ち中の idle-fire 累積) — 進行中 tick の
+  重複 wake-up として無視 (MERGE_HEAD ガードの精神どおり、staged merge は保護された)。
 - **2026-07-12 (tick 3) — 全 3 レーン合流: gammaGrid_Y_norm_bound 完全証明 (b) ほか全レーン実証明**:
   **a=2** (Pf (11.9.c) 部品 `card_uActionHom_range_modEq_one` W₁-orbit 合同 u≡1 mod q、S11 +126 全 proven
   + 1024 に (11.9.a) 実装計画確定) / **b=1** (★ **gammaGrid_Y_norm_bound (Pf 13.18d) 完全証明** — Coq leqif

@@ -963,3 +963,58 @@ feature commits: `3b34f141`, `d7d72e00`。
   (11.8) refuter を T-side data へ正規に接続すること。
 - leaf builds および AxiomsCheck (4149 jobs) green。新 axiom・新 `sorry` なし。
   追加した producer/projection theorem は全て AxiomsCheck 登録済み。
+
+### (11.8) arbitrary-member / arbitrary-σ 接続の精密化 (2026-07-12 最終)
+
+feature commits: `d5f7fc38`, `061229b4`, `bb2c9868`, `960907f6`。
+
+- `TGapNonorthogonality.lean` に、指定 `zeta` を保持する
+  `exists_charParameters_full_for_member` / `exists_s13Hypothesis_for_member` と、同じ
+  (11.8.1)--(11.8.6) chain を使う
+  `member_residual_not_orthogonal_H0C_of_refuter` を実装した。これで既存 S13 endpoint の
+  「別の ζ を existential に再選択する」問題は解消した。後者は新 `sorry` を持たないが、
+  既存 `S13.coherent_sOf_H0C` の `sorryAx` を従来 endpoint と同様に継承するため
+  AxiomsCheck には登録していない。
+- 指定 `TypePData` を保持する `s12HypothesisOfTypePData` を構成し、S12 zero-column が
+  enumeration 非依存に `sum_i mu_i0 = Ind_(T')^T 1` であることを
+  `s12_muGrid_zeroColumn_sum_eq_induce_trivial` で証明した。T-side の
+  `primeTIred 0` producer も canonical induction equality を保持する強化版へ展開し、旧
+  signature は wrapper で完全保存した。
+- Coq `PFsection8.v` の `FT_Dade1E` と Lean `TGapCross` の既存 restriction theorem を
+  独立照合した。S12 の full `A0(T)` Dade map と現行 `tSideDadeMap` (`A1(T)`) は supported
+  source 上で genuine に一致し、`s12Tau_zeroColumn_sub_eq_tSideDadeMap` が residual image
+  全体を接続する。従って未接続なのは anchor / Dade map ではない。
+- grid 転置の純線形部分は
+  `residual_not_orthogonal_of_transposed_reindexing` で arbitrary row/column enumeration に
+  一般化した。また (11.8.6) opening の column assembly を canonical S12 grid 名から分離し、
+  `tau_muColumnSum_sub_zeta_eq_of_grid_alphaImage` として任意 `omegaSigma` grid に証明した。
+  これらと上の constructor / anchor / image theorem は全て AxiomsCheck green
+  (最新 main、4155 jobs)。
+- **独立検証による重要な訂正**: S15 carrier の `tau3/eta` は genuine な (3.2) σ-isometry
+  だが、S12 が内部で選ぶ canonical σ-map との equality は carrier に保持されていない。
+  (3.2) の isometry・virtual-character・regular-value 性質だけから σ-map 自体の一意性は
+  従わない。従って「S12 aligned grid = eta を証明して既存 endpoint をそのまま rewrite」
+  は正当な frontier ではないし、opaque equality field を追加して済ませてもならない。
+
+正しい frontier は Coq の theorem が本来そうであるように **arbitrary-σ 版 (11.8)** を
+現行 T-side carrier 上で組むこと。2026-07-12 の続行で上流項目 (1) は完了した:
+
+- `tau_muColumnZero_sub_zeta_dichotomy_of_grid_orthogonal` は既存 (11.8.4) の
+  norm / integral-lattice proof を任意 grid に一般化した。canonical sigma 依存は
+  `hgridInner` (grid の正規直交性) と `hgridExtensionOrth` (coherent image と zero-column
+  sum の直交) の2入力だけへ切り出した。
+- branch 2 も `SHC_swap_grid_h114` で同じ grid のまま正規化し、最終消費 API
+  `exists_coherent_extension_h114_of_grid_orthogonal` が任意 grid に対する coherent
+  extension `nu` と `h114 : tau(mu0-zeta) = sum grid_i0 - nu(zeta)` を返す。
+- leaf build / AxiomsCheck (4156 jobs) green。3定理とも許可外公理なし、新 `sorry` なし。
+
+残りは上流順に:
+
+1. (11.8.2)+(11.8.5) の rowwise alpha-image を arbitrary grid へ一般化
+   (four-corner / reality / parity / residual coefficient; S15 `eta` fields を使用);
+2. landing 済みの grid-parametric column assembly へ渡し、narrow `S(H0C)` coherence
+   refuterで矛盾する。
+
+これは carrier signature 変更を要するという診断ではない。既存 S15 fields が持つ
+`eta_eq_tau_omega`, isometry, virtuality, conjugation, four-corner, Galois orbit 等を theorem
+引数として使う proof generalization であり、次 iteration は rowwise alpha-image から進める。
