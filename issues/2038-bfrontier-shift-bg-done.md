@@ -1774,3 +1774,22 @@ caseC / caseC_dual。**次 = typeIBetaL_betaS_disjoint_support (13.19.a)**: Ã(L
 pq-元。部品: betaGrid_A0_support (proven) / card_LF_coprime_pq (gated B2) /
 dade lift の support 局在 (dadeIntegralCharacterMap の image support ⊆ conj closure —
 S04/S07 に既存 lemma があるか要調査)。
+
+## 📐 (2026-07-12、/loop iter 14) — (13.19.a) disjoint_support 部品調査
+
+統合 build green 確認 (merge 4 files 後、1m09s)。部品在庫:
+- **Dade 像の support 局在**: `IsDadeMap.map_eq_zero_of_not_mem_dadeSupport` (一般) +
+  `map_eq_zero_of_not_mem_conjugatesOfSet_of_forall_H_eq_bot` (TI 版、S04:736)。
+  typeIBetaL 側: tau = dadeIntegralCharacterMap (dadeData.dade) — supported input
+  (Ind_H^L 1 − φ は A(L) 支持? **要確認**: φ ∈ 𝓛 の A(L)-supportedness は (12.1) 系
+  seqIndD の性質 — S14.Hypothesis.A / typeIA との接続 lemma を探す) →
+  apply_of_support で dadeMap 値 → dadeSupport 外 0。
+- **tauSbetaGrid 側**: sInstance_dade0_eq_induce (proven) + betaGrid_support (proven、
+  P^#∪V_S) + `support_induceSum_subset_conjugatesIntoSet` (InducedCharacter:264 —
+  ⚠ induceSum 版のみ。induce 版 A-局在は未整備: induce = ⅟|H|•induceSum の
+  support ⊆ で bridge する小 lemma を新設)。
+- **位数論法** (残る本体): Ã(A(L)) 元の位数 ∋ prime of |H_L| vs P^#∪V_S 元は
+  pq-系 — (8.17.a) card_LF_coprime_pq (gated B2、cite 可) + A(L) 元の位数構造
+  (§8 typeIA の定義から: A(L) ⊆ ⋃ C_L(x)^# 系 — S10_Section8Dade 系 or
+  S14.Hypothesis.ambientA の member order lemma を要調査)。
+**次 iter = A(L)-supportedness (φ/Ind の) と A(L) 位数構造の 2 点調査 → 実証明**。
