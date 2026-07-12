@@ -1828,3 +1828,29 @@ A(L)-conj、typeIA_subset_sharp の逆 + conjugatesIntoSet)、(b) dadeSupport �
 可換 coprime order 論法 (S04.Hypothesis.dadeSupport def + S10 data の
 coprime/cent fields を確認)、(c) tauSbetaGrid 側 = Ind_S^G + betaGrid_support +
 既存 support_induce_subset_conjugatesIntoSet、(d) order ∣ |P||W| vs prime of |H|。
+
+## 📐 (2026-07-12、/loop iter 17) — (13.19.a) 本体設計 FINAL
+
+**S04 構造確定**: dadeSupport = ⋃_a conjugatesOfSet(a·H(a))。h ∈ H(a) ≤ C_G(a)
+(centralizer_eq_sup) → Commute a h。**orderOf a ⟂ orderOf h**: centralizer_coprime
+(|H(a)| ⟂ |C_L(a)|) + a ∈ C_L(a) (自己中心化、a ∈ L) + orderOf h ∣ |H(a)|。
+順序積: coprime 可換で orderOf a ∣ orderOf (a·h) は 5 行手証明
+((ah)^n=1 → a^n = h^{−n} ∈ ⟨a⟩⊓⟨h⟩ = ⊥)。
+**本体スケッチ** (typeIBetaL_betaS_disjoint_support):
+1. hsupp_in : (Ind_H^L 1 − φ).support ⊆ supportInSubgroup (typeIA L typeI) L —
+   sub 両項は induce (φ = Ind θ、Sset destructure)、support_induce_subset_conjugatesInto
+   + 1∉supp (値 e−e=0、induce_apply_one) + conj 元 ≠1 → kernel-conj ∈ H^# →
+   sharpSubgroup_H_subset_typeIA + conjugatesIntoSet→supportInSubgroup 変換。
+2. supp(β_L^τ) ⊆ dadeSupport: dadeIntegralCharacterMap_apply_of_support (hsupp_in) +
+   IsDadeMap.map_eq_zero_of_not_mem_dadeSupport (dadeData.dade の dadeMap が IsDadeMap —
+   instance/lemma 名は S04 で hyp.dadeMap_isDadeMap 系を実装時 grep)。
+3. x ∈ dadeSupport → orderOf x に prime r ∣ |H_L| (a ≠ 1、orderOf a ∣ |H_L| は
+   a ∈ A(L) ⊆ H_L^# ← typeIA_subset_sharpSubgroup_of_frobenius [iter 16] +
+   typeI_frobenius で frobData 取得、orderOf_conj で conj 不変)。
+4. x ∈ supp(τ_S β) ⊆ conjugatesIntoSet S (P^#∪typePV) (sInstance_dade0_eq_induce +
+   betaGrid_support + support_induce_subset_conjugatesIntoSet [既存 :452]) →
+   orderOf x ∣ p^q·pq (P^# は p-群、typePV ⊆ W、|W|=pq — hyp.Sdata.W = hyp.W の
+   reconciliation field を実装時確認)。
+5. r ∈ {p,q} ∧ r ∣ |H_L| vs card_LF_coprime_pq (hnconjS/T は
+   not_conj_of_isTypeI_of_isTypeNonI で供給、q_not_dvd_kernel パターン) → 矛盾。
+**次 iter = この 5 段を一気に実装** (全部品所在確定済み)。
