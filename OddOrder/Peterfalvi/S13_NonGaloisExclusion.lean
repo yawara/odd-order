@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S13_TypeIIIGalois
+import OddOrder.Peterfalvi.S13_TypeDetermination
 import OddOrder.Peterfalvi.S11_MaximalII_III_IV
 
 /-!
@@ -712,5 +713,99 @@ theorem caseA_u_eq_a_of_residual_not_orthogonal [Finite G]
     · exact ⟨s, by rw [h, neg_neg]⟩
   have hm1 : (m : ℤ) = 1 ∨ (m : ℤ) = -1 := Int.isUnit_iff.mp (isUnit_of_dvd_one hdvd)
   omega
+
+end OddOrder.Peterfalvi.S13
+
+namespace OddOrder.Peterfalvi.S13
+
+open OddOrder.GroupTheory
+open OddOrder.RepresentationTheory
+
+variable {G : Type*} [Group G]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.9.c), the non-Galois exclusion** (issue 1024 P3): under Hypothesis (11.2)
+(type III/IV), the Clifford case (a) of (9.7) is impossible.
+
+The (11.8) refuter core (`exists_zeta_residual_not_orthogonal_H0C_of_refuter`, instantiated at
+the unconditional (11.3) `S_H0C_not_coherent_unconditional`) supplies `ζ` with the grid
+non-orthogonality `h118`; the keystone `caseA_u_eq_a_of_residual_not_orthogonal` then pins
+`u = a`.  The arithmetic closes both branches:
+
+* `u = 1`: the `U`-action image on the chief factor `H̄` is trivial, so `U` centralizes `H̄`,
+  contradicting `ChiefFactorData.U_noncentral_on_quotient`.
+* `u ≥ 2`: the Frobenius congruence `u ≡ 1 (mod q)` (`mkSection11CharacterData_u_modEq_one`)
+  gives `q ≤ u − 1`; with `u = a ∣ p − 1` (`caseA.a_dvd_p_sub_one`) this forces
+  `q ≤ p − 2 < p`, contradicting (11.9.b) `p < q`
+  (`w2_lt_w1_of_hypothesis_H0C_unconditional`). -/
+theorem not_cliffordCaseA_of_hypothesis [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)] :
+    ¬ Nonempty (OddOrder.Peterfalvi.S11.CliffordCaseAData
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief)) := by
+  rintro ⟨caseA⟩
+  -- (11.5)/(11.7) structural inputs for the refuter core
+  have hM2 : secondDerivedInAmbient M
+      = hyp.base.typeP.H
+        ⊔ (hyp.base.typeP.U ⊓ Subgroup.centralizer (hyp.base.typeP.H : Set G)) :=
+    secondDerived_eq_fitting_of_base hG hyp.base hyp.type_alt
+  have hHcard : Nat.card ↥hyp.base.typeP.H = hyp.base.w2 ^ hyp.base.w1 :=
+    card_H_eq_of_base hG hyp.base hyp.type_alt
+  -- (11.8): `ζ` and the grid non-orthogonality, via the unconditional (11.3)
+  obtain ⟨ζ, hζS, hζirr, hζ1, h118⟩ :=
+    exists_zeta_residual_not_orthogonal_H0C_of_refuter hG hyp.base hyp.type_alt hM2 hHcard
+      (fun s13hyp => S_H0C_not_coherent_unconditional hG s13hyp)
+  -- the keystone pin `u = a`
+  have hua := caseA_u_eq_a_of_residual_not_orthogonal hG hyp caseA hζS hζirr hζ1 h118
+  set u : ℕ := (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u with hudef
+  -- the Frobenius congruence `u ≡ 1 (mod w₁)`
+  have hU : hyp.s11Setup.typeP.U ≠ ⊥ := hyp.s11Setup.nontrivial.1
+  have hmod : u ≡ 1 [MOD hyp.base.w1] := by
+    have h := hyp.base.mkSection11CharacterData_u_modEq_one hyp.s11Setup hyp.chief hU
+    rwa [show Nat.card ↥hyp.s11Setup.typeP.W1 = hyp.base.w1 from hyp.s11Setup_q_eq] at h
+  -- `a ∣ p − 1` with `p = w₂`
+  have hpeq : hyp.chief.p = hyp.base.w2 := by
+    have h := hyp.chief.typeIII_IV_p_eq_W2 hyp.type_alt
+    rw [← h]
+    change Nat.card ↥hyp.s11Setup.typeP.W2 = hyp.base.w2
+    rw [hyp.setup_typeP_eq]
+    rfl
+  have hadvd : caseA.a ∣ hyp.base.w2 - 1 := hpeq ▸ caseA.a_dvd_p_sub_one
+  -- (11.9.b) `w₂ < w₁`, and `w₂ ≥ 3`
+  have hlt : hyp.base.w2 < hyp.base.w1 :=
+    w2_lt_w1_of_hypothesis_H0C_unconditional hG hyp.base hyp.type_alt hM2 hHcard
+  have hw2three : 3 ≤ hyp.base.w2 := by
+    have hodd : Odd hyp.base.w2 :=
+      hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card hyp.base.W2)
+    have hgt : 1 < hyp.base.w2 := hyp.params.w2_prime.one_lt
+    obtain ⟨k, hk⟩ := hodd; omega
+  have hapos := caseA.a_pos
+  rcases Nat.lt_or_ge u 2 with hu1 | hu2
+  · -- `u = 1`: the `U`-action image is trivial, contradicting `U_noncentral_on_quotient`
+    have hu_eq1 : u = 1 := by omega
+    have hcard1 : Nat.card
+        ↥(OddOrder.Peterfalvi.S11.uActionHom hyp.s11Setup hyp.chief).range = 1 := by
+      have h := (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u_eq_card_quotient
+      rw [← hudef] at h
+      rw [← hu_eq1]
+      exact h.symm
+    have hbot : (OddOrder.Peterfalvi.S11.uActionHom hyp.s11Setup hyp.chief).range = ⊥ :=
+      Subgroup.card_eq_one.mp hcard1
+    apply hyp.chief.U_noncentral_on_quotient
+    rw [eq_top_iff]
+    intro x _ l hl
+    have h1 : OddOrder.Peterfalvi.S11.uActionHom hyp.s11Setup hyp.chief ⟨l, hl⟩ = 1 := by
+      have hmem : OddOrder.Peterfalvi.S11.uActionHom hyp.s11Setup hyp.chief ⟨l, hl⟩
+          ∈ (OddOrder.Peterfalvi.S11.uActionHom hyp.s11Setup hyp.chief).range := ⟨⟨l, hl⟩, rfl⟩
+      rw [hbot, Subgroup.mem_bot] at hmem
+      exact hmem
+    change (OddOrder.Peterfalvi.S11.uActionHom hyp.s11Setup hyp.chief ⟨l, hl⟩) x = x
+    rw [h1]
+    rfl
+  · -- `u ≥ 2`: `q ≤ u − 1 = a − 1 ≤ p − 2 < p`, contradicting `p < q`
+    have hdvd : hyp.base.w1 ∣ u - 1 := (Nat.modEq_iff_dvd' (by omega)).mp hmod.symm
+    have hle : hyp.base.w1 ≤ u - 1 := Nat.le_of_dvd (by omega) hdvd
+    have hale : caseA.a ≤ hyp.base.w2 - 1 := Nat.le_of_dvd (by omega) hadvd
+    omega
 
 end OddOrder.Peterfalvi.S13
