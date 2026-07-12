@@ -1890,3 +1890,17 @@ L1 (Ã 位数、iter 18) + L2 (β_L^τ⊆Ã、iter 19) + L3/L4 一体 (S-side or
 caseC・caseC_dual (dichotomy 本体)。**次 = (13.19.b) orthogonal_eta**: ψ−ψ̄ の τ 像が
 W∖(W₁∪W₂) 上消滅 ((13.19.a) と同じ Ã-局在論法!今回の部品を再利用) → NC ≤ ‖ψ−ψ̄‖² = 2
 → (3.8)。(3.8)/NC の repo 対応 (S05_TICyclic の NC 理論?) を要調査。
+
+## 📐 (2026-07-12、/loop iter 21) — (13.19.b) 部品所在
+
+**(3.8) = S05_SigmaTrichotomy に形式化済み**: sigmaCoeff_trichotomy /
+sigmaCoeff_eq_zero_of_vanishOnV / eq_smul_chiFam_diff_of_vanishOnV (NC < 2·min の
+帰結群、TICyclicHypothesis 言語)。(13.19.b) の Coq 論法 (otau1eta、PFsection13:2036-):
+ψ ∈ 𝓛 → (ψ−ψ̄)^τ は Z[𝓛,L^#] (ZsubL) → Ã-局在 (iter 19 L2 の変種: conj-closed diff も
+A(L)-supported) → Ŵ 上消滅 ((13.19.a) tiA_PWG = iter 20 の disjoint と同根) →
+NC((ψ−ψ̄)^τ) ≤ ‖ψ−ψ̄‖² = 2 → (3.8) 帰結 + coherence (Dtau1: τ₁(ψ−ψ̄) = (ψ−ψ̄)^τ) で
+ψ^{τ₁} ⊥ η。**残調査**: hyp.eta (abstract grid) と TICyclicHypothesis の σ-grid の接続
+(tau3/omega 経由、3002 keystone の sigmaIntegral 系)、τ₁ = typeISetup.tau の coherence
+(Dtau1 相当 — S14.Hypothesis.dadeData で τ₁ = τ そのもの: extension 不要かも —
+typeISetup.tau は total lift で ℤ[𝓛] 全体に定義済み ✓ Dtau1 は apply_of_support)。
+次 iter: この接続の設計から。
