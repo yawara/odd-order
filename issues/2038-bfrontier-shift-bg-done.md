@@ -1730,3 +1730,20 @@ not_normalizer_U_le_S) で供給。**S15_ComplementStructure sorry 0**。
 Ltau_orthogonal_eta / betaL_eq、(ii) (13.19.c) parity/degree dichotomy (coherence bounds、
 NC 論法 (3.8))、(iii) e_eq_index / phi (degree e の Ind_H^L irreducible)。Coq 対応 =
 PFsection13 FTtype1_coherence / FTtype1_Ind_irr 以降の (13.19) 本体 (~:1975-)。
+
+## ✅ (2026-07-12、/loop iter 11) — (13.19) producer 分解 + S15 再 split
+
+producer 単一 sorry → **Tier-A 実構成 + φ-parametric 義務 8 本** (commit f60f6fd8)。
+Tier-A: e=[L:H] rfl / Lset=Sset / φ=choose / betaL=typeIBetaL (実 def) / betaS=tauSbetaGrid /
+betaL_eq bridge 実証明 (instance 差 = repeat' first|rfl|Subsingleton.elim|congr 1 イディオム)。
+義務 8 (TAIL 在住、上流→文書順): (1) exists_Sset_apply_one_eq_index — φ 存在 (Frobenius
+inertia、Isaacs 6.34 系。H nilpotent ≠⊥ → 非自明 linear θ → Ind_H^L θ irr、
+InducedIrreducible の inertia API + IsFrobeniusGroup.conj_frobenius) /
+(2) tauTbetaGrid — T-side honest 'A0 Dade instance (dadeHypS0 の T-dual を
+S15_HonestTypeP2A0 パターンで新設、hyp.T_typeP2 相当が要る — T は type II ≠ P2 かも、
+(13.2.a) T-side の型を確認) / (3) disjoint_support ((13.19.a): Ã(L)∩(P^G∪W^G)=∅、
+(8.17.a) coprime + support 局在) / (4) orthogonal_eta ((13.19.b): NC≤2 + (3.8)) /
+(5)(6) row/col constant ((4.8) + (13.18.a)) / (7)(8) caseC/dual (parity+degree、
+(13.18.c,d)+(1.1) 消費 — 深部)。
+付随: S15_SAndT 2101 行 → BridgeCharacter (1479、(13.18) 全 proven) + TAIL (649)。
+**次 = 義務 (1) φ 存在** (文書順最上流、Frobenius 指標論の genuine math)。
