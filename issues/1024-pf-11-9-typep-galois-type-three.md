@@ -105,7 +105,11 @@ Hypothesis (11.2) (M maximal, type III/IV)、ζ ∈ 𝒮(HC):
     S16_NonExistenceG/TGapGalois.lean (c 所有、S16-deep import) に在り S13 から import 不可 —
     GaloisCharacter.lean へ hoist (proof は c 版 mirror、`apply_inv_eq_star_of_mem_ZIrr` +
     `inner_mem_ZIrr_int` cite、~30 行)。9000 scan 済 (claim 衝突なし)。hub へ dedup note。
-  - **(G3、narrow 化済 2026-07-12 iter4)**: 一般 index-作用は不要 — 必要なのは
+  - [x] **(G3) DONE (iter5)**: `exists_mapRingEquiv_chiFam_left_move` / `_right_move` +
+    bridge `sigma_omega_omegaProdChar` (S05_SigmaIsometry、sorry-free)。素数位数 char 群の
+    生成性 (zpowers=⊤ + zpow_mod_orderOf) + orderOf ξ = orderOf p (wFst/wSnd 全射 +
+    MonoidHom.cancel_right) + exists_mapRingEquiv_sigma_omega_pow で実現。旧設計メモ:
+    一般 index-作用は不要 — 必要なのは
     **行0/列0 上の pair-move のみ** (分離性が残りを埋める):
     `∃ σ, mapRingEquiv σ (chiFam (p, κ₀)) = chiFam (p', κ₀)` (p,p' 非自明 W₁-char、κ₀ = 自明
     W₂-char は全 σ 固定 ⟹ **exists_complexRingEquiv_pow_and_fixed 不要**、
@@ -125,6 +129,18 @@ Hypothesis (11.2) (M maximal, type III/IV)、ζ ∈ 𝒮(HC):
     c の `inner_eq_intCast_of_mapRingEquiv_eq_add` 相当は G2 leaf に hoist 済 — c は
     `tSideDadeMap_mapRingEquiv_bridge` で (11.9)(a) の T-side Galois bridge を並行構築中
     (M-side とは world 別、重複なし)。
+
+  ### C-層進捗 (iter5-6、2026-07-12)
+
+  - [x] **C0 DONE (66719f45)**: S13_TypeIIIGalois.lean 新設 — mapRingEquiv_mem_SHC_stratum /
+    tau_zeta_sub_mapRingEquiv_eq_SHC_extension / 補正⊥grid。
+  - [x] **C0b/C1/C2 DONE (462659c1)**: w1_prime_of_typeIIIorIV (TypeV は common 欠落ゆえ III/IV
+    限定) / bridge σ(τφ)=τφ+τ(ζ−σζ) / **列0 定数性 a_{i'0}=a_{i0}** / **行0 定数性 a_{0j'}=a_{0j}**。
+    (ρ0,κ0)=(1,1) anchor は orthonormal 単射性で。
+  - [ ] **残 = (11.9.a) 最終組立**: a₀₀=1 (既存 pattern) + 分離性 sigmaCoeff_add_eq (3.7) を
+    aligned-grid 形へ + Bessel (Σa²+‖χ‖²=w₁+1、χ≠0 は ⟨ψ,τ(ζ−ζ̄)⟩=−1) + 整数 case 分析
+    (a₁₁=0 → a₀₁=1−a₁₀ → a₁₀≠0 ⟹ 列0形 ⟹ h118 矛盾 → a₁₀=0,a₀₁=1) → 行0射影 conclusion。
+    その後 P3 (c)-組立へ。
 
   **a_aut + 組立** (書籍 (a) mirror):
   ν(τφ) = τφ + τ(ζ−ζ^ν)、τ(ζ−ζ^ν) = τ₁ζ−τ₁ζ^ν ⊥ grid ⟹

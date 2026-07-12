@@ -983,6 +983,157 @@ theorem exists_mapRingEquiv_sigma_omega_pow (hyp : TICyclicHypothesis G) [Fintyp
         rw [hc, pow_mul, hζ, one_pow])
     rw [hbridge, ← hyp.sigma_mapRingEquiv_comm hVeq app u (hyp.omega ξ), hval, pow_one]
 
+/-- `σ` sends the `(3.3)` product-character basis point to the `(3.5)` family member:
+`(ω(χ₁·χ₂))^σ = χ_{(χ₁,χ₂)}`.  Restatement of `sigma_irreducibleCharacter` through
+`omegaIrrEquiv_apply`, exposing the product character so the (3.9.b) Galois moves can
+compute with powers. -/
+theorem sigma_omega_omegaProdChar (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
+    hyp.sigma hVeq app (hyp.omega (hyp.omegaProdChar χ₁ χ₂) : ClassFunction hyp.W ℂ)
+      = hyp.chiFam hVeq app (χ₁, χ₂) := by
+  have h := hyp.sigma_irreducibleCharacter hVeq app (hyp.omegaIrrEquiv (χ₁, χ₂))
+  rw [Equiv.symm_apply_apply] at h
+  rw [← h, hyp.omegaIrrEquiv_apply]
+
+/-- **Galois transitivity on the punctured `W₁`-side of the `(3.5)` family** (the (3.9.b)
+column-`0` pair-move): when `|W₁|` is prime, any two nontrivial `W₁`-side indices at the trivial
+`W₂`-index are Galois conjugate — `∃ u, χ_{(p',1)} = (χ_{(p,1)})^u`.  The `W₂`-side stays at `1`
+because the trivial character is a fixed point of every coefficient automorphism (no
+`CRT`-fixing is needed).  With the prime-order transitivity `p' = p^k` (`k` coprime to
+`|W₁| = orderOf p`), this is `exists_mapRingEquiv_sigma_omega_pow` at the product character
+`ξ = ω_{(p,1)}`, read through `sigma_omega_omegaProdChar`.  Peterfalvi (11.9.a) uses this and
+its `W₂`-side mirror (`exists_mapRingEquiv_chiFam_right_move`) for the column-`0`/row-`0`
+coefficient constancy of the `τ(μ₀ − ζ)` grid (issue 1024 G3). -/
+theorem exists_mapRingEquiv_chiFam_left_move (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (hprime : (Nat.card hyp.W1).Prime)
+    {p p' : (hyp.W1.subgroupOf hyp.W) →* ℂˣ} (hp : p ≠ 1) (hp' : p' ≠ 1) :
+    ∃ u : ℂ ≃+* ℂ,
+      hyp.chiFam hVeq app (p', 1)
+        = ClassFunction.mapRingEquiv u (hyp.chiFam hVeq app (p, 1)) := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  -- the character group has prime order `|W₁|`, so the nontrivial `p` generates
+  have hcard : Nat.card ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) = Nat.card hyp.W1 :=
+    hyp.card_charGroup_subgroupOf hyp.W1_le_W
+  have hord : orderOf p = Nat.card hyp.W1 := by
+    have hdvd : orderOf p ∣ Nat.card ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := orderOf_dvd_natCard p
+    rw [hcard] at hdvd
+    rcases hprime.eq_one_or_self_of_dvd _ hdvd with h1 | h
+    · exact absurd (orderOf_eq_one_iff.mp h1) hp
+    · exact h
+  have htop : Subgroup.zpowers p = ⊤ := by
+    apply Subgroup.eq_top_of_card_eq
+    rw [Nat.card_zpowers, hord, hcard]
+  obtain ⟨kz, hkz⟩ := Subgroup.mem_zpowers_iff.mp (htop ▸ Subgroup.mem_top p')
+  -- normalise the exponent to `ℕ`
+  have hordpos : 0 < orderOf p := orderOf_pos p
+  set k : ℕ := (kz % (orderOf p : ℤ)).toNat with hkdef
+  have hkcast : (k : ℤ) = kz % (orderOf p : ℤ) :=
+    Int.toNat_of_nonneg (Int.emod_nonneg _ (by exact_mod_cast hordpos.ne'))
+  have hp'k : p ^ k = p' := by
+    rw [← hkz, ← zpow_natCast, hkcast, zpow_mod_orderOf]
+  -- the product character `ξ = ω_{(p,1)}` has the same order as `p` (`wFst` is surjective)
+  set ξ : hyp.W →* ℂˣ := hyp.omegaProdChar p 1 with hξdef
+  have hξ_eq : ξ = p.comp hyp.wFst := hyp.omegaProdChar_one_right p
+  have hsurj : Function.Surjective hyp.wFst := by
+    have h1 : Function.Surjective (MonoidHom.fst (↥(hyp.W1.subgroupOf hyp.W))
+        (↥(hyp.W2.subgroupOf hyp.W))) := Prod.fst_surjective
+    exact h1.comp hyp.wProdEquiv.symm.surjective
+  have hpow : ∀ (r : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (n : ℕ),
+      (r.comp hyp.wFst) ^ n = (r ^ n).comp hyp.wFst := by
+    intro r n
+    ext w
+    simp [MonoidHom.pow_apply]
+  have hordξ : orderOf ξ = orderOf p := by
+    rw [hξ_eq]
+    refine orderOf_eq_orderOf_iff.mpr fun n => ?_
+    rw [hpow p n]
+    constructor
+    · intro h
+      refine (MonoidHom.cancel_right hsurj).mp ?_
+      rw [h, MonoidHom.one_comp]
+    · intro h
+      rw [h, MonoidHom.one_comp]
+  -- coprimality: `¬ |W₁| ∣ k`, else `p' = p^k = 1`
+  have hk : k.Coprime (orderOf ξ) := by
+    rw [hordξ, hord, Nat.coprime_comm]
+    refine (Nat.Prime.coprime_iff_not_dvd hprime).mpr fun hdvd => ?_
+    exact hp' (by rw [← hp'k, ← hord] at *; exact orderOf_dvd_iff_pow_eq_one.mp hdvd)
+  -- realise the move via (3.9)(b) and read both sides through the `(3.5)` family
+  obtain ⟨u, hu, -⟩ := hyp.exists_mapRingEquiv_sigma_omega_pow hVeq app ξ hk
+  refine ⟨u, ?_⟩
+  have hξk : ξ ^ k = hyp.omegaProdChar p' 1 := by
+    rw [hξ_eq, hpow p k, hp'k, hyp.omegaProdChar_one_right]
+  rw [← hyp.sigma_omega_omegaProdChar hVeq app p' 1, ← hξk, hu, hξdef,
+    hyp.sigma_omega_omegaProdChar hVeq app p 1]
+
+/-- **Galois transitivity on the punctured `W₂`-side of the `(3.5)` family** (the (3.9.b)
+row-`0` pair-move): the `W₂`-side mirror of `exists_mapRingEquiv_chiFam_left_move` — when
+`|W₂|` is prime, `∃ u, χ_{(1,q')} = (χ_{(1,q)})^u` for nontrivial `q, q'`. -/
+theorem exists_mapRingEquiv_chiFam_right_move (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (hprime : (Nat.card hyp.W2).Prime)
+    {q q' : (hyp.W2.subgroupOf hyp.W) →* ℂˣ} (hq : q ≠ 1) (hq' : q' ≠ 1) :
+    ∃ u : ℂ ≃+* ℂ,
+      hyp.chiFam hVeq app (1, q')
+        = ClassFunction.mapRingEquiv u (hyp.chiFam hVeq app (1, q)) := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  have hcard : Nat.card ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) = Nat.card hyp.W2 :=
+    hyp.card_charGroup_subgroupOf hyp.W2_le_W
+  have hord : orderOf q = Nat.card hyp.W2 := by
+    have hdvd : orderOf q ∣ Nat.card ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := orderOf_dvd_natCard q
+    rw [hcard] at hdvd
+    rcases hprime.eq_one_or_self_of_dvd _ hdvd with h1 | h
+    · exact absurd (orderOf_eq_one_iff.mp h1) hq
+    · exact h
+  have htop : Subgroup.zpowers q = ⊤ := by
+    apply Subgroup.eq_top_of_card_eq
+    rw [Nat.card_zpowers, hord, hcard]
+  obtain ⟨kz, hkz⟩ := Subgroup.mem_zpowers_iff.mp (htop ▸ Subgroup.mem_top q')
+  have hordpos : 0 < orderOf q := orderOf_pos q
+  set k : ℕ := (kz % (orderOf q : ℤ)).toNat with hkdef
+  have hkcast : (k : ℤ) = kz % (orderOf q : ℤ) :=
+    Int.toNat_of_nonneg (Int.emod_nonneg _ (by exact_mod_cast hordpos.ne'))
+  have hq'k : q ^ k = q' := by
+    rw [← hkz, ← zpow_natCast, hkcast, zpow_mod_orderOf]
+  set ξ : hyp.W →* ℂˣ := hyp.omegaProdChar 1 q with hξdef
+  have hξ_eq : ξ = q.comp hyp.wSnd := hyp.omegaProdChar_one_left q
+  have hsurj : Function.Surjective hyp.wSnd := by
+    have h1 : Function.Surjective (MonoidHom.snd (↥(hyp.W1.subgroupOf hyp.W))
+        (↥(hyp.W2.subgroupOf hyp.W))) := Prod.snd_surjective
+    exact h1.comp hyp.wProdEquiv.symm.surjective
+  have hpow : ∀ (r : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) (n : ℕ),
+      (r.comp hyp.wSnd) ^ n = (r ^ n).comp hyp.wSnd := by
+    intro r n
+    ext w
+    simp [MonoidHom.pow_apply]
+  have hordξ : orderOf ξ = orderOf q := by
+    rw [hξ_eq]
+    refine orderOf_eq_orderOf_iff.mpr fun n => ?_
+    rw [hpow q n]
+    constructor
+    · intro h
+      refine (MonoidHom.cancel_right hsurj).mp ?_
+      rw [h, MonoidHom.one_comp]
+    · intro h
+      rw [h, MonoidHom.one_comp]
+  have hk : k.Coprime (orderOf ξ) := by
+    rw [hordξ, hord, Nat.coprime_comm]
+    refine (Nat.Prime.coprime_iff_not_dvd hprime).mpr fun hdvd => ?_
+    exact hq' (by rw [← hq'k, ← hord] at *; exact orderOf_dvd_iff_pow_eq_one.mp hdvd)
+  obtain ⟨u, hu, -⟩ := hyp.exists_mapRingEquiv_sigma_omega_pow hVeq app ξ hk
+  refine ⟨u, ?_⟩
+  have hξk : ξ ^ k = hyp.omegaProdChar 1 q' := by
+    rw [hξ_eq, hpow q k, hq'k, hyp.omegaProdChar_one_left]
+  rw [← hyp.sigma_omega_omegaProdChar hVeq app 1 q', ← hξk, hu, hξdef,
+    hyp.sigma_omega_omegaProdChar hVeq app 1 q]
+
 end TICyclicHypothesis
 
 /-! ### Peterfalvi (3.9)(c): ingredients
