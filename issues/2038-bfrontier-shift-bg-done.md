@@ -1854,3 +1854,19 @@ coprime/cent fields を確認)、(c) tauSbetaGrid 側 = Ind_S^G + betaGrid_suppo
 5. r ∈ {p,q} ∧ r ∣ |H_L| vs card_LF_coprime_pq (hnconjS/T は
    not_conj_of_isTypeI_of_isTypeNonI で供給、q_not_dvd_kernel パターン) → 矛盾。
 **次 iter = この 5 段を一気に実装** (全部品所在確定済み)。
+
+## ✅ (2026-07-12、/loop iter 18) — (13.19.a) L1 (Ã 位数補題) 実証明
+
+exists_mem_A_prime_dvd_orderOf_of_mem_dadeSupport (S04_DadeIsometryBasic、一般形) 完。
+⚠ orderOf_conj は mathlib 現 pin に**無い** — orderOf_injective (MulAut.conj c).toMonoidHom
+で代替 (coe 形は show で明示)。mem_centralizerIn の第 2 成分は可換等式に直 rfl。
+**次 iter = L2**: typeIBetaL_support_subset_dadeSupport — (i) (Ind1−φ).support ⊆
+supportInSubgroup (typeIA) L ((Ind1−φ)(1) = e−e = 0 [φ hdeg 必要 → 義務 lemma の
+_hφ に hdeg も渡す形へ signature 拡張可]、非 1 元は conjugatesInto H' → H^#-conj →
+sharpSubgroup_H_subset_typeIA + dadeData.dade.L_normalizes_A で A(L) 内)、
+(ii) dadeIntegralCharacterMap_apply_of_support → hyp.dadeMap → IsDadeMap.
+map_eq_zero_of_not_mem_dadeSupport (dadeMap の IsDadeMap 供給 lemma を S04 で grep:
+isDadeMap_dadeMap 系)。**L3**: β_S order (sInstance bridge + betaGrid_support +
+support_induce_subset_conjugatesIntoSet :452 + P p-群/W order、Sdata.W↔hyp.W
+reconciliation field 確認)。**L4 = 合成** (L1 r ∣ |L_F| 化: A(L) ⊆ L_F^# [iter 16] +
+orderOf ∣ card、card_LF_coprime_pq で {p,q} 排除)。
