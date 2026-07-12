@@ -185,6 +185,22 @@ Hypothesis (11.2) (M maximal, type III/IV)、ζ ∈ 𝒮(HC):
    ⟹ IsMulCommutative U ⟹ ¬TypeIV。⚠ TypeIVData.typeP ≠ hyp.typeP — U の conjugacy
    独立性 bridge 要 (MaximalSubgroupTypeConj の TypePData.conj 機構を確認)。
 
+### iter11 深掘り: (5.5) 単独では不足 — t=0 退化の排除が要
+
+`certainTypeR.imageSet` = **2w₁ 員** (χ₂-半分 ±δ·ω^σ_{χ₂,i} と χ₂⁻¹-半分、
+`certainTypeRImage`、image_eq: τ(μ−μ̄) = Σ 全体)。(5.5) は c μ_j = Σ_E (|E|=w₁) までで、
+E が行0 対 {f0,t0} を 0 or 2 個含むと t := ⟨τφ, c μ_j⟩ = 0 に退化 (u=a 出ず)。
+確定済: ⟨τφ,f0⟩ + ⟨τφ,t0⟩ = ⟨φ, μ−μ̄⟩ = 0 ⟹ 両者 = ±1 逆符号 ⟹
+**E∩{f0,t0} = ちょうど1 ⟺ t = ±1**。u=a への整数論は t=±1,±2 どちらでも OK
+(a·t = u·x、a∣u、u/a 奇 ⟹ u=a; u odd/a odd は u_odd + a∣u)。
+
+**t≠0 排除 route (conj-対合)**: c の conj-等変性 (`IsCoherent.extension_mapRingEquiv_comm`
+@ conjAe、family conj-closed ✓) ⟹ Σ_E conj α = c μ̄_j = c μ_j − τ(μ−μ̄) = −Σ_{Eᶜ} α。
+conj は 2 半分を交換し行 0 ↔ 行 0 (−0=0) ⟹ conj f0 = ±t0 ⟹ E の f0/t0 選択が
+Eᶜ 側と結ばれ exactly-one が出る (符号 bookkeeping は certainTypeRImage の δ-規約次第 —
+要精査; 破綻時 fallback = Coq PFsection5 coherent_prDade_TIred (no-mix 完全版) port)。
+grid-conj 部品: `certainType_columnSum_conj` / mapRingEquiv conj 系 (S06_CertainTypeConjugation)。
+
 ## 完了条件
 
 `isTypeIII_of_isTypeIIIorIV` (または同等の普遍 Type-IV 排除) が S13 で sorry-free、
