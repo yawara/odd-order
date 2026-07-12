@@ -1273,4 +1273,75 @@ theorem eta_column_diff_classifier_of_typePV_value [Finite G]
     ← (((s : ℂ) • (base.eta i1 j0 - base.eta i2 j0)).of_isConj hconj),
     hYsource w hwV, hsource w hwV, sub_self]
 
+/-- The multiplicative character underlying an abstract S15 omega-grid entry.
+Nonvanishing follows from multiplicativity and `omega i j 1 = 1`. -/
+noncomputable def omegaMonoidHom
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    (i : Fin base.q) (j : Fin base.p) : ↥base.W →* ℂˣ where
+  toFun w := Units.mk0 (base.omega i j w) (by
+    intro hz
+    have hmul := base.omega_mul i j w w⁻¹
+    rw [mul_inv_cancel, base.omega_apply_one, hz, zero_mul] at hmul
+    exact zero_ne_one hmul.symm)
+  map_one' := Units.ext (base.omega_apply_one i j)
+  map_mul' x y := Units.ext (base.omega_mul i j x y)
+
+/-- The underlying omega-grid character has the original class-function value. -/
+theorem omegaMonoidHom_coe
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    (i : Fin base.q) (j : Fin base.p) (w : ↥base.W) :
+    ((omegaMonoidHom base i j w : ℂˣ) : ℂ) = base.omega i j w := rfl
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (3.3), abstract omega-grid exhaustion.**
+The `q*p` multiplicative characters underlying the S15 omega-grid are
+pairwise distinct by orthonormality.  Since the cyclic group `W` has order
+`p*q`, its complex linear-character group has the same cardinality; hence the
+grid enumerates every `W →* ℂˣ` character. -/
+theorem omegaMonoidHom_bijective [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+    Function.Bijective
+      (fun ij : Fin base.q × Fin base.p => omegaMonoidHom base ij.1 ij.2) := by
+  classical
+  have hinj : Function.Injective
+      (fun ij : Fin base.q × Fin base.p => omegaMonoidHom base ij.1 ij.2) := by
+    intro ⟨i, j⟩ ⟨k, l⟩ hhom
+    have hcf : base.omega i j = base.omega k l := by
+      ext w
+      have hw := DFunLike.congr_fun hhom w
+      exact congrArg (fun z : ℂˣ => (z : ℂ)) hw
+    by_contra hne
+    have h1 := eta_orthonormal base i k j l
+    rw [base.eta_eq_tau_omega, base.eta_eq_tau_omega,
+      base.tau3_isometry.inner_eq, hcf] at h1
+    have h2 := base.omega_orthonormal k k l l
+    have hcond : ¬ (i = k ∧ j = l) := fun ⟨hi, hj⟩ => hne (by rw [hi, hj])
+    rw [if_neg hcond] at h1
+    rw [if_pos (⟨rfl, rfl⟩ : k = k ∧ l = l)] at h2
+    exact zero_ne_one (h1.symm.trans h2)
+  haveI : Fintype (↥base.W →* ℂˣ) := Fintype.ofFinite _
+  haveI : IsCyclic ↥base.W := base.W_cyclic
+  letI : CommGroup ↥base.W := IsCyclic.commGroup
+  haveI : NeZero (Monoid.exponent ↥base.W) :=
+    ⟨Monoid.exponent_ne_zero_of_finite⟩
+  haveI : NeZero ((Monoid.exponent ↥base.W : ℂ)) :=
+    ⟨Nat.cast_ne_zero.2 (NeZero.ne _)⟩
+  have hcardHomNat : Nat.card (↥base.W →* ℂˣ) = base.q * base.p := by
+    rw [CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity ↥base.W ℂ,
+      OddOrder.Peterfalvi.S15.card_W_eq_pq base, Nat.mul_comm]
+  have hcardHom : Fintype.card (↥base.W →* ℂˣ) = base.q * base.p := by
+    rw [← Nat.card_eq_fintype_card]
+    exact hcardHomNat
+  exact (Fintype.bijective_iff_injective_and_card _).mpr
+    ⟨hinj, by simp [hcardHom]⟩
+
+open scoped Classical in
+/-- Every complex linear character of the shared cyclic `W` is one omega-grid entry. -/
+theorem exists_omegaMonoidHom_eq [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    (ξ : ↥base.W →* ℂˣ) :
+    ∃ (i : Fin base.q) (j : Fin base.p), omegaMonoidHom base i j = ξ := by
+  obtain ⟨ij, hij⟩ := (omegaMonoidHom_bijective base).surjective ξ
+  exact ⟨ij.1, ij.2, hij⟩
+
 end OddOrder.Peterfalvi.S16

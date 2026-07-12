@@ -3546,6 +3546,14 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.eta_column_diff_classifier_of_typePV_value
 set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.omegaMonoidHom
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.omegaMonoidHom_coe
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.omegaMonoidHom_bijective
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.exists_omegaMonoidHom_eq
+set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.residual_not_orthogonal_of_transposed_reindexing
 set_option linter.style.longLine false in

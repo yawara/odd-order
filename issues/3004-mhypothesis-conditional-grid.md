@@ -1059,3 +1059,16 @@ feature commits: `d5f7fc38`, `061229b4`, `bb2c9868`, `960907f6`。
 残る最上流は **regular-value grid enumeration alignment**:
 `alignedOmegaSigmaGrid i k v = eta (colEquiv k) (rowEquiv i) v` (`v ∈ typePV`) を、
 両側の concrete linear-character enumeration と `dataT.W = base.W` から構成する。
+
+### abstract S15 omega-grid exhaustion (2026-07-12 続行 3)
+
+- `omega_mul` と `omega_apply_one` から各 abstract grid entry の underlying character
+  `omegaMonoidHom : W ->* C^x` を構成した。
+- `omegaMonoidHom_bijective` で `(i,j) |-> omegaMonoidHom i j` が全線形指標との bijection
+  であることを証明した。injective は `omega_orthonormal`、surjective は
+  `|Fin q x Fin p| = q*p = |W| = |Hom(W,C^x)|` (W cyclic) による。
+  `exists_omegaMonoidHom_eq` が任意の W-linear character を eta source grid に配置する。
+- leaf / AxiomsCheck (4157 jobs) green。許可外公理・新 `sorry` なし。
+
+次はこの full-grid bijection を W1/W2 restriction で分解し、zero-axis を保存する
+`Fin dataT.w1 ≃ Fin base.p` / `Fin dataT.w2 ≃ Fin base.q` を構成する。
