@@ -269,6 +269,7 @@ import OddOrder.Peterfalvi.S13_PrimeTIResidueBridge
 import OddOrder.Peterfalvi.S11_NineElevenCaseA
 import OddOrder.Peterfalvi.S13_Orthogonality
 import OddOrder.Peterfalvi.S13_TypeDetermination
+import OddOrder.Peterfalvi.S13_TypeIIIGalois
 import OddOrder.Peterfalvi.S14_MaximalI
 import OddOrder.Peterfalvi.S15_SAndT
 import OddOrder.Peterfalvi.S15_HonestTypeP2A0
