@@ -437,8 +437,8 @@ theorem nineElevenPairBound [Finite G]
     (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
       (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief))
     (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp)
-    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV hG) :
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
+    (htype : IsTypeIII M ∨ IsTypeIV M) :
     NineElevenPairBound hyp caseA := by
   haveI := hyp.base.finiteG
   classical
@@ -747,8 +747,8 @@ theorem caseA_two_summand_inertia_inputs [Finite G]
     (hS2deg : ∀ χ ∈ S₂,
       (χ : ↥M → ℂ) 1 = ((hyp.s11Setup.q * caseA.a : ℕ) : ℂ))
     (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp)
-    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV hG) :
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
+    (htype : IsTypeIII M ∨ IsTypeIV M) :
     ∃ K₁ K₂ : Subgroup G,
       K₁.relIndex hyp.s11Setup.U = caseA.a ∧ K₂.relIndex hyp.s11Setup.U = caseA.a ∧
       (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).C = K₁ ⊓ K₂ := by
@@ -829,8 +829,8 @@ theorem caseA_nineElevenThree_count_inputs [Finite G]
       = (hyp.chief.p - 1)
         * ((OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup).relIndex hyp.s11Setup.U))
     (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp)
-    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV hG) :
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
+    (htype : IsTypeIII M ∨ IsTypeIV M) :
     (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u
       + ((nineElevenSFour hyp S₂).ncard * hyp.s11Setup.q + (hyp.chief.p - 1))
         * (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u ^ 2
@@ -975,8 +975,8 @@ theorem nineElevenEqualityRefutation_of_sTwoExtraction_normBound [Finite G]
     (hext : NineElevenSTwoExtraction hyp caseA)
     (hnb : NineElevenNormBound hyp caseA)
     (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp)
-    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV hG) :
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
+    (htype : IsTypeIII M ∨ IsTypeIV M) :
     NineElevenEqualityRefutation hyp caseA := by
   haveI := hyp.base.finiteG
   classical
@@ -1355,8 +1355,8 @@ theorem caseA_nineElevenTwo_tiWitness [Finite G]
     (hS2deg : ∀ χ ∈ S₂,
       (χ : ↥M → ℂ) 1 = ((hyp.s11Setup.q * caseA.a : ℕ) : ℂ))
     (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp)
-    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV hG) :
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
+    (htype : IsTypeIII M ∨ IsTypeIV M) :
     OddOrder.Peterfalvi.S11.NineElevenTwoTIWitness caseA := by
   haveI := hyp.base.finiteG
   refine OddOrder.Peterfalvi.S11.nineElevenTwoTIWitness_of_degree_dichotomy caseA ?_

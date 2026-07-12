@@ -50,7 +50,8 @@ theorem S_H0C_not_coherent_unconditional {G : Type*} [Group G] [Finite G]
     ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       s13hyp.base.tau (s13hyp.SOf s13hyp.H0C) s13hyp.base.A0) :=
   fun hcoh => OddOrder.Peterfalvi.S12.S_not_coherent_unconditional hG s13hyp.base
-    (coherent_S_of_coherent_SH0C hG s13hyp hcoh)
+    (coherent_S_of_coherent_SH0C hG s13hyp
+      (OddOrder.Peterfalvi.S12.isTypeIIIorIV_unconditional hG s13hyp.base) hcoh)
 
 /-- **Peterfalvi (11.9.b), unconditional** — `w₂ < w₁` for the §10 hypothesis on a type-III/IV
 maximal subgroup: the refuter core `exists_zeta_residual_not_orthogonal_H0C_of_refuter`
@@ -121,8 +122,10 @@ theorem card_kappaHall_lt_of_isTypeIIIorIV {G : Type*} [Group G] [Finite G]
   have hM2 : secondDerivedInAmbient S
       = hyp.typeP.H ⊔ (hyp.typeP.U ⊓ Subgroup.centralizer (hyp.typeP.H : Set G)) :=
     OddOrder.Peterfalvi.S13.secondDerived_eq_fitting_of_base hG hyp hIIIorIV
+      (fun s13 => OddOrder.Peterfalvi.S13.S_H0C_not_coherent_unconditional hG s13)
   have hHcard : Nat.card ↥hyp.typeP.H = hyp.w2 ^ hyp.w1 :=
     OddOrder.Peterfalvi.S13.card_H_eq_of_base hG hyp hIIIorIV
+      (fun s13 => OddOrder.Peterfalvi.S13.S_H0C_not_coherent_unconditional hG s13)
   -- `w₂ < w₁` (Peterfalvi (11.9.b), from the genuine (11.8) via the honest narrow `𝒮(H₀C)` route
   -- on the unconditional (11.3) — `w2_lt_w1_of_hypothesis_H0C_unconditional`, issues 1019/1020).
   rw [hKstarw2, hKw1]

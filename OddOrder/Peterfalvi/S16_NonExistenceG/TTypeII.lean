@@ -640,10 +640,12 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           hW hW2spec hW1spec hV (Or.inl hIII)
           (OddOrder.Peterfalvi.S13.secondDerived_eq_fitting_of_base hG
             (s12HypothesisOfTypePData hG hyp.base.T_maximal dataT'
-              (Or.inl hIII) hP1') (Or.inl hIII))
+              (Or.inl hIII) hP1') (Or.inl hIII)
+            (fun s13 => OddOrder.Peterfalvi.S13.S_H0C_not_coherent hG s13))
           (OddOrder.Peterfalvi.S13.card_H_eq_of_base hG
             (s12HypothesisOfTypePData hG hyp.base.T_maximal dataT'
-              (Or.inl hIII) hP1') (Or.inl hIII))
+              (Or.inl hIII) hP1') (Or.inl hIII)
+            (fun s13 => OddOrder.Peterfalvi.S13.S_H0C_not_coherent hG s13))
           -- `(11.3)` narrow-`𝒮(H₀C)` noncoherence.  The unconditional heir
           -- `S_H0C_not_coherent_unconditional` lives behind the `S12_Noncoherence` pair
           -- machinery, which transitively imports this S16 cluster; from here (upstream of that

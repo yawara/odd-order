@@ -896,8 +896,8 @@ theorem nineElevenSevenEightRefutation
     (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
       (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief))
     (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp)
-    (htype : IsTypeIII M ∨ IsTypeIV M := hyp.base.isTypeIIIorIV hG) :
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
+    (htype : IsTypeIII M ∨ IsTypeIV M) :
     NineElevenSevenEightRefutation hyp caseA := by
   haveI := hyp.base.finiteG
   classical
