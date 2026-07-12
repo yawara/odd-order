@@ -872,3 +872,134 @@ theorem U_isCyclic_of_hypothesis [Finite G]
   rwa [show y = x from Subtype.ext hyx] at hy
 
 end OddOrder.Peterfalvi.S13
+
+namespace OddOrder.Peterfalvi.S13
+
+open OddOrder.GroupTheory
+
+variable {G : Type*} [Group G]
+
+/-- **`U`-commutativity is independent of the type-`P` witness** (the `M`-side analog of the
+`S16` transfer `isMulCommutative_typePData_U_of_V`): any two `TypePData` on the same maximal `M`
+have their `U`-factors conjugate in `M' = [M,M]` — both complement the normal Hall subgroup
+`H = M_F` in `M'` (`derived_complement`, `H_eq`), so Schur–Zassenhaus conjugacy
+(`IsComplement'.exists_conj_of_coprime`, with `M_F` solvable as a proper subgroup of the minimal
+simple `G`) transports `IsMulCommutative` between them.  This is what lets the (11.9.c)
+commutativity of `hyp.base.typeP.U` refute an *arbitrary* `TypeIVData` witness. -/
+theorem isMulCommutative_typePData_U_of_typePData_U [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (d₁ d₂ : TypePData M)
+    (h : IsMulCommutative ↥d₁.U) : IsMulCommutative ↥d₂.U := by
+  classical
+  -- both `U`s complement `H = M_F` in `M'`
+  have hH12 : d₁.H = d₂.H := by rw [d₁.H_eq, d₂.H_eq]
+  have hH_le : d₁.H ≤ derivedInG M := d₁.H_le
+  have hM'_le_M : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  have hH_le_M : d₁.H ≤ M := hH_le.trans hM'_le_M
+  have hM_le_NH : M ≤ Subgroup.normalizer (d₁.H : Set G) := by
+    rw [d₁.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer M
+  haveI hHnormal : (d₁.H.subgroupOf (derivedInG M)).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hH_le).mpr (hM'_le_M.trans hM_le_NH)
+  have hcompl₁ : (d₁.H.subgroupOf (derivedInG M)).IsComplement'
+      (d₁.U.subgroupOf (derivedInG M)) := d₁.derived_complement
+  have hcompl₂ : (d₁.H.subgroupOf (derivedInG M)).IsComplement'
+      (d₂.U.subgroupOf (derivedInG M)) := by
+    rw [hH12]
+    exact d₂.derived_complement
+  -- `|H|` (Hall in `M`) is coprime to `[M' : H]` (which divides `[M : H]`)
+  have hcop : Nat.Coprime (Nat.card ↥(d₁.H.subgroupOf (derivedInG M)))
+      ((d₁.H.subgroupOf (derivedInG M)).index) := by
+    have hHall := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall M
+    rw [← d₁.H_eq] at hHall
+    have h0 := OddOrder.Isaacs.Ch03.IsHallSubgroup.coprime_index hHall
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hH_le_M).toEquiv] at h0
+    have hcard : Nat.card ↥(d₁.H.subgroupOf (derivedInG M)) = Nat.card ↥d₁.H :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hH_le).toEquiv
+    have hdvd : (d₁.H.subgroupOf (derivedInG M)).index
+        ∣ (d₁.H.subgroupOf M).index := by
+      have htower : d₁.H.relIndex (derivedInG M) * (derivedInG M).relIndex M
+          = d₁.H.relIndex M :=
+        Subgroup.relIndex_mul_relIndex d₁.H (derivedInG M) M hH_le hM'_le_M
+      exact ⟨(derivedInG M).relIndex M, htower.symm⟩
+    rw [hcard]
+    exact Nat.Coprime.coprime_dvd_right hdvd h0
+  -- `H = M_F` is solvable (a proper subgroup of the minimal simple `G`)
+  have hH_lt_top : d₁.H < ⊤ :=
+    lt_of_le_of_lt hH_le_M (lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hM).1)
+  haveI hHsolv : IsSolvable ↥d₁.H := hG.solvable_of_lt_top d₁.H hH_lt_top
+  have hsolv : IsSolvable ↥(d₁.H.subgroupOf (derivedInG M))
+      ∨ IsSolvable (↥(derivedInG M) ⧸ d₁.H.subgroupOf (derivedInG M)) :=
+    Or.inl (solvable_of_solvable_injective
+      (f := (Subgroup.subgroupOfEquivOfLe hH_le).toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe hH_le).injective)
+  -- Schur–Zassenhaus conjugacy, then push the commutativity across
+  obtain ⟨n, _hn, hn⟩ :=
+    Subgroup.IsComplement'.exists_conj_of_coprime hcop hsolv hcompl₁ hcompl₂
+  have hUsub : IsMulCommutative ↥(d₁.U.subgroupOf (derivedInG M)) :=
+    isMulCommutative_of_mulEquiv (Subgroup.subgroupOfEquivOfLe d₁.U_le).symm h
+  have hmapped : IsMulCommutative
+      ↥((d₁.U.subgroupOf (derivedInG M)).map (MulAut.conj n).toMonoidHom) :=
+    isMulCommutative_of_mulEquiv
+      (Subgroup.equivMapOfInjective _ _ (MulAut.conj n).injective) hUsub
+  rw [hn] at hmapped
+  exact isMulCommutative_of_mulEquiv (Subgroup.subgroupOfEquivOfLe d₂.U_le) hmapped
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.9.c), `U` is abelian**: the `IsMulCommutative` form of
+`U_isCyclic_of_hypothesis` — the shape the type-III/IV discriminator consumes. -/
+theorem U_isMulCommutative_of_hypothesis [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)] :
+    IsMulCommutative ↥hyp.base.typeP.U :=
+  OddOrder.GroupTheory.isMulCommutative_of_isCyclic (U_isCyclic_of_hypothesis hG hyp)
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.9.c), the Type-IV exclusion**: no type-III/IV maximal subgroup carrying
+Hypothesis (11.2) is of Type IV — any `TypeIVData` witness has its `U`-factor conjugate to the
+abelian `hyp.base.typeP.U` (`isMulCommutative_typePData_U_of_typePData_U`), contradicting
+`U_not_commutative`. -/
+theorem not_isTypeIV_of_hypothesis [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)] :
+    ¬ IsTypeIV M := by
+  rintro ⟨d⟩
+  exact d.U_not_commutative
+    (isMulCommutative_typePData_U_of_typePData_U hG hyp.s11Setup.maximal hyp.base.typeP d.typeP
+      (U_isMulCommutative_of_hypothesis hG hyp))
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.9.c), `M` is Type III** (Coq `FTtype34_structure` part (c),
+`FTtype M == 3`): a type-III/IV maximal subgroup carrying Hypothesis (11.2) is Type III.  In
+the Type-IV branch the witness itself upgrades: its `U`-factor is abelian by the conjugacy
+transfer, so the same `(typeP, common, normalizer_le)` data assembles a `TypeIIIData`. -/
+theorem isTypeIII_of_hypothesis [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)] :
+    IsTypeIII M := by
+  rcases hyp.type_alt with h3 | h4
+  · exact h3
+  · obtain ⟨d⟩ := h4
+    exact ⟨{ typeP := d.typeP
+             common := d.common
+             U_commutative :=
+               isMulCommutative_typePData_U_of_typePData_U hG hyp.s11Setup.maximal
+                 hyp.base.typeP d.typeP (U_isMulCommutative_of_hypothesis hG hyp)
+             normalizer_le := d.normalizer_le }⟩
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.9.c), the universal Type-IV exclusion** (companion of `no_typeV_maximal`):
+no maximal subgroup of a minimal simple odd group is of Type IV.  A Type-IV `M` carries the §10
+hypothesis (`exists_hypothesis_of_typeIIIorIVorV`), hence the §13 Hypothesis (11.2)
+(`exists_hypothesis_of_isTypeIIIorIV`), and `not_isTypeIV_of_hypothesis` refutes the witness. -/
+theorem no_typeIV_maximal {G : Type*} [Group G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
+    ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ IsTypeIV M := by
+  rintro ⟨M, hMmax, hMIV⟩
+  obtain ⟨hyp12⟩ := OddOrder.Peterfalvi.S12.exists_hypothesis_of_typeIIIorIVorV hG hMmax
+    (Or.inr (Or.inl hMIV))
+  obtain ⟨s13, -⟩ := exists_hypothesis_of_isTypeIIIorIV hG hyp12 (Or.inr hMIV)
+  haveI : NeZero (Nat.card (s13.base.toHypothesis46 hG hG.odd).W1) := ⟨Nat.card_pos.ne'⟩
+  exact not_isTypeIV_of_hypothesis hG s13 hMIV
+
+end OddOrder.Peterfalvi.S13
