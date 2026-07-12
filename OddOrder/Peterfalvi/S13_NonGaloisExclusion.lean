@@ -988,18 +988,30 @@ theorem isTypeIII_of_hypothesis [Finite G]
              normalizer_le := d.normalizer_le }⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (11.9.c), the universal Type-IV exclusion** (companion of `no_typeV_maximal`):
-no maximal subgroup of a minimal simple odd group is of Type IV.  A Type-IV `M` carries the §10
-hypothesis (`exists_hypothesis_of_typeIIIorIVorV`), hence the §13 Hypothesis (11.2)
-(`exists_hypothesis_of_isTypeIIIorIV`), and `not_isTypeIV_of_hypothesis` refutes the witness. -/
-theorem no_typeIV_maximal {G : Type*} [Group G] [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
-    ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ IsTypeIV M := by
-  rintro ⟨M, hMmax, hMIV⟩
-  obtain ⟨hyp12⟩ := OddOrder.Peterfalvi.S12.exists_hypothesis_of_typeIIIorIVorV hG hMmax
+/-- **Peterfalvi (11.9.c), the universal Type-IV exclusion, per-subgroup form**: no maximal
+subgroup of a minimal simple odd group is of Type IV.  A Type-IV `M` carries the §10 hypothesis
+(`exists_hypothesis_of_typeIIIorIVorV`), hence the §13 Hypothesis (11.2)
+(`exists_hypothesis_of_isTypeIIIorIV`), and `not_isTypeIV_of_hypothesis` refutes the witness.
+
+This is the consumer signature for the T-side (14.9) type determination: the `hVcomm` residual
+of `S16` `T_not_isTypeIV_of_isTypeP1` discharges as
+`not_isTypeIV_of_mem_maximalSubgroups hG hyp.base.T_maximal`. -/
+theorem not_isTypeIV_of_mem_maximalSubgroups {G : Type*} [Group G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) : ¬ IsTypeIV M := by
+  intro hMIV
+  obtain ⟨hyp12⟩ := OddOrder.Peterfalvi.S12.exists_hypothesis_of_typeIIIorIVorV hG hM
     (Or.inr (Or.inl hMIV))
   obtain ⟨s13, -⟩ := exists_hypothesis_of_isTypeIIIorIV hG hyp12 (Or.inr hMIV)
   haveI : NeZero (Nat.card (s13.base.toHypothesis46 hG hG.odd).W1) := ⟨Nat.card_pos.ne'⟩
   exact not_isTypeIV_of_hypothesis hG s13 hMIV
+
+/-- **Peterfalvi (11.9.c), the universal Type-IV exclusion** (companion of `no_typeV_maximal`,
+existential form for the FT spine). -/
+theorem no_typeIV_maximal {G : Type*} [Group G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
+    ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ IsTypeIV M := by
+  rintro ⟨M, hMmax, hMIV⟩
+  exact not_isTypeIV_of_mem_maximalSubgroups hG hMmax hMIV
 
 end OddOrder.Peterfalvi.S13
