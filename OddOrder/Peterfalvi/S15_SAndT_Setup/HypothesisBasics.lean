@@ -531,30 +531,53 @@ theorem Hypothesis.sSetIrrDeg_qa_coherent_indS_caseA [Finite G]
     (hyp.sSetIrrDeg_qa_two_le_ncard hG chars caseA)
 
 open OddOrder.Peterfalvi.S11 in
+/-- **`𝒮 = sSet` is finite** (issue 1017, the `hSfin` input of the caseB (5.7) coherence engine and
+the (9.11) non-Galois maximal-subfamily refutation): the family injects into
+`IrreducibleCharacter ↥(huSub data)` (a `Finite` type) via the induction map, so it is a subset of a
+finite range. -/
+theorem sSet_finite {M : Subgroup G} [Finite G] (data : TypesIIIIIIVSetup M) :
+    (sSet data).Finite := by
+  apply Set.Finite.subset (Set.finite_range
+    (fun χ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(huSub data) =>
+      induceHU data (χ : ClassFunction ↥(huSub data) ℂ)))
+  rintro φ ⟨χ, -, rfl⟩
+  exact ⟨χ, rfl⟩
+
+open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 /-- **(9.11) non-Galois-branch coherence of the full family `𝒮 = sSet` on `Ind_S^G`** (issue 1017,
 caseA of Peterfalvi (9.11) `Ptype_core_coherence`, Coq `PFsection9.v:1484`).  In the non-Galois case
 (`CliffordCaseAData`) the honest §9 family `𝒮 = sSet` is **genuinely mixed-degree**: the degree-`q·a`
 irreducibles fill `𝒮(H₀U′)` (at least `((p−1)/a)·(|U|/(a|U′|))` of them, `caseA_character_counts` /
 `caseA_exists_irreducible_qa`) alongside the degree-`q·u` members of `𝒮(H₀C)` (the `p−1` reducible
-μ_j residues plus an irreducible).
+μ_j residues plus an irreducible).  Because the degrees genuinely differ (`q·a ≠ q·u`), this is
+**not** the uniform-degree Galois route (caseB `sSet_coherent_indS_caseB`,
+`uniform_degree_coherence_of_families`): it is Peterfalvi's (9.11) **maximal-coherent-subfamily
+refutation**, mirroring the M-instance non-Galois assembly (`S11_NineElevenAlphaBound.lean`), not the
+uniform fold `caseB_coherent_sOf_H0Cprime_of_mixed`.
 
-Honest route (the pieces landed so far):
-* **base `h0`** = the degree-`q·a` irreducible cut `S₁(q·a)` is coherent on `Ind_S^G`
+Honest route via `coherent_of_maximal_coherent_pair_refuted` (`S07_Subcoherent.lean:702`):
+* **base** = the degree-`q·a` irreducible cut `S₁(q·a)` is the coherent conjugation-closed prefix
   (`sSetIrrDeg_qa_coherent_indS_caseA`, **landed sorry-free** modulo the accepted `dadeHypS` Dade
-  foundation) — the anchor prefix of the (9.11) induction;
-* **lift** = adjoin the higher-degree irreducible conjugate pairs `{χ, χ̄}` (per-member R-datum
-  `sSet_member_differenceImage`, landed) and the `p−1` reducible μ_j columns (as
-  `CharacterPsiDecomposition`/`OrthonormalCharacterImageFamily`) one at a time, retargeting each step
-  by the `Snorm`/`sumnS` squeeze (`S07_Subcoherent.lean`, landed) + `xAdjoinStepW`, and folding by
-  `coherentOfPairChainCover` (`S07_Coherence`, CoherenceUnion) — the (9.11.1)–(9.11.8) maximality
-  induction (arithmetic bricks in `S11_NineElevenCoherence.lean`, landed).
+  foundation; conjugation-closure `sSetIrrDeg_closedUnderConjugate`, `q·a` positive real);
+* **reduction** = the ambient family `𝒮` is finite (`sSet_finite`) and conjugation-closed
+  (`sSet_closedUnderConjugate`), so a maximal proper coherent conj-closed intermediate `S₁ ⊆ 𝒮₂ ⊊ 𝒮`
+  either equals `𝒮` (done) or is the (9.11) refutation target.
 
-The residual is the `S`-instance degree-monotone member enumeration (`hpairs`/`hcover`) and the
-per-adjoin retarget data (`hstep`) for the honest Dade world (`indS`, `A(S)`) — the multi-step
-family-specific assembly mirroring lane-a's M-instance `caseB_coherent_sOf_H0Cprime_of_mixed`
-(`S13_MaximalIII_IV.lean:1033`).  Sorried-cite here as the honest (9.11) non-Galois statement pending
-that assembly; the base and all arithmetic are landed. -/
+The reduction is landed sorry-free; the **sole residual** is the refuter, i.e. Peterfalvi's
+(9.11.1)–(9.11.8) equality-configuration refutation for the honest Dade world (`indS`, `A(S)`).  The
+`S`-instance-specific prerequisites for closing it (each still to be built in `b`-territory):
+* the **caseA per-member Dade `R`-family** — the `CliffordCaseAData` analogue of the landed
+  `sSet_caseB_memberRFamily` (`S15_CaseBReducibleCoherence.lean`), feeding the `Dmem`/`Da` of the
+  (5.6) adjoining engine `xAdjoinStepW_k`;
+* the **(9.11.1)–(9.11.6) squeeze assembly** for `indS`/`A(S)` — the analogue of the M-instance
+  `nineElevenEqualityRefutation_of_sevenEightRefutation` (`S11_NineElevenAlphaBound.lean:1124`), whose
+  bricks `lb0_le_lb1_of_degreeRatio_le` / `two_mul_le_of_dvd_of_odd` / `relIndex_le_relIndex_of_le` /
+  `sumnS_of_norm_one_constant_degree` / `sumnS_le_of_subset` are already landed in `S07_Subcoherent`;
+* the **(9.11.7)–(9.11.8) orthogonal-branch refutation** — the `S`-instance analogue of the M-instance
+  `NineElevenSevenEightRefutation` (`S11_NineElevenAlphaBound.lean:786`), which is *itself* still a
+  named residual on the M-side (issue 9083 Phase E), i.e. the deepest genuinely-unlanded piece of the
+  whole non-Galois (9.11) — not an `S`-instance-only gap. -/
 theorem Hypothesis.sSet_coherent_indS_caseA [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
@@ -563,9 +586,29 @@ theorem Hypothesis.sSet_coherent_indS_caseA [Finite G]
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.indS
       (sSet (hyp.toTypesIIIIIIVSetupS hG))
       (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)) := by
-  -- Base coherence `h0 = sSetIrrDeg_qa_coherent_indS_caseA` (landed) anchors the pair-adjoining
-  -- induction; the lift to the full mixed family `𝒮 = sSet` (`coherentOfPairChainCover` over the
-  -- reducible μ_j columns + higher-degree conjugate pairs) is the remaining (9.11.1)–(9.11.8) work.
+  classical
+  -- Peterfalvi (9.11) non-Galois: the maximal-coherent-subfamily refutation.  The degree-`q·a`
+  -- irreducible cut `S₁(q·a)` is the coherent conjugation-closed base prefix
+  -- (`sSetIrrDeg_qa_coherent_indS_caseA`, landed); `coherent_of_maximal_coherent_pair_refuted`
+  -- reduces coherence of the full mixed family `𝒮 = sSet` to refuting a maximal proper coherent
+  -- conjugation-closed `𝒮₂ ⊇ S₁(q·a)` with `𝒮₃ = 𝒮 \ 𝒮₂ ≠ ∅` and no adjoinable conjugate pair.
+  refine OddOrder.Peterfalvi.S07.coherent_of_maximal_coherent_pair_refuted
+    (sSet_finite _)
+    (sSet_closedUnderConjugate _)
+    (hyp.sSetIrrDeg_subset_sSet hG (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ))
+    (hyp.sSetIrrDeg_closedUnderConjugate hG (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ)
+      (star_natCast _))
+    (hyp.sSetIrrDeg_qa_coherent_indS_caseA hG chars caseA)
+    ?_
+  -- The (9.11.1)–(9.11.8) refuter (sole residual): given a maximal proper coherent conjugation-closed
+  -- `𝒮₂ ⊇ S₁(q·a)` with `𝒮₃ = 𝒮 \ 𝒮₂ ≠ ∅` and *no* conjugate pair `{χ, χ̄}` (`χ ∈ 𝒮₃`) coherently
+  -- adjoinable, derive `False`.  Book argument: the (9.11.1) degree squeeze `lb0 = 2·q·a·χ(1) < sumnS 𝒮₂`
+  -- would fire the (5.6) adjoining engine `xAdjoinStepW_k` on some `χ ∈ 𝒮₃` (contradicting `hnopair`),
+  -- so every squeeze inequality `lb0 ≤ lb1 ≤ lb2 ≤ lb3 ≤ sumnS S₁′ ≤ sumnS 𝒮₂` is an equality — a
+  -- configuration refuted by (9.11.7)–(9.11.8).  See the theorem docstring for the three remaining
+  -- `b`-territory prerequisites (caseA `R`-family; (9.11.1)–(9.11.6) squeeze assembly for `indS`/`A(S)`;
+  -- the (9.11.7)–(9.11.8) refutation, still a residual even on the M-side, issue 9083).
+  intro S₂ _hS₁S₂ _hS₂S _hS₂conj _hS₂coh _hS₃ne _hnopair
   sorry
 
 /-- **Peterfalvi (13.2.b), order part**: the Fitting kernel `P = S_F` has order `p^q`.
@@ -857,18 +900,6 @@ theorem Hypothesis.sSet_caseB_apply_one_eq_qu [Finite G]
     rw [hx1, OddOrder.Peterfalvi.S03.mem_characterKernel,
       OddOrder.Peterfalvi.S03.characterDegree_def]
   exact caseB_degree_qu hG chars caseB φ hmem
-
-open OddOrder.Peterfalvi.S11 in
-/-- **`𝒮 = sSet` is finite** (issue 1017, the `hSfin` input of the caseB (5.7) coherence engine):
-the family injects into `IrreducibleCharacter ↥(huSub data)` (a `Finite` type) via the induction map,
-so it is a subset of a finite range. -/
-theorem sSet_finite {M : Subgroup G} [Finite G] (data : TypesIIIIIIVSetup M) :
-    (sSet data).Finite := by
-  apply Set.Finite.subset (Set.finite_range
-    (fun χ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(huSub data) =>
-      induceHU data (χ : ClassFunction ↥(huSub data) ℂ)))
-  rintro φ ⟨χ, -, rfl⟩
-  exact ⟨χ, rfl⟩
 
 open OddOrder.Peterfalvi.S11 in
 /-- **`𝒮`-members are supported in `A(S) ∪ {1}`** (issue 1017, the full-family analogue of

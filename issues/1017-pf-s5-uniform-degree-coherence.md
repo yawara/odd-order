@@ -1371,3 +1371,40 @@ from `eta_orthonormal` (column disjointness from `⟨φ,ξ⟩=⟨φ,ξ̄⟩=0`),
 reducible R-family = 新 leaf で closed、squeeze = S07_Subcoherent landed)。lane-a M-instance
 `caseB_coherent_sOf_H0Cprime_of_mixed` の maximality induction を mirror。fold は R-family 使用ゆえ S16 下流へ
 relocation 要。caseA close で coherent_H0Cprime_S 完全 honest → character_degree_analysis (13.3) 完全 un-gate。
+
+## 2026-07-13 更新 #42 (lane b, /loop) — caseA を (9.11) maximal-subfamily refutation へ reduce + 前提 #41 の route 訂正
+
+**到達点 (build green、下記)**: `sSet_coherent_indS_caseA` (HypothesisBasics) の bare `sorry` を、
+Peterfalvi (9.11) **maximal-coherent-subfamily refutation** の skeleton へ reduce。
+`coherent_of_maximal_coherent_pair_refuted` (S07_Subcoherent:702) に
+base=`sSetIrrDeg_qa_coherent_indS_caseA` (landed) / finiteness=`sSet_finite` / conj-closure=
+`sSet_closedUnderConjugate` + `sSetIrrDeg_closedUnderConjugate` を **sorry-free で配線**し、残 sorry を
+唯一 **(9.11.1)–(9.11.8) refuter** (maximal 真部分 coherent `𝒮₂ ⊇ S₁(q·a)` で `𝒮₃ = 𝒮\𝒮₂ ≠ ∅` かつ pair 追加不能
+→ False) に局在化。`sSet_finite` を HypothesisBasics 内で前方参照解消のため上流へ移設 (下流不変)。
+
+**★ 更新 #41 の route 診断を訂正 (verify-first)**: #41 は「caseA = coherentPairChain の pair-adjoining fold、
+lane-a `caseB_coherent_sOf_H0Cprime_of_mixed` を mirror」としたが、**これは誤り**:
+- lane-a の `caseB_coherent_sOf_H0Cprime_of_mixed` は **uniform-degree** (d=qu、各 step a=1、squeeze は
+  `2 < |cut|` のみ) の fold。S-instance caseA は **genuinely mixed-degree** (q·a と q·u が併存、
+  `sSetIrrDeg (q·a) ⊊ sSet`) ゆえ uniform fold 不適 — 各 adjoin step の degree ratio `a>1`、真の (9.11) squeeze
+  `2a < ∑ deg²/mc` が要る。
+- 正しい honest route は Peterfalvi 教科書どおりの **maximal-subfamily refutation** (lane-a も M-instance caseA は
+  これを使用: `NineElevenSevenEightRefutation` / `nineElevenEqualityRefutation_of_sevenEightRefutation`,
+  S11_NineElevenAlphaBound)。fold ではない。
+- ⚠ **caseA の最深 core = (9.11.7)–(9.11.8) orthogonal-branch refutation は M-instance でも未 land** (`h78 :
+  NineElevenSevenEightRefutation` を仮説に取る、issue 9083 Phase E)。ゆえに S-instance caseA の full close は
+  「単なる assembly」ではなく、M-scale の (9.11.1)–(9.11.6) 組立 + 未 land の (9.11.7)–(9.11.8) を要する
+  **multi-session** work。今 session は honest な skeleton reduction に留め、sorry を refuter に精密局在化。
+
+**★ 次 sub-brick の発見 (caseA R-family は spurious に caseB-gated)**: caseA を進めるのに必要な per-member Dade
+`R`-family は、現状 `sSet_caseB_memberRFamily` (`CliffordCaseBData` 要求) しか無い。だが調査の結果、その caseB 依存は
+**全て 1 補題 `sSet_caseB_member_diff_supported` に funnel** し、そこでの caseB 使用は `x(1)=y(1)` を uniform 次数
+(`sSet_caseB_apply_one_eq_qu`) から出す点**のみ**。R-family が実際に使うのは **共役対 `(η, η̄)` の差**だけで、
+`η̄(1)=star(η(1))=η(1)` (実次数) は**両 Clifford case で成立** — つまり caseB 依存は spurious。よって
+case-independent な `sSet_member_conj_diff_supported` (共役差 `(η−η̄).support ⊆ A(S)`、次数実性から) を land し、
+R-family lemma 群 (`tauS_muColumn_diff_eq`/`sSet_caseB_reducible_memberRFamily{,_ofColumns}`/`sSet_caseB_memberRFamily`)
+を共役版へ rewire (caseB assembly は general 差用に `sSet_caseB_member_diff_supported` を保持) すれば、R-family が
+caseA でも利用可能になる。これが caseA refuter の `xAdjoinStepW_k` 配線の前提 (32 call-site の refactor、別 session 推奨)。
+
+**Build**: `lake build OddOrder` green (下記 jobs/time)。caseA は honest sorry 1 個 (refuter) に reduce、
+新 axiom 無し。`coherent_H0Cprime_S` の axiom status = caseB 枝 honest (accepted dadeHypS0)、caseA 枝 = refuter sorry。
