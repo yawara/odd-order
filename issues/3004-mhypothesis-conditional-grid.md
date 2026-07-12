@@ -1168,3 +1168,43 @@ omega label の未証明 separability に依存せず、zero-preserving transpos
 `tau_muGridAlpha_apply_eq_of_grid_value_alignment` と transposed eta classifier から `hclassify`
 を具体化し、arbitrary-grid beta の ZIrr / reality / trivial-orthogonality / parity を組んで
 conditional `Even a → a = 0` を unconditional `a = 0` と rowwise alpha-image へ上げる。
+
+### (11.8) 経路の決定的短絡: Coq (3.9)(a) `eq_in_cycTIiso` の port (2026-07-12 続行 9)
+
+feature commits: `0d8ec0f4` (hclassify), `406e5983` (keystone)。
+
+- まず前 iteration の宣言どおり `hclassify` を具体化した (`eta_pair_diff_rigidity` /
+  `eta_pair_diff_classifier_of_typePV_value` / `alignedOmegaEtaGrid_classifier`)。
+  aligned product label は同行/同列に居ないため、(3.8) rigidity を任意 distinct pair へ
+  一般化して使う。3 定理 AxiomsCheck 登録済み。
+- 次段 (grid-parametric parity) の設計調査で以下を確認した:
+  1. unconditional `a = 0` は β_grid の reality を要し、canonical `beta_isReal` の
+     入力 h410/h48 ((4.10)/(4.8) 型 Dade identity) の eta-grid 版は support-transport
+     では出ない (zero-row 差分の source は W₂ 上不消滅; product-label four-corner は
+     abstract carrier の label 非分離性で blocked)。
+  2. S13 capstone `coherent_SOf_H0C_of_column_identities` は hcol を **canonical grid 形**で
+     要求するため、eta-parametric 化 (A) か grounding field threading (B) かの fork に見えた。
+- **Coq 精読で fork ごと解消**: PFsection3.v `eq_in_cycTIiso` ((3.9)(a)) は「dirr な φ が
+  regular set V 上で source character と値一致 ⇒ φ = σ(source) (global)」で、その系
+  `cycTIisoC` / `cycTIiso_irrel` が正に transposed 両構成の global 一致を与える。証明機構
+  (NC ≤ 1+1, (3.7) relation, (3.8) small-support, 内積 1 ⇒ 一致) は **全て repo 既存部品**
+  (`ncard_inner_grid_ne_zero_le_one` / `inner_eta_grid_relation` /
+  `grid_eq_zero_of_relation_of_card_le_two`)。
+- `eta_eq_of_norm_one_regular_value_eq` (abstract (3.9)(a)) と
+  `alignedOmegaSigmaGrid_eq_alignedOmegaEtaGrid` (**global** grid equality) を実証明・
+  AxiomsCheck 登録。「重要な訂正」(σ-map 一意性は carrier から出ない) と整合:
+  一意なのは map でなく **dirr grid entry 単位**で、norm-one rigidity が pin する。
+- **経路の帰結**: grid-parametric parity/reality chain と capstone の eta 化は不要になった。
+  canonical (11.8) refuter `member_residual_not_orthogonal_H0C_of_refuter` (landed) を
+  global equality + product pointer で eta grid へ transport すれば TTypeII:596
+  `hnotZeroRowProjection` (Coq `FTtype34_not_ortho_cycTIiso`) が閉じる。既 landing の
+  arbitrary-grid chain ((11.8.2/4/5) grid 版・classifier) は valid な infra として温存。
+
+次 iteration: endpoint transport の組立 —
+(i) `member_residual_not_orthogonal_H0C_of_refuter` + `s12Tau_zeroColumn_sub_eq_tSideDadeMap`
+    (himage) + global equality で ¬∀⟨τ_T(ν₀−ζ) − Σ_j' η_{0j'}, η_ij⟩ = 0 版 endpoint を作る
+    (transport は product pointer の injectivity + zero-column lemma で
+    Σ_{i'} grid_{i'0} = Σ_{j'} η_{0j'}; `residual_not_orthogonal_of_transposed_reindexing` は
+    coordinatewise 仮定なので使わず inline)。
+(ii) TTypeII 局所 context の hrefute (S13 noncoherence) / hM2 / hHcard / hV / ζ 対応を
+    discharge して `hnotZeroRowProjection` sorry を close。
