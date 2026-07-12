@@ -130,6 +130,18 @@ Hypothesis (11.2) (M maximal, type III/IV)、ζ ∈ 𝒮(HC):
     `tSideDadeMap_mapRingEquiv_bridge` で (11.9)(a) の T-side Galois bridge を並行構築中
     (M-side とは world 別、重複なし)。
 
+  ### C-層進捗 (iter5-6、2026-07-12)
+
+  - [x] **C0 DONE (66719f45)**: S13_TypeIIIGalois.lean 新設 — mapRingEquiv_mem_SHC_stratum /
+    tau_zeta_sub_mapRingEquiv_eq_SHC_extension / 補正⊥grid。
+  - [x] **C0b/C1/C2 DONE (462659c1)**: w1_prime_of_typeIIIorIV (TypeV は common 欠落ゆえ III/IV
+    限定) / bridge σ(τφ)=τφ+τ(ζ−σζ) / **列0 定数性 a_{i'0}=a_{i0}** / **行0 定数性 a_{0j'}=a_{0j}**。
+    (ρ0,κ0)=(1,1) anchor は orthonormal 単射性で。
+  - [ ] **残 = (11.9.a) 最終組立**: a₀₀=1 (既存 pattern) + 分離性 sigmaCoeff_add_eq (3.7) を
+    aligned-grid 形へ + Bessel (Σa²+‖χ‖²=w₁+1、χ≠0 は ⟨ψ,τ(ζ−ζ̄)⟩=−1) + 整数 case 分析
+    (a₁₁=0 → a₀₁=1−a₁₀ → a₁₀≠0 ⟹ 列0形 ⟹ h118 矛盾 → a₁₀=0,a₀₁=1) → 行0射影 conclusion。
+    その後 P3 (c)-組立へ。
+
   **a_aut + 組立** (書籍 (a) mirror):
   ν(τφ) = τφ + τ(ζ−ζ^ν)、τ(ζ−ζ^ν) = τ₁ζ−τ₁ζ^ν ⊥ grid ⟹
   a(νη) = ⟨ν(τφ), νη⟩ (G2) = ⟨τφ + ⊥grid 項, νη⟩ = a(η) ⟹ 行/列定数性
