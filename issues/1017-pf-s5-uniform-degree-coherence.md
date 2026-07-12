@@ -1539,3 +1539,46 @@ squeeze `caseA_refuter_of_equality_refutation` を mirror → sorry を `NineEle
 `NineElevenEqualityRefutationS` (tau-free `nineElevenCaseA_equality_refutation` + (9.11.7)-(9.11.8) budget、
 case-agnostic R-family で unblocked) の 2 residual に split。真の gate は全解消 (generic core reuse 可・
 R-family closed/case-agnostic・linchpin landed)、残は M-scale の wiring 労力。
+
+
+## 2026-07-13 更新 #47 (lane b, /loop) — ★ #46 手順 (a)-(c) 全実施: caseA monolith を 2 residual に split (squeeze wiring sorry-free)
+
+**全 3 step 完遂・build green (`lake build OddOrder` 4180 jobs / 2m15s, AxiomsCheck OK, 新 axiom 無)。**
+
+- **(a) strata-collapse bridge landed AXIOM-CLEAN** (`[propext,Classical.choice,Quot.sound]`, HypothesisBasics):
+  - `Hypothesis.uprimeSub_eq_bot` : `uprimeSub (toTypesIIIIIIVSetupS hG) = ⊥` (`U' = derivedInG U = ⊥`、`U`
+    abelian `S_U_commutative`; `Cprime_eq_bot` mirror で `C ≤ U` を `U` 直に置換)。
+  - `sOf_bot_eq_sSet` (generic、linchpin antisymmetry core を抽出) : `sOf data ⊥ = sSet data`。
+  - `Hypothesis.sOf_H0_uprime_eq_sSet` : `sOf data (chief.H0 ⊔ uprimeSub data) = sSet` (H0=⊥ + U'=⊥ +
+    `sOf_bot_eq_sSet`)。⟹ generic (9.11.1) squeeze cut (`nineElevenOne_configuration` の
+    `sOf data (chief.H0 ⊔ uprimeSub data)` anchor) = `sSet`、degree-`qa` anchor cut = `sSetIrrDeg hG (qa)`。
+- **(b) relocated**: `sSet_caseA_nineElevenRefutation` + `sSet_coherent_indS_caseA` を HypothesisBasics →
+  `S15_CaseBReducibleCoherence` (`sSet_coherent_indS_A` dispatch の直前) へ移設。case-agnostic R-family
+  `sSet_memberRFamily` (同 file) が citable に。import cycle 無 (CaseBReducible は HypothesisBasics 下流)。
+  下流参照は `sSet_coherent_indS_A` (同 file) のみゆえ無変更で通過。
+- **(c) squeeze split — wiring は SORRY-FREE、monolith を 2 named residual に分割**:
+  - `Hypothesis.sSet_caseA_nineElevenRefutation` = M-side `caseA_refuter_of_equality_refutation` の mirror
+    (positivity → step(a) collapse → anchor cut `= sSetIrrDeg` → `sumnS_irreducible_constant_degree` 下端 →
+    `nineElevenOne_configuration` per-χ squeeze → `𝒮₃`-witness config 抽出 → 2 residual 呼び)。**bare sorry
+    除去、2 residual の citation のみ**。
+  - `Hypothesis.nineElevenPairBoundS` (SORRIED) = (5.6) pair-bound residual (`χ = Ind ζ`、`d ≤ u`、
+    `sumnS F ≤ 2q²a·d`)。M-side `NineElevenPairBound` shape の mirror (M-side provider `nineElevenPairBound` は
+    `htype: IsTypeIII∨IsTypeIV` 要求ゆえ type-II S で cite 不可 → 要 mirror)。残: case-agnostic R-family →
+    (5.6) engine `S08.coherentDegreeSqNormBound_of_not_coherentW_k` + (9.8.a) `a ∣ ζ(1)`。
+  - `Hypothesis.nineElevenEqualityRefutationS` (SORRIED) = (9.11.2)-(9.11.8) equality-config refutation residual。
+    M-side `NineElevenEqualityRefutation` shape の mirror。残: tau-free `nineElevenCaseA_equality_refutation`
+    (reuse 可) + degree-dichotomy world-facts + (9.11.7)-(9.11.8) coherent-pair budget
+    (`exists_bridge_target_of_budget`+`isCoherent_union_pair_of_bridge`、case-agnostic R-family で供給)。
+  - ⟹ **NET: caseA の単一 monolith sorry → 2 個の precisely-named residual sorry** (各 (9.11.k) sub-step、
+    TRUE signature = M-side proven shape の直訳、hoisting/hard-content 拡大なし)。
+- **axioms**: `nineElevenPairBoundS`/`nineElevenEqualityRefutationS`/`sSet_caseA_nineElevenRefutation`/
+  `sSet_coherent_indS_caseA`/`sSet_coherent_indS_A`/`coherent_H0Cprime_S` = 全て `[propext,sorryAx,
+  Classical.choice,Quot.sound]` (sorryAx = 2 residual 由来、caseB 枝は既存 dadeHypS0)。`sSet_coherent_indS_caseB`
+  regression 無。step(a) 3 lemma = axiom-clean。
+- **残 caseA path (順、2 residual を閉じる)**: (1) `nineElevenPairBoundS` = case-agnostic R-family
+  `sSet_memberRFamily` を (5.6) engine に配線 + (9.8.a) source-degree ratio (`caseA_sOf_source_degree_ratio` を
+  `sSet_eq_sOf_H0Cprime` 経由で S-instance に)。(2) `nineElevenEqualityRefutationS` = M-side
+  `nineElevenEqualityRefutation_of_sTwoExtraction_normBound` (S11_NineElevenCaseA:971) の world-facts producer
+  (htype-gated) を S-instance mirror → `nineElevenCaseA_equality_refutation` (tau-free、reuse) +
+  (9.11.7)-(9.11.8) `nineElevenSevenEightRefutation` の S-instance mirror。M-side Phase B-E 相当の effort だが
+  proven template あり。
