@@ -2325,3 +2325,40 @@ conjugate-difference の A₀-Dade support + norm-two rigidity engine `eta_ortho
 (A) or (B) の実構築は着手可能 (どちらも genuine on-path infra) だが、**(B) が off-path ruling と衝突しうるため hub 確認を優先**
 (off-path do-not-complete trap 回避)。gated sorry 群 (pc_le/typeP_Galois 等) は従来どおり a-landing 待ち。
 hub 裁定後に (A)/(B) を淡々と build する。
+
+## 🧭 HUB RULING (2026-07-12 監視 tick, Opus hub 自律裁定) — 設計裁定: 選択肢 (A) general coherence-ortho machinery
+
+b の (A)/(B)/(C) 設計裁定要請を hub が code-level 調査の上、**裁定 = (A)** (general R-support
+coherence-orthogonality machinery を port)。**(B) sSideDadeMap route は却下、(C) 不要**。
+
+**調査 (hub 自身の grep + Coq trace)**:
+- **(A) の machinery は Lean に genuine 不在**: `coherent_ortho_cycTIiso`/`mem_coherent_sum_subseq`/
+  `FTtypeP_base_ortho` の**実宣言はゼロ** (grep hit は全て comment 言及)。b の「grep 0」は正しい。
+- **Coq は o_tau1_eta を (A) で証明**: PFsection13:573 `o_tau1_eta` = 一般 `coherent_ortho_cycTIiso`
+  (PFsection8:839) = `mem_coherent_sum_subseq` + `FTtypeP_base_ortho`。本プロジェクトは textbook→Lean +
+  Coq で行間補完ゆえ、**Coq の実 route = (A) に従うのが原則**。
+- **(A) は既存 `coherent_H0Cprime_S` を直接使える**: general R-support 分解は coherent 像を R-support
+  signed-sum に落とすので support が (C')^# でも A₀(S) でも効く。**新 coherence/Dade-map 不要**。
+- **(B) は二重の新規構築を要し off-path risk もある**: (i) 新 `sSideDadeMap` (A₀(S)-Dade)、(ii) 新
+  A₀(S)-support coherence (既存 `coherent_H0Cprime_S` は (C')^# support で (3.8)-engine の A₀(S)/sigmaSharp
+  要求と不一致 = b 指摘)、(iii) off-path ruling との表面衝突。(A) より工数大かつ risk 有。
+
+**off-path ruling の scope 明確化 (b の交錯懸念への hub 回答)**: 2026-07-02 off-path ruling が禁じたのは
+**(13.5-13.9) S-side maximal-coherent cascade の完成** (`sibleyTarget_S`・**tauS=0 placeholder** = vestigial
+scaffold の do-not-complete)。**genuine な coherence-orthogonality infra の構築は対象外**。(A) は tauS に
+一切触れず (existing `coherent_H0Cprime_S` + general ortho)、cascade 完成でもないので **ruling と非交錯**。
+⟹ (A) を採れば (B)/ruling の tension 自体が moot になる (これが (A) を選ぶ副次的利点)。
+
+**裁定内容**:
+- **b は (A) を build**: Coq `coherent_ortho_cycTIiso` (= `mem_coherent_sum_subseq` R-support signed-sum
+  分解 + `FTtypeP_base_ortho` R-support ⊥ cycTIiso η) を **general coherence-orthogonality shared-infra**
+  として port (b の coherence territory = S07_Coherence*/S08 or 新 coherence leaf)。任意 coherence に効く汎用核。
+- これを `coherent_H0Cprime_S` に適用して `tau1S_induce_inner_eta` (o_tau1_eta の S-side 具体化) を得る。
+- **規模は非基準** ([[feedback-cost-scope-not-a-criterion]]): (A) が「大 shared-infra」なのは着手回避理由でない。
+  general coherence-ortho は他 consumer (任意 coherence⊥η) も unblock する高レバレッジ genuine infra。
+- **⚠ Coq L715-720 の textbook 修正**に従う (textbook (13.3.c)/(13.6) の logical gap を Coq が修正済)。
+- **b の着手順** (b の PFsection13 map どおり、上流優先): (1) `mem_coherent_sum_subseq` R-support 分解 →
+  (2) `FTtypeP_base_ortho` R-support⊥η → (3) 合成して general `coherent_ortho_cycTIiso` → (4)
+  `coherent_H0Cprime_S` 適用で `tau1S_induce_inner_eta` → (5) character_degree_analysis の残 field assemble。
+
+**b は本裁定で hub 確認待ちを解除、(A) を淡々と build せよ** (off-path trap 回避の懸念は上記 scope 明確化で解消)。
