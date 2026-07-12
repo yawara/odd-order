@@ -3687,6 +3687,12 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaEtaGrid_classifier
 set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.eta_eq_of_norm_one_regular_value_eq
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.alignedOmegaSigmaGrid_eq_alignedOmegaEtaGrid
+set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.exists_omegaMonoidHom_eq
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
