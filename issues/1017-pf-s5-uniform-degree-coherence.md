@@ -1276,3 +1276,28 @@ R-datum `sSet_member_differenceImage` landed] + per-pair retarget hstep [squeeze
 
 ### 残 (次 iteration、両 branch 共通の deep content)
 両 branch の sorried lift = **S-instance reducible-column pair-chain assembly** (lane-a M-instance の `caseBPair`/`caseB_chainStep`/`caseB_sOf_member_dichotomy` @ S13 を S-instance Dade world `indS`/`A(S)` へ mirror)。base coherence (両 branch) + squeeze arithmetic (S07_Subcoherent) + (9.11.1)-(9.11.8) brick (S11_NineElevenCoherence) + engine (`coherentOfPairChainCover`) は全 landed。残 = family-specific な column 列挙 + per-step hstep。caseB は h2 count (q·u ≥2 既約) も要 (caseA は `sSetIrrDeg_qa_two_le_ncard` 済)。
+
+## 2026-07-13 更新 #39 (lane b) — ★caseB (Galois) `sSet_coherent_indS_caseB` の bare sorry を解消 (残 = reducible R-family only)
+
+**commit 0f34211d** (`lake build OddOrder` GREEN **4179 jobs / 3m台**, AxiomsCheck OK)。#38 で残した 2 branch sorry のうち **caseB (Galois) を解消**。
+
+### ★verify-first の要点: caseB は *fold 不要*、uniform_degree engine 直射
+- **#38 の caseB 計画 (`coherentOfPairChainCover` で reducible μ_j を fold) を訂正**: caseB は全 member 次数 `q·u` uniform (`sSet_caseB_apply_one_eq_qu`、新 landed) ゆえ、mixed fold 不要。**landed M-instance `caseB_coherent_sOf_H0Cprime` (S13_CoreStructure:1544) が実は `uniform_degree_coherence_of_families` (S07_PivotCoherence:793) 経由** (task の指した `caseB_coherent_sOf_H0Cprime_of_mixed` = 別 route)。これを S-instance へ mirror。
+- **exceptional case (9.10) robust**: pivot = reducible μ-column `μ₁ = ∑ᵢ μ_{i1}` (self-norm `q`、`mu_orthonormal`)。既約 count `2 ≤ ncard @ q·u` は exceptional で偽ゆえ **使わない** (uniform_degree route は既約 existence 不要 = caseB base count は不要だった)。
+
+### landed sorry-free (全 HypothesisBasics、b-owned)
+- `sSet_caseB_apply_one_eq_qu` (uniform 次数 qu、bridge `sSet=𝒮(⊥)=𝒮(H₀C′)`: `chief.H0=⊥` + `C′=⊥` → `caseB_degree_qu`)。**axiom-clean**。
+- `sSet_finite` / `sSet_member_support_subset` / `sSet_caseB_member_diff_supported`。
+- `sSet_coherent_dade_caseB` (engine: 14-arg `uniform_degree_coherence_of_families` 全結線 + 既約 R-datum branch)。
+- `sSet_coherent_indS_caseB` (congrMap で Dade→indS 再接地、`sInstance_dade_eq_induce`)。**sorry-free**。
+
+### 残 = precise residual (新 sorried sub-lemma 2 個、TRUE signature)
+- `sSet_caseB_memberRFamily` の **reducible branch** = S-instance §6 certain-type image family (μ-column diff の Dade 像 = η-grid columns `j, j⁻¹`)。landed 材料: `mu_colSum_mem_sOf_H0` / `mu_j_isIndPC`。
+- `sSet_caseB_memberRFamily_orthogonal` = その (5.2.e) cross-orthogonality。
+- ⟹ caseB の hard content は「全 (9.11) Galois coherence」→「**reducible-column certain-type R-family のみ**」に縮小。他 (engine 結線 / uniform 次数 / pivot / isometry / 既約 R-datum / congrMap) は全 landed。
+
+### file 再配置 (layering)
+`card_P_eq`/`chief_N_eq_bot`/`chief_H0_eq_bot` (bridge) + `subgroup_le_of_normal_coprime_index_prime`/`pgroup_le_of_normal_coprime_index`/`W2_le_P`/`mu_colSum_mem_sOf_H0` (μ-column pivot) を DegreesFirstSplit → HypothesisBasics へ上流移設 (coherence assembly の前)。`W2_le_P` は `basic_structure`(後方) → `card_P_eq` に付替。
+
+### 次 iteration (文書順): caseA (非Galois)
+`sSet_coherent_indS_caseA` (558) は **genuinely mixed 次数** (q·a 既約 + q·u) ゆえ uniform_degree 直射 **不可** — 実 fold (`coherentOfPairChainCover`: 次数単調 decomposition + per-pair retarget) が要。base `sSetIrrDeg_qa_coherent_indS_caseA` は landed。caseA は **同じ reducible-column R-family residual** に加えて degree-monotone 列挙 + `hstep` (squeeze+xAdjoinStepW) を要 (caseB より重い)。⟹ 共通の deep residual = **reducible-column certain-type R-family の S-instance port** (両 branch を unblock)。
