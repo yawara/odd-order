@@ -536,6 +536,17 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-12 (tick 10) — 全 3 レーン合流: (11.9.a) Galois C-層完成 (a) + 義務 8→6 (b)**:
+  **a=4** ((11.9.a) Galois 補正層 C-層完成 — 新 leaf `S13_TypeIIIGalois.lean` +289 全 proven +
+  S05_SigmaIsometry chiFam pair-move +151、残り = (11.9.a) 最終組立のみ) / **b=6** ((13.19) 義務
+  8→6: φ 存在 `exists_Sset_apply_one_eq_index` 実証明 + `tauTbetaGrid` honest 実装。**T-side 'A0
+  Dade instance `dadeHypT0`/`_hconj` を c leaf S15_HonestTypeP2A0 に純 additive・proven 新設** =
+  c の generic producer を T で instantiate (c 宣言非改変、additive-supply 先例で hub 承認)。
+  SubgroupL/BetaVanishing は IsTypeP2 T 引数供給の 🔩 追従のみ) / **c=5** (PF 3.3 omega-grid
+  exhaustion + (11.8) eta rigidity 連結、TGapNonorthogonality +628 全 proven)。build green ×3
+  (4173 jobs; 7m48s/2m24s/1m16s)・AxiomsCheck OK・**count-sorry 72→70** (b 義務 2 discharge)・
+  build 警告 70→68・新 axiom なし。push `5de854c0..e369e559`。⚠ size watch:
+  **TGapNonorthogonality.lean 1553 行 (>1500) → issue 0109 起票** (c frontier 尊重、凍結境界で split)。
 - **2026-07-12 (tick 9, レーン再開後初) — b/c 合流: (13.19) producer 分解 (b) + h114 一般化 (c)**:
   tick 6-8 = 変化なし×3 (レーン停止をユーザーに flag → ユーザーが全レーン再起動)。**b=2**
   ((13.19) producer monolith sorry を **Tier-A 実構成 + 明示義務 8 本**に分解 (net sorry +7 全て

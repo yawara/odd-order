@@ -3526,6 +3526,62 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S12.Hypothesis.exists_coherent_extension_h114_of_grid_orthogonal
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S12.Hypothesis.SHC_residual_eq_grid_diff
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.grid_diff_inner_zeroColumnSum
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S12.Hypothesis.R_sum_inner_grid_zeroColumnSum
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S12.Hypothesis.charParam_a_eq_zero_of_grid_residualEq
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S12.Hypothesis.tau_muGridAlpha_apply_eq_of_grid_value_alignment
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.eta_diff_classifier_of_typePV_value
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.eta_column_diff_rigidity
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.eta_column_diff_classifier_of_typePV_value
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.omegaMonoidHom
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.omegaMonoidHom_coe
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.monoidHom_eq_of_eq_on_W1_W2
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.omegaW1Restriction
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.omegaW2Restriction
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.omegaMonoidHom_bijective
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.omegaW1Restriction_injective
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.omegaW2Restriction_injective
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.omegaW1Restriction_bijective
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.omegaW2Restriction_bijective
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.omegaW1RestrictionEquiv
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.omegaW2RestrictionEquiv
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.omegaW1Restriction_zero
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.omegaW2Restriction_zero
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.omegaW1RestrictionEquiv_symm_one
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.omegaW2RestrictionEquiv_symm_one
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.exists_omegaMonoidHom_eq
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.residual_not_orthogonal_of_transposed_reindexing
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.exists_charParameters_full_for_member
