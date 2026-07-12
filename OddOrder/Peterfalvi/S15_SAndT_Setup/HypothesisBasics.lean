@@ -530,13 +530,93 @@ theorem Hypothesis.sSetIrrDeg_qa_coherent_indS_caseA [Finite G]
     (Nat.cast_ne_zero.mpr (Nat.mul_ne_zero hqpos.ne' caseA.a_pos.ne'))
     (hyp.sSetIrrDeg_qa_two_le_ncard hG chars caseA)
 
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **(9.11) non-Galois-branch coherence of the full family `𝒮 = sSet` on `Ind_S^G`** (issue 1017,
+caseA of Peterfalvi (9.11) `Ptype_core_coherence`, Coq `PFsection9.v:1484`).  In the non-Galois case
+(`CliffordCaseAData`) the honest §9 family `𝒮 = sSet` is **genuinely mixed-degree**: the degree-`q·a`
+irreducibles fill `𝒮(H₀U′)` (at least `((p−1)/a)·(|U|/(a|U′|))` of them, `caseA_character_counts` /
+`caseA_exists_irreducible_qa`) alongside the degree-`q·u` members of `𝒮(H₀C)` (the `p−1` reducible
+μ_j residues plus an irreducible).
+
+Honest route (the pieces landed so far):
+* **base `h0`** = the degree-`q·a` irreducible cut `S₁(q·a)` is coherent on `Ind_S^G`
+  (`sSetIrrDeg_qa_coherent_indS_caseA`, **landed sorry-free** modulo the accepted `dadeHypS` Dade
+  foundation) — the anchor prefix of the (9.11) induction;
+* **lift** = adjoin the higher-degree irreducible conjugate pairs `{χ, χ̄}` (per-member R-datum
+  `sSet_member_differenceImage`, landed) and the `p−1` reducible μ_j columns (as
+  `CharacterPsiDecomposition`/`OrthonormalCharacterImageFamily`) one at a time, retargeting each step
+  by the `Snorm`/`sumnS` squeeze (`S07_Subcoherent.lean`, landed) + `xAdjoinStepW`, and folding by
+  `coherentOfPairChainCover` (`S07_Coherence`, CoherenceUnion) — the (9.11.1)–(9.11.8) maximality
+  induction (arithmetic bricks in `S11_NineElevenCoherence.lean`, landed).
+
+The residual is the `S`-instance degree-monotone member enumeration (`hpairs`/`hcover`) and the
+per-adjoin retarget data (`hstep`) for the honest Dade world (`indS`, `A(S)`) — the multi-step
+family-specific assembly mirroring lane-a's M-instance `caseB_coherent_sOf_H0Cprime_of_mixed`
+(`S13_MaximalIII_IV.lean:1033`).  Sorried-cite here as the honest (9.11) non-Galois statement pending
+that assembly; the base and all arithmetic are landed. -/
+theorem Hypothesis.sSet_coherent_indS_caseA [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
+    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
+    (caseA : CliffordCaseAData chars) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.indS
+      (sSet (hyp.toTypesIIIIIIVSetupS hG))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)) := by
+  -- Base coherence `h0 = sSetIrrDeg_qa_coherent_indS_caseA` (landed) anchors the pair-adjoining
+  -- induction; the lift to the full mixed family `𝒮 = sSet` (`coherentOfPairChainCover` over the
+  -- reducible μ_j columns + higher-degree conjugate pairs) is the remaining (9.11.1)–(9.11.8) work.
+  sorry
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **(9.11) Galois-branch coherence of the full family `𝒮 = sSet` on `Ind_S^G`** (issue 1017, caseB
+of Peterfalvi (9.11) `Ptype_core_coherence`).  In the Galois case (`CliffordCaseBData`) **every**
+member of `𝒮 = sSet` has degree `q·u` (`caseB_degree_qu`/`caseB_character_counts`), but `𝒮` is still
+**mixed**: it contains exactly `p−1` reducible members (the μ_j residues, each `Ind` of a linear
+character of `HC`, `reducible_count_sOf_H0`) alongside the degree-`q·u` irreducibles.
+
+Honest route: the base coherence of the degree-`q·u` irreducible cut (`sSetIrrDeg_coherent_indS` at
+`d = q·u`, landed modulo the `2 ≤ ncard` count) folded with the `p−1` reducible-column conjugate
+pairs `{μ_k, μ̄_k}` via `coherentOfPairChainCover` — mirroring lane-a's M-instance assembly
+`caseB_coherent_sOf_H0Cprime_of_mixed` (`S13_MaximalIII_IV.lean:1033`).  The residual is the
+`S`-instance reducible-column machinery (the `caseBPair`/`caseB_chainStep`/`caseB_sOf_member_dichotomy`
+analogues in the honest Dade world `indS`/`A(S)`).  Sorried-cite here as the honest (9.11) Galois
+statement pending that multi-step assembly. -/
+theorem Hypothesis.sSet_coherent_indS_caseB [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
+    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
+    (caseB : CliffordCaseBData chars) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.indS
+      (sSet (hyp.toTypesIIIIIIVSetupS hG))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)) := by
+  -- The whole family is uniform degree `q·u`; base = the degree-`q·u` irreducible cut
+  -- (`sSetIrrDeg_coherent_indS` at `q·u`), then adjoin the `p−1` reducible μ_j columns via
+  -- `coherentOfPairChainCover` — the remaining `S`-instance reducible-column assembly.
+  sorry
+
+open OddOrder.Peterfalvi.S11 in
 open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
-/-- **Honest §9 character data on `S`** (issue 2035 step 3): the `mkSection11CharacterDataS`
-mirror with the *genuine* coherence inputs — `tau := Ind_S^G` (`indS`, Peterfalvi (13.2.e)) and
-`H0CprimeSupport := (C')^#` (`cprimeSharpS`, the `S`-instance degeneration of `(H₀ ⊔ C')^#` via
-`H₀ = ⊥`) — instead of the `∅`/`tauS` degree-only placeholders.  Fed to `coherent_H0C_commutator`
-to extract the coherent extension `τ₁` (the (13.2.d)⇐(9.11) route to the (13.3) `τ₁`-fields).  `u`
-and `u_eq_card_quotient` are unchanged (rfl-pinned to the `U`-action image, as in the placeholder). -/
+/-- **Honest §9 character data on `S`** (issue 2035 step 3; support corrected to `A(S)`, issue 1017):
+the `mkSection11CharacterDataS` mirror with the *genuine* coherence inputs — `tau := Ind_S^G` (`indS`,
+Peterfalvi (13.2.e)) and `H0CprimeSupport := A(S)` (`supportInSubgroup (honestTypeP2ASet S) S`, the
+honest Dade support `⋃_{x∈S_σ#} C_{S′}(x)#`).
+
+**Support choice (issue 1017 verify-first).**  For the type-`P₂` maximal `S` the coherence support
+`(H₀ ⊔ C′)^#` degenerates to the empty set — `H₀ = ⊥` (chief kernel trivial) and `C′ = [C,C] = ⊥`
+(`Cprime_eq_bot`, `C ≤ U` abelian), so `(C′)^# = cprimeSharpS = ∅` (`cprimeSharpS_eq_empty`).  With
+support `∅`, `zSupportedSpan 𝒮 ∅ = {0}`, which makes `IsCoherent`'s `nonzero` field (a nonzero
+supported witness) **unsatisfiable** — the target `IsCoherent Ind_S^G 𝒮 ∅` is uninhabited, which is
+exactly why the old `sibleyTarget_H0C` route was unsound.  The honest support is the (13.2.e) Dade
+support `A(S)`, on which the family differences genuinely live (`sSet_member_diffsupp`) and
+`extends_on_supported` carries real content (`τ₁ = Ind_S^G` on `A(S)`-supported combinations); the
+degenerate `(C′)^# ⊆ A(S)` (`cprimeSharpS_subset_supportA`) restriction would only re-vacuate it.
+
+Fed to `coherent_H0Cprime_S` (re-grounded off the unsound `sibleyTarget_H0C` onto the honest
+`sSet_coherent_indS_A`) to extract the coherent extension `τ₁` (the (13.2.d)⇐(9.11) route to the
+(13.3) `τ₁`-fields).  `u` and `u_eq_card_quotient` are unchanged (rfl-pinned to the `U`-action
+image, as in the placeholder). -/
 noncomputable def Hypothesis.mkSection11CharacterDataS_honest [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
@@ -546,29 +626,54 @@ noncomputable def Hypothesis.mkSection11CharacterDataS_honest [Finite G]
         ((hyp.toTypesIIIIIIVSetupS hG).typeP.U
           ⊔ (hyp.toTypesIIIIIIVSetupS hG).typeP.W1)).subtype).range)
   u_eq_card_quotient := rfl
-  H0CprimeSupport := hyp.cprimeSharpS
+  H0CprimeSupport := OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S
   tau := hyp.indS
   quotientSemidirectFrobenius := True
 
+open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
-/-- **(9.11)-coherence of the honest `S`-instance §9 data** (issue 2035 step 4).  Applies the
-(6.8)-wired `coherent_H0C_commutator` (via the §14-gated `sibleyTarget_H0C`) to the honest
-character data (`mkSection11CharacterDataS_honest`), yielding `IsCoherent Ind_S^G 𝒮 (C')^#` — the
-Peterfalvi (13.2.d)⇐(9.11) coherence for `S(H₀C')` with the genuine Dade map `τ = Ind_S^G` and
-support `(C')^#`.  The only gap is `sibleyTarget_H0C` (§14 structural witness, sorried-cite). -/
+/-- **(9.11) coherence of the full honest §9 family `𝒮 = sSet` on `Ind_S^G`, unconditional** (issue
+1017 — the honest S-instance Peterfalvi (9.11) `Ptype_core_coherence`, replacing the unsound
+`sibleyTarget_H0C`).  Case-splits the Clifford dichotomy (9.7) (`clifford_dichotomy` on the honest
+character data) and dispatches to the Galois branch (`sSet_coherent_indS_caseB`) or the non-Galois
+branch (`sSet_coherent_indS_caseA`).  The map is the genuine induction `τ = Ind_S^G` (`indS`,
+(13.2.e)) and the support is the honest Dade support `A(S)` (nonempty — unlike the degenerate
+`(C′)^# = ∅`, which makes `IsCoherent`'s `nonzero` field unsatisfiable). -/
+theorem Hypothesis.sSet_coherent_indS_A [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.indS
+      (sSet (hyp.toTypesIIIIIIVSetupS hG))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)) := by
+  rcases clifford_dichotomy hG (hyp.mkSection11CharacterDataS_honest hG chief) with hA | hB
+  · exact hyp.sSet_coherent_indS_caseA hG (hyp.mkSection11CharacterDataS_honest hG chief) hA.some
+  · exact hyp.sSet_coherent_indS_caseB hG (hyp.mkSection11CharacterDataS_honest hG chief) hB.some
+
+open scoped FiniteInduce in
+/-- **(9.11)-coherence of the honest `S`-instance §9 data** (issue 2035 step 4; re-grounded off the
+unsound `sibleyTarget_H0C`, issue 1017).  The `.some` of the honest unconditional
+`sSet_coherent_indS_A`, yielding `IsCoherent Ind_S^G 𝒮 A(S)` — the Peterfalvi (13.2.d)⇐(9.11)
+coherence for `𝒮(H₀C′) = 𝒮` (in the type-`P₂` `S`-instance, `H₀C′ = ⊥`) with the genuine Dade map
+`τ = Ind_S^G` and the honest Dade support `A(S)`.
+
+**This no longer routes through `coherent_H0C_commutator`/`sibleyTarget_H0C`** (the unsound (6.8)
+shortcut whose target `IsCoherent Ind_S^G 𝒮 (C′)^# = IsCoherent Ind_S^G 𝒮 ∅` is uninhabited).  The
+remaining gap is the honest (9.11) pair-adjoining assembly inside `sSet_coherent_indS_{caseA,caseB}`
+(base coherences landed, the mixed-family lift sorried-cite), not a soundness defect. -/
 noncomputable def Hypothesis.coherent_H0Cprime_S [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
     OddOrder.Peterfalvi.S07.IsCoherent (hyp.mkSection11CharacterDataS_honest hG chief).tau
       (hyp.mkSection11CharacterDataS_honest hG chief).S
       (hyp.mkSection11CharacterDataS_honest hG chief).H0CprimeSupport :=
-  OddOrder.Peterfalvi.S11.coherent_H0C_commutator (hyp.mkSection11CharacterDataS_honest hG chief)
+  (hyp.sSet_coherent_indS_A hG chief).some
 
 open scoped FiniteInduce in
 /-- **The coherent extension `τ₁` for the honest `S`-instance** (issue 2035 step 4): the
 `.extension` of the (9.11)-coherence `coherent_H0Cprime_S`.  This is the (13.2.d) `τ₁ :
 IntegralCharacterMap ↥S G` that the (13.3) degree analysis threads (the `μ_j^{τ₁}` machinery).
-Sorried-cite via `sibleyTarget_H0C` (§14). -/
+Now grounded on the honest `sSet_coherent_indS_A` (base coherences landed, mixed-family lift
+sorried-cite), no longer on the unsound `sibleyTarget_H0C`. -/
 noncomputable def Hypothesis.tau1S_ofHonest [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
