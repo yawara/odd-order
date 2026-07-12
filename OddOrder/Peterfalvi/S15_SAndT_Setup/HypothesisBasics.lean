@@ -500,6 +500,36 @@ theorem Hypothesis.sSetIrrDeg_qa_two_le_ncard [Finite G]
         Set.ncard_le_ncard (Set.insert_subset hχ (Set.singleton_subset_iff.mpr hχc))
           (hyp.sSetIrrDeg_finite hG d)
 
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **(9.11) non-Galois base coherence of `S₁(q·a)` on `Ind_S^G`, fully un-gated** (issue 1017,
+Step 2 — the `h0` entry point of the pair-adjoining lift).  Combines the uniform base coherence
+`sSetIrrDeg_coherent_indS` with the base-count discharge `sSetIrrDeg_qa_two_le_ncard`, so the
+exposed `hd`/`hd0`/`h2` parameters are all discharged from the `S`-instance §9 caseA data:
+`star (q·a) = q·a` (positive real, `star_natCast`), `q·a ≠ 0` (`data.q > 0` = `Nat.card_pos`,
+`caseA.a_pos`), and `2 ≤ ncard` (the (9.8.d) count + conjugacy doubling).
+
+This is the base coherence `h0` that Peterfalvi's (9.11) pair-adjoining induction (Coq
+`Ptype_core_coherence`, `coherentPairChain`/`coherentOfPairChainCover`) starts from, for the honest
+type-`P₂` `S`.  The remaining lift steps to the full `𝒮 = sSet` are the degree-monotone
+decomposition (`hpairs`/`hcover`, the reducible `μ_j` via `CharacterPsiDecomposition` and the
+irreducible conjugate pairs via `CharacterDifferenceImage`) and the per-pair (5.6)/(9.11.5) retarget
+(`Snorm`/`sumnS` squeeze + `xAdjoinStepW`), all keeping `S₀ = S₁(q·a)` as the anchor prefix.  In the
+Galois case (caseB) the whole family is uniform of degree `q·u`, coherent directly by
+`sSetIrrDeg_coherent_indS` (no lift). -/
+theorem Hypothesis.sSetIrrDeg_qa_coherent_indS_caseA [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
+    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
+    (caseA : CliffordCaseAData chars) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.indS
+      (hyp.sSetIrrDeg hG (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)) := by
+  have hqpos : 0 < (hyp.toTypesIIIIIIVSetupS hG).q := Nat.card_pos
+  exact hyp.sSetIrrDeg_coherent_indS hG _ (star_natCast _)
+    (Nat.cast_ne_zero.mpr (Nat.mul_ne_zero hqpos.ne' caseA.a_pos.ne'))
+    (hyp.sSetIrrDeg_qa_two_le_ncard hG chars caseA)
+
 open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **Honest §9 character data on `S`** (issue 2035 step 3): the `mkSection11CharacterDataS`
 mirror with the *genuine* coherence inputs — `tau := Ind_S^G` (`indS`, Peterfalvi (13.2.e)) and
