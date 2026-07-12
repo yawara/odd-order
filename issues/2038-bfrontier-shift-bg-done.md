@@ -2377,3 +2377,34 @@ scaffold の do-not-complete)。**genuine な coherence-orthogonality infra の�
   `coherent_H0Cprime_S` 適用で `tau1S_induce_inner_eta` → (5) character_degree_analysis の残 field assemble。
 
 **b は本裁定で hub 確認待ちを解除、(A) を淡々と build せよ** (off-path trap 回避の懸念は上記 scope 明確化で解消)。
+
+## 🔧 (2026-07-12 続³、lane-b /loop) — HUB RULING (A) 着手: (A) build の architecture 精密 map
+
+hub 裁定 (A) を engage → Lean coherence framework の architecture を精査し (A) build の実構造を確定
+(hub ruling が想定した「coherent_H0Cprime_S を直接使える」を精緻化):
+
+**finding**: Lean の `IsCoherent` (S07_Coherence/NormInequalities:480、`coherent_H0Cprime_S` の返り型) は
+**`R`-support を持たない** (extension + isometry(ℤ[S]) + ZIrr codomain のみ)。∴ Coq `mem_coherent_sum_subseq`
+(subcoherent の `R` を要す) は IsCoherent から直接は出ない。**だが port 可能** — 必要な部品は既存:
+- **subcoherent R は既存**: `Hypothesis.sSetIrrDeg_subcoherent` (HypothesisBasics:232、S07.Hypothesis on
+  sSetIrrDeg) + `Sset_differenceImage` (S14 FrobeniusStructure:1143、type-I 版の R = CharacterDifferenceImage)。
+  R(χ) = (5.2.d) difference image (μ-ν pair)。
+- Coq `mem_coherent_sum_subseq` (PFsection5:958) は `scohS`(subcoherent) + `cohS1`(**任意** coherence,
+  coherent_with) → `tau1(χ) = R(χ) の signed-sum` を出す。∴ abstract `coherent_H0Cprime_S` でも、それが
+  subcoherent family と coherent_with であれば R-decomposition が導ける (coherence を subcoherent-maximal に
+  作り直す必要なし)。
+
+**(A) build の着手順** (hub 着手順を Lean architecture に即して精緻化):
+1. **`mem_coherent_sum_subseq` port** (PFsection5:958): S07.Hypothesis(subcoherent, R) + IsCoherent(coherence) →
+   `extension(χ) = Σ ±R(χ)ᵢ`。coherence framework core (b territory S07)。
+2. **`FTtypeP_base_ortho` port** (PFsection8:829): R(χ) = differenceImage ⊥ η grid。差 μ-ν が cycTIiso 直交。
+3. **合成 `coherent_ortho_cycTIiso`** (PFsection8:839): 1+2 で `⟨extension(χ), η⟩=0` (χ irr ∈ family)。
+4. **適用**: `coherent_H0Cprime_S` (+ `sSetIrrDeg_subcoherent` の R) に 3 を適用 → `tau1S_induce_inner_eta`
+   (Ind θ を irr 展開 + 線形性)。⚠ coherent_H0Cprime_S は transitive に (9.11) coherent_H0C_commutator sorry
+   を含む (lane a gate) が、`tau1S_induce_inner_eta` **定理自体**は (A) machinery で proven (tau1S を仮定として)。
+5. **character_degree_analysis 残 field assemble** (mu_col_tau1_eta_col_one 13.9.a 等、Coq L340 mu_tau1red)。
+
+**⚠ hub への注記**: (A) の実 scope は ruling 想定より大 (IsCoherent が R 非携帯ゆえ mem_coherent_sum_subseq の
+framework-level port が要)。ただし subcoherent R 部品は既存、規模は非基準 ([[feedback-cost-scope-not-a-criterion]])
+ゆえ b は淡々と build。general coherence-ortho は他 consumer も unblock する高レバレッジ genuine infra。
+**次 iteration = step 1 (mem_coherent_sum_subseq) から**。
