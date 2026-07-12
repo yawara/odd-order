@@ -2193,3 +2193,39 @@ S15_SAndT (1869 行) 分割を凍結境界で実施可能 (b の次作業 u_boun
 **b への directive**: ① u_bound cite 討伐を即着手 (ungated, 9000 cite signature どおり)。② typeP_Galois は
 再実装しない。③ 以後の a-gated sorry は gated-endpoint 待機。別クラスタ再配置・lane-c 支援は不要 (①で
 genuine ungated work が在り、支援先の c も同 char body gate 待ちゆえ)。
+
+## ✅ (2026-07-12、lane-b 再開) — HUB RULING ① 完遂: `basic_structure_gated.u_bound` cite 討伐 (commit 40a771ed)
+
+HUB RULING ① どおり `HypothesisBasics.lean:886 u_bound := sorry` を discharge。新 `Hypothesis.u_le_cyclotomicQuotient`
+(sorry-free) が lane-a proven の無条件 `S11.u_le_cyclotomicQuotient` を S-instance `toTypesIIIIIIVSetupS` で cite:
+- `data.q = q` (|W₁|=q) / `chief.p = p` (|P|=p^q=chief.p^q·|N| chief split) の 2 識別は proven code copy。
+- **`chars.u = u`** の鍵 = 既存 proven `S11.relIndex_cSub_U_eq_u` (`[U:C]=chars.u`) + `[U:C]·|C|=|U|`
+  (`index_mul_card`) + `cSub=C` (`toTypesIIIIIIVSetupS_cSub_eq_C`) + `card_U_eq_uc` → `chars.u·c = u·c` → `chars.u=u`。
+- import 追加 = S11_ImprimitiveUBound / S11_SingleFactorCentralizer (cycle-safe)。
+- full build **4178 jobs green**・AxiomsCheck exit 0・新 axiom/sorry regression 無。HypothesisBasics 実 sorry 2→1。
+
+## 🔎 (2026-07-12、lane-b 再開 census) — ⚠ census 訂正: `character_degree_analysis` (13.3) は **ON-PATH** (off-path 判定は誤り)
+
+u_bound 討伐後、b 所有残 sorry 15 本を全数 comment-strip census。**RULING ③ の「残 b-sorry は全 a-gated」を code-level で
+再検証したところ、`character_degree_analysis` (Machinery135:181) は off-path でなく on-path と判明** (u_bound と同型の census miss):
+
+- **consumer chain**: `character_degree_analysis` → `lambda_forces_T_caseB` (CountingLayer:1758) → `T_side_caseB_facts`
+  (TTypeII:189、Pf (13.4)/(14.4) T-side v-value) → **TTypeII:419/426/947 = (14.9) T-side 矛盾**。honest FT-path 上。
+- **off-path 判定の混同**: 2026-07-02 hub ruling の off-path 対象は **`tauS`** (S-side maximal-coherent Dade route、
+  `sibleyTarget_S`、tauS=0 placeholder)。`character_degree_analysis` が使うのは **`tau1S`** (Pf (13.2.d) coherence 拡張、
+  `tau1S_ofHonest` proven engine) で **別物・on-path**。predecessor census が両者を lump したのが誤り。
+
+**⟹ b の genuine on-path frontier は枯渇していない** (RULING ③ の「全 gated」は不正確)。ただし `character_degree_analysis`
+は deep な (13.3) char bundle:
+- proven 済 field: `tau1S`/`tau1S_apply_induce_sub`/`tau1S_inner_induce`/`tau1S_induce_mem_ZIrr` (= `tau1S_ofHonest_*`)、
+  `delta_eq_one` の δ_j 側 (`delta_eq_one_of_ne_zero`+`delta_zero_eq_one`)。
+- **未証明 deep field** (次の b 攻略対象): `lambda_induced_from_PC_linear` (13.3.b λ 構成) /
+  `mu_col_tau1_eta_col_one` (**13.9.a** τ₁-image=δ∑η_{i1}) / `mu_tau1_formula` (13.3.c) /
+  `tau1S_induce_inner_eta` (4.1+5.3.b η⊥τ₁-image) / `mu_j_linear_induced` (13.3.a) / `delta_eq_one` の δ'_i 側。
+- **同 chain の別 gate**: `QD_sharp_centralizer_le_T` (CountingLayer:1619 = b sorry、(13.4) A₀(T)-TI materialization) +
+  `tSide_theta_package_of_not_caseB` も要 (T-side)。
+
+**次 b 作業** = `character_degree_analysis` の deep field を (13.18)/(13.19) で predecessor が build した tau1S/eta 機械を
+使って assemble できるか精査 → 最上流 buildable field から証明 (policy「難所回避しない」; deep char frontier を engage)。
+tauS 非依存ゆえ off-path ruling には抵触しない。**hub 向け flag**: RULING ③ の「b 全 gated → gated-endpoint」は
+character_degree_analysis の on-path 性を見落とし。b は idle でなく本 (13.3) frontier を engage する。
