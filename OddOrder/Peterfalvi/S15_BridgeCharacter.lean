@@ -904,6 +904,64 @@ theorem tauS_mu_row0_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact hrig
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(4.8)/(5.3) prime-`TI` Dade cross-relation, full-grid form**:
+`τ_S(μ_{i,j₁} − μ_{i,j₂}) = η_{i,j₁} − η_{i,j₂}` for any row `i` and distinct nontrivial columns
+`j₁ ≠ j₂` (both `≠ 0`).  The all-rows/all-cols generalization of `tauS_mu_row0_cross` (Coq
+`prDade_sub_TIirr` with the FT sign `δ = 1`): `X := τ_S(μ-diff)` is a norm-`2` `ZIrr` character
+(Dade isometry on the `A₀(S)`-supported difference `tauS_mu_diff_support`) agreeing with
+`η_{i,j₁} − η_{i,j₂}` on the regular set `V^S` (`tauS_mu_vanish_on_V`), so `S16.eta_diff_rigidity`
+(Pf (3.8), general in the row `i`) pins it.  This is the per-row engine the reducible caseB
+`R`-family sums over a μ-column: `τ_S(μ_j − μ̄_j) = ∑ᵢ τ_S(μ_{ij} − μ_{ik}) = ∑ᵢ(η_{ij} − η_{ik})`
+(for the two column indices `j ≠ k` of `μ_j`, `μ̄_j`). -/
+theorem tauS_mu_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (i : Fin hyp.q) {j1 j2 : Fin hyp.p}
+    (hj1 : j1 ≠ ⟨0, hyp.p_prime.pos⟩) (hj2 : j2 ≠ ⟨0, hyp.p_prime.pos⟩) (hj12 : j1 ≠ j2) :
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
+        ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG))
+        (hyp.mu i j1 - hyp.mu i j2)
+      = hyp.eta i j1 - hyp.eta i j2 := by
+  classical
+  set D := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
+      ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) with hD
+  have hμaIrr : IsIrreducibleCharacter (hyp.mu i j1) := hyp.mu_irreducible _ _
+  have hμbIrr : IsIrreducibleCharacter (hyp.mu i j2) := hyp.mu_irreducible _ _
+  have h_ab : ClassFunction.inner (hyp.mu i j1) (hyp.mu i j2) = 0 := by
+    rw [hyp.mu_orthonormal]; exact if_neg (fun hc => hj12 hc.2)
+  have h_ba : ClassFunction.inner (hyp.mu i j2) (hyp.mu i j1) = 0 := by
+    rw [hyp.mu_orthonormal]; exact if_neg (fun hc => (Ne.symm hj12) hc.2)
+  have hsupp := hyp.tauS_mu_diff_support hG i hj1 hj2
+  have hZIrrS : (hyp.mu i j1 - hyp.mu i j2) ∈ ZIrr (↥hyp.S) :=
+    (ZIrr (↥hyp.S)).sub_mem hμaIrr.mem_ZIrr hμbIrr.mem_ZIrr
+  -- (a) `X ∈ ZIrr G`.
+  have hXZ : D (hyp.mu i j1 - hyp.mu i j2) ∈ ZIrr G :=
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+      (hyp.dadeHypS0 hG) (hyp.dadeHypS0_hconj hG) hsupp hZIrrS
+  -- (b) `‖μ_{i,j₁} − μ_{i,j₂}‖² = 2`, transported through the Dade isometry.
+  have hnorm2 : ClassFunction.inner (hyp.mu i j1 - hyp.mu i j2)
+      (hyp.mu i j1 - hyp.mu i j2) = 2 := by
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right, h_ab, h_ba,
+      hμaIrr.inner_self_eq_one, hμbIrr.inner_self_eq_one]
+    ring
+  have hX2 : ClassFunction.inner (D (hyp.mu i j1 - hyp.mu i j2))
+      (D (hyp.mu i j1 - hyp.mu i j2)) = 2 := by
+    rw [hD, OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
+      (hyp.dadeHypS0 hG) (hyp.dadeHypS0_hconj hG) hsupp hsupp]
+    exact hnorm2
+  -- (c) `X − (η_{i,j₁} − η_{i,j₂})` vanishes on the regular set `V^S`.
+  have hvanish : ∀ x ∈ conjClassSet ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))),
+      (D (hyp.mu i j1 - hyp.mu i j2)
+        - ((1 : ℤ) : ℂ) • (hyp.eta i j1 - hyp.eta i j2)) x = 0 := by
+    intro x hx
+    have hv := hyp.tauS_mu_vanish_on_V hG i hj1 hj2 x hx
+    simpa [hD] using hv
+  -- (3.8) rigidity: a norm-`2` `ZIrr` character agreeing with `η_{i,j₁} − η_{i,j₂}` on `V` is it.
+  have hrig := OddOrder.Peterfalvi.S16.eta_diff_rigidity hyp hXZ hX2 i hj12
+    (s := (1 : ℤ)) (Or.inl rfl) hvanish
+  rw [Int.cast_one, one_smul] at hrig
+  exact hrig
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.18.c), `j`-independence** (`defGamma`): for every column `j ≠ 0`, the bridge residual
 `τ_S(β_j) − 1_G + η_{0j}` equals the fixed gap `Γ = GammaGrid` (defined at column `#1`).
 

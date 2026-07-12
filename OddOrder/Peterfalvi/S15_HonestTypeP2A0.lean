@@ -980,4 +980,79 @@ theorem Hypothesis.tauS_mu_row0_vanish_on_V [Fintype G] [Finite G]
     heta j, heta ⟨1, by have := hyp.three_le_p; omega⟩]
   ring
 
+/-- **Peterfalvi (4.8), full-grid `μ`-column-difference support** (issue 1017; the all-rows/all-cols
+generalization of `tauS_mu_row0_diff_support`).  For any row `i` and any two nontrivial columns
+`j₁, j₂ ≠ 0`, the difference `μ_{i,j₁} − μ_{i,j₂}` is supported in `A₀(S) = A(S) ∪ V^S`.  Both
+columns have equal degree `u` (`mu_apply_one_eq_u`), so the (4.3.c) support grounding field
+`mu_diff_support` applies.  This is the support input the general prime-`TI` cross-relation
+`tauS_mu_cross` (`S15_BridgeCharacter`) consumes on each row of a reducible μ-column difference. -/
+theorem Hypothesis.tauS_mu_diff_support [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (i : Fin hyp.q) {j1 j2 : Fin hyp.p}
+    (hj1 : j1 ≠ ⟨0, hyp.p_prime.pos⟩) (hj2 : j2 ≠ ⟨0, hyp.p_prime.pos⟩) :
+    (hyp.mu i j1 - hyp.mu i j2).support
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set hyp.S hyp.Sdata) hyp.S :=
+  hyp.mu_diff_support i hj1 hj2
+    ((hyp.mu_apply_one_eq_u hG i j1 hj1).trans (hyp.mu_apply_one_eq_u hG i j2 hj2).symm)
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Prime-`TI` `V`-value pin, full-grid form** (the all-rows/all-cols generalization of
+`tauS_mu_row0_vanish_on_V`).  On the regular set `V^S = conjClassSet(W ∖ (W₁ ∪ W₂))`, for any row
+`i` and columns `j₁, j₂` (arbitrary — the value identity `mu_apply_of_not_mem_W2` holds off `W₂`
+regardless of column), the `'A0(S)`-Dade lift `τ_S(μ_{i,j₁} − μ_{i,j₂})` agrees with the grid
+difference `η_{i,j₁} − η_{i,j₂}`.  Both reduce to the same `ω`-value there (`μ_{i,l}|_V = δ_l·ω = ω`
+by `mu_apply_of_not_mem_W2` + `delta_eq_one_S`; `η_{i,l}|_V = ω` by `eta_eq_tau_omega` +
+`tau3_apply_of_regular`).  The nontriviality `j₁, j₂ ≠ 0` is only needed for the *support* input
+`tauS_mu_diff_support`. -/
+theorem Hypothesis.tauS_mu_vanish_on_V [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) (i : Fin hyp.q)
+    {j1 j2 : Fin hyp.p}
+    (hj1 : j1 ≠ ⟨0, hyp.p_prime.pos⟩) (hj2 : j2 ≠ ⟨0, hyp.p_prime.pos⟩) :
+    ∀ x ∈ conjClassSet ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))),
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
+          ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG))
+          (hyp.mu i j1 - hyp.mu i j2)
+        - (hyp.eta i j1 - hyp.eta i j2)) x = 0 := by
+  classical
+  intro x hx
+  obtain ⟨w, hw, g, hg⟩ := OddOrder.GroupTheory.mem_conjClassSet.mp hx
+  have hwW : w ∈ hyp.W := hw.1
+  have hw12 : w ∉ (hyp.W1 : Set G) ∪ (hyp.W2 : Set G) := hw.2
+  have hw2 : w ∉ (hyp.W2 : Set G) := fun h => hw12 (Or.inr h)
+  have hwS : w ∈ hyp.S := ((le_of_eq hyp.W_eq_inter).trans inf_le_left) hwW
+  have hconjwx : IsConj w x := isConj_iff.mpr ⟨g, hg⟩
+  have hwV : w ∈ OddOrder.GroupTheory.typePV hyp.S hyp.Sdata := by
+    constructor
+    · have hWeq : (hyp.Sdata.W : Set G) = (hyp.W : Set G) := by
+        rw [hyp.Sdata.W_eq, hyp.Sdata_W1_eq, hyp.Sdata_W2_eq, ← hyp.W_eq_join]
+      rw [hWeq]; exact hwW
+    · rw [hyp.Sdata_W1_eq, hyp.Sdata_W2_eq]; exact hw12
+  have hwA0 : w ∈ honestTypeP2A0Set hyp.S hyp.Sdata :=
+    Or.inr (OddOrder.GroupTheory.subset_conjClassSetIn hwV)
+  have hsupp := hyp.tauS_mu_diff_support hG i hj1 hj2
+  rw [OddOrder.RepresentationTheory.ClassFunction.sub_apply,
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support (hyp.dadeHypS0 hG)
+      ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) hsupp,
+    (hyp.dadeHypS0 hG).dadeMap_apply]
+  have h1H : (1 : G) ∈ (hyp.dadeHypS0 hG).H ⟨w, hwA0⟩ := by
+    rw [hyp.forall_dadeHypS0_H_eq_bot hG ⟨w, hwA0⟩]
+    exact Subgroup.mem_bot.mpr rfl
+  have hconj1 : IsConj ((⟨w, hwA0⟩ :
+      {a : G // a ∈ honestTypeP2A0Set hyp.S hyp.Sdata}).1 * 1) x := by
+    rw [mul_one]; exact hconjwx
+  rw [(hyp.dadeHypS0 hG).dadeValue_eq _ h1H hconj1]
+  have hmu : ∀ (l : Fin hyp.p),
+      hyp.mu i l ⟨w, (hyp.dadeHypS0 hG).mem_L hwA0⟩ = hyp.omega i l ⟨w, hwW⟩ := by
+    intro l
+    rw [hyp.mu_apply_of_not_mem_W2 i l w hwW
+      ((hyp.dadeHypS0 hG).mem_L hwA0) hw2, hyp.delta_eq_one_S hG l]
+    norm_num
+  have heta : ∀ (l : Fin hyp.p), hyp.eta i l x = hyp.omega i l ⟨w, hwW⟩ := by
+    intro l
+    rw [(hyp.eta i l).of_isConj hconjwx.symm, hyp.eta_eq_tau_omega,
+      hyp.tau3_apply_of_regular _ w hwW hw12]
+  rw [OddOrder.RepresentationTheory.ClassFunction.sub_apply,
+    OddOrder.RepresentationTheory.ClassFunction.sub_apply, hmu j1, hmu j2, heta j1, heta j2]
+  ring
+
 end OddOrder.Peterfalvi.S15

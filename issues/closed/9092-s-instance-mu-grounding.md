@@ -194,3 +194,28 @@ architecturally 無効**、R-family は依然 close 不能と確定 (verify-firs
 の docstring/inline comment を上記の正確な blocker に更新 (invalid route A 誘導を除去)。sorry 数不変
 (honest に close 不能ゆえ; fabricate/hoist/新 axiom 回避)。**recommend: hub が (a) FeitThompson 再 carve-out で
 grounding field 化、または (b) prime-TI 9014 value API + A0→A reformulation を優先、を裁定**。
+
+## RESOLVED — cross-lane gate DISSOLVED (2026-07-13, lane-b)
+
+**The premise of this issue (a cross-lane `Hypothesis`-field + FeitThompson-producer commit for the
+reducible R-family) is refuted.** The reducible caseB R-family is built **sorry-free by route B**
+(the abstract generalization of the proven `tauS_mu_row0_cross`), needing **no** `hyp.mu`-grounding,
+**no** `Hypothesis` field, and **no** FeitThompson edit:
+
+- `tauS_mu_cross` (`S15_BridgeCharacter`): the full-grid prime-TI Dade cross-relation
+  `dadeHypS0(μ_{i,j1} − μ_{i,j2}) = η_{i,j1} − η_{i,j2}`, any row/distinct nontrivial cols, from
+  `S16.eta_diff_rigidity` + the abstract grid fields (`mu_apply_of_not_mem_W2`, `mu_orthonormal`).
+  **No `prTIirr_id`/9014 content** — the earlier "route B needs the unported prime-TI μ-value"
+  claim was wrong; the row-0 helper `tauS_mu_vanish_on_V` already discharges the V-value from
+  `mu_apply_of_not_mem_W2` + `delta_eq_one_S`, and generalizes verbatim.
+- `sSet_caseB_reducible_memberRFamily` (`S15_CaseBReducibleCoherence`, NEW leaf): the `2q`-element
+  signed-η `OrthonormalCharacterImageFamily`, `#print axioms` = accepted dadeHypS0 foundation only.
+
+**Actual finding:** route B places the S-instance reducible R-family *downstream of S16* (unlike the
+M-side `certainTypeR` route, upstream/S06). The self-contained caseB coherence cluster was therefore
+relocated from `HypothesisBasics` into the new leaf (no external callers). The reducible-branch sorry
+of `sSet_caseB_memberRFamily` is CLOSED.
+
+**Remaining (NOT this issue — a self-contained b-side infra task, tracked under 1017):** the 2×2
+member-wise cross-orthogonality `sSet_caseB_memberRFamily_orthogonal` (imageSet-reduction lemmas +
+eta-family orthogonality). Closing → `coherent_H0Cprime_S` (caseB) fully sorry-free.
