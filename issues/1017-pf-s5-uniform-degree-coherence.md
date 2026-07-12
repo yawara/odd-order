@@ -1349,3 +1349,25 @@ cross-orthogonality. Needs: (i) imageSet-reduction lemmas for `sSet_caseB_member
 from `eta_orthonormal` (column disjointness from `⟨φ,ξ⟩=⟨φ,ξ̄⟩=0`), irr×red from
 `eta_orthogonal_of_norm_one_pair_vanish`, irr×irr from the landed (5.2.e) lemma. Closing → caseB
 `sSet_coherent_dade_caseB`/`indS_caseB`/`coherent_H0Cprime_S` fully sorry-free (caseA lift separate).
+
+## 2026-07-13 更新 #41 (lane b, /loop) — ★caseB FULLY CLOSED + 9014-block 誤診断を refute
+
+**session の到達点 (全 build green 4180、main 統合済)**:
+- **9092 producer 放電** (commit 1cd52ef6): `mu_reducible_dichotomy` grounding field + 全 producer 放電
+  (carve-out、supply lemma `muS_reducible_dichotomy` sorry-free)。
+- **9014-block 誤診断を code-level で refute**: R-family subagent が「route A (hyp46S) + prTIirr_id 未 port」
+  と結論 → 3 点全誤り確定 (値恒等式 `certainType_apply_eq_of_mem_V` proven / `tauS_mu_row0_cross`
+  accepted-dadeHypS0 で proven・landed (13.18.c) が consume / hyp.mu は certainTypeS 由来)。
+- **★ caseB FULLY CLOSED** (commits 3c00f076/1e60aa46/43b7f6ca、新 leaf `S15_CaseBReducibleCoherence.lean`
+  0-sorry): route B で reducible R-family を sorry-free 構築 (`tauS_mu_cross` = row-0 の全 row 一般化 +
+  9092 dichotomy dispatch + dadeHypS0→dadeHypS を A(S)-support 性で reconcile) → `_orthogonal` 2×2 assembly
+  (3 case: irr×irr = (5.2.e) / irr×red = `eta_orthogonal_of_norm_one_pair_vanish` + `dadeS0_apply_eq_zero_of_regular` /
+  red×red = `mu_colSum_ne_of_inner_zero` で列 disjoint) も close。`sSet_coherent_indS_caseB` →
+  `coherent_H0Cprime_S` (caseB 枝) = **honest modulo accepted dadeHypS0** (#print axioms 確認)。
+- layering 制約 (route B の道具は HypothesisBasics 下流) → caseB cluster を新 leaf に移設。9092 close (gate dissolved)。
+
+**残 = caseA のみ** (`sSet_coherent_indS_caseA`、HypothesisBasics:569): 非Galois mixed-family ゆえ uniform engine
+不可、**coherentPairChain の pair-adjoining fold** が要 (base `sSetIrrDeg_qa_coherent_indS_caseA` landed、
+reducible R-family = 新 leaf で closed、squeeze = S07_Subcoherent landed)。lane-a M-instance
+`caseB_coherent_sOf_H0Cprime_of_mixed` の maximality induction を mirror。fold は R-family 使用ゆえ S16 下流へ
+relocation 要。caseA close で coherent_H0Cprime_S 完全 honest → character_degree_analysis (13.3) 完全 un-gate。
