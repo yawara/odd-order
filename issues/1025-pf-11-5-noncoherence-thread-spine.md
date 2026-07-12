@@ -77,6 +77,23 @@ sorried `S_H0C_not_coherent` に落ちている。⟹ **内部 chain を hrefute
 - `S12.S_not_coherent_unconditional` (S12_Noncoherence)、`S_H0C_not_coherent_unconditional`
   (S13_TypeDetermination)、`w2_lt_w1_of_hypothesis_H0C_unconditional`
 
+## ⚠ 第2 artifact 判明 (2026-07-12 実装中): `isTypeIIIorIV` (10.10)
+
+10.8 chain を全 threading (commit e63ad5a6、build green) してもなお
+`exists_zeta_residual_..._of_refuter` は `#print axioms` で dirty。原因 = **第2の独立 legacy
+artifact**: `coherent_quotient_bound` が内部で `hyp.base.isTypeIIIorIV hG`
+(S13_SixTwoBridge:75) を使用、これが `no_typeV_maximal` (10.10、legacy sorried) 経由で dirty
+(honest heir = `no_typeV_maximal_unconditional`、S12_Noncoherence 下流、同じ import-DAG 構造)。
+
+⟹ spine bare sorry は **少なくとも 2 つの独立 legacy artifact (10.8 + 10.10)** で dirty。
+`isTypeIIIorIV` は chain 全体が coherent_quotient_bound 経由で透過 hit するため、10.8 と同型の
+**htype (IsTypeIII∨IsTypeIV) threading pass** が chain ~20 theorem に追加で必要
+(optParam `htype := hyp.base.isTypeIIIorIV hG`、exists_zeta_residual は既に htype 保持ゆえ clean 供給可)。
+さらに第3 artifact の可能性も未排除 (htype pass 後に再 probe で確認)。
+
+**scope 改訂**: 当初「~15-25 theorem 1 pass」見積り → 実際は **artifact 数 × chain pass** の
+compounding。10.8 pass 完了 (green)。10.10 pass + 追加 artifact 探索が残 (bookkeeping、honest heir 存在)。
+
 ## 注記
 
 - hnc の型 = `¬ Nonempty (IsCoherent hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0)`

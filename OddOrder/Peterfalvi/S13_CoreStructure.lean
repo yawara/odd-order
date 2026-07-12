@@ -1481,11 +1481,14 @@ from the `𝒮(H₀C)` form (`columnSum_muColumnChar_mem_sOf_H0C`) by the kernel
 theorem columnSum_muColumnChar_mem_sOf_H0Cprime [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
-    (k : Fin hyp.base.w2) (hk : k ≠ 0) :
+    (k : Fin hyp.base.w2) (hk : k ≠ 0)
+    (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp) :
     OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
         (hyp.base.muColumnChar hG hG.odd k)
       ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime :=
-  hyp.sOf_H0C_subset_sOf_H0Cprime (columnSum_muColumnChar_mem_sOf_H0C hG hyp k hk)
+  hyp.sOf_H0C_subset_sOf_H0Cprime
+    (columnSum_muColumnChar_mem_sOf_H0C_of_noncoherent hG hyp k hk hncH0C)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.9.a), caseB uniform degree on `𝒮(H₀C′)`** — the `hunif` input of the (9.11)
@@ -1496,7 +1499,9 @@ H₀ ⊔ [C,C]` along `C = cSub` (`C_eq_cSub`, so `cprimeSub = [cSub,cSub] = [C,
 theorem caseB_forall_mem_sOf_H0Cprime_apply_one_eq_qu [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     (caseB : OddOrder.Peterfalvi.S11.CliffordCaseBData
-      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief)) :
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief))
+    (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp) :
     ∀ φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
       (φ : ClassFunction ↥M ℂ) 1 =
         ((hyp.s11Setup.q *
@@ -1509,7 +1514,7 @@ theorem caseB_forall_mem_sOf_H0Cprime_apply_one_eq_qu [Finite G]
   have hCp : OddOrder.Peterfalvi.S11.cprimeSub hyp.s11Setup hyp.chief
       = derivedInG hyp.C := by
     change derivedInG (OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief) = derivedInG hyp.C
-    rw [C_eq_cSub hG hyp]
+    rw [C_eq_cSub_of_noncoherent hG hyp hncH0C]
   rw [hCp]
   exact hφ
 
@@ -1533,7 +1538,9 @@ theorem caseB_coherent_sOf_H0Cprime [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
     (caseB : OddOrder.Peterfalvi.S11.CliffordCaseBData
-      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief)) :
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief))
+    (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
       (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) hyp.base.A0) := by
   haveI := hyp.base.finiteG
@@ -1542,7 +1549,7 @@ theorem caseB_coherent_sOf_H0Cprime [Finite G]
   set d := hyp.s11Setup.q * (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u with hd
   have hunif : ∀ φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
       (φ : ClassFunction ↥M ℂ) 1 = (d : ℂ) :=
-    caseB_forall_mem_sOf_H0Cprime_apply_one_eq_qu hG hyp caseB
+    caseB_forall_mem_sOf_H0Cprime_apply_one_eq_qu hG hyp caseB hncH0C
   -- the world-bridge `𝒮(H₀C′) → S(⊥)` (for the support / ZIrr / no-real / pairwise facts)
   have hIKF : ∀ ⦃x : ClassFunction ↥M ℂ⦄,
       x ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime →
@@ -1557,7 +1564,7 @@ theorem caseB_coherent_sOf_H0Cprime [Finite G]
   set μ₁ : ClassFunction ↥M ℂ := OddOrder.Peterfalvi.S06.columnSum
     (hyp.base.toHypothesis46 hG hG.odd) (hyp.base.muColumnChar hG hG.odd ⟨1, hw2⟩) with hμ₁def
   have hμ₁mem : μ₁ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime :=
-    columnSum_muColumnChar_mem_sOf_H0Cprime hG hyp ⟨1, hw2⟩ hk1
+    columnSum_muColumnChar_mem_sOf_H0Cprime hG hyp ⟨1, hw2⟩ hk1 hncH0C
   -- uniform support of member differences against the pivot anchor
   have hsuppdiff : ∀ a ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
       ∀ b ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
@@ -1621,7 +1628,9 @@ noncomputable def caseB_coherent_sOf_H0C [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
     (caseB : OddOrder.Peterfalvi.S11.CliffordCaseBData
-      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief)) :
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief))
+    (hncH0C : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := S_H0C_not_coherent hG hyp) :
     OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
       (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C) hyp.base.A0 := by
   haveI := hyp.base.finiteG
@@ -1633,7 +1642,7 @@ noncomputable def caseB_coherent_sOf_H0C [Finite G]
   set μ : ClassFunction ↥M ℂ := OddOrder.Peterfalvi.S06.columnSum
     (hyp.base.toHypothesis46 hG hG.odd) (hyp.base.muColumnChar hG hG.odd ⟨1, hw2⟩) with hμdef
   have hμmem : μ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
-    columnSum_muColumnChar_mem_sOf_H0C hG hyp ⟨1, hw2⟩ hk1
+    columnSum_muColumnChar_mem_sOf_H0C_of_noncoherent hG hyp ⟨1, hw2⟩ hk1 hncH0C
   -- the `𝒮(H₀C) → inducedKernelFamily(⊥)` world-bridge (for the support / no-real facts)
   have hIKF : ∀ ⦃x : ClassFunction ↥M ℂ⦄,
       x ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C →
@@ -1645,7 +1654,7 @@ noncomputable def caseB_coherent_sOf_H0C [Finite G]
   have hμc : μ.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
     Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hμmem
   refine coherent_sOf_H0C_of_coherent_sOf_H0Cprime hyp
-    (caseB_coherent_sOf_H0Cprime hG hyp caseB).some ⟨μ.conj - μ, ⟨?_, ?_⟩, ?_⟩
+    (caseB_coherent_sOf_H0Cprime hG hyp caseB hncH0C).some ⟨μ.conj - μ, ⟨?_, ?_⟩, ?_⟩
   · -- `μ̄ − μ ∈ ℤ[𝒮(H₀C)]`
     exact Submodule.sub_mem _ (Submodule.subset_span hμc) (Submodule.subset_span hμmem)
   · -- `μ̄ − μ` is `A₀`-supported

@@ -10,6 +10,15 @@ created: 2026-07-12
 > **HUB 裁定依頼 (lane A → hub)**: lane A (§9-13 char core + typeP_Galois) の genuine new-math
 > frontier が枯渇したことを code-level に確定。次方向を hub が裁定されたい (CLAUDE.md「frontier 枯渇・
 > 方向・reallocation は user でなく hub」)。lane A は best-available work を継続しつつ本 issue で報告。
+>
+> **✅ 裁定 = (A) (ユーザー 2026-07-12「Aで」)**: (10.8) knot 閉包を完遂し spine bare-sorry-free を
+> 達成する。実装は issue 1025。threading 対象 (dirty via C_eq_cSub、`#print axioms` 確定) =
+> S11_NineElevenCaseA (nineElevenPairBound / caseA_two_summand_inertia_inputs /
+> caseA_nineElevenThree_count_inputs / caseA_nineElevenTwo_tiWitness) + S11_NineElevenPairAdjoin
+> (nineElevenSevenEightRefutation) + S11_NineElevenAlphaBound (nineElevenNormBound_of_sevenEightRefutation /
+> nineElevenEqualityRefutation_of_sTwoExtraction_normBound / nineElevenEqualityRefutation_of_sevenEightRefutation)
+> + S13_Orthogonality (coherent_sOf_H0C / coherent_SOf_H0C_of_column_identities / exists_zeta_residual rewire)。
+> wiring theorem (caseA_refuter_of_equality_refutation 等) は param 化済 clean で threading 不要。
 
 ## 確定した状態 (2026-07-12 全数トレース)
 
