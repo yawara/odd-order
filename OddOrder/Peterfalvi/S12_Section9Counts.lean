@@ -945,7 +945,7 @@ theorem Hypothesis.reducible_mem_inducedKernelFamily_mem_certainTypeSet [Finite 
   haveI := hyp.finiteG
   classical
   obtain ⟨k, hk0, rfl⟩ :=
-    hyp.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum hG htype hnt chief hψ hred
+    hyp.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum hG hψ hred
   rw [hyp.muGrid_columnSum_eq_columnSum hG hG.odd k]
   exact OddOrder.Peterfalvi.S06.columnSum_mem_certainTypeSet _
     (hyp.muColumnChar_ne_one hG hG.odd hk0)
