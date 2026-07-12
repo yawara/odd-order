@@ -277,3 +277,47 @@ S16 下 leaf ゆえ cycle なし)。これは c の TTypeII 残 local sorry を 
 engine-prep は b の grounding field 待ち)。c は上記 hVcomm unblock (a の leaf 待ち) を次の re-engage
 trigger とし、それまで gated-endpoint 化した slice で待機 (lazy idle でない)。hub は a の新 leaf landing を
 監視し、landing tick で本 issue に「c 再 engage 可 (hVcomm)」を flag する。
+
+## 🧭 HUB RULING #4 (2026-07-12 監視 tick, Opus hub) — c frontier 枯渇の正式裁定 (fresh 全数 census)
+
+RULING #3 では枯渇を RULING #2 継続と再確認しただけだったので、hub が c 所有 S16_NonExistenceG の
+**残 bare sorry 7 本を全数独立に読み、gate を census**した上で正式裁定する。
+
+**census 結果 (全 7 本 genuine gated、c-unreachable 分析付き)**:
+| sorry | gate lane | 詳細 |
+|---|---|---|
+| SubgroupMCore:853 `exists_betaMGridData` | **b** | (13.19.b) coherence + carrier `phi_mem` の `Lset=Sset` 露出待ち |
+| SubgroupM:187 `hu_full` (\|U\|-value) | **b** | (13.15) u-value = caseB_order_u/basic_structure producer |
+| SubgroupM:247 T-side field-data | **a** | 9000 t_side field-model (μ compatibility) |
+| ComparingLM:345 `m_row_odd` | **b** | 3002 S-side β_S parity (S15_SAndT, Coq FTtypeI_bridge_facts) |
+| ComparingLM:348 `m_col_odd` | **b** | 3002 双対 T-side parity |
+| ComparingLM:366 `grid_mem` (Y=0) | **b** | 3002 (parity 依存)。NC≤2 engine 不適用 (pq≥15)、bessel は ⟨Y,Y⟩≥0 止まり |
+| TTypeII:883 `hVcomm` | **a** | RULING #3 抽出 leaf 待ち |
+
+**裁定 1 — 枯渇は real**: 7 本すべて a/b の **active work** に gated (b=5, a=2)。各注記は具体的
+c-unreachable 理由 (使える parity primitive が逆 parity を出す / proven engine の適用条件外 等) を
+明示しており、c の自己申告は正確。**追加の ungated genuine work は無い** (RULING #2 の 3-probe
+workflow 2026-07-09 結論を fresh census が追認: 残 gate は全て他レーン active territory で、降りると
+policy-8 dup; GroupTheory/Mathlib shared-infra の real sorry は 0)。
+
+**裁定 2 — posture = gated-endpoint self-resume (reallocation でない)**。理由:
+(a) c の gate は **a/b が現に active に閉じつつある** (stalled でない — b は 2038/(13.19) を、a は
+(11.9.c)/9000 を landing 中で、これらが c の gate 本体)。
+(b) c が gate 本体に降りる = a/b の active file (S15_SAndT/9000 char) 編集 = **policy-8 dup + 退役 lane d
+の失敗モード (codex dup churn)**。密結合 char/coherence に 2nd operator を入れる害。
+(c) c の役割は構造的に **downstream assembler** (§14 非存在 + parity 矛盾の組立)。a/b の char/coherence
+が揃うまで gated なのは misallocation でなく FT endgame の DAG 構造そのもの。
+
+**裁定 3 — c は idle でなく engine-prep を継続**: 本 tick で c は (11.8) `T_typeIII_ratio_le` を
+local-sorry-free 化 (endpoint を「真の gate のみ残す」状態に整備) = gated-endpoint pattern の正しい
+実行。これを続け、各 a/b landing で該当 endpoint を re-engage。
+
+**dated re-engage triggers (hub が監視、landing tick で本 issue に flag)**:
+- a: RULING #3 S16-free leaf landing → c: TTypeII `hVcomm` discharge (−1 sorry)。
+- a: 9000 t_side field-data landing → c: SubgroupM:247。
+- b: (13.15) u-value landing → c: SubgroupM:187。
+- b: 3002 β_S/β_T parity landing → c: ComparingLM ×3 (m_row/m_col_odd → grid_mem)。
+- b: (13.19.b) coherence + carrier field 露出 → c: SubgroupMCore exists_betaMGridData。
+
+**結論**: c は「枯渇したが gated-endpoint 化で最大限前倒し済、a/b の active landing 待ち」が正しい
+状態。hub は reallocation せず、上記 trigger を毎 tick 監視して c の re-engage を driving する。
