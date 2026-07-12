@@ -1120,3 +1120,41 @@ supersede された**:
 **残る本 issue の scope** = §5 `uniform_degree_coherence` 一般形 + `subcoherent` R-datum が
 (6.5)/(6.8) 系 (issue 2022、lane b) と typeII 系のどこで依然必要かの再精査のみ。
 (10.8)/(10.7) unblock 目的としては closed 相当。hub の帰属裁定は「lane b (2022 と同根)」を提案。
+
+## 2026-07-12 更新 #19 (lane b) — ★uniform 底 coherence を `indS = Ind_S^G` へ re-ground (landed)
+
+(13.3) `coherent_H0Cprime_S` 再grounding の中核 route (S-instance 側、= (10.7)/(10.8) が
+superseded された後も live な本 issue の残 scope) を 1 brick 前進:
+
+**landed (`S15_SAndT_Setup/HypothesisBasics.lean`、`Hypothesis.sSetIrrDeg_coherent_indS`、
+sorry-token 0、`lake build OddOrder` GREEN 4179 jobs / 3:09)**:
+- 既 landed の `sSetIrrDeg_coherent` (update #18) は **Dade map** `τ = dadeIntegralCharacterMap
+  (dadeHypS hG) …` に対する `IsCoherent τ (S₁ d) A(S)` を産むが、consumer ((A) engine
+  `coherentIndS_image_inner_eta_eq_zero` + 最終的に `coherent_H0Cprime_S`) は **`hyp.indS =
+  Ind_S^G`** 形を要す。両 map は `A(S)`-supported 上で一致 (`sInstance_dade_eq_induce`、(13.2.e)
+  `normedTI` 等長性半分、Rungs B+C landed) し、`S07.IsCoherent` は map に `extends_on_supported`
+  経由でしか依存しない (domain `zSupportedSpan (S₁ d) A(S)` の各元は `A(S)`-supported) ので、
+  既存 `S07.IsCoherent.congrMap` (S08_CaseBCoherence2:1084) で `indS` へ re-target。追加 analytic
+  input 0。
+- 技術: finiteness instance を全て `S12.FiniteInduce` scope (`[Finite G]` 由来) から取ることで、
+  `indS` と `sInstance_dade_eq_induce` の `induce` が同一 `Fintype ↥S` instance を共有 →
+  subsingleton-instance juggling 不要 (最初 explicit `[Fintype ↥hyp.S]` を宣言したら
+  FiniteInduce と衝突して type mismatch、instance-only fix)。
+- sorryAx provenance: `dadeHypS` (shared BG §16 Theorem-II pins、accepted on-path
+  `dadeSupportHypotheses_typeI` と exact parity) からの inheritance のみ。lane-b 新規 sorry 0。
+
+**⟹ (A) engine は uniform sub-family `S₁(d)` 上で即 instantiable** (abstract family 引数ゆえ):
+`coh := sSetIrrDeg_coherent_indS …`、`hconj`/`hnoReal`/`hsupp` は `sSetIrrDeg_subcoherent` の
+local haves (conj-closure・no-real・conjugate-diff support) を standalone 化すれば供給
+(全て landed pieces、新 deep math 無)。
+
+**残 (full-family re-grounding、順に)**:
+1. (A)-engine 供給用に `sSetIrrDeg` の `ClosedUnderConjugate`/`hsupp` を standalone lemma 化
+   (`sSetIrrDeg_subcoherent` の `hconjmem`/`hdiff_of_mem` を切り出し)。
+2. full `sSet` への lift = (9.11.1)–(9.11.8) pair-adjoining induction (`coherentPairChain` fold +
+   済 squeeze、update #5/#35)。base `S₁(qa)` (今 `indS` 形で landed) + Galois `S₁(qu)` から
+   conjugate pair adjoining。`h2 : 2 ≤ (S₁ d).ncard` は §9 (9.8.d) count (exposed param、genuine
+   upstream — caseA_exists_irreducible_source_degree_qa は existence のみ、2-member count 未 landed)。
+3. `IsCoherent indS (full sSet) A(S)` を得たら同 `congrMap` step で `coherent_H0Cprime_S` を
+   honest route へ re-point (`sibleyTarget_H0C` 置換; support は `A(S)`、`(C')^#⊆A(S)` bridge で
+   `cprimeSharpS` へ絞る)。

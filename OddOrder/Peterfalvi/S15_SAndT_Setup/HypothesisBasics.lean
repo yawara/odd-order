@@ -395,6 +395,38 @@ noncomputable def Hypothesis.sSetIrrDeg_coherent [Fintype G] [Finite G]
   exact OddOrder.Peterfalvi.S07.coherent_subset_of_constant_degree hyp'
     (subset_refl _) hyp'.conjugate_closed hSfin h2 hirr hZIrr hconst hdeg0 h1A hsuppdiff
 
+open scoped FiniteInduce in
+/-- **(9.11) base / Galois coherence of `S₁(d)`, re-grounded onto the induction map `τ = Ind_S^G`**
+(issue 1017, update #19 — the honest-`indS` re-grounding of `sSetIrrDeg_coherent`).  The landed
+uniform-degree coherence `sSetIrrDeg_coherent` produces `IsCoherent τ (S₁ d) A(S)` for the honest
+Dade map `τ = dadeIntegralCharacterMap (dadeHypS hG) …`; but the (13.3) consumers — the (A) engine
+`S15.coherentIndS_image_inner_eta_eq_zero` and (ultimately) `coherent_H0Cprime_S` — want the
+coherence phrased with the plain induction map `hyp.indS = Ind_S^G` (Peterfalvi (13.2.e)).
+
+The two maps **agree on every `A(S)`-supported class function**
+(`sInstance_dade_eq_induce`, the honest (13.2.e) `normedTI` isometry half, Rungs B+C), and
+`S07.IsCoherent` depends on its map *only* through `extends_on_supported` (whose domain is
+`zSupportedSpan (S₁ d) A(S)`, every member of which is `A(S)`-supported by definition), so the
+general `S07.IsCoherent.congrMap` re-targets the coherence onto `indS` with no further analytic
+input.  This is the `indS`-form the honest (9.11) route delivers to the (A) engine; once the
+(9.11.1)–(9.11.8) pair-adjoining induction lifts it from the uniform sub-family to the full `sSet`,
+the same `congrMap` step re-grounds `coherent_H0Cprime_S` off the unsound `sibleyTarget_H0C`.
+
+All finiteness instances are taken from the `FiniteInduce` scope (from `[Finite G]`), so the
+`Ind_S^G` produced here (via `indS`) and the one `sInstance_dade_eq_induce` names share the *same*
+`Fintype ↥S` instance — no subsingleton-instance juggling is needed. -/
+theorem Hypothesis.sSetIrrDeg_coherent_indS [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (d : ℂ) (hd : star d = d) (hd0 : d ≠ 0)
+    (h2 : 2 ≤ (hyp.sSetIrrDeg hG d).ncard) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.indS
+      (hyp.sSetIrrDeg hG d)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)) :=
+  (hyp.sSetIrrDeg_coherent hG d hd hd0 h2).map fun c =>
+    c.congrMap fun φ hφ => by
+      rw [hyp.indS_apply]
+      exact hyp.sInstance_dade_eq_induce hG hφ.2
+
 open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **Honest §9 character data on `S`** (issue 2035 step 3): the `mkSection11CharacterDataS`
 mirror with the *genuine* coherence inputs — `tau := Ind_S^G` (`indS`, Peterfalvi (13.2.e)) and
