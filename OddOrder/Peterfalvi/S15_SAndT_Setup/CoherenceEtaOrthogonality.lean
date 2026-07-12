@@ -169,4 +169,46 @@ theorem coherentIndS_image_inner_eta_eq_zero [Finite G]
   rw [OddOrder.RepresentationTheory.inner_conj_symm, star_eq_zero]
   exact h
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(9.11) uniform sub-family `S₁(d)`: coherent images are orthogonal to the shared `η`-grid**
+(issue 1017, the (A)-engine instantiated on the honest uniform base coherence — *no coherence
+hypothesis*).
+
+The (A) engine `coherentIndS_image_inner_eta_eq_zero` takes an arbitrary `A(S)`-supported
+coherence `coh : IsCoherent (Ind_S^G) S A(S)` of a conjugate-closed, no-real, difference-supported
+family `S`.  Here we specialize it to the uniform-degree irreducible sub-family
+`S = sSetIrrDeg hG d` (`S₁(d)`), discharging **all** of the engine's family/coherence inputs from
+landed §9/§15 material:
+
+* `hconj` = `sSetIrrDeg_closedUnderConjugate` (uses `hd : star d = d`);
+* `hnoReal` = `sSetIrrDeg_hasNoRealCharacters` (via `oddCardS`);
+* `hsupp` = `sSetIrrDeg_member_diff_supported` with `y = ζ̄` (the conjugate lands in `S₁(d)` by
+  `sSetIrrDeg_closedUnderConjugate`);
+* `coh` = `(sSetIrrDeg_coherent_indS hG d hd hd0 h2).some`, the honest (5.7)∘(5.3.a) uniform-degree
+  base coherence of `Ind_S^G`.
+
+The only remaining hypotheses are the degree reality/nonvanishing `hd`/`hd0` and the `≥ 2`
+membership `h2` (the §9 (9.8.d) count, exposed as before) — there is **no** coherence hypothesis.
+All finiteness instances are taken from the `FiniteInduce` scope (from `[Finite G]`), so the
+`Ind_S^G` in the base coherence `sSetIrrDeg_coherent_indS` and in the engine's `coh` slot share the
+same `Fintype ↥S`.  This is the downstream orthogonality the §13 char cascade consumes for the
+uniform base; the full-`sSet` lift ((9.11.1)–(9.11.8) pair-adjoining induction) feeds the same
+engine once the base is widened. -/
+theorem sSetIrrDeg_coherentIndS_image_inner_eta_eq_zero [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (d : ℂ) (hd : star d = d) (hd0 : d ≠ 0)
+    (h2 : 2 ≤ (hyp.sSetIrrDeg hG d).ncard)
+    {ζ : ClassFunction ↥hyp.S ℂ} (hζ : ζ ∈ hyp.sSetIrrDeg hG d)
+    (hζirr : IsIrreducibleCharacter ζ) :
+    ∀ (i : Fin hyp.q) (j : Fin hyp.p),
+      ClassFunction.inner ((hyp.sSetIrrDeg_coherent_indS hG d hd hd0 h2).some.extension ζ)
+        (hyp.eta i j) = 0 :=
+  coherentIndS_image_inner_eta_eq_zero hG hyp
+    (hyp.sSetIrrDeg_closedUnderConjugate hG d hd)
+    (hyp.sSetIrrDeg_hasNoRealCharacters hG d)
+    (fun _ζ' hζ' => hyp.sSetIrrDeg_member_diff_supported hG d hζ'
+      (hyp.sSetIrrDeg_closedUnderConjugate hG d hd hζ'))
+    (hyp.sSetIrrDeg_coherent_indS hG d hd hd0 h2).some
+    hζ hζirr
+
 end OddOrder.Peterfalvi.S15
