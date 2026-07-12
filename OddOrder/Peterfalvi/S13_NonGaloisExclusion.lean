@@ -1,0 +1,716 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
+import OddOrder.Peterfalvi.S13_TypeIIIGalois
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV
+
+/-!
+# Peterfalvi (11.9.c) — the non-Galois `u = a` pin
+
+T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000), §11, pp. 66-67.
+
+Under Hypothesis (11.2) (type III/IV), in the Clifford case (a) of (9.7) (the **non-Galois**
+branch), the (11.9.a) row-`0` projection pins `u = a`
+(`caseA_u_eq_a_of_residual_not_orthogonal`): for the degree-`0` combination
+`ψ = μ_k − (u/a)·λ` — `μ_k` a reducible μ-column of `𝒮(H₀C)` (degree `qu`), `λ` the (9.8.d)
+irreducible of degree `qa` (`caseA_exists_irreducible_qa`) — the Dade pairing
+`⟨φ^τ, ψ^τ⟩ = ⟨φ, ψ⟩ = 0` (`φ = μ₀ − ζ`) expands through the `𝒮(H₀C)`-coherence `c`
+(`coherent_sOf_H0C`) as `t = (u/a)·s` with `s = ⟨φ^τ, c(λ)⟩ ∈ ℤ` and `t = ⟨φ^τ, c(μ_k)⟩`;
+`t = ±1` forces `u/a = 1`.
+
+`t = ±1` is the **conjugation-involution** argument (issue 1024, route J):
+
+* the (5.5) partial-sum expansion `c(μ_k) = ∑_{α ∈ E} α` over the `2q`-member `R(μ_k)`-family
+  (`coherent_extension_eq_sum_memberRFamily`, dispatched to `certainTypeR` by
+  `sOf_H0Cprime_memberRFamily_imageSet_of_col`);
+* the complementarity `⟨c(μ_k) − c(μ̄_k), R p⟩ = 1` (the (5.2.d) image equation);
+* on the `u ≠ a` branch, the conjugation equivariance of `c` at the *reducible* `μ_k` comes
+  **for free from integrality** (the (5.9.a) difference trick without irreducibility):
+  `qa·(conj(c μ_k) − c μ̄_k) = qu·(conj(c λ) − c λ̄)` — the degree-`0` combination
+  `qa·μ_k − qu·λ` is `A₀`-supported, where `c` restricts to the pointwise Dade map `τ`, which
+  commutes with conjugation (`tau_mapRingEquiv_comm`).  The left side has `R`-grid coefficients
+  in `{−1, 0, 1}`, the right side is `u/a ≥ 2` times a virtual character, so **all coefficients
+  vanish**;
+* `conj ∘ R = −R ∘ J` for the half-swap/row-inversion involution `J`
+  (`certainTypeRImage_conj`) with `J(false, 0) = (true, 0)` (`rowInv_zero`) then forces
+  **exactly one** of the two row-`0` members of `R(μ_k)` into `E`, and the (11.9.a) row-`0`
+  projection (`inner_tau_muColumnZero_sub_zeta_rowZero_of_residual_not_orthogonal`) evaluates
+  `t = ±1`.
+
+This is the keystone of the (11.9.c) non-Galois exclusion: downstream, `u = a` combines with
+`q ∣ u − 1` (`card_uActionHom_range_modEq_one`) and `a ∣ p − 1` into `q ≤ p − 2 < p`,
+contradicting (11.9.b) `p < q` — so case (9.7.b) (Galois) holds and `U` is cyclic.
+-/
+
+namespace OddOrder.Peterfalvi.S12
+
+open OddOrder.GroupTheory
+open OddOrder.RepresentationTheory
+
+variable {G : Type*} [Group G]
+
+open scoped FiniteInduce in
+/-- **The trivial μ-grid column has the trivial `W₂`-dual**: `muColumnChar 0 = 1`.  The
+Pontryagin reindex `finCardEquivCharacterGroup` is normalized to send `0` to the trivial
+character (`finCardEquivCharacterGroup_zero`); companion of `muColumnChar_ne_one`. -/
+theorem Hypothesis.muColumnChar_zero [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) :
+    hyp.muColumnChar hG hodd (0 : Fin hyp.w2) = 1 := by
+  haveI := hyp.finiteG
+  classical
+  set h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis with hhdef
+  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have hchar : hyp.muColumnChar hG hodd (0 : Fin hyp.w2)
+      = finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm (0 : Fin hyp.w2)) := by
+    unfold Hypothesis.muColumnChar
+    rfl
+  rw [hchar, show finCongr hcardW2sub.symm (0 : Fin hyp.w2) = 0 from Fin.ext (by simp),
+    finCardEquivCharacterGroup_zero]
+  rfl
+
+open scoped FiniteInduce in
+/-- **The inverse of a nontrivial μ-column dual is again a μ-column dual, at a nonzero index**:
+`(muColumnChar j)⁻¹ = muColumnChar j'` for some `j' ≠ 0`.  The Pontryagin reindex
+`finCardEquivCharacterGroup ∘ finCongr` is a bijection onto the `W₂`-dual group, so the inverse
+character is hit; it is nontrivial (`j ≠ 0`, `muColumnChar_ne_one`), so `j' ≠ 0` by the
+column-`0` normalization (`muColumnChar_zero`).  This lets the conjugate half of the
+`R(μ_j)`-family (built on the inverse column `χ₂⁻¹`) be read through the σ-grid world-bridge
+`certainTypeOmegaSigma_muColumnChar_eq_aligned` at the column index `j'`. -/
+theorem Hypothesis.exists_muColumnChar_inv [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    {j : Fin hyp.w2} (hj : j ≠ 0) :
+    ∃ j' : Fin hyp.w2, j' ≠ 0 ∧
+      hyp.muColumnChar hG hodd j' = (hyp.muColumnChar hG hodd j)⁻¹ := by
+  haveI := hyp.finiteG
+  classical
+  -- the surjectivity core, with the reindex-equivalence instances confined to this block
+  obtain ⟨j', hj'⟩ : ∃ j' : Fin hyp.w2,
+      hyp.muColumnChar hG hodd j' = (hyp.muColumnChar hG hodd j)⁻¹ := by
+    set h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis with hhdef
+    haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+    letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+    have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+    have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+      exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+    haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+    -- the whole reindex `Fin w₂ ≃ Ŵ₂`
+    set e : Fin hyp.w2 ≃ ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :=
+      (finCongr hcardW2sub.symm).trans (finCardEquivCharacterGroup _) with hedef
+    have hchar : ∀ j'' : Fin hyp.w2, hyp.muColumnChar hG hodd j'' = e j'' := by
+      intro j''
+      unfold Hypothesis.muColumnChar
+      rfl
+    refine ⟨e.symm ((e j)⁻¹), ?_⟩
+    rw [hchar, hchar, Equiv.apply_symm_apply]
+    rfl
+  refine ⟨j', ?_, hj'⟩
+  -- nonzero index: else `1 = muColumnChar 0 = (muColumnChar j)⁻¹`, contradicting `j ≠ 0`
+  intro h0
+  rw [h0, hyp.muColumnChar_zero hG hodd] at hj'
+  apply hyp.muColumnChar_ne_one hG hodd hj
+  ext x
+  have hx := congrArg (fun f : (_ →* ℂˣ) => f x) hj'
+  simp only [MonoidHom.one_apply, MonoidHom.inv_apply] at hx
+  have hx1 : hyp.muColumnChar hG hodd j x = 1 := inv_eq_one.mp hx.symm
+  simp [hx1]
+
+end OddOrder.Peterfalvi.S12
+
+namespace OddOrder.Peterfalvi.S13
+
+open OddOrder.GroupTheory
+open OddOrder.RepresentationTheory
+
+variable {G : Type*} [Group G]
+
+set_option maxHeartbeats 1600000 in
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.9.c), the non-Galois `u = a` pin** (issue 1024): under Hypothesis (11.2)
+(type III/IV) with the (11.8) refuter `h118`, the Clifford case (a) forces `u = a`.
+
+Proof (`by_contra u ≠ a`, so `u = a·m` with `m ≥ 2` by `caseA_a_dvd_u`):
+
+1. `λ` = the (9.8.d) degree-`qa` irreducible of `𝒮(H₀U') = 𝒮(H₀C)`
+   (`caseA_exists_irreducible_qa`; `C = U'` is (11.6) `core_structure`), and
+   `μ` = the reducible μ-column at `j = 1` (degree `qu`,
+   `caseA_character_counts` (b)).
+2. (5.5) expands `c(μ) = ∑_{α ∈ E} α` over `E ⊆ R(μ)` (`certainTypeR`, the signed σ-grid
+   family on the columns `χ₂, χ₂⁻¹`); the (5.2.d) image equation gives the complementarity
+   `⟨c(μ), R p⟩ − ⟨c(μ̄), R p⟩ = 1` for every `p`.
+3. The degree-`0` combination `qa·μ − qu·λ` is `A₀`-supported, so `c` agrees with the
+   pointwise Dade `τ` there and conjugation commutes (`tau_mapRingEquiv_comm`):
+   `qa·(conj(c μ) − c μ̄) = qu·(conj(c λ) − c λ̄)`.  The left side has `R`-grid coefficients
+   in `{−1, 0, 1}` (steps 2 and `conj(R q) = −R(J q)`, `certainTypeRImage_conj`), the right
+   side is `m ≥ 2` times an integer per grid vector — so every coefficient vanishes:
+   `[R(J p) ∈ E] + [R p ∈ E] = 1`.
+4. At `p = (false, 0)`: `J p = (true, 0)` (`rowInv_zero`), so **exactly one** of the two
+   row-`0` members of `R(μ)` lies in `E`.  The (11.9.a) row-`0` projection evaluates
+   `⟨φ^τ, R(false, i)⟩ = δ·[i = 0]`, `⟨φ^τ, R(true, i)⟩ = −δ·[i = 0]` (through the σ-grid
+   world-bridge at the columns `k` and `k'` with `muColumnChar k' = (muColumnChar k)⁻¹`),
+   hence `t = ⟨φ^τ, c(μ)⟩ = ±δ = ±1`.
+5. `ψ = μ − m·λ` has degree `0`, so `0 = ⟨φ, ψ⟩ = ⟨φ^τ, ψ^τ⟩ = t − m·⟨φ^τ, c(λ)⟩`; with
+   `t = ±1` and `⟨φ^τ, c(λ)⟩ ∈ ℤ` this gives `m ∣ 1`, contradicting `m ≥ 2`. -/
+theorem caseA_u_eq_a_of_residual_not_orthogonal [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
+    (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief))
+    {ζ : ClassFunction ↥M ℂ}
+    (hζS : ζ ∈ OddOrder.Peterfalvi.S12.inducedFamily M)
+    (hζirr : IsIrreducibleCharacter ζ) (hζ1 : ζ 1 = (hyp.base.w1 : ℂ))
+    (h118 : ¬ ∀ (i : Fin hyp.base.w1) (j : Fin hyp.base.w2),
+      ClassFunction.inner
+        ((hyp.base.tau ((∑ r : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd r 0) - ζ))
+          - ∑ r : Fin hyp.base.w1, hyp.base.alignedOmegaSigmaGrid hG hG.odd r 0)
+        (hyp.base.alignedOmegaSigmaGrid hG hG.odd i j) = 0) :
+    (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u = caseA.a := by
+  haveI := hyp.base.finiteG
+  classical
+  by_contra hne
+  -- ### 0. arithmetic frame: `u = a·m`, `m ≥ 2`
+  obtain ⟨m, hm⟩ := OddOrder.Peterfalvi.S11.caseA_a_dvd_u caseA
+  have hw1ge : 3 ≤ hyp.base.w1 := by
+    have hodd : Odd hyp.base.w1 :=
+      hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card hyp.base.W1)
+    have hgt : 1 < hyp.base.w1 :=
+      (Subgroup.one_lt_card_iff_ne_bot _).mpr hyp.base.typeP.W1_nontrivial
+    obtain ⟨k, hk⟩ := hodd; omega
+  have hqe : hyp.s11Setup.q = hyp.base.w1 := hyp.s11Setup_q_eq
+  -- ### 1. the μ-column and the (9.8.d) irreducible λ
+  have hw2 : 1 < hyp.base.w2 := hyp.params.w2_prime.one_lt
+  have hk1 : (⟨1, hw2⟩ : Fin hyp.base.w2) ≠ 0 := by
+    intro heq; have := congrArg Fin.val heq; simp at this
+  set μ : ClassFunction ↥M ℂ := ∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩
+    with hμdef
+  have hμmem : μ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C := by
+    rw [hμdef, hyp.base.muGrid_columnSum_eq_columnSum hG hG.odd ⟨1, hw2⟩]
+    exact columnSum_muColumnChar_mem_sOf_H0C hG hyp ⟨1, hw2⟩ hk1
+  have hμc : μ.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
+    Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hμmem
+  have hIKF : ∀ ⦃x : ClassFunction ↥M ℂ⦄,
+      x ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C →
+      x ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) := fun {x} hx =>
+    OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone bot_le
+      (by rw [← hyp.SOf_eq]; exact hyp.sOf_subset_SOf hyp.H0C hx)
+  have hμμ : ClassFunction.inner μ μ = (hyp.base.w1 : ℂ) :=
+    hyp.base.muGrid_column_sum_inner_self hG hG.odd ⟨1, hw2⟩
+  have hμred : ¬ IsIrreducibleCharacter μ := by
+    intro hirr
+    have h1 := hirr.inner_self_eq_one
+    rw [hμμ] at h1
+    have h2 : (hyp.base.w1 : ℕ) = 1 := by exact_mod_cast h1
+    omega
+  -- degree `μ(1) = qu` (`caseA_character_counts` (b))
+  have hμH0 : μ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.chief.H0 :=
+    OddOrder.Peterfalvi.S11.sOf_antitone hyp.s11Setup le_sup_left hμmem
+  obtain ⟨-, hb, -, -⟩ := OddOrder.Peterfalvi.S11.caseA_character_counts hG
+    (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief) caseA
+  obtain ⟨hμdeg, -⟩ := hb μ hμH0 hμred
+  -- λ: the (9.8.d) degree-`qa` irreducible, transported into `𝒮(H₀C)` via (11.6) `C = U'`
+  obtain ⟨lam, hlamU', hlamirr, hlamdeg⟩ :=
+    OddOrder.Peterfalvi.S11.caseA_exists_irreducible_qa hG
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief) caseA
+  have hCU : hyp.C = OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup := by
+    rw [(core_structure hG hyp).2.2.2, hyp.Uprime_eq]
+    show derivedInG hyp.base.typeP.U = derivedInG hyp.s11Setup.typeP.U
+    rw [hyp.setup_typeP_eq]
+  have hlammem : lam ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C := by
+    show lam ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup (hyp.chief.H0 ⊔ hyp.C)
+    rw [hCU]
+    exact hlamU'
+  have hlamc : lam.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
+    Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hlammem
+  -- `u ≠ 0` (else `μ(1) = 0`), hence `m ≥ 2`
+  have humpos : (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u ≠ 0 := by
+    intro h0
+    apply inducedKernelFamily_mem_apply_one_ne_zero (hIKF hμmem)
+    rw [hμdeg, h0, Nat.mul_zero, Nat.cast_zero]
+  have hm2 : 2 ≤ m := by
+    rcases m with _ | _ | m'
+    · exact absurd (by rw [hm, Nat.mul_zero]) humpos
+    · exact absurd (by rw [hm, Nat.mul_one]) hne
+    · omega
+  -- ### 2. the (5.5) expansion and the `R(μ)`-family
+  have hTsub : OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C ⊆
+      OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime := hyp.sOf_H0C_subset_sOf_H0Cprime
+  obtain ⟨c⟩ := coherent_sOf_H0C hG hyp
+  obtain ⟨E, hEsub, hEeq⟩ :=
+    coherent_extension_eq_sum_memberRFamily hG hyp hTsub c hμmem hμc
+  obtain ⟨k, hk0, hμcol, himg⟩ :=
+    sOf_H0Cprime_memberRFamily_imageSet_of_col hG hyp (hTsub hμmem) hμred
+  set h46 := hyp.base.toHypothesis46 hG hG.odd with hh46def
+  set χ₂ := hyp.base.muColumnChar hG hG.odd k with hχ₂def
+  set R := OddOrder.Peterfalvi.S06.certainTypeRImage h46 χ₂ χ₂⁻¹ with hRdef
+  have hχ₂ne1 : χ₂ ≠ 1 := hyp.base.muColumnChar_ne_one hG hG.odd hk0
+  have hne' : χ₂ ≠ χ₂⁻¹ := (OddOrder.Peterfalvi.S06.column_inv_ne_self h46 hχ₂ne1).symm
+  have hRinj : Function.Injective R := by
+    rw [hRdef]
+    exact OddOrder.Peterfalvi.S06.certainTypeRImage_injective h46 hne'
+  have hRinner : ∀ p q, ClassFunction.inner (R p) (R q) = if p = q then (1 : ℂ) else 0 := by
+    intro p q
+    rw [hRdef]
+    exact OddOrder.Peterfalvi.S06.certainTypeRImage_inner h46 hne' p q
+  have hRimg : (sOf_H0Cprime_memberRFamily hG hyp (hTsub hμmem)).imageSet
+      = Finset.univ.image R := by
+    rw [himg, hRdef]
+    rfl
+  -- the half-swap/row-inversion `J` is an involution, and conjugation acts as `−J` on `R`
+  have hJJ : ∀ r : Bool × Fin (Nat.card ↥h46.W1),
+      ((!(!r.1, OddOrder.Peterfalvi.S06.rowInv h46.toHypothesis r.2).1,
+        OddOrder.Peterfalvi.S06.rowInv h46.toHypothesis
+          (!r.1, OddOrder.Peterfalvi.S06.rowInv h46.toHypothesis r.2).2) :
+        Bool × Fin (Nat.card ↥h46.W1)) = r := by
+    intro r
+    simp [OddOrder.Peterfalvi.S06.rowInv_rowInv]
+  have hRconj : ∀ q : Bool × Fin (Nat.card ↥h46.W1),
+      ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv (R q)
+      = -R (!q.1, OddOrder.Peterfalvi.S06.rowInv h46.toHypothesis q.2) := by
+    intro q
+    rw [hRdef]
+    exact OddOrder.Peterfalvi.S06.certainTypeRImage_conj h46 χ₂ q
+  -- `⟨c(μ), R p⟩ = [R p ∈ E]`
+  have hE : ∀ p, ClassFunction.inner (c.extension μ) (R p)
+      = if R p ∈ E then (1 : ℂ) else 0 := by
+    intro p
+    rw [hEeq, OddOrder.RepresentationTheory.inner_sum_left,
+      Finset.sum_congr rfl (fun α hα => ?_), Finset.sum_ite_eq' E (R p) (fun _ => (1 : ℂ))]
+    have h1 := hEsub hα
+    rw [hRimg, Finset.mem_image] at h1
+    obtain ⟨q, -, rfl⟩ := h1
+    rw [hRinner q p]
+    by_cases hpq : q = p
+    · rw [if_pos hpq, if_pos (by rw [hpq])]
+    · rw [if_neg hpq, if_neg (fun he => hpq (hRinj he))]
+  -- ### 3. complementarity `⟨c(μ), R p⟩ − ⟨c(μ̄), R p⟩ = 1`
+  have hdiffsupp : ((μ - μ.conj : ClassFunction ↥M ℂ)).support ⊆ hyp.base.A0 := by
+    rw [show (μ - μ.conj : ClassFunction ↥M ℂ) = -(μ.conj - μ) from by abel,
+      ClassFunction.support_neg]
+    exact OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support
+      hyp.base.mderivSharp_subset_A0 (hIKF hμmem)
+  have hcdiff : c.extension (μ - μ.conj) = hyp.base.tau (μ - μ.conj) :=
+    c.extends_on_supported _ ⟨Submodule.sub_mem _ (Submodule.subset_span hμmem)
+      (Submodule.subset_span hμc), hdiffsupp⟩
+  have hsum_all : ∀ p, ClassFunction.inner (hyp.base.tau (μ - μ.conj)) (R p) = 1 := by
+    intro p
+    rw [(sOf_H0Cprime_memberRFamily hG hyp (hTsub hμmem)).image_eq, hRimg,
+      Finset.sum_image (fun p _ q _ hpq => hRinj hpq),
+      OddOrder.RepresentationTheory.inner_sum_left,
+      Finset.sum_congr rfl (fun q _ => hRinner q p),
+      Finset.sum_ite_eq' Finset.univ p (fun _ => (1 : ℂ)), if_pos (Finset.mem_univ p)]
+  have hcompl : ∀ p, ClassFunction.inner (c.extension μ.conj) (R p)
+      = ClassFunction.inner (c.extension μ) (R p) - 1 := by
+    intro p
+    have h1 : ClassFunction.inner (c.extension μ - c.extension μ.conj) (R p) = 1 := by
+      rw [← map_sub, hcdiff]
+      exact hsum_all p
+    rw [ClassFunction.inner_sub_left] at h1
+    linear_combination -h1
+  -- ### 4. the difference trick: `qa·(conj(c μ) − c μ̄) = qu·(conj(c λ) − c λ̄)`
+  set nlam : ℤ := ((hyp.s11Setup.q * caseA.a : ℕ) : ℤ) with hnlamdef
+  set nmu : ℤ :=
+    ((hyp.s11Setup.q * (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u : ℕ) : ℤ)
+    with hnmudef
+  set ζd : ClassFunction ↥M ℂ := nlam • μ - nmu • lam with hζddef
+  have hζdspan : ζd ∈ Submodule.span ℤ
+      (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C) :=
+    Submodule.sub_mem _ (Submodule.smul_mem _ nlam (Submodule.subset_span hμmem))
+      (Submodule.smul_mem _ nmu (Submodule.subset_span hlammem))
+  have hζd1 : ζd 1 = 0 := by
+    rw [hζddef, hnlamdef, hnmudef]
+    simp only [ClassFunction.sub_apply, ClassFunction.zsmul_apply, hμdeg, hlamdeg,
+      zsmul_eq_mul]
+    push_cast
+    ring
+  have hζdsupp : ζd.support ⊆ hyp.base.A0 :=
+    inducedKernelFamily_zSpan_support_of_apply_one_eq_zero hyp.base.mderivSharp_subset_A0
+      (Submodule.span_mono (fun x hx => hIKF hx) hζdspan) hζd1
+  have hζdconj : ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv ζd
+      = nlam • μ.conj - nmu • lam.conj := by
+    rw [hζddef, ClassFunction.mapRingEquiv_sub, ClassFunction.mapRingEquiv_zsmul,
+      ClassFunction.mapRingEquiv_zsmul, ← ClassFunction.conj_eq_mapRingEquiv_conjAe,
+      ← ClassFunction.conj_eq_mapRingEquiv_conjAe]
+  have hζdconjspan : ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv ζd
+      ∈ Submodule.span ℤ (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C) := by
+    rw [hζdconj]
+    exact Submodule.sub_mem _ (Submodule.smul_mem _ nlam (Submodule.subset_span hμc))
+      (Submodule.smul_mem _ nmu (Submodule.subset_span hlamc))
+  have hζdconjsupp : (ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv ζd).support
+      ⊆ hyp.base.A0 := by
+    rw [ClassFunction.support_mapRingEquiv]
+    exact hζdsupp
+  have hcomm : ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv (c.extension ζd)
+      = c.extension (ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv ζd) := by
+    rw [c.extends_on_supported ζd ⟨hζdspan, hζdsupp⟩,
+      ← hyp.base.tau_mapRingEquiv_comm Complex.conjAe.toRingEquiv hζdsupp,
+      c.extends_on_supported _ ⟨hζdconjspan, hζdconjsupp⟩]
+  have hLHS : ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv (c.extension ζd)
+      = nlam • ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv (c.extension μ)
+        - nmu • ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv (c.extension lam) := by
+    rw [hζddef, map_sub, map_zsmul, map_zsmul, ClassFunction.mapRingEquiv_sub,
+      ClassFunction.mapRingEquiv_zsmul, ClassFunction.mapRingEquiv_zsmul]
+  have hRHS : c.extension (ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv ζd)
+      = nlam • c.extension μ.conj - nmu • c.extension lam.conj := by
+    rw [hζdconj, map_sub, map_zsmul, map_zsmul]
+  have hD : nlam • (ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv (c.extension μ)
+        - c.extension μ.conj)
+      = nmu • (ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv (c.extension lam)
+        - c.extension lam.conj) := by
+    have h1 : nlam • ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv (c.extension μ)
+          - nmu • ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv (c.extension lam)
+        = nlam • c.extension μ.conj - nmu • c.extension lam.conj := by
+      rw [← hLHS, ← hRHS]
+      exact hcomm
+    have h2 : nlam • ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv (c.extension μ)
+          - nlam • c.extension μ.conj
+          - (nmu • ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv (c.extension lam)
+            - nmu • c.extension lam.conj)
+        = (nlam • ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv (c.extension μ)
+            - nmu • ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv (c.extension lam))
+          - (nlam • c.extension μ.conj - nmu • c.extension lam.conj) := by
+      abel
+    rw [h1, sub_self] at h2
+    rw [smul_sub, smul_sub]
+    exact sub_eq_zero.mp h2
+  -- ### 5. per-grid-vector integrality kills every coefficient: exactly-one on the row-`0` pair
+  -- `⟨conj(c μ), R p⟩ = −[R(J p) ∈ E]` for the half-swap/row-inversion `J`
+  have hconjE : ∀ p : Bool × Fin (Nat.card ↥h46.W1),
+      ClassFunction.inner
+        (ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv (c.extension μ)) (R p)
+      = -(if R (!p.1, OddOrder.Peterfalvi.S06.rowInv h46.toHypothesis p.2) ∈ E
+          then (1 : ℂ) else 0) := by
+    intro p
+    rw [hEeq, ← ClassFunction.mapRingEquivLinear_apply, map_sum,
+      OddOrder.RepresentationTheory.inner_sum_left,
+      Finset.sum_congr rfl (fun α hα => ?_),
+      Finset.sum_ite_eq' E
+        (R (!p.1, OddOrder.Peterfalvi.S06.rowInv h46.toHypothesis p.2)) (fun _ => (-1 : ℂ))]
+    · by_cases hmem : R (!p.1, OddOrder.Peterfalvi.S06.rowInv h46.toHypothesis p.2) ∈ E
+      · rw [if_pos hmem, if_pos hmem]
+      · rw [if_neg hmem, if_neg hmem, neg_zero]
+    · have h1 := hEsub hα
+      rw [hRimg, Finset.mem_image] at h1
+      obtain ⟨q, -, rfl⟩ := h1
+      rw [ClassFunction.mapRingEquivLinear_apply, hRconj q,
+        ClassFunction.inner_neg_left,
+        hRinner (!q.1, OddOrder.Peterfalvi.S06.rowInv h46.toHypothesis q.2) p]
+      -- `J q = p ↔ q = J p` (both `!` and `rowInv` are involutions)
+      by_cases hqp : (!q.1, OddOrder.Peterfalvi.S06.rowInv h46.toHypothesis q.2) = p
+      · rw [if_pos hqp, if_pos (show R q
+            = R (!p.1, OddOrder.Peterfalvi.S06.rowInv h46.toHypothesis p.2) from by
+          rw [← hqp, hJJ q])]
+      · rw [if_neg hqp, if_neg (show ¬ R q
+            = R (!p.1, OddOrder.Peterfalvi.S06.rowInv h46.toHypothesis p.2) from by
+          intro he
+          exact hqp (by rw [hRinj he, hJJ p]))]
+        norm_num
+  -- the R-members and the λ-difference are virtual characters
+  have hclamZ : c.extension lam ∈ ZIrr G :=
+    c.extension_mem_ZIrr lam (Submodule.subset_span hlammem)
+  have hclamcZ : c.extension lam.conj ∈ ZIrr G :=
+    c.extension_mem_ZIrr lam.conj (Submodule.subset_span hlamc)
+  have hDlamZ : ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv (c.extension lam)
+      - c.extension lam.conj ∈ ZIrr G :=
+    Submodule.sub_mem _ (ClassFunction.mapRingEquiv_mem_ZIrr _ hclamZ) hclamcZ
+  have hRZ : ∀ p, R p ∈ ZIrr G := by
+    intro p
+    have h1 : R p ∈ (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂ne1
+        (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm).imageSet := by
+      rw [show (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂ne1
+          (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm).imageSet
+          = Finset.univ.image R from by rw [hRdef]; rfl]
+      exact Finset.mem_image_of_mem R (Finset.mem_univ p)
+    exact (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂ne1
+      (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm).mem_ZIrr _ h1
+  have hnlamne : (0 : ℤ) < nlam := by
+    rw [hnlamdef]
+    have hq3 : 3 ≤ hyp.s11Setup.q := by omega
+    have := caseA.a_pos
+    positivity
+  -- exactly-one, in indicator form: `[R(J p) ∈ E] + [R p ∈ E] = 1`
+  have hkey : ∀ p : Bool × Fin (Nat.card ↥h46.W1),
+      ((if R (!p.1, OddOrder.Peterfalvi.S06.rowInv h46.toHypothesis p.2) ∈ E
+          then (1 : ℤ) else 0)
+        + (if R p ∈ E then (1 : ℤ) else 0)) = 1 := by
+    intro p
+    obtain ⟨y, hy⟩ := ClassFunction.inner_mem_ZIrr_int hDlamZ (hRZ p)
+    have hy' : ClassFunction.inner
+          (ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv (c.extension lam)) (R p)
+        - ClassFunction.inner (c.extension lam.conj) (R p) = ((y : ℤ) : ℂ) := by
+      rw [← ClassFunction.inner_sub_left]
+      exact hy
+    have h1 := congrArg (fun x : ClassFunction G ℂ => ClassFunction.inner x (R p)) hD
+    rw [← Int.cast_smul_eq_zsmul ℂ nlam, ← Int.cast_smul_eq_zsmul ℂ nmu,
+      ClassFunction.inner_smul_left, ClassFunction.inner_smul_left,
+      ClassFunction.inner_sub_left, ClassFunction.inner_sub_left,
+      hconjE p, hcompl p, hE p, hy'] at h1
+    -- pass to `ℤ`
+    set eJ : ℤ := if R (!p.1, OddOrder.Peterfalvi.S06.rowInv h46.toHypothesis p.2) ∈ E
+      then (1 : ℤ) else 0 with heJdef
+    set ep : ℤ := if R p ∈ E then (1 : ℤ) else 0 with hepdef
+    have hcastJ : (if R (!p.1, OddOrder.Peterfalvi.S06.rowInv h46.toHypothesis p.2) ∈ E
+        then (1 : ℂ) else 0) = ((eJ : ℤ) : ℂ) := by
+      rw [heJdef]; split <;> simp
+    have hcastp : (if R p ∈ E then (1 : ℂ) else 0) = ((ep : ℤ) : ℂ) := by
+      rw [hepdef]; split <;> simp
+    rw [hcastJ, hcastp] at h1
+    have h2 : ((nlam * (-eJ - (ep - 1)) : ℤ) : ℂ) = ((nmu * y : ℤ) : ℂ) := by
+      push_cast
+      linear_combination h1
+    have h3 : nlam * (-eJ - (ep - 1)) = nmu * y := Int.cast_injective h2
+    -- `nmu = nlam · m`
+    have hnm : nmu = nlam * (m : ℤ) := by
+      rw [hnlamdef, hnmudef, hm]
+      push_cast
+      ring
+    rw [hnm, mul_assoc] at h3
+    have h4 : -eJ - (ep - 1) = (m : ℤ) * y := mul_left_cancel₀ hnlamne.ne' h3
+    have heJ01 : eJ = 0 ∨ eJ = 1 := by rw [heJdef]; split <;> simp
+    have hep01 : ep = 0 ∨ ep = 1 := by rw [hepdef]; split <;> simp
+    -- `|LHS| ≤ 1 < 2 ≤ m·|y|` unless `y = 0`
+    have hy0 : y = 0 := by
+      by_contra hyne
+      have h1abs : 1 ≤ |y| := Int.one_le_abs (by simpa using hyne)
+      have hm2' : (2 : ℤ) ≤ (m : ℤ) := by exact_mod_cast hm2
+      have h5 : (2 : ℤ) ≤ (m : ℤ) * |y| := by
+        calc (2 : ℤ) = 2 * 1 := by ring
+          _ ≤ (m : ℤ) * |y| :=
+            mul_le_mul hm2' h1abs (by norm_num) (by omega)
+      have h6 : |(m : ℤ) * y| = (m : ℤ) * |y| := by
+        rw [abs_mul, abs_of_nonneg (by omega : (0 : ℤ) ≤ (m : ℤ))]
+      have h7 : |-eJ - (ep - 1)| ≤ 1 := by
+        rcases heJ01 with h | h <;> rcases hep01 with h' | h' <;> rw [h, h'] <;> norm_num
+      rw [h4, h6] at h7
+      omega
+    rw [hy0, mul_zero] at h4
+    omega
+  -- ### 6. the (11.9.a) row-`0` values of `φ^τ` on the `R`-members
+  have hrow0 := hyp.base.inner_tau_muColumnZero_sub_zeta_rowZero_of_residual_not_orthogonal
+    hG hyp.type_alt (hyp.base.SHC_isCoherent hG) hζS hζirr hζ1 h118
+  set τφ : ClassFunction G ℂ :=
+    hyp.base.tau ((∑ r : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd r 0) - ζ) with hτφdef
+  have hcw1 : Nat.card ↥h46.W1 = hyp.base.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.base.typeP.W1_le).toEquiv
+  have hfc : ∀ i' : Fin (Nat.card ↥h46.W1), finCongr hcw1.symm (finCongr hcw1 i') = i' := by
+    intro i'
+    ext
+    simp
+  have hfc0 : ∀ i' : Fin (Nat.card ↥h46.W1), finCongr hcw1 i' = 0 ↔ i' = 0 := by
+    intro i'
+    constructor <;> intro h <;> ext <;> simpa using congrArg Fin.val h
+  obtain ⟨kinv, hkinv0, hkinveq⟩ := hyp.base.exists_muColumnChar_inv hG hG.odd hk0
+  -- `⟨φ^τ, ω^σ_{χ₂, i'}⟩ = [i' = 0]` (the `k`-column through the world-bridge)
+  have hctval : ∀ i' : Fin (Nat.card ↥h46.W1),
+      ClassFunction.inner τφ (OddOrder.Peterfalvi.S06.certainTypeOmegaSigma h46 χ₂ i')
+      = if i' = 0 then (1 : ℂ) else 0 := by
+    intro i'
+    conv_lhs => rw [← hfc i']
+    rw [hχ₂def, certainTypeOmegaSigma_muColumnChar_eq_aligned hG hyp.base hcw1
+      (finCongr hcw1 i') k, hτφdef, hrow0 (finCongr hcw1 i') k]
+    by_cases h0 : i' = 0
+    · rw [if_pos ((hfc0 i').mpr h0), if_pos h0]
+    · rw [if_neg (fun h => h0 ((hfc0 i').mp h)), if_neg h0]
+  -- same for the inverse column `χ₂⁻¹ = muColumnChar kinv`
+  have hctvalinv : ∀ i' : Fin (Nat.card ↥h46.W1),
+      ClassFunction.inner τφ (OddOrder.Peterfalvi.S06.certainTypeOmegaSigma h46 χ₂⁻¹ i')
+      = if i' = 0 then (1 : ℂ) else 0 := by
+    intro i'
+    rw [hχ₂def, ← hkinveq]
+    conv_lhs => rw [← hfc i']
+    rw [certainTypeOmegaSigma_muColumnChar_eq_aligned hG hyp.base hcw1
+      (finCongr hcw1 i') kinv, hτφdef, hrow0 (finCongr hcw1 i') kinv]
+    by_cases h0 : i' = 0
+    · rw [if_pos ((hfc0 i').mpr h0), if_pos h0]
+    · rw [if_neg (fun h => h0 ((hfc0 i').mp h)), if_neg h0]
+  -- the signed member values
+  set δ : ℤ := (h46.columnFamily χ₂).sign with hδdef
+  have hδpm : δ = 1 ∨ δ = -1 := (h46.columnFamily χ₂).sign_eq
+  have hRfalse : ∀ i', R (false, i')
+      = ((δ : ℤ) : ℂ) • OddOrder.Peterfalvi.S06.certainTypeOmegaSigma h46 χ₂ i' := by
+    intro i'
+    rw [hRdef, hδdef]
+    rfl
+  have hRtrue : ∀ i', R (true, i')
+      = (-((δ : ℤ) : ℂ)) • OddOrder.Peterfalvi.S06.certainTypeOmegaSigma h46 χ₂⁻¹ i' := by
+    intro i'
+    rw [hRdef, hδdef]
+    rfl
+  have hvalfalse : ∀ i', ClassFunction.inner τφ (R (false, i'))
+      = if i' = 0 then ((δ : ℤ) : ℂ) else 0 := by
+    intro i'
+    rw [hRfalse i', OddOrder.RepresentationTheory.inner_smul_right, star_intCast, hctval i']
+    split <;> ring
+  have hvaltrue : ∀ i', ClassFunction.inner τφ (R (true, i'))
+      = if i' = 0 then (-((δ : ℤ) : ℂ)) else 0 := by
+    intro i'
+    rw [hRtrue i', OddOrder.RepresentationTheory.inner_smul_right, star_neg, star_intCast,
+      hctvalinv i']
+    split <;> ring
+  -- ### 7. `t = ⟨φ^τ, c(μ)⟩ = ±1` from exactly-one on the row-`0` pair
+  have hone := hkey (false, (0 : Fin (Nat.card ↥h46.W1)))
+  rw [show ((!(false, (0 : Fin (Nat.card ↥h46.W1))).1,
+      OddOrder.Peterfalvi.S06.rowInv h46.toHypothesis
+        (false, (0 : Fin (Nat.card ↥h46.W1))).2) : Bool × Fin (Nat.card ↥h46.W1))
+      = (true, 0) from by simp] at hone
+  have hft : R (false, (0 : Fin (Nat.card ↥h46.W1)))
+      ≠ R (true, (0 : Fin (Nat.card ↥h46.W1))) := by
+    intro he
+    have h1 := hRinj he
+    simp at h1
+  have hval : ∀ α ∈ E, ClassFunction.inner τφ α
+      = (if α = R (false, (0 : Fin (Nat.card ↥h46.W1))) then ((δ : ℤ) : ℂ) else 0)
+        + (if α = R (true, (0 : Fin (Nat.card ↥h46.W1))) then (-((δ : ℤ) : ℂ)) else 0) := by
+    intro α hα
+    have h1 := hEsub hα
+    rw [hRimg, Finset.mem_image] at h1
+    obtain ⟨⟨b, i'⟩, -, rfl⟩ := h1
+    cases b
+    · rw [hvalfalse i']
+      by_cases h0 : i' = 0
+      · subst h0
+        rw [if_pos rfl, if_pos rfl, if_neg hft, add_zero]
+      · rw [if_neg h0,
+          if_neg (fun he => h0 (by simpa using congrArg Prod.snd (hRinj he))),
+          if_neg (fun he => by simpa using congrArg Prod.fst (hRinj he)), add_zero]
+    · rw [hvaltrue i']
+      by_cases h0 : i' = 0
+      · subst h0
+        rw [if_pos rfl, if_neg hft.symm, if_pos rfl, zero_add]
+      · rw [if_neg h0,
+          if_neg (fun he => by simpa using congrArg Prod.fst (hRinj he)),
+          if_neg (fun he => h0 (by simpa using congrArg Prod.snd (hRinj he))), add_zero]
+  have htval : ClassFunction.inner τφ (c.extension μ)
+      = (if R (false, (0 : Fin (Nat.card ↥h46.W1))) ∈ E then ((δ : ℤ) : ℂ) else 0)
+        + (if R (true, (0 : Fin (Nat.card ↥h46.W1))) ∈ E then (-((δ : ℤ) : ℂ)) else 0) := by
+    rw [hEeq, OddOrder.RepresentationTheory.inner_sum_right, Finset.sum_congr rfl hval,
+      Finset.sum_add_distrib,
+      Finset.sum_ite_eq' E (R (false, (0 : Fin (Nat.card ↥h46.W1))))
+        (fun _ => ((δ : ℤ) : ℂ)),
+      Finset.sum_ite_eq' E (R (true, (0 : Fin (Nat.card ↥h46.W1))))
+        (fun _ => (-((δ : ℤ) : ℂ)))]
+  -- ### 8. the pin equation `0 = t − m·s` closes the contradiction
+  -- `ψ = μ − m·λ`: degree `0`, `A₀`-supported, `c`-extended by `τ`
+  set ψp : ClassFunction ↥M ℂ := μ - ((m : ℤ) : ℂ) • lam with hψpdef
+  have hψspan : ψp ∈ Submodule.span ℤ
+      (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C) := by
+    rw [hψpdef, Int.cast_smul_eq_zsmul]
+    exact Submodule.sub_mem _ (Submodule.subset_span hμmem)
+      (Submodule.smul_mem _ _ (Submodule.subset_span hlammem))
+  have hψ1 : ψp 1 = 0 := by
+    rw [hψpdef, ClassFunction.sub_apply, ClassFunction.smul_apply, hμdeg, hlamdeg, hm]
+    push_cast
+    ring
+  have hψsupp : ψp.support ⊆ hyp.base.A0 :=
+    inducedKernelFamily_zSpan_support_of_apply_one_eq_zero hyp.base.mderivSharp_subset_A0
+      (Submodule.span_mono (fun x hx => hIKF hx) hψspan) hψ1
+  have hτψ : hyp.base.tau ψp
+      = c.extension μ - ((m : ℤ) : ℂ) • c.extension lam := by
+    rw [← c.extends_on_supported ψp ⟨hψspan, hψsupp⟩, hψpdef, Int.cast_smul_eq_zsmul,
+      map_sub, map_zsmul, Int.cast_smul_eq_zsmul]
+  -- source-side orthogonality `⟨φ, ψ⟩ = 0`
+  have hζHC : ζ ∈ hyp.SOf hyp.HC := by
+    rw [← secondDerived_eq_HC hG hyp, hyp.SOf_secondDerived_eq hG]
+    exact ⟨hζS, hζirr, hζ1⟩
+  have hζμ : ClassFunction.inner ζ μ = 0 :=
+    SOf_HC_inner_sOf_H0C_eq_zero hyp hζHC hμmem
+  have hζlam : ClassFunction.inner ζ lam = 0 :=
+    SOf_HC_inner_sOf_H0C_eq_zero hyp hζHC hlammem
+  have hμ0μ : ClassFunction.inner
+      (∑ r : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd r 0) μ = 0 := by
+    rw [hμdef, hyp.base.muGrid_columnSum_eq_columnSum hG hG.odd 0,
+      hyp.base.muGrid_columnSum_eq_columnSum hG hG.odd ⟨1, hw2⟩,
+      OddOrder.Peterfalvi.S06.columnSum_def, OddOrder.Peterfalvi.S06.columnSum_def,
+      OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_neg ?_]
+    rw [hyp.base.muColumnChar_zero hG hG.odd]
+    intro h
+    exact hyp.base.muColumnChar_ne_one hG hG.odd hk1 h.symm
+  have hμ0lam : ClassFunction.inner
+      (∑ r : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd r 0) lam = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_sum_left]
+    refine Finset.sum_eq_zero fun r _ => ?_
+    rw [irr_cf_inner
+      (mem_irreducibleCharacters.mpr (hyp.base.muGrid_isIrreducible hG hG.odd r 0))
+      (mem_irreducibleCharacters.mpr hlamirr), if_neg ?_]
+    intro heq
+    have h1 : hyp.base.muGrid hG hG.odd r 0 1 = lam 1 := by rw [heq]
+    rw [hyp.base.muGrid_zero_column_apply_one hG hG.odd r, hlamdeg] at h1
+    have h2 : (hyp.s11Setup.q * caseA.a : ℕ) = 1 := by exact_mod_cast h1.symm
+    have hq1 : hyp.s11Setup.q = 1 := Nat.dvd_one.mp ⟨caseA.a, h2.symm⟩
+    omega
+  have hφψ : ClassFunction.inner
+      ((∑ r : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd r 0) - ζ) ψp = 0 := by
+    rw [hψpdef, ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right, OddOrder.RepresentationTheory.inner_smul_right,
+      OddOrder.RepresentationTheory.inner_smul_right, hμ0μ, hμ0lam, hζμ, hζlam]
+    ring
+  -- the Dade pairing
+  have hφsupp : (((∑ r : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd r 0) - ζ :
+      ClassFunction ↥M ℂ)).support ⊆ hyp.base.A0 :=
+    hyp.base.muColumnZero_sub_zeta_support hG hG.odd hζS hζ1
+  have hpair : ClassFunction.inner τφ (hyp.base.tau ψp) = 0 := by
+    rw [hτφdef, hyp.base.tau_inner_eq_of_supported hφsupp hψsupp]
+    exact hφψ
+  -- extract the integer `s = ⟨φ^τ, c(λ)⟩` and conclude
+  have hμ0Z : (∑ r : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd r 0) ∈ ZIrr ↥M :=
+    Submodule.sum_mem _ (fun r _ => (hyp.base.muGrid_isIrreducible hG hG.odd r 0).mem_ZIrr)
+  have hτφZ : τφ ∈ ZIrr G := by
+    rw [hτφdef]
+    exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+      hyp.base.dadeData.dade hyp.base.hconj hφsupp
+      (Submodule.sub_mem _ hμ0Z hζirr.mem_ZIrr)
+  obtain ⟨s, hs⟩ := ClassFunction.inner_mem_ZIrr_int hτφZ hclamZ
+  have hteq : ClassFunction.inner τφ (c.extension μ) = ((m : ℤ) : ℂ) * ((s : ℤ) : ℂ) := by
+    have h1 := hpair
+    rw [hτψ, ClassFunction.inner_sub_right,
+      OddOrder.RepresentationTheory.inner_smul_right, star_intCast, hs] at h1
+    linear_combination h1
+  -- `t = ±δ` from exactly-one; `t = m·s` forces `m ∣ 1`, contradicting `m ≥ 2`
+  have htpm : ClassFunction.inner τφ (c.extension μ) = ((δ : ℤ) : ℂ)
+      ∨ ClassFunction.inner τφ (c.extension μ) = -((δ : ℤ) : ℂ) := by
+    rw [htval]
+    by_cases hf : R (false, (0 : Fin (Nat.card ↥h46.W1))) ∈ E
+    · have ht : R (true, (0 : Fin (Nat.card ↥h46.W1))) ∉ E := by
+        rw [if_pos hf] at hone
+        intro hcon
+        rw [if_pos hcon] at hone
+        omega
+      left
+      rw [if_pos hf, if_neg ht, add_zero]
+    · have ht : R (true, (0 : Fin (Nat.card ↥h46.W1))) ∈ E := by
+        rw [if_neg hf] at hone
+        by_contra hcon
+        rw [if_neg hcon] at hone
+        omega
+      right
+      rw [if_neg hf, if_pos ht, zero_add]
+  have hmsδ : (m : ℤ) * s = δ ∨ (m : ℤ) * s = -δ := by
+    rcases htpm with h | h
+    · left
+      have h1 : (((m : ℤ) * s : ℤ) : ℂ) = ((δ : ℤ) : ℂ) := by
+        push_cast
+        linear_combination hteq.symm.trans h
+      exact_mod_cast h1
+    · right
+      have h1 : (((m : ℤ) * s : ℤ) : ℂ) = ((-δ : ℤ) : ℂ) := by
+        push_cast
+        linear_combination hteq.symm.trans h
+      exact_mod_cast h1
+  have hdvd : (m : ℤ) ∣ 1 := by
+    rcases hmsδ with h | h <;> rcases hδpm with h' | h' <;> rw [h'] at h
+    · exact ⟨s, h.symm⟩
+    · exact ⟨-s, by rw [mul_neg, h, neg_neg]⟩
+    · exact ⟨-s, by rw [mul_neg, h]; norm_num⟩
+    · exact ⟨s, by rw [h, neg_neg]⟩
+  have hm1 : (m : ℤ) = 1 ∨ (m : ℤ) = -1 := Int.isUnit_iff.mp (isUnit_of_dvd_one hdvd)
+  omega
+
+end OddOrder.Peterfalvi.S13
