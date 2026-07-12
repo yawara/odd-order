@@ -922,11 +922,29 @@ of the uniform-degree-`q·u` family `𝒮` is dispatched to its (5.2.d) `R`-datu
   the landed inputs: non-realness (`sSet_hasNoRealCharacters` via `oddCardS`) and the conjugate
   difference support `(η̄ − η).support ⊆ A(S)` (`sSet_caseB_member_diff_supported`, both `η, η̄ ∈ 𝒮`);
 * **reducible member `η = μ_j` (a nonzero μ-column sum)** — the `2q`-element certain-type image
-  family `∑_i δ_j η_{ij}`.  This branch is the **residual**: it is the honest `S`-instance port of the
-  §6 `certainTypeR` construction (the Dade image of the column difference `μ_j − μ̄_j` as the η-grid
-  columns `j, j⁻¹`, orthonormal by `mu_orthonormal`/`eta`-orthonormality), the reducible-column
-  machinery whose landed pieces are `mu_colSum_mem_sOf_H0` / `mu_j_isIndPC` (membership + linearity);
-  the image-family assembly from the η-grid is the remaining (multi-step) work. -/
+  family `∑_i δ_j η_{ij}`.  This branch is the **residual**, and (issue 9092, verified 2026-07-13)
+  it is **blocked at the abstract-vs-concrete `μ`-grounding**, *not* buildable from the abstract
+  `Hypothesis` fields:
+
+  - **Route A (`certainTypeR` @ `hyp46S`) does NOT apply.**  `hyp46S`/`residueS` are built from
+    `s06S = typePData_toS06Hypothesis hyp.Sdata` (`S13_PrimeTIResidueBridge`), a **different `S06`
+    object** than the `certainTypeS = mp.certainTypeS` that the abstract field `hyp.mu` was assigned
+    (`muS := certainTypeS.columnFamily.mu`, `FeitThompsonSetup:1466`); no lemma/field grounds
+    `hyp.mu = residueS.mu2` (`= s06S.columnFamily.mu`) — the abstract `Hypothesis` cannot see it
+    (`SubcoherenceInputs:245`).  `certainTypeR @ hyp46S` is *also* over `dadeHypS0` (`A₀`-Dade), not
+    the target `dadeHypS` (`A`-Dade).  So even the map is wrong.
+  - **Route B (Dade→η formula `τ_S(μ_j − μ̄_j) = ∑ᵢ δ_j(η_{ij} − η_{i,−j})` over `dadeHypS`)** is the
+    honest shape (`imageSet = {±δ_j η_{ij}}` orthonormal by `eta_orthonormal`, ZIrr by `eta_mem_ZIrr`),
+    but its `image_eq` needs the **(13.18) full-column cross-relation**, which bottoms out at the
+    prime-`TI` `μ`-value `μ_{ij}|_V = ω`-value (Coq `prTIirr_id`, **issue 9014, not yet ported**); the
+    row-`0` version `tauS_mu_row0_cross` (`S15_BridgeCharacter`) is itself `sorry`-gated on this *and*
+    stated over `dadeHypS0`.
+  - **The honest fix (issue 9092): a coordinated `Hypothesis`-field + producer commit** — thread the
+    reducible `R`-family (or the grounding `hyp.mu = certainTypeS.columnFamily.mu`) as a field,
+    discharged **near-definitionally** at the spine producer `FeitThompson.lean:1392` (`muS :=
+    columnFamily.mu`).  This touches `FeitThompson.lean` (currently a spent carve-out) — a hub-level
+    cross-lane decision.  The membership/linearity pieces `mu_colSum_mem_sOf_H0` / `mu_j_isIndPC`
+    are landed; only the `R`-datum itself is gated. -/
 noncomputable def Hypothesis.sSet_caseB_memberRFamily [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
@@ -944,7 +962,13 @@ noncomputable def Hypothesis.sSet_caseB_memberRFamily [Finite G]
     · exact sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupS hG) (hyp.oddCardS hG) hη
     · exact hyp.sSet_caseB_member_diff_supported hG chars caseB
         (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupS hG) hη) hη
-  · -- reducible member (`η = μ_j`): the certain-type image family — RESIDUAL (S-instance §6 port)
+  · -- reducible member (`η = μ_j`): the `2q`-element certain-type `R`-family `{±δ_j η_{ij}}`.
+    -- RESIDUAL (verified 2026-07-13, issue 9092): blocked at the abstract-vs-concrete `μ`-grounding.
+    -- Route A (`certainTypeR` @ `hyp46S`) does NOT apply — `hyp46S`/`residueS` use `s06S ≠ certainTypeS`
+    -- (the `S06` object `hyp.mu` came from) and `dadeHypS0 ≠ dadeHypS`.  Route B (Dade→η `image_eq`)
+    -- needs the (13.18) full-column cross-relation = prime-`TI` `μ|_V = ω`-value (issue 9014, unported).
+    -- Honest fix: thread the `R`-family/grounding as a `Hypothesis` field, discharged near-definitionally
+    -- at the read-only spine producer `FeitThompson.lean:1392` (hub carve-out decision).  See docstring.
     exact sorry
 
 open OddOrder.Peterfalvi.S11 in
@@ -954,10 +978,14 @@ input of `uniform_degree_coherence_of_families`, the honest `S`-instance analogu
 `caseB_sOf_memberRFamily_orthogonal`).  For members `φ, ξ ∈ 𝒮` with `⟨φ, ξ⟩ = 0` and `⟨φ, ξ̄⟩ = 0`
 (distinct non-conjugate members), the Dade image families `R(φ)`, `R(ξ)` are orthogonal.
 
-**RESIDUAL** (pending the reducible branch of `sSet_caseB_memberRFamily`): the irreducible–irreducible
-case is the landed (5.2.e) `dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal`; the cases where a
-member is a reducible μ-column reference the certain-type image family whose S-instance construction
-is the remaining reducible-column work. -/
+**RESIDUAL** (pending the reducible branch of `sSet_caseB_memberRFamily`, issue 9092): the
+irreducible–irreducible case is the landed (5.2.e) `dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal`
+(with the irr `R`-datum reduction, mirror of M-side `caseB_sOf_memberRFamily_imageSet_of_irr`); but the
+cases where a member is a reducible μ-column reference `(sSet_caseB_memberRFamily …).imageSet`, whose
+reducible branch is the blocked `R`-family above — so the reducible `imageSet` is opaque here and the
+`2×2` case split cannot proceed.  Closable once the reducible `R`-family lands (`{±δ_j η_{ij}}`): red×red
+cross-orthogonality then follows from `eta_orthonormal` (distinct columns `{j,−j} ∩ {k,−k} = ∅` from
+`⟨φ,ξ⟩ = ⟨φ,ξ̄⟩ = 0`), and irr×red from `eta_orthogonal_of_norm_one_pair_vanish` (`S16_GridExpansion`). -/
 theorem Hypothesis.sSet_caseB_memberRFamily_orthogonal [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
@@ -969,6 +997,8 @@ theorem Hypothesis.sSet_caseB_memberRFamily_orthogonal [Finite G]
     (h2 : ClassFunction.inner φ ξ.conj = 0) :
     (hyp.sSet_caseB_memberRFamily hG chars caseB hφ).Orthogonal
       (hyp.sSet_caseB_memberRFamily hG chars caseB hξ) := by
+  -- RESIDUAL (issue 9092): gated on the reducible branch of `sSet_caseB_memberRFamily` (opaque
+  -- reducible `imageSet`).  Closable once that lands — see docstring for the per-case route.
   sorry
 
 open OddOrder.Peterfalvi.S11 in
