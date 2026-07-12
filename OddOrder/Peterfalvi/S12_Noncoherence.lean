@@ -29,6 +29,7 @@ consume the honest (10.7) without the import cycle that gated the `S12_MaximalBa
 namespace OddOrder.Peterfalvi.S12
 
 open OddOrder.GroupTheory
+open OddOrder.RepresentationTheory
 open OddOrder.Isaacs
 open scoped Pointwise
 
@@ -179,6 +180,58 @@ chain), which kill case (b) outright and pin case (c) to `|M′| = w₂³`, `p =
 `δ = −1`, `n = 2` — where the sorry-free (10.10.2)–(10.10.4) package
 (`typeV_caseC_coherence_engine` + P1–P4, S12_TypeVCaseC) produces the coherence. -/
 
+open scoped Classical FiniteInduce in
+/-- **Type-V irreducibility bridge** (the `hcoh` sub-piece of `typeV_sixFiveA_bound`): a
+nonprincipal *linear* irreducible character `θ` of `M′ = (derivedInG M).subgroupOf M` induces
+irreducibly to `M`.  Generalizes the single-`ζ` `havoid` computation of
+`exists_zeta_in_inducedFamily_degree_w1` to *every* linear `θ` (the argument uses only `θ ≠ 1` and
+`θ(1) = 1`): the trivial column gives `chiRestrict 1 = 1_{M′} ≠ θ`, and a nontrivial column `χ₂`
+gives `chiRestrict χ₂ = Res_{M′} μ_{0j}` of degree `μ_{0j}(1) > 1 ≠ θ(1) = 1` (else `μ_{0j}` is a
+column-`0` character, contradicting `columnFamily_mu_ne`).  Hence `θ` avoids every `chiRestrict χ₂`
+and `Ind_{M′}^M θ` is irreducible by `induce_isIrreducible_of_forall_chiRestrict_ne`. -/
+theorem induce_linear_isIrreducible [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (θ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M))
+    (hθne : θ ≠ trivialIrreducibleCharacter ↥((derivedInG M).subgroupOf M))
+    (hθ1 : (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1) :
+    IsIrreducibleCharacter (ClassFunction.induce ((derivedInG M).subgroupOf M)
+      (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ)) := by
+  classical
+  let h : OddOrder.Peterfalvi.S06.Hypothesis ↥M :=
+    typePData_toS06Hypothesis hyp.typeP hG.odd
+      (typePData_W1_hall_coprime hG hyp.maximal (hyp.bgTypeP hG) hyp.typeP)
+  haveI hNeZ : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  have hKeq : h.K = (derivedInG M).subgroupOf M := rfl
+  have hKcomm : h.K = commutator ↥M := by
+    rw [hKeq, derivedInG, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+  refine h.induce_isIrreducible_of_forall_chiRestrict_ne (χ := θ) ?_
+  intro χ₂ heq
+  by_cases hχ₂ : χ₂ = 1
+  · subst hχ₂
+    refine hθne ?_
+    rw [← heq]
+    apply IrreducibleCharacter.ext
+    rw [OddOrder.Peterfalvi.S06.Hypothesis.coe_chiRestrict,
+      (h.certainType_zero_column_anchor).2,
+      OddOrder.Peterfalvi.S03.restrict_trivialClassFunction]
+    rfl
+  · have hmu1 : ((h.columnFamily χ₂).mu 0 : ClassFunction ↥M ℂ) (1 : ↥M) = 1 := by
+      have hval := congrArg
+        (fun c : IrreducibleCharacter ↥h.K => (c : ClassFunction ↥h.K ℂ) (1 : ↥h.K)) heq
+      simp only [OddOrder.Peterfalvi.S06.Hypothesis.coe_chiRestrict, ClassFunction.restrict_apply,
+        Subgroup.coe_one] at hval
+      rw [hval]; exact hθ1
+    have hker : (h.K : Set ↥M) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+        ((h.columnFamily χ₂).mu 0 : ClassFunction ↥M ℂ) := by
+      intro x hx
+      have hx1 := ((h.columnFamily χ₂).mu 0).isIrreducible
+        |>.apply_eq_one_of_mem_commutator_of_apply_one_eq_one hmu1 (hKcomm ▸ hx)
+      rw [OddOrder.Peterfalvi.S03.mem_characterKernel, hx1,
+        OddOrder.Peterfalvi.S03.characterDegree_def, hmu1]
+    obtain ⟨i, hi⟩ := h.exists_certainType_zero_column_eq_of_subset_characterKernel _ hker
+    exact h.columnFamily_mu_ne hχ₂ 0 i hi.symm
+
 open scoped FiniteInduce in
 /-- **Peterfalvi (6.5.a) for `(L, K, M) := (M, M′, 1)`** — the (10.10.1) index bound.
 
@@ -197,15 +250,155 @@ noncoherence of `𝒮(1) = 𝒮` yields `|M′ : M″| ≤ 4w₁² + 1` — the 
 parameter calculation `p = 2w₁ − 1` (`typeV_param_arithmetic`, with `|M′ : M″| = p²` from
 `card_abelianization_eq_prime_sq_of_card_eq_prime_cube`).
 
-**Gated on issue 2022** (general `six_two` → (6.3)-general → (6.5); `six_three_descent` /
-`six_three_index_bound_general` are landed there, `six_two` and the (6.4) carrier remain):
-the statement is book-faithful; the proof is `sorry` pending that chain. -/
+**Now landed** (issue 9089, lane a): the six-two decomposition chain
+(`exists_source_index_le_two_psi_of_ne_top` + `sixTwoDecompositionData`) was generalized to be
+htype/chief-free (commits 6ce607ce, 5065c1ea), so it applies to type V's base `Hypothesis M`
+directly.  The proof is the contrapositive of the (6.3) oracle
+`S08.six_three_of_six_two_oracle` at `(L, K, H, M, H₁) = (M, M', M', 1, M'')` (`K = H = M'`,
+`H₁ = ⁅M', M'⁆ = M''`); see `S13.coherent_S_of_coherent_SH0C` for the type III/IV template.  The
+`hcoh` input (coherence of `𝒮(M'') = S(⁅M',M'⁆)`, the uniform degree-`w₁` irreducible family) is
+the (5.7) coherence `SHC_isCoherent` after the identification
+`inducedKernelFamily M' ⁅M',M'⁆ = SHCSet`. -/
 theorem typeV_sixFiveA_bound [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     (hV : IsTypeV M)
     (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A0)) :
     Nat.card (Abelianization ↥((derivedInG M).subgroupOf M)) ≤ 4 * hyp.w1 ^ 2 + 1 := by
-  sorry
+  classical
+  by_contra hgt
+  rw [not_le] at hgt
+  apply hnc
+  obtain ⟨dV⟩ := hV
+  obtain ⟨params, hmu, -, hζS, hζ1, hζne, hδpm, hδj⟩ := hyp.exists_charParameters_full hG
+  -- instances on `K = M' = (derivedInG M).subgroupOf M`
+  haveI hKnorm : ((derivedInG M).subgroupOf M).Normal := by
+    rw [derivedInG, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+    infer_instance
+  haveI hKnil : Group.IsNilpotent ↥((derivedInG M).subgroupOf M) :=
+    TypeVData.isNilpotent_derivedInG_subgroupOf dV
+  haveI hKsolv : IsSolvable ↥((derivedInG M).subgroupOf M) := IsNilpotent.to_isSolvable
+  -- `𝒮 = SOf ⊥`
+  have hSset : hyp.Sset = OddOrder.Peterfalvi.S08.inducedKernelFamily
+      ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) := by
+    unfold OddOrder.Peterfalvi.S12.Hypothesis.Sset
+    exact inducedFamily_eq_inducedKernelFamily_bot
+  -- `⁅K,K⁆ < K` from the nontrivial abelianization (`|Ab K| > 4w₁²+1 ≥ 1`)
+  have hcard_ab : 1 < Nat.card (Abelianization ↥((derivedInG M).subgroupOf M)) := by omega
+  have hH₁H : (⁅(derivedInG M).subgroupOf M, (derivedInG M).subgroupOf M⁆ : Subgroup ↥M)
+      < (derivedInG M).subgroupOf M := by
+    refine lt_of_le_of_ne (Subgroup.commutator_le_left _ _) ?_
+    intro heq
+    have hcomm_top : commutator ↥((derivedInG M).subgroupOf M) = ⊤ := by
+      rw [← OddOrder.Peterfalvi.S08.commutator_subgroupOf_self, heq, Subgroup.subgroupOf_self]
+    haveI : Subsingleton (Abelianization ↥((derivedInG M).subgroupOf M)) := by
+      change Subsingleton (↥((derivedInG M).subgroupOf M)
+        ⧸ commutator ↥((derivedInG M).subgroupOf M))
+      rw [hcomm_top]
+      exact QuotientGroup.subsingleton_quotient_top
+    have hcard1 : Nat.card (Abelianization ↥((derivedInG M).subgroupOf M)) = 1 :=
+      Nat.card_unique
+    omega
+  -- ★ the (5.7) coherence of `𝒮(M'') = S(⁅K,K⁆)` — the uniform degree-`w₁` irreducible family
+  have hcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M)
+        (⁅(derivedInG M).subgroupOf M, (derivedInG M).subgroupOf M⁆)) hyp.A0) := by
+    haveI : IsMulCommutative (↥((derivedInG M).subgroupOf M)
+        ⧸ commutator ↥((derivedInG M).subgroupOf M)) :=
+      (Subgroup.Normal.quotient_commutative_iff_commutator_le).mpr le_rfl
+    have hw1pos : (hyp.w1 : ℂ) ≠ 0 := by
+      have h0 : 0 < hyp.w1 := Nat.card_pos
+      exact_mod_cast h0.ne'
+    have hidxw1 : ((derivedInG M).subgroupOf M).index = hyp.w1 :=
+      hyp.typeP.card_W1_eq_derived_index.symm
+    -- `S(⁅K,K⁆) = SHCSet`: both are the degree-`w₁` irreducible members of `S`
+    have hSeq : OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M)
+        (⁅(derivedInG M).subgroupOf M, (derivedInG M).subgroupOf M⁆) = hyp.SHCSet := by
+      ext φ
+      constructor
+      · -- `Ind θ` with `θ` linear (trivial on `M″`), `θ ≠ 1` ⟹ irreducible of degree `w₁`
+        rintro ⟨θ, hθne, hker, rfl⟩
+        have hkerc : (commutator ↥((derivedInG M).subgroupOf M) :
+              Set ↥((derivedInG M).subgroupOf M)) ⊆
+            OddOrder.Peterfalvi.S03.characterKernel
+              (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) := by
+          rw [← OddOrder.Peterfalvi.S08.commutator_subgroupOf_self]
+          exact hker
+        have hθ1 : (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1 :=
+          apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient
+            (N := commutator ↥((derivedInG M).subgroupOf M)) θ hkerc
+        have hirr := induce_linear_isIrreducible hG hyp θ hθne hθ1
+        have hdeg : (ClassFunction.induce ((derivedInG M).subgroupOf M)
+            (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) : ↥M → ℂ) 1
+            = (hyp.w1 : ℂ) := by
+          rw [ClassFunction.induce_apply_one, hθ1, mul_one, hidxw1]
+        refine ⟨?_, hirr, hdeg⟩
+        rw [inducedFamily_eq_inducedKernelFamily_bot]
+        exact OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone bot_le ⟨θ, hθne, hker, rfl⟩
+      · -- degree-`w₁` irreducible member ⟹ source `θ` linear ⟹ trivial on `M″`
+        rintro ⟨hmem, -, hdeg⟩
+        rw [inducedFamily_eq_inducedKernelFamily_bot,
+          OddOrder.Peterfalvi.S08.mem_inducedKernelFamily] at hmem
+        obtain ⟨θ, hθne, -, rfl⟩ := hmem
+        have hθ1 : (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1 := by
+          have hd := hdeg
+          rw [ClassFunction.induce_apply_one, hidxw1] at hd
+          have h2 : (hyp.w1 : ℂ) * (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1
+              = (hyp.w1 : ℂ) * 1 := by rw [mul_one]; exact hd
+          exact mul_left_cancel₀ hw1pos h2
+        refine ⟨θ, hθne, ?_, rfl⟩
+        rw [OddOrder.Peterfalvi.S08.commutator_subgroupOf_self]
+        intro x hx
+        rw [OddOrder.Peterfalvi.S03.mem_characterKernel,
+          OddOrder.Peterfalvi.S03.characterDegree_def, hθ1]
+        exact θ.isIrreducible.apply_eq_one_of_mem_commutator_of_apply_one_eq_one hθ1 hx
+    rw [hSeq]
+    exact ⟨hyp.SHC_isCoherent hG⟩
+  rw [hSset]
+  by_cases hcomm : (⁅(derivedInG M).subgroupOf M, (derivedInG M).subgroupOf M⁆ : Subgroup ↥M) = ⊥
+  · -- `M'` abelian: `SOf ⊥ = SOf ⁅K,K⁆` is the whole family, coherent by `hcoh`
+    rw [← hcomm]; exact hcoh
+  · -- the (6.3) oracle: `SOf ⁅K,K⁆` coherent + the index bound ⟹ `SOf ⊥` coherent
+    have hbound : 4 * ((derivedInG M).subgroupOf M).index ^ 2 + 1
+        < Nat.card (↥((derivedInG M).subgroupOf M)
+            ⧸ (⁅(derivedInG M).subgroupOf M, (derivedInG M).subgroupOf M⁆).subgroupOf
+              ((derivedInG M).subgroupOf M)) := by
+      rw [OddOrder.Peterfalvi.S08.commutator_subgroupOf_self]
+      have hidx : ((derivedInG M).subgroupOf M).index = hyp.w1 :=
+        hyp.typeP.card_W1_eq_derived_index.symm
+      rw [hidx]
+      exact hgt
+    refine OddOrder.Peterfalvi.S08.six_three_of_six_two_oracle
+      (L := M) (K := (derivedInG M).subgroupOf M) (H := (derivedInG M).subgroupOf M)
+      (M := ⊥) (H₁ := ⁅(derivedInG M).subgroupOf M, (derivedInG M).subgroupOf M⁆)
+      hKnorm bot_le hH₁H le_rfl hyp.tau hyp.A0
+      (fun X => OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) X)
+      ?_ hcoh hbound
+    -- the (5.6) break-member oracle `h56` = the generalized §11/§13 dichotomy producer
+    intro A B hAnorm hBnorm hBA hAH₁ _hcentral hAcoh hBncoh
+    haveI := hAnorm
+    haveI := hBnorm
+    haveI : (A.subgroupOf ((derivedInG M).subgroupOf M)).Normal := hAnorm.subgroupOf _
+    haveI : (B.subgroupOf ((derivedInG M).subgroupOf M)).Normal := hBnorm.subgroupOf _
+    have hAne : A.subgroupOf ((derivedInG M).subgroupOf M) ≠ ⊤ := by
+      intro htop
+      exact absurd ((Subgroup.subgroupOf_eq_top.mp htop).trans hAH₁) (not_le_of_gt hH₁H)
+    have hBne : B.subgroupOf ((derivedInG M).subgroupOf M) ≠ ⊤ := by
+      intro htop
+      exact absurd ((Subgroup.subgroupOf_eq_top.mp htop).trans (hBA.trans hAH₁))
+        (not_le_of_gt hH₁H)
+    have hAcoh' : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+        (OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) A)
+        hyp.A0) := hAcoh
+    have hBncoh' : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+        (OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B)
+        hyp.A0) := fun h => hBncoh h
+    exact hyp.exists_source_index_le_two_psi_of_ne_top hG hAne hBne
+      (hyp.sixTwoDecompositionData hG hmu hδpm hδj hζS hζ1 A B) hAcoh' hBncoh'
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (6.5.b) for `(L, K, M) := (M, M′, 1)`** — the not-(a) `p`-group reduction.
