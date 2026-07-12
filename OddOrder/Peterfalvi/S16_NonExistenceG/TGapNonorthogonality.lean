@@ -126,10 +126,11 @@ theorem s12Tau_zeroColumn_sub_eq_tSideDadeMap [Finite G]
     (hsupp : (nu0 - zeta).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup
         (OddOrder.BG.Ch4.S14.sigmaSharp side.base.T) side.base.T) :
-    let hyp12 := s12HypothesisOfTypePData hG side.base.T_maximal dataT
-      (Or.inl hIII) hP1
-    hyp12.tau
-        ((∑ i : Fin hyp12.w1, hyp12.muGrid hG hG.odd i 0) - zeta) =
+    (s12HypothesisOfTypePData hG side.base.T_maximal dataT (Or.inl hIII) hP1).tau
+        ((∑ i : Fin (s12HypothesisOfTypePData hG side.base.T_maximal dataT
+              (Or.inl hIII) hP1).w1,
+            (s12HypothesisOfTypePData hG side.base.T_maximal dataT
+              (Or.inl hIII) hP1).muGrid hG hG.odd i 0) - zeta) =
       tSideDadeMap side hG (nu0 - zeta) := by
   let hyp12 := s12HypothesisOfTypePData hG side.base.T_maximal dataT
     (Or.inl hIII) hP1
