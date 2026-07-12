@@ -363,8 +363,110 @@ Isolated obligation. -/
 theorem typeIBetaL_betaS_disjoint_support [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L)
-    (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ typeISetup.Sset) :
-    Disjoint (typeIBetaL typeISetup φ).support (tauSbetaGrid _hG hyp).support := sorry
+    (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ typeISetup.Sset)
+    (_hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ)) :
+    Disjoint (typeIBetaL typeISetup φ).support (tauSbetaGrid _hG hyp).support := by
+  classical
+  rw [Set.disjoint_left]
+  intro x hxL hxS
+  -- L-side: a prime `r ∣ orderOf a` (`a ∈ A(L)`) divides `orderOf x`
+  have hxD := typeIBetaL_support_subset_dadeSupport typeISetup φ _hφ _hdeg hxL
+  obtain ⟨a, haA, r, hr, hra, hrx⟩ :=
+    typeISetup.dadeData.dade.exists_mem_A_prime_dvd_orderOf_of_mem_dadeSupport hxD
+  obtain ⟨frob₀, -⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius _hG typeISetup.maximal
+    ⟨typeISetup.typeI⟩
+  have hHeq : frob₀.typeI.typeF.H = typeISetup.typeI.typeF.H :=
+    frob₀.typeI.typeF.H_eq.trans typeISetup.typeI.typeF.H_eq.symm
+  have hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L
+      ((typeISetup.typeI.typeF.H).subgroupOf L) frob₀.complement := by
+    have h := frob₀.frobenius
+    rwa [hHeq] at h
+  have haH := typeIA_subset_sharpSubgroup_of_frobenius typeISetup.typeI hfrob haA
+  have hrLF : r ∣ Nat.card ↥(maxNilpotentNormalHall L) := by
+    refine hra.trans ?_
+    have hdvd := Subgroup.orderOf_dvd_natCard typeISetup.typeI.typeF.H haH.1
+    rwa [typeISetup.typeI.typeF.H_eq] at hdvd
+  -- S-side: `orderOf x ∣ p^q · (q·p)`
+  have hbridge : tauSbetaGrid _hG hyp
+      = ClassFunction.induce hyp.S
+          (betaGrid hyp ⟨1, by have := hyp.three_le_p; omega⟩) := by
+    rw [tauSbetaGrid]
+    exact hyp.sInstance_dade0_eq_induce _hG
+      (betaGrid_A0_support _hG hyp _ (by norm_num))
+  rw [hbridge] at hxS
+  have hxc :=
+    OddOrder.RepresentationTheory.ClassFunction.support_induce_subset_conjugatesIntoSet
+      (betaGrid_support _hG hyp _ (by norm_num)) hxS
+  obtain ⟨c, hcS, hmem⟩ := hxc
+  have hordx : orderOf (c⁻¹ * x * c) = orderOf x := by
+    have hinj : orderOf ((MulAut.conj c⁻¹).toMonoidHom x) = orderOf x :=
+      orderOf_injective (MulAut.conj c⁻¹).toMonoidHom (MulEquiv.injective _) _
+    rw [← hinj]
+    congr 1
+    simp [MulAut.conj_apply, mul_assoc]
+  have hxdvd : orderOf x ∣ hyp.p ^ hyp.q * (hyp.q * hyp.p) := by
+    rcases hmem with hP | hV
+    · -- `c⁻¹xc ∈ P^#`
+      have hdvd : orderOf (c⁻¹ * x * c) ∣ Nat.card ↥hyp.P :=
+        Subgroup.orderOf_dvd_natCard hyp.P hP.1
+      rw [hordx, hyp.card_P_eq _hG hyp.Sdata_W2_eq] at hdvd
+      exact hdvd.trans (dvd_mul_right _ _)
+    · -- `c⁻¹xc` is `S`-conjugate to `w ∈ typePV ⊆ W`
+      obtain ⟨w, hw, t, htS, hconjw⟩ := hV
+      have hconjw' : t * w * t⁻¹ = c⁻¹ * x * c := hconjw
+      have hordw : orderOf (c⁻¹ * x * c) = orderOf w := by
+        rw [← hconjw']
+        have hinj : orderOf ((MulAut.conj t).toMonoidHom w) = orderOf w :=
+          orderOf_injective (MulAut.conj t).toMonoidHom (MulEquiv.injective _) _
+        rw [← hinj]
+        congr 1
+      have hwW : w ∈ hyp.W := by
+        have h1 : w ∈ hyp.Sdata.W := hw.1
+        rw [hyp.Sdata.W_eq, hyp.Sdata_W1_eq, hyp.Sdata_W2_eq] at h1
+        rwa [hyp.W_eq_join]
+      have hdvdW : orderOf w ∣ Nat.card ↥hyp.W :=
+        Subgroup.orderOf_dvd_natCard hyp.W hwW
+      have hWnorm : hyp.W1 ≤ Subgroup.normalizer (hyp.W2 : Set G) := by
+        intro v hv
+        rw [Subgroup.mem_normalizer_iff]
+        intro y
+        constructor
+        · intro hy
+          have hcomm := hyp.W1_commutes_W2 v hv y hy
+          rwa [show v * y * v⁻¹ = y by
+            rw [hcomm.eq, mul_assoc, mul_inv_cancel, mul_one]]
+        · intro hy
+          have hz := hyp.W1_commutes_W2 v hv (v * y * v⁻¹) hy
+          have h5 : v * (v * y * v⁻¹) = v * y := by
+            rw [hz.eq]
+            group
+          have h6 : v * y * v⁻¹ = y := mul_left_cancel h5
+          rwa [h6] at hy
+      have hWcard : Nat.card ↥hyp.W = hyp.q * hyp.p := by
+        rw [hyp.W_eq_join,
+          OddOrder.BG.Ch3.S12.card_sup_eq_mul_of_le_normalizer_of_disjoint hWnorm
+            hyp.W1_inf_W2_eq_bot, ← hyp.q_eq_card_W1, ← hyp.p_eq_card_W2]
+      have hxw : orderOf x = orderOf w := by rw [← hordx, hordw]
+      have hxqp : orderOf x ∣ hyp.q * hyp.p := by
+        rw [hxw, ← hWcard]
+        exact hdvdW
+      exact hxqp.trans (dvd_mul_left _ _)
+  -- a prime dividing both `|L_F|` and `p·q` contradicts (8.17.a)
+  have hrpq : r ∣ hyp.p * hyp.q := by
+    have h2 := hrx.trans hxdvd
+    rcases (Nat.Prime.dvd_mul hr).mp h2 with h3 | h3
+    · exact dvd_mul_of_dvd_left (hr.dvd_of_dvd_pow h3) _
+    · rcases (Nat.Prime.dvd_mul hr).mp h3 with h4 | h4
+      · exact dvd_mul_of_dvd_right h4 _
+      · exact dvd_mul_of_dvd_left h4 _
+  have hnconjS := not_conj_of_isTypeI_of_isTypeNonI _hG ⟨typeISetup.typeI⟩
+    hyp.S_maximal hyp.S_nonI
+  have hnconjT := not_conj_of_isTypeI_of_isTypeNonI _hG ⟨typeISetup.typeI⟩
+    hyp.T_maximal hyp.T_nonI
+  have hcop := card_LF_coprime_pq _hG hyp typeISetup.maximal ⟨typeISetup.typeI⟩
+    hnconjS hnconjT
+  have hone : r ∣ 1 := hcop ▸ Nat.dvd_gcd hrLF hrpq
+  exact hr.one_lt.ne' (Nat.dvd_one.mp hone)
 
 /-- **(13.19.b)**: `𝓛^{τ₁}` is orthogonal to the whole `η`-grid.  For `ψ ∈ 𝓛`,
 `(ψ − ψ̄)^τ` vanishes on `W ∖ (W₁ ∪ W₂)` by (13.19.a), so `NC((ψ−ψ̄)^τ) ≤ ‖ψ−ψ̄‖² = 2` and
@@ -459,6 +561,7 @@ noncomputable def typeIOrthogonalityGridData_of_typeISetup [Finite G]
       (Classical.choose (OddOrder.Peterfalvi.S15.reconciled_typePData_T _hG hyp))
     disjoint_support := typeIBetaL_betaS_disjoint_support _hG hyp typeISetup _
       (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).1
+      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).2
     betaL_eq := typeIBetaL_eq_tau_induce_sub typeISetup _
     Ltau_orthogonal_eta := tau_apply_orthogonal_eta_of_mem_Sset _hG hyp typeISetup _
       (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).1
