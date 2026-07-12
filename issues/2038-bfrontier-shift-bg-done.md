@@ -2104,3 +2104,30 @@ inner_eq_zero_of_disjoint_support、ψ=φ/ζ_0 両方 Sset degree-e)。⟹ 差 =
 (3) dichotomy 組立 (parity + φ-invariance + c1 + c2 + row-const、~40行) — **これで monolithic sorry → c1 bound に isolate**。
 (4) 別途 c1 bound = 一般 disjoint support (~40行 refactor: `tauImage_support_subset_dadeSupport` 抽出 +
 `typeIBetaL_dadeS_betaGrid_disjoint_support` を一般化) + coefficient + singleton Bessel。
+
+## ✅✅✅ COMPLETE (2026-07-12、/loop iter 29-30) — (13.19.c) `typeI_caseC_dichotomy` **完全証明**、S15_SAndT 実 sorry 0
+
+上記 roadmap step (1)-(4) を全完遂。`S15_SAndT.lean` 実 sorry **1 → 0** (comment-strip 実測)。
+2 commits に分割 (assembly / c1 bound):
+
+**commit 354b3ce6 (step 1-3, assembly)**: dichotomy を parity core + case bounds から φ-invariance
+2 本で組立、monolithic sorry を c1 bound skeleton に isolate。詳細は commit message。
+
+**iter 30 (step 4, c1 bound 完全証明)**:
+- **一般 disjoint support のリファクタ**: `typeIBetaL_dadeS_betaGrid_disjoint_support` (90 行) を任意
+  `χ` (support ⊆ dadeSupport) を取る `dadeSupport_betaGrid_disjoint_support` へ一般化 + 既存を thin
+  wrapper 化 (signature 不変、downstream 無影響)。`tau_support_subset_dadeSupport` (任意 A(L)-supported
+  ψ の Dade 像が dadeSupport に落ちる) を追加。
+- **KEY infra 2 本**: `inner_tauSbetaGrid_coh_ext_zeta_eq` (⟨β_S^τ, ζ_i^{τ₁}⟩ = d_i·bSphi、
+  hagree で ζ_i−d_i ζ_0 = τ(...) が dadeSupport-supported → 一般 disjoint support) /
+  `inner_gammaGrid_coh_ext_zeta_eq` (⟨Γ_S, ζ_i^{τ₁}⟩ = bSphi·d_i、Γ_S = β_S^τ−1+η_01 の 1/η 部分が
+  coherent image に直交)。
+- **c1 bound 本体**: Y = bSphi·Σ d_i ζ_i^{τ₁} の η-直交射影に `gammaGrid_Y_norm_bound` (13.18.d) を適用。
+  ‖Y‖² = bSphi²·Σd_i² (orthonormality via `nu_isometry`+`zeta_irreducible_at`+`induce_family_orthogonal`)、
+  Σd_i² = (|kernelIn|−1)/e (`card_index_mul_sum_induced_family_degree_sq`)、bSphi²≥1 で
+  (|H|−1)/e ≤ (u−1)/q。ℂ.re → ℝ → ℚ の cast chain で ℚ goal に落とす。M-side
+  `bessel_bound_of_inner_beta_zeta_ne_zero` の S-side 翻案 (grid Dade + Y-projection bound)。
+
+⟹ **(13.19.c) 完結**。下流 (`typeI_caseC_dual_dichotomy` swap / `typeIOrthogonalityGridData_of_coherent78`
+の caseC field / (14.5) `complement_not_le_Q`) が honest な (13.19.c) を消費可能に。
+本 issue の主目的 (b-frontier = (13.19) 型 I 直交グリッド) を達成。full build green・AxiomsCheck OK 確認予定。
