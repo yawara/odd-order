@@ -2130,4 +2130,34 @@ inner_eq_zero_of_disjoint_support、ψ=φ/ζ_0 両方 Sset degree-e)。⟹ 差 =
 
 ⟹ **(13.19.c) 完結**。下流 (`typeI_caseC_dual_dichotomy` swap / `typeIOrthogonalityGridData_of_coherent78`
 の caseC field / (14.5) `complement_not_le_Q`) が honest な (13.19.c) を消費可能に。
-本 issue の主目的 (b-frontier = (13.19) 型 I 直交グリッド) を達成。full build green・AxiomsCheck OK 確認予定。
+本 issue の主目的 (b-frontier = (13.19) 型 I 直交グリッド) を達成。full build 4177 jobs green・AxiomsCheck OK。
+
+## 🧭 (2026-07-12、/loop iter 30 続) — b clean on-path frontier 枯渇の census + descent target (hub 向け)
+
+(13.19.c) 完結を受け、b 所有の残 sorry を全数 census (comment-strip + consumer grep + typeP_Galois 実在確認)。
+**結論: b の clean on-path frontier は (13.19) grid で枯渇。残 sorry は全て gated / off-path / lane-c-coupled。**
+
+- **S15_SAndT.lean = 実 sorry 0 (凍結)** → **issue 0111 の分割を hub が実施可能** (b は本 file をもう触らない見込み)。
+- **S15_ComplementStructure.lean (14.5 下流) = 実 sorry 0** (grid cascade は完全に閉じた)。
+- **b 所有残 sorry の census** (全 gated/off-path):
+  - **OrderDetermination**: `pc_le_maxNilpotentNormalHall` (13.12 c=1 gap) = **typeP_Galois §9 σ-structure に gated**
+    (grep 確認: `typeP_Galois` は repo に comment のみ、未形式化)。`caseA_parameters`/`caseB_order_u` = abstract
+    case Prop (`caseA_for_S`/`caseB_for_S` 中身なし) に gated。numeric core (`c_eq_one`/`analytic_singer_m_bound`
+    /Singer) は proven。
+  - **S14_MaximalI**: `sibleyTarget_frobI` (off-path、consumer 無) / `typeIIIorIV_noncyclic_le_fitting` (S13-char gated) /
+    `allTypeI_fittingIsTI`+`not_nonTypeICovering` (P₂-crux = §14 type-duality 逆、gated) / `intersection_le_kernel` 系は
+    proven 済。
+  - **NormEstimates/CountingLayer/HypothesisBasics/Machinery135**: W-side/T-side char (lane-c-coupled) or off-path
+    S-side cascade (`sibleyTarget_S`/`character_degree_analysis`/`analyticEstimate_galois`、2026-07-02 hub ruling で
+    do-not-complete) or abstract param。
+
+- **policy 上の descent target** = **`typeP_Galois`** (§9: V が Q に irreducibly 作用、Coq PFsection9.v:323)。
+  未形式化の genuine prerequisite で複数 downstream (pc_le → 13.12 / hVcomm V-abelian → TTypeII) を unblock。
+  policy「gated frontier のレーンはさらに上流 ungated shared infra に降りて実証明」に従えば b の次 target。
+  **ただし (a) §9 σ-structure の on-path 性 ((13.12) S-side が honest spine か、2038 の off-path S-side 判定との
+  整合) と (b) typeP_Galois が lane-c territory / shared かの claim-before-build 調整が要る** → **hub 裁定事項**。
+
+**hub へ**: (13.19.c) 完結 + S15_SAndT 凍結 (0111 分割 GO)。b の次 allocation = (i) typeP_Galois §9 σ-structure
+descent (claim-before-build + on-path 確認要)、(ii) 別クラスタ再配置、(iii) lane-c 支援 (T-side/Hypothesis46-for-S)
+のいずれか。lane は churn でなく major result 直後ゆえ reallocation-trigger 非該当。次 /loop iter は main 再同期後に
+最上流 verified-on-path ungated work を engage (hub direction が 9000/notes にあればそれに従う)。
