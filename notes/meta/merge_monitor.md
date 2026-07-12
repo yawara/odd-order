@@ -542,7 +542,7 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
   faithful scaffold); S15_SAndT 再 prefix-split → 新 leaf `S15_BridgeCharacter.lean` 1479 行。
   ⚠ **c carve-out (9076 4c-3 BetaData/(13.18) rewire) がバイト同一で新 leaf へ移動** — hub 機械検証
   (1413 行中 1405 同一、差分 = b 自身の producer 分解のみ) で承認、所有マップに所在地更新を追記。
-  S15_SAndT は 324 行に縮小) / **c=1** ((11.8) h114 refuter の arbitrary-grid 一般化、
+  S15_SAndT は 649 行に縮小) / **c=1** ((11.8) h114 refuter の arbitrary-grid 一般化、
   TGapNonorthogonality +410 全 proven) / a=0。build green ×2 (4172 jobs; 2m11s/1m14s)・AxiomsCheck OK・
   count-sorry 65→72 (+7 義務化)・build 警告 63→70・新 axiom なし。push `080f9392..4fc7a99a`。
 - **2026-07-12 (tick 5) — a のみ合流**: **a=2** ((11.9.a) G1 部品 `mapRingEquiv_muColumnZero_sum`
