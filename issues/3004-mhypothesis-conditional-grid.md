@@ -1107,3 +1107,27 @@ S12 `sigma` と S15 `tau3` がとも transported underlying character の値を�
 次は reconciled `dataT.W = base.W` による `alignedOmegaSourceCharacter` の transport と、
 zero-axis restriction equivalence の合成を実装する。regular-value equality 自体は、今回の
 source theorem と S15 `eta_eq_tau_omega` / `tau3_apply_of_regular` を rewrite すれば閉じる形になった。
+
+### full-grid transport と eta value alignment (2026-07-12 続行 6)
+
+- 1,500 行 trigger に従い、以後の alignment を新 leaf
+  `S16_NonExistenceG/TGapGridAlignment.lean` へ分離した。`TTypeII` は新 leaf を importし、旧
+  `TGapNonorthogonality` の module/API は不変。
+- `monoidHomTransportSubgroupEq` で subgroup equality に沿う multiplicative-character
+  transportを定義し、`omegaMonoidHomEquiv` で S15 full omega grid を全 W-linear characters
+  との explicit equivalence にした。
+- transported S12 source character の pointer `alignedOmegaEtaIndex` を構成し、対応する
+  `omegaMonoidHom` との equality を証明した。さらに S12 source grid の joint injectivity を
+  その構成元 (`w1CharEquiv`, normalized W2 dual, `omegaProdChar`) から直接証明し、eta index
+  map の joint injectivity まで transportした。
+- `alignedOmegaSigmaGrid_apply_eq_eta_alignedIndex` により、shared regular set 上で S12 sigma
+  grid entry と、この eta pointer の S15 eta entry が一致することを実証明した。source 側は
+  前段の sigma regular-value theorem、target 側は `tau3_apply_of_regular`、間は underlying
+  monoid-hom equalityだけで、sigma-map の global uniqueness は仮定していない。
+- new leaf build green、新 `sorry`・新 axiom・carrier/signature 変更なし。
+
+残る alignment frontier は full pointer を factorwise に分離すること。具体的には source
+column-zero characters が `base.W1` 上 trivial、row-zero characters が `base.W2` 上 trivial
+であることを示し、既証明の `omegaW1RestrictionEquiv` / `omegaW2RestrictionEquiv` により
+`alignedOmegaEtaIndex i j = (colEquiv j, rowEquiv i)` を得る。zero-preservation も source の
+normalized enumerations と両 target restriction equivalence の `symm_one` から従う。
