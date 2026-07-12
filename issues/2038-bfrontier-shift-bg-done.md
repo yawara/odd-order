@@ -2247,3 +2247,21 @@ character_degree_analysis の on-path 性を見落とし。b は idle でなく�
 (4.1/5.3.b) `tau1S_induce_inner_eta`。**次 iteration**: Coq PFsection13 + textbook (13.3)/(13.9) 精読で
 tau1S(μ_col)=η_col の argument を再構成 ([[feedback-ask-chatgpt-for-elided-gaps]])、最上流 buildable field から証明。
 CharacterDegreeData の restate (未使用 δ' field drop 等) も検討。これが b の gated-endpoint でない genuine 次 frontier。
+
+### 🗺 Coq PFsection13.v proof-strategy pointer (次 iteration の build 加速用)
+
+Coq が (13.3.c)/(13.9.a) の完全な argument を持つ (CLAUDE.md: Coq コメントが行間補完)。翻訳 map:
+- **L266** `(13.3)(a)` → Lean `mu_j_isIndPC` ✅ 既 proven。
+- **L307** `(13.3)(b)` → distinguished λ の構成 (`lambda_*` field)。
+- **L326-385** `(13.3)(c)` 本体: `Let mu_tau1red b := forall j, j != 0 -> tau1 (mu_ j) = (-1)^b *: \sum_i eta_ i (signW2 b j)`
+  (L340) — これが `mu_col_tau1_eta_col_one` (13.9.a) + `mu_tau1_formula` (13.3.c) の source。証明は
+  `[forall j, tau1(mu_ j) == \sum_i eta_ i j]` の boolP case 分け (L362、b=0 uniform / b=1 は p=3 sign-flip)。
+- **L573** `o_tau1_eta : {in 'Z[calSirr], forall zeta, '[tau1 zeta, eta_ i j] = 0}` → `tau1S_induce_inner_eta` (4.1/5.3.b)。
+- **L656** `oS1eta10` (calS1 ⊥ eta10) — 補助直交。
+- **⚠ L715-720**: Coq authors が **textbook (13.3.c)/(13.6) の logical gap を埋めた**と明記
+  (「zeta^tau1 must be orthogonal to eta_01 は wrong」)。Lean 翻訳時は Coq の修正版 argument に従う (textbook 直訳不可)。
+
+**次 iteration の着手順** (上流優先): (1) `o_tau1_eta` = `tau1S_induce_inner_eta` (最も self-contained、
+coherence 直交)、(2) `mu_tau1red` = `mu_col_tau1_eta_col_one`/`mu_tau1_formula` (L342-385 の case 分けを翻訳)、
+(3) λ 構成 (13.3.b)、(4) CharacterDegreeData 全 field assemble (未使用 δ' field は restate-drop 検討)。
+tau1S = `coherent_H0Cprime_S.extension` の coherence 性質を使う (dataL coherence ではない)。
