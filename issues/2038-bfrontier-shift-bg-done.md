@@ -1921,3 +1921,17 @@ NC ≥ min」形の直接 lemma は未確認。TGapNonorthogonality (lane c) は
 無ければ (13.19.b) を「abstract field 化」して producer discharge を S16 側に置く
 (3002 パターン; field: eta_orthogonal_of_wsharp_vanish_norm_two 形 — Ŵ-消滅 ∧ ‖·‖²=2 ∧
 ℤ[Irr] → ∀ij ⊥ η)。ψ−ψ̄ の Ŵ-消滅は iter 20 部品 (Ã-局在 + tiA_PWG) の変種で証明可。
+
+## ✅ (2026-07-12、/loop iter 23) — (13.19.b) S05 エンドゲーム部品の確定
+
+`eq_smul_chiFam_diff_of_vanishOnV` (S05_SigmaTrichotomy:277) = **Coq cycTI_NC_minn/dirr
+剛性エンドゲームの既実装** ((4.8) 結論(3): X ∈ ℤ[Irr]、‖X‖²=2、X−s(χ₁−χ₂) が V-消滅 →
+X = s(χ₁−χ₂))。(13.19.b) 適用形は「Ψ = τ₁(ψ−ψ̄) が V-消滅 (Ã-局在、iter 20 部品変種) +
+‖Ψ‖² = 2 (等長 + ψ⊥ψ̄ [inner_induce_conj_eq_zero_of_frobenius_of_odd 済]) → σ係数全零 →
+Ψ ⊥ chiFam 格子 → 対偶で τ₁ψ ⊥ η」— 内部部品 (sigmaCoeff_* / grid_trichotomy /
+grid_no_constant_column / eq_smul_…_of_all_sigmaCoeff_zero) は全て S05 に在庫。
+**残 gap = hyp.eta ↔ chiFam (TICyclicHypothesis+FullDadeApplication) の橋のみ** (引き継ぎ
+(ii)): FeitThompson.lean の Section16CharacterData 供給 (tau3W = sigmaIntegral 系、3002
+keystone) が S05 の app/chiFam をどう instantiate したかを読み、(a) 直結なら (13.19.b) を
+S15 で直接証明、(b) 抽象層が厚ければ hyp に (13.19.b)-帰結 field を足して FT 側 discharge
+(3002 パターン)。次 iter = FeitThompson.lean の grid 供給部精読から。
