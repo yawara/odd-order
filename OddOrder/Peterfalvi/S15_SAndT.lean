@@ -247,6 +247,70 @@ theorem typeIBetaL_eq_tau_induce_sub [Finite G] {L : Subgroup G}
     | congr 1
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **`β_L^τ` is supported in `Ã(A(L))`**: the input `Ind_H^L 1 − φ` is `A(L)`-supported — at
+`1` the value is `e − e = 0` (`induce_apply_one` + the degree hypothesis), and off `1` its
+support lies in nontrivial kernel-conjugates (`support`s of both `Ind` terms), which land in
+`A(L)` by `H^# ⊆ A(L)` (`sharpSubgroup_H_subset_typeIA`) and the `L`-conjugation invariance of
+`A(L)` (`L_normalizes_A`).  Hence the Dade lift agrees with the (2.5) Dade map there
+(`dadeIntegralCharacterMap_apply_of_support`), which vanishes off `Ã(A(L)) = dadeSupport`
+(`IsDadeMap.map_eq_zero_of_not_mem_dadeSupport`). -/
+theorem typeIBetaL_support_subset_dadeSupport [Finite G] {L : Subgroup G}
+    (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L) (φ : ClassFunction ↥L ℂ)
+    (hφ : φ ∈ typeISetup.Sset)
+    (hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ)) :
+    (typeIBetaL typeISetup φ).support ⊆ typeISetup.dadeData.dade.dadeSupport := by
+  classical
+  set H' : Subgroup ↥L := (typeISetup.H).subgroupOf L with hH'def
+  set ι : ClassFunction ↥L ℂ :=
+    ClassFunction.induce H' (trivialClassFunction ↥H') with hιdef
+  have hsupp : (ι - φ).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (OddOrder.GroupTheory.typeIA L typeISetup.typeI) L := by
+    intro z hz
+    have hzne : (ι - φ) z ≠ 0 := hz
+    have hz1 : z ≠ 1 := by
+      rintro rfl
+      apply hzne
+      rw [ClassFunction.sub_apply, hιdef, ClassFunction.induce_apply_one,
+        trivialClassFunction_apply, mul_one, hdeg]
+      have hHeq : H' = (maxNilpotentNormalHall L).subgroupOf L := by
+        rw [hH'def]
+        show (typeISetup.typeI.typeF.H).subgroupOf L = _
+        rw [typeISetup.typeI.typeF.H_eq]
+      rw [hHeq, sub_self]
+    have hzc : z ∈ OddOrder.RepresentationTheory.ClassFunction.conjugatesInto H' := by
+      by_contra hnotc
+      apply hzne
+      rw [ClassFunction.sub_apply]
+      obtain ⟨θ, -, hφeq⟩ := hφ
+      have hφz : ClassFunction.induce ((typeISetup.typeI.typeF.H).subgroupOf L)
+          (θ : ClassFunction ↥((typeISetup.typeI.typeF.H).subgroupOf L) ℂ) z = 0 :=
+        ClassFunction.induce_eq_zero_of_not_conjugatesInto _ hnotc
+      rw [hιdef, ClassFunction.induce_eq_zero_of_not_conjugatesInto _ hnotc, hφeq, hφz,
+        sub_zero]
+    obtain ⟨c, hc⟩ := hzc
+    have hcne : c⁻¹ * z * c ≠ 1 := by
+      intro h1
+      apply hz1
+      have h2 := congrArg (fun w => c * w * c⁻¹) h1
+      simpa [mul_assoc] using h2
+    rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+    have hmem : ((c⁻¹ * z * c : ↥L) : G) ∈ sharpSubgroup typeISetup.typeI.typeF.H :=
+      ⟨Subgroup.mem_subgroupOf.mp hc, fun h1 => hcne (Subtype.ext h1)⟩
+    have hA := sharpSubgroup_H_subset_typeIA typeISetup.typeI hmem
+    have hconjA := typeISetup.dadeData.dade.L_normalizes_A c hA
+    simpa [mul_assoc] using hconjA
+  intro x hx
+  by_contra hnot
+  apply hx
+  show typeIBetaL typeISetup φ x = 0
+  rw [typeIBetaL,
+    show typeISetup.tau = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+        typeISetup.dadeData.dade
+        (typeISetup.dadeData.dade.fullDadeIsometryData typeISetup.hconj) from rfl,
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support _ _ hsupp]
+  exact (typeISetup.dadeData.dade.isDadeMap_dadeMap).map_eq_zero_of_not_mem_dadeSupport _ _ hnot
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **T-side (14.3.b) bridge character** `β_T = Ind_{QW₂}^T 1_{QW₂} − ν_{10} ∈ CF(T)` — the
 S↔T mirror of `betaGrid` (`β_S = Ind_{PW₁}^S 1 − μ_{01}`), with the grid entry `ν_{10}` in
 place of `μ_{01}`. -/
@@ -268,6 +332,29 @@ noncomputable def tauTbetaGrid [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     ((hyp.dadeHypT0 hG hT2 Tdata).fullDadeIsometryData (hyp.dadeHypT0_hconj hG hT2 Tdata))
     (betaTGridChar hyp)
 
+/-- **`A(M) ⊆ H^#` for a Frobenius type-I maximal** (with `sharpSubgroup_H_subset_typeIA`,
+equality — Coq `FTsupp_Frobenius`): an element of the type-I support `A(M)` centralizes some
+`y ∈ H^#`, and in a Frobenius group the centralizer of a nontrivial kernel element lies in the
+kernel (`IsFrobeniusGroup.centralizer_kernel_le`, Isaacs Thm 6.4). -/
+theorem typeIA_subset_sharpSubgroup_of_frobenius [Finite G] {M : Subgroup G}
+    (data : TypeIData M) {E : Subgroup ↥M}
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M (data.typeF.H.subgroupOf M) E) :
+    typeIA M data ⊆ sharpSubgroup data.typeF.H := by
+  rintro x ⟨hxM, hx1, y, hy, hxc⟩
+  have hyM : y ∈ M := data.typeF.H_le hy.1
+  have hyH' : (⟨y, hyM⟩ : ↥M) ∈ data.typeF.H.subgroupOf M := by
+    rw [Subgroup.mem_subgroupOf]
+    exact hy.1
+  have hy1' : (⟨y, hyM⟩ : ↥M) ≠ 1 := fun h => hy.2 (by
+    simpa using congrArg Subtype.val h)
+  have hxc' : (⟨x, hxM⟩ : ↥M) ∈ Subgroup.centralizer ({⟨y, hyM⟩} : Set ↥M) := by
+    rw [Subgroup.mem_centralizer_singleton_iff]
+    have hcomm := Subgroup.mem_centralizer_singleton_iff.mp hxc
+    exact Subtype.ext (by push_cast; exact hcomm)
+  have hxH' := hF.centralizer_kernel_le _ hyH' hy1' hxc'
+  rw [Subgroup.mem_subgroupOf] at hxH'
+  exact ⟨hxH', hx1⟩
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.19.a) support disjointness**: `Ã(L) ∩ (P^G ∪ W^G) = ∅` — the order of an `Ã(L)`-element
 is divisible by a prime divisor of `|H|`, and `|H|` is coprime to `p q` ((8.17.a)); `β_L^τ` is
@@ -276,8 +363,110 @@ Isolated obligation. -/
 theorem typeIBetaL_betaS_disjoint_support [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L)
-    (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ typeISetup.Sset) :
-    Disjoint (typeIBetaL typeISetup φ).support (tauSbetaGrid _hG hyp).support := sorry
+    (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ typeISetup.Sset)
+    (_hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ)) :
+    Disjoint (typeIBetaL typeISetup φ).support (tauSbetaGrid _hG hyp).support := by
+  classical
+  rw [Set.disjoint_left]
+  intro x hxL hxS
+  -- L-side: a prime `r ∣ orderOf a` (`a ∈ A(L)`) divides `orderOf x`
+  have hxD := typeIBetaL_support_subset_dadeSupport typeISetup φ _hφ _hdeg hxL
+  obtain ⟨a, haA, r, hr, hra, hrx⟩ :=
+    typeISetup.dadeData.dade.exists_mem_A_prime_dvd_orderOf_of_mem_dadeSupport hxD
+  obtain ⟨frob₀, -⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius _hG typeISetup.maximal
+    ⟨typeISetup.typeI⟩
+  have hHeq : frob₀.typeI.typeF.H = typeISetup.typeI.typeF.H :=
+    frob₀.typeI.typeF.H_eq.trans typeISetup.typeI.typeF.H_eq.symm
+  have hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L
+      ((typeISetup.typeI.typeF.H).subgroupOf L) frob₀.complement := by
+    have h := frob₀.frobenius
+    rwa [hHeq] at h
+  have haH := typeIA_subset_sharpSubgroup_of_frobenius typeISetup.typeI hfrob haA
+  have hrLF : r ∣ Nat.card ↥(maxNilpotentNormalHall L) := by
+    refine hra.trans ?_
+    have hdvd := Subgroup.orderOf_dvd_natCard typeISetup.typeI.typeF.H haH.1
+    rwa [typeISetup.typeI.typeF.H_eq] at hdvd
+  -- S-side: `orderOf x ∣ p^q · (q·p)`
+  have hbridge : tauSbetaGrid _hG hyp
+      = ClassFunction.induce hyp.S
+          (betaGrid hyp ⟨1, by have := hyp.three_le_p; omega⟩) := by
+    rw [tauSbetaGrid]
+    exact hyp.sInstance_dade0_eq_induce _hG
+      (betaGrid_A0_support _hG hyp _ (by norm_num))
+  rw [hbridge] at hxS
+  have hxc :=
+    OddOrder.RepresentationTheory.ClassFunction.support_induce_subset_conjugatesIntoSet
+      (betaGrid_support _hG hyp _ (by norm_num)) hxS
+  obtain ⟨c, hcS, hmem⟩ := hxc
+  have hordx : orderOf (c⁻¹ * x * c) = orderOf x := by
+    have hinj : orderOf ((MulAut.conj c⁻¹).toMonoidHom x) = orderOf x :=
+      orderOf_injective (MulAut.conj c⁻¹).toMonoidHom (MulEquiv.injective _) _
+    rw [← hinj]
+    congr 1
+    simp [MulAut.conj_apply, mul_assoc]
+  have hxdvd : orderOf x ∣ hyp.p ^ hyp.q * (hyp.q * hyp.p) := by
+    rcases hmem with hP | hV
+    · -- `c⁻¹xc ∈ P^#`
+      have hdvd : orderOf (c⁻¹ * x * c) ∣ Nat.card ↥hyp.P :=
+        Subgroup.orderOf_dvd_natCard hyp.P hP.1
+      rw [hordx, hyp.card_P_eq _hG hyp.Sdata_W2_eq] at hdvd
+      exact hdvd.trans (dvd_mul_right _ _)
+    · -- `c⁻¹xc` is `S`-conjugate to `w ∈ typePV ⊆ W`
+      obtain ⟨w, hw, t, htS, hconjw⟩ := hV
+      have hconjw' : t * w * t⁻¹ = c⁻¹ * x * c := hconjw
+      have hordw : orderOf (c⁻¹ * x * c) = orderOf w := by
+        rw [← hconjw']
+        have hinj : orderOf ((MulAut.conj t).toMonoidHom w) = orderOf w :=
+          orderOf_injective (MulAut.conj t).toMonoidHom (MulEquiv.injective _) _
+        rw [← hinj]
+        congr 1
+      have hwW : w ∈ hyp.W := by
+        have h1 : w ∈ hyp.Sdata.W := hw.1
+        rw [hyp.Sdata.W_eq, hyp.Sdata_W1_eq, hyp.Sdata_W2_eq] at h1
+        rwa [hyp.W_eq_join]
+      have hdvdW : orderOf w ∣ Nat.card ↥hyp.W :=
+        Subgroup.orderOf_dvd_natCard hyp.W hwW
+      have hWnorm : hyp.W1 ≤ Subgroup.normalizer (hyp.W2 : Set G) := by
+        intro v hv
+        rw [Subgroup.mem_normalizer_iff]
+        intro y
+        constructor
+        · intro hy
+          have hcomm := hyp.W1_commutes_W2 v hv y hy
+          rwa [show v * y * v⁻¹ = y by
+            rw [hcomm.eq, mul_assoc, mul_inv_cancel, mul_one]]
+        · intro hy
+          have hz := hyp.W1_commutes_W2 v hv (v * y * v⁻¹) hy
+          have h5 : v * (v * y * v⁻¹) = v * y := by
+            rw [hz.eq]
+            group
+          have h6 : v * y * v⁻¹ = y := mul_left_cancel h5
+          rwa [h6] at hy
+      have hWcard : Nat.card ↥hyp.W = hyp.q * hyp.p := by
+        rw [hyp.W_eq_join,
+          OddOrder.BG.Ch3.S12.card_sup_eq_mul_of_le_normalizer_of_disjoint hWnorm
+            hyp.W1_inf_W2_eq_bot, ← hyp.q_eq_card_W1, ← hyp.p_eq_card_W2]
+      have hxw : orderOf x = orderOf w := by rw [← hordx, hordw]
+      have hxqp : orderOf x ∣ hyp.q * hyp.p := by
+        rw [hxw, ← hWcard]
+        exact hdvdW
+      exact hxqp.trans (dvd_mul_left _ _)
+  -- a prime dividing both `|L_F|` and `p·q` contradicts (8.17.a)
+  have hrpq : r ∣ hyp.p * hyp.q := by
+    have h2 := hrx.trans hxdvd
+    rcases (Nat.Prime.dvd_mul hr).mp h2 with h3 | h3
+    · exact dvd_mul_of_dvd_left (hr.dvd_of_dvd_pow h3) _
+    · rcases (Nat.Prime.dvd_mul hr).mp h3 with h4 | h4
+      · exact dvd_mul_of_dvd_right h4 _
+      · exact dvd_mul_of_dvd_left h4 _
+  have hnconjS := not_conj_of_isTypeI_of_isTypeNonI _hG ⟨typeISetup.typeI⟩
+    hyp.S_maximal hyp.S_nonI
+  have hnconjT := not_conj_of_isTypeI_of_isTypeNonI _hG ⟨typeISetup.typeI⟩
+    hyp.T_maximal hyp.T_nonI
+  have hcop := card_LF_coprime_pq _hG hyp typeISetup.maximal ⟨typeISetup.typeI⟩
+    hnconjS hnconjT
+  have hone : r ∣ 1 := hcop ▸ Nat.dvd_gcd hrLF hrpq
+  exact hr.one_lt.ne' (Nat.dvd_one.mp hone)
 
 /-- **(13.19.b)**: `𝓛^{τ₁}` is orthogonal to the whole `η`-grid.  For `ψ ∈ 𝓛`,
 `(ψ − ψ̄)^τ` vanishes on `W ∖ (W₁ ∪ W₂)` by (13.19.a), so `NC((ψ−ψ̄)^τ) ≤ ‖ψ−ψ̄‖² = 2` and
@@ -372,6 +561,7 @@ noncomputable def typeIOrthogonalityGridData_of_typeISetup [Finite G]
       (Classical.choose (OddOrder.Peterfalvi.S15.reconciled_typePData_T _hG hyp))
     disjoint_support := typeIBetaL_betaS_disjoint_support _hG hyp typeISetup _
       (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).1
+      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).2
     betaL_eq := typeIBetaL_eq_tau_induce_sub typeISetup _
     Ltau_orthogonal_eta := tau_apply_orthogonal_eta_of_mem_Sset _hG hyp typeISetup _
       (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).1
