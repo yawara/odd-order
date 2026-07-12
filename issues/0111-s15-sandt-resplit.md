@@ -19,6 +19,14 @@ S15_SAndT をさらに触る。**active file の分割は b の作業と衝突�
 cascade が settle した後**に hub が凍結境界で実施 (mathlib 準拠 = topic leaf への追加切出し or
 prefix-split、module 名不変で下流 import 無変更)。
 
+## 更新 (2026-07-12 tick, merge a2fe7a0b)
+
+**S15_SAndT が 1869 行に成長 (1637→1869)、2000 hard 上限に接近**。同 tick で b が
+`typeI_caseC_bound_c1` を証明し **(13.19.c) 完結・S15_SAndT 実 sorry 0** に到達。⟹ b の当該 file
+frontier が settle に近づいた可能性。**次の hub 判断**: (i) 2000 超で split 必須化、または
+(ii) b の 2038 が S15_SAndT 非接触フェーズ (assembly/別 file) に移ったら split 着手。b が引き続き
+S15_SAndT を触るなら deferred 継続。hub は毎 tick の size watch で 2000 接近を監視。
+
 ## やること
 
 - [ ] b の (13.19.c) cascade (2038、c1 bound + assembly) が landing し S15_SAndT が凍結したら着手
