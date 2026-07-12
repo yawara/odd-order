@@ -586,6 +586,26 @@ theorem Hypothesis.dadeHypS0_hconj [Fintype G] [Finite G]
     (hyp.dadeHypS0 hG).HConjInvariant :=
   (dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.S_maximal hyp.S_typeP2 hyp.Sdata).some.hconj
 
+/-- **`T`-instance `'A0`-Dade hypothesis** (the S↔T mirror of `dadeHypS0`): the honest
+`A₀(T) = A(T) ∪ (V_T)^T` Dade datum for `T`, from the generic type-`P₂` construction
+`dadeSupportHypothesisData_honestTypeP2A0Set` at `T`.  Unlike the `S`-side (where `IsTypeP2 S`
+is the carrier field `hyp.S_typeP2`), `IsTypeP2 T` is a **(14.9) conclusion** (`IsTypeII T`,
+via the BG type dictionary), so it is taken as a parameter together with a `T`-side reconciled
+`TypePData` (supplied by `reconciled_typePData_T`).  This is the `τ_T` underlying the (14.3.b)
+bridge image `τ_T(β_T)` (`tauTbetaGrid`). -/
+noncomputable def Hypothesis.dadeHypT0 [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T) (Tdata : TypePData hyp.T) :
+    OddOrder.Peterfalvi.S04.Hypothesis G (honestTypeP2A0Set hyp.T Tdata) hyp.T :=
+  (dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.T_maximal hT2 Tdata).some.dade
+
+/-- **`T`-instance `'A0`-Dade `H`-conjugation invariance** (mirror of `dadeHypS0_hconj`). -/
+theorem Hypothesis.dadeHypT0_hconj [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T) (Tdata : TypePData hyp.T) :
+    (hyp.dadeHypT0 hG hT2 Tdata).HConjInvariant :=
+  (dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.T_maximal hT2 Tdata).some.hconj
+
 /-- **`dadeHypS0.H a = ftSupportKernel S (A₀(S)) a`** (A₀ analogue of `dadeHypS_H_eq_ftSupportKernel`).
 The `'A0(S)`-instance Dade stabilizer at a support point `a` is the faithful (8.14) signalizer kernel
 `R(a) = ftSupportKernel S (A₀(S)) a`, read off the `H_eq_ftSupportKernel` field of the underlying

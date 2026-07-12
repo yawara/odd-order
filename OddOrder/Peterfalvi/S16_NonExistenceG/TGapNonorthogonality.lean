@@ -922,4 +922,632 @@ theorem Hypothesis.exists_coherent_extension_h114_of_grid_orthogonal [Finite G]
         hyp.SHC_swap_conj hG hodd hζS hζirr hζ1 htwo hχS hχirr hχ1),
       hyp.SHC_swap_grid_h114 hG hodd hζS hζirr hζ1 htwo grid h2⟩
 
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (11.8.2), arbitrary-grid residual identification.**
+The Parseval decomposition and coefficient bound are independent of sigma.
+Only the norm-two residual classifier is grid-specific, so it is exposed as
+`hclassify`; this is the exact input supplied by a concrete sigma-isometry. -/
+theorem Hypothesis.SHC_residual_eq_grid_diff [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
+    (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M)
+    (hζirr : IsIrreducibleCharacter ζ) (hζ1 : ζ 1 = (hyp.w1 : ℂ))
+    {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ))
+    (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ)
+    (hδj : hyp.muColumnSign hG hodd j = δ)
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1)
+    (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hδpm : δ = 1 ∨ δ = -1) (hn2 : 2 ≤ n)
+    {R : Finset (ClassFunction G ℂ)} (hRn : R.card = n)
+    (hZ : ∀ β ∈ R, β ∈ ZIrr G)
+    (horth : ∀ α ∈ R, ∀ β ∈ R,
+      ClassFunction.inner α β = if α = β then (1 : ℂ) else 0)
+    (hRmem : ∀ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M →
+      IsIrreducibleCharacter φ → φ 1 = (hyp.w1 : ℂ) → coh.extension φ ∈ R)
+    (hRrev : ∀ β ∈ R, ∃ φ : ClassFunction ↥M ℂ,
+      φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+        φ 1 = (hyp.w1 : ℂ) ∧ β = coh.extension φ)
+    (grid : Fin hyp.w1 → Fin hyp.w2 → ClassFunction G ℂ)
+    (hclassify : ∀ {Y : ClassFunction G ℂ}, Y ∈ ZIrr G →
+      ClassFunction.inner Y Y = 2 →
+      (∀ v ∈ typePV M hyp.typeP,
+        Y v = hyp.tau
+          (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 -
+            (n : ℂ) • ζ) v) →
+      Y = (δ : ℂ) • (grid i j - grid i 0)) :
+    ∃ (a : ℤ) (Y : ClassFunction G ℂ),
+      (a = 0 ∨ a = 1 ∨ a = 2) ∧
+      ClassFunction.inner
+        (hyp.tau (hyp.muGrid hG hodd i j -
+          (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+        (coh.extension ζ) = (a : ℂ) - (n : ℂ) ∧
+      ((a = 0 ∨ a = 2) → Y = (δ : ℂ) • (grid i j - grid i 0)) ∧
+      hyp.tau (hyp.muGrid hG hodd i j -
+          (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ) =
+        Y - (n : ℂ) • coh.extension ζ + (a : ℂ) • ∑ β ∈ R, β := by
+  obtain ⟨a, Y, hbound, _, hinner, _, hnorm2case, hYZ, hYV, hdecomp⟩ :=
+    hyp.muGridAlpha_tau_residual_norm hG coh hodd i hj0 hζS hζirr hζ1
+      hdeg hμ0 hnf hδj hdζ h0ζ hδpm hn2 hRn hZ horth hRmem hRrev
+  exact ⟨a, Y, hbound, hinner,
+    fun ha02 => hclassify hYZ (hnorm2case ha02) hYV, hdecomp⟩
+
+open scoped FiniteInduce in
+/-- A row difference in an orthonormal grid pairs to `-1` with the zero-column sum. -/
+theorem grid_diff_inner_zeroColumnSum [Finite G] {w1 w2 : ℕ} [NeZero w2]
+    (grid : Fin w1 → Fin w2 → ClassFunction G ℂ)
+    (hgridInner : ∀ i j i' j',
+      ClassFunction.inner (grid i j) (grid i' j') =
+        if i = i' ∧ j = j' then 1 else 0)
+    (i : Fin w1) {j : Fin w2} (hj0 : j ≠ 0) :
+    ClassFunction.inner (grid i j - grid i 0)
+      (∑ r : Fin w1, grid r 0) = -1 := by
+  classical
+  rw [ClassFunction.inner_sub_left,
+    OddOrder.RepresentationTheory.inner_sum_right,
+    OddOrder.RepresentationTheory.inner_sum_right]
+  have h1 : ∀ r : Fin w1, ClassFunction.inner (grid i j) (grid r 0) = 0 :=
+    fun r => by
+      rw [hgridInner i j r 0, if_neg]
+      rintro ⟨_, h⟩
+      exact hj0 h
+  have h2 : ∀ r : Fin w1,
+      ClassFunction.inner (grid i 0) (grid r 0) =
+        if i = r then (1 : ℂ) else 0 := fun r => by
+    rw [hgridInner i 0 r 0]
+    simp
+  rw [Finset.sum_congr rfl (fun r _ => h1 r),
+    Finset.sum_congr rfl (fun r _ => h2 r), Finset.sum_const_zero,
+    Finset.sum_ite_eq, if_pos (Finset.mem_univ i)]
+  ring
+
+open scoped FiniteInduce in
+/-- The sum of a coherent image family is orthogonal to an arbitrary grid's zero column
+whenever each family member is. -/
+theorem Hypothesis.R_sum_inner_grid_zeroColumnSum [Finite G] {M : Subgroup G}
+    (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
+    {R : Finset (ClassFunction G ℂ)}
+    (hRrev : ∀ β ∈ R, ∃ φ : ClassFunction ↥M ℂ,
+      φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+        φ 1 = (hyp.w1 : ℂ) ∧ β = coh.extension φ)
+    (grid : Fin hyp.w1 → Fin hyp.w2 → ClassFunction G ℂ)
+    (hext : ∀ {φ : ClassFunction ↥M ℂ}, φ ∈ inducedFamily M →
+      IsIrreducibleCharacter φ → φ 1 = (hyp.w1 : ℂ) →
+      ClassFunction.inner (coh.extension φ) (∑ r : Fin hyp.w1, grid r 0) = 0) :
+    ClassFunction.inner (∑ β ∈ R, β) (∑ r : Fin hyp.w1, grid r 0) = 0 := by
+  rw [inner_sum_left]
+  refine Finset.sum_eq_zero fun β hβR => ?_
+  obtain ⟨φ, hφS, hφirr, hφ1, rfl⟩ := hRrev β hβR
+  exact hext hφS hφirr hφ1
+
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (11.8.5), arbitrary-grid conditional coefficient vanishing.**
+Given the grid-parametric (11.8.2) residual classifier and h114 identity,
+the two-way inner-product computation forces every even coefficient `a` to vanish. -/
+theorem Hypothesis.charParam_a_eq_zero_of_grid_residualEq [Finite G]
+    {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
+    (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M)
+    (hζirr : IsIrreducibleCharacter ζ) (hζ1 : ζ 1 = (hyp.w1 : ℂ))
+    {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ))
+    (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ)
+    (hδj : hyp.muColumnSign hG hodd j = δ)
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1)
+    (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hδpm : δ = 1 ∨ δ = -1) (hn2 : 2 ≤ n)
+    {R : Finset (ClassFunction G ℂ)} (hRn : R.card = n)
+    (hZ : ∀ β ∈ R, β ∈ ZIrr G)
+    (horth : ∀ α ∈ R, ∀ β ∈ R,
+      ClassFunction.inner α β = if α = β then (1 : ℂ) else 0)
+    (hRmem : ∀ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M →
+      IsIrreducibleCharacter φ → φ 1 = (hyp.w1 : ℂ) → coh.extension φ ∈ R)
+    (hRrev : ∀ β ∈ R, ∃ φ : ClassFunction ↥M ℂ,
+      φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+        φ 1 = (hyp.w1 : ℂ) ∧ β = coh.extension φ)
+    (grid : Fin hyp.w1 → Fin hyp.w2 → ClassFunction G ℂ)
+    (hgridInner : ∀ i j i' j',
+      ClassFunction.inner (grid i j) (grid i' j') =
+        if i = i' ∧ j = j' then 1 else 0)
+    (hgridExtensionOrth : ∀ {φ : ClassFunction ↥M ℂ},
+      φ ∈ inducedFamily M → IsIrreducibleCharacter φ →
+      φ 1 = (hyp.w1 : ℂ) →
+      ClassFunction.inner (coh.extension φ) (∑ r : Fin hyp.w1, grid r 0) = 0)
+    (hclassify : ∀ {Y : ClassFunction G ℂ}, Y ∈ ZIrr G →
+      ClassFunction.inner Y Y = 2 →
+      (∀ v ∈ typePV M hyp.typeP,
+        Y v = hyp.tau
+          (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 -
+            (n : ℂ) • ζ) v) →
+      Y = (δ : ℂ) • (grid i j - grid i 0))
+    (h114 : hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ) =
+      (∑ r : Fin hyp.w1, grid r 0) - coh.extension ζ) :
+    ∃ a : ℤ, (a = 0 ∨ a = 1 ∨ a = 2) ∧
+      ClassFunction.inner
+        (hyp.tau (hyp.muGrid hG hodd i j -
+          (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+        (coh.extension ζ) = (a : ℂ) - (n : ℂ) ∧
+      (Even a → a = 0) := by
+  obtain ⟨a, Y, hbound, hinner, hYeq, hdecomp⟩ :=
+    hyp.SHC_residual_eq_grid_diff hG coh hodd i hj0 hζS hζirr hζ1
+      hdeg hμ0 hnf hδj hdζ h0ζ hδpm hn2 hRn hZ horth hRmem hRrev grid hclassify
+  refine ⟨a, hbound, hinner, ?_⟩
+  intro heven
+  have ha02 : a = 0 ∨ a = 2 := by
+    rcases hbound with h | h | h
+    · exact Or.inl h
+    · obtain ⟨k, hk⟩ := heven
+      omega
+    · exact Or.inr h
+  have hYd := hYeq ha02
+  have htrans := hyp.muGridAlpha_tau_inner_zeroColumnSum_sub_zeta
+    hG hodd i hj0 hζS hζirr hζ1 hdeg hμ0 hnf hδj hdζ h0ζ
+  rw [h114] at htrans
+  have hαgrid : ClassFunction.inner
+      (hyp.tau (hyp.muGrid hG hodd i j -
+        (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+      (∑ r : Fin hyp.w1, grid r 0) = -(δ : ℂ) := by
+    rw [hdecomp, hYd]
+    simp only [ClassFunction.inner_add_left, ClassFunction.inner_sub_left,
+      ClassFunction.inner_smul_left,
+      grid_diff_inner_zeroColumnSum grid hgridInner i hj0,
+      hgridExtensionOrth hζS hζirr hζ1,
+      hyp.R_sum_inner_grid_zeroColumnSum coh hRrev grid hgridExtensionOrth]
+    ring
+  rw [ClassFunction.inner_sub_right, hαgrid, hinner] at htrans
+  have ha0 : (a : ℂ) = 0 := by
+    linear_combination -htrans
+  exact_mod_cast ha0
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (11.8.2), arbitrary-grid regular-value pin.**
+The S12 Dade image already equals the canonical aligned sigma-grid difference
+on `typePV`.  Consequently it equals any other grid difference whose two
+entries have the same values there.  This deliberately asks only for
+regular-set value alignment, not a false global uniqueness/equality of sigma
+isometries. -/
+theorem Hypothesis.tau_muGridAlpha_apply_eq_of_grid_value_alignment [Finite G]
+    {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) {i : Fin hyp.w1} {j : Fin hyp.w2}
+    (hj : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M)
+    {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ))
+    (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ))
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ)
+    (hδj : hyp.muColumnSign hG hodd j = δ)
+    (grid : Fin hyp.w1 → Fin hyp.w2 → ClassFunction G ℂ)
+    (halign : ∀ k : Fin hyp.w2, ∀ {v : G}, v ∈ typePV M hyp.typeP →
+      hyp.alignedOmegaSigmaGrid hG hodd i k v = grid i k v) :
+    ∀ v ∈ typePV M hyp.typeP,
+      hyp.tau (hyp.muGrid hG hodd i j -
+          (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ) v =
+        ((δ : ℂ) • (grid i j - grid i 0)) v := by
+  intro v hv
+  rw [hyp.tau_muGridAlpha_apply_eq_on_typePV hG hodd hj hζS
+    hdeg hμ0 hζ1 hnf hδj hv, ClassFunction.smul_apply,
+    ClassFunction.sub_apply, halign j hv, halign 0 hv,
+    ← ClassFunction.sub_apply, ← ClassFunction.smul_apply]
+
 end OddOrder.Peterfalvi.S12
+
+namespace OddOrder.Peterfalvi.S16
+
+open OddOrder.GroupTheory
+open OddOrder.RepresentationTheory
+
+variable {G : Type*} [Group G]
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (3.8)/(11.8.2), eta residual classifier from regular values.**
+Suppose the regular set of a type-P datum is the shared S15 regular set.  If a
+norm-two virtual character agrees there with a signed eta row difference, then
+it equals that difference globally.  Class-function invariance upgrades the
+pointwise type-P equality to the conjugacy saturation consumed by
+`eta_diff_rigidity`.
+
+This is the concrete eta implementation of the `hclassify` input in
+`S12.Hypothesis.SHC_residual_eq_grid_diff`; only the source's regular-value pin
+remains for a particular T-side alpha. -/
+theorem eta_diff_classifier_of_typePV_value [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    {M : Subgroup G} (data : TypePData M)
+    (hV : typePV M data =
+      (base.W : Set G) \ ((base.W1 : Set G) ∪ (base.W2 : Set G)))
+    (i0 : Fin base.q) {j1 j2 : Fin base.p} (hj : j1 ≠ j2)
+    {s : ℤ} (hs : s = 1 ∨ s = -1)
+    {source : ClassFunction G ℂ}
+    (hsource : ∀ v ∈ typePV M data,
+      source v = ((s : ℂ) • (base.eta i0 j1 - base.eta i0 j2)) v) :
+    ∀ {Y : ClassFunction G ℂ}, Y ∈ ZIrr G →
+      ClassFunction.inner Y Y = 2 →
+      (∀ v ∈ typePV M data, Y v = source v) →
+      Y = (s : ℂ) • (base.eta i0 j1 - base.eta i0 j2) := by
+  intro Y hYZ hY2 hYsource
+  apply eta_diff_rigidity base hYZ hY2 i0 hj hs
+  intro x hx
+  obtain ⟨w, hw, g, hg⟩ := hx
+  have hconj : IsConj w x := isConj_iff.mpr ⟨g, hg⟩
+  have hwV : w ∈ typePV M data := hV.symm ▸ hw
+  rw [ClassFunction.sub_apply,
+    ← Y.of_isConj hconj,
+    ← (((s : ℂ) • (base.eta i0 j1 - base.eta i0 j2)).of_isConj hconj),
+    hYsource w hwV, hsource w hwV, sub_self]
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (3.8), eta column-difference rigidity.**
+This is the transposed dual of `eta_diff_rigidity`: a norm-two virtual
+character agreeing with `s * (eta i1 j0 - eta i2 j0)` on the shared regular
+set equals that column difference globally.  The abstract grid-rigidity engine
+already permits arbitrary distinct grid points; only the (3.7) separability
+assembly is repeated here. -/
+theorem eta_column_diff_rigidity [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    {X : ClassFunction G ℂ} (hXZ : X ∈ ZIrr G)
+    (hX2 : ClassFunction.inner X X = 2)
+    {i1 i2 : Fin base.q} (hi : i1 ≠ i2) (j0 : Fin base.p)
+    {s : ℤ} (hs : s = 1 ∨ s = -1)
+    (hvanish : ∀ x ∈ conjClassSet
+      ((base.W : Set G) \ ((base.W1 : Set G) ∪ (base.W2 : Set G))),
+      (X - (s : ℂ) • (base.eta i1 j0 - base.eta i2 j0)) x = 0) :
+    X = (s : ℂ) • (base.eta i1 j0 - base.eta i2 j0) := by
+  classical
+  have hcardq : Nat.card (Fin base.q) = base.q :=
+    Nat.card_eq_fintype_card.trans (Fintype.card_fin _)
+  have hcardp : Nat.card (Fin base.p) = base.p :=
+    Nat.card_eq_fintype_card.trans (Fintype.card_fin _)
+  have hsep : ∀ (i i' : Fin base.q) (j j' : Fin base.p),
+      ClassFunction.inner
+          (X - (s : ℂ) • (base.eta i1 j0 - base.eta i2 j0))
+          (base.eta i j) +
+        ClassFunction.inner
+          (X - (s : ℂ) • (base.eta i1 j0 - base.eta i2 j0))
+          (base.eta i' j') =
+      ClassFunction.inner
+          (X - (s : ℂ) • (base.eta i1 j0 - base.eta i2 j0))
+          (base.eta i j') +
+        ClassFunction.inner
+          (X - (s : ℂ) • (base.eta i1 j0 - base.eta i2 j0))
+          (base.eta i' j) := by
+    intro i i' j j'
+    have h1 := inner_eta_grid_relation base hvanish i j
+    have h2 := inner_eta_grid_relation base hvanish i' j'
+    have h3 := inner_eta_grid_relation base hvanish i j'
+    have h4 := inner_eta_grid_relation base hvanish i' j
+    linear_combination h1 + h2 - h3 - h4
+  have hmain := OddOrder.Peterfalvi.S05.orthonormalGrid_diff_rigidity
+    (fun pq : Fin base.q × Fin base.p => base.eta pq.1 pq.2)
+    (fun pq => eta_mem_ZIrr base pq.1 pq.2)
+    (fun a => by simpa using eta_orthonormal base a.1 a.1 a.2 a.2)
+    (fun a b hab => by
+      rw [eta_orthonormal base a.1 b.1 a.2 b.2, if_neg]
+      rintro ⟨h1, h2⟩
+      exact hab (Prod.ext h1 h2))
+    (by rw [hcardq]; exact base.three_le_q)
+    (by rw [hcardp]; exact base.three_le_p)
+    (by rw [hcardq]; exact base.q_odd)
+    (by rw [hcardp]; exact base.p_odd)
+    (by
+      rw [hcardq, hcardp]
+      exact (Nat.coprime_primes base.q_prime base.p_prime).mpr
+        (Ne.symm base.p_ne_q))
+    hXZ hX2 (P1 := (i1, j0)) (P2 := (i2, j0))
+    (by intro h; exact hi (Prod.ext_iff.mp h).1) hs hsep
+  simpa using hmain
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (3.8)/(11.8.2), transposed eta classifier from regular values.**
+The type-P regular-value bridge specialized to an eta column difference, the
+orientation required by the T-side transposition in (11.8). -/
+theorem eta_column_diff_classifier_of_typePV_value [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    {M : Subgroup G} (data : TypePData M)
+    (hV : typePV M data =
+      (base.W : Set G) \ ((base.W1 : Set G) ∪ (base.W2 : Set G)))
+    {i1 i2 : Fin base.q} (hi : i1 ≠ i2) (j0 : Fin base.p)
+    {s : ℤ} (hs : s = 1 ∨ s = -1)
+    {source : ClassFunction G ℂ}
+    (hsource : ∀ v ∈ typePV M data,
+      source v = ((s : ℂ) • (base.eta i1 j0 - base.eta i2 j0)) v) :
+    ∀ {Y : ClassFunction G ℂ}, Y ∈ ZIrr G →
+      ClassFunction.inner Y Y = 2 →
+      (∀ v ∈ typePV M data, Y v = source v) →
+      Y = (s : ℂ) • (base.eta i1 j0 - base.eta i2 j0) := by
+  intro Y hYZ hY2 hYsource
+  apply eta_column_diff_rigidity base hYZ hY2 hi j0 hs
+  intro x hx
+  obtain ⟨w, hw, g, hg⟩ := hx
+  have hconj : IsConj w x := isConj_iff.mpr ⟨g, hg⟩
+  have hwV : w ∈ typePV M data := hV.symm ▸ hw
+  rw [ClassFunction.sub_apply, ← Y.of_isConj hconj,
+    ← (((s : ℂ) • (base.eta i1 j0 - base.eta i2 j0)).of_isConj hconj),
+    hYsource w hwV, hsource w hwV, sub_self]
+
+/-- The multiplicative character underlying an abstract S15 omega-grid entry.
+Nonvanishing follows from multiplicativity and `omega i j 1 = 1`. -/
+noncomputable def omegaMonoidHom
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    (i : Fin base.q) (j : Fin base.p) : ↥base.W →* ℂˣ where
+  toFun w := Units.mk0 (base.omega i j w) (by
+    intro hz
+    have hmul := base.omega_mul i j w w⁻¹
+    rw [mul_inv_cancel, base.omega_apply_one, hz, zero_mul] at hmul
+    exact zero_ne_one hmul.symm)
+  map_one' := Units.ext (base.omega_apply_one i j)
+  map_mul' x y := Units.ext (base.omega_mul i j x y)
+
+/-- The underlying omega-grid character has the original class-function value. -/
+theorem omegaMonoidHom_coe
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    (i : Fin base.q) (j : Fin base.p) (w : ↥base.W) :
+    ((omegaMonoidHom base i j w : ℂˣ) : ℂ) = base.omega i j w := rfl
+
+/-- Two linear characters of `W = W₁ ⊔ W₂` are equal when their restrictions
+to both factors are equal.  This is the factorwise extensionality used to
+recover the two coordinate axes of the abstract omega-grid. -/
+theorem monoidHom_eq_of_eq_on_W1_W2 [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    {f g : ↥base.W →* ℂˣ}
+    (hW1 : ∀ x : ↥(base.W1.subgroupOf base.W), f x = g x)
+    (hW2 : ∀ y : ↥(base.W2.subgroupOf base.W), f y = g y) :
+    f = g := by
+  letI := base.W_cyclic
+  letI : CommGroup ↥base.W := IsCyclic.commGroup
+  have hW1le : base.W1 ≤ base.W := by
+    rw [base.W_eq_join]
+    exact le_sup_left
+  have hW2le : base.W2 ≤ base.W := by
+    rw [base.W_eq_join]
+    exact le_sup_right
+  ext w
+  have hw : w ∈ (base.W1.subgroupOf base.W) ⊔
+      (base.W2.subgroupOf base.W) := by
+    rw [← Subgroup.subgroupOf_sup hW1le hW2le, ← base.W_eq_join,
+      Subgroup.subgroupOf_self]
+    exact Subgroup.mem_top w
+  obtain ⟨x, hx, y, hy, hxy⟩ := Subgroup.mem_sup.mp hw
+  rw [← hxy, map_mul, map_mul, hW1 ⟨x, hx⟩, hW2 ⟨y, hy⟩]
+
+/-- Restriction of the column-zero omega character `omega i 0` to `W₁`. -/
+noncomputable def omegaW1Restriction
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    (i : Fin base.q) : ↥(base.W1.subgroupOf base.W) →* ℂˣ :=
+  (omegaMonoidHom base i ⟨0, base.p_prime.pos⟩).comp
+    (base.W1.subgroupOf base.W).subtype
+
+/-- Restriction of the row-zero omega character `omega 0 j` to `W₂`. -/
+noncomputable def omegaW2Restriction
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    (j : Fin base.p) : ↥(base.W2.subgroupOf base.W) →* ℂˣ :=
+  (omegaMonoidHom base ⟨0, base.q_prime.pos⟩ j).comp
+    (base.W2.subgroupOf base.W).subtype
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (3.3), abstract omega-grid exhaustion.**
+The `q*p` multiplicative characters underlying the S15 omega-grid are
+pairwise distinct by orthonormality.  Since the cyclic group `W` has order
+`p*q`, its complex linear-character group has the same cardinality; hence the
+grid enumerates every `W →* ℂˣ` character. -/
+theorem omegaMonoidHom_bijective [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+    Function.Bijective
+      (fun ij : Fin base.q × Fin base.p => omegaMonoidHom base ij.1 ij.2) := by
+  classical
+  have hinj : Function.Injective
+      (fun ij : Fin base.q × Fin base.p => omegaMonoidHom base ij.1 ij.2) := by
+    intro ⟨i, j⟩ ⟨k, l⟩ hhom
+    have hcf : base.omega i j = base.omega k l := by
+      ext w
+      have hw := DFunLike.congr_fun hhom w
+      exact congrArg (fun z : ℂˣ => (z : ℂ)) hw
+    by_contra hne
+    have h1 := eta_orthonormal base i k j l
+    rw [base.eta_eq_tau_omega, base.eta_eq_tau_omega,
+      base.tau3_isometry.inner_eq, hcf] at h1
+    have h2 := base.omega_orthonormal k k l l
+    have hcond : ¬ (i = k ∧ j = l) := fun ⟨hi, hj⟩ => hne (by rw [hi, hj])
+    rw [if_neg hcond] at h1
+    rw [if_pos (⟨rfl, rfl⟩ : k = k ∧ l = l)] at h2
+    exact zero_ne_one (h1.symm.trans h2)
+  haveI : Fintype (↥base.W →* ℂˣ) := Fintype.ofFinite _
+  haveI : IsCyclic ↥base.W := base.W_cyclic
+  letI : CommGroup ↥base.W := IsCyclic.commGroup
+  haveI : NeZero (Monoid.exponent ↥base.W) :=
+    ⟨Monoid.exponent_ne_zero_of_finite⟩
+  haveI : NeZero ((Monoid.exponent ↥base.W : ℂ)) :=
+    ⟨Nat.cast_ne_zero.2 (NeZero.ne _)⟩
+  have hcardHomNat : Nat.card (↥base.W →* ℂˣ) = base.q * base.p := by
+    rw [CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity ↥base.W ℂ,
+      OddOrder.Peterfalvi.S15.card_W_eq_pq base, Nat.mul_comm]
+  have hcardHom : Fintype.card (↥base.W →* ℂˣ) = base.q * base.p := by
+    rw [← Nat.card_eq_fintype_card]
+    exact hcardHomNat
+  exact (Fintype.bijective_iff_injective_and_card _).mpr
+    ⟨hinj, by simp [hcardHom]⟩
+
+/-- Distinct column-zero omega characters remain distinct on `W₁`; on the
+other factor they are all trivial. -/
+theorem omegaW1Restriction_injective [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+    Function.Injective (omegaW1Restriction base) := by
+  intro i k hik
+  have hhom : omegaMonoidHom base i ⟨0, base.p_prime.pos⟩ =
+      omegaMonoidHom base k ⟨0, base.p_prime.pos⟩ := by
+    apply monoidHom_eq_of_eq_on_W1_W2 base
+    · intro x
+      exact DFunLike.congr_fun hik x
+    · intro y
+      apply Units.ext
+      rw [omegaMonoidHom_coe, omegaMonoidHom_coe,
+        base.omega_col_zero_apply_of_mem_W2 i y
+          (Subgroup.mem_subgroupOf.mp y.property),
+        base.omega_col_zero_apply_of_mem_W2 k y
+          (Subgroup.mem_subgroupOf.mp y.property)]
+  have hp : ((i, ⟨0, base.p_prime.pos⟩) : Fin base.q × Fin base.p) =
+      (k, ⟨0, base.p_prime.pos⟩) :=
+    (omegaMonoidHom_bijective base).injective hhom
+  exact congrArg Prod.fst hp
+
+/-- Distinct row-zero omega characters remain distinct on `W₂`; on the
+other factor they are all trivial. -/
+theorem omegaW2Restriction_injective [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+    Function.Injective (omegaW2Restriction base) := by
+  intro j l hjl
+  have hhom : omegaMonoidHom base ⟨0, base.q_prime.pos⟩ j =
+      omegaMonoidHom base ⟨0, base.q_prime.pos⟩ l := by
+    apply monoidHom_eq_of_eq_on_W1_W2 base
+    · intro x
+      apply Units.ext
+      rw [omegaMonoidHom_coe, omegaMonoidHom_coe,
+        base.omega_row_zero_apply_of_mem_W1 j x
+          (Subgroup.mem_subgroupOf.mp x.property),
+        base.omega_row_zero_apply_of_mem_W1 l x
+          (Subgroup.mem_subgroupOf.mp x.property)]
+    · intro y
+      exact DFunLike.congr_fun hjl y
+  have hp : ((⟨0, base.q_prime.pos⟩, j) : Fin base.q × Fin base.p) =
+      (⟨0, base.q_prime.pos⟩, l) :=
+    (omegaMonoidHom_bijective base).injective hhom
+  exact congrArg Prod.snd hp
+
+open scoped Classical in
+/-- **Peterfalvi (3.3), `W₁` axis exhaustion.**  The column-zero omega
+characters restrict bijectively to all complex linear characters of `W₁`.
+The injectivity is factorwise rigidity; surjectivity follows because both
+sides have cardinality `q`. -/
+theorem omegaW1Restriction_bijective [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+    Function.Bijective (omegaW1Restriction base) := by
+  classical
+  have hinj := omegaW1Restriction_injective base
+  have hW1le : base.W1 ≤ base.W := by
+    rw [base.W_eq_join]
+    exact le_sup_left
+  haveI : IsCyclic ↥base.W := base.W_cyclic
+  letI : CommGroup ↥base.W := IsCyclic.commGroup
+  haveI : Fintype (↥(base.W1.subgroupOf base.W) →* ℂˣ) := Fintype.ofFinite _
+  haveI : NeZero (Monoid.exponent ↥(base.W1.subgroupOf base.W)) :=
+    ⟨Monoid.exponent_ne_zero_of_finite⟩
+  haveI : NeZero ((Monoid.exponent ↥(base.W1.subgroupOf base.W) : ℂ)) :=
+    ⟨Nat.cast_ne_zero.2 (NeZero.ne _)⟩
+  have hcardHomNat :
+      Nat.card (↥(base.W1.subgroupOf base.W) →* ℂˣ) = base.q := by
+    rw [CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity
+      ↥(base.W1.subgroupOf base.W) ℂ,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv,
+      ← base.q_eq_card_W1]
+  have hcardHom :
+      Fintype.card (↥(base.W1.subgroupOf base.W) →* ℂˣ) = base.q := by
+    rw [← Nat.card_eq_fintype_card]
+    exact hcardHomNat
+  exact (Fintype.bijective_iff_injective_and_card _).mpr
+    ⟨hinj, by simp [hcardHom]⟩
+
+open scoped Classical in
+/-- **Peterfalvi (3.3), `W₂` axis exhaustion.**  The row-zero omega
+characters restrict bijectively to all complex linear characters of `W₂`.
+The injectivity is factorwise rigidity; surjectivity follows because both
+sides have cardinality `p`. -/
+theorem omegaW2Restriction_bijective [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+    Function.Bijective (omegaW2Restriction base) := by
+  classical
+  have hinj := omegaW2Restriction_injective base
+  have hW2le : base.W2 ≤ base.W := by
+    rw [base.W_eq_join]
+    exact le_sup_right
+  haveI : IsCyclic ↥base.W := base.W_cyclic
+  letI : CommGroup ↥base.W := IsCyclic.commGroup
+  haveI : Fintype (↥(base.W2.subgroupOf base.W) →* ℂˣ) := Fintype.ofFinite _
+  haveI : NeZero (Monoid.exponent ↥(base.W2.subgroupOf base.W)) :=
+    ⟨Monoid.exponent_ne_zero_of_finite⟩
+  haveI : NeZero ((Monoid.exponent ↥(base.W2.subgroupOf base.W) : ℂ)) :=
+    ⟨Nat.cast_ne_zero.2 (NeZero.ne _)⟩
+  have hcardHomNat :
+      Nat.card (↥(base.W2.subgroupOf base.W) →* ℂˣ) = base.p := by
+    rw [CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity
+      ↥(base.W2.subgroupOf base.W) ℂ,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv,
+      ← base.p_eq_card_W2]
+  have hcardHom :
+      Fintype.card (↥(base.W2.subgroupOf base.W) →* ℂˣ) = base.p := by
+    rw [← Nat.card_eq_fintype_card]
+    exact hcardHomNat
+  exact (Fintype.bijective_iff_injective_and_card _).mpr
+    ⟨hinj, by simp [hcardHom]⟩
+
+/-- The zero-column indices as an explicit enumeration of `W₁`'s linear
+characters. -/
+noncomputable def omegaW1RestrictionEquiv [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+    Fin base.q ≃ (↥(base.W1.subgroupOf base.W) →* ℂˣ) :=
+  Equiv.ofBijective (omegaW1Restriction base)
+    (omegaW1Restriction_bijective base)
+
+/-- The zero-row indices as an explicit enumeration of `W₂`'s linear
+characters. -/
+noncomputable def omegaW2RestrictionEquiv [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+    Fin base.p ≃ (↥(base.W2.subgroupOf base.W) →* ℂˣ) :=
+  Equiv.ofBijective (omegaW2Restriction base)
+    (omegaW2Restriction_bijective base)
+
+/-- The zero index on the `W₁` axis is the trivial linear character. -/
+theorem omegaW1Restriction_zero [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+  omegaW1Restriction base ⟨0, base.q_prime.pos⟩ = 1 := by
+  ext x
+  change base.omega ⟨0, base.q_prime.pos⟩ ⟨0, base.p_prime.pos⟩ x = 1
+  exact base.omega_row_zero_apply_of_mem_W1 ⟨0, base.p_prime.pos⟩ x
+    (Subgroup.mem_subgroupOf.mp x.property)
+
+/-- The zero index on the `W₂` axis is the trivial linear character. -/
+theorem omegaW2Restriction_zero [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+  omegaW2Restriction base ⟨0, base.p_prime.pos⟩ = 1 := by
+  ext y
+  change base.omega ⟨0, base.q_prime.pos⟩ ⟨0, base.p_prime.pos⟩ y = 1
+  exact base.omega_col_zero_apply_of_mem_W2 ⟨0, base.q_prime.pos⟩ y
+    (Subgroup.mem_subgroupOf.mp y.property)
+
+/-- The inverse `W₁`-axis enumeration sends the trivial character back to
+the distinguished zero index. -/
+theorem omegaW1RestrictionEquiv_symm_one [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+    (omegaW1RestrictionEquiv base).symm 1 = ⟨0, base.q_prime.pos⟩ := by
+  apply (omegaW1RestrictionEquiv base).injective
+  rw [Equiv.apply_symm_apply]
+  change 1 = omegaW1Restriction base ⟨0, base.q_prime.pos⟩
+  exact (omegaW1Restriction_zero base).symm
+
+/-- The inverse `W₂`-axis enumeration sends the trivial character back to
+the distinguished zero index. -/
+theorem omegaW2RestrictionEquiv_symm_one [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+    (omegaW2RestrictionEquiv base).symm 1 = ⟨0, base.p_prime.pos⟩ := by
+  apply (omegaW2RestrictionEquiv base).injective
+  rw [Equiv.apply_symm_apply]
+  change 1 = omegaW2Restriction base ⟨0, base.p_prime.pos⟩
+  exact (omegaW2Restriction_zero base).symm
+
+open scoped Classical in
+/-- Every complex linear character of the shared cyclic `W` is one omega-grid entry. -/
+theorem exists_omegaMonoidHom_eq [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    (ξ : ↥base.W →* ℂˣ) :
+    ∃ (i : Fin base.q) (j : Fin base.p), omegaMonoidHom base i j = ξ := by
+  obtain ⟨ij, hij⟩ := (omegaMonoidHom_bijective base).surjective ξ
+  exact ⟨ij.1, ij.2, hij⟩
+
+end OddOrder.Peterfalvi.S16

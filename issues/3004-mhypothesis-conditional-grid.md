@@ -1007,14 +1007,89 @@ feature commits: `d5f7fc38`, `061229b4`, `bb2c9868`, `960907f6`。
   `exists_coherent_extension_h114_of_grid_orthogonal` が任意 grid に対する coherent
   extension `nu` と `h114 : tau(mu0-zeta) = sum grid_i0 - nu(zeta)` を返す。
 - leaf build / AxiomsCheck (4156 jobs) green。3定理とも許可外公理なし、新 `sorry` なし。
+- 続く (11.8.2)/(11.8.5) も grid 依存を精密分離した。
+  `SHC_residual_eq_grid_diff` は既存の grid 非依存 Parseval / coefficient proof を再利用し、
+  残る sigma 固有入力を「norm-2 `ZIrr` residual を `delta * (grid_ij-grid_i0)` に同定する」
+  `hclassify` 一点へ縮約する。`grid_diff_inner_zeroColumnSum` と
+  `R_sum_inner_grid_zeroColumnSum` で two-way pairing を任意 grid にし、
+  `charParam_a_eq_zero_of_grid_residualEq` が conditional (11.8.5)
+  `Even a -> a = 0` を同じ grid の h114 から証明する。全て AxiomsCheck (4156 jobs) green。
 
 残りは上流順に:
 
-1. (11.8.2)+(11.8.5) の rowwise alpha-image を arbitrary grid へ一般化
-   (four-corner / reality / parity / residual coefficient; S15 `eta` fields を使用);
-2. landing 済みの grid-parametric column assembly へ渡し、narrow `S(H0C)` coherence
+1. S15 `tau3/eta` fields から `hclassify` を実証明する
+   (regular-value equality + norm-2 chi-family classifier、転置 index を保持);
+2. arbitrary-grid beta の `ZIrr` / reality / trivial-orthogonality / parity を組み、
+   conditional result を unconditional `a = 0` と rowwise alpha-image に上げる;
+3. landing 済みの grid-parametric column assembly へ渡し、narrow `S(H0C)` coherence
    refuterで矛盾する。
 
 これは carrier signature 変更を要するという診断ではない。既存 S15 fields が持つ
 `eta_eq_tau_omega`, isometry, virtuality, conjugation, four-corner, Galois orbit 等を theorem
-引数として使う proof generalization であり、次 iteration は rowwise alpha-image から進める。
+引数として使う proof generalization であり、次 iteration は eta 用 `hclassify` から進める。
+
+### eta norm-2 classifier 接続 (2026-07-12 続行)
+
+- 既存 `S16.eta_diff_rigidity` が S15 `eta` の orthonormality / `ZIrr` / (3.7) grid relation
+  から必要な norm-2 global classification を既に証明していることを確認した。
+- `eta_diff_classifier_of_typePV_value` を追加し、S12 `typePV(T,dataT)` と shared regular set
+  `W \\ (W1 ∪ W2)` の equality、およびその set 上の source-value equality から、class-function
+  conjugacy invariance を介して `eta_diff_rigidity` の conjugacy-saturation 仮定を構成した。
+  これで `hclassify` の global rigidity 部分は完了し、残る producer 入力は
+  `tau(alpha_ij)(v) = delta * (eta_transposed_ij - eta_transposed_i0)(v)` on `typePV` のみ。
+- 同時に clean rebuild が抽象 zero-column helper の暗黙条件不足を検出したため、
+  `grid_diff_inner_zeroColumnSum` に正当な `[NeZero w2]` を明示した。leaf / AxiomsCheck
+  (4156 jobs) green、許可外公理・新 `sorry` なし。
+
+次 frontier は reconciled `dataT.W1=W2`, `dataT.W2=W1`, `dataT.W=W` と S15
+`eta_eq_tau_omega` / `tau3_apply_of_regular` を用いて上記 source-value equality を証明すること。
+
+### T-side 転置 rigidity と value-level API (2026-07-12 続行 2)
+
+- S12 の既存 `tau_muGridAlpha_apply_eq_on_typePV` を任意 grid へ移す
+  `tau_muGridAlpha_apply_eq_of_grid_value_alignment` を追加した。必要仮定は各 grid entry の
+  `typePV` 上の**値一致のみ**で、global sigma-map equality は要求しない。
+- T-side 転置では S12 column index が eta の第1軸へ移るため、既存
+  `eta_diff_rigidity` (固定第1軸) だけでは向きが逆だった。抽象
+  `S05.orthonormalGrid_diff_rigidity` と (3.7) four-corner separability から dual の
+  `eta_column_diff_rigidity` を実証明し、`eta_column_diff_classifier_of_typePV_value` まで
+  接続した。これで norm-2 classifier は正しい転置向きでも閉じた。
+- leaf / AxiomsCheck (4157 jobs) green。許可外公理・新 `sorry` なし。
+
+残る最上流は **regular-value grid enumeration alignment**:
+`alignedOmegaSigmaGrid i k v = eta (colEquiv k) (rowEquiv i) v` (`v ∈ typePV`) を、
+両側の concrete linear-character enumeration と `dataT.W = base.W` から構成する。
+
+### abstract S15 omega-grid exhaustion (2026-07-12 続行 3)
+
+- `omega_mul` と `omega_apply_one` から各 abstract grid entry の underlying character
+  `omegaMonoidHom : W ->* C^x` を構成した。
+- `omegaMonoidHom_bijective` で `(i,j) |-> omegaMonoidHom i j` が全線形指標との bijection
+  であることを証明した。injective は `omega_orthonormal`、surjective は
+  `|Fin q x Fin p| = q*p = |W| = |Hom(W,C^x)|` (W cyclic) による。
+  `exists_omegaMonoidHom_eq` が任意の W-linear character を eta source grid に配置する。
+- leaf / AxiomsCheck (4157 jobs) green。許可外公理・新 `sorry` なし。
+
+次はこの full-grid bijection を W1/W2 restriction で分解し、zero-axis を保存する
+`Fin dataT.w1 ≃ Fin base.p` / `Fin dataT.w2 ≃ Fin base.q` を構成する。
+
+### factorwise omega-axis exhaustion (2026-07-12 続行 4)
+
+- `monoidHom_eq_of_eq_on_W1_W2` で、`W = W1 ⊔ W2` の両 factor 上で一致する W-linear
+  characters が全体で一致することを証明した。cyclic W の可換性と subgroup join 分解だけを
+  用い、carrier への追加仮定はない。
+- zero-column / zero-row を各 factor へ制限する `omegaW1Restriction` /
+  `omegaW2Restriction` を構成した。他方の factor 上の triviality と full-grid injectivity から
+  両 restriction family の injectivity を証明し、さらに
+  `|Hom(W1,C^x)|=|W1|=q`, `|Hom(W2,C^x)|=|W2|=p` で bijectivity まで上げた。
+- `omegaW1RestrictionEquiv` / `omegaW2RestrictionEquiv` は explicit な axis enumeration。
+  zero index が trivial character へ行き、逆写像も trivial character を zero へ戻すことを
+  `omegaW1RestrictionEquiv_symm_one` / `omegaW2RestrictionEquiv_symm_one` で固定した。
+- leaf build green、新 `sorry`・新 axiom・signature 変更なし。main 同期済み。
+
+次 frontier は source S12 grid の multiplicative characters を reconciled equality
+`dataT.W = base.W`, `dataT.W1 = base.W2`, `dataT.W2 = base.W1` で上の factor Hom へ transportし、
+axis equivalenceを合成して zero-preserving
+`Fin dataT.w1 ≃ Fin base.p` / `Fin dataT.w2 ≃ Fin base.q` を構成する。その後、regular `v` 上で
+S12 `sigma` と S15 `tau3` がとも transported underlying character の値を返すことから
+`alignedOmegaSigmaGrid i k v = eta (colEquiv k) (rowEquiv i) v` を証明する。
