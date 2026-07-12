@@ -153,3 +153,44 @@ mu_reducible_dichotomy : ∀ {X : Subgroup ↥S} {ψ : ClassFunction ↥S ℂ},
 (HypothesisBasics:948) の reducible 枝。route A: `η ∈ sSet` を `inducedKernelFamily ((derivedInG S).subgroupOf S) ⊥`
 に bridge (sSet-membership → 源 nontrivial) → `hyp.mu_reducible_dichotomy` で column j 取得 →
 `certainTypeR @ hyp46S` の image family を dispatch (+ `_orthogonal` を `eta_orthonormal` から)。
+
+## ⚠️ FOLLOW-UP 検証 (lane-b /loop 2026-07-13、exhaustive、subagent 併用) — **route A は無効、R-family は依然 gated**
+
+`mu_reducible_dichotomy` field 着地後の R-family close を精査した結果、**上記「次 step」の route A は
+architecturally 無効**、R-family は依然 close 不能と確定 (verify-first、code-level + subagent fan-out)。
+
+**(1) route A (`certainTypeR @ hyp46S`) は成立しない — 別 `S06` object + 別 Dade map**:
+- `hyp46S`/`residueS` は `s06S = typePData_toS06Hypothesis hyp.Sdata` (`S13_PrimeTIResidueBridge:55`) 由来。
+  一方 abstract field `hyp.mu` は construction 時に `muS := certainTypeS.columnFamily.mu`
+  (`certainTypeS = mp.certainTypeS`, `FeitThompsonSetup:1466`) を割当。**`s06S ≠ certainTypeS` (別構成子)**、
+  かつ `hyp.mu = residueS.mu2` を証明する lemma/field は**存在しない** (subagent 精査: docstring 内のみ、
+  "abstract Hypothesis cannot see" `SubcoherenceInputs:245`)。∴ `columnSum (hyp46S) χ₂ = ∑ᵢ residueS.mu2 i j`
+  は `∑ᵢ hyp.mu i j` と**接続不能**。
+- さらに `certainTypeR @ hyp46S` の image family は `dadeIntegralCharacterMap (hyp46S.dade0) …` 上、
+  `hyp46S.dade0 = dadeHypS0` (`A₀`-Dade) — だが target は `dadeHypS` (`A`-Dade)。**map も不一致**。
+  (両者は `A(S)`-supported 入力で `= Ind_S^G` ゆえ `sSet_caseB_member_diff_supported` の `η−η̄` 上では
+  一致するが、その bridge は image_eq を `certainTypeR` から transport する用で、上記 grid 不接続を救わない。)
+
+**(2) route B (Dade→η formula) は prime-`TI` 9014 に落ちる**:
+- honest shape: `imageSet = {±δ_j η_{ij}}` (orthonormal by `eta_orthonormal`、ZIrr by `eta_mem_ZIrr` —
+  **これは abstract fields から buildable**)。`image_eq` = **(13.18) full-column cross-relation**
+  `τ_S(μ_j − μ̄_j) = ∑ᵢ δ_j(η_{ij} − η_{i,−j})` over `dadeHypS`。
+- この cross-relation は `eta_diff_rigidity` (S16、(3.8)) 経由だが、その `hvanish` 前提 = prime-`TI`
+  `μ_{ij}|_V = ω`-value (Coq `prTIirr_id`) を要す = **issue 9014 (未 port)**。row-`0` 版
+  `tauS_mu_row0_cross` (`S15_BridgeCharacter:821`) 自体が**この prime-TI 上に `sorry`** かつ `dadeHypS0` 上。
+- `mu_tau1_formula` (`Machinery135:171`) は full-column だが `tau1S` (coherence **extension** 出力) 上 =
+  **circular** (R-family は coherence の **input**)。
+
+**(3) ∴ honest fix = R-family / grounding を `Hypothesis` field 化 + producer 放電 (coordinated commit)**:
+- field 候補: `mu_isColumnFamily : ∀ i j, hyp.mu i j = (⟨certainTypeS 由来 Hyp46⟩.columnFamily (χ₂ j)).mu i`
+  **または** R-family を直接 (`OrthonormalCharacterImageFamily (dadeHypS map) (∑ᵢ mu i j)` per column)。
+- **放電は spine producer `FeitThompson.lean:1392` で near-definitional** (`muS := columnFamily.mu`)。
+  → **`FeitThompson.lean` を触る = 現状 spent carve-out**。**新 carve-out (hub 裁定) が必要** —
+  9092 core の carve-out と同型の coordinated commit (field 追加 + 全 producer 同時放電、build 破壊回避)。
+- ⚠ route A が無効ゆえ、field は `hyp46S`/`s06S` でなく **`certainTypeS` (= `hyp.mu` の出所)** に接続する形で
+  設計すること。residueS/hyp46S 経路は `hyp.mu` と無関係な島 (subagent: downstream consumer 0)。
+
+**現状 (この commit)**: HypothesisBasics の 2 sorry (948 memberRFamily reducible 枝 / 972 `_orthogonal`)
+の docstring/inline comment を上記の正確な blocker に更新 (invalid route A 誘導を除去)。sorry 数不変
+(honest に close 不能ゆえ; fabricate/hoist/新 axiom 回避)。**recommend: hub が (a) FeitThompson 再 carve-out で
+grounding field 化、または (b) prime-TI 9014 value API + A0→A reformulation を優先、を裁定**。
