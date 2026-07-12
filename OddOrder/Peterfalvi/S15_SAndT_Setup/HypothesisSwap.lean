@@ -121,4 +121,163 @@ constructor supply (precedent: the `S_U_commutative`/`Sdata_W2_eq` additions). -
 theorem Hypothesis.nuGridSupply [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) : NuGridSupplyData hyp := sorry
 
+open scoped FiniteInduce in
+/-- **The S↔T swap of the (13.1) hypothesis** (the Coq re-instantiation of
+`Thirteen_17_to_19` with the pair roles interchanged).  Exchanges `S ↔ T`, `P ↔ Q`, `U ↔ V`,
+`C ↔ D`, `W₁ ↔ W₂`, `q ↔ p`, `u ↔ v`, `c ↔ d`, `Sset ↔ Tset`, `τ_S ↔ τ_T`, `δ ↔ δ'`,
+`μ ↔ ν` and transposes the `ω`/`η`-grids.  Inputs:
+
+* `hT2` — `IsTypeP2 T`, the (14.9)-conclusional dual of the carrier field `S_typeP2`
+  (exactly the parameter `tauTbetaGrid`/`typeI_caseC_dual_dichotomy` already take);
+* `Tdata` with the `reconciled_typePData_T` reconciliations — the swap's `Sdata`;
+* `pins : NuGridSupplyData hyp` — the ν-side §4/§6 grid facts (the swap's `μ`-side fields).
+
+Everything else is filled from `hyp`'s own fields: symmetric pairs exchange, the shared-`W`
+facts commute (`inf_comm`/`sup_comm`/`Set.union_comm`), the S-side duals of the T-side
+structural fields are read off `hyp.Sdata` (`fitting_inf_U_eq_bot` for `P ⊓ U = ⊥`,
+`M_complement` for `S = S' ⋊ W₁`), and the transposed grid facts re-index (with the
+column-axis Galois orbit supplying the transposed row-vanishing transport).
+
+Every `∀ hyp`-theorem of the S-side (13.18)/(13.19) layer then holds at `hyp.swap …`,
+giving the `T`-side duals (`typeIBetaL_eta_col_constant`, `typeI_caseC_dual_dichotomy`)
+with no further proof beyond index transport. -/
+noncomputable def Hypothesis.swap [Finite G] (hyp : Hypothesis (G := G))
+    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
+    (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
+    (pins : NuGridSupplyData hyp) : Hypothesis (G := G) where
+  finiteG := hyp.finiteG
+  S := hyp.T
+  T := hyp.S
+  W1 := hyp.W2
+  W2 := hyp.W1
+  W := hyp.W
+  P := hyp.Q
+  Q := hyp.P
+  U := hyp.V
+  V := hyp.U
+  C := hyp.D
+  D := hyp.C
+  S_maximal := hyp.T_maximal
+  T_maximal := hyp.S_maximal
+  S_ne_T := hyp.S_ne_T.symm
+  S_nonI := hyp.T_nonI
+  T_nonI := hyp.S_nonI
+  one_typeII := hyp.one_typeII.symm
+  S_typeP2 := hT2
+  theorem88_caseB := fun M hM => (hyp.theorem88_caseB M hM).imp_right Or.symm
+  W_eq_inter := by rw [hyp.W_eq_inter, inf_comm]
+  W_eq_join := by rw [hyp.W_eq_join, sup_comm]
+  W1_inf_W2_eq_bot := by rw [inf_comm]; exact hyp.W1_inf_W2_eq_bot
+  W1_commutes_W2 := fun x hx y hy => (hyp.W1_commutes_W2 y hy x hx).symm
+  W_cyclic := hyp.W_cyclic
+  P_eq_SF := hyp.Q_eq_TF
+  Q_eq_TF := hyp.P_eq_SF
+  S_deriv_eq_PU := hyp.T_deriv_eq_QV
+  T_deriv_eq_QV := hyp.S_deriv_eq_PU
+  Q_inf_V_eq_bot := by
+    have h := hyp.Sdata.fitting_inf_U_eq_bot
+    rwa [hyp.Sdata_U_eq, ← hyp.P_eq_SF] at h
+  W2_isComplement_T_deriv := by
+    have h := hyp.Sdata.M_complement
+    rwa [hyp.Sdata_W1_eq] at h
+  C_eq := hyp.D_eq
+  D_eq := hyp.C_eq
+  W1_normalizes_U := hyp.W2_normalizes_V
+  W2_normalizes_V := hyp.W1_normalizes_U
+  q := hyp.p
+  p := hyp.q
+  q_prime := hyp.p_prime
+  p_prime := hyp.q_prime
+  q_odd := hyp.p_odd
+  p_odd := hyp.q_odd
+  q_eq_card_W1 := hyp.p_eq_card_W2
+  p_eq_card_W2 := hyp.q_eq_card_W1
+  u := hyp.v
+  v := hyp.u
+  c := hyp.d
+  d := hyp.c
+  c_eq_card_C := hyp.d_eq_card_D
+  d_eq_card_D := hyp.c_eq_card_C
+  card_U_eq_uc := hyp.card_V_eq_vd
+  card_V_eq_vd := hyp.card_U_eq_uc
+  Sset := hyp.Tset
+  Tset := hyp.Sset
+  A0S := hyp.A0T
+  A0T := hyp.A0S
+  tauS := hyp.tauT
+  tauT := hyp.tauS
+  omega := fun i j => hyp.omega j i
+  eta := fun i j => hyp.eta j i
+  mu := fun i j => hyp.nu j i
+  nu := fun i j => hyp.mu j i
+  delta := hyp.deltaPrime
+  deltaPrime := hyp.delta
+  delta_pm_one := ⟨hyp.delta_pm_one.2, hyp.delta_pm_one.1⟩
+  mu_degree_modEq_delta := fun i j => pins.nu_degree_modEq_deltaPrime j i
+  delta_zero_eq_one := pins.deltaPrime_zero_eq_one
+  tau3 := hyp.tau3
+  eta_eq_tau_omega := fun i j => hyp.eta_eq_tau_omega j i
+  mu_definition := fun i j => hyp.nu_definition j i
+  mu_irreducible := fun i j => pins.nu_irreducible j i
+  mu_col_injective := pins.nu_row_injective
+  mu_orthonormal := fun i k j l => by
+    rw [pins.nu_orthonormal j l i k]
+    by_cases h : j = l ∧ i = k
+    · rw [if_pos h, if_pos ⟨h.2, h.1⟩]
+    · rw [if_neg h, if_neg fun h' => h ⟨h'.2, h'.1⟩]
+  mu_colSum_eq_induce := pins.nu_rowSum_eq_induce
+  nu_definition := fun i j => hyp.mu_definition j i
+  m := 1 - 1 / ((hyp.p : ℚ) - 1) - ((hyp.p : ℚ) - 1) / (hyp.p : ℚ) ^ hyp.q +
+    1 / (((hyp.p : ℚ) - 1) * (hyp.p : ℚ) ^ hyp.q)
+  m_eq := rfl
+  Sdata := Tdata
+  Sdata_U_eq := hU
+  Sdata_W1_eq := hW1
+  S_U_commutative := pins.V_commutative
+  Sdata_W2_eq := hW2
+  mu_diff_support := fun i _ _ hj hk hdeg =>
+    pins.nu_diff_support Tdata hU hW1 hW2 i hj hk hdeg
+  mu_apply_of_not_mem_W2 := fun i j w hwW hwS hw =>
+    pins.nu_apply_of_not_mem_W1 j i w hwW hwS hw
+  mu_conj := fun i j => pins.nu_conj j i
+  eta_conj := fun i j => hyp.eta_conj j i
+  tau3_isometry := hyp.tau3_isometry
+  tau3_trivial := hyp.tau3_trivial
+  tau3_apply_of_regular := fun α w hwW hnot =>
+    hyp.tau3_apply_of_regular α w hwW (by rwa [Set.union_comm] at hnot)
+  tau3_mem_ZIrr := hyp.tau3_mem_ZIrr
+  omega_orthonormal := fun i k j l => by
+    rw [hyp.omega_orthonormal j l i k]
+    by_cases h : j = l ∧ i = k
+    · rw [if_pos h, if_pos ⟨h.2, h.1⟩]
+    · rw [if_neg h, if_neg fun h' => h ⟨h'.2, h'.1⟩]
+  omega_apply_one := fun i j => hyp.omega_apply_one j i
+  omega_mem_ZIrr := fun i j => hyp.omega_mem_ZIrr j i
+  omega_mul := fun i j w w' => hyp.omega_mul j i w w'
+  omega_col_zero_apply_of_mem_W2 := fun i w hw =>
+    hyp.omega_row_zero_apply_of_mem_W1 i w hw
+  omega_row_zero_apply_of_mem_W1 := fun j w hw =>
+    hyp.omega_col_zero_apply_of_mem_W2 j w hw
+  omega_pow_q_of_mem_W1 := fun i j w hw => hyp.omega_pow_p_of_mem_W2 j i w hw
+  omega_pow_p_of_mem_W2 := fun i j w hw => hyp.omega_pow_q_of_mem_W1 j i w hw
+  eta_complete_vanish := fun χ horth w hwW hnot =>
+    hyp.eta_complete_vanish χ (fun i j => horth j i) w hwW
+      (by rwa [Set.union_comm] at hnot)
+  eta_fourcorner_vanish := fun i j hi hj x hx => by
+    rw [Set.union_comm] at hx
+    have h := hyp.eta_fourcorner_vanish j i hj hi x hx
+    linear_combination h
+  eta_row_vanish_of_one_zero := fun x h0 i hi => by
+    obtain ⟨u, hu⟩ := hyp.eta_column_galois_orbit i hi
+    rw [← hu, ClassFunction.mapRingEquiv_apply, h0, map_zero]
+  eta_row_galois_orbit := fun i hi => hyp.eta_column_galois_orbit i hi
+  eta_column_galois_orbit := fun j hj => hyp.eta_row_galois_orbit j hj
+  eta_intCast_of_coprime := fun g hg i j =>
+    hyp.eta_intCast_of_coprime g (by rwa [Nat.mul_comm] at hg) j i
+  eta_pair_of_coprime := fun g hg i j =>
+    hyp.eta_pair_of_coprime g (by rwa [Nat.mul_comm] at hg) j i
+  eta_principal_of_coprime := fun g hg =>
+    hyp.eta_principal_of_coprime g (by rwa [Nat.mul_comm] at hg)
+
 end OddOrder.Peterfalvi.S15

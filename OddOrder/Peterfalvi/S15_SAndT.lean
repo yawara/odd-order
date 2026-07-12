@@ -727,17 +727,30 @@ theorem typeIBetaL_eta_row_constant [Finite G]
   convert h using 2
   exact Subsingleton.elim _ _
 
-/-- **(13.19.c), first clause (column form)**: the S↔T-swapped row constancy.  Isolated
-obligation. -/
+/-- **(13.19.c), first clause (column form)**: the S↔T-swapped row constancy — the
+`typeIBetaL_eta_row_constant` instance at `hyp.swap` (Coq's re-instantiation of the section
+with the pair roles interchanged).  The swap's `η`-grid is the transpose, so its row-`0`
+constancy *is* the column constancy of `hyp.eta`; `β_L^τ` is `hyp`-independent, so no
+transport is needed on the left argument.  Takes the (14.9)-conclusional `IsTypeP2 T` (like
+`typeI_caseC_dual_dichotomy`); the reconciled `TypePData T` and the ν-side grid supply come
+from `reconciled_typePData_T` and the `nuGridSupply` pin. -/
 theorem typeIBetaL_eta_col_constant [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
     {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L)
-    (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ typeISetup.Sset) :
+    (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ typeISetup.Sset)
+    (_hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ)) :
     ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
       ∀ (i i' : Fin hyp.q), (i : ℕ) ≠ 0 → (i' : ℕ) ≠ 0 →
         ClassFunction.inner (typeIBetaL typeISetup φ) (hyp.eta i ⟨0, hyp.p_prime.pos⟩)
           = ClassFunction.inner (typeIBetaL typeISetup φ)
-              (hyp.eta i' ⟨0, hyp.p_prime.pos⟩) := sorry
+              (hyp.eta i' ⟨0, hyp.p_prime.pos⟩) := by
+  intro _ _ i i' hi hi'
+  classical
+  obtain ⟨Tdata, hU, hW1, hW2⟩ := reconciled_typePData_T _hG hyp
+  exact typeIBetaL_eta_row_constant _hG
+    (hyp.swap hT2 Tdata hU hW1 hW2 (hyp.nuGridSupply _hG))
+    typeISetup φ _hφ _hdeg i i' hi hi'
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.19.c) S-side dichotomy**: `(Γ_S, φ^{τ₁}) + (Γ_L, η_{01}) ≡ 1 (mod 2)` (from
@@ -759,11 +772,16 @@ theorem typeI_caseC_dichotomy [Finite G]
         hyp.p ≤ ((maxNilpotentNormalHall L).subgroupOf L).index) := sorry
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **(13.19.c) T-side dichotomy** (S↔T swapped): as `typeI_caseC_dichotomy` with
-`β_T`/`v`/`p` in place of `β_S`/`u`/`q`.  Isolated obligation. -/
+/-- **(13.19.c) T-side dichotomy** (S↔T swapped): the `typeI_caseC_dichotomy` instance at
+`hyp.swap` — the swap's `tauSbetaGrid` is definitionally `tauTbetaGrid` (both are the
+`'A0(T)`-Dade image of `Ind_{QW₂}^T 1 − ν_{10}`), its `u/q` are `v/p`, and its `η`-row-`0`
+axis is the `η`-column-`0` axis.  Requires the `Tdata` reconciliations (supplied by the
+producer from `reconciled_typePData_T`), so the swap's `A₀(T)`-carrier matches the one in
+`tauTbetaGrid`'s statement. -/
 theorem typeI_caseC_dual_dichotomy [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T) (Tdata : TypePData hyp.T)
+    (hU : Tdata.U = hyp.V) (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     {L : Subgroup G} (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L)
     (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ dataL.typeIHyp.Sset)
     (_hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ)) :
@@ -773,7 +791,9 @@ theorem typeI_caseC_dual_dichotomy [Finite G]
         ((hyp.v - 1 : ℕ) : ℚ) / (hyp.p : ℚ))) ∨
       ((∀ i : Fin hyp.q, (i : ℕ) ≠ 0 →
         OddIntegerInner (typeIBetaL dataL.typeIHyp φ) (hyp.eta i ⟨0, hyp.p_prime.pos⟩)) ∧
-        hyp.q ≤ ((maxNilpotentNormalHall L).subgroupOf L).index) := sorry
+        hyp.q ≤ ((maxNilpotentNormalHall L).subgroupOf L).index) :=
+  typeI_caseC_dichotomy _hG (hyp.swap hT2 Tdata hU hW1 hW2 (hyp.nuGridSupply _hG))
+    dataL φ _hφ _hdeg
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Faithful §13 producer for Peterfalvi (13.19).**  The Tier-A structure — `e = [L:H]`
@@ -809,13 +829,18 @@ noncomputable def typeIOrthogonalityGridData_of_coherent78 [Finite G]
     betaL_eta0_row_constant := typeIBetaL_eta_row_constant _hG hyp dataL.typeIHyp _
       (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).1
       (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).2
-    betaL_eta0_col_constant := typeIBetaL_eta_col_constant _hG hyp dataL.typeIHyp _
+    betaL_eta0_col_constant := typeIBetaL_eta_col_constant _hG hyp hT2 dataL.typeIHyp _
       (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).1
+      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).2
     caseC := typeI_caseC_dichotomy _hG hyp dataL _
       (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).1
       (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).2
     caseC_dual := typeI_caseC_dual_dichotomy _hG hyp hT2
-      (Classical.choose (OddOrder.Peterfalvi.S15.reconciled_typePData_T _hG hyp)) dataL _
+      (Classical.choose (OddOrder.Peterfalvi.S15.reconciled_typePData_T _hG hyp))
+      (Classical.choose_spec (OddOrder.Peterfalvi.S15.reconciled_typePData_T _hG hyp)).1
+      (Classical.choose_spec (OddOrder.Peterfalvi.S15.reconciled_typePData_T _hG hyp)).2.1
+      (Classical.choose_spec (OddOrder.Peterfalvi.S15.reconciled_typePData_T _hG hyp)).2.2
+      dataL _
       (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).1
       (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).2 }
 
