@@ -458,6 +458,14 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 注意
 
+- **⚠ live-branch merge race (2026-07-12 tick 15 実害 → 手順化)**: レーンは 60s wakeup で数分おきに
+  commit するため、hub の step 1.5 scope-check と `git merge <branch>` の**間**に新 commit が積まれると、
+  merge は check していない commit まで取り込む (実例: a@29b08747 を check → merge 時に a が 700ba71f を
+  積んでおり merge 38df2e1d の第 2 親が 700ba71f になった; 遡及チェックで clean を確認・build/AxiomsCheck は
+  merged tree に対して有効だったので実害なし)。**防止: step 1 で各レーンの tip SHA を pin し
+  (`tip=$(git rev-parse <branch>)`)、以後の 1.5/1.6 diff も merge も全て `$tip` に対して行う**
+  (`git merge --no-ff --no-commit $tip`)。merge 後に branch が進んでいても pinned SHA 分だけが対象になり、
+  超過分は次 tick に自然に回る。commit message の `@<sha>` も pin した SHA を書く。
 - A と B は `AxiomsCheck.lean` 末尾を共有 hotspot として両方追記 → **マージ毎にコンフリクトしうる**が、
   独立ブロック（別定理の axiom ガード）なので両保持で機械的に解決可。先頭 import 部も同様。
 - `git merge --abort` は `--no-commit` で止めた状態でもコンフリクト状態でも有効。
@@ -536,6 +544,32 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-12 (tick 16, セッション再開初回 — Opus 4.8 hub) — a+b 合流**:
+  **a=1 genuine + 2 sync** ((11.9.c) `not_isTypeIV_of_mem_maximalSubgroups` = 全 maximal subgroup M の
+  per-M 普遍 Type-IV 排除、issue 1024 納品記録→pending; 残 2 commit は main sync merge、自所有
+  S13_NonGaloisExclusion のみ) / **b=2** ((13.19.c) `col_constant` + `caseC_dual` を `Hypothesis.swap`
+  (S↔T 再 instantiate) transport で完遂、義務 3→1、**sorry 2 本 discharge**; swap phase 2 = `Hypothesis.swap`
+  constructor 完成 (HypothesisSwap leaf modify)) / **c=0** (未マージなし)。
+  **⚠ live-branch race 実例**: tick 冒頭で a tip=a8eebe9e を観測したが SHA pin 前に a が 2ba76a5b (sync merge)
+  まで進行 → pin した 2ba76a5b に対し全検査+merge を実行 (「注意」節の手順どおり、実害なし)。
+  build green (4177 jobs)・AxiomsCheck OK (2352 OK/0 fail)・**count-sorry 68→66** (b 実証明 discharge、
+  regression でない)・新 axiom なし・size watch 超過なし (S13_NonGaloisExclusion 1017 / S15_SAndT 1160 /
+  HypothesisSwap 283)。push `182d489f..f0d6f494`。
+  **監視ペース遷移**: 前セッションは Fable 30分 → 本セッション Opus 4.8 ゆえ **15分 `7,22,37,52`** で
+  cron 再作成 (id ce8170c7、session-only)。
+- **2026-07-12 (tick 15) — 全 3 レーン合流: ★ (11.9.c) U cyclic + Type III 完結 (a) / (13.19.c) row constancy (b) / (3.9.a) rigidity port (c)**:
+  **a=4** ((11.9.c) `U_isCyclic_of_hypothesis` + `not_cliffordCaseA_of_hypothesis` (非Galois 完全排除) +
+  新 shared leaf `GroupTheory/NilpotentAbelianization` (9086 claim 済、nilpotent+cyclic abelianization ⟹
+  cyclic) + **race 分 `700ba71f` = P3 完結 `isTypeIII_of_hypothesis`/`no_typeIV_maximal` +131** — merge
+  38df2e1d は message 上 @29b08747 だが実第 2 親 = 700ba71f (scope-check 後にレーンが積んだ; 遡及チェック
+  clean = a 自所有 file のみ・axiom/sorry 変化なし、build/AxiomsCheck は merged tree で有効。以後は tip SHA
+  pin 手順 — 「注意」節参照)) / **b=3** ((13.19.c) `betaL_eta0_row_constant` 完全証明 (義務 4→3、Coq
+  betaLeta 忠実移植) + swap phase 1 新 leaf `HypothesisSwap` +124 (NuGridSupplyData bundle、producer
+  `nuGridSupply` = 新 decl faithful scaffold sorry +1)) / **c=3** ((3.9.a) `eq_in_cycTIiso` port =
+  `eta_eq_of_norm_one_regular_value_eq` + `alignedOmegaSigmaGrid_eq_alignedOmegaEtaGrid` (global grid
+  equality) + (11.8.2) concrete hclassify — TGapGridAlignment 975→1263)。build green ×3 (4176/4177/4177
+  jobs)・AxiomsCheck OK・count-sorry 68→68 (b: −1 実証明 +1 scaffold)・新 axiom なし・size watch: 超過なし
+  (S13_NonGaloisExclusion 847 / TGapGridAlignment 1263 ⚠ 1500 接近 watch)。
 - **2026-07-12 (tick 14, セッション再開初回) — 全 3 レーン合流: ★ (11.9.c) u=a pin (a) + (13.19.b) 完全証明 + junk-τφ soundness 修正 (b)**:
   **a=1** ((11.9.c) 非Galois u=a pin keystone `caseA_u_eq_a_of_residual_not_orthogonal` —
   新 leaf S13_NonGaloisExclusion +716 sorry-free、conj-対合 + (11.9.a) 行0射影 + Dade pin;
