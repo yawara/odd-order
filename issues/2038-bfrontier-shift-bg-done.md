@@ -2161,3 +2161,35 @@ inner_eq_zero_of_disjoint_support、ψ=φ/ζ_0 両方 Sset degree-e)。⟹ 差 =
 descent (claim-before-build + on-path 確認要)、(ii) 別クラスタ再配置、(iii) lane-c 支援 (T-side/Hypothesis46-for-S)
 のいずれか。lane は churn でなく major result 直後ゆえ reallocation-trigger 非該当。次 /loop iter は main 再同期後に
 最上流 verified-on-path ungated work を engage (hub direction が 9000/notes にあればそれに従う)。
+
+## 🧭 HUB RULING (2026-07-12 監視 tick, Opus hub 自律裁定) — b の次 allocation
+
+hub が b の census を独立検証 (typeP_Galois の形式化状態 grep + 9000 精読 + u_bound sorry 実在確認)。裁定:
+
+**① b の次 target = `u_bound` sorry の cite 討伐 (ungated、census が見落とし)**。
+`OddOrder/Peterfalvi/S15_SAndT_Setup/HypothesisBasics.lean:886 u_bound := sorry` は **a が既に
+proven した `S11.u_le_cyclotomicQuotient`** (S11_ImprimitiveUBound:329、無条件・sorry-free) を cite すれば
+閉じる。**a は 9000 tail に b 向け cite signature を明記済** (`hyp.toTypesIIIIIIVSetupS hG` で setup/chief/chars
+instantiate → `u ≤ (p^q-1)/(p-1)`)。これは typeP_Galois char body に **非 gated** (u-bound は既に done)。
+b の census は pc_le に注目し u_bound を見落としていた。**b の territory (S15_SAndT_Setup) 内・ungated ゆえ即着手可**。
+
+**② descent to typeP_Galois §9 char body = 却下 (dup 禁止)**。issue 9000 は **claim = lane a** で、
+「§13 (11.9) typeP_Galois char body ... は a territory ... 他レーン並行構築は 2026-07-02 dup 事故の
+predicate-level 再演ゆえ禁止」と明記。b が descend すると当該 dup 事故の再演。**b は typeP_Galois を再実装しない**。
+(σ-theory u-bound 系は既に sorry-free = `u_le_cyclotomicQuotient`。残 9000 = a の §13 (11.9) char body で a 専有。)
+
+**③ ①の後の残 b sorry (pc_le_maxNilpotentNormalHall/13.12 等) = gated-endpoint self-resume**。
+これらは genuine に a の 9000 §13 (11.9) char body (V-abelian 等) に gated。c と同じ gated-endpoint pattern で
+sorried-cite endpoint 化して待機 (lazy idle でない)。**re-engage trigger = a の typeP_Galois char body landing**。
+
+**④ 戦略メモ (bottleneck 可視化)**: **a の 9000 §13 (11.9) typeP_Galois char body が b(pc_le)+c(hVcomm ほか
+5 sorry)の共通 root gate**。だが a は user「Aで」+ RULING(9087) で (10.8) 閉包に専念中ゆえ、当該 char body は
+一時 dormant。⟹ b・c とも当該 gate は gated-endpoint 待機し、a が (10.8) 完了後に char body へ戻る。
+(a の direction は user 決定ゆえ hub は override しない; bottleneck を記録に留める。)
+
+**⑤ 0111 split = GO**: b が S15_SAndT を実 sorry 0 で凍結・「もう触らない見込み」と確認 → hub は 0111 の
+S15_SAndT (1869 行) 分割を凍結境界で実施可能 (b の次作業 u_bound は別 file HypothesisBasics ゆえ非衝突)。
+
+**b への directive**: ① u_bound cite 討伐を即着手 (ungated, 9000 cite signature どおり)。② typeP_Galois は
+再実装しない。③ 以後の a-gated sorry は gated-endpoint 待機。別クラスタ再配置・lane-c 支援は不要 (①で
+genuine ungated work が在り、支援先の c も同 char body gate 待ちゆえ)。
