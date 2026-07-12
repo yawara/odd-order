@@ -287,4 +287,11 @@ theorem certainType_columnSum_conj_ne (h : Hypothesis46 A L) [NeZero (Nat.card h
     if_pos rfl] at h0
   exact (Nat.cast_ne_zero.mpr (NeZero.ne (Nat.card h.W1))) h0
 
+/-- **Row inversion fixes the anchor row**: `rowInv 0 = 0` (the row-`0` character is trivial,
+`w1CharEquiv_zero`, and `1⁻¹ = 1`). -/
+@[simp] theorem rowInv_zero (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)] :
+    rowInv h 0 = 0 := by
+  rw [rowInv, Hypothesis.w1CharEquiv_zero, inv_one, ← Hypothesis.w1CharEquiv_zero (h := h),
+    Equiv.symm_apply_apply]
+
 end OddOrder.Peterfalvi.S06

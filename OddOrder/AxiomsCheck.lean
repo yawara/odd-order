@@ -7633,3 +7633,5 @@ h118 ((11.8) 非直交) 下で τ(μ₀−ζ) の σ-grid 係数 = 行0 indicato
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.inner_tau_muColumnZero_sub_zeta_rowZero_of_residual_not_orthogonal
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_exists_irreducible_qa
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_a_dvd_u
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.rowInv_zero
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainTypeRImage_conj
