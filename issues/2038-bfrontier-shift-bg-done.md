@@ -2449,3 +2449,31 @@ pc_le と同一 root gate、(A) machinery 自体は tau1S 仮定で now-provable
 **bottleneck 追跡 (hub)**: character_degree_analysis + pc_le の最終 gate = a の (9.11) induction port
 (`coherent_H0C_commutator` honest、(6.8) sibleyTarget は 7001 で unsound 確定ゆえ非 route)。a は upstream-first で
 今 (6.5) type-V → 文書順で (9.11) に到達予定。b/c は (A)/T-side endpoint を prep しつつ a の (9.11) landing を待つ。
+
+## 🎯 (2026-07-12 続⁵、lane-b /loop) — (A) build = 既存 proven 定理 `T_typeIII_coherent_image_inner_eta_eq_zero` の S-side mirror に帰着 (route 確定)
+
+(3.8)-engine `eta_orthogonal_of_norm_one_pair_vanish` (S16_GridExpansion:494、proven) 経由が R-support route より
+clean と判明。しかも **T-side に完全な proven template** `T_typeIII_coherent_image_inner_eta_eq_zero`
+(TTypeIICoherence:516-631) が存在 — S-side `tau1S_induce_inner_eta` はこの **mirror**:
+
+**template 構造** (T-side、各行 S-side に写像):
+1. `coh.extension ζ` (= tau1S(χ)) の `hpsiZ`(ZIrr) = `extension_mem_ZIrr` / `hpsi1`(norm-1) =
+   `extension_inner_eq` + `hζirr.inner_self_eq_one` / `hcross`(distinct) = `extension_inner_eq` +
+   irr_inner + noReal。**全て coherence の一般 field** ゆえ S-side でそのまま。
+2. `hvanish`: `(coh.extension ζ − coh.extension ζ.conj) x = 0` on `conjClassSet(W∖(W1∪W2))` —
+   `extends_on_supported` で差 = Dade 像 (`dadeIntegralCharacterMap`)、`typePV ∉ derivedInG` +
+   support 外 vanish で消滅。**S-side 版は base=indS + (13.2.e) Ind=A₀(S)-Dade on supported**。
+3. `eta_orthogonal_of_norm_one_pair_vanish hyp.base ... hvanish` で finish。
+
+**S-side mirror の要部品** (次 iteration の build 対象):
+- coherence = `coherent_H0Cprime_S` (base τ=indS、support (C')^#=cprimeSharpS)。family = sSetIrrDeg or
+  H0C' irreducibles (要確認: どの irr family に対し tau1S_induce_inner_eta が要るか — Ind θ の irr 展開)。
+- S-side Dade map = `dadeHypS0` (既存、sSideGamma_mem_ZIrr:224 で使用) + `dadeIntegralCharacterMap`。
+- (13.2.e) `indS = A₀(S)-Dade on A₀(S)-supported` の identity (要 locate/build)。
+- 差 support: (C')^# ⊆ A₀(S) (要確認)。
+- `typePV(S) ∉ derivedInG S` 相当 (S-side、typePData_S)。
+
+**⟹ (A) は「新 framework port」でなく「proven T-side 定理の S-side mirror」**(~120 行、mechanical + S-side Dade 配線)。
+hub 注記: (A) scope は ruling 想定 (R-support machinery 新設) より大幅に軽い — 既存 engine + template の mirror。
+**次 iteration = tau1S_induce_inner_eta を T-side template mirror で build** (b territory Machinery135 or 新 S15 leaf、
+per-irr orthogonality → Ind θ 線形展開)。character_degree_analysis の残 field も順次。
