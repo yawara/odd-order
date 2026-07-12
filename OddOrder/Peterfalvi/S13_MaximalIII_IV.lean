@@ -522,9 +522,7 @@ theorem caseB_sOf_member_dichotomy [Finite G]
       have h := hyp.sOf_subset_SOf hyp.H0Cprime hφ
       rwa [hyp.SOf_eq] at h
     obtain ⟨k, hk0, hkeq⟩ := hyp.base.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum hG
-      hyp.type_alt (OddOrder.GroupTheory.typePNontrivialCore_of_isTypeIIIorIV hyp.type_alt
-        hyp.base.typeP)
-      (OddOrder.Peterfalvi.S11.exists_chiefFactorData hG _).choose hφIKF hirr
+      hφIKF hirr
     exact ⟨k, hk0, hkeq.trans (hyp.base.muGrid_columnSum_eq_columnSum hG hG.odd k)⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in

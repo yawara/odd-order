@@ -341,8 +341,6 @@ theorem sixTwoDecompositionData_of_reducible_break [Finite G]
     (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
     (hzS : params.zeta ∈ inducedFamily M)
     (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
-    (htype : IsTypeIII M ∨ IsTypeIV M) (hnt : TypePNontrivialCore M hyp.typeP)
-    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetup htype hnt))
     (A' B : Subgroup ↥M)
     (S₁ : Set (ClassFunction ↥M ℂ))
     (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
@@ -376,7 +374,7 @@ theorem sixTwoDecompositionData_of_reducible_break [Finite G]
   classical
   -- ψ is a nonzero μ-column sum; pick its conjugate column
   obtain ⟨k, hk0, hψcol⟩ := hyp.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum
-    hG htype hnt chief hψB hψred
+    hG hψB hψred
   subst hψcol
   obtain ⟨k', hk'0, hk'k, hcolconj⟩ := hyp.exists_conj_column hG hG.odd hk0
   -- `ζ` is not real (the induced family has no real characters)
@@ -527,7 +525,7 @@ theorem sixTwoDecompositionData_of_reducible_break [Finite G]
   · -- reducible member: μ-column sum, column–column orthogonality
     obtain ⟨hSne, sExt, hSie, hSeos, hSmz⟩ := hS₁coh
     obtain ⟨kχ, hkχ0, hχcol⟩ := hyp.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum
-      hG htype hnt chief hχbot hχirr
+      hG hχbot hχirr
     subst hχcol
     obtain ⟨kχ', hkχ'0, hkχ'k, hχconj⟩ := hyp.exists_conj_column hG hG.odd hkχ0
     -- the member's column pair `{kχ, kχ'}` avoids the break's `{k, k'}`
@@ -635,8 +633,6 @@ theorem sixTwoMemberDatum_of_reducible_member [Finite G]
     (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
     (hzS : params.zeta ∈ inducedFamily M)
     (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
-    (htype : IsTypeIII M ∨ IsTypeIV M) (hnt : TypePNontrivialCore M hyp.typeP)
-    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetup htype hnt))
     {A' B : Subgroup ↥M}
     {S₁ : Set (ClassFunction ↥M ℂ)}
     (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
@@ -667,7 +663,7 @@ theorem sixTwoMemberDatum_of_reducible_member [Finite G]
   -- `χ` is a nonzero μ-column sum; pick its conjugate column
   have hχbot : χ ∈ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) ⊥ := hS₁sub hχS₁
   obtain ⟨kχ, hkχ0, hχcol⟩ := hyp.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum
-    hG htype hnt chief hχbot hχred
+    hG hχbot hχred
   rw [hχcol] at hχS₁ hχred hχbot ⊢
   set χc : ClassFunction ↥M ℂ := ∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i kχ with hχcdef
   obtain ⟨kχ', hkχ'0, hkχ'k, hχconj⟩ := hyp.exists_conj_column hG hG.odd hkχ0
@@ -819,8 +815,6 @@ theorem sixTwoDecompositionData [Finite G]
     (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
     (hzS : params.zeta ∈ inducedFamily M)
     (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
-    (htype : IsTypeIII M ∨ IsTypeIV M) (hnt : TypePNontrivialCore M hyp.typeP)
-    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetup htype hnt))
     (A' B : Subgroup ↥M) :
     ∀ (S₁ : Set (ClassFunction ↥M ℂ)),
       OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁ →
@@ -867,11 +861,11 @@ theorem sixTwoDecompositionData [Finite G]
     · exact S08.inducedKernelFamily_memberDatum_orthogonal_breakDa_of_irr_irr
         hyp.dadeData.dade hyp.hconj hodd hyp.mderivSharp_subset_A0 hS₁sub hS₁conj hS₁coh
         hψB hψirr hψnotS1 hψcnotS1 hχ₁S₁ hψdeg hχS₁ hχirr
-    · exact sixTwoMemberDatum_of_reducible_member (A' := A') hG hyp hmu hδpm hδj hzS hz1 htype hnt chief hS₁conj hS₁sub hS₁coh hψB hψirr
+    · exact sixTwoMemberDatum_of_reducible_member (A' := A') hG hyp hmu hδpm hδj hzS hz1 hS₁conj hS₁sub hS₁coh hψB hψirr
         hψnotS1 hψcnotS1 hχ₁S₁ hψdeg hχS₁ hχirr
   · -- reducible (μ-column) break: the named grid obligation
-    exact sixTwoDecompositionData_of_reducible_break hG hyp hmu hδpm hδj hzS hz1 htype hnt
-      chief A' B S₁ hS₁conj hsub hS₁coh ψ hψB hψnotS1 hψcnotS1 χ₁ hχ₁S₁ a hψdeg hbreak hψirr
+    exact sixTwoDecompositionData_of_reducible_break hG hyp hmu hδpm hδj hzS hz1
+      A' B S₁ hS₁conj hsub hS₁coh ψ hψB hψnotS1 hψcnotS1 χ₁ hχ₁S₁ a hψdeg hbreak hψirr
 
 /-- **The h56 oracle for the §11 context, complete modulo the grid datum**: from the coherence
 dichotomy alone (proper traces `A', B ⊊ M'`), a source `θ ∈ Irr M'` trivial on `B` with
@@ -911,7 +905,7 @@ theorem exists_source_of_coherence_dichotomy
           (θ : ClassFunction
             ↥((derivedInG M).subgroupOf M) ℂ) 1).re :=
   hyp.exists_source_index_le_two_psi_of_ne_top hG hA'ne hBne
-    (hyp.sixTwoDecompositionData hG hmu hδpm hδj hzS hz1 htype hnt chief A' B) hAcoh hBncoh
+    (hyp.sixTwoDecompositionData hG hmu hδpm hδj hzS hz1 A' B) hAcoh hBncoh
 
 /-- **Peterfalvi (6.2) for the §11 context, complete modulo the grid datum**: with a section
 `B ≤ D ≤ C ≤ M'` (inside `↥M`) whose quotient `D/B` is central in `C/B`, the coherence

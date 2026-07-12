@@ -7,6 +7,12 @@ created: 2026-07-12
 
 # (6.5) type-V gates — lane-a 実装 handoff (fresh session 用)
 
+> **✅ ROUTE 解決済 (2026-07-12 session 2 → issue 9089)**: 下記「有力 lead」の route 判定は
+> 決着。型V の reducible member = μ_j columns (型III/IV と同一 muGrid 構造)。型III/IV h56 chain
+> (`S13_SixTwoBridge`) の htype/chief は**証明で未使用** — 削除して一般化すれば型V に直接適用可。
+> 実装は **issue 9089** を正本とする (base lemma `reducible_mem_inducedKernelFamily_eq_muGrid_columnSum`
+> の htype/chief 削除 → chain cascade → 型V h56 wiring)。
+
 > 2026-07-12 lane-a session の frontier 徹底 census の成果を durable 化。この session は
 > discovery のみ (Lean 進捗ゼロ)。**fresh session はここから実装に直行する** (下記 discovery を
 > 再実行しないこと)。census は必ず recursive glob (`find OddOrder -name '*.lean'`) + comment-strip

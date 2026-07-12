@@ -577,8 +577,6 @@ the h56 break members (issue 2022, the U-side case being impossible for *reducib
 precisely because the trivial column is the only `H`-trivial one among the `χ_j`). -/
 theorem Hypothesis.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
-    (htype : IsTypeIII M ∨ IsTypeIV M) (hnt : TypePNontrivialCore M hyp.typeP)
-    (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetup htype hnt))
     {B : Subgroup ↥M} {ψ : ClassFunction ↥M ℂ}
     (hψ : ψ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
       ((derivedInG M).subgroupOf M) B)
