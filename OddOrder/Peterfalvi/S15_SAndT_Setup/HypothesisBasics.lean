@@ -272,6 +272,18 @@ theorem Hypothesis.sSetIrrDeg_member_diff_supported [Fintype G] [Finite G]
       exact hz0 (by rw [ClassFunction.sub_apply, hdeg, sub_self])
 
 open OddOrder.Peterfalvi.S11 in
+/-- **`S₁(d)` is finite** (issue 1017, extracted from `sSetIrrDeg_coherent`'s `hSfin`): the family
+injects into `IrreducibleCharacter ↥S` (a `Finite` type) via its irreducibility field. -/
+theorem Hypothesis.sSetIrrDeg_finite [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) (d : ℂ) :
+    (hyp.sSetIrrDeg hG d).Finite := by
+  apply Set.Finite.subset (Set.finite_range
+    (fun χ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥hyp.S =>
+      (χ : ClassFunction ↥hyp.S ℂ)))
+  rintro φ ⟨_, hirr, _⟩
+  exact ⟨⟨φ, hirr⟩, rfl⟩
+
+open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 /-- **The `S07.Hypothesis` (5.2)-subcoherence structure for the uniform-degree irreducible
 sub-family `S₁(d)`** (issue 1017, update #17 — the first honest stage of the (9.11) coherence route).
@@ -378,13 +390,8 @@ noncomputable def Hypothesis.sSetIrrDeg_coherent [Fintype G] [Finite G]
   set A := OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S with hA
   -- The landed (5.3.a) subcoherence structure on `S₁(d)`; its `.tau` is the honest Dade map.
   set hyp' := hyp.sSetIrrDeg_subcoherent hG d hd with hhyp'
-  -- `hSfin`: `S₁(d)` injects into `IrreducibleCharacter ↥S` (a `Finite` type).
-  have hSfin : (hyp.sSetIrrDeg hG d).Finite := by
-    apply Set.Finite.subset (Set.finite_range
-      (fun χ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥hyp.S =>
-        (χ : ClassFunction ↥hyp.S ℂ)))
-    rintro φ ⟨_, hirr, _⟩
-    exact ⟨⟨φ, hirr⟩, rfl⟩
+  -- `hSfin`: `S₁(d)` injects into `IrreducibleCharacter ↥S` (a `Finite` type) — `sSetIrrDeg_finite`.
+  have hSfin : (hyp.sSetIrrDeg hG d).Finite := hyp.sSetIrrDeg_finite hG d
   -- `hirr`: each member is an irreducible character, so has self-inner `1`.
   have hirr : ∀ ζ ∈ hyp.sSetIrrDeg hG d, ClassFunction.inner ζ ζ = 1 :=
     fun ζ hζ => hζ.2.1.inner_self_eq_one
@@ -449,6 +456,49 @@ theorem Hypothesis.sSetIrrDeg_coherent_indS [Finite G]
     c.congrMap fun φ hφ => by
       rw [hyp.indS_apply]
       exact hyp.sInstance_dade_eq_induce hG hφ.2
+
+open OddOrder.Peterfalvi.S11 in
+/-- **(9.11) base cardinality `2 ≤ (S₁(q·a)).ncard`** in the non-Galois case (issue 1017, Step 2 —
+the honest discharge of `sSetIrrDeg_coherent`/`sSetIrrDeg_coherent_indS`'s exposed `h2` at the base
+degree `d = q·a`).
+
+Coq `PFsection9.v:1537-1551` needs only `0 < size S1` for the uniform base `S1 = {ζ ∈ 𝒮 | ζ(1) =
+q·a}`: since `𝒮` is conjugate-closed and has no real members, a single member `χ` and its distinct
+conjugate `χ̄` give `size S1 ≥ 2`.  The single member comes from the **positive** (9.8.d) count
+`caseA_exists_irreducible_qa` — `(p−1)/a ≥ 1` since `a ∣ p−1` (`CliffordCaseAData.a_dvd_p_sub_one`)
+and `[C_U(S₀):U′] ≥ 1` — whose witness lies in `𝒮(H₀U′) ⊆ 𝒮` (`sOf_subset_sSet`); conjugate-closure
+(`sSetIrrDeg_closedUnderConjugate`, `q·a` a positive real so `star d = d`) and non-realness
+(`sSetIrrDeg_hasNoRealCharacters`) then double it.
+
+Given a `CliffordCaseAData` for the `S`-instance §9 data (the non-Galois case assumption), this
+discharges the `h2` parameter of `sSetIrrDeg_coherent_indS` at the base degree `d = q·a`, un-gating
+the uniform base coherence (whose downstream is the (A)-engine orthogonality
+`S15.sSetIrrDeg_coherentIndS_image_inner_eta_eq_zero`).  In the Galois case (caseB) the whole
+family is uniform of degree `q·u`, so no such base-count is needed. -/
+theorem Hypothesis.sSetIrrDeg_qa_two_le_ncard [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
+    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
+    (caseA : CliffordCaseAData chars) :
+    2 ≤ (hyp.sSetIrrDeg hG
+        (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ)).ncard := by
+  classical
+  -- (9.8.d) existence of one degree-`q·a` irreducible member of `𝒮(H₀U′) ⊆ 𝒮`.
+  obtain ⟨χ, hχSOf, hχirr, hχdeg⟩ := caseA_exists_irreducible_qa hG chars caseA
+  set d : ℂ := (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ) with hd_def
+  have hd : star d = d := by rw [hd_def]; exact star_natCast _
+  rw [chars.SOf_eq] at hχSOf
+  have hχ : χ ∈ hyp.sSetIrrDeg hG d :=
+    ⟨sOf_subset_sSet _ _ hχSOf, hχirr, hχdeg⟩
+  -- `χ̄ ∈ S₁(d)` (conj-closed) and `χ ≠ χ̄` (no real members).
+  have hχc : χ.conj ∈ hyp.sSetIrrDeg hG d := hyp.sSetIrrDeg_closedUnderConjugate hG d hd hχ
+  have hne : χ ≠ χ.conj := fun heq =>
+    hyp.sSetIrrDeg_hasNoRealCharacters hG d hχ heq.symm
+  -- `{χ, χ̄} ⊆ S₁(d)` has two distinct members.
+  calc 2 = ({χ, χ.conj} : Set (ClassFunction ↥hyp.S ℂ)).ncard := (Set.ncard_pair hne).symm
+    _ ≤ (hyp.sSetIrrDeg hG d).ncard :=
+        Set.ncard_le_ncard (Set.insert_subset hχ (Set.singleton_subset_iff.mpr hχc))
+          (hyp.sSetIrrDeg_finite hG d)
 
 open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **Honest §9 character data on `S`** (issue 2035 step 3): the `mkSection11CharacterDataS`
