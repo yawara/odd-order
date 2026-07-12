@@ -105,7 +105,11 @@ Hypothesis (11.2) (M maximal, type III/IV)、ζ ∈ 𝒮(HC):
     S16_NonExistenceG/TGapGalois.lean (c 所有、S16-deep import) に在り S13 から import 不可 —
     GaloisCharacter.lean へ hoist (proof は c 版 mirror、`apply_inv_eq_star_of_mem_ZIrr` +
     `inner_mem_ZIrr_int` cite、~30 行)。9000 scan 済 (claim 衝突なし)。hub へ dedup note。
-  - **(G3、narrow 化済 2026-07-12 iter4)**: 一般 index-作用は不要 — 必要なのは
+  - [x] **(G3) DONE (iter5)**: `exists_mapRingEquiv_chiFam_left_move` / `_right_move` +
+    bridge `sigma_omega_omegaProdChar` (S05_SigmaIsometry、sorry-free)。素数位数 char 群の
+    生成性 (zpowers=⊤ + zpow_mod_orderOf) + orderOf ξ = orderOf p (wFst/wSnd 全射 +
+    MonoidHom.cancel_right) + exists_mapRingEquiv_sigma_omega_pow で実現。旧設計メモ:
+    一般 index-作用は不要 — 必要なのは
     **行0/列0 上の pair-move のみ** (分離性が残りを埋める):
     `∃ σ, mapRingEquiv σ (chiFam (p, κ₀)) = chiFam (p', κ₀)` (p,p' 非自明 W₁-char、κ₀ = 自明
     W₂-char は全 σ 固定 ⟹ **exists_complexRingEquiv_pow_and_fixed 不要**、

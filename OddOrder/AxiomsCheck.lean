@@ -7529,3 +7529,9 @@ the Peterfalvi (11.9.c) non-Galois contradiction `q ≤ u − 1 < u = a ≤ p �
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.inner_eq_intCast_of_mapRingEquiv_eq_add
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.inducedFamily_closedUnderMapRingEquiv
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.mapRingEquiv_muColumnZero_sum
+
+/-! **(3.9.b) chiFam pair-move (Galois 転送), axiom-clean** (lane a, 2026-07-12, issue 1024 G3).
+素数位数 W₁/W₂ 側の punctured 行/列上で (3.5) family の 2 点が Galois 共役 — (11.9.a) 行0射影の
+係数定数性入力。 -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_mapRingEquiv_chiFam_left_move
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_mapRingEquiv_chiFam_right_move
