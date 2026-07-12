@@ -80,6 +80,42 @@ theorem Hypothesis.sSet_reducible_eq_muColumnSum [Finite G]
         ((derivedInG hyp.S).subgroupOf hyp.S) (⊥ : Subgroup ↥hyp.S) := hKeq ▸ hmemHU
   exact hyp.mu_reducible_dichotomy hmem hirr
 
+/-- **The conjugate of a reducible `𝒮`-member is reducible**: if `η̄` were irreducible then so
+would be `η = η̄̄` (`IsIrreducibleCharacter.conj` + `conj_conj`). -/
+theorem Hypothesis.sSet_reducible_conj_not_irr [Finite G] (hyp : Hypothesis (G := G))
+    {η : ClassFunction ↥hyp.S ℂ}
+    (hirr : ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter η) :
+    ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter (η : ClassFunction ↥hyp.S ℂ).conj := by
+  haveI := hyp.finiteG
+  intro h
+  apply hirr
+  rw [← ClassFunction.conj_conj η]
+  exact h.conj
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **The two μ-columns of a reducible `𝒮`-member are distinct**: col`(η) ≠ ` col`(η̄)`, else
+`η̄ = ∑ᵢ μ_{i,col(η̄)} = ∑ᵢ μ_{i,col(η)} = η` makes `η` real, contradicting `sSet_hasNoRealCharacters`
+(the family is no-real by `oddCardS`). -/
+theorem Hypothesis.sSet_reducible_columns_ne [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {η : ClassFunction ↥hyp.S ℂ} (hη : η ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
+    (hirr : ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter η) :
+    (hyp.sSet_reducible_eq_muColumnSum hG hη hirr).choose ≠
+      (hyp.sSet_reducible_eq_muColumnSum hG
+        (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupS hG) hη)
+        (hyp.sSet_reducible_conj_not_irr hirr)).choose := by
+  intro he
+  have hnonreal : ¬ ClassFunction.IsReal η :=
+    sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupS hG) (hyp.oddCardS hG) hη
+  apply hnonreal
+  have hjeq := (hyp.sSet_reducible_eq_muColumnSum hG hη hirr).choose_spec.2
+  have hkeq := (hyp.sSet_reducible_eq_muColumnSum hG
+    (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupS hG) hη)
+    (hyp.sSet_reducible_conj_not_irr hirr)).choose_spec.2
+  show (η : ClassFunction ↥hyp.S ℂ).conj = η
+  rw [hkeq, ← he, ← hjeq]
+
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 /-- **The honest Dade image of a reducible `𝒮`-member column difference** (route B, the core of the
@@ -134,51 +170,33 @@ theorem Hypothesis.tauS_muColumn_diff_eq [Finite G]
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
-/-- **Per-member orthonormal Dade `R`-family for a REDUCIBLE `𝒮`-member** (route B; the honest
-`S`-instance analogue of the M-side column branch of `caseB_sOf_memberRFamily`).  For a reducible
-`η = ∑ᵢ μ_{ij} ∈ 𝒮` (Galois caseB), the (5.2.d) orthonormal Dade image family is the `2q`-element
-signed `η`-grid family `R(η) = {η_{ij} : i} ∪ {−η_{ik} : i}` (columns `j ≠ k` of `η`, `η̄`), with
+/-- **The reducible `𝒮`-member `R`-family at EXPLICIT columns `j, k`** (route B core; the
+column-parametrized form of `sSet_caseB_reducible_memberRFamily`).  For a reducible member
+`η = ∑ᵢ μ_{ij} ∈ 𝒮` with conjugate `η̄ = ∑ᵢ μ_{ik}` (`j ≠ k`, both `≠ 0`), the (5.2.d) orthonormal
+Dade image family is the `2q`-element signed `η`-grid family
+`R(η) = {η_{ij} : i} ∪ {−η_{ik} : i}` (`imageSet = Finset.image (Sum.elim …) univ`), with
 `τ_S(η − η̄) = ∑ᵢ(η_{ij} − η_{ik}) = ∑_{α ∈ R(η)} α` (`tauS_muColumn_diff_eq`), orthonormal by
-`eta_orthonormal` (distinct columns `j ≠ k`), and in `ℤ[Irr G]` by `eta_mem_ZIrr`. -/
-noncomputable def Hypothesis.sSet_caseB_reducible_memberRFamily [Finite G]
+`eta_orthonormal` (distinct columns `j ≠ k`), and in `ℤ[Irr G]` by `eta_mem_ZIrr`.  Exposing
+`j, k` as explicit parameters keeps `imageSet` a clean structure literal — its reduction
+(`…_ofColumns_imageSet`) is `rfl`, which the (5.2.e) cross-orthogonality
+(`sSet_caseB_memberRFamily_orthogonal`) needs to destructure the family element-wise. -/
+noncomputable def Hypothesis.sSet_caseB_reducible_memberRFamily_ofColumns [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
     (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
     (caseB : CliffordCaseBData chars)
     {η : ClassFunction ↥hyp.S ℂ} (hη : η ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
-    (hirr : ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter η) :
+    (hηconj : (η : ClassFunction ↥hyp.S ℂ).conj ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
+    {j k : Fin hyp.p} (hj0 : j ≠ ⟨0, hyp.p_prime.pos⟩) (hk0 : k ≠ ⟨0, hyp.p_prime.pos⟩)
+    (hjk : j ≠ k)
+    (hjeq : η = ∑ i : Fin hyp.q, hyp.mu i j)
+    (hkeq : (η : ClassFunction ↥hyp.S ℂ).conj = ∑ i : Fin hyp.q, hyp.mu i k) :
     OddOrder.Peterfalvi.S07.OrthonormalCharacterImageFamily
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
         ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG))) η := by
   classical
   haveI := hyp.finiteG
   letI : Fintype ↥hyp.S := Fintype.ofFinite _
-  -- dispatch `η` and `η̄` to their μ-columns `j`, `k` (`.choose`, since this is a data-valued def).
-  have hηconj : (η : ClassFunction ↥hyp.S ℂ).conj ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) :=
-    sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupS hG) hη
-  have hconjirr : ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter
-      (η : ClassFunction ↥hyp.S ℂ).conj := by
-    intro h
-    apply hirr
-    rw [← ClassFunction.conj_conj η]
-    exact h.conj
-  have hexj := hyp.sSet_reducible_eq_muColumnSum hG hη hirr
-  have hexk := hyp.sSet_reducible_eq_muColumnSum hG hηconj hconjirr
-  let j := hexj.choose
-  let k := hexk.choose
-  have hj0 : j ≠ ⟨0, hyp.p_prime.pos⟩ := hexj.choose_spec.1
-  have hjeq : η = ∑ i : Fin hyp.q, hyp.mu i j := hexj.choose_spec.2
-  have hk0 : k ≠ ⟨0, hyp.p_prime.pos⟩ := hexk.choose_spec.1
-  have hkeq : (η : ClassFunction ↥hyp.S ℂ).conj = ∑ i : Fin hyp.q, hyp.mu i k :=
-    hexk.choose_spec.2
-  -- `j ≠ k` from non-realness of `η`.
-  have hnonreal : ¬ ClassFunction.IsReal η :=
-    sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupS hG) (hyp.oddCardS hG) hη
-  have hjk : j ≠ k := by
-    intro he
-    apply hnonreal
-    show (η : ClassFunction ↥hyp.S ℂ).conj = η
-    rw [hkeq, ← he, ← hjeq]
   -- the honest Dade image `τ_S(η − η̄) = ∑ᵢ(η_{ij} − η_{ik})`.
   have hcross := hyp.tauS_muColumn_diff_eq hG chars caseB hj0 hk0 hjk hη hηconj hjeq hkeq
   -- the `2q`-element signed `η`-grid family.
@@ -207,29 +225,80 @@ noncomputable def Hypothesis.sSet_caseB_reducible_memberRFamily [Finite G]
     by_contra hne
     rw [if_neg hne] at h1
     exact one_ne_zero h1
-  refine
+  exact
     { imageSet := Finset.image g Finset.univ
-      mem_ZIrr := ?_
-      orthonormal := ?_
-      image_eq := ?_ }
-  · intro α hα
-    rw [Finset.mem_image] at hα
-    obtain ⟨x, -, rfl⟩ := hα
-    rcases x with a | a <;> simp only [hg, Sum.elim_inl, Sum.elim_inr]
-    · exact OddOrder.Peterfalvi.S16.eta_mem_ZIrr hyp a j
-    · exact Submodule.neg_mem _ (OddOrder.Peterfalvi.S16.eta_mem_ZIrr hyp a k)
-  · intro α hα β hβ
-    rw [Finset.mem_image] at hα hβ
-    obtain ⟨x, -, rfl⟩ := hα
-    obtain ⟨y, -, rfl⟩ := hβ
-    rw [hg_inner x y]
-    by_cases hxy : x = y
-    · rw [if_pos hxy, if_pos (by rw [hxy])]
-    · rw [if_neg hxy, if_neg (fun h => hxy (hg_inj h))]
-  · -- `τ_S(η − η̄) = ∑_{α ∈ R(η)} α`.
-    rw [hcross, Finset.sum_image (fun x _ y _ h => hg_inj h), Fintype.sum_sum_type]
-    simp only [hg, Sum.elim_inl, Sum.elim_inr, Finset.sum_sub_distrib, Finset.sum_neg_distrib]
-    abel
+      mem_ZIrr := by
+        intro α hα
+        rw [Finset.mem_image] at hα
+        obtain ⟨x, -, rfl⟩ := hα
+        rcases x with a | a <;> simp only [hg, Sum.elim_inl, Sum.elim_inr]
+        · exact OddOrder.Peterfalvi.S16.eta_mem_ZIrr hyp a j
+        · exact Submodule.neg_mem _ (OddOrder.Peterfalvi.S16.eta_mem_ZIrr hyp a k)
+      orthonormal := by
+        intro α hα β hβ
+        rw [Finset.mem_image] at hα hβ
+        obtain ⟨x, -, rfl⟩ := hα
+        obtain ⟨y, -, rfl⟩ := hβ
+        rw [hg_inner x y]
+        by_cases hxy : x = y
+        · rw [if_pos hxy, if_pos (by rw [hxy])]
+        · rw [if_neg hxy, if_neg (fun h => hxy (hg_inj h))]
+      image_eq := by
+        -- `τ_S(η − η̄) = ∑_{α ∈ R(η)} α`.
+        rw [hcross, Finset.sum_image (fun x _ y _ h => hg_inj h), Fintype.sum_sum_type]
+        simp only [hg, Sum.elim_inl, Sum.elim_inr, Finset.sum_sub_distrib, Finset.sum_neg_distrib]
+        abel }
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+open scoped Classical in
+/-- **`imageSet` of the column-parametrized reducible `R`-family** (`rfl`).  The signed `η`-grid
+family `R(η) = {η_{ij}} ∪ {−η_{ik}}` as `Finset.image (Sum.elim (η·ⱼ) (−η·ₖ)) univ`. -/
+theorem Hypothesis.sSet_caseB_reducible_memberRFamily_ofColumns_imageSet [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
+    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
+    (caseB : CliffordCaseBData chars)
+    {η : ClassFunction ↥hyp.S ℂ} (hη : η ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
+    (hηconj : (η : ClassFunction ↥hyp.S ℂ).conj ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
+    {j k : Fin hyp.p} (hj0 : j ≠ ⟨0, hyp.p_prime.pos⟩) (hk0 : k ≠ ⟨0, hyp.p_prime.pos⟩)
+    (hjk : j ≠ k)
+    (hjeq : η = ∑ i : Fin hyp.q, hyp.mu i j)
+    (hkeq : (η : ClassFunction ↥hyp.S ℂ).conj = ∑ i : Fin hyp.q, hyp.mu i k) :
+    (hyp.sSet_caseB_reducible_memberRFamily_ofColumns hG chars caseB hη hηconj hj0 hk0 hjk
+        hjeq hkeq).imageSet
+      = Finset.image (Sum.elim (fun i : Fin hyp.q => hyp.eta i j)
+          (fun i : Fin hyp.q => -hyp.eta i k)) Finset.univ :=
+  rfl
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **Per-member orthonormal Dade `R`-family for a REDUCIBLE `𝒮`-member** (route B; the honest
+`S`-instance analogue of the M-side column branch of `caseB_sOf_memberRFamily`).  The thin wrapper
+over `…_ofColumns` that dispatches `η, η̄` to their μ-columns `j = ` col`(η)`, `k = ` col`(η̄)` via the
+(9.11) reverse dichotomy `sSet_reducible_eq_muColumnSum` (`.choose`), with `j ≠ k` from
+non-realness.  See `…_ofColumns` for the family content. -/
+noncomputable def Hypothesis.sSet_caseB_reducible_memberRFamily [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
+    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
+    (caseB : CliffordCaseBData chars)
+    {η : ClassFunction ↥hyp.S ℂ} (hη : η ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
+    (hirr : ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter η) :
+    OddOrder.Peterfalvi.S07.OrthonormalCharacterImageFamily
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG))) η :=
+  hyp.sSet_caseB_reducible_memberRFamily_ofColumns hG chars caseB hη
+    (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupS hG) hη)
+    (hyp.sSet_reducible_eq_muColumnSum hG hη hirr).choose_spec.1
+    (hyp.sSet_reducible_eq_muColumnSum hG
+      (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupS hG) hη)
+      (hyp.sSet_reducible_conj_not_irr hirr)).choose_spec.1
+    (hyp.sSet_reducible_columns_ne hG hη hirr)
+    (hyp.sSet_reducible_eq_muColumnSum hG hη hirr).choose_spec.2
+    (hyp.sSet_reducible_eq_muColumnSum hG
+      (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupS hG) hη)
+      (hyp.sSet_reducible_conj_not_irr hirr)).choose_spec.2
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
@@ -282,23 +351,316 @@ noncomputable def Hypothesis.sSet_caseB_memberRFamily [Finite G]
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
+/-- **Distinct μ-columns from a vanishing cross inner product**: if `⟨∑ᵢ μ_{ia}, ∑ᵢ μ_{ib}⟩ = 0`
+then `a ≠ b` (else the self-norm `⟨∑ᵢ μ_{ia}, ∑ᵢ μ_{ia}⟩ = q ≠ 0` by `mu_orthonormal`). -/
+theorem Hypothesis.mu_colSum_ne_of_inner_zero [Finite G] (hyp : Hypothesis (G := G))
+    {a b : Fin hyp.p}
+    (h : ClassFunction.inner (∑ i : Fin hyp.q, hyp.mu i a)
+      (∑ i : Fin hyp.q, hyp.mu i b) = 0) :
+    a ≠ b := by
+  classical
+  haveI := hyp.finiteG
+  rintro rfl
+  have hself : ClassFunction.inner (∑ i : Fin hyp.q, hyp.mu i a)
+      (∑ i : Fin hyp.q, hyp.mu i a) = (hyp.q : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_sum_left]
+    calc ∑ i : Fin hyp.q, ClassFunction.inner (hyp.mu i a) (∑ i' : Fin hyp.q, hyp.mu i' a)
+        = ∑ i : Fin hyp.q, ∑ i' : Fin hyp.q,
+            ClassFunction.inner (hyp.mu i a) (hyp.mu i' a) := by
+          refine Finset.sum_congr rfl fun i _ => ?_
+          rw [OddOrder.RepresentationTheory.inner_sum_right]
+      _ = ∑ i : Fin hyp.q, ∑ i' : Fin hyp.q, if i = i' then (1 : ℂ) else 0 := by
+          refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun i' _ => ?_
+          rw [hyp.mu_orthonormal i i' a a]; simp
+      _ = ∑ _i : Fin hyp.q, (1 : ℂ) := by
+          refine Finset.sum_congr rfl fun i _ => ?_; simp
+      _ = (hyp.q : ℂ) := by simp
+  rw [hself] at h
+  exact absurd h (Nat.cast_ne_zero.mpr hyp.q_prime.pos.ne')
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **The honest `'A0`-Dade image of an `A(S)`-supported class function vanishes on the regular set**
+(the vanishing core of `S15.coherentIndS_image_inner_eta_eq_zero`, generalized from `ζ − ζ̄` to any
+`A(S)`-supported `f`).  For `f.support ⊆ A(S) = honestTypeP2ASet S` and a regular `W`-element
+`x ∈ conjClassSet (W ∖ (W₁ ∪ W₂))` (a `typePV`-point of the `S`-data, hence in `A₀(S)`), the Dade
+map reads the source at the representative `w`, which is `0` because `A(S) ⊆ S' = derivedInG S`
+while a regular `W`-element lies outside `S'` (`typePData_typePV_not_mem_derived`). -/
+theorem Hypothesis.dadeS0_apply_eq_zero_of_regular [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    {f : ClassFunction ↥hyp.S ℂ}
+    (hf : f.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)
+    {x : G} (hx : x ∈ OddOrder.GroupTheory.conjClassSet
+      ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G)))) :
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
+        ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) f x = 0 := by
+  classical
+  have hA0supp : f.support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set hyp.S hyp.Sdata) hyp.S :=
+    hf.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
+      (honestTypeP2ASet_subset_A0Set hyp.Sdata))
+  obtain ⟨w, hw, g, hg⟩ := OddOrder.GroupTheory.mem_conjClassSet.mp hx
+  rw [← (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
+    ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) f).of_isConj
+      (isConj_iff.mpr ⟨g, hg⟩)]
+  have hwV : w ∈ OddOrder.GroupTheory.typePV hyp.S hyp.Sdata := by
+    refine ⟨?_, ?_⟩
+    · have hWeq : (hyp.Sdata.W : Set G) = (hyp.W : Set G) := by
+        rw [hyp.Sdata.W_eq, hyp.Sdata_W1_eq, hyp.Sdata_W2_eq, ← hyp.W_eq_join]
+      rw [hWeq]; exact hw.1
+    · rw [hyp.Sdata_W1_eq, hyp.Sdata_W2_eq]; exact hw.2
+  have hwA0 : w ∈ honestTypeP2A0Set hyp.S hyp.Sdata :=
+    Or.inr (OddOrder.GroupTheory.subset_conjClassSetIn hwV)
+  rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support (hyp.dadeHypS0 hG)
+    ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) hA0supp]
+  let a : {a : G // a ∈ honestTypeP2A0Set hyp.S hyp.Sdata} := ⟨w, hwA0⟩
+  have hwh : w ∈ (hyp.dadeHypS0 hG).hCoset a :=
+    ⟨1, (hyp.dadeHypS0 hG).H a |>.one_mem, by simp [a]⟩
+  rw [(hyp.dadeHypS0 hG).isDadeMap_dadeMap.map_eq_of_mem_hCoset _ a hwh]
+  by_contra hne
+  have hwSupp : (⟨w, (hyp.dadeHypS0 hG).mem_L hwA0⟩ : ↥hyp.S) ∈ f.support :=
+    ClassFunction.mem_support.mpr hne
+  have hwA : w ∈ honestTypeP2ASet hyp.S := hf hwSupp
+  have hwDeriv : w ∈ derivedInG hyp.S := honestTypeP2ASet_subset_derived hwA
+  exact (OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived hyp.Sdata hwV) hwDeriv
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **`imageSet`-reduction of the caseB dispatcher, irreducible branch**: for an irreducible member
+`η`, `(sSet_caseB_memberRFamily …).imageSet = (dadeOrthonormalCharacterImageFamilyOfDiff …).imageSet`
+(the specific realness/support proofs exposed existentially, as on the M-side
+`caseB_sOf_memberRFamily_imageSet_of_irr`). -/
+theorem Hypothesis.sSet_caseB_memberRFamily_imageSet_of_irr [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
+    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
+    (caseB : CliffordCaseBData chars)
+    {η : ClassFunction ↥hyp.S ℂ} (hη : η ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
+    (hirr : OddOrder.RepresentationTheory.IsIrreducibleCharacter η) :
+    ∃ (hr : ¬ ClassFunction.IsReal (η : ClassFunction ↥hyp.S ℂ))
+      (hs : ((η : ClassFunction ↥hyp.S ℂ).conj - (η : ClassFunction ↥hyp.S ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S),
+      (hyp.sSet_caseB_memberRFamily hG chars caseB hη).imageSet =
+        (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff (hyp.dadeHypS hG)
+          (hyp.dadeHypS_hconj hG) ⟨η, hirr⟩ hr hs).imageSet := by
+  refine ⟨sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupS hG) (hyp.oddCardS hG) hη,
+    hyp.sSet_caseB_member_diff_supported hG chars caseB
+      (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupS hG) hη) hη, ?_⟩
+  unfold Hypothesis.sSet_caseB_memberRFamily
+  rw [dif_pos hirr]
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+open scoped Classical in
+/-- **`imageSet`-reduction of the caseB dispatcher, reducible branch**: for a reducible member
+`η = ∑ᵢ μ_{ij}`, `(sSet_caseB_memberRFamily …).imageSet` is the signed `η`-grid family
+`{η_{ij}} ∪ {−η_{ik}}`, with the columns `j = ` col`(η)`, `k = ` col`(η̄)` and the μ-column
+identities `η = ∑ᵢ μ_{ij}`, `η̄ = ∑ᵢ μ_{ik}` exposed (the (5.2.e) column-disjointness inputs). -/
+theorem Hypothesis.sSet_caseB_memberRFamily_imageSet_of_red [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
+    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
+    (caseB : CliffordCaseBData chars)
+    {η : ClassFunction ↥hyp.S ℂ} (hη : η ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
+    (hirr : ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter η) :
+    ∃ (j k : Fin hyp.p), η = ∑ i : Fin hyp.q, hyp.mu i j ∧
+      (η : ClassFunction ↥hyp.S ℂ).conj = ∑ i : Fin hyp.q, hyp.mu i k ∧
+      (hyp.sSet_caseB_memberRFamily hG chars caseB hη).imageSet =
+        Finset.image (Sum.elim (fun i : Fin hyp.q => hyp.eta i j)
+          (fun i : Fin hyp.q => -hyp.eta i k)) Finset.univ := by
+  refine ⟨(hyp.sSet_reducible_eq_muColumnSum hG hη hirr).choose,
+    (hyp.sSet_reducible_eq_muColumnSum hG
+      (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupS hG) hη)
+      (hyp.sSet_reducible_conj_not_irr hirr)).choose,
+    (hyp.sSet_reducible_eq_muColumnSum hG hη hirr).choose_spec.2,
+    (hyp.sSet_reducible_eq_muColumnSum hG
+      (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupS hG) hη)
+      (hyp.sSet_reducible_conj_not_irr hirr)).choose_spec.2, ?_⟩
+  rw [show (hyp.sSet_caseB_memberRFamily hG chars caseB hη).imageSet
+        = (hyp.sSet_caseB_reducible_memberRFamily hG chars caseB hη hirr).imageSet from by
+    unfold Hypothesis.sSet_caseB_memberRFamily; rw [dif_neg hirr]]
+  exact hyp.sSet_caseB_reducible_memberRFamily_ofColumns_imageSet hG chars caseB hη
+    (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupS hG) hη)
+    (hyp.sSet_reducible_eq_muColumnSum hG hη hirr).choose_spec.1
+    (hyp.sSet_reducible_eq_muColumnSum hG
+      (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupS hG) hη)
+      (hyp.sSet_reducible_conj_not_irr hirr)).choose_spec.1
+    (hyp.sSet_reducible_columns_ne hG hη hirr)
+    (hyp.sSet_reducible_eq_muColumnSum hG hη hirr).choose_spec.2
+    (hyp.sSet_reducible_eq_muColumnSum hG
+      (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupS hG) hη)
+      (hyp.sSet_reducible_conj_not_irr hirr)).choose_spec.2
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **The irreducible member's Dade `R`-family is orthogonal to the whole `η`-grid** (the irr×red /
+red×irr core; the (13.19.b) rigidity engine applied to the `S`-instance Dade image constituents).
+For an irreducible `φ ∈ 𝒮`, the two constituents `ε·μ, −ε·ν` of `τ_S(φ − φ̄)`
+(`dadeOrthonormalCharacterImageFamilyOfDiff.imageSet`) are norm-one virtual characters whose signed
+difference `τ_S(φ − φ̄)` vanishes on the regular set `Ŵ^G` (`dadeS0_apply_eq_zero_of_regular` after
+the `'A→'A0`-Dade bridge), so `eta_orthogonal_of_norm_one_pair_vanish` gives `⟨η_{ij}, α⟩ = 0` for
+every `α ∈ R(φ)`. -/
+theorem Hypothesis.sSet_caseB_irr_memberRFamily_eta_inner [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
+    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
+    (caseB : CliffordCaseBData chars)
+    {φ : ClassFunction ↥hyp.S ℂ} (hφ : φ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
+    (hφirr : OddOrder.RepresentationTheory.IsIrreducibleCharacter φ)
+    (hr : ¬ ClassFunction.IsReal (φ : ClassFunction ↥hyp.S ℂ))
+    (hs : ((φ : ClassFunction ↥hyp.S ℂ).conj - (φ : ClassFunction ↥hyp.S ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)
+    {α : ClassFunction G ℂ}
+    (hα : α ∈ (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff (hyp.dadeHypS hG)
+      (hyp.dadeHypS_hconj hG) ⟨φ, hφirr⟩ hr hs).imageSet)
+    (i : Fin hyp.q) (j : Fin hyp.p) :
+    ClassFunction.inner (hyp.eta i j) α = 0 := by
+  classical
+  -- capture the two-element `CharacterDifferenceImage` `cd` (`R(φ) = {ε·μ, −ε·ν}`).
+  obtain ⟨cd, hcd⟩ :
+      ∃ cd : OddOrder.Peterfalvi.S07.CharacterDifferenceImage (G := G)
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+          ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)))
+        (φ : ClassFunction ↥hyp.S ℂ),
+        OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff (hyp.dadeHypS hG)
+            (hyp.dadeHypS_hconj hG) ⟨φ, hφirr⟩ hr hs = cd.toOrthonormalImage := ⟨_, rfl⟩
+  rw [hcd] at hα
+  simp only [OddOrder.Peterfalvi.S07.CharacterDifferenceImage.toOrthonormalImage,
+    Finset.mem_insert, Finset.mem_singleton] at hα
+  -- `μ, ν` norms / `ZIrr` facts.
+  have hμZ : cd.muClassFunction ∈ ZIrr G := cd.mu.mem_ZIrr
+  have hνZ : cd.nuClassFunction ∈ ZIrr G := cd.nu.mem_ZIrr
+  have hμ1 : ClassFunction.inner cd.muClassFunction cd.muClassFunction = 1 := by
+    have h := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite cd.mu cd.mu
+    rwa [if_pos rfl] at h
+  have hν1 : ClassFunction.inner cd.nuClassFunction cd.nuClassFunction = 1 := by
+    have h := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite cd.nu cd.nu
+    rwa [if_pos rfl] at h
+  have hμν : ClassFunction.inner cd.muClassFunction cd.nuClassFunction = 0 := by
+    have h := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite cd.mu cd.nu
+    rwa [if_neg cd.distinct] at h
+  have hνμ : ClassFunction.inner cd.nuClassFunction cd.muClassFunction = 0 := by
+    have h := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite cd.nu cd.mu
+    rwa [if_neg (Ne.symm cd.distinct)] at h
+  have hsign : (cd.sign : ℂ) * (cd.sign : ℂ) = 1 := by
+    have := cd.sign_mul_self; exact_mod_cast congrArg (Int.cast : ℤ → ℂ) this
+  -- `φ − φ̄` is `A(S)`-supported (`hs` up to sign), hence `A₀(S)`-supported.
+  have hdiffsupp' : ((φ : ClassFunction ↥hyp.S ℂ) - (φ : ClassFunction ↥hyp.S ℂ).conj).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S := by
+    rw [show (φ : ClassFunction ↥hyp.S ℂ) - (φ : ClassFunction ↥hyp.S ℂ).conj =
+        -((φ : ClassFunction ↥hyp.S ℂ).conj - (φ : ClassFunction ↥hyp.S ℂ)) by abel,
+      ClassFunction.support_neg]
+    exact hs
+  have hA0supp' : ((φ : ClassFunction ↥hyp.S ℂ) - (φ : ClassFunction ↥hyp.S ℂ).conj).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set hyp.S hyp.Sdata) hyp.S :=
+    hdiffsupp'.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
+      (honestTypeP2ASet_subset_A0Set hyp.Sdata))
+  -- the signed difference `ε·μ − ε·ν = τ_S(φ − φ̄) = τ_S⁰(φ − φ̄)` (the `'A→'A0`-Dade bridge).
+  have hcdimg : (cd.sign : ℂ) • cd.muClassFunction - (cd.sign : ℂ) • cd.nuClassFunction
+      = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
+          ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG))
+          ((φ : ClassFunction ↥hyp.S ℂ) - (φ : ClassFunction ↥hyp.S ℂ).conj) := by
+    rw [hyp.sInstance_dade0_eq_induce hG hA0supp', ← hyp.sInstance_dade_eq_induce hG hdiffsupp',
+      cd.image_eq, smul_sub, Int.cast_smul_eq_zsmul ℂ, Int.cast_smul_eq_zsmul ℂ]
+  -- the difference vanishes on the regular set.
+  have hvanish : ∀ y ∈ OddOrder.GroupTheory.conjClassSet
+      ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))),
+      ((cd.sign : ℂ) • cd.muClassFunction - (cd.sign : ℂ) • cd.nuClassFunction) y = 0 := by
+    intro y hy
+    rw [hcdimg]
+    exact hyp.dadeS0_apply_eq_zero_of_regular hG hdiffsupp' hy
+  have hvanish' : ∀ y ∈ OddOrder.GroupTheory.conjClassSet
+      ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))),
+      ((cd.sign : ℂ) • cd.nuClassFunction - (cd.sign : ℂ) • cd.muClassFunction) y = 0 := by
+    intro y hy
+    rw [show (cd.sign : ℂ) • cd.nuClassFunction - (cd.sign : ℂ) • cd.muClassFunction
+        = -((cd.sign : ℂ) • cd.muClassFunction - (cd.sign : ℂ) • cd.nuClassFunction) by abel,
+      ClassFunction.neg_apply, hvanish y hy, neg_zero]
+  -- `ZIrr` / norm inputs for the (13.19.b) rigidity engine.
+  have hpsiZ : (cd.sign : ℂ) • cd.muClassFunction ∈ ZIrr G := by
+    rw [Int.cast_smul_eq_zsmul ℂ]; exact (ZIrr G).smul_mem cd.sign hμZ
+  have hconjZ : (cd.sign : ℂ) • cd.nuClassFunction ∈ ZIrr G := by
+    rw [Int.cast_smul_eq_zsmul ℂ]; exact (ZIrr G).smul_mem cd.sign hνZ
+  have hpsi1 : ClassFunction.inner ((cd.sign : ℂ) • cd.muClassFunction)
+      ((cd.sign : ℂ) • cd.muClassFunction) = 1 := by
+    rw [ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right, hμ1,
+      mul_one, star_intCast]; exact hsign
+  have hconj1 : ClassFunction.inner ((cd.sign : ℂ) • cd.nuClassFunction)
+      ((cd.sign : ℂ) • cd.nuClassFunction) = 1 := by
+    rw [ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right, hν1,
+      mul_one, star_intCast]; exact hsign
+  have hcross : ClassFunction.inner ((cd.sign : ℂ) • cd.muClassFunction)
+      ((cd.sign : ℂ) • cd.nuClassFunction) = 0 := by
+    rw [ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right, hμν,
+      mul_zero, mul_zero]
+  have hcross' : ClassFunction.inner ((cd.sign : ℂ) • cd.nuClassFunction)
+      ((cd.sign : ℂ) • cd.muClassFunction) = 0 := by
+    rw [ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right, hνμ,
+      mul_zero, mul_zero]
+  have hvpsi := OddOrder.Peterfalvi.S16.eta_orthogonal_of_norm_one_pair_vanish hyp
+    hpsiZ hconjZ hpsi1 hconj1 hcross hvanish i j
+  have hvconj := OddOrder.Peterfalvi.S16.eta_orthogonal_of_norm_one_pair_vanish hyp
+    hconjZ hpsiZ hconj1 hpsi1 hcross' hvanish' i j
+  rcases hα with rfl | rfl
+  · rw [← Int.cast_smul_eq_zsmul ℂ]; exact hvpsi
+  · rw [← Int.cast_smul_eq_zsmul ℂ, Int.cast_neg, neg_smul, ClassFunction.inner_neg_right, hvconj,
+      neg_zero]
+
+set_option maxHeartbeats 1600000 in
+-- the `dadeHypS`-support defeq (through the isometry data) is feasible but expensive; discharged
+-- once here so the `2×2` `hRorth` split in `sSet_caseB_memberRFamily_orthogonal` need not re-pay it.
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **irr × irr `R`-family orthogonality, `S`-instance form**: the (5.2.e)
+`dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal` (`S08_YsetInner`) specialized to the honest
+`S`-instance Dade `dadeHypS hG` with the `A(S)` supports, isolating the (feasible-but-expensive)
+`dadeHypS`-support defeq in one focused lemma (so the (5.2.e) `2×2` case split in
+`sSet_caseB_memberRFamily_orthogonal` does not re-pay it under its large local context — the
+`S`-instance analogue of the M-side `dadeOfDiff_orthogonal_dadeOfDiff_typeP`). -/
+theorem Hypothesis.dadeOfDiff_orthogonal_typeP_S [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (x χ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥hyp.S)
+    (hxreal : ¬ ClassFunction.IsReal (x : ClassFunction ↥hyp.S ℂ))
+    (hxdiffsupp : ((x : ClassFunction ↥hyp.S ℂ).conj - (x : ClassFunction ↥hyp.S ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)
+    (hχreal : ¬ ClassFunction.IsReal (χ : ClassFunction ↥hyp.S ℂ))
+    (hχdiffsupp : ((χ : ClassFunction ↥hyp.S ℂ).conj - (χ : ClassFunction ↥hyp.S ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)
+    (hxχ : ClassFunction.inner (x : ClassFunction ↥hyp.S ℂ) (χ : ClassFunction ↥hyp.S ℂ) = 0)
+    (hxχbar :
+      ClassFunction.inner (x : ClassFunction ↥hyp.S ℂ) (χ : ClassFunction ↥hyp.S ℂ).conj = 0)
+    (hxbarχ :
+      ClassFunction.inner (x : ClassFunction ↥hyp.S ℂ).conj (χ : ClassFunction ↥hyp.S ℂ) = 0)
+    (hxbarχbar : ClassFunction.inner (x : ClassFunction ↥hyp.S ℂ).conj
+      (χ : ClassFunction ↥hyp.S ℂ).conj = 0) :
+    (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff (hyp.dadeHypS hG)
+        (hyp.dadeHypS_hconj hG) x hxreal hxdiffsupp).Orthogonal
+      (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff (hyp.dadeHypS hG)
+        (hyp.dadeHypS_hconj hG) χ hχreal hχdiffsupp) :=
+  OddOrder.Peterfalvi.S08.dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal
+    (hyp.dadeHypS hG) (hyp.dadeHypS_hconj hG) hxreal hxdiffsupp hχreal hχdiffsupp
+    hxχ hxχbar hxbarχ hxbarχbar
+
+set_option maxHeartbeats 1600000 in
+-- the irr×irr branch matches the dispatched families against the (5.2.e) `dadeOfDiff` orthogonality
+-- through the `dadeHypS` isometry-data defeq; the whole `2×2` split runs above the default budget.
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
 /-- **(5.2.e) cross-orthogonality of the caseB per-member `R`-families** (issue 1017, the `hRorth`
 input of `uniform_degree_coherence_of_families`, the honest `S`-instance analogue of the M-instance
 `caseB_sOf_memberRFamily_orthogonal`).  For members `φ, ξ ∈ 𝒮` with `⟨φ, ξ⟩ = 0` and `⟨φ, ξ̄⟩ = 0`
 (distinct non-conjugate members), the Dade image families `R(φ)`, `R(ξ)` are orthogonal.
 
-**RESIDUAL (issue 1017): the `2×2` cross-orthogonality assembly** — the reducible `R`-family
-itself now LANDS (`sSet_caseB_reducible_memberRFamily`, above, sorry-free), so this is no longer
-gated on any missing `R`-datum.  What remains is the member-wise constituent-disjointness `2×2`
-case split, which needs (i) `imageSet`-reduction lemmas exposing `(sSet_caseB_memberRFamily …).imageSet`
-in each branch (irr → `dadeOrthonormalCharacterImageFamilyOfDiff.imageSet`; red → the signed-`η`
-family `{η_{ij}} ∪ {−η_{ik}}`), mirroring the M-side `caseB_sOf_memberRFamily_imageSet_of_{irr,col}`,
-and (ii) the eta-family cross-orthogonality lemmas: **irr×irr** from the landed (5.2.e)
-`dadeOrthonormalCharacterImageFamilyOfDiff` orthogonality; **red×red** from `eta_orthonormal`
-(distinct columns `{j,k} ∩ {j',k'} = ∅` forced by `⟨φ,ξ⟩ = ⟨φ,ξ̄⟩ = 0`); **irr×red** from
-`eta_orthogonal_of_norm_one_pair_vanish` (`S16_GridExpansion`).  Sorried-cite pending that
-infrastructure (the analogue of the M-side `certainTypeR_imageSet_orthogonal_*` lemmas, which
-do not transfer since the S-side family is the eta-grid family, not `certainTypeR`). -/
+A `2×2` case split on the member dichotomy (irreducible / reducible-column), on the `imageSet`
+reductions `sSet_caseB_memberRFamily_imageSet_of_{irr,red}`:
+
+* **irr × irr** — the landed (5.2.e) `dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal`
+  (`S08_YsetInner`), with the two extra scalars `⟨φ̄, ξ⟩`, `⟨φ̄, ξ̄⟩` the `star`-conjugates of
+  `⟨φ, ξ̄⟩`, `⟨φ, ξ⟩` (`inner_conj_conj`), so `0`;
+* **irr × red** / **red × irr** — `sSet_caseB_irr_memberRFamily_eta_inner` (`⟨η-grid, R(irr)⟩ = 0`
+  from the (13.19.b) rigidity engine), transported by `inner_conj_symm` / `inner_neg`;
+* **red × red** — `eta_orthonormal`, the four columns pairwise distinct (`mu_colSum_ne_of_inner_zero`
+  on `⟨φ, ξ⟩ = ⟨φ, ξ̄⟩ = ⟨φ̄, ξ⟩ = ⟨φ̄, ξ̄⟩ = 0`, so `{jφ, kφ} ∩ {jξ, kξ} = ∅`). -/
 theorem Hypothesis.sSet_caseB_memberRFamily_orthogonal [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
@@ -310,9 +672,73 @@ theorem Hypothesis.sSet_caseB_memberRFamily_orthogonal [Finite G]
     (h2 : ClassFunction.inner φ ξ.conj = 0) :
     (hyp.sSet_caseB_memberRFamily hG chars caseB hφ).Orthogonal
       (hyp.sSet_caseB_memberRFamily hG chars caseB hξ) := by
-  -- RESIDUAL (issue 1017): the reducible `R`-family now LANDS; remaining is the `2×2` member-wise
-  -- cross-orthogonality assembly (imageSet-reduction + eta-family orthogonality) — see docstring.
-  sorry
+  classical
+  -- the two extra vanishing inners `⟨φ̄, ξ⟩ = ⟨φ̄, ξ̄⟩ = 0` (`inner_conj_conj`).
+  have hbφξ : ClassFunction.inner φ.conj ξ = 0 := by
+    rw [← ClassFunction.conj_conj ξ, OddOrder.RepresentationTheory.inner_conj_conj, h2, star_zero]
+  have hbφξb : ClassFunction.inner φ.conj ξ.conj = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_conj, h1, star_zero]
+  intro α hα β hβ
+  by_cases hφirr : OddOrder.RepresentationTheory.IsIrreducibleCharacter φ <;>
+    by_cases hξirr : OddOrder.RepresentationTheory.IsIrreducibleCharacter ξ
+  · -- irr × irr
+    obtain ⟨hrφ, hsφ, hφeq⟩ := hyp.sSet_caseB_memberRFamily_imageSet_of_irr hG chars caseB hφ hφirr
+    obtain ⟨hrξ, hsξ, hξeq⟩ := hyp.sSet_caseB_memberRFamily_imageSet_of_irr hG chars caseB hξ hξirr
+    rw [hφeq] at hα
+    rw [hξeq] at hβ
+    exact hyp.dadeOfDiff_orthogonal_typeP_S hG ⟨φ, hφirr⟩ ⟨ξ, hξirr⟩ hrφ hsφ hrξ hsξ
+      h1 h2 hbφξ hbφξb α hα β hβ
+  · -- irr × red
+    obtain ⟨hrφ, hsφ, hφeq⟩ := hyp.sSet_caseB_memberRFamily_imageSet_of_irr hG chars caseB hφ hφirr
+    obtain ⟨jξ, kξ, hjξeq, hkξeq, hξeq⟩ :=
+      hyp.sSet_caseB_memberRFamily_imageSet_of_red hG chars caseB hξ hξirr
+    rw [hφeq] at hα
+    rw [hξeq, Finset.mem_image] at hβ
+    obtain ⟨y, -, rfl⟩ := hβ
+    rcases y with b | b <;> simp only [Sum.elim_inl, Sum.elim_inr]
+    · rw [OddOrder.RepresentationTheory.inner_conj_symm, star_eq_zero]
+      exact hyp.sSet_caseB_irr_memberRFamily_eta_inner hG chars caseB hφ hφirr hrφ hsφ hα b jξ
+    · rw [ClassFunction.inner_neg_right, OddOrder.RepresentationTheory.inner_conj_symm,
+        hyp.sSet_caseB_irr_memberRFamily_eta_inner hG chars caseB hφ hφirr hrφ hsφ hα b kξ,
+        star_zero, neg_zero]
+  · -- red × irr
+    obtain ⟨jφ, kφ, hjφeq, hkφeq, hφeq⟩ :=
+      hyp.sSet_caseB_memberRFamily_imageSet_of_red hG chars caseB hφ hφirr
+    obtain ⟨hrξ, hsξ, hξeq⟩ := hyp.sSet_caseB_memberRFamily_imageSet_of_irr hG chars caseB hξ hξirr
+    rw [hξeq] at hβ
+    rw [hφeq, Finset.mem_image] at hα
+    obtain ⟨x, -, rfl⟩ := hα
+    rcases x with a | a <;> simp only [Sum.elim_inl, Sum.elim_inr]
+    · exact hyp.sSet_caseB_irr_memberRFamily_eta_inner hG chars caseB hξ hξirr hrξ hsξ hβ a jφ
+    · rw [ClassFunction.inner_neg_left,
+        hyp.sSet_caseB_irr_memberRFamily_eta_inner hG chars caseB hξ hξirr hrξ hsξ hβ a kφ,
+        neg_zero]
+  · -- red × red
+    obtain ⟨jφ, kφ, hjφeq, hkφeq, hφeq⟩ :=
+      hyp.sSet_caseB_memberRFamily_imageSet_of_red hG chars caseB hφ hφirr
+    obtain ⟨jξ, kξ, hjξeq, hkξeq, hξeq⟩ :=
+      hyp.sSet_caseB_memberRFamily_imageSet_of_red hG chars caseB hξ hξirr
+    rw [hφeq, Finset.mem_image] at hα
+    rw [hξeq, Finset.mem_image] at hβ
+    have hne1 : jφ ≠ jξ :=
+      hyp.mu_colSum_ne_of_inner_zero (by rw [← hjφeq, ← hjξeq]; exact h1)
+    have hne2 : jφ ≠ kξ :=
+      hyp.mu_colSum_ne_of_inner_zero (by rw [← hjφeq, ← hkξeq]; exact h2)
+    have hne3 : kφ ≠ jξ :=
+      hyp.mu_colSum_ne_of_inner_zero (by rw [← hkφeq, ← hjξeq]; exact hbφξ)
+    have hne4 : kφ ≠ kξ :=
+      hyp.mu_colSum_ne_of_inner_zero (by rw [← hkφeq, ← hkξeq]; exact hbφξb)
+    obtain ⟨x, -, rfl⟩ := hα
+    obtain ⟨y, -, rfl⟩ := hβ
+    rcases x with a | a <;> rcases y with b | b <;> simp only [Sum.elim_inl, Sum.elim_inr]
+    · rw [OddOrder.Peterfalvi.S16.eta_orthonormal hyp a b jφ jξ, if_neg (fun h => hne1 h.2)]
+    · rw [ClassFunction.inner_neg_right, OddOrder.Peterfalvi.S16.eta_orthonormal hyp a b jφ kξ,
+        if_neg (fun h => hne2 h.2), neg_zero]
+    · rw [ClassFunction.inner_neg_left, OddOrder.Peterfalvi.S16.eta_orthonormal hyp a b kφ jξ,
+        if_neg (fun h => hne3 h.2), neg_zero]
+    · rw [ClassFunction.inner_neg_left, ClassFunction.inner_neg_right,
+        OddOrder.Peterfalvi.S16.eta_orthonormal hyp a b kφ kξ, if_neg (fun h => hne4 h.2),
+        neg_zero, neg_zero]
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
