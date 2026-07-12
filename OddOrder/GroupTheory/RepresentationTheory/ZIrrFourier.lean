@@ -619,4 +619,74 @@ theorem exists_irr_sub_irr_of_inner_self_two {φ : ClassFunction G ℂ}
     rw [← Nat.cast_add] at h2
     exact hdegne h2
 
+open scoped Classical in
+/-- **Bessel's inequality for an orthonormal family of virtual characters**: if `ψ ∈ ZIrr G` has
+`‖ψ‖² = N` and `(v i)` is an orthonormal family of virtual characters with integer coefficients
+`⟨ψ, v i⟩ = n i`, then `∑ i, (n i)² ≤ N`.  The residual `χ = ψ − ∑ᵢ nᵢ • vᵢ` is a virtual
+character orthogonal to every `v i`, so `‖ψ‖² = ∑ᵢ nᵢ² + ‖χ‖²` with `‖χ‖²` a nonnegative
+integer (`mem_ZIrr_inner_self_eq_sum_sq`).  This is the norm budget of the Peterfalvi
+(10.9)/(11.9.a) grid analyses (`‖∑ aᵢⱼ ω^σ‖² ≤ ‖(μ₀ − ζ)^τ‖²`). -/
+theorem sum_sq_inner_le_of_orthonormal {ι : Type*} [Fintype ι]
+    {v : ι → ClassFunction G ℂ} (hZ : ∀ i, v i ∈ ZIrr G)
+    (horth : ∀ i k, ClassFunction.inner (v i) (v k) = if i = k then (1 : ℂ) else 0)
+    {ψ : ClassFunction G ℂ} (hψ : ψ ∈ ZIrr G) {N : ℕ}
+    (hψN : ClassFunction.inner ψ ψ = (N : ℂ))
+    {n : ι → ℤ} (hn : ∀ i, ClassFunction.inner ψ (v i) = (n i : ℂ)) :
+    ∑ i, n i ^ 2 ≤ (N : ℤ) := by
+  set X : ClassFunction G ℂ := ∑ i, (n i : ℂ) • v i with hX
+  set χ : ClassFunction G ℂ := ψ - X with hχdef
+  -- `⟨X, v l⟩ = n l`, hence `⟨χ, v l⟩ = 0`
+  have hXvl : ∀ l, ClassFunction.inner X (v l) = (n l : ℂ) := by
+    intro l
+    rw [hX, inner_sum_left]
+    rw [Finset.sum_eq_single l]
+    · rw [ClassFunction.inner_smul_left, horth l l, if_pos rfl, mul_one]
+    · intro k _ hkl
+      rw [ClassFunction.inner_smul_left, horth k l, if_neg hkl, mul_zero]
+    · intro h; exact absurd (Finset.mem_univ _) h
+  have hχvl : ∀ l, ClassFunction.inner χ (v l) = 0 := by
+    intro l
+    rw [hχdef, ClassFunction.inner_sub_left, hn l, hXvl l, sub_self]
+  -- Parseval on `X`
+  have hXX : ClassFunction.inner X X = ((∑ i, n i ^ 2 : ℤ) : ℂ) := by
+    rw [hX, inner_sum_left]
+    push_cast
+    refine Finset.sum_congr rfl fun i _ => ?_
+    rw [ClassFunction.inner_smul_left, inner_sum_right]
+    rw [Finset.sum_eq_single i]
+    · rw [inner_smul_right, horth i i, if_pos rfl, mul_one, star_intCast]; ring
+    · intro k _ hki
+      rw [inner_smul_right, horth i k, if_neg (fun h => hki h.symm), mul_zero]
+    · intro h; exact absurd (Finset.mem_univ _) h
+  -- the cross terms vanish
+  have hχX : ClassFunction.inner χ X = 0 := by
+    rw [hX, inner_sum_right]
+    refine Finset.sum_eq_zero fun k _ => ?_
+    rw [inner_smul_right, hχvl k, mul_zero]
+  have hXχ : ClassFunction.inner X χ = 0 := by
+    rw [inner_conj_symm, hχX, star_zero]
+  -- `χ` is a virtual character with nonnegative integer squared norm
+  have hXZ : X ∈ ZIrr G := by
+    rw [hX]
+    exact Submodule.sum_mem _ fun i _ => by
+      rw [Int.cast_smul_eq_zsmul]
+      exact Submodule.smul_mem _ (n i) (hZ i)
+  have hχZ : χ ∈ ZIrr G := Submodule.sub_mem _ hψ hXZ
+  obtain ⟨c, -, -, hcnorm⟩ := mem_ZIrr_inner_self_eq_sum_sq hχZ
+  -- assemble over `ℤ`
+  have hψeq : ψ = X + χ := by rw [hχdef, add_sub_cancel]
+  have hsplit : (N : ℂ) = ((∑ i, n i ^ 2 : ℤ) : ℂ)
+      + ((∑ a ∈ c.support, (c a) ^ 2 : ℤ) : ℂ) := by
+    rw [← hψN]
+    conv_lhs => rw [hψeq]
+    rw [ClassFunction.inner_add_left, ClassFunction.inner_add_right,
+      ClassFunction.inner_add_right, hXX, hχX, hXχ, hcnorm]
+    push_cast
+    ring
+  have hZeq : (N : ℤ) = (∑ i, n i ^ 2) + ∑ a ∈ c.support, (c a) ^ 2 := by
+    exact_mod_cast hsplit
+  have hT : 0 ≤ ∑ a ∈ c.support, (c a) ^ 2 :=
+    Finset.sum_nonneg fun _ _ => sq_nonneg _
+  omega
+
 end OddOrder.RepresentationTheory
