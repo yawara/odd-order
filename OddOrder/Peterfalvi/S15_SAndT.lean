@@ -324,6 +324,27 @@ theorem typeIBetaL_support_subset_dadeSupport [Finite G] {L : Subgroup G}
   exact (typeISetup.dadeData.dade.isDadeMap_dadeMap).map_eq_zero_of_not_mem_dadeSupport _ _ hnot
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Any `A(L)`-supported Dade image lands in `Ã(A(L)) = dadeSupport`** — the general form of
+`typeIBetaL_support_subset_dadeSupport` (whose input is `ψ = Ind_H^L 1 − φ`).  Since
+`τ = dadeIntegralCharacterMap` agrees with the (2.5) Dade map on `A(L)`-supported inputs
+(`dadeIntegralCharacterMap_apply_of_support`), the image vanishes off `dadeSupport`
+(`map_eq_zero_of_not_mem_dadeSupport`). -/
+theorem tau_support_subset_dadeSupport [Finite G] {L : Subgroup G}
+    (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L) (ψ : ClassFunction ↥L ℂ)
+    (hψ : ψ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (OddOrder.GroupTheory.typeIA L typeISetup.typeI) L) :
+    (typeISetup.tau ψ).support ⊆ typeISetup.dadeData.dade.dadeSupport := by
+  intro x hx
+  by_contra hnot
+  apply hx
+  show typeISetup.tau ψ x = 0
+  rw [show typeISetup.tau = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+        typeISetup.dadeData.dade
+        (typeISetup.dadeData.dade.fullDadeIsometryData typeISetup.hconj) from rfl,
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support _ _ hψ]
+  exact (typeISetup.dadeData.dade.isDadeMap_dadeMap).map_eq_zero_of_not_mem_dadeSupport _ _ hnot
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **T-side (14.3.b) bridge character** `β_T = Ind_{QW₂}^T 1_{QW₂} − ν_{10} ∈ CF(T)` — the
 S↔T mirror of `betaGrid` (`β_S = Ind_{PW₁}^S 1 − μ_{01}`), with the grid entry `ν_{10}` in
 place of `μ_{01}`. -/
@@ -375,13 +396,13 @@ image `τ_S(β_j)` (supported in `P^# ∪ (W∖(W₁∪W₂))^S`-classes, (13.18
 `Ã(L)`-element is divisible by a prime divisor of `|H|`, and `|H|` is coprime to `p q`
 ((8.17.a)).  The column-`#1` instance is `typeIBetaL_betaS_disjoint_support`; the general
 column feeds the (13.19.c) zero-axis constancy through `gammaGrid_defGamma`. -/
-theorem typeIBetaL_dadeS_betaGrid_disjoint_support [Finite G]
+theorem dadeSupport_betaGrid_disjoint_support [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L)
-    (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ typeISetup.Sset)
-    (_hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ))
+    (χ : ClassFunction G ℂ)
+    (hχ : χ.support ⊆ typeISetup.dadeData.dade.dadeSupport)
     (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
-    Disjoint (typeIBetaL typeISetup φ).support
+    Disjoint χ.support
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 _hG)
         ((hyp.dadeHypS0 _hG).fullDadeIsometryData (hyp.dadeHypS0_hconj _hG))
         (betaGrid hyp j)).support := by
@@ -389,7 +410,7 @@ theorem typeIBetaL_dadeS_betaGrid_disjoint_support [Finite G]
   rw [Set.disjoint_left]
   intro x hxL hxS
   -- L-side: a prime `r ∣ orderOf a` (`a ∈ A(L)`) divides `orderOf x`
-  have hxD := typeIBetaL_support_subset_dadeSupport typeISetup φ _hφ _hdeg hxL
+  have hxD := hχ hxL
   obtain ⟨a, haA, r, hr, hra, hrx⟩ :=
     typeISetup.dadeData.dade.exists_mem_A_prime_dvd_orderOf_of_mem_dadeSupport hxD
   obtain ⟨frob₀, -⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius _hG typeISetup.maximal
@@ -485,6 +506,23 @@ theorem typeIBetaL_dadeS_betaGrid_disjoint_support [Finite G]
     hnconjS hnconjT
   have hone : r ∣ 1 := hcop ▸ Nat.dvd_gcd hrLF hrpq
   exact hr.one_lt.ne' (Nat.dvd_one.mp hone)
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(13.19.a), `β_L^τ`-column instance**: the (13.19.a) support disjointness for the specific
+`Ã(L)`-supported `β_L^τ = typeIBetaL φ` (`typeIBetaL_support_subset_dadeSupport`), a thin instance
+of the general `dadeSupport_betaGrid_disjoint_support`. -/
+theorem typeIBetaL_dadeS_betaGrid_disjoint_support [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L)
+    (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ typeISetup.Sset)
+    (_hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ))
+    (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
+    Disjoint (typeIBetaL typeISetup φ).support
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 _hG)
+        ((hyp.dadeHypS0 _hG).fullDadeIsometryData (hyp.dadeHypS0_hconj _hG))
+        (betaGrid hyp j)).support :=
+  dadeSupport_betaGrid_disjoint_support _hG hyp typeISetup (typeIBetaL typeISetup φ)
+    (typeIBetaL_support_subset_dadeSupport typeISetup φ _hφ _hdeg) j hj
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.19.a) support disjointness**: `Ã(L) ∩ (P^G ∪ W^G) = ∅` — the order of an `Ã(L)`-element
@@ -1174,13 +1212,88 @@ theorem typeIBetaL_inner_eta_eq_zeta0 [Finite G]
     coherent_extension_orthogonal_eta_of_mem_Sset hG hyp dataL _ hφ _ _, sub_zero]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **`(β_S^τ, ζ_i^{τ₁}) = d_i·bSphi`** (`i ≠ ind1H`): the `β_S^τ`-pairing is constant along the
+`L`-family up to degree.  For `i ≠ 0` the difference `ζ_i^{τ₁} − d_i ζ_0^{τ₁} = τ(ζ_i − d_i ζ_0)`
+(`hagree`) is an `Ã(L)`-supported Dade image, disjoint from `supp β_S^τ` ((13.19.a)); for `i = 0`
+it is `bSphi` (`d_0 = 1`). -/
+theorem inner_tauSbetaGrid_coh_ext_zeta_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {L : Subgroup G} (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L) (nS : ℤ)
+    (hnS : ClassFunction.inner (tauSbetaGrid hG hyp) (dataL.coh.extension (dataL.zeta 0))
+        = (nS : ℂ))
+    {i : Fin (dataL.n + 1)} (hi : i ≠ dataL.ind1H) :
+    ClassFunction.inner (tauSbetaGrid hG hyp) (dataL.coh.extension (dataL.zeta i))
+      = dataL.d i * (nS : ℂ) := by
+  classical
+  haveI := dataL.kernelIn_normal
+  by_cases hi0 : i = 0
+  · subst hi0
+    rw [dataL.d_zero_eq_one, one_mul]; exact hnS
+  · have hsupp : (dataL.coh.extension (dataL.zeta i)
+        - dataL.d i • dataL.coh.extension (dataL.zeta 0)).support
+        ⊆ dataL.typeIHyp.dadeData.dade.dadeSupport := by
+      have hagree := dataL.hagree hG i hi0 hi
+      rw [← hagree]
+      intro g hg
+      rw [ClassFunction.mem_support] at hg
+      by_contra hgnot
+      have hdade := (dataL.typeIHyp.dadeData.dade.fullDadeIsometryData
+        dataL.typeIHyp.hconj).toDadeIsometryData.isDadeMap
+      exact hg (hdade.map_eq_zero_of_not_mem_dadeSupport _ g hgnot)
+    have hzero : ClassFunction.inner (tauSbetaGrid hG hyp)
+        (dataL.coh.extension (dataL.zeta i)
+          - dataL.d i • dataL.coh.extension (dataL.zeta 0)) = 0 := by
+      apply ClassFunction.inner_eq_zero_of_disjoint_support
+      rw [tauSbetaGrid]
+      exact (dadeSupport_betaGrid_disjoint_support hG hyp dataL.typeIHyp _ hsupp
+        ⟨1, by have := hyp.three_le_p; omega⟩ (by norm_num)).symm
+    rw [ClassFunction.inner_sub_right, OddOrder.RepresentationTheory.inner_smul_right,
+      dataL.d_star, hnS, sub_eq_zero] at hzero
+    exact hzero
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **`(Γ_S, ζ_i^{τ₁}) = bSphi·d_i`** (`i ≠ ind1H`): the `η`-orthogonal residual `Γ_S = GammaGrid`
+pairs with the `L`-family exactly as `β_S^τ` does — `Γ_S = β_S^τ − 1 + η_{01}` (`gammaGrid_defGamma`),
+and the `1_G`/`η_{01}` parts are orthogonal to the coherent image (`(betaDecomp).orth_one`,
+(13.19.b)). -/
+theorem inner_gammaGrid_coh_ext_zeta_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {L : Subgroup G} (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L) (nS : ℤ)
+    (hnS : ClassFunction.inner (tauSbetaGrid hG hyp) (dataL.coh.extension (dataL.zeta 0))
+        = (nS : ℂ))
+    {i : Fin (dataL.n + 1)} (hi : i ≠ dataL.ind1H) :
+    ClassFunction.inner (GammaGrid hG hyp) (dataL.coh.extension (dataL.zeta i))
+      = (nS : ℂ) * dataL.d i := by
+  classical
+  have hGdecomp : GammaGrid hG hyp = tauSbetaGrid hG hyp
+      - OddOrder.Peterfalvi.S09.Hypothesis71.constOne G
+      + hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩ := by
+    have h := gammaGrid_defGamma hG hyp ⟨1, by have := hyp.three_le_p; omega⟩ (by norm_num)
+    rw [tauSbetaGrid, ← h]
+  have hi_h78 : i ≠ (dataL.h78 hG).ind1H := by rw [dataL.h78_ind1H_eq]; exact hi
+  have h1 : ClassFunction.inner (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G)
+      (dataL.coh.extension (dataL.zeta i)) = 0 := by
+    rw [show dataL.coh.extension (dataL.zeta i)
+        = (dataL.h78 hG).nu ((dataL.h78 hG).hyp76.zeta i) from rfl,
+      OddOrder.Peterfalvi.S09.Hypothesis71.ClassFunction.inner_symm,
+      (dataL.betaDecomp hG).orth_one i hi_h78, star_zero]
+  have hη : ClassFunction.inner
+      (hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)
+      (dataL.coh.extension (dataL.zeta i)) = 0 := by
+    rw [OddOrder.Peterfalvi.S09.Hypothesis71.ClassFunction.inner_symm,
+      coherent_extension_orthogonal_eta_of_mem_Sset hG hyp dataL _ (dataL.zeta_mem_Sset hi) _ _,
+      star_zero]
+  rw [hGdecomp, ClassFunction.inner_add_left, ClassFunction.inner_sub_left, h1, hη,
+    inner_tauSbetaGrid_coh_ext_zeta_eq hG hyp dataL nS hnS hi, sub_zero, add_zero, mul_comm]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.19.c) case (c1) bound**: if `bSphi = (β_S^τ, ζ_0^{τ₁}) ≠ 0` (the S-parity is odd),
-then `(|H| − 1)/e ≤ (u − 1)/q`.  The `Γ_S = betaGrid`-residual expands over `𝓛^{τ₁}` with the
-`ν(ζ_i)`-coefficient `(Γ_S, ν(ζ_i)) = bSphi·d_i` (general disjoint support + coherence
-agreement); the (13.18.d) `η`-orthogonal norm bound `‖X‖² ≤ (u − 1)/q` on the projection
-`X = bSphi·Σ d_i ν(ζ_i)` then gives `bSphi²·Σ d_i² ≤ (u − 1)/q` with `Σ d_i² = (|H| − 1)/e`
-(`degree_sum_star`) and `bSphi² ≥ 1`.  Mirror of the M-side `bessel_bound_of_inner_beta_zeta_ne_zero`
-(S16_PairingBessel).  **Roadmap step 4 (issue 2038): remaining isolated obligation.** -/
+then `(|H| − 1)/e ≤ (u − 1)/q`.  The `η`-orthogonal projection `Y = bSphi·Σ d_i ζ_i^{τ₁}` of
+`Γ_S = GammaGrid` (coefficients `(Γ_S, ζ_i^{τ₁}) = bSphi·d_i`,
+`inner_gammaGrid_coh_ext_zeta_eq`) satisfies the (13.18.d) bound `‖Y‖² ≤ (u−1)/q`
+(`gammaGrid_Y_norm_bound`); with `‖Y‖² = bSphi²·Σ d_i²`, `Σ d_i² = (|H|−1)/e`
+(`card_index_mul_sum_induced_family_degree_sq`), and `bSphi² ≥ 1`, this gives the bound.
+Mirror of the M-side `bessel_bound_of_inner_beta_zeta_ne_zero` (S16_PairingBessel). -/
 theorem typeI_caseC_bound_c1 [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {L : Subgroup G} (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L) (nS : ℤ)
@@ -1189,7 +1302,126 @@ theorem typeI_caseC_bound_c1 [Finite G]
     (hnS0 : nS ≠ 0) :
     (((Nat.card ↥dataL.typeIHyp.H - 1 : ℕ) : ℚ)
         / (((maxNilpotentNormalHall L).subgroupOf L).index : ℚ) ≤
-      ((hyp.u - 1 : ℕ) : ℚ) / (hyp.q : ℚ)) := sorry
+      ((hyp.u - 1 : ℕ) : ℚ) / (hyp.q : ℚ)) := by
+  classical
+  haveI := dataL.kernelIn_normal
+  -- index/card bridges to `kernelIn`.
+  have he_eq : (dataL.kernelIn).index = ((maxNilpotentNormalHall L).subgroupOf L).index := by
+    show ((dataL.typeIHyp.typeI.typeF.H).subgroupOf L).index = _
+    rw [dataL.typeIHyp.typeI.typeF.H_eq]
+  have hcard_eq : Nat.card ↥dataL.kernelIn = Nat.card ↥dataL.typeIHyp.H :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe dataL.kernel_le).toEquiv
+  -- the weighted `L`-family vector `v = Σ d_i ζ_i^{τ₁}`.
+  set v : ClassFunction G ℂ := ∑ i ∈ Finset.univ.erase dataL.ind1H,
+    dataL.d i • dataL.coh.extension (dataL.zeta i) with hvdef
+  -- orthonormality of the `ζ_i^{τ₁}`.
+  have hON : ∀ i ∈ Finset.univ.erase dataL.ind1H, ∀ j ∈ Finset.univ.erase dataL.ind1H,
+      ClassFunction.inner (dataL.coh.extension (dataL.zeta i))
+        (dataL.coh.extension (dataL.zeta j)) = if i = j then 1 else 0 := by
+    intro i hi j hj
+    rw [dataL.nu_isometry i j (Finset.mem_erase.mp hi).1 (Finset.mem_erase.mp hj).1]
+    by_cases hij : i = j
+    · subst hij
+      rw [if_pos rfl]
+      exact IsIrreducibleCharacter.inner_self_eq_one
+        (dataL.zeta_irreducible_at hG (Finset.mem_erase.mp hi).1)
+    · rw [if_neg hij]
+      exact OddOrder.Peterfalvi.S09.Cert.induce_family_orthogonal_of_injective dataL.kernelIn dataL.θ dataL.inj i j hij
+  -- `⟨v, v⟩ = Σ d_i²`.
+  have hvv : ClassFunction.inner v v
+      = ∑ i ∈ Finset.univ.erase dataL.ind1H, dataL.d i ^ 2 := by
+    rw [hvdef, inner_sum_left]
+    refine Finset.sum_congr rfl fun i hi => ?_
+    rw [ClassFunction.inner_smul_left, inner_sum_right,
+      Finset.sum_eq_single_of_mem i hi (fun j hj hji => by
+        rw [OddOrder.RepresentationTheory.inner_smul_right, hON i hi j hj,
+          if_neg (Ne.symm hji), mul_zero]),
+      OddOrder.RepresentationTheory.inner_smul_right, hON i hi i hi, if_pos rfl,
+      dataL.d_star, mul_one, sq]
+  -- `Σ d_i² = (|kernelIn| − 1)/e`  (degree-square sum).
+  have hidx_ne : ((dataL.kernelIn).index : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr Subgroup.index_ne_zero_of_finite
+  have hdeg_sum := card_index_mul_sum_induced_family_degree_sq dataL.hFrob dataL.θ
+    dataL.ind1H dataL.triv dataL.inj dataL.cover
+  have hSval : ∑ i ∈ Finset.univ.erase dataL.ind1H, dataL.d i ^ 2
+      = ((Nat.card ↥dataL.kernelIn : ℂ) - 1) / ((dataL.kernelIn).index : ℂ) := by
+    rw [eq_div_iff hidx_ne, mul_comm]
+    exact hdeg_sum
+  -- `⟨GammaGrid, v⟩ = nS·Σ d_i²`.
+  have hGv : ClassFunction.inner (GammaGrid hG hyp) v
+      = (nS : ℂ) * ∑ i ∈ Finset.univ.erase dataL.ind1H, dataL.d i ^ 2 := by
+    rw [hvdef, inner_sum_right, Finset.mul_sum]
+    refine Finset.sum_congr rfl fun i hi => ?_
+    rw [OddOrder.RepresentationTheory.inner_smul_right, dataL.d_star,
+      inner_gammaGrid_coh_ext_zeta_eq hG hyp dataL nS hnS (Finset.mem_erase.mp hi).1, sq]
+    ring
+  -- the projection `Y = nS • v` and the complement `X = GammaGrid − Y`.
+  set Y : ClassFunction G ℂ := (nS : ℂ) • v with hYdef
+  -- `Y ⊥ η`.
+  have hYeta : ∀ (a : Fin hyp.q) (b : Fin hyp.p), ClassFunction.inner Y (hyp.eta a b) = 0 := by
+    intro a b
+    rw [hYdef, hvdef, ClassFunction.inner_smul_left, inner_sum_left]
+    rw [Finset.sum_eq_zero fun i hi => by
+      rw [ClassFunction.inner_smul_left,
+        coherent_extension_orthogonal_eta_of_mem_Sset hG hyp dataL _
+          (dataL.zeta_mem_Sset (Finset.mem_erase.mp hi).1) a b, mul_zero], mul_zero]
+  -- `⟨Y, Y⟩ = nS²·Σ d_i²`.
+  have hYY : ClassFunction.inner Y Y
+      = (nS : ℂ) ^ 2 * ∑ i ∈ Finset.univ.erase dataL.ind1H, dataL.d i ^ 2 := by
+    rw [hYdef, ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+      hvv, show star ((nS : ℂ)) = (nS : ℂ) by simp]
+    ring
+  -- `⟨GammaGrid − Y, Y⟩ = 0`.
+  have hXY : ClassFunction.inner (GammaGrid hG hyp - Y) Y = 0 := by
+    rw [ClassFunction.inner_sub_left, hYY, hYdef,
+      OddOrder.RepresentationTheory.inner_smul_right, hGv,
+      show star ((nS : ℂ)) = (nS : ℂ) by simp]
+    ring
+  -- the (13.18.d) bound.
+  have hbound := gammaGrid_Y_norm_bound hG hyp (GammaGrid hG hyp - Y) Y (by abel) hXY hYeta
+  -- the real value `Sr = (|kernelIn| − 1)/e` of `Σ d_i²`.
+  set Sr : ℝ := ((Nat.card ↥dataL.kernelIn : ℝ) - 1) / ((dataL.kernelIn).index : ℝ) with hSrdef
+  have hSc : (∑ i ∈ Finset.univ.erase dataL.ind1H, dataL.d i ^ 2) = (Sr : ℂ) := by
+    rw [hSval, hSrdef]; push_cast; ring
+  have hYYre : (ClassFunction.inner Y Y).re = (nS : ℝ) ^ 2 * Sr := by
+    rw [hYY, hSc,
+      show (nS : ℂ) ^ 2 * (Sr : ℂ) = (((nS : ℝ) ^ 2 * Sr : ℝ) : ℂ) by push_cast; ring,
+      Complex.ofReal_re]
+  rw [hYYre] at hbound
+  -- positivity facts.
+  have hidx_pos : (0 : ℝ) < ((dataL.kernelIn).index : ℝ) := by
+    exact_mod_cast Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite
+  have hcard1 : (1 : ℝ) ≤ (Nat.card ↥dataL.kernelIn : ℝ) := by exact_mod_cast Nat.card_pos
+  have hSr_nonneg : (0 : ℝ) ≤ Sr := by
+    rw [hSrdef]; exact div_nonneg (by linarith) hidx_pos.le
+  have hnS_sq : (1 : ℝ) ≤ (nS : ℝ) ^ 2 := by
+    have hint : (1 : ℤ) ≤ nS ^ 2 := by
+      nlinarith [Int.one_le_abs hnS0, sq_abs nS]
+    exact_mod_cast hint
+  -- `Sr ≤ nS²·Sr = ‖Y‖² ≤ (u−1)/q`.
+  have hfinal_R : Sr ≤ (((hyp.u : ℚ) - 1) / (hyp.q : ℚ) : ℝ) :=
+    le_trans (le_mul_of_one_le_left hSr_nonneg hnS_sq) hbound
+  -- `1 ≤ u` (from `|U| = u·c`).
+  have hu_pos : 1 ≤ hyp.u := by
+    have hcard : 0 < Nat.card ↥hyp.U := Nat.card_pos
+    rw [hyp.card_U_eq_uc] at hcard
+    rcases Nat.eq_zero_or_pos hyp.u with h0 | h0
+    · rw [h0, zero_mul] at hcard; exact absurd hcard (lt_irrefl 0)
+    · exact h0
+  -- cast the ℝ inequality back to the ℚ goal (through `kernelIn`).
+  rw [← hcard_eq, ← he_eq]
+  have hcard_ne : 1 ≤ Nat.card ↥dataL.kernelIn := Nat.card_pos
+  have goal_R : ((((Nat.card ↥dataL.kernelIn - 1 : ℕ) : ℚ)
+        / ((dataL.kernelIn).index : ℚ)) : ℝ)
+      ≤ ((((hyp.u - 1 : ℕ) : ℚ) / (hyp.q : ℚ)) : ℝ) := by
+    have e1 : ((((Nat.card ↥dataL.kernelIn - 1 : ℕ) : ℚ)
+        / ((dataL.kernelIn).index : ℚ)) : ℝ) = Sr := by
+      rw [hSrdef, Nat.cast_sub hcard_ne]; push_cast; ring
+    have e2 : ((((hyp.u - 1 : ℕ) : ℚ) / (hyp.q : ℚ)) : ℝ)
+        = (((hyp.u : ℚ) - 1) / (hyp.q : ℚ) : ℝ) := by
+      rw [Nat.cast_sub hu_pos]; push_cast; ring
+    rw [e1, e2]; exact hfinal_R
+  exact_mod_cast goal_R
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.19.c) S-side dichotomy**: `(Γ_S, φ^{τ₁}) + (Γ_L, η_{01}) ≡ 1 (mod 2)` (from
