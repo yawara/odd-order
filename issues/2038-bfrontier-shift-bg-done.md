@@ -2056,3 +2056,33 @@ parity core 出力 `Odd(nS+nL)` → nS odd XOR nL odd。
 ⚠ **import 追加要**: c1/c2 は `normEstimates`/`smallIndex`/`degree_sum_star`/`complementIndex_eq` =
 S16_PairingBessel 定義 (現 S15_SAndT 未 import、cycle 無し確認済)。次 iter 冒頭で
 `import OddOrder.Peterfalvi.S16_PairingBessel` 追加。full build 4173 green (parity core、純 additive)。
+
+## ✅✅ (2026-07-12、/loop iter 28) — (13.19.c) case (c2) bound `typeI_caseC_bound_c2` (p≤e) 完全証明 (commit 583d2aa0)
+
+parity core (iter 27) に続き c2 bound を landing (Bessel bridge `sum_rat_weights_le_of_orthogonal_integer_decomposition`
+を p−1 個 orthonormal η_0j で適用、‖Γ_L‖²≤e−1 = normEstimates.gamma_norm_sq_le)。import S16_PairingBessel 追加。
+
+### 残 = (13.19.c) dichotomy 組立 + c1 bound。次 iter 精密 roadmap (全設計確定):
+
+**設計洞察 (重要)**: dichotomy は **φ-generic のまま組める** (producer 改修不要):
+`⟨β_S^τ, φ^{τ₁}⟩ = bSphi` は degree-e φ ∈ Sset で **φ-invariant** — `⟨β_S^τ, (φ−ζ_0)^{τ₁}⟩ = ⟨β_S^τ, τ(φ−ζ_0)⟩ = 0`
+(φ−ζ_0 degree-0 A(L)-supported → coherence agreement で τ₁=τ、**一般 disjoint support**で消滅)。
+同様 `⟨typeIBetaL φ, η_0j⟩ = ⟨h78.beta, η_0j⟩` φ-invariant (bridge `typeIGrid_betaL_inner_eta_eq_h78_beta`
+既存 or 自作)。⟹ parity (ζ_0) + φ-invariance で任意 φ の dichotomy 成立。
+
+**要 infra (c1 と共通の鍵)** = **一般 disjoint support** `⟨tauSbetaGrid, dataL.typeIHyp.tau ζ⟩ = 0`
+(ζ.support ⊆ supportInSubgroup(typeIA))。既存 `typeIBetaL_support_subset_dadeSupport` (support⊆dadeSupport) +
+`typeIBetaL_dadeS_betaGrid_disjoint_support` (dadeSupport ⊥ β_S) を **任意 supported ζ に一般化** (proof 同型:
+dadeIntegralCharacterMap_apply_of_support + map_eq_zero_of_not_mem_dadeSupport + typeI_dadeSupport_avoids_regular)。
+
+**c1 bound** `typeI_caseC_bound_c1` (nS odd → (|H|−1)/e ≤ (u−1)/q) = singleton Bessel (mirror
+`bessel_bound_of_inner_beta_zeta_ne_zero`、PairingBessel:421): v=Σ d_i ν(ζ_i)、Y=bSphi·v、
+Γ_S = (Γ_S−Y)+Y、Y⊥η、‖Y‖²=bSphi²·Σd² ≤ (u−1)/q (`gammaGrid_Y_norm_bound`)、bSphi²≥1、
+Σd²=(|H|−1)/e (`degree_sum_star`/`card_index_mul_sum_induced_family_degree_sq`)。
+key = **⟨Γ_S, ν(ζ_i)⟩ = bSphi·d_i** (一般 disjoint support で ⟨β_S^τ, ν(ζ_i)−d_i ν(ζ_0)⟩=0、
+ν(ζ_i)−d_i ν(ζ_0)=τ(ζ_i−d_i ζ_0) coherence agreement `hagree`)。
+
+**組立順** (次 iter): (1) 一般 disjoint support helper、(2) β_S pairing φ-invariance + β_L η φ-invariance、
+(3) c1 bound (sorried skeleton → 後で埋め)、(4) dichotomy = parity(ζ_0) + φ-invariance + c1 + c2 +
+row constancy。**full build 4173 green** (parity core + c2、純 additive)。⚠ S15_SAndT 1467 行 (1500 gate 接近、
+dichotomy 完成後に frozen typeIBetaL cluster を上流 leaf へ prefix-split)。
