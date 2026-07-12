@@ -4,7 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S13_TypeIIIGalois
+import OddOrder.Peterfalvi.S13_TypeDetermination
 import OddOrder.Peterfalvi.S11_MaximalII_III_IV
+import OddOrder.GroupTheory.NilpotentAbelianization
 
 /-!
 # Peterfalvi (11.9.c) — the non-Galois `u = a` pin
@@ -133,6 +135,7 @@ open OddOrder.RepresentationTheory
 variable {G : Type*} [Group G]
 
 set_option maxHeartbeats 1600000 in
+-- the (5.5)/conj-involution assembly elaborates a large grid case analysis in one declaration
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (11.9.c), the non-Galois `u = a` pin** (issue 1024): under Hypothesis (11.2)
 (type III/IV) with the (11.8) refuter `h118`, the Clifford case (a) forces `u = a`.
@@ -222,10 +225,10 @@ theorem caseA_u_eq_a_of_residual_not_orthogonal [Finite G]
       (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief) caseA
   have hCU : hyp.C = OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup := by
     rw [(core_structure hG hyp).2.2.2, hyp.Uprime_eq]
-    show derivedInG hyp.base.typeP.U = derivedInG hyp.s11Setup.typeP.U
+    change derivedInG hyp.base.typeP.U = derivedInG hyp.s11Setup.typeP.U
     rw [hyp.setup_typeP_eq]
   have hlammem : lam ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C := by
-    show lam ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup (hyp.chief.H0 ⊔ hyp.C)
+    change lam ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup (hyp.chief.H0 ⊔ hyp.C)
     rw [hCU]
     exact hlamU'
   have hlamc : lam.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
@@ -712,5 +715,291 @@ theorem caseA_u_eq_a_of_residual_not_orthogonal [Finite G]
     · exact ⟨s, by rw [h, neg_neg]⟩
   have hm1 : (m : ℤ) = 1 ∨ (m : ℤ) = -1 := Int.isUnit_iff.mp (isUnit_of_dvd_one hdvd)
   omega
+
+end OddOrder.Peterfalvi.S13
+
+namespace OddOrder.Peterfalvi.S13
+
+open OddOrder.GroupTheory
+open OddOrder.RepresentationTheory
+
+variable {G : Type*} [Group G]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.9.c), the non-Galois exclusion** (issue 1024 P3): under Hypothesis (11.2)
+(type III/IV), the Clifford case (a) of (9.7) is impossible.
+
+The (11.8) refuter core (`exists_zeta_residual_not_orthogonal_H0C_of_refuter`, instantiated at
+the unconditional (11.3) `S_H0C_not_coherent_unconditional`) supplies `ζ` with the grid
+non-orthogonality `h118`; the keystone `caseA_u_eq_a_of_residual_not_orthogonal` then pins
+`u = a`.  The arithmetic closes both branches:
+
+* `u = 1`: the `U`-action image on the chief factor `H̄` is trivial, so `U` centralizes `H̄`,
+  contradicting `ChiefFactorData.U_noncentral_on_quotient`.
+* `u ≥ 2`: the Frobenius congruence `u ≡ 1 (mod q)` (`mkSection11CharacterData_u_modEq_one`)
+  gives `q ≤ u − 1`; with `u = a ∣ p − 1` (`caseA.a_dvd_p_sub_one`) this forces
+  `q ≤ p − 2 < p`, contradicting (11.9.b) `p < q`
+  (`w2_lt_w1_of_hypothesis_H0C_unconditional`). -/
+theorem not_cliffordCaseA_of_hypothesis [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)] :
+    ¬ Nonempty (OddOrder.Peterfalvi.S11.CliffordCaseAData
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief)) := by
+  rintro ⟨caseA⟩
+  -- (11.5)/(11.7) structural inputs for the refuter core
+  have hM2 : secondDerivedInAmbient M
+      = hyp.base.typeP.H
+        ⊔ (hyp.base.typeP.U ⊓ Subgroup.centralizer (hyp.base.typeP.H : Set G)) :=
+    secondDerived_eq_fitting_of_base hG hyp.base hyp.type_alt
+  have hHcard : Nat.card ↥hyp.base.typeP.H = hyp.base.w2 ^ hyp.base.w1 :=
+    card_H_eq_of_base hG hyp.base hyp.type_alt
+  -- (11.8): `ζ` and the grid non-orthogonality, via the unconditional (11.3)
+  obtain ⟨ζ, hζS, hζirr, hζ1, h118⟩ :=
+    exists_zeta_residual_not_orthogonal_H0C_of_refuter hG hyp.base hyp.type_alt hM2 hHcard
+      (fun s13hyp => S_H0C_not_coherent_unconditional hG s13hyp)
+  -- the keystone pin `u = a`
+  have hua := caseA_u_eq_a_of_residual_not_orthogonal hG hyp caseA hζS hζirr hζ1 h118
+  set u : ℕ := (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u with hudef
+  -- the Frobenius congruence `u ≡ 1 (mod w₁)`
+  have hU : hyp.s11Setup.typeP.U ≠ ⊥ := hyp.s11Setup.nontrivial.1
+  have hmod : u ≡ 1 [MOD hyp.base.w1] := by
+    have h := hyp.base.mkSection11CharacterData_u_modEq_one hyp.s11Setup hyp.chief hU
+    rwa [show Nat.card ↥hyp.s11Setup.typeP.W1 = hyp.base.w1 from hyp.s11Setup_q_eq] at h
+  -- `a ∣ p − 1` with `p = w₂`
+  have hpeq : hyp.chief.p = hyp.base.w2 := by
+    have h := hyp.chief.typeIII_IV_p_eq_W2 hyp.type_alt
+    rw [← h]
+    change Nat.card ↥hyp.s11Setup.typeP.W2 = hyp.base.w2
+    rw [hyp.setup_typeP_eq]
+    rfl
+  have hadvd : caseA.a ∣ hyp.base.w2 - 1 := hpeq ▸ caseA.a_dvd_p_sub_one
+  -- (11.9.b) `w₂ < w₁`, and `w₂ ≥ 3`
+  have hlt : hyp.base.w2 < hyp.base.w1 :=
+    w2_lt_w1_of_hypothesis_H0C_unconditional hG hyp.base hyp.type_alt hM2 hHcard
+  have hw2three : 3 ≤ hyp.base.w2 := by
+    have hodd : Odd hyp.base.w2 :=
+      hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card hyp.base.W2)
+    have hgt : 1 < hyp.base.w2 := hyp.params.w2_prime.one_lt
+    obtain ⟨k, hk⟩ := hodd; omega
+  have hapos := caseA.a_pos
+  rcases Nat.lt_or_ge u 2 with hu1 | hu2
+  · -- `u = 1`: the `U`-action image is trivial, contradicting `U_noncentral_on_quotient`
+    have hu_eq1 : u = 1 := by omega
+    have hcard1 : Nat.card
+        ↥(OddOrder.Peterfalvi.S11.uActionHom hyp.s11Setup hyp.chief).range = 1 := by
+      have h := (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u_eq_card_quotient
+      rw [← hudef] at h
+      rw [← hu_eq1]
+      exact h.symm
+    have hbot : (OddOrder.Peterfalvi.S11.uActionHom hyp.s11Setup hyp.chief).range = ⊥ :=
+      Subgroup.card_eq_one.mp hcard1
+    apply hyp.chief.U_noncentral_on_quotient
+    rw [eq_top_iff]
+    intro x _ l hl
+    have h1 : OddOrder.Peterfalvi.S11.uActionHom hyp.s11Setup hyp.chief ⟨l, hl⟩ = 1 := by
+      have hmem : OddOrder.Peterfalvi.S11.uActionHom hyp.s11Setup hyp.chief ⟨l, hl⟩
+          ∈ (OddOrder.Peterfalvi.S11.uActionHom hyp.s11Setup hyp.chief).range := ⟨⟨l, hl⟩, rfl⟩
+      rw [hbot, Subgroup.mem_bot] at hmem
+      exact hmem
+    change (OddOrder.Peterfalvi.S11.uActionHom hyp.s11Setup hyp.chief ⟨l, hl⟩) x = x
+    rw [h1]
+    rfl
+  · -- `u ≥ 2`: `q ≤ u − 1 = a − 1 ≤ p − 2 < p`, contradicting `p < q`
+    have hdvd : hyp.base.w1 ∣ u - 1 := (Nat.modEq_iff_dvd' (by omega)).mp hmod.symm
+    have hle : hyp.base.w1 ≤ u - 1 := Nat.le_of_dvd (by omega) hdvd
+    have hale : caseA.a ≤ hyp.base.w2 - 1 := Nat.le_of_dvd (by omega) hadvd
+    omega
+
+end OddOrder.Peterfalvi.S13
+
+namespace OddOrder.Peterfalvi.S13
+
+open OddOrder.GroupTheory
+open OddOrder.RepresentationTheory
+
+variable {G : Type*} [Group G]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.9.c), `U` is cyclic** (issue 1024 P3): under Hypothesis (11.2)
+(type III/IV), `U` is cyclic.
+
+The non-Galois exclusion (`not_cliffordCaseA_of_hypothesis`) leaves the Galois case (b) of the
+(9.7) dichotomy, whose Singer field model makes the chief-factor image `Ū = U/C_U(H̄)` cyclic
+(`CliffordCaseBData.Ubar_cyclic`).  The kernel of the restriction `↥U →* Ū` is the action
+kernel `C_U(H̄) = cSub`, which is `C = U ⊓ C_G(H)` (`C_eq_cSub`, via (11.7) `H₀ = ⊥`) and hence
+`U' = [U,U]` ((11.6) `core_structure`); `U` is nilpotent (`TypePData.U_nilpotent`), and a
+nilpotent group with a cyclic quotient by a subgroup of its commutator is cyclic
+(`isCyclic_of_isNilpotent_of_ker_le_commutator`, issue 9086). -/
+theorem U_isCyclic_of_hypothesis [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)] :
+    IsCyclic ↥hyp.base.typeP.U := by
+  classical
+  rw [← hyp.setup_typeP_eq]
+  haveI hnil : Group.IsNilpotent ↥hyp.s11Setup.typeP.U := hyp.s11Setup.typeP.U_nilpotent
+  rcases OddOrder.Peterfalvi.S11.clifford_dichotomy hG
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief) with hA | hB
+  · exact absurd hA (not_cliffordCaseA_of_hypothesis hG hyp)
+  obtain ⟨caseB⟩ := hB
+  haveI hcyc : IsCyclic ↥(OddOrder.Peterfalvi.S11.uActionHom hyp.s11Setup hyp.chief).range :=
+    caseB.Ubar_cyclic
+  -- the restriction `↥U →* Ū`, kernel inside `U'`
+  set e : ↥hyp.s11Setup.typeP.U
+      ≃* ↥(hyp.s11Setup.typeP.U.subgroupOf (hyp.s11Setup.typeP.U ⊔ hyp.s11Setup.typeP.W1)) :=
+    (Subgroup.subgroupOfEquivOfLe
+      (le_sup_left : hyp.s11Setup.typeP.U ≤ hyp.s11Setup.typeP.U ⊔ hyp.s11Setup.typeP.W1)).symm
+    with hedef
+  refine OddOrder.GroupTheory.isCyclic_of_isNilpotent_of_ker_le_commutator
+    ((OddOrder.Peterfalvi.S11.uActionHom hyp.s11Setup hyp.chief).rangeRestrict.comp
+      e.toMonoidHom) ?_
+  intro x hx
+  have hone : OddOrder.Peterfalvi.S11.uActionHom hyp.s11Setup hyp.chief (e x) = 1 := by
+    have h1 := MonoidHom.mem_ker.mp hx
+    exact congrArg Subtype.val h1
+  -- `↑x ∈ cSub = C = U'` ((11.6)/(11.7))
+  have hxC : (x : G) ∈ hyp.C := by
+    rw [C_eq_cSub hG hyp]
+    exact Subgroup.mem_map.mpr
+      ⟨(hyp.s11Setup.typeP.U.subgroupOf
+          (hyp.s11Setup.typeP.U ⊔ hyp.s11Setup.typeP.W1)).subtype (e x),
+        Subgroup.mem_map.mpr ⟨e x, MonoidHom.mem_ker.mpr hone, rfl⟩, rfl⟩
+  have hCU' : hyp.C = derivedInG hyp.s11Setup.typeP.U := by
+    rw [(core_structure hG hyp).2.2.2, hyp.Uprime_eq]
+    rw [hyp.setup_typeP_eq]
+  rw [hCU'] at hxC
+  -- pull back through the injective `U.subtype`: `derivedInG U = (commutator ↥U).map U.subtype`
+  obtain ⟨y, hy, hyx⟩ := Subgroup.mem_map.mp hxC
+  rwa [show y = x from Subtype.ext hyx] at hy
+
+end OddOrder.Peterfalvi.S13
+
+namespace OddOrder.Peterfalvi.S13
+
+open OddOrder.GroupTheory
+
+variable {G : Type*} [Group G]
+
+/-- **`U`-commutativity is independent of the type-`P` witness** (the `M`-side analog of the
+`S16` transfer `isMulCommutative_typePData_U_of_V`): any two `TypePData` on the same maximal `M`
+have their `U`-factors conjugate in `M' = [M,M]` — both complement the normal Hall subgroup
+`H = M_F` in `M'` (`derived_complement`, `H_eq`), so Schur–Zassenhaus conjugacy
+(`IsComplement'.exists_conj_of_coprime`, with `M_F` solvable as a proper subgroup of the minimal
+simple `G`) transports `IsMulCommutative` between them.  This is what lets the (11.9.c)
+commutativity of `hyp.base.typeP.U` refute an *arbitrary* `TypeIVData` witness. -/
+theorem isMulCommutative_typePData_U_of_typePData_U [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (d₁ d₂ : TypePData M)
+    (h : IsMulCommutative ↥d₁.U) : IsMulCommutative ↥d₂.U := by
+  classical
+  -- both `U`s complement `H = M_F` in `M'`
+  have hH12 : d₁.H = d₂.H := by rw [d₁.H_eq, d₂.H_eq]
+  have hH_le : d₁.H ≤ derivedInG M := d₁.H_le
+  have hM'_le_M : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  have hH_le_M : d₁.H ≤ M := hH_le.trans hM'_le_M
+  have hM_le_NH : M ≤ Subgroup.normalizer (d₁.H : Set G) := by
+    rw [d₁.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer M
+  haveI hHnormal : (d₁.H.subgroupOf (derivedInG M)).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hH_le).mpr (hM'_le_M.trans hM_le_NH)
+  have hcompl₁ : (d₁.H.subgroupOf (derivedInG M)).IsComplement'
+      (d₁.U.subgroupOf (derivedInG M)) := d₁.derived_complement
+  have hcompl₂ : (d₁.H.subgroupOf (derivedInG M)).IsComplement'
+      (d₂.U.subgroupOf (derivedInG M)) := by
+    rw [hH12]
+    exact d₂.derived_complement
+  -- `|H|` (Hall in `M`) is coprime to `[M' : H]` (which divides `[M : H]`)
+  have hcop : Nat.Coprime (Nat.card ↥(d₁.H.subgroupOf (derivedInG M)))
+      ((d₁.H.subgroupOf (derivedInG M)).index) := by
+    have hHall := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall M
+    rw [← d₁.H_eq] at hHall
+    have h0 := OddOrder.Isaacs.Ch03.IsHallSubgroup.coprime_index hHall
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hH_le_M).toEquiv] at h0
+    have hcard : Nat.card ↥(d₁.H.subgroupOf (derivedInG M)) = Nat.card ↥d₁.H :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hH_le).toEquiv
+    have hdvd : (d₁.H.subgroupOf (derivedInG M)).index
+        ∣ (d₁.H.subgroupOf M).index := by
+      have htower : d₁.H.relIndex (derivedInG M) * (derivedInG M).relIndex M
+          = d₁.H.relIndex M :=
+        Subgroup.relIndex_mul_relIndex d₁.H (derivedInG M) M hH_le hM'_le_M
+      exact ⟨(derivedInG M).relIndex M, htower.symm⟩
+    rw [hcard]
+    exact Nat.Coprime.coprime_dvd_right hdvd h0
+  -- `H = M_F` is solvable (a proper subgroup of the minimal simple `G`)
+  have hH_lt_top : d₁.H < ⊤ :=
+    lt_of_le_of_lt hH_le_M (lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hM).1)
+  haveI hHsolv : IsSolvable ↥d₁.H := hG.solvable_of_lt_top d₁.H hH_lt_top
+  have hsolv : IsSolvable ↥(d₁.H.subgroupOf (derivedInG M))
+      ∨ IsSolvable (↥(derivedInG M) ⧸ d₁.H.subgroupOf (derivedInG M)) :=
+    Or.inl (solvable_of_solvable_injective
+      (f := (Subgroup.subgroupOfEquivOfLe hH_le).toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe hH_le).injective)
+  -- Schur–Zassenhaus conjugacy, then push the commutativity across
+  obtain ⟨n, _hn, hn⟩ :=
+    Subgroup.IsComplement'.exists_conj_of_coprime hcop hsolv hcompl₁ hcompl₂
+  have hUsub : IsMulCommutative ↥(d₁.U.subgroupOf (derivedInG M)) :=
+    isMulCommutative_of_mulEquiv (Subgroup.subgroupOfEquivOfLe d₁.U_le).symm h
+  have hmapped : IsMulCommutative
+      ↥((d₁.U.subgroupOf (derivedInG M)).map (MulAut.conj n).toMonoidHom) :=
+    isMulCommutative_of_mulEquiv
+      (Subgroup.equivMapOfInjective _ _ (MulAut.conj n).injective) hUsub
+  rw [hn] at hmapped
+  exact isMulCommutative_of_mulEquiv (Subgroup.subgroupOfEquivOfLe d₂.U_le) hmapped
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.9.c), `U` is abelian**: the `IsMulCommutative` form of
+`U_isCyclic_of_hypothesis` — the shape the type-III/IV discriminator consumes. -/
+theorem U_isMulCommutative_of_hypothesis [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)] :
+    IsMulCommutative ↥hyp.base.typeP.U :=
+  OddOrder.GroupTheory.isMulCommutative_of_isCyclic (U_isCyclic_of_hypothesis hG hyp)
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.9.c), the Type-IV exclusion**: no type-III/IV maximal subgroup carrying
+Hypothesis (11.2) is of Type IV — any `TypeIVData` witness has its `U`-factor conjugate to the
+abelian `hyp.base.typeP.U` (`isMulCommutative_typePData_U_of_typePData_U`), contradicting
+`U_not_commutative`. -/
+theorem not_isTypeIV_of_hypothesis [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)] :
+    ¬ IsTypeIV M := by
+  rintro ⟨d⟩
+  exact d.U_not_commutative
+    (isMulCommutative_typePData_U_of_typePData_U hG hyp.s11Setup.maximal hyp.base.typeP d.typeP
+      (U_isMulCommutative_of_hypothesis hG hyp))
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.9.c), `M` is Type III** (Coq `FTtype34_structure` part (c),
+`FTtype M == 3`): a type-III/IV maximal subgroup carrying Hypothesis (11.2) is Type III.  In
+the Type-IV branch the witness itself upgrades: its `U`-factor is abelian by the conjugacy
+transfer, so the same `(typeP, common, normalizer_le)` data assembles a `TypeIIIData`. -/
+theorem isTypeIII_of_hypothesis [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)] :
+    IsTypeIII M := by
+  rcases hyp.type_alt with h3 | h4
+  · exact h3
+  · obtain ⟨d⟩ := h4
+    exact ⟨{ typeP := d.typeP
+             common := d.common
+             U_commutative :=
+               isMulCommutative_typePData_U_of_typePData_U hG hyp.s11Setup.maximal
+                 hyp.base.typeP d.typeP (U_isMulCommutative_of_hypothesis hG hyp)
+             normalizer_le := d.normalizer_le }⟩
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.9.c), the universal Type-IV exclusion** (companion of `no_typeV_maximal`):
+no maximal subgroup of a minimal simple odd group is of Type IV.  A Type-IV `M` carries the §10
+hypothesis (`exists_hypothesis_of_typeIIIorIVorV`), hence the §13 Hypothesis (11.2)
+(`exists_hypothesis_of_isTypeIIIorIV`), and `not_isTypeIV_of_hypothesis` refutes the witness. -/
+theorem no_typeIV_maximal {G : Type*} [Group G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
+    ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ IsTypeIV M := by
+  rintro ⟨M, hMmax, hMIV⟩
+  obtain ⟨hyp12⟩ := OddOrder.Peterfalvi.S12.exists_hypothesis_of_typeIIIorIVorV hG hMmax
+    (Or.inr (Or.inl hMIV))
+  obtain ⟨s13, -⟩ := exists_hypothesis_of_isTypeIIIorIV hG hyp12 (Or.inr hMIV)
+  haveI : NeZero (Nat.card (s13.base.toHypothesis46 hG hG.odd).W1) := ⟨Nat.card_pos.ne'⟩
+  exact not_isTypeIV_of_hypothesis hG s13 hMIV
 
 end OddOrder.Peterfalvi.S13

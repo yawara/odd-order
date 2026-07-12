@@ -36,6 +36,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Clifford
 import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
 import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25Final
+import OddOrder.GroupTheory.NilpotentAbelianization
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main
@@ -7744,3 +7745,10 @@ muColumnChar_zero / exists_muColumnChar_inv = Pontryagin 逆列 index。keystone
 その着地時にここへ登録する (sorried-cite 規約)。 -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.muColumnChar_zero
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.exists_muColumnChar_inv
+
+/-! **nilpotent + cyclic abelianization ⟹ cyclic, axiom-clean** (lane a, 2026-07-12, issue 9086).
+Pf (11.9.c) caseB 帰結の一般群論 engine (mathcomp `cyclic_nilpotent_quo_der1_cyclic` 対応):
+下降中心列の安定化 (γ₂ ≤ ⁅γ₂,⊤⁆) + center-quotient cyclic → abelian。 -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.commutator_eq_bot_of_isNilpotent_of_isCyclic_quotient
+#assert_only_allowed_axioms OddOrder.GroupTheory.isCyclic_of_isNilpotent_of_isCyclic_quotient
+#assert_only_allowed_axioms OddOrder.GroupTheory.isCyclic_of_isNilpotent_of_ker_le_commutator
