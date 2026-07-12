@@ -182,15 +182,42 @@ structure TypeIOrthogonalityGridData (hyp : Hypothesis (G := G)) {L : Subgroup G
 The Tier-A structure (`e`, `𝓛`, `φ`, `β_L`, `β_S`) is built here; the genuinely deep (13.19)
 facts are isolated below as `φ`-parametric obligations, each matching one `GridData` field. -/
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.19), `φ` existence**: the family `𝓛 = {Ind_H^L θ | θ ∈ Irr H, θ ≠ 1}` has a member of
-degree `e = [L : H]` ("the existence of `φ` is clear"): induce any nontrivial *linear* character
-of the nontrivial nilpotent kernel `H` (one exists as `H^{ab} ≠ 1`); it is irreducible by the
-Frobenius inertia argument (`I_L(θ) = H` for `θ ≠ 1_H`), and `(Ind_H^L θ)(1) = [L:H]·θ(1) = e`.
-Isolated obligation. -/
-theorem exists_Sset_apply_one_eq_index [Finite G] {L : Subgroup G}
+degree `e = [L : H]` ("the existence of `φ` is clear"): the nontrivial solvable kernel `H` has a
+nontrivial degree-one character `θ`
+(`exists_irreducibleCharacter_ne_trivial_degree_one_of_commutator_ne_top`); `Ind_H^L θ` lies in
+`𝓛` by definition, with degree `(Ind_H^L θ)(1) = [L:H]·θ(1) = e` (`induce_apply_one`).  (The
+membership already witnesses irreducibility demands downstream via the Frobenius inertia
+argument packaged in `𝓛 ⊆ Irr L`.) -/
+theorem exists_Sset_apply_one_eq_index [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G}
     (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L) :
     ∃ φ : ClassFunction ↥L ℂ, φ ∈ typeISetup.Sset ∧
-      φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ) := sorry
+      φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ) := by
+  classical
+  obtain ⟨frob₀, -⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius hG typeISetup.maximal
+    ⟨typeISetup.typeI⟩
+  -- both Frobenius kernels are `L_F`
+  have hHeq : frob₀.typeI.typeF.H = typeISetup.typeI.typeF.H :=
+    frob₀.typeI.typeF.H_eq.trans typeISetup.typeI.typeF.H_eq.symm
+  have hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L
+      ((typeISetup.typeI.typeF.H).subgroupOf L) frob₀.complement := by
+    have h := frob₀.frobenius
+    rwa [hHeq] at h
+  -- the kernel is a nontrivial solvable group, so it has a nontrivial linear character
+  haveI : IsSolvable ↥L := hG.solvable_of_lt_top L
+    (lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp typeISetup.maximal).1)
+  haveI : Nontrivial ↥((typeISetup.typeI.typeF.H).subgroupOf L) :=
+    (Subgroup.nontrivial_iff_ne_bot _).mpr hfrob.ne_bot_kernel
+  have hcomm : commutator ↥((typeISetup.typeI.typeF.H).subgroupOf L) ≠ ⊤ :=
+    ne_of_lt (IsSolvable.commutator_lt_top_of_nontrivial
+      (G := ↥((typeISetup.typeI.typeF.H).subgroupOf L)))
+  obtain ⟨θ, hθ_ne, hθ1⟩ := OddOrder.Peterfalvi.S08.exists_irreducibleCharacter_ne_trivial_degree_one_of_commutator_ne_top
+    hcomm
+  refine ⟨ClassFunction.induce ((typeISetup.typeI.typeF.H).subgroupOf L)
+      (θ : ClassFunction _ ℂ), ⟨θ, hθ_ne, rfl⟩, ?_⟩
+  rw [ClassFunction.induce_apply_one, hθ1, mul_one, typeISetup.typeI.typeF.H_eq]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.19) `β_L^τ`**: the Dade image `τ₁(Ind_H^L 1_H − φ)` of the `L`-side bridge character,
@@ -317,28 +344,28 @@ noncomputable def typeIOrthogonalityGridData_of_typeISetup [Finite G]
   { e := ((maxNilpotentNormalHall L).subgroupOf L).index
     e_eq_index := rfl
     Lset := typeISetup.Sset
-    phi := Classical.choose (exists_Sset_apply_one_eq_index typeISetup)
-    phi_mem := (Classical.choose_spec (exists_Sset_apply_one_eq_index typeISetup)).1
-    phi_degree_eq_e := (Classical.choose_spec (exists_Sset_apply_one_eq_index typeISetup)).2
+    phi := Classical.choose (exists_Sset_apply_one_eq_index _hG typeISetup)
+    phi_mem := (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).1
+    phi_degree_eq_e := (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).2
     betaL := typeIBetaL typeISetup
-      (Classical.choose (exists_Sset_apply_one_eq_index typeISetup))
+      (Classical.choose (exists_Sset_apply_one_eq_index _hG typeISetup))
     betaS := tauSbetaGrid _hG hyp
     betaT := tauTbetaGrid _hG hyp
     disjoint_support := typeIBetaL_betaS_disjoint_support _hG hyp typeISetup _
-      (Classical.choose_spec (exists_Sset_apply_one_eq_index typeISetup)).1
+      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).1
     betaL_eq := typeIBetaL_eq_tau_induce_sub typeISetup _
     Ltau_orthogonal_eta := tau_apply_orthogonal_eta_of_mem_Sset _hG hyp typeISetup _
-      (Classical.choose_spec (exists_Sset_apply_one_eq_index typeISetup)).1
+      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).1
     betaL_eta0_row_constant := typeIBetaL_eta_row_constant _hG hyp typeISetup _
-      (Classical.choose_spec (exists_Sset_apply_one_eq_index typeISetup)).1
+      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).1
     betaL_eta0_col_constant := typeIBetaL_eta_col_constant _hG hyp typeISetup _
-      (Classical.choose_spec (exists_Sset_apply_one_eq_index typeISetup)).1
+      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).1
     caseC := typeI_caseC_dichotomy _hG hyp typeISetup _
-      (Classical.choose_spec (exists_Sset_apply_one_eq_index typeISetup)).1
-      (Classical.choose_spec (exists_Sset_apply_one_eq_index typeISetup)).2
+      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).1
+      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).2
     caseC_dual := typeI_caseC_dual_dichotomy _hG hyp typeISetup _
-      (Classical.choose_spec (exists_Sset_apply_one_eq_index typeISetup)).1
-      (Classical.choose_spec (exists_Sset_apply_one_eq_index typeISetup)).2 }
+      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).1
+      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG typeISetup)).2 }
 
 /-- **Peterfalvi (13.19)**: a type-I maximal subgroup has `𝓛^{τ₁}` orthogonal to the `eta_ij`,
 `(β_L^τ, η_{0j})` constant along each zero axis, and on each zero axis one of the two (13.19.c)
