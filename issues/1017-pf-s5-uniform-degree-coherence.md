@@ -1442,3 +1442,54 @@ session を要した) だが、proven template があるゆえ caseB と同様�
 その mirror の第一段として妥当。次 = M-side `nineElevenSevenEightRefutation` +
 `nineElevenEqualityRefutation_of_sevenEightRefutation` + (9.11.1)-(9.11.6) 組立 (S11_NineElevenAlphaBound/
 PairAdjoin、READ-ONLY) を S-instance world (indS/A(S)、reducible R-family closed) に mirror。
+
+## 2026-07-13 更新 #44 (lane b) — (9.11) S-instance refuter: STEP-1 reuse 監査 + stratum bridge + named residual (commit e095cfca)
+
+`sSet_coherent_indS_caseA` (HypothesisBasics:581) の単一 refuter sorry を **verify-first STEP-1 監査
+→ stratum bridge landing → named residual 化**で前進 (build green 4180 jobs、新 axiom 無し)。
+
+### STEP-1 reusability 判定 (宣言精読 + `#print axioms` で確定、従来 3 subagent の誤診を訂正)
+
+**M-side (9.11) apparatus のうち S-instance が直接 cite できるもの (REUSE-DIRECTLY)**:
+- **抽象 bridge** (`{L Γ'}`/`{ι κ}`、Hypothesis 非依存): `isCoherent_union_pair_of_bridge`
+  (S11_NineElevenPairAdjoin:107)、`exists_bridge_target_of_budget` (:564)、`unionPairExtension` (:73)。
+- **generic 算術核** (全て `{data:TypesIIIIIIVSetup M}{chief}{chars}(caseA)`-parametrized →
+  `data := toTypesIIIIIIVSetupS hG` で instantiate 可): `nineElevenCaseA_equality_refutation`
+  (S11_NineElevenCoherence:999 — (9.11.2-5) の False 生成核)、`nineElevenOne_configuration`
+  (S11_SingleFactorCentralizer:759 — (9.11.1) squeeze)、`nineElevenThree_orbit_split`
+  (Coherence:1190)、`sumnS_irreducible_constant_degree` (Coherence:663)、`nineElevenFive_refutation`
+  (Coherence:811)、`nineElevenTwo_u_le_a_sq` (Coherence:638)。
+- **degree-dichotomy から world-fact を産む generic producer** (これが従来見落とされていた核心):
+  `nineElevenTwoTIWitness_of_degree_dichotomy` (S11_NineElevenTIWitness:301 → TI-witness)、
+  `nineElevenTwo_two_summand_inertia` (S11_NineElevenTwoSummand:796 → `C = K₁⊓K₂`)、
+  `nineElevenGamma_inner_self_mul_u` (S11_NineElevenMackeyNorm:757 → Mackey norm)。
+  入力 `hdeg` = 「`sOf data (chief.H₀ ⊔ cSub)` の各 member が degree qa or qu」で、これは squeeze が
+  equality-config で導く。
+
+**MIRROR-NEEDED (M-side は `Hypothesis M` 経由、S-instance 用に新規)**: caseA per-member Dade
+`R`-family (M-side `sOf_H0Cprime_memberRFamily` の類似、`caseA_sThree_coherent` + coherent-image
+cross-orthogonality に供給)、(5.6) pair-bound producer (`NineElevenPairBound` の指標)。これらは
+`indS = dadeIntegralCharacterMap (dadeHypS hG) …` + `sSet = inducedKernelFamily ((derivedInG S)…) ⊥`
+の既存 S-instance 基盤上に組む (基盤は在る)。M-side `nineElevenSevenEightRefutation`
+(S11_NineElevenPairAdjoin:893) は axiom-clean (proven、M-side 未land は誤読 = #43 で訂正済)。
+
+### landed (commit e095cfca、全て build-green)
+- `Hypothesis.sSet_eq_sOf_H0Cprime` (**axiom-clean** [propext,Classical.choice,Quot.sound]) =
+  linchpin: type-P₂ で `chief.H₀ = ⊥`・`C′ = derivedInG(cSub) = ⊥` (`cSub ≤ U` abelian) ゆえ
+  `sSet = 𝒮(H₀C′) = sOf data (chief.H₀ ⊔ chars.Cprime)`。generic producer は全て
+  `sOf data (chief.H₀ ⊔ …)` 上ゆえ、この bridge が `sSet` refuter を generic 機構に接続する。
+- `Hypothesis.sSet_caseA_nineElevenRefutation` = refuter 単一 residual (docstring に full reuse map)。
+  `sSet_coherent_indS_caseA` はこれを cite (inline sorry 除去)。
+- `import S11_NineElevenPairAdjoin` を HypothesisBasics に追加 (generic chain + 抽象 bridge を scope に、
+  cycle 無し確認済、+11 jobs)。
+
+### 次 step (genuine scope reduction、直接着手可)
+1. **squeeze reduction** = M-side `caseA_refuter_of_equality_refutation` (S11_NineElevenCaseA:254) を
+   S-instance 用に mirror: `sSet_caseA_nineElevenRefutation` を `NineElevenPairBoundS` +
+   `NineElevenEqualityRefutationS` の 2 residual に割る。generic `nineElevenOne_configuration` +
+   `sumnS_irreducible_constant_degree` + bridge を使用。~110 行、機械的だが API-sensitive。
+2. **caseA per-member Dade R-family** (最深の S-specific piece): caseB template
+   (`sSet_caseB_reducible_memberRFamily`, S15_CaseBReducibleCoherence:281) を irreducible member 用に。
+   これが `NineElevenEqualityRefutationS` の (9.11.7-8) coherent-pair 構成 (抽象 bridge に供給) を unblock。
+3. **`NineElevenEqualityRefutationS`** = generic `nineElevenCaseA_equality_refutation` + degree-dichotomy
+   producer 3 種 + orbit-split で `S4 ≤ N` に還元、(9.11.7-8) が残る deepest。
