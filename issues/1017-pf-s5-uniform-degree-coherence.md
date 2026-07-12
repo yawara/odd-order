@@ -1246,3 +1246,33 @@ decomposition hpairs/hcover [μ_j = CharacterPsiDecomposition、既約対 = Char
 R-datum `sSet_member_differenceImage` landed] + per-pair retarget hstep [squeeze + xAdjoinStepW]) /
 (c) clifford_dichotomy で結合 → `IsCoherent indS sSet A(S)` 無条件 / (d) `coherent_H0Cprime_S` を congrMap
 で re-point、`sibleyTarget_H0C` を drop (payoff)。
+
+## 2026-07-13 更新 #38 (lane b) — ★★PAYOFF LANDED: `coherent_H0Cprime_S` を `sibleyTarget_H0C` から honest route へ re-point (support ∅→A(S) 訂正込み)
+
+**verify-first で #37 の "narrow A(S)→(C')^# で re-point" 計画を重大訂正 → 正しい honest 版を landed** (commit は本更新末尾、`lake build OddOrder` GREEN **4179 jobs / 3m10s**, AxiomsCheck OK)。
+
+### ★決定的 verify-first finding: `(C')^# = cprimeSharpS = ∅` ゆえ narrow-to-(C')^# は不可能
+- `cprimeSharpS_eq_empty` (SubcoherenceInputs:1141、既 landed) が type-P₂ で `(C')^# = ∅` を証明済 (C'=[C,C]=⊥, C≤U abelian)。
+- `zSupportedSpan sSet ∅ = {0}` ⟹ `IsCoherent indS sSet ∅` の **`nonzero` field (nonzero ∅-supported witness) は充足不能** = target は **uninhabited**。∴ 現 `coherent_H0Cprime_S` (support cprimeSharpS) は `sibleyTarget_H0C` の sorry で uninhabited 型を捏造していた = まさに unsound の実体。
+- ⟹ **#37 の「A(S)→(C')^# へ narrow して re-point」は数学的に不可能** (narrow 先が uninhabited)。`cprimeSharpS_subset_supportA` は true だが re-point に使えない (narrow すると vacuate)。**honest support は A(S) 自身** (nonempty; family 差が genuine に載る `sSet_member_diffsupp`)。
+
+### ★family 構造 verify-first (subagent 精査、確定)
+- **S-instance で `sSet = 𝒮(H₀C')`**: H₀=⊥ (chief kernel trivial) + C'=⊥ ⟹ H₀C'=⊥ ⟹ `sOf(H₀C') = sSet` (xiOf ⊥ = xiSet)。∴ full `sSet` を狙うのは正しい (Coq `Ptype_core_coherence` の `S_ H0C'` に一致、M-instance の full-sSet 対 sOf 乖離は S-instance で消える)。
+- **caseB (Galois)**: `sSet` は uniform 次数 q·u だが **mixed** — 正確に p−1 個の reducible μ_j (各 HC-linear の Ind、`reducible_count_sOf_H0`) + 既約、両者 q·u。
+- **caseA (非Galois)**: genuinely mixed 次数 — q·a 既約 (𝒮(H₀U')) + q·u (𝒮(H₀C) の reducible μ_j + 既約)。
+- ∴ 両 branch とも reducible-column adjoining が要る (lane-a M-instance `caseB_coherent_sOf_H0Cprime_of_mixed` S13_MaximalIII_IV:1033 を S-instance で mirror する multi-session work)。
+
+### landed (全 `S15_SAndT_Setup/HypothesisBasics.lean`、b-owned)
+1. **`Hypothesis.sSet_coherent_indS_A`** (theorem): `Nonempty (IsCoherent hyp.indS (sSet …) A(S))` を `clifford_dichotomy` case-split で構築 (honest unconditional の骨格)。plumbing は sorry-free、2 branch のみ sorried。
+2. **`Hypothesis.sSet_coherent_indS_caseA` / `_caseB`** (honest sorried-cite): 各 Clifford branch の (9.11) coherence (TRUE statement、pair-adjoining lift が残 = docstring に landed base + 残 assembly を精密記載)。base は landed (`sSetIrrDeg_qa_coherent_indS_caseA` / `sSetIrrDeg_coherent_indS @ q·u`)、lift = `coherentOfPairChainCover` + S-instance column machinery (未 build)。
+3. **`mkSection11CharacterDataS_honest.H0CprimeSupport` を cprimeSharpS→A(S) に訂正** (∅ 退化を回避)。docstring に support-choice の verify-first 根拠を明記。
+4. **`coherent_H0Cprime_S` re-point**: body を `coherent_H0C_commutator (=sibleyTarget_H0C cite)` → `(sSet_coherent_indS_A hG chief).some` に置換。**b-owned S15 に sibleyTarget_H0C/coherent_H0C_commutator の code 依存ゼロ** (docstring 言及のみ)。`tau1S_ofHonest` docstring も更新。
+
+### sorry / axiom status
+- 新規 sorry = **2 個のみ** (caseA/caseB branch、honest TRUE (9.11) statement、git diff で検証)。previously-sorry-free 宣言への sorry 混入 0。
+- `coherent_H0Cprime_S` #print axioms = `[propext, sorryAx, Classical.choice, Quot.sound]` — sorryAx source は **honest branch + dadeHypS 継承のみ** (sibleyTarget から構造的に解消)。
+- `sibleyTarget_H0C` (Coherence911.lean、lane-a) と `coherent_H0C_commutator` は**触っていない** (c が S12:4049 で consume ゆえ territorial 保持)。b は re-point で off にしただけ。
+- ⚠ 無関係 pre-existing sorry: `sibleyTarget_S` (HypothesisBasics:1253、VESTIGIAL "do not complete" tauS/Sset/A0S route) は本作業と別物・不変。
+
+### 残 (次 iteration、両 branch 共通の deep content)
+両 branch の sorried lift = **S-instance reducible-column pair-chain assembly** (lane-a M-instance の `caseBPair`/`caseB_chainStep`/`caseB_sOf_member_dichotomy` @ S13 を S-instance Dade world `indS`/`A(S)` へ mirror)。base coherence (両 branch) + squeeze arithmetic (S07_Subcoherent) + (9.11.1)-(9.11.8) brick (S11_NineElevenCoherence) + engine (`coherentOfPairChainCover`) は全 landed。残 = family-specific な column 列挙 + per-step hstep。caseB は h2 count (q·u ≥2 既約) も要 (caseA は `sSetIrrDeg_qa_two_le_ncard` 済)。
