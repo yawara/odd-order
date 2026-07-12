@@ -286,4 +286,276 @@ theorem Hypothesis.inner_tau_muColumnZero_sub_zeta_rowZero_const [Finite G]
     (hyp.mapRingEquiv_tau_muColumnZero_sub_zeta hG hodd u hζS hζ1) hmove.symm hm hcorr
   rw [hprod 0 j', hprod 0 j, hρ0, htransport, hm]
 
+open scoped FiniteInduce in
+/-- The aligned column-`0` grid sum pairs with a grid vector by the column-`0` indicator:
+`⟨∑_r ω_{r0}^σ, ω_{ij}^σ⟩ = δ_{j0}` (orthonormality, single surviving term `r = i`). -/
+theorem Hypothesis.alignedOmegaSigmaGrid_columnZero_sum_inner [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) (j : Fin hyp.w2) :
+    ClassFunction.inner (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0)
+      (hyp.alignedOmegaSigmaGrid hG hodd i j) = (if j = 0 then (1 : ℂ) else 0) := by
+  haveI := hyp.finiteG
+  classical
+  rw [inner_sum_left, Finset.sum_eq_single i]
+  · rw [hyp.alignedOmegaSigmaGrid_inner hG hodd i i 0 j]
+    by_cases hj : j = 0
+    · rw [if_pos ⟨rfl, hj.symm⟩, if_pos hj]
+    · rw [if_neg (fun hh => hj hh.2.symm), if_neg hj]
+  · intro r _ hri
+    rw [hyp.alignedOmegaSigmaGrid_inner hG hodd r i 0 j, if_neg (fun hh => hri hh.1)]
+  · intro h; exact absurd (Finset.mem_univ _) h
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (11.9.a)**: for an irreducible `ζ ∈ S` of degree `w₁` whose column-`0` residual
+is **not** orthogonal to the grid (the (11.8) input `h118`), the `σ`-grid coefficients of
+`ψ = τ(μ₀ − ζ)` are the **row-`0` indicator**: `⟨ψ, ω_{ij}^σ⟩ = δ_{i0}`; equivalently
+`ψ − ∑_j ω_{0j}^σ ⊥ (Irr W)^σ`.
+
+The proof mirrors the book: `a₀₀ = 1` (Dade reciprocity), Galois constancy along the punctured
+row/column (`inner_tau_muColumnZero_sub_zeta_columnZero_const`/`rowZero_const`), the (3.7)
+separability (`sigmaCoeff_add_eq`), and the norm budget `∑ a² ≤ ‖ψ‖² = w₁ + 1`
+(`sum_sq_inner_le_of_orthonormal`).  The integer case split then forces
+`a_{11} = 0`, and `a_{10} ≠ 0` would make the grid part the column-`0` sum — refuted by `h118` —
+so `a_{10} = 0` and `a_{01} = 1`. -/
+theorem Hypothesis.inner_tau_muColumnZero_sub_zeta_rowZero_of_residual_not_orthogonal [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (htype : OddOrder.GroupTheory.IsTypeIII M ∨ OddOrder.GroupTheory.IsTypeIV M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
+    {ζ : ClassFunction ↥M ℂ}
+    (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ))
+    (h118 : ¬ ∀ (i : Fin hyp.w1) (j : Fin hyp.w2),
+      ClassFunction.inner
+        ((hyp.tau ((∑ r : Fin hyp.w1, hyp.muGrid hG hG.odd r 0) - ζ))
+          - ∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hG.odd r 0)
+        (hyp.alignedOmegaSigmaGrid hG hG.odd i j) = 0) :
+    ∀ (i : Fin hyp.w1) (j : Fin hyp.w2),
+      ClassFunction.inner (hyp.tau ((∑ r : Fin hyp.w1, hyp.muGrid hG hG.odd r 0) - ζ))
+        (hyp.alignedOmegaSigmaGrid hG hG.odd i j) = (if i = 0 then (1 : ℂ) else 0) := by
+  haveI := hyp.finiteG
+  classical
+  have hodd : Odd (Nat.card G) := hG.odd
+  let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
+  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  haveI : Fintype ((tic.W1.subgroupOf tic.W) →* ℂˣ) := Fintype.ofFinite _
+  haveI : Fintype ((tic.W2.subgroupOf tic.W) →* ℂˣ) := Fintype.ofFinite _
+  let app : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication tic :=
+    hyp.canonicalFullDadeApp hG hodd
+  have hVeq : tic.V = tic.Vdiff := rfl
+  have hcardW1 : Nat.card ↥tic.W1 = hyp.w1 := rfl
+  have hcardW2 : Nat.card ↥tic.W2 = hyp.w2 := rfl
+  have h3w1 : (3 : ℕ) ≤ hyp.w1 := hcardW1 ▸ tic.three_le_card_W1
+  have h3w2 : (3 : ℕ) ≤ hyp.w2 := hcardW2 ▸ tic.three_le_card_W2
+  obtain ⟨ρ, κ, hρinj, hκinj, hprod⟩ := hyp.exists_alignedOmegaSigmaGrid_chiFam_product hG hodd
+  have hchi := tic.chiFam_spec hVeq app
+  set ψ : ClassFunction G ℂ :=
+    hyp.tau ((∑ r : Fin hyp.w1, hyp.muGrid hG hodd r 0) - ζ) with hψ
+  -- `μ₀ − ζ` is `A₀`-supported; `ψ` is a virtual character of norm `w₁ + 1`
+  have hsupp : ((∑ r : Fin hyp.w1, hyp.muGrid hG hodd r 0) - ζ).support ⊆ hyp.A0 :=
+    hyp.muColumnZero_sub_zeta_support hG hodd hζS hζ1
+  have hμ0Z : (∑ r : Fin hyp.w1, hyp.muGrid hG hodd r 0) ∈ ZIrr ↥M :=
+    Submodule.sum_mem _ (fun r _ => (hyp.muGrid_isIrreducible hG hodd r 0).mem_ZIrr)
+  have hψZ : ψ ∈ ZIrr G := by
+    rw [hψ]
+    exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+      hyp.dadeData.dade hyp.hconj hsupp (Submodule.sub_mem _ hμ0Z hζirr.mem_ZIrr)
+  have hψnorm : ClassFunction.inner ψ ψ = ((hyp.w1 + 1 : ℕ) : ℂ) := by
+    rw [hψ, hyp.tau_inner_eq_of_supported hsupp hsupp,
+      inner_muColumnZero_sub_zeta_self hG hyp hζirr hζ1]
+  -- `a₀₀ = 1`
+  have hzeta_triv : ClassFunction.inner ζ (trivialClassFunction (↥M)) = 0 := by
+    have hzmem : ζ ∈ irreducibleCharacters (↥M) := mem_irreducibleCharacters.mpr hζirr
+    have htmem : trivialClassFunction (↥M) ∈ irreducibleCharacters (↥M) :=
+      mem_irreducibleCharacters.mpr trivialClassFunction_isIrreducible
+    rw [irr_cf_inner hzmem htmem, if_neg ?_]
+    intro hcontra
+    have h1 : ζ 1 = trivialClassFunction (↥M) 1 :=
+      congrArg (fun f : ClassFunction (↥M) ℂ => (f : (↥M) → ℂ) 1) hcontra
+    rw [hζ1, trivialClassFunction_apply] at h1
+    have : (hyp.w1 : ℕ) = 1 := by exact_mod_cast h1
+    omega
+  have ha00 : ClassFunction.inner ψ (hyp.alignedOmegaSigmaGrid hG hodd 0 0) = 1 := by
+    rw [hyp.alignedOmegaSigmaGrid_zero_zero hG hodd, hψ, hyp.tau_inner_trivial hsupp,
+      ClassFunction.inner_sub_left, hyp.muColumnZero_inner_trivial hG hodd, hzeta_triv, sub_zero]
+  -- `ψ` vanishes on `V` (for the (3.7) separability)
+  have hpsiV : ∀ v ∈ tic.V, ψ v = 0 := by
+    intro v hv
+    have hvM : v ∈ M := typePData_W_le_self hyp.typeP (SetLike.mem_coe.mp hv.1)
+    rw [hψ, hyp.tau_apply_of_mem_typePV hsupp hv hvM]
+    have hKcomm : (derivedInG M).subgroupOf M = commutator ↥M := by
+      rw [derivedInG, Subgroup.subgroupOf,
+        Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+    haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
+    have hnotmem : (⟨v, hvM⟩ : ↥M) ∉ (derivedInG M).subgroupOf M := by
+      rw [Subgroup.mem_subgroupOf]
+      exact OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived hyp.typeP hv
+    obtain ⟨θ, _hθne, hζeq⟩ := hζS
+    have hζv : ζ ⟨v, hvM⟩ = 0 := by
+      rw [hζeq]; exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hnotmem
+    have hμv : (∑ r : Fin hyp.w1, hyp.muGrid hG hodd r 0) ⟨v, hvM⟩ = 0 :=
+      hyp.muGrid_column_sum_vanishes_off_derived hG hodd 0 hnotmem
+    rw [ClassFunction.sub_apply, hμv, hζv, sub_zero]
+  -- integer grid coefficients
+  have hgridZ : ∀ (i : Fin hyp.w1) (j : Fin hyp.w2),
+      hyp.alignedOmegaSigmaGrid hG hodd i j ∈ ZIrr G := by
+    intro i j
+    rw [hprod i j]
+    exact hchi.2.1 _
+  have hint : ∀ (i : Fin hyp.w1) (j : Fin hyp.w2), ∃ m : ℤ,
+      ClassFunction.inner ψ (hyp.alignedOmegaSigmaGrid hG hodd i j) = (m : ℂ) := fun i j =>
+    ClassFunction.inner_mem_ZIrr_int hψZ (hgridZ i j)
+  choose n hn using hint
+  have hn00 : n 0 0 = 1 := by
+    have := (hn 0 0).symm.trans ha00
+    exact_mod_cast this
+  -- the punctured-row/column constancy (the Galois layer)
+  have hi₁ : (⟨1, by omega⟩ : Fin hyp.w1) ≠ 0 := by
+    intro h; exact absurd (congrArg Fin.val h) (by simp)
+  have hj₁ : (⟨1, by omega⟩ : Fin hyp.w2) ≠ 0 := by
+    intro h; exact absurd (congrArg Fin.val h) (by simp)
+  set A : ℤ := n ⟨1, by omega⟩ 0 with hAdef
+  set B : ℤ := n 0 ⟨1, by omega⟩ with hBdef
+  have hA : ∀ i : Fin hyp.w1, i ≠ 0 → n i 0 = A := by
+    intro i hi
+    have h := hyp.inner_tau_muColumnZero_sub_zeta_columnZero_const hG htype coh hζS hζirr hζ1
+      hi₁ hi
+    rw [← hψ, hn i 0, hn ⟨1, by omega⟩ 0] at h
+    exact_mod_cast h
+  have hB : ∀ j : Fin hyp.w2, j ≠ 0 → n 0 j = B := by
+    intro j hj
+    have h := hyp.inner_tau_muColumnZero_sub_zeta_rowZero_const hG coh hζS hζirr hζ1 hj₁ hj
+    rw [← hψ, hn 0 j, hn 0 ⟨1, by omega⟩] at h
+    exact_mod_cast h
+  -- the (3.7) separability, integer form: `n i j + n 0 0 = n i 0 + n 0 j`
+  have hsep : ∀ (i : Fin hyp.w1) (j : Fin hyp.w2), n i j + n 0 0 = n i 0 + n 0 j := by
+    intro i j
+    have hcoeff : ∀ (i' : Fin hyp.w1) (j' : Fin hyp.w2),
+        tic.sigmaCoeff hVeq app ψ (ρ i', κ j')
+          = ClassFunction.inner ψ (hyp.alignedOmegaSigmaGrid hG hodd i' j') := by
+      intro i' j'
+      show ClassFunction.inner ψ (tic.chiFam hVeq app (ρ i', κ j')) = _
+      rw [← hprod i' j']
+    have h := tic.sigmaCoeff_add_eq hVeq app hpsiV (ρ i) (ρ 0) (κ j) (κ 0)
+    rw [hcoeff i j, hcoeff 0 0, hcoeff i 0, hcoeff 0 j, hn i j, hn 0 0, hn i 0, hn 0 j] at h
+    exact_mod_cast h
+  have hC : ∀ (i : Fin hyp.w1) (j : Fin hyp.w2), i ≠ 0 → j ≠ 0 → n i j = A + B - 1 := by
+    intro i j hi hj
+    have := hsep i j
+    rw [hn00, hA i hi, hB j hj] at this
+    omega
+  -- Bessel: `∑ n² ≤ w₁ + 1`
+  have hbessel : (∑ p : Fin hyp.w1 × Fin hyp.w2, n p.1 p.2 ^ 2) ≤ ((hyp.w1 + 1 : ℕ) : ℤ) := by
+    refine sum_sq_inner_le_of_orthonormal (v := fun p : Fin hyp.w1 × Fin hyp.w2 =>
+      hyp.alignedOmegaSigmaGrid hG hodd p.1 p.2) (fun p => hgridZ p.1 p.2) ?_ hψZ hψnorm
+      (fun p => hn p.1 p.2)
+    intro p q
+    rw [hyp.alignedOmegaSigmaGrid_inner hG hodd p.1 q.1 p.2 q.2]
+    simp [Prod.ext_iff]
+  -- the sum in closed form
+  have hcard1 : ((Finset.univ.erase (0 : Fin hyp.w1)).card : ℤ) = (hyp.w1 : ℤ) - 1 := by
+    rw [Finset.card_erase_of_mem (Finset.mem_univ _), Finset.card_univ, Fintype.card_fin]
+    have : 1 ≤ hyp.w1 := by omega
+    push_cast [this]
+    omega
+  have hcard2 : ((Finset.univ.erase (0 : Fin hyp.w2)).card : ℤ) = (hyp.w2 : ℤ) - 1 := by
+    rw [Finset.card_erase_of_mem (Finset.mem_univ _), Finset.card_univ, Fintype.card_fin]
+    have : 1 ≤ hyp.w2 := by omega
+    push_cast [this]
+    omega
+  have hsum : (∑ p : Fin hyp.w1 × Fin hyp.w2, n p.1 p.2 ^ 2)
+      = 1 + ((hyp.w1 : ℤ) - 1) * A ^ 2 + ((hyp.w2 : ℤ) - 1) * B ^ 2
+        + ((hyp.w1 : ℤ) - 1) * (((hyp.w2 : ℤ) - 1) * (A + B - 1) ^ 2) := by
+    rw [Fintype.sum_prod_type]
+    rw [← Finset.add_sum_erase _ _ (Finset.mem_univ (0 : Fin hyp.w1))]
+    have hrow0 : (∑ j : Fin hyp.w2, n 0 j ^ 2) = 1 + ((hyp.w2 : ℤ) - 1) * B ^ 2 := by
+      rw [← Finset.add_sum_erase _ _ (Finset.mem_univ (0 : Fin hyp.w2)), hn00, one_pow]
+      congr 1
+      rw [Finset.sum_congr rfl (fun j hj => by
+        rw [hB j (Finset.ne_of_mem_erase hj)]), Finset.sum_const, nsmul_eq_mul, hcard2]
+    have hrowi : ∀ i ∈ Finset.univ.erase (0 : Fin hyp.w1),
+        (∑ j : Fin hyp.w2, n i j ^ 2)
+          = A ^ 2 + ((hyp.w2 : ℤ) - 1) * (A + B - 1) ^ 2 := by
+      intro i hi
+      have hine := Finset.ne_of_mem_erase hi
+      rw [← Finset.add_sum_erase _ _ (Finset.mem_univ (0 : Fin hyp.w2)), hA i hine]
+      congr 1
+      rw [Finset.sum_congr rfl (fun j hj => by
+        rw [hC i j hine (Finset.ne_of_mem_erase hj)]), Finset.sum_const, nsmul_eq_mul, hcard2]
+    rw [hrow0, Finset.sum_congr rfl hrowi, Finset.sum_const, nsmul_eq_mul, hcard1]
+    ring
+  have hbound : 1 + ((hyp.w1 : ℤ) - 1) * A ^ 2 + ((hyp.w2 : ℤ) - 1) * B ^ 2
+      + ((hyp.w1 : ℤ) - 1) * (((hyp.w2 : ℤ) - 1) * (A + B - 1) ^ 2)
+      ≤ (hyp.w1 : ℤ) + 1 := by
+    rw [← hsum]
+    calc (∑ p : Fin hyp.w1 × Fin hyp.w2, n p.1 p.2 ^ 2)
+        ≤ ((hyp.w1 + 1 : ℕ) : ℤ) := hbessel
+      _ = (hyp.w1 : ℤ) + 1 := by push_cast; ring
+  have h3w1' : (3 : ℤ) ≤ (hyp.w1 : ℤ) := by exact_mod_cast h3w1
+  have h3w2' : (3 : ℤ) ≤ (hyp.w2 : ℤ) := by exact_mod_cast h3w2
+  -- the integer case split: `A + B − 1 = 0`, then `A = 0` (else the column-`0` form, refuted
+  -- by `h118`), hence `B = 1`
+  have h0w1 : (0 : ℤ) ≤ (hyp.w1 : ℤ) - 1 := by linarith
+  have h0w2 : (0 : ℤ) ≤ (hyp.w2 : ℤ) - 1 := by linarith
+  have hC0 : A + B - 1 = 0 := by
+    by_contra hCne
+    have h1 : 1 ≤ (A + B - 1) ^ 2 := by
+      have := sq_nonneg (A + B - 1)
+      rcases lt_or_eq_of_le this with h | h
+      · omega
+      · exact absurd (pow_eq_zero_iff (n := 2) (by omega) |>.mp h.symm) hCne
+    have hp2 : ((hyp.w1 : ℤ) - 1) * (((hyp.w2 : ℤ) - 1) * 1)
+        ≤ ((hyp.w1 : ℤ) - 1) * (((hyp.w2 : ℤ) - 1) * (A + B - 1) ^ 2) :=
+      mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left h1 h0w2) h0w1
+    have hp3 : ((hyp.w1 : ℤ) - 1) * 2 ≤ ((hyp.w1 : ℤ) - 1) * ((hyp.w2 : ℤ) - 1) :=
+      mul_le_mul_of_nonneg_left (by linarith) h0w1
+    have hA2 : 0 ≤ ((hyp.w1 : ℤ) - 1) * A ^ 2 := mul_nonneg h0w1 (sq_nonneg A)
+    have hB2 : 0 ≤ ((hyp.w2 : ℤ) - 1) * B ^ 2 := mul_nonneg h0w2 (sq_nonneg B)
+    nlinarith [hbound, hp2, hp3, hA2, hB2]
+  have hA0 : A = 0 := by
+    by_contra hAne
+    have hA1 : 1 ≤ A ^ 2 := by
+      have := sq_nonneg A
+      rcases lt_or_eq_of_le this with h | h
+      · omega
+      · exact absurd (pow_eq_zero_iff (n := 2) (by omega) |>.mp h.symm) hAne
+    have hB0 : B = 0 := by
+      by_contra hBne
+      have hB1 : 1 ≤ B ^ 2 := by
+        have := sq_nonneg B
+        rcases lt_or_eq_of_le this with h | h
+        · omega
+        · exact absurd (pow_eq_zero_iff (n := 2) (by omega) |>.mp h.symm) hBne
+      have hq1 : ((hyp.w1 : ℤ) - 1) * 1 ≤ ((hyp.w1 : ℤ) - 1) * A ^ 2 :=
+        mul_le_mul_of_nonneg_left hA1 h0w1
+      have hq2 : ((hyp.w2 : ℤ) - 1) * 1 ≤ ((hyp.w2 : ℤ) - 1) * B ^ 2 :=
+        mul_le_mul_of_nonneg_left hB1 h0w2
+      have hq3 : 0 ≤ ((hyp.w1 : ℤ) - 1) * (((hyp.w2 : ℤ) - 1) * (A + B - 1) ^ 2) :=
+        mul_nonneg h0w1 (mul_nonneg h0w2 (sq_nonneg _))
+      nlinarith [hbound, hq1, hq2, hq3]
+    have hA1' : A = 1 := by omega
+    -- the grid part is the column-`0` sum: refute `h118`
+    apply h118
+    intro i j
+    rw [ClassFunction.inner_sub_left,
+      hyp.alignedOmegaSigmaGrid_columnZero_sum_inner hG hodd i j, hn i j]
+    rcases eq_or_ne j 0 with rfl | hj
+    · rcases eq_or_ne i 0 with rfl | hi
+      · rw [hn00, if_pos rfl]; norm_num
+      · rw [hA i hi, hA1', if_pos rfl]; norm_num
+    · rcases eq_or_ne i 0 with rfl | hi
+      · rw [hB j hj, hB0, if_neg hj]; norm_num
+      · rw [hC i j hi hj, hA1', hB0, if_neg hj]; norm_num
+  have hB1 : B = 1 := by omega
+  -- conclusion: the row-`0` indicator
+  intro i j
+  rw [hn i j]
+  rcases eq_or_ne i 0 with rfl | hi
+  · rcases eq_or_ne j 0 with rfl | hj
+    · rw [hn00, if_pos rfl]; norm_num
+    · rw [hB j hj, hB1, if_pos rfl]; norm_num
+  · rcases eq_or_ne j 0 with rfl | hj
+    · rw [hA i hi, hA0, if_neg hi]; norm_num
+    · rw [hC i j hi hj, hA0, hB1, if_neg hi]; norm_num
+
 end OddOrder.Peterfalvi.S12
