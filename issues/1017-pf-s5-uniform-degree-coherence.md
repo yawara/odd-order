@@ -1493,3 +1493,24 @@ cross-orthogonality に供給)、(5.6) pair-bound producer (`NineElevenPairBound
    これが `NineElevenEqualityRefutationS` の (9.11.7-8) coherent-pair 構成 (抽象 bridge に供給) を unblock。
 3. **`NineElevenEqualityRefutationS`** = generic `nineElevenCaseA_equality_refutation` + degree-dichotomy
    producer 3 種 + orbit-split で `S4 ≤ N` に還元、(9.11.7-8) が残る deepest。
+
+### update #45 (2026-07-13, lane b): per-member Dade `R`-family made Clifford-case-agnostic
+STEP 3 (the "genuinely S-instance-specific" caseA `R`-family) landed **by de-duplication** rather than
+mirroring: the caseB per-member `R`-family chain was **Clifford-case-agnostic all along** — every lemma
+(`sSet_(reducible_)memberRFamily(_ofColumns)`, `tauS_muColumn_diff_eq`, `sSet_irr_memberRFamily_eta_inner`,
+`sSet_memberRFamily_orthogonal`, imageSet reductions) threaded `chars`/`caseB` **only** to obtain the
+member+conjugate equal-degree fact `η̄(1)=η(1)`, which is automatic (conjugation preserves the real
+positive degree).  So the whole chain in `S15_CaseBReducibleCoherence.lean` was generalized in place:
+- dropped the vestigial `{chief}(chars)(caseB)` params (9 lemmas), renamed `sSet_caseB_…RFamily…` →
+  `sSet_…RFamily…` (case-agnostic names);
+- added **`Hypothesis.sSet_member_conjDiff_supported`** (`(η̄−η).support ⊆ A(S)` for any `η ∈ 𝒮`, via the
+  landed case-agnostic `sSet_member_diffsupp`) — **axiom-clean** `[propext,Classical.choice,Quot.sound]`;
+- the caseB support-uniformity route `sSet_caseB_member_diff_supported` is kept only for the engine's
+  *arbitrary-pair* ZIrr/support inputs (`sSet_coherent_dade_caseB`), which genuinely need caseB uniformity.
+
+Result: `Hypothesis.sSet_memberRFamily hG hη : OrthonormalCharacterImageFamily (dadeHypS-Dade) η` is now
+directly usable in the **caseA** non-Galois branch (feeds the (9.11.7)–(9.11.8) coherent-image
+cross-orthogonality via `sSet_memberRFamily_orthogonal`).  sorryAx = `dadeHypS` only (tolerated).
+**Regression preserved**: `sSet_coherent_indS_caseB` axioms unchanged `[propext,sorryAx,Classical.choice,Quot.sound]`.
+Full build green (4180 jobs, AxiomsCheck OK).  Remaining for the headline `sSet_caseA_nineElevenRefutation`:
+the squeeze reduction (step 1) + `NineElevenEqualityRefutationS` deep inputs (step 3) — both still open.

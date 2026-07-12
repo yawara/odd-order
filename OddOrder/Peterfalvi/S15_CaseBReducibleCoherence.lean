@@ -118,6 +118,24 @@ theorem Hypothesis.sSet_reducible_columns_ne [Finite G]
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
+/-- **Member−conjugate difference support** (Clifford-case-agnostic; issue 1017): for any member
+`η ∈ 𝒮 = sSet`, `(η̄ − η).support ⊆ A(S)`.  Since `η = Ind_{HU}^S ξ` (`ξ ∈ 𝒳`) this is the landed
+`sSet_member_diffsupp`, which holds for *both* Clifford cases: a member and its conjugate always share
+the real, positive degree `η̄(1) = η(1)`, so `1 ∉ Supp(η̄ − η)`.  This frees the `R`-family
+diff-support input from the caseB-uniformity route `sSet_caseB_member_diff_supported` (which derives the
+equal degree from `caseB`), so the *same* per-member `R`-family serves caseA and caseB. -/
+theorem Hypothesis.sSet_member_conjDiff_supported [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {η : ClassFunction ↥hyp.S ℂ} (hη : η ∈ sSet (hyp.toTypesIIIIIIVSetupS hG)) :
+    ((η : ClassFunction ↥hyp.S ℂ).conj - η).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S := by
+  haveI := hyp.finiteG
+  letI : Fintype G := Fintype.ofFinite G
+  obtain ⟨ξ, hξ, rfl⟩ := hη
+  exact hyp.sSet_member_diffsupp hG hξ
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
 /-- **The honest Dade image of a reducible `𝒮`-member column difference** (route B, the core of the
 reducible caseB `R`-family): for a reducible `η = ∑ᵢ μ_{ij} ∈ 𝒮` with conjugate `η̄ = ∑ᵢ μ_{ik}`
 (`j ≠ k`, both `≠ 0`), the honest `'A(S)`-Dade image is `τ_S(η − η̄) = ∑ᵢ(η_{ij} − η_{ik})`.
@@ -129,9 +147,6 @@ prime-`TI` cross-relation `tauS_mu_cross` then evaluates `τ_S⁰(μ_{ij} − μ
 summed by `ℤ`-linearity of the Dade map. -/
 theorem Hypothesis.tauS_muColumn_diff_eq [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
-    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
-    (caseB : CliffordCaseBData chars)
     {j k : Fin hyp.p} (hj0 : j ≠ ⟨0, hyp.p_prime.pos⟩) (hk0 : k ≠ ⟨0, hyp.p_prime.pos⟩)
     (hjk : j ≠ k)
     {η : ClassFunction ↥hyp.S ℂ} (hη : η ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
@@ -152,7 +167,11 @@ theorem Hypothesis.tauS_muColumn_diff_eq [Finite G]
   -- `A(S)`-support of the column difference (both members of `𝒮`).
   have hAsupp : (η - (η : ClassFunction ↥hyp.S ℂ).conj).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S :=
-    hyp.sSet_caseB_member_diff_supported hG chars caseB hη hηconj
+    by
+      rw [show (η - (η : ClassFunction ↥hyp.S ℂ).conj)
+          = -((η : ClassFunction ↥hyp.S ℂ).conj - η) from by abel,
+        ClassFunction.support_neg]
+      exact hyp.sSet_member_conjDiff_supported hG hη
   have hA0supp : (η - (η : ClassFunction ↥hyp.S ℂ).conj).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set hyp.S hyp.Sdata) hyp.S :=
     hAsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
@@ -171,7 +190,7 @@ theorem Hypothesis.tauS_muColumn_diff_eq [Finite G]
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 /-- **The reducible `𝒮`-member `R`-family at EXPLICIT columns `j, k`** (route B core; the
-column-parametrized form of `sSet_caseB_reducible_memberRFamily`).  For a reducible member
+column-parametrized form of `sSet_reducible_memberRFamily`).  For a reducible member
 `η = ∑ᵢ μ_{ij} ∈ 𝒮` with conjugate `η̄ = ∑ᵢ μ_{ik}` (`j ≠ k`, both `≠ 0`), the (5.2.d) orthonormal
 Dade image family is the `2q`-element signed `η`-grid family
 `R(η) = {η_{ij} : i} ∪ {−η_{ik} : i}` (`imageSet = Finset.image (Sum.elim …) univ`), with
@@ -179,12 +198,9 @@ Dade image family is the `2q`-element signed `η`-grid family
 `eta_orthonormal` (distinct columns `j ≠ k`), and in `ℤ[Irr G]` by `eta_mem_ZIrr`.  Exposing
 `j, k` as explicit parameters keeps `imageSet` a clean structure literal — its reduction
 (`…_ofColumns_imageSet`) is `rfl`, which the (5.2.e) cross-orthogonality
-(`sSet_caseB_memberRFamily_orthogonal`) needs to destructure the family element-wise. -/
-noncomputable def Hypothesis.sSet_caseB_reducible_memberRFamily_ofColumns [Finite G]
+(`sSet_memberRFamily_orthogonal`) needs to destructure the family element-wise. -/
+noncomputable def Hypothesis.sSet_reducible_memberRFamily_ofColumns [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
-    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
-    (caseB : CliffordCaseBData chars)
     {η : ClassFunction ↥hyp.S ℂ} (hη : η ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
     (hηconj : (η : ClassFunction ↥hyp.S ℂ).conj ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
     {j k : Fin hyp.p} (hj0 : j ≠ ⟨0, hyp.p_prime.pos⟩) (hk0 : k ≠ ⟨0, hyp.p_prime.pos⟩)
@@ -198,7 +214,7 @@ noncomputable def Hypothesis.sSet_caseB_reducible_memberRFamily_ofColumns [Finit
   haveI := hyp.finiteG
   letI : Fintype ↥hyp.S := Fintype.ofFinite _
   -- the honest Dade image `τ_S(η − η̄) = ∑ᵢ(η_{ij} − η_{ik})`.
-  have hcross := hyp.tauS_muColumn_diff_eq hG chars caseB hj0 hk0 hjk hη hηconj hjeq hkeq
+  have hcross := hyp.tauS_muColumn_diff_eq hG hj0 hk0 hjk hη hηconj hjeq hkeq
   -- the `2q`-element signed `η`-grid family.
   set g : Fin hyp.q ⊕ Fin hyp.q → ClassFunction G ℂ :=
     Sum.elim (fun i => hyp.eta i j) (fun i => -hyp.eta i k) with hg
@@ -254,18 +270,15 @@ open scoped FiniteInduce in
 open scoped Classical in
 /-- **`imageSet` of the column-parametrized reducible `R`-family** (`rfl`).  The signed `η`-grid
 family `R(η) = {η_{ij}} ∪ {−η_{ik}}` as `Finset.image (Sum.elim (η·ⱼ) (−η·ₖ)) univ`. -/
-theorem Hypothesis.sSet_caseB_reducible_memberRFamily_ofColumns_imageSet [Finite G]
+theorem Hypothesis.sSet_reducible_memberRFamily_ofColumns_imageSet [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
-    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
-    (caseB : CliffordCaseBData chars)
     {η : ClassFunction ↥hyp.S ℂ} (hη : η ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
     (hηconj : (η : ClassFunction ↥hyp.S ℂ).conj ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
     {j k : Fin hyp.p} (hj0 : j ≠ ⟨0, hyp.p_prime.pos⟩) (hk0 : k ≠ ⟨0, hyp.p_prime.pos⟩)
     (hjk : j ≠ k)
     (hjeq : η = ∑ i : Fin hyp.q, hyp.mu i j)
     (hkeq : (η : ClassFunction ↥hyp.S ℂ).conj = ∑ i : Fin hyp.q, hyp.mu i k) :
-    (hyp.sSet_caseB_reducible_memberRFamily_ofColumns hG chars caseB hη hηconj hj0 hk0 hjk
+    (hyp.sSet_reducible_memberRFamily_ofColumns hG hη hηconj hj0 hk0 hjk
         hjeq hkeq).imageSet
       = Finset.image (Sum.elim (fun i : Fin hyp.q => hyp.eta i j)
           (fun i : Fin hyp.q => -hyp.eta i k)) Finset.univ :=
@@ -278,17 +291,14 @@ open scoped FiniteInduce in
 over `…_ofColumns` that dispatches `η, η̄` to their μ-columns `j = ` col`(η)`, `k = ` col`(η̄)` via the
 (9.11) reverse dichotomy `sSet_reducible_eq_muColumnSum` (`.choose`), with `j ≠ k` from
 non-realness.  See `…_ofColumns` for the family content. -/
-noncomputable def Hypothesis.sSet_caseB_reducible_memberRFamily [Finite G]
+noncomputable def Hypothesis.sSet_reducible_memberRFamily [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
-    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
-    (caseB : CliffordCaseBData chars)
     {η : ClassFunction ↥hyp.S ℂ} (hη : η ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
     (hirr : ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter η) :
     OddOrder.Peterfalvi.S07.OrthonormalCharacterImageFamily
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
         ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG))) η :=
-  hyp.sSet_caseB_reducible_memberRFamily_ofColumns hG chars caseB hη
+  hyp.sSet_reducible_memberRFamily_ofColumns hG hη
     (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupS hG) hη)
     (hyp.sSet_reducible_eq_muColumnSum hG hη hirr).choose_spec.1
     (hyp.sSet_reducible_eq_muColumnSum hG
@@ -302,17 +312,20 @@ noncomputable def Hypothesis.sSet_caseB_reducible_memberRFamily [Finite G]
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
-/-- **Per-member orthonormal Dade `R`-family over `𝒮 = sSet` in the Galois case** (issue 1017, the
-`R` input of the caseB (5.7) engine `uniform_degree_coherence_of_families`, the honest `S`-instance
-analogue of the M-instance `caseB_sOf_memberRFamily`, `S13_MaximalIII_IV.lean:546`).  Every member
-of the uniform-degree-`q·u` family `𝒮` is dispatched to its (5.2.d) `R`-datum:
+/-- **Per-member orthonormal Dade `R`-family over `𝒮 = sSet`** (issue 1017, the `R` input of the (5.7)
+coherence engine `uniform_degree_coherence_of_families`, the honest `S`-instance analogue of the
+M-instance `caseB_sOf_memberRFamily`, `S13_MaximalIII_IV.lean:546`).  **Clifford-case-agnostic**: the
+construction depends on nothing beyond `η ∈ 𝒮` and its conjugate (the two Clifford cases were only ever
+threaded to obtain the member+conjugate equal-degree fact, which is automatic — `η̄(1) = η(1)`), so the
+*same* `R`-family feeds both the caseB Galois engine (`sSet_coherent_dade_caseB`) and the caseA
+non-Galois (9.11.7)–(9.11.8) coherent-pair budget.  Every member is dispatched to its (5.2.d) `R`-datum:
 
 * **irreducible member `η`** — the 2-element signed Dade image family
   `dadeOrthonormalCharacterImageFamilyOfDiff` (`η^τ − η̄^τ = ε·(μ − ν)`), assembled sorry-free from
   the landed inputs: non-realness (`sSet_hasNoRealCharacters` via `oddCardS`) and the conjugate
-  difference support `(η̄ − η).support ⊆ A(S)` (`sSet_caseB_member_diff_supported`, both `η, η̄ ∈ 𝒮`);
+  difference support `(η̄ − η).support ⊆ A(S)` (`sSet_member_conjDiff_supported`, case-agnostic);
 * **reducible member `η = μ_j` (a nonzero μ-column sum)** — the `2q`-element signed-`η` family
-  `R(η) = {η_{ij}} ∪ {−η_{ik}}`, **built sorry-free by route B** (`sSet_caseB_reducible_memberRFamily`,
+  `R(η) = {η_{ij}} ∪ {−η_{ik}}`, **built sorry-free by route B** (`sSet_reducible_memberRFamily`,
   above): the (9.11) reverse dichotomy `mu_reducible_dichotomy` gives the columns `j, k` of `η, η̄`,
   and `τ_S(η − η̄) = ∑ᵢ(η_{ij} − η_{ik})` from the honest all-rows prime-`TI` cross-relation
   `tauS_mu_cross` (itself `S16.eta_diff_rigidity`, sorry-free from the abstract fields).
@@ -325,11 +338,8 @@ grounded to `residueS.mu2`, and `certainTypeR` is over `dadeHypS0` not `dadeHypS
 grid fields (`mu_apply_of_not_mem_W2`, `mu_orthonormal`, `eta_orthonormal`, `eta_diff_rigidity`).
 The only architectural cost is that route B lives **downstream of `S16_GridExpansion`**, hence this
 whole caseB coherence chain was relocated here from `S15_SAndT_Setup.HypothesisBasics`. -/
-noncomputable def Hypothesis.sSet_caseB_memberRFamily [Finite G]
+noncomputable def Hypothesis.sSet_memberRFamily [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
-    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
-    (caseB : CliffordCaseBData chars)
     {η : ClassFunction ↥hyp.S ℂ} (hη : η ∈ sSet (hyp.toTypesIIIIIIVSetupS hG)) :
     OddOrder.Peterfalvi.S07.OrthonormalCharacterImageFamily
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
@@ -340,14 +350,13 @@ noncomputable def Hypothesis.sSet_caseB_memberRFamily [Finite G]
     refine OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
       (hyp.dadeHypS hG) (hyp.dadeHypS_hconj hG) ⟨η, hirr⟩ ?_ ?_
     · exact sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupS hG) (hyp.oddCardS hG) hη
-    · exact hyp.sSet_caseB_member_diff_supported hG chars caseB
-        (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupS hG) hη) hη
+    · exact hyp.sSet_member_conjDiff_supported hG hη
   · -- reducible member (`η = μ_j`): the `2q`-element signed-η `R`-family, built above by route B
-    -- (`sSet_caseB_reducible_memberRFamily`), verified sorry-free (`tauS_mu_cross` +
+    -- (`sSet_reducible_memberRFamily`), verified sorry-free (`tauS_mu_cross` +
     -- `mu_reducible_dichotomy`).  Route A (`certainTypeR`) is genuinely inapplicable on the S-side
     -- (`hyp.mu` from `certainTypeS`, ungrounded), but route B is buildable from the abstract fields —
     -- refuting the prior (748e6a27) "9014-blocked" record.
-    exact hyp.sSet_caseB_reducible_memberRFamily hG chars caseB hη hirr
+    exact hyp.sSet_reducible_memberRFamily hG hη hirr
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
@@ -427,45 +436,38 @@ theorem Hypothesis.dadeS0_apply_eq_zero_of_regular [Finite G] (hG : OddOrder.BG.
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 /-- **`imageSet`-reduction of the caseB dispatcher, irreducible branch**: for an irreducible member
-`η`, `(sSet_caseB_memberRFamily …).imageSet = (dadeOrthonormalCharacterImageFamilyOfDiff …).imageSet`
+`η`, `(sSet_memberRFamily …).imageSet = (dadeOrthonormalCharacterImageFamilyOfDiff …).imageSet`
 (the specific realness/support proofs exposed existentially, as on the M-side
 `caseB_sOf_memberRFamily_imageSet_of_irr`). -/
-theorem Hypothesis.sSet_caseB_memberRFamily_imageSet_of_irr [Finite G]
+theorem Hypothesis.sSet_memberRFamily_imageSet_of_irr [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
-    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
-    (caseB : CliffordCaseBData chars)
     {η : ClassFunction ↥hyp.S ℂ} (hη : η ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
     (hirr : OddOrder.RepresentationTheory.IsIrreducibleCharacter η) :
     ∃ (hr : ¬ ClassFunction.IsReal (η : ClassFunction ↥hyp.S ℂ))
       (hs : ((η : ClassFunction ↥hyp.S ℂ).conj - (η : ClassFunction ↥hyp.S ℂ)).support ⊆
         OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S),
-      (hyp.sSet_caseB_memberRFamily hG chars caseB hη).imageSet =
+      (hyp.sSet_memberRFamily hG hη).imageSet =
         (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff (hyp.dadeHypS hG)
           (hyp.dadeHypS_hconj hG) ⟨η, hirr⟩ hr hs).imageSet := by
   refine ⟨sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupS hG) (hyp.oddCardS hG) hη,
-    hyp.sSet_caseB_member_diff_supported hG chars caseB
-      (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupS hG) hη) hη, ?_⟩
-  unfold Hypothesis.sSet_caseB_memberRFamily
+    hyp.sSet_member_conjDiff_supported hG hη, ?_⟩
+  unfold Hypothesis.sSet_memberRFamily
   rw [dif_pos hirr]
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 open scoped Classical in
 /-- **`imageSet`-reduction of the caseB dispatcher, reducible branch**: for a reducible member
-`η = ∑ᵢ μ_{ij}`, `(sSet_caseB_memberRFamily …).imageSet` is the signed `η`-grid family
+`η = ∑ᵢ μ_{ij}`, `(sSet_memberRFamily …).imageSet` is the signed `η`-grid family
 `{η_{ij}} ∪ {−η_{ik}}`, with the columns `j = ` col`(η)`, `k = ` col`(η̄)` and the μ-column
 identities `η = ∑ᵢ μ_{ij}`, `η̄ = ∑ᵢ μ_{ik}` exposed (the (5.2.e) column-disjointness inputs). -/
-theorem Hypothesis.sSet_caseB_memberRFamily_imageSet_of_red [Finite G]
+theorem Hypothesis.sSet_memberRFamily_imageSet_of_red [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
-    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
-    (caseB : CliffordCaseBData chars)
     {η : ClassFunction ↥hyp.S ℂ} (hη : η ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
     (hirr : ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter η) :
     ∃ (j k : Fin hyp.p), η = ∑ i : Fin hyp.q, hyp.mu i j ∧
       (η : ClassFunction ↥hyp.S ℂ).conj = ∑ i : Fin hyp.q, hyp.mu i k ∧
-      (hyp.sSet_caseB_memberRFamily hG chars caseB hη).imageSet =
+      (hyp.sSet_memberRFamily hG hη).imageSet =
         Finset.image (Sum.elim (fun i : Fin hyp.q => hyp.eta i j)
           (fun i : Fin hyp.q => -hyp.eta i k)) Finset.univ := by
   refine ⟨(hyp.sSet_reducible_eq_muColumnSum hG hη hirr).choose,
@@ -476,10 +478,10 @@ theorem Hypothesis.sSet_caseB_memberRFamily_imageSet_of_red [Finite G]
     (hyp.sSet_reducible_eq_muColumnSum hG
       (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupS hG) hη)
       (hyp.sSet_reducible_conj_not_irr hirr)).choose_spec.2, ?_⟩
-  rw [show (hyp.sSet_caseB_memberRFamily hG chars caseB hη).imageSet
-        = (hyp.sSet_caseB_reducible_memberRFamily hG chars caseB hη hirr).imageSet from by
-    unfold Hypothesis.sSet_caseB_memberRFamily; rw [dif_neg hirr]]
-  exact hyp.sSet_caseB_reducible_memberRFamily_ofColumns_imageSet hG chars caseB hη
+  rw [show (hyp.sSet_memberRFamily hG hη).imageSet
+        = (hyp.sSet_reducible_memberRFamily hG hη hirr).imageSet from by
+    unfold Hypothesis.sSet_memberRFamily; rw [dif_neg hirr]]
+  exact hyp.sSet_reducible_memberRFamily_ofColumns_imageSet hG hη
     (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupS hG) hη)
     (hyp.sSet_reducible_eq_muColumnSum hG hη hirr).choose_spec.1
     (hyp.sSet_reducible_eq_muColumnSum hG
@@ -500,11 +502,8 @@ For an irreducible `φ ∈ 𝒮`, the two constituents `ε·μ, −ε·ν` of `�
 difference `τ_S(φ − φ̄)` vanishes on the regular set `Ŵ^G` (`dadeS0_apply_eq_zero_of_regular` after
 the `'A→'A0`-Dade bridge), so `eta_orthogonal_of_norm_one_pair_vanish` gives `⟨η_{ij}, α⟩ = 0` for
 every `α ∈ R(φ)`. -/
-theorem Hypothesis.sSet_caseB_irr_memberRFamily_eta_inner [Finite G]
+theorem Hypothesis.sSet_irr_memberRFamily_eta_inner [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
-    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
-    (caseB : CliffordCaseBData chars)
     {φ : ClassFunction ↥hyp.S ℂ} (hφ : φ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
     (hφirr : OddOrder.RepresentationTheory.IsIrreducibleCharacter φ)
     (hr : ¬ ClassFunction.IsReal (φ : ClassFunction ↥hyp.S ℂ))
@@ -608,14 +607,14 @@ theorem Hypothesis.sSet_caseB_irr_memberRFamily_eta_inner [Finite G]
 
 set_option maxHeartbeats 1600000 in
 -- the `dadeHypS`-support defeq (through the isometry data) is feasible but expensive; discharged
--- once here so the `2×2` `hRorth` split in `sSet_caseB_memberRFamily_orthogonal` need not re-pay it.
+-- once here so the `2×2` `hRorth` split in `sSet_memberRFamily_orthogonal` need not re-pay it.
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 /-- **irr × irr `R`-family orthogonality, `S`-instance form**: the (5.2.e)
 `dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal` (`S08_YsetInner`) specialized to the honest
 `S`-instance Dade `dadeHypS hG` with the `A(S)` supports, isolating the (feasible-but-expensive)
 `dadeHypS`-support defeq in one focused lemma (so the (5.2.e) `2×2` case split in
-`sSet_caseB_memberRFamily_orthogonal` does not re-pay it under its large local context — the
+`sSet_memberRFamily_orthogonal` does not re-pay it under its large local context — the
 `S`-instance analogue of the M-side `dadeOfDiff_orthogonal_dadeOfDiff_typeP`). -/
 theorem Hypothesis.dadeOfDiff_orthogonal_typeP_S [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
@@ -652,26 +651,23 @@ input of `uniform_degree_coherence_of_families`, the honest `S`-instance analogu
 (distinct non-conjugate members), the Dade image families `R(φ)`, `R(ξ)` are orthogonal.
 
 A `2×2` case split on the member dichotomy (irreducible / reducible-column), on the `imageSet`
-reductions `sSet_caseB_memberRFamily_imageSet_of_{irr,red}`:
+reductions `sSet_memberRFamily_imageSet_of_{irr,red}`:
 
 * **irr × irr** — the landed (5.2.e) `dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal`
   (`S08_YsetInner`), with the two extra scalars `⟨φ̄, ξ⟩`, `⟨φ̄, ξ̄⟩` the `star`-conjugates of
   `⟨φ, ξ̄⟩`, `⟨φ, ξ⟩` (`inner_conj_conj`), so `0`;
-* **irr × red** / **red × irr** — `sSet_caseB_irr_memberRFamily_eta_inner` (`⟨η-grid, R(irr)⟩ = 0`
+* **irr × red** / **red × irr** — `sSet_irr_memberRFamily_eta_inner` (`⟨η-grid, R(irr)⟩ = 0`
   from the (13.19.b) rigidity engine), transported by `inner_conj_symm` / `inner_neg`;
 * **red × red** — `eta_orthonormal`, the four columns pairwise distinct (`mu_colSum_ne_of_inner_zero`
   on `⟨φ, ξ⟩ = ⟨φ, ξ̄⟩ = ⟨φ̄, ξ⟩ = ⟨φ̄, ξ̄⟩ = 0`, so `{jφ, kφ} ∩ {jξ, kξ} = ∅`). -/
-theorem Hypothesis.sSet_caseB_memberRFamily_orthogonal [Finite G]
+theorem Hypothesis.sSet_memberRFamily_orthogonal [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
-    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
-    (caseB : CliffordCaseBData chars)
     {φ ξ : ClassFunction ↥hyp.S ℂ}
     (hφ : φ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG)) (hξ : ξ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
     (h1 : ClassFunction.inner φ ξ = 0)
     (h2 : ClassFunction.inner φ ξ.conj = 0) :
-    (hyp.sSet_caseB_memberRFamily hG chars caseB hφ).Orthogonal
-      (hyp.sSet_caseB_memberRFamily hG chars caseB hξ) := by
+    (hyp.sSet_memberRFamily hG hφ).Orthogonal
+      (hyp.sSet_memberRFamily hG hξ) := by
   classical
   -- the two extra vanishing inners `⟨φ̄, ξ⟩ = ⟨φ̄, ξ̄⟩ = 0` (`inner_conj_conj`).
   have hbφξ : ClassFunction.inner φ.conj ξ = 0 := by
@@ -682,42 +678,42 @@ theorem Hypothesis.sSet_caseB_memberRFamily_orthogonal [Finite G]
   by_cases hφirr : OddOrder.RepresentationTheory.IsIrreducibleCharacter φ <;>
     by_cases hξirr : OddOrder.RepresentationTheory.IsIrreducibleCharacter ξ
   · -- irr × irr
-    obtain ⟨hrφ, hsφ, hφeq⟩ := hyp.sSet_caseB_memberRFamily_imageSet_of_irr hG chars caseB hφ hφirr
-    obtain ⟨hrξ, hsξ, hξeq⟩ := hyp.sSet_caseB_memberRFamily_imageSet_of_irr hG chars caseB hξ hξirr
+    obtain ⟨hrφ, hsφ, hφeq⟩ := hyp.sSet_memberRFamily_imageSet_of_irr hG hφ hφirr
+    obtain ⟨hrξ, hsξ, hξeq⟩ := hyp.sSet_memberRFamily_imageSet_of_irr hG hξ hξirr
     rw [hφeq] at hα
     rw [hξeq] at hβ
     exact hyp.dadeOfDiff_orthogonal_typeP_S hG ⟨φ, hφirr⟩ ⟨ξ, hξirr⟩ hrφ hsφ hrξ hsξ
       h1 h2 hbφξ hbφξb α hα β hβ
   · -- irr × red
-    obtain ⟨hrφ, hsφ, hφeq⟩ := hyp.sSet_caseB_memberRFamily_imageSet_of_irr hG chars caseB hφ hφirr
+    obtain ⟨hrφ, hsφ, hφeq⟩ := hyp.sSet_memberRFamily_imageSet_of_irr hG hφ hφirr
     obtain ⟨jξ, kξ, hjξeq, hkξeq, hξeq⟩ :=
-      hyp.sSet_caseB_memberRFamily_imageSet_of_red hG chars caseB hξ hξirr
+      hyp.sSet_memberRFamily_imageSet_of_red hG hξ hξirr
     rw [hφeq] at hα
     rw [hξeq, Finset.mem_image] at hβ
     obtain ⟨y, -, rfl⟩ := hβ
     rcases y with b | b <;> simp only [Sum.elim_inl, Sum.elim_inr]
     · rw [OddOrder.RepresentationTheory.inner_conj_symm, star_eq_zero]
-      exact hyp.sSet_caseB_irr_memberRFamily_eta_inner hG chars caseB hφ hφirr hrφ hsφ hα b jξ
+      exact hyp.sSet_irr_memberRFamily_eta_inner hG hφ hφirr hrφ hsφ hα b jξ
     · rw [ClassFunction.inner_neg_right, OddOrder.RepresentationTheory.inner_conj_symm,
-        hyp.sSet_caseB_irr_memberRFamily_eta_inner hG chars caseB hφ hφirr hrφ hsφ hα b kξ,
+        hyp.sSet_irr_memberRFamily_eta_inner hG hφ hφirr hrφ hsφ hα b kξ,
         star_zero, neg_zero]
   · -- red × irr
     obtain ⟨jφ, kφ, hjφeq, hkφeq, hφeq⟩ :=
-      hyp.sSet_caseB_memberRFamily_imageSet_of_red hG chars caseB hφ hφirr
-    obtain ⟨hrξ, hsξ, hξeq⟩ := hyp.sSet_caseB_memberRFamily_imageSet_of_irr hG chars caseB hξ hξirr
+      hyp.sSet_memberRFamily_imageSet_of_red hG hφ hφirr
+    obtain ⟨hrξ, hsξ, hξeq⟩ := hyp.sSet_memberRFamily_imageSet_of_irr hG hξ hξirr
     rw [hξeq] at hβ
     rw [hφeq, Finset.mem_image] at hα
     obtain ⟨x, -, rfl⟩ := hα
     rcases x with a | a <;> simp only [Sum.elim_inl, Sum.elim_inr]
-    · exact hyp.sSet_caseB_irr_memberRFamily_eta_inner hG chars caseB hξ hξirr hrξ hsξ hβ a jφ
+    · exact hyp.sSet_irr_memberRFamily_eta_inner hG hξ hξirr hrξ hsξ hβ a jφ
     · rw [ClassFunction.inner_neg_left,
-        hyp.sSet_caseB_irr_memberRFamily_eta_inner hG chars caseB hξ hξirr hrξ hsξ hβ a kφ,
+        hyp.sSet_irr_memberRFamily_eta_inner hG hξ hξirr hrξ hsξ hβ a kφ,
         neg_zero]
   · -- red × red
     obtain ⟨jφ, kφ, hjφeq, hkφeq, hφeq⟩ :=
-      hyp.sSet_caseB_memberRFamily_imageSet_of_red hG chars caseB hφ hφirr
+      hyp.sSet_memberRFamily_imageSet_of_red hG hφ hφirr
     obtain ⟨jξ, kξ, hjξeq, hkξeq, hξeq⟩ :=
-      hyp.sSet_caseB_memberRFamily_imageSet_of_red hG chars caseB hξ hξirr
+      hyp.sSet_memberRFamily_imageSet_of_red hG hξ hξirr
     rw [hφeq, Finset.mem_image] at hα
     rw [hξeq, Finset.mem_image] at hβ
     have hne1 : jφ ≠ jξ :=
@@ -748,12 +744,12 @@ open scoped FiniteInduce in
 `𝒮` is uniform degree `q·u` (`sSet_caseB_apply_one_eq_qu`), so the (5.7) *norm-general* coherence
 producer fires directly (no reducible-column *fold* needed): the pivot is a reducible μ-column
 `μ₁ = ∑ᵢ μ_{i1}` (of self-norm `q`, from `mu_orthonormal`), and every member carries its (5.2.d)
-`R`-datum via `sSet_caseB_memberRFamily`.  All the family inputs — finiteness (`sSet_finite`),
+`R`-datum via `sSet_memberRFamily`.  All the family inputs — finiteness (`sSet_finite`),
 pairwise orthogonality (`sSet_pairwiseOrthogonal`), conjugate-closure (`sSet_closedUnderConjugate`),
 no-real (`sSet_hasNoRealCharacters`), the Dade isometry / ZIrr-image / support facts
 (`dadeIntegralCharacterMap_*_of_supported`, `sSet_caseB_member_diff_supported`), and the uniform
 degree — are landed sorry-free; the sole residual is the reducible branch of
-`sSet_caseB_memberRFamily` (+ `_orthogonal`), the `S`-instance §6 certain-type port. -/
+`sSet_memberRFamily` (+ `_orthogonal`), the `S`-instance §6 certain-type port. -/
 noncomputable def Hypothesis.sSet_coherent_dade_caseB [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
@@ -791,7 +787,7 @@ noncomputable def Hypothesis.sSet_coherent_dade_caseB [Finite G]
       _ = (hyp.q : ℂ) := by simp
   refine OddOrder.Peterfalvi.S07.uniform_degree_coherence_of_families
     (sSet_finite _) hη₁
-    (fun η hη => hyp.sSet_caseB_memberRFamily hG chars caseB hη)
+    (fun η hη => hyp.sSet_memberRFamily hG hη)
     (fun a ha b hb hab => by
       have h := sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupS hG) ha hb hab
       convert h using 2 <;> exact Subsingleton.elim _ _)
@@ -809,7 +805,7 @@ noncomputable def Hypothesis.sSet_coherent_dade_caseB [Finite G]
         (hyp.sSet_caseB_member_diff_supported hG chars caseB ha hb) hab_Z)
     (fun a ha b hb => hyp.sSet_caseB_member_diff_supported hG chars caseB ha hb)
     (fun {φ ξ} hφ hξ h1 h2 =>
-      hyp.sSet_caseB_memberRFamily_orthogonal hG chars caseB hφ hξ h1 h2)
+      hyp.sSet_memberRFamily_orthogonal hG hφ hξ h1 h2)
     (fun a ha => (hyp.sSet_caseB_apply_one_eq_qu hG chars caseB ha).trans
       (hyp.sSet_caseB_apply_one_eq_qu hG chars caseB hη₁).symm)
     (by
@@ -838,7 +834,7 @@ than the mixed *fold*): since the whole family is **uniform** degree `q·u`
 pivot; then `congrMap` re-grounds `τ` onto `Ind_S^G` on the `A(S)`-supported span
 (`sInstance_dade_eq_induce`).  All the (5.7)-engine wiring, the uniform-degree fact, the pivot norm,
 the Dade isometry/ZIrr/support inputs, and the *irreducible* per-member `R`-datum are landed
-sorry-free here; the sole residual is the **reducible** branch of `sSet_caseB_memberRFamily`
+sorry-free here; the sole residual is the **reducible** branch of `sSet_memberRFamily`
 (+ `_orthogonal`) — the `S`-instance §6 certain-type image-family port. -/
 theorem Hypothesis.sSet_coherent_indS_caseB [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
