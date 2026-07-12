@@ -176,3 +176,22 @@ A+B を完璧に threading しても residual/`card_kappaHall_lt_of_isTypeIIIorI
 delicate refactor リスクを負っても spine は clean 化しない = honest 前進なし)。**真の frontier = (C) の (9.11)
 coherence の Coq 8-step induction port** (`sibleyTarget_H0C`/`caseB_coherent_sOf_H0Cprime` を honest 証明で置換)。
 本 issue は open のまま (spine 未 clean); 実測は上記 `#print axioms` で再現可 (heir CLEAN 2 件 / (9.11) DIRTY / residual DIRTY)。
+
+## ⚠⚠⚠⚠ 第5判明 = 第4判明の (C) は誤り、(A)+(B) で十分 (2026-07-13 lane-a, faithful CollectAxioms-replica metaprogram)
+
+**第4判明の (C) sibleyTarget binding は FALSE** (詳細 = issue **9091**)。前 session の STEP-0 は
+`#print axioms` (sorryAx の有無のみ、localize 不可) + **手読みトレース**で「residual → `coherent_sOf_H0C`
+caseA → `Ptype_core_coherence` → `cohereOfSibleyTarget (sibleyTarget_H0C)`」と誤診した。実際は
+`caseA_coherent_sOf_H0Cprime_of_refuter` (caseA 本体) は sibleyTarget を **cite しない** (metaprogram 実測
+CLEAN)。sibley route (`coherent_H0C_commutator`) は off-spine (S12:1747 / S15 のみ)。
+
+**faithful CollectAxioms replica** (getUsedConstants を type+value 双方; inductInfo ctors 再帰;
+sorryAx parent 記録) で spine の leaf sorry を localize すると **ちょうど 2 つ**:
+`typeV_forces_coherence` (via `isTypeIIIorIV`→legacy `no_typeV_maximal`) と
+`typeII_coherence_contradiction_estimate` (via legacy `S12.S_not_coherent`)。**両方 (A)/(B) 圏で
+heir CLEAN・fixable。`sibleyTarget_H0C` は spine に到達しない (reaches=false 実測)。**
+
+∴ **本 issue の当初 plan (A+B threading) は necessary AND sufficient**。第4判明の STOP rationale
+(「(C) ゆえ A+B は無駄」) は無効。残 = optParam 汚染方式 (435b057a) を **explicit param + wrapper**
+(:111-127) へ rework + `coherent_S_of_coherent_SH0C`/`isTypeIIIorIV` 経路の htype 化。方式選択
+(DAG relayer vs pervasive threading) と継続可否は **hub 再裁定へ回付** (9091)。
