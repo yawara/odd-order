@@ -2265,3 +2265,33 @@ Coq が (13.3.c)/(13.9.a) の完全な argument を持つ (CLAUDE.md: Coq コメ
 coherence 直交)、(2) `mu_tau1red` = `mu_col_tau1_eta_col_one`/`mu_tau1_formula` (L342-385 の case 分けを翻訳)、
 (3) λ 構成 (13.3.b)、(4) CharacterDegreeData 全 field assemble (未使用 δ' field は restate-drop 検討)。
 tau1S = `coherent_H0Cprime_S.extension` の coherence 性質を使う (dataL coherence ではない)。
+
+## 🧭 (2026-07-12 続、lane-b /loop) — character_degree_analysis の precise blocker = S-side coherence-orthogonality infra (hub 設計裁定要)
+
+character_degree_analysis (on-path、前節) の build を engage → 全 deep field が **S-side coherence の
+(5.3.b)/(4.1) 直交性** (`tau1S_induce_inner_eta` = Coq `o_tau1_eta`) に収束、その precise blocker を確定:
+
+**Coq `o_tau1_eta` (PFsection13:573)** = 一般 `coherent_ortho_cycTIiso` (PFsection8:839) =
+`mem_coherent_sum_subseq` (coherent 像 = Dade R-support の signed sum) + `FTtypeP_base_ortho` (R-support ⊥ cycTIiso η)。
+**⟹ Lean はこの R-support coherence machinery を持たない** (grep 0)。
+
+**代替 = (3.8)-engine ルート** (既存の T-side `T_typeIII_coherent_image_inner_eta_eq_zero` / (13.19.b) が採用):
+conjugate-difference の A₀-Dade support + norm-two rigidity engine `eta_orthogonal_of_norm_one_pair_vanish`。
+これには **A₀(S)-Dade coherence** (S-family Sset の A₀(S)-Dade 拡張) が要る。だが:
+- Lean の唯一の S-side coherence = `coherent_H0Cprime_S` (support = **(C')^# = cprimeSharpS ⊊ A₀(S)**、(9.11) H0C' 由来) —
+  support が (5.3.b) engine の要求 (A₀(S)/sigmaSharp) と不一致で流用不可。
+- T-side は genuine `tSideDadeMap` (S04 A₀(T)-Dade、TGapGalois:110) を持つが、**S-side analog `sSideDadeMap` は不在**。
+
+**hub 設計裁定要 (2026-07-02 off-path ruling との交錯)**:
+- 事実: character_degree_analysis は **on-path** (→`T_side_caseB_facts` (13.4)→TTypeII (14.9) 矛盾、notes s16_w4 L37/466 も "genuinely open §9/§11 char" と分類、W-side 置換対象でない)。
+- 事実: 2026-07-02 ruling の off-path 対象は **(13.5-13.9) S-side cascade (`sibleyTarget_S`/tauS=0)** 限定 — (13.3)/(13.4) は別レイヤ。
+- **設計分岐 (hub 所有)**: S-side (5.3.b) 直交を得る infra route の選択 —
+  **(A)** 一般 R-support coherence machinery を S07/S08 に新設 (Coq `mem_coherent_sum_subseq`+`FTtypeP_base_ortho` port、大 shared-infra、任意 coherence に効く); or
+  **(B)** genuine `sSideDadeMap` (S04 A₀(S)-Dade、`tSideDadeMap` の S 対称形、off-path tauS=0 placeholder とは別の実構成) + Sset coherence を建て (3.8)-engine を S-side 適用; or
+  **(C)** hub が「(13.3) は別 route / T_side_caseB_facts を別法で」と裁定。
+- **(B) は 2026-07-02 ruling の "S-Dade route off-path" と表面上衝突** ([[scaffold-sorry-free-not-done]] hub 指示と技術分析の矛盾ゆえ flag): ruling は cascade 完成禁止か、A₀(S)-Dade map 構成自体禁止かで route が変わる。**この裁定は hub 所有** (ruling を出した主体、intended routing を知る)。
+
+**b の posture**: character_degree_analysis は on-path だが本 infra 設計裁定 (A/B/C) が front gate。b は裁定を待つ間、
+(A) or (B) の実構築は着手可能 (どちらも genuine on-path infra) だが、**(B) が off-path ruling と衝突しうるため hub 確認を優先**
+(off-path do-not-complete trap 回避)。gated sorry 群 (pc_le/typeP_Galois 等) は従来どおり a-landing 待ち。
+hub 裁定後に (A)/(B) を淡々と build する。
