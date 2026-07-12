@@ -94,3 +94,17 @@ a の `#print axioms` 再トレースを hub が code-level 検証 → **finding
 M-instance case-a の honest port** (Coq Ptype_core_coherence 8-step、sibleyTarget_H0C を coherent_H0C_commutator で
 置換) を進めよ。core を instance-generic に書けるか検討 (b の S-instance と共有可能なら shared-infra 化)。
 その後 1025 の (10.8) caseB bookkeeping で spine を axiom-clean 化。
+
+## ✅ coordination flag RESOLVED (2026-07-12 監視 tick, Opus hub — b の #37 応答を追認)
+
+b の 9090 coordination 応答 (update #37、commit 6fc5bbea) を hub が確認 → **coordination flag は解決、二重 port なし**:
+- **shared 8-step core は既に b-owned・instance-generic に構築済**: (i) (9.11.1-8) 算術 brick = `S11_NineElevenCoherence`
+  (Dade-pair parameterized)、(ii) squeeze = `S07_Subcoherent`、(iii) 組立 engine `coherentOfPairChainCover` =
+  `S07_Coherence` — いずれも sorry-free。
+- a の M-instance port と b の S-instance は**共にこの shared core を consume**、per-instance に異なるのは
+  family-specific assembly のみ (M=type-III/IV / S=type-II sSet、genuinely 別物)。⟹ **core の二重 port なし**。
+- **分担確定**: a = M-family assembly (Coherence911/S13、b の shared core を cite) / b = S-family assembly
+  (S15_SAndT_Setup)。file 非衝突 (b は Coherence911/S13_Orthogonality 非接触、a は S15_SAndT_Setup 非接触)。
+  a が port 時に shared engine を generalize したら b は main sync で re-point (通常 flow)。
+
+⟹ 9087/9090 の裁定は完全に整合。a は (9.11) M-family port (b core cite)、b は S-instance assembly を独立継続。
