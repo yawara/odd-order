@@ -321,3 +321,24 @@ local-sorry-free 化 (endpoint を「真の gate のみ残す」状態に整備)
 
 **結論**: c は「枯渇したが gated-endpoint 化で最大限前倒し済、a/b の active landing 待ち」が正しい
 状態。hub は reallocation せず、上記 trigger を毎 tick 監視して c の re-engage を driving する。
+
+## 🎯 2026-07-12 lane-c (trigger 監視 loop, tick 1): T5 発火 — exists_betaMGridData discharge
+
+RULING #4 の dated re-engage trigger の一つが発火。lane b が (13.19.c) を完結
+(`typeIOrthogonalityGridData_of_coherent78` producer + `Lset:=typeIHyp.Sset` landing、
+merge afc368a0/a2fe7a0b) → c が該当 endpoint を re-engage:
+
+- **`exists_betaMGridData` discharge** (commit `51a39e2f`): b の landed producer を `Mdata.coherent78`
+  で instantiate (`IsTypeP2 T` は `T_typeII` から供給、BetaVanishing と同一パターン) し `phi_mem`
+  を projection。**SubgroupMCore は sorry-free 化**。full build 4177 jobs green、AxiomsCheck exit 0。
+
+**census 更新 (RULING #4 の 7 → 6)**:
+- ✅ SubgroupMCore `exists_betaMGridData` (旧 :853) = **discharged** (b の (13.19) landing 発火)。
+- 残 6: TTypeII hVcomm (a, RULING #3 leaf 待ち) / SubgroupM hu_full (b, u-value) /
+  SubgroupM t-side field (a, 9000) / ComparingLM m_row_odd/m_col_odd/grid_mem (b, parity)。
+
+**T4 (ComparingLM parity) の再評価**: b の (13.19.c) dichotomy は landing したが、`m_row_odd` の
+(c2) odd parity を得るには c1 disjunct の排除 (caseB gap) が必要。`lSideGridCoeffData` の signature
+には gap が無く (`hq3`/`hp5`/`hepq` のみ)、gap は上位 consumer 供給ゆえ **T4 は未発火** (依然 b-gated、
+"c-unreachable" コメントは概ね有効)。b が `FTtypeI_bridge_facts` の parity を直接 citable な形で
+export するか、consumer 側で gap を threading する landing が次の T4 trigger。
