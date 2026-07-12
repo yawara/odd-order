@@ -368,16 +368,22 @@ theorem typeIA_subset_sharpSubgroup_of_frobenius [Finite G] {M : Subgroup G}
   exact ⟨hxH', hx1⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **(13.19.a) support disjointness**: `Ã(L) ∩ (P^G ∪ W^G) = ∅` — the order of an `Ã(L)`-element
-is divisible by a prime divisor of `|H|`, and `|H|` is coprime to `p q` ((8.17.a)); `β_L^τ` is
-supported in `Ã(L)`-classes while `β_S^τ` is supported in `P^# ∪ (W∖(W₁∪W₂))^G` ((13.18.a)).
-Isolated obligation. -/
-theorem typeIBetaL_betaS_disjoint_support [Finite G]
+/-- **(13.19.a) support disjointness, arbitrary-column form** (Coq `o_tauL_S`): for every
+`j ≠ 0`, `β_L^τ` (supported in `Ã(L)`-classes) has support disjoint from the `S`-side Dade
+image `τ_S(β_j)` (supported in `P^# ∪ (W∖(W₁∪W₂))^S`-classes, (13.18.a)) — the order of an
+`Ã(L)`-element is divisible by a prime divisor of `|H|`, and `|H|` is coprime to `p q`
+((8.17.a)).  The column-`#1` instance is `typeIBetaL_betaS_disjoint_support`; the general
+column feeds the (13.19.c) zero-axis constancy through `gammaGrid_defGamma`. -/
+theorem typeIBetaL_dadeS_betaGrid_disjoint_support [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L)
     (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ typeISetup.Sset)
-    (_hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ)) :
-    Disjoint (typeIBetaL typeISetup φ).support (tauSbetaGrid _hG hyp).support := by
+    (_hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ))
+    (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
+    Disjoint (typeIBetaL typeISetup φ).support
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 _hG)
+        ((hyp.dadeHypS0 _hG).fullDadeIsometryData (hyp.dadeHypS0_hconj _hG))
+        (betaGrid hyp j)).support := by
   classical
   rw [Set.disjoint_left]
   intro x hxL hxS
@@ -399,23 +405,22 @@ theorem typeIBetaL_betaS_disjoint_support [Finite G]
     have hdvd := Subgroup.orderOf_dvd_natCard typeISetup.typeI.typeF.H haH.1
     rwa [typeISetup.typeI.typeF.H_eq] at hdvd
   -- S-side: `orderOf x ∣ p^q · (q·p)`
-  have hbridge : tauSbetaGrid _hG hyp
-      = ClassFunction.induce hyp.S
-          (betaGrid hyp ⟨1, by have := hyp.three_le_p; omega⟩) := by
-    rw [tauSbetaGrid]
-    exact hyp.sInstance_dade0_eq_induce _hG
-      (betaGrid_A0_support _hG hyp _ (by norm_num))
+  have hbridge : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 _hG)
+        ((hyp.dadeHypS0 _hG).fullDadeIsometryData (hyp.dadeHypS0_hconj _hG))
+        (betaGrid hyp j)
+      = ClassFunction.induce hyp.S (betaGrid hyp j) :=
+    hyp.sInstance_dade0_eq_induce _hG (betaGrid_A0_support _hG hyp j hj)
   rw [hbridge] at hxS
   have hxc :=
     OddOrder.RepresentationTheory.ClassFunction.support_induce_subset_conjugatesIntoSet
-      (betaGrid_support _hG hyp _ (by norm_num)) hxS
+      (betaGrid_support _hG hyp j hj) hxS
   obtain ⟨c, hcS, hmem⟩ := hxc
   have hordx : orderOf (c⁻¹ * x * c) = orderOf x := by
     have hinj : orderOf ((MulAut.conj c⁻¹).toMonoidHom x) = orderOf x :=
       orderOf_injective (MulAut.conj c⁻¹).toMonoidHom (MulEquiv.injective _) _
     rw [← hinj]
     congr 1
-    simp [MulAut.conj_apply, mul_assoc]
+    simp [mul_assoc]
   have hxdvd : orderOf x ∣ hyp.p ^ hyp.q * (hyp.q * hyp.p) := by
     rcases hmem with hP | hV
     · -- `c⁻¹xc ∈ P^#`
@@ -479,6 +484,21 @@ theorem typeIBetaL_betaS_disjoint_support [Finite G]
     hnconjS hnconjT
   have hone : r ∣ 1 := hcop ▸ Nat.dvd_gcd hrLF hrpq
   exact hr.one_lt.ne' (Nat.dvd_one.mp hone)
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(13.19.a) support disjointness**: `Ã(L) ∩ (P^G ∪ W^G) = ∅` — the order of an `Ã(L)`-element
+is divisible by a prime divisor of `|H|`, and `|H|` is coprime to `p q` ((8.17.a)); `β_L^τ` is
+supported in `Ã(L)`-classes while `β_S^τ` is supported in `P^# ∪ (W∖(W₁∪W₂))^G` ((13.18.a)).
+The column-`#1` instance of `typeIBetaL_dadeS_betaGrid_disjoint_support`. -/
+theorem typeIBetaL_betaS_disjoint_support [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L)
+    (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ typeISetup.Sset)
+    (_hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ)) :
+    Disjoint (typeIBetaL typeISetup φ).support (tauSbetaGrid _hG hyp).support := by
+  rw [tauSbetaGrid]
+  exact typeIBetaL_dadeS_betaGrid_disjoint_support _hG hyp typeISetup φ _hφ _hdeg
+    ⟨1, by have := hyp.three_le_p; omega⟩ (by norm_num)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (13.19.a), Dade-support avoidance** (Coq `tiA_PWG` restricted to `Ŵ^G`): for
@@ -651,18 +671,61 @@ theorem coherent_extension_orthogonal_eta_of_mem_Sset [Finite G]
   intro i j
   rw [OddOrder.RepresentationTheory.inner_conj_symm, core i j, star_zero]
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(13.19.c), first clause (row form), difference core** (Coq `betaLeta`):
+`(β_L^τ, η_{0j} − η_{0j'}) = 0` for `j, j' ≠ 0`.  By (13.18.c) `j`-independence
+(`gammaGrid_defGamma` at `j` and `j'`), `η_{0j} − η_{0j'} = τ_S(β_{j'}) − τ_S(β_j)`; each
+`(β_L^τ, τ_S(β_j))` vanishes by the (13.19.a) support disjointness
+(`typeIBetaL_dadeS_betaGrid_disjoint_support`). -/
+theorem typeIBetaL_inner_eta_row_sub_eq_zero [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L)
+    (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ typeISetup.Sset)
+    (_hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ))
+    (j j' : Fin hyp.p) (hj : (j : ℕ) ≠ 0) (hj' : (j' : ℕ) ≠ 0) :
+    ClassFunction.inner (typeIBetaL typeISetup φ)
+        (hyp.eta ⟨0, hyp.q_prime.pos⟩ j - hyp.eta ⟨0, hyp.q_prime.pos⟩ j') = 0 := by
+  classical
+  have h1 := gammaGrid_defGamma _hG hyp j hj
+  have h2 := gammaGrid_defGamma _hG hyp j' hj'
+  -- `η_{0j} − η_{0j'} = τ_S(β_{j'}) − τ_S(β_j)` from the two `Γ`-identities.
+  have hkey : hyp.eta ⟨0, hyp.q_prime.pos⟩ j - hyp.eta ⟨0, hyp.q_prime.pos⟩ j'
+      = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 _hG)
+          ((hyp.dadeHypS0 _hG).fullDadeIsometryData (hyp.dadeHypS0_hconj _hG))
+          (betaGrid hyp j')
+        - OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 _hG)
+          ((hyp.dadeHypS0 _hG).fullDadeIsometryData (hyp.dadeHypS0_hconj _hG))
+          (betaGrid hyp j) := by
+    have h3 := h1.trans h2.symm
+    rw [← sub_eq_zero] at h3 ⊢
+    rw [← h3]
+    abel
+  rw [hkey, ClassFunction.inner_sub_right,
+    ClassFunction.inner_eq_zero_of_disjoint_support
+      (typeIBetaL_dadeS_betaGrid_disjoint_support _hG hyp typeISetup φ _hφ _hdeg j' hj'),
+    ClassFunction.inner_eq_zero_of_disjoint_support
+      (typeIBetaL_dadeS_betaGrid_disjoint_support _hG hyp typeISetup φ _hφ _hdeg j hj),
+    sub_zero]
+
 /-- **(13.19.c), first clause (row form)**: `(β_L^τ, η_{0j})` is independent of `j ≥ 1` — by
-(13.18.a) `Supp(μ_{0j} − μ_{01}) ⊆ P^# ∪ (W∖(W₁∪W₂))^S`, (4.8) and (13.19.a) give
-`(β_L^τ, η_{0j} − η_{01}) = (β_L^τ, (μ_{0j} − μ_{01})^τ) = 0`.  Isolated obligation. -/
+(13.18.c) `j`-independence (`gammaGrid_defGamma`), `η_{0j} − η_{0j'} = τ_S(β_{j'}) − τ_S(β_j)`,
+and (13.19.a) support disjointness kills both `(β_L^τ, τ_S(β_·))` terms
+(`typeIBetaL_inner_eta_row_sub_eq_zero`). -/
 theorem typeIBetaL_eta_row_constant [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L)
-    (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ typeISetup.Sset) :
+    (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ typeISetup.Sset)
+    (_hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ)) :
     ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
       ∀ (j j' : Fin hyp.p), (j : ℕ) ≠ 0 → (j' : ℕ) ≠ 0 →
         ClassFunction.inner (typeIBetaL typeISetup φ) (hyp.eta ⟨0, hyp.q_prime.pos⟩ j)
           = ClassFunction.inner (typeIBetaL typeISetup φ)
-              (hyp.eta ⟨0, hyp.q_prime.pos⟩ j') := sorry
+              (hyp.eta ⟨0, hyp.q_prime.pos⟩ j') := by
+  intro _ _ j j' hj hj'
+  rw [← sub_eq_zero, ← ClassFunction.inner_sub_right]
+  have h := typeIBetaL_inner_eta_row_sub_eq_zero _hG hyp typeISetup φ _hφ _hdeg j j' hj hj'
+  convert h using 2
+  exact Subsingleton.elim _ _
 
 /-- **(13.19.c), first clause (column form)**: the S↔T-swapped row constancy.  Isolated
 obligation. -/
@@ -745,6 +808,7 @@ noncomputable def typeIOrthogonalityGridData_of_coherent78 [Finite G]
       (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).1
     betaL_eta0_row_constant := typeIBetaL_eta_row_constant _hG hyp dataL.typeIHyp _
       (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).1
+      (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).2
     betaL_eta0_col_constant := typeIBetaL_eta_col_constant _hG hyp dataL.typeIHyp _
       (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG dataL.typeIHyp)).1
     caseC := typeI_caseC_dichotomy _hG hyp dataL _
