@@ -71,3 +71,34 @@ coherent_of_maximal_coherent_pair_refuted、witness は (9.8.d) count から gen
 (S13 namespace だが別 file 隔離、a の S13_MaximalIII_IV/S13_CoreStructure とは非衝突)。
 a がこの file を編集したら逸脱。b は他の S13 file には従来どおり触れない (import cite のみ)。
 merge_monitor 🔒 所有マップに転記要。
+
+## 🧭 HUB RECONCILIATION (2026-07-12 監視 tick, Opus hub) — a の (10.8) threading 編集権を追認
+
+**背景**: 監視 tick で lane a が S11_NineElevenCaseA を **編集** (merge a85869eb、9083 Phase E
+machinery = `caseA_two_summand_inertia_inputs` / `NineElevenNormBound` / `C_eq_cSub` 系の signature
+threading)。上記 2026-07-08 carve-out では「a がこの file を編集したら逸脱」ゆえ**名目上は範囲逸脱**。
+hub が調査し、**逸脱 STOP でなく編集権追認**で reconcile:
+
+**追認の根拠**:
+1. **user+hub 裁定 (A) が authorize**: (10.8) knot 閉包 = **ユーザー 2026-07-12「Aで」+ HUB RULING
+   (issue 9087)**。a の 9087 が threading target を明記 (`S11_NineElevenCaseA` の
+   nineElevenPairBound/caseA_two_summand_inertia_inputs/caseA_nineElevenThree_count_inputs/
+   caseA_nineElevenTwo_tiWitness を含む)。a はこの authorized 方向を実行しただけ (rogue 逸脱でない)。
+2. **b の entry point は preserved**: `caseA_coherent_sOf_H0Cprime_of_refuter` (line 70) は無変更、
+   a は decl を **1 本も削除/追加していない** (decl 16→16)。a が触ったのは 9083 Phase E machinery の
+   proof/signature threading のみ (b の entry point 論法には非接触)。
+3. **collision なし**: b は本 file に **非 ahead** (b-vs-main diff = 0、b の active work は S15_SAndT の
+   2038 で S11 非接触)。concurrent 編集衝突は発生しない。
+4. **merge-safety 全通過**: build green (4177 jobs) / AxiomsCheck OK / sorry 65→65 (regression なし) /
+   新 axiom なし / conflict なし。
+
+**追認内容 (時限)**: **(10.8) 閉包 (issue 1025) の期間中、a は S11_NineElevenCaseA の 9083 Phase E
+caseA machinery 宣言を編集してよい** (threading = signature/proof の honest-route 化)。b の entry point
+`caseA_coherent_sOf_H0Cprime_of_refuter` は b 専有・a 非接触を維持。3002/2038 供給編集権と同型の
+時限 carve-out。**(10.8) 閉包 landing で失効** (以後 a の本 file 編集は通常どおり逸脱)。
+恒久解: (10.8) 閉包後、この file の Phase E machinery が真に a 所有なら owner 再割当を検討
+(現状は混在 leaf = b entry point + a Phase E machinery、decl 単位で判定)。
+
+**⚠ 併記 — step 1.5 更新**: 以後 hub は S11_NineElevenCaseA について「a=Phase E machinery 編集可
+(1025 期間)、b=entry point 専有」で判定 (decl 単位)。merge_monitor 🔒 所有マップにも本 reconciliation
+を反映。

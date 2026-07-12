@@ -261,6 +261,15 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > (a が編集したら逸脱; b は a の S13_MaximalIII_IV/S13_CoreStructure 等 active S13 file には従来どおり
 > 触れない = import cite のみ)。詳細 = issues/0101「2026-07-08 追加 carve-out」節。
 >
+> **⟹ HUB RECONCILIATION (issue 0101, hub 裁定 2026-07-12 監視 tick — merge a85869eb)**: 上記
+> 「a が編集したら逸脱」を **(10.8) 閉包 (issue 1025) 期間中に限り緩和**。**ユーザー 2026-07-12「Aで」+
+> HUB RULING (9087) が (10.8) knot 閉包を authorize し、その threading target に S11_NineElevenCaseA が
+> 明記**されている。⟹ step 1.5 で **a が S11_NineElevenCaseA の 9083 Phase E caseA machinery 宣言**
+> (`caseA_two_summand_inertia_inputs`/`NineElevenNormBound`/`C_eq_cSub` 系の signature/proof threading)
+> **を編集しても逸脱でない** (b の entry point `caseA_coherent_sOf_H0Cprime_of_refuter` を a が触ったら
+> 逸脱; b はこの entry point を専有維持)。判定 = decl 単位 (混在 leaf)。merge-safety 全通過確認済
+> (build green 4177 / sorry 65→65 / 新 axiom なし / b entry point preserved decl 16→16 / b 非 ahead で
+> collision なし)。**(10.8) 閉包 landing で失効**。詳細 = issues/0101「HUB RECONCILIATION」節。
 > **carve-out (issue 9076, hub 裁定 2026-07-08 監視 tick)**: `OddOrder/Peterfalvi/S05_GridRigidity.lean`
 > (lane c が新規作成、Pf (3.8) abstract norm-2 rigidity engine `orthonormalGrid_diff_rigidity` = S05 σ-image
 > と S15 η-grid を de-dup する module-generic 核) は名目上 lane a の S05 regex に掛かるが、issue 9076
