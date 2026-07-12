@@ -362,6 +362,15 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > (ii) proven (sorry 追加なし)、(iii) 用途 = 2038 (12.14) 供給、(iv) issue で self-flag)。既存宣言の
 > statement/proof 改変は従来どおり逸脱。**(12.14) 供給完了で失効**。詳細 = issues/2038 「HUB carve-out」節。
 >
+> **carve-out (issue 9092 供給編集権, hub 裁定 2026-07-13 監視 tick — merge a6fa0ca5)**: 3002/2038 供給編集権と
+> 同型の期限付き編集権を **issue 9092 の `mu_isColumnFamily` 供給** に付与: b は **`Hypothesis` (SubcoherenceInputs,
+> b territory) への field 追加 + 全 producer 同時放電を 1 coordinated commit** で行ってよく、その放電のうち
+> **a 所有 `FeitThompson.lean` の Hypothesis producer (:1392/+1556/1686) への `mu_isColumnFamily` near-definitional
+> 供給行の追加**を許容 (`mu:=muS:=columnFamily.mu` ゆえ near-definitional)。条件: (i) FeitThompson は当該 field の
+> near-definitional 供給行のみ (他 statement/math 不変)、(ii) **field+全 producer 放電を 1 commit** (build 破壊回避)、
+> (iii) issue 9092 で self-flag、(iv) build green。⟹ step 1.5 で b が FeitThompson の当該供給行を編集していても
+> 逸脱でない (他の FeitThompson 編集は従来どおり逸脱)。**mu_isColumnFamily 供給完了で失効**。詳細 = issues/9092。
+>
 > **⟹ 拡張 #2 (ユーザー裁定 2026-07-05 tick(3) — Hypothesis76 (7.6) 忠実化 field の包括許可)**:
 > 同型逸脱 3 連発 (issue 0091 Hypothesis78 / zeta_induced / zeta_injective、各回ユーザー受理) の
 > 反復解消として、**issue 2034/3002 の (13.5) 供給作業中に限り、b による `S09_NonexistenceCertain`
