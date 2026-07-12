@@ -1870,3 +1870,14 @@ isDadeMap_dadeMap 系)。**L3**: β_S order (sInstance bridge + betaGrid_support
 support_induce_subset_conjugatesIntoSet :452 + P p-群/W order、Sdata.W↔hyp.W
 reconciliation field 確認)。**L4 = 合成** (L1 r ∣ |L_F| 化: A(L) ⊆ L_F^# [iter 16] +
 orderOf ∣ card、card_LF_coprime_pq で {p,q} 排除)。
+
+## ✅ (2026-07-12、/loop iter 19) — (13.19.a) L2 完 (β_L^τ ⊆ Ã)
+
+typeIBetaL_support_subset_dadeSupport 実証明 (tau の rfl-show unfold は instance 一致で
+素通り; φ-side induce は typeF.H 表記差 → 型注釈 have で defeq 橋)。
+**次 iter = L3 + L4 (合成)**: L3 = β_S 側 orderOf x ∣ p·q 系 (sInstance bridge +
+betaGrid_support + support_induce_subset_conjugatesIntoSet :452; P^# 元 order ∣ |P| = p^q、
+typePV ⊆ Sdata.W — Sdata.W と hyp.W の同定 field を確認、conjClassSetIn の元も conj で
+order 保存)。L4 = disjoint 本体: x ∈ 両 support → L1 (r ∣ orderOf a、a ∈ A(L) →
+typeIA_subset_sharpSubgroup_of_frobenius [typeI_frobenius で frobData] → orderOf a ∣ |L_F|
+→ r ∣ |L_F|) vs L3 (orderOf x の素因数 ⊆ {p,q}) + card_LF_coprime_pq → False。
