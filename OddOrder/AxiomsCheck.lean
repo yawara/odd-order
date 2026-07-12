@@ -129,7 +129,7 @@ import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 
 -- 機械列挙ファイル (flagship axioms check) のため分割対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 7700
+set_option linter.style.longFile 7900
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -3584,6 +3584,100 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.omegaW1RestrictionEquiv_symm_one
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.omegaW2RestrictionEquiv_symm_one
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.monoidHomTransportSubgroupEq
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.monoidHomTransportSubgroupEq_apply
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.omegaMonoidHomEquiv
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.omegaMonoidHomEquiv_apply
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaSourceCharacterOnBase
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaEtaIndex
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.omegaMonoidHom_alignedOmegaEtaIndex
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaSourceCharacter_injective
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaSourceCharacter_eq_mul_axes
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaEtaIndex_injective
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.alignedOmegaSigmaGrid_apply_eq_eta_alignedIndex
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.alignedOmegaSourceCharacter_zero_row_apply_of_mem_W1
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.alignedOmegaSourceCharacter_zero_column_apply_of_mem_W2
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaSourceW1Restriction
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaSourceW2Restriction
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaColumnIndex
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaRowIndex
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.omegaMonoidHom_alignedOmegaColumnIndex
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.omegaMonoidHom_alignedOmegaRowIndex
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.alignedOmegaSourceCharacterOnBase_zero_zero
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaColumnIndex_zero
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaRowIndex_zero
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaColumnIndex_injective
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaRowIndex_injective
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaColumnIndex_bijective
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaRowIndex_bijective
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaColumnEquiv
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaRowEquiv
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaColumnEquiv_zero
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaRowEquiv_zero
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.alignedOmegaSourceCharacterOnBase_eq_mul_axes
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaProductIndex
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.omegaMonoidHom_alignedOmegaProductIndex
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.alignedOmegaProductIndex_eq_alignedOmegaEtaIndex
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaProductIndex_zero_column
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaProductIndex_zero_row
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaEtaGrid
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaEtaGrid_zero_column
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaEtaGrid_zero_row
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaProductIndex_injective
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaEtaGrid_orthonormal
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.alignedOmegaSigmaGrid_apply_eq_alignedOmegaEtaGrid
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.exists_omegaMonoidHom_eq
 set_option linter.style.longLine false in
@@ -7639,3 +7733,5 @@ h118 ((11.8) 非直交) 下で τ(μ₀−ζ) の σ-grid 係数 = 行0 indicato
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.inner_tau_muColumnZero_sub_zeta_rowZero_of_residual_not_orthogonal
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_exists_irreducible_qa
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_a_dvd_u
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.rowInv_zero
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainTypeRImage_conj

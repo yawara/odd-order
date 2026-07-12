@@ -886,4 +886,40 @@ noncomputable def certainTypeSeedDecomposition (h : Hypothesis46 A L) [NeZero (N
     (by simp)
     hχχbar
 
+open scoped Classical in
+/-- **Complex conjugation acts on the `R(μ_j)`-family as minus the half-swap involution**
+(the (11.9.c) `t ≠ 0` input, issue 1024): for the signed `σ`-image family
+`certainTypeRImage h χ₂ χ₂⁻¹`, conjugation sends the member at `(b, i)` to the *negative* of the
+member at `(¬b, rowInv i)` — the `(4.9)(a)` grid conjugation `certainTypeOmegaSigma_conj_eq`
+swaps the two column halves (`χ₂ ↔ χ₂⁻¹`) and inverts the row, while the fixed sign
+`δ = (columnFamily χ₂).sign` flips against the `(true, ·)`-half's built-in `−δ`. -/
+theorem certainTypeRImage_conj (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (p : Bool × Fin (Nat.card h.W1)) :
+    ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv (certainTypeRImage h χ₂ χ₂⁻¹ p)
+      = -(certainTypeRImage h χ₂ χ₂⁻¹ (!p.1, rowInv h.toHypothesis p.2)) := by
+  obtain ⟨b, i⟩ := p
+  cases b
+  · -- `(false, i) ↦ δ•ω_{χ₂,i}`; conjugate = `δ•ω_{χ₂⁻¹, rowInv i} = −((true, rowInv i))`
+    show ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
+        (((h.columnFamily χ₂).sign : ℂ) • certainTypeOmegaSigma h χ₂ i)
+      = -((-((h.columnFamily χ₂).sign : ℂ)) • certainTypeOmegaSigma h χ₂⁻¹
+          (rowInv h.toHypothesis i))
+    rw [Int.cast_smul_eq_zsmul, ClassFunction.mapRingEquiv_zsmul,
+      certainTypeOmegaSigma_conj_eq, neg_smul, neg_neg, Int.cast_smul_eq_zsmul]
+  · -- `(true, i) ↦ −δ•ω_{χ₂⁻¹,i}`; conjugate = `−δ•ω_{χ₂, rowInv i} = −((false, rowInv i))`
+    show ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
+        ((-((h.columnFamily χ₂).sign : ℂ)) • certainTypeOmegaSigma h χ₂⁻¹ i)
+      = -(((h.columnFamily χ₂).sign : ℂ) • certainTypeOmegaSigma h χ₂ (rowInv h.toHypothesis i))
+    rw [show (-((h.columnFamily χ₂).sign : ℂ)) = ((-(h.columnFamily χ₂).sign : ℤ) : ℂ) from by
+        push_cast; ring,
+      Int.cast_smul_eq_zsmul, ClassFunction.mapRingEquiv_zsmul, certainTypeOmegaSigma_conj_eq,
+      inv_inv]
+    rw [show ((-(h.columnFamily χ₂).sign : ℤ)) • certainTypeOmegaSigma h χ₂
+          (rowInv h.toHypothesis i)
+        = -(((h.columnFamily χ₂).sign : ℂ) • certainTypeOmegaSigma h χ₂
+            (rowInv h.toHypothesis i)) from by
+      rw [← Int.cast_smul_eq_zsmul ℂ]; push_cast; rw [neg_smul]]
+
 end OddOrder.Peterfalvi.S06
