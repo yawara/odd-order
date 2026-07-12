@@ -2530,3 +2530,31 @@ lane a の (9.11) honest port landing を待つ。hub 注記: (A) core は lande
 **session 総括 (lane-b、2 concrete landing)**: u_bound cite 討伐 (13.2.c) + (A) core engine (5.3.b/coherent 像⊥η)。
 両者 proven・main 統合 (u_bound) / commit 済 ((A) engine)。設計: census 訂正 + hub 裁定 (A) + core 完遂 +
 re-grounding gate 特定。b は gated-endpoint prep を正しく前倒しし、lane a の (9.11) を待つ健全な状態。
+
+## ✅ 2026-07-12 続⁸ (lane-b /loop 再開) — ★posture 訂正: S-instance (9.11) は ungated b-work (「lane-a 待ち」は誤り)
+
+再開 session の frontier 精査 + focused subagent build で **07-12 の「gated-endpoint、lane-a の (9.11) 待ち」
+posture が誤りと確定**:
+
+- **lane-a は honest (9.11) を既に CLOSED** (2026-07-11、issue 9083、`S13.coherent_sOf_H0Cprime`
+  S13_Orthogonality:1171) — ただし **M-instance `Hypothesis M` 版** (support `base.A0`)。
+- **Route A (M-instance engine を cite) は構造的に不可能**: M-instance `Hypothesis M`
+  (S13_MaximalIII_IVBasic:181) は mandatory field `type_alt : IsTypeIII M ∨ IsTypeIV M` を持ち、
+  (9.11) engine `nineElevenSevenEightRefutation` (S11_NineElevenPairAdjoin:893) も
+  `htype : IsTypeIII M ∨ IsTypeIV M` を consume。**S は type II** (`isTypeII_of_isTypeP2`) ゆえ
+  `Hypothesis hyp.S` は honestly 構成不能、closed engine を cite 不能。
+- **⟹ S-instance (9.11) は M-instance bridge でなく direct honest construction** (issue 1017 campaign
+  そのもの): honest §9 family lemmas + (13.2.e) Dade foundation (`dadeHypS`/`sInstance_dade_eq_induce`) +
+  landed (9.11) norm-chain infra から `IsCoherent indS 𝒮 A(S)` を組む。**全て b-territory
+  (S15_SAndT_Setup/* + S07_Subcoherent)、lane-a 変更不要**。type-II/III-IV の壁が「M-instance を
+  bypass する理由」そのもの。
+
+**⟹ b の frontier = issue 1017 campaign 続行 (ungated)。**「gated-endpoint prep で lane-a 待ち」でなく
+honest S-instance (9.11) を直接 close する。**landed (本 session brick 1、commit 21671789)**:
+`Hypothesis.sSetIrrDeg_coherent_indS` (HypothesisBasics:418) = uniform 底 coherence を Dade-map 形から
+`indS=Ind_S^G` 形へ re-ground (`congrMap` + `sInstance_dade_eq_induce`、3 行、sorry-free、axiom parity)。
+
+**残手順 (issue 1017 update #19、文書順)**: (1) sSetIrrDeg の conj-closure/diff-support を standalone 化 →
+(A) engine `coherentIndS_image_inner_eta_eq_zero` を S₁(d) に instantiate (new math 無) / (2) S₁(d)→full sSet
+の (9.11.1)-(9.11.8) pair-adjoining lift (coherentPairChain fold + landed squeeze; h2 = §9(9.8.d) 2-member
+count が sub-gate) / (3) `coherent_H0Cprime_S` を congrMap で re-point、`sibleyTarget_H0C` を drop。
