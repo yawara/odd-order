@@ -2408,3 +2408,22 @@ hub 裁定 (A) を engage → Lean coherence framework の architecture を精�
 framework-level port が要)。ただし subcoherent R 部品は既存、規模は非基準 ([[feedback-cost-scope-not-a-criterion]])
 ゆえ b は淡々と build。general coherence-ortho は他 consumer も unblock する高レバレッジ genuine infra。
 **次 iteration = step 1 (mem_coherent_sum_subseq) から**。
+
+## ✅ (2026-07-12 続⁴、lane-b /loop active build) — (A) build 大幅 de-risk: §5 machinery 既存 + FTtypeP_base_ortho の clean 導出発見
+
+step 1 `mem_coherent_sum_subseq` を build しようとして **§5 の hard machinery が既に Lean にある**と判明 (hub の (A) scope 見積を下方修正):
+- **(5.5) coherent_sum_subseq = `eq_sum_of_psi_eq_zero`** (S07_Coherence/NormInequalities:445): `D.tau1 χ = D.X = ∑_{α∈E} α`, E ⊆ R(χ)=`imageFamily.imageSet`。
+- **(5.4) subcoherent_split/norm = `CharacterPsiDecomposition`** (:33) + `ofProjection` smart constructor (:108): imageFamily(R) + coherence tau1 + isometry から CharacterPsiDecomposition を **projection で構成** (X/Y/coeff computed, not posited)。
+- ∴ step 1 は「新規 port」でなく既存 machinery の **application**。
+
+**FTtypeP_base_ortho (R ⊥ η) の clean 導出発見** (Coq は coherence-base が carry するが Lean は導出可):
+μ-ν = sign·τ(χ-χ̄)。`τ(χ-χ̄) ⊥ η` (Dade support avoids regular set、predecessor の 13.19.a `typeI_dadeSupport_avoids_regular`/`dadeSupport_betaGrid_disjoint_support` 系) ⟹ ⟨μ,η⟩=⟨ν,η⟩ (差の inner=0)。μ,ν,η 全 irreducible + μ≠ν ⟹ 両=1 なら μ=η=ν 矛盾 ⟹ 両=0 ⟹ **μ⊥η ∧ ν⊥η** = R⊥η。**新 coherence-base signature 不要**。
+
+**⟹ (A) build の全部品 tractable** (実装 roadmap):
+1. imageFamily R = `Sset_differenceImage` (S14:1143 既存、type-I) / S-instance 版は sSetIrrDeg の difference image。
+2. `τ(χ-χ̄) ⊥ η` = Dade support avoidance (既存 13.19.a 系を irr χ の difference に適用)。
+3. `FTtypeP_base_ortho` (R⊥η) = 上記 clean 導出 (新 helper、~30行)。
+4. `ofProjection`(imageFamily, coherent_H0Cprime_S.extension, isometry, ZIrr) → CharacterPsiDecomposition → `eq_sum_of_psi_eq_zero` → tau1(χ)=∑R-subseq。
+5. 合成: tau1(χ)=∑(R-subseq) ⊥ η (各 R 元 ⊥ η)。Ind θ を irr 展開+線形性で `tau1S_induce_inner_eta`。
+
+**⚠ 要確認 (次 iteration の着手点)**: (i) S-instance の imageFamily が indS(=Ind_S^G) base で χ-χ̄ が A₀(S)-supported ゆえ indS(χ-χ̄)=Dade=μ-ν になるか (13.2.e τ=Ind on A₀ + Sset difference の A₀-support)、(ii) coherence の isometry/ZIrr 供給 (`coherent_H0Cprime_S` の extension_inner_eq/extension_mem_ZIrr、既存)。**hub 注記**: (A) は ruling 想定より軽い (§5 machinery 既存)。**次 = step 3 FTtypeP_base_ortho helper から build**。
