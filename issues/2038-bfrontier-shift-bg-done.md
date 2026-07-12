@@ -2266,6 +2266,36 @@ coherence 直交)、(2) `mu_tau1red` = `mu_col_tau1_eta_col_one`/`mu_tau1_formul
 (3) λ 構成 (13.3.b)、(4) CharacterDegreeData 全 field assemble (未使用 δ' field は restate-drop 検討)。
 tau1S = `coherent_H0Cprime_S.extension` の coherence 性質を使う (dataL coherence ではない)。
 
+## 🧭 HUB RULING AMENDMENT (2026-07-12 監視 tick, Opus hub) — RULING ③ 訂正: (13.3) は on-path、b 自律 engage を追認
+
+b の census 訂正 flag (character_degree_analysis (13.3) は on-path) を **hub が code-level で独立検証 → 正しいと確定**。
+私の当初 RULING ③ (「b 残 sorry は全 a-gated → gated-endpoint 待機」) は **不完全な census に基づく誤りだったので訂正**する。
+
+**検証 (hub 自身の grep)**:
+1. **b territory**: `character_degree_analysis` = Machinery135:178 (S15_SAndT_Setup、b 所有)。b が証明・c は TTypeII で
+   **cite するだけ** (b は TTypeII を編集しない → territorial 衝突なし)。
+2. **非 dup (tau1S ≠ tauS)**: 使用する `tau1S_ofHonest` = `coherent_H0Cprime_S.extension` は **proven engine**
+   (`tau1S_ofHonest_extends_on_supported`/`_inner_induce`/`_induce_mem_ZIrr` = sorry-free)。2026-07-02 off-path ruling の
+   対象 `tauS`/`sibleyTarget_S` (S-side maximal-coherent Dade、tauS=0 placeholder) とは **別 decl・別 route**。
+   predecessor census が両者を lump したのが誤り (①u_bound と同型の census-miss)。
+3. **on-path FT**: consumer chain = `character_degree_analysis → S15.lambda_forces_T_caseB → T_side_caseB_facts
+   (TTypeII:189) → TTypeII:419/426 (D=⊥・|V|=v) = (14.9) T-side type 判定 = S16 非存在の矛盾`。honest FT-path。
+4. **非 dup with a**: char-degree 解析であって a の typeP_Galois (9.7) σ-structure とは別内容。
+
+**訂正裁定**:
+- **RULING ③ を amend**: b の残 frontier は「全 a-gated」ではない。**`character_degree_analysis` (13.3)/(13.9) の deep
+  char body は genuine on-path・ungated・b-territory・非dup** ゆえ、**b はこれを autonomous に engage する** (gated-endpoint
+  待機でない、idle でない)。これは lane 自律 frontier 選択 (上流優先+文書順) の範囲で hub 許可 不要 — b の判断は正しい。
+- **② (typeP_Galois descend 却下)・④ (pc_le 等は a char body gated)・⑤ (0111 split=done) は不変**。b は (13.3) を engage
+  しつつ、pc_le 系の a-gated sorry は従来どおり gated-endpoint 待機 (二本立て)。
+- **b への directive (更新)**: `character_degree_analysis` の未証明 deep field を上流優先で証明せよ (b の Coq PFsection13.v
+  map の着手順 = (1) `tau1S_induce_inner_eta` (o_tau1_eta) → (2) `mu_col_tau1_eta_col_one`/`mu_tau1_formula` (mu_tau1red の
+  case 分け) → (3) λ 構成 (13.3.b) → (4) CharacterDegreeData assemble)。難所回避せず deep char frontier を正面から。
+  ⚠ Coq L715-720 が textbook (13.3.c)/(13.6) の logical gap を修正済ゆえ **textbook 直訳でなく Coq 修正版 argument に従う**。
+
+**hub 自己反省**: RULING ③ は census を lane の自己申告 (「全 gated」) にやや依存し、tau1S/tauS の区別を独立検証しきれて
+いなかった。b が u_bound (①) に続き 2 例目の census-miss を自己発見・訂正したのは genuine progress。以後 hub は
+「frontier 枯渇/全 gated」裁定時に off-path decl と on-path decl の lump を code-level で分離確認する ([[verify-port-state-by-number-not-coq-name]] の実践)。
 ## 🧭 (2026-07-12 続、lane-b /loop) — character_degree_analysis の precise blocker = S-side coherence-orthogonality infra (hub 設計裁定要)
 
 character_degree_analysis (on-path、前節) の build を engage → 全 deep field が **S-side coherence の
@@ -2306,6 +2336,44 @@ hub 裁定後に (A)/(B) を淡々と build する。
 
 **⟹ 訂正された理解**: `tau1S = coherent_H0Cprime_S.extension` は `coherent_H0C_commutator` (9.11) に gated、それは **lane a の (9.11) induction port そのもの**。よって character_degree_analysis (13.3) 全体が **lane a の (9.11)/typeP_Galois char cluster に gated** = pc_le (13.12) と同一 root gate。**独立した b-infra 設計裁定 (A/B/C) は不要** (私の前節 framing は撤回)。off-path ruling との「衝突」も幻: (6.8) sibleyTarget route は unsound (7001) で、honest route は (9.11) induction (lane a) と明確。
 
-**b の正しい posture = gated-endpoint** (RULING ③ に整合): character_degree_analysis も pc_le も lane a の (9.11)/typeP_Galois landing 待ち。**re-engage trigger = lane a の `coherent_H0C_commutator` honest (9.11) induction port landing** (+ typeP_Galois for pc_le)。
+**⟹ 上記「gated-endpoint wait」結論は下記 HUB RULING で supersede**: hub は本 (9.11)-gate 分析を受け、
+設計裁定 (A) = general coherence-ortho machinery を裁定した。**鍵**: (A) の R-support 分解は既存
+`coherent_H0Cprime_S` を support 不問で直接使えるため **新 Dade-map 不要・(9.11) coherence の landing を待たず b が now build 可**
+(character_degree_analysis は (A) 完成で残 gate が coherent_H0C_commutator (9.11) cite 1 点に isolate される — それは lane a 領域)。詳細は次節 HUB RULING。
 
-**残る b-actionable gated-endpoint prep 候補** (lane a と非 dup なら): 一般 `coherent_ortho_cycTIiso` (Coq PFsection8:839) の Lean port = coherent 像 (irr) ⊥ η、任意 coherence に効く shared-infra。これが landing すれば (9.11) coherence 到着後に `tau1S_induce_inner_eta` を薄い cite で close。ただし coherence-framework (R-support base = `FTtypeP_base_ortho` + `mem_coherent_sum_subseq`) の port を要し lane a の (9.11) と領域が近い → **claim-before-build + hub/lane-a 調整必要**。単独着手前に lane a の (9.11) port が本 infra を内包するか確認。
+## 🧭 HUB RULING (2026-07-12 監視 tick, Opus hub 自律裁定) — 設計裁定: 選択肢 (A) general coherence-ortho machinery
+
+b の (A)/(B)/(C) 設計裁定要請を hub が code-level 調査の上、**裁定 = (A)** (general R-support
+coherence-orthogonality machinery を port)。**(B) sSideDadeMap route は却下、(C) 不要**。
+
+**調査 (hub 自身の grep + Coq trace)**:
+- **(A) の machinery は Lean に genuine 不在**: `coherent_ortho_cycTIiso`/`mem_coherent_sum_subseq`/
+  `FTtypeP_base_ortho` の**実宣言はゼロ** (grep hit は全て comment 言及)。b の「grep 0」は正しい。
+- **Coq は o_tau1_eta を (A) で証明**: PFsection13:573 `o_tau1_eta` = 一般 `coherent_ortho_cycTIiso`
+  (PFsection8:839) = `mem_coherent_sum_subseq` + `FTtypeP_base_ortho`。本プロジェクトは textbook→Lean +
+  Coq で行間補完ゆえ、**Coq の実 route = (A) に従うのが原則**。
+- **(A) は既存 `coherent_H0Cprime_S` を直接使える**: general R-support 分解は coherent 像を R-support
+  signed-sum に落とすので support が (C')^# でも A₀(S) でも効く。**新 coherence/Dade-map 不要**。
+- **(B) は二重の新規構築を要し off-path risk もある**: (i) 新 `sSideDadeMap` (A₀(S)-Dade)、(ii) 新
+  A₀(S)-support coherence (既存 `coherent_H0Cprime_S` は (C')^# support で (3.8)-engine の A₀(S)/sigmaSharp
+  要求と不一致 = b 指摘)、(iii) off-path ruling との表面衝突。(A) より工数大かつ risk 有。
+
+**off-path ruling の scope 明確化 (b の交錯懸念への hub 回答)**: 2026-07-02 off-path ruling が禁じたのは
+**(13.5-13.9) S-side maximal-coherent cascade の完成** (`sibleyTarget_S`・**tauS=0 placeholder** = vestigial
+scaffold の do-not-complete)。**genuine な coherence-orthogonality infra の構築は対象外**。(A) は tauS に
+一切触れず (existing `coherent_H0Cprime_S` + general ortho)、cascade 完成でもないので **ruling と非交錯**。
+⟹ (A) を採れば (B)/ruling の tension 自体が moot になる (これが (A) を選ぶ副次的利点)。
+
+**裁定内容**:
+- **b は (A) を build**: Coq `coherent_ortho_cycTIiso` (= `mem_coherent_sum_subseq` R-support signed-sum
+  分解 + `FTtypeP_base_ortho` R-support ⊥ cycTIiso η) を **general coherence-orthogonality shared-infra**
+  として port (b の coherence territory = S07_Coherence*/S08 or 新 coherence leaf)。任意 coherence に効く汎用核。
+- これを `coherent_H0Cprime_S` に適用して `tau1S_induce_inner_eta` (o_tau1_eta の S-side 具体化) を得る。
+- **規模は非基準** ([[feedback-cost-scope-not-a-criterion]]): (A) が「大 shared-infra」なのは着手回避理由でない。
+  general coherence-ortho は他 consumer (任意 coherence⊥η) も unblock する高レバレッジ genuine infra。
+- **⚠ Coq L715-720 の textbook 修正**に従う (textbook (13.3.c)/(13.6) の logical gap を Coq が修正済)。
+- **b の着手順** (b の PFsection13 map どおり、上流優先): (1) `mem_coherent_sum_subseq` R-support 分解 →
+  (2) `FTtypeP_base_ortho` R-support⊥η → (3) 合成して general `coherent_ortho_cycTIiso` → (4)
+  `coherent_H0Cprime_S` 適用で `tau1S_induce_inner_eta` → (5) character_degree_analysis の残 field assemble。
+
+**b は本裁定で hub 確認待ちを解除、(A) を淡々と build せよ** (off-path trap 回避の懸念は上記 scope 明確化で解消)。
