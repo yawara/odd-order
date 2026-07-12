@@ -43,18 +43,27 @@ Lean 側の型III/IV h56 chain (`S13_SixTwoBridge`) は per-member `CharacterPsi
       `sixTwoDecompositionData`: `htype hnt chief` 削除。✅ (`exists_source_of_coherence_dichotomy` /
       `sixTwoBound` は型III/IV 専用ゆえ signature 維持、内部 `sixTwoDecompositionData` 呼び出しのみ drop)。
 - [x] 4. consumers: S13 内部 (914/870/873), S11_NineElevenCaseA:585 — drop。✅ **full build green (4178 jobs)**。
-- [ ] 5. 型V h56 wiring: `six_three_of_six_two_oracle` を (L,K,H,H₁,M)=(M,M',M',M'',⊥) に
+- [x] 5. 型V h56 wiring: `six_three_of_six_two_oracle` を (L,K,H,H₁,M)=(M,M',M',M'',⊥) に
       instantiate (template = `S13_Lemmas113To115.coherent_S_of_coherent_SH0C` (11.3))、h56 は
       generalized `exists_source_index_le_two_psi_of_ne_top` + `sixTwoDecompositionData`
-      (params = `hyp.exists_charParameters_full hG`)。hcoh = S(M'') coherent
-      (`uniform_degree_coherence_of_subcoherent`、全 member linear-induced degree w₁)。対偶で
-      `typeV_sixFiveA_bound`。→ (6.5.b)/(6.5.c) (S08_PGroupReduction infra、ただし quotient-Frobenius 版要検討)。
+      (params = `hyp.exists_charParameters_full hG`)。hcoh = S(M'') coherent。対偶で
+      `typeV_sixFiveA_bound`。✅ (commit 0a6d9c91)
+- [x] 6. hcoh の irreducibility bridge crack: helper `induce_linear_isIrreducible`
+      (単一ζ havoid を全 linear θ に一般化) + `inducedKernelFamily_commutator_eq_SHCSet`
+      (S(⁅M',M'⁆)=SHCSet) → `SHC_isCoherent`。✅
+- [x] 7. (6.5.b)/(6.5.c): quotient-Frobenius は full-Frobenius 不要と判明 —
+      `S08.isPGroup_of_isNilpotent_of_coprime_fixedPoints_le_commutator` が centralizer 条件
+      (fixed pts ⊆ M'') から nilpotent M' の p-群性を直接与える (Ab への fpf 作用は
+      `quotient_of_fixedPoints_le` 内部で構成)。(6.5.c) = `six_five_c_arith` 対偶。✅
+      (commit a9fbccfa)
 
-## 完了条件
+## 完了条件 ✅ 達成 (commit 0a6d9c91, a9fbccfa)
 
 `typeV_sixFiveA_bound` / `typeV_sixFiveB_pGroup` / `typeV_sixFiveC_not_dvd`
-(S12_Noncoherence.lean) の 3 sorry が消え、`typeV_forces_coherence_v2` が honest 完成。
-build-green (S12_Noncoherence 及び影響 file)。
+(S12_Noncoherence.lean) の 3 sorry が全て消え、`typeV_forces_coherence_v2` /
+`no_typeV_maximal_unconditional` が honest 完成。#print axioms は 4 宣言とも
+[propext, Classical.choice, Quot.sound] のみ (sorryAx 無し)。full build green (4179 jobs)。
+**型V排除 (Peterfalvi 10.10) が完全 sorry-free。**
 
 ## step 5 実装詳細 (次 iteration 用、全 lemma 名確定済)
 

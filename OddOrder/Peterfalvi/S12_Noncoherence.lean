@@ -232,6 +232,69 @@ theorem induce_linear_isIrreducible [Finite G]
     obtain ⟨i, hi⟩ := h.exists_certainType_zero_column_eq_of_subset_characterKernel _ hker
     exact h.columnFamily_mu_ne hχ₂ 0 i hi.symm
 
+open scoped Classical FiniteInduce in
+/-- **`S(M″) = SHCSet`**: the kernel-filter family `S(⁅M′,M′⁆)` equals the degree-`w₁` irreducible
+subfamily `SHCSet = {φ ∈ 𝒮 | φ irreducible, φ(1) = w₁}`.
+
+`⊆`: a member `Ind_{M′}^M θ` (`θ` trivial on `M″ = ⁅M′,M′⁆`, i.e. *linear*, `θ ≠ 1`) is irreducible
+(`induce_linear_isIrreducible`) of degree `[M:M′]·θ(1) = w₁·1 = w₁` (`induce_apply_one`,
+`card_W1_eq_derived_index`); linearity `θ(1) = 1` from the commutator kernel via
+`apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient`.  `⊇`: a degree-`w₁`
+member `Ind θ` has `θ(1) = 1` (as `w₁·θ(1) = w₁`), so `θ` is linear, hence trivial on `M″`
+(`apply_eq_one_of_mem_commutator_of_apply_one_eq_one`).  Feeds the (5.7) coherence
+`SHC_isCoherent` into the `hcoh` input of `typeV_sixFiveA_bound` and the non-abelian branch of
+`typeV_sixFiveB_pGroup`. -/
+theorem inducedKernelFamily_commutator_eq_SHCSet [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
+    OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M)
+        (⁅(derivedInG M).subgroupOf M, (derivedInG M).subgroupOf M⁆) = hyp.SHCSet := by
+  haveI : IsMulCommutative (↥((derivedInG M).subgroupOf M)
+      ⧸ commutator ↥((derivedInG M).subgroupOf M)) :=
+    (Subgroup.Normal.quotient_commutative_iff_commutator_le).mpr le_rfl
+  have hw1pos : (hyp.w1 : ℂ) ≠ 0 := by
+    have h0 : 0 < hyp.w1 := Nat.card_pos
+    exact_mod_cast h0.ne'
+  have hidxw1 : ((derivedInG M).subgroupOf M).index = hyp.w1 :=
+    hyp.typeP.card_W1_eq_derived_index.symm
+  ext φ
+  constructor
+  · -- `Ind θ` with `θ` linear (trivial on `M″`), `θ ≠ 1` ⟹ irreducible of degree `w₁`
+    rintro ⟨θ, hθne, hker, rfl⟩
+    have hkerc : (commutator ↥((derivedInG M).subgroupOf M) :
+          Set ↥((derivedInG M).subgroupOf M)) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel
+          (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) := by
+      rw [← OddOrder.Peterfalvi.S08.commutator_subgroupOf_self]
+      exact hker
+    have hθ1 : (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1 :=
+      apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient
+        (N := commutator ↥((derivedInG M).subgroupOf M)) θ hkerc
+    have hirr := induce_linear_isIrreducible hG hyp θ hθne hθ1
+    have hdeg : (ClassFunction.induce ((derivedInG M).subgroupOf M)
+        (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) : ↥M → ℂ) 1
+        = (hyp.w1 : ℂ) := by
+      rw [ClassFunction.induce_apply_one, hθ1, mul_one, hidxw1]
+    refine ⟨?_, hirr, hdeg⟩
+    rw [inducedFamily_eq_inducedKernelFamily_bot]
+    exact OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone bot_le ⟨θ, hθne, hker, rfl⟩
+  · -- degree-`w₁` irreducible member ⟹ source `θ` linear ⟹ trivial on `M″`
+    rintro ⟨hmem, -, hdeg⟩
+    rw [inducedFamily_eq_inducedKernelFamily_bot,
+      OddOrder.Peterfalvi.S08.mem_inducedKernelFamily] at hmem
+    obtain ⟨θ, hθne, -, rfl⟩ := hmem
+    have hθ1 : (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1 := by
+      have hd := hdeg
+      rw [ClassFunction.induce_apply_one, hidxw1] at hd
+      have h2 : (hyp.w1 : ℂ) * (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1
+          = (hyp.w1 : ℂ) * 1 := by rw [mul_one]; exact hd
+      exact mul_left_cancel₀ hw1pos h2
+    refine ⟨θ, hθne, ?_, rfl⟩
+    rw [OddOrder.Peterfalvi.S08.commutator_subgroupOf_self]
+    intro x hx
+    rw [OddOrder.Peterfalvi.S03.mem_characterKernel,
+      OddOrder.Peterfalvi.S03.characterDegree_def, hθ1]
+    exact θ.isIrreducible.apply_eq_one_of_mem_commutator_of_apply_one_eq_one hθ1 hx
+
 open scoped FiniteInduce in
 /-- **Peterfalvi (6.5.a) for `(L, K, M) := (M, M′, 1)`** — the (10.10.1) index bound.
 
@@ -299,60 +362,11 @@ theorem typeV_sixFiveA_bound [Finite G]
     have hcard1 : Nat.card (Abelianization ↥((derivedInG M).subgroupOf M)) = 1 :=
       Nat.card_unique
     omega
-  -- ★ the (5.7) coherence of `𝒮(M'') = S(⁅K,K⁆)` — the uniform degree-`w₁` irreducible family
+  -- ★ the (5.7) coherence of `𝒮(M″) = S(⁅K,K⁆)` — the uniform degree-`w₁` irreducible family
   have hcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
       (OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M)
         (⁅(derivedInG M).subgroupOf M, (derivedInG M).subgroupOf M⁆)) hyp.A0) := by
-    haveI : IsMulCommutative (↥((derivedInG M).subgroupOf M)
-        ⧸ commutator ↥((derivedInG M).subgroupOf M)) :=
-      (Subgroup.Normal.quotient_commutative_iff_commutator_le).mpr le_rfl
-    have hw1pos : (hyp.w1 : ℂ) ≠ 0 := by
-      have h0 : 0 < hyp.w1 := Nat.card_pos
-      exact_mod_cast h0.ne'
-    have hidxw1 : ((derivedInG M).subgroupOf M).index = hyp.w1 :=
-      hyp.typeP.card_W1_eq_derived_index.symm
-    -- `S(⁅K,K⁆) = SHCSet`: both are the degree-`w₁` irreducible members of `S`
-    have hSeq : OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M)
-        (⁅(derivedInG M).subgroupOf M, (derivedInG M).subgroupOf M⁆) = hyp.SHCSet := by
-      ext φ
-      constructor
-      · -- `Ind θ` with `θ` linear (trivial on `M″`), `θ ≠ 1` ⟹ irreducible of degree `w₁`
-        rintro ⟨θ, hθne, hker, rfl⟩
-        have hkerc : (commutator ↥((derivedInG M).subgroupOf M) :
-              Set ↥((derivedInG M).subgroupOf M)) ⊆
-            OddOrder.Peterfalvi.S03.characterKernel
-              (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) := by
-          rw [← OddOrder.Peterfalvi.S08.commutator_subgroupOf_self]
-          exact hker
-        have hθ1 : (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1 :=
-          apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient
-            (N := commutator ↥((derivedInG M).subgroupOf M)) θ hkerc
-        have hirr := induce_linear_isIrreducible hG hyp θ hθne hθ1
-        have hdeg : (ClassFunction.induce ((derivedInG M).subgroupOf M)
-            (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) : ↥M → ℂ) 1
-            = (hyp.w1 : ℂ) := by
-          rw [ClassFunction.induce_apply_one, hθ1, mul_one, hidxw1]
-        refine ⟨?_, hirr, hdeg⟩
-        rw [inducedFamily_eq_inducedKernelFamily_bot]
-        exact OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone bot_le ⟨θ, hθne, hker, rfl⟩
-      · -- degree-`w₁` irreducible member ⟹ source `θ` linear ⟹ trivial on `M″`
-        rintro ⟨hmem, -, hdeg⟩
-        rw [inducedFamily_eq_inducedKernelFamily_bot,
-          OddOrder.Peterfalvi.S08.mem_inducedKernelFamily] at hmem
-        obtain ⟨θ, hθne, -, rfl⟩ := hmem
-        have hθ1 : (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1 := by
-          have hd := hdeg
-          rw [ClassFunction.induce_apply_one, hidxw1] at hd
-          have h2 : (hyp.w1 : ℂ) * (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1
-              = (hyp.w1 : ℂ) * 1 := by rw [mul_one]; exact hd
-          exact mul_left_cancel₀ hw1pos h2
-        refine ⟨θ, hθne, ?_, rfl⟩
-        rw [OddOrder.Peterfalvi.S08.commutator_subgroupOf_self]
-        intro x hx
-        rw [OddOrder.Peterfalvi.S03.mem_characterKernel,
-          OddOrder.Peterfalvi.S03.characterDegree_def, hθ1]
-        exact θ.isIrreducible.apply_eq_one_of_mem_commutator_of_apply_one_eq_one hθ1 hx
-    rw [hSeq]
+    rw [inducedKernelFamily_commutator_eq_SHCSet hG hyp]
     exact ⟨hyp.SHC_isCoherent hG⟩
   rw [hSset]
   by_cases hcomm : (⁅(derivedInG M).subgroupOf M, (derivedInG M).subgroupOf M⁆ : Subgroup ↥M) = ⊥
@@ -412,14 +426,129 @@ folded to `p = w₂` following the (10.10) proof ("then `p = w₂` because `w₂
 divisor of `|H|`" — `W₂ ≤ M″ ≤ M′` with `w₂` prime, `Hypothesis.w2_prime`), so the
 conclusion is stated with `hyp.w2` directly.
 
-**Gated on issue 2022**: the statement is book-faithful; the proof is `sorry` pending the
-general `six_two` → (6.3)-general → (6.5) chain (lane b). -/
+**Now landed** (issue 9089, lane a).  Non-abelian: if `M′` were abelian then `⁅M′,M′⁆ = ⊥`, so
+`𝒮 = S(⁅M′,M′⁆) = SHCSet` (`inducedKernelFamily_commutator_eq_SHCSet`) is coherent
+(`SHC_isCoherent`), contradicting `hnc`.  `p`-group: the `W₁`-conjugation action on `M′` has its
+fixed points in `M″` (`TypePData.centralizer_W1`: `C_{M′}(w) = W₂ ⊆ M″`), so
+`isPGroup_of_isNilpotent_of_coprime_fixedPoints_le_commutator` fires with the (6.5.a) index bound
+(`typeV_sixFiveA_bound`) to make the nilpotent `M′` a `p`-group; `p = w₂` since `w₂ ∣ |M′| = p^n`
+with `w₂` prime. -/
 theorem typeV_sixFiveB_pGroup [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     (hV : IsTypeV M)
     (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A0)) :
     IsPGroup hyp.w2 ↥(derivedInG M) ∧ ¬ IsMulCommutative ↥(derivedInG M) := by
-  sorry
+  classical
+  obtain ⟨dV⟩ := hV
+  have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  haveI hKnorm : ((derivedInG M).subgroupOf M).Normal := by
+    rw [derivedInG, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+    infer_instance
+  haveI hKnil : Group.IsNilpotent ↥((derivedInG M).subgroupOf M) :=
+    TypeVData.isNilpotent_derivedInG_subgroupOf dV
+  -- `⁅M′,M′⁆.map subtype = M″`
+  have hmapcomm : Subgroup.map M.subtype
+      (⁅(derivedInG M).subgroupOf M, (derivedInG M).subgroupOf M⁆ : Subgroup ↥M)
+      = secondDerivedInAmbient M := by
+    rw [Subgroup.map_commutator, Subgroup.subgroupOf_map_subtype,
+      inf_of_le_left (show derivedInG M ≤ M from Subgroup.map_subtype_le _)]
+    exact (Subgroup.map_subtype_commutator (derivedInG M)).symm
+  -- ★ non-abelian
+  have hnonab : ¬ IsMulCommutative ↥(derivedInG M) := by
+    intro habel
+    apply hnc
+    haveI hKcomm : IsMulCommutative ↥((derivedInG M).subgroupOf M) :=
+      ⟨⟨fun a b => (Subgroup.subgroupOfEquivOfLe hM'le).injective
+        (by rw [map_mul, map_mul]; exact habel.is_comm.comm _ _)⟩⟩
+    have hcommbot : (⁅(derivedInG M).subgroupOf M, (derivedInG M).subgroupOf M⁆ :
+        Subgroup ↥M) = ⊥ := by
+      have h1 : (⁅(derivedInG M).subgroupOf M, (derivedInG M).subgroupOf M⁆ :
+          Subgroup ↥M).subgroupOf ((derivedInG M).subgroupOf M) = ⊥ := by
+        rw [OddOrder.Peterfalvi.S08.commutator_subgroupOf_self]
+        exact (commutator_eq_bot_iff _).mpr hKcomm
+      exact (Subgroup.subgroupOf_eq_bot.mp h1).eq_bot_of_le (Subgroup.commutator_le_left _ _)
+    have hSeq := inducedKernelFamily_commutator_eq_SHCSet hG hyp
+    rw [hcommbot] at hSeq
+    have hSset : hyp.Sset = OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) := by
+      unfold OddOrder.Peterfalvi.S12.Hypothesis.Sset
+      exact inducedFamily_eq_inducedKernelFamily_bot
+    rw [hSset, hSeq]
+    exact ⟨hyp.SHC_isCoherent hG⟩
+  refine ⟨?_, hnonab⟩
+  -- ★ p-group: fixed-point-free `W₁`-action on `Ab(M′)` + the (6.5.a) bound
+  letI actH : MulDistribMulAction ↥(hyp.W1.subgroupOf M) ↥((derivedInG M).subgroupOf M) :=
+    MulDistribMulAction.compHom ((derivedInG M).subgroupOf M)
+      ((MulAut.conjNormal (H := (derivedInG M).subgroupOf M)).comp (hyp.W1.subgroupOf M).subtype)
+  have hsmul : ∀ (a : ↥(hyp.W1.subgroupOf M)) (x : ↥((derivedInG M).subgroupOf M)),
+      ((a • x : ↥((derivedInG M).subgroupOf M)) : ↥M)
+        = (a : ↥M) * (x : ↥M) * (a : ↥M)⁻¹ := by
+    intro a x
+    have h1 : (a • x : ↥((derivedInG M).subgroupOf M))
+        = (MulDistribMulAction.toMulAut ↥(hyp.W1.subgroupOf M)
+            ↥((derivedInG M).subgroupOf M) a) x := by
+      simp [MulDistribMulAction.toMulAut_apply]
+    rw [h1]
+    show ((MulAut.conjNormal (H := (derivedInG M).subgroupOf M)
+      ((hyp.W1.subgroupOf M).subtype a)) x : ↥M) = _
+    rw [MulAut.conjNormal_apply]; rfl
+  have hW1card : Nat.card ↥(hyp.W1.subgroupOf M) = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.typeP.W1_le).toEquiv
+  have hcop : Nat.Coprime (Nat.card ↥(hyp.W1.subgroupOf M))
+      (Nat.card ↥((derivedInG M).subgroupOf M)) := by
+    rw [hW1card, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'le).toEquiv]
+    exact (typePData_W1_hall_coprime hG hyp.maximal (hyp.bgTypeP hG) hyp.typeP).symm
+  have hfix : ∀ w : ↥(hyp.W1.subgroupOf M), w ≠ 1 → ∀ x : ↥((derivedInG M).subgroupOf M),
+      w • x = x → x ∈ commutator ↥((derivedInG M).subgroupOf M) := by
+    intro a ha x hx
+    have hc := hsmul a x
+    rw [hx] at hc
+    have hcommM : (a : ↥M) * (x : ↥M) = (x : ↥M) * (a : ↥M) :=
+      mul_inv_eq_iff_eq_mul.mp hc.symm
+    have haW1G : ((a : ↥M) : G) ∈ hyp.W1 := Subgroup.mem_subgroupOf.mp a.2
+    have hane : ((a : ↥M) : G) ≠ 1 := fun h => ha (Subtype.ext (Subtype.ext h))
+    have hxM'G : ((x : ↥M) : G) ∈ derivedInG M := Subgroup.mem_subgroupOf.mp x.2
+    have hcommG : ((x : ↥M) : G) * ((a : ↥M) : G) = ((a : ↥M) : G) * ((x : ↥M) : G) := by
+      simpa using (congrArg (fun t : ↥M => (↑t : G)) hcommM).symm
+    have hxW2 : ((x : ↥M) : G) ∈ hyp.typeP.W2 := by
+      rw [← hyp.typeP.centralizer_W1 _ haW1G hane]
+      exact Subgroup.mem_inf.mpr ⟨hxM'G, Subgroup.mem_centralizer_singleton_iff.mpr hcommG⟩
+    have hxsd : ((x : ↥M) : G) ∈ secondDerivedInAmbient M :=
+      (hyp.typeP.W2_le.trans inf_le_right) hxW2
+    have key : (x : ↥M) ∈ (⁅(derivedInG M).subgroupOf M,
+        (derivedInG M).subgroupOf M⁆ : Subgroup ↥M) := by
+      refine (Subgroup.mem_map_iff_mem M.subtype_injective).mp ?_
+      rw [hmapcomm]; exact hxsd
+    exact OddOrder.Peterfalvi.S08.commutator_subgroupOf_self ((derivedInG M).subgroupOf M) ▸
+      Subgroup.mem_subgroupOf.mpr key
+  have hWodd : Odd (Nat.card ↥(hyp.W1.subgroupOf M)) := by
+    rw [hW1card]
+    exact hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card hyp.W1)
+  have hHodd : Odd (Nat.card (Abelianization ↥((derivedInG M).subgroupOf M))) :=
+    hG.odd.of_dvd_nat
+      (((Subgroup.card_quotient_dvd_card
+          (commutator ↥((derivedInG M).subgroupOf M))).trans
+        (Subgroup.card_subgroup_dvd_card ((derivedInG M).subgroupOf M))).trans
+        (Subgroup.card_subgroup_dvd_card M))
+  have hbound' : Nat.card (Abelianization ↥((derivedInG M).subgroupOf M))
+      ≤ 4 * Nat.card ↥(hyp.W1.subgroupOf M) ^ 2 + 1 := by
+    rw [hW1card]
+    exact typeV_sixFiveA_bound hG hyp ⟨dV⟩ hnc
+  obtain ⟨p, hp, hHp⟩ := OddOrder.Peterfalvi.S08.isPGroup_of_isNilpotent_of_coprime_fixedPoints_le_commutator
+    hcop hfix hHodd hWodd hbound'
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hHp' : IsPGroup p ↥(derivedInG M) := hHp.of_equiv (Subgroup.subgroupOfEquivOfLe hM'le)
+  have hw2prime : hyp.w2.Prime := hyp.w2_prime hG
+  have hW2der : hyp.W2 ≤ derivedInG M :=
+    (hyp.typeP.W2_le.trans inf_le_right).trans (Subgroup.map_subtype_le _)
+  have hw2dvd : hyp.w2 ∣ Nat.card ↥(derivedInG M) := by
+    have h := Subgroup.card_subgroup_dvd_card (hyp.W2.subgroupOf (derivedInG M))
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2der).toEquiv] at h
+  obtain ⟨n, hn⟩ := hHp'.exists_card_eq
+  have hpw2 : hyp.w2 = p :=
+    (Nat.prime_dvd_prime_iff_eq hw2prime hp).mp (hw2prime.dvd_of_dvd_pow (hn ▸ hw2dvd))
+  rw [hpw2]; exact hHp'
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (6.5.c) for `(L, K, M) := (M, M′, 1)`** — the case-(b) killer.
@@ -432,14 +561,34 @@ Instantiated at `(L, K, M) := (M, M′, 1)`: `|L : K| = w₁` and `p = w₂`
 proof this refutes case (b) of Definition (8.7): its prime `p′` with `w₁ ∣ p′ − 1` lies in
 `(Nat.card ↥M′).primeFactors` of the `w₂`-group `M′`, so `p′ = w₂` — contradiction.
 
-**Gated on issue 2022**: the statement is book-faithful; the proof is `sorry` pending the
-general `six_two` → (6.3)-general → (6.5) chain (lane b). -/
+**Now landed** (issue 9089, lane a): the (6.5.c) arithmetic `S08.six_five_c_arith`.  If
+`w₁ ∣ w₂ − 1`, then the non-abelian `w₂`-group `M′` (`typeV_sixFiveB_pGroup`) has
+`w₂² ≤ |Ab M′|` (`sq_le_card_abelianization_of_isPGroup_of_noncomm`) while the (6.5.a) bound
+(`typeV_sixFiveA_bound`) gives `|Ab M′| ≤ 4w₁² + 1`; with `w₁, w₂` odd and `w₂` prime, the
+divisor gap `w₂ ≥ 2w₁ + 1` forces `w₂² ≥ (2w₁+1)² > 4w₁² + 1` — contradiction. -/
 theorem typeV_sixFiveC_not_dvd [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     (hV : IsTypeV M)
     (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A0)) :
     ¬ (hyp.w1 ∣ hyp.w2 - 1) := by
-  sorry
+  intro hdvd
+  have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  obtain ⟨hpgrp, hnonab⟩ := typeV_sixFiveB_pGroup hG hyp hV hnc
+  have hw2prime : hyp.w2.Prime := hyp.w2_prime hG
+  have hw2odd : Odd hyp.w2 := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card hyp.W2)
+  have hw1odd : Odd hyp.w1 := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card hyp.W1)
+  have hnc' : ¬ ∀ a b : ↥(derivedInG M), a * b = b * a := fun h => hnonab ⟨⟨h⟩⟩
+  -- `|Ab M′|` in the two coordinates (`↥M′ ≃* ↥(M′.subgroupOf M)`)
+  have hcardeq : Nat.card (Abelianization ↥(derivedInG M))
+      = Nat.card (Abelianization ↥((derivedInG M).subgroupOf M)) :=
+    Nat.card_congr (MulEquiv.abelianizationCongr
+      (Subgroup.subgroupOfEquivOfLe hM'le).symm).toEquiv
+  have hpsq : hyp.w2 ^ 2 ≤ Nat.card (Abelianization ↥((derivedInG M).subgroupOf M)) :=
+    hcardeq ▸ OddOrder.Peterfalvi.S08.sq_le_card_abelianization_of_isPGroup_of_noncomm
+      hw2prime hpgrp hnc'
+  have hbound : Nat.card (Abelianization ↥((derivedInG M).subgroupOf M))
+      ≤ 4 * hyp.w1 ^ 2 + 1 := typeV_sixFiveA_bound hG hyp hV hnc
+  exact OddOrder.Peterfalvi.S08.six_five_c_arith hw2prime hw2odd hw1odd hdvd hpsq hbound
 
 open scoped Classical FiniteInduce in
 /-- **Peterfalvi (10.10.1)–(10.10.4): a type-V maximal forces `𝒮` coherent** — the honest
