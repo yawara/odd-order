@@ -536,6 +536,17 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-12 (tick 13) — c のみ合流**: **c=1** ((11.8) transposed eta grid align —
+  TGapGridAlignment 256→975 行 +719 全 proven、AxiomsCheck +73)。a=0 / b=0。build green
+  (4174 jobs)・AxiomsCheck OK (2342/0)・count-sorry 69→69・新 axiom なし。push `7fe28d44..1be17740`。
+- **2026-07-12 (tick 12, セッション再開初回) — 全 3 レーン合流**: **a=3** ((11.9.a)/1024 J0/J2:
+  R(μ)-family conj-対合公式 `certainTypeRImage_conj` + `rowInv_zero` (S06 +43 全 proven) +
+  t=0 退化排除 = conj-対合 route 設計 docs) / **b=7** (docs のみ: 2038 iter20-24 記録 —
+  (13.19.a) 完・(13.19.b) 戦略 = field (B) 形 + FT discharge; CLAUDE.md /loop 自動自走明文化
+  (ユーザー 2026-07-12) — .lean 変更なし build 省略) / **c=2** ((11.8) aligned source grid
+  factor 化 — 新 leaf `S16_NonExistenceG/TGapGridAlignment.lean` +256、TTypeII import で root
+  closure OK、AxiomsCheck +23)。build green ×2 (4173/4174 jobs)・AxiomsCheck OK・
+  count-sorry 69→69・新 axiom なし・size watch 超過なし。push `5c092591..dc3c2eaa`。
 - **2026-07-12 (tick 11) — 全 3 レーン合流: ★ (11.9.a) 行0射影 完全証明 (a) + (13.19.a) L1-L2 (b)**:
   **a=3** (★ `inner_tau_muColumnZero_sub_zeta_rowZero_of_residual_not_orthogonal` **完全証明**
   ((11.9.a) 行0射影) + ZIrrFourier Bessel 不等式 (shared additive +70) + S11 λ 存在/a∣u 部品) /

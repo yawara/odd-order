@@ -1,6 +1,6 @@
 import OddOrder.Peterfalvi.S16_NonExistenceG.TTypeIICoherence
 import OddOrder.Peterfalvi.S16_NonExistenceG.TGapGalois
-import OddOrder.Peterfalvi.S16_NonExistenceG.TGapNonorthogonality
+import OddOrder.Peterfalvi.S16_NonExistenceG.TGapGridAlignment
 
 /-!
 # Peterfalvi (14.9): the T-side Type-II theorem
