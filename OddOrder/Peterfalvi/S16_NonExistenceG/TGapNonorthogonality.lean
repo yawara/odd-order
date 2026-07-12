@@ -1107,6 +1107,38 @@ theorem Hypothesis.charParam_a_eq_zero_of_grid_residualEq [Finite G]
     linear_combination -htrans
   exact_mod_cast ha0
 
+open scoped FiniteInduce in
+/-- **Peterfalvi (11.8.2), arbitrary-grid regular-value pin.**
+The S12 Dade image already equals the canonical aligned sigma-grid difference
+on `typePV`.  Consequently it equals any other grid difference whose two
+entries have the same values there.  This deliberately asks only for
+regular-set value alignment, not a false global uniqueness/equality of sigma
+isometries. -/
+theorem Hypothesis.tau_muGridAlpha_apply_eq_of_grid_value_alignment [Finite G]
+    {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) {i : Fin hyp.w1} {j : Fin hyp.w2}
+    (hj : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M)
+    {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ))
+    (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ))
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ)
+    (hδj : hyp.muColumnSign hG hodd j = δ)
+    (grid : Fin hyp.w1 → Fin hyp.w2 → ClassFunction G ℂ)
+    (halign : ∀ k : Fin hyp.w2, ∀ {v : G}, v ∈ typePV M hyp.typeP →
+      hyp.alignedOmegaSigmaGrid hG hodd i k v = grid i k v) :
+    ∀ v ∈ typePV M hyp.typeP,
+      hyp.tau (hyp.muGrid hG hodd i j -
+          (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ) v =
+        ((δ : ℂ) • (grid i j - grid i 0)) v := by
+  intro v hv
+  rw [hyp.tau_muGridAlpha_apply_eq_on_typePV hG hodd hj hζS
+    hdeg hμ0 hζ1 hnf hδj hv, ClassFunction.smul_apply,
+    ClassFunction.sub_apply, halign j hv, halign 0 hv,
+    ← ClassFunction.sub_apply, ← ClassFunction.smul_apply]
+
 end OddOrder.Peterfalvi.S12
 
 namespace OddOrder.Peterfalvi.S16
@@ -1150,6 +1182,95 @@ theorem eta_diff_classifier_of_typePV_value [Finite G]
   rw [ClassFunction.sub_apply,
     ← Y.of_isConj hconj,
     ← (((s : ℂ) • (base.eta i0 j1 - base.eta i0 j2)).of_isConj hconj),
+    hYsource w hwV, hsource w hwV, sub_self]
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (3.8), eta column-difference rigidity.**
+This is the transposed dual of `eta_diff_rigidity`: a norm-two virtual
+character agreeing with `s * (eta i1 j0 - eta i2 j0)` on the shared regular
+set equals that column difference globally.  The abstract grid-rigidity engine
+already permits arbitrary distinct grid points; only the (3.7) separability
+assembly is repeated here. -/
+theorem eta_column_diff_rigidity [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    {X : ClassFunction G ℂ} (hXZ : X ∈ ZIrr G)
+    (hX2 : ClassFunction.inner X X = 2)
+    {i1 i2 : Fin base.q} (hi : i1 ≠ i2) (j0 : Fin base.p)
+    {s : ℤ} (hs : s = 1 ∨ s = -1)
+    (hvanish : ∀ x ∈ conjClassSet
+      ((base.W : Set G) \ ((base.W1 : Set G) ∪ (base.W2 : Set G))),
+      (X - (s : ℂ) • (base.eta i1 j0 - base.eta i2 j0)) x = 0) :
+    X = (s : ℂ) • (base.eta i1 j0 - base.eta i2 j0) := by
+  classical
+  have hcardq : Nat.card (Fin base.q) = base.q :=
+    Nat.card_eq_fintype_card.trans (Fintype.card_fin _)
+  have hcardp : Nat.card (Fin base.p) = base.p :=
+    Nat.card_eq_fintype_card.trans (Fintype.card_fin _)
+  have hsep : ∀ (i i' : Fin base.q) (j j' : Fin base.p),
+      ClassFunction.inner
+          (X - (s : ℂ) • (base.eta i1 j0 - base.eta i2 j0))
+          (base.eta i j) +
+        ClassFunction.inner
+          (X - (s : ℂ) • (base.eta i1 j0 - base.eta i2 j0))
+          (base.eta i' j') =
+      ClassFunction.inner
+          (X - (s : ℂ) • (base.eta i1 j0 - base.eta i2 j0))
+          (base.eta i j') +
+        ClassFunction.inner
+          (X - (s : ℂ) • (base.eta i1 j0 - base.eta i2 j0))
+          (base.eta i' j) := by
+    intro i i' j j'
+    have h1 := inner_eta_grid_relation base hvanish i j
+    have h2 := inner_eta_grid_relation base hvanish i' j'
+    have h3 := inner_eta_grid_relation base hvanish i j'
+    have h4 := inner_eta_grid_relation base hvanish i' j
+    linear_combination h1 + h2 - h3 - h4
+  have hmain := OddOrder.Peterfalvi.S05.orthonormalGrid_diff_rigidity
+    (fun pq : Fin base.q × Fin base.p => base.eta pq.1 pq.2)
+    (fun pq => eta_mem_ZIrr base pq.1 pq.2)
+    (fun a => by simpa using eta_orthonormal base a.1 a.1 a.2 a.2)
+    (fun a b hab => by
+      rw [eta_orthonormal base a.1 b.1 a.2 b.2, if_neg]
+      rintro ⟨h1, h2⟩
+      exact hab (Prod.ext h1 h2))
+    (by rw [hcardq]; exact base.three_le_q)
+    (by rw [hcardp]; exact base.three_le_p)
+    (by rw [hcardq]; exact base.q_odd)
+    (by rw [hcardp]; exact base.p_odd)
+    (by
+      rw [hcardq, hcardp]
+      exact (Nat.coprime_primes base.q_prime base.p_prime).mpr
+        (Ne.symm base.p_ne_q))
+    hXZ hX2 (P1 := (i1, j0)) (P2 := (i2, j0))
+    (by intro h; exact hi (Prod.ext_iff.mp h).1) hs hsep
+  simpa using hmain
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (3.8)/(11.8.2), transposed eta classifier from regular values.**
+The type-P regular-value bridge specialized to an eta column difference, the
+orientation required by the T-side transposition in (11.8). -/
+theorem eta_column_diff_classifier_of_typePV_value [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    {M : Subgroup G} (data : TypePData M)
+    (hV : typePV M data =
+      (base.W : Set G) \ ((base.W1 : Set G) ∪ (base.W2 : Set G)))
+    {i1 i2 : Fin base.q} (hi : i1 ≠ i2) (j0 : Fin base.p)
+    {s : ℤ} (hs : s = 1 ∨ s = -1)
+    {source : ClassFunction G ℂ}
+    (hsource : ∀ v ∈ typePV M data,
+      source v = ((s : ℂ) • (base.eta i1 j0 - base.eta i2 j0)) v) :
+    ∀ {Y : ClassFunction G ℂ}, Y ∈ ZIrr G →
+      ClassFunction.inner Y Y = 2 →
+      (∀ v ∈ typePV M data, Y v = source v) →
+      Y = (s : ℂ) • (base.eta i1 j0 - base.eta i2 j0) := by
+  intro Y hYZ hY2 hYsource
+  apply eta_column_diff_rigidity base hYZ hY2 hi j0 hs
+  intro x hx
+  obtain ⟨w, hw, g, hg⟩ := hx
+  have hconj : IsConj w x := isConj_iff.mpr ⟨g, hg⟩
+  have hwV : w ∈ typePV M data := hV.symm ▸ hw
+  rw [ClassFunction.sub_apply, ← Y.of_isConj hconj,
+    ← (((s : ℂ) • (base.eta i1 j0 - base.eta i2 j0)).of_isConj hconj),
     hYsource w hwV, hsource w hwV, sub_self]
 
 end OddOrder.Peterfalvi.S16

@@ -3536,7 +3536,15 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S12.Hypothesis.charParam_a_eq_zero_of_grid_residualEq
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S12.Hypothesis.tau_muGridAlpha_apply_eq_of_grid_value_alignment
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.eta_diff_classifier_of_typePV_value
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.eta_column_diff_rigidity
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.eta_column_diff_classifier_of_typePV_value
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.residual_not_orthogonal_of_transposed_reindexing

@@ -1043,3 +1043,19 @@ feature commits: `d5f7fc38`, `061229b4`, `bb2c9868`, `960907f6`。
 
 次 frontier は reconciled `dataT.W1=W2`, `dataT.W2=W1`, `dataT.W=W` と S15
 `eta_eq_tau_omega` / `tau3_apply_of_regular` を用いて上記 source-value equality を証明すること。
+
+### T-side 転置 rigidity と value-level API (2026-07-12 続行 2)
+
+- S12 の既存 `tau_muGridAlpha_apply_eq_on_typePV` を任意 grid へ移す
+  `tau_muGridAlpha_apply_eq_of_grid_value_alignment` を追加した。必要仮定は各 grid entry の
+  `typePV` 上の**値一致のみ**で、global sigma-map equality は要求しない。
+- T-side 転置では S12 column index が eta の第1軸へ移るため、既存
+  `eta_diff_rigidity` (固定第1軸) だけでは向きが逆だった。抽象
+  `S05.orthonormalGrid_diff_rigidity` と (3.7) four-corner separability から dual の
+  `eta_column_diff_rigidity` を実証明し、`eta_column_diff_classifier_of_typePV_value` まで
+  接続した。これで norm-2 classifier は正しい転置向きでも閉じた。
+- leaf / AxiomsCheck (4157 jobs) green。許可外公理・新 `sorry` なし。
+
+残る最上流は **regular-value grid enumeration alignment**:
+`alignedOmegaSigmaGrid i k v = eta (colEquiv k) (rowEquiv i) v` (`v ∈ typePV`) を、
+両側の concrete linear-character enumeration と `dataT.W = base.W` から構成する。
