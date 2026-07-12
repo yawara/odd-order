@@ -1131,3 +1131,16 @@ column-zero characters が `base.W1` 上 trivial、row-zero characters が `base
 であることを示し、既証明の `omegaW1RestrictionEquiv` / `omegaW2RestrictionEquiv` により
 `alignedOmegaEtaIndex i j = (colEquiv j, rowEquiv i)` を得る。zero-preservation も source の
 normalized enumerations と両 target restriction equivalence の `symm_one` から従う。
+
+### source grid の factor product (2026-07-12 続行 7)
+
+- S15 abstract omega carrier は full grid exhaustion と二つの zero-axis triviality を持つが、
+  一般 label `(i,j)` が既に factor-separable だとは仮定していないことを独立確認した。
+  従って既存 label を無証明に transposed `(col,row)` と読む方針は採らない。
+- `alignedOmegaSourceCharacter_eq_mul_axes` を追加し、S12 の concrete source character が
+  `source(i,j) = source(i,0) * source(0,j)` と分解することを、normalized zero characters と
+  `omegaProdChar_mul` から実証明した。leaf build green、新 axiom/sorry なし。
+
+次は二つの source axis を reconciled factor 上へ restrictし、既存 target zero-axis equivalence
+へ別々に送る。その積を full `omegaMonoidHomEquiv` の逆で eta pointer に戻せば、abstract
+omega label の未証明 separability に依存せず、zero-preserving transposed grid を構成できる。

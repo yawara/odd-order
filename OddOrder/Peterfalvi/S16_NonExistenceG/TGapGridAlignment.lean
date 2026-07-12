@@ -133,6 +133,67 @@ theorem alignedOmegaSourceCharacter_injective [Finite G]
       ((OddOrder.Peterfalvi.S12.finCardEquivCharacterGroup _).injective
         hfactors.2)
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- The aligned S12 source character separates as its column-zero character
+times its row-zero character.  This is the honest factorization used to build
+a coordinate-respecting eta reindex; it does not assume that the abstract S15
+omega labels are already separable. -/
+theorem alignedOmegaSourceCharacter_eq_mul_axes [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (s12 : OddOrder.Peterfalvi.S12.Hypothesis M)
+    (hodd : Odd (Nat.card G)) (i : Fin s12.w1) (j : Fin s12.w2) :
+    s12.alignedOmegaSourceCharacter hG hodd i j =
+      s12.alignedOmegaSourceCharacter hG hodd i 0 *
+        s12.alignedOmegaSourceCharacter hG hodd 0 j := by
+  classical
+  let h := (s12.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI : NeZero (Nat.card h.W1) :=
+    ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : s12.typeP.W1 ≤ M := s12.typeP.W1_le
+  have hW2le : s12.typeP.W2 ≤ M :=
+    OddOrder.Peterfalvi.S12.typePData_W2_le_self s12.typeP
+  have hcardW1 : Nat.card ↥h.W1 = s12.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = s12.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) :=
+    ⟨Nat.card_pos.ne'⟩
+  let χ₂ : Fin s12.w2 → (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
+    fun k => OddOrder.Peterfalvi.S12.finCardEquivCharacterGroup _
+      (finCongr hcardW2sub.symm k)
+  let tic := OddOrder.Peterfalvi.S12.typePData_toTICyclicHypothesis
+    s12.typeP hodd
+  let e : ↥tic.W ≃* ↥(h.W1 ⊔ h.W2) :=
+    (Subgroup.subgroupOfEquivOfLe
+      (OddOrder.Peterfalvi.S12.typePData_W_le_self s12.typeP)).symm.trans
+      (MulEquiv.subgroupCongr
+        (OddOrder.Peterfalvi.S12.typePData_sup_subgroupOf_eq s12.typeP).symm)
+  have hsource : ∀ a b, s12.alignedOmegaSourceCharacter hG hodd a b =
+      (h.sdiffTICyclicHypothesis.omegaProdChar
+        (h.w1CharEquiv (finCongr hcardW1.symm a)) (χ₂ b)).comp
+          e.toMonoidHom := by
+    intro a b
+    unfold OddOrder.Peterfalvi.S12.Hypothesis.alignedOmegaSourceCharacter
+    rfl
+  have hrow0 : h.w1CharEquiv (finCongr hcardW1.symm (0 : Fin s12.w1)) = 1 := by
+    rw [show finCongr hcardW1.symm (0 : Fin s12.w1) = 0 from by ext; simp,
+      h.w1CharEquiv_zero]
+  have hcol0 : χ₂ 0 = 1 := by
+    change OddOrder.Peterfalvi.S12.finCardEquivCharacterGroup _
+      (finCongr hcardW2sub.symm (0 : Fin s12.w2)) = 1
+    rw [show finCongr hcardW2sub.symm (0 : Fin s12.w2) = 0 from by ext; simp,
+      OddOrder.Peterfalvi.S12.finCardEquivCharacterGroup_zero]
+  rw [hsource i j, hsource i 0, hsource 0 j]
+  rw [hrow0, hcol0]
+  have hp := h.sdiffTICyclicHypothesis.omegaProdChar_mul
+    (h.w1CharEquiv (finCongr hcardW1.symm i)) 1 1 (χ₂ j)
+  simp only [mul_one, one_mul] at hp
+  rw [hp]
+  rfl
+
 /-- Reindexing the transported S12 source grid through the full omega-grid
 equivalence remains jointly injective. -/
 theorem alignedOmegaEtaIndex_injective [Finite G]

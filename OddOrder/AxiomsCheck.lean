@@ -3601,6 +3601,8 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaSourceCharacter_injective
 set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaSourceCharacter_eq_mul_axes
+set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.alignedOmegaEtaIndex_injective
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
