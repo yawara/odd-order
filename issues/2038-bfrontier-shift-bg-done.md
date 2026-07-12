@@ -1747,3 +1747,16 @@ S15_HonestTypeP2A0 パターンで新設、hyp.T_typeP2 相当が要る — T �
 (13.18.c,d)+(1.1) 消費 — 深部)。
 付随: S15_SAndT 2101 行 → BridgeCharacter (1479、(13.18) 全 proven) + TAIL (649)。
 **次 = 義務 (1) φ 存在** (文書順最上流、Frobenius 指標論の genuine math)。
+
+## ✅ (2026-07-12、/loop iter 12) — 義務 (1) φ 存在 実証明 (8 → 7)
+
+exists_Sset_apply_one_eq_index 完全証明 (commit 下記): typeI_frobenius + ne_bot_kernel +
+solvable_of_lt_top + S08.exists_irreducibleCharacter_ne_trivial_degree_one_of_commutator_ne_top
++ induce_apply_one。2 つの TypeIData の kernel は H_eq で橋渡し (Prop rwa)。Sset membership
+は同 FiniteInduce scope ゆえ rfl。**残 7 義務** (S15_SAndT:252-322): tauTbetaGrid (T-side
+honest 'A0 Dade def) / disjoint_support (13.19.a) / orthogonal_eta (13.19.b) / row・col
+constant (13.19.c 第一節) / caseC・caseC_dual (dichotomy 本体)。
+**次 = tauTbetaGrid** (文書順: (13.18) の T-dual 定義が (13.19.a) 以降の前提)。設計:
+S15_HonestTypeP2A0 の dadeHypS0/sInstance パターンの T-instance 化 — ただし T の型
+((13.2.a) で T は type II ≠ P2 の可能性 — S_typeP2 の T-dual field の有無) を要確認。
+軽ければ次 iter で def 化、重ければ S-side パターン精査から。
