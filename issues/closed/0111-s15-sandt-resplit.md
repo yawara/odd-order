@@ -27,17 +27,26 @@ frontier が settle に近づいた可能性。**次の hub 判断**: (i) 2000 �
 (ii) b の 2038 が S15_SAndT 非接触フェーズ (assembly/別 file) に移ったら split 着手。b が引き続き
 S15_SAndT を触るなら deferred 継続。hub は毎 tick の size watch で 2000 接近を監視。
 
-## やること
+## ✅ 完了 (2026-07-12 監視 tick, hub 実施)
 
-- [ ] b の (13.19.c) cascade (2038、c1 bound + assembly) が landing し S15_SAndT が凍結したら着手
-- [ ] 分割方式決定 (既存 S15_SAndTBasic/Defs へ追加切出し or 新 topic leaf; c 所有 BetaData 領域は
-      既に S15_BridgeCharacter へ移動済ゆえ非対象)
-- [ ] hub が凍結境界で実施 (b の frontier と非衝突の宣言境界)
+b が (13.19.c) 完結で S15_SAndT を実 sorry 0 で凍結・idle 化 → hub が prefix-split 実施:
+- **新 leaf `S15_SAndTGrid.lean` (792 行)** = (13.19) type-I orthogonality **producer / grid-facts 層**
+  (`OddIntegerInner` / `TypeIOrthogonalityData` bundle / `typeIBetaL` 分解 / disjoint-support /
+  row·col constancy、21 decl)。namespace `OddOrder.Peterfalvi.S15` 維持。
+- **`S15_SAndT.lean` (1105 行)** = (13.19.c) dichotomy (parity core + 2 case bounds + assembly) +
+  (14.5) complement exclusion (17 decl)。冒頭で `S15_SAndTGrid` を import。
+- decl 総数 38 保存 (21+17)、namespace 名不変 ⟹ **下流 import 無変更**、build green (4178 jobs)・
+  AxiomsCheck OK・sorry 63→63 (中立)・新 axiom なし。root closure = S15_SAndT の import 経由 (transitive、
+  prior-split 兄弟と同慣例ゆえ OddOrder.lean 追記不要)。
 
-## 完了条件
+- [x] b の (13.19.c) landing で S15_SAndT 凍結 → 着手
+- [x] 分割方式 = 新 topic leaf S15_SAndTGrid への prefix-split
+- [x] hub が凍結境界 (line 794 = (13.19) producer 層 / (13.19.c) dichotomy の topic 境界) で実施
 
-- S15_SAndT.lean (+ 分割後 leaf 群) が各 2000 行未満・理想 1500 未満
-- `lake build OddOrder` green・下流 import 無変更
+## 完了条件 (達成)
+
+- [x] S15_SAndT.lean (1105) + S15_SAndTGrid.lean (792) が各 2000 行未満・1500 未満
+- [x] `lake build OddOrder` green・下流 import 無変更
 
 ## 参照
 
