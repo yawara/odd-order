@@ -1301,3 +1301,26 @@ R-datum `sSet_member_differenceImage` landed] + per-pair retarget hstep [squeeze
 
 ### 次 iteration (文書順): caseA (非Galois)
 `sSet_coherent_indS_caseA` (558) は **genuinely mixed 次数** (q·a 既約 + q·u) ゆえ uniform_degree 直射 **不可** — 実 fold (`coherentOfPairChainCover`: 次数単調 decomposition + per-pair retarget) が要。base `sSetIrrDeg_qa_coherent_indS_caseA` は landed。caseA は **同じ reducible-column R-family residual** に加えて degree-monotone 列挙 + `hstep` (squeeze+xAdjoinStepW) を要 (caseB より重い)。⟹ 共通の deep residual = **reducible-column certain-type R-family の S-instance port** (両 branch を unblock)。
+
+## 2026-07-13 更新 #40 (lane b, /loop) — caseB decompose → R-family residual が cross-lane gate (9092) に収束
+
+**session 進捗 (全 main 統合済)**: base coherences + (A) engine instantiate + h2 count →
+**PAYOFF: `coherent_H0Cprime_S` を unsound `sibleyTarget_H0C` から sound A(S)-supported (9.11) へ
+re-point** (adfe9f58) → **caseB (Galois) を concrete residual まで decompose** (0f34211d):
+`sSet_coherent_indS_caseB` 本体 = sorry-free plumbing ((5.7) `uniform_degree_coherence_of_families`
+engine、fold 不要・exceptional (9.10) robust)、irreducible member R-family も landed sorry-free。
+
+**残 = 単一の cross-lane gate (subagent exhaustive で確定、9092 に起票)**:
+`sSet_caseB_memberRFamily` の **reducible-μ_j 枝** (HypothesisBasics:948) + `_orthogonal` (:972) +
+caseA fold (:569、同 R-family を consume) は全て **reverse dichotomy「reducible η∈sSet = column sum
+∑_i μ_{ij}」= mu-grid ↔ certain-type grounding** に gated。この grounding は abstract `Hypothesis` 内で
+証明不能で、**spine producer `FeitThompson.lean:1392` (lane-a) で near-definitional** (muS:=columnFamily.mu)。
+counting route も b 単独不可 (reducible count は lane-a S12、mu_colSum distinctness 不在)。⟹ **9092
+(cross-lane、Hypothesis field 追加 + producer 放電) が真の gate**。
+
+**route 決定 = route B (b-buildable Dade→η formula)** を採用予定 (route A = S06 `certainTypeR` cite の
+代替、b 自己完結)。**9092 と独立に b-buildable な half = `image_eq` 相当**
+`dadeHypS(μ_j − μ̄_j) = ∑ η-columns` (proven `tauS_mu_row0_cross` (S15_BridgeCharacter:821) を全 row +
+column pair (j,−j) に generalize、`S16.eta_diff_rigidity` (S16_GridExpansion:390) 経由)。closes-no-sorry
+だが R-family (route B) が 9092 放電後に consume する core μ→η Dade 計算。次 = これを build (gated-endpoint
+prep、CLAUDE.md deferred-payoff 容認)。9092 放電後に R-family closing + caseA fold。
