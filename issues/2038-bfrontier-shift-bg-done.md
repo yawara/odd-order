@@ -1881,3 +1881,74 @@ typePV ⊆ Sdata.W — Sdata.W と hyp.W の同定 field を確認、conjClassSe
 order 保存)。L4 = disjoint 本体: x ∈ 両 support → L1 (r ∣ orderOf a、a ∈ A(L) →
 typeIA_subset_sharpSubgroup_of_frobenius [typeI_frobenius で frobData] → orderOf a ∣ |L_F|
 → r ∣ |L_F|) vs L3 (orderOf x の素因数 ⊆ {p,q}) + card_LF_coprime_pq → False。
+
+## ✅ (2026-07-12、/loop iter 20) — (13.19.a) disjoint_support 完全証明 (義務 6 → 5)
+
+L1 (Ã 位数、iter 18) + L2 (β_L^τ⊆Ã、iter 19) + L3/L4 一体 (S-side order + coprime 矛盾) を
+合成 (commit 662f4275)。card_LF_coprime_pq (8.17.a、Gate3 sorried) が唯一の sorried-cite。
+残 5 義務: orthogonal_eta (13.19.b、NC/(3.8)) / row・col constant (13.19.c 第一節、(4.8)) /
+caseC・caseC_dual (dichotomy 本体)。**次 = (13.19.b) orthogonal_eta**: ψ−ψ̄ の τ 像が
+W∖(W₁∪W₂) 上消滅 ((13.19.a) と同じ Ã-局在論法!今回の部品を再利用) → NC ≤ ‖ψ−ψ̄‖² = 2
+→ (3.8)。(3.8)/NC の repo 対応 (S05_TICyclic の NC 理論?) を要調査。
+
+## 📐 (2026-07-12、/loop iter 21) — (13.19.b) 部品所在
+
+**(3.8) = S05_SigmaTrichotomy に形式化済み**: sigmaCoeff_trichotomy /
+sigmaCoeff_eq_zero_of_vanishOnV / eq_smul_chiFam_diff_of_vanishOnV (NC < 2·min の
+帰結群、TICyclicHypothesis 言語)。(13.19.b) の Coq 論法 (otau1eta、PFsection13:2036-):
+ψ ∈ 𝓛 → (ψ−ψ̄)^τ は Z[𝓛,L^#] (ZsubL) → Ã-局在 (iter 19 L2 の変種: conj-closed diff も
+A(L)-supported) → Ŵ 上消滅 ((13.19.a) tiA_PWG = iter 20 の disjoint と同根) →
+NC((ψ−ψ̄)^τ) ≤ ‖ψ−ψ̄‖² = 2 → (3.8) 帰結 + coherence (Dtau1: τ₁(ψ−ψ̄) = (ψ−ψ̄)^τ) で
+ψ^{τ₁} ⊥ η。**残調査**: hyp.eta (abstract grid) と TICyclicHypothesis の σ-grid の接続
+(tau3/omega 経由、3002 keystone の sigmaIntegral 系)、τ₁ = typeISetup.tau の coherence
+(Dtau1 相当 — S14.Hypothesis.dadeData で τ₁ = τ そのもの: extension 不要かも —
+typeISetup.tau は total lift で ℤ[𝓛] 全体に定義済み ✓ Dtau1 は apply_of_support)。
+次 iter: この接続の設計から。
+
+## 📐 (2026-07-12、/loop iter 22) — (13.19.b) Coq 論法確定 + 引き継ぎ
+
+**Coq otau1eta (:2046-2060) の正確な構造**: Ψ := τ₁(ψ−ψ̄)、‖Ψ‖² = 2 (Itau1 等長 +
+ψ ⊥ ψ̄ [odd、seqInd_conjC_ortho — repo 対応 inner_induce_conj_eq_zero_of_frobenius_of_odd
+済!]) → NC(Ψ) ≤ 2 < min q p (cycTI_NC_norm) → **cycTI_NC_minn の対偶** (τ₁ψ が η_ij と
+非直交 → dirr 剛性で η = ±τ₁ψ → Ψ との内積 ≠ 0 → NC ≥ min、矛盾)。
+**Lean gap**: cycTI_NC_norm/cycTI_NC_minn 対応 (σ-grid の非直交格子点数 NC の下界剛性) は
+S05_SigmaTrichotomy の sigmaCoeff 系に部分対応 — ただし「G-level CF の grid 非直交 →
+NC ≥ min」形の直接 lemma は未確認。TGapNonorthogonality (lane c) は S12/S13 文脈で別物。
+**引き継ぎ (次セッション)**: (i) S05_SigmaTrichotomy の eq_smul_chiFam_diff_of_vanishOnV
+(:277) / eq_smul_chiFam_column_of_vanishOnV (:456) が cycTI_NC_minn 帰結の実体か精読、
+(ii) abstract hyp.eta との橋 = tau3/omega + sigmaIntegral (3002 keystone) — S16 assembly
+(FeitThompson.lean の cd 供給) がどう sigma-grid を hyp.eta に繋いだか読む、(iii) 橋が
+無ければ (13.19.b) を「abstract field 化」して producer discharge を S16 側に置く
+(3002 パターン; field: eta_orthogonal_of_wsharp_vanish_norm_two 形 — Ŵ-消滅 ∧ ‖·‖²=2 ∧
+ℤ[Irr] → ∀ij ⊥ η)。ψ−ψ̄ の Ŵ-消滅は iter 20 部品 (Ã-局在 + tiA_PWG) の変種で証明可。
+
+## ✅ (2026-07-12、/loop iter 23) — (13.19.b) S05 エンドゲーム部品の確定
+
+`eq_smul_chiFam_diff_of_vanishOnV` (S05_SigmaTrichotomy:277) = **Coq cycTI_NC_minn/dirr
+剛性エンドゲームの既実装** ((4.8) 結論(3): X ∈ ℤ[Irr]、‖X‖²=2、X−s(χ₁−χ₂) が V-消滅 →
+X = s(χ₁−χ₂))。(13.19.b) 適用形は「Ψ = τ₁(ψ−ψ̄) が V-消滅 (Ã-局在、iter 20 部品変種) +
+‖Ψ‖² = 2 (等長 + ψ⊥ψ̄ [inner_induce_conj_eq_zero_of_frobenius_of_odd 済]) → σ係数全零 →
+Ψ ⊥ chiFam 格子 → 対偶で τ₁ψ ⊥ η」— 内部部品 (sigmaCoeff_* / grid_trichotomy /
+grid_no_constant_column / eq_smul_…_of_all_sigmaCoeff_zero) は全て S05 に在庫。
+**残 gap = hyp.eta ↔ chiFam (TICyclicHypothesis+FullDadeApplication) の橋のみ** (引き継ぎ
+(ii)): FeitThompson.lean の Section16CharacterData 供給 (tau3W = sigmaIntegral 系、3002
+keystone) が S05 の app/chiFam をどう instantiate したかを読み、(a) 直結なら (13.19.b) を
+S15 で直接証明、(b) 抽象層が厚ければ hyp に (13.19.b)-帰結 field を足して FT 側 discharge
+(3002 パターン)。次 iter = FeitThompson.lean の grid 供給部精読から。
+
+## ✅ (2026-07-12、/loop iter 24) — (13.19.b) 戦略確定: field 化 + FT 層 discharge
+
+**橋の実体**: hyp.tau3 = tau3W = `(tiCyclicW hG mp tp).sigmaIntegral rfl (tiCyclicWDadeApp)`
+(FeitThompson:268) — S05 の σ-isometry/chiFam 語彙に**直結**。ただし tiCyclicW /
+FullDadeApplication は FT 層構成物で S15 abstract 層からは不可視。
+∴ **(13.19.b) は hyp field 追加 + FT 層 producer discharge (3002 パターン) で閉じる**。
+field 設計 (次セッションで確定): Coq otau1eta の抽象単位は「X ∈ ℤ[Irr G]、‖X‖² = 2、
+X が Ŵ^G-消滅 → dirr 剛性: ∀ij (⟨X, η_ij⟩ = 0 ∨ η_ij = ±(X の半分))」— 実際の Coq は
+Ψ = τ₁ψ − τ₁ψ̄ 差形で η = ±τ₁ψ branch を ⟨Ψ,η⟩ ≠ 0 → NC ≥ min で殺す。候補形 2 つ:
+(A) sigmaCoeff-全零形「X ZIrr ∧ ‖X‖²=2 ∧ Ŵ-vanish ∧ (⟨X,η_ij⟩ ≠ 0 が高々…)」の直接
+NC-bound field、(B) eq_smul_chiFam_diff_of_vanishOnV の η-語彙 restate
+「X ZIrr ∧ ‖X‖²=2 ∧ (X − s(η_ij − η_kl)) Ŵ-vanish → X = s(η_ij − η_kl)」(S05 と 1:1、
+discharge は sigmaIntegral の chiFam↔eta 同定のみ)。**(B) 推奨** (producer が既存定理の
+直 restate で済む)。discharge 箇所 = FeitThompson の tau3_* 系 property 供給ブロック
+(:271-)。(13.19.b) 本体は (B) + Ã-局在 (iter 20 部品) + ψ⊥ψ̄ (既存) で S15 内で閉じる。
+⚠ merge +396 行 (4 files) — 次 iter 冒頭で統合 build 確認。
