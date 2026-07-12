@@ -56,6 +56,59 @@ Lean 側の型III/IV h56 chain (`S13_SixTwoBridge`) は per-member `CharacterPsi
 (S12_Noncoherence.lean) の 3 sorry が消え、`typeV_forces_coherence_v2` が honest 完成。
 build-green (S12_Noncoherence 及び影響 file)。
 
+## step 5 実装詳細 (次 iteration 用、全 lemma 名確定済)
+
+**commit 6ce607ce で step 1-4 完了 (generalization、full build green)。** 残 = 型V h56 wiring。
+`typeV_sixFiveA_bound` の証明構造 (template = `coherent_S_of_coherent_SH0C` S13_Lemmas113To115:35):
+
+```
+by_contra hgt; rw [not_le] at hgt   -- 4w₁²+1 < |Ab(K)|, K := (derivedInG M).subgroupOf M
+apply hnc
+obtain ⟨params, hmu, -, hζS, hζ1, hζne, hδpm, hδj⟩ := hyp.exists_charParameters_full hG
+-- Sset = SOf ⊥:  inducedFamily_eq_inducedKernelFamily_bot (S12)
+-- SOf := fun X => S08.inducedKernelFamily K X
+-- instances: TypeVData.isNilpotent_derivedInG_subgroupOf (要 dV), IsSolvable, Invertible
+-- hcoh: SOf ⁅K,K⁆ coherent   ← ★唯一の hard sub-piece (下記)
+-- case ⁅K,K⁆ = ⊥ (M' abelian): rwa [hcomm] at hcoh   (SOf ⊥ = 𝒮 coherent、hnc 矛盾)
+-- else: six_three_of_six_two_oracle (L:=M) (K:=K) (H:=K) (M:=⊥) (H₁:=⁅K,K⁆)
+--   hHnorm, bot_le, hH₁H (⁅K,K⁆<K: |Ab|>1), hHK=le_rfl, hyp.tau, hyp.A0, SOf, h56, hcoh, hbound
+-- hbound: commutator_subgroupOf_self ▸ hgt  (Nat.card(↥K⧸⁅K,K⁆.subgroupOf K)=|Ab(K)|),
+--   K.index = w₁ (typeP.card_W1_eq_derived_index)
+-- h56 (∀ A B): mirror S13_Lemmas:105-134 だが generalized 版:
+--   hyp.exists_source_index_le_two_psi_of_ne_top hG hAne hBne
+--     (hyp.sixTwoDecompositionData hG hmu hδpm hδj hζS hζ1 A B) hAcoh' hBncoh'
+--   (htype/chief 不要! hAne/hBne: A,B ≤ ⁅K,K⁆ < K ⟹ subgroupOf K ≠ ⊤)
+```
+
+### ★ hcoh の hard sub-piece = irreducibility bridge
+
+`SOf ⁅K,K⁆ = inducedKernelFamily K ⁅K,K⁆` の全 member `Ind_K θ` (θ trivial on ⁅K,K⁆ = θ linear,
+θ≠1) が **irreducible** であることを示せば、`SHC_isCoherent` (S12_Prop109:687、degree-w₁ irreducible
+族の coherence) に `inducedKernelFamily K ⁅K,K⁆ = SHCSet` で rewrite して hcoh 完成 (⊇ は degree のみで
+easy: degree-w₁ ⟹ θ(1)=1 ⟹ θ trivial on ⁅K,K⁆)。
+
+**bridge = 「θ nonprincipal linear (trivial on ⁅K,K⁆=M'') ⟹ Ind_K θ irreducible」**。数学的本質 =
+Frobenius M/M'' (kernel M'/M'') の fpf action ⟹ θ は W₁-fixed でない ⟹ inertia=K ⟹ Ind irreducible。
+Lean 経路候補:
+- `induce_isIrreducible_of_forall_chiRestrict_ne` (S06:931): `∀ χ₂, h.chiRestrict χ₂ ≠ θ` ⟹ Ind θ irr
+  (`h := (hyp.toCertainTypeHypothesis hG hG.odd).toHypothesis`, `h.K = K`)。
+- 要: 「chiRestrict χ₂ (= restrict_K μ_{0}(χ₂), W₁-fixed) ≠ θ (θ trivial on ⁅K,K⁆)」。
+  W₂.subgroupOf M ≤ ⁅K,K⁆ = `TypePData.W2_subgroupOf_le_commutator` (S12_TypeVSibley:175)。
+  chiRestrict 1 = trivial (`chiRestrict_one_eq_trivial`), θ≠1 ⟹ χ₂=1 排除。
+  **未解決の gap**: χ₂≠1 で「chiRestrict χ₂ が W₂ 上 nontrivial (∴ ⁅K,K⁆ 上 nontrivial ∴ ≠θ)」を
+  与える certain-type lemma が直接には無い。S06 の chiRestrict は W₁-fixed-point 特徴付け
+  (`chiRestrict_isFixedPt`/`inertia_eq_K_of_forall_chiRestrict_ne`) 中心で W₂-restriction 性質が薄い。
+  → 次 iteration: (i) S06 に「chiRestrict χ₂ の W₂ 制限 = χ₂」補題を足すか、(ii) 型V の M/M'' Frobenius を
+  `IsFrobeniusGroup` として取り出し Frobenius-kernel-induce-irreducible (cf. `S08_YsetConjugation:447
+  isIrreducibleCharacter_induce_of_degree_one` の Sibley 版、`normOneFrobeniusKernel_induce_isIrreducible`
+  BG/AppC:350) を非Sibley で適用。[[feedback-ask-chatgpt-for-elided-gaps]] 候補。
+
+### (6.5.b)/(6.5.c)
+(6.5.a) 完成後: (6.5.b) 非可換 = ¬coherent+hcoh から M''≠⊥ (M' abelian なら 𝒮 uniform→coherent 矛盾)、
+p-group = (6.5.a)+Frobenius (`isPGroup_of_isFrobeniusGroup_of_card_le`、ただし型V は quotient-Frobenius
+M/M'' ゆえ `S08_PGroupReduction` の full-Frobenius 版でなく quotient 版の導出要検討)、p=w₂ = W₂≤M''。
+(6.5.c) = `six_five_c_arith` (S08_PGroupReduction:149) 対偶。
+
 ## territory / coordination
 
 対象 file (S11/S12/S13 char-theory) は型III/IV coherence (lane b 隣接) を含むが、変更は
