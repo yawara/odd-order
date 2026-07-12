@@ -1292,6 +1292,46 @@ theorem omegaMonoidHom_coe
     (i : Fin base.q) (j : Fin base.p) (w : ↥base.W) :
     ((omegaMonoidHom base i j w : ℂˣ) : ℂ) = base.omega i j w := rfl
 
+/-- Two linear characters of `W = W₁ ⊔ W₂` are equal when their restrictions
+to both factors are equal.  This is the factorwise extensionality used to
+recover the two coordinate axes of the abstract omega-grid. -/
+theorem monoidHom_eq_of_eq_on_W1_W2 [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    {f g : ↥base.W →* ℂˣ}
+    (hW1 : ∀ x : ↥(base.W1.subgroupOf base.W), f x = g x)
+    (hW2 : ∀ y : ↥(base.W2.subgroupOf base.W), f y = g y) :
+    f = g := by
+  letI := base.W_cyclic
+  letI : CommGroup ↥base.W := IsCyclic.commGroup
+  have hW1le : base.W1 ≤ base.W := by
+    rw [base.W_eq_join]
+    exact le_sup_left
+  have hW2le : base.W2 ≤ base.W := by
+    rw [base.W_eq_join]
+    exact le_sup_right
+  ext w
+  have hw : w ∈ (base.W1.subgroupOf base.W) ⊔
+      (base.W2.subgroupOf base.W) := by
+    rw [← Subgroup.subgroupOf_sup hW1le hW2le, ← base.W_eq_join,
+      Subgroup.subgroupOf_self]
+    exact Subgroup.mem_top w
+  obtain ⟨x, hx, y, hy, hxy⟩ := Subgroup.mem_sup.mp hw
+  rw [← hxy, map_mul, map_mul, hW1 ⟨x, hx⟩, hW2 ⟨y, hy⟩]
+
+/-- Restriction of the column-zero omega character `omega i 0` to `W₁`. -/
+noncomputable def omegaW1Restriction
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    (i : Fin base.q) : ↥(base.W1.subgroupOf base.W) →* ℂˣ :=
+  (omegaMonoidHom base i ⟨0, base.p_prime.pos⟩).comp
+    (base.W1.subgroupOf base.W).subtype
+
+/-- Restriction of the row-zero omega character `omega 0 j` to `W₂`. -/
+noncomputable def omegaW2Restriction
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    (j : Fin base.p) : ↥(base.W2.subgroupOf base.W) →* ℂˣ :=
+  (omegaMonoidHom base ⟨0, base.q_prime.pos⟩ j).comp
+    (base.W2.subgroupOf base.W).subtype
+
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (3.3), abstract omega-grid exhaustion.**
 The `q*p` multiplicative characters underlying the S15 omega-grid are
@@ -1334,6 +1374,172 @@ theorem omegaMonoidHom_bijective [Finite G]
     exact hcardHomNat
   exact (Fintype.bijective_iff_injective_and_card _).mpr
     ⟨hinj, by simp [hcardHom]⟩
+
+/-- Distinct column-zero omega characters remain distinct on `W₁`; on the
+other factor they are all trivial. -/
+theorem omegaW1Restriction_injective [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+    Function.Injective (omegaW1Restriction base) := by
+  intro i k hik
+  have hhom : omegaMonoidHom base i ⟨0, base.p_prime.pos⟩ =
+      omegaMonoidHom base k ⟨0, base.p_prime.pos⟩ := by
+    apply monoidHom_eq_of_eq_on_W1_W2 base
+    · intro x
+      exact DFunLike.congr_fun hik x
+    · intro y
+      apply Units.ext
+      rw [omegaMonoidHom_coe, omegaMonoidHom_coe,
+        base.omega_col_zero_apply_of_mem_W2 i y
+          (Subgroup.mem_subgroupOf.mp y.property),
+        base.omega_col_zero_apply_of_mem_W2 k y
+          (Subgroup.mem_subgroupOf.mp y.property)]
+  have hp : ((i, ⟨0, base.p_prime.pos⟩) : Fin base.q × Fin base.p) =
+      (k, ⟨0, base.p_prime.pos⟩) :=
+    (omegaMonoidHom_bijective base).injective hhom
+  exact congrArg Prod.fst hp
+
+/-- Distinct row-zero omega characters remain distinct on `W₂`; on the
+other factor they are all trivial. -/
+theorem omegaW2Restriction_injective [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+    Function.Injective (omegaW2Restriction base) := by
+  intro j l hjl
+  have hhom : omegaMonoidHom base ⟨0, base.q_prime.pos⟩ j =
+      omegaMonoidHom base ⟨0, base.q_prime.pos⟩ l := by
+    apply monoidHom_eq_of_eq_on_W1_W2 base
+    · intro x
+      apply Units.ext
+      rw [omegaMonoidHom_coe, omegaMonoidHom_coe,
+        base.omega_row_zero_apply_of_mem_W1 j x
+          (Subgroup.mem_subgroupOf.mp x.property),
+        base.omega_row_zero_apply_of_mem_W1 l x
+          (Subgroup.mem_subgroupOf.mp x.property)]
+    · intro y
+      exact DFunLike.congr_fun hjl y
+  have hp : ((⟨0, base.q_prime.pos⟩, j) : Fin base.q × Fin base.p) =
+      (⟨0, base.q_prime.pos⟩, l) :=
+    (omegaMonoidHom_bijective base).injective hhom
+  exact congrArg Prod.snd hp
+
+open scoped Classical in
+/-- **Peterfalvi (3.3), `W₁` axis exhaustion.**  The column-zero omega
+characters restrict bijectively to all complex linear characters of `W₁`.
+The injectivity is factorwise rigidity; surjectivity follows because both
+sides have cardinality `q`. -/
+theorem omegaW1Restriction_bijective [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+    Function.Bijective (omegaW1Restriction base) := by
+  classical
+  have hinj := omegaW1Restriction_injective base
+  have hW1le : base.W1 ≤ base.W := by
+    rw [base.W_eq_join]
+    exact le_sup_left
+  haveI : IsCyclic ↥base.W := base.W_cyclic
+  letI : CommGroup ↥base.W := IsCyclic.commGroup
+  haveI : Fintype (↥(base.W1.subgroupOf base.W) →* ℂˣ) := Fintype.ofFinite _
+  haveI : NeZero (Monoid.exponent ↥(base.W1.subgroupOf base.W)) :=
+    ⟨Monoid.exponent_ne_zero_of_finite⟩
+  haveI : NeZero ((Monoid.exponent ↥(base.W1.subgroupOf base.W) : ℂ)) :=
+    ⟨Nat.cast_ne_zero.2 (NeZero.ne _)⟩
+  have hcardHomNat :
+      Nat.card (↥(base.W1.subgroupOf base.W) →* ℂˣ) = base.q := by
+    rw [CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity
+      ↥(base.W1.subgroupOf base.W) ℂ,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv,
+      ← base.q_eq_card_W1]
+  have hcardHom :
+      Fintype.card (↥(base.W1.subgroupOf base.W) →* ℂˣ) = base.q := by
+    rw [← Nat.card_eq_fintype_card]
+    exact hcardHomNat
+  exact (Fintype.bijective_iff_injective_and_card _).mpr
+    ⟨hinj, by simp [hcardHom]⟩
+
+open scoped Classical in
+/-- **Peterfalvi (3.3), `W₂` axis exhaustion.**  The row-zero omega
+characters restrict bijectively to all complex linear characters of `W₂`.
+The injectivity is factorwise rigidity; surjectivity follows because both
+sides have cardinality `p`. -/
+theorem omegaW2Restriction_bijective [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+    Function.Bijective (omegaW2Restriction base) := by
+  classical
+  have hinj := omegaW2Restriction_injective base
+  have hW2le : base.W2 ≤ base.W := by
+    rw [base.W_eq_join]
+    exact le_sup_right
+  haveI : IsCyclic ↥base.W := base.W_cyclic
+  letI : CommGroup ↥base.W := IsCyclic.commGroup
+  haveI : Fintype (↥(base.W2.subgroupOf base.W) →* ℂˣ) := Fintype.ofFinite _
+  haveI : NeZero (Monoid.exponent ↥(base.W2.subgroupOf base.W)) :=
+    ⟨Monoid.exponent_ne_zero_of_finite⟩
+  haveI : NeZero ((Monoid.exponent ↥(base.W2.subgroupOf base.W) : ℂ)) :=
+    ⟨Nat.cast_ne_zero.2 (NeZero.ne _)⟩
+  have hcardHomNat :
+      Nat.card (↥(base.W2.subgroupOf base.W) →* ℂˣ) = base.p := by
+    rw [CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity
+      ↥(base.W2.subgroupOf base.W) ℂ,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv,
+      ← base.p_eq_card_W2]
+  have hcardHom :
+      Fintype.card (↥(base.W2.subgroupOf base.W) →* ℂˣ) = base.p := by
+    rw [← Nat.card_eq_fintype_card]
+    exact hcardHomNat
+  exact (Fintype.bijective_iff_injective_and_card _).mpr
+    ⟨hinj, by simp [hcardHom]⟩
+
+/-- The zero-column indices as an explicit enumeration of `W₁`'s linear
+characters. -/
+noncomputable def omegaW1RestrictionEquiv [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+    Fin base.q ≃ (↥(base.W1.subgroupOf base.W) →* ℂˣ) :=
+  Equiv.ofBijective (omegaW1Restriction base)
+    (omegaW1Restriction_bijective base)
+
+/-- The zero-row indices as an explicit enumeration of `W₂`'s linear
+characters. -/
+noncomputable def omegaW2RestrictionEquiv [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+    Fin base.p ≃ (↥(base.W2.subgroupOf base.W) →* ℂˣ) :=
+  Equiv.ofBijective (omegaW2Restriction base)
+    (omegaW2Restriction_bijective base)
+
+/-- The zero index on the `W₁` axis is the trivial linear character. -/
+theorem omegaW1Restriction_zero [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+  omegaW1Restriction base ⟨0, base.q_prime.pos⟩ = 1 := by
+  ext x
+  change base.omega ⟨0, base.q_prime.pos⟩ ⟨0, base.p_prime.pos⟩ x = 1
+  exact base.omega_row_zero_apply_of_mem_W1 ⟨0, base.p_prime.pos⟩ x
+    (Subgroup.mem_subgroupOf.mp x.property)
+
+/-- The zero index on the `W₂` axis is the trivial linear character. -/
+theorem omegaW2Restriction_zero [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+  omegaW2Restriction base ⟨0, base.p_prime.pos⟩ = 1 := by
+  ext y
+  change base.omega ⟨0, base.q_prime.pos⟩ ⟨0, base.p_prime.pos⟩ y = 1
+  exact base.omega_col_zero_apply_of_mem_W2 ⟨0, base.q_prime.pos⟩ y
+    (Subgroup.mem_subgroupOf.mp y.property)
+
+/-- The inverse `W₁`-axis enumeration sends the trivial character back to
+the distinguished zero index. -/
+theorem omegaW1RestrictionEquiv_symm_one [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+    (omegaW1RestrictionEquiv base).symm 1 = ⟨0, base.q_prime.pos⟩ := by
+  apply (omegaW1RestrictionEquiv base).injective
+  rw [Equiv.apply_symm_apply]
+  change 1 = omegaW1Restriction base ⟨0, base.q_prime.pos⟩
+  exact (omegaW1Restriction_zero base).symm
+
+/-- The inverse `W₂`-axis enumeration sends the trivial character back to
+the distinguished zero index. -/
+theorem omegaW2RestrictionEquiv_symm_one [Finite G]
+    (base : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
+    (omegaW2RestrictionEquiv base).symm 1 = ⟨0, base.p_prime.pos⟩ := by
+  apply (omegaW2RestrictionEquiv base).injective
+  rw [Equiv.apply_symm_apply]
+  change 1 = omegaW2Restriction base ⟨0, base.p_prime.pos⟩
+  exact (omegaW2Restriction_zero base).symm
 
 open scoped Classical in
 /-- Every complex linear character of the shared cyclic `W` is one omega-grid entry. -/

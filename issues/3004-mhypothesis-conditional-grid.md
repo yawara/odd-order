@@ -1072,3 +1072,24 @@ feature commits: `d5f7fc38`, `061229b4`, `bb2c9868`, `960907f6`。
 
 次はこの full-grid bijection を W1/W2 restriction で分解し、zero-axis を保存する
 `Fin dataT.w1 ≃ Fin base.p` / `Fin dataT.w2 ≃ Fin base.q` を構成する。
+
+### factorwise omega-axis exhaustion (2026-07-12 続行 4)
+
+- `monoidHom_eq_of_eq_on_W1_W2` で、`W = W1 ⊔ W2` の両 factor 上で一致する W-linear
+  characters が全体で一致することを証明した。cyclic W の可換性と subgroup join 分解だけを
+  用い、carrier への追加仮定はない。
+- zero-column / zero-row を各 factor へ制限する `omegaW1Restriction` /
+  `omegaW2Restriction` を構成した。他方の factor 上の triviality と full-grid injectivity から
+  両 restriction family の injectivity を証明し、さらに
+  `|Hom(W1,C^x)|=|W1|=q`, `|Hom(W2,C^x)|=|W2|=p` で bijectivity まで上げた。
+- `omegaW1RestrictionEquiv` / `omegaW2RestrictionEquiv` は explicit な axis enumeration。
+  zero index が trivial character へ行き、逆写像も trivial character を zero へ戻すことを
+  `omegaW1RestrictionEquiv_symm_one` / `omegaW2RestrictionEquiv_symm_one` で固定した。
+- leaf build green、新 `sorry`・新 axiom・signature 変更なし。main 同期済み。
+
+次 frontier は source S12 grid の multiplicative characters を reconciled equality
+`dataT.W = base.W`, `dataT.W1 = base.W2`, `dataT.W2 = base.W1` で上の factor Hom へ transportし、
+axis equivalenceを合成して zero-preserving
+`Fin dataT.w1 ≃ Fin base.p` / `Fin dataT.w2 ≃ Fin base.q` を構成する。その後、regular `v` 上で
+S12 `sigma` と S15 `tau3` がとも transported underlying character の値を返すことから
+`alignedOmegaSigmaGrid i k v = eta (colEquiv k) (rowEquiv i) v` を証明する。
