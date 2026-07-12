@@ -71,7 +71,8 @@ Hypothesis (11.2) (M maximal, type III/IV)、ζ ∈ 𝒮(HC):
       (9.8.d) count `((p−1)/a)·(|U|/(a|U′|)) ≤ #{qa-irreducibles in 𝒮(H₀U′)}`。
       λ 存在は正値性 ((p−1)/a ≥ 1 ⟸ a∣p−1、|U|/(a|U′|) ≥ 1 ⟸ a∣[U:U′]) から。
       (9.8.b) μ_j 度数 qu / (9.8.c) も同 theorem。CliffordCaseAData が a_pos/a_dvd_p_sub_one 持ち。
-- [ ] **P2 (11.9.a)** 行0射影 (§11): S13 新 leaf で grid 係数解析。
+- [x] **P2 (11.9.a)** 行0射影 (§11): ✅ **DONE** (S13_TypeIIIGalois、
+      `inner_tau_muColumnZero_sub_zeta_rowZero_of_residual_not_orthogonal`、AxiomsCheck 登録済)。
       ⚠ (3.8) trichotomy は転置方向で NC 境界不成立 (NC≤w₁+1 は列 w₁ 本/行 w₂ 本双方を許す) —
       書籍通りの **Galois 定数性 (3.9.b) + (3.7) 分離 + norm≤q + case 分析**が必要。
       case 分析: all-zero は a₀₀=1 で、列枝は h118 ((11.8) refuter) で排除 → 行0枝。
@@ -153,14 +154,18 @@ Hypothesis (11.2) (M maximal, type III/IV)、ζ ∈ 𝒮(HC):
   新 leaf = `S13_TypeIIIGalois.lean` (import: S13_Orthogonality + S12_Props109To1011 +
   S07_CoherenceGalois + S06_CertainTypeConjugation)。着手順 = G2 (shared hoist) → G4 → G1 → G3 →
   本体。
-- [ ] **P3 (c) 組立**: u=a → q<p 矛盾 → Galois → `U_cyclic` → `isTypeIII_of_isTypeIIIorIV`
-      (普遍 Type-IV 排除) + T-side 供給形 (c が cite する signature)。
+- [x] **P3 (c) 組立**: ✅ **DONE (2026-07-12、commits 775f2d86/678b6826/29b08747/700ba71f+)** —
+      下記「納品 (P3 完了)」参照。
   - [x] **q∣u−1 部品 landed (2026-07-12)**: `card_uActionHom_range_modEq_one` (u ≡ 1 mod q、
         S11_ImprimitiveUBound、sorry-free・build 一発 green) + 抽出補題
         `fixedSubgroup_quotient_uActionKer_eq_bot` (C_Ū(W̄₁)=1)。AxiomsCheck 登録。
   - 残: nilpotent + U/U′ cyclic → U cyclic (mathlib/Isaacs 確認 — Coq
         cyclic_nilpotent_quo_der1_cyclic 対応)、u=a pin 議論 (S11↔S13 world bridge)、組立。
-- [ ] AxiomsCheck 登録 + consumer への配線 note (1016/9013/2018 参照)。
+- [x] consumer への配線 note = 下記納品 section (2026-07-12)。AxiomsCheck 登録は **deferred**:
+      P3 組立群は `coherent_sOf_H0C` (lane-b (9.11.2) refuter) +
+      `exists_zeta_residual_not_orthogonal_H0C_of_refuter` (§14 Sibley glue (6.7)/(5.8)) を
+      推移 cite するため sorry-free でなく、**trigger = これら上流の sorry-free 化着地時**に
+      keystone とまとめて登録 (sorried-cite 規約)。
 
 ## u=a pin 設計 (iter10 確定 — 実装は次 iteration)
 
@@ -225,6 +230,34 @@ conj は 2 半分を交換し行 0 ↔ 行 0 (−0=0) ⟹ conj f0 = ±t0 ⟹ E �
 Eᶜ 側と結ばれ exactly-one が出る (符号 bookkeeping は certainTypeRImage の δ-規約次第 —
 要精査; 破綻時 fallback = Coq PFsection5 coherent_prDade_TIred (no-mix 完全版) port)。
 grid-conj 部品: `certainType_columnSum_conj` / mapRingEquiv conj 系 (S06_CertainTypeConjugation)。
+
+## 納品 (P3 完了、2026-07-12 lane a)
+
+S13_NonGaloisExclusion.lean (1035 行、leaf 内 sorry 0) に (11.9.c) 全チェーン:
+
+| theorem | 内容 |
+|---|---|
+| `not_cliffordCaseA_of_hypothesis` | 非Galois 排除 (keystone u=a + u≡1 mod q + a∣p−1 + (11.9.b); u=1 枝は U_noncentral_on_quotient) |
+| `U_isCyclic_of_hypothesis` | caseB Ū cyclic (Singer) + ker=cSub=C=U′ ((11.6)/(11.7)、C_eq_cSub) + U nilpotent + **9086 engine** |
+| `U_isMulCommutative_of_hypothesis` | IsMulCommutative ↥hyp.base.typeP.U |
+| `isMulCommutative_typePData_U_of_typePData_U` | TypePData witness 間 U-可換性 transfer (Schur–Zassenhaus 共役) |
+| `not_isTypeIV_of_hypothesis` / `isTypeIII_of_hypothesis` | Hypothesis (11.2) 下の Type III 判定 (Coq FTtype34_structure (c)) |
+| **`not_isTypeIV_of_mem_maximalSubgroups`** | **普遍 Type-IV 排除 per-M 形 (前提 = hG + M maximal のみ)** |
+| `no_typeIV_maximal` | 同 ∃-形 (no_typeV_maximal の対、FT spine 用) |
+
+shared infra: `OddOrder/GroupTheory/NilpotentAbelianization.lean` (issue 9086、sorry-free、
+AxiomsCheck 登録済) — nilpotent + cyclic abelianization ⟹ cyclic。
+
+### consumer 配線
+
+- **c (T-side, S16 TTypeII:784 hVcomm)**: `T_not_isTypeIV_of_isTypeP1` の結論は
+  **`not_isTypeIV_of_mem_maximalSubgroups hG hyp.base.T_maximal` の直 cite で丸ごと discharge**
+  (hVcomm sorry・V-可換性・isMulCommutative_typePData_U_of_V 経由は不要になる;
+  import + S13_NonGaloisExclusion は S16 から cycle-safe)。T-side instantiate 作業消滅。
+- **b (S-side 13.12/13.13)**: §9 case 構造 export は従来通り (S は type II ゆえ本定理の対象外、
+  numeric export = caseA_character_counts 系を直接使う)。
+- 推移 sorry の所在: `coherent_sOf_H0C` ← lane-b (9.11.2) refuter;
+  refuter core ← §14 Sibley glue (6.7)/(5.8)。これらが埋まれば (11.9.c) は端から端まで sorry-free。
 
 ## 完了条件
 
