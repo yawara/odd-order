@@ -152,15 +152,22 @@ theorem S_H0C_not_coherent [Finite G]
   fun hcoh => OddOrder.Peterfalvi.S12.S_not_coherent _hG hyp.base
     (coherent_S_of_coherent_SH0C _hG hyp hcoh)
 
-/-- **Peterfalvi (11.4)**: if `S(H_1)` is coherent for a normal subgroup `H_1 < M'`,
-then `|M'/H_1| - 1 ≤ 2 q |U/C|` (the quotient bound from Theorem (6.2)), stated here in
-the subtraction-free form `|M' : H_1| ≤ 2 q |U : C| + 1`. -/
-theorem coherent_quotient_bound [Finite G]
+/-- **Peterfalvi (11.4), parametrized on the (11.3) non-coherence** (issue 1025): if `S(H_1)`
+is coherent for a normal subgroup `H_1 < M'`, then `|M'/H_1| - 1 ≤ 2 q |U/C|` (the quotient
+bound from Theorem (6.2)), stated in the subtraction-free form `|M' : H_1| ≤ 2 q |U : C| + 1`.
+The (11.3) non-coherence `hnc` of `𝒮(H₀C)` is taken as a hypothesis (rather than cited from the
+legacy sorried `S_H0C_not_coherent`) so a caller who has an *axiom-clean* (11.3) — the spine's
+`S_H0C_not_coherent_unconditional`, threaded through `exists_zeta_residual_..._of_refuter`'s
+`hrefute` — gets an axiom-clean bound.  The legacy wrapper `coherent_quotient_bound` supplies the
+sorried `S_H0C_not_coherent` for the upstream (import-blocked) consumers. -/
+theorem coherent_quotient_bound_of_noncoherent [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M H1 : Subgroup G}
     (hyp : Hypothesis M) (hH1_norm : M ≤ Subgroup.normalizer (H1 : Set G))
     (hH1_lt : H1 < derivedInG M)
     (hcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf H1) hyp.base.A0)) :
+      hyp.base.tau (hyp.SOf H1) hyp.base.A0))
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0)) :
     H1.relIndex (derivedInG M) ≤ 2 * hyp.q * hyp.C.relIndex hyp.U + 1 := by
   classical
   -- normality instances for the section subgroups and their traces
@@ -188,7 +195,7 @@ theorem coherent_quotient_bound [Finite G]
         (hyp.base.dadeData.dade.fullDadeIsometryData hyp.base.hconj))
       (OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M)
         (hyp.H0C.subgroupOf M)) hyp.base.A0) := by
-    have h := S_H0C_not_coherent _hG hyp
+    have h := hnc
     rw [hyp.SOf_eq] at h
     exact h
   -- the (6.2) bound at `(C, D) = (HC, HC)`-traces
@@ -240,6 +247,19 @@ theorem coherent_quotient_bound [Finite G]
         change 2 * (hyp.base.w1 * hyp.C.relIndex hyp.U) + 1
           = 2 * hyp.base.w1 * hyp.C.relIndex hyp.U + 1
         ring
+
+/-- **Peterfalvi (11.4)** (legacy wrapper): `coherent_quotient_bound_of_noncoherent` at the
+sorried (11.3) `S_H0C_not_coherent`.  Carries the (11.3) `sorryAx` debt for the import-blocked
+upstream consumers; the axiom-clean spine path uses `_of_noncoherent` directly (issue 1025). -/
+theorem coherent_quotient_bound [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M H1 : Subgroup G}
+    (hyp : Hypothesis M) (hH1_norm : M ≤ Subgroup.normalizer (H1 : Set G))
+    (hH1_lt : H1 < derivedInG M)
+    (hcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf H1) hyp.base.A0)) :
+    H1.relIndex (derivedInG M) ≤ 2 * hyp.q * hyp.C.relIndex hyp.U + 1 :=
+  coherent_quotient_bound_of_noncoherent _hG hyp hH1_norm hH1_lt hcoh
+    (S_H0C_not_coherent _hG hyp)
 
 /-- **`HC < M'`** (sorry-free): if `HC = M'` then `U ≤ HC = H·C`; decomposing `u = a·b`
 (`a ∈ H`, `b ∈ C`) along the normal `H`-factor forces `a ∈ H ∩ U = ⊥`, so `u = b ∈ C`,
@@ -825,12 +845,15 @@ noncomputable def coherent_SOf_H0C_of_glued [Finite G] {M : Subgroup G} (hyp : H
     coh hY ν hagreeX hagreeY
     (fun _ hu _ hv => span_inner_SOf_HC_sOf_H0C_eq_zero hyp hu hv) hmixed D hDτ hgen
 
-/-- **Peterfalvi (11.5), reverse inclusion `HC ⊆ M''`** (named obligation): the coherence content
-of (11.5).  Since `M'/M''` is abelian, `S(M'')` is coherent by (5.7); the quotient bound (11.4)
-together with (11.1)/(9.6) then forces `M'' = HC`.  Char-gated — it bottoms out in Theorem (10.8)
-via (11.3)/(11.4) — so it is left as a clean named subgroup-inclusion obligation. -/
-theorem HC_le_secondDerived [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hyp : Hypothesis M) :
+/-- **Peterfalvi (11.5), reverse inclusion `HC ⊆ M''`, parametrized on the (11.3) non-coherence**
+(issue 1025): the coherence content of (11.5).  Since `M'/M''` is abelian, `S(M'')` is coherent by
+(5.7); the quotient bound (11.4) together with (11.1)/(9.6) then forces `M'' = HC`.  The (11.3)
+non-coherence `hnc` of `𝒮(H₀C)` is a hypothesis (see `coherent_quotient_bound_of_noncoherent`); the
+legacy wrapper `HC_le_secondDerived` supplies the sorried `S_H0C_not_coherent`. -/
+theorem HC_le_secondDerived_of_noncoherent [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0)) :
     hyp.HC ≤ secondDerivedInAmbient M := by
   classical
   rw [← Subgroup.relIndex_eq_one]
@@ -839,8 +862,8 @@ theorem HC_le_secondDerived [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   -- `(11.4)` at `H₁ := M''` with `(5.7)`
   have hM''lt : secondDerivedInAmbient M < derivedInG M :=
     lt_of_le_of_lt hyp.secondDerived_le_HC hHCltM'
-  have h114 := coherent_quotient_bound _hG hyp le_normalizer_secondDerived hM''lt
-    (hyp.secondDerived_coherent _hG)
+  have h114 := coherent_quotient_bound_of_noncoherent _hG hyp le_normalizer_secondDerived hM''lt
+    (hyp.secondDerived_coherent _hG) hnc
   -- tower `|M':M''| = X·|U:C|`
   set X := (secondDerivedInAmbient M).relIndex hyp.HC with hX
   set v := hyp.C.relIndex hyp.U with hv
@@ -900,15 +923,31 @@ theorem HC_le_secondDerived [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
       omega
     omega
 
+/-- **Peterfalvi (11.5) reverse** (legacy wrapper): `HC_le_secondDerived_of_noncoherent` at the
+sorried (11.3) `S_H0C_not_coherent`, for the import-blocked upstream consumers (issue 1025). -/
+theorem HC_le_secondDerived [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.HC ≤ secondDerivedInAmbient M :=
+  HC_le_secondDerived_of_noncoherent _hG hyp (S_H0C_not_coherent _hG hyp)
+
+/-- **Peterfalvi (11.5), parametrized on (11.3) non-coherence** (issue 1025): `M'' = HC` from the
+reverse `HC_le_secondDerived_of_noncoherent hnc` and the unconditional `secondDerived_le_HC`. -/
+theorem secondDerived_eq_HC_of_noncoherent [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0)) :
+    secondDerivedInAmbient M = hyp.HC :=
+  le_antisymm hyp.secondDerived_le_HC (HC_le_secondDerived_of_noncoherent _hG hyp hnc)
+
 /-- **Peterfalvi (11.5)**: the second derived subgroup is `H C`, i.e. `M'' = HC`.
 
 `M'' ⊆ HC` is unconditional ((8.5.a), `secondDerived_le_HC`); the reverse `HC ⊆ M''` is the
 coherence content carried by `HC_le_secondDerived`.  The theorem composes the two with no `sorry`
-of its own. -/
+of its own.  (Legacy wrapper of `secondDerived_eq_HC_of_noncoherent` at the sorried (11.3).) -/
 theorem secondDerived_eq_HC [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) :
     secondDerivedInAmbient M = hyp.HC :=
-  le_antisymm hyp.secondDerived_le_HC (HC_le_secondDerived _hG hyp)
+  secondDerived_eq_HC_of_noncoherent _hG hyp (S_H0C_not_coherent _hG hyp)
 
 /-- **Peterfalvi (11.6), `C = U'`**: `U' ≤ C` is (8.5.b) (`derivedU_le_C`); conversely
 `C ≤ HC = M'' ≤ H ⊔ U'` ((11.5) + `secondDerived_le_H_sup_derivedU`), and an
