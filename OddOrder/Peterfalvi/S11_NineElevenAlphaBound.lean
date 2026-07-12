@@ -194,9 +194,7 @@ theorem sOf_H0Cprime_reducible_eq_columnSum
     have h := hyp.sOf_subset_SOf hyp.H0Cprime hη
     rwa [hyp.SOf_eq] at h
   obtain ⟨k, hk0, hkeq⟩ := hyp.base.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum hG
-    hyp.type_alt (OddOrder.GroupTheory.typePNontrivialCore_of_isTypeIIIorIV hyp.type_alt
-      hyp.base.typeP)
-    (OddOrder.Peterfalvi.S11.exists_chiefFactorData hG _).choose hηIKF hirr
+    hηIKF hirr
   exact ⟨k, hk0, hkeq.trans (hyp.base.muGrid_columnSum_eq_columnSum hG hG.odd k)⟩
 
 /-- **Per-member orthonormal `R`-family over `𝒮(H₀C′)`, `hunif`-free** (mirror of
@@ -437,9 +435,7 @@ theorem SOf_reducible_eq_columnSum
       ((derivedInG M).subgroupOf M) (N.subgroupOf M) := by
     rwa [hyp.SOf_eq] at hη
   obtain ⟨k, hk0, hkeq⟩ := hyp.base.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum hG
-    hyp.type_alt (OddOrder.GroupTheory.typePNontrivialCore_of_isTypeIIIorIV hyp.type_alt
-      hyp.base.typeP)
-    (OddOrder.Peterfalvi.S11.exists_chiefFactorData hG _).choose hηIKF hirr
+    hηIKF hirr
   exact ⟨k, hk0, hkeq.trans (hyp.base.muGrid_columnSum_eq_columnSum hG hG.odd k)⟩
 
 /-- **Per-member orthonormal `R`-family over `S(N)`** (stratum-generic

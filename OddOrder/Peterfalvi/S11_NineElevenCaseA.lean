@@ -585,9 +585,7 @@ theorem nineElevenPairBound [Finite G]
   obtain ⟨Da, hDatau1, hdatum⟩ := hyp.base.sixTwoDecompositionData hG
     (hyp.params_mu_eq hG hG.odd) hyp.params_delta_pm
     (fun j hj => hyp.params_delta_sign hG hG.odd j hj)
-    hyp.params_zeta_mem hyp.params_zeta_degree hyp.type_alt hnt
-    ((OddOrder.Peterfalvi.S11.exists_chiefFactorData hG
-      (hyp.base.toTypesIIIIIIVSetup hyp.type_alt hnt)).choose)
+    hyp.params_zeta_mem hyp.params_zeta_degree
     (hyp.H0Cprime.subgroupOf M) (hyp.H0Cprime.subgroupOf M)
     S₂ hS₂conj hsub cohS₂
     (OddOrder.Peterfalvi.S11.induceHU hyp.s11Setup
