@@ -1093,5 +1093,50 @@ theorem exceptional_case_frobenius_realization [Finite G]
   rw [← hM'eq]
   exact hfrob2
 
+/-- **Peterfalvi (9.8.d), existence form**: in case (9.7.a) the family `𝒮(H₀U′)` contains an
+irreducible character of degree `q·a` — the character `λ` of the (11.9.c) non-Galois
+contradiction (`ψ = μ_j − (u/a)λ`, issue 1024).  Positivity of the (9.8.d) count
+(`caseA_character_counts`): `(p−1)/a ≥ 1` since `a ∣ p−1` (`a_dvd_p_sub_one`), and
+`|U|/(a|U′|) = [C_U(S₀) : U′] ≥ 1` (`card_U_div_a_mul_card_Uprime_eq_relIndex`). -/
+theorem caseA_exists_irreducible_qa [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief) (caseA : CliffordCaseAData chars) :
+    ∃ χ ∈ chars.SOf (chief.H0 ⊔ chars.Uprime),
+      IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * caseA.a : ℕ) : ℂ) := by
+  classical
+  obtain ⟨-, -, -, hcount⟩ := caseA_character_counts hG chars caseA
+  have hppos : 0 < chief.p - 1 := by
+    have := chief.p_prime.two_le; omega
+  have hf1 : 1 ≤ (chief.p - 1) / caseA.a :=
+    (Nat.one_le_div_iff caseA.a_pos).mpr (Nat.le_of_dvd hppos caseA.a_dvd_p_sub_one)
+  have hf2 : 1 ≤ Nat.card ↥data.U / (caseA.a * Nat.card ↥chars.Uprime) := by
+    show 1 ≤ Nat.card ↥data.U / (caseA.a * Nat.card ↥(uprimeSub data))
+    rw [card_U_div_a_mul_card_Uprime_eq_relIndex caseA]
+    have hne : (uprimeSub data).relIndex (cuSub caseA) ≠ 0 := by
+      rw [Subgroup.relIndex]
+      exact Subgroup.index_ne_zero_of_finite
+    omega
+  have hpos : {χ ∈ chars.SOf (chief.H0 ⊔ chars.Uprime) |
+      IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}.ncard ≠ 0 := by
+    have h1 : (1 : ℕ) ≤ ((chief.p - 1) / caseA.a)
+        * (Nat.card ↥data.U / (caseA.a * Nat.card ↥chars.Uprime)) :=
+      Nat.one_le_iff_ne_zero.mpr (Nat.mul_ne_zero (by omega) (by omega))
+    omega
+  obtain ⟨χ, hχ⟩ := Set.nonempty_of_ncard_ne_zero hpos
+  exact ⟨χ, hχ.1, hχ.2.1, hχ.2.2⟩
+
+/-- **`a ∣ u`** (Peterfalvi (11.9.c) integrality input): the Clifford integer `a = [U : C_U(S₀)]`
+divides `u = [U : C_U(H̄)]`, since `C_U(H̄) ≤ C_U(S₀)` (`cInHu_le_cuInHu`) — index
+antitonicity through the two first-isomorphism identifications
+(`index_cuInHu_subgroupOf_uInHu_eq_a`, `index_cInHu_subgroupOf_uInHu_eq_u`). -/
+theorem caseA_a_dvd_u [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
+    (caseA : CliffordCaseAData chars) :
+    caseA.a ∣ chars.u := by
+  rw [caseA.a_eq_card_restrictAut_range, ← index_cuInHu_subgroupOf_uInHu_eq_a caseA,
+    ← index_cInHu_subgroupOf_uInHu_eq_u data chief chars]
+  exact Subgroup.index_dvd_of_le (fun x hx =>
+    Subgroup.mem_subgroupOf.mpr (cInHu_le_cuInHu caseA (Subgroup.mem_subgroupOf.mp hx)))
+
 end OddOrder.Peterfalvi.S11
 
