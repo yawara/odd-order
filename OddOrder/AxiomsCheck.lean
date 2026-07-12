@@ -115,6 +115,7 @@ import OddOrder.Peterfalvi.S08_SixTwoGeneral
 import OddOrder.Peterfalvi.S13_CoreStructure
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.Peterfalvi.S10_CoherenceWiring
+import OddOrder.GroupTheory.RepresentationTheory.GaloisInnerTransport
 import OddOrder.Peterfalvi.S11_ImprimitiveUBound
 import OddOrder.Peterfalvi.S12_Noncoherence
 import OddOrder.Peterfalvi.S12_TypeVCaseC
@@ -3360,6 +3361,9 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.exists_typeIII_primeTIredZero_with_projectionData
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.exists_typeIII_primeTIredZero_with_projectionData_galois_and_eq_induce
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.exists_typeIII_primeTIredZero_with_projectionData_and_galois
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
@@ -3504,6 +3508,15 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.s12_muGrid_zeroColumn_sum_eq_induce_trivial
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.s12Tau_zeroColumn_sub_eq_tSideDadeMap
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.tau_muColumnSum_sub_zeta_eq_of_grid_alphaImage
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.residual_not_orthogonal_of_transposed_reindexing
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.exists_charParameters_full_for_member
 set_option linter.style.longLine false in
@@ -7520,3 +7533,11 @@ The Frobenius fixed-point-freeness of the `W₁`-conjugation on the `U`-action i
 the Peterfalvi (11.9.c) non-Galois contradiction `q ≤ u − 1 < u = a ≤ p − 1 < p`. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.fixedSubgroup_quotient_uActionKer_eq_bot
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.card_uActionHom_range_modEq_one
+
+/-! **ZIrr-Galois 内積 transport (shared leaf), axiom-clean** (lane a, 2026-07-12, issue 9085).
+`mapRingEquiv` の ZIrr 上 ℤ-等長性と Galois 係数定数性 engine — (10.9)/(11.9.a) 型 grid 解析の
+(3.9.b) 行/列定数性の generic 核 (S16 TGapGalois の generic 部 hoist)。 -/
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.inner_mapRingEquiv_eq_of_mem_ZIrr
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.inner_eq_intCast_of_mapRingEquiv_eq_add
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.inducedFamily_closedUnderMapRingEquiv
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.mapRingEquiv_muColumnZero_sum
