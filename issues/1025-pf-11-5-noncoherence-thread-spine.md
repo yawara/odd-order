@@ -140,3 +140,39 @@ clean 化できない** (optParam 不可)。当初「~15-25 theorem 1 pass」→
 - legacy wrapper が sorried のまま残るのは意図どおり (他の legacy consumer 用)。spine path のみ clean 化。
 - CLAUDE.md「sorry-free 化の着地を目的にしない」に留意しつつ: 本件は **honest math (unconditional 10.8)
   が存在するのに import-DAG で spine が cite できず bare sorry が残る**状況の解消 = spine の honest 化。
+
+## ⚠⚠⚠ 第4 判明 = 本 issue の前提が誤り、bookkeeping plan は不十分 (2026-07-12 lane-a STEP-0 再トレース, `#print axioms` 実測)
+
+再開時 STEP-0 で **`#print axioms` を実測**したところ、本 issue の 2 つの核心前提がいずれも FALSE と判明:
+
+1. **前提「`S_H0C_not_coherent_unconditional` は already axiom-clean」= FALSE**。実測: **DIRTY (sorryAx)**。
+   dirty root = `coherent_S_of_coherent_SH0C` (6.3, `S13_Lemmas113To115:35`) が body 内で **直接** `hyp.base.isTypeIIIorIV _hG` (legacy 10.10、`:132`/`:134`) を cite。これは (10.10) artifact ゆえ heir `no_typeV_maximal_unconditional` (CLEAN 実測) で置換可能 = fixable bookkeeping。
+2. **前提「aec0d595 の `_of_noncoherent` は explicit param ゆえ clean」= FALSE**。実測: `coherent_quotient_bound_of_noncoherent` 他 **全て DIRTY**。原因 = aec0d595 は `hnc` を explicit 化したが 435b057a が **`htype` を optParam dirty default `:= hyp.base.isTypeIIIorIV _hG` で追加** (`:171`)。→ optParam 汚染 (第3判明どおり)。fixable。
+
+**だが決定的なのは第3の dirty source (heir 無し、bookkeeping 不可)**:
+
+- residual `exists_zeta_residual_not_orthogonal_H0C_of_refuter` は body で **無条件に**
+  `coherent_SOf_H0C_of_column_identities` (`:1100`) を呼び、これが **無条件に**
+  `coherent_sOf_H0C hG hyp hncH0C htype` (`S13_Orthogonality:917`) を呼ぶ。
+- `coherent_sOf_H0C` は `rcases clifford_dichotomy … with hA | hB` で **両 branch とも** (9.11) coherence を要し、
+  両 branch とも DIRTY: caseA = `caseA_coherent_sOf_H0Cprime_of_refuter` → `Ptype_core_coherence`
+  → `cohereOfSibleyTarget (sibleyTarget_H0C chars)`; caseB = `caseB_coherent_sOf_H0C` → 同 (9.11) S(H0C') coherence。
+- 終端 = **`sibleyTarget_H0C := sorry`** (`S11_MaximalII_III_IV/Coherence911.lean:48`)。これは
+  **term-level `noncomputable def … := sorry`** (override すべき param 無し) かつ
+  **「⚠ UNSOUND (6.8)-shortcut, do NOT fill」** (7001 audit 2026-07-07: nilpotent-Hall kernel HC の H^# は非-TI ゆえ SibleyTarget は偽)。
+  honest route = **Coq `PFsection9.v:1484` の 8-step induction を port** (`coherent_H0C_commutator`) =「次の lane-a work」= **未着手の genuine 数学**。
+
+∴ **spine `card_kappaHall_lt_of_isTypeIIIorIV` の dirty source は独立に 3 つ**:
+(A) (10.8) legacy `S12.S_not_coherent` [heir `S_not_coherent_unconditional` CLEAN → fixable],
+(B) (10.10) legacy `no_typeV_maximal` [heir `no_typeV_maximal_unconditional` CLEAN → fixable],
+(C) **(9.11) `sibleyTarget_H0C` [heir 無し・do-not-fill unsound・honest route=Coq induction port 未着手 → bookkeeping で不可]**。
+
+**本 issue 1025 の plan (A+B の optParam→explicit rework) は necessary-but-insufficient。(C) が binding constraint** で、
+A+B を完璧に threading しても residual/`card_kappaHall_lt_of_isTypeIIIorIV` は **(9.11) 経由で DIRTY のまま**。
+= 「(10.8) knot を解けば residual が axiom-clean」(本 issue 冒頭) は **誤り**。
+
+**STEP-0 判定 = STOP+report** (元指示「sorried root が issue の主張と違えば STOP」に該当; `sibleyTarget_H0C` は
+`do-not-fill`ゆえ埋めるのは unsound STOP 条件)。**A+B の ~16 theorem rename は実施せず** (capstone spine の
+delicate refactor リスクを負っても spine は clean 化しない = honest 前進なし)。**真の frontier = (C) の (9.11)
+coherence の Coq 8-step induction port** (`sibleyTarget_H0C`/`caseB_coherent_sOf_H0Cprime` を honest 証明で置換)。
+本 issue は open のまま (spine 未 clean); 実測は上記 `#print axioms` で再現可 (heir CLEAN 2 件 / (9.11) DIRTY / residual DIRTY)。
