@@ -1408,3 +1408,16 @@ caseA でも利用可能になる。これが caseA refuter の `xAdjoinStepW_k`
 
 **Build**: `lake build OddOrder` green (下記 jobs/time)。caseA は honest sorry 1 個 (refuter) に reduce、
 新 axiom 無し。`coherent_H0Cprime_S` の axiom status = caseB 枝 honest (accepted dadeHypS0)、caseA 枝 = refuter sorry。
+
+### 更新 #42 補足 (R-family 一般化の crux は既に存在): `sSet_member_diffsupp`
+
+上記「case-independent な `sSet_member_conj_diff_supported` を land」は、実は **既に存在**する:
+`Hypothesis.sSet_member_diffsupp` (`SubcoherenceInputs.lean:1325`) が
+`((induceHU ξ).conj − induceHU ξ).support ⊆ A(S)` を `ξ ∈ xiSet` から **caseB 無しで** 証明済
+(`irreducibleCharacter_apply_one_eq_pos_natCast` + `induceHU_apply_one_eq_q_mul` + `star_natCast` で
+共役次数 `η̄(1)=η(1)` を出す)。ゆえに R-family の caseA 一般化は **new math 不要・機械的 rewire のみ**:
+`sSet_caseB_memberRFamily`/`…_reducible…`/`tauS_muColumn_diff_eq` の `sSet_caseB_member_diff_supported`
+呼び (共役対 (η,η̄) 用) を `sSet_member_diffsupp` (η=induceHU ξ を hη∈sSet から destructure、必要なら
+`support(η−η̄)=support(η̄−η)` の符号 rewrite) に置換し、4 lemma から `chars`/`caseB` を除去 → caseB assembly
+の call-site (chars/caseB 引数) を更新。`sSet_caseB_member_diff_supported` (general x,y、uniform 次数依存) は
+caseB assembly の非共役差用に残す。別 session の focused refactor 推奨 (~32 call-site、build-green 維持)。
