@@ -120,6 +120,7 @@ import OddOrder.Peterfalvi.S11_ImprimitiveUBound
 import OddOrder.Peterfalvi.S12_Noncoherence
 import OddOrder.Peterfalvi.S12_TypeVCaseC
 import OddOrder.Peterfalvi.S13_TypeIIIGalois
+import OddOrder.Peterfalvi.S13_NonGaloisExclusion
 import OddOrder.FeitThompson
 import OddOrder.BG.AppC_NormSet
 import OddOrder.BG.AppC_FrobeniusClassSum
@@ -7735,3 +7736,11 @@ h118 ((11.8) 非直交) 下で τ(μ₀−ζ) の σ-grid 係数 = 行0 indicato
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_a_dvd_u
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.rowInv_zero
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainTypeRImage_conj
+
+/-! **Peterfalvi (11.9.c) 非Galois u=a pin 部品, axiom-clean** (lane a, 2026-07-12, issue 1024).
+muColumnChar_zero / exists_muColumnChar_inv = Pontryagin 逆列 index。keystone
+`caseA_u_eq_a_of_residual_not_orthogonal` (u=a pin 本体) は証明完備だが
+`coherent_sOf_H0C` 経由で lane-b の (9.11.2) refuter sorry を推移 cite するため、
+その着地時にここへ登録する (sorried-cite 規約)。 -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.muColumnChar_zero
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.exists_muColumnChar_inv
