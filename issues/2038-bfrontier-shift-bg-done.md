@@ -1747,3 +1747,73 @@ S15_HonestTypeP2A0 パターンで新設、hyp.T_typeP2 相当が要る — T �
 (13.18.c,d)+(1.1) 消費 — 深部)。
 付随: S15_SAndT 2101 行 → BridgeCharacter (1479、(13.18) 全 proven) + TAIL (649)。
 **次 = 義務 (1) φ 存在** (文書順最上流、Frobenius 指標論の genuine math)。
+
+## ✅ (2026-07-12、/loop iter 12) — 義務 (1) φ 存在 実証明 (8 → 7)
+
+exists_Sset_apply_one_eq_index 完全証明 (commit 下記): typeI_frobenius + ne_bot_kernel +
+solvable_of_lt_top + S08.exists_irreducibleCharacter_ne_trivial_degree_one_of_commutator_ne_top
++ induce_apply_one。2 つの TypeIData の kernel は H_eq で橋渡し (Prop rwa)。Sset membership
+は同 FiniteInduce scope ゆえ rfl。**残 7 義務** (S15_SAndT:252-322): tauTbetaGrid (T-side
+honest 'A0 Dade def) / disjoint_support (13.19.a) / orthogonal_eta (13.19.b) / row・col
+constant (13.19.c 第一節) / caseC・caseC_dual (dichotomy 本体)。
+**次 = tauTbetaGrid** (文書順: (13.18) の T-dual 定義が (13.19.a) 以降の前提)。設計:
+S15_HonestTypeP2A0 の dadeHypS0/sInstance パターンの T-instance 化 — ただし T の型
+((13.2.a) で T は type II ≠ P2 の可能性 — S_typeP2 の T-dual field の有無) を要確認。
+軽ければ次 iter で def 化、重ければ S-side パターン精査から。
+
+## ✅ (2026-07-12、/loop iter 13) — tauTbetaGrid honest 実装 (7 → 6)
+
+T-side 'A0 Dade instance (dadeHypT0/hconj、S15_HonestTypeP2A0) を generic 構成の T 適用で
+新設 (commit 1d7a1621)。IsTypeP2 T = (14.9) 帰結ゆえ**パラメータ化**が正しい層割り
+(TypePData T は sorry-free reconciled_typePData_T が supply — docstring の「declared
+sorried」は stale で実装は Fact A/B 経由で閉じ済み)。betaTGridChar = Ind_{QW₂}^T 1 − ν₁₀。
+threading は (14.5) chain + dichotomy + S16 供給 2 箇所 (dictionary .2.1 で II→P2)。
+**残 6 義務** (S15_SAndT:280-350): disjoint_support / orthogonal_eta / row / col /
+caseC / caseC_dual。**次 = typeIBetaL_betaS_disjoint_support (13.19.a)**: Ã(L) 元の位数は
+|H| の素因数で割れる vs (8.17.a) |H| ⟂ pq、β_S^τ 側 support は P^#∪(W∖W₁∪W₂)^G ⊆
+pq-元。部品: betaGrid_A0_support (proven) / card_LF_coprime_pq (gated B2) /
+dade lift の support 局在 (dadeIntegralCharacterMap の image support ⊆ conj closure —
+S04/S07 に既存 lemma があるか要調査)。
+
+## 📐 (2026-07-12、/loop iter 14) — (13.19.a) disjoint_support 部品調査
+
+統合 build green 確認 (merge 4 files 後、1m09s)。部品在庫:
+- **Dade 像の support 局在**: `IsDadeMap.map_eq_zero_of_not_mem_dadeSupport` (一般) +
+  `map_eq_zero_of_not_mem_conjugatesOfSet_of_forall_H_eq_bot` (TI 版、S04:736)。
+  typeIBetaL 側: tau = dadeIntegralCharacterMap (dadeData.dade) — supported input
+  (Ind_H^L 1 − φ は A(L) 支持? **要確認**: φ ∈ 𝓛 の A(L)-supportedness は (12.1) 系
+  seqIndD の性質 — S14.Hypothesis.A / typeIA との接続 lemma を探す) →
+  apply_of_support で dadeMap 値 → dadeSupport 外 0。
+- **tauSbetaGrid 側**: sInstance_dade0_eq_induce (proven) + betaGrid_support (proven、
+  P^#∪V_S) + `support_induceSum_subset_conjugatesIntoSet` (InducedCharacter:264 —
+  ⚠ induceSum 版のみ。induce 版 A-局在は未整備: induce = ⅟|H|•induceSum の
+  support ⊆ で bridge する小 lemma を新設)。
+- **位数論法** (残る本体): Ã(A(L)) 元の位数 ∋ prime of |H_L| vs P^#∪V_S 元は
+  pq-系 — (8.17.a) card_LF_coprime_pq (gated B2、cite 可) + A(L) 元の位数構造
+  (§8 typeIA の定義から: A(L) ⊆ ⋃ C_L(x)^# 系 — S10_Section8Dade 系 or
+  S14.Hypothesis.ambientA の member order lemma を要調査)。
+**次 iter = A(L)-supportedness (φ/Ind の) と A(L) 位数構造の 2 点調査 → 実証明**。
+
+## 📐 (2026-07-12、/loop iter 15) — (13.19.a) 完全設計 (Coq :2010-2031 解読)
+
+**位数論法の実体** (constt 不要): x ∈ Ã(L) ∩ (P∪W)^G で矛盾 —
+(i) x ∈ (P∪W)^G → orderOf x ∣ |P|·|W| = p^q·pq → π(x) ⊆ {p,q}
+(ii) x ∈ Ã(L) = dadeSupport → x = conj(z·y)、y ∈ A(L) = **H^#** (Frobenius 等号!
+    Coq defA = FTsupp_Frobenius)、z ∈ R(y) (Dade signalizer、z ∈ C(y) かつ
+    orderOf z ⟂ |H|) → Commute z y + coprime → orderOf(zy) = orderOf z · orderOf y
+    (mathlib Commute.orderOf_mul_eq_...of_coprime) → prime of orderOf y (∣ |H|) が
+    orderOf x を割る
+(iii) (8.17.a) |H| ⟂ pq (card_LF_coprime_pq、cite 可) で矛盾。
+**Lean 部品所在**: A(L) ⊆ H^# は `IsFrobeniusGroup.centralizer_kernel_le` (Isaacs
+Ch06:572) + typeIA = centralizerSupport (sharpSubgroup H) M の定義から新設 lemma
+`typeIA_eq_sharpSubgroup_of_frobenius`; 逆包含 = sharpSubgroup_H_subset_typeIA (既存)。
+Ã 分解 = S04.Hypothesis.dadeSupport の membership (typeISetup.dadeData.dade の
+H(a)/R(a) fields: coprime + centralizing — S10.DadeSupportHypothesisData 経由)。
+β_L 側 supported 性: supp(Ind_H^L 1 − φ) ⊆ conjugatesInto H'、1 での値 0
+(induce_apply_one で e − e)、H^#-conj ⊆ A(L)-conj = A(L)。
+β_S 側: sInstance_dade0_eq_induce + betaGrid_support (P^#∪typePV、typePV ⊆ W∖(W₁∪W₂))
++ **新設** induce 版 conjugatesIntoSet 局在 (induceSum 版 :264 から ⅟-scalar bridge)。
+W 元 order ∣ pq ✓、P^# 元 = p-元 ✓。
+**実装順 (次 iter)**: (1) induce-support bridge (InducedCharacter) → (2)
+typeIA_eq_sharp (S10_MinimalSimpleBasic or MaximalSubgroupType) → (3) 本体
+typeIBetaL_betaS_disjoint_support。

@@ -1188,7 +1188,10 @@ theorem exists_typeI_eta_axes_odd_of_caseB_gap
           OddOrder.Peterfalvi.S15.OddIntegerInner orth.betaL
             (hyp.base.eta i ⟨0, hyp.base.p_prime.pos⟩)) := by
   rcases OddOrder.Peterfalvi.S15.typeI_orthogonality_dichotomy
-      _hG hyp.base nc.Ldata.L_maximal nc.Ldata.isTypeI with
+      _hG hyp.base
+      (((OddOrder.BG.Ch4.S16.proposition_type_classification _hG
+          hyp.base.T_maximal).2.1).mp (T_typeII _hG hyp))
+      nc.Ldata.L_maximal nc.Ldata.isTypeI with
     ⟨orth, horth⟩
   exact ⟨orth, typeI_eta_axes_odd_of_caseB_gap orth horth.2.2.2.1 horth.2.2.2.2
     (hH_of_orth orth) (he_of_orth orth) hhv hvu⟩
