@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.S13_TypeIIIGalois
 import OddOrder.Peterfalvi.S13_TypeDetermination
 import OddOrder.Peterfalvi.S11_MaximalII_III_IV
+import OddOrder.GroupTheory.NilpotentAbelianization
 
 /-!
 # Peterfalvi (11.9.c) — the non-Galois `u = a` pin
@@ -134,6 +135,7 @@ open OddOrder.RepresentationTheory
 variable {G : Type*} [Group G]
 
 set_option maxHeartbeats 1600000 in
+-- the (5.5)/conj-involution assembly elaborates a large grid case analysis in one declaration
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (11.9.c), the non-Galois `u = a` pin** (issue 1024): under Hypothesis (11.2)
 (type III/IV) with the (11.8) refuter `h118`, the Clifford case (a) forces `u = a`.
@@ -223,10 +225,10 @@ theorem caseA_u_eq_a_of_residual_not_orthogonal [Finite G]
       (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief) caseA
   have hCU : hyp.C = OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup := by
     rw [(core_structure hG hyp).2.2.2, hyp.Uprime_eq]
-    show derivedInG hyp.base.typeP.U = derivedInG hyp.s11Setup.typeP.U
+    change derivedInG hyp.base.typeP.U = derivedInG hyp.s11Setup.typeP.U
     rw [hyp.setup_typeP_eq]
   have hlammem : lam ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C := by
-    show lam ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup (hyp.chief.H0 ⊔ hyp.C)
+    change lam ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup (hyp.chief.H0 ⊔ hyp.C)
     rw [hCU]
     exact hlamU'
   have hlamc : lam.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
@@ -807,5 +809,66 @@ theorem not_cliffordCaseA_of_hypothesis [Finite G]
     have hle : hyp.base.w1 ≤ u - 1 := Nat.le_of_dvd (by omega) hdvd
     have hale : caseA.a ≤ hyp.base.w2 - 1 := Nat.le_of_dvd (by omega) hadvd
     omega
+
+end OddOrder.Peterfalvi.S13
+
+namespace OddOrder.Peterfalvi.S13
+
+open OddOrder.GroupTheory
+open OddOrder.RepresentationTheory
+
+variable {G : Type*} [Group G]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.9.c), `U` is cyclic** (issue 1024 P3): under Hypothesis (11.2)
+(type III/IV), `U` is cyclic.
+
+The non-Galois exclusion (`not_cliffordCaseA_of_hypothesis`) leaves the Galois case (b) of the
+(9.7) dichotomy, whose Singer field model makes the chief-factor image `Ū = U/C_U(H̄)` cyclic
+(`CliffordCaseBData.Ubar_cyclic`).  The kernel of the restriction `↥U →* Ū` is the action
+kernel `C_U(H̄) = cSub`, which is `C = U ⊓ C_G(H)` (`C_eq_cSub`, via (11.7) `H₀ = ⊥`) and hence
+`U' = [U,U]` ((11.6) `core_structure`); `U` is nilpotent (`TypePData.U_nilpotent`), and a
+nilpotent group with a cyclic quotient by a subgroup of its commutator is cyclic
+(`isCyclic_of_isNilpotent_of_ker_le_commutator`, issue 9086). -/
+theorem U_isCyclic_of_hypothesis [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)] :
+    IsCyclic ↥hyp.base.typeP.U := by
+  classical
+  rw [← hyp.setup_typeP_eq]
+  haveI hnil : Group.IsNilpotent ↥hyp.s11Setup.typeP.U := hyp.s11Setup.typeP.U_nilpotent
+  rcases OddOrder.Peterfalvi.S11.clifford_dichotomy hG
+      (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief) with hA | hB
+  · exact absurd hA (not_cliffordCaseA_of_hypothesis hG hyp)
+  obtain ⟨caseB⟩ := hB
+  haveI hcyc : IsCyclic ↥(OddOrder.Peterfalvi.S11.uActionHom hyp.s11Setup hyp.chief).range :=
+    caseB.Ubar_cyclic
+  -- the restriction `↥U →* Ū`, kernel inside `U'`
+  set e : ↥hyp.s11Setup.typeP.U
+      ≃* ↥(hyp.s11Setup.typeP.U.subgroupOf (hyp.s11Setup.typeP.U ⊔ hyp.s11Setup.typeP.W1)) :=
+    (Subgroup.subgroupOfEquivOfLe
+      (le_sup_left : hyp.s11Setup.typeP.U ≤ hyp.s11Setup.typeP.U ⊔ hyp.s11Setup.typeP.W1)).symm
+    with hedef
+  refine OddOrder.GroupTheory.isCyclic_of_isNilpotent_of_ker_le_commutator
+    ((OddOrder.Peterfalvi.S11.uActionHom hyp.s11Setup hyp.chief).rangeRestrict.comp
+      e.toMonoidHom) ?_
+  intro x hx
+  have hone : OddOrder.Peterfalvi.S11.uActionHom hyp.s11Setup hyp.chief (e x) = 1 := by
+    have h1 := MonoidHom.mem_ker.mp hx
+    exact congrArg Subtype.val h1
+  -- `↑x ∈ cSub = C = U'` ((11.6)/(11.7))
+  have hxC : (x : G) ∈ hyp.C := by
+    rw [C_eq_cSub hG hyp]
+    exact Subgroup.mem_map.mpr
+      ⟨(hyp.s11Setup.typeP.U.subgroupOf
+          (hyp.s11Setup.typeP.U ⊔ hyp.s11Setup.typeP.W1)).subtype (e x),
+        Subgroup.mem_map.mpr ⟨e x, MonoidHom.mem_ker.mpr hone, rfl⟩, rfl⟩
+  have hCU' : hyp.C = derivedInG hyp.s11Setup.typeP.U := by
+    rw [(core_structure hG hyp).2.2.2, hyp.Uprime_eq]
+    rw [hyp.setup_typeP_eq]
+  rw [hCU'] at hxC
+  -- pull back through the injective `U.subtype`: `derivedInG U = (commutator ↥U).map U.subtype`
+  obtain ⟨y, hy, hyx⟩ := Subgroup.mem_map.mp hxC
+  rwa [show y = x from Subtype.ext hyx] at hy
 
 end OddOrder.Peterfalvi.S13
