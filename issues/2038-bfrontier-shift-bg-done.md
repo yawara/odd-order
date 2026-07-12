@@ -2295,3 +2295,17 @@ conjugate-difference の A₀-Dade support + norm-two rigidity engine `eta_ortho
 (A) or (B) の実構築は着手可能 (どちらも genuine on-path infra) だが、**(B) が off-path ruling と衝突しうるため hub 確認を優先**
 (off-path do-not-complete trap 回避)。gated sorry 群 (pc_le/typeP_Galois 等) は従来どおり a-landing 待ち。
 hub 裁定後に (A)/(B) を淡々と build する。
+
+## ✅ (2026-07-12 続²、lane-b /loop) — 設計質問は解決: A/B/C framing 撤回、character_degree_analysis は lane a の (9.11) coherence induction port に gated
+
+前節の「S-side coherence infra route の hub 設計裁定 (A/B/C)」は **over-framing だった** ([[verify-port-state-by-number-not-coq-name]] の自戒)。main 同期で lane a の 7001 audit + 1026 frontier 訂正を取り込み再検証 → 私の質問は既に解決済みと判明:
+
+- **`coherent_H0C_commutator` (9.11、Coherence911:63) は GATED** — `sibleyTarget_H0C` (sorried) を cite。
+- **7001 audit (2026-07-07 lane-a) が (6.8) `sibleyTarget_H0C` route を UNSOUND と確定**: Sibley kernel `HC ⊆ F(M)` は nilpotent-Hall ゆえ `H^#` が G で非 TI → `SibleyDadeHypothesis.H_sharp_ti`/`dade_H_eq_bot` 両偽 (sibleyTarget_frobI と同じ 2032 failure mode)。「do **not** fill」。
+- **honest route = Coq `Ptype_core_coherence` (PFsection9.v:1484-1571) の 8-step (9.11) induction port** (Galois 枝 = `uniform_degree_coherence` / 非 Galois 枝 = degree-qa subfamily filter + conjugate-pair 逐次 extend、maximality 矛盾)。**= lane a の active frontier** (1026: 「real frontier = (9.11) induction port」、typeP_Galois cluster)。
+
+**⟹ 訂正された理解**: `tau1S = coherent_H0Cprime_S.extension` は `coherent_H0C_commutator` (9.11) に gated、それは **lane a の (9.11) induction port そのもの**。よって character_degree_analysis (13.3) 全体が **lane a の (9.11)/typeP_Galois char cluster に gated** = pc_le (13.12) と同一 root gate。**独立した b-infra 設計裁定 (A/B/C) は不要** (私の前節 framing は撤回)。off-path ruling との「衝突」も幻: (6.8) sibleyTarget route は unsound (7001) で、honest route は (9.11) induction (lane a) と明確。
+
+**b の正しい posture = gated-endpoint** (RULING ③ に整合): character_degree_analysis も pc_le も lane a の (9.11)/typeP_Galois landing 待ち。**re-engage trigger = lane a の `coherent_H0C_commutator` honest (9.11) induction port landing** (+ typeP_Galois for pc_le)。
+
+**残る b-actionable gated-endpoint prep 候補** (lane a と非 dup なら): 一般 `coherent_ortho_cycTIiso` (Coq PFsection8:839) の Lean port = coherent 像 (irr) ⊥ η、任意 coherence に効く shared-infra。これが landing すれば (9.11) coherence 到着後に `tau1S_induce_inner_eta` を薄い cite で close。ただし coherence-framework (R-support base = `FTtypeP_base_ortho` + `mem_coherent_sum_subseq`) の port を要し lane a の (9.11) と領域が近い → **claim-before-build + hub/lane-a 調整必要**。単独着手前に lane a の (9.11) port が本 infra を内包するか確認。
