@@ -2086,3 +2086,21 @@ key = **⟨Γ_S, ν(ζ_i)⟩ = bSphi·d_i** (一般 disjoint support で ⟨β_S
 (3) c1 bound (sorried skeleton → 後で埋め)、(4) dichotomy = parity(ζ_0) + φ-invariance + c1 + c2 +
 row constancy。**full build 4173 green** (parity core + c2、純 additive)。⚠ S15_SAndT 1467 行 (1500 gate 接近、
 dichotomy 完成後に frozen typeIBetaL cluster を上流 leaf へ prefix-split)。
+
+### 精緻化 (iter 28 続): assembly の φ-invariance は一般 disjoint support **不要**
+
+**β_S pairing φ-invariance** `⟨β_S^τ, φ^{τ₁}⟩ = ⟨β_S^τ, ζ_0^{τ₁}⟩ (= bSphi)`:
+`φ^{τ₁} − ζ_0^{τ₁} = coh.ext(φ−ζ_0) = τ(φ−ζ_0) = typeIBetaL ζ_0 − typeIBetaL φ` (coh.ext/τ 線形 map_sub +
+extends_on_supported)、`⟨β_S^τ, typeIBetaL ψ⟩ = 0` (既存 `typeIBetaL_betaS_disjoint_support` +
+inner_eq_zero_of_disjoint_support、ψ=φ/ζ_0 両方 Sset degree-e)。⟹ 差 = 0−0 = 0。
+**β_L η φ-invariance** `⟨typeIBetaL φ, η_0j⟩ = ⟨typeIBetaL ζ_0, η_0j⟩`: 差 = ⟨τ(ζ_0−φ), η_0j⟩ =
+⟨coh.ext(ζ_0−φ), η_0j⟩ = 0 (coherent image ⊥ η)。技法 = `typeIGrid_betaL_inner_eta_eq_h78_beta`
+(CoherentEtaOrthogonality:330、S16 downstream ゆえ import 不可だが proof mirror 可) の map_sub+extends_on_supported+hagree。
+⚠ support-of-diff `(φ−ζ_0).support ⊆ supportInSubgroup(typeIA)` = φ=Ind θ_φ (degree-1、φ(1)=index=e·θ_φ(1)→θ_φ(1)=1)
+を unpack して `induce_diff_support` 系。**⟹ 一般 disjoint support は c1 bound の係数 `⟨Γ_S,ν(ζ_i)⟩=bSphi·d_i` のみが要**
+(ζ_i−d_i ζ_0 は Ind1 非経由ゆえ typeIBetaL 差に還元不可 → 真に一般形要)。
+
+**次 iter 実装順**: (1) β_S/β_L φ-invariance helper 2 本 (既存 infra + map_sub、~40行)、(2) c1 sorried skeleton、
+(3) dichotomy 組立 (parity + φ-invariance + c1 + c2 + row-const、~40行) — **これで monolithic sorry → c1 bound に isolate**。
+(4) 別途 c1 bound = 一般 disjoint support (~40行 refactor: `tauImage_support_subset_dadeSupport` 抽出 +
+`typeIBetaL_dadeS_betaGrid_disjoint_support` を一般化) + coefficient + singleton Bessel。
