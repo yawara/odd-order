@@ -911,6 +911,7 @@ theorem Hypothesis.tau1S_ofHonest_mu_col_eta_col_one [Finite G]
     (hyp : Hypothesis (G := G))
     (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
     ∃ (j : Fin hyp.p) (δ : ℤ) (θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ),
+      j ≠ ⟨0, hyp.p_prime.pos⟩ ∧
       (δ = 1 ∨ δ = -1) ∧
       OddOrder.RepresentationTheory.IsIrreducibleCharacter θ ∧ θ 1 = 1 ∧
       (∑ i : Fin hyp.q, hyp.mu i j) = ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ ∧
@@ -923,7 +924,7 @@ theorem Hypothesis.tau1S_ofHonest_mu_col_eta_col_one [Finite G]
   rcases hyp.tau1S_ofHonest_muColumn_formula hG hnoV chief with hclean | ⟨hp3, hflip⟩
   · -- clean branch: `j = 1`, `δ = 1`
     obtain ⟨θ, hθirr, hθ1, hθeq⟩ := hyp.mu_j_isIndPC hG ⟨1, hyp.p_prime.one_lt⟩ hp1
-    exact ⟨⟨1, hyp.p_prime.one_lt⟩, 1, θ, Or.inl rfl, hθirr, hθ1, hθeq,
+    exact ⟨⟨1, hyp.p_prime.one_lt⟩, 1, θ, hp1, Or.inl rfl, hθirr, hθ1, hθeq,
       by rw [hclean ⟨1, hyp.p_prime.one_lt⟩ hp1]; push_cast; rw [one_smul]⟩
   · -- `p = 3` sign-flip branch: `j = 2`, `δ = -1`
     have h2lt : 2 < hyp.p := by omega
@@ -932,7 +933,7 @@ theorem Hypothesis.tau1S_ofHonest_mu_col_eta_col_one [Finite G]
     have hne : (⟨2, h2lt⟩ : Fin hyp.p) ≠ ⟨1, hyp.p_prime.one_lt⟩ := by
       intro h; exact absurd (congrArg Fin.val h) (by norm_num)
     obtain ⟨θ, hθirr, hθ1, hθeq⟩ := hyp.mu_j_isIndPC hG ⟨2, h2lt⟩ hj2
-    refine ⟨⟨2, h2lt⟩, -1, θ, Or.inr rfl, hθirr, hθ1, hθeq, ?_⟩
+    refine ⟨⟨2, h2lt⟩, -1, θ, hj2, Or.inr rfl, hθirr, hθ1, hθeq, ?_⟩
     rw [hflip ⟨2, h2lt⟩ ⟨1, hyp.p_prime.one_lt⟩ hj2 hp1 hne]
     push_cast
     rw [neg_one_smul]

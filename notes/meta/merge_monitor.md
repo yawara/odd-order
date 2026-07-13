@@ -601,6 +601,16 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 7) — b 合流: ★ 9094 案 A 実装 1/3 (CharacterDegreeCore + 無条件 producer)**:
+  **b=5** (CharacterDegreeCore = Machinery135 に guard 付き λ-free structure (+126) + 無条件
+  producer `characterDegreeCore_nonempty` = 新 leaf S15_CharacterDegreeSupply (+255、landed engine
+  で全 field discharge、残 sorry = `deltaPrime_eq_one_T` 1 本 = nuGridSupply a-所有 carrier gated
+  scaffold)。τ₁ field guarded supply 5 本完備 (2035 #23)。producer 置き場は import 制約で新 leaf
+  = RULING 裁量条項内・self-flag 済 → hub 追認) を merge a0659a8a で合流 (build green 4190 /
+  count-sorry 47→48 scaffold ALLOW / 新 axiom なし)。**a=sync-only** (3 sync merge、実差分ゼロ →
+  skip、次の実 commit とまとめて合流)。c=0。9094 残 = 2/3 conditional producer + 3/3 dichotomy
+  producer + consumer 移行。b が言及する将来 coordination = nuGridSupply の FeitThompson carrier
+  field 追加 (9081 pattern) — b が必要時に claim してくる想定。
 - **2026-07-14 (tick 6) — a+b 合流: (7.9) family conclusion sorry-free (a) + S1cases irr-branch 供給 leaf (b)**:
   **a=3** (0044 再開 cont.49-51: 新 leaf `S09_FrobeniusParity` 146 行 = `hypothesis79_conclusion`
   sorry-free ((7.9) family-level: Sibley Δ + delta-reality + parity)、(7.10) 定量 assembly の原文

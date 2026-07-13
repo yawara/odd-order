@@ -1266,3 +1266,28 @@ signature (hG, hyp) は不変で OK — **hnoV = `S12.no_typeV_maximal_unconditi
 - `tau1S_ofHonest_apply_induce_sub` (CaseACoherence) — 全て sorry-free、build green
 - 残 build list (#21) の item 2 完了。next = 9094 案 A 実装 (Core は guarded field で定義、
   発見 1-2 を織り込み) → item 1 (conditional producer) と統合。
+
+## 2026-07-14 更新 #23 (lane b, /loop) — τ₁ field 供給 5 本完備 + item 5 (tau1T/swap) 調査完了
+
+### landed (S15_CharacterDegreeSupply.lean、新 leaf)
+- `induce_H_mem_zSpan_sSet_irr` (Coq S1cases irr-branch): irr な Ind_{PC}^S θ (P⊄Ker) ∈ ℤ[𝒮∩Irr S]
+- `tau1S_ofHonest_zSpanIrr_inner_eta` + `tau1S_ofHonest_induce_inner_eta` (field 供給、guard 付き)
+- `tau1S_ofHonest_zSpan_inner_eta_col_zero` + `tau1S_ofHonest_induce_inner_eta_col_zero`
+  (混在族対応: irr→crux / red→μ-column→(13.3.c) formula→η-grid 直交)
+- 前 iteration: `tau1S_ofHonest_apply_induce_sub` + zSpan 支持補題 2 本 (CaseA/CaseB leaf)
+⟹ **CDD の τ₁ field 群 (inner_induce / mem_ZIrr / apply_induce_sub / inner_eta /
+inner_eta_col_zero) の guarded supply が全て sorry-free で完備**。
+
+### item 5 (tau1T/swap) 調査結果
+- `NuGridSupplyData` (HypothesisSwap:62) 定義済 + `Hypothesis.swap` (:153) 構成済。
+- producer `Hypothesis.nuGridSupply` (:131) = **sorried**。discharge 経路は docstring に文書化済:
+  FT-layer で hyp.nu ↔ certainTypeT grid (nuT) 同定 + muS_* 供給鎖の T-instance 読出し。
+  **carrier files が a 所有 (FeitThompson{,Setup}.lean)** — 9081 pattern の coordinated field
+  addition が要 (2038 iter 26 の記録)。tau1T は swap 経由 sorried-cite で組める
+  (conditional producer は nuGridSupply を cite、discharge は別 coordination)。
+
+### next
+9094 案 A 実装: CharacterDegreeCore (guarded field 版、#22 発見織り込み) + conditional
+producer (置き場 = S15_CharacterDegreeSupply、CaseACoherence+Machinery135 の合流点 —
+RULING の「Machinery135/CountingLayer」は import 上不可能 (producer は tau1S_ofHonest =
+CaseACoherence 下流が必須) ゆえ b 裁量で新 leaf に配置、と 9094 に追記予定)。

@@ -137,3 +137,18 @@ RULING 案 A を実装する。Core 定義に 2035 更新 #22 の発見を織り
 3. λ-conditional 側 consumer (Canonicalization cCoeff 系) は trivial-base (7.7) 問題の
    rebase 修理が必要 (詳細 = 2035 更新 #22 発見 2)。statement 修正は cCoeff 補題のみ
    (b 所有)、NormEstimates 5 定理の statement は不変 (RULING §3-2 の通り)。
+
+## 2026-07-14 追記 (lane b) — 案 A 実装 1/3: CharacterDegreeCore + 無条件 producer landed
+
+- **CharacterDegreeCore** (Machinery135, additive): λ-free fields を honest guard 付きで定義
+  (τ₁ ×5 に P ⊄ Ker guard、μ fields に 𝒮₁-witness + j ≠ 0)。producer
+  `characterDegreeCore_nonempty` (S15_CharacterDegreeSupply) は landed engine で全 field
+  discharge — 残 sorry は `deltaPrime_eq_one_T` (δ'-half、nuGridSupply = a-所有 carrier
+  threading に gated、precisely-named) のみ。
+- **producer 置き場**: RULING の Machinery135/CountingLayer は import 上不可能
+  (producer は tau1S_ofHonest = CaseACoherence 下流が必須; Machinery135 は CaseACoherence の
+  上流)。b 裁量で新 leaf `S15_CharacterDegreeSupply.lean` (CaseACoherence + CountingLayer の
+  合流点) に配置。structure 本体は RULING 通り Machinery135。
+- 残り: 2/3 = conditional producer (∃λ → Nonempty CDD; CDD field の guard 化と consumer
+  (Canonicalization ×2 の rebase 修理 = 2035 #22 発見 2) が前提) / 3/3 = dichotomy producer +
+  NormEstimates 5 定理移行 + TTypeII proof-only 差替え。
