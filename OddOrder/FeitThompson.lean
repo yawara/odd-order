@@ -1,5 +1,6 @@
 import OddOrder.FeitThompsonSetup
 import OddOrder.Peterfalvi.S13_TypeDetermination
+import OddOrder.FeitThompsonPairProducer
 import OddOrder.Peterfalvi.S15_HonestTypeP2A0
 
 /-!

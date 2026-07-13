@@ -1,5 +1,6 @@
 import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructure
 import OddOrder.Peterfalvi.S14_MaximalI.CentralizerContainment
+import OddOrder.Peterfalvi.S13_NonGaloisExclusion
 
 /-!
 # WitnessSylowCyclic
@@ -895,17 +896,13 @@ theorem typeIIIorIV_noncyclic_le_fitting [Finite G]
       (hIIIIV.imp id Or.inl)
     obtain ⟨s13, -⟩ := OddOrder.Peterfalvi.S13.exists_hypothesis_of_isTypeIIIorIV hG hyp12 hIIIIV
     haveI : NeZero (Nat.card (s13.base.toHypothesis46 hG hG.odd).W1) := ⟨Nat.card_pos.ne'⟩
-    -- **(11.9.c)/(9.7.b): `U` is cyclic** = `S13.U_isCyclic_of_hypothesis hG s13` (proven, sorry-free
-    -- in `S13_NonGaloisExclusion`).  Citing it directly needs `S13_NonGaloisExclusion` imported here,
-    -- currently blocked by a §12–§16 import inversion: `FeitThompsonSetup` transitively pulls the
-    -- `AppC → S16` capstone (for a `Fintype ↥mp.S` instance and the `S15.FiniteInduce` scope), so
-    -- `S13_NonGaloisExclusion` is transitively *downstream* of §12.10.  Extracting the §8 centralizer
-    -- facts to `CentralizerContainment` (done) cuts one back-edge; the remaining `FeitThompsonSetup →
-    -- capstone` back-edge is a hub-coordinated capstone re-layering (issue 9093).  Everything below
-    -- this `have` is fully proven against `hUcyc`; once the re-layering lands this `sorry` becomes the
-    -- one-line cite `OddOrder.Peterfalvi.S13.U_isCyclic_of_hypothesis hG s13`.
-    have hUcyc : IsCyclic ↥s13.base.typeP.U := by
-      sorry
+    -- **(11.9.c)/(9.7.b): `U` is cyclic** (Peterfalvi §11.9, proven sorry-free in
+    -- `S13_NonGaloisExclusion`).  Available here now that the §12–16 import inversion is resolved
+    -- (HUB RULING, issue 9093: the §16 pair-data structures were extracted to `S13_Section16PairData`
+    -- and the (12.17) producer to `FeitThompsonPairProducer`, so `S13_NonGaloisExclusion` sits upstream
+    -- of §12.10 as the mathematics requires).
+    have hUcyc : IsCyclic ↥s13.base.typeP.U :=
+      OddOrder.Peterfalvi.S13.U_isCyclic_of_hypothesis hG s13
     set d : TypePData L := s13.base.typeP with hd
     -- `M_F = H ≤ L' ≤ L`, and `M_F ⊴ L'` (via `L' ≤ L ≤ N_G(M_F)`).
     have hLFle : maxNilpotentNormalHall L ≤ derivedInG L := by rw [← d.H_eq]; exact d.H_le

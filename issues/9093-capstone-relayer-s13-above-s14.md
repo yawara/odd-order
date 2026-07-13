@@ -154,3 +154,36 @@ from-Finite に還元され、**upstream の `OddOrder.Peterfalvi.S12.FiniteIndu
 
 **lane a への指示**: 上記 5 step を engage。FeitThompsonSetup は spine-critical ゆえ各 step 後に build 確認。
 lane A の当初 diagnosis (instance-borrowing) に引きずられず、edge (B) の data relocation に集中せよ。
+
+---
+
+## ✅ lane-a 完了報告 (2026-07-13, HUB RULING の 5-step 完遂 — build green + axiom-clean 検証済)
+
+RULING (Option 3 extended) の 5-step directive を完遂。full `lake build OddOrder` green (4187 jobs) +
+AxiomsCheck 全 assert OK。**(12.10) 3 定理が axiom-clean 化** (`#print axioms` =
+`[propext, Classical.choice, Quot.sound]`, sorryAx 無し): `typeIIIorIV_noncyclic_le_fitting` /
+`witness_L_isTypeI` / `witness_L_type_eq_typeI`。census: base 53 → 52 (差 1 = `hUcyc` sorry 除去のみ、
+regression 無し)。cycle 切断を BFS 確認 (S13_NonGaloisExclusion ⇝ Witness = NO PATH)。
+
+### 実施
+- **新 upstream leaf `OddOrder/Peterfalvi/S13_Section16PairData.lean`**: 3 struct
+  (`Section16MaximalPairCore`/`Section16MaximalPair`/`Section16TypePStructure`) + `card_mul_...` を
+  FeitThompsonSetup から verbatim 移設 (import = 指定 4 Witness-safe module)。
+- **新 downstream leaf `OddOrder/FeitThompsonPairProducer.lean`**: producer
+  `section16MaximalPair_of_isMinimalSimpleOdd` を S13_TypeDetermination から移設 (import FeitThompsonSetup +
+  S13_TypeDetermination)。FeitThompson capstone を repoint。
+- FeitThompsonSetup: 4 decl 削除 + 新 leaf import。GridTranspose: import 新 leaf に swap。
+- WitnessSylowCyclic: `import S13_NonGaloisExclusion` + `hUcyc` sorry → cite `U_isCyclic_of_hypothesis`。
+
+### ⚠ RULING plan の gap 2 件を STOP-gate 手順で補完 (Witness-safe import 追加)
+1. **GridTranspose の isCyclic gap**: GridTranspose は 3 struct 以外に
+   `Section16MaximalPairCore.isCyclic_K`/`isCyclic_Kstar` (+ Pair 版) も code 使用 (RULING move set 外)。
+   `mp.Z_cyclic` + mathlib のみ依存 = Witness-safe を確認し、新 leaf に加えた。
+2. **CrossIsometryPair の undeclared transitive-dep gap**: step 3 で GridTranspose の closure が縮小し、
+   CrossIsometryPair が GridTranspose→FeitThompsonSetup 経由で暗黙依存していた
+   `orthonormal_vchar_diff_ortho` (S09_CrossOrthogonality) / `typeII_T2_coherent` (S12_TypeIIFrobenius) /
+   `IsFrobeniusGroup.mapEquiv` (Isaacs Ch06 FrobeniusGroupQuotient) を喪失。全 3 module Witness-safe を確認し、
+   CrossIsometryPair に直接 import 追加 (minimal-import 是正、cycle 再発なし BFS 確認)。
+
+RULING の「lane A の当初 diagnosis (instance-borrowing) は red herring」は正しかった (真因は module bundling)。
+close 可否は hub 判断に委ねる。
