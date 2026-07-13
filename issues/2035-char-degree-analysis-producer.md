@@ -1085,3 +1085,49 @@ tau1(mu_j) = (-1)^b *: \sum_i eta_i (signW2 b j)   -- b : bool, b → p = 3
 ### 現状 (clean、正しい)
 all-reducible glue = landed (clean pin, b=false)。pivot sorry は honest に残存 (has-irr の b 選定が未解決ゆえ
 誤 target で bundle を組まない)。has-irr γ-trick + bundle は上記解決後。**誤った pin target で build しないため保留**。
+
+## 2026-07-13 更新 #17 (lane b, /loop) — ★更新 #16 の 3 問全決着: 正しい pin target = disjunction、has-irr 機構 = row-exchange (全 tool 実在)
+
+### Q1 (downstream 要件) — 決着: clean pin 不要
+`CharacterDegreeData.mu_tau1_formula` (Machinery135:169) は**最初から disjunction**:
+`(∀j≠0, τ₁μ_j = ∑η_ij) ∨ (p=3 ∧ ∀ j≠j'≠0, τ₁μ_j = −∑η_ij')`。`mu_col_tau1_eta_col_one` も δ=±1 許容。
+⟹ scaffold `tau1S_ofHonest_muColumn_pivot` (clean 形) は **overstatement**。MuColumnPin 3 lemma は
+consumer 0・importer 0 (OddOrder.lean 未登録!) ゆえ restatement 完全 free。正しい target = mu_tau1_formula と同形の disjunction。
+
+### Q3 (p=3 の現実性) — 決着: 排除不能かつ mixed split の脅威は has-irr では消える
+- p=3 all-reducible: **mixed split** `c(μ₁)=∑_{A}η_i1−∑_{B}η_i2` (|A|+|B|=q, A_2=B₁ᶜ, B_2=A₁ᶜ) が
+  真に coherent (isometry+diff-identity+ZIrr 全部 OK、supported span が μ₁−μ₂ の倍数のみゆえ)。
+  ⟹ 任意 `.some` は disjunction すら破りうる → **glue 構成 (landed) が p=3 all-red の唯一の supply**。
+- p≥5: diff-identity の係数比較だけで **任意の coherence が clean pin** (下記)。flip は不成立。
+- p=3 has-irr: Coq 通り disjunction まで pin 可能 (b 排除は不能、Coq も keep)。
+
+### has-irr 機構 (Coq coherent_prDade_TIred PFsection5:1371 精読) — S-side 全 tool 実在
+Coq の核 = **row-exchange**: irr member ζ で τ₁(μ_k) が V=Ŵ 上消滅 → `cycTIiso_cfdot_exchange` (PF 3.5) で
+`⟨φ,η_il⟩` が行 i に独立 → mixed split 排除 → norm=q で column 全取り 1 本 → clean or conj-column flip。
+S-side 対応 (全部既存!):
+1. **ζ-消滅**: `coherentIndS_image_inner_eta_eq_zero` (CoherenceEtaOrthogonality:67, crux) →
+   `vanish_of_inner_eta_eq_zero` (Canonicalization:501, (3.2.d)) + class-fn conj 飽和 → c.ext(ξ) は Ŵ^G 消滅。
+2. **γ-element**: γ = ξ(1)•μcol_j − μcol_j(1)•ξ (ℤ-係数、`sSet_subset_inducedKernelFamily`
+   (CaseBRed:197) + `inducedKernelFamily_mem_intDegree` 型整数次数)、γ(1)=0 →
+   support ⊆ A(S) (`sSet_member_support_subset` + muColumn_diff_supported パターン) →
+   c.ext(γ) = indS(γ) = Dade⁰(γ) (`sInstance_dade0_eq_induce`) → **`dadeS0_apply_eq_zero_of_regular`**
+   (SSetMemberRFamily:522) で Ŵ^G 消滅 → φ_j := c.ext(μcol_j) が Ŵ^G 消滅 (ξ(1)≠0 で割る)。
+3. **exchange**: 新設不要 — **`S16.inner_eta_grid_relation`** (S16_GridExpansion, (3.7)) が既にある:
+   Ŵ^G-消滅 ψ に `⟨ψ,η_ij⟩+⟨ψ,η_00⟩=⟨ψ,η_i0⟩+⟨ψ,η_0j⟩` → φ の 0-column 消滅と合わせ row-uniformity。
+4. **E-分解**: `sSet_coherent_extension_eq_sum_memberRFamily` (:879, τ=Dade 版) へは
+   **`IsCoherent.congrMap`** (S08_CaseBCoherence2:1084, extension 保存) + `sInstance_dade_eq_induce` で transport。
+   `sSet_memberRFamily_imageSet_of_red` で E ⊆ {η_ij}∪{−η_ik} (k=conj 列、k≠j: no-real、k≠0: 列一意性)。
+5. **endgame**: ⟨φ,η_aj⟩=[η_aj∈E]∈{0,1} 行独立 s、⟨φ,η_ak⟩=−[−η_ak∈E] 行独立 t、‖φ‖²=q ⟹ q(s+t)=q ⟹
+   (s,t)=(1,0): φ=∑η_ij (clean) / (0,1): φ=−∑η_ik (conj-flip)。
+6. **flip 排除 (p≥5)**: c-generic diff-identity (c.ext(μ_j)−c.ext(μ_j')=ηcol_j−ηcol_j'、任意 c で成立:
+   extends_on_supported+`dadeHypS_muColumn_diff`) を ηcol_j と内積: j'∉{j,k_j,0} を選ぶ (p−1≥4 で可) と
+   flip_j なら 0=q 矛盾。p=3 は k_1=2,k_2=1 強制で clean↔clean / flip↔flip が diff で連動 → disjunction。
+
+### 実装 plan (既存宣言の移動ゼロ)
+- **MuColumnPin.lean を c-generic 機構 leaf に転換**: import = Machinery135 + S15_CaseBReducibleCoherence +
+  CoherenceEtaOrthogonality (CaseACoherence import を外す)。内容: c-generic diff / ξ・φ-消滅 /
+  `coherentIndS_muColumn_pin_of_irr` (係数抽出+endgame) / formula 組み立て。旧 tau1S-特化 3 lemma は撤去。
+- **CaseACoherence** += import MuColumnPin: `sSet_coherent_indS_A_pinned` (∃c, formula) を by_cases(∃irr) で
+  構成 (has-irr: `.some`+formula_of_irr / all-red: `exists_pinned_coherent_sSet_of_all_reducible`+diff 拡張)、
+  `coherent_H0Cprime_S := .choose` に rewire (型不変)、`tau1S_ofHonest_muColumn_formula := .choose_spec`。
+- OddOrder.lean に MuColumnPin 登録 (現在未登録)。
