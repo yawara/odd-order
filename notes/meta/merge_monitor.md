@@ -601,6 +601,15 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 6) — a+b 合流: (7.9) family conclusion sorry-free (a) + S1cases irr-branch 供給 leaf (b)**:
+  **a=3** (0044 再開 cont.49-51: 新 leaf `S09_FrobeniusParity` 146 行 = `hypothesis79_conclusion`
+  sorry-free ((7.9) family-level: Sibley Δ + delta-reality + parity)、(7.10) 定量 assembly の原文
+  blueprint 記録。残 S09-side sorry root = `hypothesis79_delta_even`) を merge 06681cf1 で合流
+  (build green 4189 / count-sorry 47→47 / 3-dot の merge_monitor.md 差分は古い base 幻 =
+  per-commit 確認で排除)。**b=2** (2035: 新 leaf `S15_CharacterDegreeSupply` 327 行 sorry-free
+  3 定理 = Coq S1cases irr-branch 対応の tau1S_induce_inner_eta 供給 + private→public 化 1 箇所、
+  OddOrder.lean import 追記済で root closure 自己完結 — 先 tick の指導が定着) を merge eef40a78 で
+  合流 (build green 4190 / count-sorry 47→47)。c=0。9094 実装は b が Core 供給部品を順調に蓄積中。
 - **2026-07-14 (tick 5) — a+b 合流: ★ 9087 carve-out 完遂・失効 (a) + 9094 案 A 実装開始 (b)**:
   **a=3** (9087 RULING #4 2/3 `allTypeI_fittingIsTI` + 3/3 `not_nonTypeICovering_of_all_typeI` 実証明
   landing = carve-out 3 decl 全 sorry-free 化 → **失効・b 所有復帰** (上記 ❌ 追記)。3/3 は as-stated
