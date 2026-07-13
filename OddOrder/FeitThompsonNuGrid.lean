@@ -291,6 +291,37 @@ theorem nuT_orthonormal (i k : Fin tp.q) (j l : Fin tp.p) :
         (fun hc => hik (colT_injective hG mp tp hc)) _ _),
       if_neg (by simp [hik])]
 
+/-- **Peterfalvi (4.3.c), T-side** (Coq `prTIirr_id`, `PFsection4.v:403`): on
+`W ∖ W₁` the canonical `ν`-grid is the signed shared `ω`-grid,
+`ν_{ij}(w) = δ'_i·ω_{ij}(w)`. -/
+theorem nuT_apply_of_not_mem_W1 (i : Fin tp.q) (j : Fin tp.p) (w : G)
+    (hwW : w ∈ tp.W) (hwT : w ∈ mp.T) (hw1 : w ∉ (tp.W1 : Set G)) :
+    nuT hG mp tp i j ⟨w, hwT⟩
+      = (deltaPrimeT hG mp tp i : ℂ) * omegaS hG mp tp i j ⟨w, hwW⟩ := by
+  have hjoin : (⟨w, hwT⟩ : ↥mp.T) ∈
+      (mp.certainTypeT hG).sdiffTICyclicHypothesis.W := by
+    rw [← tpW_subgroupOf_T_eq hG mp tp]
+    exact Subgroup.mem_subgroupOf.mpr hwW
+  have hnot : (⟨w, hwT⟩ : ↥mp.T) ∉ ((mp.certainTypeT hG).W2 : Set ↥mp.T) := by
+    intro hmem
+    apply hw1
+    rw [tp.W1_eq_K hG]
+    have hk := (certainTypeT_W2_eq hG mp) ▸ hmem
+    exact Subgroup.mem_subgroupOf.mp hk
+  have hv : (⟨w, hwT⟩ : ↥mp.T) ∈
+      (mp.certainTypeT hG).sdiffTICyclicHypothesis.V :=
+    ⟨SetLike.mem_coe.mpr hjoin, hnot⟩
+  have h43c := (mp.certainTypeT hG).certainType_apply_eq_of_mem_V
+    (colT hG mp tp i) (rowT hG mp tp j) hv
+  refine (show nuT hG mp tp i j ⟨w, hwT⟩ =
+      (((mp.certainTypeT hG).columnFamily (colT hG mp tp i)).mu
+        (rowT hG mp tp j) : ClassFunction ↥mp.T ℂ) ⟨w, hwT⟩ from rfl).trans
+    (h43c.trans ?_)
+  rw [omegaS_eq_omegaT hG mp tp i j, omegaT, ClassFunction.compHom_apply]
+  show (((mp.certainTypeT hG).columnFamily (colT hG mp tp i)).sign : ℂ) * _
+      = (deltaPrimeT hG mp tp i : ℂ) * _
+  congr 1
+
 /-- **Peterfalvi (4.3.d), T-side**: `ν_{ij}(1) ≡ δ'_i (mod p)`. -/
 theorem nuT_degree_modEq_deltaPrime (i : Fin tp.q) (j : Fin tp.p) : ∃ a : ℤ,
     nuT hG mp tp i j 1 = (deltaPrimeT hG mp tp i : ℂ) + (tp.p : ℂ) * (a : ℂ) := by
