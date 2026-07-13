@@ -219,3 +219,16 @@ The `normalizerPPart` API identifies that weight with the order of every Sylow
 `p`-subgroup of `N_G(U)` and bounds all `p`-subgroups of the normalizer.  The next
 proof obligation is the mathematical core of Step 1: use induction plus the
 normalizer-growth argument to force `N_G(U)=G`, then maximality to show `U=O_p(G)`.
+
+## 2026-07-14 update — subgroup descent for the induction step landed
+
+A normal `p`-complement now descends along an inclusion of finite subgroups, and
+homomorphic images of normalizers are controlled by the ambient normalizer.  Using
+these two facts together with the exact injective-image formulas for centers and
+Thompson subgroups, `HasThompsonLocalPComplements.of_subgroup` proves that the
+ambient local hypotheses at a `p`-subgroup descend to any containing subgroup.
+
+This supplies the induction bridge needed when the selected bad normalizer is
+proper.  The remaining Step 1 core is to turn a failed local hypothesis inside
+that normalizer into a strictly larger bad normalizer `p`-part, contradicting the
+lexicographic choice of `U`.
