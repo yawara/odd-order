@@ -391,6 +391,12 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > (iv) build green。**移行完了で失効**。NormEstimates 5 定理の dichotomy thread は b 自所有で通常作業。
 > 詳細 = issues/9094 HUB RULING (案 A = λ-free Core 分割、右分岐は landed CliffordCaseBData vocabulary、
 > 非破壊移行手順つき)。
+> **⟹ 拡張 (hub 裁定 2026-07-14 tick 8 — merge 78193bad)**: b の **a 所有 S09 Hypothesis76/chiRho
+> 機構ファイル (S09_Building78C 等) への純 additive・proven helper 追加 (用途 = 9094/2035 供給)** を
+> retroactive 受理し本編集権に統合 (実例 = `hypothesis76OfDadeBase` (7.7) 任意 base builder +57 行、
+> 2035 #24 self-flag 済; 2038 供給編集権 (用途 (12.14)) と同型の 9094 用途版)。条件は 2038 と同一:
+> (i) additive のみ、(ii) proven、(iii) 用途 9094/2035、(iv) self-flag。a の active S09
+> (S09_FrobeniusParity (7.10) 系) と非交差確認済。**9094 供給完了で失効**。
 >
 > **carve-out (issue 9087 RULING #4, hub 裁定 2026-07-13 監視 tick 2 — merge da032e55)**: newly-ungated
 > 3 decl — `card_LF_coprime_pq` (`S15_Gate3.lean:157`) / `allTypeI_fittingIsTI` (`S14_MaximalI/
@@ -601,6 +607,27 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 9) — a+b 合流: a=S09 family-wide Frobenius 直交 (実証明) + b=9094 案 A 3/3 部分 (λ-cluster Core 版)**:
+  **a=1** (`fa68a784` = `S09_FrobeniusFamilyOrthogonality.lean` 新 leaf +575、family-wide Frobenius
+  orthogonality を **sorry-free で実証明** — AxiomsCheck に hypothesis79/78 系 6 決定を追加、全て
+  「3 axiom, all in allowlist」= sorryAx 非依存の clean landing。issue 0044 更新。scope = a の S09
+  territory ✓・新 axiom なし) を merge 53243b88 で合流。**b=3 実 commit** (`lambda_forces_T_caseB_core`
+  (13.4) の Core/λ-cluster 版 = ④ 完了 + `lambda_tau1_apply_eq_of_not_mem_H_sat_core` (13.9.a) 第一段
+  Core 版、いずれも S15_CharacterDegreeSupply.lean +167、b 所有 leaf) を merge 2ae545d6 で合流。
+  build green **4191 jobs** (10.8s) / AxiomsCheck OK (2367+/0、新 S09 FrobeniusFamily 6 決定 clean) /
+  **count-sorry 48→49 = +1 新 decl scaffold** (`tSide_theta_package_of_not_caseB_core` = b の新規、tick8
+  で既 sorried の `deltaPrime_eq_one_T` は不変 = regression でない、hub 検証済) / 新 axiom なし / 逸脱なし。
+  c=0 (40 behind、DORMANT 継続)。9094 残 = 3/3 の dichotomy producer + NormEstimates 5 定理移行 +
+  TTypeII proof-only 差替え。⚠ **size watch**: `S15_SAndT_Setup/CountingLayer.lean` = **2001 行**
+  (2000 gate を +1 超、0094 dir 化分割以来 6+ tick 安定・本 tick 非接触ゆえ pre-existing)。**次に b が
+  本 file へ追記したら prefix-split 必須** (今回は非成長ゆえ split issue 起票せず watch のみ)。
+- **2026-07-14 (tick 8) — a+b 合流: 9094 案 A 実装 2/3 (LambdaClusterData + conditional producer)**:
+  **a=5** (実質 issues のみ: 9095 duplicate claim close = issue hygiene) を merge 3bec4cfa
+  (build 省略)。**b=6** (LambdaClusterData + conditional producer + cCoeff guarded restate 2 本
+  ((13.5) λ-係数 / (13.7) η₁₀-係数) + `hypothesis76OfDadeBase` (7.7) 任意 base builder =
+  S09_Building78C への additive 追加 → **9094 供給編集権を S09 additive に拡張して受理** (上記
+  ⟹ 拡張)) を merge 78193bad で合流 (build green 4190 / count-sorry 48→48 / 新 axiom なし)。
+  c=0。9094 残 = 3/3 (dichotomy producer + NormEstimates 5 定理移行 + TTypeII proof-only 差替え)。
 - **2026-07-14 (tick 7) — b 合流: ★ 9094 案 A 実装 1/3 (CharacterDegreeCore + 無条件 producer)**:
   **b=5** (CharacterDegreeCore = Machinery135 に guard 付き λ-free structure (+126) + 無条件
   producer `characterDegreeCore_nonempty` = 新 leaf S15_CharacterDegreeSupply (+255、landed engine
