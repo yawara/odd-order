@@ -1322,3 +1322,17 @@ CaseACoherence 下流が必須) ゆえ b 裁量で新 leaf に配置、と 9094 
   (CDD = Core extends + λ-cluster; (13.6)/(13.7) norm 系は cCoeff_base 版に接続替え) →
   ⑥ dichotomy producer (no-λ vs no-irr 橋: Coq PFsection13 :296-340 の
   FTtypeP_no_Ind_Fitting_facts 精読)。
+
+## 2026-07-14 更新 #26 (lane b, /loop) — ④ 前半完了 (NormEstimates 側)
+
+- `lambda_tau1_apply_eq_of_not_mem_H_sat_core` landed (S15_CharacterDegreeSupply、sorry-free):
+  (13.9.a) 第一段の Core/λ-cluster 版。witness thread パターン確立
+  (mu_col の P-witness + λ-cluster witness → guarded apply_induce_sub)。
+- **次 = ④ 後半**: `lambda_forces_T_caseB` (CountingLayer:1758、(13.4)) の core/lam 版 —
+  **TTypeII endpoint (T_side_caseB_facts) の直接上流**。配置 = CountingLayer 内
+  (Machinery135 は upstream ✓)。chars 使用箇所: tau1S_apply_induce_sub (:1805、
+  thetaL/θlin = λ/μ witnesses で discharge)、tau1S_induce_inner_eta (:1808-1814、
+  λ の witness + irr(λ) = irr(Ind thetaL) で discharge)、mu_col/lambda fields。
+  同 file の tSide_theta_package_of_not_caseB (:1727、sorry 持ち) は chars 非依存で流用可か確認。
+- その後: ⑤ flip (旧 CDD consumer 全差替え — Canonicalization 旧 cCoeff 2 本と
+  NormEstimates (13.6)/(13.7) 系の cCoeff_base 接続替えを含む) → ⑥ dichotomy producer。

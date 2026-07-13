@@ -980,4 +980,171 @@ theorem eta10_cCoeff_base_eq_zero [Fintype G] [Invertible (Nat.card G : ℂ)]
       star_zero]
   rw [h1, h2, sub_zero]
 
+open scoped FiniteInduce in
+/-- **The `λ^{τ₁}`-value off the `H^#`-saturation is `±` an `η`-column sum** (Peterfalvi
+(13.9.a) first step — the Core/λ-cluster restatement of
+`lambda_tau1_apply_eq_of_not_mem_H_sat`, issue 9094 案 A): `(μ_j − λ)^{τ₁} = Ind_S^G(μ_j − λ)`
+vanishes off `(H^#)^G` — both are induced from linear characters of `H = PC` with `P ⊄ Ker`
+(the Core `mu_col` witness and the λ-cluster witness thread the *guarded*
+`tau1S_apply_induce_sub`), so the difference is `H^#`-supported — whence
+`λ^{τ₁}(x) = δ ∑_i η_{i1}(x)` there by the (13.3.c) column formula. -/
+theorem lambda_tau1_apply_eq_of_not_mem_H_sat_core [Finite G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (core : CharacterDegreeCore hyp) (lam : LambdaClusterData hyp) {x : G}
+    (hx : x ∉ OddOrder.GroupTheory.conjClassSet (sharpSubgroup hyp.H)) :
+    ∃ δ : ℤ, (δ = 1 ∨ δ = -1) ∧
+      core.tau1S lam.lambda x
+        = (δ : ℂ) * ∑ i : Fin hyp.q, hyp.eta i ⟨1, hyp.p_prime.one_lt⟩ x := by
+  classical
+  obtain ⟨j, δ, θμ, -, hδ, hθμirr, hθμ1, hθμP, hμInd, hμτ⟩ := core.mu_col_tau1_eta_col_one
+  obtain ⟨θl, hθlirr, hθl1, hlamEq, x₀, hx₀P, hx₀ker⟩ := lam.lambda_induced_from_PC_linear
+  have hθlP : ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
+      Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel θl) := by
+    intro hsub
+    exact hx₀ker (hsub (by
+      rw [SetLike.mem_coe, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf]
+      exact hx₀P))
+  haveI hKnorm : (hyp.H.subgroupOf hyp.S).Normal := H_sharp_subgroupOf_normal hyp
+  have hdiff : core.tau1S (∑ i : Fin hyp.q, hyp.mu i j) - core.tau1S lam.lambda
+      = ClassFunction.induce hyp.S
+          (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θμ
+            - ClassFunction.induce (hyp.H.subgroupOf hyp.S) θl) := by
+    rw [← map_sub, hμInd, hlamEq]
+    have h := core.tau1S_apply_induce_sub θμ θl hθμirr hθlirr hθμP hθlP
+    exact h.trans (by congr! <;> exact Subsingleton.elim _ _)
+  have hsupp : ∀ w : ↥hyp.S, (w : G) ∉ sharpSubgroup hyp.H →
+      (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θμ
+        - ClassFunction.induce (hyp.H.subgroupOf hyp.S) θl) w = 0 := by
+    intro w hw
+    rw [ClassFunction.sub_apply]
+    by_cases hwH : (w : G) ∈ hyp.H
+    · have hw1 : (w : G) = 1 := by
+        by_contra hne
+        exact hw ⟨hwH, fun h1 => hne (Set.mem_singleton_iff.mp h1)⟩
+      have hw1' : w = 1 := Subtype.ext hw1
+      subst hw1'
+      rw [OddOrder.RepresentationTheory.ClassFunction.induce_apply_one,
+        OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, hθμ1, hθl1, sub_self]
+    · rw [OddOrder.RepresentationTheory.ClassFunction.induce_eq_zero_of_not_mem_normal _
+          (fun h => hwH (Subgroup.mem_subgroupOf.mp h)),
+        OddOrder.RepresentationTheory.ClassFunction.induce_eq_zero_of_not_mem_normal _
+          (fun h => hwH (Subgroup.mem_subgroupOf.mp h)), sub_self]
+  have hvan : ClassFunction.induce hyp.S
+      (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θμ
+        - ClassFunction.induce (hyp.H.subgroupOf hyp.S) θl) x = 0 :=
+    OddOrder.GroupTheory.IsTISubset.induce_apply_of_not_mem_conjClassSet _ hsupp hx
+  refine ⟨δ, hδ, ?_⟩
+  have hdv := congrArg (fun f : ClassFunction G ℂ => f x) hdiff
+  simp only [ClassFunction.sub_apply] at hdv
+  rw [hvan] at hdv
+  have hμv := congrArg (fun f : ClassFunction G ℂ => f x) hμτ
+  simp only [ClassFunction.smul_apply, smul_eq_mul,
+    OddOrder.RepresentationTheory.ClassFunction.finset_sum_apply] at hμv
+  have hlamv : core.tau1S lam.lambda x = core.tau1S (∑ i : Fin hyp.q, hyp.mu i j) x :=
+    (sub_eq_zero.mp hdv).symm
+  exact hlamv.trans hμv
+
+open scoped FiniteInduce in
+/-- **(13.3.b,c)-for-`T` θ-package, Core/λ-cluster form** ((13.4) character gate — the
+core/lam restatement of `tSide_theta_package_of_not_caseB`, issue 9094 案 A).
+
+**Residual (precisely named, mirrors the legacy sorried gate)**: the T-side (13.3.b)/(13.3.c)
+package — `𝒯` contains an irreducible `θ` induced from a linear character of `K = QD`, the
+`ν`-row τ₁-formula, and the pairwise orthogonality of `η`, `λ^{τ₁}`, `θ^{τ₁}`.  Gated on the
+ν-side grid supply (`nuGridSupply`) and the `T`-side coherence — the swap-instance of the
+S-side (13.3) engines (issue 9013 追記⁶). -/
+theorem tSide_theta_package_of_not_caseB_core [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (core : CharacterDegreeCore hyp) (lam : LambdaClusterData hyp)
+    (_hne : ¬ (hyp.D = ⊥ ∧ hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) ∧
+      Nat.card ↥hyp.Q = hyp.q ^ hyp.p)) :
+    ∃ (θT : ClassFunction ↥hyp.T ℂ) (r : Fin hyp.q) (δ' : ℤ) (θG : ClassFunction G ℂ),
+      (δ' = 1 ∨ δ' = -1) ∧
+      ((θT - ∑ j : Fin hyp.p, hyp.nu r j).support ⊆
+        {z : ↥hyp.T | (z : G) ∈ hyp.Q ⊔ hyp.D ∧ z ≠ 1}) ∧
+      (ClassFunction.induce hyp.T (θT - ∑ j : Fin hyp.p, hyp.nu r j)
+        = θG - (δ' : ℂ) • ∑ j : Fin hyp.p, hyp.eta r j) ∧
+      (∀ (i : Fin hyp.q) (j : Fin hyp.p), ClassFunction.inner (hyp.eta i j) θG = 0) ∧
+      ClassFunction.inner (core.tau1S lam.lambda) θG = 0 := by
+  sorry
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (13.4), Core/λ-cluster form** (the core/lam restatement of
+`lambda_forces_T_caseB`, issue 9094 案 A): if `𝒮` contains the λ-cluster (a degree-`uq`
+character induced from a linear character of `PC`), then case (9.7.b) holds for `T`, with
+`D = 1`, `v = (q^p−1)/(q−1)` and `|Q| = q^p`.  The witnesses of the Core `mu_col` field and
+the λ-cluster thread the guarded `tau1S_apply_induce_sub`/`tau1S_induce_inner_eta`. -/
+theorem lambda_forces_T_caseB_core [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (core : CharacterDegreeCore hyp) (lam : LambdaClusterData hyp) :
+    hyp.D = ⊥ ∧ hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) ∧
+      Nat.card ↥hyp.Q = hyp.q ^ hyp.p := by
+  haveI := hyp.finiteG
+  by_contra hne
+  -- T-side θ-package from the (13.3.b,c)-for-`T` gate.
+  obtain ⟨θT, r, δ', θG, hδ', hβsupp, hβform, hηθ, hLamTheta⟩ :=
+    tSide_theta_package_of_not_caseB_core hG core lam hne
+  -- S-side (13.3) data with the `𝒮₁`-witnesses.
+  obtain ⟨thetaL, hthetaLirr, hthetaL1, hlamEq, x₀, hx₀P, hx₀ker⟩ :=
+    lam.lambda_induced_from_PC_linear
+  have hthetaLP : ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
+      Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel thetaL) := by
+    intro hsub
+    exact hx₀ker (hsub (by
+      rw [SetLike.mem_coe, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf]
+      exact hx₀P))
+  obtain ⟨j₀, δ, θlin, -, hδ, hθlinirr, hθlin1, hθlinP, hμeq, hμtau⟩ :=
+    core.mu_col_tau1_eta_col_one
+  -- `α = λ − μ_{j₀}` is supported on `H^#` (`H ⊴ S`; both terms `H`-induced of equal degree).
+  haveI hKnorm : (hyp.H.subgroupOf hyp.S).Normal := H_sharp_subgroupOf_normal hyp
+  have hαsupp : (lam.lambda - ∑ i : Fin hyp.q, hyp.mu i j₀).support ⊆
+      {y : ↥hyp.S | (y : G) ∈ hyp.H ∧ y ≠ 1} := by
+    intro s hs
+    have hs0 : (lam.lambda - ∑ i : Fin hyp.q, hyp.mu i j₀) s ≠ 0 := hs
+    refine ⟨?_, ?_⟩
+    · by_contra hsH
+      apply hs0
+      have hsH' : s ∉ hyp.H.subgroupOf hyp.S := fun h => hsH (Subgroup.mem_subgroupOf.mp h)
+      rw [ClassFunction.sub_apply, hlamEq, hμeq,
+        ClassFunction.induce_eq_zero_of_not_mem_normal _ hsH',
+        ClassFunction.induce_eq_zero_of_not_mem_normal _ hsH', sub_zero]
+    · rintro rfl
+      apply hs0
+      rw [ClassFunction.sub_apply, hlamEq, hμeq, ClassFunction.induce_apply_one,
+        ClassFunction.induce_apply_one, hthetaL1, hθlin1, sub_self]
+  -- The conjugate closures of `H^#` and `K^#` are disjoint.
+  have hdisj := disjoint_conjugatesIntoSet_of_centralizer
+    (A_M := {y : ↥hyp.S | (y : G) ∈ hyp.H ∧ y ≠ 1})
+    (A_N := {z : ↥hyp.T | (z : G) ∈ hyp.Q ⊔ hyp.D ∧ z ≠ 1})
+    (fun _y hy => hyp.P_le_centralizer_of_mem_H hG hy.1)
+    (fun z hz => QD_sharp_centralizer_le_T hG hyp z hz.1 hz.2)
+    (P_conj_forall_not_le_T hG hyp)
+  -- Hence `(α^τ, β^τ) = 0`.
+  have h0 : ClassFunction.inner
+      (ClassFunction.induce hyp.S (lam.lambda - ∑ i : Fin hyp.q, hyp.mu i j₀))
+      (ClassFunction.induce hyp.T (θT - ∑ j : Fin hyp.p, hyp.nu r j)) = 0 :=
+    inner_induce_induce_eq_zero_of_disjoint hαsupp hβsupp hdisj
+  -- Rewrite `α^τ = λ° − δ·∑ᵢ η_{i1}` ((13.2.e)+τ₁-additivity + the (13.3.c) column formula).
+  have hαform : ClassFunction.induce hyp.S (lam.lambda - ∑ i : Fin hyp.q, hyp.mu i j₀)
+      = core.tau1S lam.lambda
+        - (δ : ℂ) • ∑ i : Fin hyp.q, hyp.eta i ⟨1, hyp.p_prime.one_lt⟩ := by
+    conv_lhs => rw [hlamEq, hμeq]
+    rw [← core.tau1S_apply_induce_sub thetaL θlin hthetaLirr hθlinirr hthetaLP hθlinP,
+      map_sub, ← hlamEq, ← hμeq, hμtau]
+  -- The `λ°`-side grid orthogonality, flipped to the expansion brick's slot order.
+  have hLamEta : ∀ (i : Fin hyp.q) (j : Fin hyp.p),
+      ClassFunction.inner (core.tau1S lam.lambda) (hyp.eta i j) = 0 := by
+    intro i j
+    have h := core.tau1S_induce_inner_eta i j thetaL hthetaLirr hthetaLP
+      (hlamEq ▸ lam.lambda_irreducible)
+    rw [← hlamEq] at h
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, h, star_zero]
+  -- The bilinear expansion is `δ·δ' ≠ 0` — contradiction.
+  rw [hαform, hβform] at h0
+  exact eta_cross_expansion_ne_zero hyp.eta (fun i k j l => hyp.eta_orthonormal i k j l)
+    (core.tau1S lam.lambda) θG r ⟨1, hyp.p_prime.one_lt⟩ hLamEta hηθ hLamTheta hδ hδ' h0
+
 end OddOrder.Peterfalvi.S15
