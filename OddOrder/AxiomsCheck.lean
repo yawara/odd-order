@@ -648,6 +648,12 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.hasThompsonPComplementHypothesis_iff
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.hasNormalPComplement_of_le
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.map_normalizer_le_normalizer_map
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.HasThompsonLocalPComplements.of_subgroup
+#assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.normalizerPPart_eq_card_sylow
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.card_le_normalizerPPart_of_isPGroup
