@@ -648,6 +648,14 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.hasThompsonPComplementHypothesis_iff
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.normalizerPPart_eq_card_sylow
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.card_le_normalizerPPart_of_isPGroup
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.exists_isBadNormalizerPSubgroup
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.exists_lexicographically_maximal_badNormalizerPSubgroup
+#assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.center_map_subtype_map_of_coprime_kernel
 
 -- Ch.7 (Thompson Subgroup): Thm 7.8 Burnside p^a q^b solvability ⭐⭐⭐ **character-free**
