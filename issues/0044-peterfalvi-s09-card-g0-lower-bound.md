@@ -1350,3 +1350,32 @@ hypothesis78_delta_isReal) は genuine・保存済で再利用可。
 - (d) (7.8.b) source data 群 (hind_norm/hzeta_ind/hirr/hdistinct/hzeta_degree/hdegree_sum/
   hzeta_uv) — Ind θ family の直接計算。
 - (e) concrete `FamilyHypothesis71` instance (P) + hP_L/hP_A/hP_G0 識別。
+
+## cont.⁵¹ — (7.10) 定量 assembly の原文 blueprint (mmd pp. 42-43 精読、実装マップ)
+
+**原文の構造** (Lean 対応付き):
+1. **index 選択**: h 最小の member を 1 に取る (Lean: argmin `F.h`、`hmin`)。
+   χ₁ := ν₁ζ₁ (= 選択 member の distinguished coherent image = `H78.nu (zeta zetaDistinct)`)。
+2. **𝓐/𝓑 分割**: 𝓐 = {i>1 : ⟨β_i, χ₁⟩ ≠ 0}、𝓑 = 残り。Lean の entry
+   (`characterEstimateData_of_family71_coherent_zeta_source_data`) の `B` = 𝓑、
+   `hgood` の対象 = 𝓐 (j ∉ B)。
+3. **𝓐 側 (hgood)**: (7.8.c) = `chiRhoNormSq_ge_ratio_of_inner_beta_ne_zero`
+   (S09_FrobeniusEstimate:51、H78 := member j、χ := χ₁、hbeta_ne = 𝓐 定義)。
+   hχ_orth (χ₁ ⊥ member-j の全 ν_jζ_r) = cross-orthogonality (disjoint kernel spread、
+   S09_FrobeniusCrossOrtho に既存のはず — 要確認)。
+4. **𝓑 側 (hx_nonzero)**: (7.9) = `hypothesis79_conclusion` (cont.⁵⁰ ✅)。
+   𝓑 定義 ⟨β_j, χ₁⟩ = 0 → dichotomy 他枝 ⟨β₁, ν_jζ_j⟩ ≠ 0 → x_j ≠ 0。
+5. **Γ 分解 (hΓ/horth/hΓ₁)**: x_j := ⟨Γ, ν_jζ_{j1}⟩ ∈ ℤ (Γ ∈ ℤ[Irr G])、
+   v_j := member-j の weightedNuSum (Σ_t d_{jt}·ν_jζ_{jt})、weight ⟨v_j,v_j⟩ =
+   Σ_t d_{jt}² = (h_j−1)/e_j = `BsumWeight`。⟨Γ, ν_jζ_{jt}⟩ = d_{jt}x_j は
+   「β と χ_{jt}−d_{jt}χ_{j1} の support 非交差」(原文 (4.1) 経由) から。
+   Γ₁ := Γ − Σ_{𝓑} x_j v_j (構成的、hΓ₁ は展開計算)。
+6. **hsmall**: e | h−1 (Frobenius) + h 奇数 ⟹ e ≤ (h−1)/2 ⟹ 2e+1 ≤ h。純数値。
+7. **hi**: (7.8.b) ‖χ₁^ρ‖² ≥ 1 − e/h — hzeta_uv 経由 (`zetaNuRhoNormSqGeOfDade` 系)。
+8. **source data (hind_norm 等)**: H normal in L ⟹ Ind_H^L 1 = Σ_{λ∈Irr(L/H)} λ ⟹
+   ⟨Ind1,Ind1⟩ = e。他も Ind θ family の直接計算。
+9. **P : FamilyHypothesis71**: F からの instance (既存 producer 要確認)。
+
+**次 iteration の実装順**: (α) S09_FrobeniusCrossOrtho の cross-orthogonality 在庫確認
+(3 の hχ_orth と 5 の support 非交差)、(β) 6 の数値補題 + 1 の argmin、(γ) 5 の Γ 分解
+(x/v/Γ₁ 構成 + horth)、(δ) 4+3 の 𝓐𝓑 wiring、(ε) 7-9 の残 source data。
