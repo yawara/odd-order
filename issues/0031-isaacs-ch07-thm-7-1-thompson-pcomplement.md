@@ -281,3 +281,24 @@ No solvability assumption or extension-closure scaffold is used.
 Step 2 is therefore complete.  The next textbook frontier is Step 3:
 prove `O_{p′}(G) = 1` using Lemma 7.7 and quotient inheritance for the two
 local normal-complement hypotheses.
+
+## 2026-07-14 update — Step 3 p′-core reduction landed
+
+Step 3 is complete in
+`oPiPrimeCore_eq_bot_of_minimal_counterexample`.  For
+`N = O_{p′}(G)`, the quotient map is injective on the chosen Sylow
+`p`-subgroup.  The existing quotient formulas identify the ambient images of
+`Z(P)` and `J(P)` with `Z(Pbar)` and `J(Pbar)`; Lemma 7.7 then transports
+the centralizer and normalizer hypotheses to `G/N`.  If `N ≠ 1`, minimality
+therefore gives a normal `p`-complement in the smaller quotient.
+
+The supporting theorem
+`hasNormalPComplement_of_quotient_of_isPiGroup_compl` proves the required
+reverse inheritance honestly: the inverse image of the quotient complement is
+a `p′`-group by extension closure, its index is preserved by correspondence,
+and it complements every Sylow `p`-subgroup.  Thus a quotient complement would
+lift to `G`, contradicting counterexample minimality, so `O_{p′}(G) = 1`.
+
+The next textbook frontier is Step 4: use Step 2 p-separability, Step 3, and
+the Hall–Higman centralizer bound (Isaacs Lemma 1.2.3) to prove that the chosen
+Sylow `p`-subgroup is maximal in `G`.
