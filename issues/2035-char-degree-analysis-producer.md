@@ -1033,3 +1033,55 @@ apply: subset_coherent_with cohT ...                          (* full calS へ�
 - [ ] bundle + rewire + discharge pivot
 
 γ-trick (更新 #12) は完全に回避。全て proven template の mirror ゆえ「新数学なし・transcription」。
+
+## 2026-07-13 更新 #15 (lane b, /loop) — ★architecture 訂正 (bridge 不要): Coq FTtypeP_coherence = by_cases(all-reducible/has-irr)
+
+更新 #14 の bridge transfer は**誤り** (bridge は M-side の 𝒮(H₀C)∪S(HC) 二 family 用、honest S-side は C'=⊥ で単一 family)。
+Coq `FTtypeP_coherence` (PFsection13:350-383) 精読で**正しい (かつより simple) 構成**が確定:
+
+### by_cases: calS が all-reducible か (irreducible member の有無)
+- **all-reducible (redS)**: μ-column の uniform seq coherence を `subset_coherent_with` で calS へ restrict
+  (all-reducible ゆえ calS ⊆ uniform seq)。⟹ **`exists_pinned_coherent_sSet_of_all_reducible` が対応、landing 済** (commit 71b34d70) ✓
+- **has-irr**: `FTtypeP_facts` の **arbitrary な既存 full coherence** を取り、pin を**証明** (bridge も subfamily glue も新 coherence 構成も不要):
+  - (A) `FTtypeP_coherent_TIred` (Coq PFsection8:852): coherent tau1 + irr member で `tau1(mu_j) = ±∑ᵢη_i(col)`
+    (符号 δ・共役 conjC まで)。core = `coherent_prDade_TIred` (prime-Dade)。**S-side analog = R-family 機構**:
+    - `sSet_coherent_extension_eq_sum_memberRFamily` (SSetMemberRFamily:879): coherent ext = signed R-family 和
+    - `sSet_memberRFamily_imageSet_of_red` (:590): reducible μ-column の R-family imageSet = {η_ij} ∪ {−η_ik}
+    - `sSet_irr_memberRFamily_eta_inner` (:633): irr member の R-family ⊥ η-grid
+    - positivity で (δ,col) を {(d,j),(~d,conjC j)} に pin
+  - (B) 符号確定 (Coq FTtypeP_coherence:362-382): flip `tau1(mu_k)=−tau1(mu_j)` を **isometry** で排除
+    (`tau1(mu_k)=tau(mu_k−mu_j)+tau1(mu_j)` = column 恒等式 `dadeHypS_muColumn_diff` + isometry)。
+    p=3 subtlety あり (Coq コメント 343-346)。
+
+⟹ 更新 #12 の capstone subtlety は **detour**。正しくは R-family γ-trick (更新 #8/#9 の caseA recipe が正解だった)。
+
+### 残作業 (訂正)
+1. [x] all-reducible glue (commit 71b34d70) — hallred branch
+2. [ ] **has-irr γ-trick** `sSet_coherent_muColumn_pin_of_irr`: 既存 coherence + irr member → pin
+   (R-family (A) + 符号確定 (B))。~150 行、Coq FTtypeP_coherent_TIred + branch-2 template。
+3. [ ] bundle `sSet_coherent_indS_A_pinned` = by_cases(∃irr) → {γ-trick / glue} + rewire coherent_H0Cprime_S + discharge pivot
+
+## 2026-07-13 更新 #16 (lane b, /loop) — ⚠ has-irr γ-trick に p=3 global-sign subtlety (target 選定要確認)
+
+γ-trick 精査で Coq `typeP_TIred_coherent` 定義 (PFsection13:338-340) の重要な nuance:
+```
+tau1(mu_j) = (-1)^b *: \sum_i eta_i (signW2 b j)   -- b : bool, b → p = 3
+```
+**pin は global sign b を許す** (b=true は p=3 のみ)。clean pin `tau1(mu_j) = ∑ᵢη_ij` は b=false 相当。
+
+- **all-reducible glue (landing 済)**: b=false を**構成で保証** (μcol_j ↦ ∑η_j 直写)。clean pin ✓。
+- **has-irr**: `FTtypeP_facts` の arbitrary coherence は b が未定 (p=3 で b=true 可)。⟹ scaffold target
+  `tau1S_ofHonest_muColumn_pivot` (clean, b=false) は p=3,b=true の coherence では**偽になりうる**。
+
+### 要確認 (次段で解決)
+1. downstream (`character_degree_analysis` / `mu_tau1_formula`) が clean pin (b=false) を要するか、
+   global-sign 形を許すか。delta_eq_one_S (δ=1) は clean を示唆。
+2. clean pin を要するなら: **b=false coherence を選択/構成**する必要。候補:
+   (a) has-irr でも μ-column subfamily glue (b=false) を base に取り full 𝒮 へ拡張 (base 保存拡張、要 lemma);
+   (b) p=3 の flip を isometry で排除 (Coq FTtypeP_coherence:362-382 の p=3 分析を mirror);
+   (c) p≠3 は自動 b=false、p=3 のみ特別処理。
+3. p=3 が honest S-instance で実際に起こるか (p,q 奇素数ゆえ p=3 可)。
+
+### 現状 (clean、正しい)
+all-reducible glue = landed (clean pin, b=false)。pivot sorry は honest に残存 (has-irr の b 選定が未解決ゆえ
+誤 target で bundle を組まない)。has-irr γ-trick + bundle は上記解決後。**誤った pin target で build しないため保留**。
