@@ -93,36 +93,6 @@ It returns `IsCyclic Z_p ∧ (IsCyclic Z_q → p < q)`.  `step3_not_both_opCore_
 applies it with `(p,q)` and `(q,p)` (same `M`): `Z_p, Z_q` cyclic and `p < q`,
 `q < p` — contradiction. -/
 
-/-- **§7D helper** — normalizer-grows. If `D < ↑S` for a finite `p`-group Sylow `S`,
-then `D` is strictly contained in `N_H(D) ⊓ ↑S`. -/
-theorem lt_normalizer_inf_sylow_of_lt
-    {H : Type*} [Group H] [Finite H] {p : ℕ} [Fact p.Prime]
-    (S : Sylow p H) {D : Subgroup H} (hD_lt : D < (S : Subgroup H)) :
-    D < Subgroup.normalizer D ⊓ (S : Subgroup H) := by
-  classical
-  haveI : Group.IsNilpotent ↥(S : Subgroup H) := S.isPGroup'.isNilpotent
-  have hNC : NormalizerCondition ↥(S : Subgroup H) :=
-    Group.normalizerCondition_of_isNilpotent (G := ↥(S : Subgroup H))
-  -- D.subgroupOf S < ⊤.
-  have hD_le : D ≤ (S : Subgroup H) := le_of_lt hD_lt
-  have hsub_lt_top : D.subgroupOf (S : Subgroup H) < ⊤ := by
-    rw [lt_top_iff_ne_top]
-    intro htop
-    rw [Subgroup.subgroupOf_eq_top] at htop
-    exact (ne_of_lt hD_lt) (le_antisymm hD_le htop)
-  have hlt := hNC (D.subgroupOf (S : Subgroup H)) hsub_lt_top
-  obtain ⟨t, ht_norm, ht_not⟩ := SetLike.exists_of_lt hlt
-  rw [← Subgroup.subgroupOf_normalizer_eq hD_le, Subgroup.mem_subgroupOf] at ht_norm
-  rw [Subgroup.mem_subgroupOf] at ht_not
-  -- ↑t ∈ N_H(D) ⊓ ↑S, ↑t ∉ D.
-  refine lt_of_le_of_ne (le_inf ?_ hD_le) ?_
-  · -- D ≤ N_H(D).
-    exact Subgroup.le_normalizer
-  · intro heq
-    apply ht_not
-    have : (t : H) ∈ Subgroup.normalizer D ⊓ (S : Subgroup H) := ⟨ht_norm, t.2⟩
-    rw [← heq] at this
-    exact this
 
 /-- **§7D Step 3 arithmetic** — a nontrivial `p`-group `A` acting faithfully on a
 cyclic `q`-group `C` (via an injective `A →* MulAut C`) forces `p < q`.
