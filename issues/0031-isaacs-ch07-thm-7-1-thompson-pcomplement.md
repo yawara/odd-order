@@ -232,3 +232,19 @@ This supplies the induction bridge needed when the selected bad normalizer is
 proper.  The remaining Step 1 core is to turn a failed local hypothesis inside
 that normalizer into a strictly larger bad normalizer `p`-part, contradicting the
 lexicographic choice of `U`.
+
+## 2026-07-14 update — Step 1 maximal bad subgroup identified with `O_p(G)`
+
+The normalizer-growth core of Step 1 is now complete.  If the selected bad
+subgroup `U` has proper normalizer `N`, strong induction makes the Thompson local
+hypothesis fail in `N`.  The failed center-or-`J` condition constructs a bad
+ambient `p`-subgroup `X`; growing a Sylow subgroup of `N` inside an ambient Sylow
+subgroup gives a strictly larger `p`-subgroup of `N_G(X)`, contradicting the first
+lexicographic maximality coordinate.  Hence `N_G(U) = G`.
+
+Normality then gives `U ≤ O_p(G)`.  Since `O_p(G)` has the same full normalizer
+and is itself bad, the second maximality coordinate forces equal finite orders,
+so `U = O_p(G)`.  The generic normalizer-growth lemma was moved upstream from
+`Basic.lean` into the §7C leaf so this proof remains acyclic and downstream users
+retain the same public theorem name.  The next frontier is Step 2: prove that
+`G / O_p(G)` has a normal `p`-complement.
