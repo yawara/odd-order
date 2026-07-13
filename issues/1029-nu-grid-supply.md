@@ -31,7 +31,8 @@ S15 carrier/API の正しい threading は分けて扱う。後者は b-owned si
 
 - [x] `FeitThompsonNuGrid.lean` へ canonical `nuT` 定義群を topic leaf として抽出する
 - [x] irreducibility / row injectivity / orthonormality / degree congruence / base sign を証明する
-- [ ] row-sum induction / reducible dichotomy / support / value / conjugation を T-side で証明する
+- [x] row-sum induction / reducible dichotomy / support / value を T-side で証明する
+- [ ] conjugation を T-side で証明する
 - [ ] V-side commutativity を既存の reconciled type-P data から供給する
 - [ ] AxiomsCheck tripwire と full build を通す
 - [ ] generic carrier の row-base gap と必要な cross-lane API 修正を issue 9096 に報告する

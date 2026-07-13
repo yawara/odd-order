@@ -1175,6 +1175,12 @@ theorem certainTypeT_W1_eq : (mp.certainTypeT hG).W1 = mp.Kstar.subgroupOf mp.T 
 theorem certainTypeT_W2_eq : (mp.certainTypeT hG).W2 = mp.K.subgroupOf mp.T := by
   unfold Section16MaximalPair.certainTypeT certainTypeHypothesis_of_typeP_kappaHall; rfl
 
+/-- `K` of `certainTypeT` is `(derivedInG mp.T).subgroupOf mp.T` (the (4.2) convention
+`K = T'`). -/
+theorem certainTypeT_K_eq :
+    (mp.certainTypeT hG).K = (derivedInG mp.T).subgroupOf mp.T := by
+  unfold Section16MaximalPair.certainTypeT certainTypeHypothesis_of_typeP_kappaHall; rfl
+
 include hG in
 /-- `mp.K ≤ mp.T` (it lies in `S ∩ T = K ⊔ K*`). -/
 theorem k_le_T : mp.K ≤ mp.T := by
