@@ -704,4 +704,270 @@ theorem Hypothesis.nineElevenPairBoundS [Finite G]
     _ = 2 * ((hyp.toTypesIIIIIIVSetupS hG).q : ℝ) ^ 2 * (caseA.a : ℝ) * (d : ℝ) := by
         rw [hde]; push_cast; ring
 
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **The canonical pinned `𝒮 = sSet`-coherence, all-reducible case** (issue 2035, (13.3.c) pin; the
+honest `S`-instance mirror of the M-side `exists_pinned_coherent_sOf_H0C_of_all_reducible`,
+`S13_Orthogonality.lean:560`).  If every member of `𝒮` is reducible — hence a μ-column sum
+(`sSet_reducible_eq_muColumnSum`) — the assignment `μ-column ↦ aligned η-column` extends to a
+coherent extension of `𝒮` on `Ind_S^G` (`coherentImageMap` over the orthogonal μ-column family),
+*pinned by construction* at the pivot column `1`.
+
+Isometry: μ-columns are pairwise `q·[j=k]`-orthogonal, matched by the η-columns (`muColumn_inner`
+/ `etaColumn_inner`).  τ-agreement: an `A(S)`-supported lattice element vanishes at `1`
+(`honestTypeP2ASet_one_not_mem`); since every reducible column shares degree `q·u`
+(`muColumn_apply_one`), the residual `ν₀ − Ind_S^G` is `(x 1 / q·u)`-proportional to the
+column-independent constant `r = η-col₁ − Ind_S^G(μ-col₁)` (from the general-column Dade
+cross-relation `dadeHypS_muColumn_diff` re-grounded onto `Ind_S^G` by `sInstance_dade_eq_induce`),
+hence vanishes there. -/
+theorem Hypothesis.exists_pinned_coherent_sSet_of_all_reducible [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))
+    (hallred : ∀ η ∈ sSet (hyp.toTypesIIIIIIVSetupS hG),
+      ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter η) :
+    ∃ c : OddOrder.Peterfalvi.S07.IsCoherent hyp.indS
+        (sSet (hyp.toTypesIIIIIIVSetupS hG))
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S),
+      c.extension (∑ i : Fin hyp.q, hyp.mu i ⟨1, hyp.p_prime.one_lt⟩)
+        = ∑ i : Fin hyp.q, hyp.eta i ⟨1, hyp.p_prime.one_lt⟩ := by
+  haveI := hyp.finiteG
+  classical
+  -- pivot / second-column index arithmetic
+  have hj1_0 : (⟨1, hyp.p_prime.one_lt⟩ : Fin hyp.p) ≠ ⟨0, hyp.p_prime.pos⟩ := by
+    intro h; exact absurd (congrArg Fin.val h) one_ne_zero
+  have h2lt : 2 < hyp.p := by have := hyp.three_le_p; omega
+  have hj2_0 : (⟨2, h2lt⟩ : Fin hyp.p) ≠ ⟨0, hyp.p_prime.pos⟩ := by
+    intro h; exact absurd (congrArg Fin.val h) (by norm_num)
+  have hne12 : (⟨1, hyp.p_prime.one_lt⟩ : Fin hyp.p) ≠ ⟨2, h2lt⟩ := by
+    intro h; exact absurd (congrArg Fin.val h) (by norm_num)
+  have hu_ne : hyp.u ≠ 0 := by
+    intro h0
+    have hcard : 0 < Nat.card ↥hyp.U := Nat.card_pos
+    rw [hyp.card_U_eq_uc, h0, zero_mul] at hcard
+    exact absurd hcard (lt_irrefl 0)
+  have hqne0 : (hyp.q : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hyp.q_prime.pos.ne'
+  have hone_notin : (1 : ↥hyp.S) ∉
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S := by
+    rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+    simpa using honestTypeP2ASet_one_not_mem (M := hyp.S)
+  -- the family, its finiteness, and the per-member column datum (all members reducible)
+  set F : Set (ClassFunction ↥hyp.S ℂ) := sSet (hyp.toTypesIIIIIIVSetupS hG) with hFdef
+  have hFfin : F.Finite := sSet_finite (hyp.toTypesIIIIIIVSetupS hG)
+  have hcolof : ∀ a ∈ F, ∃ k : Fin hyp.p, k ≠ ⟨0, hyp.p_prime.pos⟩ ∧
+      a = ∑ i : Fin hyp.q, hyp.mu i k := fun a ha =>
+    hyp.sSet_reducible_eq_muColumnSum hG ha (hallred a ha)
+  -- enumeration of the family
+  set n := hFfin.toFinset.card with hndef
+  set χ : Fin n → ClassFunction ↥hyp.S ℂ := fun i => ↑(hFfin.toFinset.equivFin.symm i) with hχdef
+  have hχmem : ∀ i, χ i ∈ F := fun i =>
+    hFfin.mem_toFinset.mp (hFfin.toFinset.equivFin.symm i).2
+  have hχinj : Function.Injective χ := fun i j hij =>
+    (Equiv.injective _ (Subtype.ext hij) :)
+  set kf : Fin n → Fin hyp.p := fun i => (hcolof (χ i) (hχmem i)).choose with hkfdef
+  have hkf0 : ∀ i, kf i ≠ ⟨0, hyp.p_prime.pos⟩ := fun i => (hcolof (χ i) (hχmem i)).choose_spec.1
+  have hkfeq : ∀ i, χ i = ∑ i' : Fin hyp.q, hyp.mu i' (kf i) :=
+    fun i => (hcolof (χ i) (hχmem i)).choose_spec.2
+  -- column inner products: `⟨μ-col_j, μ-col_k⟩ = q·[j=k] = ⟨η-col_j, η-col_k⟩`
+  have hμcols : ∀ j k : Fin hyp.p,
+      ClassFunction.inner (∑ i : Fin hyp.q, hyp.mu i j) (∑ i : Fin hyp.q, hyp.mu i k)
+        = if j = k then (hyp.q : ℂ) else 0 := hyp.muColumn_inner
+  have hηcols : ∀ j k : Fin hyp.p,
+      ClassFunction.inner (∑ i : Fin hyp.q, hyp.eta i j) (∑ i : Fin hyp.q, hyp.eta i k)
+        = if j = k then (hyp.q : ℂ) else 0 := hyp.etaColumn_inner
+  -- distinct members carry distinct columns; member-pair inner products
+  have hkfinj : ∀ i i' : Fin n, kf i = kf i' → i = i' := by
+    intro i i' hk
+    apply hχinj
+    rw [hkfeq i, hkfeq i', hk]
+  have hχpair : ∀ i i' : Fin n, ClassFunction.inner (χ i) (χ i')
+      = if i = i' then (hyp.q : ℂ) else 0 := by
+    intro i i'
+    rw [hkfeq i, hkfeq i', hμcols]
+    by_cases hii : i = i'
+    · subst hii; rw [if_pos rfl, if_pos rfl]
+    · rw [if_neg (fun h => hii (hkfinj _ _ h)), if_neg hii]
+  have hχorth : ∀ i j : Fin n, i ≠ j → ClassFunction.inner (χ i) (χ j) = 0 := by
+    intro i j hij; rw [hχpair, if_neg hij]
+  have hχnorm : ∀ i : Fin n, ClassFunction.inner (χ i) (χ i) ≠ 0 := by
+    intro i; rw [hχpair, if_pos rfl]; exact hqne0
+  -- the canonical Fourier map and its member images
+  set ν₀ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥hyp.S G :=
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap.coherentImageMap χ
+      (fun i => (ClassFunction.inner (χ i) (χ i))⁻¹ • ∑ i' : Fin hyp.q, hyp.eta i' (kf i))
+    with hν₀def
+  have hν₀apply : ∀ i : Fin n, ν₀ (χ i) = ∑ i' : Fin hyp.q, hyp.eta i' (kf i) := fun i =>
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap.coherentImageMap_apply_eq_of_orthogonal
+      hχorth hχnorm i
+  -- the general-column Dade cross-relation re-grounded onto `Ind_S^G`
+  have hindS_col_diff : ∀ j : Fin hyp.p, j ≠ ⟨0, hyp.p_prime.pos⟩ →
+      hyp.indS ((∑ i : Fin hyp.q, hyp.mu i j)
+          - (∑ i : Fin hyp.q, hyp.mu i ⟨1, hyp.p_prime.one_lt⟩))
+        = (∑ i : Fin hyp.q, hyp.eta i j)
+          - (∑ i : Fin hyp.q, hyp.eta i ⟨1, hyp.p_prime.one_lt⟩) := by
+    intro j hj0
+    by_cases hj1 : j = ⟨1, hyp.p_prime.one_lt⟩
+    · subst hj1; rw [sub_self, map_zero, sub_self]
+    · rw [hyp.indS_apply,
+        ← hyp.sInstance_dade_eq_induce hG hnoV (hyp.muColumn_diff_supported hG chief hj0 hj1_0),
+        hyp.dadeHypS_muColumn_diff hG hnoV chief hj0 hj1_0 hj1, Finset.sum_sub_distrib]
+  -- the column-independent residual `r = η-col₁ − Ind_S^G(μ-col₁)`
+  set r : ClassFunction G ℂ :=
+    (∑ i : Fin hyp.q, hyp.eta i ⟨1, hyp.p_prime.one_lt⟩)
+      - hyp.indS (∑ i : Fin hyp.q, hyp.mu i ⟨1, hyp.p_prime.one_lt⟩) with hrdef
+  have hrconst : ∀ j : Fin hyp.p, j ≠ ⟨0, hyp.p_prime.pos⟩ →
+      (∑ i : Fin hyp.q, hyp.eta i j) - hyp.indS (∑ i : Fin hyp.q, hyp.mu i j) = r := by
+    intro j hj0
+    have hτdiff : hyp.indS (∑ i : Fin hyp.q, hyp.mu i j)
+        - hyp.indS (∑ i : Fin hyp.q, hyp.mu i ⟨1, hyp.p_prime.one_lt⟩)
+        = (∑ i : Fin hyp.q, hyp.eta i j)
+          - (∑ i : Fin hyp.q, hyp.eta i ⟨1, hyp.p_prime.one_lt⟩) := by
+      rw [← map_sub]; exact hindS_col_diff j hj0
+    rw [hrdef, sub_eq_sub_iff_sub_eq_sub]
+    exact hτdiff.symm
+  -- every reducible member shares the degree `q·u` — via the value-at-1 of the column sum
+  have hdegs : ∀ i : Fin n, ((χ i : ClassFunction ↥hyp.S ℂ) : ↥hyp.S → ℂ) 1
+      = ((∑ i' : Fin hyp.q, hyp.mu i' ⟨1, hyp.p_prime.one_lt⟩ :
+          ClassFunction ↥hyp.S ℂ) : ↥hyp.S → ℂ) 1 := by
+    intro i
+    rw [hkfeq i, hyp.muColumn_apply_one hG (kf i) (hkf0 i),
+      hyp.muColumn_apply_one hG ⟨1, hyp.p_prime.one_lt⟩ hj1_0]
+  -- the member-index extraction from a set-membership
+  have hidxof : ∀ a ∈ F, ∃ i : Fin n, χ i = a := by
+    intro a ha
+    exact ⟨hFfin.toFinset.equivFin ⟨a, hFfin.mem_toFinset.mpr ha⟩, by simp [hχdef]⟩
+  -- the isometry field
+  have hinner : ∀ x y : ClassFunction ↥hyp.S ℂ,
+      x ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.S) F →
+      y ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.S) F →
+      ClassFunction.inner (ν₀ x) (ν₀ y) = ClassFunction.inner x y := by
+    intro x y hx hy
+    induction hy using Submodule.span_induction with
+    | mem b hb =>
+        induction hx using Submodule.span_induction with
+        | mem a ha =>
+            obtain ⟨i, rfl⟩ := hidxof a ha
+            obtain ⟨j', rfl⟩ := hidxof b hb
+            rw [hν₀apply i, hν₀apply j', hηcols, hχpair]
+            by_cases hij : i = j'
+            · subst hij; rw [if_pos rfl, if_pos rfl]
+            · rw [if_neg (fun h => hij (hkfinj _ _ h)), if_neg hij]
+        | zero => rw [map_zero, ClassFunction.inner_zero_left,
+            ClassFunction.inner_zero_left]
+        | add u v hu hv ihu ihv =>
+            rw [map_add, ClassFunction.inner_add_left, ClassFunction.inner_add_left,
+              ihu, ihv]
+        | smul m u hu ihu =>
+            rw [map_zsmul, ← Int.cast_smul_eq_zsmul ℂ m (ν₀ u),
+              ← Int.cast_smul_eq_zsmul ℂ m u, ClassFunction.inner_smul_left,
+              ClassFunction.inner_smul_left, ihu]
+    | zero => rw [map_zero, ClassFunction.inner_zero_right, ClassFunction.inner_zero_right]
+    | add u v hu hv ihu ihv =>
+        rw [map_add, ClassFunction.inner_add_right, ClassFunction.inner_add_right, ihu, ihv]
+    | smul m u hu ihu =>
+        rw [map_zsmul, ← Int.cast_smul_eq_zsmul ℂ m (ν₀ u),
+          ← Int.cast_smul_eq_zsmul ℂ m u, OddOrder.RepresentationTheory.inner_smul_right,
+          OddOrder.RepresentationTheory.inner_smul_right, ihu]
+  -- the pivot degree is nonzero (`q·u`)
+  have hD1ne : ((∑ i' : Fin hyp.q, hyp.mu i' ⟨1, hyp.p_prime.one_lt⟩ :
+      ClassFunction ↥hyp.S ℂ) : ↥hyp.S → ℂ) 1 ≠ 0 := by
+    rw [hyp.muColumn_apply_one hG ⟨1, hyp.p_prime.one_lt⟩ hj1_0]
+    exact mul_ne_zero hqne0 (Nat.cast_ne_zero.mpr hu_ne)
+  -- the residual identity on the whole lattice
+  have hres : ∀ x ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.S) F,
+      ν₀ x - hyp.indS x
+        = ((x 1) / ((∑ i' : Fin hyp.q, hyp.mu i' ⟨1, hyp.p_prime.one_lt⟩ :
+            ClassFunction ↥hyp.S ℂ) : ↥hyp.S → ℂ) 1) • r := by
+    intro x hx
+    induction hx using Submodule.span_induction with
+    | mem a ha =>
+        obtain ⟨i, rfl⟩ := hidxof a ha
+        rw [hν₀apply i, hdegs i, div_self hD1ne, one_smul]
+        have h1 : (∑ i' : Fin hyp.q, hyp.eta i' (kf i)) - hyp.indS (χ i) = r := by
+          conv_lhs => rw [hkfeq i]
+          exact hrconst (kf i) (hkf0 i)
+        exact h1
+    | zero => rw [map_zero, map_zero, ClassFunction.zero_apply, zero_div, zero_smul, sub_zero]
+    | add u v hu hv ihu ihv =>
+        rw [map_add, map_add, ClassFunction.add_apply, add_div, add_smul]
+        rw [show ν₀ u + ν₀ v - (hyp.indS u + hyp.indS v)
+            = (ν₀ u - hyp.indS u) + (ν₀ v - hyp.indS v) from by abel, ihu, ihv]
+    | smul m u hu ihu =>
+        rw [map_zsmul, map_zsmul, ← Int.cast_smul_eq_zsmul ℂ m (ν₀ u),
+          ← Int.cast_smul_eq_zsmul ℂ m (hyp.indS u), ← Int.cast_smul_eq_zsmul ℂ m u,
+          ClassFunction.smul_apply, ← smul_sub, ihu, smul_smul, mul_div_assoc]
+  -- the supported-agreement field
+  have hextends : ∀ x : ClassFunction ↥hyp.S ℂ,
+      x ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.S) F
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S) →
+      ν₀ x = hyp.indS x := by
+    rintro x ⟨hxspan, hxsupp⟩
+    have hx1 : x 1 = 0 := by
+      by_contra h
+      exact hone_notin (hxsupp (ClassFunction.mem_support.mpr h))
+    have h := hres x hxspan
+    rw [hx1, zero_div, zero_smul, sub_eq_zero] at h
+    exact h
+  -- the ZIrr-codomain field
+  have hZIrr : ∀ x : ClassFunction ↥hyp.S ℂ,
+      x ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.S) F → ν₀ x ∈ ZIrr G := by
+    intro x hx
+    induction hx using Submodule.span_induction with
+    | mem a ha =>
+        obtain ⟨i, rfl⟩ := hidxof a ha
+        rw [hν₀apply i]
+        exact Submodule.sum_mem _ fun i' _ =>
+          OddOrder.Peterfalvi.S16.eta_mem_ZIrr hyp i' (kf i)
+    | zero => rw [map_zero]; exact Submodule.zero_mem _
+    | add u v hu hv ihu ihv => rw [map_add]; exact Submodule.add_mem _ ihu ihv
+    | smul m u hu ihu => rw [map_zsmul]; exact Submodule.smul_mem _ m ihu
+  -- the nonzero supported witness `μ-col₁ − μ-col₂`
+  have hnonzero : ∃ φ : ClassFunction ↥hyp.S ℂ,
+      φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.S) F
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S) ∧ φ ≠ 0 := by
+    refine ⟨(∑ i : Fin hyp.q, hyp.mu i ⟨1, hyp.p_prime.one_lt⟩)
+        - (∑ i : Fin hyp.q, hyp.mu i ⟨2, h2lt⟩), ?_, ?_⟩
+    · rw [OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff]
+      refine ⟨Submodule.sub_mem _ (Submodule.subset_span ?_) (Submodule.subset_span ?_),
+        hyp.muColumn_diff_supported hG chief hj1_0 hj2_0⟩
+      · rw [hFdef]
+        exact sOf_subset_sSet _ chief.H0
+          (hyp.mu_colSum_mem_sOf_H0 hG chief ⟨1, hyp.p_prime.one_lt⟩ hj1_0)
+      · rw [hFdef]
+        exact sOf_subset_sSet _ chief.H0
+          (hyp.mu_colSum_mem_sOf_H0 hG chief ⟨2, h2lt⟩ hj2_0)
+    · intro heq
+      have hce : (∑ i : Fin hyp.q, hyp.mu i ⟨1, hyp.p_prime.one_lt⟩)
+          = ∑ i : Fin hyp.q, hyp.mu i ⟨2, h2lt⟩ := sub_eq_zero.mp heq
+      have hcontra := hyp.muColumn_inner ⟨1, hyp.p_prime.one_lt⟩ ⟨2, h2lt⟩
+      rw [if_neg hne12, ← hce, hyp.muColumn_inner_self] at hcontra
+      exact hqne0 hcontra
+  -- assemble; the pin is `hν₀apply` at the `μ-col₁`-member index
+  have hμ1mem : (∑ i : Fin hyp.q, hyp.mu i ⟨1, hyp.p_prime.one_lt⟩) ∈ F := by
+    rw [hFdef]
+    exact sOf_subset_sSet _ chief.H0
+      (hyp.mu_colSum_mem_sOf_H0 hG chief ⟨1, hyp.p_prime.one_lt⟩ hj1_0)
+  set i₁ : Fin n := hFfin.toFinset.equivFin ⟨_, hFfin.mem_toFinset.mpr hμ1mem⟩ with hi₁def
+  have hχi₁ : χ i₁ = ∑ i : Fin hyp.q, hyp.mu i ⟨1, hyp.p_prime.one_lt⟩ := by
+    rw [hχdef, hi₁def]; simp
+  have hkfi₁ : kf i₁ = ⟨1, hyp.p_prime.one_lt⟩ := by
+    have hcols_eq : (∑ i' : Fin hyp.q, hyp.mu i' (kf i₁))
+        = ∑ i' : Fin hyp.q, hyp.mu i' ⟨1, hyp.p_prime.one_lt⟩ := by
+      rw [← hkfeq i₁, hχi₁]
+    have h2 : (if kf i₁ = (⟨1, hyp.p_prime.one_lt⟩ : Fin hyp.p) then (hyp.q : ℂ) else 0)
+        = (hyp.q : ℂ) := by
+      rw [← hμcols, hcols_eq, hμcols, if_pos rfl]
+    by_contra hne
+    rw [if_neg hne] at h2
+    exact hqne0 h2.symm
+  refine ⟨{ nonzero := hnonzero
+            extension := ν₀
+            extension_inner_eq := hinner
+            extends_on_supported := hextends
+            extension_mem_ZIrr := hZIrr }, ?_⟩
+  show ν₀ (∑ i : Fin hyp.q, hyp.mu i ⟨1, hyp.p_prime.one_lt⟩)
+    = ∑ i : Fin hyp.q, hyp.eta i ⟨1, hyp.p_prime.one_lt⟩
+  rw [← hχi₁, hν₀apply i₁, hkfi₁]
+
 end OddOrder.Peterfalvi.S15
