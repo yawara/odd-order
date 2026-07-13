@@ -623,6 +623,12 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 24) — a 合流: Isaacs Ch07 Step4 Sylow maximality (新 leaf S7C_SylowMaximal)**:
+  **a=1** (`c02156ee` = Isaacs Ch07 issue 0031。**新 leaf `S7C_SylowMaximal.lean` +120 (0 sorry、root closure
+  = S7D1 が import)** + Basic/S7B2/S7D1 の import 追従 (decl 削除ゼロ) + AxiomsCheck +6)。scope Isaacs
+  shared-foundation additive ✓。b=0 / c=0。build green **4198 jobs** / AxiomsCheck OK (**2409** 全 allowlist) /
+  count-sorry **50→50 不変** / 新 axiom なし / 逸脱なし。
+  ⚠ **issue 9096 (b frontier direction) 依然 保留** — ユーザー裁定待ち (tick 23 参照)。
 - **2026-07-14 (tick 23) — a+b 合流: a=Isaacs Ch07 Step3 p-prime core trivial + b=docs (frontier assessment, issue 9096)**:
   **a=1** (`58c67f17` = Isaacs Ch07 issue 0031。`S7C_ThompsonPComplement` +227、0 sorry、計 1223 行 + AxiomsCheck +4)。
   **b=1 docs-only** (`b3ca00fb` = frontier assessment。issue **9096 新規 (HUB direction 依頼)**: b の S15-solo 9094
