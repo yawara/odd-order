@@ -607,6 +607,14 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 16) — b 合流: hbridge caseA branch を genuine に証明 (9094/2035)**:
+  **b=1 実 commit** (`f553eae6` = `S15_CharacterDegreeSupply.lean` +173、hbridge の caseA 分岐を genuine 証明 =
+  "subtlety" は red herring と判明。b 所有 leaf ✓)。a=0 / c=0。
+  build green **4197 jobs** / AxiomsCheck OK (2382 assertion 全 allowlist) / **count-sorry 51→51 不変**
+  (S15 file 4→4、4 sorried decl set 不変 = `deltaPrime_eq_one_T`/`tSide_theta_package_of_not_caseB_core`/
+  `T_caseB_facts_no_lambda`/`S_caseB_facts_no_lambda`、proven→sorry swap なし。+173 は caseA 内部証明機械 =
+  S_caseB_facts_no_lambda discharge へ向かう sub-lemma) / 新 axiom なし / 逸脱なし。
+  size watch: S15_CharacterDegreeSupply 1436 (tick12 1240 → +196、2000 未満だが成長中 — watch)。
 - **2026-07-14 (tick 15) — a 合流: Isaacs Ch07 Thm 7.1 (Thompson normal p-complement) — Sylow centers via p-prime quotients**:
   **a=1** (`e2772ae0` = Isaacs Ch07 Thompson subgroup work、issue 0031。**新 leaf `S7C_ThompsonPComplement.lean` +76**
   (sorry-free) + `Basic.lean` +3/-2・`S7D1_BurnsideSetup.lean` +1/-1 (import 追加 + 微修正、**decl 削除ゼロ = 既存
