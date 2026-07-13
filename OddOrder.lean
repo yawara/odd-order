@@ -275,6 +275,7 @@ import OddOrder.Peterfalvi.S15_SAndT
 import OddOrder.Peterfalvi.S15_HonestTypeP2A0
 import OddOrder.Peterfalvi.S15_SSetMemberRFamily
 import OddOrder.Peterfalvi.S15_CaseBReducibleCoherence
+import OddOrder.Peterfalvi.S15_NineElevenSteps
 import OddOrder.Peterfalvi.S15_CaseACoherence
 import OddOrder.Peterfalvi.S15_SAndT_Setup.CoherenceEtaOrthogonality
 import OddOrder.Peterfalvi.S16_CaseBOrder
