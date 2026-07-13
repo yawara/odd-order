@@ -822,3 +822,59 @@ subagent 調査 + **自己検証済**の重大な設計発見 (CLAUDE.md donenes
 tau1S_ofHonest_inner_induce 等は forced property のみ使うので影響なし)。内部 def のみ pin projection に変更。
 これで `muColumn_tau1_inner_etaColumn` は pin `.some.2` から直接 discharge (MuColumnPin の inner_pin_eq scaffold は
 optional 化)。⚠ subagent の engine 名は一部 M-side 混同あり、上記は自己 grep で S15 実名を確定済。
+
+## 2026-07-13 更新 #9 (lane b, /loop) — carrier 再設計の feasibility 確定 (全ピース実在) + 実装 recipe
+
+更新 #8 の bundling が feasible と確定。追加で判明した実装の鍵:
+
+- **map-type subtlety**: `sSet_coherent_indS_A` は `IsCoherent hyp.indS` (`indS θ = induce hyp.S θ`、純 Ind_S^G)
+  を返すが、linchpin engine `sSet_coherent_extension_eq_sum_memberRFamily` (SSetMemberRFamily:765) は
+  **dade-coherence** `IsCoherent (dadeIntegralCharacterMap (dadeHypS…))` を取る。
+- **bridge 実在**: `IsCoherent.congrMap hindS_dade` で indS-coherence → dade-coherence 変換
+  (`S15_CaseBReducibleCoherence.lean:436` に既存使用例 `cohS₂ := cohS₂_indS.congrMap hindS_dade`)。
+  extension field は不変ゆえ pin (extension の性質) は両 map 間で transport 可。
+
+### 実装 recipe (次 iteration、複数回可)
+1. engine で `c'.extension(∑ᵢμᵢⱼ) = ∑_{α∈E} α`, `E ⊆ (memberRFamily (∑μ)).imageSet`。
+   `sSet_memberRFamily_imageSet_of_red` (:476) で imageSet = `{ηᵢⱼ}ᵢ ∪ {−η_{i,finNeg j}}ᵢ`。isometry
+   (‖∑μ‖²=q, muColumn_inner_self) + orthonormal で `|E|=q`。
+2. **+符号 (E={ηᵢⱼ}) の強制**:
+   - caseA: irreducible member ξ (`caseA_exists_irreducible_qa`) に対し `sSet_irr_memberRFamily_eta_inner`
+     (:519、irr member の像 ⊥ η) + `tauS_mu_cross` (BridgeCharacter:917) で γ-forcing → mix/−符号を排除。
+   - caseB: `sSet_coherent_dade_caseB` (CaseBReducibleCoherence:46) を +符号で構成 (M-side
+     `exists_pinned_coherent_sOf_H0C_of_all_reducible` (S13_Orthogonality:560) の S-side 類比)。
+3. bundle: `sSet_coherent_indS_A` の戻り値を `Nonempty (Σ' c : IsCoherent hyp.indS 𝒮 A(S),
+   ∀ j≠0, c.extension(∑ᵢμᵢⱼ)=∑ᵢηᵢⱼ)` に。`coherent_H0Cprime_S := .some.1` (型不変)、
+   pin accessor `.some.2`。下流 engine (tau1S_ofHonest_inner_induce 等) は forced property のみ
+   ゆえ無影響。
+4. `muColumn_tau1_inner_etaColumn` を pin accessor から discharge。
+
+**安全策**: まず新 `sSet_coherent_indS_A_pinned` を additive に建て (既存 coherent_H0Cprime_S 不変)、
+branch pin 2 本を sorried-skeleton で landing → 各 branch pin を proven → 最後に coherent_H0Cprime_S
+rewire。これで load-bearing carrier の破壊リスクを最小化。
+
+## 2026-07-13 更新 #10 (lane b, /loop) — carrier 再設計の深度確定: caseB は S07 pin 露出が必要
+
+更新 #9 の実装に着手し、caseB 分岐が想定より深いことが判明 (精読で確定):
+
+- **caseA (has-irr)**: 任意 coherence で γ-forcing 可 (`sSet_irr_memberRFamily_eta_inner` +
+  `caseA_exists_irreducible_qa`)。⟹ `sSet_coherent_indS_caseA.some` + 後付け pin 証明で bundle 可。S15-local。
+- **caseB (all-reducible)**: ⚠ flip witness が valid ゆえ **任意 coherence で pin 証明不可**。
+  `sSet_coherent_dade_caseB` (:46) は `uniform_degree_coherence_of_families` (S07_PivotCoherence:793)
+  経由だが、**両者とも bare `Nonempty (IsCoherent)` を返し pin を expose しない** → `.some` は任意 inhabitant
+  → caseB の pin も現状決まらない。
+  - 必要: `uniform_degree_coherence_of_families` / `pivotCoherence` (S07、**shared infra**) を
+    `Nonempty (Σ c, c.extension(pivot)=<pivot partner>)` に強化して pin (pivot の像) を露出、
+    or S-side glue 構成 (M-side `exists_pinned_coherent_sOf_H0C_of_all_reducible` (S13:560) の類比
+    — ただし M-side は concrete glue machinery 依存)。
+  - `pivotCoherence` は pivot η₁ を specific に写すので **pin は構成上決まっている**が、`Nonempty` が
+    witness を消している。露出は S07 の return type 変更 (shared、9000 claim 対象の可能性)。
+
+### frontier 現状 (正確)
+(13.3.c) formula は「carrier に μ-column pin を bundle」に帰着し、その pin bundle は:
+1. caseA = S15-local な γ-forcing (中程度)
+2. caseB = **S07 `uniform_degree_coherence_of_families` の pin 露出** (shared infra 強化) が本丸
+
+= 深い multi-layer 課題。fresh session で S07 pin-露出強化から着手推奨 (shared ゆえ着手前に 9000 claim +
+既存 open 9000 scan)。MuColumnPin の formula scaffold は bundle 完成まで sorried-cite で保持 (soundness 問題なし
+= tau1S_ofHonest は valid coherence、pin が未確定なだけ)。
