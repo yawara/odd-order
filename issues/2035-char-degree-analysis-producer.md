@@ -1382,3 +1382,39 @@ NormEstimates 5 obtain-site 移行の keystone = **general S-side dichotomy** �
 **次 = ⑤ flip 3/N**: NormEstimates 8 helper の core/lam 版 + 5 obtain-site の dichotomy 移行
 (λ枝 = core+lam で helper 呼出、no-λ枝 = C=⊥∧u=full からの (13.10)-arithmetic)。または (c) の
 deep bridge を先に engage (最上流 genuine math、multi-session)。
+
+## 2026-07-14 更新 #29 (lane b, /loop) — ⚠ 重大 architecture 発見: NormEstimates 移行は import DAG でブロック (honest producer が下流)
+
+⑤ flip 3/N (NormEstimates 5 obtain-site 移行) 着手時に **import 上の根本ブロッカー**を発見:
+
+- **honest producer 群 (`T_caseB_facts_unconditional` / `lambdaCluster_or_caseB` /
+  `characterDegreeCore_nonempty` / `lambda_forces_T_caseB_core`、全て S15_CharacterDegreeSupply)
+  は NormEstimates の *下流***。理由 = producer は `tau1S_ofHonest` (S15_CaseACoherence) が必須で、
+  `S15_CharacterDegreeSupply → CaseACoherence → MuColumnPin → CoherenceEtaOrthogonality →
+  {S15_HonestTypeP2A0, S16_GridExpansion} → hub S15_SAndT_Setup → NormEstimates`。
+- ⟹ **NormEstimates は honest producer を import 不能** (cycle)。overstatement
+  `character_degree_analysis` (Machinery135, 上流) 経由でしか character-degree data を取れない。
+- 教科書層序 ((13.3) char degrees → (13.6-15) analytic) に対し repo は **逆転** (honest (13.3)
+  producer が τ₁ coherence engine 依存で (13.6-15) NormEstimates の下流に来た)。
+- **層逆転の実在**: `CoherenceEtaOrthogonality (S15) → S16_GridExpansion (S16)` — S15 が S16 を import。
+  hub を import する closure 内ファイル = S16_GridExpansion / S15_SAndTDefs / S13_PrimeTIResidueBridge /
+  S15_HonestTypeP2A0 の複数。単一 spurious edge の de-hub では解けない (multi-file relayer + S15↔S16
+  層序修正が要る、delicate)。
+
+### 含意 (9094 RULING §3 の feasibility 修正)
+- RULING §3-2「NormEstimates 5 を dichotomy thread に proof 移行」は **現 import DAG では不可能**。
+  前提に「honest producer が NormEstimates 上流」があったが、実際は下流。
+- RULING §3-3「全 consumer 移行後 character_degree_analysis 削除」も NormEstimates 移行がブロックゆえ
+  現状不可。**overstatement は当面上流 interface として残る** (§13 analytic 枝は honest 化できない = FT
+  honest 証明の債務、要 relayer)。
+- 移行済は downstream consumer のみ = TTypeII (S16、honest producer 下流ゆえ可、更新 #27)。
+
+### 選択肢 (次の方針)
+- **(A) multi-file relayer**: CoherenceEtaOrthogonality 系の hub 依存を specific-leaf import に置換 +
+  S15↔S16 層逆転解消 → honest producer を NormEstimates 上流へ。high-leverage だが delicate・多反復・
+  build 検証必須 ([[relayer-verify-with-build-not-bfs]])。
+- **(B) deep math bridge を先に**: `S_caseB_facts_no_lambda` ((13.3.b) forward, S-instance irr SOf
+  member → LambdaWitness) / `T_caseB_facts_no_lambda` (no-λ T-mirror)。honest producer を下流のまま
+  honest 化 (downstream TTypeII 枝が fully honest に)。upstream genuine math。
+- hub 監視 tick で本発見を確認 (RULING §3 前提の訂正ゆえ)。b は当面 (B) の deep math を engage
+  (relayer は別 major effort、着手前に規模精査)。
