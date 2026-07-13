@@ -264,3 +264,20 @@ the full Thompson local hypothesis in `G/U`; strong induction then yields
 is handled separately and constructively.  The remaining Step 2 frontier is the
 textbook consequence that `G` is `p`-solvable from `U` being a normal `p`-group
 and `G/U` having a normal `p`-complement.
+
+## 2026-07-14 update — Step 2 p-separability consequence landed
+
+The p-solvability consequence is now proved as the honest three-layer canonical
+`piFittingSeries` construction
+`isPiSeparable_of_normalPSubgroup_quotient_hasNormalPComplement`.
+
+For `U ◁ G` a `p`-group and `Nbar ◁ G/U` a normal `p′`-complement, let
+`K` be the inverse image of `Nbar`.  The first π-Fitting layer absorbs `U`.
+The image of `K` modulo that layer is a homomorphic image of `Nbar`, hence a
+`p′`-group, so the second layer absorbs `K`.  Finally
+`G/K ≃ (G/U)/Nbar` is a `p`-group, so the third layer is all of `G`.
+No solvability assumption or extension-closure scaffold is used.
+
+Step 2 is therefore complete.  The next textbook frontier is Step 3:
+prove `O_{p′}(G) = 1` using Lemma 7.7 and quotient inheritance for the two
+local normal-complement hypotheses.
