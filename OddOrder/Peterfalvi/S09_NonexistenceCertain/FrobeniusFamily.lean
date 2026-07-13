@@ -1009,30 +1009,11 @@ lemma exists_lowerBoundTerm_of_exists_real_Bsum_bound [Finite G]
 
 end FrobeniusFamily
 
-/-- **Peterfalvi (7.10).** Under `FrobeniusFamily` with `G` of odd order, there is
-an index `i` for which, writing `e = e_i` and `h = h_i`,
-
-`(|G₀| - 1)/|G| ≥ (e - 1) · ((h - 2e - 1)/(e·h) + 2/(h·(h+2)))`.
-
-This is the quantitative heart of §9; its proof uses the Dade isometry and the
-coherence estimates (7.5)-(7.9). -/
-theorem card_G0_lower_bound [Finite G] {k : ℕ} (F : FrobeniusFamily G k)
-    (hodd : Odd (Nat.card G)) :
-    ∃ i : Fin k,
-      ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
-        ((F.e i : ℚ) - 1) *
-          (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ)) +
-            2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
-  have hdata : F.CharacterEstimateData := by
-    -- TODO: assemble from (7.5), (7.8), (7.9), and (6.8).
-    sorry
-  exact F.lowerBoundTerm_of_characterEstimateData hodd hdata
-
 /-- **Peterfalvi (7.11), displayed-bound form.**  The final contradiction from the
 existential lower bound displayed in (7.10).
 
 This isolates the terminal arithmetic of (7.11): any proof of the displayed (7.10) bound,
-including the still-open theorem `card_G0_lower_bound` or the conditional §9 assembly lemmas,
+including the downstream theorem `card_G0_lower_bound` or the conditional §9 assembly lemmas,
 can be consumed without duplicating the `G₀ = {1}` contradiction proof. -/
 theorem not_trivial_G0_of_lowerBoundTerm [Finite G] {k : ℕ} (F : FrobeniusFamily G k)
     (hodd : Odd (Nat.card G))
@@ -1109,9 +1090,9 @@ theorem not_trivial_G0_of_exists_real_Bsum_bound [Finite G] {k : ℕ}
 /-- **Peterfalvi (7.11), conditional form.**  The final contradiction from the named
 `CharacterEstimateData` package used to prove (7.10).
 
-This avoids routing through the still-open `card_G0_lower_bound`: once the §9 character theory has
-constructed `F.CharacterEstimateData`, the terminal `G₀ ≠ {1}` contradiction is already closed by
-the completed arithmetic and positivity lemmas. -/
+This is the direct `CharacterEstimateData` consumer underlying the downstream
+`card_G0_lower_bound`: once the §9 character theory has constructed the package, the terminal
+`G₀ ≠ {1}` contradiction is already closed by the completed arithmetic and positivity lemmas. -/
 theorem not_trivial_G0_of_characterEstimateData [Finite G] {k : ℕ} (F : FrobeniusFamily G k)
     (hodd : Odd (Nat.card G)) (hdata : F.CharacterEstimateData)
     (hG0 : F.G0 = {(1 : G)}) : False :=
@@ -1123,9 +1104,9 @@ theorem not_trivial_G0_of_characterEstimateData [Finite G] {k : ℕ} (F : Froben
 contradiction from the concrete (7.5) family inequality, coherent `ζ` image,
 (7.8.b) source estimates, and the (7.9) orthogonal integer decomposition.
 
-This bypasses the open top-level `card_G0_lower_bound`: once these textbook
-source-data inputs are available, the displayed lower bound and the final
-`G₀ = {1}` contradiction are already closed. -/
+This is a source-data consumer parallel to the downstream top-level
+`card_G0_lower_bound`: once these textbook inputs are available, the displayed lower bound and
+the final `G₀ = {1}` contradiction are already closed. -/
 theorem not_trivial_G0_of_family71_coherent_zeta_source_data
     [Fintype G] [Invertible (Nat.card G : ℂ)] {k : ℕ}
     {A : Set G} {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)]
@@ -1251,7 +1232,7 @@ This is the terminal consumer paired with
 `FrobeniusFamily.lowerBoundTerm_of_family_source_decomposition`: once the
 character-theoretic work has supplied the chosen local (7.8) source package, the
 real reduced family inequality, and the orthogonal integer decomposition, the
-case `G₀ = {1}` is already impossible without using the still-open
+case `G₀ = {1}` is already impossible without first packaging those inputs through
 `card_G0_lower_bound`. -/
 theorem not_trivial_G0_of_family_source_decomposition
     [Fintype G] [Invertible (Nat.card G : ℂ)] {k : ℕ}
@@ -1305,20 +1286,6 @@ theorem not_trivial_G0_of_family_source_decomposition
       hB_ne v x Γ₁ hΓ horth hΓ₁ hx_nonzero hind_norm hzeta_ind hirr hdistinct
       hzeta_degree hdegree_sum hzeta_uv hsmall hred⟩
     hG0
-
-/-- **Peterfalvi (7.11)** — the §9 main theorem.
-
-There is no odd-order group `G` admitting a family of `k ≥ 2` Frobenius subgroups
-(as in `FrobeniusFamily`) whose kernels' conjugate-spreads cover everything except
-the identity, i.e. with `G₀ = {1}`.
-
-Proof (in the text): if `G₀ = {1}` then `|G₀| = 1`, so the left side of (7.10)
-vanishes; but `e ≥ 2` (the Frobenius complement is nontrivial and `|G|` is odd)
-and `e ∣ h - 1` with `h` odd give `(h - 2e - 1)/(eh) ≥ 0`, whence the right side
-of (7.10) is strictly positive — a contradiction. -/
-theorem not_trivial_G0 [Finite G] {k : ℕ} (F : FrobeniusFamily G k)
-    (hodd : Odd (Nat.card G)) (hG0 : F.G0 = {(1 : G)}) : False := by
-  exact not_trivial_G0_of_lowerBoundTerm F hodd (card_G0_lower_bound F hodd) hG0
 
 end OddOrder.Peterfalvi.S09
 

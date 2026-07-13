@@ -785,3 +785,18 @@ concrete (7.5)、coherent image、(7.8.b) source estimates、(7.9) decomposition
 
 これで `card_G0_lower_bound` の残り assembly 義務は、抽象的な `CharacterEstimateData` ではなく、
 教科書の concrete source-data package を存在させる問題として使える形に近づいた。
+
+### 2026-07-14 — (7.10)/(7.11) final assembly complete
+
+`S09_FrobeniusCardG0LowerBound.lean` で minimal kernel member と canonical character を選び、
+完成済みの (7.8.b)、(7.8.c)、(7.9) concrete bounds から
+`FrobeniusFamily.CharacterEstimateData` を実構成した。これを displayed (7.10)
+`card_G0_lower_bound` と (7.11) `not_trivial_G0` へ接続し、§9 の proof-term `sorry` を閉じた。
+
+一般 Frobenius-kernel nilpotence そのものはここで再証明せず、両 endpoint は per-member
+nilpotence を入力に取る。FT 上の実 consumer では各 kernel が
+`maxNilpotentNormalHall` なので、BG §15 の構成済み nilpotence と subgroup equivalence から
+この入力を供給する。したがって最終 FT 経路には未充足の nilpotence 仮定を残さない。
+
+import DAG は `S09_Building78C` を lower `FrobeniusFamily` leaf に向け、S09 hub が final leaf を
+re-export する形にした。AxiomsCheck tripwire は constructor、(7.10)、(7.11) の全てで green。

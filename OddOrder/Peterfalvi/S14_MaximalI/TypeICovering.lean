@@ -461,7 +461,17 @@ theorem not_all_maximal_typeI (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     by_contra hx1
     obtain ⟨i, g, hg⟩ := cov.covers x hx1
     exact (F.mem_G0_iff.mp hx) i ⟨g, hg⟩
-  exact OddOrder.Peterfalvi.S09.not_trivial_G0 F hG.odd hG0
+  have hnilp : ∀ i : Fin cov.k,
+      Group.IsNilpotent ↥((F.H i).subgroupOf (F.L i)) := by
+    intro i
+    change Group.IsNilpotent
+      ↥((maxNilpotentNormalHall (cov.reps i)).subgroupOf (cov.reps i))
+    haveI : Group.IsNilpotent ↥(maxNilpotentNormalHall (cov.reps i)) :=
+      OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent (cov.reps i)
+    exact Group.nilpotent_of_mulEquiv
+      (Subgroup.subgroupOfEquivOfLe
+        (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le (cov.reps i))).symm
+  exact OddOrder.Peterfalvi.S09.not_trivial_G0 F hG.odd hnilp hG0
 
 end Theorem1217
 
