@@ -47,8 +47,9 @@ The (9.11) proof splits on the Clifford dichotomy (9.7):
   (9.11.2)–(9.11.8).
 
 Consumers: lane b's (13.3) `coherent_H0Cprime_S` re-grounding (`S`-instance, issue 1017 G1),
-lane a's gate-2 `hY` (`coherent_Sset_diff_SHCSet`, issue 9016) and (10.7)
-`typeII_derived_frobenius`.
+lane a's gate-2 `hY` (`coherent_Sset_diff_SHCSet`, issue 9016) and the (10.7) pair-witness
+producer `typeII_HU_frobenius_of_coherent_at_pair` (`S12_TypeIICrossIsometryPair`; the legacy
+`typeII_derived_frobenius` is retired, issues 1020/9079/9087).
 
 Reference note: `issues/1017-pf-s5-uniform-degree-coherence.md` (G1),
 `issues/9016-gate2-nine-eleven-difference-report.md` (hY contract).

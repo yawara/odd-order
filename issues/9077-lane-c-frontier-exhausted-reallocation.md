@@ -404,3 +404,26 @@ RULING #3 抽出 (5 補題を S16-free leaf へ) を driving し、landing 後�
 
 **posture 変更なし**: c は idle 継続 (gated-endpoint hold) が正しい。ユーザー再開は上記 T1 (a の leaf) or
 T2-T4 landing 時。検証は .lean 無変更 (docs のみ)。
+
+---
+
+## ✅ T1 RESOLVED (2026-07-13, lane a) — `hVcomm` 閉包・(14.9) type-III determination が axiom-clean
+
+9077 T1 の推奨 (「lane a が S16-free 抽出 leaf を作る」) は **9093 の import inversion が先に上位解決**:
+`S13_TypeDetermination` の downstream producer が `FeitThompsonPairProducer` へ移設された結果、
+`S13_NonGaloisExclusion` の transitive closure から `Peterfalvi.S16_NonExistenceG.*` /
+`FeitThompsonSetup` が消滅 (BFS 検証済、closure 648 modules 中 S16 系 0)。**抽出 leaf は不要になった**。
+
+これを受け lane a が TTypeII.lean の `hVcomm` residual を機械的に閉包 (RULING #3 の consumer 追従 pattern、
+c は idle 確認済・hunk 衝突なし):
+- `import OddOrder.Peterfalvi.S13_NonGaloisExclusion` 追加 (acyclic BFS 確認済)。
+- `T_not_isTypeIV_of_isTypeP1` の body を producer 直 cite に置換
+  (`not_isTypeIV_of_mem_maximalSubgroups hG hyp.base.T_maximal` — producer docstring 記載通り)。
+  bare sorry −1 (`hVcomm`)。
+
+**検証**: full `lake build OddOrder` green (4187 jobs) + 新 AxiomsCheck asserts OK —
+`T_not_isTypeIV_of_isTypeP1` / **`T_isTypeIII_of_isTypeP1` (14.9 type-III determination) が
+axiom-clean** (`[propext, Classical.choice, Quot.sound]`)。
+
+**c への通知**: T1 は landing 済。`T_typeII` はまだ dirty (残 residual = `T_isTypeP2` 系 carrier、
+T2-T4 の genuine char/coherence/parity 待ちで変化なし)。c の idle posture 変更は hub 判断。

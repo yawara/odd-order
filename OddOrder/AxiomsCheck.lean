@@ -7796,3 +7796,19 @@ cited off the card_kappaHall subtree); the spine character core is the lane-a co
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.isTypeIIIorIV_unconditional
 #assert_only_allowed_axioms OddOrder.card_kappaHall_lt_of_isTypeIIIorIV
 #assert_only_allowed_axioms OddOrder.card_kappaHall_lt_of_isTypeP1
+
+/-! **Peterfalvi (8.17) BG-Theorem-E cover interface `bgTheoremE_cover_data`, axiom-clean**
+(lane a, 2026-07-13, issue 9087 census 訂正).  The §10 covering interface (representatives of
+maximal conjugacy classes, `π(G)` partition by the `π((M_i)_s)`, thickened `A₁(M_i)` counts) is
+fully proven off the BG §14/§16 σ-decomposition layer (`genuineSigmaDecomposition`,
+`exists_peterfalviType`, `mainSubgroup_eq_Msigma`).  Tripwire: this is the B2 input
+(`card_LF_coprime_pq`, §15 gate 4) and the (12.9) `exists_second_maximal` cover step. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.bgTheoremE_cover_data
+
+/-! **Peterfalvi (14.9) T-side type-III determination `T_isTypeIII_of_isTypeP1`, axiom-clean**
+(lane a, 2026-07-13, issues 9077 T1 / 9093).  The `hVcomm` residual (`V` abelian, (11.9)-gated)
+of `T_not_isTypeIV_of_isTypeP1` is discharged by the universal (11.9.c) Type-IV exclusion
+`not_isTypeIV_of_mem_maximalSubgroups` (`S13_NonGaloisExclusion`, sorry-free), citable from §16
+after the 9093 import inversion broke the `S13_NonGaloisExclusion → §16` transitive edge. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.T_not_isTypeIV_of_isTypeP1
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.T_isTypeIII_of_isTypeP1

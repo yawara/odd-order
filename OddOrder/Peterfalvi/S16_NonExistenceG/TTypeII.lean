@@ -1,6 +1,7 @@
 import OddOrder.Peterfalvi.S16_NonExistenceG.TTypeIICoherence
 import OddOrder.Peterfalvi.S16_NonExistenceG.TGapGalois
 import OddOrder.Peterfalvi.S16_NonExistenceG.TGapGridAlignment
+import OddOrder.Peterfalvi.S13_NonGaloisExclusion
 
 /-!
 # Peterfalvi (14.9): the T-side Type-II theorem
@@ -833,59 +834,22 @@ theorem isMulCommutative_typePData_U_of_V [Finite G]
   exact OddOrder.GroupTheory.isMulCommutative_of_mulEquiv
     (Subgroup.subgroupOfEquivOfLe d.U_le) hmapped
 
-/-- **Peterfalvi (11.9)/(14.9), the Type-IV exclusion residual** — the genuine deep content of the
-type determination.  Coq `FTtype34_structure` (Peterfalvi (11.9), `PFsection11.v:1001`, consumed at
-`PFsection14.v:735`) pins a non-type-II type-`P` maximal `T` to Type III (not IV) via the
-character/Galois argument `suffices galM : typeP_Galois MtypeP` (`PFsection11.v:1139`) — the
-`η`-grid projection computation `a₁₁ = a₁₀ = 0`.  In this formalisation the III/IV discriminator is
-`IsMulCommutative U` (`TypeIIIData` carries `U_commutative`, `TypeIVData` its negation), so the
-(11.9) content is exactly: *`T`'s derived complement `U`-factor (`= V`) is abelian*.
+/-- **Peterfalvi (11.9)/(14.9), the Type-IV exclusion** — the deep content of the type
+determination, now discharged.  Coq `FTtype34_structure` (Peterfalvi (11.9), `PFsection11.v:1001`,
+consumed at `PFsection14.v:735`) pins a non-type-II type-`P` maximal `T` to Type III (not IV) via
+the character/Galois argument `suffices galM : typeP_Galois MtypeP` (`PFsection11.v:1139`) — the
+`η`-grid projection computation `a₁₁ = a₁₀ = 0`.
 
-This is genuine §11 character theory — **not** a σ-structural config fact — and is formalised
-nowhere in this repo (the §11/§13 layer `S13_MaximalIII_IV` only ever *posits* `IsTypeIII M ∨
-IsTypeIV M`, and there is no universal Type-IV exclusion analogous to the proven Type-V one
-`no_typeV_maximal`).  Isolated here as the *single* residual of the (14.9) type determination:
-everything else (Type-V exclusion, the III/IV structural wiring incl. `normalizer_le`) is proven in
-`T_isTypeIII_of_isTypeP1` below. -/
+Formalised as the universal (11.9.c) Type-IV exclusion `not_isTypeIV_of_mem_maximalSubgroups`
+(`S13_NonGaloisExclusion`, sorry-free): the `IsMulCommutative V` residual that used to live here
+follows from `cyclic V ⟸ typeP_Galois T`, whose full §5–§13 chain
+(`not_isTypeIV_of_hypothesis`/`U_isCyclic_of_hypothesis`) is landed.  The direct cite became
+possible once the §12–16 import inversion (issue 9093) removed `S13_NonGaloisExclusion`'s
+transitive dependency on §16. -/
 theorem T_not_isTypeIV_of_isTypeP1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T) :
-    ¬ OddOrder.GroupTheory.IsTypeIV hyp.base.T := by
-  -- Coq (11.9) `FTtype34_structure` ⟹ `typeP_Galois T` ⟹ (in the `IsMulCommutative U` presentation)
-  -- the `U = V` factor is abelian, so `T` is Type III not IV.  The deep character/projection argument
-  -- is now isolated to the single residual `hVcomm` (`V` abelian); everything else is the honest
-  -- complement-conjugacy transfer `isMulCommutative_typePData_U_of_V`.
-  --
-  -- EXACT REDUCTION of `IsMulCommutative V` (verified against Coq `PFsection{9,11}.v`, 2026-07-06):
-  --   V abelian  ⟸  `cyclic V`  ⟸  `typeP_Galois T`  (the genuine (11.9) content).
-  -- Coq chain (`FTtype34_structure`, `PFsection11.v:1139-1144`):
-  --   `suffices galM : typeP_Galois MtypeP` (`:1139`); then
-  --   `typeP_Galois_P` (`PFsection9.v:501-511`) extracts `cyclic Ubar` (`:1140`), and
-  --   `cyclic V` + `nilpotent V` ⟹ `cyclic V` ⟹ `abelian V`
-  --   (`cyclic_nilpotent_quo_der1_cyclic`/`cyclic_abelian`, `:1144`).
-  -- `typeP_Galois := acts_irreducibly U Hbar 'Q` (`PFsection9.v:323`): `V` acts IRREDUCIBLY on
-  -- `Hbar = Q/Φ(Q)`.  Proving THAT is the `η`-grid projection `a₁₁ = a₁₀ = 0` (`PFsection11.v:1041-
-  -- 1126`), whose inputs are the FULL §3–§11 apparatus: `S₁`-coherence (`cohS1`), the Dade isometry
-  -- (`Dade_isometry`/`Dade_reciprocity`, §4/§5), the cyclic-TI isometry (`cycTIiso`,
-  -- `coherent_ortho_cycTIiso`, §3), and prime-TI reducibles (`prTIred`) — via the norm bound
-  -- `⟨X,X⟩ ≤ q` and odd-order parity.  So this is genuinely (11.9)-GATED, NOT σ-theory: the §9/§13
-  -- σ-engine (`card_le_cyclotomicQuotient_of_faithful_fpf`, `TypePGaloisUBound.lean`) is the (13.2.c)
-  -- `u`-bound `|V| ≤ (p^q−1)/(p−1)` which CARRIES `[CommGroup V]` as a hypothesis — it consumes
-  -- commutativity, never proves it.
-  --
-  -- WHY NOT STRUCTURALLY FREE (contrast S-side): the S-side `U` is abelian for free via BG 15.1(b)
-  -- (`typeP_hall_derived_eq_and_abelian`, `⁅U,U⁆ ≤ U ⊓ M_σ = ⊥`) BECAUSE `U` is the `(κ∪σ)'`-Hall
-  -- of `S`.  For type `P₁` (`IsTypeP1 T ⟺ κ(T) = σ'(T) = π(T) ∖ σ(T)`, `S14.IsTypeP1`), the
-  -- `(κ∪σ)'`-Hall is TRIVIAL (`κ ∪ σ = π`) and `V` is instead the κ-Hall complement to `Q = T_F` in
-  -- `T' = Q ⋊ V`; with `T_F ⊊ M_σ` (III/IV case) one gets `V ⊓ M_σ ≠ ⊥` (exactly the σ-part that,
-  -- at type IV, is where non-commutativity lives), so the `⁅V,V⁆ ≤ V ⊓ M_σ = ⊥` mechanism FAILS.
-  -- Structurally `V` is only known to be a nilpotent Frobenius kernel (`Hypothesis.isNilpotent_V`,
-  -- `V ⋊ W₂` Frobenius with `C_V(W₂) = ⊥`) — nilpotent ⇏ abelian.  No lane-c-doable sub-part
-  -- advances this: even the final `nilpotent + cyclic V/V' ⟹ abelian` step needs `cyclic V`, which
-  -- is downstream of `typeP_Galois`.  Missing bridge (Lean): a `typeP_Galois`/`cyclic V` producer,
-  -- itself requiring the §5–§11 coherence/Dade layer (S05/S06/S07 Dade + coherence, still sorried).
-  have hVcomm : IsMulCommutative ↥hyp.base.V := sorry  -- (11.9)-gated: V (=T's U-factor) abelian ⟸ `cyclic V` ⟸ `typeP_Galois T`
-  rintro ⟨d⟩
-  exact d.U_not_commutative (isMulCommutative_typePData_U_of_V hG hyp d.typeP hVcomm)
+    (hyp : Hypothesis (G := G)) (_hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T) :
+    ¬ OddOrder.GroupTheory.IsTypeIV hyp.base.T :=
+  OddOrder.Peterfalvi.S13.not_isTypeIV_of_mem_maximalSubgroups hG hyp.base.T_maximal
 
 /-- **Peterfalvi (14.9), the type determination** — Coq `PFsection14`
 `have [_ _ [Ttype3 _]] := FTtype34_structure maxT TtypeP notTtype2` (line 735): a type-`P` maximal
