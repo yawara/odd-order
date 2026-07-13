@@ -530,7 +530,7 @@ theorem lambda_tau1_apply_mul_eq_zero [Fintype G] [Invertible (Nat.card G : ℂ)
   refine hyp.vanish_of_inner_eta_eq_zero (chars.tau1S chars.lambda) (fun i j => ?_)
     (mul_mem (hW2W hx) (hW1W hy)) hnot
   rw [hlamEq]
-  exact chars.tau1S_induce_inner_eta i j θl hθlirr
+  exact chars.tau1S_induce_inner_eta i j θl hθlirr (hlamEq ▸ chars.lambda_irreducible)
 
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce Classical in
 /-- **The (7.7.a) coefficients of any virtual character are integers** (general form; cf.
@@ -1054,7 +1054,7 @@ theorem eta10_cCoeff_orthogonal [Fintype G] [Invertible (Nat.card G : ℂ)]
         (chars.tau1S (ClassFunction.induce K (θ : ClassFunction ↥K ℂ))) = 0 := by
     rw [hKJ]
     intro θ
-    have h := chars.tau1S_induce_inner_eta ⟨1, hyp.q_prime.one_lt⟩ ⟨0, hyp.p_prime.pos⟩ _ θ.2
+    have h := chars.tau1S_induce_inner_eta_col_zero ⟨1, hyp.q_prime.one_lt⟩ _ θ.2
     convert h using 1 <;> congr! <;> exact Subsingleton.elim _ _
   obtain ⟨θj, hθj⟩ := (H_sharp_hypothesis76 hG hyp).zeta_induced j
   rw [show (H_sharp_hypothesis76 hG hyp).cCoeff hyp.eta10 j

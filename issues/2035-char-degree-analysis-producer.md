@@ -1131,3 +1131,54 @@ S-side 対応 (全部既存!):
   構成 (has-irr: `.some`+formula_of_irr / all-red: `exists_pinned_coherent_sSet_of_all_reducible`+diff 拡張)、
   `coherent_H0Cprime_S := .choose` に rewire (型不変)、`tau1S_ofHonest_muColumn_formula := .choose_spec`。
 - OddOrder.lean に MuColumnPin 登録 (現在未登録)。
+
+## 2026-07-13 更新 #18 (lane b, /loop) — ★★(13.3.c) main formula LANDED (sorry-free、pivot sorry 消滅)
+
+更新 #17 の plan を完全実装 (commits 5a198c90 + 7376ec89、full build 4188 jobs green + AxiomsCheck OK):
+
+1. **MuColumnPin.lean** = c-generic pin 機構 leaf (sorry-free):
+   `muColumn_not_irreducible` / `coherentIndS_muColumn_diff` (列独立性、任意 coherence) /
+   `coherentIndS_extension_irr_vanish_regular` (irr 像の Ŵ^G 消滅) /
+   `coherentIndS_muColumn_vanish_regular` (γ-trick) /
+   **`coherentIndS_muColumn_pin_of_irr`** (dichotomy: clean ∨ conj-column flip; R-family 分解を
+   congrMap transport + (3.7) inner_eta_grid_relation row-uniformity + norm=q) /
+   `coherentIndS_muColumn_eq_etaColumn_of_pivot` (pivot→全列)。
+2. **CaseACoherence**: `sSet_coherent_indS_A_pinned` (by_cases ∃irr; flipped pivot → p≥5 矛盾
+   (hno3rd) → p=3 強制 + swap 組み立て; all-red → glue) → `coherent_H0Cprime_S := .choose` rewire
+   (型不変) → **`tau1S_ofHonest_muColumn_formula`** = (13.3.c) main:
+   `(∀j≠0, τ₁μ_j = ∑η_ij) ∨ (p=3 ∧ swap-negate)` — `mu_tau1_formula` field と同形。
+3. 旧 scaffold の閉じ得ない clean-pivot sorry (`tau1S_ofHonest_muColumn_pivot`) は撤去
+   (honest な proven formula に置換)。
+
+### 残作業 (次段) = CharacterDegreeData 材料化 (issue 2035 本丸)
+`character_degree_analysis` (Machinery135:~215, sorry) の Nonempty (CharacterDegreeData hyp) 構成:
+- `mu_tau1_formula` ⟵ **tau1S_ofHonest_muColumn_formula で直接 discharge 可** ✓
+- `tau1S := hyp.tau1S_ofHonest hG hnoV chief` を採る場合、hG/hnoV/chief の供給設計が要
+  (CharacterDegreeData は hyp のみ参照 — hnoV・chief を仮説/field としてどう thread するか)。
+- 他 field: tau1S_isometry 系 = tau1S_ofHonest_inner_induce / _induce_mem_ZIrr ✓ (proven)、
+  `tau1S_induce_inner_eta` = crux ✓、`mu_j_linear_induced` (13.3.a)、`delta_eq_one`、
+  `mu_col_tau1_eta_col_one` ⟵ formula + (13.3.a) の合成。lambda 系 field は要調査。
+
+## 2026-07-13 更新 #19 (lane b, /loop) — carrier bug 修正 + CharacterDegreeData 材料化 inventory
+
+### ⚠ uninhabitability 発見・修正済
+`tau1S_induce_inner_eta` (∀ irr θ: ⟨η_ij, τ₁(Ind θ)⟩=0) が `mu_col_tau1_eta_col_one` と矛盾
+(θ := (13.3.a) の θ_j で ±1 = 0) → structure uninhabited だった。修正 = 2 field 化
+(irr(Ind θ) 仮説付き本体 + 列0限定 ∀θ 版 `tau1S_induce_inner_eta_col_zero`)、consumer 3 箇所調整。
+
+### 材料化 inventory (character_degree_analysis の構成部品)
+signature (hG, hyp) は不変で OK — **hnoV = `S12.no_typeV_maximal_unconditional hG`**、
+**chief = `exists_chiefFactorData hG (hyp.toTypesIIIIIIVSetupS hG)`** で内部調達可能。
+- tau1S := tau1S_ofHonest hG hnoV chief ✓
+- mu_tau1_formula ⟵ tau1S_ofHonest_muColumn_formula ✓ (更新 #18)
+- mu_j_linear_induced ⟵ **mu_j_isIndPC** (DegreesFirstSplit:767, proven) ✓
+- delta_eq_one ⟵ S 側 **delta_eq_one_S** (CountingLayer:1547, proven) ✓ + δ' 側 (swap 経由? 要確認)
+- mu_col_tau1_eta_col_one ⟵ formula + mu_j_isIndPC の合成 (buildable、p=3 分岐で j 選択)
+- tau1S_inner_induce ⟵ tau1S_ofHonest_inner_induce ✓ / tau1S_induce_mem_ZIrr ⟵ ..._induce_mem_ZIrr ✓
+- tau1S_apply_induce_sub ⟵ tau1S_ofHonest_extends_on_supported + induce_H_mem_zSpan_S
+  (zSpan 所属) + degree-0 差の A(S)-support (要小 lemma: zSpan 元の (η−η')(1)=0 → A(S)-supported)
+- tau1S_induce_inner_eta ⟵ crux coherentIndS_image_inner_eta_eq_zero (Ind θ irr member 版、
+  Ind θ ∈ sSet の membership が要 — 𝒳 kernel 条件の確認要)
+- tau1S_induce_inner_eta_col_zero ⟵ zSpan 分解 + formula + crux (irr/red 両対応)
+- **lambda (13.3.b) = 未存在の genuine content** (irr・degree uq・H-linear-induced な member の存在)
+- tau1T ⟵ hyp.swap (HypothesisSwap:153) の tau1S_ofHonest (swap 側 chief も exists_chiefFactorData)

@@ -1808,6 +1808,7 @@ theorem lambda_forces_T_caseB [Finite G]
       ClassFunction.inner (chars.tau1S chars.lambda) (hyp.eta i j) = 0 := by
     intro i j
     have h := chars.tau1S_induce_inner_eta i j thetaL hthetaLirr
+      (hlamEq ▸ chars.lambda_irreducible)
     rw [← hlamEq] at h
     rw [OddOrder.RepresentationTheory.inner_conj_symm, h, star_zero]
   -- The bilinear expansion is `δ·δ' ≠ 0` — contradiction.
