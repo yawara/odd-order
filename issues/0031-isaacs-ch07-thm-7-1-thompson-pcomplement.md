@@ -320,3 +320,17 @@ trivial.  Therefore `H` is its own Sylow `p`-subgroup and `H = P`, proving
 
 The next textbook frontier is Step 5: derive `C_G(Z(P)) = P` from Step 4 and
 the assumed normal `p`-complement in `C_G(Z(P))`.
+
+## 2026-07-14 update — Step 5 Sylow-center centralizer landed
+
+Step 5 is complete in
+`OddOrder/Isaacs/Ch07_ThompsonSubgroup/S7C_CentralizerCenter.lean`.
+The proof first establishes `P ≤ C_G(Z(P))` directly from the intrinsic center
+membership condition.  Step 4 supplies `IsCoatom P`.  If the centralizer were
+all of `G`, its normal `p`-complement from the theorem hypothesis would transport
+along `C_G(Z(P)) ≃ G`, contradicting minimal-counterexample failure.  The only
+remaining overgroup allowed by maximality is therefore `P` itself.
+
+The next textbook frontier is Step 6: analyze the normal `p`-complement of
+`G/O_p(G)`, prove it is abelian, and derive the abelian Sylow-2 hypothesis used
+by the existing normal-J closing theorem.
