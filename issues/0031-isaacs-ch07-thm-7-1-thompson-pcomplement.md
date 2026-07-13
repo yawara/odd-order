@@ -248,3 +248,19 @@ so `U = O_p(G)`.  The generic normalizer-growth lemma was moved upstream from
 `Basic.lean` into the §7C leaf so this proof remains acyclic and downstream users
 retain the same public theorem name.  The next frontier is Step 2: prove that
 `G / O_p(G)` has a normal `p`-complement.
+
+## 2026-07-14 update — Step 2 quotient normal complement landed
+
+The quotient half of Step 2 is complete.  For a Sylow `P` containing the normal
+maximal bad subgroup `U`, any nontrivial `Xbar ≤ P/U` normalized by `P/U` has
+inverse image `U < X ≤ P` normalized by `P`.  Lexicographic maximality therefore
+forces `N_G(X)` to have a normal `p`-complement.  The correspondence theorem
+identifies `N_{G/U}(Xbar)` with the quotient image of `N_G(X)`, so that complement
+passes to the quotient normalizer.
+
+Applying this argument to the ambient image of `Z(P/U)` and to `J(P/U)` proves
+the full Thompson local hypothesis in `G/U`; strong induction then yields
+`maximal_badNormalizer_quotient_hasNormalPComplement`.  The trivial `P/U` case
+is handled separately and constructively.  The remaining Step 2 frontier is the
+textbook consequence that `G` is `p`-solvable from `U` being a normal `p`-group
+and `G/U` having a normal `p`-complement.
