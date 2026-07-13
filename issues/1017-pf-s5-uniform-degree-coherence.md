@@ -1810,3 +1810,15 @@ axiom-clean 確認済み (#print axioms)。
 **次 frontier 候補 (次 iteration で確定)**: 上流優先により BG §16 Theorem-II pin
 (共有 infra、claim 状況を 9000 issue で確認) or lane-b open issues (2018/2020/2022/2030) の
 文書順最上流。
+
+## 2026-07-13 更新 #56 (lane b, /loop) — 再 split + frontier 確定
+
+- **split (commit 037539d9)**: S15_CaseACoherence 1463 行 → prefix-split で
+  `S15_NineElevenSevenEight.lean` (531 行、(9.11.7)-(9.11.8) refutation) を分離、本体 957 行。
+- **frontier 確認**: `induce_H_mem_zSpan_S` (sS1S / Pf (1.5.a)、2035 gap#1) は **axiom-clean 済**
+  (#print axioms 標準 3 のみ — 9014 constructor 後に closed 済と確認)。τ₁ engines
+  (`tau1S_ofHonest_inner_induce`/`_induce_mem_ZIrr`) の残 sorryAx は dadeHypS 系 (accepted parity)。
+- **次 (文書順)**: (9.11) S-instance coherence (sSet_coherent_indS_A) の landing で
+  「coherence 依存で gated」だった b-owned sorry 群 (2038 census: S15_SAndT_Setup 11 / S15_SAndT 9)
+  の gate が解除された可能性 → **次 iteration = 再 census** (comment-strip + gate 判定を code-level で
+  やり直し、2035 gap#2 の A₀(S) support-widening / mu_tau1red (13.6)-(13.9) port を含む文書順最上流に着手)。
