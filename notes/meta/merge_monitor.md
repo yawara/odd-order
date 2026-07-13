@@ -607,6 +607,16 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 12) — a+b 合流: a=S09 concrete Frobenius γ-norm/B-sum bound (実証明 2 leaf) + b=docs (NormEstimates 移行の architecture 発見)**:
+  **a=2** (`c1f8402b` gamma norm bound + `64c01243` B-sum bound = `S09_FrobeniusGammaNormEstimate.lean` +252 /
+  `S09_FrobeniusBsumEstimate.lean` +72、いずれも **sorry-free の concrete 評価**、AxiomsCheck +23、**a が
+  OddOrder.lean import を自分で追記** (tick10 申し送りを反映) ✓、issue 0044 更新。scope=S09 territory ✓)。
+  **b=1 docs-only** (`a6c43531` issue 2035 #29 = ⚠ architecture 発見: NormEstimates 5 定理の Core+dichotomy
+  移行が **import DAG でブロック** — NormEstimates は Machinery135 (legacy `character_degree_analysis` 定義元) を
+  import する層にあり、新 producer への切替が循環 import を生む旨。.lean 非接触)。c=0。
+  build green **4194 jobs** / AxiomsCheck OK (2379 assertion 全 allowlist、exit 0) / **count-sorry 51→51 不変**
+  (a leaf sorry-free・b docs-only) / 新 axiom なし / 逸脱なし。size watch: a leaf 72/252 OK。
+  9094 残 = NormEstimates 5 定理移行 (b が import DAG 制約を issue 化 = 次の設計判断待ち) + dichotomy scaffold 実証明。
 - **2026-07-14 (tick 11) — a+b 合流: a=S09 family-wide weighted Γ 分解 (実証明) + b=9094 ⑤ flip 1-2/N (TTypeII endpoint→Core+dichotomy)**:
   **a=1** (`c023f3cc` = `S09_FrobeniusGammaDecomposition.lean` +585 で family-wide weighted gamma
   decomposition を **sorry-free で構成** (0→0)、AxiomsCheck +18 (新 decl assertion)、issue 0044 更新。
