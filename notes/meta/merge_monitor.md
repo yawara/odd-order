@@ -573,6 +573,13 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-13 (新セッション tick 1 — Fable 5 hub; 監視対象 = a/b、c はユーザー指示で明示停止中) — b 合流**:
+  **b=3** (feat(2035, 13.3.c) all-reducible pinned coherence glue `coherentImageMap` = pin bundle core、
+  S15_CaseBReducibleCoherence +266 全 proven + sync merge + docs(2035) pin architecture 訂正 #15/#16) /
+  a=0 / c=0。tip SHA pin (27cf1336) で検査・merge を一致させ実行。build green (4187 jobs)・
+  AxiomsCheck OK (2361/0)・count-sorry 52→52・新 axiom なし・逸脱なし・size watch OK
+  (S15_CaseBReducibleCoherence 973 <1500)。push `e94f6265..ddba2593`。
+  **監視ペース**: Fable ゆえ 30 分 `13,43` で cron 再作成 (id b64b7309、session-only)。
 - **2026-07-13 (tick 1, セッション再開初回 — Fable 5 hub; 監視対象 = a/b のみ、c 未稼働 ユーザー指示) — b 合流**:
   **b=4** ((9.11.6) S-instance `nineElevenNormBoundS` dichotomy closed (1017) + **0114 再分割実施**:
   S15_CaseBReducibleCoherence 1829→697、新 leaf S15_CaseACoherence 1031 + S15_NineElevenSteps 523、
