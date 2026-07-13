@@ -89,3 +89,68 @@ edge-2 が解ければ `WitnessSylowCyclic` に `import OddOrder.Peterfalvi.S13_
   `FeitThompsonSetup:1,62,70,1648` (edge-2), `AppC_FinalContradiction` (imports AppC_LemmaC2 + S16).
 - 関連 issue: 9087 (lane-A cluster complete + RULING #3 capstone rewire = inversion の起源候補),
   1024 (typeP_Galois/11.9 pending), 9079 (grid transpose obl.2b, Section16MaximalPair 使用元)。
+
+---
+
+## 🧭 HUB RULING (2026-07-13 監視 tick, Opus hub 自律裁定) — Option 3 (extended): edge (B) を data relocation で切る
+
+**裁定 = Option 3 (extended)。edge (A) FeitThompsonSetup→AppC は切らない (genuine math)。edge (B)
+GridTranspose→FeitThompsonSetup を「upstream-safe な data 構造の新 leaf 抽出」で切る。**
+
+深掘り調査 (hub subagent) + hub 自身の独立 BFS 検証で確定した根拠:
+
+### lane A の当初診断は誤り (訂正)
+「FeitThompsonSetup が S16 閉包から `Fintype ↥mp.S` を借用し、9087 RULING #3 の hnoV/hncH0C threading が
+inversion を作った」は **red herring**。flag された全 item (`Fintype ↥mp.S` @:1648 / `S15.FiniteInduce`
+scope @:70 / :165/177/182/191/195 の Section16Inputs field) は trivial な `Fintype.ofFinite`/Invertible-
+from-Finite に還元され、**upstream の `OddOrder.Peterfalvi.S12.FiniteInduce` に既存**。S16 側は何も供給していない。
+⟹ **真因は module bundling**: FeitThompsonSetup が (a) upstream-safe な data 構造 3 本 + 一般 lemma を、
+(b) 真に downstream な AppC 呼び出し (`BG.AppC.final_contradiction` @:68) + (12.17) producer
+(`exists_section16MaximalPair_data` → `theorem88_caseB_holds`、Witness 下流) と**同一 file に束ねている**。
+
+### hub 独立検証 (自分で再確認済)
+- 3 struct (`Section16MaximalPairCore`@341 / `Section16MaximalPair`@383 / `Section16TypePStructure`@397)
+  + `card_mul_eq_of_disjoint_sup_le_isCyclic`@1117 が FeitThompsonSetup にある ✓
+- edge B: GridTranspose@8 が FeitThompsonSetup を import、struct を code で 27 箇所使用 ✓
+- edge A genuine: FeitThompsonSetup@68 が `BG.AppC.final_contradiction hG hnoV hncH0C hyp` を実呼び出し ✓
+- **BFS (hub 自前)**: 新 leaf が import する 4 module (S13_CoreStructure / S13_Orthogonality /
+  S06_MuColumnBridge / S14_TypePComplement) は **全て Witness 非到達** = 真に upstream-safe ✓。
+  S13_NonGaloisExclusion→Witness=True (現 cycle)、GridTranspose は FeitThompsonSetup 経由でのみ Witness 到達 ✓
+
+### 実装手順 (全 5 step、lane a directive)
+1. **新 upstream leaf** `OddOrder/Peterfalvi/S13_Section16PairData.lean` (naming は a 裁量だが **lane-a
+   territory と明確な名**にせよ — `S16_` prefix は c の S16_NonExistenceG と territory 混同を招くので避ける;
+   data は §13/§14 type-P pairing ゆえ S13_ prefix 推奨)。中身 = 3 struct + `card_mul_...` を
+   FeitThompsonSetup から **verbatim 移設**。import = {S13_CoreStructure, S13_Orthogonality,
+   S06_MuColumnBridge, BG.Ch4_FamilyOfMaximal.S14_TypePComplement} (全 Witness-safe、検証済)。
+2. **FeitThompsonSetup**: 当該 4 decl 削除 + 新 leaf を import。他 (producer / Section16CharacterData /
+   AppC assembly) は不変。
+3. **S12_TypeIIGridTranspose**: `import OddOrder.FeitThompsonSetup` (line 8) → `import 新leaf` に置換。
+   CrossIsometryPair / S12_Noncoherence / S13_TypeDetermination は transitive に struct+lemma を回復
+   (import 1 行のみ変化)。
+4. **downstream producer 移設**: `section16MaximalPair_of_isMinimalSimpleOdd` (S13_TypeDetermination:200、
+   `exists_section16MaximalPair_data` @:207 経由で (12.17) 依存) を新 downstream leaf
+   `OddOrder/FeitThompsonPairProducer.lean` (import FeitThompsonSetup + S13_TypeDetermination) へ移し、
+   `FeitThompson` capstone (:1507) を新 leaf に向ける。S13_TypeDetermination の S13-local producer
+   (`exists_section16MaximalPair_data_around` :247/:285) は残す。
+5. **payoff**: WitnessSylowCyclic に `import S13_NonGaloisExclusion` 追加 + `hUcyc` sorry (:907-908) を
+   `OddOrder.Peterfalvi.S13.U_isCyclic_of_hypothesis hG s13` に置換。post-fix BFS で S13_NonGaloisExclusion
+   非 Witness-到達を確認済ゆえ acyclic。
+
+### territory / coordination
+- **全 5 step = lane a**。a は現に FeitThompsonSetup (9087 threading) + WitnessSylowCyclic ((12.10) reduction、
+  documented sorry) を編集中。Step 5 は a の (12.10) 完成であって b の新規作業でない (b の現 frontier =
+  S15_SAndT_Setup/Machinery135・MuColumnPin、WitnessSylowCyclic 非接触 ⟹ 衝突なし)。
+- ⚠ **carve-out (hub 付与)**: `S14_MaximalI/WitnessSylowCyclic.lean` の (12.10)/(11.9.c) 完成に限り
+  **lane a に編集権**。b はこの settle 中 WitnessSylowCyclic を触らない (現に触れていない)。
+- **c (S16_NonExistenceG) 不接触**。
+
+### 検証要件 (STOP gate)
+- Option 1 は **却下** (AppC 呼び出しは genuine ゆえ instance-supply では FeitThompsonSetup を upstream 化不能)。
+- **defeq diamond リスクなし** (新 instance を一切導入しない、struct は名前ごと移設)。
+- ⚠ **primary risk**: Step 3 後 GridTranspose が AppC/S16 閉包を失う。code は 3 struct + `S12.FiniteInduce`
+  (両方保存) のみ使用ゆえ no-op のはずだが、**full `lake build OddOrder` green + AxiomsCheck 全 assert OK**
+  で必須確認。gap が出たら該当 Witness-safe import を新 leaf に追加。build 破壊・sorry regression 時は halt+報告。
+
+**lane a への指示**: 上記 5 step を engage。FeitThompsonSetup は spine-critical ゆえ各 step 後に build 確認。
+lane A の当初 diagnosis (instance-borrowing) に引きずられず、edge (B) の data relocation に集中せよ。
