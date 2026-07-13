@@ -878,3 +878,42 @@ rewire。これで load-bearing carrier の破壊リスクを最小化。
 = 深い multi-layer 課題。fresh session で S07 pin-露出強化から着手推奨 (shared ゆえ着手前に 9000 claim +
 既存 open 9000 scan)。MuColumnPin の formula scaffold は bundle 完成まで sorried-cite で保持 (soundness 問題なし
 = tau1S_ofHonest は valid coherence、pin が未確定なだけ)。
+
+## 2026-07-13 更新 #11 (lane b, /loop) — ★実装プラン確定: Route 2 (S15-local glue mirror) — 全ピース sorry-free で在庫確認済
+
+更新 #10 の「S07 pin 露出 (shared infra)」より**優れる route を確定**。精読で全ピースが揃った:
+
+### 発見: pin は「diff lemma (sorry-free) + pivot pin (carrier bundle)」に分解できる
+
+`muColumn_tau1_inner_etaColumn` (`⟨τ₁μcol_j, ηcol_j⟩ = q`, ∀ j≠0) は次に帰着:
+1. **diff lemma** `τ₁(μcol_j) − τ₁(μcol_1) = ηcol_j − ηcol_1` — **sorry-free**:
+   - μcol_j − μcol_1 ∈ zSupportedSpan 𝒮 A(S): 両 column ∈ 𝒮 (`mu_colSum_mem_sOf_H0`+`sOf_subset_sSet`)、
+     degree 一定 qu (`mu_apply_one_eq_u`、**case 非依存** — mixed-degree は irr qa メンバーの話で μ-column は常に uq) ⟹ 差の value(1)=0 ⟹ A(S)-supported (`sSet_member_support_subset`)。
+   - τ₁(diff) = indS(diff) (`IsCoherent.extends_on_supported`) = dadeHypS(diff) (`sInstance_dade_eq_induce`)
+   - dadeHypS(μcol_j − μcol_1) = ηcol_j − ηcol_1: `tauS_mu_cross` (BridgeCharacter:917, **sorry-free**、
+     任意列 j≠k) を i で和。既存 `tauS_muColumn_diff_eq` (SSetMemberRFamily:148) の一般列版
+     (conjugate 制約を外す)。dadeHypS0↔dadeHypS↔indS reconciliation は `sInstance_dade0/S_eq_induce` で解決済。
+2. **pivot pin** `τ₁μcol_1 = ηcol_1` (or `⟨τ₁μcol_1, ηcol_1⟩=q`) — **carrier bundle** (deep, flip witness ゆえ .some 不可):
+   - **caseB (all-reducible)**: M-side `exists_pinned_coherent_sOf_H0C_of_all_reducible` (S13_Orthogonality:560,
+     ~360 行 proven) を mirror。`coherentImageMap` (S07_Coherence/PsiDecomposition:951, **shared, b 所有**) で
+     μ-column ↦ aligned η-column を構成で pin。入力 = mu_orthonormal (member 直交) / eta_orthonormal
+     (image 直交) / column 恒等式 (residual、= diff lemma の dade 版) / degree 一定 / eta ∈ ZIrr。全て S-side 在庫あり。
+   - **caseA (has-irr)**: M-side `coherent_sOf_H0C_extension_muColumnSum_pin_of_irr` (S13_Orthogonality:290) を
+     mirror。任意 coherence + irreducible member の γ-trick で pin (flip 対称性を irr が破る)。carrier 構成不要
+     (既存 .some + 後付け証明)。
+
+### なぜ Route 2 > update #10 の S07 route
+- **S07 shared infra 非接触**: `coherentImageMap` は既存 (b 所有 S07_Coherence)、改変不要。`uniform_degree_coherence_of_families`
+  の return type 変更 (10+ consumer に波及) を回避。⟹ **9000 claim 不要** (全て b-owned S15 + 既存 shared 利用)。
+- **全 column を pin** (S07 pivot 露出は pivot 列のみ)。
+- M-side に **proven template 実在** (`exists_pinned_coherent_sOf_H0C_of_all_reducible` / `..._pin_of_irr`)。
+
+### 実装順 (upstream-first、複数 iteration)
+1. [ ] diff lemma + general 列 dade diff (sorry-free) → `muColumn_tau1_inner_etaColumn` を pivot (j=1) に帰着
+2. [ ] caseB glue: `sSet_coherent_...caseB` pinned 版 (coherentImageMap mirror)
+3. [ ] caseA γ: `..._pin_of_irr` S-side mirror
+4. [ ] bundle → `sSet_coherent_indS_A` pinned 化 (安全策: additive、coherent_H0Cprime_S 型不変)
+5. [ ] pivot pin discharge → MuColumnPin scaffold 完成
+
+⚠ soundness: 現 `tau1S_ofHonest` は valid coherence (pin 未確定なだけ)、MuColumnPin scaffold は bundle 完成まで
+sorried-cite 保持で問題なし。
