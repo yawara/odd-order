@@ -607,6 +607,11 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 14) — a 合流: S09 canonical Frobenius selected bound (実証明)**:
+  **a=1** (`eb1e4920` = `S09_FrobeniusSelectedEstimate.lean` +240、canonical selected bound を **sorry-free で実証明**、
+  AxiomsCheck +11、OddOrder.lean import 自追記 ✓、issue 0044 更新。scope=S09 territory ✓)。b=0 / c=0。
+  build green **4196 jobs** / AxiomsCheck OK (2381 assertion 全 allowlist) / **count-sorry 51→51 不変** (新 leaf sorry-free) /
+  新 axiom なし / 逸脱なし。size watch: 240 OK。a は §9 concrete norm 評価群 (γ-norm/B-sum/good-index/selected) を継続 build。
 - **2026-07-14 (tick 13) — a+b 合流: a=S09 concrete Frobenius good-index bound (実証明) + b=S_caseB_facts_no_lambda de-opacify**:
   **a=1** (`9b7b9c79` = `S09_FrobeniusGoodIndexEstimate.lean` +215、concrete good-index bound を **sorry-free で実証明**、
   AxiomsCheck +11、OddOrder.lean import 自追記 ✓、issue 0044 更新。scope=S09 territory ✓)。**b=1** (`3ca01cef` =
