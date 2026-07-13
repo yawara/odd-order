@@ -607,6 +607,19 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 10) — a 合流: S09 (7.9) local degree-ratio reality + coherence agreement (Γ 分解)**:
+  **a=1** (`3b6382d4` = `S09_FrobeniusGammaDecomposition.lean` **新 leaf +317**、(7.9) Γ 分解の
+  local degree-ratio reality + coherence agreement を実証明、**sorry-free**)。b=0 / c=0。
+  build green **4192 jobs** / AxiomsCheck OK (2374 assertion 全て allowlist 内、lake exit 0 —
+  `linter.style.header` の `#assert_only_allowed_axioms` 未パース error は既知の pre-existing false-positive) /
+  **count-sorry 49→49** (新 file sorry-free) / 新 axiom なし / 逸脱なし。
+  ⚠ **2-dot 幻の phantom deletion**: `git diff main..a` は a が 7 behind ゆえ main の tick8/9 内容
+  (b の 3 λ-cluster 定理 + 本 note の tick8/9 entry) を「削除」と誤表示したが、a の実 commit
+  `3b6382d4` は **S09_FrobeniusGammaDecomposition.lean のみ +317** (`git show --stat` で確認) →
+  3-way merge で main 版が保持され b の定理・note は intact (merge 後 grep で確認済)。
+  🔧 **hub 機械修正**: 新 leaf が **どこからも import されず** (orphan、root closure 欠落) →
+  `OddOrder.lean` に import 追記 (9014 先例と同じ step 3b)。**a は今後新 leaf 作成時に OddOrder.lean
+  追記まで込みで commit すること**。size watch: 新 file 317 行 OK。
 - **2026-07-14 (tick 9) — a+b 合流: a=S09 family-wide Frobenius 直交 (実証明) + b=9094 案 A 3/3 部分 (λ-cluster Core 版)**:
   **a=1** (`fa68a784` = `S09_FrobeniusFamilyOrthogonality.lean` 新 leaf +575、family-wide Frobenius
   orthogonality を **sorry-free で実証明** — AxiomsCheck に hypothesis79/78 系 6 決定を追加、全て
