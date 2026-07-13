@@ -1751,3 +1751,25 @@ sorry 2 = 0+2 保存。importer は OddOrder.lean のみ (import 追加)。build
 `nineElevenNormBound_of_sevenEightRefutation` mirror で dichotomy 分解 (c₃ = landed
 `sSet_sThree_coherent_dade`、α-context = landed bundle 流用、h78 = 新 named residual)、
 (ii) alphaSupport の Hall 論法実証明。
+
+## 2026-07-13 更新 #53 (lane b, /loop) — nineElevenNormBoundS の (9.11.6) dichotomy 分解 CLOSED
+
+**`nineElevenNormBoundS` の bare sorry を除去** — M-side `nineElevenNormBound_of_sevenEightRefutation`
+の full mirror (一発 green、S-side τ = dadeIntegralCharacterMap 直書きゆえ M-side の maxHeartbeats
+1600000 不要):
+- indS → honest-Dade 変換 (hS₂cohD/hnopairD、pair-bound の congrMap pattern)
+- c₃ = landed `sSet_sThree_coherent_dade`
+- α-context 再構築 (landed bundle pattern: `cuSubOf_zero_tiWitness` + generic Gamma 層 +
+  `nineElevenAlphaSupportS` residual 引用)
+- (9.11.6) 定数性 (`⟨α^τ, λ^{τ₃}⟩` は 𝒮₃ 上一定: `sSet_scaledDiff_support` c:=1 等度数台 +
+  Dade isometry + `α ⊥ 𝒮₃` source 直交)
+- 二分岐: 直交枝 → **新 named residual `nineElevenSevenEightRefutationS`** (M-side Prop の unrolled
+  mirror、M-side は discharged ゆえ TRUE; 全 coherence 節を honest 'A-Dade 側で受ける)、
+  非直交枝 → Bessel (`S13.card_le_inner_self_re_of_orthonormal_inner_int_ne`、
+  `AlphaBound` は HypothesisBasics → PairAdjoin 経由で閉包内)。
+
+**caseA 残 residual = 2 (最終形)**:
+1. `nineElevenAlphaSupportS` — (9.11.4) A(S)-support (Coq gap-patch; Hall 論法)。
+2. `nineElevenSevenEightRefutationS` — (9.11.7)-(9.11.8) budget (M-side ~700 行 discharge の mirror)。
+
+file 1524 行 (>1500 watch 微超; 次の追記前に再 split)。build green 4182。

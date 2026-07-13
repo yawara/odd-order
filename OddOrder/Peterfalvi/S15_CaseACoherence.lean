@@ -528,6 +528,77 @@ theorem Hypothesis.nineElevenFourNormInputsS [Finite G]
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
+/-- **Peterfalvi (9.11.7)–(9.11.8), the orthogonal-branch refutation — `S`-instance residual**
+(issue 1017; the `S`-mirror of the M-side `S13.NineElevenSevenEightRefutation`, **discharged**
+M-side by `nineElevenSevenEightRefutation`, Coq `PFsection9.v:2048-2227`).  In the orthogonal
+branch `α^τ ⊥ 𝒮₃^{τ₃}` of the (9.11.6) dichotomy: `𝒮₄ ≠ ∅` (else the (9.11.2)–(9.11.5)
+arithmetic spine already refutes), pick `λ₁ ∈ 𝒮₄`, put `e = u/a` and `β = λ₁ − e·ψ₁`; the
+projection budget (`S13.exists_bridge_target_of_budget`) over the orthonormal families
+`𝒮₂^{τ₁}` and `𝒮₄^{τ₃}` — cross-orthogonal via the case-agnostic `sSet_memberRFamily` —
+produces `Γ ∈ ℤ[Irr G]` with `‖Γ‖² = 1` and the bridge `β^τ = Γ − e·τ₁ψ₁`; the union-pair
+extension (`S13.isCoherent_union_pair_of_bridge`) then adjoins `{λ₁, λ̄₁}` coherently to `𝒮₂`,
+contradicting the pair clause `hnopairD`.  All coherence clauses on the honest `'A`-Dade
+(`dadeHypS`/`A(S)`), converted from `indS` by the caller. -/
+theorem Hypothesis.nineElevenSevenEightRefutationS [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
+    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
+    (caseA : CliffordCaseAData chars)
+    (S₂ : Set (ClassFunction ↥hyp.S ℂ))
+    (hS₁S₂ : hyp.sSetIrrDeg hG (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ) ⊆ S₂)
+    (hS₂S : S₂ ⊆ sSet (hyp.toTypesIIIIIIVSetupS hG))
+    (hS₂conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₂)
+    (hS₂cohD : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG))) S₂
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)))
+    (hS₃ne : (sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂).Nonempty)
+    (hnopairD : ∀ χ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂,
+      ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+          ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)))
+        (S₂ ∪ {χ, χ.conj})
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)))
+    (h2a : 2 * caseA.a = chief.p - 1)
+    (hCUprime : chars.C = chars.Uprime)
+    (hS3deg : ∀ χ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂,
+      (χ : ↥hyp.S → ℂ) 1 = (((hyp.toTypesIIIIIIVSetupS hG).q * chars.u : ℕ) : ℂ))
+    (hcount : {χ ∈ OddOrder.Peterfalvi.S11.sOf (hyp.toTypesIIIIIIVSetupS hG)
+          (chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub (hyp.toTypesIIIIIIVSetupS hG)) |
+          IsIrreducibleCharacter χ ∧
+            χ 1 = (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ)}.ncard
+        * (caseA.a * caseA.a)
+        = (chief.p - 1) * ((OddOrder.Peterfalvi.S11.uprimeSub
+          (hyp.toTypesIIIIIIVSetupS hG)).relIndex (hyp.toTypesIIIIIIVSetupS hG).U))
+    (hFboundU : ∀ F : Finset (ClassFunction ↥hyp.S ℂ), ↑F ⊆ S₂ →
+      OddOrder.Peterfalvi.S07.sumnS F ≤ 2 * ((hyp.toTypesIIIIIIVSetupS hG).q : ℝ) ^ 2
+        * (caseA.a : ℝ) * (chars.u : ℝ))
+    (hS2deg : ∀ χ ∈ S₂,
+      (χ : ↥hyp.S → ℂ) 1 = (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ))
+    (c₃ : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)))
+      (sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S))
+    (γ ψ₁ : ClassFunction ↥hyp.S ℂ)
+    (hψ₁S₂ : ψ₁ ∈ S₂)
+    (hψ₁irr : IsIrreducibleCharacter ψ₁)
+    (hψ₁deg : (ψ₁ : ↥hyp.S → ℂ) 1 = (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ))
+    (hγZIrr : γ ∈ OddOrder.RepresentationTheory.ZIrr ↥hyp.S)
+    (hγ1 : (γ : ↥hyp.S → ℂ) 1 = (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ))
+    (hγorth : ∀ φ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG), ClassFunction.inner γ φ = 0)
+    (hαsupp : ((γ - ψ₁ : ClassFunction ↥hyp.S ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)
+    (hc : ∀ lam ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂,
+      ClassFunction.inner
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+          ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) (γ - ψ₁))
+        (c₃.extension lam) = 0) :
+    False := by
+  sorry
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
 /-- **Peterfalvi (9.11.4)–(9.11.8), the norm bound — `S`-instance residual** (issue 1017; the
 `S`-mirror of the M-side `S13.NineElevenNormBound` discharge
 (`nineElevenNormBound_of_sevenEightRefutation` + `nineElevenSevenEightRefutation`, issue 9083
@@ -582,7 +653,292 @@ theorem Hypothesis.nineElevenNormBoundS [Finite G]
       {φ ∈ OddOrder.Peterfalvi.S11.sOf (hyp.toTypesIIIIIIVSetupS hG)
           (chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief) |
         IsIrreducibleCharacter φ ∧ φ ∉ S₂}.ncard ≤ N := by
-  sorry
+  classical
+  haveI := hyp.finiteG
+  -- ── `indS` → honest-Dade conversions for the coherence clauses (as in `nineElevenPairBoundS`)
+  obtain ⟨cohS₂_indS⟩ := hS₂coh
+  have hindS_dade : ∀ f : ClassFunction ↥hyp.S ℂ,
+      f ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.S) S₂
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S) →
+      hyp.indS f = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) f := fun f hf => by
+    rw [hyp.indS_apply, ← hyp.sInstance_dade_eq_induce hG
+      (OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mp hf).2]
+  have hS₂cohD : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG))) S₂
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)) :=
+    ⟨cohS₂_indS.congrMap hindS_dade⟩
+  have hnopairD : ∀ χ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂,
+      ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+          ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)))
+        (S₂ ∪ {χ, χ.conj})
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)) := by
+    intro χ hχ
+    rintro ⟨c⟩
+    refine hnopair χ hχ ⟨c.congrMap (fun f hf => ?_)⟩
+    rw [hyp.sInstance_dade_eq_induce hG
+      (OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mp hf).2, hyp.indS_apply]
+  -- ── `τ₃` = the (9.11.6) `𝒮₃`-coherence on the honest Dade
+  obtain ⟨c₃⟩ := hyp.sSet_sThree_coherent_dade hG chars hS₂conj hS₃ne hS3deg
+  -- ── the `𝒮(H₀C)`-stratum dictionary and degree dichotomy (as in the equality assembler)
+  have hsubC : OddOrder.Peterfalvi.S11.sOf (hyp.toTypesIIIIIIVSetupS hG)
+      (chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief)
+      ⊆ sSet (hyp.toTypesIIIIIIVSetupS hG) := by
+    rw [hyp.sSet_eq_sOf_H0Cprime hG chars]
+    exact OddOrder.Peterfalvi.S11.sOf_antitone (hyp.toTypesIIIIIIVSetupS hG)
+      (sup_le_sup_left chars.Cprime_le_C chief.H0)
+  have hdich : ∀ φ ∈ OddOrder.Peterfalvi.S11.sOf (hyp.toTypesIIIIIIVSetupS hG)
+      (chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief),
+      (φ : ↥hyp.S → ℂ) 1 = (((hyp.toTypesIIIIIIVSetupS hG).q * chars.u : ℕ) : ℂ) ∨
+      (φ : ↥hyp.S → ℂ) 1 = (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ) := by
+    intro φ hφ
+    by_cases hφS₂ : φ ∈ S₂
+    · exact Or.inr (hS2deg φ hφS₂)
+    · exact Or.inl (hS3deg φ ⟨hsubC hφ, hφS₂⟩)
+  -- ── the (9.11.4) `α = γ − ψ₁` context at the explicit TI-witness (as in the Phase-D bundle)
+  have hq0 : 0 < (hyp.toTypesIIIIIIVSetupS hG).q :=
+    (hyp.toTypesIIIIIIVSetupS hG).nontrivial.2.1.pos
+  have hTI := cuSubOf_zero_tiWitness caseA hdich
+  have hCU₁ : OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief
+      ≤ cuSubOf caseA ⟨0, hq0⟩ := cSub_le_cuSubOf caseA ⟨0, hq0⟩
+  have hU₁U : cuSubOf caseA ⟨0, hq0⟩ ≤ (hyp.toTypesIIIIIIVSetupS hG).U :=
+    cuSubOf_le_U caseA ⟨0, hq0⟩
+  have hU₁a : (cuSubOf caseA ⟨0, hq0⟩).relIndex (hyp.toTypesIIIIIIVSetupS hG).U = caseA.a :=
+    relIndex_cuSubOf_U_eq_a caseA ⟨0, hq0⟩
+  have hUpU₁ : OddOrder.Peterfalvi.S11.uprimeSub (hyp.toTypesIIIIIIVSetupS hG)
+      ≤ cuSubOf caseA ⟨0, hq0⟩ := by
+    have hUpC : OddOrder.Peterfalvi.S11.uprimeSub (hyp.toTypesIIIIIIVSetupS hG)
+        = OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief := hCUprime.symm
+    rw [hUpC]; exact hCU₁
+  have hrelne : (OddOrder.Peterfalvi.S11.uprimeSub (hyp.toTypesIIIIIIVSetupS hG)).relIndex
+      (hyp.toTypesIIIIIIVSetupS hG).U ≠ 0 := Subgroup.index_ne_zero_of_finite
+  have hcne : {χ ∈ OddOrder.Peterfalvi.S11.sOf (hyp.toTypesIIIIIIVSetupS hG)
+      (chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub (hyp.toTypesIIIIIIVSetupS hG)) |
+      IsIrreducibleCharacter χ ∧
+        χ 1 = (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ)}.ncard ≠ 0 := by
+    intro h0
+    rw [h0, zero_mul] at hcount
+    have hp1 : 1 < chief.p := chief.p_prime.one_lt
+    have hrpos := Nat.pos_of_ne_zero hrelne
+    have : 0 < (chief.p - 1) * ((OddOrder.Peterfalvi.S11.uprimeSub
+        (hyp.toTypesIIIIIIVSetupS hG)).relIndex (hyp.toTypesIIIIIIVSetupS hG).U) :=
+      Nat.mul_pos (by omega) hrpos
+    omega
+  obtain ⟨ψ₁, hψ₁sOf, hψ₁irr, hψ₁deg⟩ := Set.nonempty_of_ncard_ne_zero hcne
+  have hψ₁sSet : ψ₁ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) :=
+    hyp.sOf_H0Uprime_subset_sSet hG chars hψ₁sOf
+  have hψ₁S₂ : ψ₁ ∈ S₂ := hS₁S₂ ⟨hψ₁sSet, hψ₁irr, hψ₁deg⟩
+  obtain ⟨ζ, hζmem, hψ₁eq⟩ := hψ₁sOf
+  -- `γ = Ind_{HU₁}^S 1` and its (9.11.4) facts
+  set K : Subgroup ↥hyp.S := (hyp.toTypesIIIIIIVSetupS hG).H.subgroupOf hyp.S
+    ⊔ (cuSubOf caseA ⟨0, hq0⟩).subgroupOf hyp.S with hKdef
+  set γ : ClassFunction ↥hyp.S ℂ :=
+    ClassFunction.induce K (trivialClassFunction ↥K) with hγdef
+  have hγZIrr : γ ∈ OddOrder.RepresentationTheory.ZIrr ↥hyp.S :=
+    nineElevenGamma_mem_ZIrr (hyp.toTypesIIIIIIVSetupS hG) (cuSubOf caseA ⟨0, hq0⟩)
+  have hγ1 : γ (1 : ↥hyp.S) = (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ) :=
+    nineElevenGamma_apply_one (hyp.toTypesIIIIIIVSetupS hG) hU₁U hU₁a
+  have hγγu : ClassFunction.inner γ γ * (chars.u : ℂ)
+      = ((caseA.a * chars.u
+          + ((hyp.toTypesIIIIIIVSetupS hG).q - 1) * caseA.a ^ 2 : ℕ) : ℂ) :=
+    nineElevenGamma_inner_self_mul_u chars hU₁U hUpU₁ hU₁a hTI
+  -- `γ ⊥` every `𝒮`-member (`H ⊆ Ker γ` at the source, `H ⊄ Ker ξ` on `𝒳`)
+  have hγorth : ∀ φ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG),
+      ClassFunction.inner γ φ = 0 := by
+    intro φ hφ
+    obtain ⟨ξ, hξ, rfl⟩ := hφ
+    have hindEqξ : induceHU (hyp.toTypesIIIIIIVSetupS hG)
+        (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupS hG)) ℂ)
+        = ClassFunction.induce (huSub (hyp.toTypesIIIIIIVSetupS hG))
+          (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupS hG)) ℂ) := rfl
+    rw [hindEqξ]
+    exact nineElevenGamma_inner_induceHU (hyp.toTypesIIIIIIVSetupS hG) hU₁U hξ
+  -- `α = γ − ψ₁`: norm split, integrality, `‖α‖² = N`, the cleared identity, support
+  have hγψ : ClassFunction.inner γ ψ₁ = 0 := hγorth ψ₁ hψ₁sSet
+  have hαα : ClassFunction.inner (γ - ψ₁) (γ - ψ₁) = ClassFunction.inner γ γ + 1 :=
+    cfnorm_sub_irreducible_orthogonal hψ₁irr hγψ
+  have hαZIrr : γ - ψ₁ ∈ OddOrder.RepresentationTheory.ZIrr ↥hyp.S := by
+    refine Submodule.sub_mem _ hγZIrr ?_
+    rw [hψ₁eq]
+    exact induceHU_mem_ZIrr (hyp.toTypesIIIIIIVSetupS hG) ζ
+  obtain ⟨c, -, -, hcsum⟩ :=
+    OddOrder.RepresentationTheory.mem_ZIrr_inner_self_eq_sum_sq hαZIrr
+  have hm0 : 0 ≤ ∑ x ∈ c.support, (c x) ^ 2 :=
+    Finset.sum_nonneg fun _ _ => sq_nonneg _
+  have hmval : ClassFunction.inner (γ - ψ₁) (γ - ψ₁)
+      = ((∑ x ∈ c.support, (c x) ^ 2 : ℤ) : ℂ) := by
+    rw [hcsum]
+    push_cast
+    rfl
+  set N : ℕ := (∑ x ∈ c.support, (c x) ^ 2).toNat with hNdef
+  have hNval : ((N : ℕ) : ℂ) = ClassFunction.inner (γ - ψ₁) (γ - ψ₁) := by
+    rw [hmval, hNdef]
+    exact_mod_cast congrArg (fun z : ℤ => (z : ℂ)) (Int.toNat_of_nonneg hm0)
+  have hNu : N * chars.u = (caseA.a + 1) * chars.u
+      + ((hyp.toTypesIIIIIIVSetupS hG).q - 1) * caseA.a ^ 2 := by
+    have h2 : ClassFunction.inner (γ - ψ₁) (γ - ψ₁) * (chars.u : ℂ)
+        = ((caseA.a * chars.u
+            + ((hyp.toTypesIIIIIIVSetupS hG).q - 1) * caseA.a ^ 2 : ℕ) : ℂ)
+          + (chars.u : ℂ) := by
+      rw [hαα, add_mul, one_mul, hγγu]
+    have h3 : ((N * chars.u : ℕ) : ℂ)
+        = (((caseA.a + 1) * chars.u
+            + ((hyp.toTypesIIIIIIVSetupS hG).q - 1) * caseA.a ^ 2 : ℕ) : ℂ) := by
+      push_cast at h2 ⊢
+      rw [hNval]
+      linear_combination h2
+    exact Nat.cast_injective h3
+  have hαsupp : ((γ - ψ₁ : ClassFunction ↥hyp.S ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S :=
+    hyp.nineElevenAlphaSupportS hG chars caseA ⟨0, hq0⟩ hψ₁sSet hψ₁deg
+  -- `α^τ ∈ ℤ[Irr G]`, norm preservation
+  have hταZIrr : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+      ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) (γ - ψ₁)
+      ∈ OddOrder.RepresentationTheory.ZIrr G :=
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+      (hyp.dadeHypS hG) (hyp.dadeHypS_hconj hG) hαsupp hαZIrr
+  have hταnorm : ClassFunction.inner
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) (γ - ψ₁))
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) (γ - ψ₁))
+      = ClassFunction.inner (γ - ψ₁) (γ - ψ₁) :=
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
+      (hyp.dadeHypS hG) (hyp.dadeHypS_hconj hG) hαsupp hαsupp
+  -- ── `α ⊥ 𝒮₃` at the source
+  have hαorthS₃ : ∀ lam ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂,
+      ClassFunction.inner (γ - ψ₁) lam = 0 := by
+    intro lam hlam
+    have hψlam : ClassFunction.inner ψ₁ lam = 0 :=
+      sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupS hG) hψ₁sSet hlam.1
+        (fun h => hlam.2 (h ▸ hψ₁S₂))
+    rw [ClassFunction.inner_sub_left, hγorth lam hlam.1, hψlam, sub_zero]
+  -- ── the (9.11.6) constancy of `⟨α^τ, λ^{τ₃}⟩` over `λ ∈ 𝒮₃`
+  have hconst : ∀ lam ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂,
+      ∀ lam' ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂,
+      ClassFunction.inner
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+          ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) (γ - ψ₁))
+        (c₃.extension lam)
+      = ClassFunction.inner
+          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+            ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) (γ - ψ₁))
+          (c₃.extension lam') := by
+    intro lam hlam lam' hlam'
+    have hdiffsupp : ((lam - lam' : ClassFunction ↥hyp.S ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S := by
+      have h := hyp.sSet_scaledDiff_support hG hlam.1 hlam'.1 (c := 1)
+        (by rw [hS3deg lam hlam, hS3deg lam' hlam', Nat.cast_one, one_mul])
+      rwa [one_smul] at h
+    have hzss : (lam - lam' : ClassFunction ↥hyp.S ℂ)
+        ∈ OddOrder.Peterfalvi.S07.zSupportedSpan
+          (sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂)
+          (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S) :=
+      OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mpr
+        ⟨Submodule.sub_mem _ (Submodule.subset_span hlam) (Submodule.subset_span hlam'),
+          hdiffsupp⟩
+    have hagree : c₃.extension (lam - lam')
+        = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+          ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) (lam - lam') :=
+      c₃.extends_on_supported _ hzss
+    have hiso : ClassFunction.inner
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+          ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) (γ - ψ₁))
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+          ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) (lam - lam'))
+        = ClassFunction.inner (γ - ψ₁) (lam - lam') :=
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
+        (hyp.dadeHypS hG) (hyp.dadeHypS_hconj hG) hαsupp hdiffsupp
+    have hz : ClassFunction.inner (γ - ψ₁) (lam - lam') = 0 := by
+      rw [ClassFunction.inner_sub_right, hαorthS₃ lam hlam, hαorthS₃ lam' hlam', sub_zero]
+    have hsub : ClassFunction.inner
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+          ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) (γ - ψ₁))
+        (c₃.extension lam)
+        - ClassFunction.inner
+            (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+              ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) (γ - ψ₁))
+            (c₃.extension lam') = 0 := by
+      rw [← ClassFunction.inner_sub_right, ← map_sub, hagree, hiso, hz]
+    exact sub_eq_zero.mp hsub
+  -- ── the (9.11.6) dichotomy
+  by_cases hc : ∀ lam ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂,
+      ClassFunction.inner
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+          ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) (γ - ψ₁))
+        (c₃.extension lam) = 0
+  · -- orthogonal branch — the (9.11.7)–(9.11.8) residual refutes
+    exact (hyp.nineElevenSevenEightRefutationS hG chars caseA S₂ hS₁S₂ hS₂S hS₂conj hS₂cohD
+      hS₃ne hnopairD h2a hCUprime hS3deg hcount hFboundU hS2deg c₃ γ ψ₁ hψ₁S₂ hψ₁irr hψ₁deg
+      hγZIrr hγ1 hγorth hαsupp hc).elim
+  · -- non-orthogonal branch — the Bessel count `|𝒮₄| ≤ ‖α^τ‖² = N`
+    push Not at hc
+    obtain ⟨lam₀, hlam₀, hlam₀ne⟩ := hc
+    have hS4sub : {φ ∈ OddOrder.Peterfalvi.S11.sOf (hyp.toTypesIIIIIIVSetupS hG)
+        (chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief) |
+        IsIrreducibleCharacter φ ∧ φ ∉ S₂}
+        ⊆ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂ := fun ξ hξ => ⟨hsubC hξ.1, hξ.2.2⟩
+    have hS4fin : ({φ ∈ OddOrder.Peterfalvi.S11.sOf (hyp.toTypesIIIIIIVSetupS hG)
+        (chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief) |
+        IsIrreducibleCharacter φ ∧ φ ∉ S₂} : Set (ClassFunction ↥hyp.S ℂ)).Finite :=
+      (sSet_finite (hyp.toTypesIIIIIIVSetupS hG)).subset (fun ξ hξ => (hS4sub hξ).1)
+    refine ⟨N, hNu, ?_⟩
+    have hON1 : ∀ ξ ∈ hS4fin.toFinset,
+        ClassFunction.inner (c₃.extension ξ) (c₃.extension ξ) = 1 := by
+      intro ξ hξT
+      have hξ := hS4fin.mem_toFinset.mp hξT
+      have hξ3 := hS4sub hξ
+      rw [c₃.extension_inner_eq ξ ξ (Submodule.subset_span hξ3)
+        (Submodule.subset_span hξ3)]
+      have h := irreducibleCharacter_inner_eq_ite
+        (⟨ξ, hξ.2.1⟩ : IrreducibleCharacter ↥hyp.S) ⟨ξ, hξ.2.1⟩
+      rwa [if_pos rfl] at h
+    have hON2 : ∀ ξ ∈ hS4fin.toFinset, ∀ ξ' ∈ hS4fin.toFinset, ξ ≠ ξ' →
+        ClassFunction.inner (c₃.extension ξ) (c₃.extension ξ') = 0 := by
+      intro ξ hξT ξ' hξ'T hne
+      have hξ3 := hS4sub (hS4fin.mem_toFinset.mp hξT)
+      have hξ'3 := hS4sub (hS4fin.mem_toFinset.mp hξ'T)
+      rw [c₃.extension_inner_eq ξ ξ' (Submodule.subset_span hξ3)
+        (Submodule.subset_span hξ'3)]
+      exact sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupS hG) hξ3.1 hξ'3.1 hne
+    have hint : ∀ ξ ∈ hS4fin.toFinset, ∃ m : ℤ,
+        ClassFunction.inner
+          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+            ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) (γ - ψ₁))
+          (c₃.extension ξ) = (m : ℂ) := by
+      intro ξ hξT
+      have hξ3 := hS4sub (hS4fin.mem_toFinset.mp hξT)
+      exact ClassFunction.inner_mem_ZIrr_int hταZIrr
+        (c₃.extension_mem_ZIrr ξ (Submodule.subset_span hξ3))
+    have hnec : ∀ ξ ∈ hS4fin.toFinset,
+        ClassFunction.inner
+          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+            ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) (γ - ψ₁))
+          (c₃.extension ξ) ≠ 0 := by
+      intro ξ hξT
+      have hξ3 := hS4sub (hS4fin.mem_toFinset.mp hξT)
+      rw [hconst ξ hξ3 lam₀ hlam₀]
+      exact hlam₀ne
+    have hcount4 := OddOrder.Peterfalvi.S13.card_le_inner_self_re_of_orthonormal_inner_int_ne
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) (γ - ψ₁))
+      hS4fin.toFinset (fun ξ => c₃.extension ξ) hON1 hON2 hint hnec
+    have hNre : (ClassFunction.inner
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+          ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) (γ - ψ₁))
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+          ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) (γ - ψ₁))).re
+        = (N : ℝ) := by
+      rw [hταnorm, ← hNval, Complex.natCast_re]
+    rw [hNre] at hcount4
+    have hcard : (({φ ∈ OddOrder.Peterfalvi.S11.sOf (hyp.toTypesIIIIIIVSetupS hG)
+        (chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief) |
+        IsIrreducibleCharacter φ ∧ φ ∉ S₂}.ncard : ℝ)) ≤ (N : ℝ) := by
+      rw [Set.ncard_eq_toFinset_card _ hS4fin]
+      exact hcount4
+    exact_mod_cast hcard
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
