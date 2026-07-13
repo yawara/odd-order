@@ -792,10 +792,43 @@ kernel `M_F`) kills escaping centralizers.  The two lemmas below supply the coll
 exactly that no-escaping hypothesis; the §12 consumer (`S14.exists_typeICovering`) discharges
 it with (12.7) in scope. -/
 
+/-- **`𝓜_σ(x)` is a singleton when the centralizer does not escape** (the no-escaping
+degeneration of BG Theorem 14.4): if `M, L ∈ 𝓜_σ(x)` and `C_G(x) ≤ M`, then `M = L`.  For
+`x ∈ M_σ` the σ-length is `1` (`length_one_of_isPiElement_sigma`), so in the multi-maximal case
+the Theorem-14.4 sharp transitivity of `R(x) ≤ C_G(x)` on `𝓜_σ(x)` yields `r ∈ R(x) ≤ M`
+conjugating `M` onto the *different* member `L`, absurd for `r ∈ M`.
+
+This is the uniqueness input of the all-type-I `FittingIsTI` derivation (Peterfalvi (8.13.c1)
+degeneration, `S14.allTypeI_fittingIsTI`): `x ∈ M_σ# ∩ (M^g)_σ#` with non-escaping centralizers
+forces `M^g = M`, i.e. `g ∈ N_G(M) = M`. -/
+theorem eq_of_mem_maximalSigmaSubgroupsOfElement_of_centralizer_le [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : OddOrder.BG.Ch4.S14.SigmaDecompositionData G) {x : G} (hx1 : x ≠ 1)
+    {M L : Subgroup G}
+    (hM : M ∈ OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement x)
+    (hL : L ∈ OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement x)
+    (hc : Subgroup.centralizer ({x} : Set G) ≤ M) :
+    M = L := by
+  classical
+  by_contra hML
+  haveI : Finite (Subgroup G) :=
+    Finite.of_injective (fun H : Subgroup G => (H : Set G)) SetLike.coe_injective
+  have hlen : D.length x = 1 :=
+    OddOrder.BG.Ch4.S14.length_one_of_isPiElement_sigma hG D hM.1 hx1
+      (OddOrder.BG.Ch4.S14.isPiElement_sigma_of_mem_Msigma hM.2)
+  have hgt : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement x).ncard :=
+    Set.one_lt_ncard_iff_nontrivial.mpr ⟨M, hM, L, hL, hML⟩
+  -- the Theorem-14.4 sharp transitivity of `R(x)` on `𝓜_σ(x)`, at the pair `(M, L)`
+  obtain ⟨N, hNspec, -⟩ :=
+    (OddOrder.BG.Ch4.S14.sigmaLength_one_centralizer_structure hG D hx1 hlen).2 hgt
+  obtain ⟨r, ⟨hrmem, hrconj⟩, -⟩ := (hNspec.2.2.2.2.2.2 M hM).2.2.2 L hL
+  have hrM : r ∈ M := hc (Subgroup.mem_inf.mp hrmem).2
+  exact hML ((hrconj.symm.trans
+    (conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hrM))).symm)
+
 /-- **`R(x)` collapses when the centralizer does not escape** (the (12.17)-side degeneration of
-BG Theorem 14.4): if `M ∈ 𝓜_σ(x)` and `C_G(x) ≤ M`, then `R(x) = 1`.  In the multi-maximal
-case the Theorem-14.4 sharp transitivity of `R(x) ≤ C_G(x)` on `𝓜_σ(x)` yields `r ∈ R(x) ≤ M`
-conjugating `M` onto a *different* member of `𝓜_σ(x)`, absurd for `r ∈ M`. -/
+BG Theorem 14.4): if `M ∈ 𝓜_σ(x)` and `C_G(x) ≤ M`, then `R(x) = 1` — the `ncard`-form
+corollary of the singleton fact `eq_of_mem_maximalSigmaSubgroupsOfElement_of_centralizer_le`. -/
 theorem Rsub_eq_bot_of_centralizer_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (D : OddOrder.BG.Ch4.S14.SigmaDecompositionData G) {x : G} {M : Subgroup G}
     (hM : M ∈ OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement x)
@@ -804,20 +837,14 @@ theorem Rsub_eq_bot_of_centralizer_le [Finite G] (hG : OddOrder.BG.IsMinimalSimp
   classical
   have hnot : ¬ (x ≠ 1 ∧ D.length x = 1 ∧
       1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement x).ncard) := by
-    rintro ⟨hx1, hlen, hgt⟩
-    -- a second member `L ≠ M` of `𝓜_σ(x)`
+    rintro ⟨hx1, -, hgt⟩
     haveI : Finite (Subgroup G) :=
       Finite.of_injective (fun H : Subgroup G => (H : Set G)) SetLike.coe_injective
     have hnt : (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement x).Nontrivial :=
       Set.one_lt_ncard_iff_nontrivial.mp hgt
     obtain ⟨L, hL, hLM⟩ := hnt.exists_ne M
-    -- the Theorem-14.4 sharp transitivity of `R(x)` on `𝓜_σ(x)`, at the pair `(M, L)`
-    obtain ⟨N, hNspec, -⟩ :=
-      (OddOrder.BG.Ch4.S14.sigmaLength_one_centralizer_structure hG D hx1 hlen).2 hgt
-    obtain ⟨r, ⟨hrmem, hrconj⟩, -⟩ := (hNspec.2.2.2.2.2.2 M hM).2.2.2 L hL
-    have hrM : r ∈ M := hc (Subgroup.mem_inf.mp hrmem).2
-    exact hLM (hrconj.symm.trans
-      (conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hrM)))
+    exact hLM (eq_of_mem_maximalSigmaSubgroupsOfElement_of_centralizer_le hG D hx1
+      hM hL hc).symm
   rw [OddOrder.BG.Ch4.S14.Rsub, dif_neg hnot]
 
 /-- **The no-escaping collapse `M̃ = M_σ#`** (the (12.17)-case degeneration of the faithful BG
