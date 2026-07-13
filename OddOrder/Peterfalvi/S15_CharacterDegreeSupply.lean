@@ -1,4 +1,5 @@
 import OddOrder.Peterfalvi.S15_CaseACoherence
+import OddOrder.Peterfalvi.S15_SAndT_Setup.CountingLayer
 
 /-!
 # Peterfalvi §13 (pp. 75–86) — (13.3)/(13.5) τ₁-field supplies on the irreducibly-induced family
@@ -323,5 +324,259 @@ theorem Hypothesis.tau1S_ofHonest_induce_inner_eta [Finite G]
     hyp.tau1S_ofHonest_zSpanIrr_inner_eta hG hnoV chief i j
       (hyp.induce_H_mem_zSpan_sSet_irr hG θ hθ hθP hind),
     star_zero]
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **`τ₁`-images of the full lattice `ℤ[𝒮]` are orthogonal to the `η`-column `0`**
+(Peterfalvi (4.1)+(5.3.b) + (13.3.c), issue 2035): span induction over the *mixed* family —
+an irreducible member is grid-orthogonal by the (5.3.b) crux; a reducible member is a
+`μ`-column (`sSet_reducible_eq_muColumnSum`) whose `τ₁`-image is a (signed) *nonzero*-column
+`η`-sum (`tau1S_ofHonest_muColumn_formula`), orthogonal to column `0` by the grid
+orthonormality. -/
+theorem Hypothesis.tau1S_ofHonest_zSpan_inner_eta_col_zero [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))
+    (i : Fin hyp.q)
+    {φ : ClassFunction ↥hyp.S ℂ}
+    (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSpan (sSet (hyp.toTypesIIIIIIVSetupS hG))) :
+    ClassFunction.inner (hyp.tau1S_ofHonest hG hnoV chief φ)
+      (hyp.eta i ⟨0, hyp.p_prime.pos⟩) = 0 := by
+  haveI := hyp.finiteG
+  letI : Fintype G := Fintype.ofFinite G
+  letI : Invertible (Nat.card G : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Fintype ↥hyp.S := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥hyp.S : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  induction hφ using Submodule.span_induction with
+  | mem ζ hζ =>
+      by_cases hζirr : OddOrder.RepresentationTheory.IsIrreducibleCharacter ζ
+      · -- irreducible member: full grid orthogonality by the (5.3.b) crux
+        exact coherentIndS_image_inner_eta_eq_zero hG hnoV hyp
+          (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupS hG))
+          (sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupS hG) (hyp.oddCardS hG))
+          (fun ζ' hζ' => by
+            rw [show ζ' - (ζ' : ClassFunction ↥hyp.S ℂ).conj
+                = -((ζ' : ClassFunction ↥hyp.S ℂ).conj - ζ') from (neg_sub _ _).symm,
+              ClassFunction.support_neg]
+            exact hyp.sSet_member_conjDiff_supported hG hζ')
+          (hyp.coherent_H0Cprime_S hG hnoV chief) hζ hζirr i ⟨0, hyp.p_prime.pos⟩
+      · -- reducible member: a nonzero `μ`-column, sent by (13.3.c) into a nonzero `η`-column
+        obtain ⟨j, hj, rfl⟩ := hyp.sSet_reducible_eq_muColumnSum hG hζ hζirr
+        rcases hyp.tau1S_ofHonest_muColumn_formula hG hnoV chief with hclean | ⟨-, hflip⟩
+        · rw [hclean j hj, OddOrder.RepresentationTheory.inner_sum_left]
+          refine Finset.sum_eq_zero fun l _ => ?_
+          rw [hyp.eta_orthonormal l i j ⟨0, hyp.p_prime.pos⟩, if_neg (fun h => hj h.2)]
+        · have h2lt : 2 < hyp.p := by have := hyp.three_le_p; omega
+          set j1 : Fin hyp.p := ⟨1, hyp.p_prime.one_lt⟩ with hj1
+          set j2 : Fin hyp.p := ⟨2, h2lt⟩ with hj2
+          have hj10 : j1 ≠ ⟨0, hyp.p_prime.pos⟩ := by
+            intro h; exact absurd (congrArg Fin.val h) (by norm_num)
+          have hj20 : j2 ≠ ⟨0, hyp.p_prime.pos⟩ := by
+            intro h; exact absurd (congrArg Fin.val h) (by norm_num)
+          -- route through the other nonzero column `j' ≠ 0, j' ≠ j`
+          obtain ⟨j', hj'0, hjj'⟩ : ∃ j' : Fin hyp.p,
+              j' ≠ ⟨0, hyp.p_prime.pos⟩ ∧ j ≠ j' := by
+            rcases eq_or_ne j j1 with rfl | hne1
+            · exact ⟨j2, hj20, fun h => absurd (congrArg Fin.val h) (by norm_num)⟩
+            · exact ⟨j1, hj10, hne1⟩
+          rw [hflip j j' hj hj'0 hjj',
+            OddOrder.RepresentationTheory.ClassFunction.inner_neg_left,
+            OddOrder.RepresentationTheory.inner_sum_left]
+          rw [Finset.sum_eq_zero fun l _ => by
+            rw [hyp.eta_orthonormal l i j' ⟨0, hyp.p_prime.pos⟩, if_neg (fun h => hj'0 h.2)]]
+          exact neg_zero
+  | zero => rw [map_zero, OddOrder.RepresentationTheory.ClassFunction.inner_zero_left]
+  | add x y _ _ hx hy =>
+      rw [map_add, OddOrder.RepresentationTheory.ClassFunction.inner_add_left, hx, hy, add_zero]
+  | smul z x _ hx =>
+      rw [map_smul, ← Int.cast_smul_eq_zsmul ℂ z,
+        OddOrder.RepresentationTheory.ClassFunction.inner_smul_left, hx, mul_zero]
+
+open scoped FiniteInduce in
+/-- **(4.1)+(5.3.b)+(13.3.c) honest supply for the `tau1S_induce_inner_eta_col_zero` field**
+(issue 2035/9094): for *any* irreducible `θ ∈ Irr H` (`H = PC`, `P ⊄ Ker θ`) — the induction
+`Ind_{PC}^S θ` may be irreducible or a `μ`-column — the `τ₁`-image is orthogonal to the
+`η`-column `0`.  Composition of the `ℤ[𝒮]` membership (`induce_H_mem_zSpan_S`) with the
+mixed-family column-`0` orthogonality (`tau1S_ofHonest_zSpan_inner_eta_col_zero`). -/
+theorem Hypothesis.tau1S_ofHonest_induce_inner_eta_col_zero [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))
+    (i : Fin hyp.q)
+    (θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ)
+    (hθ : OddOrder.RepresentationTheory.IsIrreducibleCharacter θ)
+    (hθP : ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
+        Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel θ)) :
+    ClassFunction.inner (hyp.eta i ⟨0, hyp.p_prime.pos⟩)
+      (hyp.tau1S_ofHonest hG hnoV chief
+        (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ)) = 0 := by
+  haveI := hyp.finiteG
+  letI : Fintype G := Fintype.ofFinite G
+  letI : Invertible (Nat.card G : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  rw [OddOrder.RepresentationTheory.inner_conj_symm,
+    hyp.tau1S_ofHonest_zSpan_inner_eta_col_zero hG hnoV chief i
+      (hyp.induce_H_mem_zSpan_S hG chief θ hθ hθP),
+    star_zero]
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **Peterfalvi (13.3.a) with the `P`-witness** (issue 2035 更新 #22, the guard the (13.5)
+consumers thread): the inducing linear character `θ` of the nonzero `μ`-column sum
+`μ_j = Ind_{PC}^S θ` has `P ⊄ Ker θ` — i.e. `μ_j ∈ 𝒮₁` in the sense of (13.5).
+
+**Proof.**  `mu_j_isIndPC` supplies `θ`; if `P ⊆ Ker θ` then `P ⊆ Ker μ_j` by the elementary
+half of (1.6.a) (`subsetCharacterKernel_induce_of_subgroupOf`, `P ⊴ S`).  But `μ_j ∈ 𝒮(H₀)`
+(`mu_colSum_mem_sOf_H0`) is induced from an `S'`-source `χ ∈ 𝒳` with `P ⊄ Ker χ`, and the
+converse of (1.6.a) ([Is] 2.21, `mem_characterKernel_of_mem_characterKernel_induce`, `S' ⊴ S`)
+pushes `P ⊆ Ker μ_j` down to `P ⊆ Ker χ` — contradiction. -/
+theorem Hypothesis.mu_j_isIndPC_not_ker [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (j : Fin hyp.p) (hj : j ≠ ⟨0, hyp.p_prime.pos⟩) :
+    ∃ θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ,
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter θ ∧ θ 1 = 1 ∧
+        (∑ i : Fin hyp.q, hyp.mu i j)
+          = ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ ∧
+        ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
+            Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel θ) := by
+  classical
+  haveI := hyp.finiteG
+  letI : Fintype ↥hyp.S := Fintype.ofFinite _
+  letI : Fintype ↥(hyp.H.subgroupOf hyp.S) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥hyp.S : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥(hyp.H.subgroupOf hyp.S) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  obtain ⟨θ, hθirr, hθ1, hμeq⟩ := hyp.mu_j_isIndPC hG j hj
+  refine ⟨θ, hθirr, hθ1, hμeq, fun hker => ?_⟩
+  set data := hyp.toTypesIIIIIIVSetupS hG with hdata
+  obtain ⟨chief, -⟩ := OddOrder.Peterfalvi.S11.exists_chiefFactorData hG data
+  -- the `S'`-level source: `μ_j = Ind_{HU}^S χ`, `χ ∈ 𝒳` (so `P ⊄ Ker χ`)
+  obtain ⟨χ, hχ, hμeq'⟩ := OddOrder.Peterfalvi.S11.mem_sOf.mp
+    (hyp.mu_colSum_mem_sOf_H0 hG chief j hj)
+  letI : Fintype ↥(OddOrder.Peterfalvi.S11.huSub data) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥(OddOrder.Peterfalvi.S11.huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI hHUnorm : (OddOrder.Peterfalvi.S11.huSub data).Normal := by
+    rw [OddOrder.Peterfalvi.S11.huSub_eq_derivedInG_subgroupOf data]
+    infer_instance
+  -- `P ⊴ S`, realised in `↥S`
+  haveI hPnorm : (hyp.P.subgroupOf hyp.S).Normal := by
+    have hPle : hyp.P ≤ hyp.S := by
+      rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
+    refine (Subgroup.normal_subgroupOf_iff_le_normalizer hPle).mpr ?_
+    rw [hyp.P_eq_SF]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
+  have hPH : hyp.P.subgroupOf hyp.S ≤ hyp.H.subgroupOf hyp.S :=
+    Subgroup.subgroupOf_mono hyp.S (show hyp.P ≤ hyp.H from le_sup_left)
+  -- (1.6.a) forward: `P ⊆ Ker θ` pushes up to `P ⊆ Ker μ_j`
+  have hkerInd : OddOrder.Peterfalvi.S03.SubsetCharacterKernel
+      ((hyp.P.subgroupOf hyp.S : Subgroup ↥hyp.S) : Set ↥hyp.S)
+      (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ) :=
+    OddOrder.Peterfalvi.S03.subsetCharacterKernel_induce_of_subgroupOf hPH θ hker
+  -- rewrite the induced character as the `S'`-stage induction
+  have hInd_eq : ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ
+      = ClassFunction.induce (OddOrder.Peterfalvi.S11.huSub data)
+          (χ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub data) ℂ) := by
+    rw [← hμeq, hμeq']
+    exact OddOrder.Peterfalvi.S11.induceHU_eq_induce data _
+  -- contradict `χ ∈ 𝒳`: `P (in HU) ⊆ Ker χ`
+  apply hχ.1
+  intro x hx
+  have hxP : (x : ↥hyp.S) ∈ hyp.P.subgroupOf hyp.S := by
+    have hx' : x ∈ (data.H.subgroupOf hyp.S).subgroupOf
+        (OddOrder.Peterfalvi.S11.huSub data) := hx
+    have hPeq : data.H = hyp.P := by
+      show hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
+    rw [hPeq] at hx'
+    exact Subgroup.mem_subgroupOf.mp hx'
+  have hxkerInd : (x : ↥hyp.S) ∈ OddOrder.Peterfalvi.S03.characterKernel
+      (ClassFunction.induce (OddOrder.Peterfalvi.S11.huSub data)
+        (χ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub data) ℂ)) := by
+    rw [← hInd_eq]
+    exact hkerInd hxP
+  have h := OddOrder.Peterfalvi.S03.mem_characterKernel_of_mem_characterKernel_induce
+    χ.isIrreducible x.2 hxkerInd
+  simpa using h
+
+open scoped FiniteInduce in
+/-- **`Ind_T^G` as an `IntegralCharacterMap ↥T G`** — the `T`-side mirror of `Hypothesis.indS`.
+Used as the (unconstrained) `tau1T` of the λ-free core until the ν-side (13.2.e)-T coherence
+lands (`nuGridSupply`, gated on the a-owned FT-layer carrier threading). -/
+noncomputable def Hypothesis.indT [Finite G] (hyp : Hypothesis (G := G)) :
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥hyp.T G :=
+  LinearMap.restrictScalars ℤ
+    ({ toFun := ClassFunction.induce hyp.T
+       map_add' := ClassFunction.induce_add hyp.T
+       map_smul' := fun c θ => ClassFunction.induce_smul hyp.T c θ } :
+      ClassFunction ↥hyp.T ℂ →ₗ[ℂ] ClassFunction G ℂ)
+
+/-- **Peterfalvi (13.3.c), the `T`-side signs `δ'_i = 1`** — the δ'-half of the
+`delta_eq_one` field.
+
+**Residual (precisely named)**: the `T`-mirror of `delta_eq_one_S` — the route is the ν-grid
+degree congruence `ν_{ij}(1) ≡ δ'_i (mod p)` (`NuGridSupplyData.nu_degree_modEq_deltaPrime`,
+(4.3.d) at `T`) against `v ≡ 1 (mod p)` (the `T`-side `u_modEq_one`), exactly as
+`delta_eq_one_of_ne_zero` runs the `S`-side.  Gated on the ν-side grid supply `nuGridSupply`
+(HypothesisSwap; a-owned FT-layer carrier threading, issue 2038 iter 26 / 9094). -/
+theorem Hypothesis.deltaPrime_eq_one_T [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (i : Fin hyp.q) : hyp.deltaPrime i = 1 := by
+  sorry
+
+open scoped FiniteInduce in
+/-- **The λ-free core producer** (issue 9094 RULING 案 A): every field of
+`CharacterDegreeCore` from the landed engines — `τ₁ = tau1S_ofHonest` with its five guarded
+field supplies, the (13.3.a) `𝒮₁`-witnessed `μ`-facts (`mu_j_isIndPC_not_ker`,
+`tau1S_ofHonest_mu_col_eta_col_one`), the (13.3.c) signs (`delta_eq_one_S` +
+the ν-gated `deltaPrime_eq_one_T`), and the (13.3.c) column formula
+(`tau1S_ofHonest_muColumn_formula`). -/
+noncomputable def Hypothesis.characterDegreeCore [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
+    CharacterDegreeCore hyp where
+  tau1S := hyp.tau1S_ofHonest hG hnoV chief
+  tau1T := hyp.indT
+  tau1S_apply_induce_sub := fun θ θ' hθ hθ' hθP hθ'P =>
+    hyp.tau1S_ofHonest_apply_induce_sub hG hnoV chief θ θ' hθ hθ' hθP hθ'P
+  tau1S_inner_induce := fun θ θ' hθ hθ' hθP hθ'P =>
+    hyp.tau1S_ofHonest_inner_induce hG hnoV chief θ θ' hθ hθ' hθP hθ'P
+  tau1S_induce_mem_ZIrr := fun θ hθ hθP =>
+    hyp.tau1S_ofHonest_induce_mem_ZIrr hG hnoV chief θ hθ hθP
+  tau1S_induce_inner_eta := fun i j θ hθ hθP hind =>
+    hyp.tau1S_ofHonest_induce_inner_eta hG hnoV chief i j θ hθ hθP hind
+  tau1S_induce_inner_eta_col_zero := fun i θ hθ hθP =>
+    hyp.tau1S_ofHonest_induce_inner_eta_col_zero hG hnoV chief i θ hθ hθP
+  mu_col_tau1_eta_col_one := by
+    obtain ⟨j, δ, θold, hj, hδ, -, -, -, hform⟩ :=
+      hyp.tau1S_ofHonest_mu_col_eta_col_one hG hnoV chief
+    obtain ⟨θ, hθirr, hθ1, hμeq, hθP⟩ := hyp.mu_j_isIndPC_not_ker hG j hj
+    exact ⟨j, δ, θ, hj, hδ, hθirr, hθ1, hθP, hμeq, hform⟩
+  mu_j_linear_induced := fun j hj => by
+    obtain ⟨θ, hθirr, hθ1, hμeq, hθP⟩ := hyp.mu_j_isIndPC_not_ker hG j hj
+    exact ⟨θ, hθirr, hθ1, hθP, hμeq⟩
+  delta_eq_one :=
+    ⟨fun j => hyp.delta_eq_one_S hG j, fun i => hyp.deltaPrime_eq_one_T hG i⟩
+  mu_tau1_formula := hyp.tau1S_ofHonest_muColumn_formula hG hnoV chief
+
+/-- **The λ-free core, unconditionally** (issue 9094 RULING 案 A): `CharacterDegreeCore` is
+inhabited for every (13.1) hypothesis — the (12.x) no-type-V fact supplies `hnoV`, and a chief
+factor datum always exists. -/
+theorem Hypothesis.characterDegreeCore_nonempty [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    Nonempty (CharacterDegreeCore hyp) := by
+  haveI := hyp.finiteG
+  obtain ⟨chief, -⟩ := OddOrder.Peterfalvi.S11.exists_chiefFactorData hG
+    (hyp.toTypesIIIIIIVSetupS hG)
+  exact ⟨hyp.characterDegreeCore hG
+    (OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional hG) chief⟩
 
 end OddOrder.Peterfalvi.S15
