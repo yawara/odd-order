@@ -403,6 +403,12 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > (iv) build green。**3 decl の sorry-free 化で失効** (完全 b 所有へ復帰)。b は当該 3 decl を再証明
 > しない。⟹ step 1.5 で a が S15_Gate3 / TypeICovering の**当該 decl 文脈のみ**を編集しても逸脱で
 > ない (a が両 file の他領域 = b の既存宣言を触ったら従来どおり逸脱)。詳細 = issues/9087 RULING #4。
+> **⟹ ❌ 失効 (2026-07-14 監視 tick — merge 004be7f0)**: 3 decl 全て sorry-free 化で失効条件充足。
+> S15_Gate3 / S14_MaximalI/TypeICovering は完全 b 所有へ復帰。3/3 `not_nonTypeICovering_of_all_typeI`
+> の signature 変更 (provenance 引数化) は self-flag → hub 受理 (as-stated は carrier provenance
+> 非記録による in-file 循環で証明不能 — producer `bgTheoremE_cover_data` (a 所有 S10) の教科書
+> (8.8.b) 準拠強化とセットの honest fix; 他 consumer 無影響を機械検証済)。b は次回 main sync で
+> 新 signature を取り込む (再 restate しない)。
 >
 > **⟹ 拡張 #2 (ユーザー裁定 2026-07-05 tick(3) — Hypothesis76 (7.6) 忠実化 field の包括許可)**:
 > 同型逸脱 3 連発 (issue 0091 Hypothesis78 / zeta_induced / zeta_injective、各回ユーザー受理) の
@@ -595,6 +601,19 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 5) — a+b 合流: ★ 9087 carve-out 完遂・失効 (a) + 9094 案 A 実装開始 (b)**:
+  **a=3** (9087 RULING #4 2/3 `allTypeI_fittingIsTI` + 3/3 `not_nonTypeICovering_of_all_typeI` 実証明
+  landing = carve-out 3 decl 全 sorry-free 化 → **失効・b 所有復帰** (上記 ❌ 追記)。3/3 は as-stated
+  証明不能 (carrier provenance 非記録) → producer `bgTheoremE_cover_data` (a 所有) の (8.8.b) 準拠
+  強化 + signature 変更 self-flag = hub 受理。Isaacs 側 `normal_pGroup_le_kernel` 等 additive 追加。
+  (12.17) chain 残 dirty root = (7.10) card_G0_lower_bound + (12.6)(c1) sibleyTarget_frobI の 2 本に
+  localize、(7.10) OFF-PATH label は stale 化 → a は 0044 再開) を merge 004be7f0 で合流
+  (build green 4188 / AxiomsCheck OK / count-sorry 49→47 実証明減 / 新 axiom なし)。
+  **b=2** (2035 τ₁ honest supply (zSpan 支持 + guarded (13.2.e))、9094 RULING 受領 + Core 設計入力
+  = τ₁ field 3 本の P ⊄ Ker guard 化 (第 5 overstatement)) を merge df9c0f7d で合流
+  (build green 4188 / count-sorry 47→47)。c=0。**ユーザー相談**: a/b どちらを codex に任せるか
+  → hub 回答 = a 推奨 (cross-lane 調整ゼロ + frontier localize 済み 2 本 vs b は 9094 restructure
+  実装中で供給編集権・混在 leaf の条件密度が高く d 退役教訓の弱点領域)。
 - **2026-07-13 (tick 4) — b 合流 + ★ 9094 HUB RULING (λ-cluster 案 A)**: **b=8** (feat(2035, 13.3.a+c):
   `tau1S_ofHonest_mu_col_eta_col_one` sorry-free + issue 9094 起票 + docs 2035 #20/#21) を検証合流
   (merge c14d8a01: build green 4188 jobs / AxiomsCheck OK / count-sorry 49→49 / 新 axiom なし / scope
