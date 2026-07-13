@@ -623,6 +623,10 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 31) — a 合流: ν-grid T-side nu conjugation (issue 1029 継続)**:
+  **a=1** (`9d221886` = T-side nu conjugation。`FeitThompsonNuGrid.lean` +52 (0 sorry、計 587))。b=0 / c=0。
+  build green **4203 jobs** / AxiomsCheck OK (**2416** 全 allowlist) / count-sorry **49→49 不変** / 新 axiom なし / 逸脱なし。
+  ★ 9096 ν-carrier build 継続 (conjugation API 追加)。
 - **2026-07-14 (tick 30) — a 合流: ν-grid T-side row sum dichotomy / value identity / difference support (issue 1029 継続)**:
   **a=3 実 commit** (`83d63b79`/`d0d3e9ca`/`6e106fdd` = T-side nu row sum dichotomy + value identity +
   difference support。`FeitThompsonNuGrid.lean` +236 (0 sorry、計 535) + `FeitThompsonSetup.lean` +6 (0 sorry)。
