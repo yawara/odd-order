@@ -1773,3 +1773,17 @@ sorry 2 = 0+2 保存。importer は OddOrder.lean のみ (import 追加)。build
 2. `nineElevenSevenEightRefutationS` — (9.11.7)-(9.11.8) budget (M-side ~700 行 discharge の mirror)。
 
 file 1524 行 (>1500 watch 微超; 次の追記前に再 split)。build green 4182。
+
+## 2026-07-13 更新 #54 (lane b, /loop) — (9.11.4) nineElevenAlphaSupportS CLOSED (Coq gap-patch)
+
+**landed (commit eb05b48c、前段で再 split 686d6eff → S15_NineElevenSteps.lean 新 leaf)**:
+- `exists_cuSubOf_centralizer_witness` (generic): C_H(U₁) ≠ 1 (coprime fixed-point lifting、
+  S11_NineElevenCoherence upstream-merge 候補)。
+- `Hypothesis.mem_honestTypeP2ASet_of_mem_H_sup_cuSubOf`: (HU₁)^# ⊆ A(S) — piPart σ 分岐 +
+  Hall D/C (可解 K = H⊔U₁、U₁ = Hall σ′)。Coq PFsection9.v:1478-1484 の gap-patch の Lean 版。
+- `nineElevenAlphaSupportS` assembly → **axiom-clean**。連鎖して
+  `nineElevenFourNormInputsS` (9.11.4 bundle) も **axiom-clean**。S15_NineElevenSteps sorry 0。
+
+**caseA 残 residual = 1 (最終)**: `nineElevenSevenEightRefutationS` (S15_CaseACoherence.lean:105)
+— (9.11.7)-(9.11.8) budget、M-side discharge (~700 行) の S-mirror。次 iteration はここから
+(M-side `nineElevenSevenEightRefutation` の証明 chain を S-instance へ移植)。
