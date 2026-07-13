@@ -1336,3 +1336,24 @@ CaseACoherence 下流が必須) ゆえ b 裁量で新 leaf に配置、と 9094 
   同 file の tSide_theta_package_of_not_caseB (:1727、sorry 持ち) は chars 非依存で流用可か確認。
 - その後: ⑤ flip (旧 CDD consumer 全差替え — Canonicalization 旧 cCoeff 2 本と
   NormEstimates (13.6)/(13.7) 系の cCoeff_base 接続替えを含む) → ⑥ dichotomy producer。
+
+## 2026-07-14 更新 #27 (lane b, /loop) — ⑤ flip 開始: TTypeII cross-lane endpoint 移行 (9094 §4 carve-out)
+
+前 iteration で ④ (NormEstimates/CountingLayer witness thread) 完了。⑤ flip の最初の対象 =
+**TTypeII (lane c 所有) の cross-lane endpoint** を選択 (RULING §4 carve-out あり + λ-branch 機械完備 +
+no-λ 分岐が sorried bridging 明示許可 + downstream ゆえ CountingLayer legacy 非接触)。
+
+- **landed** (S15_CharacterDegreeSupply、build green 4191 jobs / AxiomsCheck OK / 新 axiom なし):
+  - `LambdaWitness hyp` (def) = (13.3.b) dichotomy 条件述語。
+  - `T_caseB_facts_unconditional` = `by_cases LambdaWitness` の dichotomy producer
+    (λ枝 lambda_forces_T_caseB_core / no-λ枝 T_caseB_facts_no_lambda)。
+  - `T_caseB_facts_no_lambda` = no-λ T-mirror の precisely-named sorried bridge。
+- **TTypeII rewire**: `T_side_caseB_facts` proof を差替え、`character_degree_analysis` 依存除去
+  (statement 不変)。詳細 = 9094 追記。
+- **残 `character_degree_analysis` 実 consumer = NormEstimates 5 obtain-site** (454/570/704/1093/1197)。
+  全て λ-dependent (`chars.tau1S chars.lambda` / `lambda_forces_T_caseB` / 構造 field)。
+- **次 = ⑤ flip 続き**: NormEstimates 5 の dichotomy 移行。keystone = general S-side dichotomy
+  `Nonempty (LambdaClusterData hyp) ∨ (C=⊥ ∧ u=(p^q−1)/(p−1))`。no-λ 枝 =
+  `caseB_of_no_irreducible_sOf_H0Cprime` (S-instance) 経由だが「no LambdaWitness → no irr member of
+  S-instance SOf」橋 = (13.3.b) の核心 (S15↔S11 SOf bridge、deep)。NormEstimates statement は
+  λ 非依存ゆえ no-λ 枝は (13.10)-arithmetic (c=1 ∧ u=full) で閉じる (RULING §3-2)。

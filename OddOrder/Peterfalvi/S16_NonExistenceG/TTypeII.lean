@@ -2,6 +2,7 @@ import OddOrder.Peterfalvi.S16_NonExistenceG.TTypeIICoherence
 import OddOrder.Peterfalvi.S16_NonExistenceG.TGapGalois
 import OddOrder.Peterfalvi.S16_NonExistenceG.TGapGridAlignment
 import OddOrder.Peterfalvi.S13_NonGaloisExclusion
+import OddOrder.Peterfalvi.S15_CharacterDegreeSupply
 
 /-!
 # Peterfalvi (14.9): the T-side Type-II theorem
@@ -191,8 +192,10 @@ theorem T_side_caseB_facts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     hyp.base.D = ⊥ ∧
       hyp.base.v = (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1) := by
-  obtain ⟨chars⟩ := OddOrder.Peterfalvi.S15.character_degree_analysis hG hyp.base
-  obtain ⟨hD, hv, _hQ⟩ := OddOrder.Peterfalvi.S15.lambda_forces_T_caseB hG chars
+  -- issue 9094 RULING §4 (b proof-only carve-out): the (13.4) `T`-side facts come from the
+  -- honest `CharacterDegreeCore` + (13.3.b) dichotomy (`T_caseB_facts_unconditional`), replacing
+  -- the uninhabitable unconditional-λ producer `character_degree_analysis`.
+  obtain ⟨hD, hv, _hQ⟩ := OddOrder.Peterfalvi.S15.T_caseB_facts_unconditional hG hyp.base
   exact ⟨hD, hv⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
