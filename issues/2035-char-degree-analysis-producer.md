@@ -627,3 +627,15 @@ extension、landed)。
 
 **着手順 (文書順)**: 4 (13.3.a) → 1-3 (13.2.d/e 系 field 署名 amend + engine 接続) → 5 (13.6-13.9 port)
 → producer assembly。
+
+## 2026-07-13 更新 #3 (lane b, /loop) — field 対応表の訂正: (13.3.a) は landed 済
+
+- **mu_j_linear_induced ((13.3.a)) = `Hypothesis.mu_j_isIndPC` (DegreesFirstSplit.lean:766) が
+  landed 済・sorry-free** (docstring が field の materialization と明記)。brick 4 は完了扱い。
+- ⟹ CharacterDegreeData 9 fields のうち **未充足の本物の数学は mu_tau1red 系 3 fields
+  (mu_col_tau1_eta_col_one / mu_tau1_formula / delta_eq_one) のみ** = Coq PFsection13
+  (13.6)-(13.9) norm-bound machinery の fresh port。他は landed engine の接続 + field 署名 amend
+  (P⊄Ker / zero-degree) のみ。
+- **次 iteration**: mu_tau1red port に着手 — Coq PFsection13.v の mu_tau1red / (13.6)
+  FTtypeP_sum_Ind_Fitting_lb / (13.7) FTtypeP_sum_cycTIiso10_lb を精読し S-side statement を設計、
+  chunk 分割して build (subagent 委譲可)。
