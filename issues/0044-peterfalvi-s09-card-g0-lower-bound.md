@@ -1325,3 +1325,28 @@ hypothesis78_delta_isReal) は genuine・保存済で再利用可。
   conclusion → good index)、(c) (7.9) orthogonal integer decomposition (v/x/Γ₁)、
   (d) (7.8.b) source data (hind_norm/hzeta_ind/irr/distinct/degree/hsmall)、
   (e) FamilyHypothesis71 instance。hdelta_even assembly (cont.⁴⁷ 残) は (d)-(7.9) parity 側。
+
+## cont.⁵⁰ — (7.9) family-level conclusion 完成 (hypothesis79_conclusion、sorry-free axiom-clean) ✅
+
+**新 leaf `S09_FrobeniusParity.lean`** (S09_FrobeniusConjIndex + S09_ParityPrimitive 下流):
+1. `hypothesis78_ind1H_mem_ZIrr` — hindZ 供給 (hyp76_zeta_eq projection + induce_mem_ZIrr)。
+2. `hypothesis79_delta_even` — **cont.⁴⁷ 残の hdelta_even 完成**: δ∈ZIrr
+   (delta_and_zetaImages_mem_ZIrr、Sibley coherence 経由) + δ real (hypothesis78_delta_isReal)
+   + ⟨δ,1⟩=0 (delta_orth_one; constOne = trivialIrreducibleCharacter は defeq で exact 一発)
+   + cfdot_real_vchar_even ⟹ Even ⟨Δ_i,Δ_j⟩。
+3. `hypothesis79_conclusion` — **(7.9) 本体**: parity route consumer に全 supplier
+   (isCoherent_sourceSet/nu_eq/ind1H_ZIrr/zeta_irreducible/betaDecomp/zetaImage_cross/delta_even)
+   を wire。⟨β_i, ζ_j^ν⟩ ≠ 0 ∨ ⟨β_j, ζ_i^ν⟩ ≠ 0 for all i ≠ j。
+
+検証: leaf 一発 green (3781 jobs) + AxiomsCheck assert 2 本 (4167 jobs) + full build green
+(4189 jobs)。両定理 axiom-clean `[propext, Classical.choice, Quot.sound]`。
+
+**残 (7.10) assembly** (次 iteration 以降、入口 =
+`characterEstimateData_of_family71_coherent_zeta_source_data`):
+- (a) min-index `i` 選択 (argmin F.h) + `hsmall : 2e_i+1 ≤ h_i` (奇数位数 Frobenius の数値事実)。
+- (b) `hbeta_ne` (= hypothesis79_conclusion) → good-index norm 下界
+  `chiRhoNormSq_ge_ratio_of_inner_beta_ne_zero` (S09_FrobeniusEstimate:51) → hgood/hi。
+- (c) 𝓑-set 構成 + (7.9) orthogonal integer decomposition (v/x/Γ₁: Γ の Irr 展開)。
+- (d) (7.8.b) source data 群 (hind_norm/hzeta_ind/hirr/hdistinct/hzeta_degree/hdegree_sum/
+  hzeta_uv) — Ind θ family の直接計算。
+- (e) concrete `FamilyHypothesis71` instance (P) + hP_L/hP_A/hP_G0 識別。
