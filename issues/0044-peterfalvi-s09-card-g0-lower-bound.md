@@ -1508,3 +1508,25 @@ inequalityへ接続する。
 **次 frontier**: selected index の既証明 (7.8.b) lower bound、本 good-index 下界、
 concrete B-sum を (7.5) reduced family inequalityへ一括配線し、minimal `h_i` の
 `CharacterEstimateData` と displayed (7.10) lower bound を構成する。
+
+## cont.⁵⁷ — canonical selected (7.8.b) 下界完成 (2026-07-14) ✅
+
+**新 leaf `S09_FrobeniusSelectedEstimate.lean`** で、(7.10) の concrete B-set を
+定義しているものと同一の canonical character `distinguishedNuAt i = ν_i ζ_{i0}` に
+対する selected-index lower bound を閉じた。
+
+canonical `Hypothesis78` とその proved `BetaDecomp` に対し、誘導族の pairwise
+orthogonality、coherence coefficient `c_r = -d_r`、
+`(β,νζ_0)=a-1`、principal induced member の degree/norm、(1.5.d) degree sum を
+組み立てて抽象 `zetaNuRhoNormSq_ge_of_facts` を適用した。さらに Sibley rho-map と
+family `hypothesis71` の一致を用い、consumer 形
+`distinguishedNuAt_chiRhoNormSq_ge` を得た。新しい仮定・carrier・axiom はない。
+
+検証: selected-estimate leaf / AxiomsCheck / full build green。leaf 自身 warning-free。
+主定理を AxiomsCheck tripwire に追加。
+
+**次 frontier**: minimal `h_i` を選び、`B = reverseCoefficientZeroIndices i`、
+`χ = distinguishedNuAt i` として signed irreducibility、norm one、selected bound、
+good-index bounds、B-sum bound を既存
+`characterEstimateData_of_family71_reduced_estimates_of_signed_irreducible` に渡す。
+続いて `lowerBoundTerm_of_characterEstimateData` から displayed (7.10) lower bound を得る。

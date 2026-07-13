@@ -607,6 +607,20 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 14) — a 合流: S09 canonical Frobenius selected bound (実証明)**:
+  **a=1** (`eb1e4920` = `S09_FrobeniusSelectedEstimate.lean` +240、canonical selected bound を **sorry-free で実証明**、
+  AxiomsCheck +11、OddOrder.lean import 自追記 ✓、issue 0044 更新。scope=S09 territory ✓)。b=0 / c=0。
+  build green **4196 jobs** / AxiomsCheck OK (2381 assertion 全 allowlist) / **count-sorry 51→51 不変** (新 leaf sorry-free) /
+  新 axiom なし / 逸脱なし。size watch: 240 OK。a は §9 concrete norm 評価群 (γ-norm/B-sum/good-index/selected) を継続 build。
+- **2026-07-14 (tick 13) — a+b 合流: a=S09 concrete Frobenius good-index bound (実証明) + b=S_caseB_facts_no_lambda de-opacify**:
+  **a=1** (`9b7b9c79` = `S09_FrobeniusGoodIndexEstimate.lean` +215、concrete good-index bound を **sorry-free で実証明**、
+  AxiomsCheck +11、OddOrder.lean import 自追記 ✓、issue 0044 更新。scope=S09 territory ✓)。**b=1** (`3ca01cef` =
+  `S_caseB_facts_no_lambda` を de-opacify (構造化 + translation lemmas) — S15_CharacterDegreeSupply +29/-2 に
+  proof 再構造化 + `HypothesisBasics.lean` に **additive translation lemma 3 本** (`toTypesIIIIIIVSetupS_q_eq`/
+  `chiefFactorS_p_eq`/`mkSection11CharacterDataS_u_eq`、+51/-0、c 所有 decl 非接触 ✓ = b の S15_SAndT_Setup territory))。c=0。
+  build green **4195 jobs** / AxiomsCheck OK (2380 assertion 全 allowlist) / **count-sorry 51→51 不変**
+  (de-opacify は S_caseB_facts_no_lambda の 1 sorry を構造化しただけ、4 sorried decl set は tick11-13 で不変 =
+  proven→sorry swap なし、hub diff 検証済) / 新 axiom なし / 逸脱なし。size watch: a leaf 215 OK。
 - **2026-07-14 (tick 12) — a+b 合流: a=S09 concrete Frobenius γ-norm/B-sum bound (実証明 2 leaf) + b=docs (NormEstimates 移行の architecture 発見)**:
   **a=2** (`c1f8402b` gamma norm bound + `64c01243` B-sum bound = `S09_FrobeniusGammaNormEstimate.lean` +252 /
   `S09_FrobeniusBsumEstimate.lean` +72、いずれも **sorry-free の concrete 評価**、AxiomsCheck +23、**a が

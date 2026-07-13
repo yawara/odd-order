@@ -120,6 +120,7 @@ import OddOrder.Peterfalvi.S09_FrobeniusGammaDecomposition
 import OddOrder.Peterfalvi.S09_FrobeniusGammaNormEstimate
 import OddOrder.Peterfalvi.S09_FrobeniusBsumEstimate
 import OddOrder.Peterfalvi.S09_FrobeniusGoodIndexEstimate
+import OddOrder.Peterfalvi.S09_FrobeniusSelectedEstimate
 import OddOrder.Peterfalvi.S09_FrobeniusParity
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.GroupTheory.RepresentationTheory.GaloisInnerTransport
@@ -636,6 +637,8 @@ set_option linter.style.longLine false in
 -- p ≠ 2, G p-solvable, abelian Sylow-2, O_{p'}(G)=1, C_G(Z(P))=P ⇒ J(P) ⊴ G.
 -- Goldschmidt 帰納 (Steps 1-8) を full discharge; §7B 内に focused axiom 残無し.
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch07.normal_J
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.center_map_subtype_map_of_coprime_kernel
 
 -- Ch.7 (Thompson Subgroup): Thm 7.8 Burnside p^a q^b solvability ⭐⭐⭐ **character-free**
 -- |G| = p^a q^b ⇒ G solvable.  Goldschmidt-Bender-Matsuyama 9-step proof (no character
@@ -7913,3 +7916,13 @@ across the sign to the canonical coherent image. -/
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.reverseCoefficientZeroIndices_good_bound
+
+/-! **Peterfalvi (7.8.b) canonical selected-character bound, axiom-clean**
+(lane a, 2026-07-14, issue 0044 cont.⁵⁷).  The canonical distinguished
+coherent image used to define the concrete B-set is fed through the proved
+BetaDecomp coefficient identities, induced-family degree sum, and Frobenius
+small-index inequality.  This identifies the selected-index rho norm required
+by the final (7.5)/(7.10) CharacterEstimateData assembly. -/
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.distinguishedNuAt_chiRhoNormSq_ge

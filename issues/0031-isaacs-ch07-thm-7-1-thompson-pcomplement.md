@@ -180,3 +180,16 @@ Together with the normalizer image inheritance already landed, this removes the
 missing `J(Pbar)` identification needed to push the `N_G(J(P))` hypothesis through
 `p'`-quotients in Step 3.  The analogous center/`Z(Pbar)` quotient identification
 remains open for the centralizer half.
+
+## 2026-07-14 update — Step 3 center quotient identification landed
+
+Added the dedicated §7C leaf
+`OddOrder/Isaacs/Ch07_ThompsonSubgroup/S7C_ThompsonPComplement.lean` and proved
+`center_map_subtype_map_of_coprime_kernel`.  For a normal `p′`-kernel `N`, the
+quotient map is injective on a `p`-subgroup `P`; the theorem uses this to identify
+the ambient image of `Z(P̄)` with the quotient image of the ambient `Z(P)`.
+
+Together with `thompsonJ_map_of_coprime_kernel` and the normalizer/centralizer
+image inheritance lemmas in `S7B2_NormalJ_PComplement`, both Step 3 local
+hypotheses can now be transported through `G/O_{p′}(G)`.  Remaining frontier is
+the minimum-counterexample carrier and Steps 1–6 assembly of the full Theorem 7.1.
