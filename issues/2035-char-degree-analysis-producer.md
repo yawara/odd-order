@@ -822,3 +822,33 @@ subagent 調査 + **自己検証済**の重大な設計発見 (CLAUDE.md donenes
 tau1S_ofHonest_inner_induce 等は forced property のみ使うので影響なし)。内部 def のみ pin projection に変更。
 これで `muColumn_tau1_inner_etaColumn` は pin `.some.2` から直接 discharge (MuColumnPin の inner_pin_eq scaffold は
 optional 化)。⚠ subagent の engine 名は一部 M-side 混同あり、上記は自己 grep で S15 実名を確定済。
+
+## 2026-07-13 更新 #9 (lane b, /loop) — carrier 再設計の feasibility 確定 (全ピース実在) + 実装 recipe
+
+更新 #8 の bundling が feasible と確定。追加で判明した実装の鍵:
+
+- **map-type subtlety**: `sSet_coherent_indS_A` は `IsCoherent hyp.indS` (`indS θ = induce hyp.S θ`、純 Ind_S^G)
+  を返すが、linchpin engine `sSet_coherent_extension_eq_sum_memberRFamily` (SSetMemberRFamily:765) は
+  **dade-coherence** `IsCoherent (dadeIntegralCharacterMap (dadeHypS…))` を取る。
+- **bridge 実在**: `IsCoherent.congrMap hindS_dade` で indS-coherence → dade-coherence 変換
+  (`S15_CaseBReducibleCoherence.lean:436` に既存使用例 `cohS₂ := cohS₂_indS.congrMap hindS_dade`)。
+  extension field は不変ゆえ pin (extension の性質) は両 map 間で transport 可。
+
+### 実装 recipe (次 iteration、複数回可)
+1. engine で `c'.extension(∑ᵢμᵢⱼ) = ∑_{α∈E} α`, `E ⊆ (memberRFamily (∑μ)).imageSet`。
+   `sSet_memberRFamily_imageSet_of_red` (:476) で imageSet = `{ηᵢⱼ}ᵢ ∪ {−η_{i,finNeg j}}ᵢ`。isometry
+   (‖∑μ‖²=q, muColumn_inner_self) + orthonormal で `|E|=q`。
+2. **+符号 (E={ηᵢⱼ}) の強制**:
+   - caseA: irreducible member ξ (`caseA_exists_irreducible_qa`) に対し `sSet_irr_memberRFamily_eta_inner`
+     (:519、irr member の像 ⊥ η) + `tauS_mu_cross` (BridgeCharacter:917) で γ-forcing → mix/−符号を排除。
+   - caseB: `sSet_coherent_dade_caseB` (CaseBReducibleCoherence:46) を +符号で構成 (M-side
+     `exists_pinned_coherent_sOf_H0C_of_all_reducible` (S13_Orthogonality:560) の S-side 類比)。
+3. bundle: `sSet_coherent_indS_A` の戻り値を `Nonempty (Σ' c : IsCoherent hyp.indS 𝒮 A(S),
+   ∀ j≠0, c.extension(∑ᵢμᵢⱼ)=∑ᵢηᵢⱼ)` に。`coherent_H0Cprime_S := .some.1` (型不変)、
+   pin accessor `.some.2`。下流 engine (tau1S_ofHonest_inner_induce 等) は forced property のみ
+   ゆえ無影響。
+4. `muColumn_tau1_inner_etaColumn` を pin accessor から discharge。
+
+**安全策**: まず新 `sSet_coherent_indS_A_pinned` を additive に建て (既存 coherent_H0Cprime_S 不変)、
+branch pin 2 本を sorried-skeleton で landing → 各 branch pin を proven → 最後に coherent_H0Cprime_S
+rewire。これで load-bearing carrier の破壊リスクを最小化。
