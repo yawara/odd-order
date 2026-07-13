@@ -1205,3 +1205,19 @@ signature (hG, hyp) は不変で OK — **hnoV = `S12.no_typeV_maximal_unconditi
 ### 今 iteration の landing
 - `tau1S_ofHonest_mu_col_eta_col_one` (CaseACoherence、sorry-free): mu_col_tau1_eta_col_one
   field の honest supply (formula + mu_j_isIndPC 合成、p=3 分岐で j=2/δ=−1)。
+
+## 2026-07-13 更新 #21 (lane b, /loop) — (13.3.b) 数学は landed 済と判明 + 残 build list 確定
+
+- **(13.3.b) dichotomy glue = `caseB_of_no_irreducible_sOf_H0Cprime`** (CountingLayer:1042,
+  sorry-free, §9-generic) が既に存在 — no-irr → caseB + C=⊥ + u=(p^q−1)/(p−1)。
+  (9.10) 相当 = `exceptional_case_frobenius_realization` (ThetaCountAssembly:993, sorry 3 残
+  は type-II HU-Frobenius 節のみ)。9094 の裁定対象は carrier 形状のみに縮小 (追記済)。
+- **残 build list (ungated、9094 裁定と独立に有用)**:
+  1. conditional producer `character_degree_analysis_of_irr`: (∃ λ witness) → Nonempty (CDD hyp)
+     — 全 field を landed engine で組む (λ-cluster は witness から)。
+  2. `tau1S_apply_induce_sub` 供給: zSpan(sSet) 元の degree-0 → A(S)-supported 小 lemma +
+     tau1S_ofHonest_extends_on_supported + induce_H_mem_zSpan_S。
+  3. `tau1S_induce_inner_eta` (restated 版) 供給: Ind θ irr → sSet membership 橋 + crux。
+  4. `tau1S_induce_inner_eta_col_zero` 供給: induce_H_mem_zSpan_S の zSpan 分解 + formula + crux。
+  5. tau1T / δ'-half: `Hypothesis.swap` 経由 — 前提 = hT2 (T type-P₂) + Tdata + **NuGridSupplyData**
+    (T-side (13.1.e)/(4.3)/(4.4) grid facts の Prop bundle、producer 未確認 — 要調査)。
