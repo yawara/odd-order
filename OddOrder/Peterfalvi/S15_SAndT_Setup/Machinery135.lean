@@ -193,8 +193,132 @@ structure CharacterDegreeData (hyp : Hypothesis (G := G)) where
       j' ≠ ⟨0, hyp.p_prime.pos⟩ → j ≠ j' →
       tau1S (∑ i : Fin hyp.q, hyp.mu i j) = -∑ i : Fin hyp.q, hyp.eta i j')
 
+open scoped FiniteInduce in
+/-- **The λ-free core of Peterfalvi (13.3)** (issue 9094 RULING 案 A + issue 2035 更新 #22): the
+`τ₁`-maps and the unconditionally-available (13.3.a/c) facts, **without** the λ-cluster (which is
+conditional on `𝒮` containing an irreducible `uq`-degree `PC`-induced member — Pf (13.3.b) is a
+dichotomy).  Mirrors Coq `PFsection13`'s factoring: the λ-free Section `Thirteen_2_3_5_to_9`
+exports these unconditionally, the λ-facts are `Variable`-scoped.
+
+The τ₁-fields carry the **`P ⊄ Ker` guards** (2035 更新 #22): the coherence `IsCoherent` pins
+`τ₁` only on `ℤ[𝒮]`, and `Ind_{PC}^S θ ∈ ℤ[𝒮]` requires `P ⊄ Ker θ` ((1.5.a)); Peterfalvi's
+(13.5) proof converts `τ₁ ↔ Ind_S^G` only on such `𝒮₁`-members, the `P`-kernel side staying
+inside the unknown `α` of (13.5.a).  The unconditional-in-`θ` shapes of the legacy
+`CharacterDegreeData` fields are *not suppliable* from the (9.11) coherence.  The `μ`-fields
+carry the matching `P ⊄ Ker` **witness** (`mu_j_isIndPC_not_ker`: `μ_j ∈ 𝒮₁`), which is what the
+(13.5)-consumers thread into the guards. -/
+structure CharacterDegreeCore (hyp : Hypothesis (G := G)) where
+  tau1S : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥hyp.S G
+  tau1T : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥hyp.T G
+  /-- **(13.2.e)+(7.2), τ₁-extension semantics** on `𝒮₁`-differences: `τ₁` agrees with
+  `Ind_S^G` on zero-degree differences of `P`-nonkernel `H`-induced irreducibles. -/
+  tau1S_apply_induce_sub :
+    haveI := hyp.finiteG
+    ∀ θ θ' : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ,
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter θ →
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter θ' →
+      ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
+          Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel θ) →
+      ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
+          Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel θ') →
+      tau1S (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ
+          - ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ')
+        = ClassFunction.induce hyp.S
+            (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ
+              - ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ')
+  /-- **The τ₁ coherence isometry on the `𝒮₁`-family**. -/
+  tau1S_inner_induce :
+    haveI := hyp.finiteG
+    ∀ θ θ' : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ,
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter θ →
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter θ' →
+      ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
+          Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel θ) →
+      ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
+          Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel θ') →
+      ClassFunction.inner (tau1S (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ))
+          (tau1S (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ'))
+        = ClassFunction.inner (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ)
+            (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ')
+  /-- **τ₁ sends `𝒮₁`-members to virtual characters**. -/
+  tau1S_induce_mem_ZIrr :
+    haveI := hyp.finiteG
+    ∀ θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ,
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter θ →
+      ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
+          Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel θ) →
+      tau1S (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ) ∈ ZIrr G
+  /-- **(4.1)+(5.3.b): grid orthogonality of τ₁-images of *irreducibly*-induced `𝒮₁`-members**. -/
+  tau1S_induce_inner_eta :
+    haveI := hyp.finiteG
+    ∀ (i : Fin hyp.q) (j : Fin hyp.p) (θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ),
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter θ →
+      ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
+          Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel θ) →
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter
+        (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ) →
+      ClassFunction.inner (hyp.eta i j)
+        (tau1S (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ)) = 0
+  /-- **(4.1)+(5.3.b)+(13.3.c): column-`0` orthogonality for *every* `𝒮₁`-member** (irreducible
+  or `μ`-column). -/
+  tau1S_induce_inner_eta_col_zero :
+    haveI := hyp.finiteG
+    ∀ (i : Fin hyp.q) (θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ),
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter θ →
+      ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
+          Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel θ) →
+      ClassFunction.inner (hyp.eta i ⟨0, hyp.p_prime.pos⟩)
+        (tau1S (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ)) = 0
+  /-- **(13.3.a)+(13.3.c), the distinguished `μ`-column** with the `𝒮₁`-membership witness. -/
+  mu_col_tau1_eta_col_one :
+    haveI := hyp.finiteG
+    ∃ (j : Fin hyp.p) (δ : ℤ) (θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ),
+      j ≠ ⟨0, hyp.p_prime.pos⟩ ∧
+      (δ = 1 ∨ δ = -1) ∧
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter θ ∧ θ 1 = 1 ∧
+      ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
+          Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel θ) ∧
+      (∑ i : Fin hyp.q, hyp.mu i j) = ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ ∧
+      tau1S (∑ i : Fin hyp.q, hyp.mu i j)
+        = (δ : ℂ) • ∑ i : Fin hyp.q, hyp.eta i ⟨1, hyp.p_prime.one_lt⟩
+  /-- **(13.3.a) with the `𝒮₁`-witness**: every nonzero column sum is induced from a linear
+  character of `H = PC` with `P ⊄ Ker`. -/
+  mu_j_linear_induced :
+    haveI := hyp.finiteG
+    ∀ j : Fin hyp.p, j ≠ ⟨0, hyp.p_prime.pos⟩ →
+      ∃ θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ,
+        OddOrder.RepresentationTheory.IsIrreducibleCharacter θ ∧ θ 1 = 1 ∧
+          ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
+              Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
+            OddOrder.Peterfalvi.S03.characterKernel θ) ∧
+          (∑ i : Fin hyp.q, hyp.mu i j) = ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ
+  /-- **(13.3.c)**: the signs `δ_j`, `δ'_i` are all `1`. -/
+  delta_eq_one : (∀ j : Fin hyp.p, hyp.delta j = 1) ∧ (∀ i : Fin hyp.q, hyp.deltaPrime i = 1)
+  /-- **(13.3.c)**: the `τ₁`-images of the nonzero column sums are the `η`-column sums. -/
+  mu_tau1_formula :
+    (∀ j : Fin hyp.p, j ≠ ⟨0, hyp.p_prime.pos⟩ →
+      tau1S (∑ i : Fin hyp.q, hyp.mu i j) = ∑ i : Fin hyp.q, hyp.eta i j) ∨
+    (hyp.p = 3 ∧ ∀ j j' : Fin hyp.p, j ≠ ⟨0, hyp.p_prime.pos⟩ →
+      j' ≠ ⟨0, hyp.p_prime.pos⟩ → j ≠ j' →
+      tau1S (∑ i : Fin hyp.q, hyp.mu i j) = -∑ i : Fin hyp.q, hyp.eta i j')
+
 /-- **Peterfalvi (13.3)**: the `mu_j` have degree `u q`, the signs are `1`,
-and the `tau_1` images are controlled by the `eta_ij` grid. -/
+and the `tau_1` images are controlled by the `eta_ij` grid.
+
+⚠ **Deprecation (issue 9094 RULING 案 A)**: the unconditional λ-cluster of `CharacterDegreeData`
+is a Pf (13.3.b) *dichotomy* overstatement, and the unguarded τ₁-fields are not suppliable
+(issue 2035 更新 #20/#22).  New consumers should use the λ-free `CharacterDegreeCore` (producer
+`characterDegreeCore_nonempty`) and the conditional/dichotomy producers
+(`S15_CharacterDegreeSupply`).  This producer is kept signature-stable until the consumer
+migration completes (9094 移行手順 §3). -/
 theorem character_degree_analysis [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     Nonempty (CharacterDegreeData hyp) := by

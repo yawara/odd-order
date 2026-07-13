@@ -1,4 +1,5 @@
 import OddOrder.Peterfalvi.S15_CaseACoherence
+import OddOrder.Peterfalvi.S15_SAndT_Setup.CountingLayer
 
 /-!
 # Peterfalvi §13 (pp. 75–86) — (13.3)/(13.5) τ₁-field supplies on the irreducibly-induced family
@@ -503,5 +504,79 @@ theorem Hypothesis.mu_j_isIndPC_not_ker [Finite G]
   have h := OddOrder.Peterfalvi.S03.mem_characterKernel_of_mem_characterKernel_induce
     χ.isIrreducible x.2 hxkerInd
   simpa using h
+
+open scoped FiniteInduce in
+/-- **`Ind_T^G` as an `IntegralCharacterMap ↥T G`** — the `T`-side mirror of `Hypothesis.indS`.
+Used as the (unconstrained) `tau1T` of the λ-free core until the ν-side (13.2.e)-T coherence
+lands (`nuGridSupply`, gated on the a-owned FT-layer carrier threading). -/
+noncomputable def Hypothesis.indT [Finite G] (hyp : Hypothesis (G := G)) :
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥hyp.T G :=
+  LinearMap.restrictScalars ℤ
+    ({ toFun := ClassFunction.induce hyp.T
+       map_add' := ClassFunction.induce_add hyp.T
+       map_smul' := fun c θ => ClassFunction.induce_smul hyp.T c θ } :
+      ClassFunction ↥hyp.T ℂ →ₗ[ℂ] ClassFunction G ℂ)
+
+/-- **Peterfalvi (13.3.c), the `T`-side signs `δ'_i = 1`** — the δ'-half of the
+`delta_eq_one` field.
+
+**Residual (precisely named)**: the `T`-mirror of `delta_eq_one_S` — the route is the ν-grid
+degree congruence `ν_{ij}(1) ≡ δ'_i (mod p)` (`NuGridSupplyData.nu_degree_modEq_deltaPrime`,
+(4.3.d) at `T`) against `v ≡ 1 (mod p)` (the `T`-side `u_modEq_one`), exactly as
+`delta_eq_one_of_ne_zero` runs the `S`-side.  Gated on the ν-side grid supply `nuGridSupply`
+(HypothesisSwap; a-owned FT-layer carrier threading, issue 2038 iter 26 / 9094). -/
+theorem Hypothesis.deltaPrime_eq_one_T [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (i : Fin hyp.q) : hyp.deltaPrime i = 1 := by
+  sorry
+
+open scoped FiniteInduce in
+/-- **The λ-free core producer** (issue 9094 RULING 案 A): every field of
+`CharacterDegreeCore` from the landed engines — `τ₁ = tau1S_ofHonest` with its five guarded
+field supplies, the (13.3.a) `𝒮₁`-witnessed `μ`-facts (`mu_j_isIndPC_not_ker`,
+`tau1S_ofHonest_mu_col_eta_col_one`), the (13.3.c) signs (`delta_eq_one_S` +
+the ν-gated `deltaPrime_eq_one_T`), and the (13.3.c) column formula
+(`tau1S_ofHonest_muColumn_formula`). -/
+noncomputable def Hypothesis.characterDegreeCore [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
+    CharacterDegreeCore hyp where
+  tau1S := hyp.tau1S_ofHonest hG hnoV chief
+  tau1T := hyp.indT
+  tau1S_apply_induce_sub := fun θ θ' hθ hθ' hθP hθ'P =>
+    hyp.tau1S_ofHonest_apply_induce_sub hG hnoV chief θ θ' hθ hθ' hθP hθ'P
+  tau1S_inner_induce := fun θ θ' hθ hθ' hθP hθ'P =>
+    hyp.tau1S_ofHonest_inner_induce hG hnoV chief θ θ' hθ hθ' hθP hθ'P
+  tau1S_induce_mem_ZIrr := fun θ hθ hθP =>
+    hyp.tau1S_ofHonest_induce_mem_ZIrr hG hnoV chief θ hθ hθP
+  tau1S_induce_inner_eta := fun i j θ hθ hθP hind =>
+    hyp.tau1S_ofHonest_induce_inner_eta hG hnoV chief i j θ hθ hθP hind
+  tau1S_induce_inner_eta_col_zero := fun i θ hθ hθP =>
+    hyp.tau1S_ofHonest_induce_inner_eta_col_zero hG hnoV chief i θ hθ hθP
+  mu_col_tau1_eta_col_one := by
+    obtain ⟨j, δ, θold, hj, hδ, -, -, -, hform⟩ :=
+      hyp.tau1S_ofHonest_mu_col_eta_col_one hG hnoV chief
+    obtain ⟨θ, hθirr, hθ1, hμeq, hθP⟩ := hyp.mu_j_isIndPC_not_ker hG j hj
+    exact ⟨j, δ, θ, hj, hδ, hθirr, hθ1, hθP, hμeq, hform⟩
+  mu_j_linear_induced := fun j hj => by
+    obtain ⟨θ, hθirr, hθ1, hμeq, hθP⟩ := hyp.mu_j_isIndPC_not_ker hG j hj
+    exact ⟨θ, hθirr, hθ1, hθP, hμeq⟩
+  delta_eq_one :=
+    ⟨fun j => hyp.delta_eq_one_S hG j, fun i => hyp.deltaPrime_eq_one_T hG i⟩
+  mu_tau1_formula := hyp.tau1S_ofHonest_muColumn_formula hG hnoV chief
+
+/-- **The λ-free core, unconditionally** (issue 9094 RULING 案 A): `CharacterDegreeCore` is
+inhabited for every (13.1) hypothesis — the (12.x) no-type-V fact supplies `hnoV`, and a chief
+factor datum always exists. -/
+theorem Hypothesis.characterDegreeCore_nonempty [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    Nonempty (CharacterDegreeCore hyp) := by
+  haveI := hyp.finiteG
+  obtain ⟨chief, -⟩ := OddOrder.Peterfalvi.S11.exists_chiefFactorData hG
+    (hyp.toTypesIIIIIIVSetupS hG)
+  exact ⟨hyp.characterDegreeCore hG
+    (OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional hG) chief⟩
 
 end OddOrder.Peterfalvi.S15
