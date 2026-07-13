@@ -1200,4 +1200,41 @@ theorem T_caseB_facts_unconditional [Finite G]
     exact lambda_forces_T_caseB_core hG core lam
   · exact T_caseB_facts_no_lambda hG hyp hlam
 
+open scoped FiniteInduce in
+/-- **The no-λ (Galois) branch of the `S`-side (13.3.b) facts** (issue 9094 RULING §2, faithful
+sorried bridging): if `𝒮` contains no `uq`-degree `PC`-induced irreducible (`¬ LambdaWitness`),
+then by Pf (13.3.b) `M = S` is in case (9.7.b) with `C = ⊥` and `u = (p^q−1)/(p−1)` — the Galois
+case.
+
+Assembled from the §9-generic `caseB_of_no_irreducible_sOf_H0Cprime` (sorry-free) through the
+S15↔S11 `Section11CharacterData` SOf-identification: an irreducible member of the `S`-instance
+family `𝒮(H₀ ⊔ C')` is (13.3.a-style) a `uq`-degree `PC`-linear induced irreducible, i.e. a
+`LambdaWitness`, and the `chars.C`/`chars.u` conclusion transports to `hyp.C`/`hyp.u`
+(`toTypesIIIIIIVSetupS_cSub_eq_C`).  That identification is the deep (13.3.b) forward bridge
+(S15↔S11, multi-session); until it lands this is the honest, precisely-named gate. -/
+theorem S_caseB_facts_no_lambda [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (_hnolam : ¬ LambdaWitness hyp) :
+    hyp.C = ⊥ ∧ hyp.u = (hyp.p ^ hyp.q - 1) / (hyp.p - 1) := by
+  sorry
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (13.3.b) dichotomy, the `S`-side keystone producer** (issue 9094 RULING 案 A/§2):
+either `𝒮` contains the honest λ-cluster (`Nonempty (LambdaClusterData hyp)`), or `M = S` is in
+the Galois case (`C = ⊥`, `u = (p^q−1)/(p−1)`).  This is the producer every λ-independent
+consumer of the legacy `character_degree_analysis` threads: the λ-branch supplies the
+`LambdaClusterData` (against the unconditional `CharacterDegreeCore`), the no-λ branch supplies
+the (13.10)-arithmetic inputs `C = ⊥ ∧ u = full`.
+
+The case-split is `LambdaWitness hyp` (`Classical.em`): the λ-branch is
+`lambdaClusterData_of_irr_witness`, the no-λ branch is `S_caseB_facts_no_lambda`. -/
+theorem lambdaCluster_or_caseB [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    Nonempty (LambdaClusterData hyp) ∨
+      (hyp.C = ⊥ ∧ hyp.u = (hyp.p ^ hyp.q - 1) / (hyp.p - 1)) := by
+  by_cases hlam : LambdaWitness hyp
+  · obtain ⟨θ, hθ, hθ1, hθP, hind⟩ := hlam
+    exact Or.inl (hyp.lambdaClusterData_of_irr_witness hG θ hθ hθ1 hθP hind)
+  · exact Or.inr (S_caseB_facts_no_lambda hG hyp hlam)
+
 end OddOrder.Peterfalvi.S15

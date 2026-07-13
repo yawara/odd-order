@@ -1357,3 +1357,28 @@ no-λ 分岐が sorried bridging 明示許可 + downstream ゆえ CountingLayer 
   `caseB_of_no_irreducible_sOf_H0Cprime` (S-instance) 経由だが「no LambdaWitness → no irr member of
   S-instance SOf」橋 = (13.3.b) の核心 (S15↔S11 SOf bridge、deep)。NormEstimates statement は
   λ 非依存ゆえ no-λ 枝は (13.10)-arithmetic (c=1 ∧ u=full) で閉じる (RULING §3-2)。
+
+## 2026-07-14 更新 #28 (lane b, /loop) — ⑤ flip 2/N: general S-side dichotomy producer landed (keystone)
+
+NormEstimates 5 obtain-site 移行の keystone = **general S-side dichotomy** を landing:
+
+- **`lambdaCluster_or_caseB`** (S15_CharacterDegreeSupply、**完全証明**): `Nonempty (LambdaClusterData hyp)
+  ∨ (hyp.C = ⊥ ∧ hyp.u = (p^q−1)/(p−1))`。`by_cases LambdaWitness` — λ枝 =
+  `lambdaClusterData_of_irr_witness`、no-λ枝 = `S_caseB_facts_no_lambda`。全 λ-independent consumer が
+  thread する producer (λ枝で LambdaClusterData 供給 / no-λ枝で (13.10)-arithmetic 入力 C=⊥∧u=full)。
+- **`S_caseB_facts_no_lambda`** (precisely-named sorried bridge): `¬LambdaWitness → C=⊥ ∧ u=full`。
+  `caseB_of_no_irreducible_sOf_H0Cprime` (§9-generic, sorry-free) 経由だが、hno 供給に
+  **「irr member of S-instance SOf(H0⊔C') → LambdaWitness」= (13.3.b) forward の深い S15↔S11 橋**が要る
+  (irr SOf member が uq 次数 PC-linear-induced であることを示す; chars.C/chars.u → hyp.C/hyp.u 変換も;
+  multi-session)。`mu_j_isIndPC_not_ker` の SOf→Ind 機械 (mu_colSum_mem_sOf_H0 / induceHU_eq_induce) が
+  素材だが、reducible μ-column 版で、irr member + linear θ 抽出が未構築。
+
+**深い橋の所在確定** (issue の設計 map を更新): 9094 の残 genuine math gate は 3 本に isolate —
+(a) `tSide_theta_package_of_not_caseB_core` (ν-gated (13.4) T-package)、
+(b) `T_caseB_facts_no_lambda` (no-λ T-mirror: q<p + (13.13)/(13.12)-on-T)、
+(c) `S_caseB_facts_no_lambda` (no-λ S-side: (13.3.b) forward S15↔S11 SOf bridge)。
+(c) が最上流の genuine math (S-instance SOf の irr-member 特徴付け)。
+
+**次 = ⑤ flip 3/N**: NormEstimates 8 helper の core/lam 版 + 5 obtain-site の dichotomy 移行
+(λ枝 = core+lam で helper 呼出、no-λ枝 = C=⊥∧u=full からの (13.10)-arithmetic)。または (c) の
+deep bridge を先に engage (最上流 genuine math、multi-session)。
