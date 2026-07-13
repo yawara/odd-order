@@ -852,3 +852,29 @@ optional 化)。⚠ subagent の engine 名は一部 M-side 混同あり、上�
 **安全策**: まず新 `sSet_coherent_indS_A_pinned` を additive に建て (既存 coherent_H0Cprime_S 不変)、
 branch pin 2 本を sorried-skeleton で landing → 各 branch pin を proven → 最後に coherent_H0Cprime_S
 rewire。これで load-bearing carrier の破壊リスクを最小化。
+
+## 2026-07-13 更新 #10 (lane b, /loop) — carrier 再設計の深度確定: caseB は S07 pin 露出が必要
+
+更新 #9 の実装に着手し、caseB 分岐が想定より深いことが判明 (精読で確定):
+
+- **caseA (has-irr)**: 任意 coherence で γ-forcing 可 (`sSet_irr_memberRFamily_eta_inner` +
+  `caseA_exists_irreducible_qa`)。⟹ `sSet_coherent_indS_caseA.some` + 後付け pin 証明で bundle 可。S15-local。
+- **caseB (all-reducible)**: ⚠ flip witness が valid ゆえ **任意 coherence で pin 証明不可**。
+  `sSet_coherent_dade_caseB` (:46) は `uniform_degree_coherence_of_families` (S07_PivotCoherence:793)
+  経由だが、**両者とも bare `Nonempty (IsCoherent)` を返し pin を expose しない** → `.some` は任意 inhabitant
+  → caseB の pin も現状決まらない。
+  - 必要: `uniform_degree_coherence_of_families` / `pivotCoherence` (S07、**shared infra**) を
+    `Nonempty (Σ c, c.extension(pivot)=<pivot partner>)` に強化して pin (pivot の像) を露出、
+    or S-side glue 構成 (M-side `exists_pinned_coherent_sOf_H0C_of_all_reducible` (S13:560) の類比
+    — ただし M-side は concrete glue machinery 依存)。
+  - `pivotCoherence` は pivot η₁ を specific に写すので **pin は構成上決まっている**が、`Nonempty` が
+    witness を消している。露出は S07 の return type 変更 (shared、9000 claim 対象の可能性)。
+
+### frontier 現状 (正確)
+(13.3.c) formula は「carrier に μ-column pin を bundle」に帰着し、その pin bundle は:
+1. caseA = S15-local な γ-forcing (中程度)
+2. caseB = **S07 `uniform_degree_coherence_of_families` の pin 露出** (shared infra 強化) が本丸
+
+= 深い multi-layer 課題。fresh session で S07 pin-露出強化から着手推奨 (shared ゆえ着手前に 9000 claim +
+既存 open 9000 scan)。MuColumnPin の formula scaffold は bundle 完成まで sorried-cite で保持 (soundness 問題なし
+= tau1S_ofHonest は valid coherence、pin が未確定なだけ)。
