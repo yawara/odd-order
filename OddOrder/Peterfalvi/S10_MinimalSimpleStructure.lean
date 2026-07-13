@@ -873,10 +873,20 @@ interface.
 This statement deliberately does not prove BG Theorem E.  It records the exact
 data Peterfalvi uses after (8.14): the `π(G)` partition by the `M_i_s`, the
 cardinality of each thickened `A_1(M_i)`, and the appropriate `G#` cover in the
-two cases from (8.8). -/
+two cases from (8.8).
+
+The case-(b) branch carries its **type-`P` provenance** (`maximalTypePFamily G` nonempty):
+per (8.8), the two-exceptional-subgroup cover arises *only* from a type-`P` maximal (the
+exceptional `Ẑ` is built from a reference type-`P` maximal's `κ`-Hall data,
+`nonTypeICovering_of_isTypeP`).  Recording the witness is the (8.8.a) *exclusivity* — the
+carrier `BGTheoremENonTypeICovering` alone does not expose it (an empty exceptional set
+satisfies the carrier whenever the type-I cover holds), and the all-type-I consumer (12.17)
+needs it to rule the branch out (`S14.not_nonTypeICovering_of_all_typeI`). -/
 theorem bgTheoremE_cover_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     ∃ data : BGTheoremECoverData G,
-      BGTheoremETypeICovering data ∨ Nonempty (BGTheoremENonTypeICovering data) := by
+      BGTheoremETypeICovering data ∨
+        ((OddOrder.BG.Ch4.S14.maximalTypePFamily G).Nonempty ∧
+          Nonempty (BGTheoremENonTypeICovering data)) := by
   classical
   haveI : Finite (Subgroup G) :=
     Finite.of_injective (fun H : Subgroup G => (H : Set G)) SetLike.coe_injective
@@ -962,8 +972,9 @@ theorem bgTheoremE_cover_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     obtain ⟨Mref, hMrefmax, hMrefP⟩ := hP
     obtain ⟨Kref, Kstarref, Uref, hKMref, hKref, hKstarref, hUref⟩ :=
       OddOrder.BG.Ch4.S14.exists_typeP_data hG hMrefmax
-    exact Or.inr ⟨nonTypeICovering_of_isTypeP hG _ (fun _ => rfl) hMrefmax hMrefP hKMref hKref
-      hKstarref hUref⟩
+    exact Or.inr ⟨⟨Mref, hMrefmax, hMrefP⟩,
+      ⟨nonTypeICovering_of_isTypeP hG _ (fun _ => rfl) hMrefmax hMrefP hKMref hKref
+        hKstarref hUref⟩⟩
   · -- `𝓜_P = ∅` (every maximal is type-F/I): the Type-I covering — the faithful BG Cor 14.9
     -- all-type-`F` cover and Lemma 14.5(b) disjointness.  (The former kernel-collapse field was
     -- mis-layered §8 content and is discharged at the §12 consumer via the (12.17)-faithful

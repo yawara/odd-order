@@ -498,3 +498,65 @@ consumer `exists_typeICovering` は残 3/3 (`not_nonTypeICovering_of_all_typeI` 
 dirty root になった (allTypeI_fittingIsTI 経路は閉)。
 
 **残 3/3**: `not_nonTypeICovering_of_all_typeI` ((8.8.a) exclusivity 抽出) → 次 iteration。
+
+---
+
+## ✅ RULING #4 実施 3/3 (2026-07-13 lane a): `not_nonTypeICovering_of_all_typeI` landed — (8.8.a) exclusivity で (12.17) chain 完結
+
+**⚠ self-flag: carved decl の signature 変更 (条件 i の hub flag)**。3/3 target は precise には
+**as-stated で非循環的に証明不能**だった:
+
+- 旧 statement は任意の `hcov : BGTheoremENonTypeICovering data` から `hall` との矛盾を主張。
+  しかし carrier は exceptionalSet の非空性も type-P 由来も記録しない —
+  **`exceptionalSet = ∅` は type-I cover が成り立つ配置で常に carrier を充足**する
+  (cover_nonidentity は `∪ ∅`、exceptional_disjoint は `Disjoint ∅ _`)。ゆえに旧 statement の
+  証明は hall+hG 自体の矛盾 = (12.17) 全体を要し、(12.17) が本 decl を cite する構造上
+  **in-file 循環**。docstring の「Soundness: TRUE」は正しいが「hcov から抽出」は不可能だった。
+- **honest fix = (8.8.a) exclusivity を producer 側 (S10、lane-a 所有) で記録**:
+  `bgTheoremE_cover_data` の右分岐を `(maximalTypePFamily G).Nonempty ∧ Nonempty (…)` に強化
+  (proof は既に `by_cases hP : (maximalTypePFamily G).Nonempty` で分岐しており witness を
+  そのまま pack する 1 行適応)。教科書 (8.8.b) は S,T type-II〜V の存在を明示的に含むので、
+  これは Lean statement を原文に合わせる訂正。
+- 3/3 decl の新 signature: `(hP : (maximalTypePFamily G).Nonempty) (hall : …) : False`
+  (data/hcov 引数は削除 — provenance が直接矛盾を与える)。証明 =
+  `isTypeF_iff_not_isTypeP` + `proposition_type_classification` (3 行、type-P vs type-I=F)。
+- **b file への変更は 3/3 decl + その cite 1 箇所 + stale docstring のみ**:
+  `exists_typeICovering` の case-(b) 分岐 1 行 (`hNonTypeI.1` 供給) と docstring 訂正
+  (「Two upstream facts remain isolated as residual sorries」→ 全 discharge)。
+  既存 b 宣言の math 変更なし。
+- S10 statement 強化の他 consumer への影響: `S15_Gate3:164` / `WitnessSylowCyclic:712` は
+  `obtain ⟨data, -⟩` で disjunction を破棄しており無影響 (機械検証済)。
+
+**検証**: (build/axioms 結果は下記追記)
+
+**検証結果 (追記)**:
+- leaf + full `lake build OddOrder` green (4188 jobs、AxiomsCheck asserts 全 pass)。
+- `#print axioms`: `bgTheoremE_cover_data` (強化後) = clean / `theorem88_dichotomy` = clean /
+  3/3 decl sorry-free (TypeICovering の sorry warning 消滅)。
+- **carve-out 失効条件充足**: RULING #4 の 3 decl 全て sorry-free 化 — S15_Gate3 /
+  TypeICovering は完全 b 所有へ復帰。
+
+### (12.17) chain の残 dirty root localization (authoritative、#print axioms + code-read)
+
+`exists_typeICovering` / `not_all_maximal_typeI` / `theorem88_caseB_holds` は依然 sorryAx。
+中間補題の全数 probe で root は正確に 2 本:
+1. **(7.10) `S09.card_G0_lower_bound`** (FrobeniusFamily.lean:1016) —
+   `not_trivial_G0` (7.11) の唯一の dirty 入力 (`not_trivial_G0_of_lowerBoundTerm` は clean)。
+2. **(12.6)(c1) `sibleyTarget_frobI`** (S14_MaximalI/FrobeniusStructure.lean:117) —
+   `typeI_frobenius` (12.7) の root。
+他は全 clean (escape structure / σ-uniqueness / Mtilde collapse / type classification /
+normalizer bridges / (14.5) counting 全て)。
+
+### ⚠ hub surface 2 点
+
+1. **(7.10) の OFF-PATH label は stale 化**: 0044 cont.⁴⁸ (2026-07-04) の凍結根拠
+   「card_G0 の consumer は S09 assembly 内のみ、spine 上に無い」は本 3/3 landing で覆った —
+   現 live trace: (7.10) → (7.11) → `not_all_maximal_typeI` → `theorem88_caseB_holds` →
+   **FeitThompsonSetup:548 (spine)**。(7.10) は feitThompson の推移的 prerequisite に復帰。
+   0044 は完遂寸前で凍結されていた (delta-reality 完了済、残 = hdelta_even assembly +
+   CharacterEstimateData + 定量 strand、全 input 所在確認済 = cont.⁴⁷)。
+   **lane a は upstream-first + 文書順 (§7-9 < §12+) + a-territory (S09) により 0044 を再開する**
+   (ft_path_policy の (7.10) OFF-PATH 行の訂正は hub の merge tick に委ねる)。
+2. **`sibleyTarget_frobI` (12.6)(c1) は b territory** (S14_MaximalI/FrobeniusStructure、
+   issue 2032 系): (12.17)→(12.7) chain のもう 1 本の root。b の 2035 queue との sequencing は
+   hub 裁定事項 (a は grab しない)。

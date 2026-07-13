@@ -50,30 +50,25 @@ before (12.10), where the type-`P` pins consume it. -/
 /-- **Peterfalvi (8.8.a) dichotomy, all-type-I case** — the case-(b) covering branch of BG Theorem
 E cannot occur when every maximal subgroup is of type I.
 
-If `data`'s cover admits a `BGTheoremENonTypeICovering` (the two-exceptional-subgroup case (8.8.b)
-of BG Theorem E) while every maximal subgroup is of type I (`hall`), a contradiction results.
+The case-(b) branch of `S10.bgTheoremE_cover_data` carries its type-`P` provenance
+(`maximalTypePFamily G` nonempty — the (8.8.a) *exclusivity*: the two-exceptional-subgroup cover
+is produced, in `nonTypeICovering_of_isTypeP`, *only* from a reference type-`P` maximal).  A
+type-`P` maximal is type F-negated (`isTypeF_iff_not_isTypeP`), while `hall` makes it type I
+= type F (Proposition 16.1(a), `proposition_type_classification`) — contradiction.
 
-**Genuinely still-missing**: the `BGTheoremENonTypeICovering` carrier records only the exceptional
-`Ẑ`-set and its cover geometry — it does **not** expose the type-`P` maximal whose Theorem 14.7
-duality produced `Ẑ` (see `nonTypeICovering_of_isTypeP`, whose inputs `Mref, Kref, …` are consumed
-but not re-exported).  So no non-type-I maximal is directly extractable from `hNonTypeI` to
-contradict `hall`.  The (8.8) dichotomy's *exclusivity* — case (b) selected `iff` some maximal is
-non-type-I — is the BG §16 (8.8.a) residual (parallel to `theorem88_dichotomy`), not assembled in
-reach of `S14`.
-
-**Soundness**: the statement is TRUE — the (8.8.b) covering branch is produced (in
-`nonTypeICovering_of_isTypeP`) *only* from a type-`P` (= non-type-I, `isTypeNonI_of_isTypeP`)
-maximal, which `hall` forbids; so the two hypotheses are jointly contradictory.  It is **not** a
-false general implication: it does not claim `BGTheoremENonTypeICovering` is empty unconditionally
-(it is inhabited whenever a non-type-I maximal exists) — only its incompatibility with the
-all-type-I hypothesis `hall`.  Tied to `hG`, the specific `data`, its non-type-I covering, and
-`hall`. -/
+The provenance hypothesis is essential: the bare `BGTheoremENonTypeICovering` carrier records
+only the exceptional `Ẑ`-set and its cover geometry, and an **empty** exceptional set satisfies
+it whenever the type-I cover holds — so no contradiction with `hall` is extractable from the
+carrier alone, and the earlier `(hcov : BGTheoremENonTypeICovering data)`-form of this lemma was
+provable only through the full (12.17) contradiction (circular here). -/
 private theorem not_nonTypeICovering_of_all_typeI (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {data : OddOrder.Peterfalvi.S10.BGTheoremECoverData G}
-    (_hcov : OddOrder.Peterfalvi.S10.BGTheoremENonTypeICovering data)
-    (_hall : ∀ N : Subgroup G, N ∈ maximalSubgroups G → IsTypeI N) :
+    (hP : (OddOrder.BG.Ch4.S14.maximalTypePFamily G).Nonempty)
+    (hall : ∀ N : Subgroup G, N ∈ maximalSubgroups G → IsTypeI N) :
     False := by
-  sorry
+  obtain ⟨Mref, hMrefmax, hMrefP⟩ := hP
+  exact OddOrder.BG.Ch4.S14.isTypeF_iff_not_isTypeP.mp
+    ((OddOrder.BG.Ch4.S16.proposition_type_classification hG hMrefmax).1.mp
+      (hall Mref hMrefmax)) hMrefP
 
 /-- **A type-I maximal has no "hat" beyond its kernel** (the (12.17)-side collapse of the (8.14)
 signalizer support): for a type-I maximal `N`, every element of `N` whose `N_σ`-centralizer is
@@ -249,10 +244,10 @@ prime-factor partition is disjoint, hence the kernels are coprime), `two_le` (a 
 make `|G#| = (|M_s|-1)|G:M| < |G|-1 = |G#|`), and `covers` (the (12.17)-faithful collapse, issue
 9080: no centralizer escapes by (12.7)+Theorem D(4) (`allTypeI_centralizer_le`), so the faithful
 BG Cor 14.9 cover collapses onto the kernels, `Mtilde_eq_sigmaSharp_of_forall_centralizer_le`) are
-all discharged.  Two upstream facts remain isolated as residual sorries: `isTI`, the
-escaping-centralizer control (8.13.c1)+(2.3) making each kernel sharp-set a TI-subset; and the
-selection of the type-I cover branch under `hall`, the (8.8.a) dichotomy (BG §16, parallel to
-`theorem88_dichotomy`). -/
+all discharged.  The two formerly-sorried inputs are also discharged: `isTI` by the
+escaping-centralizer control (8.13.c1)+(2.3) (`allTypeI_fittingIsTI`), and the selection of the
+type-I cover branch under `hall` by the type-`P` provenance of the case-(b) branch
+(`not_nonTypeICovering_of_all_typeI`, the (8.8.a) exclusivity). -/
 theorem exists_typeICovering (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hall : ∀ M : Subgroup G, M ∈ maximalSubgroups G → IsTypeI M) :
@@ -424,13 +419,10 @@ theorem exists_typeICovering (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       rw [← hσeq]
       exact hmem
   · -- **(8.8.b) non-type-I cover branch**: ruled out when every maximal subgroup is type I.
-    -- This is the all-type-I case of the (8.8) dichotomy (`theorem88_dichotomy`); under `hall`
-    -- BG Theorem E returns the type-I cover, never the two-exceptional-subgroup case (the
-    -- exceptional `W` of `hNonTypeI` is the normalizer of a non-type-I maximal).  Isolating that
-    -- is the BG §16 (8.8.a) residual (`not_nonTypeICovering_of_all_typeI`).
-    exfalso
-    obtain ⟨hcov⟩ := hNonTypeI
-    exact not_nonTypeICovering_of_all_typeI hG hcov hall
+    -- The branch carries its type-`P` provenance (the (8.8.a) exclusivity recorded in
+    -- `bgTheoremE_cover_data`), which `hall` contradicts
+    -- (`not_nonTypeICovering_of_all_typeI`).
+    exact (not_nonTypeICovering_of_all_typeI hG hNonTypeI.1 hall).elim
 
 /-- **Peterfalvi (12.17), non-existence half**: in a minimal simple group of odd order, not every
 maximal subgroup is of type I.
