@@ -623,6 +623,19 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 23) — a+b 合流: a=Isaacs Ch07 Step3 p-prime core trivial + b=docs (frontier assessment, issue 9096)**:
+  **a=1** (`58c67f17` = Isaacs Ch07 issue 0031。`S7C_ThompsonPComplement` +227、0 sorry、計 1223 行 + AxiomsCheck +4)。
+  **b=1 docs-only** (`b3ca00fb` = frontier assessment。issue **9096 新規 (HUB direction 依頼)**: b の S15-solo 9094
+  char-degree S-side は完了 (`S_caseB_facts_no_lambda` proven, tick22)、残 3 gate は全て cross-lane gated —
+  `tSide_theta_package_of_not_caseB_core`/`deltaPrime_eq_one_T` = ν-carrier (a-territory) 依存、
+  `T_caseB_facts_no_lambda` = S16-gated、NormEstimates 移行 = c-owned S16_GridExpansion relayer。.lean 非接触)。c=0。
+  build green **4197 jobs** / AxiomsCheck OK (**2406** assertion 全 allowlist) / count-sorry **50→50 不変** /
+  新 axiom なし / 逸脱なし。size watch: S7C 1223 (2000 未満)。
+  ⚠ **HUB direction 保留 (issue 9096)**: b の cluster 完了 + frontier cross-lane gated。**a は ν-carrier でなく
+  Isaacs Ch07 (Thm 7.1) を自律進行中**ゆえ b の default「a-ν landing 待ち」は自然発火しない。本セッションは
+  merge-only scope (cron「hub は合流のみ・frontier 選択に介入しない」) ゆえ hub direction ruling は保留し、
+  ユーザーへ surface (推奨 = b に ν-carrier discharge の proof-only carve-out (option B) or ungated T-instance
+  hbridge (option E)。詳細 = 本 summary + issues/9096)。
 - **2026-07-14 (tick 22) — a+b 合流: a=Isaacs Ch07 p-separability + ★b=S_caseB_facts_no_lambda 完全証明 (sorry 実 discharge)**:
   **a=1** (`455a310b` = Isaacs Ch07 issue 0031。`S7C_ThompsonPComplement` +144、0 sorry、計 996 行 + AxiomsCheck +2)。
   **b=1** (`a8b777b6` = ★ **hbridge 完全 CLOSE — `S_caseB_facts_no_lambda` を完全証明** (sorry→proven)。
