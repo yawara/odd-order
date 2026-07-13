@@ -1221,3 +1221,48 @@ signature (hG, hyp) は不変で OK — **hnoV = `S12.no_typeV_maximal_unconditi
   4. `tau1S_induce_inner_eta_col_zero` 供給: induce_H_mem_zSpan_S の zSpan 分解 + formula + crux。
   5. tau1T / δ'-half: `Hypothesis.swap` 経由 — 前提 = hT2 (T type-P₂) + Tdata + **NuGridSupplyData**
     (T-side (13.1.e)/(4.3)/(4.4) grid facts の Prop bundle、producer 未確認 — 要調査)。
+
+## 2026-07-13 更新 #22 (lane b, /loop) — ⚠ τ₁ field 群は P ⊄ Ker guard が必須 (第 5 の overstatement) + (7.7) trivial-base 問題と rebase 修理経路
+
+### 発見 1: 3 つの τ₁ field は無条件形では供給不能
+`tau1S_apply_induce_sub` / `tau1S_inner_induce` / `tau1S_induce_mem_ZIrr` (Machinery135) は
+全 irr θ, θ' で量化するが、IsCoherent が与えるのは ℤ[𝒮] 上のみ:
+- `extension_inner_eq` / `extension_mem_ZIrr` は zSpan 𝒮 membership が前提
+- Ind θ ∈ ℤ[𝒮] は **P ⊄ Ker θ が必要** (induce_H_mem_zSpan_S の hθP; P ⊆ Ker θ なら
+  constituents が P-kernel irr で sSet 外)
+- 原文 (13.5) 証明 (mmd 04.15:69-73) も同形: 「For i ≤ n, ζ_i ∈ ℤ[𝒮] by (1.5.a), and, by
+  (13.2.e), (ζ_i−ζ_0)^τ = Ind(ζ_i−ζ_0)」 — τ₁ 変換は **𝒮₁ member (P ⊄ Ker) のみ**。
+  P-kernel 側の係数は未知のまま α に吸収 ((13.5.a) の構造そのもの)。
+- τ₁ = .choose の opaque extension ゆえ ℤ[𝒮] 外の値は未拘束 → 無条件 field は証明不能
+  (2034 lambda_mem / #19 tau1S_induce_inner_eta / 9094 λ-cluster に続く同型第 5 例)。
+- **供給は landed**: tau1S_ofHonest_inner_induce / _induce_mem_ZIrr (既存、guarded) +
+  **tau1S_ofHonest_apply_induce_sub** (今回 landing、guarded; zSpan_sSet_degree_zero_support +
+  extends_on_supported)。⟹ **9094 案 A の Core 定義時に 3 field を guarded 形で入れる**。
+
+### 発見 2: H_sharp_hypothesis76 の trivial base で (13.5) 系 cCoeff 補題が実質証明不能
+- repo の (7.6) instantiation は `hypothesis76OfDadeTrivialBase` — **zeta 0 = Ind 1_H (P-kernel!)**。
+- Canonicalization の `lambda_tau1_cCoeff` / `eta10_cCoeff_*` (:326, :1073) は
+  hfield1/hfield2 を **(θ, trivial) pair に適用** — guarded field では討ち取れず、
+  絶対値 claim (c_{i₁}=1 ∧ c_i=0) は trivial base では genuinely undetermined
+  (τ₁ の choice に依存: ⟨Ind ζ₀^triv, τ₁λ⟩ は coherence が pin しない)。
+- 原文は application ごとに base を選ぶ ((7.8.b) 「We use (7.7) with ζ₀ ∈ 𝒮−{ζ}」、
+  (13.5) は ζ₀ ∈ 𝒮₁)。
+- **修理経路 (instantiation 再構築不要)**: rebase 恒等式
+  `∑_{全 i} ζ_i/‖ζ_i‖² |_{H^#} = 0` (H abelian ⟹ ∑_{θ∈Irr H} θ = reg_H = |H|·δ_1) により、
+  trivial-base chiRho_decomp から **任意の P-non-kernel base i₀ への rebased (7.7.a)** が
+  定理として導出可能: χ^ρ(x) = ∑_{i≠i₀} ((c̄_i − c̄_{i₀})/‖ζ_i‖²) ζ_i(x)。
+  c_i − c_{i₀} = ⟨τ(ζ_i − ζ_{i₀}), χ⟩ は P-non-kernel pair なら guarded field で計算可。
+  base witness: i₀ = μ-column index (mu_j_isIndPC、λ ≠ μ_j は irr/red で分離、p−1 ≥ 2 本)。
+- 影響: Canonicalization ×2 (cCoeff 補題の証明再構成; conclusion 形は book-faithful に要修正 —
+  絶対値でなく「P-non-kernel 係数差」または rebased 係数)、NormEstimates:806・
+  CountingLayer:1805 は λ/μ の P-witness thread のみ (statement 不変)。
+  **Q_sharp_hypothesis76 (NormEstimates:246 系、T-side twin) も同パターン — 要同修理**。
+- 派生要件: μ 側 field (`mu_j_linear_induced` / `mu_col_tau1_eta_col_one`) に **P ⊄ Ker θ
+  witness の追加が必要** (供給側: μ_ij ∈ 𝒮 は P-non-kernel + P ⊴ S ⟹ P ⊆ Ker θ なら全
+  constituent P-kernel、で導出可)。
+
+### 今 iteration landing
+- `zSpan_sSet_support_subset` / `zSpan_sSet_degree_zero_support` (CaseBReducibleCoherence)
+- `tau1S_ofHonest_apply_induce_sub` (CaseACoherence) — 全て sorry-free、build green
+- 残 build list (#21) の item 2 完了。next = 9094 案 A 実装 (Core は guarded field で定義、
+  発見 1-2 を織り込み) → item 1 (conditional producer) と統合。
