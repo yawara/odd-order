@@ -1667,3 +1667,28 @@ bare sorry を除去し、generic (9.11) 装置への **sorry-free assembly** �
 `sSet_subset_inducedKernelFamily` + `S08.inducedKernelFamily_inner_self_real_pos` +
 `sumnS_irreducible_constant_degree`)。(2) `nineElevenNormBoundS` を (9.11.4) norm inputs mirror /
 (9.11.6) dichotomy / (9.11.7)-(9.11.8) SevenEight mirror の sub-phase 順で。
+
+## 2026-07-13 更新 #50 (lane b, /loop) — nineElevenSTwoExtractionS CLOSED (axiom-clean) → caseA 残 1 residual
+
+**(9.11.1) 𝒮₂ = 𝒮₁ 抽出を実証明** (M-side `caseA_sTwo_subset_degreeQaCut` mirror、一発 green):
+- 新 brick `sOf_H0Uprime_subset_sSet` (C′ ≤ U′ commutator-mono + dictionary; assembler の重複 block も
+  これに置換) + `sSet_mem_Snorm_pos` (`sSet_subset_inducedKernelFamily` →
+  `S08.inducedKernelFamily_inner_self_real_pos` + `induceHU_apply_one_eq_q_mul` 正度数)。
+- 本体 = S1′ (H₀U′-stratum qa-cut) atom 化 → `sumnS_irreducible_constant_degree` で
+  `sumnS S1′ = |S1′|(qa)²` → hcount+hCUprime (`relIndex_cSub_U_eq_u`)+h2a で `= 2q²au` 飽和 →
+  S₂∖S1′ member は正 Snorm 追加で hFboundU 超過 (linarith)。
+- **#print axioms = [propext, Classical.choice, Quot.sound] — sorryAx 無し (dadeHypS すら不要)**。
+  helpers 2 本も同様に clean。
+- ⟹ `nineElevenEqualityRefutationS` の sorryAx 源 = **`nineElevenNormBoundS` ただ 1 本**。
+  build green 4181 jobs。
+
+**caseA 残 = `nineElevenNormBoundS` のみ** ((9.11.4)-(9.11.8))。次の sub-phase 分解 (M-side mirror):
+1. (9.11.2) TI-witness: `S11.nineElevenTwoTIWitness_of_degree_dichotomy` を S-instance dichotomy
+   (assembler の hdich と同じ構成、gate 無し) で fire — 直接 reuse 見込み。
+2. (9.11.4) norm inputs: `caseA_nineElevenFour_norm_inputs` mirror (γ = Ind_{HU₁}^S 1、
+   `nineElevenGamma_inner_self_mul_u` Mackey count、`cfnorm_sub_irreducible_orthogonal`) —
+   M-side は hyp.base packaging 非依存の generic 層が主、`ψ₁ ∈ 𝒮₁` 選択と `(S′)^# ⊆ A(S)` 台のみ
+   S-specific (後者は `sSet_scaledDiff_support` 系の landed 台 lemma 圏)。
+3. (9.11.5)-(9.11.8) `|𝒮₄| ≤ N`: `nineElevenSevenEightRefutation` mirror (最深部) — indS/A(S) 再接地
+   (c₁/c₃ coherence congrMap、`exists_bridge_target_of_budget`+`isCoherent_union_pair_of_bridge`、
+   case-agnostic `sSet_memberRFamily` cross-orthogonality、Bessel)。

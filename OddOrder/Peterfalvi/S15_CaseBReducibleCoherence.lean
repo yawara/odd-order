@@ -698,6 +698,62 @@ theorem Hypothesis.nineElevenPairBoundS [Finite G]
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
+/-- **The `𝒮(H₀U′)` stratum sits inside `𝒮 = 𝒮(H₀C′)`** (issue 1017): `C′ = [C,C] ≤ [U,U] = U′`
+by commutator monotonicity (`cSub_le_U`), so `H₀ ⊔ C′ ≤ H₀ ⊔ U′` and `sOf` is antitone
+(`sSet_eq_sOf_H0Cprime` dictionary).  Shared brick of the (9.11.1) extraction and the (9.11.3)
+class-equation wiring. -/
+theorem Hypothesis.sOf_H0Uprime_subset_sSet [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
+    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief) :
+    OddOrder.Peterfalvi.S11.sOf (hyp.toTypesIIIIIIVSetupS hG)
+      (chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub (hyp.toTypesIIIIIIVSetupS hG))
+      ⊆ sSet (hyp.toTypesIIIIIIVSetupS hG) := by
+  rw [hyp.sSet_eq_sOf_H0Cprime hG chars]
+  refine OddOrder.Peterfalvi.S11.sOf_antitone (hyp.toTypesIIIIIIVSetupS hG)
+    (sup_le_sup_left ?_ chief.H0)
+  change derivedInG (OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief)
+    ≤ derivedInG (hyp.toTypesIIIIIIVSetupS hG).U
+  rw [OddOrder.Peterfalvi.S11.derivedInG_eq_commutator
+      (OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief),
+    OddOrder.Peterfalvi.S11.derivedInG_eq_commutator (hyp.toTypesIIIIIIVSetupS hG).U]
+  exact Subgroup.commutator_mono
+    (OddOrder.Peterfalvi.S11.cSub_le_U (hyp.toTypesIIIIIIVSetupS hG) chief)
+    (OddOrder.Peterfalvi.S11.cSub_le_U (hyp.toTypesIIIIIIVSetupS hG) chief)
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **Every `𝒮 = sSet`-member has positive `Snorm` weight** (issue 1017; the `S`-instance mirror
+of `S13.sOf_mem_Snorm_pos`): `Snorm χ = (χ(1).re)²/⟨χ,χ⟩.re` with `χ(1) = q·d` a positive
+natural degree (`induceHU_apply_one_eq_q_mul`) and `⟨χ,χ⟩.re > 0` (the landed embedding
+`sSet_subset_inducedKernelFamily` + `S08.inducedKernelFamily_inner_self_real_pos`). -/
+theorem Hypothesis.sSet_mem_Snorm_pos [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {χ : ClassFunction ↥hyp.S ℂ}
+    (hχ : χ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG)) :
+    0 < OddOrder.Peterfalvi.S07.Snorm χ := by
+  haveI := hyp.finiteG
+  classical
+  have hpos := OddOrder.Peterfalvi.S08.inducedKernelFamily_inner_self_real_pos
+    (hyp.sSet_subset_inducedKernelFamily hG hχ)
+  obtain ⟨ζ, hζ, rfl⟩ := hχ
+  obtain ⟨dζ, hdpos, hdζ⟩ := irreducibleCharacter_apply_one_eq_pos_natCast ζ
+  have hq : 0 < (hyp.toTypesIIIIIIVSetupS hG).q :=
+    (hyp.toTypesIIIIIIVSetupS hG).nontrivial.2.1.pos
+  have hdeg : (induceHU (hyp.toTypesIIIIIIVSetupS hG)
+      (ζ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupS hG)) ℂ) : ↥hyp.S → ℂ) 1
+      = (((hyp.toTypesIIIIIIVSetupS hG).q * dζ : ℕ) : ℂ) := by
+    rw [induceHU_apply_one_eq_q_mul, hdζ]
+    push_cast
+    ring
+  unfold OddOrder.Peterfalvi.S07.Snorm
+  apply div_pos
+  · rw [hdeg, Complex.natCast_re]
+    exact pow_pos (Nat.cast_pos.mpr (Nat.mul_pos hq hdpos)) 2
+  · exact hpos.2
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
 /-- **Peterfalvi (9.11.1), the `𝒮₂ = 𝒮₁` extraction — `S`-instance residual** (issue 1017; the
 `S`-mirror of the M-side `S13.caseA_sTwo_subset_degreeQaCut`, Coq `PFsection9.v:1626-1680`
 `eqS12`).  At the equality configuration the degree-`qa` irreducible cut `𝒮₁′` of `𝒮(H₀U′)`
@@ -731,7 +787,60 @@ theorem Hypothesis.nineElevenSTwoExtractionS [Finite G]
         (chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub (hyp.toTypesIIIIIIVSetupS hG)) |
       IsIrreducibleCharacter χ ∧
         χ 1 = (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ)} := by
-  sorry
+  haveI := hyp.finiteG
+  classical
+  intro χ hχS₂
+  by_contra hnot
+  -- make the cut `𝒮₁′` an atom so cast rewrites cannot enter its set-builder
+  set S1' : Set (ClassFunction ↥hyp.S ℂ) := {φ ∈ OddOrder.Peterfalvi.S11.sOf
+      (hyp.toTypesIIIIIIVSetupS hG)
+      (chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub (hyp.toTypesIIIIIIVSetupS hG)) |
+      IsIrreducibleCharacter φ ∧
+      φ 1 = (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ)} with hS1'def
+  -- `𝒮₁′ ⊆ 𝒮₂` along `𝒮(H₀U′) ⊆ 𝒮` and the base cut `hS₁S₂`
+  have hS1'sub : S1' ⊆ S₂ := fun φ hφ =>
+    hS₁S₂ ⟨hyp.sOf_H0Uprime_subset_sSet hG chars hφ.1, hφ.2.1, hφ.2.2⟩
+  have hS1'fin : S1'.Finite :=
+    (sSet_finite (hyp.toTypesIIIIIIVSetupS hG)).subset fun φ hφ =>
+      hyp.sOf_H0Uprime_subset_sSet hG chars hφ.1
+  -- `sumnS 𝒮₁′ = |𝒮₁′|·(qa)²` (norm-one irreducibles of uniform degree `qa`)
+  have hsum1' : OddOrder.Peterfalvi.S07.sumnS hS1'fin.toFinset
+      = (hS1'fin.toFinset.card : ℝ)
+        * ((((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℝ)) ^ 2 :=
+    OddOrder.Peterfalvi.S11.sumnS_irreducible_constant_degree hS1'fin.toFinset
+      (fun ψ hψ => (hS1'fin.mem_toFinset.mp hψ).2.1)
+      (fun ψ hψ => (hS1'fin.mem_toFinset.mp hψ).2.2)
+  -- the count at `C = U′`: `|𝒮₁′|·a² = 2a·u` in `ℕ`
+  have hrelu : (OddOrder.Peterfalvi.S11.uprimeSub (hyp.toTypesIIIIIIVSetupS hG)).relIndex
+      (hyp.toTypesIIIIIIVSetupS hG).U = chars.u := by
+    have hUpC : OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief
+        = OddOrder.Peterfalvi.S11.uprimeSub (hyp.toTypesIIIIIIVSetupS hG) := hCUprime
+    rw [← hUpC]
+    exact OddOrder.Peterfalvi.S11.relIndex_cSub_U_eq_u chars
+  have hcount' : S1'.ncard * (caseA.a * caseA.a) = 2 * caseA.a * chars.u := by
+    rw [hcount, hrelu, ← h2a]
+  -- `𝒮₁′` alone saturates the bound: `sumnS 𝒮₁′ = 2q²au` in `ℝ`
+  have hsatur : OddOrder.Peterfalvi.S07.sumnS hS1'fin.toFinset
+      = 2 * (((hyp.toTypesIIIIIIVSetupS hG).q : ℝ)) ^ 2 * (caseA.a : ℝ) * (chars.u : ℝ) := by
+    have hcast : ((S1'.ncard : ℝ)) * ((caseA.a : ℝ) * (caseA.a : ℝ))
+        = 2 * (caseA.a : ℝ) * (chars.u : ℝ) := by
+      exact_mod_cast congrArg (fun n : ℕ => (n : ℝ)) hcount'
+    rw [hsum1', ← Set.ncard_eq_toFinset_card _ hS1'fin, Nat.cast_mul]
+    linear_combination (((hyp.toTypesIIIIIIVSetupS hG).q : ℝ) ^ 2) * hcast
+  -- the offending member: `χ ∈ 𝒮₂ ∖ 𝒮₁′` adds positive `Snorm` beyond the saturated bound
+  have hχnot : χ ∉ hS1'fin.toFinset := fun hmem => hnot (hS1'fin.mem_toFinset.mp hmem)
+  have hFsub : ↑(insert χ hS1'fin.toFinset) ⊆ S₂ := by
+    rw [Finset.coe_insert]
+    exact Set.insert_subset hχS₂
+      (by rw [Set.Finite.coe_toFinset]; exact hS1'sub)
+  have hbound := hFboundU _ hFsub
+  have hsplit : OddOrder.Peterfalvi.S07.sumnS (insert χ hS1'fin.toFinset)
+      = OddOrder.Peterfalvi.S07.Snorm χ
+        + OddOrder.Peterfalvi.S07.sumnS hS1'fin.toFinset := by
+    unfold OddOrder.Peterfalvi.S07.sumnS
+    exact Finset.sum_insert hχnot
+  rw [hsplit, hsatur] at hbound
+  linarith [hyp.sSet_mem_Snorm_pos hG (hS₂S hχS₂)]
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
@@ -872,22 +981,8 @@ theorem Hypothesis.nineElevenEqualityRefutationS [Finite G]
   have hS₁'sub : {χ ∈ OddOrder.Peterfalvi.S11.sOf (hyp.toTypesIIIIIIVSetupS hG)
       (chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub (hyp.toTypesIIIIIIVSetupS hG)) |
       IsIrreducibleCharacter χ ∧
-        χ 1 = (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ)} ⊆ S₂ := by
-    intro χ hχ
-    refine hS₁S₂ ⟨?_, hχ.2.1, hχ.2.2⟩
-    rw [hyp.sSet_eq_sOf_H0Cprime hG chars]
-    refine OddOrder.Peterfalvi.S11.sOf_antitone (hyp.toTypesIIIIIIVSetupS hG)
-      (sup_le_sup_left ?_ chief.H0) hχ.1
-    show OddOrder.Peterfalvi.S11.cprimeSub (hyp.toTypesIIIIIIVSetupS hG) chief
-      ≤ OddOrder.Peterfalvi.S11.uprimeSub (hyp.toTypesIIIIIIVSetupS hG)
-    show derivedInG (OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief)
-      ≤ derivedInG (hyp.toTypesIIIIIIVSetupS hG).U
-    rw [OddOrder.Peterfalvi.S11.derivedInG_eq_commutator
-        (OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief),
-      OddOrder.Peterfalvi.S11.derivedInG_eq_commutator (hyp.toTypesIIIIIIVSetupS hG).U]
-    exact Subgroup.commutator_mono
-      (OddOrder.Peterfalvi.S11.cSub_le_U (hyp.toTypesIIIIIIVSetupS hG) chief)
-      (OddOrder.Peterfalvi.S11.cSub_le_U (hyp.toTypesIIIIIIVSetupS hG) chief)
+        χ 1 = (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ)} ⊆ S₂ := fun χ hχ =>
+    hS₁S₂ ⟨hyp.sOf_H0Uprime_subset_sSet hG chars hχ.1, hχ.2.1, hχ.2.2⟩
   have hCU : OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief
       = OddOrder.Peterfalvi.S11.uprimeSub (hyp.toTypesIIIIIIVSetupS hG) := hCUprime
   have hclass := OddOrder.Peterfalvi.S11.nineElevenThree_orbit_split hG caseA hS₁'sub
