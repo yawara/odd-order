@@ -1611,3 +1611,26 @@ decomposition supply に差し替え:
 **残 caseA residual** = `nineElevenEqualityRefutationS` (同 file :1421, 変更なし) = (9.11.2)-(9.11.8)
 equality-config refutation。M-side `nineElevenEqualityRefutation_of_sTwoExtraction_normBound` mirror で、
 (9.11.7)-(9.11.8) orthogonal 枝は M-side でも named residual (issue 9083 Phase E)。
+
+## 2026-07-13 更新 #48 (lane b, /loop) — caseA nineElevenPairBoundS CLOSED → 残 1 residual; 次段 = file split (0113) + deep residual 分解
+
+**進捗**: caseA の (5.6) pair-bound residual **`nineElevenPairBoundS` CLOSED** (S15_CaseBReducibleCoherence、
+commit 61151b24、#print axioms = accepted dadeHypS のみ、新 brick `sSet_subset_inducedKernelFamily`/
+`sSet_scaledDiff_support` は sorryAx-free)。⟹ **caseA = 単一 residual `nineElevenEqualityRefutationS`**
+((9.11.2)-(9.11.8) equality-config refutation) のみ。build green 4180。
+
+**caseA monolith → 2 → 1 の分解が完了**。残 `nineElevenEqualityRefutationS` は最深部 (M-side 9083 Phase B-E 相当、
+subagent が one-shot で stop = 分解必須の signal)。
+
+**次段の順序 (2 点)**:
+1. **file split (issue 0113)**: S15_CaseBReducibleCoherence 1926 行 (2000 hard 接近) → 凍結した caseB
+   reducible-coherence クラスタ (sSet_caseB_reducible_memberRFamily / sSet_memberRFamily / _orthogonal /
+   apply_one_eq_qu 等) を sibling leaf へ prefix-split、元 file は import + caseA lift を保持 (module 名不変・
+   下流 import 無変更)。caseA 継続で 2000 超前に必須。
+2. **deep residual 分解**: `nineElevenEqualityRefutationS` を named (9.11.k) sub-residual に split — (9.11.2)
+   TI-witness / (9.11.3) orbit-count / (9.11.4) Mackey-norm / (9.11.5) arithmetic の world-facts (generic
+   `nineElevenCaseA_equality_refutation` へ feed) + (9.11.7)-(9.11.8) budget (`exists_bridge_target_of_budget`
+   + case-agnostic R-family で `nineElevenSevenEightRefutation` mirror)。one-shot でなく sub-phase 毎に landing。
+
+真の gate は全解消済 (generic core reuse 可・R-family closed/case-agnostic・全 bridge landed)。残は M-scale の
+mirror 労力を (9.11.k) 単位で methodical に積む multi-session work。
