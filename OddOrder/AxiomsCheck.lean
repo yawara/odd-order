@@ -119,6 +119,7 @@ import OddOrder.Peterfalvi.S09_FrobeniusFamilyOrthogonality
 import OddOrder.Peterfalvi.S09_FrobeniusGammaDecomposition
 import OddOrder.Peterfalvi.S09_FrobeniusGammaNormEstimate
 import OddOrder.Peterfalvi.S09_FrobeniusBsumEstimate
+import OddOrder.Peterfalvi.S09_FrobeniusGoodIndexEstimate
 import OddOrder.Peterfalvi.S09_FrobeniusParity
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.GroupTheory.RepresentationTheory.GaloisInnerTransport
@@ -7902,3 +7903,13 @@ coefficients and an orthogonal weighted Gamma decomposition.  The concrete
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.reverseCoefficientZeroIndices_Bsum_le
+
+/-! **Peterfalvi (7.8.c)/(7.10) concrete good-index bound, axiom-clean**
+(lane a, 2026-07-14, issue 0044 cont.⁵⁶).  The distinguished coherent image is
+first resolved as a signed irreducible character.  Cross-family orthogonality,
+the nonzero reverse coefficient outside B, and the integral (7.8.c) formula
+give the local sharp-kernel ratio bound; rho-linearity transports it back
+across the sign to the canonical coherent image. -/
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.reverseCoefficientZeroIndices_good_bound

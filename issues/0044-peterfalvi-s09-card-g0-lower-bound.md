@@ -1484,3 +1484,27 @@ cont.⁵⁴ の `gammaAt_inner_self_re_le` を
 (7.9) の非零 reverse coefficient と (7.8.c) を使った good-index norm 下界を供給する。
 その後、selected index の (7.8.b) lower bound と合わせて (7.5) reduced family
 inequalityへ接続する。
+
+## cont.⁵⁶ — (7.8.c) concrete good-index 下界完成 (2026-07-14) ✅
+
+**新 leaf `S09_FrobeniusGoodIndexEstimate.lean`** で、cont.⁵⁵ の concrete
+`𝓑` の補集合側に必要な per-index estimate を閉じた。
+
+1. coherent image `ν_iζ_{i0}` を既存 coherence theorem から `ε • ξ`
+   (`ε = ±1`, `ξ ∈ Irr(G)`) として取り出した。
+2. `i ≠ j` に対する family-wide cross orthogonalityを符号越しに `ξ ⟂ S_j^ν`
+   へ移し、`j ∉ 𝓑` から `⟨β_j,ν_iζ_{i0}⟩ ≠ 0`、したがって
+   `⟨β_j,ξ⟩ ≠ 0` を得た。
+3. 既証明の (7.8.c) integer-coefficient estimate
+   `chiRhoNormSq_ge_ratio_of_inner_beta_ne_zero` を適用し、Sibley の rho-mapを
+   concrete family の `hypothesis71` へ接続した。
+4. rho-map の符号反転と norm の符号不変性を実証明し、canonical signed imageについて
+   `((h_j-1)/(e_j h_j)) ≤ chiRhoNormSq` を得た。
+5. consumer 形 `reverseCoefficientZeroIndices_good_bound` は
+   `i ≠ j → j ∉ 𝓑 → ...` を直接供給する。
+
+検証: good-index leaf green。主定理を AxiomsCheck tripwire に追加。
+
+**次 frontier**: selected index の既証明 (7.8.b) lower bound、本 good-index 下界、
+concrete B-sum を (7.5) reduced family inequalityへ一括配線し、minimal `h_i` の
+`CharacterEstimateData` と displayed (7.10) lower bound を構成する。
