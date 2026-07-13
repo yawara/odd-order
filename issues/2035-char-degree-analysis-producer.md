@@ -570,3 +570,72 @@ support だけ差し替え)。**helper 3 は speculative sorry で前倒しせ�
   sS1S closure で完全 sorry-free 化。`tau1S_apply_induce_sub` は別 gap (#6 の A₀(S) support-widening)。
 
 **戦略的岐路**: (13.3) 完遂 + broad §13 は **prime-TI residue API** (major ~2-3 session infra port) に gated。
+
+## 2026-07-13 更新 (lane b, /loop) — (9.11) S-instance coherence landed による gap#2 再評価
+
+**本日 issue 1017 で `sSet_coherent_indS_A` (S-instance (9.11) coherence、support = A(S)) が
+closed** (caseA: alphaSupport + sevenEight 全討伐、残 sorryAx = dadeHypS parity のみ)。これによる
+本 issue への影響:
+
+1. **gap#2 (support-widening) は A(S) で解消の見込み**: 旧診断は「foundation の support (C')^# が
+   H^# を含まない」だったが、**H^# ⊆ A(S) が成立** (h ∈ H^# = Sσ^# は x := h 自身を Sσ^#-witness
+   に y ∈ C(x) を満たし、H ≤ S′ ゆえ mem_honestTypeP2ASet の 3 条件を満たす)。つまり
+   A₀(S)-widening を待たず、A(S)-coherence (`coherent_H0Cprime_S` を sSet_coherent_indS_A ベースに
+   re-point 済のもの) の `extends_on_supported` が zero-degree の H^#-supported 差を被覆する。
+   `tau1S_apply_induce_sub` はこの route で buildable 候補。
+2. **⚠ field 署名の宿題は残る**: `CharacterDegreeData.tau1S_apply_induce_sub` / `tau1S_inner_induce`
+   / `tau1S_induce_mem_ZIrr` は ∀ irr θ (P⊄Ker 無し、equal-degree 無し) のまま。update #6 の指摘
+   通り P⊄Ker (と apply_induce_sub は zero-degree 化 or 別処理) の要否を consumer
+   (Canonicalization:277/1049, NormEstimates:806) の実引数と突き合わせて設計する必要。
+3. **残 field 対応表 (現状)**: inner_induce/mem_ZIrr = engine landed (P⊄Ker 付き) /
+   induce_inner_eta = (A) core engine landed / apply_induce_sub = 上記 route 1 /
+   mu_col_tau1_eta_col_one + mu_tau1_formula = **mu_tau1red (13.6)-(13.9) port (major、未着手)** /
+   mu_j_linear_induced (13.3.a) / delta_eq_one (13.3.c) = 要確認。
+
+**次**: b-sorry 再 census (subagent 実行中) の結果と突き合わせ、`character_degree_analysis`
+(Machinery135:178、S15 最上流 sorry) の assembly 設計 (field 署名調整の要否含む) に着手。
+
+## 2026-07-13 更新 #2 (lane b, /loop) — 再 census 結果 + (13.3) assembly 計画 (正本)
+
+**census (subagent、comment-strip、17 bare sorry)**: S15_SAndT_Setup+S15_SAndT+S14 のうち、本日の
+`sSet_coherent_indS_A` landing で解除されるのは **`character_degree_analysis` (Machinery135:181) のみ**。
+他は T-side (13.4)/9013・§14/BG§16・(13.10) analytic・typeP_Galois §14 に gated、`sibleyTarget_S` は
+vestigial (do-not-complete 維持)。`sibleyTarget_frobI` (12.6) は §14 type-I Frobenius 系で別物。
+⚠ S15_CaseACoherence の docstring に「sole residual is the refuter」等の stale 記述が残存 (本日
+refuter closed 済) — 次の編集時に更新。
+
+### CharacterDegreeData assembly 計画 (fields 9)
+
+carrier `tau1S := hyp.tau1S_ofHonest hG chief` (= sSet_coherent_indS_A → coherent_H0Cprime_S →
+extension、landed)。
+
+1. **tau1S_apply_induce_sub** ((13.2.e)): H^# ⊆ A(S) (更新 #1) → zero-degree 差は A(S)-supported →
+   `extends_on_supported`。⚠ field は equal-degree 仮定無し: θ,θ' irr with P⊄Ker は同 degree とは
+   限らない → **P⊄Ker + zero-degree の要否を consumer 実引数 (Canonicalization:277/1049 の θ.2) と
+   突き合わせ、field 署名を amend** (b-owned structure; consumer 側は μ-column/λ 由来で P⊄Ker・
+   同 degree uq を満たすはず — 要 build 検証、lane-c consumer (CountingLayer:1740) も再 compile 確認)。
+2. **tau1S_inner_induce / tau1S_induce_mem_ZIrr**: engines landed
+   (`tau1S_ofHonest_inner_induce`/`_induce_mem_ZIrr`、P⊄Ker 付き) — field 署名 amend (P⊄Ker 追加) で直結。
+3. **tau1S_induce_inner_eta** ((5.3.b)): (A) core engine `coherentIndS_image_inner_eta_eq_zero`
+   (S15_SAndT_Setup/CoherenceEtaOrthogonality) landed — 接続のみ。
+4. **mu_j_linear_induced** ((13.3.a)): 既存 §9 stock の family→Ind_{PC}(linear) 方向
+   (isIndHC / mu_j_isIndPC 系) から derivable 見込み — 最初の brick 候補。
+5. **mu_col_tau1_eta_col_one ((13.9.a)) / mu_tau1_formula ((13.3.c)) / delta_eq_one**: **mu_tau1red
+   (Coq PFsection13 (13.6)-(13.9)) deep port が必須** — P1_int2_lb / 2-sided norm 下界 /
+   FTtypeP_sum_Ind_Fitting_lb (13.6) / FTtypeP_sum_cycTIiso10_lb (13.7)。repo に template 無、
+   major fresh port (~1-2 session、subagent 委譲候補)。
+
+**着手順 (文書順)**: 4 (13.3.a) → 1-3 (13.2.d/e 系 field 署名 amend + engine 接続) → 5 (13.6-13.9 port)
+→ producer assembly。
+
+## 2026-07-13 更新 #3 (lane b, /loop) — field 対応表の訂正: (13.3.a) は landed 済
+
+- **mu_j_linear_induced ((13.3.a)) = `Hypothesis.mu_j_isIndPC` (DegreesFirstSplit.lean:766) が
+  landed 済・sorry-free** (docstring が field の materialization と明記)。brick 4 は完了扱い。
+- ⟹ CharacterDegreeData 9 fields のうち **未充足の本物の数学は mu_tau1red 系 3 fields
+  (mu_col_tau1_eta_col_one / mu_tau1_formula / delta_eq_one) のみ** = Coq PFsection13
+  (13.6)-(13.9) norm-bound machinery の fresh port。他は landed engine の接続 + field 署名 amend
+  (P⊄Ker / zero-degree) のみ。
+- **次 iteration**: mu_tau1red port に着手 — Coq PFsection13.v の mu_tau1red / (13.6)
+  FTtypeP_sum_Ind_Fitting_lb / (13.7) FTtypeP_sum_cycTIiso10_lb を精読し S-side statement を設計、
+  chunk 分割して build (subagent 委譲可)。

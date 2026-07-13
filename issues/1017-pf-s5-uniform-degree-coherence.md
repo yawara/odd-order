@@ -1787,3 +1787,38 @@ file 1524 行 (>1500 watch 微超; 次の追記前に再 split)。build green 41
 **caseA 残 residual = 1 (最終)**: `nineElevenSevenEightRefutationS` (S15_CaseACoherence.lean:105)
 — (9.11.7)-(9.11.8) budget、M-side discharge (~700 行) の S-mirror。次 iteration はここから
 (M-side `nineElevenSevenEightRefutation` の証明 chain を S-instance へ移植)。
+
+## 2026-07-13 更新 #55 (lane b, /loop) — (9.11.7)-(9.11.8) CLOSED、caseA named residual 全討伐
+
+**landed (commit 8c092ef3)**:
+- S15_SSetMemberRFamily: `sSet_coherent_extension_eq_sum_memberRFamily` ((5.5) honest-Dade mirror)
+  + `sSet_coherent_extension_cross_orthogonal` ((5.2.e) Coq coherent_ortho mirror)。
+- `nineElevenSevenEightRefutationS` 本体 (M-side ~420 行の S-mirror、一発 green):
+  arithmetic spine で 𝒮₄ ≠ ∅ → e = u/a ≥ 2 → |𝒮₂| = 2e → β = λ₁ − e·ψ₁ →
+  projection budget (S13.exists_bridge_target_of_budget) → union-pair 接合 → hnopairD 矛盾。
+
+**caseA campaign 状態**: named residual (alphaSupport / sevenEight) 全て実証明済み。
+`sSet_coherent_indS_caseA` / `sSet_coherent_indS_A` chain の残 sorryAx 汚染源は
+**`dadeHypS` のみ** (= dadeSupportHypothesisData_honestTypeP2ASet 経由の BG §16
+Theorem-II 共有 pin、type-I 経路 `dadeSupportHypotheses_typeI` と exact parity の
+accepted 上流; settled finding「BG§14-16 残 sorry の性質」参照)。
+nineElevenSTwoExtractionS / budget / union-pair / (9.11.2)-(9.11.3) generic 層は
+axiom-clean 確認済み (#print axioms)。
+
+**file watch**: S15_CaseACoherence 1463 行 — 次の追記前に prefix-split 必要。
+
+**次 frontier 候補 (次 iteration で確定)**: 上流優先により BG §16 Theorem-II pin
+(共有 infra、claim 状況を 9000 issue で確認) or lane-b open issues (2018/2020/2022/2030) の
+文書順最上流。
+
+## 2026-07-13 更新 #56 (lane b, /loop) — 再 split + frontier 確定
+
+- **split (commit 037539d9)**: S15_CaseACoherence 1463 行 → prefix-split で
+  `S15_NineElevenSevenEight.lean` (531 行、(9.11.7)-(9.11.8) refutation) を分離、本体 957 行。
+- **frontier 確認**: `induce_H_mem_zSpan_S` (sS1S / Pf (1.5.a)、2035 gap#1) は **axiom-clean 済**
+  (#print axioms 標準 3 のみ — 9014 constructor 後に closed 済と確認)。τ₁ engines
+  (`tau1S_ofHonest_inner_induce`/`_induce_mem_ZIrr`) の残 sorryAx は dadeHypS 系 (accepted parity)。
+- **次 (文書順)**: (9.11) S-instance coherence (sSet_coherent_indS_A) の landing で
+  「coherence 依存で gated」だった b-owned sorry 群 (2038 census: S15_SAndT_Setup 11 / S15_SAndT 9)
+  の gate が解除された可能性 → **次 iteration = 再 census** (comment-strip + gate 判定を code-level で
+  やり直し、2035 gap#2 の A₀(S) support-widening / mu_tau1red (13.6)-(13.9) port を含む文書順最上流に着手)。
