@@ -623,6 +623,11 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 21) — a 合流: Isaacs Ch07 quotient normal complement in Step 2 (Thm 7.1 継続)**:
+  **a=1** (`fc6fb9a1` = Isaacs Ch07 issue 0031。`S7C_ThompsonPComplement.lean` +215 (自 file 継続、0→0 sorry、
+  計 852 行) + AxiomsCheck +8)。scope Isaacs shared-foundation additive ✓。b=0 / c=0。
+  build green **4197 jobs** / AxiomsCheck OK (**2403** assertion 全 allowlist) / **count-sorry 51→51 不変** /
+  新 axiom なし / 逸脱なし。(間に「変化なし」tick 2 本、番号なし)。
 - **2026-07-14 (tick 20) — a+b 合流: a=Isaacs Ch07 maximal-bad-subgroup=p-core + b=S11 (9.11) caseB reverse-characterization (hub carve-out)**:
   **a=1** (`6036cc4f` = Isaacs Ch07 issue 0031。`S7C_ThompsonPComplement` +271/`Basic` -30 + AxiomsCheck +10。
   ⚠ diff に `-theorem lt_normalizer_inf_sylow_of_lt` が出たが **removed@Basic + re-added@S7C の byte-identical
