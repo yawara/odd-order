@@ -1552,3 +1552,23 @@ forward 部品 (hcPsiPair/hcZetaPair_irreducible/hcZetaPair_mem_xiOf) は既存�
 
 ### hub 向け flag
 - subagent は S15 単一ファイル scope ゆえ main 同期せず (branch は main の 4 commit 遅れを検出)。commit 後に lane b が同期。
+
+## 2026-07-14 更新 #34 (lane b, /loop + subagent) — caseB の hard S11 math (reverse characterization) landed; wiring は set-artifact 回避で follow-up
+
+第 2 subagent が caseB の **hard S11 math を genuine に構築** (InnerCompHom.lean、build green、#print axioms
+= sorryAx なし、0 sorry):
+- `caseB_xiOf_H0Cprime_eq_induce_hcPsiPair` (:173): pair (C'-kernel) 版 reverse characterization
+  「ζ ∈ 𝒳(H₀C') irr ⟹ ∃ θbar lam, ζ = Ind_{HC}(hcPsiPair θbar lam)」= 既存 `caseB_xiOf_H0C_eq_induce_hcPsi`
+  (C-kernel 版) の pair 拡張 (λ≠1 on C 対応)。#32/#33 が「唯一の欠落」と特定したもの。
+- `isIndHC_of_source_eq_induce_hcPsiPair` (:493): pair 版 flatten helper。
+
+**⚠ S15 caseB wiring は set-artifact で未完了 (revert 済)**: subagent の S15 caseB branch は
+`set data`/`set chars` (caseA から共有) + `mem_sOf.mp _hχmem` の相互作用で **chief✝/ζ✝ の folding artifact**
+(型不一致)。extraction を set 前に移動しても `set` が obtain 済 hypothesis を rename して悪化。
+S15 は committed 版 (caseA proven, caseB sorried) に revert。InnerCompHom lemma は保持。
+
+**wiring の clean 経路 (follow-up)**: caseB branch を inline せず、**explicit-arg standalone lemma
+`lambdaWitness_of_caseB_member` (chief chars caseB χ hmem hirr を explicit に取る) に切り出す** →
+set 不使用ゆえ artifact 回避。中身は caseA branch の mirror (mem_sOf 抽出 →
+caseB_xiOf_H0Cprime_eq_induce_hcPsiPair → isIndHC_of_source_eq_induce_hcPsiPair flatten → transport
+hcRealized_map_subtype_eq/cSub_eq_C → θ' の 4 条件)。~50 行。
