@@ -1158,3 +1158,27 @@ S-side 対応 (全部既存!):
 - 他 field: tau1S_isometry 系 = tau1S_ofHonest_inner_induce / _induce_mem_ZIrr ✓ (proven)、
   `tau1S_induce_inner_eta` = crux ✓、`mu_j_linear_induced` (13.3.a)、`delta_eq_one`、
   `mu_col_tau1_eta_col_one` ⟵ formula + (13.3.a) の合成。lambda 系 field は要調査。
+
+## 2026-07-13 更新 #19 (lane b, /loop) — carrier bug 修正 + CharacterDegreeData 材料化 inventory
+
+### ⚠ uninhabitability 発見・修正済
+`tau1S_induce_inner_eta` (∀ irr θ: ⟨η_ij, τ₁(Ind θ)⟩=0) が `mu_col_tau1_eta_col_one` と矛盾
+(θ := (13.3.a) の θ_j で ±1 = 0) → structure uninhabited だった。修正 = 2 field 化
+(irr(Ind θ) 仮説付き本体 + 列0限定 ∀θ 版 `tau1S_induce_inner_eta_col_zero`)、consumer 3 箇所調整。
+
+### 材料化 inventory (character_degree_analysis の構成部品)
+signature (hG, hyp) は不変で OK — **hnoV = `S12.no_typeV_maximal_unconditional hG`**、
+**chief = `exists_chiefFactorData hG (hyp.toTypesIIIIIIVSetupS hG)`** で内部調達可能。
+- tau1S := tau1S_ofHonest hG hnoV chief ✓
+- mu_tau1_formula ⟵ tau1S_ofHonest_muColumn_formula ✓ (更新 #18)
+- mu_j_linear_induced ⟵ **mu_j_isIndPC** (DegreesFirstSplit:767, proven) ✓
+- delta_eq_one ⟵ S 側 **delta_eq_one_S** (CountingLayer:1547, proven) ✓ + δ' 側 (swap 経由? 要確認)
+- mu_col_tau1_eta_col_one ⟵ formula + mu_j_isIndPC の合成 (buildable、p=3 分岐で j 選択)
+- tau1S_inner_induce ⟵ tau1S_ofHonest_inner_induce ✓ / tau1S_induce_mem_ZIrr ⟵ ..._induce_mem_ZIrr ✓
+- tau1S_apply_induce_sub ⟵ tau1S_ofHonest_extends_on_supported + induce_H_mem_zSpan_S
+  (zSpan 所属) + degree-0 差の A(S)-support (要小 lemma: zSpan 元の (η−η')(1)=0 → A(S)-supported)
+- tau1S_induce_inner_eta ⟵ crux coherentIndS_image_inner_eta_eq_zero (Ind θ irr member 版、
+  Ind θ ∈ sSet の membership が要 — 𝒳 kernel 条件の確認要)
+- tau1S_induce_inner_eta_col_zero ⟵ zSpan 分解 + formula + crux (irr/red 両対応)
+- **lambda (13.3.b) = 未存在の genuine content** (irr・degree uq・H-linear-induced な member の存在)
+- tau1T ⟵ hyp.swap (HypothesisSwap:153) の tau1S_ofHonest (swap 側 chief も exists_chiefFactorData)
