@@ -117,6 +117,7 @@ import OddOrder.Peterfalvi.S13_CoreStructure
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.Peterfalvi.S09_FrobeniusFamilyOrthogonality
 import OddOrder.Peterfalvi.S09_FrobeniusGammaDecomposition
+import OddOrder.Peterfalvi.S09_FrobeniusGammaNormEstimate
 import OddOrder.Peterfalvi.S09_FrobeniusParity
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.GroupTheory.RepresentationTheory.GaloisInnerTransport
@@ -7879,3 +7880,14 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.exists_weightedGammaDecomposition_on_reverseCoefficientZeroIndices
+
+/-! **Peterfalvi (7.8.b) concrete Frobenius-family Gamma norm bound, axiom-clean**
+(lane a, 2026-07-14, issue 0044 cont.⁵⁴).  The induced principal source norm,
+orthogonality to the distinguished non-principal character, and Dade isometry
+give `‖beta‖² = e + 1`.  Combining this with the proved weighted-sum norm and
+the canonical beta decomposition yields the exact quadratic Gamma formula;
+the odd-order Frobenius inequality `2e + 1 ≤ h` then gives
+`‖Gamma_i‖² ≤ e_i - 1`. -/
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.gammaAt_inner_self_re_le

@@ -246,6 +246,7 @@ import OddOrder.Peterfalvi.S09_FrobeniusCrossOrtho
 import OddOrder.Peterfalvi.S09_FrobeniusConjIndex
 import OddOrder.Peterfalvi.S09_FrobeniusFamilyOrthogonality
 import OddOrder.Peterfalvi.S09_FrobeniusGammaDecomposition
+import OddOrder.Peterfalvi.S09_FrobeniusGammaNormEstimate
 import OddOrder.Peterfalvi.S09_FrobeniusParity
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
