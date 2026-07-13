@@ -1482,3 +1482,73 @@ sub-gate は (13.3.b) forward の genuine math (multi-session)。translations �
 irr S-instance SOf member → LambdaWitness の genuine 構成。素材 = caseA irr witness
 (ThetaCountAssembly:730, degree qu ∈ SOf(H0⊔C)) を Ind_{H.subgroupOf S} linear 形に落とす +
 induceHU_eq_induce (PU↔PC) + irr 保存。multi-session、S11_MaximalII_III_IV 精読要。
+
+## 2026-07-14 更新 #32 (lane b, /loop) — hbridge の構成 map 確定 (deep S11、multi-session)
+
+`hbridge` = 「irr χ ∈ S-instance SOf(H0⊔C') → LambdaWitness」= (13.3.a)-for-irr の構成 map を精査確定
+(reducible 版 `caseB_reducible_sOf_H0_isIndHC` は (9.9.b) 依存で irr 非適用、新機械が要る):
+
+**SOf/xiOf 構造** (ChiefFactorCore): `sOf(Y) = {induceHU ζ | ζ ∈ xiOf(Y)}`、
+ζ = irr on huSub(=PU=S') で H⊄Ker ∧ Y⊆Ker。`induceHU ζ = Ind_{PU}^M ζ` (induceHU_eq_induce)。
+degree: induceHU(ζ)(1) = q·ζ(1) (induceHU_apply_one_eq_q_mul) → 度数 qu なら ζ(1)=u。
+
+**LambdaWitness 目標**: θ irr **linear** on PC.subgroupOf S (P⊄Ker)、Ind_{PC} θ irr。
+χ = Ind_{PC} θ なら Ind θ irr = χ irr ✓。要: χ = induceHU ζ を Ind_{PC}(linear) 形に。
+
+**caseA (tractable half)**: caseA member は explicit = `induceHU(hcuZetaPair caseA θ hinv lam)`
+(ThetaCountAssembly:868/871、hcuZetaPair_induceHU_mem_sOf/caseA_member_induceHU_irreducible)。
+`hcuZetaPair = Ind_{hInHu⊔cuInHu}^{PU}(hcuPsiPair)`、`hcuPsiPair` = **linear** (hcuPairHom : →*ℂˣ 由来、
+ThetaCountAssembly:148 hom_eq)。`hInHu⊔cuInHu = HC(=PC)` 想定 (hInHu=P-in-HU, cuInHu=C_U-in-HU)。
+⟹ caseA member = induceHU(Ind_{HC-in-PU} linear) = Ind_{HC}(linear) [stages] = LambdaWitness。
+**要 M-transport**: HC-in-HU (hInHu⊔cuInHu を huSub 内) ↔ PC.subgroupOf S。pattern =
+caseB_reducible_sOf_H0_isIndHC:322-350 (subgroupOfEquivOfLe.symm.trans subgroupCongr +
+compHom + induce_induce_subgroupOf)。~80 行。
+
+**caseB (harder half)**: C≠⊥ の irr member (caseB_no_irreducible_forces_C_bot の contrapositive で存在)
+も H-induced のはずだが caseB Clifford 構造の characterization が要 (未特定、要 CaseBXi/CharacterCounts 精読)。
+
+**logical 構造** (現行 hbridge 維持が最適、clifford split は core 難度不変ゆえ非推奨):
+現行 = 単一 hbridge + caseB_of_no_irreducible_sOf_H0Cprime (clifford split を内部処理)。
+hbridge の内部で clifford_dichotomy → caseA (lambdaWitness_of_caseA、explicit witness、χ 不要) /
+caseB (caseB member → LambdaWitness、χ 使用)。
+
+**推奨**: focused subagent or 次 session で S11_MaximalII_III_IV 精読 → lambdaWitness_of_caseA を先に
+(explicit witness ゆえ tractable) → caseB member 版。build-verify 必須 (transport plumbing)。
+
+### #32 追記 — ⚠ caseA approach の subtlety (要解決): cuInHu = C_U(S₀) ≠ C
+`cuInHu caseA` = **C_U(S₀)** (S₀ = Clifford summand of H̄)、**C = C_U(P) ではない**
+(InertiaLift:327「uInHu ⊓ (hInHu⊔cuInHu) = cuInHu」= U⊓H·C_U(S₀)=C_U(S₀))。caseA (a>1) では
+C_U(S₀) ⊋ C_U(P)=C ゆえ `hInHu⊔cuInHu = P·C_U(S₀) ⊋ PC`。⟹ caseA witness = Ind_{P·C_U(S₀)}(linear)
+は素朴には Ind_{PC} でない。degree qu との整合 ([S':P·C_U(S₀)]=[U:C_U(S₀)] vs u=[U:C_U(P)]) が
+未解決。**caseA witness → LambdaWitness (Ind_{PC} linear) の正しい経路は要精査** (Clifford
+correspondence の inertia lift; hcuZetaPair が実は further-induce で Ind_{PC} に落ちるか、或いは
+別の member を採るか)。次の focused effort はこの degree/centralizer 整合を最初に解決すること。
+
+## 2026-07-14 更新 #33 (lane b, /loop + subagent) — ✅ hbridge caseA branch を genuine に証明 (subtlety は red herring)
+
+#32 の cuInHu subtlety は **red herring** と判明 (subagent 精査 + 自己検証)。2 種類の caseA member を混同:
+- degree-**qa** (`hcuZetaPair`, cuInHu=C_U(S₀)) = (9.8.d) count in SOf(H₀⊔U') — LambdaWitness でない
+- degree-**qu** witness = (9.8.c) `caseA_exists_irreducible_sOf_H0C` — **regular seed** θ (全 Clifford summand
+  で非自明) の inflation hcPsi θ は inertia = **full HC** (`caseA_regular_inflation_inertia_eq`)、source
+  ζ=Ind_{HC}(hcPsi θ) degree u、induceHU(ζ) degree qu=[S:PC]。M-transport で真に Ind_{PC}(linear) = LambdaWitness。
+  正しい経路は `hcZeta_*` (cuInHu 不介入)。
+
+**landed** (S15_CharacterDegreeSupply、build green 4114 jobs / #print axioms = [propext,Classical.choice,
+Quot.sound] のみ = sorryAx なし / signature 不変):
+- `caseA_exists_irreducible_witnessed` (**sorry-free**): (9.8.c) parity 論法を mirror + regular seed θ を露出。
+- **hbridge の caseA branch を完全証明**: clifford_dichotomy → caseA で LambdaWitness を genuine 構成
+  (caseA_exists_irreducible_witnessed → isIndHC_of_source_eq_induce_hcPsi flatten → hcRealized_map_subtype_eq
+  + cSub_eq_C transport → θ' 構成、irr/linear/P⊄Ker[mu_j_isIndPC_not_ker 流]/Ind-irr の 4 条件)。
+- **残 sorry = caseB branch 1 本のみ** (S15:1401)。net sorry 4→4 不変 (hbridge sorry → caseB sorry)、
+  caseA は proven に置換。
+
+**残 caseB gate の plan** (#32 harder half を精緻化): caseB (Singer, U irr on H̄) では全非自明 θ̄ が inertia HC
+(`inertia_eq_hcInHu` + caseB.actsIrreducibly)、given irr χ=induceHU ζ (ζ∈𝒳(H₀C')) は Ind_{HC}(hcPsiPair θ λ)
+(linear pair, λ≠1 on C when C≠⊥, Cprime=[C,C])。transport は caseA と同一 (既に caseB-agnostic)。
+**唯一の欠落 = reverse characterization `caseB_xiOf_H0Cprime_eq_induce_hcPsiPair`** = `caseB_xiOf_H0C_eq_induce_hcPsi`
+(InnerCompHom:36) の **pair (C'-kernel) 版** (現行は C-kernel family 𝒳(H₀C) のみで λ≠1 pair member 非対応)。
+~100 行の Clifford correspondence、S11 material ゆえ **InnerCompHom.lean に追加すべき** (S15 でも可だが所属は S11)。
+forward 部品 (hcPsiPair/hcZetaPair_irreducible/hcZetaPair_mem_xiOf) は既存。
+
+### hub 向け flag
+- subagent は S15 単一ファイル scope ゆえ main 同期せず (branch は main の 4 commit 遅れを検出)。commit 後に lane b が同期。
