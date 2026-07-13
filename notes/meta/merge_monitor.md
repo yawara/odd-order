@@ -623,6 +623,11 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 25) — a 合流: Isaacs Ch07 Step5 Sylow-center centralizer (新 leaf S7C_CentralizerCenter)**:
+  **a=1** (`ec2cebff` = Isaacs Ch07 issue 0031。新 leaf `S7C_CentralizerCenter.lean` +73 (0 sorry、root closure
+  = S7D1 import) + Basic/S7D1 import 追従 + AxiomsCheck)。scope Isaacs shared-foundation additive ✓。b=0 / c=0。
+  build green **4199 jobs** / AxiomsCheck OK (**2410** 全 allowlist) / count-sorry **50→50 不変** / 新 axiom なし / 逸脱なし。
+  ⚠ issue 9096 (b frontier direction) 依然 保留。
 - **2026-07-14 (tick 24) — a 合流: Isaacs Ch07 Step4 Sylow maximality (新 leaf S7C_SylowMaximal)**:
   **a=1** (`c02156ee` = Isaacs Ch07 issue 0031。**新 leaf `S7C_SylowMaximal.lean` +120 (0 sorry、root closure
   = S7D1 が import)** + Basic/S7B2/S7D1 の import 追従 (decl 削除ゼロ) + AxiomsCheck +6)。scope Isaacs
