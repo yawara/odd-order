@@ -706,3 +706,15 @@ producer assembly 全体は両者を import する下流 leaf に置くか、tau
 **次 iteration**: 下流 leaf 新設 → family alignment で hxx wiring → step 3 は
 `coherent_sOf_H0C_extension_muColumnSum_pin_of_irr` の S15 port (subagent 委譲候補、ただし "port (13.6)-(13.9)"
 ではなく "S13_Orthogonality の γ-trick pin を S15 tau1S_ofHonest に port" が正しい指示)。
+
+### 追記 (更新 #5): family alignment の要注意点 (hxx wiring)
+
+coherence `coherent_H0Cprime_S` の domain は **H0Cprime** support 側の family
+(`S11.sOf hyp.s11Setup hyp.H0Cprime`, CaseA coherence が使う; S11_NineElevenCaseA:88/542 参照) だが、
+`mu_colSum_mem_sOf_H0` (HypothesisBasics:815) が与えるのは **chief.H0** 側 (`sOf ... chief.H0`)。
+**support mismatch (H0Cprime vs chief.H0)** ゆえ、∑μ ∈ zSpan(coherence domain) を得るには
+sOf の containment/monotone (chief.H0 ⊆ H0Cprime 方向 or その逆) を経由する必要がある
+(`sOf_subset_SOf` / `inducedKernelFamily_antitone` 系、`induce_H_mem_zSpan_S` の証明が同種の bridge を
+既に踏んでいる — その pattern を流用可)。次 iteration はまず `induce_H_mem_zSpan_S`
+(S15_CaseACoherence:801) が `∑μ`/`Ind_{H}θ` を coherence domain の zSpan に入れる正確な形を読み、
+それを ∑μ = Ind_{S'}ψ (mu_colSum_eq_induce) に適用する。
