@@ -1170,6 +1170,57 @@ theorem Hypothesis.u_le_cyclotomicQuotient [Finite G]
   rw [hu_eq, hpp, hq] at hbound
   exact hbound
 
+/-- **`S`-instance chief-factor `q` identity**: the `(9.x)` chief-factor prime `data.q` of the
+`S`-instance `toTypesIIIIIIVSetupS` is the type-`P` invariant `q = |W₁|`.  Extracted from
+`u_le_cyclotomicQuotient` for reuse by the (13.3.b) dichotomy translations. -/
+theorem Hypothesis.toTypesIIIIIIVSetupS_q_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    (hyp.toTypesIIIIIIVSetupS hG).q = hyp.q := by
+  change Nat.card ↥hyp.Sdata.W1 = hyp.q
+  rw [hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1]
+
+/-- **`S`-instance chief-factor prime identity**: the chief prime `chief.p = p`, forced by
+`|P| = p^q = chief.p^q · |N|`.  Extracted from `u_le_cyclotomicQuotient`. -/
+theorem Hypothesis.chiefFactorS_p_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
+    chief.p = hyp.p := by
+  haveI := chief.N_normal
+  have hHeq : ((hyp.toTypesIIIIIIVSetupS hG).H : Subgroup G) = hyp.P := by
+    change hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
+  have hcardH : Nat.card ↥(hyp.toTypesIIIIIIVSetupS hG).H = hyp.p ^ hyp.q := by
+    rw [hHeq]; exact hyp.card_P_eq hG hyp.Sdata_W2_eq
+  have hquot := OddOrder.Peterfalvi.S11.chiefFactor_quotient_card chief
+  rw [hyp.toTypesIIIIIIVSetupS_q_eq hG] at hquot
+  have hsplitP := Subgroup.card_eq_card_quotient_mul_card_subgroup chief.N
+  rw [hquot, hcardH] at hsplitP
+  have hdvd : chief.p ∣ hyp.p ^ hyp.q :=
+    dvd_trans (dvd_pow_self chief.p hyp.q_prime.pos.ne') (hsplitP ▸ Dvd.intro _ rfl)
+  exact (Nat.prime_dvd_prime_iff_eq chief.p_prime hyp.p_prime).mp
+    (chief.p_prime.dvd_of_dvd_pow hdvd)
+
+/-- **`S`-instance `u` identity**: the `U`-action image order `chars.u = |Ū| = [U : C_U(P)] = u`.
+Extracted from `u_le_cyclotomicQuotient`; the (13.3.b) dichotomy uses it to transport the
+`caseB_of_no_irreducible_sOf_H0Cprime` conclusion `chars.u = (p^q−1)/(p−1)` to `hyp.u`. -/
+theorem Hypothesis.mkSection11CharacterDataS_u_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
+    (hyp.mkSection11CharacterDataS hG chief).u = hyp.u := by
+  have hc0 : 0 < hyp.c := hyp.c_eq_card_C ▸ Nat.card_pos
+  refine Nat.eq_of_mul_eq_mul_right hc0 ?_
+  have key : (hyp.mkSection11CharacterDataS hG chief).u
+      * Nat.card ↥(OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief)
+      = Nat.card ↥(hyp.toTypesIIIIIIVSetupS hG).U := by
+    rw [← OddOrder.Peterfalvi.S11.relIndex_cSub_U_eq_u (hyp.mkSection11CharacterDataS hG chief)]
+    have h := Subgroup.index_mul_card
+      ((OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief).subgroupOf
+        (hyp.toTypesIIIIIIVSetupS hG).U)
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+      (OddOrder.Peterfalvi.S11.cSub_le_U (hyp.toTypesIIIIIIVSetupS hG) chief)).toEquiv] at h
+  rw [hyp.toTypesIIIIIIVSetupS_cSub_eq_C hG chief, ← hyp.c_eq_card_C,
+    show (hyp.toTypesIIIIIIVSetupS hG).U = hyp.U from hyp.Sdata_U_eq, hyp.card_U_eq_uc] at key
+  exact key
+
 /-- **Peterfalvi (13.2.b,c,e)** structural producer: the `M_F`-structure of the type-`P₂` member
 `S`.  Faithful obligation on the §16 σ-structure (`BasicStructureGated` docstring).
 
