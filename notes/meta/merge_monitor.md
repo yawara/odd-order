@@ -607,6 +607,20 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 11) — a+b 合流: a=S09 family-wide weighted Γ 分解 (実証明) + b=9094 ⑤ flip 1-2/N (TTypeII endpoint→Core+dichotomy)**:
+  **a=1** (`c023f3cc` = `S09_FrobeniusGammaDecomposition.lean` +585 で family-wide weighted gamma
+  decomposition を **sorry-free で構成** (0→0)、AxiomsCheck +18 (新 decl assertion)、issue 0044 更新。
+  scope=S09 territory ✓)。**b=2** (`eb9a7364` TTypeII endpoint を Core+dichotomy へ移行 = ⑤ flip 1/N +
+  `21769869` general S-side dichotomy producer landed = ⑤ flip 2/N; S15_CharacterDegreeSupply +90 に
+  新 producer `T_caseB_facts_unconditional` 等、**c 所有 TTypeII.lean は 9094 供給編集権の proof-only
+  差替え** = `T_side_caseB_facts` の statement 不変・`character_degree_analysis`(uninhabitable)→
+  `T_caseB_facts_unconditional` cite + import 1 行、self-flag 済・c の A0-Dade/BetaData 非接触 ✓)。c=0。
+  build green **4192 jobs** / AxiomsCheck OK (2377 assertion 全 allowlist、exit 0) /
+  **count-sorry 49→51 = +2 新 decl scaffold** (`T_caseB_facts_no_lambda`@1180 + `S_caseB_facts_no_lambda`@1219、
+  いずれも b の新規 dichotomy scaffold。pre-existing 2 本 (`deltaPrime_eq_one_T`/`tSide_theta_package_of_not_caseB_core`)
+  不変 = regression でない、全 +2 が新 decl で説明済) / 新 axiom なし / 逸脱なし。size watch: S09 902 / S15 1240 /
+  TTypeII 965 全て 2000 未満 OK。9094 残 = NormEstimates 5 定理移行 (:454/:570 が legacy `character_degree_analysis`
+  を依然 cite) + dichotomy scaffold の実証明。
 - **2026-07-14 (tick 10) — a 合流: S09 (7.9) local degree-ratio reality + coherence agreement (Γ 分解)**:
   **a=1** (`3b6382d4` = `S09_FrobeniusGammaDecomposition.lean` **新 leaf +317**、(7.9) Γ 分解の
   local degree-ratio reality + coherence agreement を実証明、**sorry-free**)。b=0 / c=0。
