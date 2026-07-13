@@ -42,10 +42,12 @@ kernel `S_F`**.  The proof splits on the `S`-side §9 Clifford dichotomy
 The left-branch cross facts (τ₂-coherence of `T2`, the `S`-side (5.8) row identity against
 the shared grid, the (4.1)/(5.3.b) orthogonality of `λ^{τ₂}`, `ζ^{τ₁}` to the grid and to
 each other, and the (8.18.b)-based `⟨α^τ, β^{τ_S}⟩ = 0`) are bundled as the explicit
-carrier `TypeIICrossIsometryData`, produced by the (sorried) named gate
-`exists_typeIICrossIsometryData` — see its docstring for the precise provenance of each
-obligation.  The contradiction consumer (`TypeIICrossIsometryData.elim`) and the dichotomy
-assembly (`typeII_HU_frobenius_of_coherent`) are proven.
+carrier `TypeIICrossIsometryData`, produced at the (8.8) canonical pair by
+`exists_typeIICrossIsometryData_at_pair` (`S12_TypeIICrossIsometryPair`, axiom-clean).
+The contradiction consumer (`TypeIICrossIsometryData.elim`) is proven here; the dichotomy
+assembly is the heir `typeII_HU_frobenius_of_coherent'` (`S12_TypeIICrossIsometryPair`).
+The former in-file legacy chain (the bare-sorry gate `exists_typeIICrossIsometryData` and
+the assembly `typeII_HU_frobenius_of_coherent`) is retired (issues 1020/9079/9087).
 -/
 
 namespace OddOrder.Peterfalvi.S12
@@ -1006,7 +1008,8 @@ set_option maxHeartbeats 1600000 in
 open OddOrder.Peterfalvi.S11 in
 open scoped Classical FiniteInduce in
 /-- **Peterfalvi (5.7) for the (10.7) `T2 = {λ, λ̄, ν, ν̄}` family — obligation 1 of
-`exists_typeIICrossIsometryData`**: for an irreducible `λ` and a reducible `ν` of equal degree
+the (10.7) cross-isometry package (`TypeIICrossIsometryData`)**: for an irreducible `λ`
+and a reducible `ν` of equal degree
 in the `S`-side §9 family `𝒮(Y)`, the 4-element family `T2` is coherent over the `S`-side
 `A₀(S)`-Dade isometry `τ_S` (the (8.16) `typeIIHypothesis46` base).
 
@@ -1178,49 +1181,6 @@ structure TypeIICrossIsometryData [Finite G] [Fintype G]
       (tau2 nu - tau2 lam) = 0
 
 open scoped Classical FiniteInduce in
-/-- **The (10.7) left-branch gate** (Coq `Frob_der1_type2`, `PFsection10.v:568-658` tail):
-for a Type-II maximal `S` whose `S`-side §9 family `𝒮(H₀)` contains an irreducible `lam`
-and a reducible `nu` of equal degree, the (10.7) cross-isometry package exists.
-
-The honest production decomposes into (tracking: the (10.7) frontier note
-`notes/peterfalvi/s10_7_derived_frobenius.md`):
-
-1. **`τ₂` = T2-coherence** (Peterfalvi (5.7)): the norm-general uniform-degree engine
-   `S07.uniform_degree_coherence_of_families` applied to `{λ, λ̄, ν, ν̄}` over the honest
-   type-`P₂` `S`-side Dade datum (`dadeSupportHypothesisData_honestTypeP2ASet`), with the
-   reducible column `R(ν)`-family `S06.certainTypeRImage` and the irreducible 2-element
-   `R(λ)` (`dadeCharacterDifferenceImageOfDiff`).
-2. **The shared grid** ((8.8) pair + (3.2) σ-uniqueness): `S ∩ M = W` with the `W₁/W₂`
-   roles swapped identifies the `S`-side `certainTypeOmegaSigma` grid with the transpose of
-   `M`'s `alignedOmegaSigmaGrid`; then (5.8) (Coq `coherent_prDade_TIred`, via (3.7)
-   coefficient rigidity and the `V`-vanishing (3.2.d)) pins `ν^{τ₂}` to a signed row sum.
-3. **Support disjointness** ((8.18.b) via (8.13.c4)): `Ã₁(M) ∩ Ã(S) = ∅` because `M` is
-   not Frobenius with kernel `M_F` (Hypothesis (10.1)), so no conjugate of `S` supports
-   `M`; with (8.10)/(8.15)/(4.7) this gives `cross_zero` and (with the conjugate-pair
-   difference trick) `zeta_lam_ortho`.
-
-Each numbered item is genuine unformalized mathematics (none is `M`-side §10 material,
-which is fully proven); item 2 is in the `typeP_pair` sphere (issue 0098 item 1), item 3
-in the §8 support geometry (S10).  Consumed by `TypeIICrossIsometryData.elim` /
-`typeII_HU_frobenius_of_coherent` below. -/
-theorem exists_typeIICrossIsometryData [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    {hyp : Hypothesis M} {params : CharacterParameters hyp}
-    (coh : CoherentHypothesis hyp params)
-    {S : Subgroup G} (hSII : IsTypeII S)
-    {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup S}
-    {chief : OddOrder.Peterfalvi.S11.ChiefFactorData data}
-    (chars : OddOrder.Peterfalvi.S11.Section11CharacterData data chief)
-    {lam nu : ClassFunction ↥S ℂ}
-    (hlam_mem : lam ∈ OddOrder.Peterfalvi.S11.sOf data chief.H0)
-    (hlam_irr : IsIrreducibleCharacter lam)
-    (hnu_mem : nu ∈ OddOrder.Peterfalvi.S11.sOf data chief.H0)
-    (hnu_red : ¬ IsIrreducibleCharacter nu)
-    (hdeg : lam 1 = nu 1) :
-    Nonempty (TypeIICrossIsometryData hG coh lam nu) := by
-  sorry
-
-open scoped Classical FiniteInduce in
 /-- **Peterfalvi (10.7), left-branch contradiction** (the tail computation of Coq
 `Frob_der1_type2`): the cross-isometry package is contradictory.
 
@@ -1312,118 +1272,5 @@ theorem TypeIICrossIsometryData.elim [Finite G]
   simp only [star_intCast, mul_one, mul_zero, sub_zero] at h0
   rcases hδpm with hδ | hδ <;> rcases pkg.delta'_pm with hδ' | hδ' <;>
     rw [hδ, hδ'] at h0 <;> norm_num at h0
-
-open scoped Classical FiniteInduce in
-/-- **Peterfalvi (10.7), dichotomy assembly** (setup form): under Hypothesis (10.4) for
-`M`, a maximal `S` with a Types-II/III/IV setup that is actually of Type II has
-`[S,S] = S_F ⋊ U` Frobenius with kernel `S_F` (on the `derivedInG S` carrier).
-
-Splits on the `S`-side §9 Clifford dichotomy (`S11.clifford_dichotomy`):
-
-* **Case A** (imprimitive `Ū`-action): (9.8.c) supplies an irreducible of degree `q·u` in
-  `𝒮(H₀C)` and (9.8.a,b) a reducible of the same degree — the left-branch package
-  (`exists_typeIICrossIsometryData`) is contradictory (`TypeIICrossIsometryData.elim`).
-* **Case B, exceptional** (no irreducible of degree `q·u` in `𝒮(H₀C')`): Peterfalvi (9.10)
-  = `S11.exceptional_case_frobenius_realization` yields the `H ⊔ U` Frobenius structure
-  directly (its Type-II conjunct), transported to `derivedInG S` by
-  `M' = H ⊔ U` (`TypePData.derivedInG_eq_fitting_sup_U`).
-* **Case B, non-exceptional**: the degree-`q·u` irreducible exists in `𝒮(H₀C')`, and
-  (9.9.b,c) supply the equal-degree reducible — again the left-branch contradiction. -/
-theorem typeII_HU_frobenius_of_coherent_aux [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    {hyp : Hypothesis M} {params : CharacterParameters hyp}
-    (coh : CoherentHypothesis hyp params)
-    {S : Subgroup G} (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup S)
-    (hSII : IsTypeII S) :
-    OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(derivedInG S)
-      (data.typeP.H.subgroupOf (derivedInG S))
-      (data.typeP.U.subgroupOf (derivedInG S)) := by
-  haveI := hyp.finiteG
-  classical
-  -- reconstruct the (10.3) parameters carrying the grid/`ζ` pins (the coherence datum is
-  -- params-independent), as in `typeII_coherence_contradiction_estimate`.
-  obtain ⟨params', hmu, hos, hzS, hz1, hzconj, hδpm, hδj⟩ := hyp.exists_charParameters_full hG
-  let coh' : CoherentHypothesis hyp params' := ⟨coh.coherent⟩
-  obtain ⟨chief, -⟩ := OddOrder.Peterfalvi.S11.exists_chiefFactorData hG data
-  -- §9 character data: only the genuine `u`/`u_eq` pair is consumed by the counts; the
-  -- coherence-only fields are inert placeholders (cf. `Hypothesis.mkSection11CharacterData`).
-  let chars : OddOrder.Peterfalvi.S11.Section11CharacterData data chief :=
-    { u := Nat.card ↥(((OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom
-          (N := chief.N) chief.N_aInvariant).comp
-          (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype).range)
-      u_eq_card_quotient := rfl
-      H0CprimeSupport := ∅
-      tau := 0
-      quotientSemidirectFrobenius := True }
-  -- the reducible `ν ∈ 𝒮(H₀)`: the (9.8.a)/(9.9.b) count `p − 1 ≥ 1`.
-  have hred_ne : {φ ∈ OddOrder.Peterfalvi.S11.sOf data chief.H0 |
-      ¬ IsIrreducibleCharacter φ}.Nonempty := by
-    apply Set.nonempty_of_ncard_ne_zero
-    rw [OddOrder.Peterfalvi.S11.reducible_count_sOf_H0 hG chief]
-    have := chief.p_prime.two_le
-    omega
-  obtain ⟨nu, hnu_mem, hnu_red⟩ := hred_ne
-  -- the left-branch refutation, shared by Case A and the non-exceptional Case B.
-  have hleft : ∀ lam : ClassFunction ↥S ℂ,
-      lam ∈ OddOrder.Peterfalvi.S11.sOf data chief.H0 → IsIrreducibleCharacter lam →
-      lam 1 = nu 1 → False := fun lam hlam_mem hlam_irr hdeg =>
-    (exists_typeIICrossIsometryData hG coh' hSII chars
-      hlam_mem hlam_irr hnu_mem hnu_red hdeg).elim fun pkg =>
-      pkg.elim hG hmu hos hzS hz1 hzconj hδpm hδj
-  -- the §9 Clifford dichotomy.
-  rcases OddOrder.Peterfalvi.S11.clifford_dichotomy hG chars with hA | hB
-  · -- **Case A**: (9.8.c) irreducible + (9.8.b) reducible degree — contradiction.
-    exfalso
-    obtain ⟨caseA⟩ := hA
-    obtain ⟨-, hbred, ⟨lam, hlam_mem, hlam_irr, hlam_deg⟩, -⟩ :=
-      OddOrder.Peterfalvi.S11.caseA_character_counts hG chars caseA
-    have hnu_deg := (hbred nu hnu_mem hnu_red).1
-    exact hleft lam
-      (OddOrder.Peterfalvi.S11.sOf_antitone data le_sup_left hlam_mem)
-      hlam_irr (by rw [hlam_deg, hnu_deg])
-  · -- **Case B**: split on the exceptional condition.
-    obtain ⟨caseB⟩ := hB
-    by_cases hex : ∃ χ ∈ chars.SOf (chief.H0 ⊔ chars.Cprime),
-        IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * chars.u : ℕ) : ℂ)
-    · -- non-exceptional: the degree-`q·u` irreducible exists — contradiction.
-      exfalso
-      obtain ⟨lam, hlam_mem, hlam_irr, hlam_deg⟩ := hex
-      obtain ⟨-, -, hbred, -⟩ :=
-        OddOrder.Peterfalvi.S11.caseB_character_counts hG chars caseB
-      have hnu_deg := (hbred nu hnu_mem hnu_red).1
-      exact hleft lam
-        (OddOrder.Peterfalvi.S11.sOf_antitone data le_sup_left hlam_mem)
-        hlam_irr (by rw [hlam_deg, hnu_deg])
-    · -- exceptional: (9.10) gives the `H ⊔ U` Frobenius, transported to `M' = derivedInG S`.
-      have hfrobHU := (OddOrder.Peterfalvi.S11.exceptional_case_frobenius_realization
-        hG chars caseB hex).2.2 hSII
-      have hM'eq : derivedInG S = data.typeP.H ⊔ data.typeP.U := by
-        rw [data.typeP.derivedInG_eq_fitting_sup_U, ← data.typeP.H_eq]
-      rw [hM'eq]
-      exact hfrobHU
-
-open scoped Classical FiniteInduce in
-/-- **Peterfalvi (10.7)** (Type-II datum form): under Hypothesis (10.4) for `M`, every
-Type-II maximal subgroup `S` has `[S,S] = S_F ⋊ U` Frobenius with kernel `S_F`, on the
-`derivedInG S` carrier with the type-`P` factors of the given `TypeIIData`.
-
-**Legacy** (issues 9079/1020): the honest heir is `typeII_HU_frobenius_of_coherent'`
-(`S12_TypeIICrossIsometryPair`, **axiom-clean** — the pair-witness route discharges the
-`exists_typeIICrossIsometryData` gate that this version still carries as a `sorry`).
-Downstream consumers use the heir; this version remains only for the legacy
-`typeII_derived_frobenius`/(10.8)-estimate chain of `S12_MaximalBasic`. -/
-theorem typeII_HU_frobenius_of_coherent [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    {hyp : Hypothesis M} {params : CharacterParameters hyp}
-    (coh : CoherentHypothesis hyp params)
-    {S : Subgroup G} (hSmax : S ∈ maximalSubgroups G) (dII : TypeIIData S) :
-    OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(derivedInG S)
-      (dII.typeP.H.subgroupOf (derivedInG S))
-      (dII.typeP.U.subgroupOf (derivedInG S)) :=
-  typeII_HU_frobenius_of_coherent_aux hG coh
-    { maximal := hSmax
-      typeP := dII.typeP
-      nontrivial := dII.common
-      type_alt := Or.inl ⟨dII⟩ } ⟨dII⟩
 
 end OddOrder.Peterfalvi.S12

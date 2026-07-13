@@ -44,7 +44,9 @@ no-real (`sSet_hasNoRealCharacters`), the Dade isometry / ZIrr-image / support f
 degree — are landed sorry-free; the sole residual is the reducible branch of
 `sSet_memberRFamily` (+ `_orthogonal`), the `S`-instance §6 certain-type port. -/
 noncomputable def Hypothesis.sSet_coherent_dade_caseB [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
     (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
     (caseB : CliffordCaseBData chars) :
@@ -80,7 +82,7 @@ noncomputable def Hypothesis.sSet_coherent_dade_caseB [Finite G]
       _ = (hyp.q : ℂ) := by simp
   refine OddOrder.Peterfalvi.S07.uniform_degree_coherence_of_families
     (sSet_finite _) hη₁
-    (fun η hη => hyp.sSet_memberRFamily hG hη)
+    (fun η hη => hyp.sSet_memberRFamily hG hnoV hη)
     (fun a ha b hb hab => by
       have h := sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupS hG) ha hb hab
       convert h using 2 <;> exact Subsingleton.elim _ _)
@@ -98,7 +100,7 @@ noncomputable def Hypothesis.sSet_coherent_dade_caseB [Finite G]
         (hyp.sSet_caseB_member_diff_supported hG chars caseB ha hb) hab_Z)
     (fun a ha b hb => hyp.sSet_caseB_member_diff_supported hG chars caseB ha hb)
     (fun {φ ξ} hφ hξ h1 h2 =>
-      hyp.sSet_memberRFamily_orthogonal hG hφ hξ h1 h2)
+      hyp.sSet_memberRFamily_orthogonal hG hnoV hφ hξ h1 h2)
     (fun a ha => (hyp.sSet_caseB_apply_one_eq_qu hG chars caseB ha).trans
       (hyp.sSet_caseB_apply_one_eq_qu hG chars caseB hη₁).symm)
     (by
@@ -130,7 +132,9 @@ the Dade isometry/ZIrr/support inputs, and the *irreducible* per-member `R`-datu
 sorry-free here; the sole residual is the **reducible** branch of `sSet_memberRFamily`
 (+ `_orthogonal`) — the `S`-instance §6 certain-type image-family port. -/
 theorem Hypothesis.sSet_coherent_indS_caseB [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
     (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
     (caseB : CliffordCaseBData chars) :
@@ -142,10 +146,10 @@ theorem Hypothesis.sSet_coherent_indS_caseB [Finite G]
   -- `A(S)`-supported class function (`sInstance_dade_eq_induce`, the (13.2.e) `normedTI` isometry
   -- half), and `IsCoherent` depends on its map only through the `A(S)`-supported span — exactly the
   -- `indS`-re-grounding `sSetIrrDeg_coherent_indS` performs for the uniform sub-family.
-  (hyp.sSet_coherent_dade_caseB hG chars caseB).map fun c =>
+  (hyp.sSet_coherent_dade_caseB hG hnoV chars caseB).map fun c =>
     c.congrMap fun φ hφ => by
       rw [hyp.indS_apply]
-      exact hyp.sInstance_dade_eq_induce hG hφ.2
+      exact hyp.sInstance_dade_eq_induce hG hnoV hφ.2
 
 open OddOrder.Peterfalvi.S11 in
 open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
@@ -231,7 +235,9 @@ input (non-realness cross-orthogonality `⟨φ, φ̄⟩ = 0`, conjugate-differen
 `S`-instance analogue of `memberExtensionDecomposition`, with the case-agnostic family in place of the
 irreducible-only `dadeOrthonormalCharacterImageFamilyOfDiff`. -/
 noncomputable def Hypothesis.sSet_memberPsiDecomp [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     {S₂ : Set (ClassFunction ↥hyp.S ℂ)}
     (hS₂coh : OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
@@ -242,7 +248,7 @@ noncomputable def Hypothesis.sSet_memberPsiDecomp [Finite G]
     { D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥hyp.S) (G := G)
         (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
           ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG))) φ 0 //
-      D.imageFamily = hyp.sSet_memberRFamily hG hφ ∧ D.tau1 φ = hS₂coh.extension φ } := by
+      D.imageFamily = hyp.sSet_memberRFamily hG hnoV hφ ∧ D.tau1 φ = hS₂coh.extension φ } := by
   classical
   haveI := hyp.finiteG
   have hfam : φ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
@@ -277,7 +283,7 @@ noncomputable def Hypothesis.sSet_memberPsiDecomp [Finite G]
           ClassFunction.support_neg]
         exact hdiffsupp⟩
   exact ⟨OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection
-    (hyp.sSet_memberRFamily hG hφ) hS₂coh.extension
+    (hyp.sSet_memberRFamily hG hnoV hφ) hS₂coh.extension
     (fun ψ' ζ' hψ' hζ' => hS₂coh.extension_inner_eq ψ' ζ' (hle hψ') (hle hζ'))
     (hS₂coh.extends_on_supported _ hdiffsupported)
     (by rw [sub_zero]; exact hνZ)
@@ -288,12 +294,14 @@ open scoped FiniteInduce in
 /-- **The break decomposition `Da` for a pair-refuted member `χ`, case-agnostic** (issue 1017
 step (c)).  The `ψ = a·χ₁` `CharacterPsiDecomposition` over the honest Dade map `τ` (with `τ` itself as
 the auxiliary isometry, so `Da.tau1 = τ`) whose image family is the case-agnostic `R`-family
-`sSet_memberRFamily hG hχ`; the difference set `{χ − χ̄, χ − a·χ₁}` is `A(S)`-supported
+`sSet_memberRFamily hG hnoV hχ`; the difference set `{χ − χ̄, χ − a·χ₁}` is `A(S)`-supported
 (`sSet_member_conjDiff_supported` + `hdiffasupp`), so the Dade isometry preserves the sponsoring-lattice
 inner products (`dadeIntegralCharacterMap_inner_eq_on_supported_span`).  The `S`-instance analogue of
 `decompositionDaFromDadeOfDiff`, case-agnostic in `χ`. -/
 noncomputable def Hypothesis.sSet_breakPsiDecomp [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     {χ : ClassFunction ↥hyp.S ℂ} (hχ : χ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
     {χ₁ : ClassFunction ↥hyp.S ℂ} {a : ℕ}
     (hdiffasupp : (χ - a • χ₁).support ⊆
@@ -310,7 +318,7 @@ noncomputable def Hypothesis.sSet_breakPsiDecomp [Finite G]
           ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG))) χ (a • χ₁) //
       Da.tau1 = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
           ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) ∧
-      Da.imageFamily = hyp.sSet_memberRFamily hG hχ } := by
+      Da.imageFamily = hyp.sSet_memberRFamily hG hnoV hχ } := by
   classical
   haveI := hyp.finiteG
   have hdiffsupp : ((χ : ClassFunction ↥hyp.S ℂ).conj - χ).support ⊆
@@ -328,7 +336,7 @@ noncomputable def Hypothesis.sSet_breakPsiDecomp [Finite G]
       exact hdiffsupp
     · exact hdiffasupp
   exact ⟨OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection
-    (hyp.sSet_memberRFamily hG hχ)
+    (hyp.sSet_memberRFamily hG hnoV hχ)
     (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
       ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)))
     (fun ψ' ζ' hψ' hζ' =>
@@ -392,7 +400,9 @@ Clifford-case-agnostic, `sSet_memberRFamily` (issue 1017 update #45), citable he
 relocation — feeding the (5.6) engine, and the (9.8.a) source-degree divisibility `a ∣ ζ(1)`
 (`S11.caseA_sOf_source_degree_ratio` via `sSet_eq_sOf_H0Cprime`). -/
 theorem Hypothesis.nineElevenPairBoundS [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
     (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
     (caseA : CliffordCaseAData chars)
@@ -421,7 +431,7 @@ theorem Hypothesis.nineElevenPairBoundS [Finite G]
         (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S) →
       hyp.indS f = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
         ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) f := fun f hf => by
-    rw [hyp.indS_apply, ← hyp.sInstance_dade_eq_induce hG
+    rw [hyp.indS_apply, ← hyp.sInstance_dade_eq_induce hG hnoV
       (OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mp hf).2]
   have cohS₂ := cohS₂_indS.congrMap hindS_dade
   -- (2) not-coherent (Dade side) from `hnopair` (indS side), the contrapositive of `congrMap`.
@@ -432,7 +442,7 @@ theorem Hypothesis.nineElevenPairBoundS [Finite G]
       (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)) := by
     rintro ⟨c⟩
     refine hnopair ⟨c.congrMap (fun f hf => ?_)⟩
-    rw [hyp.sInstance_dade_eq_induce hG
+    rw [hyp.sInstance_dade_eq_induce hG hnoV
       (OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mp hf).2, hyp.indS_apply]
   -- (3) break dictionary: `χ = Ind_{HU}^S ξ`, `χ(1) = q·d`, `d ≤ u`, source ratio `q·a·e`.
   have hχsOf : χ ∈ OddOrder.Peterfalvi.S11.sOf (hyp.toTypesIIIIIIVSetupS hG)
@@ -636,14 +646,14 @@ theorem Hypothesis.nineElevenPairBoundS [Finite G]
     rw [← Nat.cast_smul_eq_nsmul ℂ e (χmem i₁),
       OddOrder.RepresentationTheory.inner_smul_right, hψbar_S1 (χmem i₁) (hmemS1set i₁), mul_zero]
   obtain ⟨Da, hDatau1, hDaimg⟩ :=
-    hyp.sSet_breakPsiDecomp hG hχS hdiffasuppχ htau1ψ hχaeχ1 hχbaraeχ1 hχψb
+    hyp.sSet_breakPsiDecomp hG hnoV hχS hdiffasuppχ htau1ψ hχaeχ1 hχbaraeχ1 hχψb
   have memberDatum := fun j : Fin k =>
-    hyp.sSet_memberPsiDecomp hG cohS₂ (hmemsSet j) (hmemS1set j) (hS₂conj (hmemS1set j))
+    hyp.sSet_memberPsiDecomp hG hnoV cohS₂ (hmemsSet j) (hmemS1set j) (hS₂conj (hmemS1set j))
   have hortho_mem : ∀ i (_ : i ∈ (Finset.univ : Finset (Fin k))),
       ((memberDatum i).1).imageFamily.Orthogonal Da.imageFamily := by
     intro i _
     rw [(memberDatum i).2.1, hDaimg]
-    exact hyp.sSet_memberRFamily_orthogonal hG (hmemsSet i) hχS
+    exact hyp.sSet_memberRFamily_orthogonal hG hnoV (hmemsSet i) hχS
       (sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupS hG) (hmemsSet i) hχS
         (fun h => hχnotS₂ (h ▸ hmemS1set i)))
       (sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupS hG) (hmemsSet i)

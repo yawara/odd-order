@@ -267,10 +267,12 @@ prime to `pq`.  The avoidance fields of `MHypothesis` (`G0_avoid`) feed the prov
 Sylow/TI/(2.1) coset collapse, `S16_G0Coprime`), with the two case-(9.7.b) Frobenius-kernel
 inputs supplied by `s_side_frobenius_kernel`/`t_side_frobenius_kernel`. -/
 theorem MHypothesis.G0_orderOf_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     {hyp : Hypothesis (G := G)} (Mdata : MHypothesis hyp) {g : G} (hg : g ∈ Mdata.G0) :
     Nat.Coprime (orderOf g) (hyp.base.p * hyp.base.q) := by
   obtain ⟨hreg, hP, hQ⟩ := Mdata.G0_avoid g hg
-  exact orderOf_coprime_pq_of_not_mem_conj hG hyp.base (T_typeII hG hyp)
+  exact orderOf_coprime_pq_of_not_mem_conj hG hyp.base (T_typeII hG hnoV hncH0C hyp)
     (s_side_frobenius_kernel hG hyp) (t_side_frobenius_kernel hG hyp) hreg hP hQ
 
 /-- **Peterfalvi (3.9.a,c) for the `η`-grid on the generic set `G₀`** (faithful §3 Dade obligation).
@@ -301,6 +303,8 @@ grid primitives determine `η` on `W`-regular values but not its Galois behaviou
 on the generic set `G₀`, the `η`-grid takes integer values (3.9.c) and pairs under the
 negation involution (3.9.a). -/
 theorem eta_grid_galois_facts_on_G0 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G))
     (Mdata : MHypothesis hyp) :
     (∀ g ∈ Mdata.G0, ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
@@ -313,8 +317,8 @@ theorem eta_grid_galois_facts_on_G0 [Finite G] (hG : OddOrder.BG.IsMinimalSimple
   -- to every `g` of order coprime to `pq` — and `G₀` elements are exactly such
   -- (`MHypothesis.G0_orderOf_coprime`).
   refine ⟨fun g hg i j => ?_, fun g hg i j => ?_⟩
-  · exact hyp.base.eta_intCast_of_coprime g (Mdata.G0_orderOf_coprime hG hg) i j
-  · exact hyp.base.eta_pair_of_coprime g (Mdata.G0_orderOf_coprime hG hg) i j
+  · exact hyp.base.eta_intCast_of_coprime g (Mdata.G0_orderOf_coprime hG hnoV hncH0C hg) i j
+  · exact hyp.base.eta_pair_of_coprime g (Mdata.G0_orderOf_coprime hG hnoV hncH0C hg) i j
 
 /-- **Peterfalvi (3.9.a/c) `η`-grid facts on `G₀`**: on the generic set `G₀`, the `η`-grid
 takes integer values (3.9.c), pairs under the negation involution (3.9.a), and has principal
@@ -322,6 +326,8 @@ entry `η₀₀ = 1`.  The principal entry is now genuine (`eta_principal_apply_
 issue-2033 grid-semantics payoff, `S16_GridExpansion`); the Galois half remains the named
 obligation `eta_grid_galois_facts_on_G0`. -/
 theorem eta_grid_facts_on_G0 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) :
     (∀ g ∈ Mdata.G0, ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
       ∃ m : ℤ, hyp.base.eta i j g = (m : ℂ)) ∧
@@ -330,7 +336,7 @@ theorem eta_grid_facts_on_G0 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         = hyp.base.eta i j g) ∧
     (∀ g ∈ Mdata.G0,
       hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩ g = 1) := by
-  obtain ⟨hint, hpair⟩ := eta_grid_galois_facts_on_G0 hG hyp Mdata
+  obtain ⟨hint, hpair⟩ := eta_grid_galois_facts_on_G0 hG hnoV hncH0C hyp Mdata
   exact ⟨hint, hpair, fun g _ => eta_principal_apply_eq_one hyp.base g⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -339,9 +345,11 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 vanishing `β_M^τ = 0` on `G₀`: `β_M = β` is a Dade image, so its support lies in `Ã(M)`
 (`beta_support_subset_dadeSupport`), while `G₀` avoids `Ã(M)` (`G0_off_dadeSupport`). -/
 theorem eta_generic_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) :
     EtaGenericData hyp Mdata := by
-  obtain ⟨hint, hpair, hprinc⟩ := eta_grid_facts_on_G0 hG hyp Mdata
+  obtain ⟨hint, hpair, hprinc⟩ := eta_grid_facts_on_G0 hG hnoV hncH0C hyp Mdata
   refine { eta_int := hint, eta_pair := hpair, eta_principal := hprinc, betaM_vanish := ?_ }
   -- **Peterfalvi (14.11.3)**: `β_M^τ` vanishes off its Dade support `Ã(M)`, and `G₀ ⊆ G ∖ Ã(M)`.
   intro g hg
@@ -361,15 +369,18 @@ Dade extension `τ₁` applied to `ψ`.  Proof recipe (Pf p.89): for `g ∈ G_0`
 (3.9.c) each `η_ij(g) ∈ ℤ` and by (3.9.a) they pair under conjugation, and `η₀₀(g) = 1`, whence
 `Σ(±η_ij(g)) ∈ 2ℤ+1`, giving absolute value `≥ 1`.  Depends on `betaM_expansion` (14.11.2). -/
 theorem generic_character_bound [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    (hyp : Hypothesis (G := G))
     (Mdata : MHypothesis hyp) (hne : Mdata.K ≠ hyp.base.V) :
     ∀ g : G, g ∈ Mdata.G0 → 1 ≤ ‖(Mdata.tau1 Mdata.psi) g‖ := by
   classical
   -- (14.11.2): the signed `η`-grid expansion of `β_M^τ`.
-  obtain ⟨_he, ε, hε, χ, hχnorm, hexp⟩ := betaM_expansion _hG hyp Mdata hne
+  obtain ⟨_he, ε, hε, χ, hχnorm, hexp⟩ := betaM_expansion _hG hnoV hncH0C hyp Mdata hne
   -- (3.9)/(14.10): the `η`-grid is integral and conjugation-symmetric on `G₀`, and `β_M^τ`
   -- vanishes there.
-  have hdata := eta_generic_data _hG hyp Mdata
+  have hdata := eta_generic_data _hG hnoV hncH0C hyp Mdata
   intro g hg
   -- (3.9.c) integer values of the `η`-grid at `g`.
   choose n hn using hdata.eta_int g hg
@@ -423,7 +434,10 @@ This is the first step of (14.11.4)'s upper bound; the remaining passage to the 
 `(Q#)^G` contributions, isolated for the cascade producer `normCascadeData`.  `famG₀ =
 (toFamilyHypothesis71).G0 = G − Ã(M)` and `G₀ = Mdata.G0`. -/
 theorem MHypothesis.chiRhoNormSq_psi_le_line83 [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    {hyp : Hypothesis (G := G)}
     (Mdata : MHypothesis hyp) (hne : Mdata.K ≠ hyp.base.V) :
     (Mdata.toFamilyHypothesis71).chiRhoNormSq (Mdata.tau1 Mdata.psi) 0
       ≤ (Nat.card ↥(OddOrder.GroupTheory.typeIA Mdata.M Mdata.typeIHyp.typeI) : ℝ)
@@ -455,7 +469,7 @@ theorem MHypothesis.chiRhoNormSq_psi_le_line83 [Finite G]
             ‖(Mdata.tau1 Mdata.psi : G → ℂ) g‖ ^ 2 := by
           refine Finset.sum_le_sum (fun g hg => ?_)
           have hg2 : g ∈ Mdata.G0 := (Finset.mem_filter.mp hg).2
-          have h1 := generic_character_bound _hG hyp Mdata hne g hg2
+          have h1 := generic_character_bound _hG hnoV hncH0C hyp Mdata hne g hg2
           nlinarith [h1, norm_nonneg ((Mdata.tau1 Mdata.psi : G → ℂ) g)]
   have hdrop : ((Finset.univ.filter (fun g : G => g ∈ Mdata.G0)).card : ℝ)
       ≤ ∑ g ∈ Finset.univ.filter (fun g : G => g ∈ (Mdata.toFamilyHypothesis71).G0),
@@ -556,11 +570,12 @@ type-I Dade support `A(M) = typeIA M` equals `K#` (`centralizerSupport_sharpSubg
 applied to the Frobenius structure of `M` from `typeI_frobenius` (12.7), kernel `K = M_F`), so its
 cardinality is `|K| − 1 = k − 1`. -/
 theorem MHypothesis.card_typeIA_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {hyp : Hypothesis (G := G)} (Mdata : MHypothesis hyp) :
     Nat.card ↥(OddOrder.GroupTheory.typeIA Mdata.M Mdata.typeIHyp.typeI) = Mdata.k - 1 := by
   -- Frobenius witness for `M` (kernel `M_F`), from (12.7).
   obtain ⟨fdata, _⟩ :=
-    OddOrder.Peterfalvi.S14.typeI_frobenius hG Mdata.M_maximal ⟨Mdata.typeIHyp.typeI⟩
+    OddOrder.Peterfalvi.S14.typeI_frobenius hG hnoV Mdata.M_maximal ⟨Mdata.typeIHyp.typeI⟩
   -- The two kernels both equal `maxNilpotentNormalHall M`.
   have hKf : fdata.typeI.typeF.H = Mdata.typeIHyp.typeI.typeF.H := by
     rw [fdata.typeI.typeF.H_eq, Mdata.typeIHyp.typeI.typeF.H_eq]
@@ -853,7 +868,9 @@ and the structural values (`|W|`/`|N_G(P)|`, `IsTI P`/`IsTI Q`, `normalizer_V`) 
 then `normCascade_upper_loosen`.  The remaining §8 structural input is the TI/normalizer data of the
 Frobenius pieces `W`, `P`, `Q` (the type-I analogue of S12 (10.8)'s `G₁ ⊆ (H#)^G ∪ V^G`). -/
 theorem MHypothesis.line83_le_displayed_upper [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    {hyp : Hypothesis (G := G)}
     (Mdata : MHypothesis hyp) (hepq : Mdata.e = hyp.base.p * hyp.base.q) :
     (Nat.card ↥(OddOrder.GroupTheory.typeIA Mdata.M Mdata.typeIHyp.typeI) : ℝ)
         / (Nat.card ↥Mdata.M : ℝ)
@@ -944,7 +961,7 @@ theorem MHypothesis.line83_le_displayed_upper [Finite G]
   have hAterm : (Nat.card ↥(OddOrder.GroupTheory.typeIA Mdata.M Mdata.typeIHyp.typeI) : ℝ)
         / (Nat.card ↥Mdata.M : ℝ)
       = ((Mdata.k : ℝ) - 1) / ((Mdata.k * hyp.base.p * hyp.base.q : ℕ) : ℝ) := by
-    rw [Mdata.card_typeIA_eq hG, Mdata.card_M_eq, hepq]
+    rw [Mdata.card_typeIA_eq hG hnoV, Mdata.card_M_eq, hepq]
     have hkR : ((Mdata.k - 1 : ℕ) : ℝ) = (Mdata.k : ℝ) - 1 := by
       have : 1 ≤ Mdata.k := hkpos
       push_cast [Nat.cast_sub this]; ring
@@ -1031,10 +1048,13 @@ norm `(toFamilyHypothesis71).chiRhoNormSq (ψ^{τ₁}) 0` for the `(M, A(M))` ma
   `normCascadeBound` error terms.  Both arithmetic ends of `upper` are honest; the gap is the §8
   orbit cardinality `|K#|/|M|`, `|(W#)^G|`/`|(P#)^G|`/`|(Q#)^G|` count. -/
 noncomputable def normCascadeData [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    (hyp : Hypothesis (G := G))
     (Mdata : MHypothesis hyp) (hne : Mdata.K ≠ hyp.base.V) :
     NormCascadeData hyp Mdata := by
-  have hepq := (betaM_expansion _hG hyp Mdata hne).1
+  have hepq := (betaM_expansion _hG hnoV hncH0C hyp Mdata hne).1
   refine {
     rhoNormSq := (Mdata.toFamilyHypothesis71).chiRhoNormSq (Mdata.tau1 Mdata.psi) 0
     lower := ?_
@@ -1044,8 +1064,8 @@ noncomputable def normCascadeData [Finite G]
     exact Mdata.rhoNormSq_ge_lower
   · -- line-83 (`chiRhoNormSq_psi_le_line83`, proven) chained with the §8 TI-counting step
     -- (`line83_le_displayed_upper`, the single remaining gate).
-    exact le_trans (Mdata.chiRhoNormSq_psi_le_line83 _hG hne)
-      (Mdata.line83_le_displayed_upper _hG hepq)
+    exact le_trans (Mdata.chiRhoNormSq_psi_le_line83 _hG hnoV hncH0C hne)
+      (Mdata.line83_le_displayed_upper _hG hnoV hepq)
 
 /-- **Peterfalvi (14.11.4)**: the character-theoretic norm calculation produces the displayed
 rational inequality `normCascadeBound hyp k`.
@@ -1057,10 +1077,13 @@ passage to `normCascadeBound` is then the pure rational rearrangement
 `1/p + 1/q ≤ pq/k + 2/(pq) + 1/(uq) + 1/(vp)` (`linarith`).  Everything downstream of
 `normCascadeBound` is the arithmetic cascade already discharged in `norm_cascade_contradiction`. -/
 theorem normCascadeBound_of_charData [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    (hyp : Hypothesis (G := G))
     (Mdata : MHypothesis hyp) (hne : Mdata.K ≠ hyp.base.V) :
     normCascadeBound hyp Mdata.k := by
-  obtain ⟨R, hlower, hupper⟩ := normCascadeData _hG hyp Mdata hne
+  obtain ⟨R, hlower, hupper⟩ := normCascadeData _hG hnoV hncH0C hyp Mdata hne
   unfold normCascadeBound
   -- The two-sided `ℝ` bound `1 − pq/k ≤ R ≤ 1 − 1/p − 1/q + 2/(pq) + 1/(uq) + 1/(vp)` gives the
   -- displayed rational inequality; lift the `ℚ` goal to `ℝ` and close by `linarith`.
@@ -1078,14 +1101,17 @@ displayed norm inequality.  The arithmetic consumer
 `norm_cascade_contradiction_of_caseB_outputs_main_size_bounds` then closes the
 cascade.  The only remaining genuine `sorry`s are the named producers above. -/
 theorem contradiction_of_K_ne_V [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    (hyp : Hypothesis (G := G))
     (Ldata : LHypothesis hyp) (Mdata : MHypothesis hyp)
     (hne : Mdata.K ≠ hyp.base.V) :
     False :=
   norm_cascade_contradiction_of_caseB_outputs_main_size_bounds
     (caseB_for_T _hG hyp) (caseB_for_S _hG hyp Ldata) Mdata
-    (main_size_bounds _hG hyp Mdata hne)
-    (normCascadeBound_of_charData _hG hyp Mdata hne)
+    (main_size_bounds _hG hnoV hncH0C hyp Mdata hne)
+    (normCascadeBound_of_charData _hG hnoV hncH0C hyp Mdata hne)
 
 /-- **Peterfalvi (13.17.c)-dual specialised in the §14 context.**  Once `K = V`, the
 alternative complement branch `e = p` is excluded by (14.9), leaving `e = p q`.
@@ -1094,7 +1120,10 @@ This is the second named hand-off boundary from issue 3004.  It deliberately dep
 proved kernel equality instead of restoring an unconditional `e = p q` field on
 `MHypothesis`. -/
 theorem MHypothesis.complementIndex_eq_pq_of_K_eq_V [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    {hyp : Hypothesis (G := G)}
     (Mdata : MHypothesis hyp) (_hKV : Mdata.K = hyp.base.V)
     (_hcases : Mdata.e = hyp.base.p ∨ Mdata.e = hyp.base.p * hyp.base.q) :
     Mdata.e = hyp.base.p * hyp.base.q := by
@@ -1104,7 +1133,7 @@ theorem MHypothesis.complementIndex_eq_pq_of_K_eq_V [Finite G]
     have hMI : IsTypeI Mdata.M := ⟨Mdata.typeIHyp.typeI⟩
     obtain ⟨frob, _hker, hW2E⟩ :=
       OddOrder.Peterfalvi.S15.exists_typeIFrobeniusData_W2_le
-        _hG hyp.base Mdata.M_maximal hMI Mdata.normalizer_V_le_M
+        _hG hnoV hyp.base Mdata.M_maximal hMI Mdata.normalizer_V_le_M
     have hEcard : Nat.card ↥(frob.complement.map Mdata.M.subtype) =
         Nat.card ↥frob.complement :=
       Subgroup.card_map_of_injective (K := frob.complement) Mdata.M.subtype_injective
@@ -1138,7 +1167,7 @@ theorem MHypothesis.complementIndex_eq_pq_of_K_eq_V [Finite G]
     have hMleT : Mdata.M ≤ hyp.base.T := by
       rw [hM_eq]
       exact sup_le hVleT (hW2leW.trans hWleT)
-    obtain ⟨tdata⟩ := T_typeII _hG hyp
+    obtain ⟨tdata⟩ := T_typeII _hG hnoV hncH0C hyp
     have hcop := OddOrder.Peterfalvi.S15.coprime_card_V_card_Q_of_disjoint
       hyp.base tdata hyp.base.Q_inf_V_eq_bot
     have hNVT : ¬ Subgroup.normalizer (hyp.base.V : Set G) ≤ hyp.base.T :=
@@ -1157,13 +1186,15 @@ obligation; note `betaM_expansion`'s `e = p q` is unavailable here because it
 is conditioned on `K ≠ V`, so the equal-index value under `K = V` needs the
 type-I structure of `M` directly. -/
 theorem K_eq_V_index_pq [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G)) (Ldata : LHypothesis hyp) (Mdata : MHypothesis hyp) :
     Mdata.K = hyp.base.V ∧ Mdata.e = hyp.base.p * hyp.base.q := by
   have hKV : Mdata.K = hyp.base.V := by
     -- (14.11.1)--(14.11.4): `K ≠ V` is contradictory.
     by_contra hne
-    exact contradiction_of_K_ne_V _hG hyp Ldata Mdata hne
+    exact contradiction_of_K_ne_V _hG hnoV hncH0C hyp Ldata Mdata hne
   have hcases := Mdata.complementIndex_eq_p_or_pq _hG
-  exact ⟨hKV, Mdata.complementIndex_eq_pq_of_K_eq_V _hG hKV hcases⟩
+  exact ⟨hKV, Mdata.complementIndex_eq_pq_of_K_eq_V _hG hnoV hncH0C hKV hcases⟩
 
 end OddOrder.Peterfalvi.S16

@@ -65,7 +65,9 @@ For a conjugate-closed no-real family `𝒮` of irreducible characters of the ty
 every coherent image `coh.extension ζ` (`ζ ∈ 𝒮` irreducible) is orthogonal to the entire
 `η`-grid. -/
 theorem coherentIndS_image_inner_eta_eq_zero [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     [fintypeG : Fintype G] [invertibleG : Invertible (Nat.card G : ℂ)]
     [Fintype ↥hyp.S] [Invertible (Nat.card ↥hyp.S : ℂ)]
     {S : Set (ClassFunction ↥hyp.S ℂ)}
@@ -108,7 +110,7 @@ theorem coherentIndS_image_inner_eta_eq_zero [Finite G]
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
         ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) (ζ - ζ.conj) := by
     rw [hyp.indS_apply]
-    exact (hyp.sInstance_dade0_eq_induce hG hA0Supp).symm
+    exact (hyp.sInstance_dade0_eq_induce hG hnoV hA0Supp).symm
   -- the coherent conjugate difference agrees with that Dade image.
   have hextDiff : coh.extension ζ - coh.extension ζ.conj =
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
@@ -195,20 +197,23 @@ same `Fintype ↥S`.  This is the downstream orthogonality the §13 char cascade
 uniform base; the full-`sSet` lift ((9.11.1)–(9.11.8) pair-adjoining induction) feeds the same
 engine once the base is widened. -/
 theorem sSetIrrDeg_coherentIndS_image_inner_eta_eq_zero [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     (d : ℂ) (hd : star d = d) (hd0 : d ≠ 0)
     (h2 : 2 ≤ (hyp.sSetIrrDeg hG d).ncard)
     {ζ : ClassFunction ↥hyp.S ℂ} (hζ : ζ ∈ hyp.sSetIrrDeg hG d)
     (hζirr : IsIrreducibleCharacter ζ) :
     ∀ (i : Fin hyp.q) (j : Fin hyp.p),
-      ClassFunction.inner ((hyp.sSetIrrDeg_coherent_indS hG d hd hd0 h2).some.extension ζ)
+      ClassFunction.inner
+        ((hyp.sSetIrrDeg_coherent_indS hG hnoV d hd hd0 h2).some.extension ζ)
         (hyp.eta i j) = 0 :=
-  coherentIndS_image_inner_eta_eq_zero hG hyp
+  coherentIndS_image_inner_eta_eq_zero hG hnoV hyp
     (hyp.sSetIrrDeg_closedUnderConjugate hG d hd)
     (hyp.sSetIrrDeg_hasNoRealCharacters hG d)
     (fun _ζ' hζ' => hyp.sSetIrrDeg_member_diff_supported hG d hζ'
       (hyp.sSetIrrDeg_closedUnderConjugate hG d hd hζ'))
-    (hyp.sSetIrrDeg_coherent_indS hG d hd hd0 h2).some
+    (hyp.sSetIrrDeg_coherent_indS hG hnoV d hd hd0 h2).some
     hζ hζirr
 
 end OddOrder.Peterfalvi.S15

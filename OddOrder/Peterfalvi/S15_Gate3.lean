@@ -201,13 +201,14 @@ the Frobenius group `U W₁ ⊆ L` (from (13.2.a)) would act fixed-point-freely 
 `CoprimeFrobeniusAction (U W₁) (L_F)` construction plus the (still sorried) Wielandt formula.
 `:= sorry`; see issue 2009 / `notes/peterfalvi/s13_17_structural_program.md`. -/
 theorem typeI_U_le_fitting_of_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (_hSTypeII : IsTypeII hyp.S) {L : Subgroup G}
     (hLmax : L ∈ maximalSubgroups G) (hLI : IsTypeI L)
     (hNUL : Subgroup.normalizer (hyp.U : Set G) ≤ L)
     (hcop : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) (hyp.p * hyp.q)) :
     hyp.U ≤ maxNilpotentNormalHall L := by
   -- The (12.7) Frobenius structure of the type-`I` `L`, with kernel `L_F = maxNilpotentNormalHall L`.
-  obtain ⟨frob, _⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius hG hLmax hLI
+  obtain ⟨frob, _⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius hG hnoV hLmax hLI
   have hHeq : frob.typeI.typeF.H = maxNilpotentNormalHall L := frob.typeI.typeF.H_eq
   have hfrobLF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L
       ((maxNilpotentNormalHall L).subgroupOf L) frob.complement := hHeq ▸ frob.frobenius
@@ -272,7 +273,9 @@ while `S`, `T` are non-I and type is conjugacy-invariant — `not_conj_of_isType
 Assembled `sorry`-free from the piece-1 non-conjugacy, the (8.17.a) coprimality producer
 `card_LF_coprime_pq` (owner = F, BG Theorem E), and `typeI_U_le_fitting_of_coprime`. -/
 theorem typeI_overNormalizer_U_le_fitting [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     (_hSTypeII : IsTypeII hyp.S) {L : Subgroup G} (_hLmax : L ∈ maximalSubgroups G)
     (_hLI : IsTypeI L) (_hNUL : Subgroup.normalizer (hyp.U : Set G) ≤ L) :
     hyp.U ≤ maxNilpotentNormalHall L := by
@@ -282,7 +285,7 @@ theorem typeI_overNormalizer_U_le_fitting [Finite G]
   have hnT : ¬ ∃ g : G, MulAut.conj g • L = hyp.T :=
     not_conj_of_isTypeI_of_isTypeNonI _hG _hLI hyp.T_maximal hyp.T_nonI
   -- (piece 2) the (8.17.a) coprimality, then (pieces 4–6) the isolated FPF residual.
-  exact typeI_U_le_fitting_of_coprime _hG hyp _hSTypeII _hLmax _hLI _hNUL
+  exact typeI_U_le_fitting_of_coprime _hG hnoV hyp _hSTypeII _hLmax _hLI _hNUL
     (card_LF_coprime_pq _hG hyp _hLmax _hLI hnS hnT)
 
 /-- **`T`-side dual of `typeI_U_le_fitting_of_coprime`** (Pf (13.17.b), V-side): for `T` type II and
@@ -290,6 +293,7 @@ a type-`I` maximal `L` over `N_G(V)` with `|L_F| ⟂ pq`, the complement `V ⊆ 
 `U`-side; the `V W₂` Frobenius is built from the reconciled `TypePData T`
 (`typeP_uW1_frobenius`) rather than `basic_structure` (which is `S`-side only). -/
 theorem typeI_V_le_fitting_of_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T) {L : Subgroup G}
     (hLmax : L ∈ maximalSubgroups G) (hLI : IsTypeI L)
     (hNVL : Subgroup.normalizer (hyp.V : Set G) ≤ L)
@@ -297,7 +301,7 @@ theorem typeI_V_le_fitting_of_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimp
     hyp.V ≤ maxNilpotentNormalHall L := by
   obtain ⟨tdata⟩ := hTTypeII
   obtain ⟨tpd, htpdV, htpdW2, _⟩ := reconciled_typePData_T hG hyp
-  obtain ⟨frob, _⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius hG hLmax hLI
+  obtain ⟨frob, _⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius hG hnoV hLmax hLI
   have hHeq : frob.typeI.typeF.H = maxNilpotentNormalHall L := frob.typeI.typeF.H_eq
   have hfrobLF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L
       ((maxNilpotentNormalHall L).subgroupOf L) frob.complement := hHeq ▸ frob.frobenius
@@ -361,7 +365,9 @@ theorem typeI_V_le_fitting_of_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimp
 and a type-`I` maximal `L` over `N_G(V)`, `V ⊆ L_F`.  Mirror; cites the (8.17.a) coprimality
 `card_LF_coprime_pq` (gated, BG Thm E) and the V-side FPF residual `typeI_V_le_fitting_of_coprime`. -/
 theorem typeI_overNormalizer_V_le_fitting [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     (hTTypeII : IsTypeII hyp.T) {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
     (hLI : IsTypeI L) (hNVL : Subgroup.normalizer (hyp.V : Set G) ≤ L) :
     hyp.V ≤ maxNilpotentNormalHall L := by
@@ -369,7 +375,7 @@ theorem typeI_overNormalizer_V_le_fitting [Finite G]
     not_conj_of_isTypeI_of_isTypeNonI _hG hLI hyp.S_maximal hyp.S_nonI
   have hnT : ¬ ∃ g : G, MulAut.conj g • L = hyp.T :=
     not_conj_of_isTypeI_of_isTypeNonI _hG hLI hyp.T_maximal hyp.T_nonI
-  exact typeI_V_le_fitting_of_coprime _hG hyp hTTypeII hLmax hLI hNVL
+  exact typeI_V_le_fitting_of_coprime _hG hnoV hyp hTTypeII hLmax hLI hNVL
     (card_LF_coprime_pq _hG hyp hLmax hLI hnS hnT)
 
 /-- **Peterfalvi (13.17.a/b)**: a maximal subgroup `L` over `N_G(U)` (for `S` of type II) is of
@@ -388,7 +394,9 @@ coprime_card_U_card_P_of_disjoint`.  Four documented gates remain: `hdisj` (Phas
 faithfulness, F-ask `P ⊓ U = ⊥`); the L~S Hall-conjugacy derivation of `N_G(U) ⊆ S`; the L~T
 `|L_F| = q^p` exclusion; and `U ⊆ L_F` ((8.17.a)+(9.1)). -/
 theorem exists_typeI_maximal_overNormalizer_U [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     (hSTypeII : IsTypeII hyp.S) (hTTypeII : IsTypeII hyp.T) :
     ∃ L : Subgroup G, L ∈ maximalSubgroups G ∧ IsTypeI L ∧
       Subgroup.normalizer (hyp.U : Set G) ≤ L ∧ hyp.U ≤ maxNilpotentNormalHall L := by
@@ -448,7 +456,7 @@ theorem exists_typeI_maximal_overNormalizer_U [Finite G]
     -- `wielandt_fixedPoint_frobenius`, against type-`I` `L_F ≠ 1`; hence `U ∩ L_F ≠ 1` and
     -- `U ⊆ C_L(U ∩ L_F) ⊆ L_F` — is `typeI_overNormalizer_U_le_fitting`.
     exact ⟨L, hLmem, hLI, hNUL,
-      typeI_overNormalizer_U_le_fitting _hG hyp ⟨tdata⟩ hLmem hLI hNUL⟩
+      typeI_overNormalizer_U_le_fitting _hG hnoV hyp ⟨tdata⟩ hLmem hLI hNUL⟩
   · -- `L` conjugate to `S` is excluded (`_hLconjS`): Pf (13.17.a) derives `N_G(U) ⊆ S` from the
     -- Hall conjugacy of `U` in the solvable `S`, contradicting `hNUS`.  The structural argument is
     -- `normalizer_le_of_isHall_subgroupOf_of_conj`; its only `S`-specific input is "`U` is a Hall
@@ -614,7 +622,9 @@ the two exclusion branches swapped: `L ~ T` is ruled out by the Hall conjugacy `
 (`not_normalizer_V_le_T`), and `L ~ S` by the `|L_F| = p^q` order contradiction
 (`sConjugate_fitting_data`) against the `V W₂` Frobenius (from the reconciled `TypePData T`). -/
 theorem exists_typeI_maximal_overNormalizer_V [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     (hTTypeII : IsTypeII hyp.T) :
     ∃ L : Subgroup G, L ∈ maximalSubgroups G ∧ IsTypeI L ∧
       Subgroup.normalizer (hyp.V : Set G) ≤ L ∧ hyp.V ≤ maxNilpotentNormalHall L := by
@@ -654,7 +664,7 @@ theorem exists_typeI_maximal_overNormalizer_V [Finite G]
     rwa [htpdV, htpdW2] at h
   rcases hyp.theorem88_caseB L hLmem with hLI | hLconjS | hLconjT
   · exact ⟨L, hLmem, hLI, hNVL,
-      typeI_overNormalizer_V_le_fitting _hG hyp ⟨tdata⟩ hLmem hLI hNVL⟩
+      typeI_overNormalizer_V_le_fitting _hG hnoV hyp ⟨tdata⟩ hLmem hLI hNVL⟩
   · -- `L ~ S` excluded (order contradiction, mirror of the S-side `L ~ T`).
     exfalso
     obtain ⟨g, hg⟩ := hLconjS

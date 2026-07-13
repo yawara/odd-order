@@ -40,6 +40,7 @@ nontrivial `θ_lin` by the family shape), so the distinguished member is
 (`zetaNuRhoNormSqGeOfDade`) lands, via `ν = coh.extension` and `ψ = coh.extension dade.chi`,
 exactly on `‖chiRhoCF dade.psi‖²` — the `normRho` that the (12.16) `hC` shares. -/
 theorem witness_dade_psi_rho_norm_ge [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
     (hyp : Hypothesis data.L)
     (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
@@ -51,7 +52,7 @@ theorem witness_dade_psi_rho_norm_ge [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
           (hyp.toHypothesis71.chiRhoCF dade.psi)).re := by
   classical
   -- The Frobenius witness for `L`, transported to `hyp`'s kernel accessor.
-  obtain ⟨frob, -⟩ := witness_L_frobenius hG data
+  obtain ⟨frob, -⟩ := witness_L_frobenius hG hnoV data
   have hHfrob : hyp.typeI.typeF.H = frob.typeI.typeF.H := by
     rw [hyp.typeI.typeF.H_eq, frob.typeI.typeF.H_eq]
   have hC : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥data.L
@@ -62,7 +63,7 @@ theorem witness_dade_psi_rho_norm_ge [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
     rw [hyp.typeI.typeF.H_eq]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal data.L
   have hAH : typeIA data.L hyp.typeI = (hyp.typeI.typeF.H : Set G) \ {1} :=
-    witness_typeIA_eq_sharp hG data hyp
+    witness_typeIA_eq_sharp hG hnoV data hyp
   have hHnorm : ∀ (l : ↥data.L) {h : G}, h ∈ hyp.typeI.typeF.H →
       (l : G) * h * (l : G)⁻¹ ∈ hyp.typeI.typeF.H := by
     intro l h hh
@@ -245,6 +246,7 @@ monotone).  Neither support contains `1`, so the joint integral is at most
 strictly less than `1`. -/
 theorem witness_dade_psi_rhoM_rho_normSq_lt_one [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
     (hyp : Hypothesis data.L)
     (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
@@ -259,7 +261,7 @@ theorem witness_dade_psi_rhoM_rho_normSq_lt_one [Finite G]
   classical
   -- `‖ψ‖² = 1`: the coherent extension is isometric on `S ∋ dade.chi`, and members of `S`
   -- are norm-`1` induced characters of the Frobenius kernel.
-  obtain ⟨frob, -⟩ := witness_L_frobenius hG data
+  obtain ⟨frob, -⟩ := witness_L_frobenius hG hnoV data
   have hHfrob : hyp.typeI.typeF.H = frob.typeI.typeF.H := by
     rw [hyp.typeI.typeF.H_eq, frob.typeI.typeF.H_eq]
   have hC : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥data.L
@@ -289,7 +291,7 @@ theorem witness_dade_psi_rhoM_rho_normSq_lt_one [Finite G]
   have hdisjSet : Disjoint hyp.toHypothesis71.hyp.dadeSupport
       ((hypothesis71SharpKernel hypM).hyp.dadeSupport) := by
     rcases nonconjugate_thickened_mixed_disjoint_or_swap hG hyp hypM
-      (witness_L_not_conj_M hG data) with hd | hd
+      (witness_L_not_conj_M hG hnoV data) with hd | hd
     · -- `Ã(L) ∩ Ã₁(M) = ∅`
       exact Disjoint.mono hsuppL_eq.le hsuppM_sub hd
     · -- `Ã(M) ∩ Ã₁(L) = ∅`; `Ã₁(M) ⊆ Ã(M)` and the witness `Ã(L) = Ã₁(L)`
@@ -304,7 +306,7 @@ theorem witness_dade_psi_rhoM_rho_normSq_lt_one [Finite G]
       -- `typeIA L = H^# = A₁(L)` for the Frobenius witness
         rw [hsuppL_eq,
           show typeIA data.L hyp.typeI = A1 data.L PeterfalviType.I from
-            (witness_typeIA_eq_sharp hG data hyp).trans (A1_eq_sharpSubgroup_H hyp).symm]
+            (witness_typeIA_eq_sharp hG hnoV data hyp).trans (A1_eq_sharpSubgroup_H hyp).symm]
       exact Disjoint.mono hLsub hMsub hd.symm
   -- Finset forms of the two supports.
   set SL : Finset G :=
@@ -470,6 +472,7 @@ fact for the *specific* witness character `ψ = dade.psi` of the genuine witness
 `ctr`/`witness`/`hyp`/`dade` via `data` and `hψZ`), with `e = dade.e` and `|K|,|K'|,|M|,|H|` the
 genuine cardinalities — not a free arithmetic implication. -/
 theorem witness_value_norm_package [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} {L : Subgroup G}
     (data : RankTwoWitnessData ctr) (hLeq : L = data.L)
     {g : G} (hg_comm : Commute data.x g) (hgK : g ∈ ctr.K) (hgK' : g ∉ ctr.Kprime)
@@ -492,7 +495,7 @@ theorem witness_value_norm_package [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
   -- The type-I (12.1) Hypothesis for `M`.
   obtain ⟨hypM⟩ := exists_typeI_hypothesis hG ctr.M_maximal ctr.M_typeI
   -- The Frobenius witness for `L` (for the `S`-irreducibility of `dade.chi`).
-  obtain ⟨frob, -⟩ := witness_L_frobenius hG data
+  obtain ⟨frob, -⟩ := witness_L_frobenius hG hnoV data
   have hHfrob : hyp.typeI.typeF.H = frob.typeI.typeF.H := by
     rw [hyp.typeI.typeF.H_eq, frob.typeI.typeF.H_eq]
   have hC : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥data.L
@@ -514,7 +517,7 @@ theorem witness_value_norm_package [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
   have hpsi0 : dade.psi = coh.extension (chi0 : ClassFunction ↥data.L ℂ) := by
     rw [hchi0_coe]; exact hψeq
   -- (12.15): `ψ(g) = mval ∈ ℤ` on `K − K′`.
-  obtain ⟨mval, hmval⟩ := counterexample_psi_int_on_K_sub_Kprime hG data hyp coh data0
+  obtain ⟨mval, hmval⟩ := counterexample_psi_int_on_K_sub_Kprime hG hnoV data hyp coh data0
     hchi0_cons hchi0_mem hpsi0 hψZ hypM hgK hgK'
   refine ⟨mval,
     (ClassFunction.inner ((hypothesis71SharpKernel hypM).chiRhoCF dade.psi)
@@ -524,20 +527,20 @@ theorem witness_value_norm_package [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
     ?_, hmval, ?_, ?_, ?_, ?_, ?_⟩
   · -- (12.14): `ψ` constant on the coset `x·K`.
     exact psi_constant_on_xK hG hyp coh data dade data0 hchi0_cons hchi0_mem hpsi0
-      (witness_L_not_conj_M hG data) g hgK
+      (witness_L_not_conj_M hG hnoV data) g hgK
   · -- (12.12): `2e ≤ p + 1`.
-    have h := witness_two_mul_index_le_p_add_one hG data hyp
+    have h := witness_two_mul_index_le_p_add_one hG hnoV data hyp
     rw [he_eq]
     exact_mod_cast h
   · -- (8.1.c): `4·|K′| ≤ |K|`.
     exact_mod_cast four_mul_card_Kprime_le hG ctr
   · -- (12.15) norm relation `hA`.
-    exact counterexample_chiRhoA1_normSq_ge hG data hyp coh data0 hchi0_cons hchi0_mem
+    exact counterexample_chiRhoA1_normSq_ge hG hnoV data hyp coh data0 hchi0_cons hchi0_mem
       hpsi0 hypM hgK hgK' hmval
   · -- (7.8.b) `hB`.
-    exact witness_dade_psi_rho_norm_ge hG data hyp coh dade hψeq he_eq
+    exact witness_dade_psi_rho_norm_ge hG hnoV data hyp coh dade hψeq he_eq
   · -- (7.3)+(8.17) `hC`.
-    exact witness_dade_psi_rhoM_rho_normSq_lt_one hG data hyp coh dade hψeq hψZ hypM
+    exact witness_dade_psi_rhoM_rho_normSq_lt_one hG hnoV data hyp coh dade hψeq hψZ hypM
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.13)–(12.15) + (7.3)/(7.8.b)**, the construction of the character/norm contract
@@ -558,7 +561,9 @@ each `CounterexampleDadeData` field is discharged:
 * `mval`/`h_const`/`h_psig_int`/`h2e`/`hidx`/`hA`/`hB`/`hC` from the deep value/norm package
   `witness_value_norm_package` (the (12.14)/(12.15)/(12.12)/(8.1.c)/(7.x) content). -/
 theorem exists_counterexample_dade_data [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (ctr : CounterexampleHypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (ctr : CounterexampleHypothesis (G := G))
     (witness : RankTwoWitnessData ctr) {g : G}
     (hg_comm : Commute witness.x g) (hgK : g ∈ ctr.K) (hgK' : g ∉ ctr.Kprime) :
     Nonempty (CounterexampleDadeData witness g) := by
@@ -566,7 +571,7 @@ theorem exists_counterexample_dade_data [Finite G]
   haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
   -- The witness (12.13) Dade calculation with its proven (12.14) evaluation `ψ(x) = χ(x)`.
   obtain ⟨hyp, coh, dade, hψeq, he_eq, hψZ, hχZ, hψx_eq⟩ :=
-    witness_dade_psi_apply_x_eq_chi hG witness
+    witness_dade_psi_apply_x_eq_chi hG hnoV witness
   -- A primitive `p`-th root of unity.
   obtain ⟨ε, hε⟩ : ∃ ε : ℂ, IsPrimitiveRoot ε ctr.p :=
     ⟨_, Complex.isPrimitiveRoot_exp ctr.p ctr.p_prime.pos.ne'⟩
@@ -574,7 +579,7 @@ theorem exists_counterexample_dade_data [Finite G]
   have hthree : 3 ≤ dade.e := he_eq ▸ three_le_index hG hyp
   -- (12.14) + the `L`-side (1.10.a): `ψ(x) = χ(x) ≡ χ(1) = e (mod 1 − ε)` (`h_psix`),
   -- with no coherent-extension degree identity `ψ(1) = e` needed.
-  have hxL : witness.x ∈ witness.L := witness_x_mem_L hG witness
+  have hxL : witness.x ∈ witness.L := witness_x_mem_L hG hnoV witness
   have hxp : (⟨witness.x, hxL⟩ : ↥witness.L) ^ ctr.p = 1 := by
     apply Subtype.ext
     push_cast
@@ -592,11 +597,11 @@ theorem exists_counterexample_dade_data [Finite G]
     rw [hyp.typeI.typeF.H_eq]
   -- The deep value/norm package (12.14)/(12.15)/(12.12)/(8.1.c)/(7.x).
   obtain ⟨mval, normRhoM, normRho, h_const, h_psig_int, h2e, hidx, hA, hB, hC⟩ :=
-    witness_value_norm_package hG witness rfl hg_comm hgK hgK' hyp coh dade hψeq he_eq hψZ
+    witness_value_norm_package hG hnoV witness rfl hg_comm hgK hgK' hyp coh dade hψeq he_eq hψZ
   -- `|M| ≤ |K|·|H|` (12.11).
   have hM : (Nat.card ↥ctr.M : ℝ)
       ≤ (Nat.card ↥ctr.K : ℝ) * (Nat.card ↥(maxNilpotentNormalHall witness.L) : ℝ) := by
-    have := card_M_le hG witness
+    have := card_M_le hG hnoV witness
     calc (Nat.card ↥ctr.M : ℝ)
         ≤ ((Nat.card ↥ctr.K * Nat.card ↥(maxNilpotentNormalHall witness.L) : ℕ) : ℝ) := by
           exact_mod_cast this
@@ -640,23 +645,25 @@ into `exists_counterexample_dade_data`; the contradiction then follows from the 
 `counterexample_contradiction_of_facts`. -/
 theorem counterexample_contradiction [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (ctr : CounterexampleHypothesis (G := G)) :
     False := by
   obtain ⟨_, _, ⟨witness⟩⟩ := exists_rankTwoWitness hG ctr
   obtain ⟨g, hg_comm, hgK, hgK'⟩ := exists_witness_g witness
-  obtain ⟨d⟩ := exists_counterexample_dade_data hG ctr witness hg_comm hgK hgK'
+  obtain ⟨d⟩ := exists_counterexample_dade_data hG hnoV ctr witness hg_comm hgK hgK'
   exact counterexample_contradiction_of_facts ctr.p_prime d.hε d.hψ witness.x_mem_omega1 hg_comm
     d.he d.h2e d.h_const d.h_psix d.h_psig_int d.hkKp d.hkM d.hkH d.hidx d.hM d.hA d.hB d.hC
 
 /-- **Peterfalvi (12.7), `π = ∅`** (the headline consequence of (12.16)): no prime lies in the
 set `π` of (12.8).  Were `π` nonempty, (12.8) (`exists_counterexampleHypothesis`) would build a
 minimal counterexample, contradicting (12.16) (`counterexample_contradiction`). -/
-theorem pi_empty [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
+theorem pi_empty [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M) :
     ∀ q : ℕ, q.Prime → ¬ InPi (G := G) q := by
   by_contra h
   push Not at h
   obtain ⟨ctr⟩ := exists_counterexampleHypothesis hG h
-  exact counterexample_contradiction hG ctr
+  exact counterexample_contradiction hG hnoV ctr
 
 /-- **Peterfalvi (12.7)**: every maximal subgroup of type I is Frobenius, with kernel `M_F`.
 
@@ -665,6 +672,7 @@ and gives the Frobenius decomposition with kernel `M_F = typeF.H` and complement
 `kernel_eq_MF` carrier is vacuous here: the `frobenius` field already names `typeF.H = M_F` as the
 kernel, so the identification holds definitionally.) -/
 theorem typeI_frobenius [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hType : IsTypeI M) :
     ∃ data : TypeIFrobeniusData M, data.kernel_eq_MF := by
   obtain ⟨data⟩ := hType
@@ -672,7 +680,7 @@ theorem typeI_frobenius [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
            complement := data.typeF.U.subgroupOf M
            kernel_eq_MF := True
            kernel_eq_MF_holds := trivial
-           frobenius := typeI_frobenius_of_pi_empty hG (pi_empty hG) hM data }, trivial⟩
+           frobenius := typeI_frobenius_of_pi_empty hG (pi_empty hG hnoV) hM data }, trivial⟩
 
 /-- **The type-I Dade support is `H#`** (Peterfalvi (8.3)/(12.1) for the witness subgroup `L`).
 `typeIA L = centralizerSupport (H#) L` collapses to `H# = (H : Set G) \ {1}` (`H = L_F`): the
@@ -685,10 +693,11 @@ Re-derives the `centralizerSupport = sharp` argument of
 cannot be cited here; a hub dedup hoisting that pure-group-theory fact to a shared file (e.g.
 `MaximalSubgroupType`) is tracked in issue 1013. -/
 theorem Hypothesis.typeIA_eq_sharp [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {L : Subgroup G} (hyp : Hypothesis L) :
     OddOrder.GroupTheory.typeIA L hyp.typeI
       = OddOrder.GroupTheory.sharpSubgroup hyp.typeI.typeF.H := by
-  obtain ⟨fdata, _⟩ := typeI_frobenius hG hyp.maximal ⟨hyp.typeI⟩
+  obtain ⟨fdata, _⟩ := typeI_frobenius hG hnoV hyp.maximal ⟨hyp.typeI⟩
   have hKf : fdata.typeI.typeF.H = hyp.typeI.typeF.H := by
     rw [fdata.typeI.typeF.H_eq, hyp.typeI.typeF.H_eq]
   exact hyp.typeIA_eq_sharp_of_frobenius (hKf ▸ fdata.frobenius)

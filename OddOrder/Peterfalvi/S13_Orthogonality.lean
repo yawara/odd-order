@@ -98,7 +98,7 @@ the conjugate difference `μ̄ − μ` of a reducible μ-column (`columnSum_muCo
 `w₂ ≥ 2`), `A₀`-supported and nonzero (odd-order no-real-characters).
 
 This is the unconditional `X`-side (𝒮(H₀C)-coherence) input of the honest (11.8.6) world-bridge union
-glue `S07.coherentUnion_of_glued_of_bridge`; contradicting (11.3) `S_H0C_not_coherent` closes (11.8) without the
+glue `S07.coherentUnion_of_glued_of_bridge`; contradicting the (11.3) non-coherence closes (11.8) without the
 false wide uniform-degree route (issue 1019). -/
 theorem coherent_sOf_H0C [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
@@ -999,9 +999,9 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (11.8), the genuine non-orthogonality — narrow `𝒮(H₀C)` route, refuter core**
 (the honest replacement of `S12.exists_zeta_residual_not_orthogonal`, which routed through the
 deprecated wide `Sset \ SHCSet` uniform-degree lemma, false for non-Galois type III/IV, issue
-1019).  The closing (11.3) noncoherence is the `hrefute` hypothesis (issue 1020 Phase 3), so the
-legacy `S_H0C_not_coherent` (via the partner-sorried `S12.S_not_coherent`) and the unconditional
-heir (`S_H0C_not_coherent_unconditional`, `S13_TypeDetermination`) instantiate one proof.
+1019).  The closing (11.3) noncoherence is the `hrefute` hypothesis (issue 1020 Phase 3),
+instantiated by the unconditional heir (`S_H0C_not_coherent_unconditional`,
+`S13_TypeDetermination`; the legacy sorried (11.3) route is retired, issue 9087).
 
 Under Hypothesis (10.1), there is an irreducible `ζ ∈ S = inducedFamily M` of degree `w₁` for which
 the residual `(μ₀ − ζ)^τ − ∑_i ω_{i0}^σ` is **not** orthogonal to `(Irr W)^σ`.  Same statement as the
@@ -1009,11 +1009,11 @@ S12 version; the proof reuses the S12 residual machinery (`exists_charParameters
 `exists_coherent_extension_h114_of_orthogonal`, `tau_muColumnSum_sub_dzeta_eq_of_residualData`)
 verbatim to build the coherent extension `ν` and the column identities `hcol` from the orthogonality
 assumption, then closes via the **narrow** capstone `coherent_SOf_H0C_of_column_identities`
-(coherence of `S(H₀C)`) contradicting (11.3) `S_H0C_not_coherent` — instead of the wide
-`S12.coherent_Sset_of_column_identities`/`S_not_coherent`.
+(coherence of `S(H₀C)`) contradicting the (11.3) non-coherence `hrefute` — instead of the wide
+`S12.coherent_Sset_of_column_identities`/(10.8) route.
 
 World-bridge threading: the residual machinery and the conclusion live in the §12 `hyp`-world, while
-the narrow capstone/refuter (`coherent_sOf_H0C`, `S_H0C_not_coherent`) live in the §13 `s13hyp`-world
+the narrow capstone/refuter (`coherent_sOf_H0C`, the (11.3) non-coherence) live in the §13 `s13hyp`-world
 (`s13hyp.base = hyp` propositionally, via `exists_hypothesis_of_isTypeIIIorIV`).  Since `s13hyp.base =
 hyp` holds only up to `hbase` (not definitionally), the whole goal is first `rw [← hbase]`-transported
 into the `s13hyp.base`-world, so the S12 machinery and the narrow endpoint share one world and the
@@ -1091,7 +1091,7 @@ theorem exists_zeta_residual_not_orthogonal_H0C_of_refuter [Finite G]
     rw [ClassFunction.finset_sum_apply]
     simp only [hall, Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, hz1]
     ring
-  -- (11.8.6) the narrow τ₃ union makes `S(H₀C)` coherent, contradicting (11.3) `S_H0C_not_coherent`.
+  -- (11.8.6) the narrow τ₃ union makes `S(H₀C)` coherent, contradicting the (11.3) non-coherence.
   -- `coh` = the `ν` (h_orth-derived `S(HC)` coherence) restricted to `S(HC) ⊆ SHCSet`
   -- (`isCoherent_of_subset`, keeping `coh.extension = ν.extension`); the narrow capstone consumes
   -- `hcol` and the unconditional `𝒮(H₀C)`-coherence (`coherent_sOf_H0C`, threaded inside).
@@ -1115,9 +1115,12 @@ hypotheses: the Clifford dichotomy (9.7) `clifford_dichotomy` splits into
   equality-configuration refutation `hrefuteEq` (`NineElevenEqualityRefutation`), both quantified
   over the dichotomy's caseA datum.
 
-Once the later 9083 phases discharge `hbound`/`hrefuteEq`, this becomes the unconditional (9.11);
-composed with the (11.7) transfer (`coherent_sOf_H0C_of_coherent_sOf_H0Cprime` + the reducible
-μ-column witness, as in `coherent_sOf_H0C`) it replaces the sole live sorry of that endpoint. -/
+The (11.3) non-coherence `hnc` and the type disjunction `htype` (the caseB inputs) are
+explicit hypotheses (instantiate with `S_H0C_not_coherent_unconditional` / `hyp.type_alt`
+downstream; issue 9087).  Once the later 9083 phases discharge `hbound`/`hrefuteEq`, this
+becomes the (9.11) at those inputs; composed with the (11.7) transfer
+(`coherent_sOf_H0C_of_coherent_sOf_H0Cprime` + the reducible μ-column witness, as in
+`coherent_sOf_H0C`) it replaces the sole live sorry of that endpoint. -/
 theorem coherent_sOf_H0Cprime_of_equality_refutation [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
@@ -1126,7 +1129,10 @@ theorem coherent_sOf_H0Cprime_of_equality_refutation [Finite G]
       NineElevenPairBound hyp caseA)
     (hrefuteEq : ∀ caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
         (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief),
-      NineElevenEqualityRefutation hyp caseA) :
+      NineElevenEqualityRefutation hyp caseA)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
+    (htype : IsTypeIII M ∨ IsTypeIV M) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
       (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) hyp.base.A0) := by
   haveI := hyp.base.finiteG
@@ -1138,8 +1144,7 @@ theorem coherent_sOf_H0Cprime_of_equality_refutation [Finite G]
     exact caseA_coherent_sOf_H0Cprime_of_refuter hG hyp caseA
       (caseA_refuter_of_equality_refutation hG hyp caseA (hbound caseA) (hrefuteEq caseA))
   · -- **caseB**: the landed norm-general coherence (issue 9075).
-    exact caseB_coherent_sOf_H0Cprime hG hyp hB.some (S_H0C_not_coherent hG hyp)
-      (hyp.base.isTypeIIIorIV hG)
+    exact caseB_coherent_sOf_H0Cprime hG hyp hB.some hnc htype
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11), reduced to the single (9.11.7)–(9.11.8) residual** (issue 9083
@@ -1148,36 +1153,43 @@ Phase E): with the (5.6) pair bound (`nineElevenPairBound`, Phase E-PairBound), 
 count, the (9.11.4) Mackey norm, and the (9.11.6) dichotomy
 (`nineElevenNormBound_of_sevenEightRefutation`) all landed, the coherence of `𝒮(H₀C′)`
 follows from the one remaining named input: the (9.11.7)–(9.11.8) coherent-pair
-construction `NineElevenSevenEightRefutation`, quantified over the caseA datum.  Once that
-is discharged, this becomes the unconditional (9.11) and replaces the live sorry of
-`coherent_sOf_H0C`. -/
+construction `NineElevenSevenEightRefutation`, quantified over the caseA datum.  The (11.3)
+non-coherence `hnc` and the type disjunction `htype` are explicit hypotheses (issue 9087). -/
 theorem coherent_sOf_H0Cprime_of_sevenEightRefutation [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
     (h78 : ∀ caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
         (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief),
-      NineElevenSevenEightRefutation hyp caseA) :
+      NineElevenSevenEightRefutation hyp caseA)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
+    (htype : IsTypeIII M ∨ IsTypeIV M) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
       (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) hyp.base.A0) :=
   coherent_sOf_H0Cprime_of_equality_refutation hG hyp
-    (fun caseA => nineElevenPairBound hG hyp caseA (S_H0C_not_coherent hG hyp)
-      (hyp.base.isTypeIIIorIV hG))
+    (fun caseA => nineElevenPairBound hG hyp caseA hnc htype)
     (fun caseA =>
       nineElevenEqualityRefutation_of_sevenEightRefutation hG hyp caseA (h78 caseA)
-        (S_H0C_not_coherent hG hyp) (hyp.base.isTypeIIIorIV hG))
+        hnc htype)
+    hnc htype
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11)** (Coq `Ptype_core_coherence`, `PFsection9.v:1484`): the family
-`𝒮(H₀C′)` is coherent — **unconditional**.  The (9.11.7)–(9.11.8) coherent-pair
-construction (`nineElevenSevenEightRefutation`, issue 9083 Phase E-final) discharges the
-last hypothesis of `coherent_sOf_H0Cprime_of_sevenEightRefutation`. -/
+`𝒮(H₀C′)` is coherent, **parametrized on the (11.3) non-coherence** `hnc` and the type
+disjunction `htype` (instantiate with `S_H0C_not_coherent_unconditional` / `hyp.type_alt`
+downstream; issue 9087).  The (9.11.7)–(9.11.8) coherent-pair construction
+(`nineElevenSevenEightRefutation`, issue 9083 Phase E-final) discharges the `h78`
+hypothesis of `coherent_sOf_H0Cprime_of_sevenEightRefutation`. -/
 theorem coherent_sOf_H0Cprime [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
-    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)] :
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
+    (htype : IsTypeIII M ∨ IsTypeIV M) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
       (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) hyp.base.A0) :=
   coherent_sOf_H0Cprime_of_sevenEightRefutation hG hyp
-    (fun caseA => nineElevenSevenEightRefutation hG hyp caseA (S_H0C_not_coherent hG hyp)
-      (hyp.base.isTypeIIIorIV hG))
+    (fun caseA => nineElevenSevenEightRefutation hG hyp caseA hnc htype)
+    hnc htype
 
 end OddOrder.Peterfalvi.S13

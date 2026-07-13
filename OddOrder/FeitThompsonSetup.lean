@@ -61,9 +61,11 @@ counterexample and Peterfalvi Section 16 hypotheses are available, BG Appendix C
 closes the contradiction. -/
 theorem noMinimalSimpleOdd_of_section16 {G : Type*} [Group G] [Finite G]
     (hG : IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Peterfalvi.S16.Hypothesis (G := G)) :
     False :=
-  BG.AppC.final_contradiction hG hyp
+  BG.AppC.final_contradiction hG hnoV hncH0C hyp
 
 /-! ## The single remaining upstream obligation
 
@@ -623,7 +625,8 @@ Mirrors the dichotomy branch of `theoremI_nilpotentHall_conjugacy_and_type_dicho
 exposing the canonical partner `T = Mstar` and its κ-Hall factors `K, K*` (dropped by the
 dichotomy).  Case (a) of (8.8) (every maximal Type I) is excluded by Peterfalvi (12.17). -/
 theorem exists_section16MaximalPair_data {G : Type*} [Group G] [Finite G]
-    (hG : IsMinimalSimpleOdd G) :
+    (hG : IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ IsTypeV M) :
     ∃ S T K Kstar : Subgroup G,
       S ∈ maximalSubgroups G ∧ T ∈ maximalSubgroups G ∧ S ≠ T ∧
       IsTypeNonI S ∧ IsTypeNonI T ∧ (IsTypeII S ∨ IsTypeII T) ∧
@@ -656,7 +659,7 @@ theorem exists_section16MaximalPair_data {G : Type*} [Group G] [Finite G]
         · exact Or.inr (Or.inr (Or.inl hIV))
     · exact Or.inl (hbII.mpr ⟨hP, hk⟩)
   by_cases hall : ∀ M : Subgroup G, M ∈ maximalSubgroups G → IsTypeI M
-  · obtain ⟨cb⟩ := Peterfalvi.S14.theorem88_caseB_holds hG
+  · obtain ⟨cb⟩ := Peterfalvi.S14.theorem88_caseB_holds hG hnoV
     exact absurd (hall cb.S cb.S_maximal)
       (BG.Ch4.S16.not_isTypeI_of_isTypeNonI hG cb.S_maximal cb.S_nonI)
   · push Not at hall
@@ -898,7 +901,9 @@ complements `U, V` with `M' = M_F ⊔ U` and `K ≤ N_G(U)` (Peterfalvi (13.1.b)
 Def (8.4)"), the primality of `|K|, |K*|` (BG Theorem C(10); type II–IV via the type data,
 Type-V via the partner argument), and the ordering `q < p` (Peterfalvi (13.2.a)). -/
 noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Group G] [Finite G]
-    (hG : IsMinimalSimpleOdd G) (mp : Section16MaximalPair G) :
+    (hG : IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ IsTypeV M)
+    (mp : Section16MaximalPair G) :
     Section16TypePStructure mp := by
   -- **W-side** from `mp`'s canonical partner witness (`typeP_pair_W_structure`, BG 14.7).  A Hall
   -- `(κ ∪ σ)'`-subgroup `U₀` of `S` (needed only to invoke the lemma) comes from Hall's theorem.
@@ -929,7 +934,7 @@ noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Gro
   haveI : IsCyclic ↥mp.Kstar :=
     isCyclic_of_injective (Subgroup.inclusion (le_sup_right : mp.Kstar ≤ mp.K ⊔ mp.Kstar))
       (Subgroup.inclusion_injective _)
-  have hprimes := Peterfalvi.S12.theorem88_caseB_prime_orders hG
+  have hprimes := Peterfalvi.S12.theorem88_caseB_prime_orders hG hnoV
     { S := mp.S, T := mp.T, W1 := mp.K, W2 := mp.Kstar, W := mp.K ⊔ mp.Kstar,
       S_maximal := mp.S_maximal, T_maximal := mp.T_maximal, S_ne_T := mp.S_ne_T,
       W_eq := rfl, W_cyclic := mp.Z_cyclic,
