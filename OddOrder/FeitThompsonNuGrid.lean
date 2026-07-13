@@ -206,6 +206,50 @@ theorem colT_injective : Function.Injective (colT hG mp tp) := by
     omegaS_pair_injective hG mp tp hω
   exact congrArg Prod.fst hp
 
+/-- The transported T-side row enumeration is bijective. -/
+theorem rowT_bijective : Function.Bijective (rowT hG mp tp) := by
+  apply (Fintype.bijective_iff_injective_and_card _).mpr
+  refine ⟨rowT_injective hG mp tp, ?_⟩
+  simp only [Fintype.card_fin]
+  exact (cardCertainTypeT_W1 hG mp tp).symm
+
+/-- Reindexing equivalence for the T-side rows. -/
+noncomputable def rowTEquiv :
+    Fin tp.p ≃ Fin (Nat.card ↥(mp.certainTypeT hG).W1) :=
+  Equiv.ofBijective (rowT hG mp tp) (rowT_bijective hG mp tp)
+
+/-- The transported T-side column enumeration is bijective in the certain-type column-dual
+presentation. -/
+theorem colT_bijective : Function.Bijective
+    (fun i : Fin tp.q =>
+      show (((mp.certainTypeT hG).W2.subgroupOf
+        ((mp.certainTypeT hG).W1 ⊔ (mp.certainTypeT hG).W2)) →* ℂˣ) from
+        colT hG mp tp i) := by
+  classical
+  apply (Fintype.bijective_iff_injective_and_card _).mpr
+  refine ⟨fun _ _ h => colT_injective hG mp tp h, ?_⟩
+  have hcard :=
+    (mp.certainTypeT hG).sdiffTICyclicHypothesis.card_charGroup_subgroupOf
+      (mp.certainTypeT hG).sdiffTICyclicHypothesis.W2_le_W
+  change Nat.card (((mp.certainTypeT hG).W2.subgroupOf
+      ((mp.certainTypeT hG).W1 ⊔ (mp.certainTypeT hG).W2)) →* ℂˣ) =
+    Nat.card ↥(mp.certainTypeT hG).W2 at hcard
+  simp only [Fintype.card_fin]
+  rw [← Nat.card_eq_fintype_card]
+  exact (hcard.trans (cardCertainTypeT_W2 hG mp tp)).symm
+
+/-- Reindexing equivalence for the T-side columns. -/
+noncomputable def colTEquiv :
+    Fin tp.q ≃
+      (((mp.certainTypeT hG).W2.subgroupOf
+        ((mp.certainTypeT hG).W1 ⊔ (mp.certainTypeT hG).W2)) →* ℂˣ) :=
+  Equiv.ofBijective
+    (fun i : Fin tp.q =>
+      show (((mp.certainTypeT hG).W2.subgroupOf
+        ((mp.certainTypeT hG).W1 ⊔ (mp.certainTypeT hG).W2)) →* ℂˣ) from
+        colT hG mp tp i)
+    (colT_bijective hG mp tp)
+
 /-- T-side `ν`-grid from the certain-type characters of `mp.T`. -/
 noncomputable def nuT (i : Fin tp.q) (j : Fin tp.p) : ClassFunction ↥mp.T ℂ :=
   (((mp.certainTypeT hG).columnFamily (colT hG mp tp i)).mu
@@ -263,6 +307,91 @@ theorem deltaPrimeT_zero_eq_one :
     deltaPrimeT hG mp tp ⟨0, tp.q_prime.pos⟩ = 1 := by
   rw [deltaPrimeT, colT_zero hG mp tp]
   exact ((mp.certainTypeT hG).certainType_zero_column_anchor).1
+
+/-- **Peterfalvi (4.5.a), T-side**: each canonical `ν`-row sum is induced from an
+irreducible character of `T'`, and a non-anchor row is nontrivial on `tp.W1`. -/
+theorem nuT_rowSum_eq_induce (i : Fin tp.q) :
+    ∃ ψ : ClassFunction ↥((derivedInG mp.T).subgroupOf mp.T) ℂ,
+      IsIrreducibleCharacter ψ ∧
+      (∑ j : Fin tp.p, nuT hG mp tp i j) =
+        ClassFunction.induce ((derivedInG mp.T).subgroupOf mp.T) ψ ∧
+      (i ≠ ⟨0, tp.q_prime.pos⟩ →
+        ¬ (((tp.W1.subgroupOf mp.T).subgroupOf
+            ((derivedInG mp.T).subgroupOf mp.T) :
+              Set ↥((derivedInG mp.T).subgroupOf mp.T)) ⊆
+          Peterfalvi.S03.characterKernel ψ)) := by
+  refine ⟨ClassFunction.restrict ((derivedInG mp.T).subgroupOf mp.T)
+      (((mp.certainTypeT hG).columnFamily (colT hG mp tp i)).mu 0 :
+        ClassFunction ↥mp.T ℂ), ?_, ?_, ?_⟩
+  · exact (mp.certainTypeT hG).certainTypeRestrict_isIrreducible _
+  · calc
+      (∑ j : Fin tp.p, nuT hG mp tp i j) =
+          ∑ j' : Fin (Nat.card ↥(mp.certainTypeT hG).W1),
+            (((mp.certainTypeT hG).columnFamily (colT hG mp tp i)).mu j' :
+              ClassFunction ↥mp.T ℂ) := by
+        simp only [nuT]
+        exact Equiv.sum_comp (rowTEquiv hG mp tp)
+          (fun j' => (((mp.certainTypeT hG).columnFamily
+            (colT hG mp tp i)).mu j' : ClassFunction ↥mp.T ℂ))
+      _ = _ := ((mp.certainTypeT hG).induce_restrict_certainType_eq _).symm
+  · intro hine hsub
+    have hχ₂ne : colT hG mp tp i ≠ 1 := by
+      rw [← colT_zero hG mp tp]
+      exact fun h => hine (colT_injective hG mp tp h)
+    refine (mp.certainTypeT hG).not_subset_characterKernel_chiRestrict_of_ne_one
+      hχ₂ne ?_
+    have hseq : ((tp.W1.subgroupOf mp.T).subgroupOf
+          ((derivedInG mp.T).subgroupOf mp.T)) =
+        (((mp.certainTypeT hG).W2).subgroupOf
+          ((derivedInG mp.T).subgroupOf mp.T)) := by
+      rw [certainTypeT_W2_eq hG mp, tp.W1_eq_K hG]
+    exact hseq ▸ hsub
+
+/-- **Peterfalvi (9.8)/(9.11), T-side reverse dichotomy**: every reducible member of a
+kernel-filter family over `T'` is a non-anchor canonical `ν`-row sum. -/
+theorem nuT_reducible_dichotomy {X : Subgroup ↥mp.T} {ψ : ClassFunction ↥mp.T ℂ}
+    (hψ : ψ ∈ Peterfalvi.S08.inducedKernelFamily
+      ((derivedInG mp.T).subgroupOf mp.T) X)
+    (hred : ¬ IsIrreducibleCharacter ψ) :
+    ∃ i : Fin tp.q, i ≠ ⟨0, tp.q_prime.pos⟩ ∧
+      ψ = ∑ j : Fin tp.p, nuT hG mp tp i j := by
+  classical
+  haveI hcyc : IsCyclic ↥((mp.certainTypeT hG).W1 ⊔ (mp.certainTypeT hG).W2) :=
+    (mp.certainTypeT hG).isCyclic_sup
+  letI : CommGroup ↥((mp.certainTypeT hG).W1 ⊔ (mp.certainTypeT hG).W2) :=
+    IsCyclic.commGroup
+  letI : Fintype ↥mp.T := Fintype.ofFinite _
+  letI : Fintype ↥(mp.certainTypeT hG).K := Fintype.ofFinite _
+  letI : Fintype ↥((mp.certainTypeT hG).W1 ⊔ (mp.certainTypeT hG).W2) :=
+    Fintype.ofFinite _
+  obtain ⟨θ, hθne, hθker, rfl⟩ := hψ
+  have hFk : ∀ i : Fin tp.q, (∑ j : Fin tp.p, nuT hG mp tp i j) =
+      ClassFunction.induce (mp.certainTypeT hG).K
+        (((mp.certainTypeT hG).chiRestrict (colTEquiv hG mp tp i) :
+          ClassFunction ↥(mp.certainTypeT hG).K ℂ)) := by
+    intro i
+    rw [(mp.certainTypeT hG).coe_chiRestrict,
+      (mp.certainTypeT hG).induce_restrict_certainType_eq]
+    simp only [nuT]
+    exact Equiv.sum_comp (rowTEquiv hG mp tp)
+      (fun j' => (((mp.certainTypeT hG).columnFamily
+        (colT hG mp tp i)).mu j' : ClassFunction ↥mp.T ℂ))
+  obtain ⟨χ₂', hχ₂'⟩ :=
+    ((mp.certainTypeT hG).induce_not_isIrreducible_iff θ).mp hred
+  have hχ₂'ne : χ₂' ≠ 1 := by
+    rintro rfl
+    rw [(mp.certainTypeT hG).chiRestrict_one_eq_trivial] at hχ₂'
+    exact hθne hχ₂'.symm
+  refine ⟨(colTEquiv hG mp tp).symm χ₂', ?_, ?_⟩
+  · intro h0
+    apply hχ₂'ne
+    calc
+      χ₂' = colTEquiv hG mp tp ((colTEquiv hG mp tp).symm χ₂') :=
+        (Equiv.apply_symm_apply _ _).symm
+      _ = colTEquiv hG mp tp ⟨0, tp.q_prime.pos⟩ := by rw [h0]
+      _ = 1 := colT_zero hG mp tp
+  · rw [hFk, Equiv.apply_symm_apply, hχ₂']
+    exact rfl
 
 /-- **Peterfalvi (13.1.e), T-side**:
 `Ind_W^T (ω_{ij} - ω_{i0}) = δ'_i (ν_{ij} - ν_{i0})`. -/
