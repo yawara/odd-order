@@ -279,6 +279,7 @@ import OddOrder.Peterfalvi.S15_CaseBReducibleCoherence
 import OddOrder.Peterfalvi.S15_NineElevenSteps
 import OddOrder.Peterfalvi.S15_NineElevenSevenEight
 import OddOrder.Peterfalvi.S15_CaseACoherence
+import OddOrder.Peterfalvi.S15_CharacterDegreeSupply
 import OddOrder.Peterfalvi.S15_SAndT_Setup.CoherenceEtaOrthogonality
 import OddOrder.Peterfalvi.S16_CaseBOrder
 import OddOrder.Peterfalvi.S16_G0Coprime
