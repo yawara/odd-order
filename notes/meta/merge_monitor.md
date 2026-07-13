@@ -270,6 +270,22 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > 逸脱; b はこの entry point を専有維持)。判定 = decl 単位 (混在 leaf)。merge-safety 全通過確認済
 > (build green 4177 / sorry 65→65 / 新 axiom なし / b entry point preserved decl 16→16 / b 非 ahead で
 > collision なし)。**(10.8) 閉包 landing で失効**。詳細 = issues/0101「HUB RECONCILIATION」節。
+> **carve-out (issue 2035, hub 裁定 2026-07-14 監視 tick 20 — merge 側で記録)**:
+> `OddOrder/Peterfalvi/S11_MaximalII_III_IV/InnerCompHom.lean` の **caseB-Xi / `CliffordCaseBData`
+> reverse-characterization 系宣言** (`caseB_xiOf_H0C_eq_induce_hcPsi` / `caseB_xiOf_H0Cprime_eq_induce_hcPsiPair` /
+> `isIndHC_of_source_eq_induce_hcPsiPair` 等、S11 (9.11) caseB Clifford 対応) は名目上 lane a の S11 regex
+> (`S(0[3-9]|1[0-3])`) に掛かるが **lane b 所有**として扱う (carve-out 0101/9076/9014 と同型 = 名目 regex でなく
+> 内容で割当; 0101 の S11 (9.11) caseB coherence carve-out の同ディレクトリ拡張)。根拠 (hub 自律裁定):
+> (1) genuine b content — `CliffordCaseBData` (b の landed 9094 vocabulary) は同 dir の `ChiefFactorCore.lean`
+> で定義、本 file は `CaseBXi` を import する caseB-exhaustion 機械 = b の 9094/2035 char cascade;
+> (2) **lane a は本 file 非接触** (a 現 0 ahead、`InnerCompHom.lean` の非-refactor 履歴は b の commit のみ;
+> dir 内の唯一の a feature commit 30a256cf (11.9.c) は別 file `ThetaCountAssembly.lean` で main 既 merge の
+> past work); (3) **a の S13 (9.7.b) 一様 route の dup でない** (3 宣言とも S13/S11_NineEleven の main に不在 =
+> 0101「b は (9.7.b) 再構築禁止」に抵触せず — これは 9094 CliffordCaseBData の caseB であって (9.7.b) route でない);
+> (4) sorry-free・純 additive (+328/-0)・build green 4197 / AxiomsCheck OK 2399 / 新 axiom なし。b は S15 caseB
+> wiring (set-artifact) を自ら revert し InnerCompHom lemma のみ保持 (2035 #34 self-flag) = 「軌道修正で保全」自己適用。
+> ⟹ step 1.5 で b が InnerCompHom の caseB-Xi/CliffordCaseBData 宣言を編集しても逸脱でない (a が編集したら逸脱;
+> dir の (11.9.c) `ThetaCountAssembly` 系は従来どおり decl-unit で a 領域)。詳細 = issues/2035 #34。
 > **carve-out (issue 9076, hub 裁定 2026-07-08 監視 tick)**: `OddOrder/Peterfalvi/S05_GridRigidity.lean`
 > (lane c が新規作成、Pf (3.8) abstract norm-2 rigidity engine `orthonormalGrid_diff_rigidity` = S05 σ-image
 > と S15 η-grid を de-dup する module-generic 核) は名目上 lane a の S05 regex に掛かるが、issue 9076
@@ -607,6 +623,18 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 20) — a+b 合流: a=Isaacs Ch07 maximal-bad-subgroup=p-core + b=S11 (9.11) caseB reverse-characterization (hub carve-out)**:
+  **a=1** (`6036cc4f` = Isaacs Ch07 issue 0031。`S7C_ThompsonPComplement` +271/`Basic` -30 + AxiomsCheck +10。
+  ⚠ diff に `-theorem lt_normalizer_inf_sylow_of_lt` が出たが **removed@Basic + re-added@S7C の byte-identical
+  relocation** (statement 保持、consumer Main.lean 685/756 無傷、build green で確認) = 削除でなく自 file 間移設。
+  scope Isaacs shared-foundation additive ✓)。**b=1** (`6bfd6b38` = S11 (9.11) caseB reverse-characterization
+  Clifford 機械 `caseB_xiOf_H0Cprime_eq_induce_hcPsiPair` 等を `S11_MaximalII_III_IV/InnerCompHom.lean` に
+  +328/-0 sorry-free。**hub 自律裁定で carve-out 付与** (上記 carve-out 節、= 内容で b 割当・a 非接触・a の
+  (9.7.b) route dup でない・(11.9.c) 別 file、0101 の同 dir 拡張)。b は S15 caseB wiring を自ら revert し
+  lemma のみ保持 (2035 #34) = 軌道修正で保全の自己適用)。c=0。
+  build green **4197 jobs** / AxiomsCheck OK (**2399** assertion 全 allowlist) / **count-sorry 51→51 不変** /
+  新 axiom なし / 逸脱なし (b は carve-out で in-scope 化)。size watch: InnerCompHom **1678** (2000 未満だが
+  +328 で成長 — 次追記で prefix-split 検討)、S7C 637。
 - **2026-07-14 (tick 19) — a 合流: Isaacs Ch07 descend Thompson local hypotheses (Thm 7.1 継続)**:
   **a=1** (`fc19d7e7` = Isaacs Ch07 issue 0031。`S7C_ThompsonPComplement.lean` +77 (自 file 継続、0→0 sorry、
   計 366 行) + AxiomsCheck +6)。scope: Isaacs/** shared foundation additive ✓。b=0 / c=0。
