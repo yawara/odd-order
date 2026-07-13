@@ -1692,3 +1692,37 @@ bare sorry を除去し、generic (9.11) 装置への **sorry-free assembly** �
 3. (9.11.5)-(9.11.8) `|𝒮₄| ≤ N`: `nineElevenSevenEightRefutation` mirror (最深部) — indS/A(S) 再接地
    (c₁/c₃ coherence congrMap、`exists_bridge_target_of_budget`+`isCoherent_union_pair_of_bridge`、
    case-agnostic `sSet_memberRFamily` cross-orthogonality、Bessel)。
+
+## 2026-07-13 更新 #51 (lane b, /loop) — 𝒮₃-coherence landed + (9.11.4) support の設計確定
+
+**landed**: `sSet_sThree_coherent_dade` (commit 2d6a993e) = (9.11.6) の τ₃。caseB assembly の供給
+pattern を family = `sSet \ S₂` に差し替えて `uniform_degree_coherence_of_families` を発火 (一発 green)。
+等度数 diff 台は `sSet_scaledDiff_support` の c := 1 特殊化。axioms = 受理済 dadeHypS 基盤のみ。
+
+**(9.11.4) norm inputs mirror の設計解析 (実装は次 iteration)**:
+- generic 供給は全部ある: `nineElevenGamma_{support,mem_ZIrr,apply_one,inner_self_mul_u,inner_induceHU}`
+  + `cfnorm_sub_irreducible_orthogonal` + `mem_ZIrr_inner_self_eq_sum_sq` (全て data-parametrized)。
+  ψ₁ 選択 = hcount nonempty 経由 (M-side 1076-1095 mirror)。
+- **唯一の S-specific 難所 = `Supp(α) ⊆ A(S)`**。M-side は `A(M) = (M′)^#` が定理で
+  `mderivSharp_subset_A0` により自明だが、**S (type P₂) では A(S) ⊊ (S′)^# が strict**
+  (`honestTypeP2ASet` = {y ∈ S′ | y≠1, ∃x ∈ Msigma^#, y ∈ C_G(x)}, `mem_honestTypeP2ASet`;
+  H = P = S_σ = Msigma)。**Coq はここに gap-patch を当てている (PFsection9.v:1478-1484 コメント)**:
+  book は「U₁ ⊆ 1∪A(M) ⟹ 'obviously' HU₁ ⊆ 1∪A(M)」と書くが 1∪A(M) は部分群でなく非自明 —
+  Coq は HU₁ の可解性 + Hall の定理で埋めた。
+- **Lean 化の道筋 (Hall 論法)**: y ∈ (HU₁)^g \ {1} (supp γ ⊆ ⋃ conj HU₁) に対し ⟨y⟩ の commuting
+  Hall 分解で (i) y の H-part h ≠ 1 → h ∈ ⟨y⟩ ∩ H^# (H normal) → y ∈ C(h) ⊆ A(S)。
+  (ii) h = 1 (y は σ′-元) → 可解 HU₁ 内の Hall 共役で y ∈ U₁^{g′} → **U₁ = C_U(H₁) が H₁ ≠ ⊥ を
+  中心化**する事実で y ∈ C(h₁) ⊆ A(S)。
+- **⟹ TRUE signature の要請: support residual は witness の中心化性を持つ形でしか真でない**
+  (汎用 `NineElevenTwoTIWitness` の opaque ∃-U₁ では、U/C Frobenius 縮退を除外できず
+  U₁^# ⊄ A(S) がありうる)。generic producer `nineElevenTwoTIWitness_of_degree_dichotomy` は実は
+  **両分岐とも witness = `cuSubOf caseA ⟨0,hq0⟩`** を返すが Prop が ∃ で隠している。
+- **次 iteration の実装計画**:
+  1. `cuSubOf_zero_tiWitness_of_degree_dichotomy` (S15 側): TI-identity を witness = cuSubOf ⟨0,hq0⟩
+     の**明示形**で返す strengthened producer (generic producer body の mirror ~80 行; 部品
+     `exists_conj_smul_cuSubOf_eq`/`nineElevenTwo_relIndex_dichotomy`/`relIndex_lt_relIndex_of_le_of_ne`
+     等は全て public generic)。lane-a 所有 file は触らない (S15 に置く)。
+  2. named residual `nineElevenAlphaSupportS`: U₁ := cuSubOf caseA i 明示 +
+     `Supp(Ind_{H⊔U₁}^S 1 − ψ₁) ⊆ A(S)` (Hall 論法; supp γ ⊆ ⋃ conj HU₁ の一般 lemma +
+     `honestTypeP2ASet_conj_mem` + cyclic Hall 分解 + Hall 共役定理)。
+  3. `nineElevenFourNormInputsS` bundle: 1+2+generic γ-facts の配線 (M-side 1063-1176 mirror)。
