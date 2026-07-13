@@ -639,3 +639,39 @@ extension、landed)。
 - **次 iteration**: mu_tau1red port に着手 — Coq PFsection13.v の mu_tau1red / (13.6)
   FTtypeP_sum_Ind_Fitting_lb / (13.7) FTtypeP_sum_cycTIiso10_lb を精読し S-side statement を設計、
   chunk 分割して build (subagent 委譲可)。
+
+## 2026-07-13 更新 #4 (lane b, /loop) — ★再診断: 3 fields は (13.3.c)、"(13.6)-(13.9) port" は誤り
+
+**更新 #3 の「次 = mu_tau1red (13.6)-(13.9) deep port」は誤診断。撤回する。** Coq PFsection13 精読で確定:
+
+- **(13.3.c) は (13.6)-(13.9) の上流**: `FTtypeP_coherence` (13.3.c main, `PFsection13.v:347`) と
+  `FTprTIsign` (13.3.c first δ=1, `:281`) は、norm-bound machinery `FTtypeP_sum_Ind_Fitting_lb`
+  (13.6, `:595`) 等より**前**に証明される。Coq Section-local lemma は順序証明ゆえ前方依存は構文上
+  不可能。Coq コメント (`:335-337`) も「(13.3.c) の reformulation は (13.7)(13.8)(13.9) *で使われる*」と
+  明記 = (13.3.c) は下流でなく上流。`FTtypeP_coherence` の実依存は `FTtypeP_facts` (13.2 coherence) +
+  `uniform_prTIred_coherent` (**PFsection4**) + `FTtypeP_coherent_TIred` (**PFsection8**) + `delta1`。
+  **どれも (13.6)-(13.9) でない。** ⟹ mu_tau1red / P1_int2_lb / FTtypeP_sum_*_lb の port は**不要**。
+
+### CharacterDegreeData 9 fields の正しい状態 (grep 検証済)
+
+| field | Pf | 状態 |
+|---|---|---|
+| tau1S (carrier) | (13.2.d) | `tau1S_ofHonest` landed。chief = `S11.exists_chiefFactorData hG data` |
+| tau1S_inner_induce | (13.2.d) | engine `tau1S_ofHonest_inner_induce` landed (要 P⊄Ker 署名 amend) |
+| tau1S_induce_mem_ZIrr | | engine `tau1S_ofHonest_induce_mem_ZIrr` landed |
+| tau1S_induce_inner_eta | (5.3.b) | engine `coherentIndS_image_inner_eta_eq_zero` / `coherent_extension_orthogonal_eta_of_mem_Sset` landed |
+| tau1S_apply_induce_sub | (13.2.e) | `extends_on_supported` + H^#⊆A(S) route |
+| mu_j_linear_induced | (13.3.a) | `mu_j_isIndPC` landed |
+| **delta_eq_one** | (13.3.c-first) | **S-side `delta_eq_one_S` 証明済** (`u_modEq_one`+`mu_apply_one_eq_u`)。T-side (deltaPrime) = swap+`delta_eq_one_S(swap)` だが `IsTypeP2 T` 要 → `T_typeII` は **S16 (TTypeII.lean:986)** = character_degree_analysis (S15 Machinery135) の**下流** ⟹ producer 内で使うと循環。**layering 課題** (下記) |
+| **lambda** (+3 fields) | (13.3.b) | **未実装**。最多消費 (Canon:79/150/209/523, NormEstimates:799, CountingLayer:1770)。typeP_Galois 場合分け (calS 全 reducible 時に irr λ が在るか) の subtlety あり — 要設計確認 |
+| **mu_col_tau1_eta_col_one / mu_tau1_formula** | (13.3.c-main) | **未実装 = keystone**。`tau1S(∑ᵢμᵢⱼ)=δⱼ∑ᵢηᵢⱼ` の coherence-pin。S11-world analog = `coherent_sOf_H0C_extension_muColumnSum_pin_of_irr` (S13_Orthogonality:290, γ-trick+正定値 pin)。S15 world 未実装。mu_col は formula + mu_j_isIndPC の系 |
+
+### frontier = (13.3) assembly campaign (multi-iteration)
+
+genuinely-missing な S-side math: **(13.3.b) lambda 構成** (document 順で先) と **(13.3.c) formula keystone**。
+T-side (deltaPrime / tau1T carrier) は S16 layering 複雑 (character_degree_analysis が IsTypeP2 T を
+どこで得るか = producer 署名に IsTypeP2 T を追加するか、T_typeII を上流移設するか、の設計判断)。
+
+**着手方針**: 難所回避せず (13.3.c) keystone formula `tau1S_ofHonest(∑ᵢμᵢⱼ)=δⱼ·∑ᵢηᵢⱼ` を S15 world で
+build (S13_Orthogonality の γ-trick pin を S15 coherence に port/bridge)。δ=1 は `delta_eq_one_S` で
+`=∑ᵢηᵢⱼ` に。次いで (13.3.b) lambda。**subagent 委譲は "port (13.6)-(13.9)" では NG** (誤ターゲット)。
