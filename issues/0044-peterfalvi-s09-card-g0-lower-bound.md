@@ -1299,3 +1299,29 @@ orthogonal` (Pf 11.8)** (S12_MaximalIII_IV_V.lean:3633)。feitThompson は §12�
 「いったん区切り」)。**次 session は loop 再開前にこの判定を確認**し、S12 (11.8) か card_G0 完遂かを選ぶ。
 delta-reality 成果 (dadeMap_conj/coherence_extension_conj/delta_isReal/hbeta_conj_sub/
 hypothesis78_delta_isReal) は genuine・保存済で再利用可。
+
+---
+
+## cont.⁴⁹ — 再開 (2026-07-13): ON-PATH 復帰確定、frontier = CharacterEstimateData assembly
+
+**cont.⁴⁸ の OFF-PATH 判定は stale 化** (9087 RULING #4 3/3 landing、2026-07-13):
+(12.17) TypeICovering carve-out 完遂により live spine trace が復活 —
+`card_G0_lower_bound` (7.10) → `not_trivial_G0` (7.11) → `not_all_maximal_typeI` →
+`theorem88_caseB_holds` → **FeitThompsonSetup:548 (spine)**。#print axioms 全数 probe で
+(12.17) chain の残 dirty root は (7.10) と (12.6)(c1) `sibleyTarget_frobI` (b territory) の
+正確に 2 本 (9087 追記参照)。lane a は upstream-first + 文書順 + a-territory (S09) により本 issue を再開。
+
+**再開時 frontier (確認済)**:
+- S09 cluster の sorry は `card_G0_lower_bound` 本体の 1 本のみ
+  (`hdata : F.CharacterEstimateData := sorry`、FrobeniusFamily.lean:1021)。
+- cont.⁴⁷ 計画 step 1 (`hypothesis79` 2-family datum) は **landed 済**
+  (S09_FrobeniusHypothesis79.lean、dadeSupport_disjoint = kernelSpread_disjoint 経由)。
+- 残 = `CharacterEstimateData` (6 fields: i/hmin/B/B_avoids_min/Bsum_le/base_estimate) の
+  concrete assembly。入口は `characterEstimateData_of_family71_coherent_zeta_source_data`
+  (concrete (7.5) FamilyHypothesis71 + coherent image + (7.8.b) source data +
+  (7.9) decomposition を一括接続、notes 2026-06-05 pass) — 残る義務は
+  「教科書の concrete source-data package を存在させる」こと:
+  (a) minimal index i の選択 (argmin h)、(b) 𝓑-set 構成 ((7.9) dichotomy `hypothesis79`
+  conclusion → good index)、(c) (7.9) orthogonal integer decomposition (v/x/Γ₁)、
+  (d) (7.8.b) source data (hind_norm/hzeta_ind/irr/distinct/degree/hsmall)、
+  (e) FamilyHypothesis71 instance。hdelta_even assembly (cont.⁴⁷ 残) は (d)-(7.9) parity 側。
