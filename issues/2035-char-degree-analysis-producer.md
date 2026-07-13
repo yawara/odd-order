@@ -570,3 +570,27 @@ support だけ差し替え)。**helper 3 は speculative sorry で前倒しせ�
   sS1S closure で完全 sorry-free 化。`tau1S_apply_induce_sub` は別 gap (#6 の A₀(S) support-widening)。
 
 **戦略的岐路**: (13.3) 完遂 + broad §13 は **prime-TI residue API** (major ~2-3 session infra port) に gated。
+
+## 2026-07-13 更新 (lane b, /loop) — (9.11) S-instance coherence landed による gap#2 再評価
+
+**本日 issue 1017 で `sSet_coherent_indS_A` (S-instance (9.11) coherence、support = A(S)) が
+closed** (caseA: alphaSupport + sevenEight 全討伐、残 sorryAx = dadeHypS parity のみ)。これによる
+本 issue への影響:
+
+1. **gap#2 (support-widening) は A(S) で解消の見込み**: 旧診断は「foundation の support (C')^# が
+   H^# を含まない」だったが、**H^# ⊆ A(S) が成立** (h ∈ H^# = Sσ^# は x := h 自身を Sσ^#-witness
+   に y ∈ C(x) を満たし、H ≤ S′ ゆえ mem_honestTypeP2ASet の 3 条件を満たす)。つまり
+   A₀(S)-widening を待たず、A(S)-coherence (`coherent_H0Cprime_S` を sSet_coherent_indS_A ベースに
+   re-point 済のもの) の `extends_on_supported` が zero-degree の H^#-supported 差を被覆する。
+   `tau1S_apply_induce_sub` はこの route で buildable 候補。
+2. **⚠ field 署名の宿題は残る**: `CharacterDegreeData.tau1S_apply_induce_sub` / `tau1S_inner_induce`
+   / `tau1S_induce_mem_ZIrr` は ∀ irr θ (P⊄Ker 無し、equal-degree 無し) のまま。update #6 の指摘
+   通り P⊄Ker (と apply_induce_sub は zero-degree 化 or 別処理) の要否を consumer
+   (Canonicalization:277/1049, NormEstimates:806) の実引数と突き合わせて設計する必要。
+3. **残 field 対応表 (現状)**: inner_induce/mem_ZIrr = engine landed (P⊄Ker 付き) /
+   induce_inner_eta = (A) core engine landed / apply_induce_sub = 上記 route 1 /
+   mu_col_tau1_eta_col_one + mu_tau1_formula = **mu_tau1red (13.6)-(13.9) port (major、未着手)** /
+   mu_j_linear_induced (13.3.a) / delta_eq_one (13.3.c) = 要確認。
+
+**次**: b-sorry 再 census (subagent 実行中) の結果と突き合わせ、`character_degree_analysis`
+(Machinery135:178、S15 最上流 sorry) の assembly 設計 (field 署名調整の要否含む) に着手。
