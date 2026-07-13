@@ -1634,3 +1634,36 @@ subagent が one-shot で stop = 分解必須の signal)。
 
 真の gate は全解消済 (generic core reuse 可・R-family closed/case-agnostic・全 bridge landed)。残は M-scale の
 mirror 労力を (9.11.k) 単位で methodical に積む multi-session work。
+
+## 2026-07-13 更新 #49 (lane b, /loop) — nineElevenEqualityRefutationS を assembly 化: monolith → 2 named residual
+
+**S15 file split (issue 0113) 完了後、caseA 残 residual を分解**。`nineElevenEqualityRefutationS` の
+bare sorry を除去し、generic (9.11) 装置への **sorry-free assembly** に置換 (commit 参照):
+
+- **KEY FINDING (htype gate は S-side で消滅)**: M-side producer 群 (`caseA_two_summand_inertia_inputs`
+  / `caseA_nineElevenThree_count_inputs` / `caseA_nineElevenTwo_tiWitness`) の `htype`/`hncH0C` 入力は
+  「M-packaging の `hyp.H0Cprime` ↔ generic `cSub` 層の同一視 (`C_eq_cSub_of_noncoherent`)」**のみ**に
+  使われる。S-instance は `sSet_eq_sOf_H0Cprime` (定義的 dictionary) + `Cprime_le_C`/commutator-mono で
+  同じ配線が **gate 無しで**通る。`chars.C`/`chars.Uprime` は free field でなく **def** (= `cSub`/
+  `uprimeSub`、ChiefFactorCore:626/631) ゆえ `hCUprime` がそのまま generic `hCU` になる。
+- **assembly (全て直接 fire、sorry-free)**: `𝒮(H₀C)`-stratum 度数二分法 (hS3deg + 抽出) →
+  `S11.nineElevenTwo_two_summand_inertia` ((9.11.2) K₁⊓K₂) + `S11.nineElevenThree_orbit_split`
+  ((9.11.3) class eq、`hn := rfl`) + 数値 (q≥3 odd prime / u≥1 via `u_odd` / p=2a+1) →
+  `S11.nineElevenCaseA_equality_refutation` (tau-free core)。
+- **残 2 named residual (TRUE signature)**:
+  1. `nineElevenSTwoExtractionS` = (9.11.1) 𝒮₂ ⊆ 𝒮₁′ 飽和 bound 抽出 (M-side
+     `caseA_sTwo_subset_degreeQaCut` mirror、subset-cut 形で irr+mem+deg を同時供給)。
+  2. `nineElevenNormBoundS` = (9.11.4)-(9.11.8) norm bound (`∃ N, N·u = (a+1)u + (q−1)a² ∧ |𝒮₄| ≤ N`、
+     M-side `nineElevenNormBound_of_sevenEightRefutation` + `nineElevenSevenEightRefutation` mirror —
+     **M-side は両方 landed** (9083 Phase D/E discharged)、S-mirror は indS/A(S) 再接地労力)。
+- **M-side 状況の再確認**: `nineElevenSevenEightRefutation` (S11_NineElevenPairAdjoin:893) は
+  **discharged** (残 residual でない)。よって S-side の残りは真に mirror 労力のみ。
+- #print axioms (refutationS/squeeze/coherent_indS_A/coherent_H0Cprime_S) = 全て
+  `[propext, sorryAx, Classical.choice, Quot.sound]` (sorryAx = 2 residual + 受理済 dadeHypS)。
+  build green 4181 jobs。
+
+**次**: (1) `nineElevenSTwoExtractionS` を `caseA_sTwo_subset_degreeQaCut` mirror で実証明
+(S-side `sSet_mem_Snorm_pos` helper ~20 行 + cut 本体 ~95 行; 依存は全て landed —
+`sSet_subset_inducedKernelFamily` + `S08.inducedKernelFamily_inner_self_real_pos` +
+`sumnS_irreducible_constant_degree`)。(2) `nineElevenNormBoundS` を (9.11.4) norm inputs mirror /
+(9.11.6) dichotomy / (9.11.7)-(9.11.8) SevenEight mirror の sub-phase 順で。

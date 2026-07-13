@@ -35,3 +35,17 @@ created: 2026-07-13
 - CLAUDE.md「ファイル粒度」(2026-07-09 節: 1500 watch / 2000 hard / dir 化第一)
 - 同型 deferred split issue = 0110/0112 (active file)、0111 (closed)
 - issue 1017 (b の (9.11) S-instance campaign)、merge 70b8ef95 (1926 行到達)
+
+## 2026-07-13 CLOSED (lane b, 自主 prefix-split)
+
+b が caseA 継続前に自主 prefix-split を実施:
+
+- **新 sibling leaf `S15_SSetMemberRFamily.lean` (739 行)**: 凍結した reducible R-family 構成クラスタ
+  (`sSet_reducible_eq_muColumnSum` … `sSet_memberRFamily_orthogonal`、旧 40–737 行、16 宣言) を移設。
+  body は byte-identical (diff 検証済)、sorry 0。
+- **`S15_CaseBReducibleCoherence.lean` (1926 → 1222 行)**: caseB coherence
+  (`sSet_coherent_dade_caseB`/`sSet_coherent_indS_caseB`) + caseA (9.11) campaign + coherence assembly
+  + τ₁ engines を保持 (19 宣言、sorry 1 = `nineElevenEqualityRefutationS` residual)。新 sibling を import、
+  module 名不変 → 下流 import 無変更 (importer は OddOrder.lean のみ)。
+- OddOrder.lean に新 module import 追加。宣言数 35 = 16+19 保存、sorry 1 = 0+1 保存。
+- `lake build OddOrder` GREEN (4181 jobs, 9.5s)。両 leaf とも 1500 行未満 (理想値内)。
