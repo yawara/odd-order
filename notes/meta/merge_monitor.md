@@ -623,6 +623,14 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 22) — a+b 合流: a=Isaacs Ch07 p-separability + ★b=S_caseB_facts_no_lambda 完全証明 (sorry 実 discharge)**:
+  **a=1** (`455a310b` = Isaacs Ch07 issue 0031。`S7C_ThompsonPComplement` +144、0 sorry、計 996 行 + AxiomsCheck +2)。
+  **b=1** (`a8b777b6` = ★ **hbridge 完全 CLOSE — `S_caseB_facts_no_lambda` を完全証明** (sorry→proven)。
+  S15_CharacterDegreeSupply +259/-107 (proof restructure、decl 削除ゼロ、b 所有 leaf))。c=0。
+  build green **4197 jobs** / AxiomsCheck OK (**2404** assertion 全 allowlist) / **count-sorry 51→50 (実 discharge、
+  regression でなく前進)** — S15 sorry 4→3、残 3 = `deltaPrime_eq_one_T`/`tSide_theta_package_of_not_caseB_core`/
+  `T_caseB_facts_no_lambda` (原 4 の subset、新 regress なし hub 検証済) / 新 axiom なし / 逸脱なし。
+  size watch: S15 1566 / S7C 996 (共に 2000 未満)。9094 残 = T_caseB_facts_no_lambda 側 + NormEstimates 移行 (import DAG 制約)。
 - **2026-07-14 (tick 21) — a 合流: Isaacs Ch07 quotient normal complement in Step 2 (Thm 7.1 継続)**:
   **a=1** (`fc6fb9a1` = Isaacs Ch07 issue 0031。`S7C_ThompsonPComplement.lean` +215 (自 file 継続、0→0 sorry、
   計 852 行) + AxiomsCheck +8)。scope Isaacs shared-foundation additive ✓。b=0 / c=0。
