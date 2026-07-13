@@ -359,3 +359,48 @@ export するか、consumer 側で gap を threading する landing が次の T4
   (m_row_odd/m_col_odd → grid_mem)
 
 いずれか 1 本の発火で通知 (全部揃うのを待たない — c は 1 endpoint 単位で re-engage 可能)。
+
+## 🔬 2026-07-13 独立全数再検証 (ユーザー要請、workflow wf_905a48ba / 17 agents / 199万 tokens)
+
+ユーザーが「C レーンで本当にやることが無いか」を独立検証するよう指示。main 同期 (0 behind) 後、
+**6 gated sorry を各々 verify+敵対的 skeptic、加えて 4 descent probe** (shared-infra / 非S16 territory /
+trigger 発火 / off-path) を並列実行。**#print axioms を fresh rebuild で直接実行**して census-based の
+誤判定を潰した。**結論 = TRULY_EXHAUSTED を追認** (RULING #4 census と完全一致、精度向上)。
+
+**6 sorry の最終 gate (全て STILL_GATED、skeptic UPHELD)**:
+| sorry | gate | 検証で確定した実状態 |
+|---|---|---|
+| TTypeII:886 `hVcomm` | **a (RULING #3 leaf)** | ⭐ **下の nuance 参照** — deep math は done、残るは a の機械的抽出のみ |
+| SubgroupM:187 `hu_full` | **b** | (13.15) `caseB_order_u` = OrderDetermination.lean:774 **raw sorry** |
+| SubgroupM:247 t-side field-data | **a/b** | Singer engine proven、必須の `character_degree_analysis` (13.3) = Machinery135.lean:181 **raw sorry** (issue 2035) |
+| ComparingLM:353/356 `m_row/m_col_odd` | **b** | census route は **false positive**。#print axioms で `typeI_caseC_dichotomy`/`_dual_dichotomy` が **sorryAx 保持** (`V_inf_centralizer_Q_eq_bot` 13.12 T-side v-value = 9013 lane-b) と確認 |
+| ComparingLM:374 `grid_mem` | **b** | engine `etaGrid_projection_rigidity` は m_row/m_col の odd-parity を入力に要求 → parity gated ゆえ gated。閉じても新規 discharge 無 (純 sorry-count 削減) |
+
+**4 descent probe = 全て `ungated_work_found: false`**:
+- shared-infra (GroupTheory/Mathlib/Algebra ~140 leaf): **real sorry 0** (RULING #2 追認)。c の 6 gate は
+  どれも「未構築 shared leaf」に帰着しない (generic 前提は全て構築済 sorry-free)。
+- 非S16 territory: **Clifford 9002 完全** (全 leaf 0 sorry)、**9013 carve-out `reconciled_typePData_T` は
+  sorry-free** (CountingLayer.lean:757、残 2 sorry の 1619/1740 は lane-b territory)。
+- trigger 発火: **T1-T4 全て UNLANDED**。
+- off-path/engine-prep: gate map の「M-side betaGrid mirror」は既に done (T5 発火時)。c-buildable な残り無し。
+
+### ⭐ hVcomm の gate 性質が変化 (T1 refinement、hub 宛の最重要所見)
+
+`hVcomm` (TTypeII:886) の gate は**もはや「a/b の deep active math」ではない**:
+- 親定理 `T_not_isTypeIV_of_isTypeP1` が必要とするのは `¬ IsTypeIV hyp.base.T` のみ。その producer
+  **`not_isTypeIV_of_mem_maximalSubgroups`** (S13_NonGaloisExclusion.lean:1007) は **今 sorry-free**
+  (fresh rebuild + #print axioms = `[propext, Classical.choice, Quot.sound]`、no sorryAx)。(11.9.c) chain
+  全体 (`not_isTypeIV_of_hypothesis`/`U_isCyclic_of_hypothesis`/`not_cliffordCaseA_of_hypothesis`/
+  `S_H0C_not_coherent_unconditional`) も comment-strip 後 0 real sorry。
+- c が閉じられない唯一の理由 = **file-level import cycle** (`S13_NonGaloisExclusion` は
+  `S13_TypeDetermination` 経由で S16 を transitive import; BFS 確認)。∴ TTypeII から直接 cite 不可。
+- 解消 = **RULING #3 の S16-free 抽出 leaf `S13_TypeIVExclusionCore` を lane a が作る** (未着手、
+  `git log --all` で不在)。これは a territory の**機械的 refactor** で、依存する deep math は既に完了。
+
+**⟹ T1 の blocker は「a の active math 待ち」から「a の未着手な機械的 RULING #3 抽出待ち」に降格**。
+これは c の frontier を 1 sorry 縮める**最高レバレッジかつ今 unblock 済**の次手。hub は lane a に
+RULING #3 抽出 (5 補題を S16-free leaf へ) を driving し、landing 後に c へ hVcomm re-engage を通知するのが
+最善。他 5 sorry は依然 a/b の genuine な未証明 char/coherence/parity 待ちで c-unreachable。
+
+**posture 変更なし**: c は idle 継続 (gated-endpoint hold) が正しい。ユーザー再開は上記 T1 (a の leaf) or
+T2-T4 landing 時。検証は .lean 無変更 (docs のみ)。
