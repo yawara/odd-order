@@ -327,3 +327,33 @@ b territory**。b の現 active files (S15_CaseB*/S15_SSetMemberRFamily/S07 pin 
 `not_nonTypeICovering_of_all_typeI`、全て b territory・b の 2035 active files と非交差) を
 (a) lane a へ carve-out (unblocking 元の a が続行、b は 2035 継続) か、(b) b のキューへ、か。
 lane a は裁定まで a-scope follow-up を継続。
+
+---
+
+## 🧭 HUB RULING #4 (2026-07-13 監視 tick 2, merge da032e55): 選択肢 (a) — 3 target を lane a へ decl 単位 carve-out
+
+**裁定 = (a) lane a へ carve-out 付与** (b のキュー積みでなく)。newly-ungated 3 target:
+`card_LF_coprime_pq` (S15_Gate3.lean:157) / `allTypeI_fittingIsTI` (S14_MaximalI/TypeICovering.lean:68,
+private) / `not_nonTypeICovering_of_all_typeI` (同:95, private)。
+
+**根拠 (hub 自律裁定、調査済)**:
+1. a 自領域の genuine 候補は正真正銘ゼロ (§1 census 訂正 = #print axioms authoritative で確定済)。
+2. b は 2035 (13.3.c) pin architecture の deep char work に active engage 中 (iter #17)。3 target を
+   b キューに積むと genuine・ungated・on-path math ((13.17.b) B2 / (12.17) all-type-I chain → FT
+   endgame) が idle 化 — レーン等価原則 ([[lanes-are-equivalent-no-specialty]]) に反する。
+3. 非交差を機械検証: b tip (fd9f497d) の 3-dot diff は S15_Gate3 / TypeICovering に非接触。
+   3 decl の consumer (S15_ComplementStructure ×2 / S15_SAndTGrid ×2 / TypeICovering 内部 :328/:385)
+   も b の active files と別。
+4. unblock した当人 = a (bgTheoremE_cover_data axiom-clean census + 9093 import inversion) で
+   上流文脈が最も新しい。
+
+**carve-out 条件 (decl 単位、0101/9076 の混在-leaf パターンと同型)**:
+- (i) **signature 不変** — 3 decl の statement 改変は要 hub flag (proof 供給 + stale docstring 訂正のみ)。
+- (ii) 新規 helper は **additive のみ** (S15_Gate3 / TypeICovering 内の既存 b 宣言の改変・削除は従来どおり逸脱)。
+- (iii) 9087 + commit message で self-flag、(iv) build green。
+- **失効**: 3 decl の sorry-free 化で carve-out 失効、両 file は完全 b 所有へ復帰。
+- b は当該 3 decl を再証明しない (dup 回避)。b 側で statement 変更の必要が生じたら issue で調整。
+
+**併記**: 9077-T1 の TTypeII proof-only de-gate (c 所有 file) は本 tick で **非逸脱として受理・合流済**
+(0096 拡張と同型 = signature 不変・新規宣言なし・sorry −1・self-flag 済・c 停止中で衝突なし)。
+c 再開時は 9077 の T1 RESOLVED 追記を参照。

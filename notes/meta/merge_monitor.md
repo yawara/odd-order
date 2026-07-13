@@ -382,6 +382,18 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > (iii) issue 9092 で self-flag、(iv) build green。⟹ step 1.5 で b が FeitThompson の当該供給行を編集していても
 > 逸脱でない (他の FeitThompson 編集は従来どおり逸脱)。**mu_isColumnFamily 供給完了で失効**。詳細 = issues/9092。
 >
+> **carve-out (issue 9087 RULING #4, hub 裁定 2026-07-13 監視 tick 2 — merge da032e55)**: newly-ungated
+> 3 decl — `card_LF_coprime_pq` (`S15_Gate3.lean:157`) / `allTypeI_fittingIsTI` (`S14_MaximalI/
+> TypeICovering.lean:68`, private) / `not_nonTypeICovering_of_all_typeI` (同 `:95`, private) — を
+> **lane a へ decl 単位 carve-out** (両 file は本来 b territory)。根拠: a 自領域 genuine 候補ゼロ
+> (census #print axioms 確定) / b は 2035 active で 3 target と非交差 (機械検証済) / ungated genuine
+> on-path math ((13.17.b) B2 + (12.17) all-type-I chain) を idle 化しない / unblock 元 = a で文脈鮮度。
+> 条件: (i) signature 不変 (statement 改変は要 hub flag、proof 供給 + stale docstring 訂正のみ)、
+> (ii) 新規 helper は additive のみ (既存 b 宣言の改変・削除は逸脱)、(iii) 9087+commit で self-flag、
+> (iv) build green。**3 decl の sorry-free 化で失効** (完全 b 所有へ復帰)。b は当該 3 decl を再証明
+> しない。⟹ step 1.5 で a が S15_Gate3 / TypeICovering の**当該 decl 文脈のみ**を編集しても逸脱で
+> ない (a が両 file の他領域 = b の既存宣言を触ったら従来どおり逸脱)。詳細 = issues/9087 RULING #4。
+>
 > **⟹ 拡張 #2 (ユーザー裁定 2026-07-05 tick(3) — Hypothesis76 (7.6) 忠実化 field の包括許可)**:
 > 同型逸脱 3 連発 (issue 0091 Hypothesis78 / zeta_induced / zeta_injective、各回ユーザー受理) の
 > 反復解消として、**issue 2034/3002 の (13.5) 供給作業中に限り、b による `S09_NonexistenceCertain`
@@ -573,6 +585,15 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-13 (tick 2) — a+b 合流: ★ 9077-T1 閉包 (a、c 所有 file への proof-only de-gate 受理) + 9087 RULING #4**:
+  **a=3** (feat(9077 T1): TTypeII `T_not_isTypeIV_of_isTypeP1` の (11.9)-gated `hVcomm` bare sorry を
+  landed 済 `not_isTypeIV_of_mem_maximalSubgroups` (S13_NonGaloisExclusion) 直 cite で閉包 —
+  **c 所有 TTypeII.lean への編集は proof-only de-gate (signature 不変・新規宣言なし・self-flag・c 停止中)
+  = 0096 拡張と同型で非逸脱と裁定** + AxiomsCheck assert 3 本 + docs 9087/9077 + sync) /
+  **b=1** (docs 2035 #17 のみ、build 省略) / c=0。build green (4187 jobs)・AxiomsCheck OK (2364/0, +3)・
+  **count-sorry 52→51** (hVcomm discharge)・新 axiom なし・size watch OK。push `ddba2593..`(da032e55+df8d2d62+裁定 docs)。
+  **HUB RULING #4 (9087)**: newly-ungated 3 decl (`card_LF_coprime_pq`/`allTypeI_fittingIsTI`/
+  `not_nonTypeICovering_of_all_typeI`) を lane a へ decl 単位 carve-out (所有マップに entry 追記済)。
 - **2026-07-13 (新セッション tick 1 — Fable 5 hub; 監視対象 = a/b、c はユーザー指示で明示停止中) — b 合流**:
   **b=3** (feat(2035, 13.3.c) all-reducible pinned coherence glue `coherentImageMap` = pin bundle core、
   S15_CaseBReducibleCoherence +266 全 proven + sync merge + docs(2035) pin architecture 訂正 #15/#16) /
