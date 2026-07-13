@@ -125,3 +125,15 @@ no-λ 分岐証明は μ-column 解析+直接算術を使うので Core 分離�
 `exists_caseB_data_eta10_T` 等 chars-引数系) は **Coq の λ-Section export に対応する正しい形 —
 そのまま維持** (λ 分岐でのみ呼ばれる)。変更対象は「proof 内で `character_degree_analysis` を
 obtain する無条件 statement 定理」6 箇所のみ。
+
+## 2026-07-13 追記 (lane b) — RULING 受領 + Core 設計への追加入力 (2035 更新 #22)
+
+RULING 案 A を実装する。Core 定義に 2035 更新 #22 の発見を織り込む:
+1. **Core の τ₁ field 3 本 (apply_induce_sub / inner_induce / induce_mem_ZIrr) は
+   P ⊄ Ker guard 付きで定義する** (無条件形は IsCoherent から供給不能 — 第 5 の overstatement。
+   原文 (13.5) も guard 付きが honest 形)。供給 theorem は 3 本とも landed 済 (guarded)。
+2. μ 側 field (mu_j_linear_induced / mu_col_tau1_eta_col_one) に P ⊄ Ker witness を追加
+   (consumer が guard を discharge するのに必要)。
+3. λ-conditional 側 consumer (Canonicalization cCoeff 系) は trivial-base (7.7) 問題の
+   rebase 修理が必要 (詳細 = 2035 更新 #22 発見 2)。statement 修正は cCoeff 補題のみ
+   (b 所有)、NormEstimates 5 定理の statement は不変 (RULING §3-2 の通り)。
