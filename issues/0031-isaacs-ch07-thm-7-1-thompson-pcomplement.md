@@ -206,3 +206,16 @@ Sylow conjugacy then proves that the hypotheses at the chosen textbook Sylow
 subgroup are equivalent to `HasThompsonPComplementHypothesis p G`, the intrinsic
 all-Sylow form needed by strong induction.  The next frontier is Step 1: construct
 the lexicographically maximal bad `p`-subgroup and prove that it is `O_p(G)`.
+
+## 2026-07-14 update — Step 1 maximal bad-subgroup selection landed
+
+Frobenius' normal-complement criterion now constructs a nontrivial `p`-subgroup
+whose normalizer has no normal `p`-complement.  A second theorem selects such a
+subgroup `U` lexicographically, first maximizing the intrinsic `p`-part of
+`|N_G(U)|`, then `|U|` among ties.  Both maxima are selected from the finite type
+`Subgroup G`; no choice field is postulated.
+
+The `normalizerPPart` API identifies that weight with the order of every Sylow
+`p`-subgroup of `N_G(U)` and bounds all `p`-subgroups of the normalizer.  The next
+proof obligation is the mathematical core of Step 1: use induction plus the
+normalizer-growth argument to force `N_G(U)=G`, then maximality to show `U=O_p(G)`.
