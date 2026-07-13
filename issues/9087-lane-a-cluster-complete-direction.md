@@ -328,6 +328,102 @@ b territory**。b の現 active files (S15_CaseB*/S15_SSetMemberRFamily/S07 pin 
 (a) lane a へ carve-out (unblocking 元の a が続行、b は 2035 継続) か、(b) b のキューへ、か。
 lane a は裁定まで a-scope follow-up を継続。
 
+### 3″. `card_LF_coprime_pq` の実証明を probe で検証完了 (2026-07-13 lane a、landing 待ちのみ)
+
+裁定待ちの間に read-only 精査を進め、**完全な証明を probe file で end-to-end コンパイル検証済み**
+(`lake env lean` エラー 0、import 追加不要 — 全依存が S15_Gate3 の既存 closure 内)。設計は docstring の
+derivation より単純化: (9.3) order relation 不要、`TypePData.W2_le` (K* ≤ H) + `H_eq` +
+`maxNilpotentNormalHall_le_Msigma` + `Msigma_conj_smul` + `mainSubgroup_eq_Msigma` で
+p/q ∈ π(M_σ) を rep に輸送し、`primeFactors_disjoint` の対偶で L ~ S / L ~ T に帰着して矛盾。
+
+carve-out 付与なら S15_Gate3:161 の `:= sorry` を下記 proof body で置換 + stale docstring 訂正
+(binder の `_hG` 等 5 個を un-underscore)。b 側 queue 裁定でもこの proof をそのまま使えばよい。
+
+```lean
+  classical
+  obtain ⟨data, -⟩ := OddOrder.Peterfalvi.S10.bgTheoremE_cover_data.{_, 0} hG
+  obtain ⟨k, gL, hgL⟩ := data.representatives L hLmax
+  obtain ⟨iS, gS, hgS⟩ := data.representatives hyp.S hyp.S_maximal
+  obtain ⟨iT, gT, hgT⟩ := data.representatives hyp.T hyp.T_maximal
+  have hrepcard : ∀ (M : Subgroup G), M ∈ maximalSubgroups G → ∀ (m : data.ι) (g : G),
+      MulAut.conj g • M = data.reps m →
+      Nat.card ↥(mainSubgroup (data.reps m) (data.tau m)) =
+        Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) := by
+    intro M hM m g hg
+    rw [OddOrder.BG.Ch4.S16.mainSubgroup_eq_Msigma hG (data.maximal m) (data.typed m),
+      ← hg, OddOrder.BG.Ch4.S14.Msigma_conj_smul]
+    exact Nat.card_congr (Subgroup.equivSMul (MulAut.conj g)
+      (OddOrder.BG.Ch3.S10.Msigma M)).toEquiv.symm
+  have hpS : hyp.p ∈ (Nat.card ↥(mainSubgroup (data.reps iS) (data.tau iS))).primeFactors := by
+    rw [hrepcard hyp.S hyp.S_maximal iS gS hgS]
+    refine Nat.mem_primeFactors.mpr ⟨hyp.p_prime, ?_, Nat.card_pos.ne'⟩
+    have hle : hyp.Sdata.W2 ≤ OddOrder.BG.Ch3.S10.Msigma hyp.S := by
+      refine le_trans (le_trans hyp.Sdata.W2_le inf_le_left) ?_
+      rw [hyp.Sdata.H_eq]
+      exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hyp.S_maximal
+    calc hyp.p = Nat.card ↥hyp.W2 := hyp.p_eq_card_W2
+      _ = Nat.card ↥hyp.Sdata.W2 := by rw [hyp.Sdata_W2_eq]
+      _ ∣ Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma hyp.S) := Subgroup.card_dvd_of_le hle
+  have hqT : hyp.q ∈ (Nat.card ↥(mainSubgroup (data.reps iT) (data.tau iT))).primeFactors := by
+    rw [hrepcard hyp.T hyp.T_maximal iT gT hgT]
+    refine Nat.mem_primeFactors.mpr ⟨hyp.q_prime, ?_, Nat.card_pos.ne'⟩
+    obtain ⟨tpd, -, -, htpdW2⟩ := reconciled_typePData_T hG hyp
+    have hle : tpd.W2 ≤ OddOrder.BG.Ch3.S10.Msigma hyp.T := by
+      refine le_trans (le_trans tpd.W2_le inf_le_left) ?_
+      rw [tpd.H_eq]
+      exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hyp.T_maximal
+    calc hyp.q = Nat.card ↥hyp.W1 := hyp.q_eq_card_W1
+      _ = Nat.card ↥tpd.W2 := by rw [htpdW2]
+      _ ∣ Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma hyp.T) := Subgroup.card_dvd_of_le hle
+  have hLcard : Nat.card ↥(mainSubgroup (data.reps k) (data.tau k)) =
+      Nat.card ↥(maxNilpotentNormalHall L) := by
+    rw [hrepcard L hLmax k gL hgL,
+      OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II hG hLmax
+        (Or.inl hLI)]
+  have htransfer : ∀ (M : Subgroup G) (m : data.ι) (g : G), MulAut.conj g • M = data.reps m →
+      k = m → ∃ g' : G, MulAut.conj g' • L = M := by
+    intro M m g hg hkm
+    refine ⟨g⁻¹ * gL, ?_⟩
+    rw [map_mul, mul_smul, hgL, hkm, ← hg, map_inv, inv_smul_smul]
+  rw [Nat.coprime_mul_iff_right]
+  constructor
+  · refine Nat.Coprime.symm (hyp.p_prime.coprime_iff_not_dvd.mpr fun hdvd => ?_)
+    have hpL : hyp.p ∈ (Nat.card ↥(mainSubgroup (data.reps k) (data.tau k))).primeFactors := by
+      rw [hLcard]
+      exact Nat.mem_primeFactors.mpr ⟨hyp.p_prime, hdvd, Nat.card_pos.ne'⟩
+    have hk : k = iS := by
+      by_contra hne
+      exact Finset.disjoint_left.mp (data.primeFactors_disjoint k iS hne) hpL hpS
+    exact hLnconjS (htransfer hyp.S iS gS hgS hk)
+  · refine Nat.Coprime.symm (hyp.q_prime.coprime_iff_not_dvd.mpr fun hdvd => ?_)
+    have hqL : hyp.q ∈ (Nat.card ↥(mainSubgroup (data.reps k) (data.tau k))).primeFactors := by
+      rw [hLcard]
+      exact Nat.mem_primeFactors.mpr ⟨hyp.q_prime, hdvd, Nat.card_pos.ne'⟩
+    have hk : k = iT := by
+      by_contra hne
+      exact Finset.disjoint_left.mp (data.primeFactors_disjoint k iT hne) hqL hqT
+    exact hLnconjT (htransfer hyp.T iT gT hgT hk)
+```
+
+### 3‴. `allTypeI_fittingIsTI` の proof 設計 recon (2026-07-13 lane a、read-only)
+
+裁定待ち継続中の精査結果 — **全主要部品が既存 proven** で assembly は実行可能:
+- **goal**: `FittingIsTI M` = `IsTISubset (fittingSharp M) (N_G(fittingInAmbient M))`。
+- **骨子**: a ∈ F(M)^#, g·a·g⁻¹ ∈ F(M)^# とする。type-I M で F(M)^# ⊆ M_σ^# に還元 (下記残課題)。
+  x := g·a·g⁻¹ は M_σ^# ∩ (M*)_σ^# (M* := conj g • M、`sigmaSharp_conj_smul`)。no-escape
+  (`allTypeI_centralizer_le`、同 file 既存・hnoV 要 thread) で C(x) ≤ M かつ C(x) ≤ M*。
+  **uniqueness**: `Rsub_eq_bot_of_centralizer_le` (S10_MinimalSimpleStructure:799、lane-a 所有) の
+  内部論法そのもの — ℓ_σ(x)=1 (`length_one_of_isPiElement_sigma`、Conjugacy145C:791) + 14.4 sharp
+  transitivity (`sigmaLength_one_centralizer_structure`) で |𝓜_σ(x)|>1 なら r ∈ C(x) ≤ M が M を
+  別 member に conj して矛盾 ⟹ M = M* ⟹ g ∈ N_G(M) = M (`normalizer_eq_self_of_mem_maximalSubgroups`)。
+  g ∈ M ⟹ g ∈ N(F(M)) (`normalizer_fittingInAmbient_eq_self` TypeP1Criteria:120 で N(F(M)) = M)。
+- **残課題 1 個**: type-I (type F) M で `fittingInAmbient M = maxNilpotentNormalHall M`
+  (F(M)^# ⊆ M_σ^# 用)。直接 lemma は未発見 — (12.7) `typeI_frobenius` (M Frobenius kernel M_F) から
+  C_E(M_F) = 1 ⟹ F(M) = M_F で導出可能な見込み (小補題 1 本)。
+- **推奨分担**: uniqueness 補題 (`eq_of_mem_maximalSigmaSubgroups_of_centralizer_le` 的な形) は
+  **S10_MinimalSimpleStructure (lane-a 所有) に factor して置ける** — Rsub_eq_bot の内部論法の抽出。
+  carve-out 裁定がどちらでも、この部品は a が自所有 file で先行提供可能。
+
 ---
 
 ## 🧭 HUB RULING #4 (2026-07-13 監視 tick 2, merge da032e55): 選択肢 (a) — 3 target を lane a へ decl 単位 carve-out
@@ -357,3 +453,20 @@ private) / `not_nonTypeICovering_of_all_typeI` (同:95, private)。
 **併記**: 9077-T1 の TTypeII proof-only de-gate (c 所有 file) は本 tick で **非逸脱として受理・合流済**
 (0096 拡張と同型 = signature 不変・新規宣言なし・sorry −1・self-flag 済・c 停止中で衝突なし)。
 c 再開時は 9077 の T1 RESOLVED 追記を参照。
+
+---
+
+## ✅ RULING #4 実施 1/3 (2026-07-13 lane a): `card_LF_coprime_pq` landed — §15 gate-4 B2 axiom-clean
+
+**self-flag (carve-out 条件 iii)**: S15_Gate3.lean (b territory、RULING #4 decl 単位 carve-out) を編集 —
+`card_LF_coprime_pq` の sorry を 9087 §3″ の検証済み proof で置換 (signature 不変、binder un-underscore
+のみ) + stale docstring (「bgTheoremE_cover_data = := sorry」「owner = F」) を現状に訂正。既存 b 宣言の
+改変・削除なし (条件 ii 遵守)。
+
+**検証**: leaf + full `lake build OddOrder` green (4187 jobs) + `#print axioms` =
+`[propext, Classical.choice, Quot.sound]` for `card_LF_coprime_pq` **および下流 corollary 2 本**
+(`q_not_dvd_kernel` / `p_not_dvd_kernel`、S15_ComplementStructure — (13.17.b) type-I branch の
+kernel coprimality)。AxiomsCheck assert 3 本追加。
+
+**残 2/3**: `allTypeI_fittingIsTI` (uniqueness 部品は S10 に landed 済 @dcbd148e、残 = F(M) = M_F
+for type-F 小補題 + assembly) → 次 iteration で着手。`not_nonTypeICovering_of_all_typeI` はその後。

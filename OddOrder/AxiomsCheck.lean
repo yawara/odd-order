@@ -7812,3 +7812,13 @@ of `T_not_isTypeIV_of_isTypeP1` is discharged by the universal (11.9.c) Type-IV 
 after the 9093 import inversion broke the `S13_NonGaloisExclusion → §16` transitive edge. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.T_not_isTypeIV_of_isTypeP1
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.T_isTypeIII_of_isTypeP1
+
+/-! **Peterfalvi (8.17.a) coprimality (gate-4 B2) `card_LF_coprime_pq`, axiom-clean**
+(lane a, 2026-07-13, issue 9087 RULING #4 carve-out).  For a type-I maximal `L` not conjugate
+to `S`/`T`, `|L_F| ⟂ pq` — proven from the BG-Theorem-E cover (`bgTheoremE_cover_data`,
+`primeFactors_disjoint`) by transporting `p ∈ π(S_σ)`, `q ∈ π(T_σ)`, and `π(L_F) = π(L_σ)`
+along `Msigma_conj_smul` to the conjugacy representatives.  The (13.17.b) type-I-branch
+kernel coprimalities `q_not_dvd_kernel` / `p_not_dvd_kernel` are clean as corollaries. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.card_LF_coprime_pq
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.q_not_dvd_kernel
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.p_not_dvd_kernel
