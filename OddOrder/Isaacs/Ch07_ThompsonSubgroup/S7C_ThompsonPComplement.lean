@@ -993,4 +993,231 @@ theorem isPiSeparable_of_normalPSubgroup_quotient_hasNormalPComplement
 
 end MinimalCounterexampleStepTwo
 
+section MinimalCounterexampleStepThree
+
+/-- A normal `p`-complement lifts across a normal `p′`-kernel.
+
+The inverse image of the quotient complement is again a `p′`-group: its normal
+kernel and quotient are both `p′`-groups.  Its index is the order of every Sylow
+`p`-subgroup, because the quotient map is injective on such a subgroup. -/
+theorem hasNormalPComplement_of_quotient_of_isPiGroup_compl
+    [Finite G] {p : ℕ} [Fact p.Prime] {N : Subgroup G} [N.Normal]
+    (hN_pi' : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ≠ p} N)
+    (hQ : OddOrder.Isaacs.Ch05.HasNormalPComplement p (G ⧸ N)) :
+    OddOrder.Isaacs.Ch05.HasNormalPComplement p G := by
+  classical
+  obtain ⟨Nbar, hNbar_normal, hNbar_complement⟩ := hQ
+  letI : Nbar.Normal := hNbar_normal
+  obtain ⟨Qbar⟩ := (inferInstance : Nonempty (Sylow p (G ⧸ N)))
+  have hNbar_card : Nat.card Nbar = (Qbar : Subgroup (G ⧸ N)).index :=
+    ((hNbar_complement Qbar).index_eq_card).symm
+  have hNbar_pi' :
+      OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ≠ p} Nbar := by
+    intro q hq
+    rw [hNbar_card] at hq
+    intro hqp
+    subst q
+    exact Qbar.not_dvd_index (Nat.dvd_of_mem_primeFactors hq)
+  let q : G →* G ⧸ N := QuotientGroup.mk' N
+  have hq : Function.Surjective q := QuotientGroup.mk'_surjective N
+  let K : Subgroup G := Nbar.comap q
+  haveI hK_normal : K.Normal := hNbar_normal.comap q
+  have hN_le_K : N ≤ K := by
+    dsimp [K, q]
+    exact QuotientGroup.le_comap_mk' N Nbar
+  have hK_map : K.map q = Nbar := by
+    dsimp [K, q]
+    exact Subgroup.map_comap_eq_self_of_surjective
+      (QuotientGroup.mk'_surjective N) Nbar
+  have hK_map_pi' :
+      OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ≠ p} (K.map q) := by
+    rw [hK_map]
+    exact hNbar_pi'
+  have hN_sub_pi' :
+      OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ≠ p} (N.subgroupOf K) :=
+    OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.subgroupOf hN_le_K hN_pi'
+  have hK_quotient_pi' :
+      ∀ r ∈ (Nat.card (↥K ⧸ N.subgroupOf K)).primeFactors, r ≠ p :=
+    OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.primeFactors_quotient_subgroupOf
+      hK_map_pi'
+  have hK_pi' :
+      OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ≠ p} K :=
+    OddOrder.Isaacs.Ch03.IsPiGroup.of_normal_quotient
+      (N.subgroupOf K) hN_sub_pi' hK_quotient_pi'
+  refine ⟨K, hK_normal, fun P => ?_⟩
+  have hP_pi :
+      OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup ({p} : Set ℕ)
+        (P : Subgroup G) :=
+    OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.of_isPGroup_of_mem
+      P.isPGroup' (by simp)
+  have hPN_coprime :
+      Nat.Coprime (Nat.card (P : Subgroup G)) (Nat.card N) :=
+    OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      Nat.card_pos.ne' Nat.card_pos.ne' hP_pi (by
+        intro r hr
+        simpa using hN_pi' r hr)
+  have hP_inf_N : (P : Subgroup G) ⊓ N = ⊥ :=
+    (Subgroup.disjoint_of_coprime_natCard hPN_coprime).eq_bot
+  let qP : ↥(P : Subgroup G) →* G ⧸ N := q.comp (P : Subgroup G).subtype
+  have hqP_injective : Function.Injective qP := by
+    rw [← MonoidHom.ker_eq_bot_iff, Subgroup.eq_bot_iff_forall]
+    intro x hx
+    have hx_N : (x : G) ∈ N := by
+      have hx' : (x : G) ∈ (QuotientGroup.mk' N).ker := hx
+      rwa [QuotientGroup.ker_mk'] at hx'
+    have hx_inf : (x : G) ∈ (P : Subgroup G) ⊓ N := ⟨x.property, hx_N⟩
+    rw [hP_inf_N, Subgroup.mem_bot] at hx_inf
+    exact Subtype.ext hx_inf
+  have hqP_range : qP.range = (P : Subgroup G).map q := by
+    simp [qP, q, MonoidHom.range_comp, Subgroup.range_subtype]
+  have hP_map_card :
+      Nat.card ↥((P : Subgroup G).map q) = Nat.card ↥(P : Subgroup G) := by
+    have hEquiv : ↥(P : Subgroup G) ≃* ↥qP.range :=
+      MonoidHom.ofInjective hqP_injective
+    have hcard : Nat.card ↥qP.range = Nat.card ↥(P : Subgroup G) :=
+      (Nat.card_congr hEquiv.toEquiv).symm
+    rwa [hqP_range] at hcard
+  set Pbar : Sylow p (G ⧸ N) := P.mapSurjective hq with hPbar_def
+  have hPbar_coe :
+      (Pbar : Subgroup (G ⧸ N)) = (P : Subgroup G).map q := by
+    rw [hPbar_def, Sylow.coe_mapSurjective]
+  have hK_index : K.index = Nat.card (P : Subgroup G) := by
+    calc
+      K.index = Nbar.index := by
+        dsimp [K]
+        exact Nbar.index_comap_of_surjective hq
+      _ = Nat.card (Pbar : Subgroup (G ⧸ N)) :=
+        (hNbar_complement Pbar).symm.index_eq_card
+      _ = Nat.card ↥((P : Subgroup G).map q) := by rw [hPbar_coe]
+      _ = Nat.card ↥(P : Subgroup G) := hP_map_card
+  have hcard :
+      Nat.card K * Nat.card (P : Subgroup G) = Nat.card G := by
+    rw [← hK_index]
+    exact K.card_mul_index
+  have hKP_coprime :
+      Nat.Coprime (Nat.card K) (Nat.card (P : Subgroup G)) :=
+    (OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      Nat.card_pos.ne' Nat.card_pos.ne' hP_pi (by
+        intro r hr
+        simpa using hK_pi' r hr)).symm
+  exact Subgroup.isComplement'_of_coprime hcard hKP_coprime
+
+/-- **Isaacs Theorem 7.1, Step 3.**
+
+In a minimal counterexample, the normal `p′`-core is trivial.  If it were
+nontrivial, Lemma 7.7 and the quotient formulas for `Z(P)` and `J(P)` would
+transport both local normal-complement hypotheses to the smaller quotient.
+Minimality gives a normal `p`-complement there, and the preceding lifting
+theorem gives one in `G`, contradicting the counterexample assumption. -/
+theorem oPiPrimeCore_eq_bot_of_minimal_counterexample.{u}
+    {G : Type u} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    (P : Sylow p G) (hHyp : HasThompsonPComplementHypothesis p G)
+    (ih : ∀ (H : Type u) [Group H] [Finite H],
+      Nat.card H < Nat.card G →
+      HasThompsonPComplementHypothesis p H →
+      OddOrder.Isaacs.Ch05.HasNormalPComplement p H)
+    (hG : ¬ OddOrder.Isaacs.Ch05.HasNormalPComplement p G) :
+    OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G = ⊥ := by
+  classical
+  set N : Subgroup G :=
+    OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G with hN_def
+  haveI hN_normal : N.Normal := by
+    dsimp [N]
+    infer_instance
+  have hN_pi' :
+      OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ≠ p} N := by
+    dsimp [N]
+    exact OddOrder.Isaacs.Ch03.oPiCore.isPiGroup {q | q ≠ p}
+  change N = ⊥
+  by_contra hN_ne
+  have hp_coprime : ¬ p ∣ Nat.card N := by
+    intro hp
+    have hp_mem : p ∈ (Nat.card N).primeFactors :=
+      Nat.mem_primeFactors.mpr
+        ⟨Fact.out, hp, Nat.card_pos.ne'⟩
+    exact (hN_pi' p hp_mem) rfl
+  have hP_ne : (P : Subgroup G) ≠ ⊥ := by
+    intro hP_bot
+    exact hG (hasNormalPComplement_of_sylow_eq_bot P hP_bot)
+  let q : G →* G ⧸ N := QuotientGroup.mk' N
+  have hq : Function.Surjective q := QuotientGroup.mk'_surjective N
+  set Pbar : Sylow p (G ⧸ N) := P.mapSurjective hq with hPbar_def
+  have hPbar_coe :
+      (Pbar : Subgroup (G ⧸ N)) = (P : Subgroup G).map q := by
+    rw [hPbar_def, Sylow.coe_mapSurjective]
+  haveI : Nontrivial ↥(P : Subgroup G) :=
+    (P : Subgroup G).nontrivial_iff_ne_bot.mpr hP_ne
+  set Z : Subgroup G :=
+    (Subgroup.center ↥(P : Subgroup G)).map
+      (P : Subgroup G).subtype with hZ_def
+  have hZ_ne : Z ≠ ⊥ := by
+    rw [hZ_def, Ne,
+      Subgroup.map_eq_bot_iff_of_injective _
+        (P : Subgroup G).subtype_injective]
+    exact (Subgroup.center ↥(P : Subgroup G)).nontrivial_iff_ne_bot.mp
+      P.isPGroup'.center_nontrivial
+  have hZ_p : IsPGroup p Z := by
+    rw [hZ_def]
+    exact
+      (P.isPGroup'.to_subgroup (Subgroup.center ↥(P : Subgroup G))).map
+        (P : Subgroup G).subtype
+  have hCenter :
+      (Subgroup.center ↥(Pbar : Subgroup (G ⧸ N))).map
+          (Pbar : Subgroup (G ⧸ N)).subtype =
+        Z.map q := by
+    rw [hPbar_coe]
+    simpa only [hZ_def, q] using
+      (center_map_subtype_map_of_coprime_kernel
+        (G := G) (N := N) hp_coprime P.isPGroup')
+  have hCZ_image :=
+    hasNormalPComplement_centralizer_map_of_coprime_kernel
+      (G := G) (N := N) hp_coprime hZ_ne hZ_p (hHyp P).1
+  have hCZbar :
+      OddOrder.Isaacs.Ch05.HasNormalPComplement p
+        ↥(Subgroup.centralizer
+          (((Subgroup.center ↥(Pbar : Subgroup (G ⧸ N))).map
+            (Pbar : Subgroup (G ⧸ N)).subtype :
+              Subgroup (G ⧸ N)) : Set (G ⧸ N))) := by
+    rw [hCenter]
+    simpa only [q] using hCZ_image
+  set J : Subgroup G :=
+    Subgroup.thompsonJ (P : Subgroup G) p with hJ_def
+  have hJ_ne : J ≠ ⊥ := by
+    rw [hJ_def]
+    exact Subgroup.thompsonJ_ne_bot P.isPGroup' hP_ne
+  have hJ_p : IsPGroup p J := by
+    rw [hJ_def]
+    exact P.isPGroup'.to_le (Subgroup.thompsonJ_le (P : Subgroup G) p)
+  have hJ_map :
+      Subgroup.thompsonJ (Pbar : Subgroup (G ⧸ N)) p = J.map q := by
+    rw [hPbar_coe]
+    simpa only [hJ_def, q] using
+      (thompsonJ_map_of_coprime_kernel
+        (G := G) (N := N) hp_coprime P.isPGroup')
+  have hNJ_image :=
+    hasNormalPComplement_normalizer_map_of_coprime_kernel
+      (G := G) (N := N) hp_coprime hJ_ne hJ_p (hHyp P).2
+  have hNJbar :
+      OddOrder.Isaacs.Ch05.HasNormalPComplement p
+        ↥(Subgroup.normalizer
+          ((Subgroup.thompsonJ (Pbar : Subgroup (G ⧸ N)) p :
+            Subgroup (G ⧸ N)) : Set (G ⧸ N))) := by
+    rw [hJ_map]
+    simpa only [q] using hNJ_image
+  have hPbar_local :
+      HasThompsonLocalPComplements p (Pbar : Subgroup (G ⧸ N)) :=
+    ⟨hCZbar, hNJbar⟩
+  have hQ_hyp : HasThompsonPComplementHypothesis p (G ⧸ N) := by
+    rw [hasThompsonPComplementHypothesis_iff Pbar]
+    exact hPbar_local
+  have hcard : Nat.card (G ⧸ N) < Nat.card G :=
+    Subgroup.card_quotient_lt_of_ne_bot hN_ne
+  have hQ_complement :=
+    ih (G ⧸ N) hcard hQ_hyp
+  exact hG
+    (hasNormalPComplement_of_quotient_of_isPiGroup_compl
+      hN_pi' hQ_complement)
+
+end MinimalCounterexampleStepThree
+
 end OddOrder.Isaacs.Ch07
