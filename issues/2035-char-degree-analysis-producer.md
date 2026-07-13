@@ -1453,3 +1453,32 @@ sub-gate は (13.3.b) forward の genuine math (multi-session)。translations �
 **注意**: このプランは deep math を honest 化するが、**NormEstimates 移行ブロッカー (更新 #29) は別問題**
 (architecture relayer 要、S15↔S16 層逆転含む)。honest producer が下流のままなので、S_caseB_facts_no_lambda を
 閉じても NormEstimates は救われない (downstream の TTypeII 枝が honest になるのみ)。
+
+## 2026-07-14 更新 #31 (lane b, /loop) — ✅ S_caseB_facts_no_lambda を de-opacify: 構造化 + translations proven + 単一 gate 分離
+
+更新 #30 プランを実行、deep S-side bridge を **monolithic sorry → 構造化 proof + 単一 isolated
+(13.3.b)-forward gate** に de-opacify (full build green 4194 jobs / AxiomsCheck OK / 新 axiom なし):
+
+- **translations 3 本 landed** (HypothesisBasics、additive、`u_le_cyclotomicQuotient` の inline have
+  から抽出した reusable API、全て sorry-free):
+  - `toTypesIIIIIIVSetupS_q_eq` : `(toTypesIIIIIIVSetupS hG).q = hyp.q`
+  - `chiefFactorS_p_eq` : `chief.p = hyp.p`
+  - `mkSection11CharacterDataS_u_eq` : `(mkSection11CharacterDataS hG chief).u = hyp.u`
+- **S_caseB_facts_no_lambda 構造化** (S15_CharacterDegreeSupply):
+  - S-instance 構築 → `caseB_of_no_irreducible_sOf_H0Cprime hG chars hno` 適用 → **proven**
+  - C 変換 (`chars.C = cSub = hyp.C` via toTypesIIIIIIVSetupS_cSub_eq_C) → **proven**
+  - u/p/q 変換 (3 translations で `chars.u=(chief.p^data.q−1)/…` → `hyp.u=(p^q−1)/(p−1)`) → **proven**
+  - **残 sorry = `hbridge` 1 本のみ** = (13.3.b) forward「irr S-instance SOf member → LambdaWitness」。
+    precisely-named、genuine deep math (irr member の (13.3.a)-for-irr 特徴付け; reducible 版
+    `caseB_reducible_sOf_H0_isIndHC` は (9.9.b) 依存で非適用; multi-session S15↔S11 assembly)。
+- **効果**: 9094 の残 genuine gate の 1 つ (S-side no-λ) を、算術/plumbing を全部証明し尽くして
+  **唯一の本質的 math 障害 (irr-member 特徴付け) に凝縮**。次に engage すべき対象が完全に isolate された。
+
+### 別件 flag (hub 向け)
+- **AxiomsCheck.lean が 7905 行で longFile 制限 7900 超過** (a-lane merge 由来の warning、build は green)。
+  shared file ゆえ hub が `set_option linter.style.longFile` を bump 推奨 (b territory 外、未編集)。
+
+### 次 (残 (13.3.b) forward gate `hbridge`)
+irr S-instance SOf member → LambdaWitness の genuine 構成。素材 = caseA irr witness
+(ThetaCountAssembly:730, degree qu ∈ SOf(H0⊔C)) を Ind_{H.subgroupOf S} linear 形に落とす +
+induceHU_eq_induce (PU↔PC) + irr 保存。multi-session、S11_MaximalII_III_IV 精読要。

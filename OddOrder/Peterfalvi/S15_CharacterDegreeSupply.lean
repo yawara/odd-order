@@ -1214,9 +1214,34 @@ family `𝒮(H₀ ⊔ C')` is (13.3.a-style) a `uq`-degree `PC`-linear induced i
 (S15↔S11, multi-session); until it lands this is the honest, precisely-named gate. -/
 theorem S_caseB_facts_no_lambda [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (_hnolam : ¬ LambdaWitness hyp) :
+    (hnolam : ¬ LambdaWitness hyp) :
     hyp.C = ⊥ ∧ hyp.u = (hyp.p ^ hyp.q - 1) / (hyp.p - 1) := by
-  sorry
+  haveI := hyp.finiteG
+  obtain ⟨chief, -⟩ :=
+    OddOrder.Peterfalvi.S11.exists_chiefFactorData hG (hyp.toTypesIIIIIIVSetupS hG)
+  -- **(13.3.b) forward, the one isolated genuine gate**: an irreducible member of the `S`-instance
+  -- family `𝒮(H₀ ⊔ C')` is a `uq`-degree `PC`-linear induced irreducible — a `LambdaWitness`.
+  -- (The reducible members are `Ind_{HC}` linear by `caseB_reducible_sOf_H0_isIndHC`; the
+  -- irreducible ones — the `λ`-candidates — need the (13.3.a)-for-irr characterization, the
+  -- multi-session S15↔S11 assembly.)
+  have hbridge : ∀ χ ∈ (hyp.mkSection11CharacterDataS hG chief).SOf
+      (chief.H0 ⊔ (hyp.mkSection11CharacterDataS hG chief).Cprime),
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter χ → LambdaWitness hyp := by
+    sorry
+  have hno : ¬ ∃ χ ∈ (hyp.mkSection11CharacterDataS hG chief).SOf
+      (chief.H0 ⊔ (hyp.mkSection11CharacterDataS hG chief).Cprime),
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter χ :=
+    fun ⟨χ, hmem, hirr⟩ => hnolam (hbridge χ hmem hirr)
+  obtain ⟨-, hCbot, hufull⟩ :=
+    caseB_of_no_irreducible_sOf_H0Cprime hG
+      (hyp.mkSection11CharacterDataS hG chief) hno
+  refine ⟨?_, ?_⟩
+  · -- `chars.C = cSub = hyp.C` (`toTypesIIIIIIVSetupS_cSub_eq_C`)
+    rw [← hyp.toTypesIIIIIIVSetupS_cSub_eq_C hG chief]
+    exact hCbot
+  · -- transport `chars.u = (chief.p^data.q − 1)/(chief.p − 1)` to `hyp.u = (p^q − 1)/(p − 1)`
+    rw [← hyp.mkSection11CharacterDataS_u_eq hG chief, hufull, hyp.chiefFactorS_p_eq hG chief,
+      hyp.toTypesIIIIIIVSetupS_q_eq hG]
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (13.3.b) dichotomy, the `S`-side keystone producer** (issue 9094 RULING 案 A/§2):
