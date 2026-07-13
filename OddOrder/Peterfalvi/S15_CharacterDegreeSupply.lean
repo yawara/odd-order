@@ -1147,4 +1147,94 @@ theorem lambda_forces_T_caseB_core [Finite G]
   exact eta_cross_expansion_ne_zero hyp.eta (fun i k j l => hyp.eta_orthonormal i k j l)
     (core.tau1S lam.lambda) θG r ⟨1, hyp.p_prime.one_lt⟩ hLamEta hηθ hLamTheta hδ hδ' h0
 
+open scoped FiniteInduce in
+/-- **The `𝒮₁`-λ-witness predicate** (Pf (13.3.b)): `𝒮` contains a `uq`-degree `PC`-induced
+irreducible — a linear `θ ∈ Irr(H.subgroupOf S)` with `P ⊄ Ker θ` whose induction is
+irreducible.  Its existence is the conditional branch of the (13.3.b) dichotomy
+(`lambdaClusterData_of_irr_witness` packages it into `LambdaClusterData`); its failure is the
+Galois/`C = ⊥` case. -/
+def LambdaWitness [Finite G] (hyp : Hypothesis (G := G)) : Prop :=
+  haveI := hyp.finiteG
+  ∃ θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ,
+    OddOrder.RepresentationTheory.IsIrreducibleCharacter θ ∧ θ 1 = 1 ∧
+    ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
+        Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel θ) ∧
+    OddOrder.RepresentationTheory.IsIrreducibleCharacter
+      (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ)
+
+open scoped FiniteInduce in
+/-- **The no-λ (Galois) branch of the `T`-side (13.4) facts** (issue 9094 RULING §4, faithful
+sorried bridging): if `𝒮` contains no `uq`-degree `PC`-induced irreducible (`¬ LambdaWitness`),
+then by Pf (13.3.b) `M = S` is in case (9.7.b) with `C = ⊥`, `u = (p^q−1)/(p−1)` (Galois); the
+`T`-mirror of (13.9)–(13.12) then forces `D = ⊥`, `v = (q^p−1)/(q−1)` and `|Q| = q^p`.
+
+Gated on the unbuilt `T`-mirror engine (RULING §4: `q < p` — Coq `PFsection14` `ltqp` — with
+(13.13)-on-`T` and (13.12)-on-`T`).  This is the honest replacement, in the no-λ branch, of the
+overstated unconditional λ-cluster of `character_degree_analysis`. -/
+theorem T_caseB_facts_no_lambda [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (_hnolam : ¬ LambdaWitness hyp) :
+    hyp.D = ⊥ ∧ hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) ∧
+      Nat.card ↥hyp.Q = hyp.q ^ hyp.p := by
+  sorry
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (13.4)/(14.4), `T`-side case (9.7.b), unconditional via the (13.3.b) dichotomy**
+(issue 9094 RULING 案 A + §4): `D = ⊥`, `v = (q^p−1)/(q−1)` and `|Q| = q^p`, obtained **without**
+the overstated unconditional λ-cluster of the legacy `character_degree_analysis`.
+
+Case-splits on `LambdaWitness hyp` (Pf (13.3.b) dichotomy): the λ-branch builds the honest
+`LambdaClusterData` (`lambdaClusterData_of_irr_witness`) and runs `lambda_forces_T_caseB_core`
+against the unconditional `CharacterDegreeCore`; the no-λ branch is the (Galois) T-mirror
+`T_caseB_facts_no_lambda`.  This is the b-side export the (14.9) type-II endpoint
+(`S16 … T_side_caseB_facts`) cites in place of the uninhabitable monolithic producer. -/
+theorem T_caseB_facts_unconditional [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    hyp.D = ⊥ ∧ hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) ∧
+      Nat.card ↥hyp.Q = hyp.q ^ hyp.p := by
+  obtain ⟨core⟩ := hyp.characterDegreeCore_nonempty hG
+  by_cases hlam : LambdaWitness hyp
+  · obtain ⟨θ, hθ, hθ1, hθP, hind⟩ := hlam
+    obtain ⟨lam⟩ := hyp.lambdaClusterData_of_irr_witness hG θ hθ hθ1 hθP hind
+    exact lambda_forces_T_caseB_core hG core lam
+  · exact T_caseB_facts_no_lambda hG hyp hlam
+
+open scoped FiniteInduce in
+/-- **The no-λ (Galois) branch of the `S`-side (13.3.b) facts** (issue 9094 RULING §2, faithful
+sorried bridging): if `𝒮` contains no `uq`-degree `PC`-induced irreducible (`¬ LambdaWitness`),
+then by Pf (13.3.b) `M = S` is in case (9.7.b) with `C = ⊥` and `u = (p^q−1)/(p−1)` — the Galois
+case.
+
+Assembled from the §9-generic `caseB_of_no_irreducible_sOf_H0Cprime` (sorry-free) through the
+S15↔S11 `Section11CharacterData` SOf-identification: an irreducible member of the `S`-instance
+family `𝒮(H₀ ⊔ C')` is (13.3.a-style) a `uq`-degree `PC`-linear induced irreducible, i.e. a
+`LambdaWitness`, and the `chars.C`/`chars.u` conclusion transports to `hyp.C`/`hyp.u`
+(`toTypesIIIIIIVSetupS_cSub_eq_C`).  That identification is the deep (13.3.b) forward bridge
+(S15↔S11, multi-session); until it lands this is the honest, precisely-named gate. -/
+theorem S_caseB_facts_no_lambda [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (_hnolam : ¬ LambdaWitness hyp) :
+    hyp.C = ⊥ ∧ hyp.u = (hyp.p ^ hyp.q - 1) / (hyp.p - 1) := by
+  sorry
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (13.3.b) dichotomy, the `S`-side keystone producer** (issue 9094 RULING 案 A/§2):
+either `𝒮` contains the honest λ-cluster (`Nonempty (LambdaClusterData hyp)`), or `M = S` is in
+the Galois case (`C = ⊥`, `u = (p^q−1)/(p−1)`).  This is the producer every λ-independent
+consumer of the legacy `character_degree_analysis` threads: the λ-branch supplies the
+`LambdaClusterData` (against the unconditional `CharacterDegreeCore`), the no-λ branch supplies
+the (13.10)-arithmetic inputs `C = ⊥ ∧ u = full`.
+
+The case-split is `LambdaWitness hyp` (`Classical.em`): the λ-branch is
+`lambdaClusterData_of_irr_witness`, the no-λ branch is `S_caseB_facts_no_lambda`. -/
+theorem lambdaCluster_or_caseB [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    Nonempty (LambdaClusterData hyp) ∨
+      (hyp.C = ⊥ ∧ hyp.u = (hyp.p ^ hyp.q - 1) / (hyp.p - 1)) := by
+  by_cases hlam : LambdaWitness hyp
+  · obtain ⟨θ, hθ, hθ1, hθP, hind⟩ := hlam
+    exact Or.inl (hyp.lambdaClusterData_of_irr_witness hG θ hθ hθ1 hθP hind)
+  · exact Or.inr (S_caseB_facts_no_lambda hG hyp hlam)
+
 end OddOrder.Peterfalvi.S15

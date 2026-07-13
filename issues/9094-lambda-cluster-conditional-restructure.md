@@ -152,3 +152,25 @@ RULING 案 A を実装する。Core 定義に 2035 更新 #22 の発見を織り
 - 残り: 2/3 = conditional producer (∃λ → Nonempty CDD; CDD field の guard 化と consumer
   (Canonicalization ×2 の rebase 修理 = 2035 #22 発見 2) が前提) / 3/3 = dichotomy producer +
   NormEstimates 5 定理移行 + TTypeII proof-only 差替え。
+
+## 2026-07-14 追記 (lane b) — ⑤ flip 1/N: TTypeII cross-lane endpoint 移行完了 (RULING §4 carve-out 発動)
+
+**RULING §4 の proof-only 供給編集権を発動、TTypeII (lane c 所有) の `character_degree_analysis`
+依存を除去** (build green 4191 jobs / AxiomsCheck OK / 新 axiom なし / statement 不変):
+
+- **b-side export 新設** (S15_CharacterDegreeSupply、b territory):
+  - `LambdaWitness hyp` (def): 「𝒮 が uq 次数 PC-誘導既約を含む」= (13.3.b) dichotomy の条件分岐述語。
+  - `T_caseB_facts_unconditional` (theorem): `D=⊥ ∧ v=(q^p−1)/(q−1) ∧ |Q|=q^p` を **overstated
+    unconditional-λ producer 抜きで** 供給。`by_cases LambdaWitness`:
+    - λ 枝 = `lambdaClusterData_of_irr_witness` + `lambda_forces_T_caseB_core` (proven、
+      ν-gated `tSide_theta_package_of_not_caseB_core` のみ)。
+    - no-λ 枝 = `T_caseB_facts_no_lambda` (新、precisely-named sorried bridge — RULING §4 許可の
+      no-λ T-mirror engine: q<p [Coq PFsection14 ltqp] + (13.13)-on-T + (13.12)-on-T)。
+- **TTypeII rewire** (条件 i-iv 充足): `T_side_caseB_facts` (:190) の proof を
+  `T_caseB_facts_unconditional hG hyp.base` cite に差替え (statement 不変)。import 1 行追加
+  (`S15_CharacterDegreeSupply`、S15<S16 ゆえ cycle なし)。c の A0-Dade/BetaData 非接触。
+- **効果**: TTypeII は uninhabitable な `character_degree_analysis` から honest な
+  Core+dichotomy 基盤へ。残 sorry は precisely-named な genuine gate 2 本
+  (`tSide_theta_package_of_not_caseB_core` = ν-gated (13.4) T-package、`T_caseB_facts_no_lambda` =
+  no-λ T-mirror) に isolate。overstatement 除去 = 9094 の目的そのものの前進。
+- 残 `character_degree_analysis` 実 consumer = **NormEstimates 5 obtain-site のみ** (次の ⑤ flip 対象)。
