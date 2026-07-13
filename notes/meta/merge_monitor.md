@@ -623,6 +623,12 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 30) — a 合流: ν-grid T-side row sum dichotomy / value identity / difference support (issue 1029 継続)**:
+  **a=3 実 commit** (`83d63b79`/`d0d3e9ca`/`6e106fdd` = T-side nu row sum dichotomy + value identity +
+  difference support。`FeitThompsonNuGrid.lean` +236 (0 sorry、計 535) + `FeitThompsonSetup.lean` +6 (0 sorry)。
+  全 a-owned ν-carrier files)。b=0 / c=0。build green **4203 jobs** / AxiomsCheck OK (**2416** 全 allowlist) /
+  count-sorry **49→49 不変** / 新 axiom なし / 逸脱なし。sizes: NuGrid 535 / FeitThompsonSetup 1568。
+  ★ 9096 ν-carrier build 継続中 (a が row-sum/value/support の T-side ν-grid API を積み上げ = b の T-side gate 前提)。
 - **2026-07-14 (tick 29) — a 合流: canonical T-side ν-grid core 構築 (issue 1029) — ★ 9096 の ν-carrier gate を a が自律着手**:
   **a=1** (`bb959962` = **ν-carrier 着手**。ν-grid decls (nuT/deltaPrimeT/omegaS_inner/eTS/colT 等) を
   `FeitThompson.lean`→新 leaf `FeitThompsonNuGrid.lean` +299 へ抽出 (clean relocation、-185/+1) +
