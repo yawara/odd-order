@@ -383,6 +383,45 @@ theorem Hypothesis.sSet_scaledDiff_support [Finite G]
     · rw [Set.mem_singleton_iff] at h'; subst h'; exact absurd hzero hz0
 
 open OddOrder.Peterfalvi.S11 in
+/-- **`ℤ[𝒮]`-elements are supported in `A(S) ∪ {1}`** (issue 2035, the `zSpan`-closure of the
+member-level honest (4.7) support fact `sSet_member_support_subset`).  Support is subadditive
+under the lattice operations, so the union bound survives arbitrary `ℤ`-combinations. -/
+theorem Hypothesis.zSpan_sSet_support_subset [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {φ : ClassFunction ↥hyp.S ℂ}
+    (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSpan (sSet (hyp.toTypesIIIIIIVSetupS hG))) :
+    φ.support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S ∪ {1} := by
+  induction hφ using Submodule.span_induction with
+  | mem x hx => exact hyp.sSet_member_support_subset hG hx
+  | zero => simp
+  | add x y _ _ hx hy =>
+      exact (ClassFunction.support_add_subset x y).trans (Set.union_subset hx hy)
+  | smul z x _ hx =>
+      refine subset_trans ?_ hx
+      rw [← Int.cast_smul_eq_zsmul ℂ z x]
+      exact ClassFunction.support_smul_subset _ x
+
+open OddOrder.Peterfalvi.S11 in
+/-- **Degree-`0` elements of `ℤ[𝒮]` are `A(S)`-supported** (issue 2035, the (13.2.e)-input
+support step for the `tau1S_apply_induce_sub` supply): a `ℤ`-combination of `𝒮`-members that
+vanishes at `1` has its support inside the honest Dade support `A(S)` — the `{1}`-corner of
+`zSpan_sSet_support_subset` is exactly the vanishing degree. -/
+theorem Hypothesis.zSpan_sSet_degree_zero_support [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {φ : ClassFunction ↥hyp.S ℂ}
+    (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSpan (sSet (hyp.toTypesIIIIIIVSetupS hG)))
+    (hφ1 : φ (1 : ↥hyp.S) = 0) :
+    φ.support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S := by
+  intro z hz
+  rcases hyp.zSpan_sSet_support_subset hG hφ hz with h | h
+  · exact h
+  · rw [Set.mem_singleton_iff] at h
+    subst h
+    exact absurd hφ1 hz
+
+open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 set_option maxHeartbeats 1600000 in
 /-- **Peterfalvi (9.11.1), the `S`-instance (5.6) pair-bound residual** (issue 1017 step (c); the

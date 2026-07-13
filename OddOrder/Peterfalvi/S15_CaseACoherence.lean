@@ -1178,4 +1178,64 @@ theorem Hypothesis.tau1S_ofHonest_induce_mem_ZIrr [Finite G]
   (hyp.coherent_H0Cprime_S hG hnoV chief).extension_mem_ZIrr _
     (hyp.induce_H_mem_zSpan_S hG chief θ hθ hθP)
 
+open scoped FiniteInduce in
+/-- **(13.2.e)+(7.2), the τ₁-extension semantics on `H`-induced differences** (issue 2035, the
+honest supply for the `CharacterDegreeData.tau1S_apply_induce_sub` field): for irreducible
+characters `θ, θ'` of `H = PC` with `P ⊄ Ker` (the guard the (13.5) proof carries — Peterfalvi
+converts `(ζ_i − ζ_0)^{τ}` to `Ind_S^G` *only* for the `𝒮₁`-members `i ≤ n`, the `P`-kernel side
+staying as the unknown `α`), `τ₁` agrees with `Ind_S^G` on the difference `Ind θ − Ind θ'`.
+
+Assembly: both inductions lie in `ℤ[𝒮]` (`induce_H_mem_zSpan_S`, the (1.5.a) membership); `H` is
+abelian ((13.2.a)) so both are degree `uq` and the difference vanishes at `1`; hence the
+difference is `A(S)`-supported (`zSpan_sSet_degree_zero_support`) and `extends_on_supported`
+evaluates `τ₁` as `Ind_S^G` there. -/
+theorem Hypothesis.tau1S_ofHonest_apply_induce_sub [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))
+    (θ θ' : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ)
+    (hθ : OddOrder.RepresentationTheory.IsIrreducibleCharacter θ)
+    (hθ' : OddOrder.RepresentationTheory.IsIrreducibleCharacter θ')
+    (hθP : ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
+        Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel θ))
+    (hθ'P : ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
+        Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel θ')) :
+    hyp.tau1S_ofHonest hG hnoV chief
+        (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ
+          - ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ')
+      = ClassFunction.induce hyp.S
+          (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ
+            - ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ') := by
+  haveI := hyp.finiteG
+  -- `ℤ[𝒮]` membership of both inductions ((1.5.a))
+  have hmem := hyp.induce_H_mem_zSpan_S hG chief θ hθ hθP
+  have hmem' := hyp.induce_H_mem_zSpan_S hG chief θ' hθ' hθ'P
+  have hsub : ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ
+        - ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ'
+      ∈ OddOrder.Peterfalvi.S07.zSpan
+          (OddOrder.Peterfalvi.S11.sSet (hyp.toTypesIIIIIIVSetupS hG)) :=
+    Submodule.sub_mem _ hmem hmem'
+  -- `H = PC` abelian ((13.2.a)): both inducing characters are linear, the difference has degree 0
+  haveI hHcomm : IsMulCommutative ↥(hyp.H.subgroupOf hyp.S) := by
+    have hH := hyp.H_mulCommutative hG
+    have e := Subgroup.subgroupOfEquivOfLe (show hyp.H ≤ hyp.S from hyp.H_le_S)
+    exact ⟨⟨fun a b => e.injective (by
+      rw [map_mul, map_mul]
+      exact hH.is_comm.comm (e a) (e b))⟩⟩
+  have hθ1 : θ 1 = 1 :=
+    OddOrder.RepresentationTheory.IsIrreducibleCharacter.apply_one_eq_one_of_isMulCommutative hθ
+  have hθ'1 : θ' 1 = 1 :=
+    OddOrder.RepresentationTheory.IsIrreducibleCharacter.apply_one_eq_one_of_isMulCommutative hθ'
+  have hdeg : (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ
+      - ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ') (1 : ↥hyp.S) = 0 := by
+    rw [ClassFunction.sub_apply,
+      OddOrder.RepresentationTheory.ClassFunction.induce_apply_one,
+      OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, hθ1, hθ'1, sub_self]
+  -- `A(S)`-support of the degree-0 difference, then the (13.2.d) extension evaluates as `Ind`
+  exact hyp.tau1S_ofHonest_extends_on_supported hG hnoV chief _
+    ⟨hsub, hyp.zSpan_sSet_degree_zero_support hG hsub hdeg⟩
+
 end OddOrder.Peterfalvi.S15
