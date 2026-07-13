@@ -138,7 +138,7 @@ import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 
 -- 機械列挙ファイル (flagship axioms check) のため分割対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 7900
+set_option linter.style.longFile 8100
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -637,6 +637,16 @@ set_option linter.style.longLine false in
 -- p ≠ 2, G p-solvable, abelian Sylow-2, O_{p'}(G)=1, C_G(Z(P))=P ⇒ J(P) ⊴ G.
 -- Goldschmidt 帰納 (Steps 1-8) を full discharge; §7B 内に focused axiom 残無し.
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch07.normal_J
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.hasNormalPComplement_of_mulEquiv
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.center_map_subtype_map_of_restrict_injective
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.HasThompsonLocalPComplements.map_mulEquiv
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.HasThompsonLocalPComplements.of_sylow
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.hasThompsonPComplementHypothesis_iff
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.center_map_subtype_map_of_coprime_kernel
 
