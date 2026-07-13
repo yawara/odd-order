@@ -327,3 +327,80 @@ b territory**。b の現 active files (S15_CaseB*/S15_SSetMemberRFamily/S07 pin 
 `not_nonTypeICovering_of_all_typeI`、全て b territory・b の 2035 active files と非交差) を
 (a) lane a へ carve-out (unblocking 元の a が続行、b は 2035 継続) か、(b) b のキューへ、か。
 lane a は裁定まで a-scope follow-up を継続。
+
+### 3″. `card_LF_coprime_pq` の実証明を probe で検証完了 (2026-07-13 lane a、landing 待ちのみ)
+
+裁定待ちの間に read-only 精査を進め、**完全な証明を probe file で end-to-end コンパイル検証済み**
+(`lake env lean` エラー 0、import 追加不要 — 全依存が S15_Gate3 の既存 closure 内)。設計は docstring の
+derivation より単純化: (9.3) order relation 不要、`TypePData.W2_le` (K* ≤ H) + `H_eq` +
+`maxNilpotentNormalHall_le_Msigma` + `Msigma_conj_smul` + `mainSubgroup_eq_Msigma` で
+p/q ∈ π(M_σ) を rep に輸送し、`primeFactors_disjoint` の対偶で L ~ S / L ~ T に帰着して矛盾。
+
+carve-out 付与なら S15_Gate3:161 の `:= sorry` を下記 proof body で置換 + stale docstring 訂正
+(binder の `_hG` 等 5 個を un-underscore)。b 側 queue 裁定でもこの proof をそのまま使えばよい。
+
+```lean
+  classical
+  obtain ⟨data, -⟩ := OddOrder.Peterfalvi.S10.bgTheoremE_cover_data.{_, 0} hG
+  obtain ⟨k, gL, hgL⟩ := data.representatives L hLmax
+  obtain ⟨iS, gS, hgS⟩ := data.representatives hyp.S hyp.S_maximal
+  obtain ⟨iT, gT, hgT⟩ := data.representatives hyp.T hyp.T_maximal
+  have hrepcard : ∀ (M : Subgroup G), M ∈ maximalSubgroups G → ∀ (m : data.ι) (g : G),
+      MulAut.conj g • M = data.reps m →
+      Nat.card ↥(mainSubgroup (data.reps m) (data.tau m)) =
+        Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) := by
+    intro M hM m g hg
+    rw [OddOrder.BG.Ch4.S16.mainSubgroup_eq_Msigma hG (data.maximal m) (data.typed m),
+      ← hg, OddOrder.BG.Ch4.S14.Msigma_conj_smul]
+    exact Nat.card_congr (Subgroup.equivSMul (MulAut.conj g)
+      (OddOrder.BG.Ch3.S10.Msigma M)).toEquiv.symm
+  have hpS : hyp.p ∈ (Nat.card ↥(mainSubgroup (data.reps iS) (data.tau iS))).primeFactors := by
+    rw [hrepcard hyp.S hyp.S_maximal iS gS hgS]
+    refine Nat.mem_primeFactors.mpr ⟨hyp.p_prime, ?_, Nat.card_pos.ne'⟩
+    have hle : hyp.Sdata.W2 ≤ OddOrder.BG.Ch3.S10.Msigma hyp.S := by
+      refine le_trans (le_trans hyp.Sdata.W2_le inf_le_left) ?_
+      rw [hyp.Sdata.H_eq]
+      exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hyp.S_maximal
+    calc hyp.p = Nat.card ↥hyp.W2 := hyp.p_eq_card_W2
+      _ = Nat.card ↥hyp.Sdata.W2 := by rw [hyp.Sdata_W2_eq]
+      _ ∣ Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma hyp.S) := Subgroup.card_dvd_of_le hle
+  have hqT : hyp.q ∈ (Nat.card ↥(mainSubgroup (data.reps iT) (data.tau iT))).primeFactors := by
+    rw [hrepcard hyp.T hyp.T_maximal iT gT hgT]
+    refine Nat.mem_primeFactors.mpr ⟨hyp.q_prime, ?_, Nat.card_pos.ne'⟩
+    obtain ⟨tpd, -, -, htpdW2⟩ := reconciled_typePData_T hG hyp
+    have hle : tpd.W2 ≤ OddOrder.BG.Ch3.S10.Msigma hyp.T := by
+      refine le_trans (le_trans tpd.W2_le inf_le_left) ?_
+      rw [tpd.H_eq]
+      exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hyp.T_maximal
+    calc hyp.q = Nat.card ↥hyp.W1 := hyp.q_eq_card_W1
+      _ = Nat.card ↥tpd.W2 := by rw [htpdW2]
+      _ ∣ Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma hyp.T) := Subgroup.card_dvd_of_le hle
+  have hLcard : Nat.card ↥(mainSubgroup (data.reps k) (data.tau k)) =
+      Nat.card ↥(maxNilpotentNormalHall L) := by
+    rw [hrepcard L hLmax k gL hgL,
+      OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II hG hLmax
+        (Or.inl hLI)]
+  have htransfer : ∀ (M : Subgroup G) (m : data.ι) (g : G), MulAut.conj g • M = data.reps m →
+      k = m → ∃ g' : G, MulAut.conj g' • L = M := by
+    intro M m g hg hkm
+    refine ⟨g⁻¹ * gL, ?_⟩
+    rw [map_mul, mul_smul, hgL, hkm, ← hg, map_inv, inv_smul_smul]
+  rw [Nat.coprime_mul_iff_right]
+  constructor
+  · refine Nat.Coprime.symm (hyp.p_prime.coprime_iff_not_dvd.mpr fun hdvd => ?_)
+    have hpL : hyp.p ∈ (Nat.card ↥(mainSubgroup (data.reps k) (data.tau k))).primeFactors := by
+      rw [hLcard]
+      exact Nat.mem_primeFactors.mpr ⟨hyp.p_prime, hdvd, Nat.card_pos.ne'⟩
+    have hk : k = iS := by
+      by_contra hne
+      exact Finset.disjoint_left.mp (data.primeFactors_disjoint k iS hne) hpL hpS
+    exact hLnconjS (htransfer hyp.S iS gS hgS hk)
+  · refine Nat.Coprime.symm (hyp.q_prime.coprime_iff_not_dvd.mpr fun hdvd => ?_)
+    have hqL : hyp.q ∈ (Nat.card ↥(mainSubgroup (data.reps k) (data.tau k))).primeFactors := by
+      rw [hLcard]
+      exact Nat.mem_primeFactors.mpr ⟨hyp.q_prime, hdvd, Nat.card_pos.ne'⟩
+    have hk : k = iT := by
+      by_contra hne
+      exact Finset.disjoint_left.mp (data.primeFactors_disjoint k iT hne) hqL hqT
+    exact hLnconjT (htransfer hyp.T iT gT hgT hk)
+```
