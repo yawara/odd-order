@@ -34,3 +34,14 @@ created: 2026-07-13
 - 分割 owner = hub。b の active frontier ((9.11) residual 群) と衝突しない**凍結境界で prefix-split**
 - 候補境界: 0113 と同様、ファイル前半の landed sorry-free クラスタ (S3-coherence `sSet_sThree_coherent_dade` 系や norm-inputs bundle が凍結したタイミングで切り出し)
 - trigger: 次に 2000 行に接近した時点、または b の (9.11) 系 landing の節目。b が自主分割してもよい (0113 先例)
+
+## 解決 (2026-07-13, hub 監視 tick)
+
+lane b 自身が再分割を実施し、merge `34da8c50` (b @686d7eff) で main に landed:
+
+- `317b060a` suffix-split: S15_CaseBReducibleCoherence → **S15_CaseACoherence.lean** (1031 行)
+- `686d7eff` prefix-split: S15_CaseACoherence → **S15_NineElevenSteps.lean** (523 行)
+- 結果: S15_CaseBReducibleCoherence **1829 → 697 行**。3 file とも <1500。
+- OddOrder.lean import 追記済 (root closure OK)、build green (4183 jobs)、count-sorry 61→61。
+
+→ closed。
