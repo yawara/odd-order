@@ -971,7 +971,7 @@ irreducible `θ'` of `K'` with `P0.subgroupOf K' ⊄ ker θ'`: if `θ'` is a con
 contradicting the hypothesis.  This is the `S`-instance analogue of the leaf
 `PrimeTIResidue.constituent_P_not_subset_ker`, grounded on the honest `S'`-family — no
 `PrimeTIResidueData` and no prime-TI dichotomy is used. -/
-private theorem constituent_P_not_subset_characterKernel {Γ : Type*} [Group Γ] [Fintype Γ]
+theorem constituent_P_not_subset_characterKernel {Γ : Type*} [Group Γ] [Fintype Γ]
     [Invertible (Nat.card Γ : ℂ)] (P0 K' : Subgroup Γ) [Fintype ↥K']
     [Invertible (Nat.card ↥K' : ℂ)]
     (θ' : ClassFunction ↥K' ℂ)
