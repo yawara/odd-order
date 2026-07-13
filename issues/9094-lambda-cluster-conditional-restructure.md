@@ -44,3 +44,15 @@
 
 - issue 2035 更新 #17-#20 (発見の経緯・材料化 inventory)
 - 先行同型例: 2034 W-side restate (lambda_mem 削除)、2035 更新 #19 (tau1S_induce_inner_eta 分割)
+
+## 2026-07-13 追記 (lane b) — 訂正: dichotomy の数学は landed 済、裁定対象は carrier 形状のみ
+
+(13.3.b) の数学本体は **既に sorry-free で landed**:
+`caseB_of_no_irreducible_sOf_H0Cprime` (CountingLayer:1042, §9-generic) =
+「𝒮(H₀C′) に irr member 無し → CliffordCaseBData + C = ⊥ + u = (p^q−1)/(p−1)」
+(clifford_dichotomy + (9.8.c) caseA_character_counts + (9.9.c) caseB_character_counts の組立)。
+(9.10) 相当も `exceptional_case_frobenius_realization` (ThetaCountAssembly:993) に landed。
+
+⟹ 裁定は純粋に **carrier/API 形状** (案 A/B) と TTypeII 調整のみ。lane b は裁定を待たず
+両案共通の部品 (conditional producer `∃λ-witness → Nonempty CDD`、λ-free field 供給
+theorem 群) を先行 build する。
