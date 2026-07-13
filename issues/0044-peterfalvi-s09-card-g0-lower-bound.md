@@ -1465,3 +1465,22 @@ reduced family inequalityへ接続する。
 **次 frontier**: cont.⁵³ の concrete B decomposition と本上界を既存
 `Bsum_le_of_orthogonal_integer_decomposition` へ渡し、原文 (7.10) の
 `Σ_{j∈B}(h_j-1)/e_j ≤ e_i-1` を concrete B 上で証明する。
+
+## cont.⁵⁵ — (7.10) concrete B-sum 上界完成 (2026-07-14) ✅
+
+**新 leaf `S09_FrobeniusBsumEstimate.lean`** で原文の concrete
+`𝓑 = {j ≠ i | ⟨β_j,ν_iζ_{i0}⟩ = 0}` に対する
+`Σ_{j∈𝓑}(h_j-1)/e_j ≤ e_i-1` を閉じた。
+
+`exists_weightedGammaDecomposition_on_reverseCoefficientZeroIndices` が供給する
+integer coefficients `x_j ≠ 0`、weighted sums の対角直交性、Γ 分解、Γ₁ 直交性と、
+cont.⁵⁴ の `gammaAt_inner_self_re_le` を
+`Bsum_le_of_orthogonal_integer_decomposition` に渡した。併せて consumer 用に
+`reverseCoefficientZeroIndices_avoids` も公開した。
+
+検証: B-sum leaf green。主定理を AxiomsCheck tripwire に追加。
+
+**次 frontier**: この 𝓑 の補集合側を原文の 𝓐 として明示し、各 `j ∈ 𝓐` には
+(7.9) の非零 reverse coefficient と (7.8.c) を使った good-index norm 下界を供給する。
+その後、selected index の (7.8.b) lower bound と合わせて (7.5) reduced family
+inequalityへ接続する。

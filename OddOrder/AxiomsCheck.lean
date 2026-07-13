@@ -118,6 +118,7 @@ import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.Peterfalvi.S09_FrobeniusFamilyOrthogonality
 import OddOrder.Peterfalvi.S09_FrobeniusGammaDecomposition
 import OddOrder.Peterfalvi.S09_FrobeniusGammaNormEstimate
+import OddOrder.Peterfalvi.S09_FrobeniusBsumEstimate
 import OddOrder.Peterfalvi.S09_FrobeniusParity
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.GroupTheory.RepresentationTheory.GaloisInnerTransport
@@ -7891,3 +7892,13 @@ the odd-order Frobenius inequality `2e + 1 ≤ h` then gives
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.gammaAt_inner_self_re_le
+
+/-! **Peterfalvi (7.10) concrete B-sum bound, axiom-clean**
+(lane a, 2026-07-14, issue 0044 cont.⁵⁵).  On the exact set of indices whose
+reverse cross coefficient vanishes, (7.9) supplies nonzero integral projection
+coefficients and an orthogonal weighted Gamma decomposition.  The concrete
+(7.8.b) Gamma norm bound therefore gives
+`sum_{j in B} (h_j - 1) / e_j ≤ e_i - 1`. -/
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.reverseCoefficientZeroIndices_Bsum_le
