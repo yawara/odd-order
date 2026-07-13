@@ -607,6 +607,17 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 15) — a 合流: Isaacs Ch07 Thm 7.1 (Thompson normal p-complement) — Sylow centers via p-prime quotients**:
+  **a=1** (`e2772ae0` = Isaacs Ch07 Thompson subgroup work、issue 0031。**新 leaf `S7C_ThompsonPComplement.lean` +76**
+  (sorry-free) + `Basic.lean` +3/-2・`S7D1_BurnsideSetup.lean` +1/-1 (import 追加 + 微修正、**decl 削除ゼロ = 既存
+  Isaacs statement 非改変**) + AxiomsCheck +2)。**scope**: Isaacs/** = shared foundation ゆえ additive 追加は
+  全 lane 可・逸脱でない ✓ (2026-07-04 hub 裁定)。新 S7C は root closure OK (`OddOrder.lean → S03g_Thm310 →
+  S7D1_BurnsideSetup → S7C`、a が S7D1 に import 配線)。b=0 / c=0。
+  build green **4197 jobs** / AxiomsCheck OK (2382 assertion 全 allowlist) / **count-sorry 51→51 不変** (全 Ch07 file
+  sorry-free) / 新 axiom なし / 逸脱なし。size watch: S7C 76 OK。
+  ⚠ **build 所要時間の注意**: a が `S7D1_BurnsideSetup` (BG §3 `S03g_Thm310` の依存元 = DAG 深部) を触ったため、
+  .olean 無効化が下流 Peterfalvi spine 全体にカスケードし **full build が 10 分超** (通常の leaf 変更は cached ~10-40s)。
+  失敗でなく大規模再コンパイル (background で完走)。深部 foundation を触る tick では build 時間増を見込む。
 - **2026-07-14 (tick 14) — a 合流: S09 canonical Frobenius selected bound (実証明)**:
   **a=1** (`eb1e4920` = `S09_FrobeniusSelectedEstimate.lean` +240、canonical selected bound を **sorry-free で実証明**、
   AxiomsCheck +11、OddOrder.lean import 自追記 ✓、issue 0044 更新。scope=S09 territory ✓)。b=0 / c=0。
