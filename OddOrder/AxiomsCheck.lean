@@ -698,6 +698,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.twoSubgroups_commutative_of_minimal_counterexample
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.thompson_normal_p_complement_of_local_hypotheses
+#assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.center_map_subtype_map_of_coprime_kernel
 
 -- Ch.7 (Thompson Subgroup): Thm 7.8 Burnside p^a q^b solvability ⭐⭐⭐ **character-free**

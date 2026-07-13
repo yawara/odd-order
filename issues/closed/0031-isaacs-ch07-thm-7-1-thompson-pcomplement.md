@@ -24,14 +24,14 @@ normal p-complement + Lem 7.7 (N/C `p'`-quotient).
 ## やること
 
 - [x] Resolve Thm 7.6 first (issue #30).  ← **DONE** (0030 closed; `normal_J` landed・axiom-clean. 下記 2026-05-30 update)
-- [ ] Implement 7-step proof (mmd L3913-L3949):
+- [x] Implement 7-step proof (mmd L3913-L3949):
   1. Reduce to minimum counterexample.
   2. Use Lem 7.7 to pass through O_{p'}(G).
   3. Apply normal-J theorem 7.6 in reduced group.
   4. Combine with N_G(J(P)) normal p-complement hypothesis.
   5. Combine with C_G(Z(P)) normal p-complement hypothesis (via Thm 5.26).
   6. Derive contradiction in minimum counterexample.
-- [ ] Add top-level theorem `OddOrder.Isaacs.Ch07.thompson_normal_p_complement…`.
+- [x] Add top-level theorem `OddOrder.Isaacs.Ch07.thompson_normal_p_complement…`.
 
 ## 2026-05-26 update — sub-agent feasibility analysis
 
@@ -352,3 +352,20 @@ complement by coprimality with the complement index, so it is abelian.
 The next textbook frontier is Step 7: assemble Steps 2, 3, 5, and 6 into the
 existing sorry-free `thompson_normal_p_complement` closing theorem and expose
 the unconditional Theorem 7.1 endpoint.
+
+## 2026-07-14 update — Step 7 and Theorem 7.1 landed
+
+The full textbook endpoint is complete in
+`OddOrder/Isaacs/Ch07_ThompsonSubgroup/S7C_ThompsonPComplementFinal.lean` as
+`thompson_normal_p_complement_of_local_hypotheses`.  Its public assumptions are
+exactly `p ≠ 2`, a chosen `P ∈ Syl_p(G)`, and normal `p`-complements in
+`C_G(Z(P))` and `N_G(J(P))`.
+
+The proof first transports the chosen-Sylow hypotheses to the intrinsic
+all-Sylow carrier, then performs strong induction on `|G|`.  In a putative
+counterexample it constructs the lexicographically maximal bad subgroup,
+identifies it with `O_p(G)`, and applies Step 2 to obtain the quotient normal
+`p`-complement.  Steps 3, 5, and 6 supply `O_{p′}(G) = 1`,
+`C_G(Z(P)) = P`, and abelian `2`-subgroups; the existing sorry-free Step 7
+closing theorem then applies Theorem 7.6 (`normal_J`) and contradicts the
+counterexample.  No carrier field, new axiom, or signature change is used.

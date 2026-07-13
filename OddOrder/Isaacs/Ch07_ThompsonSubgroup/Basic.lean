@@ -61,7 +61,7 @@ Feit-Thompson 局所解析の中核を担う:
 Dependency-ordered split to keep the build inner-loop fast (issue 0038).
 Import chain: S7A1 → S7A2 → S7B1 → S7B2 → S7C →
 S7C Sylow maximal → S7C centralizer center → S7C abelian quotient complement →
-S7D1 → Main.
+S7C Thompson p-complement final → S7D1 → Main.
 
 * `S7A1_JpGL2p` — §7A part 1 (J(P), Thm 7.1 stmt, Lem 7.3 GL(2,p))
 * `S7A2_NormalPThm75` — §7A part 2 (Lem 7.3 formal, Thm 7.5, action infra)
@@ -71,6 +71,7 @@ S7D1 → Main.
 * `S7C_SylowMaximal` — §7C Thm 7.1 Step 4 (Sylow subgroup maximality)
 * `S7C_CentralizerCenter` — §7C Thm 7.1 Step 5 (`C_G(Z(P)) = P`)
 * `S7C_AbelianQuotientComplement` — §7C Thm 7.1 Step 6 (abelian Sylow `2`-subgroups)
+* `S7C_ThompsonPComplementFinal` — §7C Thm 7.1 Step 7 and final strong-induction assembly
 * `S7D1_BurnsideSetup` — §7D setup (Thm 7.8 stmt, scaffolding, Steps 2-9 decomp)
 * `Main` (this file) — §7D Step 3, Step 8, Step 9, final assembly
 -/
