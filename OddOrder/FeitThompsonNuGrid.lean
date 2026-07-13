@@ -378,6 +378,82 @@ theorem nuT_rowSum_eq_induce (i : Fin tp.q) :
       rw [certainTypeT_W2_eq hG mp, tp.W1_eq_K hG]
     exact hseq ▸ hsub
 
+/-- The Dade-free Hypothesis (4.6) core on `mp.T`, reconciled with an arbitrary T-side
+`TypePData`.  Its certain-type parent is exactly the canonical `nuT` producer. -/
+noncomputable def hyp46TmpCore (Tdata : TypePData mp.T)
+    (hW1 : Tdata.W1 = tp.W2) (hW2 : Tdata.W2 = tp.W1) :
+    OddOrder.Peterfalvi.S06.Hypothesis46Core
+      (OddOrder.Peterfalvi.S15.honestTypeP2ASet mp.T) mp.T :=
+  { toHypothesis := mp.certainTypeT hG
+    L_normalizes_A := fun l _ ha =>
+      OddOrder.Peterfalvi.S15.honestTypeP2ASet_conj_mem l.2 ha
+    tic := OddOrder.Peterfalvi.S12.typePData_toTICyclicHypothesis Tdata hG.odd
+    tic_W1 := by
+      change Tdata.W1 = _
+      rw [certainTypeT_W1_eq, Subgroup.map_subgroupOf_eq_of_le mp.Kstar_le_T,
+        hW1, tp.W2_eq_Kstar hG]
+    tic_W2 := by
+      change Tdata.W2 = _
+      rw [certainTypeT_W2_eq, Subgroup.map_subgroupOf_eq_of_le (k_le_T hG mp),
+        hW2, tp.W1_eq_K hG]
+    tic_V := rfl
+    subH := (OddOrder.BG.Ch3.S10.Msigma mp.T).subgroupOf mp.T
+    subH_normal := by
+      rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
+    W2_le_subH := by
+      rw [certainTypeT_W2_eq, ← tp.W1_eq_K hG, ← hW2]
+      refine Subgroup.subgroupOf_mono mp.T ?_
+      have hW2H : Tdata.W2 ≤ Tdata.H := le_trans Tdata.W2_le inf_le_left
+      rw [Tdata.H_eq] at hW2H
+      exact le_trans hW2H
+        (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG mp.T_maximal)
+    subH_le_K := by
+      rw [certainTypeT_K_eq]
+      exact Subgroup.subgroupOf_mono mp.T
+        (OddOrder.BG.Ch3.S10.Msigma_le_derived hG mp.T_maximal)
+    A_covers := by
+      intro hh hhσ hh1 x hx hx1
+      rw [Subgroup.mem_inf] at hx
+      obtain ⟨hxC, hxD⟩ := hx
+      rw [certainTypeT_K_eq, Subgroup.mem_subgroupOf] at hxD
+      rw [Subgroup.mem_subgroupOf] at hhσ
+      rw [Subgroup.mem_centralizer_iff] at hxC
+      rw [OddOrder.Peterfalvi.S15.mem_honestTypeP2ASet]
+      refine ⟨hxD, ?_, (hh : G), ⟨hhσ, ?_⟩, ?_⟩
+      · simpa using hx1
+      · simpa using hh1
+      · rw [Subgroup.mem_centralizer_iff]
+        rintro g rfl
+        have hcomm := hxC (hh : ↥mp.T) rfl
+        have := congrArg (mp.T.subtype) hcomm
+        simpa using this }
+
+/-- **Peterfalvi (4.8), conclusion (1), T-side** (Coq `prDade_sub_TIirr_on`): for
+non-anchor equal-degree rows, `ν_{ij} - ν_{kj}` is supported in
+`A₀(T) = A(T) ∪ (V_T)^T`. -/
+theorem nuT_diff_support (Tdata : TypePData mp.T) (_hU : Tdata.U = tp.V)
+    (hW1 : Tdata.W1 = tp.W2) (hW2 : Tdata.W2 = tp.W1)
+    (j : Fin tp.p) {i k : Fin tp.q}
+    (hi0 : i ≠ ⟨0, tp.q_prime.pos⟩) (hk0 : k ≠ ⟨0, tp.q_prime.pos⟩)
+    (hdeg : nuT hG mp tp i j 1 = nuT hG mp tp k j 1) :
+    (nuT hG mp tp i j - nuT hG mp tp k j).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.Peterfalvi.S15.honestTypeP2A0Set mp.T Tdata) mp.T := by
+  classical
+  haveI : NeZero (Nat.card ↥(hyp46TmpCore hG mp tp Tdata hW1 hW2).W1) :=
+    inferInstanceAs (NeZero (Nat.card ↥(mp.certainTypeT hG).W1))
+  have hχi : colT hG mp tp i ≠ 1 := by
+    intro hc
+    exact hi0 (colT_injective hG mp tp (hc.trans (colT_zero hG mp tp).symm))
+  have hχk : colT hG mp tp k ≠ 1 := by
+    intro hc
+    exact hk0 (colT_injective hG mp tp (hc.trans (colT_zero hG mp tp).symm))
+  intro z hz
+  rw [OddOrder.RepresentationTheory.ClassFunction.mem_support] at hz
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+  exact OddOrder.Peterfalvi.S06.certainType_diff_supp_subset_A0
+    (hyp46TmpCore hG mp tp Tdata hW1 hW2) hχi hχk (rowT hG mp tp j) hdeg hz
+
 /-- **Peterfalvi (9.8)/(9.11), T-side reverse dichotomy**: every reducible member of a
 kernel-filter family over `T'` is a non-anchor canonical `ν`-row sum. -/
 theorem nuT_reducible_dichotomy {X : Subgroup ↥mp.T} {ψ : ClassFunction ↥mp.T ℂ}
