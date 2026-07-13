@@ -193,3 +193,16 @@ Together with `thompsonJ_map_of_coprime_kernel` and the normalizer/centralizer
 image inheritance lemmas in `S7B2_NormalJ_PComplement`, both Step 3 local
 hypotheses can now be transported through `G/O_{p′}(G)`.  Remaining frontier is
 the minimum-counterexample carrier and Steps 1–6 assembly of the full Theorem 7.1.
+
+## 2026-07-14 update — conjugacy-invariant hypothesis carrier landed
+
+The §7C leaf now packages the two textbook local hypotheses as
+`HasThompsonLocalPComplements p P` and proves their honest transport across any
+group isomorphism.  The proof uses the public normal-`p`-complement `MulEquiv`
+transport, injective-image formulas for `Z(P)` and `J(P)`, and exact image formulas
+for centralizers and normalizers.
+
+Sylow conjugacy then proves that the hypotheses at the chosen textbook Sylow
+subgroup are equivalent to `HasThompsonPComplementHypothesis p G`, the intrinsic
+all-Sylow form needed by strong induction.  The next frontier is Step 1: construct
+the lexicographically maximal bad `p`-subgroup and prove that it is `O_p(G)`.

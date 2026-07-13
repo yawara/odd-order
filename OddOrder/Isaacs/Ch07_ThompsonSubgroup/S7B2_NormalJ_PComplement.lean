@@ -1586,7 +1586,7 @@ theorem normalizer_and_centralizer_map_of_coprime_kernel [Finite G]
 
 If `e : G ≃* H` and `G` has a normal `p`-complement, so does `H`. The complement is the
 image of `G`'s complement under `e`. -/
-private theorem hasNormalPComplement_of_mulEquiv
+theorem hasNormalPComplement_of_mulEquiv
     {G' H : Type*} [Group G'] [Group H]
     [Finite G'] [Finite H] {p : ℕ} [Fact p.Prime] (e : G' ≃* H)
     (hG : OddOrder.Isaacs.Ch05.HasNormalPComplement p G') :
