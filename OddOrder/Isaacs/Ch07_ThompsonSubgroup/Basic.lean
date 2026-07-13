@@ -59,12 +59,13 @@ Feit-Thompson 局所解析の中核を担う:
 ## File layout (split per issue 0038)
 
 Dependency-ordered split to keep the build inner-loop fast (issue 0038).
-Import chain: S7A1 → S7A2 → S7B1 → S7B2 → S7D1 → Main.
+Import chain: S7A1 → S7A2 → S7B1 → S7B2 → S7C → S7D1 → Main.
 
 * `S7A1_JpGL2p` — §7A part 1 (J(P), Thm 7.1 stmt, Lem 7.3 GL(2,p))
 * `S7A2_NormalPThm75` — §7A part 2 (Lem 7.3 formal, Thm 7.5, action infra)
 * `S7B1_NormalJ` — §7B Steps 1-6
-* `S7B2_NormalJ_PComplement` — §7B close + §7C (Thm 7.1 proof, Thm 7.7)
+* `S7B2_NormalJ_PComplement` — §7B close + §7C infrastructure (Lem 7.7)
+* `S7C_ThompsonPComplement` — §7C quotient identifications + Thm 7.1 assembly
 * `S7D1_BurnsideSetup` — §7D setup (Thm 7.8 stmt, scaffolding, Steps 2-9 decomp)
 * `Main` (this file) — §7D Step 3, Step 8, Step 9, final assembly
 -/
