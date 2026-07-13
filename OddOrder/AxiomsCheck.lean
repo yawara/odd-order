@@ -115,6 +115,7 @@ import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
 import OddOrder.Peterfalvi.S08_SixTwoGeneral
 import OddOrder.Peterfalvi.S13_CoreStructure
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
+import OddOrder.Peterfalvi.S09_FrobeniusFamilyOrthogonality
 import OddOrder.Peterfalvi.S09_FrobeniusParity
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.GroupTheory.RepresentationTheory.GaloisInnerTransport
@@ -7843,3 +7844,20 @@ good-index norm estimates in the (7.10) `card_G0_lower_bound` assembly — the s
 S09-side sorry root of the (12.17) chain (`theorem88_caseB_holds` → FT spine). -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S09.FrobeniusFamily.hypothesis79_delta_even
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S09.FrobeniusFamily.hypothesis79_conclusion
+
+/-! **Peterfalvi (7.10) family-wide weighted orthogonality, axiom-clean**
+(lane a, 2026-07-14, issue 0044 cont.⁵⁰).  Every non-principal induced-family
+member has a distinct conjugate partner in odd order; coherence carries their
+difference into the Dade support.  Disjoint kernel spreads then give
+cross-orthogonality for every pair of members and hence for the weighted sums.
+The diagonal weighted norm is evaluated by the induced-family Burnside
+degree sum as (h_i - 1) / e_i = BsumWeight i. -/
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.hypothesis79_zeta_cross_eq_zero_at
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.hypothesis79_weightedNuSum_cross_eq_zero
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.hypothesis78_weightedNuSum_inner_self_eq_BsumWeight

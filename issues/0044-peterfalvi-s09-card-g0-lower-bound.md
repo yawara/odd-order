@@ -1379,3 +1379,31 @@ hypothesis78_delta_isReal) は genuine・保存済で再利用可。
 **次 iteration の実装順**: (α) S09_FrobeniusCrossOrtho の cross-orthogonality 在庫確認
 (3 の hχ_orth と 5 の support 非交差)、(β) 6 の数値補題 + 1 の argmin、(γ) 5 の Γ 分解
 (x/v/Γ₁ 構成 + horth)、(δ) 4+3 の 𝓐𝓑 wiring、(ε) 7-9 の残 source data。
+
+## cont.⁵² — family-wide weighted orthogonality 完成 (2026-07-14) ✅
+
+**新 leaf S09_FrobeniusFamilyOrthogonality.lean** に、(7.10) の 𝓑-family 全体で必要な
+直交性を上流 API として実証明した。
+
+1. 任意の non-principal index r について、誘導指標 ζ_r の既約性、共役 index r' の存在、
+   奇数位数による ζ_r ≠ ζ̄_r、ζ_r − ζ̄_r の sharp-kernel support を証明。
+2. coherence agreement から νζ_r − νζ̄_r が Dade support に載ること、各 νζ_r の norm 1、
+   共役対の内積 0 を証明。
+3. 異なる family member i ≠ j の任意の source indices r,s について
+   hypothesis79_zeta_cross_eq_zero_at を証明。共役差の supports は
+   hypothesis79.dadeSupport_disjoint で disjoint なので、
+   orthonormal_vchar_diff_ortho が全組合せの内積 0 を与える。
+4. 双方の有限和を展開し、
+   hypothesis79_weightedNuSum_cross_eq_zero を証明。
+5. 同一 member の weighted sum は、誘導族の pairwise orthogonality +
+   family_degree_sum から norm を (h_i−1)/e_i と評価し、
+   hypothesis78_weightedNuSum_inner_self_eq_BsumWeight で既存の
+   BsumWeight interface へ接続。
+
+検証: leaf green、代表3定理の AxiomsCheck green
+([propext, Classical.choice, Quot.sound])。これで cont.⁵¹ の (α) と、Γ 分解で必要な
+horth : ⟨v_j,v_l⟩ = if j=l then BsumWeight j else 0 の character-side supplier は完成。
+
+**次 frontier**: 原文 (7.9) の係数関係
+⟨Γ, ν_j ζ_{jt}⟩ = d_{jt} x_j を証明し、x_j・v_j・Γ₁ を構成して
+Bsum_le_of_orthogonal_integer_decomposition へ渡す。続いて 𝓐/𝓑 wiring と残 source data を組む。
