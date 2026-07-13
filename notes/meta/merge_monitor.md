@@ -573,6 +573,12 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-13 (tick 1, セッション再開初回 — Fable 5 hub; 監視対象 = a/b のみ、c 未稼働 ユーザー指示) — b 合流**:
+  **b=4** ((9.11.6) S-instance `nineElevenNormBoundS` dichotomy closed (1017) + **0114 再分割実施**:
+  S15_CaseBReducibleCoherence 1829→697、新 leaf S15_CaseACoherence 1031 + S15_NineElevenSteps 523、
+  OddOrder.lean import 追記済) / a=0 / c=0。build green (4183 jobs)・AxiomsCheck OK・count-sorry 61→61・
+  新 axiom なし・逸脱なし・size watch 全 <1500 (**0114 closed**)。push `31c519fd..47cafdc2`。
+  **監視ペース**: Fable ゆえ 30 分 `13,43` で cron 再作成 (id 66211cac、session-only)。
 - **2026-07-12 (tick 16, セッション再開初回 — Opus 4.8 hub) — a+b 合流**:
   **a=1 genuine + 2 sync** ((11.9.c) `not_isTypeIV_of_mem_maximalSubgroups` = 全 maximal subgroup M の
   per-M 普遍 Type-IV 排除、issue 1024 納品記録→pending; 残 2 commit は main sync merge、自所有

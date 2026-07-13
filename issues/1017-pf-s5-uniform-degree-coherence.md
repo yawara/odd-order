@@ -1726,3 +1726,64 @@ pattern を family = `sSet \ S₂` に差し替えて `uniform_degree_coherence_
      `Supp(Ind_{H⊔U₁}^S 1 − ψ₁) ⊆ A(S)` (Hall 論法; supp γ ⊆ ⋃ conj HU₁ の一般 lemma +
      `honestTypeP2ASet_conj_mem` + cyclic Hall 分解 + Hall 共役定理)。
   3. `nineElevenFourNormInputsS` bundle: 1+2+generic γ-facts の配線 (M-side 1063-1176 mirror)。
+
+## 2026-07-13 更新 #52 (lane b, /loop) — (9.11.4) bundle landed + file split (campaign → S15_CaseACoherence)
+
+**landed (commit 11765a58)**:
+1. `cuSubOf_zero_tiWitness` (**axiom-clean**) = (9.11.2) TI-identity を明示 witness `cuSubOf caseA 0`
+   で返す strengthened producer (generic producer の proof verbatim mirror; S11_NineElevenTIWitness への
+   upstream-merge 候補 — hub 向け note)。
+2. `nineElevenAlphaSupportS` (new named residual, TRUE signature) = `Supp(γ − ψ₁) ⊆ A(S)` @ 明示
+   witness。Coq gap-patch site。証明経路 (次): `support_induce_subset_conjugatesInto` + cyclic Hall
+   分解 + Hall 共役 (可解 HU₁) + coprime fixed-point lifting + `sSet_member_support_subset` +
+   `honestTypeP2ASet_conj_mem`。
+3. `nineElevenFourNormInputsS` = (9.11.4) bundle (∃ N, N·u = (a+1)u+(q−1)a² ∧ A(S)-supported
+   α = γ−ψ₁ ∈ ZIrr, ‖α‖² = N)。generic `nineElevenGamma_*` 層 + `cfnorm_sub_irreducible_orthogonal`
+   + `mem_ZIrr_inner_self_eq_sum_sq` の S-instance 配線、sorryAx = support residual のみ。
+
+**file split (1829 行 > 1500 watch → 自主 suffix-split)**: active な (9.11) campaign + assembly + τ₁
+を新 leaf **`S15_CaseACoherence.lean`** (1168 行) へ、`S15_CaseBReducibleCoherence.lean` (697 行) は
+凍結 caseB coherence + (5.6) pair bound を保持し新 leaf が import。body byte-identical・宣言 28 = 8+20・
+sorry 2 = 0+2 保存。importer は OddOrder.lean のみ (import 追加)。build green 4182 jobs。
+
+**残 residual 2 (共に S15_CaseACoherence)**: `nineElevenAlphaSupportS` (9.11.4 support) +
+`nineElevenNormBoundS` (9.11.5-8 dichotomy/Bessel/budget)。次: (i) normBound を
+`nineElevenNormBound_of_sevenEightRefutation` mirror で dichotomy 分解 (c₃ = landed
+`sSet_sThree_coherent_dade`、α-context = landed bundle 流用、h78 = 新 named residual)、
+(ii) alphaSupport の Hall 論法実証明。
+
+## 2026-07-13 更新 #53 (lane b, /loop) — nineElevenNormBoundS の (9.11.6) dichotomy 分解 CLOSED
+
+**`nineElevenNormBoundS` の bare sorry を除去** — M-side `nineElevenNormBound_of_sevenEightRefutation`
+の full mirror (一発 green、S-side τ = dadeIntegralCharacterMap 直書きゆえ M-side の maxHeartbeats
+1600000 不要):
+- indS → honest-Dade 変換 (hS₂cohD/hnopairD、pair-bound の congrMap pattern)
+- c₃ = landed `sSet_sThree_coherent_dade`
+- α-context 再構築 (landed bundle pattern: `cuSubOf_zero_tiWitness` + generic Gamma 層 +
+  `nineElevenAlphaSupportS` residual 引用)
+- (9.11.6) 定数性 (`⟨α^τ, λ^{τ₃}⟩` は 𝒮₃ 上一定: `sSet_scaledDiff_support` c:=1 等度数台 +
+  Dade isometry + `α ⊥ 𝒮₃` source 直交)
+- 二分岐: 直交枝 → **新 named residual `nineElevenSevenEightRefutationS`** (M-side Prop の unrolled
+  mirror、M-side は discharged ゆえ TRUE; 全 coherence 節を honest 'A-Dade 側で受ける)、
+  非直交枝 → Bessel (`S13.card_le_inner_self_re_of_orthonormal_inner_int_ne`、
+  `AlphaBound` は HypothesisBasics → PairAdjoin 経由で閉包内)。
+
+**caseA 残 residual = 2 (最終形)**:
+1. `nineElevenAlphaSupportS` — (9.11.4) A(S)-support (Coq gap-patch; Hall 論法)。
+2. `nineElevenSevenEightRefutationS` — (9.11.7)-(9.11.8) budget (M-side ~700 行 discharge の mirror)。
+
+file 1524 行 (>1500 watch 微超; 次の追記前に再 split)。build green 4182。
+
+## 2026-07-13 更新 #54 (lane b, /loop) — (9.11.4) nineElevenAlphaSupportS CLOSED (Coq gap-patch)
+
+**landed (commit eb05b48c、前段で再 split 686d6eff → S15_NineElevenSteps.lean 新 leaf)**:
+- `exists_cuSubOf_centralizer_witness` (generic): C_H(U₁) ≠ 1 (coprime fixed-point lifting、
+  S11_NineElevenCoherence upstream-merge 候補)。
+- `Hypothesis.mem_honestTypeP2ASet_of_mem_H_sup_cuSubOf`: (HU₁)^# ⊆ A(S) — piPart σ 分岐 +
+  Hall D/C (可解 K = H⊔U₁、U₁ = Hall σ′)。Coq PFsection9.v:1478-1484 の gap-patch の Lean 版。
+- `nineElevenAlphaSupportS` assembly → **axiom-clean**。連鎖して
+  `nineElevenFourNormInputsS` (9.11.4 bundle) も **axiom-clean**。S15_NineElevenSteps sorry 0。
+
+**caseA 残 residual = 1 (最終)**: `nineElevenSevenEightRefutationS` (S15_CaseACoherence.lean:105)
+— (9.11.7)-(9.11.8) budget、M-side discharge (~700 行) の S-mirror。次 iteration はここから
+(M-side `nineElevenSevenEightRefutation` の証明 chain を S-instance へ移植)。
