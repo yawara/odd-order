@@ -453,3 +453,20 @@ private) / `not_nonTypeICovering_of_all_typeI` (同:95, private)。
 **併記**: 9077-T1 の TTypeII proof-only de-gate (c 所有 file) は本 tick で **非逸脱として受理・合流済**
 (0096 拡張と同型 = signature 不変・新規宣言なし・sorry −1・self-flag 済・c 停止中で衝突なし)。
 c 再開時は 9077 の T1 RESOLVED 追記を参照。
+
+---
+
+## ✅ RULING #4 実施 1/3 (2026-07-13 lane a): `card_LF_coprime_pq` landed — §15 gate-4 B2 axiom-clean
+
+**self-flag (carve-out 条件 iii)**: S15_Gate3.lean (b territory、RULING #4 decl 単位 carve-out) を編集 —
+`card_LF_coprime_pq` の sorry を 9087 §3″ の検証済み proof で置換 (signature 不変、binder un-underscore
+のみ) + stale docstring (「bgTheoremE_cover_data = := sorry」「owner = F」) を現状に訂正。既存 b 宣言の
+改変・削除なし (条件 ii 遵守)。
+
+**検証**: leaf + full `lake build OddOrder` green (4187 jobs) + `#print axioms` =
+`[propext, Classical.choice, Quot.sound]` for `card_LF_coprime_pq` **および下流 corollary 2 本**
+(`q_not_dvd_kernel` / `p_not_dvd_kernel`、S15_ComplementStructure — (13.17.b) type-I branch の
+kernel coprimality)。AxiomsCheck assert 3 本追加。
+
+**残 2/3**: `allTypeI_fittingIsTI` (uniqueness 部品は S10 に landed 済 @dcbd148e、残 = F(M) = M_F
+for type-F 小補題 + assembly) → 次 iteration で着手。`not_nonTypeICovering_of_all_typeI` はその後。
