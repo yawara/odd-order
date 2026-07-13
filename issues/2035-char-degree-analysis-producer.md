@@ -1182,3 +1182,42 @@ signature (hG, hyp) は不変で OK — **hnoV = `S12.no_typeV_maximal_unconditi
 - tau1S_induce_inner_eta_col_zero ⟵ zSpan 分解 + formula + crux (irr/red 両対応)
 - **lambda (13.3.b) = 未存在の genuine content** (irr・degree uq・H-linear-induced な member の存在)
 - tau1T ⟵ hyp.swap (HypothesisSwap:153) の tau1S_ofHonest (swap 側 chief も exists_chiefFactorData)
+
+## 2026-07-13 更新 #20 (lane b, /loop) — ⚠ (13.3.b) は dichotomy: CharacterDegreeData.lambda 無条件 field は overstatement の疑い濃厚
+
+### 原文・Coq の確定事実
+- **Pf (13.3.b)** (mmd 04.15 line 43): 「𝒮 が PC の線型指標から誘導される次数 uq の既約指標を
+  **含まないなら**、(9.7.b) が M=S, C=1, u=(p^q−1)/(p−1) で成立」— λ の存在は **dichotomy**、無条件でない。
+- **Coq PFsection13:307-310**: `~~ has irrIndH calS → [typeP_Galois, C=1, u=(p^q−1)/(p−1)]` — 同形。
+- Coq は (13.4) を skip し、(13.5-8) は `calS1 = seqIndD H S P 1` の member zeta を**引数に取る条件付き**
+  (S1cases :402: zeta ∈ calS1 → μ-column か irr)。λ を無条件に選ぶ lemma は存在しない。
+- book 後段 (13.15) (mmd line 262): x = (p^q−1)/((p−1)u) の算術で x ≥ 2q+1 の場合に no-λ 分岐を
+  refute して初めて「By (13.3.b), there is a character λ」と言う — **no-λ (Galois, C=1) は
+  (13.3) 時点で live な case**。
+- ⟹ `character_degree_analysis : Nonempty (CharacterDegreeData hyp)` (無条件 λ 込み) は
+  no-λ case を排除できない限り証明不能の疑い。要確認: S15.Hypothesis が C≠1/非Galois を既に
+  field で排除していないか (排除していれば無条件で OK)。していなければ restructure:
+  **(A) λ-free core** (μ/τ₁/δ field 群 — 全て landed engine で供給可) **+ λ-cluster 条件付き carrier**、
+  or **(B)** producer を dichotomy 化 `Nonempty CDD ∨ (Galois ∧ C=1 ∧ u=…)`。
+  consumer 影響: NormEstimates ×5 (13.8-T 系、λ 前提で自然) + **TTypeII:194 (lane c 所有)** —
+  restructure は cross-lane 影響あり、実施時は hub 調整 (9000 issue) 経由。
+
+### 今 iteration の landing
+- `tau1S_ofHonest_mu_col_eta_col_one` (CaseACoherence、sorry-free): mu_col_tau1_eta_col_one
+  field の honest supply (formula + mu_j_isIndPC 合成、p=3 分岐で j=2/δ=−1)。
+
+## 2026-07-13 更新 #21 (lane b, /loop) — (13.3.b) 数学は landed 済と判明 + 残 build list 確定
+
+- **(13.3.b) dichotomy glue = `caseB_of_no_irreducible_sOf_H0Cprime`** (CountingLayer:1042,
+  sorry-free, §9-generic) が既に存在 — no-irr → caseB + C=⊥ + u=(p^q−1)/(p−1)。
+  (9.10) 相当 = `exceptional_case_frobenius_realization` (ThetaCountAssembly:993, sorry 3 残
+  は type-II HU-Frobenius 節のみ)。9094 の裁定対象は carrier 形状のみに縮小 (追記済)。
+- **残 build list (ungated、9094 裁定と独立に有用)**:
+  1. conditional producer `character_degree_analysis_of_irr`: (∃ λ witness) → Nonempty (CDD hyp)
+     — 全 field を landed engine で組む (λ-cluster は witness から)。
+  2. `tau1S_apply_induce_sub` 供給: zSpan(sSet) 元の degree-0 → A(S)-supported 小 lemma +
+     tau1S_ofHonest_extends_on_supported + induce_H_mem_zSpan_S。
+  3. `tau1S_induce_inner_eta` (restated 版) 供給: Ind θ irr → sSet membership 橋 + crux。
+  4. `tau1S_induce_inner_eta_col_zero` 供給: induce_H_mem_zSpan_S の zSpan 分解 + formula + crux。
+  5. tau1T / δ'-half: `Hypothesis.swap` 経由 — 前提 = hT2 (T type-P₂) + Tdata + **NuGridSupplyData**
+    (T-side (13.1.e)/(4.3)/(4.4) grid facts の Prop bundle、producer 未確認 — 要調査)。

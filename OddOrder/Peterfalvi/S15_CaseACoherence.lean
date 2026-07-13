@@ -1,5 +1,6 @@
 import OddOrder.Peterfalvi.S15_NineElevenSevenEight
 import OddOrder.Peterfalvi.S15_SAndT_Setup.MuColumnPin
+import OddOrder.Peterfalvi.S15_SAndT_Setup.DegreesFirstSplit
 
 /-!
 # Peterfalvi (9.11.5)–(9.11.8) — the `S`-instance caseA coherence endgame and assembly
@@ -895,6 +896,46 @@ theorem Hypothesis.tau1S_ofHonest_muColumn_formula [Finite G]
       hyp.tau1S_ofHonest hG hnoV chief (∑ i : Fin hyp.q, hyp.mu i j)
         = -∑ i : Fin hyp.q, hyp.eta i j') :=
   (hyp.sSet_coherent_indS_A_pinned hG hnoV chief).choose_spec
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **Peterfalvi (13.3.a)+(13.3.c), the distinguished `μ`-column for `τ₁ = tau1S_ofHonest`**
+(issue 2035): a column `j ≠ 0` whose sum is induced from a linear character of `H = PC`
+((13.3.a), `mu_j_isIndPC`) and whose `τ₁`-image is `±∑_i η_{i1}` — the (13.3.c) formula routed to
+the `η`-column `1` (`j = 1, δ = 1` in the clean branch; the `p = 3` sign-flip exception takes
+`j = 2, δ = -1`).  This is the honest supply of the `CharacterDegreeData.mu_col_tau1_eta_col_one`
+field. -/
+theorem Hypothesis.tau1S_ofHonest_mu_col_eta_col_one [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
+    ∃ (j : Fin hyp.p) (δ : ℤ) (θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ),
+      (δ = 1 ∨ δ = -1) ∧
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter θ ∧ θ 1 = 1 ∧
+      (∑ i : Fin hyp.q, hyp.mu i j) = ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ ∧
+      hyp.tau1S_ofHonest hG hnoV chief (∑ i : Fin hyp.q, hyp.mu i j)
+        = (δ : ℂ) • ∑ i : Fin hyp.q, hyp.eta i ⟨1, hyp.p_prime.one_lt⟩ := by
+  classical
+  haveI := hyp.finiteG
+  have hp1 : (⟨1, hyp.p_prime.one_lt⟩ : Fin hyp.p) ≠ ⟨0, hyp.p_prime.pos⟩ := by
+    intro h; exact absurd (congrArg Fin.val h) one_ne_zero
+  rcases hyp.tau1S_ofHonest_muColumn_formula hG hnoV chief with hclean | ⟨hp3, hflip⟩
+  · -- clean branch: `j = 1`, `δ = 1`
+    obtain ⟨θ, hθirr, hθ1, hθeq⟩ := hyp.mu_j_isIndPC hG ⟨1, hyp.p_prime.one_lt⟩ hp1
+    exact ⟨⟨1, hyp.p_prime.one_lt⟩, 1, θ, Or.inl rfl, hθirr, hθ1, hθeq,
+      by rw [hclean ⟨1, hyp.p_prime.one_lt⟩ hp1]; push_cast; rw [one_smul]⟩
+  · -- `p = 3` sign-flip branch: `j = 2`, `δ = -1`
+    have h2lt : 2 < hyp.p := by omega
+    have hj2 : (⟨2, h2lt⟩ : Fin hyp.p) ≠ ⟨0, hyp.p_prime.pos⟩ := by
+      intro h; exact absurd (congrArg Fin.val h) (by norm_num)
+    have hne : (⟨2, h2lt⟩ : Fin hyp.p) ≠ ⟨1, hyp.p_prime.one_lt⟩ := by
+      intro h; exact absurd (congrArg Fin.val h) (by norm_num)
+    obtain ⟨θ, hθirr, hθ1, hθeq⟩ := hyp.mu_j_isIndPC hG ⟨2, h2lt⟩ hj2
+    refine ⟨⟨2, h2lt⟩, -1, θ, Or.inr rfl, hθirr, hθ1, hθeq, ?_⟩
+    rw [hflip ⟨2, h2lt⟩ ⟨1, hyp.p_prime.one_lt⟩ hj2 hp1 hne]
+    push_cast
+    rw [neg_one_smul]
 
 open scoped FiniteInduce in
 /-- **Type-alignment probe for the (13.3) `τ₁` route** (issue 2035 step 4 verification): confirms
