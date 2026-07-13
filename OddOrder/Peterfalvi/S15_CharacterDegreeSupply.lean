@@ -579,4 +579,67 @@ theorem Hypothesis.characterDegreeCore_nonempty [Finite G]
   exact ⟨hyp.characterDegreeCore hG
     (OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional hG) chief⟩
 
+open scoped FiniteInduce in
+/-- **The conditional λ-cluster producer** (issue 9094 RULING 案 A, the (13.3.b) conditional
+branch): a linear `θ ∈ Irr H` (`H = PC`) with `P ⊄ Ker θ` whose induction `Ind_{PC}^S θ` is
+irreducible packages into `LambdaClusterData` — the degree is `[S:H]·1 = uq`
+(`H_index_eq_uq`). -/
+theorem Hypothesis.lambdaClusterData_of_irr_witness [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ)
+    (hθ : OddOrder.RepresentationTheory.IsIrreducibleCharacter θ) (hθ1 : θ 1 = 1)
+    (hθP : ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
+        Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel θ))
+    (hind : OddOrder.RepresentationTheory.IsIrreducibleCharacter
+      (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ)) :
+    Nonempty (LambdaClusterData hyp) := by
+  haveI := hyp.finiteG
+  refine ⟨⟨ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ, hind, ?_, θ, hθ, hθ1, rfl, ?_⟩⟩
+  · rw [OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, hθ1, mul_one,
+      hyp.H_index_eq_uq hG]
+  · obtain ⟨x, hxP, hxker⟩ := Set.not_subset.mp hθP
+    exact ⟨x, Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp hxP), hxker⟩
+
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
+/-- **The (13.5)/(7.6) datum for `(S, H^#)` with a chosen `𝒮₁`-base** (issue 2035 更新
+#22/#24): the `H_sharp_hypothesis76` mirror through `hypothesis76OfDadeBase`, pinning
+`ζ₀ = Ind_{PC}^S φ₀` for a *given* `φ₀` — Peterfalvi's per-application base choice ((13.5)
+takes `ζ₀ ∈ 𝒮₁`, i.e. `P ⊄ Ker φ₀`; the (13.5.a/b/c) coefficient computations then convert
+`(ζ_i − ζ₀)^{τ₁} ↔ Ind_S^G` through the *guarded* `CharacterDegreeCore` fields, which the
+trivial-base instance cannot). -/
+noncomputable def H_sharp_hypothesis76_base [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (φ₀ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(hyp.H.subgroupOf hyp.S)) :
+    OddOrder.Peterfalvi.S09.Hypothesis76 G
+      (OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G)) hyp.S := by
+  refine OddOrder.Peterfalvi.S09.Cert.hypothesis76OfDadeBase
+    (H_sharp_hypothesis71 hG hyp) ?_ hyp.H ?_ ?_ rfl φ₀
+  · exact ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData
+      (H_sharp_hconj hG hyp)).toDadeIsometryData.isDadeIsometry
+  · have hUS : hyp.U ≤ hyp.S := by
+      have h1 : hyp.U ≤ derivedInG hyp.S := by rw [hyp.S_deriv_eq_PU]; exact le_sup_right
+      exact le_trans h1 (Subgroup.map_subtype_le _)
+    show hyp.P ⊔ hyp.C ≤ hyp.S
+    refine sup_le ?_ ?_
+    · rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
+    · rw [hyp.C_eq]; exact le_trans inf_le_left hUS
+  · intro l h hh
+    by_cases h1 : h = 1
+    · subst h1; simpa using hyp.H.one_mem
+    · have hsh : h ∈ OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G) :=
+        OddOrder.Peterfalvi.S04.mem_sharp.mpr ⟨hh, h1⟩
+      exact (OddOrder.Peterfalvi.S04.mem_sharp.mp (S_normalizes_H_sharp hG hyp l hsh)).1
+
+open scoped FiniteInduce in
+/-- **The chosen-base `(S, H^#)` family pins `ζ₀ = Ind_{PC}^S φ₀`.** -/
+theorem H_sharp_hypothesis76_base_zeta_zero [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (φ₀ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(hyp.H.subgroupOf hyp.S)) :
+    (H_sharp_hypothesis76_base hG hyp φ₀).zeta 0
+      = ClassFunction.induce (hyp.H.subgroupOf hyp.S)
+          (φ₀ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ) := by
+  unfold H_sharp_hypothesis76_base
+  exact OddOrder.Peterfalvi.S09.Cert.hypothesis76OfDadeBase_zeta_zero _ _ _ _ _ _ _
+
 end OddOrder.Peterfalvi.S15
