@@ -25,13 +25,19 @@ open OddOrder.RepresentationTheory
 variable {G : Type*} [Group G]
 
 open scoped FiniteInduce in
-/-- **Peterfalvi (13.3.c) main, the cross inner product** (issue 2035, the γ-trick / step 3):
-`⟨τ₁ μ_j, ∑_i η_{ij}⟩ = q` (`δ_j = 1` folded in, `delta_eq_one_S`).  This is the one genuinely
-Character-theoretic input of the (13.3.c) column pin — the S15-world port of
-`coherent_sOf_H0C_extension_muColumnSum_pin_of_irr` (`S13_Orthogonality`): the degree-`0`
-`γ = ξ(1)·μ_j − μ_j(1)·ξ` (for an irreducible `ξ ∈ 𝒮`, or the uniform case) is `A₀(S)`-supported,
-so `τ₁γ = τγ` (Dade `= Ind`), and expanding `⟨τ₁γ, τ(μ_j − δζ)⟩ = ⟨γ, ·⟩` against the column
-identity leaves only `ξ(1)·⟨τ₁μ_j, ∑η⟩`, pinning it to `q`. -/
+/-- **Peterfalvi (13.3.c) main, the cross inner product** (issue 2035 更新 #8): `⟨τ₁ μ_j, ∑_i η_{ij}⟩
+= q` (`δ_j = 1`, `delta_eq_one_S`).  ⚠ **This is NOT closeable as a standalone lemma about the
+current `tau1S_ofHonest`.**  `tau1S_ofHonest = (sSet_coherent_indS_A …).some.extension` is the
+`extension` of an *arbitrary* inhabitant of the data-carrying `IsCoherent Ind_S^G 𝒮 A(S)`, and that
+`Nonempty` carries **no μ-column pin**: in the all-reducible (`clifford` caseB) branch the
+sign-flipped map `μ_j ↦ −∑_i η_{i,finNeg j}` is an equally valid inhabitant (isometric, agreeing with
+`Ind` on the `A(S)`-supported conjugate differences), for which `⟨·, ∑η_{ij}⟩ = 0 ≠ q`.  The pin is
+**not invariant across coherence inhabitants**, so it must be **bundled into `sSet_coherent_indS_A`
+/ `coherent_H0Cprime_S` at construction** (Coq's `typeP_TIred_coherent`, `PFsection13.v:338`) — the
+real frontier (issue 2035 更新 #8: `clifford`-branchwise, caseA γ-forcing via
+`sSet_coherent_extension_eq_sum_memberRFamily` + `sSet_memberRFamily_imageSet_of_red` +
+`sSet_irr_memberRFamily_eta_inner`, caseB the `+`-pinned `sSet_coherent_dade_caseB`).  Once
+bundled, this `sorry` is discharged by the coherence's pin component. -/
 theorem Hypothesis.muColumn_tau1_inner_etaColumn [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
