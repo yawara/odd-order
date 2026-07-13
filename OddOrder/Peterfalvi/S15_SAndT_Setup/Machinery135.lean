@@ -191,6 +191,68 @@ theorem Hypothesis.eta_orthonormal [Finite G] (hyp : Hypothesis (G := G))
   rw [hyp.eta_eq_tau_omega, hyp.eta_eq_tau_omega, hyp.tau3_isometry.inner_eq,
     hyp.omega_orthonormal]
 
+open scoped FiniteInduce in
+/-- **The `μ`-column sum has squared norm `q`** (issue 2035, (13.3.c) pin step 2): the reducible
+prime-TI character `μ_j = ∑_i μ_{ij}` is a sum of `q` orthonormal irreducibles (`mu_orthonormal`),
+so `⟨μ_j, μ_j⟩ = q`.  Through the coherence isometry (`extension_inner_eq`) this pins
+`‖τ₁ μ_j‖² = q`, one of the two positive-definiteness inputs of the (13.3.c) column pin. -/
+theorem Hypothesis.muColumn_inner_self [Finite G] (hyp : Hypothesis (G := G)) (j : Fin hyp.p) :
+    ClassFunction.inner (∑ i : Fin hyp.q, hyp.mu i j) (∑ i : Fin hyp.q, hyp.mu i j)
+      = (hyp.q : ℂ) := by
+  rw [OddOrder.RepresentationTheory.inner_sum_left]
+  have hrow : ∀ i : Fin hyp.q,
+      ClassFunction.inner (hyp.mu i j) (∑ k : Fin hyp.q, hyp.mu k j) = (1 : ℂ) := by
+    intro i
+    rw [OddOrder.RepresentationTheory.inner_sum_right,
+      Finset.sum_eq_single i
+        (fun k _ hki => by rw [hyp.mu_orthonormal i k j j, if_neg (fun h => hki h.1.symm)])
+        (fun h => absurd (Finset.mem_univ i) h),
+      hyp.mu_orthonormal i i j j]
+    simp
+  rw [Finset.sum_congr rfl fun i _ => hrow i, Finset.sum_const, Finset.card_univ,
+    Fintype.card_fin, nsmul_eq_mul, mul_one]
+
+open scoped FiniteInduce in
+/-- **The `η`-column sum has squared norm `q`** (issue 2035, (13.3.c) pin step 1): the aligned
+grid column `∑_i η_{ij}` is a sum of `q` orthonormal virtual characters (`eta_orthonormal`), so
+`⟨∑_i η_{ij}, ∑_i η_{ij}⟩ = q`.  The other positive-definiteness input of the (13.3.c) column
+pin `τ₁ μ_j = δ_j·∑_i η_{ij}`. -/
+theorem Hypothesis.etaColumn_inner_self [Finite G] (hyp : Hypothesis (G := G)) (j : Fin hyp.p) :
+    ClassFunction.inner (∑ i : Fin hyp.q, hyp.eta i j) (∑ i : Fin hyp.q, hyp.eta i j)
+      = (hyp.q : ℂ) := by
+  rw [OddOrder.RepresentationTheory.inner_sum_left]
+  have hrow : ∀ i : Fin hyp.q,
+      ClassFunction.inner (hyp.eta i j) (∑ k : Fin hyp.q, hyp.eta k j) = (1 : ℂ) := by
+    intro i
+    rw [OddOrder.RepresentationTheory.inner_sum_right,
+      Finset.sum_eq_single i
+        (fun k _ hki => by rw [hyp.eta_orthonormal i k j j, if_neg (fun h => hki h.1.symm)])
+        (fun h => absurd (Finset.mem_univ i) h),
+      hyp.eta_orthonormal i i j j]
+    simp
+  rw [Finset.sum_congr rfl fun i _ => hrow i, Finset.sum_const, Finset.card_univ,
+    Fintype.card_fin, nsmul_eq_mul, mul_one]
+
+/-- **Positive-definiteness pin** (issue 2035, (13.3.c) pin step 4): two class functions with the
+same squared norm `n` and cross inner product `⟨x, y⟩ = n` (a real value, `star n = n`) are equal.
+The bilinear expansion gives `‖x − y‖² = ⟨x,x⟩ − ⟨x,y⟩ − ⟨y,x⟩ + ⟨y,y⟩ = n − n − n + n = 0`
+(using `⟨y,x⟩ = star⟨x,y⟩ = n`), and positive-definiteness (`eq_zero_of_inner_self_re_eq_zero`)
+forces `x = y`.  Combined with `muColumn_inner_self`/`etaColumn_inner_self` and the coherence
+isometry, this reduces the (13.3.c) column pin `τ₁ μ_j = δ_j·∑_i η_{ij}` to the single cross
+inner product `⟨τ₁ μ_j, δ_j·∑_i η_{ij}⟩ = q`. -/
+theorem inner_pin_eq [Fintype G] [Invertible (Nat.card G : ℂ)] {x y : ClassFunction G ℂ} {n : ℂ}
+    (hxx : ClassFunction.inner x x = n) (hyy : ClassFunction.inner y y = n)
+    (hxy : ClassFunction.inner x y = n) (hn : star n = n) : x = y := by
+  have hyx : ClassFunction.inner y x = n := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm x y, hxy, hn]
+  have hzero : ClassFunction.inner (x - y) (x - y) = 0 := by
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right, hxx, hyy, hxy, hyx]
+    ring
+  have hsub : x - y = 0 :=
+    OddOrder.RepresentationTheory.eq_zero_of_inner_self_re_eq_zero (by rw [hzero]; simp)
+  exact sub_eq_zero.mp hsub
+
 /-- **Peterfalvi (13.4), inner-product endgame** (abstract bookkeeping, issue 9013 追記⁶ core (d)):
 for an orthonormal grid `η` and vectors `λ°, θ°` orthogonal to each other and to every grid
 member, `⟨λ° − δ·∑ᵢ η_{is}, θ° − δ'·∑ⱼ η_{rj}⟩ = δ·δ' ≠ 0` for signs `δ, δ' = ±1` — the only
