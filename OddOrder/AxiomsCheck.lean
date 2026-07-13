@@ -7909,8 +7909,8 @@ all-type-I `FittingIsTI` gate (`allTypeI_fittingIsTI`, Pf (8.13.c1)+(2.3), `S14`
 `hdelta_even` (`hypothesis79_delta_even`) assembles `Δ ∈ ℤ[Irr G]` (Sibley coherence), `Δ` real
 (the delta-reality milestone `hypothesis78_delta_isReal`), `⟨Δ, 1⟩ = 0`, and the odd-order
 parity primitive `cfdot_real_vchar_even`.  Tripwire: this is the `hbeta_ne` source for the
-good-index norm estimates in the (7.10) `card_G0_lower_bound` assembly — the sole remaining
-S09-side sorry root of the (12.17) chain (`theorem88_caseB_holds` → FT spine). -/
+good-index norm estimates consumed by the completed (7.10) `card_G0_lower_bound`
+assembly on the (12.17) chain (`theorem88_caseB_holds` → FT spine). -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S09.FrobeniusFamily.hypothesis79_delta_even
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S09.FrobeniusFamily.hypothesis79_conclusion
 
@@ -7988,3 +7988,16 @@ by the final (7.5)/(7.10) CharacterEstimateData assembly. -/
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.distinguishedNuAt_chiRhoNormSq_ge
+
+/-! **Peterfalvi (7.10)–(7.11) final Frobenius-family assembly, axiom-clean**
+(lane a, 2026-07-14, issue 0044).  Choose a member of minimal kernel order,
+take the canonical distinguished coherent image and the reverse-coefficient
+zero set, and combine signed irreducibility, norm one, the concrete B-sum
+bound, and selected/good-index rho estimates into `CharacterEstimateData`.
+The explicit per-member nilpotence input is constructed by the FT consumer
+from `maxNilpotentNormalHall_isNilpotent`; it is not an opaque carrier field. -/
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_isNilpotent
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S09.card_G0_lower_bound
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S09.not_trivial_G0

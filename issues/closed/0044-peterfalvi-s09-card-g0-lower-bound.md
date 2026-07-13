@@ -209,10 +209,10 @@ Hypothesis78.betaNormSq_eq_complementIndex_add_one_of_zeta_ind_orthogonal_of_zet
 - [x] sub-issue 0046: (6.8) `sibleySetup_is_coherent` statement + `IndChainDecomposition` consumer interface (proof 本体は別 issue)
 - [x] sub-issue: (7.4) family hypothesis + (7.5) main inequality (sorry-free, 2026-05-29)
 - [x] sub-issue: (7.6) `Hypothesis76` + (7.7.a/b) `χ^ρ` explicit formula + norm-square double sum (2026-05-29; (7.7.a) は `chiRho_decomp` 証明書フィールド, (7.7.b) は proved)
-- [ ] sub-issue: (7.8.a/b/c) norm estimates — (7.8.c) `Hypothesis78` + `chiRho_eq_inner_beta_on_A` (証明書) + `chiRho_norm_sq_eq_card_ratio_mul` (proved) done 2026-05-29; (7.8.a) `Hypothesis78.weightedNuSum` + `Hypothesis78.BetaDecomp` target は 2026-06-02 に追加済み, proof 未; (7.8.b) `Hypothesis78.NormEstimates` target も 2026-06-02 に追加済み, `quadraticTerm_nonneg_of_smallIndex` と beta norm Dade/source expansion は proved, `⟨ζ,ζ⟩=1` は `IsIrreducibleCharacter ζ` bridge まで proved, `⟨Ind1H,ζ⟩=0` は Hermitian symmetry bridge まで proved, 残り proof 未 (`‖ζ^{νρ}‖² ≥ 1-e/h`, `‖Γ‖² ≤ e-1`) — 精密 spec + blocker は `notes/peterfalvi/s09_nonexistence_certain.md` 2026-05-30 節 (B: 整数射影 / `‖β‖²=e+1` / ~~Burnside (1.5.d)~~ / `nu↔coherence` 未組立)。**Burnside (1.5.d) building block は 2026-05-30 解消** → `ColumnOrthogonality.lean` の `sumIrreducibleDegreeSq` (`Σ χ(1)²=|G|`) + `sumNontrivialIrreducibleDegreeSq` (`Σ_{χ≠1} χ(1)²=|G|−1`), AxiomsCheck clean
-- [ ] sub-issue: (7.9) 2-family non-orthogonality — `Hypothesis79` + `Hypothesis79.conclusion` statement interface は 2026-06-02 に追加済み。proof blocker は同ノート 2026-05-30 節 ((5.9) nu 接続; **disjoint-support inner=0 補題は 2026-05-30 解消** → `ClassFunction.inner_eq_zero_of_disjoint_support` (+ `innerSum_eq_zero_of_disjoint_support`); **`Odd card ⇒ ¬IsReal χ` も 2026-05-30 解消**)
-- [ ] sub-issue: (6.8) 本体 proof ((6.1)-(6.7), (5.2), (4.6) の積み上げ)
-- [ ] (7.10) 最終 assembly: (7.5)(7.8)(7.9)(6.8)+Thompson の連立 + 算術（counting/ratio, minimal-index, erased-sum arithmetic, B-sum→displayed-bound bridge は 2026-06-02 までに実装済み）。2026-06-02 追記: `FrobeniusFamily.CharacterEstimateData` と `lowerBoundTerm_of_characterEstimateData` を追加し、残りを `CharacterEstimateData` 構成に局所化。
+- [x] sub-issue: (7.8.a/b/c) norm estimates — concrete family estimates completed (2026-07-14; cont.⁵²–⁵⁷).
+- [x] sub-issue: (7.9) 2-family non-orthogonality — family conclusion and concrete decomposition completed.
+- [x] sub-issue: (6.8) 本体 proof ((6.1)-(6.7), (5.2), (4.6) の積み上げ)
+- [x] (7.10) 最終 assembly — `CharacterEstimateData` の実構成から displayed lower bound まで完成。
 
 ## 完了条件
 
@@ -1530,3 +1530,27 @@ family `hypothesis71` の一致を用い、consumer 形
 good-index bounds、B-sum bound を既存
 `characterEstimateData_of_family71_reduced_estimates_of_signed_irreducible` に渡す。
 続いて `lowerBoundTerm_of_characterEstimateData` から displayed (7.10) lower bound を得る。
+
+## cont.⁵⁸ — (7.10)/(7.11) final assembly COMPLETE (2026-07-14) ✅
+
+新 leaf `S09_FrobeniusCardG0LowerBound.lean` に
+`FrobeniusFamily.characterEstimateData_of_isNilpotent` を実装した。minimal `h_i`、
+`reverseCoefficientZeroIndices i`、`distinguishedNuAt i` を選び、signed irreducibility、
+norm one、selected (7.8.b)、good-index (7.8.c)、concrete B-sum bound を既証明の
+final constructor へ渡して `CharacterEstimateData` を実構成する。
+
+closed issue 9095 の裁定どおり、一般 Frobenius-kernel nilpotence を新たに仮定なしで
+主張せず、公開 endpoint `card_G0_lower_bound` / `not_trivial_G0` は各 member kernel の
+`Group.IsNilpotent` を明示入力に取る。FT consumer
+`S14_MaximalI.TypeICovering.not_all_maximal_typeI` ではこの入力を
+`maxNilpotentNormalHall_isNilpotent` と `subgroupOfEquivOfLe` から実際に構成した。
+free field、新 axiom、opaque carrier の追加はない。
+
+import cycle は `S09_Building78C` の import を `FrobeniusFamily` leaf に下げ、
+`S09_NonexistenceCertain` hub から新 final leaf を re-export して解消した。
+`card_G0_lower_bound` の唯一の proof-term `sorry` は消え、(7.11) と FT consumer は
+同じ完成 endpoint を通る。
+
+検証: new leaf、S09 hub、TypeICovering、AxiomsCheck、full `lake build OddOrder`
+(4202 jobs) green。AxiomsCheck tripwire では新 constructor、(7.10)、(7.11) はいずれも
+allowlist 内 (`propext`, `Classical.choice`, `Quot.sound`) のみ。

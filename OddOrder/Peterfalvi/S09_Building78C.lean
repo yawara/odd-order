@@ -11,7 +11,7 @@ conflicts; it imports the `S09` machinery and supplies standalone lemmas toward 
 discharge (issue 1013).
 -/
 import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
-import OddOrder.Peterfalvi.S09_NonexistenceCertain
+import OddOrder.Peterfalvi.S09_NonexistenceCertain.FrobeniusFamily
 
 /-!
 # S09_Building78C

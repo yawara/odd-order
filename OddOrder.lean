@@ -250,6 +250,7 @@ import OddOrder.Peterfalvi.S09_FrobeniusGammaNormEstimate
 import OddOrder.Peterfalvi.S09_FrobeniusBsumEstimate
 import OddOrder.Peterfalvi.S09_FrobeniusGoodIndexEstimate
 import OddOrder.Peterfalvi.S09_FrobeniusSelectedEstimate
+import OddOrder.Peterfalvi.S09_FrobeniusCardG0LowerBound
 import OddOrder.Peterfalvi.S09_FrobeniusParity
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
