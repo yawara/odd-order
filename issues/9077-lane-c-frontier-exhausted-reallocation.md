@@ -342,3 +342,20 @@ merge afc368a0/a2fe7a0b) → c が該当 endpoint を re-engage:
 には gap が無く (`hq3`/`hp5`/`hepq` のみ)、gap は上位 consumer 供給ゆえ **T4 は未発火** (依然 b-gated、
 "c-unreachable" コメントは概ね有効)。b が `FTtypeI_bridge_facts` の parity を直接 citable な形で
 export するか、consumer 側で gap を threading する landing が次の T4 trigger。
+
+## 📌 2026-07-13 lane c 一時停止 (ユーザー) — 再開判定はユーザー通知が必須
+
+ユーザーが lane c のセッションを一時停止 (2026-07-13、hub セッションで口頭指示「C はいったん
+止まっているので、再開する必要が出てきたら教えてね」)。RULING #4 の gated-endpoint self-resume
+は c セッションが走っていることを前提とするため、**以後 hub は re-engage trigger の landing を
+検出したら、本 issue への flag に加えて必ずユーザーへ明示通知する** (tick サマリ冒頭で
+「lane c 再開推奨 + 発火 trigger + 対象 endpoint」を報告 + PushNotification)。
+
+現行の残 trigger (RULING #4 census 残 6 対応、T5 は 2026-07-12 発火済):
+- **T1**: a の S16-free Type-IV 排除 leaf landing (RULING #3 の抽出) → c: TTypeII:885 `hVcomm` discharge
+- **T2**: a の 9000 t_side field-data landing → c: SubgroupM:247
+- **T3**: b の (13.15) u-value landing → c: SubgroupM:187 `hu_full`
+- **T4**: b の 3002 β_S/β_T parity の citable export (or caseB gap threading) → c: ComparingLM ×3
+  (m_row_odd/m_col_odd → grid_mem)
+
+いずれか 1 本の発火で通知 (全部揃うのを待たない — c は 1 endpoint 単位で re-engage 可能)。
