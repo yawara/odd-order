@@ -1,4 +1,6 @@
 import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructure
+import OddOrder.Peterfalvi.S14_MaximalI.CentralizerContainment
+import OddOrder.Peterfalvi.S13_NonGaloisExclusion
 
 /-!
 # WitnessSylowCyclic
@@ -862,78 +864,6 @@ theorem exists_rankTwoWitness [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
            CKx_not_le_Kprime := hCKx, normalizer_closure_x_le_M := hNx,
            centralizer_x_not_le_L := hCx }⟩
 
-/-- **Normalizer bridge** (used by (12.10) and (12.17)): a maximal subgroup `L` of a minimal
-simple group of odd order is the normalizer of its maximal nilpotent normal Hall subgroup `L_F`,
-as soon as `L_F ≠ ⊥`.
-
-`L ≤ N_G(L_F)` is `maxNilpotentNormalHall_le_normalizer`.  If `N_G(L_F) = ⊤` then `L_F ⊴ G`, so by
-simplicity `L_F = ⊥` or `⊤`; both are excluded (`L_F ≠ ⊥` by hypothesis, `L_F ≤ L < ⊤`).  Hence
-`L ≤ N_G(L_F) < ⊤`, and `L` being a coatom upgrades the containment to equality. -/
-theorem maximalSubgroup_eq_normalizer_maxNilpotentNormalHall [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} (hL : L ∈ maximalSubgroups G)
-    (hne : maxNilpotentNormalHall L ≠ ⊥) :
-    L = Subgroup.normalizer (maxNilpotentNormalHall L : Set G) := by
-  have hco : IsCoatom L := hL
-  have hLleN : L ≤ Subgroup.normalizer (maxNilpotentNormalHall L : Set G) :=
-    OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer L
-  refine le_antisymm hLleN ?_
-  rcases hLleN.lt_or_eq with hlt | heq
-  · -- `L < N_G(L_F)` would force `N_G(L_F) = ⊤`, making `L_F ⊴ G`, which simplicity excludes.
-    exfalso
-    have hNtop : Subgroup.normalizer (maxNilpotentNormalHall L : Set G) = ⊤ := hco.2 _ hlt
-    haveI hHnormal : (maxNilpotentNormalHall L).Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (maxNilpotentNormalHall L) hHnormal with hb | ht
-    · exact hne hb
-    · have hle : maxNilpotentNormalHall L ≤ L := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le L
-      rw [ht] at hle
-      exact hco.1 (top_le_iff.mp hle)
-  · exact heq.ge
-
-/-- **Peterfalvi (8.6.a) centralizer containment for type-`P` kernels**: for a maximal `L` of
-type II–IV — i.e. carrying the `TypePNontrivialCore` of Definition (8.6), whose clause (a) makes
-`L_F^#` a TI-subset with normalizer `N_G(L_F)` — every nonidentity `y ∈ L_F` has `C_G(y) ≤ L`.
-
-An element `c ∈ C_G(y)` fixes `y ∈ L_F^# ∩ (L_F^#)^c`, so the TI property puts
-`c ∈ N_G(L_F) = L` (`maximalSubgroup_eq_normalizer_maxNilpotentNormalHall`).  This is the (8.16)
-proof's "`(8.6.a)` implies `R(a) = 1`" mechanism, exposed as the containment the (12.10) type
-exclusions consume.  (The textbook (8.6.a) states the TI property for the full Fitting subgroup
-`F(L)^# ⊇ L_F^#`; the Lean `TypePNontrivialCore` carries the `L_F`-form, which is what we use.) -/
-theorem typeP_core_centralizer_le_of_mem_fitting [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} (hL : L ∈ maximalSubgroups G)
-    {data : TypePData L} (hcore : TypePNontrivialCore L data)
-    {y : G} (hy : y ∈ maxNilpotentNormalHall L) (hy1 : y ≠ 1) :
-    Subgroup.centralizer ({y} : Set G) ≤ L := by
-  obtain ⟨-, -, hTI⟩ := hcore
-  have hne : maxNilpotentNormalHall L ≠ ⊥ := by
-    intro hb
-    rw [hb] at hy
-    exact hy1 (Subgroup.mem_bot.mp hy)
-  have hNL := maximalSubgroup_eq_normalizer_maxNilpotentNormalHall hG hL hne
-  intro c hc
-  have hcy : c * y * c⁻¹ = y := by
-    rw [mul_inv_eq_iff_eq_mul]
-    exact Subgroup.mem_centralizer_singleton_iff.mp hc
-  have hysharp : y ∈ OddOrder.GroupTheory.sharpSubgroup (maxNilpotentNormalHall L) :=
-    ⟨hy, by simpa using hy1⟩
-  rw [hNL]
-  exact hTI c ⟨y, hysharp, by rw [hcy]; exact hysharp⟩
-
-/-- **Peterfalvi (8.16) centralizer-containment, Type II**: for a maximal subgroup `L` of
-Type II, `C_G(y) ⊆ L` for every nonidentity `y ∈ L_s` (`L_s = L_F` for Type II).
-
-This is the "By (8.16), `C_G(y) ⊆ L` for all `y ∈ A(L)`" step of (12.10), restricted to the
-`A_1(L) = L_s^#` core the witness argument uses.  Peterfalvi's (8.16) proof reduces the `A_1(L)`
-case to exactly clause (a) of Definition (8.6) — the kernel-sharp TI-set — which the Lean
-`TypeIIData` carries in its `TypePNontrivialCore`; the containment is then
-`typeP_core_centralizer_le_of_mem_fitting`. -/
-theorem typeII_centralizer_le_of_mem_mainSubgroup [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} (hL : L ∈ maximalSubgroups G)
-    (hII : IsTypeII L) {y : G} (hy : y ∈ mainSubgroup L PeterfalviType.II) (hy1 : y ≠ 1) :
-    Subgroup.centralizer ({y} : Set G) ≤ L := by
-  obtain ⟨iiData⟩ := hII
-  exact typeP_core_centralizer_le_of_mem_fitting hG hL iiData.common
-    (by simpa [mainSubgroup] using hy) hy1
-
 /-- **Peterfalvi (10.10)+(11.9.c)+(11.6)+(9.7.b) kernel reduction, Type III/IV** (pinned sorried
 §9–§11 obligation, hub 9003 Cluster A): for a maximal subgroup `L` of Type III or IV, a noncyclic
 `p`-group `P₀ ⊆ L_s` lies in the Fitting kernel `L_F`.
@@ -951,11 +881,115 @@ so `p ∣ |L_F|` and `P₀` lies in the Sylow `p`-subgroup of the normal Hall `L
 bookkeeping in reach of S14. -/
 theorem typeIIIorIV_noncyclic_le_fitting [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L P0 : Subgroup G} (hL : L ∈ maximalSubgroups G)
-    (hIIIIV : IsTypeIII L ∨ IsTypeIV L) (hP0nc : ¬ IsCyclic ↥P0)
+    (hIIIIV : IsTypeIII L ∨ IsTypeIV L) {p : ℕ} (hp : p.Prime) (hP0p : IsPGroup p ↥P0)
+    (hP0nc : ¬ IsCyclic ↥P0)
     {Lt : PeterfalviType} (hLhasType : HasPeterfalviType Lt L)
     (hP0 : P0 ≤ mainSubgroup L Lt) :
     P0 ≤ maxNilpotentNormalHall L := by
-  sorry
+  haveI : Fact p.Prime := ⟨hp⟩
+  -- The genuine content, for types III/IV where `mainSubgroup L = L' = [L,L]`.  For types I/II/V
+  -- `mainSubgroup L = M_F` and the goal is exactly `hP0`.
+  have key : P0 ≤ derivedInG L → P0 ≤ maxNilpotentNormalHall L := by
+    intro hP0'
+    -- (10.10)+(11.9.c): the (10.1)/(11.2) Hypothesis holds, so (11.6)+(9.7.b) makes `U` cyclic.
+    obtain ⟨hyp12⟩ := OddOrder.Peterfalvi.S12.exists_hypothesis_of_typeIIIorIVorV hG hL
+      (hIIIIV.imp id Or.inl)
+    obtain ⟨s13, -⟩ := OddOrder.Peterfalvi.S13.exists_hypothesis_of_isTypeIIIorIV hG hyp12 hIIIIV
+    haveI : NeZero (Nat.card (s13.base.toHypothesis46 hG hG.odd).W1) := ⟨Nat.card_pos.ne'⟩
+    -- **(11.9.c)/(9.7.b): `U` is cyclic** (Peterfalvi §11.9, proven sorry-free in
+    -- `S13_NonGaloisExclusion`).  Available here now that the §12–16 import inversion is resolved
+    -- (HUB RULING, issue 9093: the §16 pair-data structures were extracted to `S13_Section16PairData`
+    -- and the (12.17) producer to `FeitThompsonPairProducer`, so `S13_NonGaloisExclusion` sits upstream
+    -- of §12.10 as the mathematics requires).
+    have hUcyc : IsCyclic ↥s13.base.typeP.U :=
+      OddOrder.Peterfalvi.S13.U_isCyclic_of_hypothesis hG s13
+    set d : TypePData L := s13.base.typeP with hd
+    -- `M_F = H ≤ L' ≤ L`, and `M_F ⊴ L'` (via `L' ≤ L ≤ N_G(M_F)`).
+    have hLFle : maxNilpotentNormalHall L ≤ derivedInG L := by rw [← d.H_eq]; exact d.H_le
+    have hL'le : derivedInG L ≤ L := Subgroup.map_subtype_le _
+    have hNnorm : ((maxNilpotentNormalHall L).subgroupOf (derivedInG L)).Normal :=
+      (Subgroup.normal_subgroupOf_iff_le_normalizer hLFle).mpr
+        (hL'le.trans (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer L))
+    -- `|U| = [L' : M_F]` divides `[L : M_F]`, and `M_F` is Hall in `L`, so `gcd(|M_F|, |U|) = 1`.
+    have hUdvd : Nat.card ↥d.U ∣ ((maxNilpotentNormalHall L).subgroupOf L).index := by
+      have htower := Subgroup.relIndex_mul_relIndex (maxNilpotentNormalHall L) (derivedInG L) L
+        hLFle hL'le
+      rw [d.card_U_eq_index]
+      show (maxNilpotentNormalHall L).relIndex (derivedInG L)
+        ∣ (maxNilpotentNormalHall L).relIndex L
+      exact ⟨(derivedInG L).relIndex L, htower.symm⟩
+    have hcopHU : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) (Nat.card ↥d.U) := by
+      have hHall := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall L
+      have hcard : Nat.card ↥((maxNilpotentNormalHall L).subgroupOf L)
+          = Nat.card ↥(maxNilpotentNormalHall L) :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+          (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le L)).toEquiv
+      have hci := hHall.coprime_index
+      rw [hcard] at hci
+      exact hci.coprime_dvd_right hUdvd
+    -- The crux: `p ∤ |U|`.  Otherwise `P₀` embeds in the cyclic quotient `L'/M_F ≅ U`, making
+    -- `P₀` cyclic (contradiction).
+    have hpU : ¬ p ∣ Nat.card ↥d.U := by
+      intro hpU
+      apply hP0nc
+      have hpLF : ¬ p ∣ Nat.card ↥(maxNilpotentNormalHall L) := fun h =>
+        hp.ne_one (Nat.dvd_one.mp (hcopHU.gcd_eq_one ▸ Nat.dvd_gcd h hpU))
+      -- `P₀ ∩ M_F = 1`: a `p`-group inside the `p'`-order `M_F`.
+      have hP0inf : P0 ⊓ maxNilpotentNormalHall L = ⊥ := by
+        obtain ⟨n, hn⟩ := (IsPGroup.iff_card).mp
+          (hP0p.to_inf_left (K := maxNilpotentNormalHall L))
+        rcases Nat.eq_zero_or_pos n with h0 | hpos
+        · exact Subgroup.card_eq_one.mp (by rw [hn, h0, pow_zero])
+        · exact absurd (dvd_trans (dvd_pow_self p hpos.ne')
+            (hn ▸ Subgroup.card_dvd_of_le inf_le_right)) hpLF
+      -- `L'/M_F ≅ U` is cyclic.
+      have hcompl : Subgroup.IsComplement'
+          ((maxNilpotentNormalHall L).subgroupOf (derivedInG L))
+          (d.U.subgroupOf (derivedInG L)) := by rw [← d.H_eq]; exact d.derived_complement
+      haveI : ((maxNilpotentNormalHall L).subgroupOf (derivedInG L)).Normal := hNnorm
+      haveI hUcyc' : IsCyclic ↥(d.U.subgroupOf (derivedInG L)) :=
+        (Subgroup.subgroupOfEquivOfLe d.U_le).isCyclic.mpr hUcyc
+      haveI hQcyc :
+          IsCyclic (↥(derivedInG L) ⧸ (maxNilpotentNormalHall L).subgroupOf (derivedInG L)) :=
+        (hcompl.symm.QuotientMulEquiv).isCyclic.mpr hUcyc'
+      -- `P₀ ↪ L'/M_F` (kernel `P₀ ∩ M_F = 1`), so `P₀` is cyclic.
+      have hinj : Function.Injective
+          ((QuotientGroup.mk' ((maxNilpotentNormalHall L).subgroupOf (derivedInG L))).comp
+            (P0.subgroupOf (derivedInG L)).subtype) := by
+        rw [injective_iff_map_eq_one]
+        intro x hx
+        have hxN : ((x : ↥(derivedInG L)) : G) ∈ maxNilpotentNormalHall L := by
+          rwa [MonoidHom.comp_apply, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff,
+            Subgroup.mem_subgroupOf] at hx
+        have hxP0 : ((x : ↥(derivedInG L)) : G) ∈ P0 := by
+          have h2 := x.2; rwa [Subgroup.mem_subgroupOf] at h2
+        have hbot : ((x : ↥(derivedInG L)) : G) ∈ P0 ⊓ maxNilpotentNormalHall L := ⟨hxP0, hxN⟩
+        rw [hP0inf, Subgroup.mem_bot] at hbot
+        exact Subtype.ext (Subtype.ext hbot)
+      haveI : IsCyclic ↥(P0.subgroupOf (derivedInG L)) := isCyclic_of_injective _ hinj
+      exact (Subgroup.subgroupOfEquivOfLe hP0').isCyclic.mp inferInstance
+    -- With `p ∤ |U|`, `|P₀|` (a `p`-power) is coprime to `|U| = [L' : M_F]`, so `P₀ ≤ M_F`.
+    obtain ⟨n, hn⟩ := (IsPGroup.iff_card).mp hP0p
+    have hcop : Nat.Coprime (Nat.card ↥P0) (Nat.card ↥d.U) := by
+      rw [hn]; exact (hp.coprime_iff_not_dvd.mpr hpU).pow_left n
+    haveI : ((maxNilpotentNormalHall L).subgroupOf (derivedInG L)).Normal := hNnorm
+    have hle : P0.subgroupOf (derivedInG L)
+        ≤ (maxNilpotentNormalHall L).subgroupOf (derivedInG L) := by
+      apply OddOrder.BG.Ch4.S14.le_of_coprime_index
+      rw [← d.card_U_eq_index, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hP0').toEquiv]
+      exact hcop
+    intro x hx
+    have hxL' : x ∈ derivedInG L := hP0' hx
+    have hmem : (⟨x, hxL'⟩ : ↥(derivedInG L))
+        ∈ (maxNilpotentNormalHall L).subgroupOf (derivedInG L) :=
+      hle (by rw [Subgroup.mem_subgroupOf]; exact hx)
+    rwa [Subgroup.mem_subgroupOf] at hmem
+  cases Lt with
+  | I => simpa [mainSubgroup] using hP0
+  | II => simpa [mainSubgroup] using hP0
+  | III => exact key (by simpa [mainSubgroup] using hP0)
+  | IV => exact key (by simpa [mainSubgroup] using hP0)
+  | V => simpa [mainSubgroup] using hP0
 
 /-- **Peterfalvi (10.10)+(11.9.c)+(11.6)+(9.7.b)+(8.6.a), Type III/IV route**: for a maximal
 subgroup `L` of Type III or IV and a noncyclic `p`-group `P₀ ⊆ L_s`, `C_G(y) ⊆ L` for every
@@ -967,12 +1001,13 @@ nonidentity `y ∈ P₀`.
 `TypeIIIData` and `TypeIVData` witnesses) yields `C_G(y) ≤ L` for `y ∈ L_F^#`. -/
 theorem typeIIIorIV_centralizer_le_of_mem_noncyclic_mainSubgroup [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L P0 : Subgroup G} (hL : L ∈ maximalSubgroups G)
-    (hIIIIV : IsTypeIII L ∨ IsTypeIV L) (hP0nc : ¬ IsCyclic ↥P0)
+    (hIIIIV : IsTypeIII L ∨ IsTypeIV L) {p : ℕ} (hp : p.Prime) (hP0p : IsPGroup p ↥P0)
+    (hP0nc : ¬ IsCyclic ↥P0)
     {Lt : PeterfalviType} (hLhasType : HasPeterfalviType Lt L)
     (hP0 : P0 ≤ mainSubgroup L Lt) {y : G} (hy : y ∈ P0) (hy1 : y ≠ 1) :
     Subgroup.centralizer ({y} : Set G) ≤ L := by
   have hyF : y ∈ maxNilpotentNormalHall L :=
-    typeIIIorIV_noncyclic_le_fitting hG hL hIIIIV hP0nc hLhasType hP0 hy
+    typeIIIorIV_noncyclic_le_fitting hG hL hIIIIV hp hP0p hP0nc hLhasType hP0 hy
   have hcommon : ∃ pdata : TypePData L, TypePNontrivialCore L pdata := by
     rcases hIIIIV with h3 | h4
     · obtain ⟨iiiData⟩ := h3
@@ -1022,11 +1057,13 @@ theorem witness_L_isTypeI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   | III =>
     rw [hLtype] at hLt
     exact absurd (typeIIIorIV_centralizer_le_of_mem_noncyclic_mainSubgroup hG data.L_maximal
-      (Or.inl hLt) ctr.P0_noncyclic data.L_hasType data.P0_le_Ls data.x_mem_P0 data.x_ne_one) hEsc
+      (Or.inl hLt) ctr.p_prime ctr.P0_pGroup ctr.P0_noncyclic data.L_hasType data.P0_le_Ls
+      data.x_mem_P0 data.x_ne_one) hEsc
   | IV =>
     rw [hLtype] at hLt
     exact absurd (typeIIIorIV_centralizer_le_of_mem_noncyclic_mainSubgroup hG data.L_maximal
-      (Or.inr hLt) ctr.P0_noncyclic data.L_hasType data.P0_le_Ls data.x_mem_P0 data.x_ne_one) hEsc
+      (Or.inr hLt) ctr.p_prime ctr.P0_pGroup ctr.P0_noncyclic data.L_hasType data.P0_le_Ls
+      data.x_mem_P0 data.x_ne_one) hEsc
   | V =>
     rw [hLtype] at hLt
     exact absurd ⟨data.L, data.L_maximal, hLt⟩ hnoV
@@ -1053,11 +1090,13 @@ theorem witness_L_type_eq_typeI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
   | III =>
     rw [hLtype] at hLt
     exact absurd (typeIIIorIV_centralizer_le_of_mem_noncyclic_mainSubgroup hG data.L_maximal
-      (Or.inl hLt) ctr.P0_noncyclic data.L_hasType data.P0_le_Ls data.x_mem_P0 data.x_ne_one) hEsc
+      (Or.inl hLt) ctr.p_prime ctr.P0_pGroup ctr.P0_noncyclic data.L_hasType data.P0_le_Ls
+      data.x_mem_P0 data.x_ne_one) hEsc
   | IV =>
     rw [hLtype] at hLt
     exact absurd (typeIIIorIV_centralizer_le_of_mem_noncyclic_mainSubgroup hG data.L_maximal
-      (Or.inr hLt) ctr.P0_noncyclic data.L_hasType data.P0_le_Ls data.x_mem_P0 data.x_ne_one) hEsc
+      (Or.inr hLt) ctr.p_prime ctr.P0_pGroup ctr.P0_noncyclic data.L_hasType data.P0_le_Ls
+      data.x_mem_P0 data.x_ne_one) hEsc
   | V =>
     rw [hLtype] at hLt
     exact absurd ⟨data.L, data.L_maximal, hLt⟩ hnoV

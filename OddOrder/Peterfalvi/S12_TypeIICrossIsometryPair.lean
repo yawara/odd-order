@@ -4,6 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S12_TypeIIGridTranspose
+import OddOrder.Peterfalvi.S09_CrossOrthogonality
+import OddOrder.Peterfalvi.S12_TypeIIFrobenius
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
 
 /-!
 # Peterfalvi (10.7): the cross-isometry package at the canonical pair

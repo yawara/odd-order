@@ -6,7 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.S12_TypeIICrossIsometryPair
 import OddOrder.Peterfalvi.S12_TypeVCaseC
 import OddOrder.Peterfalvi.S13_Lemmas113To115
-import OddOrder.Peterfalvi.S14_MaximalI.WitnessSylowCyclic
+import OddOrder.Peterfalvi.S14_MaximalI.CentralizerContainment
 
 /-!
 # S12_Noncoherence — the unconditional Peterfalvi (10.8)
