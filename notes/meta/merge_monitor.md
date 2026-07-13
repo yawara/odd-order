@@ -623,6 +623,13 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 27) — ★ a 合流: Isaacs Thm 7.1 (Thompson normal p-complement) COMPLETE + issue 0031 close**:
+  **a=1** (`cb7faf68` = ★ **Isaacs Theorem 7.1 完成** — capstone `thompson_normal_p_complement_of_local_hypotheses`
+  を新 leaf `S7C_ThompsonPComplementFinal.lean` +105 で **sorry-free 証明**、AxiomsCheck で「3 axiom 全 allowlist =
+  sorryAx 非依存」確認。issue 0031 → closed/ (git mv)。root closure = S7D1 import)。scope Isaacs shared-foundation
+  additive ✓。b=0 / c=0。build green **4201 jobs** / AxiomsCheck OK (**2413** 全 allowlist) / count-sorry **50→50 不変** /
+  新 axiom なし / 逸脱なし。**a の tick15-27 Ch07 build-out (Step1-6 + final、全 sorry-free) が Thm 7.1 で完結**。
+  ⚠ issue 9096 (b frontier direction) 依然 保留。
 - **2026-07-14 (tick 26) — a 合流: Isaacs Ch07 Step6 abelian Sylow-2 input (新 leaf S7C_AbelianQuotientComplement)**:
   **a=1** (`5e0c7b43` = Isaacs Ch07 issue 0031。新 leaf `S7C_AbelianQuotientComplement.lean` +322 (0 sorry、
   root closure = S7D1 import) + Basic/S7D1 import 追従 + AxiomsCheck)。scope Isaacs shared-foundation additive ✓。
