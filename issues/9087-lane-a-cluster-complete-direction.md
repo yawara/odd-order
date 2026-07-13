@@ -233,3 +233,45 @@ notes/issue で hub に flag (sequencing)。
 
 **併記**: (i) **9079 close** (obligation 2(b) grid transpose = S12_TypeIIGridTranspose sorry 0 完了、a 報告)。
 (ii) stale docstring cleanup (`_at_pair` false-sorry 記述等) は a 裁量で。
+
+---
+
+## ✅ UPDATE (2026-07-13 lane a session 2): RULING #3 directive 完遂 — legacy (10.7)/(10.8)/(10.10)/(11.3) subtree retired、feitThompson honest-heir rewire 完了
+
+前 session が中断した rewire (26 dirty files、consumer cascade 途中) を再開・完遂。
+commit **e69904bb** (feature) + **ee0a6863** (main merge + b 再分割への threading 追従)。
+
+### 実施内容
+1. **legacy sorried decl 削除 (bare sorry −3、+0)**: `exists_typeIICrossIsometryData` +
+   `typeII_HU_frobenius_of_coherent{,_aux}` + `typeII_derived_frobenius`/`DerivedFrobeniusData`
+   (10.7) / `typeII_coherence_contradiction_estimate` (hB bare sorry) + legacy `S_not_coherent`
+   (10.8) / `typeV_forces_coherence` (bare sorry) + legacy `no_typeV_maximal` (10.10) /
+   legacy `S13.S_H0C_not_coherent` (11.3)。
+2. **(10.10) threading**: `hnoV : ¬ ∃ M ∈ maximalSubgroups G, IsTypeV M` を explicit param
+   として S12→S16+spine の consumer chain (~120 decl) に thread。
+3. **(11.3) threading**: 新 abbrev **`S13.H0CNoncoherenceRefuter`** (S13_CoreStructure、
+   FiniteInduce scope 下で 1 回 elaborate — instance-diamond 回避) を §16 cluster
+   (TTypeII/SubgroupM/SubgroupMCore/SubgroupL/ComparingLM/BetaVanishing/KeyInequality/
+   CoherentEtaOrthogonality) + AppC + FeitThompsonSetup に thread。
+4. **spine 供給**: `noMinimalSimpleOdd` (FeitThompson.lean) が
+   `no_typeV_maximal_unconditional` + `S_H0C_not_coherent_unconditional` を直 cite。
+   `exists_section16MaximalPair_data` 消費側 (S13_TypeDetermination) も unconditional 供給。
+
+### 検証
+- full `lake build OddOrder` green ×2 (feature 時 4181 jobs 33.9s / merge 後 4183 jobs)。
+  AxiomsCheck asserts 込み。
+- `#print axioms feitThompson` = {propext, sorryAx, Classical.choice, Quot.sound} —
+  残 sorryAx は **§14–16 cross-lane honest frontier のみ** (legacy 経路は定義ごと消滅)。
+
+### ⚠ hub flag: b/c territory file への 🔩 機械的追従 (sequencing 記録)
+threading は以下の b/c file に触れた (全て引数供給/cite 置換/binder 追加のみ、math 変更なし):
+- **b**: S15_CaseBReducibleCoherence / S15_CaseACoherence / S15_NineElevenSteps /
+  S15_SSetMemberRFamily (b の 0113/0114 再分割 @48db2cee と衝突 → main 構造採用+再 thread 済)
+- **c**: S16_NonExistenceG/* (TTypeII, SubgroupM, SubgroupMCore, SubgroupL, ComparingLM,
+  BetaVanishing, KeyInequality, CoherentEtaOrthogonality, TGapCross), S16_PairingCoherence
+- b/c の次 session は「hG の直後に hnoV (と §16 では hncH0C) が入った」signature 変更に注意。
+  新規 consumer は同 param を thread するか spine の unconditional を供給。
+
+### 残 follow-up (a 裁量、RULING #3 併記)
+- stale docstring cleanup (削除済み legacy 名への言及 ~10 箇所、S07_Subcoherent /
+  S12_TypeVSibley 等 — comment のみ、build 無影響)。
