@@ -623,6 +623,15 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 29) — a 合流: canonical T-side ν-grid core 構築 (issue 1029) — ★ 9096 の ν-carrier gate を a が自律着手**:
+  **a=1** (`bb959962` = **ν-carrier 着手**。ν-grid decls (nuT/deltaPrimeT/omegaS_inner/eTS/colT 等) を
+  `FeitThompson.lean`→新 leaf `FeitThompsonNuGrid.lean` +299 へ抽出 (clean relocation、-185/+1) +
+  canonical T-side nu grid core を sorry-free 構築。issue 1029 新規。全 a-owned files)。b=0 / c=0。
+  build green **4203 jobs** / AxiomsCheck OK (**2416** 全 allowlist) / count-sorry **49→49 不変**
+  (relocation sorry-neutral + 新 core sorry-free) / 新 axiom なし / 逸脱なし。size: NuGrid 299 / FeitThompson 1674。
+  ★ **9096 進展**: b の T-side gate (`tSide_theta_package`/`deltaPrime_eq_one_T`) が要求する **ν-carrier を a が
+  自律的に build 開始** (option A が organic に成立)。a の ν-grid が完成すれば b の T-side が un-gate される見込み。
+  ⟹ hub は 9096 direction ruling を急がず、a の ν landing を監視 → landing tick で b に「T-side 再開可」を flag。
 - **2026-07-14 (tick 28) — ★ a 合流: Peterfalvi Frobenius-family lower bound 実証明 (sorry 実 discharge 50→49)**:
   **a=1** (`463983d5` = §9 char に復帰。`card_G0_lower_bound`/`not_trivial_G0` を新 leaf
   `S09_FrobeniusCardG0LowerBound.lean` +142 へ移設 + **genuine 証明 → FrobeniusFamily.lean の sorry 1→0 discharge**。
