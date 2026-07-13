@@ -423,4 +423,85 @@ theorem Hypothesis.tau1S_ofHonest_induce_inner_eta_col_zero [Finite G]
       (hyp.induce_H_mem_zSpan_S hG chief θ hθ hθP),
     star_zero]
 
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **Peterfalvi (13.3.a) with the `P`-witness** (issue 2035 更新 #22, the guard the (13.5)
+consumers thread): the inducing linear character `θ` of the nonzero `μ`-column sum
+`μ_j = Ind_{PC}^S θ` has `P ⊄ Ker θ` — i.e. `μ_j ∈ 𝒮₁` in the sense of (13.5).
+
+**Proof.**  `mu_j_isIndPC` supplies `θ`; if `P ⊆ Ker θ` then `P ⊆ Ker μ_j` by the elementary
+half of (1.6.a) (`subsetCharacterKernel_induce_of_subgroupOf`, `P ⊴ S`).  But `μ_j ∈ 𝒮(H₀)`
+(`mu_colSum_mem_sOf_H0`) is induced from an `S'`-source `χ ∈ 𝒳` with `P ⊄ Ker χ`, and the
+converse of (1.6.a) ([Is] 2.21, `mem_characterKernel_of_mem_characterKernel_induce`, `S' ⊴ S`)
+pushes `P ⊆ Ker μ_j` down to `P ⊆ Ker χ` — contradiction. -/
+theorem Hypothesis.mu_j_isIndPC_not_ker [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (j : Fin hyp.p) (hj : j ≠ ⟨0, hyp.p_prime.pos⟩) :
+    ∃ θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ,
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter θ ∧ θ 1 = 1 ∧
+        (∑ i : Fin hyp.q, hyp.mu i j)
+          = ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ ∧
+        ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
+            Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel θ) := by
+  classical
+  haveI := hyp.finiteG
+  letI : Fintype ↥hyp.S := Fintype.ofFinite _
+  letI : Fintype ↥(hyp.H.subgroupOf hyp.S) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥hyp.S : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥(hyp.H.subgroupOf hyp.S) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  obtain ⟨θ, hθirr, hθ1, hμeq⟩ := hyp.mu_j_isIndPC hG j hj
+  refine ⟨θ, hθirr, hθ1, hμeq, fun hker => ?_⟩
+  set data := hyp.toTypesIIIIIIVSetupS hG with hdata
+  obtain ⟨chief, -⟩ := OddOrder.Peterfalvi.S11.exists_chiefFactorData hG data
+  -- the `S'`-level source: `μ_j = Ind_{HU}^S χ`, `χ ∈ 𝒳` (so `P ⊄ Ker χ`)
+  obtain ⟨χ, hχ, hμeq'⟩ := OddOrder.Peterfalvi.S11.mem_sOf.mp
+    (hyp.mu_colSum_mem_sOf_H0 hG chief j hj)
+  letI : Fintype ↥(OddOrder.Peterfalvi.S11.huSub data) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥(OddOrder.Peterfalvi.S11.huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI hHUnorm : (OddOrder.Peterfalvi.S11.huSub data).Normal := by
+    rw [OddOrder.Peterfalvi.S11.huSub_eq_derivedInG_subgroupOf data]
+    infer_instance
+  -- `P ⊴ S`, realised in `↥S`
+  haveI hPnorm : (hyp.P.subgroupOf hyp.S).Normal := by
+    have hPle : hyp.P ≤ hyp.S := by
+      rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
+    refine (Subgroup.normal_subgroupOf_iff_le_normalizer hPle).mpr ?_
+    rw [hyp.P_eq_SF]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
+  have hPH : hyp.P.subgroupOf hyp.S ≤ hyp.H.subgroupOf hyp.S :=
+    Subgroup.subgroupOf_mono hyp.S (show hyp.P ≤ hyp.H from le_sup_left)
+  -- (1.6.a) forward: `P ⊆ Ker θ` pushes up to `P ⊆ Ker μ_j`
+  have hkerInd : OddOrder.Peterfalvi.S03.SubsetCharacterKernel
+      ((hyp.P.subgroupOf hyp.S : Subgroup ↥hyp.S) : Set ↥hyp.S)
+      (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ) :=
+    OddOrder.Peterfalvi.S03.subsetCharacterKernel_induce_of_subgroupOf hPH θ hker
+  -- rewrite the induced character as the `S'`-stage induction
+  have hInd_eq : ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ
+      = ClassFunction.induce (OddOrder.Peterfalvi.S11.huSub data)
+          (χ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub data) ℂ) := by
+    rw [← hμeq, hμeq']
+    exact OddOrder.Peterfalvi.S11.induceHU_eq_induce data _
+  -- contradict `χ ∈ 𝒳`: `P (in HU) ⊆ Ker χ`
+  apply hχ.1
+  intro x hx
+  have hxP : (x : ↥hyp.S) ∈ hyp.P.subgroupOf hyp.S := by
+    have hx' : x ∈ (data.H.subgroupOf hyp.S).subgroupOf
+        (OddOrder.Peterfalvi.S11.huSub data) := hx
+    have hPeq : data.H = hyp.P := by
+      show hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
+    rw [hPeq] at hx'
+    exact Subgroup.mem_subgroupOf.mp hx'
+  have hxkerInd : (x : ↥hyp.S) ∈ OddOrder.Peterfalvi.S03.characterKernel
+      (ClassFunction.induce (OddOrder.Peterfalvi.S11.huSub data)
+        (χ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub data) ℂ)) := by
+    rw [← hInd_eq]
+    exact hkerInd hxP
+  have h := OddOrder.Peterfalvi.S03.mem_characterKernel_of_mem_characterKernel_induce
+    χ.isIrreducible x.2 hxkerInd
+  simpa using h
+
 end OddOrder.Peterfalvi.S15
