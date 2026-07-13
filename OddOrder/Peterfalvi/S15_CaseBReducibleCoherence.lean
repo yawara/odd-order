@@ -844,6 +844,95 @@ theorem Hypothesis.nineElevenSTwoExtractionS [Finite G]
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
+/-- **Peterfalvi (9.11.6), `𝒮₃`-coherence on the honest Dade map** (issue 1017; the `S`-instance
+mirror of `S13.caseA_sThree_coherent`).  In the equality configuration every `𝒮₃ = 𝒮 ∖ 𝒮₂`-member
+has uniform degree `q·u` (`hS3deg`), so the (5.7) norm-general coherence producer
+`S07.uniform_degree_coherence_of_families` fires with an arbitrary pivot `χ₀ ∈ 𝒮₃`: per-member
+(5.2.d) `R`-data from the case-agnostic `sSet_memberRFamily`, cross-orthogonality from
+`sSet_memberRFamily_orthogonal`, the Dade isometry/`ℤ[Irr]` facts from
+`dadeIntegralCharacterMap_*_of_supported`, and the equal-degree `A(S)`-difference supports from
+`sSet_scaledDiff_support` at `c = 1`.  This is the `τ₃` of the (9.11.6) dichotomy: the coherent
+extension of `𝒮₃` whose unit images the non-orthogonal branch counts against `‖α^τ‖²` (Bessel)
+and whose orthogonal branch the (9.11.7)–(9.11.8) residual refutes. -/
+theorem Hypothesis.sSet_sThree_coherent_dade [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
+    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
+    {S₂ : Set (ClassFunction ↥hyp.S ℂ)}
+    (hS₂conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₂)
+    (hS₃ne : (sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂).Nonempty)
+    (hS3deg : ∀ χ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂,
+      (χ : ↥hyp.S → ℂ) 1 = (((hyp.toTypesIIIIIIVSetupS hG).q * chars.u : ℕ) : ℂ)) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)))
+      (sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)) := by
+  classical
+  haveI := hyp.finiteG
+  obtain ⟨χ₀, hχ₀⟩ := hS₃ne
+  -- `𝒮₃` is conjugation-closed
+  have hconj : ∀ a ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂,
+      a.conj ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂ := by
+    intro a ha
+    refine ⟨sSet_closedUnderConjugate _ ha.1, fun hc => ?_⟩
+    have h := hS₂conj hc
+    rw [ClassFunction.conj_conj] at h
+    exact ha.2 h
+  -- no member is real
+  have hnr : ∀ a ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂, a ≠ a.conj :=
+    fun a ha h => sSet_hasNoRealCharacters _ (hyp.oddCardS hG) ha.1 h.symm
+  -- equal-degree differences are `A(S)`-supported (`sSet_scaledDiff_support` at `c = 1`)
+  have hsuppdiff : ∀ a ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂,
+      ∀ b ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂,
+      ((a - b : ClassFunction ↥hyp.S ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S := by
+    intro a ha b hb
+    have h := hyp.sSet_scaledDiff_support hG ha.1 hb.1 (c := 1)
+      (by rw [hS3deg a ha, hS3deg b hb, Nat.cast_one, one_mul])
+    rwa [one_smul] at h
+  -- pivot self-norm is a natural (`ℤ[Irr]` sum-of-squares)
+  have hN : ∃ n : ℕ, ClassFunction.inner χ₀ χ₀ = (n : ℂ) := by
+    obtain ⟨c, -, -, hcsum⟩ := OddOrder.RepresentationTheory.mem_ZIrr_inner_self_eq_sum_sq
+      (sSet_subset_ZIrr _ hχ₀.1)
+    have hm0 : 0 ≤ ∑ x ∈ c.support, (c x) ^ 2 :=
+      Finset.sum_nonneg fun _ _ => sq_nonneg _
+    refine ⟨(∑ x ∈ c.support, (c x) ^ 2).toNat, ?_⟩
+    rw [hcsum]
+    exact_mod_cast (congrArg (fun z : ℤ => (z : ℂ)) (Int.toNat_of_nonneg hm0)).symm
+  exact OddOrder.Peterfalvi.S07.uniform_degree_coherence_of_families
+    ((sSet_finite _).subset Set.sdiff_subset)
+    hχ₀
+    (fun η hη => hyp.sSet_memberRFamily hG hη.1)
+    (fun a ha b hb hab => by
+      have h := sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupS hG) ha.1 hb.1 hab
+      convert h using 2 <;> exact Subsingleton.elim _ _)
+    hconj
+    hnr
+    hN
+    (fun {φ ψ} hφ hψ =>
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
+        (hyp.dadeHypS hG) (hyp.dadeHypS_hconj hG) hφ.2 hψ.2)
+    (fun a ha b hb =>
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+        (hyp.dadeHypS hG) (hyp.dadeHypS_hconj hG)
+        (hsuppdiff a ha b hb)
+        (Submodule.sub_mem _ (sSet_subset_ZIrr _ ha.1) (sSet_subset_ZIrr _ hb.1)))
+    hsuppdiff
+    (fun {φ ξ} hφ hξ h1 h2 => hyp.sSet_memberRFamily_orthogonal hG hφ.1 hξ.1 h1 h2)
+    (fun a ha => (hS3deg a ha).trans (hS3deg χ₀ hχ₀).symm)
+    (by
+      rw [hS3deg χ₀ hχ₀]
+      exact Nat.cast_ne_zero.mpr (Nat.mul_ne_zero Nat.card_pos.ne'
+        (OddOrder.Peterfalvi.S11.u_odd hG chars).pos.ne'))
+    (by
+      rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+      simpa using honestTypeP2ASet_one_not_mem (M := hyp.S))
+    (hconj χ₀ hχ₀)
+    (fun h => hnr χ₀ hχ₀ h.symm)
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
 /-- **Peterfalvi (9.11.4)–(9.11.8), the norm bound — `S`-instance residual** (issue 1017; the
 `S`-mirror of the M-side `S13.NineElevenNormBound` discharge
 (`nineElevenNormBound_of_sevenEightRefutation` + `nineElevenSevenEightRefutation`, issue 9083
