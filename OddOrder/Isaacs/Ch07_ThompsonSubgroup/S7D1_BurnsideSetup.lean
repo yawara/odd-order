@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_CentralizerCenter
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_AbelianQuotientComplement
 
 /-!
 # Isaacs FGT Ch.7 (Thompson subgroup) — S7D part 1: Burnside p^a q^b setup (Thm 7.8 stmt, scaffolding, Steps 2-9 decomp, faithful-action bridge) (pp. 219-222)

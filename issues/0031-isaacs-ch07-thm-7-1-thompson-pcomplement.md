@@ -334,3 +334,21 @@ remaining overgroup allowed by maximality is therefore `P` itself.
 The next textbook frontier is Step 6: analyze the normal `p`-complement of
 `G/O_p(G)`, prove it is abelian, and derive the abelian Sylow-2 hypothesis used
 by the existing normal-J closing theorem.
+
+## 2026-07-14 update — Step 6 abelian quotient complement landed
+
+Step 6 is complete in
+`OddOrder/Isaacs/Ch07_ThompsonSubgroup/S7C_AbelianQuotientComplement.lean`.
+For the normal `p`-complement `Nbar` of `G/O_p(G)`, every subgroup of `Nbar`
+invariant under the image of `P` is either trivial or all of `Nbar`: its inverse
+image together with `P` is an overgroup of the maximal Sylow subgroup from
+Step 4, and the two maximality cases reduce by complement disjointness and the
+Dedekind law.  A nontrivial invariant Sylow subgroup therefore fills `Nbar`, so
+`Nbar` is a prime-power group.  Its derived subgroup is invariant and proper,
+hence trivial, proving that `Nbar` is abelian.  Finally every `2`-subgroup of
+`G` injects into the quotient (`p ≠ 2`) and its image lies in the normal
+complement by coprimality with the complement index, so it is abelian.
+
+The next textbook frontier is Step 7: assemble Steps 2, 3, 5, and 6 into the
+existing sorry-free `thompson_normal_p_complement` closing theorem and expose
+the unconditional Theorem 7.1 endpoint.
