@@ -305,3 +305,25 @@ bgTheoremE_cover_data の axiom-clean 化で、**(13.17.b) の B2 入力 `card_L
   (本項) (iii) 要 hub 確認 — S15_Gate3 = S15_SAndT split (c 系 territory、c は idle/TRULY_EXHAUSTED、
   b の active files (S15_CaseB*/SSetMemberRFamily/S07) と非交差)。
 **lane a への carve-out 可否を裁定されたい**。裁定待ちの間は残 follow-up (stale docstring 等) を継続。
+
+### 3′. 訂正 + 追加候補 (同 session、merge_monitor 所有マップ照合後)
+
+**所有訂正**: §3 で「S15_Gate3 = c 系 territory」と書いたのは誤り。`S15_SAndT{,_Setup}` は
+2026-07-04 に c→b 移管済み (merge_monitor レーン表) ⟹ **`card_LF_coprime_pq` (S15_Gate3) は
+b territory**。b の現 active files (S15_CaseB*/S15_SSetMemberRFamily/S07 pin 系、issue 2035) とは
+別 file だが、carve-out 裁定は「a に付与 vs b の 2035 後のキューに積む」の 2 択になる。
+
+**追加候補 (同型の newly-ungated、これも b territory = S14_MaximalI 全体)**:
+`TypeICovering.lean` の 2 sorry (`allTypeI_fittingIsTI` :72 / `not_nonTypeICovering_of_all_typeI`
+:100) の docstring が「genuinely still-missing」と挙げる上流 gate は**両方とも解消済み**:
+- `escapingCentralizers_control` (S10_MinimalSimpleBasic:1244) — **AxiomsCheck assert 済み**
+  (AxiomsCheck:7718、docstring の「open BG §16 residual」は stale)。
+- `theorem88_dichotomy` — **AxiomsCheck assert 済み** (AxiomsCheck:7281)。
+残る中身は「escape control → FittingIsTI の assembly」と「(8.8.a) exclusivity の抽出」で、
+機械的 rewire でなく genuine assembly 証明 (中規模)。(12.17) all-type-I chain →
+`Theorem88CaseBData` → FT endgame に direct。
+
+**hub への裁定事項 (まとめ)**: newly-ungated 3 target (`card_LF_coprime_pq` / `allTypeI_fittingIsTI` /
+`not_nonTypeICovering_of_all_typeI`、全て b territory・b の 2035 active files と非交差) を
+(a) lane a へ carve-out (unblocking 元の a が続行、b は 2035 継続) か、(b) b のキューへ、か。
+lane a は裁定まで a-scope follow-up を継続。
