@@ -44,60 +44,31 @@ variable [Finite G]
 for maximal `L` with `L_F ≠ ⊥`) now lives with the (8.6.a)/(8.16) centralizer-containment block
 before (12.10), where the type-`P` pins consume it. -/
 
-/-- **Peterfalvi (8.13.c1)+(2.3), all-type-I case** — the escaping-centralizer control that makes
-each type-I kernel's Fitting subgroup a `TI`-subgroup, supplying the `FittingIsTI` gate of the
-(12.17) `isTI` covering input.
-
-For a maximal subgroup `M` of a minimal simple group of odd order in which **every** maximal subgroup
-is of type I (`hall`), the Fitting subgroup `F(M)` is `TI` (`S15.FittingIsTI M`).  In the all-type-I
-configuration the (8.13.c1) escaping-centralizer control forces `R(x) = 1` on `M_σ#` (the (8.14)
-signalizer is trivial), so `M_σ = M_F = F(M)` is a genuine trivial-intersection subgroup.
-
-**Genuinely still-missing**: the (8.13.c1) escaping-centralizer control is `escapingCentralizers_control`
-(S10:526), itself an open BG §16 / (2.3) residual, and the passage from it to `FittingIsTI` is not
-assembled anywhere in reach of `S14`.  BG §16 exposes `FittingIsTI` only in the `M_F ≠ M_σ` /
-type-`P₂` directions (`fittingIsTI_of_isTypeP2`, `fitting_isTI_of_mf_ne_msigma`), never for the
-all-type-I `M_F = M_σ` case, which is exactly the escaping-centralizer content here.
-
-**Soundness**: the statement is TRUE and **not** a false general implication.  It is *not* claimed
-for an arbitrary type-I subgroup — the (12.10)/(12.16) Frobenius witness `L` is type-I-like yet
-has `H^# = (L_F)#` **not** `TI` in `G` (Pf (12.10), see `sibleyTarget_frobI`), so the conclusion
-genuinely requires the ambient all-type-I hypothesis `hall` (which excludes the counterexample
-configuration and puts us in the (8.17.a) type-I covering case where (8.13.c1) applies).  Tied to
-`hG`, `M` maximal, its type-I witness, and `hall`. -/
-private theorem allTypeI_fittingIsTI (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (_hI : IsTypeI M)
-    (_hall : ∀ N : Subgroup G, N ∈ maximalSubgroups G → IsTypeI N) :
-    OddOrder.BG.Ch4.S15.FittingIsTI M := by
-  sorry
+/-! `allTypeI_fittingIsTI` — the (8.13.c1)+(2.3) all-type-I `FittingIsTI` gate — now lives after
+`allTypeI_centralizer_le` below, whose non-escaping control it consumes. -/
 
 /-- **Peterfalvi (8.8.a) dichotomy, all-type-I case** — the case-(b) covering branch of BG Theorem
 E cannot occur when every maximal subgroup is of type I.
 
-If `data`'s cover admits a `BGTheoremENonTypeICovering` (the two-exceptional-subgroup case (8.8.b)
-of BG Theorem E) while every maximal subgroup is of type I (`hall`), a contradiction results.
+The case-(b) branch of `S10.bgTheoremE_cover_data` carries its type-`P` provenance
+(`maximalTypePFamily G` nonempty — the (8.8.a) *exclusivity*: the two-exceptional-subgroup cover
+is produced, in `nonTypeICovering_of_isTypeP`, *only* from a reference type-`P` maximal).  A
+type-`P` maximal is type F-negated (`isTypeF_iff_not_isTypeP`), while `hall` makes it type I
+= type F (Proposition 16.1(a), `proposition_type_classification`) — contradiction.
 
-**Genuinely still-missing**: the `BGTheoremENonTypeICovering` carrier records only the exceptional
-`Ẑ`-set and its cover geometry — it does **not** expose the type-`P` maximal whose Theorem 14.7
-duality produced `Ẑ` (see `nonTypeICovering_of_isTypeP`, whose inputs `Mref, Kref, …` are consumed
-but not re-exported).  So no non-type-I maximal is directly extractable from `hNonTypeI` to
-contradict `hall`.  The (8.8) dichotomy's *exclusivity* — case (b) selected `iff` some maximal is
-non-type-I — is the BG §16 (8.8.a) residual (parallel to `theorem88_dichotomy`), not assembled in
-reach of `S14`.
-
-**Soundness**: the statement is TRUE — the (8.8.b) covering branch is produced (in
-`nonTypeICovering_of_isTypeP`) *only* from a type-`P` (= non-type-I, `isTypeNonI_of_isTypeP`)
-maximal, which `hall` forbids; so the two hypotheses are jointly contradictory.  It is **not** a
-false general implication: it does not claim `BGTheoremENonTypeICovering` is empty unconditionally
-(it is inhabited whenever a non-type-I maximal exists) — only its incompatibility with the
-all-type-I hypothesis `hall`.  Tied to `hG`, the specific `data`, its non-type-I covering, and
-`hall`. -/
+The provenance hypothesis is essential: the bare `BGTheoremENonTypeICovering` carrier records
+only the exceptional `Ẑ`-set and its cover geometry, and an **empty** exceptional set satisfies
+it whenever the type-I cover holds — so no contradiction with `hall` is extractable from the
+carrier alone, and the earlier `(hcov : BGTheoremENonTypeICovering data)`-form of this lemma was
+provable only through the full (12.17) contradiction (circular here). -/
 private theorem not_nonTypeICovering_of_all_typeI (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {data : OddOrder.Peterfalvi.S10.BGTheoremECoverData G}
-    (_hcov : OddOrder.Peterfalvi.S10.BGTheoremENonTypeICovering data)
-    (_hall : ∀ N : Subgroup G, N ∈ maximalSubgroups G → IsTypeI N) :
+    (hP : (OddOrder.BG.Ch4.S14.maximalTypePFamily G).Nonempty)
+    (hall : ∀ N : Subgroup G, N ∈ maximalSubgroups G → IsTypeI N) :
     False := by
-  sorry
+  obtain ⟨Mref, hMrefmax, hMrefP⟩ := hP
+  exact OddOrder.BG.Ch4.S14.isTypeF_iff_not_isTypeP.mp
+    ((OddOrder.BG.Ch4.S16.proposition_type_classification hG hMrefmax).1.mp
+      (hall Mref hMrefmax)) hMrefP
 
 /-- **A type-I maximal has no "hat" beyond its kernel** (the (12.17)-side collapse of the (8.14)
 signalizer support): for a type-I maximal `N`, every element of `N` whose `N_σ`-centralizer is
@@ -158,6 +129,78 @@ private theorem allTypeI_centralizer_le (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     OddOrder.BG.Ch4.S16.exists_RData_escape_structure hG hM hx hesc
   exact hxA.2 (typeI_hatMsigma_subset_Msigma hG hnoV hNmem.1 (hall N hNmem.1) hxA.1.1)
 
+/-- **Peterfalvi (8.13.c1)+(2.3), all-type-I case** — the escaping-centralizer control makes
+each type-I kernel's Fitting subgroup a `TI`-subgroup, supplying the `FittingIsTI` gate of the
+(12.17) `isTI` covering input.
+
+For a maximal subgroup `M` of a minimal simple group of odd order in which **every** maximal
+subgroup is of type I (`hall`), the Fitting subgroup `F(M)` is `TI` (`S15.FittingIsTI M`):
+`M` is type F, so `M_F = M_σ`, and the (12.7) Frobenius structure pins `F(M) ≤ M_F`
+(`IsFrobeniusGroup.fitting_le_kernel`); for `a, g·a·g⁻¹ ∈ F(M)^# ⊆ M_σ^#` the non-escaping
+control (`allTypeI_centralizer_le`) gives `C_G(g·a·g⁻¹) ≤ M`, and the Theorem-14.4 σ-uniqueness
+(`S10.eq_of_mem_maximalSigmaSubgroupsOfElement_of_centralizer_le`) pins `M = M^g`, i.e.
+`g ∈ N_G(M) = M = N_G(F(M))`.  The type-V exclusion feeding (12.7) is discharged internally by
+the axiom-clean (10.10) `no_typeV_maximal_unconditional`.
+
+**Soundness**: the statement is *not* claimed for an arbitrary type-I subgroup — the
+(12.10)/(12.16) Frobenius witness `L` is type-I-like yet has `H^# = (L_F)#` **not** `TI` in `G`
+(Pf (12.10), see `sibleyTarget_frobI`); the ambient all-type-I hypothesis `hall` (through the
+non-escaping control) is what excludes that configuration. -/
+private theorem allTypeI_fittingIsTI (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hI : IsTypeI M)
+    (hall : ∀ N : Subgroup G, N ∈ maximalSubgroups G → IsTypeI N) :
+    OddOrder.BG.Ch4.S15.FittingIsTI M := by
+  classical
+  have hnoV : ¬ ∃ L : Subgroup G, L ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV L :=
+    OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional hG
+  -- Type F, so `M_F = M_σ`.
+  have htypeF : OddOrder.BG.Ch4.S14.IsTypeF M :=
+    (OddOrder.BG.Ch4.S16.proposition_type_classification hG hM).1.mp hI
+  have hMσ : maxNilpotentNormalHall M = OddOrder.BG.Ch3.S10.Msigma M :=
+    OddOrder.BG.Ch4.S16.maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2 hG hM
+      (Or.inl htypeF)
+  -- (12.7): `M` is Frobenius with kernel `M_F`, so `F(M) ≤ M_F = M_σ`.
+  obtain ⟨fdata, -⟩ := typeI_frobenius hG hnoV hM hI
+  have hfitle : OddOrder.BG.Ch4.S15.fittingInAmbient M ≤ OddOrder.BG.Ch3.S10.Msigma M := by
+    have h1 : OddOrder.Isaacs.Ch01.fitting ↥M ≤ fdata.typeI.typeF.H.subgroupOf M :=
+      fdata.frobenius.fitting_le_kernel
+    have h2 := Subgroup.map_mono (f := M.subtype) h1
+    rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr fdata.typeI.typeF.H_le,
+      fdata.typeI.typeF.H_eq, hMσ] at h2
+    exact h2
+  -- TI: a nonidentity conjugate meeting `F(M)#` pins the maximal subgroup.
+  intro g hg
+  obtain ⟨a, ha, hga⟩ := hg
+  have hx1 : g * a * g⁻¹ ≠ 1 := fun h => hga.2 (Set.mem_singleton_iff.mpr h)
+  have haσ : a ∈ OddOrder.BG.Ch3.S10.Msigma M := hfitle (SetLike.mem_coe.mp ha.1)
+  have hxσ : g * a * g⁻¹ ∈ OddOrder.BG.Ch3.S10.Msigma M := hfitle (SetLike.mem_coe.mp hga.1)
+  -- `x = g·a·g⁻¹ ∈ (M^g)_σ` as well.
+  have hM'max : MulAut.conj g • M ∈ maximalSubgroups G :=
+    mem_maximalSubgroups.mpr
+      (OddOrder.BG.Ch3.S12.isCoatom_conj_smul (mem_maximalSubgroups.mp hM))
+  have hxσ' : g * a * g⁻¹ ∈ OddOrder.BG.Ch3.S10.Msigma (MulAut.conj g • M) := by
+    rw [OddOrder.BG.Ch4.S14.Msigma_conj_smul, Subgroup.pointwise_smul_def, Subgroup.mem_map]
+    exact ⟨a, haσ, rfl⟩
+  -- Non-escaping centralizer at `M` + Theorem-14.4 σ-uniqueness pin `M = M^g`.
+  have hcM : Subgroup.centralizer ({g * a * g⁻¹} : Set G) ≤ M := by
+    refine allTypeI_centralizer_le hG hnoV hall hM _ ?_
+    rw [OddOrder.BG.Ch4.S14.sigmaSharp, sharpSubgroup, Set.mem_sdiff]
+    exact ⟨SetLike.mem_coe.mpr hxσ, fun h => hx1 (Set.mem_singleton_iff.mp h)⟩
+  have heq : M = MulAut.conj g • M :=
+    OddOrder.Peterfalvi.S10.eq_of_mem_maximalSigmaSubgroupsOfElement_of_centralizer_le hG
+      (OddOrder.BG.Ch4.S14.genuineSigmaDecomposition hG) hx1
+      ⟨hM, hxσ⟩ ⟨hM'max, hxσ'⟩ hcM
+  -- `g ∈ N_G(M) = M = N_G(F(M))`.
+  have hMne : M ≠ ⊥ := fun h =>
+    OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM
+      (le_bot_iff.mp (h ▸ OddOrder.BG.Ch3.S10.Msigma_le M))
+  have hgM : g ∈ M := by
+    have hgN : g ∈ Subgroup.normalizer M :=
+      OddOrder.GroupTheory.mem_normalizer_of_conj_smul_eq_self heq.symm
+    rwa [OddOrder.BG.Ch4.S15.normalizer_eq_self_of_mem_maximalSubgroups hG hM hMne] at hgN
+  rw [OddOrder.BG.Ch4.S16.normalizer_fittingInAmbient_eq_self hG hM]
+  exact hgM
+
 /-- **§8/§10 covering inputs to Peterfalvi (12.17)** — the all-type-I case of Theorem (8.8).
 
 When every maximal subgroup of `G` is of type I, the §8 covering theory (BG Theorem E, (8.17), and
@@ -201,10 +244,10 @@ prime-factor partition is disjoint, hence the kernels are coprime), `two_le` (a 
 make `|G#| = (|M_s|-1)|G:M| < |G|-1 = |G#|`), and `covers` (the (12.17)-faithful collapse, issue
 9080: no centralizer escapes by (12.7)+Theorem D(4) (`allTypeI_centralizer_le`), so the faithful
 BG Cor 14.9 cover collapses onto the kernels, `Mtilde_eq_sigmaSharp_of_forall_centralizer_le`) are
-all discharged.  Two upstream facts remain isolated as residual sorries: `isTI`, the
-escaping-centralizer control (8.13.c1)+(2.3) making each kernel sharp-set a TI-subset; and the
-selection of the type-I cover branch under `hall`, the (8.8.a) dichotomy (BG §16, parallel to
-`theorem88_dichotomy`). -/
+all discharged.  The two formerly-sorried inputs are also discharged: `isTI` by the
+escaping-centralizer control (8.13.c1)+(2.3) (`allTypeI_fittingIsTI`), and the selection of the
+type-I cover branch under `hall` by the type-`P` provenance of the case-(b) branch
+(`not_nonTypeICovering_of_all_typeI`, the (8.8.a) exclusivity). -/
 theorem exists_typeICovering (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hall : ∀ M : Subgroup G, M ∈ maximalSubgroups G → IsTypeI M) :
@@ -376,13 +419,10 @@ theorem exists_typeICovering (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       rw [← hσeq]
       exact hmem
   · -- **(8.8.b) non-type-I cover branch**: ruled out when every maximal subgroup is type I.
-    -- This is the all-type-I case of the (8.8) dichotomy (`theorem88_dichotomy`); under `hall`
-    -- BG Theorem E returns the type-I cover, never the two-exceptional-subgroup case (the
-    -- exceptional `W` of `hNonTypeI` is the normalizer of a non-type-I maximal).  Isolating that
-    -- is the BG §16 (8.8.a) residual (`not_nonTypeICovering_of_all_typeI`).
-    exfalso
-    obtain ⟨hcov⟩ := hNonTypeI
-    exact not_nonTypeICovering_of_all_typeI hG hcov hall
+    -- The branch carries its type-`P` provenance (the (8.8.a) exclusivity recorded in
+    -- `bgTheoremE_cover_data`), which `hall` contradicts
+    -- (`not_nonTypeICovering_of_all_typeI`).
+    exact (not_nonTypeICovering_of_all_typeI hG hNonTypeI.1 hall).elim
 
 /-- **Peterfalvi (12.17), non-existence half**: in a minimal simple group of odd order, not every
 maximal subgroup is of type I.

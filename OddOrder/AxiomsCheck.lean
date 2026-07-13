@@ -7822,3 +7822,12 @@ kernel coprimalities `q_not_dvd_kernel` / `p_not_dvd_kernel` are clean as coroll
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.card_LF_coprime_pq
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.q_not_dvd_kernel
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.p_not_dvd_kernel
+
+/-! **Frobenius kernel contains the Fitting subgroup `IsFrobeniusGroup.fitting_le_kernel`,
+axiom-clean** (lane a, 2026-07-13, issue 9087 RULING #4 carve-out, 2/3).  A normal `p`-subgroup
+of a Frobenius group lies in the kernel (`normal_pGroup_le_kernel`: quotient-order coprimality
+when `p ∣ |N|`, commutator + Thm 6.4 centralizer containment when `p ∤ |N|`), hence
+`F(G) = ⨆ p, O_p(G) ≤ N`.  Tripwire: this is the (12.7)-side input pinning `F(M) ≤ M_F` in the
+all-type-I `FittingIsTI` gate (`allTypeI_fittingIsTI`, Pf (8.13.c1)+(2.3), `S14` covering). -/
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch06.IsFrobeniusGroup.normal_pGroup_le_kernel
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch06.IsFrobeniusGroup.fitting_le_kernel
