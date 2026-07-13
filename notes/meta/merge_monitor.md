@@ -607,6 +607,11 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 18) — a 合流: Isaacs Ch07 select maximal bad normalizer subgroup (Thm 7.1 継続)**:
+  **a=1** (`0304119b` = Isaacs Ch07 issue 0031。`S7C_ThompsonPComplement.lean` +100 (自 file 継続、decl 削除ゼロ、
+  0→0 sorry、計 289 行) + AxiomsCheck +8)。scope: Isaacs/** shared foundation additive ✓。b=0 / c=0。
+  build green **4197 jobs** / AxiomsCheck OK (**2391** assertion 全 allowlist) / **count-sorry 51→51 不変** /
+  新 axiom なし / 逸脱なし。S7C は DAG 深部ゆえ大規模再コンパイル継続。
 - **2026-07-14 (tick 17) — a 合流: Isaacs Ch07 transport Thompson local hypotheses (Thm 7.1 継続)**:
   **a=1** (`5e7b477d` = Isaacs Ch07 issue 0031。`S7C_ThompsonPComplement.lean` +133/-20 (a 自身が tick15 で作った
   file の継続、decl 削除ゼロ = 既存 statement 非改変) + `S7B2_NormalJ_PComplement.lean` +1/-1 (import 追従) +
