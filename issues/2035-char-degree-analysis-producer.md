@@ -1131,3 +1131,93 @@ S-side 対応 (全部既存!):
   構成 (has-irr: `.some`+formula_of_irr / all-red: `exists_pinned_coherent_sSet_of_all_reducible`+diff 拡張)、
   `coherent_H0Cprime_S := .choose` に rewire (型不変)、`tau1S_ofHonest_muColumn_formula := .choose_spec`。
 - OddOrder.lean に MuColumnPin 登録 (現在未登録)。
+
+## 2026-07-13 更新 #18 (lane b, /loop) — ★★(13.3.c) main formula LANDED (sorry-free、pivot sorry 消滅)
+
+更新 #17 の plan を完全実装 (commits 5a198c90 + 7376ec89、full build 4188 jobs green + AxiomsCheck OK):
+
+1. **MuColumnPin.lean** = c-generic pin 機構 leaf (sorry-free):
+   `muColumn_not_irreducible` / `coherentIndS_muColumn_diff` (列独立性、任意 coherence) /
+   `coherentIndS_extension_irr_vanish_regular` (irr 像の Ŵ^G 消滅) /
+   `coherentIndS_muColumn_vanish_regular` (γ-trick) /
+   **`coherentIndS_muColumn_pin_of_irr`** (dichotomy: clean ∨ conj-column flip; R-family 分解を
+   congrMap transport + (3.7) inner_eta_grid_relation row-uniformity + norm=q) /
+   `coherentIndS_muColumn_eq_etaColumn_of_pivot` (pivot→全列)。
+2. **CaseACoherence**: `sSet_coherent_indS_A_pinned` (by_cases ∃irr; flipped pivot → p≥5 矛盾
+   (hno3rd) → p=3 強制 + swap 組み立て; all-red → glue) → `coherent_H0Cprime_S := .choose` rewire
+   (型不変) → **`tau1S_ofHonest_muColumn_formula`** = (13.3.c) main:
+   `(∀j≠0, τ₁μ_j = ∑η_ij) ∨ (p=3 ∧ swap-negate)` — `mu_tau1_formula` field と同形。
+3. 旧 scaffold の閉じ得ない clean-pivot sorry (`tau1S_ofHonest_muColumn_pivot`) は撤去
+   (honest な proven formula に置換)。
+
+### 残作業 (次段) = CharacterDegreeData 材料化 (issue 2035 本丸)
+`character_degree_analysis` (Machinery135:~215, sorry) の Nonempty (CharacterDegreeData hyp) 構成:
+- `mu_tau1_formula` ⟵ **tau1S_ofHonest_muColumn_formula で直接 discharge 可** ✓
+- `tau1S := hyp.tau1S_ofHonest hG hnoV chief` を採る場合、hG/hnoV/chief の供給設計が要
+  (CharacterDegreeData は hyp のみ参照 — hnoV・chief を仮説/field としてどう thread するか)。
+- 他 field: tau1S_isometry 系 = tau1S_ofHonest_inner_induce / _induce_mem_ZIrr ✓ (proven)、
+  `tau1S_induce_inner_eta` = crux ✓、`mu_j_linear_induced` (13.3.a)、`delta_eq_one`、
+  `mu_col_tau1_eta_col_one` ⟵ formula + (13.3.a) の合成。lambda 系 field は要調査。
+
+## 2026-07-13 更新 #19 (lane b, /loop) — carrier bug 修正 + CharacterDegreeData 材料化 inventory
+
+### ⚠ uninhabitability 発見・修正済
+`tau1S_induce_inner_eta` (∀ irr θ: ⟨η_ij, τ₁(Ind θ)⟩=0) が `mu_col_tau1_eta_col_one` と矛盾
+(θ := (13.3.a) の θ_j で ±1 = 0) → structure uninhabited だった。修正 = 2 field 化
+(irr(Ind θ) 仮説付き本体 + 列0限定 ∀θ 版 `tau1S_induce_inner_eta_col_zero`)、consumer 3 箇所調整。
+
+### 材料化 inventory (character_degree_analysis の構成部品)
+signature (hG, hyp) は不変で OK — **hnoV = `S12.no_typeV_maximal_unconditional hG`**、
+**chief = `exists_chiefFactorData hG (hyp.toTypesIIIIIIVSetupS hG)`** で内部調達可能。
+- tau1S := tau1S_ofHonest hG hnoV chief ✓
+- mu_tau1_formula ⟵ tau1S_ofHonest_muColumn_formula ✓ (更新 #18)
+- mu_j_linear_induced ⟵ **mu_j_isIndPC** (DegreesFirstSplit:767, proven) ✓
+- delta_eq_one ⟵ S 側 **delta_eq_one_S** (CountingLayer:1547, proven) ✓ + δ' 側 (swap 経由? 要確認)
+- mu_col_tau1_eta_col_one ⟵ formula + mu_j_isIndPC の合成 (buildable、p=3 分岐で j 選択)
+- tau1S_inner_induce ⟵ tau1S_ofHonest_inner_induce ✓ / tau1S_induce_mem_ZIrr ⟵ ..._induce_mem_ZIrr ✓
+- tau1S_apply_induce_sub ⟵ tau1S_ofHonest_extends_on_supported + induce_H_mem_zSpan_S
+  (zSpan 所属) + degree-0 差の A(S)-support (要小 lemma: zSpan 元の (η−η')(1)=0 → A(S)-supported)
+- tau1S_induce_inner_eta ⟵ crux coherentIndS_image_inner_eta_eq_zero (Ind θ irr member 版、
+  Ind θ ∈ sSet の membership が要 — 𝒳 kernel 条件の確認要)
+- tau1S_induce_inner_eta_col_zero ⟵ zSpan 分解 + formula + crux (irr/red 両対応)
+- **lambda (13.3.b) = 未存在の genuine content** (irr・degree uq・H-linear-induced な member の存在)
+- tau1T ⟵ hyp.swap (HypothesisSwap:153) の tau1S_ofHonest (swap 側 chief も exists_chiefFactorData)
+
+## 2026-07-13 更新 #20 (lane b, /loop) — ⚠ (13.3.b) は dichotomy: CharacterDegreeData.lambda 無条件 field は overstatement の疑い濃厚
+
+### 原文・Coq の確定事実
+- **Pf (13.3.b)** (mmd 04.15 line 43): 「𝒮 が PC の線型指標から誘導される次数 uq の既約指標を
+  **含まないなら**、(9.7.b) が M=S, C=1, u=(p^q−1)/(p−1) で成立」— λ の存在は **dichotomy**、無条件でない。
+- **Coq PFsection13:307-310**: `~~ has irrIndH calS → [typeP_Galois, C=1, u=(p^q−1)/(p−1)]` — 同形。
+- Coq は (13.4) を skip し、(13.5-8) は `calS1 = seqIndD H S P 1` の member zeta を**引数に取る条件付き**
+  (S1cases :402: zeta ∈ calS1 → μ-column か irr)。λ を無条件に選ぶ lemma は存在しない。
+- book 後段 (13.15) (mmd line 262): x = (p^q−1)/((p−1)u) の算術で x ≥ 2q+1 の場合に no-λ 分岐を
+  refute して初めて「By (13.3.b), there is a character λ」と言う — **no-λ (Galois, C=1) は
+  (13.3) 時点で live な case**。
+- ⟹ `character_degree_analysis : Nonempty (CharacterDegreeData hyp)` (無条件 λ 込み) は
+  no-λ case を排除できない限り証明不能の疑い。要確認: S15.Hypothesis が C≠1/非Galois を既に
+  field で排除していないか (排除していれば無条件で OK)。していなければ restructure:
+  **(A) λ-free core** (μ/τ₁/δ field 群 — 全て landed engine で供給可) **+ λ-cluster 条件付き carrier**、
+  or **(B)** producer を dichotomy 化 `Nonempty CDD ∨ (Galois ∧ C=1 ∧ u=…)`。
+  consumer 影響: NormEstimates ×5 (13.8-T 系、λ 前提で自然) + **TTypeII:194 (lane c 所有)** —
+  restructure は cross-lane 影響あり、実施時は hub 調整 (9000 issue) 経由。
+
+### 今 iteration の landing
+- `tau1S_ofHonest_mu_col_eta_col_one` (CaseACoherence、sorry-free): mu_col_tau1_eta_col_one
+  field の honest supply (formula + mu_j_isIndPC 合成、p=3 分岐で j=2/δ=−1)。
+
+## 2026-07-13 更新 #21 (lane b, /loop) — (13.3.b) 数学は landed 済と判明 + 残 build list 確定
+
+- **(13.3.b) dichotomy glue = `caseB_of_no_irreducible_sOf_H0Cprime`** (CountingLayer:1042,
+  sorry-free, §9-generic) が既に存在 — no-irr → caseB + C=⊥ + u=(p^q−1)/(p−1)。
+  (9.10) 相当 = `exceptional_case_frobenius_realization` (ThetaCountAssembly:993, sorry 3 残
+  は type-II HU-Frobenius 節のみ)。9094 の裁定対象は carrier 形状のみに縮小 (追記済)。
+- **残 build list (ungated、9094 裁定と独立に有用)**:
+  1. conditional producer `character_degree_analysis_of_irr`: (∃ λ witness) → Nonempty (CDD hyp)
+     — 全 field を landed engine で組む (λ-cluster は witness から)。
+  2. `tau1S_apply_induce_sub` 供給: zSpan(sSet) 元の degree-0 → A(S)-supported 小 lemma +
+     tau1S_ofHonest_extends_on_supported + induce_H_mem_zSpan_S。
+  3. `tau1S_induce_inner_eta` (restated 版) 供給: Ind θ irr → sSet membership 橋 + crux。
+  4. `tau1S_induce_inner_eta_col_zero` 供給: induce_H_mem_zSpan_S の zSpan 分解 + formula + crux。
+  5. tau1T / δ'-half: `Hypothesis.swap` 経由 — 前提 = hT2 (T type-P₂) + Tdata + **NuGridSupplyData**
+    (T-side (13.1.e)/(4.3)/(4.4) grid facts の Prop bundle、producer 未確認 — 要調査)。

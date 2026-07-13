@@ -585,6 +585,17 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-13 (tick 3) — a+b 合流: ★ carve-out 1/3 `card_LF_coprime_pq` 実証明 (a) + (13.3.c) pin bundle 完成 + carrier 健全化 (b)**:
+  **a=5** (feat(9087 RULING #4 1/3): `card_LF_coprime_pq` (S15_Gate3 carve-out decl) **実証明 landing** =
+  §15 gate-4 B2 axiom-clean — carve-out 条件遵守確認済 (当該 decl 文脈のみ・signature 型不変)、
+  σ-uniqueness 補題を a 所有 S10 に factor (+40、0096 宣言非接触)、allTypeI_fittingIsTI 設計 recon =
+  残 2/3 へ) / **b=6** (feat(2035, 13.3.c): has-irr μ-column pin dichotomy + pin bundle 完成
+  (MuColumnPin rewrite +573/−88 sorry-free); **fix: CharacterDegreeData.tau1S_induce_inner_eta
+  uninhabitability 修正** — 旧 field が mu_col_tau1_eta_col_one と矛盾し structure uninhabited だった
+  のを honest scope 化 = b 自所有 carrier の健全化・self-flag 済で受理) / c=0。build green ×2
+  (4187/4188 jobs)・AxiomsCheck OK (2367/0)・**count-sorry 51→50→49** (B2 + pin 両 discharge、
+  regression なし)・新 axiom なし・size watch 全 <1500 (CaseACoherence 1140 / Machinery135 1166 /
+  MuColumnPin 550 / Gate3 930)。push `b3836d70..4f36cc7c` (fef8c18a + 4f36cc7c)。
 - **2026-07-13 (tick 2) — a+b 合流: ★ 9077-T1 閉包 (a、c 所有 file への proof-only de-gate 受理) + 9087 RULING #4**:
   **a=3** (feat(9077 T1): TTypeII `T_not_isTypeIV_of_isTypeP1` の (11.9)-gated `hVcomm` bare sorry を
   landed 済 `not_isTypeIV_of_mem_maximalSubgroups` (S13_NonGaloisExclusion) 直 cite で閉包 —

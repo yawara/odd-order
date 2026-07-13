@@ -1,4 +1,6 @@
 import OddOrder.Peterfalvi.S15_NineElevenSevenEight
+import OddOrder.Peterfalvi.S15_SAndT_Setup.MuColumnPin
+import OddOrder.Peterfalvi.S15_SAndT_Setup.DegreesFirstSplit
 
 /-!
 # Peterfalvi (9.11.5)–(9.11.8) — the `S`-instance caseA coherence endgame and assembly
@@ -698,12 +700,152 @@ theorem Hypothesis.sSet_coherent_indS_A [Finite G]
   · exact hyp.sSet_coherent_indS_caseA hG hnoV (hyp.mkSection11CharacterDataS_honest hG chief) hA.some
   · exact hyp.sSet_coherent_indS_caseB hG hnoV (hyp.mkSection11CharacterDataS_honest hG chief) hB.some
 
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **The (9.11) coherence of `𝒮 = sSet`, pinned by the (13.3.c) `μ`-column formula** (issue 2035
+更新 #17; Coq `FTtypeP_coherence`, `PFsection13.v:347`, with `typeP_TIred_coherent`'s global-sign
+disjunction `PFsection13.v:338`): there is a coherent extension of `𝒮` on `Ind_S^G` whose values
+on the reducible `μ`-column sums are the aligned `η`-column sums — either uniformly (`δ = 1`), or
+(the `p = 3` sign-flip exception) with a global negative sign and the two nonzero columns swapped.
+
+By-cases on an irreducible member of `𝒮`:
+
+* **has-irr**: *any* inhabitant (`sSet_coherent_indS_A`) is pinned by the γ-trick dichotomy
+  `coherentIndS_muColumn_pin_of_irr`.  A clean pivot propagates by column-independence; a flipped
+  pivot forces `p = 3` (for `p ≥ 5` a third column `j₂ ∉ {0, 1, k}` makes the column-difference
+  identity contradict the flip) and the columns swap.
+* **all-reducible**: the constructed glue `exists_pinned_coherent_sSet_of_all_reducible` supplies
+  a clean-pinned inhabitant (here arbitrary inhabitants may genuinely violate the formula — the
+  `p = 3` mixed splits — so the pin must come from the construction). -/
+theorem Hypothesis.sSet_coherent_indS_A_pinned [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
+    (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
+    ∃ c : OddOrder.Peterfalvi.S07.IsCoherent hyp.indS
+      (sSet (hyp.toTypesIIIIIIVSetupS hG))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S),
+      (∀ j : Fin hyp.p, j ≠ ⟨0, hyp.p_prime.pos⟩ →
+        c.extension (∑ i : Fin hyp.q, hyp.mu i j) = ∑ i : Fin hyp.q, hyp.eta i j) ∨
+      (hyp.p = 3 ∧ ∀ j j' : Fin hyp.p, j ≠ ⟨0, hyp.p_prime.pos⟩ →
+        j' ≠ ⟨0, hyp.p_prime.pos⟩ → j ≠ j' →
+        c.extension (∑ i : Fin hyp.q, hyp.mu i j) = -∑ i : Fin hyp.q, hyp.eta i j') := by
+  classical
+  haveI := hyp.finiteG
+  have hp1 : (⟨1, hyp.p_prime.one_lt⟩ : Fin hyp.p) ≠ ⟨0, hyp.p_prime.pos⟩ := by
+    intro h; exact absurd (congrArg Fin.val h) one_ne_zero
+  have hqne : (hyp.q : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hyp.q_prime.pos.ne'
+  by_cases hirr : ∃ ξ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG), IsIrreducibleCharacter ξ
+  · -- has-irr: any inhabitant is pinned by the γ-trick dichotomy
+    obtain ⟨ξ, hξ, hξirr⟩ := hirr
+    obtain ⟨c⟩ := hyp.sSet_coherent_indS_A hG hnoV chief
+    refine ⟨c, ?_⟩
+    rcases hyp.coherentIndS_muColumn_pin_of_irr hG hnoV chief c hξ hξirr hp1 with
+      hclean | ⟨k, hk0, hk1, hkconj, hflip⟩
+    · exact Or.inl fun j hj =>
+        hyp.coherentIndS_muColumn_eq_etaColumn_of_pivot hG hnoV chief c hclean hj
+    · -- flipped pivot: `p = 3` is forced, and the two nonzero columns swap
+      right
+      have hμcols := hyp.muColumn_inner
+      have hηcols := hyp.etaColumn_inner
+      -- a flipped pivot with a third nonzero column `j₂ ∉ {0, 1, k}` is contradictory
+      have hno3rd : ∀ j₂ : Fin hyp.p, j₂ ≠ ⟨0, hyp.p_prime.pos⟩ →
+          j₂ ≠ ⟨1, hyp.p_prime.one_lt⟩ → j₂ ≠ k → False := by
+        intro j₂ hj₂0 hj₂1 hj₂k
+        have hdiff := hyp.coherentIndS_muColumn_diff hG hnoV chief c hp1 hj₂0
+          (fun h => hj₂1 h.symm)
+        -- inner the difference identity with the pivot `η`-column
+        have hinner := congrArg (fun f => ClassFunction.inner f
+          (∑ i : Fin hyp.q, hyp.eta i ⟨1, hyp.p_prime.one_lt⟩)) hdiff
+        simp only [ClassFunction.inner_sub_left] at hinner
+        rw [hflip, ClassFunction.inner_neg_left,
+          hηcols k ⟨1, hyp.p_prime.one_lt⟩, if_neg hk1, neg_zero,
+          hηcols ⟨1, hyp.p_prime.one_lt⟩ ⟨1, hyp.p_prime.one_lt⟩, if_pos rfl,
+          hηcols j₂ ⟨1, hyp.p_prime.one_lt⟩, if_neg hj₂1] at hinner
+        -- so `⟨c(μ_{j₂}), η-col₁⟩ = −q`; but the dichotomy at `j₂` gives `0`
+        rcases hyp.coherentIndS_muColumn_pin_of_irr hG hnoV chief c hξ hξirr hj₂0 with
+          hc2 | ⟨k₂, hk₂0, hk₂j₂, hk₂conj, hc2⟩
+        · rw [hc2, hηcols j₂ ⟨1, hyp.p_prime.one_lt⟩, if_neg hj₂1] at hinner
+          rw [sub_zero] at hinner
+          exact hqne (by linear_combination -hinner)
+        · have hk₂1 : k₂ ≠ ⟨1, hyp.p_prime.one_lt⟩ := by
+            rintro rfl
+            -- `k₂ = 1` would give `conj(μ_{j₂}) = μ_1`, i.e. `μ_{j₂} = conj(μ_1) = μ_k`
+            have h1 : (∑ i : Fin hyp.q, hyp.mu i j₂ : ClassFunction ↥hyp.S ℂ)
+                = (∑ i : Fin hyp.q, hyp.mu i ⟨1, hyp.p_prime.one_lt⟩ :
+                    ClassFunction ↥hyp.S ℂ).conj := by
+              rw [← hk₂conj, ClassFunction.conj_conj]
+            rw [hkconj] at h1
+            have h2 := hμcols j₂ k
+            rw [if_neg hj₂k, h1, hμcols k k, if_pos rfl] at h2
+            exact hqne h2
+          rw [hc2, ClassFunction.inner_neg_left,
+            hηcols k₂ ⟨1, hyp.p_prime.one_lt⟩, if_neg hk₂1, neg_zero, sub_zero] at hinner
+          exact hqne (by linear_combination -hinner)
+      -- `p = 3`: otherwise `p ≥ 5` and a third column exists
+      have hp3 : hyp.p = 3 := by
+        by_contra hp3ne
+        have h3p := hyp.three_le_p
+        have hp4 : hyp.p ≠ 4 := fun h => by
+          have := hyp.p_prime; rw [h] at this; norm_num at this
+        have hp5 : 5 ≤ hyp.p := by omega
+        have h2lt : 2 < hyp.p := by omega
+        have h3lt : 3 < hyp.p := by omega
+        by_cases hk2 : k = ⟨2, h2lt⟩
+        · refine hno3rd ⟨3, h3lt⟩ ?_ ?_ ?_
+          · intro h; exact absurd (congrArg Fin.val h) (by norm_num)
+          · intro h; exact absurd (congrArg Fin.val h) (by norm_num)
+          · rw [hk2]; intro h; exact absurd (congrArg Fin.val h) (by norm_num)
+        · refine hno3rd ⟨2, h2lt⟩ ?_ ?_ ?_
+          · intro h; exact absurd (congrArg Fin.val h) (by norm_num)
+          · intro h; exact absurd (congrArg Fin.val h) (by norm_num)
+          · intro h; exact hk2 h.symm
+      refine ⟨hp3, ?_⟩
+      -- with `p = 3` the nonzero columns are `1` and `k = 2`
+      have hkval : (k : Fin hyp.p).val = 2 := by
+        have hklt := k.isLt
+        have hk0' : k.val ≠ 0 := fun h => hk0 (Fin.ext h)
+        have hk1' : k.val ≠ 1 := fun h => hk1 (Fin.ext h)
+        omega
+      intro j j' hj hj' hjj'
+      have hjlt := j.isLt; have hj'lt := j'.isLt
+      have hj0' : j.val ≠ 0 := fun h => hj (Fin.ext h)
+      have hj'0 : j'.val ≠ 0 := fun h => hj' (Fin.ext h)
+      have hjj'' : j.val ≠ j'.val := fun h => hjj' (Fin.ext h)
+      rcases show j.val = 1 ∧ j'.val = 2 ∨ j.val = 2 ∧ j'.val = 1 by omega with
+        ⟨hjv, hj'v⟩ | ⟨hjv, hj'v⟩
+      · -- `j` is the pivot, `j' = k`: the flip itself
+        have hjp : j = ⟨1, hyp.p_prime.one_lt⟩ := Fin.ext hjv
+        have hj'k : j' = k := Fin.ext (hj'v.trans hkval.symm)
+        rw [hjp, hj'k]
+        exact hflip
+      · -- `j = k`, `j'` the pivot: transport the flip through the column difference
+        have hjk : j = k := Fin.ext (hjv.trans hkval.symm)
+        have hj'p : j' = ⟨1, hyp.p_prime.one_lt⟩ := Fin.ext hj'v
+        rw [hjk, hj'p]
+        have hdiff := hyp.coherentIndS_muColumn_diff hG hnoV chief c hp1 hk0 hk1.symm
+        have : c.extension (∑ i : Fin hyp.q, hyp.mu i k)
+            = c.extension (∑ i : Fin hyp.q, hyp.mu i ⟨1, hyp.p_prime.one_lt⟩)
+              - ((∑ i : Fin hyp.q, hyp.eta i ⟨1, hyp.p_prime.one_lt⟩)
+                - ∑ i : Fin hyp.q, hyp.eta i k) := by
+          rw [← hdiff]; abel
+        rw [this, hflip]
+        abel
+  · -- all-reducible: the constructed glue supplies the clean pin
+    push Not at hirr
+    obtain ⟨c, hpivot⟩ := hyp.exists_pinned_coherent_sSet_of_all_reducible hG hnoV chief hirr
+    exact ⟨c, Or.inl fun j hj =>
+      hyp.coherentIndS_muColumn_eq_etaColumn_of_pivot hG hnoV chief c hpivot hj⟩
+
 open scoped FiniteInduce in
 /-- **(9.11)-coherence of the honest `S`-instance §9 data** (issue 2035 step 4; re-grounded off the
-unsound `sibleyTarget_H0C`, issue 1017).  The `.some` of the honest unconditional
-`sSet_coherent_indS_A`, yielding `IsCoherent Ind_S^G 𝒮 A(S)` — the Peterfalvi (13.2.d)⇐(9.11)
-coherence for `𝒮(H₀C′) = 𝒮` (in the type-`P₂` `S`-instance, `H₀C′ = ⊥`) with the genuine Dade map
-`τ = Ind_S^G` and the honest Dade support `A(S)`.
+unsound `sibleyTarget_H0C`, issue 1017).  The `.choose` of the **pinned** unconditional
+`sSet_coherent_indS_A_pinned`, yielding `IsCoherent Ind_S^G 𝒮 A(S)` — the Peterfalvi
+(13.2.d)⇐(9.11) coherence for `𝒮(H₀C′) = 𝒮` (in the type-`P₂` `S`-instance, `H₀C′ = ⊥`) with the
+genuine Dade map `τ = Ind_S^G` and the honest Dade support `A(S)` — carrying the (13.3.c)
+`μ`-column formula (`tau1S_ofHonest_muColumn_formula`) **bundled at construction** (the pin is not
+invariant across inhabitants, so it cannot be recovered from a bare `.some`; issue 2035 更新
+#8/#17).
 
 **This no longer routes through `coherent_H0C_commutator`/`sibleyTarget_H0C`** (the unsound (6.8)
 shortcut whose target `IsCoherent Ind_S^G 𝒮 (C′)^# = IsCoherent Ind_S^G 𝒮 ∅` is uninhabited).  The
@@ -717,7 +859,7 @@ noncomputable def Hypothesis.coherent_H0Cprime_S [Finite G]
     OddOrder.Peterfalvi.S07.IsCoherent (hyp.mkSection11CharacterDataS_honest hG chief).tau
       (hyp.mkSection11CharacterDataS_honest hG chief).S
       (hyp.mkSection11CharacterDataS_honest hG chief).H0CprimeSupport :=
-  (hyp.sSet_coherent_indS_A hG hnoV chief).some
+  (hyp.sSet_coherent_indS_A_pinned hG hnoV chief).choose
 
 open scoped FiniteInduce in
 /-- **The coherent extension `τ₁` for the honest `S`-instance** (issue 2035 step 4): the
@@ -732,6 +874,68 @@ noncomputable def Hypothesis.tau1S_ofHonest [Finite G]
     (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
     OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥hyp.S G :=
   (hyp.coherent_H0Cprime_S hG hnoV chief).extension
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **Peterfalvi (13.3.c), the `μ`-column formula for `τ₁ = tau1S_ofHonest`** (issue 2035; Coq
+`FTtypeP_coherence`, `PFsection13.v:347`): the (9.11)-coherent extension sends every reducible
+`μ`-column sum `μ_j = ∑_i μ_{ij}` (`j ≠ 0`) to the aligned `η`-column sum `∑_i η_{ij}` — either
+uniformly, or (the `p = 3` sign-flip exception) with a global negative sign and the two nonzero
+columns swapped.  The `.choose_spec` of the pinned carrier `sSet_coherent_indS_A_pinned`; this is
+the exact shape of the `CharacterDegreeData.mu_tau1_formula` field (`Machinery135`). -/
+theorem Hypothesis.tau1S_ofHonest_muColumn_formula [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
+    (∀ j : Fin hyp.p, j ≠ ⟨0, hyp.p_prime.pos⟩ →
+      hyp.tau1S_ofHonest hG hnoV chief (∑ i : Fin hyp.q, hyp.mu i j)
+        = ∑ i : Fin hyp.q, hyp.eta i j) ∨
+    (hyp.p = 3 ∧ ∀ j j' : Fin hyp.p, j ≠ ⟨0, hyp.p_prime.pos⟩ →
+      j' ≠ ⟨0, hyp.p_prime.pos⟩ → j ≠ j' →
+      hyp.tau1S_ofHonest hG hnoV chief (∑ i : Fin hyp.q, hyp.mu i j)
+        = -∑ i : Fin hyp.q, hyp.eta i j') :=
+  (hyp.sSet_coherent_indS_A_pinned hG hnoV chief).choose_spec
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **Peterfalvi (13.3.a)+(13.3.c), the distinguished `μ`-column for `τ₁ = tau1S_ofHonest`**
+(issue 2035): a column `j ≠ 0` whose sum is induced from a linear character of `H = PC`
+((13.3.a), `mu_j_isIndPC`) and whose `τ₁`-image is `±∑_i η_{i1}` — the (13.3.c) formula routed to
+the `η`-column `1` (`j = 1, δ = 1` in the clean branch; the `p = 3` sign-flip exception takes
+`j = 2, δ = -1`).  This is the honest supply of the `CharacterDegreeData.mu_col_tau1_eta_col_one`
+field. -/
+theorem Hypothesis.tau1S_ofHonest_mu_col_eta_col_one [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
+    ∃ (j : Fin hyp.p) (δ : ℤ) (θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ),
+      (δ = 1 ∨ δ = -1) ∧
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter θ ∧ θ 1 = 1 ∧
+      (∑ i : Fin hyp.q, hyp.mu i j) = ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ ∧
+      hyp.tau1S_ofHonest hG hnoV chief (∑ i : Fin hyp.q, hyp.mu i j)
+        = (δ : ℂ) • ∑ i : Fin hyp.q, hyp.eta i ⟨1, hyp.p_prime.one_lt⟩ := by
+  classical
+  haveI := hyp.finiteG
+  have hp1 : (⟨1, hyp.p_prime.one_lt⟩ : Fin hyp.p) ≠ ⟨0, hyp.p_prime.pos⟩ := by
+    intro h; exact absurd (congrArg Fin.val h) one_ne_zero
+  rcases hyp.tau1S_ofHonest_muColumn_formula hG hnoV chief with hclean | ⟨hp3, hflip⟩
+  · -- clean branch: `j = 1`, `δ = 1`
+    obtain ⟨θ, hθirr, hθ1, hθeq⟩ := hyp.mu_j_isIndPC hG ⟨1, hyp.p_prime.one_lt⟩ hp1
+    exact ⟨⟨1, hyp.p_prime.one_lt⟩, 1, θ, Or.inl rfl, hθirr, hθ1, hθeq,
+      by rw [hclean ⟨1, hyp.p_prime.one_lt⟩ hp1]; push_cast; rw [one_smul]⟩
+  · -- `p = 3` sign-flip branch: `j = 2`, `δ = -1`
+    have h2lt : 2 < hyp.p := by omega
+    have hj2 : (⟨2, h2lt⟩ : Fin hyp.p) ≠ ⟨0, hyp.p_prime.pos⟩ := by
+      intro h; exact absurd (congrArg Fin.val h) (by norm_num)
+    have hne : (⟨2, h2lt⟩ : Fin hyp.p) ≠ ⟨1, hyp.p_prime.one_lt⟩ := by
+      intro h; exact absurd (congrArg Fin.val h) (by norm_num)
+    obtain ⟨θ, hθirr, hθ1, hθeq⟩ := hyp.mu_j_isIndPC hG ⟨2, h2lt⟩ hj2
+    refine ⟨⟨2, h2lt⟩, -1, θ, Or.inr rfl, hθirr, hθ1, hθeq, ?_⟩
+    rw [hflip ⟨2, h2lt⟩ ⟨1, hyp.p_prime.one_lt⟩ hj2 hp1 hne]
+    push_cast
+    rw [neg_one_smul]
 
 open scoped FiniteInduce in
 /-- **Type-alignment probe for the (13.3) `τ₁` route** (issue 2035 step 4 verification): confirms

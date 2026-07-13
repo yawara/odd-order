@@ -141,15 +141,35 @@ structure CharacterDegreeData (hyp : Hypothesis (G := G)) where
       (∑ i : Fin hyp.q, hyp.mu i j) = ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ ∧
       tau1S (∑ i : Fin hyp.q, hyp.mu i j)
         = (δ : ℂ) • ∑ i : Fin hyp.q, hyp.eta i ⟨1, hyp.p_prime.one_lt⟩
-  /-- **Peterfalvi (4.1)+(5.3.b): the `η`-grid is orthogonal to the τ₁-image of the induced
-  family** (issue 2034): the coherence extension lands in the orthogonal complement of the
-  `σ`-image grid.  With the (3.2.d) completeness (`vanish_of_inner_eta_eq_zero`) this forces
-  `λ^{τ₁}` to vanish on the regular set `Ŵ` (`lambda_tau1_apply_mul_eq_zero`). -/
+  /-- **Peterfalvi (4.1)+(5.3.b): the `η`-grid is orthogonal to the τ₁-image of the
+  *irreducibly*-induced family** (issue 2034; honest scope 2026-07-13, issue 2035 更新 #19): the
+  coherence extension of an **irreducible** `H`-induced member lands in the orthogonal complement
+  of the `σ`-image grid (the member's `R`-family is a Dade-difference pair, orthogonal to the
+  grid).  With the (3.2.d) completeness (`vanish_of_inner_eta_eq_zero`) this forces `λ^{τ₁}` to
+  vanish on the regular set `Ŵ` (`lambda_tau1_apply_mul_eq_zero`).
+
+  ⚠ The irreducibility hypothesis on `Ind θ` is **load-bearing**: for a *reducible* induction —
+  a `μ`-column sum, (13.3.a) — the (13.3.c) formula sends `τ₁(μ_j)` *into* the grid
+  (`mu_tau1_formula`, `mu_col_tau1_eta_col_one`), so the unrestricted statement contradicts the
+  other fields and made this structure uninhabitable. -/
   tau1S_induce_inner_eta :
     haveI := hyp.finiteG
     ∀ (i : Fin hyp.q) (j : Fin hyp.p) (θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ),
       OddOrder.RepresentationTheory.IsIrreducibleCharacter θ →
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter
+        (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ) →
       ClassFunction.inner (hyp.eta i j)
+        (tau1S (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ)) = 0
+  /-- **Peterfalvi (4.1)+(5.3.b), the grid column `0`** (issue 2035 更新 #19): against the
+  *trivial-column* grid entries `η_{i0}`, the τ₁-image of **every** `H`-induced member is
+  orthogonal — irreducible members by the field above, reducible members because their images
+  are (signed) *nonzero-column* sums (`mu_tau1_formula`), orthogonal to column `0`.  This is the
+  `θ`-uniform form the (7.7) `η₁₀`-coefficient computations consume. -/
+  tau1S_induce_inner_eta_col_zero :
+    haveI := hyp.finiteG
+    ∀ (i : Fin hyp.q) (θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ),
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter θ →
+      ClassFunction.inner (hyp.eta i ⟨0, hyp.p_prime.pos⟩)
         (tau1S (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ)) = 0
   /-- **Peterfalvi (13.3.a)** (materialized, issue 2034): every nonzero column sum
   `μ_j = ∑_i μ_{ij}` is induced from a linear character of `H = PC` (hence of degree
