@@ -12,7 +12,7 @@ import OddOrder.Peterfalvi.S12_Props109To1011
 T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000),
 §10, pp. 58-63, Theorem (10.10) proof, case (c) of Definition (8.7).
 
-Case-(c) cluster of `typeV_forces_coherence` (issue 1021): the column characters
+Case-(c) cluster of `typeV_forces_coherence_v2` (issue 1021): the column characters
 `μ_j = ∑_{0≤i<w₁} μ_{ij}` of the (10.3) grid — Peterfalvi's reducible members of
 `S` in case (c) — their degree `μ_j(1) = d·w₁` ((10.10.2)), and the (10.10.4)
 column identity `∑_i α_{ij} = μ_j − δ·μ_0 − (d−δ)·ζ`, the source-side algebra of

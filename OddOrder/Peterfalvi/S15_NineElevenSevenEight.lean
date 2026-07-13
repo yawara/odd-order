@@ -38,7 +38,9 @@ extension (`S13.isCoherent_union_pair_of_bridge`) then adjoins `{λ₁, λ̄₁}
 contradicting the pair clause `hnopairD`.  All coherence clauses on the honest `'A`-Dade
 (`dadeHypS`/`A(S)`), converted from `indS` by the caller. -/
 theorem Hypothesis.nineElevenSevenEightRefutationS [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
     (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
     (caseA : CliffordCaseAData chars)
@@ -256,7 +258,7 @@ theorem Hypothesis.nineElevenSevenEightRefutationS [Finite G]
       ∀ lam ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂,
       ClassFunction.inner (c₁.extension φ) (c₃.extension lam) = 0 := by
     intro φ hφ lam hlam
-    exact hyp.sSet_coherent_extension_cross_orthogonal hG hS₂S Set.sdiff_subset c₁ c₃
+    exact hyp.sSet_coherent_extension_cross_orthogonal hG hnoV hS₂S Set.sdiff_subset c₁ c₃
       hφ (hS₂conj hφ) hlam (hS₃conj lam hlam)
       (fun h => hlam.2 (h ▸ hφ)) (fun h => (hS₃conj lam hlam).2 (h ▸ hφ))
   -- ── `β = λ₁ − e·ψ₁`: support, integrality, `τ`-image

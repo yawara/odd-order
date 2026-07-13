@@ -843,7 +843,9 @@ Suppose `a ∈ A(M)` escapes.  Then `a ∈ M_σ^#` ((8.13.b),
   Frobenius-kernel regularity (Isaacs Thm 6.4, `centralizer_kernel_le`) pulls `a` into the
   kernel `N_σ` — contradicting `a ∉ N_σ`. -/
 theorem escaping_honestTypeP2ASet_eq_empty [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hP2 : OddOrder.BG.Ch4.S14.IsTypeP2 M) :
     OddOrder.GroupTheory.escapingCentralizerSet M (honestTypeP2ASet M) = ∅ := by
   classical
@@ -863,7 +865,7 @@ theorem escaping_honestTypeP2ASet_eq_empty [Finite G]
     have hNmax : N ∈ maximalSubgroups G := hNmem.1
     have hNI : OddOrder.GroupTheory.IsTypeI N :=
       (OddOrder.Peterfalvi.S10Interface.isTypeI_iff_isTypeF hG hNmax).mpr hNF
-    obtain ⟨fdata, -⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius hG hNmax hNI
+    obtain ⟨fdata, -⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius hG hnoV hNmax hNI
     -- the Frobenius kernel is `N_F = N_σ` (the D(4) `S15.MF N = Msigma N` conjunct)
     have hker : fdata.typeI.typeF.H = OddOrder.BG.Ch3.S10.Msigma N := by
       rw [fdata.typeI.typeF.H_eq]; exact hMFN
@@ -1058,29 +1060,35 @@ theorem Hypothesis.isTISubset_honestTypeP2ASet_iff_forall_dadeHypS_H_eq_bot [Fin
 escaping exclusion `escaping_honestTypeP2ASet_eq_empty` instantiated at the carrier's `S`
 (`hyp.S_maximal`, `hyp.S_typeP2`) — the single input Rung B was reduced to. -/
 theorem Hypothesis.no_escaping_honestTypeP2ASet [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G)) :
     ∀ a ∈ honestTypeP2ASet hyp.S,
       a ∉ OddOrder.GroupTheory.escapingCentralizerSet hyp.S (honestTypeP2ASet hyp.S) := by
   intro a _ ha
-  rw [escaping_honestTypeP2ASet_eq_empty hG hyp.S_maximal hyp.S_typeP2] at ha
+  rw [escaping_honestTypeP2ASet_eq_empty hG hnoV hyp.S_maximal hyp.S_typeP2] at ha
   exact Set.notMem_empty a ha
 
 /-- **(13.2.e) for the `S`-instance, stabilizer form: every `S`-instance Dade stabilizer is
 trivial.**  Rung B + Rung C: no `A(S)`-point escapes (`no_escaping_honestTypeP2ASet`), so every
 `dadeHypS` stabilizer `H a = R(a)` vanishes (`forall_dadeHypS_H_eq_bot_of_not_escaping`). -/
 theorem Hypothesis.forall_dadeHypS_H_eq_bot [Fintype G] [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G)) :
     ∀ a : {a : G // a ∈ honestTypeP2ASet hyp.S}, (hyp.dadeHypS hG).H a = ⊥ :=
-  hyp.forall_dadeHypS_H_eq_bot_of_not_escaping hG (hyp.no_escaping_honestTypeP2ASet hG)
+  hyp.forall_dadeHypS_H_eq_bot_of_not_escaping hG (hyp.no_escaping_honestTypeP2ASet hG hnoV)
 
 /-- **(13.2.e) `normedTI`, TI half — `A(S)` is a TI-subset with normalizer `S`** (Coq
 `FTtypeP_facts` (e), the `normedTI 'A0(S) G S` conclusion; PFsection13.v:197).  Closes the
 gate G2 of issue 1017 update #22: Rung B's equivalence fed by Rung C. -/
 theorem Hypothesis.isTISubset_honestTypeP2ASet [Fintype G] [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G)) :
     OddOrder.GroupTheory.IsTISubset (honestTypeP2ASet hyp.S) hyp.S :=
   (hyp.isTISubset_honestTypeP2ASet_iff_forall_dadeHypS_H_eq_bot hG).mpr
-    (hyp.forall_dadeHypS_H_eq_bot hG)
+    (hyp.forall_dadeHypS_H_eq_bot hG hnoV)
 
 open scoped FiniteInduce in
 /-- **(13.2.e) `normedTI`, isometry half — `τ = Ind_S^G` on all of `A(S)`** (Coq
@@ -1090,7 +1098,9 @@ with plain induction on every `A(S)`-supported class function.  This is
 trivial-stabilizer input is discharged by Rung C (`forall_dadeHypS_H_eq_bot`) — the honest
 `dade = Ind` identity the (13.3) `tau1S_apply_induce_sub` route consumes. -/
 theorem Hypothesis.sInstance_dade_eq_induce [Fintype G] [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     {f : ClassFunction ↥hyp.S ℂ}
     (hf : f.support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S) :
@@ -1099,7 +1109,7 @@ theorem Hypothesis.sInstance_dade_eq_induce [Fintype G] [Finite G]
       = ClassFunction.induce hyp.S f :=
   hyp.sInstance_dade_eq_induce_of_supported_trivial_H hG (subset_refl _)
     (fun l _ ha => honestTypeP2ASet_conj_mem l.2 ha)
-    (fun a => hyp.forall_dadeHypS_H_eq_bot hG ⟨a.1, a.2⟩) hf
+    (fun a => hyp.forall_dadeHypS_H_eq_bot hG hnoV ⟨a.1, a.2⟩) hf
 
 /-- **The honest `(H₀ ⊔ C')^#`-support for the `S`-instance, `= (C')^#`** (issue 2035 step 2).
 For the `S`-instance the chief kernel is trivial (`toTypesIIIIIIVSetupS_chief_N_eq_bot`, giving

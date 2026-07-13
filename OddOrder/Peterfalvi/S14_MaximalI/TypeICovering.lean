@@ -109,6 +109,7 @@ kernel element is contained in the kernel (Isaacs Thm 6.4 (1) ⇒ (4),
 `IsFrobeniusGroup.centralizer_kernel_le`); so `x ∈ N` centralizing some `1 ≠ r ∈ N_σ` lies in
 `N_σ`. -/
 private theorem typeI_hatMsigma_subset_Msigma (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {N : Subgroup G} (hNmax : N ∈ maximalSubgroups G) (hNI : IsTypeI N) :
     OddOrder.BG.Ch4.S16.hatMsigma N ⊆ (OddOrder.BG.Ch3.S10.Msigma N : Set G) := by
   rintro x ⟨hxN, hRne⟩
@@ -122,7 +123,7 @@ private theorem typeI_hatMsigma_subset_Msigma (hG : OddOrder.BG.IsMinimalSimpleO
   have hrC : r ∈ Subgroup.centralizer ({x} : Set G) := (Subgroup.mem_inf.mp hr).2
   have hrN : r ∈ N := OddOrder.BG.Ch3.S10.Msigma_le N hrσ
   -- `N` is Frobenius with kernel `typeF.H = N_F = N_σ` ((12.7)).
-  obtain ⟨fd, -⟩ := typeI_frobenius hG hNmax hNI
+  obtain ⟨fd, -⟩ := typeI_frobenius hG hnoV hNmax hNI
   have hHσ : fd.typeI.typeF.H = OddOrder.BG.Ch3.S10.Msigma N := by
     rw [fd.typeI.typeF.H_eq]
     exact OddOrder.BG.Ch4.S16.maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2 hG hNmax
@@ -147,6 +148,7 @@ so `Â_σ(N) ⊆ N_σ` (`typeI_hatMsigma_subset_Msigma`) — contradiction.  Thi
 hypothesis under which the faithful BG Theorem E cover collapses onto the Frobenius kernels
 (`Mtilde_eq_sigmaSharp_of_forall_centralizer_le`, issue 9080). -/
 private theorem allTypeI_centralizer_le (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hall : ∀ N : Subgroup G, N ∈ maximalSubgroups G → IsTypeI N)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
     ∀ x ∈ OddOrder.BG.Ch4.S14.sigmaSharp M, Subgroup.centralizer ({x} : Set G) ≤ M := by
@@ -154,7 +156,7 @@ private theorem allTypeI_centralizer_le (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   by_contra hesc
   obtain ⟨R, -, N, ⟨hNmem, -, -, hxA, -, -, -⟩, -⟩ :=
     OddOrder.BG.Ch4.S16.exists_RData_escape_structure hG hM hx hesc
-  exact hxA.2 (typeI_hatMsigma_subset_Msigma hG hNmem.1 (hall N hNmem.1) hxA.1.1)
+  exact hxA.2 (typeI_hatMsigma_subset_Msigma hG hnoV hNmem.1 (hall N hNmem.1) hxA.1.1)
 
 /-- **§8/§10 covering inputs to Peterfalvi (12.17)** — the all-type-I case of Theorem (8.8).
 
@@ -204,6 +206,7 @@ escaping-centralizer control (8.13.c1)+(2.3) making each kernel sharp-set a TI-s
 selection of the type-I cover branch under `hall`, the (8.8.a) dichotomy (BG §16, parallel to
 `theorem88_dichotomy`). -/
 theorem exists_typeICovering (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hall : ∀ M : Subgroup G, M ∈ maximalSubgroups G → IsTypeI M) :
     Nonempty (TypeICovering hG hall) := by
   classical
@@ -351,7 +354,7 @@ theorem exists_typeICovering (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         htypeF] at hxsharp
       obtain ⟨M, hMmax, hxM⟩ := Set.mem_iUnion₂.mp hxsharp
       rw [OddOrder.Peterfalvi.S10.Mtilde_eq_sigmaSharp_of_forall_centralizer_le hG _ hMmax
-        (allTypeI_centralizer_le hG hall hMmax)] at hxM
+        (allTypeI_centralizer_le hG hnoV hall hMmax)] at hxM
       -- `x = c * t * c⁻¹` with `t ∈ M_σ#`; move `M` to its representative `conj g • M = reps i`.
       obtain ⟨t, ht, c, hc⟩ := hxM
       obtain ⟨i, g, hgconj⟩ := data.representatives M hMmax
@@ -391,17 +394,18 @@ pairwise-coprime TI-subsets covering `G#`.  Each `reps i` is a Frobenius group w
 (`maximalSubgroup_eq_normalizer_maxNilpotentNormalHall`), so these data assemble into a Frobenius
 family in the sense of (7.10) (`S09.FrobeniusFamily`).  The covering makes `G₀ = {1}`, contradicting
 (7.11) (`S09.not_trivial_G0`). -/
-theorem not_all_maximal_typeI (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
+theorem not_all_maximal_typeI (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M) :
     ¬ (∀ M : Subgroup G, M ∈ maximalSubgroups G → IsTypeI M) := by
   intro hall
-  obtain ⟨cov⟩ := exists_typeICovering hG hall
+  obtain ⟨cov⟩ := exists_typeICovering hG hnoV hall
   let F : OddOrder.Peterfalvi.S09.FrobeniusFamily G cov.k :=
     { L := cov.reps
       H := fun i => maxNilpotentNormalHall (cov.reps i)
       two_le := cov.two_le
       kernel_le := fun i => OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le (cov.reps i)
       isFrobenius := fun i => by
-        obtain ⟨fd, -⟩ := typeI_frobenius hG (cov.reps_maximal i) (hall _ (cov.reps_maximal i))
+        obtain ⟨fd, -⟩ := typeI_frobenius hG hnoV (cov.reps_maximal i) (hall _ (cov.reps_maximal i))
         refine ⟨fd.complement, ?_⟩
         rw [← fd.typeI.typeF.H_eq]
         exact fd.frobenius
@@ -506,8 +510,9 @@ theorem theorem88_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
 /-- **Peterfalvi (12.17)**: the all-type-I case of Theorem (8.8) is impossible, so the case-(b)
 data of (8.8) exists.  Immediate from the (8.8) dichotomy (`theorem88_dichotomy`) and the
 non-existence half `not_all_maximal_typeI`. -/
-theorem theorem88_caseB_holds [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
+theorem theorem88_caseB_holds [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M) :
     Nonempty (OddOrder.Peterfalvi.S12.Theorem88CaseBData G) :=
-  (theorem88_dichotomy hG).resolve_left (not_all_maximal_typeI hG)
+  (theorem88_dichotomy hG).resolve_left (not_all_maximal_typeI hG hnoV)
 
 end OddOrder.Peterfalvi.S14

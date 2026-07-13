@@ -609,6 +609,8 @@ is odd, `x` is odd, so `x ≥ 2p+1` and `k = vx > 2pv`.  The third inequality of
 `(v − 1) / p > (u − 1) / q`, is `key_ratio_inequality_of_caseB_data` (14.8), discharged in
 `main_size_bounds`. -/
 theorem main_size_bounds_structural [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp)
     (hne : Mdata.K ≠ hyp.base.V)
     (he_le : Mdata.e ≤ hyp.base.p * hyp.base.q) :
@@ -620,11 +622,11 @@ theorem main_size_bounds_structural [Finite G] (_hG : OddOrder.BG.IsMinimalSimpl
   -- the §13/§15 structural datum (13.17); `k > 2 p v` is then arithmetic (`x` odd, so `x ≥ 2p+1`).
   have hstruct : ∃ x : ℕ, Mdata.k = hyp.base.v * x ∧ x ≡ 1 [MOD hyp.base.p] ∧ x ≠ 1 := by
     have hMI : IsTypeI Mdata.M := ⟨Mdata.typeIHyp.typeI⟩
-    have hTII : IsTypeII hyp.base.T := T_typeII _hG hyp
+    have hTII : IsTypeII hyp.base.T := T_typeII _hG hnoV hncH0C hyp
     -- **(13.17)/(14.11.1)**: `V ≤ K = M_F` (type-I-over-`N_G(V)` Fitting inclusion).
     have hVK : hyp.base.V ≤ Mdata.K := by
       rw [Mdata.K_eq_MF]
-      exact OddOrder.Peterfalvi.S15.typeI_overNormalizer_V_le_fitting _hG hyp.base hTII
+      exact OddOrder.Peterfalvi.S15.typeI_overNormalizer_V_le_fitting _hG hnoV hyp.base hTII
         Mdata.M_maximal hMI Mdata.normalizer_V_le_M
     -- `|V| = v` (`d = 1` from `D = V ⊓ C_G(Q) = ⊥`, (13.12) dual).
     have hVcard : Nat.card ↥hyp.base.V = hyp.base.v := by
@@ -640,7 +642,7 @@ theorem main_size_bounds_structural [Finite G] (_hG : OddOrder.BG.IsMinimalSimpl
     obtain ⟨x, hkx⟩ := hvdvdk
     -- **(13.17)**: type-I Frobenius data with `W₂ ≤ complement`, so `W₂` acts fpf on `K = M_F`.
     obtain ⟨frob, _hker, hW2E⟩ := OddOrder.Peterfalvi.S15.exists_typeIFrobeniusData_W2_le
-      _hG hyp.base Mdata.M_maximal hMI Mdata.normalizer_V_le_M
+      _hG hnoV hyp.base Mdata.M_maximal hMI Mdata.normalizer_V_le_M
     have hKeq : Mdata.K = frob.typeI.typeF.H := by rw [Mdata.K_eq_MF, frob.typeI.typeF.H_eq]
     have hW2card : Nat.card ↥hyp.base.W2 = hyp.base.p := hyp.base.p_eq_card_W2.symm
     have hW2M : hyp.base.W2 ≤ Mdata.M := by
@@ -758,6 +760,8 @@ ratio comparison `key_ratio_inequality_of_caseB_data` (14.8), fed by the (14.4)/
 cyclotomic data.  The two structural bounds remain the named §13/§14 obligation
 `main_size_bounds_structural`. -/
 theorem main_size_bounds [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp)
     (hne : Mdata.K ≠ hyp.base.V) :
     Mdata.k > 2 * hyp.base.p * hyp.base.v ∧
@@ -765,11 +769,11 @@ theorem main_size_bounds [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
         ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ)) ∧
       (((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
         ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)) := by
-  obtain ⟨Ldata⟩ := exists_LHypothesis _hG hyp
+  obtain ⟨Ldata⟩ := exists_LHypothesis _hG hnoV hncH0C hyp
   obtain ⟨Tdata, _⟩ := caseB_for_T _hG hyp
   obtain ⟨Sdata, _⟩ := caseB_for_S _hG hyp Ldata
   obtain ⟨hk, hke⟩ :=
-    main_size_bounds_structural _hG hyp Mdata hne (Mdata.complementIndex_le_pq _hG)
+    main_size_bounds_structural _hG hnoV hncH0C hyp Mdata hne (Mdata.complementIndex_le_pq _hG)
   exact ⟨hk, hke, key_ratio_inequality_of_caseB_data Tdata Sdata⟩
 
 /-- **Arithmetic core of Peterfalvi (14.11.2)**: an integer grid of *odd* Dade-isometry
@@ -846,6 +850,8 @@ at `Mdata.coherent78` (supplying its `IsTypeP2 T` input from the (14.9) type det
 projects the chosen member's membership; no false uniqueness of the two class functions is required. -/
 theorem exists_betaMGridData [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) :
     ∃ grid : OddOrder.Peterfalvi.S15.TypeIOrthogonalityGridData hyp.base Mdata.coherent78,
       grid.phi ∈ Mdata.typeIHyp.Sset := by
@@ -856,10 +862,10 @@ theorem exists_betaMGridData [Finite G]
   -- `BetaVanishing` feeds `typeI_orthogonality_dichotomy`.
   have hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.base.T :=
     ((OddOrder.BG.Ch4.S16.proposition_type_classification _hG hyp.base.T_maximal).2.1).mp
-      (T_typeII _hG hyp)
-  exact ⟨OddOrder.Peterfalvi.S15.typeIOrthogonalityGridData_of_coherent78 _hG hyp.base hT2
+      (T_typeII _hG hnoV hncH0C hyp)
+  exact ⟨OddOrder.Peterfalvi.S15.typeIOrthogonalityGridData_of_coherent78 _hG hnoV hyp.base hT2
       Mdata.coherent78,
-    (Classical.choose_spec (OddOrder.Peterfalvi.S15.exists_Sset_apply_one_eq_index _hG
+    (Classical.choose_spec (OddOrder.Peterfalvi.S15.exists_Sset_apply_one_eq_index _hG hnoV
       Mdata.coherent78.typeIHyp)).1⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -869,9 +875,11 @@ of its `β_L^τ` with those of the actual `Mdata.betaM`; it does not overclaim e
 class functions. -/
 theorem betaMGridParityAlternatives [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) :
     BetaMGridParityAlternatives hyp Mdata := by
-  obtain ⟨grid, hphi⟩ := exists_betaMGridData _hG hyp Mdata
+  obtain ⟨grid, hphi⟩ := exists_betaMGridData _hG hnoV hncH0C hyp Mdata
   have hbeta : Mdata.betaM =
       OrthogonalitySwitchData.coherentBeta _hG Mdata.coherent78 := rfl
   have hcoeff : ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
@@ -881,7 +889,7 @@ theorem betaMGridParityAlternatives [Finite G]
     intro _ _ i j
     rw [hbeta]
     exact OrthogonalitySwitchData.typeIGrid_betaL_inner_eta_eq_h78_beta
-      _hG Mdata.M_maximal Mdata.coherent78 grid hphi i j
+      _hG hnoV hncH0C Mdata.M_maximal Mdata.coherent78 grid hphi i j
   have heM : Mdata.e = ((maxNilpotentNormalHall Mdata.M).subgroupOf Mdata.M).index := by
     rw [Mdata.e_eq_index, Mdata.K_eq_MF]
   have he : grid.e = Mdata.e := grid.e_eq_index.symm.trans heM.symm
@@ -1005,6 +1013,8 @@ coefficient projection and norm-tightness argument derives `e = p q`, vanishing 
 residual, the signed `η`-grid expansion, and the classification of `χ`.  The bridge lemma
 `betaMExpansionData_of_hypothesis78` supplies its concrete (7.8.a) branch. -/
 noncomputable def betaM_expansion_data [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp)
     (_hne : Mdata.K ≠ hyp.base.V)
     (_he_le : Mdata.e ≤ hyp.base.p * hyp.base.q)
@@ -1036,7 +1046,7 @@ noncomputable def betaM_expansion_data [Finite G] (_hG : OddOrder.BG.IsMinimalSi
   -- Every coherent family image, hence also the weighted sum, is orthogonal to the grid.
   have hDadeAvoid :=
     OrthogonalitySwitchData.mSide_dadeSupport_avoids_regular
-      (hyp := hyp) Mdata.hG Mdata.M_maximal Mdata.coherent78
+      (hyp := hyp) Mdata.hG hnoV hncH0C Mdata.M_maximal Mdata.coherent78
   have hetaNu : ∀ (k : Fin (Mdata.coherent78.n + 1)), k ≠ H78.ind1H →
       ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
         ClassFunction.inner (H78.nu (H78.hyp76.zeta k)) (hyp.base.eta i j) = 0 := by
@@ -1265,6 +1275,8 @@ faithful (13.17.c)-dual bound, and the explicit (13.19.c) alternatives.  This pu
 retains only the pointwise norm consequence needed downstream.  No conclusion of (14.11.2) is
 read from `MHypothesis`. -/
 theorem betaM_expansion [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp)
     (hne : Mdata.K ≠ hyp.base.V) :
     Mdata.e = hyp.base.p * hyp.base.q ∧
@@ -1276,12 +1288,12 @@ theorem betaM_expansion [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
             (∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p,
               (ε i j : ℂ) • hyp.base.eta i j) - χ := by
   have he_le := Mdata.complementIndex_le_pq _hG
-  have hsize := main_size_bounds _hG hyp Mdata hne
+  have hsize := main_size_bounds _hG hnoV hncH0C hyp Mdata hne
   have haxis :=
     betaM_axis_odd_of_main_size_bounds hsize
-      (betaMGridParityAlternatives _hG hyp Mdata)
+      (betaMGridParityAlternatives _hG hnoV hncH0C hyp Mdata)
   obtain ⟨hepq, delta, chi, hchi_norm, _hchi_classification, hbeta, signs, hsigns, hgrid⟩ :=
-    betaM_expansion_data _hG hyp Mdata hne he_le hsize haxis.1 haxis.2
+    betaM_expansion_data _hG hnoV hncH0C hyp Mdata hne he_le hsize haxis.1 haxis.2
   refine ⟨hepq, ?_⟩
   refine ⟨signs, hsigns, chi, hchi_norm, ?_⟩
   rw [hbeta, ← hgrid]

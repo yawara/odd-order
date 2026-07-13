@@ -201,13 +201,15 @@ since `V^S` does not escape), and the honest `A(S)` has no escaping point on a t
 `'A0(S)` support is `normedTI`: this is the trivial-stabilizer input `∀ a, dadeHypS0.H a = ⊥` the
 `τ_S = Ind_S^G` Dade=Ind bridge needs (feeding (13.18.c) `⟨Γ, 1_G⟩ = 0` etc., issue 9076). -/
 theorem escaping_honestTypeP2A0Set_eq_empty [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hP2 : OddOrder.BG.Ch4.S14.IsTypeP2 M) (data : TypePData M) :
     OddOrder.GroupTheory.escapingCentralizerSet M (honestTypeP2A0Set M data) = ∅ := by
   rw [Set.eq_empty_iff_forall_notMem]
   intro a ha
   have hAesc := escaping_honestTypeP2A0Set_mem_honestTypeP2ASet data ha
-  rw [escaping_honestTypeP2ASet_eq_empty hG hM hP2] at hAesc
+  rw [escaping_honestTypeP2ASet_eq_empty hG hnoV hM hP2] at hAesc
   exact Set.notMem_empty a hAesc
 
 /-! ### The `A₀(S) ⊆ A0Set M K₀` bridge (issue 9076 piece 4c)
@@ -624,11 +626,13 @@ no `A₀(S)`-point escapes (`escaping_honestTypeP2A0Set_eq_empty`), the faithful
 (`ftSupportKernel_eq_bot_of_not_escaping`).  This is the trivial-stabilizer input the `τ_S = Ind_S^G`
 Dade=Ind bridge consumes (for (13.18.c) `⟨Γ,1_G⟩ = 0` and pin C `tauS_mu_row0_vanish_on_V`). -/
 theorem Hypothesis.forall_dadeHypS0_H_eq_bot [Fintype G] [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G)) :
     ∀ a : {a : G // a ∈ honestTypeP2A0Set hyp.S hyp.Sdata}, (hyp.dadeHypS0 hG).H a = ⊥ := by
   intro a
   rw [hyp.dadeHypS0_H_eq_ftSupportKernel hG a]
-  have hempty := escaping_honestTypeP2A0Set_eq_empty hG hyp.S_maximal hyp.S_typeP2 hyp.Sdata
+  have hempty := escaping_honestTypeP2A0Set_eq_empty hG hnoV hyp.S_maximal hyp.S_typeP2 hyp.Sdata
   exact OddOrder.Peterfalvi.S10.ftSupportKernel_eq_bot_of_not_escaping
     (fun hesc => Set.notMem_empty a.1 (hempty ▸ hesc))
 
@@ -643,7 +647,9 @@ support `A₁ = A₀(S)`).  This is the `'A0` analogue of `sInstance_dade_eq_ind
 `τ_S = Ind` half of (13.18.c) `⟨Γ,1_G⟩ = 0` (`gammaGrid_orthogonal_one`) and of pin C
 `tauS_mu_row0_vanish_on_V` (both additionally need prime-`TI` `μ`-value content, issue 9014). -/
 theorem Hypothesis.sInstance_dade0_eq_induce [Fintype G] [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     {f : ClassFunction ↥hyp.S ℂ}
     (hf : f.support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set hyp.S hyp.Sdata) hyp.S) :
@@ -657,7 +663,7 @@ theorem Hypothesis.sInstance_dade0_eq_induce [Fintype G] [Finite G]
     (fun l _ ha => (honestTypeP2A0Set_conj_mem hyp.Sdata l.2).mpr ha)
     (fun a => by
       rw [OddOrder.Peterfalvi.S04.Hypothesis.restrict_H]
-      exact hyp.forall_dadeHypS0_H_eq_bot hG ⟨a.1, a.2⟩)
+      exact hyp.forall_dadeHypS0_H_eq_bot hG hnoV ⟨a.1, a.2⟩)
     ⟨f, (ClassFunction.mem_supportedSubmodule).mpr hf⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -923,7 +929,9 @@ of the honest `A₀` at the trivial conjugator) the Dade lift evaluates by the �
 which is exactly the `η`-difference value by `eta_eq_tau_omega` + `tau3_apply_of_regular`
 (the (3.2.c) regular-set identity). -/
 theorem Hypothesis.tauS_mu_row0_vanish_on_V [Fintype G] [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) (j : Fin hyp.p)
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G)) (j : Fin hyp.p)
     (hj0 : (j : ℕ) ≠ 0) :
     ∀ x ∈ conjClassSet ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))),
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
@@ -956,7 +964,7 @@ theorem Hypothesis.tauS_mu_row0_vanish_on_V [Fintype G] [Finite G]
       ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) hsupp,
     (hyp.dadeHypS0 hG).dadeMap_apply]
   have h1H : (1 : G) ∈ (hyp.dadeHypS0 hG).H ⟨w, hwA0⟩ := by
-    rw [hyp.forall_dadeHypS0_H_eq_bot hG ⟨w, hwA0⟩]
+    rw [hyp.forall_dadeHypS0_H_eq_bot hG hnoV ⟨w, hwA0⟩]
     exact Subgroup.mem_bot.mpr rfl
   have hconj1 : IsConj ((⟨w, hwA0⟩ :
       {a : G // a ∈ honestTypeP2A0Set hyp.S hyp.Sdata}).1 * 1) x := by
@@ -1005,7 +1013,9 @@ by `mu_apply_of_not_mem_W2` + `delta_eq_one_S`; `η_{i,l}|_V = ω` by `eta_eq_ta
 `tau3_apply_of_regular`).  The nontriviality `j₁, j₂ ≠ 0` is only needed for the *support* input
 `tauS_mu_diff_support`. -/
 theorem Hypothesis.tauS_mu_vanish_on_V [Fintype G] [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) (i : Fin hyp.q)
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G)) (i : Fin hyp.q)
     {j1 j2 : Fin hyp.p}
     (hj1 : j1 ≠ ⟨0, hyp.p_prime.pos⟩) (hj2 : j2 ≠ ⟨0, hyp.p_prime.pos⟩) :
     ∀ x ∈ conjClassSet ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))),
@@ -1035,7 +1045,7 @@ theorem Hypothesis.tauS_mu_vanish_on_V [Fintype G] [Finite G]
       ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) hsupp,
     (hyp.dadeHypS0 hG).dadeMap_apply]
   have h1H : (1 : G) ∈ (hyp.dadeHypS0 hG).H ⟨w, hwA0⟩ := by
-    rw [hyp.forall_dadeHypS0_H_eq_bot hG ⟨w, hwA0⟩]
+    rw [hyp.forall_dadeHypS0_H_eq_bot hG hnoV ⟨w, hwA0⟩]
     exact Subgroup.mem_bot.mpr rfl
   have hconj1 : IsConj ((⟨w, hwA0⟩ :
       {a : G // a ∈ honestTypeP2A0Set hyp.S hyp.Sdata}).1 * 1) x := by

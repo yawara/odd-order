@@ -187,7 +187,9 @@ has uniform degree `q·u` (`hS3deg`), so the (5.7) norm-general coherence produc
 extension of `𝒮₃` whose unit images the non-orthogonal branch counts against `‖α^τ‖²` (Bessel)
 and whose orthogonal branch the (9.11.7)–(9.11.8) residual refutes. -/
 theorem Hypothesis.sSet_sThree_coherent_dade [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
     (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
     {S₂ : Set (ClassFunction ↥hyp.S ℂ)}
@@ -235,7 +237,7 @@ theorem Hypothesis.sSet_sThree_coherent_dade [Finite G]
   exact OddOrder.Peterfalvi.S07.uniform_degree_coherence_of_families
     ((sSet_finite _).subset Set.sdiff_subset)
     hχ₀
-    (fun η hη => hyp.sSet_memberRFamily hG hη.1)
+    (fun η hη => hyp.sSet_memberRFamily hG hnoV hη.1)
     (fun a ha b hb hab => by
       have h := sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupS hG) ha.1 hb.1 hab
       convert h using 2 <;> exact Subsingleton.elim _ _)
@@ -251,7 +253,7 @@ theorem Hypothesis.sSet_sThree_coherent_dade [Finite G]
         (hsuppdiff a ha b hb)
         (Submodule.sub_mem _ (sSet_subset_ZIrr _ ha.1) (sSet_subset_ZIrr _ hb.1)))
     hsuppdiff
-    (fun {φ ξ} hφ hξ h1 h2 => hyp.sSet_memberRFamily_orthogonal hG hφ.1 hξ.1 h1 h2)
+    (fun {φ ξ} hφ hξ h1 h2 => hyp.sSet_memberRFamily_orthogonal hG hnoV hφ.1 hξ.1 h1 h2)
     (fun a ha => (hS3deg a ha).trans (hS3deg χ₀ hχ₀).symm)
     (by
       rw [hS3deg χ₀ hχ₀]

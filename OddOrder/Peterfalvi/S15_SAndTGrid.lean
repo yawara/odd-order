@@ -201,12 +201,14 @@ nontrivial degree-one character `θ`
 membership already witnesses irreducibility demands downstream via the Frobenius inertia
 argument packaged in `𝓛 ⊆ Irr L`.) -/
 theorem exists_Sset_apply_one_eq_index [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    {L : Subgroup G}
     (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L) :
     ∃ φ : ClassFunction ↥L ℂ, φ ∈ typeISetup.Sset ∧
       φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ) := by
   classical
-  obtain ⟨frob₀, -⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius hG typeISetup.maximal
+  obtain ⟨frob₀, -⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius hG hnoV typeISetup.maximal
     ⟨typeISetup.typeI⟩
   -- both Frobenius kernels are `L_F`
   have hHeq : frob₀.typeI.typeF.H = typeISetup.typeI.typeF.H :=
@@ -394,7 +396,9 @@ image `τ_S(β_j)` (supported in `P^# ∪ (W∖(W₁∪W₂))^S`-classes, (13.18
 ((8.17.a)).  The column-`#1` instance is `typeIBetaL_betaS_disjoint_support`; the general
 column feeds the (13.19.c) zero-axis constancy through `gammaGrid_defGamma`. -/
 theorem dadeSupport_betaGrid_disjoint_support [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L)
     (χ : ClassFunction G ℂ)
     (hχ : χ.support ⊆ typeISetup.dadeData.dade.dadeSupport)
@@ -410,7 +414,7 @@ theorem dadeSupport_betaGrid_disjoint_support [Finite G]
   have hxD := hχ hxL
   obtain ⟨a, haA, r, hr, hra, hrx⟩ :=
     typeISetup.dadeData.dade.exists_mem_A_prime_dvd_orderOf_of_mem_dadeSupport hxD
-  obtain ⟨frob₀, -⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius _hG typeISetup.maximal
+  obtain ⟨frob₀, -⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius _hG hnoV typeISetup.maximal
     ⟨typeISetup.typeI⟩
   have hHeq : frob₀.typeI.typeF.H = typeISetup.typeI.typeF.H :=
     frob₀.typeI.typeF.H_eq.trans typeISetup.typeI.typeF.H_eq.symm
@@ -428,7 +432,7 @@ theorem dadeSupport_betaGrid_disjoint_support [Finite G]
         ((hyp.dadeHypS0 _hG).fullDadeIsometryData (hyp.dadeHypS0_hconj _hG))
         (betaGrid hyp j)
       = ClassFunction.induce hyp.S (betaGrid hyp j) :=
-    hyp.sInstance_dade0_eq_induce _hG (betaGrid_A0_support _hG hyp j hj)
+    hyp.sInstance_dade0_eq_induce _hG hnoV (betaGrid_A0_support _hG hyp j hj)
   rw [hbridge] at hxS
   have hxc :=
     OddOrder.RepresentationTheory.ClassFunction.support_induce_subset_conjugatesIntoSet
@@ -509,7 +513,9 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 `Ã(L)`-supported `β_L^τ = typeIBetaL φ` (`typeIBetaL_support_subset_dadeSupport`), a thin instance
 of the general `dadeSupport_betaGrid_disjoint_support`. -/
 theorem typeIBetaL_dadeS_betaGrid_disjoint_support [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L)
     (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ typeISetup.Sset)
     (_hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ))
@@ -518,7 +524,7 @@ theorem typeIBetaL_dadeS_betaGrid_disjoint_support [Finite G]
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 _hG)
         ((hyp.dadeHypS0 _hG).fullDadeIsometryData (hyp.dadeHypS0_hconj _hG))
         (betaGrid hyp j)).support :=
-  dadeSupport_betaGrid_disjoint_support _hG hyp typeISetup (typeIBetaL typeISetup φ)
+  dadeSupport_betaGrid_disjoint_support _hG hnoV hyp typeISetup (typeIBetaL typeISetup φ)
     (typeIBetaL_support_subset_dadeSupport typeISetup φ _hφ _hdeg) j hj
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -527,13 +533,15 @@ is divisible by a prime divisor of `|H|`, and `|H|` is coprime to `p q` ((8.17.a
 supported in `Ã(L)`-classes while `β_S^τ` is supported in `P^# ∪ (W∖(W₁∪W₂))^G` ((13.18.a)).
 The column-`#1` instance of `typeIBetaL_dadeS_betaGrid_disjoint_support`. -/
 theorem typeIBetaL_betaS_disjoint_support [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L)
     (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ typeISetup.Sset)
     (_hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ)) :
     Disjoint (typeIBetaL typeISetup φ).support (tauSbetaGrid _hG hyp).support := by
   rw [tauSbetaGrid]
-  exact typeIBetaL_dadeS_betaGrid_disjoint_support _hG hyp typeISetup φ _hφ _hdeg
+  exact typeIBetaL_dadeS_betaGrid_disjoint_support _hG hnoV hyp typeISetup φ _hφ _hdeg
     ⟨1, by have := hyp.three_le_p; omega⟩ (by norm_num)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -544,7 +552,9 @@ a type-I maximal `L`, the Dade support `Ã(L)` avoids the regular-set saturation
 `Ŵ^G`-element has order dividing `|W| = p q`, coprime to `|L_F|` ((8.17.a)
 `card_LF_coprime_pq`).  The conjugation-free core of `typeIBetaL_betaS_disjoint_support`. -/
 theorem typeI_dadeSupport_avoids_regular [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L) :
     ∀ x ∈ OddOrder.GroupTheory.conjClassSet
         ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))),
@@ -553,7 +563,7 @@ theorem typeI_dadeSupport_avoids_regular [Finite G]
   -- L-side: a prime `r ∣ |L_F|` divides `orderOf x`
   obtain ⟨a, haA, r, hr, hra, hrx⟩ :=
     typeISetup.dadeData.dade.exists_mem_A_prime_dvd_orderOf_of_mem_dadeSupport hxD
-  obtain ⟨frob₀, -⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius _hG typeISetup.maximal
+  obtain ⟨frob₀, -⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius _hG hnoV typeISetup.maximal
     ⟨typeISetup.typeI⟩
   have hHeq : frob₀.typeI.typeF.H = typeISetup.typeI.typeF.H :=
     frob₀.typeI.typeF.H_eq.trans typeISetup.typeI.typeF.H_eq.symm
@@ -660,7 +670,9 @@ member (`exists_conjIndex_at`); `ζ_k^{τ₁} − ζ_{k'}^{τ₁}` is supported 
 orthogonality (`nu_zeta_inner_nu_conj_eq_zero`), and `ℤ[Irr G]`-membership feed the (3.8)
 rigidity engine `eta_orthogonal_of_norm_one_pair_vanish`. -/
 theorem coherent_extension_orthogonal_eta_of_mem_Sset [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     {L : Subgroup G} (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L)
     (φ : ClassFunction ↥L ℂ) (hφ : φ ∈ dataL.typeIHyp.Sset) :
     ∀ (i : Fin hyp.q) (j : Fin hyp.p),
@@ -687,7 +699,7 @@ theorem coherent_extension_orthogonal_eta_of_mem_Sset [Finite G]
     have hconj1 := dataL.nu_zeta_norm_one _hG hk'_ne
     have hcross := dataL.nu_zeta_inner_nu_conj_eq_zero _hG _hG.odd hk_ne hk'_ne hk'
     have hsupp := dataL.nu_zeta_sub_conj_support_at _hG hk_ne hk'_ne hk'
-    have havoid := typeI_dadeSupport_avoids_regular _hG hyp dataL.typeIHyp
+    have havoid := typeI_dadeSupport_avoids_regular _hG hnoV hyp dataL.typeIHyp
     have hvanish : ∀ x ∈ OddOrder.GroupTheory.conjClassSet
         ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))),
         ((dataL.h78 _hG).nu ((dataL.h78 _hG).hyp76.zeta k)
@@ -714,7 +726,9 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 `(β_L^τ, τ_S(β_j))` vanishes by the (13.19.a) support disjointness
 (`typeIBetaL_dadeS_betaGrid_disjoint_support`). -/
 theorem typeIBetaL_inner_eta_row_sub_eq_zero [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L)
     (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ typeISetup.Sset)
     (_hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ))
@@ -722,8 +736,8 @@ theorem typeIBetaL_inner_eta_row_sub_eq_zero [Finite G]
     ClassFunction.inner (typeIBetaL typeISetup φ)
         (hyp.eta ⟨0, hyp.q_prime.pos⟩ j - hyp.eta ⟨0, hyp.q_prime.pos⟩ j') = 0 := by
   classical
-  have h1 := gammaGrid_defGamma _hG hyp j hj
-  have h2 := gammaGrid_defGamma _hG hyp j' hj'
+  have h1 := gammaGrid_defGamma _hG hnoV hyp j hj
+  have h2 := gammaGrid_defGamma _hG hnoV hyp j' hj'
   -- `η_{0j} − η_{0j'} = τ_S(β_{j'}) − τ_S(β_j)` from the two `Γ`-identities.
   have hkey : hyp.eta ⟨0, hyp.q_prime.pos⟩ j - hyp.eta ⟨0, hyp.q_prime.pos⟩ j'
       = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 _hG)
@@ -738,9 +752,9 @@ theorem typeIBetaL_inner_eta_row_sub_eq_zero [Finite G]
     abel
   rw [hkey, ClassFunction.inner_sub_right,
     ClassFunction.inner_eq_zero_of_disjoint_support
-      (typeIBetaL_dadeS_betaGrid_disjoint_support _hG hyp typeISetup φ _hφ _hdeg j' hj'),
+      (typeIBetaL_dadeS_betaGrid_disjoint_support _hG hnoV hyp typeISetup φ _hφ _hdeg j' hj'),
     ClassFunction.inner_eq_zero_of_disjoint_support
-      (typeIBetaL_dadeS_betaGrid_disjoint_support _hG hyp typeISetup φ _hφ _hdeg j hj),
+      (typeIBetaL_dadeS_betaGrid_disjoint_support _hG hnoV hyp typeISetup φ _hφ _hdeg j hj),
     sub_zero]
 
 /-- **(13.19.c), first clause (row form)**: `(β_L^τ, η_{0j})` is independent of `j ≥ 1` — by
@@ -748,7 +762,9 @@ theorem typeIBetaL_inner_eta_row_sub_eq_zero [Finite G]
 and (13.19.a) support disjointness kills both `(β_L^τ, τ_S(β_·))` terms
 (`typeIBetaL_inner_eta_row_sub_eq_zero`). -/
 theorem typeIBetaL_eta_row_constant [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L)
     (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ typeISetup.Sset)
     (_hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ)) :
@@ -759,7 +775,7 @@ theorem typeIBetaL_eta_row_constant [Finite G]
               (hyp.eta ⟨0, hyp.q_prime.pos⟩ j') := by
   intro _ _ j j' hj hj'
   rw [← sub_eq_zero, ← ClassFunction.inner_sub_right]
-  have h := typeIBetaL_inner_eta_row_sub_eq_zero _hG hyp typeISetup φ _hφ _hdeg j j' hj hj'
+  have h := typeIBetaL_inner_eta_row_sub_eq_zero _hG hnoV hyp typeISetup φ _hφ _hdeg j j' hj hj'
   convert h using 2
   exact Subsingleton.elim _ _
 
@@ -771,7 +787,9 @@ transport is needed on the left argument.  Takes the (14.9)-conclusional `IsType
 `typeI_caseC_dual_dichotomy`); the reconciled `TypePData T` and the ν-side grid supply come
 from `reconciled_typePData_T` and the `nuGridSupply` pin. -/
 theorem typeIBetaL_eta_col_constant [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
     {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L)
     (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ typeISetup.Sset)
@@ -784,7 +802,7 @@ theorem typeIBetaL_eta_col_constant [Finite G]
   intro _ _ i i' hi hi'
   classical
   obtain ⟨Tdata, hU, hW1, hW2⟩ := reconciled_typePData_T _hG hyp
-  exact typeIBetaL_eta_row_constant _hG
+  exact typeIBetaL_eta_row_constant _hG hnoV
     (hyp.swap hT2 Tdata hU hW1 hW2 (hyp.nuGridSupply _hG))
     typeISetup φ _hφ _hdeg i i' hi hi'
 

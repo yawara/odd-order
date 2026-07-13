@@ -70,16 +70,6 @@ theorem card_odd_of_isMinimalSimpleOdd [Finite G] (hG : OddOrder.BG.IsMinimalSim
     (_hyp : Hypothesis M) : Odd (Nat.card ↥M) :=
   hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
 
-/-- Under `IsMinimalSimpleOdd`, the §11 hypothesis forces type III or IV: type V is eliminated
-by Peterfalvi (10.10) (`no_typeV_maximal`). -/
-theorem isTypeIIIorIV [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis M) : IsTypeIII M ∨ IsTypeIV M := by
-  haveI : Fintype G := Fintype.ofFinite _
-  rcases hyp.type_alt with h | h | h
-  · exact Or.inl h
-  · exact Or.inr h
-  · exact absurd ⟨M, hyp.maximal, h⟩ (no_typeV_maximal hG)
-
 /-- **`|W₁|` is coprime to `|M'|`** (types III/IV): `M' = H ⋊ U` with
 `(|H|, |U·W₁|) = 1` (Peterfalvi (8.4), `typeP_coprime_H_uW1`) killing the `H`-side, and
 `U ⋊ W₁` Frobenius (`typeP_uW1_frobenius`) killing the `U`-side

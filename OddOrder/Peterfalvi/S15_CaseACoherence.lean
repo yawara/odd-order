@@ -50,7 +50,9 @@ non-orthogonal branch distinct `𝒮₄`-members consume orthogonal integral sli
 `𝒮(H₀C)` stratum outside `𝒮₂` (the `S`-instance `nineElevenSFour`), whose `ncard` is exactly the
 `S4` of the (9.11.3) class equation. -/
 theorem Hypothesis.nineElevenNormBoundS [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
     (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
     (caseA : CliffordCaseAData chars)
@@ -95,7 +97,7 @@ theorem Hypothesis.nineElevenNormBoundS [Finite G]
         (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S) →
       hyp.indS f = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
         ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) f := fun f hf => by
-    rw [hyp.indS_apply, ← hyp.sInstance_dade_eq_induce hG
+    rw [hyp.indS_apply, ← hyp.sInstance_dade_eq_induce hG hnoV
       (OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mp hf).2]
   have hS₂cohD : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
@@ -111,10 +113,10 @@ theorem Hypothesis.nineElevenNormBoundS [Finite G]
     intro χ hχ
     rintro ⟨c⟩
     refine hnopair χ hχ ⟨c.congrMap (fun f hf => ?_)⟩
-    rw [hyp.sInstance_dade_eq_induce hG
+    rw [hyp.sInstance_dade_eq_induce hG hnoV
       (OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mp hf).2, hyp.indS_apply]
   -- ── `τ₃` = the (9.11.6) `𝒮₃`-coherence on the honest Dade
-  obtain ⟨c₃⟩ := hyp.sSet_sThree_coherent_dade hG chars hS₂conj hS₃ne hS3deg
+  obtain ⟨c₃⟩ := hyp.sSet_sThree_coherent_dade hG hnoV chars hS₂conj hS₃ne hS3deg
   -- ── the `𝒮(H₀C)`-stratum dictionary and degree dichotomy (as in the equality assembler)
   have hsubC : OddOrder.Peterfalvi.S11.sOf (hyp.toTypesIIIIIIVSetupS hG)
       (chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief)
@@ -303,7 +305,7 @@ theorem Hypothesis.nineElevenNormBoundS [Finite G]
           ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) (γ - ψ₁))
         (c₃.extension lam) = 0
   · -- orthogonal branch — the (9.11.7)–(9.11.8) residual refutes
-    exact (hyp.nineElevenSevenEightRefutationS hG chars caseA S₂ hS₁S₂ hS₂S hS₂conj hS₂cohD
+    exact (hyp.nineElevenSevenEightRefutationS hG hnoV chars caseA S₂ hS₁S₂ hS₂S hS₂conj hS₂cohD
       hS₃ne hnopairD h2a hCUprime hS3deg hcount hFboundU hS2deg c₃ γ ψ₁ hψ₁S₂ hψ₁irr hψ₁deg
       hγZIrr hγ1 hγorth hαsupp hc).elim
   · -- non-orthogonal branch — the Bessel count `|𝒮₄| ≤ ‖α^τ‖² = N`
@@ -395,7 +397,9 @@ packaging's `H₀C′` with the generic `cprimeSub` stratum (`C_eq_cSub_of_nonco
 `S`-instance dictionary is definitional, so they vanish.  Remaining named residuals:
 `nineElevenSTwoExtractionS` and `nineElevenNormBoundS`. -/
 theorem Hypothesis.nineElevenEqualityRefutationS [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
     (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
     (caseA : CliffordCaseAData chars)
@@ -461,7 +465,7 @@ theorem Hypothesis.nineElevenEqualityRefutationS [Finite G]
   have hclass := OddOrder.Peterfalvi.S11.nineElevenThree_orbit_split hG caseA hS₁'sub
     (fun χ hχ hn => hS3deg χ ⟨hsubC hχ, hn⟩) hS2deg hCU hcount
   -- ── (9.11.4)–(9.11.8): the norm bound `|𝒮₄| ≤ N` (residual)
-  obtain ⟨N, hnorm, hleN⟩ := hyp.nineElevenNormBoundS hG chars caseA S₂ hS₁S₂ hS₂S hS₂conj
+  obtain ⟨N, hnorm, hleN⟩ := hyp.nineElevenNormBoundS hG hnoV chars caseA S₂ hS₁S₂ hS₂S hS₂conj
     hS₂coh hS₃ne hnopair h2a hCUprime hS3deg hcount hFboundU hS2deg
   -- ── numerics: `q ≥ 3` odd prime, `u ≥ 1`, `p = 2a+1`
   have hqp : ((hyp.toTypesIIIIIIVSetupS hG).q).Prime :=
@@ -506,7 +510,9 @@ analogue of the M-side `sOf_H0Cprime_memberRFamily`, feeding `𝒮₃`-coherence
 cross-orthogonality) and the (5.6) pair-bound producer for the `indS`/`A(S)` world; the (9.11.7)–
 (9.11.8) orthogonal branch is itself a residual on the M-side (issue 9083 Phase E). -/
 theorem Hypothesis.sSet_caseA_nineElevenRefutation [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
     (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
     (caseA : CliffordCaseAData chars)
@@ -575,7 +581,7 @@ theorem Hypothesis.sSet_caseA_nineElevenRefutation [Finite G]
             ≤ 2 * ((hyp.toTypesIIIIIIVSetupS hG).q : ℝ) ^ 2 * (caseA.a : ℝ) * (d : ℝ)) := by
     intro χ hχ
     obtain ⟨d, hχdeg, hdu, hFbound⟩ :=
-      hyp.nineElevenPairBoundS hG chars caseA S₂ hS₁S₂ hS₂S hS₂conj hS₂coh χ hχ (hnopair χ hχ)
+      hyp.nineElevenPairBoundS hG hnoV chars caseA S₂ hS₁S₂ hS₂S hS₂conj hS₂coh χ hχ (hnopair χ hχ)
     have hpair : OddOrder.Peterfalvi.S07.sumnS hS1'fin.toFinset
         ≤ 2 * ((hyp.toTypesIIIIIIVSetupS hG).q : ℝ) ^ 2 * (caseA.a : ℝ) * (d : ℝ) :=
       hFbound hS1'fin.toFinset (by rw [Set.Finite.coe_toFinset]; exact hS1'sub)
@@ -599,7 +605,7 @@ theorem Hypothesis.sSet_caseA_nineElevenRefutation [Finite G]
     have h := hFbound₀ F hF
     rwa [hd₀u] at h
   -- hand the equality configuration to the (9.11.2)–(9.11.8) refutation residual
-  exact hyp.nineElevenEqualityRefutationS hG chars caseA S₂ hS₁S₂ hS₂S hS₂conj hS₂coh
+  exact hyp.nineElevenEqualityRefutationS hG hnoV chars caseA S₂ hS₁S₂ hS₂S hS₂conj hS₂coh
     ⟨χ₀, hχ₀⟩ hnopair h2a hCUprime hS3deg hcount hFboundU
 
 open OddOrder.Peterfalvi.S11 in
@@ -638,7 +644,9 @@ The reduction is landed sorry-free; the **sole residual** is the refuter, i.e. P
   named residual on the M-side (issue 9083 Phase E), i.e. the deepest genuinely-unlanded piece of the
   whole non-Galois (9.11) — not an `S`-instance-only gap. -/
 theorem Hypothesis.sSet_coherent_indS_caseA [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
     (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
     (caseA : CliffordCaseAData chars) :
@@ -657,7 +665,7 @@ theorem Hypothesis.sSet_coherent_indS_caseA [Finite G]
     (hyp.sSetIrrDeg_subset_sSet hG (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ))
     (hyp.sSetIrrDeg_closedUnderConjugate hG (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ)
       (star_natCast _))
-    (hyp.sSetIrrDeg_qa_coherent_indS_caseA hG chars caseA)
+    (hyp.sSetIrrDeg_qa_coherent_indS_caseA hG hnoV chars caseA)
     ?_
   -- The (9.11.1)–(9.11.8) refuter (sole residual): given a maximal proper coherent conjugation-closed
   -- `𝒮₂ ⊇ S₁(q·a)` with `𝒮₃ = 𝒮 \ 𝒮₂ ≠ ∅` and *no* conjugate pair `{χ, χ̄}` (`χ ∈ 𝒮₃`) coherently
@@ -668,7 +676,7 @@ theorem Hypothesis.sSet_coherent_indS_caseA [Finite G]
   -- `b`-territory prerequisites (caseA `R`-family; (9.11.1)–(9.11.6) squeeze assembly for `indS`/`A(S)`;
   -- the (9.11.7)–(9.11.8) refutation, still a residual even on the M-side, issue 9083).
   intro S₂ hS₁S₂ hS₂S hS₂conj hS₂coh hS₃ne hnopair
-  exact hyp.sSet_caseA_nineElevenRefutation hG chars caseA S₂ hS₁S₂ hS₂S hS₂conj hS₂coh hS₃ne hnopair
+  exact hyp.sSet_caseA_nineElevenRefutation hG hnoV chars caseA S₂ hS₁S₂ hS₂S hS₂conj hS₂coh hS₃ne hnopair
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 /-- **(9.11) coherence of the full honest §9 family `𝒮 = sSet` on `Ind_S^G`, unconditional** (issue
@@ -679,14 +687,16 @@ branch (`sSet_coherent_indS_caseA`).  The map is the genuine induction `τ = Ind
 (13.2.e)) and the support is the honest Dade support `A(S)` (nonempty — unlike the degenerate
 `(C′)^# = ∅`, which makes `IsCoherent`'s `nonzero` field unsatisfiable). -/
 theorem Hypothesis.sSet_coherent_indS_A [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.indS
       (sSet (hyp.toTypesIIIIIIVSetupS hG))
       (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)) := by
   rcases clifford_dichotomy hG (hyp.mkSection11CharacterDataS_honest hG chief) with hA | hB
-  · exact hyp.sSet_coherent_indS_caseA hG (hyp.mkSection11CharacterDataS_honest hG chief) hA.some
-  · exact hyp.sSet_coherent_indS_caseB hG (hyp.mkSection11CharacterDataS_honest hG chief) hB.some
+  · exact hyp.sSet_coherent_indS_caseA hG hnoV (hyp.mkSection11CharacterDataS_honest hG chief) hA.some
+  · exact hyp.sSet_coherent_indS_caseB hG hnoV (hyp.mkSection11CharacterDataS_honest hG chief) hB.some
 
 open scoped FiniteInduce in
 /-- **(9.11)-coherence of the honest `S`-instance §9 data** (issue 2035 step 4; re-grounded off the
@@ -700,12 +710,14 @@ shortcut whose target `IsCoherent Ind_S^G 𝒮 (C′)^# = IsCoherent Ind_S^G �
 remaining gap is the honest (9.11) pair-adjoining assembly inside `sSet_coherent_indS_{caseA,caseB}`
 (base coherences landed, the mixed-family lift sorried-cite), not a soundness defect. -/
 noncomputable def Hypothesis.coherent_H0Cprime_S [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
     OddOrder.Peterfalvi.S07.IsCoherent (hyp.mkSection11CharacterDataS_honest hG chief).tau
       (hyp.mkSection11CharacterDataS_honest hG chief).S
       (hyp.mkSection11CharacterDataS_honest hG chief).H0CprimeSupport :=
-  (hyp.sSet_coherent_indS_A hG chief).some
+  (hyp.sSet_coherent_indS_A hG hnoV chief).some
 
 open scoped FiniteInduce in
 /-- **The coherent extension `τ₁` for the honest `S`-instance** (issue 2035 step 4): the
@@ -714,10 +726,12 @@ IntegralCharacterMap ↥S G` that the (13.3) degree analysis threads (the `μ_j^
 Now grounded on the honest `sSet_coherent_indS_A` (base coherences landed, mixed-family lift
 sorried-cite), no longer on the unsound `sibleyTarget_H0C`. -/
 noncomputable def Hypothesis.tau1S_ofHonest [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
     OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥hyp.S G :=
-  (hyp.coherent_H0Cprime_S hG chief).extension
+  (hyp.coherent_H0Cprime_S hG hnoV chief).extension
 
 open scoped FiniteInduce in
 /-- **Type-alignment probe for the (13.3) `τ₁` route** (issue 2035 step 4 verification): confirms
@@ -726,14 +740,16 @@ expected `IntegralCharacterMap ↥S G` type; and that `extends_on_supported` giv
 `τ₁ φ = Ind_S^G φ` on the supported span (`tau1S_apply_induce` on the family) — the input to the
 (13.3) `tau1S_apply_induce_sub` / `tau1S_inner_induce` / `tau1S_induce_mem_ZIrr` fields. -/
 theorem Hypothesis.tau1S_ofHonest_extends_on_supported [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))
     (φ : ClassFunction ↥hyp.S ℂ)
     (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan
       (hyp.mkSection11CharacterDataS_honest hG chief).S
       (hyp.mkSection11CharacterDataS_honest hG chief).H0CprimeSupport) :
-    hyp.tau1S_ofHonest hG chief φ = ClassFunction.induce hyp.S φ := by
-  have h := (hyp.coherent_H0Cprime_S hG chief).extends_on_supported φ hφ
+    hyp.tau1S_ofHonest hG hnoV chief φ = ClassFunction.induce hyp.S φ := by
+  have h := (hyp.coherent_H0Cprime_S hG hnoV chief).extends_on_supported φ hφ
   -- `.extension φ = chars.tau φ = indS φ = Ind_S^G φ`
   simpa [Hypothesis.tau1S_ofHonest, Hypothesis.mkSection11CharacterDataS_honest,
     Hypothesis.indS_apply] using h
@@ -917,7 +933,9 @@ membership `induce_H_mem_zSpan_S`.  This is the honest engine for the `Character
 `tau1S_inner_induce` field (with the `P ⊄ Ker` hypothesis the (13.3) consumers actually satisfy —
 `μ_j`, `λ` all have `P ⊄ Ker`). -/
 theorem Hypothesis.tau1S_ofHonest_inner_induce [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))
     (θ θ' : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ)
     (hθ : OddOrder.RepresentationTheory.IsIrreducibleCharacter θ)
@@ -929,11 +947,11 @@ theorem Hypothesis.tau1S_ofHonest_inner_induce [Finite G]
         Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
       OddOrder.Peterfalvi.S03.characterKernel θ')) :
     ClassFunction.inner
-        (hyp.tau1S_ofHonest hG chief (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ))
-        (hyp.tau1S_ofHonest hG chief (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ'))
+        (hyp.tau1S_ofHonest hG hnoV chief (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ))
+        (hyp.tau1S_ofHonest hG hnoV chief (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ'))
       = ClassFunction.inner (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ)
           (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ') := by
-  exact (hyp.coherent_H0Cprime_S hG chief).extension_inner_eq _ _
+  exact (hyp.coherent_H0Cprime_S hG hnoV chief).extension_inner_eq _ _
     (hyp.induce_H_mem_zSpan_S hG chief θ hθ hθP)
     (hyp.induce_H_mem_zSpan_S hG chief θ' hθ' hθ'P)
 
@@ -943,15 +961,17 @@ irreducible `θ` of `H = PC` with `P ⊄ Ker θ`, `τ₁ (Ind_{PC}^S θ) ∈ ℤ
 field `extension_mem_ZIrr` (virtual-character codomain on all of `ℤ[𝒮]`) and the family membership
 `induce_H_mem_zSpan_S`.  Honest engine for the `CharacterDegreeData` `tau1S_induce_mem_ZIrr` field. -/
 theorem Hypothesis.tau1S_ofHonest_induce_mem_ZIrr [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))
     (θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ)
     (hθ : OddOrder.RepresentationTheory.IsIrreducibleCharacter θ)
     (hθP : ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
         Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
       OddOrder.Peterfalvi.S03.characterKernel θ)) :
-    hyp.tau1S_ofHonest hG chief (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ) ∈ ZIrr G :=
-  (hyp.coherent_H0Cprime_S hG chief).extension_mem_ZIrr _
+    hyp.tau1S_ofHonest hG hnoV chief (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ) ∈ ZIrr G :=
+  (hyp.coherent_H0Cprime_S hG hnoV chief).extension_mem_ZIrr _
     (hyp.induce_H_mem_zSpan_S hG chief θ hθ hθP)
 
 end OddOrder.Peterfalvi.S15

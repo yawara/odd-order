@@ -34,6 +34,7 @@ With `q < p`, a noncyclic Sylow `q`-subgroup `Q` of `L` would witness `InPi q` (
 full `q`-order, and `q ∣ [L : L_F] = |U|`), contradicting the (12.8) minimality `minimal_p`. -/
 theorem witness_L_sylow_cyclic_of_dvd_complement [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
     (typeI : TypeIData data.L) {q : ℕ} (hq : q.Prime)
     (hqU : q ∣ Nat.card ↥typeI.typeF.U) (Q : Sylow q ↥data.L) :
@@ -43,7 +44,7 @@ theorem witness_L_sylow_cyclic_of_dvd_complement [Finite G]
   haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
   -- `P₀ ≤ H`, so `p ∣ |H|`.
   have hP0H : ctr.P0 ≤ typeI.typeF.H := by
-    rw [typeI.typeF.H_eq]; exact witness_P0_le_kernel hG data
+    rw [typeI.typeF.H_eq]; exact witness_P0_le_kernel hG hnoV data
   have hP0ne : ctr.P0 ≠ ⊥ := fun h => ctr.P0_noncyclic (h ▸ inferInstance)
   have hpH : ctr.p ∣ Nat.card ↥typeI.typeF.H := by
     obtain ⟨k, hk⟩ := ctr.P0_pGroup.exists_card_eq
@@ -59,7 +60,7 @@ theorem witness_L_sylow_cyclic_of_dvd_complement [Finite G]
   -- Step A: `q < p`, by the (8.3) alternative for the type-I witness `L`.
   have hqp : q < ctr.p := by
     rcases typeI.alternative with hTI | ⟨hab, hrank⟩ | ⟨hexp, _⟩
-    · exact absurd hTI (witness_H_sharp_not_isTISubset_of_typeI hG data typeI)
+    · exact absurd hTI (witness_H_sharp_not_isTISubset_of_typeI hG hnoV data typeI)
     · exact prime_lt_of_odd_dvd_sq_sub_one ctr.p_prime hq hp_odd hq_odd
         (typeI.typeF.prime_dvd_sq_sub_one_of_abelian_kernel hab hrank.le hq hpH hqU)
     · have hpmem : ctr.p ∈ (Nat.card ↥typeI.typeF.H).primeFactors :=
@@ -103,6 +104,7 @@ embed `U ↪ L` (via `U_le`): `P` becomes a `q`-subgroup of `L`, contained in a 
 of `L`, which is cyclic by the minimality core `witness_L_sylow_cyclic_of_dvd_complement`; a subgroup
 of a cyclic group is cyclic, so `P` is cyclic. -/
 theorem witness_L_complement_isZGroup [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
     (typeI : TypeIData data.L) :
     _root_.IsZGroup ↥typeI.typeF.U := by
@@ -122,7 +124,7 @@ theorem witness_L_complement_isZGroup [Finite G] (hG : OddOrder.BG.IsMinimalSimp
     obtain ⟨Q, hQle⟩ := hPLpg.exists_le_sylow
     -- The containing Sylow `q`-subgroup of `L` is cyclic (minimality core).
     haveI hQcyc : IsCyclic ↥(Q : Subgroup ↥data.L) :=
-      witness_L_sylow_cyclic_of_dvd_complement hG data typeI hq hqU Q
+      witness_L_sylow_cyclic_of_dvd_complement hG hnoV data typeI hq hqU Q
     -- A subgroup of a cyclic group is cyclic; `PL ≤ Q ≅ P`.
     haveI : IsCyclic ↥PL := Subgroup.isCyclic_of_le hQle
     exact isCyclic_of_surjective _
@@ -147,15 +149,16 @@ theorem witness_L_complement_isZGroup [Finite G] (hG : OddOrder.BG.IsMinimalSimp
 (8.2.b) bridge `typeI_frobenius_of_isZGroup_complement` yields the Frobenius structure with kernel
 `H = L_F` (`typeF.H_eq`). -/
 theorem witness_L_frobenius [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
     ∃ frob : TypeIFrobeniusData data.L, frob.kernel_eq_MF := by
-  obtain ⟨typeI⟩ := witness_L_isTypeI hG data
+  obtain ⟨typeI⟩ := witness_L_isTypeI hG hnoV data
   exact ⟨{ typeI := typeI
            complement := typeI.typeF.U.subgroupOf data.L
            kernel_eq_MF := typeI.typeF.H = maxNilpotentNormalHall data.L
            kernel_eq_MF_holds := typeI.typeF.H_eq
            frobenius := typeI_frobenius_of_isZGroup_complement typeI
-             (witness_L_complement_isZGroup hG data typeI) },
+             (witness_L_complement_isZGroup hG hnoV data typeI) },
          typeI.typeF.H_eq⟩
 
 /-- The type-`τ` **main subgroup** `M_s` is contained in `M` (both `M_F` and `[M,M]` are). -/
@@ -179,16 +182,17 @@ singleton), applied at `M' := L ∈ 𝓜_σ(x)`; `N_σ = M_σ = M_F = K` is the 
 `MF_eq_Msigma`. -/
 theorem intersection_complements_K [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
     Subgroup.IsComplement' (ctr.K.subgroupOf ctr.M) ((ctr.M ⊓ data.L).subgroupOf ctr.M) := by
   classical
   -- The witness `L` is type I with `L_F = L_σ`, so `x ∈ P₀ ⊆ L_F` is `σ`-sharp in `L`.
-  have hLtypeI : IsTypeI data.L := witness_L_isTypeI hG data
+  have hLtypeI : IsTypeI data.L := witness_L_isTypeI hG hnoV data
   have hLF_eq : maxNilpotentNormalHall data.L = OddOrder.BG.Ch3.S10.Msigma data.L :=
     (OddOrder.BG.Ch4.S16.proposition_type_classification hG data.L_maximal).2.2.2.2.2.mpr
       (Or.inl hLtypeI)
   have hxLσ : data.x ∈ OddOrder.BG.Ch3.S10.Msigma data.L :=
-    hLF_eq ▸ witness_P0_le_kernel hG data data.x_mem_P0
+    hLF_eq ▸ witness_P0_le_kernel hG hnoV data data.x_mem_P0
   have hxσ : data.x ∈ OddOrder.BG.Ch4.S14.sigmaSharp data.L :=
     ⟨hxLσ, by simpa using data.x_ne_one⟩
   -- `C_G(x) ≤ M` (via `N_G(⟨x⟩) ≤ M`), so `M` is THE maximal subgroup over `C_G(x)`.
@@ -230,10 +234,11 @@ theorem intersection_complements_K [Finite G]
 complements `K = M_F` in `M` (`intersection_complements_K`), so `|M ∩ L| = [M : K]`, which is
 coprime to `|K|` because `K = M_F` is a Hall subgroup of `M`. -/
 theorem card_MinfL_coprime_card_K [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
     Nat.Coprime (Nat.card ↥(ctr.M ⊓ data.L)) (Nat.card ↥ctr.K) := by
   have hKM : ctr.K ≤ ctr.M := ctr.K_eq_MF ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le ctr.M
-  have hcompl := intersection_complements_K hG data
+  have hcompl := intersection_complements_K hG hnoV data
   have hHall := (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall ctr.M).coprime_index
   rw [← ctr.K_eq_MF] at hHall
   -- `hHall : Coprime |K| [M : K]`;  `[M : K] = |M ∩ L|` by the complement.
@@ -260,6 +265,7 @@ The genuine (12.11) argument, now fully assembled from the landed infrastructure
 * by `L`'s Frobenius condition (4) (`centralizer_kernel_le`, `x ∈ H^#`), `A ≤ C_L(x) ⊆ H`, so
   `A ⊆ H`, forcing `A = A ⊓ H = ⊥`. -/
 theorem witness_MinfL_pprime_subgroup_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) {A : Subgroup G}
     (hAML : A ≤ ctr.M ⊓ data.L) (hAH : A ⊓ maxNilpotentNormalHall data.L = ⊥) (hAne : A ≠ ⊥) :
     False := by
@@ -273,18 +279,18 @@ theorem witness_MinfL_pprime_subgroup_eq_bot [Finite G] (hG : OddOrder.BG.IsMini
   have hHnorm : data.L ≤ Subgroup.normalizer (H : Set G) :=
     OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer data.L
   -- Frobenius structure of `L` with kernel `H` (upstream of this theorem).
-  obtain ⟨frob, _⟩ := witness_L_frobenius hG data
+  obtain ⟨frob, _⟩ := witness_L_frobenius hG hnoV data
   have hHfrob : frob.typeI.typeF.H = H := frob.typeI.typeF.H_eq
   have hFrobL : ∃ C : Subgroup ↥data.L,
       OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥data.L (H.subgroupOf data.L) C :=
     ⟨frob.complement, hHfrob ▸ frob.frobenius⟩
   -- `x ∈ H^#` and `x ∈ M ∩ L`.
-  have hxH : data.x ∈ H := witness_P0_le_kernel hG data data.x_mem_P0
+  have hxH : data.x ∈ H := witness_P0_le_kernel hG hnoV data data.x_mem_P0
   have hxML : data.x ∈ ctr.M ⊓ data.L := ⟨ctr.P0_le_M data.x_mem_P0, hHL hxH⟩
   -- `P = O_p(H) ∩ M` contains `P₀`, sits inside `H` and `M`.
   set P : Subgroup G := opiCoreInG ({ctr.p} : Set ℕ) H ⊓ ctr.M with hPdef
   have hP0_le_P : ctr.P0 ≤ P :=
-    le_inf (pGroup_le_opiCoreInG_of_le_of_isNilpotent ctr.P0_pGroup (witness_P0_le_kernel hG data))
+    le_inf (pGroup_le_opiCoreInG_of_le_of_isNilpotent ctr.P0_pGroup (witness_P0_le_kernel hG hnoV data))
       ctr.P0_le_M
   have hP_le_H : P ≤ H := inf_le_left.trans (opiCoreInG_le _ _)
   have hP_le_M : P ≤ ctr.M := inf_le_right
@@ -316,7 +322,7 @@ theorem witness_MinfL_pprime_subgroup_eq_bot [Finite G] (hG : OddOrder.BG.IsMini
     solvable_of_solvable_injective (Subgroup.inclusion_injective hKM)
   -- Coprimality of the `P ⊔ A`-action on `K`.
   have hcop : Nat.Coprime (Nat.card ↥ctr.K) (Nat.card ↥(P ⊔ A)) :=
-    (card_MinfL_coprime_card_K hG data).symm.coprime_dvd_right (Subgroup.card_dvd_of_le hPA_ML)
+    (card_MinfL_coprime_card_K hG hnoV data).symm.coprime_dvd_right (Subgroup.card_dvd_of_le hPA_ML)
   -- `P` does not centralize `K`.
   have hPnc : ¬ P ≤ Subgroup.centralizer (ctr.K : Set G) := fun hPc =>
     P0_not_le_centralizer_K hG ctr (hP0_le_P.trans hPc)
@@ -331,7 +337,7 @@ theorem witness_MinfL_pprime_subgroup_eq_bot [Finite G] (hG : OddOrder.BG.IsMini
   obtain ⟨typeIM⟩ := ctr.M_typeI
   have htypeFH : typeIM.typeF.H = ctr.K := ctr.K_eq_MF ▸ typeIM.typeF.H_eq
   obtain ⟨W, hWab, hWle⟩ := exists_abelian_centralizer_le_of_isComplement hMsolv typeIM.typeF
-    (V := ctr.M ⊓ data.L) inf_le_left (htypeFH ▸ intersection_complements_K hG data)
+    (V := ctr.M ⊓ data.L) inf_le_left (htypeFH ▸ intersection_complements_K hG hnoV data)
   have hnFH : n ∈ typeIM.typeF.H := by rw [htypeFH]; exact hnK
   have hn'FH : n' ∈ typeIM.typeF.H := by rw [htypeFH]; exact hn'K
   have hA_W : A ≤ W := by
@@ -369,6 +375,7 @@ subgroup meeting `H` trivially (`witness_MinfL_pprime_subgroup_eq_bot`), so its 
 normal-Hall reduction `le_of_coprime_card_index_of_normal` places `M ∩ L` inside `H`. -/
 theorem intersection_le_kernel [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
     ctr.M ⊓ data.L ≤ maxNilpotentNormalHall data.L := by
   classical
@@ -428,7 +435,7 @@ theorem intersection_le_kernel [Finite G]
       rw [hb, Subgroup.card_bot] at hA1
       rw [← hA1] at hqQ
       exact hq.one_lt.ne' (Nat.dvd_one.mp hqQ)
-    exact witness_MinfL_pprime_subgroup_eq_bot hG data hAML hAH hAne
+    exact witness_MinfL_pprime_subgroup_eq_bot hG hnoV data hAML hAH hAne
   -- Apply the normal-Hall reduction.
   have hle := Subgroup.le_of_coprime_card_index_of_normal hcop
   intro z hz
@@ -444,10 +451,11 @@ and (8.13.c1)) and `intersection_le_kernel` (the (8.1.b/c)+(9.1)+(12.10) `A = 1`
 combined here. -/
 theorem intersection_complement_structure [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
     Subgroup.IsComplement' (ctr.K.subgroupOf ctr.M) ((ctr.M ⊓ data.L).subgroupOf ctr.M) ∧
       ctr.M ⊓ data.L ≤ maxNilpotentNormalHall data.L :=
-  ⟨intersection_complements_K hG data, intersection_le_kernel hG data⟩
+  ⟨intersection_complements_K hG hnoV data, intersection_le_kernel hG hnoV data⟩
 
 /-- **Peterfalvi (12.10), non-TI clause**: for the (12.9) witness `L`, its Frobenius kernel
 `H = L_F` has `H^#` **not** a TI-subset of `G`.  This is the "By (12.9), `H^#` is not a TI-subset"
@@ -463,12 +471,13 @@ than on the (8.18.c) geometry that case (a) (`sibleyTarget_frobI`) transitively 
 Specialization of the `TypeIData`-form `witness_H_sharp_not_isTISubset_of_typeI` to the
 Frobenius witness (whose `x ∈ H` route is the upstream `witness_P0_le_kernel`, not (12.11)). -/
 theorem witness_H_sharp_not_isTISubset [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
     (frob : TypeIFrobeniusData data.L) :
     ¬ OddOrder.GroupTheory.IsTISubset
         (OddOrder.GroupTheory.sharpSubgroup frob.typeI.typeF.H)
         (Subgroup.normalizer (frob.typeI.typeF.H : Set G)) :=
-  witness_H_sharp_not_isTISubset_of_typeI hG data frob.typeI
+  witness_H_sharp_not_isTISubset_of_typeI hG hnoV data frob.typeI
 
 /-- **Peterfalvi (12.1) for the witness subgroup `L`, with its Frobenius witness**: the second
 maximal subgroup `L` of (12.9) carries the (12.1) Hypothesis together with an explicit Frobenius
@@ -477,27 +486,29 @@ decomposition of its kernel `H = L_F`.  Since `L` is type I (Frobenius, by (12.1
 Hypothesis whose `typeI` is that very data, so the Frobenius group structure `frob.frobenius`
 transfers to `hyp.H`.  This Frobenius witness is the structural input to coherence (12.6). -/
 theorem witness_L_hypothesis_frobenius [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
     ∃ hyp : Hypothesis data.L, ∃ C : Subgroup ↥data.L,
       OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥data.L (hyp.H.subgroupOf data.L) C ∧
       ¬ OddOrder.GroupTheory.IsTISubset
           (OddOrder.GroupTheory.sharpSubgroup hyp.typeI.typeF.H)
           (Subgroup.normalizer (hyp.typeI.typeF.H : Set G)) := by
-  obtain ⟨frob, hker⟩ := witness_L_frobenius hG data
+  obtain ⟨frob, hker⟩ := witness_L_frobenius hG hnoV data
   obtain ⟨hyp, hhyp⟩ := hypothesis_of_typeIData hG data.L_maximal frob.typeI
   have hH : hyp.typeI.typeF.H = frob.typeI.typeF.H := by rw [hhyp]
   refine ⟨hyp, frob.complement, ?_, ?_⟩
   · rw [show hyp.H = hyp.typeI.typeF.H from rfl, hH]
     exact frob.frobenius
   · rw [hH]
-    exact witness_H_sharp_not_isTISubset hG data frob
+    exact witness_H_sharp_not_isTISubset hG hnoV data frob
 
 /-- **Peterfalvi (12.1) Hypothesis for the witness subgroup `L`** (forgetful form of
 `witness_L_hypothesis_frobenius`). -/
 theorem witness_L_hypothesis [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
     Nonempty (Hypothesis data.L) := by
-  obtain ⟨hyp, _⟩ := witness_L_hypothesis_frobenius hG data
+  obtain ⟨hyp, _⟩ := witness_L_hypothesis_frobenius hG hnoV data
   exact ⟨hyp⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -510,10 +521,11 @@ so the TI-only case (a) `sibleyTarget_frobI` is excluded — hence this coherenc
 This is the coherence input "`S` coherent" of the (12.16) Dade calculation — it feeds the `(7.8.b)`
 norm bound `hB` of `CounterexampleDadeData` via the §7 `Hypothesis78`/`NormEstimates`. -/
 theorem witness_L_coherent [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
     ∃ hyp : Hypothesis data.L,
       Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) := by
-  obtain ⟨hyp, C, hC, hNonTI⟩ := witness_L_hypothesis_frobenius hG data
+  obtain ⟨hyp, C, hC, hNonTI⟩ := witness_L_hypothesis_frobenius hG hnoV data
   refine ⟨hyp, ?_⟩
   rcases hyp.typeI.alternative with hTI | hab | hexp
   · exact absurd hTI hNonTI
@@ -1017,6 +1029,7 @@ so `e ∈ N_G(⟨x⟩) ⊆ M` by (12.9), hence `e ∈ M ∩ L ⊆ H = L_F` by (1
 (`intersection_le_kernel`), and the Frobenius disjointness `H ∩ E = 1` gives `e = 1`. -/
 theorem witness_complement_dvd_p_sub_or_add_one [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
     (frob : TypeIFrobeniusData data.L)
     {T : Subgroup G} (hTelem : T.IsElementaryAbelian ctr.p) (hTP0 : T ≤ ctr.P0) (hTne : T ≠ ⊥)
@@ -1040,7 +1053,7 @@ theorem witness_complement_dvd_p_sub_or_add_one [Finite G]
   have hTH : T ≤ frob.typeI.typeF.H := by
     refine hTP0.trans ?_
     rw [hHeq]
-    exact witness_P0_le_kernel hG data
+    exact witness_P0_le_kernel hG hnoV data
   -- `p ∤ |E'|`: Frobenius kernel/complement coprimality with `p ∣ |T| ∣ |H|`.
   have hp_ndvd : ¬ ctr.p ∣ Nat.card ↥(frob.complement.map data.L.subtype) := by
     have hpT : ctr.p ∣ Nat.card ↥T := by
@@ -1123,7 +1136,7 @@ theorem witness_complement_dvd_p_sub_or_add_one [Finite G]
     have heL : e ∈ data.L := Subgroup.map_subtype_le _ heE
     have heH : e ∈ frob.typeI.typeF.H := by
       rw [hHeq]
-      exact intersection_le_kernel hG data ⟨heM, heL⟩
+      exact intersection_le_kernel hG hnoV data ⟨heM, heL⟩
     -- Frobenius disjointness: `e ∈ E ∩ H = 1`.
     obtain ⟨a, haC, rfl⟩ := heE
     have haH : a ∈ frob.typeI.typeF.H.subgroupOf data.L :=
@@ -1161,6 +1174,7 @@ fixed-point-freely on `T ⊆ H` by the Frobenius structure.  The `p+1` refinemen
 `witness_complement_dvd_p_sub_or_add_one`. -/
 theorem exists_center_omega1_elemAbelian_fpf_of_witness [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
     (frob : TypeIFrobeniusData data.L) :
     ∃ T : Subgroup G, IsElementaryAbelian ctr.p ↥T ∧
@@ -1178,7 +1192,7 @@ theorem exists_center_omega1_elemAbelian_fpf_of_witness [Finite G]
   haveI hHnilp : Group.IsNilpotent ↥frob.typeI.typeF.H := by
     rw [hHeq]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent data.L
   have hP0H : ctr.P0 ≤ frob.typeI.typeF.H := by
-    rw [hHeq]; exact witness_P0_le_kernel hG data
+    rw [hHeq]; exact witness_P0_le_kernel hG hnoV data
   set P : Subgroup G := opiCoreInG ({ctr.p} : Set ℕ) frob.typeI.typeF.H with hPdef
   have hP0P : ctr.P0 ≤ P := pGroup_le_opiCoreInG_of_le_of_isNilpotent ctr.P0_pGroup hP0H
   have hPH : P ≤ frob.typeI.typeF.H := opiCoreInG_le _ _
@@ -1292,7 +1306,7 @@ theorem exists_center_omega1_elemAbelian_fpf_of_witness [Finite G]
       (Subgroup.mem_subgroupOf.mpr htH) (fun h => htne (congrArg Subtype.val h))
       (Subtype.ext hconj)
   exact ⟨T, hTelem, hEnorm, hTcard, hTH, hfpf, fun _ =>
-    witness_complement_dvd_p_sub_or_add_one hG data frob hTelem hTP0 hTne hEnorm hfpf⟩
+    witness_complement_dvd_p_sub_or_add_one hG hnoV data frob hTelem hTP0 hTne hEnorm hfpf⟩
 
 /-- **Peterfalvi (12.12)**: the Frobenius complement `E` in the (12.9) witness subgroup `L` is
 cyclic, with order `e = |E|` dividing `p - 1` or `p + 1`.
@@ -1306,6 +1320,7 @@ with `E'` acting fixed-point-freely on `T` by conjugation.  The proven rep-theor
 and applying the packaged `p+1` refinement to the `p²-1` branch yields the (12.12) conclusion. -/
 theorem complement_cyclic_order_dvd [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
     (frob : TypeIFrobeniusData data.L) :
     IsCyclic ↥frob.complement ∧
@@ -1320,7 +1335,7 @@ theorem complement_cyclic_order_dvd [Finite G]
     Subgroup.card_map_of_injective (K := frob.complement) data.L.subtype_injective
   -- The (12.9)/(12.10)/(12.11) structural package for the witness complement.
   obtain ⟨T, hTelem, hEnorm, hTcard, hTleH, hfpf, hrefine⟩ :=
-    exists_center_omega1_elemAbelian_fpf_of_witness hG data frob
+    exists_center_omega1_elemAbelian_fpf_of_witness hG hnoV data frob
   -- Odd order of `E'` (a subgroup of the odd-order `G`).
   have hodd : Odd (Nat.card ↥E') :=
     hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card E')
@@ -1372,12 +1387,13 @@ The witness complement order `e = |E|` is odd (a subgroup of the odd-order `G`) 
 `2e ≤ p ∓ 1 ≤ p + 1`.  This is the `h2e` field of `CounterexampleDadeData`, in `ℕ` form. -/
 theorem two_mul_card_complement_le [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
     (frob : TypeIFrobeniusData data.L) :
     2 * Nat.card ↥frob.complement ≤ ctr.p + 1 := by
   classical
   haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
-  obtain ⟨-, hdvd⟩ := complement_cyclic_order_dvd hG data frob
+  obtain ⟨-, hdvd⟩ := complement_cyclic_order_dvd hG hnoV data frob
   -- `e = |E|` is odd.
   have hodd : Odd (Nat.card ↥frob.complement) :=
     hG.odd.of_dvd_nat ((Subgroup.card_subgroup_dvd_card frob.complement).trans
@@ -1500,13 +1516,14 @@ fixed-point-freely on the kernel
 (`IsFrobeniusGroup.centralizer_inf_kernel_eq_bot_of_not_mem`). -/
 theorem witness_L_not_conj_of_kernel_centralizer_ne_bot [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
     {N : Subgroup G} {g : G} (hgN : g ∈ N)
     (hgNF : g ∉ maxNilpotentNormalHall N)
     (hR : maxNilpotentNormalHall N ⊓ Subgroup.centralizer ({g} : Set G) ≠ ⊥) :
     ¬ ∃ c : G, MulAut.conj c • data.L = N := by
   rintro ⟨c, hc⟩
-  obtain ⟨frob, -⟩ := witness_L_frobenius hG data
+  obtain ⟨frob, -⟩ := witness_L_frobenius hG hnoV data
   -- kernel transport: `N_F = (conj c) • L_F`.
   have hNF : maxNilpotentNormalHall N
       = MulAut.conj c • maxNilpotentNormalHall data.L := by

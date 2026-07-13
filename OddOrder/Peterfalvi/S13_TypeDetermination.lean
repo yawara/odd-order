@@ -205,6 +205,7 @@ noncomputable def section16MaximalPair_of_isMinimalSimpleOdd {G : Type*} [Group 
   -- be `rcases`'d into the `Type`-valued structure goal); the structural conjunction is an `And`
   -- (large-eliminating), so it `obtain`s into named hypotheses directly.
   have e := exists_section16MaximalPair_data hG
+    (OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional hG)
   obtain ⟨hSmax, hTmax, hSneT, hSnonI, hTnonI, hone, hcaseB, hKleS, hKhall, hKstareq,
     hStypeP, hTtypeP, hSTnconj, hKstarleT, hKstarhall, hKeq, hZcyc, hKlt⟩ :=
     e.choose_spec.choose_spec.choose_spec.choose_spec

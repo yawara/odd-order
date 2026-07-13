@@ -396,7 +396,8 @@ theorem member_residual_not_orthogonal_H0C_of_refuter [Finite G]
       hG nu hnuConj hG.odd hj hzS params.zeta_irreducible hz1 params.w2_prime
       hd hnf hdeg hmu0 hsign params.two_le_n hRn hZ hRorth hRmem hRrev h114
   have hzHC : params.zeta ∈ s13hyp.SOf s13hyp.HC := by
-    rw [← OddOrder.Peterfalvi.S13.secondDerived_eq_HC hG s13hyp,
+    rw [← OddOrder.Peterfalvi.S13.secondDerived_eq_HC_of_noncoherent hG s13hyp
+        (hrefute s13hyp) s13hyp.type_alt,
       s13hyp.SOf_secondDerived_eq hG]
     exact ⟨hzS, params.zeta_irreducible, hz1⟩
   have hzdeg : ∀ j : Fin s13hyp.base.w2, j ≠ 0 →

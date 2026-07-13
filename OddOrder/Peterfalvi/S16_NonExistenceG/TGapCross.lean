@@ -108,6 +108,8 @@ This is the genuine group-theoretic producer behind the T-side full-`A₀` norme
 input; it does not use the downstream conclusion that `T` is type II. -/
 theorem escaping_typePA0_eq_empty_of_isTypeP1 [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G,
+      M ∈ OddOrder.GroupTheory.maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {M : Subgroup G} (hM : M ∈ OddOrder.GroupTheory.maximalSubgroups G)
     (data : OddOrder.GroupTheory.TypePData M)
     (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M) :
@@ -124,7 +126,7 @@ theorem escaping_typePA0_eq_empty_of_isTypeP1 [Finite G]
   · have hNmax : N ∈ OddOrder.GroupTheory.maximalSubgroups G := hNmem.1
     have hNI : OddOrder.GroupTheory.IsTypeI N :=
       (OddOrder.Peterfalvi.S10Interface.isTypeI_iff_isTypeF hG hNmax).mpr hNF
-    obtain ⟨fdata, -⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius hG hNmax hNI
+    obtain ⟨fdata, -⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius hG hnoV hNmax hNI
     have hker : fdata.typeI.typeF.H = OddOrder.BG.Ch3.S10.Msigma N := by
       rw [fdata.typeI.typeF.H_eq]
       exact hMFN
@@ -153,6 +155,8 @@ full TI statement.  This is Coq's `normedTI 'A0(M) G M` conclusion with no downs
 type-II assumption. -/
 theorem typePA0_isTISubset_of_isTypeP1 [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G,
+      M ∈ OddOrder.GroupTheory.maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {M : Subgroup G} (hM : M ∈ OddOrder.GroupTheory.maximalSubgroups G)
     (data : OddOrder.GroupTheory.TypePData M)
     (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M) :
@@ -165,7 +169,7 @@ theorem typePA0_isTISubset_of_isTypeP1 [Finite G]
   rw [full.H_eq_ftSupportKernel]
   exact OddOrder.Peterfalvi.S10.ftSupportKernel_eq_bot_of_not_escaping (by
     intro haesc
-    have hempty := escaping_typePA0_eq_empty_of_isTypeP1 hG hM data hP1
+    have hempty := escaping_typePA0_eq_empty_of_isTypeP1 hG hnoV hM data hP1
     rw [hempty] at haesc
     exact Set.notMem_empty a.1 haesc)
 
@@ -321,6 +325,8 @@ The Type-`P₁` escape analysis now supplies full `A₀(T)` normed-TI internally
 TI hypothesis or downstream type-II conclusion remains in the consumer interface. -/
 theorem tSideDadeMap_eq_induce_of_isTypeP1 [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G,
+      M ∈ OddOrder.GroupTheory.maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G))
     [Fintype G] [Invertible (Nat.card G : ℂ)]
     [Fintype ↥hyp.base.T] [Invertible (Nat.card ↥hyp.base.T : ℂ)]
@@ -331,7 +337,7 @@ theorem tSideDadeMap_eq_induce_of_isTypeP1 [Finite G]
       (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T) :
     tSideDadeMap hyp hG φ = ClassFunction.induce hyp.base.T φ :=
   tSideDadeMap_eq_induce_of_isTISubset hG hyp dataT hP1
-    (typePA0_isTISubset_of_isTypeP1 hG hyp.base.T_maximal dataT hP1) hφsupp
+    (typePA0_isTISubset_of_isTypeP1 hG hnoV hyp.base.T_maximal dataT hP1) hφsupp
 
 /-- Conjugate closures are disjoint when a prime divides every order on the left
 and no order on the right.
@@ -480,6 +486,8 @@ this reusable boundary theorem.  The Type-`P₁` TI producer is now proved above
 specialized theorem below discharges `hTI` and retains only the (13.18.a) β support. -/
 theorem tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_exact_supports [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G,
+      M ∈ OddOrder.GroupTheory.maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G))
     [fintypeG : Fintype G] [invertibleG : Invertible (Nat.card G : ℂ)]
     (dataT : OddOrder.GroupTheory.TypePData hyp.base.T)
@@ -531,7 +539,7 @@ theorem tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_exact_supports [Finite G]
         (OddOrder.Peterfalvi.S15.betaGrid hyp.base
           ⟨1, by have := hyp.base.three_le_p; omega⟩) := by
     rw [OddOrder.Peterfalvi.S15.tauSbetaGrid]
-    exact hyp.base.sInstance_dade0_eq_induce hG hbetaA0
+    exact hyp.base.sInstance_dade0_eq_induce hG hnoV hbetaA0
   rw [hTmap, hSmap]
   exact OddOrder.Peterfalvi.S15.inner_induce_induce_eq_zero_of_disjoint
     hφderiv hbeta
@@ -545,6 +553,8 @@ character-theoretic input for the S/T Dade cross term is Peterfalvi (13.18.a)'s 
 `β_S` support statement. -/
 theorem tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_beta_support [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G,
+      M ∈ OddOrder.GroupTheory.maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G))
     [fintypeG : Fintype G] [invertibleG : Invertible (Nat.card G : ℂ)]
     (dataT : OddOrder.GroupTheory.TypePData hyp.base.T)
@@ -560,8 +570,8 @@ theorem tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_beta_support [Finite G]
       (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T) :
     ClassFunction.inner (tSideDadeMap hyp hG φ)
       (OddOrder.Peterfalvi.S15.tauSbetaGrid hG hyp.base) = 0 :=
-  tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_exact_supports hG hyp dataT hP1
-    (typePA0_isTISubset_of_isTypeP1 hG hyp.base.T_maximal dataT hP1)
+  tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_exact_supports hG hnoV hyp dataT hP1
+    (typePA0_isTISubset_of_isTypeP1 hG hnoV hyp.base.T_maximal dataT hP1)
     hbeta hφsupp
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -572,6 +582,8 @@ The S-side exact support is supplied by the fully proved `(13.18.a)` theorem
 are therefore discharged. -/
 theorem tSideDadeMap_inner_tauSbetaGrid_eq_zero [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G,
+      M ∈ OddOrder.GroupTheory.maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G))
     [fintypeG : Fintype G] [invertibleG : Invertible (Nat.card G : ℂ)]
     (dataT : OddOrder.GroupTheory.TypePData hyp.base.T)
@@ -581,7 +593,7 @@ theorem tSideDadeMap_inner_tauSbetaGrid_eq_zero [Finite G]
       (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T) :
     ClassFunction.inner (tSideDadeMap hyp hG φ)
       (OddOrder.Peterfalvi.S15.tauSbetaGrid hG hyp.base) = 0 :=
-  tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_beta_support hG hyp dataT hP1
+  tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_beta_support hG hnoV hyp dataT hP1
     (OddOrder.Peterfalvi.S15.betaGrid_support hG hyp.base
       ⟨1, by have := hyp.base.three_le_p; omega⟩ (by norm_num))
     hφsupp

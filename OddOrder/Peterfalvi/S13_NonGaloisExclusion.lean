@@ -196,7 +196,8 @@ theorem caseA_u_eq_a_of_residual_not_orthogonal [Finite G]
     with hμdef
   have hμmem : μ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C := by
     rw [hμdef, hyp.base.muGrid_columnSum_eq_columnSum hG hG.odd ⟨1, hw2⟩]
-    exact columnSum_muColumnChar_mem_sOf_H0C hG hyp ⟨1, hw2⟩ hk1
+    exact columnSum_muColumnChar_mem_sOf_H0C_of_noncoherent hG hyp ⟨1, hw2⟩ hk1
+      (S_H0C_not_coherent_unconditional hG hyp) hyp.type_alt
   have hμc : μ.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
     Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hμmem
   have hIKF : ∀ ⦃x : ClassFunction ↥M ℂ⦄,
@@ -224,7 +225,8 @@ theorem caseA_u_eq_a_of_residual_not_orthogonal [Finite G]
     OddOrder.Peterfalvi.S11.caseA_exists_irreducible_qa hG
       (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief) caseA
   have hCU : hyp.C = OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup := by
-    rw [(core_structure hG hyp).2.2.2, hyp.Uprime_eq]
+    rw [(core_structure hG hyp (S_H0C_not_coherent_unconditional hG hyp)
+      hyp.type_alt).2.2.2, hyp.Uprime_eq]
     change derivedInG hyp.base.typeP.U = derivedInG hyp.s11Setup.typeP.U
     rw [hyp.setup_typeP_eq]
   have hlammem : lam ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C := by
@@ -246,8 +248,8 @@ theorem caseA_u_eq_a_of_residual_not_orthogonal [Finite G]
   -- ### 2. the (5.5) expansion and the `R(μ)`-family
   have hTsub : OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C ⊆
       OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime := hyp.sOf_H0C_subset_sOf_H0Cprime
-  obtain ⟨c⟩ := coherent_sOf_H0C hG hyp (S_H0C_not_coherent hG hyp)
-    (hyp.base.isTypeIIIorIV hG)
+  obtain ⟨c⟩ := coherent_sOf_H0C hG hyp (S_H0C_not_coherent_unconditional hG hyp)
+    hyp.type_alt
   obtain ⟨E, hEsub, hEeq⟩ :=
     coherent_extension_eq_sum_memberRFamily hG hyp hTsub c hμmem hμc
   obtain ⟨k, hk0, hμcol, himg⟩ :=
@@ -622,7 +624,8 @@ theorem caseA_u_eq_a_of_residual_not_orthogonal [Finite G]
       map_sub, map_zsmul, Int.cast_smul_eq_zsmul]
   -- source-side orthogonality `⟨φ, ψ⟩ = 0`
   have hζHC : ζ ∈ hyp.SOf hyp.HC := by
-    rw [← secondDerived_eq_HC hG hyp, hyp.SOf_secondDerived_eq hG]
+    rw [← secondDerived_eq_HC_of_noncoherent hG hyp
+      (S_H0C_not_coherent_unconditional hG hyp) hyp.type_alt, hyp.SOf_secondDerived_eq hG]
     exact ⟨hζS, hζirr, hζ1⟩
   have hζμ : ClassFunction.inner ζ μ = 0 :=
     SOf_HC_inner_sOf_H0C_eq_zero hyp hζHC hμmem
@@ -752,10 +755,10 @@ theorem not_cliffordCaseA_of_hypothesis [Finite G]
       = hyp.base.typeP.H
         ⊔ (hyp.base.typeP.U ⊓ Subgroup.centralizer (hyp.base.typeP.H : Set G)) :=
     secondDerived_eq_fitting_of_base hG hyp.base hyp.type_alt
-      (fun s13 => S_H0C_not_coherent hG s13)
+      (fun s13 => S_H0C_not_coherent_unconditional hG s13)
   have hHcard : Nat.card ↥hyp.base.typeP.H = hyp.base.w2 ^ hyp.base.w1 :=
     card_H_eq_of_base hG hyp.base hyp.type_alt
-      (fun s13 => S_H0C_not_coherent hG s13)
+      (fun s13 => S_H0C_not_coherent_unconditional hG s13)
   -- (11.8): `ζ` and the grid non-orthogonality, via the unconditional (11.3)
   obtain ⟨ζ, hζS, hζirr, hζ1, h118⟩ :=
     exists_zeta_residual_not_orthogonal_H0C_of_refuter hG hyp.base hyp.type_alt hM2 hHcard
@@ -861,13 +864,15 @@ theorem U_isCyclic_of_hypothesis [Finite G]
     exact congrArg Subtype.val h1
   -- `↑x ∈ cSub = C = U'` ((11.6)/(11.7))
   have hxC : (x : G) ∈ hyp.C := by
-    rw [C_eq_cSub hG hyp]
+    rw [C_eq_cSub_of_noncoherent hG hyp (S_H0C_not_coherent_unconditional hG hyp)
+      hyp.type_alt]
     exact Subgroup.mem_map.mpr
       ⟨(hyp.s11Setup.typeP.U.subgroupOf
           (hyp.s11Setup.typeP.U ⊔ hyp.s11Setup.typeP.W1)).subtype (e x),
         Subgroup.mem_map.mpr ⟨e x, MonoidHom.mem_ker.mpr hone, rfl⟩, rfl⟩
   have hCU' : hyp.C = derivedInG hyp.s11Setup.typeP.U := by
-    rw [(core_structure hG hyp).2.2.2, hyp.Uprime_eq]
+    rw [(core_structure hG hyp (S_H0C_not_coherent_unconditional hG hyp)
+      hyp.type_alt).2.2.2, hyp.Uprime_eq]
     rw [hyp.setup_typeP_eq]
   rw [hCU'] at hxC
   -- pull back through the injective `U.subtype`: `derivedInG U = (commutator ↥U).map U.subtype`
@@ -1009,7 +1014,8 @@ theorem not_isTypeIV_of_mem_maximalSubgroups {G : Type*} [Group G] [Finite G]
   haveI : NeZero (Nat.card (s13.base.toHypothesis46 hG hG.odd).W1) := ⟨Nat.card_pos.ne'⟩
   exact not_isTypeIV_of_hypothesis hG s13 hMIV
 
-/-- **Peterfalvi (11.9.c), the universal Type-IV exclusion** (companion of `no_typeV_maximal`,
+/-- **Peterfalvi (11.9.c), the universal Type-IV exclusion** (companion of
+`no_typeV_maximal_unconditional`,
 existential form for the FT spine). -/
 theorem no_typeIV_maximal {G : Type*} [Group G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) :

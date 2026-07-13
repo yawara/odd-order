@@ -102,3 +102,11 @@ engage する** (hub が先に裁定・実施しても異存なし)。
 
 **→ lane a: step 2 (S10 の `cover_subset_kernels` field 削除 + producer sorry-free 完結) が
 unblock。**完了後この issue を close。
+
+## ✅ lane-a step 2 完了 → CLOSE (2026-07-13, commit f9f2f2df)
+
+`cover_subset_kernels` field を削除 (外部 consumer 0 を grep 再確認)。producer branch は
+`Or.inl ⟨cover_nonidentity, pairwise_disjoint_thickened⟩` で実証明完結 (bare sorry −1、
+S10_MinimalSimpleStructure sorry 0)。collapse lemma 2 本 (`Rsub_eq_bot_of_centralizer_le` /
+`Mtilde_eq_sigmaSharp_of_forall_centralizer_le`) は S14 consumer が引き続き cite。
+full build green (4183 jobs)。migration 1→2 完了につき close。

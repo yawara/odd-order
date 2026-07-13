@@ -33,10 +33,12 @@ Character-theoretic input of the (13.3.c) column pin — the S15-world port of
 so `τ₁γ = τγ` (Dade `= Ind`), and expanding `⟨τ₁γ, τ(μ_j − δζ)⟩ = ⟨γ, ·⟩` against the column
 identity leaves only `ξ(1)·⟨τ₁μ_j, ∑η⟩`, pinning it to `q`. -/
 theorem Hypothesis.muColumn_tau1_inner_etaColumn [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))
     (j : Fin hyp.p) (hj : j ≠ ⟨0, hyp.p_prime.pos⟩) :
-    ClassFunction.inner (hyp.tau1S_ofHonest hG chief (∑ i : Fin hyp.q, hyp.mu i j))
+    ClassFunction.inner (hyp.tau1S_ofHonest hG hnoV chief (∑ i : Fin hyp.q, hyp.mu i j))
       (∑ i : Fin hyp.q, hyp.eta i j) = (hyp.q : ℂ) :=
   sorry
 
@@ -50,21 +52,23 @@ orthonormal grids `muColumn_inner_self`/`etaColumn_inner_self`) and `⟨τ₁μ_
 This materializes the (13.3.c)-main branch of the `CharacterDegreeData.mu_tau1_formula` /
 `mu_col_tau1_eta_col_one` fields (issue 2035). -/
 theorem Hypothesis.tau1S_ofHonest_muColumn_eq_etaColumn [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))
     (j : Fin hyp.p) (hj : j ≠ ⟨0, hyp.p_prime.pos⟩) :
-    hyp.tau1S_ofHonest hG chief (∑ i : Fin hyp.q, hyp.mu i j)
+    hyp.tau1S_ofHonest hG hnoV chief (∑ i : Fin hyp.q, hyp.mu i j)
       = ∑ i : Fin hyp.q, hyp.eta i j := by
   have hmem : (∑ i : Fin hyp.q, hyp.mu i j) ∈
       OddOrder.Peterfalvi.S07.zSpan (hyp.mkSection11CharacterDataS_honest hG chief).S :=
     Submodule.subset_span
       (OddOrder.Peterfalvi.S11.sOf_subset_sSet _ _ (hyp.mu_colSum_mem_sOf_H0 hG chief j hj))
-  have hxx : ClassFunction.inner (hyp.tau1S_ofHonest hG chief (∑ i : Fin hyp.q, hyp.mu i j))
-      (hyp.tau1S_ofHonest hG chief (∑ i : Fin hyp.q, hyp.mu i j)) = (hyp.q : ℂ) := by
+  have hxx : ClassFunction.inner (hyp.tau1S_ofHonest hG hnoV chief (∑ i : Fin hyp.q, hyp.mu i j))
+      (hyp.tau1S_ofHonest hG hnoV chief (∑ i : Fin hyp.q, hyp.mu i j)) = (hyp.q : ℂ) := by
     simp only [Hypothesis.tau1S_ofHonest]
-    rw [(hyp.coherent_H0Cprime_S hG chief).extension_inner_eq _ _ hmem hmem,
+    rw [(hyp.coherent_H0Cprime_S hG hnoV chief).extension_inner_eq _ _ hmem hmem,
       hyp.muColumn_inner_self]
   exact inner_pin_eq hxx (hyp.etaColumn_inner_self j)
-    (hyp.muColumn_tau1_inner_etaColumn hG chief j hj) (by simp)
+    (hyp.muColumn_tau1_inner_etaColumn hG hnoV chief j hj) (by simp)
 
 end OddOrder.Peterfalvi.S15

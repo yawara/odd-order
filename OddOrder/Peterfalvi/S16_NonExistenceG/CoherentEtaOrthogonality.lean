@@ -134,7 +134,10 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 `p, q ∈ σ(S) ∪ σ(T)` are disjoint from `σ(M)` for non-conjugate maximals (`nc.not_conj`).
 Deep named §13/BG §10 obligation. -/
 theorem card_kernel_coprime_pq [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    {hyp : Hypothesis (G := G)}
     {M : Subgroup G} (hMmax : M ∈ maximalSubgroups G) (dataM : TypeICoherent78Data M) :
     Nat.Coprime (Nat.card ↥dataM.kernel) (hyp.base.p * hyp.base.q) := by
   classical
@@ -142,7 +145,7 @@ theorem card_kernel_coprime_pq [Finite G]
   have hMI : IsTypeI M := ⟨dataM.typeIHyp.typeI⟩
   have hSII : IsTypeII hyp.base.S :=
     OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.base.S_maximal hyp.base.S_typeP2
-  have hTII : IsTypeII hyp.base.T := T_typeII hG hyp
+  have hTII : IsTypeII hyp.base.T := T_typeII hG hnoV hncH0C hyp
   -- `M_F = M_σ`, `S_σ = P`, `T_σ = Q`
   have hMF : dataM.kernel = OddOrder.BG.Ch3.S10.Msigma M := by
     change dataM.typeIHyp.typeI.typeF.H = _
@@ -209,7 +212,7 @@ theorem dadeSupport_not_coprime_card_kernel [Finite G]
   obtain ⟨a, h, hh, hconj⟩ := hy
   -- `a.1 ∈ M_F`, `a.1 ≠ 1` (`A = typeIA = M_F ∖ {1}`)
   have ha2 : a.1 ∈ (dataM.kernel : Set G) \ {1} := by
-    rw [← dataM.typeIA_eq_sharp hG]; exact a.2
+    rw [← dataM.typeIA_eq_sharp]; exact a.2
   have haK : a.1 ∈ dataM.kernel := ha2.1
   have hane : a.1 ≠ 1 := fun h1 => ha2.2 (Set.mem_singleton_iff.mpr h1)
   have hord_ne : orderOf a.1 ≠ 1 := fun h1 => hane (orderOf_eq_one_iff.mp h1)
@@ -257,7 +260,10 @@ is coprime to `|M_F|` (`card_kernel_coprime_pq`); but every element of `Ã(M)` i
 `π(M_F)`-singular (`dadeSupport_not_coprime_card_kernel`), a contradiction.  The two named
 ingredients are the genuine BG §10-level σ-decomposition inputs. -/
 theorem mSide_dadeSupport_avoids_regular [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    {hyp : Hypothesis (G := G)}
     {M : Subgroup G} (hMmax : M ∈ maximalSubgroups G) (dataM : TypeICoherent78Data M) :
     ∀ x ∈ conjClassSet
         ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G))),
@@ -303,7 +309,7 @@ theorem mSide_dadeSupport_avoids_regular [Finite G]
   have hxord : orderOf x ∣ hyp.base.p * hyp.base.q := hordx ▸ hword
   -- `orderOf x` is coprime to `|M_F|`, contradicting `π(M_F)`-singularity of `Ã(M)`
   have hcop : Nat.Coprime (orderOf x) (Nat.card ↥dataM.kernel) :=
-    Nat.Coprime.coprime_dvd_left hxord (card_kernel_coprime_pq hG hMmax dataM).symm
+    Nat.Coprime.coprime_dvd_left hxord (card_kernel_coprime_pq hG hnoV hncH0C hMmax dataM).symm
   exact dadeSupport_not_coprime_card_kernel hG dataM hdade hcop
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -328,7 +334,10 @@ This is the choice-free synchronization needed by (14.11.2): it deliberately ass
 the grid coefficients, not equality of the two `beta` class functions (which need not hold for
 different distinguished family members). -/
 theorem typeIGrid_betaL_inner_eta_eq_h78_beta [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    {hyp : Hypothesis (G := G)}
     {M : Subgroup G} (hMmax : M ∈ maximalSubgroups G) (dataM : TypeICoherent78Data M)
     (grid : OddOrder.Peterfalvi.S15.TypeIOrthogonalityGridData
       hyp.base dataM)
@@ -356,7 +365,7 @@ theorem typeIGrid_betaL_inner_eta_eq_h78_beta [Finite G]
     rw [dataM.deg0, grid.phi_degree_eq_e, he]
   -- Their difference lies in the supported coherent lattice, so `tau = tau1` on it.
   have hsharp : dataM.typeIHyp.ambientA = (dataM.kernel : Set G) \ {1} := by
-    simpa [OddOrder.Peterfalvi.S14.Hypothesis.ambientA] using dataM.typeIA_eq_sharp hG
+    simpa [OddOrder.Peterfalvi.S14.Hypothesis.ambientA] using dataM.typeIA_eq_sharp
   have hsupp : (dataM.zeta 0 - grid.phi).support ⊆ dataM.typeIHyp.A := by
     simpa [OddOrder.Peterfalvi.S14.Hypothesis.A,
       OddOrder.Peterfalvi.S14.Hypothesis.ambientA] using
@@ -414,7 +423,7 @@ theorem typeIGrid_betaL_inner_eta_eq_h78_beta [Finite G]
         change ClassFunction.induce dataM.kernelIn
             (dataM.θ dataM.ind1H : ClassFunction _ ℂ) = _
         rw [dataM.triv, IrreducibleCharacter.coe_trivialIrreducibleCharacter]
-  have hDadeAvoid := mSide_dadeSupport_avoids_regular (hyp := hyp) hG hMmax dataM
+  have hDadeAvoid := mSide_dadeSupport_avoids_regular (hyp := hyp) hG hnoV hncH0C hMmax dataM
   have hzero_ne : (0 : Fin (dataM.n + 1)) ≠ (dataM.h78 hG).ind1H := by
     rw [dataM.h78_ind1H_eq]
     exact Ne.symm dataM.ind1H_ne_zero
