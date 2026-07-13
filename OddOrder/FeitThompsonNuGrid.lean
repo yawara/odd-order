@@ -78,6 +78,25 @@ theorem colT_zero : colT hG mp tp ⟨0, tp.q_prime.pos⟩ = 1 := by
   simp [colT, eqQ_zero, Peterfalvi.S05.TICyclicHypothesis.omegaProdChar]
   rfl
 
+/-- Column-index negation is inversion of the transported T-side column dual. -/
+theorem colT_finNeg (i : Fin tp.q) :
+    colT hG mp tp (OddOrder.Peterfalvi.S15.finNeg tp.q_prime.pos i)
+      = (colT hG mp tp i)⁻¹ := by
+  have heq :
+      eqQ hG mp tp (OddOrder.Peterfalvi.S15.finNeg tp.q_prime.pos i)
+        = ⟨(Nat.card ↥(mp.certainTypeS hG).W1 - ((eqQ hG mp tp i : Fin _) : ℕ))
+              % Nat.card ↥(mp.certainTypeS hG).W1,
+            Nat.mod_lt _ (Nat.pos_of_ne_zero (NeZero.ne _))⟩ := by
+    apply Fin.ext
+    simp only [eqQ, finCongr_apply, Fin.val_cast, OddOrder.Peterfalvi.S15.finNeg]
+    rw [cardCertainTypeS_W1 hG mp tp]
+  rw [colT, colT, heq,
+    (mp.certainTypeS hG).w1CharEquiv_finNeg (eqQ hG mp tp i)]
+  ext w
+  simp [OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaProdChar,
+    Units.val_inv_eq_inv_val]
+  exact Units.val_inv_eq_inv_val _
+
 /-- `rowDualT j` agrees with the S-side dual on a transported `mp.Kstar`-element. -/
 theorem rowDualT_apply_mem_Kstar (j : Fin tp.p) (w : ↥tp.W)
     (hw : (w : G) ∈ mp.Kstar) :
@@ -97,6 +116,13 @@ theorem rowDualT_zero : rowDualT hG mp tp ⟨0, tp.p_prime.pos⟩ = 1 := by
     (mp.certainTypeS hG).sdiffTICyclicHypothesis.omegaProdChar_one_one,
     MonoidHom.one_comp, MonoidHom.one_comp]
 
+/-- Row-index negation is inversion of the transported T-side row dual. -/
+theorem rowDualT_finNeg (j : Fin tp.p) :
+    rowDualT hG mp tp (OddOrder.Peterfalvi.S15.finNeg tp.p_prime.pos j)
+      = (rowDualT hG mp tp j)⁻¹ := by
+  rw [rowDualT, rowDualT, chi2enum_finNeg hG mp tp j]
+  ext w
+  simp [OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaProdChar]
 variable [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)]
 
 /-- T-side row index corresponding to `rowDualT`. -/
@@ -108,6 +134,16 @@ theorem rowT_zero : rowT hG mp tp ⟨0, tp.p_prime.pos⟩ = 0 := by
   rw [rowT, rowDualT_zero]
   exact (mp.certainTypeT hG).w1CharEquiv.symm_apply_eq.mpr
     ((mp.certainTypeT hG).w1CharEquiv_zero).symm
+
+/-- The transported row enumeration intertwines `finNeg` with the certain-type `rowInv`. -/
+theorem rowT_finNeg_eq_rowInv (j : Fin tp.p) :
+    rowT hG mp tp (OddOrder.Peterfalvi.S15.finNeg tp.p_prime.pos j)
+      = OddOrder.Peterfalvi.S06.rowInv (mp.certainTypeT hG) (rowT hG mp tp j) := by
+  apply (mp.certainTypeT hG).w1CharEquiv.injective
+  rw [OddOrder.Peterfalvi.S06.w1CharEquiv_rowInv, rowT,
+    Equiv.apply_symm_apply, rowDualT_finNeg hG mp tp j]
+  congr 1
+  rw [rowT, Equiv.apply_symm_apply]
 
 /-- The shared `ω`-grid expressed through `certainTypeT`. -/
 noncomputable def omegaT (i : Fin tp.q) (j : Fin tp.p) : ClassFunction ↥tp.W ℂ :=
@@ -453,6 +489,22 @@ theorem nuT_diff_support (Tdata : TypePData mp.T) (_hU : Tdata.U = tp.V)
   rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
   exact OddOrder.Peterfalvi.S06.certainType_diff_supp_subset_A0
     (hyp46TmpCore hG mp tp Tdata hW1 hW2) hχi hχk (rowT hG mp tp j) hdeg hz
+
+/-- **Peterfalvi (4.9.a), T-side**: complex conjugation pairs the canonical grid by
+`ν̄_{ij} = ν_{-i,-j}`. -/
+theorem nuT_conj (i : Fin tp.q) (j : Fin tp.p) :
+    (nuT hG mp tp i j).conj
+      = nuT hG mp tp (OddOrder.Peterfalvi.S15.finNeg tp.q_prime.pos i)
+          (OddOrder.Peterfalvi.S15.finNeg tp.p_prime.pos j) := by
+  have hg2 := congrArg
+    (fun χ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥mp.T =>
+      (χ : ClassFunction ↥mp.T ℂ))
+    (OddOrder.Peterfalvi.S06.certainType_mu_conj_eq (mp.certainTypeT hG)
+      (colT hG mp tp i) (rowT hG mp tp j))
+  simp only [IrreducibleCharacter.galoisMap_apply_coe] at hg2
+  rw [nuT, nuT, colT_finNeg hG mp tp i, rowT_finNeg_eq_rowInv hG mp tp j,
+    ClassFunction.conj_eq_mapRingEquiv_conjAe]
+  exact hg2
 
 /-- **Peterfalvi (9.8)/(9.11), T-side reverse dichotomy**: every reducible member of a
 kernel-filter family over `T'` is a non-anchor canonical `ν`-row sum. -/
