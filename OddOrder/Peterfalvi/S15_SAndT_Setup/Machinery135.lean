@@ -191,6 +191,48 @@ theorem Hypothesis.eta_orthonormal [Finite G] (hyp : Hypothesis (G := G))
   rw [hyp.eta_eq_tau_omega, hyp.eta_eq_tau_omega, hyp.tau3_isometry.inner_eq,
     hyp.omega_orthonormal]
 
+open scoped FiniteInduce in
+/-- **The `μ`-column sum has squared norm `q`** (issue 2035, (13.3.c) pin step 2): the reducible
+prime-TI character `μ_j = ∑_i μ_{ij}` is a sum of `q` orthonormal irreducibles (`mu_orthonormal`),
+so `⟨μ_j, μ_j⟩ = q`.  Through the coherence isometry (`extension_inner_eq`) this pins
+`‖τ₁ μ_j‖² = q`, one of the two positive-definiteness inputs of the (13.3.c) column pin. -/
+theorem Hypothesis.muColumn_inner_self [Finite G] (hyp : Hypothesis (G := G)) (j : Fin hyp.p) :
+    ClassFunction.inner (∑ i : Fin hyp.q, hyp.mu i j) (∑ i : Fin hyp.q, hyp.mu i j)
+      = (hyp.q : ℂ) := by
+  rw [OddOrder.RepresentationTheory.inner_sum_left]
+  have hrow : ∀ i : Fin hyp.q,
+      ClassFunction.inner (hyp.mu i j) (∑ k : Fin hyp.q, hyp.mu k j) = (1 : ℂ) := by
+    intro i
+    rw [OddOrder.RepresentationTheory.inner_sum_right,
+      Finset.sum_eq_single i
+        (fun k _ hki => by rw [hyp.mu_orthonormal i k j j, if_neg (fun h => hki h.1.symm)])
+        (fun h => absurd (Finset.mem_univ i) h),
+      hyp.mu_orthonormal i i j j]
+    simp
+  rw [Finset.sum_congr rfl fun i _ => hrow i, Finset.sum_const, Finset.card_univ,
+    Fintype.card_fin, nsmul_eq_mul, mul_one]
+
+open scoped FiniteInduce in
+/-- **The `η`-column sum has squared norm `q`** (issue 2035, (13.3.c) pin step 1): the aligned
+grid column `∑_i η_{ij}` is a sum of `q` orthonormal virtual characters (`eta_orthonormal`), so
+`⟨∑_i η_{ij}, ∑_i η_{ij}⟩ = q`.  The other positive-definiteness input of the (13.3.c) column
+pin `τ₁ μ_j = δ_j·∑_i η_{ij}`. -/
+theorem Hypothesis.etaColumn_inner_self [Finite G] (hyp : Hypothesis (G := G)) (j : Fin hyp.p) :
+    ClassFunction.inner (∑ i : Fin hyp.q, hyp.eta i j) (∑ i : Fin hyp.q, hyp.eta i j)
+      = (hyp.q : ℂ) := by
+  rw [OddOrder.RepresentationTheory.inner_sum_left]
+  have hrow : ∀ i : Fin hyp.q,
+      ClassFunction.inner (hyp.eta i j) (∑ k : Fin hyp.q, hyp.eta k j) = (1 : ℂ) := by
+    intro i
+    rw [OddOrder.RepresentationTheory.inner_sum_right,
+      Finset.sum_eq_single i
+        (fun k _ hki => by rw [hyp.eta_orthonormal i k j j, if_neg (fun h => hki h.1.symm)])
+        (fun h => absurd (Finset.mem_univ i) h),
+      hyp.eta_orthonormal i i j j]
+    simp
+  rw [Finset.sum_congr rfl fun i _ => hrow i, Finset.sum_const, Finset.card_univ,
+    Fintype.card_fin, nsmul_eq_mul, mul_one]
+
 /-- **Peterfalvi (13.4), inner-product endgame** (abstract bookkeeping, issue 9013 追記⁶ core (d)):
 for an orthonormal grid `η` and vectors `λ°, θ°` orthogonal to each other and to every grid
 member, `⟨λ° − δ·∑ᵢ η_{is}, θ° − δ'·∑ⱼ η_{rj}⟩ = δ·δ' ≠ 0` for signs `δ, δ' = ±1` — the only
