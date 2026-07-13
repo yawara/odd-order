@@ -307,6 +307,8 @@ theorem key_inequality_of_caseB_outputs {hyp : Hypothesis (G := G)}
 /-- **Peterfalvi (14.8)**: the strict exponential inequality and its
 character-theoretic corollary comparing `(v - 1) / p` and `(u - 1) / q`. -/
 theorem key_inequality [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G)) :
     hyp.base.q ^ (hyp.base.p + 1) > hyp.base.p ^ (hyp.base.q + 1) ∧
       (((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
@@ -314,7 +316,7 @@ theorem key_inequality [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   -- (14.8) is the proven arithmetic consumer `key_inequality_of_caseB_outputs`
   -- fed by the (14.4) T-side and (14.6) S-side case-(9.7.b) data.  The S-side
   -- data `caseB_for_S` needs an `LHypothesis`, supplied by `exists_LHypothesis`.
-  obtain ⟨Ldata⟩ := exists_LHypothesis _hG hyp
+  obtain ⟨Ldata⟩ := exists_LHypothesis _hG hnoV hncH0C hyp
   exact key_inequality_of_caseB_outputs (caseB_for_T _hG hyp) (caseB_for_S _hG hyp Ldata)
 
 end OddOrder.Peterfalvi.S16

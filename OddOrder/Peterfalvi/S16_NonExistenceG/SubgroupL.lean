@@ -45,11 +45,14 @@ non-existence argument, so the carrier holds exactly the structural data the pro
 Placed here (ahead of the (14.4)--(14.16) lemmas) so the mid-file numeric lemmas can construct
 an `LHypothesis` to feed the S-side case-(9.7.b) data `caseB_for_S`. -/
 theorem exists_LHypothesis [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    (hyp : Hypothesis (G := G)) :
     Nonempty (LHypothesis hyp) := by
   obtain ⟨bdata, _⟩ := OddOrder.Peterfalvi.S15.basic_structure _hG hyp.base
   have hSII : IsTypeII hyp.base.S := bdata.q_lt_p_forces_typeII hyp.q_lt_p
-  have hTII : IsTypeII hyp.base.T := T_typeII _hG hyp
+  have hTII : IsTypeII hyp.base.T := T_typeII _hG hnoV hncH0C hyp
   obtain ⟨tdata⟩ := hSII
   have hNUS : ¬ Subgroup.normalizer (hyp.base.U : Set G) ≤ hyp.base.S :=
     OddOrder.Peterfalvi.S15.not_normalizer_U_le_S _hG hyp.base tdata
@@ -59,7 +62,7 @@ theorem exists_LHypothesis [Finite G]
   have hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.base.T :=
     ((OddOrder.BG.Ch4.S16.proposition_type_classification _hG hyp.base.T_maximal).2.1).mp hTII
   obtain ⟨typeI_data, _, _⟩ :=
-    OddOrder.Peterfalvi.S15.typeII_overNormalizer_frobenius _hG hyp.base ⟨tdata⟩ hTII hT2
+    OddOrder.Peterfalvi.S15.typeII_overNormalizer_frobenius _hG hnoV hyp.base ⟨tdata⟩ hTII hT2
       hyp.q_lt_p hNUS
   exact ⟨⟨typeI_data.L, typeI_data.H, typeI_data.L_maximal, typeI_data.normalizer_U_le_L,
     typeI_data.H_eq_LF, typeI_data, rfl, rfl, typeI_data.complement_card_eq_pq⟩⟩

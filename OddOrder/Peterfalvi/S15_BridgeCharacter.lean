@@ -819,6 +819,7 @@ Remaining to discharge the `sorry` (rigidity engine now available): `X := τ_S(�
 `μ_{0j}|_V = ω`-value (Coq `prTIirr_id`, prime-`TI` theory — not yet ported, cf. 9014); then
 `X = η_{0j} − η_{01}` by `S16.eta_diff_rigidity` (Peterfalvi (3.8), issue 9076 piece 4b). -/
 theorem tauS_mu_row0_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (_hj : (j : ℕ) ≠ 0) :
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
         ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG))
@@ -895,7 +896,7 @@ theorem tauS_mu_row0_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           - ((1 : ℤ) : ℂ) • (hyp.eta ⟨0, hyp.q_prime.pos⟩ j
               - hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)) x = 0 := by
       intro x hx
-      have hv := hyp.tauS_mu_row0_vanish_on_V hG j _hj x hx
+      have hv := hyp.tauS_mu_row0_vanish_on_V hG hnoV j _hj x hx
       simpa [hD] using hv
     -- (3.8) rigidity: a norm-`2` `ZIrr` character agreeing with `η_{0j} − η_{0,#1}` on `V` is it.
     have hrig := OddOrder.Peterfalvi.S16.eta_diff_rigidity hyp hXZ hX2
@@ -914,6 +915,7 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 `R`-family sums over a μ-column: `τ_S(μ_j − μ̄_j) = ∑ᵢ τ_S(μ_{ij} − μ_{ik}) = ∑ᵢ(η_{ij} − η_{ik})`
 (for the two column indices `j ≠ k` of `μ_j`, `μ̄_j`). -/
 theorem tauS_mu_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (i : Fin hyp.q) {j1 j2 : Fin hyp.p}
     (hj1 : j1 ≠ ⟨0, hyp.p_prime.pos⟩) (hj2 : j2 ≠ ⟨0, hyp.p_prime.pos⟩) (hj12 : j1 ≠ j2) :
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
@@ -953,7 +955,7 @@ theorem tauS_mu_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (D (hyp.mu i j1 - hyp.mu i j2)
         - ((1 : ℤ) : ℂ) • (hyp.eta i j1 - hyp.eta i j2)) x = 0 := by
     intro x hx
-    have hv := hyp.tauS_mu_vanish_on_V hG i hj1 hj2 x hx
+    have hv := hyp.tauS_mu_vanish_on_V hG hnoV i hj1 hj2 x hx
     simpa [hD] using hv
   -- (3.8) rigidity: a norm-`2` `ZIrr` character agreeing with `η_{i,j₁} − η_{i,j₂}` on `V` is it.
   have hrig := OddOrder.Peterfalvi.S16.eta_diff_rigidity hyp hXZ hX2 i hj12
@@ -976,12 +978,13 @@ Proof (sorry-free glue, one isolated obligation): `τ_S(β_j) − τ_S(β_{#1}) 
 η_{01} − η_{0j}` by the (4.8)/(5.3) cross-relation `tauS_mu_row0_cross`.  Cancelling the `−1_G`'s and
 `abel` closes the goal. -/
 theorem gammaGrid_defGamma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
         ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) (betaGrid hyp j)
         - OddOrder.Peterfalvi.S09.Hypothesis71.constOne G + hyp.eta ⟨0, hyp.q_prime.pos⟩ j
       = GammaGrid hG hyp := by
-  have hcross := tauS_mu_row0_cross hG hyp j hj
+  have hcross := tauS_mu_row0_cross hG hnoV hyp j hj
   have hbeta : betaGrid hyp j - betaGrid hyp ⟨1, by have := hyp.three_le_p; omega⟩
       = -(hyp.mu ⟨0, hyp.q_prime.pos⟩ j
           - hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩) := by
@@ -1074,7 +1077,9 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 
 The **single** remaining gate is `betaGrid_A0_support` (the (13.18.a) `'A0`-support). -/
 private theorem gammaGrid_orthogonal_one_aux [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G)) :
     ClassFunction.inner (GammaGrid hG hyp)
       (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G) = 0 := by
   classical
@@ -1122,7 +1127,7 @@ private theorem gammaGrid_orthogonal_one_aux [Finite G]
     have hbridge : tauSbetaGrid hG hyp
         = ClassFunction.induce hyp.S (betaGrid hyp ⟨1, by have := hyp.three_le_p; omega⟩) := by
       rw [tauSbetaGrid]
-      exact hyp.sInstance_dade0_eq_induce hG
+      exact hyp.sInstance_dade0_eq_induce hG hnoV
         (betaGrid_A0_support hG hyp ⟨1, by have := hyp.three_le_p; omega⟩ (by norm_num))
     rw [hbridge, ClassFunction.inner_induce_eq_inner_restrict]
     have hres : ClassFunction.restrict hyp.S
@@ -1154,12 +1159,13 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 that reconciles the caller's `Fintype G`/`Invertible (Nat.card G : ℂ)` instances with the
 `FiniteInduce`-scoped ones the core proof uses (both are `Subsingleton`). -/
 theorem gammaGrid_orthogonal_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) :
     ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
       ClassFunction.inner (GammaGrid hG hyp)
         (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G) = 0 := by
   intro _ _
-  convert gammaGrid_orthogonal_one_aux hG hyp using 2 <;> exact Subsingleton.elim _ _
+  convert gammaGrid_orthogonal_one_aux hG hnoV hyp using 2 <;> exact Subsingleton.elim _ _
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.18.c)** `Γ` is real: `Γ.conj = Γ` — fully proven (Coq `GammaReal`,
@@ -1172,6 +1178,7 @@ Conjugation commutes with the Dade lift on `A₀(S)`-supported inputs
 `Γ̄ = τ_S(β_{−#1}) − 1_G + η_{0,−#1}`, which is `Γ` by the proven `j`-independence
 `gammaGrid_defGamma` at the conjugate column `−#1 = p−1 ≠ 0`. -/
 theorem gammaGrid_real [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) :
     (GammaGrid hG hyp).conj = GammaGrid hG hyp := by
   classical
@@ -1215,7 +1222,7 @@ theorem gammaGrid_real [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       + hyp.eta ⟨0, hyp.q_prime.pos⟩ j1 from rfl,
     ClassFunction.conj_add, ClassFunction.conj_sub, hDconj, hconst,
     hyp.eta_conj ⟨0, hyp.q_prime.pos⟩ j1, hneg0]
-  exact gammaGrid_defGamma hG hyp j' hj'0
+  exact gammaGrid_defGamma hG hnoV hyp j' hj'0
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **The (13.18) residual `Γ` is a virtual character**: each constituent of
@@ -1225,6 +1232,7 @@ bridge (`sInstance_dade0_eq_induce` + `induce_mem_ZIrr`, with `β_{#1} ∈ ℤ[I
 character, and `η_{01} = τ₃(ω_{01})` (`tau3_mem_ZIrr` + `omega_mem_ZIrr`).  Feeds the
 integrality of `⟨Γ, η_{01}⟩` in the (13.18.d) bound. -/
 theorem gammaGrid_mem_ZIrr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) :
     GammaGrid hG hyp ∈ OddOrder.RepresentationTheory.ZIrr G := by
   classical
@@ -1243,7 +1251,7 @@ theorem gammaGrid_mem_ZIrr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (OddOrder.RepresentationTheory.IsIrreducibleCharacter.mem_ZIrr htriv)
   have hTZ : tauSbetaGrid hG hyp ∈ OddOrder.RepresentationTheory.ZIrr G := by
     rw [tauSbetaGrid,
-      hyp.sInstance_dade0_eq_induce hG (betaGrid_A0_support hG hyp j1 hj1ne)]
+      hyp.sInstance_dade0_eq_induce hG hnoV (betaGrid_A0_support hG hyp j1 hj1ne)]
     exact OddOrder.RepresentationTheory.ClassFunction.induce_mem_ZIrr _ hβZ
   rw [show GammaGrid hG hyp = tauSbetaGrid hG hyp
       - OddOrder.Peterfalvi.S09.Hypothesis71.constOne G
@@ -1265,7 +1273,9 @@ on `A₀(S)`-support + `betaGrid_norm`); peel `1_G` (`⟨Γ,1⟩ = 0`, `⟨η_{0
 `η̄_{01} = η_{0,−1} ⊥ η_{01}`; drop `‖X₁‖² ≥ 0` and close with the integer inequality
 `a² + (a−1)² ≥ 1`. -/
 private theorem gammaGrid_Y_norm_bound_aux [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     (X Y : ClassFunction G ℂ) (defXY : GammaGrid hG hyp = X + Y)
     (oXY : ClassFunction.inner X Y = 0)
     (oYeta : ∀ (i : Fin hyp.q) (k : Fin hyp.p), ClassFunction.inner Y (hyp.eta i k) = 0) :
@@ -1323,7 +1333,7 @@ private theorem gammaGrid_Y_norm_bound_aux [Finite G]
     exact h
   have hΓone : ClassFunction.inner (GammaGrid hG hyp)
       (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G) = 0 :=
-    gammaGrid_orthogonal_one hG hyp
+    gammaGrid_orthogonal_one hG hnoV hyp
   -- Pythagoras helper
   have pyth : ∀ A B : ClassFunction G ℂ, ClassFunction.inner A B = 0 →
       ClassFunction.inner (A + B) (A + B)
@@ -1368,7 +1378,7 @@ private theorem gammaGrid_Y_norm_bound_aux [Finite G]
     rw [hη01def, hyp.eta_eq_tau_omega]
     exact hyp.tau3_mem_ZIrr _ (hyp.omega_mem_ZIrr i0 j1)
   obtain ⟨m, hm⟩ := OddOrder.RepresentationTheory.ClassFunction.inner_mem_ZIrr_int
-    (gammaGrid_mem_ZIrr hG hyp) hηZ
+    (gammaGrid_mem_ZIrr hG hnoV hyp) hηZ
   -- `⟨X, η_{01}⟩ = m` and `⟨X, η_{0,−1}⟩ = m` (the latter via `Γ` real + conj-pair)
   have hXη : ClassFunction.inner X η01 = (m : ℂ) := by
     have h := congrArg (fun φ : ClassFunction G ℂ => ClassFunction.inner φ η01) defXY
@@ -1377,7 +1387,7 @@ private theorem gammaGrid_Y_norm_bound_aux [Finite G]
     rw [oY01, add_zero] at h
     rw [← h, hm]
   have hΓη' : ClassFunction.inner (GammaGrid hG hyp) η01' = (m : ℂ) := by
-    rw [← hconj, ← gammaGrid_real hG hyp,
+    rw [← hconj, ← gammaGrid_real hG hnoV hyp,
       OddOrder.RepresentationTheory.ClassFunction.inner_conj_conj,
       ClassFunction.inner_star_comm, hm, star_intCast]
   have hXη' : ClassFunction.inner X η01' = (m : ℂ) := by
@@ -1455,6 +1465,7 @@ the earlier `Re⟨Γ,Γ⟩ ≤ (u−1)/q + 1` overstatement was corrected in iss
 `gammaGrid_Y_norm_bound_aux`, reconciling the caller's `Fintype G`/`Invertible` instances with
 the `FiniteInduce`-scoped ones (both are `Subsingleton`). -/
 theorem gammaGrid_Y_norm_bound [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) :
     ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
       ∀ (X Y : ClassFunction G ℂ), GammaGrid hG hyp = X + Y →
@@ -1462,7 +1473,7 @@ theorem gammaGrid_Y_norm_bound [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
         (∀ (i : Fin hyp.q) (k : Fin hyp.p), ClassFunction.inner Y (hyp.eta i k) = 0) →
         (ClassFunction.inner Y Y).re ≤ ((hyp.u : ℚ) - 1) / (hyp.q : ℚ) := by
   intro _ _ X Y defXY oXY oYeta
-  have h := gammaGrid_Y_norm_bound_aux hG hyp X Y defXY
+  have h := gammaGrid_Y_norm_bound_aux hG hnoV hyp X Y defXY
     (by convert oXY using 2; exact Subsingleton.elim _ _)
     (fun i k => by convert oYeta i k using 2; exact Subsingleton.elim _ _)
   convert h using 3
@@ -1480,7 +1491,9 @@ obligations `betaGrid_support` / `betaGrid_norm` / `gammaGrid_orthogonal_one` /
 Their deep content bottoms out at the (13.2.e) `A₀(S)` normedTI Dade=Ind bridge, the (5.3)
 `S`↔`W` Dade cross-relation, and the Frobenius norm `norm_induce_one_frobenius`. -/
 noncomputable def betaData_of_grid [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
     BetaData hyp where
   j := j
@@ -1489,9 +1502,9 @@ noncomputable def betaData_of_grid [Finite G]
   Gamma := GammaGrid hG hyp
   support_formula := betaGrid_support hG hyp j hj
   norm_formula := betaGrid_norm hG hyp j hj
-  Gamma_orthogonal_one := gammaGrid_orthogonal_one hG hyp
-  Gamma_real := gammaGrid_real hG hyp
-  Y_norm_bound := gammaGrid_Y_norm_bound hG hyp
+  Gamma_orthogonal_one := gammaGrid_orthogonal_one hG hnoV hyp
+  Gamma_real := gammaGrid_real hG hnoV hyp
+  Y_norm_bound := gammaGrid_Y_norm_bound hG hnoV hyp
 
 /-- **Peterfalvi (13.18)**: the virtual character `beta_j` has controlled
 support, norm, and orthogonal remainder.
@@ -1506,7 +1519,9 @@ characters `data.beta`/`data.Gamma`.  They are the genuine fields of the faithfu
 explicit inner-product instance binders here).  (The earlier grid-orthogonality and `‖Γ‖²`
 conjuncts were overstatements — issue 3003.) -/
 theorem beta_support_norm_and_remainder [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G)) :
     ∃ data : BetaData hyp,
       (data.beta.support ⊆
         {z : ↥hyp.S |
@@ -1527,11 +1542,11 @@ theorem beta_support_norm_and_remainder [Finite G]
             (ClassFunction.inner Y Y).re ≤ ((hyp.u : ℚ) - 1) / (hyp.q : ℚ)) := by
   -- The principal index `j = 1` (nonzero, using `p ≥ 3`).
   have hp3 : 3 ≤ hyp.p := hyp.three_le_p
-  refine ⟨betaData_of_grid _hG hyp ⟨1, by omega⟩ (by simp),
-    (betaData_of_grid _hG hyp ⟨1, by omega⟩ (by simp)).support_formula,
-    (betaData_of_grid _hG hyp ⟨1, by omega⟩ (by simp)).norm_formula,
-    (betaData_of_grid _hG hyp ⟨1, by omega⟩ (by simp)).Gamma_orthogonal_one,
-    (betaData_of_grid _hG hyp ⟨1, by omega⟩ (by simp)).Gamma_real,
-    (betaData_of_grid _hG hyp ⟨1, by omega⟩ (by simp)).Y_norm_bound⟩
+  refine ⟨betaData_of_grid _hG hnoV hyp ⟨1, by omega⟩ (by simp),
+    (betaData_of_grid _hG hnoV hyp ⟨1, by omega⟩ (by simp)).support_formula,
+    (betaData_of_grid _hG hnoV hyp ⟨1, by omega⟩ (by simp)).norm_formula,
+    (betaData_of_grid _hG hnoV hyp ⟨1, by omega⟩ (by simp)).Gamma_orthogonal_one,
+    (betaData_of_grid _hG hnoV hyp ⟨1, by omega⟩ (by simp)).Gamma_real,
+    (betaData_of_grid _hG hnoV hyp ⟨1, by omega⟩ (by simp)).Y_norm_bound⟩
 
 end OddOrder.Peterfalvi.S15

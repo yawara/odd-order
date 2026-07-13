@@ -1633,53 +1633,6 @@ theorem typeV_param_arithmetic {p w₁ : ℕ} (hpodd : Odd p) (hw1odd : Odd w₁
   · omega
   · omega
 
-/-- **Peterfalvi (10.10.1)--(10.10.4)**: if Hypothesis (10.1) holds with `M` of type V, then the
-type-V parameter calculation forces `S` to be coherent.
-
-De-scaffolded: the conclusion is now the *genuine* coherence `Nonempty (IsCoherent τ S A₀)` only,
-dropping the former opaque `typeV_parameter_formula`/`typeV_coherence_formula : Prop` conjuncts
-(unprovable for generic `params`; producers set them `True`).  The remaining `sorry` is the honest
-(10.10.1)–(10.10.4) coherence argument: case (a) of Def (8.7) gives coherence by (6.8); case (b) is
-excluded by (6.5.c); case (c) (`|H| = p³`, `w₁ ∣ p+1`) runs the parameter calculation
-(`typeV_param_arithmetic` gives `p = 2w₁−1`, then `d = p`, `δ = −1`, `n = 2`) and the σ-grid column
-identities (reusing the (11.8) `muGrid`/`alignedOmegaSigmaGrid`/coherent-extension machinery).
-Gated on the §6/§8 coherence inputs (6.5.a/6.8) and the type-V `|H| = p³` structure.
-
-**Superseded (issue 1021)**: use `typeV_forces_coherence_v2` (S12_Noncoherence) — the honest
-three-branch assembly (case (a) = `S13.typeV_caseA_coherence`, case (b) refuted, case (c) =
-`typeV_caseC_coherence_engine` + the (10.10.2) package) whose only sorries are the explicit
-(6.5) gate lemmas (issue 2022).  This bare-sorry form remains only for the legacy
-`no_typeV_maximal` consumer (this file sits upstream of `S12_Noncoherence` in the import DAG,
-so it cannot be rewired). -/
-theorem typeV_forces_coherence [Finite G] [Fintype G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Fintype ↥M]
-    [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
-    {hyp : Hypothesis M} (hV : IsTypeV M) (params : CharacterParameters hyp) :
-    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A0) := by
-  sorry
-
-open scoped FiniteInduce in
-/-- **Peterfalvi (10.10)**: `G` has no maximal subgroup of type V.
-
-By (10.8) (`S_not_coherent`) the family `S` of any type-III/IV/V maximal is not
-coherent; but a type-V maximal forces `S` to be coherent by (10.10.1)–(10.10.4)
-(`typeV_forces_coherence`).  These now refer to the *genuine* Dade isometry,
-induced family, and support carried by the faithful (10.1) `Hypothesis` (built by
-`exists_hypothesis_of_typeIIIorIVorV`), so the contradiction is honest.
-
-**Legacy** (issue 1020 Phase 3): the honest heir is `no_typeV_maximal_unconditional`
-(`S12_Noncoherence` — the (10.8) side axiom-clean via the partner supply, the (10.10) side the
-three-branch `typeV_forces_coherence_v2` whose only `sorry`s are the (6.5) gates, issue 2022).
-This version remains as the forward-citation for the upstream `S13`-world
-(`S12.Hypothesis.isTypeIIIorIV`, `S13_SixTwoBridge`) and other consumers above the pair
-machinery in the import DAG; downstream consumers should cite the heir. -/
-theorem no_typeV_maximal [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
-    ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ IsTypeV M := by
-  rintro ⟨M, hMmax, hMV⟩
-  obtain ⟨hyp⟩ := exists_hypothesis_of_typeIIIorIVorV hG hMmax (Or.inr (Or.inr hMV))
-  obtain ⟨params, -⟩ := w2_prime_and_parameter_independence hG hyp
-  exact S_not_coherent hG hyp (typeV_forces_coherence hG hMV params)
-
 /-- The case-(b) data in Peterfalvi (8.8), used in the remark (10.11). -/
 structure Theorem88CaseBData (G : Type*) [Group G] where
   S : Subgroup G
@@ -1703,24 +1656,29 @@ structure Theorem88CaseBData (G : Type*) [Group G] where
 
 /-- A non-type-I maximal subgroup that is not of type V (so of type II/III/IV) carries type-`P`
 data whose `W₁` has prime order — Peterfalvi (8.6.a), via `TypePNontrivialCore`.  Type V is
-excluded by Theorem (10.10) `no_typeV_maximal`. -/
-private theorem caseB_typeP_prime_W1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+excluded by the (10.10) hypothesis `hnoV` (supplied downstream by the axiom-clean
+`no_typeV_maximal_unconditional`, `S12_Noncoherence`; issue 9087). -/
+private theorem caseB_typeP_prime_W1 [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ IsTypeV M)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hnonI : IsTypeNonI M) :
     ∃ data : TypePData M, (Nat.card ↥data.W1).Prime := by
   rcases hnonI with h | h | h | h
   · exact ⟨h.some.typeP, h.some.common.2.1⟩
   · exact ⟨h.some.typeP, h.some.common.2.1⟩
   · exact ⟨h.some.typeP, h.some.common.2.1⟩
-  · exact absurd ⟨M, hM, h⟩ (no_typeV_maximal hG)
+  · exact absurd ⟨M, hM, h⟩ hnoV
 
 /-- **Peterfalvi (10.11), first assertion**: in case (b) of Theorem (8.8), the
 orders of `W_1` and `W_2` are prime.
 
-By Theorem (10.10) `no_typeV_maximal`, the non-type-I subgroups `S`, `T` are of type II/III/IV,
-whose type-`P` `W₁` has prime order (8.6.a).  The case-(b) factors `W₁`, `W₂` complement the
-derived subgroups of `S`, `T` (8.8.b1, `S_compl`/`T_compl`), so they share the orders
-`|S : S'|`, `|T : T'|` with the respective type-`P` `W₁` (`card_W1_eq_derived_index`) — hence prime. -/
+By the (10.10) hypothesis `hnoV` (Type-V exclusion; instantiate with the axiom-clean
+`no_typeV_maximal_unconditional`, `S12_Noncoherence`), the non-type-I subgroups `S`, `T` are of
+type II/III/IV, whose type-`P` `W₁` has prime order (8.6.a).  The case-(b) factors `W₁`, `W₂`
+complement the derived subgroups of `S`, `T` (8.8.b1, `S_compl`/`T_compl`), so they share the
+orders `|S : S'|`, `|T : T'|` with the respective type-`P` `W₁` (`card_W1_eq_derived_index`)
+— hence prime. -/
 theorem theorem88_caseB_prime_orders [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ IsTypeV M)
     (caseB : Theorem88CaseBData G) :
     (Nat.card ↥caseB.W1).Prime ∧ (Nat.card ↥caseB.W2).Prime := by
   have hW1 : Nat.card ↥caseB.W1 = ((derivedInG caseB.S).subgroupOf caseB.S).index := by
@@ -1730,9 +1688,9 @@ theorem theorem88_caseB_prime_orders [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
     rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe caseB.W2_le_T).toEquiv,
       ← caseB.T_compl.symm.index_eq_card]
   refine ⟨?_, ?_⟩
-  · obtain ⟨dataS, hSp⟩ := caseB_typeP_prime_W1 hG caseB.S_maximal caseB.S_nonI
+  · obtain ⟨dataS, hSp⟩ := caseB_typeP_prime_W1 hG hnoV caseB.S_maximal caseB.S_nonI
     rw [hW1, ← dataS.card_W1_eq_derived_index]; exact hSp
-  · obtain ⟨dataT, hTp⟩ := caseB_typeP_prime_W1 hG caseB.T_maximal caseB.T_nonI
+  · obtain ⟨dataT, hTp⟩ := caseB_typeP_prime_W1 hG hnoV caseB.T_maximal caseB.T_nonI
     rw [hW2, ← dataT.card_W1_eq_derived_index]; exact hTp
 
 /-- **Peterfalvi (10.11), Type II assertion**: for a type-II maximal subgroup,

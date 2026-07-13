@@ -93,6 +93,12 @@ structure TypeICoherent78Data [Finite G] (L : Subgroup G) where
       Set.range (fun i =>
         ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf L)
           (θ i : ClassFunction _ ℂ))
+  /-- **The (8.3)/(12.1) support shape `A(L) = typeIA = H^#`** — carried as a discharged
+  field: the producer (`nonempty`) proves it from the (12.7) Frobenius structure
+  (`S14.Hypothesis.typeIA_eq_sharp`), whose Type-V exclusion input is the axiom-clean
+  `no_typeV_maximal_unconditional` (issue 9087).  Bundling it here keeps the member
+  theorems (`h78`, `psi_support`, …) free of the (10.10) hypothesis. -/
+  typeIA_eq : typeIA L typeIHyp.typeI = (typeIHyp.typeI.typeF.H : Set G) \ {1}
 
 namespace TypeICoherent78Data
 
@@ -128,9 +134,8 @@ theorem kernel_conj_mem : ∀ (l : ↥L) {h : G}, h ∈ data.kernel →
   simpa using hconj
 
 /-- The type-I support is the sharp kernel: `A(L) = H \ {1}` (Peterfalvi (12.1)). -/
-theorem typeIA_eq_sharp (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
-    typeIA L data.typeIHyp.typeI = (data.kernel : Set G) \ {1} :=
-  OddOrder.Peterfalvi.S14.Hypothesis.typeIA_eq_sharp hG data.typeIHyp
+theorem typeIA_eq_sharp : typeIA L data.typeIHyp.typeI = (data.kernel : Set G) \ {1} :=
+  data.typeIA_eq
 
 /-- `θ 0 ≠ 1_H` (the distinguished member is not the induced principal). -/
 theorem theta_zero_ne_trivial :
@@ -193,7 +198,7 @@ theorem psi_support (hG : OddOrder.BG.IsMinimalSimpleOdd G) (i : Fin (data.n + 1
   intro x hx
   rw [Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff] at hx
   exact (mem_supportInSubgroup_sharp_subgroupOf_iff data.kernel
-    (data.typeIA_eq_sharp hG) x).mpr ⟨hx.1, hx.2⟩
+    (data.typeIA_eq_sharp) x).mpr ⟨hx.1, hx.2⟩
 
 /-- The coherent extension preserves inner products on the placed family. -/
 theorem nu_isometry (i j : Fin (data.n + 1)) (hi : i ≠ data.ind1H)
@@ -228,7 +233,7 @@ noncomputable def h78 (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
   hypothesis78OfDade data.typeIHyp.toHypothesis71
     (data.typeIHyp.dadeData.dade.fullDadeIsometryData
       data.typeIHyp.hconj).toDadeIsometryData.isDadeIsometry
-    data.kernel data.kernel_le data.kernel_conj_mem (data.typeIA_eq_sharp hG)
+    data.kernel data.kernel_le data.kernel_conj_mem (data.typeIA_eq_sharp)
     data.θ data.inj data.cover data.d (data.psi_support hG) data.zeta_deg
     data.ind1H data.ind1H_ne_zero data.triv data.zeta_deg_match
     data.coh.extension data.nu_isometry (data.hagree hG)
@@ -403,7 +408,7 @@ theorem zeta_sub_conj_support (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   intro x hx
   rw [ClassFunction.mem_support, ClassFunction.sub_apply, hj₁, ClassFunction.conj_apply] at hx
   refine (mem_supportInSubgroup_sharp_subgroupOf_iff data.kernel
-    (data.typeIA_eq_sharp hG) x).mpr ⟨?_, ?_⟩
+    (data.typeIA_eq_sharp) x).mpr ⟨?_, ?_⟩
   · -- `x ∈ kernelIn`: else `ζ_0 x = 0`, so the difference vanishes.
     by_contra hxH
     apply hx
@@ -470,12 +475,12 @@ noncomputable def betaDecomp (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
   betaDecompOfDade data.typeIHyp.toHypothesis71
     (data.typeIHyp.dadeData.dade.fullDadeIsometryData
       data.typeIHyp.hconj).toDadeIsometryData.isDadeIsometry
-    data.kernel data.kernel_le data.kernel_conj_mem (data.typeIA_eq_sharp hG)
+    data.kernel data.kernel_le data.kernel_conj_mem (data.typeIA_eq_sharp)
     data.θ data.inj data.cover data.d (data.psi_support hG) data.zeta_deg
     data.ind1H data.ind1H_ne_zero data.triv data.zeta_deg_match
     data.coh.extension data.nu_isometry (data.hagree hG)
     (OddOrder.Peterfalvi.S14.witness_L_hzeta0nu hG data.typeIHyp data.hFrob data.coh
-      (data.typeIA_eq_sharp hG) (data.θ 0) data.theta_zero_ne_trivial)
+      (data.typeIA_eq_sharp) (data.θ 0) data.theta_zero_ne_trivial)
     data.zeta_zero_norm_one
     (Classical.choose (exists_betaDecomp_a (data.h78 hG)
       (Submodule.sub_mem _
@@ -529,7 +534,7 @@ theorem zSpan_Sset_support_subset (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rintro rfl; exact (ClassFunction.mem_support.mp hg) h1
   show g ∈ OddOrder.Peterfalvi.S04.supportInSubgroup (typeIA L data.typeIHyp.typeI) L
   exact (mem_supportInSubgroup_sharp_subgroupOf_iff data.kernel
-    (data.typeIA_eq_sharp hG) g).mpr ⟨hgH, hg1⟩
+    (data.typeIA_eq_sharp) g).mpr ⟨hgH, hg1⟩
 
 /-- **The family `S` consists of irreducibles** (Frobenius kernel induction). -/
 theorem Sset_subset_irreducible :
@@ -691,7 +696,7 @@ theorem dadeSupport_eq (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
 sharp Fitting kernel). -/
 theorem typeIA_eq_A1 (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     typeIA L data.typeIHyp.typeI = A1 L PeterfalviType.I := by
-  rw [data.typeIA_eq_sharp hG]
+  rw [data.typeIA_eq_sharp]
   show (data.kernel : Set G) \ {1} = sharpSubgroup (maxNilpotentNormalHall L)
   rw [show data.kernel = maxNilpotentNormalHall L from data.typeIHyp.typeI.typeF.H_eq]
   rfl
@@ -785,7 +790,7 @@ theorem zeta_sub_conj_support_at (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   intro x hx
   rw [ClassFunction.mem_support, ClassFunction.sub_apply, hi', ClassFunction.conj_apply] at hx
   refine (mem_supportInSubgroup_sharp_subgroupOf_iff data.kernel
-    (data.typeIA_eq_sharp hG) x).mpr ⟨?_, ?_⟩
+    (data.typeIA_eq_sharp) x).mpr ⟨?_, ?_⟩
   · by_contra hxH
     apply hx
     rw [(data.h78 hG).hyp76.zeta_eq_zero_of_not_mem_H _ x hxH, star_zero, sub_zero]
@@ -879,12 +884,14 @@ theorem nu_zeta_inner_nu_conj_eq_zero (hodd : Odd (Nat.card G))
 from the headline (12.7) `typeI_frobenius`, the coherence from
 `frobenius_typeI_coherent`, and the placed family from
 `exists_witness_placed_family`. -/
-theorem nonempty (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G}
+theorem nonempty (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    {L : Subgroup G}
     (hLmax : L ∈ maximalSubgroups G) (hLtypeI : IsTypeI L) :
     Nonempty (TypeICoherent78Data L) := by
   classical
   obtain ⟨typeIHyp⟩ := OddOrder.Peterfalvi.S14.exists_typeI_hypothesis hG hLmax hLtypeI
-  obtain ⟨fdata, -⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius hG hLmax hLtypeI
+  obtain ⟨fdata, -⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius hG hnoV hLmax hLtypeI
   -- Transport the Frobenius witness to `typeIHyp`'s kernel (both are `L_F`).
   have hHeq : fdata.typeI.typeF.H = typeIHyp.typeI.typeF.H := by
     rw [fdata.typeI.typeF.H_eq, typeIHyp.typeI.typeF.H_eq]
@@ -906,7 +913,9 @@ theorem nonempty (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G}
            deg0 := hdeg0
            triv := htriv
            inj := hinj
-           cover := hcover }⟩
+           cover := hcover
+           typeIA_eq :=
+             OddOrder.Peterfalvi.S14.Hypothesis.typeIA_eq_sharp hG hnoV typeIHyp }⟩
 
 end TypeICoherent78Data
 

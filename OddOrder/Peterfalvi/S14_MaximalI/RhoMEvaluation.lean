@@ -44,6 +44,7 @@ open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 the ambient support, `ftSupportKernel_restrict`). -/
 theorem counterexample_psi_constant_on_signalizer_coset [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
     (hyp : Hypothesis data.L)
     (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
@@ -134,7 +135,7 @@ theorem counterexample_psi_constant_on_signalizer_coset [Finite G]
       rwa [hN₁mem] at hR₁ne
     -- `N` is not conjugate to the Frobenius witness `L`
     have hLN : ¬ ∃ c : G, MulAut.conj c • data.L = N :=
-      witness_L_not_conj_of_kernel_centralizer_ne_bot hG data hgN hgNF hRne
+      witness_L_not_conj_of_kernel_centralizer_ne_bot hG hnoV data hgN hgNF hRne
     -- the N-side (12.4) supply
     obtain ⟨hypN⟩ := exists_typeI_hypothesis hG hNmax hNtypeI
     have data_N : ∀ χ ∈ hypN.Sset, CharacterDecompositionData hypN χ :=
@@ -169,6 +170,7 @@ open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 (`hypM.toHypothesis71`). -/
 theorem counterexample_chiRho_eval_of_mem_K_sharp [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
     (hyp : Hypothesis data.L)
     (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
@@ -192,7 +194,7 @@ theorem counterexample_chiRho_eval_of_mem_K_sharp [Finite G]
   refine OddOrder.Peterfalvi.S09.Hypothesis71.chiRho_apply_eq_of_forall_coset
     hypM.toHypothesis71 ψ hgA ?_
   intro y hy
-  refine counterexample_psi_constant_on_signalizer_coset hG data hyp coh data0 hchi0
+  refine counterexample_psi_constant_on_signalizer_coset hG hnoV data hyp coh data0 hchi0
     hchi0_mem hpsi hypM hgK hg1 y ?_
   rw [← hypM.dadeData.H_eq_ftSupportKernel ⟨g, hgA⟩]
   exact hy
@@ -250,6 +252,7 @@ collapse as the `A(M)`-form — the restricted datum's local kernel at `g` is th
 signalizer (`S04.Hypothesis.restrict` keeps the per-point `H`). -/
 theorem counterexample_chiRhoA1_eval_of_mem_K_sharp [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
     (hyp : Hypothesis data.L)
     (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
@@ -272,7 +275,7 @@ theorem counterexample_chiRhoA1_eval_of_mem_K_sharp [Finite G]
   refine OddOrder.Peterfalvi.S09.Hypothesis71.chiRho_apply_eq_of_forall_coset
     (hypothesis71SharpKernel hypM) ψ hgA1 ?_
   intro y hy
-  refine counterexample_psi_constant_on_signalizer_coset hG data hyp coh data0 hchi0
+  refine counterexample_psi_constant_on_signalizer_coset hG hnoV data hyp coh data0 hchi0
     hchi0_mem hpsi hypM hgK hg1 y ?_
   -- the restricted datum's kernel at `g` is the original one (`restrict_H` is `rfl`)
   rw [← hypM.dadeData.H_eq_ftSupportKernel
@@ -286,6 +289,7 @@ coherence-free, with the `(12.3)+(5.5)` cross-orthogonality supply from `L ≁ M
 `ψ` by the first claim (`counterexample_chiRho_eval_of_mem_K_sharp`). -/
 theorem counterexample_psi_constant_on_K_sub_Kprime [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
     (hyp : Hypothesis data.L)
     (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
@@ -302,7 +306,7 @@ theorem counterexample_psi_constant_on_K_sub_Kprime [Finite G]
   classical
   have hHK : hypM.typeI.typeF.H = ctr.K :=
     hypM.typeI.typeF.H_eq.trans ctr.K_eq_MF.symm
-  have hLM : ¬ ∃ c : G, MulAut.conj c • data.L = ctr.M := witness_L_not_conj_M hG data
+  have hLM : ¬ ∃ c : G, MulAut.conj c • data.L = ctr.M := witness_L_not_conj_M hG hnoV data
   have data_M : ∀ χ ∈ hypM.Sset, CharacterDecompositionData hypM χ :=
     fun χ hχ => (character_decomposition_and_dade_domain hG hypM hχ).choose
   have horth : ∀ χ (hχ : χ ∈ hypM.Sset), ∀ α ∈ Rset (data_M χ hχ),
@@ -316,7 +320,7 @@ theorem counterexample_psi_constant_on_K_sub_Kprime [Finite G]
         (⟨z, hypM.typeI.typeF.H_le hz⟩ : ↥ctr.M) = ψ z := by
     intro z hz hz1
     rw [OddOrder.Peterfalvi.S09.Hypothesis71.chiRhoCF_apply]
-    exact counterexample_chiRho_eval_of_mem_K_sharp hG data hyp coh data0 hchi0 hchi0_mem
+    exact counterexample_chiRho_eval_of_mem_K_sharp hG hnoV data hyp coh data0 hchi0 hchi0_mem
       hpsi hypM (by rw [← hHK]; exact hz) hz1 (hypM.typeI.typeF.H_le hz)
   have hK' : derivedInG hypM.typeI.typeF.H = ctr.Kprime := by
     rw [hHK, ctr.Kprime_eq]
@@ -332,6 +336,7 @@ open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 where `ψ^{ρ_M} = ψ = mval` (the three (12.15) claims), gives the bound. -/
 theorem counterexample_chiRhoA1_normSq_ge [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
     (hyp : Hypothesis data.L)
     (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
@@ -378,10 +383,10 @@ theorem counterexample_chiRhoA1_normSq_ge [Finite G]
     have hm1 : (m : G) ≠ 1 := fun h => hmK' (h ▸ ctr.Kprime.one_mem)
     have heval : f m = ψ (m : G) := by
       rw [hf, OddOrder.Peterfalvi.S09.Hypothesis71.chiRhoCF_apply]
-      exact counterexample_chiRhoA1_eval_of_mem_K_sharp hG data hyp coh data0 hchi0
+      exact counterexample_chiRhoA1_eval_of_mem_K_sharp hG hnoV data hyp coh data0 hchi0
         hchi0_mem hpsi hypM hmK hm1 m.2
     have hconst : ψ (m : G) = ψ g0 :=
-      counterexample_psi_constant_on_K_sub_Kprime hG data hyp coh data0 hchi0 hchi0_mem
+      counterexample_psi_constant_on_K_sub_Kprime hG hnoV data hyp coh data0 hchi0 hchi0_mem
         hpsi hypM hmK hmK' hg0K hg0K'
     rw [heval, hconst, hmval]
     rw [show ‖((mval : ℤ) : ℂ)‖ = |(mval : ℝ)| by
@@ -437,6 +442,7 @@ open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 second claim fed into the rationality/integrality argument `rhoM_integer_values`. -/
 theorem counterexample_psi_int_on_K_sub_Kprime [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
     (hyp : Hypothesis data.L)
     (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
@@ -452,7 +458,7 @@ theorem counterexample_psi_int_on_K_sub_Kprime [Finite G]
     ∃ z : ℤ, ψ g = (z : ℂ) :=
   rhoM_integer_values hψZ
     (fun g₁ g₂ h1 h2 h3 h4 =>
-      counterexample_psi_constant_on_K_sub_Kprime hG data hyp coh data0 hchi0 hchi0_mem
+      counterexample_psi_constant_on_K_sub_Kprime hG hnoV data hyp coh data0 hchi0 hchi0_mem
         hpsi hypM h1 h2 h3 h4)
     g hgK hgK'
 

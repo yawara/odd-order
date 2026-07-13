@@ -1505,7 +1505,8 @@ witnesses. -/
 noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [Finite G]
     (hG : IsMinimalSimpleOdd G) : Section16Inputs G :=
   let mp := section16MaximalPair_of_isMinimalSimpleOdd hG
-  let tp := section16TypePStructure_of_isMinimalSimpleOdd hG mp
+  let tp := section16TypePStructure_of_isMinimalSimpleOdd hG
+    (OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional hG) mp
   let cd := section16CharacterData_of_isMinimalSimpleOdd hG mp tp
   { S := mp.S
     T := mp.T
@@ -1761,7 +1762,10 @@ construction of the Section 16 configuration
 final contradiction (`noMinimalSimpleOdd_of_section16`). -/
 theorem noMinimalSimpleOdd {G : Type*} [Group G] [Finite G]
     (hG : IsMinimalSimpleOdd G) : False :=
-  noMinimalSimpleOdd_of_section16 hG (sectionSixteenHypothesis_of_isMinimalSimpleOdd hG)
+  noMinimalSimpleOdd_of_section16 hG
+    (OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional hG)
+    (fun s13 => OddOrder.Peterfalvi.S13.S_H0C_not_coherent_unconditional hG s13)
+    (sectionSixteenHypothesis_of_isMinimalSimpleOdd hG)
 
 /-! ## The minimal-counterexample reduction -/
 

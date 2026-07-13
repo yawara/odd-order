@@ -447,7 +447,9 @@ All finiteness instances are taken from the `FiniteInduce` scope (from `[Finite 
 `Ind_S^G` produced here (via `indS`) and the one `sInstance_dade_eq_induce` names share the *same*
 `Fintype ↥S` instance — no subsingleton-instance juggling is needed. -/
 theorem Hypothesis.sSetIrrDeg_coherent_indS [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     (d : ℂ) (hd : star d = d) (hd0 : d ≠ 0)
     (h2 : 2 ≤ (hyp.sSetIrrDeg hG d).ncard) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.indS
@@ -456,7 +458,7 @@ theorem Hypothesis.sSetIrrDeg_coherent_indS [Finite G]
   (hyp.sSetIrrDeg_coherent hG d hd hd0 h2).map fun c =>
     c.congrMap fun φ hφ => by
       rw [hyp.indS_apply]
-      exact hyp.sInstance_dade_eq_induce hG hφ.2
+      exact hyp.sInstance_dade_eq_induce hG hnoV hφ.2
 
 open OddOrder.Peterfalvi.S11 in
 /-- **(9.11) base cardinality `2 ≤ (S₁(q·a)).ncard`** in the non-Galois case (issue 1017, Step 2 —
@@ -519,7 +521,9 @@ irreducible conjugate pairs via `CharacterDifferenceImage`) and the per-pair (5.
 Galois case (caseB) the whole family is uniform of degree `q·u`, coherent directly by
 `sSetIrrDeg_coherent_indS` (no lift). -/
 theorem Hypothesis.sSetIrrDeg_qa_coherent_indS_caseA [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
     {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
     (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
     (caseA : CliffordCaseAData chars) :
@@ -527,7 +531,7 @@ theorem Hypothesis.sSetIrrDeg_qa_coherent_indS_caseA [Finite G]
       (hyp.sSetIrrDeg hG (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ))
       (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)) := by
   have hqpos : 0 < (hyp.toTypesIIIIIIVSetupS hG).q := Nat.card_pos
-  exact hyp.sSetIrrDeg_coherent_indS hG _ (star_natCast _)
+  exact hyp.sSetIrrDeg_coherent_indS hG hnoV _ (star_natCast _)
     (Nat.cast_ne_zero.mpr (Nat.mul_ne_zero hqpos.ne' caseA.a_pos.ne'))
     (hyp.sSetIrrDeg_qa_two_le_ncard hG chars caseA)
 

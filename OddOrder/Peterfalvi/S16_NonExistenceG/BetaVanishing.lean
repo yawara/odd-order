@@ -219,9 +219,12 @@ theorem W2_le_P [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
 /-- **Peterfalvi (13.2.b) for `T`**: `Q` is elementary abelian (13.2.b applied to the dual subgroup
 `T`) — the canonical §15 obligation `Q_elementaryAbelian_T` (`T` type-II from `T_typeII` (14.9)). -/
 theorem Q_elemAbelian_S [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    (hyp : Hypothesis (G := G)) :
     IsElementaryAbelian hyp.base.q ↥hyp.base.Q :=
-  OddOrder.Peterfalvi.S15.Q_elementaryAbelian_T _hG hyp.base (T_typeII _hG hyp)
+  OddOrder.Peterfalvi.S15.Q_elementaryAbelian_T _hG hyp.base (T_typeII _hG hnoV hncH0C hyp)
 
 /-- **Peterfalvi (13.2) `S`-side structural inputs for the (14.7) field model.**  The field-model
 construction (14.2.a) needs two §13 structural facts about the type-`P` subgroup `S`: `W₂ ≤ P`
@@ -234,10 +237,13 @@ built from `U` **abelian** (Peterfalvi (13.2.a): `UW₁` is Frobenius with abeli
 `isSimpleModule_of_abelian_faithful_card`, and the injection `μ : U ↪ 𝔽_{p^q}^×` into the cyclic unit
 group is a *consequence* — never a hypothesis. -/
 theorem S_field_model_structural_inputs [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    (hyp : Hypothesis (G := G)) :
     hyp.base.W2 ≤ hyp.base.P ∧
       IsElementaryAbelian hyp.base.q ↥hyp.base.Q :=
-  ⟨W2_le_P _hG hyp, Q_elemAbelian_S _hG hyp⟩
+  ⟨W2_le_P _hG hyp, Q_elemAbelian_S _hG hnoV hncH0C hyp⟩
 
 /-- **Peterfalvi (14.7)**: if `U` is characteristic in `H`, then the field-normalizer
 configuration (14.2) holds.  The value argument is assembled entirely from the structural
@@ -249,7 +255,10 @@ remaining §13 structural facts are cited as the named obligation `S_field_model
 (`U` cyclic / `W₂ ≤ P` / `Q` elementary abelian), while `W₂ ≤ N_G(Q)` is discharged outright
 (`W₂ ≤ W ≤ T` and `Q = T_F`). -/
 theorem field_normalizer_of_U_characteristic [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    (hyp : Hypothesis (G := G))
     (Ldata : LHypothesis hyp)
     (hchar : (hyp.base.U.subgroupOf Ldata.H).Characteristic) :
     Nonempty (FieldNormalizerData hyp) := by
@@ -257,7 +266,7 @@ theorem field_normalizer_of_U_characteristic [Finite G]
   have hmod := u_modEq_one_mod_p_of_LHypothesis hG Ldata hchar hW2y_compl
   have hW2_conj_y := W2conj_le_normalizer_U_of_LHypothesis Ldata hchar hW2y_compl
   -- §13 structural inputs (13.2.a/b, companion to `basic_structure`; Lane B / §13 group theory)
-  obtain ⟨hW2_le_P, hQ_elemAb⟩ := S_field_model_structural_inputs hG hyp
+  obtain ⟨hW2_le_P, hQ_elemAb⟩ := S_field_model_structural_inputs hG hnoV hncH0C hyp
   -- `W₂ ≤ N_G(Q)` is ungated: `W₂ ≤ W ≤ T` and `Q = T_F`
   have hW2_norm_Q : hyp.base.W2 ≤ Subgroup.normalizer (hyp.base.Q : Set G) := by
     have hW2_le_W : hyp.base.W2 ≤ hyp.base.W := by
@@ -307,11 +316,13 @@ representation `μ : V ↪ 𝔽_{q^p}^×` is constructed from `V` abelian via
 `isSimpleModule_of_abelian_faithful_card`, `V` cyclic follows.  Used to transport `K = V` (14.11) to
 `K` cyclic in `MHypothesis_kernel_cyclic`. -/
 theorem V_cyclic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G)) : IsCyclic ↥hyp.base.V := by
   letI : Fact hyp.base.q.Prime := ⟨hyp.base.q_prime⟩
   haveI : NeZero hyp.base.q := ⟨hyp.base.q_prime.ne_zero⟩
-  haveI hTII : IsTypeII hyp.base.T := T_typeII hG hyp
-  have hQea : IsElementaryAbelian hyp.base.q ↥hyp.base.Q := Q_elemAbelian_S hG hyp
+  haveI hTII : IsTypeII hyp.base.T := T_typeII hG hnoV hncH0C hyp
+  have hQea : IsElementaryAbelian hyp.base.q ↥hyp.base.Q := Q_elemAbelian_S hG hnoV hncH0C hyp
   haveI hQcomm : IsMulCommutative ↥hyp.base.Q := IsMulCommutative.of_comm hQea.comm
   letI hVcomm : CommGroup ↥hyp.base.V :=
     { (inferInstance : Group ↥hyp.base.V) with
@@ -415,11 +426,14 @@ obligations `K_eq_V_index_pq` (the (14.11) cascade, whose structural input is
 `generic_character_bound`) and `V_cyclic` (13.2.a for `T`).  Feeds the (14.12) reduction; the
 `L ≅ M` case transports it to `H = L_F` purely structurally (`H_cyclic_of_L_conj_M`). -/
 theorem MHypothesis_kernel_cyclic [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    (hyp : Hypothesis (G := G))
     (Mdata : MHypothesis hyp) : IsCyclic ↥Mdata.K := by
-  obtain ⟨Ldata⟩ := exists_LHypothesis _hG hyp
-  rw [(K_eq_V_index_pq _hG hyp Ldata Mdata).1]
-  exact V_cyclic _hG hyp
+  obtain ⟨Ldata⟩ := exists_LHypothesis _hG hnoV hncH0C hyp
+  rw [(K_eq_V_index_pq _hG hnoV hncH0C hyp Ldata Mdata).1]
+  exact V_cyclic _hG hnoV hncH0C hyp
 
 /-- **Peterfalvi (14.12) structural input**: in the `L ≅ M` case, `H = L_F` is cyclic.  Since
 `L ≅ M` (a conjugation `MulAut.conj g`), the maximal nilpotent normal Hall subgroup is
@@ -427,12 +441,15 @@ automorphism-equivariant (`maxNilpotentNormalHall_pointwise_smul`), so `H = L_F 
 cyclicity of `K` is the §13/§14 obligation `MHypothesis_kernel_cyclic`.  This reduction is
 purely structural — the character theory is confined to `MHypothesis_kernel_cyclic`. -/
 theorem H_cyclic_of_L_conj_M [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    (hyp : Hypothesis (G := G))
     (Ldata : LHypothesis hyp) (Mdata : MHypothesis hyp)
     (_hconj : ∃ g : G, MulAut.conj g • Ldata.L = Mdata.M) :
     IsCyclic ↥Ldata.H := by
   obtain ⟨g, hg⟩ := _hconj
-  haveI := MHypothesis_kernel_cyclic _hG hyp Mdata
+  haveI := MHypothesis_kernel_cyclic _hG hnoV hncH0C hyp Mdata
   rw [Ldata.H_eq_LF]
   -- `M_F` is the `conj g`-image of `L_F`: `conj g • L_F = (conj g • L)_F = M_F = K`.
   have hmap : (maxNilpotentNormalHall Ldata.L).map ((MulAut.conj g : MulAut G) : G →* G)
@@ -449,12 +466,15 @@ subgroup of `H` — in particular `U` — is characteristic (`characteristic_of_
 `field_normalizer_of_U_characteristic` applies.  Carries **no `sorry`**; gated only through the
 named §13/§14 obligation `H_cyclic_of_L_conj_M`. -/
 theorem field_normalizer_of_L_conj_M [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    (hyp : Hypothesis (G := G))
     (Ldata : LHypothesis hyp) (Mdata : MHypothesis hyp)
     (hconj : ∃ g : G, MulAut.conj g • Ldata.L = Mdata.M) :
     Nonempty (FieldNormalizerData hyp) := by
-  haveI : IsCyclic ↥Ldata.H := H_cyclic_of_L_conj_M hG hyp Ldata Mdata hconj
-  exact field_normalizer_of_U_characteristic hG hyp Ldata
+  haveI : IsCyclic ↥Ldata.H := H_cyclic_of_L_conj_M hG hnoV hncH0C hyp Ldata Mdata hconj
+  exact field_normalizer_of_U_characteristic hG hnoV hncH0C hyp Ldata
     (characteristic_of_isCyclic (hyp.base.U.subgroupOf Ldata.H))
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -1167,6 +1187,8 @@ inputs identify the abstract kernel and complement index in the (13.19) data
 with the `H` and `p q` already fixed in Section 16. -/
 theorem exists_typeI_eta_axes_odd_of_caseB_gap
     [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
     (hH_of_orth :
       ∀ orth : OddOrder.Peterfalvi.S15.TypeIOrthogonalityData hyp.base nc.Ldata.L,
@@ -1188,9 +1210,9 @@ theorem exists_typeI_eta_axes_odd_of_caseB_gap
           OddOrder.Peterfalvi.S15.OddIntegerInner orth.betaL
             (hyp.base.eta i ⟨0, hyp.base.p_prime.pos⟩)) := by
   rcases OddOrder.Peterfalvi.S15.typeI_orthogonality_dichotomy
-      _hG hyp.base
+      _hG hnoV hyp.base
       (((OddOrder.BG.Ch4.S16.proposition_type_classification _hG
-          hyp.base.T_maximal).2.1).mp (T_typeII _hG hyp))
+          hyp.base.T_maximal).2.1).mp (T_typeII _hG hnoV hncH0C hyp))
       nc.Ldata.L_maximal nc.Ldata.isTypeI with
     ⟨orth, horth⟩
   exact ⟨orth, typeI_eta_axes_odd_of_caseB_gap orth horth.2.2.2.1 horth.2.2.2.2

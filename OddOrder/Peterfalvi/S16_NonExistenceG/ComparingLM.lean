@@ -26,6 +26,8 @@ saturation `Ŵ^G = (W ∖ (W₁ ∪ W₂))^G`.  `β_L` is supported in the Dade 
 `W`-containing maximals `S`, `T`).  This is the first ingredient of the (14.11.2)/(13.19.c)
 signed `η`-grid expansion (`lSide_signed_eta_expansion`). -/
 theorem betaL_vanishes_on_regular_W [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     {hyp : Hypothesis (G := G)} {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
     (dataL : TypeICoherent78Data L) :
     ∀ x ∈ conjClassSet
@@ -33,7 +35,7 @@ theorem betaL_vanishes_on_regular_W [Finite G] (hG : OddOrder.BG.IsMinimalSimple
       (dataL.h78 hG).beta x = 0 := by
   intro x hx
   by_contra hval
-  exact mSide_dadeSupport_avoids_regular hG hLmax dataL x hx
+  exact mSide_dadeSupport_avoids_regular hG hnoV hncH0C hLmax dataL x hx
     ((dataL.h78 hG).beta_support_subset_dadeSupport (ClassFunction.mem_support.mpr hval))
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -43,6 +45,8 @@ from the (3.7) engine `inner_eta_grid_relation` (`S16_GridExpansion`) and
 `betaL_vanishes_on_regular_W`.  This is the (3.7) linear-relation ingredient of the
 (14.11.2)/(13.19.c) signed `η`-grid expansion. -/
 theorem betaL_grid_relation [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     {hyp : Hypothesis (G := G)} {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
     (dataL : TypeICoherent78Data L) (i : Fin hyp.base.q) (j : Fin hyp.base.p) :
     ClassFunction.inner (dataL.h78 hG).beta (hyp.base.eta i j)
@@ -51,7 +55,7 @@ theorem betaL_grid_relation [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       = ClassFunction.inner (dataL.h78 hG).beta (hyp.base.eta i ⟨0, hyp.base.p_prime.pos⟩)
         + ClassFunction.inner (dataL.h78 hG).beta
             (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ j) :=
-  inner_eta_grid_relation hyp.base (betaL_vanishes_on_regular_W hG hLmax dataL) i j
+  inner_eta_grid_relation hyp.base (betaL_vanishes_on_regular_W hG hnoV hncH0C hLmax dataL) i j
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **`β_L ∈ ℤ[Irr G]`**: the coherence residual `β_L = τ_L(Ind 1_H − ζ)` is a virtual character
@@ -164,6 +168,8 @@ orthonormal grid `{η_ij}` (`eta_orthonormal`) applied to `φ = 1_G + Γ_L` then
 `Σ m_ij² ≤ 1 + (p q − 1) = p q`.  This is the honest (13.19.c) grid Bessel bound; the only
 external datum is `hepq` (`e_L = p q`, carried by `LHypothesis` at the call site). -/
 theorem betaL_grid_coeff_bessel [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     {hyp : Hypothesis (G := G)} {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
     (dataL : TypeICoherent78Data L)
     (hepq : (dataL.h78 hG).complementIndex = hyp.base.p * hyp.base.q)
@@ -176,7 +182,7 @@ theorem betaL_grid_coeff_bessel [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
   set H78 := dataL.h78 hG with hH78
   set BD := dataL.betaDecomp hG with hBD
   -- `ζ_0^ν ⊥ η_ij` and every family member `ζ_k^ν ⊥ η_ij` (Coq `o_tauLeta`, full family).
-  have hDadeAvoid := mSide_dadeSupport_avoids_regular (hyp := hyp) hG hLmax dataL
+  have hDadeAvoid := mSide_dadeSupport_avoids_regular (hyp := hyp) hG hnoV hncH0C hLmax dataL
   have hetaNu : ∀ (k : Fin (dataL.n + 1)), k ≠ H78.ind1H →
       ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
         ClassFunction.inner (H78.nu (H78.hyp76.zeta k)) (hyp.base.eta i j) = 0 := by
@@ -312,6 +318,8 @@ two off-principal parity facts remain as the isolated gate: `m_row_odd`/`m_col_o
 partner bridge, Coq `FTtypeI_bridge_facts`) and `grid_mem` (the §13 `Y = 0` grid membership,
 issue 3002), genuinely cross-lane-gated to lane b's §13/§15 type-P layer. -/
 noncomputable def lSideGridCoeffData [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G)) {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
     (dataL : TypeICoherent78Data L) (hq3 : hyp.base.q = 3) (hp5 : hyp.base.p = 5)
     (hepq : (dataL.h78 hG).complementIndex = hyp.base.p * hyp.base.q) :
@@ -351,7 +359,7 @@ noncomputable def lSideGridCoeffData [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
   -- `⟨β_L, η_ij⟩ = ⟨1_G + Γ_L, η_ij⟩` (`caseB_eta_orthogonal_nu_zeta_at` kills the `ζ_0^ν`/`W`
   -- parts), and Bessel + `‖Γ_L‖² ≤ e − 1` gives `Σ m² ≤ 1 + (e − 1) = e = p q` (using `hepq`).
   bessel :=
-    betaL_grid_coeff_bessel hG hLmax dataL hepq _
+    betaL_grid_coeff_bessel hG hnoV hncH0C hLmax dataL hepq _
       (fun i j => Classical.choose_spec (betaL_grid_coeff_int hG dataL i j))
   -- **The deep §13 gate (issue 3002, Coq `Y = 0`, PFsection14.v:212-251).** `1_G + Δ_L = Σ m_ij η_ij`:
   -- the coherence residual equals its own orthogonal projection onto the `η`-grid, i.e. the residual
@@ -386,6 +394,8 @@ The three deep facts are isolated in `lSideGridCoeffData`; this theorem is the h
 rigidity assembly.  The pure-algebra rearrangement into `β_L^τ = Σ ±η_ij − ε ζ_i^ν` is
 `lSide_signed_eta_expansion`. -/
 theorem lSide_delta_grid_expansion [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     {hyp : Hypothesis (G := G)} {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
     (dataL : TypeICoherent78Data L)
     (hq3 : hyp.base.q = 3) (hp5 : hyp.base.p = 5)
@@ -399,12 +409,12 @@ theorem lSide_delta_grid_expansion [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
   set i₀ : Fin hyp.base.q := ⟨0, hyp.base.q_prime.pos⟩ with hi₀
   set j₀ : Fin hyp.base.p := ⟨0, hyp.base.p_prime.pos⟩ with hj₀
   obtain ⟨m, hcoeff, hprin, hrow, hcol, hbessel, hmem⟩ :=
-    lSideGridCoeffData hG hyp hLmax dataL hq3 hp5 hepq
+    lSideGridCoeffData hG hnoV hncH0C hyp hLmax dataL hq3 hp5 hepq
   -- (3.7) four-corner relation on `m_ij` (from `betaL_grid_relation`, via the integrality bridge).
   have hrel : ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
       m i j + m i₀ j₀ = m i j₀ + m i₀ j := by
     intro i j
-    have h := betaL_grid_relation hG hLmax dataL i j
+    have h := betaL_grid_relation hG hnoV hncH0C hLmax dataL i j
     rw [hcoeff i j, hcoeff i₀ j₀, hcoeff i j₀, hcoeff i₀ j] at h
     exact_mod_cast h
   -- every coefficient is odd: `m_ij = m_i0 + m_0j − m_00` with the three boundary values odd.
@@ -494,6 +504,8 @@ together with the `η`-grid identity `1_G + Δ_L = Σ ±η_ij` (`lSide_delta_gri
 `±1` rigidity is *proven* from the (3.7) relation plus the isolated §14 grid-coefficient carrier
 `lSideGridCoeffData`). -/
 theorem lSide_signed_eta_expansion [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
     (dataL : TypeICoherent78Data nc.Ldata.L)
     (hq3 : hyp.base.q = 3) (hp5 : hyp.base.p = 5)
@@ -514,7 +526,7 @@ theorem lSide_signed_eta_expansion [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
   -- `e_L = |L : H_L| = p q` (`typeICoherent78_complementIndex_eq_pq`, the (14.3) Frobenius order).
   have hepq := typeICoherent78_complementIndex_eq_pq hG nc.Ldata dataL
   obtain ⟨signs, hsigns, hgrid⟩ :=
-    lSide_delta_grid_expansion hG nc.Ldata.L_maximal dataL hq3 hp5 hepq
+    lSide_delta_grid_expansion hG hnoV hncH0C nc.Ldata.L_maximal dataL hq3 hp5 hepq
   -- the removed member is the distinguished coherent image `ζ_0^ν` (`ε = 1`, `zetaDistinct`)
   refine ⟨signs, hsigns, (dataL.h78 hG).zetaDistinct, ?_, 1, Or.inl rfl, ?_⟩
   · -- `zetaDistinct ≠ ind1H`
@@ -536,6 +548,8 @@ Under case-(b) (`(q,p) = (3,5)`) and the two gap inequalities:
   (3.6)–(3.8)/(13.19.b) engine `caseB_eta_orthogonal_psi`, whose one residual input is the
   named (13.19.a) Dade-support avoidance `mSide_dadeSupport_avoids_regular`. -/
 theorem caseB_expansion_input [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
     (dataL : TypeICoherent78Data nc.Ldata.L) (dataM : TypeICoherent78Data nc.Mdata.M)
     (hq3 : hyp.base.q = 3) (hp5 : hyp.base.p = 5)
@@ -558,10 +572,10 @@ theorem caseB_expansion_input [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G
             ((dataM.h78 _hG).nu
               ((dataM.h78 _hG).hyp76.zeta (dataM.h78 _hG).zetaDistinct)) = 0 := by
   obtain ⟨signs, hsigns, i, hi, ε, hε, hexp⟩ :=
-    lSide_signed_eta_expansion _hG dataL hq3 hp5 hhv hvu
+    lSide_signed_eta_expansion _hG hnoV hncH0C dataL hq3 hp5 hhv hvu
   exact ⟨signs, hsigns, i, hi, ε, hε, hexp,
     caseB_eta_orthogonal_psi _hG hyp.base dataM
-      (mSide_dadeSupport_avoids_regular _hG nc.Mdata.M_maximal dataM)⟩
+      (mSide_dadeSupport_avoids_regular _hG hnoV hncH0C nc.Mdata.M_maximal dataM)⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Faithful §16 producer for the (14.16) case-(b) contradiction inputs.**  The case-(b)
@@ -570,6 +584,8 @@ the `χ_L ⊥ ψ^{τ₁}` orthogonality is the proven (4.1) cross-orthogonality
 `pair_cross_orthogonal`; the remaining (13.19.c)/(14.11.2) grid content is the named
 `caseB_expansion_input`. -/
 theorem caseB_contradiction_data [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
     (data : OrthogonalitySwitchData nc) (hcaseB : data.caseB)
     (hhv :
@@ -582,7 +598,7 @@ theorem caseB_contradiction_data [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOd
   obtain ⟨hq3, hp5⟩ := data.caseB_params hcaseB
   obtain ⟨dataL, dataM, hpair⟩ := data.caseB_pairing hcaseB _hG
   obtain ⟨signs, hsigns, i, hi, ε, hε, hexp, horth⟩ :=
-    caseB_expansion_input _hG dataL dataM hq3 hp5 hhv hvu
+    caseB_expansion_input _hG hnoV hncH0C dataL dataM hq3 hp5 hhv hvu
   have hjne : (dataM.h78 _hG).zetaDistinct ≠ dataM.ind1H := by
     have h := (dataM.h78 _hG).zetaDistinct_ne_ind1H
     rwa [dataM.h78_ind1H_eq] at h
@@ -612,6 +628,8 @@ the contradiction itself is the pure inner-product computation `(β_L^τ, ψ^{τ
 = Σ ±·0 − 0 = 0`, contradicting `(β_L^τ, ψ^{τ₁}) ≠ 0`. -/
 theorem caseB_character_contradiction_of_gap_inequalities
     [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
     (data : OrthogonalitySwitchData nc) (hcaseB : data.caseB)
     (hhv :
@@ -623,7 +641,7 @@ theorem caseB_character_contradiction_of_gap_inequalities
     False := by
   -- The (14.11.2)-style signed `eta_ij` expansion of `beta_L^tau` and its orthogonalities.
   obtain ⟨⟨betaL, chiL, psiImg, signs, _hsigns, hexp, heta_orth, hchiL_orth, hpair_ne⟩⟩ :=
-    caseB_contradiction_data _hG data hcaseB hhv hvu
+    caseB_contradiction_data _hG hnoV hncH0C data hcaseB hhv hvu
   -- `(beta_L^tau, psi^tau_1) = 0` by linearity + orthogonality, contradicting case-(b).
   refine hpair_ne ?_
   rw [hexp, ClassFunction.inner_sub_left, hchiL_orth, sub_zero, inner_finset_sum_left]
@@ -637,6 +655,8 @@ under `H > U`.  All numerical work in the paragraph is discharged here; only
 the named character-theoretic endpoint remains as a producer. -/
 theorem caseB_contradiction_of_full_u_card_congruences
     [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
     (data : OrthogonalitySwitchData nc) (Tdata : CaseBForTData hyp)
     (Sdata : CaseBForSData hyp) (hcaseB : data.caseB)
@@ -651,7 +671,7 @@ theorem caseB_contradiction_of_full_u_card_congruences
     _hG hu_full hu_dvd_h hh_mod_p hh_mod_q hu_mod_q hx_ne_one_of_quotient
   rcases data.caseB_gap_inequalities_of_h_gt_two_mul_pq_mul_u
       Tdata Sdata hcaseB hh_lower with ⟨hhv, hvu⟩
-  exact data.caseB_character_contradiction_of_gap_inequalities _hG hcaseB hhv hvu
+  exact data.caseB_character_contradiction_of_gap_inequalities _hG hnoV hncH0C hcaseB hhv hvu
 
 end OrthogonalitySwitchData
 
@@ -771,7 +791,10 @@ gives `(v−1)/pq ≤ pq−1`.  This isolates the character-theoretic input to `
 the case-(b) passage to `q = 3`, `p = 5` is the arithmetic
 `Hypothesis.caseB_forces_q_three_and_p_five`. -/
 theorem orthogonality_switch_pairing_bounds [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    (hyp : Hypothesis (G := G))
     (nc : NonConjugateHypothesis hyp) :
     (((nc.h - 1 : ℕ) : ℚ) / (hyp.base.p * hyp.base.q : ℚ) ≤
         ((hyp.base.p * hyp.base.q - 1 : ℕ) : ℚ)) ∨
@@ -787,8 +810,8 @@ theorem orthogonality_switch_pairing_bounds [Finite G]
           ((hyp.base.p * hyp.base.q - 1 : ℕ) : ℚ))) := by
   classical
   -- The two (14.14) coherence bundles, for `L ⊇ N_G(U)` and `M ⊇ N_G(V)`.
-  obtain ⟨dataL⟩ := TypeICoherent78Data.nonempty _hG nc.Ldata.L_maximal nc.Ldata.isTypeI
-  obtain ⟨dataM⟩ := TypeICoherent78Data.nonempty _hG nc.Mdata.M_maximal
+  obtain ⟨dataL⟩ := TypeICoherent78Data.nonempty _hG hnoV nc.Ldata.L_maximal nc.Ldata.isTypeI
+  obtain ⟨dataM⟩ := TypeICoherent78Data.nonempty _hG hnoV nc.Mdata.M_maximal
     ⟨nc.Mdata.typeIHyp.typeI⟩
   have hnc' : ¬ OddOrder.BG.Ch4.S14.IsConjugateSubgroup nc.Mdata.M nc.Ldata.L :=
     fun h => nc.not_conj h.symm
@@ -810,12 +833,12 @@ theorem orthogonality_switch_pairing_bounds [Finite G]
     rw [h2, ← nc.Ldata.typeI_data_L_eq]
     exact h.trans nc.Ldata.typeI_complement_card_eq_pq
   -- `M`-side sizes: `|K| = v` ((14.11) `K = V`, `|V| = v·d`, `d = 1`) and `[M : K] = p q`.
-  obtain ⟨hKV, hepq⟩ := K_eq_V_index_pq _hG hyp nc.Ldata nc.Mdata
+  obtain ⟨hKV, hepq⟩ := K_eq_V_index_pq _hG hnoV hncH0C hyp nc.Ldata nc.Mdata
   have hkerM : dataM.kernel = nc.Mdata.K := by
     rw [show dataM.kernel = maxNilpotentNormalHall nc.Mdata.M from
         dataM.typeIHyp.typeI.typeF.H_eq, ← nc.Mdata.K_eq_MF]
   have hd1 : hyp.base.d = 1 := by
-    have hTII : IsTypeII hyp.base.T := T_typeII _hG hyp
+    have hTII : IsTypeII hyp.base.T := T_typeII _hG hnoV hncH0C hyp
     have hDbot : hyp.base.D = ⊥ := by
       rw [hyp.base.D_eq]
       exact OddOrder.Peterfalvi.S15.V_inf_centralizer_Q_eq_bot _hG hyp.base hTII
@@ -871,7 +894,10 @@ the (14.4) cyclotomic value of `v`, into `q = 3`, `p = 5`.  The abstract `caseA`
 `OrthogonalitySwitchData` are taken to be the case-(a) bound and the `(q,p)=(3,5)` conclusion
 themselves, so the downstream (14.15)/(14.16) machinery reads them off directly. -/
 theorem orthogonality_switch [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    (hyp : Hypothesis (G := G))
     (nc : NonConjugateHypothesis hyp) :
     ∃ data : OrthogonalitySwitchData nc, data.caseA ∨ data.caseB := by
   obtain ⟨_Tdata, _, hv⟩ := caseB_for_T _hG hyp
@@ -890,7 +916,7 @@ theorem orthogonality_switch [Finite G]
                 nc.Mdata.M_maximal nc.not_conj).secondZetaImage) ≠ 0
     caseB_params := fun h => h.1
     caseB_pairing := fun h => h.2 }, ?_⟩
-  rcases orthogonality_switch_pairing_bounds _hG hyp nc with hA | ⟨hpair, hB⟩
+  rcases orthogonality_switch_pairing_bounds _hG hnoV hncH0C hyp nc with hA | ⟨hpair, hB⟩
   · exact Or.inl hA
   · exact Or.inr ⟨hyp.caseB_forces_q_three_and_p_five hv hB, hpair⟩
 
@@ -901,13 +927,15 @@ assuming the non-full value contradicts the fixed-point-free cardinal
 congruences for `H` and `U`. -/
 theorem u_final_value_of_fpf_card_congruences
     [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G)) (nc : NonConjugateHypothesis hyp)
     (hu_dvd_h : hyp.base.u ∣ nc.h)
     (hh_mod_p : nc.h ≡ 1 [MOD hyp.base.p])
     (hh_mod_q : nc.h ≡ 1 [MOD hyp.base.q])
     (hu_mod_q : hyp.base.u ≡ 1 [MOD hyp.base.q]) :
     hyp.base.u = (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) := by
-  rcases orthogonality_switch _hG hyp nc with ⟨data, hcase⟩
+  rcases orthogonality_switch _hG hnoV hncH0C hyp nc with ⟨data, hcase⟩
   rcases caseB_for_S _hG hyp nc.Ldata with ⟨Sdata, _hS_caseB⟩
   rcases hcase with hcaseA | hcaseB
   · by_contra hu_not_full
@@ -923,22 +951,26 @@ Frobenius-kernel congruences for `h`, and the fixed-point-free cardinal
 congruence for `U`.  The arithmetic contradiction is packaged in
 `u_final_value_of_fpf_card_congruences`. -/
 theorem u_final_value [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G)) (nc : NonConjugateHypothesis hyp) :
     hyp.base.u = (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) := by
   rcases nc.h_modEq_one_mod_p_and_q _hG with ⟨hh_mod_p, hh_mod_q⟩
-  exact u_final_value_of_fpf_card_congruences _hG hyp nc (nc.u_dvd_h _hG)
+  exact u_final_value_of_fpf_card_congruences _hG hnoV hncH0C hyp nc (nc.u_dvd_h _hG)
     hh_mod_p hh_mod_q (hyp.u_modEq_one_mod_q _hG)
 
 /-- **Peterfalvi (14.16)**: in the non-conjugate case, the kernel `H` is
 exactly `U`. -/
 theorem H_eq_U [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G)) (nc : NonConjugateHypothesis hyp) :
     nc.Ldata.H = hyp.base.U := by
   by_contra hHU
-  rcases orthogonality_switch _hG hyp nc with ⟨data, hcase⟩
+  rcases orthogonality_switch _hG hnoV hncH0C hyp nc with ⟨data, hcase⟩
   rcases caseB_for_T _hG hyp with ⟨Tdata, _hT_caseB, _hv_eq⟩
   rcases caseB_for_S _hG hyp nc.Ldata with ⟨Sdata, _hS_caseB⟩
-  have hu_full := u_final_value _hG hyp nc
+  have hu_full := u_final_value _hG hnoV hncH0C hyp nc
   rcases nc.h_modEq_one_mod_p_and_q _hG with ⟨hh_mod_p, hh_mod_q⟩
   have hU_card : Nat.card ↥hyp.base.U = hyp.base.u := by
     rw [hyp.base.card_U_eq_uc, OddOrder.Peterfalvi.S15.c_eq_one _hG hyp.base, mul_one]
@@ -958,7 +990,7 @@ theorem H_eq_U [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
       _hG Sdata hcaseA hu_full (nc.u_dvd_h _hG) hh_mod_p hh_mod_q
       (hyp.u_modEq_one_mod_q _hG) hx_ne_one_of_quotient
   · exact data.caseB_contradiction_of_full_u_card_congruences
-      _hG Tdata Sdata hcaseB (nc.u_dvd_h _hG) hh_mod_p hh_mod_q
+      _hG hnoV hncH0C Tdata Sdata hcaseB (nc.u_dvd_h _hG) hh_mod_p hh_mod_q
       (hyp.u_modEq_one_mod_q _hG) hx_ne_one_of_quotient
 
 /-- **Peterfalvi §8 / BG 15.7(a)**: the type-`P` Fitting core `P = S_F` is a TI-subgroup of `G`.
@@ -1116,6 +1148,7 @@ and the (7.8) datum is assembled by the same `hypothesis78OfDade` construction (
 alternatives `|M:M_F| = p ∨ |M:M_F| = p q`, never the unconditional second branch, and additionally
 supplies the `h78` field of `MHypothesis`. -/
 theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (hTII : IsTypeII hyp.base.T) :
     ∃ (M : Subgroup G) (typeIHyp : OddOrder.Peterfalvi.S14.Hypothesis M),
       M ∈ maximalSubgroups G ∧
@@ -1134,9 +1167,9 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
                 ≤ h78.zetaNuRhoNormSq := by
   classical
   obtain ⟨M, typeIHyp, hMmax, hnormV, hindexCases⟩ :=
-    OddOrder.Peterfalvi.S15.exists_M_structural_dichotomy hG hyp.base hTII
+    OddOrder.Peterfalvi.S15.exists_M_structural_dichotomy hG hnoV hyp.base hTII
   obtain ⟨fdata, _⟩ :=
-    OddOrder.Peterfalvi.S14.typeI_frobenius hG hMmax ⟨typeIHyp.typeI⟩
+    OddOrder.Peterfalvi.S14.typeI_frobenius hG hnoV hMmax ⟨typeIHyp.typeI⟩
   refine ⟨M, typeIHyp, hMmax, hnormV, hindexCases, ?_⟩
   -- Coherence for `M` via the general type-I Frobenius engine: the Frobenius witness for
   -- `typeIHyp.H = M_F` comes from (12.7) (both kernels are `maxNilpotentNormalHall M`).
@@ -1154,7 +1187,7 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal M
   have hAH : OddOrder.GroupTheory.typeIA M typeIHyp.typeI
       = (typeIHyp.typeI.typeF.H : Set G) \ {1} :=
-    OddOrder.Peterfalvi.S14.Hypothesis.typeIA_eq_sharp hG typeIHyp
+    OddOrder.Peterfalvi.S14.Hypothesis.typeIA_eq_sharp hG hnoV typeIHyp
   have hHnorm : ∀ (l : ↥M) {h : G}, h ∈ typeIHyp.typeI.typeF.H →
       (l : G) * h * (l : G)⁻¹ ∈ typeIHyp.typeI.typeF.H := by
     intro l h hh
@@ -1333,13 +1366,16 @@ set algebra on the (14.11.3) complement
 No conclusion of (14.11) is packaged here: `e = p q`, the `±1` signs, and the η-grid expansion
 are produced only in the `K ≠ V` branch by `betaM_expansion_data`. -/
 theorem exists_MHypothesis [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    (hyp : Hypothesis (G := G)) :
     Nonempty (MHypothesis hyp) := by
-  have hTII : IsTypeII hyp.base.T := T_typeII _hG hyp
+  have hTII : IsTypeII hyp.base.T := T_typeII _hG hnoV hncH0C hyp
   obtain ⟨M, structuralHyp, hM_max, hnorm_V, hindexCases⟩ :=
-    OddOrder.Peterfalvi.S15.exists_M_structural_dichotomy _hG hyp.base hTII
+    OddOrder.Peterfalvi.S15.exists_M_structural_dichotomy _hG hnoV hyp.base hTII
   obtain ⟨dataM⟩ :=
-    TypeICoherent78Data.nonempty _hG hM_max ⟨structuralHyp.typeI⟩
+    TypeICoherent78Data.nonempty _hG hnoV hM_max ⟨structuralHyp.typeI⟩
   refine ⟨{
     M := M
     K := maxNilpotentNormalHall M
@@ -1417,17 +1453,20 @@ in `H`:
   * otherwise (14.13)–(14.16) `H_eq_U` give `H = U`, so `U` is characteristic in
     `H` (`U_characteristic_of_H_eq_U`), contradicting the branch assumption. -/
 theorem field_normalizer_structure [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    (hyp : Hypothesis (G := G)) :
     Nonempty (FieldNormalizerData hyp) := by
-  obtain ⟨Ldata⟩ := exists_LHypothesis _hG hyp
+  obtain ⟨Ldata⟩ := exists_LHypothesis _hG hnoV hncH0C hyp
   by_cases hchar : (hyp.base.U.subgroupOf Ldata.H).Characteristic
-  · exact field_normalizer_of_U_characteristic _hG hyp Ldata hchar
-  · obtain ⟨Mdata⟩ := exists_MHypothesis _hG hyp
+  · exact field_normalizer_of_U_characteristic _hG hnoV hncH0C hyp Ldata hchar
+  · obtain ⟨Mdata⟩ := exists_MHypothesis _hG hnoV hncH0C hyp
     by_cases hconj : ∃ g : G, MulAut.conj g • Ldata.L = Mdata.M
-    · exact field_normalizer_of_L_conj_M _hG hyp Ldata Mdata hconj
+    · exact field_normalizer_of_L_conj_M _hG hnoV hncH0C hyp Ldata Mdata hconj
     · exact absurd
         (U_characteristic_of_H_eq_U Ldata
-          (H_eq_U _hG hyp
+          (H_eq_U _hG hnoV hncH0C hyp
             { Ldata := Ldata, Mdata := Mdata, not_conj := hconj,
               h := Nat.card ↥Ldata.H, h_eq_card_H := rfl }))
         hchar
@@ -1435,10 +1474,12 @@ theorem field_normalizer_structure [Finite G]
 /-- **Peterfalvi Section 16 + BG Appendix C**: BG Appendix C turns the
 field-normalizer configuration into `p <= q`, contradicting (14.1). -/
 theorem nonexistence_of_G [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G))
     (bgAppendixC : FieldNormalizerData hyp → hyp.base.p ≤ hyp.base.q) :
     False := by
-  rcases field_normalizer_structure hG hyp with ⟨data⟩
+  rcases field_normalizer_structure hG hnoV hncH0C hyp with ⟨data⟩
   exact (not_lt_of_ge (bgAppendixC data)) hyp.q_lt_p
 
 end OddOrder.Peterfalvi.S16

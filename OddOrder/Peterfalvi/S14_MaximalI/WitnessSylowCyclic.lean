@@ -987,7 +987,8 @@ theorem typeIIIorIV_centralizer_le_of_mem_noncyclic_mainSubgroup [Finite G]
 `P₀^# ⊆ (L_s)^#` (`data.x_mem_P0`, `data.P0_le_Ls`, `data.x_ne_one`), and `P₀` is noncyclic
 (`ctr.P0_noncyclic`).
 
-* **Type V** is excluded outright by Theorem (10.10) (`S12.no_typeV_maximal`).
+* **Type V** is excluded outright by the (10.10) hypothesis `hnoV` (instantiate with the
+  axiom-clean `no_typeV_maximal_unconditional`, `S12_Noncoherence`; issue 9087).
 * **Type II**: (8.16) gives `C_G(x) ⊆ L` for `x ∈ (L_s)^# = A_1(L)`
   (`typeII_centralizer_le_of_mem_mainSubgroup`), contradiction.
 * **Types III/IV**: via (10.10)+(11.9.c)+(11.6)+(9.7.b), `P₀ ⊆ L_F`, and (8.6.a) gives
@@ -996,9 +997,10 @@ theorem typeIIIorIV_centralizer_le_of_mem_noncyclic_mainSubgroup [Finite G]
 
 The two §8–§11 centralizer-containment facts are pinned sorried above (genuinely missing as usable
 containments — the upstream (8.16)/(8.6.a)/(11.9.c) results are themselves sorried or overstated);
-the case analysis, the Type-V exclusion (cited, real), and the contradiction assembly here are
-honest. -/
+the case analysis, the Type-V exclusion (hypothesised, honest), and the contradiction assembly
+here are honest. -/
 theorem witness_L_isTypeI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
     IsTypeI data.L := by
   -- `x ∈ (L_s)^#`: nonidentity element of `mainSubgroup L L_type`.
@@ -1025,14 +1027,16 @@ theorem witness_L_isTypeI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (Or.inr hLt) ctr.P0_noncyclic data.L_hasType data.P0_le_Ls data.x_mem_P0 data.x_ne_one) hEsc
   | V =>
     rw [hLtype] at hLt
-    exact absurd ⟨data.L, data.L_maximal, hLt⟩ (OddOrder.Peterfalvi.S12.no_typeV_maximal hG)
+    exact absurd ⟨data.L, data.L_maximal, hLt⟩ hnoV
 
 /-- **Peterfalvi (12.9)/(12.10): the witness type is exactly `I`.**  The recorded type `data.L_type`
 of the witness `L` is forced to be `I`: every other type contradicts the escape condition
 `C_G(x) ⊄ L` (`data.centralizer_x_not_le_L`) via the type-II/III/IV centralizer-containment lemmas
-(and type `V` is excluded outright).  Same case-split as `witness_L_isTypeI`, but concluding the
-identity `data.L_type = I` needed to compute `L_s = L_F`. -/
+(and type `V` is excluded outright by the (10.10) hypothesis `hnoV`).  Same case-split as
+`witness_L_isTypeI`, but concluding the identity `data.L_type = I` needed to compute
+`L_s = L_F`. -/
 theorem witness_L_type_eq_typeI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
     data.L_type = PeterfalviType.I := by
   have hx_mem : data.x ∈ mainSubgroup data.L data.L_type := data.P0_le_Ls data.x_mem_P0
@@ -1054,14 +1058,15 @@ theorem witness_L_type_eq_typeI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
       (Or.inr hLt) ctr.P0_noncyclic data.L_hasType data.P0_le_Ls data.x_mem_P0 data.x_ne_one) hEsc
   | V =>
     rw [hLtype] at hLt
-    exact absurd ⟨data.L, data.L_maximal, hLt⟩ (OddOrder.Peterfalvi.S12.no_typeV_maximal hG)
+    exact absurd ⟨data.L, data.L_maximal, hLt⟩ hnoV
 
 /-- **Peterfalvi (12.10): `P₀ ⊆ L_F`.**  Since the witness type is `I` (`witness_L_type_eq_typeI`),
 `L_s = mainSubgroup L I = L_F`, so `data.P0_le_Ls` (`P₀ ⊆ L_s`) gives `P₀ ⊆ L_F`. -/
 theorem witness_P0_le_kernel [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
     ctr.P0 ≤ maxNilpotentNormalHall data.L := by
-  have hI := witness_L_type_eq_typeI hG data
+  have hI := witness_L_type_eq_typeI hG hnoV data
   have hP0 := data.P0_le_Ls
   rw [hI] at hP0
   simpa [mainSubgroup] using hP0
@@ -1110,6 +1115,7 @@ while `N_G(H) = L` (`witness_normalizer_kernel_eq`); picking `g ∈ C_G(x) ∖ L
 (8.3) alternative in the (12.10) minimality argument. -/
 theorem witness_H_sharp_not_isTISubset_of_typeI [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
     (typeI : TypeIData data.L) :
     ¬ OddOrder.GroupTheory.IsTISubset
@@ -1119,7 +1125,7 @@ theorem witness_H_sharp_not_isTISubset_of_typeI [Finite G]
   have hNL := witness_normalizer_kernel_eq hG data typeI
   have hxH : data.x ∈ typeI.typeF.H := by
     rw [typeI.typeF.H_eq]
-    exact witness_P0_le_kernel hG data data.x_mem_P0
+    exact witness_P0_le_kernel hG hnoV data data.x_mem_P0
   have hxsharp : data.x ∈ OddOrder.GroupTheory.sharpSubgroup typeI.typeF.H :=
     ⟨hxH, by simpa using data.x_ne_one⟩
   obtain ⟨g, hgC, hgL⟩ := SetLike.not_le_iff_exists.mp data.centralizer_x_not_le_L

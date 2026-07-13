@@ -163,8 +163,10 @@ theorem theoremC [Finite G] (hyp : S16.Hypothesis (G := G)) :
 field-normalizer data, BG Theorem C contradicts the standing hypothesis `q < p`. -/
 theorem final_contradiction [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : S16.Hypothesis (G := G)) :
     False :=
-  S16.nonexistence_of_G hG hyp (theoremC hyp)
+  S16.nonexistence_of_G hG hnoV hncH0C hyp (theoremC hyp)
 
 end OddOrder.BG.AppC

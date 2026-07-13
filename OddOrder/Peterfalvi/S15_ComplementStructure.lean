@@ -116,11 +116,12 @@ that `W₁ ⊂ E`".  Since `W₁ ≤ N_G(U) ≤ L` is coprime to the kernel (`q 
 `E₀`, which is again a Frobenius complement (`IsFrobeniusGroup.conjComplement`).  The only `sorry`
 is the coprimality, gated on the opaque `kernel_eq_MF` carrier. -/
 theorem exists_typeIFrobeniusData_W1_le [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
     (hLtypeI : IsTypeI L) (hNUL : Subgroup.normalizer (hyp.U : Set G) ≤ L) :
     ∃ frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L, frob.kernel_eq_MF ∧
       hyp.W1 ≤ frob.complement.map L.subtype := by
-  obtain ⟨frob₀, hker₀⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius _hG hLmax hLtypeI
+  obtain ⟨frob₀, hker₀⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius _hG hnoV hLmax hLtypeI
   have hW1L : hyp.W1 ≤ L := hyp.W1_normalizes_U.trans hNUL
   haveI : (frob₀.typeI.typeF.H.subgroupOf L).Normal := frob₀.frobenius.isNormal
   -- `L` (maximal) is solvable, hence so is the kernel.
@@ -172,11 +173,12 @@ theorem p_not_dvd_kernel [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
 decomposition of `L` can be taken with the complement containing `W₂` (`|W₂| = p` coprime to the
 kernel by `p_not_dvd_kernel`, Schur–Zassenhaus complement conjugacy). -/
 theorem exists_typeIFrobeniusData_W2_le [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
     (hLtypeI : IsTypeI L) (hNVL : Subgroup.normalizer (hyp.V : Set G) ≤ L) :
     ∃ frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L, frob.kernel_eq_MF ∧
       hyp.W2 ≤ frob.complement.map L.subtype := by
-  obtain ⟨frob₀, hker₀⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius _hG hLmax hLtypeI
+  obtain ⟨frob₀, hker₀⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius _hG hnoV hLmax hLtypeI
   have hW2L : hyp.W2 ≤ L := hyp.W2_normalizes_V.trans hNVL
   haveI : (frob₀.typeI.typeF.H.subgroupOf L).Normal := frob₀.frobenius.isNormal
   haveI hLsolv : IsSolvable ↥L :=
@@ -453,6 +455,7 @@ complement dichotomy `complement_card_p_or_pq_V`; the resolution to `p q` happen
 (14.11): the `K ≠ V` branch by the (14.11.2) character argument, the `K = V` branch by excluding
 `E = W₂` in the §14 context).  The restructured §16 `exists_MHypothesis` cites this form. -/
 theorem exists_M_structural_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (hTII : IsTypeII hyp.T) :
     ∃ (M : Subgroup G) (_typeIHyp : OddOrder.Peterfalvi.S14.Hypothesis M),
       M ∈ maximalSubgroups G ∧
@@ -460,8 +463,8 @@ theorem exists_M_structural_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimp
           (((maxNilpotentNormalHall M).subgroupOf M).index = hyp.p ∨
             ((maxNilpotentNormalHall M).subgroupOf M).index = hyp.p * hyp.q) := by
   obtain ⟨L, hLmax, hLtypeI, hNVL, _hVH⟩ :=
-    exists_typeI_maximal_overNormalizer_V hG hyp hTII
-  obtain ⟨frob, _hker, hW2E⟩ := exists_typeIFrobeniusData_W2_le hG hyp hLmax hLtypeI hNVL
+    exists_typeI_maximal_overNormalizer_V hG hnoV hyp hTII
+  obtain ⟨frob, _hker, hW2E⟩ := exists_typeIFrobeniusData_W2_le hG hnoV hyp hLmax hLtypeI hNVL
   obtain ⟨typeIHyp⟩ := OddOrder.Peterfalvi.S14.exists_typeI_hypothesis hG hLmax hLtypeI
   refine ⟨L, typeIHyp, hLmax, hNVL, ?_⟩
   rw [typeIFrobenius_kernel_index_eq_complement frob]

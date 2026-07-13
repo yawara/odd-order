@@ -308,6 +308,8 @@ remaining local residual in this ratio theorem is Coq (11.8)
 the concrete (13.18.d) bound `betaData.Y_norm_bound` to obtain
 `(v − 1)/p ≤ (u − 1)/q`, contradicting the strict (14.8) inequality. -/
 theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G)) (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T) :
     ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) ≤
       ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) := by
@@ -442,7 +444,7 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   -- The genuine (13.18) gap is the concrete `GammaGrid`.  Its virtuality follows from the
   -- supported S-side Dade image; reality and principal orthogonality are the faithful BetaData
   -- fields.  The coherent images are virtual characters by the coherent-extension contract.
-  let betaData := OddOrder.Peterfalvi.S15.betaData_of_grid hG hyp.base
+  let betaData := OddOrder.Peterfalvi.S15.betaData_of_grid hG hnoV hyp.base
     ⟨1, hyp.base.p_prime.one_lt⟩ (by simp)
   have hGammaZ : betaData.Gamma ∈ ZIrr G := by
     simpa [betaData, OddOrder.Peterfalvi.S15.betaData_of_grid] using
@@ -641,18 +643,17 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           (OddOrder.Peterfalvi.S13.secondDerived_eq_fitting_of_base hG
             (s12HypothesisOfTypePData hG hyp.base.T_maximal dataT'
               (Or.inl hIII) hP1') (Or.inl hIII)
-            (fun s13 => OddOrder.Peterfalvi.S13.S_H0C_not_coherent hG s13))
+            (fun s13 => hncH0C s13))
           (OddOrder.Peterfalvi.S13.card_H_eq_of_base hG
             (s12HypothesisOfTypePData hG hyp.base.T_maximal dataT'
               (Or.inl hIII) hP1') (Or.inl hIII)
-            (fun s13 => OddOrder.Peterfalvi.S13.S_H0C_not_coherent hG s13))
+            (fun s13 => hncH0C s13))
           -- `(11.3)` narrow-`𝒮(H₀C)` noncoherence.  The unconditional heir
           -- `S_H0C_not_coherent_unconditional` lives behind the `S12_Noncoherence` pair
           -- machinery, which transitively imports this S16 cluster; from here (upstream of that
           -- back-edge) the in-DAG refuter is the legacy `S_H0C_not_coherent`, exactly as its
           -- docstring reserves for consumers above the pair machinery.
-          (fun s13hyp =>
-            OddOrder.Peterfalvi.S13.S_H0C_not_coherent hG s13hyp)
+          (fun s13hyp => hncH0C s13hyp)
           ζ hzetaS (hirr ζ hζT) hzeta1
           -- `source` is inferred from `himage` (scoped `tSideDadeMap`); the local goal states the
           -- same `inner (tSideDadeMap …) …` under the `haveI` diamond, bridged per-entry below.
@@ -692,7 +693,7 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       have hcross :
           ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ))
             (OddOrder.Peterfalvi.S15.tauSbetaGrid hG hyp.base) = 0 :=
-        tSideDadeMap_inner_tauSbetaGrid_eq_zero hG hyp dataT hP1 hβsupp
+        tSideDadeMap_inner_tauSbetaGrid_eq_zero hG hnoV hyp dataT hP1 hβsupp
       have hτβeta : ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ))
           (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩
             ⟨1, by have := hyp.base.three_le_p; omega⟩) = 0 := by
@@ -893,21 +894,22 @@ subgroup that is *not* type II is type III.  In σ-theoretic terms, `IsTypeP1 T`
 
 **Fully reduced to the single (11.9) residual `T_not_isTypeIV_of_isTypeP1`.**  The type dictionary
 `proposition_type_classification` (BG Prop 16.1, proven) gives, from `IsTypeP1 T`, either Type III/IV
-(if `M_F ≠ M_σ`) or Type V (if `M_F = M_σ`).  **Type V is excluded outright** by Peterfalvi (10.10)
-`no_typeV_maximal` (proven — no maximal subgroup of a minimal simple group of odd order is Type V),
-so `M_F ≠ M_σ` and `T` is Type III or IV.  Excluding Type IV — the genuine (11.9) Galois/character
+(if `M_F ≠ M_σ`) or Type V (if `M_F = M_σ`).  **Type V is excluded outright** by the (10.10)
+hypothesis `hnoV` (instantiate with the axiom-clean `no_typeV_maximal_unconditional`,
+`S12_Noncoherence`; issue 9087), so `M_F ≠ M_σ` and `T` is Type III or IV.  Excluding Type IV — the genuine (11.9) Galois/character
 content — is the isolated residual `T_not_isTypeIV_of_isTypeP1`.  The Type-V exclusion and the III/IV
 structural wiring (incl. the `TypeIIIData.normalizer_le` field, bundled into the clause-(c)
 disjunction) are proven here. -/
 theorem T_isTypeIII_of_isTypeP1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ IsTypeV M)
     (hyp : Hypothesis (G := G)) (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T) :
     OddOrder.GroupTheory.IsTypeIII hyp.base.T := by
   -- Type dictionary (BG Prop 16.1): `IsTypeP1 T` ⟹ III/IV (`M_F ≠ M_σ`) or V (`M_F = M_σ`).
   obtain ⟨_, _, hcIII_IV, hdV, _, _⟩ :=
     OddOrder.BG.Ch4.S16.proposition_type_classification hG hyp.base.T_maximal
-  -- Type V excluded universally by Peterfalvi (10.10) `no_typeV_maximal`, so `M_F ≠ M_σ`.
+  -- Type V excluded universally by the (10.10) hypothesis `hnoV`, so `M_F ≠ M_σ`.
   have hMF : OddOrder.BG.Ch4.S15.MF hyp.base.T ≠ OddOrder.BG.Ch3.S10.Msigma hyp.base.T := fun h =>
-    OddOrder.Peterfalvi.S12.no_typeV_maximal hG ⟨hyp.base.T, hyp.base.T_maximal, hdV.mpr ⟨hP1, h⟩⟩
+    hnoV ⟨hyp.base.T, hyp.base.T_maximal, hdV.mpr ⟨hP1, h⟩⟩
   -- `T` is Type III or IV; exclude IV by the (11.9) residual.
   exact (hcIII_IV.mpr ⟨hP1, hMF⟩).resolve_right (T_not_isTypeIV_of_isTypeP1 hG hyp hP1)
 
@@ -929,6 +931,8 @@ order inputs are the direct (13.4) producer `T_side_caseB_facts` and the (13.15)
 `S15.caseB_order_u_data`.  Thus no forward reference through the later `key_inequality` theorem is
 needed. -/
 theorem T_isTypeP2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G)) :
     OddOrder.BG.Ch4.S14.IsTypeP2 hyp.base.T := by
   have hP : OddOrder.BG.Ch4.S14.IsTypeP hyp.base.T :=
@@ -938,10 +942,11 @@ theorem T_isTypeP2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   intro hκeq
   -- Then `T` is type `P₁`, hence (Coq `FTtype34_structure`) structurally Type III.
   have hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T := ⟨hP, hκeq⟩
-  have hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T := T_isTypeIII_of_isTypeP1 hG hyp hP1
+  have hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T := T_isTypeIII_of_isTypeP1 hG hnoV hyp hP1
   -- The character body then gives the type-III Γ-bridge estimate `(v − 1)/p ≤ (u − 1)/q`.
   have hle : ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) ≤
-      ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) := T_typeIII_ratio_le hG hyp hIII
+      ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) :=
+    T_typeIII_ratio_le hG hnoV hncH0C hyp hIII
   -- The arithmetic half of (14.8), separated from the later `key_inequality` packaging.
   have hratio := cyclotomic_ratio_gt_of_q_lt_p
     hyp.base.p_prime hyp.base.q_prime hyp.base.p_odd hyp.base.q_odd hyp.q_lt_p
@@ -984,8 +989,10 @@ the deep `M'`-type-`F` structure — `IsTypeF (derivedInG T)` and `(T')_F = T_F`
 (Placed ahead of `exists_LHypothesis` so the §14 `T`-side chain — `typeII_overNormalizer_frobenius`
 etc. — can cite `IsTypeII T` locally.) -/
 theorem T_typeII [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G)) :
     IsTypeII hyp.base.T :=
-  OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.base.T_maximal (T_isTypeP2 hG hyp)
+  OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.base.T_maximal (T_isTypeP2 hG hnoV hncH0C hyp)
 
 end OddOrder.Peterfalvi.S16
