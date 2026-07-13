@@ -1382,3 +1382,74 @@ NormEstimates 5 obtain-site 移行の keystone = **general S-side dichotomy** �
 **次 = ⑤ flip 3/N**: NormEstimates 8 helper の core/lam 版 + 5 obtain-site の dichotomy 移行
 (λ枝 = core+lam で helper 呼出、no-λ枝 = C=⊥∧u=full からの (13.10)-arithmetic)。または (c) の
 deep bridge を先に engage (最上流 genuine math、multi-session)。
+
+## 2026-07-14 更新 #29 (lane b, /loop) — ⚠ 重大 architecture 発見: NormEstimates 移行は import DAG でブロック (honest producer が下流)
+
+⑤ flip 3/N (NormEstimates 5 obtain-site 移行) 着手時に **import 上の根本ブロッカー**を発見:
+
+- **honest producer 群 (`T_caseB_facts_unconditional` / `lambdaCluster_or_caseB` /
+  `characterDegreeCore_nonempty` / `lambda_forces_T_caseB_core`、全て S15_CharacterDegreeSupply)
+  は NormEstimates の *下流***。理由 = producer は `tau1S_ofHonest` (S15_CaseACoherence) が必須で、
+  `S15_CharacterDegreeSupply → CaseACoherence → MuColumnPin → CoherenceEtaOrthogonality →
+  {S15_HonestTypeP2A0, S16_GridExpansion} → hub S15_SAndT_Setup → NormEstimates`。
+- ⟹ **NormEstimates は honest producer を import 不能** (cycle)。overstatement
+  `character_degree_analysis` (Machinery135, 上流) 経由でしか character-degree data を取れない。
+- 教科書層序 ((13.3) char degrees → (13.6-15) analytic) に対し repo は **逆転** (honest (13.3)
+  producer が τ₁ coherence engine 依存で (13.6-15) NormEstimates の下流に来た)。
+- **層逆転の実在**: `CoherenceEtaOrthogonality (S15) → S16_GridExpansion (S16)` — S15 が S16 を import。
+  hub を import する closure 内ファイル = S16_GridExpansion / S15_SAndTDefs / S13_PrimeTIResidueBridge /
+  S15_HonestTypeP2A0 の複数。単一 spurious edge の de-hub では解けない (multi-file relayer + S15↔S16
+  層序修正が要る、delicate)。
+
+### 含意 (9094 RULING §3 の feasibility 修正)
+- RULING §3-2「NormEstimates 5 を dichotomy thread に proof 移行」は **現 import DAG では不可能**。
+  前提に「honest producer が NormEstimates 上流」があったが、実際は下流。
+- RULING §3-3「全 consumer 移行後 character_degree_analysis 削除」も NormEstimates 移行がブロックゆえ
+  現状不可。**overstatement は当面上流 interface として残る** (§13 analytic 枝は honest 化できない = FT
+  honest 証明の債務、要 relayer)。
+- 移行済は downstream consumer のみ = TTypeII (S16、honest producer 下流ゆえ可、更新 #27)。
+
+### 選択肢 (次の方針)
+- **(A) multi-file relayer**: CoherenceEtaOrthogonality 系の hub 依存を specific-leaf import に置換 +
+  S15↔S16 層逆転解消 → honest producer を NormEstimates 上流へ。high-leverage だが delicate・多反復・
+  build 検証必須 ([[relayer-verify-with-build-not-bfs]])。
+- **(B) deep math bridge を先に**: `S_caseB_facts_no_lambda` ((13.3.b) forward, S-instance irr SOf
+  member → LambdaWitness) / `T_caseB_facts_no_lambda` (no-λ T-mirror)。honest producer を下流のまま
+  honest 化 (downstream TTypeII 枝が fully honest に)。upstream genuine math。
+- hub 監視 tick で本発見を確認 (RULING §3 前提の訂正ゆえ)。b は当面 (B) の deep math を engage
+  (relayer は別 major effort、着手前に規模精査)。
+
+## 2026-07-14 更新 #30 (lane b, /loop) — 次 session 実行プラン: S_caseB_facts_no_lambda の structuring (deep bridge の de-opacify)
+
+deep S-side bridge `S_caseB_facts_no_lambda` (S15_CharacterDegreeSupply:1211, monolithic sorry) を
+**structured proof + isolated irr-member sub-gate** に de-opacify する具体プラン (素材は全て所在確認済):
+
+**目標**: `¬LambdaWitness hyp → hyp.C = ⊥ ∧ hyp.u = (p^q−1)/(p−1)` を
+`caseB_of_no_irreducible_sOf_H0Cprime` (CountingLayer:1041, sorry-free, 上流ゆえ import 可) 経由で組む。
+
+**手順**:
+1. S-instance 構築: `chief := (exists_chiefFactorData hG (hyp.toTypesIIIIIIVSetupS hG)).choose`、
+   `chars := hyp.mkSection11CharacterDataS hG chief` (SubcoherenceInputs:547)。
+2. `hno : ¬ ∃ χ ∈ chars.SOf (chief.H0 ⊔ chars.Cprime), IsIrreducibleCharacter χ` を
+   **新 sorried sub-lemma** `irr_sOf_S_to_lambdaWitness` (χ irr ∈ S-instance SOf → LambdaWitness) の
+   contrapositive で供給。**これが唯一の残 genuine gate** = (13.3.b) forward: S-instance の irr SOf
+   member が uq 次数 PC-linear-induced (θ irr linear P⊄Ker on H.subgroupOf S, Ind θ irr) であること。
+   reducible 版 (`caseB_reducible_sOf_H0_isIndHC`, InnerCompHom:281) は (9.9.b) 依存で irr に非適用 —
+   irr member は (9.9.b) で捕まらぬ特別ゆえ新機械が要る (multi-session、S11_MaximalII_III_IV 資材の
+   caseA irr witness [ThetaCountAssembly:730, degree qu ∈ SOf(H0⊔C)] を Ind 形に落とす)。
+3. `obtain ⟨_, hCbot, hufull⟩ := caseB_of_no_irreducible_sOf_H0Cprime hG chars hno`
+   → `chars.C = ⊥ ∧ chars.u = (chief.p ^ data.q − 1)/(chief.p − 1)`。
+4. **translations** (全て HypothesisBasics:1130-1166 に inline have あり、抽出/再導出):
+   - `hq : (toTypesIIIIIIVSetupS hG).q = hyp.q` (:1134, Sdata_W1_eq + q_eq_card_W1)
+   - `hpp : chief.p = hyp.p` (:1138, card_P_eq + chiefFactor_quotient_card)
+   - `hu_eq : chars.u = hyp.u` (:1152, relIndex_cSub_U_eq_u + cSub_eq_C + card_U_eq_uc)
+   - `chars.C = hyp.C`: chars.C は導出値、`toTypesIIIIIIVSetupS_cSub_eq_C` (:1040) + Section11CharacterData.C
+     定義 (ChiefFactorCore:606) の展開 (SubcoherenceInputs:592-593「C = C_U(P), cprimeSub = derivedInG(cSub)」)
+   → `refine ⟨C 変換 ▸ hCbot, u/p/q 変換 ▸ hufull⟩`。
+
+**効果**: monolithic sorry → 1 本の precisely-named sub-gate (irr_sOf_S_to_lambdaWitness) に isolate。
+sub-gate は (13.3.b) forward の genuine math (multi-session)。translations は既存 inline have の抽出。
+
+**注意**: このプランは deep math を honest 化するが、**NormEstimates 移行ブロッカー (更新 #29) は別問題**
+(architecture relayer 要、S15↔S16 層逆転含む)。honest producer が下流のままなので、S_caseB_facts_no_lambda を
+閉じても NormEstimates は救われない (downstream の TTypeII 枝が honest になるのみ)。
