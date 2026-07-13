@@ -939,7 +939,7 @@ theorem typeII_centralizer_le_of_mem_mainSubgroup [Finite G]
 `p`-group `P₀ ⊆ L_s` lies in the Fitting kernel `L_F`.
 
 This is the second paragraph of (12.10) up to its final (8.6.a) step: by Theorem (10.10)
-(`S12.no_typeV_maximal`, available — excludes Type V) and (11.9.c)
+(`S12.no_typeV_maximal_unconditional`, available — excludes Type V) and (11.9.c)
 (`S13.final_typeIII_conclusions`, sorried) `L` is Type III with case (b) of (9.7); by (11.6)
 (`C_U(H) = 1`) and (9.7.b) the complement `U` of `H = L_F` in `[L,L]` is **cyclic**.  Since
 `L_F` is a normal Hall subgroup of `L_s = [L,L]` with cyclic complement, a noncyclic `p`-group

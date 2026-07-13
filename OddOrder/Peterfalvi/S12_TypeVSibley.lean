@@ -18,7 +18,7 @@ T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000),
 §10, pp. 58-63 — Theorem (10.10) proof, first sentence ("If case (a) of Definition
 (8.7) holds, then `S` is coherent by Theorem (6.8)").
 
-Coordinate layer for the case-(a) branch of `typeV_forces_coherence` (issue 1021):
+Coordinate layer for the case-(a) branch of `typeV_forces_coherence_v2` (issue 1021):
 when a type-V maximal `M` satisfies the (8.7)(a) TI alternative, coherence of `S`
 comes from Theorem (6.8) (`S08.sibleySetup_is_coherent`) applied to a
 `SibleyDadeHypothesis` over `L = M`, `H = (M').subgroupOf M`.  This file aligns the

@@ -238,8 +238,8 @@ twice:
 
 Both are `coherent_of_constant_degree ∘ subset_subcoherent`: restrict the subcoherent family to a
 uniform-degree conjugate-closed subset, then fire the (5.7) equal-degree coherence producer.  Lane
-a's (10.7) `typeII_derived_frobenius` (Coq `Frob_der1_type2`) consumes the same base-case glue on
-the 4-element uniform T2 family. -/
+a's (10.7) `typeII_HU_frobenius_of_coherent'` (Coq `Frob_der1_type2`) consumes the same base-case
+glue on the 4-element uniform T2 family. -/
 
 /-- **Peterfalvi (5.7)∘(5.3)(a): coherence of a uniform-degree conjugate-closed subfamily.**
 
@@ -310,8 +310,8 @@ both wrong, a Coq-name-grep false-negative, disproven by verify-first):
    (restrict a subcoherent family to a `cfConjC_subset`, Coq `PFsection5.v:845`) +
    `coherent_of_constant_degree` (= `uniform_degree_coherence`, **already proven**,
    `S07_CoherenceConstantDegree.lean:551`), with `sixTwoDecompositionData` as the
-   subcoherent supply.  Lane a's (10.7) `typeII_derived_frobenius` consumes the
-   same (9.11) coherence.
+   subcoherent supply.  Lane a's (10.7) `typeII_HU_frobenius_of_coherent'` consumes
+   the same (9.11) coherence.
 
 **LANDED 2026-07-06 (this file, sorry-free — `#print axioms` shows only
 `propext`/`Classical.choice`/`Quot.sound`)**:
@@ -607,7 +607,8 @@ against the honest §9 induced-family Dade witnesses (the per-step `Dmem`/`hmemO
 in `S08_CaseBEnumeration.sMember_degreeSqNormBound_of_not_coherent`, but for the §9 `S_ H0C'` family
 rather than §8 case-B).  This is **one focused multi-step session** for lane b's (13.3)
 `coherent_H0Cprime_S` re-grounding (drop `sibleyTarget_H0C`) once the §9 induced-family witnesses
-are threaded, and the same (9.11) coherence closes lane a's (10.7) `typeII_derived_frobenius`.
+are threaded, and the same (9.11) coherence closes lane a's (10.7)
+`typeII_HU_frobenius_of_coherent'`.
 Tracking = issue 1017. -/
 
 /-! ### Peterfalvi (9.11): the maximal-coherent-subfamily skeleton

@@ -1014,7 +1014,8 @@ theorem not_isTypeIV_of_mem_maximalSubgroups {G : Type*} [Group G] [Finite G]
   haveI : NeZero (Nat.card (s13.base.toHypothesis46 hG hG.odd).W1) := ⟨Nat.card_pos.ne'⟩
   exact not_isTypeIV_of_hypothesis hG s13 hMIV
 
-/-- **Peterfalvi (11.9.c), the universal Type-IV exclusion** (companion of `no_typeV_maximal`,
+/-- **Peterfalvi (11.9.c), the universal Type-IV exclusion** (companion of
+`no_typeV_maximal_unconditional`,
 existential form for the FT spine). -/
 theorem no_typeIV_maximal {G : Type*} [Group G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
