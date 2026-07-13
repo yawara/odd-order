@@ -53,7 +53,7 @@ are normal `H`-subgroups with coprime orders (`M` a `p'`-group, `U` a `p`-group)
 so they commute; hence `M` (mapped into `G`) lies in `C_G(U) ≤ U` (Hall-Higman
 3.21, hypothesis (iv)).  But `M` is a `p'`-group inside the `p`-group `U`, so
 `M = 1`. -/
-private theorem oPiCorePrime_subgroup_eq_bot_of_opCore_le
+theorem oPiCorePrime_subgroup_eq_bot_of_opCore_le
     {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
     [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G]
     (h_oPiPrime_trivial : OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G = ⊥)

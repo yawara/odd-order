@@ -302,3 +302,21 @@ lift to `G`, contradicting counterexample minimality, so `O_{p′}(G) = 1`.
 The next textbook frontier is Step 4: use Step 2 p-separability, Step 3, and
 the Hall–Higman centralizer bound (Isaacs Lemma 1.2.3) to prove that the chosen
 Sylow `p`-subgroup is maximal in `G`.
+
+## 2026-07-14 update — Step 4 Sylow maximality landed
+
+Step 4 is complete in the dedicated leaf
+`OddOrder/Isaacs/Ch07_ThompsonSubgroup/S7C_SylowMaximal.lean`.
+For every proper overgroup `P ≤ H < G`, the ambient center and Thompson-local
+normal-complement hypotheses descend to `H`.  Strong induction gives a normal
+`p`-complement `K ◁ H`.
+
+Step 2 supplies `p`-separability of `G`, while Step 3 gives
+`O_{p′}(G) = 1`.  The existing Hall–Higman argument is now public and yields
+`O_{p′}(H) = 1` whenever `O_p(G) ≤ H`.  The complement `K` is proved to be a
+normal `p′`-subgroup from its cardinality, hence lies in `O_{p′}(H)` and is
+trivial.  Therefore `H` is its own Sylow `p`-subgroup and `H = P`, proving
+`IsCoatom P` without a maximality hypothesis or carrier field.
+
+The next textbook frontier is Step 5: derive `C_G(Z(P)) = P` from Step 4 and
+the assumed normal `p`-complement in `C_G(Z(P))`.
