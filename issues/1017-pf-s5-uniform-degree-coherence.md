@@ -1726,3 +1726,28 @@ pattern を family = `sSet \ S₂` に差し替えて `uniform_degree_coherence_
      `Supp(Ind_{H⊔U₁}^S 1 − ψ₁) ⊆ A(S)` (Hall 論法; supp γ ⊆ ⋃ conj HU₁ の一般 lemma +
      `honestTypeP2ASet_conj_mem` + cyclic Hall 分解 + Hall 共役定理)。
   3. `nineElevenFourNormInputsS` bundle: 1+2+generic γ-facts の配線 (M-side 1063-1176 mirror)。
+
+## 2026-07-13 更新 #52 (lane b, /loop) — (9.11.4) bundle landed + file split (campaign → S15_CaseACoherence)
+
+**landed (commit 11765a58)**:
+1. `cuSubOf_zero_tiWitness` (**axiom-clean**) = (9.11.2) TI-identity を明示 witness `cuSubOf caseA 0`
+   で返す strengthened producer (generic producer の proof verbatim mirror; S11_NineElevenTIWitness への
+   upstream-merge 候補 — hub 向け note)。
+2. `nineElevenAlphaSupportS` (new named residual, TRUE signature) = `Supp(γ − ψ₁) ⊆ A(S)` @ 明示
+   witness。Coq gap-patch site。証明経路 (次): `support_induce_subset_conjugatesInto` + cyclic Hall
+   分解 + Hall 共役 (可解 HU₁) + coprime fixed-point lifting + `sSet_member_support_subset` +
+   `honestTypeP2ASet_conj_mem`。
+3. `nineElevenFourNormInputsS` = (9.11.4) bundle (∃ N, N·u = (a+1)u+(q−1)a² ∧ A(S)-supported
+   α = γ−ψ₁ ∈ ZIrr, ‖α‖² = N)。generic `nineElevenGamma_*` 層 + `cfnorm_sub_irreducible_orthogonal`
+   + `mem_ZIrr_inner_self_eq_sum_sq` の S-instance 配線、sorryAx = support residual のみ。
+
+**file split (1829 行 > 1500 watch → 自主 suffix-split)**: active な (9.11) campaign + assembly + τ₁
+を新 leaf **`S15_CaseACoherence.lean`** (1168 行) へ、`S15_CaseBReducibleCoherence.lean` (697 行) は
+凍結 caseB coherence + (5.6) pair bound を保持し新 leaf が import。body byte-identical・宣言 28 = 8+20・
+sorry 2 = 0+2 保存。importer は OddOrder.lean のみ (import 追加)。build green 4182 jobs。
+
+**残 residual 2 (共に S15_CaseACoherence)**: `nineElevenAlphaSupportS` (9.11.4 support) +
+`nineElevenNormBoundS` (9.11.5-8 dichotomy/Bessel/budget)。次: (i) normBound を
+`nineElevenNormBound_of_sevenEightRefutation` mirror で dichotomy 分解 (c₃ = landed
+`sSet_sThree_coherent_dade`、α-context = landed bundle 流用、h78 = 新 named residual)、
+(ii) alphaSupport の Hall 論法実証明。
