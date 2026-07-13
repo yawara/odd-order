@@ -736,4 +736,98 @@ theorem Hypothesis.sSet_memberRFamily_orthogonal [Finite G]
         OddOrder.Peterfalvi.S16.eta_orthonormal hyp a b kφ kξ, if_neg (fun h => hne4 h.2),
         neg_zero, neg_zero]
 
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **Peterfalvi (5.5) for a coherent subfamily of `𝒮 = sSet`** (issue 1017; the honest-Dade
+`S`-instance of the M-side `S13.SOf_coherent_extension_eq_sum_memberRFamily`): a coherent
+extension of `T ⊆ 𝒮` w.r.t. the honest `'A(S)`-Dade `τ_S` evaluates a member `ψ` (whose
+conjugate is also in `T`) as a partial sum over the dispatched case-agnostic `R`-family
+`sSet_memberRFamily`. -/
+theorem Hypothesis.sSet_coherent_extension_eq_sum_memberRFamily [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {T : Set (ClassFunction ↥hyp.S ℂ)} (hTsub : T ⊆ sSet (hyp.toTypesIIIIIIVSetupS hG))
+    (c' : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG))) T
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S))
+    {ψ : ClassFunction ↥hyp.S ℂ} (hψT : ψ ∈ T) (hψcT : ψ.conj ∈ T) :
+    ∃ E ⊆ (hyp.sSet_memberRFamily hG (hTsub hψT)).imageSet,
+      c'.extension ψ = ∑ α ∈ E, α := by
+  haveI := hyp.finiteG
+  classical
+  have hne : ψ ≠ ψ.conj := fun h =>
+    sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupS hG) (hyp.oddCardS hG)
+      (hTsub hψT) h.symm
+  have hχχbar : ClassFunction.inner ψ ψ.conj = 0 :=
+    sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupS hG) (hTsub hψT) (hTsub hψcT) hne
+  have hdiffsupp : ((ψ - ψ.conj : ClassFunction ↥hyp.S ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S := by
+    rw [show (ψ - ψ.conj : ClassFunction ↥hyp.S ℂ) = -(ψ.conj - ψ) from by abel,
+      ClassFunction.support_neg]
+    exact hyp.sSet_member_conjDiff_supported hG (hTsub hψT)
+  have hle : OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.S)
+      ({ψ - ψ.conj, ψ - 0} : Set (ClassFunction ↥hyp.S ℂ))
+      ≤ OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.S) T :=
+    Submodule.span_le.mpr (by
+      intro x hx
+      simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx
+      rcases hx with rfl | rfl
+      · exact Submodule.sub_mem _ (Submodule.subset_span hψT) (Submodule.subset_span hψcT)
+      · exact Submodule.sub_mem _ (Submodule.subset_span hψT) (Submodule.zero_mem _))
+  obtain ⟨-, hτ1ψ, E, hEsub, hXsum, -⟩ :=
+    OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.eq_sum_of_psi_eq_zero
+      (OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection
+        (hyp.sSet_memberRFamily hG (hTsub hψT)) c'.extension
+        (fun φ ζ hφ hζ => c'.extension_inner_eq φ ζ (hle hφ) (hle hζ))
+        (c'.extends_on_supported (ψ - ψ.conj)
+          ⟨Submodule.sub_mem _ (Submodule.subset_span hψT) (Submodule.subset_span hψcT),
+            hdiffsupp⟩)
+        (by rw [sub_zero]; exact c'.extension_mem_ZIrr ψ (Submodule.subset_span hψT))
+        (by rw [ClassFunction.inner_zero_right])
+        (by rw [ClassFunction.inner_zero_right])
+        hχχbar)
+  exact ⟨E, hEsub, hτ1ψ.trans hXsum⟩
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **Cross-orthogonality of coherent images on the honest `'A(S)`-Dade** (Coq `coherent_ortho`,
+`PFsection5.v:986`; issue 1017, the `S`-instance of the M-side
+`S13.coherent_extension_cross_orthogonal`): for coherent subfamilies `T₁, T₂ ⊆ 𝒮 = sSet` and
+members `ψ ∈ T₁`, `λ ∈ T₂` with `ψ ∉ {λ, λ̄}` (so `⟨ψ, λ⟩ = ⟨ψ, λ̄⟩ = 0` by the family's
+pairwise orthogonality), the coherent images are orthogonal: both are partial `R`-family sums
+by (5.5) (`sSet_coherent_extension_eq_sum_memberRFamily`), and the case-agnostic `R`-families
+are cross-orthogonal by (5.2.e) (`sSet_memberRFamily_orthogonal`). -/
+theorem Hypothesis.sSet_coherent_extension_cross_orthogonal [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {T₁ T₂ : Set (ClassFunction ↥hyp.S ℂ)}
+    (hT₁sub : T₁ ⊆ sSet (hyp.toTypesIIIIIIVSetupS hG))
+    (hT₂sub : T₂ ⊆ sSet (hyp.toTypesIIIIIIVSetupS hG))
+    (c₁ : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG))) T₁
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S))
+    (c₂ : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG))) T₂
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S))
+    {ψ lam : ClassFunction ↥hyp.S ℂ}
+    (hψT : ψ ∈ T₁) (hψcT : ψ.conj ∈ T₁) (hlamT : lam ∈ T₂) (hlamcT : lam.conj ∈ T₂)
+    (hne1 : ψ ≠ lam) (hne2 : ψ ≠ lam.conj) :
+    ClassFunction.inner (c₁.extension ψ) (c₂.extension lam) = 0 := by
+  haveI := hyp.finiteG
+  classical
+  have h1 : ClassFunction.inner ψ lam = 0 :=
+    sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupS hG) (hT₁sub hψT) (hT₂sub hlamT) hne1
+  have h2 : ClassFunction.inner ψ lam.conj = 0 :=
+    sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupS hG) (hT₁sub hψT) (hT₂sub hlamcT) hne2
+  obtain ⟨E₁, hE₁sub, hE₁⟩ :=
+    hyp.sSet_coherent_extension_eq_sum_memberRFamily hG hT₁sub c₁ hψT hψcT
+  obtain ⟨E₂, hE₂sub, hE₂⟩ :=
+    hyp.sSet_coherent_extension_eq_sum_memberRFamily hG hT₂sub c₂ hlamT hlamcT
+  have horth := hyp.sSet_memberRFamily_orthogonal hG (hT₁sub hψT) (hT₂sub hlamT) h1 h2
+  rw [hE₁, hE₂, OddOrder.RepresentationTheory.inner_sum_left]
+  refine Finset.sum_eq_zero fun α hα => ?_
+  rw [OddOrder.RepresentationTheory.inner_sum_right]
+  exact Finset.sum_eq_zero fun β hβ => horth α (hE₁sub hα) β (hE₂sub hβ)
+
 end OddOrder.Peterfalvi.S15
