@@ -116,6 +116,7 @@ import OddOrder.Peterfalvi.S08_SixTwoGeneral
 import OddOrder.Peterfalvi.S13_CoreStructure
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.Peterfalvi.S09_FrobeniusFamilyOrthogonality
+import OddOrder.Peterfalvi.S09_FrobeniusGammaDecomposition
 import OddOrder.Peterfalvi.S09_FrobeniusParity
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.GroupTheory.RepresentationTheory.GaloisInnerTransport
@@ -7861,3 +7862,20 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.hypothesis78_weightedNuSum_inner_self_eq_BsumWeight
+
+/-! **Peterfalvi (7.10) weighted Gamma projection and concrete B-set, axiom-clean**
+(lane a, 2026-07-14, issue 0044 cont.⁵³).  Integral cross-family coefficients
+project Gamma onto the pairwise orthogonal weighted coherent sums.  Subtracting
+those projections constructs Gamma₁, while the (7.9) alternative makes every
+coefficient on B = {j ≠ i | ⟨β_j, ζ_i^ν⟩ = 0} nonzero.  The final theorem exposes
+the decomposition, diagonal BsumWeight formula, residual orthogonality, and
+nonzero coefficients consumed by the existing B-sum norm bridge. -/
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Cert.exists_orthogonal_projection_residual
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.hypothesis79_gamma_inner_weightedNuSum_eq_mul_BsumWeight
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.exists_weightedGammaDecomposition_on_reverseCoefficientZeroIndices
