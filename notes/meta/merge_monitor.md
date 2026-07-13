@@ -382,6 +382,16 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > (iii) issue 9092 で self-flag、(iv) build green。⟹ step 1.5 で b が FeitThompson の当該供給行を編集していても
 > 逸脱でない (他の FeitThompson 編集は従来どおり逸脱)。**mu_isColumnFamily 供給完了で失効**。詳細 = issues/9092。
 >
+> **carve-out (issue 9094 供給編集権, hub 裁定 2026-07-13 監視 tick 4 — merge c14d8a01)**: 3002/2038/9092 と
+> 同型の期限付き proof-only 編集権を **issue 9094 の λ-cluster restructure (案 A)** に付与: b は
+> **c 所有 `S16_NonExistenceG/TTypeII.lean` の `T_side_caseB_facts` (:191-196) の proof 差し替え**
+> (旧 `character_degree_analysis` obtain → 新 dichotomy-split export cite) を行ってよい。statement は
+> 無条件のまま正しい (Coq PFsection14 `ltqp`+(13.12)/(13.13)-on-T 準拠、hub 検証済) ゆえ **proof のみ**。
+> 条件: (i) statement 不変、(ii) c の A0-Dade/BetaData 領域非接触、(iii) issue 9094+commit self-flag、
+> (iv) build green。**移行完了で失効**。NormEstimates 5 定理の dichotomy thread は b 自所有で通常作業。
+> 詳細 = issues/9094 HUB RULING (案 A = λ-free Core 分割、右分岐は landed CliffordCaseBData vocabulary、
+> 非破壊移行手順つき)。
+>
 > **carve-out (issue 9087 RULING #4, hub 裁定 2026-07-13 監視 tick 2 — merge da032e55)**: newly-ungated
 > 3 decl — `card_LF_coprime_pq` (`S15_Gate3.lean:157`) / `allTypeI_fittingIsTI` (`S14_MaximalI/
 > TypeICovering.lean:68`, private) / `not_nonTypeICovering_of_all_typeI` (同 `:95`, private) — を
@@ -585,6 +595,15 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-13 (tick 4) — b 合流 + ★ 9094 HUB RULING (λ-cluster 案 A)**: **b=8** (feat(2035, 13.3.a+c):
+  `tau1S_ofHonest_mu_col_eta_col_one` sorry-free + issue 9094 起票 + docs 2035 #20/#21) を検証合流
+  (merge c14d8a01: build green 4188 jobs / AxiomsCheck OK / count-sorry 49→49 / 新 axiom なし / scope
+  clean)。a=0 / c=0。**9094 裁定 (f94eb232)**: `CharacterDegreeData` λ-cluster の no-λ uninhabitability
+  (carrier bug 第 3 例) に対し **案 A = λ-free `CharacterDegreeCore` 分割**を採用 — Coq PFsection13 の
+  Section factoring (Variable lambda :961-962、(13.4) 非 export、無条件 (13.12)/(13.13) は dichotomy
+  case-split) と 1:1 対応が根拠。no-λ 分岐 = landed `caseB_of_no_irreducible_sOf_H0Cprime` vocabulary
+  (新 structure なし)。TTypeII `T_side_caseB_facts` は statement 正 (Coq §14 ltqp 準拠) → b に
+  proof-only 供給編集権 carve-out (上記)。consumer 6 箇所は全て statement 正・proof route のみ修正。
 - **2026-07-13 (tick 3) — a+b 合流: ★ carve-out 1/3 `card_LF_coprime_pq` 実証明 (a) + (13.3.c) pin bundle 完成 + carrier 健全化 (b)**:
   **a=5** (feat(9087 RULING #4 1/3): `card_LF_coprime_pq` (S15_Gate3 carve-out decl) **実証明 landing** =
   §15 gate-4 B2 axiom-clean — carve-out 条件遵守確認済 (当該 decl 文脈のみ・signature 型不変)、
