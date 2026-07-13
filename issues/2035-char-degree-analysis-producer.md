@@ -1291,3 +1291,34 @@ inner_eta_col_zero) の guarded supply が全て sorry-free で完備**。
 producer (置き場 = S15_CharacterDegreeSupply、CaseACoherence+Machinery135 の合流点 —
 RULING の「Machinery135/CountingLayer」は import 上不可能 (producer は tau1S_ofHonest =
 CaseACoherence 下流が必須) ゆえ b 裁量で新 leaf に配置、と 9094 に追記予定)。
+
+## 2026-07-14 更新 #24 (lane b, /loop) — 案 A 1/3 landed + rebase 経路の簡素化
+
+- **CharacterDegreeCore + 無条件 producer landed** (詳細 = 9094 追記): 残 sorry は
+  deltaPrime_eq_one_T (ν-gated) のみ。
+- **#22 発見 2 の修理経路を簡素化**: hypothesis76OfFamily が base-agnostic (generic
+  certificate 証明済) と判明 → `hypothesis76OfDadeBase` (任意 φ₀ base builder、landed) で
+  P-non-kernel base の (7.7) instance を直接作れる。**rebase 恒等式 ∑ζ_i/‖ζ_i‖²|_{H^#} = 0
+  の形式化は不要**。
+- **next (案 A 2/3 の残り)**:
+  1. S15 instantiation `H_sharp_hypothesis76_base φ₀` (Machinery135 mirror、supply leaf)
+  2. cCoeff 補題 2 本 (lambda_tau1_cCoeff / eta10 版) を base = μ-source で restate
+     (guarded field 版証明; base ≠ λ は irr/red 分離、P-non-kernel 係数のみ claim)
+  3. LambdaClusterData structure + conditional producer (packaging)
+  4. NormEstimates:806 / CountingLayer:1805 の witness thread 版
+  5. flip: CDD = Core extends + λ-cluster、旧 field 消費の一斉差替え (build-green 1 commit)
+  6. dichotomy producer (no-λ 分岐 ↔ caseB_of_no_irreducible_sOf_H0Cprime の条件差
+     「no-λ-witness vs no-irr-member」の橋 = caseB では全 irr member が deg qu、
+     PC-linear-induced 性の確認要 — Coq (13.3.b) 対応箇所精読)
+
+## 2026-07-14 更新 #25 (lane b, /loop) — 案 A 2/3 核心完了: cCoeff 補題 2 本の guarded restate landed
+
+- `lambda_tau1_cCoeff_base` + `eta10_cCoeff_base_eq_zero` (S15_CharacterDegreeSupply):
+  chosen-base instance (H_sharp_hypothesis76_base、ζ₀ = Ind φ₀ ∈ 𝒮₁) 上で旧 Canonicalization
+  版 (trivial base、実質証明不能) を book-faithful に復元。guarded Core field 経由、
+  P-non-kernel index のみ claim (P-kernel は (13.5.a) α 吸収)。両方 sorry-free。
+- 残 (更新 #24 リスト): ④ NormEstimates:806/CountingLayer:1805 の Core/LambdaCluster 版
+  (witness thread、旧 lemma の statement 不変で proof 差替え or 並行版) → ⑤ flip
+  (CDD = Core extends + λ-cluster; (13.6)/(13.7) norm 系は cCoeff_base 版に接続替え) →
+  ⑥ dichotomy producer (no-λ vs no-irr 橋: Coq PFsection13 :296-340 の
+  FTtypeP_no_Ind_Fitting_facts 精読)。

@@ -1068,4 +1068,61 @@ theorem hypothesis76OfDadeTrivialBase_zeta_zero
   dsimp only at h
   exact h
 
+/-- **`Hypothesis76` from `(7.1)` data with a chosen base**: the `distinctInducedFamily`
+enumeration reindexed (by a transposition) so that `ζ₀ = Ind_H^L φ₀` for the *given* `φ₀` — the
+general form of the trivial-base normalization.  Peterfalvi re-chooses the (7.7) base per
+application ((7.8.b) "we use (7.7) with `ζ₀ ∈ 𝒮 − {ζ}`"; (13.5) takes `ζ₀ ∈ 𝒮₁`): the (13.5)
+coefficient computations need a **`P`-nonkernel** base (issue 2035 更新 #22 — with the trivial
+base the τ₁-conversion `(ζ_i − ζ₀)^{τ₁} = Ind(ζ_i − ζ₀)` is not available, `Ind 1_H ∉ ℤ[𝒮]`),
+which this builder provides at `φ₀ := θ_{μ_{j₀}}` (the `μ`-column source, `mu_j_isIndPC_not_ker`). -/
+noncomputable def hypothesis76OfDadeBase
+    {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L)
+    (hτ : OddOrder.Peterfalvi.S04.IsDadeIsometry (G := G) (k := ℂ) (L := L) H71.τ)
+    (H : Subgroup G) (hHL : H ≤ L)
+    (hHnorm : ∀ (l : ↥L) {h : G}, h ∈ H → (l : G) * h * (l : G)⁻¹ ∈ H)
+    (hAH : A = (H : Set G) \ {1})
+    (φ₀ :
+      haveI : Fintype ↥(H.subgroupOf L) := Fintype.ofFinite _
+      IrreducibleCharacter ↥(H.subgroupOf L)) :
+    Hypothesis76 G A L :=
+  haveI hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
+  haveI : Fintype ↥(H.subgroupOf L) := Fintype.ofFinite _
+  haveI : Invertible (Nat.card ↥(H.subgroupOf L) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  hypothesis76OfFamily H71 hτ H hHL hHnorm hAH
+    (fun i => (distinctInducedFamily (H.subgroupOf L)).θ
+      (Equiv.swap 0 (Classical.choose ((distinctInducedFamily (H.subgroupOf L)).cover φ₀)) i))
+    (induce_family_comp_perm_injective (distinctInducedFamily (H.subgroupOf L)).inj _)
+    (induce_family_comp_perm_covering (distinctInducedFamily (H.subgroupOf L)).cover _)
+
+/-- **The chosen-base normalization pins `ζ₀ = Ind_H^L φ₀`.** -/
+theorem hypothesis76OfDadeBase_zeta_zero
+    {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L)
+    (hτ : OddOrder.Peterfalvi.S04.IsDadeIsometry (G := G) (k := ℂ) (L := L) H71.τ)
+    (H : Subgroup G) (hHL : H ≤ L)
+    (hHnorm : ∀ (l : ↥L) {h : G}, h ∈ H → (l : G) * h * (l : G)⁻¹ ∈ H)
+    (hAH : A = (H : Set G) \ {1})
+    (φ₀ :
+      haveI : Fintype ↥(H.subgroupOf L) := Fintype.ofFinite _
+      IrreducibleCharacter ↥(H.subgroupOf L)) :
+    haveI : Fintype ↥(H.subgroupOf L) := Fintype.ofFinite _
+    haveI : Invertible (Nat.card ↥(H.subgroupOf L) : ℂ) :=
+      invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+    (hypothesis76OfDadeBase H71 hτ H hHL hHnorm hAH φ₀).zeta 0
+      = ClassFunction.induce (H.subgroupOf L) (φ₀ : ClassFunction ↥(H.subgroupOf L) ℂ) := by
+  haveI hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
+  letI : Fintype ↥(H.subgroupOf L) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥(H.subgroupOf L) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  unfold hypothesis76OfDadeBase hypothesis76OfFamily
+  dsimp only
+  rw [Equiv.swap_apply_left]
+  have h := Classical.choose_spec ((distinctInducedFamily (H.subgroupOf L)).cover φ₀)
+  dsimp only at h
+  exact h
+
 end OddOrder.Peterfalvi.S09.Cert

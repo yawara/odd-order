@@ -310,6 +310,26 @@ structure CharacterDegreeCore (hyp : Hypothesis (G := G)) where
       j' ≠ ⟨0, hyp.p_prime.pos⟩ → j ≠ j' →
       tau1S (∑ i : Fin hyp.q, hyp.mu i j) = -∑ i : Fin hyp.q, hyp.eta i j')
 
+open scoped FiniteInduce in
+/-- **The λ-cluster of Peterfalvi (13.3.b)** (issue 9094 RULING 案 A): the distinguished
+irreducible `λ ∈ Irr S` of degree `uq` induced from a linear character of `H = PC` with
+`P ⊄ Ker` — the data whose existence is the *conditional* branch of the (13.3.b) dichotomy
+("if `𝒮` contains no such character, then (9.7.b) holds with `C = 1`,
+`u = (p^q−1)/(p−1)`").  Mirrors Coq's `Variable lambda … Hypotheses (Slam) (irrHlam)`
+(`PFsection13:961-962`, Section `Thirteen_10_to_13_15`).  The maps and their (13.3) facts live
+in the λ-free `CharacterDegreeCore`. -/
+structure LambdaClusterData (hyp : Hypothesis (G := G)) where
+  lambda : ClassFunction ↥hyp.S ℂ
+  lambda_irreducible : OddOrder.RepresentationTheory.IsIrreducibleCharacter lambda
+  lambda_degree : lambda 1 = ((hyp.u * hyp.q : ℕ) : ℂ)
+  lambda_induced_from_PC_linear :
+    haveI := hyp.finiteG
+    ∃ θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ,
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter θ ∧ θ 1 = 1 ∧
+        lambda = ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ ∧
+        ∃ x : ↥(hyp.H.subgroupOf hyp.S), ((x : ↥hyp.S) : G) ∈ hyp.P ∧
+          x ∉ OddOrder.Peterfalvi.S03.characterKernel θ
+
 /-- **Peterfalvi (13.3)**: the `mu_j` have degree `u q`, the signs are `1`,
 and the `tau_1` images are controlled by the `eta_ij` grid.
 
