@@ -1299,3 +1299,83 @@ orthogonal` (Pf 11.8)** (S12_MaximalIII_IV_V.lean:3633)。feitThompson は §12�
 「いったん区切り」)。**次 session は loop 再開前にこの判定を確認**し、S12 (11.8) か card_G0 完遂かを選ぶ。
 delta-reality 成果 (dadeMap_conj/coherence_extension_conj/delta_isReal/hbeta_conj_sub/
 hypothesis78_delta_isReal) は genuine・保存済で再利用可。
+
+---
+
+## cont.⁴⁹ — 再開 (2026-07-13): ON-PATH 復帰確定、frontier = CharacterEstimateData assembly
+
+**cont.⁴⁸ の OFF-PATH 判定は stale 化** (9087 RULING #4 3/3 landing、2026-07-13):
+(12.17) TypeICovering carve-out 完遂により live spine trace が復活 —
+`card_G0_lower_bound` (7.10) → `not_trivial_G0` (7.11) → `not_all_maximal_typeI` →
+`theorem88_caseB_holds` → **FeitThompsonSetup:548 (spine)**。#print axioms 全数 probe で
+(12.17) chain の残 dirty root は (7.10) と (12.6)(c1) `sibleyTarget_frobI` (b territory) の
+正確に 2 本 (9087 追記参照)。lane a は upstream-first + 文書順 + a-territory (S09) により本 issue を再開。
+
+**再開時 frontier (確認済)**:
+- S09 cluster の sorry は `card_G0_lower_bound` 本体の 1 本のみ
+  (`hdata : F.CharacterEstimateData := sorry`、FrobeniusFamily.lean:1021)。
+- cont.⁴⁷ 計画 step 1 (`hypothesis79` 2-family datum) は **landed 済**
+  (S09_FrobeniusHypothesis79.lean、dadeSupport_disjoint = kernelSpread_disjoint 経由)。
+- 残 = `CharacterEstimateData` (6 fields: i/hmin/B/B_avoids_min/Bsum_le/base_estimate) の
+  concrete assembly。入口は `characterEstimateData_of_family71_coherent_zeta_source_data`
+  (concrete (7.5) FamilyHypothesis71 + coherent image + (7.8.b) source data +
+  (7.9) decomposition を一括接続、notes 2026-06-05 pass) — 残る義務は
+  「教科書の concrete source-data package を存在させる」こと:
+  (a) minimal index i の選択 (argmin h)、(b) 𝓑-set 構成 ((7.9) dichotomy `hypothesis79`
+  conclusion → good index)、(c) (7.9) orthogonal integer decomposition (v/x/Γ₁)、
+  (d) (7.8.b) source data (hind_norm/hzeta_ind/irr/distinct/degree/hsmall)、
+  (e) FamilyHypothesis71 instance。hdelta_even assembly (cont.⁴⁷ 残) は (d)-(7.9) parity 側。
+
+## cont.⁵⁰ — (7.9) family-level conclusion 完成 (hypothesis79_conclusion、sorry-free axiom-clean) ✅
+
+**新 leaf `S09_FrobeniusParity.lean`** (S09_FrobeniusConjIndex + S09_ParityPrimitive 下流):
+1. `hypothesis78_ind1H_mem_ZIrr` — hindZ 供給 (hyp76_zeta_eq projection + induce_mem_ZIrr)。
+2. `hypothesis79_delta_even` — **cont.⁴⁷ 残の hdelta_even 完成**: δ∈ZIrr
+   (delta_and_zetaImages_mem_ZIrr、Sibley coherence 経由) + δ real (hypothesis78_delta_isReal)
+   + ⟨δ,1⟩=0 (delta_orth_one; constOne = trivialIrreducibleCharacter は defeq で exact 一発)
+   + cfdot_real_vchar_even ⟹ Even ⟨Δ_i,Δ_j⟩。
+3. `hypothesis79_conclusion` — **(7.9) 本体**: parity route consumer に全 supplier
+   (isCoherent_sourceSet/nu_eq/ind1H_ZIrr/zeta_irreducible/betaDecomp/zetaImage_cross/delta_even)
+   を wire。⟨β_i, ζ_j^ν⟩ ≠ 0 ∨ ⟨β_j, ζ_i^ν⟩ ≠ 0 for all i ≠ j。
+
+検証: leaf 一発 green (3781 jobs) + AxiomsCheck assert 2 本 (4167 jobs) + full build green
+(4189 jobs)。両定理 axiom-clean `[propext, Classical.choice, Quot.sound]`。
+
+**残 (7.10) assembly** (次 iteration 以降、入口 =
+`characterEstimateData_of_family71_coherent_zeta_source_data`):
+- (a) min-index `i` 選択 (argmin F.h) + `hsmall : 2e_i+1 ≤ h_i` (奇数位数 Frobenius の数値事実)。
+- (b) `hbeta_ne` (= hypothesis79_conclusion) → good-index norm 下界
+  `chiRhoNormSq_ge_ratio_of_inner_beta_ne_zero` (S09_FrobeniusEstimate:51) → hgood/hi。
+- (c) 𝓑-set 構成 + (7.9) orthogonal integer decomposition (v/x/Γ₁: Γ の Irr 展開)。
+- (d) (7.8.b) source data 群 (hind_norm/hzeta_ind/hirr/hdistinct/hzeta_degree/hdegree_sum/
+  hzeta_uv) — Ind θ family の直接計算。
+- (e) concrete `FamilyHypothesis71` instance (P) + hP_L/hP_A/hP_G0 識別。
+
+## cont.⁵¹ — (7.10) 定量 assembly の原文 blueprint (mmd pp. 42-43 精読、実装マップ)
+
+**原文の構造** (Lean 対応付き):
+1. **index 選択**: h 最小の member を 1 に取る (Lean: argmin `F.h`、`hmin`)。
+   χ₁ := ν₁ζ₁ (= 選択 member の distinguished coherent image = `H78.nu (zeta zetaDistinct)`)。
+2. **𝓐/𝓑 分割**: 𝓐 = {i>1 : ⟨β_i, χ₁⟩ ≠ 0}、𝓑 = 残り。Lean の entry
+   (`characterEstimateData_of_family71_coherent_zeta_source_data`) の `B` = 𝓑、
+   `hgood` の対象 = 𝓐 (j ∉ B)。
+3. **𝓐 側 (hgood)**: (7.8.c) = `chiRhoNormSq_ge_ratio_of_inner_beta_ne_zero`
+   (S09_FrobeniusEstimate:51、H78 := member j、χ := χ₁、hbeta_ne = 𝓐 定義)。
+   hχ_orth (χ₁ ⊥ member-j の全 ν_jζ_r) = cross-orthogonality (disjoint kernel spread、
+   S09_FrobeniusCrossOrtho に既存のはず — 要確認)。
+4. **𝓑 側 (hx_nonzero)**: (7.9) = `hypothesis79_conclusion` (cont.⁵⁰ ✅)。
+   𝓑 定義 ⟨β_j, χ₁⟩ = 0 → dichotomy 他枝 ⟨β₁, ν_jζ_j⟩ ≠ 0 → x_j ≠ 0。
+5. **Γ 分解 (hΓ/horth/hΓ₁)**: x_j := ⟨Γ, ν_jζ_{j1}⟩ ∈ ℤ (Γ ∈ ℤ[Irr G])、
+   v_j := member-j の weightedNuSum (Σ_t d_{jt}·ν_jζ_{jt})、weight ⟨v_j,v_j⟩ =
+   Σ_t d_{jt}² = (h_j−1)/e_j = `BsumWeight`。⟨Γ, ν_jζ_{jt}⟩ = d_{jt}x_j は
+   「β と χ_{jt}−d_{jt}χ_{j1} の support 非交差」(原文 (4.1) 経由) から。
+   Γ₁ := Γ − Σ_{𝓑} x_j v_j (構成的、hΓ₁ は展開計算)。
+6. **hsmall**: e | h−1 (Frobenius) + h 奇数 ⟹ e ≤ (h−1)/2 ⟹ 2e+1 ≤ h。純数値。
+7. **hi**: (7.8.b) ‖χ₁^ρ‖² ≥ 1 − e/h — hzeta_uv 経由 (`zetaNuRhoNormSqGeOfDade` 系)。
+8. **source data (hind_norm 等)**: H normal in L ⟹ Ind_H^L 1 = Σ_{λ∈Irr(L/H)} λ ⟹
+   ⟨Ind1,Ind1⟩ = e。他も Ind θ family の直接計算。
+9. **P : FamilyHypothesis71**: F からの instance (既存 producer 要確認)。
+
+**次 iteration の実装順**: (α) S09_FrobeniusCrossOrtho の cross-orthogonality 在庫確認
+(3 の hχ_orth と 5 の support 非交差)、(β) 6 の数値補題 + 1 の argmin、(γ) 5 の Γ 分解
+(x/v/Γ₁ 構成 + horth)、(δ) 4+3 の 𝓐𝓑 wiring、(ε) 7-9 の残 source data。
