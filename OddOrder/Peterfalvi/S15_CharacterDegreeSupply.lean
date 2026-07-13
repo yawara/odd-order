@@ -324,4 +324,103 @@ theorem Hypothesis.tau1S_ofHonest_induce_inner_eta [Finite G]
       (hyp.induce_H_mem_zSpan_sSet_irr hG θ hθ hθP hind),
     star_zero]
 
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **`τ₁`-images of the full lattice `ℤ[𝒮]` are orthogonal to the `η`-column `0`**
+(Peterfalvi (4.1)+(5.3.b) + (13.3.c), issue 2035): span induction over the *mixed* family —
+an irreducible member is grid-orthogonal by the (5.3.b) crux; a reducible member is a
+`μ`-column (`sSet_reducible_eq_muColumnSum`) whose `τ₁`-image is a (signed) *nonzero*-column
+`η`-sum (`tau1S_ofHonest_muColumn_formula`), orthogonal to column `0` by the grid
+orthonormality. -/
+theorem Hypothesis.tau1S_ofHonest_zSpan_inner_eta_col_zero [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))
+    (i : Fin hyp.q)
+    {φ : ClassFunction ↥hyp.S ℂ}
+    (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSpan (sSet (hyp.toTypesIIIIIIVSetupS hG))) :
+    ClassFunction.inner (hyp.tau1S_ofHonest hG hnoV chief φ)
+      (hyp.eta i ⟨0, hyp.p_prime.pos⟩) = 0 := by
+  haveI := hyp.finiteG
+  letI : Fintype G := Fintype.ofFinite G
+  letI : Invertible (Nat.card G : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Fintype ↥hyp.S := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥hyp.S : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  induction hφ using Submodule.span_induction with
+  | mem ζ hζ =>
+      by_cases hζirr : OddOrder.RepresentationTheory.IsIrreducibleCharacter ζ
+      · -- irreducible member: full grid orthogonality by the (5.3.b) crux
+        exact coherentIndS_image_inner_eta_eq_zero hG hnoV hyp
+          (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupS hG))
+          (sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupS hG) (hyp.oddCardS hG))
+          (fun ζ' hζ' => by
+            rw [show ζ' - (ζ' : ClassFunction ↥hyp.S ℂ).conj
+                = -((ζ' : ClassFunction ↥hyp.S ℂ).conj - ζ') from (neg_sub _ _).symm,
+              ClassFunction.support_neg]
+            exact hyp.sSet_member_conjDiff_supported hG hζ')
+          (hyp.coherent_H0Cprime_S hG hnoV chief) hζ hζirr i ⟨0, hyp.p_prime.pos⟩
+      · -- reducible member: a nonzero `μ`-column, sent by (13.3.c) into a nonzero `η`-column
+        obtain ⟨j, hj, rfl⟩ := hyp.sSet_reducible_eq_muColumnSum hG hζ hζirr
+        rcases hyp.tau1S_ofHonest_muColumn_formula hG hnoV chief with hclean | ⟨-, hflip⟩
+        · rw [hclean j hj, OddOrder.RepresentationTheory.inner_sum_left]
+          refine Finset.sum_eq_zero fun l _ => ?_
+          rw [hyp.eta_orthonormal l i j ⟨0, hyp.p_prime.pos⟩, if_neg (fun h => hj h.2)]
+        · have h2lt : 2 < hyp.p := by have := hyp.three_le_p; omega
+          set j1 : Fin hyp.p := ⟨1, hyp.p_prime.one_lt⟩ with hj1
+          set j2 : Fin hyp.p := ⟨2, h2lt⟩ with hj2
+          have hj10 : j1 ≠ ⟨0, hyp.p_prime.pos⟩ := by
+            intro h; exact absurd (congrArg Fin.val h) (by norm_num)
+          have hj20 : j2 ≠ ⟨0, hyp.p_prime.pos⟩ := by
+            intro h; exact absurd (congrArg Fin.val h) (by norm_num)
+          -- route through the other nonzero column `j' ≠ 0, j' ≠ j`
+          obtain ⟨j', hj'0, hjj'⟩ : ∃ j' : Fin hyp.p,
+              j' ≠ ⟨0, hyp.p_prime.pos⟩ ∧ j ≠ j' := by
+            rcases eq_or_ne j j1 with rfl | hne1
+            · exact ⟨j2, hj20, fun h => absurd (congrArg Fin.val h) (by norm_num)⟩
+            · exact ⟨j1, hj10, hne1⟩
+          rw [hflip j j' hj hj'0 hjj',
+            OddOrder.RepresentationTheory.ClassFunction.inner_neg_left,
+            OddOrder.RepresentationTheory.inner_sum_left]
+          rw [Finset.sum_eq_zero fun l _ => by
+            rw [hyp.eta_orthonormal l i j' ⟨0, hyp.p_prime.pos⟩, if_neg (fun h => hj'0 h.2)]]
+          exact neg_zero
+  | zero => rw [map_zero, OddOrder.RepresentationTheory.ClassFunction.inner_zero_left]
+  | add x y _ _ hx hy =>
+      rw [map_add, OddOrder.RepresentationTheory.ClassFunction.inner_add_left, hx, hy, add_zero]
+  | smul z x _ hx =>
+      rw [map_smul, ← Int.cast_smul_eq_zsmul ℂ z,
+        OddOrder.RepresentationTheory.ClassFunction.inner_smul_left, hx, mul_zero]
+
+open scoped FiniteInduce in
+/-- **(4.1)+(5.3.b)+(13.3.c) honest supply for the `tau1S_induce_inner_eta_col_zero` field**
+(issue 2035/9094): for *any* irreducible `θ ∈ Irr H` (`H = PC`, `P ⊄ Ker θ`) — the induction
+`Ind_{PC}^S θ` may be irreducible or a `μ`-column — the `τ₁`-image is orthogonal to the
+`η`-column `0`.  Composition of the `ℤ[𝒮]` membership (`induce_H_mem_zSpan_S`) with the
+mixed-family column-`0` orthogonality (`tau1S_ofHonest_zSpan_inner_eta_col_zero`). -/
+theorem Hypothesis.tau1S_ofHonest_induce_inner_eta_col_zero [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))
+    (i : Fin hyp.q)
+    (θ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ)
+    (hθ : OddOrder.RepresentationTheory.IsIrreducibleCharacter θ)
+    (hθP : ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
+        Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel θ)) :
+    ClassFunction.inner (hyp.eta i ⟨0, hyp.p_prime.pos⟩)
+      (hyp.tau1S_ofHonest hG hnoV chief
+        (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ)) = 0 := by
+  haveI := hyp.finiteG
+  letI : Fintype G := Fintype.ofFinite G
+  letI : Invertible (Nat.card G : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  rw [OddOrder.RepresentationTheory.inner_conj_symm,
+    hyp.tau1S_ofHonest_zSpan_inner_eta_col_zero hG hnoV chief i
+      (hyp.induce_H_mem_zSpan_S hG chief θ hθ hθP),
+    star_zero]
+
 end OddOrder.Peterfalvi.S15
