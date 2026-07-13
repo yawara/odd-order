@@ -1572,3 +1572,25 @@ S15 は committed 版 (caseA proven, caseB sorried) に revert。InnerCompHom le
 set 不使用ゆえ artifact 回避。中身は caseA branch の mirror (mem_sOf 抽出 →
 caseB_xiOf_H0Cprime_eq_induce_hcPsiPair → isIndHC_of_source_eq_induce_hcPsiPair flatten → transport
 hcRealized_map_subtype_eq/cSub_eq_C → θ' の 4 条件)。~50 行。
+
+## 2026-07-14 更新 #35 (lane b, /loop + subagent) — ✅✅ hbridge 完全 CLOSE: S-side (13.3.b) forward gate proven
+
+第 3 subagent が caseB wiring を完成、**`S_caseB_facts_no_lambda` が完全 sorry-free** に (自己検証済:
+leaf build green 4115 jobs / #print axioms = [propext,Classical.choice,Quot.sound] のみ = sorryAx なし /
+残 file sorry = deltaPrime_eq_one_T・tSide_theta_package・T_caseB_facts_no_lambda の 3 pre-existing のみ /
+新 axiom なし / signature 不変 / InnerCompHom 非接触):
+
+- **set-artifact の根治**: hbridge を **set-free** 化。`set data`/`set chars` が外部 obtain の chief を
+  folded copy + stray `chief✝` に分裂させ _hχmem と caseB が non-defeq chief fvar を参照 → 単一 lemma
+  call 不能だった。解決 = caseA/caseB を **explicit-arg standalone lemma** に切り出し (`let data`、set 不使用):
+  - `lambdaWitness_of_caseA` (proven caseA body を verbatim 移設、set→let)
+  - `lambdaWitness_of_caseB_member` (χ→ζ mem_sOf 抽出 → caseB_xiOf_H0Cprime_eq_induce_hcPsiPair →
+    isIndHC_of_source_eq_induce_hcPsiPair flatten → transport → θ' の 4 条件。Ind θ' irr = `hχeq ▸ _hχirr`
+    = 与 χ の既約性、genuine)
+  - hbridge = `rcases clifford_dichotomy` + 2 つの one-line `exact`。
+- **soundness 検証**: caseB は与えられた χ (hχmem/_hχirr) を genuine に使用、reverse characterization
+  経由で LambdaWitness を構成 (vacuous でない)。caseA 移設は proven content 保全。
+
+**⟹ `lambdaCluster_or_caseB` dichotomy の S-side が honest に。9094 の残 genuine gate は 2 本に減:**
+`tSide_theta_package_of_not_caseB_core` (ν-gated (13.4) T-package) と `T_caseB_facts_no_lambda`
+(no-λ T-mirror、S16 q<p gated)。deltaPrime_eq_one_T は ν-gated (a carrier)。
