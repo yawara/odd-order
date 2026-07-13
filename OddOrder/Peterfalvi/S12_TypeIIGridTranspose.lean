@@ -5,7 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S12_TypeIIColumnPin
 import OddOrder.Peterfalvi.S12_TICyclicSigmaBridge
-import OddOrder.FeitThompsonSetup
+import OddOrder.Peterfalvi.S13_Section16PairData
 
 /-!
 # Peterfalvi (8.8)/(10.7): the σ-agreement bridge for the type-P pair grid transpose
