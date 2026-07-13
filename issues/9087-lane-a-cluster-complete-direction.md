@@ -404,3 +404,22 @@ carve-out 付与なら S15_Gate3:161 の `:= sorry` を下記 proof body で置�
       exact Finset.disjoint_left.mp (data.primeFactors_disjoint k iT hne) hqL hqT
     exact hLnconjT (htransfer hyp.T iT gT hgT hk)
 ```
+
+### 3‴. `allTypeI_fittingIsTI` の proof 設計 recon (2026-07-13 lane a、read-only)
+
+裁定待ち継続中の精査結果 — **全主要部品が既存 proven** で assembly は実行可能:
+- **goal**: `FittingIsTI M` = `IsTISubset (fittingSharp M) (N_G(fittingInAmbient M))`。
+- **骨子**: a ∈ F(M)^#, g·a·g⁻¹ ∈ F(M)^# とする。type-I M で F(M)^# ⊆ M_σ^# に還元 (下記残課題)。
+  x := g·a·g⁻¹ は M_σ^# ∩ (M*)_σ^# (M* := conj g • M、`sigmaSharp_conj_smul`)。no-escape
+  (`allTypeI_centralizer_le`、同 file 既存・hnoV 要 thread) で C(x) ≤ M かつ C(x) ≤ M*。
+  **uniqueness**: `Rsub_eq_bot_of_centralizer_le` (S10_MinimalSimpleStructure:799、lane-a 所有) の
+  内部論法そのもの — ℓ_σ(x)=1 (`length_one_of_isPiElement_sigma`、Conjugacy145C:791) + 14.4 sharp
+  transitivity (`sigmaLength_one_centralizer_structure`) で |𝓜_σ(x)|>1 なら r ∈ C(x) ≤ M が M を
+  別 member に conj して矛盾 ⟹ M = M* ⟹ g ∈ N_G(M) = M (`normalizer_eq_self_of_mem_maximalSubgroups`)。
+  g ∈ M ⟹ g ∈ N(F(M)) (`normalizer_fittingInAmbient_eq_self` TypeP1Criteria:120 で N(F(M)) = M)。
+- **残課題 1 個**: type-I (type F) M で `fittingInAmbient M = maxNilpotentNormalHall M`
+  (F(M)^# ⊆ M_σ^# 用)。直接 lemma は未発見 — (12.7) `typeI_frobenius` (M Frobenius kernel M_F) から
+  C_E(M_F) = 1 ⟹ F(M) = M_F で導出可能な見込み (小補題 1 本)。
+- **推奨分担**: uniqueness 補題 (`eq_of_mem_maximalSigmaSubgroups_of_centralizer_le` 的な形) は
+  **S10_MinimalSimpleStructure (lane-a 所有) に factor して置ける** — Rsub_eq_bot の内部論法の抽出。
+  carve-out 裁定がどちらでも、この部品は a が自所有 file で先行提供可能。
