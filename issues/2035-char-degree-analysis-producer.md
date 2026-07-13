@@ -1182,3 +1182,26 @@ signature (hG, hyp) は不変で OK — **hnoV = `S12.no_typeV_maximal_unconditi
 - tau1S_induce_inner_eta_col_zero ⟵ zSpan 分解 + formula + crux (irr/red 両対応)
 - **lambda (13.3.b) = 未存在の genuine content** (irr・degree uq・H-linear-induced な member の存在)
 - tau1T ⟵ hyp.swap (HypothesisSwap:153) の tau1S_ofHonest (swap 側 chief も exists_chiefFactorData)
+
+## 2026-07-13 更新 #20 (lane b, /loop) — ⚠ (13.3.b) は dichotomy: CharacterDegreeData.lambda 無条件 field は overstatement の疑い濃厚
+
+### 原文・Coq の確定事実
+- **Pf (13.3.b)** (mmd 04.15 line 43): 「𝒮 が PC の線型指標から誘導される次数 uq の既約指標を
+  **含まないなら**、(9.7.b) が M=S, C=1, u=(p^q−1)/(p−1) で成立」— λ の存在は **dichotomy**、無条件でない。
+- **Coq PFsection13:307-310**: `~~ has irrIndH calS → [typeP_Galois, C=1, u=(p^q−1)/(p−1)]` — 同形。
+- Coq は (13.4) を skip し、(13.5-8) は `calS1 = seqIndD H S P 1` の member zeta を**引数に取る条件付き**
+  (S1cases :402: zeta ∈ calS1 → μ-column か irr)。λ を無条件に選ぶ lemma は存在しない。
+- book 後段 (13.15) (mmd line 262): x = (p^q−1)/((p−1)u) の算術で x ≥ 2q+1 の場合に no-λ 分岐を
+  refute して初めて「By (13.3.b), there is a character λ」と言う — **no-λ (Galois, C=1) は
+  (13.3) 時点で live な case**。
+- ⟹ `character_degree_analysis : Nonempty (CharacterDegreeData hyp)` (無条件 λ 込み) は
+  no-λ case を排除できない限り証明不能の疑い。要確認: S15.Hypothesis が C≠1/非Galois を既に
+  field で排除していないか (排除していれば無条件で OK)。していなければ restructure:
+  **(A) λ-free core** (μ/τ₁/δ field 群 — 全て landed engine で供給可) **+ λ-cluster 条件付き carrier**、
+  or **(B)** producer を dichotomy 化 `Nonempty CDD ∨ (Galois ∧ C=1 ∧ u=…)`。
+  consumer 影響: NormEstimates ×5 (13.8-T 系、λ 前提で自然) + **TTypeII:194 (lane c 所有)** —
+  restructure は cross-lane 影響あり、実施時は hub 調整 (9000 issue) 経由。
+
+### 今 iteration の landing
+- `tau1S_ofHonest_mu_col_eta_col_one` (CaseACoherence、sorry-free): mu_col_tau1_eta_col_one
+  field の honest supply (formula + mu_j_isIndPC 合成、p=3 分岐で j=2/δ=−1)。
