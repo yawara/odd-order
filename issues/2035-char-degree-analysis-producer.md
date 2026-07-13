@@ -764,3 +764,23 @@ honestTypeP2A0Set support) に移す。必要な S15 素材: `mu_diff_support` (
 Coq は `FTtypeP_coherence` (PFsection13:347)。has-irr 場合と uniform 場合の 2 分岐に注意。
 **subagent 委譲時の正しい指示** = 「S13_Orthogonality の γ-trick pin を S15 tau1S_ofHonest に port」
 (NOT "port (13.6)-(13.9)" — 更新 #4 の誤診断)。
+
+## 2026-07-13 更新 #7 (lane b, /loop) — γ-trick は S13 clean port 不可、S15-abstract 証明が必要
+
+S13_Orthogonality:290 `coherent_sOf_H0C_extension_muColumnSum_pin_of_irr` の完全な証明を精読した結果:
+**S12 concrete 機構に深く依存** — `inducedKernelFamily_*` (mem_intDegree/pairwise_orthogonal/
+inner_self_real_pos/conjDiff_support)、`SOf_coherent_extension_cross_orthogonal`、
+`SOf_coherent_extension_eq_sum_memberRFamily`、`certainTypeR`/`certainTypeRImage`/
+`certainTypeOmegaSigma_muColumnChar_eq_aligned` (world-bridge)、`toHypothesis46`/`muColumnChar`/
+`columnFamily.sign_eq`。これらは S12 `Hypothesis M` の concrete grid 構成であり、
+**S15 の abstract `Hypothesis` (mu/eta が抽象 field) には移植できない**。
+
+⟹ `muColumn_tau1_inner_etaColumn` は S15-abstract fields から fresh に証明する必要
+(= Coq `FTtypeP_coherent_TIred` (PFsection8) の S15-abstract 版)。利用可能な abstract 素材:
+coherence (extends_on_supported = Dade on A₀-supported / extension_inner_eq isometry) +
+mu_diff_support (μ列差 A₀-supported) + mu_definition (μ↔ω via induce) + eta_eq_tau_omega +
+mu/eta_orthonormal + delta_eq_one_S。⚠ γ-trick が要する「irreducible ξ ∈ 𝒮」が abstract field で
+保証されるか (has-irr vs uniform-degree 場合分け) は要確認 — 保証されないなら **abstract field
+不足の設計課題**が露見する可能性 (lambda (13.3.b) の typeP_Galois subtlety と同根)。
+
+**subagent に深掘り委譲中** (background): abstract route の特定 + 証明試行 or 精密 blocker 報告。
