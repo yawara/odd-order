@@ -1263,6 +1263,230 @@ theorem caseA_exists_irreducible_witnessed [Finite G] {M : Subgroup G}
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
+/-- **(13.3.b) caseB forward — the Singer/Galois branch witness**: an irreducible member `χ` of
+the `S`-instance family `𝒮(H₀ ⊔ C')` in Clifford case (b) is a `LambdaWitness` (a `uq`-degree
+`PC`-linear induced irreducible).  Mirrors the caseA branch of `S_caseB_facts_no_lambda` (which
+produces the witness unconditionally from the (9.8.c) regular seed); here the source is the given
+`χ = Ind_{HU} ζ`, and the reverse (13.3.a)-for-irr characterization is the pair (`C'`-kernel)
+`caseB_xiOf_H0Cprime_eq_induce_hcPsiPair`: `ζ ∈ 𝒳(H₀C')` irreducible equals
+`Ind_{HC}(hcPsiPair θ̄ λ)` for a linear pair character (`λ` trivial on `C'`).  Flattening
+(`isIndHC_of_source_eq_induce_hcPsiPair`) and the `HC.map subtype = (PC).subgroupOf S` transport
+(`hcRealized_map_subtype_eq`, `toTypesIIIIIIVSetupS_cSub_eq_C`) give the linear
+`θ' ∈ Irr(H.subgroupOf S)` with `P ⊄ Ker θ'` whose induction (`= χ`) is irreducible.
+
+Stated with `chief`/`caseB`/`χ`-membership as explicit arguments (no `set` inside): the caseB
+branch of `S_caseB_facts_no_lambda` is then a one-line call. -/
+theorem lambdaWitness_of_caseB_member [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))
+    (caseB : OddOrder.Peterfalvi.S11.CliffordCaseBData (hyp.mkSection11CharacterDataS hG chief))
+    {χ : ClassFunction ↥hyp.S ℂ}
+    (hχmem : χ ∈ (hyp.mkSection11CharacterDataS hG chief).SOf
+      (chief.H0 ⊔ (hyp.mkSection11CharacterDataS hG chief).Cprime))
+    (_hχirr : OddOrder.RepresentationTheory.IsIrreducibleCharacter χ) :
+    LambdaWitness hyp := by
+  classical
+  haveI := hyp.finiteG
+  -- Extract the source `ζ ∈ 𝒳(H₀C')` of the given irreducible `χ = Ind_{HU} ζ`.  Done *before*
+  -- any `let`, and re-cast to `data`-form so every downstream term is uniform (a `set` here would
+  -- revert/rename `ζ`; the extraction stays clean because `hχmem` names the explicit terms).
+  rw [Section11CharacterData.SOf_eq] at hχmem
+  let data := hyp.toTypesIIIIIIVSetupS hG
+  have hχmem' : χ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) := hχmem
+  obtain ⟨ζ, hζxi, hχeq⟩ := mem_sOf.mp hχmem'
+  letI : Fintype ↥hyp.S := Fintype.ofFinite _
+  letI : Fintype ↥(huSub data) := Fintype.ofFinite _
+  letI : Fintype ((↥data.H ⧸ chief.N) →* ℂˣ) := Fintype.ofFinite _
+  letI : Fintype ↥(hInHu data) := Fintype.ofFinite _
+  letI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf
+    (huSub data)) := Fintype.ofFinite _
+  letI : Fintype ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf
+    (huSub data)).map (huSub data).subtype) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥hyp.S : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+    hyp.S).subgroupOf (huSub data)) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+    hyp.S).subgroupOf (huSub data)).map (huSub data).subtype) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf
+    (huSub data)).Normal := hcInHu_realized_normal (data := data) chief
+  -- (1) the reverse (13.3.a)-for-irr characterization: `ζ = Ind_{HC}(hcPsiPair θ̄ λ)`, `θ̄ ≠ 1`.
+  obtain ⟨θbar, lam, hnt, hlamC', hζeq⟩ :=
+    caseB_xiOf_H0Cprime_eq_induce_hcPsiPair (data := data) (chief := chief) caseB hζxi
+  -- (2) flatten `induceHU(Ind_{HC}(hcPsiPair)) = Ind_{HC.map subtype}(ψ)`, `ψ` linear irr.
+  obtain ⟨ψ, hψirr, hψ1, hψeq⟩ :=
+    isIndHC_of_source_eq_induce_hcPsiPair (M := hyp.S) (data := data) (chief := chief)
+      (θbar := θbar) (lam := lam) (ζ' := ζ) hζeq
+  -- (3) transport `HC.map subtype = (PC).subgroupOf S`.
+  have hHeq : data.H = hyp.P := by show hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
+  have hsupeq : data.H ⊔ cSub data chief = hyp.H := by
+    rw [hHeq, hyp.toTypesIIIIIIVSetupS_cSub_eq_C hG chief]; rfl
+  have hHC : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf
+      (huSub data)).map (huSub data).subtype = hyp.H.subgroupOf hyp.S := by
+    rw [hcRealized_map_subtype_eq (data := data) chief, hsupeq]
+  let θ' := ClassFunction.compHom (MulEquiv.subgroupCongr hHC.symm).toMonoidHom ψ
+  have hθ'def : θ' = ClassFunction.compHom (MulEquiv.subgroupCongr hHC.symm).toMonoidHom ψ := rfl
+  have hindeq : ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ'
+      = induceHU data (ζ : ClassFunction ↥(huSub data) ℂ) := by
+    rw [hθ'def, OddOrder.RepresentationTheory.induce_compHom_subgroupCongr hHC.symm ψ, ← hψeq]
+  refine ⟨θ', ?_, ?_, ?_, ?_⟩
+  · exact OddOrder.RepresentationTheory.IsIrreducibleCharacter.compHom_of_surjective
+      (MulEquiv.subgroupCongr hHC.symm).surjective hψirr
+  · rw [hθ'def, ClassFunction.compHom_apply, map_one, hψ1]
+  · -- `P ⊄ Ker θ'`: else `P ⊆ Ker(Ind θ') = Ker(Ind_{HU} ζ)`, which (converse (1.6.a)) pushes to
+    -- `P ⊆ Ker ζ`, contradicting `ζ ∈ 𝒳` (`P = H ⊄ Ker ζ`).  Mirrors `mu_j_isIndPC_not_ker`.
+    intro hker
+    haveI hHUnorm : (huSub data).Normal := by
+      rw [huSub_eq_derivedInG_subgroupOf data]; infer_instance
+    haveI hPnorm : (hyp.P.subgroupOf hyp.S).Normal := by
+      have hPle : hyp.P ≤ hyp.S := by
+        rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
+      refine (Subgroup.normal_subgroupOf_iff_le_normalizer hPle).mpr ?_
+      rw [hyp.P_eq_SF]
+      exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
+    have hPH : hyp.P.subgroupOf hyp.S ≤ hyp.H.subgroupOf hyp.S :=
+      Subgroup.subgroupOf_mono hyp.S (show hyp.P ≤ hyp.H from le_sup_left)
+    have hkerInd := OddOrder.Peterfalvi.S03.subsetCharacterKernel_induce_of_subgroupOf
+      hPH θ' hker
+    have hInd_eq : ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ'
+        = ClassFunction.induce (huSub data) (ζ : ClassFunction ↥(huSub data) ℂ) := by
+      rw [hindeq]; exact induceHU_eq_induce data _
+    apply hζxi.1
+    intro x hx
+    have hxP : (x : ↥hyp.S) ∈ hyp.P.subgroupOf hyp.S := by
+      have hx' : x ∈ (data.H.subgroupOf hyp.S).subgroupOf (huSub data) := hx
+      rw [hHeq] at hx'
+      exact Subgroup.mem_subgroupOf.mp hx'
+    have hxkerInd : (x : ↥hyp.S) ∈ OddOrder.Peterfalvi.S03.characterKernel
+        (ClassFunction.induce (huSub data) (ζ : ClassFunction ↥(huSub data) ℂ)) := by
+      rw [← hInd_eq]; exact hkerInd hxP
+    have h := OddOrder.Peterfalvi.S03.mem_characterKernel_of_mem_characterKernel_induce
+      ζ.isIrreducible x.2 hxkerInd
+    simpa using h
+  · rw [hindeq]; exact hχeq ▸ _hχirr
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **(13.3.b) caseA — the unconditional branch witness**: in Clifford case (a) a `LambdaWitness`
+exists unconditionally (independent of the given `χ`).  The (9.8.c) degree-`qu` irreducible member
+`Ind_{HU}^S(Ind_{HC}(hcPsi θ̄))` for a *regular* seed `θ̄` (`caseA_exists_irreducible_witnessed`) is
+`Ind_{PC}^S(linear irr)`: flattening (`isIndHC_of_source_eq_induce_hcPsi`) and the
+`HC.map subtype = (PC).subgroupOf S` transport give the linear `θ' ∈ Irr(H.subgroupOf S)` with
+`P ⊄ Ker θ'` whose induction is irreducible.
+
+Stated with `chief`/`caseA` explicit (no `set` inside), so the caseA branch of
+`S_caseB_facts_no_lambda` is a one-line call and hbridge stays `set`-free (a `set` there would
+split `chief` and desync the branch calls). -/
+theorem lambdaWitness_of_caseA [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))
+    (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData (hyp.mkSection11CharacterDataS hG chief)) :
+    LambdaWitness hyp := by
+  classical
+  haveI := hyp.finiteG
+  let data := hyp.toTypesIIIIIIVSetupS hG
+  letI : Fintype ↥hyp.S := Fintype.ofFinite _
+  letI : Fintype ↥(huSub data) := Fintype.ofFinite _
+  letI : Fintype ((↥data.H ⧸ chief.N) →* ℂˣ) := Fintype.ofFinite _
+  letI : Fintype ↥(hInHu data) := Fintype.ofFinite _
+  letI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf
+    (huSub data)) := Fintype.ofFinite _
+  letI : Fintype ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf
+    (huSub data)).map (huSub data).subtype) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥hyp.S : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+    hyp.S).subgroupOf (huSub data)) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+    hyp.S).subgroupOf (huSub data)).map (huSub data).subtype) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf
+    (huSub data)).Normal := hcInHu_realized_normal (data := data) chief
+  -- (1) the regular seed `θbar` with irreducible `induceHU(Ind_{HC}(hcPsi θbar))`.
+  obtain ⟨θbar, hnt, hreg, hirr⟩ :=
+    caseA_exists_irreducible_witnessed (data := data) (chief := chief) caseA hG
+  have hθ₀ := caseA_regular_inflation_inertia_eq (data := data) (chief := chief) caseA θbar hreg
+  -- (2) the `S'`-source `ζ' = Ind_{HC}(hcPsi θbar) ∈ 𝒳(H₀C)` (`P ⊄ Ker ζ'`).
+  have hζ'mem := hcZeta_mem_xiOf (data := data) chief θbar hnt hθ₀
+  -- (3) flatten `induceHU(Ind_{HC}(hcPsi)) = Ind_{HC.map subtype}(ψ)`, `ψ` linear irr.
+  obtain ⟨ψ, hψirr, hψ1, hψeq⟩ :=
+    isIndHC_of_source_eq_induce_hcPsi (M := hyp.S) (data := data) (chief := chief)
+      (θbar := θbar)
+      (ζ' := ⟨ClassFunction.induce (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+        hyp.S).subgroupOf (huSub data)) (hcPsi chief θbar),
+        hcZeta_irreducible (data := data) chief θbar hθ₀⟩) rfl
+  have hwit : induceHU data (ClassFunction.induce (hInHu data ⊔
+      ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf (huSub data))
+      (hcPsi chief θbar).toClassFunction)
+      = ClassFunction.induce ((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+        hyp.S).subgroupOf (huSub data)).map (huSub data).subtype) ψ := hψeq
+  -- (4) transport `HC.map subtype = (PC).subgroupOf S`.
+  have hHeq : data.H = hyp.P := by show hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
+  have hsupeq : data.H ⊔ cSub data chief = hyp.H := by
+    rw [hHeq, hyp.toTypesIIIIIIVSetupS_cSub_eq_C hG chief]; rfl
+  have hHC : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf
+      (huSub data)).map (huSub data).subtype = hyp.H.subgroupOf hyp.S := by
+    rw [hcRealized_map_subtype_eq (data := data) chief, hsupeq]
+  let θ' := ClassFunction.compHom (MulEquiv.subgroupCongr hHC.symm).toMonoidHom ψ
+  have hθ'def : θ' = ClassFunction.compHom (MulEquiv.subgroupCongr hHC.symm).toMonoidHom ψ := rfl
+  have hindeq : ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ'
+      = induceHU data (ClassFunction.induce (hInHu data ⊔
+        ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf (huSub data))
+        (hcPsi chief θbar).toClassFunction) := by
+    rw [hθ'def, OddOrder.RepresentationTheory.induce_compHom_subgroupCongr hHC.symm ψ, ← hwit]
+  refine ⟨θ', ?_, ?_, ?_, ?_⟩
+  · exact OddOrder.RepresentationTheory.IsIrreducibleCharacter.compHom_of_surjective
+      (MulEquiv.subgroupCongr hHC.symm).surjective hψirr
+  · rw [hθ'def, ClassFunction.compHom_apply, map_one, hψ1]
+  · -- `P ⊄ Ker θ'`: else `P ⊆ Ker(Ind θ') = Ker(Ind_{HU} ζ')` pushes to `P ⊆ Ker ζ'`,
+    -- contradicting `ζ' ∈ 𝒳` (`P = H ⊄ Ker ζ'`).  Mirrors `mu_j_isIndPC_not_ker`.
+    intro hker
+    haveI hHUnorm : (huSub data).Normal := by
+      rw [huSub_eq_derivedInG_subgroupOf data]; infer_instance
+    haveI hPnorm : (hyp.P.subgroupOf hyp.S).Normal := by
+      have hPle : hyp.P ≤ hyp.S := by
+        rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
+      refine (Subgroup.normal_subgroupOf_iff_le_normalizer hPle).mpr ?_
+      rw [hyp.P_eq_SF]
+      exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
+    have hPH : hyp.P.subgroupOf hyp.S ≤ hyp.H.subgroupOf hyp.S :=
+      Subgroup.subgroupOf_mono hyp.S (show hyp.P ≤ hyp.H from le_sup_left)
+    have hkerInd := OddOrder.Peterfalvi.S03.subsetCharacterKernel_induce_of_subgroupOf
+      hPH θ' hker
+    have hInd_eq : ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ'
+        = ClassFunction.induce (huSub data) (ClassFunction.induce (hInHu data ⊔
+          ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf (huSub data))
+          (hcPsi chief θbar).toClassFunction) := by
+      rw [hindeq]; exact induceHU_eq_induce data _
+    apply hζ'mem.1
+    intro x hx
+    have hxP : (x : ↥hyp.S) ∈ hyp.P.subgroupOf hyp.S := by
+      have hx' : x ∈ (data.H.subgroupOf hyp.S).subgroupOf (huSub data) := hx
+      rw [hHeq] at hx'
+      exact Subgroup.mem_subgroupOf.mp hx'
+    have hxkerInd : (x : ↥hyp.S) ∈ OddOrder.Peterfalvi.S03.characterKernel
+        (ClassFunction.induce (huSub data) (ClassFunction.induce (hInHu data ⊔
+          ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf (huSub data))
+          (hcPsi chief θbar).toClassFunction)) := by
+      rw [← hInd_eq]; exact hkerInd hxP
+    have h := OddOrder.Peterfalvi.S03.mem_characterKernel_of_mem_characterKernel_induce
+      (hcZeta_irreducible (data := data) chief θbar hθ₀) x.2 hxkerInd
+    simpa using h
+  · rw [hindeq]; exact hirr
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
 /-- **The no-λ (Galois) branch of the `S`-side (13.3.b) facts** (issue 9094 RULING §2, faithful
 sorried bridging): if `𝒮` contains no `uq`-degree `PC`-induced irreducible (`¬ LambdaWitness`),
 then by Pf (13.3.b) `M = S` is in case (9.7.b) with `C = ⊥` and `u = (p^q−1)/(p−1)` — the Galois
@@ -1290,115 +1514,21 @@ theorem S_caseB_facts_no_lambda [Finite G]
       (chief.H0 ⊔ (hyp.mkSection11CharacterDataS hG chief).Cprime),
       OddOrder.RepresentationTheory.IsIrreducibleCharacter χ → LambdaWitness hyp := by
     intro χ _hχmem _hχirr
-    set data := hyp.toTypesIIIIIIVSetupS hG with hdata
-    set chars := hyp.mkSection11CharacterDataS hG chief with hchars
-    rcases clifford_dichotomy hG chars with hA | hB
-    · -- **caseA**: a `LambdaWitness` exists unconditionally (ignore `χ`).  The (9.8.c) degree-`qu`
-      -- irreducible member `Ind_{HU}^S(Ind_{HC}(hcPsi θ))` is `Ind_{PC}^S(linear irr)`.
+    -- `set`-free case split: a `set data`/`set chars` here would split the (externally obtained)
+    -- `chief` into a folded copy plus a stray `chief✝`, desyncing `_hχmem` from `caseB`.  Both
+    -- branches are `set`-free standalone witnesses (`lambdaWitness_of_caseA` / `_of_caseB_member`),
+    -- each doing its own `let data` internally, so hbridge passes one pristine `chief`.
+    rcases clifford_dichotomy hG (hyp.mkSection11CharacterDataS hG chief) with hA | hB
+    · -- **caseA**: a `LambdaWitness` exists unconditionally (ignore `χ`) — the (9.8.c) degree-`qu`
+      -- irreducible `Ind_{HU}^S(Ind_{HC}(hcPsi θ̄))` is `Ind_{PC}^S(linear irr)`.
       obtain ⟨caseA⟩ := hA
-      letI : Fintype ↥hyp.S := Fintype.ofFinite _
-      letI : Fintype ↥(huSub data) := Fintype.ofFinite _
-      letI : Fintype ((↥data.H ⧸ chief.N) →* ℂˣ) := Fintype.ofFinite _
-      letI : Fintype ↥(hInHu data) := Fintype.ofFinite _
-      letI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf
-        (huSub data)) := Fintype.ofFinite _
-      letI : Fintype ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf
-        (huSub data)).map (huSub data).subtype) := Fintype.ofFinite _
-      letI : Invertible (Nat.card ↥hyp.S : ℂ) :=
-        invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-      letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
-        invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-      letI : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
-        invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-      letI : Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
-        hyp.S).subgroupOf (huSub data)) : ℂ) :=
-        invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-      letI : Invertible (Nat.card ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
-        hyp.S).subgroupOf (huSub data)).map (huSub data).subtype) : ℂ) :=
-        invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-      haveI : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf
-        (huSub data)).Normal := hcInHu_realized_normal chief
-      -- (1) the regular seed `θbar` with irreducible `induceHU(Ind_{HC}(hcPsi θbar))`.
-      obtain ⟨θbar, hnt, hreg, hirr⟩ := caseA_exists_irreducible_witnessed caseA hG
-      have hθ₀ := caseA_regular_inflation_inertia_eq caseA θbar hreg
-      -- (2) the `S'`-source `ζ' = Ind_{HC}(hcPsi θbar) ∈ 𝒳(H₀C)` (`P ⊄ Ker ζ'`).
-      have hζ'mem := hcZeta_mem_xiOf chief θbar hnt hθ₀
-      -- (3) flatten `induceHU(Ind_{HC}(hcPsi)) = Ind_{HC.map subtype}(ψ)`, `ψ` linear irr.
-      obtain ⟨ψ, hψirr, hψ1, hψeq⟩ :=
-        isIndHC_of_source_eq_induce_hcPsi (M := hyp.S) (data := data) (chief := chief)
-          (θbar := θbar)
-          (ζ' := ⟨ClassFunction.induce (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
-            hyp.S).subgroupOf (huSub data)) (hcPsi chief θbar),
-            hcZeta_irreducible chief θbar hθ₀⟩) rfl
-      have hwit : induceHU data (ClassFunction.induce (hInHu data ⊔
-          ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf (huSub data))
-          (hcPsi chief θbar).toClassFunction)
-          = ClassFunction.induce ((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
-            hyp.S).subgroupOf (huSub data)).map (huSub data).subtype) ψ := hψeq
-      -- (4) transport `HC.map subtype = (PC).subgroupOf S`.
-      have hHeq : data.H = hyp.P := by show hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
-      have hsupeq : data.H ⊔ cSub data chief = hyp.H := by
-        rw [hHeq, hyp.toTypesIIIIIIVSetupS_cSub_eq_C hG chief]; rfl
-      have hHC : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf
-          (huSub data)).map (huSub data).subtype = hyp.H.subgroupOf hyp.S := by
-        rw [hcRealized_map_subtype_eq chief, hsupeq]
-      set θ' := ClassFunction.compHom (MulEquiv.subgroupCongr hHC.symm).toMonoidHom ψ with hθ'def
-      have hindeq : ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ'
-          = induceHU data (ClassFunction.induce (hInHu data ⊔
-            ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf (huSub data))
-            (hcPsi chief θbar).toClassFunction) := by
-        rw [hθ'def, OddOrder.RepresentationTheory.induce_compHom_subgroupCongr hHC.symm ψ, ← hwit]
-      refine ⟨θ', ?_, ?_, ?_, ?_⟩
-      · exact OddOrder.RepresentationTheory.IsIrreducibleCharacter.compHom_of_surjective
-          (MulEquiv.subgroupCongr hHC.symm).surjective hψirr
-      · rw [hθ'def, ClassFunction.compHom_apply, map_one, hψ1]
-      · -- `P ⊄ Ker θ'`: else `P ⊆ Ker(Ind θ') = Ker(Ind_{HU} ζ')`, which (converse (1.6.a)) pushes
-        -- to `P ⊆ Ker ζ'`, contradicting `ζ' ∈ 𝒳` (`P = H ⊄ Ker ζ'`).  Mirrors `mu_j_isIndPC_not_ker`.
-        intro hker
-        haveI hHUnorm : (huSub data).Normal := by
-          rw [huSub_eq_derivedInG_subgroupOf data]; infer_instance
-        haveI hPnorm : (hyp.P.subgroupOf hyp.S).Normal := by
-          have hPle : hyp.P ≤ hyp.S := by
-            rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
-          refine (Subgroup.normal_subgroupOf_iff_le_normalizer hPle).mpr ?_
-          rw [hyp.P_eq_SF]
-          exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
-        have hPH : hyp.P.subgroupOf hyp.S ≤ hyp.H.subgroupOf hyp.S :=
-          Subgroup.subgroupOf_mono hyp.S (show hyp.P ≤ hyp.H from le_sup_left)
-        have hkerInd := OddOrder.Peterfalvi.S03.subsetCharacterKernel_induce_of_subgroupOf
-          hPH θ' hker
-        have hInd_eq : ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ'
-            = ClassFunction.induce (huSub data) (ClassFunction.induce (hInHu data ⊔
-              ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf (huSub data))
-              (hcPsi chief θbar).toClassFunction) := by
-          rw [hindeq]; exact induceHU_eq_induce data _
-        apply hζ'mem.1
-        intro x hx
-        have hxP : (x : ↥hyp.S) ∈ hyp.P.subgroupOf hyp.S := by
-          have hx' : x ∈ (data.H.subgroupOf hyp.S).subgroupOf (huSub data) := hx
-          rw [hHeq] at hx'
-          exact Subgroup.mem_subgroupOf.mp hx'
-        have hxkerInd : (x : ↥hyp.S) ∈ OddOrder.Peterfalvi.S03.characterKernel
-            (ClassFunction.induce (huSub data) (ClassFunction.induce (hInHu data ⊔
-              ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf (huSub data))
-              (hcPsi chief θbar).toClassFunction)) := by
-          rw [← hInd_eq]; exact hkerInd hxP
-        have h := OddOrder.Peterfalvi.S03.mem_characterKernel_of_mem_characterKernel_induce
-          (hcZeta_irreducible chief θbar hθ₀) x.2 hxkerInd
-        simpa using h
-      · rw [hindeq]; exact hirr
-    · -- **caseB** (Singer/Galois, `U` irreducible on `H̄`): the remaining genuine (13.3.b)-forward
-      -- gate.  Here every nontrivial `θ̄` has inertia `HC` (`inertia_eq_hcInHu`,
-      -- `caseB.actsIrreducibly`), so the given irreducible `χ = induceHU ζ` (`ζ ∈ 𝒳(H₀C')`) is
-      -- `Ind_{HC}(hcPsiPair θ λ)` for a *linear* pair character (`λ ≠ 1` on `C` when `C ≠ ⊥`).
-      -- The forward pieces exist (`hcPsiPair`, `hcZetaPair_irreducible`, `hcZetaPair_mem_xiOf`,
-      -- and the transport `isIndHC_of_source_eq_induce_hcPsi` reused above), but the *reverse*
-      -- characterization "`ζ ∈ 𝒳(H₀C')` irr ⟹ `ζ = Ind_{HC}(hcPsiPair θ λ)`" is the pair
-      -- (`C'`-kernel) analogue of `caseB_xiOf_H0C_eq_induce_hcPsi` (which is stated for the
-      -- `C`-kernel family `𝒳(H₀C)` and does not apply to pair members with `λ ≠ 1`).  That
-      -- reverse Clifford correspondence is unbuilt S11 machinery (issue 2035 #32 "harder half").
+      exact lambdaWitness_of_caseA hG hyp chief caseA
+    · -- **caseB** (Singer/Galois, `U` irreducible on `H̄`): the given irreducible `χ = Ind_{HU} ζ`
+      -- (`ζ ∈ 𝒳(H₀C')`) is `Ind_{HC}(hcPsiPair θ̄ λ)` for a linear pair character
+      -- (`caseB_xiOf_H0Cprime_eq_induce_hcPsiPair`); `lambdaWitness_of_caseB_member` flattens and
+      -- transports it to the `Ind_{PC}(linear irr)` = `LambdaWitness` shape.
       obtain ⟨caseB⟩ := hB
-      sorry
+      exact lambdaWitness_of_caseB_member hG hyp chief caseB _hχmem _hχirr
   have hno : ¬ ∃ χ ∈ (hyp.mkSection11CharacterDataS hG chief).SOf
       (chief.H0 ⊔ (hyp.mkSection11CharacterDataS hG chief).Cprime),
       OddOrder.RepresentationTheory.IsIrreducibleCharacter χ :=
