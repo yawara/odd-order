@@ -275,3 +275,55 @@ threading は以下の b/c file に触れた (全て引数供給/cite 置換/bin
 ### 残 follow-up (a 裁量、RULING #3 併記)
 - stale docstring cleanup (削除済み legacy 名への言及 ~10 箇所、S07_Subcoherent /
   S12_TypeVSibley 等 — comment のみ、build 無影響)。
+
+---
+
+## ✅ UPDATE (2026-07-13 lane a session 3): census 訂正 + 9077-T1 閉包 + 次候補 surface
+
+### 1. census 訂正: `bgTheoremE_cover_data` は既に AXIOM-CLEAN (「genuine 候補」は stale)
+9087 census の「genuine 候補: S10 `bgTheoremE_cover_data` (BG §16)」を #print axioms authoritative で
+localize → `[propext, Classical.choice, Quot.sound]`、**sorry-free 完成済**
+(BG §14/§16 σ-decomposition 層 `genuineSigmaDecomposition`/`exists_peterfalviType` off で実証明済)。
+RULING #2 の `exists_typeIICrossIsometryData` と同型の stale-census パターン。AxiomsCheck assert 追加済。
+⟹ **lane-a owned territory の genuine 候補は正真正銘ゼロ** (9087 census の 2 候補とも done 確定)。
+
+### 2. 9077-T1 (c の最高レバレッジ blocker) を機械的閉包 — (14.9) type-III determination axiom-clean
+9093 の import inversion が 9077-T1 の cycle を既に切っていたことを BFS で確認 → 抽出 leaf 不要、
+TTypeII `hVcomm` residual を producer 直 cite で閉包 (詳細 = 9077 追記)。bare sorry −1。
+`T_isTypeIII_of_isTypeP1` axiom-clean + AxiomsCheck assert。**a の 9093 成果が c の frontier を
+1 unblock した** (RULING #2 併記の「a の成果が T-side に接続しうるか追跡」の実現例)。
+
+### 3. 次候補 surface (hub 裁定要請): `card_LF_coprime_pq` (S15_Gate3:161) が newly-ungated
+bgTheoremE_cover_data の axiom-clean 化で、**(13.17.b) の B2 入力 `card_LF_coprime_pq`
+(S15_Gate3.lean:161 `:= sorry`) の documented derivation が完全 ungated 化**:
+- docstring 自身が「`bgTheoremE_cover_data` (`:= sorry`, §10/BG-gated) の residual として sorry」と
+  宣言している (その前提が消滅、docstring は stale — 訂正は carve-out 先に委ねる)。
+- derivation は機械的でない genuine 証明 (~中規模): cover data の `primeFactors_disjoint` + type-I
+  `mainSubgroup = maxNilpotentNormalHall` + S/T/L の conjugacy-class 代表への帰着。
+- consumers = S15_ComplementStructure (×2) + S15_SAndTGrid (×2) — (13.17.b) type-I branch chain。
+- **RULING #3 (B) 再検討 3 条件の充足状況**: (i) ✓ (A) landed・S13/S11 凍結済 (ii) ✓ 具体 target 特定
+  (本項) (iii) 要 hub 確認 — S15_Gate3 = S15_SAndT split (c 系 territory、c は idle/TRULY_EXHAUSTED、
+  b の active files (S15_CaseB*/SSetMemberRFamily/S07) と非交差)。
+**lane a への carve-out 可否を裁定されたい**。裁定待ちの間は残 follow-up (stale docstring 等) を継続。
+
+### 3′. 訂正 + 追加候補 (同 session、merge_monitor 所有マップ照合後)
+
+**所有訂正**: §3 で「S15_Gate3 = c 系 territory」と書いたのは誤り。`S15_SAndT{,_Setup}` は
+2026-07-04 に c→b 移管済み (merge_monitor レーン表) ⟹ **`card_LF_coprime_pq` (S15_Gate3) は
+b territory**。b の現 active files (S15_CaseB*/S15_SSetMemberRFamily/S07 pin 系、issue 2035) とは
+別 file だが、carve-out 裁定は「a に付与 vs b の 2035 後のキューに積む」の 2 択になる。
+
+**追加候補 (同型の newly-ungated、これも b territory = S14_MaximalI 全体)**:
+`TypeICovering.lean` の 2 sorry (`allTypeI_fittingIsTI` :72 / `not_nonTypeICovering_of_all_typeI`
+:100) の docstring が「genuinely still-missing」と挙げる上流 gate は**両方とも解消済み**:
+- `escapingCentralizers_control` (S10_MinimalSimpleBasic:1244) — **AxiomsCheck assert 済み**
+  (AxiomsCheck:7718、docstring の「open BG §16 residual」は stale)。
+- `theorem88_dichotomy` — **AxiomsCheck assert 済み** (AxiomsCheck:7281)。
+残る中身は「escape control → FittingIsTI の assembly」と「(8.8.a) exclusivity の抽出」で、
+機械的 rewire でなく genuine assembly 証明 (中規模)。(12.17) all-type-I chain →
+`Theorem88CaseBData` → FT endgame に direct。
+
+**hub への裁定事項 (まとめ)**: newly-ungated 3 target (`card_LF_coprime_pq` / `allTypeI_fittingIsTI` /
+`not_nonTypeICovering_of_all_typeI`、全て b territory・b の 2035 active files と非交差) を
+(a) lane a へ carve-out (unblocking 元の a が続行、b は 2035 継続) か、(b) b のキューへ、か。
+lane a は裁定まで a-scope follow-up を継続。
