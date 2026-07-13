@@ -120,6 +120,7 @@ import OddOrder.Peterfalvi.S09_FrobeniusGammaDecomposition
 import OddOrder.Peterfalvi.S09_FrobeniusGammaNormEstimate
 import OddOrder.Peterfalvi.S09_FrobeniusBsumEstimate
 import OddOrder.Peterfalvi.S09_FrobeniusGoodIndexEstimate
+import OddOrder.Peterfalvi.S09_FrobeniusSelectedEstimate
 import OddOrder.Peterfalvi.S09_FrobeniusParity
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.GroupTheory.RepresentationTheory.GaloisInnerTransport
@@ -7913,3 +7914,13 @@ across the sign to the canonical coherent image. -/
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.reverseCoefficientZeroIndices_good_bound
+
+/-! **Peterfalvi (7.8.b) canonical selected-character bound, axiom-clean**
+(lane a, 2026-07-14, issue 0044 cont.⁵⁷).  The canonical distinguished
+coherent image used to define the concrete B-set is fed through the proved
+BetaDecomp coefficient identities, induced-family degree sum, and Frobenius
+small-index inequality.  This identifies the selected-index rho norm required
+by the final (7.5)/(7.10) CharacterEstimateData assembly. -/
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.distinguishedNuAt_chiRhoNormSq_ge
