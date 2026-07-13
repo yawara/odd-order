@@ -675,3 +675,34 @@ T-side (deltaPrime / tau1T carrier) は S16 layering 複雑 (character_degree_an
 **着手方針**: 難所回避せず (13.3.c) keystone formula `tau1S_ofHonest(∑ᵢμᵢⱼ)=δⱼ·∑ᵢηᵢⱼ` を S15 world で
 build (S13_Orthogonality の γ-trick pin を S15 coherence に port/bridge)。δ=1 は `delta_eq_one_S` で
 `=∑ᵢηᵢⱼ` に。次いで (13.3.b) lambda。**subagent 委譲は "port (13.6)-(13.9)" では NG** (誤ターゲット)。
+
+## 2026-07-13 更新 #5 (lane b, /loop) — (13.3.c) keystone formula の pin 素材 landed + assembly recipe
+
+再診断 (更新 #4) に基づき (13.3.c) main formula `tau1S(∑ᵢμᵢⱼ)=δⱼ·∑ᵢηᵢⱼ` を **honest bottom-up** で構築中。
+positive-definiteness pin の 3 素材を Machinery135 に landed (全 sorry-free, commit f2ac3a3f/b6b8876c):
+
+- `Hypothesis.muColumn_inner_self` : ⟨∑ᵢμᵢⱼ, ∑ᵢμᵢⱼ⟩ = q  (mu_orthonormal 対角和)
+- `Hypothesis.etaColumn_inner_self` : ⟨∑ᵢηᵢⱼ, ∑ᵢηᵢⱼ⟩ = q  (eta_orthonormal 対角和)
+- `inner_pin_eq` : ⟨x,x⟩=⟨y,y⟩=⟨x,y⟩=n (star n=n) ⟹ x=y  (‖x−y‖²=0、正定値)
+
+### assembly recipe (次 iteration — 下流 leaf、Machinery135+CaseACoherence を import)
+
+`x := tau1S_ofHonest hG chief (∑ᵢμᵢⱼ)`, `y := ∑ᵢηᵢⱼ`, `n := (q:ℂ)`。`inner_pin_eq hxx hyy hxy (by simp)`:
+- **hyy** = `etaColumn_inner_self` (済)
+- **hxx** = isometry: `⟨tau1S(∑μ), tau1S(∑μ)⟩ = ⟨∑μ,∑μ⟩ = q`。
+  `(hyp.coherent_H0Cprime_S hG chief).extension_inner_eq (∑μ) (∑μ) hmem hmem` ∘ `muColumn_inner_self`。
+  ⚠ `tau1S_ofHonest = coherent_H0Cprime_S.extension` (定義)。**hmem = ∑μ ∈ zSpan (mkSection11CharacterDataS_honest).S** の family alignment が要:
+  `mu_colSum_mem_sOf_H0` (HypothesisBasics:815) は ∑μ ∈ `S11.sOf (toTypesIIIIIIVSetupS) chief.H0` を与える。
+  `(mkSection11CharacterDataS_honest).S` = この sOf family と一致するか (定義展開) を確認して zSpan membership を得る。
+- **hxy** = ★step 3 = **γ-trick** `⟨tau1S(∑μ), ∑η⟩ = δⱼ·q` (δⱼ=1 は `delta_eq_one_S` で正)。
+  = (13.3.c) の本体 hard core。S11-world に完全 analog `coherent_sOf_H0C_extension_muColumnSum_pin_of_irr`
+  (S13_Orthogonality:290, γ=ξ(1)μⱼ−μⱼ(1)ξ の A₀-supported Dade + 正定値 pin, ~100 行) が在り、
+  S15 world に port/bridge する。**これが残る唯一の本物の数学** (他は上記 pin 代数で機械的)。
+
+⚠ 注意: character_degree_analysis (Machinery135) は tau1S_ofHonest (CaseACoherence) を **見えない** (import DAG)。
+producer assembly 全体は両者を import する下流 leaf に置くか、tau1S_ofHonest を上流移設する architectural 判断が要る
+(別途)。formula 自体も同 leaf。
+
+**次 iteration**: 下流 leaf 新設 → family alignment で hxx wiring → step 3 は
+`coherent_sOf_H0C_extension_muColumnSum_pin_of_irr` の S15 port (subagent 委譲候補、ただし "port (13.6)-(13.9)"
+ではなく "S13_Orthogonality の γ-trick pin を S15 tau1S_ofHonest に port" が正しい指示)。
