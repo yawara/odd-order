@@ -641,6 +641,67 @@ theorem disjoint_kernel_conjugate_complement (h : IsFrobeniusGroup G N A) (g : G
         group
   exact hx_one
 
+/-- **A normal `p`-subgroup of a Frobenius group lies in the kernel.**  If `p ∣ |N|` then
+`p ∤ |A| = [G : N]` (Lemma 6.1 coprimality), so the image of `P` in `G ⧸ N` is a `p`-group of
+`p'`-order, trivial.  If `p ∤ |N|` the order coprimality kills `P ⊓ N`, so `P` and `N` commute
+elementwise (the commutator of two normal subgroups lies in their intersection) and
+`P ≤ C_G(n₀) ≤ N` for any `1 ≠ n₀ ∈ N` (Thm 6.4 (1) ⇒ (4)). -/
+theorem normal_pGroup_le_kernel [Finite G] (h : IsFrobeniusGroup G N A)
+    {p : ℕ} [Fact p.Prime] {P : Subgroup G} [P.Normal] (hP : IsPGroup p ↥P) : P ≤ N := by
+  classical
+  haveI : N.Normal := h.isNormal
+  by_cases hpN : p ∣ Nat.card ↥N
+  · have hpA : ¬ p ∣ Nat.card ↥A :=
+      (Nat.Prime.coprime_iff_not_dvd Fact.out).mp
+        (Nat.Coprime.coprime_dvd_left hpN h.coprime_card_kernel_complement)
+    have himg : IsPGroup p ↥(P.map (QuotientGroup.mk' N)) := hP.map _
+    obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp himg
+    have hdvd : Nat.card ↥(P.map (QuotientGroup.mk' N)) ∣ Nat.card ↥A := by
+      have h1 : Nat.card ↥(P.map (QuotientGroup.mk' N)) ∣ Nat.card (G ⧸ N) :=
+        Subgroup.card_subgroup_dvd_card _
+      rwa [← Subgroup.index_eq_card, h.isComplement.symm.index_eq_card] at h1
+    have hk0 : k = 0 := by
+      by_contra hk0
+      exact hpA (dvd_trans (dvd_pow_self p hk0) (hk ▸ hdvd))
+    have hbot : P.map (QuotientGroup.mk' N) = ⊥ :=
+      Subgroup.card_eq_one.mp (by rw [hk, hk0, pow_zero])
+    have hle := (Subgroup.map_eq_bot_iff _).mp hbot
+    rwa [QuotientGroup.ker_mk'] at hle
+  · have hPN : P ⊓ N = ⊥ := by
+      rw [Subgroup.eq_bot_iff_forall]
+      intro x hx
+      obtain ⟨k, hk⟩ := hP ⟨x, (Subgroup.mem_inf.mp hx).1⟩
+      have hxpk : x ^ p ^ k = 1 := by simpa using congrArg Subtype.val hk
+      have hordp : orderOf x ∣ p ^ k := orderOf_dvd_of_pow_eq_one hxpk
+      have hordN : orderOf x ∣ Nat.card ↥N :=
+        Subgroup.orderOf_dvd_natCard N (Subgroup.mem_inf.mp hx).2
+      have hcop : Nat.gcd (p ^ k) (Nat.card ↥N) = 1 :=
+        Nat.Coprime.pow_left _ ((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr hpN)
+      exact orderOf_eq_one_iff.mp (Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hordp hordN))
+    obtain ⟨n₀, hn₀N, hn₀1⟩ :=
+      (Subgroup.nontrivial_iff_exists_ne_one N).mp
+        ((Subgroup.nontrivial_iff_ne_bot N).mpr h.ne_bot_kernel)
+    refine le_trans ?_ (h.centralizer_kernel_le n₀ hn₀N hn₀1)
+    intro f hf
+    rw [Subgroup.mem_centralizer_singleton_iff]
+    have hc1 : f * n₀ * f⁻¹ * n₀⁻¹ ∈ N :=
+      mul_mem (h.isNormal.conj_mem n₀ hn₀N f) (inv_mem hn₀N)
+    have hc2 : f * n₀ * f⁻¹ * n₀⁻¹ ∈ P := by
+      have hconj : n₀ * f⁻¹ * n₀⁻¹ ∈ P := ‹P.Normal›.conj_mem f⁻¹ (inv_mem hf) n₀
+      simpa [mul_assoc] using mul_mem hf hconj
+    have hcomm : f * n₀ * f⁻¹ * n₀⁻¹ = 1 :=
+      Subgroup.mem_bot.mp (hPN ▸ Subgroup.mem_inf.mpr ⟨hc2, hc1⟩)
+    rw [mul_inv_eq_one, mul_inv_eq_iff_eq_mul] at hcomm
+    exact hcomm
+
+/-- **The Fitting subgroup of a Frobenius group lies in the kernel**: each `O_p(G)` is a
+normal `p`-subgroup, hence in `N` (`normal_pGroup_le_kernel`), and `F(G) = ⨆ p, O_p(G)`. -/
+theorem fitting_le_kernel [Finite G] (h : IsFrobeniusGroup G N A) :
+    OddOrder.Isaacs.Ch01.fitting G ≤ N := by
+  refine iSup_le fun p => ?_
+  haveI : Fact (p : ℕ).Prime := ⟨p.2⟩
+  exact h.normal_pGroup_le_kernel (OddOrder.Isaacs.Ch01.opCore_isPGroup p G)
+
 end IsFrobeniusGroup
 
 namespace SubgroupPartition

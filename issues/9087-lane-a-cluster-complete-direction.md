@@ -470,3 +470,31 @@ kernel coprimality)。AxiomsCheck assert 3 本追加。
 
 **残 2/3**: `allTypeI_fittingIsTI` (uniqueness 部品は S10 に landed 済 @dcbd148e、残 = F(M) = M_F
 for type-F 小補題 + assembly) → 次 iteration で着手。`not_nonTypeICovering_of_all_typeI` はその後。
+
+---
+
+## ✅ RULING #4 実施 2/3 (2026-07-13 lane a): `allTypeI_fittingIsTI` landed — (12.17) all-type-I FittingIsTI gate 実証明
+
+**self-flag (carve-out 条件 iii)**: TypeICovering.lean (b territory、RULING #4 decl 単位 carve-out) を編集 —
+`allTypeI_fittingIsTI` の sorry を §3‴ recon の設計どおり実証明で置換 (signature 不変、private のまま。
+`allTypeI_centralizer_le` の後へ移動 — 同 file 内の宣言順のみ、b 既存宣言の改変・削除なし)。
+
+**実装 (§3‴ からの差分)**:
+- 「F(M) = M_F for type-F 小補題」は **Isaacs 側の一般補題**として供給:
+  `IsFrobeniusGroup.normal_pGroup_le_kernel` (正規 p-部分群 ⊆ Frobenius kernel; p ∣ |N| なら
+  商の p'-order で p-群像が消滅、p ∤ |N| なら P ⊓ N = ⊥ + 交換子論法 + Thm 6.4 (1)⇒(4) centralizer
+  containment) + `IsFrobeniusGroup.fitting_le_kernel` (F(G) = ⨆ O_p ≤ N)。equality でなく
+  **F(M) ≤ M_F で十分** (fittingSharp ⊆ M_σ^# の輸送のみ必要)。
+- assembly: (12.7) `typeI_frobenius` (hnoV は `no_typeV_maximal_unconditional` で内部 discharge) +
+  `subgroupOf_map_subtype` 輸送で F(M) ≤ M_F = M_σ (type-F、
+  `maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2`) → 非脱出 `allTypeI_centralizer_le` +
+  14.4 σ-uniqueness `S10.eq_of_mem_maximalSigmaSubgroupsOfElement_of_centralizer_le` (@dcbd148e で
+  S10 に factor 済) で M = M^g → `normalizer_eq_self_of_mem_maximalSubgroups` +
+  `normalizer_fittingInAmbient_eq_self` で g ∈ N(F(M))。
+
+**検証**: leaf build green (4078 jobs)。新規公開補題 2 本 = axiom-clean
+(`[propext, Classical.choice, Quot.sound]`、probe 確認) + AxiomsCheck assert 2 本追加。
+consumer `exists_typeICovering` は残 3/3 (`not_nonTypeICovering_of_all_typeI` :71) が唯一の
+dirty root になった (allTypeI_fittingIsTI 経路は閉)。
+
+**残 3/3**: `not_nonTypeICovering_of_all_typeI` ((8.8.a) exclusivity 抽出) → 次 iteration。
