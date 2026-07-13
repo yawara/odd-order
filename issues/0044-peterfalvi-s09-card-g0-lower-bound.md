@@ -1407,3 +1407,37 @@ horth : ⟨v_j,v_l⟩ = if j=l then BsumWeight j else 0 の character-side suppl
 **次 frontier**: 原文 (7.9) の係数関係
 ⟨Γ, ν_j ζ_{jt}⟩ = d_{jt} x_j を証明し、x_j・v_j・Γ₁ を構成して
 Bsum_le_of_orthogonal_integer_decomposition へ渡す。続いて 𝓐/𝓑 wiring と残 source data を組む。
+
+## cont.⁵³ — (7.10) weighted Γ projection・concrete B 分解完成 (2026-07-14) ✅
+
+**新 leaf `S09_FrobeniusGammaDecomposition.lean`** で、cont.⁵² の weighted
+orthogonality を実際の Peterfalvi (7.10) Γ 分解へ接続した。
+
+1. concrete Frobenius member の degree ratio `d_r` が実数であることと、
+   coherence extension が `ζ_r - d_r ζ_0` 上で Dade map と一致することを証明。
+   これにより異なる member について
+   `⟨Γ_i, ν_j ζ_{jr}⟩ = d_{jr} ⟨β_i, ν_j ζ_{j0}⟩` を得た。
+2. `β_i` と distinguished image `ν_j ζ_{j0}` は virtual characters なので、
+   cross coefficient を整数 `x_j` として構成。weighted sum 全体へ展開して
+   `⟨Γ_i, v_j⟩ = x_j · BsumWeight j` を証明。
+3. 有限直交族の一般補題 `Cert.exists_orthogonal_projection_residual` を実証明し、
+   `Γ₁ := Γ_i - Σ_{j∈B} x_j v_j` を構成。decomposition と
+   `⟨Γ₁,v_j⟩=0` を同時に得た。
+4. 原文どおり
+   `reverseCoefficientZeroIndices i = {j ≠ i | ⟨β_j,ν_iζ_{i0}⟩=0}`
+   を定義。(7.9) `hypothesis79_conclusion` の他方の枝から、この B 上で
+   全 `x_j ≠ 0` を証明。
+5. `exists_weightedGammaDecomposition_on_reverseCoefficientZeroIndices` は既存
+   `Bsum_le_of_orthogonal_integer_decomposition` が要求する horth / hΓ / hΓ₁ /
+   hx_nonzero を concrete family data から一括供給する。
+
+検証: Γ decomposition leaf green (3783 jobs) + AxiomsCheck green (4169 jobs) +
+full build green (4192 jobs)。一般 Γ₁ 構成、weighted projection formula、concrete B
+decomposition の代表 tripwire はすべて axiom-clean
+`[propext, Classical.choice, Quot.sound]`。
+
+**次 frontier**: 選択 member の (7.8.b) `‖Γ_i‖² ≤ e_i-1` を concrete induced-family
+source dataから閉じ、この decomposition を
+`Bsum_le_of_orthogonal_integer_decomposition` へ渡して Bsum_le を実証明する。
+続いて同じ concrete B の補集合を 𝓐 として (7.8.c) good-index 下界と (7.5)
+reduced family inequalityへ接続する。
