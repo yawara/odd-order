@@ -718,3 +718,27 @@ sOf の containment/monotone (chief.H0 ⊆ H0Cprime 方向 or その逆) を経�
 既に踏んでいる — その pattern を流用可)。次 iteration はまず `induce_H_mem_zSpan_S`
 (S15_CaseACoherence:801) が `∑μ`/`Ind_{H}θ` を coherence domain の zSpan に入れる正確な形を読み、
 それを ∑μ = Ind_{S'}ψ (mu_colSum_eq_induce) に適用する。
+
+### 追記² (更新 #5): isometry wiring は clean と確定 — 残る hard core は step 3 のみ
+
+family alignment 解決: `(mkSection11CharacterDataS_honest).S = sSet (toTypesIIIIIIVSetupS)` (定義、
+ChiefFactorCore:653 `def S _chars := sSet data`)。`sOf_subset_sSet` (ChiefFactorCore:165,
+`sOf data Y ⊆ sSet data`) と `mu_colSum_mem_sOf_H0` (∑μ ∈ sOf chief.H0) で ∑μ ∈ sSet = .S。よって:
+
+```
+have hmem : (∑ i, hyp.mu i j) ∈ S07.zSpan (hyp.mkSection11CharacterDataS_honest hG chief).S :=
+  Submodule.subset_span (sOf_subset_sSet _ _ (hyp.mu_colSum_mem_sOf_H0 hG chief j hj))
+have hxx : ⟨tau1S_ofHonest hG chief (∑μ), tau1S_ofHonest hG chief (∑μ)⟩ = (q:ℂ) := by
+  rw [Hypothesis.tau1S_ofHonest,
+      (hyp.coherent_H0Cprime_S hG chief).extension_inner_eq _ _ hmem hmem,
+      hyp.muColumn_inner_self]  -- tau1S_ofHonest = coherent_H0Cprime_S.extension (defeq)
+```
+
+⟹ **assembly は step 3 (γ-trick `⟨tau1S(∑μ), ∑η⟩ = q`) を除き全て機械的**:
+`inner_pin_eq hxx (hyp.etaColumn_inner_self j) hstep3 (by simp [Complex.star_def])`。
+step 3 = `coherent_sOf_H0C_extension_muColumnSum_pin_of_irr` (S13_Orthogonality:290) の S15 port。
+
+**次 iteration 手順**: (1) 下流 leaf 新設 (import Machinery135 + S15_CaseACoherence、cycle 無しを build 確認)、
+(2) 上記 hxx/hyy/hn を wire + step 3 を genuine sorried lemma `Hypothesis.muColumn_tau1_inner_etaColumn`
+として分離 → formula `Hypothesis.tau1S_ofHonest_muColumn_eq_etaColumn` を build green 化、
+(3) step 3 の γ-trick port に着手 (これが (13.3.c) の唯一残る本物の数学)。
