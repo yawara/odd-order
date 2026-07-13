@@ -623,6 +623,19 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 28) — ★ a 合流: Peterfalvi Frobenius-family lower bound 実証明 (sorry 実 discharge 50→49)**:
+  **a=1** (`463983d5` = §9 char に復帰。`card_G0_lower_bound`/`not_trivial_G0` を新 leaf
+  `S09_FrobeniusCardG0LowerBound.lean` +142 へ移設 + **genuine 証明 → FrobeniusFamily.lean の sorry 1→0 discharge**。
+  issue 0044 closed。not_trivial_G0 に nilpotency 仮説 `hnilp` 追加 (a-owned signature 変更))。c=0 / b=0。
+  build green **4202 jobs** / AxiomsCheck OK (**2416** 全 allowlist) / **count-sorry 50→49 (実 discharge、
+  FrobeniusFamily 1→0、他 file 増なし = clean、hub 検証済)** / 新 axiom なし。
+  🔩 **mechanical follow (非逸脱, hub 裁定)**: a の `not_trivial_G0` signature 変更 (hnilp 追加) に伴い
+  **b-owned `S14_MaximalI/TypeICovering.lean` の `not_all_maximal_typeI` proof に +11/-1 の call-site 追従**
+  (hnilp witness = `maxNilpotentNormalHall_isNilpotent` 供給、statement 不変)。判定 = b active math 非接触
+  (b 0 ahead、not_all_maximal_typeI は 9087 RULING #4 で既 landed・b 現 frontier でない) → 🔩 rule 該当。
+  ⚠ **a は commit で self-flag し忘れ (🔩 cond iii)** — hub が merge log + 本 note で traceability 補完。
+  a への申し送り: 自 upstream signature 変更で他レーン file を追従する時は commit self-flag すること。
+  ⚠ issue 9096 (b frontier direction) 依然 保留。
 - **2026-07-14 (tick 27) — ★ a 合流: Isaacs Thm 7.1 (Thompson normal p-complement) COMPLETE + issue 0031 close**:
   **a=1** (`cb7faf68` = ★ **Isaacs Theorem 7.1 完成** — capstone `thompson_normal_p_complement_of_local_hypotheses`
   を新 leaf `S7C_ThompsonPComplementFinal.lean` +105 で **sorry-free 証明**、AxiomsCheck で「3 axiom 全 allowlist =
