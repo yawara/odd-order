@@ -932,6 +932,262 @@ theorem Hypothesis.sSet_sThree_coherent_dade [Finite G]
     (fun h => hnr χ₀ hχ₀ h.symm)
 
 open OddOrder.Peterfalvi.S11 in
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+/-- **The (9.11.2) TI-identity at the explicit witness `U₁ = C_U(H̄₀)`** (issue 1017).  The generic
+producer `S11.nineElevenTwoTIWitness_of_degree_dichotomy` proves the (9.11.2) identity but returns
+its witness behind an `∃`; the (9.11.4) `S`-instance support argument (`nineElevenAlphaSupportS`)
+needs the witness **concretely** — `U₁ = cuSubOf caseA i` centralizes the chief-factor summand
+`H̄ᵢ ≠ 1`, which is what puts `U₁^#` inside `A(S)` (coprime fixed-point lifting) — so this restates
+the producer with the witness exposed at `i = 0`.  Proof = the producer's, verbatim;
+upstream-merge candidate into `S11_NineElevenTIWitness` (issue 1017 update #51). -/
+theorem cuSubOf_zero_tiWitness {M : Subgroup G} [Finite G]
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (hdeg : ∀ φ ∈ sOf data (chief.H0 ⊔ cSub data chief),
+      (φ : ↥M → ℂ) 1 = ((data.q * chars.u : ℕ) : ℂ) ∨
+      (φ : ↥M → ℂ) 1 = ((data.q * caseA.a : ℕ) : ℂ)) :
+    ∀ w ∈ data.typeP.W1, w ≠ 1 →
+      cuSubOf caseA ⟨0, data.nontrivial.2.1.pos⟩
+          ⊓ MulAut.conj w • cuSubOf caseA ⟨0, data.nontrivial.2.1.pos⟩
+        = cSub data chief := by
+  classical
+  have hq0 : 0 < data.q := data.nontrivial.2.1.pos
+  by_cases hall : ∀ k, cuSubOf caseA k = cuSubOf caseA ⟨0, hq0⟩
+  · -- all single-factor centralizers coincide: `C = U₁`, the TI-identity is trivial
+    have hCeq : cSub data chief = cuSubOf caseA ⟨0, hq0⟩ := by
+      apply le_antisymm (cSub_le_cuSubOf caseA ⟨0, hq0⟩)
+      intro g hg
+      exact mem_cSub_of_forall_mem_cuSubOf caseA (fun k => (hall k).symm ▸ hg)
+    intro w hw _hne
+    obtain ⟨j, hj⟩ := exists_conj_smul_cuSubOf_eq caseA hw ⟨0, hq0⟩
+    rw [hj, hall j, inf_idem, ← hCeq]
+  · -- some centralizer differs: the pair dichotomy resolves to index `u`
+    push Not at hall
+    obtain ⟨k₀, hk₀⟩ := hall
+    intro w hw hne
+    obtain ⟨j, hj⟩ := exists_conj_smul_cuSubOf_eq caseA hw ⟨0, hq0⟩
+    -- `C_U(H_j) ≠ U₁`: else `⟨w⟩ = W₁` fixes `U₁` and transitivity collapses all
+    have hjne : cuSubOf caseA j ≠ cuSubOf caseA ⟨0, hq0⟩ := by
+      intro hjeq
+      apply hk₀
+      have hwfix : MulAut.conj w • cuSubOf caseA ⟨0, hq0⟩ = cuSubOf caseA ⟨0, hq0⟩ := by
+        rw [hj, hjeq]
+      have hallfix : ∀ v ∈ data.typeP.W1,
+          MulAut.conj v • cuSubOf caseA ⟨0, hq0⟩ = cuSubOf caseA ⟨0, hq0⟩ := by
+        intro v hv
+        obtain ⟨n, rfl⟩ := exists_zpow_of_mem_W1 hw hne v hv
+        rw [map_zpow]
+        have hstab : MulAut.conj w
+            ∈ MulAction.stabilizer (MulAut G) (cuSubOf caseA ⟨0, hq0⟩) :=
+          MulAction.mem_stabilizer_iff.mpr hwfix
+        exact MulAction.mem_stabilizer_iff.mp (zpow_mem hstab n)
+      obtain ⟨w0, hw0W, hw0⟩ := exists_w1_rep_Hpart caseA k₀
+      obtain ⟨wi, hwiW, hwi⟩ := exists_w1_rep_Hpart caseA ⟨0, hq0⟩
+      have hvW : ((w0 * wi⁻¹ : ↥(data.typeP.U ⊔ data.typeP.W1)) : G) ∈ data.typeP.W1 :=
+        mul_mem hw0W (inv_mem hwiW)
+      have hHk₀ : caseA.Hpart k₀ = quotientMulAutHom chief.N_aInvariant (w0 * wi⁻¹)
+          • caseA.Hpart ⟨0, hq0⟩ := by
+        rw [hw0, hwi, map_mul, mul_smul, map_inv, inv_smul_smul]
+      have hdict := conj_smul_cuSubOf_of_Hpart_smul caseA (w0 * wi⁻¹).2 hHk₀
+      rw [← hdict]
+      exact hallfix _ hvW
+    have hij : (⟨0, hq0⟩ : Fin data.q) ≠ j := fun h => hjne (by rw [h])
+    rcases nineElevenTwo_relIndex_dichotomy caseA hij hdeg with hu | ha
+    · -- index `u`: `C = U₁ ∩ U₁^w` by index equality
+      have hCle : cSub data chief ≤ cuSubOf caseA ⟨0, hq0⟩ ⊓ cuSubOf caseA j :=
+        le_inf (cSub_le_cuSubOf caseA ⟨0, hq0⟩) (cSub_le_cuSubOf caseA j)
+      have hCeq : cSub data chief = cuSubOf caseA ⟨0, hq0⟩ ⊓ cuSubOf caseA j := by
+        by_contra hne'
+        have hlt := OddOrder.Peterfalvi.S07.relIndex_lt_relIndex_of_le_of_ne hCle
+          (inf_le_left.trans (cuSubOf_le_U caseA ⟨0, hq0⟩)) (fun h => hne' h.symm)
+        rw [hu, relIndex_cSub_U_eq_u chars] at hlt
+        exact lt_irrefl _ hlt
+      rw [hj, ← hCeq]
+    · -- index `a`: would force `C_U(H_{i₀}) = C_U(H_j)`, contradicting `hjne`
+      exfalso
+      apply hjne
+      have hi : cuSubOf caseA ⟨0, hq0⟩ ⊓ cuSubOf caseA j = cuSubOf caseA ⟨0, hq0⟩ := by
+        by_contra hne'
+        have hlt := OddOrder.Peterfalvi.S07.relIndex_lt_relIndex_of_le_of_ne
+          (inf_le_left : cuSubOf caseA ⟨0, hq0⟩ ⊓ cuSubOf caseA j
+            ≤ cuSubOf caseA ⟨0, hq0⟩)
+          (cuSubOf_le_U caseA ⟨0, hq0⟩) (fun h => hne' h.symm)
+        rw [relIndex_cuSubOf_U_eq_a caseA ⟨0, hq0⟩, ha] at hlt
+        exact lt_irrefl _ hlt
+      have hjeq : cuSubOf caseA ⟨0, hq0⟩ ⊓ cuSubOf caseA j = cuSubOf caseA j := by
+        by_contra hne'
+        have hlt := OddOrder.Peterfalvi.S07.relIndex_lt_relIndex_of_le_of_ne
+          (inf_le_right : cuSubOf caseA ⟨0, hq0⟩ ⊓ cuSubOf caseA j ≤ cuSubOf caseA j)
+          (cuSubOf_le_U caseA j) (fun h => hne' h.symm)
+        rw [relIndex_cuSubOf_U_eq_a caseA j, ha] at hlt
+        exact lt_irrefl _ hlt
+      rw [← hjeq, hi]
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **Peterfalvi (9.11.4), the `A(S)`-support of `α = γ − ψ₁` — `S`-instance residual**
+(issue 1017; the Coq gap-patch site `PFsection9.v:1478-1484`).  For the explicit TI-witness
+`U₁ = cuSubOf caseA i = C_U(H̄ᵢ)` and a degree-`qa` member `ψ₁ ∈ 𝒮`, the difference
+`α = Ind_{HU₁}^S 1 − ψ₁` is supported in `A(S) = {y ∈ (S′)^# | ∃ x ∈ S_σ^#, y ∈ C(x)}`
+(`mem_honestTypeP2ASet`; `H = S_σ = Msigma`).  The M-side dispatches this via
+`A(M) = (M′)^#` (`mderivSharp_subset_A0`), **false** here (`A(S) ⊊ (S′)^#` strictly); the honest
+route is the book's patched (9.11.4) argument: `supp γ ⊆ ⋃_g (HU₁)^g`
+(`support_induce_subset_conjugatesInto`), and `HU₁^# ⊆ A(S)` by the commuting Hall decomposition
+in `⟨y⟩` — a nontrivial `H`-part `h ∈ ⟨y⟩ ∩ H^#` gives `y ∈ C(h)` directly, while a σ′-element
+`y` lies in a Hall-conjugate of `U₁` (solvable `HU₁`, Hall conjugacy) and `U₁ = C_U(H̄ᵢ)`
+centralizes a nontrivial `H`-element by coprime fixed-point lifting; `ψ₁`'s support is
+`A(S) ∪ {1}` (`sSet_member_support_subset`) and the value at `1` cancels
+(`γ(1) = qa = ψ₁(1)`). -/
+theorem Hypothesis.nineElevenAlphaSupportS [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
+    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
+    (caseA : CliffordCaseAData chars) (i : Fin (hyp.toTypesIIIIIIVSetupS hG).q)
+    {ψ₁ : ClassFunction ↥hyp.S ℂ}
+    (hψ₁mem : ψ₁ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
+    (hψ₁deg : (ψ₁ : ↥hyp.S → ℂ) 1 = (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ)) :
+    (ClassFunction.induce
+        ((hyp.toTypesIIIIIIVSetupS hG).H.subgroupOf hyp.S
+          ⊔ (cuSubOf caseA i).subgroupOf hyp.S)
+        (trivialClassFunction ↥((hyp.toTypesIIIIIIVSetupS hG).H.subgroupOf hyp.S
+          ⊔ (cuSubOf caseA i).subgroupOf hyp.S))
+      - ψ₁).support
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S := by
+  sorry
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **Peterfalvi (9.11.4) at the `S`-instance: the cleared Mackey-norm bundle** (issue 1017; the
+`S`-mirror of `S13.caseA_nineElevenFour_norm_inputs`).  In the equality configuration (`C = U′`,
+the (9.8.d) count) there is `N : ℕ` with `N·u = (a+1)·u + (q−1)·a²`, realized as `N = ‖α‖²` for
+the `A(S)`-supported virtual character `α = γ − ψ₁ ∈ ℤ[Irr S]` — `γ = Ind_{HU₁}^S 1` at the
+explicit TI-witness `U₁ = cuSubOf caseA 0` (`cuSubOf_zero_tiWitness`), `ψ₁` a degree-`qa`
+irreducible member from the (9.8.d) count.  Norm: `‖α‖² = ‖γ‖² + 1`
+(`cfnorm_sub_irreducible_orthogonal`; orthogonality `nineElevenGamma_inner_induceHU`) and
+`‖γ‖²·u = a·u + (q−1)·a²` (`nineElevenGamma_inner_self_mul_u`, the Mackey double-coset count at
+the TI-identity); integrality by `mem_ZIrr_inner_self_eq_sum_sq`; support by the
+`nineElevenAlphaSupportS` residual. -/
+theorem Hypothesis.nineElevenFourNormInputsS [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
+    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
+    (caseA : CliffordCaseAData chars)
+    (hdich : ∀ φ ∈ OddOrder.Peterfalvi.S11.sOf (hyp.toTypesIIIIIIVSetupS hG)
+      (chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief),
+      (φ : ↥hyp.S → ℂ) 1 = (((hyp.toTypesIIIIIIVSetupS hG).q * chars.u : ℕ) : ℂ) ∨
+      (φ : ↥hyp.S → ℂ) 1 = (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ))
+    (hCUprime : chars.C = chars.Uprime)
+    (hcount : {χ ∈ OddOrder.Peterfalvi.S11.sOf (hyp.toTypesIIIIIIVSetupS hG)
+          (chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub (hyp.toTypesIIIIIIVSetupS hG)) |
+          IsIrreducibleCharacter χ ∧
+            χ 1 = (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ)}.ncard
+        * (caseA.a * caseA.a)
+        = (chief.p - 1) * ((OddOrder.Peterfalvi.S11.uprimeSub
+          (hyp.toTypesIIIIIIVSetupS hG)).relIndex (hyp.toTypesIIIIIIVSetupS hG).U)) :
+    ∃ N : ℕ,
+      N * chars.u = (caseA.a + 1) * chars.u
+        + ((hyp.toTypesIIIIIIVSetupS hG).q - 1) * caseA.a ^ 2 ∧
+      ∃ α : ClassFunction ↥hyp.S ℂ,
+        α ∈ OddOrder.RepresentationTheory.ZIrr ↥hyp.S ∧
+        α.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S ∧
+        ClassFunction.inner α α = (N : ℂ) := by
+  classical
+  haveI := hyp.finiteG
+  have hq0 : 0 < (hyp.toTypesIIIIIIVSetupS hG).q :=
+    (hyp.toTypesIIIIIIVSetupS hG).nontrivial.2.1.pos
+  -- the explicit TI-witness `U₁ = cuSubOf caseA 0` and its (9.11.2) facts
+  have hTI := cuSubOf_zero_tiWitness caseA hdich
+  have hCU₁ : OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief
+      ≤ cuSubOf caseA ⟨0, hq0⟩ := cSub_le_cuSubOf caseA ⟨0, hq0⟩
+  have hU₁U : cuSubOf caseA ⟨0, hq0⟩ ≤ (hyp.toTypesIIIIIIVSetupS hG).U :=
+    cuSubOf_le_U caseA ⟨0, hq0⟩
+  have hU₁a : (cuSubOf caseA ⟨0, hq0⟩).relIndex (hyp.toTypesIIIIIIVSetupS hG).U = caseA.a :=
+    relIndex_cuSubOf_U_eq_a caseA ⟨0, hq0⟩
+  have hUpU₁ : OddOrder.Peterfalvi.S11.uprimeSub (hyp.toTypesIIIIIIVSetupS hG)
+      ≤ cuSubOf caseA ⟨0, hq0⟩ := by
+    have hUpC : OddOrder.Peterfalvi.S11.uprimeSub (hyp.toTypesIIIIIIVSetupS hG)
+        = OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief := hCUprime.symm
+    rw [hUpC]; exact hCU₁
+  -- `ψ₁ ∈ 𝒮₁`: the degree-`qa` irreducible family is nonempty by the (9.8.d) count
+  have hrelne : (OddOrder.Peterfalvi.S11.uprimeSub (hyp.toTypesIIIIIIVSetupS hG)).relIndex
+      (hyp.toTypesIIIIIIVSetupS hG).U ≠ 0 := Subgroup.index_ne_zero_of_finite
+  have hcne : {χ ∈ OddOrder.Peterfalvi.S11.sOf (hyp.toTypesIIIIIIVSetupS hG)
+      (chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub (hyp.toTypesIIIIIIVSetupS hG)) |
+      IsIrreducibleCharacter χ ∧
+        χ 1 = (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ)}.ncard ≠ 0 := by
+    intro h0
+    rw [h0, zero_mul] at hcount
+    have hp1 : 1 < chief.p := chief.p_prime.one_lt
+    have hrpos := Nat.pos_of_ne_zero hrelne
+    have : 0 < (chief.p - 1) * ((OddOrder.Peterfalvi.S11.uprimeSub
+        (hyp.toTypesIIIIIIVSetupS hG)).relIndex (hyp.toTypesIIIIIIVSetupS hG).U) :=
+      Nat.mul_pos (by omega) hrpos
+    omega
+  obtain ⟨ψ₁, hψ₁sOf, hψ₁irr, hψ₁deg⟩ := Set.nonempty_of_ncard_ne_zero hcne
+  obtain ⟨ζ, hζmem, hψ₁eq⟩ := hψ₁sOf
+  have hζxi : ζ ∈ OddOrder.Peterfalvi.S11.xiSet (hyp.toTypesIIIIIIVSetupS hG) :=
+    OddOrder.Peterfalvi.S11.xiOf_subset_xiSet (hyp.toTypesIIIIIIVSetupS hG) _ hζmem
+  -- `γ = Ind_{HU₁}^S 1` and its landed (9.11.4) facts
+  set K : Subgroup ↥hyp.S := (hyp.toTypesIIIIIIVSetupS hG).H.subgroupOf hyp.S
+    ⊔ (cuSubOf caseA ⟨0, hq0⟩).subgroupOf hyp.S with hKdef
+  set γ : ClassFunction ↥hyp.S ℂ :=
+    ClassFunction.induce K (trivialClassFunction ↥K) with hγdef
+  have hγZIrr : γ ∈ OddOrder.RepresentationTheory.ZIrr ↥hyp.S :=
+    nineElevenGamma_mem_ZIrr (hyp.toTypesIIIIIIVSetupS hG) (cuSubOf caseA ⟨0, hq0⟩)
+  have hγ1 : γ (1 : ↥hyp.S) = (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ) :=
+    nineElevenGamma_apply_one (hyp.toTypesIIIIIIVSetupS hG) hU₁U hU₁a
+  have hγγu : ClassFunction.inner γ γ * (chars.u : ℂ)
+      = ((caseA.a * chars.u
+          + ((hyp.toTypesIIIIIIVSetupS hG).q - 1) * caseA.a ^ 2 : ℕ) : ℂ) :=
+    nineElevenGamma_inner_self_mul_u chars hU₁U hUpU₁ hU₁a hTI
+  have hindEq : induceHU (hyp.toTypesIIIIIIVSetupS hG)
+        (ζ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupS hG)) ℂ)
+      = ClassFunction.induce (huSub (hyp.toTypesIIIIIIVSetupS hG))
+        (ζ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupS hG)) ℂ) := rfl
+  -- orthogonality `⟨γ, ψ₁⟩ = 0` and the norm split `‖α‖² = ‖γ‖² + 1`
+  have hγψ : ClassFunction.inner γ ψ₁ = 0 := by
+    rw [hψ₁eq, hindEq]
+    exact nineElevenGamma_inner_induceHU (hyp.toTypesIIIIIIVSetupS hG) hU₁U hζxi
+  have hαα : ClassFunction.inner (γ - ψ₁) (γ - ψ₁) = ClassFunction.inner γ γ + 1 :=
+    cfnorm_sub_irreducible_orthogonal hψ₁irr hγψ
+  -- `α ∈ ℤ[Irr S]` and the integrality of `‖α‖²`
+  have hαZIrr : γ - ψ₁ ∈ OddOrder.RepresentationTheory.ZIrr ↥hyp.S := by
+    refine Submodule.sub_mem _ hγZIrr ?_
+    rw [hψ₁eq]
+    exact induceHU_mem_ZIrr (hyp.toTypesIIIIIIVSetupS hG) ζ
+  obtain ⟨c, -, -, hcsum⟩ :=
+    OddOrder.RepresentationTheory.mem_ZIrr_inner_self_eq_sum_sq hαZIrr
+  have hm0 : 0 ≤ ∑ x ∈ c.support, (c x) ^ 2 :=
+    Finset.sum_nonneg fun _ _ => sq_nonneg _
+  have hmval : ClassFunction.inner (γ - ψ₁) (γ - ψ₁)
+      = ((∑ x ∈ c.support, (c x) ^ 2 : ℤ) : ℂ) := by
+    rw [hcsum]
+    push_cast
+    rfl
+  set N : ℕ := (∑ x ∈ c.support, (c x) ^ 2).toNat with hNdef
+  have hNval : ((N : ℕ) : ℂ) = ClassFunction.inner (γ - ψ₁) (γ - ψ₁) := by
+    rw [hmval, hNdef]
+    exact_mod_cast congrArg (fun z : ℤ => (z : ℂ)) (Int.toNat_of_nonneg hm0)
+  refine ⟨N, ?_, γ - ψ₁, hαZIrr, ?_, hNval.symm⟩
+  · -- the cleared norm identity `N·u = (a+1)·u + (q−1)·a²`, by `ℕ`-cast injectivity
+    have h2 : ClassFunction.inner (γ - ψ₁) (γ - ψ₁) * (chars.u : ℂ)
+        = ((caseA.a * chars.u
+            + ((hyp.toTypesIIIIIIVSetupS hG).q - 1) * caseA.a ^ 2 : ℕ) : ℂ)
+          + (chars.u : ℂ) := by
+      rw [hαα, add_mul, one_mul, hγγu]
+    have h3 : ((N * chars.u : ℕ) : ℂ)
+        = (((caseA.a + 1) * chars.u
+            + ((hyp.toTypesIIIIIIVSetupS hG).q - 1) * caseA.a ^ 2 : ℕ) : ℂ) := by
+      push_cast at h2 ⊢
+      rw [hNval]
+      linear_combination h2
+    exact Nat.cast_injective h3
+  · -- `Supp(α) ⊆ A(S)`: the (9.11.4) support residual at the explicit witness
+    have hψ₁mem : ψ₁ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) :=
+      hyp.sOf_H0Uprime_subset_sSet hG chars ⟨ζ, hζmem, hψ₁eq⟩
+    exact hyp.nineElevenAlphaSupportS hG chars caseA ⟨0, hq0⟩ hψ₁mem hψ₁deg
+
+open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 /-- **Peterfalvi (9.11.4)–(9.11.8), the norm bound — `S`-instance residual** (issue 1017; the
 `S`-mirror of the M-side `S13.NineElevenNormBound` discharge
