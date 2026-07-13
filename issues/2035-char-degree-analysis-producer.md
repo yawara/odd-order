@@ -742,3 +742,25 @@ step 3 = `coherent_sOf_H0C_extension_muColumnSum_pin_of_irr` (S13_Orthogonality:
 (2) 上記 hxx/hyy/hn を wire + step 3 を genuine sorried lemma `Hypothesis.muColumn_tau1_inner_etaColumn`
 として分離 → formula `Hypothesis.tau1S_ofHonest_muColumn_eq_etaColumn` を build green 化、
 (3) step 3 の γ-trick port に着手 (これが (13.3.c) の唯一残る本物の数学)。
+
+## 2026-07-13 更新 #6 (lane b, /loop) — ★(13.3.c) formula landed (build-green)、残る本物の数学は γ-trick 1 点
+
+`OddOrder/Peterfalvi/S15_SAndT_Setup/MuColumnPin.lean` 新設 (commit c23fe9f5):
+
+- **`Hypothesis.tau1S_ofHonest_muColumn_eq_etaColumn`** : `τ₁(∑ᵢμᵢⱼ) = ∑ᵢηᵢⱼ` (j≠0, δ=1) =
+  (13.3.c) main **build-green**。pin/isometry/norm/family-alignment 全て **sorry-free** で proven。
+- **`Hypothesis.muColumn_tau1_inner_etaColumn`** : `⟨τ₁μⱼ, ∑ηᵢⱼ⟩ = q` = **唯一の sorry** = γ-trick。
+
+⟹ (13.3.c) formula の残る本物の数学は **γ-trick (`muColumn_tau1_inner_etaColumn`) 1 点のみ**。
+これは `coherent_sOf_H0C_extension_muColumnSum_pin_of_irr` (S13_Orthogonality:290、S11/S12-world、
+γ=ξ(1)μⱼ−μⱼ(1)ξ の A₀-supported Dade + 正定値 pin) の **S15-world port**。
+
+### 次 iteration = γ-trick port (`muColumn_tau1_inner_etaColumn`)
+
+S13_Orthogonality:290 の証明を精読し S15 world (tau1S_ofHonest coherence, hyp.mu/eta grid,
+honestTypeP2A0Set support) に移す。必要な S15 素材: `mu_diff_support` (μ列差の A₀-support, field)、
+`extends_on_supported` (Dade=Ind on A₀-supported)、`tau1S_induce_inner_eta` (η⊥coherence image、
+但し H=PC induction 側 — mu列は S'induction ゆえ別、要 case 確認)、`eta_eq_tau_omega`。
+Coq は `FTtypeP_coherence` (PFsection13:347)。has-irr 場合と uniform 場合の 2 分岐に注意。
+**subagent 委譲時の正しい指示** = 「S13_Orthogonality の γ-trick pin を S15 tau1S_ofHonest に port」
+(NOT "port (13.6)-(13.9)" — 更新 #4 の誤診断)。
