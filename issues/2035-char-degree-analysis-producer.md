@@ -1594,3 +1594,21 @@ leaf build green 4115 jobs / #print axioms = [propext,Classical.choice,Quot.soun
 **⟹ `lambdaCluster_or_caseB` dichotomy の S-side が honest に。9094 の残 genuine gate は 2 本に減:**
 `tSide_theta_package_of_not_caseB_core` (ν-gated (13.4) T-package) と `T_caseB_facts_no_lambda`
 (no-λ T-mirror、S16 q<p gated)。deltaPrime_eq_one_T は ν-gated (a carrier)。
+
+## 2026-07-14 更新 #36 (lane b, /loop) — frontier assessment: S-side 完了、残は全て cross-lane gated → hub direction 依頼 (9096)
+
+hbridge closed (#35) 後、残 9094 gate を精査、b-solo S15 では全て close 不能と確定:
+- **tSide_theta_package_of_not_caseB_core / deltaPrime_eq_one_T**: a-owned ν-carrier (nuGridSupply)。
+- **T_caseB_facts_no_lambda**: S16-gated (T-side D/v machinery が S16_NonExistenceG/**、q<p が S16 field)。
+  S15 から到達不可。de-opacify (S_caseB_facts_no_lambda proven 経由 + galois_S_forces_T_caseB gate) は
+  forward-reference (S_caseB は後方定義) で不適 — reorder churn 過大ゆえ見送り。
+- **NormEstimates 移行**: honest producer 下流 (#29)。relayer の S15→S16 inversion
+  (CoherenceEtaOrthogonality → S16_GridExpansion) は genuine (2 lemma) かつ S16_GridExpansion=c-owned。
+
+⟹ **b の S-side char-degree genuine math は完了、残は cross-lane 調整 or a-ν 待ち**。CLAUDE.md 準拠で
+**hub に direction 依頼 (issue 9096)**。b は待機中も re-assess を continue: a-lane が ν-carrier を
+landing したら un-gate 波及 (tSide_theta_package/deltaPrime_T) を検出して T-side を再開。
+
+**session 総括 (2026-07-14 大量 landing)**: TTypeII 移行 + dichotomy keystone + translation API +
+S-side (13.3.b) forward gate 完全証明 (caseA + caseB pair-Clifford、3 subagent + 自己検証)。
+9094 の S-side deliverable 達成。
