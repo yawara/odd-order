@@ -784,3 +784,41 @@ mu/eta_orthonormal + delta_eq_one_S。⚠ γ-trick が要する「irreducible ξ
 不足の設計課題**が露見する可能性 (lambda (13.3.b) の typeP_Galois subtlety と同根)。
 
 **subagent に深掘り委譲中** (background): abstract route の特定 + 証明試行 or 精密 blocker 報告。
+
+## 2026-07-13 更新 #8 (lane b, /loop) — ★★重大発見: (13.3.c) pin は carrier 再設計が必須 (unpinned choice)
+
+subagent 調査 + **自己検証済**の重大な設計発見 (CLAUDE.md doneness 検証 [[scaffold-sorry-free-not-done]]
+= carrier 構成可能性で判定、が scaffold を捕捉):
+
+### 発見: `muColumn_tau1_inner_etaColumn` は現 carrier で証明不可 (flip witness で偽)
+
+- `tau1S_ofHonest := (coherent_H0Cprime_S).extension`、`coherent_H0Cprime_S := (sSet_coherent_indS_A).some`。
+- **`sSet_coherent_indS_A` (S15_CaseACoherence:689) は pin 無しの bare `Nonempty (S07.IsCoherent Ind_S^G 𝒮 A(S))` を返す** (694-696、検証済)。
+- `S07.IsCoherent` は data-carrying structure (`extension : IntegralCharacterMap`、NormInequalities:480)
+  ゆえ `.some = Classical.choice` は**任意の inhabitant** を選ぶ。
+- `IsCoherent Ind_S^G 𝒮 A(S)` は**複数 inhabitant を持つ**: all-reducible 場合 (clifford_dichotomy caseB、
+  type-P₂ S で到達可)、符号反転 `F(μ_j) := −∑ᵢη_{i,finNeg j}` も valid (isometric・A(S)-supported 差
+  `μ_j−μ_{finNeg j}` 上で Ind に一致・ZIrr)。この F では `⟨F(μ_j),Ω_j⟩ = 0 ≠ q`。
+- ⟹ **μ-column pin は coherence inhabitant 不変でない**。`.some` では決まらず、**証明不可能**。
+  Coq は `typeP_TIred_coherent tau1` (PFsection13:338) として **coherence に pin を bundle** している。
+
+⟹ **更新 #6 の「formula build-green で landed」は honest-done でない**: `tau1S_ofHonest_muColumn_eq_etaColumn`
+は上記の証明不可能 sorry (`muColumn_tau1_inner_etaColumn`) に載っている scaffold。pin/isometry/norm 素材
+(muColumn/etaColumn_inner_self, inner_pin_eq) は valid で再利用されるが、**単独 sorry では pin は閉じない**。
+
+### 真の frontier = carrier 再設計 (coherence に pin を bundle) — 全 engine 実在確認済
+
+`sSet_coherent_indS_A` を **pin 込み** (例 `Nonempty (Σ c : IsCoherent …, ∀ j≠0, c.extension(∑ᵢμᵢⱼ)=∑ᵢηᵢⱼ)`)
+に強化 → `coherent_H0Cprime_S := .some.1` に projection、`tau1S_ofHonest` は型不変、pin は `.some.2`。
+`clifford_dichotomy` で分岐 (S15_CaseACoherence:697 の既存分岐と同型):
+- **caseA (has-irr)**: 任意 coherence + γ-forcing。engine: `sSet_coherent_extension_eq_sum_memberRFamily`
+  (SSetMemberRFamily:765、任意 coherence 拡張 = signed R-family 和) + `sSet_memberRFamily_imageSet_of_red`
+  (:476、reducible μ_j の R-family = {η_ij}∪{−η_{i,finNeg j}}) + `sSet_irr_memberRFamily_eta_inner`
+  (:519、irr member ⊥ η) + `caseA_exists_irreducible_qa` + `tauS_mu_cross` (BridgeCharacter:917, sorry-free)。
+- **caseB (all-reducible)**: 符号を + に固定した pinned coherence。engine: `sSet_coherent_dade_caseB`
+  (CaseBReducibleCoherence:46) / `uniform_degree_coherence_of_families` (S07_PivotCoherence)。
+
+⚠ signature: `coherent_H0Cprime_S`/`tau1S_ofHonest` の**型は不変**に保つ (下流 engine
+tau1S_ofHonest_inner_induce 等は forced property のみ使うので影響なし)。内部 def のみ pin projection に変更。
+これで `muColumn_tau1_inner_etaColumn` は pin `.some.2` から直接 discharge (MuColumnPin の inner_pin_eq scaffold は
+optional 化)。⚠ subagent の engine 名は一部 M-side 混同あり、上記は自己 grep で S15 実名を確定済。
