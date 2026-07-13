@@ -940,13 +940,15 @@ theorem typeII_centralizer_le_of_mem_mainSubgroup [Finite G]
 
 This is the second paragraph of (12.10) up to its final (8.6.a) step: by Theorem (10.10)
 (`S12.no_typeV_maximal_unconditional`, available — excludes Type V) and (11.9.c)
-(`S13.final_typeIII_conclusions`, sorried) `L` is Type III with case (b) of (9.7); by (11.6)
+(the §13 type determination, `S13_NonGaloisExclusion`) `L` is Type III with case (b) of
+(9.7); by (11.6)
 (`C_U(H) = 1`) and (9.7.b) the complement `U` of `H = L_F` in `[L,L]` is **cyclic**.  Since
 `L_F` is a normal Hall subgroup of `L_s = [L,L]` with cyclic complement, a noncyclic `p`-group
 `P₀ ≤ L_s` cannot embed in the complement side (`p ∣ |U|` would make `P₀ ↪ L_s/L_F ≅ U` cyclic),
 so `p ∣ |L_F|` and `P₀` lies in the Sylow `p`-subgroup of the normal Hall `L_F`, i.e. `P₀ ⊆ L_F`.
-**Genuinely still-missing**: the (9.7.b)/(11.6) cyclicity of `U` (`S13.final_typeIII_conclusions`
-is sorried) and the Hall-embedding bookkeeping are not assembled in reach of S14. -/
+**Genuinely still-missing**: assembling the (9.7.b)/(11.6) cyclicity of `U`
+(`S13.U_isCyclic_of_hypothesis`, proven in `S13_NonGaloisExclusion`) and the Hall-embedding
+bookkeeping in reach of S14. -/
 theorem typeIIIorIV_noncyclic_le_fitting [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L P0 : Subgroup G} (hL : L ∈ maximalSubgroups G)
     (hIIIIV : IsTypeIII L ∨ IsTypeIV L) (hP0nc : ¬ IsCyclic ↥P0)

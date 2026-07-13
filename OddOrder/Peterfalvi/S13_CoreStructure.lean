@@ -1371,52 +1371,6 @@ theorem card_H_eq_of_base [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     show s13.q = base12.w1 from by rw [Hypothesis.q, hbase]] at h
   exact h
 
-/-! ## (11.8): the main orthogonality calculation -/
-
-/-- Carrier for the five substeps of Peterfalvi (11.8). -/
-structure OrthogonalityData {M : Subgroup G} (hyp : Hypothesis M) where
-  zeta : ClassFunction ↥M ℂ
-  zeta_mem_SHC : zeta ∈ hyp.SOf hyp.HC
-  S1 : Set (ClassFunction ↥M ℂ)
-  S2 : Set (ClassFunction ↥M ℂ)
-  tau1 : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G
-  tau2 : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G
-  beta : ClassFunction G ℂ
-  coefficientA : ℤ
-  frobenius_setup : Prop
-  omega_support_reduction : Prop
-  average_formula : Prop
-  coefficient_formula : Prop
-  coefficient_zero : coefficientA = 0
-  conclusion_formula : Prop
-
-/-- **Peterfalvi (11.8.1)--(11.8.4)**: the setup for the coefficient calculation
-in the proof of (11.8). -/
-theorem orthogonality_setup [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hyp : Hypothesis M) :
-    ∃ data : OrthogonalityData hyp,
-      data.frobenius_setup ∧ data.omega_support_reduction ∧
-        data.average_formula ∧ data.coefficient_formula := by
-  sorry
-
-/-- **Peterfalvi (11.8.5)**: the coefficient `a` in the orthogonality
-calculation is zero. -/
-theorem orthogonality_coefficient_zero [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    {hyp : Hypothesis M} (data : OrthogonalityData hyp) :
-    data.coefficientA = 0 :=
-  -- (11.8.5) is carried as the `coefficient_zero` field of `OrthogonalityData`; the
-  -- real `a = 0` content lives in `orthogonality_setup` (11.8.1)-(11.8.4), which
-  -- constructs the data.  This is the intended public-name wiring for that field.
-  data.coefficient_zero
-
-/-- **Peterfalvi (11.8)**: for `zeta in S(HC)`, the residual character is not
-orthogonal to `(Irr W)^sigma`. -/
-theorem not_orthogonal_mu0_sub_zeta [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    {hyp : Hypothesis M} (data : OrthogonalityData hyp) :
-    hyp.notOrthogonalFormula data.zeta := by
-  sorry
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.5)/(9.9.b): the nontrivial column sums `μ_k` are `𝒮(H₀C)`-members** — the
@@ -1662,16 +1616,5 @@ noncomputable def caseB_coherent_sOf_H0C [Finite G]
     exact OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters
       (hyp.base.card_odd_of_isMinimalSimpleOdd hG) _ (hIKF hμmem) (sub_eq_zero.mp h)
 
-/-! ## (11.9): final Type III conclusion -/
-
-/-- **Peterfalvi (11.9)**: the final three conclusions of §13: the symmetric
-orthogonality statement, `q > p`, and the fact that case (b) of (9.7) holds,
-so `M` is of type III. -/
-theorem final_typeIII_conclusions [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    {hyp : Hypothesis M} (data : OrthogonalityData hyp) :
-    hyp.finalOrthogonalityFormula data.zeta ∧ hyp.q > hyp.p ∧
-      hyp.caseB_of_97 ∧ IsTypeIII M := by
-  sorry
 
 end OddOrder.Peterfalvi.S13
