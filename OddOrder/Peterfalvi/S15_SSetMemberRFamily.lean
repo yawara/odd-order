@@ -189,6 +189,120 @@ theorem Hypothesis.tauS_muColumn_diff_eq [Finite G]
   rw [hτeq, hsub, map_sum]
   refine Finset.sum_congr rfl fun i _ => tauS_mu_cross hG hnoV hyp i hj0 hk0 hjk
 
+/-! ### `μ`-column arithmetic and the general-column Dade cross-relation (issue 2035, (13.3.c))
+
+The `μ`-column degree, the case-agnostic `A(S)`-support of column differences, and the
+arbitrary-column generalization of `tauS_muColumn_diff_eq` — the column-independence infrastructure
+for the (13.3.c) pin (`MuColumnPin`) and the all-reducible pinned-coherence glue (`S15_CaseACoherence`). -/
+
+open scoped FiniteInduce in
+/-- **μ-column degree** (Peterfalvi (13.3.a), case-agnostic): `(∑ᵢ μ_{ij})(1) = q·u` for `j ≠ 0`.
+Each per-entry `μ_{ij}(1) = u` (`mu_apply_one_eq_u`), independent of the Clifford case — the
+mixed-degree members of `𝒮` are the *irreducible* `q·a`-degree ones, never the reducible
+`μ`-columns. -/
+theorem Hypothesis.muColumn_apply_one [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (j : Fin hyp.p) (hj : j ≠ ⟨0, hyp.p_prime.pos⟩) :
+    ((∑ i : Fin hyp.q, hyp.mu i j : ClassFunction ↥hyp.S ℂ) : ↥hyp.S → ℂ) 1
+      = (hyp.q : ℂ) * (hyp.u : ℂ) := by
+  rw [ClassFunction.finset_sum_apply,
+    Finset.sum_congr rfl (fun i _ => hyp.mu_apply_one_eq_u hG i j hj),
+    Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+
+open scoped FiniteInduce in
+/-- **μ-column self/cross inner product**: `⟨∑ᵢ μ_{ij}, ∑ᵢ μ_{ik}⟩ = q·[j = k]`, from the full-grid
+orthonormality `mu_orthonormal`. -/
+theorem Hypothesis.muColumn_inner [Finite G] (hyp : Hypothesis (G := G)) (j k : Fin hyp.p) :
+    ClassFunction.inner (∑ i : Fin hyp.q, hyp.mu i j) (∑ i : Fin hyp.q, hyp.mu i k)
+      = if j = k then (hyp.q : ℂ) else 0 := by
+  by_cases hjk : j = k
+  · subst hjk; rw [if_pos rfl]; exact hyp.muColumn_inner_self j
+  · rw [if_neg hjk, OddOrder.RepresentationTheory.inner_sum_left]
+    refine Finset.sum_eq_zero fun i _ => ?_
+    rw [OddOrder.RepresentationTheory.inner_sum_right]
+    exact Finset.sum_eq_zero fun i' _ => by
+      rw [hyp.mu_orthonormal i i' j k, if_neg (fun h => hjk h.2)]
+
+open scoped FiniteInduce in
+/-- **η-column self/cross inner product**: `⟨∑ᵢ η_{ij}, ∑ᵢ η_{ik}⟩ = q·[j = k]`, from the grid
+orthonormality `eta_orthonormal`. -/
+theorem Hypothesis.etaColumn_inner [Finite G] (hyp : Hypothesis (G := G)) (j k : Fin hyp.p) :
+    ClassFunction.inner (∑ i : Fin hyp.q, hyp.eta i j) (∑ i : Fin hyp.q, hyp.eta i k)
+      = if j = k then (hyp.q : ℂ) else 0 := by
+  by_cases hjk : j = k
+  · subst hjk; rw [if_pos rfl]; exact hyp.etaColumn_inner_self j
+  · rw [if_neg hjk, OddOrder.RepresentationTheory.inner_sum_left]
+    refine Finset.sum_eq_zero fun i _ => ?_
+    rw [OddOrder.RepresentationTheory.inner_sum_right]
+    exact Finset.sum_eq_zero fun i' _ => by
+      rw [OddOrder.Peterfalvi.S16.eta_orthonormal hyp i i' j k, if_neg (fun h => hjk h.2)]
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **μ-column differences are `A(S)`-supported** (case-agnostic).  Both columns have degree `q·u`
+(`muColumn_apply_one`), so `μ_j − μ_k` vanishes at `1`; each column lies in `𝒮`
+(`mu_colSum_mem_sOf_H0` + `sOf_subset_sSet`) whose members are supported on `A(S) ∪ {1}`
+(`sSet_member_support_subset`), so the difference avoids `{1}` and lands in `A(S)`.  The
+arbitrary-column, Clifford-case-agnostic analogue of `sSet_caseB_member_diff_supported`. -/
+theorem Hypothesis.muColumn_diff_supported [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))
+    {j k : Fin hyp.p} (hj : j ≠ ⟨0, hyp.p_prime.pos⟩) (hk : k ≠ ⟨0, hyp.p_prime.pos⟩) :
+    ((∑ i : Fin hyp.q, hyp.mu i j) - (∑ i : Fin hyp.q, hyp.mu i k)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S := by
+  intro z hz
+  have hz0 : ((∑ i : Fin hyp.q, hyp.mu i j) - (∑ i : Fin hyp.q, hyp.mu i k)) z ≠ 0 := hz
+  have hxmem : (∑ i : Fin hyp.q, hyp.mu i j) ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) :=
+    sOf_subset_sSet _ chief.H0 (hyp.mu_colSum_mem_sOf_H0 hG chief j hj)
+  have hymem : (∑ i : Fin hyp.q, hyp.mu i k) ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) :=
+    sOf_subset_sSet _ chief.H0 (hyp.mu_colSum_mem_sOf_H0 hG chief k hk)
+  have hdeg : ((∑ i : Fin hyp.q, hyp.mu i j : ClassFunction ↥hyp.S ℂ) : ↥hyp.S → ℂ) 1
+      = ((∑ i : Fin hyp.q, hyp.mu i k : ClassFunction ↥hyp.S ℂ) : ↥hyp.S → ℂ) 1 := by
+    rw [hyp.muColumn_apply_one hG j hj, hyp.muColumn_apply_one hG k hk]
+  rcases ClassFunction.support_sub_subset _ _ hz with h | h
+  · rcases hyp.sSet_member_support_subset hG hxmem h with h' | h'
+    · exact h'
+    · exfalso; rw [Set.mem_singleton_iff] at h'; subst h'
+      exact hz0 (by rw [ClassFunction.sub_apply, hdeg, sub_self])
+  · rcases hyp.sSet_member_support_subset hG hymem h with h' | h'
+    · exact h'
+    · exfalso; rw [Set.mem_singleton_iff] at h'; subst h'
+      exact hz0 (by rw [ClassFunction.sub_apply, hdeg, sub_self])
+
+open scoped FiniteInduce in
+/-- **General-column `dadeHypS` cross-relation**: for distinct nonzero columns `j ≠ k`,
+`τ_S(∑ᵢ μ_{ij} − ∑ᵢ μ_{ik}) = ∑ᵢ(η_{ij} − η_{ik})`.  The arbitrary-column generalization of
+`tauS_muColumn_diff_eq` (which fixes `k` = conjugate of `j`): the honest `A(S)`-Dade agrees with the
+`A₀`-Dade on the `A(S)`-supported column difference (`sInstance_dade_eq_induce` /
+`sInstance_dade0_eq_induce`), and the per-row prime-`TI` `tauS_mu_cross` evaluates each summand. -/
+theorem Hypothesis.dadeHypS_muColumn_diff [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))
+    {j k : Fin hyp.p} (hj : j ≠ ⟨0, hyp.p_prime.pos⟩) (hk : k ≠ ⟨0, hyp.p_prime.pos⟩)
+    (hjk : j ≠ k) :
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG))
+        ((∑ i : Fin hyp.q, hyp.mu i j) - (∑ i : Fin hyp.q, hyp.mu i k))
+      = ∑ i : Fin hyp.q, (hyp.eta i j - hyp.eta i k) := by
+  classical
+  haveI := hyp.finiteG
+  letI : Fintype ↥hyp.S := Fintype.ofFinite _
+  have hAsupp := hyp.muColumn_diff_supported hG chief hj hk
+  have hA0supp := hAsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
+    (honestTypeP2ASet_subset_A0Set hyp.Sdata))
+  have hτeq : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG))
+        ((∑ i : Fin hyp.q, hyp.mu i j) - (∑ i : Fin hyp.q, hyp.mu i k))
+      = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
+          ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG))
+          ((∑ i : Fin hyp.q, hyp.mu i j) - (∑ i : Fin hyp.q, hyp.mu i k)) := by
+    rw [hyp.sInstance_dade_eq_induce hG hnoV hAsupp, hyp.sInstance_dade0_eq_induce hG hnoV hA0supp]
+  rw [hτeq, show ((∑ i : Fin hyp.q, hyp.mu i j) - (∑ i : Fin hyp.q, hyp.mu i k))
+      = ∑ i : Fin hyp.q, (hyp.mu i j - hyp.mu i k) from by rw [Finset.sum_sub_distrib], map_sum]
+  refine Finset.sum_congr rfl fun i _ => tauS_mu_cross hG hnoV hyp i hj hk hjk
+
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 /-- **The reducible `𝒮`-member `R`-family at EXPLICIT columns `j, k`** (route B core; the
