@@ -2641,3 +2641,20 @@ architecture task」の裁定どおり)。⟹ **c_eq_one → caseA_parameters �
 
 **実施順 (二重 churn 回避)**: gap-patch fix (次 brick、genuine math) → **単一 mega-sweep** (~72 binder + 181 call site を python 一括、per-file build 検証) → summit summon 除去。
 FeitThompson.lean ×4 (.1 追従、a-owned、statement 不変) self-flag: `2c96b8d8`。
+
+## 2026-07-14 更新 #84 (lane b, /loop iter 10) — gap-patch 一般 P 化 — genuine root 全 4 件 CLOSED
+
+- **`0975e47f`**: (9.11.4)-T gap-patch `mem_honestTypeP2ASet_of_mem_H_sup_cuSubOf_T` を
+  一般 type P へ:
+  - hHMs を `H = Q ≤ M_σ(T)` (≤ 版、全 maximal 有効) に弱化、II-only の等式と hσH
+    (III/IV で偽: T_F ⊊ Mσ) を削除。
+  - **σ'-枝を再構成**: type III/IV では V の σ-部が非自明で U₁ 自体は σ-free でない
+    (それらの元は piPart-σ 枝が捕捉)。U₁ 内の Hall-σ' P₁ (⊥-seed hall_D) を index 分割
+    `[K:P₁] = [U₁:P₁]·|H|` (relIndex_mul_index、両因子 σ-側) で K-Hall 化し、hall_C で
+    ⟨y⟩ → P₁ ≤ U₁ — 同じ centralizer-witness で着地。
+  - **hT2 binder を除去** (gap-patch / AlphaSupportT / FourNormInputsT の 3 定理) —
+    弱化でなく削除。SevenEightT/CaseACoherenceT の call site は引数 drop。
+- **hT2 の genuine root 全 4 件 (A-Dade / A0-Dade / normedTI / gap-patch) が一般 P で稼働**。
+  残 = 機械的 mega-sweep (~60 binders / ~181 call sites → IsTypeP; (14.9)-conclusional 群
+  [swap / dichotomy consumers / CDS summit] は keep-IsTypeP2)。sweep 完了で CDS summit の
+  `T_isTypeP2_gate` summon が供給 chain から消え、0116 Finding-2 の knot 解消。
