@@ -2040,3 +2040,16 @@ dispatch + orthogonal + engine。
 
 R-family 残: `ofRows` 本体 (S-side `sSet_reducible_memberRFamily_ofColumns` の
 OrthonormalCharacterImageFamily 構築 mirror、~100 行) → dispatch → `_orthogonal` → (5.7) engine。
+
+## 2026-07-14 更新 #57 (lane b, /loop iter 18) — ✅ T-side per-member R-family 完成
+
+新 leaf **`S15_TSetMemberRFamily.lean`** (sorry-free、一発 build):
+- `sSet_reducible_memberRFamily_ofRows`: 2p-element signed η-grid family (rows r≠s)、
+  image_eq = `tauT_nuRow_diff_eq`、orthonormal = eta_orthonormal 行違い。
+- `sSet_reducible_memberRFamily_T`: reverse-dichotomy dispatch wrapper。
+- **`sSet_memberRFamily_T`**: case-agnostic 全 member dispatch (irr = 2-element Dade family
+  over dadeHypT / red = route-B)。
+
+(5.7)-T engine の入力残 1: **`sSet_memberRFamily_orthogonal` の T 版** ((5.2.e)
+cross-orthogonality、S-side SSetMemberRFamily:794)。それで engine assembly
+(`sSet_coherent_dade_caseB_T`) が組める。
