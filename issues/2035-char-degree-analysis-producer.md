@@ -1813,3 +1813,162 @@ S_U_commutative)」から出す。T-side の対応 cSub-T = D で **D abelian �
 b の `2ca52edf` (新 leaf NilpotentCyclicAbelianization) は同内容の複製ゆえ差し戻し (合流せず) —
 詳細 = issue 9086 HUB RULING。`V_commutative_of_caseB` の route (#43) 自体は genuine と評価済み、
 supply 元を既存 leaf に差し替えて続行されたい。
+
+## 2026-07-14 更新 #43 (lane b, /loop iter 6 続) — shared lemma landed + V_commutative_of_caseB 組み立て経路確定
+
+**landed**: `OddOrder/GroupTheory/NilpotentCyclicAbelianization.lean` (新 shared leaf、sorry-free、
+mathlib のみ依存): `commutator_eq_bot_of_isCyclic_quotient` + `isMulCommutative_of_isNilpotent_of_isCyclic_quotient`
+(H nilpotent + H/H' cyclic → abelian; H⧸⁅H',⊤⁆ の central-kernel × cyclic quotient → mathlib
+`MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center` → lcs stabilization)。
+
+**`isMulCommutative_V_of_caseB` の組み立て経路 (次 iteration)**:
+- 置き場所: S15_CharacterDegreeSupply (θ-witness 機構の隣; II 分岐が S15_SAndTBasic の
+  isMulCommutative_V を使うため Setup 配下は不可)。
+- T_nonI 分岐: **II** = isMulCommutative_V (既存、IsTypeII 直) / **V** = no_typeV 排除 /
+  **III/IV** = 以下:
+  1. `Ubar_cyclic` (CliffordCaseBData field): IsCyclic (uActionHom setupT chief).range。
+     **setupT.typeP.U = V (reconciled choose_spec.1) なので domain は V-sub、ker.map = cSub = D
+     (cSub_eq_D 済)** → V/D ≅ range cyclic (quotientKerEquivRange、
+     mkSection11CharacterDataT_v_eq の key と同じ構図)。
+  2. **D ≤ V'** ((11.6) deep 側): S13 chain (exists_hypothesis_of_typeIIIorIVorV →
+     exists_hypothesis_of_isTypeIIIorIV → core_structure 第 4 成分 C = U') は witness
+     w.U ≠ V なので **conjugation transport**: V = g • w.U (Schur–Zassenhaus
+     exists_conj_of_coprime、isMulCommutative_V の証明パターン)、Q normal →
+     D = V ⊓ C(Q) = g • (w.U ⊓ C(Q)) = g • s13.C = g • w.U' = (g • w.U)' = V'。
+  3. D ≤ V' + V/D cyclic → V/V' cyclic (cyclic の quotient) + V nilpotent (isNilpotent_V)
+     → 新 shared lemma → IsMulCommutative ↥V。
+- 帰結: `Cprime-T = derivedInG D = ⊥` (D ≤ V' … V abelian → V' = ⊥ → D = ⊥!実は V abelian
+  なら D ≤ V' = ⊥ で **D = ⊥ まで出る**) → sSet_eq_sOf_H0Cprime-T → step 2 uniform degree。
+
+## 2026-07-14 更新 #44 (lane b, /loop iter 7) — ✅ isMulCommutative_V_unconditional: (13.2.a)-T V-side が完全 ungated
+
+#43 の複雑な route (conjugation transport + (11.6)-T + cyclic-abelianization) は**不要だった**:
+repo 精査で **S13_NonGaloisExclusion が (11.9.c) を sorry-free で完備**していると判明 —
+`not_isTypeIV_of_mem_maximalSubgroups` (universal type-IV 排除) + `isTypeIII_of_hypothesis` +
+`isMulCommutative_typePData_U_of_typePData_U` (witness 間 Schur–Zassenhaus conjugacy transfer)。
+
+**`Hypothesis.isMulCommutative_V_unconditional`** (TSideDegrees、sorry-free、
+#print axioms clean): T_nonI 4 分岐 — II/III は witness `U_commutative` + conjugacy transfer で
+reconciled `tpd.U = V` へ、IV は (11.9.c) universal 排除、V は (10.10)。
+
+**波及**:
+1. **caseB-T の D-abelian 解決**: D ≤ V abelian → D abelian → `Cprime-T = derivedInG D = ⊥`
+   (#42/#43 の障害消滅)。V abelian は caseB 前提すら不要。
+2. **9096 hV 供給の unconditional 化**: `Hypothesis.swap` の `hV` は
+   isMulCommutative_V_unconditional で直接供給可能 (hT2 → dictionary 経由は不要に;
+   既存 consumer は変更不要だが a の producer threading はこちらを使える)。→ 9096 に通知。
+3. hub audit (9096) の「V_commutative = post-(14.9) fact」は audit 当時は正しかったが、
+   (11.9.c) chain (S13_NonGaloisExclusion、issue 1024) の landing により**現在は ungated**。
+   NuGridSupplyData から外した判断自体は正しいまま (grid fact でないことに変わりなし)。
+
+新 shared leaf `NilpotentCyclicAbelianization` (#43 で landing 済) は独立の価値で保持
+(mathlib 級の一般補題)。次: sSet_eq_sOf_H0Cprime-T (Cprime = ⊥ 経由) → step 2 uniform degree。
+
+## 2026-07-14 更新 #45 (lane b, /loop iter 7 続) — caseB-T step 2 (uniform degree) landed
+
+**`sSet_caseB_apply_one_eq_vp`** (TSideDegrees、sorry-free): Clifford caseB で 𝒯 全 member の
+degree = setupT.q · chars.u (= p·v)。`sSet_eq_sOf_H0Cprime` 相当を inline — H₀ = ⊥ (kernel
+collapse #39) + **Cprime-T = ⊥** (cSub ≤ V + `isMulCommutative_V_unconditional` #44 →
+derivedInG cSub = ⊥) → 𝒮(H₀C') = 𝒯 → generic `caseB_degree_qu`。
+
+caseB-T coherence の残り: member diff support (S-side `sSet_caseB_member_diff_supported` mirror —
+uniform degree + (4.7)-T support fact `sSet_member_support_subset` の T 版が要る)、per-member
+R-family (S-side `S15_SSetMemberRFamily` route-B の T-mirror — S-side 自身に reducible-branch
+residual あり)、(5.7) engine assembly (`sSet_coherent_dade_caseB` mirror)、caseA-T、pin、τ₁T。
+
+## 2026-07-14 更新 #46 (lane b, /loop iter 8) — HUB tick 38 裁定受領: 重複 leaf 削除
+
+hub 裁定 (tick 38 / issue 9086) を受領: 私の `NilpotentCyclicAbelianization.lean` (2ca52edf) は
+lane a の 9086 claim (`NilpotentAbelianization.lean`、2026-07-12、S13_NonGaloisExclusion が live
+consume) の**複製** — claim-before-build の 9000 scan を怠ったのが原因 (反省点として記録)。
+b branch から削除する (consumer 0 — #44 の isMulCommutative_V_unconditional は conjugacy
+transfer 経由で本 leaf を使っていない)。#43 の supply 計画は #44 の unconditional 化で
+そもそも不要になっており、差し替え作業も発生しない。
+
+なお #44 で「発見」と書いた S13_NonGaloisExclusion の (11.9.c) chain は a の issue 1024 P3 +
+9086 の成果物 (2026-07-12 landing)。正しく attribute する。
+
+## 2026-07-14 更新 #47 (lane b, /loop iter 8 続) — member-support-T の経路確定
+
+caseB-T member-diff support の残り部材 `sSet_member_support_subset_A` T-mirror の経路精査:
+- S-side は `hPeq : P = Msigma S` (type-II 等号、S_typeP2 carrier 経由) を使うが、**使用箇所は
+  membership 方向のみ** — T-side は等号不要で `Q ≤ Msigma T` で足りる。
+- **`OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hM`** (proven、TypeP1Criteria で
+  live 使用) がそれを与える — type III でも成立 (M_F ≠ M_σ でも ≤ は一般)。
+- 他の部品 (`support_induce_subset_conjugatesIntoSet` / (1.2) core
+  `irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot` /
+  `honestTypeP2ASet_conj_mem` / `mem_honestTypeP2ASet`) は M-generic ✓。
+- 実装: SubcoherenceInputs:1231-1330 の逐語 mirror (hPeq → hQle、S→T、P→Q、~180 行) +
+  `sSet_member_support_subset`-T + `sSet_caseB_member_diff_supported`-T (~60 行)。
+  A(T) = honestTypeP2ASet hyp.T (M-generic def) で S-side と同形。
+
+次 iteration: この 3 本 mirror → (5.7) engine assembly (`sSet_coherent_dade_caseB`-T)。
+
+## 2026-07-14 更新 #48 (lane b, /loop iter 9) — (4.7)-T support 3 本 landed
+
+TSideDegrees (sorry-free、一発 build):
+- **`sSet_member_support_subset_A_T`**: 𝒯-member source の support ⊆ A(T) ∪ {1}。#47 の経路
+  通り — type-II 等号の代わりに `maxNilpotentNormalHall_le_Msigma` (≤ で十分、type III OK)。
+- **`sSet_member_support_subset_T`** (full-family form)
+- **`sSet_caseB_member_diff_supported_T`**: uniform degree #45 + support → member 差は
+  A(T)-supported ((5.7) engine の hsuppdiff 入力)。
+
+caseB-T 残り: per-member R-family (S-side `S15_SSetMemberRFamily` — irr branch =
+dadeOrthonormalCharacterImageFamilyOfDiff 系、red branch = route-B tauS_mu_cross、S-side 自身に
+residual あり) + `sSet_coherent_dade_caseB`-T ((5.7) engine) + congrMap Ind 再接地。
+R-family は dadeHypT0 (hT2/Tdata パラメトリック) 依存の可能性 — S-side の dadeHypS 依存構造の
+確認から。
+
+## 2026-07-14 更新 #49 (lane b, /loop iter 10) — (5.7)-T assembly の残入力精査: Dade 基盤の設計分岐
+
+`sSet_coherent_dade_caseB` (S-side、全文精査) の (5.7) engine 入力 11 個の T-side 状況:
+- ✓ 済/generic: finiteness、pivot (nu_rowSum_mem_sOf_H0_T + sOf_subset_sSet)、pivot norm = p
+  (pins.nu_orthonormal、S-side hN と同計算)、pairwiseOrthogonal/closedUnderConjugate/
+  hasNoRealCharacters (generic; oddCardS → oddCardT mirror 要 ~5 行)、diff_supported (#48)、
+  uniform degree (#45)。
+- **残 1: `dadeHypT` (A(T)-Dade datum)** — S-side `dadeHypS` =
+  `(dadeSupportHypothesisData_honestTypeP2ASet hG S_maximal S_typeP2).some.dade`
+  (generic 構成 + **IsTypeP2 carrier**)。T 版の設計分岐:
+  (a) hT2-パラメトリック (dadeHypT0/tauTbetaGrid の既存パターン) — ただし (13.4) は (14.9) 前に
+      使われるため hT2 供給が S16.T_isTypeP2 (sorried、hub 指摘の循環リスク) になる懸念。
+      **要確認**: tSide_theta_package の消費文脈に hT2 があるか。
+  (b) `dadeSupportHypothesisData_honestTypeP2ASet` の実装を精査し、IsTypeP2 引数が実は
+      IsTypeP (or type II∨III) で足りるなら **unconditional 化** (isTypeP_of_isTypeNonI +
+      isTypeIII_of_hypothesis の世界)。(13.2.e) 原文は (8.13)+(12.7) の type-P 一般論。
+- **残 2: per-member R-family** (`sSet_memberRFamily` T-mirror) — irr branch =
+  `dadeCharacterDifferenceImageOfDiff` (dadeHypT 依存、上と同根)、red branch = route-B
+  (`tauS_mu_cross` の T-mirror = tauT_nu_cross、S16_GridExpansion の eta_diff_rigidity T-instance;
+  S-side 自身の residual と同形になる見込み)。
+
+次 iteration: (b) の実装精査 (`dadeSupportHypothesisData_honestTypeP2ASet` の IsTypeP2 使用箇所)
+→ 分岐決定 → dadeHypT + oddCardT + R-family irr branch。
+
+## 2026-07-14 更新 #50 (lane b, /loop iter 11) — dadeHypT (設計決定 = hT2-パラメトリック) + oddCardT landed
+
+**設計決定 (分岐 (a))**: `dadeSupportHypothesisData_honestTypeP2ASet` の hP2 使用を精査 —
+本質使用は `typeP2_exists_matched_kappa_hall_pair` (matched κ/(κ∪σ)'-Hall pair、U₀ abelian 込み)
+のみで、消費側 3 lemma ((8.13.a/b/c2)) は pair データだけ取る。type III 版 pair は E-setup chain
+(BG §16 Thm A–E 級) の P₁ 対応 port が要り別戦線。**repo 確立済みの hT2-パラメトリック設計**
+(dadeHypT0 / tauTbetaGrid / typeI_caseC_dual_dichotomy と同層) を採用。unconditional 化
+(type-III pair port) は将来の独立 obligation。
+
+**landed** (TSideDegrees、sorry-free): `oddCardT` (realness 入力) / `dadeHypT` (A(T)-Dade datum、
+hT2 param) / `dadeHypT_hconj`。
+
+残: per-member R-family (irr branch = `dadeCharacterDifferenceImageOfDiff` over dadeHypT +
+`sSet_member_diffsupp`-T; red branch = route-B tauT_nu_cross) → `sSet_coherent_dade_caseB`-T
+assembly (hT2-パラメトリック)。
+
+## 2026-07-14 更新 #51 (lane b, /loop iter 12) — R-family irr-branch 入力 2 本 landed
+
+TSideDegrees (sorry-free、一発 build): **`sSet_member_diffsupp_T`** ((5.3.a)-T per-member 差
+support — support ⊆ A(T)∪{1} #48 + degree 実正値で 1 除去) + **`sSet_member_conjDiff_supported_T`**
+(case-agnostic conjugate-diff support)。
+
+⟹ irr branch の R-datum は `dadeOrthonormalCharacterImageFamilyOfDiff (dadeHypT hG hT2)
+(dadeHypT_hconj) ⟨η,hirr⟩ (no-real via oddCardT) (conjDiff_supported_T)` で組める。
+残: red branch (route-B `tauT_nu_cross` — S15_BridgeCharacter `tauS_mu_cross` の T-mirror、
+pins.nu_apply_of_not_mem_W1 + eta_diff_rigidity 系; dadeHypT0 との dade=Ind 橋も) →
+`sSet_memberRFamily_T` dispatch → `_orthogonal` → engine assembly。route-B は
+S16_GridExpansion 下流ゆえ **置き場所は TSideDegrees 不可** (S16_GridExpansion → S15_SAndT_Setup
+逆依存確認要) — S15_SSetMemberRFamily に同居 or 新 leaf `S15_TSetMemberRFamily`。
