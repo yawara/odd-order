@@ -1049,6 +1049,65 @@ noncomputable def Q_sharp_hypothesis76 [Fintype G] [Invertible (Nat.card G : ℂ
       rw [hnorm]; exact l.2
     exact (Subgroup.mem_set_normalizer_iff.mp hlnorm h).mp hh
 
+open scoped FiniteInduce in
+/-- **Peterfalvi (13.2.e)/(7.2)-for-`T`: the `(T, Q^#)` Dade isometry is `Ind_T^G`** (mirror of
+`H_sharp_tau_eq_induce`, issue 2035 #22 T-side twin): for the TI-subset construction (all local
+subgroups trivial) the Dade map and the induction agree pointwise — on the conjugacy saturation
+of `Q^#` both take the base value, and both vanish off it.  This is the link between the
+`T`-side (7.7.a) coefficients `c_i = ⟨τψ_i, χ⟩` and the τ₁T-coherence
+(`coherentIndT_pinned .extends_on_supported`). -/
+theorem Q_sharp_tau_eq_induce [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1)
+    (α : OddOrder.Peterfalvi.S04.SupportedClassFunctions ℂ
+      (OddOrder.Peterfalvi.S04.sharp (hyp.Q : Set G)) hyp.T) :
+    (Q_sharp_hypothesis71 hG hyp hvd).τ α
+      = ClassFunction.induce hyp.T (α : ClassFunction ↥hyp.T ℂ) := by
+  classical
+  have hQT : hyp.Q ≤ hyp.T := by
+    rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.T
+  have hAL : OddOrder.Peterfalvi.S04.sharp (hyp.Q : Set G) ⊆ (hyp.T : Set G) := fun x hx =>
+    hQT (OddOrder.Peterfalvi.S04.mem_sharp.mp hx).1
+  have hsupp : ∀ w : ↥hyp.T, (w : G) ∉ OddOrder.Peterfalvi.S04.sharp (hyp.Q : Set G) →
+      (α : ClassFunction ↥hyp.T ℂ) w = 0 := by
+    intro w hw
+    by_contra hne
+    exact hw (OddOrder.Peterfalvi.S04.mem_supportInSubgroup.mp
+      (α.2 (ClassFunction.mem_support.mpr hne)))
+  have hstab : ∀ l ∈ hyp.T,
+      MulAut.conj l • (OddOrder.Peterfalvi.S04.sharp (hyp.Q : Set G))
+        = OddOrder.Peterfalvi.S04.sharp (hyp.Q : Set G) := by
+    intro l hl
+    ext x
+    constructor
+    · rintro ⟨a, ha, rfl⟩
+      simp only [MulAut.smul_def, MulAut.conj_apply]
+      exact T_normalizes_Q_sharp hG hyp ⟨l, hl⟩ ha
+    · intro hx
+      refine ⟨l⁻¹ * x * l, ?_, ?_⟩
+      · have := T_normalizes_Q_sharp hG hyp (⟨l, hl⟩ : ↥hyp.T)⁻¹ hx
+        simpa using this
+      · simp only [MulAut.smul_def, MulAut.conj_apply]
+        group
+  ext g
+  by_cases hg : g ∈ OddOrder.GroupTheory.conjClassSet
+      (OddOrder.Peterfalvi.S04.sharp (hyp.Q : Set G))
+  · obtain ⟨a, ha, y, hy⟩ := OddOrder.GroupTheory.mem_conjClassSet.mp hg
+    rw [OddOrder.Peterfalvi.S04.map_eq_of_isConj_of_forall_H_eq_bot
+        (Q_sharp_hypothesis71 hG hyp hvd).isDadeMap (fun _ => rfl) α ha
+        (isConj_iff.mpr ⟨y, hy⟩),
+      OddOrder.GroupTheory.IsTISubset.induce_apply_of_mem_conj (Q_sharp_isTISubset hG hyp hvd)
+        hAL hstab (α : ClassFunction ↥hyp.T ℂ) hsupp ha hy.symm]
+  · have hg' : g ∉ Group.conjugatesOfSet (OddOrder.Peterfalvi.S04.sharp (hyp.Q : Set G)) := by
+      intro hmem
+      obtain ⟨a, ha, hconj⟩ := Group.mem_conjugatesOfSet_iff.mp hmem
+      obtain ⟨c, hc⟩ := isConj_iff.mp hconj
+      exact hg (OddOrder.GroupTheory.mem_conjClassSet.mpr ⟨a, ha, c, hc⟩)
+    rw [OddOrder.Peterfalvi.S04.map_eq_zero_of_not_mem_conjugatesOfSet_of_forall_H_eq_bot
+        (Q_sharp_hypothesis71 hG hyp hvd).isDadeMap (fun _ => rfl) α hg',
+      OddOrder.GroupTheory.IsTISubset.induce_apply_of_not_mem_conjClassSet
+        (α : ClassFunction ↥hyp.T ℂ) hsupp hg]
+
 /-- **`G₀` is cyclic-closed**: closed under `x ↦ x^k` for `k` coprime to `|G|` — the hypothesis
 shape of the Galois integrality `exists_nat_sum_normSq_of_mem_ZIrr_of_cyclicClosed` (and of
 [Is] Lemma 3.14) that makes the (13.10) atoms `slam`/`seta` rational.  The coprime power is
