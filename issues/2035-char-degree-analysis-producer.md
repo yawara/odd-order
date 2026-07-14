@@ -2225,3 +2225,24 @@ AxiomsCheck 2 endpoint 追加 (4192 jobs green)。main 再同期 (c レーン初
 (`exists_pinned_coherent_sSet_of_all_reducible` の T-mirror、S 版 = CaseBReducibleCoherence:762)
 → `sSet_coherent_indT_A_pinned` (dispatch + pin bundling、S 版 = CaseACoherence:720) →
 step 5 τ₁T 定義 + conjunct 4 assembly。
+
+## 2026-07-14 更新 #68 (lane b, /loop iter 31) — ✅ #41 step 4 完全達成: pinned assembly
+
+S15_NuRowPin.lean 1261 行 (⚠ 1500 接近 — 次の主結果で新 leaf 切り):
+- **`exists_pinned_coherent_sSet_of_all_reducible_T`** (sorry-free・axiom-clean、一発 build):
+  all-reducible glue — coherentImageMap over 直交 ν-row family、residual
+  r = ηrow₁ − Ind(νrow₁) の行独立性 (per-column tauT_nu_cross)、A(T)-supported は x(1)=0 で
+  residual 消滅。S 版の機械 mirror (index 転置のみ)。
+- **`sSet_coherent_indT_A_pinned`** (唯一の sorry 源 = refuter-T 経由、S 版と同 profile):
+  has-irr 分岐 = dispatch + pin dichotomy + pivot 伝播 + **flip は q = 3 を強制**
+  (q ≥ 5 なら第 3 行 i₂ ∉ {0,1,s} で行差恒等式が flip と矛盾) + q=3 で 2 行 swap 転送 /
+  all-reducible 分岐 = glue の clean pin。
+
+**T-side (9.11) coherence 戦線がフル装備になった**: dispatch (indT) + Dade 版 (caseB) +
+pin dichotomy + pinned carrier。residual は refuter-T (S 側 construction site と共通機構) と
+a-owned nuGridSupply のみ。
+
+次 = #41 step 5: `tau1T_ofHonest` (pinned carrier の bundling、S 版 = tau1S_ofHonest
+CaseACoherence:870 — ⚠ [[lean-nonempty-some-erases-witness-pin]]: pin は Nonempty.some で
+消える、bundle 必須) → (5.3.b)-T ✓ (coherentIndT_image_inner_eta_eq_zero 済) → conjunct 4
+assembly (⟨η_{ij}, Ind(θT−ν_r)⟩ = −δ'[i=r])。

@@ -8091,3 +8091,5 @@ row-independence. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.coherentIndT_nuRow_pin_of_irr
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S15.Hypothesis.coherentIndT_nuRow_eq_etaRow_of_pivot
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.Hypothesis.exists_pinned_coherent_sSet_of_all_reducible_T

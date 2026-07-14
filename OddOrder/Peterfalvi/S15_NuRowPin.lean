@@ -833,4 +833,429 @@ theorem Hypothesis.coherentIndT_nuRow_eq_etaRow_of_pivot [Finite G]
           + ∑ j : Fin hyp.p, hyp.eta ⟨1, hyp.q_prime.one_lt⟩ j := by rw [hdiff, hpivot]
       _ = ∑ j : Fin hyp.p, hyp.eta i j := by abel
 
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **The canonical pinned `𝒯 = sSet(setupT)`-coherence, all-reducible case** (mirror of
+`exists_pinned_coherent_sSet_of_all_reducible`).  If every member of `𝒯` is reducible — hence a
+ν-row sum (`sSet_reducible_eq_nuRowSum`) — the assignment `ν-row ↦ aligned η-row` extends to a
+coherent extension of `𝒯` on `Ind_T^G` (`coherentImageMap` over the orthogonal ν-row family),
+*pinned by construction* at the pivot row `1`.
+
+Isometry: ν-rows are pairwise `p·[r=s]`-orthogonal, matched by the η-rows (`nuRow_inner` /
+`etaRow_inner`).  τ-agreement: an `A(T)`-supported lattice element vanishes at `1`
+(`honestTypeP2ASet_one_not_mem`); since every reducible row shares degree `p·v`
+(`nuRow_apply_one`), the residual `ν₀ − Ind_T^G` is `(x 1 / p·v)`-proportional to the
+row-independent constant `r = η-row₁ − Ind_T^G(ν-row₁)` (from the per-column prime-`TI`
+cross-relation `tauT_nu_cross` through `tInstance_dade0_eq_induce`), hence vanishes there. -/
+theorem Hypothesis.exists_pinned_coherent_sSet_of_all_reducible_T [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
+    (hvd : hyp.v * hyp.d ≠ 1)
+    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
+    (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
+    (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd))
+    (hallred : ∀ η ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd),
+      ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter η) :
+    ∃ c : OddOrder.Peterfalvi.S07.IsCoherent hyp.indT
+        (sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T),
+      c.extension (∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j)
+        = ∑ j : Fin hyp.p, hyp.eta ⟨1, hyp.q_prime.one_lt⟩ j := by
+  haveI := hyp.finiteG
+  classical
+  -- pivot / second-row index arithmetic
+  have hi1_0 : (⟨1, hyp.q_prime.one_lt⟩ : Fin hyp.q) ≠ ⟨0, hyp.q_prime.pos⟩ := by
+    intro h; exact absurd (congrArg Fin.val h) one_ne_zero
+  have h2lt : 2 < hyp.q := by have := hyp.three_le_q; omega
+  have hi2_0 : (⟨2, h2lt⟩ : Fin hyp.q) ≠ ⟨0, hyp.q_prime.pos⟩ := by
+    intro h; exact absurd (congrArg Fin.val h) (by norm_num)
+  have hne12 : (⟨1, hyp.q_prime.one_lt⟩ : Fin hyp.q) ≠ ⟨2, h2lt⟩ := by
+    intro h; exact absurd (congrArg Fin.val h) (by norm_num)
+  have hv_ne : hyp.v ≠ 0 := by
+    intro h0
+    have hcard : 0 < Nat.card ↥hyp.V := Nat.card_pos
+    rw [hyp.card_V_eq_vd, h0, zero_mul] at hcard
+    exact absurd hcard (lt_irrefl 0)
+  have hpne0 : (hyp.p : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hyp.p_prime.pos.ne'
+  have hone_notin : (1 : ↥hyp.T) ∉
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
+    rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+    simpa using honestTypeP2ASet_one_not_mem (M := hyp.T)
+  -- the family, its finiteness, and the per-member row datum (all members reducible)
+  set F : Set (ClassFunction ↥hyp.T ℂ) := sSet (hyp.toTypesIIIIIIVSetupT hG hvd) with hFdef
+  have hFfin : F.Finite := sSet_finite (hyp.toTypesIIIIIIVSetupT hG hvd)
+  have hrowof : ∀ a ∈ F, ∃ r : Fin hyp.q, r ≠ ⟨0, hyp.q_prime.pos⟩ ∧
+      a = ∑ j : Fin hyp.p, hyp.nu r j := fun a ha =>
+    hyp.sSet_reducible_eq_nuRowSum hG pins hvd ha (hallred a ha)
+  -- enumeration of the family
+  set n := hFfin.toFinset.card with hndef
+  set χ : Fin n → ClassFunction ↥hyp.T ℂ := fun i => ↑(hFfin.toFinset.equivFin.symm i) with hχdef
+  have hχmem : ∀ i, χ i ∈ F := fun i =>
+    hFfin.mem_toFinset.mp (hFfin.toFinset.equivFin.symm i).2
+  have hχinj : Function.Injective χ := fun i j hij =>
+    (Equiv.injective _ (Subtype.ext hij) :)
+  set rf : Fin n → Fin hyp.q := fun i => (hrowof (χ i) (hχmem i)).choose with hrfdef
+  have hrf0 : ∀ i, rf i ≠ ⟨0, hyp.q_prime.pos⟩ := fun i =>
+    (hrowof (χ i) (hχmem i)).choose_spec.1
+  have hrfeq : ∀ i, χ i = ∑ j : Fin hyp.p, hyp.nu (rf i) j :=
+    fun i => (hrowof (χ i) (hχmem i)).choose_spec.2
+  -- row inner products: `⟨ν-row_r, ν-row_s⟩ = p·[r=s] = ⟨η-row_r, η-row_s⟩`
+  have hνrows : ∀ r s : Fin hyp.q,
+      ClassFunction.inner (∑ j : Fin hyp.p, hyp.nu r j) (∑ j : Fin hyp.p, hyp.nu s j)
+        = if r = s then (hyp.p : ℂ) else 0 := hyp.nuRow_inner pins
+  have hηrows : ∀ r s : Fin hyp.q,
+      ClassFunction.inner (∑ j : Fin hyp.p, hyp.eta r j) (∑ j : Fin hyp.p, hyp.eta s j)
+        = if r = s then (hyp.p : ℂ) else 0 := hyp.etaRow_inner
+  -- distinct members carry distinct rows; member-pair inner products
+  have hrfinj : ∀ i i' : Fin n, rf i = rf i' → i = i' := by
+    intro i i' hk
+    apply hχinj
+    rw [hrfeq i, hrfeq i', hk]
+  have hχpair : ∀ i i' : Fin n, ClassFunction.inner (χ i) (χ i')
+      = if i = i' then (hyp.p : ℂ) else 0 := by
+    intro i i'
+    rw [hrfeq i, hrfeq i', hνrows]
+    by_cases hii : i = i'
+    · subst hii; rw [if_pos rfl, if_pos rfl]
+    · rw [if_neg (fun h => hii (hrfinj _ _ h)), if_neg hii]
+  have hχorth : ∀ i j : Fin n, i ≠ j → ClassFunction.inner (χ i) (χ j) = 0 := by
+    intro i j hij; rw [hχpair, if_neg hij]
+  have hχnorm : ∀ i : Fin n, ClassFunction.inner (χ i) (χ i) ≠ 0 := by
+    intro i; rw [hχpair, if_pos rfl]; exact hpne0
+  -- the canonical Fourier map and its member images
+  set ν₀ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥hyp.T G :=
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap.coherentImageMap χ
+      (fun i => (ClassFunction.inner (χ i) (χ i))⁻¹ • ∑ j' : Fin hyp.p, hyp.eta (rf i) j')
+    with hν₀def
+  have hν₀apply : ∀ i : Fin n, ν₀ (χ i) = ∑ j' : Fin hyp.p, hyp.eta (rf i) j' := fun i =>
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap.coherentImageMap_apply_eq_of_orthogonal
+      hχorth hχnorm i
+  -- the general-row prime-`TI` cross-relation re-grounded onto `Ind_T^G`
+  have hindT_row_diff : ∀ r : Fin hyp.q, r ≠ ⟨0, hyp.q_prime.pos⟩ →
+      hyp.indT ((∑ j : Fin hyp.p, hyp.nu r j)
+          - (∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j))
+        = (∑ j : Fin hyp.p, hyp.eta r j)
+          - (∑ j : Fin hyp.p, hyp.eta ⟨1, hyp.q_prime.one_lt⟩ j) := by
+    intro r hr0
+    by_cases hr1 : r = ⟨1, hyp.q_prime.one_lt⟩
+    · subst hr1; rw [sub_self, map_zero, sub_self]
+    · have hAsupp := hyp.nuRow_diff_supported hG pins hvd chief hr0 hi1_0
+      have hA0supp := hAsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
+        (honestTypeP2ASet_subset_A0Set Tdata))
+      rw [hyp.indT_apply, ← hyp.tInstance_dade0_eq_induce hG hnoV hT2 Tdata hA0supp,
+        show ((∑ j : Fin hyp.p, hyp.nu r j)
+            - (∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j))
+          = ∑ j : Fin hyp.p, (hyp.nu r j - hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j) from by
+          rw [Finset.sum_sub_distrib],
+        map_sum, Finset.sum_congr rfl (fun j _ =>
+          tauT_nu_cross hG hnoV hyp pins hT2 Tdata hU hW1 hW2 j hr0 hi1_0 hr1),
+        Finset.sum_sub_distrib]
+  -- the row-independent residual `r = η-row₁ − Ind_T^G(ν-row₁)`
+  set r : ClassFunction G ℂ :=
+    (∑ j : Fin hyp.p, hyp.eta ⟨1, hyp.q_prime.one_lt⟩ j)
+      - hyp.indT (∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j) with hrdef
+  have hrconst : ∀ i : Fin hyp.q, i ≠ ⟨0, hyp.q_prime.pos⟩ →
+      (∑ j : Fin hyp.p, hyp.eta i j) - hyp.indT (∑ j : Fin hyp.p, hyp.nu i j) = r := by
+    intro i hi0
+    have hτdiff : hyp.indT (∑ j : Fin hyp.p, hyp.nu i j)
+        - hyp.indT (∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j)
+        = (∑ j : Fin hyp.p, hyp.eta i j)
+          - (∑ j : Fin hyp.p, hyp.eta ⟨1, hyp.q_prime.one_lt⟩ j) := by
+      rw [← map_sub]; exact hindT_row_diff i hi0
+    rw [hrdef, sub_eq_sub_iff_sub_eq_sub]
+    exact hτdiff.symm
+  -- every reducible member shares the degree `p·v` — via the value-at-1 of the row sum
+  have hdegs : ∀ i : Fin n, ((χ i : ClassFunction ↥hyp.T ℂ) : ↥hyp.T → ℂ) 1
+      = ((∑ j' : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j' :
+          ClassFunction ↥hyp.T ℂ) : ↥hyp.T → ℂ) 1 := by
+    intro i
+    rw [hrfeq i, hyp.nuRow_apply_one hG pins (rf i) (hrf0 i),
+      hyp.nuRow_apply_one hG pins ⟨1, hyp.q_prime.one_lt⟩ hi1_0]
+  -- the member-index extraction from a set-membership
+  have hidxof : ∀ a ∈ F, ∃ i : Fin n, χ i = a := by
+    intro a ha
+    exact ⟨hFfin.toFinset.equivFin ⟨a, hFfin.mem_toFinset.mpr ha⟩, by simp [hχdef]⟩
+  -- the isometry field
+  have hinner : ∀ x y : ClassFunction ↥hyp.T ℂ,
+      x ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.T) F →
+      y ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.T) F →
+      ClassFunction.inner (ν₀ x) (ν₀ y) = ClassFunction.inner x y := by
+    intro x y hx hy
+    induction hy using Submodule.span_induction with
+    | mem b hb =>
+        induction hx using Submodule.span_induction with
+        | mem a ha =>
+            obtain ⟨i, rfl⟩ := hidxof a ha
+            obtain ⟨j', rfl⟩ := hidxof b hb
+            rw [hν₀apply i, hν₀apply j', hηrows, hχpair]
+            by_cases hij : i = j'
+            · subst hij; rw [if_pos rfl, if_pos rfl]
+            · rw [if_neg (fun h => hij (hrfinj _ _ h)), if_neg hij]
+        | zero => rw [map_zero, ClassFunction.inner_zero_left,
+            ClassFunction.inner_zero_left]
+        | add u v hu hv ihu ihv =>
+            rw [map_add, ClassFunction.inner_add_left, ClassFunction.inner_add_left,
+              ihu, ihv]
+        | smul m u hu ihu =>
+            rw [map_zsmul, ← Int.cast_smul_eq_zsmul ℂ m (ν₀ u),
+              ← Int.cast_smul_eq_zsmul ℂ m u, ClassFunction.inner_smul_left,
+              ClassFunction.inner_smul_left, ihu]
+    | zero => rw [map_zero, ClassFunction.inner_zero_right, ClassFunction.inner_zero_right]
+    | add u v hu hv ihu ihv =>
+        rw [map_add, ClassFunction.inner_add_right, ClassFunction.inner_add_right, ihu, ihv]
+    | smul m u hu ihu =>
+        rw [map_zsmul, ← Int.cast_smul_eq_zsmul ℂ m (ν₀ u),
+          ← Int.cast_smul_eq_zsmul ℂ m u, OddOrder.RepresentationTheory.inner_smul_right,
+          OddOrder.RepresentationTheory.inner_smul_right, ihu]
+  -- the pivot degree is nonzero (`p·v`)
+  have hD1ne : ((∑ j' : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j' :
+      ClassFunction ↥hyp.T ℂ) : ↥hyp.T → ℂ) 1 ≠ 0 := by
+    rw [hyp.nuRow_apply_one hG pins ⟨1, hyp.q_prime.one_lt⟩ hi1_0]
+    exact mul_ne_zero hpne0 (Nat.cast_ne_zero.mpr hv_ne)
+  -- the residual identity on the whole lattice
+  have hres : ∀ x ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.T) F,
+      ν₀ x - hyp.indT x
+        = ((x 1) / ((∑ j' : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j' :
+            ClassFunction ↥hyp.T ℂ) : ↥hyp.T → ℂ) 1) • r := by
+    intro x hx
+    induction hx using Submodule.span_induction with
+    | mem a ha =>
+        obtain ⟨i, rfl⟩ := hidxof a ha
+        rw [hν₀apply i, hdegs i, div_self hD1ne, one_smul]
+        have h1 : (∑ j' : Fin hyp.p, hyp.eta (rf i) j') - hyp.indT (χ i) = r := by
+          conv_lhs => rw [hrfeq i]
+          exact hrconst (rf i) (hrf0 i)
+        exact h1
+    | zero => rw [map_zero, map_zero, ClassFunction.zero_apply, zero_div, zero_smul, sub_zero]
+    | add u v hu hv ihu ihv =>
+        rw [map_add, map_add, ClassFunction.add_apply, add_div, add_smul]
+        rw [show ν₀ u + ν₀ v - (hyp.indT u + hyp.indT v)
+            = (ν₀ u - hyp.indT u) + (ν₀ v - hyp.indT v) from by abel, ihu, ihv]
+    | smul m u hu ihu =>
+        rw [map_zsmul, map_zsmul, ← Int.cast_smul_eq_zsmul ℂ m (ν₀ u),
+          ← Int.cast_smul_eq_zsmul ℂ m (hyp.indT u), ← Int.cast_smul_eq_zsmul ℂ m u,
+          ClassFunction.smul_apply, ← smul_sub, ihu, smul_smul, mul_div_assoc]
+  -- the supported-agreement field
+  have hextends : ∀ x : ClassFunction ↥hyp.T ℂ,
+      x ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.T) F
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T) →
+      ν₀ x = hyp.indT x := by
+    rintro x ⟨hxspan, hxsupp⟩
+    have hx1 : x 1 = 0 := by
+      by_contra h
+      exact hone_notin (hxsupp (ClassFunction.mem_support.mpr h))
+    have h := hres x hxspan
+    rw [hx1, zero_div, zero_smul, sub_eq_zero] at h
+    exact h
+  -- the ZIrr-codomain field
+  have hZIrr : ∀ x : ClassFunction ↥hyp.T ℂ,
+      x ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.T) F → ν₀ x ∈ ZIrr G := by
+    intro x hx
+    induction hx using Submodule.span_induction with
+    | mem a ha =>
+        obtain ⟨i, rfl⟩ := hidxof a ha
+        rw [hν₀apply i]
+        exact Submodule.sum_mem _ fun j' _ =>
+          OddOrder.Peterfalvi.S16.eta_mem_ZIrr hyp (rf i) j'
+    | zero => rw [map_zero]; exact Submodule.zero_mem _
+    | add u v hu hv ihu ihv => rw [map_add]; exact Submodule.add_mem _ ihu ihv
+    | smul m u hu ihu => rw [map_zsmul]; exact Submodule.smul_mem _ m ihu
+  -- the nonzero supported witness `ν-row₁ − ν-row₂`
+  have hnonzero : ∃ φ : ClassFunction ↥hyp.T ℂ,
+      φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.T) F
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T) ∧
+        φ ≠ 0 := by
+    refine ⟨(∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j)
+        - (∑ j : Fin hyp.p, hyp.nu ⟨2, h2lt⟩ j), ?_, ?_⟩
+    · rw [OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff]
+      refine ⟨Submodule.sub_mem _ (Submodule.subset_span ?_) (Submodule.subset_span ?_),
+        hyp.nuRow_diff_supported hG pins hvd chief hi1_0 hi2_0⟩
+      · rw [hFdef]
+        exact sOf_subset_sSet _ chief.H0
+          (hyp.nu_rowSum_mem_sOf_H0_T hG pins hvd chief ⟨1, hyp.q_prime.one_lt⟩ hi1_0)
+      · rw [hFdef]
+        exact sOf_subset_sSet _ chief.H0
+          (hyp.nu_rowSum_mem_sOf_H0_T hG pins hvd chief ⟨2, h2lt⟩ hi2_0)
+    · intro heq
+      have hce : (∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j)
+          = ∑ j : Fin hyp.p, hyp.nu ⟨2, h2lt⟩ j := sub_eq_zero.mp heq
+      have hcontra := hνrows ⟨1, hyp.q_prime.one_lt⟩ ⟨2, h2lt⟩
+      rw [if_neg hne12, ← hce, hνrows ⟨1, hyp.q_prime.one_lt⟩ ⟨1, hyp.q_prime.one_lt⟩,
+        if_pos rfl] at hcontra
+      exact hpne0 hcontra
+  -- assemble; the pin is `hν₀apply` at the `ν-row₁`-member index
+  have hν1mem : (∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j) ∈ F := by
+    rw [hFdef]
+    exact sOf_subset_sSet _ chief.H0
+      (hyp.nu_rowSum_mem_sOf_H0_T hG pins hvd chief ⟨1, hyp.q_prime.one_lt⟩ hi1_0)
+  set i₁ : Fin n := hFfin.toFinset.equivFin ⟨_, hFfin.mem_toFinset.mpr hν1mem⟩ with hi₁def
+  have hχi₁ : χ i₁ = ∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j := by
+    rw [hχdef, hi₁def]; simp
+  have hrfi₁ : rf i₁ = ⟨1, hyp.q_prime.one_lt⟩ := by
+    have hrows_eq : (∑ j' : Fin hyp.p, hyp.nu (rf i₁) j')
+        = ∑ j' : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j' := by
+      rw [← hrfeq i₁, hχi₁]
+    have h2 : (if rf i₁ = (⟨1, hyp.q_prime.one_lt⟩ : Fin hyp.q) then (hyp.p : ℂ) else 0)
+        = (hyp.p : ℂ) := by
+      rw [← hνrows, hrows_eq, hνrows, if_pos rfl]
+    by_contra hne
+    rw [if_neg hne] at h2
+    exact hpne0 h2.symm
+  refine ⟨{ nonzero := hnonzero
+            extension := ν₀
+            extension_inner_eq := hinner
+            extends_on_supported := hextends
+            extension_mem_ZIrr := hZIrr }, ?_⟩
+  show ν₀ (∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j)
+    = ∑ j : Fin hyp.p, hyp.eta ⟨1, hyp.q_prime.one_lt⟩ j
+  rw [← hχi₁, hν₀apply i₁, hrfi₁]
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **The (9.11)-`T` coherence of `𝒯 = sSet(setupT)`, pinned by the (13.3.c)-`T` ν-row
+formula** (mirror of `sSet_coherent_indS_A_pinned`): there is a coherent extension of `𝒯` on
+`Ind_T^G` whose values on the reducible ν-row sums are the aligned `η`-row sums — either
+uniformly, or (the `q = 3` sign-flip exception) with a global negative sign and the two nonzero
+rows swapped.
+
+By-cases on an irreducible member of `𝒯`:
+
+* **has-irr**: *any* inhabitant (`sSet_coherent_indT_A`) is pinned by the γ-trick dichotomy
+  `coherentIndT_nuRow_pin_of_irr`.  A clean pivot propagates by row-independence; a flipped
+  pivot forces `q = 3` (for `q ≥ 5` a third row `i₂ ∉ {0, 1, s}` makes the row-difference
+  identity contradict the flip) and the rows swap.
+* **all-reducible**: the constructed glue `exists_pinned_coherent_sSet_of_all_reducible_T`
+  supplies a clean-pinned inhabitant. -/
+theorem Hypothesis.sSet_coherent_indT_A_pinned [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
+    (hvd : hyp.v * hyp.d ≠ 1)
+    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
+    (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
+    (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd)) :
+    ∃ c : OddOrder.Peterfalvi.S07.IsCoherent hyp.indT
+      (sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T),
+      (∀ i : Fin hyp.q, i ≠ ⟨0, hyp.q_prime.pos⟩ →
+        c.extension (∑ j : Fin hyp.p, hyp.nu i j) = ∑ j : Fin hyp.p, hyp.eta i j) ∨
+      (hyp.q = 3 ∧ ∀ i i' : Fin hyp.q, i ≠ ⟨0, hyp.q_prime.pos⟩ →
+        i' ≠ ⟨0, hyp.q_prime.pos⟩ → i ≠ i' →
+        c.extension (∑ j : Fin hyp.p, hyp.nu i j) = -∑ j : Fin hyp.p, hyp.eta i' j) := by
+  classical
+  haveI := hyp.finiteG
+  have hq1 : (⟨1, hyp.q_prime.one_lt⟩ : Fin hyp.q) ≠ ⟨0, hyp.q_prime.pos⟩ := by
+    intro h; exact absurd (congrArg Fin.val h) one_ne_zero
+  have hpne0 : (hyp.p : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hyp.p_prime.pos.ne'
+  by_cases hirr : ∃ ξ ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd), IsIrreducibleCharacter ξ
+  · -- has-irr: any inhabitant is pinned by the γ-trick dichotomy
+    obtain ⟨ξ, hξ, hξirr⟩ := hirr
+    obtain ⟨c⟩ := hyp.sSet_coherent_indT_A hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+    refine ⟨c, ?_⟩
+    rcases hyp.coherentIndT_nuRow_pin_of_irr hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief c
+        hξ hξirr hq1 with
+      hclean | ⟨s, hs0, hs1, hsconj, hflip⟩
+    · exact Or.inl fun i hi =>
+        hyp.coherentIndT_nuRow_eq_etaRow_of_pivot hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+          c hclean hi
+    · -- flipped pivot: `q = 3` is forced, and the two nonzero rows swap
+      right
+      have hνrows := hyp.nuRow_inner pins
+      have hηrows := hyp.etaRow_inner
+      -- a flipped pivot with a third nonzero row `i₂ ∉ {0, 1, s}` is contradictory
+      have hno3rd : ∀ i₂ : Fin hyp.q, i₂ ≠ ⟨0, hyp.q_prime.pos⟩ →
+          i₂ ≠ ⟨1, hyp.q_prime.one_lt⟩ → i₂ ≠ s → False := by
+        intro i₂ hi₂0 hi₂1 hi₂s
+        have hdiff := hyp.coherentIndT_nuRow_diff hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+          c hq1 hi₂0 (fun h => hi₂1 h.symm)
+        -- inner the difference identity with the pivot `η`-row
+        have hinner := congrArg (fun f => ClassFunction.inner f
+          (∑ j : Fin hyp.p, hyp.eta ⟨1, hyp.q_prime.one_lt⟩ j)) hdiff
+        simp only [ClassFunction.inner_sub_left] at hinner
+        rw [hflip, ClassFunction.inner_neg_left,
+          hηrows s ⟨1, hyp.q_prime.one_lt⟩, if_neg hs1, neg_zero,
+          hηrows ⟨1, hyp.q_prime.one_lt⟩ ⟨1, hyp.q_prime.one_lt⟩, if_pos rfl,
+          hηrows i₂ ⟨1, hyp.q_prime.one_lt⟩, if_neg hi₂1] at hinner
+        -- so `⟨c(ν_{i₂}), η-row₁⟩ = −p`; but the dichotomy at `i₂` gives `0`
+        rcases hyp.coherentIndT_nuRow_pin_of_irr hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief c
+            hξ hξirr hi₂0 with
+          hc2 | ⟨s₂, hs₂0, hs₂i₂, hs₂conj, hc2⟩
+        · rw [hc2, hηrows i₂ ⟨1, hyp.q_prime.one_lt⟩, if_neg hi₂1] at hinner
+          rw [sub_zero] at hinner
+          exact hpne0 (by linear_combination -hinner)
+        · have hs₂1 : s₂ ≠ ⟨1, hyp.q_prime.one_lt⟩ := by
+            rintro rfl
+            -- `s₂ = 1` would give `conj(ν_{i₂}) = ν_1`, i.e. `ν_{i₂} = conj(ν_1) = ν_s`
+            have h1 : (∑ j : Fin hyp.p, hyp.nu i₂ j : ClassFunction ↥hyp.T ℂ)
+                = (∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j :
+                    ClassFunction ↥hyp.T ℂ).conj := by
+              rw [← hs₂conj, ClassFunction.conj_conj]
+            rw [hsconj] at h1
+            have h2 := hνrows i₂ s
+            rw [if_neg hi₂s, h1, hνrows s s, if_pos rfl] at h2
+            exact hpne0 h2
+          rw [hc2, ClassFunction.inner_neg_left,
+            hηrows s₂ ⟨1, hyp.q_prime.one_lt⟩, if_neg hs₂1, neg_zero, sub_zero] at hinner
+          exact hpne0 (by linear_combination -hinner)
+      -- `q = 3`: otherwise `q ≥ 5` and a third row exists
+      have hq3 : hyp.q = 3 := by
+        by_contra hq3ne
+        have h3q := hyp.three_le_q
+        have hq4 : hyp.q ≠ 4 := fun h => by
+          have := hyp.q_prime; rw [h] at this; norm_num at this
+        have hq5 : 5 ≤ hyp.q := by omega
+        have h2lt : 2 < hyp.q := by omega
+        have h3lt : 3 < hyp.q := by omega
+        by_cases hs2 : s = ⟨2, h2lt⟩
+        · refine hno3rd ⟨3, h3lt⟩ ?_ ?_ ?_
+          · intro h; exact absurd (congrArg Fin.val h) (by norm_num)
+          · intro h; exact absurd (congrArg Fin.val h) (by norm_num)
+          · rw [hs2]; intro h; exact absurd (congrArg Fin.val h) (by norm_num)
+        · refine hno3rd ⟨2, h2lt⟩ ?_ ?_ ?_
+          · intro h; exact absurd (congrArg Fin.val h) (by norm_num)
+          · intro h; exact absurd (congrArg Fin.val h) (by norm_num)
+          · intro h; exact hs2 h.symm
+      refine ⟨hq3, ?_⟩
+      -- with `q = 3` the nonzero rows are `1` and `s = 2`
+      have hsval : (s : Fin hyp.q).val = 2 := by
+        have hslt := s.isLt
+        have hs0' : s.val ≠ 0 := fun h => hs0 (Fin.ext h)
+        have hs1' : s.val ≠ 1 := fun h => hs1 (Fin.ext h)
+        omega
+      intro i i' hi hi' hii'
+      have hilt := i.isLt; have hi'lt := i'.isLt
+      have hi0' : i.val ≠ 0 := fun h => hi (Fin.ext h)
+      have hi'0 : i'.val ≠ 0 := fun h => hi' (Fin.ext h)
+      have hii'' : i.val ≠ i'.val := fun h => hii' (Fin.ext h)
+      rcases show i.val = 1 ∧ i'.val = 2 ∨ i.val = 2 ∧ i'.val = 1 by omega with
+        ⟨hiv, hi'v⟩ | ⟨hiv, hi'v⟩
+      · -- `i` is the pivot, `i' = s`: the flip itself
+        have hip : i = ⟨1, hyp.q_prime.one_lt⟩ := Fin.ext hiv
+        have hi's : i' = s := Fin.ext (hi'v.trans hsval.symm)
+        rw [hip, hi's]
+        exact hflip
+      · -- `i = s`, `i'` the pivot: transport the flip through the row difference
+        have his : i = s := Fin.ext (hiv.trans hsval.symm)
+        have hi'p : i' = ⟨1, hyp.q_prime.one_lt⟩ := Fin.ext hi'v
+        rw [his, hi'p]
+        have hdiff := hyp.coherentIndT_nuRow_diff hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+          c hq1 hs0 hs1.symm
+        have : c.extension (∑ j : Fin hyp.p, hyp.nu s j)
+            = c.extension (∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j)
+              - ((∑ j : Fin hyp.p, hyp.eta ⟨1, hyp.q_prime.one_lt⟩ j)
+                - ∑ j : Fin hyp.p, hyp.eta s j) := by
+          rw [← hdiff]; abel
+        rw [this, hflip]
+        abel
+  · -- all-reducible: the constructed glue supplies the clean pin
+    push Not at hirr
+    obtain ⟨c, hpivot⟩ := hyp.exists_pinned_coherent_sSet_of_all_reducible_T hG hnoV pins hvd
+      hT2 Tdata hU hW1 hW2 chief hirr
+    exact ⟨c, Or.inl fun i hi =>
+      hyp.coherentIndT_nuRow_eq_etaRow_of_pivot hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+        c hpivot hi⟩
+
 end OddOrder.Peterfalvi.S15
