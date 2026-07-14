@@ -87,6 +87,7 @@ import OddOrder.GroupTheory.RepresentationTheory.ConjugationFieldModel
 import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldModel
 import OddOrder.GroupTheory.RepresentationTheory.SingerLineBound
 import OddOrder.GroupTheory.RepresentationTheory.SemilinearImprimitiveBound
+import OddOrder.GroupTheory.RepresentationTheory.BlockScalarSylow
 import OddOrder.GroupTheory.RepresentationTheory.LineScalarCharacter
 import OddOrder.GroupTheory.RepresentationTheory.TypePGaloisUBound
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialSinger

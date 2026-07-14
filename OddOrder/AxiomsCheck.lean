@@ -15,6 +15,7 @@ import OddOrder.GroupTheory.RepresentationTheory.WielandtKernelFPF
 import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
 import OddOrder.GroupTheory.RepresentationTheory.ConjugationFieldModel
+import OddOrder.GroupTheory.RepresentationTheory.BlockScalarSylow
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialSinger
 import OddOrder.GroupTheory.WielandtFixedPoint
 import OddOrder.GroupTheory.PiElementDecomposition
@@ -8156,3 +8157,12 @@ gap of the (12.6) case split: all three coherence routes (a) TI/(6.8), (b) abeli
 (5.7), (c) cyclic-quotient (6.5.c) are real. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.sibleyTarget_frobI
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.frobenius_typeI_coherent
+
+/-! **Peterfalvi (14.6), sharp case-(9.7.a) Sylow bridge.**  A faithful two-coordinate
+block-scalar embedding of sharp square order has noncyclic Sylow subgroups at every prime
+dividing the coordinate exponent; odd-order scalar images specialize the exponent to
+`(p - 1) / 2`. -/
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.sylow_not_isCyclic_of_card_eq_sq_of_injective_pi
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.sylow_not_isCyclic_of_odd_blockScalarEmbedding
