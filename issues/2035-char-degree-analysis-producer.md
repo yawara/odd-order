@@ -2426,6 +2426,35 @@ T_isTypeP2_gate (0116) / T_caseB_facts_no_lambda の 4 named-obligation に coll
 obligation 自体が消える型。refuter-T / T_caseB_facts_no_lambda は従来どおり。nuGridSupply は
 a-owned 9096。
 
+## 2026-07-14 更新 #76 (lane b, /loop 再開 iter 1 — 元 #75、hub #75 との番号衝突を合流時に振り直し) — refuter-T campaign 開始: PairBoundT + StepsT 着地
+
+#74 の 4 named-obligation のうち **refuter-T (`sSet_caseA_nineElevenRefutation_T`,
+S15_TSetMemberRFamily:1017 唯一の sorry) が文書順+依存の最上流 ungated b-work** と確定
+(S-side (9.11) chain は 1017 #53-#55 で全討伐済 → docstring の「S↦T dictionary 置換のみ」が
+現実になった)。mirror campaign を開始、2 brick 着地 (いずれも一発 green・sorry-free):
+
+- **`825ebdd9` S15_NineElevenPairBoundT.lean** (642 行): 世界 bricks
+  (`sSet_eq_sOf_H0Cprime_T` / `uprimeSub_eq_bot_T` / `sOf_H0_uprime_eq_sSet_T` /
+  `sSet_subset_inducedKernelFamily_T` / `sSet_scaledDiff_support_T`) + ψ-分解
+  (`sSet_memberPsiDecomp_T` / `sSet_breakPsiDecomp_T`) + **`nineElevenPairBoundT`**
+  ((9.11.1)/(5.6) pair-bound、S08 engine 発火)。
+- **`ef7efb5e` S15_NineElevenStepsT.lean** (678 行): `sOf_H0Uprime_subset_sSet_T` /
+  `sSet_mem_Snorm_pos_T` / **`nineElevenSTwoExtractionT`** ((9.11.1) 抽出) /
+  **`sSet_sThree_coherent_dade_T`** ((9.11.6) τ₃) /
+  **`mem_honestTypeP2ASet_of_mem_H_sup_cuSubOf_T`** (Coq gap-patch mirror; 型 II 辞書
+  Q = T_F = M_σ(T) は hT2 経由、T′ = Q⊔V は T_deriv_eq_QV) / **`nineElevenAlphaSupportT`** /
+  **`nineElevenFourNormInputsT`**。(9.11.2) TI-witness bricks は {M}-generic ゆえ直 cite。
+
+**T-side 引数規約**: 全 mirror は `pins hvd hT2 Tdata hU hW1 hW2` を `sSet_memberRFamily_T`
+と同型で thread (T の ν-grid は pins 供給; S の μ-grid は carrier 供給という非対称)。
+**最終 assembly 時に refuter + `sSet_coherent_indT_caseA` の signature を widen して
+pins/Tdata を thread する** (b 所有 file 内、consumer = `sSet_coherent_indT_A` は既に全引数
+保持 → pass-through のみ)。
+
+残 bricks (文書順): (5.5)/(5.2.e)-T 前提 → `nineElevenSevenEightRefutationT` (~490 行 mirror)
+→ `nineElevenNormBoundT` (~330 行) → `nineElevenEqualityRefutationT` (~90 行) → assembly
+(refuter sorry 置換 + dispatch 移設 or signature widen + NuRowPin 接続確認)。
+
 ## 📎 lane-c cross-ref (2026-07-14, 9077 carve-out 条件 4 の記録)
 
 9077 RULING #3 の b-quiet-file carve-out 実施状況: item 2 `sibleyTarget_frobI`
