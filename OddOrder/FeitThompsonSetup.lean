@@ -19,9 +19,9 @@ This is the top-level file for Phase 4 of the project: the odd-order theorem,
 
 ## Structure of the top-level reduction
 
-The proof is organized into a *downstream* reduction (pure group theory, fully
-formalized here) and a single *upstream* obligation (the entire local + character
-analysis, still to be constructed):
+The proof is organized into a *downstream* minimal-counterexample reduction, a
+named construction of the Peterfalvi Section 16 configuration, and the final
+BG Appendix C contradiction:
 
 * `feitThompson_of_noMinimalSimpleOdd` — the **minimal-counterexample reduction**.
   By strong induction on `|G|`, if there were a finite group of odd order that is
@@ -30,19 +30,19 @@ analysis, still to be constructed):
   quotient is solvable (induction hypothesis), so the group is simple (an extension
   of a solvable group by a solvable group is solvable). This step is `sorry`-free.
 
-* `sectionSixteenHypothesis_of_isMinimalSimpleOdd` — the **single remaining upstream
-  obligation**. From a minimal simple group of odd order, the Bender–Glauberman
-  local analysis (BG §7–§16) together with Peterfalvi's character theory
-  (Peterfalvi §10–§16) constructs the Section 16 field-normalizer configuration.
-  This is the one `sorry` that the whole remaining project targets.
+* `sectionSixteenHypothesis_of_isMinimalSimpleOdd` — the **named Section 16
+  configuration producer**.  The BG §7–§16 and Peterfalvi §3–§16 producers now
+  construct the explicit `Section16Inputs` menu, and the assembly into
+  `Peterfalvi.S16.Hypothesis` is axiom-clean.
 
-* `noMinimalSimpleOdd_of_section16` / `noMinimalSimpleOdd` — the **already-wired
-  final contradiction**: once the Section 16 configuration is available,
-  `BG.AppC.final_contradiction` derives `False` (BG Appendix C contradicts the
-  standing inequality `q < p` of Peterfalvi §16).
+* `noMinimalSimpleOdd_of_section16` / `noMinimalSimpleOdd` — the **wired final
+  contradiction**: `BG.AppC.final_contradiction` derives `False` from that
+  configuration.  This is the current `sorryAx` boundary: unresolved BG/Peterfalvi
+  inputs cited by the final-contradiction chain live below this bridge, not in the
+  `Section16Inputs` producer.
 
-`feitThompson` then combines the reduction with the (currently `sorry`-blocked)
-non-existence of a minimal simple group of odd order.
+`feitThompson` combines the reduction with this final-contradiction bridge and
+therefore inherits exactly its remaining dependencies.
 -/
 
 namespace OddOrder
@@ -68,17 +68,15 @@ theorem noMinimalSimpleOdd_of_section16 {G : Type*} [Group G] [Finite G]
     False :=
   BG.AppC.final_contradiction hG hnoV hncH0C hyp
 
-/-! ## The single remaining upstream obligation
+/-! ## Named Section 16 input construction
 
-The obligation `sectionSixteenHypothesis_of_isMinimalSimpleOdd` is presented as a
-*gated-endpoint skeleton* (see `notes/meta/` and the
-`feedback-gated-endpoint-skeleton-pattern` memo): a `sorry`-free assembly
-`sectionSixteenHypothesis_of_inputs` builds the Section 16 configuration from an
-explicit `Section16Inputs` menu of genuine §7–§16 witnesses, and the single
-residual `sorry` is localized to "construct that menu".  The assembly *derives*
+The former gated-endpoint skeleton has been discharged: the named BG/Peterfalvi
+producers construct the explicit `Section16Inputs` menu, and
+`sectionSixteenHypothesis_of_inputs` builds the Section 16 configuration from it.
+Both the menu producer and the resulting canonical configuration are axiom-clean.
+The assembly *derives*
 the fields of `Peterfalvi.S16.Hypothesis` that are not independent data (`η`, `m`,
-the oddness facts, `finiteG`), so the menu is a strictly smaller obligation than
-the raw `Hypothesis`. -/
+the oddness facts, `finiteG`). -/
 
 section
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce

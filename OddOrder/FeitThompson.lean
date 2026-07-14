@@ -1596,19 +1596,19 @@ theorem sectionSixteenNuGridSupplyData_of_inputs
       nu_apply_of_not_mem_W1 := inp.nu_apply_of_not_mem_W1
       nu_conj := inp.nu_conj }
 
-/-- **The one remaining upstream obligation.** From a minimal simple group of odd
-order, the Bender–Glauberman local analysis (BG §7–§16) together with Peterfalvi's
-character theory (Peterfalvi §3–§16) constructs the Section 16 field-normalizer
-configuration of Peterfalvi (14.2).
+/-- **Canonical Section 16 configuration from a minimal simple odd-order group.**
+The named Bender–Glauberman and Peterfalvi producers construct
+`Section16Inputs G`, and the axiom-clean `sectionSixteenHypothesis_of_inputs`
+assembles those inputs into the field-normalizer configuration of Peterfalvi (14.2).
 
-In gated-endpoint-skeleton form: the `sorry`-free `sectionSixteenHypothesis_of_inputs`
-already performs the assembly, so the only thing missing is a `Section16Inputs G`
-witness — the explicit menu of §7–§16 obligations.  This single `sorry` is what the
-whole remaining project targets.
+Axiom audit (2026-07-14): this definition and
+`section16Inputs_of_isMinimalSimpleOdd` depend only on `propext`,
+`Classical.choice`, and `Quot.sound`.  In particular, the former gated input-menu
+obligation is no longer the FT frontier.
 
-Everything *downstream* of this point is already formalized:
-`noMinimalSimpleOdd_of_section16` feeds the configuration into BG Appendix C, which
-contradicts the standing inequality `q < p`. -/
+The downstream `noMinimalSimpleOdd_of_section16` bridge is present, but currently
+inherits `sorryAx` from the unresolved BG/Peterfalvi dependencies of
+`BG.AppC.final_contradiction`; that is the remaining capstone boundary. -/
 noncomputable def sectionSixteenHypothesis_of_isMinimalSimpleOdd
     {G : Type*} [Group G] [Finite G] (hG : IsMinimalSimpleOdd G) :
     Peterfalvi.S16.Hypothesis (G := G) :=
