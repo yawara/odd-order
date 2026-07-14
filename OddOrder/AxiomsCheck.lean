@@ -7370,8 +7370,8 @@ not an additional sorry in this theorem. -/
 -- `M*`, and the cyclic `W = K ⊔ K*`; a second application at `M*` gives `M* = (M*)' ⋊ K*`.  Now
 -- axiom-clean: both `proposition_type_classification` (BG Prop 16.1, issue 8015 reverse bridges closed)
 -- and `typeP_duality` (BG Theorem 14.7) are axiom-clean, so the (8.8) dichotomy is honestly proven.
--- (`theorem88_caseB_holds` itself is not yet axiom-clean: it also consumes `not_all_maximal_typeI`,
--- gated on the `exists_typeICovering`/`typeI_frobenius` §8/char residuals.)
+-- The full `theorem88_caseB_holds` chain is now axiom-clean: the type-I Dade and covering
+-- residuals are discharged, and its guard is registered in the Section 16 producer block below.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.theorem88_dichotomy
 
 -- **W2 §12 (12.9) rank-two witness machinery (lane-h/lane-c)** — the minimal-counterexample structure
