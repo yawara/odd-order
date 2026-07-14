@@ -2145,3 +2145,15 @@ caseA-T 残 chain: `sSetIrrDegT_coherent` (cut 上の uniform engine — S 版 H
 `sSetIrrDegT_pa_two_le_ncard` ((9.8.d) caseA_exists_irreducible_qa の T-instance + conj doubling)
 → `sSetIrrDegT_pa_coherent_indT_caseA` → dispatch `sSet_coherent_indT_A` → refuter-T (sorried、
 S 版 signature mirror)。
+
+## 2026-07-14 更新 #64 (lane b, /loop iter 25) — caseA-T base cut coherence 完成
+
+TSetMemberRFamily (sorry-free、一発 build): `sSet_member_differenceImage_T` (irr per-member
+R-datum over dadeHypT) / `sSetIrrDegT_finite` / **`sSetIrrDegT_subcoherent`** ((5.2)-subcoherence、
+irrSubcoherent + T 部材) / **`sSetIrrDegT_coherent`** ((5.7)∘(5.3.a) uniform-degree producer、
+base count h2 exposed — S 版と同じ honest pattern)。
+
+caseA-T 残: base count `sSetIrrDegT_pa_two_le_ncard` (generic `caseA_exists_irreducible_qa` の
+T-instance + conj doubling) → caseA assembly (`coherent_of_maximal_coherent_pair_refuted` +
+refuter-T sorried) → dispatch `sSet_coherent_dadeT_A` (clifford_dichotomy、caseB 分岐 =
+`sSet_coherent_dade_caseB_T` ✓)。
