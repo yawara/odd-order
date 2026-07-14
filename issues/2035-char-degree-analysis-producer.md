@@ -2591,3 +2591,19 @@ architecture task」の裁定どおり)。⟹ **c_eq_one → caseA_parameters �
   (base-0 certificate から任意 base i₀: χ^ρ = ∑_{i≠i₀} (star(c_i−c_{i₀})/N_i)ζ_i、
   c_0 = 0 は d_0 = 1 (ζ_0(1) ≠ 0) 経由、Fin 和の 0/Ioi 分解) / その後 cCoeff restate
   (Canonicalization) + μ-field P-witness + Q_sharp twin。
+
+## 2026-07-14 更新 #81 (lane b, /loop iter 7) — rebase campaign bricks 2-3: Hypothesis76 rebase layer
+
+- **`26468ff9`** (NormalCase.lean、sorry-free ×2):
+  - `Hypothesis76.zeta_sum_div_normSq_apply_eq_zero` — (7.6) 族での abelian rebase 恒等式
+    (ζ-列挙 ↔ induced-image の全単射 [zeta_injective/induced/family_cover] + generic 核)。
+  - `Hypothesis76.chiRho_decomp_rebased` — **rebased (7.7.a)** (= (13.5.a) 形):
+    `χ^ρ(x) = ∑_{i≥1, i≠i₀} (star(c_i−c_{i₀})/‖ζ_i‖²)ζ_i(x) − (star c_{i₀}/‖ζ_0‖²)ζ_0(x)`。
+- **⚠ 設計知見**: 素朴な「c_0 = 0」経由は**不可能** — DadeMap は生関数で IsDadeIsometry は
+  inner_eq のみゆえ τ(ψ_0) = τ(0) に map_zero が無い (cCoeff docstring の "c_0 = 0" 注記は
+  τ-線形性を要する言い過ぎ)。ζ_0 項を明示係数 −star(c_{i₀}) で残す形が honest かつ
+  book-faithful ((13.5.a) の α に吸収される P-kernel 側そのもの)。
+- 係数差 c_i − c_{i₀} = ⟨τ(ζ_i − ζ_{i₀}), χ⟩ (P-non-kernel pair) が guarded τ₁-field の
+  計算対象 — 次 brick = **cCoeff restate** (Canonicalization:198 `lambda_tau1_cCoeff` /
+  eta10_cCoeff_* を差分形に書換え + guarded field で証明再構成、μ-field P-witness 追加、
+  Q_sharp twin)。
