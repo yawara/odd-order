@@ -631,6 +631,23 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 48) — ★ a (13.15) 実証明 = OrderDetermination 移管 4 sorry 完遂 + b refuter-T campaign 開始**:
+  **a=1** (`a6c9bb3f` = ★ **(13.15) caseB_order_u 実証明** — 数値エンジンを S16_CaseBOrder →
+  新 Setup leaf `CaseBOrder.lean` (399 行) へ自己 relayer し honest 入力で実証明。旧 opaque 版削除、
+  下流互換 bridge `caseB_order_u_data` のみ faithful scaffold +1。S16_CaseBOrder は deprecated
+  redirect 化 (下流不変、内容ベースで a 域 = 非逸脱)。**0115 移管 4 本 ((13.11)-(13.15)) 全て実証明
+  完了、OrderDetermination.lean 実 sorry 0** — 0116 sequencing 条件 (ii) の対象 cluster が close。
+  残 = CaseBOrder:394 bridge 1 本 (CliffordCaseBData certificate 化が次 obligation)。merge)。
+  **b=5** (`825ebdd9`〜`aa5ecb5a` = **refuter-T campaign 開始** — #74 4-obligation の refuter-T
+  (S15_TSetMemberRFamily:1017) mirror。新 leaf 3 本 sorry-free: NineElevenPairBoundT 641 /
+  NineElevenStepsT 677 / NineElevenSevenEightT 656、OddOrder.lean 配線済。NuRowPin 微修正。
+  issues/2035 で hub #75 vs b #75 の独立追記衝突 → 両保持 + b 側 #76 振り直し。merge)。c=0。
+  build green **4210→4213 jobs** (+4 = 新 leaf 実 elaborate) / AxiomsCheck OK / census **40 不変**
+  (a: −1 実 discharge +1 scaffold) / 新 axiom なし / 逸脱なし / orphan なし。push 済。
+  **0116 追跡**: 条件 (ii) は「a の OrderDetermination cluster quiet 化」→ 移管 4 本完遂で実質成立に
+  接近 (a の次 frontier が同 file 群を離れるか次 tick で確認)。条件 (i) = b の hT2 弱化裁定は未応答
+  (b は 2035 #75 未読の可能性 — 今 tick で main 経由配達済、b の refuter-T campaign は #75 の弱化と
+  独立に進行可能なので block しない)。
 - **2026-07-14 (監視再開、tick 48〜) — ユーザー指示で監視ループ再開**:
   cron `a51a9e3d` を再作成 (Fable=30分 `13,43`)。再開時点: `main..{a,b,c}` = 0・全 worktree clean・
   レーン operator 未稼働 (ユーザーが順次起動予定)。tick 47 記録の再開時 hub TODO 処理:
