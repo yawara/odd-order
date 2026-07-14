@@ -1,4 +1,5 @@
 import OddOrder.Peterfalvi.S15_NuRowPin
+import OddOrder.Peterfalvi.S15_CaseACoherence
 
 /-!
 # The bundled coherent extension `τ₁T` (Peterfalvi (13.2.d)/(13.3.c) at `T`)
@@ -214,5 +215,162 @@ theorem Hypothesis.tau1T_ofHonest_image_inner_eta_eq_zero [Finite G]
       rw [show ζ' - ζ'.conj = -(ζ'.conj - ζ') from by abel, ClassFunction.support_neg]
       exact hyp.sSet_member_conjDiff_supported_T hG hvd hζ')
     (hyp.coherentIndT_pinned hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief) hζ hζirr
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **`ℤ[𝒯]`-elements are supported in `A(T) ∪ {1}`** (mirror of `zSpan_sSet_support_subset`):
+the `zSpan`-closure of the member-level support fact `sSet_member_support_subset_T`. -/
+theorem Hypothesis.zSpan_sSet_support_subset_T [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1)
+    {φ : ClassFunction ↥hyp.T ℂ}
+    (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSpan (sSet (hyp.toTypesIIIIIIVSetupT hG hvd))) :
+    φ.support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T ∪ {1} := by
+  induction hφ using Submodule.span_induction with
+  | mem x hx => exact hyp.sSet_member_support_subset_T hG hvd hx
+  | zero => simp
+  | add x y _ _ hx hy =>
+      exact (ClassFunction.support_add_subset x y).trans (Set.union_subset hx hy)
+  | smul z x _ hx =>
+      refine subset_trans ?_ hx
+      rw [← Int.cast_smul_eq_zsmul ℂ z x]
+      exact ClassFunction.support_smul_subset _ x
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **Degree-`0` elements of `ℤ[𝒯]` are `A(T)`-supported** (mirror of
+`zSpan_sSet_degree_zero_support`; the (13.2.e)-input support step for the
+`tau1T_apply_induce_sub` supply). -/
+theorem Hypothesis.zSpan_sSet_degree_zero_support_T [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1)
+    {φ : ClassFunction ↥hyp.T ℂ}
+    (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSpan (sSet (hyp.toTypesIIIIIIVSetupT hG hvd)))
+    (hφ1 : φ (1 : ↥hyp.T) = 0) :
+    φ.support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
+  intro z hz
+  rcases hyp.zSpan_sSet_support_subset_T hG hvd hφ hz with h | h
+  · exact h
+  · rw [Set.mem_singleton_iff] at h
+    subst h
+    exact absurd hφ1 hz
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **(1.5.a)-at-`T`, the `K`-induced membership** (mirror of `induce_H_mem_zSpan_S`): for an
+irreducible `θ` of `K = QD` with `Q ⊄ Ker θ`, the induction `Ind_K^T θ` lies in `ℤ[𝒯]`.
+
+Two-stage induction through `T' = huSub(setupT)` (`induce_induce_subgroupOf`, `K ≤ T'` from
+`T' = QV`): the inner induction expands into `T'`-constituents with `ℕ`-coefficients, and each
+constituent `s` with nonzero coefficient has `Q ⊄ Ker s` (the constituent kernel step
+`constituent_P_not_subset_characterKernel` at `P := Q`), so `Ind_{T'}^T s ∈ 𝒯 = sSet(setupT)`
+(the `xiSet` kernel filter is exactly `hInHu = Q.subgroupOf T'` by
+`toTypesIIIIIIVSetupT_H_eq`). -/
+theorem Hypothesis.induce_K_mem_zSpan_T [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1)
+    (θ : ClassFunction ↥(hyp.K.subgroupOf hyp.T) ℂ)
+    (hθ : OddOrder.RepresentationTheory.IsIrreducibleCharacter θ)
+    (hθQ : ¬ (((hyp.Q.subgroupOf hyp.T).subgroupOf (hyp.K.subgroupOf hyp.T) :
+        Set ↥(hyp.K.subgroupOf hyp.T)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel θ)) :
+    ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ ∈
+      OddOrder.Peterfalvi.S07.zSpan (sSet (hyp.toTypesIIIIIIVSetupT hG hvd)) := by
+  classical
+  haveI := hyp.finiteG
+  letI : Fintype ↥hyp.T := Fintype.ofFinite _
+  letI : Fintype ↥((derivedInG hyp.T).subgroupOf hyp.T) := Fintype.ofFinite _
+  letI : Fintype ↥(hyp.K.subgroupOf hyp.T) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥hyp.T : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥((derivedInG hyp.T).subgroupOf hyp.T) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥(hyp.K.subgroupOf hyp.T) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  set data := hyp.toTypesIIIIIIVSetupT hG hvd with hdata
+  -- Work with the §9 induction carrier `HU = huSub data`, equal to `T' = derivedInG T` in `↥T`.
+  set HU : Subgroup ↥hyp.T := OddOrder.Peterfalvi.S11.huSub data with hHU
+  have hHUeq : HU = (derivedInG hyp.T).subgroupOf hyp.T :=
+    OddOrder.Peterfalvi.S11.huSub_eq_derivedInG_subgroupOf data
+  letI : Fintype ↥HU := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥HU : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  -- `K = QD ≤ T' = HU`.
+  have hKderiv : hyp.K ≤ derivedInG hyp.T := by
+    show hyp.Q ⊔ hyp.D ≤ derivedInG hyp.T
+    rw [hyp.T_deriv_eq_QV]
+    exact sup_le le_sup_left (le_trans (hyp.D_eq ▸ inf_le_left) le_sup_right)
+  have hKle : hyp.K.subgroupOf hyp.T ≤ HU := by
+    rw [hHUeq]; exact Subgroup.subgroupOf_mono hyp.T hKderiv
+  letI : Fintype ↥((hyp.K.subgroupOf hyp.T).subgroupOf HU) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥((hyp.K.subgroupOf hyp.T).subgroupOf HU) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  -- The transport `θ' = θ ∘ e` of `θ` onto `K' = K.subgroupOf HU ≤ HU`.
+  have hθ'irr : OddOrder.RepresentationTheory.IsIrreducibleCharacter
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom θ) :=
+    OddOrder.RepresentationTheory.IsIrreducibleCharacter.compHom_of_surjective
+      (Subgroup.subgroupOfEquivOfLe hKle).surjective hθ
+  -- Two-stage induction: `Ind_K^T θ = Ind_{HU}^T (Ind_{K'}^{HU} θ')`.
+  rw [← OddOrder.RepresentationTheory.induce_induce_subgroupOf hKle θ]
+  -- Expand the inner induction into `HU`-constituents and push `Ind_{HU}^T` inside.
+  rw [OddOrder.RepresentationTheory.induce_eq_sum_inner_restrict_smul
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom θ),
+    ClassFunction.induce_sum]
+  refine Submodule.sum_mem _ fun s _ => ?_
+  rw [ClassFunction.induce_smul]
+  -- The coefficient `⟨θ', Res s⟩` is a non-negative integer `(k : ℂ)`.
+  have hResChar : IsCharacter (ClassFunction.restrict
+      ((hyp.K.subgroupOf hyp.T).subgroupOf HU) (s : ClassFunction ↥HU ℂ)) :=
+    OddOrder.Peterfalvi.S08.isCharacter_restrict s.isIrreducible.isCharacter _
+  obtain ⟨k, hk⟩ := hResChar.exists_natCast_inner_irreducible hθ'irr
+  have hc : ClassFunction.inner
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom θ)
+      (ClassFunction.restrict ((hyp.K.subgroupOf hyp.T).subgroupOf HU)
+        (s : ClassFunction ↥HU ℂ)) = (k : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hk, star_natCast]
+  rw [hc, Nat.cast_smul_eq_nsmul ℂ k (ClassFunction.induce HU (s : ClassFunction ↥HU ℂ))]
+  rcases Nat.eq_zero_or_pos k with hk0 | hk0
+  · simp [hk0]
+  · refine nsmul_mem ?_ k
+    -- `Q (in HU) ⊄ ker s`: kernel step from `Q ⊄ ker θ'` (from `hθQ`) and constituent `θ'`.
+    have hθ'Q : ¬ ((((hyp.Q.subgroupOf hyp.T).subgroupOf HU).subgroupOf
+          ((hyp.K.subgroupOf hyp.T).subgroupOf HU) :
+        Set ↥((hyp.K.subgroupOf hyp.T).subgroupOf HU)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel
+        (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom θ)) := by
+      rw [OddOrder.RepresentationTheory.subset_characterKernel_compHom_iff]
+      have himg : (((hyp.Q.subgroupOf hyp.T).subgroupOf HU).subgroupOf
+            ((hyp.K.subgroupOf hyp.T).subgroupOf HU)).map
+            (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom
+          = (hyp.Q.subgroupOf hyp.T).subgroupOf (hyp.K.subgroupOf hyp.T) := by
+        ext y
+        rw [Subgroup.mem_map_equiv, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf,
+          Subgroup.mem_subgroupOf]
+        rfl
+      rw [himg]; exact hθQ
+    refine Submodule.subset_span ?_
+    rw [OddOrder.Peterfalvi.S11.mem_sSet]
+    refine ⟨s, ?_, rfl⟩
+    -- `s ∈ xiSet data`: `hInHu data ⊄ ker s`, with `hInHu = (Q.subgroupOf T).subgroupOf HU`.
+    show ¬ ((OddOrder.Peterfalvi.S11.hInHu data : Set ↥HU) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (s : ClassFunction ↥HU ℂ))
+    have hHInHu : (OddOrder.Peterfalvi.S11.hInHu data : Set ↥HU)
+        = ((hyp.Q.subgroupOf hyp.T).subgroupOf HU : Set ↥HU) := by
+      congr 1
+      show (data.H.subgroupOf hyp.T).subgroupOf HU = (hyp.Q.subgroupOf hyp.T).subgroupOf HU
+      rw [hyp.toTypesIIIIIIVSetupT_H_eq hG hvd]
+    rw [hHInHu]
+    -- The generic kernel step: `θ'` is a constituent of `Res s` (coefficient `k > 0`), and
+    -- `Q (in HU) ⊄ ker θ'` (`hθ'Q`), so `Q (in HU) ⊄ ker s`.
+    have hs : ClassFunction.inner
+        (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom θ)
+        (ClassFunction.restrict ((hyp.K.subgroupOf hyp.T).subgroupOf HU)
+          (s : ClassFunction ↥HU ℂ)) ≠ 0 := by
+      rw [hc]; exact_mod_cast hk0.ne'
+    exact constituent_P_not_subset_characterKernel ((hyp.Q.subgroupOf hyp.T).subgroupOf HU)
+      ((hyp.K.subgroupOf hyp.T).subgroupOf HU)
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom θ) hθ'irr hθ'Q s hs
 
 end OddOrder.Peterfalvi.S15

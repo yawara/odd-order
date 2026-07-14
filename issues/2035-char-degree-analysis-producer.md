@@ -2270,3 +2270,21 @@ hyp.vd_ne_one hG / Tdata+hU+hW1+hW2 = reconciled_typePData_T choose / hT2 = SAnd
 restate (consumer の expansion 呼び出しも r'-thread — 共に b-owned 同一 file) → ThetaWitness
 (Ind_K θ) の 𝒯-membership 接続 (conjunct 4 の (5.3.b) 適用に必要) → conjunct 2
 (indK_sub_nuRow_support ✓ #40) + 3 + 4 の組立。conjunct 5 (S/T cross) = step 6。
+
+## 2026-07-14 更新 #70 (lane b, /loop iter 33) — (1.5.a)-T membership 層 (θ-package 部材)
+
+S15_Tau1T.lean 376 行に追加 (全 sorry-free・axiom-clean・一発 build):
+- `zSpan_sSet_support_subset_T` / **`zSpan_sSet_degree_zero_support_T`** — ℤ[𝒯] の
+  A(T)∪{1} support + degree-0 ⟹ A(T)-support。**conjunct 3 の support 橋はこれで完結
+  ((QD)# ⊆ A(T) の直接橋は不要 — S 側と同じ zSpan+degree-0 ルート)**。
+- **`induce_K_mem_zSpan_T`** — Ind_K^T θ ∈ ℤ[𝒯] (θ irr on K=QD、Q ⊄ ker θ)。
+  induce_H_mem_zSpan_S の mirror: K ≤ T' (T_deriv_eq_QV)、hInHu = Q.subgroupOf T'
+  (toTypesIIIIIIVSetupT_H_eq)、constituent kernel 転送 (generic
+  constituent_P_not_subset_characterKernel、CaseACoherence import 追加)。
+
+残 (θ-package まで): `induce_K_mem_zSpan_sSet_irr_T` (irr 版 membership、S 版 =
+CharacterDegreeSupply:55 の mirror ~100 行; 反例列 = ν-row との直交) →
+`tau1T_ofHonest_zSpanIrr_inner_eta` (span 帰納 + (5.3.b)-T crux ✓) →
+`tau1T_ofHonest_induce_inner_eta` (conjunct 4 producer) → `tau1T_ofHonest_apply_induce_sub`
+(conjunct 3 producer; θ(1)=1 仮説版 — K-abelian 不要) → package 本体
+(conjunct 3 の r' 量化 restate + consumer thread + 組立)。
