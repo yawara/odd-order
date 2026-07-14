@@ -7128,6 +7128,25 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.rowT_zero
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaS_eq_omegaT
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.nuT_definition
+-- **Canonical T-side `ν`-grid supply (issue 1029)** — the certain-type construction supplies every
+-- grid-theoretic field of `NuGridSupplyData`: index negation/conjugation, irreducibility,
+-- row-injectivity, full orthonormality, degree congruence and base sign, row induction and reverse
+-- dichotomy, the (4.8) support estimate, and the (4.3.c) value identity.  The separate structural
+-- field `V_commutative` is intentionally not included: it is a post-(14.9) type-II fact, not a
+-- property of the canonical character grid (issue 9096 API audit).
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.colT_finNeg
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.rowDualT_finNeg
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.rowT_finNeg_eq_rowInv
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.nuT_irreducible
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.nuT_row_injective
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.nuT_orthonormal
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.nuT_degree_modEq_deltaPrime
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.deltaPrimeT_zero_eq_one
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.nuT_rowSum_eq_induce
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.nuT_reducible_dichotomy
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.nuT_diff_support
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.nuT_apply_of_not_mem_W1
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.nuT_conj
 -- **cd `tau3` (piece 5, real Dade σ-integral)** — `tau3W` is the Peterfalvi (3.2) σ-isometry of the
 -- G-internal TI-cyclic structure on `W = tp.W = mp.K ⊔ mp.Kstar` (support `Ẑ = W \ (W₁ ∪ W₂) =
 -- S14.zTilde`), as an `IntegralCharacterMap`.  The TI-set fact is read off the proven `BG §14
