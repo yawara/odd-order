@@ -7730,8 +7730,10 @@ The side-agnostic embedding `SemilinearFieldModel.fieldModelEmbedding` (injectiv
 `hcompatLift_of_equivariant`, together with the T-side producer `tFieldModelData_of_repr`
 (instantiating `E = Q`, `C = V`, `r = q`, `s = p`) and its `σ`-transport
 `TFieldModelData.derived_inf_centralizer_le_Q` (`C_{T'}(x) ≤ Q` for `x ∈ Q#`) — the T-side mirror
-of the `P`-side engine above.  All `sorry`-free; the sole T-side gate (`t_side_caseB_fieldModel`'s
-field-data existence) is not on this list. -/
+of the `P`-side engine above.  All `sorry`-free.  (`t_side_caseB_fieldModel` itself is now proven
+via the 9097 `ConjugationFieldModel` adapter (issue 0115 Campaign B) but inherits `sorryAx`
+transitively from `S15.T_caseB_facts_unconditional`'s upstream θ-package and the (14.9)
+`T_typeII` chain, so it is not asserted here; it joins when those close.) -/
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.SemilinearFieldModel.fieldModelEmbedding
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.SemilinearFieldModel.hcompatLift_of_equivariant
