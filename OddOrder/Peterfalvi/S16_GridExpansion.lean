@@ -432,6 +432,58 @@ theorem eta_diff_rigidity [Finite G]
     (by intro h; exact hj (Prod.ext_iff.mp h).2) hs hsep
   simpa using hmain
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (3.8) difference rigidity, column form** (issue 2035 #86, the de-swap of the
+`T`-side cross-relation): the same abstract engine as `eta_diff_rigidity`
+(`S05.orthonormalGrid_diff_rigidity` takes arbitrary distinct grid points), instantiated at a
+fixed *column* `j₀` with distinct rows `i₁ ≠ i₂`.  This is the `T`-side
+column-fixed/row-difference shape consumed by `tauT_nu_cross` directly at `hyp` — previously
+obtained by transposing through `Hypothesis.swap`, which needlessly demanded `IsTypeP2 T`
+(the swap's `S_typeP2` field). -/
+theorem eta_diff_rigidity_col [Finite G]
+    (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
+    {X : ClassFunction G ℂ} (hXZ : X ∈ ZIrr G) (hX2 : ClassFunction.inner X X = 2)
+    {i1 i2 : Fin hyp.q} (hi : i1 ≠ i2) (j0 : Fin hyp.p) {s : ℤ} (hs : s = 1 ∨ s = -1)
+    (hvanish : ∀ x ∈ conjClassSet
+        ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))),
+      (X - (s : ℂ) • (hyp.eta i1 j0 - hyp.eta i2 j0)) x = 0) :
+    X = (s : ℂ) • (hyp.eta i1 j0 - hyp.eta i2 j0) := by
+  classical
+  have hcardq : Nat.card (Fin hyp.q) = hyp.q :=
+    Nat.card_eq_fintype_card.trans (Fintype.card_fin _)
+  have hcardp : Nat.card (Fin hyp.p) = hyp.p :=
+    Nat.card_eq_fintype_card.trans (Fintype.card_fin _)
+  have hsep : ∀ (i i' : Fin hyp.q) (j j' : Fin hyp.p),
+      ClassFunction.inner (X - (s : ℂ) • (hyp.eta i1 j0 - hyp.eta i2 j0))
+          ((fun pq : Fin hyp.q × Fin hyp.p => hyp.eta pq.1 pq.2) (i, j))
+        + ClassFunction.inner (X - (s : ℂ) • (hyp.eta i1 j0 - hyp.eta i2 j0))
+            ((fun pq : Fin hyp.q × Fin hyp.p => hyp.eta pq.1 pq.2) (i', j'))
+      = ClassFunction.inner (X - (s : ℂ) • (hyp.eta i1 j0 - hyp.eta i2 j0))
+            ((fun pq : Fin hyp.q × Fin hyp.p => hyp.eta pq.1 pq.2) (i, j'))
+        + ClassFunction.inner (X - (s : ℂ) • (hyp.eta i1 j0 - hyp.eta i2 j0))
+            ((fun pq : Fin hyp.q × Fin hyp.p => hyp.eta pq.1 pq.2) (i', j)) := by
+    intro i i' j j'
+    have h1 := inner_eta_grid_relation hyp hvanish i j
+    have h2 := inner_eta_grid_relation hyp hvanish i' j'
+    have h3 := inner_eta_grid_relation hyp hvanish i j'
+    have h4 := inner_eta_grid_relation hyp hvanish i' j
+    simp only
+    linear_combination h1 + h2 - h3 - h4
+  have hmain := OddOrder.Peterfalvi.S05.orthonormalGrid_diff_rigidity
+    (fun pq : Fin hyp.q × Fin hyp.p => hyp.eta pq.1 pq.2)
+    (fun pq => eta_mem_ZIrr hyp pq.1 pq.2)
+    (fun a => by simpa using eta_orthonormal hyp a.1 a.1 a.2 a.2)
+    (fun a b hab => by
+      rw [eta_orthonormal hyp a.1 b.1 a.2 b.2, if_neg ?_]
+      rintro ⟨h1, h2⟩; exact hab (Prod.ext h1 h2))
+    (by rw [hcardq]; exact hyp.three_le_q) (by rw [hcardp]; exact hyp.three_le_p)
+    (by rw [hcardq]; exact hyp.q_odd) (by rw [hcardp]; exact hyp.p_odd)
+    (by rw [hcardq, hcardp]
+        exact (Nat.coprime_primes hyp.q_prime hyp.p_prime).mpr (Ne.symm hyp.p_ne_q))
+    hXZ hX2 (P1 := (i1, j0)) (P2 := (i2, j0))
+    (by intro h; exact hi (Prod.ext_iff.mp h).1) hs hsep
+  simpa using hmain
+
 /-! ## The `dirr` finish: from `Ψ ⊥ grid` to `ψ^{τ₁} ⊥ grid` -/
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in

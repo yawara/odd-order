@@ -49,14 +49,14 @@ noncomputable def Hypothesis.coherentIndT_pinned [Finite G]
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
     (hvd : hyp.v * hyp.d ≠ 1)
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)
     (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
     (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd)) :
     OddOrder.Peterfalvi.S07.IsCoherent hyp.indT
       (sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
       (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T) :=
-  (hyp.sSet_coherent_indT_A_pinned hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief).choose
+  (hyp.sSet_coherent_indT_A_pinned hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief).choose
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
@@ -68,12 +68,12 @@ noncomputable def Hypothesis.tau1T_ofHonest [Finite G]
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
     (hvd : hyp.v * hyp.d ≠ 1)
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)
     (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
     (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd)) :
     OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥hyp.T G :=
-  (hyp.coherentIndT_pinned hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief).extension
+  (hyp.coherentIndT_pinned hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief).extension
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
@@ -88,20 +88,20 @@ theorem Hypothesis.tau1T_ofHonest_nuRow_formula [Finite G]
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
     (hvd : hyp.v * hyp.d ≠ 1)
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)
     (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
     (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd)) :
     (∀ i : Fin hyp.q, i ≠ ⟨0, hyp.q_prime.pos⟩ →
-      hyp.tau1T_ofHonest hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+      hyp.tau1T_ofHonest hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
           (∑ j : Fin hyp.p, hyp.nu i j)
         = ∑ j : Fin hyp.p, hyp.eta i j) ∨
     (hyp.q = 3 ∧ ∀ i i' : Fin hyp.q, i ≠ ⟨0, hyp.q_prime.pos⟩ →
       i' ≠ ⟨0, hyp.q_prime.pos⟩ → i ≠ i' →
-      hyp.tau1T_ofHonest hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+      hyp.tau1T_ofHonest hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
           (∑ j : Fin hyp.p, hyp.nu i j)
         = -∑ j : Fin hyp.p, hyp.eta i' j) :=
-  (hyp.sSet_coherent_indT_A_pinned hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief).choose_spec
+  (hyp.sSet_coherent_indT_A_pinned hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief).choose_spec
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
@@ -116,17 +116,17 @@ theorem Hypothesis.tau1T_ofHonest_nuRow_eta_row [Finite G]
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
     (hvd : hyp.v * hyp.d ≠ 1)
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)
     (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
     (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd))
     {r : Fin hyp.q} (hr : r ≠ ⟨0, hyp.q_prime.pos⟩) :
     ∃ (r' : Fin hyp.q) (δ' : ℤ), r' ≠ ⟨0, hyp.q_prime.pos⟩ ∧ (δ' = 1 ∨ δ' = -1) ∧
-      hyp.tau1T_ofHonest hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+      hyp.tau1T_ofHonest hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
           (∑ j : Fin hyp.p, hyp.nu r j)
         = (δ' : ℂ) • ∑ j : Fin hyp.p, hyp.eta r' j := by
   classical
-  rcases hyp.tau1T_ofHonest_nuRow_formula hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief with
+  rcases hyp.tau1T_ofHonest_nuRow_formula hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief with
     hclean | ⟨hq3, hflip⟩
   · -- clean branch: `r' = r`, `δ' = 1`
     exact ⟨r, 1, hr, Or.inl rfl, by rw [hclean r hr]; push_cast; rw [one_smul]⟩
@@ -172,7 +172,7 @@ theorem Hypothesis.tau1T_ofHonest_extends_on_supported [Finite G]
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
     (hvd : hyp.v * hyp.d ≠ 1)
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)
     (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
     (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd))
@@ -180,9 +180,9 @@ theorem Hypothesis.tau1T_ofHonest_extends_on_supported [Finite G]
     (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan
       (sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
       (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T)) :
-    hyp.tau1T_ofHonest hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief φ
+    hyp.tau1T_ofHonest hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief φ
       = ClassFunction.induce hyp.T φ := by
-  have h := (hyp.coherentIndT_pinned hG hnoV pins hvd hT2 Tdata hU hW1 hW2
+  have h := (hyp.coherentIndT_pinned hG hnoV pins hvd hTP Tdata hU hW1 hW2
     chief).extends_on_supported φ hφ
   simpa [Hypothesis.tau1T_ofHonest, Hypothesis.indT_apply] using h
 
@@ -198,7 +198,7 @@ theorem Hypothesis.tau1T_ofHonest_image_inner_eta_eq_zero [Finite G]
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
     (hvd : hyp.v * hyp.d ≠ 1)
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)
     (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
     (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd))
@@ -206,15 +206,15 @@ theorem Hypothesis.tau1T_ofHonest_image_inner_eta_eq_zero [Finite G]
     (hζirr : IsIrreducibleCharacter ζ) :
     ∀ (i : Fin hyp.q) (j : Fin hyp.p),
       ClassFunction.inner
-        (hyp.tau1T_ofHonest hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief ζ)
+        (hyp.tau1T_ofHonest hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief ζ)
         (hyp.eta i j) = 0 :=
-  coherentIndT_image_inner_eta_eq_zero hG hnoV hyp hT2 Tdata hW1 hW2
+  coherentIndT_image_inner_eta_eq_zero hG hnoV hyp hTP Tdata hW1 hW2
     (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupT hG hvd))
     (sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupT hG hvd) (hyp.oddCardT hG))
     (fun ζ' hζ' => by
       rw [show ζ' - ζ'.conj = -(ζ'.conj - ζ') from by abel, ClassFunction.support_neg]
       exact hyp.sSet_member_conjDiff_supported_T hG hvd hζ')
-    (hyp.coherentIndT_pinned hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief) hζ hζirr
+    (hyp.coherentIndT_pinned hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief) hζ hζirr
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
@@ -591,7 +591,7 @@ theorem Hypothesis.tau1T_ofHonest_zSpanIrr_inner_eta [Finite G]
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
     (hvd : hyp.v * hyp.d ≠ 1)
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)
     (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
     (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd))
@@ -601,12 +601,12 @@ theorem Hypothesis.tau1T_ofHonest_zSpanIrr_inner_eta [Finite G]
       {ψ : ClassFunction ↥hyp.T ℂ | ψ ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd) ∧
         OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ}) :
     ClassFunction.inner
-      (hyp.tau1T_ofHonest hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief φ)
+      (hyp.tau1T_ofHonest hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief φ)
       (hyp.eta i j) = 0 := by
   haveI := hyp.finiteG
   induction hφ using Submodule.span_induction with
   | mem ζ hζ =>
-      exact hyp.tau1T_ofHonest_image_inner_eta_eq_zero hG hnoV pins hvd hT2 Tdata hU hW1 hW2
+      exact hyp.tau1T_ofHonest_image_inner_eta_eq_zero hG hnoV pins hvd hTP Tdata hU hW1 hW2
         chief hζ.1 hζ.2 i j
   | zero => rw [map_zero, OddOrder.RepresentationTheory.ClassFunction.inner_zero_left]
   | add x y _ _ hx hy =>
@@ -627,7 +627,7 @@ theorem Hypothesis.tau1T_ofHonest_induce_inner_eta [Finite G]
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
     (hvd : hyp.v * hyp.d ≠ 1)
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)
     (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
     (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd))
@@ -640,11 +640,11 @@ theorem Hypothesis.tau1T_ofHonest_induce_inner_eta [Finite G]
     (hind : OddOrder.RepresentationTheory.IsIrreducibleCharacter
       (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ)) :
     ClassFunction.inner (hyp.eta i j)
-      (hyp.tau1T_ofHonest hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+      (hyp.tau1T_ofHonest hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
         (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ)) = 0 := by
   haveI := hyp.finiteG
   rw [OddOrder.RepresentationTheory.inner_conj_symm,
-    hyp.tau1T_ofHonest_zSpanIrr_inner_eta hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief i j
+    hyp.tau1T_ofHonest_zSpanIrr_inner_eta hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief i j
       (hyp.induce_K_mem_zSpan_sSet_irr_T hG pins hvd θ hθ hθQ hind),
     star_zero]
 
@@ -662,7 +662,7 @@ theorem Hypothesis.tau1T_ofHonest_apply_induce_sub [Finite G]
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
     (hvd : hyp.v * hyp.d ≠ 1)
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)
     (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
     (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd))
@@ -676,7 +676,7 @@ theorem Hypothesis.tau1T_ofHonest_apply_induce_sub [Finite G]
     (hθ'Q : ¬ (((hyp.Q.subgroupOf hyp.T).subgroupOf (hyp.K.subgroupOf hyp.T) :
         Set ↥(hyp.K.subgroupOf hyp.T)) ⊆
       OddOrder.Peterfalvi.S03.characterKernel θ')) :
-    hyp.tau1T_ofHonest hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+    hyp.tau1T_ofHonest hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
         (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ
           - ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ')
       = ClassFunction.induce hyp.T
@@ -694,7 +694,7 @@ theorem Hypothesis.tau1T_ofHonest_apply_induce_sub [Finite G]
     rw [ClassFunction.sub_apply,
       OddOrder.RepresentationTheory.ClassFunction.induce_apply_one,
       OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, hθ1, hθ'1, sub_self]
-  exact hyp.tau1T_ofHonest_extends_on_supported hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief _
+  exact hyp.tau1T_ofHonest_extends_on_supported hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief _
     ⟨hsub, hyp.zSpan_sSet_degree_zero_support_T hG hvd hsub hdeg⟩
 
 /-! ### The (13.4) "pairwise orthogonal" dirr bricks (conjunct-5 producers)

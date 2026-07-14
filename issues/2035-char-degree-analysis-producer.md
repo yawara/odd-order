@@ -2673,3 +2673,30 @@ FeitThompson.lean ×4 (.1 追従、a-owned、statement 不変) self-flag: `2c96b
   cross-relation を直接証明 (S-side `tauS_mu_cross` の T-mirror を swap を使わず直に) —
   これが sweep 残余 (~45 binders) の唯一の unlock。de-swap 後に sweep 再適用 →
   CDS summit の T_isTypeP2_gate summon 切除 → 0116 Finding-2 完了。
+
+## 2026-07-15 更新 #86 (lane b, /loop iter 12) — ★ de-swap + 全 sweep 完了 — T_isTypeP2_gate を供給 chain から切除
+
+- **`a896c657`**: 0116 Finding-2 の供給側解消:
+  - **`eta_diff_rigidity_col`** (S16_GridExpansion 新設): (3.8) rigidity の列固定形。抽象 engine
+    (`orthonormalGrid_diff_rigidity`) は任意の 2 格子点を取る — 行固定は wrapper の statement
+    だけだったので、同一 body の (P1,P2) 差替えのみ。
+  - **`tauT_nu_cross` de-swap**: swap-transpose ending を列固定 rigidity の直接適用に置換 →
+    cross pair (`tauT_nu_cross`/`tauT_nuRow_diff_eq`) は **IsTypeP + axiom-clean**。
+  - **中間 chain 全 sweep**: TSetMemberRFamily / PairBoundT / StepsT / SevenEightT /
+    CaseACoherenceT / NuRowPin / Tau1T — R-family・(9.11)-T refuter・pin・τ₁T carrier が
+    全て一般 type P で稼働。
+  - **CDS summit**: θ-package chain の gate summon を ungated `T_isTypeP` に置換。
+    `tSide_theta_package_of_not_caseB_core` の残 sorryAx 源 = **nuGridSupply (a、9096) のみ**。
+- **gate の残 citer = `d_eq_one` / `T_caseB_v_eq_full` の 2 箇所のみ** (swap route =
+  (13.12)/(13.15)-at-T、swap の S_typeP2 field が honest 入力 — 設計どおり keep)。
+- **hub 0116 宛**: sequencing (i) の hT2 弱化は**実装完了** (裁定 #82 → root #82-84 →
+  sweep #85-86)。Route T の threading param 型は確定 (供給 chain = IsTypeP、conclusional =
+  IsTypeP2 keep)。(ii) (a の OrderDetermination cluster 静穏化) 成立確認後に Route T 実施可。
+
+## 📎 HUB 追記 (2026-07-15, 0116 調整): NormEstimates hold 撤回 — b の #22 campaign は即進行可
+
+0116 の hub Phase 1 claim (tick 55) は精読の結果**撤回** (詳細 = 0116 自己訂正節): 5 obtain-site
+の flip は CDD atom 層の core/lam 化と不可分で、それは b の #22 rebase campaign の層。
+**「NormEstimates:806 / CountingLayer:1805 は hub landing 後に」の hold は無効 — b は #22 を
+順序どおり進めてよい**。hub は #22 の NormEstimates/CountingLayer 到達後に full flip
+(obtain-site param 化 + discharge leaf + legacy retire) を実施する。

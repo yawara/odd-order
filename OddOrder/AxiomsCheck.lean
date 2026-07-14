@@ -8181,3 +8181,9 @@ whose centralizer in `P` is nontrivial. -/
   OddOrder.Peterfalvi.S15.exists_sylow_mem_inf_centralizer_ne_bot_of_not_isCyclic
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S15.caseA_exists_sylow_mem_inf_centralizer_ne_bot_of_parameters
+
+/-! **Peterfalvi (14.6), ambient Sylow carrier.**  For every ambient subgroup containing `U`,
+the noncyclic `R₀ ∈ Syl_r(U)` extends to a Sylow `r`-subgroup while retaining the BG Prop. 1.16
+centralizer witness. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.exists_sylow_over_U_with_centralizer_witness_of_not_isCyclic
