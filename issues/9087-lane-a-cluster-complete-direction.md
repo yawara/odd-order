@@ -637,3 +637,29 @@ mp producer の legacy sorryAx 除去は Section 16 named input producer 実構�
 (statement/signature/構造変更なし)、(2) 単独 commit + commit message で self-flag
 (cross-lane carve-out 明記)、(3) landing で carve-out 失効 (standing でない)、
 (4) build green + `#print axioms` で mp→inputs chain の clean 化を実測して本 issue に記録。
+
+## ✅ UPDATE (2026-07-14 lane a): faithful Theorem A consumer rewire landed
+
+HUB RULING tick 36 の one-time proof-only carve-out を commit **abac8ca9**
+(`fix(bg): use faithful Theorem A in tame embedding`) で完遂。対象は
+`S16_MainResults/TaxonomyOutput.lean` の legacy `theoremA_maximal_structure` cite 3 箇所のみで、すべて
+`theoremA_maximal_structure_faithful hG hM hKM hUM hK rfl hU` に置換した。statement / signature /
+structure / comment の変更はなく、同 file の legacy cite は 0 件。carve-out は本 landing で失効。
+
+### 公理監査 (dependency closure rebuild 後)
+
+次の 12 宣言はすべて正確に **`[propext, Classical.choice, Quot.sound]`** のみに依存し、`sorryAx` なし:
+
+- BG §16: `theoremII_tame_embedding_of_inputs`, `theoremII_tame_embedding`
+- Peterfalvi §10: `dadeSupportHypothesisData_of_subset`, `dadeSupportHypotheses_typeI`
+- Peterfalvi §14: `hypothesis_of_typeIData`, `typeI_frobenius`, `not_all_maximal_typeI`,
+  `theorem88_caseB_holds`
+- FT spine inputs: `exists_section16MaximalPair_data`, `section16MaximalPair_of_isMinimalSimpleOdd`,
+  `section16Inputs_of_isMinimalSimpleOdd`, `sectionSixteenHypothesis_of_isMinimalSimpleOdd`
+
+### Build evidence
+
+- `lake build OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TaxonomyOutput` — green (3208 jobs)
+- `lake build OddOrder.FeitThompson` — green (4181 jobs)
+- `lake build OddOrder.AxiomsCheck` — green (4189 jobs)
+- `lake build OddOrder` — green (4204 jobs)
