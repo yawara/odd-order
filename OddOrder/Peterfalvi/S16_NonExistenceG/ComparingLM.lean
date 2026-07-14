@@ -1,4 +1,5 @@
 import OddOrder.Peterfalvi.S16_NonExistenceG.BetaVanishing
+import OddOrder.Peterfalvi.S16_PairingBessel
 
 /-!
 # TAIL
@@ -1621,5 +1622,183 @@ theorem nonexistence_of_G [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     False := by
   rcases field_normalizer_structure hG hnoV hncH0C hyp with ⟨data⟩
   exact (not_lt_of_ge (bgAppendixC data)) hyp.q_lt_p
+
+/-! ## The (14.14) producer -/
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The Peterfalvi (14.14) producer** (Coq `LM_cases`, PFsection14.v:1059-1099): the
+`OrthogonalitySwitchData` carrier constructed from the landed (7.9) dichotomy
+(`pairing_dichotomy`) and the single-branch Bessel bounds
+(`bessel_bound_of_inner_beta_zeta_ne_zero`).
+
+* `caseA`/`caseB` are the two concrete pairing alternatives of the dichotomy
+  (`⟨β_M^τ, ζ_L^ν⟩ ≠ 0` / `⟨β_L^τ, ζ_M^ν⟩ ≠ 0` in the `Hypothesis79` phrasing); their
+  disjunction is `orthogonalitySwitch_caseA_or_caseB` below.
+* `caseA_bound`: the branch Bessel bound `(h_L−1)/e_L ≤ e_M − 1` becomes `(h−1)/pq ≤ pq − 1`
+  via `e_L = pq` (`typeICoherent78_index_eq_pq`), `|H_L| = h`
+  (`typeICoherent78_card_kernel_eq_h`), and `e_M ≤ pq` (`complementIndex_le_pq` — the
+  unconditional (13.17.c)-dual bound; the paper's `e_M = pq` is not needed).
+* `caseB_params`: the swapped bound `(k−1)/e_M ≤ e_L − 1 = pq − 1` is weakened monotonically to
+  `(v−1)/pq ≤ pq − 1` using `v ≤ k` (`V ≤ K` — the (13.17) Fitting inclusion
+  `typeI_overNormalizer_V_le_fitting` — with `|V| = v` from the unconditional
+  `T_caseB_facts_unconditional` `D = ⊥`), sidestepping the paper's `K = V` (14.11) forward
+  reference; then the proven arithmetic `caseB_forces_q_three_and_p_five` with the (14.4)
+  `v`-value gives `(q, p) = (3, 5)`.
+* `caseB_pairing` is the branch witness itself (`IsMinimalSimpleOdd` is a `Prop`, so the
+  re-quantified `hG'` is definitionally the fixed `hG`). -/
+noncomputable def orthogonalitySwitchData_of_coherent78 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    {hyp : Hypothesis (G := G)} (nc : NonConjugateHypothesis hyp)
+    (dataL : TypeICoherent78Data nc.Ldata.L) (dataM : TypeICoherent78Data nc.Mdata.M) :
+    OrthogonalitySwitchData nc where
+  caseA := ClassFunction.inner
+      ((hypothesis79OfNonconjugate dataL dataM hG nc.Ldata.L_maximal nc.Mdata.M_maximal
+          nc.not_conj).second.beta)
+      ((hypothesis79OfNonconjugate dataL dataM hG nc.Ldata.L_maximal nc.Mdata.M_maximal
+          nc.not_conj).firstZetaImage) ≠ 0
+  caseA_bound := by
+    intro hA
+    -- Bessel: `(h_L − 1)/e_L ≤ e_M − 1`.
+    have hb := bessel_bound_of_inner_beta_zeta_ne_zero dataL dataM hG
+      nc.Ldata.L_maximal nc.Mdata.M_maximal nc.not_conj hA
+    -- `|kernelIn_L| = h`.
+    have hcard : Nat.card ↥dataL.kernelIn = nc.h := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe dataL.kernel_le).toEquiv]
+      exact OrthogonalitySwitchData.typeICoherent78_card_kernel_eq_h nc dataL
+    -- `e_L = pq`.
+    have hkerL : dataL.kernelIn = (maxNilpotentNormalHall nc.Ldata.L).subgroupOf nc.Ldata.L := by
+      show (dataL.typeIHyp.typeI.typeF.H).subgroupOf nc.Ldata.L = _
+      rw [dataL.typeIHyp.typeI.typeF.H_eq]
+    have hidx : (dataL.kernelIn).index = hyp.base.p * hyp.base.q := by
+      rw [hkerL]
+      exact OrthogonalitySwitchData.typeICoherent78_index_eq_pq hG nc.Ldata dataL
+    -- `e_M ≤ pq` (`complementIndex_le_pq` through the canonical-kernel identification).
+    have hkerM : dataM.kernelIn = (nc.Mdata.K).subgroupOf nc.Mdata.M := by
+      show (dataM.typeIHyp.typeI.typeF.H).subgroupOf nc.Mdata.M = _
+      rw [dataM.typeIHyp.typeI.typeF.H_eq, nc.Mdata.K_eq_MF]
+    have hceM : (dataM.h78 hG).complementIndex = (dataM.kernelIn).index := by
+      show Nat.card ↥nc.Mdata.M / Nat.card dataM.kernel = (dataM.kernelIn).index
+      rw [show Nat.card dataM.kernel = Nat.card ↥dataM.kernelIn from
+          (dataM.kernelOrder_eq hG) ▸ rfl,
+        ← Subgroup.index_mul_card dataM.kernelIn, Nat.mul_div_cancel _ Nat.card_pos]
+    have heM_le : (dataM.h78 hG).complementIndex ≤ hyp.base.p * hyp.base.q := by
+      rw [hceM, hkerM, ← nc.Mdata.e_eq_index]
+      exact nc.Mdata.complementIndex_le_pq hG
+    -- assemble in `ℚ`.
+    have h1le : 1 ≤ nc.h := by rw [nc.h_eq_card_H]; exact Nat.card_pos
+    have hpq1 : 1 ≤ hyp.base.p * hyp.base.q :=
+      Nat.one_le_of_lt (Nat.one_lt_mul_iff.mpr
+        ⟨hyp.base.p_prime.pos, hyp.base.q_prime.pos, Or.inl hyp.base.p_prime.one_lt⟩)
+    rw [hcard, hidx] at hb
+    calc ((nc.h - 1 : ℕ) : ℚ) / (hyp.base.p * hyp.base.q : ℚ)
+        = ((nc.h : ℚ) - 1) / (((hyp.base.p * hyp.base.q : ℕ) : ℚ)) := by
+          rw [Nat.cast_sub h1le]; push_cast; ring_nf
+      _ ≤ (((dataM.h78 hG).complementIndex : ℕ) : ℚ) - 1 := hb
+      _ ≤ ((hyp.base.p * hyp.base.q - 1 : ℕ) : ℚ) := by
+          have h2 : ((dataM.h78 hG).complementIndex : ℚ) ≤
+              ((hyp.base.p * hyp.base.q : ℕ) : ℚ) := by exact_mod_cast heM_le
+          rw [Nat.cast_sub hpq1]
+          push_cast at h2 ⊢
+          linarith
+  caseB := ClassFunction.inner
+      ((hypothesis79OfNonconjugate dataL dataM hG nc.Ldata.L_maximal nc.Mdata.M_maximal
+          nc.not_conj).first.beta)
+      ((hypothesis79OfNonconjugate dataL dataM hG nc.Ldata.L_maximal nc.Mdata.M_maximal
+          nc.not_conj).secondZetaImage) ≠ 0
+  caseB_params := by
+    intro hB
+    -- swapped Bessel: `(k − 1)/e_M ≤ e_L − 1`.
+    have hnc' : ¬ OddOrder.BG.Ch4.S14.IsConjugateSubgroup nc.Mdata.M nc.Ldata.L :=
+      fun h => nc.not_conj h.symm
+    have hb := bessel_bound_of_inner_beta_zeta_ne_zero dataM dataL hG
+      nc.Mdata.M_maximal nc.Ldata.L_maximal hnc' hB
+    -- `|kernelIn_M| = k`, `e_M = kernelIn_M.index ≤ pq`, `e_L(complementIndex) = pq`.
+    have hkerM : dataM.kernelIn = (nc.Mdata.K).subgroupOf nc.Mdata.M := by
+      show (dataM.typeIHyp.typeI.typeF.H).subgroupOf nc.Mdata.M = _
+      rw [dataM.typeIHyp.typeI.typeF.H_eq, nc.Mdata.K_eq_MF]
+    have hkerK : dataM.kernel = nc.Mdata.K := by
+      rw [nc.Mdata.K_eq_MF]
+      exact dataM.typeIHyp.typeI.typeF.H_eq
+    have hcardM : Nat.card ↥dataM.kernelIn = nc.Mdata.k := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe dataM.kernel_le).toEquiv, hkerK]
+      exact nc.Mdata.k_eq_card_K.symm
+    have hidxM : (dataM.kernelIn).index = nc.Mdata.e := by
+      rw [hkerM, ← nc.Mdata.e_eq_index]
+    have heL : (dataL.h78 hG).complementIndex = hyp.base.p * hyp.base.q :=
+      OrthogonalitySwitchData.typeICoherent78_complementIndex_eq_pq hG nc.Ldata dataL
+    rw [hcardM, hidxM, heL] at hb
+    -- `v ≤ k` (`V ≤ K` + `|V| = v`), `e_M ≤ pq`.
+    have hTII := T_typeII hG hnoV hncH0C hyp
+    have hMI : IsTypeI nc.Mdata.M := ⟨nc.Mdata.typeIHyp.typeI⟩
+    have hVK : hyp.base.V ≤ nc.Mdata.K := by
+      rw [nc.Mdata.K_eq_MF]
+      exact OddOrder.Peterfalvi.S15.typeI_overNormalizer_V_le_fitting hG hnoV hyp.base hTII
+        nc.Mdata.M_maximal hMI nc.Mdata.normalizer_V_le_M
+    obtain ⟨hDbot, hv, -⟩ := OddOrder.Peterfalvi.S15.T_caseB_facts_unconditional hG hyp.base
+    have hVcard : Nat.card ↥hyp.base.V = hyp.base.v := by
+      have hd1 : hyp.base.d = 1 := by
+        rw [hyp.base.d_eq_card_D, hDbot, Subgroup.card_bot]
+      rw [hyp.base.card_V_eq_vd, hd1, mul_one]
+    have hvk : hyp.base.v ≤ nc.Mdata.k := by
+      rw [← hVcard, nc.Mdata.k_eq_card_K]
+      exact Subgroup.card_le_of_le hVK
+    have heM_le : nc.Mdata.e ≤ hyp.base.p * hyp.base.q := nc.Mdata.complementIndex_le_pq hG
+    -- `(v−1)/pq ≤ (k−1)/e_M ≤ pq − 1`, then the proven (14.14.b) arithmetic.
+    have hpq_pos : (0 : ℚ) < ((hyp.base.p * hyp.base.q : ℕ) : ℚ) := by
+      exact_mod_cast Nat.mul_pos hyp.base.p_prime.pos hyp.base.q_prime.pos
+    have heM_pos : (0 : ℚ) < (nc.Mdata.e : ℚ) := by
+      have : 0 < nc.Mdata.e := by
+        rw [nc.Mdata.e_eq_index]
+        exact Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite
+      exact_mod_cast this
+    have hbound : ((hyp.base.v - 1 : ℕ) : ℚ) / ((hyp.base.p * hyp.base.q : ℕ) : ℚ) ≤
+        ((hyp.base.p * hyp.base.q - 1 : ℕ) : ℚ) := by
+      have hstep : ((hyp.base.v - 1 : ℕ) : ℚ) / ((hyp.base.p * hyp.base.q : ℕ) : ℚ) ≤
+          ((nc.Mdata.k : ℚ) - 1) / (nc.Mdata.e : ℚ) := by
+        have hnum : ((hyp.base.v - 1 : ℕ) : ℚ) ≤ (nc.Mdata.k : ℚ) - 1 := by
+          have hv1 : 1 ≤ hyp.base.v := by
+            rw [← hVcard]; exact Nat.card_pos
+          have h2 : (hyp.base.v : ℚ) ≤ (nc.Mdata.k : ℚ) := by exact_mod_cast hvk
+          rw [Nat.cast_sub hv1]
+          push_cast at h2 ⊢
+          linarith
+        have hden : (nc.Mdata.e : ℚ) ≤ ((hyp.base.p * hyp.base.q : ℕ) : ℚ) := by
+          exact_mod_cast heM_le
+        have hnum0 : (0 : ℚ) ≤ ((hyp.base.v - 1 : ℕ) : ℚ) := by positivity
+        calc ((hyp.base.v - 1 : ℕ) : ℚ) / ((hyp.base.p * hyp.base.q : ℕ) : ℚ)
+            ≤ ((hyp.base.v - 1 : ℕ) : ℚ) / (nc.Mdata.e : ℚ) := by gcongr
+          _ ≤ ((nc.Mdata.k : ℚ) - 1) / (nc.Mdata.e : ℚ) := by gcongr
+      have hpq1 : 1 ≤ hyp.base.p * hyp.base.q :=
+        Nat.one_le_iff_ne_zero.mpr
+          (Nat.mul_ne_zero hyp.base.p_prime.ne_zero hyp.base.q_prime.ne_zero)
+      have hb' : ((nc.Mdata.k : ℚ) - 1) / (nc.Mdata.e : ℚ) ≤
+          ((hyp.base.p * hyp.base.q - 1 : ℕ) : ℚ) := by
+        rw [Nat.cast_sub hpq1, Nat.cast_one]
+        exact hb
+      exact hstep.trans hb'
+    exact hyp.caseB_forces_q_three_and_p_five hv hbound
+  caseB_pairing := fun hB _hG' => ⟨dataL, dataM, hB⟩
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The (14.14) dichotomy for the producer**: the constructed `OrthogonalitySwitchData`'s two
+cases are the (7.9) `pairing_dichotomy` alternatives, so one of them holds. -/
+theorem orthogonalitySwitch_caseA_or_caseB [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    {hyp : Hypothesis (G := G)} (nc : NonConjugateHypothesis hyp)
+    (dataL : TypeICoherent78Data nc.Ldata.L) (dataM : TypeICoherent78Data nc.Mdata.M) :
+    (orthogonalitySwitchData_of_coherent78 hG hnoV hncH0C nc dataL dataM).caseA ∨
+      (orthogonalitySwitchData_of_coherent78 hG hnoV hncH0C nc dataL dataM).caseB := by
+  rcases pairing_dichotomy dataL dataM hG nc.Ldata.L_maximal nc.Mdata.M_maximal
+      nc.not_conj with hfirst | hsecond
+  · right
+    unfold orthogonalitySwitchData_of_coherent78
+    exact hfirst
+  · left
+    unfold orthogonalitySwitchData_of_coherent78
+    exact hsecond
 
 end OddOrder.Peterfalvi.S16
