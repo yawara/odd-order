@@ -2288,3 +2288,25 @@ CharacterDegreeSupply:55 の mirror ~100 行; 反例列 = ν-row との直交) �
 `tau1T_ofHonest_induce_inner_eta` (conjunct 4 producer) → `tau1T_ofHonest_apply_induce_sub`
 (conjunct 3 producer; θ(1)=1 仮説版 — K-abelian 不要) → package 本体
 (conjunct 3 の r' 量化 restate + consumer thread + 組立)。
+
+## 2026-07-14 更新 #71 (lane b, /loop iter 34) — θ-package conjunct 2-4 producers 完備
+
+S15_Tau1T.lean 700 行 (build 一発 green):
+- **`induce_K_mem_zSpan_sSet_irr_T`** (sorry-free・axiom-clean): irr 版 membership —
+  Ind_K^T θ 自身が irr なら全 nonzero 係数 constituent が irr member (反例 = ν-row との
+  直交性 ⟨Ind θ, ν_i⟩ = 0 vs k·p > 0; S 版の μ→ν 機械 mirror)。
+- `tau1T_ofHonest_zSpanIrr_inner_eta` (span 帰納 + (5.3.b)-T crux)
+- **`tau1T_ofHonest_induce_inner_eta`** = conjunct 4 producer (τ₁T sorryAx profile)
+- **`tau1T_ofHonest_apply_induce_sub`** = conjunct 3 producer (θ(1)=1 明示仮説版 —
+  S 版の H-abelian 経由を回避、K-abelian 不要)
+
+**θ-package の τ₁ 側部材が全て揃った**: conjunct 2 = indK_sub_nuRow_support ✓ (#40) /
+conjunct 3 = apply_induce_sub ✓ + nuRow_eta_row ✓ (r'-形) / conjunct 4 = induce_inner_eta ✓。
+
+次 = package 本体組立 (CharacterDegreeSupply): (a) `tSide_theta_package_of_not_caseB_core` の
+conjunct 3 を「∃ r' ≠ 0」量化に restate + 供給 producer 束線 (pins = hyp.nuGridSupply hG
+[sorried a-owned] / hvd = vd_ne_one / Tdata 系 = reconciled_typePData_T / hT2 = SAndTBasic:192
+経由 / chief = exists_chiefFactorData / θ-witness = thetaWitness_of_not_caseB) →
+(b) consumer `lambda_forces_T_caseB_core` の hβform r'-thread → (c) conjunct 5 (S/T cross
+直交、step 6) は package 内で θG = τ₁T(θT) 形から導出予定 (τ₁λ ⊥ η-grid ✓ +
+disjoint-support h0 パターン)。CharacterDegreeSupply に import S15_Tau1T 追加要 (DAG ✓ 無循環)。

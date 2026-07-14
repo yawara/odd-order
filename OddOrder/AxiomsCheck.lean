@@ -8100,3 +8100,4 @@ through `T' = huSub`, constituent kernel transfer), and the degree-`0` `A(T)`-su
 `ℤ[𝒯]`-elements. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.induce_K_mem_zSpan_T
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.zSpan_sSet_degree_zero_support_T
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.induce_K_mem_zSpan_sSet_irr_T
