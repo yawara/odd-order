@@ -8216,3 +8216,13 @@ the (14.5) type-I-over-normalizer carrier supplies the concrete conjugate `W₂^
   OddOrder.Peterfalvi.S15.prime_dvd_sq_sub_one_of_frobenius_omega1Center
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S15.TypeIOverNormalizerData.prime_dvd_sq_sub_one_of_omega1Center
+
+/-! **Peterfalvi (14.6), final case-A contradiction.**  A prime
+`r ∣ (p - 1) / 2` has a noncyclic Sylow subgroup in `U`; center trapping and the
+fixed-point-free `W₂^y` action give `p ∣ r² - 1`.  Odd-prime comparison gives
+`p < r`, contradicting `r ≤ (p - 1) / 2`.  The case-A parameter equalities are
+explicit inputs, so this capstone does not use the issue-0116 analytic producer. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.false_of_odd_primes_dvd_half_and_sq_sub_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.caseA_false_of_parameters_and_typeIOverNormalizerData
