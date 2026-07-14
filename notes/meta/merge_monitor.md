@@ -641,6 +641,21 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 53) — ★ b が 0116 条件 (i) を裁定+ROOT 実装 (hT2 弱化 = IsTypeP)。census 37**:
+  **a=1** (`ce809790` = sharp Sylow noncyclicity の S11_CaseAOddPartBound transport
+  (claim 1032 完備、9101 の続き)。merge)。
+  **b=2** (`e442b8fe` = ★ **hT2-weakening ROOT** — 弱化型 = **`S14.IsTypeP hyp.T`** に裁定
+  (T_typeII_or_III_or_IV + type classification で ungated 供給 ✓、Coq PFsection13 context 一致)。
+  `typeP_exists_kappa_hall_pair` (P₁ 枝 K₀:=E/U₀:=⊥) + `dadeSupportHypothesisData_honestTypeP2ASet`
+  の hP2→hTP 弱化 — **Dade 層 root の (14.9)-循環は解消**。HonestTypeP2A0 への 2 行 proof 追従は
+  🔩 (c content 非接触)。#83 で per-site 表 (~72 binders/~181 sites/9 files): 供給 chain =
+  機械的 mega-sweep 対象 / StepsT gap-patch hHMs (Q=Mσ、II-only) = 唯一の genuine-math root 残
+  (fix 素描済 = 正規 σ-Hall 吸収)。merge)。**c=0** (hold 継続)。
+  build green 4219 jobs ×2 / AxiomsCheck OK / census **37 不変** / 新 axiom なし / 逸脱なし。
+  push 済 (main = 7f7cac91)。
+  **0116 追跡**: **条件 (i) = 設計解決 ✓** (弱化型 IsTypeP 確定)。実装 mega-sweep が Route T の
+  thread 対象 file 群を書き換え中のため、**Route T 実施は sweep landing 後** (新 sequencing)。
+  条件 (ii) 成立継続。
 - **2026-07-14 (tick 52) — a field-model/Sylow 2 leaf + b rebase bricks 1-3。census 37 不変**:
   **a=2** (`d19dba88`/`303b1d73` = **(9.7.b) case B chief-factor field model** (新 leaf
   S11_GaloisFieldModel、issue 1031) + **noncyclic sharp scalar Sylow 強制** (shared
