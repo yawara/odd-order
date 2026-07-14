@@ -1804,3 +1804,29 @@ S_U_commutative)」から出す。T-side の対応 cSub-T = D で **D abelian �
   step 2 uniform degree。
 
 次: 「nilpotent + cyclic abelianization → abelian」の所在確認 → V_commutative_of_caseB 構築。
+
+## 2026-07-14 更新 #43 (lane b, /loop iter 6 続) — shared lemma landed + V_commutative_of_caseB 組み立て経路確定
+
+**landed**: `OddOrder/GroupTheory/NilpotentCyclicAbelianization.lean` (新 shared leaf、sorry-free、
+mathlib のみ依存): `commutator_eq_bot_of_isCyclic_quotient` + `isMulCommutative_of_isNilpotent_of_isCyclic_quotient`
+(H nilpotent + H/H' cyclic → abelian; H⧸⁅H',⊤⁆ の central-kernel × cyclic quotient → mathlib
+`MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center` → lcs stabilization)。
+
+**`isMulCommutative_V_of_caseB` の組み立て経路 (次 iteration)**:
+- 置き場所: S15_CharacterDegreeSupply (θ-witness 機構の隣; II 分岐が S15_SAndTBasic の
+  isMulCommutative_V を使うため Setup 配下は不可)。
+- T_nonI 分岐: **II** = isMulCommutative_V (既存、IsTypeII 直) / **V** = no_typeV 排除 /
+  **III/IV** = 以下:
+  1. `Ubar_cyclic` (CliffordCaseBData field): IsCyclic (uActionHom setupT chief).range。
+     **setupT.typeP.U = V (reconciled choose_spec.1) なので domain は V-sub、ker.map = cSub = D
+     (cSub_eq_D 済)** → V/D ≅ range cyclic (quotientKerEquivRange、
+     mkSection11CharacterDataT_v_eq の key と同じ構図)。
+  2. **D ≤ V'** ((11.6) deep 側): S13 chain (exists_hypothesis_of_typeIIIorIVorV →
+     exists_hypothesis_of_isTypeIIIorIV → core_structure 第 4 成分 C = U') は witness
+     w.U ≠ V なので **conjugation transport**: V = g • w.U (Schur–Zassenhaus
+     exists_conj_of_coprime、isMulCommutative_V の証明パターン)、Q normal →
+     D = V ⊓ C(Q) = g • (w.U ⊓ C(Q)) = g • s13.C = g • w.U' = (g • w.U)' = V'。
+  3. D ≤ V' + V/D cyclic → V/V' cyclic (cyclic の quotient) + V nilpotent (isNilpotent_V)
+     → 新 shared lemma → IsMulCommutative ↥V。
+- 帰結: `Cprime-T = derivedInG D = ⊥` (D ≤ V' … V abelian → V' = ⊥ → D = ⊥!実は V abelian
+  なら D ≤ V' = ⊥ で **D = ⊥ まで出る**) → sSet_eq_sOf_H0Cprime-T → step 2 uniform degree。
