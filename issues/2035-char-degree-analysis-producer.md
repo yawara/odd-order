@@ -2097,3 +2097,63 @@ Galois case の 𝒯 全 family coherence on dadeHypT — (5.7) uniform-degree e
 残 (#41): step 3 caseA-T (base cut + generic reduction + M-common (9.11.7-8) refuter cite) /
 step 4 dispatch + ν-row pin / step 5 τ₁T + (5.3.b)-T + conjunct 4 / step 6 conjunct 5 /
 step 7 package assembly。
+
+## 2026-07-14 更新 #62 (lane b, /loop iter 23) — caseA-T 設計監査 (次セッション引き継ぎ)
+
+S 版 caseA 構造の精査結果:
+- **base cut** `sSetIrrDeg_qa_coherent_indS_caseA` (HypothesisBasics:523): degree-q·a irr cut の
+  coherence — T 版は degree-p·a cut (`sSetIrrDeg` は hyp.S 固定 def → T 版 def から要 mirror)。
+- **reduction** `coherent_of_maximal_coherent_pair_refuted` (S07 generic) ✓ そのまま。
+- **refuter** `sSet_caseA_nineElevenRefutation` (CaseACoherence:514): **S 版自体が sorried**
+  (docstring に reuse map 記録済 — generic (9.11) apparatus は sOf-parametrized で T-instance
+  直接適用可、S-specific residual = caseA per-member R-family + (5.6) pair-bound、
+  M-common residual = (9.11.7-8)、issue 9083)。T 版は同構造の precisely-named sorried
+  obligation として立てる (S 版が閉じれば同機構で T も閉じる)。
+
+**caseA-T 実装順 (次セッション)**: sSetIrrDeg-T def + base cut mirror → dispatch
+(`sSet_coherent_indT_A`: clifford_dichotomy at mkSection11CharacterDataT、caseB 分岐 =
+`sSet_coherent_dade_caseB_T` ✓ + congrMap Ind 再接地 `tInstance_dade_eq_induce` ✓) →
+refuter-T (sorried、S 版 signature mirror) → step 4 pin (ν-row formula) → step 5 τ₁T +
+(5.3.b)-T + conjunct 4 → step 6-7 package。
+
+## 📌 セッション総括 (2026-07-14、lane b、iter 1-23)
+
+**T-side (13.3)/(13.4) 戦線の成果** (全 commit build green + axioms clean):
+1. 9096 bundle split (NuGridSupplyData pure grid 化 + swap hV) — hub ruling 実施
+2. (13.3.c) δ'ᵢ = 1 完全 assembly (v ≡ 1 mod p Frobenius 証明、|Q| 約分 counting)
+3. **card_Q_eq_qp**: |Q| = q^p **無条件** ((11.7) chain + order relation + no-typeV/IV)
+4. (13.3.a)-at-T: nu_i_isIndQD + nu_apply_one_eq_v (kernel collapse 込み)
+5. (13.3.b)-at-T: θ-witness dichotomy (T_caseB_facts_no_theta / thetaWitness_of_not_caseB)
+6. **isMulCommutative_V_unconditional** ((11.9.c) chain 発見による V-side (13.2.a) 完全 ungate)
+7. (13.4) conjunct 1-3 + support estimate (K ⊴ T + Ind vanishing)
+8. **caseB-T (9.11) coherence 完成** (`sSet_coherent_dade_caseB_T`): Dade 基盤 (dadeHypT/T0 +
+   dade=Ind bridges + regular vanishing)、R-family (irr 2-element + red 2p-element route-B、
+   tauT_nu_cross は swap-transpose rigidity)、(5.2.e) orthogonality、(5.7) engine — 全て
+   sorry-free、pins/hT2/Tdata パラメトリック。
+9. 重複 leaf 事故 (9086) の是正 + claim-before-build 教訓の memory 記録。
+
+残 sorry (b 関連): nuGridSupply (a-owned producer)、tSide_theta_package (conjunct 4/5 待ち)、
+lambda_forces_T_caseB_core、caseA-T refuter (次セッション立て)。
+
+## 2026-07-14 更新 #63 (lane b, /loop iter 24) — sSetIrrDegT 基本層 landed
+
+TSetMemberRFamily (sorry-free、一発 build): `sSetIrrDegT` def (uniform-degree irr cut of 𝒯) +
+subset/closedUnderConjugate/hasNoRealCharacters/member_support_subset/member_diff_supported。
+
+caseA-T 残 chain: `sSetIrrDegT_coherent` (cut 上の uniform engine — S 版 HypothesisBasics 260-440
+の mirror、irr-only R-family で組む) → `_indT` (congrMap + tInstance_dade_eq_induce ✓) →
+`sSetIrrDegT_pa_two_le_ncard` ((9.8.d) caseA_exists_irreducible_qa の T-instance + conj doubling)
+→ `sSetIrrDegT_pa_coherent_indT_caseA` → dispatch `sSet_coherent_indT_A` → refuter-T (sorried、
+S 版 signature mirror)。
+
+## 2026-07-14 更新 #64 (lane b, /loop iter 25) — caseA-T base cut coherence 完成
+
+TSetMemberRFamily (sorry-free、一発 build): `sSet_member_differenceImage_T` (irr per-member
+R-datum over dadeHypT) / `sSetIrrDegT_finite` / **`sSetIrrDegT_subcoherent`** ((5.2)-subcoherence、
+irrSubcoherent + T 部材) / **`sSetIrrDegT_coherent`** ((5.7)∘(5.3.a) uniform-degree producer、
+base count h2 exposed — S 版と同じ honest pattern)。
+
+caseA-T 残: base count `sSetIrrDegT_pa_two_le_ncard` (generic `caseA_exists_irreducible_qa` の
+T-instance + conj doubling) → caseA assembly (`coherent_of_maximal_coherent_pair_refuted` +
+refuter-T sorried) → dispatch `sSet_coherent_dadeT_A` (clifford_dichotomy、caseB 分岐 =
+`sSet_coherent_dade_caseB_T` ✓)。
