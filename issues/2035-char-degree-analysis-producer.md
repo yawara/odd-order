@@ -2454,3 +2454,30 @@ pins/Tdata を thread する** (b 所有 file 内、consumer = `sSet_coherent_in
 残 bricks (文書順): (5.5)/(5.2.e)-T 前提 → `nineElevenSevenEightRefutationT` (~490 行 mirror)
 → `nineElevenNormBoundT` (~330 行) → `nineElevenEqualityRefutationT` (~90 行) → assembly
 (refuter sorry 置換 + dispatch 移設 or signature widen + NuRowPin 接続確認)。
+
+## 2026-07-14 更新 #76 (lane b, /loop iter 2) — ★★ refuter-T CLOSED — T-side (9.11) chain 全体 axiom-clean
+
+campaign 完遂 (計 5 commit、全て一発 or 微修正 green):
+- `aa5ecb5a` S15_NineElevenSevenEightT.lean (657 行): (5.5)-T を NuRowPin から移設 +
+  (5.2.e)-T cross_orthogonal + **`nineElevenSevenEightRefutationT`** ((9.11.7)-(9.11.8)
+  budget refutation、M→S→T の 3 段 mirror 完成)。
+- `7576e198` S15_CaseACoherenceT.lean (702 行): **`nineElevenNormBoundT`** +
+  **`nineElevenEqualityRefutationT`** + **`sSet_caseA_nineElevenRefutation_T` 実証明**
+  (monolithic sorry 置換) + dispatch 2 本を TSetMemberRFamily から移設 (caseA 側は
+  pins/Tdata thread で signature widen、`sSet_coherent_indT_A` は不変 pass-through)。
+  TSetMemberRFamily 1092→973 行。NuRowPin import 切替。
+
+**AxiomsCheck 12 assert 追加 — chain 全体が [propext, Classical.choice, Quot.sound] のみ**
+(sorryAx ゼロ): PairBoundT / STwoExtractionT / AlphaSupportT / FourNormInputsT /
+SevenEightRefutationT / NormBoundT / EqualityRefutationT / refuter / dispatch ×2 /
+**pinned carrier `sSet_coherent_indT_A_pinned`** / **`tau1T_ofHonest_nuRow_eta_row`**。
+⟹ (13.4) θ-package が thread する τ₁T carrier は入力仮説 (pins 等) を除き完全 clean。
+full build 4213 jobs / AxiomsCheck 4198 jobs green。
+
+**T-side campaign 残 gate (#74 の 4 → 3)**: nuGridSupply (a、9096) / T_isTypeP2_gate
+(0116 layer-inversion、hub) / **T_caseB_facts_no_lambda (b、次 frontier — no-λ T-mirror
+engine (13.9)-(13.12)-on-T + q<p ltqp、9094 RULING §4)**。
+
+⚠ file 分割 TODO (次 iteration 先頭): CountingLayer 2002 行 / CharacterDegreeSupply 2240 行が
+2000 上限超過 (linter warning 発火中、いずれも本 campaign 以前からの累積)。次の追記前に
+prefix-split する。
