@@ -1143,14 +1143,14 @@ noncomputable def Hypothesis.dadeHypT [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T) :
     OddOrder.Peterfalvi.S04.Hypothesis G (honestTypeP2ASet hyp.T) hyp.T :=
-  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.T_maximal hT2).some.dade
+  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.T_maximal hT2.1).some.dade
 
 /-- **(13.2.e) `T`-instance Dade `H`-conjugation invariance** (mirror of `dadeHypS_hconj`). -/
 theorem Hypothesis.dadeHypT_hconj [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T) :
     (hyp.dadeHypT hG hT2).HConjInvariant :=
-  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.T_maximal hT2).some.hconj
+  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.T_maximal hT2.1).some.hconj
 
 
 open OddOrder.Peterfalvi.S11 in

@@ -811,17 +811,17 @@ theorem honestTypeP2ASet_isConj_conj_in_M [Finite G] (hG : OddOrder.BG.IsMinimal
     b (honestTypeP2ASet_subset_ASet hG hM hKM hUM hKne hK hU hb) ⟨g, hg.symm⟩
   exact ⟨m, hmM, hmb.symm⟩
 
-/-- The `κ(M)`-Hall witness of a matched pair on a type-`P₂` maximal subgroup is nontrivial:
-`κ(M) ≠ ∅` (type `P₂` is a type-`P` predicate), a `κ`-prime `p` has positive `p`-rank in `M`
-(so `p ∣ |M|`) and avoids the index of a `κ(M)`-Hall subgroup, so it divides `|K₀|` — impossible
-for `K₀ = ⊥`. -/
-theorem kappaHall_ne_bot_of_isTypeP2 [Finite G] {M K₀ : Subgroup G}
-    (hP2 : OddOrder.BG.Ch4.S14.IsTypeP2 M)
+/-- The `κ(M)`-Hall witness on a type-`P` maximal subgroup is nontrivial (issue 2035 #82,
+weakened from `IsTypeP2` for the 0116 (i) hT2-weakening): `κ(M) ≠ ∅` by type `P`, a `κ`-prime
+`p` has positive `p`-rank in `M` (so `p ∣ |M|`) and avoids the index of a `κ(M)`-Hall
+subgroup, so it divides `|K₀|` — impossible for `K₀ = ⊥`. -/
+theorem kappaHall_ne_bot_of_isTypeP [Finite G] {M K₀ : Subgroup G}
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP M)
     (hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M)
       (K₀.subgroupOf M)) :
     K₀ ≠ ⊥ := by
   intro hK0bot
-  obtain ⟨p, hp⟩ := (OddOrder.BG.Ch4.S14.isTypeP_of_isTypeP2 hP2)
+  obtain ⟨p, hp⟩ := hTP
   -- `p ∈ κ(M) ⊆ π(M) = primeFactors |M|` (a κ-prime has `pRank_M p = 1 > 0`).
   haveI : Fact p.Prime := ⟨OddOrder.BG.Ch4.S14.prime_of_mem_kappa hp⟩
   have hprk : 0 < pRank ↥M p := by
@@ -842,6 +842,123 @@ theorem kappaHall_ne_bot_of_isTypeP2 [Finite G] {M K₀ : Subgroup G}
   -- but `K₀ = ⊥` makes `K₀.subgroupOf M = ⊥` of order `1`, which `p` cannot divide.
   rw [hK0bot, Subgroup.bot_subgroupOf, Subgroup.card_bot] at hpKcard
   exact hpp.one_lt.ne' (Nat.dvd_one.mp hpKcard)
+
+/-- **Matched `κ`-Hall / `(κ∪σ)'`-Hall pair for a type-`P` maximal subgroup** (issue 2035 #82,
+the 0116 Finding-2 hT2-weakening root; Coq `PFsection13` runs its §13 context at
+`FTtype ∈ {2,3,4}` without assuming type II).  Type `P₂` defers to
+`typeP2_exists_matched_kappa_hall_pair`; type `P₁` (`κ(M) = σ(M)'∩π(M)`, the type-III/IV case)
+takes `K₀ := E` (the `σ`-complement, which is exactly a `κ`-Hall since `κ` covers the
+complement primes) and `U₀ := ⊥` (vacuously `(κ∪σ)'`-Hall as `κ ∪ σ ⊇ π(M)`). -/
+theorem typeP_exists_kappa_hall_pair [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hTP : OddOrder.BG.Ch4.S14.IsTypeP M) :
+    ∃ K₀ U₀ : Subgroup G, K₀ ≤ M ∧ U₀ ≤ M ∧ K₀ ≠ ⊥ ∧
+      OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M)
+        (K₀.subgroupOf M) ∧
+      OddOrder.Isaacs.Ch03.IsHallSubgroup
+        ((OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+        (U₀.subgroupOf M) := by
+  classical
+  by_cases hP2 : OddOrder.BG.Ch4.S14.IsTypeP2 M
+  · obtain ⟨K₀, U₀, hKM, hUM, -, hK, hU, -, -⟩ :=
+      OddOrder.BG.Ch4.S16.typeP2_exists_matched_kappa_hall_pair hG hM hP2
+    exact ⟨K₀, U₀, hKM, hUM, kappaHall_ne_bot_of_isTypeP hTP hK, hK, hU⟩
+  · -- type `P₁`: `κ(M) = piSet(M) \ σ(M)`
+    have hκeq : OddOrder.BG.Ch4.S14.kappa M
+        = OddOrder.BG.Ch4.S14.sigmaComplementPrimes M := by
+      by_contra hne
+      exact hP2 ⟨hTP, hne⟩
+    obtain ⟨E, E₁, E₂, E₃, hsetup⟩ := OddOrder.BG.Ch3.S12.exists_subgroupESetup hG hM
+    -- the product formula `|M_σ| · |E| = |M|` (`M_σ ⊴ M` normalizes, trivial intersection)
+    have hnorm : E ≤ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma M) :=
+      hsetup.E_le.trans (OddOrder.GroupTheory.le_normalizer_opiCoreInG _ M)
+    have hdisj : Disjoint (OddOrder.BG.Ch3.S10.Msigma M) E :=
+      disjoint_iff.mpr hsetup.E_compl_inf
+    have hcard : Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) * Nat.card ↥E = Nat.card ↥M := by
+      rw [← OddOrder.BG.Ch1.S03f.card_sup_of_le_normalizer_of_disjoint hnorm hdisj,
+        hsetup.E_compl_sup]
+    -- `M_σ.subgroupOf M` is the `σ`-Hall; transport its card/index along the product formula
+    have hMσHall := OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hM
+    have hMσle : OddOrder.BG.Ch3.S10.Msigma M ≤ M :=
+      OddOrder.BG.Ch3.S10.Msigma_le M
+    have hcardMσ : Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+        = Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMσle).toEquiv
+    have hcardE : Nat.card ↥(E.subgroupOf M) = Nat.card ↥E :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hsetup.E_le).toEquiv
+    have hMne : Nat.card ↥M ≠ 0 := Nat.card_pos.ne'
+    -- `index (M_σ.subgroupOf M) = |E|` and `index (E.subgroupOf M) = |M_σ|`
+    have hidxMσ : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index = Nat.card ↥E := by
+      have h := Subgroup.card_mul_index ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+      rw [hcardMσ] at h
+      have h2 : Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M)
+          * ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index
+          = Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) * Nat.card ↥E := by
+        rw [h, hcard]
+      exact Nat.eq_of_mul_eq_mul_left Nat.card_pos h2
+    have hidxE : (E.subgroupOf M).index = Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) := by
+      have h := Subgroup.card_mul_index (E.subgroupOf M)
+      rw [hcardE] at h
+      have h2 : Nat.card ↥E * (E.subgroupOf M).index
+          = Nat.card ↥E * Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) := by
+        rw [h, ← hcard]; ring
+      exact Nat.eq_of_mul_eq_mul_left Nat.card_pos h2
+    -- `E ≠ ⊥`: otherwise `π(M) ⊆ σ(M)` and `κ(M) = ∅`, contradicting type `P`
+    have hEne : E ≠ ⊥ := by
+      intro hEbot
+      obtain ⟨p, hp⟩ := hTP
+      rw [hκeq] at hp
+      obtain ⟨hppi, hpσ⟩ := hp
+      have hpM : p ∣ Nat.card ↥M := by
+        have := hppi
+        unfold OddOrder.BG.Ch4.S14.piSet at this
+        exact (Nat.mem_primeFactors.mp this).2.1
+      have hcard' : Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) = Nat.card ↥M := by
+        rw [← hcard, hEbot, Subgroup.card_bot, mul_one]
+      have hpp : p.Prime := (Nat.mem_primeFactors.mp hppi).1
+      have hpMσ : p ∈ (Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)).primeFactors := by
+        rw [hcardMσ, hcard']
+        exact Nat.mem_primeFactors.mpr ⟨hpp, hpM, hMne⟩
+      exact hpσ (hMσHall.1 p hpMσ)
+    refine ⟨E, ⊥, hsetup.E_le, bot_le, hEne, ?_, ?_⟩
+    · -- `E` is `κ(M)`-Hall in `M` (`κ = piSet \ σ`)
+      constructor
+      · intro p hp
+        rw [hcardE] at hp
+        obtain ⟨hpp, hpE, -⟩ := Nat.mem_primeFactors.mp hp
+        rw [hκeq]
+        refine ⟨?_, ?_⟩
+        · unfold OddOrder.BG.Ch4.S14.piSet
+          have hEdvd : Nat.card ↥E ∣ Nat.card ↥M :=
+            ⟨Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M), by rw [← hcard]; ring⟩
+          exact Nat.mem_primeFactors.mpr ⟨hpp, hpE.trans hEdvd, hMne⟩
+        · intro hpσ
+          exact (hMσHall.2 p (by
+            rw [hidxMσ]
+            exact Nat.mem_primeFactors.mpr ⟨hpp, hpE, Nat.card_pos.ne'⟩)) hpσ
+      · intro p hp
+        rw [hidxE] at hp
+        rw [hκeq]
+        rintro ⟨-, hpσ⟩
+        exact hpσ (hMσHall.1 p (by rwa [hcardMσ]))
+    · -- `⊥` is `(κ∪σ)'`-Hall in `M`: `κ ∪ σ ⊇ π(M)`
+      constructor
+      · intro p hp
+        rw [Subgroup.bot_subgroupOf, Subgroup.card_bot] at hp
+        simp at hp
+      · intro p hp
+        rw [Subgroup.bot_subgroupOf, Subgroup.index_bot] at hp
+        have hcardM : Nat.card ↥((⊤ : Subgroup ↥M)) = Nat.card ↥M := by
+          simp
+        simp only [Set.mem_compl_iff, not_not]
+        by_cases hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M
+        · exact Set.mem_union_right _ hpσ
+        · refine Set.mem_union_left _ ?_
+          rw [hκeq]
+          refine ⟨?_, hpσ⟩
+          unfold OddOrder.BG.Ch4.S14.piSet
+          obtain ⟨hpp, hpM, -⟩ := Nat.mem_primeFactors.mp hp
+          exact Nat.mem_primeFactors.mpr ⟨hpp, by simpa using hpM, hMne⟩
 
 /-- **(13.2.e) `normedTI` core — no `A(S)`-point escapes** (Coq `FTtypeP_facts` (e) escaping
 exclusion, PFsection13.v:224-238): on a type-`P₂` maximal subgroup, every `a ∈ A(M)` has
@@ -864,15 +981,14 @@ theorem escaping_honestTypeP2ASet_eq_empty [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
-    (hP2 : OddOrder.BG.Ch4.S14.IsTypeP2 M) :
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP M) :
     OddOrder.GroupTheory.escapingCentralizerSet M (honestTypeP2ASet M) = ∅ := by
   classical
   rw [Set.eq_empty_iff_forall_notMem]
   rintro a ⟨haA, haesc⟩
   -- the matched `κ`-Hall / `(κ∪σ)′`-Hall pair, for the `σ`-sharp confinement (8.13.b)
-  obtain ⟨K₀, U₀, hKM, hUM, hUne, hK, hU, -, -⟩ :=
-    OddOrder.BG.Ch4.S16.typeP2_exists_matched_kappa_hall_pair hG hM hP2
-  have hKne : K₀ ≠ ⊥ := kappaHall_ne_bot_of_isTypeP2 hP2 hK
+  obtain ⟨K₀, U₀, hKM, hUM, hKne, hK, hU⟩ :=
+    typeP_exists_kappa_hall_pair hG hM hTP
   have haσ : a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M :=
     escaping_honestTypeP2ASet_mem_sigmaSharp hG hM hKM hUM hKne hK hU ⟨haA, haesc⟩
   -- BG Theorem D(4): the unique neighbour `N ⊇ C_G(a)` with the escape structure
@@ -902,9 +1018,9 @@ theorem escaping_honestTypeP2ASet_eq_empty [Finite G]
       exact Subtype.ext (Subgroup.mem_centralizer_singleton_iff.mp hzC).symm
     exact hxAN.2 (SetLike.mem_coe.mpr
       (by rw [← hker]; exact Subgroup.mem_subgroupOf.mp haker))
-  · -- `N` type `P₂`: the escape package makes `M` type `F`, contradicting type `P₂`.
+  · -- `N` type `P₂`: the escape package makes `M` type `F`, contradicting type `P`.
     obtain ⟨hFM, -⟩ := hP2imp hNP2
-    exact OddOrder.BG.Ch4.S14.not_isTypeP_and_isTypeF ⟨hP2.1, hFM⟩
+    exact OddOrder.BG.Ch4.S14.not_isTypeP_and_isTypeF ⟨hTP, hFM⟩
 
 /-- **Peterfalvi (8.15) for the type-`P₂` support `A(S)`: the Dade (2.2) support hypotheses hold.**
 The honest (13.2.e) foundation.  Assembles the `σ`-decomposition-generic engine
@@ -920,13 +1036,11 @@ field is the `S04.Hypothesis G (A(S)) M` (the `τ = Ind_M^G` Dade isometry lives
 the likely-unsound `sibleyTarget_H0C` route for the (13.3) `S`-instance coherence. -/
 theorem dadeSupportHypothesisData_honestTypeP2ASet [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
-    (hP2 : OddOrder.BG.Ch4.S14.IsTypeP2 M) :
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP M) :
     Nonempty (OddOrder.Peterfalvi.S10.DadeSupportHypothesisData M (honestTypeP2ASet M)) := by
   classical
-  obtain ⟨K₀, U₀, hKM, hUM, hUne, hK, hU, -, -⟩ :=
-    OddOrder.BG.Ch4.S16.typeP2_exists_matched_kappa_hall_pair hG hM hP2
-  -- `K₀ ≠ ⊥` (else `κ(M)` is empty, contradicting type `P₂ ⟹ κ(M) ≠ ∅`).
-  have hKne : K₀ ≠ ⊥ := kappaHall_ne_bot_of_isTypeP2 hP2 hK
+  obtain ⟨K₀, U₀, hKM, hUM, hKne, hK, hU⟩ :=
+    typeP_exists_kappa_hall_pair hG hM hTP
   refine OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_of_subset_escaping_sigmaSharp hG hM
     honestTypeP2ASet_subset (fun x hx => hx.2.1)
     (fun a ha => escaping_honestTypeP2ASet_mem_sigmaSharp hG hM hKM hUM hKne hK hU ha)
@@ -964,7 +1078,7 @@ inherited shared BG §16 Theorem-II pins, at exact parity with the accepted on-p
 noncomputable def Hypothesis.dadeHypS [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     OddOrder.Peterfalvi.S04.Hypothesis G (honestTypeP2ASet hyp.S) hyp.S :=
-  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.S_maximal hyp.S_typeP2).some.dade
+  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.S_maximal hyp.S_typeP2.1).some.dade
 
 /-- **(13.2.e) `S`-instance Dade `H`-conjugation invariance** (issue 1017): the `HConjInvariant` of
 `dadeHypS`, carried by the underlying `DadeSupportHypothesisData` (Peterfalvi (8.14)/(8.15), the
@@ -975,7 +1089,7 @@ so the isometry `dadeHypS.fullDadeIsometryData dadeHypS_hconj` is well-defined. 
 theorem Hypothesis.dadeHypS_hconj [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     (hyp.dadeHypS hG).HConjInvariant :=
-  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.S_maximal hyp.S_typeP2).some.hconj
+  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.S_maximal hyp.S_typeP2.1).some.hconj
 
 open scoped FiniteInduce in
 /-- **(13.2.e) `S`-instance `dade = Ind` bridge** (issue 1017): for the honest type-`P₂` maximal `S`,
@@ -1025,7 +1139,7 @@ theorem Hypothesis.dadeHypS_H_eq_ftSupportKernel [Fintype G] [Finite G]
     (a : {a : G // a ∈ honestTypeP2ASet hyp.S}) :
     (hyp.dadeHypS hG).H a =
       OddOrder.Peterfalvi.S10.ftSupportKernel hyp.S (honestTypeP2ASet hyp.S) a.1 :=
-  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.S_maximal hyp.S_typeP2).some.H_eq_ftSupportKernel a
+  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.S_maximal hyp.S_typeP2.1).some.H_eq_ftSupportKernel a
 
 /-- **(Rung B, reduction) No escaping `A(S)`-points ⟹ all `S`-instance Dade stabilizers vanish.**
 For the honest type-`P₂` support, `dadeHypS.H a = ftSupportKernel S (A(S)) a`
@@ -1084,7 +1198,7 @@ theorem Hypothesis.no_escaping_honestTypeP2ASet [Finite G]
     ∀ a ∈ honestTypeP2ASet hyp.S,
       a ∉ OddOrder.GroupTheory.escapingCentralizerSet hyp.S (honestTypeP2ASet hyp.S) := by
   intro a _ ha
-  rw [escaping_honestTypeP2ASet_eq_empty hG hnoV hyp.S_maximal hyp.S_typeP2] at ha
+  rw [escaping_honestTypeP2ASet_eq_empty hG hnoV hyp.S_maximal hyp.S_typeP2.1] at ha
   exact Set.notMem_empty a ha
 
 /-- **(13.2.e) for the `S`-instance, stabilizer form: every `S`-instance Dade stabilizer is
