@@ -671,3 +671,47 @@ hub tick 37 の follow-up (i) を commit **07787735**
 `#assert_only_allowed_axioms` を追加したため、将来 legacy cite が再導入されれば CI が検出する。
 `lake build OddOrder.AxiomsCheck` は green (4189 jobs、12/12 が標準3公理のみ)、
 full `lake build OddOrder` も green (4204 jobs)。
+
+## ✅ FINAL (2026-07-15 lane a): lane A 完遂 — 現割当 frontier なし
+
+前節以後の hub 裁定・追加 carve-out をすべて完遂した。
+
+- **0115 OrderDetermination 移管**: (13.11)--(13.15) の実定理を real Clifford certificate から
+  証明済み。`caseB_order_u_data` だけは hub 裁定どおり legacy S16 consumer 用の明示的な
+  temporary compatibility bridge として維持し、本物の (13.15) theorem はこれを cite しない。
+- **(14.6) case-A campaign**: Sylow center trap / center layer / fixed-point-free action /
+  prime contradictionを各 sorry-free leaf として構成し、最終算術矛盾まで完了。
+- **S-side field model (claim 9102)**: `S15_SSideGaloisFieldModel.lean` に (9.7.b) field realization を
+  実装。case-A parameter は実 certificate がある枝でのみ要求する faithful conditional dispatcher
+  `sSide_galoisField_repr_of_c_eq_one_and_caseA_parameters` に修正した (`817dbddd`, `98848db9`)。
+- **0117 proof-only carve-out**: c 停止中の `S16.s_side_field_repr` を、canonical
+  `TypeIOverNormalizerData` + (13.12)/(13.13) の closed-term supply で配線し local bare `sorry` を除去
+  (`f40ad61a`)。statement/signature は不変、direct leaf / AxiomsCheck / full build は green。
+
+### 最終 census と owner 判定
+
+comment を除く実 `sorry` は **35**。内訳は次のとおりで、A の主所有域
+`Peterfalvi/S03`--`S13` + `FeitThompson.lean` は **0**。
+
+| 区分 | 件数 | 現 owner / 裁定 |
+|---|---:|---|
+| Pf Appendices | 15 | FT off-path、0115 で凍結 |
+| BG App.D/E | 8 | FT off-path |
+| BG §14 TypePCounting + legacy Theorem A | 3 | frozen/faithful replacement 済み |
+| S15 FT-path | 9 | b/c/hub 0116・2035・9094・9096、または明示的 legacy/vestigial |
+
+S15 の 9 本は `S15_CharacterDegreeSupply` (1)、`S15_SAndTBasic` (1)、
+`CountingLayer` (1)、`NormEstimates` (2)、`HypothesisBasics` (1)、`HypothesisSwap` (1)、
+`CaseBOrder` (1)、`Machinery135` (1)。それぞれ 0115/0116 と該当 issue の現裁定により
+b/c/hub 所有、構成不能と確認済みの generic legacy、または consumer 用 compatibility bridge であり、
+未着手の A 数学ではない。
+
+`s_side_field_repr` は local bare `sorry` を持たない一方、closed-term chain は現時点で
+`c_eq_one` / `caseA_parameters` / `exists_LHypothesis` の既知 `sorryAx` を推移的に継承する。
+clean な explicit-input dispatcher は AxiomsCheck 登録済みで、これら upstream root の flip は
+0116/2035 の b+hub campaign に属するため、A の未完 obligation と数えない。
+
+open issue の最終監査でも、9093 の 5-step relayer は完了済み、9085/9086 の A-owned clause は完了済み、
+0116 の一時的な A 宛 3-cite request は hub 自己訂正で撤回済みと確認した。したがって現在の
+ownership / carve-out / hub ruling の下で **lane A は genuine assigned frontier を完遂**した。
+新しい hub 割当または upstream landing 後の明示的 re-engage directive が出た場合にのみ再開する。

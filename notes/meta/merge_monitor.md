@@ -641,6 +641,50 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (tick 60) — ★ a: s_side_field_repr 討伐 (0117 完遂)。census 36→35**:
+  **a=3** (`588d4314` 系 = ★ **c 所有 gate `S16.s_side_field_repr` (SubgroupM:170) の bare
+  sorry を実証明討伐** — statement 完全不変・proof-only、hnoV (10.10) + H0C refuter (11.3) +
+  `exists_LHypothesis` で side conditions 放電 → a の (14.6) dispatcher cite。issue 0117
+  (hub 割当 = a campaign 継続) の完遂で**非逸脱**。dispatcher は事前に条件付け直し
+  (case (b) は c=1 のみ、sharp (13.13) は case-(a) certificate のみ要求) + rename
+  `sSide_galoisField_repr_of_c_eq_one_and_caseA_parameters` (tick 59 直後・外部 consumer
+  なし)。s_side_frobenius_kernel は docstring 更新のみ。0117/9087/9093 → closed。merge)。
+  **b=0**。build green 4224 jobs / AxiomsCheck OK / census **36→35 (実証明減)** /
+  新 axiom なし / size flag なし。push 済。
+- **2026-07-15 (tick 59) — a: (14.6) S-side Galois field model (claim 9102)。census 36**:
+  **a=1** (`817dbddd` = 新 leaf `S15_SSideGaloisFieldModel.lean` (210 行 sorry-free、
+  **9000 番台 claim 9102**、non-dup audit 付き): (9.7.b) Singer realization (9097/9100) +
+  caseA contradiction (1038) を組み上げた **(14.6) S-side Clifford dichotomy dispatcher**。
+  c 所有 consumer `S16.s_side_field_repr` (SubgroupM:170 bare sorry) は非接触、thin-cite
+  probe 成功 (`simpa using sSide_galoisField_repr_of_parameters_and_typeIOverNormalizerData …`)
+  を hub/c 宛に通知。merge)。**b=0**。build green 4224 jobs / AxiomsCheck OK /
+  census **36 不変** / 新 axiom なし / 逸脱なし / size flag なし。push 済。
+  **⟹ hub follow-up**: c 停止中につき `s_side_field_repr` の proof-only thin cite
+  (canonical TypeIOverNormalizerData + (13.12)/(13.13) parameter 等式の供給) を hub が
+  実施するか次 tick までに判断 (a の probe 報告あり、statement 不変・de-gate のみ)。
+- **2026-07-15 (tick 58) — a: caseA 最終算術矛盾 (leaf 2 枚) / b: (7.2)-for-T Dade=Ind bridge。census 36**:
+  **a=4** (`bc561ebc` 系 feature 2 = **(14.6) caseA campaign 続行**: 新 leaf
+  `S15_CaseAOmegaFixedPointFree.lean` (153 行、center action FPF 計数、claim 1037) +
+  `S15_CaseAContradiction.lean` (106 行、**caseA prime contradiction を閉じる最終算術**、
+  claim 1038)。file 単位 a 所有 carve-out 同型継続。S15_SAndT import 2 行 = 機械的配線。merge)。
+  **b=3** (`7f95fdcf` 系 = `Q_sharp_tau_eq_induce` (CountingLayer +59 additive、
+  (13.2.e)/(7.2)-for-T Dade=Ind bridge、H_sharp 版の機械的 mirror、2035 #88 brick 2a —
+  muT cCoeff 部品 map 完成、残 = red 分類のみ)。merge)。⚠ b の 3-dot は multiple merge bases
+  警告 (base 97f20c18 選択で tick 57 済み分を過大表示) — trial-merge staged で実 delta 確認
+  (手順どおり誤検出排除)。build green 4223 jobs ×2 / AxiomsCheck OK / census **36 不変** /
+  新 axiom なし / 逸脱なし / size flag なし。push 済。
+- **2026-07-15 (tick 57, 新監視セッション開始) — a: (14.6) Ω₁(Z(R)) 位数 leaf / b: (13.2.e)-for-T QD_sharp gate 討伐。census 37→36**:
+  **監視スコープ変更 (ユーザー指示)**: 本セッションは **a/b のみ監視、c は明示停止中** (c の
+  `main..c` 6 commits は全て空 sync merge = 実内容ゼロ、マージ不要)。
+  **a=1** (`aecc7341` = Pf **(14.6)** Ω₁(Z(R)) 位数 — 新 leaf `S15_CaseAOmegaCenter.lean`
+  (246 行 sorry-free、claim 1036)。c=1, q=3 入力で 2-座標 scalar 作用 faithful → rank U ≤ 2 →
+  |Ω₁(Z(R))| ∈ {r, r²}。**tick 56 CaseASylowCenter と同型の file 単位 a 所有 carve-out**
+  (名目 S15 = b 域だが内容 = a の caseA campaign)。S15_SAndT import 1 行 = 機械的配線。merge)。
+  **b=5** (`bfa04e9d` 系 = ★ **(13.2.e)-for-T `QD_sharp_centralizer_le_T` (CountingLayer) の
+  sorry を実証明討伐** (honest A(T)-support 経由、signature 不変、2035 #87) + `Q_sharp_hypothesis76_base`
+  T-side chosen-base (7.6) datum (CharacterDegreeEngines additive、2035 #88 = T-side twin brick 1/3)。
+  merge)。build green 4221 jobs ×2 / AxiomsCheck OK / census **37→36 (実証明による減)** /
+  新 axiom なし / 逸脱なし / size flag なし。push 済。
 - **2026-07-15 (tick 56) — a: (14.6) caseA Sylow center (新 leaf、S15 内容ベース carve-out)。census 37**:
   **a=1** (`b4e95807` = Pf **(14.6)** caseA Sylow center trap — 新 leaf `S15_CaseASylowCenter.lean`
   (197 行 sorry-free、claim 1035)。名目 S15 = b 域だが内容 = a の caseA campaign ⟹ **file 単位

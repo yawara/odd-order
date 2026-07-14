@@ -163,10 +163,11 @@ statement-level overclaim (issue 0115 audit).  The package itself is what `typeP
 supplies in **both** branches (Schur: an abelian group acting faithfully and irreducibly on
 `𝔽_p^q` lies in a Singer torus `𝔽_{p^q}^×`).
 
-Discharge (lane-a 9000/9097 pipeline): in the `p ≢ 1 (mod q)` branch this is exactly
-`exists_pu_field_repr` applied to the (13.15) certificate (`S15.caseB_order_u_data`); in the
-`p ≡ 1 (mod q)` branch it needs the `typeP_Galois` irreducibility body ((9.7.b), the
-`ConjugationFieldModel` leaf + §9/§13 producers). -/
+The branch-independent package is assembled from the unconditional (10.10) exclusion of type V,
+the unconditional (11.3) `H₀C` noncoherence refuter, and the canonical (14.3)/(14.5)
+`LHypothesis.typeI_data`.  The S-side dispatcher then uses (13.12) `c = 1`; only an actual
+Clifford case-(a) certificate requests the (13.13) sharp parameters, while case (b) returns the
+transported §9 Singer realization directly (issue 0117). -/
 theorem s_side_field_repr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
@@ -178,7 +179,18 @@ theorem s_side_field_repr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
             ↥hyp.base.P))
           = ((μ v : (GaloisField hyp.base.p hyp.base.q)ˣ) :
               GaloisField hyp.base.p hyp.base.q) * e (Additive.ofMul x) := by
-  sorry
+  have hnoV := OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional hG
+  have hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G :=
+    fun s13 =>
+      OddOrder.Peterfalvi.S13.S_H0C_not_coherent_unconditional hG s13
+  obtain ⟨Ldata⟩ := exists_LHypothesis hG hnoV hncH0C hyp
+  simpa using
+    OddOrder.Peterfalvi.S15.sSide_galoisField_repr_of_c_eq_one_and_caseA_parameters
+      hG hyp.base
+        (OddOrder.Peterfalvi.S15.c_eq_one hG hyp.base)
+        (fun caseA =>
+          OddOrder.Peterfalvi.S15.caseA_parameters hG hyp.base caseA)
+        Ldata.typeI_data
 
 /-- **Peterfalvi (14.6)+(13.12), the S-side Frobenius kernel** — `C_{S'}(x) ≤ P` for
 `x ∈ P#`.  Follows Coq `PFsection14.v:111-141` *exactly*: the (9.7.b) resolution for `S`
@@ -187,13 +199,11 @@ theorem s_side_field_repr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 the standard Frobenius kernel-centralizer property `Frobenius_cent1_ker` — here the proven
 Isaacs Thm 6.4 transport `IsFrobeniusGroup.centralizer_kernel_le`.
 
-The **single remaining gate is exactly Coq's `typeP_Galois_P` package** — the named sorried
-obligation `s_side_field_repr` above (the (9.7.b) resolution, issue 9000 / lane a, threading
-through the §13 producers of issue 2035); everything else (Coq's `frobPU` semiregularity and
-the `↥S'`-coordinate transport) is proven.  (The alternative route through the (14.2) field
-model `FieldNormalizerData` is *not* available here: `field_normalizer_structure` sits
-downstream of `exists_MHypothesis`, which consumes (14.11.3) and hence this very lemma — a
-genuine circularity, so the (9.7.b)-package gate is the honest isolation.) -/
+The `typeP_Galois_P` package is the theorem `s_side_field_repr` above, assembled upstream from
+the §9 realization and the §13–§14 structural producers.  The remaining argument is Coq's
+`frobPU` semiregularity plus the `↥S'`-coordinate transport.  (The alternative route through the
+(14.2) field model `FieldNormalizerData` is *not* used here: `field_normalizer_structure` sits
+downstream of `exists_MHypothesis`, which consumes (14.11.3) and hence this very lemma.) -/
 theorem s_side_frobenius_kernel [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     ∀ x ∈ sharpSubgroup hyp.base.P,
