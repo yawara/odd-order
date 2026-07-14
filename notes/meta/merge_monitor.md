@@ -641,6 +641,16 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (tick 60) — ★ a: s_side_field_repr 討伐 (0117 完遂)。census 36→35**:
+  **a=3** (`588d4314` 系 = ★ **c 所有 gate `S16.s_side_field_repr` (SubgroupM:170) の bare
+  sorry を実証明討伐** — statement 完全不変・proof-only、hnoV (10.10) + H0C refuter (11.3) +
+  `exists_LHypothesis` で side conditions 放電 → a の (14.6) dispatcher cite。issue 0117
+  (hub 割当 = a campaign 継続) の完遂で**非逸脱**。dispatcher は事前に条件付け直し
+  (case (b) は c=1 のみ、sharp (13.13) は case-(a) certificate のみ要求) + rename
+  `sSide_galoisField_repr_of_c_eq_one_and_caseA_parameters` (tick 59 直後・外部 consumer
+  なし)。s_side_frobenius_kernel は docstring 更新のみ。0117/9087/9093 → closed。merge)。
+  **b=0**。build green 4224 jobs / AxiomsCheck OK / census **36→35 (実証明減)** /
+  新 axiom なし / size flag なし。push 済。
 - **2026-07-15 (tick 59) — a: (14.6) S-side Galois field model (claim 9102)。census 36**:
   **a=1** (`817dbddd` = 新 leaf `S15_SSideGaloisFieldModel.lean` (210 行 sorry-free、
   **9000 番台 claim 9102**、non-dup audit 付き): (9.7.b) Singer realization (9097/9100) +
