@@ -8172,3 +8172,12 @@ dividing the coordinate exponent; odd-order scalar images specialize the exponen
   OddOrder.Peterfalvi.S11.caseA_sylow_U_not_isCyclic_of_sharp_order
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S15.caseA_sylow_U_not_isCyclic_of_parameters
+
+/-! **Peterfalvi (14.6), BG Prop. 1.16 centralizer witness.**  The ambient image of a
+noncyclic Sylow subgroup of the abelian `S`-side complement normalizes `P`; its `r`-power
+order is coprime to `|P| = p^q`.  BG Prop. 1.16 therefore produces a nonidentity element
+whose centralizer in `P` is nontrivial. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.exists_sylow_mem_inf_centralizer_ne_bot_of_not_isCyclic
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.caseA_exists_sylow_mem_inf_centralizer_ne_bot_of_parameters
