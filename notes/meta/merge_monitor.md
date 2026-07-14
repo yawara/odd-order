@@ -623,6 +623,10 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 — 監視再開 (ユーザー指示「監視を再開して」)**: cron `88a50cb0` を Fable 規定ペース
+  `13,43 * * * *` (30 分間隔) で再作成。再開時点: main = `4fdf38ce` (push 済・tree clean・full build
+  green 4203 jobs)、`main..{a,b,c}` = 0、lane a は main 同期済 tree clean (codex 再開待ち)、b/c は
+  session 停止中 (b は 9096 RULING の bundle split 待ち、c は hold 継続)。
 - **2026-07-14 (tick 32、手動 — ユーザー指示「各レーンの進捗を統合」) — a 未コミット diff 回収 + ★ 9096 HUB RULING + c hold 継続**:
   cron 停止中 (session 新規)。**a=1** (`1f4c3ef9` = **lane-a codex session の残置 3-file diff を hub が回収 commit**:
   AxiomsCheck ν-grid assert 13 本 + issue 1029 完了記録 (checklist 全 [x]、V_commutative は意図的除外) +
