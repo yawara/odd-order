@@ -623,6 +623,19 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 38) — a 合流 (AxiomsCheck guard 登録) + b **partial** 合流 (step 1 genuine / ⚠ dup leaf 差し戻し = 9086 裁定)**:
+  **a=4** (`07787735`/`5907e03a` = tick 37 follow-up: **section16 producer chain 12 宣言 + type-P2 Dade
+  bundle の AxiomsCheck assert 登録** (+29)、`fd980c5b`/`887ef16d` = 9087 記録 + stale spine-root 診断
+  issue 2 件 close (9090/9091)。merge)。
+  **b=4 中 2 のみ合流** (`02a4f916` = 2035 #41 step 1 `sSet_reducible_eq_nuRowSum` 実証明 (TSideDegrees
+  +44 sorry-free) + `c3892668` = #42 D-abelian route 記録。merge `e68658ad`)。⚠ **b `2ca52edf`
+  (新 leaf NilpotentCyclicAbelianization +120) は a の既存 9086 leaf `NilpotentAbelianization` の
+  真部分複製 + consumer-0 orphan と hub 照合で確定 → `e1dea754` (#43、dup 前提 docs) と共に未合流・
+  差し戻し** (9086 HUB RULING + 2035 に cite 先回答を記録。route #43 自体は genuine 評価 — supply 元の
+  差し替えのみ)。次 tick 以降 `main..b` に両 SHA が残るのは既知状態 (盲目的 merge 禁止)。c=0。
+  build green **4204 jobs** / AxiomsCheck OK (a の新 guard 込み) / census **46 不変** / 新 axiom なし /
+  orphan scan clean。push 済。⚠ hub 手順スリップ 1 件 (裁定 issue 編集を staged のまま merge 実行 →
+  exit 2、commit 後に再 merge で解消。「手動マージは atomic」gotcha の再確認)。
 - **2026-07-14 (tick 37) — ★★★ a 合流: 9087 carve-out 実施 landing = FT spine Section 16 named input producer chain が axiom-clean 化**:
   **a=2** (`abac8ca9` = carve-out 実施 (裁定条件 4 点全遵守: 3 cite 置換のみ / 単独 commit / message
   self-flag / 9087 実測記録)。`58f0f533` = landing 記録: **12 宣言が `[propext, Classical.choice,
