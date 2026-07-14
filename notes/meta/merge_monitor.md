@@ -638,6 +638,17 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
   T-side campaign の残りは 4 named obligation (refuter-T / nuGridSupply / T_isTypeP2_gate / no_lambda) に
   collapse = (13.4)/(13.3) cluster close の節目。かつ全レーン quiet の今が衝突最小 window ⟹ hub が着手
   (issue 0116 に実施記録)。(3) NuRowPin 1261 行 (<1500) = watch 継続、対処不要。
+  **⟹ 0116 調査完了・HUB RULING 記録 (同日)**: 5-agent workflow (wf_746d2ebb) + hub 自前検証で
+  設計確定 — (a) SAndTBasic:841 は c の 9077 #3 carve-out ゆえ scope 外 (かつ c の route は
+  DAG-blocked → 9077 に HOLD+item-2-first を追記)、(b) 「NormEstimates 沈降」は c_eq_one の
+  (13.10) 依存 + mid-layer 実 cite で cycle = 不可能、(c) **T_isTypeP2_gate は layer-inversion
+  でなく証明循環** (T_isTypeP2 → … → gate を hub が TTypeII 読解 + Coq PFsection13 対照で確認)
+  → honest fix = hT2 弱化 (b の math、2035 #75 で通知)、(d) 実施 = Route T (threading、新
+  discharge leaf) で確定だが **sequencing = b の hT2 弱化裁定 + a の OrderDetermination cluster
+  quiet 化の後** (threading が a の active decl 群 numeric_bounds/c_eq_one/caseA_parameters の
+  signature を編集するため — 0116 トリガー節と同じ anti-collision 原則、コスト理由でない)。
+  hub は毎 tick で両条件を追跡し、成立 tick で Route T 実施。size flags: CDS 2239 行 (b へ flag
+  済 2035 #75) / CountingLayer 2001 行 (Route T step 3 で解消予定)。
 - **2026-07-14 (tick 47、最終 sweep) — 監視停止 (ユーザー「いったん区切ります」) + 9077 RULING #3**:
   cron `88a50cb0` を CronDelete。⛔ 停止 (問題起因) ではないので**自動再開しない** — 次回はユーザー指示で
   現行モデル対応ペース (Fable=30分 `13,43`) で再作成。最終 sweep: **a=1** (`0a75fb65` = ★ **(13.13)
