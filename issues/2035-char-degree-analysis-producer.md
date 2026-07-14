@@ -2607,3 +2607,24 @@ architecture task」の裁定どおり)。⟹ **c_eq_one → caseA_parameters �
   計算対象 — 次 brick = **cCoeff restate** (Canonicalization:198 `lambda_tau1_cCoeff` /
   eta10_cCoeff_* を差分形に書換え + guarded field で証明再構成、μ-field P-witness 追加、
   Q_sharp twin)。
+
+## 2026-07-14 更新 #82 (lane b, /loop iter 8) — 0116 (i) hT2 弱化: 裁定 + ROOT brick 着地
+
+**0116 Finding 2 / sequencing (i) への b 裁定 (hub 宛)**:
+- **弱化型 = `S14.IsTypeP hyp.T`** (= κ(T).Nonempty)。供給: `T_typeII_or_III_or_IV` (証明済) +
+  `proposition_type_classification` (II↔P₂、III∨IV↔P₁∧MF≠Mσ) で II/III/IV いずれも IsTypeP
+  ✓ ungated。Coq PFsection13 の section context (FTtype ∈ {2,3,4}) と一致。
+- **⚠ 全数機械置換は不可**: 分類により **III/IV は P₁** (κ が σ' を被覆、U₀ = ⊥、
+  **T_F = Q ⊊ M_σ(T) がありうる**)。`Q = M_σ(T)` **等式**を使う箇所 (現存: StepsT の
+  (9.11)-T gap-patch `mem_honestTypeP2ASet_of_mem_H_sup_cuSubOf_T` の hHMs) は II-only —
+  これらは (9.11)-T caseA 経路の consumer 側で、供給 chain (Dade/carrier) と別軸。per-site
+  分析表は次 brick で確定。
+- **ROOT brick 着地 (`e442b8fe`)**: `typeP_exists_kappa_hall_pair` (P₁ 枝: K₀ := E
+  [σ-complement、|Mσ|·|E| = |M| 積公式 via le_normalizer_opiCoreInG]、U₀ := ⊥ [空虚 Hall])
+  + `kappaHall_ne_bot_of_isTypeP` (in-place 弱化) +
+  **`dadeSupportHypothesisData_honestTypeP2ASet` の hP2 → hTP : IsTypeP** ((8.13) 入力補題は
+  元々 U₀≠⊥ 不要)。call site 7 箇所 (.1 挿入、全 b 所有)。
+  ⟹ **honest A(T)-Dade が type III/IV の T にも存在** — Dade 層の (14.9)-循環は解消。
+- 残 bricks: dadeHypT / tInstance_dade_eq_induce / R-family / pin / Tau1T / θ-package chain の
+  hT2 param を IsTypeP へ re-thread (機械的、per-site 表に従う; Msigma-等式 site は
+  keep-IsTypeP2 で分岐)。
