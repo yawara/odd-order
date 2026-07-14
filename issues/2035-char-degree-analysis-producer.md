@@ -2576,3 +2576,18 @@ architecture task」の裁定どおり)。⟹ **c_eq_one → caseA_parameters �
 3. μ 側 field に P ⊄ Ker witness 追加 (`mu_j_linear_induced`/`mu_col_tau1_eta_col_one`)。
 4. `Q_sharp_hypothesis76` (T-side twin) 同修理; NormEstimates:806 / CountingLayer:1805 は
    P-witness thread のみ (statement 不変)。
+
+## 2026-07-14 更新 #80 (lane b, /loop iter 6) — rebase campaign brick 1: abelian rebase 恒等式 (generic 核)
+
+- **`f8642a56`**: `sum_image_induce_div_normSq_apply_eq_zero` (InducedIrreducible.lean、
+  sorry-free、+130 行) — abelian normal H ⊴ G で
+  `∑_{χ ∈ image(Irr H, Ind)} χ(g)/‖χ‖² = 0` (g ≠ 1)。証明 = 第二直交関係 (abelian で
+  Irr-和 = 正則指標 → off-1 消滅、induceTerm 二重和交換) + fiberwise orbit 縮約
+  (fibre size [G:I] × ‖χ‖² = |I|/|H| → 定数 [G:H])。ColumnOrthogonality import 追加
+  (DAG-safe、Fintype (IrreducibleCharacter G) instance 同梱)。shared leaf 追記 self-flag 済。
+- 残 bricks: **B** = Hypothesis76-level `zeta_sum_div_normSq_apply_eq_zero` (ζ-族 = image
+  への橋渡し: zeta_injective で Finset.sum_image、zeta_induced ⊆ + zeta_family_cover ⊇ で
+  image 一致、canonical instance は Subsingleton.elim bridge) / **C** = `chiRho_decomp_rebased`
+  (base-0 certificate から任意 base i₀: χ^ρ = ∑_{i≠i₀} (star(c_i−c_{i₀})/N_i)ζ_i、
+  c_0 = 0 は d_0 = 1 (ζ_0(1) ≠ 0) 経由、Fin 和の 0/Ioi 分解) / その後 cCoeff restate
+  (Canonicalization) + μ-field P-witness + Q_sharp twin。
