@@ -8024,3 +8024,20 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_isNilpotent
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S09.card_G0_lower_bound
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S09.not_trivial_G0
+
+/-! **BG §16 → Peterfalvi §10/§14 → Section 16 named-input producer chain, axiom-clean**
+(lane a, 2026-07-14, issue 9087).  The three tame-embedding consumers now cite the faithful
+Theorem A interface, so the maximal-pair construction, its type-I Dade consequences, and the
+assembled Section 16 inputs depend only on Lean/mathlib's standard three axioms. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremII_tame_embedding_of_inputs
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremII_tame_embedding
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_of_subset
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.dadeSupportHypotheses_typeI
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.hypothesis_of_typeIData
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.typeI_frobenius
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.not_all_maximal_typeI
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.theorem88_caseB_holds
+#assert_only_allowed_axioms OddOrder.exists_section16MaximalPair_data
+#assert_only_allowed_axioms OddOrder.section16MaximalPair_of_isMinimalSimpleOdd
+#assert_only_allowed_axioms OddOrder.section16Inputs_of_isMinimalSimpleOdd
+#assert_only_allowed_axioms OddOrder.sectionSixteenHypothesis_of_isMinimalSimpleOdd
