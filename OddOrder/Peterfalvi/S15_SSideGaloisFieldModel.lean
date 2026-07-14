@@ -19,9 +19,11 @@ the abstract complement is the named subgroup `U`, so the realization is
 transported to the concrete S-side conjugation action.  The branch-independent
 dispatcher combines this transport with the already proved case-A contradiction.
 
-The conclusions `c = 1`, `q = 3`, and `u = (p - 1)² / 4`, and the
-type-I maximal subgroup over `N_G(U)`, remain explicit inputs.  Thus this leaf
-does not depend on the analytic producer currently being relayered.
+The conclusion `c = 1`, the case-(a)-conditional producer of `q = 3` and
+`u = (p - 1)² / 4`, and the type-I maximal subgroup over `N_G(U)` remain
+explicit inputs.  Thus this leaf does not depend on the analytic producer
+currently being relayered.  An explicit-parameter specialization is also
+provided for callers that already have both equalities unconditionally.
 
 Peterfalvi, *Character Theory for the Odd Order Theorem*, (14.6), pp. 87–88.
 Coq reference: `coq/theories/PFsection14.v`, `typeP_Galois_P`.
@@ -165,6 +167,53 @@ theorem caseB_exists_sSide_galoisField_repr_of_c_eq_one [Finite G]
 
 /-! ## The branch-independent (14.6) assembly -/
 
+/-- **Peterfalvi (14.6), downstream-facing S-side Galois-field model.**
+
+Assume `c = 1`, the type-I maximal-subgroup data over `N_G(U)`, and that every
+actual Clifford case-(a) certificate supplies the sharp parameter equalities
+`q = 3` and `u = (p - 1)² / 4`.  Then the named S-side Galois-field model
+exists.
+
+The parameter equalities are deliberately conditional on the case-(a)
+certificate: (13.13) proves them only in that branch.  This is the exact
+interface needed by downstream consumers.  It also keeps the currently
+relayered analytic producer explicit rather than hiding it in this theorem. -/
+theorem sSide_galoisField_repr_of_c_eq_one_and_caseA_parameters
+    [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    (hc : hyp.c = 1)
+    (hcaseAParams :
+      ∀ {chief : OddOrder.Peterfalvi.S11.ChiefFactorData
+          (hyp.toTypesIIIIIIVSetupS hG)},
+        OddOrder.Peterfalvi.S11.CliffordCaseAData
+            (hyp.mkSection11CharacterDataS hG chief) →
+          hyp.q = 3 ∧ hyp.u = (hyp.p - 1) ^ 2 / 4)
+    (data : TypeIOverNormalizerData hyp) :
+    letI : Fact hyp.p.Prime := ⟨hyp.p_prime⟩
+    ∃ (e : Additive ↥hyp.P ≃+ GaloisField hyp.p hyp.q)
+      (μ : ↥hyp.U →* (GaloisField hyp.p hyp.q)ˣ),
+      Function.Injective μ ∧
+      ∀ (v : ↥hyp.U) (x : ↥hyp.P),
+        e (Additive.ofMul
+            (⟨(v : G) * (x : G) * (v : G)⁻¹, hyp.conj_mem_P v x⟩ : ↥hyp.P))
+          = ((μ v : (GaloisField hyp.p hyp.q)ˣ) : GaloisField hyp.p hyp.q) *
+            e (Additive.ofMul x) := by
+  classical
+  letI : Fact hyp.p.Prime := ⟨hyp.p_prime⟩
+  obtain ⟨chief, -⟩ :=
+    OddOrder.Peterfalvi.S11.exists_chiefFactorData hG
+      (hyp.toTypesIIIIIIVSetupS hG)
+  rcases OddOrder.Peterfalvi.S11.clifford_dichotomy hG
+      (hyp.mkSection11CharacterDataS hG chief) with hA | hB
+  · obtain ⟨caseA⟩ := hA
+    obtain ⟨hq, hu⟩ := hcaseAParams caseA
+    exact
+      (caseA_false_of_parameters_and_typeIOverNormalizerData
+        hG hyp caseA hc hq hu data).elim
+  · obtain ⟨caseB⟩ := hB
+    exact caseB_exists_sSide_galoisField_repr_of_c_eq_one
+      hG hyp caseB hc
+
 /-- **Peterfalvi (14.6), S-side case (9.7.b) with explicit sharp parameters.**
 
 For the explicit conclusions `c = 1`, `q = 3`, and
@@ -190,20 +239,8 @@ theorem sSide_galoisField_repr_of_parameters_and_typeIOverNormalizerData
             (⟨(v : G) * (x : G) * (v : G)⁻¹, hyp.conj_mem_P v x⟩ : ↥hyp.P))
           = ((μ v : (GaloisField hyp.p hyp.q)ˣ) : GaloisField hyp.p hyp.q) *
             e (Additive.ofMul x) := by
-  classical
-  letI : Fact hyp.p.Prime := ⟨hyp.p_prime⟩
-  obtain ⟨chief, -⟩ :=
-    OddOrder.Peterfalvi.S11.exists_chiefFactorData hG
-      (hyp.toTypesIIIIIIVSetupS hG)
-  rcases OddOrder.Peterfalvi.S11.clifford_dichotomy hG
-      (hyp.mkSection11CharacterDataS hG chief) with hA | hB
-  · obtain ⟨caseA⟩ := hA
-    exact
-      (caseA_false_of_parameters_and_typeIOverNormalizerData
-        hG hyp caseA hc hq hu data).elim
-  · obtain ⟨caseB⟩ := hB
-    exact caseB_exists_sSide_galoisField_repr_of_c_eq_one
-      hG hyp caseB hc
+  exact sSide_galoisField_repr_of_c_eq_one_and_caseA_parameters
+    hG hyp hc (fun _ => ⟨hq, hu⟩) data
 
 end
 
