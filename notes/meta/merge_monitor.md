@@ -95,6 +95,14 @@ open shared claim が立つまで **issue/notes hygiene + open-9000 scan** に�
 > BG local analysis) に接続するかを定期確認する (0-consumer 自体は off-path 根拠にしないが、FT-relevance の追跡は
 > 続ける)。正本 = 本ブロック + ft_lane_reallocation「lane d 再活性化」節。
 
+> **🔀 2026-07-14 レーン再設計 (issue 0115、ユーザー発議 + hub 3 並列監査 wf_525303b8)**:
+> (1) **c 再起動 GO** — 5 endpoint 中 4 workable (07-05 の「c-unreachable」は STALE; campaign A =
+> ComparingLM 3-field bridge 配線、campaign B = T-side Singer field model)。operator はユーザー起動待ち。
+> (2) **`S15_SAndT_Setup/OrderDetermination.lean` の所有 b→a 移管** (4 sorry; (13.11)/(13.12) は un-gated、
+> (13.13)/(13.15) は de-opacify 要)。以後 range-check: a の同 file 編集 = 非逸脱 / b の同 file 編集 = 逸脱。
+> (3) **4 レーン目見送り** — Pf Appendices 15 sorry は off-path 確定 (Part II scaffold)。
+> (4) NormEstimates/CountingLayer/SAndTBasic の残 5 sorry = layer-inversion 問題、hub relayer (issue 0116)。
+
 **signature-first interface (ゲートは幻)**: 上流が sorried signature を export → 下流が cite。各レーンは独立クラスタを
 正面から埋め、cross-cluster は signature contract で媒介 (待たない)。詳細 = ft_lane_reallocation_2026_06_28.md。
 
@@ -623,6 +631,16 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 41) — ★ b 合流 (caseB-T (9.11) coherence) + レーン再設計裁定 (issue 0115/0116)**:
+  **b=6** (`4ae89c31`/`d8ec3e45`/`fd2c0675`/`cc3fa98a` = ★ **caseB-T (9.11) coherence
+  `sSet_coherent_dade_caseB_T`** + (5.2.e) cross-orthogonality + dadeT0 regular-set vanishing +
+  dispatcher reductions。S15_TSetMemberRFamily +506、実 sorry 0。merge)。a=0 / c=0。
+  build green **4205 jobs** / AxiomsCheck OK / census **46 不変** / 新 axiom なし / 逸脱なし / orphan clean。
+  ★ **レーン再設計 (ユーザー発議「c 停止・レーン増設?」→ hub 3 並列監査 wf_525303b8 → issue 0115)**:
+  c 再起動 GO (4/5 workable、独立 2 campaign 定義済、hu_full statement mismatch の caveat 付き) /
+  OrderDetermination b→a 移管 (4 sorry、a の 9000 材料の自然な consumer、b active set と非交差) /
+  4 レーン目は Appendices off-path 確定につき見送り (3 レーン飽和が正解) / NormEstimates 系
+  layer-inversion は hub relayer issue 0116 で追跡。push 済。**c の operator 起動はユーザー操作待ち**。
 - **2026-07-14 (tick 40) — a+b 合流: T-side prime-TI Dade cross-relation ほか / ⚠ orphan 1 件を hub 配線で修正**:
   **a=1** (`132a1dbf` = section16 capstone boundary の docstring 訂正 (−6 hit は全て prose 内 `sorry` 言及、
   comment-strip で両版 real 0 確認)。merge)。
