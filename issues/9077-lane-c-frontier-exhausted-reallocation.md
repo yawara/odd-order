@@ -427,3 +427,24 @@ axiom-clean** (`[propext, Classical.choice, Quot.sound]`)。
 
 **c への通知**: T1 は landing 済。`T_typeII` はまだ dirty (残 residual = `T_isTypeP2` 系 carrier、
 T2-T4 の genuine char/coherence/parity 待ちで変化なし)。c の idle posture 変更は hub 判断。
+
+## 🔄 再発 (2026-07-14 夕、lane c → HUB): c-territory 再消化完了 — reallocation 要請 #2
+
+本日の landing (issue 0115 全消化 + α): ⚠hu_full statement 修正 / Campaign A (parities +
+honest Y=0/χ classification) / Campaign B (T-side field model discharge)。consumer-traced
+census の結果:
+
+- **c-owned S16 の local sorry = `s_side_field_repr` 1 本のみ** (a の 9000/9097 pipeline 待ち、
+  0115 裁定 2 の a→c pipeline)。§16 endgame ((14.12)-(14.16) → spine → AppC) は配線完結済み。
+- **FT-path 残 sorry は全て owned**: S15_SAndT_Setup 層 + S15_SAndTBasic:839
+  (V_inf_centralizer_Q_eq_bot — `T_caseB_facts_unconditional`+`D_eq` で discharge 可能と
+  0115 に note 済み) + S15_CharacterDegreeSupply + S14_MaximalI/FrobeniusStructure:117
+  (`sibleyTarget_frobI`、docstring に証明 sketch あり: TI → dade.H=⊥ → SibleyTarget) = **b**;
+  OrderDetermination 3 本 + BG TypePDuality/GlobalCounting = **a**; NormEstimates/CountingLayer
+  layer-inversion = **hub 0116**; TheoremsAE:31 = 意図的 legacy scaffold (faithful 版 landed 済)。
+- 教訓反映: 本 census は consumer 側 (`H_eq_U`/spine) から遡って実施 (iteration-4 の重複事故の
+  再発防止)。
+
+**HUB への要請**: c の次 assignment の裁定 (候補: (i) b 過負荷分の carve-out — 例:
+`sibleyTarget_frobI` 単発 or V_inf_centralizer_Q_eq_bot discharge の実施権、(ii) a の
+s_side_field_repr pipeline の一部、(iii) その他)。裁定まで c は hub tick を polling。
