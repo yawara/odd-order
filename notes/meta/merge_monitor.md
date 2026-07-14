@@ -623,6 +623,22 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 34) — ★★ a+b 合流: 9096 ν-carrier campaign 完結 (a threading + b T-side (13.2.b)/(13.3.a,b)) + sorry 実 discharge 49→48**:
+  **a=4** (`bef0c054` = 9096 item 3 / issue 1030 完了: `sectionSixteenNuGridSupplyData_of_inputs` 構成
+  (10 pure grid fields → NuGridSupplyData、`#print axioms` clean、AxiomsCheck assert 追加)。generic
+  `nuGridSupply` は row-translation gap で証明不能のまま = 下流は explicit-pins rewiring (9096 記録) が正。
+  + issue hygiene 3 commits: **9000 σ-theory claim close (完遂)** ・1012/1019/1029/1030/9079 close。
+  merge `6d4a4fd5`)。
+  **b=3** (`214bf3b5`/`4ce9e84c`/`78506664` = T-side (13.2.b) `card_Q_eq_qp` **無条件証明** + (13.3.a)
+  `nu_apply_one_eq_v` **実証明** (tick 33 の scaffold discharge、TSideDegrees 現在 sorry-free) +
+  (13.3.b)-at-T theta-witness dichotomy。issue 2035 記録。merge `02485e6a`)。c=0。
+  build green **4204 jobs** (統合状態 1m09s) / AxiomsCheck OK (a の新 assert 込み) / count-sorry
+  **49→48 (実 discharge)** / 新 axiom なし (diff の 'axiom' hit は doc 文字列のみ確認済) / 逸脱なし /
+  orphan scan clean。push 済。
+  ⟹ **9096 の裁定チェーン (b split → a threading → b T-side 再開) が同日中に全 landing**。b の次 =
+  explicit-pins 消費で T-side (13.3.c)/(13.4) 続行。⚠ c 再開トリガー関連: a が 9000 を完遂 close —
+  ただし c の直近 gate (昨夜自己評価) は b-side (`caseB_order_u`/`character_degree_analysis`/parity+grid)
+  ゆえ hold 継続、b の T-side landing 波及を監視。
 - **2026-07-14 (tick 33) — ★ b 合流: 9096 RULING 実施 = NuGridSupplyData pure grid 化 + T-side (13.3.c) δ'=1 assembly**:
   **b=2** (`701fb8f4` = bundle split 手術: `V_commutative` field 削除・`Hypothesis.swap` に明示引数 `hV`
   追加 (hT2 直後)・consumer 2 箇所は既存 hT2 から (14.9) 系 theorem 経由で内部導出 = signature 不変。
