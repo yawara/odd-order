@@ -641,6 +641,13 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 54) — b: 最後の genuine hT2 root close (残 = 機械 sweep のみ)。census 37**:
+  **a=1** (`41109dc9` = caseA centralizer witness 構成、claim 1033 完備。merge)。
+  **b=2** (`0975e47f` = ★ **StepsT gap-patch の一般 type P 化** (hHMs Q=Mσ 等式を正規 σ-Hall
+  吸収 route で置換) — #83 per-site 表の**唯一の genuine-math root が close**。hT2 弱化の残り =
+  純機械的 mega-sweep (~181 sites)。merge)。**c=0** (hold)。
+  build green 4219 jobs ×2 / AxiomsCheck OK / census **37 不変** / 新 axiom なし / 逸脱なし。
+  push 済 (main = 66ac4343)。**0116**: sweep landing 待ち (次 1-2 tick 想定) → Route T 実施へ。
 - **2026-07-14 (tick 53) — ★ b が 0116 条件 (i) を裁定+ROOT 実装 (hT2 弱化 = IsTypeP)。census 37**:
   **a=1** (`ce809790` = sharp Sylow noncyclicity の S11_CaseAOddPartBound transport
   (claim 1032 完備、9101 の続き)。merge)。
