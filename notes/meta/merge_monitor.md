@@ -623,6 +623,40 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 37) — ★★★ a 合流: 9087 carve-out 実施 landing = FT spine Section 16 named input producer chain が axiom-clean 化**:
+  **a=2** (`abac8ca9` = carve-out 実施 (裁定条件 4 点全遵守: 3 cite 置換のみ / 単独 commit / message
+  self-flag / 9087 実測記録)。`58f0f533` = landing 記録: **12 宣言が `[propext, Classical.choice,
+  Quot.sound]` のみに** — BG §16 `theoremII_tame_embedding{,_of_inputs}` / Pf §10 type-I Dade 2 本 /
+  Pf §14 4 本 (`not_all_maximal_typeI`/`theorem88_caseB_holds` 含む) / **FT spine inputs 4 本
+  (`section16MaximalPair`→`section16Inputs`→`sectionSixteenHypothesis_of_isMinimalSimpleOdd`)**。
+  merge)。b=0 / c=0。build green **4204 jobs** (7m01s、rewire の下流再 elaboration) / census **46 不変** /
+  新 axiom なし / 逸脱なし (carve-out 範囲内)。**hub 独立実測**: flagship 2 宣言の `#print axioms` を
+  scratch probe で再確認 = clean 一致。push 済。carve-out は landing で失効 (9087 記録どおり)。
+  ⟹ named Section 16 input producer の**実構成が clean 化** = carrier 構成可能性の実進捗 (doneness 基準)。
+  follow-up 候補: (i) 12 clean 宣言の AxiomsCheck assert 登録 (a)、(ii) consumer-0 化した legacy
+  `theoremA_maximal_structure` (OVERSTATEMENT 明記、TheoremsAE の残 sorry) の retirement 検討 (b territory)。
+- **2026-07-14 (tick 36) — a 合流 (docs) + ★ 9087 HUB RULING: TaxonomyOutput 3-cite rewire carve-out を a に付与**:
+  **a=1** (`0df692bb` = 9087 追記: Section 16 producer chain の `#print axioms` 実測で dirty root を
+  **旧 `theoremA_maximal_structure` の 3 cite (TaxonomyOutput.lean:1265/1292/1359) に局所化**。
+  faithful 版は既に axiom-clean、置換は mechanical proof-only。merge)。b=0 / c=0。
+  build green **4204 jobs** (docs-only、warm 確認) / census 46 不変 / 新 axiom なし。
+  ★ **HUB RULING (9087 記録)**: hub が 3 site + faithful 宣言 + b ファイル非交差を検証 → **a に当該
+  3 cite 置換限定の proof-only carve-out 付与** (b queue 却下 — 上流優先、b は 2035 #41 続行)。条件 =
+  置換以外の編集禁止 / 単独 commit self-flag / landing で失効 / clean 化を #print axioms 実測で 9087 に記録。
+  landing すれば mp producer の legacy sorryAx が除去され、named Section 16 input producer の実構成が
+  clean 化する見込み (FT spine root 直結)。
+- **2026-07-14 (tick 35) — a+b 合流: a unsound-route 撤去 (soundness cleanup) + b T-side (13.4) support estimate 実証明**:
+  **a=1** (`f2cb4ff2` = **(6.8)-TI 依存の unsound subtree 撤去**: `S11.sibleyTarget_H0C` + 唯一 consumer
+  `coherent_H0C_commutator` + wrapper `S12.typeII_section11_coherence`、および consumer-0 legacy obligation
+  `S12.coherent_Sset_diff_SHCSet` を削除。live spine は S15 honest route (`sSet_coherent_indS_A`/
+  `coherent_H0Cprime_S`) が既に担う。9087 に authoritative 記録 (issue 7001/1017)。hub 検証: 残参照は
+  docstring のみ + build green で code-level 無参照確定。merge `3860a802`)。
+  **b=2** (`c975fec2` = **(13.4)-at-T support estimate 実証明** (TSideDegrees +68 sorry-free)、`e4509630` =
+  2035 #41 T-side coherence construction plan。merge `c40721fa`)。c=0。
+  build green **4204 jobs** / AxiomsCheck OK / count-sorry **48→46** (両減とも a の unsound/dead sorried
+  obligation 削除による census 減 — 実証明 discharge でなく soundness cleanup、開示済み) / 新 axiom なし /
+  逸脱なし / orphan scan clean。push 済。**a-owned S03–S13/FeitThompson の literal sorry = 0 に到達**
+  (a 注記どおり FT 完了指標ではない — 9096 ν pins の cross-lane explicit 配線が genuine frontier)。
 - **2026-07-14 (tick 34) — ★★ a+b 合流: 9096 ν-carrier campaign 完結 (a threading + b T-side (13.2.b)/(13.3.a,b)) + sorry 実 discharge 49→48**:
   **a=4** (`bef0c054` = 9096 item 3 / issue 1030 完了: `sectionSixteenNuGridSupplyData_of_inputs` 構成
   (10 pure grid fields → NuGridSupplyData、`#print axioms` clean、AxiomsCheck assert 追加)。generic

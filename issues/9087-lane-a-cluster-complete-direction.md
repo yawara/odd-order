@@ -560,3 +560,106 @@ normalizer bridges / (14.5) counting 全て)。
 2. **`sibleyTarget_frobI` (12.6)(c1) は b territory** (S14_MaximalI/FrobeniusStructure、
    issue 2032 系): (12.17)→(12.7) chain のもう 1 本の root。b の 2035 queue との sequencing は
    hub 裁定事項 (a は grab しない)。
+
+## ✅ UPDATE (2026-07-14 lane a): (7.10) + canonical ν supply 完遂、dead wide-`Sset` obligation 撤去
+
+- (7.10) `card_G0_lower_bound` / (7.11) `not_trivial_G0` は closed/0044 で全完了・
+  AxiomsCheck 済み。上記の「再開」は完遂済み。
+- canonical T-side ν-grid の 10 facts を `Section16Inputs` まで thread し、
+  `sectionSixteenNuGridSupplyData_of_inputs` を axiom-clean で構成 (issue 1030/9096)。
+- `S12.Hypothesis.coherent_Sset_diff_SHCSet` は honest S13 world-bridge/refuter route に
+  supersede された consumer-0 の over-broad legacy obligation と authoritative に再確認。
+  周囲の sorry-free genuine helper は保全し、この未実装 theorem だけを削除した。
+- 同時に、(6.8) の不成立な TI 仮定へ依存していた `S11.sibleyTarget_H0C` と、その唯一の
+  code consumer `coherent_H0C_commutator`、さらに唯一の downstream wrapper
+  `S12.typeII_section11_coherence` がすべて live consumer 0 であることを code-only scan で確認。
+  S15 の honest `sSet_coherent_indS_A` / `coherent_H0Cprime_S` が live spine を担っているため、
+  この unsound subtree も撤去した (issue 7001/1017)。
+
+この撤去は sorry 数を減らすためではなく、構成不能な carrier を live API から除く
+soundness cleanup である。結果として A-owned S03–S13/FeitThompson の literal-sorry census
+も 0 になったが、それ自体は FT 完了指標ではない。現在の genuine 接続 frontier は
+issue 9096 の canonical ν pins を b-owned S15 chain / c-owned S16 carrier へ explicit 配線する
+cross-lane 作業。
+
+## ⚠ UPDATE (2026-07-14 lane a): Section 16 producer の残 dirty root を BG Theorem A 旧 cite に局所化
+
+`#print axioms` を mp → tp → cd → inputs の producer 順に再実測した。結果:
+
+- `section16TypePStructure_of_isMinimalSimpleOdd` / `section16CharacterData_of_isMinimalSimpleOdd`
+  は axiom-clean。
+- `section16MaximalPair_of_isMinimalSimpleOdd` だけが dirty で、そのため
+  `section16Inputs_of_isMinimalSimpleOdd` / `sectionSixteenHypothesis_of_isMinimalSimpleOdd` が
+  `sorryAx` を継承する。
+- mp の dirty path は
+  `theorem88_caseB_holds` → `not_all_maximal_typeI` → `typeI_frobenius` →
+  `hypothesis_of_typeIData` → `dadeSupportHypotheses_typeI` に局所化した。
+  (7.10) `card_G0_lower_bound` / (7.11) `not_trivial_G0` は今回の実測でも clean。
+- type-I Dade producer の 3 pin は最終的に BG `theoremII_tame_embedding` のみを dirty root とし、
+  A--D suite を個別測定すると **唯一 dirty なのは旧 `theoremA_maximal_structure`**。
+  Theorems B/C/D と Proposition 16.1 は clean。
+
+旧 Theorem A は docstring 自身が `OVERSTATEMENT — do not prove as-is` と明記する legacy 宣言で、
+faithfulness-corrected `theoremA_maximal_structure_faithful` は既に axiom-clean。同じ
+`TaxonomyOutput.lean` の `theoremII_tame_embedding_of_inputs` 内に残る旧 cite は 3 箇所だけ:
+
+```text
+TaxonomyOutput.lean:1265 / :1292 / :1359
+  theoremA_maximal_structure hG hM hK rfl hU
+```
+
+当該 theorem は既に `hKM : K ≤ M` / `hUM : U ≤ M` を引数に持つので、3 箇所を
+
+```text
+theoremA_maximal_structure_faithful hG hM hKM hUM hK rfl hU
+```
+
+へ置換するのが依存順を保存する honest rewire。新 theorem / 新仮説 / signature 変更は不要。
+これにより `theoremII_tame_embedding` → type-I (8.15) Dade → (12.7) → (12.17) → mp producer の
+legacy `sorryAx` を除ける見込みで、named Section 16 input producer の実構成を clean にする直接 prerequisite。
+
+ただし `TaxonomyOutput.lean` は BG §16 node = lane b territory。lane a は無断編集せず、hub に
+**3 cite の proof-only rewire carve-out を a へ付与するか、b queue に即時投入するか**の裁定を求める。
+b の現 2035/9096 S15 char-degree files とは file 非交差。A 自所有の未形式化 frontier は実測上ゼロで、
+もう一つの cross-lane frontier は上記どおり 9096 explicit-pins consumer wiring。
+
+## 🧭 HUB RULING (2026-07-14, tick 36): TaxonomyOutput 3-cite rewire = **a に proof-only carve-out 付与**
+
+hub 検証: (i) 3 cite site (`TaxonomyOutput.lean:1265/1292/1359`) と
+`theoremA_maximal_structure_faithful` (TypeBridges.lean:1508、axiom-clean) の存在を確認、
+(ii) b の active work (2035 #41、S15 files) とファイル非交差、(iii) 変更は mechanical
+proof-only (旧 overstated cite → faithful cite、新 theorem/新仮説/signature 変更なし)。
+
+**裁定**: lane a に `OddOrder/BG/Ch4_FamilyOfMaximal/S16_MainResults/TaxonomyOutput.lean` の
+**当該 3 cite の置換に限る** proof-only carve-out を付与 (b queue 投入は却下 — 上流優先:
+mp producer の legacy sorryAx 除去は Section 16 named input producer 実構成の直接 prerequisite
+で、b を 2035 #41 frontier から外す価値がない)。条件: (1) 3 cite 置換以外の編集禁止
+(statement/signature/構造変更なし)、(2) 単独 commit + commit message で self-flag
+(cross-lane carve-out 明記)、(3) landing で carve-out 失効 (standing でない)、
+(4) build green + `#print axioms` で mp→inputs chain の clean 化を実測して本 issue に記録。
+
+## ✅ UPDATE (2026-07-14 lane a): faithful Theorem A consumer rewire landed
+
+HUB RULING tick 36 の one-time proof-only carve-out を commit **abac8ca9**
+(`fix(bg): use faithful Theorem A in tame embedding`) で完遂。対象は
+`S16_MainResults/TaxonomyOutput.lean` の legacy `theoremA_maximal_structure` cite 3 箇所のみで、すべて
+`theoremA_maximal_structure_faithful hG hM hKM hUM hK rfl hU` に置換した。statement / signature /
+structure / comment の変更はなく、同 file の legacy cite は 0 件。carve-out は本 landing で失効。
+
+### 公理監査 (dependency closure rebuild 後)
+
+次の 12 宣言はすべて正確に **`[propext, Classical.choice, Quot.sound]`** のみに依存し、`sorryAx` なし:
+
+- BG §16: `theoremII_tame_embedding_of_inputs`, `theoremII_tame_embedding`
+- Peterfalvi §10: `dadeSupportHypothesisData_of_subset`, `dadeSupportHypotheses_typeI`
+- Peterfalvi §14: `hypothesis_of_typeIData`, `typeI_frobenius`, `not_all_maximal_typeI`,
+  `theorem88_caseB_holds`
+- FT spine inputs: `exists_section16MaximalPair_data`, `section16MaximalPair_of_isMinimalSimpleOdd`,
+  `section16Inputs_of_isMinimalSimpleOdd`, `sectionSixteenHypothesis_of_isMinimalSimpleOdd`
+
+### Build evidence
+
+- `lake build OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TaxonomyOutput` — green (3208 jobs)
+- `lake build OddOrder.FeitThompson` — green (4181 jobs)
+- `lake build OddOrder.AxiomsCheck` — green (4189 jobs)
+- `lake build OddOrder` — green (4204 jobs)
