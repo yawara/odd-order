@@ -2539,3 +2539,40 @@ campaign の残 gate (#74 起点): **nuGridSupply (a、9096) + T_isTypeP2_gate (
 cCoeff rebase 修理、3/3 NormEstimates 5 定理移行)、(ii) S15_SAndTBasic 残 sorry
 (772/969、V_inf:841 は c carve-out)、(iii) SubcoherenceInputs/HypothesisBasics/
 DegreesFirstSplit/TSideDegrees の残 sorry 群の census。
+
+## 2026-07-14 更新 #79 (lane b, /loop iter 5) — b-owned 実 sorry 全数 census + gating map (⑤ flip は 0116-gated と訂正)
+
+comment-strip census (S15 世界全 file): **実 sorry は 10 本のみ** (SubcoherenceInputs /
+DegreesFirstSplit / TSideDegrees / Canonicalization はゼロ — 従来 grep の hit は docstring 汚染)。
+全数 gating 判定:
+
+| sorry | 所属 |
+|---|---|
+| CharacterDegreeSupply:37 `T_isTypeP2_gate` | hub 0116 (layer inversion) |
+| SAndTBasic:841 `V_inf_centralizer_Q_eq_bot` | c carve-out (DAG-block HOLD) |
+| CaseBOrder:397 `caseB_order_u_data` | a (active (13.15) frontier) |
+| CountingLayer:695 `QD_sharp_centralizer_le_T` / :816 `tSide_theta_package_of_not_caseB` | hub 0116 set |
+| HypothesisBasics:1309 `sibleyTarget_S` | VESTIGIAL (hub 2026-07-02 do-not-complete、tauS=0 placeholder、spine cite 0) |
+| HypothesisSwap:134 `nuGridSupply` | a (9096 producer obligation) |
+| Machinery135:345 `character_degree_analysis` | uninhabitable — flip 後に削除 (証明対象でない) |
+| NormEstimates:253/264 `exists_muT_index`/`exists_etaT_alphaFun_one_int` | hub 0116 set |
+
+**⚠ 訂正 (9094 tail の「次の ⑤ flip 対象」framing)**: NormEstimates 5 obtain-site
+(454/570/704/1093/1197 — eta10_Qsharp_norm_lower / analyticEstimate_eta /
+analyticCounting_disjointCover / analyticInequalityEstimates / **analytic_inequality (13.10)**)
+の character_degree_analysis 依存除去は、**honest producer (characterDegreeCore_nonempty /
+lambdaCluster_or_caseB) が NormEstimates より import DAG 下流 (Supply 層) にあるため
+b 単独では実行不能 — 0116 layer-inversion の本体そのもの** (0115「レーンに配らず hub
+architecture task」の裁定どおり)。⟹ **c_eq_one → caseA_parameters → caseB_order_u →
+#78 の swap 証明群は全て analytic_inequality 経由で character_degree_analysis の sorryAx を
+運んでいる** — 0116 解決が profile を一気に清浄化する lever (hub 宛情報)。
+
+**⟹ b の ungated genuine frontier = 2035 #22 発見 2 の rebase 修理 campaign** (次 iteration 開始):
+1. rebase 恒等式 `∑_{全 i} ζ_i/‖ζ_i‖² |_{H^#} = 0` (H abelian ⟹ Irr 和 = reg) を定理化 →
+   trivial-base chiRho_decomp から任意 P-non-kernel base i₀ への rebased (7.7.a) を導出。
+2. `lambda_tau1_cCoeff` (Canonicalization:198) / `eta10_cCoeff_*` の**結論を book-faithful に
+   restate** (絶対値 c_{i₁}=1∧c_i=0 → P-non-kernel 係数差) + guarded field で証明再構成
+   (現行は unfillable CDD field 消費で value が trapped)。
+3. μ 側 field に P ⊄ Ker witness 追加 (`mu_j_linear_induced`/`mu_col_tau1_eta_col_one`)。
+4. `Q_sharp_hypothesis76` (T-side twin) 同修理; NormEstimates:806 / CountingLayer:1805 は
+   P-witness thread のみ (statement 不変)。
