@@ -3,6 +3,8 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.Peterfalvi.S13_CoreStructure
+import OddOrder.Peterfalvi.S13_TypeDetermination
 import OddOrder.Peterfalvi.S15_SAndT_Setup.CountingLayer
 import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisSwap
 
@@ -205,6 +207,89 @@ theorem Hypothesis.v_modEq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   have hrv : Nat.card ↥((φ.comp N.subtype).range) = hyp.v := hrangecard
   rw [hrv, hAcard] at hmod
   exact hmod
+
+/-- **Peterfalvi (13.2.b) at `T`, order part — unconditional**: `|Q| = |T_F| = q^p`.
+
+The `T`-analogue of `card_P_eq` with **no type-II carrier**: the four `T_nonI` branches are
+each closed —
+
+* **type II**: the (9.3) Wielandt order relation (`typeII_III_IV_order_relations`, first
+  clause) on the reconciled type-`P` datum, exactly as `card_Q_eq` (S15_Gate3) runs it from
+  the (14.9) `IsTypeII T` — here the branch hypothesis supplies it directly;
+* **types III/IV**: the §11 chain — Peterfalvi (11.7) `|H| = p^q` is **proven
+  unconditionally** for type-III/IV maximals (`card_H_eq_of_base` +
+  `S_H0C_not_coherent_unconditional`, the honest (11.3)-on-(10.8) route), and the local
+  `w₁`/`w₂` reconcile to the abstract `p`/`q` via the derived index
+  (`card_W1_eq_derived_index` + `W2_isComplement_T_deriv`) and the κ-Hall dual-factor bridge
+  (`card_Msigma_inf_centralizer_eq_card_W2` + `W1_eq_Msigma_T_inf_centralizer_W2`);
+* **type V**: excluded by the unconditional Theorem (10.10)
+  (`no_typeV_maximal_unconditional`).
+
+This is exactly Peterfalvi's "(13.2.b) holds for `T` as well as `S`" ((13.1) makes `S` and
+`T` play the same role): the `S`-side reads it off the carried `S_typeP2`, the `T`-side runs
+the honest classification.  It un-gates the §9-on-`T` chief-kernel triviality (the
+`nu_apply_one_eq_v` gate). -/
+theorem Hypothesis.card_Q_eq_qp [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    Nat.card ↥hyp.Q = hyp.q ^ hyp.p := by
+  haveI := hyp.finiteG
+  obtain ⟨tpd, hU, htpdW1, htpdW2⟩ := reconciled_typePData_T hG hyp
+  have hW2T : hyp.W2 ≤ hyp.T :=
+    (by rw [hyp.W_eq_join]; exact le_sup_right : hyp.W2 ≤ hyp.W).trans
+      (by rw [hyp.W_eq_inter]; exact inf_le_right)
+  -- The type-III/IV branch, shared by both disjuncts.
+  have hIIIIV : (IsTypeIII hyp.T ∨ IsTypeIV hyp.T) → Nat.card ↥hyp.Q = hyp.q ^ hyp.p := by
+    intro htype
+    obtain ⟨base12⟩ := OddOrder.Peterfalvi.S12.exists_hypothesis_of_typeIIIorIVorV hG
+      hyp.T_maximal (htype.imp id Or.inl)
+    have hcard := OddOrder.Peterfalvi.S13.card_H_eq_of_base hG base12 htype
+      (fun s13 => OddOrder.Peterfalvi.S13.S_H0C_not_coherent_unconditional hG s13)
+    -- `base12.typeP.H = Q` (`H = M_F` is intrinsic)
+    have hHQ : base12.typeP.H = hyp.Q := by rw [base12.typeP.H_eq, hyp.Q_eq_TF]
+    -- `w₁ = p`: both `typeP.W1` and `W₂` complement `T'` in `T`, so both have the derived index
+    have hw1 : base12.w1 = hyp.p := by
+      show Nat.card ↥base12.typeP.W1 = hyp.p
+      rw [base12.typeP.card_W1_eq_derived_index,
+        hyp.W2_isComplement_T_deriv.symm.index_eq_card,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2T).toEquiv, ← hyp.p_eq_card_W2]
+    -- `w₂ = q`: the dual-factor bridge `|M_σ(T) ⊓ C(W₂)| = |typeP.W2|` against `W₁ = M_σ(T) ⊓ C(W₂)`
+    have hw2 : base12.w2 = hyp.q := by
+      show Nat.card ↥base12.typeP.W2 = hyp.q
+      haveI : IsCyclic ↥hyp.W2 := by
+        haveI := hyp.W_cyclic
+        exact isCyclic_of_surjective _ (Subgroup.subgroupOfEquivOfLe
+          (by rw [hyp.W_eq_join]; exact le_sup_right : hyp.W2 ≤ hyp.W)).surjective
+      have hbridge := OddOrder.Peterfalvi.S10.card_Msigma_inf_centralizer_eq_card_W2 hG
+        hyp.T_maximal (OddOrder.BG.Ch4.S16.isTypeP_of_isTypeNonI hG hyp.T_maximal hyp.T_nonI)
+        hW2T (hyp.W2_isKappaHall_T hG) base12.typeP
+      rw [← hbridge, ← hyp.W1_eq_Msigma_T_inf_centralizer_W2 hG, ← hyp.q_eq_card_W1]
+    rw [hHQ, hw1, hw2] at hcard
+    exact hcard
+  rcases hyp.T_nonI with h | h | h | h
+  · -- **type II**: the (9.3) Wielandt order relation on the reconciled datum.
+    have w := h.some
+    have hUne : tpd.U ≠ ⊥ := by
+      intro hbot
+      have h1 : Nat.card ↥tpd.U = Nat.card ↥w.typeP.U := by
+        rw [tpd.card_U_eq_index, w.typeP.card_U_eq_index]
+      rw [hbot, Subgroup.card_bot] at h1
+      exact w.common.1 (Subgroup.card_eq_one.mp h1.symm)
+    have hW1prime : (Nat.card ↥tpd.W1).Prime := by
+      rw [htpdW1, ← hyp.p_eq_card_W2]; exact hyp.p_prime
+    have hord := (OddOrder.Peterfalvi.S11.typeII_III_IV_order_relations hG
+      { maximal := hyp.T_maximal
+        typeP := tpd
+        nontrivial := ⟨hUne, hW1prime, w.common.2.2⟩
+        type_alt := Or.inl h }).1 h
+    have hord2 : Nat.card ↥tpd.H = Nat.card ↥tpd.W2 ^ Nat.card ↥tpd.W1 := hord.2
+    have hW2card : Nat.card ↥tpd.W2 = hyp.q := by
+      rw [htpdW2, ← hyp.q_eq_card_W1]
+    rw [tpd.H_eq, ← hyp.Q_eq_TF, hW2card, htpdW1, ← hyp.p_eq_card_W2] at hord2
+    exact hord2
+  · exact hIIIIV (Or.inl h)
+  · exact hIIIIV (Or.inr h)
+  · exact absurd ⟨hyp.T, hyp.T_maximal, h⟩
+      (OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional hG)
 
 open scoped FiniteInduce in
 /-- **Row-constant degree** (Peterfalvi (13.1.e)/(4.3.c), `T`-side): within a row `i`, all
