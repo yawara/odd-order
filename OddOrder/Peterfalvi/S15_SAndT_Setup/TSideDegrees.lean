@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S13_CoreStructure
+import OddOrder.Peterfalvi.S13_NonGaloisExclusion
 import OddOrder.Peterfalvi.S13_TypeDetermination
 import OddOrder.Peterfalvi.S15_SAndT_Setup.CountingLayer
 import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisSwap
@@ -884,5 +885,318 @@ theorem Hypothesis.sSet_reducible_eq_nuRowSum [Finite G]
       ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
         ((derivedInG hyp.T).subgroupOf hyp.T) (⊥ : Subgroup ↥hyp.T) := hKeq ▸ hmemHU
   exact pins.nu_reducible_dichotomy hmem hirr
+
+/-- **Peterfalvi (13.2.a) at `T`, `V`-side — unconditional**: the complement `V` is abelian,
+with **no** (14.9) input.  The `T_nonI` classification: a type-II or type-III witness carries
+`U_commutative`, transported to the reconciled complement `V` by the Schur–Zassenhaus
+conjugacy transfer (`isMulCommutative_typePData_U_of_typePData_U`); type IV is excluded
+unconditionally by Peterfalvi (11.9.c) (`not_isTypeIV_of_mem_maximalSubgroups`,
+`S13_NonGaloisExclusion` — sorry-free); type V by (10.10).
+
+This supersedes the (14.9)-gated route (`isMulCommutative_V`, which consumes `IsTypeII T`):
+the (11.9.c) chain landing makes the `V`-side (13.2.a) an unconditional §13 fact.  It is the
+`D`-abelian input of the caseB-`T` coherence (`Cprime-T = derivedInG D = ⊥`) and an
+unconditional supply for `Hypothesis.swap`'s `hV`. -/
+theorem Hypothesis.isMulCommutative_V_unconditional [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    IsMulCommutative ↥hyp.V := by
+  obtain ⟨tpd, hU, -, -⟩ := reconciled_typePData_T hG hyp
+  rw [← hU]
+  rcases hyp.T_nonI with h | h | h | h
+  · obtain ⟨w⟩ := h
+    exact OddOrder.Peterfalvi.S13.isMulCommutative_typePData_U_of_typePData_U hG
+      hyp.T_maximal w.typeP tpd w.U_commutative
+  · obtain ⟨w⟩ := h
+    exact OddOrder.Peterfalvi.S13.isMulCommutative_typePData_U_of_typePData_U hG
+      hyp.T_maximal w.typeP tpd w.U_commutative
+  · exact absurd h
+      (OddOrder.Peterfalvi.S13.not_isTypeIV_of_mem_maximalSubgroups hG hyp.T_maximal)
+  · exact absurd ⟨hyp.T, hyp.T_maximal, h⟩
+      (OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional hG)
+
+
+open OddOrder.Peterfalvi.S11 in
+open scoped commutatorElement in
+open scoped FiniteInduce in
+/-- **(9.9.a) uniform degree of the `T`-instance §9 family in the Galois case** (mirror of
+`sSet_caseB_apply_one_eq_qu`; the `hdeg` input of the caseB (5.7) uniform-degree coherence
+engine on `T`): in Clifford case (b) every member of `𝒯 = sSet(setupT)` has degree
+`setupT.q · chars.u` (= `p·v` after the identifications).  The kernel data degenerates —
+`chief.H₀ = ⊥` (`toTypesIIIIIIVSetupT_chief_H0_eq_bot`) and `C′ = derivedInG (cSub) = ⊥`
+(`cSub ≤ V` abelian by the **unconditional** `isMulCommutative_V_unconditional`) — so
+`𝒮(H₀C′) = 𝒮(⊥) = 𝒯` and `caseB_degree_qu` applies to every member. -/
+theorem Hypothesis.sSet_caseB_apply_one_eq_vp [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1)
+    {chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd)}
+    (caseB : OddOrder.Peterfalvi.S11.CliffordCaseBData
+      (hyp.mkSection11CharacterDataT hG hvd chief))
+    {φ : ClassFunction ↥hyp.T ℂ} (hφ : φ ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd)) :
+    (φ : ↥hyp.T → ℂ) 1
+      = (((hyp.toTypesIIIIIIVSetupT hG hvd).q
+          * (hyp.mkSection11CharacterDataT hG hvd chief).u : ℕ) : ℂ) := by
+  classical
+  haveI := hyp.finiteG
+  have hH0 : chief.H0 = ⊥ := hyp.toTypesIIIIIIVSetupT_chief_H0_eq_bot hG hvd chief
+  have hCp : (hyp.mkSection11CharacterDataT hG hvd chief).Cprime = ⊥ := by
+    show cprimeSub (hyp.toTypesIIIIIIVSetupT hG hvd) chief = ⊥
+    have hCV : cSub (hyp.toTypesIIIIIIVSetupT hG hvd) chief ≤ hyp.V :=
+      (cSub_le_U _ _).trans (le_of_eq (hyp.toTypesIIIIIIVSetupT_U_eq hG hvd))
+    have hVab : IsMulCommutative ↥hyp.V := hyp.isMulCommutative_V_unconditional hG
+    have hCab : IsMulCommutative
+        ↥(cSub (hyp.toTypesIIIIIIVSetupT hG hvd) chief) :=
+      ⟨⟨fun a b => Subtype.ext (by
+        have h := hVab.is_comm.comm
+          (⟨(a : G), hCV a.2⟩ : ↥hyp.V) ⟨(b : G), hCV b.2⟩
+        simpa using congrArg Subtype.val h)⟩⟩
+    have hcomm : commutator
+        ↥(cSub (hyp.toTypesIIIIIIVSetupT hG hvd) chief) = ⊥ := by
+      rw [eq_bot_iff]
+      refine (Subgroup.commutator_le (H₁ := ⊤) (H₂ := ⊤) (H₃ := ⊥)).mpr (fun a _ b _ => ?_)
+      rw [Subgroup.mem_bot, commutatorElement_eq_one_iff_commute]
+      exact hCab.is_comm.comm a b
+    show derivedInG (cSub (hyp.toTypesIIIIIIVSetupT hG hvd) chief) = ⊥
+    rw [derivedInG, hcomm, Subgroup.map_bot]
+  have hmem : φ ∈ (hyp.mkSection11CharacterDataT hG hvd chief).SOf
+      (chief.H0 ⊔ (hyp.mkSection11CharacterDataT hG hvd chief).Cprime) := by
+    rw [Section11CharacterData.SOf_eq, hH0, hCp, sup_bot_eq]
+    obtain ⟨χ, hχ, rfl⟩ := hφ
+    refine ⟨χ, ?_, rfl⟩
+    rw [mem_xiOf]
+    refine ⟨hχ, ?_⟩
+    intro x hx
+    have hx1 : x = 1 := by
+      have h2 := Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp
+        (SetLike.mem_coe.mp hx))
+      rw [Subgroup.mem_bot] at h2
+      exact Subtype.ext (Subtype.ext h2)
+    rw [hx1, OddOrder.Peterfalvi.S03.mem_characterKernel,
+      OddOrder.Peterfalvi.S03.characterDegree_def]
+  exact caseB_degree_qu hG (hyp.mkSection11CharacterDataT hG hvd chief) caseB φ hmem
+
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **(4.7)-at-`T` member support**: every `𝒯`-member source `Ind_{HU}^T ξ` (`ξ ∈ 𝒳`) is
+supported in `A(T) ∪ {1}`.  Mirror of `sSet_member_support_subset_A` — the S-side type-II
+identification `P = M_σ(S)` is only used for a *membership*, so the `T`-side needs just
+`Q ≤ M_σ(T)` (`maxNilpotentNormalHall_le_Msigma`, valid for every maximal subgroup, type III
+included); every other ingredient (`support_induce_subset_conjugatesIntoSet`, the (1.2) core,
+`honestTypeP2ASet_conj_mem`) is `M`-generic. -/
+theorem Hypothesis.sSet_member_support_subset_A_T [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1)
+    {ξ : OddOrder.RepresentationTheory.IrreducibleCharacter
+      ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd))}
+    (hξ : ξ ∈ xiSet (hyp.toTypesIIIIIIVSetupT hG hvd)) :
+    (induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
+        (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T ∪ {1} := by
+  classical
+  have hHQ : ((hyp.toTypesIIIIIIVSetupT hG hvd).H : Subgroup G) = hyp.Q :=
+    hyp.toTypesIIIIIIVSetupT_H_eq hG hvd
+  have hQle : hyp.Q ≤ OddOrder.BG.Ch3.S10.Msigma hyp.T := by
+    rw [hyp.Q_eq_TF]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hyp.T_maximal
+  have hcore : ∀ w : ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)),
+      (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ) w ≠ 0 →
+      ((w : ↥hyp.T) : G) ≠ 1 →
+      ((w : ↥hyp.T) : G) ∈ honestTypeP2ASet hyp.T := by
+    intro w hwval hwne
+    haveI := hInHu_normal (hyp.toTypesIIIIIIVSetupT hG hvd)
+    have hCne : OddOrder.Peterfalvi.S03.centralizerInSubgroup
+        (hInHu (hyp.toTypesIIIIIIVSetupT hG hvd)) w ≠ ⊥ := fun hbot =>
+      hwval
+        (OddOrder.Peterfalvi.S03.irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot
+          ξ hξ hbot)
+    obtain ⟨d, hd_mem, hd_ne⟩ := (Subgroup.bot_or_exists_ne_one _).resolve_left hCne
+    rw [OddOrder.Peterfalvi.S03.mem_centralizerInSubgroup] at hd_mem
+    obtain ⟨hd_H, hd_comm⟩ := hd_mem
+    have hdS_H : (d : ↥hyp.T) ∈ (hyp.toTypesIIIIIIVSetupT hG hvd).H.subgroupOf hyp.T :=
+      (Subgroup.mem_subgroupOf).mp hd_H
+    have hdH_G : ((d : ↥hyp.T) : G) ∈ (hyp.toTypesIIIIIIVSetupT hG hvd).H :=
+      (Subgroup.mem_subgroupOf).mp hdS_H
+    have hdG_ne : ((d : ↥hyp.T) : G) ≠ 1 := fun he => hd_ne (by
+      apply Subtype.ext; apply Subtype.ext; exact he)
+    have hcommG : ((d : ↥hyp.T) : G) * ((w : ↥hyp.T) : G)
+        = ((w : ↥hyp.T) : G) * ((d : ↥hyp.T) : G) := by
+      have := congrArg (fun t : ↥hyp.T => (t : G)) (Subtype.ext_iff.mp hd_comm)
+      simpa using this
+    rw [mem_honestTypeP2ASet]
+    refine ⟨?_, hwne, ((d : ↥hyp.T) : G), ?_, ?_⟩
+    · have hwHU : (w : ↥hyp.T) ∈ (derivedInG hyp.T).subgroupOf hyp.T := by
+        rw [← huSub_eq_derivedInG_subgroupOf]; exact w.2
+      exact (Subgroup.mem_subgroupOf).mp hwHU
+    · refine (Set.mem_sdiff _).mpr ⟨?_, fun he => hdG_ne (Set.mem_singleton_iff.mp he)⟩
+      have hdQ : ((d : ↥hyp.T) : G) ∈ hyp.Q := hHQ ▸ hdH_G
+      exact SetLike.mem_coe.mpr (hQle hdQ)
+    · rw [Subgroup.mem_centralizer_singleton_iff]
+      exact hcommG.symm
+  intro x hx
+  rw [Set.mem_union, Set.mem_singleton_iff]
+  by_cases hx1 : x = 1
+  · exact Or.inr hx1
+  have hxsupp : (induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
+      (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)) x ≠ 0 :=
+    ClassFunction.mem_support.mp hx
+  have hx_conj : x ∈ ClassFunction.conjugatesIntoSet (huSub (hyp.toTypesIIIIIIVSetupT hG hvd))
+      ((ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)).support := by
+    have hind : induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
+          (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)
+        = ClassFunction.induce (huSub (hyp.toTypesIIIIIIVSetupT hG hvd))
+          (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ) := rfl
+    refine ClassFunction.support_induce_subset_conjugatesIntoSet (subset_refl _) ?_
+    rw [← hind]; exact hxsupp
+  rw [ClassFunction.mem_conjugatesIntoSet] at hx_conj
+  obtain ⟨c, hc, hcsupp⟩ := hx_conj
+  set w : ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) := ⟨c⁻¹ * x * c, hc⟩ with hw_def
+  have hw_val : (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ) w ≠ 0 :=
+    ClassFunction.mem_support.mp hcsupp
+  have hwS_eq : ((w : ↥hyp.T) : G) = (c : G)⁻¹ * (x : G) * (c : G) := rfl
+  have hxeq : (x : G) = (c : G) * ((w : ↥hyp.T) : G) * (c : G)⁻¹ := by
+    rw [hwS_eq]; group
+  have hwne : ((w : ↥hyp.T) : G) ≠ 1 := by
+    intro he
+    apply hx1
+    have hxG : (x : G) = 1 := by rw [hxeq, he]; group
+    exact Subtype.ext hxG
+  have hwA : ((w : ↥hyp.T) : G) ∈ honestTypeP2ASet hyp.T := hcore w hw_val hwne
+  refine Or.inl ?_
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup, hxeq]
+  exact honestTypeP2ASet_conj_mem c.2 hwA
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **`𝒯`-members are supported in `A(T) ∪ {1}`** (full-family form; mirror of
+`sSet_member_support_subset`). -/
+theorem Hypothesis.sSet_member_support_subset_T [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1)
+    {φ : ClassFunction ↥hyp.T ℂ} (hφ : φ ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd)) :
+    φ.support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T ∪ {1} := by
+  obtain ⟨ξ, hξ, rfl⟩ := hφ
+  exact hyp.sSet_member_support_subset_A_T hG hvd hξ
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **`𝒯`-member differences are `A(T)`-supported in the Galois case** (mirror of
+`sSet_caseB_member_diff_supported`; the `hsuppdiff` input of the caseB (5.7) coherence engine
+on `T`): both members have the uniform degree `p·v` (`sSet_caseB_apply_one_eq_vp`), so the
+difference vanishes at `1` and its support lands in `A(T)`. -/
+theorem Hypothesis.sSet_caseB_member_diff_supported_T [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1)
+    {chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd)}
+    (caseB : OddOrder.Peterfalvi.S11.CliffordCaseBData
+      (hyp.mkSection11CharacterDataT hG hvd chief))
+    {x : ClassFunction ↥hyp.T ℂ} (hx : x ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
+    {y : ClassFunction ↥hyp.T ℂ} (hy : y ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd)) :
+    (x - y).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
+  intro z hz
+  have hz0 : (x - y) z ≠ 0 := hz
+  have hdeg : (x : ↥hyp.T → ℂ) 1 = (y : ↥hyp.T → ℂ) 1 := by
+    rw [hyp.sSet_caseB_apply_one_eq_vp hG hvd caseB hx,
+      hyp.sSet_caseB_apply_one_eq_vp hG hvd caseB hy]
+  rcases ClassFunction.support_sub_subset x y hz with h | h
+  · rcases hyp.sSet_member_support_subset_T hG hvd hx h with h' | h'
+    · exact h'
+    · exfalso; rw [Set.mem_singleton_iff] at h'; subst h'
+      exact hz0 (by rw [ClassFunction.sub_apply, hdeg, sub_self])
+  · rcases hyp.sSet_member_support_subset_T hG hvd hy h with h' | h'
+    · exact h'
+    · exfalso; rw [Set.mem_singleton_iff] at h'; subst h'
+      exact hz0 (by rw [ClassFunction.sub_apply, hdeg, sub_self])
+
+
+/-- **`Odd |T|`** (mirror of `oddCardS`): the subcoherence realness input for the `T`-instance
+§9 family. -/
+theorem Hypothesis.oddCardT [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    Odd (Nat.card ↥hyp.T) := by
+  rcases hG.odd with ⟨k, hk⟩
+  have hdvd : Nat.card ↥hyp.T ∣ Nat.card G := Subgroup.card_subgroup_dvd_card hyp.T
+  rcases Nat.even_or_odd (Nat.card ↥hyp.T) with heven | hodd
+  · exfalso
+    have h2 : (2 : ℕ) ∣ Nat.card G := (even_iff_two_dvd.mp heven).trans hdvd
+    rw [hk] at h2
+    omega
+  · exact hodd
+
+/-- **(13.2.e) `T`-instance Dade hypothesis** (mirror of `dadeHypS`; the `A(T)`-Dade datum for
+the caseB-`T` (5.7) coherence).  Like `dadeHypT0`/`tauTbetaGrid`, `IsTypeP2 T` is a
+(14.9)-conclusional parameter supplied by the caller (the `S`-side reads the carried
+`S_typeP2`); the underlying construction is the generic type-`P₂`
+`dadeSupportHypothesisData_honestTypeP2ASet` at `T`. -/
+noncomputable def Hypothesis.dadeHypT [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T) :
+    OddOrder.Peterfalvi.S04.Hypothesis G (honestTypeP2ASet hyp.T) hyp.T :=
+  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.T_maximal hT2).some.dade
+
+/-- **(13.2.e) `T`-instance Dade `H`-conjugation invariance** (mirror of `dadeHypS_hconj`). -/
+theorem Hypothesis.dadeHypT_hconj [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T) :
+    (hyp.dadeHypT hG hT2).HConjInvariant :=
+  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.T_maximal hT2).some.hconj
+
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **(5.3.a)-at-`T` per-member difference support** (mirror of `sSet_member_diffsupp`): for a
+`𝒯`-member source `Ind_{HU}^T ξ`, the conjugate difference is `A(T)`-supported — the support
+lands in `A(T) ∪ {1}` (`sSet_member_support_subset_A_T`) and the value at `1` is the real
+positive degree, so `1` drops out.  The `hdiffsupp` half of the irreducible `R`-datum. -/
+theorem Hypothesis.sSet_member_diffsupp_T [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1)
+    {ξ : OddOrder.RepresentationTheory.IrreducibleCharacter
+      ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd))}
+    (hξ : ξ ∈ xiSet (hyp.toTypesIIIIIIVSetupT hG hvd)) :
+    ((induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
+          (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)).conj
+        - induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
+          (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)).support
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
+  set φ : ClassFunction ↥hyp.T ℂ :=
+    induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
+      (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ) with hφ
+  have hsupp_eq : φ.conj.support = φ.support := by
+    ext y
+    simp only [ClassFunction.mem_support, ne_eq, ClassFunction.conj_apply, star_eq_zero]
+  intro x hx
+  have hx0 : (φ.conj - φ) x ≠ 0 := hx
+  have hxsupp : x ∈ φ.support := by
+    have hxU := ClassFunction.support_sub_subset _ _ hx
+    rwa [hsupp_eq, Set.union_self] at hxU
+  rcases hyp.sSet_member_support_subset_A_T hG hvd hξ (hφ ▸ hxsupp) with h | h
+  · exact h
+  · exfalso
+    rw [Set.mem_singleton_iff] at h
+    subst h
+    obtain ⟨d, _, hd⟩ :=
+      OddOrder.RepresentationTheory.irreducibleCharacter_apply_one_eq_pos_natCast ξ
+    apply hx0
+    rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hφ, induceHU_apply_one_eq_q_mul, hd,
+      star_mul', star_natCast, star_natCast, sub_self]
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **Conjugate-difference support for `𝒯`-members** (mirror of
+`sSet_member_conjDiff_supported`): case-agnostic — a member and its conjugate share the real
+positive degree, so `(η̄ − η).support ⊆ A(T)`.  The diff-support input of the irreducible
+`R`-family, serving both Clifford cases. -/
+theorem Hypothesis.sSet_member_conjDiff_supported_T [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1)
+    {η : ClassFunction ↥hyp.T ℂ} (hη : η ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd)) :
+    ((η : ClassFunction ↥hyp.T ℂ).conj - η).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
+  haveI := hyp.finiteG
+  letI : Fintype G := Fintype.ofFinite G
+  obtain ⟨ξ, hξ, rfl⟩ := hη
+  exact hyp.sSet_member_diffsupp_T hG hvd hξ
 
 end OddOrder.Peterfalvi.S15
