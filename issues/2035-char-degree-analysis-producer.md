@@ -2064,3 +2064,14 @@ cross-orthogonality、S-side SSetMemberRFamily:794)。それで engine assembly
   dadeT0_apply_eq_zero_of_regular + tInstance_dade{,0}_eq_induce で S 版逐語) /
   `dadeOfDiff_orthogonal_typeP_T` (S08 generic wrapper) / `nu_rowSum_ne_of_inner_zero` /
   orthogonal-T 本体 (2×2 分岐) → **(5.7) engine assembly**。
+
+## 2026-07-14 更新 #59 (lane b, /loop iter 20) — orthogonal-T 部材 5 本 landed (残り本体のみ)
+
+TSetMemberRFamily (sorry-free、一発 build): `sSet_reducible_memberRFamily_ofRows_imageSet` (rfl) /
+`sSet_memberRFamily_T_imageSet_of_irr` / `_of_red` (dispatcher 分解) / `nu_rowSum_ne_of_inner_zero`
+/ **`sSet_irr_memberRFamily_eta_inner_T`** (最大部材 — τ_T(φ−φ̄) の constituents が η-grid ⊥、
+tInstance bridges + dadeT0_apply_eq_zero_of_regular + hyp-level
+eta_orthogonal_of_norm_one_pair_vanish)。
+
+残: `dadeOfDiff_orthogonal_typeP_T` wrapper + **`sSet_memberRFamily_orthogonal_T`** 本体 (2×2) →
+(5.7) engine assembly `sSet_coherent_dade_caseB_T`。

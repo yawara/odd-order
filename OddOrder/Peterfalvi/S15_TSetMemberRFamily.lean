@@ -217,4 +217,241 @@ theorem Hypothesis.dadeT0_apply_eq_zero_of_regular [Fintype G] [Finite G]
   have hwDeriv : w ∈ derivedInG hyp.T := honestTypeP2ASet_subset_derived hwA
   exact (OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived Tdata hwV) hwDeriv
 
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+open scoped Classical in
+/-- **`imageSet` of the row-parametrized reducible `R`-family** (`rfl`; mirror of
+`sSet_reducible_memberRFamily_ofColumns_imageSet`). -/
+theorem Hypothesis.sSet_reducible_memberRFamily_ofRows_imageSet [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
+    (hvd : hyp.v * hyp.d ≠ 1)
+    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
+    (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
+    {η : ClassFunction ↥hyp.T ℂ} (hη : η ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
+    {r s : Fin hyp.q}
+    (hr0 : r ≠ ⟨0, hyp.q_prime.pos⟩) (hs0 : s ≠ ⟨0, hyp.q_prime.pos⟩) (hrs : r ≠ s)
+    (hreq : η = ∑ j : Fin hyp.p, hyp.nu r j)
+    (hseq : (η : ClassFunction ↥hyp.T ℂ).conj = ∑ j : Fin hyp.p, hyp.nu s j) :
+    (hyp.sSet_reducible_memberRFamily_ofRows hG hnoV pins hvd hT2 Tdata hU hW1 hW2 hη
+        hr0 hs0 hrs hreq hseq).imageSet
+      = Finset.image (Sum.elim (fun j : Fin hyp.p => hyp.eta r j)
+          (fun j : Fin hyp.p => -hyp.eta s j)) Finset.univ :=
+  rfl
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **`imageSet`-reduction of the `T`-dispatcher, irreducible branch** (mirror of
+`sSet_memberRFamily_imageSet_of_irr`). -/
+theorem Hypothesis.sSet_memberRFamily_T_imageSet_of_irr [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
+    (hvd : hyp.v * hyp.d ≠ 1)
+    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
+    (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
+    {η : ClassFunction ↥hyp.T ℂ} (hη : η ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
+    (hirr : OddOrder.RepresentationTheory.IsIrreducibleCharacter η) :
+    ∃ (hr : ¬ ClassFunction.IsReal (η : ClassFunction ↥hyp.T ℂ))
+      (hs : ((η : ClassFunction ↥hyp.T ℂ).conj - (η : ClassFunction ↥hyp.T ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T),
+      (hyp.sSet_memberRFamily_T hG hnoV pins hvd hT2 Tdata hU hW1 hW2 hη).imageSet =
+        (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
+          (hyp.dadeHypT hG hT2) (hyp.dadeHypT_hconj hG hT2) ⟨η, hirr⟩ hr hs).imageSet := by
+  refine ⟨sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupT hG hvd) (hyp.oddCardT hG) hη,
+    hyp.sSet_member_conjDiff_supported_T hG hvd hη, ?_⟩
+  unfold Hypothesis.sSet_memberRFamily_T
+  rw [dif_pos hirr]
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+open scoped Classical in
+/-- **`imageSet`-reduction of the `T`-dispatcher, reducible branch** (mirror of
+`sSet_memberRFamily_imageSet_of_red`). -/
+theorem Hypothesis.sSet_memberRFamily_T_imageSet_of_red [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
+    (hvd : hyp.v * hyp.d ≠ 1)
+    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
+    (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
+    {η : ClassFunction ↥hyp.T ℂ} (hη : η ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
+    (hirr : ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter η) :
+    ∃ (r s : Fin hyp.q), η = ∑ j : Fin hyp.p, hyp.nu r j ∧
+      (η : ClassFunction ↥hyp.T ℂ).conj = ∑ j : Fin hyp.p, hyp.nu s j ∧
+      (hyp.sSet_memberRFamily_T hG hnoV pins hvd hT2 Tdata hU hW1 hW2 hη).imageSet =
+        Finset.image (Sum.elim (fun j : Fin hyp.p => hyp.eta r j)
+          (fun j : Fin hyp.p => -hyp.eta s j)) Finset.univ := by
+  refine ⟨(hyp.sSet_reducible_eq_nuRowSum hG pins hvd hη hirr).choose,
+    (hyp.sSet_reducible_eq_nuRowSum hG pins hvd
+      (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupT hG hvd) hη)
+      (hyp.sSet_reducible_conj_not_irr_T hirr)).choose,
+    (hyp.sSet_reducible_eq_nuRowSum hG pins hvd hη hirr).choose_spec.2,
+    (hyp.sSet_reducible_eq_nuRowSum hG pins hvd
+      (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupT hG hvd) hη)
+      (hyp.sSet_reducible_conj_not_irr_T hirr)).choose_spec.2, ?_⟩
+  rw [show (hyp.sSet_memberRFamily_T hG hnoV pins hvd hT2 Tdata hU hW1 hW2 hη).imageSet
+        = (hyp.sSet_reducible_memberRFamily_T hG hnoV pins hvd hT2 Tdata hU hW1 hW2
+            hη hirr).imageSet from by
+    unfold Hypothesis.sSet_memberRFamily_T; rw [dif_neg hirr]]
+  exact hyp.sSet_reducible_memberRFamily_ofRows_imageSet hG hnoV pins hvd hT2 Tdata hU hW1 hW2
+    hη
+    (hyp.sSet_reducible_eq_nuRowSum hG pins hvd hη hirr).choose_spec.1
+    (hyp.sSet_reducible_eq_nuRowSum hG pins hvd
+      (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupT hG hvd) hη)
+      (hyp.sSet_reducible_conj_not_irr_T hirr)).choose_spec.1
+    (hyp.sSet_reducible_rows_ne hG pins hvd hη hirr)
+    (hyp.sSet_reducible_eq_nuRowSum hG pins hvd hη hirr).choose_spec.2
+    (hyp.sSet_reducible_eq_nuRowSum hG pins hvd
+      (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupT hG hvd) hη)
+      (hyp.sSet_reducible_conj_not_irr_T hirr)).choose_spec.2
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **Distinct ν-rows from a vanishing cross inner product** (mirror of
+`mu_colSum_ne_of_inner_zero`). -/
+theorem Hypothesis.nu_rowSum_ne_of_inner_zero [Finite G] (hyp : Hypothesis (G := G))
+    (pins : NuGridSupplyData hyp) {a b : Fin hyp.q}
+    (h : ClassFunction.inner (∑ j : Fin hyp.p, hyp.nu a j)
+      (∑ j : Fin hyp.p, hyp.nu b j) = 0) :
+    a ≠ b := by
+  classical
+  haveI := hyp.finiteG
+  rintro rfl
+  have hself : ClassFunction.inner (∑ j : Fin hyp.p, hyp.nu a j)
+      (∑ j : Fin hyp.p, hyp.nu a j) = (hyp.p : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_sum_left]
+    calc ∑ j : Fin hyp.p, ClassFunction.inner (hyp.nu a j) (∑ j' : Fin hyp.p, hyp.nu a j')
+        = ∑ j : Fin hyp.p, ∑ j' : Fin hyp.p,
+            ClassFunction.inner (hyp.nu a j) (hyp.nu a j') := by
+          refine Finset.sum_congr rfl fun j _ => ?_
+          rw [OddOrder.RepresentationTheory.inner_sum_right]
+      _ = ∑ j : Fin hyp.p, ∑ j' : Fin hyp.p, if j = j' then (1 : ℂ) else 0 := by
+          refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun j' _ => ?_
+          rw [pins.nu_orthonormal a a j j']; simp
+      _ = ∑ _j : Fin hyp.p, (1 : ℂ) := by
+          refine Finset.sum_congr rfl fun j _ => ?_; simp
+      _ = (hyp.p : ℂ) := by simp
+  rw [hself] at h
+  exact absurd h (Nat.cast_ne_zero.mpr hyp.p_prime.pos.ne')
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **The irreducible member's Dade `R`-family is orthogonal to the whole `η`-grid**, `T`-side
+(mirror of `sSet_irr_memberRFamily_eta_inner`): the two constituents of `τ_T(φ − φ̄)` are
+norm-one virtual characters whose signed difference vanishes on the regular set
+(`dadeT0_apply_eq_zero_of_regular` after the `A→A₀` bridge), so
+`eta_orthogonal_of_norm_one_pair_vanish` (hyp-level, the shared `η`/`W` grid) applies. -/
+theorem Hypothesis.sSet_irr_memberRFamily_eta_inner_T [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
+    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (Tdata : TypePData hyp.T) (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
+    {φ : ClassFunction ↥hyp.T ℂ}
+    (hφirr : OddOrder.RepresentationTheory.IsIrreducibleCharacter φ)
+    (hr : ¬ ClassFunction.IsReal (φ : ClassFunction ↥hyp.T ℂ))
+    (hs : ((φ : ClassFunction ↥hyp.T ℂ).conj - (φ : ClassFunction ↥hyp.T ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T)
+    {α : ClassFunction G ℂ}
+    (hα : α ∈ (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
+      (hyp.dadeHypT hG hT2) (hyp.dadeHypT_hconj hG hT2) ⟨φ, hφirr⟩ hr hs).imageSet)
+    (i : Fin hyp.q) (j : Fin hyp.p) :
+    ClassFunction.inner (hyp.eta i j) α = 0 := by
+  classical
+  haveI := hyp.finiteG
+  letI : Fintype G := Fintype.ofFinite G
+  obtain ⟨cd, hcd⟩ :
+      ∃ cd : OddOrder.Peterfalvi.S07.CharacterDifferenceImage (G := G)
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2)
+          ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2)))
+        (φ : ClassFunction ↥hyp.T ℂ),
+        OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff (hyp.dadeHypT hG hT2)
+            (hyp.dadeHypT_hconj hG hT2) ⟨φ, hφirr⟩ hr hs = cd.toOrthonormalImage := ⟨_, rfl⟩
+  rw [hcd] at hα
+  simp only [OddOrder.Peterfalvi.S07.CharacterDifferenceImage.toOrthonormalImage,
+    Finset.mem_insert, Finset.mem_singleton] at hα
+  have hμZ : cd.muClassFunction ∈ ZIrr G := cd.mu.mem_ZIrr
+  have hνZ : cd.nuClassFunction ∈ ZIrr G := cd.nu.mem_ZIrr
+  have hμ1 : ClassFunction.inner cd.muClassFunction cd.muClassFunction = 1 := by
+    have h := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite cd.mu cd.mu
+    rwa [if_pos rfl] at h
+  have hν1 : ClassFunction.inner cd.nuClassFunction cd.nuClassFunction = 1 := by
+    have h := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite cd.nu cd.nu
+    rwa [if_pos rfl] at h
+  have hμν : ClassFunction.inner cd.muClassFunction cd.nuClassFunction = 0 := by
+    have h := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite cd.mu cd.nu
+    rwa [if_neg cd.distinct] at h
+  have hνμ : ClassFunction.inner cd.nuClassFunction cd.muClassFunction = 0 := by
+    have h := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite cd.nu cd.mu
+    rwa [if_neg (Ne.symm cd.distinct)] at h
+  have hsign : (cd.sign : ℂ) * (cd.sign : ℂ) = 1 := by
+    have := cd.sign_mul_self; exact_mod_cast congrArg (Int.cast : ℤ → ℂ) this
+  have hdiffsupp' : ((φ : ClassFunction ↥hyp.T ℂ)
+      - (φ : ClassFunction ↥hyp.T ℂ).conj).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
+    rw [show (φ : ClassFunction ↥hyp.T ℂ) - (φ : ClassFunction ↥hyp.T ℂ).conj =
+        -((φ : ClassFunction ↥hyp.T ℂ).conj - (φ : ClassFunction ↥hyp.T ℂ)) by abel,
+      ClassFunction.support_neg]
+    exact hs
+  have hA0supp' : ((φ : ClassFunction ↥hyp.T ℂ)
+      - (φ : ClassFunction ↥hyp.T ℂ).conj).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set hyp.T Tdata) hyp.T :=
+    hdiffsupp'.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
+      (honestTypeP2ASet_subset_A0Set Tdata))
+  have hcdimg : (cd.sign : ℂ) • cd.muClassFunction - (cd.sign : ℂ) • cd.nuClassFunction
+      = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hT2 Tdata)
+          ((hyp.dadeHypT0 hG hT2 Tdata).fullDadeIsometryData
+            (hyp.dadeHypT0_hconj hG hT2 Tdata))
+          ((φ : ClassFunction ↥hyp.T ℂ) - (φ : ClassFunction ↥hyp.T ℂ).conj) := by
+    rw [hyp.tInstance_dade0_eq_induce hG hnoV hT2 Tdata hA0supp',
+      ← hyp.tInstance_dade_eq_induce hG hnoV hT2 hdiffsupp',
+      cd.image_eq, smul_sub, Int.cast_smul_eq_zsmul ℂ, Int.cast_smul_eq_zsmul ℂ]
+  have hvanish : ∀ y ∈ OddOrder.GroupTheory.conjClassSet
+      ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))),
+      ((cd.sign : ℂ) • cd.muClassFunction - (cd.sign : ℂ) • cd.nuClassFunction) y = 0 := by
+    intro y hy
+    rw [hcdimg]
+    exact hyp.dadeT0_apply_eq_zero_of_regular hG hT2 Tdata hW1 hW2 hdiffsupp' hy
+  have hvanish' : ∀ y ∈ OddOrder.GroupTheory.conjClassSet
+      ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))),
+      ((cd.sign : ℂ) • cd.nuClassFunction - (cd.sign : ℂ) • cd.muClassFunction) y = 0 := by
+    intro y hy
+    rw [show (cd.sign : ℂ) • cd.nuClassFunction - (cd.sign : ℂ) • cd.muClassFunction
+        = -((cd.sign : ℂ) • cd.muClassFunction - (cd.sign : ℂ) • cd.nuClassFunction) by abel,
+      ClassFunction.neg_apply, hvanish y hy, neg_zero]
+  have hpsiZ : (cd.sign : ℂ) • cd.muClassFunction ∈ ZIrr G := by
+    rw [Int.cast_smul_eq_zsmul ℂ]; exact (ZIrr G).smul_mem cd.sign hμZ
+  have hconjZ : (cd.sign : ℂ) • cd.nuClassFunction ∈ ZIrr G := by
+    rw [Int.cast_smul_eq_zsmul ℂ]; exact (ZIrr G).smul_mem cd.sign hνZ
+  have hpsi1 : ClassFunction.inner ((cd.sign : ℂ) • cd.muClassFunction)
+      ((cd.sign : ℂ) • cd.muClassFunction) = 1 := by
+    rw [ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right, hμ1,
+      mul_one, star_intCast]; exact hsign
+  have hconj1 : ClassFunction.inner ((cd.sign : ℂ) • cd.nuClassFunction)
+      ((cd.sign : ℂ) • cd.nuClassFunction) = 1 := by
+    rw [ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right, hν1,
+      mul_one, star_intCast]; exact hsign
+  have hcross : ClassFunction.inner ((cd.sign : ℂ) • cd.muClassFunction)
+      ((cd.sign : ℂ) • cd.nuClassFunction) = 0 := by
+    rw [ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right, hμν,
+      mul_zero, mul_zero]
+  have hcross' : ClassFunction.inner ((cd.sign : ℂ) • cd.nuClassFunction)
+      ((cd.sign : ℂ) • cd.muClassFunction) = 0 := by
+    rw [ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right, hνμ,
+      mul_zero, mul_zero]
+  have hvpsi := OddOrder.Peterfalvi.S16.eta_orthogonal_of_norm_one_pair_vanish hyp
+    hpsiZ hconjZ hpsi1 hconj1 hcross hvanish i j
+  have hvconj := OddOrder.Peterfalvi.S16.eta_orthogonal_of_norm_one_pair_vanish hyp
+    hconjZ hpsiZ hconj1 hpsi1 hcross' hvanish' i j
+  rcases hα with rfl | rfl
+  · rw [← Int.cast_smul_eq_zsmul ℂ]; exact hvpsi
+  · rw [← Int.cast_smul_eq_zsmul ℂ, Int.cast_neg, neg_smul, ClassFunction.inner_neg_right,
+      hvconj, neg_zero]
+
 end OddOrder.Peterfalvi.S15
