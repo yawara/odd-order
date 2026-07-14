@@ -1,5 +1,6 @@
 import OddOrder.Peterfalvi.S15_SAndT_Setup.NormEstimates
 import OddOrder.Peterfalvi.S13_ElementaryAbelianKernel
+import OddOrder.BG.Ch2_Uniqueness.S07_Theorem74
 
 /-!
 # Peterfalvi (13.11)-(13.15) — order and divisor determination
@@ -991,6 +992,90 @@ theorem caseA_sylow_U_not_isCyclic [Finite G]
     (R : Sylow r ↥hyp.U) : ¬ IsCyclic ↥(R : Subgroup ↥hyp.U) := by
   obtain ⟨hq, hu⟩ := caseA_parameters hG hyp caseA
   exact caseA_sylow_U_not_isCyclic_of_parameters hG hyp caseA hq hu hr hrhalf R
+
+/-- **Peterfalvi (14.6), BG Prop. 1.16 witness.**  Let `R₀` be a noncyclic Sylow
+`r`-subgroup of the `S`-side complement `U`, where `r ∣ (p - 1) / 2`.  Then some
+nonidentity `x ∈ R₀` has `C_P(x) ≠ 1`.
+
+The ambient image `B` of `R₀` is abelian because `U` is abelian, normalizes `P` because
+`U ≤ S ≤ N_G(P)`, and has order coprime to `|P| = p^q` because `r < p`.  These are exactly
+the hypotheses of BG Prop. 1.16(1). -/
+theorem exists_sylow_mem_inf_centralizer_ne_bot_of_not_isCyclic [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {r : ℕ} (hr : r.Prime) (hrhalf : r ∣ (hyp.p - 1) / 2)
+    (R : Sylow r ↥hyp.U) (hRnc : ¬ IsCyclic ↥(R : Subgroup ↥hyp.U)) :
+    ∃ x ∈ (R : Subgroup ↥hyp.U).map hyp.U.subtype, x ≠ (1 : G) ∧
+      hyp.P ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ := by
+  let B : Subgroup G := (R : Subgroup ↥hyp.U).map hyp.U.subtype
+  have hBU : B ≤ hyp.U := by
+    simpa only [B] using (Subgroup.map_subtype_le (R : Subgroup ↥hyp.U))
+  have hBnc : ¬ IsCyclic ↥B := by
+    intro hBcyc
+    exact hRnc ((Subgroup.equivMapOfInjective (R : Subgroup ↥hyp.U) hyp.U.subtype
+      hyp.U.subtype_injective).isCyclic.mpr (by simpa only [B] using hBcyc))
+  letI : IsMulCommutative ↥B := IsMulCommutative.of_comm fun a b => by
+    apply Subtype.ext
+    change (a : G) * (b : G) = (b : G) * (a : G)
+    exact congrArg (fun z : ↥hyp.U => (z : G)) (hyp.S_U_commutative.is_comm.comm
+      (⟨(a : G), hBU a.2⟩ : ↥hyp.U) (⟨(b : G), hBU b.2⟩ : ↥hyp.U))
+  have hUS : hyp.U ≤ hyp.S := by
+    rw [← hyp.Sdata_U_eq]
+    exact hyp.Sdata.U_le.trans (Subgroup.map_subtype_le _)
+  have hSP : hyp.S ≤ Subgroup.normalizer (hyp.P : Set G) := by
+    rw [hyp.P_eq_SF]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
+  have hBP : B ≤ Subgroup.normalizer (hyp.P : Set G) := hBU.trans (hUS.trans hSP)
+  have hrltp : r < hyp.p := by
+    have hhalfpos : 0 < (hyp.p - 1) / 2 := by have := hyp.three_le_p; omega
+    have hrle : r ≤ (hyp.p - 1) / 2 := Nat.le_of_dvd hhalfpos hrhalf
+    omega
+  have hrne : r ≠ hyp.p := ne_of_lt hrltp
+  letI : Fact r.Prime := ⟨hr⟩
+  letI : Fact hyp.p.Prime := ⟨hyp.p_prime⟩
+  have hBr : IsPGroup r B := by
+    simpa only [B] using R.isPGroup'.map hyp.U.subtype
+  have hPp : IsPGroup hyp.p hyp.P :=
+    IsPGroup.of_card (hyp.card_P_eq hG hyp.Sdata_W2_eq)
+  have hcop : Nat.Coprime (Nat.card ↥B) (Nat.card ↥hyp.P) :=
+    IsPGroup.coprime_card_of_ne r hyp.p hrne B hyp.P hBr hPp
+  have hpdvd : hyp.p ∣ Nat.card ↥hyp.P := by
+    rw [hyp.card_P_eq hG hyp.Sdata_W2_eq]
+    exact dvd_pow_self hyp.p hyp.q_prime.pos.ne'
+  have hPne : hyp.P ≠ ⊥ := (Subgroup.one_lt_card_iff_ne_bot hyp.P).mp <| by
+    exact hyp.p_prime.one_lt.trans_le (Nat.le_of_dvd Nat.card_pos hpdvd)
+  simpa only [B] using
+    (OddOrder.BG.Ch2.S07.exists_mem_inf_centralizer_ne_bot_of_not_isCyclic
+      hBP hBnc hcop hPne)
+
+/-- **Peterfalvi (14.6), sharp-parameter centralizer witness.**  The case-(9.7.a)
+block-scalar noncyclicity at the explicit (13.13) parameters supplies the noncyclic Sylow
+input to `exists_sylow_mem_inf_centralizer_ne_bot_of_not_isCyclic`. -/
+theorem caseA_exists_sylow_mem_inf_centralizer_ne_bot_of_parameters [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
+    (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
+      (hyp.mkSection11CharacterDataS hG chief))
+    (hq : hyp.q = 3) (hu : hyp.u = (hyp.p - 1) ^ 2 / 4)
+    {r : ℕ} (hr : r.Prime) (hrhalf : r ∣ (hyp.p - 1) / 2)
+    (R : Sylow r ↥hyp.U) :
+    ∃ x ∈ (R : Subgroup ↥hyp.U).map hyp.U.subtype, x ≠ (1 : G) ∧
+      hyp.P ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ := by
+  apply exists_sylow_mem_inf_centralizer_ne_bot_of_not_isCyclic hG hyp hr hrhalf R
+  exact caseA_sylow_U_not_isCyclic_of_parameters hG hyp caseA hq hu hr hrhalf R
+
+/-- **Peterfalvi (14.6), case-(9.7.a) centralizer witness.**  This consumer obtains the
+sharp (13.13) parameters from `caseA_parameters`. -/
+theorem caseA_exists_sylow_mem_inf_centralizer_ne_bot [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
+    (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
+      (hyp.mkSection11CharacterDataS hG chief))
+    {r : ℕ} (hr : r.Prime) (hrhalf : r ∣ (hyp.p - 1) / 2)
+    (R : Sylow r ↥hyp.U) :
+    ∃ x ∈ (R : Subgroup ↥hyp.U).map hyp.U.subtype, x ≠ (1 : G) ∧
+      hyp.P ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ := by
+  apply exists_sylow_mem_inf_centralizer_ne_bot_of_not_isCyclic hG hyp hr hrhalf R
+  exact caseA_sylow_U_not_isCyclic hG hyp caseA hr hrhalf R
 
 /-- The parity calculation behind **Peterfalvi (13.14)**: if `p` is odd, the
 geometric sum of its first `q` powers has the same parity as `q`. -/
