@@ -212,8 +212,8 @@ theorem Hypothesis.sSet_sThree_coherent_dade_T [Finite G]
     (hS3deg : ∀ χ ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd) \ S₂,
       (χ : ↥hyp.T → ℂ) 1 = (((hyp.toTypesIIIIIIVSetupT hG hvd).q * chars.u : ℕ) : ℂ)) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2)
-        ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2)))
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2.1)
+        ((hyp.dadeHypT hG hT2.1).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2.1)))
       (sSet (hyp.toTypesIIIIIIVSetupT hG hvd) \ S₂)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T)) := by
   classical
@@ -260,10 +260,10 @@ theorem Hypothesis.sSet_sThree_coherent_dade_T [Finite G]
     hN
     (fun {φ ψ} hφ hψ =>
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
-        (hyp.dadeHypT hG hT2) (hyp.dadeHypT_hconj hG hT2) hφ.2 hψ.2)
+        (hyp.dadeHypT hG hT2.1) (hyp.dadeHypT_hconj hG hT2.1) hφ.2 hψ.2)
     (fun a ha b hb =>
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-        (hyp.dadeHypT hG hT2) (hyp.dadeHypT_hconj hG hT2)
+        (hyp.dadeHypT hG hT2.1) (hyp.dadeHypT_hconj hG hT2.1)
         (hsuppdiff a ha b hb)
         (Submodule.sub_mem _ (sSet_subset_ZIrr _ ha.1) (sSet_subset_ZIrr _ hb.1)))
     hsuppdiff
@@ -295,20 +295,18 @@ the solvable `K = H ⊔ U₁`; `U₁` is a Hall `σ′`-subgroup of `K` (`|K| = 
 theorem Hypothesis.mem_honestTypeP2ASet_of_mem_H_sup_cuSubOf_T [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hvd : hyp.v * hyp.d ≠ 1)
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
     {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd)}
     (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupT hG hvd) chief)
     (caseA : CliffordCaseAData chars) (i : Fin (hyp.toTypesIIIIIIVSetupT hG hvd).q)
     {y : G} (hy : y ∈ (hyp.toTypesIIIIIIVSetupT hG hvd).H ⊔ cuSubOf caseA i) (hy1 : y ≠ 1) :
     y ∈ honestTypeP2ASet hyp.T := by
   classical
-  -- dictionary: `H = Q = T_σ` and `T′ = H ⊔ U = Q ⊔ V`
+  -- dictionary: `H = Q ≤ T_σ` (the `≤` suffices at every use — general type `P`) and
+  -- `T′ = H ⊔ U = Q ⊔ V`
   have hHMs : ((hyp.toTypesIIIIIIVSetupT hG hvd).H : Subgroup G)
-      = OddOrder.BG.Ch3.S10.Msigma hyp.T := by
+      ≤ OddOrder.BG.Ch3.S10.Msigma hyp.T := by
     rw [hyp.toTypesIIIIIIVSetupT_H_eq hG hvd, hyp.Q_eq_TF]
-    exact OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II hG
-      hyp.T_maximal
-      (Or.inr (OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.T_maximal hT2))
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hyp.T_maximal
   have hSderiv : derivedInG hyp.T
       = (hyp.toTypesIIIIIIVSetupT hG hvd).H ⊔ (hyp.toTypesIIIIIIVSetupT hG hvd).U := by
     rw [hyp.T_deriv_eq_QV, hyp.toTypesIIIIIIVSetupT_H_eq hG hvd,
@@ -319,26 +317,13 @@ theorem Hypothesis.mem_honestTypeP2ASet_of_mem_H_sup_cuSubOf_T [Finite G]
   have hKS : (hyp.toTypesIIIIIIVSetupT hG hvd).H ⊔ cuSubOf caseA i ≤ hyp.T :=
     hKderiv.trans (derivedInG_le_self hyp.T)
   have hyS : y ∈ hyp.T := hKS hy
-  -- `σ`-prime dictionary: `π(|H|) ⊆ σ(S)` and `σ(S)`-primes divide `|H|`
+  -- `σ`-prime dictionary: `π(|H|) ⊆ σ(T)` (via `H ≤ M_σ`)
   have hHpi : ∀ p ∈ (Nat.card ↥(hyp.toTypesIIIIIIVSetupT hG hvd).H).primeFactors,
       p ∈ OddOrder.BG.Ch3.S10.sigma hyp.T := by
     intro p hp
-    exact OddOrder.BG.Ch3.S10.Msigma_isPiGroup hyp.T p (by rwa [← hHMs])
-  have hσH : ∀ p ∈ OddOrder.BG.Ch3.S10.sigma hyp.T,
-      p ∣ Nat.card ↥(hyp.toTypesIIIIIIVSetupT hG hvd).H := by
-    intro p hpσ
-    obtain ⟨hpS, -⟩ := (OddOrder.BG.Ch3.S10.mem_sigma_iff hyp.T p).mp hpσ
-    have hp_prime : p.Prime := (Nat.mem_primeFactors.mp hpS).1
-    have hpdvd : p ∣ Nat.card ↥hyp.T := (Nat.mem_primeFactors.mp hpS).2.1
-    have hHall := OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hyp.T_maximal
-    rw [← Subgroup.card_mul_index
-      ((OddOrder.BG.Ch3.S10.Msigma hyp.T).subgroupOf hyp.T)] at hpdvd
-    rcases hp_prime.dvd_mul.mp hpdvd with h | h
-    · rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe
-        (OddOrder.BG.Ch3.S10.Msigma_le hyp.T)).toEquiv] at h
-      rwa [hHMs]
-    · exact absurd hpσ (hHall.index_no_pi p (Nat.mem_primeFactors.mpr
-        ⟨hp_prime, h, Subgroup.index_ne_zero_of_finite⟩))
+    obtain ⟨hpp, hpH, -⟩ := Nat.mem_primeFactors.mp hp
+    refine OddOrder.BG.Ch3.S10.Msigma_isPiGroup hyp.T p (Nat.mem_primeFactors.mpr
+      ⟨hpp, hpH.trans (Subgroup.card_dvd_of_le hHMs), Nat.card_pos.ne'⟩)
   by_cases hone : OddOrder.BG.Ch4.S14.piPart (OddOrder.BG.Ch3.S10.sigma hyp.T) y = 1
   · -- `y` is a `σ′`-element: Hall-conjugate into `U₁`, then use the fixed-point witness
     have hyπ' : OddOrder.GroupTheory.IsPiElement ((OddOrder.BG.Ch3.S10.sigma hyp.T)ᶜ) y :=
@@ -371,28 +356,46 @@ theorem Hypothesis.mem_honestTypeP2ASet_of_mem_H_sup_cuSubOf_T [Finite G]
       rw [hcardU₁, hcardK,
         mul_comm (Nat.card ↥(hyp.toTypesIIIIIIVSetupT hG hvd).H)] at h1
       exact Nat.eq_of_mul_eq_mul_left Nat.card_pos h1
-    have hcopHU₁ : Nat.Coprime (Nat.card ↥(hyp.toTypesIIIIIIVSetupT hG hvd).H)
-        (Nat.card ↥(cuSubOf caseA i)) :=
-      (typeP_coprime_H_uW1 (hyp.toTypesIIIIIIVSetupT hG hvd).typeP
-        (hyp.toTypesIIIIIIVSetupT hG hvd).nontrivial.1).coprime_dvd_right
-        (Subgroup.card_dvd_of_le ((cuSubOf_le_U caseA i).trans le_sup_left))
-    have hU₁Hall : OddOrder.Isaacs.Ch03.IsHallSubgroup
-        ((OddOrder.BG.Ch3.S10.sigma hyp.T)ᶜ) ((cuSubOf caseA i).subgroupOf Kg) := by
+    -- a Hall-`σ′` subgroup `P₁` of `U₁` is Hall-`σ′` in `K`: `[K : P₁] = |H|·[U₁ : P₁]`,
+    -- both `σ`-sided.  (General type `P`: `U₁` itself need not be `σ`-free — for type III/IV
+    -- the `σ`-part of `V` is nontrivial — but its `σ`-elements are caught by the `piPart`
+    -- branch, and the `σ′`-conjugation only needs *some* Hall-`σ′` inside `U₁`.)
+    haveI hU₁solv : IsSolvable ↥((cuSubOf caseA i).subgroupOf Kg) := inferInstance
+    obtain ⟨P₁, hP₁Hall, -⟩ := OddOrder.Isaacs.Ch03.hall_D
+      (G := ↥((cuSubOf caseA i).subgroupOf Kg))
+      (U := ⊥) (fun p hp => by
+        rw [Subgroup.card_bot] at hp
+        simp at hp)
+    set P₁' : Subgroup ↥Kg := P₁.map ((cuSubOf caseA i).subgroupOf Kg).subtype with hP₁'def
+    have hP₁'le : P₁' ≤ (cuSubOf caseA i).subgroupOf Kg := Subgroup.map_subtype_le _
+    have hP₁'card : Nat.card ↥P₁' = Nat.card ↥P₁ :=
+      Nat.card_congr (Subgroup.equivMapOfInjective _ _
+        ((cuSubOf caseA i).subgroupOf Kg).subtype_injective).toEquiv.symm
+    have hP₁'sub : P₁'.subgroupOf ((cuSubOf caseA i).subgroupOf Kg) = P₁ :=
+      Subgroup.comap_map_eq_self_of_injective
+        ((cuSubOf caseA i).subgroupOf Kg).subtype_injective P₁
+    have hP₁'Hall : OddOrder.Isaacs.Ch03.IsHallSubgroup
+        ((OddOrder.BG.Ch3.S10.sigma hyp.T)ᶜ) P₁' := by
       constructor
       · intro p hp
-        rw [hcardU₁] at hp
-        rw [Set.mem_compl_iff]
-        intro hpσ
-        have hpgcd : p ∣ Nat.gcd (Nat.card ↥(hyp.toTypesIIIIIIVSetupT hG hvd).H)
-            (Nat.card ↥(cuSubOf caseA i)) :=
-          Nat.dvd_gcd (hσH p hpσ) (Nat.mem_primeFactors.mp hp).2.1
-        rw [Nat.Coprime.gcd_eq_one hcopHU₁] at hpgcd
-        exact (Nat.mem_primeFactors.mp hp).1.one_lt.ne' (Nat.dvd_one.mp hpgcd)
+        rw [hP₁'card] at hp
+        exact hP₁Hall.1 p hp
       · intro p hp
-        rw [hidxU₁] at hp
+        have hsplit := Subgroup.relIndex_mul_index hP₁'le
+        obtain ⟨hpp, hpdvd, -⟩ := Nat.mem_primeFactors.mp hp
+        rw [← hsplit] at hpdvd
         simp only [Set.mem_compl_iff, not_not]
-        exact hHpi p hp
-    -- `⟨y⟩` is a `σ′`-subgroup of `K`: Hall D + Hall C conjugate it into `U₁`
+        rcases hpp.dvd_mul.mp hpdvd with h | h
+        · -- `p ∣ [U₁ : P₁]`: the Hall complement side of `P₁`
+          have hrel : P₁'.relIndex ((cuSubOf caseA i).subgroupOf Kg) = P₁.index := by
+            rw [Subgroup.relIndex, hP₁'sub]
+          rw [hrel] at h
+          exact not_not.mp (hP₁Hall.2 p (Nat.mem_primeFactors.mpr
+            ⟨hpp, h, Subgroup.index_ne_zero_of_finite⟩))
+        · -- `p ∣ [K : U₁] = |H|`
+          rw [hidxU₁] at h
+          exact hHpi p (Nat.mem_primeFactors.mpr ⟨hpp, h, Nat.card_pos.ne'⟩)
+    -- `⟨y⟩` is a `σ′`-subgroup of `K`: Hall D + Hall C conjugate it into `P₁ ≤ U₁`
     have hyK : y ∈ Kg := hy
     have hZpi : ∀ p ∈ (Nat.card ↥(Subgroup.zpowers (⟨y, hyK⟩ : ↥Kg))).primeFactors,
         p ∈ (OddOrder.BG.Ch3.S10.sigma hyp.T)ᶜ := by
@@ -403,9 +406,10 @@ theorem Hypothesis.mem_honestTypeP2ASet_of_mem_H_sup_cuSubOf_T [Finite G]
       rw [← hord] at hp
       exact hyπ' p hp
     obtain ⟨Q, hQHall, hZQ⟩ := OddOrder.Isaacs.Ch03.hall_D (G := ↥Kg) hZpi
-    obtain ⟨g, hgconj⟩ := OddOrder.Isaacs.Ch03.hall_C hQHall hU₁Hall
+    obtain ⟨g, hgconj⟩ := OddOrder.Isaacs.Ch03.hall_C hQHall hP₁'Hall
     have hyU₁ : (MulAut.conj g).toMonoidHom (⟨y, hyK⟩ : ↥Kg)
         ∈ (cuSubOf caseA i).subgroupOf Kg := by
+      refine hP₁'le ?_
       rw [← hgconj]
       exact Subgroup.mem_map_of_mem _ (hZQ (Subgroup.mem_zpowers _))
     have hgyG : (g : G) * y * (g : G)⁻¹ ∈ cuSubOf caseA i := by
@@ -433,7 +437,7 @@ theorem Hypothesis.mem_honestTypeP2ASet_of_mem_H_sup_cuSubOf_T [Finite G]
         _ = ((g : G)⁻¹ * x₀ * (g : G)) * y := by group
     rw [mem_honestTypeP2ASet]
     exact ⟨hKderiv hy, hy1, (g : G)⁻¹ * x₀ * (g : G),
-      ⟨SetLike.mem_coe.mpr (hHMs ▸ hx₁H), fun h => hx₁ne (Set.mem_singleton_iff.mp h)⟩,
+      ⟨SetLike.mem_coe.mpr (hHMs hx₁H), fun h => hx₁ne (Set.mem_singleton_iff.mp h)⟩,
       Subgroup.mem_centralizer_singleton_iff.mpr hcent⟩
   · -- the `σ`-part `h ≠ 1` is a nonidentity centralized `T_σ`-witness
     obtain ⟨b, hmul, hcomm, hpiA, hpiB, hhzpow, hbzpow⟩ :=
@@ -468,7 +472,6 @@ centralizes a nontrivial `H`-element by coprime fixed-point lifting; `ψ₁`'s s
 theorem Hypothesis.nineElevenAlphaSupportT [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hvd : hyp.v * hyp.d ≠ 1)
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
     {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd)}
     (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupT hG hvd) chief)
     (caseA : CliffordCaseAData chars) (i : Fin (hyp.toTypesIIIIIIVSetupT hG hvd).q)
@@ -528,7 +531,7 @@ theorem Hypothesis.nineElevenAlphaSupportT [Finite G]
       have h2 : z = c * (c⁻¹ * z * c) * c⁻¹ := by group
       rw [h2, h1]
       group
-    have hwA := hyp.mem_honestTypeP2ASet_of_mem_H_sup_cuSubOf_T hG hvd hT2 chars caseA i hwG hwne
+    have hwA := hyp.mem_honestTypeP2ASet_of_mem_H_sup_cuSubOf_T hG hvd chars caseA i hwG hwne
     rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
     have hzeq : (z : G) = (c : G) * ((c⁻¹ * z * c : ↥hyp.T) : G) * (c : G)⁻¹ := by
       push_cast
@@ -555,7 +558,6 @@ the TI-identity); integrality by `mem_ZIrr_inner_self_eq_sum_sq`; support by the
 theorem Hypothesis.nineElevenFourNormInputsT [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hvd : hyp.v * hyp.d ≠ 1)
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
     {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd)}
     (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupT hG hvd) chief)
     (caseA : CliffordCaseAData chars)
@@ -672,6 +674,6 @@ theorem Hypothesis.nineElevenFourNormInputsT [Finite G]
   · -- `Supp(α) ⊆ A(T)`: the (9.11.4) support residual at the explicit witness
     have hψ₁mem : ψ₁ ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd) :=
       hyp.sOf_H0Uprime_subset_sSet_T hG hvd chars ⟨ζ, hζmem, hψ₁eq⟩
-    exact hyp.nineElevenAlphaSupportT hG hvd hT2 chars caseA ⟨0, hq0⟩ hψ₁mem hψ₁deg
+    exact hyp.nineElevenAlphaSupportT hG hvd chars caseA ⟨0, hq0⟩ hψ₁mem hψ₁deg
 
 end OddOrder.Peterfalvi.S15
