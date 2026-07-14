@@ -1279,6 +1279,17 @@ noncomputable def section16CharacterData_of_isMinimalSimpleOdd {G : Type*} [Grou
           exact hseq ▸ hsub
       mu_reducible_dichotomy := Section16CharacterData.muS_reducible_dichotomy hG mp tp
       nu_definition := Section16CharacterData.nuT_definition hG mp tp
+      nu_irreducible := Section16CharacterData.nuT_irreducible hG mp tp
+      nu_row_injective := Section16CharacterData.nuT_row_injective hG mp tp
+      nu_orthonormal := Section16CharacterData.nuT_orthonormal hG mp tp
+      nu_degree_modEq_deltaPrime :=
+        Section16CharacterData.nuT_degree_modEq_deltaPrime hG mp tp
+      deltaPrime_zero_eq_one := Section16CharacterData.deltaPrimeT_zero_eq_one hG mp tp
+      nu_rowSum_eq_induce := Section16CharacterData.nuT_rowSum_eq_induce hG mp tp
+      nu_reducible_dichotomy := Section16CharacterData.nuT_reducible_dichotomy hG mp tp
+      nu_diff_support := Section16CharacterData.nuT_diff_support hG mp tp
+      nu_apply_of_not_mem_W1 := Section16CharacterData.nuT_apply_of_not_mem_W1 hG mp tp
+      nu_conj := Section16CharacterData.nuT_conj hG mp tp
       tau3_isometry := Section16CharacterData.tau3W_isometry hG mp tp
       tau3_trivial := Section16CharacterData.tau3W_trivial hG mp tp
       tau3_apply_of_regular := fun α w hwW hnot =>
@@ -1391,6 +1402,16 @@ noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [F
     mu_colSum_eq_induce := cd.mu_colSum_eq_induce
     mu_reducible_dichotomy := cd.mu_reducible_dichotomy
     nu_definition := cd.nu_definition
+    nu_irreducible := cd.nu_irreducible
+    nu_row_injective := cd.nu_row_injective
+    nu_orthonormal := cd.nu_orthonormal
+    nu_degree_modEq_deltaPrime := cd.nu_degree_modEq_deltaPrime
+    deltaPrime_zero_eq_one := cd.deltaPrime_zero_eq_one
+    nu_rowSum_eq_induce := cd.nu_rowSum_eq_induce
+    nu_reducible_dichotomy := cd.nu_reducible_dichotomy
+    nu_diff_support := cd.nu_diff_support
+    nu_apply_of_not_mem_W1 := cd.nu_apply_of_not_mem_W1
+    nu_conj := cd.nu_conj
     q_lt_p := tp.q_lt_p
     Sdata := tp.Sdata
     Sdata_U_eq := tp.Sdata_U_eq
@@ -1552,6 +1573,28 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       eta_pair_of_coprime := inp.eta_pair_of_coprime
       eta_principal_of_coprime := inp.eta_principal_of_coprime }
   q_lt_p := inp.q_lt_p
+
+/-- **Canonical pure ν-grid supply from named Section 16 inputs** (issue 1030).
+
+The T-side Peterfalvi (4.3)--(4.9) facts are explicit fields of `Section16Inputs`.
+Consequently they assemble into the pure `NuGridSupplyData` package at the same
+axiom-clean boundary as `sectionSixteenHypothesis_of_inputs`; no generic row-translation
+principle and no post-(14.9) commutativity fact is used. -/
+theorem sectionSixteenNuGridSupplyData_of_inputs
+    {G : Type*} [Group G] [Finite G] (hodd : Odd (Nat.card G))
+    (inp : Section16Inputs G) :
+    Peterfalvi.S15.NuGridSupplyData (sectionSixteenHypothesis_of_inputs hodd inp).base := by
+  exact
+    { nu_irreducible := inp.nu_irreducible
+      nu_row_injective := inp.nu_row_injective
+      nu_orthonormal := inp.nu_orthonormal
+      nu_degree_modEq_deltaPrime := inp.nu_degree_modEq_deltaPrime
+      deltaPrime_zero_eq_one := inp.deltaPrime_zero_eq_one
+      nu_rowSum_eq_induce := inp.nu_rowSum_eq_induce
+      nu_reducible_dichotomy := inp.nu_reducible_dichotomy
+      nu_diff_support := inp.nu_diff_support
+      nu_apply_of_not_mem_W1 := inp.nu_apply_of_not_mem_W1
+      nu_conj := inp.nu_conj }
 
 /-- **The one remaining upstream obligation.** From a minimal simple group of odd
 order, the Bender–Glauberman local analysis (BG §7–§16) together with Peterfalvi's

@@ -346,3 +346,14 @@ instantiate し本 theorem を cite → `hyp.u = chars.u`・`hyp.p = chief.p`・
 
 **interface guard (必須)**: shared leaf は module-level generic のみ (side-specific predicate 禁止)、
 a の S12/S13 と c の S16 が同一 formulation を両側 instantiate。S11 dedup の thin singerAdapter パターン再利用。
+
+## ✅ 完了 (2026-07-14, lane a)
+
+本 claim の残 tail は後続実装で全て閉じた。generic σ-theory engine は sorry-free、
+S11 の block decomposition / `hconst` assembly は `caseA_u_le_cyclotomicQuotient` と
+`u_le_cyclotomicQuotient` に着地済み。最後の (11.9) type-III determination / `typeP_Galois`
+character body も issue 1024/1026 で完成し、`T_not_isTypeIV_of_isTypeP1` は
+`AxiomsCheck.lean` の allowlist のみで検証済み。
+
+S16 `SubgroupM` の field-model residual は issue 9078 / lane c の別 scope であり、
+本 shared-infra claim の未完ではない。よって close する。
