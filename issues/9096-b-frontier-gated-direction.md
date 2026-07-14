@@ -158,3 +158,36 @@ b は待機中 re-assess を continue (a-ν landing で un-gate 波及を検出�
 
 ruling item 2 final clause に従い T-side (13.3)/(13.4) を再開
 (`tSide_theta_package_of_not_caseB_core` / `deltaPrime_eq_one_T`、issue 2035 文脈)。
+
+## ✅ a 実施報告 (2026-07-14): canonical pure ν-grid carrier producer landed
+
+HUB RULING item 3 を実施した。`Section16CharacterData` と `Section16Inputs` に、split 後の
+`NuGridSupplyData` と 1:1 対応する 10 個の pure ν-grid proof fields を thread し、canonical
+`nuT_*` 定理から全 field を構成した。named-input boundary の producer は次の通り:
+
+```lean
+theorem OddOrder.sectionSixteenNuGridSupplyData_of_inputs
+    (hodd : Odd (Nat.card G)) (inp : Section16Inputs G) :
+    Peterfalvi.S15.NuGridSupplyData
+      (sectionSixteenHypothesis_of_inputs hodd inp).base
+```
+
+公理監査は `[propext, Classical.choice, Quot.sound]` のみ。AxiomsCheck assertion 登録済み、
+`lake build OddOrder.FeitThompson OddOrder.AxiomsCheck` green (4189 jobs)。post-(14.9) の
+`V_commutative` は producer の型にも証明にも現れない。
+
+### 残る consumer rewiring (cross-lane; hub arbitration target)
+
+generic `Hypothesis.nuGridSupply` は引き続き sorried theorem のままであり、置換可能な generic
+proof ではない。`nu_definition` は row differences しか拘束せず、各 row の一様平行移動を
+排除できないためである。したがって canonical producer を consumer まで明示的に運ぶ必要がある。
+
+最小の依存順保存案は、c-owned `S16.Hypothesis` に
+`nuGridSupply : S15.NuGridSupplyData base` を追加し、A の
+`sectionSixteenHypothesis_of_inputs` が上記 producer 相当の fields で埋めること。その上で b-owned
+S15 の grid-dependent chain (`typeIBetaL_eta_col_constant`, `typeI_caseC_dual_dichotomy`,
+`typeIOrthogonalityGridData_of_coherent78`, `typeI_orthogonality_dichotomy`,
+`complement_not_le_Q` → `complement_card_eq_pq` → `typeI_overNormalizer_complement` →
+`typeII_overNormalizer_frobenius`) に explicit `pins` を通し、c-owned S16 callers が
+`hyp.nuGridSupply` を渡す。これにより generic S15 hypothesis を不当に強化せず、canonical
+Section 16 construction だけが pure ν-grid facts を供給する。

@@ -212,6 +212,43 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
             ((le_of_eq W_eq_inter).trans inf_le_right)).toMonoidHom
           (omega i j - omega i ⟨0, p_prime.pos⟩))
       = (deltaPrime i : ℂ) • (nu i j - nu i ⟨0, p_prime.pos⟩)
+  /- Peterfalvi (4.3)--(4.9), T-side pure ν-grid data. -/
+  nu_irreducible : ∀ (i : Fin q) (j : Fin p),
+    OddOrder.RepresentationTheory.IsIrreducibleCharacter (nu i j)
+  nu_row_injective : ∀ i : Fin q, Function.Injective (fun j : Fin p => nu i j)
+  nu_orthonormal : ∀ (i k : Fin q) (j l : Fin p),
+    OddOrder.RepresentationTheory.ClassFunction.inner (nu i j) (nu k l)
+      = if i = k ∧ j = l then 1 else 0
+  nu_degree_modEq_deltaPrime : ∀ (i : Fin q) (j : Fin p), ∃ a : ℤ,
+    nu i j 1 = (deltaPrime i : ℂ) + (p : ℂ) * (a : ℂ)
+  deltaPrime_zero_eq_one : deltaPrime ⟨0, q_prime.pos⟩ = 1
+  nu_rowSum_eq_induce : ∀ i : Fin q,
+    ∃ ψ : ClassFunction ↥((derivedInG T).subgroupOf T) ℂ,
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ ∧
+      (∑ j : Fin p, nu i j)
+        = ClassFunction.induce ((derivedInG T).subgroupOf T) ψ ∧
+      (i ≠ ⟨0, q_prime.pos⟩ →
+        ¬ (((W1.subgroupOf T).subgroupOf ((derivedInG T).subgroupOf T) :
+            Set ↥((derivedInG T).subgroupOf T)) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel ψ))
+  nu_reducible_dichotomy : ∀ {X : Subgroup ↥T} {ψ : ClassFunction ↥T ℂ},
+    ψ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG T).subgroupOf T) X →
+    ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ →
+    ∃ i : Fin q, i ≠ ⟨0, q_prime.pos⟩ ∧ ψ = ∑ j : Fin p, nu i j
+  nu_diff_support : ∀ (Tdata : TypePData T), Tdata.U = V →
+    Tdata.W1 = W2 → Tdata.W2 = W1 → ∀ (j : Fin p) {i k : Fin q},
+    i ≠ ⟨0, q_prime.pos⟩ → k ≠ ⟨0, q_prime.pos⟩ →
+    nu i j 1 = nu k j 1 →
+    (nu i j - nu k j).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.Peterfalvi.S15.honestTypeP2A0Set T Tdata) T
+  nu_apply_of_not_mem_W1 : ∀ (i : Fin q) (j : Fin p) (w : G)
+    (hwW : w ∈ W) (hwT : w ∈ T), w ∉ (W1 : Set G) →
+    nu i j ⟨w, hwT⟩ = (deltaPrime i : ℂ) * omega i j ⟨w, hwW⟩
+  nu_conj : ∀ (i : Fin q) (j : Fin p),
+    (nu i j).conj =
+      nu (OddOrder.Peterfalvi.S15.finNeg q_prime.pos i)
+        (OddOrder.Peterfalvi.S15.finNeg p_prime.pos j)
   q_lt_p : q < p
   /-- **Peterfalvi (13.1.b) carrier (S-side)**: the type-`P` data of `S` with its complement `U`
   and cyclic factor `W₁` reconciled to the menu's `U`/`W1`.  Sourced from the `tp` producer
@@ -419,6 +456,47 @@ structure Section16CharacterData {G : Type*} [Group G] [Finite G]
             ((le_of_eq tp.W_eq_inter).trans inf_le_right)).toMonoidHom
           (omega i j - omega i ⟨0, tp.p_prime.pos⟩))
       = (deltaPrime i : ℂ) • (nu i j - nu i ⟨0, tp.p_prime.pos⟩)
+  /- Peterfalvi (4.3)--(4.9), T-side pure ν-grid data.  These fields mirror the
+  μ-side grounding data and are kept independent of the post-(14.9) structural
+  fact that V is commutative. -/
+  nu_irreducible : ∀ (i : Fin tp.q) (j : Fin tp.p),
+    OddOrder.RepresentationTheory.IsIrreducibleCharacter (nu i j)
+  nu_row_injective : ∀ i : Fin tp.q, Function.Injective (fun j : Fin tp.p => nu i j)
+  nu_orthonormal : ∀ (i k : Fin tp.q) (j l : Fin tp.p),
+    OddOrder.RepresentationTheory.ClassFunction.inner (nu i j) (nu k l)
+      = if i = k ∧ j = l then 1 else 0
+  nu_degree_modEq_deltaPrime : ∀ (i : Fin tp.q) (j : Fin tp.p), ∃ a : ℤ,
+    nu i j 1 = (deltaPrime i : ℂ) + (tp.p : ℂ) * (a : ℂ)
+  deltaPrime_zero_eq_one : deltaPrime ⟨0, tp.q_prime.pos⟩ = 1
+  nu_rowSum_eq_induce : ∀ i : Fin tp.q,
+    ∃ ψ : ClassFunction ↥((derivedInG mp.T).subgroupOf mp.T) ℂ,
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ ∧
+      (∑ j : Fin tp.p, nu i j)
+        = ClassFunction.induce ((derivedInG mp.T).subgroupOf mp.T) ψ ∧
+      (i ≠ ⟨0, tp.q_prime.pos⟩ →
+        ¬ (((tp.W1.subgroupOf mp.T).subgroupOf
+            ((derivedInG mp.T).subgroupOf mp.T) :
+              Set ↥((derivedInG mp.T).subgroupOf mp.T)) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel ψ))
+  nu_reducible_dichotomy : ∀ {X : Subgroup ↥mp.T} {ψ : ClassFunction ↥mp.T ℂ},
+    ψ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+      ((derivedInG mp.T).subgroupOf mp.T) X →
+    ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ →
+    ∃ i : Fin tp.q, i ≠ ⟨0, tp.q_prime.pos⟩ ∧ ψ = ∑ j : Fin tp.p, nu i j
+  nu_diff_support : ∀ (Tdata : TypePData mp.T), Tdata.U = tp.V →
+    Tdata.W1 = tp.W2 → Tdata.W2 = tp.W1 → ∀ (j : Fin tp.p) {i k : Fin tp.q},
+    i ≠ ⟨0, tp.q_prime.pos⟩ → k ≠ ⟨0, tp.q_prime.pos⟩ →
+    nu i j 1 = nu k j 1 →
+    (nu i j - nu k j).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.Peterfalvi.S15.honestTypeP2A0Set mp.T Tdata) mp.T
+  nu_apply_of_not_mem_W1 : ∀ (i : Fin tp.q) (j : Fin tp.p) (w : G)
+    (hwW : w ∈ tp.W) (hwT : w ∈ mp.T), w ∉ (tp.W1 : Set G) →
+    nu i j ⟨w, hwT⟩ = (deltaPrime i : ℂ) * omega i j ⟨w, hwW⟩
+  nu_conj : ∀ (i : Fin tp.q) (j : Fin tp.p),
+    (nu i j).conj =
+      nu (OddOrder.Peterfalvi.S15.finNeg tp.q_prime.pos i)
+        (OddOrder.Peterfalvi.S15.finNeg tp.p_prime.pos j)
   /- Grid property fields (issue 3002): the (3.2)/(3.3)/(3.4) character-theoretic content of
   `tau3`/`omega`, supplied by the producer from `tau3W_isometry` etc. and `omegaS_inner` etc. -/
   /-- **Peterfalvi (3.2), isometry part**: `τ₃` preserves the class-function inner product. -/
