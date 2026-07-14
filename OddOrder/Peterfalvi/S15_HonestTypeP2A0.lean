@@ -529,7 +529,7 @@ theorem dadeSupportHypothesisData_honestTypeP2A0Set [Fintype G] [Finite G]
   classical
   obtain ⟨K₀, U₀, hKM, hUM, hUne, hK, hU, -, -⟩ :=
     OddOrder.BG.Ch4.S16.typeP2_exists_matched_kappa_hall_pair hG hM hP2
-  have hKne : K₀ ≠ ⊥ := kappaHall_ne_bot_of_isTypeP2 hP2 hK
+  have hKne : K₀ ≠ ⊥ := kappaHall_ne_bot_of_isTypeP (OddOrder.BG.Ch4.S14.isTypeP_of_isTypeP2 hP2) hK
   refine OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_of_subset_escaping_sigmaSharp hG hM
     (honestTypeP2A0Set_subset data) (honestTypeP2A0Set_ne_one data)
     (fun a ha => escaping_honestTypeP2ASet_mem_sigmaSharp hG hM hKM hUM hKne hK hU
@@ -1183,7 +1183,7 @@ theorem Hypothesis.dadeHypT_H_eq_ftSupportKernel [Fintype G] [Finite G]
     (a : {a : G // a ∈ honestTypeP2ASet hyp.T}) :
     (hyp.dadeHypT hG hT2).H a =
       OddOrder.Peterfalvi.S10.ftSupportKernel hyp.T (honestTypeP2ASet hyp.T) a.1 :=
-  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.T_maximal hT2).some.H_eq_ftSupportKernel a
+  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.T_maximal hT2.1).some.H_eq_ftSupportKernel a
 
 /-- **No `A(T)`-point escapes `T`** (mirror of `no_escaping_honestTypeP2ASet`, at the
 (14.9)-parametric `hT2`). -/
