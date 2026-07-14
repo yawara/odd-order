@@ -176,7 +176,7 @@ noncomputable def hyp46Smp :
       (OddOrder.Peterfalvi.S15.honestTypeP2ASet mp.S) mp.S :=
   { toHypothesis := mp.certainTypeS hG
     dade := ((OddOrder.Peterfalvi.S15.dadeSupportHypothesisData_honestTypeP2A0Set hG
-          mp.S_maximal mp.S_typeP2 tp.Sdata).some.dade).restrict Set.subset_union_left
+          mp.S_maximal mp.S_typeP2.1 tp.Sdata).some.dade).restrict Set.subset_union_left
         (fun l _ ha => OddOrder.Peterfalvi.S15.honestTypeP2ASet_conj_mem l.2 ha)
     tic := OddOrder.Peterfalvi.S12.typePData_toTICyclicHypothesis tp.Sdata hG.odd
     tic_W1 := by
@@ -219,11 +219,11 @@ noncomputable def hyp46Smp :
         have := congrArg (mp.S.subtype) hcomm
         simpa using this
     dade0 := (OddOrder.Peterfalvi.S15.dadeSupportHypothesisData_honestTypeP2A0Set hG
-        mp.S_maximal mp.S_typeP2 tp.Sdata).some.dade
+        mp.S_maximal mp.S_typeP2.1 tp.Sdata).some.dade
     tau := ((OddOrder.Peterfalvi.S15.dadeSupportHypothesisData_honestTypeP2A0Set hG
-          mp.S_maximal mp.S_typeP2 tp.Sdata).some.dade).fullDadeIsometryData
+          mp.S_maximal mp.S_typeP2.1 tp.Sdata).some.dade).fullDadeIsometryData
       (OddOrder.Peterfalvi.S15.dadeSupportHypothesisData_honestTypeP2A0Set hG
-        mp.S_maximal mp.S_typeP2 tp.Sdata).some.hconj }
+        mp.S_maximal mp.S_typeP2.1 tp.Sdata).some.hconj }
 
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
 /-- **The Dade-free (4.6) core on the `muS` producer instance** (issue 9081): the structural
