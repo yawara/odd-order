@@ -609,4 +609,233 @@ theorem Hypothesis.exists_muT_index_core [Finite G]
   rw [hζi₁]
   exact hQkerNu
 
+section GenericAlphaIntegrality
+
+/-! ### The (13.5.a) integrality over an abstract (7.6) datum
+
+Generic forms of the `α(1) ∈ ℤ` integrality of the correction term `hypothesis76AlphaFun`
+(Peterfalvi (13.5.a) "`α(1) = qb` with `b` an integer", integrality half), over any
+`H76 : Hypothesis76 G A L` and kernel subgroup `P' ≤ L` — the abstract layer shared by the
+`S`-side (`H_sharp_alphaCF_restrict_mem_ZIrr` route) and the `T`-side ((13.8):
+`Q_sharp_hypothesis76_base`, `P' = Q.subgroupOf T`). -/
+
+variable {A : Set G} {L : Subgroup G}
+
+open scoped Classical in
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
+/-- **`(1/‖ζ_i‖²)·Res_H ζ_i` is a virtual character of `H`** over an abstract (7.6) datum —
+the generic form of `H_sharp_inv_normSq_restrict_zeta_mem_ZIrr` (the "`Res ζ_i/‖ζ_i‖²` is a
+character" step of Peterfalvi (13.5.a)): `ζ_i = Ind_K^L θ_i` (`zeta_induced`), so by the Mackey
+orbit form (`card_smul_restrict_induce_eq_inertia_smul_orbitSum`) and the inertia norm
+(`card_mul_inner_self_induce_eq_card_inertia`), `Res_K ζ_i = ‖ζ_i‖² · (sum of the distinct
+conjugates of θ_i)` — an ℕ-combination of irreducibles (`orbitSum_mem_ZIrr`). -/
+theorem hypothesis76_inv_normSq_restrict_zeta_mem_ZIrr [Fintype G]
+    [Invertible (Nat.card G : ℂ)]
+    (H76 : OddOrder.Peterfalvi.S09.Hypothesis76 G A L) (i : Fin (H76.n + 1)) :
+    (H76.zetaNormSq i)⁻¹ •
+        ClassFunction.restrict (H76.H.subgroupOf L) (H76.zeta i)
+      ∈ ZIrr ↥(H76.H.subgroupOf L) := by
+  classical
+  set K : Subgroup ↥L := H76.H.subgroupOf L with hKdef
+  haveI hKnorm : K.Normal :=
+    OddOrder.Peterfalvi.S09.Cert.subgroupOf_normal_of_conj H76.H_normal_in_L
+  obtain ⟨θ₀, hθ₀⟩ := H76.zeta_induced i
+  -- Bridge the canonical `Fintype`/`Invertible` instances of the `zeta_induced` field
+  -- (both subsingleton classes) to the ambient scoped ones.
+  have hθ : H76.zeta i = ClassFunction.induce K (θ₀ : ClassFunction ↥K ℂ) := by
+    rw [hθ₀]
+  -- The Mackey orbit form, divided by `|K|`.
+  have hK0 : (Nat.card ↥K : ℂ) ≠ 0 := by exact_mod_cast Nat.card_pos.ne'
+  have horbit := OddOrder.RepresentationTheory.card_smul_restrict_induce_eq_inertia_smul_orbitSum
+    (G := ↥L) (H := K) (k := ℂ) (θ₀ : ClassFunction ↥K ℂ)
+  have hinertia := OddOrder.RepresentationTheory.card_mul_inner_self_induce_eq_card_inertia
+    (G := ↥L) (H := K) θ₀
+  -- `‖ζ_i‖² ≠ 0` (it is `|I|/|K|` with `|I| ≥ 1`).
+  have hnormval : (Nat.card ↥K : ℂ) * H76.zetaNormSq i
+      = (Nat.card ↥(ClassFunction.inertia (G := ↥L)
+          (θ₀ : ClassFunction ↥K ℂ)) : ℂ) := by
+    rw [OddOrder.Peterfalvi.S09.Hypothesis76.zetaNormSq, hθ]
+    exact hinertia
+  have hI0 : (Nat.card ↥(ClassFunction.inertia (G := ↥L)
+      (θ₀ : ClassFunction ↥K ℂ)) : ℂ) ≠ 0 := by
+    exact_mod_cast Nat.card_pos.ne'
+  have hnorm0 : H76.zetaNormSq i ≠ 0 := by
+    intro h0
+    rw [h0, mul_zero] at hnormval
+    exact hI0 hnormval.symm
+  -- `Res ζ_i = ‖ζ_i‖² • orbitSum θ₀`, hence `(1/‖ζ_i‖²)·Res ζ_i` is the orbit sum.
+  have hIKnorm : ((Nat.card ↥K : ℂ))⁻¹ * (Nat.card ↥(ClassFunction.inertia (G := ↥L)
+      (θ₀ : ClassFunction ↥K ℂ)) : ℂ) = H76.zetaNormSq i := by
+    rw [← hnormval]
+    field_simp
+  have hres : ClassFunction.restrict K (H76.zeta i)
+      = H76.zetaNormSq i •
+          ∑ ψ ∈ Finset.univ.image (fun x : ↥L =>
+            ClassFunction.conjBy x⁻¹ (θ₀ : ClassFunction ↥K ℂ)), ψ := by
+    have h1 : (Nat.card ↥K : ℂ) • ClassFunction.restrict K (H76.zeta i)
+        = ((Nat.card ↥(ClassFunction.inertia (G := ↥L)
+            (θ₀ : ClassFunction ↥K ℂ)) : ℕ) : ℂ) • ∑ ψ ∈ Finset.univ.image
+              (fun x : ↥L => ClassFunction.conjBy x⁻¹ (θ₀ : ClassFunction ↥K ℂ)), ψ := by
+      rw [← Nat.cast_smul_eq_nsmul (R := ℂ)] at horbit
+      rw [hθ]
+      exact horbit
+    have h2 := congrArg (fun φ => ((Nat.card ↥K : ℂ))⁻¹ • φ) h1
+    simp only [smul_smul, inv_mul_cancel₀ hK0, one_smul] at h2
+    rw [h2, hIKnorm]
+  have hmain : (H76.zetaNormSq i)⁻¹ •
+      ClassFunction.restrict K (H76.zeta i)
+      = ∑ ψ ∈ Finset.univ.image (fun x : ↥L =>
+          ClassFunction.conjBy x⁻¹ (θ₀ : ClassFunction ↥K ℂ)), ψ := by
+    rw [hres, smul_smul, inv_mul_cancel₀ hnorm0, one_smul]
+  rw [hmain]
+  exact OddOrder.RepresentationTheory.orbitSum_mem_ZIrr (G := ↥L) θ₀
+
+open scoped Classical in
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
+/-- **Generic (13.5.a) integrality of the correction at `1`**: with integer (7.7.a) coefficients
+`c_i ∈ ℤ`, the `P'`-kernel tail `α = hypothesis76AlphaFun` restricts on `K = H76.H` to
+`∑ c_i • ((1/‖ζ_i‖²)·Res ζ_i) ∈ ℤ[Irr K]` (each normalized restriction is the conjugate-orbit
+character, `hypothesis76_inv_normSq_restrict_zeta_mem_ZIrr`), so `α(1) ∈ ℤ`
+(`exists_int_apply_one_of_mem_ZIrr`).  The generic form of the
+`H_sharp_alphaCF_restrict_mem_ZIrr`-route to Peterfalvi (13.5) "`α(1) = qb` with `b` an
+integer"; instantiated by the `T`-side at `Q_sharp_hypothesis76_base`
+(`exists_etaT_alphaFun_one_int_core`). -/
+theorem hypothesis76AlphaFun_one_int [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (H76 : OddOrder.Peterfalvi.S09.Hypothesis76 G A L) (P' : Subgroup ↥L)
+    (χ : ClassFunction G ℂ)
+    (hc : ∀ i : Fin (H76.n + 1), ∃ z : ℤ, H76.cCoeff χ i = (z : ℂ)) :
+    ∃ α1 : ℤ, hypothesis76AlphaFun H76 P' χ 1 = (α1 : ℂ) := by
+  classical
+  set K : Subgroup ↥L := H76.H.subgroupOf L with hKdef
+  -- The tail as a class function on `↥L`.
+  set alphaCF : ClassFunction ↥L ℂ :=
+    ∑ i ∈ (Finset.Ioi (0 : Fin (H76.n + 1))).filter
+          (fun i => (P' : Set ↥L) ⊆
+            OddOrder.Peterfalvi.S03.characterKernel (H76.zeta i)),
+        (star (H76.cCoeff χ i) / H76.zetaNormSq i) • H76.zeta i with halphaCF
+  have happly : ∀ x : ↥L, alphaCF x = hypothesis76AlphaFun H76 P' χ x := by
+    intro x
+    rw [halphaCF, OddOrder.RepresentationTheory.ClassFunction.finset_sum_apply,
+      hypothesis76AlphaFun]
+    exact Finset.sum_congr rfl (fun i _ => by rw [ClassFunction.smul_apply])
+  -- Restriction is pointwise, so it commutes with the defining sum.
+  have hlin : ClassFunction.restrict K alphaCF
+      = ∑ i ∈ (Finset.Ioi (0 : Fin (H76.n + 1))).filter
+            (fun i => (P' : Set ↥L) ⊆
+              OddOrder.Peterfalvi.S03.characterKernel (H76.zeta i)),
+          (star (H76.cCoeff χ i) / H76.zetaNormSq i) •
+            ClassFunction.restrict K (H76.zeta i) := by
+    ext x
+    rw [ClassFunction.restrict_apply, halphaCF,
+      OddOrder.RepresentationTheory.ClassFunction.finset_sum_apply,
+      OddOrder.RepresentationTheory.ClassFunction.finset_sum_apply]
+    exact Finset.sum_congr rfl (fun i _ => by
+      rw [ClassFunction.smul_apply, ClassFunction.smul_apply, ClassFunction.restrict_apply])
+  -- `Res_K α ∈ ℤ[Irr K]`: integer coefficients times the normalized restrictions.
+  have hres : ClassFunction.restrict K alphaCF ∈ ZIrr ↥K := by
+    rw [hlin]
+    refine Submodule.sum_mem _ (fun i _ => ?_)
+    obtain ⟨z, hz⟩ := hc i
+    rw [hz, star_intCast, div_eq_mul_inv, mul_smul, Int.cast_smul_eq_zsmul]
+    exact Submodule.smul_mem _ z (hypothesis76_inv_normSq_restrict_zeta_mem_ZIrr H76 i)
+  obtain ⟨z, hz⟩ := OddOrder.Algebra.exists_int_apply_one_of_mem_ZIrr hres
+  refine ⟨z, ?_⟩
+  rw [← happly 1, ← hz, ClassFunction.restrict_apply, OneMemClass.coe_one]
+
+end GenericAlphaIntegrality
+
+open scoped Classical in
+open scoped FiniteInduce in
+/-- **The `T`-side (7.7.a) coefficients of a virtual character are integers** (mirror of
+`H_sharp_cCoeff_int` over the chosen-base `(T, Q^#)` family): `c_i = ⟨τψ_i, χ⟩` with both
+arguments virtual characters — `ψ_i = ζ_i − d_i ζ_0` has `d_i = 1` (all family degrees are
+`[T : Q]` since `Q` is abelian, the explicit input `hQcomm` — the abelian half of the
+(13.2.b)-for-`T` "Q elementary abelian") and the Dade image `τψ_i ∈ ℤ[Irr G]` ((2.10)
+`preserves_virtualCharacters` of the `(T, Q^#)` TI-isometry). -/
+theorem Q_sharp_hypothesis76_base_cCoeff_int [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1)
+    (hQcomm : IsMulCommutative ↥hyp.Q)
+    (φ₀ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(hyp.Q.subgroupOf hyp.T))
+    {χ : ClassFunction G ℂ} (hχ : χ ∈ ZIrr G) :
+    ∀ i : Fin ((Q_sharp_hypothesis76_base hG hyp hvd φ₀).n + 1),
+      ∃ z : ℤ, (Q_sharp_hypothesis76_base hG hyp hvd φ₀).cCoeff χ i = (z : ℂ) := by
+  classical
+  intro i
+  set K : Subgroup ↥hyp.T := (Q_sharp_hypothesis76_base hG hyp hvd φ₀).H.subgroupOf hyp.T
+    with hKdef
+  haveI hKnorm : K.Normal :=
+    OddOrder.Peterfalvi.S09.Cert.subgroupOf_normal_of_conj
+      (Q_sharp_hypothesis76_base hG hyp hvd φ₀).H_normal_in_L
+  -- `K ≅ Q` is abelian, so every `θ_j` is linear and all `ζ_j` have degree `[T:K]`.
+  have hQT : hyp.Q ≤ hyp.T := by
+    rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.T
+  haveI hKcomm : IsMulCommutative ↥K := by
+    have e := Subgroup.subgroupOfEquivOfLe
+      (show (Q_sharp_hypothesis76_base hG hyp hvd φ₀).H ≤ hyp.T from hQT)
+    exact ⟨⟨fun a b => e.injective (by
+      rw [map_mul, map_mul]
+      exact hQcomm.is_comm.comm (e a) (e b))⟩⟩
+  -- Degrees: `ζ_j(1) = [T:K]` for every `j`, so the degree ratio is `1`.
+  have hzeta_one : ∀ j : Fin ((Q_sharp_hypothesis76_base hG hyp hvd φ₀).n + 1),
+      (Q_sharp_hypothesis76_base hG hyp hvd φ₀).zeta j 1 = (K.index : ℂ) := by
+    intro j
+    obtain ⟨θ, hθ⟩ := (Q_sharp_hypothesis76_base hG hyp hvd φ₀).zeta_induced j
+    have hθ1 : (θ : ClassFunction ↥K ℂ) 1 = 1 :=
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter.apply_one_eq_one_of_isMulCommutative
+        θ.2
+    rw [hθ, OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, hθ1, mul_one]
+  have hidx0 : (K.index : ℂ) ≠ 0 := by
+    exact_mod_cast Subgroup.index_ne_zero_of_finite (H := K)
+  have hd1 : (Q_sharp_hypothesis76_base hG hyp hvd φ₀).d i = 1 := by
+    have h := (Q_sharp_hypothesis76_base hG hyp hvd φ₀).zeta_one_eq_d_mul i
+    rw [hzeta_one i, hzeta_one 0] at h
+    field_simp at h
+    exact h.symm
+  -- `ψ_i = ζ_i − ζ_0 ∈ ℤ[Irr T]`.
+  have hzetaZ : ∀ j : Fin ((Q_sharp_hypothesis76_base hG hyp hvd φ₀).n + 1),
+      (Q_sharp_hypothesis76_base hG hyp hvd φ₀).zeta j ∈ ZIrr ↥hyp.T := by
+    intro j
+    obtain ⟨θ, hθ⟩ := (Q_sharp_hypothesis76_base hG hyp hvd φ₀).zeta_induced j
+    rw [hθ]
+    exact OddOrder.RepresentationTheory.ClassFunction.induce_mem_ZIrr K (θ.2.mem_ZIrr)
+  have hψZ : ((Q_sharp_hypothesis76_base hG hyp hvd φ₀).psiSupp i : ClassFunction ↥hyp.T ℂ)
+      ∈ ZIrr ↥hyp.T := by
+    rw [OddOrder.Peterfalvi.S09.Hypothesis76.psiSupp_coe, hd1, one_smul]
+    exact Submodule.sub_mem _ (hzetaZ i) (hzetaZ 0)
+  -- The Dade image is a virtual character ((2.10) `preserves_virtualCharacters`).
+  have hτeq : (Q_sharp_hypothesis76_base hG hyp hvd φ₀).hyp71.τ
+      = ((Q_sharp_dadeHypothesis hG hyp hvd).fullDadeIsometryData
+          (Q_sharp_hconj hG hyp hvd)).toDadeIsometryData.toDadeMap := rfl
+  have hpres : (Q_sharp_hypothesis76_base hG hyp hvd φ₀).hyp71.τ
+      ((Q_sharp_hypothesis76_base hG hyp hvd φ₀).psiSupp i) ∈ ZIrr G := by
+    rw [hτeq]
+    exact ((Q_sharp_dadeHypothesis hG hyp hvd).fullDadeIsometryData
+      (Q_sharp_hconj hG hyp hvd)).preserves_virtualCharacters _ hψZ
+  -- `c_i = ⟨τψ_i, χ⟩ ∈ ℤ`.
+  rw [OddOrder.Peterfalvi.S09.Hypothesis76.cCoeff]
+  exact ClassFunction.inner_mem_ZIrr_int hpres hχ
+
+open scoped Classical in
+open scoped FiniteInduce in
+/-- **The `T`-side correction has integer value at `1`** over the chosen base — the core
+restatement of `exists_etaT_alphaFun_one_int` (Peterfalvi (13.5.a)-for-`T` integrality,
+issue 2035 #22 T-side twin): `α(1) ∈ ℤ` for the `Q`-kernel tail `α = hypothesis76AlphaFun` of
+the `(T, Q^#)` (7.7.a) decomposition of `η₁₀`.  The commutativity of `Q` (the abelian half of
+the (13.2.b)-for-`T` "Q elementary abelian", whose §13-internal route is the (14.9)-gated
+`Q_elementaryAbelian_T`) enters as the explicit input `hQcomm`: it makes `α|_Q ∈ ℤ[Irr Q]`
+via the integer (7.7.a) coefficients (`Q_sharp_hypothesis76_base_cCoeff_int`, using
+`η₁₀ ∈ ℤ[Irr G]` = `eta10_mem_ZIrr`) through the generic route
+(`hypothesis76AlphaFun_one_int`). -/
+theorem Hypothesis.exists_etaT_alphaFun_one_int_core [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hvd : hyp.v * hyp.d ≠ 1)
+    (hQcomm : IsMulCommutative ↥hyp.Q)
+    (φ₀ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(hyp.Q.subgroupOf hyp.T)) :
+    ∃ α1 : ℤ, hypothesis76AlphaFun (Q_sharp_hypothesis76_base hG hyp hvd φ₀)
+      (hyp.Q.subgroupOf hyp.T) hyp.eta10 1 = (α1 : ℂ) :=
+  hypothesis76AlphaFun_one_int (Q_sharp_hypothesis76_base hG hyp hvd φ₀)
+    (hyp.Q.subgroupOf hyp.T) hyp.eta10
+    (Q_sharp_hypothesis76_base_cCoeff_int hG hyp hvd hQcomm φ₀ hyp.eta10_mem_ZIrr)
+
 end OddOrder.Peterfalvi.S15
