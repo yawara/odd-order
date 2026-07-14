@@ -1804,3 +1804,12 @@ S_U_commutative)」から出す。T-side の対応 cSub-T = D で **D abelian �
   step 2 uniform degree。
 
 次: 「nilpotent + cyclic abelianization → abelian」の所在確認 → V_commutative_of_caseB 構築。
+
+## 🧭 HUB (2026-07-14, tick 38): #42 の「nilpotent + cyclic abelianization」所在 = 既存 repo leaf
+
+#42 の「所在要確認」への回答: **`OddOrder/GroupTheory/NilpotentAbelianization.lean` に既存**
+(lane a claim 9086、2026-07-12、sorry-free、S13_NonGaloisExclusion が live consume 中)。
+`isCyclic_of_isNilpotent_of_isCyclic_quotient` + `isMulCommutative_of_isCyclic` を cite すること。
+b の `2ca52edf` (新 leaf NilpotentCyclicAbelianization) は同内容の複製ゆえ差し戻し (合流せず) —
+詳細 = issue 9086 HUB RULING。`V_commutative_of_caseB` の route (#43) 自体は genuine と評価済み、
+supply 元を既存 leaf に差し替えて続行されたい。
