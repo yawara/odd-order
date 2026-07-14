@@ -58,6 +58,45 @@ theorem card_le_pow_sub_one_of_injective_imprimitive
     rwa [hcardA] at this
   exact hb.trans (Nat.pow_le_pow_left ha _)
 
+/-- **The block-scalar ratio homomorphism** in Peterfalvi (9.7.a):
+`x ↦ (φ_{i+1}(x) / φ_0(x))_i`.
+
+Normalizing all scalar coordinates by the zeroth one removes the common-scalar diagonal and leaves
+`n` coordinates from an `n + 1` block system.  The target is a group because scalar values lie
+in the commutative group `A`. -/
+def blockScalarRatioHom {Ubar A : Type*} [Group Ubar] [CommGroup A] {n : ℕ}
+    (φ : Fin (n + 1) → (Ubar →* A)) : Ubar →* (Fin n → A) where
+  toFun x i := φ i.succ x / φ 0 x
+  map_one' := by
+    ext i
+    simp
+  map_mul' x y := by
+    ext i
+    simp only [Pi.mul_apply, map_mul, div_eq_mul_inv, mul_inv_rev]
+    ac_rfl
+
+/-- **Injectivity of the block-scalar ratio homomorphism.**  If an element whose scalar values are
+constant on all `n + 1` blocks is necessarily trivial, then the normalized ratio homomorphism is
+injective.  This is the qualitative form of the (9.7.a) product embedding; unlike its cardinality
+corollaries below, it can be restricted to Sylow subgroups by downstream consumers. -/
+theorem blockScalarRatioHom_injective {Ubar A : Type*} [Group Ubar] [CommGroup A] {n : ℕ}
+    (φ : Fin (n + 1) → (Ubar →* A))
+    (hconst : ∀ x : Ubar, (∀ i : Fin (n + 1), φ i x = φ 0 x) → x = 1) :
+    Function.Injective (blockScalarRatioHom φ) := by
+  intro x y hxy
+  have hxy' : ∀ i : Fin n, φ i.succ x / φ 0 x = φ i.succ y / φ 0 y :=
+    fun i => congrFun hxy i
+  have hz : x * y⁻¹ = 1 := by
+    apply hconst
+    refine Fin.cases rfl (fun j => ?_)
+    have h : φ j.succ x * φ 0 y = φ j.succ y * φ 0 x :=
+      (div_eq_div_iff_mul_eq_mul).mp (hxy' j)
+    change φ j.succ (x * y⁻¹) = φ 0 (x * y⁻¹)
+    rw [map_mul, map_mul, map_inv, map_inv, ← div_eq_mul_inv, ← div_eq_mul_inv,
+      div_eq_div_iff_mul_eq_mul, mul_comm (φ 0 x)]
+    exact h
+  exact mul_inv_eq_one.mp hz
+
 /-- **Ratio-embedding order divisibility**: under the block-scalar hypotheses of
 `card_le_pow_of_block_scalars`, the order of `Ubar` divides `|A|^n`.
 
@@ -71,30 +110,9 @@ theorem card_dvd_pow_of_block_scalars {Ubar A : Type*} [CommGroup Ubar] [Finite 
     {n : ℕ} (φ : Fin (n + 1) → (Ubar →* A))
     (hconst : ∀ x : Ubar, (∀ i : Fin (n + 1), φ i x = φ 0 x) → x = 1) :
     Nat.card Ubar ∣ Nat.card A ^ n := by
-  let ψ : Ubar →* (Fin n → A) := {
-    toFun x i := φ i.succ x / φ 0 x
-    map_one' := by
-      ext i
-      simp
-    map_mul' x y := by
-      ext i
-      simp only [Pi.mul_apply, map_mul, div_eq_mul_inv, mul_inv_rev]
-      ac_rfl }
-  have hinj : Function.Injective ψ := by
-    intro x y hxy
-    have hxy' : ∀ i : Fin n, φ i.succ x / φ 0 x = φ i.succ y / φ 0 y :=
-      fun i => congrFun hxy i
-    have hz : x * y⁻¹ = 1 := by
-      apply hconst
-      refine Fin.cases rfl (fun j => ?_)
-      have h : φ j.succ x * φ 0 y = φ j.succ y * φ 0 x :=
-        (div_eq_div_iff_mul_eq_mul).mp (hxy' j)
-      show φ j.succ (x * y⁻¹) = φ 0 (x * y⁻¹)
-      rw [map_mul, map_mul, map_inv, map_inv, ← div_eq_mul_inv, ← div_eq_mul_inv,
-        div_eq_div_iff_mul_eq_mul, mul_comm (φ 0 x)]
-      exact h
-    exact mul_inv_eq_one.mp hz
-  simpa [Nat.card_pi] using Subgroup.card_dvd_of_injective ψ hinj
+  simpa [Nat.card_pi] using
+    Subgroup.card_dvd_of_injective (blockScalarRatioHom φ)
+      (blockScalarRatioHom_injective φ hconst)
 
 /-- **Ratio embedding from block scalars** (the injectivity core of Peterfalvi (9.7)(a)'s `psi`,
 `PFsection9.v:442`): given a finite commutative group `Ū` with `q = n+1` scalar characters
@@ -113,28 +131,15 @@ theorem card_le_pow_of_block_scalars {Ubar A : Type*} [CommGroup Ubar] [Finite U
     {n : ℕ} (φ : Fin (n + 1) → (Ubar →* A))
     (hconst : ∀ x : Ubar, (∀ i : Fin (n + 1), φ i x = φ 0 x) → x = 1) :
     Nat.card Ubar ≤ Nat.card A ^ n := by
-  have hinj : Function.Injective
-      (fun x : Ubar => fun i : Fin n => φ i.succ x / φ 0 x) := by
-    intro x y hxy
-    have hxy' : ∀ i : Fin n, φ i.succ x / φ 0 x = φ i.succ y / φ 0 y :=
-      fun i => congrFun hxy i
-    have hz : x * y⁻¹ = 1 := by
-      apply hconst
-      refine Fin.cases rfl (fun j => ?_)
-      have h : φ j.succ x * φ 0 y = φ j.succ y * φ 0 x :=
-        (div_eq_div_iff_mul_eq_mul).mp (hxy' j)
-      show φ j.succ (x * y⁻¹) = φ 0 (x * y⁻¹)
-      rw [map_mul, map_mul, map_inv, map_inv, ← div_eq_mul_inv, ← div_eq_mul_inv,
-        div_eq_div_iff_mul_eq_mul, mul_comm (φ 0 x)]
-      exact h
-    exact mul_inv_eq_one.mp hz
   calc Nat.card Ubar
-      ≤ Nat.card (Fin n → A) := Nat.card_le_card_of_injective _ hinj
+      ≤ Nat.card (Fin n → A) := Nat.card_le_card_of_injective _
+        (blockScalarRatioHom_injective φ hconst)
     _ = Nat.card A ^ n := by simp [Nat.card_pi]
 
 /-- **Non-Galois → cyclotomic-quotient bridge**: `(p − 1)^{q−1} ≤ (p^q − 1)/(p − 1)`.
 
-`(p−1)^{q−1}·(p−1) = (p−1)^q < p^q`, so `(p−1)^q ≤ p^q − 1`, and dividing by `p − 1` gives the claim.
+`(p−1)^{q−1}·(p−1) = (p−1)^q < p^q`, so `(p−1)^q ≤ p^q − 1`; division by `p − 1`
+gives the claim.
 Pure `ℕ` arithmetic, `sorry`-free.  Lifts the non-Galois bound `u ≤ (p−1)^{q−1}` to the uniform
 `u ≤ (p^q − 1)/(p − 1)` matching the Galois branch (`SingerLineBound`). -/
 theorem pow_sub_one_le_cyclotomicQuotient {p q : ℕ} (hp : 2 ≤ p) (hq : 1 ≤ q) :

@@ -138,3 +138,22 @@ cite すれば閉じる。hyp.u/p/q ↔ chars.u/chief.p/data.q の橋は S15 側
 
 **最深部 = step 4 の coprime 降下 setup** (W₁↷U/C の action・fixedSubgroup 形を CoprimeFixedPoints
 の API に合わせる)。step 1-2 は zmodModule smul unfold + power-map centrality で機械的。
+
+## ✅ qualitative product embedding 公開 (2026-07-14, issue 9099)
+
+(14.6) は case (9.7.a) の位数評価だけでなく、`q = 3` のときの Sylow 部分群を二つの
+巡回因子の積の中で扱う。そのため、従来 `caseA_u_dvd_pred_pow` の証明内部に消えていた
+normalized ratio map を実際の injective group homomorphism として公開した。
+
+- `blockScalarRatioHom` / `blockScalarRatioHom_injective`: 一般の `n + 1` 個の block scalar
+  characters から `x ↦ (φ_{i+1}(x) / φ₀(x))ᵢ : U →* (Fin n → A)` を構成する汎用 API。
+- `exists_blockScalarRatioEmbedding_of_blocks`: order-`p` subrepresentations に対する module-level
+  API。各 block の `lineScalarChar` と no-common-scalar 条件を上の ratio map へ接続する。
+- `caseA_exists_blockScalarRatioEmbedding`: 実 `CliffordCaseAData` から
+  `range (uActionHom) ↪ Fin (q - 1) → (ZMod p)ˣ` を構成する Peterfalvi (9.7.a) 本体。
+  共通 scalar の排除は `Hpart_iSup` による subgroup induction と
+  `uActionHom_eq_one_of_commute_mulAut` の Frobenius fixed-point-free 論証を再利用する。
+- `caseA_u_dvd_pred_pow` はこの公開 embedding の位数整除系として再配線した。
+
+これにより downstream (14.6) は cardinality 結論を逆算せず、埋め込みを Sylow 部分群へ
+制限して質的な rank-two 構造を直接使える。構造体署名・opaque carrier の追加はない。
