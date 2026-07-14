@@ -19,8 +19,9 @@ the `U`-action on the chief factor `H̄ = H/N` is imprimitive (Clifford case (a)
 This routes the S11 case-(a) block data through the generic σ-theory engine
 `card_le_cyclotomicQuotient_of_blocks` (`TypePGaloisUBound`), via the subgroup→subrepresentation
 bridge `aInvariantSubrep`.  The only genuinely §9-specific input is the "no global scalar" injectivity
-(Coq `psi`, `PFsection9.v:442`) — the Frobenius fixed-point-freeness of the `W̄₁`-action on `Ū` — left
-as the `sorry` inside the block engine's `hconst` argument (see `notes/peterfalvi/s11_9_7a_imprimitive_ubound.md`).
+(Coq `psi`, `PFsection9.v:442`) — the Frobenius fixed-point-freeness of the `W̄₁`-action on `Ū` —
+proved below by turning a common block scalar into a central automorphism and applying the descended
+Frobenius action (see `notes/peterfalvi/s11_9_7a_imprimitive_ubound.md`).
 -/
 
 namespace OddOrder.Peterfalvi.S11
@@ -56,18 +57,13 @@ theorem representation_eq_smul_id_of_block_scalars_const {p : ℕ} [Fact p.Prime
     obtain ⟨i, hi⟩ := Set.mem_iUnion.mp hx
     rw [hblock i x hi, LinearMap.smul_apply, LinearMap.id_apply]
 
-/-- **A global `ZMod p`-scalar is central in `MulAut`.**  If `l` acts on the additive side as the
-scalar `μ` (`ρ l = μ • id` for the descended representation `ρ = elabRepresentation p φ`), then
-`φ l` commutes with every automorphism of `V`: automorphisms are additive maps, and additive maps
-commute with `ZMod p`-scalar multiplication (`ZMod.map_smul`). -/
-theorem commute_mulAut_of_elabRepresentation_eq_smul_id {p : ℕ} {L V : Type*} [Group L]
+/-- **A pointwise global `ZMod p`-scalar is central in `MulAut`.**  If `l` acts on every element as
+the scalar `μ`, then `φ l` commutes with every automorphism of `V`: automorphisms are additive maps,
+and additive maps commute with `ZMod p`-scalar multiplication (`ZMod.map_smul`). -/
+theorem commute_mulAut_of_elabRepresentation_apply_eq_smul {p : ℕ} {L V : Type*} [Group L]
     [CommGroup V] [Module (ZMod p) (Additive V)] (φ : L →* MulAut V) (l : L) (μ : ZMod p)
-    (h : elabRepresentation p φ l = μ • LinearMap.id) (σ : MulAut V) :
+    (happly : ∀ x : V, Additive.ofMul ((φ l) x) = μ • Additive.ofMul x) (σ : MulAut V) :
     Commute σ (φ l) := by
-  have happly : ∀ x : V, Additive.ofMul ((φ l) x) = μ • Additive.ofMul x := by
-    intro x
-    have hx := LinearMap.congr_fun h (Additive.ofMul x)
-    rwa [LinearMap.smul_apply, LinearMap.id_apply, elabRepresentation_apply] at hx
   have : σ * (φ l) = (φ l) * σ := by
     refine MulEquiv.ext fun x => ?_
     show σ ((φ l) x) = (φ l) (σ x)
@@ -80,6 +76,17 @@ theorem commute_mulAut_of_elabRepresentation_eq_smul_id {p : ℕ} {L V : Type*} 
       _ = Additive.toMul (Additive.ofMul ((φ l) (σ x))) := by rw [← happly]
       _ = (φ l) (σ x) := rfl
   exact this
+
+/-- **A global `ZMod p`-scalar is central in `MulAut`.**  Linear-map form of
+`commute_mulAut_of_elabRepresentation_apply_eq_smul`. -/
+theorem commute_mulAut_of_elabRepresentation_eq_smul_id {p : ℕ} {L V : Type*} [Group L]
+    [CommGroup V] [Module (ZMod p) (Additive V)] (φ : L →* MulAut V) (l : L) (μ : ZMod p)
+    (h : elabRepresentation p φ l = μ • LinearMap.id) (σ : MulAut V) :
+    Commute σ (φ l) := by
+  apply commute_mulAut_of_elabRepresentation_apply_eq_smul φ l μ ?_ σ
+  intro x
+  have hx := LinearMap.congr_fun h (Additive.ofMul x)
+  rwa [LinearMap.smul_apply, LinearMap.id_apply, elabRepresentation_apply] at hx
 
 /-- Unfolding `uActionHom` along the conjugation action of `L = U ⊔ W₁` on its normal subgroup
 `U`: the action of a conjugate is the conjugate of the actions. -/
@@ -244,19 +251,25 @@ theorem uActionHom_range_comm [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSe
   exact Subtype.ext (hComm a b)
 
 open scoped Classical in
-/-- **Peterfalvi (9.7.a): imprimitive block-scalar order divisibility.**  From the case-(a) Clifford
-data, the image `Ū = U/C_U(H̄)` embeds as a subgroup of `((𝔽_p)ˣ)^{q-1}`; hence its order
-`u = |Ū|` divides `(p - 1)^{q-1}`.  This strengthened form retains the odd-part information used
-in Peterfalvi (13.13). -/
-theorem caseA_u_dvd_pred_pow [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+/-- **Peterfalvi (9.7.a): the qualitative block-scalar product embedding.**  The faithful image
+`Ū = U/C_U(H̄)` of the `U`-action embeds into the product of `q - 1` copies of
+`(𝔽_p)ˣ`.  The homomorphism is the normalized scalar ratio
+`ū ↦ (φ_{i+1}(ū) / φ_0(ū))_i` on the `q` order-`p` Clifford summands.
+
+This exposes the actual injective group homomorphism behind `caseA_u_dvd_pred_pow`.  In
+Peterfalvi (14.6), a Sylow subgroup is restricted along this map to obtain the qualitative
+two-cyclic-factor structure; cardinality divisibility alone does not retain that information. -/
+theorem caseA_exists_blockScalarRatioEmbedding [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M}
     {chief : ChiefFactorData data} (chars : Section11CharacterData data chief)
     (caseA : CliffordCaseAData chars) :
-    chars.u ∣ (chief.p - 1) ^ (data.q - 1) := by
+    ∃ ψ : ↥(MonoidHom.range (uActionHom data chief)) →*
+        (Fin (data.q - 1) → (ZMod chief.p)ˣ),
+      Function.Injective ψ := by
   haveI : Fact chief.p.Prime := ⟨chief.p_prime⟩
   haveI : chief.N.Normal := chief.N_normal
-  -- `CommGroup H̄` and `CommGroup Ū` built over the *canonical* `Group` instances (via an explicit
-  -- `inferInstance` base, not `set`-folded locals), so the `MulAut H̄` of `uActionHom`/`Ubar.subtype`
-  -- and the ones `elabRepresentation`/the block engine expect agree with no instance diamond.
+  -- Build the vector-space structure over the canonical quotient-group instance, so the
+  -- `MulAut H̄` used by `uActionHom` and by `elabRepresentation` agrees definitionally.
   letI : CommGroup (↥data.H ⧸ chief.N) :=
     { (inferInstance : Group (↥data.H ⧸ chief.N)) with
       mul_comm := chief.quotient_elementaryAbelian.comm }
@@ -267,52 +280,116 @@ theorem caseA_u_dvd_pred_pow [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSet
     { (inferInstance : Group ↥(MonoidHom.range (uActionHom data chief))) with
       mul_comm := uActionHom_range_comm chief }
   have hq1 : (data.q - 1) + 1 = data.q := Nat.sub_add_cancel data.nontrivial.2.1.pos
-  -- apply the generic block engine at `n = q - 1`, reindexing `Fin q ≃ Fin ((q-1)+1)`
-  have hdiv : Nat.card ↥(MonoidHom.range (uActionHom data chief))
-      ∣ (chief.p - 1) ^ (data.q - 1) :=
-    card_dvd_pred_pow_of_blocks (p := chief.p) (n := data.q - 1)
-      (elabRepresentation chief.p (MonoidHom.range (uActionHom data chief)).subtype)
-      (fun i => aInvariantSubrep
-        (isAInvariant_range_subtype (caseA.Hpart_aInvariant (finCongr hq1 i))))
-      (fun i => (card_aInvariantSubrep _).trans (caseA.Hpart_order (finCongr hq1 i)))
-      -- **hconst — the genuine §9 crux (Coq `psi` injectivity, `PFsection9.v:442-484`)**: no
-      -- nonidentity `ū ∈ Ū` acts by one common scalar on every block.  A common scalar makes
-      -- `ū = λ·(-)` central in `MulAut(H̄)` (`commute_mulAut_of_elabRepresentation_eq_smul_id`),
-      -- hence `W̄₁`-conjugation-invariant, so `ū ∈ C_Ū(W̄₁) = 1` by the Frobenius fpf of
-      -- `(U ⊔ W₁, U, W₁)` descended mod `C` (`uActionHom_eq_one_of_commute_mulAut`).
-      (fun u hscal => by
-        -- the blocks span `H̄`, so the common block scalar `μ` is a global scalar: `ρ u = μ • id`
-        have hspan : ⨆ i : Fin ((data.q - 1) + 1),
-            (aInvariantSubrep (p := chief.p) (isAInvariant_range_subtype
-              (caseA.Hpart_aInvariant (finCongr hq1 i)))).toSubmodule = ⊤ := by
-          have hre : ⨆ i : Fin ((data.q - 1) + 1), caseA.Hpart (finCongr hq1 i) = ⊤ := by
-            rw [Equiv.iSup_comp (finCongr hq1) (g := caseA.Hpart)]
-            exact caseA.Hpart_iSup
-          calc ⨆ i : Fin ((data.q - 1) + 1),
-              (aInvariantSubrep (p := chief.p) (isAInvariant_range_subtype
-                (caseA.Hpart_aInvariant (finCongr hq1 i)))).toSubmodule
-              = ⨆ i : Fin ((data.q - 1) + 1), (elabSubmoduleSubgroupEquiv chief.p).symm
-                  (caseA.Hpart (finCongr hq1 i)) := rfl
-            _ = (elabSubmoduleSubgroupEquiv chief.p).symm
-                  (⨆ i : Fin ((data.q - 1) + 1), caseA.Hpart (finCongr hq1 i)) :=
-                ((elabSubmoduleSubgroupEquiv chief.p).symm.map_iSup _).symm
-            _ = ⊤ := by rw [hre, OrderIso.map_top]
-        have hsmul := representation_eq_smul_id_of_block_scalars_const
-          (elabRepresentation chief.p (MonoidHom.range (uActionHom data chief)).subtype)
-          (fun i => aInvariantSubrep (isAInvariant_range_subtype
-            (caseA.Hpart_aInvariant (finCongr hq1 i))))
-          (fun i => finrank_eq_one_of_card_eq_prime
-            ((card_aInvariantSubrep _).trans (caseA.Hpart_order (finCongr hq1 i))))
-          hspan u _ hscal
-        -- a global scalar is central in `MulAut(H̄)`, so the Frobenius fpf forces `u = 1`
-        obtain ⟨g, hg⟩ := MonoidHom.mem_range.mp u.2
-        have hone : uActionHom data chief g = 1 :=
-          uActionHom_eq_one_of_commute_mulAut chief g (fun σ => by
-            rw [hg]
-            exact (commute_mulAut_of_elabRepresentation_eq_smul_id _ u _ hsmul σ).symm)
-        exact Subtype.ext (hg ▸ hone))
-  rw [chars.u_eq_card_quotient]
-  exact hdiv
+  refine exists_blockScalarRatioEmbedding_of_blocks (p := chief.p) (n := data.q - 1)
+    (elabRepresentation chief.p (MonoidHom.range (uActionHom data chief)).subtype)
+    (fun i => aInvariantSubrep
+      (isAInvariant_range_subtype (caseA.Hpart_aInvariant (finCongr hq1 i))))
+    (fun i => (card_aInvariantSubrep _).trans
+      (caseA.Hpart_order (finCongr hq1 i))) ?_
+  -- **The genuine §9 crux** (Coq `psi`, `PFsection9.v:442-484`): no nonidentity
+  -- `ū ∈ Ū` acts by one common scalar on every block.
+  intro u hscal
+  let B := fun i : Fin ((data.q - 1) + 1) =>
+    aInvariantSubrep (p := chief.p)
+      (φ := (MonoidHom.range (uActionHom data chief)).subtype)
+      (isAInvariant_range_subtype (caseA.Hpart_aInvariant (finCongr hq1 i)))
+  let μ : (ZMod chief.p)ˣ := lineScalarChar (B 0).toRepresentation
+    (finrank_eq_one_of_card_eq_prime
+      ((card_aInvariantSubrep _).trans
+        (caseA.Hpart_order (finCongr hq1 0)))) u
+  have hscalB : ∀ i, lineScalarChar (B i).toRepresentation
+      (finrank_eq_one_of_card_eq_prime
+        ((card_aInvariantSubrep _).trans
+          (caseA.Hpart_order (finCongr hq1 i)))) u = μ := by
+    intro i
+    simpa only [B, μ] using hscal i
+  -- On each Clifford summand, the action is the common scalar `μ`.
+  have hblock (i : Fin ((data.q - 1) + 1)) (x : ↥data.H ⧸ chief.N)
+      (hx : x ∈ caseA.Hpart (finCongr hq1 i)) :
+      (elabRepresentation chief.p
+          (MonoidHom.range (uActionHom data chief)).subtype u).toFun
+          (Additive.ofMul x) = (μ : ZMod chief.p) • Additive.ofMul x := by
+    have hxB : Additive.ofMul x ∈
+        (B i).toSubmodule.carrier := by
+      have hm := (mem_symm_elabSubmoduleSubgroupEquiv (p := chief.p)
+        (caseA.Hpart (finCongr hq1 i)) (Additive.ofMul x)).mpr (by simpa using hx)
+      exact hm
+    have hs := lineScalarChar_smul_coe_of_card_eq_prime
+      (elabRepresentation chief.p
+        (MonoidHom.range (uActionHom data chief)).subtype) (B i)
+      ((card_aInvariantSubrep _).trans
+        (caseA.Hpart_order (finCongr hq1 i))) u
+      ⟨Additive.ofMul x, hxB⟩
+    rw [hscalB i] at hs
+    exact hs
+  -- The summands span `H̄`; subgroup induction extends the scalar identity to every vector.
+  have hpoint : ∀ x : ↥data.H ⧸ chief.N,
+      (elabRepresentation chief.p
+          (MonoidHom.range (uActionHom data chief)).subtype u).toFun
+          (Additive.ofMul x) = (μ : ZMod chief.p) • Additive.ofMul x := by
+    intro x
+    have hre : ⨆ i : Fin ((data.q - 1) + 1), caseA.Hpart (finCongr hq1 i) = ⊤ := by
+      rw [Equiv.iSup_comp (finCongr hq1) (g := caseA.Hpart)]
+      exact caseA.Hpart_iSup
+    have hx : x ∈ ⨆ i : Fin ((data.q - 1) + 1),
+        caseA.Hpart (finCongr hq1 i) := hre ▸ Subgroup.mem_top x
+    refine Subgroup.iSup_induction
+      (C := fun z =>
+        (elabRepresentation chief.p
+            (MonoidHom.range (uActionHom data chief)).subtype u).toFun
+            (Additive.ofMul z) = (μ : ZMod chief.p) • Additive.ofMul z)
+      (fun i => caseA.Hpart (finCongr hq1 i)) hx hblock ?_ ?_
+    · simpa using
+        (elabRepresentation chief.p
+          (MonoidHom.range (uActionHom data chief)).subtype u).map_zero
+    · intro a b ha hb
+      change
+        (elabRepresentation chief.p
+            (MonoidHom.range (uActionHom data chief)).subtype u).toFun
+            (Additive.ofMul a + Additive.ofMul b)
+          = (μ : ZMod chief.p) • (Additive.ofMul a + Additive.ofMul b)
+      calc
+        _ = (elabRepresentation chief.p
+              (MonoidHom.range (uActionHom data chief)).subtype u).toFun (Additive.ofMul a)
+            + (elabRepresentation chief.p
+              (MonoidHom.range (uActionHom data chief)).subtype u).toFun
+                (Additive.ofMul b) :=
+            (elabRepresentation chief.p
+              (MonoidHom.range (uActionHom data chief)).subtype u).map_add _ _
+        _ = (μ : ZMod chief.p) • Additive.ofMul a
+            + (μ : ZMod chief.p) • Additive.ofMul b := by rw [ha, hb]
+        _ = (μ : ZMod chief.p) • (Additive.ofMul a + Additive.ofMul b) :=
+            (smul_add _ _ _).symm
+  -- A global scalar is central in `MulAut(H̄)`; Frobenius fpf forces `u = 1`.
+  obtain ⟨g, hg⟩ := MonoidHom.mem_range.mp u.2
+  have hone : uActionHom data chief g = 1 :=
+    uActionHom_eq_one_of_commute_mulAut chief g (fun σ => by
+      rw [hg]
+      exact (commute_mulAut_of_elabRepresentation_apply_eq_smul
+        (MonoidHom.range (uActionHom data chief)).subtype u (μ : ZMod chief.p)
+        (fun x => by simpa [elabRepresentation_apply] using hpoint x) σ).symm)
+  exact Subtype.ext (hg ▸ hone)
+
+open scoped Classical in
+/-- **Peterfalvi (9.7.a): imprimitive block-scalar order divisibility.**  From the case-(a) Clifford
+data, the image `Ū = U/C_U(H̄)` embeds as a subgroup of `((𝔽_p)ˣ)^{q-1}`; hence its order
+`u = |Ū|` divides `(p - 1)^{q-1}`.  This strengthened form retains the odd-part information used
+in Peterfalvi (13.13). -/
+theorem caseA_u_dvd_pred_pow [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} (chars : Section11CharacterData data chief)
+    (caseA : CliffordCaseAData chars) :
+    chars.u ∣ (chief.p - 1) ^ (data.q - 1) := by
+  haveI : Fact chief.p.Prime := ⟨chief.p_prime⟩
+  obtain ⟨ψ, hψ⟩ := caseA_exists_blockScalarRatioEmbedding chars caseA
+  have hunits : Nat.card (ZMod chief.p)ˣ = chief.p - 1 := by
+    rw [Nat.card_eq_fintype_card, ZMod.card_units_eq_totient,
+      Nat.totient_prime chief.p_prime]
+  have hdiv := Subgroup.card_dvd_of_injective ψ hψ
+  rw [Nat.card_pi, hunits] at hdiv
+  have hu : chars.u = Nat.card ↥(uActionHom data chief).range :=
+    chars.u_eq_card_quotient
+  rw [hu]
+  simpa using hdiv
 
 /-- **Peterfalvi (9.7.a): the imprimitive `u`-bound** `u ≤ (p^q − 1)/(p − 1)`.  This is the
 cardinality consequence of `caseA_u_dvd_pred_pow`, followed by the elementary cyclotomic bound

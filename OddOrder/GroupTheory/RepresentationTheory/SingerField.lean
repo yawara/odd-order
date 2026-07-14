@@ -402,18 +402,21 @@ theorem isSimpleModule_of_abelian_faithful_card {q : ℕ} (hq : q.Prime) (hqodd 
     exact not_dvd_factorial_pred hq hqdvdD
   exact hnotdvd hrN
 
-omit [IsCyclic C] in
-/-- **Peterfalvi (14.2)(a), abstract form.**  A faithful action of an abelian group `C` of order
-`(p^q-1)/(p-1)` on an `F_p`-module `M` of order `p^q` (`q` an *odd* prime) realizes `M` as the
-Galois field `GF(p^q)` with `C` embedded in the multiplicative group `GF(p^q)ˣ`: there is an additive
-isomorphism `e : M ≃+ GF(p^q)` and an injective `μ : C →* GF(p^q)ˣ` with `e (c • x) = μ c · e x`.
+omit [IsCyclic C] [Finite C] in
+/-- **Galois-field realization of a faithful irreducible abelian action.**
 
-This is the field-isomorphism that the Section 16 finite-field model (`FieldNormalizerData`)
-requires: combine `isSimpleModule_of_abelian_faithful_card` (irreducibility), the Singer engine,
-and `nonempty_ringEquiv_galoisField` (uniqueness of finite fields). -/
-theorem exists_galoisField_repr {q : ℕ} (hq : q.Prime) (hqodd : Odd q)
-    [NeZero (Nat.card C : ZMod p)]
-    (hcardM : Nat.card M = p ^ q) (hcardC : Nat.card C = (p ^ q - 1) / (p - 1))
+If a commutative group `C` acts faithfully and irreducibly on a finite
+`F_p[C]`-module `M` of order `p^q`, then `M` is additively `GF(p^q)` and
+the action is multiplication through an injective homomorphism
+`C → GF(p^q)ˣ`.
+
+Unlike `exists_galoisField_repr`, this theorem takes irreducibility directly
+as an `IsSimpleModule` instance and imposes no order condition on `C`.  This
+is the branch-independent Singer entry used by Peterfalvi (9.7.b), including
+the divided-order branch needed in (14.6). -/
+theorem exists_galoisField_repr_of_faithful_irreducible {q : ℕ} (hq : q ≠ 0)
+    [IsSimpleModule (MonoidAlgebra (ZMod p) C) M]
+    (hcardM : Nat.card M = p ^ q)
     (hfaith : ∀ c : C, (∀ x : M, MonoidAlgebra.of (ZMod p) C c • x = x) → c = 1) :
     ∃ (e : M ≃+ GaloisField p q) (μ : C →* (GaloisField p q)ˣ),
       Function.Injective μ ∧
@@ -421,14 +424,12 @@ theorem exists_galoisField_repr {q : ℕ} (hq : q.Prime) (hqodd : Odd q)
         e (MonoidAlgebra.of (ZMod p) C c • x) = (μ c : GaloisField p q) * e x := by
   classical
   haveI : Fintype M := Fintype.ofFinite _
-  haveI hsimp : IsSimpleModule (MonoidAlgebra (ZMod p) C) M :=
-    isSimpleModule_of_abelian_faithful_card hq hqodd hcardM hcardC hfaith
   obtain ⟨data⟩ := nonempty_singerFieldData (p := p) (C := C) (M := M)
-  obtain ⟨φ⟩ := data.nonempty_ringEquiv_galoisField hq.pos.ne'
+  obtain ⟨φ⟩ := data.nonempty_ringEquiv_galoisField hq
     (by rw [← Nat.card_eq_fintype_card, hcardM])
   refine ⟨data.e.trans φ.toAddEquiv,
     (Units.map (φ : data.K →+* GaloisField p q).toMonoidHom).comp data.μ, ?_, ?_⟩
-  · -- `μ` is injective: `μ c = 1 ⟹ data.μ c = 1 ⟹ c` acts trivially `⟹ c = 1`.
+  · -- Faithfulness turns the multiplicative realization into an embedding.
     rw [injective_iff_map_eq_one]
     intro c hc
     apply hfaith c
@@ -452,6 +453,28 @@ theorem exists_galoisField_repr {q : ℕ} (hq : q.Prime) (hqodd : Odd q)
       _ = φ ((data.μ c : data.K)) * φ (data.e x) := map_mul _ _ _
       _ = (((Units.map (φ : data.K →+* GaloisField p q).toMonoidHom).comp data.μ) c :
             GaloisField p q) * (data.e.trans φ.toAddEquiv) x := by rw [hμc]; rfl
+
+omit [IsCyclic C] in
+/-- **Peterfalvi (14.2)(a), abstract form.**  A faithful action of an abelian group `C` of order
+`(p^q-1)/(p-1)` on an `F_p`-module `M` of order `p^q` (`q` an *odd* prime) realizes `M` as the
+Galois field `GF(p^q)` with `C` embedded in the multiplicative group `GF(p^q)ˣ`: there is an
+additive isomorphism `e : M ≃+ GF(p^q)` and an injective `μ : C →* GF(p^q)ˣ` with
+`e (c • x) = μ c · e x`.
+
+This is the field-isomorphism that the Section 16 finite-field model (`FieldNormalizerData`)
+requires: combine `isSimpleModule_of_abelian_faithful_card` (irreducibility), the Singer engine,
+and `nonempty_ringEquiv_galoisField` (uniqueness of finite fields). -/
+theorem exists_galoisField_repr {q : ℕ} (hq : q.Prime) (hqodd : Odd q)
+    [NeZero (Nat.card C : ZMod p)]
+    (hcardM : Nat.card M = p ^ q) (hcardC : Nat.card C = (p ^ q - 1) / (p - 1))
+    (hfaith : ∀ c : C, (∀ x : M, MonoidAlgebra.of (ZMod p) C c • x = x) → c = 1) :
+    ∃ (e : M ≃+ GaloisField p q) (μ : C →* (GaloisField p q)ˣ),
+      Function.Injective μ ∧
+      ∀ (c : C) (x : M),
+        e (MonoidAlgebra.of (ZMod p) C c • x) = (μ c : GaloisField p q) * e x := by
+  haveI hsimp : IsSimpleModule (MonoidAlgebra (ZMod p) C) M :=
+    isSimpleModule_of_abelian_faithful_card hq hqodd hcardM hcardC hfaith
+  exact exists_galoisField_repr_of_faithful_irreducible hq.pos.ne' hcardM hfaith
 
 omit [IsCyclic C] [Finite C] in
 /-- **Singer order bound.**  A (commutative) group `C` acting `𝔽_p`-linearly,

@@ -772,6 +772,11 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_irreducibleCharacter_le
 -- RepresentationTheory: there are finitely many irreducible characters of a finite group.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finite_irreducibleCharacter
+-- RepresentationTheory (Singer, case-(9.7.b) entry): a faithful irreducible abelian action on an
+-- `F_p`-module of order `p^q` is realized by multiplication on `GF(p^q)`, with no order
+-- assumption on the acting group.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_galoisField_repr_of_faithful_irreducible
 -- RepresentationTheory (Singer, commutativity as a hypothesis): an abelian group acting
 -- faithfully + irreducibly on a finite 𝔽_p-module is cyclic with order dividing |M| - 1.
 -- This is the `CommGroup`-instance-free Singer mechanism (Peterfalvi (12.12) / (14.2)(a) core),
