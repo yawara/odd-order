@@ -46,13 +46,13 @@ The (9.11) proof splits on the Clifford dichotomy (9.7):
   or forces the equality configuration `a = (p−1)/2`, `C = U′`, `𝒮₂ = 𝒮₁`, … refuted by
   (9.11.2)–(9.11.8).
 
-Consumers: lane b's (13.3) `coherent_H0Cprime_S` re-grounding (`S`-instance, issue 1017 G1),
-lane a's gate-2 `hY` (`coherent_Sset_diff_SHCSet`, issue 9016) and the (10.7) pair-witness
-producer `typeII_HU_frobenius_of_coherent_at_pair` (`S12_TypeIICrossIsometryPair`; the legacy
-`typeII_derived_frobenius` is retired, issues 1020/9079/9087).
+Consumers: lane b (13.3) `coherent_H0Cprime_S` re-grounding (`S`-instance, issue 1017 G1)
+and the (10.7) pair-witness producer `typeII_HU_frobenius_of_coherent_at_pair`
+(`S12_TypeIICrossIsometryPair`).  The former lane-a wide-`Sset` gate and legacy
+`typeII_derived_frobenius` route are retired (issues 1019/1020/9079/9087).
 
-Reference note: `issues/1017-pf-s5-uniform-degree-coherence.md` (G1),
-`issues/9016-gate2-nine-eleven-difference-report.md` (hY contract).
+Reference note: `issues/1017-pf-s5-uniform-degree-coherence.md` (G1) and
+`issues/closed/1019-pf-11-8-6-bounded-coherence-redesign.md` (honest replacement).
 -/
 
 namespace OddOrder.Peterfalvi.S11

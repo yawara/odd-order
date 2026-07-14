@@ -1526,37 +1526,6 @@ theorem Hypothesis.Sset_eq_SHCSet_union_diff [Finite G] {M : Subgroup G} (hyp : 
     hyp.Sset = hyp.SHCSet ∪ (hyp.Sset \ hyp.SHCSet) :=
   (Set.union_diff_cancel hyp.SHCSet_subset_Sset).symm
 
-open scoped FiniteInduce in
-/-- ⚠️ **Over-broad family, part of the uniform-degree route (issue 1019).**  Here `S₂` is taken as
-`hyp.Sset \ hyp.SHCSet = inducedFamily M \ S(HC) = S_1 \ S(HC)`, but Peterfalvi's `S₂` is the narrower
-`S(C) \ S(HC)` (with the `C`-kernel condition).  The coherence of the full `S_1 \ S(HC)` is not a
-standalone fact — in Coq `S_1` is merely `subcoherent`, and its coherence is *derived* from `S(H₀C)`
-coherence via `bounded_seqIndD_coherence`.  This obligation should be re-scoped in the redesign
-(narrow to `S(C)` / `S(H₀C)`, then extend via bounded coherence).
-
-**Peterfalvi (11.8.6) prerequisite: `S₂ = S(C) − S(HC)` is coherent** (the `hY` gluing input;
-§9/§14-gated, named obligation).
-
-This is Peterfalvi's "By (9.11), `𝒮(H₀C') − 𝒮(HC')` is coherent, whence `𝒮₂` is coherent by (11.7)"
-(mmd 04.13 L67).  It is the `S₂`-side coherence `hY` that `coherent_Sset_of_glued` and the (11.8.6)
-capstone `coherent_Sset_of_column_identities` consume — with `S₂ = hyp.Sset \ hyp.SHCSet` (the
-`S(C) − S(HC)` difference of the pinned §10 induced family).
-
-Reduction status (see `notes/peterfalvi/s13_11_8_orthogonality.md` update²⁶): the underlying content
-is (9.11) `S11.coherent_H0C_commutator`, itself gated on `S11.sibleyTarget_H0C` (§14 Sibley setup +
-lane-b (6.8)).  Three carrier obstructions block a direct sorry-free cite of (9.11) here:
-(1) the `S11.Section11CharacterData` bridge `mkSection11CharacterData` sets `H0CprimeSupport := ∅`,
-but `IsCoherent … ∅` is unconstructible (`zSupportedSpan S ∅ = {0}` kills `nonzero`);
-(2) (9.11) is stated for the *difference* `𝒮(H₀C') − 𝒮(HC')`, whereas the repo's
-`coherent_H0C_commutator` concludes on the *full* `chars.S = sSet data`;
-(3) the world-bridge `sSet`/`sOf` (§9) ↔ `inducedFamily` (§10) `𝒮₂ = hyp.Sset ∖ hyp.SHCSet` is
-unformalized.  Honest close = re-port (9.11) as `SOf`-difference coherence + (11.7) collapse, deep
-char work coordinated with §14/lane-b.  Left as a single §14-gated `sorry` of the correct
-difference-coherence signature (NOT a false-hypothesis hoist). -/
-theorem Hypothesis.coherent_Sset_diff_SHCSet [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
-    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Sset \ hyp.SHCSet) hyp.A0) := by
-  sorry
 
 open scoped Classical FiniteInduce in
 /-- **(11.8.6) gluing wrapper: `S(C) = S(HC) ∪ S₂` coherence from the glued `τ₃` data** (sorry-free).
@@ -1692,17 +1661,6 @@ theorem theorem88_caseB_prime_orders [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
     rw [hW1, ← dataS.card_W1_eq_derived_index]; exact hSp
   · obtain ⟨dataT, hTp⟩ := caseB_typeP_prime_W1 hG hnoV caseB.T_maximal caseB.T_nonI
     rw [hW2, ← dataT.card_W1_eq_derived_index]; exact hTp
-
-/-- **Peterfalvi (10.11), Type II assertion**: for a type-II maximal subgroup,
-the §11 family `S(H_0 C')` specializes to a coherent set. -/
-theorem typeII_section11_coherence [Finite G] [Fintype G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Fintype ↥M]
-    [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
-    {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup M}
-    {chief : OddOrder.Peterfalvi.S11.ChiefFactorData data}
-    (chars : OddOrder.Peterfalvi.S11.Section11CharacterData data chief) :
-    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent chars.tau chars.S chars.H0CprimeSupport) := by
-  exact ⟨OddOrder.Peterfalvi.S11.coherent_H0C_commutator chars⟩
 
 end OddOrder.Peterfalvi.S12
 

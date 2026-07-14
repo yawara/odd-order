@@ -1,9 +1,13 @@
 import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
 
 /-!
-# Peterfalvi (9.11) — coherence for S(H₀C') + (9.8.c)/(9.9.c) constructions
+# Peterfalvi (9.8.c)/(9.9.c) — irreducible-character constructions
 
 Split from the former monolithic `OddOrder.Peterfalvi.S11_MaximalII_III_IV` (directory split, issue 0103).
+
+The former (9.11) declarations in this leaf routed through an inapplicable (6.8)
+`SibleyTarget`.  They were withdrawn after the honest `Ind_S^G` / `A(S)` coherence construction
+landed in `S15_CaseACoherence` (issues 7001/1017).
 -/
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory
@@ -17,56 +21,6 @@ open OddOrder.Isaacs.Ch03 (IsAInvariant isAInvariant_iff_smul_mem)
 open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
 
 variable {M : Subgroup G}
-
-
-/-! ## (9.11): coherence for `S(H_0 C')` -/
-
-/-- **Structural input for Peterfalvi (9.11) — ⚠ UNSOUND (6.8)-shortcut, do NOT fill.**
-
-⚠ **7001 soundness audit COMPLETE (2026-07-07, lane-a): this witness is unsound — do not fill
-its `sorry`.**  A `SibleyTarget` requires `S08.SibleyDadeHypothesis`, whose *unconditional* fields
-`H_sharp_ti : IsTISubset (sharpImage H) L` (S08:3248) and `dade_H_eq_bot : ∀ a, dade.H a = ⊥`
-(S08:3258) demand `H^#` be a **TI-subset of `G`** in *both* the (c1) Frobenius and (c2)
-Hypothesis46 branches.  But the Sibley kernel `H` for `S(H₀C')` is a large nilpotent Hall
-subgroup (`HC ⊆ F(M)`), whose `H^#` is **not** TI in `G` (centralizers escape `M`).  Both fields
-are therefore false — the exact `sibleyTarget_frobI` failure mode (issue 2032: non-TI witness →
-false `dade_H_eq_bot` → unprovable).
-
-**Confirming smoking gun**: Coq `Ptype_core_coherence` (Pf (9.11), `PFsection9.v:1484-1571`)
-proves coherence of `S_ H0C'` **without** (6.8) — a genuine 8-step induction (Galois branch:
-`uniform_degree_coherence`; non-Galois: filter the degree-`qa` subfamily, coherent by
-`uniform_degree_coherence`, then extend one conjugate-pair at a time contradicting maximality).
-Gonthier et al. would have used the shorter (6.8) route had it applied; it does not.
-
-**Honest route** = port that 8-step induction (see `coherent_H0C_commutator`), not a `SibleyTarget`.
-Kept as `sorry` only so the wiring type-checks; the honest proof will replace the whole cite. -/
-noncomputable def sibleyTarget_H0C [Fintype G]
-    {M : Subgroup G} [Fintype ↥M]
-    [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
-    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
-    (chars : Section11CharacterData data chief) :
-    CoherenceWiring.SibleyTarget chars.tau chars.S chars.H0CprimeSupport := sorry
-
-/-- **Peterfalvi (9.11)**: the set `S(H_0 C')` is coherent for the Dade map `τ`.
-
-⚠ **The (6.8) wiring below is unsound (7001 audit, 2026-07-07)** — see `sibleyTarget_H0C`.  The
-earlier claim that "the eight internal steps (9.11.1)–(9.11.8) are subsumed by the (6.8)
-reduction" is **false**: (6.8) requires `H^#` TI in `G` (`SibleyDadeHypothesis.H_sharp_ti`),
-which fails for the nilpotent-Hall kernel `HC`.  Coq (`PFsection9.v:1484`) proves this by a
-genuine 8-step induction, not (6.8).
-
-**Honest route (next lane-a work)**: replace the `cohereOfSibleyTarget` cite by porting Coq's
-induction — Galois branch via `uniform_degree_coherence` on the uniform-`qu` family; non-Galois
-branch by filtering the degree-`qa` subfamily (coherent via `uniform_degree_coherence`), then
-inductively extending conjugate-pairs (`S1 :: S1^* :: S2`) contradicting maximality.  The current
-`sorry` lives in `sibleyTarget_H0C`; do **not** fill it. -/
-noncomputable def coherent_H0C_commutator [Fintype G]
-    {M : Subgroup G} [Fintype ↥M]
-    [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
-    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
-    (chars : Section11CharacterData data chief) :
-    OddOrder.Peterfalvi.S07.IsCoherent chars.tau chars.S chars.H0CprimeSupport :=
-  CoherenceWiring.cohereOfSibleyTarget (sibleyTarget_H0C chars)
 
 /-! ### (9.8.c) irreducible-character construction
 

@@ -301,17 +301,16 @@ both wrong, a Coq-name-grep false-negative, disproven by verify-first):
    case-B capstone).  So `irrSubcoherent` (irreducible producer) is the only
    `S07.Hypothesis`-form piece needed.
 
-2. **The real gate is the (13.3) coherence route**, not `prDade`.  `coherent_H0Cprime_S`
-   (`S15_SAndT_Setup.lean:572`) → `coherent_H0C_commutator` (S11) currently routes
-   through `sibleyTarget_H0C` (S11:7775, sorried, **likely-UNSOUND** — `PU ≠ C'`
-   kernel contradiction, same defect class as the reverted issue 2032).  Honest
-   fix = re-ground it on the **(9.11) `Ptype_core_coherence`** 8-step derived-series
-   induction (Coq `PFsection9.v:1484`), which composes `subset_subcoherent`
-   (restrict a subcoherent family to a `cfConjC_subset`, Coq `PFsection5.v:845`) +
-   `coherent_of_constant_degree` (= `uniform_degree_coherence`, **already proven**,
-   `S07_CoherenceConstantDegree.lean:551`), with `sixTwoDecompositionData` as the
-   subcoherent supply.  Lane a's (10.7) `typeII_HU_frobenius_of_coherent'` consumes
-   the same (9.11) coherence.
+2. **The real gate was the (13.3) coherence route**, not `prDade`.  Its first S11 wiring
+   used a (6.8) Sibley shortcut whose TI/support hypotheses fail for the `H₀C'` kernel;
+   that unsound carrier and its wrappers are now withdrawn (issues 7001/1017).
+   The live S15 carrier is instead grounded on the honest `Ind_S^G` map and `A(S)` support
+   through the **(9.11) `Ptype_core_coherence`** derived-series construction (Coq
+   `PFsection9.v:1484`).  Its base composes `subset_subcoherent` (restrict to a
+   `cfConjC_subset`, Coq `PFsection5.v:845`) with `coherent_of_constant_degree`
+   (`uniform_degree_coherence`, `S07_CoherenceConstantDegree.lean:551`) and the genuine
+   §9 decomposition supply.  The former lane-a (10.7) generic consumer was also retired;
+   the remaining honest pair-adjoining/refuter residual is localized in S15.
 
 **LANDED 2026-07-06 (this file, sorry-free — `#print axioms` shows only
 `propext`/`Classical.choice`/`Quot.sound`)**:
@@ -322,12 +321,12 @@ both wrong, a Coq-name-grep false-negative, disproven by verify-first):
   `coherent_of_constant_degree`.  This is the whole **Galois case** and the **base case `S1`** of
   the (9.11) derived-series induction.
 
-**NOT re-grounded this session — genuine multi-step induction (honest verdict, verify-first
-2026-07-06)**: `coherent_H0Cprime_S` cannot yet drop `sibleyTarget_H0C`.  The honest `S`-instance
-family `chars.S = sSet` is **mixed-degree** (`(Ind_{HU}^M χ)(1) = q·χ(1)` for varying `χ(1)`;
-`S11.induceHU_apply_one_eq_q_mul`), so `coherent_of_constant_degree` alone does **not** apply — it
-is exactly Coq's **non-Galois case**, needing the (9.11.1)-(9.11.8) pair-adjoining induction on top
-of the uniform base.  Precise remaining steps to fully replace `sibleyTarget_H0C`:
+**STATUS UPDATE (2026-07-14)**: the live `coherent_H0Cprime_S` carrier has been re-grounded on
+the honest `Ind_S^G` / `A(S)` world.  Its family `chars.S = sSet` is **mixed-degree**
+(`(Ind_{HU}^M χ)(1) = q·χ(1)` for varying `χ(1)`; `S11.induceHU_apply_one_eq_q_mul`), so
+`coherent_of_constant_degree` alone still does **not** prove the result: Coq's non-Galois branch
+needs the (9.11.1)–(9.11.8) pair-adjoining induction on top of the uniform base.  The original
+construction plan, whose honest residual is now localized in S15, is:
 
 1. Assemble a subcoherent `S07.Hypothesis` for `sSet` on the honest Dade map `indS` (via
    `irrSubcoherent`, feeding per-member `R`-data from the §9 induced-family Dade witnesses).
@@ -599,17 +598,16 @@ firing precondition (`two_mul_lt_normalizedDegreeSq_of_lb0_lt_sumnS`), and the b
   `retarget_isCoherent_of_decompositions_and_memberFamily`, whose `hY` per step is discharged by the
   `lb0 < sumnS S2` branch (`extend_coherent`) using the firing precondition above.
 
-**Verdict + effort.**  The single *analytic* gap named in the issue — the `Snorm`/`sumnS` degree-sum
-quantity and the `extend_coherent` integer-forcing bridge — is now landed sorry-free.  What remains
-is the **assembly** of the (9.11) induction: the middle squeeze steps (9.11.2-9.11.5) are ℕ-index
-arithmetic (medium, mechanical), and (9.11.1)/(9.11.7)/(9.11.8) are the `coherentPairChain` fold
-against the honest §9 induced-family Dade witnesses (the per-step `Dmem`/`hmemOrtho`/`hgen` data, as
-in `S08_CaseBEnumeration.sMember_degreeSqNormBound_of_not_coherent`, but for the §9 `S_ H0C'` family
-rather than §8 case-B).  This is **one focused multi-step session** for lane b's (13.3)
-`coherent_H0Cprime_S` re-grounding (drop `sibleyTarget_H0C`) once the §9 induced-family witnesses
-are threaded, and the same (9.11) coherence closes lane a's (10.7)
-`typeII_HU_frobenius_of_coherent'`.
-Tracking = issue 1017. -/
+**Current verdict.**  The analytic `Snorm`/`sumnS` degree-sum and `extend_coherent`
+integer-forcing bridge are landed sorry-free.  The remaining genuine work is the honest
+(9.11) induction assembly inside the S15 carrier: the middle squeeze steps
+(9.11.2)–(9.11.5), plus the (9.11.1)/(9.11.7)/(9.11.8) `coherentPairChain` fold against the
+§9 induced-family Dade witnesses (`Dmem`/`hmemOrtho`/`hgen` per step, analogous to
+`S08_CaseBEnumeration.sMember_degreeSqNormBound_of_not_coherent`).  The sound carrier and
+support are now fixed; this residual is genuine proof content, not another carrier shortcut.
+The former lane-a wide-family and (10.7) generic consumers are retired in favor of the S13
+world-bridge/refuter route.  The current live downstream consumer is lane b's (13.3) chain.
+Tracking = issues 1017/2035. -/
 
 /-! ### Peterfalvi (9.11): the maximal-coherent-subfamily skeleton
 
@@ -635,9 +633,9 @@ This subsection provides the **family-agnostic skeleton** of that argument:
 The (9.11.1) squeeze discharges the refuter: either the degree bound `lb0 < sumnS 𝒮₂` fires the
 (5.6) adjoining engine (`xAdjoinStepW`/`xAdjoinStepW_k`) on some `χ ∈ 𝒮₃` — contradicting the
 pair clause — or all squeeze inequalities are equalities, a configuration refuted by
-(9.11.2)–(9.11.8).  Consumers: lane b's (13.3) `coherent_H0Cprime_S` re-grounding (S-instance),
-lane a's gate-2 `hY` (`coherent_Sset_diff_SHCSet`, issue 9016) and (10.7)
-`typeII_derived_frobenius`. -/
+(9.11.2)–(9.11.8).  Consumer: lane b (13.3) `coherent_H0Cprime_S` re-grounding (S-instance).
+The former lane-a wide-`Sset` gate `coherent_Sset_diff_SHCSet` and legacy (10.7) consumer were
+retired by the honest S13 world-bridge/refuter route (issues 1019/1020/9087). -/
 
 /-- **Peterfalvi (9.11): a maximal coherent conjugation-closed subfamily exists.**
 

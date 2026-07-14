@@ -560,3 +560,24 @@ normalizer bridges / (14.5) counting 全て)。
 2. **`sibleyTarget_frobI` (12.6)(c1) は b territory** (S14_MaximalI/FrobeniusStructure、
    issue 2032 系): (12.17)→(12.7) chain のもう 1 本の root。b の 2035 queue との sequencing は
    hub 裁定事項 (a は grab しない)。
+
+## ✅ UPDATE (2026-07-14 lane a): (7.10) + canonical ν supply 完遂、dead wide-`Sset` obligation 撤去
+
+- (7.10) `card_G0_lower_bound` / (7.11) `not_trivial_G0` は closed/0044 で全完了・
+  AxiomsCheck 済み。上記の「再開」は完遂済み。
+- canonical T-side ν-grid の 10 facts を `Section16Inputs` まで thread し、
+  `sectionSixteenNuGridSupplyData_of_inputs` を axiom-clean で構成 (issue 1030/9096)。
+- `S12.Hypothesis.coherent_Sset_diff_SHCSet` は honest S13 world-bridge/refuter route に
+  supersede された consumer-0 の over-broad legacy obligation と authoritative に再確認。
+  周囲の sorry-free genuine helper は保全し、この未実装 theorem だけを削除した。
+- 同時に、(6.8) の不成立な TI 仮定へ依存していた `S11.sibleyTarget_H0C` と、その唯一の
+  code consumer `coherent_H0C_commutator`、さらに唯一の downstream wrapper
+  `S12.typeII_section11_coherence` がすべて live consumer 0 であることを code-only scan で確認。
+  S15 の honest `sSet_coherent_indS_A` / `coherent_H0Cprime_S` が live spine を担っているため、
+  この unsound subtree も撤去した (issue 7001/1017)。
+
+この撤去は sorry 数を減らすためではなく、構成不能な carrier を live API から除く
+soundness cleanup である。結果として A-owned S03–S13/FeitThompson の literal-sorry census
+も 0 になったが、それ自体は FT 完了指標ではない。現在の genuine 接続 frontier は
+issue 9096 の canonical ν pins を b-owned S15 chain / c-owned S16 carrier へ explicit 配線する
+cross-lane 作業。
