@@ -1,4 +1,4 @@
-import OddOrder.Peterfalvi.S15_NineElevenSevenEightT
+import OddOrder.Peterfalvi.S15_CaseACoherenceT
 
 /-!
 # Peterfalvi (13.3.c)-`T` — the ν-row pin machinery (coherence-generic)
