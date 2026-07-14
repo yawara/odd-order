@@ -143,9 +143,11 @@ structure LSideGridCoeffData [Finite G] (hyp : Hypothesis (G := G))
   coeff : ∀ i j, ClassFunction.inner (dataL.h78 hG).beta (hyp.base.eta i j) = (m i j : ℂ)
   /-- **Principal coefficient** `m_00 = 1` (Coq `a00 = 1`).  **PROVEN in-place**. -/
   m_principal : m ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩ = 1
-  /-- **Off-principal row parity** (Coq `FTtypeI_bridge_facts`, gated): `m_0j` odd. -/
+  /-- **Off-principal row parity** (Coq `a0j`): `m_0j` odd — **PROVEN in the producer** from the
+  S-side (13.19.c) dichotomy (`typeI_caseC_dichotomy`, (c1) refuted by the strict gap). -/
   m_row_odd : ∀ j, j ≠ ⟨0, hyp.base.p_prime.pos⟩ → Odd (m ⟨0, hyp.base.q_prime.pos⟩ j)
-  /-- **Off-principal column parity** (Coq `FTtypeI_bridge_facts`, gated): `m_i0` odd. -/
+  /-- **Off-principal column parity** (Coq `ai0`): `m_i0` odd — **PROVEN in the producer** from
+  the T-side dual dichotomy (`typeI_caseC_dual_dichotomy`, (c1)-dual refuted by the strict gap). -/
   m_col_odd : ∀ i, i ≠ ⟨0, hyp.base.q_prime.pos⟩ → Odd (m i ⟨0, hyp.base.p_prime.pos⟩)
   /-- **Bessel bound** (Coq `ub_e`, gated): `Σ m_ij² ≤ p q`. -/
   bessel : ∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (m i j) ^ 2
@@ -310,19 +312,30 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Faithful §14 producer of the L-side grid-coefficient data** (policy-A descent).  The type-I
 maximal `L` carries the (13.19.c)/(7.8) grid-coefficient package `LSideGridCoeffData`.  The
 lane-c-available facts are **proven in-place** here — `coeff` (integrality, `betaL_grid_coeff_int`),
-`m_principal` (`m_00 = 1`, `betaL_grid_coeff_principal_eq_one`), and `bessel` (the (13.19.c) grid
+`m_principal` (`m_00 = 1`, `betaL_grid_coeff_principal_eq_one`), `bessel` (the (13.19.c) grid
 Bessel bound `Σ m² ≤ p q`, `betaL_grid_coeff_bessel`, from the full-family grid orthogonality
 `caseB_eta_orthogonal_nu_zeta_at` + the (7.8.b) residual bound `‖Γ_L‖² ≤ e − 1`, using the carried
-`hepq : e_L = p q`) — with the integer witness `m` taken from the proven integrality.  Only the
-two off-principal parity facts remain as the isolated gate: `m_row_odd`/`m_col_odd` (the S/T type-P
-partner bridge, Coq `FTtypeI_bridge_facts`) and `grid_mem` (the §13 `Y = 0` grid membership,
-issue 3002), genuinely cross-lane-gated to lane b's §13/§15 type-P layer. -/
+`hepq : e_L = p q`), and — issue 0115 Campaign A — the two off-principal parities
+`m_row_odd`/`m_col_odd`, now **proven** from the landed (13.19.c) dichotomies
+`S15.typeI_caseC_dichotomy`/`typeI_caseC_dual_dichotomy` at the distinguished member `ζ_0`:
+the (c1) branches are refuted by the Coq-(14.11.2)-style strict gap hypotheses `hub_u`/`hub_v`
+(`(u−1)/q < (h−1)/e`, `(v−1)/p < (h−1)/e` — supplied by the caller from the (14.14) gap chain),
+and the (c2) branches are exactly the parities, transported through the bridge
+`typeIBetaL_zeta0_eq_h78_beta`.  Only `grid_mem` (the `Y = 0` grid membership, issue 3002)
+remains sorried: its parity input is now discharged, and the missing piece is the Parseval-defect
+tightening of the `bessel` argument. -/
 noncomputable def lSideGridCoeffData [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G)) {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
     (dataL : TypeICoherent78Data L) (hq3 : hyp.base.q = 3) (hp5 : hyp.base.p = 5)
-    (hepq : (dataL.h78 hG).complementIndex = hyp.base.p * hyp.base.q) :
+    (hepq : (dataL.h78 hG).complementIndex = hyp.base.p * hyp.base.q)
+    (hub_u : ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) <
+      ((Nat.card ↥dataL.typeIHyp.H - 1 : ℕ) : ℚ)
+        / (((maxNilpotentNormalHall L).subgroupOf L).index : ℚ))
+    (hub_v : ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) <
+      ((Nat.card ↥dataL.typeIHyp.H - 1 : ℕ) : ℚ)
+        / (((maxNilpotentNormalHall L).subgroupOf L).index : ℚ)) :
     LSideGridCoeffData hyp dataL hG where
   -- The integer coefficient is the witness of the proven integrality `betaL_grid_coeff_int`.
   m i j := Classical.choose (betaL_grid_coeff_int hG dataL i j)
@@ -339,21 +352,64 @@ noncomputable def lSideGridCoeffData [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
         (hyp := hyp) ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩) : ℤ) : ℂ) = 1 :=
       hspec.symm.trans h1
     exact_mod_cast this
-  -- **Genuinely cross-lane-gated (Coq `FTtypeI_bridge_facts`, the S/T type-P partner bridge).**
-  -- Off-principal parity `a i j ≡ 1 (mod 2)` needs the `cycTIiso_cfdot_exchange` reciprocity of the
-  -- type-P `S`/`T` maximals (`hyp.base.S_typeP2`), which lives in lane b's §13/§15 layer.
-  -- **Genuinely cross-lane-gated (Coq `FTtypeI_bridge_facts`, PFsection13.v:1987; issue 3002).**
-  -- `m_0j = ⟨β_L, η_0j⟩ ≡ 1 (mod 2)` is the (c2) disjunct of `FTtypeI_bridge_facts` applied to the
-  -- **S-side type-P partner** `StypeP` (PFsection14.v:187, `case/betaL_P: StypeP => _ _ -> //`).
-  -- That bound is the type-P coherent pairing `⟨τ β_S, τ₁ φ⟩ ≡ 1 (mod 2)` on the S-side residual
-  -- `β_S`, which lives in lane b's `S15_SAndT.lean`; S16 only carries an opaque `caseB_formula`.
-  -- Verified c-unreachable: the only c-available parity primitive `cfdot_real_vchar_even` needs
-  -- `η_0j` real (no `eta_isReal` — `η` is a cyclic-TI image, complex) and would anyway give
-  -- `⟨β_L,1⟩·⟨η_0j,1⟩ = 1·0 = 0 (mod 2)` = EVEN, the *opposite* parity.
-  m_row_odd := sorry
-  -- Dual of `m_row_odd`, from `FTtypeI_bridge_facts` on the **T-side type-P partner** `TtypeP`
-  -- (PFsection14.v:190) — same lane-b §13 gate (issue 3002).
-  m_col_odd := sorry
+  -- **(c2) of the landed S-side (13.19.c) dichotomy** (Coq `a0j`, PFsection14.v:186-188:
+  -- `case/betaL_P: StypeP => _ _ -> //; case=> [[_ /idPn[]] | [//]]`): the (c1) branch's bound
+  -- `(h−1)/e ≤ (u−1)/q` is refuted by the strict gap `hub_u`, so the parity branch holds.
+  m_row_odd := by
+    intro j hj
+    have hφmem : dataL.zeta 0 ∈ dataL.typeIHyp.Sset :=
+      dataL.zeta_mem_Sset (Ne.symm dataL.ind1H_ne_zero)
+    have hker : dataL.kernelIn = (maxNilpotentNormalHall L).subgroupOf L := by
+      show (dataL.typeIHyp.typeI.typeF.H).subgroupOf L = _
+      rw [dataL.typeIHyp.typeI.typeF.H_eq]
+    have hφdeg : dataL.zeta 0 (1 : ↥L)
+        = ((((maxNilpotentNormalHall L).subgroupOf L).index : ℕ) : ℂ) := by
+      rw [← hker]; exact dataL.deg0
+    rcases OddOrder.Peterfalvi.S15.typeI_caseC_dichotomy hG hnoV hyp.base dataL
+        (dataL.zeta 0) hφmem hφdeg with ⟨-, hbound⟩ | ⟨hodd, -⟩
+    · exact absurd hbound (not_le.mpr hub_u)
+    · obtain ⟨n, hn_odd, hn_eq⟩ := hodd j (fun h0 => hj (Fin.ext h0))
+      have hspec := Classical.choose_spec (betaL_grid_coeff_int hG dataL
+        (hyp := hyp) ⟨0, hyp.base.q_prime.pos⟩ j)
+      have hcast : ((Classical.choose (betaL_grid_coeff_int hG dataL
+          (hyp := hyp) ⟨0, hyp.base.q_prime.pos⟩ j) : ℤ) : ℂ) = ((n : ℤ) : ℂ) := by
+        rw [← hspec, ← OddOrder.Peterfalvi.S15.typeIBetaL_zeta0_eq_h78_beta hG dataL]
+        exact hn_eq
+      have hmn : Classical.choose (betaL_grid_coeff_int hG dataL
+          (hyp := hyp) ⟨0, hyp.base.q_prime.pos⟩ j) = n := by exact_mod_cast hcast
+      rw [hmn]
+      exact hn_odd
+  -- **(c2) of the landed T-side dual dichotomy** (Coq `ai0`, PFsection14.v:189-191, via
+  -- `cycTIisoC`/`TtypeP`): the (c1)-dual bound `(h−1)/e ≤ (v−1)/p` is refuted by `hub_v`.
+  -- `IsTypeP2 T` is the landed (14.9) `T_isTypeP2`; the reconciled `TypePData T` comes from
+  -- `reconciled_typePData_T`.
+  m_col_odd := by
+    intro i hi
+    have hφmem : dataL.zeta 0 ∈ dataL.typeIHyp.Sset :=
+      dataL.zeta_mem_Sset (Ne.symm dataL.ind1H_ne_zero)
+    have hker : dataL.kernelIn = (maxNilpotentNormalHall L).subgroupOf L := by
+      show (dataL.typeIHyp.typeI.typeF.H).subgroupOf L = _
+      rw [dataL.typeIHyp.typeI.typeF.H_eq]
+    have hφdeg : dataL.zeta 0 (1 : ↥L)
+        = ((((maxNilpotentNormalHall L).subgroupOf L).index : ℕ) : ℂ) := by
+      rw [← hker]; exact dataL.deg0
+    have hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.base.T := T_isTypeP2 hG hnoV hncH0C hyp
+    obtain ⟨Tdata, hU, hW1, hW2⟩ :=
+      OddOrder.Peterfalvi.S15.reconciled_typePData_T hG hyp.base
+    rcases OddOrder.Peterfalvi.S15.typeI_caseC_dual_dichotomy hG hnoV hyp.base hT2 Tdata
+        hU hW1 hW2 dataL (dataL.zeta 0) hφmem hφdeg with ⟨-, hbound⟩ | ⟨hodd, -⟩
+    · exact absurd hbound (not_le.mpr hub_v)
+    · obtain ⟨n, hn_odd, hn_eq⟩ := hodd i (fun h0 => hi (Fin.ext h0))
+      have hspec := Classical.choose_spec (betaL_grid_coeff_int hG dataL
+        (hyp := hyp) i ⟨0, hyp.base.p_prime.pos⟩)
+      have hcast : ((Classical.choose (betaL_grid_coeff_int hG dataL
+          (hyp := hyp) i ⟨0, hyp.base.p_prime.pos⟩) : ℤ) : ℂ) = ((n : ℤ) : ℂ) := by
+        rw [← hspec, ← OddOrder.Peterfalvi.S15.typeIBetaL_zeta0_eq_h78_beta hG dataL]
+        exact hn_eq
+      have hmn : Classical.choose (betaL_grid_coeff_int hG dataL
+          (hyp := hyp) i ⟨0, hyp.base.p_prime.pos⟩) = n := by exact_mod_cast hcast
+      rw [hmn]
+      exact hn_odd
   -- **The (13.19.c) Bessel bound `Σ m² ≤ p q`** (Coq `ub_e`), fully proven via
   -- `betaL_grid_coeff_bessel`: the (7.8.a) decomposition projects onto the `η`-grid as
   -- `⟨β_L, η_ij⟩ = ⟨1_G + Γ_L, η_ij⟩` (`caseB_eta_orthogonal_nu_zeta_at` kills the `ζ_0^ν`/`W`
@@ -361,16 +417,15 @@ noncomputable def lSideGridCoeffData [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
   bessel :=
     betaL_grid_coeff_bessel hG hnoV hncH0C hLmax dataL hepq _
       (fun i j => Classical.choose_spec (betaL_grid_coeff_int hG dataL i j))
-  -- **The deep §13 gate (issue 3002, Coq `Y = 0`, PFsection14.v:212-251).** `1_G + Δ_L = Σ m_ij η_ij`:
+  -- **The `Y = 0` grid membership (issue 3002, Coq PFsection14.v:212-251).** `1_G + Δ_L = Σ m_ij η_ij`:
   -- the coherence residual equals its own orthogonal projection onto the `η`-grid, i.e. the residual
   -- `Y := (1_G + Γ_L) − Σ m_ij η_ij` is `0`.  This is the `orthogonal_split` + `leif`-equality step
-  -- forced by the tightness `e = p q` (`ub_e`) **together with** each `|m_ij|² ≥ 1` (from the parities
-  -- `m_row_odd`/`m_col_odd` above, `a_odd`), so `grid_mem` genuinely *depends on* the gated boundary
-  -- parity.  Verified c-unreachable: the proven `NC ≤ 2` engine
-  -- `grid_eq_zero_of_relation_of_card_le_two` (S16_GridExpansion) does not apply here (all `p q ≥ 15`
-  -- coefficients are `±1`, so `NC = p q ≫ 2`), and the `bessel` proof only yields `⟨Y,Y⟩ ≥ 0`, not the
-  -- tight `⟨Y,Y⟩ = 0`.  The M-side analogue is now the conditional
-  -- `betaM_expansion_data`; it is not stored on the unconditional (14.10) carrier.
+  -- forced by the tightness `e = p q` (`ub_e`) **together with** each `|m_ij|² ≥ 1`.  The parity
+  -- input is now DISCHARGED (`m_row_odd`/`m_col_odd` above + the (3.7) four-corner relation give
+  -- every `m_ij` odd, hence `m_ij² ≥ 1`, hence `Σ m² ≥ p q`); the remaining piece is the
+  -- **Parseval-defect tightening** of the `bessel` argument: `Σ m² + ‖Y‖² = ‖1_G + Γ_L‖² ≤ p q`
+  -- (the `betaL_grid_coeff_bessel` chain keeps only the `≤`, dropping `‖Y‖²`), which with
+  -- `Σ m² ≥ p q` forces `‖Y‖² = 0`, i.e. `Y = 0` (issue 0115 Campaign A, next stage).
   grid_mem := sorry
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -399,7 +454,13 @@ theorem lSide_delta_grid_expansion [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
     {hyp : Hypothesis (G := G)} {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
     (dataL : TypeICoherent78Data L)
     (hq3 : hyp.base.q = 3) (hp5 : hyp.base.p = 5)
-    (hepq : (dataL.h78 hG).complementIndex = hyp.base.p * hyp.base.q) :
+    (hepq : (dataL.h78 hG).complementIndex = hyp.base.p * hyp.base.q)
+    (hub_u : ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) <
+      ((Nat.card ↥dataL.typeIHyp.H - 1 : ℕ) : ℚ)
+        / (((maxNilpotentNormalHall L).subgroupOf L).index : ℚ))
+    (hub_v : ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) <
+      ((Nat.card ↥dataL.typeIHyp.H - 1 : ℕ) : ℚ)
+        / (((maxNilpotentNormalHall L).subgroupOf L).index : ℚ)) :
     ∃ signs : Fin hyp.base.q → Fin hyp.base.p → ℤ,
       (∀ i j, signs i j = 1 ∨ signs i j = -1) ∧
         OddOrder.Peterfalvi.S09.Hypothesis71.constOne G + (dataL.h78 hG).delta =
@@ -409,7 +470,7 @@ theorem lSide_delta_grid_expansion [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
   set i₀ : Fin hyp.base.q := ⟨0, hyp.base.q_prime.pos⟩ with hi₀
   set j₀ : Fin hyp.base.p := ⟨0, hyp.base.p_prime.pos⟩ with hj₀
   obtain ⟨m, hcoeff, hprin, hrow, hcol, hbessel, hmem⟩ :=
-    lSideGridCoeffData hG hnoV hncH0C hyp hLmax dataL hq3 hp5 hepq
+    lSideGridCoeffData hG hnoV hncH0C hyp hLmax dataL hq3 hp5 hepq hub_u hub_v
   -- (3.7) four-corner relation on `m_ij` (from `betaL_grid_relation`, via the integrality bridge).
   have hrel : ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
       m i j + m i₀ j₀ = m i j₀ + m i₀ j := by
@@ -490,6 +551,41 @@ theorem typeICoherent78_complementIndex_eq_pq [Finite G]
   exact Ldata.typeI_complement_card_eq_pq
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **`[L : H_L] = p q` in `Subgroup.index` form** — the (14.3) complement order
+(`typeICoherent78_complementIndex_eq_pq`) transported to the canonical-kernel index
+`((maxNilpotentNormalHall L).subgroupOf L).index` consumed by the (13.19.c) dichotomy bounds. -/
+theorem typeICoherent78_index_eq_pq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (Ldata : LHypothesis hyp) (dataL : TypeICoherent78Data Ldata.L) :
+    ((maxNilpotentNormalHall Ldata.L).subgroupOf Ldata.L).index
+      = hyp.base.p * hyp.base.q := by
+  have hker : dataL.kernelIn = (maxNilpotentNormalHall Ldata.L).subgroupOf Ldata.L := by
+    show (dataL.typeIHyp.typeI.typeF.H).subgroupOf Ldata.L = _
+    rw [dataL.typeIHyp.typeI.typeF.H_eq]
+  rw [← hker]
+  -- `kernelIn.index = complementIndex` (both are `|L| / |H_L|`), then the complement order.
+  have hmul : dataL.kernelIn.index * Nat.card ↥dataL.kernelIn = Nat.card ↥Ldata.L :=
+    Subgroup.index_mul_card dataL.kernelIn
+  have hce : (dataL.h78 hG).complementIndex = dataL.kernelIn.index := by
+    show Nat.card ↥Ldata.L / Nat.card dataL.kernel = dataL.kernelIn.index
+    rw [show Nat.card dataL.kernel = Nat.card ↥dataL.kernelIn from
+        (dataL.kernelOrder_eq hG) ▸ rfl,
+      ← hmul, Nat.mul_div_cancel _ Nat.card_pos]
+  rw [← hce]
+  exact typeICoherent78_complementIndex_eq_pq hG Ldata dataL
+
+/-- **`|H_L| = h`** — the (7.8) kernel of any coherence bundle on the (14.3) `L` is the
+canonical `H = L_F`, so its order is the `NonConjugateHypothesis` parameter `h`. -/
+theorem typeICoherent78_card_kernel_eq_h [Finite G]
+    {hyp : Hypothesis (G := G)} (nc : NonConjugateHypothesis hyp)
+    (dataL : TypeICoherent78Data nc.Ldata.L) :
+    Nat.card ↥dataL.typeIHyp.H = nc.h := by
+  have hHeq : dataL.typeIHyp.H = nc.Ldata.H := by
+    show dataL.typeIHyp.typeI.typeF.H = nc.Ldata.H
+    rw [dataL.typeIHyp.typeI.typeF.H_eq, nc.Ldata.H_eq_LF]
+  rw [nc.h_eq_card_H, hHeq]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (13.19.c), the L-side signed `η`-grid expansion.**  Under case-(b)
 (`(q,p) = (3,5)`) and the two gap inequalities, (13.19.c) applied on the S- and T-sides gives
 the (14.11.2)-style signed expansion `β_L^τ = Σ_{ij} ε_ij η_ij − ε ζ_i^ν` of the L-side, with
@@ -525,8 +621,25 @@ theorem lSide_signed_eta_expansion [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
             - (ε : ℂ) • ((dataL.h78 hG).nu ((dataL.h78 hG).hyp76.zeta i)) := by
   -- `e_L = |L : H_L| = p q` (`typeICoherent78_complementIndex_eq_pq`, the (14.3) Frobenius order).
   have hepq := typeICoherent78_complementIndex_eq_pq hG nc.Ldata dataL
+  -- (14.11.2)-style strict gap inputs for the (13.19.c) dichotomy branches, in `dataL`
+  -- coordinates: `(v−1)/p < (h−1)/e` is `hhv` (after `e = pq`, `|H_L| = h`), and
+  -- `(u−1)/q < (h−1)/e` chains it with `hvu`.
+  have hindex : ((maxNilpotentNormalHall nc.Ldata.L).subgroupOf nc.Ldata.L).index
+      = hyp.base.p * hyp.base.q := typeICoherent78_index_eq_pq hG nc.Ldata dataL
+  have hcardH : Nat.card ↥dataL.typeIHyp.H = nc.h :=
+    typeICoherent78_card_kernel_eq_h nc dataL
+  have hub_v : ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) <
+      ((Nat.card ↥dataL.typeIHyp.H - 1 : ℕ) : ℚ)
+        / (((maxNilpotentNormalHall nc.Ldata.L).subgroupOf nc.Ldata.L).index : ℚ) := by
+    rw [hcardH, hindex]
+    exact hhv
+  have hub_u : ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) <
+      ((Nat.card ↥dataL.typeIHyp.H - 1 : ℕ) : ℚ)
+        / (((maxNilpotentNormalHall nc.Ldata.L).subgroupOf nc.Ldata.L).index : ℚ) :=
+    lt_trans hvu hub_v
   obtain ⟨signs, hsigns, hgrid⟩ :=
     lSide_delta_grid_expansion hG hnoV hncH0C nc.Ldata.L_maximal dataL hq3 hp5 hepq
+      hub_u hub_v
   -- the removed member is the distinguished coherent image `ζ_0^ν` (`ε = 1`, `zetaDistinct`)
   refine ⟨signs, hsigns, (dataL.h78 hG).zetaDistinct, ?_, 1, Or.inl rfl, ?_⟩
   · -- `zetaDistinct ≠ ind1H`
