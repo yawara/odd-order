@@ -101,6 +101,7 @@ theorem sharpImage_H_subgroupOf_eq_typeIA [Finite G] {L : Subgroup G} (hyp : Hyp
     centralizerSupport_sharp_eq_of_frobenius (N := hyp.typeI.typeF.H) hfrob hyp.typeI.typeF.H_le]
   simp only [OddOrder.Peterfalvi.S08.sharpImage, OddOrder.GroupTheory.sharpSubgroup, hmap]
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Structural input for Peterfalvi (12.6) — TI-kernel Frobenius case (6.8)(c1).**
 
 For the (6.8) case-(c1) route, `L` is Frobenius **and** `H^#` is a TI-subset of `G`
@@ -113,7 +114,22 @@ separate hypothesis).  Under TI, the §4 Dade datum's local subgroups vanish
 witness `L` is Frobenius but its `H^#` is **not** TI in `G` (Peterfalvi (12.10): "By (12.9), `H^#` is
 not a TI-subset of `G`"), so `dade_H_eq_bot` fails there.  The `_hTI` hypothesis restores soundness;
 the witness (non-TI) is handled by the case-(b)/(c) routes of `frobenius_typeI_coherent`, not by this
-TI-only carrier. -/
+TI-only carrier.
+
+**Construction (2026-07-14, carve-out issue 9077)**: kernel `H = (L_F).subgroupOf L`; the Frobenius
+witness supplies the split/nontriviality fields, `L_F = maxNilpotentNormalHall` the nilpotency.  The
+TI bound `N_G(H)` collapses to `L` through the (8.15) normalizer identification
+`hyp.dadeData.normalizer_eq` (`N_G(A(L)) = L`) and `A(L) = H^#` for Frobenius `L`
+(`typeIA_eq_sharp_of_frobenius`, `normalizer_sharpSubgroup`).  The §4 Dade datum is the (12.1)
+`hyp.dadeData.dade` recoordinated along `sharpImage H = A(L)`
+(`sharpImage_H_subgroupOf_eq_typeIA`), so the Sibley map *is* `hyp.tau` exactly
+(`dadeIntegralCharacterMap_transport_ambient`), and its local subgroups vanish by the (2.3) reverse
+direction (`H_eq_bot_of_isTISubset`).  ⚠ Residual `sorry` (9077 flag, 2026-07-14): `card_L_odd` —
+`Odd (Nat.card ↥L)` is **not derivable** from the current hypotheses (no
+`IsMinimalSimpleOdd G`/parity input here; cf. the `hG.odd`-fed `card_L_odd` of
+`typeVSibleyDadeHypothesis`).  Fix = add an `Odd (Nat.card G)` hypothesis and thread `hG.odd` at
+the single call site (`frobenius_typeI_coherent`); frozen pending hub/lane-b approval (proof-only
+carve-out). -/
 noncomputable def sibleyTarget_frobI [Fintype G] {L : Subgroup G} [Fintype ↥L]
     [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card G : ℂ)] (hyp : Hypothesis L)
     (_hfrob : ∃ C : Subgroup ↥L,
@@ -121,7 +137,81 @@ noncomputable def sibleyTarget_frobI [Fintype G] {L : Subgroup G} [Fintype ↥L]
     (_hTI : OddOrder.GroupTheory.IsTISubset
       (OddOrder.GroupTheory.sharpSubgroup hyp.typeI.typeF.H)
       (Subgroup.normalizer (hyp.typeI.typeF.H : Set G))) :
-    CoherenceWiring.SibleyTarget hyp.tau hyp.Sset hyp.A := sorry
+    CoherenceWiring.SibleyTarget hyp.tau hyp.Sset hyp.A := by
+  -- Reconcile the four instance binders with the scoped `FiniteInduce` instances baked into
+  -- `hyp.tau`/`hyp.Sset`/`hyp.A` (all four classes are subsingletons; `Finite G` proofs are
+  -- definitionally irrelevant), so the whole construction lives in one instance world.
+  rename_i iFG iFL iIL iIG
+  haveI hFin : Finite G := hyp.finiteG
+  obtain rfl : iFG = OddOrder.Peterfalvi.S12.FiniteInduce.finiteGFintype :=
+    Subsingleton.elim _ _
+  obtain rfl : iFL = OddOrder.Peterfalvi.S12.FiniteInduce.finiteSubFintype L :=
+    Subsingleton.elim _ _
+  obtain rfl : iIL = OddOrder.Peterfalvi.S12.FiniteInduce.natCardInvC L :=
+    Subsingleton.elim _ _
+  obtain rfl : iIG = OddOrder.Peterfalvi.S12.FiniteInduce.natCardInvCG :=
+    Subsingleton.elim _ _
+  -- The target lives in `Type`, so extract the Frobenius complement by choice.
+  let C : Subgroup ↥L := _hfrob.choose
+  have hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L (hyp.H.subgroupOf L) C :=
+    _hfrob.choose_spec
+  -- Support-set identifications: `sharpImage ((L_F).subgroupOf L) = A(L) (= (L_F)^#)`.
+  have hset : OddOrder.Peterfalvi.S08.sharpImage (hyp.H.subgroupOf L)
+      = typeIA L hyp.typeI := sharpImage_H_subgroupOf_eq_typeIA hyp hfrob
+  have hEq : typeIA L hyp.typeI
+      = OddOrder.Peterfalvi.S08.sharpImage (hyp.H.subgroupOf L) := hset.symm
+  -- `A(L) = (L_F)^#` for the Frobenius `L` (the non-circular upstream twin of
+  -- `typeIA_eq_sharp_of_frobenius`, which is defined only later in this file).
+  have hsharp : typeIA L hyp.typeI
+      = OddOrder.GroupTheory.sharpSubgroup hyp.typeI.typeF.H :=
+    centralizerSupport_sharp_eq_of_frobenius hfrob hyp.typeI.typeF.H_le
+  -- The (6.8.a) TI in the `L`-relative form: the TI bound `N_G(H)` collapses to `L`
+  -- through the (8.15) normalizer identification `N_G(A(L)) = L`.
+  have hNeq : Subgroup.normalizer (hyp.typeI.typeF.H : Set G) = L := by
+    rw [← OddOrder.Peterfalvi.S12.normalizer_sharpSubgroup, ← hsharp]
+    exact hyp.dadeData.normalizer_eq
+  have hTI_L : OddOrder.GroupTheory.IsTISubset
+      (OddOrder.Peterfalvi.S08.sharpImage (hyp.H.subgroupOf L)) L := by
+    rw [hset, hsharp]
+    exact _hTI.mono hNeq.le
+  -- The (12.1) Dade datum recoordinated to the Sibley support: the *identical* datum
+  -- transported along `hEq`, so the Dade isometry is preserved exactly.
+  have hconj' : (hEq ▸ hyp.dadeData.dade :
+      OddOrder.Peterfalvi.S04.Hypothesis G
+        (OddOrder.Peterfalvi.S08.sharpImage (hyp.H.subgroupOf L)) L).HConjInvariant :=
+    hconj_transport_ambient hEq hyp.dadeData.dade hyp.hconj
+  -- ⚠ 9077 flag (2026-07-14): not derivable from the current signature — see docstring.
+  have hodd : Odd (Nat.card ↥L) := sorry
+  refine
+    { H := hyp.H.subgroupOf L
+      invH := inferInstance
+      sib :=
+        { W1 := C
+          H_ne_bot := hfrob.ne_bot_kernel
+          H_normal := hfrob.isNormal
+          H_nilpotent := ?_
+          split := hfrob.isComplement
+          W1_nontrivial := hfrob.ne_bot_complement
+          card_L_odd := hodd
+          H_sharp_ti := hTI_L
+          dade := hEq ▸ hyp.dadeData.dade
+          hconj := hconj'
+          dade_H_eq_bot := fun a =>
+            OddOrder.Peterfalvi.S04.Hypothesis.H_eq_bot_of_isTISubset _ hTI_L a
+          S := hyp.Sset
+          S_eq := rfl
+          cases := Or.inl hfrob }
+      tau_eq :=
+        dadeIntegralCharacterMap_transport_ambient hEq hyp.dadeData.dade hyp.hconj hconj'
+      S_eq := rfl
+      A0_eq := by rw [hset]; rfl }
+  -- `H = L_F` is nilpotent: `maxNilpotentNormalHall` nilpotency transported to the
+  -- `↥L`-coordinate along `subgroupOfEquivOfLe`.
+  haveI : Group.IsNilpotent ↥(hyp.typeI.typeF.H) := by
+    rw [hyp.typeI.typeF.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent L
+  exact Group.nilpotent_of_mulEquiv
+    (Subgroup.subgroupOfEquivOfLe hyp.typeI.typeF.H_le).symm
 
 /-- **Lattice-relative `xFamily_inner`** — the (5.7) `X`-family orthonormality `⟨Xᵢ, Xⱼ⟩ = ⟨χᵢ, χⱼ⟩`
 (`Xⱼ = β − τ(χ₀ − χⱼ)`) **without a global isometry**.  `S07.xFamily_inner` (S07:472) uses the

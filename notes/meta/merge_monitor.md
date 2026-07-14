@@ -631,6 +631,21 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 49) — ★★ b refuter-T CLOSED + c 稼働開始 (item 2 構成 + unprovability 発見)。census 39**:
+  **a=0** (13.15 完遂後 quiet)。**b=3** (`7576e198` 系 = ★ **refuter-T CLOSED** —
+  `sSet_caseA_nineElevenRefutation_T` 実証明で T-side (9.11) chain 全体 axiom-clean
+  (AxiomsCheck 12 assert 追加、census 40→39 実 −1)。新 leaf S15_CaseACoherenceT 701 行。
+  b 残 gate = nuGridSupply (a) / T_isTypeP2_gate / T_caseB_facts_no_lambda (b 次 frontier)。
+  ⚠ b 自己 flag: CountingLayer 2002 / CDS 2240 の分割を b が次 iteration 先頭で実施予定 = hub 代行不要)。
+  **c=2** (`237ff7fc` = 9077 item 2 `sibleyTarget_frobI` (6.8)(c1) 実構成 + ★ **statement-level
+  unprovability 発見** (`card_L_odd` が現 hypotheses から導出不能、反例 G=S₄/L=S₃) → hub が
+  **RULING #4′ で signature fix 承認** (odd 仮説追加 = faithfulness 訂正クラス、c 即実施可)。
+  item 1 DAG-blocked HOLD は c も独立検証で hub と一致)。
+  2035 で独立追記衝突 2 回 (b#76/c cross-ref) → 両保持解決。build green 4214 jobs (+1) ×2 /
+  AxiomsCheck OK / 新 axiom なし / 逸脱なし / orphan なし。push 済 (main = ab69cf59)。
+  **0116 追跡**: 条件 (ii) 実質成立 (a の OrderDetermination cluster close、a quiet)。条件 (i)
+  hT2 弱化裁定は b 未応答 (b の #76 は #75 配達前に起票; b は分割 → no_lambda の順で進む見込み。
+  no_lambda engine は hT2 弱化と結合しうるので次 tick 以降の b の反応を待つ)。
 - **2026-07-14 (tick 48) — ★ a (13.15) 実証明 = OrderDetermination 移管 4 sorry 完遂 + b refuter-T campaign 開始**:
   **a=1** (`a6c9bb3f` = ★ **(13.15) caseB_order_u 実証明** — 数値エンジンを S16_CaseBOrder →
   新 Setup leaf `CaseBOrder.lean` (399 行) へ自己 relayer し honest 入力で実証明。旧 opaque 版削除、

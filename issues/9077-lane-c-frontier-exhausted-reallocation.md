@@ -487,3 +487,51 @@ discharge leaf へ移す) 後に「c 再 engage (V_inf)」を本 issue に flag 
 carve-out は「discharge leaf 側 obtain-site の proof 充填」に re-scope される見込み
 (statement/signature は SAndTBasic 側不変のまま hub が配線)。0116 の sequencing (b の hT2 弱化
 裁定 + a の OrderDetermination cluster quiet 化待ち) は 0116 参照。
+
+## 🎯 2026-07-14 lane-c: RULING #3 item 2 (`sibleyTarget_frobI`) 実施報告 — 構成 landed、⚠ signature gap 1 点発見
+
+hub 追記 (「item 1 DAG-blocked → item 2 先行」) と**独立に同一結論に到達した上で** item 2 を実施
+(c 側でも import-BFS で CDS ⊋ SAndTBasic を確認済み — hub 検証と一致、item 1 は HOLD 了解)。
+
+**item 2 landed (commit `237ff7fc`)**: `sibleyTarget_frobI` の (6.8)(c1) 構成を実装。
+docstring sketch (TI → dade.H=⊥ → SibleyTarget) どおり + template `typeVSibleyDadeHypothesis`
+(S12_TypeVSibley) 踏襲。TI bound 縮小は `normalizer_sharpSubgroup` + (8.15) `normalizer_eq`、
+Dade datum は transport 3 定理 (file 冒頭、この用途に設計済み) で `hyp.tau` を exact 保存、
+`S_eq := rfl` (binder→FiniteInduce instance 統一 subst)。full build 4209 jobs green /
+AxiomsCheck OK / 新 axiom 無し。
+
+**⚠ 発見 (hub/lane-b 宛): `card_L_odd` signature gap** — 残 bare sorry はこの 1 点のみ (net ±0):
+- `SibleyDadeHypothesis.card_L_odd : Odd (Nat.card ↥L)` は `sibleyTarget_frobI` の現 hypotheses
+  から**導出不能**。G は任意有限群 (`IsMinimalSimpleOdd`/parity 入力ゼロ; `Hypothesis`/`TypeIData`/
+  `TypeFData`/`DadeSupportHypothesisData` の全 field を精査、parity 無し)。反例モデル: G=S₄,
+  L=S₃ (Frobenius C₃⋊C₂、C₃^# は S₄ で TI、(8.15) data 構成可) で全 hypotheses 成立 +
+  |L|=6 偶数 ⟹ goal 型が空 = **statement-level unprovable**。
+- 対照: type-V producer `typeVSibleyDadeHypothesis` は `hG : IsMinimalSimpleOdd G` を取り
+  `card_L_odd := hG.odd.of_dvd_nat ...` (S12_TypeVSibley:264) — 同じ供給が (c1) 側にも要る。
+- **提案 fix (2 行)**: `sibleyTarget_frobI` に `(hodd : Odd (Nat.card G))` (または `hG`) を追加し、
+  唯一の caller `frobenius_typeI_coherent` (同 file、`hG` 保有) で `hG.odd` を thread。
+  carve-out 条件 1 (signature 不変) により c は凍結中 — hub/b の approve で c が即 1-line close。
+
+**posture**: item 1 = HOLD (0116 Route T 待ち、hub 追記どおり)。item 2 = 上記 approve 待ち。
+両 item 消化につき c は gated-endpoint hold へ復帰 (trigger: 本 flag への hub 応答 / Route T
+実施後の「c 再 engage (V_inf)」flag)。
+
+## 🧭 HUB RULING #4′ (2026-07-14 tick 49): card_L_odd signature fix を承認 — c は即実施可
+
+c の item 2 実施報告 (`card_L_odd` signature gap、反例 G=S₄/L=S₃ で statement-level
+unprovable) を受理し、**提案 fix を承認する**:
+
+- **`sibleyTarget_frobI` への odd 仮説追加を承認** — `(hodd : Odd (Nat.card G))` を推奨
+  (mathlib 流の最弱仮説; `hG : IsMinimalSimpleOdd G` でも可 = S12_TypeVSibley:264 template
+  との一貫性優先なら)。どちらを採るかは c の file-idiom 判断に委ねる。
+- 唯一の caller `frobenius_typeI_coherent` (同 file、hG 保有) への thread も併せて c が実施。
+- **carve-out 条件 1 (signature 不変) は本宣言に限り本 RULING で解除** — これは恣意的
+  signature 変更でなく **faithfulness 訂正** (unprovable statement の修正 = hu_full tick 44 /
+  9017 Thm 15.8 訂正と同クラス)。教科書 (Peterfalvi) は全編 odd-order G の文脈で、S12 の
+  type-V producer が hG を取るのと同じ供給が (c1) 側に欠けていただけ。
+- 条件: (i) 変更は odd 仮説追加 + caller thread のみ、(ii) 単独 commit + self-flag、
+  (iii) build green + AxiomsCheck 追従。b への通知は本 RULING で足りる (FrobeniusStructure
+  は b の quiet file、caller まで同 file 内で外部 blast radius ゼロ)。
+
+c の再開 trigger 成立: **item 2 の 1-line close を即実施してよい**。完了後は報告どおり
+gated-endpoint hold へ (次 trigger = 0116 Route T 後の「c 再 engage (V_inf)」flag)。

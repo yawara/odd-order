@@ -2508,3 +2508,12 @@ prefix-split する。
 c_eq_one/caseA_parameters の swap 適用可否 (mkSection11CharacterDataS @ swap vs
 mkSection11CharacterDataT の整合)、(ii) T_side_D_eq_bot discharge、(iii) v_eq_full は
 caseB_order_u の a-landing 待ち部分を切り分け。
+
+## 📎 lane-c cross-ref (2026-07-14, 9077 carve-out 条件 4 の記録)
+
+9077 RULING #3 の b-quiet-file carve-out 実施状況: item 2 `sibleyTarget_frobI`
+(S14_MaximalI/FrobeniusStructure) = 構成 landed (commit `237ff7fc`)、残 sorry は
+`card_L_odd` (signature gap — `Odd (Nat.card G)` 仮説の追加要、詳細 9077) 1 点のみ。
+item 1 `V_inf_centralizer_Q_eq_bot` (S15_SAndTBasic:841) = DAG-blocked で HOLD
+(hub 9077 追記 + 0116 Route T; c も独立検証で一致)。b への影響: FrobeniusStructure の
+編集は proof-only + docstring 注記のみ、signature/statement 不変。
