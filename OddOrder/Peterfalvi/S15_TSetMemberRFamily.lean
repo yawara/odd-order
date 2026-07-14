@@ -672,4 +672,76 @@ noncomputable def Hypothesis.sSet_coherent_dade_caseB_T [Finite G]
     (sSet_closedUnderConjugate _ hη₁)
     (sSet_hasNoRealCharacters _ (hyp.oddCardT hG) hη₁)
 
+
+open OddOrder.Peterfalvi.S11 in
+/-- **The uniform-degree irreducible cut `S₁(d)` of `𝒯`** (mirror of `sSetIrrDeg`): the
+degree-`d` irreducible members of the `T`-instance §9 family — the caseA-`T` base prefix
+(`d = p·a`) of the (9.11) pair-adjoining route. -/
+noncomputable def Hypothesis.sSetIrrDegT [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hvd : hyp.v * hyp.d ≠ 1) (d : ℂ) :
+    Set (ClassFunction ↥hyp.T ℂ) :=
+  { φ ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd) |
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter φ ∧ (φ : ↥hyp.T → ℂ) 1 = d }
+
+open OddOrder.Peterfalvi.S11 in
+theorem Hypothesis.sSetIrrDegT_subset_sSet [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hvd : hyp.v * hyp.d ≠ 1) (d : ℂ) :
+    hyp.sSetIrrDegT hG hvd d ⊆ sSet (hyp.toTypesIIIIIIVSetupT hG hvd) := fun _ h => h.1
+
+open OddOrder.Peterfalvi.S11 in
+/-- **`S₁(d)`-`T` is conjugation-closed** (mirror of `sSetIrrDeg_closedUnderConjugate`). -/
+theorem Hypothesis.sSetIrrDegT_closedUnderConjugate [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1) (d : ℂ) (hd : star d = d) :
+    OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.sSetIrrDegT hG hvd d) := by
+  intro φ hφ
+  refine ⟨sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupT hG hvd) hφ.1, hφ.2.1.conj, ?_⟩
+  rw [ClassFunction.conj_apply, hφ.2.2, hd]
+
+open OddOrder.Peterfalvi.S11 in
+/-- **`S₁(d)`-`T` has no real members** (mirror of `sSetIrrDeg_hasNoRealCharacters`). -/
+theorem Hypothesis.sSetIrrDegT_hasNoRealCharacters [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1) (d : ℂ) :
+    OddOrder.Peterfalvi.S03.HasNoRealCharacters (hyp.sSetIrrDegT hG hvd d) :=
+  (sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupT hG hvd) (hyp.oddCardT hG)).mono
+    (hyp.sSetIrrDegT_subset_sSet hG hvd d)
+
+open OddOrder.Peterfalvi.S11 in
+/-- **`S₁(d)`-`T`-members are supported in `A(T) ∪ {1}`** (mirror of
+`sSetIrrDeg_member_support_subset`). -/
+theorem Hypothesis.sSetIrrDegT_member_support_subset [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1) (d : ℂ)
+    {φ : ClassFunction ↥hyp.T ℂ} (hφ : φ ∈ hyp.sSetIrrDegT hG hvd d) :
+    φ.support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T ∪ {1} := by
+  obtain ⟨hφsSet, _⟩ := hφ
+  obtain ⟨hξ, hφeq⟩ := hφsSet.choose_spec
+  rw [hφeq]
+  exact hyp.sSet_member_support_subset_A_T hG hvd hξ
+
+open OddOrder.Peterfalvi.S11 in
+/-- **`S₁(d)`-`T`-member differences are `A(T)`-supported** (mirror of
+`sSetIrrDeg_member_diff_supported`): equal degrees cancel at `1`. -/
+theorem Hypothesis.sSetIrrDegT_member_diff_supported [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1) (d : ℂ)
+    {x : ClassFunction ↥hyp.T ℂ} (hx : x ∈ hyp.sSetIrrDegT hG hvd d)
+    {y : ClassFunction ↥hyp.T ℂ} (hy : y ∈ hyp.sSetIrrDegT hG hvd d) :
+    (x - y).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
+  intro z hz
+  have hz0 : (x - y) z ≠ 0 := hz
+  have hdeg : (x : ↥hyp.T → ℂ) 1 = (y : ↥hyp.T → ℂ) 1 := by rw [hx.2.2, hy.2.2]
+  rcases ClassFunction.support_sub_subset x y hz with h | h
+  · rcases hyp.sSetIrrDegT_member_support_subset hG hvd d hx h with h' | h'
+    · exact h'
+    · exfalso; rw [Set.mem_singleton_iff] at h'; subst h'
+      exact hz0 (by rw [ClassFunction.sub_apply, hdeg, sub_self])
+  · rcases hyp.sSetIrrDegT_member_support_subset hG hvd d hy h with h' | h'
+    · exact h'
+    · exfalso; rw [Set.mem_singleton_iff] at h'; subst h'
+      exact hz0 (by rw [ClassFunction.sub_apply, hdeg, sub_self])
+
 end OddOrder.Peterfalvi.S15

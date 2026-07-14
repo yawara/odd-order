@@ -2134,3 +2134,14 @@ refuter-T (sorried、S 版 signature mirror) → step 4 pin (ν-row formula) →
 
 残 sorry (b 関連): nuGridSupply (a-owned producer)、tSide_theta_package (conjunct 4/5 待ち)、
 lambda_forces_T_caseB_core、caseA-T refuter (次セッション立て)。
+
+## 2026-07-14 更新 #63 (lane b, /loop iter 24) — sSetIrrDegT 基本層 landed
+
+TSetMemberRFamily (sorry-free、一発 build): `sSetIrrDegT` def (uniform-degree irr cut of 𝒯) +
+subset/closedUnderConjugate/hasNoRealCharacters/member_support_subset/member_diff_supported。
+
+caseA-T 残 chain: `sSetIrrDegT_coherent` (cut 上の uniform engine — S 版 HypothesisBasics 260-440
+の mirror、irr-only R-family で組む) → `_indT` (congrMap + tInstance_dade_eq_induce ✓) →
+`sSetIrrDegT_pa_two_le_ncard` ((9.8.d) caseA_exists_irreducible_qa の T-instance + conj doubling)
+→ `sSetIrrDegT_pa_coherent_indT_caseA` → dispatch `sSet_coherent_indT_A` → refuter-T (sorried、
+S 版 signature mirror)。
