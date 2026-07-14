@@ -2392,7 +2392,41 @@ not_isReal_of_ne_trivial_irreducible_of_odd_card (S03:156 ✓)、h0 = inner_indu
 → S16) が既に配線済みのため、**T-side campaign の残 gate は refuter-T / nuGridSupply (a) /
 T_isTypeP2_gate (0116) / T_caseB_facts_no_lambda の 4 named-obligation に collapse**。
 
-## 2026-07-14 更新 #75 (lane b, /loop 再開 iter 1) — refuter-T campaign 開始: PairBoundT + StepsT 着地
+## 2026-07-14 更新 #75 (HUB、監視再開時 — 0116 調査からの b 宛 findings)
+
+0116 relayer のトリガー成立 (#74 の θ-package 組立完了) を受け hub が全容調査
+(wf_746d2ebb 5-agent + hub 自前検証)。**b の次行動に直接効く 3 findings** を通知:
+
+1. **⚠ `T_isTypeP2_gate` (CDS:1052) は「0116 類の layer-inversion」ではなく証明循環** —
+   honest 供給と目していた `T_isTypeP2` (TTypeII:900) の証明自体が
+   `T_side_caseB_facts → T_caseB_facts_unconditional → lambda_forces_T_caseB_core →
+   tSide_theta_package_of_not_caseB_core → T_isTypeP2_gate` を経由する (hub が TTypeII 読解で
+   確認)。producer 移設や import 追加では**永遠に discharge できない**。さらに gate は `hG` のみを
+   取る形で、producer 側が要る hnoV (proven ✓) + hncH0C refuter を欠く分**真に強い statement**。
+   **honest fix = θ-package/τ₁T machinery (dadeHypT / tau1T_ofHonest / core θ-package) の
+   `hT2 : IsTypeP2 hyp.T` 入力を、ungated な type-P facts (IsTypeP via T_nonI +
+   reconciled_typePData_T) へ弱める**。Coq 裏付け: PFsection13 の section context は
+   `of_typeP S U defW` + `FTtype ≠ 1,5` のみで FTtype = 2 を仮定しない
+   (coq/theories/PFsection13.v:80,102-103; (13.4) 本体も :866 で同 context のまま)。
+   TTypeII:188-190 に b 自身が書いた cycle-hazard 注記の一般形。**この弱化の設計裁定は b**
+   (エンジンは b 所有)。hub の 0116 Route T threading は弱化後の型でパラメータを流すため、
+   **b の裁定が 0116 実施の前提条件 (i)** になっている — 方針だけでも早めに 2035/0116 へ。
+
+2. **`QD_sharp_centralizer_le_T` (CountingLayer:1615) の残る本質 = (QD)^# ⊆ A₀(T) membership
+   補題 (repo に未存在、genuine math)**。A₀-TI 部材は揃っている: escaping_honestTypeP2ASet_eq_empty
+   (SubcoherenceInputs:863、上流 ✓) / escaping_honestTypeP2A0Set_eq_empty +
+   conjClassSetIn_typePV_centralizer_le_M (HonestTypeP2A0:203/:165、TypePData-generic で上移可能)。
+   hT2 param 化 (弱化後の型) + 上移は 0116 Route T step 4 で hub が実施予定。membership 補題は b。
+
+3. **size flag: S15_CharacterDegreeSupply 2239 行 = 2000 行上限超過** — 分割要 (dir 化 or
+   prefix-split、mathlib 準拠)。0116 Route T は discharge 部材を CDS でなく新 leaf に置く設計に
+   したので、分割は b の裁量タイミングでよい (hub 代行可、希望あれば 2035 で flag)。
+
+(次 iteration の参考) #74 の 4 named obligation のうち T_isTypeP2_gate は上記 1 の弱化で
+obligation 自体が消える型。refuter-T / T_caseB_facts_no_lambda は従来どおり。nuGridSupply は
+a-owned 9096。
+
+## 2026-07-14 更新 #76 (lane b, /loop 再開 iter 1 — 元 #75、hub #75 との番号衝突を合流時に振り直し) — refuter-T campaign 開始: PairBoundT + StepsT 着地
 
 #74 の 4 named-obligation のうち **refuter-T (`sSet_caseA_nineElevenRefutation_T`,
 S15_TSetMemberRFamily:1017 唯一の sorry) が文書順+依存の最上流 ungated b-work** と確定

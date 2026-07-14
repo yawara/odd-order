@@ -466,3 +466,24 @@ SubcoherenceInputs/TSideDegrees) と非交差の quiet file。b は 2035 #41 ste
 **条件** (9087 carve-out と同型): (1) 当該 2 宣言の proof 充填以外の編集禁止 (statement/
 signature 不変; 必要な helper は c-owned or 新 shared leaf claim へ)、(2) 宣言ごと単独 commit +
 message self-flag、(3) landing で失効、(4) AxiomsCheck 追従 + 結果を本 issue と 2035 に記録。
+
+## ⚠ HUB 追記 (2026-07-14 監視再開時): RULING #3 item 1 は DAG-blocked — item 2 を先に
+
+0116 relayer 調査 (wf_746d2ebb + hub import-path 検証) の副産物として、**RULING #3 item 1
+(`V_inf_centralizer_Q_eq_bot`, S15_SAndTBasic:839) の c 自身が note した discharge route
+(`T_caseB_facts_unconditional` + `D_eq`) は現 DAG で不可能**と確定:
+
+- `T_caseB_facts_unconditional` は S15_CharacterDegreeSupply:2227 にあり、その import 閉包は
+  CDS → CaseACoherence → … → TSetMemberRFamily → BridgeCharacter → … → SAndTBasic を含む =
+  **CDS は SAndTBasic の strictly 下流** (T_side_caseB_facts (TTypeII:191) 経由も同様に下流)。
+  SAndTBasic 内の proof-only 充填からはどちらも cite 不能 (import すると cycle)。
+- D = ⊥ の honest 供給は (13.4) 系のみ (それが (13.12)-T d=1 の内容) なので、SAndTBasic 内での
+  代替 in-place route も無い。
+
+**c への指示**: item 1 は HOLD し、**item 2 (`sibleyTarget_frobI`,
+S14_MaximalI/FrobeniusStructure.lean:117) から着手** (S14 層で layer-block なし、docstring に
+証明 sketch あり)。item 1 の unblock は hub の 0116 Route T 実施 (obtain-site を CDS 下流の
+discharge leaf へ移す) 後に「c 再 engage (V_inf)」を本 issue に flag する — その際 item 1 の
+carve-out は「discharge leaf 側 obtain-site の proof 充填」に re-scope される見込み
+(statement/signature は SAndTBasic 側不変のまま hub が配線)。0116 の sequencing (b の hT2 弱化
+裁定 + a の OrderDetermination cluster quiet 化待ち) は 0116 参照。
