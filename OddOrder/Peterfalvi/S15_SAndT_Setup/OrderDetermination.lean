@@ -929,6 +929,69 @@ theorem caseA_parameters [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   exact caseA_numeric_parameters hyp.three_le_p hyp.q_prime hyp.q_ne_two hpeven
     hyp.m_gt_seven_tenths_of_five_le_q h13c h1310' hdiv
 
+/-- **Peterfalvi (14.6), sharp-parameter Sylow noncyclicity for the `S`-side `U`.**
+At the (13.13) parameters `q = 3` and `u = (p - 1)² / 4`, for every prime
+`r ∣ (p - 1) / 2`, every Sylow `r`-subgroup of Peterfalvi's actual subgroup `U` is noncyclic.
+
+The numeric equality is normalized to `u = ((p - 1) / 2)²`; the §11 block-scalar theorem gives
+the result for the `S`-instance `U`, and `Sdata_U_eq` transports it to the named subgroup
+`hyp.U`. -/
+theorem caseA_sylow_U_not_isCyclic_of_parameters [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
+    (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
+      (hyp.mkSection11CharacterDataS hG chief))
+    (hq : hyp.q = 3) (hu : hyp.u = (hyp.p - 1) ^ 2 / 4)
+    {r : ℕ} (hr : r.Prime) (hrhalf : r ∣ (hyp.p - 1) / 2)
+    (R : Sylow r ↥hyp.U) : ¬ IsCyclic ↥(R : Subgroup ↥hyp.U) := by
+  have hpeven : 2 ∣ hyp.p - 1 := by
+    have h := even_iff_two_dvd.mp
+      (OddOrder.Peterfalvi.S11.chiefFactor_p_sub_one_even (chief := chief) hG)
+    rwa [hyp.chiefFactorS_p_eq hG chief] at h
+  have hhalfSq : (hyp.p - 1) ^ 2 / 4 = ((hyp.p - 1) / 2) ^ 2 := by
+    have hsplit : hyp.p - 1 = 2 * ((hyp.p - 1) / 2) :=
+      (Nat.mul_div_cancel' hpeven).symm
+    rw [hsplit, mul_pow]
+    norm_num
+  have hqSharp : (hyp.toTypesIIIIIIVSetupS hG).q = 3 := by
+    rw [hyp.toTypesIIIIIIVSetupS_q_eq hG]
+    exact hq
+  have huSharp : (hyp.mkSection11CharacterDataS hG chief).u =
+      ((chief.p - 1) / 2) ^ 2 := by
+    rw [hyp.mkSection11CharacterDataS_u_eq hG chief,
+      hyp.chiefFactorS_p_eq hG chief, hu, hhalfSq]
+  have hrhalf' : r ∣ (chief.p - 1) / 2 := by
+    rwa [hyp.chiefFactorS_p_eq hG chief]
+  let e : ↥hyp.U ≃* ↥(hyp.toTypesIIIIIIVSetupS hG).U :=
+    MulEquiv.subgroupCongr hyp.Sdata_U_eq.symm
+  let f : ↥hyp.U →* ↥(hyp.toTypesIIIIIIVSetupS hG).U := e.toMonoidHom
+  have hf : Function.Surjective f := e.surjective
+  letI : Fact r.Prime := ⟨hr⟩
+  let Rsetup : Sylow r ↥(hyp.toTypesIIIIIIVSetupS hG).U :=
+    R.mapSurjective hf
+  have hRsetup := OddOrder.Peterfalvi.S11.caseA_sylow_U_not_isCyclic_of_sharp_order
+    hG (hyp.mkSection11CharacterDataS hG chief) caseA hqSharp huSharp hr hrhalf' Rsetup
+  intro hR
+  letI : IsCyclic ↥(R : Subgroup ↥hyp.U) := hR
+  rw [show (Rsetup : Subgroup ↥(hyp.toTypesIIIIIIVSetupS hG).U) =
+    (R : Subgroup ↥hyp.U).map f by rfl] at hRsetup
+  exact hRsetup <| isCyclic_of_surjective _
+    (f.subgroupMap_surjective (R : Subgroup ↥hyp.U))
+
+/-- **Peterfalvi (14.6), case-(9.7.a) Sylow noncyclicity for the `S`-side `U`.**
+If case (a) holds, then for every prime `r ∣ (p - 1) / 2`, every Sylow `r`-subgroup of
+Peterfalvi's actual subgroup `U` is noncyclic.  This is the direct consumer of the (13.13)
+parameter determination. -/
+theorem caseA_sylow_U_not_isCyclic [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
+    (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
+      (hyp.mkSection11CharacterDataS hG chief))
+    {r : ℕ} (hr : r.Prime) (hrhalf : r ∣ (hyp.p - 1) / 2)
+    (R : Sylow r ↥hyp.U) : ¬ IsCyclic ↥(R : Subgroup ↥hyp.U) := by
+  obtain ⟨hq, hu⟩ := caseA_parameters hG hyp caseA
+  exact caseA_sylow_U_not_isCyclic_of_parameters hG hyp caseA hq hu hr hrhalf R
+
 /-- The parity calculation behind **Peterfalvi (13.14)**: if `p` is odd, the
 geometric sum of its first `q` powers has the same parity as `q`. -/
 private theorem sum_range_pow_mod_two_eq {p q : ℕ} (hpodd : Odd p) :

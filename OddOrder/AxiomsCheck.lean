@@ -8166,3 +8166,9 @@ dividing the coordinate exponent; odd-order scalar images specialize the exponen
   OddOrder.RepresentationTheory.sylow_not_isCyclic_of_card_eq_sq_of_injective_pi
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.sylow_not_isCyclic_of_odd_blockScalarEmbedding
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S11.caseA_sylow_not_isCyclic_of_sharp_order
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S11.caseA_sylow_U_not_isCyclic_of_sharp_order
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.caseA_sylow_U_not_isCyclic_of_parameters
