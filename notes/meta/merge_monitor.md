@@ -631,6 +631,13 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (監視再開、tick 48〜) — ユーザー指示で監視ループ再開**:
+  cron `a51a9e3d` を再作成 (Fable=30分 `13,43`)。再開時点: `main..{a,b,c}` = 0・全 worktree clean・
+  レーン operator 未稼働 (ユーザーが順次起動予定)。tick 47 記録の再開時 hub TODO 処理:
+  (1) 合流対象なし。(2) **0116 relayer = トリガー成立と判断** — 2035 #74 で b の θ-package 本体組立完了、
+  T-side campaign の残りは 4 named obligation (refuter-T / nuGridSupply / T_isTypeP2_gate / no_lambda) に
+  collapse = (13.4)/(13.3) cluster close の節目。かつ全レーン quiet の今が衝突最小 window ⟹ hub が着手
+  (issue 0116 に実施記録)。(3) NuRowPin 1261 行 (<1500) = watch 継続、対処不要。
 - **2026-07-14 (tick 47、最終 sweep) — 監視停止 (ユーザー「いったん区切ります」) + 9077 RULING #3**:
   cron `88a50cb0` を CronDelete。⛔ 停止 (問題起因) ではないので**自動再開しない** — 次回はユーザー指示で
   現行モデル対応ペース (Fable=30分 `13,43`) で再作成。最終 sweep: **a=1** (`0a75fb65` = ★ **(13.13)
