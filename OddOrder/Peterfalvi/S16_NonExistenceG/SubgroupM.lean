@@ -17,20 +17,29 @@ open scoped BigOperators
 variable {G : Type*} [Group G]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Coq `frobPU` (`PFsection14.v:111-124`), realized**: given the (13.15) `u`-value
-`|U| = (p^q−1)/(p−1)`, the derived subgroup `S' = P ⋊ U` is a **Frobenius group with kernel `P`**.
-This is the Lean form of the Coq derivation `typeP_Galois_P … → Frobenius_semiregularP`: the
-(9.7.b) field model `exists_pu_field_repr` (built from the `u`-value through the §13 producers)
-linearizes the `U`-action on `P` as multiplication by the injective character
-`μ : U ↪ 𝔽_{p^q}^×`, so a `U`-element fixing a nonidentity `P`-point forces `μ(u) = 1`, i.e.
-`u = 1` — the Frobenius (semiregularity) condition.  The complement structure is the carrier:
-`S' = P ⊔ U` (`S_deriv_eq_PU`), `P ⊓ U = ⊥` (`P_inf_U_eq_bot`), `P` normal in `S`
-(`maxNilpotentNormalHall`), `P ≠ ⊥` (`P_ne_bot`), and `U ≠ ⊥` from the `u`-value itself
-(`(p^q−1)/(p−1) ≥ p+1 > 1`). -/
-theorem frobenius_PU_of_u_full [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+/-- **Coq `frobPU` (`PFsection14.v:111-124`), realized**: given a (9.7.b) field-model package —
+an additive isomorphism `e : Additive ↥P ≃+ 𝔽_{p^q}` with an **injective** character
+`μ : U ↪ 𝔽_{p^q}^×` linearizing the conjugation action of `U` on `P` — the derived subgroup
+`S' = P ⋊ U` is a **Frobenius group with kernel `P`**.  This is the Lean form of the Coq
+derivation `typeP_Galois_P … → Frobenius_semiregularP`: a `U`-element fixing a nonidentity
+`P`-point forces `μ(u) = 1`, i.e. `u = 1` — the Frobenius (semiregularity) condition.  The
+`u`-**value** `|U| = (p^q−1)/(p−1)` is deliberately *not* an input: (13.15) supplies it only in
+the `p ≢ 1 (mod q)` branch (`qu = (p^q−1)/(p−1)` in the other), and Coq's `frobPU` never
+consumes it — only the injectivity of the model (issue 0115 statement audit).  The complement
+structure is the carrier: `S' = P ⊔ U` (`S_deriv_eq_PU`), `P ⊓ U = ⊥` (`P_inf_U_eq_bot`), `P`
+normal in `S` (`maxNilpotentNormalHall`), `P ≠ ⊥` (`P_ne_bot`), and `U ≠ ⊥` from the §13
+`U ⋊ W₁` Frobenius structure (`basic_structure`). -/
+theorem frobenius_PU_of_field_repr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G))
-    (hu_full : Nat.card ↥hyp.base.U =
-      (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1)) :
+    (hrepr : letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+      ∃ (e : Additive ↥hyp.base.P ≃+ GaloisField hyp.base.p hyp.base.q)
+        (μ : ↥hyp.base.U →* (GaloisField hyp.base.p hyp.base.q)ˣ),
+        Function.Injective μ ∧
+        ∀ (v : ↥hyp.base.U) (x : ↥hyp.base.P),
+          e (Additive.ofMul (⟨(v : G) * (x : G) * (v : G)⁻¹, conj_mem_P hyp v x⟩ :
+              ↥hyp.base.P))
+            = ((μ v : (GaloisField hyp.base.p hyp.base.q)ˣ) :
+                GaloisField hyp.base.p hyp.base.q) * e (Additive.ofMul x)) :
     OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(derivedInG hyp.base.S)
       (hyp.base.P.subgroupOf (derivedInG hyp.base.S))
       (hyp.base.U.subgroupOf (derivedInG hyp.base.S)) := by
@@ -93,7 +102,7 @@ theorem frobenius_PU_of_u_full [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
       rw [hbot, Subgroup.mem_bot] at this
       simpa using congrArg Subtype.val this
     exact P_ne_bot hG hyp.base hPbot
-  · -- `U ≠ ⊥`: `|U| = (p^q−1)/(p−1) ≥ p+1 > 1`
+  · -- `U ≠ ⊥`: the §13 `U ⋊ W₁` Frobenius structure has nontrivial kernel `U`
     intro hbot
     have hUbot : hyp.base.U = ⊥ := by
       rw [eq_bot_iff]
@@ -103,29 +112,12 @@ theorem frobenius_PU_of_u_full [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
         Subgroup.mem_subgroupOf.mpr hx
       rw [hbot, Subgroup.mem_bot] at this
       simpa using congrArg Subtype.val this
-    have hcard1 : Nat.card ↥hyp.base.U = 1 := by rw [hUbot]; simp
-    have hp3 : 3 ≤ hyp.base.p := by
-      rcases hyp.base.p_odd with ⟨k, hk⟩
-      have := hyp.base.p_prime.two_le
-      omega
-    have hq2 : 2 ≤ hyp.base.q := hyp.base.q_prime.two_le
-    have hple : hyp.base.p ^ 2 - 1 ≤ hyp.base.p ^ hyp.base.q - 1 :=
-      Nat.sub_le_sub_right (Nat.pow_le_pow_right (by omega) hq2) 1
-    have hdiv2 : (hyp.base.p ^ 2 - 1) / (hyp.base.p - 1) = hyp.base.p + 1 := by
-      have hfact : hyp.base.p ^ 2 - 1 = (hyp.base.p - 1) * (hyp.base.p + 1) := by
-        have h1 : 1 ≤ hyp.base.p := by omega
-        have h1sq : 1 ≤ hyp.base.p ^ 2 := Nat.one_le_pow _ _ (by omega)
-        zify [h1, h1sq]
-        ring
-      rw [hfact, Nat.mul_div_cancel_left _ (by omega)]
-    have : hyp.base.p + 1 ≤ Nat.card ↥hyp.base.U := by
-      rw [hu_full, ← hdiv2]
-      exact Nat.div_le_div_right hple
-    omega
+    obtain ⟨data, -⟩ := OddOrder.Peterfalvi.S15.basic_structure hG hyp.base
+    exact data.UW1_frobenius.ne_bot_kernel (by rw [hUbot, Subgroup.bot_subgroupOf])
   · -- semiregularity from the (9.7.b) field model
     intro a haA ha1 n hnN hn1 heq
     rw [Subgroup.mem_subgroupOf] at haA hnN
-    obtain ⟨e, μ, hμinj, hcompat⟩ := exists_pu_field_repr hG hyp hu_full
+    obtain ⟨e, μ, hμinj, hcompat⟩ := hrepr
     set v : ↥hyp.base.U := ⟨(a : G), haA⟩
     set x : ↥hyp.base.P := ⟨(n : G), hnN⟩
     have hGeq : (a : G) * (n : G) * (a : G)⁻¹ = (n : G) := by
@@ -158,6 +150,35 @@ theorem frobenius_PU_of_u_full [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
       have hx1 : x = 1 := Additive.ofMul.injective hx0
       exact Subtype.ext (show (n : G) = 1 from congrArg Subtype.val hx1)
 
+/-- **The (9.7.b) `S`-side field-model package** (Coq `typeP_Galois_P` for `S` with the §13
+trivial kernels `Ptype_Fcore_kernel_trivial`/`Ptype_Fcompl_kernel_trivial`,
+`PFsection14.v:115-118`): an additive isomorphism `e : Additive ↥P ≃+ 𝔽_{p^q}` and an
+injective character `μ : U ↪ 𝔽_{p^q}^×` linearizing the conjugation action of `U` on `P`.
+
+This is the **branch-independent** honest (9.7.b) gate — it deliberately does *not* posit the
+`u`-value `|U| = (p^q−1)/(p−1)`: by (13.15) that value holds only in the `p ≢ 1 (mod q)`
+branch (in the other branch `qu = (p^q−1)/(p−1)`), so positing it unconditionally was a
+statement-level overclaim (issue 0115 audit).  The package itself is what `typeP_Galois S`
+supplies in **both** branches (Schur: an abelian group acting faithfully and irreducibly on
+`𝔽_p^q` lies in a Singer torus `𝔽_{p^q}^×`).
+
+Discharge (lane-a 9000/9097 pipeline): in the `p ≢ 1 (mod q)` branch this is exactly
+`exists_pu_field_repr` applied to the (13.15) certificate (`S15.caseB_order_u_data`); in the
+`p ≡ 1 (mod q)` branch it needs the `typeP_Galois` irreducibility body ((9.7.b), the
+`ConjugationFieldModel` leaf + §9/§13 producers). -/
+theorem s_side_field_repr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+    ∃ (e : Additive ↥hyp.base.P ≃+ GaloisField hyp.base.p hyp.base.q)
+      (μ : ↥hyp.base.U →* (GaloisField hyp.base.p hyp.base.q)ˣ),
+      Function.Injective μ ∧
+      ∀ (v : ↥hyp.base.U) (x : ↥hyp.base.P),
+        e (Additive.ofMul (⟨(v : G) * (x : G) * (v : G)⁻¹, conj_mem_P hyp v x⟩ :
+            ↥hyp.base.P))
+          = ((μ v : (GaloisField hyp.base.p hyp.base.q)ˣ) :
+              GaloisField hyp.base.p hyp.base.q) * e (Additive.ofMul x) := by
+  sorry
+
 /-- **Peterfalvi (14.6)+(13.12), the S-side Frobenius kernel** — `C_{S'}(x) ≤ P` for
 `x ∈ P#`.  Follows Coq `PFsection14.v:111-141` *exactly*: the (9.7.b) resolution for `S`
 (`typeP_Galois S`, via `typeP_Galois_P` and the §13 (13.12) structure) makes
@@ -165,13 +186,13 @@ theorem frobenius_PU_of_u_full [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
 the standard Frobenius kernel-centralizer property `Frobenius_cent1_ker` — here the proven
 Isaacs Thm 6.4 transport `IsFrobeniusGroup.centralizer_kernel_le`.
 
-The **single remaining `sorry` is exactly Coq's `frobPU`** — gated on the `typeP_Galois S`
-char body (the (9.7.b) resolution, issue 9000 / lane a, threading through the §13 producers
-of issue 2035); everything else (the `↥S'`-coordinate transport) is proven below.  (The
-alternative route through the (14.2) field model `FieldNormalizerData` is *not* available
-here: `field_normalizer_structure` sits downstream of `exists_MHypothesis`, which consumes
-(14.11.3) and hence this very lemma — a genuine circularity, so the (13.12)-Frobenius gate
-is the honest isolation.) -/
+The **single remaining gate is exactly Coq's `typeP_Galois_P` package** — the named sorried
+obligation `s_side_field_repr` above (the (9.7.b) resolution, issue 9000 / lane a, threading
+through the §13 producers of issue 2035); everything else (Coq's `frobPU` semiregularity and
+the `↥S'`-coordinate transport) is proven.  (The alternative route through the (14.2) field
+model `FieldNormalizerData` is *not* available here: `field_normalizer_structure` sits
+downstream of `exists_MHypothesis`, which consumes (14.11.3) and hence this very lemma — a
+genuine circularity, so the (9.7.b)-package gate is the honest isolation.) -/
 theorem s_side_frobenius_kernel [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     ∀ x ∈ sharpSubgroup hyp.base.P,
@@ -179,16 +200,10 @@ theorem s_side_frobenius_kernel [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
   intro x hx
   rw [sharpSubgroup, Set.mem_sdiff_singleton] at hx
   obtain ⟨hxP, hx1⟩ := hx
-  -- ⚠ the crisp gate, reduced to the **(13.15) `u`-value alone**: Coq's `galS` chain
-  -- (`typeP_Galois_P` → `frobPU`) is realized by the proven engine `frobenius_PU_of_u_full`,
-  -- whose sole input is `|U| = (p^q−1)/(p−1)` — the S-side case-(9.7.b) value (issue 2035/9000
-  -- sphere, lane-b `caseB_order_u` / `basic_structure` producers).
-  have hu_full : Nat.card ↥hyp.base.U =
-      (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) := sorry
   have frobPU : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(derivedInG hyp.base.S)
       (hyp.base.P.subgroupOf (derivedInG hyp.base.S))
       (hyp.base.U.subgroupOf (derivedInG hyp.base.S)) :=
-    frobenius_PU_of_u_full hG hyp hu_full
+    frobenius_PU_of_field_repr hG hyp (s_side_field_repr hG hyp)
   -- `P ≤ S'` (carrier: `S' = P ⊔ U`)
   have hP_le : hyp.base.P ≤ derivedInG hyp.base.S := by
     rw [hyp.base.S_deriv_eq_PU]; exact le_sup_left
