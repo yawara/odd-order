@@ -623,6 +623,16 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 36) — a 合流 (docs) + ★ 9087 HUB RULING: TaxonomyOutput 3-cite rewire carve-out を a に付与**:
+  **a=1** (`0df692bb` = 9087 追記: Section 16 producer chain の `#print axioms` 実測で dirty root を
+  **旧 `theoremA_maximal_structure` の 3 cite (TaxonomyOutput.lean:1265/1292/1359) に局所化**。
+  faithful 版は既に axiom-clean、置換は mechanical proof-only。merge)。b=0 / c=0。
+  build green **4204 jobs** (docs-only、warm 確認) / census 46 不変 / 新 axiom なし。
+  ★ **HUB RULING (9087 記録)**: hub が 3 site + faithful 宣言 + b ファイル非交差を検証 → **a に当該
+  3 cite 置換限定の proof-only carve-out 付与** (b queue 却下 — 上流優先、b は 2035 #41 続行)。条件 =
+  置換以外の編集禁止 / 単独 commit self-flag / landing で失効 / clean 化を #print axioms 実測で 9087 に記録。
+  landing すれば mp producer の legacy sorryAx が除去され、named Section 16 input producer の実構成が
+  clean 化する見込み (FT spine root 直結)。
 - **2026-07-14 (tick 35) — a+b 合流: a unsound-route 撤去 (soundness cleanup) + b T-side (13.4) support estimate 実証明**:
   **a=1** (`f2cb4ff2` = **(6.8)-TI 依存の unsound subtree 撤去**: `S11.sibleyTarget_H0C` + 唯一 consumer
   `coherent_H0C_commutator` + wrapper `S12.typeII_section11_coherence`、および consumer-0 legacy obligation

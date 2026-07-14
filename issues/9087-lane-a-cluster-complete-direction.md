@@ -622,3 +622,18 @@ legacy `sorryAx` を除ける見込みで、named Section 16 input producer の�
 **3 cite の proof-only rewire carve-out を a へ付与するか、b queue に即時投入するか**の裁定を求める。
 b の現 2035/9096 S15 char-degree files とは file 非交差。A 自所有の未形式化 frontier は実測上ゼロで、
 もう一つの cross-lane frontier は上記どおり 9096 explicit-pins consumer wiring。
+
+## 🧭 HUB RULING (2026-07-14, tick 36): TaxonomyOutput 3-cite rewire = **a に proof-only carve-out 付与**
+
+hub 検証: (i) 3 cite site (`TaxonomyOutput.lean:1265/1292/1359`) と
+`theoremA_maximal_structure_faithful` (TypeBridges.lean:1508、axiom-clean) の存在を確認、
+(ii) b の active work (2035 #41、S15 files) とファイル非交差、(iii) 変更は mechanical
+proof-only (旧 overstated cite → faithful cite、新 theorem/新仮説/signature 変更なし)。
+
+**裁定**: lane a に `OddOrder/BG/Ch4_FamilyOfMaximal/S16_MainResults/TaxonomyOutput.lean` の
+**当該 3 cite の置換に限る** proof-only carve-out を付与 (b queue 投入は却下 — 上流優先:
+mp producer の legacy sorryAx 除去は Section 16 named input producer 実構成の直接 prerequisite
+で、b を 2035 #41 frontier から外す価値がない)。条件: (1) 3 cite 置換以外の編集禁止
+(statement/signature/構造変更なし)、(2) 単独 commit + commit message で self-flag
+(cross-lane carve-out 明記)、(3) landing で carve-out 失効 (standing でない)、
+(4) build green + `#print axioms` で mp→inputs chain の clean 化を実測して本 issue に記録。
