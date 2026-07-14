@@ -1055,12 +1055,12 @@ theorem tSide_theta_package_of_not_caseB_core [Finite G]
     (core : CharacterDegreeCore hyp) (lam : LambdaClusterData hyp)
     (_hne : ¬ (hyp.D = ⊥ ∧ hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) ∧
       Nat.card ↥hyp.Q = hyp.q ^ hyp.p)) :
-    ∃ (θT : ClassFunction ↥hyp.T ℂ) (r : Fin hyp.q) (δ' : ℤ) (θG : ClassFunction G ℂ),
+    ∃ (θT : ClassFunction ↥hyp.T ℂ) (r r' : Fin hyp.q) (δ' : ℤ) (θG : ClassFunction G ℂ),
       (δ' = 1 ∨ δ' = -1) ∧
       ((θT - ∑ j : Fin hyp.p, hyp.nu r j).support ⊆
         {z : ↥hyp.T | (z : G) ∈ hyp.Q ⊔ hyp.D ∧ z ≠ 1}) ∧
       (ClassFunction.induce hyp.T (θT - ∑ j : Fin hyp.p, hyp.nu r j)
-        = θG - (δ' : ℂ) • ∑ j : Fin hyp.p, hyp.eta r j) ∧
+        = θG - (δ' : ℂ) • ∑ j : Fin hyp.p, hyp.eta r' j) ∧
       (∀ (i : Fin hyp.q) (j : Fin hyp.p), ClassFunction.inner (hyp.eta i j) θG = 0) ∧
       ClassFunction.inner (core.tau1S lam.lambda) θG = 0 := by
   sorry
@@ -1079,7 +1079,7 @@ theorem lambda_forces_T_caseB_core [Finite G]
   haveI := hyp.finiteG
   by_contra hne
   -- T-side θ-package from the (13.3.b,c)-for-`T` gate.
-  obtain ⟨θT, r, δ', θG, hδ', hβsupp, hβform, hηθ, hLamTheta⟩ :=
+  obtain ⟨θT, r, r', δ', θG, hδ', hβsupp, hβform, hηθ, hLamTheta⟩ :=
     tSide_theta_package_of_not_caseB_core hG core lam hne
   -- S-side (13.3) data with the `𝒮₁`-witnesses.
   obtain ⟨thetaL, hthetaLirr, hthetaL1, hlamEq, x₀, hx₀P, hx₀ker⟩ :=
@@ -1140,7 +1140,7 @@ theorem lambda_forces_T_caseB_core [Finite G]
   -- The bilinear expansion is `δ·δ' ≠ 0` — contradiction.
   rw [hαform, hβform] at h0
   exact eta_cross_expansion_ne_zero hyp.eta (fun i k j l => hyp.eta_orthonormal i k j l)
-    (core.tau1S lam.lambda) θG r ⟨1, hyp.p_prime.one_lt⟩ hLamEta hηθ hLamTheta hδ hδ' h0
+    (core.tau1S lam.lambda) θG r' ⟨1, hyp.p_prime.one_lt⟩ hLamEta hηθ hLamTheta hδ hδ' h0
 
 open scoped FiniteInduce in
 /-- **The `𝒮₁`-λ-witness predicate** (Pf (13.3.b)): `𝒮` contains a `uq`-degree `PC`-induced

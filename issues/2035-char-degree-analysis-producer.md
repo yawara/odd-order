@@ -2310,3 +2310,29 @@ conjunct 3 を「∃ r' ≠ 0」量化に restate + 供給 producer 束線 (pins
 (b) consumer `lambda_forces_T_caseB_core` の hβform r'-thread → (c) conjunct 5 (S/T cross
 直交、step 6) は package 内で θG = τ₁T(θT) 形から導出予定 (τ₁λ ⊥ η-grid ✓ +
 disjoint-support h0 パターン)。CharacterDegreeSupply に import S15_Tau1T 追加要 (DAG ✓ 無循環)。
+
+## 2026-07-14 更新 #72 (lane b, /loop iter 35) — 原文 (13.4) 精読 + package restate + dirr bricks
+
+**原文検証 (mmd 04.15 p.75-86)**: (13.4) の (13.3.c) cite は両側とも target index 自由
+(μ₁^{τ₁} = ±∑_i η_{is}、ν₁^{τ₁} = ±∑_j η_{rj}) — #69 の r'-一般化は原文通りと確認。
+conjunct 5 (⟨λ^{τ₁}, θ^{τ₁}⟩ = 0) の原文根拠 = 「(4.1)+(5.3.b) で η・λ^{τ₁}・θ^{τ₁} pairwise
+直交」+ 中間表示 ((λ−λ̄)^τ, (θ−θ̄)^τ) = 0 (disjoint support)。
+
+実施:
+- **package restate**: `tSide_theta_package_of_not_caseB_core` conjunct 3 を ∃ r' 量化に変更
+  + consumer `lambda_forces_T_caseB_core` の obtain/expansion を r'-thread (build green、
+  expansion brick は η-row index を自由引数で受けるので無修正適合)。
+- **dirr bricks (Tau1T、sorry-free・axiom-clean)**:
+  `conj_eq_of_norm_one_conj_antisym` — A,B norm-1 ZIrr、⟨A,B⟩=0、Ā−B̄ = B−A ⟹ B = Ā ∧
+  constituent 非実 (χA との inner で εA(real-ind + 1) = εB·[χ̄B=χA] を case bash)。
+  `inner_eq_zero_of_conj_diff_orthogonal` — 2 対の conj-antisym pair + ⟨A−B, C−D⟩ = 0 ⟹
+  ⟨A,C⟩ = 0 (共有 constituent なら h0 = ±2 ≠ 0)。
+  ⚠ 実装注意: repo の ClassFunction.inner は**右 slot 共役** (inner_smul_left は star 無し);
+  rw の if_neg は条件向きを show で明示 pin (逆向き ne は h.symm)。
+
+残 = package 本体組立 (次 iteration): θ-witness → θT := Ind_K θ、r := 1、
+conjunct 2 = indK_sub_nuRow_support / 3 = apply_induce_sub + nuRow_eta_row (τ₁T(ν_1) 経由、
+θG := τ₁T θT) / 4 = induce_inner_eta / 5 = dirr bricks + core 側 (τ₁S λ の pair 供給:
+core.tau1S_inner_induce 系 + λ 非実) + disjoint support ⟨Ind_S(λ−λ̄), Ind_T(θ−θ̄)⟩ = 0。
+供給: pins = hyp.nuGridSupply hG (sorried a-owned) / hT2・Tdata 系 / hnoV = ?
+(Hypothesis-level no-typeV producer 要確認 — card_Q_eq_qp chain が使った物)。
