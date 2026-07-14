@@ -2482,6 +2482,33 @@ engine (13.9)-(13.12)-on-T + q<p ltqp、9094 RULING §4)**。
 2000 上限超過 (linter warning 発火中、いずれも本 campaign 以前からの累積)。次の追記前に
 prefix-split する。
 
+## 2026-07-14 更新 #77 (lane b, /loop iter 3) — 分割 2 件 + T_caseB_facts_no_lambda statement 修理
+
+- **`6546bc02` 分割 (policy 必須)**: CountingLayer 2002 → PairStructure 965 + CountingLayer 1078 /
+  CharacterDegreeSupply 2240 → CharacterDegreeEngines 1050 + Supply 1220 (純 move、module 名
+  不変で下流無変更)。longFile warning 解消。
+- **`49cac4ff` statement 修理 (0115 hu_full 修理と同類)**: `T_caseB_facts_no_lambda` の
+  `¬LambdaWitness` 仮説は**書籍の route が使いもせず十分でもない** — Pf (14.4) は T-side facts
+  を **(14.1) q < p のみ**から導く (原文 p.87 / Coq PFsection14 galT・oV via ltqp)。ordering
+  無しでは p = 3 < q の caseA-T が排除されず旧 statement は overstatement。
+  → 新 `T_caseB_facts_of_q_lt_p (hqp)` = `card_Q_eq_qp` (landed ✓) + 2 named swap-route gates:
+  - **`T_side_D_eq_bot`** — (13.12) `c_eq_one` @ `Hypothesis.swap` (swap.c = hyp.d、9096 threading)
+  - **`T_caseB_v_eq_full (hqp)`** — (13.13) `caseA_parameters` @ swap で caseA-T 反駁 (p=3 vs
+    3≤q<p) + (13.15) `caseB_order_u` @ swap で full value (q mod p = q ≠ 1)
+  hqp threading: `T_caseB_facts_unconditional` + TTypeII (9094§4 carve-out) +
+  **SubgroupM:272 (c 所有、機械的 consumer 整合、statement 不変 — c の hnoV threading 前例に
+  従い self-flag)**。
+- **設計確定**: 「unbuilt T-mirror engine」の正体 = **S-side (13.12)/(13.13)/(13.15) @
+  hyp.swap** (swap docstring 明記: "Every ∀hyp-theorem of the S-side layer holds at hyp.swap
+  with no further proof beyond index transport")。swap args は全て在庫
+  (hV=isMulCommutative_V_unconditional / Tdata=reconciled_typePData_T / pins=param)。
+  a-pipeline: c_eq_one landed ✓ / caseA_parameters landed ✓ / caseB_order_u = a active frontier。
+
+次 iteration = swap instantiation 実装: (i) swap の数値 field 対応 (swap.d-num=hyp.c-num 等) と
+c_eq_one/caseA_parameters の swap 適用可否 (mkSection11CharacterDataS @ swap vs
+mkSection11CharacterDataT の整合)、(ii) T_side_D_eq_bot discharge、(iii) v_eq_full は
+caseB_order_u の a-landing 待ち部分を切り分け。
+
 ## 📎 lane-c cross-ref (2026-07-14, 9077 carve-out 条件 4 の記録)
 
 9077 RULING #3 の b-quiet-file carve-out 実施状況: item 2 `sibleyTarget_frobI`
@@ -2490,3 +2517,25 @@ prefix-split する。
 item 1 `V_inf_centralizer_Q_eq_bot` (S15_SAndTBasic:841) = DAG-blocked で HOLD
 (hub 9077 追記 + 0116 Route T; c も独立検証で一致)。b への影響: FrobeniusStructure の
 編集は proof-only + docstring 注記のみ、signature/statement 不変。
+
+## 2026-07-14 更新 #78 (lane b, /loop iter 4) — ★ swap instantiation 完遂 — no-λ branch CLOSED
+
+#77 の 2 named gates を**実証明で discharge** (swap 機構の初の live 適用、一発 green):
+- **`d_eq_one`** = `c_eq_one hG (hyp.swap …)` — swap.c := hyp.d が定義的ゆえ index 輸送ゼロ。
+- **`T_side_D_eq_bot`** = d_eq_one + `d_eq_card_D` + `Subgroup.card_eq_one`。
+- **`T_caseB_v_eq_full (hqp)`** = swap 上の clifford_dichotomy:
+  caseA → `caseA_parameters` (a の (13.13)) が swap.q = hyp.p = 3 → 3 ≤ q < p と omega 矛盾 /
+  caseB → `caseB_order_u` (a の (13.15)、本日 landing) の第 2 枝 + q<p → q ≢ 1 (mod p)。
+  結論は定義的に hyp.v = (q^p−1)/(q−1)。
+- swap 入力は λ-branch と同じ house pattern で内部 summon (T_isTypeP2_gate [0116] /
+  isMulCommutative_V_unconditional / reconciled_typePData_T / nuGridSupply [a 9096])。
+
+**効果**: `T_caseB_facts_of_q_lt_p` は 2 named obligation (T_isTypeP2_gate / nuGridSupply)
+modulo で完全証明。**Supply file の bare sorry は T_isTypeP2_gate 1 本のみ**。T-side
+campaign の残 gate (#74 起点): **nuGridSupply (a、9096) + T_isTypeP2_gate (hub 0116) の
+2 本に collapse** — refuter-T ✓ / no-λ engine ✓ とも CLOSED。
+
+次 frontier 候補 (文書順): (i) 9094 案 A 残り (2/3 conditional producer — Canonicalization
+cCoeff rebase 修理、3/3 NormEstimates 5 定理移行)、(ii) S15_SAndTBasic 残 sorry
+(772/969、V_inf:841 は c carve-out)、(iii) SubcoherenceInputs/HypothesisBasics/
+DegreesFirstSplit/TSideDegrees の残 sorry 群の census。

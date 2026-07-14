@@ -269,7 +269,7 @@ theorem t_side_caseB_fieldModel [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
                 e (Additive.ofMul x) := by
     -- (13.4)/(14.4): `D = ⊥`, the `v`-value, `|Q| = q^p`.
     obtain ⟨hDbot, hv, hcardQ⟩ :=
-      OddOrder.Peterfalvi.S15.T_caseB_facts_unconditional hG hyp.base
+      OddOrder.Peterfalvi.S15.T_caseB_facts_unconditional hG hyp.base hyp.q_lt_p
     have hQ_elemAb : IsElementaryAbelian hyp.base.q ↥hyp.base.Q :=
       OddOrder.Peterfalvi.S15.Q_elementaryAbelian_T hG hyp.base (T_typeII hG hnoV hncH0C hyp)
     have hVcomm : IsMulCommutative ↥hyp.base.V :=
