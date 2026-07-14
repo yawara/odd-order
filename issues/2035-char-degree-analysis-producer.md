@@ -2246,3 +2246,27 @@ a-owned nuGridSupply のみ。
 CaseACoherence:870 — ⚠ [[lean-nonempty-some-erases-witness-pin]]: pin は Nonempty.some で
 消える、bundle 必須) → (5.3.b)-T ✓ (coherentIndT_image_inner_eta_eq_zero 済) → conjunct 4
 assembly (⟨η_{ij}, Ind(θT−ν_r)⟩ = −δ'[i=r])。
+
+## 2026-07-14 更新 #69 (lane b, /loop iter 32) — #41 step 5 前半: τ₁T bundling (S15_Tau1T.lean 新設)
+
+新 leaf S15_Tau1T.lean (build green; sorryAx = pinned carrier → refuter-T 経由の意図伝播、
+S 側 tau1S_ofHonest と同 profile):
+- `coherentIndT_pinned` (carrier .choose) / **`tau1T_ofHonest`** (.extension) /
+  `tau1T_ofHonest_nuRow_formula` (.choose_spec pin)
+- **`tau1T_ofHonest_nuRow_eta_row`** (per-row consumable 形): ∀ r ≠ 0, ∃ r' ≠ 0, δ' = ±1,
+  τ₁T(ν_r) = δ'·∑_j η_{r'j}。**設計発見: (13.4) θ-package の conjunct 3 は η-row index を
+  θ-row と別に量化する必要がある** — flip 分岐 (q=3) では τ₁T(ν_r) ≠ ±∑η_{rj} (行が真に
+  swap する) ため same-index 形は unprovable。下流の eta_cross_expansion 矛盾は「どこかの
+  nonzero 行」で足りるので split 量化が忠実 (consumer `lambda_forces_T_caseB_core` の
+  expansion brick は r を自由引数で受けており r' 化は無害 — 要 restate)。
+- `tau1T_ofHonest_extends_on_supported` ((13.2.e) 一致、conjunct 3 producer) /
+  `tau1T_ofHonest_image_inner_eta_eq_zero` ((5.3.b)-T at τ₁T、conjunct 4 producer)
+
+供給 producer 確認済: pins = hyp.nuGridSupply hG (sorried、a-owned 9096) / hvd =
+hyp.vd_ne_one hG / Tdata+hU+hW1+hW2 = reconciled_typePData_T choose / hT2 = SAndTBasic:192
+パターン / chief = exists_chiefFactorData。
+
+次 = θ-package assembly: `tSide_theta_package_of_not_caseB_core` の conjunct 3 を r'-量化に
+restate (consumer の expansion 呼び出しも r'-thread — 共に b-owned 同一 file) → ThetaWitness
+(Ind_K θ) の 𝒯-membership 接続 (conjunct 4 の (5.3.b) 適用に必要) → conjunct 2
+(indK_sub_nuRow_support ✓ #40) + 3 + 4 の組立。conjunct 5 (S/T cross) = step 6。
