@@ -1042,6 +1042,90 @@ theorem lambda_tau1_apply_eq_of_not_mem_H_sat_core [Finite G] [Fintype G]
   exact hlamv.trans hμv
 
 open scoped FiniteInduce in
+/-- **Differences of degree-one `K`-inductions are supported in `(QD)^#`** (the general-`θ'`
+form of `indK_sub_nuRow_support`; the θ-package conjunct-2 companion for the conjugate pair
+`Ind_K θ − Ind_K θ̄`): both terms vanish off the normal `K = QD` and share the degree
+`[T:K]·1`. -/
+theorem Hypothesis.indK_sub_indK_support [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (θ θ' : ClassFunction ↥(hyp.K.subgroupOf hyp.T) ℂ)
+    (hθ1 : θ 1 = 1) (hθ'1 : θ' 1 = 1) :
+    (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ
+      - ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ').support ⊆
+      {z : ↥hyp.T | (z : G) ∈ hyp.Q ⊔ hyp.D ∧ z ≠ 1} := by
+  haveI := hyp.finiteG
+  letI : Fintype ↥hyp.T := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥(hyp.K.subgroupOf hyp.T) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI hKn := hyp.K_subgroupOf_T_normal hG
+  intro z hz
+  have hzne : (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ
+      - ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ') z ≠ 0 := hz
+  refine ⟨?_, ?_⟩
+  · by_contra hzK
+    apply hzne
+    have hzKsub : z ∉ hyp.K.subgroupOf hyp.T := fun h => hzK (Subgroup.mem_subgroupOf.mp h)
+    rw [ClassFunction.sub_apply,
+      ClassFunction.induce_apply_eq_zero_of_not_mem_normal _ θ hzKsub,
+      ClassFunction.induce_apply_eq_zero_of_not_mem_normal _ θ' hzKsub, sub_zero]
+  · intro hz1
+    apply hzne
+    rw [hz1, ClassFunction.sub_apply, ClassFunction.induce_apply_one, hθ1,
+      ClassFunction.induce_apply_one, hθ'1, sub_self]
+
+open scoped FiniteInduce in
+/-- **The (13.2.e) `S`/`T` cross-orthogonality** (the (13.4) disjoint-support input, in
+producer form): for an `H^#`-supported `α` on `S` and a `(QD)^#`-supported `β` on `T`, the
+inductions to `G` are orthogonal — `(H^#)^G ∩ ((QD)^#)^G = ∅` since every `H^#`-point has
+`P ≤ C_G(x)` while `(QD)^#`-centralizers lie in the `T`-conjugates, and no `P`-conjugate lies
+in `T`. -/
+theorem Hypothesis.inner_induce_H_QD_eq_zero [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {α : ClassFunction ↥hyp.S ℂ}
+    (hα : α.support ⊆ {y : ↥hyp.S | (y : G) ∈ hyp.H ∧ y ≠ 1})
+    {β : ClassFunction ↥hyp.T ℂ}
+    (hβ : β.support ⊆ {z : ↥hyp.T | (z : G) ∈ hyp.Q ⊔ hyp.D ∧ z ≠ 1}) :
+    ClassFunction.inner (ClassFunction.induce hyp.S α) (ClassFunction.induce hyp.T β) = 0 := by
+  haveI := hyp.finiteG
+  have hdisj := disjoint_conjugatesIntoSet_of_centralizer
+    (A_M := {y : ↥hyp.S | (y : G) ∈ hyp.H ∧ y ≠ 1})
+    (A_N := {z : ↥hyp.T | (z : G) ∈ hyp.Q ⊔ hyp.D ∧ z ≠ 1})
+    (fun _y hy => hyp.P_le_centralizer_of_mem_H hG hy.1)
+    (fun z hz => QD_sharp_centralizer_le_T hG hyp z hz.1 hz.2)
+    (P_conj_forall_not_le_T hG hyp)
+  exact inner_induce_induce_eq_zero_of_disjoint hα hβ hdisj
+
+open scoped FiniteInduce in
+/-- **Differences of degree-one `H`-inductions are supported in `H^#`** (the `S`-side mirror
+of `indK_sub_indK_support`; the (13.4) `α`-support for the conjugate pair `λ − λ̄`). -/
+theorem Hypothesis.indH_sub_indH_support [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (θ θ' : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ)
+    (hθ1 : θ 1 = 1) (hθ'1 : θ' 1 = 1) :
+    (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ
+      - ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ').support ⊆
+      {y : ↥hyp.S | (y : G) ∈ hyp.H ∧ y ≠ 1} := by
+  haveI := hyp.finiteG
+  letI : Fintype ↥hyp.S := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥(hyp.H.subgroupOf hyp.S) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI hHn : (hyp.H.subgroupOf hyp.S).Normal := H_sharp_subgroupOf_normal hyp
+  intro y hy
+  have hyne : (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ
+      - ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ') y ≠ 0 := hy
+  refine ⟨?_, ?_⟩
+  · by_contra hyH
+    apply hyne
+    have hyHsub : y ∉ hyp.H.subgroupOf hyp.S := fun h => hyH (Subgroup.mem_subgroupOf.mp h)
+    rw [ClassFunction.sub_apply,
+      ClassFunction.induce_apply_eq_zero_of_not_mem_normal _ θ hyHsub,
+      ClassFunction.induce_apply_eq_zero_of_not_mem_normal _ θ' hyHsub, sub_zero]
+  · intro hy1
+    apply hyne
+    rw [hy1, ClassFunction.sub_apply, ClassFunction.induce_apply_one, hθ1,
+      ClassFunction.induce_apply_one, hθ'1, sub_self]
+
+open scoped FiniteInduce in
 /-- **(13.3.b,c)-for-`T` θ-package, Core/λ-cluster form** ((13.4) character gate — the
 core/lam restatement of `tSide_theta_package_of_not_caseB`, issue 9094 案 A).
 

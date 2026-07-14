@@ -2336,3 +2336,29 @@ conjunct 2 = indK_sub_nuRow_support / 3 = apply_induce_sub + nuRow_eta_row (τ�
 core.tau1S_inner_induce 系 + λ 非実) + disjoint support ⟨Ind_S(λ−λ̄), Ind_T(θ−θ̄)⟩ = 0。
 供給: pins = hyp.nuGridSupply hG (sorried a-owned) / hT2・Tdata 系 / hnoV = ?
 (Hypothesis-level no-typeV producer 要確認 — card_Q_eq_qp chain が使った物)。
+
+## 2026-07-14 更新 #73 (lane b, /loop iter 36) — package 組立部材 3 本 + 供給 producer 確定
+
+CharacterDegreeSupply に追加 (build green):
+- `indK_sub_indK_support` / `indH_sub_indH_support` (sorry-free・axiom-clean) — degree-1
+  K/H-induction 差の (QD)#/H# support (conj pair λ−λ̄、θT−θ̄T 用)
+- `inner_induce_H_QD_eq_zero` — (13.2.e) S/T cross 直交 producer 形 (sorryAx は既存上流
+  QD_sharp_centralizer_le_T 系から継承 — consumer h0 と同 profile)
+
+**供給 producer 全確定**:
+- hnoV = `S12.no_typeV_maximal_unconditional` — **axiom-clean 確認** ✓✓
+- pins = hyp.nuGridSupply hG (sorried、a-owned 9096) / hvd = vd_ne_one / Tdata 系 =
+  reconciled_typePData_T / chief = exists_chiefFactorData
+- **hT2 = 残る唯一の gate**: honest 供給 = S16.T_isTypeP2 (TTypeII:900) だが S16 は
+  CharacterDegreeSupply の下流 (layer-inversion、issue 0116 と同類)。package 組立時に
+  precisely-named sorried gate `T_typeP2_for_thetaPackage`-類として立て、0116 解決 or
+  producer 移設で discharge する方針。
+
+次 iteration = package 本体 (組立設計確定済):
+θ-witness (thetaWitness_of_not_caseB) → θT := Ind_K θ、r := ⟨1⟩ / conjunct 2 =
+indK_sub_nuRow_support / 3 = extends_on_supported + map_sub + nuRow_eta_row (θG := τ₁T θT、
+apply_induce_sub 不要 — ν_r 側は zSpan+degree-0 で直接) / 4 = induce_inner_eta / 5 =
+dirr bricks (A,B) = (core.tau1S λ, core.tau1S λ̄)、(C,D) = (τ₁T θT, τ₁T θ̄T)、
+conj-antisym = induce_conj + characterKernel_conj (S03:395 ✓)、非実 =
+not_isReal_of_ne_trivial_irreducible_of_odd_card (S03:156 ✓)、h0 = inner_induce_H_QD_eq_zero
++ indH/indK_sub 支持。
