@@ -1972,3 +1972,84 @@ pins.nu_apply_of_not_mem_W1 + eta_diff_rigidity 系; dadeHypT0 との dade=Ind �
 `sSet_memberRFamily_T` dispatch → `_orthogonal` → engine assembly。route-B は
 S16_GridExpansion 下流ゆえ **置き場所は TSideDegrees 不可** (S16_GridExpansion → S15_SAndT_Setup
 逆依存確認要) — S15_SSetMemberRFamily に同居 or 新 leaf `S15_TSetMemberRFamily`。
+
+## 2026-07-14 更新 #52 (lane b, /loop iter 13) — red branch (tauT_nu_cross) の依存 5 点監査
+
+`tauS_mu_cross` (S15_BridgeCharacter:917) の T-mirror `tauT_nu_cross`
+(τ_T⁰(ν_{rj} − ν_{sj}) = η_{rj} − η_{sj}、行差・列固定) の依存対応:
+1. irr/orthonormal → `pins.nu_irreducible`/`pins.nu_orthonormal` ✓
+2. diff A₀-support → **`pins.nu_diff_support`** ((4.8)-T field、最初から行差形!Tdata param) +
+   equal degree = `nu_apply_one_eq_v` (両方 v) ✓ — S-side の tauS_mu_diff_support 相当 wrapper 要
+3. Dade ZIrr/isometry (generic S07) + `dadeHypT0` (既存、hT2/Tdata param) ✓
+4. **`tauT_nu_vanish_on_V`** (regular set 上 τ⁰(ν-diff) = η-diff) — 唯一の実質新規 mirror。
+   S-side `tauS_mu_vanish_on_V` の証明精査が次段 (dade0_apply_eq_zero_of_regular 系 +
+   η vanish fields の組合せと推測)。
+5. rigidity → **swap-instance transpose**: `eta_diff_rigidity (hyp.swap hT2 hV Tdata … pins)` で
+   行固定形を transpose 適用 (swap.eta i j = hyp.eta j i、regular set は union_comm で同一、
+   hV = isMulCommutative_V_unconditional ✓)。行差 rigidity の独立実装不要 (c-owned
+   S16_GridExpansion への追記も不要)。
+置き場所: S15_BridgeCharacter 同居 (S-cross と並置、rigidity/swap とも import 済、b 実績 file)。
+
+## 2026-07-14 更新 #53 (lane b, /loop iter 14) — vanish-on-V-T 系 4 本 landed (cross-T 部材完備)
+
+- hub 登録: `TSideDegrees` を `S15_SAndT_Setup` hub に追加 (未登録だった)。
+- `deltaPrime_eq_one_pins` (TSideDegrees): 全 i の δ'=1、pins-パラメトリック。
+- **HonestTypeP2A0 に T-mirror 4 本** (sorry-free、一発 build):
+  `dadeHypT0_H_eq_ftSupportKernel` / `forall_dadeHypT0_H_eq_bot` (A₀(T) normedTI、
+  generic escaping-empty の (hT2,Tdata)-instance) / `tauT_nu_diff_support` ((4.8)-T wrapper、
+  pins.nu_diff_support + nu_apply_one_eq_v) / **`tauT_nu_vanish_on_V`** (regular set 上
+  τ_T⁰(ν-行差) = η-行差; typePV 側は hW1/hW2 交換 + union_comm、値は
+  nu_apply_of_not_mem_W1 + deltaPrime_eq_one_pins)。
+
+⟹ `tauT_nu_cross` の依存 5 点が**全て**揃った (残るは本体 assembly + swap-transpose rigidity
+のみ、~80 行、置き場所 = S15_BridgeCharacter)。次 iteration で cross-T 本体。
+
+## 2026-07-14 更新 #54 (lane b, /loop iter 15) — ✅ tauT_nu_cross landed (red branch の核心)
+
+**`tauT_nu_cross`** (S15_BridgeCharacter、sorry-free、一発 build):
+τ_T⁰(ν_{r,j} − ν_{s,j}) = η_{r,j} − η_{s,j} (列固定・行差、r≠s 両方 ≠0)。
+- norm-2 ZIrr: pins.nu_irreducible/nu_orthonormal + tauT_nu_diff_support + generic S07 isometry
+- regular-set 一致: tauT_nu_vanish_on_V (#53)
+- **(3.8) rigidity は swap-transpose**: `eta_diff_rigidity (hyp.swap hT2 hV Tdata … pins)` —
+  swap の η-grid が transpose なので行固定形がそのまま列固定形に。swap 構造 field の
+  coercion 同一性 (W/W1/W2) は **rfl で通った** (defeq)。hV = isMulCommutative_V_unconditional。
+
+red branch 残り: rows_ne-T (conj 行相異) → `sSet_reducible_memberRFamily_T`
+(cross の ν-row 総和 → 2p-element OrthonormalCharacterImageFamily、S-side
+`sSet_reducible_memberRFamily_ofColumns` mirror) → dispatch (`sSet_memberRFamily_T`) →
+`_orthogonal` → (5.7) engine assembly。
+
+## 2026-07-14 更新 #55 (lane b, /loop iter 16) — T-side dade=Ind bridge chain 完備
+
+HonestTypeP2A0 に 5 本追加 (sorry-free): `dadeHypT_H_eq_ftSupportKernel` /
+`no_escaping_honestTypeP2ASet_T` (generic escaping-empty の hT2-instance) /
+`forall_dadeHypT_H_eq_bot` ((13.2.e)-T stabilizer form) / **`tInstance_dade_eq_induce`**
+(τ_T = Ind on A(T)-supported) / **`tInstance_dade0_eq_induce`** (τ_T⁰ = Ind on A₀(T)-supported、
+forall_dadeHypT0_H_eq_bot #53 経由)。
+
+⟹ `tauT_nuRow_diff_eq` (S-side `tauS_muColumn_diff_eq` mirror: τ_T(ν_r − ν̄_r) = ∑_j(η_{rj}−η_{sj})、
+A/A₀ Dade 一致 + cross 総和) の部材完備。残: rows_ne-T + nuRow_diff_eq + ofRows family 本体 +
+dispatch + orthogonal + engine。
+
+## 2026-07-14 更新 #56 (lane b, /loop iter 17) — rows_ne-T + tauT_nuRow_diff_eq landed
+
+- `sSet_reducible_conj_not_irr_T` / **`sSet_reducible_rows_ne`** (TSideDegrees): reducible
+  𝒯-member とその conjugate の ν-行相異 (no-real 経由)。
+- **`tauT_nuRow_diff_eq`** (BridgeCharacter): τ_T(η − η̄) = ∑_j(η_{rj} − η_{sj}) — A/A₀ Dade
+  一致 (tInstance bridges #55) + `tauT_nu_cross` (#54) の列総和。
+
+R-family 残: `ofRows` 本体 (S-side `sSet_reducible_memberRFamily_ofColumns` の
+OrthonormalCharacterImageFamily 構築 mirror、~100 行) → dispatch → `_orthogonal` → (5.7) engine。
+
+## 2026-07-14 更新 #57 (lane b, /loop iter 18) — ✅ T-side per-member R-family 完成
+
+新 leaf **`S15_TSetMemberRFamily.lean`** (sorry-free、一発 build):
+- `sSet_reducible_memberRFamily_ofRows`: 2p-element signed η-grid family (rows r≠s)、
+  image_eq = `tauT_nuRow_diff_eq`、orthonormal = eta_orthonormal 行違い。
+- `sSet_reducible_memberRFamily_T`: reverse-dichotomy dispatch wrapper。
+- **`sSet_memberRFamily_T`**: case-agnostic 全 member dispatch (irr = 2-element Dade family
+  over dadeHypT / red = route-B)。
+
+(5.7)-T engine の入力残 1: **`sSet_memberRFamily_orthogonal` の T 版** ((5.2.e)
+cross-orthogonality、S-side SSetMemberRFamily:794)。それで engine assembly
+(`sSet_coherent_dade_caseB_T`) が組める。

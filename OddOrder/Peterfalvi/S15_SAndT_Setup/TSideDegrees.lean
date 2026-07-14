@@ -721,6 +721,16 @@ theorem Hypothesis.deltaPrime_eq_one_of_ne_zero_T [Finite G]
     have hodd := Nat.odd_iff.mp hyp.p_odd
     omega
 
+/-- **Peterfalvi (13.3.c), all `T`-side signs are `1`** (pins-parametric form): `δ'_i = 1` for
+every `i` — the anchor row is the (4.4) base sign, the rest is
+`deltaPrime_eq_one_of_ne_zero_T`. -/
+theorem Hypothesis.deltaPrime_eq_one_pins [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (pins : NuGridSupplyData hyp) (i : Fin hyp.q) : hyp.deltaPrime i = 1 := by
+  by_cases hi : i = ⟨0, hyp.q_prime.pos⟩
+  · rw [hi]; exact pins.deltaPrime_zero_eq_one
+  · exact hyp.deltaPrime_eq_one_of_ne_zero_T hG pins i hi
+
 /-- **`T`-instance chief-factor `q` identity**: `data.q = p = |W₂|`.  Mirror of
 `toTypesIIIIIIVSetupS_q_eq`. -/
 theorem Hypothesis.toTypesIIIIIIVSetupT_q_eq [Finite G]
@@ -1198,5 +1208,44 @@ theorem Hypothesis.sSet_member_conjDiff_supported_T [Finite G]
   letI : Fintype G := Fintype.ofFinite G
   obtain ⟨ξ, hξ, rfl⟩ := hη
   exact hyp.sSet_member_diffsupp_T hG hvd hξ
+
+
+/-- **The conjugate of a reducible `𝒯`-member is reducible** (mirror of
+`sSet_reducible_conj_not_irr`). -/
+theorem Hypothesis.sSet_reducible_conj_not_irr_T [Finite G] (hyp : Hypothesis (G := G))
+    {η : ClassFunction ↥hyp.T ℂ}
+    (hirr : ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter η) :
+    ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter
+      (η : ClassFunction ↥hyp.T ℂ).conj := by
+  haveI := hyp.finiteG
+  intro h
+  apply hirr
+  rw [← ClassFunction.conj_conj η]
+  exact h.conj
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **The two ν-rows of a reducible `𝒯`-member are distinct** (mirror of
+`sSet_reducible_columns_ne`): row`(η) ≠ ` row`(η̄)`, else `η` would be real, contradicting
+`sSet_hasNoRealCharacters` (via `oddCardT`). -/
+theorem Hypothesis.sSet_reducible_rows_ne [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (pins : NuGridSupplyData hyp) (hvd : hyp.v * hyp.d ≠ 1)
+    {η : ClassFunction ↥hyp.T ℂ} (hη : η ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
+    (hirr : ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter η) :
+    (hyp.sSet_reducible_eq_nuRowSum hG pins hvd hη hirr).choose ≠
+      (hyp.sSet_reducible_eq_nuRowSum hG pins hvd
+        (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupT hG hvd) hη)
+        (hyp.sSet_reducible_conj_not_irr_T hirr)).choose := by
+  intro he
+  have hnonreal : ¬ ClassFunction.IsReal η :=
+    sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupT hG hvd) (hyp.oddCardT hG) hη
+  apply hnonreal
+  have hjeq := (hyp.sSet_reducible_eq_nuRowSum hG pins hvd hη hirr).choose_spec.2
+  have hkeq := (hyp.sSet_reducible_eq_nuRowSum hG pins hvd
+    (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupT hG hvd) hη)
+    (hyp.sSet_reducible_conj_not_irr_T hirr)).choose_spec.2
+  show (η : ClassFunction ↥hyp.T ℂ).conj = η
+  rw [hkeq, ← he, ← hjeq]
 
 end OddOrder.Peterfalvi.S15
