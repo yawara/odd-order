@@ -1918,3 +1918,27 @@ dadeOrthonormalCharacterImageFamilyOfDiff 系、red branch = route-B tauS_mu_cro
 residual あり) + `sSet_coherent_dade_caseB`-T ((5.7) engine) + congrMap Ind 再接地。
 R-family は dadeHypT0 (hT2/Tdata パラメトリック) 依存の可能性 — S-side の dadeHypS 依存構造の
 確認から。
+
+## 2026-07-14 更新 #49 (lane b, /loop iter 10) — (5.7)-T assembly の残入力精査: Dade 基盤の設計分岐
+
+`sSet_coherent_dade_caseB` (S-side、全文精査) の (5.7) engine 入力 11 個の T-side 状況:
+- ✓ 済/generic: finiteness、pivot (nu_rowSum_mem_sOf_H0_T + sOf_subset_sSet)、pivot norm = p
+  (pins.nu_orthonormal、S-side hN と同計算)、pairwiseOrthogonal/closedUnderConjugate/
+  hasNoRealCharacters (generic; oddCardS → oddCardT mirror 要 ~5 行)、diff_supported (#48)、
+  uniform degree (#45)。
+- **残 1: `dadeHypT` (A(T)-Dade datum)** — S-side `dadeHypS` =
+  `(dadeSupportHypothesisData_honestTypeP2ASet hG S_maximal S_typeP2).some.dade`
+  (generic 構成 + **IsTypeP2 carrier**)。T 版の設計分岐:
+  (a) hT2-パラメトリック (dadeHypT0/tauTbetaGrid の既存パターン) — ただし (13.4) は (14.9) 前に
+      使われるため hT2 供給が S16.T_isTypeP2 (sorried、hub 指摘の循環リスク) になる懸念。
+      **要確認**: tSide_theta_package の消費文脈に hT2 があるか。
+  (b) `dadeSupportHypothesisData_honestTypeP2ASet` の実装を精査し、IsTypeP2 引数が実は
+      IsTypeP (or type II∨III) で足りるなら **unconditional 化** (isTypeP_of_isTypeNonI +
+      isTypeIII_of_hypothesis の世界)。(13.2.e) 原文は (8.13)+(12.7) の type-P 一般論。
+- **残 2: per-member R-family** (`sSet_memberRFamily` T-mirror) — irr branch =
+  `dadeCharacterDifferenceImageOfDiff` (dadeHypT 依存、上と同根)、red branch = route-B
+  (`tauS_mu_cross` の T-mirror = tauT_nu_cross、S16_GridExpansion の eta_diff_rigidity T-instance;
+  S-side 自身の residual と同形になる見込み)。
+
+次 iteration: (b) の実装精査 (`dadeSupportHypothesisData_honestTypeP2ASet` の IsTypeP2 使用箇所)
+→ 分岐決定 → dadeHypT + oddCardT + R-family irr branch。
