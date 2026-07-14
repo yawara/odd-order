@@ -32,6 +32,42 @@ namespace OddOrder.RepresentationTheory
 
 universe u
 
+/-- **The qualitative block-scalar product embedding.**  Under the imprimitive block hypotheses,
+the normalized scalar-ratio homomorphism embeds `U` into `n` copies of `(ZMod p)ˣ`.
+
+This is the group-structural form of the block engine.  The cardinality and divisibility theorems
+below forget this map; Peterfalvi (14.6) instead restricts it to a Sylow subgroup. -/
+theorem exists_blockScalarRatioEmbedding_of_blocks {p : ℕ} [Fact p.Prime]
+    {U M : Type u} [CommGroup U] [Finite U] [AddCommGroup M] [Module (ZMod p) M] [Finite M]
+    {n : ℕ} (ρ : Representation (ZMod p) U M) (B : Fin (n + 1) → Subrepresentation ρ)
+    (hBcard : ∀ i, Nat.card (B i).toSubmodule = p)
+    (hconst : ∀ u : U,
+        (∀ i : Fin (n + 1),
+          lineScalarChar (B i).toRepresentation
+              (finrank_eq_one_of_card_eq_prime (hBcard i)) u
+            = lineScalarChar (B 0).toRepresentation
+                (finrank_eq_one_of_card_eq_prime (hBcard 0)) u)
+        → u = 1) :
+    ∃ ψ : U →* (Fin n → (ZMod p)ˣ), Function.Injective ψ :=
+  ⟨blockScalarRatioHom (fun i => lineScalarChar (B i).toRepresentation
+      (finrank_eq_one_of_card_eq_prime (hBcard i))),
+    blockScalarRatioHom_injective _ hconst⟩
+
+/-- The scalar-character identity on an order-`p` subrepresentation, viewed in the ambient
+representation.  This avoids exposing the subtype module's implementation instances to callers
+that assemble the block identities into an equality on the whole representation. -/
+theorem lineScalarChar_smul_coe_of_card_eq_prime {p : ℕ} [Fact p.Prime]
+    {U M : Type u} [Group U] [AddCommGroup M] [Module (ZMod p) M] [Finite M]
+    (ρ : Representation (ZMod p) U M) (B : Subrepresentation ρ)
+    (hBcard : Nat.card B.toSubmodule = p) (u : U) (x : B) :
+    ρ u x.1 =
+      (lineScalarChar B.toRepresentation
+        (finrank_eq_one_of_card_eq_prime hBcard) u : ZMod p) • x.1 := by
+  change (↑(B.toRepresentation u x) : M) = _
+  simpa using congrArg Subtype.val
+    (lineScalarChar_smul B.toRepresentation
+      (finrank_eq_one_of_card_eq_prime hBcard) u x)
+
 /-- **`typeP_Galois` `u`-bound dichotomy** (Peterfalvi (13.2.c)): a faithful, fixed-point-free
 abelian `U`-action on `M ≅ 𝔽_p^q` has `|U| ≤ (p^q − 1)/(p − 1)`.
 
