@@ -130,7 +130,7 @@ import OddOrder.Peterfalvi.S12_Noncoherence
 import OddOrder.Peterfalvi.S12_TypeVCaseC
 import OddOrder.Peterfalvi.S13_TypeIIIGalois
 import OddOrder.Peterfalvi.S13_NonGaloisExclusion
-import OddOrder.Peterfalvi.S15_TSetMemberRFamily
+import OddOrder.Peterfalvi.S15_NuRowPin
 import OddOrder.FeitThompson
 import OddOrder.BG.AppC_NormSet
 import OddOrder.BG.AppC_FrobeniusClassSum
@@ -8074,3 +8074,11 @@ one intended sorried obligation `sSet_caseA_nineElevenRefutation_T`, mirroring t
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.sSetIrrDegT_pa_two_le_ncard
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.sSetIrrDegT_coherent_indT
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.sSetIrrDegT_pa_coherent_indT_caseA
+
+/-! **Peterfalvi (13.3.c)-`T` ν-row pin machinery, first layer, axiom-clean** (lane b,
+2026-07-14, issue 2035 #41 step 4-5).  The coherence-generic row-independence
+`c(ν_r) − c(ν_s) = ∑_j η_{rj} − ∑_j η_{sj}` (per-column `tauT_nu_cross` through
+`tInstance_dade0_eq_induce`) and the (5.3.b)-at-`T` grid orthogonality of coherent images
+(the `A₀(T)`-Dade regular vanishing + the (3.7)–(3.8) norm-two engine). -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.coherentIndT_nuRow_diff
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.coherentIndT_image_inner_eta_eq_zero
