@@ -741,7 +741,9 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 `'A0(T)`-Dade image of `Ind_{QW₂}^T 1 − ν_{10}`), its `u/q` are `v/p`, and its `η`-row-`0`
 axis is the `η`-column-`0` axis.  Requires the `Tdata` reconciliations (supplied by the
 producer from `reconciled_typePData_T`), so the swap's `A₀(T)`-carrier matches the one in
-`tauTbetaGrid`'s statement. -/
+`tauTbetaGrid`'s statement.  The swap's structural input `IsMulCommutative ↥V` (13.2.a at `T`)
+is derived here from `hT2` via the BG type dictionary (`proposition_type_classification` (b))
+and `isMulCommutative_V` (issue 9096 bundle split). -/
 theorem typeI_caseC_dual_dichotomy [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
@@ -758,7 +760,11 @@ theorem typeI_caseC_dual_dichotomy [Finite G]
       ((∀ i : Fin hyp.q, (i : ℕ) ≠ 0 →
         OddIntegerInner (typeIBetaL dataL.typeIHyp φ) (hyp.eta i ⟨0, hyp.p_prime.pos⟩)) ∧
         hyp.q ≤ ((maxNilpotentNormalHall L).subgroupOf L).index) :=
-  typeI_caseC_dichotomy _hG hnoV (hyp.swap hT2 Tdata hU hW1 hW2 (hyp.nuGridSupply _hG))
+  typeI_caseC_dichotomy _hG hnoV
+    (hyp.swap hT2
+      (isMulCommutative_V _hG hyp
+        ((OddOrder.BG.Ch4.S16.proposition_type_classification _hG hyp.T_maximal).2.1.mpr hT2))
+      Tdata hU hW1 hW2 (hyp.nuGridSupply _hG))
     dataL φ _hφ _hdeg
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in

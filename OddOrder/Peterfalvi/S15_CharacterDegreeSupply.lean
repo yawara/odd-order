@@ -1,5 +1,6 @@
 import OddOrder.Peterfalvi.S15_CaseACoherence
 import OddOrder.Peterfalvi.S15_SAndT_Setup.CountingLayer
+import OddOrder.Peterfalvi.S15_SAndT_Setup.TSideDegrees
 
 /-!
 # Peterfalvi §13 (pp. 75–86) — (13.3)/(13.5) τ₁-field supplies on the irreducibly-induced family
@@ -520,15 +521,22 @@ noncomputable def Hypothesis.indT [Finite G] (hyp : Hypothesis (G := G)) :
 /-- **Peterfalvi (13.3.c), the `T`-side signs `δ'_i = 1`** — the δ'-half of the
 `delta_eq_one` field.
 
-**Residual (precisely named)**: the `T`-mirror of `delta_eq_one_S` — the route is the ν-grid
-degree congruence `ν_{ij}(1) ≡ δ'_i (mod p)` (`NuGridSupplyData.nu_degree_modEq_deltaPrime`,
-(4.3.d) at `T`) against `v ≡ 1 (mod p)` (the `T`-side `u_modEq_one`), exactly as
-`delta_eq_one_of_ne_zero` runs the `S`-side.  Gated on the ν-side grid supply `nuGridSupply`
-(HypothesisSwap; a-owned FT-layer carrier threading, issue 2038 iter 26 / 9094). -/
+**Assembled** (issue 2035, T-side reopening after the 9096 bundle split): the anchor row is
+the (4.4)-at-`T` base sign (`NuGridSupplyData.deltaPrime_zero_eq_one`); off the anchor it is
+`deltaPrime_eq_one_of_ne_zero_T` (`TSideDegrees.lean`) — the (4.3.d)-at-`T` congruence
+`ν_{i0}(1) = δ'_i + p·a` against the **proven** Frobenius congruence `v ≡ 1 (mod p)`
+(`v_modEq_one`), exactly as `delta_eq_one_of_ne_zero` runs the `S`-side.  The ν-grid facts
+enter through the sorried producer `nuGridSupply` (a-owned canonical threading, issue 9096),
+and the single remaining `T`-side obligation inside the assembly is the (13.3.a)-at-`T`
+per-entry degree `nu_apply_one_eq_v` (see its docstring for the `|Q| = q^p` gate and the
+discharge routes). -/
 theorem Hypothesis.deltaPrime_eq_one_T [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (i : Fin hyp.q) : hyp.deltaPrime i = 1 := by
-  sorry
+  by_cases hi : i = ⟨0, hyp.q_prime.pos⟩
+  · rw [hi]
+    exact (hyp.nuGridSupply _hG).deltaPrime_zero_eq_one
+  · exact hyp.deltaPrime_eq_one_of_ne_zero_T _hG (hyp.nuGridSupply _hG) i hi
 
 open scoped FiniteInduce in
 /-- **The λ-free core producer** (issue 9094 RULING 案 A): every field of

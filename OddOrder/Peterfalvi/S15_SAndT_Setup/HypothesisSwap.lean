@@ -24,13 +24,15 @@ further proof, and the `T`-side obligations (`typeIBetaL_eta_col_constant`,
 The swap constructor's genuinely missing inputs are the `ν`-grid analogues of the `μ`-side
 grounding fields (`mu_orthonormal`, `mu_diff_support`, …): the §4/§6 prime-TI facts for the
 `T`-side certain-type grid.  These are bundled here as `NuGridSupplyData` with signatures that
-**exactly mirror** the `μ`-fields under the role swap, so the producer discharge is the
-mechanical `certainTypeT`-instance of the proven `muS_*` supply chain
-(`FeitThompson.lean`: `muS_orthonormal` / `muS_diff_support` / `muS_apply_of_not_mem_W2` /
-`muS_conj` via `hyp46SmpCore` — the `T`-instances use `mp.certainTypeT hG`, which is already
-constructed with the factor roles swapped, `W₁ = K*`, `W₂ = K`).  Until that producer threading
-lands (a-owned carrier files, coordinated via the shared-infra claim), the supply is the single
-sorried producer `Hypothesis.nuGridSupply`.
+**exactly mirror** the `μ`-fields under the role swap.  The bundle is **purely grid-theoretic**
+(issue 9096 split): the canonical `certainTypeT`-instance theorems proving every field for the
+canonical `nuT` grid are landed in `FeitThompsonNuGrid.lean` (`nuT_orthonormal` /
+`nuT_diff_support` / `nuT_apply_of_not_mem_W1` / `nuT_conj`, … — `mp.certainTypeT hG` is
+already constructed with the factor roles swapped, `W₁ = K*`, `W₂ = K`), so the producer
+discharge is their threading through the FT-layer carrier plus the `hyp.nu ≡ nuT`
+identification at the construction site (a-owned carrier files).  Until that threading lands,
+the supply is the single sorried producer `Hypothesis.nuGridSupply`.  The post-(14.9)
+structural fact `IsMulCommutative ↥V` is *not* in the bundle — see `Hypothesis.swap`'s `hV`.
 -/
 
 namespace OddOrder.Peterfalvi.S15
@@ -56,9 +58,13 @@ corresponding `μ`-field, so `Hypothesis.swap` can consume them verbatim:
   any `TypePData T` reconciled to the abstract `V`/`W₂`/`W₁` (the swap's `Sdata` is the
   `reconciled_typePData_T` witness, which is exactly such a datum);
 * `nu_apply_of_not_mem_W1` ↔ `mu_apply_of_not_mem_W2` — (4.3.c) at `T` (Coq `prTIirr_id`);
-* `nu_conj` ↔ `mu_conj` — (4.9.a) at `T`;
-* `V_commutative` ↔ `S_U_commutative` — (13.2.a) at `T` (BG Lemma 15.1(b) for the
-  `(κ∪σ)'`-Hall complement of `T`). -/
+* `nu_conj` ↔ `mu_conj` — (4.9.a) at `T`.
+
+The bundle is **purely grid-theoretic** (issue 9096 API audit): every field is a property of
+the canonical certain-type character grid, dischargeable at the FT-layer construction site
+with no (14.9) input.  The structural fact `IsMulCommutative ↥V` (Peterfalvi (13.2.a) at `T`)
+is deliberately *not* a field — it is a post-(14.9) type-II fact, supplied to
+`Hypothesis.swap` as the separate argument `hV` alongside the (14.9)-conclusional `hT2`. -/
 structure NuGridSupplyData [Finite G] (hyp : Hypothesis (G := G)) : Prop where
   /-- **Peterfalvi (13.1.e) at `T`**: each `ν_{ij}` is an irreducible character of `T`. -/
   nu_irreducible : ∀ (i : Fin hyp.q) (j : Fin hyp.p),
@@ -114,9 +120,6 @@ structure NuGridSupplyData [Finite G] (hyp : Hypothesis (G := G)) : Prop where
   /-- **Peterfalvi (4.9.a) at `T`**: CF-level conjugation symmetry `ν̄_{ij} = ν_{−i,−j}`. -/
   nu_conj : ∀ (i : Fin hyp.q) (j : Fin hyp.p),
     (hyp.nu i j).conj = hyp.nu (finNeg hyp.q_prime.pos i) (finNeg hyp.p_prime.pos j)
-  /-- **Peterfalvi (13.2.a), V-side**: the complement `V` is abelian (BG Lemma 15.1(b) for the
-  `(κ∪σ)'`-Hall complement of `T`). -/
-  V_commutative : IsMulCommutative ↥hyp.V
 
 /-- **The ν-side grid supply, producer obligation**: the `T`-side certain-type facts for the
 abstract `ν`-grid.  Discharge route (issue 2038 iter 26): the FT-layer producer identifies
@@ -138,6 +141,11 @@ open scoped FiniteInduce in
 
 * `hT2` — `IsTypeP2 T`, the (14.9)-conclusional dual of the carrier field `S_typeP2`
   (exactly the parameter `tauTbetaGrid`/`typeI_caseC_dual_dichotomy` already take);
+* `hV` — `IsMulCommutative ↥V`, Peterfalvi (13.2.a) at `T` (BG Lemma 15.1(b) for the
+  `(κ∪σ)'`-Hall complement of `T`), the swap's `S_U_commutative`.  Like `hT2` this is
+  (14.9)-conclusional: consumers derive it from `hT2` via the BG type dictionary
+  (`proposition_type_classification` (b): `IsTypeII T ↔ IsTypeP2 T`) and
+  `isMulCommutative_V` — it is *not* part of the grid bundle `pins` (issue 9096);
 * `Tdata` with the `reconciled_typePData_T` reconciliations — the swap's `Sdata`;
 * `pins : NuGridSupplyData hyp` — the ν-side §4/§6 grid facts (the swap's `μ`-side fields).
 
@@ -152,6 +160,7 @@ giving the `T`-side duals (`typeIBetaL_eta_col_constant`, `typeI_caseC_dual_dich
 with no further proof beyond index transport. -/
 noncomputable def Hypothesis.swap [Finite G] (hyp : Hypothesis (G := G))
     (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hV : IsMulCommutative ↥hyp.V)
     (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
     (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     (pins : NuGridSupplyData hyp) : Hypothesis (G := G) where
@@ -244,7 +253,7 @@ noncomputable def Hypothesis.swap [Finite G] (hyp : Hypothesis (G := G))
   Sdata := Tdata
   Sdata_U_eq := hU
   Sdata_W1_eq := hW1
-  S_U_commutative := pins.V_commutative
+  S_U_commutative := hV
   Sdata_W2_eq := hW2
   mu_diff_support := fun i _ _ hj hk hdeg =>
     pins.nu_diff_support Tdata hU hW1 hW2 i hj hk hdeg
