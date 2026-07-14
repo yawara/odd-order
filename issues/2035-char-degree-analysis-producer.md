@@ -1989,3 +1989,17 @@ S16_GridExpansion 下流ゆえ **置き場所は TSideDegrees 不可** (S16_Grid
    hV = isMulCommutative_V_unconditional ✓)。行差 rigidity の独立実装不要 (c-owned
    S16_GridExpansion への追記も不要)。
 置き場所: S15_BridgeCharacter 同居 (S-cross と並置、rigidity/swap とも import 済、b 実績 file)。
+
+## 2026-07-14 更新 #53 (lane b, /loop iter 14) — vanish-on-V-T 系 4 本 landed (cross-T 部材完備)
+
+- hub 登録: `TSideDegrees` を `S15_SAndT_Setup` hub に追加 (未登録だった)。
+- `deltaPrime_eq_one_pins` (TSideDegrees): 全 i の δ'=1、pins-パラメトリック。
+- **HonestTypeP2A0 に T-mirror 4 本** (sorry-free、一発 build):
+  `dadeHypT0_H_eq_ftSupportKernel` / `forall_dadeHypT0_H_eq_bot` (A₀(T) normedTI、
+  generic escaping-empty の (hT2,Tdata)-instance) / `tauT_nu_diff_support` ((4.8)-T wrapper、
+  pins.nu_diff_support + nu_apply_one_eq_v) / **`tauT_nu_vanish_on_V`** (regular set 上
+  τ_T⁰(ν-行差) = η-行差; typePV 側は hW1/hW2 交換 + union_comm、値は
+  nu_apply_of_not_mem_W1 + deltaPrime_eq_one_pins)。
+
+⟹ `tauT_nu_cross` の依存 5 点が**全て**揃った (残るは本体 assembly + swap-transpose rigidity
+のみ、~80 行、置き場所 = S15_BridgeCharacter)。次 iteration で cross-T 本体。

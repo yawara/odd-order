@@ -721,6 +721,16 @@ theorem Hypothesis.deltaPrime_eq_one_of_ne_zero_T [Finite G]
     have hodd := Nat.odd_iff.mp hyp.p_odd
     omega
 
+/-- **Peterfalvi (13.3.c), all `T`-side signs are `1`** (pins-parametric form): `δ'_i = 1` for
+every `i` — the anchor row is the (4.4) base sign, the rest is
+`deltaPrime_eq_one_of_ne_zero_T`. -/
+theorem Hypothesis.deltaPrime_eq_one_pins [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (pins : NuGridSupplyData hyp) (i : Fin hyp.q) : hyp.deltaPrime i = 1 := by
+  by_cases hi : i = ⟨0, hyp.q_prime.pos⟩
+  · rw [hi]; exact pins.deltaPrime_zero_eq_one
+  · exact hyp.deltaPrime_eq_one_of_ne_zero_T hG pins i hi
+
 /-- **`T`-instance chief-factor `q` identity**: `data.q = p = |W₂|`.  Mirror of
 `toTypesIIIIIIVSetupS_q_eq`. -/
 theorem Hypothesis.toTypesIIIIIIVSetupT_q_eq [Finite G]
