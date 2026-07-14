@@ -1109,4 +1109,37 @@ theorem Hypothesis.sSet_caseB_member_diff_supported_T [Fintype G] [Finite G]
     · exfalso; rw [Set.mem_singleton_iff] at h'; subst h'
       exact hz0 (by rw [ClassFunction.sub_apply, hdeg, sub_self])
 
+
+/-- **`Odd |T|`** (mirror of `oddCardS`): the subcoherence realness input for the `T`-instance
+§9 family. -/
+theorem Hypothesis.oddCardT [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    Odd (Nat.card ↥hyp.T) := by
+  rcases hG.odd with ⟨k, hk⟩
+  have hdvd : Nat.card ↥hyp.T ∣ Nat.card G := Subgroup.card_subgroup_dvd_card hyp.T
+  rcases Nat.even_or_odd (Nat.card ↥hyp.T) with heven | hodd
+  · exfalso
+    have h2 : (2 : ℕ) ∣ Nat.card G := (even_iff_two_dvd.mp heven).trans hdvd
+    rw [hk] at h2
+    omega
+  · exact hodd
+
+/-- **(13.2.e) `T`-instance Dade hypothesis** (mirror of `dadeHypS`; the `A(T)`-Dade datum for
+the caseB-`T` (5.7) coherence).  Like `dadeHypT0`/`tauTbetaGrid`, `IsTypeP2 T` is a
+(14.9)-conclusional parameter supplied by the caller (the `S`-side reads the carried
+`S_typeP2`); the underlying construction is the generic type-`P₂`
+`dadeSupportHypothesisData_honestTypeP2ASet` at `T`. -/
+noncomputable def Hypothesis.dadeHypT [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T) :
+    OddOrder.Peterfalvi.S04.Hypothesis G (honestTypeP2ASet hyp.T) hyp.T :=
+  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.T_maximal hT2).some.dade
+
+/-- **(13.2.e) `T`-instance Dade `H`-conjugation invariance** (mirror of `dadeHypS_hconj`). -/
+theorem Hypothesis.dadeHypT_hconj [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T) :
+    (hyp.dadeHypT hG hT2).HConjInvariant :=
+  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.T_maximal hT2).some.hconj
+
 end OddOrder.Peterfalvi.S15

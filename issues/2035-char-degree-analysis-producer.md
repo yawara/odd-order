@@ -1942,3 +1942,19 @@ R-family は dadeHypT0 (hT2/Tdata パラメトリック) 依存の可能性 — 
 
 次 iteration: (b) の実装精査 (`dadeSupportHypothesisData_honestTypeP2ASet` の IsTypeP2 使用箇所)
 → 分岐決定 → dadeHypT + oddCardT + R-family irr branch。
+
+## 2026-07-14 更新 #50 (lane b, /loop iter 11) — dadeHypT (設計決定 = hT2-パラメトリック) + oddCardT landed
+
+**設計決定 (分岐 (a))**: `dadeSupportHypothesisData_honestTypeP2ASet` の hP2 使用を精査 —
+本質使用は `typeP2_exists_matched_kappa_hall_pair` (matched κ/(κ∪σ)'-Hall pair、U₀ abelian 込み)
+のみで、消費側 3 lemma ((8.13.a/b/c2)) は pair データだけ取る。type III 版 pair は E-setup chain
+(BG §16 Thm A–E 級) の P₁ 対応 port が要り別戦線。**repo 確立済みの hT2-パラメトリック設計**
+(dadeHypT0 / tauTbetaGrid / typeI_caseC_dual_dichotomy と同層) を採用。unconditional 化
+(type-III pair port) は将来の独立 obligation。
+
+**landed** (TSideDegrees、sorry-free): `oddCardT` (realness 入力) / `dadeHypT` (A(T)-Dade datum、
+hT2 param) / `dadeHypT_hconj`。
+
+残: per-member R-family (irr branch = `dadeCharacterDifferenceImageOfDiff` over dadeHypT +
+`sSet_member_diffsupp`-T; red branch = route-B tauT_nu_cross) → `sSet_coherent_dade_caseB`-T
+assembly (hT2-パラメトリック)。
