@@ -631,6 +631,18 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 45) — ★★ 3 レーン同時 landing: census 46→42 (実 −4)。c Campaign A 完了**:
+  **a=1** (`6f6e3414` = **(13.12) PC Hall obligation 実証明** (OrderDetermination 移管 4 sorry の 2 本目、
+  実 discharge −1、残 = (13.13)/(13.15) の de-opacify 2 本)。merge)。
+  **b=2** (`29ef27bf`/`13cb3f34` = **(13.3.c)-T ν-row pin dichotomy 完成** + pinned (9.11)-T coherence
+  carrier = 2035 #41 step 4 complete。S15_NuRowPin +994 (現 1261 行 — ⚠ 1500 接近 watch)、AxiomsCheck
+  assert 11 本自発追記、sorry 0/0。merge)。
+  **c=3** (`e357717d`/`3fe31b7f`/`567e2866` = ★ **0115 Campaign A 完了**: L-side off-principal grid
+  parities を (13.19.c) dichotomies から実証明 + honest (14.11.2) L-side Y=0 + chi classification
+  (grid_mem overclaim は除去し producer sorry-free 化)。**ComparingLM の実 sorry 3→0**。0115 に実施
+  報告。再起動当日に campaign 1 本完遂。merge)。
+  build green **4207 jobs** / AxiomsCheck OK / census **46→42 (実 −4: a 1 + c 3)** / 新 axiom なし /
+  逸脱なし / orphan clean。push 済。S16 残 = SubgroupM 2 (Campaign B 進行中)、OrderDetermination 残 2。
 - **2026-07-14 (tick 44、ミニ — c 初 commit) — c 再稼働後の first landing: hu_full statement 修正**:
   **c=1** (`3450746f` = **0115 監査 caveat への即応**: SubgroupM `hu_full` の statement バグ
   (p ≡ 1 (mod q) 枝と矛盾する無条件 u-値主張) を branch-independent な (9.7.b) gate に修正
