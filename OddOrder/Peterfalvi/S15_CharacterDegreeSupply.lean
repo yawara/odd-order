@@ -135,21 +135,41 @@ def LambdaWitness [Finite G] (hyp : Hypothesis (G := G)) : Prop :=
     OddOrder.RepresentationTheory.IsIrreducibleCharacter
       (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ)
 
-open scoped FiniteInduce in
-/-- **The no-λ (Galois) branch of the `T`-side (13.4) facts** (issue 9094 RULING §4, faithful
-sorried bridging): if `𝒮` contains no `uq`-degree `PC`-induced irreducible (`¬ LambdaWitness`),
-then by Pf (13.3.b) `M = S` is in case (9.7.b) with `C = ⊥`, `u = (p^q−1)/(p−1)` (Galois); the
-`T`-mirror of (13.9)–(13.12) then forces `D = ⊥`, `v = (q^p−1)/(q−1)` and `|Q| = q^p`.
-
-Gated on the unbuilt `T`-mirror engine (RULING §4: `q < p` — Coq `PFsection14` `ltqp` — with
-(13.13)-on-`T` and (13.12)-on-`T`).  This is the honest replacement, in the no-λ branch, of the
-overstated unconditional λ-cluster of `character_degree_analysis`. -/
-theorem T_caseB_facts_no_lambda [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (_hnolam : ¬ LambdaWitness hyp) :
-    hyp.D = ⊥ ∧ hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) ∧
-      Nat.card ↥hyp.Q = hyp.q ^ hyp.p := by
+/-- **`D = ⊥` — Peterfalvi (13.12) at `T`** (precisely-named swap-route gate, issue 2035 #77):
+the `T`-side centralizer parameter vanishes.  `d = 1` is the `S`-side (13.12) `c_eq_one`
+instantiated at the swapped hypothesis (`Hypothesis.swap`, 9096 threading: `swap.c = hyp.d`
+by construction), transported to `D = ⊥` by `d_eq_card_D`; discharged when the swap
+instantiation is wired (the `c_eq_one` chain itself is lane-a's landed (13.10)–(13.12)). -/
+theorem Hypothesis.T_side_D_eq_bot [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    hyp.D = ⊥ := by
   sorry
+
+/-- **`v = (q^p−1)/(q−1)` — Peterfalvi (14.4) second assertion** (precisely-named swap-route
+gate, issue 2035 #77; Coq `PFsection14` `oV`): under the (14.1) ordering `q < p`, case (9.7.b)
+holds for `M = T` — a case-(a) `T` would force `p = 3` by (13.13)-at-the-swap
+(`caseA_parameters`), contradicting `3 ≤ q < p` — and `q ≢ 1 (mod p)` (again `q < p`), so
+(13.15)-at-the-swap (`caseB_order_u`, lane-a's side-agnostic `CaseBOrder` engine) pins the
+full cyclotomic value.  Discharged by the swap instantiation over lane-a's (13.13)/(13.15)
+chain. -/
+theorem Hypothesis.T_caseB_v_eq_full [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hqp : hyp.q < hyp.p) :
+    hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) := by
+  sorry
+
+/-- **The `T`-side (13.4)/(14.4) facts under the (14.1) ordering `q < p`** (issue 2035 #77;
+the honest restatement of the former `T_caseB_facts_no_lambda`, whose `¬ LambdaWitness`
+hypothesis was neither used by the book's route nor sufficient — Peterfalvi (14.4) derives
+case (9.7.b)-for-`T`, `D = ⊥` and the full `v` from `q < p` alone, with no λ-dichotomy):
+`|Q| = q^p` is the landed unconditional classification (`card_Q_eq_qp`); `D = ⊥` and the
+`v`-value are the precisely-named swap-route gates above. -/
+theorem T_caseB_facts_of_q_lt_p [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hqp : hyp.q < hyp.p) :
+    hyp.D = ⊥ ∧ hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) ∧
+      Nat.card ↥hyp.Q = hyp.q ^ hyp.p :=
+  ⟨hyp.T_side_D_eq_bot hG, hyp.T_caseB_v_eq_full hG hqp, hyp.card_Q_eq_qp hG⟩
 
 open OddOrder.Peterfalvi.S11 in
 /-- **(9.8.c) with the regular seed exposed**: the degree-`qu` irreducible member of `𝒮(H₀C)` from
@@ -1206,7 +1226,8 @@ against the unconditional `CharacterDegreeCore`; the no-λ branch is the (Galois
 `T_caseB_facts_no_lambda`.  This is the b-side export the (14.9) type-II endpoint
 (`S16 … T_side_caseB_facts`) cites in place of the uninhabitable monolithic producer. -/
 theorem T_caseB_facts_unconditional [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hqp : hyp.q < hyp.p) :
     hyp.D = ⊥ ∧ hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) ∧
       Nat.card ↥hyp.Q = hyp.q ^ hyp.p := by
   obtain ⟨core⟩ := hyp.characterDegreeCore_nonempty hG
@@ -1214,6 +1235,6 @@ theorem T_caseB_facts_unconditional [Finite G]
   · obtain ⟨θ, hθ, hθ1, hθP, hind⟩ := hlam
     obtain ⟨lam⟩ := hyp.lambdaClusterData_of_irr_witness hG θ hθ hθ1 hθP hind
     exact lambda_forces_T_caseB_core hG core lam
-  · exact T_caseB_facts_no_lambda hG hyp hlam
+  · exact T_caseB_facts_of_q_lt_p hG hyp hqp
 
 end OddOrder.Peterfalvi.S15
