@@ -914,4 +914,64 @@ theorem Hypothesis.isMulCommutative_V_unconditional [Finite G]
   · exact absurd ⟨hyp.T, hyp.T_maximal, h⟩
       (OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional hG)
 
+
+open OddOrder.Peterfalvi.S11 in
+open scoped commutatorElement in
+open scoped FiniteInduce in
+/-- **(9.9.a) uniform degree of the `T`-instance §9 family in the Galois case** (mirror of
+`sSet_caseB_apply_one_eq_qu`; the `hdeg` input of the caseB (5.7) uniform-degree coherence
+engine on `T`): in Clifford case (b) every member of `𝒯 = sSet(setupT)` has degree
+`setupT.q · chars.u` (= `p·v` after the identifications).  The kernel data degenerates —
+`chief.H₀ = ⊥` (`toTypesIIIIIIVSetupT_chief_H0_eq_bot`) and `C′ = derivedInG (cSub) = ⊥`
+(`cSub ≤ V` abelian by the **unconditional** `isMulCommutative_V_unconditional`) — so
+`𝒮(H₀C′) = 𝒮(⊥) = 𝒯` and `caseB_degree_qu` applies to every member. -/
+theorem Hypothesis.sSet_caseB_apply_one_eq_vp [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1)
+    {chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd)}
+    (caseB : OddOrder.Peterfalvi.S11.CliffordCaseBData
+      (hyp.mkSection11CharacterDataT hG hvd chief))
+    {φ : ClassFunction ↥hyp.T ℂ} (hφ : φ ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd)) :
+    (φ : ↥hyp.T → ℂ) 1
+      = (((hyp.toTypesIIIIIIVSetupT hG hvd).q
+          * (hyp.mkSection11CharacterDataT hG hvd chief).u : ℕ) : ℂ) := by
+  classical
+  haveI := hyp.finiteG
+  have hH0 : chief.H0 = ⊥ := hyp.toTypesIIIIIIVSetupT_chief_H0_eq_bot hG hvd chief
+  have hCp : (hyp.mkSection11CharacterDataT hG hvd chief).Cprime = ⊥ := by
+    show cprimeSub (hyp.toTypesIIIIIIVSetupT hG hvd) chief = ⊥
+    have hCV : cSub (hyp.toTypesIIIIIIVSetupT hG hvd) chief ≤ hyp.V :=
+      (cSub_le_U _ _).trans (le_of_eq (hyp.toTypesIIIIIIVSetupT_U_eq hG hvd))
+    have hVab : IsMulCommutative ↥hyp.V := hyp.isMulCommutative_V_unconditional hG
+    have hCab : IsMulCommutative
+        ↥(cSub (hyp.toTypesIIIIIIVSetupT hG hvd) chief) :=
+      ⟨⟨fun a b => Subtype.ext (by
+        have h := hVab.is_comm.comm
+          (⟨(a : G), hCV a.2⟩ : ↥hyp.V) ⟨(b : G), hCV b.2⟩
+        simpa using congrArg Subtype.val h)⟩⟩
+    have hcomm : commutator
+        ↥(cSub (hyp.toTypesIIIIIIVSetupT hG hvd) chief) = ⊥ := by
+      rw [eq_bot_iff]
+      refine (Subgroup.commutator_le (H₁ := ⊤) (H₂ := ⊤) (H₃ := ⊥)).mpr (fun a _ b _ => ?_)
+      rw [Subgroup.mem_bot, commutatorElement_eq_one_iff_commute]
+      exact hCab.is_comm.comm a b
+    show derivedInG (cSub (hyp.toTypesIIIIIIVSetupT hG hvd) chief) = ⊥
+    rw [derivedInG, hcomm, Subgroup.map_bot]
+  have hmem : φ ∈ (hyp.mkSection11CharacterDataT hG hvd chief).SOf
+      (chief.H0 ⊔ (hyp.mkSection11CharacterDataT hG hvd chief).Cprime) := by
+    rw [Section11CharacterData.SOf_eq, hH0, hCp, sup_bot_eq]
+    obtain ⟨χ, hχ, rfl⟩ := hφ
+    refine ⟨χ, ?_, rfl⟩
+    rw [mem_xiOf]
+    refine ⟨hχ, ?_⟩
+    intro x hx
+    have hx1 : x = 1 := by
+      have h2 := Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp
+        (SetLike.mem_coe.mp hx))
+      rw [Subgroup.mem_bot] at h2
+      exact Subtype.ext (Subtype.ext h2)
+    rw [hx1, OddOrder.Peterfalvi.S03.mem_characterKernel,
+      OddOrder.Peterfalvi.S03.characterDegree_def]
+  exact caseB_degree_qu hG (hyp.mkSection11CharacterDataT hG hvd chief) caseB φ hmem
+
 end OddOrder.Peterfalvi.S15

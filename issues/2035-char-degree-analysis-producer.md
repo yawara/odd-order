@@ -1854,3 +1854,15 @@ reconciled `tpd.U = V` へ、IV は (11.9.c) universal 排除、V は (10.10)。
 
 新 shared leaf `NilpotentCyclicAbelianization` (#43 で landing 済) は独立の価値で保持
 (mathlib 級の一般補題)。次: sSet_eq_sOf_H0Cprime-T (Cprime = ⊥ 経由) → step 2 uniform degree。
+
+## 2026-07-14 更新 #45 (lane b, /loop iter 7 続) — caseB-T step 2 (uniform degree) landed
+
+**`sSet_caseB_apply_one_eq_vp`** (TSideDegrees、sorry-free): Clifford caseB で 𝒯 全 member の
+degree = setupT.q · chars.u (= p·v)。`sSet_eq_sOf_H0Cprime` 相当を inline — H₀ = ⊥ (kernel
+collapse #39) + **Cprime-T = ⊥** (cSub ≤ V + `isMulCommutative_V_unconditional` #44 →
+derivedInG cSub = ⊥) → 𝒮(H₀C') = 𝒯 → generic `caseB_degree_qu`。
+
+caseB-T coherence の残り: member diff support (S-side `sSet_caseB_member_diff_supported` mirror —
+uniform degree + (4.7)-T support fact `sSet_member_support_subset` の T 版が要る)、per-member
+R-family (S-side `S15_SSetMemberRFamily` route-B の T-mirror — S-side 自身に reducible-branch
+residual あり)、(5.7) engine assembly (`sSet_coherent_dade_caseB` mirror)、caseA-T、pin、τ₁T。
