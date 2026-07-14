@@ -581,3 +581,44 @@ soundness cleanup である。結果として A-owned S03–S13/FeitThompson の
 も 0 になったが、それ自体は FT 完了指標ではない。現在の genuine 接続 frontier は
 issue 9096 の canonical ν pins を b-owned S15 chain / c-owned S16 carrier へ explicit 配線する
 cross-lane 作業。
+
+## ⚠ UPDATE (2026-07-14 lane a): Section 16 producer の残 dirty root を BG Theorem A 旧 cite に局所化
+
+`#print axioms` を mp → tp → cd → inputs の producer 順に再実測した。結果:
+
+- `section16TypePStructure_of_isMinimalSimpleOdd` / `section16CharacterData_of_isMinimalSimpleOdd`
+  は axiom-clean。
+- `section16MaximalPair_of_isMinimalSimpleOdd` だけが dirty で、そのため
+  `section16Inputs_of_isMinimalSimpleOdd` / `sectionSixteenHypothesis_of_isMinimalSimpleOdd` が
+  `sorryAx` を継承する。
+- mp の dirty path は
+  `theorem88_caseB_holds` → `not_all_maximal_typeI` → `typeI_frobenius` →
+  `hypothesis_of_typeIData` → `dadeSupportHypotheses_typeI` に局所化した。
+  (7.10) `card_G0_lower_bound` / (7.11) `not_trivial_G0` は今回の実測でも clean。
+- type-I Dade producer の 3 pin は最終的に BG `theoremII_tame_embedding` のみを dirty root とし、
+  A--D suite を個別測定すると **唯一 dirty なのは旧 `theoremA_maximal_structure`**。
+  Theorems B/C/D と Proposition 16.1 は clean。
+
+旧 Theorem A は docstring 自身が `OVERSTATEMENT — do not prove as-is` と明記する legacy 宣言で、
+faithfulness-corrected `theoremA_maximal_structure_faithful` は既に axiom-clean。同じ
+`TaxonomyOutput.lean` の `theoremII_tame_embedding_of_inputs` 内に残る旧 cite は 3 箇所だけ:
+
+```text
+TaxonomyOutput.lean:1265 / :1292 / :1359
+  theoremA_maximal_structure hG hM hK rfl hU
+```
+
+当該 theorem は既に `hKM : K ≤ M` / `hUM : U ≤ M` を引数に持つので、3 箇所を
+
+```text
+theoremA_maximal_structure_faithful hG hM hKM hUM hK rfl hU
+```
+
+へ置換するのが依存順を保存する honest rewire。新 theorem / 新仮説 / signature 変更は不要。
+これにより `theoremII_tame_embedding` → type-I (8.15) Dade → (12.7) → (12.17) → mp producer の
+legacy `sorryAx` を除ける見込みで、named Section 16 input producer の実構成を clean にする直接 prerequisite。
+
+ただし `TaxonomyOutput.lean` は BG §16 node = lane b territory。lane a は無断編集せず、hub に
+**3 cite の proof-only rewire carve-out を a へ付与するか、b queue に即時投入するか**の裁定を求める。
+b の現 2035/9096 S15 char-degree files とは file 非交差。A 自所有の未形式化 frontier は実測上ゼロで、
+もう一つの cross-lane frontier は上記どおり 9096 explicit-pins consumer wiring。
