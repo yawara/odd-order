@@ -2425,3 +2425,12 @@ T_isTypeP2_gate (0116) / T_caseB_facts_no_lambda の 4 named-obligation に coll
 (次 iteration の参考) #74 の 4 named obligation のうち T_isTypeP2_gate は上記 1 の弱化で
 obligation 自体が消える型。refuter-T / T_caseB_facts_no_lambda は従来どおり。nuGridSupply は
 a-owned 9096。
+
+## 📎 lane-c cross-ref (2026-07-14, 9077 carve-out 条件 4 の記録)
+
+9077 RULING #3 の b-quiet-file carve-out 実施状況: item 2 `sibleyTarget_frobI`
+(S14_MaximalI/FrobeniusStructure) = 構成 landed (commit `237ff7fc`)、残 sorry は
+`card_L_odd` (signature gap — `Odd (Nat.card G)` 仮説の追加要、詳細 9077) 1 点のみ。
+item 1 `V_inf_centralizer_Q_eq_bot` (S15_SAndTBasic:841) = DAG-blocked で HOLD
+(hub 9077 追記 + 0116 Route T; c も独立検証で一致)。b への影響: FrobeniusStructure の
+編集は proof-only + docstring 注記のみ、signature/statement 不変。
