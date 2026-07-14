@@ -623,6 +623,18 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 35) — a+b 合流: a unsound-route 撤去 (soundness cleanup) + b T-side (13.4) support estimate 実証明**:
+  **a=1** (`f2cb4ff2` = **(6.8)-TI 依存の unsound subtree 撤去**: `S11.sibleyTarget_H0C` + 唯一 consumer
+  `coherent_H0C_commutator` + wrapper `S12.typeII_section11_coherence`、および consumer-0 legacy obligation
+  `S12.coherent_Sset_diff_SHCSet` を削除。live spine は S15 honest route (`sSet_coherent_indS_A`/
+  `coherent_H0Cprime_S`) が既に担う。9087 に authoritative 記録 (issue 7001/1017)。hub 検証: 残参照は
+  docstring のみ + build green で code-level 無参照確定。merge `3860a802`)。
+  **b=2** (`c975fec2` = **(13.4)-at-T support estimate 実証明** (TSideDegrees +68 sorry-free)、`e4509630` =
+  2035 #41 T-side coherence construction plan。merge `c40721fa`)。c=0。
+  build green **4204 jobs** / AxiomsCheck OK / count-sorry **48→46** (両減とも a の unsound/dead sorried
+  obligation 削除による census 減 — 実証明 discharge でなく soundness cleanup、開示済み) / 新 axiom なし /
+  逸脱なし / orphan scan clean。push 済。**a-owned S03–S13/FeitThompson の literal sorry = 0 に到達**
+  (a 注記どおり FT 完了指標ではない — 9096 ν pins の cross-lane explicit 配線が genuine frontier)。
 - **2026-07-14 (tick 34) — ★★ a+b 合流: 9096 ν-carrier campaign 完結 (a threading + b T-side (13.2.b)/(13.3.a,b)) + sorry 実 discharge 49→48**:
   **a=4** (`bef0c054` = 9096 item 3 / issue 1030 完了: `sectionSixteenNuGridSupplyData_of_inputs` 構成
   (10 pure grid fields → NuGridSupplyData、`#print axioms` clean、AxiomsCheck assert 追加)。generic
