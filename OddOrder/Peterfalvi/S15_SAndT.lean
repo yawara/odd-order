@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S15_BridgeCharacter
+import OddOrder.Peterfalvi.S15_CaseASylowCenter
 import OddOrder.Peterfalvi.S16_PairingCoherence
 import OddOrder.Peterfalvi.S16_PairingBessel
 import OddOrder.Peterfalvi.S16_GridExpansion
