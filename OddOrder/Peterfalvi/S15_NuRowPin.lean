@@ -1,4 +1,4 @@
-import OddOrder.Peterfalvi.S15_TSetMemberRFamily
+import OddOrder.Peterfalvi.S15_NineElevenSevenEightT
 
 /-!
 # Peterfalvi (13.3.c)-`T` — the ν-row pin machinery (coherence-generic)
@@ -441,66 +441,6 @@ theorem Hypothesis.etaRow_inner_self [Finite G] (hyp : Hypothesis (G := G)) (r :
     ClassFunction.inner (∑ j : Fin hyp.p, hyp.eta r j) (∑ j : Fin hyp.p, hyp.eta r j)
       = (hyp.p : ℂ) := by
   rw [hyp.etaRow_inner r r, if_pos rfl]
-
-open OddOrder.Peterfalvi.S11 in
-open scoped FiniteInduce in
-/-- **Peterfalvi (5.5) for a coherent subfamily of `𝒯 = sSet(setupT)`** (mirror of
-`sSet_coherent_extension_eq_sum_memberRFamily`): a coherent extension of `F ⊆ 𝒯` w.r.t. the
-honest `A(T)`-Dade `τ_T` evaluates a member `ψ` (whose conjugate is also in `F`) as a partial
-sum over the dispatched case-agnostic `R`-family `sSet_memberRFamily_T`. -/
-theorem Hypothesis.sSet_coherent_extension_eq_sum_memberRFamily_T [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
-    (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
-    (hvd : hyp.v * hyp.d ≠ 1)
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
-    (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
-    (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
-    {F : Set (ClassFunction ↥hyp.T ℂ)}
-    (hFsub : F ⊆ sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
-    (c' : OddOrder.Peterfalvi.S07.IsCoherent
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2)
-        ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2))) F
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T))
-    {ψ : ClassFunction ↥hyp.T ℂ} (hψT : ψ ∈ F) (hψcT : ψ.conj ∈ F) :
-    ∃ E ⊆ (hyp.sSet_memberRFamily_T hG hnoV pins hvd hT2 Tdata hU hW1 hW2
-        (hFsub hψT)).imageSet,
-      c'.extension ψ = ∑ α ∈ E, α := by
-  haveI := hyp.finiteG
-  classical
-  have hne : ψ ≠ ψ.conj := fun h =>
-    sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupT hG hvd) (hyp.oddCardT hG)
-      (hFsub hψT) h.symm
-  have hχχbar : ClassFunction.inner ψ ψ.conj = 0 :=
-    sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupT hG hvd) (hFsub hψT) (hFsub hψcT) hne
-  have hdiffsupp : ((ψ - ψ.conj : ClassFunction ↥hyp.T ℂ)).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
-    rw [show (ψ - ψ.conj : ClassFunction ↥hyp.T ℂ) = -(ψ.conj - ψ) from by abel,
-      ClassFunction.support_neg]
-    exact hyp.sSet_member_conjDiff_supported_T hG hvd (hFsub hψT)
-  have hle : OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.T)
-      ({ψ - ψ.conj, ψ - 0} : Set (ClassFunction ↥hyp.T ℂ))
-      ≤ OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.T) F :=
-    Submodule.span_le.mpr (by
-      intro x hx
-      simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx
-      rcases hx with rfl | rfl
-      · exact Submodule.sub_mem _ (Submodule.subset_span hψT) (Submodule.subset_span hψcT)
-      · exact Submodule.sub_mem _ (Submodule.subset_span hψT) (Submodule.zero_mem _))
-  obtain ⟨-, hτ1ψ, E, hEsub, hXsum, -⟩ :=
-    OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.eq_sum_of_psi_eq_zero
-      (OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection
-        (hyp.sSet_memberRFamily_T hG hnoV pins hvd hT2 Tdata hU hW1 hW2 (hFsub hψT))
-        c'.extension
-        (fun φ ζ hφ hζ => c'.extension_inner_eq φ ζ (hle hφ) (hle hζ))
-        (c'.extends_on_supported (ψ - ψ.conj)
-          ⟨Submodule.sub_mem _ (Submodule.subset_span hψT) (Submodule.subset_span hψcT),
-            hdiffsupp⟩)
-        (by rw [sub_zero]; exact c'.extension_mem_ZIrr ψ (Submodule.subset_span hψT))
-        (by rw [ClassFunction.inner_zero_right])
-        (by rw [ClassFunction.inner_zero_right])
-        hχχbar)
-  exact ⟨E, hEsub, hτ1ψ.trans hXsum⟩
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
