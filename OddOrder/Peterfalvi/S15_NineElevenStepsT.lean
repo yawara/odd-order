@@ -20,7 +20,7 @@ the (9.11.5)–(9.11.8) endgame of the `T`-instance (9.11) equality-configuratio
 * **(9.11.4)**: the `A(T)`-support residual `nineElevenAlphaSupportT` (the Coq gap-patch site
   `PFsection9.v:1478-1484` mirrored at `T` — Hall decomposition/conjugacy in the solvable
   `HU₁` + coprime fixed-point lifting, with the type-II dictionary `Q = T_F = M_σ(T)` from
-  `hT2`) and the cleared Mackey-norm bundle `nineElevenFourNormInputsT`.
+  `hTP`) and the cleared Mackey-norm bundle `nineElevenFourNormInputsT`.
 
 The (9.11.2) TI-witness bricks (`cuSubOf_zero_tiWitness`, `exists_cuSubOf_centralizer_witness`,
 `S15_NineElevenSteps.lean`) are `{M}`-generic and cited directly — no mirror needed.
@@ -201,7 +201,7 @@ theorem Hypothesis.sSet_sThree_coherent_dade_T [Finite G]
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
     (hvd : hyp.v * hyp.d ≠ 1)
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)
     (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
     (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd)}
@@ -212,8 +212,8 @@ theorem Hypothesis.sSet_sThree_coherent_dade_T [Finite G]
     (hS3deg : ∀ χ ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd) \ S₂,
       (χ : ↥hyp.T → ℂ) 1 = (((hyp.toTypesIIIIIIVSetupT hG hvd).q * chars.u : ℕ) : ℂ)) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2.1)
-        ((hyp.dadeHypT hG hT2.1).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2.1)))
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
+        ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP)))
       (sSet (hyp.toTypesIIIIIIVSetupT hG hvd) \ S₂)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T)) := by
   classical
@@ -251,7 +251,7 @@ theorem Hypothesis.sSet_sThree_coherent_dade_T [Finite G]
   exact OddOrder.Peterfalvi.S07.uniform_degree_coherence_of_families
     ((sSet_finite _).subset Set.sdiff_subset)
     hχ₀
-    (fun η hη => hyp.sSet_memberRFamily_T hG hnoV pins hvd hT2 Tdata hU hW1 hW2 hη.1)
+    (fun η hη => hyp.sSet_memberRFamily_T hG hnoV pins hvd hTP Tdata hU hW1 hW2 hη.1)
     (fun a ha b hb hab => by
       have h := sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupT hG hvd) ha.1 hb.1 hab
       convert h using 2)
@@ -260,14 +260,14 @@ theorem Hypothesis.sSet_sThree_coherent_dade_T [Finite G]
     hN
     (fun {φ ψ} hφ hψ =>
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
-        (hyp.dadeHypT hG hT2.1) (hyp.dadeHypT_hconj hG hT2.1) hφ.2 hψ.2)
+        (hyp.dadeHypT hG hTP) (hyp.dadeHypT_hconj hG hTP) hφ.2 hψ.2)
     (fun a ha b hb =>
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-        (hyp.dadeHypT hG hT2.1) (hyp.dadeHypT_hconj hG hT2.1)
+        (hyp.dadeHypT hG hTP) (hyp.dadeHypT_hconj hG hTP)
         (hsuppdiff a ha b hb)
         (Submodule.sub_mem _ (sSet_subset_ZIrr _ ha.1) (sSet_subset_ZIrr _ hb.1)))
     hsuppdiff
-    (fun {φ ξ} hφ hξ h1 h2 => hyp.sSet_memberRFamily_orthogonal_T hG hnoV pins hvd hT2 Tdata hU hW1 hW2 hφ.1 hξ.1 h1 h2)
+    (fun {φ ξ} hφ hξ h1 h2 => hyp.sSet_memberRFamily_orthogonal_T hG hnoV pins hvd hTP Tdata hU hW1 hW2 hφ.1 hξ.1 h1 h2)
     (fun a ha => (hS3deg a ha).trans (hS3deg χ₀ hχ₀).symm)
     (by
       rw [hS3deg χ₀ hχ₀]

@@ -144,7 +144,7 @@ theorem Hypothesis.coherentIndT_nuRow_diff [Finite G]
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
     (hvd : hyp.v * hyp.d ≠ 1)
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)
     (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
     (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd))
@@ -170,11 +170,11 @@ theorem Hypothesis.coherentIndT_nuRow_diff [Finite G]
   have hA0supp := hAsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
     (honestTypeP2ASet_subset_A0Set Tdata))
   rw [← map_sub, c.extends_on_supported _ hmemSpan, hyp.indT_apply,
-    ← hyp.tInstance_dade0_eq_induce hG hnoV hT2.1 Tdata hA0supp,
+    ← hyp.tInstance_dade0_eq_induce hG hnoV hTP Tdata hA0supp,
     show ((∑ j : Fin hyp.p, hyp.nu r j) - (∑ j : Fin hyp.p, hyp.nu s j))
       = ∑ j : Fin hyp.p, (hyp.nu r j - hyp.nu s j) from by rw [Finset.sum_sub_distrib],
     map_sum, Finset.sum_congr rfl (fun j _ =>
-      tauT_nu_cross hG hnoV hyp pins hT2 Tdata hU hW1 hW2 j hr hs hrs),
+      tauT_nu_cross hG hnoV hyp pins hTP Tdata hU hW1 hW2 j hr hs hrs),
     Finset.sum_sub_distrib]
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -194,7 +194,7 @@ theorem coherentIndT_image_inner_eta_eq_zero [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G))
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)
     (Tdata : TypePData hyp.T) (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     {S : Set (ClassFunction ↥hyp.T ℂ)}
     (hconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S)
@@ -224,16 +224,16 @@ theorem coherentIndT_image_inner_eta_eq_zero [Finite G]
       (OddOrder.Peterfalvi.S04.supportInSubgroup_mono (honestTypeP2ASet_subset_A0Set Tdata))
   -- `τ = Ind_T^G` equals the `A₀(T)`-Dade image on the `A₀(T)`-supported difference.
   have hmaps : hyp.indT (ζ - ζ.conj) =
-      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hT2.1 Tdata)
-        ((hyp.dadeHypT0 hG hT2.1 Tdata).fullDadeIsometryData
-          (hyp.dadeHypT0_hconj hG hT2.1 Tdata)) (ζ - ζ.conj) := by
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hTP Tdata)
+        ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData
+          (hyp.dadeHypT0_hconj hG hTP Tdata)) (ζ - ζ.conj) := by
     rw [hyp.indT_apply]
-    exact (hyp.tInstance_dade0_eq_induce hG hnoV hT2.1 Tdata hA0Supp).symm
+    exact (hyp.tInstance_dade0_eq_induce hG hnoV hTP Tdata hA0Supp).symm
   -- the coherent conjugate difference agrees with that Dade image.
   have hextDiff : coh.extension ζ - coh.extension ζ.conj =
-      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hT2.1 Tdata)
-        ((hyp.dadeHypT0 hG hT2.1 Tdata).fullDadeIsometryData
-          (hyp.dadeHypT0_hconj hG hT2.1 Tdata)) (ζ - ζ.conj) := by
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hTP Tdata)
+        ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData
+          (hyp.dadeHypT0_hconj hG hTP Tdata)) (ζ - ζ.conj) := by
     rw [← hmaps, ← coh.extends_on_supported (ζ - ζ.conj) hdiffSupported, map_sub]
   -- the crux: the difference vanishes on the saturated regular set.
   have hvanish : ∀ x ∈ OddOrder.GroupTheory.conjClassSet
@@ -241,7 +241,7 @@ theorem coherentIndT_image_inner_eta_eq_zero [Finite G]
       (coh.extension ζ - coh.extension ζ.conj) x = 0 := by
     intro x hx
     rw [hextDiff]
-    exact hyp.dadeT0_apply_eq_zero_of_regular hG hT2 Tdata hW1 hW2 hdiffSupp hx
+    exact hyp.dadeT0_apply_eq_zero_of_regular hG hTP Tdata hW1 hW2 hdiffSupp hx
   -- the straightforward `dirr`-input norms.
   have hpsiZ : coh.extension ζ ∈ ZIrr G :=
     coh.extension_mem_ZIrr ζ (Submodule.subset_span hζ)
@@ -277,7 +277,7 @@ theorem Hypothesis.coherentIndT_extension_irr_vanish_regular [Finite G]
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G))
     (hvd : hyp.v * hyp.d ≠ 1)
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)
     (Tdata : TypePData hyp.T) (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     (c : OddOrder.Peterfalvi.S07.IsCoherent hyp.indT
       (sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
@@ -289,7 +289,7 @@ theorem Hypothesis.coherentIndT_extension_irr_vanish_regular [Finite G]
     c.extension ξ x = 0 := by
   classical
   haveI := hyp.finiteG
-  have hcrux := coherentIndT_image_inner_eta_eq_zero hG hnoV hyp hT2 Tdata hW1 hW2
+  have hcrux := coherentIndT_image_inner_eta_eq_zero hG hnoV hyp hTP Tdata hW1 hW2
     (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupT hG hvd))
     (sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupT hG hvd) (hyp.oddCardT hG))
     (fun ζ hζ => by
@@ -317,7 +317,7 @@ theorem Hypothesis.coherentIndT_nuRow_vanish_regular [Finite G]
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
     (hvd : hyp.v * hyp.d ≠ 1)
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)
     (Tdata : TypePData hyp.T) (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd))
     (c : OddOrder.Peterfalvi.S07.IsCoherent hyp.indT
@@ -385,14 +385,14 @@ theorem Hypothesis.coherentIndT_nuRow_vanish_regular [Finite G]
       (honestTypeP2ASet_subset_A0Set Tdata))
   -- `c(γ)` is the honest `A₀(T)`-Dade image, vanishing at the regular `x`
   have hcγ : c.extension γ
-      = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hT2.1 Tdata)
-          ((hyp.dadeHypT0 hG hT2.1 Tdata).fullDadeIsometryData
-            (hyp.dadeHypT0_hconj hG hT2.1 Tdata)) γ := by
+      = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hTP Tdata)
+          ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData
+            (hyp.dadeHypT0_hconj hG hTP Tdata)) γ := by
     rw [c.extends_on_supported γ ⟨hγspan, hγsupp⟩, hyp.indT_apply,
-      hyp.tInstance_dade0_eq_induce hG hnoV hT2.1 Tdata hγA0supp]
+      hyp.tInstance_dade0_eq_induce hG hnoV hTP Tdata hγA0supp]
   have hcγx : c.extension γ x = 0 := by
     rw [hcγ]
-    exact hyp.dadeT0_apply_eq_zero_of_regular hG hT2 Tdata hW1 hW2 hγsupp hx
+    exact hyp.dadeT0_apply_eq_zero_of_regular hG hTP Tdata hW1 hW2 hγsupp hx
   -- expand `c(γ) = nξ·c(ν_i) − (p·v)·c(ξ)` and divide by `nξ`
   have hsplit : c.extension γ
       = (nξ : ℂ) • c.extension νrow - ((hyp.p * hyp.v : ℕ) : ℂ) • c.extension ξ := by
@@ -402,7 +402,7 @@ theorem Hypothesis.coherentIndT_nuRow_vanish_regular [Finite G]
     push_cast
     rfl
   have hξx : c.extension ξ x = 0 :=
-    hyp.coherentIndT_extension_irr_vanish_regular hG hnoV hvd hT2 Tdata hW1 hW2 c hξ hξirr hx
+    hyp.coherentIndT_extension_irr_vanish_regular hG hnoV hvd hTP Tdata hW1 hW2 c hξ hξirr hx
   have h0 : (nξ : ℂ) * c.extension νrow x = 0 := by
     have := hcγx
     rw [hsplit, ClassFunction.sub_apply, ClassFunction.smul_apply, ClassFunction.smul_apply,
@@ -461,7 +461,7 @@ theorem Hypothesis.coherentIndT_nuRow_pin_of_irr [Finite G]
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
     (hvd : hyp.v * hyp.d ≠ 1)
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)
     (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
     (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd))
@@ -501,17 +501,17 @@ theorem Hypothesis.coherentIndT_nuRow_pin_of_irr [Finite G]
       φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.T)
         (sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
         (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T) →
-      hyp.indT φ = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2.1)
-        ((hyp.dadeHypT hG hT2.1).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2.1)) φ :=
+      hyp.indT φ = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
+        ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP)) φ :=
     fun φ hφ => by
-      rw [hyp.indT_apply, hyp.tInstance_dade_eq_induce hG hnoV hT2.1 hφ.2]
+      rw [hyp.indT_apply, hyp.tInstance_dade_eq_induce hG hnoV hTP hφ.2]
   obtain ⟨E, hEsub, hEsum⟩ :=
-    hyp.sSet_coherent_extension_eq_sum_memberRFamily_T hG hnoV pins hvd hT2 Tdata hU hW1 hW2
+    hyp.sSet_coherent_extension_eq_sum_memberRFamily_T hG hnoV pins hvd hTP Tdata hU hW1 hW2
       (Set.Subset.refl _) (c.congrMap hagree) hνmem hνcmem
   have hEsum' : c.extension νrow = ∑ α ∈ E, α := hEsum
   -- the `R`-family image set: `{η_{ij}} ∪ {−η_{sj}}`
   obtain ⟨i', s', hi'eq, hs'eq, himg⟩ :=
-    hyp.sSet_memberRFamily_T_imageSet_of_red hG hnoV pins hvd hT2 Tdata hU hW1 hW2 hνmem hνred
+    hyp.sSet_memberRFamily_T_imageSet_of_red hG hnoV pins hvd hTP Tdata hU hW1 hW2 hνmem hνred
   have hi' : i' = i := by
     by_contra hne
     have h := hνrows i' i
@@ -594,7 +594,7 @@ theorem Hypothesis.coherentIndT_nuRow_pin_of_irr [Finite G]
   have hvanish : ∀ x ∈ OddOrder.GroupTheory.conjClassSet
       ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))),
       c.extension νrow x = 0 := fun x hx =>
-    hyp.coherentIndT_nuRow_vanish_regular hG hnoV pins hvd hT2 Tdata hW1 hW2 chief c
+    hyp.coherentIndT_nuRow_vanish_regular hG hnoV pins hvd hTP Tdata hW1 hW2 chief c
       hξ hξirr hi hx
   have hi0' : (⟨0, hyp.q_prime.pos⟩ : Fin hyp.q) ≠ i := fun h => hi h.symm
   have hs0' : (⟨0, hyp.q_prime.pos⟩ : Fin hyp.q) ≠ s := fun h => hs0 h.symm
@@ -745,7 +745,7 @@ theorem Hypothesis.coherentIndT_nuRow_eq_etaRow_of_pivot [Finite G]
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
     (hvd : hyp.v * hyp.d ≠ 1)
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)
     (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
     (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd))
@@ -762,7 +762,7 @@ theorem Hypothesis.coherentIndT_nuRow_eq_etaRow_of_pivot [Finite G]
     intro h; exact absurd (congrArg Fin.val h) one_ne_zero
   by_cases hiq : i = ⟨1, hyp.q_prime.one_lt⟩
   · subst hiq; exact hpivot
-  · have hdiff := hyp.coherentIndT_nuRow_diff hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief c
+  · have hdiff := hyp.coherentIndT_nuRow_diff hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief c
       hi hq1 hiq
     calc c.extension (∑ j : Fin hyp.p, hyp.nu i j)
         = (c.extension (∑ j : Fin hyp.p, hyp.nu i j)
@@ -792,7 +792,7 @@ theorem Hypothesis.exists_pinned_coherent_sSet_of_all_reducible_T [Finite G]
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
     (hvd : hyp.v * hyp.d ≠ 1)
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)
     (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
     (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd))
@@ -884,13 +884,13 @@ theorem Hypothesis.exists_pinned_coherent_sSet_of_all_reducible_T [Finite G]
     · have hAsupp := hyp.nuRow_diff_supported hG pins hvd chief hr0 hi1_0
       have hA0supp := hAsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
         (honestTypeP2ASet_subset_A0Set Tdata))
-      rw [hyp.indT_apply, ← hyp.tInstance_dade0_eq_induce hG hnoV hT2.1 Tdata hA0supp,
+      rw [hyp.indT_apply, ← hyp.tInstance_dade0_eq_induce hG hnoV hTP Tdata hA0supp,
         show ((∑ j : Fin hyp.p, hyp.nu r j)
             - (∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j))
           = ∑ j : Fin hyp.p, (hyp.nu r j - hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j) from by
           rw [Finset.sum_sub_distrib],
         map_sum, Finset.sum_congr rfl (fun j _ =>
-          tauT_nu_cross hG hnoV hyp pins hT2 Tdata hU hW1 hW2 j hr0 hi1_0 hr1),
+          tauT_nu_cross hG hnoV hyp pins hTP Tdata hU hW1 hW2 j hr0 hi1_0 hr1),
         Finset.sum_sub_distrib]
   -- the row-independent residual `r = η-row₁ − Ind_T^G(ν-row₁)`
   set r : ClassFunction G ℂ :=
@@ -1073,7 +1073,7 @@ theorem Hypothesis.sSet_coherent_indT_A_pinned [Finite G]
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
     (hvd : hyp.v * hyp.d ≠ 1)
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)
     (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
     (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd)) :
@@ -1093,13 +1093,13 @@ theorem Hypothesis.sSet_coherent_indT_A_pinned [Finite G]
   by_cases hirr : ∃ ξ ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd), IsIrreducibleCharacter ξ
   · -- has-irr: any inhabitant is pinned by the γ-trick dichotomy
     obtain ⟨ξ, hξ, hξirr⟩ := hirr
-    obtain ⟨c⟩ := hyp.sSet_coherent_indT_A hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+    obtain ⟨c⟩ := hyp.sSet_coherent_indT_A hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
     refine ⟨c, ?_⟩
-    rcases hyp.coherentIndT_nuRow_pin_of_irr hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief c
+    rcases hyp.coherentIndT_nuRow_pin_of_irr hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief c
         hξ hξirr hq1 with
       hclean | ⟨s, hs0, hs1, hsconj, hflip⟩
     · exact Or.inl fun i hi =>
-        hyp.coherentIndT_nuRow_eq_etaRow_of_pivot hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+        hyp.coherentIndT_nuRow_eq_etaRow_of_pivot hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
           c hclean hi
     · -- flipped pivot: `q = 3` is forced, and the two nonzero rows swap
       right
@@ -1109,7 +1109,7 @@ theorem Hypothesis.sSet_coherent_indT_A_pinned [Finite G]
       have hno3rd : ∀ i₂ : Fin hyp.q, i₂ ≠ ⟨0, hyp.q_prime.pos⟩ →
           i₂ ≠ ⟨1, hyp.q_prime.one_lt⟩ → i₂ ≠ s → False := by
         intro i₂ hi₂0 hi₂1 hi₂s
-        have hdiff := hyp.coherentIndT_nuRow_diff hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+        have hdiff := hyp.coherentIndT_nuRow_diff hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
           c hq1 hi₂0 (fun h => hi₂1 h.symm)
         -- inner the difference identity with the pivot `η`-row
         have hinner := congrArg (fun f => ClassFunction.inner f
@@ -1120,7 +1120,7 @@ theorem Hypothesis.sSet_coherent_indT_A_pinned [Finite G]
           hηrows ⟨1, hyp.q_prime.one_lt⟩ ⟨1, hyp.q_prime.one_lt⟩, if_pos rfl,
           hηrows i₂ ⟨1, hyp.q_prime.one_lt⟩, if_neg hi₂1] at hinner
         -- so `⟨c(ν_{i₂}), η-row₁⟩ = −p`; but the dichotomy at `i₂` gives `0`
-        rcases hyp.coherentIndT_nuRow_pin_of_irr hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief c
+        rcases hyp.coherentIndT_nuRow_pin_of_irr hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief c
             hξ hξirr hi₂0 with
           hc2 | ⟨s₂, hs₂0, hs₂i₂, hs₂conj, hc2⟩
         · rw [hc2, hηrows i₂ ⟨1, hyp.q_prime.one_lt⟩, if_neg hi₂1] at hinner
@@ -1181,7 +1181,7 @@ theorem Hypothesis.sSet_coherent_indT_A_pinned [Finite G]
         have his : i = s := Fin.ext (hiv.trans hsval.symm)
         have hi'p : i' = ⟨1, hyp.q_prime.one_lt⟩ := Fin.ext hi'v
         rw [his, hi'p]
-        have hdiff := hyp.coherentIndT_nuRow_diff hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+        have hdiff := hyp.coherentIndT_nuRow_diff hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
           c hq1 hs0 hs1.symm
         have : c.extension (∑ j : Fin hyp.p, hyp.nu s j)
             = c.extension (∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j)
@@ -1193,9 +1193,9 @@ theorem Hypothesis.sSet_coherent_indT_A_pinned [Finite G]
   · -- all-reducible: the constructed glue supplies the clean pin
     push Not at hirr
     obtain ⟨c, hpivot⟩ := hyp.exists_pinned_coherent_sSet_of_all_reducible_T hG hnoV pins hvd
-      hT2 Tdata hU hW1 hW2 chief hirr
+      hTP Tdata hU hW1 hW2 chief hirr
     exact ⟨c, Or.inl fun i hi =>
-      hyp.coherentIndT_nuRow_eq_etaRow_of_pivot hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+      hyp.coherentIndT_nuRow_eq_etaRow_of_pivot hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
         c hpivot hi⟩
 
 end OddOrder.Peterfalvi.S15
