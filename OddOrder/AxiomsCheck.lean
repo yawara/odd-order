@@ -130,7 +130,7 @@ import OddOrder.Peterfalvi.S12_Noncoherence
 import OddOrder.Peterfalvi.S12_TypeVCaseC
 import OddOrder.Peterfalvi.S13_TypeIIIGalois
 import OddOrder.Peterfalvi.S13_NonGaloisExclusion
-import OddOrder.Peterfalvi.S15_NuRowPin
+import OddOrder.Peterfalvi.S15_Tau1T
 import OddOrder.FeitThompson
 import OddOrder.BG.AppC_NormSet
 import OddOrder.BG.AppC_FrobeniusClassSum
@@ -8093,3 +8093,11 @@ row-independence. -/
   OddOrder.Peterfalvi.S15.Hypothesis.coherentIndT_nuRow_eq_etaRow_of_pivot
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S15.Hypothesis.exists_pinned_coherent_sSet_of_all_reducible_T
+
+/-! **(1.5.a)-at-`T` membership layer, axiom-clean** (lane b, 2026-07-14, issue 2035 #41 step
+5).  `Ind_K^T θ ∈ ℤ[𝒯]` for irreducible `θ` on `K = QD` with `Q ⊄ Ker θ` (two-stage induction
+through `T' = huSub`, constituent kernel transfer), and the degree-`0` `A(T)`-support of
+`ℤ[𝒯]`-elements. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.induce_K_mem_zSpan_T
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.zSpan_sSet_degree_zero_support_T
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.induce_K_mem_zSpan_sSet_irr_T

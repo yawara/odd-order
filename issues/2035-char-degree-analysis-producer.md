@@ -2246,3 +2246,67 @@ a-owned nuGridSupply のみ。
 CaseACoherence:870 — ⚠ [[lean-nonempty-some-erases-witness-pin]]: pin は Nonempty.some で
 消える、bundle 必須) → (5.3.b)-T ✓ (coherentIndT_image_inner_eta_eq_zero 済) → conjunct 4
 assembly (⟨η_{ij}, Ind(θT−ν_r)⟩ = −δ'[i=r])。
+
+## 2026-07-14 更新 #69 (lane b, /loop iter 32) — #41 step 5 前半: τ₁T bundling (S15_Tau1T.lean 新設)
+
+新 leaf S15_Tau1T.lean (build green; sorryAx = pinned carrier → refuter-T 経由の意図伝播、
+S 側 tau1S_ofHonest と同 profile):
+- `coherentIndT_pinned` (carrier .choose) / **`tau1T_ofHonest`** (.extension) /
+  `tau1T_ofHonest_nuRow_formula` (.choose_spec pin)
+- **`tau1T_ofHonest_nuRow_eta_row`** (per-row consumable 形): ∀ r ≠ 0, ∃ r' ≠ 0, δ' = ±1,
+  τ₁T(ν_r) = δ'·∑_j η_{r'j}。**設計発見: (13.4) θ-package の conjunct 3 は η-row index を
+  θ-row と別に量化する必要がある** — flip 分岐 (q=3) では τ₁T(ν_r) ≠ ±∑η_{rj} (行が真に
+  swap する) ため same-index 形は unprovable。下流の eta_cross_expansion 矛盾は「どこかの
+  nonzero 行」で足りるので split 量化が忠実 (consumer `lambda_forces_T_caseB_core` の
+  expansion brick は r を自由引数で受けており r' 化は無害 — 要 restate)。
+- `tau1T_ofHonest_extends_on_supported` ((13.2.e) 一致、conjunct 3 producer) /
+  `tau1T_ofHonest_image_inner_eta_eq_zero` ((5.3.b)-T at τ₁T、conjunct 4 producer)
+
+供給 producer 確認済: pins = hyp.nuGridSupply hG (sorried、a-owned 9096) / hvd =
+hyp.vd_ne_one hG / Tdata+hU+hW1+hW2 = reconciled_typePData_T choose / hT2 = SAndTBasic:192
+パターン / chief = exists_chiefFactorData。
+
+次 = θ-package assembly: `tSide_theta_package_of_not_caseB_core` の conjunct 3 を r'-量化に
+restate (consumer の expansion 呼び出しも r'-thread — 共に b-owned 同一 file) → ThetaWitness
+(Ind_K θ) の 𝒯-membership 接続 (conjunct 4 の (5.3.b) 適用に必要) → conjunct 2
+(indK_sub_nuRow_support ✓ #40) + 3 + 4 の組立。conjunct 5 (S/T cross) = step 6。
+
+## 2026-07-14 更新 #70 (lane b, /loop iter 33) — (1.5.a)-T membership 層 (θ-package 部材)
+
+S15_Tau1T.lean 376 行に追加 (全 sorry-free・axiom-clean・一発 build):
+- `zSpan_sSet_support_subset_T` / **`zSpan_sSet_degree_zero_support_T`** — ℤ[𝒯] の
+  A(T)∪{1} support + degree-0 ⟹ A(T)-support。**conjunct 3 の support 橋はこれで完結
+  ((QD)# ⊆ A(T) の直接橋は不要 — S 側と同じ zSpan+degree-0 ルート)**。
+- **`induce_K_mem_zSpan_T`** — Ind_K^T θ ∈ ℤ[𝒯] (θ irr on K=QD、Q ⊄ ker θ)。
+  induce_H_mem_zSpan_S の mirror: K ≤ T' (T_deriv_eq_QV)、hInHu = Q.subgroupOf T'
+  (toTypesIIIIIIVSetupT_H_eq)、constituent kernel 転送 (generic
+  constituent_P_not_subset_characterKernel、CaseACoherence import 追加)。
+
+残 (θ-package まで): `induce_K_mem_zSpan_sSet_irr_T` (irr 版 membership、S 版 =
+CharacterDegreeSupply:55 の mirror ~100 行; 反例列 = ν-row との直交) →
+`tau1T_ofHonest_zSpanIrr_inner_eta` (span 帰納 + (5.3.b)-T crux ✓) →
+`tau1T_ofHonest_induce_inner_eta` (conjunct 4 producer) → `tau1T_ofHonest_apply_induce_sub`
+(conjunct 3 producer; θ(1)=1 仮説版 — K-abelian 不要) → package 本体
+(conjunct 3 の r' 量化 restate + consumer thread + 組立)。
+
+## 2026-07-14 更新 #71 (lane b, /loop iter 34) — θ-package conjunct 2-4 producers 完備
+
+S15_Tau1T.lean 700 行 (build 一発 green):
+- **`induce_K_mem_zSpan_sSet_irr_T`** (sorry-free・axiom-clean): irr 版 membership —
+  Ind_K^T θ 自身が irr なら全 nonzero 係数 constituent が irr member (反例 = ν-row との
+  直交性 ⟨Ind θ, ν_i⟩ = 0 vs k·p > 0; S 版の μ→ν 機械 mirror)。
+- `tau1T_ofHonest_zSpanIrr_inner_eta` (span 帰納 + (5.3.b)-T crux)
+- **`tau1T_ofHonest_induce_inner_eta`** = conjunct 4 producer (τ₁T sorryAx profile)
+- **`tau1T_ofHonest_apply_induce_sub`** = conjunct 3 producer (θ(1)=1 明示仮説版 —
+  S 版の H-abelian 経由を回避、K-abelian 不要)
+
+**θ-package の τ₁ 側部材が全て揃った**: conjunct 2 = indK_sub_nuRow_support ✓ (#40) /
+conjunct 3 = apply_induce_sub ✓ + nuRow_eta_row ✓ (r'-形) / conjunct 4 = induce_inner_eta ✓。
+
+次 = package 本体組立 (CharacterDegreeSupply): (a) `tSide_theta_package_of_not_caseB_core` の
+conjunct 3 を「∃ r' ≠ 0」量化に restate + 供給 producer 束線 (pins = hyp.nuGridSupply hG
+[sorried a-owned] / hvd = vd_ne_one / Tdata 系 = reconciled_typePData_T / hT2 = SAndTBasic:192
+経由 / chief = exists_chiefFactorData / θ-witness = thetaWitness_of_not_caseB) →
+(b) consumer `lambda_forces_T_caseB_core` の hβform r'-thread → (c) conjunct 5 (S/T cross
+直交、step 6) は package 内で θG = τ₁T(θT) 形から導出予定 (τ₁λ ⊥ η-grid ✓ +
+disjoint-support h0 パターン)。CharacterDegreeSupply に import S15_Tau1T 追加要 (DAG ✓ 無循環)。
