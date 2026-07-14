@@ -1082,39 +1082,6 @@ theorem cyclotomic_divisor_facts {p q : ℕ} (hp : p.Prime) (hq : q.Prime)
     exact ⟨cyclotomic_quotient_coprime_of_not_modEq_one hp hq hpq,
       cyclotomic_quotient_dvd_modEq_one_of_not_modEq_one hp hq hpq⟩
 
-/-- **Peterfalvi (13.15)**: in case (9.7.b), `u` has the final cyclotomic
-value, depending on whether `p` is `1 mod q`. -/
-theorem caseB_order_u [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (caseB_for_S : Prop) :
-    caseB_for_S →
-      ((p_mod : hyp.p ≡ 1 [MOD hyp.q]) →
-          hyp.u = (hyp.p ^ hyp.q - 1) / (hyp.q * (hyp.p - 1))) ∧
-        (¬ (hyp.p ≡ 1 [MOD hyp.q]) →
-          hyp.u = (hyp.p ^ hyp.q - 1) / (hyp.p - 1)) := by
-  sorry
-
-/-- Carrier for the `u`-order conclusion in **Peterfalvi (13.15)** under
-case (9.7.b).  It packages the two congruence branches so Section 16 can carry
-the order data together with the case-(b) certificate. -/
-structure CaseBOrderUData (hyp : Hypothesis (G := G)) (caseB_for_S : Prop) where
-  caseB_holds : caseB_for_S
-  u_eq_of_p_modEq_one :
-    hyp.p ≡ 1 [MOD hyp.q] →
-      hyp.u = (hyp.p ^ hyp.q - 1) / (hyp.q * (hyp.p - 1))
-  u_eq_of_not_modEq_one :
-    ¬ hyp.p ≡ 1 [MOD hyp.q] →
-      hyp.u = (hyp.p ^ hyp.q - 1) / (hyp.p - 1)
-
-/-- Data form of **Peterfalvi (13.15)**, derived from `caseB_order_u`. -/
-theorem caseB_order_u_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) {caseB_for_S : Prop} (hcase : caseB_for_S) :
-    CaseBOrderUData hyp caseB_for_S := by
-  rcases caseB_order_u hG hyp caseB_for_S hcase with ⟨hmod, hnot⟩
-  exact
-    { caseB_holds := hcase
-      u_eq_of_p_modEq_one := hmod
-      u_eq_of_not_modEq_one := hnot }
-
 /-! ## The `(13.18.a)` `S′−P` vanishing input (`hmuD`)
 
 The second pointwise `μ`-value input of the exact `β`-support
@@ -1295,4 +1262,3 @@ theorem Hypothesis.mu_row0_apply_eq_zero_of_mem_derived_not_mem_P [Finite G]
 
 
 end OddOrder.Peterfalvi.S15
-
