@@ -1903,3 +1903,18 @@ caseB-T member-diff support の残り部材 `sSet_member_support_subset_A` T-mir
   A(T) = honestTypeP2ASet hyp.T (M-generic def) で S-side と同形。
 
 次 iteration: この 3 本 mirror → (5.7) engine assembly (`sSet_coherent_dade_caseB`-T)。
+
+## 2026-07-14 更新 #48 (lane b, /loop iter 9) — (4.7)-T support 3 本 landed
+
+TSideDegrees (sorry-free、一発 build):
+- **`sSet_member_support_subset_A_T`**: 𝒯-member source の support ⊆ A(T) ∪ {1}。#47 の経路
+  通り — type-II 等号の代わりに `maxNilpotentNormalHall_le_Msigma` (≤ で十分、type III OK)。
+- **`sSet_member_support_subset_T`** (full-family form)
+- **`sSet_caseB_member_diff_supported_T`**: uniform degree #45 + support → member 差は
+  A(T)-supported ((5.7) engine の hsuppdiff 入力)。
+
+caseB-T 残り: per-member R-family (S-side `S15_SSetMemberRFamily` — irr branch =
+dadeOrthonormalCharacterImageFamilyOfDiff 系、red branch = route-B tauS_mu_cross、S-side 自身に
+residual あり) + `sSet_coherent_dade_caseB`-T ((5.7) engine) + congrMap Ind 再接地。
+R-family は dadeHypT0 (hT2/Tdata パラメトリック) 依存の可能性 — S-side の dadeHypS 依存構造の
+確認から。
