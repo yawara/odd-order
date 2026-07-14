@@ -1142,4 +1142,61 @@ theorem Hypothesis.dadeHypT_hconj [Fintype G] [Finite G]
     (hyp.dadeHypT hG hT2).HConjInvariant :=
   (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.T_maximal hT2).some.hconj
 
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **(5.3.a)-at-`T` per-member difference support** (mirror of `sSet_member_diffsupp`): for a
+`𝒯`-member source `Ind_{HU}^T ξ`, the conjugate difference is `A(T)`-supported — the support
+lands in `A(T) ∪ {1}` (`sSet_member_support_subset_A_T`) and the value at `1` is the real
+positive degree, so `1` drops out.  The `hdiffsupp` half of the irreducible `R`-datum. -/
+theorem Hypothesis.sSet_member_diffsupp_T [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1)
+    {ξ : OddOrder.RepresentationTheory.IrreducibleCharacter
+      ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd))}
+    (hξ : ξ ∈ xiSet (hyp.toTypesIIIIIIVSetupT hG hvd)) :
+    ((induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
+          (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)).conj
+        - induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
+          (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)).support
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
+  set φ : ClassFunction ↥hyp.T ℂ :=
+    induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
+      (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ) with hφ
+  have hsupp_eq : φ.conj.support = φ.support := by
+    ext y
+    simp only [ClassFunction.mem_support, ne_eq, ClassFunction.conj_apply, star_eq_zero]
+  intro x hx
+  have hx0 : (φ.conj - φ) x ≠ 0 := hx
+  have hxsupp : x ∈ φ.support := by
+    have hxU := ClassFunction.support_sub_subset _ _ hx
+    rwa [hsupp_eq, Set.union_self] at hxU
+  rcases hyp.sSet_member_support_subset_A_T hG hvd hξ (hφ ▸ hxsupp) with h | h
+  · exact h
+  · exfalso
+    rw [Set.mem_singleton_iff] at h
+    subst h
+    obtain ⟨d, _, hd⟩ :=
+      OddOrder.RepresentationTheory.irreducibleCharacter_apply_one_eq_pos_natCast ξ
+    apply hx0
+    rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hφ, induceHU_apply_one_eq_q_mul, hd,
+      star_mul', star_natCast, star_natCast, sub_self]
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **Conjugate-difference support for `𝒯`-members** (mirror of
+`sSet_member_conjDiff_supported`): case-agnostic — a member and its conjugate share the real
+positive degree, so `(η̄ − η).support ⊆ A(T)`.  The diff-support input of the irreducible
+`R`-family, serving both Clifford cases. -/
+theorem Hypothesis.sSet_member_conjDiff_supported_T [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1)
+    {η : ClassFunction ↥hyp.T ℂ} (hη : η ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd)) :
+    ((η : ClassFunction ↥hyp.T ℂ).conj - η).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
+  haveI := hyp.finiteG
+  letI : Fintype G := Fintype.ofFinite G
+  obtain ⟨ξ, hξ, rfl⟩ := hη
+  exact hyp.sSet_member_diffsupp_T hG hvd hξ
+
 end OddOrder.Peterfalvi.S15

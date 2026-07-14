@@ -1958,3 +1958,17 @@ hT2 param) / `dadeHypT_hconj`。
 残: per-member R-family (irr branch = `dadeCharacterDifferenceImageOfDiff` over dadeHypT +
 `sSet_member_diffsupp`-T; red branch = route-B tauT_nu_cross) → `sSet_coherent_dade_caseB`-T
 assembly (hT2-パラメトリック)。
+
+## 2026-07-14 更新 #51 (lane b, /loop iter 12) — R-family irr-branch 入力 2 本 landed
+
+TSideDegrees (sorry-free、一発 build): **`sSet_member_diffsupp_T`** ((5.3.a)-T per-member 差
+support — support ⊆ A(T)∪{1} #48 + degree 実正値で 1 除去) + **`sSet_member_conjDiff_supported_T`**
+(case-agnostic conjugate-diff support)。
+
+⟹ irr branch の R-datum は `dadeOrthonormalCharacterImageFamilyOfDiff (dadeHypT hG hT2)
+(dadeHypT_hconj) ⟨η,hirr⟩ (no-real via oddCardT) (conjDiff_supported_T)` で組める。
+残: red branch (route-B `tauT_nu_cross` — S15_BridgeCharacter `tauS_mu_cross` の T-mirror、
+pins.nu_apply_of_not_mem_W1 + eta_diff_rigidity 系; dadeHypT0 との dade=Ind 橋も) →
+`sSet_memberRFamily_T` dispatch → `_orthogonal` → engine assembly。route-B は
+S16_GridExpansion 下流ゆえ **置き場所は TSideDegrees 不可** (S16_GridExpansion → S15_SAndT_Setup
+逆依存確認要) — S15_SSetMemberRFamily に同居 or 新 leaf `S15_TSetMemberRFamily`。
