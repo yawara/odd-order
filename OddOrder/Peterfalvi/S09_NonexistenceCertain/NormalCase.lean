@@ -449,6 +449,139 @@ theorem chiRho_norm_sq_double_sum (H76 : Hypothesis76 G A L)
   refine Finset.sum_congr rfl fun j _ => ?_
   ring
 
+open scoped Classical in
+/-- **The abelian rebase identity for the (7.6) family** (issue 2035 #79/#80): when the normal
+`H` is abelian (all its irreducible characters are linear), the family `(ζ_i)` — which
+enumerates the distinct induced irreducibles bijectively (`zeta_injective` /
+`zeta_family_cover`) — satisfies `∑_i ζ_i(x)/‖ζ_i‖² = 0` at every `x ≠ 1`.  The
+`Hypothesis76`-level packaging of `sum_image_induce_div_normSq_apply_eq_zero`. -/
+theorem zeta_sum_div_normSq_apply_eq_zero (H76 : Hypothesis76 G A L)
+    (hab : haveI : Fintype ↥(H76.H.subgroupOf L) := Fintype.ofFinite _
+      ∀ θ : IrreducibleCharacter ↥(H76.H.subgroupOf L),
+        θ.toClassFunction (1 : ↥(H76.H.subgroupOf L)) = 1)
+    {x : L} (hx : x ≠ 1) :
+    ∑ i : Fin (H76.n + 1), H76.zeta i x / H76.zetaNormSq i = 0 := by
+  classical
+  letI : Fintype ↥(H76.H.subgroupOf L) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥(H76.H.subgroupOf L) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : (H76.H.subgroupOf L).Normal := by
+    refine ⟨fun h hmem l => ?_⟩
+    rw [Subgroup.mem_subgroupOf] at hmem ⊢
+    exact H76.H_normal_in_L l hmem
+  -- the ζ-enumeration is the image of `Irr H` under induction
+  have himg : (Finset.univ : Finset (Fin (H76.n + 1))).image H76.zeta
+      = (Finset.univ : Finset (IrreducibleCharacter ↥(H76.H.subgroupOf L))).image
+          (fun θ => OddOrder.RepresentationTheory.ClassFunction.induce
+            (H76.H.subgroupOf L) θ.toClassFunction) := by
+    ext φ
+    simp only [Finset.mem_image, Finset.mem_univ, true_and]
+    constructor
+    · rintro ⟨i, rfl⟩
+      obtain ⟨θ, hθ⟩ := H76.zeta_induced i
+      exact ⟨θ, hθ.symm⟩
+    · rintro ⟨θ, rfl⟩
+      obtain ⟨i, hi⟩ := H76.zeta_family_cover θ
+      exact ⟨i, hi⟩
+  calc ∑ i : Fin (H76.n + 1), H76.zeta i x / H76.zetaNormSq i
+      = ∑ i : Fin (H76.n + 1),
+          (fun φ : OddOrder.RepresentationTheory.ClassFunction ↥L ℂ =>
+            φ x / ClassFunction.inner φ φ) (H76.zeta i) :=
+        Finset.sum_congr rfl fun i _ => by rw [zetaNormSq]
+    _ = ∑ φ ∈ (Finset.univ : Finset (Fin (H76.n + 1))).image H76.zeta,
+          φ x / ClassFunction.inner φ φ := by
+        rw [Finset.sum_image (fun i _ j _ h => H76.zeta_injective h)]
+    _ = ∑ φ ∈ (Finset.univ : Finset (IrreducibleCharacter ↥(H76.H.subgroupOf L))).image
+          (fun θ => OddOrder.RepresentationTheory.ClassFunction.induce
+            (H76.H.subgroupOf L) θ.toClassFunction),
+          φ x / ClassFunction.inner φ φ := by rw [himg]
+    _ = 0 :=
+        OddOrder.RepresentationTheory.sum_image_induce_div_normSq_apply_eq_zero
+          (H := H76.H.subgroupOf L) hab hx
+
+open scoped Classical in
+/-- **The rebased (7.7.a)** (Peterfalvi (13.5.a); issue 2035 #79/#80): for an abelian `H` the
+(7.7.a) decomposition can be re-based at any family index `i₀ ≠ 0` — the coefficients become
+the *differences* `c_i − c_{i₀}` (computable through τ₁-coherence for `P`-non-kernel *pairs*,
+unlike the trivial-base absolute coefficients), at the cost of one explicit `ζ_0`-term with
+coefficient `−c̄_{i₀}`:
+
+`χ^ρ(x) = ∑_{i ≥ 1, i ≠ i₀} ((c̄_i − c̄_{i₀})/‖ζ_i‖²)·ζ_i(x) − (c̄_{i₀}/‖ζ_0‖²)·ζ_0(x)`.
+
+Follows from the base-`0` certificate (`chiRho_decomp`) by adding `c̄_{i₀}` times the abelian
+rebase identity (`zeta_sum_div_normSq_apply_eq_zero`). -/
+theorem chiRho_decomp_rebased (H76 : Hypothesis76 G A L)
+    (hab : haveI : Fintype ↥(H76.H.subgroupOf L) := Fintype.ofFinite _
+      ∀ θ : IrreducibleCharacter ↥(H76.H.subgroupOf L),
+        θ.toClassFunction (1 : ↥(H76.H.subgroupOf L)) = 1)
+    (i₀ : Fin (H76.n + 1)) (hi₀ : 0 < i₀)
+    (χ : ClassFunction G ℂ) {x : L} (hxA : (x : G) ∈ A) :
+    H76.hyp71.chiRho χ x =
+      (∑ i ∈ (Finset.Ioi (0 : Fin (H76.n + 1))).erase i₀,
+        (star (H76.cCoeff χ i - H76.cCoeff χ i₀) / H76.zetaNormSq i) * H76.zeta i x)
+      - (star (H76.cCoeff χ i₀) / H76.zetaNormSq 0) * H76.zeta 0 x := by
+  classical
+  have hx1 : x ≠ 1 := by
+    intro h
+    apply H76.one_not_mem_A
+    rw [h] at hxA
+    simpa using hxA
+  have hzero := H76.zeta_sum_div_normSq_apply_eq_zero hab hx1
+  -- split `univ = insert 0 (Ioi 0)` and `Ioi 0 = insert i₀ ((Ioi 0).erase i₀)`
+  have huniv : (Finset.univ : Finset (Fin (H76.n + 1)))
+      = insert (0 : Fin (H76.n + 1)) (Finset.Ioi 0) := by
+    ext j
+    simp only [Finset.mem_univ, Finset.mem_insert, Finset.mem_Ioi, true_iff]
+    rcases eq_or_ne j 0 with h | h
+    · exact Or.inl h
+    · exact Or.inr (Fin.pos_iff_ne_zero.mpr h)
+  have h0notIoi : (0 : Fin (H76.n + 1)) ∉ Finset.Ioi (0 : Fin (H76.n + 1)) := by
+    simp
+  have hIoi : Finset.Ioi (0 : Fin (H76.n + 1))
+      = insert i₀ ((Finset.Ioi (0 : Fin (H76.n + 1))).erase i₀) :=
+    (Finset.insert_erase (Finset.mem_Ioi.mpr hi₀)).symm
+  have hi₀mem : i₀ ∉ (Finset.Ioi (0 : Fin (H76.n + 1))).erase i₀ := by
+    simp
+  -- the rebase identity, split along the same decomposition
+  have hzero' : H76.zeta 0 x / H76.zetaNormSq 0
+      + (H76.zeta i₀ x / H76.zetaNormSq i₀
+        + ∑ i ∈ (Finset.Ioi (0 : Fin (H76.n + 1))).erase i₀,
+            H76.zeta i x / H76.zetaNormSq i) = 0 := by
+    calc H76.zeta 0 x / H76.zetaNormSq 0
+        + (H76.zeta i₀ x / H76.zetaNormSq i₀
+          + ∑ i ∈ (Finset.Ioi (0 : Fin (H76.n + 1))).erase i₀,
+              H76.zeta i x / H76.zetaNormSq i)
+        = ∑ i : Fin (H76.n + 1), H76.zeta i x / H76.zetaNormSq i := by
+          rw [huniv, Finset.sum_insert h0notIoi, hIoi, Finset.sum_insert hi₀mem,
+            Finset.erase_insert hi₀mem]
+      _ = 0 := hzero
+  -- expand the base-`0` certificate along `Ioi 0 = {i₀} ∪ ((Ioi 0).erase i₀)`
+  rw [H76.chiRho_explicit_formula χ hxA]
+  conv_lhs => rw [hIoi, Finset.sum_insert hi₀mem]
+  -- pure algebra: subtract `star c_{i₀} ·` (rebase identity)
+  have hexp : ∀ i ∈ (Finset.Ioi (0 : Fin (H76.n + 1))).erase i₀,
+      (star (H76.cCoeff χ i - H76.cCoeff χ i₀) / H76.zetaNormSq i) * H76.zeta i x
+        = (star (H76.cCoeff χ i) / H76.zetaNormSq i) * H76.zeta i x
+          - star (H76.cCoeff χ i₀) * (H76.zeta i x / H76.zetaNormSq i) := by
+    intro i _
+    rw [star_sub]
+    ring
+  have hRHS : ∑ i ∈ (Finset.Ioi (0 : Fin (H76.n + 1))).erase i₀,
+      (star (H76.cCoeff χ i - H76.cCoeff χ i₀) / H76.zetaNormSq i) * H76.zeta i x
+      = (∑ i ∈ (Finset.Ioi (0 : Fin (H76.n + 1))).erase i₀,
+          (star (H76.cCoeff χ i) / H76.zetaNormSq i) * H76.zeta i x)
+        - star (H76.cCoeff χ i₀)
+            * ∑ i ∈ (Finset.Ioi (0 : Fin (H76.n + 1))).erase i₀,
+                H76.zeta i x / H76.zetaNormSq i := by
+    rw [Finset.mul_sum, ← Finset.sum_sub_distrib]
+    exact Finset.sum_congr rfl hexp
+  have hrearr : ∑ i ∈ (Finset.Ioi (0 : Fin (H76.n + 1))).erase i₀,
+      H76.zeta i x / H76.zetaNormSq i
+      = -(H76.zeta 0 x / H76.zetaNormSq 0) - H76.zeta i₀ x / H76.zetaNormSq i₀ := by
+    linear_combination hzero'
+  rw [hRHS, hrearr]
+  ring
+
 end Hypothesis76
 
 end Section_7_6_to_7_7
