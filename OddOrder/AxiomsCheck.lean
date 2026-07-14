@@ -8230,14 +8230,17 @@ explicit inputs, so this capstone does not use the issue-0116 analytic producer.
 /-! **Peterfalvi (14.6), S-side Galois-field model.**  In Clifford case (9.7.b),
 the §9 Singer realization transports from the chief quotient to the named groups
 `P` and `U` because `H₀ = ⊥`, `H = P`, and `C_U(P) = 1`.  The branch-independent
-endpoint eliminates case (9.7.a) using the prime contradiction above.  Its sharp
-parameters and type-I-over-normalizer carrier remain explicit, so no issue-0116
-analytic producer is hidden. -/
+endpoint eliminates case (9.7.a) using the prime contradiction above.  The sharp
+parameters are required only conditionally on an actual case-(a) certificate;
+that producer and the type-I-over-normalizer carrier remain explicit, so no
+issue-0116 analytic producer is hidden. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S15.Hypothesis.U_le_normalizer_P
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S15.Hypothesis.conj_mem_P
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S15.caseB_exists_sSide_galoisField_repr_of_c_eq_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.sSide_galoisField_repr_of_c_eq_one_and_caseA_parameters
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S15.sSide_galoisField_repr_of_parameters_and_typeIOverNormalizerData
