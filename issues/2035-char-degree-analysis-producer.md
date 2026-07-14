@@ -2003,3 +2003,18 @@ S16_GridExpansion 下流ゆえ **置き場所は TSideDegrees 不可** (S16_Grid
 
 ⟹ `tauT_nu_cross` の依存 5 点が**全て**揃った (残るは本体 assembly + swap-transpose rigidity
 のみ、~80 行、置き場所 = S15_BridgeCharacter)。次 iteration で cross-T 本体。
+
+## 2026-07-14 更新 #54 (lane b, /loop iter 15) — ✅ tauT_nu_cross landed (red branch の核心)
+
+**`tauT_nu_cross`** (S15_BridgeCharacter、sorry-free、一発 build):
+τ_T⁰(ν_{r,j} − ν_{s,j}) = η_{r,j} − η_{s,j} (列固定・行差、r≠s 両方 ≠0)。
+- norm-2 ZIrr: pins.nu_irreducible/nu_orthonormal + tauT_nu_diff_support + generic S07 isometry
+- regular-set 一致: tauT_nu_vanish_on_V (#53)
+- **(3.8) rigidity は swap-transpose**: `eta_diff_rigidity (hyp.swap hT2 hV Tdata … pins)` —
+  swap の η-grid が transpose なので行固定形がそのまま列固定形に。swap 構造 field の
+  coercion 同一性 (W/W1/W2) は **rfl で通った** (defeq)。hV = isMulCommutative_V_unconditional。
+
+red branch 残り: rows_ne-T (conj 行相異) → `sSet_reducible_memberRFamily_T`
+(cross の ν-row 総和 → 2p-element OrthonormalCharacterImageFamily、S-side
+`sSet_reducible_memberRFamily_ofColumns` mirror) → dispatch (`sSet_memberRFamily_T`) →
+`_orthogonal` → (5.7) engine assembly。
