@@ -874,4 +874,99 @@ noncomputable def Hypothesis.sSetIrrDegT_coherent [Fintype G] [Finite G]
   exact OddOrder.Peterfalvi.S07.coherent_subset_of_constant_degree hyp'
     (subset_refl _) hyp'.conjugate_closed hSfin h2 hirr hZIrr hconst hdeg0 h1A hsuppdiff
 
+open OddOrder.Peterfalvi.S11 in
+/-- **(9.11) base cardinality `2 ≤ (S₁(p·a)).ncard` for the `T`-instance** (mirror of
+`sSetIrrDeg_qa_two_le_ncard` — the honest discharge of `sSetIrrDegT_coherent`'s exposed `h2` at
+the caseA-`T` base degree `d = p·a`, where `p = (setupT).q = |W₁(T)|` is the `T`-side Frobenius
+prime).
+
+The single member comes from the §9-generic positive (9.8.d) count `caseA_exists_irreducible_qa`
+applied to the `T`-instance character data; its witness lies in `𝒮(H₀C') ⊆ 𝒯` (`sOf_subset_sSet`),
+and conjugate-closure (`sSetIrrDegT_closedUnderConjugate`, `p·a` a positive real) plus
+non-realness (`sSetIrrDegT_hasNoRealCharacters`, from `|T|` odd) double it.  In the Galois case
+(caseB-`T`) the whole family is uniform of degree `p·v`, coherent directly by
+`sSet_coherent_dade_caseB_T` — no base count is needed there. -/
+theorem Hypothesis.sSetIrrDegT_pa_two_le_ncard [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1)
+    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd)}
+    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupT hG hvd) chief)
+    (caseA : CliffordCaseAData chars) :
+    2 ≤ (hyp.sSetIrrDegT hG hvd
+        (((hyp.toTypesIIIIIIVSetupT hG hvd).q * caseA.a : ℕ) : ℂ)).ncard := by
+  classical
+  -- (9.8.d) existence of one degree-`p·a` irreducible member of `𝒮(H₀C') ⊆ 𝒯`.
+  obtain ⟨χ, hχSOf, hχirr, hχdeg⟩ := caseA_exists_irreducible_qa hG chars caseA
+  set d : ℂ := (((hyp.toTypesIIIIIIVSetupT hG hvd).q * caseA.a : ℕ) : ℂ) with hd_def
+  have hd : star d = d := by rw [hd_def]; exact star_natCast _
+  rw [chars.SOf_eq] at hχSOf
+  have hχ : χ ∈ hyp.sSetIrrDegT hG hvd d :=
+    ⟨sOf_subset_sSet _ _ hχSOf, hχirr, hχdeg⟩
+  -- `χ̄ ∈ S₁(d)` (conj-closed) and `χ ≠ χ̄` (no real members).
+  have hχc : χ.conj ∈ hyp.sSetIrrDegT hG hvd d :=
+    hyp.sSetIrrDegT_closedUnderConjugate hG hvd d hd hχ
+  have hne : χ ≠ χ.conj := fun heq =>
+    hyp.sSetIrrDegT_hasNoRealCharacters hG hvd d hχ heq.symm
+  -- `{χ, χ̄} ⊆ S₁(d)` has two distinct members.
+  calc 2 = ({χ, χ.conj} : Set (ClassFunction ↥hyp.T ℂ)).ncard := (Set.ncard_pair hne).symm
+    _ ≤ (hyp.sSetIrrDegT hG hvd d).ncard :=
+        Set.ncard_le_ncard (Set.insert_subset hχ (Set.singleton_subset_iff.mpr hχc))
+          (hyp.sSetIrrDegT_finite hG hvd d)
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **(9.11) base coherence of `S₁(d)`-`T` on `Ind_T^G`** (mirror of `sSetIrrDeg_coherent_indS`):
+the (13.2.e)-at-`T` re-grounding of `sSetIrrDegT_coherent` off the honest `T`-Dade map onto plain
+induction `indT`.  On the `zSupportedSpan` of an `A(T)`-supported family the Dade map *is*
+`Ind_T^G` (`tInstance_dade_eq_induce`, from the trivial-stabilizer computation
+`forall_dadeHypT_H_eq_bot`), so the general `S07.IsCoherent.congrMap` re-targets the coherence
+with no further analytic input.  All finiteness instances are taken from the `FiniteInduce`
+scope, so the `Ind_T^G` produced here (via `indT`) and the one `tInstance_dade_eq_induce` names
+share the *same* `Fintype ↥T` instance. -/
+theorem Hypothesis.sSetIrrDegT_coherent_indT [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1)
+    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (d : ℂ) (hd : star d = d) (hd0 : d ≠ 0)
+    (h2 : 2 ≤ (hyp.sSetIrrDegT hG hvd d).ncard) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.indT
+      (hyp.sSetIrrDegT hG hvd d)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T)) :=
+  (hyp.sSetIrrDegT_coherent hG hvd hT2 d hd hd0 h2).map fun c =>
+    c.congrMap fun φ hφ => by
+      rw [hyp.indT_apply]
+      exact hyp.tInstance_dade_eq_induce hG hnoV hT2 hφ.2
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **(9.11) caseA-`T` base coherence of `S₁(p·a)` on `Ind_T^G`, fully un-gated** (mirror of
+`sSetIrrDeg_qa_coherent_indS_caseA` — the `h0` entry point of the caseA-`T` pair-adjoining
+lift).  Combines the uniform base coherence `sSetIrrDegT_coherent_indT` with the base-count
+discharge `sSetIrrDegT_pa_two_le_ncard`, so the exposed `hd`/`hd0`/`h2` parameters are all
+discharged from the `T`-instance §9 caseA data: `star (p·a) = p·a` (positive real,
+`star_natCast`), `p·a ≠ 0` (`(setupT).q > 0` = `Nat.card_pos`, `caseA.a_pos`), and `2 ≤ ncard`
+(the (9.8.d) count + conjugacy doubling).
+
+This is the base coherence Peterfalvi's (9.11) pair-adjoining induction starts from, for the
+honest type-`P₂` `T` in the non-Galois case.  In the Galois case (caseB-`T`) the whole family is
+uniform of degree `p·v`, coherent directly by `sSet_coherent_dade_caseB_T` (no lift). -/
+theorem Hypothesis.sSetIrrDegT_pa_coherent_indT_caseA [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1)
+    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd)}
+    (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupT hG hvd) chief)
+    (caseA : CliffordCaseAData chars) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.indT
+      (hyp.sSetIrrDegT hG hvd (((hyp.toTypesIIIIIIVSetupT hG hvd).q * caseA.a : ℕ) : ℂ))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T)) := by
+  have hqpos : 0 < (hyp.toTypesIIIIIIVSetupT hG hvd).q := Nat.card_pos
+  exact hyp.sSetIrrDegT_coherent_indT hG hnoV hvd hT2 _ (star_natCast _)
+    (Nat.cast_ne_zero.mpr (Nat.mul_ne_zero hqpos.ne' caseA.a_pos.ne'))
+    (hyp.sSetIrrDegT_pa_two_le_ncard hG hvd chars caseA)
+
 end OddOrder.Peterfalvi.S15

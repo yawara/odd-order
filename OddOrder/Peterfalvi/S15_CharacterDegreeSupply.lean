@@ -506,18 +506,6 @@ theorem Hypothesis.mu_j_isIndPC_not_ker [Finite G]
     χ.isIrreducible x.2 hxkerInd
   simpa using h
 
-open scoped FiniteInduce in
-/-- **`Ind_T^G` as an `IntegralCharacterMap ↥T G`** — the `T`-side mirror of `Hypothesis.indS`.
-Used as the (unconstrained) `tau1T` of the λ-free core until the ν-side (13.2.e)-T coherence
-lands (`nuGridSupply`, gated on the a-owned FT-layer carrier threading). -/
-noncomputable def Hypothesis.indT [Finite G] (hyp : Hypothesis (G := G)) :
-    OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥hyp.T G :=
-  LinearMap.restrictScalars ℤ
-    ({ toFun := ClassFunction.induce hyp.T
-       map_add' := ClassFunction.induce_add hyp.T
-       map_smul' := fun c θ => ClassFunction.induce_smul hyp.T c θ } :
-      ClassFunction ↥hyp.T ℂ →ₗ[ℂ] ClassFunction G ℂ)
-
 /-- **Peterfalvi (13.3.c), the `T`-side signs `δ'_i = 1`** — the δ'-half of the
 `delta_eq_one` field.
 

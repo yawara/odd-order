@@ -588,6 +588,24 @@ open scoped FiniteInduce in
     (θ : ClassFunction ↥hyp.S ℂ) :
     hyp.indS θ = ClassFunction.induce hyp.S θ := rfl
 
+open scoped FiniteInduce in
+/-- **`Ind_T^G` as an `IntegralCharacterMap ↥T G`** — the `T`-side mirror of `Hypothesis.indS`.
+Used as the (unconstrained) `tau1T` of the λ-free core until the ν-side (13.2.e)-T coherence
+lands (`nuGridSupply`, gated on the a-owned FT-layer carrier threading), and as the re-grounded
+target of the caseA-`T` (9.11) base coherence (`sSetIrrDegT_coherent_indT`). -/
+noncomputable def Hypothesis.indT [Finite G] (hyp : Hypothesis (G := G)) :
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥hyp.T G :=
+  LinearMap.restrictScalars ℤ
+    ({ toFun := ClassFunction.induce hyp.T
+       map_add' := ClassFunction.induce_add hyp.T
+       map_smul' := fun c θ => ClassFunction.induce_smul hyp.T c θ } :
+      ClassFunction ↥hyp.T ℂ →ₗ[ℂ] ClassFunction G ℂ)
+
+open scoped FiniteInduce in
+@[simp] theorem Hypothesis.indT_apply [Finite G] (hyp : Hypothesis (G := G))
+    (θ : ClassFunction ↥hyp.T ℂ) :
+    hyp.indT θ = ClassFunction.induce hyp.T θ := rfl
+
 /-- **`C' = [C, C]` as a subgroup** (Peterfalvi (9.5), `S`-instance): the derived subgroup of
 `C = C_U(P)`.  Definitionally matches the §9 `cprimeSub` (`= derivedInG (cSub …)`) once the
 `S`-instance kernel `cSub = C` identification (`toTypesIIIIIIVSetupS_cSub_eq_C`) is applied. -/
