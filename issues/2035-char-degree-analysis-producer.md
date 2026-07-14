@@ -1612,3 +1612,45 @@ landing したら un-gate 波及 (tSide_theta_package/deltaPrime_T) を検出し
 **session 総括 (2026-07-14 大量 landing)**: TTypeII 移行 + dichotomy keystone + translation API +
 S-side (13.3.b) forward gate 完全証明 (caseA + caseB pair-Clifford、3 subagent + 自己検証)。
 9094 の S-side deliverable 達成。
+
+## 2026-07-14 更新 #37 (lane b, /loop) — T-side 再開: deltaPrime_eq_one_T 完全 assembly 化 (9096 split 後続)
+
+9096 bundle split (ruling item 2) 完了後、T-side (13.3.c) を再開。新 leaf
+`S15_SAndT_Setup/TSideDegrees.lean` に S-side (13.3) 度数/counting 層の T-mirror を実証明:
+
+- **`v_modEq_one`** (Pf「As (V/D)W₂ is a Frobenius group, v ≡ 1 (mod p)」): `u_modEq_one` の
+  完全 mirror。reconciled_typePData_T の tpd で `typeP_uW1_frobenius` → Isaacs 6.1
+  `card_range_comp_subtype_modEq_one` → kernel = D (`D_eq`)、`|V| = vd`。**genuine 証明**。
+- **`vd_ne_one`**: nontriviality を無仮定で導出 (T_nonI 4 択 + II/III/IV witness の
+  `common.1` + `card_U_eq_index` witness 独立性 + type V は proven `no_typeV_maximal_unconditional`
+  (Pf 10.10) で排除)。`toTypesIIIIIIVSetupT` の `hvd` 入力もこれで discharge 可能に。
+- **`K_le_T` / `card_K_val` (|K| = |Q|·d) / `K_index_eq_vp` ([T:K] = v·p)**: `card_H_eq` /
+  `H_index_eq_uq` mirror。**key: Fitting order |Q| は約分で消える**ので (14.9)-gated な
+  `|Q| = q^p` (card_Q_eq) 不要。
+- **`nu_apply_one_row_const`**: `nu_definition` (honest field) 経由の行内 degree 定数性。
+- **`nu_rowSum_not_irreducible`** (pins 引数): p ≥ 2 distinct irr の和。
+- **`deltaPrime_eq_one_of_ne_zero_T`** (pins 引数): (4.3.d)-T congruence + v ≡ 1 + δ' = ±1 +
+  p odd ≥ 3 の完全 assembly。
+
+`deltaPrime_eq_one_T` (S15_CharacterDegreeSupply:528) の **sorry を除去**し、anchor
+(`pins.deltaPrime_zero_eq_one`) + 上記 assembly の実証明に置換。
+
+### 残 obligation は 1 点に isolate: `nu_apply_one_eq_v` (TSideDegrees.lean, sorried)
+
+(13.3.a)-at-T per-entry degree `ν_{ij}(1) = v` (i ≠ 0)。route は S-side `mu_j_isIndPC` mirror
+(§9-on-T: `nu_rowSum_eq_induce` + reducible → `reducible_sOf_H0_isIndHC` at
+`toTypesIIIIIIVSetupT` → Ind_{QD} linear、degree [T:K] = vp proven、row-const で per-entry)。
+**gate**: sOf-membership に T-instance chief kernel triviality `H₀ = ⊥` が要り、それは
+`|Q| = q^p` = (13.2.b)-at-T。S-side は carried `S_typeP2` で読めたが T の対応 carrier は
+(14.9) 結論 (`S16.T_typeII` は sorryAx + 循環リスクで cite 不可、9096 audit)。type III 分岐は
+(11.7) chain (`S13_ElementaryAbelianKernel`、§11 hypothesis は noncoherence-conditional)。
+
+**discharge 経路 2 択** (docstring にも記載):
+1. **canonical certain-type readout** (a-territory): FT-layer 構成サイトで `T = mp.certainTypeT`
+   は §16 構造を持ち、per-entry degree は canonical grid property として証明可能see。
+   nuGridSupply producer threading (9096 follow-up) と同時に埋まる形。**a への通知**: canonical
+   側で `nuT_apply_one_eq_v` 相当を証明して bundle field 追加を検討する場合は 9096 で API 調整。
+2. §11 (11.7) chain の T-instantiation (b-solo 可能だが noncoherence-conditional の処理要、大)。
+
+build green (4136 jobs)。CharacterDegreeSupply 残 sorry = tSide_theta_package /
+T_caseB_facts_no_lambda の 2 本 (どちらも既知 gate、#36)。
