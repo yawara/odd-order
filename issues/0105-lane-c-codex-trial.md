@@ -183,3 +183,7 @@ issue は trial ログの追記継続のため open 維持、次の節目 (T-sid
   裁定で operator を一時 Claude に戻す (本セッション)。次回 codex 再開予定。trial 評価 (26/26) は
   不変 — 切断は infra 事由でモデル起因でない。frontier は 3004 末尾の記載どおり
   `alignedOmegaEtaGrid` → (11.8) chain `hclassify` 接続から継続。
+
+- 2026-07-14 (hub 注記): lane c 再起動 (issue 0115 Campaign A/B)。**operator = Claude (Fable 5)
+  セッション** (ユーザー起動、15:57)。codex は lane a 稼働継続中のため、本 issue の codex trial
+  対象は当面 lane a 側の運用が事実上引き継ぐ形 (c の codex 復帰は将来の operator 判断)。

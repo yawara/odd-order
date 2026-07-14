@@ -631,6 +631,14 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 44、ミニ — c 初 commit) — c 再稼働後の first landing: hu_full statement 修正**:
+  **c=1** (`3450746f` = **0115 監査 caveat への即応**: SubgroupM `hu_full` の statement バグ
+  (p ≡ 1 (mod q) 枝と矛盾する無条件 u-値主張) を branch-independent な (9.7.b) gate に修正
+  (+63/−48、faithfulness 修正)。operator = Claude session (Fable、15:57 起動、issue 0105 の codex
+  運用から変更 — 0105 に注記要)。merge)。a=0 / b=0 (両者稼働中)。
+  build green **4207 jobs** / AxiomsCheck OK / census **46 不変** (統計 +1/−2 は restate に伴う
+  移動、comment-strip net 0) / 新 axiom なし / 逸脱なし。push 済。c は続けて Campaign A
+  (ComparingLM) を編集中。**3 レーン + hub の full pipeline が完全稼働**。
 - **2026-07-14 (tick 43) — ★ 再設計後の初 tick: 3 レーン全て稼働状態に復帰。a (13.11) 実証明 + b caseA-T (9.11) 本体**:
   **a=1** (`e775eced` = ★ **(13.11) numeric_bounds 実証明** — issue 0115 の OrderDetermination b→a
   移管を a が即消化した初 landing (sorry 実 discharge −1)。同 file 編集は移管済みゆえ非逸脱。merge)。
