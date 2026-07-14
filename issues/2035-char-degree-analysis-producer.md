@@ -1972,3 +1972,20 @@ pins.nu_apply_of_not_mem_W1 + eta_diff_rigidity 系; dadeHypT0 との dade=Ind �
 `sSet_memberRFamily_T` dispatch → `_orthogonal` → engine assembly。route-B は
 S16_GridExpansion 下流ゆえ **置き場所は TSideDegrees 不可** (S16_GridExpansion → S15_SAndT_Setup
 逆依存確認要) — S15_SSetMemberRFamily に同居 or 新 leaf `S15_TSetMemberRFamily`。
+
+## 2026-07-14 更新 #52 (lane b, /loop iter 13) — red branch (tauT_nu_cross) の依存 5 点監査
+
+`tauS_mu_cross` (S15_BridgeCharacter:917) の T-mirror `tauT_nu_cross`
+(τ_T⁰(ν_{rj} − ν_{sj}) = η_{rj} − η_{sj}、行差・列固定) の依存対応:
+1. irr/orthonormal → `pins.nu_irreducible`/`pins.nu_orthonormal` ✓
+2. diff A₀-support → **`pins.nu_diff_support`** ((4.8)-T field、最初から行差形!Tdata param) +
+   equal degree = `nu_apply_one_eq_v` (両方 v) ✓ — S-side の tauS_mu_diff_support 相当 wrapper 要
+3. Dade ZIrr/isometry (generic S07) + `dadeHypT0` (既存、hT2/Tdata param) ✓
+4. **`tauT_nu_vanish_on_V`** (regular set 上 τ⁰(ν-diff) = η-diff) — 唯一の実質新規 mirror。
+   S-side `tauS_mu_vanish_on_V` の証明精査が次段 (dade0_apply_eq_zero_of_regular 系 +
+   η vanish fields の組合せと推測)。
+5. rigidity → **swap-instance transpose**: `eta_diff_rigidity (hyp.swap hT2 hV Tdata … pins)` で
+   行固定形を transpose 適用 (swap.eta i j = hyp.eta j i、regular set は union_comm で同一、
+   hV = isMulCommutative_V_unconditional ✓)。行差 rigidity の独立実装不要 (c-owned
+   S16_GridExpansion への追記も不要)。
+置き場所: S15_BridgeCharacter 同居 (S-cross と並置、rigidity/swap とも import 済、b 実績 file)。
