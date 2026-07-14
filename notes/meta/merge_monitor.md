@@ -623,6 +623,23 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 32、手動 — ユーザー指示「各レーンの進捗を統合」) — a 未コミット diff 回収 + ★ 9096 HUB RULING + c hold 継続**:
+  cron 停止中 (session 新規)。**a=1** (`1f4c3ef9` = **lane-a codex session の残置 3-file diff を hub が回収 commit**:
+  AxiomsCheck ν-grid assert 13 本 + issue 1029 完了記録 (checklist 全 [x]、V_commutative は意図的除外) +
+  9096 A-lane ν-carrier audit。codex session は task_complete 正常終了・作業中でないことを jsonl + proc で
+  確認の上で回収。merge `87fa792b`)。b=0 / c=0。build green **4203 jobs** (warm 7.4s、AxiomsCheck 再 elab
+  3.7s exit 0 = 新 13 assert 全通過) / count-sorry **49→49 不変** (comment-strip census) / 新 axiom なし /
+  逸脱なし (AxiomsCheck=shared sanctioned additive + issues のみ) / orphan scan N/A (新 .lean なし)。
+  a は merge 後 main 同期済 (ahead 0 / behind 0、tree clean = codex 再開可能状態)。
+  ★ **9096 HUB RULING 記録 = (A)-modified**: a の ν-grid canonical package landing 承認 (audit 2 主張を
+  hub code-level 検証) → **b の次 work = `NuGridSupplyData` 分割手術 (b-owned HypothesisSwap.lean、
+  V_commutative 除去 + hT2 以後供給へ再配線) → T-side (13.3)/(13.4) 再開**。a は split 後に producer thread。
+  詳細 = issue 9096 🧭 節。
+  ★ **c 再開可否 (ユーザー質問) = hold 継続が正**: 昨夜の c-codex 自己評価 (23:31 JST session、main 同期のみ)
+  と hub 検証が一致 — T1 `hVcomm` は a が解消済 (TTypeII 現在 sorry-free、census 確認)、残 5 endpoint は
+  b-side (`caseB_order_u` / `character_degree_analysis` / parity+grid) gated。re-engage トリガー = 本 tick の
+  9096 ruling 経由で b の T-side landing 波及。⚠ 備考: c worktree に 7/1 からの stale lean プロセス
+  (PID 113472、S11_MaximalII_III_IV elaborate) が残存 — 実害なし、c 再開時に自然消滅か手動 kill。
 - **2026-07-14 (tick 31) — a 合流: ν-grid T-side nu conjugation (issue 1029 継続)**:
   **a=1** (`9d221886` = T-side nu conjugation。`FeitThompsonNuGrid.lean` +52 (0 sorry、計 587))。b=0 / c=0。
   build green **4203 jobs** / AxiomsCheck OK (**2416** 全 allowlist) / count-sorry **49→49 不変** / 新 axiom なし / 逸脱なし。
