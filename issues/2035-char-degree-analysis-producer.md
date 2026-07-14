@@ -1887,3 +1887,19 @@ transfer 経由で本 leaf を使っていない)。#43 の supply 計画は #44
 
 なお #44 で「発見」と書いた S13_NonGaloisExclusion の (11.9.c) chain は a の issue 1024 P3 +
 9086 の成果物 (2026-07-12 landing)。正しく attribute する。
+
+## 2026-07-14 更新 #47 (lane b, /loop iter 8 続) — member-support-T の経路確定
+
+caseB-T member-diff support の残り部材 `sSet_member_support_subset_A` T-mirror の経路精査:
+- S-side は `hPeq : P = Msigma S` (type-II 等号、S_typeP2 carrier 経由) を使うが、**使用箇所は
+  membership 方向のみ** — T-side は等号不要で `Q ≤ Msigma T` で足りる。
+- **`OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hM`** (proven、TypeP1Criteria で
+  live 使用) がそれを与える — type III でも成立 (M_F ≠ M_σ でも ≤ は一般)。
+- 他の部品 (`support_induce_subset_conjugatesIntoSet` / (1.2) core
+  `irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot` /
+  `honestTypeP2ASet_conj_mem` / `mem_honestTypeP2ASet`) は M-generic ✓。
+- 実装: SubcoherenceInputs:1231-1330 の逐語 mirror (hPeq → hQle、S→T、P→Q、~180 行) +
+  `sSet_member_support_subset`-T + `sSet_caseB_member_diff_supported`-T (~60 行)。
+  A(T) = honestTypeP2ASet hyp.T (M-generic def) で S-side と同形。
+
+次 iteration: この 3 本 mirror → (5.7) engine assembly (`sSet_coherent_dade_caseB`-T)。
