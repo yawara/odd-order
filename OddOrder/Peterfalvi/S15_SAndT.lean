@@ -753,7 +753,7 @@ theorem typeI_caseC_dual_dichotomy [Finite G]
     {L : Subgroup G} (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L)
     (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ dataL.typeIHyp.Sset)
     (_hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ)) :
-    (OddIntegerInner (tauTbetaGrid _hG hyp hT2 Tdata) (dataL.coh.extension φ) ∧
+    (OddIntegerInner (tauTbetaGrid _hG hyp hT2.1 Tdata) (dataL.coh.extension φ) ∧
       (((Nat.card ↥dataL.typeIHyp.H - 1 : ℕ) : ℚ)
           / (((maxNilpotentNormalHall L).subgroupOf L).index : ℚ) ≤
         ((hyp.v - 1 : ℕ) : ℚ) / (hyp.p : ℚ))) ∨
@@ -792,7 +792,7 @@ noncomputable def typeIOrthogonalityGridData_of_coherent78 [Finite G]
     betaL := typeIBetaL dataL.typeIHyp
       (Classical.choose (exists_Sset_apply_one_eq_index _hG hnoV dataL.typeIHyp))
     betaS := tauSbetaGrid _hG hyp
-    betaT := tauTbetaGrid _hG hyp hT2
+    betaT := tauTbetaGrid _hG hyp hT2.1
       (Classical.choose (OddOrder.Peterfalvi.S15.reconciled_typePData_T _hG hyp))
     disjoint_support := typeIBetaL_betaS_disjoint_support _hG hnoV hyp dataL.typeIHyp _
       (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG hnoV dataL.typeIHyp)).1

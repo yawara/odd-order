@@ -1134,23 +1134,37 @@ theorem Hypothesis.oddCardT [Finite G]
     omega
   · exact hodd
 
+/-- **`T` is of type `P`** (issue 2035 #85, the 0116 (i) ungated producer): `T` is non-type-I
+(`T_nonI`), and every branch of the Peterfalvi taxonomy (II/III/IV/V) is a BG type-`P` class
+(`proposition_type_classification`: II ↔ `P₂`, III∨IV / V ↔ `P₁`-side).  This is what the
+weakened (general type-`P`) `τ₁T`/Dade supply chain consumes in place of the (14.9)-circular
+`T_isTypeP2_gate`. -/
+theorem Hypothesis.T_isTypeP [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    OddOrder.BG.Ch4.S14.IsTypeP hyp.T := by
+  have hcls := OddOrder.BG.Ch4.S16.proposition_type_classification hG hyp.T_maximal
+  rcases hyp.T_nonI with h | h | h | h
+  · exact (hcls.2.1.mp h).1
+  · exact (hcls.2.2.1.mp (Or.inl h)).1.1
+  · exact (hcls.2.2.1.mp (Or.inr h)).1.1
+  · exact (hcls.2.2.2.1.mp h).1.1
+
 /-- **(13.2.e) `T`-instance Dade hypothesis** (mirror of `dadeHypS`; the `A(T)`-Dade datum for
-the caseB-`T` (5.7) coherence).  Like `dadeHypT0`/`tauTbetaGrid`, `IsTypeP2 T` is a
-(14.9)-conclusional parameter supplied by the caller (the `S`-side reads the carried
-`S_typeP2`); the underlying construction is the generic type-`P₂`
-`dadeSupportHypothesisData_honestTypeP2ASet` at `T`. -/
+the caseB-`T` (5.7) coherence).  Runs at general type `P` (issue 2035 #85): the underlying
+construction is `dadeSupportHypothesisData_honestTypeP2ASet`, weakened to `IsTypeP` — supplied
+ungated by `T_isTypeP`. -/
 noncomputable def Hypothesis.dadeHypT [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T) :
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T) :
     OddOrder.Peterfalvi.S04.Hypothesis G (honestTypeP2ASet hyp.T) hyp.T :=
-  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.T_maximal hT2.1).some.dade
+  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.T_maximal hTP).some.dade
 
 /-- **(13.2.e) `T`-instance Dade `H`-conjugation invariance** (mirror of `dadeHypS_hconj`). -/
 theorem Hypothesis.dadeHypT_hconj [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T) :
-    (hyp.dadeHypT hG hT2).HConjInvariant :=
-  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.T_maximal hT2.1).some.hconj
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T) :
+    (hyp.dadeHypT hG hTP).HConjInvariant :=
+  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.T_maximal hTP).some.hconj
 
 
 open OddOrder.Peterfalvi.S11 in
