@@ -7370,8 +7370,8 @@ not an additional sorry in this theorem. -/
 -- `M*`, and the cyclic `W = K ⊔ K*`; a second application at `M*` gives `M* = (M*)' ⋊ K*`.  Now
 -- axiom-clean: both `proposition_type_classification` (BG Prop 16.1, issue 8015 reverse bridges closed)
 -- and `typeP_duality` (BG Theorem 14.7) are axiom-clean, so the (8.8) dichotomy is honestly proven.
--- (`theorem88_caseB_holds` itself is not yet axiom-clean: it also consumes `not_all_maximal_typeI`,
--- gated on the `exists_typeICovering`/`typeI_frobenius` §8/char residuals.)
+-- The full `theorem88_caseB_holds` chain is now axiom-clean: the type-I Dade and covering
+-- residuals are discharged, and its guard is registered in the Section 16 producer block below.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.theorem88_dichotomy
 
 -- **W2 §12 (12.9) rank-two witness machinery (lane-h/lane-c)** — the minimal-counterexample structure
@@ -8024,3 +8024,28 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_isNilpotent
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S09.card_G0_lower_bound
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S09.not_trivial_G0
+
+/-! **BG §16 → Peterfalvi §10/§14 → Section 16 named-input producer chain, axiom-clean**
+(lane a, 2026-07-14, issue 9087).  The three tame-embedding consumers now cite the faithful
+Theorem A interface, so the maximal-pair construction, its type-I Dade consequences, and the
+assembled Section 16 inputs depend only on Lean/mathlib's standard three axioms. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremII_tame_embedding_of_inputs
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremII_tame_embedding
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_of_subset
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.dadeSupportHypotheses_typeI
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.hypothesis_of_typeIData
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.typeI_frobenius
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.not_all_maximal_typeI
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.theorem88_caseB_holds
+#assert_only_allowed_axioms OddOrder.exists_section16MaximalPair_data
+#assert_only_allowed_axioms OddOrder.section16MaximalPair_of_isMinimalSimpleOdd
+#assert_only_allowed_axioms OddOrder.section16Inputs_of_isMinimalSimpleOdd
+#assert_only_allowed_axioms OddOrder.sectionSixteenHypothesis_of_isMinimalSimpleOdd
+
+/-! **Peterfalvi (4.6) type-`P₂` Dade producer on the canonical `muS` instance, axiom-clean**
+(lane a, 2026-07-14, issues 2038/9081).  The honest `A₀(S)` Dade data now constructs the full
+`Hypothesis46`; its Dade-free core remains separately guarded as the exact prerequisite of the
+(4.7)/(4.8)-(1) support engine. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.dadeSupportHypothesisData_honestTypeP2A0Set
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.hyp46Smp
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.hyp46SmpCore

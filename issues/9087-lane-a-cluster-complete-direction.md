@@ -663,3 +663,11 @@ structure / comment の変更はなく、同 file の legacy cite は 0 件。ca
 - `lake build OddOrder.FeitThompson` — green (4181 jobs)
 - `lake build OddOrder.AxiomsCheck` — green (4189 jobs)
 - `lake build OddOrder` — green (4204 jobs)
+
+## ✅ FOLLOW-UP (2026-07-14 lane a): clean producer chain を AxiomsCheck に恒久登録
+
+hub tick 37 の follow-up (i) を commit **07787735**
+(`test(ft): guard clean section16 producer chain`) で完遂。上記 12 宣言すべてに
+`#assert_only_allowed_axioms` を追加したため、将来 legacy cite が再導入されれば CI が検出する。
+`lake build OddOrder.AxiomsCheck` は green (4189 jobs、12/12 が標準3公理のみ)、
+full `lake build OddOrder` も green (4204 jobs)。
