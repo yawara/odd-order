@@ -1781,3 +1781,26 @@ coherent extension 経由)。**T-side (9.11) coherence の構築が正道** — 
 は S-side と共通の precisely-named sorried-cite に collapse)。複数 session。CLAUDE.md 原則
 (コスト・規模は判断基準でない) により淡々と建設する。次 iteration: step 1-2 (caseB-T、
 uniform-degree route) から。
+
+## 2026-07-14 更新 #42 (lane b, /loop iter 6) — caseB-T step 1 landed + step 2 の D-abelian 解析
+
+**step 1 ✓**: `sSet_reducible_eq_nuRowSum` (TSideDegrees、sorry-free) — 𝒯 の reducible member =
+ν-row sum。`pins.nu_reducible_dichotomy` (pure grid field) 経由の機械 mirror。
+
+**step 2 (`sSet_caseB_apply_one_eq_vp`) の障害と解決 route**: S-side は `sSet_eq_sOf_H0Cprime`
+(𝒮(H₀C')=𝒮 同定) で Cprime = derivedInG cSub = ⊥ を「cSub ≤ U abelian (carried
+S_U_commutative)」から出す。T-side の対応 cSub-T = D で **D abelian ⟸ V abelian が (14.9)-gated**。
+
+**解決 (caseB 分岐内で V abelian を導出)**:
+- T type II/III: witness `U_commutative` (TypeII/IIIData 両方が field に持つ) + Schur–Zassenhaus
+  conjugate transport (isMulCommutative_V の証明パターンの分岐版)。
+- T type IV: witness は `U_not_commutative` — だが **caseB (Singer) データと (11.6)-T で排除可能**:
+  (11.6)-T (S13.core_structure T-instance、card_Q_eq_qp と同じ chain): D = V' (C = U' の T)。
+  caseB の Ū = V/D cyclic → V/V' cyclic、V nilpotent (isNilpotent_V) →
+  「nilpotent + cyclic abelianization → abelian」(標準事実、mathlib/repo 所在要確認) → V abelian
+  → type IV の U_not_commutative と矛盾 (witness transport) → **type IV は caseB と両立しない**。
+- ⟹ `V_commutative_of_caseB : CliffordCaseBData (charsT) → IsMulCommutative ↥hyp.V`
+  (unconditional、(14.9) 不要) → D abelian → Cprime-T = ⊥ → sSet_eq_sOf_H0Cprime-T →
+  step 2 uniform degree。
+
+次: 「nilpotent + cyclic abelianization → abelian」の所在確認 → V_commutative_of_caseB 構築。

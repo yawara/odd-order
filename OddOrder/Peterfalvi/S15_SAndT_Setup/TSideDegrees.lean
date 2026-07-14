@@ -841,4 +841,48 @@ theorem Hypothesis.indK_sub_nuRow_support [Finite G]
     rw [hz1, ClassFunction.sub_apply, ClassFunction.induce_apply_one, hθ1, mul_one, hθreq,
       ClassFunction.induce_apply_one, hθr1, mul_one, sub_self]
 
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **Reducible `𝒯`-members are nonzero ν-row sums** (Peterfalvi (9.8)/(9.11) reverse
+dichotomy, `T`-instance; mirror of `sSet_reducible_eq_muColumnSum`).  A reducible member
+`η ∈ 𝒯 = sSet(setupT)` bridges into the general kernel-filter family `S(⊥)` over
+`T' = derivedInG T`, where the ν-side reverse dichotomy (`nu_reducible_dichotomy`, a pure
+grid field of the ν-supply) dispatches it to its ν-row `∃ i ≠ 0, η = ∑_j ν_{ij}`. -/
+theorem Hypothesis.sSet_reducible_eq_nuRowSum [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (pins : NuGridSupplyData hyp) (hvd : hyp.v * hyp.d ≠ 1)
+    {η : ClassFunction ↥hyp.T ℂ} (hη : η ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
+    (hirr : ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter η) :
+    ∃ i : Fin hyp.q, i ≠ ⟨0, hyp.q_prime.pos⟩ ∧ η = ∑ j : Fin hyp.p, hyp.nu i j := by
+  classical
+  haveI := hyp.finiteG
+  obtain ⟨ξ, hξ, rfl⟩ := hη
+  have hξne : ξ ≠ trivialIrreducibleCharacter
+      ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) := by
+    intro htriv
+    apply hξ
+    rw [htriv]
+    simp only [IrreducibleCharacter.coe_trivialIrreducibleCharacter,
+      OddOrder.Peterfalvi.S03.characterKernel_trivialClassFunction]
+    exact Set.subset_univ _
+  have hmemHU : induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
+        (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)
+      ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        (huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) (⊥ : Subgroup ↥hyp.T) := by
+    refine ⟨ξ, hξne, ?_, (induceHU_eq_induce (hyp.toTypesIIIIIIVSetupT hG hvd) _)⟩
+    intro x hx
+    have hx1 : x = 1 := by
+      have h2 := Subgroup.mem_subgroupOf.mp (SetLike.mem_coe.mp hx)
+      rw [Subgroup.mem_bot] at h2; exact Subtype.ext h2
+    rw [hx1]
+    exact OddOrder.Peterfalvi.S03.one_mem_characterKernel _
+  have hKeq : huSub (hyp.toTypesIIIIIIVSetupT hG hvd)
+      = (derivedInG hyp.T).subgroupOf hyp.T :=
+    huSub_eq_derivedInG_subgroupOf _
+  have hmem : induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
+        (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)
+      ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG hyp.T).subgroupOf hyp.T) (⊥ : Subgroup ↥hyp.T) := hKeq ▸ hmemHU
+  exact pins.nu_reducible_dichotomy hmem hirr
+
 end OddOrder.Peterfalvi.S15
