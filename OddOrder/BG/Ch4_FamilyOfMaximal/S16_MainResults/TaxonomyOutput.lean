@@ -1262,7 +1262,7 @@ theorem theoremII_tame_embedding_of_inputs [Finite G] (hG : OddOrder.BG.IsMinima
           refine hxA ⟨hxA0.1, ?_⟩
           have hxM : x ∈ M := hxA0.1.1
           have hA3 : M = K ⊔ U ⊔ OddOrder.BG.Ch3.S10.Msigma M :=
-            (theoremA_maximal_structure hG hM hK rfl hU).2.2.1
+            (theoremA_maximal_structure_faithful hG hM hKM hUM hK rfl hU).2.2.1
           have hx' : x ∈ (K ⊔ U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) := hA3 ▸ hxM
           rw [hKbot, bot_sup_eq] at hx'
           exact hx'
@@ -1289,7 +1289,7 @@ theorem theoremII_tame_embedding_of_inputs [Finite G] (hG : OddOrder.BG.IsMinima
         obtain ⟨z, ⟨hzA0, hznA⟩, _⟩ := hex
         refine absurd ⟨hzA0.1, ?_⟩ hznA
         have hA3 : M = K ⊔ U ⊔ OddOrder.BG.Ch3.S10.Msigma M :=
-          (theoremA_maximal_structure hG hM hK rfl hU).2.2.1
+          (theoremA_maximal_structure_faithful hG hM hKM hUM hK rfl hU).2.2.1
         have hz' : z ∈ (K ⊔ U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) := hA3 ▸ hzA0.1.1
         rw [hKbot, bot_sup_eq] at hz'
         exact hz'
@@ -1356,7 +1356,7 @@ theorem mem_sigmaSharp_of_mem_aSet_of_escape [Finite G]
       · refine hxA ⟨hxA0.1, ?_⟩
         have hxM : x ∈ M := hxA0.1.1
         have hA3 : M = K ⊔ U ⊔ OddOrder.BG.Ch3.S10.Msigma M :=
-          (theoremA_maximal_structure hG hM hK rfl hU).2.2.1
+          (theoremA_maximal_structure_faithful hG hM hKM hUM hK rfl hU).2.2.1
         have hx' : x ∈ (K ⊔ U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) := hA3 ▸ hxM
         rw [hKbot, bot_sup_eq] at hx'
         exact hx'
