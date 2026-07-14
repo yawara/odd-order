@@ -8196,3 +8196,14 @@ lies in `S`.  Sylow maximality identifies `C_R(x)` with `R₀`, hence `Z(R) ≤ 
   OddOrder.Peterfalvi.S15.sylow_center_le_U_sylow_of_centralizer_witness
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S15.exists_sylow_over_U_with_trapped_center_of_not_isCyclic
+
+/-! **Peterfalvi (14.6), order of `Ω₁(Z(R))`.**  Under the explicit (13.12)/(13.13)
+inputs `c = 1` and `q = 3`, the two-coordinate scalar action on the actual `U` is faithful,
+so `rank U ≤ 2`.  The nontrivial elementary abelian subgroup `Ω₁(Z(R)) ≤ R₀ ≤ U`
+consequently has order `r` or `r²`. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.caseA_rank_U_le_two_of_c_eq_one_q_eq_three
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.omega1Center_card_eq_prime_or_sq_of_rank_U_le_two
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.caseA_omega1Center_card_eq_prime_or_sq_of_parameters
