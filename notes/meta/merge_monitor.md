@@ -641,6 +641,19 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (tick 61) — ★★ b: #22 T-side twin 完了 = 0116 full flip トリガー成立。census 35**:
+  **a=0**。**b=5** (`1708d7cd` 系 = **(13.8)-for-T `exists_muT_index_core` 完全証明**
+  (+548 行、7 conjuncts sorry 0、#print axioms 標準 3 のみ、2035 #90 brick 2) +
+  **(13.5.a)-for-T `exists_etaT_alphaFun_one_int_core`** (sorry 0、#91 brick 3) +
+  **Engines prefix-split** (1634 行 watch 自主解消 → 新 sibling
+  `S15_CharacterDegreeEnginesSSide.lean` 1049 行、Engines 841 行に縮小)。merge)。
+  build green 4225 jobs / AxiomsCheck OK / census **35 不変** / 新 axiom なし / 逸脱なし。
+  push 済。
+  **⟹ hub action: 0116 full flip トリガー成立** (b #91 flag)。S-side atom (#25/#26) +
+  T-side atom (#88-#91) が全て core+(hD,hQcomm) param 型で完備 — hub が obtain-site の
+  core/lam param 化 + 討伐済 atom cite 置換 + discharge leaf + legacy retire を実施可。
+  T-side param の hQcomm discharge (threading param 追加 vs S16 hoist) は hub 裁量。
+  本 tick 後に hub が 0116 flip を開始する。
 - **2026-07-15 (tick 60) — ★ a: s_side_field_repr 討伐 (0117 完遂)。census 36→35**:
   **a=3** (`588d4314` 系 = ★ **c 所有 gate `S16.s_side_field_repr` (SubgroupM:170) の bare
   sorry を実証明討伐** — statement 完全不変・proof-only、hnoV (10.10) + H0C refuter (11.3) +
