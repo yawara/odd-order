@@ -124,14 +124,13 @@ TI bound `N_G(H)` collapses to `L` through the (8.15) normalizer identification
 `hyp.dadeData.dade` recoordinated along `sharpImage H = A(L)`
 (`sharpImage_H_subgroupOf_eq_typeIA`), so the Sibley map *is* `hyp.tau` exactly
 (`dadeIntegralCharacterMap_transport_ambient`), and its local subgroups vanish by the (2.3) reverse
-direction (`H_eq_bot_of_isTISubset`).  ⚠ Residual `sorry` (9077 flag, 2026-07-14): `card_L_odd` —
-`Odd (Nat.card ↥L)` is **not derivable** from the current hypotheses (no
-`IsMinimalSimpleOdd G`/parity input here; cf. the `hG.odd`-fed `card_L_odd` of
-`typeVSibleyDadeHypothesis`).  Fix = add an `Odd (Nat.card G)` hypothesis and thread `hG.odd` at
-the single call site (`frobenius_typeI_coherent`); frozen pending hub/lane-b approval (proof-only
-carve-out). -/
+direction (`H_eq_bot_of_isTISubset`).  The `hodd` hypothesis feeds `card_L_odd` (Peterfalvi works
+throughout with odd-order `G`; the earlier `hodd`-less signature was statement-level unprovable —
+counter-model `G = S₄`, `L = S₃` — cf. the `hG.odd`-fed `card_L_odd` of
+`typeVSibleyDadeHypothesis`; faithfulness fix approved by issue 9077 HUB RULING #4′). -/
 noncomputable def sibleyTarget_frobI [Fintype G] {L : Subgroup G} [Fintype ↥L]
     [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card G : ℂ)] (hyp : Hypothesis L)
+    (hodd : Odd (Nat.card G))
     (_hfrob : ∃ C : Subgroup ↥L,
       OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L (hyp.H.subgroupOf L) C)
     (_hTI : OddOrder.GroupTheory.IsTISubset
@@ -180,8 +179,7 @@ noncomputable def sibleyTarget_frobI [Fintype G] {L : Subgroup G} [Fintype ↥L]
       OddOrder.Peterfalvi.S04.Hypothesis G
         (OddOrder.Peterfalvi.S08.sharpImage (hyp.H.subgroupOf L)) L).HConjInvariant :=
     hconj_transport_ambient hEq hyp.dadeData.dade hyp.hconj
-  -- ⚠ 9077 flag (2026-07-14): not derivable from the current signature — see docstring.
-  have hodd : Odd (Nat.card ↥L) := sorry
+  have hoddL : Odd (Nat.card ↥L) := hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card L)
   refine
     { H := hyp.H.subgroupOf L
       invH := inferInstance
@@ -192,7 +190,7 @@ noncomputable def sibleyTarget_frobI [Fintype G] {L : Subgroup G} [Fintype ↥L]
           H_nilpotent := ?_
           split := hfrob.isComplement
           W1_nontrivial := hfrob.ne_bot_complement
-          card_L_odd := hodd
+          card_L_odd := hoddL
           H_sharp_ti := hTI_L
           dade := hEq ▸ hyp.dadeData.dade
           hconj := hconj'
@@ -1748,7 +1746,7 @@ theorem frobenius_typeI_coherent [Finite G]
       OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L (hyp.H.subgroupOf L) C) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) := by
   rcases hyp.typeI.alternative with hTI | hab | hexp
-  · exact CoherenceWiring.coherent_of_sibleyTarget (sibleyTarget_frobI hyp hfrob hTI)
+  · exact CoherenceWiring.coherent_of_sibleyTarget (sibleyTarget_frobI hyp hG.odd hfrob hTI)
   · exact frobenius_typeI_coherent_of_abelianKernel hG hyp hfrob hab
   · exact frobenius_typeI_coherent_of_cyclicQuotient hG hyp hfrob hexp
 
