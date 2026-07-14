@@ -37,6 +37,37 @@ a8b777b6、詳細 = issue 2035 #33/#35):
    relayer に要する S15→S16 inversion `CoherenceEtaOrthogonality → S16_GridExpansion` は
    **genuine** (2 lemma 使用) かつ **S16_GridExpansion = c-owned**。cross-lane relayer。
 
+## A-lane ν-carrier audit (2026-07-14)
+
+### Canonical grid package は着地
+
+`OddOrder/FeitThompsonNuGrid.lean` に、`mp.certainTypeT` から作る canonical `nuT` について
+`NuGridSupplyData` の**純粋な grid field 全部**を証明した。具体的には irreducibility、
+row injectivity、orthonormality、degree congruence、base sign、row-sum induction、reverse
+dichotomy、(4.8) support、(4.3.c) value、(4.9.a) conjugation である。各 theorem の
+`#print axioms` は `[propext, Classical.choice, Quot.sound]` のみ。関連 commits:
+`bb959962`, `83d63b79`, `d0d3e9ca`, `6e106fdd`, `9d221886`。
+
+### 現行 `NuGridSupplyData` は二つの独立理由で generic producer にできない
+
+1. **generic `hyp.nu` の row-translation gap**: `Hypothesis.nu_definition` は各 row の差だけを
+   拘束する。各 row に任意の class function を一様加算しても保存されるため、generic
+   `hyp : Hypothesis G` から `nu_irreducible` 等は導けない。canonical `nuT` との同定を
+   carrier 契約に明示する必要がある。
+2. **`V_commutative` は grid fact ではなく post-(14.9) fact**: canonical `V` は `T_F` の
+   `T'` 内補群であり、一般の type-P datumでは nilpotent までしか得られない。既存の正しい
+   theorem `S15.isMulCommutative_V` も `IsTypeII T`（(14.9)）を要求する。現行
+   `Hypothesis.swap` はすでに `hT2 : IsTypeP2 T` を引数に取る一方、前段の
+   `NuGridSupplyData` が `V_commutative` を無条件 field に混在させている。さらに現行
+   `S16.T_typeII` / `T_isTypeP2` は `sorryAx` を継承し、その前段には
+   `T_side_caseB_facts` があるため、これを A 側 producer から cite して field を埋めるのは
+   (13.4)→(14.9) の循環を隠すだけである。
+
+したがって cross-lane API 修正は、(a) canonical grid facts を canonical `nuT` 同定付きで
+thread し、(b) `V_commutative` をその bundle から分離して `Hypothesis.swap` の既存 `hT2`
+以後に供給する、という依存順を保存する必要がある。A lane は b-owned
+`HypothesisSwap.lean` の signature を無断変更しない。
+
 ## direction 依頼 (hub 裁定)
 
 b の S15-solo char-degree frontier は上記の通り cross-lane gated。次の b work の方向を依頼:

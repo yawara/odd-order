@@ -33,15 +33,24 @@ S15 carrier/API の正しい threading は分けて扱う。後者は b-owned si
 - [x] irreducibility / row injectivity / orthonormality / degree congruence / base sign を証明する
 - [x] row-sum induction / reducible dichotomy / support / value を T-side で証明する
 - [x] conjugation を T-side で証明する
-- [ ] V-side commutativity を既存の reconciled type-P data から供給する
-- [ ] AxiomsCheck tripwire と full build を通す
-- [ ] generic carrier の row-base gap と必要な cross-lane API 修正を issue 9096 に報告する
+- [x] V-side commutativity の供給可能性を監査する（post-(14.9) fact と確定、無条件供給は棄却）
+- [x] AxiomsCheck tripwire と full build を通す
+- [x] generic carrier の row-base gap と必要な cross-lane API 修正を issue 9096 に報告する
 
+## Carrier 監査結果
+
+canonical `nuT` の grid field はすべて構成できたが、現行 `NuGridSupplyData` の
+`V_commutative` は grid property ではない。`V` は general type-P では `T_F` の nilpotent
+complement にすぎず、可換性は `IsTypeII T`（Peterfalvi (14.9)）の後に
+`S15.isMulCommutative_V` から得る事実である。したがって `V_commutative` を前段 bundle に
+無条件で要求して A 側から埋めることはしない。row-translation で generic `hyp.nu` 自体も
+canonical grid に固定されない問題と合わせ、正しい signature 分割を issue 9096 に報告した。
 ## 完了条件
 
-canonical certain-Type-T の全 field が sorry-free / allowed-axiom-only で揃い、
-`lake build OddOrder` が成功すること。generic `Hypothesis` への threading は、正しい
-carrier 契約が hub/b 側で裁定・実装されるまでは本 issue の completion に含めない。
+canonical certain-Type-T の全 **grid field** が sorry-free / allowed-axiom-only で揃い、
+`lake build OddOrder` が成功すること。post-(14.9) の `V_commutative` と generic
+`Hypothesis` への threading は、正しい carrier 契約が hub/b 側で裁定・実装されるまでは
+本 issue の completion に含めない。
 
 ## 参照
 
