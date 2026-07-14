@@ -641,6 +641,17 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (tick 58) — a: caseA 最終算術矛盾 (leaf 2 枚) / b: (7.2)-for-T Dade=Ind bridge。census 36**:
+  **a=4** (`bc561ebc` 系 feature 2 = **(14.6) caseA campaign 続行**: 新 leaf
+  `S15_CaseAOmegaFixedPointFree.lean` (153 行、center action FPF 計数、claim 1037) +
+  `S15_CaseAContradiction.lean` (106 行、**caseA prime contradiction を閉じる最終算術**、
+  claim 1038)。file 単位 a 所有 carve-out 同型継続。S15_SAndT import 2 行 = 機械的配線。merge)。
+  **b=3** (`7f95fdcf` 系 = `Q_sharp_tau_eq_induce` (CountingLayer +59 additive、
+  (13.2.e)/(7.2)-for-T Dade=Ind bridge、H_sharp 版の機械的 mirror、2035 #88 brick 2a —
+  muT cCoeff 部品 map 完成、残 = red 分類のみ)。merge)。⚠ b の 3-dot は multiple merge bases
+  警告 (base 97f20c18 選択で tick 57 済み分を過大表示) — trial-merge staged で実 delta 確認
+  (手順どおり誤検出排除)。build green 4223 jobs ×2 / AxiomsCheck OK / census **36 不変** /
+  新 axiom なし / 逸脱なし / size flag なし。push 済。
 - **2026-07-15 (tick 57, 新監視セッション開始) — a: (14.6) Ω₁(Z(R)) 位数 leaf / b: (13.2.e)-for-T QD_sharp gate 討伐。census 37→36**:
   **監視スコープ変更 (ユーザー指示)**: 本セッションは **a/b のみ監視、c は明示停止中** (c の
   `main..c` 6 commits は全て空 sync merge = 実内容ゼロ、マージ不要)。
