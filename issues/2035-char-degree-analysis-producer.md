@@ -2481,3 +2481,12 @@ engine (13.9)-(13.12)-on-T + q<p ltqp、9094 RULING §4)**。
 ⚠ file 分割 TODO (次 iteration 先頭): CountingLayer 2002 行 / CharacterDegreeSupply 2240 行が
 2000 上限超過 (linter warning 発火中、いずれも本 campaign 以前からの累積)。次の追記前に
 prefix-split する。
+
+## 📎 lane-c cross-ref (2026-07-14, 9077 carve-out 条件 4 の記録)
+
+9077 RULING #3 の b-quiet-file carve-out 実施状況: item 2 `sibleyTarget_frobI`
+(S14_MaximalI/FrobeniusStructure) = 構成 landed (commit `237ff7fc`)、残 sorry は
+`card_L_odd` (signature gap — `Odd (Nat.card G)` 仮説の追加要、詳細 9077) 1 点のみ。
+item 1 `V_inf_centralizer_Q_eq_bot` (S15_SAndTBasic:841) = DAG-blocked で HOLD
+(hub 9077 追記 + 0116 Route T; c も独立検証で一致)。b への影響: FrobeniusStructure の
+編集は proof-only + docstring 注記のみ、signature/statement 不変。
