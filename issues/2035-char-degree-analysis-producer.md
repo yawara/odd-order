@@ -1684,3 +1684,36 @@ TSideDegrees.lean は **sorry 0**。#37 に記録した「discharge 経路 2 択
 次: (13.4) `tSide_theta_package_of_not_caseB_core` (残 2 sorry の上流側) — (13.3.b)-at-T
 (caseB_of_no_irreducible_sOf_H0Cprime T-instance) + ν-row τ₁-formula + 直交性。今回の
 S11-T-instance 基盤 (setupT/chars/chief collapse) がそのまま土台になる。
+
+## 2026-07-14 更新 #39 (lane b, /loop iter 3) — ✅ (13.3.b)-at-T θ-witness dichotomy 完全証明
+
+(13.4) `tSide_theta_package` の Step 1 (θ-supply) を閉じた。`LambdaWitness` 機構の T-mirror 一式、
+**全て sorry-free / #print axioms clean**:
+
+- `ThetaWitness` def (vp-degree QD-linear induced irr of T)
+- `thetaWitness_of_caseB_member` / `thetaWitness_of_caseA` (S-side witness 2 lemma の逐語 mirror;
+  generic S11 部材 caseB_xiOf_H0Cprime_eq_induce_hcPsiPair / isIndHC_of_source_* /
+  caseA_exists_irreducible_witnessed / hcZeta_* がすべて M-generic だったので transport 3 点
+  (H_eq → toTypesIIIIIIVSetupT_H_eq、cSub_eq_C → cSub_eq_D、W2_le_P → Q normal) の差し替えのみ)
+- `T_caseB_facts_no_theta`: ¬ThetaWitness → D = ⊥ ∧ v = (q^p−1)/(q−1) (S_caseB_facts_no_lambda mirror)
+- `thetaWitness_of_not_caseB`: (13.4) の _hne → ThetaWitness (対偶 + card_Q_eq_qp で第 3 conjunct 消化)
+
+同定 3 lemma (TSideDegrees 側): `toTypesIIIIIIVSetupT_q_eq` (setup.q = p) / `chiefFactorT_p_eq`
+(chief.p = q、card_Q_eq_qp 経由) / `mkSection11CharacterDataT_v_eq` (chars.u = v、relIndex +
+cSub_eq_D)。
+
+配置: witness 機構 5 宣言は S15_CharacterDegreeSupply (caseA_exists_irreducible_witnessed が同
+ファイル定義のため; LambdaWitness 機構の直後で読みやすい)。同 file ~1846 行 (2000 未満、次の
+大型追加で分割要検討)。
+
+### tSide_theta_package 残り conjunct の状況
+
+θT := Ind_K θ' (ThetaWitness) として:
+- conjunct 1 (δ' = ±1): delta_pm_one.2 ✓ 既存
+- conjunct 2 (support ⊆ (Q⊔D)#): θT, ν_r とも Ind_K (nu_i_isIndQD #38) で同 degree vp →
+  K ⊴ T (D normal: S12.typePData_C_normalized_by_M の T-instance) + Ind vanishing off K
+- conjunct 3 (Ind formula): θG 存在量化ゆえ θG := Ind_T(θT − ν_r) + δ'∑η_{rj} で定義消化
+- conjunct 4 (⟨η, θG⟩ = 0): 実内容 = ⟨η_{ij}, Ind_T^G(θT − ν_r)⟩ = −δ'·[i=r]·(j-sum 相当) 型の
+  Dade/直交計算 — S-side の tau1S_induce_inner_eta 系 mirror + ν_r^τ = δ'∑η formula (§4/§6-T)
+- conjunct 5 (⟨τ₁S λ, θG⟩ = 0): (13.2.e) disjoint support 直交
+次 iteration: conjunct 4 の ν-η formula (Ind_T(ν_{rj} 差) と η の関係、nu_definition + Dade 経由) を精査。

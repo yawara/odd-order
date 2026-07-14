@@ -720,4 +720,57 @@ theorem Hypothesis.deltaPrime_eq_one_of_ne_zero_T [Finite G]
     have hodd := Nat.odd_iff.mp hyp.p_odd
     omega
 
+/-- **`T`-instance chief-factor `q` identity**: `data.q = p = |W₂|`.  Mirror of
+`toTypesIIIIIIVSetupS_q_eq`. -/
+theorem Hypothesis.toTypesIIIIIIVSetupT_q_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1) :
+    (hyp.toTypesIIIIIIVSetupT hG hvd).q = hyp.p := by
+  show Nat.card ↥(hyp.toTypesIIIIIIVSetupT hG hvd).W1 = hyp.p
+  rw [hyp.toTypesIIIIIIVSetupT_W1_eq hG hvd, ← hyp.p_eq_card_W2]
+
+/-- **`T`-instance chief-factor prime identity**: `chief.p = q`, forced by
+`|Q| = q^p = chief.p^p · |N|` (`card_Q_eq_qp`).  Mirror of `chiefFactorS_p_eq`. -/
+theorem Hypothesis.chiefFactorT_p_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1)
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd)) :
+    chief.p = hyp.q := by
+  haveI := chief.N_normal
+  have hcardH : Nat.card ↥(hyp.toTypesIIIIIIVSetupT hG hvd).H = hyp.q ^ hyp.p := by
+    rw [show ((hyp.toTypesIIIIIIVSetupT hG hvd).H : Subgroup G) = hyp.Q from
+      hyp.toTypesIIIIIIVSetupT_H_eq hG hvd]
+    exact hyp.card_Q_eq_qp hG
+  have hquot := OddOrder.Peterfalvi.S11.chiefFactor_quotient_card chief
+  rw [hyp.toTypesIIIIIIVSetupT_q_eq hG hvd] at hquot
+  have hsplitQ := Subgroup.card_eq_card_quotient_mul_card_subgroup chief.N
+  rw [hquot, hcardH] at hsplitQ
+  have hdvd : chief.p ∣ hyp.q ^ hyp.p :=
+    dvd_trans (dvd_pow_self chief.p hyp.p_prime.pos.ne') (hsplitQ ▸ Dvd.intro _ rfl)
+  exact (Nat.prime_dvd_prime_iff_eq chief.p_prime hyp.q_prime).mp
+    (chief.p_prime.dvd_of_dvd_pow hdvd)
+
+/-- **`T`-instance `u` identity**: the `V`-action image order `chars.u = |V̄| = [V : D] = v`.
+Mirror of `mkSection11CharacterDataS_u_eq`, via `cSub = D` and `|V| = v·d`. -/
+theorem Hypothesis.mkSection11CharacterDataT_v_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1)
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd)) :
+    (hyp.mkSection11CharacterDataT hG hvd chief).u = hyp.v := by
+  have hd0 : 0 < hyp.d := hyp.d_eq_card_D ▸ Nat.card_pos
+  refine Nat.eq_of_mul_eq_mul_right hd0 ?_
+  have key : (hyp.mkSection11CharacterDataT hG hvd chief).u
+      * Nat.card ↥(OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupT hG hvd) chief)
+      = Nat.card ↥(hyp.toTypesIIIIIIVSetupT hG hvd).U := by
+    rw [← OddOrder.Peterfalvi.S11.relIndex_cSub_U_eq_u
+      (hyp.mkSection11CharacterDataT hG hvd chief)]
+    have h := Subgroup.index_mul_card
+      ((OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupT hG hvd) chief).subgroupOf
+        (hyp.toTypesIIIIIIVSetupT hG hvd).U)
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+      (OddOrder.Peterfalvi.S11.cSub_le_U (hyp.toTypesIIIIIIVSetupT hG hvd) chief)).toEquiv] at h
+  rw [hyp.toTypesIIIIIIVSetupT_cSub_eq_D hG hvd chief, ← hyp.d_eq_card_D,
+    hyp.toTypesIIIIIIVSetupT_U_eq hG hvd, hyp.card_V_eq_vd] at key
+  exact key
+
 end OddOrder.Peterfalvi.S15
