@@ -2157,3 +2157,51 @@ caseA-T 残: base count `sSetIrrDegT_pa_two_le_ncard` (generic `caseA_exists_irr
 T-instance + conj doubling) → caseA assembly (`coherent_of_maximal_coherent_pair_refuted` +
 refuter-T sorried) → dispatch `sSet_coherent_dadeT_A` (clifford_dichotomy、caseB 分岐 =
 `sSet_coherent_dade_caseB_T` ✓)。
+
+## 2026-07-14 更新 #65 (lane b, /loop iter 26-27) — ✅ caseA-T assembly + dispatch `sSet_coherent_indT_A`
+
+TSetMemberRFamily (build green、AxiomsCheck 4190 jobs OK):
+- **`sSetIrrDegT_pa_two_le_ncard`** (sorry-free、axiom-clean): (9.8.d) generic
+  `caseA_exists_irreducible_qa` の T-instance + 共役倍加 → `2 ≤ |S₁(p·a)|`。
+- **`sSetIrrDegT_coherent_indT`** (sorry-free、axiom-clean): (5.7) cut coherence を
+  `tInstance_dade_eq_induce` congrMap で Ind_T^G に再接地。⚠ T-side instance 規約:
+  `[Fintype G]`/`[Invertible]` 明示 binder は scoped FiniteInduce (`ambientFintype`/
+  `natCardInvC`) と unify しない → S 版同様 `[Finite G]`-only で統一 (defeq trap 実例)。
+- **`sSetIrrDegT_pa_coherent_indT_caseA`** (sorry-free、axiom-clean): caseA-T `h0`。
+- **`sSet_caseA_nineElevenRefutation_T`** (意図した sorried obligation、S 版 signature の
+  precise mirror + hT2): docstring に reuse map (generic (9.11) apparatus は data-parametrized
+  で T 直接適用可 / S-specific residual = per-member R-family + (5.6) pair-bound / M-common
+  = (9.11.7-8) issue 9083)。S 版 chain (`nineElevenSTwoExtractionS`/`nineElevenNormBoundS`/
+  `nineElevenEqualityRefutationS`) が閉じれば S↦T dictionary 置換で閉じる。
+- **`sSet_coherent_indT_caseA`**: generic `coherent_of_maximal_coherent_pair_refuted` +
+  base ✓ + refuter-T (唯一の sorry 源)。
+- **`sSet_coherent_indT_A`** (dispatch、#41 step 3 完): `clifford_dichotomy` at
+  `mkSection11CharacterDataT` → caseA 分岐 = 上記 / caseB 分岐 = `sSet_coherent_dade_caseB_T`
+  ✓ を congrMap 再接地。**caseB-T 側は完全 sorry-free で dispatch に接続済**。
+- `indT`/`indT_apply` を CharacterDegreeSupply → SubcoherenceInputs (indS の隣) に移設。
+- AxiomsCheck: clean 3 endpoint 登録 + `import S15_TSetMemberRFamily` 追加 (leaf ゆえ未 import だった)。
+
+残 (#41): step 4 dispatch 済につき → ν-row pin (τ(μ-col)=η-col の T 版) → step 5 τ₁T +
+(5.3.b)-T + conjunct 4 → step 6 conjunct 5 → step 7 package assembly。
+
+## 2026-07-14 更新 #66 (lane b, /loop iter 28) — ν-row pin 機構 第 1 層 (S15_NuRowPin.lean 新設)
+
+新 leaf `S15_NuRowPin.lean` (TSetMemberRFamily の上、全て sorry-free・axiom-clean、一発 build):
+- `nuRow_apply_one` (p·v) / `nuRow_inner` (p·[r=s]) / `nuRow_not_irreducible` — pure grid 基礎
+- `nuRow_diff_supported` — 任意行差の A(T)-support (muColumn_diff_supported mirror)
+- **`coherentIndT_nuRow_diff`** — 行独立性 c(ν_r) − c(ν_s) = ∑η_r − ∑η_s
+  (extends_on_supported → indT_apply → tInstance_dade0_eq_induce → per-column tauT_nu_cross)
+- **`coherentIndT_image_inner_eta_eq_zero`** — **(5.3.b)-at-T** (family-generic;
+  #41 step 5 の入力): coherent image ⊥ η-grid。S 版より短い —
+  `dadeT0_apply_eq_zero_of_regular` (既設) が regular 消滅を丸ごと供給。
+  ⚠ S 版の Fintype/Invertible subst juggling は [Finite G]-only 化で不要。
+
+AxiomsCheck: import を S15_TSetMemberRFamily → S15_NuRowPin に置換 (推移含意) + 2 endpoint 登録。
+
+残 (pin 完成まで): `coherentIndT_extension_irr_vanish_regular` (γ-trick 前半、mirror ~30 行) →
+`coherentIndT_nuRow_vanish_regular` (γ-trick、mirror ~90 行; dadeT0 regular ✓ 流用) →
+**`coherentIndT_nuRow_pin_of_irr`** (本体 ~270 行 mirror; 必要部材
+`sSet_coherent_extension_eq_sum_memberRFamily`-T (R-family 分解、S 版は CaseBReducibleCoherence)
++ `sSet_reducible_eq_nuRowSum` ✓ + `sSet_memberRFamily_T_imageSet_of_red` ✓ +
+`S16.inner_eta_grid_relation` (generic ✓) + eta_orthonormal ✓) → `..._eq_etaRow_of_pivot` →
+all-reducible glue → `sSet_coherent_indT_A_pinned`。
