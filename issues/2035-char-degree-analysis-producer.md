@@ -2808,3 +2808,10 @@ rebase campaign の NormEstimates/CountingLayer 到達 landing」は本 update �
 - 注: T-side atom の param は (hD : D = ⊥) + (hQcomm : IsMulCommutative Q)。hQcomm は
   (13.2.b)-T の可換部分で、Q_elementaryAbelian_T (hTTypeII gated) から S16 レベルで
   discharge 可能 (threading param に追加するか S16 hoist かは hub 裁量)。
+
+## 2026-07-15 HUB 追記 (tick 61 直後) — 0116 full flip IN PROGRESS、b への anti-collision request
+
+#91 の flag を受け **hub full flip を開始** (0116「🚧 HUB FULL FLIP — IN PROGRESS」節参照)。
+**b 宛 request: flip landing まで `S15_SAndT_Setup/{NormEstimates,CountingLayer}.lean` への
+touch を控える** (Engines[SSide]・S15_Tau1T 等その他 b file は通常どおり)。landing は
+merge_monitor 現状メモで通知する。

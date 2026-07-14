@@ -217,3 +217,32 @@ sequencing (i) は #82-86 で完了済み、(ii) 成立確認は hub 判断の�
 **(時系列注、b 2026-07-15)**: 上の b 報告は tick 55 自己訂正より**後**に landed。自己訂正の
 「full flip に QD_sharp 移設を含める」項目は本討伐 (bee4bef9、signature 不変 in-place discharge)
 で解決済み — full flip から除外してよい。b は再確定順序どおり #22 rebase campaign へ進む。
+
+## 🚧 HUB FULL FLIP — IN PROGRESS (2026-07-15 tick 61 直後、hub claim)
+
+**トリガー成立を確認** (b 2035 #91 flag、tick 61 merge `c6667e0c`): #22 rebase campaign 完了 —
+S-side atom (#25/#26) + T-side atom (#88-#91 = Q_sharp_hypothesis76_base / tau_eq_induce /
+exists_muT_index_core / exists_etaT_alphaFun_one_int_core) が全て core + (hD, hQcomm) param 型で
+discharge leaf 側 (S15_CharacterDegreeEngines[SSide]) に完備。sequencing (ii) も成立
+(a は OrderDetermination を直近 8 tick 非接触 = quiet 化、かつ additive+legacy-wrapper 方式で
+無変更に生き続ける)。
+
+**hub 作業宣言 (scope = 再確定順序 (2) の full flip)**:
+1. NormEstimates 5 obtain-site (:295/:455/:493/:571/:706) の core/lam + (hD,hv) param 化
+   (additive 新 decl + 旧 signature は legacy wrapper 温存)
+2. 討伐済み atom の cite 置換 (sorried atom `exists_muT_index` :238 /
+   `exists_etaT_alphaFun_one_int` :259 → Engines core 版 cite; hQcomm の discharge 方針は
+   実装時に確定 = threading param 追加 or S16 hoist、hub 裁量条項)
+3. 新 discharge leaf (`S15_CaseBEndgameSupply.lean` 予定、CDS import) で
+   `T_caseB_facts_unconditional` cite による一括 discharge
+4. legacy retire (CountingLayer `tSide_theta_package_of_not_caseB` + `lambda_forces_T_caseB`
+   削除 = 実 sorry −1) — a の 3 obtain-site param 版移行後に最終化 (それまで wrapper 温存)
+
+**anti-collision (lane 宛)**:
+- **b 宛**: full flip landing まで `S15_SAndT_Setup/{NormEstimates,CountingLayer}.lean` への
+  touch を控えること (2035 にも記載)。Engines[SSide] / その他 b file は通常どおり。
+- **a 宛**: 変更なし (legacy wrapper が生きるため OrderDetermination の 3 obtain-site は無変更で
+  可)。flip landing 後に param 版への機械的移行 request を再掲する。
+
+作業は hub worktree (branch `hub0116`) で行い、green 後に通常ゲートで main 合流。進捗は本 issue
+に追記。
