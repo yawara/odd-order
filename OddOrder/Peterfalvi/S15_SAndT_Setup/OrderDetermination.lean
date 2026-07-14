@@ -1077,6 +1077,27 @@ theorem caseA_exists_sylow_mem_inf_centralizer_ne_bot [Finite G]
   apply exists_sylow_mem_inf_centralizer_ne_bot_of_not_isCyclic hG hyp hr hrhalf R
   exact caseA_sylow_U_not_isCyclic hG hyp caseA hr hrhalf R
 
+/-- **Peterfalvi (14.6), ambient Sylow carrier.**  If `R₀ ∈ Syl_r(U)` is noncyclic and
+`U ≤ K`, then there is `R ∈ Syl_r(K)` containing the image of `R₀`; simultaneously retain the
+BG Prop. 1.16 witness `x ∈ R₀#` with `P ∩ C_G(x) ≠ 1`.  Taking `K = H = L_F` is the Sylow
+selection used before the center argument in (14.6). -/
+theorem exists_sylow_over_U_with_centralizer_witness_of_not_isCyclic [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {r : ℕ} (hr : r.Prime) (hrhalf : r ∣ (hyp.p - 1) / 2)
+    (R₀ : Sylow r ↥hyp.U) (hR₀nc : ¬ IsCyclic ↥(R₀ : Subgroup ↥hyp.U))
+    (K : Subgroup G) (hUK : hyp.U ≤ K) :
+    ∃ R : Sylow r ↥K,
+      (R₀ : Subgroup ↥hyp.U).map (Subgroup.inclusion hUK) ≤ R ∧
+        ∃ x ∈ (R₀ : Subgroup ↥hyp.U).map hyp.U.subtype, x ≠ (1 : G) ∧
+          hyp.P ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ := by
+  obtain ⟨x, hxR₀, hx1, hxP⟩ :=
+    exists_sylow_mem_inf_centralizer_ne_bot_of_not_isCyclic hG hyp hr hrhalf R₀ hR₀nc
+  have hR₀K : IsPGroup r
+      ((R₀ : Subgroup ↥hyp.U).map (Subgroup.inclusion hUK)) :=
+    R₀.isPGroup'.map (Subgroup.inclusion hUK)
+  obtain ⟨R, hR₀R⟩ := hR₀K.exists_le_sylow
+  exact ⟨R, hR₀R, x, hxR₀, hx1, hxP⟩
+
 /-- The parity calculation behind **Peterfalvi (13.14)**: if `p` is odd, the
 geometric sum of its first `q` powers has the same parity as `q`. -/
 private theorem sum_range_pow_mod_two_eq {p q : ℕ} (hpodd : Odd p) :

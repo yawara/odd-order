@@ -8181,3 +8181,18 @@ whose centralizer in `P` is nontrivial. -/
   OddOrder.Peterfalvi.S15.exists_sylow_mem_inf_centralizer_ne_bot_of_not_isCyclic
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S15.caseA_exists_sylow_mem_inf_centralizer_ne_bot_of_parameters
+
+/-! **Peterfalvi (14.6), ambient Sylow carrier.**  For every ambient subgroup containing `U`,
+the noncyclic `R₀ ∈ Syl_r(U)` extends to a Sylow `r`-subgroup while retaining the BG Prop. 1.16
+centralizer witness. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.exists_sylow_over_U_with_centralizer_witness_of_not_isCyclic
+
+/-! **Peterfalvi (14.6), Sylow center trapping.**  The named complement `U` is Hall in `S`;
+the BG Prop. 1.16 witness belongs to the honest type-`P₂` TI-set, so its ambient centralizer
+lies in `S`.  Sylow maximality identifies `C_R(x)` with `R₀`, hence `Z(R) ≤ R₀`. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.coprime_card_U_index_S
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.sylow_center_le_U_sylow_of_centralizer_witness
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.exists_sylow_over_U_with_trapped_center_of_not_isCyclic

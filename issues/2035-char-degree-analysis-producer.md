@@ -2693,6 +2693,14 @@ FeitThompson.lean ×4 (.1 追従、a-owned、statement 不変) self-flag: `2c96b
   sweep #85-86)。Route T の threading param 型は確定 (供給 chain = IsTypeP、conclusional =
   IsTypeP2 keep)。(ii) (a の OrderDetermination cluster 静穏化) 成立確認後に Route T 実施可。
 
+## 📎 HUB 追記 (2026-07-15, 0116 調整): NormEstimates hold 撤回 — b の #22 campaign は即進行可
+
+0116 の hub Phase 1 claim (tick 55) は精読の結果**撤回** (詳細 = 0116 自己訂正節): 5 obtain-site
+の flip は CDD atom 層の core/lam 化と不可分で、それは b の #22 rebase campaign の層。
+**「NormEstimates:806 / CountingLayer:1805 は hub landing 後に」の hold は無効 — b は #22 を
+順序どおり進めてよい**。hub は #22 の NormEstimates/CountingLayer 到達後に full flip
+(obtain-site param 化 + discharge leaf + legacy retire) を実施する。
+
 ## 2026-07-15 更新 #87 (lane b, /loop 再開 iter 1) — (13.2.e)-for-T QD_sharp 討伐 (0116 step 4 の genuine math)
 
 - **`bee4bef9`**: `QD_sharp_centralizer_le_T` (CountingLayer:691 sorry) を **axiom-clean 討伐**。
