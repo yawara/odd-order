@@ -596,16 +596,16 @@ via the BG type dictionary), so it is taken as a parameter together with a `T`-s
 bridge image `τ_T(β_T)` (`tauTbetaGrid`). -/
 noncomputable def Hypothesis.dadeHypT0 [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T) (Tdata : TypePData hyp.T) :
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T) (Tdata : TypePData hyp.T) :
     OddOrder.Peterfalvi.S04.Hypothesis G (honestTypeP2A0Set hyp.T Tdata) hyp.T :=
-  (dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.T_maximal hT2.1 Tdata).some.dade
+  (dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.T_maximal hTP Tdata).some.dade
 
 /-- **`T`-instance `'A0`-Dade `H`-conjugation invariance** (mirror of `dadeHypS0_hconj`). -/
 theorem Hypothesis.dadeHypT0_hconj [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T) (Tdata : TypePData hyp.T) :
-    (hyp.dadeHypT0 hG hT2 Tdata).HConjInvariant :=
-  (dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.T_maximal hT2.1 Tdata).some.hconj
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T) (Tdata : TypePData hyp.T) :
+    (hyp.dadeHypT0 hG hTP Tdata).HConjInvariant :=
+  (dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.T_maximal hTP Tdata).some.hconj
 
 /-- **`dadeHypS0.H a = ftSupportKernel S (A₀(S)) a`** (A₀ analogue of `dadeHypS_H_eq_ftSupportKernel`).
 The `'A0(S)`-instance Dade stabilizer at a support point `a` is the faithful (8.14) signalizer kernel
@@ -1069,26 +1069,26 @@ theorem Hypothesis.tauS_mu_vanish_on_V [Fintype G] [Finite G]
 `dadeHypS0_H_eq_ftSupportKernel`). -/
 theorem Hypothesis.dadeHypT0_H_eq_ftSupportKernel [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T) (Tdata : TypePData hyp.T)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T) (Tdata : TypePData hyp.T)
     (a : {a : G // a ∈ honestTypeP2A0Set hyp.T Tdata}) :
-    (hyp.dadeHypT0 hG hT2 Tdata).H a =
+    (hyp.dadeHypT0 hG hTP Tdata).H a =
       OddOrder.Peterfalvi.S10.ftSupportKernel hyp.T (honestTypeP2A0Set hyp.T Tdata) a.1 :=
-  (dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.T_maximal hT2.1
+  (dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.T_maximal hTP
     Tdata).some.H_eq_ftSupportKernel a
 
 /-- **All `'A0(T)`-instance Dade stabilizers vanish** (mirror of
 `forall_dadeHypS0_H_eq_bot`; the `T`-side (13.2.e) `A₀` `normedTI` conclusion, from the generic
-`escaping_honestTypeP2A0Set_eq_empty` at the (14.9)-parametric `hT2`/`Tdata`). -/
+`escaping_honestTypeP2A0Set_eq_empty` at the (14.9)-parametric `hTP`/`Tdata`). -/
 theorem Hypothesis.forall_dadeHypT0_H_eq_bot [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G))
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T) (Tdata : TypePData hyp.T) :
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T) (Tdata : TypePData hyp.T) :
     ∀ a : {a : G // a ∈ honestTypeP2A0Set hyp.T Tdata},
-      (hyp.dadeHypT0 hG hT2 Tdata).H a = ⊥ := by
+      (hyp.dadeHypT0 hG hTP Tdata).H a = ⊥ := by
   intro a
-  rw [hyp.dadeHypT0_H_eq_ftSupportKernel hG hT2 Tdata a]
-  have hempty := escaping_honestTypeP2A0Set_eq_empty hG hnoV hyp.T_maximal hT2.1 Tdata
+  rw [hyp.dadeHypT0_H_eq_ftSupportKernel hG hTP Tdata a]
+  have hempty := escaping_honestTypeP2A0Set_eq_empty hG hnoV hyp.T_maximal hTP Tdata
   exact OddOrder.Peterfalvi.S10.ftSupportKernel_eq_bot_of_not_escaping
     (fun hesc => Set.notMem_empty a.1 (hempty ▸ hesc))
 
@@ -1119,14 +1119,14 @@ theorem Hypothesis.tauT_nu_vanish_on_V [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)
     (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
     (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     (j : Fin hyp.p) {r s : Fin hyp.q}
     (hr : r ≠ ⟨0, hyp.q_prime.pos⟩) (hs : s ≠ ⟨0, hyp.q_prime.pos⟩) :
     ∀ x ∈ conjClassSet ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))),
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hT2 Tdata)
-          ((hyp.dadeHypT0 hG hT2 Tdata).fullDadeIsometryData (hyp.dadeHypT0_hconj hG hT2 Tdata))
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hTP Tdata)
+          ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData (hyp.dadeHypT0_hconj hG hTP Tdata))
           (hyp.nu r j - hyp.nu s j)
         - (hyp.eta r j - hyp.eta s j)) x = 0 := by
   classical
@@ -1148,22 +1148,22 @@ theorem Hypothesis.tauT_nu_vanish_on_V [Fintype G] [Finite G]
   have hsupp := hyp.tauT_nu_diff_support hG pins Tdata hU hW1 hW2 j hr hs
   rw [OddOrder.RepresentationTheory.ClassFunction.sub_apply,
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support
-      (hyp.dadeHypT0 hG hT2 Tdata)
-      ((hyp.dadeHypT0 hG hT2 Tdata).fullDadeIsometryData (hyp.dadeHypT0_hconj hG hT2 Tdata))
+      (hyp.dadeHypT0 hG hTP Tdata)
+      ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData (hyp.dadeHypT0_hconj hG hTP Tdata))
       hsupp,
-    (hyp.dadeHypT0 hG hT2 Tdata).dadeMap_apply]
-  have h1H : (1 : G) ∈ (hyp.dadeHypT0 hG hT2 Tdata).H ⟨w, hwA0⟩ := by
-    rw [hyp.forall_dadeHypT0_H_eq_bot hG hnoV hT2 Tdata ⟨w, hwA0⟩]
+    (hyp.dadeHypT0 hG hTP Tdata).dadeMap_apply]
+  have h1H : (1 : G) ∈ (hyp.dadeHypT0 hG hTP Tdata).H ⟨w, hwA0⟩ := by
+    rw [hyp.forall_dadeHypT0_H_eq_bot hG hnoV hTP Tdata ⟨w, hwA0⟩]
     exact Subgroup.mem_bot.mpr rfl
   have hconj1 : IsConj ((⟨w, hwA0⟩ :
       {a : G // a ∈ honestTypeP2A0Set hyp.T Tdata}).1 * 1) x := by
     rw [mul_one]; exact hconjwx
-  rw [(hyp.dadeHypT0 hG hT2 Tdata).dadeValue_eq _ h1H hconj1]
+  rw [(hyp.dadeHypT0 hG hTP Tdata).dadeValue_eq _ h1H hconj1]
   have hnu : ∀ (l : Fin hyp.q),
-      hyp.nu l j ⟨w, (hyp.dadeHypT0 hG hT2 Tdata).mem_L hwA0⟩ = hyp.omega l j ⟨w, hwW⟩ := by
+      hyp.nu l j ⟨w, (hyp.dadeHypT0 hG hTP Tdata).mem_L hwA0⟩ = hyp.omega l j ⟨w, hwW⟩ := by
     intro l
     rw [pins.nu_apply_of_not_mem_W1 l j w hwW
-      ((hyp.dadeHypT0 hG hT2 Tdata).mem_L hwA0) hw1, hyp.deltaPrime_eq_one_pins hG pins l]
+      ((hyp.dadeHypT0 hG hTP Tdata).mem_L hwA0) hw1, hyp.deltaPrime_eq_one_pins hG pins l]
     norm_num
   have heta : ∀ (l : Fin hyp.q), hyp.eta l j x = hyp.omega l j ⟨w, hwW⟩ := by
     intro l
@@ -1178,22 +1178,22 @@ theorem Hypothesis.tauT_nu_vanish_on_V [Fintype G] [Finite G]
 `dadeHypS_H_eq_ftSupportKernel`). -/
 theorem Hypothesis.dadeHypT_H_eq_ftSupportKernel [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)
     (a : {a : G // a ∈ honestTypeP2ASet hyp.T}) :
-    (hyp.dadeHypT hG hT2).H a =
+    (hyp.dadeHypT hG hTP).H a =
       OddOrder.Peterfalvi.S10.ftSupportKernel hyp.T (honestTypeP2ASet hyp.T) a.1 :=
-  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.T_maximal hT2.1).some.H_eq_ftSupportKernel a
+  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.T_maximal hTP).some.H_eq_ftSupportKernel a
 
 /-- **No `A(T)`-point escapes `T`** (mirror of `no_escaping_honestTypeP2ASet`, at the
-(14.9)-parametric `hT2`). -/
+(14.9)-parametric `hTP`). -/
 theorem Hypothesis.no_escaping_honestTypeP2ASet_T [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
-    (hyp : Hypothesis (G := G)) (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T) :
+    (hyp : Hypothesis (G := G)) (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T) :
     ∀ a ∈ honestTypeP2ASet hyp.T,
       a ∉ OddOrder.GroupTheory.escapingCentralizerSet hyp.T (honestTypeP2ASet hyp.T) := by
   intro a _ ha
-  rw [escaping_honestTypeP2ASet_eq_empty hG hnoV hyp.T_maximal hT2.1] at ha
+  rw [escaping_honestTypeP2ASet_eq_empty hG hnoV hyp.T_maximal hTP] at ha
   exact Set.notMem_empty a ha
 
 /-- **(13.2.e)-at-`T`, stabilizer form: every `T`-instance Dade stabilizer is trivial**
@@ -1201,12 +1201,12 @@ theorem Hypothesis.no_escaping_honestTypeP2ASet_T [Finite G]
 theorem Hypothesis.forall_dadeHypT_H_eq_bot [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
-    (hyp : Hypothesis (G := G)) (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T) :
-    ∀ a : {a : G // a ∈ honestTypeP2ASet hyp.T}, (hyp.dadeHypT hG hT2).H a = ⊥ := by
+    (hyp : Hypothesis (G := G)) (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T) :
+    ∀ a : {a : G // a ∈ honestTypeP2ASet hyp.T}, (hyp.dadeHypT hG hTP).H a = ⊥ := by
   intro a
-  rw [hyp.dadeHypT_H_eq_ftSupportKernel hG hT2 a]
+  rw [hyp.dadeHypT_H_eq_ftSupportKernel hG hTP a]
   exact OddOrder.Peterfalvi.S10.ftSupportKernel_eq_bot_of_not_escaping
-    (hyp.no_escaping_honestTypeP2ASet_T hG hnoV hT2 a.1 a.2)
+    (hyp.no_escaping_honestTypeP2ASet_T hG hnoV hTP a.1 a.2)
 
 open OddOrder.RepresentationTheory in
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -1216,22 +1216,22 @@ class function. -/
 theorem Hypothesis.tInstance_dade_eq_induce [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
-    (hyp : Hypothesis (G := G)) (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hyp : Hypothesis (G := G)) (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)
     {f : ClassFunction ↥hyp.T ℂ}
     (hf : f.support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T) :
-    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2)
-        ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2)) f
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
+        ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP)) f
       = ClassFunction.induce hyp.T f := by
-  rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support (hyp.dadeHypT hG hT2)
-    ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2)) hf]
+  rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support (hyp.dadeHypT hG hTP)
+    ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP)) hf]
   exact OddOrder.Peterfalvi.S14.dadeMap_eq_induce_of_supported_on_trivial_H
-    (hyp.dadeHypT hG hT2)
+    (hyp.dadeHypT hG hTP)
     (subset_refl _)
     (fun l _ ha => honestTypeP2ASet_conj_mem l.2 ha)
     (fun a => by
       rw [OddOrder.Peterfalvi.S04.Hypothesis.restrict_H]
-      exact hyp.forall_dadeHypT_H_eq_bot hG hnoV hT2 ⟨a.1, a.2⟩)
+      exact hyp.forall_dadeHypT_H_eq_bot hG hnoV hTP ⟨a.1, a.2⟩)
     ⟨f, (ClassFunction.mem_supportedSubmodule).mpr hf⟩
 
 open OddOrder.RepresentationTheory in
@@ -1242,23 +1242,23 @@ theorem Hypothesis.tInstance_dade0_eq_induce [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G))
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T) (Tdata : TypePData hyp.T)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T) (Tdata : TypePData hyp.T)
     {f : ClassFunction ↥hyp.T ℂ}
     (hf : f.support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set hyp.T Tdata) hyp.T) :
-    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hT2 Tdata)
-        ((hyp.dadeHypT0 hG hT2 Tdata).fullDadeIsometryData (hyp.dadeHypT0_hconj hG hT2 Tdata)) f
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hTP Tdata)
+        ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData (hyp.dadeHypT0_hconj hG hTP Tdata)) f
       = ClassFunction.induce hyp.T f := by
   rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support
-    (hyp.dadeHypT0 hG hT2 Tdata)
-    ((hyp.dadeHypT0 hG hT2 Tdata).fullDadeIsometryData (hyp.dadeHypT0_hconj hG hT2 Tdata)) hf]
+    (hyp.dadeHypT0 hG hTP Tdata)
+    ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData (hyp.dadeHypT0_hconj hG hTP Tdata)) hf]
   exact OddOrder.Peterfalvi.S14.dadeMap_eq_induce_of_supported_on_trivial_H
-    (hyp.dadeHypT0 hG hT2 Tdata)
+    (hyp.dadeHypT0 hG hTP Tdata)
     (subset_refl _)
     (fun l _ ha => (honestTypeP2A0Set_conj_mem Tdata l.2).mpr ha)
     (fun a => by
       rw [OddOrder.Peterfalvi.S04.Hypothesis.restrict_H]
-      exact hyp.forall_dadeHypT0_H_eq_bot hG hnoV hT2 Tdata ⟨a.1, a.2⟩)
+      exact hyp.forall_dadeHypT0_H_eq_bot hG hnoV hTP Tdata ⟨a.1, a.2⟩)
     ⟨f, (ClassFunction.mem_supportedSubmodule).mpr hf⟩
 
 end OddOrder.Peterfalvi.S15
