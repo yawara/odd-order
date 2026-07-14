@@ -1717,3 +1717,67 @@ cSub_eq_D)。
   Dade/直交計算 — S-side の tau1S_induce_inner_eta 系 mirror + ν_r^τ = δ'∑η formula (§4/§6-T)
 - conjunct 5 (⟨τ₁S λ, θG⟩ = 0): (13.2.e) disjoint support 直交
 次 iteration: conjunct 4 の ν-η formula (Ind_T(ν_{rj} 差) と η の関係、nu_definition + Dade 経由) を精査。
+
+## 2026-07-14 更新 #40 (lane b, /loop iter 4) — (13.4) conjunct 2 (support estimate) 実証明
+
+`tSide_theta_package` の conjunct 2 を閉じた (TSideDegrees、sorry-free):
+- **`K_subgroupOf_T_normal`**: K = QD ⊴ T。Q = T_F Fitting Hall + D = V ⊓ C_G(Q) の T-正規性
+  (`typePData_C_normalized_by_M` reconciled T-instance、D は F(T) の π(Q)'-part) + normal sup。
+- **`indK_sub_nuRow_support`**: `(Ind_K^T θ − ν_r).support ⊆ (QD)^#`。両項とも normal K からの
+  induce (`nu_i_isIndQD`) → K 外で消滅 (`induce_apply_eq_zero_of_not_mem_normal`)、1 では両者
+  degree v·p (`K_index_eq_vp`) で相殺。
+
+### tSide_theta_package 残り conjunct 状況 (再掲+更新)
+- conjunct 1 (δ'=±1) ✓ / conjunct 2 (support) ✓ #40 / conjunct 3 (Ind formula) = θG 定義消化 ✓方針
+- **conjunct 4 (∀ij ⟨η_{ij}, θG⟩ = 0) = 残る本丸**: θG = Ind(θT−ν_r) + δ'∑η_{rj} の η-直交
+  ⟺ ⟨η_{ij}, Ind_T^G(θT−ν_r)⟩ = −δ'[i=r]。原文 route は τ₁-T formula (ν_r^{τ₁} = δ'∑η_{rj})
+  + θ^τ ⊥ η ((5.3.b)-T) — **T-side (9.11) coherence (`sSet_coherent_indT_A_pinned` 相当) の構築
+  が必要** (S-side 機構 sSet_coherent_indS_{caseA,caseB} + coherentIndS_image_inner_eta_eq_zero
+  の T-instance 化; S-side 自体に mixed-family lift の sorried-cite residual あり)。
+- conjunct 5 (⟨τ₁Sλ, θG⟩ = 0): (13.2.e) S/T cross disjoint-support 直交。
+
+次 iteration: S-side coherence 機構の generic 性精査 → T-instance 化の設計判断。
+
+## 2026-07-14 更新 #41 (lane b, /loop iter 5) — (13.4) conjunct 4/5 の T-side coherence 戦線: 設計確定
+
+conjunct 4 (∀ij ⟨η_{ij}, θG⟩ = 0) の short route (Frobenius reciprocity + K#-support 直接計算) を
+検討したが **不成立** (η の K# 上の値は coherence 抜きに決まらない; 原文も (13.3.c)-T formula =
+coherent extension 経由)。**T-side (9.11) coherence の構築が正道** — S-side stack の T-mirror。
+
+### S-side coherence stack の現状 (精査済)
+- `sSet_coherent_indS_A_pinned` = dispatch (`clifford_dichotomy`) + caseA/caseB + μ-column pin
+- **caseB** (`S15_CaseBReducibleCoherence`): uniform-degree (5.7) route、landed;
+  residual = `sSet_memberRFamily` reducible branch (§6 certain-type image-family port)
+- **caseA** (`S15_CaseACoherence`): (9.11) 非 Galois maximal-pair refutation;
+  base cut + reduction landed; residual = `sSet_caseA_nineElevenRefutation`
+  ((9.11.7)-(9.11.8) は M-side 共通 residual、issue 9083 Phase E)
+- Dade 基盤 = `dadeHypS`/`dadeHypS0` (S15_HonestTypeP2A0)
+
+### T-side 建設計画 (資産と残作業)
+
+**既存資産 (この session で建った物を含む)**:
+- `dadeHypT0` (S15_HonestTypeP2A0:598、hT2/Tdata パラメトリック A₀(T)-Dade) ✓
+- T-instance §9 完備: `toTypesIIIIIIVSetupT` + `mkSection11CharacterDataT` + kernel collapse
+  (chief_N/H0_eq_bot、cSub_eq_D) + 同定 (q_eq/p_eq/v_eq) ✓ (#38/#39)
+- **uniform degree v·p** = `nu_apply_one_eq_v` ✓ (#38 — caseB-T の (5.7) 入力そのもの)
+- generic engines: `uniform_degree_coherence_of_families` (5.7) / S07 maximal-pair reduction /
+  `clifford_dichotomy` ✓
+- conjunct 2 support (`indK_sub_nuRow_support`) + K ⊴ T ✓ (#40)
+
+**残 construction (建設順)**:
+1. 𝒯-family 同定: generic `sSet (toTypesIIIIIIVSetupT)` と (13.1) の 𝒯 の対応 + ν-row sums が
+   reducible members (`sSet_reducible_eq_nuRowSum` mirror)
+2. caseB-T: `sSet_caseB_apply_one_eq_vp` (uniform degree — 部材済で組むだけ) +
+   T-instance R-family (§6-T port; S-side と同じ residual 構造になる)
+3. caseA-T: base cut (degree p·a irr) + reduction (generic) + refuter (M-common residual cite)
+4. dispatch + **ν-row pin** (`sSet_coherent_indT_A_pinned`: ν_r^{τ₁T} = δ'∑_j η_{rj} form)
+5. `tau1T_ofHonest` + (5.3.b)-T (`coherentIndT_image_inner_eta_eq_zero` mirror) +
+   conjunct 4 assembly (⟨η_{ij}, Ind(θT−ν_r)⟩ = −δ'[i=r]: coherence ext = Ind on A₀(T)-supported
+   (conjunct 2 support) + pin + (5.3.b)-T)
+6. conjunct 5: (13.2.e) S/T cross disjoint-support 直交 ((H#)^G ∩ (K#)^G = ∅、原文 13.4 冒頭)
+7. package assembly → `tSide_theta_package_of_not_caseB_core` sorry 置換
+
+規模: S-side stack ~2500 行の mirror (generic 部分は cite で短縮、実質 ~1000-1500 行 + 2 residual
+は S-side と共通の precisely-named sorried-cite に collapse)。複数 session。CLAUDE.md 原則
+(コスト・規模は判断基準でない) により淡々と建設する。次 iteration: step 1-2 (caseB-T、
+uniform-degree route) から。

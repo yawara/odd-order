@@ -773,4 +773,72 @@ theorem Hypothesis.mkSection11CharacterDataT_v_eq [Finite G]
     hyp.toTypesIIIIIIVSetupT_U_eq hG hvd, hyp.card_V_eq_vd] at key
   exact key
 
+/-- **`K = QD ⊴ T`** (as `K.subgroupOf T`): `Q = T_F ⊴ T` (Fitting Hall) and `D = V ⊓ C_G(Q)`
+is `T`-normalized (`typePData_C_normalized_by_M` on the reconciled datum — `D` is the
+`π(Q)'`-part of `F(T)`), so the join is normal.  The support engine of the (13.4) θ-package:
+characters induced from the normal `K` vanish off `K`. -/
+theorem Hypothesis.K_subgroupOf_T_normal [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) : (hyp.K.subgroupOf hyp.T).Normal := by
+  haveI := hyp.finiteG
+  obtain ⟨tpd, hU, -, -⟩ := reconciled_typePData_T hG hyp
+  have hUne : tpd.U ≠ ⊥ := by
+    intro hbot
+    apply hyp.vd_ne_one hG
+    rw [← hyp.card_V_eq_vd, ← hU, hbot, Subgroup.card_bot]
+  have hQT : hyp.Q ≤ hyp.T := by
+    rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.T
+  have hDT : hyp.D ≤ hyp.T := (hyp.D_eq ▸ inf_le_left : hyp.D ≤ hyp.V).trans
+    ((by rw [hyp.T_deriv_eq_QV]; exact le_sup_right : hyp.V ≤ derivedInG hyp.T).trans
+      (Subgroup.map_subtype_le _))
+  haveI hQn : (hyp.Q.subgroupOf hyp.T).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hQT).mpr (by
+      rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.T)
+  haveI hDn : (hyp.D.subgroupOf hyp.T).Normal := by
+    have hnorm := OddOrder.Peterfalvi.S12.typePData_C_normalized_by_M tpd hUne
+    rw [hU, show tpd.H = hyp.Q from by rw [tpd.H_eq, hyp.Q_eq_TF], ← hyp.D_eq] at hnorm
+    exact (Subgroup.normal_subgroupOf_iff_le_normalizer hDT).mpr hnorm
+  have hKeq : hyp.K.subgroupOf hyp.T = hyp.Q.subgroupOf hyp.T ⊔ hyp.D.subgroupOf hyp.T := by
+    rw [← Subgroup.subgroupOf_sup hQT hDT]; rfl
+  rw [hKeq]
+  infer_instance
+
+open scoped FiniteInduce in
+/-- **The (13.4) support estimate** (conjunct 2 of the θ-package): for any degree-one
+`θ` on `K` and any nonzero row `r`, the difference `Ind_K^T θ − ν_r` is supported in
+`(QD)^# = {z ∈ K, z ≠ 1}`.  Both terms are induced from the *normal* `K = QD`
+(`nu_i_isIndQD` for the row sum), so they vanish off `K`
+(`induce_apply_eq_zero_of_not_mem_normal`); at `1` both have degree
+`[T:K]·1 = v·p` (`K_index_eq_vp`), so the difference vanishes. -/
+theorem Hypothesis.indK_sub_nuRow_support [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (pins : NuGridSupplyData hyp)
+    (θ : ClassFunction ↥(hyp.K.subgroupOf hyp.T) ℂ) (hθ1 : θ 1 = 1)
+    (r : Fin hyp.q) (hr : r ≠ ⟨0, hyp.q_prime.pos⟩) :
+    (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ
+      - ∑ j : Fin hyp.p, hyp.nu r j).support ⊆
+      {z : ↥hyp.T | (z : G) ∈ hyp.Q ⊔ hyp.D ∧ z ≠ 1} := by
+  haveI := hyp.finiteG
+  letI : Fintype ↥hyp.T := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥(hyp.K.subgroupOf hyp.T) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI hKn := hyp.K_subgroupOf_T_normal hG
+  obtain ⟨θr, hθrirr, hθr1, hθreq⟩ := hyp.nu_i_isIndQD hG pins r hr
+  intro z hz
+  have hzne : (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ
+      - ∑ j : Fin hyp.p, hyp.nu r j) z ≠ 0 := hz
+  refine ⟨?_, ?_⟩
+  · -- `(z : G) ∈ Q ⊔ D`: otherwise both inductions vanish at `z`.
+    by_contra hzK
+    apply hzne
+    have hzKsub : z ∉ hyp.K.subgroupOf hyp.T := fun h => hzK (Subgroup.mem_subgroupOf.mp h)
+    rw [ClassFunction.sub_apply,
+      ClassFunction.induce_apply_eq_zero_of_not_mem_normal _ θ hzKsub, hθreq,
+      ClassFunction.induce_apply_eq_zero_of_not_mem_normal _ θr hzKsub,
+      sub_zero]
+  · -- `z ≠ 1`: at `1` both sides have degree `v·p`.
+    intro hz1
+    apply hzne
+    rw [hz1, ClassFunction.sub_apply, ClassFunction.induce_apply_one, hθ1, mul_one, hθreq,
+      ClassFunction.induce_apply_one, hθr1, mul_one, sub_self]
+
 end OddOrder.Peterfalvi.S15
