@@ -631,6 +631,40 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 51) — ★ c が RULING #4′ 実施 = sibleyTarget_frobI 完全 close。census 37**:
+  **a=0**。**b=1+merge** (`ed8ed811` = docs 2035 **#79 b-owned sorry 全数 gating map**。
+  hub 宛 lever 情報: ⑤ flip (NormEstimates 5 obtain-site の chars→core/lam 化) = 0116 本体で
+  b 単独不能を確認 + **a の swap 証明群 (c_eq_one 系) も全て analytic_inequality 経由で
+  character_degree_analysis (Machinery135:345、uninhabitable) の sorryAx を運ぶ = 0116 解決が
+  profile 一括清浄化の lever**。b の ungated 次 frontier = #22 rebase 修理 campaign (4 項目、
+  NormEstimates:806/CountingLayer:1805 への P-witness thread は statement 不変)。build 省略
+  (issues のみ)。merge)。
+  **c=2** (`1da9aa29` = ★ **RULING #4′ 実施 — card_L_odd faithfulness fix + caller thread で
+  sibleyTarget_frobI 完全 close (実 −1、9077 item 2 完遂、(12.6) chain root axiom-clean)** +
+  AxiomsCheck assert。conflict = AxiomsCheck longFile 上限 8200 vs 8300 → 大値採用 (機械的)。
+  merge)。build green 4216 jobs / AxiomsCheck OK / census **38→37 (実 −1)** / 新 axiom なし /
+  逸脱なし。push 済 (main = a643dd05)。
+  **0116 追跡**: Route T の実体 = ⑤ flip + (13.4)-triple/muT/integrality の core-param 化と
+  確定 (#79 で b と認識一致)。b の swap instantiation (T_side_D_eq_bot/v_eq_full) landing で
+  パラメータ形状 fix → hub 実施、の sequencing 継続。c は再び gated-endpoint hold
+  (trigger = Route T 後の V_inf re-engage flag)。
+- **2026-07-14 (tick 50) — a Singer 実現 + b 分割 2 件 & no_lambda 修理 (swap-route)。census 38**:
+  **a=2** (`5fb29c7e`/`37ff2a08` = caseA scalar embedding 露出 + **faithful irreducible Singer
+  actions 実現** (GroupTheory 3 leaf 加算 + S11_ImprimitiveUBound、claims 9099/9100 起票→close
+  完備)。sorry 0/0。merge)。
+  **b=3** (`6546bc02` = **2000 行超過 2 件の prefix-split** (CountingLayer→+PairStructure /
+  CDS→+CharacterDegreeEngines、module 名不変) / `49cac4ff` = ★ **T_caseB_facts_no_lambda
+  statement 修理** — ¬LambdaWitness は overstatement、(14.1) q<p のみの swap-route
+  ((13.12)/(13.13)/(13.15) @ hyp.swap) へ再構成、旧 sorry 消滅 (実 −1)。q_lt_p threading で
+  TTypeII/SubgroupM (c 域) へ機械的追従 (self-flag ✓ 🔩)。merge)。**c=0** (RULING #4′ 未消化 —
+  card_L_odd 1-line close は次 tick 期待)。
+  build green 4214/4216 jobs / AxiomsCheck OK / census **39→38 (実 −1)** / 新 axiom なし /
+  逸脱なし / orphan なし。push 済 (main = 6e8ed9fd)。
+  **0116 追跡**: b の swap-route は **θ-package/hT2 を経由しない (13.4) facts への別 honest
+  route** = #75 knot の部分解消が進行中 (T_side_caseB_facts が swap-route 化すれば循環が切れ、
+  gate は通常の layer-inversion に降格 → Route T で discharge 可能になる見込み)。b の次 =
+  swap instantiation (T_side_D_eq_bot / v_eq_full)。条件 (i) は b のこの track の帰結を待つのが
+  合理的 (hT2 弱化そのものより良い解に向かっている)。条件 (ii) 成立継続 (a は Singer/S11 側)。
 - **2026-07-14 (tick 49) — ★★ b refuter-T CLOSED + c 稼働開始 (item 2 構成 + unprovability 発見)。census 39**:
   **a=0** (13.15 完遂後 quiet)。**b=3** (`7576e198` 系 = ★ **refuter-T CLOSED** —
   `sSet_caseA_nineElevenRefutation_T` 実証明で T-side (9.11) chain 全体 axiom-clean

@@ -535,3 +535,22 @@ unprovable) を受理し、**提案 fix を承認する**:
 
 c の再開 trigger 成立: **item 2 の 1-line close を即実施してよい**。完了後は報告どおり
 gated-endpoint hold へ (次 trigger = 0116 Route T 後の「c 再 engage (V_inf)」flag)。
+
+## ✅ 2026-07-14 lane-c: RULING #4′ 実施完了 — item 2 完全 close (`frobenius_typeI_coherent` axiom-clean)
+
+RULING #4′ の承認どおり実施 (commit `1da9aa29`、単独 commit + self-flag):
+- `sibleyTarget_frobI` に `(hodd : Odd (Nat.card G))` 追加 (推奨の最弱仮説形を採用)、
+  `card_L_odd := hodd.of_dvd_nat …` (template と同型)。residual sorry 除去。
+- caller `frobenius_typeI_coherent` に `hG.odd` thread (同 file 内 1 行)。
+- AxiomsCheck に `sibleyTarget_frobI` + `frobenius_typeI_coherent` の 2 assert 追加
+  (longFile 8100→8300 bump 込み)、**両方 axiom-clean 認証** ([propext, Classical.choice,
+  Quot.sound])。full build green (4214 jobs)。net sorry −1、FrobeniusStructure 実 sorry 0。
+
+**milestone**: Peterfalvi **(12.6) が全 3 route ((a) TI/(6.8)・(b) abelian rank-2 (5.7)・
+(c) cyclic-quotient (6.5.c)) 実証明で完結**。下流の §16 consumer (S16_PairingCoherence:901 /
+ComparingLM:1322 — いずれも c cluster の coherence 供給) の sorry-root が 1 本減。
+
+**carve-out 消化状況**: item 2 = **CLOSED** (RULING #3 条件 3 により本 item の carve-out 失効)。
+item 1 (V_inf) = HOLD 継続 (0116 Route T 待ち)。c は gated-endpoint hold へ復帰 —
+trigger: (α) Route T 実施後の「c 再 engage (V_inf)」flag、(β) a の 9000/9097 pipeline landing
+→ `s_side_field_repr` (c-owned SubgroupM の最後の local sorry)。
