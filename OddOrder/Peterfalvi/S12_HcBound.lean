@@ -92,9 +92,10 @@ theorem Hypothesis.forall_sOf_H0Cprime_degree_qu_caseB [Finite G]
 /-- **Bridge to the §9 (repo S11) character analysis.**  A §10 type-III/IV `Hypothesis` yields the
 §9 `TypesIIIIIIVSetup` on the same `M`, sharing the type-`P` structure `(H, U, W₁, W₂)`.  This is the
 `Hypothesis` → `Section11CharacterData` bridge the (11.8.1) §9 counts need: with it,
-`exists_chiefFactorData` produces the chief factor `H̄ = H/H₀`, and the §9 results (`caseB_degree_qu`
-for `μ_j(1) = qu`, `coherent_H0C_commutator` for the (9.11) `S(H₀C')` coherence) apply to the §10
-character parameters.  `type_alt` restricts to III/IV (type V is eliminated separately by
+`exists_chiefFactorData` produces the chief factor `H̄ = H/H₀`, and `caseB_degree_qu` supplies
+`μ_j(1) = qu` for the §10 character parameters.  The generic (9.11) shortcut formerly attached
+to this bridge had an invalid support carrier and is withdrawn; the live honest coherence is
+constructed in the S15 `Ind_S^G` / `A(S)` world.  `type_alt` restricts to III/IV (type V by
 `no_typeV_maximal`); the `nontrivial` core (`U ≠ ⊥`, `|W₁|` prime, the `M_F`-TI condition) is the §8
 structural input, threaded as `hnt` (obtainable from the type data via
 `typePNontrivialCore_of_isTypeIIIorIV`). -/

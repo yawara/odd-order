@@ -629,8 +629,8 @@ noncomputable def sOf_degreeSubfamily_isCoherent [Finite G]
   exact isCoherent_of_subset hcoh hsub hwit
 
 /-- **(9.11) `hY`-route subset step**: the capstone's `𝒮(H₀C)`-coherence input (`hY`) follows from
-the (9.11) coherence of the smaller-kernel family `𝒮(H₀C')` (`coherent_H0C_commutator`'s honest
-target, the Coq `Ptype_core_coherence` induction) by `isCoherent_of_subset` along `𝒮(H₀C) ⊆
+a supplied (9.11) coherence datum for the smaller-kernel family `𝒮(H₀C')` (the honest Coq
+`Ptype_core_coherence` induction target) by `isCoherent_of_subset` along `𝒮(H₀C) ⊆
 𝒮(H₀C')`, once a nonzero `A₀`-supported `𝒮(H₀C)` witness is supplied.  This wires the (9.11) result
 to the world-bridge capstone `coherent_SOf_H0C_of_glued`'s `hY` parameter.
 
