@@ -2053,3 +2053,14 @@ OrthonormalCharacterImageFamily 構築 mirror、~100 行) → dispatch → `_ort
 (5.7)-T engine の入力残 1: **`sSet_memberRFamily_orthogonal` の T 版** ((5.2.e)
 cross-orthogonality、S-side SSetMemberRFamily:794)。それで engine assembly
 (`sSet_coherent_dade_caseB_T`) が組める。
+
+## 2026-07-14 更新 #58 (lane b, /loop iter 19) — dadeT0_apply_eq_zero_of_regular landed + orthogonal-T 依存監査
+
+- **`dadeT0_apply_eq_zero_of_regular`** (TSetMemberRFamily、sorry-free): A(T)-supported f の
+  A₀(T)-Dade 像は regular set 上 0 (S 版 mirror; of_isConj の x→w 書き換えが必要だった)。
+- orthogonal-T の依存監査完了: `eta_orthogonal_of_norm_one_pair_vanish` は **hyp-level で
+  T にもそのまま適用可** (η/W grid は S/T 共有)。残 mirror: imageSet_of_irr/red-T (dispatch
+  分解 rfl 系) / `sSet_irr_memberRFamily_eta_inner`-T (rigidity engine 適用、
+  dadeT0_apply_eq_zero_of_regular + tInstance_dade{,0}_eq_induce で S 版逐語) /
+  `dadeOfDiff_orthogonal_typeP_T` (S08 generic wrapper) / `nu_rowSum_ne_of_inner_zero` /
+  orthogonal-T 本体 (2×2 分岐) → **(5.7) engine assembly**。

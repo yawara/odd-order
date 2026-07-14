@@ -166,4 +166,55 @@ noncomputable def Hypothesis.sSet_memberRFamily_T [Finite G]
     · exact hyp.sSet_member_conjDiff_supported_T hG hvd hη
   · exact hyp.sSet_reducible_memberRFamily_T hG hnoV pins hvd hT2 Tdata hU hW1 hW2 hη hirr
 
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **The `'A0(T)`-Dade image of an `A(T)`-supported class function vanishes on the regular
+set** (mirror of `dadeS0_apply_eq_zero_of_regular`): for `f.support ⊆ A(T)` and a regular
+`W`-point `x`, the Dade map reads the source at the representative `w ∈ typePV(Tdata)`, which
+is `0` because `A(T) ⊆ T'` while regular `W`-elements lie outside `T'`. -/
+theorem Hypothesis.dadeT0_apply_eq_zero_of_regular [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (Tdata : TypePData hyp.T) (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
+    {f : ClassFunction ↥hyp.T ℂ}
+    (hf : f.support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T)
+    {x : G} (hx : x ∈ OddOrder.GroupTheory.conjClassSet
+      ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G)))) :
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hT2 Tdata)
+        ((hyp.dadeHypT0 hG hT2 Tdata).fullDadeIsometryData
+          (hyp.dadeHypT0_hconj hG hT2 Tdata)) f x = 0 := by
+  classical
+  obtain ⟨w, hw, g, hg⟩ := OddOrder.GroupTheory.mem_conjClassSet.mp hx
+  rw [← (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hT2 Tdata)
+    ((hyp.dadeHypT0 hG hT2 Tdata).fullDadeIsometryData (hyp.dadeHypT0_hconj hG hT2 Tdata))
+      f).of_isConj (isConj_iff.mpr ⟨g, hg⟩)]
+  have hA0supp : f.support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set hyp.T Tdata) hyp.T :=
+    hf.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
+      (honestTypeP2ASet_subset_A0Set Tdata))
+  have hwV : w ∈ OddOrder.GroupTheory.typePV hyp.T Tdata := by
+    refine ⟨?_, ?_⟩
+    · have hWeq : (Tdata.W : Set G) = (hyp.W : Set G) := by
+        rw [Tdata.W_eq, hW1, hW2, sup_comm, ← hyp.W_eq_join]
+      rw [hWeq]; exact hw.1
+    · rw [hW1, hW2, Set.union_comm]; exact hw.2
+  have hwA0 : w ∈ honestTypeP2A0Set hyp.T Tdata :=
+    Or.inr (OddOrder.GroupTheory.subset_conjClassSetIn hwV)
+  rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support
+    (hyp.dadeHypT0 hG hT2 Tdata)
+    ((hyp.dadeHypT0 hG hT2 Tdata).fullDadeIsometryData (hyp.dadeHypT0_hconj hG hT2 Tdata))
+    hA0supp]
+  let a : {a : G // a ∈ honestTypeP2A0Set hyp.T Tdata} := ⟨w, hwA0⟩
+  have hwh : w ∈ (hyp.dadeHypT0 hG hT2 Tdata).hCoset a :=
+    ⟨1, (hyp.dadeHypT0 hG hT2 Tdata).H a |>.one_mem, by simp [a]⟩
+  rw [(hyp.dadeHypT0 hG hT2 Tdata).isDadeMap_dadeMap.map_eq_of_mem_hCoset _ a hwh]
+  by_contra hne
+  have hwSupp : (⟨w, (hyp.dadeHypT0 hG hT2 Tdata).mem_L hwA0⟩ : ↥hyp.T) ∈ f.support :=
+    ClassFunction.mem_support.mpr hne
+  have hwA : w ∈ honestTypeP2ASet hyp.T := hf hwSupp
+  have hwDeriv : w ∈ derivedInG hyp.T := honestTypeP2ASet_subset_derived hwA
+  exact (OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived Tdata hwV) hwDeriv
+
 end OddOrder.Peterfalvi.S15
