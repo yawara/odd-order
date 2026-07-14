@@ -623,6 +623,18 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 37) — ★★★ a 合流: 9087 carve-out 実施 landing = FT spine Section 16 named input producer chain が axiom-clean 化**:
+  **a=2** (`abac8ca9` = carve-out 実施 (裁定条件 4 点全遵守: 3 cite 置換のみ / 単独 commit / message
+  self-flag / 9087 実測記録)。`58f0f533` = landing 記録: **12 宣言が `[propext, Classical.choice,
+  Quot.sound]` のみに** — BG §16 `theoremII_tame_embedding{,_of_inputs}` / Pf §10 type-I Dade 2 本 /
+  Pf §14 4 本 (`not_all_maximal_typeI`/`theorem88_caseB_holds` 含む) / **FT spine inputs 4 本
+  (`section16MaximalPair`→`section16Inputs`→`sectionSixteenHypothesis_of_isMinimalSimpleOdd`)**。
+  merge)。b=0 / c=0。build green **4204 jobs** (7m01s、rewire の下流再 elaboration) / census **46 不変** /
+  新 axiom なし / 逸脱なし (carve-out 範囲内)。**hub 独立実測**: flagship 2 宣言の `#print axioms` を
+  scratch probe で再確認 = clean 一致。push 済。carve-out は landing で失効 (9087 記録どおり)。
+  ⟹ named Section 16 input producer の**実構成が clean 化** = carrier 構成可能性の実進捗 (doneness 基準)。
+  follow-up 候補: (i) 12 clean 宣言の AxiomsCheck assert 登録 (a)、(ii) consumer-0 化した legacy
+  `theoremA_maximal_structure` (OVERSTATEMENT 明記、TheoremsAE の残 sorry) の retirement 検討 (b territory)。
 - **2026-07-14 (tick 36) — a 合流 (docs) + ★ 9087 HUB RULING: TaxonomyOutput 3-cite rewire carve-out を a に付与**:
   **a=1** (`0df692bb` = 9087 追記: Section 16 producer chain の `#print axioms` 実測で dirty root を
   **旧 `theoremA_maximal_structure` の 3 cite (TaxonomyOutput.lean:1265/1292/1359) に局所化**。
