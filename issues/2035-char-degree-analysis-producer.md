@@ -2733,3 +2733,22 @@ Pf (13.4) は「λ有∧θ有→矛盾」のみで、λ 無のとき T-side は�
 「T-side v-value 依存」ケースに該当。**解決は 0116 Route T ((hD,hv) param threading + S16 summit
 discharge) と不可分** — b 単独の dichotomy 移行では閉じない。Route T (hub、sequencing (ii) =
 a の OrderDetermination cluster 静穏化待ち) の実施時に同時解決される設計。
+
+## 2026-07-15 更新 #88 (lane b, /loop iter 2) — #22 T-side twin 修理開始: Q_sharp_hypothesis76_base landed
+
+hub 再確定順序 (0116 tick 55 自己訂正: b の #22 campaign 先行 → hub full flip) に従い、
+**T-side atom 層の restate campaign** に着手。main merge (conflict 2 件解決、hub 追記保持) 済。
+
+- **`9bfa61b1`** (brick 1/3): `Q_sharp_hypothesis76_base` + `_zeta_zero`
+  (S15_CharacterDegreeEngines) — (T, Q^#) の (7.6) family を chosen-base 化
+  (hypothesis76OfDadeBase、ζ₀ = Ind_Q^T φ₀ pin)。S-side #25 の機械的 mirror、sorry-free。
+- **設計確定 (T-side atom の gate 構造)**: `exists_muT_index` (NormEstimates:238) の
+  ζ_{i₁} = ν-row-sum は **QD-induced** (`nu_i_isIndQD`) — Q_sharp family (Ind_Q^T) に
+  入るのは **D = ⊥ の下でのみ** (K = QD = Q)。∴ core 版 restate は
+  **(hD : hyp.D = ⊥) param 込み**が book-faithful 形 (Route T の (hD,hv) threading と整合、
+  (13.8)-T は Pf でも (13.4) D=1 の後で使用)。
+- 残 bricks: **2/3** = muT cCoeff 版 (exists_muT_index core restate — (13.3.c)-at-T
+  ν-row τ₁T formula [NuRowPin/Tau1T landed 済] を Q_sharp_base family の cCoeff に接続、
+  ‖ν_i‖² = p / ν_i(1) = pv は nu_apply_one_eq_v 系) / **3/3** = etaT integrality
+  (exists_etaT_alphaFun_one_int core 版、Q elementary abelian (13.2.b)-T mirror →
+  α|_Q ∈ ℤ[Irr Q]、S-side eta10_cCoeff_int パターン)。
