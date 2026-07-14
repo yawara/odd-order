@@ -454,4 +454,137 @@ theorem Hypothesis.sSet_irr_memberRFamily_eta_inner_T [Finite G]
   · rw [← Int.cast_smul_eq_zsmul ℂ, Int.cast_neg, neg_smul, ClassFunction.inner_neg_right,
       hvconj, neg_zero]
 
+
+set_option maxHeartbeats 1600000 in
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **irr × irr `R`-family orthogonality, `T`-instance form** (mirror of
+`dadeOfDiff_orthogonal_typeP_S`): the (5.2.e) generic orthogonality specialized to
+`dadeHypT hG hT2`, isolating the support defeq in one focused lemma. -/
+theorem Hypothesis.dadeOfDiff_orthogonal_typeP_T [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (x χ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥hyp.T)
+    (hxreal : ¬ ClassFunction.IsReal (x : ClassFunction ↥hyp.T ℂ))
+    (hxdiffsupp : ((x : ClassFunction ↥hyp.T ℂ).conj - (x : ClassFunction ↥hyp.T ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T)
+    (hχreal : ¬ ClassFunction.IsReal (χ : ClassFunction ↥hyp.T ℂ))
+    (hχdiffsupp : ((χ : ClassFunction ↥hyp.T ℂ).conj - (χ : ClassFunction ↥hyp.T ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T)
+    (hxχ : ClassFunction.inner (x : ClassFunction ↥hyp.T ℂ) (χ : ClassFunction ↥hyp.T ℂ) = 0)
+    (hxχbar :
+      ClassFunction.inner (x : ClassFunction ↥hyp.T ℂ) (χ : ClassFunction ↥hyp.T ℂ).conj = 0)
+    (hxbarχ :
+      ClassFunction.inner (x : ClassFunction ↥hyp.T ℂ).conj (χ : ClassFunction ↥hyp.T ℂ) = 0)
+    (hxbarχbar : ClassFunction.inner (x : ClassFunction ↥hyp.T ℂ).conj
+      (χ : ClassFunction ↥hyp.T ℂ).conj = 0) :
+    (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff (hyp.dadeHypT hG hT2)
+        (hyp.dadeHypT_hconj hG hT2) x hxreal hxdiffsupp).Orthogonal
+      (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff (hyp.dadeHypT hG hT2)
+        (hyp.dadeHypT_hconj hG hT2) χ hχreal hχdiffsupp) :=
+  OddOrder.Peterfalvi.S08.dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal
+    (hyp.dadeHypT hG hT2) (hyp.dadeHypT_hconj hG hT2) hxreal hxdiffsupp hχreal hχdiffsupp
+    hxχ hxχbar hxbarχ hxbarχbar
+
+set_option maxHeartbeats 1600000 in
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **(5.2.e) cross-orthogonality of the caseB-`T` per-member `R`-families** (mirror of
+`sSet_memberRFamily_orthogonal`; the `hRorth` input of the (5.7)-`T` engine): for members
+`φ, ξ ∈ 𝒯` with `⟨φ, ξ⟩ = ⟨φ, ξ̄⟩ = 0`, the Dade image families are orthogonal — the `2×2`
+member dichotomy over the dispatcher `imageSet` reductions, exactly as on the `S`-side (with
+rows in place of columns). -/
+theorem Hypothesis.sSet_memberRFamily_orthogonal_T [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
+    (hvd : hyp.v * hyp.d ≠ 1)
+    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
+    (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
+    {φ ξ : ClassFunction ↥hyp.T ℂ}
+    (hφ : φ ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
+    (hξ : ξ ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
+    (h1 : ClassFunction.inner φ ξ = 0)
+    (h2 : ClassFunction.inner φ ξ.conj = 0) :
+    (hyp.sSet_memberRFamily_T hG hnoV pins hvd hT2 Tdata hU hW1 hW2 hφ).Orthogonal
+      (hyp.sSet_memberRFamily_T hG hnoV pins hvd hT2 Tdata hU hW1 hW2 hξ) := by
+  classical
+  have hbφξ : ClassFunction.inner φ.conj ξ = 0 := by
+    rw [← ClassFunction.conj_conj ξ, OddOrder.RepresentationTheory.inner_conj_conj, h2,
+      star_zero]
+  have hbφξb : ClassFunction.inner φ.conj ξ.conj = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_conj, h1, star_zero]
+  intro α hα β hβ
+  by_cases hφirr : OddOrder.RepresentationTheory.IsIrreducibleCharacter φ <;>
+    by_cases hξirr : OddOrder.RepresentationTheory.IsIrreducibleCharacter ξ
+  · -- irr × irr
+    obtain ⟨hrφ, hsφ, hφeq⟩ := hyp.sSet_memberRFamily_T_imageSet_of_irr hG hnoV pins hvd hT2
+      Tdata hU hW1 hW2 hφ hφirr
+    obtain ⟨hrξ, hsξ, hξeq⟩ := hyp.sSet_memberRFamily_T_imageSet_of_irr hG hnoV pins hvd hT2
+      Tdata hU hW1 hW2 hξ hξirr
+    rw [hφeq] at hα
+    rw [hξeq] at hβ
+    exact hyp.dadeOfDiff_orthogonal_typeP_T hG hT2 ⟨φ, hφirr⟩ ⟨ξ, hξirr⟩ hrφ hsφ hrξ hsξ
+      h1 h2 hbφξ hbφξb α hα β hβ
+  · -- irr × red
+    obtain ⟨hrφ, hsφ, hφeq⟩ := hyp.sSet_memberRFamily_T_imageSet_of_irr hG hnoV pins hvd hT2
+      Tdata hU hW1 hW2 hφ hφirr
+    obtain ⟨rξ, sξ, hjξeq, hkξeq, hξeq⟩ :=
+      hyp.sSet_memberRFamily_T_imageSet_of_red hG hnoV pins hvd hT2 Tdata hU hW1 hW2 hξ hξirr
+    rw [hφeq] at hα
+    rw [hξeq, Finset.mem_image] at hβ
+    obtain ⟨y, -, rfl⟩ := hβ
+    rcases y with b | b <;> simp only [Sum.elim_inl, Sum.elim_inr]
+    · rw [OddOrder.RepresentationTheory.inner_conj_symm, star_eq_zero]
+      exact hyp.sSet_irr_memberRFamily_eta_inner_T hG hnoV hT2 Tdata hW1 hW2 hφirr hrφ hsφ
+        hα rξ b
+    · rw [ClassFunction.inner_neg_right, OddOrder.RepresentationTheory.inner_conj_symm,
+        hyp.sSet_irr_memberRFamily_eta_inner_T hG hnoV hT2 Tdata hW1 hW2 hφirr hrφ hsφ
+          hα sξ b,
+        star_zero, neg_zero]
+  · -- red × irr
+    obtain ⟨rφ, sφ, hjφeq, hkφeq, hφeq⟩ :=
+      hyp.sSet_memberRFamily_T_imageSet_of_red hG hnoV pins hvd hT2 Tdata hU hW1 hW2 hφ hφirr
+    obtain ⟨hrξ, hsξ, hξeq⟩ := hyp.sSet_memberRFamily_T_imageSet_of_irr hG hnoV pins hvd hT2
+      Tdata hU hW1 hW2 hξ hξirr
+    rw [hξeq] at hβ
+    rw [hφeq, Finset.mem_image] at hα
+    obtain ⟨x, -, rfl⟩ := hα
+    rcases x with a | a <;> simp only [Sum.elim_inl, Sum.elim_inr]
+    · exact hyp.sSet_irr_memberRFamily_eta_inner_T hG hnoV hT2 Tdata hW1 hW2 hξirr hrξ hsξ
+        hβ rφ a
+    · rw [ClassFunction.inner_neg_left,
+        hyp.sSet_irr_memberRFamily_eta_inner_T hG hnoV hT2 Tdata hW1 hW2 hξirr hrξ hsξ
+          hβ sφ a,
+        neg_zero]
+  · -- red × red
+    obtain ⟨rφ, sφ, hjφeq, hkφeq, hφeq⟩ :=
+      hyp.sSet_memberRFamily_T_imageSet_of_red hG hnoV pins hvd hT2 Tdata hU hW1 hW2 hφ hφirr
+    obtain ⟨rξ, sξ, hjξeq, hkξeq, hξeq⟩ :=
+      hyp.sSet_memberRFamily_T_imageSet_of_red hG hnoV pins hvd hT2 Tdata hU hW1 hW2 hξ hξirr
+    rw [hφeq, Finset.mem_image] at hα
+    rw [hξeq, Finset.mem_image] at hβ
+    have hne1 : rφ ≠ rξ :=
+      hyp.nu_rowSum_ne_of_inner_zero pins (by rw [← hjφeq, ← hjξeq]; exact h1)
+    have hne2 : rφ ≠ sξ :=
+      hyp.nu_rowSum_ne_of_inner_zero pins (by rw [← hjφeq, ← hkξeq]; exact h2)
+    have hne3 : sφ ≠ rξ :=
+      hyp.nu_rowSum_ne_of_inner_zero pins (by rw [← hkφeq, ← hjξeq]; exact hbφξ)
+    have hne4 : sφ ≠ sξ :=
+      hyp.nu_rowSum_ne_of_inner_zero pins (by rw [← hkφeq, ← hkξeq]; exact hbφξb)
+    obtain ⟨x, -, rfl⟩ := hα
+    obtain ⟨y, -, rfl⟩ := hβ
+    rcases x with a | a <;> rcases y with b | b <;> simp only [Sum.elim_inl, Sum.elim_inr]
+    · rw [OddOrder.Peterfalvi.S16.eta_orthonormal hyp rφ rξ a b, if_neg (fun h => hne1 h.1)]
+    · rw [ClassFunction.inner_neg_right,
+        OddOrder.Peterfalvi.S16.eta_orthonormal hyp rφ sξ a b,
+        if_neg (fun h => hne2 h.1), neg_zero]
+    · rw [ClassFunction.inner_neg_left,
+        OddOrder.Peterfalvi.S16.eta_orthonormal hyp sφ rξ a b,
+        if_neg (fun h => hne3 h.1), neg_zero]
+    · rw [ClassFunction.inner_neg_left, ClassFunction.inner_neg_right,
+        OddOrder.Peterfalvi.S16.eta_orthonormal hyp sφ sξ a b, if_neg (fun h => hne4 h.1),
+        neg_zero, neg_zero]
+
 end OddOrder.Peterfalvi.S15

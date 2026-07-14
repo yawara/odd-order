@@ -2075,3 +2075,14 @@ eta_orthogonal_of_norm_one_pair_vanish)。
 
 残: `dadeOfDiff_orthogonal_typeP_T` wrapper + **`sSet_memberRFamily_orthogonal_T`** 本体 (2×2) →
 (5.7) engine assembly `sSet_coherent_dade_caseB_T`。
+
+## 2026-07-14 更新 #60 (lane b, /loop iter 21) — ✅ orthogonal-T 完成: (5.7)-T engine 入力 11/11 完備
+
+TSetMemberRFamily (sorry-free、一発 build): `dadeOfDiff_orthogonal_typeP_T` (irr×irr wrapper) +
+**`sSet_memberRFamily_orthogonal_T`** (2×2 本体 — irr×irr は S08 generic、irr×red/red×irr は
+eta_inner-T、red×red は行相異 + eta_orthonormal)。
+
+**(5.7)-T engine `uniform_degree_coherence_of_families` の入力が全部揃った**:
+finiteness/pivot/pivot-norm/R-family/pairwiseOrth/closedConj/no-real/Dade-isometry(dadeHypT)/
+diff-supported/uniform-degree/R-orthogonal。次 iteration: engine assembly
+`sSet_coherent_dade_caseB_T` (S 版 sSet_coherent_dade_caseB の mirror、~100 行)。
