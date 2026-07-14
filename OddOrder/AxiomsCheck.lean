@@ -15,6 +15,7 @@ import OddOrder.GroupTheory.RepresentationTheory.WielandtKernelFPF
 import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
 import OddOrder.GroupTheory.RepresentationTheory.ConjugationFieldModel
+import OddOrder.GroupTheory.RepresentationTheory.BlockScalarSylow
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialSinger
 import OddOrder.GroupTheory.WielandtFixedPoint
 import OddOrder.GroupTheory.PiElementDecomposition
@@ -126,6 +127,7 @@ import OddOrder.Peterfalvi.S09_FrobeniusParity
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.GroupTheory.RepresentationTheory.GaloisInnerTransport
 import OddOrder.Peterfalvi.S11_ImprimitiveUBound
+import OddOrder.Peterfalvi.S11_GaloisFieldModel
 import OddOrder.Peterfalvi.S12_Noncoherence
 import OddOrder.Peterfalvi.S12_TypeVCaseC
 import OddOrder.Peterfalvi.S13_TypeIIIGalois
@@ -7057,6 +7059,15 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.clifford_caseA_data
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.clifford_dichotomy
 
+/-! **Peterfalvi (9.7.b) chief-factor Galois-field model, axiom-clean** (lane a, issue 1031).
+The actual case-(b) irreducibility proof feeds the shared faithful irreducible Singer constructor,
+giving `H/H₀ ≃+ GF(p^q)` and an injective scalar realization of `Ū`.  When `C_U(H/H₀) = 1`, the
+model transports along `U.subgroupOf (U ⊔ W₁) ≃ U`; no legacy opaque `field_model` is used. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseB_exists_galoisField_repr
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.uActionHom_injective_of_cSub_eq_bot
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S11.caseB_exists_galoisField_repr_of_cSub_eq_bot
+
 -- Peterfalvi §13 (= repo `S13_MaximalIII_IV`, types III/IV) structural cluster.  After de-opacifying
 -- the `Hypothesis` scaffold (the `C = C_U(H)` field and the deleted opaque conclusion-Props), the
 -- two *unconditional* inclusions of (11.5)/(11.6) are axiom-clean: `secondDerived_le_HC`
@@ -8146,3 +8157,12 @@ gap of the (12.6) case split: all three coherence routes (a) TI/(6.8), (b) abeli
 (5.7), (c) cyclic-quotient (6.5.c) are real. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.sibleyTarget_frobI
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.frobenius_typeI_coherent
+
+/-! **Peterfalvi (14.6), sharp case-(9.7.a) Sylow bridge.**  A faithful two-coordinate
+block-scalar embedding of sharp square order has noncyclic Sylow subgroups at every prime
+dividing the coordinate exponent; odd-order scalar images specialize the exponent to
+`(p - 1) / 2`. -/
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.sylow_not_isCyclic_of_card_eq_sq_of_injective_pi
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.sylow_not_isCyclic_of_odd_blockScalarEmbedding
