@@ -641,6 +641,15 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (tick 56) — a: (14.6) caseA Sylow center (新 leaf、S15 内容ベース carve-out)。census 37**:
+  **a=1** (`b4e95807` = Pf **(14.6)** caseA Sylow center trap — 新 leaf `S15_CaseASylowCenter.lean`
+  (197 行 sorry-free、claim 1035)。名目 S15 = b 域だが内容 = a の caseA campaign ⟹ **file 単位
+  a 所有 carve-out** (CaseBOrder tick 48 と同型)。S15_SAndT への import 1 行 = 機械的配線。
+  merge)。**b=0** (#22 rebase campaign 進行中と推定)。**c=0** (hold)。
+  build green 4220 jobs (+1) / AxiomsCheck OK / census **37 不変** / 新 axiom なし。push 済。
+  ⚠ 0116 は tick 55 直後に **Phase 1 claim を自己訂正で撤回** (5 obtain-site が uninhabitable
+  CDD interface に atom ごと縛られ、triple 単独 flip では honest 供給を構成できない) — 順序 =
+  b #22 (hold 解除済、即進行可) → hub full flip。正本 = 0116 自己訂正節 + 2035 HUB 追記。
 - **2026-07-15 (tick 55) — ★★ b: full hT2 sweep 完了 = 0116 条件 (i) 実装完了。Route T Phase 1 を hub が claim。census 37**:
   **a=1** (`93b737f5` = ambient caseA Sylow 構成、claim 1034。merge)。
   **b=2** (`a896c657` = ★★ **de-swap + full hT2 sweep — T_isTypeP2_gate を供給 chain から excise**。
