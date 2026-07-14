@@ -169,3 +169,28 @@ additive + legacy-wrapper 方式で行う (下記)。
 - **b 宛**: rebase campaign の NormEstimates:806 / CountingLayer:1805 touch は **hub Phase 1
   landing 後に** (本 claim の衝突回避。Phase 1 は本日中に landing 予定、次 tick 以降の
   merge_monitor 記録参照)。
+
+## ⚠ HUB 自己訂正 (2026-07-15 tick 55 直後) — Phase 1 claim を撤回、実施順序を再確定
+
+Phase 1 実装のため 5 obtain-site の proof を精読した結果、**Phase 1 (13.4-triple flip 単独) は
+設計不成立**と判明:
+
+- 5 obtain-site は冒頭で `obtain ⟨chars⟩ := character_degree_analysis` (Machinery135:345、
+  **uninhabitable** — b #79) を取り、全 atom (exists_caseB_data_eta10 / exists_muT_index /
+  lambda_tau1_norm_one 等) が `chars : CharacterDegreeData` typed。
+- (hD, hv) だけ param 化しても、discharge leaf 側で **chars を honest に供給できない**
+  (honest interface = CharacterDegreeCore + LambdaClusterData; CDD は overstatement ゆえ
+  bridge constructor は原理的に作れない — それが 9094 案 A で core 化した理由)。
+- ⟹ 真の flip は atom 層の core/lam 再 type = **b の #22 rebase-repair campaign が restate
+  する層そのもの** (lambda_tau1_cCoeff / eta10_cCoeff_* の book-faithful restate + guarded
+  field 化)。これ抜きの Phase 1 は legacy wrapper churn のみで honest 供給ゼロ。
+
+**再確定した実施順序**: (1) **b の #22 rebase campaign** (atom 層 restate、NormEstimates:806 /
+CountingLayer:1805 の P-witness thread 含む — **前節の「hub Phase 1 landing 後に」の hold は
+撤回、b は即進行してよい**) → (2) **hub の full flip** (旧 Phase 1+2 統合: obtain-site を
+core/lam + (hD,hv) param 化 + 討伐済 atom の cite 置換 + discharge leaf + legacy retire +
+QD_sharp 移設)。トリガー = b の #22 campaign の NormEstimates/CountingLayer 到達 landing。
+hub は毎 tick 追跡。
+
+教訓: threading 設計は obtain-site の **atom interface の型**まで読んでから claim する
+(triple の所在だけでは不十分)。
