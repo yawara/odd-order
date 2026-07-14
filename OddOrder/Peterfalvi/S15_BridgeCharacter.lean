@@ -1565,18 +1565,18 @@ reducible caseB-`T` `R`-family sums over a ν-row:
 theorem tauT_nu_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)
     (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
     (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     (j : Fin hyp.p) {r s : Fin hyp.q}
     (hr : r ≠ ⟨0, hyp.q_prime.pos⟩) (hs : s ≠ ⟨0, hyp.q_prime.pos⟩) (hrs : r ≠ s) :
-    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hT2.1 Tdata)
-        ((hyp.dadeHypT0 hG hT2.1 Tdata).fullDadeIsometryData (hyp.dadeHypT0_hconj hG hT2.1 Tdata))
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hTP Tdata)
+        ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData (hyp.dadeHypT0_hconj hG hTP Tdata))
         (hyp.nu r j - hyp.nu s j)
       = hyp.eta r j - hyp.eta s j := by
   classical
-  set D := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hT2.1 Tdata)
-      ((hyp.dadeHypT0 hG hT2.1 Tdata).fullDadeIsometryData (hyp.dadeHypT0_hconj hG hT2.1 Tdata))
+  set D := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hTP Tdata)
+      ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData (hyp.dadeHypT0_hconj hG hTP Tdata))
     with hD
   have hνaIrr : IsIrreducibleCharacter (hyp.nu r j) := pins.nu_irreducible _ _
   have hνbIrr : IsIrreducibleCharacter (hyp.nu s j) := pins.nu_irreducible _ _
@@ -1590,7 +1590,7 @@ theorem tauT_nu_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   -- (a) `X ∈ ZIrr G`.
   have hXZ : D (hyp.nu r j - hyp.nu s j) ∈ ZIrr G :=
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-      (hyp.dadeHypT0 hG hT2.1 Tdata) (hyp.dadeHypT0_hconj hG hT2.1 Tdata) hsupp hZIrrT
+      (hyp.dadeHypT0 hG hTP Tdata) (hyp.dadeHypT0_hconj hG hTP Tdata) hsupp hZIrrT
   -- (b) norm `2`, transported through the Dade isometry.
   have hnorm2 : ClassFunction.inner (hyp.nu r j - hyp.nu s j)
       (hyp.nu r j - hyp.nu s j) = 2 := by
@@ -1601,7 +1601,7 @@ theorem tauT_nu_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hX2 : ClassFunction.inner (D (hyp.nu r j - hyp.nu s j))
       (D (hyp.nu r j - hyp.nu s j)) = 2 := by
     rw [hD, OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
-      (hyp.dadeHypT0 hG hT2.1 Tdata) (hyp.dadeHypT0_hconj hG hT2.1 Tdata) hsupp hsupp]
+      (hyp.dadeHypT0 hG hTP Tdata) (hyp.dadeHypT0_hconj hG hTP Tdata) hsupp hsupp]
     exact hnorm2
   -- (c) `X − (η_{r,j} − η_{s,j})` vanishes on the regular set.
   have hvanish : ∀ x ∈ conjClassSet
@@ -1609,29 +1609,11 @@ theorem tauT_nu_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (D (hyp.nu r j - hyp.nu s j)
         - ((1 : ℤ) : ℂ) • (hyp.eta r j - hyp.eta s j)) x = 0 := by
     intro x hx
-    have hv := hyp.tauT_nu_vanish_on_V hG hnoV pins hT2.1 Tdata hU hW1 hW2 j hr hs x hx
+    have hv := hyp.tauT_nu_vanish_on_V hG hnoV pins hTP Tdata hU hW1 hW2 j hr hs x hx
     simpa [hD] using hv
-  -- (3.8) rigidity via the swap transpose: the swap's η-grid is the transpose, so its
-  -- row-fixed form at row `j` with columns `r, s` is exactly our column-fixed form.
-  have hV : IsMulCommutative ↥hyp.V := hyp.isMulCommutative_V_unconditional hG
-  have hvanish' : ∀ x ∈ conjClassSet
-      (((hyp.swap hT2 hV Tdata hU hW1 hW2 pins).W : Set G) \
-        (((hyp.swap hT2 hV Tdata hU hW1 hW2 pins).W1 : Set G) ∪
-          ((hyp.swap hT2 hV Tdata hU hW1 hW2 pins).W2 : Set G))),
-      (D (hyp.nu r j - hyp.nu s j)
-        - ((1 : ℤ) : ℂ) • ((hyp.swap hT2 hV Tdata hU hW1 hW2 pins).eta j r
-            - (hyp.swap hT2 hV Tdata hU hW1 hW2 pins).eta j s)) x = 0 := by
-    intro x hx
-    refine hvanish x ?_
-    have : ((hyp.W2 : Set G) ∪ (hyp.W1 : Set G))
-        = ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G)) := Set.union_comm _ _
-    rw [show ((hyp.swap hT2 hV Tdata hU hW1 hW2 pins).W : Set G) = (hyp.W : Set G) from rfl,
-      show ((hyp.swap hT2 hV Tdata hU hW1 hW2 pins).W1 : Set G) = (hyp.W2 : Set G) from rfl,
-      show ((hyp.swap hT2 hV Tdata hU hW1 hW2 pins).W2 : Set G) = (hyp.W1 : Set G) from rfl,
-      this] at hx
-    exact hx
-  have hrig := OddOrder.Peterfalvi.S16.eta_diff_rigidity
-    (hyp.swap hT2 hV Tdata hU hW1 hW2 pins) hXZ hX2 j hrs (s := (1 : ℤ)) (Or.inl rfl) hvanish'
+  -- (3.8) rigidity, column form — directly at `hyp` (issue 2035 #86 de-swap)
+  have hrig := OddOrder.Peterfalvi.S16.eta_diff_rigidity_col
+    hyp hXZ hX2 hrs j (s := (1 : ℤ)) (Or.inl rfl) hvanish
   rw [Int.cast_one, one_smul] at hrig
   exact hrig
 
@@ -1648,7 +1630,7 @@ theorem tauT_nuRow_diff_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
     (hvd : hyp.v * hyp.d ≠ 1)
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)
     (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
     (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     {r s : Fin hyp.q}
@@ -1657,8 +1639,8 @@ theorem tauT_nuRow_diff_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hη : η ∈ OddOrder.Peterfalvi.S11.sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
     (hreq : η = ∑ j : Fin hyp.p, hyp.nu r j)
     (hseq : (η : ClassFunction ↥hyp.T ℂ).conj = ∑ j : Fin hyp.p, hyp.nu s j) :
-    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2.1)
-        ((hyp.dadeHypT hG hT2.1).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2.1))
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
+        ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP))
         (η - (η : ClassFunction ↥hyp.T ℂ).conj)
       = ∑ j : Fin hyp.p, (hyp.eta r j - hyp.eta s j) := by
   classical
@@ -1681,17 +1663,17 @@ theorem tauT_nuRow_diff_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     hAsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
       (honestTypeP2ASet_subset_A0Set Tdata))
   -- the honest `A`-Dade agrees with the `A₀`-Dade on the `A(T)`-supported row difference.
-  have hτeq : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2.1)
-        ((hyp.dadeHypT hG hT2.1).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2.1))
+  have hτeq : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
+        ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP))
         (η - (η : ClassFunction ↥hyp.T ℂ).conj)
-      = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hT2.1 Tdata)
-          ((hyp.dadeHypT0 hG hT2.1 Tdata).fullDadeIsometryData
-            (hyp.dadeHypT0_hconj hG hT2.1 Tdata))
+      = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hTP Tdata)
+          ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData
+            (hyp.dadeHypT0_hconj hG hTP Tdata))
           (η - (η : ClassFunction ↥hyp.T ℂ).conj) := by
-    rw [hyp.tInstance_dade_eq_induce hG hnoV hT2.1 hAsupp,
-      hyp.tInstance_dade0_eq_induce hG hnoV hT2.1 Tdata hA0supp]
+    rw [hyp.tInstance_dade_eq_induce hG hnoV hTP hAsupp,
+      hyp.tInstance_dade0_eq_induce hG hnoV hTP Tdata hA0supp]
   rw [hτeq, hsub, map_sum]
   exact Finset.sum_congr rfl fun j _ =>
-    tauT_nu_cross hG hnoV hyp pins hT2 Tdata hU hW1 hW2 j hr0 hs0 hrs
+    tauT_nu_cross hG hnoV hyp pins hTP Tdata hU hW1 hW2 j hr0 hs0 hrs
 
 end OddOrder.Peterfalvi.S15

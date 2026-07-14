@@ -879,7 +879,7 @@ theorem tSide_theta_package_of_not_caseB_core [Finite G]
   -- ── supply: the Hypothesis-level producers
   have hnoV := OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional _hG
   have hvd : hyp.v * hyp.d ≠ 1 := hyp.vd_ne_one _hG
-  have hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T := hyp.T_isTypeP2_gate _hG
+  have hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T := hyp.T_isTypeP _hG
   set pins : NuGridSupplyData hyp := hyp.nuGridSupply _hG with hpins
   obtain ⟨Tdata, hU, hW1, hW2⟩ := reconciled_typePData_T _hG hyp
   obtain ⟨chief, -⟩ := OddOrder.Peterfalvi.S11.exists_chiefFactorData _hG
@@ -890,9 +890,9 @@ theorem tSide_theta_package_of_not_caseB_core [Finite G]
     intro h; exact absurd (congrArg Fin.val h) one_ne_zero
   -- ── the (13.3.c)-at-`T` pin at the anchor row `1`
   obtain ⟨r', δ', hr'0, hδ', hpin⟩ :=
-    hyp.tau1T_ofHonest_nuRow_eta_row _hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief hq1
+    hyp.tau1T_ofHonest_nuRow_eta_row _hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief hq1
   refine ⟨ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ, ⟨1, hyp.q_prime.one_lt⟩, r', δ',
-    hyp.tau1T_ofHonest _hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+    hyp.tau1T_ofHonest _hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
       (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ),
     hδ', ?_, ?_, ?_, ?_⟩
   · -- conjunct 2: the (13.4) support estimate
@@ -912,12 +912,12 @@ theorem tSide_theta_package_of_not_caseB_core [Finite G]
       rw [ClassFunction.sub_apply, hθreq,
         OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, hθ1,
         OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, hθr1, sub_self]
-    have hext := hyp.tau1T_ofHonest_extends_on_supported _hG hnoV pins hvd hT2 Tdata hU hW1
+    have hext := hyp.tau1T_ofHonest_extends_on_supported _hG hnoV pins hvd hTP Tdata hU hW1
       hW2 chief _ ⟨hzspan, hyp.zSpan_sSet_degree_zero_support_T _hG hvd hzspan hdeg0⟩
     rw [← hext, map_sub, hpin]
   · -- conjunct 4: `θ_G ⊥ η`-grid ((4.1)+(5.3.b)-at-`T`)
     intro i j
-    exact hyp.tau1T_ofHonest_induce_inner_eta _hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+    exact hyp.tau1T_ofHonest_induce_inner_eta _hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
       i j θ hθirr hθQ hind
   · -- conjunct 5: `⟨λ^{τ₁S}, θ^{τ₁T}⟩ = 0` (the (13.4) pairwise orthogonality)
     obtain ⟨thetaL, hthetaLirr, hthetaL1, hlamEq, x₀, hx₀P, hx₀ker⟩ :=
@@ -1063,52 +1063,52 @@ theorem tSide_theta_package_of_not_caseB_core [Finite G]
     -- ── `T`-side dirr inputs via the pinned coherence carrier
     have hmemθ := hyp.induce_K_mem_zSpan_T _hG hvd θ hθirr hθQ
     have hmemθc := hyp.induce_K_mem_zSpan_T _hG hvd θ.conj hθirr.conj hθQc
-    have hCZ : hyp.tau1T_ofHonest _hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+    have hCZ : hyp.tau1T_ofHonest _hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
         (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ) ∈ ZIrr G :=
-      (hyp.coherentIndT_pinned _hG hnoV pins hvd hT2 Tdata hU hW1 hW2
+      (hyp.coherentIndT_pinned _hG hnoV pins hvd hTP Tdata hU hW1 hW2
         chief).extension_mem_ZIrr _ hmemθ
-    have hDZ : hyp.tau1T_ofHonest _hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+    have hDZ : hyp.tau1T_ofHonest _hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
         (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ.conj) ∈ ZIrr G :=
-      (hyp.coherentIndT_pinned _hG hnoV pins hvd hT2 Tdata hU hW1 hW2
+      (hyp.coherentIndT_pinned _hG hnoV pins hvd hTP Tdata hU hW1 hW2
         chief).extension_mem_ZIrr _ hmemθc
     have hC1 : ClassFunction.inner
-        (hyp.tau1T_ofHonest _hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+        (hyp.tau1T_ofHonest _hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
           (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ))
-        (hyp.tau1T_ofHonest _hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+        (hyp.tau1T_ofHonest _hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
           (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ)) = 1 := by
-      rw [show (hyp.tau1T_ofHonest _hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+      rw [show (hyp.tau1T_ofHonest _hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
           (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ))
-          = (hyp.coherentIndT_pinned _hG hnoV pins hvd hT2 Tdata hU hW1 hW2
+          = (hyp.coherentIndT_pinned _hG hnoV pins hvd hTP Tdata hU hW1 hW2
             chief).extension (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ) from rfl,
-        (hyp.coherentIndT_pinned _hG hnoV pins hvd hT2 Tdata hU hW1 hW2
+        (hyp.coherentIndT_pinned _hG hnoV pins hvd hTP Tdata hU hW1 hW2
           chief).extension_inner_eq _ _ hmemθ hmemθ]
       exact hind.inner_self_eq_one
     have hD1 : ClassFunction.inner
-        (hyp.tau1T_ofHonest _hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+        (hyp.tau1T_ofHonest _hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
           (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ.conj))
-        (hyp.tau1T_ofHonest _hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+        (hyp.tau1T_ofHonest _hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
           (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ.conj)) = 1 := by
-      rw [show (hyp.tau1T_ofHonest _hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+      rw [show (hyp.tau1T_ofHonest _hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
           (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ.conj))
-          = (hyp.coherentIndT_pinned _hG hnoV pins hvd hT2 Tdata hU hW1 hW2
+          = (hyp.coherentIndT_pinned _hG hnoV pins hvd hTP Tdata hU hW1 hW2
             chief).extension (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ.conj) from rfl,
-        (hyp.coherentIndT_pinned _hG hnoV pins hvd hT2 Tdata hU hW1 hW2
+        (hyp.coherentIndT_pinned _hG hnoV pins hvd hTP Tdata hU hW1 hW2
           chief).extension_inner_eq _ _ hmemθc hmemθc]
       exact hindc.inner_self_eq_one
     have hCDi : ClassFunction.inner
-        (hyp.tau1T_ofHonest _hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+        (hyp.tau1T_ofHonest _hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
           (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ))
-        (hyp.tau1T_ofHonest _hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+        (hyp.tau1T_ofHonest _hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
           (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ.conj)) = 0 := by
-      rw [show (hyp.tau1T_ofHonest _hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+      rw [show (hyp.tau1T_ofHonest _hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
           (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ))
-          = (hyp.coherentIndT_pinned _hG hnoV pins hvd hT2 Tdata hU hW1 hW2
+          = (hyp.coherentIndT_pinned _hG hnoV pins hvd hTP Tdata hU hW1 hW2
             chief).extension (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ) from rfl,
-        show (hyp.tau1T_ofHonest _hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+        show (hyp.tau1T_ofHonest _hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
           (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ.conj))
-          = (hyp.coherentIndT_pinned _hG hnoV pins hvd hT2 Tdata hU hW1 hW2
+          = (hyp.coherentIndT_pinned _hG hnoV pins hvd hTP Tdata hU hW1 hW2
             chief).extension (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ.conj) from rfl,
-        (hyp.coherentIndT_pinned _hG hnoV pins hvd hT2 Tdata hU hW1 hW2
+        (hyp.coherentIndT_pinned _hG hnoV pins hvd hTP Tdata hU hW1 hW2
           chief).extension_inner_eq _ _ hmemθ hmemθc]
       exact hCD0
     -- ── the `T`-side difference is the honest induction ((13.2.e))
@@ -1122,37 +1122,37 @@ theorem tSide_theta_package_of_not_caseB_core [Finite G]
       rw [ClassFunction.sub_apply,
         OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, hθ1,
         OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, hθc1, sub_self]
-    have hCDdiff : hyp.tau1T_ofHonest _hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+    have hCDdiff : hyp.tau1T_ofHonest _hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
           (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ)
-        - hyp.tau1T_ofHonest _hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+        - hyp.tau1T_ofHonest _hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
           (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ.conj)
         = ClassFunction.induce hyp.T
             (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ
               - ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ.conj) := by
       rw [← map_sub]
-      exact hyp.tau1T_ofHonest_extends_on_supported _hG hnoV pins hvd hT2 Tdata hU hW1 hW2
+      exact hyp.tau1T_ofHonest_extends_on_supported _hG hnoV pins hvd hTP Tdata hU hW1 hW2
         chief _ ⟨hCDzspan, hyp.zSpan_sSet_degree_zero_support_T _hG hvd hCDzspan hCDdeg0⟩
-    have hDCdiff : hyp.tau1T_ofHonest _hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+    have hDCdiff : hyp.tau1T_ofHonest _hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
           (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ.conj)
-        - hyp.tau1T_ofHonest _hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+        - hyp.tau1T_ofHonest _hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
           (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ)
         = ClassFunction.induce hyp.T
             (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ.conj
               - ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ) := by
       rw [← map_sub]
-      refine hyp.tau1T_ofHonest_extends_on_supported _hG hnoV pins hvd hT2 Tdata hU hW1 hW2
+      refine hyp.tau1T_ofHonest_extends_on_supported _hG hnoV pins hvd hTP Tdata hU hW1 hW2
         chief _ ⟨Submodule.sub_mem _ hmemθc hmemθ,
           hyp.zSpan_sSet_degree_zero_support_T _hG hvd (Submodule.sub_mem _ hmemθc hmemθ) ?_⟩
       rw [ClassFunction.sub_apply,
         OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, hθc1,
         OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, hθ1, sub_self]
-    have hCDconj : (hyp.tau1T_ofHonest _hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+    have hCDconj : (hyp.tau1T_ofHonest _hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
           (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ)).conj
-        - (hyp.tau1T_ofHonest _hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+        - (hyp.tau1T_ofHonest _hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
           (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ.conj)).conj
-        = hyp.tau1T_ofHonest _hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+        = hyp.tau1T_ofHonest _hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
             (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ.conj)
-          - hyp.tau1T_ofHonest _hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+          - hyp.tau1T_ofHonest _hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
             (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ) := by
       rw [← ClassFunction.conj_sub, hCDdiff, hDCdiff,
         OddOrder.RepresentationTheory.ClassFunction.induce_conj]
@@ -1169,9 +1169,9 @@ theorem tSide_theta_package_of_not_caseB_core [Finite G]
       hyp.indK_sub_indK_support _hG θ θ.conj hθ1 hθc1
     have h0 : ClassFunction.inner
         (core.tau1S lam.lambda - core.tau1S lam.lambda.conj)
-        (hyp.tau1T_ofHonest _hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+        (hyp.tau1T_ofHonest _hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
             (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ)
-          - hyp.tau1T_ofHonest _hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chief
+          - hyp.tau1T_ofHonest _hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
             (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ.conj)) = 0 := by
       rw [hABdiff, hCDdiff]
       exact hyp.inner_induce_H_QD_eq_zero _hG hαsupp hβsupp
