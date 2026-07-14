@@ -112,7 +112,7 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Faithful §14 Dade carrier for the L-side `η`-grid coefficients** (Peterfalvi (13.19.c),
 Coq `FTtype2_support_coherence` core).  Bundles the facts about the integer grid coefficients
 `m_ij = ⟨β_L, η_ij⟩` of the coherence residual `β_L = (dataL.h78 hG).beta`, from which
-`lSide_delta_grid_expansion` proves the `±1` rigidity and the grid identity.  The two lane-c
+`lSide_expansion_classification` proves the `±1` rigidity and the grid identity.  The two lane-c
 available facts are proven in-place in the producer `lSideGridCoeffData`; only the S/T type-P
 bridge and §13 grid content remain as the isolated gate:
 
@@ -126,14 +126,15 @@ bridge and §13 grid content remain as the isolated gate:
   cross-lane-gated to the type-P `S`/`T` maximals (lane b's §13/§15 layer);
 * `bessel` — **the (13.19.c) Bessel bound** (Coq `orthonormal_span` + `lb_b` + `ub_e`):
   `Σ_{ij} m_ij² ≤ p q`; needs the coherent-image/grid orthogonality `ζ_i^ν ⊥ η`-grid (Coq
-  `o_tauLeta`) to match `β_L`'s grid projection with `(Γ_L + 1_G)`'s and apply `‖Γ_L‖² ≤ e − 1`,
-  the same §13 residual content as `grid_mem`;
-* `grid_mem` — **the grid membership** (Coq `Y = 0`, issue 3002): `1_G + Δ_L = Σ_{ij} m_ij η_ij`,
-  i.e. `β_L + ζ_0^ν` equals its own orthogonal projection onto the `η`-grid.
+  `o_tauLeta`) to match `β_L`'s grid projection with `(Γ_L + 1_G)`'s and apply `‖Γ_L‖² ≤ e − 1`.
 
-These are genuine facts about the type-I maximal `L` (its Dade isometry, coherent extension, and
-the S/T-partner bridge); the concrete construction of the three off-principal/grid facts is the
-remaining §13/§14 obligation, isolated here away from the pure `±1` combinatorics. -/
+The `Y = 0` grid membership is deliberately **not** a field: the honest (14.11.2) conclusion
+(Coq `FTtype2_support_coherence`, `cfdot_add_dirr_eq1`) identifies `1_G + Γ_L` — not
+`1_G + Δ_L` — with the signed grid sum, and classifies the removed unit-norm character only up
+to the two alternatives `ζ_0^ν` / `−(ζ̄_0)^ν`; a field pinning `1_G + Δ_L = Σ m_ij η_ij` would
+overclaim the first alternative.  That conclusion is the theorem
+`lSide_expansion_classification` below (the L-instance of the generic
+`etaGrid_projection_rigidity`/`_sub_beta_classification` engines). -/
 structure LSideGridCoeffData [Finite G] (hyp : Hypothesis (G := G))
     {L : Subgroup G} (dataL : TypeICoherent78Data L)
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) where
@@ -149,12 +150,10 @@ structure LSideGridCoeffData [Finite G] (hyp : Hypothesis (G := G))
   /-- **Off-principal column parity** (Coq `ai0`): `m_i0` odd — **PROVEN in the producer** from
   the T-side dual dichotomy (`typeI_caseC_dual_dichotomy`, (c1)-dual refuted by the strict gap). -/
   m_col_odd : ∀ i, i ≠ ⟨0, hyp.base.q_prime.pos⟩ → Odd (m i ⟨0, hyp.base.p_prime.pos⟩)
-  /-- **Bessel bound** (Coq `ub_e`, gated): `Σ m_ij² ≤ p q`. -/
+  /-- **Bessel bound** (Coq `ub_e`): `Σ m_ij² ≤ p q` — **PROVEN in the producer**
+  (`betaL_grid_coeff_bessel`). -/
   bessel : ∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (m i j) ^ 2
     ≤ (hyp.base.p * hyp.base.q : ℤ)
-  /-- **Grid membership** (Coq `Y = 0`): `1_G + Δ_L = Σ m_ij η_ij`. -/
-  grid_mem : OddOrder.Peterfalvi.S09.Hypothesis71.constOne G + (dataL.h78 hG).delta =
-    ∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (m i j : ℂ) • hyp.base.eta i j
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (13.19.c), the Bessel bound `Σ m_ij² ≤ p q`** (Coq `ub_e`).  With
@@ -321,9 +320,9 @@ Bessel bound `Σ m² ≤ p q`, `betaL_grid_coeff_bessel`, from the full-family g
 the (c1) branches are refuted by the Coq-(14.11.2)-style strict gap hypotheses `hub_u`/`hub_v`
 (`(u−1)/q < (h−1)/e`, `(v−1)/p < (h−1)/e` — supplied by the caller from the (14.14) gap chain),
 and the (c2) branches are exactly the parities, transported through the bridge
-`typeIBetaL_zeta0_eq_h78_beta`.  Only `grid_mem` (the `Y = 0` grid membership, issue 3002)
-remains sorried: its parity input is now discharged, and the missing piece is the Parseval-defect
-tightening of the `bessel` argument. -/
+`typeIBetaL_zeta0_eq_h78_beta`.  With the over-strong `grid_mem` field removed (see the
+structure docstring), **this producer is sorry-free**; the honest `Y = 0` conclusion lives in
+`lSide_expansion_classification`. -/
 noncomputable def lSideGridCoeffData [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
@@ -417,38 +416,26 @@ noncomputable def lSideGridCoeffData [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
   bessel :=
     betaL_grid_coeff_bessel hG hnoV hncH0C hLmax dataL hepq _
       (fun i j => Classical.choose_spec (betaL_grid_coeff_int hG dataL i j))
-  -- **The `Y = 0` grid membership (issue 3002, Coq PFsection14.v:212-251).** `1_G + Δ_L = Σ m_ij η_ij`:
-  -- the coherence residual equals its own orthogonal projection onto the `η`-grid, i.e. the residual
-  -- `Y := (1_G + Γ_L) − Σ m_ij η_ij` is `0`.  This is the `orthogonal_split` + `leif`-equality step
-  -- forced by the tightness `e = p q` (`ub_e`) **together with** each `|m_ij|² ≥ 1`.  The parity
-  -- input is now DISCHARGED (`m_row_odd`/`m_col_odd` above + the (3.7) four-corner relation give
-  -- every `m_ij` odd, hence `m_ij² ≥ 1`, hence `Σ m² ≥ p q`); the remaining piece is the
-  -- **Parseval-defect tightening** of the `bessel` argument: `Σ m² + ‖Y‖² = ‖1_G + Γ_L‖² ≤ p q`
-  -- (the `betaL_grid_coeff_bessel` chain keeps only the `≤`, dropping `‖Y‖²`), which with
-  -- `Σ m² ≥ p q` forces `‖Y‖² = 0`, i.e. `Y = 0` (issue 0115 Campaign A, next stage).
-  grid_mem := sorry
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (13.19.c)/(13.1.d), the L-side `η`-grid identity of the coherence residual.**
-The residual `Δ_L = β_L − 1_G + ζ_0^ν` of the (7.8.a) Dade decomposition
-(`beta_eq_constOne_sub_zetaImage_add_delta`, PROVEN) combines with the principal `1_G` to a
-`±1`-signed sum of the whole `η`-grid: `1_G + Δ_L = Σ_{ij} ε_ij η_ij`, `ε_ij ∈ {±1}`.
+/-- **Peterfalvi (14.11.2) for the L-side** (Coq `FTtype2_support_coherence`, stated for `S`
+and `L`): the Dade image `β_L^τ` is a `±1`-signed sum of the **whole** `η`-grid minus a single
+removed unit-norm character `χ`, classified as the distinguished coherent image `ζ_0^ν` or the
+negative coherent image `−(ζ̄_0)^ν` of its conjugate (Coq `cfdot_add_dirr_eq1` — the honest
+conclusion does *not* pin the first alternative).
 
-This is the L-analog of the M-side conditional `betaM_expansion_data`, and of the Coq
-`FTtype2_support_coherence` core.  Here it is *proven* from the faithful
-§14 grid-coefficient carrier `LSideGridCoeffData` and the PROVEN (3.7) four-corner relation
-(`betaL_grid_relation`):
+This is the L-instance of the generic (14.11.2) engines (shared with the M-side
+`betaM_expansion_data`):
 
-* the coefficients `m_ij = ⟨β_L, η_ij⟩` satisfy `m_ij + m_00 = m_i0 + m_0j` (3.7), so with the
-  carried boundary parity (`m_00 = 1`, `m_0j`/`m_i0` odd) *every* `m_ij` is odd (hence `≠ 0`);
-* the carried Bessel bound `Σ m_ij² ≤ p q = #grid` then sandwiches `#grid ≤ Σ m_ij² ≤ #grid`, so
-  each `m_ij² = 1`, i.e. `m_ij = ±1` (`all_pm_one_and_card_of_odd_sq_sum_le`);
-* the carried grid membership `1_G + Δ_L = Σ m_ij η_ij` is the displayed identity with `±1` signs.
-
-The three deep facts are isolated in `lSideGridCoeffData`; this theorem is the honest `±1`
-rigidity assembly.  The pure-algebra rearrangement into `β_L^τ = Σ ±η_ij − ε ζ_i^ν` is
-`lSide_signed_eta_expansion`. -/
-theorem lSide_delta_grid_expansion [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+* the carrier `lSideGridCoeffData` supplies the integer coefficients `m_ij = ⟨β_L, η_ij⟩`, the
+  principal value `m_00 = 1`, and the two off-principal boundary parities (now proven from the
+  (13.19.c) dichotomies);
+* `betaL_grid_relation` supplies the (3.7) four-corner relation;
+* `etaGrid_projection_rigidity` turns these plus `e_L ≤ p q` into the `±1` rigidity **and** the
+  Parseval-defect vanishing `1_G + Γ_L = Σ m_ij η_ij` (Coq `Y = 0`);
+* `etaGrid_projection_sub_beta_norm_one`/`_classification` give `‖χ‖² = 1` for
+  `χ = Σ m_ij η_ij − β_L^τ` and the two-alternative classification. -/
+theorem lSide_expansion_classification [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     {hyp : Hypothesis (G := G)} {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
@@ -461,50 +448,85 @@ theorem lSide_delta_grid_expansion [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
     (hub_v : ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) <
       ((Nat.card ↥dataL.typeIHyp.H - 1 : ℕ) : ℚ)
         / (((maxNilpotentNormalHall L).subgroupOf L).index : ℚ)) :
-    ∃ signs : Fin hyp.base.q → Fin hyp.base.p → ℤ,
+    ∃ (signs : Fin hyp.base.q → Fin hyp.base.p → ℤ) (chi : ClassFunction G ℂ),
       (∀ i j, signs i j = 1 ∨ signs i j = -1) ∧
-        OddOrder.Peterfalvi.S09.Hypothesis71.constOne G + (dataL.h78 hG).delta =
-          ∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p,
-            (signs i j : ℂ) • hyp.base.eta i j := by
+      (chi = (dataL.h78 hG).nu ((dataL.h78 hG).hyp76.zeta (dataL.h78 hG).zetaDistinct) ∨
+        chi = -((dataL.h78 hG).nu
+          (((dataL.h78 hG).hyp76.zeta (dataL.h78 hG).zetaDistinct).conj))) ∧
+      (dataL.h78 hG).beta =
+        (∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p,
+            (signs i j : ℂ) • hyp.base.eta i j) - chi := by
   classical
-  set i₀ : Fin hyp.base.q := ⟨0, hyp.base.q_prime.pos⟩ with hi₀
-  set j₀ : Fin hyp.base.p := ⟨0, hyp.base.p_prime.pos⟩ with hj₀
-  obtain ⟨m, hcoeff, hprin, hrow, hcol, hbessel, hmem⟩ :=
+  haveI := dataL.kernelIn_normal
+  obtain ⟨m, hcoeff, hprin, hrow, hcol, -⟩ :=
     lSideGridCoeffData hG hnoV hncH0C hyp hLmax dataL hq3 hp5 hepq hub_u hub_v
   -- (3.7) four-corner relation on `m_ij` (from `betaL_grid_relation`, via the integrality bridge).
   have hrel : ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
-      m i j + m i₀ j₀ = m i j₀ + m i₀ j := by
+      m i j + m ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩ =
+        m i ⟨0, hyp.base.p_prime.pos⟩ + m ⟨0, hyp.base.q_prime.pos⟩ j := by
     intro i j
     have h := betaL_grid_relation hG hnoV hncH0C hLmax dataL i j
-    rw [hcoeff i j, hcoeff i₀ j₀, hcoeff i j₀, hcoeff i₀ j] at h
+    rw [hcoeff i j, hcoeff ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩,
+      hcoeff i ⟨0, hyp.base.p_prime.pos⟩, hcoeff ⟨0, hyp.base.q_prime.pos⟩ j] at h
     exact_mod_cast h
-  -- every coefficient is odd: `m_ij = m_i0 + m_0j − m_00` with the three boundary values odd.
-  have hodd : ∀ p : Fin hyp.base.q × Fin hyp.base.p, Odd (m p.1 p.2) := by
-    rintro ⟨i, j⟩
-    by_cases hi : i = i₀ <;> by_cases hj : j = j₀
-    · subst hi; subst hj; rw [hprin]; exact ⟨0, rfl⟩
-    · subst hi; exact hrow j hj
-    · subst hj; exact hcol i hi
-    · -- `m_ij = m_i0 + m_0j − 1` (rel + `m_00 = 1`), sum of two odds minus odd is odd.
-      have h := hrel i j
-      rw [hprin] at h
-      have hval : m i j = m i j₀ + m i₀ j - 1 := by omega
-      obtain ⟨r, hr⟩ := hcol i hi
-      obtain ⟨s, hs⟩ := hrow j hj
-      exact ⟨r + s, by rw [hval, hr, hs]; ring⟩
-  -- rigidity: `Σ m_ij² ≤ pq = #grid` with all odd forces each `m_ij = ±1`.
-  have hcard : Fintype.card (Fin hyp.base.q × Fin hyp.base.p) = hyp.base.p * hyp.base.q := by
-    rw [Fintype.card_prod, Fintype.card_fin, Fintype.card_fin, Nat.mul_comm]
-  have hsq : ∑ p : Fin hyp.base.q × Fin hyp.base.p, (m p.1 p.2) ^ 2
-      ≤ ((hyp.base.p * hyp.base.q + 1 : ℕ) : ℤ) - 1 := by
-    rw [Fintype.sum_prod_type]; push_cast; linarith [hbessel]
-  have hle : ((hyp.base.p * hyp.base.q + 1 : ℕ) : ℤ)
-      ≤ (Fintype.card (Fin hyp.base.q × Fin hyp.base.p) : ℤ) + 1 := by
-    rw [hcard]; push_cast; omega
-  obtain ⟨_, hpm⟩ := all_pm_one_and_card_of_odd_sq_sum_le
-    (fun p : Fin hyp.base.q × Fin hyp.base.p => m p.1 p.2) (hyp.base.p * hyp.base.q + 1)
-    hodd hsq hle
-  exact ⟨m, fun i j => hpm (i, j), hmem⟩
+  -- the grid projection of `β_L` is the projection of `1_G + Γ_L` (`ζ_0^ν`/`W`-parts ⊥ grid).
+  set H78 := dataL.h78 hG with hH78
+  set BD := dataL.betaDecomp hG with hBD
+  have hDadeAvoid := mSide_dadeSupport_avoids_regular (hyp := hyp) hG hnoV hncH0C hLmax dataL
+  have hetaNu : ∀ (k : Fin (dataL.n + 1)), k ≠ H78.ind1H →
+      ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
+        ClassFunction.inner (H78.nu (H78.hyp76.zeta k)) (hyp.base.eta i j) = 0 := by
+    intro k hk i j
+    rw [OddOrder.RepresentationTheory.inner_conj_symm,
+      caseB_eta_orthogonal_nu_zeta_at hG hyp.base dataL hDadeAvoid hk i j, star_zero]
+  have hWeta : ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
+      ClassFunction.inner H78.weightedNuSum (hyp.base.eta i j) = 0 := by
+    intro i j
+    rw [show H78.weightedNuSum
+        = ∑ k ∈ (Finset.univ.erase H78.ind1H),
+            (H78.hyp76.zeta k (1 : ↥L) /
+              (H78.hyp76.zeta H78.zetaDistinct (1 : ↥L) *
+                ClassFunction.inner (H78.hyp76.zeta k) (H78.hyp76.zeta k))) •
+              H78.nu (H78.hyp76.zeta k) from rfl]
+    rw [inner_sum_left]
+    refine Finset.sum_eq_zero fun k hk => ?_
+    rw [ClassFunction.inner_smul_left, hetaNu k (Finset.mem_erase.mp hk).1 i j, mul_zero]
+  have hphi_coeff : ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
+      ClassFunction.inner
+        (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G + (dataL.betaDecomp hG).Gamma)
+        (hyp.base.eta i j) = (m i j : ℂ) := by
+    intro i j
+    rw [← hcoeff i j,
+      show H78.beta = OddOrder.Peterfalvi.S09.Hypothesis71.constOne G
+          - H78.nu (H78.hyp76.zeta H78.zetaDistinct)
+          + (BD.a : ℂ) • H78.weightedNuSum + BD.Gamma from BD.beta_eq]
+    simp only [ClassFunction.inner_add_left, ClassFunction.inner_sub_left,
+      ClassFunction.inner_smul_left,
+      hetaNu H78.zetaDistinct H78.zetaDistinct_ne_ind1H i j, hWeta i j, mul_zero, sub_zero,
+      add_zero]
+    rw [hBD]
+  -- rigidity: `e_L = p q` (re-derived), all `m_ij = ±1`, and the defect `Y = 0`.
+  obtain ⟨hepqH, hpm, hgrid⟩ :=
+    dataL.etaGrid_projection_rigidity hG hyp.base m hphi_coeff hprin hrel hrow hcol hepq.le
+  -- unit norm and classification of `χ = Σ m_ij η_ij − β_L^τ`.
+  have hchi1 :=
+    dataL.etaGrid_projection_sub_beta_norm_one hG hyp.base m hpm hepqH hcoeff
+  have hetaNuData : ∀ (t : Fin (dataL.n + 1)), t ≠ dataL.ind1H →
+      ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
+        ClassFunction.inner
+          ((dataL.h78 hG).nu ((dataL.h78 hG).hyp76.zeta t)) (hyp.base.eta i j) = 0 := by
+    intro t ht i j
+    refine hetaNu t ?_ i j
+    rw [dataL.h78_ind1H_eq]
+    exact ht
+  have hclass :=
+    dataL.etaGrid_projection_sub_beta_classification hG hyp.base m hetaNuData hchi1
+  refine ⟨m, etaGridProjection hyp.base m - (dataL.h78 hG).beta, hpm, by simpa using hclass, ?_⟩
+  have hXdef : etaGridProjection hyp.base m
+      = ∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (m i j : ℂ) • hyp.base.eta i j := by
+    rw [etaGridProjection]
+  rw [← hXdef]
+  abel
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **`e_L = |L : H_L| = p q`** for the (14.3) L-side.  The (7.8) complement index
@@ -592,13 +614,13 @@ the (14.11.2)-style signed expansion `β_L^τ = Σ_{ij} ε_ij η_ij − ε ζ_i^
 the removed unit-norm member an `L`-family coherent image (`i ≠ ind1H`; the `−ψ̄^{τ₁}`
 alternative is the conjugate member `conjIndex`).
 
-De-scaffolded (lane c, mirroring the `M`-side `betaM_expansion`): the removed member is the
-distinguished coherent image `ζ_0^ν = ν(ζ_{zetaDistinct})` with `ε = 1` and
-`zetaDistinct ≠ ind1H`, and the whole content is the pure-algebra rearrangement of the (7.8.a)
-Dade decomposition `β_L = 1_G − ζ_0^ν + Δ_L` (`beta_eq_constOne_sub_zetaImage_add_delta`, PROVEN)
-together with the `η`-grid identity `1_G + Δ_L = Σ ±η_ij` (`lSide_delta_grid_expansion`, whose
-`±1` rigidity is *proven* from the (3.7) relation plus the isolated §14 grid-coefficient carrier
-`lSideGridCoeffData`). -/
+Proven (lane c, issue 0115 Campaign A) from the honest (14.11.2) L-side conclusion
+`lSide_expansion_classification`: the removed member is the distinguished coherent image
+`ζ_0^ν` with `ε = 1` **or** the conjugate family member `ζ_{j₁}^ν = ν(ζ̄_0)`
+(`exists_conjIndex`) with `ε = −1`, matching the Coq `FTtype2_support_coherence` alternatives
+`chi = tau1L phi \/ chi = - tau1L phi^*`.  The strict gap inputs `ub_u`/`ub_v` of the
+(c1)-branch refutations are derived here from the (14.14) gap chain `hhv`/`hvu` through the
+`e_L = p q` and `|H_L| = h` bridges. -/
 theorem lSide_signed_eta_expansion [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
@@ -637,18 +659,23 @@ theorem lSide_signed_eta_expansion [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
       ((Nat.card ↥dataL.typeIHyp.H - 1 : ℕ) : ℚ)
         / (((maxNilpotentNormalHall nc.Ldata.L).subgroupOf nc.Ldata.L).index : ℚ) :=
     lt_trans hvu hub_v
-  obtain ⟨signs, hsigns, hgrid⟩ :=
-    lSide_delta_grid_expansion hG hnoV hncH0C nc.Ldata.L_maximal dataL hq3 hp5 hepq
+  obtain ⟨signs, chi, hsigns, hclass, hexp⟩ :=
+    lSide_expansion_classification hG hnoV hncH0C nc.Ldata.L_maximal dataL hq3 hp5 hepq
       hub_u hub_v
-  -- the removed member is the distinguished coherent image `ζ_0^ν` (`ε = 1`, `zetaDistinct`)
-  refine ⟨signs, hsigns, (dataL.h78 hG).zetaDistinct, ?_, 1, Or.inl rfl, ?_⟩
-  · -- `zetaDistinct ≠ ind1H`
-    have h := (dataL.h78 hG).zetaDistinct_ne_ind1H
-    rwa [dataL.h78_ind1H_eq] at h
-  · -- `β_L = (1_G + Δ_L) − ζ_0^ν = Σ ±η_ij − ζ_0^ν`
-    rw [Int.cast_one, one_smul, ← hgrid,
-      (dataL.h78 hG).beta_eq_constOne_sub_zetaImage_add_delta]
-    abel
+  rcases hclass with hchi | hchi
+  · -- `χ = ζ_0^ν`: the removed member is the distinguished image (`i = zetaDistinct`, `ε = 1`)
+    refine ⟨signs, hsigns, (dataL.h78 hG).zetaDistinct, ?_, 1, Or.inl rfl, ?_⟩
+    · have h := (dataL.h78 hG).zetaDistinct_ne_ind1H
+      rwa [dataL.h78_ind1H_eq] at h
+    · rw [hexp, hchi]
+      norm_num
+  · -- `χ = −(ζ̄_0)^ν`: the removed member is the conjugate family member (`ε = −1`)
+    obtain ⟨j₁, hj₁ne, hj₁⟩ := dataL.exists_conjIndex hG
+    refine ⟨signs, hsigns, j₁, ?_, -1, Or.inr rfl, ?_⟩
+    · rwa [dataL.h78_ind1H_eq] at hj₁ne
+    · rw [hexp, hchi, ← congrArg (dataL.h78 hG).nu hj₁]
+      push_cast
+      rw [neg_smul, one_smul]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **The (14.16) expansion input** — the §13-gated character content of the case-(b)
