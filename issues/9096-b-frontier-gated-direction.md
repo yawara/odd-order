@@ -111,3 +111,50 @@ b は待機中 re-assess を continue (a-ν landing で un-gate 波及を検出�
 
 ## 参照
 - issue 2035 (#33/#35/#36)、issue 9094 (RULING)、commit a8b777b6 (hbridge closed)
+
+## ✅ b 実施報告 (2026-07-14, ruling item 2 完了): bundle split landed
+
+`HypothesisSwap.lean` の分割手術を実装、build green (4132 jobs)。
+
+### 新 signature (a へ通知 — producer thread はこの形を対象に)
+
+1. **`NuGridSupplyData` = pure grid bundle 化**: `V_commutative` field を**削除**。残る field は
+   grid-theoretic のみ (`nu_irreducible` / `nu_row_injective` / `nu_orthonormal` /
+   `nu_degree_modEq_deltaPrime` / `deltaPrime_zero_eq_one` / `nu_rowSum_eq_induce` /
+   `nu_reducible_dichotomy` / `nu_diff_support` / `nu_apply_of_not_mem_W1` / `nu_conj`)。
+   全て `FeitThompsonNuGrid.lean` の canonical `nuT_*` theorem と 1:1 対応 (a の 13 assert が
+   カバー済み)。a の producer discharge (`Hypothesis.nuGridSupply` の sorry 置換) は
+   canonical 構成サイトでの `hyp.nu ≡ nuT` 同定 + これら grid field の readout のみでよい —
+   post-(14.9) fact は一切要らない。
+
+2. **`Hypothesis.swap` に明示引数 `hV` を追加** (`hT2` 直後、(14.9)-conclusional グループ):
+
+   ```
+   noncomputable def Hypothesis.swap [Finite G] (hyp : Hypothesis (G := G))
+       (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+       (hV : IsMulCommutative ↥hyp.V)          -- ← 新引数 (13.2.a at T)
+       (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
+       (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
+       (pins : NuGridSupplyData hyp) : Hypothesis (G := G)
+   ```
+
+   `S_U_commutative := hV` に再配線 (依存順保存: V の可換性は `hT2` 以後の supply)。
+
+3. **consumer 2 箇所は signature 不変で内部導出** (「(14.9) 系 theorem 経由」ルート):
+   `typeI_caseC_dual_dichotomy` (S15_SAndT.lean) / `typeIBetaL_eta_col_constant`
+   (S15_SAndTGrid.lean) は既存引数 `hT2 : IsTypeP2 hyp.T` から
+   `(proposition_type_classification _hG hyp.T_maximal).2.1.mpr hT2 : IsTypeII hyp.T`
+   (BG Prop 16.1(b) dictionary、axiom-clean) → `isMulCommutative_V` (genuine 証明、
+   Schur–Zassenhaus conjugacy) で `hV` を導出して渡す。下流 consumer ゼロにつき波及なし。
+
+### 循環断ち切りの確認
+
+`V_commutative` の供給が `S16.T_typeII` (sorryAx、`T_side_caseB_facts` 前段) を経由する
+ルートは存在しなくなった: swap への供給は caller の `hT2` (これ自体が (14.9)-conclusional
+引数として上流から供給される) からの dictionary 導出のみ。(13.4)→(14.9) 循環は構造的に
+不可能になった。
+
+### b 次 work
+
+ruling item 2 final clause に従い T-side (13.3)/(13.4) を再開
+(`tSide_theta_package_of_not_caseB_core` / `deltaPrime_eq_one_T`、issue 2035 文脈)。
