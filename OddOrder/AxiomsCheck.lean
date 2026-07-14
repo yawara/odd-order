@@ -8103,3 +8103,10 @@ through `T' = huSub`, constituent kernel transfer), and the degree-`0` `A(T)`-su
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.induce_K_mem_zSpan_T
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.zSpan_sSet_degree_zero_support_T
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.induce_K_mem_zSpan_sSet_irr_T
+
+/-! **The (13.4) dirr cross-orthogonality bricks, axiom-clean** (lane b, 2026-07-14, issue
+2035 #41 step 6): the conjugate identification `B = Ā` for conjugation-antisymmetric norm-one
+`ℤ`-irreducible pairs, and the cross-`τ` lead orthogonality `⟨A, C⟩ = 0` from orthogonal
+differences — the "pairwise orthogonality of `η`, `λ^{τ₁}`, `θ^{τ₁}`" of Peterfalvi (13.4). -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.conj_eq_of_norm_one_conj_antisym
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.inner_eq_zero_of_conj_diff_orthogonal

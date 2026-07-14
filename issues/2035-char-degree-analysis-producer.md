@@ -2310,3 +2310,84 @@ conjunct 3 を「∃ r' ≠ 0」量化に restate + 供給 producer 束線 (pins
 (b) consumer `lambda_forces_T_caseB_core` の hβform r'-thread → (c) conjunct 5 (S/T cross
 直交、step 6) は package 内で θG = τ₁T(θT) 形から導出予定 (τ₁λ ⊥ η-grid ✓ +
 disjoint-support h0 パターン)。CharacterDegreeSupply に import S15_Tau1T 追加要 (DAG ✓ 無循環)。
+
+## 2026-07-14 更新 #72 (lane b, /loop iter 35) — 原文 (13.4) 精読 + package restate + dirr bricks
+
+**原文検証 (mmd 04.15 p.75-86)**: (13.4) の (13.3.c) cite は両側とも target index 自由
+(μ₁^{τ₁} = ±∑_i η_{is}、ν₁^{τ₁} = ±∑_j η_{rj}) — #69 の r'-一般化は原文通りと確認。
+conjunct 5 (⟨λ^{τ₁}, θ^{τ₁}⟩ = 0) の原文根拠 = 「(4.1)+(5.3.b) で η・λ^{τ₁}・θ^{τ₁} pairwise
+直交」+ 中間表示 ((λ−λ̄)^τ, (θ−θ̄)^τ) = 0 (disjoint support)。
+
+実施:
+- **package restate**: `tSide_theta_package_of_not_caseB_core` conjunct 3 を ∃ r' 量化に変更
+  + consumer `lambda_forces_T_caseB_core` の obtain/expansion を r'-thread (build green、
+  expansion brick は η-row index を自由引数で受けるので無修正適合)。
+- **dirr bricks (Tau1T、sorry-free・axiom-clean)**:
+  `conj_eq_of_norm_one_conj_antisym` — A,B norm-1 ZIrr、⟨A,B⟩=0、Ā−B̄ = B−A ⟹ B = Ā ∧
+  constituent 非実 (χA との inner で εA(real-ind + 1) = εB·[χ̄B=χA] を case bash)。
+  `inner_eq_zero_of_conj_diff_orthogonal` — 2 対の conj-antisym pair + ⟨A−B, C−D⟩ = 0 ⟹
+  ⟨A,C⟩ = 0 (共有 constituent なら h0 = ±2 ≠ 0)。
+  ⚠ 実装注意: repo の ClassFunction.inner は**右 slot 共役** (inner_smul_left は star 無し);
+  rw の if_neg は条件向きを show で明示 pin (逆向き ne は h.symm)。
+
+残 = package 本体組立 (次 iteration): θ-witness → θT := Ind_K θ、r := 1、
+conjunct 2 = indK_sub_nuRow_support / 3 = apply_induce_sub + nuRow_eta_row (τ₁T(ν_1) 経由、
+θG := τ₁T θT) / 4 = induce_inner_eta / 5 = dirr bricks + core 側 (τ₁S λ の pair 供給:
+core.tau1S_inner_induce 系 + λ 非実) + disjoint support ⟨Ind_S(λ−λ̄), Ind_T(θ−θ̄)⟩ = 0。
+供給: pins = hyp.nuGridSupply hG (sorried a-owned) / hT2・Tdata 系 / hnoV = ?
+(Hypothesis-level no-typeV producer 要確認 — card_Q_eq_qp chain が使った物)。
+
+## 2026-07-14 更新 #73 (lane b, /loop iter 36) — package 組立部材 3 本 + 供給 producer 確定
+
+CharacterDegreeSupply に追加 (build green):
+- `indK_sub_indK_support` / `indH_sub_indH_support` (sorry-free・axiom-clean) — degree-1
+  K/H-induction 差の (QD)#/H# support (conj pair λ−λ̄、θT−θ̄T 用)
+- `inner_induce_H_QD_eq_zero` — (13.2.e) S/T cross 直交 producer 形 (sorryAx は既存上流
+  QD_sharp_centralizer_le_T 系から継承 — consumer h0 と同 profile)
+
+**供給 producer 全確定**:
+- hnoV = `S12.no_typeV_maximal_unconditional` — **axiom-clean 確認** ✓✓
+- pins = hyp.nuGridSupply hG (sorried、a-owned 9096) / hvd = vd_ne_one / Tdata 系 =
+  reconciled_typePData_T / chief = exists_chiefFactorData
+- **hT2 = 残る唯一の gate**: honest 供給 = S16.T_isTypeP2 (TTypeII:900) だが S16 は
+  CharacterDegreeSupply の下流 (layer-inversion、issue 0116 と同類)。package 組立時に
+  precisely-named sorried gate `T_typeP2_for_thetaPackage`-類として立て、0116 解決 or
+  producer 移設で discharge する方針。
+
+次 iteration = package 本体 (組立設計確定済):
+θ-witness (thetaWitness_of_not_caseB) → θT := Ind_K θ、r := ⟨1⟩ / conjunct 2 =
+indK_sub_nuRow_support / 3 = extends_on_supported + map_sub + nuRow_eta_row (θG := τ₁T θT、
+apply_induce_sub 不要 — ν_r 側は zSpan+degree-0 で直接) / 4 = induce_inner_eta / 5 =
+dirr bricks (A,B) = (core.tau1S λ, core.tau1S λ̄)、(C,D) = (τ₁T θT, τ₁T θ̄T)、
+conj-antisym = induce_conj + characterKernel_conj (S03:395 ✓)、非実 =
+not_isReal_of_ne_trivial_irreducible_of_odd_card (S03:156 ✓)、h0 = inner_induce_H_QD_eq_zero
++ indH/indK_sub 支持。
+
+## 2026-07-14 更新 #74 (lane b, /loop iter 37) — ✅✅✅ θ-package 本体組立完了 (#41 step 5-6 の核心)
+
+**`tSide_theta_package_of_not_caseB_core` の monolithic sorry を実証明 (~330 行) に置換**
+(build green、full build 4209 jobs 9.8s、S16 下流 green):
+
+- 供給: hnoV = no_typeV_maximal_unconditional (axiom-clean) / hvd = vd_ne_one / pins =
+  nuGridSupply (sorried a-owned) / Tdata = reconciled_typePData_T / chief = exists_chief /
+  **hT2 = 新 gate `T_isTypeP2_gate`** (precisely-named sorried、honest 供給 = S16.T_isTypeP2
+  の layer-inversion 0116 類、docstring 記録済)。
+- θ-witness (thetaWitness_of_not_caseB) → θT := Ind_K θ、anchor row r := ⟨1⟩。
+- conjunct 2 = indK_sub_nuRow_support ✓ / conjunct 3 = zSpan+degree-0 → extends_on_supported
+  → map_sub → nuRow_eta_row pin (r'、δ') / conjunct 4 = tau1T_ofHonest_induce_inner_eta /
+  **conjunct 5 = dirr bricks 全結線**: (A,B) = (τ₁S λ, τ₁S λ̄) core fields 経由
+  (inner_induce/apply_induce_sub/mem_ZIrr ×(thetaL, thetaL.conj))、(C,D) = (τ₁T θT, τ₁T θ̄T)
+  carrier 直 (extension_inner_eq/mem_ZIrr)、非実 = not_isReal_of_ne_trivial_of_odd_card'
+  (度数 uq/vp ≠ 1)、conj-antisym = induce_conj + conj algebra、h0 =
+  inner_induce_H_QD_eq_zero (disjoint support)。
+- **File 内 sorry 残 2 のみ**: T_isTypeP2_gate (新、0116 類) + T_caseB_facts_no_lambda
+  (既存 no-λ Galois 分岐、T-mirror (13.9)-(13.12) gated)。
+- 実装 lessons: (i) λ̄ = lam.lambda.conj は λ を部分項に含む → rw は conj-composite
+  (hlamconj) を先に。 (ii) induce_conj の向き = (Ind θ).conj = Ind (θ.conj)。
+  (iii) file 内前方参照 → package chain (package + lambda_forces + T_caseB_facts_unconditional)
+  を θ-witness block の後方へ python 一括移設 ([[lean-systematic-refactor-script]])。
+
+これで #41 step 5+6 が実質完了 (τ₁T bundling ✓ + conjunct 全結線 ✓ + S/T cross 直交 ✓)。
+残 = step 7 package assembly は既存 consumer chain (lambda_forces → T_caseB_facts_unconditional
+→ S16) が既に配線済みのため、**T-side campaign の残 gate は refuter-T / nuGridSupply (a) /
+T_isTypeP2_gate (0116) / T_caseB_facts_no_lambda の 4 named-obligation に collapse**。
