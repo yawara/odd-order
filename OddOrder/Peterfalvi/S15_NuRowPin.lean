@@ -170,7 +170,7 @@ theorem Hypothesis.coherentIndT_nuRow_diff [Finite G]
   have hA0supp := hAsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
     (honestTypeP2ASet_subset_A0Set Tdata))
   rw [← map_sub, c.extends_on_supported _ hmemSpan, hyp.indT_apply,
-    ← hyp.tInstance_dade0_eq_induce hG hnoV hT2 Tdata hA0supp,
+    ← hyp.tInstance_dade0_eq_induce hG hnoV hT2.1 Tdata hA0supp,
     show ((∑ j : Fin hyp.p, hyp.nu r j) - (∑ j : Fin hyp.p, hyp.nu s j))
       = ∑ j : Fin hyp.p, (hyp.nu r j - hyp.nu s j) from by rw [Finset.sum_sub_distrib],
     map_sum, Finset.sum_congr rfl (fun j _ =>
@@ -224,16 +224,16 @@ theorem coherentIndT_image_inner_eta_eq_zero [Finite G]
       (OddOrder.Peterfalvi.S04.supportInSubgroup_mono (honestTypeP2ASet_subset_A0Set Tdata))
   -- `τ = Ind_T^G` equals the `A₀(T)`-Dade image on the `A₀(T)`-supported difference.
   have hmaps : hyp.indT (ζ - ζ.conj) =
-      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hT2 Tdata)
-        ((hyp.dadeHypT0 hG hT2 Tdata).fullDadeIsometryData
-          (hyp.dadeHypT0_hconj hG hT2 Tdata)) (ζ - ζ.conj) := by
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hT2.1 Tdata)
+        ((hyp.dadeHypT0 hG hT2.1 Tdata).fullDadeIsometryData
+          (hyp.dadeHypT0_hconj hG hT2.1 Tdata)) (ζ - ζ.conj) := by
     rw [hyp.indT_apply]
-    exact (hyp.tInstance_dade0_eq_induce hG hnoV hT2 Tdata hA0Supp).symm
+    exact (hyp.tInstance_dade0_eq_induce hG hnoV hT2.1 Tdata hA0Supp).symm
   -- the coherent conjugate difference agrees with that Dade image.
   have hextDiff : coh.extension ζ - coh.extension ζ.conj =
-      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hT2 Tdata)
-        ((hyp.dadeHypT0 hG hT2 Tdata).fullDadeIsometryData
-          (hyp.dadeHypT0_hconj hG hT2 Tdata)) (ζ - ζ.conj) := by
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hT2.1 Tdata)
+        ((hyp.dadeHypT0 hG hT2.1 Tdata).fullDadeIsometryData
+          (hyp.dadeHypT0_hconj hG hT2.1 Tdata)) (ζ - ζ.conj) := by
     rw [← hmaps, ← coh.extends_on_supported (ζ - ζ.conj) hdiffSupported, map_sub]
   -- the crux: the difference vanishes on the saturated regular set.
   have hvanish : ∀ x ∈ OddOrder.GroupTheory.conjClassSet
@@ -385,11 +385,11 @@ theorem Hypothesis.coherentIndT_nuRow_vanish_regular [Finite G]
       (honestTypeP2ASet_subset_A0Set Tdata))
   -- `c(γ)` is the honest `A₀(T)`-Dade image, vanishing at the regular `x`
   have hcγ : c.extension γ
-      = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hT2 Tdata)
-          ((hyp.dadeHypT0 hG hT2 Tdata).fullDadeIsometryData
-            (hyp.dadeHypT0_hconj hG hT2 Tdata)) γ := by
+      = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hT2.1 Tdata)
+          ((hyp.dadeHypT0 hG hT2.1 Tdata).fullDadeIsometryData
+            (hyp.dadeHypT0_hconj hG hT2.1 Tdata)) γ := by
     rw [c.extends_on_supported γ ⟨hγspan, hγsupp⟩, hyp.indT_apply,
-      hyp.tInstance_dade0_eq_induce hG hnoV hT2 Tdata hγA0supp]
+      hyp.tInstance_dade0_eq_induce hG hnoV hT2.1 Tdata hγA0supp]
   have hcγx : c.extension γ x = 0 := by
     rw [hcγ]
     exact hyp.dadeT0_apply_eq_zero_of_regular hG hT2 Tdata hW1 hW2 hγsupp hx
@@ -501,10 +501,10 @@ theorem Hypothesis.coherentIndT_nuRow_pin_of_irr [Finite G]
       φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.T)
         (sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
         (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T) →
-      hyp.indT φ = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2)
-        ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2)) φ :=
+      hyp.indT φ = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2.1)
+        ((hyp.dadeHypT hG hT2.1).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2.1)) φ :=
     fun φ hφ => by
-      rw [hyp.indT_apply, hyp.tInstance_dade_eq_induce hG hnoV hT2 hφ.2]
+      rw [hyp.indT_apply, hyp.tInstance_dade_eq_induce hG hnoV hT2.1 hφ.2]
   obtain ⟨E, hEsub, hEsum⟩ :=
     hyp.sSet_coherent_extension_eq_sum_memberRFamily_T hG hnoV pins hvd hT2 Tdata hU hW1 hW2
       (Set.Subset.refl _) (c.congrMap hagree) hνmem hνcmem
@@ -884,7 +884,7 @@ theorem Hypothesis.exists_pinned_coherent_sSet_of_all_reducible_T [Finite G]
     · have hAsupp := hyp.nuRow_diff_supported hG pins hvd chief hr0 hi1_0
       have hA0supp := hAsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
         (honestTypeP2ASet_subset_A0Set Tdata))
-      rw [hyp.indT_apply, ← hyp.tInstance_dade0_eq_induce hG hnoV hT2 Tdata hA0supp,
+      rw [hyp.indT_apply, ← hyp.tInstance_dade0_eq_induce hG hnoV hT2.1 Tdata hA0supp,
         show ((∑ j : Fin hyp.p, hyp.nu r j)
             - (∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j))
           = ∑ j : Fin hyp.p, (hyp.nu r j - hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j) from by

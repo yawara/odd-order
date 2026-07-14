@@ -101,25 +101,25 @@ theorem Hypothesis.nineElevenNormBoundT [Finite G]
   have hindS_dade : ∀ f : ClassFunction ↥hyp.T ℂ,
       f ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.T) S₂
         (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T) →
-      hyp.indT f = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2)
-        ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2)) f := fun f hf => by
-    rw [hyp.indT_apply, ← hyp.tInstance_dade_eq_induce hG hnoV hT2
+      hyp.indT f = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2.1)
+        ((hyp.dadeHypT hG hT2.1).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2.1)) f := fun f hf => by
+    rw [hyp.indT_apply, ← hyp.tInstance_dade_eq_induce hG hnoV hT2.1
       (OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mp hf).2]
   have hS₂cohD : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2)
-        ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2))) S₂
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2.1)
+        ((hyp.dadeHypT hG hT2.1).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2.1))) S₂
       (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T)) :=
     ⟨cohS₂_indS.congrMap hindS_dade⟩
   have hnopairD : ∀ χ ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd) \ S₂,
       ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2)
-          ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2)))
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2.1)
+          ((hyp.dadeHypT hG hT2.1).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2.1)))
         (S₂ ∪ {χ, χ.conj})
         (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T)) := by
     intro χ hχ
     rintro ⟨c⟩
     refine hnopair χ hχ ⟨c.congrMap (fun f hf => ?_)⟩
-    rw [hyp.tInstance_dade_eq_induce hG hnoV hT2
+    rw [hyp.tInstance_dade_eq_induce hG hnoV hT2.1
       (OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mp hf).2, hyp.indT_apply]
   -- ── `τ₃` = the (9.11.6) `𝒮₃`-coherence on the honest Dade
   obtain ⟨c₃⟩ := hyp.sSet_sThree_coherent_dade_T hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chars hS₂conj hS₃ne hS3deg
@@ -233,21 +233,21 @@ theorem Hypothesis.nineElevenNormBoundT [Finite G]
     exact Nat.cast_injective h3
   have hαsupp : ((γ - ψ₁ : ClassFunction ↥hyp.T ℂ)).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T :=
-    hyp.nineElevenAlphaSupportT hG hvd hT2 chars caseA ⟨0, hq0⟩ hψ₁sSet hψ₁deg
+    hyp.nineElevenAlphaSupportT hG hvd chars caseA ⟨0, hq0⟩ hψ₁sSet hψ₁deg
   -- `α^τ ∈ ℤ[Irr G]`, norm preservation
-  have hταZIrr : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2)
-      ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2)) (γ - ψ₁)
+  have hταZIrr : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2.1)
+      ((hyp.dadeHypT hG hT2.1).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2.1)) (γ - ψ₁)
       ∈ OddOrder.RepresentationTheory.ZIrr G :=
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-      (hyp.dadeHypT hG hT2) (hyp.dadeHypT_hconj hG hT2) hαsupp hαZIrr
+      (hyp.dadeHypT hG hT2.1) (hyp.dadeHypT_hconj hG hT2.1) hαsupp hαZIrr
   have hταnorm : ClassFunction.inner
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2)
-        ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2)) (γ - ψ₁))
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2)
-        ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2)) (γ - ψ₁))
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2.1)
+        ((hyp.dadeHypT hG hT2.1).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2.1)) (γ - ψ₁))
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2.1)
+        ((hyp.dadeHypT hG hT2.1).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2.1)) (γ - ψ₁))
       = ClassFunction.inner (γ - ψ₁) (γ - ψ₁) :=
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
-      (hyp.dadeHypT hG hT2) (hyp.dadeHypT_hconj hG hT2) hαsupp hαsupp
+      (hyp.dadeHypT hG hT2.1) (hyp.dadeHypT_hconj hG hT2.1) hαsupp hαsupp
   -- ── `α ⊥ 𝒮₃` at the source
   have hαorthS₃ : ∀ lam ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd) \ S₂,
       ClassFunction.inner (γ - ψ₁) lam = 0 := by
@@ -260,12 +260,12 @@ theorem Hypothesis.nineElevenNormBoundT [Finite G]
   have hconst : ∀ lam ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd) \ S₂,
       ∀ lam' ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd) \ S₂,
       ClassFunction.inner
-        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2)
-          ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2)) (γ - ψ₁))
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2.1)
+          ((hyp.dadeHypT hG hT2.1).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2.1)) (γ - ψ₁))
         (c₃.extension lam)
       = ClassFunction.inner
-          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2)
-            ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2)) (γ - ψ₁))
+          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2.1)
+            ((hyp.dadeHypT hG hT2.1).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2.1)) (γ - ψ₁))
           (c₃.extension lam') := by
     intro lam hlam lam' hlam'
     have hdiffsupp : ((lam - lam' : ClassFunction ↥hyp.T ℂ)).support ⊆
@@ -281,34 +281,34 @@ theorem Hypothesis.nineElevenNormBoundT [Finite G]
         ⟨Submodule.sub_mem _ (Submodule.subset_span hlam) (Submodule.subset_span hlam'),
           hdiffsupp⟩
     have hagree : c₃.extension (lam - lam')
-        = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2)
-          ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2)) (lam - lam') :=
+        = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2.1)
+          ((hyp.dadeHypT hG hT2.1).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2.1)) (lam - lam') :=
       c₃.extends_on_supported _ hzss
     have hiso : ClassFunction.inner
-        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2)
-          ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2)) (γ - ψ₁))
-        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2)
-          ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2)) (lam - lam'))
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2.1)
+          ((hyp.dadeHypT hG hT2.1).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2.1)) (γ - ψ₁))
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2.1)
+          ((hyp.dadeHypT hG hT2.1).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2.1)) (lam - lam'))
         = ClassFunction.inner (γ - ψ₁) (lam - lam') :=
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
-        (hyp.dadeHypT hG hT2) (hyp.dadeHypT_hconj hG hT2) hαsupp hdiffsupp
+        (hyp.dadeHypT hG hT2.1) (hyp.dadeHypT_hconj hG hT2.1) hαsupp hdiffsupp
     have hz : ClassFunction.inner (γ - ψ₁) (lam - lam') = 0 := by
       rw [ClassFunction.inner_sub_right, hαorthS₃ lam hlam, hαorthS₃ lam' hlam', sub_zero]
     have hsub : ClassFunction.inner
-        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2)
-          ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2)) (γ - ψ₁))
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2.1)
+          ((hyp.dadeHypT hG hT2.1).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2.1)) (γ - ψ₁))
         (c₃.extension lam)
         - ClassFunction.inner
-            (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2)
-              ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2)) (γ - ψ₁))
+            (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2.1)
+              ((hyp.dadeHypT hG hT2.1).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2.1)) (γ - ψ₁))
             (c₃.extension lam') = 0 := by
       rw [← ClassFunction.inner_sub_right, ← map_sub, hagree, hiso, hz]
     exact sub_eq_zero.mp hsub
   -- ── the (9.11.6) dichotomy
   by_cases hc : ∀ lam ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd) \ S₂,
       ClassFunction.inner
-        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2)
-          ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2)) (γ - ψ₁))
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2.1)
+          ((hyp.dadeHypT hG hT2.1).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2.1)) (γ - ψ₁))
         (c₃.extension lam) = 0
   · -- orthogonal branch — the (9.11.7)–(9.11.8) residual refutes
     exact (hyp.nineElevenSevenEightRefutationT hG hnoV pins hvd hT2 Tdata hU hW1 hW2 chars caseA S₂ hS₁S₂ hS₂S hS₂conj hS₂cohD
@@ -346,8 +346,8 @@ theorem Hypothesis.nineElevenNormBoundT [Finite G]
       exact sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupT hG hvd) hξ3.1 hξ'3.1 hne
     have hint : ∀ ξ ∈ hS4fin.toFinset, ∃ m : ℤ,
         ClassFunction.inner
-          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2)
-            ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2)) (γ - ψ₁))
+          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2.1)
+            ((hyp.dadeHypT hG hT2.1).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2.1)) (γ - ψ₁))
           (c₃.extension ξ) = (m : ℂ) := by
       intro ξ hξT
       have hξ3 := hS4sub (hS4fin.mem_toFinset.mp hξT)
@@ -355,22 +355,22 @@ theorem Hypothesis.nineElevenNormBoundT [Finite G]
         (c₃.extension_mem_ZIrr ξ (Submodule.subset_span hξ3))
     have hnec : ∀ ξ ∈ hS4fin.toFinset,
         ClassFunction.inner
-          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2)
-            ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2)) (γ - ψ₁))
+          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2.1)
+            ((hyp.dadeHypT hG hT2.1).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2.1)) (γ - ψ₁))
           (c₃.extension ξ) ≠ 0 := by
       intro ξ hξT
       have hξ3 := hS4sub (hS4fin.mem_toFinset.mp hξT)
       rw [hconst ξ hξ3 lam₀ hlam₀]
       exact hlam₀ne
     have hcount4 := OddOrder.Peterfalvi.S13.card_le_inner_self_re_of_orthonormal_inner_int_ne
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2)
-        ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2)) (γ - ψ₁))
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2.1)
+        ((hyp.dadeHypT hG hT2.1).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2.1)) (γ - ψ₁))
       hS4fin.toFinset (fun ξ => c₃.extension ξ) hON1 hON2 hint hnec
     have hNre : (ClassFunction.inner
-        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2)
-          ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2)) (γ - ψ₁))
-        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2)
-          ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2)) (γ - ψ₁))).re
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2.1)
+          ((hyp.dadeHypT hG hT2.1).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2.1)) (γ - ψ₁))
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2.1)
+          ((hyp.dadeHypT hG hT2.1).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2.1)) (γ - ψ₁))).re
         = (N : ℝ) := by
       rw [hταnorm, ← hNval, Complex.natCast_re]
     rw [hNre] at hcount4
@@ -696,6 +696,6 @@ theorem Hypothesis.sSet_coherent_indT_A [Finite G]
   · exact (hyp.sSet_coherent_dade_caseB_T hG hnoV pins hvd hT2 Tdata hU hW1 hW2 hB.some).map
       fun c => c.congrMap fun φ hφ => by
         rw [hyp.indT_apply]
-        exact hyp.tInstance_dade_eq_induce hG hnoV hT2 hφ.2
+        exact hyp.tInstance_dade_eq_induce hG hnoV hT2.1 hφ.2
 
 end OddOrder.Peterfalvi.S15
