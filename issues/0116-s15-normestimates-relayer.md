@@ -194,3 +194,26 @@ hub は毎 tick 追跡。
 
 教訓: threading 設計は obtain-site の **atom interface の型**まで読んでから claim する
 (triple の所在だけでは不十分)。
+## ✅ b 実施報告 (2026-07-15, lane b /loop) — step 4 の genuine math 討伐 + Route T への補足
+
+**Finding 3 step 4 の本質 ((QD)^# ⊆ A₀(T) membership) を実証明、`QD_sharp_centralizer_le_T` を
+axiom-clean 討伐した** (commit `bee4bef9`、issue 2035 #87):
+
+- `mem_honestTypeP2ASet_of_mem_Q_sup_D`: (QD)^# ⊆ **A(T)** (A₀ でなく A に直接入る —
+  z = q·d 分解で d ∈ D = C_V(Q) が Q を centralize、witness は q 自身 or 任意 Q^#-点)。
+- ⟹ step 4 の「hT2 parameterize + HonestTypeP2A0 2 補題上移」は**不要になった**:
+  A(T)-escaping-empty (SubcoherenceInputs:980、既に上流) + Pf (10.10)
+  `no_typeV_maximal_unconditional` (axiom-clean と実測確認) で signature 不変のまま in-place
+  discharge 完了。hub の Route T step 4 は **step 1-3 のみに縮小**。
+- 連鎖: `inner_induce_H_QD_eq_zero` も axiom-clean 化。CountingLayer 実 sorry は
+  `tSide_theta_package_of_not_caseB` (step 3 削除対象) のみ。
+
+**Route T step 2 への補足 (b 調査、2026-07-15)**: NormEstimates 5 定理の character_degree_analysis
+obtain は、no-λ∧θ-有ケースで T-side caseB values が §13 内で確定しないため、**S15 レベルの
+dichotomy 移行では閉じない** (9094 §3-2 但し書きの「T-side v-value 依存」に該当、2035 #87 に詳細)。
+Route T の (hD, hv) param threading が唯一の解 — b は Route T 実施を妨げる作業をしない。
+sequencing (i) は #82-86 で完了済み、(ii) 成立確認は hub 判断のまま。
+
+**(時系列注、b 2026-07-15)**: 上の b 報告は tick 55 自己訂正より**後**に landed。自己訂正の
+「full flip に QD_sharp 移設を含める」項目は本討伐 (bee4bef9、signature 不変 in-place discharge)
+で解決済み — full flip から除外してよい。b は再確定順序どおり #22 rebase campaign へ進む。
