@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S15_CharacterDegreeEngines
+import OddOrder.Peterfalvi.S15_SAndT_Setup.CaseBOrder
 
 /-!
 # Peterfalvi §13 (pp. 75–86) — the (13.3.b)/(13.4) dichotomy supplies
@@ -135,15 +136,29 @@ def LambdaWitness [Finite G] (hyp : Hypothesis (G := G)) : Prop :=
     OddOrder.RepresentationTheory.IsIrreducibleCharacter
       (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ)
 
-/-- **`D = ⊥` — Peterfalvi (13.12) at `T`** (precisely-named swap-route gate, issue 2035 #77):
-the `T`-side centralizer parameter vanishes.  `d = 1` is the `S`-side (13.12) `c_eq_one`
-instantiated at the swapped hypothesis (`Hypothesis.swap`, 9096 threading: `swap.c = hyp.d`
-by construction), transported to `D = ⊥` by `d_eq_card_D`; discharged when the swap
-instantiation is wired (the `c_eq_one` chain itself is lane-a's landed (13.10)–(13.12)). -/
+/-- **`d = 1` — Peterfalvi (13.12) at `T`** (issue 2035 #77, the swap instantiation): the
+`S`-side (13.12) `c_eq_one` at the swapped hypothesis — `swap.c := hyp.d` by the 9096
+threading, so the conclusion is definitional.  Swap inputs: `hT2` from the (13.2.b)-at-`T`
+gate (`T_isTypeP2_gate`, 0116-class), the unconditional abelian `V`, the reconciled type-`P`
+datum, and the ν-grid supply (`nuGridSupply`, the a-owned 9096 producer obligation) — the
+same internal summons as the λ-branch (`tSide_theta_package` chain). -/
+theorem Hypothesis.d_eq_one [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    hyp.d = 1 := by
+  have hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T := hyp.T_isTypeP2_gate hG
+  have hV : IsMulCommutative ↥hyp.V := hyp.isMulCommutative_V_unconditional hG
+  obtain ⟨Tdata, hU, hW1, hW2⟩ := reconciled_typePData_T hG hyp
+  exact c_eq_one hG (hyp.swap hT2 hV Tdata hU hW1 hW2 (hyp.nuGridSupply hG))
+
+/-- **`D = ⊥` — Peterfalvi (13.12) at `T`, subgroup form** (issue 2035 #77): `d = 1`
+(`d_eq_one`, the swap instantiation of `c_eq_one`) transported through
+`d_eq_card_D`. -/
 theorem Hypothesis.T_side_D_eq_bot [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     hyp.D = ⊥ := by
-  sorry
+  have hd := hyp.d_eq_one hG
+  rw [hyp.d_eq_card_D] at hd
+  exact Subgroup.card_eq_one.mp hd
 
 /-- **`v = (q^p−1)/(q−1)` — Peterfalvi (14.4) second assertion** (precisely-named swap-route
 gate, issue 2035 #77; Coq `PFsection14` `oV`): under the (14.1) ordering `q < p`, case (9.7.b)
@@ -156,7 +171,34 @@ theorem Hypothesis.T_caseB_v_eq_full [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hqp : hyp.q < hyp.p) :
     hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) := by
-  sorry
+  have hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T := hyp.T_isTypeP2_gate hG
+  have hV : IsMulCommutative ↥hyp.V := hyp.isMulCommutative_V_unconditional hG
+  obtain ⟨Tdata, hU, hW1, hW2⟩ := reconciled_typePData_T hG hyp
+  let hyp' : Hypothesis (G := G) := hyp.swap hT2 hV Tdata hU hW1 hW2 (hyp.nuGridSupply hG)
+  haveI := hyp'.finiteG
+  obtain ⟨chief', -⟩ :=
+    OddOrder.Peterfalvi.S11.exists_chiefFactorData hG (hyp'.toTypesIIIIIIVSetupS hG)
+  rcases OddOrder.Peterfalvi.S11.clifford_dichotomy hG
+      (hyp'.mkSection11CharacterDataS hG chief') with hA | hB
+  · -- case (9.7.a) at the swap: (13.13) forces `swap.q = hyp.p = 3`, contradicting `3 ≤ q < p`
+    obtain ⟨caseA⟩ := hA
+    obtain ⟨hq3, -⟩ := caseA_parameters hG hyp' caseA
+    have hp3 : hyp.p = 3 := hq3
+    have h3q : 3 ≤ hyp.q := hyp.three_le_q
+    omega
+  · -- case (9.7.b) at the swap: (13.15) with `q ≢ 1 (mod p)` (from `q < p`) pins the full value
+    obtain ⟨caseB⟩ := hB
+    have hnotmod : ¬ hyp'.p ≡ 1 [MOD hyp'.q] := by
+      show ¬ hyp.q ≡ 1 [MOD hyp.p]
+      intro hmod
+      have hq_mod : hyp.q % hyp.p = hyp.q := Nat.mod_eq_of_lt hqp
+      have h1_mod : 1 % hyp.p = 1 :=
+        Nat.mod_eq_of_lt (lt_of_lt_of_le (by norm_num) hyp.three_le_p)
+      have h3q : 3 ≤ hyp.q := hyp.three_le_q
+      have := hmod
+      unfold Nat.ModEq at this
+      omega
+    exact (caseB_order_u hG hyp' caseB).2 hnotmod
 
 /-- **The `T`-side (13.4)/(14.4) facts under the (14.1) ordering `q < p`** (issue 2035 #77;
 the honest restatement of the former `T_caseB_facts_no_lambda`, whose `¬ LambdaWitness`
