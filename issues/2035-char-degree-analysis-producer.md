@@ -2086,3 +2086,14 @@ eta_inner-T、red×red は行相異 + eta_orthonormal)。
 finiteness/pivot/pivot-norm/R-family/pairwiseOrth/closedConj/no-real/Dade-isometry(dadeHypT)/
 diff-supported/uniform-degree/R-orthogonal。次 iteration: engine assembly
 `sSet_coherent_dade_caseB_T` (S 版 sSet_coherent_dade_caseB の mirror、~100 行)。
+
+## 2026-07-14 更新 #61 (lane b, /loop iter 22) — ✅✅ caseB-T (9.11) coherence 完成
+
+**`sSet_coherent_dade_caseB_T`** (TSetMemberRFamily、sorry-free、一発 build、#print axioms clean):
+Galois case の 𝒯 全 family coherence on dadeHypT — (5.7) uniform-degree engine への 11 入力
+全て T-instance 部材で供給 (pivot = ν-row、norm p、uniform degree p·v、R-family、orthogonality)。
+**#41 建設計画の step 1-2 (caseB-T) が完全達成** (pins/hT2/Tdata パラメトリック)。
+
+残 (#41): step 3 caseA-T (base cut + generic reduction + M-common (9.11.7-8) refuter cite) /
+step 4 dispatch + ν-row pin / step 5 τ₁T + (5.3.b)-T + conjunct 4 / step 6 conjunct 5 /
+step 7 package assembly。

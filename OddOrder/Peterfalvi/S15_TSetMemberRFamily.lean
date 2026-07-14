@@ -587,4 +587,89 @@ theorem Hypothesis.sSet_memberRFamily_orthogonal_T [Finite G]
         OddOrder.Peterfalvi.S16.eta_orthonormal hyp sφ sξ a b, if_neg (fun h => hne4 h.1),
         neg_zero, neg_zero]
 
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **(9.11) Galois-branch coherence of `𝒯 = sSet(setupT)` on the honest `T`-Dade map**
+(mirror of `sSet_coherent_dade_caseB`; the caseB-`T` (5.7) `uniform_degree_coherence_of_families`
+assembly).  In the Galois case the whole family is uniform degree `p·v`
+(`sSet_caseB_apply_one_eq_vp`), the pivot is a reducible ν-row `ν₁ = ∑_j ν_{1j}` (self-norm
+`p`), every member carries its (5.2.d) `R`-datum (`sSet_memberRFamily_T`), and the family
+facts (finiteness, pairwise orthogonality, conjugate-closure, no-real, Dade isometry/ZIrr/
+support, cross-orthogonality) are the landed `T`-instance inputs. -/
+noncomputable def Hypothesis.sSet_coherent_dade_caseB_T [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
+    (hvd : hyp.v * hyp.d ≠ 1)
+    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
+    (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
+    {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd)}
+    (caseB : CliffordCaseBData (hyp.mkSection11CharacterDataT hG hvd chief)) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2)
+        ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2)))
+      (sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T)) := by
+  classical
+  -- Pivot: a nonzero reducible ν-row `ν₁ = ∑_j ν_{1j} ∈ 𝒯` (self-norm `p`).
+  have hi0 : (⟨1, hyp.q_prime.one_lt⟩ : Fin hyp.q) ≠ ⟨0, hyp.q_prime.pos⟩ := by
+    intro h; exact absurd (congrArg Fin.val h) one_ne_zero
+  have hη₁ : (∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j)
+      ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd) :=
+    sOf_subset_sSet _ chief.H0
+      (hyp.nu_rowSum_mem_sOf_H0_T hG pins hvd chief ⟨1, hyp.q_prime.one_lt⟩ hi0)
+  have hN : ClassFunction.inner (∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j)
+      (∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j) = (hyp.p : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_sum_left]
+    calc ∑ j : Fin hyp.p, ClassFunction.inner (hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j)
+            (∑ j' : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j')
+        = ∑ j : Fin hyp.p, ∑ j' : Fin hyp.p,
+            ClassFunction.inner (hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j)
+              (hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j') := by
+          refine Finset.sum_congr rfl fun j _ => ?_
+          rw [OddOrder.RepresentationTheory.inner_sum_right]
+      _ = ∑ j : Fin hyp.p, ∑ j' : Fin hyp.p, if j = j' then (1 : ℂ) else 0 := by
+          refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun j' _ => ?_
+          rw [pins.nu_orthonormal ⟨1, hyp.q_prime.one_lt⟩ ⟨1, hyp.q_prime.one_lt⟩ j j']
+          simp
+      _ = ∑ _j : Fin hyp.p, (1 : ℂ) := by
+          refine Finset.sum_congr rfl fun j _ => ?_
+          simp
+      _ = (hyp.p : ℂ) := by simp
+  refine OddOrder.Peterfalvi.S07.uniform_degree_coherence_of_families
+    (sSet_finite _) hη₁
+    (fun η hη => hyp.sSet_memberRFamily_T hG hnoV pins hvd hT2 Tdata hU hW1 hW2 hη)
+    (fun a ha b hb hab => by
+      have h := sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupT hG hvd) ha hb hab
+      convert h using 2 <;> exact Subsingleton.elim _ _)
+    (fun a ha => sSet_closedUnderConjugate _ ha)
+    (fun a ha heq => sSet_hasNoRealCharacters _ (hyp.oddCardT hG) ha heq.symm)
+    ⟨hyp.p, hN⟩
+    (fun {φ ψ} hφ hψ =>
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
+        (hyp.dadeHypT hG hT2) (hyp.dadeHypT_hconj hG hT2) hφ.2 hψ.2)
+    (fun a ha b hb => by
+      have hab_Z : (a - b : ClassFunction ↥hyp.T ℂ)
+          ∈ OddOrder.RepresentationTheory.ZIrr ↥hyp.T :=
+        Submodule.sub_mem _ (sSet_subset_ZIrr _ ha) (sSet_subset_ZIrr _ hb)
+      exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+        (hyp.dadeHypT hG hT2) (hyp.dadeHypT_hconj hG hT2)
+        (hyp.sSet_caseB_member_diff_supported_T hG hvd caseB ha hb) hab_Z)
+    (fun a ha b hb => hyp.sSet_caseB_member_diff_supported_T hG hvd caseB ha hb)
+    (fun {φ ξ} hφ hξ h1 h2 =>
+      hyp.sSet_memberRFamily_orthogonal_T hG hnoV pins hvd hT2 Tdata hU hW1 hW2 hφ hξ h1 h2)
+    (fun a ha => (hyp.sSet_caseB_apply_one_eq_vp hG hvd caseB ha).trans
+      (hyp.sSet_caseB_apply_one_eq_vp hG hvd caseB hη₁).symm)
+    (by
+      rw [hyp.sSet_caseB_apply_one_eq_vp hG hvd caseB hη₁]
+      exact Nat.cast_ne_zero.mpr (Nat.mul_ne_zero Nat.card_pos.ne'
+        (OddOrder.Peterfalvi.S11.u_odd hG (hyp.mkSection11CharacterDataT hG hvd chief)).pos.ne'))
+    (by
+      rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+      simpa using honestTypeP2ASet_one_not_mem (M := hyp.T))
+    (sSet_closedUnderConjugate _ hη₁)
+    (sSet_hasNoRealCharacters _ (hyp.oddCardT hG) hη₁)
+
 end OddOrder.Peterfalvi.S15
