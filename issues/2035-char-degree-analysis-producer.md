@@ -2053,3 +2053,47 @@ OrthonormalCharacterImageFamily 構築 mirror、~100 行) → dispatch → `_ort
 (5.7)-T engine の入力残 1: **`sSet_memberRFamily_orthogonal` の T 版** ((5.2.e)
 cross-orthogonality、S-side SSetMemberRFamily:794)。それで engine assembly
 (`sSet_coherent_dade_caseB_T`) が組める。
+
+## 2026-07-14 更新 #58 (lane b, /loop iter 19) — dadeT0_apply_eq_zero_of_regular landed + orthogonal-T 依存監査
+
+- **`dadeT0_apply_eq_zero_of_regular`** (TSetMemberRFamily、sorry-free): A(T)-supported f の
+  A₀(T)-Dade 像は regular set 上 0 (S 版 mirror; of_isConj の x→w 書き換えが必要だった)。
+- orthogonal-T の依存監査完了: `eta_orthogonal_of_norm_one_pair_vanish` は **hyp-level で
+  T にもそのまま適用可** (η/W grid は S/T 共有)。残 mirror: imageSet_of_irr/red-T (dispatch
+  分解 rfl 系) / `sSet_irr_memberRFamily_eta_inner`-T (rigidity engine 適用、
+  dadeT0_apply_eq_zero_of_regular + tInstance_dade{,0}_eq_induce で S 版逐語) /
+  `dadeOfDiff_orthogonal_typeP_T` (S08 generic wrapper) / `nu_rowSum_ne_of_inner_zero` /
+  orthogonal-T 本体 (2×2 分岐) → **(5.7) engine assembly**。
+
+## 2026-07-14 更新 #59 (lane b, /loop iter 20) — orthogonal-T 部材 5 本 landed (残り本体のみ)
+
+TSetMemberRFamily (sorry-free、一発 build): `sSet_reducible_memberRFamily_ofRows_imageSet` (rfl) /
+`sSet_memberRFamily_T_imageSet_of_irr` / `_of_red` (dispatcher 分解) / `nu_rowSum_ne_of_inner_zero`
+/ **`sSet_irr_memberRFamily_eta_inner_T`** (最大部材 — τ_T(φ−φ̄) の constituents が η-grid ⊥、
+tInstance bridges + dadeT0_apply_eq_zero_of_regular + hyp-level
+eta_orthogonal_of_norm_one_pair_vanish)。
+
+残: `dadeOfDiff_orthogonal_typeP_T` wrapper + **`sSet_memberRFamily_orthogonal_T`** 本体 (2×2) →
+(5.7) engine assembly `sSet_coherent_dade_caseB_T`。
+
+## 2026-07-14 更新 #60 (lane b, /loop iter 21) — ✅ orthogonal-T 完成: (5.7)-T engine 入力 11/11 完備
+
+TSetMemberRFamily (sorry-free、一発 build): `dadeOfDiff_orthogonal_typeP_T` (irr×irr wrapper) +
+**`sSet_memberRFamily_orthogonal_T`** (2×2 本体 — irr×irr は S08 generic、irr×red/red×irr は
+eta_inner-T、red×red は行相異 + eta_orthonormal)。
+
+**(5.7)-T engine `uniform_degree_coherence_of_families` の入力が全部揃った**:
+finiteness/pivot/pivot-norm/R-family/pairwiseOrth/closedConj/no-real/Dade-isometry(dadeHypT)/
+diff-supported/uniform-degree/R-orthogonal。次 iteration: engine assembly
+`sSet_coherent_dade_caseB_T` (S 版 sSet_coherent_dade_caseB の mirror、~100 行)。
+
+## 2026-07-14 更新 #61 (lane b, /loop iter 22) — ✅✅ caseB-T (9.11) coherence 完成
+
+**`sSet_coherent_dade_caseB_T`** (TSetMemberRFamily、sorry-free、一発 build、#print axioms clean):
+Galois case の 𝒯 全 family coherence on dadeHypT — (5.7) uniform-degree engine への 11 入力
+全て T-instance 部材で供給 (pivot = ν-row、norm p、uniform degree p·v、R-family、orthogonality)。
+**#41 建設計画の step 1-2 (caseB-T) が完全達成** (pins/hT2/Tdata パラメトリック)。
+
+残 (#41): step 3 caseA-T (base cut + generic reduction + M-common (9.11.7-8) refuter cite) /
+step 4 dispatch + ν-row pin / step 5 τ₁T + (5.3.b)-T + conjunct 4 / step 6 conjunct 5 /
+step 7 package assembly。
