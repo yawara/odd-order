@@ -1,4 +1,5 @@
 import OddOrder.Peterfalvi.S15_SAndT_Setup.NormEstimates
+import OddOrder.Peterfalvi.S13_ElementaryAbelianKernel
 
 /-!
 # Peterfalvi (13.11)-(13.15) — order and divisor determination
@@ -9,7 +10,7 @@ namespace OddOrder.Peterfalvi.S15
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory
 open OddOrder.Isaacs
-open scoped Pointwise
+open scoped Pointwise IsMulCommutative
 
 variable {G : Type*} [Group G]
 
@@ -543,22 +544,96 @@ theorem c_eq_one_forces_params {p q c : ℕ} {m : ℚ}
 
 Peterfalvi's argument: `PC` is **abelian** (hence nilpotent) — `P` is elementary abelian, `C ≤ U` is
 abelian, and `C` centralizes `P` (`C_eq`); it is **normal** in `S` (type-`P` `W₁`-structure); and it
-is a **Hall** subgroup once `gcd(c, u) = 1`, which holds because case (9.7.b) for `S` (as `p − 1 = 4`
+is a **Hall** subgroup once `gcd(c, u) = 1`, which holds because case (9.7.b) for `S`
+(as `p − 1 = 4`
 has no odd divisor `≠ 1`) forces `u ∣ (p^q − 1)/(p − 1) = 31` (Singer / `typeP_Galois`), coprime to
-`c = 7`.  By `le_maxNilpotentNormalHall` these three facts give `PC ≤ M_F`.  The `typeP_Galois`
-dichotomy and the `W₁`-normality are the genuinely deep §13 σ-structure content (Coq
-`FTtypeP_Ind_Fitting_reg_Fcore`: `typeP_Galois` + Fitting-core maximality `Fcore_max`), §14-gated /
-multi-session — the sole remaining gap of (13.12). -/
+`c = 7`.
+
+The Lean proof follows the same dichotomy.  In Clifford case (a), `a ∣ p − 1 = 4` and oddness of
+`a` force `a = 1`; the resulting trivial action on the orbit generator `S₀` contradicts
+`caseA_fixed_contradiction`.  In case (b), `CliffordCaseBData.u_dvd_norm_quotient` gives
+`u ∣ 31`.  The already-proved normality and commutativity of `H = PC`, together with its card/index
+formulas, then give the normal nilpotent Hall subgroup absorbed by `le_maxNilpotentNormalHall`. -/
 theorem pc_le_maxNilpotentNormalHall [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (hp5 : hyp.p = 5) (hq3 : hyp.q = 3) (hc7 : hyp.c = 7) :
     hyp.P ⊔ hyp.C ≤ maxNilpotentNormalHall hyp.S :=
-  sorry
+  by
+  haveI := hyp.finiteG
+  change hyp.H ≤ maxNilpotentNormalHall hyp.S
+  -- The (9.7) dichotomy: case (a) is impossible for `p - 1 = 4`; case (b) gives `u ∣ 31`.
+  have hu_dvd_31 : hyp.u ∣ 31 := by
+    obtain ⟨chief, -⟩ :=
+      OddOrder.Peterfalvi.S11.exists_chiefFactorData hG (hyp.toTypesIIIIIIVSetupS hG)
+    rcases OddOrder.Peterfalvi.S11.clifford_dichotomy hG
+        (hyp.mkSection11CharacterDataS hG chief) with hA | hB
+    · obtain ⟨caseA⟩ := hA
+      exfalso
+      have ha_dvd_4 : caseA.a ∣ 4 := by
+        have h := caseA.a_dvd_p_sub_one
+        rw [hyp.chiefFactorS_p_eq hG chief, hp5] at h
+        norm_num at h ⊢
+        exact h
+      have ha_cop_4 : Nat.Coprime caseA.a 4 := by
+        have h := (Nat.coprime_two_left.mpr
+          (OddOrder.Peterfalvi.S11.caseA_a_odd hG caseA)).symm.pow_right 2
+        norm_num at h ⊢
+        exact h
+      have ha_one : caseA.a = 1 :=
+        Nat.eq_one_of_dvd_coprimes ha_cop_4 dvd_rfl ha_dvd_4
+      have hrange_card : Nat.card
+          ↥(OddOrder.Peterfalvi.S11.aInvariantRestrictAut caseA.S0_aInvariant).range = 1 := by
+        rw [← caseA.a_eq_card_restrictAut_range, ha_one]
+      have hrange_bot :
+          (OddOrder.Peterfalvi.S11.aInvariantRestrictAut caseA.S0_aInvariant).range = ⊥ :=
+        Subgroup.card_eq_one.mp hrange_card
+      let j0 : Fin (hyp.toTypesIIIIIIVSetupS hG).q :=
+        ⟨0, (hyp.toTypesIIIIIIVSetupS hG).nontrivial.2.1.pos⟩
+      have hS0card : Nat.card ↥caseA.S0 = chief.p := by
+        have h := caseA.Hpart_order j0
+        rwa [caseA.Hpart_orbit j0, card_pointwise_smul] at h
+      have hS0ne : caseA.S0 ≠ ⊥ := by
+        intro hbot
+        rw [hbot, Subgroup.card_bot] at hS0card
+        exact chief.p_prime.one_lt.ne' hS0card.symm
+      refine OddOrder.Peterfalvi.S13.caseA_fixed_contradiction chief hS0ne ?_
+      intro v s hs
+      have hvRange :
+          OddOrder.Peterfalvi.S11.aInvariantRestrictAut caseA.S0_aInvariant v ∈
+            (OddOrder.Peterfalvi.S11.aInvariantRestrictAut caseA.S0_aInvariant).range :=
+        ⟨v, rfl⟩
+      rw [hrange_bot, Subgroup.mem_bot] at hvRange
+      have happ := congrArg
+        (fun f : MulAut ↥caseA.S0 => f ⟨s, hs⟩) hvRange
+      have hval := congrArg Subtype.val happ
+      change (OddOrder.Peterfalvi.S11.uActionHom (hyp.toTypesIIIIIIVSetupS hG) chief) v s = s
+      exact hval
+    · obtain ⟨caseB⟩ := hB
+      have h := caseB.u_dvd_norm_quotient
+      rw [hyp.mkSection11CharacterDataS_u_eq hG chief,
+        hyp.chiefFactorS_p_eq hG chief, hyp.toTypesIIIIIIVSetupS_q_eq hG, hp5, hq3] at h
+      norm_num at h ⊢
+      exact h
+  -- `|H| = 5^3·7` and `[S:H] = 3u`, with `u ∣ 31`, are coprime.
+  have hcop_u : Nat.Coprime (5 ^ 3 * 7) hyp.u :=
+    (show Nat.Coprime (5 ^ 3 * 7) 31 by norm_num).coprime_dvd_right hu_dvd_31
+  have hcop_three : Nat.Coprime (5 ^ 3 * 7) 3 := by norm_num
+  have hHcop : Nat.Coprime (Nat.card ↥hyp.H) ((hyp.H.subgroupOf hyp.S).index) := by
+    rw [hyp.card_H_eq hG, hyp.H_index_eq_uq hG, hp5, hq3, hc7]
+    exact Nat.Coprime.mul_right hcop_u hcop_three
+  have hHhall := OddOrder.BG.Ch4.S15.isHallSubgroup_primeFactors_of_coprime_index
+    hyp.H_le_S hHcop
+  haveI hHcomm : IsMulCommutative ↥(hyp.H.subgroupOf hyp.S) :=
+    OddOrder.GroupTheory.isMulCommutative_of_mulEquiv
+      (Subgroup.subgroupOfEquivOfLe hyp.H_le_S).symm (hyp.H_mulCommutative hG)
+  have hHnil : Group.IsNilpotent ↥(hyp.H.subgroupOf hyp.S) := inferInstance
+  exact OddOrder.BG.Ch4.S15.le_maxNilpotentNormalHall hyp.H_le_S
+    (H_sharp_subgroupOf_normal hyp) hHnil hHhall
 
-/-- **Peterfalvi (13.12), structural residual**: the numerically-forced case `p = 5, q = 3, c = 7`
-is impossible.  By `pc_le_maxNilpotentNormalHall`, `PC = P ⊔ C ≤ M_F = P` (`P_eq_SF`), so `C ≤ P`;
-but `|C| = c = 7` cannot divide `|P| = p^q = 125`.  The genuine gap is isolated in
-`pc_le_maxNilpotentNormalHall` (the `PC`-nilpotent-normal-Hall obligation, `typeP_Galois`-gated); the
-`C ≤ P ⟹ 7 ∣ 125` maximality contradiction is discharged here. -/
+/-- **Peterfalvi (13.12), structural residual**: the numerically-forced case
+`p = 5, q = 3, c = 7` is impossible.  By `pc_le_maxNilpotentNormalHall`,
+`PC = P ⊔ C ≤ M_F = P` (`P_eq_SF`), so `C ≤ P`; but `|C| = c = 7` cannot divide
+`|P| = p^q = 125`.  The preceding theorem discharges the Clifford/Singer Hall obligation;
+the remaining `C ≤ P ⟹ 7 ∣ 125` maximality contradiction is discharged here. -/
 theorem c_eq_one_final_case [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (hp5 : hyp.p = 5) (hq3 : hyp.q = 3) (hc7 : hyp.c = 7) : False := by
   -- `C ≤ P ⊔ C ≤ M_F = P`.
