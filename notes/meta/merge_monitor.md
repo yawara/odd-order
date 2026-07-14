@@ -623,6 +623,18 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 40) — a+b 合流: T-side prime-TI Dade cross-relation ほか / ⚠ orphan 1 件を hub 配線で修正**:
+  **a=1** (`132a1dbf` = section16 capstone boundary の docstring 訂正 (−6 hit は全て prose 内 `sorry` 言及、
+  comment-strip で両版 real 0 確認)。merge)。
+  **b=6** (`7439926c` = T-side A0-Dade vanish quartet `tauT_nu_vanish_on_V`、`320b7dd8` = ★ **tauT_nu_cross
+  (T-side prime-TI Dade cross-relation)**、`732a2573` = dade=Ind bridge chain、`6d7ef716` = reducible
+  T-member row distinctness + row-sum Dade image、`e7e0bd00` = 新 leaf `S15_TSetMemberRFamily` +169、
+  #52 依存監査。全 +642 additive、実 sorry 0。merge)。c=0。
+  ⚠ **orphan 検出→即修正**: 新 leaf `S15_TSetMemberRFamily` が root closure 外 (初回 build 4204 jobs =
+  未 elaborate)。gotcha 手順どおり hub が OddOrder.lean へ import 追加 (sanctioned) → **再 build green
+  4205 jobs** (+1 = 実 elaborate 確認)・orphan re-scan clean。b への申し送り: 新 leaf は作成 commit 内で
+  root 配線まで含めること (TSideDegrees の hub import は同 commit で実施済みだった — R-family leaf のみ漏れ)。
+  AxiomsCheck OK / census **46 不変** / 新 axiom なし / 逸脱なし。push 済。
 - **2026-07-14 (tick 39) — ★ b 合流: 9086 差し戻しに模範対応 + T-side 2035 campaign 大幅前進 / a docs**:
   **b=de-dup 済 tip `d5d6f0d2` を合流** (b は 9086 裁定を同期 merge `8675a186` 内で即消化 — dup leaf
   drop、cite 発生前に解消。net diff は TSideDegrees +314 (実 sorry 0) + issues のみで dup-free 確認済。
