@@ -135,3 +135,37 @@ signature を編集する。本 issue のトリガー節が b に適用したの
 
 CountingLayer 2001 行 (Route T step 3 で解消) / **CDS 2239 行 (b 分割要 — 2035 に記録)** /
 NuRowPin 1261 行 (watch 継続)。
+
+## 🧭 HUB 実施計画確定 (2026-07-15 tick 55) — Route T を 2 phase 化、Phase 1 を hub が claim
+
+**前提成立**: (i) hT2 弱化 = 実装完了 (b 2035 #82-#86: 供給 chain 全 sweep、param 型確定 =
+供給 chain IsTypeP / conclusional IsTypeP2 keep。θ-package core の残 sorryAx = nuGridSupply
+(9096) のみ)。(ii) a の OrderDetermination 移管 4 sorry は完遂済 (tick 48) — ただし a は同 file
+で case-A witness 群 (claims 1031-1034) を継続 landing 中 = **完全 quiet ではない** → 衝突回避は
+additive + legacy-wrapper 方式で行う (下記)。
+
+**Phase 分割**:
+- **Phase 1 (hub、本日実施 — 本節が claim)**: (13.4)-triple flip。
+  1. NormEstimates の 5 obtain-site decl (exists_caseB_data_eta10_T :295 / eta10_Qsharp_norm_lower /
+     analyticEstimate_lambda / analyticEstimate_eta / analyticCounting_disjointCover) +
+     analyticInequalityEstimates / analytic_inequality に **(hD : hyp.D = ⊥)(hv : …) 明示 param 版**を
+     導入 (hQ は card_Q_eq_qp cite で場内 discharge、TSideDegrees import 追加)。
+     **旧 signature は legacy wrapper として温存** (sorried legacy lambda_forces_T_caseB から
+     (hD,hv) を供給) — a の 3 obtain-site (numeric_bounds/c_eq_one/caseA_parameters) は無変更で
+     生き続ける = a の active work と非衝突。
+  2. S16 側 (TTypeII の T_side_caseB_facts 系が既に honest 供給を持つため、S16 spine の
+     analytic_inequality consumer を param 版 + T_caseB_facts_unconditional 供給へ rewire)。
+  3. legacy 完全 retire (CountingLayer の tSide_theta_package_of_not_caseB + lambda_forces_T_caseB
+     削除、実 sorry −1) は **a が 3 obtain-site を param 版へ移行後** (下記 a 宛 request)。
+- **Phase 2 (b の #22 rebase campaign 後)**: muT-index / (13.5.a)-integrality atom flip —
+  exists_muT_index / exists_etaT_alphaFun_one_int の statement 自体が rebase 修理で
+  book-faithful restate される見込み (2035 #22 発見 2) のため、restate 前の param 化は二度手間。
+  b の rebase campaign (Canonicalization/NormalCase/NormEstimates:806) landing 後に hub が実施。
+
+**調整 (lane 宛 request)**:
+- **a 宛**: 次の main sync 後、OrderDetermination の 3 obtain-site (:535/:855/:911 の
+  `analytic_inequality` cite) を param 版 `analytic_inequality_of_caseB_facts` + 供給 cite へ
+  切替 (機械的 3 行)。完了で hub が legacy retire。急がない (legacy wrapper が生きている)。
+- **b 宛**: rebase campaign の NormEstimates:806 / CountingLayer:1805 touch は **hub Phase 1
+  landing 後に** (本 claim の衝突回避。Phase 1 は本日中に landing 予定、次 tick 以降の
+  merge_monitor 記録参照)。
