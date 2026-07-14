@@ -525,11 +525,10 @@ noncomputable def Hypothesis.indT [Finite G] (hyp : Hypothesis (G := G)) :
 the (4.4)-at-`T` base sign (`NuGridSupplyData.deltaPrime_zero_eq_one`); off the anchor it is
 `deltaPrime_eq_one_of_ne_zero_T` (`TSideDegrees.lean`) — the (4.3.d)-at-`T` congruence
 `ν_{i0}(1) = δ'_i + p·a` against the **proven** Frobenius congruence `v ≡ 1 (mod p)`
-(`v_modEq_one`), exactly as `delta_eq_one_of_ne_zero` runs the `S`-side.  The ν-grid facts
-enter through the sorried producer `nuGridSupply` (a-owned canonical threading, issue 9096),
-and the single remaining `T`-side obligation inside the assembly is the (13.3.a)-at-`T`
-per-entry degree `nu_apply_one_eq_v` (see its docstring for the `|Q| = q^p` gate and the
-discharge routes). -/
+(`v_modEq_one`) and the **proven** (13.3.a)-at-`T` per-entry degree `nu_apply_one_eq_v`
+(via `card_Q_eq_qp`, the unconditional `|Q| = q^p`), exactly as `delta_eq_one_of_ne_zero`
+runs the `S`-side.  The ν-grid facts enter through the sorried producer `nuGridSupply`
+(a-owned canonical threading, issue 9096) — the assembly itself is sorry-free. -/
 theorem Hypothesis.deltaPrime_eq_one_T [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (i : Fin hyp.q) : hyp.deltaPrime i = 1 := by

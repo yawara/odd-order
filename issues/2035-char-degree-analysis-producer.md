@@ -1654,3 +1654,33 @@ S-side (13.3.b) forward gate 完全証明 (caseA + caseB pair-Clifford、3 subag
 
 build green (4136 jobs)。CharacterDegreeSupply 残 sorry = tSide_theta_package /
 T_caseB_facts_no_lambda の 2 本 (どちらも既知 gate、#36)。
+
+## 2026-07-14 更新 #38 (lane b, /loop iter 2) — ✅ (13.3.a)+(13.3.c)-at-T 完全証明: nu_apply_one_eq_v の gate 突破
+
+#37 で isolate した `nu_apply_one_eq_v` の gate (`|Q| = q^p`) を**破った**。「(14.9)-gated」は誤認で、
+§11/§13 の既存 sorry-free 資産で全 T_nonI 分岐が閉じる:
+
+- **`card_Q_eq_qp`** (|Q| = q^p、(13.2.b)-at-T、**無条件**):
+  - type II: (9.3) Wielandt order relation (Gate3 card_Q_eq と同計算、分岐仮定が IsTypeII を直接供給)
+  - type III/IV: **(11.7) は type III/IV maximal に対し既に無条件証明済み** (`S13.card_H_eq_of_base`
+    + `S13.S_H0C_not_coherent_unconditional` — (11.3) を Thm (10.8) unconditional から出す honest 経路;
+    Pf Hypothesis (11.2) は「(10.1) + M type III/IV」のみで noncoherence は帰結)。local w₁/w₂ ↔ 抽象 p/q
+    の同定は derived index (`card_W1_eq_derived_index` vs `W2_isComplement_T_deriv`) と κ-Hall 双対因子
+    橋 (`S10.card_Msigma_inf_centralizer_eq_card_W2` vs proven `W1_eq_Msigma_T_inf_centralizer_W2`)。
+  - type V: `no_typeV_maximal_unconditional`。
+- **§9-on-T kernel collapse**: `toTypesIIIIIIVSetupT_chief_N_eq_bot` / `_chief_H0_eq_bot` /
+  `_cSub_eq_D` (S-instance 三兄弟の mirror、card_Q_eq_qp が動力)。
+- **(13.3.a)-at-T**: `nu_rowSum_mem_sOf_H0_T` (pins) → `nu_i_isIndQD` (ν_i = Ind_{QD}^T linear、
+  `mu_j_isIndPC` mirror、generic `reducible_sOf_H0_isIndHC` + `mkSection11CharacterDataT`) →
+  `nu_apply_one_eq_v` (ν_{ij}(1) = v) **実証明化** (sorry 除去)。
+
+**#print axioms 検証済** (card_Q_eq_qp / v_modEq_one / nu_i_isIndQD / nu_apply_one_eq_v /
+deltaPrime_eq_one_of_ne_zero_T すべて [propext, Classical.choice, Quot.sound] のみ)。
+
+**⟹ (13.3.c) δ'_i = 1 は pins パラメトリックに sorry-free**。`deltaPrime_eq_one_T`
+(CharacterDegreeSupply) の残依存は `nuGridSupply` cite のみ (a の producer threading で消える形)。
+TSideDegrees.lean は **sorry 0**。#37 に記録した「discharge 経路 2 択」は不要になった (abstract 経路で完結)。
+
+次: (13.4) `tSide_theta_package_of_not_caseB_core` (残 2 sorry の上流側) — (13.3.b)-at-T
+(caseB_of_no_irreducible_sOf_H0Cprime T-instance) + ν-row τ₁-formula + 直交性。今回の
+S11-T-instance 基盤 (setupT/chars/chief collapse) がそのまま土台になる。
