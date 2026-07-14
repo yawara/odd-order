@@ -2752,3 +2752,19 @@ hub 再確定順序 (0116 tick 55 自己訂正: b の #22 campaign 先行 → hu
   ‖ν_i‖² = p / ν_i(1) = pv は nu_apply_one_eq_v 系) / **3/3** = etaT integrality
   (exists_etaT_alphaFun_one_int core 版、Q elementary abelian (13.2.b)-T mirror →
   α|_Q ∈ ℤ[Irr Q]、S-side eta10_cCoeff_int パターン)。
+
+## 2026-07-15 更新 #89 (lane b, /loop iter 3) — brick 2a landed + muT cCoeff の部品完全 map
+
+- **`3f9b57f6`** (sub-brick 2a): `Q_sharp_tau_eq_induce` (CountingLayer) —
+  (13.2.e)/(7.2)-for-T「(T,Q^#) TI-Dade = Ind_T^G」。H_sharp_tau_eq_induce の mirror、一発 green。
+- **muT cCoeff (brick 2 本体) の部品調査完了 — ほぼ全部 landed 済と判明**:
+  | 部品 | 状態 |
+  |---|---|
+  | τ = Ind bridge | ✓ 2a (本 commit) |
+  | τ₁T = Ind on K-induced diff | ✓ `tau1T_ofHonest_apply_induce_sub` (S15_Tau1T:660) |
+  | irr K-induction ⊥ η | ✓ `tau1T_ofHonest_induce_inner_eta` (:625、zSpanIrr 経由) |
+  | ν-row τ₁T formula | ✓ `tau1T_ofHonest_nuRow_eta_row` (:114) |
+  | ν-row = K-linear induced | ✓ `nu_i_isIndQD` + `nu_apply_one_eq_v` + `K_index_eq_vp` |
+  | **red K-induction → ν-row 分類** | **✗ 唯一の未 landed** (sSet_reducible_eq_nuRowSum は T'-induced 用; K-induced 版が要る — induce_K_mem_zSpan_sSet_irr_T :386 の証明が同素材 [constituent 展開+distinct-source 直交] を含むので流用可) |
+- **設計確定**: exists_muT_index core 版の引数 = (core 不要 — τ₁T carrier 直) hnoV/pins/hvd/hTP/Tdata/hU/hW1/hW2/chief + **hD : hyp.D = ⊥** (K=Q 化、(13.4) 帰結、Route T param と整合) + **hQcomm : IsMulCommutative ↥hyp.Q** (d≡1 + (13.5.a) 整数性; Q_elementaryAbelian_T は hTTypeII gated ゆえ直接 param が honest) + chosen base φ₀ (Q⊄Ker、Ind irr)。
+  distinguished index = ν_r の family index (r = nuRow formula で r'=1 になる行: clean→r=1/δ=1、flip→r=2/δ=−1)。他 index: irr→⊥η、red→ν_s (s≠r) → η_{s'} (s'≠1) ⊥ η₁₀。
