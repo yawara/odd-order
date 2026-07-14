@@ -2517,3 +2517,25 @@ caseB_order_u の a-landing 待ち部分を切り分け。
 item 1 `V_inf_centralizer_Q_eq_bot` (S15_SAndTBasic:841) = DAG-blocked で HOLD
 (hub 9077 追記 + 0116 Route T; c も独立検証で一致)。b への影響: FrobeniusStructure の
 編集は proof-only + docstring 注記のみ、signature/statement 不変。
+
+## 2026-07-14 更新 #78 (lane b, /loop iter 4) — ★ swap instantiation 完遂 — no-λ branch CLOSED
+
+#77 の 2 named gates を**実証明で discharge** (swap 機構の初の live 適用、一発 green):
+- **`d_eq_one`** = `c_eq_one hG (hyp.swap …)` — swap.c := hyp.d が定義的ゆえ index 輸送ゼロ。
+- **`T_side_D_eq_bot`** = d_eq_one + `d_eq_card_D` + `Subgroup.card_eq_one`。
+- **`T_caseB_v_eq_full (hqp)`** = swap 上の clifford_dichotomy:
+  caseA → `caseA_parameters` (a の (13.13)) が swap.q = hyp.p = 3 → 3 ≤ q < p と omega 矛盾 /
+  caseB → `caseB_order_u` (a の (13.15)、本日 landing) の第 2 枝 + q<p → q ≢ 1 (mod p)。
+  結論は定義的に hyp.v = (q^p−1)/(q−1)。
+- swap 入力は λ-branch と同じ house pattern で内部 summon (T_isTypeP2_gate [0116] /
+  isMulCommutative_V_unconditional / reconciled_typePData_T / nuGridSupply [a 9096])。
+
+**効果**: `T_caseB_facts_of_q_lt_p` は 2 named obligation (T_isTypeP2_gate / nuGridSupply)
+modulo で完全証明。**Supply file の bare sorry は T_isTypeP2_gate 1 本のみ**。T-side
+campaign の残 gate (#74 起点): **nuGridSupply (a、9096) + T_isTypeP2_gate (hub 0116) の
+2 本に collapse** — refuter-T ✓ / no-λ engine ✓ とも CLOSED。
+
+次 frontier 候補 (文書順): (i) 9094 案 A 残り (2/3 conditional producer — Canonicalization
+cCoeff rebase 修理、3/3 NormEstimates 5 定理移行)、(ii) S15_SAndTBasic 残 sorry
+(772/969、V_inf:841 は c carve-out)、(iii) SubcoherenceInputs/HypothesisBasics/
+DegreesFirstSplit/TSideDegrees の残 sorry 群の census。
