@@ -631,6 +631,16 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 42) — a+b 合流: (9.7.b) conjugation field model (shared leaf) + caseA-T base-cut coherence**:
+  **a=1** (`fcb25e47` = ★ **norm-one conjugation field model 構築** — (9.7.b) faithful carrier の新
+  shared leaf `GroupTheory/RepresentationTheory/ConjugationFieldModel.lean` +199 (sorry 0)。
+  **claim 9097 起票→close・OddOrder.lean 配線・AxiomsCheck assert 13 本まで 1 commit 内で完備**
+  (手順の模範実施)。c の 0115 Campaign B (T-side Singer field model) の上流部品。merge)。
+  **b=3** (`b8ce4654`/`f98a61ea`/`5da34f33` = caseA-T 設計監査 #62 + sSetIrrDegT uniform-degree cut +
+  **caseA-T base-cut coherence (subcoherent + (5.7) producer)**。S15_TSetMemberRFamily +202、実 sorry 0。
+  merge)。c=0 (operator 起動待ち)。b は追加 3 file 編集中 (稼働中、非接触)。
+  build green **4206 jobs** (+1 = ConjugationFieldModel 実 elaborate) / AxiomsCheck OK / census **46 不変** /
+  新 axiom なし / 逸脱なし / orphan clean。push 済。
 - **2026-07-14 (tick 41) — ★ b 合流 (caseB-T (9.11) coherence) + レーン再設計裁定 (issue 0115/0116)**:
   **b=6** (`4ae89c31`/`d8ec3e45`/`fd2c0675`/`cc3fa98a` = ★ **caseB-T (9.11) coherence
   `sSet_coherent_dade_caseB_T`** + (5.2.e) cross-orthogonality + dadeT0 regular-set vanishing +
