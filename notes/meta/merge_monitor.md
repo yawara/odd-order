@@ -221,6 +221,16 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > `S09_NonexistenceCertain.lean` 等を編集したら逸脱）。lane b は別ファイル隔離ゆえ lane a の S09 本体と
 > 衝突しない。恒久解（現状維持 / `S07_*` rename / S09 統合）は issue 0090 で追跡。
 >
+> **carve-out 拡張 (issue 0090 同型, hub 裁定 2026-07-14 tick 52 — merge 79920646)**:
+> `OddOrder/Peterfalvi/S09_NonexistenceCertain/NormalCase.lean` のうち **b の (7.7.a)
+> certificate/rebase cluster 宣言** (`zeta_sum_div_normSq_apply_eq_zero` /
+> `chiRho_decomp_rebased` + 今後の同 cluster additive 追加、2035 #22 rebase campaign) は
+> **lane b 所有 decl** として扱う (0090 S09_CertificateDischarge と同内容クラス = (7.7.a)
+> CF(L,A)/ρ-family 基盤; 名目 regex でなく内容で割当)。根拠: 純 additive (+133/-0)・
+> sorry-free・a は S09 非接触。⟹ step 1.5 で b が NormalCase.lean にこの cluster の
+> additive 宣言を足しても逸脱でない (既存 a 宣言の statement/proof 改変は従来どおり逸脱;
+> 混在 leaf ゆえ decl 単位判定)。
+>
 > **carve-out (issue 0096, hub 裁定 2026-07-02 ユーザー委任レビュー)**:
 > `OddOrder/Peterfalvi/S10_MinimalSimpleStructure.lean`（原則 lane a）のうち **§8 Dade-support 宣言群**
 > — `typeII_A_sets_TI` / `typeII_A_sets_normalizer` / `dadeSupportHypotheses_typeI` /
@@ -631,6 +641,17 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 52) — a field-model/Sylow 2 leaf + b rebase bricks 1-3。census 37 不変**:
+  **a=2** (`d19dba88`/`303b1d73` = **(9.7.b) case B chief-factor field model** (新 leaf
+  S11_GaloisFieldModel、issue 1031) + **noncyclic sharp scalar Sylow 強制** (shared
+  BlockScalarSylow、claim 9101 完備)。⚠ S11_GaloisFieldModel が orphan → hub が OddOrder.lean
+  追記 (step 3b)。merge)。
+  **b=3** (`f8642a56`〜`2536a1d0` = **#22 rebase 修理 campaign brick 1-3** — shared
+  InducedIrreducible へ abelian rebase 恒等式 + **S09_NonexistenceCertain/NormalCase.lean に
+  rebased (7.7.a)** (純 additive +133、sorry-free)。🧭 **carve-out 拡張付与** (0090 同型、
+  上記 carve-out 節参照)。merge)。**c=0** (sync のみ、gated-endpoint hold 継続)。
+  build green 4219 jobs (+3) ×2 / AxiomsCheck OK / census **37 不変** / 新 axiom なし /
+  逸脱なし (carve-out 裁定込み)。push 済 (main = 79920646)。
 - **2026-07-14 (tick 51) — ★ c が RULING #4′ 実施 = sibleyTarget_frobI 完全 close。census 37**:
   **a=0**。**b=1+merge** (`ed8ed811` = docs 2035 **#79 b-owned sorry 全数 gating map**。
   hub 宛 lever 情報: ⑤ flip (NormEstimates 5 obtain-site の chars→core/lam 化) = 0116 本体で
