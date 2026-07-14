@@ -623,6 +623,17 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 33) — ★ b 合流: 9096 RULING 実施 = NuGridSupplyData pure grid 化 + T-side (13.3.c) δ'=1 assembly**:
+  **b=2** (`701fb8f4` = bundle split 手術: `V_commutative` field 削除・`Hypothesis.swap` に明示引数 `hV`
+  追加 (hT2 直後)・consumer 2 箇所は既存 hT2 から (14.9) 系 theorem 経由で内部導出 = signature 不変。
+  `98fb5a14` = T-side (13.3.c) `deltaPrime_eq_one_T` **sorry 実 discharge** + 新 leaf
+  `S15_SAndT_Setup/TSideDegrees.lean` +343 (nu identity-value scaffold 1 本 = a の 1030 threading が
+  埋める前提、faithful)。9096 に実施報告 + 新 signature の a 宛通知を自己記録)。a=0 / c=0。
+  build green **4204 jobs** (2m31s) / AxiomsCheck OK / count-sorry **49→49 不変** (S15 内で −1 実証明
+  +1 新 scaffold) / 新 axiom なし / 逸脱なし (全 b-owned S15 cluster) / orphan scan clean (TSideDegrees
+  は S15_CharacterDegreeSupply が import)。merge `8e83c01a`、push 済。
+  ⟹ **9096 ruling item 2 完了 → a の producer thread (item 3, issue 1030) が un-gate**。a は現在
+  probe 作業中 (未コミット) — 次 tick 以降で 1030 landing を監視。
 - **2026-07-14 — 監視再開 (ユーザー指示「監視を再開して」)**: cron `88a50cb0` を Fable 規定ペース
   `13,43 * * * *` (30 分間隔) で再作成。再開時点: main = `4fdf38ce` (push 済・tree clean・full build
   green 4203 jobs)、`main..{a,b,c}` = 0、lane a は main 同期済 tree clean (codex 再開待ち)、b/c は
