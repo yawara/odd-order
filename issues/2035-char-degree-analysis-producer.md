@@ -1830,3 +1830,27 @@ mathlib のみ依存): `commutator_eq_bot_of_isCyclic_quotient` + `isMulCommutat
      → 新 shared lemma → IsMulCommutative ↥V。
 - 帰結: `Cprime-T = derivedInG D = ⊥` (D ≤ V' … V abelian → V' = ⊥ → D = ⊥!実は V abelian
   なら D ≤ V' = ⊥ で **D = ⊥ まで出る**) → sSet_eq_sOf_H0Cprime-T → step 2 uniform degree。
+
+## 2026-07-14 更新 #44 (lane b, /loop iter 7) — ✅ isMulCommutative_V_unconditional: (13.2.a)-T V-side が完全 ungated
+
+#43 の複雑な route (conjugation transport + (11.6)-T + cyclic-abelianization) は**不要だった**:
+repo 精査で **S13_NonGaloisExclusion が (11.9.c) を sorry-free で完備**していると判明 —
+`not_isTypeIV_of_mem_maximalSubgroups` (universal type-IV 排除) + `isTypeIII_of_hypothesis` +
+`isMulCommutative_typePData_U_of_typePData_U` (witness 間 Schur–Zassenhaus conjugacy transfer)。
+
+**`Hypothesis.isMulCommutative_V_unconditional`** (TSideDegrees、sorry-free、
+#print axioms clean): T_nonI 4 分岐 — II/III は witness `U_commutative` + conjugacy transfer で
+reconciled `tpd.U = V` へ、IV は (11.9.c) universal 排除、V は (10.10)。
+
+**波及**:
+1. **caseB-T の D-abelian 解決**: D ≤ V abelian → D abelian → `Cprime-T = derivedInG D = ⊥`
+   (#42/#43 の障害消滅)。V abelian は caseB 前提すら不要。
+2. **9096 hV 供給の unconditional 化**: `Hypothesis.swap` の `hV` は
+   isMulCommutative_V_unconditional で直接供給可能 (hT2 → dictionary 経由は不要に;
+   既存 consumer は変更不要だが a の producer threading はこちらを使える)。→ 9096 に通知。
+3. hub audit (9096) の「V_commutative = post-(14.9) fact」は audit 当時は正しかったが、
+   (11.9.c) chain (S13_NonGaloisExclusion、issue 1024) の landing により**現在は ungated**。
+   NuGridSupplyData から外した判断自体は正しいまま (grid fact でないことに変わりなし)。
+
+新 shared leaf `NilpotentCyclicAbelianization` (#43 で landing 済) は独立の価値で保持
+(mathlib 級の一般補題)。次: sSet_eq_sOf_H0Cprime-T (Cprime = ⊥ 経由) → step 2 uniform degree。

@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S13_CoreStructure
+import OddOrder.Peterfalvi.S13_NonGaloisExclusion
 import OddOrder.Peterfalvi.S13_TypeDetermination
 import OddOrder.Peterfalvi.S15_SAndT_Setup.CountingLayer
 import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisSwap
@@ -884,5 +885,33 @@ theorem Hypothesis.sSet_reducible_eq_nuRowSum [Finite G]
       ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
         ((derivedInG hyp.T).subgroupOf hyp.T) (⊥ : Subgroup ↥hyp.T) := hKeq ▸ hmemHU
   exact pins.nu_reducible_dichotomy hmem hirr
+
+/-- **Peterfalvi (13.2.a) at `T`, `V`-side — unconditional**: the complement `V` is abelian,
+with **no** (14.9) input.  The `T_nonI` classification: a type-II or type-III witness carries
+`U_commutative`, transported to the reconciled complement `V` by the Schur–Zassenhaus
+conjugacy transfer (`isMulCommutative_typePData_U_of_typePData_U`); type IV is excluded
+unconditionally by Peterfalvi (11.9.c) (`not_isTypeIV_of_mem_maximalSubgroups`,
+`S13_NonGaloisExclusion` — sorry-free); type V by (10.10).
+
+This supersedes the (14.9)-gated route (`isMulCommutative_V`, which consumes `IsTypeII T`):
+the (11.9.c) chain landing makes the `V`-side (13.2.a) an unconditional §13 fact.  It is the
+`D`-abelian input of the caseB-`T` coherence (`Cprime-T = derivedInG D = ⊥`) and an
+unconditional supply for `Hypothesis.swap`'s `hV`. -/
+theorem Hypothesis.isMulCommutative_V_unconditional [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    IsMulCommutative ↥hyp.V := by
+  obtain ⟨tpd, hU, -, -⟩ := reconciled_typePData_T hG hyp
+  rw [← hU]
+  rcases hyp.T_nonI with h | h | h | h
+  · obtain ⟨w⟩ := h
+    exact OddOrder.Peterfalvi.S13.isMulCommutative_typePData_U_of_typePData_U hG
+      hyp.T_maximal w.typeP tpd w.U_commutative
+  · obtain ⟨w⟩ := h
+    exact OddOrder.Peterfalvi.S13.isMulCommutative_typePData_U_of_typePData_U hG
+      hyp.T_maximal w.typeP tpd w.U_commutative
+  · exact absurd h
+      (OddOrder.Peterfalvi.S13.not_isTypeIV_of_mem_maximalSubgroups hG hyp.T_maximal)
+  · exact absurd ⟨hyp.T, hyp.T_maximal, h⟩
+      (OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional hG)
 
 end OddOrder.Peterfalvi.S15

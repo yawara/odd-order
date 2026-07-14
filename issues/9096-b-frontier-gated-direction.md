@@ -191,3 +191,12 @@ S15 の grid-dependent chain (`typeIBetaL_eta_col_constant`, `typeI_caseC_dual_d
 `typeII_overNormalizer_frobenius`) に explicit `pins` を通し、c-owned S16 callers が
 `hyp.nuGridSupply` を渡す。これにより generic S15 hypothesis を不当に強化せず、canonical
 Section 16 construction だけが pure ν-grid facts を供給する。
+
+## 📣 b 追加通知 (2026-07-14, /loop iter 7): swap の hV 供給が unconditional 化
+
+`Hypothesis.isMulCommutative_V_unconditional` (TSideDegrees.lean、sorry-free) が landed:
+(11.9.c) chain (S13_NonGaloisExclusion — universal type-IV 排除 + witness conjugacy transfer) に
+より、`IsMulCommutative ↥hyp.V` は **(14.9) 入力なし**で証明済み。a の producer threading で
+`Hypothesis.swap` の `hV` 引数はこれで直接埋められる (consumer 側の hT2-dictionary 経由も
+そのまま有効)。audit の「V_commutative = post-(14.9) fact」判定は audit 時点では正しかったが
+現在は解消 (bundle から外す API 設計自体は grid/structural 分離として引き続き正)。
